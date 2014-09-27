@@ -270,17 +270,3 @@ L.Control.Inspect = L.Control.extend({
 L.control.inspect = function (options) {
 	return new L.Control.Inspect(options);
 };
-
-
-
-// inspect layers
-//
-// must be connected to layermenu somehow. 
-// also connected to descriptionControl
-// each active layer must appear in inspect layers.
-//	// drag n drop zindex
-//      // eye - isolate layers
-//      // show which is active, which will be the layer that's active in description
-//
-//
-//
