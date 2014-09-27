@@ -98,13 +98,6 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 
 
 
- //   ____                            _   
- //  / ___|___  _ __  _ __   ___  ___| |_ 
- // | |   / _ \| '_ \| '_ \ / _ \/ __| __|
- // | |__| (_) | | | | | | |  __/ (__| |_ 
- //  \____\___/|_| |_|_| |_|\___|\___|\__|
-                                       
-
 Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 	type : 'connect',			
@@ -230,14 +223,7 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 })
 
 
-
-
- //  ____                 _                              
- // | __ )  __ _ ___  ___| |    __ _ _   _  ___ _ __ ___ 
- // |  _ \ / _` / __|/ _ \ |   / _` | | | |/ _ \ '__/ __|
- // | |_) | (_| \__ \  __/ |__| (_| | |_| |  __/ |  \__ \
- // |____/ \__,_|___/\___|_____\__,_|\__, |\___|_|  |___/
- //                                  |___/               
+                                    
 Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 	type : 'baseLayers',
@@ -559,12 +545,7 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 
 
- //  _                          __  __                  
- // | |    __ _ _   _  ___ _ __|  \/  | ___ _ __  _   _ 
- // | |   / _` | | | |/ _ \ '__| |\/| |/ _ \ '_ \| | | |
- // | |__| (_| | |_| |  __/ |  | |  | |  __/ | | | |_| |
- // |_____\__,_|\__, |\___|_|  |_|  |_|\___|_| |_|\__,_|
- //             |___/                                   
+                             
 Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	type : 'layerMenu',
@@ -783,11 +764,6 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 
 
- //  ____           _ _   _             
- // |  _ \ ___  ___(_) |_(_) ___  _ __  
- // | |_) / _ \/ __| | __| |/ _ \| '_ \ 
- // |  __/ (_) \__ \ | |_| | (_) | | | |
- // |_|   \___/|___/_|\__|_|\___/|_| |_|
 
 Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 
@@ -895,12 +871,7 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 
 });
 
- //  ____                        _     
- // | __ )  ___  _   _ _ __   __| |___ 
- // |  _ \ / _ \| | | | '_ \ / _` / __|
- // | |_) | (_) | |_| | | | | (_| \__ \
- // |____/ \___/ \__,_|_| |_|\__,_|___/
-                                    
+
 
 Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 
@@ -1165,13 +1136,7 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 
 
 
-
- //   ____            _             _     
- //  / ___|___  _ __ | |_ _ __ ___ | |___ 
- // | |   / _ \| '_ \| __| '__/ _ \| / __|
- // | |__| (_) | | | | |_| | | (_) | \__ \
- //  \____\___/|_| |_|\__|_|  \___/|_|___/
-                                       
+                       
 Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 	type : 'controls',
