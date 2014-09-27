@@ -19,36 +19,41 @@
 	cursor: pointer;
 
 }
+
 .baselayertoggle-item:hover {
 	background: yellow;
 }
+
 .baselayertoggle-item.active {
 	background: green;
 	color: white;
 }
+
 .baselayertoggle-list {
 	position: relative;
 	left: 22px;
 	top: -1px;
 }
+
 .collapsed {
 	visibility: hidden;
 }
+
 .expand {
 	display: block;
 }
-
-
 
 /*clients*/
 .client-logo {
 	width: 100px;
 	height: 60px;
 }
+
 .client-logo.editable:hover {
 	border: 1px solid yellow;
 	cursor: copy;
 }
+
 .project-logo.editable:hover {
 	border: 1px solid yellow;
 	cursor: copy;
@@ -106,7 +111,6 @@
 	vertical-align: top;
 }
 
-
 /*sidepane documents*/
 #documents-container-textarea h2 {
 	color: red;
@@ -121,8 +125,6 @@
 	font-size: 120%;
 	color: yellow;
 }
-
-
 
 /*grande plugin attachments*/
 .grande-sources-container {
@@ -147,14 +149,13 @@
 	overflow: hidden;
 }
 
-
 .grande-sources-container div:nth-child(2) {
 	border-radius: 5px 5px 0px 0px;
 }
+
 .grande-sources-container div:last-child {
 	border-radius: 0px 0px 5px 5px;
 }
-
 
 .grande-sources-source:hover {
 	background: #60d778;
@@ -187,15 +188,3 @@
 	padding-top: 1px !important;
 	width: 245px !important;
 }
-
-
-
-
-
-
-
-
-
-
-
-

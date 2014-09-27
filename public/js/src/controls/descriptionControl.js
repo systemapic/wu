@@ -37,14 +37,6 @@ L.Control.Description = L.Control.extend({
 
 		this._outer.appendChild(this._inner);
 
-
-
-		// Wu.DomEvent.on(this._outer, 'mousewheel', fetta, this);
-		// Wu.DomEvent.on(this._inner, 'mousewheel', kuken, this);
-		// function fetta() { console.log("Scrolling on description-control-inner-content-box") };
-		// function kuken() { console.log("Scrolling on description-scroller") };
-
-
 		// get legends container
 		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
 		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');

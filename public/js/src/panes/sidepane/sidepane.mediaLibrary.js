@@ -11,50 +11,40 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 		// create container (overwrite default) and insert template			// innerHTML
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content, ich.mediaLibrary({ media : 'this is media!' }));
 
-		// get pane
+		// get panes
 		this._innerContent = Wu.DomUtil.get('mediaLibrary-inner-content');
 
-
-		
-
-
 		this._leftImage = {}
-		this._leftImage.innerSlider = Wu.DomUtil.get("mediaLibrary-inner-slider-left");
-		this._leftImage.grabGrid = Wu.DomUtil.get("mediaLibrary-grabgrid-left");
-		this._leftImage.Image = Wu.DomUtil.get("mediaLibrary-image-container-left");
-		this._leftImage.Image.img = this._leftImage.Image.getElementsByTagName("img")[0];
+		this._leftImage.innerSlider 	= Wu.DomUtil.get("mediaLibrary-inner-slider-left");
+		this._leftImage.grabGrid 	= Wu.DomUtil.get("mediaLibrary-grabgrid-left");
+		this._leftImage.Image 		= Wu.DomUtil.get("mediaLibrary-image-container-left");
+		this._leftImage.Image.img 	= this._leftImage.Image.getElementsByTagName("img")[0];
 		this._leftImage.nativeResolution = Wu.DomUtil.get("mediaLibrary-data-resolution-l");
-		this._leftImage.filename = Wu.DomUtil.get("mediaLibrary-data-filename-l");
-		this._leftImage.fileCaptured = Wu.DomUtil.get("mediaLibrary-data-captured-l");
-		this._leftImage.fileUploaded = Wu.DomUtil.get("mediaLibrary-data-uploaded-l");
-		this._leftImage.fileUploadedBy = Wu.DomUtil.get("mediaLibrary-data-uploaded-by-l");
-		this._leftImage.percent = Wu.DomUtil.get("mediaLibrary-percent-left-side");
-		this._leftImage.zoomIn = Wu.DomUtil.get("mediaLibrary-zoom-in-left");
-		this._leftImage.zoomOut = Wu.DomUtil.get("mediaLibrary-zoom-out-left");
-
-
+		this._leftImage.filename 	= Wu.DomUtil.get("mediaLibrary-data-filename-l");
+		this._leftImage.fileCaptured 	= Wu.DomUtil.get("mediaLibrary-data-captured-l");
+		this._leftImage.fileUploaded 	= Wu.DomUtil.get("mediaLibrary-data-uploaded-l");
+		this._leftImage.fileUploadedBy 	= Wu.DomUtil.get("mediaLibrary-data-uploaded-by-l");
+		this._leftImage.percent 	= Wu.DomUtil.get("mediaLibrary-percent-left-side");
+		this._leftImage.zoomIn 		= Wu.DomUtil.get("mediaLibrary-zoom-in-left");
+		this._leftImage.zoomOut 	= Wu.DomUtil.get("mediaLibrary-zoom-out-left");
 
 		this._rightImage = {}
-		this._rightImage.innerSlider = Wu.DomUtil.get("mediaLibrary-inner-slider-right");
-		this._rightImage.grabGrid = Wu.DomUtil.get("mediaLibrary-grabgrid-right");
-		this._rightImage.Image = Wu.DomUtil.get("mediaLibrary-image-container-right");
-		this._rightImage.Image.img = this._rightImage.Image.getElementsByTagName("img")[0];
+		this._rightImage.innerSlider 	= Wu.DomUtil.get("mediaLibrary-inner-slider-right");
+		this._rightImage.grabGrid 	= Wu.DomUtil.get("mediaLibrary-grabgrid-right");
+		this._rightImage.Image 		= Wu.DomUtil.get("mediaLibrary-image-container-right");
+		this._rightImage.Image.img 	= this._rightImage.Image.getElementsByTagName("img")[0];
 		this._rightImage.nativeResolution = Wu.DomUtil.get("mediaLibrary-data-resolution-r");
-		this._rightImage.filename = Wu.DomUtil.get("mediaLibrary-data-filename-r");
-		this._rightImage.fileCaptured = Wu.DomUtil.get("mediaLibrary-data-captured-r");
-		this._rightImage.fileUploaded = Wu.DomUtil.get("mediaLibrary-data-uploaded-r");
+		this._rightImage.filename 	= Wu.DomUtil.get("mediaLibrary-data-filename-r");
+		this._rightImage.fileCaptured 	= Wu.DomUtil.get("mediaLibrary-data-captured-r");
+		this._rightImage.fileUploaded 	= Wu.DomUtil.get("mediaLibrary-data-uploaded-r");
 		this._rightImage.fileUploadedBy = Wu.DomUtil.get("mediaLibrary-data-uploaded-by-r");
-		this._rightImage.percent = Wu.DomUtil.get("mediaLibrary-percent-right-side");
-		this._rightImage.zoomIn = Wu.DomUtil.get("mediaLibrary-zoom-in-right");
-		this._rightImage.zoomOut = Wu.DomUtil.get("mediaLibrary-zoom-out-right");
+		this._rightImage.percent 	= Wu.DomUtil.get("mediaLibrary-percent-right-side");
+		this._rightImage.zoomIn 	= Wu.DomUtil.get("mediaLibrary-zoom-in-right");
+		this._rightImage.zoomOut 	= Wu.DomUtil.get("mediaLibrary-zoom-out-right");
 
-
-
-		
-		
-		
 
 	},
+
 
 	_addHooks : function () {
 
@@ -63,19 +53,19 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 
 		// Zooming in on Left Image
 		Wu.DomEvent.on(this._leftImage.zoomIn, 'mousedown', function() { this.zoomInImg('left') }, this);
-		Wu.DomEvent.on(this._leftImage.zoomIn, 'mouseup', function() { this.zoomInImg_stop('left') }, this);
+		Wu.DomEvent.on(this._leftImage.zoomIn, 'mouseup',   function() { this.zoomInImg_stop('left') }, this);
 
 		// Zooming out on Left Image
 		Wu.DomEvent.on(this._leftImage.zoomOut, 'mousedown', function() { this.zoomOutImg('left') }, this);
-		Wu.DomEvent.on(this._leftImage.zoomOut, 'mouseup', function() { this.zoomOutImg_stop('left') }, this);
+		Wu.DomEvent.on(this._leftImage.zoomOut, 'mouseup',   function() { this.zoomOutImg_stop('left') }, this);
 		
 		// Zooming in on Right Image
 		Wu.DomEvent.on(this._rightImage.zoomIn, 'mousedown', function() { this.zoomInImg('right') }, this);
-		Wu.DomEvent.on(this._rightImage.zoomIn, 'mouseup', function() { this.zoomInImg_stop('right') }, this);
+		Wu.DomEvent.on(this._rightImage.zoomIn, 'mouseup',   function() { this.zoomInImg_stop('right') }, this);
 
 		// Zooming out on Right Image
 		Wu.DomEvent.on(this._rightImage.zoomOut, 'mousedown', function() { this.zoomOutImg('right') }, this);
-		Wu.DomEvent.on(this._rightImage.zoomOut, 'mouseup', function() { this.zoomOutImg_stop('right') }, this);
+		Wu.DomEvent.on(this._rightImage.zoomOut, 'mouseup',   function() { this.zoomOutImg_stop('right') }, this);
 
 
 	},
@@ -128,10 +118,10 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 				var currentPercent = Math.round((_imgWidth / currentActiveNativeWidth) * 100);
 				that._leftImage.percent.innerHTML = currentPercent;
 				
-				imgContainer.style.width = _imgWidth + 'px';
+				imgContainer.style.width  = _imgWidth           + 'px';
 				imgContainer.style.height = _imgWidth * hw_prop + 'px';
-				imgContainer.style.left = _imgLeft + 'px';
-				imgContainer.style.top = _imgTop + 'px';
+				imgContainer.style.left   = _imgLeft            + 'px';
+				imgContainer.style.top    = _imgTop             + 'px';
 
 			}, 10);
 		}
@@ -451,7 +441,6 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 
 		var crunchPath = 'http://85.10.202.87:8080/pixels/';
 
-
 		var jpegs = _.filter(files, function (f) {
 			return f.format.indexOf('jpg') > -1;
 		});
@@ -523,9 +512,9 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 	// Will be called when user starts dragging an element
 	_initDragging : function () {
 
-			// Store the object of the element which needs to be moved
-		    this.__x_elem = this.__x_pos - this._leftImage.Image.img.offsetLeft;
-		    this.__y_elem = this.__y_pos - this._leftImage.Image.img.offsetTop;
+		// Store the object of the element which needs to be moved
+		this.__x_elem = this.__x_pos - this._leftImage.Image.img.offsetLeft;
+		this.__y_elem = this.__y_pos - this._leftImage.Image.img.offsetTop;
 
 		this._draggingLeftImage = true;
 
@@ -545,16 +534,11 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 
 				this._leftImage.Image.img.style.left = __new_X + 'px';
 				this._leftImage.Image.img.style.top = __new_Y + 'px';
-
-
 			}
-
 	},	
 
 	_stopDragging : function () {
-
 		this._draggingLeftImage = false;
-
 	},
 
 	reset : function () {

@@ -24,12 +24,12 @@ var crypto      = require('crypto');
 var nodemailer  = require('nodemailer');
 
 
-
 // superusers
 var superusers = [
 			'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', // KO
 			'user-e6e5d7d9-3b4c-403b-ad80-a854b0215831'  // J
 		]
+
 // convenience method for checking hardcoded super user
 function superadmin(user) {
 	if (superusers.indexOf(user.uuid) >= 0) return true;

@@ -221,5 +221,3 @@ Wu.App = Wu.Class.extend({
 	}
 
 });
-
-

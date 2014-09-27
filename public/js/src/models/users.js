@@ -478,5 +478,3 @@ Wu.User = Wu.Class.extend({
 	},
 
 });
-
-
