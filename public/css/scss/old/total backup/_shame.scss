@@ -1,0 +1,249 @@
+.q-editor-container {
+	overflow: hidden;
+	z-index: 2000;
+	
+}
+
+
+
+#app {
+	z-index: 200;
+	}
+
+.g-body {
+	z-index: 35000;	
+	top: 5px;
+	left: -17px;
+	position: relative;
+	}
+
+.middle-item {
+	width: 100%;
+	height: 30px;
+	background: gainsboro;
+	padding: 4px;
+	color: #666;
+	cursor: pointer;
+	position: relative;
+	margin: 0;	
+	margin-bottom: 10px;
+	text-indent: 6px;
+	line-height: 1.3;
+	text-shadow: none;
+	font-size: 123%;
+	text-align: left;
+	font-weight: 200;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+	
+	}
+	
+.middle-item:hover {
+	background: white;
+	}
+	
+	
+#layers-mapbox h4,
+#layers-library h4 {
+	margin-top: 30px;
+	font-size: 200%;
+	border-bottom: 1px solid gainsboro;
+	padding-bottom: 10px;
+	margin-bottom: 0px;
+	color: white;
+	opacity: 1;
+	}	
+
+.layers-mapbox-name {
+	text-transform: capitalize;
+	margin: 10px;
+	font-size: 130%;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+	font-weight: 100;
+	margin-bottom: 4px;
+	margin-left: 4px;
+	opacity: 1;
+	}
+	
+	
+.active-layer {
+	background: gainsboro;
+	color: #666;
+	}	
+	
+.active-layer:hover {
+	background: white;
+	color: #666;
+	}		
+	
+#layers-library-list {
+	margin: 10px;
+	margin-top: 20px;	
+	}
+	
+	
+	
+	
+#editor-layers-connect-mapbox,
+#editor-layers-upload {
+	background: rgba(255, 255, 255, 0.15);
+	height: 40px;
+	padding: 10px;
+	padding-left: 17px;
+	color: white;
+	}
+	
+.mapbox-connect-wrap,
+.datalibrary-connect-wrap {
+	position: relative;
+	background: rgba(255, 255, 255, 0.15);
+	color: white;
+	margin: 0;
+	padding: 16px;	
+	padding-top: 10px;
+	padding-top: 4px;
+	height: 55px;
+	}	
+	
+#import-mapbox-layers-ok,
+#import-datalibrary-layers-ok {
+	background: #DADADA;
+	color: #666;	
+	}	
+	
+#import-mapbox-layers-ok:hover, 
+#import-datalibrary-layers-ok:hover	{
+	background: white;
+	}
+	
+	
+	
+
+
+
+
+// TAKE OVER FOR KNUT!!! ~ USER PANE
+
+.users-projects-checkwrap {
+	position: absolute;
+	width: 64px;
+	left: 0;
+	padding: 10px;
+	background: rgba(0, 0, 0, 0.2);
+	height: 37px;
+	border-right: 1px solid rgba(255, 255, 255, 0.2);
+	border-bottom: 1px solid white;
+	}
+	
+.users-projects-itemwrap:nth-child(even) {
+	background-color: rgba(0,0,0,0.6);
+	}	
+
+.users-projects-itemwrap:nth-child(odd) {
+	background-color: rgba(0,0,0,0.5);
+	}	
+	
+.projects-select-cancel {
+	height: 28px;
+	color: gainsboro;
+	background: #646464;
+	padding: 3px 10px 5px 10px;
+	text-align: center;
+	margin: 0px;
+	font-weight: 200;
+	cursor: pointer;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+	font-size: 100%;
+	display: inline-block;
+	vertical-align: top;
+	margin-top: 7px;
+	}	
+
+.projects-select-confirm {
+	height: 28px;
+	color: gainsboro;
+	background: #646464;
+	padding: 3px 10px 5px 10px;
+	text-align: center;
+	margin: 0px;
+	font-weight: 200;
+	cursor: pointer;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+	font-size: 100%;
+	display: inline-block;
+	vertical-align: top;
+	margin-top: 7px;
+	margin-left: 3px;
+	}
+	
+	
+.users-projects-top-title {
+	color: white;
+	font-size: 130%;
+	padding-left: 9px;
+	font-weight: 100;
+	background: rgba(0, 0, 0, 0.49);
+	width: 63px;
+	letter-spacing: 2.8px;
+	position: relative;
+	border-bottom: 1px solid white;
+	}	
+	
+.users-projects-itemwrap {
+	width: 300px;
+	height: 37px;
+	background: rgba(0,0,0,0.5);
+	position: relative;
+	border-bottom: 1px solid white;
+	}	
+	
+.users-projects-checkwrap:before, .users-projects-top-title:before {
+	content: '';
+	width: 0px;
+	height: 37px;
+	left: 30px;
+	position: absolute;
+	top: 0;
+	border-right: 1px dashed rgba(255,255,255,0.1);
+	}
+	
+.users-projects-namediv {
+	position: absolute;
+	width: 90%;
+	left: 60px;
+	padding: 7px;
+	color: white;
+	font-size: 120%;
+	font-weight: 200;
+	padding-left: 13px;
+	}	
+
+.users-projects-dropwrap {
+	z-index: 4000;
+	position: absolute;
+	background: rgba(255,255,255,0.7);
+	width: 317px;
+	height: auto;
+	padding: 10px;
+	margin-top: 50px;
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
+	border-radius: 2px;
+	}
+	
+.check-write-input {
+	left: 31px;
+	}
+	
+.check-write-label {
+	right: 9px;
+	left: auto;
+	}
+	
+.check-read-input {
+	left: 8px;
+	}
+	
+.check-read-label {
+	left: 8px;
+	}	
+	
+	

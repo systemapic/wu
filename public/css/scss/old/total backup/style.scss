@@ -1,0 +1,27 @@
+$font: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+
+// #content, .q-editor-menu, .list_view .editor-projects-item, .select-elem, .select-title
+$ecolor1: #0F1A1E;
+
+// #selectedTab span, #editorPanel > .content, body, .q-editor-container, #editor, .q-editor-menu .active, #datalibrary-download-dialogue:after, th
+$ecolor2: #3F4652;
+
+$translight: rgba(255, 255, 255, 0.15);
+$translighter: rgba(255, 255, 255, 0.075);
+
+
+@import 'basics';
+@import 'canva';		// Stolen from Canva
+@import 'app';			// Main file
+@import 'kits';			// All the webkit, moz, etc transitions and other properties
+@import 'leaflet_draw';
+@import 'layer_menu';
+@import 'documents';	// Documents Pane
+@import 'data_library';	// Data Library Pane
+@import 'color_picker';	// Color Theme selecteur
+@import 'knut';
+@import 'shame';
+
+
+
+
