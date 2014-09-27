@@ -456,8 +456,3 @@ Wu.Project = Wu.Class.extend({
 		return sources;
 	},
 });
-
-
-
-
-

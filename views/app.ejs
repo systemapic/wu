@@ -6,11 +6,11 @@
 		<!-- Styles -->
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/grande.js/css/menu.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/grande.js/css/editor.css">
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-		<link rel="stylesheet" href="//cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
-		<link rel="stylesheet" href="//85.10.202.87:8080/css/Leaflet.StyleEditor.css">
-		<link rel="stylesheet" href="https://raw.githubusercontent.com/abpetkov/powerange/master/dist/powerange.min.css">
+		<link rel="stylesheet" href="//85.10.202.87:8080/css/bootstrap.min.css">
+		<link rel="stylesheet" href="//85.10.202.87:8080/css/font-awesome.min.css">
+		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/leaflet/leaflet.css" />
+		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/leaflet/plugins/styleEditor/Leaflet.StyleEditor.css">
+		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/powerange/powerange.min.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/style.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/knut.css">
 
@@ -21,7 +21,6 @@
 		<script src="//85.10.202.87:8080/js/lib/lodash/lodash.min.js"></script>
 		<script src="//85.10.202.87:8080/js/lib/parallel.js/parallel.js"></script>
 		
-
 		<script src="//85.10.202.87:8080/js/lib/leaflet/leaflet-0.7.3-src.js"></script>
 		<script src="//85.10.202.87:8080/js/lib/mapbox.js/mapbox.standalone.1.6.2.js"></script>
 		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/leaflet-omnivore.min.js"></script>
@@ -29,20 +28,16 @@
 		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/leaflet.draw.min.js"></script>
 		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/leaflet.draw.note.js"></script>
 
-		<script src="//85.10.202.87:8080/js/src/ext/extendLeaflet.js"></script>
+		<script src="//85.10.202.87:8080/js/src/core/extendLeaflet.js"></script>
 
-		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/Leaflet.StyleEditor.js"></script>
-		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/Leaflet.StyleForms.js"></script>
-
-		
+		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/styleEditor/Leaflet.StyleEditor.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/styleEditor/Leaflet.StyleForms.js"></script>
 		
 		<script src="//85.10.202.87:8080/js/lib/dropzone.js/dropzone.min.js"></script> 
 		<script src="//85.10.202.87:8080/js/lib/icanhaz/icanhaz.min.js"></script> 
 
-	
 		<script src="//85.10.202.87:8080/js/lib/grande.js/dist/grande.min.js"></script>
 		<script src="//85.10.202.87:8080/js/lib/grande.js/dist/grande.attachments.min.js"></script>
-
 
 		<script src="//85.10.202.87:8080/js/lib/list.js/list.min.js"></script> 
 		<script src="//85.10.202.87:8080/js/lib/sortable.js/Sortable.js"></script>
@@ -1604,9 +1599,19 @@
 <!-- ************************************************************************************************************************ -->
 
 		<script src="//85.10.202.87:8080/js/src/core/class.js"></script> 
-		<script src="//85.10.202.87:8080/js/src/core/app.js"></script> 
 		
-		<script src="//85.10.202.87:8080/js/src/panes/sidepane.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.item.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.clients.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.project.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.client.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.users.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.map.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.mapSettings.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.documents.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.dataLibrary.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.mediaLibrary.js"></script> 
+
 		<script src="//85.10.202.87:8080/js/src/panes/headerpane.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/panes/mappane.js"></script>
 		
@@ -1622,11 +1627,9 @@
 		<script src="//85.10.202.87:8080/js/src/models/users.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/models/layers.js"></script> 
 		
-		<script src="//85.10.202.87:8080/js/src/ext/mediaLibrary.js"></script> 
-
 		<script src="//85.10.202.87:8080/js/src/ext/colorThemes.js"></script>		
 		
-
+		<script src="//85.10.202.87:8080/js/src/core/app.js"></script> 
 
 		<script>
 
@@ -1634,9 +1637,10 @@
 			// start systemapic app
 			var app = new Wu.App({
 					
-					id 		: 'app',
+					id 		: 'app', 						//todo! options!
 					documentsPane 	: true,               // default true
 					downloadsPane 	: true,               // default true
+					mediaLibrary    : true,
 					header 		: true,
 					chat 		: true,                         // default false
 					mapbox 		: true,

@@ -423,17 +423,3 @@ Wu.createLayer = function (layer) {
 		// todo
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
