@@ -40,33 +40,6 @@ var userSchema = mongoose.Schema({
 
         },
 
-        // access  : {                             // access only for projects/clients. files are attached to project OR to user through createdBy
-        //                                         // users are attached to client. if adding to second client, manager will get prompt to invite.
-
-
-        //         projects : {
-        //                 read    : [String], // can read
-        //                 write   : [String], // can write
-        //                 manage  : [String], // can add read permission to users for project
-        //                 admin   : [String], // can add read/write/manage permission to users for project, can remove project
-                       
-        //                 create  : Boolean,  // can create new project
-        //                 remove  : Boolean   // can remove projects (todo: move to admin list)
-        //         },
-
-        //         clients : {
-        //                 read    : [String],
-        //                 write   : [String],                             // those who can write a client are Admins of that client
-        //                 manage  : [String],  // todo: remove            // those who can manage a client are Managers of that client.. 
-        //                 admin   : [String],  
-                       
-        //                 create  : Boolean,                              // users can only be edited by self or manager that created the user.
-        //                 remove  : Boolean
-        //         },
-
-        // },
-
-
         local : {
                 email        : String,      // login name
                 password     : String,

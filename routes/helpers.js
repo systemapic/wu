@@ -39,33 +39,7 @@ function superadmin(user) {
 // function exports
 module.exports = api = {
 
-
-	
-
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	// ██████╗ ██████╗  ██████╗      ██╗███████╗ ██████╗████████╗    
-	// ██╔══██╗██╔══██╗██╔═══██╗     ██║██╔════╝██╔════╝╚══██╔══╝    
-	// ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║       
-	// ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║       
-	// ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║       
-	// ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝       
-																	    
+								    
 
 	// #########################################
 	// ###  API: Create Project              ###
@@ -579,13 +553,8 @@ module.exports = api = {
 
 
 
-	//  ██████╗██╗     ██╗███████╗███╗   ██╗████████╗
-	// ██╔════╝██║     ██║██╔════╝████╗  ██║╚══██╔══╝
-	// ██║     ██║     ██║█████╗  ██╔██╗ ██║   ██║   
-	// ██║     ██║     ██║██╔══╝  ██║╚██╗██║   ██║   
-	// ╚██████╗███████╗██║███████╗██║ ╚████║   ██║   
-	//  ╚═════╝╚══════╝╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   
-	
+
+
 
 	// #########################################
 	// ###  API: Create Client               ###
@@ -866,14 +835,6 @@ module.exports = api = {
 
 
 
-
-	// ██╗   ██╗███████╗███████╗██████╗ 
-	// ██║   ██║██╔════╝██╔════╝██╔══██╗
-	// ██║   ██║███████╗█████╗  ██████╔╝
-	// ██║   ██║╚════██║██╔══╝  ██╔══██╗
-	// ╚██████╔╝███████║███████╗██║  ██║
-	//  ╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═╝
-				 
 
 	// #########################################
 	// ###  API: Create User                 ###
@@ -1826,12 +1787,6 @@ module.exports = api = {
 
 
 
-	// ███████╗██╗██╗     ███████╗███████╗
-	// ██╔════╝██║██║     ██╔════╝██╔════╝
-	// █████╗  ██║██║     █████╗  ███████╗
-	// ██╔══╝  ██║██║     ██╔══╝  ╚════██║
-	// ██║     ██║███████╗███████╗███████║
-	// ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
 				   
 
 	// zip a file and send to client
@@ -2051,11 +2006,6 @@ module.exports = api = {
 	// delete a file
 	deleteFiles : function (req, res) {
 
-		// delete fuuid from project
-		// delete project uuid from file
-		// keep file ;)
-		// file still available for user
-
 		var _fids  = req.body._fids;
 		var puuid  = req.body.puuid;
 		var userid = req.user.uuid;
@@ -2064,50 +2014,12 @@ module.exports = api = {
 		if (!_fids || !puuid || !userid) return res.end('missing!');
 
 		var qu = [];
-		// _fids.forEach(function(_fid, i, arr) {
-			
-			// // delete project from file
-			// qu.push(function (callback) {
-				
-
-			// 	// return File.findOne({ _id : _fid }, function (err, file) {
-
-					
-			// 	// 	file.projects.pull({'access.projects' :  puuid});
-			// 	// 	file.markModified('projects');
-			// 	// 	file.save(function (err) {
-			// 	// 		if (err) console.error(err);
-			// 	// 		console.log('file removed form project.')
-			// 	// 	}
-			// 	// 	// async callback
-			// 	// 	return callback(err, user);
-					
-		 //  //   		});
-
-
-			// 	// return File.update(
-			    
-			// 	// 	// conditions
-			// 	// 	{ 'access.users' : userid, _id : _fid }, 
-
-			// 	// 	// pull project from file
-			// 	// 	{ $pull: {'access.projects' :  puuid}},
-
-			// 	// 	// callback
-			// 	// 	function (err, numberAffected, raw) {
-			// 	// 		return callback(err, numberAffected);
-			// 	// 	}
-		 //  //   		);
-			// });
 
 			// delete file from project
 			qu.push(function (callback) {
 				
 				return Project.findOne({uuid : puuid}, function (err, project) {
 
-					console.log('_________ DELETING FILE FROM PROJECT ________________');
-					// console.log('projct:', project);
-					console.log('_fid: ', _fids);
 					_fids.forEach(function (f) {
 						project.files.pull(f);
 					})
@@ -2122,23 +2034,10 @@ module.exports = api = {
 
 				});
 
-				// return Project.update(
-			    
-				// 	// conditions
-				// 	{ 'access.write' : userid, uuid : puuid }, 
-
-				// 	// pull file from project
-				// 	{ $pull: {'files' :  _fid}},
-
-				// 	// callback
-				// 	function (err, numberAffected, raw) {
-				// 		return callback(err, numberAffected);
-				// 	}
-		  //   		);
+				
 			});
 
-		// }, this);
-
+	
 		// run queries
 		async.parallel(qu, function(err, doc) {
 
@@ -2236,9 +2135,7 @@ module.exports = api = {
 	// get geojson
 	getGeojsonFile : function (req, res) {
 
-		console.log('getGeojsonFile');
-		console.log(req.body);
-		
+	
 		//var file = req.body.file;	//  "ERI0.shp.geojson"
 		var uuid = req.body.uuid;	// file-1091209120-0129029
 		var user = req.user.uuid;	// user-1290192-adasas-1212
@@ -2246,7 +2143,6 @@ module.exports = api = {
 		// return if invalid
 		if (!uuid || !user) return false;
 
-		console.log('looking up Files: ', uuid, user);
 		// get geojson file path from db
 		return File.findOne({'access.users' : req.user.uuid, 'uuid' : uuid }, function(err, record) {
 			console.log('found: ', record);
@@ -2405,14 +2301,8 @@ module.exports = api = {
 
 	
 
-	
-	//  █████╗  ██████╗ ██████╗███████╗███████╗███████╗ 
-	// ██╔══██╗██╔════╝██╔════╝██╔════╝██╔════╝██╔════╝ 
-	// ███████║██║     ██║     █████╗  ███████╗███████╗ 
-	// ██╔══██║██║     ██║     ██╔══╝  ╚════██║╚════██║ 
-	// ██║  ██║╚██████╗╚██████╗███████╗███████║███████║ 
-	// ╚═╝  ╚═╝ ╚═════╝ ╚═════╝╚══════╝╚══════╝╚══════╝    
-							
+
+
 
 	// CRUD capabilities
 	can : {

@@ -15,20 +15,6 @@ var fileSchema = mongoose.Schema({
     files           : [String],
     folder          :  String,
     absfolder       :  String,
-    // raw             : {
-    //     file        :  String, 
-    //     dimensions  : {
-    //         width : Number,
-    //         height : Number
-    //     },
-    //     created    : String,
-    //     gps        : {
-    //         lat : String,
-    //         lng : String,
-    //     },
-    //     orientation : Number
-    // },
-
     name            :  String,
     description     :  String,
     keywords        : [String],

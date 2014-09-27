@@ -239,34 +239,6 @@ module.exports = function(app, passport) {
 
 
 
-	// // =====================================
-	// // GET CLIENT USERS ====================
-	// // =====================================
-	// // get users that have read access to this client, and a list of projects they have access to under same client
-	// app.post('/api/client/users', isLoggedIn, function (req,res) {
-	// 	console.log('/api/client/users');
-
-	// 	// get users that the logged in user has access to
-	// 	api.getUsers(req, res);
-
-	// });
-
-
-
-	// // =====================================
-	// // GET CLIENT DATA  ====================
-	// // =====================================
-	// // get users that have read access to this client, and a list of projects they have access to under same client
-	// app.post('/api/client/data', isLoggedIn, function (req,res) {
-	// 	console.log('/api/client/data');
-	// 	console.log('$$$$$$$$$$$$$ CAN DELETE THIS??? $$$$$$$$$$$$$$')
-
-	// 	// get users that the logged in user has access to
-	// 	api.getClientData(req, res);
-
-	// });
-
-
 
 	// =====================================
 	// UPLOAD DATA LIBRARY FILES ===========
