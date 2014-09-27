@@ -1,0 +1,202 @@
+
+/*baselayer toggle*/
+.leaflet-control-baselayertoggle {
+	width: 27px;
+	height: 27px;
+	background: white;
+	position: relative;
+	float: right;
+	border: 1px solid gray;
+}
+
+.baselayertoggle-item {
+	width: 150px;
+	background: white;
+	border: 1px solid black;
+	height: 25px;
+	font-size: 120%;
+	text-align: left;
+	padding-left: 5px;
+	cursor: pointer;
+
+}
+.baselayertoggle-item:hover {
+	background: yellow;
+}
+.baselayertoggle-item.active {
+	background: green;
+	color: white;
+}
+.baselayertoggle-list {
+	position: relative;
+	left: 22px;
+	top: -1px;
+}
+.collapsed {
+	visibility: hidden;
+}
+.expand {
+	display: block;
+}
+
+
+
+/*clients*/
+.client-logo {
+	width: 100px;
+	height: 60px;
+}
+.client-logo.editable:hover {
+	border: 1px solid yellow;
+	cursor: copy;
+}
+.project-logo.editable:hover {
+	border: 1px solid yellow;
+	cursor: copy;
+}
+
+/*dropzone*/
+.dz-preview {
+	display: none;
+}
+
+
+/*connect accounts control*/
+.mapbox-listed-account {
+	color: white;
+	padding: 4px;
+	font-size: 110%;
+	height: 30px;
+	position: relative;
+}
+.mapbox-listed-account-title {
+	position: absolute;
+	left: 0;
+}
+.mapbox-listed-account-kill {
+	position: absolute;
+	right: 0;
+	color: red;
+	font-weight: 900;
+}
+
+
+/*sidepane bounds*/
+#editor-map-bounds-set-maxZoom {
+	width: 60px;
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+}
+#editor-map-bounds-max-zoom-value {
+	width: 195px;
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+}
+#editor-map-bounds-set-minZoom {
+	width: 60px;
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+}
+#editor-map-bounds-min-zoom-value {
+	width: 195px;
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+}
+
+
+/*sidepane documents*/
+#documents-container-textarea h2 {
+	color: red;
+	font-size: 200%;
+}
+
+#documents-container-textarea h1 {
+	font-size: 300%;
+}
+
+#documents-container-textarea p {
+	font-size: 120%;
+	color: yellow;
+}
+
+
+
+/*grande plugin attachments*/
+.grande-sources-container {
+	position: absolute;
+	width: 300px;
+	top: 30px;
+	background: black;
+	border-radius: 5px;
+}
+
+.grande-sources-topwrap {
+	height: 0px;
+	width: 100%;
+
+}
+
+.grande-sources-source {
+	position: relative;
+	height: 50px;
+	border-top: 1px solid #0C4818;
+	width: 100%;
+	overflow: hidden;
+}
+
+
+.grande-sources-container div:nth-child(2) {
+	border-radius: 5px 5px 0px 0px;
+}
+.grande-sources-container div:last-child {
+	border-radius: 0px 0px 5px 5px;
+}
+
+
+.grande-sources-source:hover {
+	background: #60d778;
+}
+
+.grande-sources-source-icon {
+	width: 30px;
+	height: 30px;
+}
+
+.grande-sources-source-title {
+	color: white;
+	position: absolute;
+	top: 0px;
+	left: 34px;
+	font-size: 110%;
+	padding: 2px;
+
+}
+
+.grande-sources-source-thumb {
+	position: absolute;
+	width: 30px;
+	height: 100%;
+	right: 0px;
+	top: 0px;
+}
+
+.text-menu .options {
+	padding-top: 1px !important;
+	width: 245px !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+

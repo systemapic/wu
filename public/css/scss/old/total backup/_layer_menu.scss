@@ -1,0 +1,218 @@
+/*layer meny*/
+
+#layer-menu-container {
+	width: 250px;
+	height: 500px;
+	position: absolute;
+	left: 440px;
+	top: 140px;
+	z-index: 1000;
+	background: rgba(29, 29, 29, 0.46);
+	margin: 10px;
+	}
+
+#layer-menu-inner-content {
+	width: 220px;
+	height: 100%;
+	background: rgba(255, 255, 255, 0.70);
+	position: absolute;
+	padding: 4px;
+	}
+	
+#layer-menu-inner-content:active {
+	}
+
+.over {
+	opacity: 0.5;
+	background-color: white !important;
+	}
+
+
+
+
+
+
+.layer-active {
+	background: rgba(154, 92, 148, 0.8);
+	}
+
+
+#layers-library-browser {
+	width: 100%;
+	height: 150px;
+	}
+
+#layers-library-browser-datalayers {
+	cursor: pointer;
+	font-family: $font;
+	font-size: 140%;
+	font-weight: 100;
+	text-align: center;
+	padding-top: 19px;
+	text-transform: uppercase;
+	color: gainsboro;
+	}
+
+#layers-library-browser-datalayers:hover {
+	color: white;
+	}
+
+#layers-library-browser-mapbox {
+	background-image: url('http://www.altweeklies.com/imager/b/main/6640192/462f/mapbox-logo-256.jpg')
+	}
+
+#layers-library-browser-mapbox:hover {
+	//	-webkit-filter: saturate(150%);
+	}
+
+.layers-library-browser-item {
+	width: 100px;
+	height: 100px;
+	border: 1px solid gray;
+	float: left;
+	margin: 3px;
+	background-size:100px 100px;
+	cursor: pointer;
+	}
+
+#layers-library {
+	display: block;
+	}
+
+#layers-mapbox {
+	display: none;
+	}
+
+#import-mapbox-layers-ok {
+	height: 33px;
+	width: 75px;
+	border-radius: 0;
+	padding: 0;
+	vertical-align: top;
+	margin: 0px;
+	float: left;
+	padding-top: 5px;
+	font-size: 110%;
+	}
+
+#import-mapbox-layers {
+	background: rgba(0,0,0,0.3);
+	padding: 7px !important;
+	color: white !important;	
+	font-weight: 200;
+	border: 0px;
+	float: left;
+	width: 170px;
+	}
+
+.mapbox-connect-wrap {
+	margin: 10px;
+	height: 60px;
+	}
+
+.layers-mapbox-name {
+	margin: 0px;
+	text-transform: capitalize;
+	margin: 10px;
+	font-size: 170%;
+	font-family: $font;
+	font-weight: 100;
+	margin-bottom: 4px;
+	margin-left: 4px;
+	}
+	
+.mapbox-list-item {
+	margin: 10px;
+	padding: 2px;
+	}
+
+
+
+
+
+
+
+
+
+
+// From Evil Menu
+
+
+.layer-menu-item-wrap {
+/*
+	color: white;
+	font-family: $font;
+	font-size: 130%;
+	padding-left: 5px;
+	background: rgba(54, 92, 148, 0.6);
+	font-weight: 200;
+	text-align: center;
+	cursor: pointer;
+*/
+	}
+
+.layer-menu-item-wrap:hover {
+/* 	background: rgba(54, 92, 148, 0.8); */
+	}
+
+
+// Outer
+.layer-menu-item-wrap {
+
+	// From .menuitem
+	cursor: pointer;
+	overflow: hidden;
+	margin: 0;
+
+	font-family: helvetica,arial,sans-serif;
+	font-size: 13px;
+	z-index: 100;
+	position: relative;
+
+	// From .level_1
+/* 	background: #89aeb8; */
+	padding: 0;
+	height: 25px;
+	color: #fff;
+	text-shadow: none;
+
+	// From ._color7bg, .color1
+	background-color: #63A3A0;
+
+	// From .color1, .selected
+	color: white;
+
+	margin-bottom: 1px;
+	}
+
+
+// Inner
+.layer-menu-item {
+
+	// From .menu_inner
+	width: 100%;
+	height: 25px;
+	padding: 5px;
+	text-align: center;
+	-webkit-box-sizing: border-box;
+	z-index: 2222;
+	line-height: 1.2;
+	}
+	
+.layer-active {
+	background-color: #B536B5;
+}
+
+
+
+
+
+
+.scroller-frame {
+height: 100%;
+padding-bottom: 28px;	
+}
+
+.inner-scroller {
+	min-height: 100%;
+}

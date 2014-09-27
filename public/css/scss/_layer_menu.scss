@@ -1,0 +1,258 @@
+/*LAYER MENU*/
+/*LAYER MENU*/
+/*LAYER MENU*/
+/*LAYER MENU*/
+
+#layer-menu-inner-content {
+	width: 320px;
+	height: 100%;
+	background: rgba(255, 255, 255, 0.93);
+	position: absolute;
+	padding: 4px;
+	}
+
+
+.layeritem-open {
+	height: 29px;
+	}
+
+.layeritem-closed {
+	height: 0px !important;
+	margin-bottom: 0 !important;
+	}
+
+/*Universal => on every layer menu item*/
+.layer-menu-item-wrap {
+	cursor: pointer;
+	overflow: hidden;
+	margin: 0;
+	font-family: helvetica,arial,sans-serif;
+	font-size: 15px;
+	z-index: 100;
+	position: relative;
+	padding: 0;
+	height: 29px;
+	color: #fff;
+	text-shadow: none;
+	color: white;
+	margin-bottom: 1px;
+	/*background-color: rgba(84, 138, 135, 1) !important;*/
+	background-color: #427676;
+	}
+
+
+.menufolder {
+	/*background-color: #4d7f7c !important;*/
+	}
+
+.layer-menu-item-wrap.menufolder.level-0 {
+	background-color: #713045;
+	}
+
+.layer-menu-item-wrap.menufolder.level-1 {
+	background-color: #982e4b;
+	}
+
+.layer-menu-item-wrap.menufolder.level-2 {
+	background-color: #a84158;
+	}
+
+
+
+
+.layer-active {
+	/*background-color: rgba(154, 92, 148, 1);*/
+	background-color: #e05723;
+	
+	}
+
+.layer-menu-item {
+	width: 100%;
+	height: 100%;
+	padding: 5px;
+	text-align: center;
+	-webkit-box-sizing: border-box;
+	z-index: 2222;
+	line-height: 1.2;
+	}	
+
+.layer-menu-item input {
+	text-align: center;
+	padding: 0;
+	background-color: transparent;
+	color: yellow;
+}
+
+
+
+
+/*layermenu dragging etc*/
+.dragged-ghost {
+	background: red;
+}
+
+
+
+/*edit mode for layermenu.. todo: maybe mask out errything else, blurred?*/
+.edit-mode {
+	box-shadow: 0px 0px 0px 3px red, 0px 0px 2px 4px black !important;
+}
+
+/*indent levels*/
+.level-0 {
+	margin-left: 0px;
+}
+
+.level-1 { 
+	margin-left: 25px;
+}
+
+.level-2 {
+	margin-left: 50px;
+}
+
+.level-3 {
+	margin-left: 75px;
+}
+.level-4 {
+	margin-left: 100px;
+}
+
+.layer-closed {
+	height: 0 !important;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+
+
+/*up/down/delete buttons on layermenu items*/
+.layer-item-up {
+	width: 18px;
+	height: 25px;
+	background-color: rgba(255,255,255,0.8);
+	position: absolute;
+	left: 2px;
+	padding: 0px 0px 0px 2px;
+	font-size: 160%;
+	display: none;
+	color: transparent;
+	background-image: url(evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: 7px -74px;
+	top: 2px;
+	}
+
+.layer-item-down {
+	width: 18px;
+	height: 25px;
+	background-color: rgba(255,255,255,0.8);
+	position: absolute;
+	left: 21px;
+	padding: 0px 0px 0px 2px;
+	font-size: 160%;
+	display: none;
+	color: transparent;
+	background-image: url(evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: -28px -74px;
+	top: 2px;
+	}
+
+.layer-item-up:hover,
+.layer-item-down:hover {
+	background-color: rgba(255,255,255,1);
+	}	
+
+.layer-item-delete {
+	width: 18px;
+	height: 25px;
+	background: rgba(255, 255, 255, 1);
+	position: absolute;
+	right: 2px;
+	padding: 0px 0px 0px 2px;
+	font-size: 160%;
+	display: none;
+	color: transparent;
+	background-image: url(evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: 1px -40px;
+	top: 2px;
+	border-radius: 1px;
+	opacity: 0.8;
+	}
+
+.layer-item-delete:hover {
+	opacity: 1;
+	}
+
+
+
+
+
+	
+
+	
+
+
+	
+/* Layer menu folders */
+	
+
+
+.layer-menufolder-delete {							// Layer Menu : Folder, delete;
+	width: 20px;
+	height: 100%;
+	background: gray;
+	position: absolute;
+	right: 0px;
+	padding: 0px 0px 0px 2px;
+	font-size: 160%;
+	}
+
+.layer-menufolder-up {								// Layer Menu : Folder, up;
+	width: 20px;
+	height: 100%;
+	background: red;
+	position: absolute;
+	left: 0px;
+	padding: 0px 0px 0px 2px;
+	font-size: 160%;
+	}
+
+.layer-menufolder-down {							// Layer Menu : Folder, down;
+	width: 20px;
+	height: 100%;
+	background: purple;
+	position: absolute;
+	left: 20px;
+	padding: 0px 0px 0px 2px;
+	font-size: 160%;
+	}		
+	
+// -- Layers opener 
+
+#open-layers {										// Layers: Open layer menu;
+	position: absolute;
+	top: 29px;
+	right: 0px;
+	background: white;
+	text-align: center;
+	line-height: 2;
+	font-weight: $fat;
+	cursor: pointer;
+	margin: 0;
+	overflow: hidden;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+	}
+	
+.layer-opener-opened {								// Layers: Open layer menu mover;
+	right: auto;
+	left: -120px;
+	}
+	
+.close-layer-opener {								// Layers: Open layer menu mover;
+	width: 0px;
+	height: 0px;
+	}		
+
+

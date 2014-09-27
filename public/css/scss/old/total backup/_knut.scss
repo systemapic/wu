@@ -1,0 +1,373 @@
+.inliner {
+	position: absolute;
+	right: 1px;
+	top: 8px;
+}
+
+#editor-map-initpos-button, #editor-map-bounds {
+	width: 210px;
+}
+
+.input-box {
+	background: rgba(0, 0, 0, 0.3) !important;
+	padding: 7px !important;
+	color: white !important;
+	font-weight: 200;
+	border: 0px;
+	float: left;
+	width: 170px;
+}
+
+#import-datalibrary-layers-ok {
+	height: 33px;
+	width: 75px;
+	border-radius: 0;
+	padding: 0;
+	vertical-align: top;
+	margin: 0px;
+	padding-top: 5px;
+	font-size: 110%;
+}
+
+.datalibrary-connect-wrap {
+	margin-bottom: 10px;
+	position: relative;
+	margin-top: 10px;
+}
+
+.mapbox-connect-wrap {
+	position: relative;
+}
+
+.dropdown-button {
+	background-image: url(evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: 4px 8px;
+	position: absolute;
+	right: 15px;
+	top: 50px;
+	background-color: white;
+	width: 20px;
+	height: 20px;
+	border-radius: 20px;
+}
+
+#editor-layers-upload {
+	background: gainsboro;
+	height: 40px;
+	padding: 10px;
+	color: black;
+}
+#editor-layers-upload-more {
+	top: 10px;
+	right: 5px;
+}
+
+#editor-layers-connect-mapbox {
+	background: gainsboro;
+	height: 40px;
+	padding: 10px;
+	color: black;
+}
+
+#editor-layers-connect-mapbox-more {
+	top: 10px;
+	right: 5px;
+}
+
+#layers-library {
+	position: relative;
+}
+
+#layers-library h4 {
+	margin-top:10px;
+}
+
+#layers-mapbox {
+	position: relative;
+}
+
+#layers-mapbox h4 {
+	margin-top:10px;
+}
+
+.active-layer {
+	background: rgba(129, 255, 134, 0.62)
+}
+.active-layer:hover {
+	background: rgba(0, 255, 134, 0.62)
+}
+
+.middle-item {
+	width: 100px;
+	height: 25px;
+	background: gainsboro;
+	margin: 10px;
+	padding: 4px;
+	color: black;
+	cursor: pointer;
+}
+
+.menufolder {
+	background: blue;
+}
+
+.layer-menufolder-delete {
+	width: 20px;
+	height: 100%;
+	background: gray;
+	position: absolute;
+	right: 0px;
+	padding: 0px 0px 0px 2px;
+	font-size: 160%;
+}
+
+
+.layer-menufolder-up {
+	width: 20px;
+	height: 100%;
+	background: red;
+	position: absolute;
+	left: 0px;
+	padding: 0px 0px 0px 2px;
+	font-size: 160%;
+}
+
+.layer-menufolder-down {
+	width: 20px;
+	height: 100%;
+	background: purple;
+	position: absolute;
+	left: 20px;
+	padding: 0px 0px 0px 2px;
+	font-size: 160%;
+}
+
+.fullpage-users {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: #3f4652;
+	z-index: 3400;
+	display: none;
+	left: 100px;
+	padding-right: 84px;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.fullpage-users .editor-wrapper {
+	width: auto;
+}
+
+.editor-wrapper h3 {
+	margin-top: 20px;
+}
+
+.users-button {
+	height: 33px;
+	color: gainsboro;
+	font-size: 200%;
+	background: rgba(255, 255, 255, 0.15);
+	padding: 5px 10px 5px 10px;
+	text-align: center;
+	margin: 5px;
+	font-weight: 200;
+	cursor: pointer;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+	font-size: 120%;
+	display: inline-block;
+	vertical-align: top;
+}
+
+.users-button:hover {
+	color: white;
+}
+
+
+.smallerText {
+	font-size: 125%;
+}
+
+
+.inject-input {
+	font-weight: 200;
+	margin-left: 30px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+	color: white;
+	background: none;
+	border: none;
+	font-size: 100%;
+	margin: 0px 10px 0px 0px;
+	padding-bottom: 0;
+	width: 100%;
+	padding: 0;
+}
+
+.tdcont {
+	color: gainsboro;
+	font-weight: 200;
+}
+
+.tdcont:hover {
+	color:white;
+}
+
+.users-actions-save {
+	color: #222;
+	background: rgba(255,255,255,0.9);
+}
+
+.users-actions-save:hover {
+	color: black;
+	background: rgba(255,255,255,1);
+}
+
+.abs-left-20 {
+	position: absolute;
+	left: 0;
+	width: 20%;
+}
+
+
+.abs-right-80 {
+	position: absolute;
+	right: 0;
+	width: 80%;
+}
+
+.relative {
+	position: relative;
+}
+
+.tdcont.projects:hover {
+	color: gainsboro;
+}
+
+.leaflet-bottom.leaflet-right {
+	margin-top: 7px;
+	padding-top: 0px;
+}
+
+.leaflet-top.leaflet-right {
+	margin-top: 7px;
+}
+
+
+.editor-client-title img {
+	max-height: 33px;
+}
+
+#editor-map-initpos-more, #editor-map-bounds-more {
+	top: 54px;
+}
+
+/*
+.users-projects-dropwrap {
+	width: 200px;
+	height: 0;
+	z-index: 4000;
+	position: absolute;
+}
+*/
+
+/*
+.users-projects-itemwrap:nth-child(even) {
+	background-color: #222;
+}
+*/
+
+/*
+.users-projects-itemwrap {
+	width: 300px;
+	height: 37px;
+	background: gray;
+	position: relative;
+}
+*/
+
+/*
+.users-projects-namediv {
+	position: absolute;
+	width: 90%;
+	left: 60px;
+	padding: 7px;
+	color: white;
+	font-size: 120%;
+	font-weight: 200;
+}
+*/
+
+/*
+.users-projects-checkwrap {
+	position: absolute;
+	width: 10%;
+	left: 0;
+	padding: 10px;
+}
+*/
+
+/*
+.projects-select-confirm {
+	height: 33px;
+	color: gainsboro;
+	font-size: 200%;
+	background: rgba(100, 100, 100, 1);
+	padding: 5px 10px 5px 10px;
+	text-align: center;
+	margin: 5px;
+	font-weight: 200;
+	cursor: pointer;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+	font-size: 120%;
+	display: inline-block;
+	vertical-align: top;
+}
+*/
+
+/*
+.projects-select-cancel {
+	height: 33px;
+	color: gainsboro;
+	font-size: 200%;
+	background: rgba(100, 100, 100, 1);
+	padding: 5px 10px 5px 10px;
+	text-align: center;
+	margin: 5px;
+	font-weight: 200;
+	cursor: pointer;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+	font-size: 120%;
+	display: inline-block;
+	vertical-align: top;
+}
+*/
+
+/*
+.users-projects-top-title {
+	color: white;
+	font-size: 130%;
+	padding-left: 9px;
+	font-weight: 100;
+	background: rgba(0, 0, 0, 0.49);
+	width: 61px;
+}
+*/
+
+/*
+.check-write-input {
+	left: 31px;
+}
+.check-write-label {
+	left: 31px;
+}
+.check-read-input {
+	left: 8px;
+}
+.check-read-label {
+	left: 8px;
+}
+*/
+
+
+

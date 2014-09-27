@@ -1,0 +1,713 @@
+
+
+
+
+/* canva.com rules */
+/* not used afaik! */
+
+#content.on {
+	opacity: 1;
+}
+#content.preparing, #content.on {
+	display: block;
+}
+#content {
+	display: none;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 10;
+	overflow: hidden;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	color: #222222;
+	opacity: 0;
+	-webkit-transition: -webkit-filter 0.3s linear;
+	-moz-transition: -moz-filter 0.3s linear;
+	-ms-transition: -ms-filter 0.3s linear;
+	transition: filter 0.3s linear;
+}
+#editorPanel {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	z-index: 100;
+	width: 33.333%;
+	min-width: 300px;
+	max-width: 430px;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 15px 30px 15px 100px;
+	background-color: #272c33;
+	color: #ffffff;
+	box-shadow: 2px 0 0 rgba(255,255,255,0.333);
+	-webkit-transform: translate3d(0,0,0);
+	-webkit-transition: -webkit-transform 0.6s ease-out;
+	-moz-transition: -moz-transform 0.6s ease-out;
+	-ms-transition: -ms-transform 0.6s ease-out;
+	transition: transform 0.6s ease-out;
+}
+.stage2 #selectedTab {
+	top: 70px;
+}
+#selectedTab span {
+	position: absolute;
+	right: 0;
+	top: -7px;
+	width: 7px;
+	height: 7px;
+	background-color: #3f4652;
+}
+#selectedTab span:after {
+	content: '';
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	width: 14px;
+	height: 14px;
+	border-radius: 7px;
+	background-color: #272c33;
+}
+#selectedTab span:last-child {
+	top: auto;
+	bottom: -7px;
+}
+#editorPanel > menu {
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 11;
+	width: 70px;
+	list-style: none;
+	text-align: center;
+	padding-left: 0;
+}
+#editorPanel > menu li {
+	font-size: 70%;
+	text-align: center;
+	text-transform: uppercase;
+}
+#editorPanel > menu a {
+	display: block;
+	width: 70px;
+	height: 70px;
+	padding-top: 41px;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	background-image: url(https://d29498xbqfhwsb.cloudfront.net/static/images/icon_tabs_search.png);
+	background-repeat: no-repeat;
+	background-size: 20px 20px;
+	background-position: 50% 19px;
+	color: #ffffff;
+	text-decoration: none;
+	-webkit-transition: all 0.15s linear, opacity 0s linear;
+	-moz-transition: all 0.15s linear, opacity 0s linear;
+	-ms-transition: all 0.15s linear, opacity 0s linear;
+	transition: all 0.15s linear, opacity 0s linear;
+}
+#editorPanel > .content {
+	position: absolute;
+	left: 70px;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	overflow: hidden;
+	padding: 20px 18px 20px 0;
+	background-color: #3f4652;
+	text-align: left;
+}
+.results {
+	position: absolute;
+	left: 0;
+	top: 50px;
+	bottom: 0;
+	z-index: -1;
+	width: 100%;
+	-webkit-transition: all 0.3s ease-out;
+	-moz-transition: all 0.3s ease-out;
+	transition: all 0.3s ease-out;
+}
+.layer {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 10;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 20px 30px 20px 30px;
+	-webkit-transition: all 0.3s linear;
+	-moz-transition: all 0.3s linear;
+	transition: all 0.3s linear;
+}
+#editorPanel > menu .layout a:hover, #editorPanel > menu .layout.on a {
+	background-image: url(https://di8vc3anm8wl1.cloudfront.net/static/images/icon_tabs_layouts_on.png);
+}
+
+#square {
+	position: absolute;
+	width: 100px;
+	height: 100px;
+	left: 300px;
+	z-index: 1000;
+	border: 2px red solid;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* systemapic.com */
+/* original rules */
+
+body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background-color: #ebeced;
+	color: #3F4652;
+	line-height: 1.4;
+	font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	text-align: left;
+	-webkit-overflow-scrolling: none;
+	-webkit-user-select: none;
+}
+
+
+#app {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#map {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 400px;
+	top: 120px;
+}
+
+
+
+.q-editor-container {
+	position: absolute;
+	height: 100%;
+	width: 400px;
+	background-color: #3f4652;
+}
+
+.q-editor-menu {
+	width: 100px;
+	height: 100%;
+	background-color: #222222;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+}
+
+.q-editor-menu-item {
+	text-align: center;
+	height: 70px;
+	position: relative;
+	//border: 1px white solid;
+	cursor: pointer;
+
+}
+
+
+
+.q-editor-menu-item a {
+	width: 100%;
+	font-size: 90%;
+	text-transform: uppercase;
+	font-weight: 500;
+	color: white;
+	bottom: 0px;
+	position: absolute;
+	left: 0px;
+	top: 48px;
+}
+
+
+.red {
+	background-color: red;
+}
+
+.green {
+	background-color: green;
+}
+
+
+.q-editor-content-item {
+	position: absolute;
+	width: 300px;
+	height: 100%;
+	left: 100px;
+	display: none;
+	padding: 10px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.margined {
+	margin: 20px;
+	margin-top: 5px;
+}
+
+.eightyWidth {
+	width: 85%;
+}
+
+.show {
+	display: block;
+}
+
+.content-title {
+	color: white;
+	font-size: 20px;
+	margin: 10px;
+}
+
+h3, h4 {
+	color: white;
+}
+
+
+
+
+
+
+/* editor */
+#editor {
+	position: absolute;
+	width: 300px;
+	background: #3f4652;
+	height: 100%;
+}
+
+.editor-clients-container {
+	border: 1px solid white;
+}
+
+.editor-clients-container:hover {
+	border: 1px solid yellow;
+}
+.editor-client-title {
+	position: relative;
+	color: white;
+}
+
+.editor-client-title img {
+	max-width: 100px;
+	max-height: 100px;
+	border: 2px solid black;
+}
+
+.editor-client-title h5 {
+	right: 0px;
+	position: absolute;
+	top: 0px;
+}
+
+.editor-client-project {
+	position: relative;
+	width: 49%;
+	border: 1px solid red;
+	color: white;
+}
+
+.editor-client-project img {
+	max-width: 100px;
+	max-height: 100px;
+	border: 2px solid black;
+}
+
+.editor-wrapper {
+	color: white;
+}
+
+.editor-projects-item {
+	color: white;
+	border: 1px solid green;
+	overflow: hidden;
+	max-height: 98px;
+	margin: 10px;
+	position: relative;
+	height: 130px;
+}
+}
+
+.editor-projects-item:hover {
+	border: 1px solid white;
+}
+
+.editor-projects-item img {
+	max-width: 100px;
+	position: absolute;
+}
+
+.editor-projects-item h5 {
+	position: absolute;
+	left: 100px;
+	word-wrap: break-word;
+	margin: 10px;
+
+}
+
+.editor-header-item img {
+	max-width: 200px;
+}
+
+
+
+.editor-map-item-wrap {
+	border: 2px solid white;
+	padding: 5px;
+}
+
+
+/* header */
+#header {
+	position: absolute;
+	top: 0px;
+	left: 400px;
+	height: 120px;
+	width: 100%;
+	background: white;
+	z-index: 10;
+}
+
+
+#header .header-logo {
+	position: relative;
+	height: 120px;
+	max-width: 200px;
+	color: white;	
+	margin-right: 20px;
+	float: left;
+	max-height: inherit;
+}
+
+.header-logo img {
+	position: relative;
+	max-height: inherit;
+
+}
+
+.header-logo img:hover {
+	opacity: 0.5;
+}
+
+
+
+.header-title { 
+	border: 0px;
+	background: white;
+	font-size: 25px;
+	border: 1px solid white;
+}
+
+.header-subtitle {
+	border: 0px;
+	background: white;
+	font-size: 15px;
+	border: 1px solid white;
+}
+
+/* when hovering on editable textbox in header */
+.editable:hover {
+	//border: 1px solid gray;
+}
+
+#headerResizer { 
+	
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	height: 6px;
+	cursor: ns-resize;
+
+}
+
+input {
+  -webkit-transition: all 0.30s ease-in-out;
+  -moz-transition: all 0.30s ease-in-out;
+  -ms-transition: all 0.30s ease-in-out;
+  -o-transition: all 0.30s ease-in-out;
+  outline: none;
+  padding: 3px 0px 3px 3px;
+  margin: 5px 1px 3px 0px;
+  border: 1px solid #DDDDDD;
+}
+ 
+input:focus  {
+  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+  padding: 3px 0px 3px 3px;
+  margin: 5px 1px 3px 0px;
+  border: 1px solid rgba(81, 203, 238, 1);
+}
+
+
+.new-client {
+	width: 100px;
+	height: 50px;
+	border: 1px solid yellow;
+}
+
+
+#new-project-button {
+	width: 100px;
+	height: 50px;
+	border: 1px solid yellow;
+}
+
+#editor-client-confirm-button {
+	width: 100px;
+	height: 50px;
+	border: 1px solid red;
+
+}
+
+#editor-client-delete-button {
+	width: 100px;
+	height: 50px;
+	border: 1px solid red;
+}
+
+#editor-client-cancel-button {
+	width: 100px;
+	height: 50px;
+	border: 1px solid red;
+}
+.editor-client-edit-toggle {
+	width: 50px;
+	height: 30px;
+	border: 1px solid blue;
+}
+
+.editor-client-edit-wrapper {
+	display: none;
+}
+.editor-client-delete-button {
+	width: 50px;
+	height: 30px;
+	border: 1px solid blue;
+}
+
+
+
+
+
+
+
+
+/*iphone style flip switch */
+
+ul#checked {
+	width: 300px;
+	list-style: none;
+	position: relative;
+}
+
+ul#checked li p {
+	display: block;
+	margin-bottom: 20px;
+	background: -moz-linear-gradient(19% 75% 90deg,#3095C7, #14539C); 
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#14539C), to(#3095C7));
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	border: 1px solid #555555;
+	width: 80px;
+	width: 120px;
+	position: relative;
+	height: 32px;
+}
+
+ul#checked p:before {
+	content: "Vector";
+	padding-left: 9px;
+	line-height: 32px;
+	color: #fff;
+	font-size: 14px;
+	text-shadow: #093B5C 0px -1px 1px;
+
+}
+
+ul#checked p:after {
+	content: "Raster";
+	padding-left: 12px;
+	line-height: 32px;
+	color: #fff;
+	font-size: 14px;
+	text-shadow: #093B5C 0px -1px 1px;
+}
+
+.check { 
+	display: block;
+	width: 60px;
+	height: 30px;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	background: -moz-linear-gradient(19% 75% 90deg,#FFFFFF, #A1A1A1);
+	background: #fff -webkit-gradient(linear, 0% 0%, 0% 100%, from(#A1A1A1), to(#FFFFFF));
+	border: 1px solid #e5e5e5;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
+
+
+input[type=checkbox] {
+	display: none;
+}
+
+@-webkit-keyframes labelON {
+	0% {
+		top: 0px;
+    	left: 0px;
+	}
+	
+	100% { 
+		top: 0px;
+    	left: 38px;
+	}
+}
+
+input[type=checkbox]:checked + label.check {
+	top: 0px;
+	left: 58px;
+	-webkit-animation-name: labelON; 
+  	-webkit-animation-duration: .2s; 
+  	-webkit-animation-iteration-count: 1;
+  	-webkit-animation-timing-function: ease-in;
+  	-webkit-box-shadow: #244766 -1px 0px 3px;
+}
+
+@-webkit-keyframes labelOFF {
+	0% {
+		top: 0px;
+    	left: 38px;
+	}
+	
+	100% { 
+		top: 0px;
+    	left: 0px;
+	}
+}
+
+input[type=checkbox] + label.check {
+	top: 0px;
+	left: 0px;
+	-webkit-animation-name: labelOFF; 
+  	-webkit-animation-duration: .2s; 
+  	-webkit-animation-iteration-count: 1;
+  	-webkit-animation-timing-function: ease-in;
+  	-webkit-box-shadow: #244766 1px 0px 3px;
+}
+
+label.info {
+	position: absolute;
+	color: #000;
+	top:0px;
+	left: 100px;
+	line-height: 32px;
+	width: 200px;
+}
+
+/* END - iphone style flip switch - END */
+
+
+.active {
+	background-color: #3F4652 !important;
+}
+
+
+.dropzone-pane {
+	width: 100px;
+	height: 100px;
+	border: white solid 1px;
+}
+
+.sources-item {
+	border: 2px solid white;
+	margin: 5px;
+	overflow: hidden;
+}
+	
+.disabled {
+	color: rgb(66, 66, 66) !important;
+}
+
+.active {
+	border: 2px solid white;
+}
+
+
+
+
+/*d3 tests*/
+svg {
+  position: relative;
+}
+
+path {
+  fill: #000;
+  fill-opacity: .2;
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+path:hover {
+  fill: brown;
+  fill-opacity: .7;
+}
+
+
+.sources-pane-project .sources-item {
+	background-color: red;
+}
+
+.new {
+	background-color: green !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
