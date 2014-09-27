@@ -18,34 +18,35 @@
 		<script>(function(){ window.hotlink = <%- JSON.stringify(hotlink) %>; }());</script>
 		
 		<!-- Dependencies -->
-		<script src="//85.10.202.87:8080/js/lib/lodash.min.js"></script>
-		<script src="//85.10.202.87:8080/js/lib/parallel.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/lodash/lodash.min.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/parallel.js/parallel.js"></script>
 		
 
-		<script src="//85.10.202.87:8080/js/lib/leaflet-0.7.3-src.js"></script>
-		<script src="//85.10.202.87:8080/js/lib/mapbox.standalone.1.6.2.js"></script>
-		<script src="//85.10.202.87:8080/js/lib/leaflet-omnivore.min.js"></script>
-		<script src="//85.10.202.87:8080/js/lib/leaflet.geojson.draw.min.js"></script>
-		<script src="//85.10.202.87:8080/js/lib/leaflet.draw.min.js"></script>
-		<script src="//85.10.202.87:8080/js/lib/leaflet.draw.note.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/leaflet/leaflet-0.7.3-src.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/mapbox.js/mapbox.standalone.1.6.2.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/leaflet-omnivore.min.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/leaflet.geojson.draw.min.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/leaflet.draw.min.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/leaflet.draw.note.js"></script>
 
-		<script src="//85.10.202.87:8080/js/src/extendLeaflet.js"></script>
+		<script src="//85.10.202.87:8080/js/src/ext/extendLeaflet.js"></script>
 
-		<script src="//85.10.202.87:8080/js/lib/Leaflet.StyleEditor.js"></script>
-		<script src="//85.10.202.87:8080/js/lib/Leaflet.StyleForms.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/Leaflet.StyleEditor.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/Leaflet.StyleForms.js"></script>
 
 		
 		
-		<script src="//85.10.202.87:8080/js/lib/dropzone.min.js"></script> 
-		<script src="//85.10.202.87:8080/js/lib/icanhaz.min.js"></script> 
+		<script src="//85.10.202.87:8080/js/lib/dropzone.js/dropzone.min.js"></script> 
+		<script src="//85.10.202.87:8080/js/lib/icanhaz/icanhaz.min.js"></script> 
 
 	
-		<script src="//85.10.202.87:8080/js/lib/grande.js/dist/grande.attachments-included.min.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/grande.js/dist/grande.min.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/grande.js/dist/grande.attachments.min.js"></script>
 
 
 		<script src="//85.10.202.87:8080/js/lib/list.js/list.min.js"></script> 
-		<script src="//85.10.202.87:8080/js/lib/Sortable/Sortable.js"></script>
-		<script src="//85.10.202.87:8080/js/lib/powerange.min.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/sortable.js/Sortable.js"></script>
+		<script src="//85.10.202.87:8080/js/lib/powerange/powerange.min.js"></script>
 
 	
 
@@ -1602,24 +1603,29 @@
 <!-- ************************************************************************************************************************ -->
 <!-- ************************************************************************************************************************ -->
 
-		<script src="//85.10.202.87:8080/js/src/class.js"></script> 
-		<script src="//85.10.202.87:8080/js/src/sidepane.js"></script> 
-		<script src="//85.10.202.87:8080/js/src/layers.js"></script> 
-		<script src="//85.10.202.87:8080/js/src/headerpane.js"></script> 
-		<script src="//85.10.202.87:8080/js/src/mappane.js"></script>
-		<script src="//85.10.202.87:8080/js/src/layermenuControl.js"></script> 
-		<script src="//85.10.202.87:8080/js/src/inspectControl.js"></script> 		
-		<script src="//85.10.202.87:8080/js/src/descriptionControl.js"></script> 
-		<script src="//85.10.202.87:8080/js/src/legendsControl.js"></script> 				
-		<script src="//85.10.202.87:8080/js/src/mousepositionControl.js"></script> 
-		<script src="//85.10.202.87:8080/js/src/baselayertoggleControl.js"></script> 
-		<script src="//85.10.202.87:8080/js/src/objects.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/core/class.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/core/app.js"></script> 
 		
-		<script src="//85.10.202.87:8080/js/src/mediaLibrary.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/sidepane.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/headerpane.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/panes/mappane.js"></script>
+		
+		<script src="//85.10.202.87:8080/js/src/controls/layermenuControl.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/controls/inspectControl.js"></script> 		
+		<script src="//85.10.202.87:8080/js/src/controls/descriptionControl.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/controls/legendsControl.js"></script> 				
+		<script src="//85.10.202.87:8080/js/src/controls/mousepositionControl.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/controls/baselayertoggleControl.js"></script> 
+		
+		<script src="//85.10.202.87:8080/js/src/models/projects.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/models/clients.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/models/users.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/models/layers.js"></script> 
+		
+		<script src="//85.10.202.87:8080/js/src/ext/mediaLibrary.js"></script> 
 
-		<script src="//85.10.202.87:8080/js/src/color_themes.js"></script>		
+		<script src="//85.10.202.87:8080/js/src/ext/colorThemes.js"></script>		
 		
-		<script src="//85.10.202.87:8080/js/app.js"></script> 
 
 
 		<script>
