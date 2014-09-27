@@ -28,7 +28,7 @@ app.configure(function() {
 	app.set('view engine', 'ejs'); // set up ejs for templating
 
 	// required for passport
-	app.use(express.session({ secret: 'mCbrLFr7J7V6Tg7P4kDKVK5QaVepEa' })); // session secret
+	app.use(express.session({ secret: '******************************' })); // session secret
 	app.use(passport.initialize());
 	app.use(passport.session()); // persistent login sessions
 	app.use(flash()); // use connect-flash for flash messages stored in session
