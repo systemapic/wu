@@ -2259,7 +2259,11 @@ module.exports = api = {
 		var path 	= req.originalUrl.split('/');
 		var client 	= path[1];
 		var project 	= path[2];
-		var hotlink 	= {
+		// console.log('req: ', req);
+		console.log('q: ', req.query);
+		console.log('path: ', path);
+		console.log('req.originalUrl.', req.originalUrl)
+		var hotlink = {
 			client : client,
 			project : project
 		}
@@ -2275,6 +2279,7 @@ module.exports = api = {
 				hotlink : hotlink || {}
 			});
 		} else {
+			
 			// redirect to login with hotlink embedded
 			req.session.hotlink = hotlink;
 			res.redirect('/');

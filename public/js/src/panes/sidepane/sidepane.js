@@ -3,7 +3,7 @@ Wu.SidePane = Wu.Class.extend({
 
 	initialize : function (options) {
 		
-		this.options = options || Wu.app.options;
+		this.options = options || app.options;
 
 		this.initContainer();
 		this.initContent();
@@ -41,31 +41,46 @@ Wu.SidePane = Wu.Class.extend({
 	},
 	
 	render : function () {
+		var pane = this.options.panes;
+
+		console.log('render: pane: ', pane);
 
 		// render sidepanes
-		this.Clients 	  = new Wu.SidePane.Clients();
-		this.Map 	  = new Wu.SidePane.Map();
-		this.Documents 	  = new Wu.SidePane.Documents();
-		this.DataLibrary  = new Wu.SidePane.DataLibrary();
-		this.MediaLibrary = new Wu.SidePane.MediaLibrary();
-		this.Users 	  = new Wu.SidePane.Users();
+		if (pane.clients) 	this.Clients 	  = new Wu.SidePane.Clients();
+		if (pane.mapOptions) 	this.Map 	  = new Wu.SidePane.Map();
+		if (pane.documents) 	this.Documents 	  = new Wu.SidePane.Documents();
+		if (pane.dataLibrary) 	this.DataLibrary  = new Wu.SidePane.DataLibrary();
+		if (pane.mediaLibrary) 	this.MediaLibrary = new Wu.SidePane.MediaLibrary();
+		if (pane.users) 	this.Users 	  = new Wu.SidePane.Users();
 
+	},
+
+	_getPaneArray : function () {
+		var panes = [];
+		var pane = this.options.panes;
+		if (pane.clients) 	panes.push('Clients');
+		if (pane.mapOptions) 	panes.push('Map');
+		if (pane.documents) 	panes.push('Documents');
+		if (pane.dataLibrary) 	panes.push('DataLibrary');
+		if (pane.mediaLibrary) 	panes.push('MediaLibrary');
+		if (pane.users) 	panes.push('Users');
+		return panes;
 	},
 
 
 	setProject : function (project) {
 
 		// update content
-		this.Map.updateContent(project);
-		this.Documents.updateContent(project);
-		this.DataLibrary.updateContent(project);
+		if (this.Map) this.Map.updateContent(project);
+		if (this.Documents) this.Documents.updateContent(project);
+		if (this.DataLibrary) this.DataLibrary.updateContent(project);
 	},
 
 	refreshProject : function (project) {
 		var editMode = project.editMode; // access determined at Wu.Project
 		
 		// default menus in SidePane
-		var panes = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users'];	// case-sensitive -> eg. Wu.SidePane.DataLibrary
+		var panes = this._getPaneArray();	// case-sensitive -> eg. Wu.SidePane.DataLibrary
 		
 		// remove Map pane if not editor
 		if (!editMode) _.pull(panes, 'Map');
@@ -87,7 +102,8 @@ Wu.SidePane = Wu.Class.extend({
 
 	// display the relevant panes
 	refresh : function (panes) {
-		
+		console.log('sidepane refresh: ', panes);
+
 		this.panes = [];
 
 		// all panes
@@ -105,7 +121,8 @@ Wu.SidePane = Wu.Class.extend({
 		// panes to deactivate
 		var off = all.diff(panes);
 		off.forEach(function (elem, i, arr) {
-			Wu.app.SidePane[elem].disable();
+			var dis = Wu.app.SidePane[elem];
+			if (dis)  Wu.app.SidePane[elem].disable();
 			_.pull(this.panes, elem);
 		}, this)
 

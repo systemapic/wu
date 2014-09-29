@@ -1,4 +1,4 @@
-// Clients
+// Projects and Clients
 Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	type : 'clients',
