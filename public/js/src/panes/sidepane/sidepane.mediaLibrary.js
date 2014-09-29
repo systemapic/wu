@@ -52,35 +52,47 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 		// Wu.DomEvent.on(this._button, 'mousedown', this.dosomething, this);
 
 		// Zooming in on Left Image
-		Wu.DomEvent.on(this._leftImage.zoomIn, 'mousedown', function() { this.zoomInImg('left') }, this);
-		Wu.DomEvent.on(this._leftImage.zoomIn, 'mouseup',   function() { this.zoomInImg_stop('left') }, this);
+		Wu.DomEvent.on(this._leftImage.zoomIn, 'mousedown', function() { this.zoomImg('left', 'in') }, this);
+		Wu.DomEvent.on(this._leftImage.zoomIn, 'mouseup',   function() { this.zoomImg_stop('left') }, this);
 
 		// Zooming out on Left Image
-		Wu.DomEvent.on(this._leftImage.zoomOut, 'mousedown', function() { this.zoomOutImg('left') }, this);
-		Wu.DomEvent.on(this._leftImage.zoomOut, 'mouseup',   function() { this.zoomOutImg_stop('left') }, this);
+		Wu.DomEvent.on(this._leftImage.zoomOut, 'mousedown', function() { this.zoomImg('left', 'out') }, this);
+		Wu.DomEvent.on(this._leftImage.zoomOut, 'mouseup',   function() { this.zoomImg_stop('left') }, this);
 		
 		// Zooming in on Right Image
-		Wu.DomEvent.on(this._rightImage.zoomIn, 'mousedown', function() { this.zoomInImg('right') }, this);
-		Wu.DomEvent.on(this._rightImage.zoomIn, 'mouseup',   function() { this.zoomInImg_stop('right') }, this);
+		Wu.DomEvent.on(this._rightImage.zoomIn, 'mousedown', function() { this.zoomImg('right', 'in') }, this);
+		Wu.DomEvent.on(this._rightImage.zoomIn, 'mouseup',   function() { this.zoomImg_stop('right') }, this);
 
 		// Zooming out on Right Image
-		Wu.DomEvent.on(this._rightImage.zoomOut, 'mousedown', function() { this.zoomOutImg('right') }, this);
-		Wu.DomEvent.on(this._rightImage.zoomOut, 'mouseup',   function() { this.zoomOutImg_stop('right') }, this);
+		Wu.DomEvent.on(this._rightImage.zoomOut, 'mousedown', function() { this.zoomImg('right', 'out') }, this);
+		Wu.DomEvent.on(this._rightImage.zoomOut, 'mouseup',   function() { this.zoomImg_stop('right') }, this);
 
 
 	},
 
-	zoomInImg : function (side) {
+	zoomImg : function (side, direction) {
 		
-		// get image container
-		var container = this._leftImage.Image.img;
+
+		var zoomThis;
 
 		// LEFT
 		if ( side == "left" ) {
-		
+			var zoomThis = this._leftImage;
 			var currentActiveNativeWidth = this.images[this._currentActiveLeft].file.data.image.dimensions.width;
+		} 
+		
 
-			var imgContainer = this._leftImage.Image.img;
+		// RIGHT
+		if ( side == "right" ) {
+			var zoomThis = this._rightImage;
+			var currentActiveNativeWidth = this.images[this._currentActiveRight].file.data.image.dimensions.width;			
+		} 
+
+
+			// get image container
+			var container = zoomThis.Image.img;
+
+			var imgContainer = zoomThis.Image.img;
 			
 			var _imgWidth = imgContainer.offsetWidth;
 			var _imgHeight = imgContainer.offsetHeight;
@@ -89,177 +101,71 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 
 			var hw_prop = _imgHeight / _imgWidth;			
 
-			var _imgWrapperWidth = this._leftImage.Image.offsetWidth;
-			var _imgWrapperHeight = this._leftImage.Image.offsetHeight;
+			var _imgWrapperWidth = zoomThis.Image.offsetWidth;
+			var _imgWrapperHeight = zoomThis.Image.offsetHeight;		
 
-			// var iol = - ((_imgWidth - _imgWrapperWidth)/2);
-			// var offset_X = iol - _imgLeft;
-
-			// var iot = - (((_imgHeight - _imgWrapperHeight) - 3)/2);
-			// var offset_Y = iot - _imgTop;
 
 			var that = this;
 
 			// ZOOOOOMING 
-			this._leftImage.ZoomingIn = setInterval(function() {
+			this.imgZooming = setInterval(function() {
 				
-				// How fast we want to zoom IN 
-				zoomIndex = 10;
+				// How fast we want to Zoom
+				// 1% of image width
+				if ( direction == "in" ) {
+					zoomIndex = _imgWidth/100;
+				} else {
+					zoomIndex = - _imgWidth/100;					
+				}
 
-				// flytte 5px opp og til venstre
-				leftZoomIndex = zoomIndex/2;
-				topZoomIndex = (zoomIndex/2) * hw_prop;				
-
-				// Update Image size and posititon
+				// New Image width
 				_imgWidth+=zoomIndex;
+
+				// New Image height
+				var zoomIndexHeight = zoomIndex * hw_prop;
+				_imgHeight+=zoomIndexHeight;
+				
+				// Figure out percent position of image center relevant to container center
+				KOPercentLeft = (-_imgLeft + (_imgWrapperWidth / 2) ) / _imgWidth;
+				KOPercentTop = (-_imgTop + (_imgWrapperHeight / 2) ) / _imgHeight;
+
+				// New Left Position
+				leftZoomIndex = zoomIndex * KOPercentLeft;
 				_imgLeft-=leftZoomIndex;
+
+				// New Top Position
+				topZoomIndex = (zoomIndex * hw_prop) * KOPercentTop;
 				_imgTop-=topZoomIndex;
 
+				// Update Percentage Number
 				var currentPercent = Math.round((_imgWidth / currentActiveNativeWidth) * 100);
-				that._leftImage.percent.innerHTML = currentPercent;
+				zoomThis.percent.innerHTML = currentPercent;
 				
 				imgContainer.style.width  = _imgWidth           + 'px';
-				imgContainer.style.height = _imgWidth * hw_prop + 'px';
+				imgContainer.style.height = _imgHeight 		+ 'px';
 				imgContainer.style.left   = _imgLeft            + 'px';
 				imgContainer.style.top    = _imgTop             + 'px';
 
 			}, 10);
-		}
-
-		// RIGHT
-		if ( side == "right" ) {
-
-				var currentActiveNativeWidth = this.images[this._currentActiveRight].file.data.image.dimensions.width;
-				
-				var imgContainer = this._rightImage.Image.img;
-				
-				var _imgWrapperWidth = this._rightImage.Image.offsetWidth;
-				var _imgWidth = imgContainer.offsetWidth;
-				var _imgHeight = imgContainer.offsetHeight;
-				var _imgLeft = imgContainer.offsetLeft;
-
-				var that = this;
-				this._rightImage.ZoomingIn = setInterval(function() {
-					
-					_imgWidth+=10;
-					_imgLeft-=5;
-
-					var currentPercent = Math.round((_imgWidth / currentActiveNativeWidth) * 100);
-					that._rightImage.percent.innerHTML = currentPercent;
-
-
-					// Prevent Image from becoming smaller than its wrapper
-					if ( _imgWidth <= _imgWrapperWidth ) _imgWidth = _imgWrapperWidth;
-					if ( _imgLeft >= 0 ) _imgLeft = 0;
-
-					imgContainer.style.width = _imgWidth + 'px';
-					imgContainer.style.height = 'auto';
-					imgContainer.style.left = _imgLeft + 'px';				
-
-			}, 10);
-		}
-
+		
 		
 	},
 
-	zoomInImg_stop : function (side) {
-		
+	zoomImg_stop : function (side) {
+
+		clearInterval(this.imgZooming);
+
 		if ( side == "left" ) {
-			clearInterval(this._leftImage.ZoomingIn);
-	
-			this.__leftImageUpdate();
-
-		}
-
-		if ( side == "right" ) {
-			clearInterval(this._rightImage.ZoomingIn);	
-		}
-		
-	},
-
-
-	zoomOutImg : function (side) {
-		
-		// LEFT
-		if ( side == "left" ) {
-
-			var currentActiveNativeWidth = this.images[this._currentActiveLeft].file.data.image.dimensions.width;
-
-			var imgContainer = this._leftImage.Image.img;
-
-			var _imgWrapperWidth = this._leftImage.Image.offsetWidth;
-			var _imgWidth = imgContainer.offsetWidth;
-			var _imgHeight = imgContainer.offsetHeight;
-			var _imgLeft = imgContainer.offsetLeft;
-
-			var that = this;
-			this._leftImage.ZoomingOut = setInterval(function() {
-
-				_imgWidth-=10;
-				_imgLeft+=5;
-
-				var currentPercent = Math.round((_imgWidth / currentActiveNativeWidth) * 100);
-				that._leftImage.percent.innerHTML = currentPercent;
-
-
-				// Prevent Image from becoming smaller than its wrapper
-				if ( _imgWidth <= _imgWrapperWidth ) _imgWidth = _imgWrapperWidth;
-				if ( _imgLeft >= 0 ) _imgLeft = 0;
-
-				imgContainer.style.width = _imgWidth + 'px';
-				imgContainer.style.height = 'auto';
-				imgContainer.style.left = _imgLeft + 'px';
-
-			}, 10);
-		}
-
-		// RIGHT
-		if ( side == "right" ) {
-
-				var currentActiveNativeWidth = this.images[this._currentActiveRight].file.data.image.dimensions.width;
-
-				var imgContainer = this._rightImage.Image.img;
-
-				var _imgWrapperWidth = this._rightImage.Image.offsetWidth;
-				var _imgWidth = imgContainer.offsetWidth;
-				var _imgHeight = imgContainer.offsetHeight;
-				var _imgLeft = imgContainer.offsetLeft;
-
-				var that = this;
-				this._rightImage.ZoomingOut = setInterval(function() {
-
-					_imgWidth-=10;
-					_imgLeft+=5;
-
-					var currentPercent = Math.round((_imgWidth / currentActiveNativeWidth) * 100);
-					that._rightImage.percent.innerHTML = currentPercent;
-
-					// Prevent Image from becoming smaller than its wrapper
-					if ( _imgWidth <= _imgWrapperWidth ) _imgWidth = _imgWrapperWidth;
-					if ( _imgLeft >= 0 ) _imgLeft = 0;
-
-					imgContainer.style.width = _imgWidth + 'px';
-					imgContainer.style.height = 'auto';
-					imgContainer.style.left = _imgLeft + 'px';
-
-
-				}, 10);
-		}
-
-	},
-
-	zoomOutImg_stop : function (side) {
-		
-		if ( side == "left" ) {
-			clearInterval(this._leftImage.ZoomingOut);
 			this.__leftImageUpdate();
 		}
 
 		if ( side == "right" ) {
-			clearInterval(this._rightImage.ZoomingOut);
 		}
-
+		
 	},
+
+
+
 
 	__leftImageUpdate : function () {
 
@@ -277,12 +183,11 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 			var wrapperHeight = this._leftImage.Image.offsetHeight;
 
 			var _xCrop = this._leftImage.Image.img.offsetLeft;
+			var _yCrop = this._leftImage.Image.img.offsetTop;
 
-			if ( imageHeight >= wrapperHeight ) {
-				var _yCrop = wrapperHeight - imageHeight;
-			} else {
-				var _yCrop = 0;
-			}
+			// Make sure to never crop if the offsetTop and offsetLeft is positive
+			if ( _xCrop > 0 ) _xCrop = 0;
+			if ( _yCrop > 0 ) _yCrop = 0;
 
 
 			console.log("************************");
@@ -295,6 +200,7 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 			console.log("------------------------");
 			console.log("New image crop width:", wrapperWidth)
 			console.log("New image crop height:", wrapperHeight)
+			console.log("************************");
 			
 			var _requestCrunch = crunchPath;
 				_requestCrunch += thisImage.file.uuid;
@@ -303,7 +209,7 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 				_requestCrunch += '&cropw=' + wrapperWidth;
 				_requestCrunch += '&croph=' + wrapperHeight;
 				_requestCrunch += '&cropx=' + Math.abs(_xCrop);
-				_requestCrunch += '&cropy=' + Math.abs(_yCrop)/2;
+				_requestCrunch += '&cropy=' + Math.abs(_yCrop);
 
 			this._rightImage.Image.img.src = _requestCrunch;		
 	
@@ -539,6 +445,7 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 
 	_stopDragging : function () {
 		this._draggingLeftImage = false;
+		this.__leftImageUpdate();
 	},
 
 	reset : function () {

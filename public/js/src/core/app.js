@@ -1,3 +1,4 @@
+Wu.version = '0.2-dev';
 Wu.App = Wu.Class.extend({
 
 	options : {},
@@ -12,6 +13,7 @@ Wu.App = Wu.Class.extend({
 
 		// set options
 		L.mapbox.config.FORCE_HTTPS = true;
+		L.mapbox.accessToken = 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJQMWFRWUZnIn0.yrBvMg13AZC9lyOAAf9rGg';
 
 		// get objects from server
 		this.initServer();

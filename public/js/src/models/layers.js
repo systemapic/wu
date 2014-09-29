@@ -106,9 +106,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		
 		// load data if not loaded
 		if (!this.loaded) this.loadData();
-		
-		console.log('addto: ', layer);
-		
+				
 		// leaflet fn, add to map		
 		layer.addTo(map);  
 
@@ -295,7 +293,8 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 			// create popup
 			var popup = L.popup({
 				offset : [0, -5],
-				closeButton : false
+				closeButton : false,
+				zoomAnimation : false
 			})
 			.setContent(popstr);
 
@@ -307,41 +306,64 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	},
 
+	setPopupPosition : function (e) {
+		var popup = e.layer._popup;
+		var latlng = app._map.mouseEventToLatLng(e.originalEvent);
+		popup.setLatLng(latlng);
+	},
+
 	bindHoverTooltip : function () {
 		var that = this;
+
 
 		// mousemove on layer
 		this.layer.on('mousemove', function (e) {
 			var popup = e.layer._popup;
+			var latlng = app._map.mouseEventToLatLng(e.originalEvent);
 
+			Wu.DomEvent.stop(e);
+	
 			// first time open
 			if (!popup._isOpen) {
-				
+									// todo: BUGGY!!!
 				// open popup
-				e.layer.openPopup();
-				
+				e.layer.openPopup(latlng);
+				popup._isOpen = true;
+
 				// add event to avoid bs when hovering over tooltip itself
 				Wu.DomEvent.on(popup._container, 'mousemove', function (f) {
-					var latlng = app._map.mouseEventToLatLng(f);
-					popup.setLatLng(latlng);
-				});
+					that.setPopupPosition(e); 
+				}, that);
+			
+			} else {
+				// set position of popup
+				// popup.setLatLng(e.latlng);
+				that.setPopupPosition(e);
 			}
-
-			// set position of popup
-			popup.setLatLng(e.latlng);
+			
 
 		});
 
 		// mouseout on layer
 		this.layer.on('mouseout', function (e) {
 
-			var target = e.originalEvent.toElement.className;
+			var target = e.originalEvent.toElement;//.className;
+
+			if (!target) {
+				if (e.layer) {
+					e.layer.closePopup();	
+					e.layer._popup._isOpen = false;
+				}
+
+				return;
+			}
 
 			// if touching tooltip itself, don't close
-			if (target == 'leaflet-popup-tip-container') return;
+			if (target.className == 'leaflet-popup-tip-container') return;
 
 			// close
 			e.layer.closePopup();
+			e.layer._popup._isOpen = false;
 		});
 
 
