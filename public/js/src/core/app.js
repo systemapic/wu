@@ -1,7 +1,44 @@
 Wu.version = '0.2-dev';
 Wu.App = Wu.Class.extend({
 
-	options : {},
+	// default options
+	options : {
+		id : 'app',
+
+		panes : {
+			// plugged in and working! :)
+			clients 	: true,
+			mapOptions 	: true,
+			documents 	: true,               	
+			dataLibrary 	: true,               	
+			mediaLibrary    : true,
+			users 		: true,
+		},						
+		
+		plugins : {
+			// not plugged in
+			chat 		: false, 
+			colorTheme      : true,
+			screenshot 	: true,
+		},
+
+		providers : {
+			// default accounts, added to all new (and old?) projects
+			mapbox : [{	
+				username : 'systemapic',
+				accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJQMWFRWUZnIn0.yrBvMg13AZC9lyOAAf9rGg'
+			}]
+		},
+
+		servers : {
+			// not used, using window url atm..
+			portal : 'http://85.10.202.87:8080/',
+			raster : 'http://85.10.202.87:8003/',
+			vector : '',	// tile servers
+			socket : ''	// websocket server
+		}
+	},
+
 
 	initialize : function (options) {
 
@@ -13,7 +50,7 @@ Wu.App = Wu.Class.extend({
 
 		// set options
 		L.mapbox.config.FORCE_HTTPS = true;
-		L.mapbox.accessToken = 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJQMWFRWUZnIn0.yrBvMg13AZC9lyOAAf9rGg';
+		L.mapbox.accessToken = this.options.providers.mapbox[0].accessToken; // todo: move to relevant place
 
 		// get objects from server
 		this.initServer();
@@ -21,7 +58,7 @@ Wu.App = Wu.Class.extend({
 	},
 
 	initServer : function () {
-		var serverUrl = this.options.server;
+		var serverUrl = this.options.servers.portal;
 
 		console.log('Server: ', serverUrl);
 
@@ -62,6 +99,7 @@ Wu.App = Wu.Class.extend({
 		// check if only one client and no read
 		this._singleClient();
 
+		// init pane view
 		this._initView();
 
 	},
@@ -107,14 +145,13 @@ Wu.App = Wu.Class.extend({
 		       this.Projects[elem.uuid] = new Wu.Project(elem, this);
 		}, this);
 
-
 	},
 
 
 	_initPanes : function () {
 
 		// render side pane 
-		this.SidePane = new Wu.SidePane();
+		this.SidePane = new Wu.SidePane();	// todo: add settings more locally?
 
 		// render header pane
 		this.HeaderPane = new Wu.HeaderPane();
@@ -126,7 +163,6 @@ Wu.App = Wu.Class.extend({
 
 	// init default view on page-load
 	_initView : function () {
-
 
 		// if user is admin or manager, set Projects and Users as default panes
 		var user = app.Account;
@@ -162,7 +198,11 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_initHotlink : function () {
+		// return;
+		
+		console.log('HOTLINK: ', window.hotlink);
 		return;
+
 		
 		// only if hotlink
 		if (!window.hotlink.hasOwnProperty('client')) return;

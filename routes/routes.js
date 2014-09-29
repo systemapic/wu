@@ -39,13 +39,15 @@ module.exports = function(app, passport) {
 	// ================================
 	app.get('/', function(req, res) {
 
+		console.log('GET / ', req.session.hotlink);
+
 		// return if not logged in 			redirect to login page
 		if (!req.isAuthenticated()) return res.render('../../views/index.ejs'); // load the index.ejs file
 		
 		// render app html				// todo: hotlink
 		res.render('../../views/app.ejs', {
 			//json : json,
-			hotlink : {}
+			hotlink : req.session.hotlink
 		});
 
 		// reset hotlink

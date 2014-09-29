@@ -1625,14 +1625,12 @@
 		<script src="//85.10.202.87:8080/js/src/controls/legendsControl.js"></script> 				
 		<script src="//85.10.202.87:8080/js/src/controls/mousepositionControl.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/controls/baselayertoggleControl.js"></script> 
-		
+	
 		<script src="//85.10.202.87:8080/js/src/models/projects.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/models/clients.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/models/users.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/models/layers.js"></script> 
-		
 		<script src="//85.10.202.87:8080/js/src/models/colorThemes.js"></script>		
-		
 		<script src="//85.10.202.87:8080/js/src/core/app.js"></script> 
 
 		<script>
@@ -1641,18 +1639,39 @@
 			// start systemapic app
 			var app = new Wu.App({
 					
-					id 		: 'app', 						//todo! options!
-					documentsPane 	: true,               // default true
-					downloadsPane 	: true,               // default true
-					mediaLibrary    : true,
-					header 		: true,
-					chat 		: true,                         // default false
-					mapbox 		: true,
-					cartodb 	: true,
-					serverdb 	: true,
-					tileserver 	: 'http://85.10.202.87:8003/',
-					server 		: 'http://85.10.202.87:8080/'
-					// etc...
+					// id : 'app',
+
+					
+					// panes : {
+					// 	clients 	: true,
+					// 	mapOptions 	: true,
+					// 	documents 	: true,               	// default true
+					// 	dataLibrary 	: true,               	// default true
+					// 	mediaLibrary    : true,
+					// 	users 		: true,
+					// },						//todo! options!
+					
+					// plugins : {
+					// 	chat 		: false, 
+					// 	colorTheme      : true,
+					// 	screenshot 	: true,
+					// },
+
+					// providers : {
+
+					// 	mapbox : [{	// default accounts
+					// 		username : 'systemapic',
+					// 		accessToken : ''
+					// 	}]
+						
+					// },
+
+					// servers : {
+					// 	portal : 'http://85.10.202.87:8080/',
+					// 	raster : 'http://85.10.202.87:8003/',
+					// 	vector : '',	// tile servers
+					// 	socket : ''	// websocket server
+					// }
 
 			});
 

@@ -195,7 +195,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 		// Check if we're swiping up or down
 		if ( swfrom > swto ) {
 			swipeOut = 'swipe_out';
-			swipeIn = 'swipe_in';						// maybe refactor, write as separate fn's - up/down vs. in/out ?
+			swipeIn = 'swipe_in';						
 		} else {
 			swipeOut = 'swipe_out_up';
 			swipeIn = 'swipe_in_up';

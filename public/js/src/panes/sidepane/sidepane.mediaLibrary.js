@@ -211,8 +211,19 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 				_requestCrunch += '&cropx=' + Math.abs(_xCrop);
 				_requestCrunch += '&cropy=' + Math.abs(_yCrop);
 
-			this._rightImage.Image.img.src = _requestCrunch;		
-	
+			
+			// Load image before pasting it (high res version)
+			var myTempImage = new Image();
+			var that = this;
+
+			myTempImage.onload=function() {
+				that._rightImage.Image.img.style.top = '0px';
+				that._rightImage.Image.img.style.left = '0px';
+				that._rightImage.Image.img.src = myTempImage.src;
+			};
+			myTempImage.src = _requestCrunch;
+
+
 	},
 
 	removeHooks : function () {
@@ -438,8 +449,23 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 				var __new_X = this.__x_pos - this.__x_elem;
 				var __new_Y = this.__y_pos - this.__y_elem;
 
+				// Moving X
+				var movingX = 	this._leftImage.Image.img.offsetLeft - __new_X;
+				var hrX = 		this._rightImage.Image.img.offsetLeft;
+				console.log("movingX", movingX);
+
+				// Moving Y
+				var movingY = 	this._leftImage.Image.img.offsetTop - __new_Y;
+				var hrY = 		this._rightImage.Image.img.offsetTop;
+				console.log("movingY", movingY);
+
+
 				this._leftImage.Image.img.style.left = __new_X + 'px';
 				this._leftImage.Image.img.style.top = __new_Y + 'px';
+
+
+				this._rightImage.Image.img.style.left = hrX - movingX + 'px';
+				this._rightImage.Image.img.style.top = hrY - movingY + 'px';
 			}
 	},	
 
