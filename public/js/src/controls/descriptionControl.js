@@ -131,13 +131,16 @@ L.Control.Description = L.Control.extend({
 		this.editing = false;
 
 		// unbind text editor
-		grande.unbind([this._inner]);
+		// grande.unbind([this._inner]);
 
-		// hide grande menu
-		var g = document.getElementsByClassName('text-menu')[0];
-		Wu.DomUtil.removeClass(g, 'active');
-		Wu.DomUtil.addClass(g, 'hide');
+		// // hide grande menu
+		// var g = document.getElementsByClassName('text-menu')[0];
+		// Wu.DomUtil.removeClass(g, 'active');
+		// Wu.DomUtil.addClass(g, 'hide');
 		
+		// hide grande
+		this.removeGrande();
+
 		// re-enable dragging
 		app._map.dragging.enable();
 
@@ -183,6 +186,10 @@ L.Control.Description = L.Control.extend({
 		Wu.DomEvent.on(this._inner, 'click', Wu.DomEvent.stop, this);
 		Wu.DomEvent.on(document, 'click', this.editOff, this);
 
+	},
+
+	textChange : function () {
+		console.log('text Change');
 	},
 
 	removeGrande : function () {

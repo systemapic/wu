@@ -4751,19 +4751,19 @@ h4 {
   /*border: 1px solid red;*/
   z-index: 100; }
 
-#mediaLibrary-grabgrid-left:before {
-  content: '';
-  width: 20px;
-  height: 20px;
-  background: red;
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  border-radius: 10px; }
-
+/*#mediaLibrary-grabgrid-left:before {
+	content: '';
+	width: 20px;
+	height: 20px;
+	background: red;
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+	border-radius: 10px;
+}	*/
 #fuckyou {
   position: absolute;
   background-color: rgba(255, 0, 0, 0.3);
