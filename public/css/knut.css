@@ -243,3 +243,15 @@
 	padding-top: 1px !important;
 	width: 245px !important;
 }
+
+
+/*home button*/
+.home-container {
+	width: 100px;
+	height: 80px;
+	background: rgba(255, 255, 0, 0.77);
+}
+
+.q-editor-container {
+	height: 80px;
+}

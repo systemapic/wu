@@ -170,7 +170,6 @@ Wu.MapPane = Wu.Class.extend({
 
 		// create new map
 		this._map = Wu.app._map = L.map('map', options).setView([0, 0], 5);
-		console.log('createNewMap: ', this._map);
 
 		// add editable layer
 		this.addEditableLayer(this._map);

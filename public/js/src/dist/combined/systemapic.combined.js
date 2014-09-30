@@ -1497,7 +1497,7 @@ String.prototype.camelize = function () {
 		Wu.app._editorContentPane = Wu.DomUtil.create('content', className, this._container); 
 
 		// menuslider
-		Wu.app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', this._container);
+		Wu.app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
 		Wu.DomUtil.addClass(Wu.app._menuSlider, 'ct1');
 		
 	},
@@ -1505,7 +1505,10 @@ String.prototype.camelize = function () {
 	render : function () {
 		var pane = this.options.panes;
 
-		console.log('render: pane: ', pane);
+		// add home button
+		this.Home = new Wu.SidePane.Home({
+			addTo: this._container
+		});
 
 		// render sidepanes
 		if (pane.clients) 	this.Clients 	  = new Wu.SidePane.Clients();
@@ -1515,6 +1518,38 @@ String.prototype.camelize = function () {
 		if (pane.mediaLibrary) 	this.MediaLibrary = new Wu.SidePane.MediaLibrary();
 		if (pane.users) 	this.Users 	  = new Wu.SidePane.Users();
 
+	},
+
+	calculateHeight : function () {
+		var header = app.HeaderPane;
+		var height = header.getHeight();
+
+		// set minimum width
+		if (!height) height = 80;
+
+		// set height
+		this._minHeight = height;
+	},
+
+	setHeight : function (height) {
+		this._container.style.height = height + 'px';
+	},
+
+	collapse : function () {
+		
+		// calculate
+		this.calculateHeight();
+		
+		// set height
+		this.setHeight(this._minHeight);
+
+		// close menu panes if open
+		this.closePane();
+
+	},
+
+	expand : function () {
+		this._container.style.height = '100%';
 	},
 
 	_getPaneArray : function () {
@@ -1529,10 +1564,9 @@ String.prototype.camelize = function () {
 		return panes;
 	},
 
-
 	setProject : function (project) {
-
 		// update content
+		if (this.Home) this.Home.updateContent(project);
 		if (this.Map) this.Map.updateContent(project);
 		if (this.Documents) this.Documents.updateContent(project);
 		if (this.DataLibrary) this.DataLibrary.updateContent(project);
@@ -1608,6 +1642,7 @@ String.prototype.camelize = function () {
 		}, 300); // time with css
 
 		this._closePane();
+		Wu.DomUtil.removeClass(app._active, 'show');	
 	},
 
 	_closePane : function () {				// refactor: move to SidePane.Item ... 
@@ -5174,7 +5209,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	removeEditHooks : function () {
-		console.log('removeEditHooks doc');
 		
 		// new folder
 		Wu.DomEvent.off(this._newfolder, 'mousedown', this.newFolder, this);
@@ -6833,6 +6867,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	enableResize : function () {
+
+		if (!this.project.editMode) return;
+		
 		// resizer
 		Wu.DomEvent.on(this._resizer, 'mousedown', this.resize, this);
 		Wu.DomEvent.on(this._resizer, 'mouseup', this._resized, this);
@@ -6911,6 +6948,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._container.style.maxHeight = this._headerHeight  + 'px';    
 
 		// add edit hooks
+		console.log('this editmode!???', project.editMode);
 		if (project.editMode) {
 			this.addEditHooks();
 			this.refreshDropzone();
@@ -6919,18 +6957,22 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		}
 	},
 
+	getHeight : function () {
+		return this._headerHeight;
+	},
+
 	reset : function () {
 		// hide header
 		this._container.style.display = 'none';
 	},
 
 	_resetView : function () {
-	       // this._container.innerHTML = '';
+
 	},
 
 	resize : function () {
-		// this._resizer.style.backgroundColor = 'rgba(103, 120, 163, 0.57)';
 		var that = this;
+
 		window.onmouseup = function (e) {
 			that._resized();
 			window.onmouseup = null;
@@ -6950,8 +6992,16 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._container.style.maxHeight = this._headerHeight  + 'px';
 
 		// map height
-		var control = Wu.app._map._controlContainer;
+		var control = app._map._controlContainer;
 		control.style.paddingTop = this._headerHeight + 'px';
+
+		// home height
+		var home = app.SidePane.Home;
+		home.setHeight(newHeight);
+
+		// set height sidepane
+		var sidepane = app.SidePane;
+		sidepane.setHeight(newHeight);
 
 	},
 
@@ -7165,7 +7215,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// create new map
 		this._map = Wu.app._map = L.map('map', options).setView([0, 0], 5);
-		console.log('createNewMap: ', this._map);
 
 		// add editable layer
 		this.addEditableLayer(this._map);
@@ -10906,7 +10955,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		http.setRequestHeader("Content-type", "application/json");
 
 		http.onreadystatechange = function() {
-			if (http.readyState == 4 && http.status == 200) {
+			if (http.readyState == 4 && http.status == 200) {			// todo: refactor
 				that.dataLoaded(that, http.responseText);
 			}
 		}
@@ -10920,6 +10969,9 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		// parse json into geojson object
 		that.data = JSON.parse(json);
 		
+		// return if error
+		if (that.data.error) return console.log(that.data.error);
+
 		// add data to layer
 		that.layer.addData(that.data);
 

@@ -112,6 +112,9 @@ Wu.HeaderPane = Wu.Class.extend({
 	},
 
 	enableResize : function () {
+
+		if (!this.project.editMode) return;
+		
 		// resizer
 		Wu.DomEvent.on(this._resizer, 'mousedown', this.resize, this);
 		Wu.DomEvent.on(this._resizer, 'mouseup', this._resized, this);
@@ -190,6 +193,7 @@ Wu.HeaderPane = Wu.Class.extend({
 		this._container.style.maxHeight = this._headerHeight  + 'px';    
 
 		// add edit hooks
+		console.log('this editmode!???', project.editMode);
 		if (project.editMode) {
 			this.addEditHooks();
 			this.refreshDropzone();
@@ -198,18 +202,22 @@ Wu.HeaderPane = Wu.Class.extend({
 		}
 	},
 
+	getHeight : function () {
+		return this._headerHeight;
+	},
+
 	reset : function () {
 		// hide header
 		this._container.style.display = 'none';
 	},
 
 	_resetView : function () {
-	       // this._container.innerHTML = '';
+
 	},
 
 	resize : function () {
-		// this._resizer.style.backgroundColor = 'rgba(103, 120, 163, 0.57)';
 		var that = this;
+
 		window.onmouseup = function (e) {
 			that._resized();
 			window.onmouseup = null;
@@ -229,8 +237,16 @@ Wu.HeaderPane = Wu.Class.extend({
 		this._container.style.maxHeight = this._headerHeight  + 'px';
 
 		// map height
-		var control = Wu.app._map._controlContainer;
+		var control = app._map._controlContainer;
 		control.style.paddingTop = this._headerHeight + 'px';
+
+		// home height
+		var home = app.SidePane.Home;
+		home.setHeight(newHeight);
+
+		// set height sidepane
+		var sidepane = app.SidePane;
+		sidepane.setHeight(newHeight);
 
 	},
 
