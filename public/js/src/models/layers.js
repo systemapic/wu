@@ -154,7 +154,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		http.setRequestHeader("Content-type", "application/json");
 
 		http.onreadystatechange = function() {
-			if (http.readyState == 4 && http.status == 200) {
+			if (http.readyState == 4 && http.status == 200) {			// todo: refactor
 				that.dataLoaded(that, http.responseText);
 			}
 		}
@@ -168,6 +168,9 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		// parse json into geojson object
 		that.data = JSON.parse(json);
 		
+		// return if error
+		if (that.data.error) return console.log(that.data.error);
+
 		// add data to layer
 		that.layer.addData(that.data);
 

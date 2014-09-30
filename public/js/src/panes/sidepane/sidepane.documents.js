@@ -106,7 +106,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	removeEditHooks : function () {
-		console.log('removeEditHooks doc');
 		
 		// new folder
 		Wu.DomEvent.off(this._newfolder, 'mousedown', this.newFolder, this);

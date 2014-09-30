@@ -35,7 +35,7 @@ Wu.SidePane = Wu.Class.extend({
 		Wu.app._editorContentPane = Wu.DomUtil.create('content', className, this._container); 
 
 		// menuslider
-		Wu.app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', this._container);
+		Wu.app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
 		Wu.DomUtil.addClass(Wu.app._menuSlider, 'ct1');
 		
 	},
@@ -43,7 +43,10 @@ Wu.SidePane = Wu.Class.extend({
 	render : function () {
 		var pane = this.options.panes;
 
-		console.log('render: pane: ', pane);
+		// add home button
+		this.Home = new Wu.SidePane.Home({
+			addTo: this._container
+		});
 
 		// render sidepanes
 		if (pane.clients) 	this.Clients 	  = new Wu.SidePane.Clients();
@@ -53,6 +56,38 @@ Wu.SidePane = Wu.Class.extend({
 		if (pane.mediaLibrary) 	this.MediaLibrary = new Wu.SidePane.MediaLibrary();
 		if (pane.users) 	this.Users 	  = new Wu.SidePane.Users();
 
+	},
+
+	calculateHeight : function () {
+		var header = app.HeaderPane;
+		var height = header.getHeight();
+
+		// set minimum width
+		if (!height) height = 80;
+
+		// set height
+		this._minHeight = height;
+	},
+
+	setHeight : function (height) {
+		this._container.style.height = height + 'px';
+	},
+
+	collapse : function () {
+		
+		// calculate
+		this.calculateHeight();
+		
+		// set height
+		this.setHeight(this._minHeight);
+
+		// close menu panes if open
+		this.closePane();
+
+	},
+
+	expand : function () {
+		this._container.style.height = '100%';
 	},
 
 	_getPaneArray : function () {
@@ -67,10 +102,9 @@ Wu.SidePane = Wu.Class.extend({
 		return panes;
 	},
 
-
 	setProject : function (project) {
-
 		// update content
+		if (this.Home) this.Home.updateContent(project);
 		if (this.Map) this.Map.updateContent(project);
 		if (this.Documents) this.Documents.updateContent(project);
 		if (this.DataLibrary) this.DataLibrary.updateContent(project);
@@ -146,6 +180,7 @@ Wu.SidePane = Wu.Class.extend({
 		}, 300); // time with css
 
 		this._closePane();
+		Wu.DomUtil.removeClass(app._active, 'show');	
 	},
 
 	_closePane : function () {				// refactor: move to SidePane.Item ... 

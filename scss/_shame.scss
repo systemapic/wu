@@ -1,3 +1,26 @@
+.leaflet-styleeditor-mouseTooltip {
+	z-index: 600;
+	position: absolute;
+	padding: 10px;
+	height: auto;
+	background: red;
+}
+	
+	
+.home-container {
+	background: none;
+	background-image: url("evil_sprite.png") !important;
+	background-repeat: no-repeat !important;
+	background-position: -59px -229px !important;
+	background-color: #0F1A1E !important;
+	cursor: pointer;
+}
 
-	
-	
+.q-editor-container {
+	-webkit-transition: height 250ms ease;
+}
+
+.q-editor-menu {
+	box-shadow: 0 -1px 0 0 white;	
+	margin-top: 1px;
+	}

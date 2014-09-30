@@ -349,16 +349,18 @@ body {
 
 #header .header-logo {
   position: relative;
-  height: 120px;
-  max-width: 200px;
+  /*height: 120px;*/
+  /*max-width: 200px;*/
   color: white;
   margin-right: 20px;
   float: left;
-  max-height: inherit; }
+  max-height: inherit;
+  padding: 5px; }
 
 .header-logo img {
-  position: relative;
-  max-height: inherit; }
+  max-height: 100%;
+  padding-bottom: 10px;
+  width: auto; }
 
 .header-title {
   border: 0px;
@@ -3579,9 +3581,9 @@ h3 {
 h4 {
   cursor: default; }
 
-.header-logo img {
-  min-width: 100px; }
-
+/*.header-logo img {*/
+/*min-width: 100px;*/
+/*}*/
 .disabled {
   height: 0px !important; }
 
@@ -3590,7 +3592,7 @@ h4 {
 
 /*pane closed by default*/
 #map {
-  left: 100px; }
+  left: 0px; }
 
 #header {
   left: 100px; }
@@ -4485,6 +4487,22 @@ h4 {
   width: 90px;
   height: 60px; }
 
+.mapbox-listed-account {
+  padding: 10px;
+  top: 10px; }
+
+.mapbox-listed-account-title {
+  text-indent: 20px; }
+
+.mapbox-listed-account-title:before {
+  content: '•';
+  position: absolute;
+  left: -18px;
+  color: white;
+  font-size: 36px;
+  top: 11px;
+  line-height: 0; }
+
 .fullpage-mediaLibrary .editor-wrapper {
   width: 100% !important;
   padding-right: 50px !important;
@@ -4782,5 +4800,27 @@ h4 {
   border-radius: 10px;
   z-index: 9999999;
   margin: 0; }
+
+.leaflet-styleeditor-mouseTooltip {
+  z-index: 600;
+  position: absolute;
+  padding: 10px;
+  height: auto;
+  background: red; }
+
+.home-container {
+  background: none;
+  background-image: url("evil_sprite.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: -59px -229px !important;
+  background-color: #0F1A1E !important;
+  cursor: pointer; }
+
+.q-editor-container {
+  -webkit-transition: height 250ms ease; }
+
+.q-editor-menu {
+  box-shadow: 0 -1px 0 0 white;
+  margin-top: 1px; }
 
 /*# sourceMappingURL=style.css.map */

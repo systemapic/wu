@@ -41,9 +41,9 @@ h4 {
 	cursor: default;
 }
 
-.header-logo img {
-	min-width: 100px;
-}
+/*.header-logo img {*/
+	/*min-width: 100px;*/
+/*}*/
 
 .disabled {
 	height: 0px !important;
@@ -55,7 +55,7 @@ h4 {
 
 /*pane closed by default*/
 #map {
-	left: 100px;
+	left: 0px;
 }
 #header {
 	left: 100px;
@@ -1111,3 +1111,21 @@ h4 {
 	}
 
 
+.mapbox-listed-account {
+	padding: 10px;
+	top: 10px;
+	}
+
+.mapbox-listed-account-title {
+	text-indent: 20px;
+}
+
+.mapbox-listed-account-title:before {
+	content: '•';
+	position: absolute;
+	left: -18px;
+	color: white;
+	font-size: 36px;
+	top: 11px;
+	line-height: 0;
+	}

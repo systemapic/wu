@@ -2140,6 +2140,9 @@ module.exports = api = {
 		var uuid = req.body.uuid;	// file-1091209120-0129029
 		var user = req.user.uuid;	// user-1290192-adasas-1212
 
+		console.log('uuid: ', uuid);
+		console.log('user: ', user);
+
 		// return if invalid
 		if (!uuid || !user) return false;
 
