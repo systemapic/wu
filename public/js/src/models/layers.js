@@ -68,8 +68,6 @@ Wu.Layer = Wu.Class.extend({
 		json.uuid   = app.activeProject.store.uuid; // project uuid
 		var string  = JSON.stringify(json);
 		
-		console.log('svaestring: ', string);
-
 		Wu.save('/api/layer/update', string);
 	}
 
@@ -89,10 +87,10 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 	       
 		// create leaflet geoJson layer
 		this.layer = L.geoJson(false, {
-			onEachFeature : this.hoverTooltip
-		});
 
-		// this.layer = L.geoJson();
+			// create popup
+			onEachFeature : this.createPopup
+		});
 		
 	},
 
@@ -107,36 +105,22 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		// load data if not loaded
 		if (!this.loaded) this.loadData();
 				
-		// leaflet fn, add to map		
-		layer.addTo(map);  
+		// set hover popup
+		this.bindHoverPopup();
 
-		// set tooltip
-		this.bindHoverTooltip();
+		// add to drawControl
+		var drawControl = app.MapPane.editableLayers;
+		drawControl.addLayer(layer);
 
-		// var drawControl = Wu.app.MapPane._drawControlLayer;
-		// // add to map or drawControl
-		// if (drawControl) {
-		// 	drawControl.addLayer(layer);
-		// } else {
-		// 	layer.addTo(map);  // leaflet fn
-		// }
 	},
 
 	remove : function (map) {
 		var map = map || Wu.app._map;
 		var layer = this.layer;
-		// var drawControl = Wu.app.MapPane._drawControlLayer;
 		
-		// remove from map
-		map.removeLayer(layer);
-		// this.loaded = false;
-
-
-		// if (drawControl) {
-		// 	drawControl.removeLayer(layer);
-		// } else {
-		// 	map.removeLayer(layer);  // leaflet fn
-		// }
+		// remove from editableLayers 
+		var editableLayers = app.MapPane.editableLayers;
+		editableLayers.removeLayer(layer);
 
 	},
 
@@ -191,7 +175,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		that.loaded = true;
 
 		// set opacity
-		this.setOpacity()
+		that.setOpacity()
 
 	},
 
@@ -206,29 +190,11 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	setZIndex : function (zIndex) {
 
-		console.log('L.geoJSON this: ', this);
-
 		// set zIndex for now or later
 		this.zIndex = zIndex || 1;
 
 		// return if not yet loaded
 		if (!this.loaded) return;
-
-		// set style 
-		// this.layer.setZIndex(zIndex);	// todo: doesn't really work. the overlay pane itself must be zIndex'd, but all geoJSON layers are in same pane.
-
-
-
-		// if (zIndex > 3)  {
-		// 	console.log('BRING TO FRONT!')
-		// 	this.layer.bringToFront();	// layer.bringToFront() works relative to other geoJSON layers, but not tileLayers.
-		// } else {
-		// 	console.log('SEND TO BACK!');
-		// 	this.layer.bringToBack();
-		// 	this.layer.setStyle({
-		// 		fillColor: "#ffffff"
-		// 	})
-		// }
 
 	},
 
@@ -274,37 +240,39 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		return this.opacity || 0.5;
 	},
 
-	hoverTooltip : function (feature, layer) {
+
+	// create tooltip
+	createPopup : function (feature, layer) {
 		
-		if (feature.properties) {
-			var popstr = '';
-			for (key in feature.properties) {
-				var value = feature.properties[key];
-				
-				// if not empty value
-				if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined') {
-					
-					// add features to string
-					popstr += key + ': ' + value + '<br>';
-				
-				}
+		// return if no features in geojson
+		if (!feature.properties) return;
+
+		// create popup
+		var popup = L.popup({
+			offset : [0, -5],
+			closeButton : false,
+			zoomAnimation : false
+		});
+
+		// create content
+		var string = '';
+		for (key in feature.properties) {
+			var value = feature.properties[key];
+			// if not empty value
+			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined') {
+				// add features to string
+				string += key + ': ' + value + '<br>';
 			}
-
-			// create popup
-			var popup = L.popup({
-				offset : [0, -5],
-				closeButton : false,
-				zoomAnimation : false
-			})
-			.setContent(popstr);
-
-			// bind popup to layer
-			layer.bindPopup(popup);
-
-			
 		}
 
+		// set content
+		popup.setContent(string);
+		
+		// bind popup to layer
+		layer.bindPopup(popup);
+		
 	},
+
 
 	setPopupPosition : function (e) {
 		var popup = e.layer._popup;
@@ -312,74 +280,23 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		popup.setLatLng(latlng);
 	},
 
-	bindHoverTooltip : function () {
+	bindHoverPopup : function () {
 		var that = this;
 
 
-		// mousemove on layer
-		this.layer.on('mousemove', function (e) {
-			var popup = e.layer._popup;
-			var latlng = app._map.mouseEventToLatLng(e.originalEvent);
-
-			Wu.DomEvent.stop(e);
-	
-			// first time open
-			if (!popup._isOpen) {
-									// todo: BUGGY!!!
-				// open popup
-				e.layer.openPopup(latlng);
-				popup._isOpen = true;
-
-				// add event to avoid bs when hovering over tooltip itself
-				Wu.DomEvent.on(popup._container, 'mousemove', function (f) {
-					that.setPopupPosition(e); 
-				}, that);
-			
-			} else {
-				// set position of popup
-				// popup.setLatLng(e.latlng);
-				that.setPopupPosition(e);
-			}
-			
-
-		});
-
-		// mouseout on layer
-		this.layer.on('mouseout', function (e) {
-
-			var target = e.originalEvent.toElement;//.className;
-
-			if (!target) {
-				if (e.layer) {
-					e.layer.closePopup();	
-					e.layer._popup._isOpen = false;
-				}
-
-				return;
-			}
-
-			// if touching tooltip itself, don't close
-			if (target.className == 'leaflet-popup-tip-container') return;
-
-			// close
-			e.layer.closePopup();
-			e.layer._popup._isOpen = false;
-		});
-
 
 	}
-
-	
-
-
-
 });
+
+
 
 Wu.RasterLayer = Wu.Layer.extend({
 
 	type : 'rasterLayer',
 
 });
+
+
 
 Wu.MapboxLayer = Wu.Layer.extend({
 
@@ -429,6 +346,7 @@ Wu.MapboxLayer = Wu.Layer.extend({
 Wu.CartodbLayer = Wu.Layer.extend({
 
 });
+
 
 // shorthand for creating all kinds of layers
 Wu.createLayer = function (layer) {

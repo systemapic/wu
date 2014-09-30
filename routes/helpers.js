@@ -2255,21 +2255,24 @@ module.exports = api = {
 	// process wildcard paths, including hotlinks
 	processWildcardPath : function (req, res) {
 
+		console.log('processWildcardPath:');
+
 		// get client/project
 		var path 	= req.originalUrl.split('/');
 		var client 	= path[1];
 		var project 	= path[2];
-		// console.log('req: ', req);
+
 		console.log('q: ', req.query);
 		console.log('path: ', path);
 		console.log('req.originalUrl.', req.originalUrl)
+
 		var hotlink = {
 			client : client,
 			project : project
 		}
 		
 		if (req.isAuthenticated()) {
-			console.log('hawtlink: ', hotlink);
+			console.log('req.isAuth: hotlink:', hotlink);
 			
 			// send complete user block (TODO: what if not in edit mode, just consuming?)
 			req.session.hotlink = hotlink;
@@ -2280,9 +2283,10 @@ module.exports = api = {
 			});
 		} else {
 			
+			console.log('req. NOT auth: hotlink:', hotlink);
 			// redirect to login with hotlink embedded
 			req.session.hotlink = hotlink;
-			res.redirect('/');
+			res.redirect('/login');
 		}
 
 	},

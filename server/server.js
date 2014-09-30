@@ -10,6 +10,7 @@ var passport = require('passport');
 var flash    = require('connect-flash');
 var path     = require('path');
 var compress = require('compression')
+var favicon  = require('serve-favicon');
 
 var configDB = require('../config/database.js');
 
@@ -32,6 +33,7 @@ app.configure(function() {
 	app.use(passport.initialize());
 	app.use(passport.session()); // persistent login sessions
 	app.use(flash()); // use connect-flash for flash messages stored in session
+	app.use(favicon(__dirname + '/../public/favicon.ico'));
 
 	// enable compression
 	app.use(compress());

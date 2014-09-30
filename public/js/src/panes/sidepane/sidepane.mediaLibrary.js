@@ -416,7 +416,9 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 
 		Wu.DomEvent.on(_dragGrid, 'mousedown', function() { this._initDragging() }, this);
 		Wu.DomEvent.on(_dragGrid, 'mousemove', function(e) { this._draggingImage(e) }, this);
-		Wu.DomEvent.on(document, 'mouseup', function() { this._stopDragging() }, this);
+		// Wu.DomEvent.on(document, 'mouseup', function() { this._stopDragging() }, this);		// ko var her! 
+														// ga feil. kanskje finne noe
+														// lavere enn document
 
 		this.__x_pos = 0; // Stores x & y coordinates of the mouse pointer
 		this.__y_pos = 0;

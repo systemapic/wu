@@ -93,12 +93,6 @@ Wu.App = Wu.Class.extend({
 		// create panes
 		this._initPanes();
 
-		// check for /client/project url
-		this._initHotlink();			// incl. if only one client (and only read access), then hide Clients tab
-
-		// check if only one client and no read
-		this._singleClient();
-
 		// init pane view
 		this._initView();
 
@@ -151,7 +145,7 @@ Wu.App = Wu.Class.extend({
 	_initPanes : function () {
 
 		// render side pane 
-		this.SidePane = new Wu.SidePane();	// todo: add settings more locally?
+		this.SidePane = new Wu.SidePane();	// todo: add settings more locally? Wu.SidePane({options})
 
 		// render header pane
 		this.HeaderPane = new Wu.HeaderPane();
@@ -164,6 +158,9 @@ Wu.App = Wu.Class.extend({
 	// init default view on page-load
 	_initView : function () {
 
+		// runs hotlink
+		if (this._initHotlink()) return;
+
 		// if user is admin or manager, set Projects and Users as default panes
 		var user = app.Account;
 		if (user.isAdmin() || user.isSuperadmin() || user.isManager()) {
@@ -175,89 +172,78 @@ Wu.App = Wu.Class.extend({
 	},
 
 
-	_singleClient : function () {
-		return;
-		var size = _.size(this.Clients);
-		var can = Wu.can.createClient();
+	// _singleClient : function () {
+	// 	return;
+	// 	var size = _.size(this.Clients);
+	// 	var can = Wu.can.createClient();
 
-		if (size > 1) return;
-		if (can) return;
+	// 	if (size > 1) return;
+	// 	if (can) return;
 
-		var clientUuid = this.User.options.access.clients.read[0];
-		var client = this.Clients[clientUuid];
+	// 	var clientUuid = this.User.options.access.clients.read[0];
+	// 	var client = this.Clients[clientUuid];
 
-		// select client
-		this.SidePane.Clients.select(client);
+	// 	// select client
+	// 	this.SidePane.Clients.select(client);
 
-		// open pane
-		this.SidePane.openPane();
+	// 	// open pane
+	// 	this.SidePane.openPane();
 
-		// hide Clients tab
-		this.SidePane.Clients.permanentlyDisabled = true;
+	// 	// hide Clients tab
+	// 	this.SidePane.Clients.permanentlyDisabled = true;
 		
-	},
+	// },
 
 	_initHotlink : function () {
-		// return;
 		
-		console.log('HOTLINK: ', window.hotlink);
-		return;
+		// parse error prone content of hotlink..
+		try { this.hotlink = JSON.parse(window.hotlink); } 
+		catch (e) { this.hotlink = false };
 
-		
-		// only if hotlink
-		if (!window.hotlink.hasOwnProperty('client')) return;
-		
-		// if user has access to client/project
-		var client = this._hasClient();
-		var project = this._hasProject();
-		
-		// reset address bar if no client
-		if (!client) return Wu.Util.setAddressBar(url);
-			 
-		// select client
-		this.SidePane.Clients.select(client);
-		
-		if (!project) {
-			// open projects pane so user can select something
-			this.SidePane.openPane();
-		}
+		console.log('this.hotlink: ', this.hotlink);
+
+		// return if no hotlink
+		if (!this.hotlink) return false;
+
+		// check if project slug exists, and if belongs to client slug
+		var project = this._projectExists(this.hotlink.project, this.hotlink.client);
+
+		// return if not found
+		if (!project) return false;
 
 		// select project
-		if (project) {
-			this.SidePane.Projects.select(project);
+		project.select();
+		app.SidePane.refreshProject(project);
 
-			// if read only on project, closePane
-			if (!_.contains(this.User.options.access.projects.write, project.uuid) && _.contains(this.User.options.access.projects.read, project.uuid) ) {
-				this.SidePane.closePane();
-			}
-		}
-
+		return true;
 		
-
-		
-
 	},
 
 
-	_hasClient : function (clientSlug) {
 
-		// find client slug in Wu.app.Clients
-		clientSlug = clientSlug || window.hotlink.client;
-		for (c in Wu.app.Clients) {
-			var client = Wu.app.Clients[c];
-			if (clientSlug == client.slug) return client; 
+
+	// _hasClient : function (slug) {
+
+	// 	// find client slug in Wu.app.Clients
+	// 	var slug = slug || window.hotlink.client;
+	// 	for (c in Wu.app.Clients) {
+	// 		var client = Wu.app.Clients[c];
+	// 		if (slug == client.slug) return client; 
 			
-		}
-		return false;
-	},
+	// 	}
+	// 	return false;
+	// },
 
-	_hasProject : function (projectSlug) {
+	// check if project exists (for hotlink)
+	_projectExists : function (projectSlug, clientSlug) {
 
 		// find project slug in Wu.app.Projects
-		projectSlug = projectSlug || window.hotlink.project;
+		var projectSlug = projectSlug || window.hotlink.project;
 		for (p in Wu.app.Projects) {
 			var project = Wu.app.Projects[p];
-			if (projectSlug == project.slug) return project; 
+			if (projectSlug == project.store.slug) {
+				if (project._client.slug == clientSlug) return project; 
+			}
 		}
 		return false;
 	}

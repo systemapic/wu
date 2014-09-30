@@ -170,6 +170,16 @@ Wu.MapPane = Wu.Class.extend({
 
 		// create new map
 		this._map = Wu.app._map = L.map('map', options).setView([0, 0], 5);
+		console.log('createNewMap: ', this._map);
+
+		// add editable layer
+		this.addEditableLayer(this._map);
+	},
+
+	addEditableLayer : function (map) {
+		// create layer
+		this.editableLayers = new L.FeatureGroup();
+		map.addLayer(this.editableLayers);
 	},
 
 	reset : function () {
@@ -595,62 +605,21 @@ Wu.MapPane = Wu.Class.extend({
 
 		// remove draw control
 		this._map.removeControl(this._drawControl);
-		this._map.removeLayer(this._drawControlLayer);
+		// this._map.removeLayer(this.editableLayers);	//todo
 		this._drawControl = false;
 	},
 
 	addDrawControl : function () {
-		var that = this;
+		var that = this,
+		    map = this._map,
+		    editableLayers = this.editableLayers;
 
-		// debug
-		geojsony = {
-		   "type": "Feature",
-		      "properties": {
-			"OK": "asdasd",
-			"asdsad": "asd"
-		      },
-		      "geometry": {
-			"type": "Polygon",
-			"coordinates": [
-			  [
-			    [
-			      43.9453125,
-			      36.73888412439431
-			    ],
-			    [
-			      43.9453125,
-			      53.4357192066942
-			    ],
-			    [
-			      77.6953125,
-			      53.4357192066942
-			    ],
-			    [
-			      77.6953125,
-			      36.73888412439431
-			    ],
-			    [
-			      33.9453125,
-			      36.73888412439431
-			    ]
-			  ]
-			]
-		      }
-		}
-
-		// initialize the FeatureGroup to store editable layers
-		//this._drawControlLayer = window.dc = new L.FeatureGroup();
-		//this._map.addLayer(this._drawControlLayer);
-
-		//var layer = L.geoJson(geojsony).addTo(this._map);
-		this._drawControlLayer = window.drawControl = L.geoJson().addTo(this._map);
-
-
-		// initialize the draw control and pass it the FeatureGroup of editable layers
+		// Leaflet.Draw options
 		options = {
 			position: 'topleft',
 			edit: {
-				featureGroup: this._drawControlLayer
+				// editable layers
+				featureGroup: editableLayers
 			},
 			draw: {
 				circle: {
@@ -688,35 +657,38 @@ Wu.MapPane = Wu.Class.extend({
 		};
 
 		// add drawControl
-		this._drawControl = new L.Control.Draw(options);
-		this._map.addControl(this._drawControl);
-		L.DomUtil.addClass(this._drawControl._container, 'elizaveta');
+		var drawControl = this._drawControl = new L.Control.Draw(options);
+		map.addControl(drawControl);
+		
+		// add class
+		var container = drawControl._container;
+		L.DomUtil.addClass(container, 'elizaveta');	// todo: className
 
 		// close popups on hover
-		Wu.DomEvent.on(this._drawControl, 'mousemove', L.DomEvent.stop, this);
-		Wu.DomEvent.on(this._drawControl, 'mouseover', this._map.closePopup, this);
+		Wu.DomEvent.on(drawControl, 'mousemove', L.DomEvent.stop, this);
+		Wu.DomEvent.on(drawControl, 'mouseover', map.closePopup, this);
 
 		// add circle support
-		this._map.on('draw:created', function(e) {
+		map.on('draw:created', function(e) {
 
 			// add circle support
 			e.layer.layerType = e.layerType;            
 
 			// add drawn layer to map
-			that._drawControlLayer.addLayer(e.layer);
+			editableLayers.addLayer(e.layer);
 		});
 
 		// created note
-		this._map.on('draw:note:created', function(e) {
+		map.on('draw:note:created', function(e) {
 
 			// add layers
-			that._drawControlLayer.addLayer(e.noteLayer);
-			that._drawControlLayer.addLayer(e.rectangleLayer);
+			editableLayers.addLayer(e.noteLayer);
+			editableLayers.addLayer(e.rectangleLayer);
 
 			// enable edit toolbar and focus Note
-			L.Draw._editshortcut.enable();
+			L.Draw._editshortcut.enable();		// todo, refactor
 			e.noteLayer._el.focus();
-			that._map.LeafletDrawEditEnabled = true;
+			map.LeafletDrawEditEnabled = true;
 		});
 	}
 

@@ -39,7 +39,7 @@ module.exports = function(app, passport) {
 	// ================================
 	app.get('/', function(req, res) {
 
-		console.log('GET / ', req.session.hotlink);
+		console.log('GET / ', req.session.hotlink, req.url);
 
 		// return if not logged in 			redirect to login page
 		if (!req.isAuthenticated()) return res.render('../../views/index.ejs'); // load the index.ejs file
@@ -513,7 +513,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// process the login form
 	app.post('/login', passport.authenticate('local-login', {
-		successRedirect : '/', // redirect to the secure profile section
+		successRedirect : '/', // redirect to the portal
 		failureRedirect : '/login', // redirect back to the signup page if there is an error
 		failureFlash : true // allow flash messages
 	}));
@@ -533,7 +533,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// process /client/project url structure
 	app.get('*', function (req, res) {
-		console.log('/*');
+		
+		console.log('GET *', req.url);
 
 		// process wildcard path
 		api.processWildcardPath(req, res);
@@ -542,14 +543,11 @@ module.exports = function(app, passport) {
 
 
 
-		
-
-
 	// helper function : if is logged in
 	function isLoggedIn(req, res, next) {
 		if (req.isAuthenticated()) return next();
 		res.redirect('/');
 	}
 
-
+	
 }

@@ -1,0 +1,26 @@
+$font: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+
+$ecolor1: #0F1A1E;
+$ecolor2: #3F4652;
+$translight: rgba(255, 255, 255, 0.15);
+$translighter: rgba(255, 255, 255, 0.075);
+
+
+// FONT-WEIGHT
+// Cannot be 100 as it renders too thin with fonth smoothing
+// That's not a problem in Chrome or Firefox, but it fucks up
+// in Safari and on PC... 
+
+$lean: 200;
+$median: 400;
+$fat: 500;
+$obese: 600;
+
+
+@import 'basics';		// Contains Most CSS rules
+@import 'kits';			// All the webkit, moz, etc transitions and other properties
+@import 'leaflet_draw';	// Leaflet Draw + Layer menu, Info box, Legends etc
+@import 'color_picker';	// Color Theme selecteur
+@import 'layer_menu';	// The Layer menu
+@import 'knut';			// Knut's pølsin'
+@import 'mediaLibrary';	// Media Library
