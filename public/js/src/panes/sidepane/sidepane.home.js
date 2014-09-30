@@ -35,9 +35,7 @@ Wu.SidePane.Home = Wu.Class.extend({
 		this.isOpen = true;
 		var sidepane = app.SidePane;
 		sidepane.expand();
-
 		this.refresh();
-
 	},
 
 	close : function (e) {
@@ -45,7 +43,6 @@ Wu.SidePane.Home = Wu.Class.extend({
 		var sidepane = app.SidePane;
 		sidepane.collapse();
 		sidepane.closePane();
-
 		this.refresh();
 	},
 
@@ -56,14 +53,12 @@ Wu.SidePane.Home = Wu.Class.extend({
 
 	setHeight : function (height) {
 		// set height
-		console.log('setHE;', height);
 		this._container.style.height = parseInt(height) + 'px';
 	},
 
 	refresh : function () {
 		// set height to project headerHeight
 		var headerHeight = this.project.getHeaderHeight();
-		console.log('refresh hig: ', headerHeight);
 		this.setHeight(headerHeight);
 	},
 
