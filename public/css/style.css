@@ -1701,12 +1701,7 @@ body {
   -o-transition: top 300ms ease, opacity 300ms ease;
   transition: top 300ms ease, opacity 300ms ease; }
 
-.q-editor-container {
-  -webkit-transition: width 250ms ease;
-  -moz-transition: width 250ms ease;
-  -o-transition: width 250ms ease;
-  transition: width 250ms ease; }
-
+/*  Transition width på side panes */
 @-webkit-keyframes nclient {
   0% {
     height: 0px;
@@ -2748,11 +2743,20 @@ input[type=checkbox] + label.check {
   border-radius: 0;
   padding-left: 0 !important; }
 
-.leaflet-control-zoom, .leaflet-draw, .leaflet-control-styleeditor {
+.leaflet-control-zoom, .leaflet-draw, .leaflet-control-styleeditor, .leaflet-control-baselayertoggle {
   float: right; }
 
 .leaflet-bar a:first-child, .leaflet-bar a:last-child, .leaflet-control-styleeditor-interior {
   border-radius: 0px !important; }
+
+.leaflet-control-styleeditor-interior {
+  background-image: url('evil_sprite.png');
+  background-repeat: no-repeat;
+  background-position: 2px -271px;
+  background-color: white; }
+
+.enabled:hover {
+  background-color: #FAFAFA; }
 
 .leaflet-control-description {
   width: 100%;

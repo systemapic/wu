@@ -1179,7 +1179,8 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 	},
 
 	calculateHeight : function () {
-		this.maxHeight = 330;
+		var x = _.size(this.controls);
+		this.maxHeight = x * 30 + 30;
 		this.minHeight = 0;
 	},
 
@@ -1256,9 +1257,11 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		// call update on prototype
 		Wu.SidePane.Map.MapSetting.prototype.update.call(this)
 
+		this.controls = this.project.getControls();
+
 		// toggle each control
-		for (c in this.project.store.controls) {
-			var on = this.project.store.controls[c];
+		for (c in this.controls) {
+			var on = this.controls[c];
 			var enable = 'enable' + c.camelize();
 			var disable = 'disable' + c.camelize();
 			

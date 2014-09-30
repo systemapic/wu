@@ -77,10 +77,11 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	refreshProject : function (project) {
+
 		var editMode = project.editMode; // access determined at Wu.Project
 		
-		// default menus in SidePane
-		var panes = this._getPaneArray();	// case-sensitive -> eg. Wu.SidePane.DataLibrary
+		// default menus in sidepane
+		var panes = this._getPaneArray();
 		
 		// remove Map pane if not editor
 		if (!editMode) _.pull(panes, 'Map');
@@ -102,7 +103,6 @@ Wu.SidePane = Wu.Class.extend({
 
 	// display the relevant panes
 	refresh : function (panes) {
-		console.log('sidepane refresh: ', panes);
 
 		this.panes = [];
 

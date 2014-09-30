@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>mæpz</title>
-		
+	
 		<!-- Styles -->
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/grande.js/css/menu.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/grande.js/css/editor.css">
@@ -14,19 +14,15 @@
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/style.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/knut.css">
 
-		<!--hotlink -->
-		<script>(function(){ window.hotlink = <%- JSON.stringify(hotlink) %>; }());</script>
 		
 		<!-- Dependencies -->
 		<script src="//85.10.202.87:8080/js/lib/lodash/lodash.min.js"></script>
 		<script src="//85.10.202.87:8080/js/lib/parallel.js/parallel.js"></script>
 		
 		<!-- Leaflet -->
-		<script src="//85.10.202.87:8080/js/lib/leaflet/Leaflet/dist/leaflet-src.js"></script>
-		<!-- <script src="//85.10.202.87:8080/js/lib/leaflet/leaflet-0.7.3-src.js"></script> -->
-		<!-- <script src="//85.10.202.87:8080/js/lib/mapbox.js/mapbox.2.1.4.js"></script> -->
+		<!-- <script src="//85.10.202.87:8080/js/lib/leaflet/Leaflet/dist/leaflet-src.js"></script> -->
+		<script src="//85.10.202.87:8080/js/lib/leaflet/leaflet-0.7.3-src.js"></script>
 		<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.2/mapbox.standalone.js'></script>
-
 		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/leaflet-omnivore.min.js"></script>
 		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/leaflet.geojson.draw.js"></script>
 		<script src="//85.10.202.87:8080/js/lib/leaflet/plugins/leaflet.draw.min.js"></script>
@@ -42,12 +38,19 @@
 		<script src="//85.10.202.87:8080/js/lib/sortable.js/Sortable.js"></script>
 		<script src="//85.10.202.87:8080/js/lib/powerange/powerange.min.js"></script>
 
-		<!-- <script src="//85.10.202.87:8080/js/lib/grande.js/dist/grande.min.js"></script> -->
-		<!-- <script src="//85.10.202.87:8080/js/lib/grande.js/dist/grande.attachments.min.js"></script> -->
-	
 		<script src="//85.10.202.87:8080/js/lib/grande.js/js/grande.class.js"></script>
 		<script src="//85.10.202.87:8080/js/lib/grande.js/js/grande.js"></script>
 		<script src="//85.10.202.87:8080/js/lib/grande.js/js/grande.attachments.js"></script>
+
+		
+		<!-- Minifya dependencies -->
+		<!-- // <script src="//85.10.202.87:8080/js/src/dist/combined/systemapic.dependencies.combined.min.js"></script>  -->
+
+
+
+	
+		<!--hotlink -->
+		<script>(function(){ window.hotlink = '<%- JSON.stringify(hotlink) %>'; }());</script>
 
 		
 	</head>
@@ -1602,6 +1605,7 @@
 <!-- ************************************************************************************************************************ -->
 <!-- ************************************************************************************************************************ -->
 
+		<!-- class.js must be added first -->
 		<script src="//85.10.202.87:8080/js/src/core/class.js"></script> 
 		
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.js"></script> 
@@ -1630,8 +1634,12 @@
 		<script src="//85.10.202.87:8080/js/src/models/clients.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/models/users.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/models/layers.js"></script> 
-		<script src="//85.10.202.87:8080/js/src/models/colorThemes.js"></script>		
+		<script src="//85.10.202.87:8080/js/src/models/colorThemes.js"></script>	
+
+		<!-- app.js must be added last -->
 		<script src="//85.10.202.87:8080/js/src/core/app.js"></script> 
+
+		<!-- // <script src="//85.10.202.87:8080/js/src/dist/combined/systemapic.combined.min.js"></script>  -->
 
 		<script>
 
@@ -1639,8 +1647,7 @@
 			// start systemapic app
 			var app = new Wu.App({
 					
-					// id : 'app',
-
+					id : 'app',
 					
 					// panes : {
 					// 	clients 	: true,
@@ -1687,9 +1694,5 @@
 <!-- ************************************************************************************************************************ -->
 <!-- ************************************************************************************************************************ -->
 
-
-	</body>
-	
-	
-		
+	</body>	
 </html>

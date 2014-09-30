@@ -1,0 +1,2179 @@
+// *********************************************
+
+// UNIVERSALS
+
+// ********************************************
+
+:focus { 
+	outline: none !important; 
+	border: 0 !important 
+	}
+	
+label {
+	margin-bottom: 0px !important;
+	}
+
+h3, h4 {
+	color: white;
+	}	
+	
+h5 {
+	position: relative;
+	font-size: 150%;
+	color: white;
+	margin-top: 0;
+	font-weight: $fat;
+	width: 100%;
+	text-align: left;
+	}
+	
+	
+// OMG... UNIVERSALS EVERYWHERES...
+	
+#editor-client-item-new h5,
+.editor-inner-wrapper h5,
+#select-basic-themes,
+#advanced-color-header, 
+.editor-wrapper h4 {					// q-editor under title
+	text-align: center;
+	margin-top: 0px;
+	margin-bottom: 15px;
+	opacity: 1;
+	font-size: 22px;
+	font-weight: $lean;
+	}
+	
+	
+tr {
+	background: rgba(63, 70, 82, 1);
+	}
+	
+thead tr, thead tr th {
+	border: none;
+	background: transparent !important;
+	}	
+
+tr:nth-child(odd) {
+	background-color: $translight;
+	}
+
+tr:nth-child(even) {
+	background-color: $translighter;
+	}
+
+tr.new {
+	background-color: rgb(0,255,255) !important;
+	}
+
+// ColorThemes .ct1
+th {
+	background: $ecolor2;
+	cursor: pointer;
+	font-size: 100%;
+	font-weight: $lean;
+	width: 10%;
+	padding: 10px;
+	letter-spacing: 1px;
+	padding-left: 6px;
+	padding-bottom: 2px;
+	}
+	
+td {
+	padding: 5px;
+	vertical-align: top;
+	}
+		
+th.thirtyp {
+	width: 30%;
+	}
+
+th.fivep { 
+	width: 3%;
+	padding-left: 9px;
+	padding-bottom: 0;
+	padding-top: 22px;
+	}
+	
+path {											// SVG
+	stroke-width: 1.5px;
+	}
+		
+path:hover {									// ditto
+	fill-opacity: .7;
+	}
+	
+a {
+	font-weight: $median;
+	}
+	
+.active a,										// Link Color
+.editor-wrapper a {
+	color: rgb(0,255,255) !important;
+	}	
+		
+	
+		
+// *********************************************
+	
+// Handy hooks
+
+// *********************************************
+	
+	
+.box {
+	margin: 4px !important;
+	}	
+
+.die {
+	display: none !important;
+	}
+
+.show {
+	display: block;
+	}
+
+.relative {
+	position: relative;
+	}	
+
+.inline {
+	display: inline-block;
+	vertical-align: top;
+	}
+	
+.inliner {
+	position: absolute;
+	right: 1px;
+	top: 8px;
+	}
+
+.underline {
+	text-decoration: underline;
+	}				
+
+		
+.search {										// Search fields
+	margin: 0px;
+	border: none;
+	padding: 5px;
+	font-family: $font;
+	font-weight: $lean;
+	color: black;
+	background: white;
+	font-size: 120%;
+	padding-left: 11px;
+	width: 171px;
+	text-align: left;
+	position: relative;
+	}		
+	
+
+.eightyWidth {									// Often used in tables
+/* 	background: rgba(255,255,255,0.2) !important; */
+	background: rgba(0, 0, 0, 0.3);
+	color: white !important;
+	border: 0;
+	box-shadow: none;
+	border-radius: 0;
+	padding: 6px !important;
+	height: 30px !important;
+	margin-bottom: 10px !important;
+	margin-top: 0 !important;
+	}
+
+
+
+
+// ********** The Gray Background + Input Fields **********
+
+.editor-inner-wrapper {							// The Gray background overlaying in menu...
+	padding: 5px;
+	margin-bottom: 3px;
+	position: relative;
+	margin-top: 8px;
+	border-radius: 0px;
+	cursor: pointer;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: $translight;
+	width: 280px;
+	}	
+	
+.editor-inner-wrapper h5 {						// Client : New Client title
+/* 	font-size: 200%; */
+/* 	font-weight: $lean; */
+	padding: 0;
+	position: relative;
+/* 	display: block; */
+/* 	text-align: center; */
+	padding-top: 10px;
+	}
+
+.editor-inner-wrapper input, 					// Input fields in gray wrapper
+.input-box {
+	background: rgba(0,0,0,0.3);
+	padding: 7px;
+	color: white;	
+	font-weight: $lean;
+	}
+
+.input-box {									// Input fields in "Connect to MapBox" and "Upload Layers"
+	float: left;
+	width: 170px;
+	border: 0;
+	}
+	
+.search {
+	padding: 5px !important;
+}
+
+
+// ********** BUTTONS **********
+
+
+.dropdown-button {								// Button : little circular button;
+	background-image: url(evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: 4px 8px;
+	position: absolute;
+	right: 15px;
+	top: 50px;
+	background-color: white;
+	width: 20px;
+	height: 20px;
+	border-radius: 20px;
+	z-index: 99999;
+	}
+		
+.smap-button-gray {								// Button : standard GRAY button
+	height: 33px;
+	color: gainsboro;
+	font-size: 17px;
+	line-height: 1.5;
+	background: $translight;
+	padding: 5px 10px 5px 10px;
+	text-align: center;
+	font-weight: $lean;
+	cursor: pointer;
+	font-family: $font;
+	display: inline-block;
+	vertical-align: top;
+	}	
+
+.smap-button-gray:hover {						// ditto
+	color: white;
+	}
+
+.smap-button-white {							// Button : standard WHITE button
+	height: 32px;
+	color: #666;
+	text-align: center;
+	margin: 0;
+	margin-bottom: 10px;
+	padding: 0px 10px 0px 10px;
+	border: 0px;
+	border-radius: 0;
+	line-height: 2.1;
+	font-family: $font;
+	font-size: 110%;
+	font-weight: $median;
+	cursor: pointer;
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+	
+	background: #EAEAEA;
+	}
+	
+.smap-button-white:hover {
+	background: white;
+	}
+	
+.smap-button-white.small {						// Button : standard WHITE button smaller
+	height: 26px;
+	font-size: 13px;
+	line-height: 2;
+	}	
+	
+.smap-button-white.small.red {					// Button : red button
+	color: white !important;
+	background: #B80077 !important;
+	box-shadow: 0 0 0 1px white inset;
+	}
+	
+.item-list {									// List Buttons (map layers, controls, etc)
+	height: 32px;
+	margin-bottom: 10px;
+	color: rgba(255,255,255,1);
+	background: rgba(0,0,0,0.3);
+	cursor: pointer;
+	border: 0px;
+	line-height: 1;
+	border-radius: 0;
+	font-family: $font;
+	font-size: 100%;
+	font-weight: $lean;
+	position: relative;
+	margin-bottom: 1px;
+	width: 100%;
+	padding: 0px;
+	opacity: .7;
+	}
+	
+.item-list div,
+.layers-mapbox-item,
+.select-elem {
+	padding: 8px;
+}	
+	
+.item-list:hover {
+	opacity: 1;
+}	
+	
+.item-list.active,
+.layer-item.active,
+.active .layers-mapbox-item {								// List Buttons : Active State
+	background-color: white;
+	color: rgba(0,0,0,0.7);
+	font-weight: $median;
+	}
+
+
+// ********** EDIT WRAPPER **********
+
+.editor-project-edit-super-wrap {	
+	background: rgba(255,255,255,0.1);
+	height: 231px;
+	width: 270px;
+	opacity: 1;
+	position: relative;
+	left: 2px;
+	padding: 10px;
+	margin-bottom: 10px;
+	top: 0px;
+	overflow: hidden;
+	margin-top: 7px;
+	}
+
+
+// *********************************************
+		
+// General
+
+// *********************************************
+
+body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background-color: #ebeced;
+	color: $ecolor2;
+	line-height: 1.4;
+	font-family: $font;
+	font-size: 14px;
+	text-align: left;
+	
+	-webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    }
+	
+#app {									// The Outer Super Wrapper	
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 200;
+	}
+	
+#map {									// Map
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 400px;
+	height: 100%;
+	}
+
+#map:after {
+/*	content: 'No projects selected';
+	background-image: url('sysa_txt.png');
+	background-repeat: no-repeat;
+	background-position: 750px 430px;
+*/	position: relative;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 280px;
+	text-align: center;
+	display: block;
+	padding-right: 400px;
+	font-size: 42px;
+	color: #666;
+	font-weight: $lean;
+	}
+	
+#map:before {
+	content: '';
+	background-image: url('systemapic_BG.jpg');
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	}
+
+.g-body {								// This holds tooltop etc.
+	z-index: 35000;	
+	top: 5px;
+	left: -17px;
+	position: relative;
+	}
+	
+	
+#header {								// The Header
+	position: absolute;
+	top: 0px;
+	left: 400px;
+	height: 120px;
+	width: 100%;
+	background: rgba(255,255,255,0.93);
+	z-index: 10;
+	box-shadow: 0px 0px 5px black;
+	}
+
+#headerResizer { 						// The Header
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	height: 6px;
+	cursor: ns-resize;
+	}
+
+.headerResizerDisabled { 				// The Header
+	cursor: default !important;
+	}
+
+#header .header-logo {					// The Header
+	position: relative;
+	height: 120px;
+	max-width: 200px;
+	color: white;	
+	margin-right: 20px;
+	float: left;
+	max-height: inherit;
+	}
+
+.header-logo img {						// The Header
+	position: relative;
+	max-height: inherit;
+	}
+
+.header-title {							// The Header
+	border: 0px;
+	background: transparent;
+	font-size: 40px;
+	font-weight: $lean;
+	}
+
+.header-title input {
+	padding: 0;
+}
+
+.header-subtitle input {
+	margin-top: 7px;
+	/*background-color: yellow;*/
+	width: 300px;
+	color: black;
+}
+
+
+.header-subtitle {						// The Header
+	border: 0px;
+	background: transparent;
+	display: block;
+	position: relative;
+	top: -8px;
+	font-style: italic;
+	color: #666;
+	font-size: 16px;
+	font-weight: $lean;
+	}
+
+#header input {							// The Header
+	outline: none;
+	}
+ 
+#header input:focus  {					// The Header
+	border: 1px solid rgb(81, 203, 238);
+
+	}
+	
+
+// *********************************************
+
+// THE Q-EDITOR --> The Menu on the Left
+
+// *********************************************
+	
+.q-editor-container {
+	position: absolute;
+	height: 100%;
+	width: 400px;
+	/*background-color: $ecolor2;*/
+	background-color: rgba(62,70,82,0.98);
+	overflow: hidden;
+	z-index: 2000;	
+	box-shadow: 1px 0 0 0 rgba(0,0,0,0.2), 0 0 5px rgba(0,0,0,0.4);
+	}
+
+.disabled {
+	opacity: 0.1;
+	}	
+	
+// ColorThemes .ct0
+.q-editor-menu {
+	width: 100px;
+	height: 100%;
+	background-color: $ecolor1;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	}
+
+.q-editor-menu-item {
+	text-align: center;
+	height: 70px;
+	position: relative;
+	cursor: pointer;
+	z-index: 200;
+	}
+
+.q-editor-menu-item a {
+	width: 100%;
+	font-size: 90%;
+	text-transform: uppercase;
+	font-weight: $fat;
+	color: white;
+	bottom: 0px;
+	position: absolute;
+	left: 0px;
+	top: 0;
+	height: 100%;
+	line-height: 5;
+	text-decoration: none;
+	}
+
+.q-editor-content-item {
+	position: absolute;
+	width: 300px;
+	height: 100%;
+	left: 100px;
+	display: none;
+	padding: 10px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	opacity: 1;
+	top: 0;
+	margin-top: 10px;
+	}
+
+// ColorThemes .ct1
+.editor-wrapper { 						// The inner Wrapper of the .q-editor-content-item
+	color: white;
+	width: 310px;
+	height: 100%;
+	overflow-y: scroll;
+	/*padding-right: 16px;*/
+	padding-right: 30px;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0px;
+	}
+
+.editor-wrapper h3 {					// q-editor main title
+	text-align: center;
+	font-weight: $lean;
+	font-size: 320%;
+	margin-top: 0;
+	}
+
+.swipe_out_up {							// q-editor movers and shakers
+	top: -200px;
+	opacity: 0;
+	display: block;
+	}
+	
+.swipe_out {							// q-editor movers and shakers
+	top: 200px;
+	opacity: 0;
+	display: block;
+	}	
+
+#menuslider {							// The background slider
+	width: 100px;
+	height: 70px;
+	background-color: $ecolor2;
+	top: 0px;
+	position: absolute;	
+	border-right: 1px dashed rgba(120, 120, 120, 0.3);
+	}
+
+#menucloser {							// The menu pane closer
+	position: absolute;
+	bottom: 20px;
+	left: 40px;
+	background: white;
+	width: 19px;
+	height: 19px;
+	z-index: 99999;
+	border-radius: 20px;
+	cursor: pointer;
+	background-image: url(evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: 4px 8px;
+	-webkit-transform: rotate(270deg);
+	}
+	
+.pane-open {							// The menu pane closer in open state
+	-webkit-transform: rotate(90deg) !important;	
+	}	
+
+.client-project-title-wrapper {
+	text-align: center;
+	margin-bottom: 15px;
+	}
+	
+.client-project-title-wrapper span {
+	opacity: 0.6;
+	margin: 10px;
+	position: relative;
+	left: 3px;
+	}
+
+.client-project-title-wrapper h4 {
+	opacity: 0.6;
+	font-size: 130%;
+	display: inline-block;
+	margin: 0;
+	}
+
+
+
+			
+// ********* Q-EDITOR : CLIENTS *********	
+	
+// --- Buttons
+	
+.new-client {								// Clients : New client button
+	width: 280px;							// Extends .smap-button-white
+	}
+	
+.jbutton {									// Client : drop down buttpn
+	top: 11px !important;
+	right: 10px !important;	
+	color: transparent !important;
+	opacity: 0;
+	}
+	
+.editor-clients-container:hover > .jbutton {	// ditto
+	opacity: 1 !important;
+	}	
+	
+// --- New Client
+	
+.new-client-container {						// Client : New Client inner wrapper
+	position: relative;
+	top: -7px;
+	}	
+	
+.editor-client-edit-wrapper label:nth-child(1) { 	// Push the height of the box from the first label in the container...
+	margin-top: 10px;
+	}	
+		
+#editor-client-item-new {					// Clients : New Client title wrapper
+	height: 55px;
+	width: 280px;
+	text-align: center;
+	padding: 0;
+	}
+	
+
+#editor-project-item-new {					// PROKJCTS
+	height: 55px;
+	}
+
+
+#editor-client-item-new h5 {				// Client : New Client title
+/* 	font-size: 200%; */
+	padding: 0;
+	position: relative;
+	display: block;
+	text-align: center;
+	padding-top: 10px;
+	}
+
+
+	
+// --- Client	
+	
+.editor-clients {
+	position: relative;
+}
+
+
+.client-title {
+	padding: 5px;
+	font-size: 22px;
+	text-transform: uppercase;
+	font-weight: $lean;
+	}
+
+.client-logo {
+	position: absolute;
+	top: 10px;
+	right: 10px;	
+	}	
+
+.editor-clients-container {					/* // Clients : inner wrapper */
+	/*	
+	background-color: #626771;
+	padding: 4px 6px 4px 6px;
+	margin: 0px 0px 1px 0px;
+	height: 80px;
+	position: relative;
+	cursor: pointer;
+	overflow: hidden;
+	-webkit-transition: height 300ms ease;
+	*/
+
+	/*background-color: rgba(98,103,113,0.3);*/
+	background-color: rgba(255, 255, 255, 0.15);
+
+	padding: 4px 6px 4px 6px;
+	margin: 0px 0px 1px 0px;
+	height: 80px;
+	position: relative;
+	cursor: pointer;
+	overflow: hidden;
+	-webkit-transition: height 300ms ease;
+	/*box-shadow: 0 0 0 1px #626771 inset;*/
+	}
+
+.editor-clients-container:hover {
+	background-color: rgba(255, 255, 255, 0.05)
+	}	
+
+
+.projects-container	{
+	position: absolute;
+	top: 78px;
+	left: 0;
+	width: 100%;
+	height: 50px;
+	padding: 10px;
+	}
+
+
+.project-logo {
+/*	width: 75px;
+	height: 46px;
+	position: absolute;
+	right: 4px;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	background-position: center;
+	top: 4px;*/
+
+	width: 75px;
+	height: 46px;
+	position: absolute;
+	right: 4px;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	background-position: center;
+	top: 4px;
+	background-color: white;
+	box-shadow: 0 0 2px 0px rgba(0,0,0,0.5);	
+	}
+
+.project-item {
+/*	background: rgba(0, 0, 0, 0.2);
+	opacity: 1;
+	margin-bottom: 1px;
+	height: 55px;
+	position: relative;*/
+
+	/*background: rgba(255, 255, 255, 0.15);*/
+
+	background: rgba(0, 0, 0, 0.15);
+
+	opacity: 1;
+	margin-bottom: 5px;
+	/*height: 55px;*/
+	position: relative;
+	color: white;	
+	}
+
+.project-item:hover {
+	background: rgba(0, 0, 0, 0.3);
+	}	
+
+.project-logo-wrap img {
+	height: 100%;
+	}
+
+.project-title {
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	}
+
+
+
+.editor-client-title {						// Clients : Title wrapper
+	position: relative;
+	color: white;
+	left: -20px;
+	width: 273px;
+	}	
+		
+.editor-client-title h5 {					// Client : Title
+	top: 5px;
+	padding-left: 60px;
+	text-shadow: none;
+	font-size: 140%;
+	font-weight: $lean;
+	margin: 0;
+	height: 18px;
+	}	
+
+.editor-client-title img {					// Client : Logo
+	max-width: 50px;
+	max-height: 33px;
+	position: absolute;
+	left: 6px;
+	top: 0px;
+	}
+	
+.editor-client-edit-wrapper {				// Client : edit wrapper
+	display: none;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-top: 1px solid rgba(255,255,255,0.5);
+	margin-top: 14px;
+	padding-top: 10px;
+	padding-bottom: 40px;
+	position: relative;
+	left: -10px;
+	width: 261px;	
+	display: block !important;
+	height: 0 !important;
+	overflow: hidden !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;	
+	top: 5px !important;
+	opacity: 0 !important;	
+	}
+
+.client-editor-open {							// ditto : open
+	height: 229px !important;
+	opacity: 1 !important;
+	}
+		
+	
+#new-client-button {
+	height: 42px;
+	width: 42px;
+	color: rgba(255,255,255,0.4);
+	margin: 0;
+	margin-bottom: 10px;
+	padding: 2px 12px 2px 5px;
+	border: 0px;
+	border-radius: 0;
+	line-height: 0.55;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+	font-size: 383%;
+	font-weight: $lean;
+	cursor: pointer;
+	position: absolute;
+	display: inline-block;
+	/*background: rgba(255, 255, 255, 0.15);*/
+	background-color: #616671;
+	right: 0px;
+	bottom: -56px;
+	}	
+
+#new-client-button:hover {
+	background: rgba(255, 255, 255, 0.30);
+	color: rgba(255,255,255,0.8);
+	}
+
+
+// ********* Q-EDITOR : PROJECTS *********	
+
+// --- Buttons 
+
+.box .dropdown-button {					// Extend drop down button - box view
+	bottom: 5px;
+	top: auto;
+	left: auto;
+	right: 5px;	
+	opacity: 0;	
+	}
+
+.list .dropdown-button {				// Extend drop down button - list view
+	bottom: auto;
+	left: auto;
+	right: 10px;
+	top: 6px;
+	opacity: 0;
+	}
+	
+.editor-projects-item:hover > .dropdown-button {	// Make buttons visible on hover, yo
+	opacity: 1;
+	}	
+
+.editor-projects-item.ct0.active:before,			// Active client
+.active-client:before {								// Active projects
+	content: '';
+	width: 22px;
+	height: 30px;
+	position: absolute;
+	background: green;
+	z-index: 99999;
+	right: -11px;
+	top: -11px;
+	-webkit-transform: rotate(320deg);
+	box-shadow: 0 0 0 2px white;	
+	}
+	
+#new-project-button {					// Projects : New project button
+	width: 100%;
+	display: inline-block;
+	}
+
+.sort-by-clients-projects {				// Project : sort buttons container
+	display: inline-block;
+	vertical-align: top;
+	}
+	
+#editor-projects-sort-by-left {			// Project : box view button
+	border: none !important;
+	border-radius: 0 !important;
+	}	
+
+#editor-projects-sort-by-right {		// Project : list view button
+	border: none !important;
+	border-left: 1px solid !important;
+	border-radius: 0 !important;
+	}
+
+
+// ---
+
+
+.editor-projects-container {			// Projects : inner wrapper
+	min-height: 80px;
+	}
+
+#editor-projects-container-new {		// Projects : New project container
+	padding-bottom: 47px;	
+	margin-bottom: 10px;
+	}	
+
+// ColorThemes .ct0
+.editor-projects-item {					// Project : box veiw - Project (clickable) outer wrapper 
+	color: white;
+	overflow: hidden;
+	height: 131px;
+	width: 131px;
+	left: 0px;
+	margin: 2px;
+	margin-left: 0;
+	margin-right: 0;
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+	cursor: pointer;
+	background: white;
+	}
+
+// .list_view ColorThemes .ct0
+.list_view .editor-projects-item {		// ditto : list view 
+	width: 277px;
+	background: $ecolor1;
+	height: 41px;
+	}
+	
+.editor-projects-item:hover {			// ditto
+	color: gainsboro;
+	}
+
+.editor-projects-item img {				// Project : Featured image (small, next to project title) 
+	width: auto;
+	position: absolute;
+	height: 200px;
+	}
+	
+.list_view .editor-projects-item img {	// ditto : list view
+	width: 50px;
+	height: 41px;
+	}	
+
+.editor-projects-item h5 {				// Project : title 
+	position: absolute;
+	left: 0px;
+	word-wrap: break-word;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,0.8);
+	padding: 12px;
+	padding-top: 9px;
+	opacity: 0;
+	font-family: $font;
+	font-weight: $lean;
+	font-size: 174%;
+	text-align: center;
+	}
+	
+.list_view .editor-projects-item h5 {	// ditto : list view
+	color: white;
+	height: 41px;
+	padding-left: 60px;
+	opacity: 1;
+	background: none;	
+	text-shadow: none;
+	font-size: 140%;
+	z-index: 2344;
+	text-align: left;
+	}
+
+.editor-projects-item:hover > .project-edit-button,		// Project : bring opacity 1 to all overlaying elements
+.editor-projects-item:hover > h5 {						
+	opacity: 1;
+	}
+	
+
+		
+.swipe_left {											// Project : swipe toggle
+	left: -300px !important;
+	}	
+	
+
+
+
+
+// ********* Q-EDITOR : MAP *********		
+	
+// --- Buttons	
+	
+#editor-map-initpos-more,   			// Extends .dropdown-button
+#editor-map-bounds-more {
+	top: 54px;
+}		
+	
+// Extends .smap-button-white	
+#editor-map-initpos-button,				// Map : Set current possition button
+#editor-map-bounds,						// Map : Set current bounnds button
+.select-title {							// Map : Base layer button				
+	width: 225px;
+	}
+
+// ------	
+	
+				
+.editor-map-item-wrap {					// Map : inner wrapper
+	padding: 10px;
+	min-height: 80px;
+	margin-bottom: 1px;
+	margin-top: 1px;
+	}	
+	
+.editor-map-item-wrap:last-child {		// Map : "Map Controls" wrapper
+	margin-top: 10px;
+	}
+
+.select-elems {							// Map : base layer list wrapper
+	height: 0;
+	display: block;
+	overflow: hidden;
+	-webkit-transition: height 250ms ease;
+	margin-top: 8px;
+	}
+	
+.select-baselayer-open {				// Map : base layer list wrapper open
+	height: 297px;
+	}
+
+// ColorThemes .ct0
+.select-elem {}
+
+#editor-map-initpos-coordinates,		// Map : position wrapper
+#editor-map-bounds-coordinates {		// Map : bounds wrapper
+	position: relative;
+	top: 15px;
+	height: 0;
+	overflow: hidden;	
+	}
+
+.coordinates_open {						// Map : position wrapper open
+	height: 192px !important;			
+	}
+
+.bounds_open {							// Map : bounds wrapper open
+	height: 220px !important;
+	}
+
+
+
+
+
+// ********* Q-EDITOR : LAYERS *********
+
+
+#layers-wrapper {						// Wrapper
+	width: 280px;
+	}
+	
+#layers-library-browser {				// Data Library & MapBox Library logo wrapper
+	width: 100%;
+	height: 125px;
+	text-align: center;
+	}
+
+.layers-library-browser-item { 			// The LOGOS : For Data Library & MapBox Library
+/*
+	width: 100px;
+	height: 100px;
+	border: 1px solid gray;
+	float: left;
+	margin: 3px;
+	background-size:100px 100px;
+	cursor: pointer;
+*/
+	width: 100px;
+	height: 100px;
+	border: 1px solid gray;
+	margin: 3px;
+	background-size: 100px 100px;
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+	}
+
+#layers-library-browser-datalayers {	// Data Library logo
+	cursor: pointer;
+	font-family: $font;
+	font-size: 140%;
+	font-weight: $lean;
+	text-align: center;
+	padding-top: 19px;
+	text-transform: uppercase;
+	color: gainsboro;
+	}
+
+#layers-library-browser-datalayers:hover {	// MapBox logo
+/* 	color: white; */
+	}
+
+#layers-library-browser-mapbox {			// MapBox logo
+	background-image: url('http://www.altweeklies.com/imager/b/main/6640192/462f/mapbox-logo-256.jpg');
+	cursor: pointer;
+	}
+
+	
+	
+	
+// *** MIDDLE ITEM	
+.middle-item { 								/*// LAYER FOLDER : For making level buttons on map layer selector*/ /*// Extends .smap-button-white*/
+	width: 260px;							
+	margin: auto;
+	position: relative;
+	display: block;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	color: #666;
+	text-transform: uppercase;
+	font-weight: $obese;
+	line-height: 2.4;
+	background: rgba(255,255,255,1);
+	box-shadow: 0 0 2px 1px rgba(0,0,0,0.3)	
+}
+	
+.middle-item:after {
+	content: '';
+	position: absolute;
+	top: -20px;
+	left: -30px;
+	background-color: rgba(255, 255, 255, 0.93);
+	width: 320px;
+	height: 72px;
+	z-index: -2;
+	}	
+
+	
+	
+	
+	
+// *** BACK TO Q-EDITOR : LAYERS ***
+	
+#layers-library,							// Data library : wrapper
+#layers-mapbox {							// MapBox : wrapper
+	position: relative;
+	padding-bottom: 12px;
+	border-bottom: 1px solid;
+	}
+	
+// *** Import Part ***	
+	
+#editor-layers-connect-mapbox,				// MapBox : connect wrapper
+#editor-layers-upload {						// Data library : upload wrapper
+	background: rgba(255, 255, 255, 0.15);
+	height: 40px;
+	padding: 10px;
+	padding-left: 17px;
+	color: white;
+	}	
+	
+#editor-layers-upload-more,					// Data library : Drop down button
+#editor-layers-connect-mapbox-more {		// MapBox : Drop down button
+	top: 10px;
+	right: 5px;
+	}
+	
+.mapbox-connect-wrap,						// MapBox : connect drop down wrapper
+.datalibrary-connect-wrap {					// Data Library : upload drop down wrapper
+	position: relative;
+	color: white;
+	margin: 0;
+	padding: 16px;	
+	padding-top: 10px;
+	padding-top: 4px;
+	height: 55px;
+	}	
+	
+#import-mapbox-layers {						// MapBox : connect input field
+	background: rgba(0,0,0,0.3);
+	color: white !important;	
+	font-weight: $lean;
+	border: 0px;
+	float: left;
+	width: 170px;
+	}
+	
+#import-mapbox-layers-ok,					// MapBox : connect OK button
+#import-datalibrary-layers-ok {				// Data library : upload OK button
+	background: #DADADA;
+	color: #666;	
+	height: 33px;
+	width: 75px;
+	border-radius: 0;
+	padding: 0;
+	vertical-align: top;
+	margin: 0px;
+	padding-top: 5px;
+	font-size: 110%;
+	}		
+	
+// ColorTheme Colors : NOT INTEGRATED
+#import-mapbox-layers-ok:hover, 			// ditto
+#import-datalibrary-layers-ok:hover	{		// ditto
+	background: white;
+	}
+	
+	
+	
+// *** Layer List ***		
+	
+#layers-library {							// Layer list : outer wrapper
+	display: block;
+	}
+
+#layers-mapbox {							// MapBox : outer wrapper
+	display: none;
+	}
+
+#layers-mapbox h4,							// MapBox : layer list header
+#layers-library h4 {						// Data library : layer list header
+	margin-top:10px;
+	font-size: 200%;
+	border-bottom: 1px solid gainsboro;
+	padding-bottom: 10px;
+	margin-bottom: 0px;
+	color: white;
+	opacity: 1;
+	}
+	
+	
+#layers-library-list,						// Data library : Layer list wrapper
+.mapbox-list-item {							// MapBox : Layer list wrapper for each account
+	margin-top: 12px;
+//	background: rgba(255, 255, 255, 0.15);
+	padding: 10px;
+	}
+	
+.mapbox-list-item {
+	margin-top: 5px;
+	padding-top: 1px;
+	}	
+
+.mapbox-list-item:first-child {
+	margin-top: 12px;	
+	}
+	
+.layers-mapbox-name {						// MapBox : Account name (ie. 'rawger')
+	text-transform: capitalize;
+	margin: 10px;
+	font-size: 170%;
+	font-family: $font;
+	font-weight: $lean;
+	margin-bottom: 4px;
+	margin-left: 4px;
+	opacity: 1;
+	text-align: center;
+	}
+
+
+// ********* Q-EDITOR : DOCUMENTS & DATA LIBRARY *********
+
+.fullpage-documents .editor-wrapper,
+.data-library .editor-wrapper { 
+	width: auto;
+	}
+
+
+
+// ********* Q-EDITOR : DOCUMENTS *********
+
+
+// ColorThemes .ct1
+.fullpage-documents {						// Documents : outer wrapper
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: rgba(63, 70, 82, 1);
+	z-index: 3400;
+	display: none;
+	left: 100px;	
+	padding-right: 84px;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	}
+
+#documents-container-leftpane {				// Documents : left wrapper
+	position: absolute;
+	font-weight: $lean;
+	margin: 10px;
+	font-family: $font;
+	position: absolute;
+	width: 300px;
+	top: 36px;
+	}
+
+#documents-container-rightpane {			// Documents : right wrapper
+	position: absolute;
+	font-weight: $lean;
+	padding: 20px;
+	font-family: $font;
+	position: absolute;
+	left: 300px;
+	height: 100%;
+	color: gainsboro;
+	font-size: 20px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	width: 100%;
+	padding-right: 440px;
+	-webkit-box-sizing: border-box;
+	top: 45px;
+	}
+
+#documents-folder-list {					// Documents : folder list
+	margin-top: 30px;
+	}
+
+.documents-folder-item,						// Documents : list items
+#documents-new-folder {
+	background: none;
+	border: none;
+	font-weight: $lean;
+	font-size: 150%;
+	width: 75%;
+	margin: 4px;
+	margin-left: 30px;
+	font-family: $font;
+	color: gainsboro;	
+	cursor: pointer;	
+	}
+
+#documents-new-folder:hover,				// ditto
+.documents-folder-item:hover {
+	color: white;
+	}
+
+.text-menu .options {						// Documents : tooltip
+	padding-top: 1px !important;
+	width: 215px !important;
+	}
+
+.text-menu.options.url-mode .file {			// Documents : tooltip
+	display: none;
+	}
+
+.text-menu.active {							// Documents : tooltip
+	z-index: 1500;
+	}
+
+.grande-project-files {						// Documents : tooltip select options menu
+	width: 181px;
+	top: 36px;
+	position: absolute;
+	left: 0px;
+	}	
+	
+.grande-project-files-btn {					// Documents : OK button for select tooltip
+	width: 30px !important;
+	height: 16px !important;
+	background-color: white !important;
+	position: absolute !important;
+	top: 37px !important;
+	right: 0px !important;
+	border-radius: 3px !important;	
+	cursor: pointer;
+	}
+	
+.grande-project-files-btn:before {			// ditto
+	content: 'OK';
+	width: 100%;
+	height: 100%;
+	color: black;
+	position: absolute;
+	text-align: center;
+	font-size: 11px;
+	font-weight: $obese;
+	}
+	
+	
+	
+	
+// ********* Q-EDITOR : DATA LIBRARY & USERS *********	
+
+	
+#filelist,									// Data library : inner wrapper
+#userlist {									// Users : inner wrapper
+	margin: 20px;
+	}
+	
+.datalibrary-controls,						// Data library : controls wrapper
+.users-controls {							// Users : controls wrapper
+	height: 42px;
+	position: relative;
+	color: white;
+	border-bottom: 1px solid;
+	margin-bottom: 20px;
+	}
+		
+	
+// ********* Q-EDITOR : DATA LIBRARY *********	
+
+// --- Buttons
+
+#datalibrary-download-files {				// Data library : download button
+	float: right;
+	}
+	
+#datalibrary-delete-file {					// Data library : delete button
+	float: right;
+	margin-left: 5px;
+	}
+	
+#download-ok-button {						// Data library : download OK button
+	width: 100px;							// Extends .smap-button
+	bottom: 10px;
+	position: absolute;
+	right: 10px;
+	}
+
+#download-cancel-button {					// Data library : dowload cancel button
+	position: absolute;						// Extends .smap-button
+	bottom: 10px;
+	right: 114px;
+	}
+
+#download-ready-button {					// Data library : download ready button
+	width: 106px;							// Extends .smap-button
+	color: white !important;
+	height: 38px;
+	position: relative;
+	margin: auto;
+	display: block;
+	top: 170px;
+	}
+	
+// ---	
+
+#download-ready-button a {					// ditto
+	color: white;
+	text-decoration: none;
+	}
+
+#download-ready-button a:hover {			// ditto
+	color: gainsboro;
+	text-decoration: none;
+	}	
+
+
+// ColorThemes .ct1	
+.data-library,
+.fullpage-mediaLibrary {								// Data library : outer wrapper
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: rgba(63, 70, 82, 1);
+	z-index: 3400;
+	display: none;
+	left: 100px;
+	overflow-y: auto;	
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;   
+	padding-right: 84px;
+	}
+		
+#datalibrary-download-dialogue {			// Data library : download box
+	position: fixed;
+	width: 80%;
+	height: 400px;
+	display: none;
+	top: 20%;
+	left: 15%;
+	background: rgba(86, 95, 111, 1);
+	color: white;
+	font-family: $font;
+	font-size: 120%;
+	z-index: 1000;
+	padding: 10px;
+	}
+	
+#datalibrary-download-dialogue:before {		// ditto
+	content: '';
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background: white;
+	z-index: -2;
+	opacity: 0.75;
+	}	
+
+// ColorThemes .ct1
+#datalibrary-download-dialogue:after {		// ditto
+	content: '';
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background: $ecolor2;
+	z-index: -2;
+	}	
+			
+#datalibrary-download-table thead tr {		// Data library : download table head
+	font-size: 80%;
+	}
+	
+.tdcont {									// Data library : table cell 
+	color: gainsboro;
+	opacity: 0.7;
+	font-size: 14px;
+	font-weight: $lean;
+	letter-spacing: 0.5px;
+	line-height: 1.2;
+	padding-top: 10px;
+	border-left: 1px dashed rgba(255,255,255,0.05);
+	padding-left: 9px;
+	}
+	
+.tdcont:hover {								// ditto
+	color:white;
+	}
+	
+.download-remove {							// Data library : unselect download check box in download window
+	text-align: center;
+	}
+	
+.dln {										// Data library : Main name (in table)
+	font-weight: $lean;
+	margin-left: 30px;
+	font-family: $font;
+	color: white;
+	background: none;
+	border: none;
+	font-size : 130%;
+	margin: 0px 10px 0px 0px;
+	padding-bottom: 0;
+	width: 100%;
+	}
+
+.smallerText {								// Data library : First name
+	font-size: 100%;
+	opacity: 0.6;
+	font-style: italic;
+	}
+
+.dln:hover {								// ditto
+	color: gainsboro;
+	}
+
+.dld {										// Data library : file description
+	font-weight: $lean;
+	font-size: 100%;
+	margin: 0 10px 0 0;
+	font-family: $font;
+	color: white;
+	background: none;
+	border: none;
+	resize: none;
+	width: 100%; 
+	height: 24px;
+	opacity: 0.5;
+	position: relative;
+	top: -3px;	
+	font-style: italic;
+	overflow-y: hidden;
+	}
+	
+#datalibrary-errors {						// Data library : Errors
+	font-family: $font;
+	width: 400px;
+	height: 80px;
+	position: absolute;
+	right: 121px;
+	background: white;
+	top: 57px;
+	color: rgb(255, 111, 111);
+	font-size: 140%;
+	font-weight: $lean;
+	padding: 5px;
+	background: rgba(86, 95, 111, 1);
+	display: none;
+	}
+
+.grande-project-files-btn {					// Data library : Unknown???
+	width: 30px;
+	height: 30px;
+	background-color: red;
+	}
+
+.grande-project-files-wrap {				// Data library : Unknown???
+	height: auto;
+	display: none;
+	}	
+	
+.dz-details {								// Data library : DropZone style
+	top: 320px;
+	left: 30%;
+	position: fixed;
+	height: 50px;
+	padding: 5px;
+	padding-left: 10px;
+	padding-right: 10px;
+	width: auto;
+	z-index: 20000;
+	font-size: 120%;
+	}
+
+.dz-progress {								// Data library : DropZone style
+	display: none;
+	}
+
+.dz-success-mark {							// Data library : DropZone style
+	display: none;
+	}
+
+.dz-error-mark {							// Data library : DropZone style
+	display: none;
+	}
+	
+.progress-bar {								// Data library : DropZone style
+	position: fixed;
+	width: 0%;
+	height: 6px;
+	top: 0px;
+	left: 0px;
+	background: white;
+	z-index: 20000;
+	margin-left: 100px;
+	}
+
+.fullscreen-drop {							// Data library : DropZone style
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	background-color: rgba(63, 70, 82, 1);
+	top: 0;
+	left: 0;
+	z-index: -1000;
+	margin-left: 100px;
+	}
+
+.fullscreen-drop::after {					// Data library : DropZone style
+	content: 'Drop files to upload';
+	color: white;
+	font-weight: $lean;
+	font-family: $font;
+	font-size: 400%;
+	position: fixed;
+	top: 30%;
+	left: 25%;
+	}
+
+.fullscreen-dropped {						// Data library : DropZone style
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	background-color: rgba(63, 70, 82, 1);
+	top: 0;
+	left: 0;
+	z-index: -1000;
+	margin-left: 100px;
+	}
+
+.fullscreen-dropped::after {				// Data library : DropZone style
+	content: 'Uploading';
+	color: white;
+	font-weight: $lean;
+	font-family: $font;
+	font-size: 400%;
+	position: fixed;
+	top: 30%;
+	left: 30%;
+	}
+	
+#squaredThree-checkbox-all {				// Data library : DropZone style
+	top: -4px;
+	}
+		
+.checkbox {									// Data library : DropZone style
+	width: 20px;
+	padding: 0;
+	top: 0px;
+	position: relative;
+	left: 10px;
+	}	
+	
+.dropzone-pane {							// Data library : DropZone style
+	width: 100px;
+	height: 100px;
+	border: white solid 1px;
+	}
+	
+	
+// ********* Q-EDITOR : USERS *********	
+		
+.q-editor-menu-item .users {				// Users : in left menu, white line on top
+	border-top: 1px solid white;
+	}
+	
+.fullpage-users {							// Users : outer wrapper
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: #3f4652;
+	z-index: 3400;
+	display: none;
+	left: 100px;
+	padding-right: 84px;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	}
+	
+.fullpage-users .editor-wrapper {			// Users : inner wrapper
+	width: auto;
+	}	
+	
+.users-projects-dropwrap {					// Users : The R/W outer wrapper
+	z-index: 4000;
+	position: absolute;
+	background: rgba(255,255,255,0.7);
+	width: 317px;
+	height: auto;
+	padding: 10px;
+	margin-top: 50px;
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
+	border-radius: 2px;
+	}	
+	
+.users-projects-top-title {					// Users : The R/W part in the header
+	color: white;
+	font-size: 130%;
+	padding-left: 9px;
+	font-weight: $lean;
+	background: rgba(0, 0, 0, 0.49);
+	width: 63px;
+	letter-spacing: 2.8px;
+	position: relative;
+	border-bottom: 1px solid white;
+	}	
+	
+.users-projects-checkwrap {					// Users : checkbox wrapper when editing user R/W access
+	left: 0;
+	padding: 10px;
+	background: rgba(0, 0, 0, 0.2);
+	border-right: 1px solid rgba(255, 255, 255, 0.2);
+	width: 64px !important;
+	height: 100% !important;
+	}
+	
+.users-projects-checkwrap:before, 			// Users : R/W before
+.users-projects-top-title:before {			// Users : R/W before
+	content: '';
+	width: 0px;
+	height: 37px;
+	left: 30px;
+	position: absolute;
+	top: 0;
+	border-right: 1px dashed rgba(255,255,255,0.1);
+	}	
+	
+.users-projects-itemwrap {					// Users : Project list when editing user R/W access
+	width: 300px;
+	height: 37px;
+	background: rgba(0,0,0,0.5);
+	position: relative;
+	border-bottom: 1px solid white;
+	}	
+	
+.users-projects-itemwrap:nth-child(even) {	// ditto
+	background-color: rgba(0,0,0,0.6);
+	}	
+
+.users-projects-itemwrap:nth-child(odd) {	// ditto
+	background-color: rgba(0,0,0,0.5);
+	}	
+	
+.projects-select-cancel {					// Users : Cancel when editing R/W access
+	height: 28px;
+	color: gainsboro;
+	background: #646464;
+	padding: 3px 10px 5px 10px;
+	text-align: center;
+	margin: 0px;
+	font-weight: $lean;
+	cursor: pointer;
+	font-family: $font;
+	font-size: 100%;
+	display: inline-block;
+	vertical-align: top;
+	margin-top: 7px;
+	}	
+
+.projects-select-confirm {					// Users : Confirm when editing R/W access
+	height: 28px;
+	color: gainsboro;
+	background: #646464;
+	padding: 3px 10px 5px 10px;
+	text-align: center;
+	margin: 0px;
+	font-weight: $lean;
+	cursor: pointer;
+	font-family: $font;
+	font-size: 100%;
+	display: inline-block;
+	vertical-align: top;
+	margin-top: 7px;
+	margin-left: 3px;
+	}
+	
+.inject-input {								// Users : Text fields to input fields
+	font-weight: $lean;
+	margin-left: 30px;
+	font-family: $font;
+	color: white;
+	background: none;
+	border: none;
+	font-size: 100%;
+	margin: 0px 10px 0px 0px;
+	padding-bottom: 0;
+	width: 100%;
+	padding: 0;
+	}	
+	
+.users-projects-namediv {					// Users : Project name in R/W editing mode
+	position: absolute;
+	width: 90%;
+	left: 60px;
+	top: 0;
+	padding: 7px;
+	color: white;
+	font-size: 120%;
+	font-weight: $lean;
+	padding-left: 13px;
+	}	
+
+.check-write-label {						// Users : R/W, Write checkbox
+	right: 9px;
+	left: auto;
+	}
+
+.check-read-label {							// Users : R/W, Read checkbox
+	left: 8px;
+	}			
+
+// *********************************************
+
+// CUSTOM CHECKBOX
+
+// *********************************************
+
+/* SQUARED THREE */
+.squaredThree {
+	position: relative;
+	margin-left: 0px;
+	width: 22px;
+	height: 22px;	
+	}
+
+.squaredThree label {
+	cursor: pointer;
+	position: absolute;
+	width: 15px;
+	height: 15px;
+	z-index: 222;
+	border-radius: 4px;
+	-webkit-box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,.4);
+	-moz-box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,.4);
+	box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,.4);
+
+	background: -webkit-linear-gradient(top, rgba(34,34,34,0.7) 0%, rgba(69,72,77,0.7) 100%);
+	background: -moz-linear-gradient(top, rgba(34,34,34,0.7) 0%, rgba(69,72,77,0.7) 100%);
+	background: -o-linear-gradient(top, rgba(34,34,34,0.7) 0%, rgba(69,72,77,0.7) 100%);
+	background: -ms-linear-gradient(top, rgba(34,34,34,0.7) 0%, rgba(69,72,77,0.7) 100%);
+	background: linear-gradient(top, rgba(34,34,34,0.7) 0%, rgba(69,72,77,0.7) 100%);
+
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#222', endColorstr='#45484d',GradientType=0 );
+	}
+
+.squaredThree label:after {
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter: alpha(opacity=0);
+	opacity: 0;
+	content: '';
+	position: absolute;
+	width: 9px;
+	height: 5px;
+	background: transparent;
+	top: 4px;
+	left: 4px;
+	border: 3px solid #fcfff4;
+	border-top: none;
+	border-right: none;
+	}
+
+.squaredThree label:hover::after {
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+	filter: alpha(opacity=30);
+	opacity: 0.3;
+	top: 4px;
+	left: 2px;
+	height: 6px;
+	width: 11px;
+
+	}
+
+.squaredThree input[type=checkbox]:checked + label:after {
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+	filter: alpha(opacity=100);
+	opacity: 1;
+	top: 4px;
+	left: 2px;
+	height: 6px;
+	width: 11px;
+	}
+
+
+
+// *********************************************
+
+// iPhone style
+
+// *********************************************
+
+
+
+ul#checked {
+	width: 100px;
+	list-style: none;
+	position: relative;
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	padding-left: 10px;
+	height: 40px;
+	float: right;
+	}
+
+ul#checked li p {
+	display: block;
+	margin-bottom: 20px;
+	background: -moz-linear-gradient(19% 75% 90deg,#3095C7, #14539C); 
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#14539C), to(#3095C7));
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	border: 1px solid #555555;
+	width: 90px;
+	position: relative;
+	height: 22px;
+	}
+
+ul#checked p:before {
+	content: "Vector";
+	padding-left: 5px;
+	color: #fff;
+	font-size: 12px;
+	text-shadow: #093B5C 0px -1px 1px;
+	}
+
+ul#checked p:after {
+	content: "Raster";
+	padding-left: 6px;
+	line-height: 23px;
+	color: #fff;
+	font-size: 12px;
+	text-shadow: #093B5C 0px -1px 1px;
+	}
+
+.check { 
+	display: block;
+	width: 45px;
+	height: 20px;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	background: -moz-linear-gradient(19% 75% 90deg,#FFFFFF, #A1A1A1);
+	background: #fff -webkit-gradient(linear, 0% 0%, 0% 100%, from(#A1A1A1), to(#FFFFFF));
+	border: 1px solid #e5e5e5;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	}
+
+input[type=checkbox] {
+	display: none;
+	}
+
+input[type=checkbox]:checked + label.check {
+	top: 0px;
+	left: 44px;
+	}
+
+input[type=checkbox] + label.check {
+	top: 0px;
+	left: 0px;
+	}
+
+label.info {
+	position: absolute;
+	color: #000;
+	top:0px;
+	left: 100px;
+	line-height: 32px;
+	width: 200px;
+	}
+	
+	
+	
+// *********************************************
+
+// unknown styling
+
+// *********************************************
+	
+
+
+.abs-left-20 {
+	position: absolute;
+	left: 0;
+	width: 20%;
+	}
+
+.abs-right-80 {
+	position: absolute;
+	right: 0;
+	width: 80%;
+	}	
+	
+	
+	
+	
+	
+// *********************************************
+
+// Login Page
+
+// *********************************************
+	
+
+.container {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	margin: 0;
+	padding: 0;	
+	background: #3F4652;
+	color: #FAFAFA;
+	}
+
+.jumbotron {
+	height: 100%;
+	background: #3F4652;
+	color: #FAFAFA;
+	padding-top: 170px;
+	}
+
+.col-sm-6.col-sm-offset-3 {
+	width: 500px;
+	margin: auto;
+	float: none;
+	margin-top: 150px;	
+	}
+
+.form-control {
+	border-radius: 0px;
+	border: 0px;
+	}
+	
+
+
+
+
+
+
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+	background-color: white !important;
+	background: white !important;
+	}
+
+
+
+// *********************************************
+
+// Layer Menu
+
+// *********************************************
+
+
+
+
+.no-inspector {
+	padding-bottom: 0 !important;
+	top: -8px !important;
+	padding-top: 15px !important;
+}
+
+.no-inspector #open-layers {
+	top: 14px !important;
+}
