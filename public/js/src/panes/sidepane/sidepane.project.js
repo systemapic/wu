@@ -45,7 +45,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent.on(this.users, 'mouseenter', this.expandUsers, this);
 		Wu.DomEvent.on(this.users, 'mouseleave', this.collapseUsers, this);
 
-
 		// kill button
 		if (app.Account.canDeleteProject(this.project.store.uuid)) {
 			this.kill = Wu.DomUtil.create('div', 'project-kill', this._container, 'X');
@@ -96,6 +95,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	
 	addEditHooks : function () {
+		console.log('addEditHooks', this.project.editMode);
 
 		// editing hooks
 		if (!this.project.editMode) return;
@@ -111,7 +111,10 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	removeEditHooks : function () {
-		if (!this.project.editMode) return;
+		// if (!this.project.editMode) return;
+
+		console.log('addEditHooks', this.project.editMode);
+
 
 		// editing hooks
 		Wu.DomEvent.off(this.name, 	  'dblclick', this.edit, this);
@@ -201,7 +204,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 	select : function () {
 
 		// dont select if already active
-		// if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
+		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
 
 		// select project
 		this.project.select();
