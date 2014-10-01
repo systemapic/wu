@@ -92,6 +92,64 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 	getPanes : function () {
 		// noop
 	},
+
+	// sort layers by provider
+	sortLayers : function (layers) {
+		// possible keys in layer.store.data. must add more here later if other sources
+		var keys = ['geojson', 'mapbox'];
+		var results = [];
+		keys.forEach(function (key) {
+			var sort = {
+				key : key,
+				layers : []
+			}
+			for (l in layers) {
+				var layer = layers[l];
+				if (layer.store.data.hasOwnProperty(key)) {
+					sort.layers.push(layer)
+				}
+			}
+			results.push(sort);
+		}, this);
+
+		this.numberOfProviders = results.length;
+		return results;
+	},
+
+	addProvider : function (provider) {
+		var title = '';
+		if (provider == 'geojson') title = 'Data Library';
+		if (provider == 'mapbox') title = 'Mapbox';
+		var header = Wu.DomUtil.create('div', 'item-list-header', this._outer, title)
+	},
+
+	fillLayers : function () {
+
+		this._layers = {};
+
+		// return if no layers
+	       	if (_.isEmpty(this.project.layers)) return;
+	       	
+
+	       	var sortedLayers = this.sortLayers(this.project.layers);
+	       	console.log('sorted layers: ', sortedLayers);
+
+	       	sortedLayers.forEach(function (provider) {
+
+	       		this.addProvider(provider.key);
+
+	       		provider.layers.forEach(function (layer) {
+	       			this.addLayer(layer);
+	       		}, this);
+
+	       	}, this);
+
+	       	// calculate height for wrapper
+	       	this.calculateHeight();
+
+	},
+
+
 	
 
 });
@@ -259,20 +317,20 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		
 	},
 
-	fillLayers : function () {
+	// fillLayers : function () {
 
-		// return if no layers
-	       	if (_.isEmpty(this.project.layers)) return;
+	// 	// return if no layers
+	//        	if (_.isEmpty(this.project.layers)) return;
 	       	
-	       	// fill in with layers in DOM
-	       	_.each(this.project.layers, function (layer) {
-	       		this.addLayer(layer);
-	       	}, this);
+	//        	// fill in with layers in DOM
+	//        	_.each(this.project.layers, function (layer) {
+	//        		this.addLayer(layer);
+	//        	}, this);
 
-	       	// calculate height for wrapper
-	       	this.calculateHeight();
+	//        	// calculate height for wrapper
+	//        	this.calculateHeight();
 
-	},
+	// },
 
 
 	addLayer : function (layer) {
@@ -534,8 +592,18 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 	},
 
+	// calculateHeight : function () {
+	// 	this.maxHeight = _.size(this.project.layers) * 33;
+	// 	this.minHeight = 0;
+
+	// 	// add 100 if in editMode
+	// 	if (this.editMode) this.maxHeight += 100;
+	// },
+
 	calculateHeight : function () {
-		this.maxHeight = _.size(this.project.layers) * 33;
+
+		var padding = this.numberOfProviders * 35;
+		this.maxHeight = _.size(this.project.layers) * 33 + padding;
 		this.minHeight = 0;
 
 		// add 100 if in editMode
@@ -562,8 +630,8 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		this._container.innerHTML = '<h4>Layer Menu</h4><br>';		
 		this._inner  = Wu.DomUtil.create('div', 'map-layermenu-inner', this._container);
 		this._outer  = Wu.DomUtil.create('div', 'map-layermenu-outer', this._inner);
-		var status   = 'Enable layer menu in Controls below.';
-		this._status = Wu.DomUtil.create('div', 'layermenu-status', this._outer, status);
+		// var status   = 'Enable layer menu in Controls below.';
+		// this._status = Wu.DomUtil.create('div', 'layermenu-status', this._outer, status);
 
 	},
 
@@ -585,22 +653,61 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		
 	},
 
-	fillLayers : function () {
+	// fillLayers : function () {
 
-		this._layers = {};
+	// 	this._layers = {};
 
-		// return if no layers
-	       	if (_.isEmpty(this.project.layers)) return;
+	// 	// return if no layers
+	//        	if (_.isEmpty(this.project.layers)) return;
 	       	
-	       	// fill in with layers in DOM
-	       	_.each(this.project.layers, function (layer) {
-	       		this.addLayer(layer);
-	       	}, this);
 
-	       	// calculate height for wrapper
-	       	this.calculateHeight();
+	//        	var sortedLayers = this.sortLayers(this.project.layers);
+	//        	console.log('sorted layers: ', sortedLayers);
 
-	},
+	//        	sortedLayers.forEach(function (provider) {
+
+	//        		this.addProvider(provider.key);
+
+	//        		provider.layers.forEach(function (layer) {
+	//        			this.addLayer(layer);
+	//        		}, this);
+
+	//        	}, this);
+
+	//        	// calculate height for wrapper
+	//        	this.calculateHeight();
+
+	// },
+
+	// // sort layers by provider
+	// sortLayers : function (layers) {
+	// 	// possible keys in layer.store.data. must add more here later if other sources
+	// 	var keys = ['geojson', 'mapbox'];
+	// 	var results = [];
+	// 	keys.forEach(function (key) {
+	// 		var sort = {
+	// 			key : key,
+	// 			layers : []
+	// 		}
+	// 		for (l in layers) {
+	// 			var layer = layers[l];
+	// 			if (layer.store.data.hasOwnProperty(key)) {
+	// 				sort.layers.push(layer)
+	// 			}
+	// 		}
+	// 		results.push(sort);
+	// 	}, this);
+
+	// 	this.numberOfProviders = results.length;
+	// 	return results;
+	// },
+
+	// addProvider : function (provider) {
+	// 	var title = '';
+	// 	if (provider == 'geojson') title = 'Data Library';
+	// 	if (provider == 'mapbox') title = 'Mapbox';
+	// 	var header = Wu.DomUtil.create('div', 'item-list-header', this._outer, title)
+	// },
 
 	// add layers to layermenu list in sidepane
 	addLayer : function (layer) {
@@ -666,7 +773,9 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 	},
 
 	calculateHeight : function () {
-		this.maxHeight = _.size(this.project.layers) * 33 + 20; // add 20 for status msg
+
+		var padding = this.numberOfProviders * 35;
+		this.maxHeight = _.size(this.project.layers) * 33 + padding;
 		this.minHeight = 0;
 
 		// add 100 if in editMode

@@ -282,12 +282,8 @@
 	font-size: 120%;
 	cursor: pointer;
 }
-
 .q-editor-container {
 	background-color: rgba(255, 255, 255, 0);
-}
-.q-editor-content-item {
-	background-color: rgba(15, 26, 30, 0.80) !important;
 }
 
 /*tiny header*/
@@ -298,8 +294,47 @@
 
 
 
+/*layermenu/baselayer headers*/
+.item-list-header {
+	padding: 5px;
+	font-size: 130%;
+	padding-left: 0px;
+}
 
 
 
+/*transparent everything style*/
+.editor-clients-container {
+	background: rgba(15, 26, 30, 0.65);
+}
+.project-item {
+	background: rgba(15, 26, 30, 0.65);
+}
+.editor-clients-container:hover {
+	background-color: rgba(0, 0, 0, 0.55);
+}
+.q-editor-menu {
+	background-color: rgba(0, 0, 0, 0.55);
+}
+#menuslider {
+	background-color: rgba(0, 0, 0, 0.55);
+}
+.editor-inner-wrapper {
+	background-color: rgba(0, 0, 0, 0.55);
+}
+.editor-inner-wrapper:hover {
+	background-color: rgba(0, 0, 0, 0.45);
+}
+#header {
+	background: rgba(0, 0, 0, 0.55);
+	color: white !important;
+}
+.header-title {
+	color: white;
+}
+.header-subtitle {
+	color: white;
+	font-weight: 400;
+}
 
 
