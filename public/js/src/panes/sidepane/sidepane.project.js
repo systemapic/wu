@@ -78,6 +78,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent.on(this._container, 'mouseenter', this.open, this);
 		Wu.DomEvent.on(this._container, 'mouseleave', this.close, this);
 		Wu.DomEvent.on(this._container, 'click',      this.select, this);
+		Wu.DomEvent.on( this._container, 'mousedown', Wu.DomEvent.stop, this);
 	
 		// add edit hooks
 		if (this.project.editMode) this.addEditHooks();
@@ -88,6 +89,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent.off(this._container, 'mouseenter', this.open, this);
 		Wu.DomEvent.off(this._container, 'mouseleave', this.close, this);
 		Wu.DomEvent.off(this._container, 'click', this.select, this);
+		Wu.DomEvent.off( this._container, 'mousedown', Wu.DomEvent.stop, this);
 
 		// remove edit hooks
 		if (this.project.editMode) this.removeEditHooks();
@@ -201,7 +203,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	},
 
-	select : function () {
+	select : function (e) {
+
+		console.log('select e: ', e);
 
 		// dont select if already active
 		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!

@@ -238,15 +238,18 @@ Wu.SidePane.Client = Wu.Class.extend({
 	
 
 	addHooks : function () {
-		Wu.DomEvent.on( this._container.parentNode, 'mouseleave', this.close, this);	// todo: add click for opening also...
-		Wu.DomEvent.on( this._container, 'mousemove', this.pendingOpen, this);
-		Wu.DomEvent.on( this._container, 'mousedown', this.open, this);
+		// Wu.DomEvent.on( this._container.parentNode, 'mouseleave', this.close, this);	// todo: add click for opening also...
+		// Wu.DomEvent.on( this._container, 'mousemove', this.pendingOpen, this);
+		// Wu.DomEvent.on( this._container, 'mousedown', this.open, this);
+		Wu.DomEvent.on( this._container, 'mousedown', this.toggle, this);
+		
 	},
 
 	removeHooks : function () {
-		Wu.DomEvent.off( this._container.parentNode, 'mouseleave', this.close, this);
-		Wu.DomEvent.off( this._container, 'mousemove', this.pendingOpen, this);
-		Wu.DomEvent.off( this._container, 'mousedown', this.open, this);
+		// Wu.DomEvent.off( this._container.parentNode, 'mouseleave', this.close, this);
+		// Wu.DomEvent.off( this._container, 'mousemove', this.pendingOpen, this);
+		// Wu.DomEvent.off( this._container, 'mousedown', this.open, this);
+		Wu.DomEvent.off( this._container, 'mousedown', this.toggle, this);
 	},
 
 	addEditHooks : function () {
@@ -414,10 +417,15 @@ Wu.SidePane.Client = Wu.Class.extend({
 		}, 200);	
 	},
 
+	toggle : function () {
+		this._isOpen ? this.close() : this.open();
+	},
+
 	open : function () {
 		this.calculateHeight();
 		this._container.style.height = this.maxHeight + 'px';          
 		this._isOpen = true;
+		// this._pendingClose = this;
 	},
 
 
@@ -425,8 +433,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.calculateHeight();
 		this._container.style.height = this.minHeight + 'px';    
 		this._isOpen = false;
-		app._pendingCloseClient = false;
-		if (app._timerOpenClient) clearTimeout(app._timerOpenClient);
+		// app._pendingCloseClient = false;
+		// if (app._timerOpenClient) clearTimeout(app._timerOpenClient);
 	},
 
 	

@@ -15,7 +15,7 @@ Wu.App = Wu.Class.extend({
 			mapOptions 	: true,
 			documents 	: true,               	
 			dataLibrary 	: true,               	
-			mediaLibrary    : true,
+			mediaLibrary    : false,
 			users 		: true,
 		},	
 		

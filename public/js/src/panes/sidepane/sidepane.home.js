@@ -66,6 +66,7 @@ Wu.SidePane.Home = Wu.Class.extend({
 	},
 
 	refresh : function () {
+		if (!this.project) return;
 		// set height to project headerHeight
 		var headerHeight = this.project.getHeaderHeight();
 		this.setHeight(headerHeight);
