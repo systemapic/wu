@@ -1,7 +1,5 @@
 /* Leaflet.Draw.Note Plugin  (depends on Leaflet.Draw)
    @kosjoli — 2013 MIT Licence						   */
-
-
 L.Draw.Note = L.Draw.Rectangle.extend({
 	statics: {
 		TYPE: 'note'
@@ -810,7 +808,10 @@ L.EditToolbar.Edit = L.Handler.extend({
 					
                         		// save styles
 					var geolayer = layer._layers[l];
-					geolayer.options.previousStyle = geolayer.getStyle();
+					console.log('geolayer): ', geolayer);
+
+					if (geolayer.getStyle) geolayer.options.previousStyle = geolayer.getStyle();
+					
 
 					// set edit styyle
 					geolayer.setStyle(pathOptions);
@@ -834,7 +835,10 @@ L.EditToolbar.Edit = L.Handler.extend({
           
                 } else if (layer instanceof L.GeoJSON && layer._layers) {
                 	for (l in layer._layers) {
-                		layer._layers[l].editing.enable();
+                		var lay = layer._layers[l];
+                		if (lay.editing) {
+                			lay.editing.enable();
+                		}
                 	}	
         	
         	} else {
@@ -1144,7 +1148,6 @@ L.EditToolbar.Style = L.Handler.extend({
 // L.Path.getStyle
 L.Path.include({
 	getStyle : function () {
-		
 		if (this._renderer) return this._renderer._getStyle(this);		
 		return this._getStyle(this);		
 	},
@@ -1170,4 +1173,32 @@ L.Path.include({
 	}
 });
 
+L.Draw.Feature.include({
+	getStyle : function () {
+		if (this._renderer) return this._renderer._getStyle(this);		
+		return this._getStyle(this);		
+	},
+
+	_getStyle : function (layer) {
+		var path = layer._path,
+		   style = {};
+
+		style.color = path.getAttribute('stroke');
+		style.opacity = parseFloat(path.getAttribute('stroke-opacity'));
+		style.strokeWidth = parseFloat(path.getAttribute('stroke-width'));
+		style.lineCap = path.getAttribute('stroke-linecap');
+		style.lineJoin = path.getAttribute('stroke-linejoin');
+		style.dashArray = path.getAttribute('stroke-dasharray');
+		style.dashOffset = path.getAttribute('stroke-dashoffset');
+		style.fill = true;
+		style.fillColor = path.getAttribute('fill');
+		style.fillOpacity = parseFloat(path.getAttribute('fill-opacity'));
+		style.fillRule = path.getAttribute('fill-rule');
+		style.pointerEvents = path.getAttribute('pointer-events');
+		
+		return style;
+	}
+});
+
+	
 	
