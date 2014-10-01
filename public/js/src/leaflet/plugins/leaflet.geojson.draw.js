@@ -87,39 +87,39 @@ L.extend(L.GeoJSON, {
 
 		coordsToLatLng = coordsToLatLng || this.coordsToLatLng;
 		
-		switch (geometry.type) {
+		switch (geometry.type.toLowerCase()) {
 		
-			case 'Point':
+			case 'point':
 				latlng = coordsToLatLng(coords);
 				return pointToLayer ? pointToLayer(geojson, latlng) : new L.Marker(latlng);
 	
-			case 'MultiPoint':
+			case 'multipoint':
 				for (i = 0, len = coords.length; i < len; i++) {
 					latlng = coordsToLatLng(coords[i]);
 					layers.push(pointToLayer ? pointToLayer(geojson, latlng) : new L.Marker(latlng));
 				}
 				return new L.FeatureGroup(layers);
 	
-			case 'LineString':
+			case 'linestring':
 				latlngs = this.coordsToLatLngs(coords, 0, coordsToLatLng);
 				return new L.Polyline(latlngs, vectorOptions);
 	
-			case 'Polygon':
+			case 'polygon':
 				if (coords.length === 2 && !coords[1].length) {
 					throw new Error('Invalid GeoJSON object.');
 				}
 				latlngs = this.coordsToLatLngs(coords, 1, coordsToLatLng);
 				return new L.Polygon(latlngs, vectorOptions);
 	
-			case 'MultiLineString':
+			case 'multilinestring':
 				latlngs = this.coordsToLatLngs(coords, 1, coordsToLatLng);
 				return new L.MultiPolyline(latlngs, vectorOptions);
 	
-			case 'MultiPolygon':
+			case 'multipolygon':
 				latlngs = this.coordsToLatLngs(coords, 2, coordsToLatLng);
 				return new L.MultiPolygon(latlngs, vectorOptions);
 	
-			case 'GeometryCollection':
+			case 'geometrycollection':
 				for (i = 0, len = geometry.geometries.length; i < len; i++) {
 					layers.push(this.geometryToLayer({
 						geometry: geometry.geometries[i],
@@ -129,7 +129,7 @@ L.extend(L.GeoJSON, {
 				}
 				return new L.FeatureGroup(layers);
 	
-			case 'Circle':
+			case 'circle':
 				var coord = coords[0];
 				latlng = new L.LatLng(coord[1], coord[0]);
 				return new L.Circle(latlng, geometry.radius);

@@ -167,8 +167,11 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 	dataLoaded : function (that, json) {
 	
 		// parse json into geojson object
-		that.data = JSON.parse(json);
+		try { that.data = JSON.parse(json); }
+		catch (e) { return console.log('error!', json)}
 		
+		console.log('got data: ', that.data);
+
 		// return if error
 		if (that.data.error) return console.log(that.data.error);
 

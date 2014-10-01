@@ -11,15 +11,10 @@
 	box-shadow: 0 1px 7px rgba(0, 0, 0, 0.65);
 	text-align: center;
 	background-color: #FFFFFF;
-
 	background-image: url('evil_sprite.png');
 	background-repeat: no-repeat;
 	background-position: 2px -233px;
-
 }
-
-
-
 .baselayertoggle-item {
 	width: 150px;
 	background: white;
@@ -302,6 +297,11 @@
 }
 
 
+/*småting*/
+.editor-inner-wrapper h4 {
+	cursor: pointer;
+}
+
 
 /*transparent everything style*/
 .editor-clients-container {
@@ -312,6 +312,9 @@
 }
 .editor-clients-container:hover {
 	background-color: rgba(0, 0, 0, 0.55);
+}
+.q-editor-container {
+	box-shadow: 0 0px;
 }
 .q-editor-menu {
 	background-color: rgba(0, 0, 0, 0.55);
@@ -335,6 +338,10 @@
 .header-subtitle {
 	color: white;
 	font-weight: 400;
+}
+#new-client-button {
+	background: rgba(0, 0, 0, 0.4);
+	right: -15px;
 }
 
 
