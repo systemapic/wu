@@ -26,8 +26,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// filecount
 		this.filecount = 0;
 
-
-
 		// render empty table
 		this._tableContainer.innerHTML = ich.datalibraryTableframe();
 
@@ -236,6 +234,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	deleteFiles : function (files) {
 		console.log('deleting ', files);
+
+		// set status
+		app.setStatus('Deleting');
 		
 		// iterate over files and delete
 		var _fids = [];
@@ -277,6 +278,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		}
 		var string = JSON.stringify(json);
 		Wu.save('/api/file/delete', string); 
+
+		// set status
+		app.setStatus('Deleted!');
 
 	},
 
@@ -364,6 +368,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				that.fullOn();
 				that.fullUpOn();
 			}
+
+			// set status
+			app.setStatus('Uploading');
 		});
 
 
@@ -375,6 +382,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 			// clean up
 			that.dz.removeFile(file);
+
+			// set status
+			app.setStatus('Done!', 2000);
 		      
 		});
 
@@ -387,6 +397,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.dz.on('uploadprogress', function (file, progress) {
 			// set progress
 			that.progress.style.width = progress + '%';
+
+			// console.log('progresS: ', progress);
+
+			// set status
+			// app.setStatus(Math.floor(progress) + '%');
 		})                                                                                                                                                                                                               
 
 		this.dz.on('success', function (err, json) {

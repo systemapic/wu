@@ -4808,14 +4808,6 @@ h4 {
   height: auto;
   background: red; }
 
-.home-container {
-  background: none;
-  background-image: url("evil_sprite.png") !important;
-  background-repeat: no-repeat !important;
-  background-position: -59px -229px !important;
-  background-color: #0F1A1E !important;
-  cursor: pointer; }
-
 .q-editor-container {
   -webkit-transition: height 250ms ease; }
 

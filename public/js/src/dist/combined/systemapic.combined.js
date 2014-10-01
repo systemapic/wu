@@ -14841,6 +14841,7 @@ Wu.App = Wu.Class.extend({
 	options : {
 		id : 'app',
 
+		// sidepane
 		panes : {
 			// plugged in and working! :)
 			clients 	: true,
@@ -14849,14 +14850,18 @@ Wu.App = Wu.Class.extend({
 			dataLibrary 	: true,               	
 			mediaLibrary    : true,
 			users 		: true,
-		},						
+		},	
+
+		headerPane : true,
+
 		
-		plugins : {
-			// not plugged in
-			chat 		: false, 
-			colorTheme      : true,
-			screenshot 	: true,
-		},
+		// not plugged in
+		chat : true,
+		colorTheme : true,
+		screenshot : true,
+
+		// plugged in
+		statusPane : true,
 
 		providers : {
 			// default accounts, added to all new (and old?) projects
@@ -14988,6 +14993,9 @@ Wu.App = Wu.Class.extend({
 
 		// render map pane
 		this.MapPane = new Wu.MapPane();
+
+		// render status bar
+		// if (this.options.statusPane) this.StatusPane = new Wu.StatusPane();
 
 	},
 

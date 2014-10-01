@@ -10,20 +10,27 @@ Wu.SidePane.Home = Wu.Class.extend({
 
 		// add hooks
 		this.addHooks();
+
 	},
 
 	initContainer : function () {
 
 		// create div
 		var container = this._container = Wu.DomUtil.create('div', 'home-container');
+		var logo = this._logo = Wu.DomUtil.create('div', 'home-logo', container);
+		var statusWrap = this._statusWrap = Wu.DomUtil.create('div', 'home-status-wrap', container);
+		var status1 = Wu.DomUtil.create('div', 'home-status', statusWrap);
 
-		// add to sidepane
+		// set default status
+		this.clearStatus();
+
+		// add to sidepane if assigned container in options
 		if (this.options.addTo) this.addTo(this.options.addTo);
 
 	},
 
 	addHooks : function () {
-		// open pane on mouseover
+		// open sidepane menu on mousedown
 		Wu.DomEvent.on(this._container, 'mousedown', this.toggle, this);
 	},
 
@@ -31,6 +38,7 @@ Wu.SidePane.Home = Wu.Class.extend({
 		this.isOpen ? this.close() : this.open();
 	},
 
+	// open sidepane menu
 	open : function (e) {
 		this.isOpen = true;
 		var sidepane = app.SidePane;
@@ -38,6 +46,7 @@ Wu.SidePane.Home = Wu.Class.extend({
 		this.refresh();
 	},
 
+	// close sidepane menu
 	close : function (e) {
 		this.isOpen = false;
 		var sidepane = app.SidePane;
@@ -70,12 +79,57 @@ Wu.SidePane.Home = Wu.Class.extend({
 
 		// collapse errything to just logo
 		this.close();
-
 	},
 
+	setStatus : function (message, timer) {
+		var that = this;
 
+		// clear last clearTimer
+		if (this.clearTimer) clearTimeout(this.clearTimer);
 
+		// create div
+		var status = Wu.DomUtil.create('div', 'home-status');
+		
+		// set message
+		status.innerHTML = message;
+		
+		// push onto dom
+		this.pushStatus(status);
 
+		// clearTimer
+		this.clearTimer = setTimeout(function () {
+			that.clearStatus();
+		}, timer || 3000);
+	
+	},
 
+	getStatus : function () {
+		return this._statusWrap.firstChild.innerHTML;
+	},
+
+	pushStatus : function (div) {
+
+		// get old status div, insertBefore
+		var old = this._statusWrap.firstChild;
+		this._statusWrap.insertBefore(div, old);
+		
+		// set height
+		div.style.height = '27px';
+
+		// remove old
+		Wu.DomUtil.remove(old);
+		
+	},
+
+	clearStatus : function () {
+		// set default string
+		var portalName = app.getPortalName();
+		
+		// do nothing if same
+		if (portalName == this.getStatus()) return;
+
+		// set status
+		this.setStatus(portalName);
+	},
 
 });
