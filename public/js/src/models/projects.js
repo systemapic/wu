@@ -133,7 +133,6 @@ Wu.Project = Wu.Class.extend({
 		// refresh project and sidepane
 		this._refresh();
 		this.refreshSidepane();
-
 	},
 
 

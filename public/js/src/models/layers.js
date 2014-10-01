@@ -60,8 +60,6 @@ Wu.Layer = Wu.Class.extend({
 
 	// save updates to layer (like description)
 	save : function (field) {
-		console.log('Layer.save()', field);
-
 		var json = {};
 		json[field] = this.store[field];
 		json.layer  = this.store.uuid;
@@ -130,6 +128,9 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		// do nothing if already loaded
 		if (this.loaded) return; 
 
+		// set status
+		app.setStatus('Loading...');
+
 		// get geojson from server
 		var data = { 'uuid' : this.store.data.geojson }
 		var json = JSON.stringify(data);
@@ -179,6 +180,9 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		// set opacity
 		that.setOpacity()
+
+		// set status
+		app.setStatus('Loaded!');
 
 	},
 
