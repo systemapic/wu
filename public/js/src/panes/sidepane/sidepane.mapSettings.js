@@ -35,9 +35,15 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 	},
 
 	addHooks : function () {
-		Wu.DomEvent.on( this.mapsettingsContainer, 'mouseleave', this.close, this);	
-		Wu.DomEvent.on( this._container, 'mousemove', this.pendingOpen, this);
-		Wu.DomEvent.on( this._container, 'mousedown', this.open, this);
+		// Wu.DomEvent.on( this.mapsettingsContainer, 'mouseleave', this.close, this);	
+		// Wu.DomEvent.on( this._container, 'mousemove', this.pendingOpen, this);
+		// Wu.DomEvent.on( this._container, 'mousedown', this.open, this);
+		Wu.DomEvent.on( this._container, 'mousedown', this.toggleOpen, this);
+		
+	},
+
+	removeHooks : function () {
+		// todo!!!
 	},
 
 	calculateHeight : function () {
@@ -55,6 +61,10 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 			if (app._pendingClose) app._pendingClose.close();
 			app._pendingClose = that;
 		}, 200);	
+	},
+
+	toggleOpen : function () {
+		this._isOpen ? this.close() : this.open();
 	},
 
 	open : function () {
@@ -184,6 +194,10 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		// connect mapbox button
 		Wu.DomEvent.on( this._mapboxConnect, 'click', this.importMapbox, this );
 	},
+
+	removeHooks : function () {
+		// todo!!!
+	},	
 
 	calculateHeight : function () {
 		var num = this.project.getMapboxAccounts().length;
@@ -317,20 +331,9 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		
 	},
 
-	// fillLayers : function () {
-
-	// 	// return if no layers
-	//        	if (_.isEmpty(this.project.layers)) return;
-	       	
-	//        	// fill in with layers in DOM
-	//        	_.each(this.project.layers, function (layer) {
-	//        		this.addLayer(layer);
-	//        	}, this);
-
-	//        	// calculate height for wrapper
-	//        	this.calculateHeight();
-
-	// },
+	removeHooks : function () {
+		// todo!!!
+	},
 
 
 	addLayer : function (layer) {
@@ -592,14 +595,6 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 	},
 
-	// calculateHeight : function () {
-	// 	this.maxHeight = _.size(this.project.layers) * 33;
-	// 	this.minHeight = 0;
-
-	// 	// add 100 if in editMode
-	// 	if (this.editMode) this.maxHeight += 100;
-	// },
-
 	calculateHeight : function () {
 
 		var padding = this.numberOfProviders * 35;
@@ -653,61 +648,7 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		
 	},
 
-	// fillLayers : function () {
 
-	// 	this._layers = {};
-
-	// 	// return if no layers
-	//        	if (_.isEmpty(this.project.layers)) return;
-	       	
-
-	//        	var sortedLayers = this.sortLayers(this.project.layers);
-	//        	console.log('sorted layers: ', sortedLayers);
-
-	//        	sortedLayers.forEach(function (provider) {
-
-	//        		this.addProvider(provider.key);
-
-	//        		provider.layers.forEach(function (layer) {
-	//        			this.addLayer(layer);
-	//        		}, this);
-
-	//        	}, this);
-
-	//        	// calculate height for wrapper
-	//        	this.calculateHeight();
-
-	// },
-
-	// // sort layers by provider
-	// sortLayers : function (layers) {
-	// 	// possible keys in layer.store.data. must add more here later if other sources
-	// 	var keys = ['geojson', 'mapbox'];
-	// 	var results = [];
-	// 	keys.forEach(function (key) {
-	// 		var sort = {
-	// 			key : key,
-	// 			layers : []
-	// 		}
-	// 		for (l in layers) {
-	// 			var layer = layers[l];
-	// 			if (layer.store.data.hasOwnProperty(key)) {
-	// 				sort.layers.push(layer)
-	// 			}
-	// 		}
-	// 		results.push(sort);
-	// 	}, this);
-
-	// 	this.numberOfProviders = results.length;
-	// 	return results;
-	// },
-
-	// addProvider : function (provider) {
-	// 	var title = '';
-	// 	if (provider == 'geojson') title = 'Data Library';
-	// 	if (provider == 'mapbox') title = 'Mapbox';
-	// 	var header = Wu.DomUtil.create('div', 'item-list-header', this._outer, title)
-	// },
 
 	// add layers to layermenu list in sidepane
 	addLayer : function (layer) {
@@ -904,6 +845,10 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 
 	},
 
+	removeHooks : function () {
+		// todo!!!
+	},
+
 	toggleDropdown : function (e) {
 		if ( !this.toggled ) {
 			this.toggled = true;
@@ -916,12 +861,8 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 
 	setPosition : function (e) {
 
-		console.log('setPosition!');
-
 		// get actual Project object
 		var project = app.activeProject;
-
-		console.log('project:::::::: ', project);
 
 		// if no active project, do nothing
 		if (!project) return; 
@@ -930,20 +871,16 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 		var center = Wu.app._map.getCenter();
 		var zoom   = Wu.app._map.getZoom();
 
-		console.log('cent:ER', center);
-
-		// write directly to Project
+		// set position 
 		var position = {
 			lat  : center.lat,
 			lng  : center.lng,
 			zoom : zoom
 		}
-		console.log('position: ', position);
+
+		// save to project
 		project.setPosition(position);
 	
-		// call update on Project
-		// this.save();
-
 		// call update on view
 		this.update();
 
@@ -1024,6 +961,10 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		Wu.DomEvent.on( this.panes.bounds,   'mouseup',    this.buttonUp,    this );
 		Wu.DomEvent.on( this.panes.bounds,   'mouseleave', this.buttonUp,    this );
 
+	},
+
+	removeHooks : function () {
+		// todo!!!
 	},
 
 	setBounds : function (e) {
@@ -1287,6 +1228,10 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 	},
 
+	removeHooks : function () {
+		// todo!!!
+	},
+
 	calculateHeight : function () {
 		var x = _.size(this.controls);
 		this.maxHeight = x * 30 + 30;
@@ -1299,6 +1244,9 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		// prevent default checkbox behaviour
 		if (e.type == 'click') return Wu.DomEvent.stop(e);
 		
+		// stop anyway
+		Wu.DomEvent.stop(e);
+
 		// get type (zoom, draw, etc.)
 		var item = e.target.getAttribute('which');
 
