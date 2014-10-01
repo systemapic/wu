@@ -178,6 +178,9 @@ Wu.Project = Wu.Class.extend({
 	_save : function (string) {
 		console.log('saving...');                                       // TODO: pgp
 		Wu.save('/api/project/update', string);                         // TODO: save only if actual changes! saving too much already
+	
+		// set status
+		app.setStatus('Saved!');
 	},
 
 	_saveNew : function (context) {

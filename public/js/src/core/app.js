@@ -5,6 +5,10 @@ Wu.App = Wu.Class.extend({
 	options : {
 		id : 'app',
 
+		portalName : 'systemapic',	// plugged in
+		portalLogo : false,		// not plugged in.. using sprites atm..
+
+		// sidepane
 		panes : {
 			// plugged in and working! :)
 			clients 	: true,
@@ -13,14 +17,12 @@ Wu.App = Wu.Class.extend({
 			dataLibrary 	: true,               	
 			mediaLibrary    : true,
 			users 		: true,
-		},						
+		},	
 		
-		plugins : {
-			// not plugged in
-			chat 		: false, 
-			colorTheme      : true,
-			screenshot 	: true,
-		},
+		// not plugged in
+		chat : true,
+		colorTheme : true,
+		screenshot : true,
 
 		providers : {
 			// default accounts, added to all new (and old?) projects
@@ -153,6 +155,9 @@ Wu.App = Wu.Class.extend({
 		// render map pane
 		this.MapPane = new Wu.MapPane();
 
+		// render status bar
+		// if (this.options.statusPane) this.StatusPane = new Wu.StatusPane();
+
 	},
 
 	// init default view on page-load
@@ -220,20 +225,6 @@ Wu.App = Wu.Class.extend({
 	},
 
 
-
-
-	// _hasClient : function (slug) {
-
-	// 	// find client slug in Wu.app.Clients
-	// 	var slug = slug || window.hotlink.client;
-	// 	for (c in Wu.app.Clients) {
-	// 		var client = Wu.app.Clients[c];
-	// 		if (slug == client.slug) return client; 
-			
-	// 	}
-	// 	return false;
-	// },
-
 	// check if project exists (for hotlink)
 	_projectExists : function (projectSlug, clientSlug) {
 
@@ -246,6 +237,16 @@ Wu.App = Wu.Class.extend({
 			}
 		}
 		return false;
+	},
+
+	// get name provided for portal from options hash 
+	getPortalName : function () {
+		return this.options.portalName;
+	},
+
+	// shorthand for setting status bar
+	setStatus : function (status, timer) {
+		app.SidePane.Home.setStatus(status, timer);
 	}
 
 });

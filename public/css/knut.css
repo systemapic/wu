@@ -249,9 +249,57 @@
 .home-container {
 	width: 100px;
 	height: 80px;
-	background: rgba(255, 255, 0, 0.77);
 }
 
 .q-editor-container {
 	height: 80px;
 }
+
+
+
+/*status message pane*/
+.home-logo {
+	background: none;
+	background-image: url("evil_sprite.png") !important;
+	background-repeat: no-repeat !important;
+	background-position: -59px -229px !important;
+	cursor: pointer;
+	height: 50px;
+	width: 100%;
+}
+.home-container {
+	position: relative;
+	background-color: rgba(15, 26, 30, 0.55) !important;
+}
+.home-status {
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	height: 0px;
+	color: white;
+	text-align: center;
+	font-weight: 500;
+	font-size: 120%;
+	cursor: pointer;
+}
+
+.q-editor-container {
+	background-color: rgba(255, 255, 255, 0);
+}
+.q-editor-content-item {
+	background-color: rgba(15, 26, 30, 0.80) !important;
+}
+
+/*tiny header*/
+#header {
+	width: 400px;
+	left: 40%;
+}
+
+
+
+
+
+
+
+
