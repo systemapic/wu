@@ -357,6 +357,21 @@ Wu.Project = Wu.Class.extend({
 	},
 
 
+	setFile : function (file) {
+		console.log('setFile: ', file);
+
+		// add to local store
+		this.store.files.push(file);
+
+		// create layer if geojson
+		
+		
+
+		// save to server (if necessary)
+		this._update('files');
+
+	},
+
 	setLogo : function (path) {
 		this.store.logo = path;
 		this._update('logo');

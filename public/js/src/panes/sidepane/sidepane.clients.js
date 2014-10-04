@@ -1,5 +1,8 @@
 // Projects and Clients
 Wu.SidePane.Clients = Wu.SidePane.Item.extend({
+	_ : 'sidepane.clients', 
+
+
 
 	type : 'clients',
 	title : 'Projects',
@@ -15,8 +18,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	initContent : function () {
 
 		// h3 title
-		var title = Wu.DomUtil.create('h3', '', this._container);
-		title.innerHTML = 'Clients';
+		// var title = Wu.DomUtil.create('h3', '', this._container);
+		// title.innerHTML = 'Clients';
 
 		// clients container
 		this._clientsContainer = Wu.DomUtil.create('div', 'editor-clients', this._container);

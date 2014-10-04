@@ -1,270 +1,59 @@
-/*baselayer toggle*/
-.leaflet-control-baselayertoggle {
-	height: 26px;
-	width: 26px;
-	background-image: url('');
-	background-position: 4px 4px;
-	background-repeat: no-repeat;
-	display: block;
-	padding: 3px;
-	-moz-border-radius: 4px;
-	box-shadow: 0 1px 7px rgba(0, 0, 0, 0.65);
-	text-align: center;
-	background-color: #FFFFFF;
-	background-image: url('evil_sprite.png');
-	background-repeat: no-repeat;
-	background-position: 2px -233px;
-}
-.baselayertoggle-item {
-	width: 150px;
-	background: white;
-	height: 25px;
-	font-size: 120%;
-	text-align: left;
-	padding-left: 5px;
-	cursor: pointer;
-	padding: 13px 6px 13px 6px;
-	line-height: 0;
-
-	border-left: 6px solid white;
-	border-right: 6px solid white;
-	border-top: 1px solid white;
-	border-bottom: 1px solid white;
-
-	box-shadow: 2px 3px 5px -2px rgba(0,0,0,0.3);
-
-	background-color: #FAFAFA;
-
-}
-
-.baselayertoggle-item:first-child {
-	border-top: 6px solid white;
-}
-
-.baselayertoggle-item:last-child {
-	border-bottom: 6px solid white;
-}
-
-.baselayertoggle-item:hover {
-	background: #DADADA;
-}
-
-.baselayertoggle-item.active {
-	background: cadetblue;
-	color: white;
-}
-
-.baselayertoggle-list {
-	position: relative;
-/*	left: 36px;
-	top: -11px;
-*/	/*background: white;*/
-
-	left: 21px;
-	top: -18px;
-
-	position: relative;
-	padding: 10px;
-	width: 170px;	
-	/*box-shadow: 0 0 10px 0 rgba(0,0,0,0.3);*/
-	border-radius: 2px;
-
-	padding-left: 15px;
-	box-sizing: border-box;
-	}
-
-.baselayertoggle-list:before {
-	content: '';
-	background-color: white;
-	width: 14px;
-	height: 14px;
-	position: absolute;
-	top: 20px;
-	left: 8px;
-	-webkit-transform: rotate(45deg);
-	z-index: -1;
-	}
-
-.collapsed {
-	visibility: hidden;
-}
-
-.expand {
-	display: block;
-}
-
-/*clients*/
-.client-logo {
-	width: 100px;
-	height: 60px;
-}
-
-.client-logo.editable:hover {
-	border: 1px solid yellow;
-	cursor: copy;
-}
-
-.project-logo.editable:hover {
-	border: 1px solid yellow;
-	cursor: copy;
-}
-
-/*dropzone*/
-.dz-preview {
-	display: none;
-}
-
-
-/*connect accounts control*/
-.mapbox-listed-account {
-	color: white;
-	padding: 4px;
-	font-size: 110%;
-	height: 30px;
-	position: relative;
-}
-.mapbox-listed-account-title {
-	position: absolute;
-	left: 0;
-}
-.mapbox-listed-account-kill {
-	position: absolute;
-	right: 0;
-	color: red;
-	font-weight: 900;
-}
-
-
-/*sidepane bounds*/
-#editor-map-bounds-set-maxZoom {
-	width: 60px;
-	position: relative;
+#header {
+	height: 77px;
+	top: 6px;
+	left: 101px;
 	display: inline-block;
-	vertical-align: top;
+	width: auto;
 }
-#editor-map-bounds-max-zoom-value {
-	width: 195px;
-	position: relative;
-	display: inline-block;
-	vertical-align: top;
+.header-logo {
+	float: left;
 }
-#editor-map-bounds-set-minZoom {
-	width: 60px;
-	position: relative;
-	display: inline-block;
-	vertical-align: top;
+.header-title-wrap {
+	border: 0px;
+	background: transparent;
+	font-size: 30px;
+	font-weight: 200;
+	float: left;
+	width: auto;
+	padding-right: 22px;
 }
-#editor-map-bounds-min-zoom-value {
-	width: 195px;
-	position: relative;
-	display: inline-block;
-	vertical-align: top;
+.header-title {
+	
 }
-
-/*sidepane documents*/
-#documents-container-textarea h2 {
-	color: red;
-	font-size: 200%;
-}
-
-#documents-container-textarea h1 {
-	font-size: 300%;
-}
-
-#documents-container-textarea p {
-	font-size: 120%;
-	color: yellow;
-}
-
-/*grande plugin attachments*/
-.grande-sources-container {
+.header-subtitle {
+	float: left;
+	height: 55px;
+	word-wrap: break-word;
 	position: absolute;
-	width: 300px;
-	top: 30px;
-	background: black;
-	border-radius: 5px;
-}
-
-.grande-sources-topwrap {
-	height: 0px;
-	width: 100%;
-
-}
-
-.grande-sources-source {
-	position: relative;
-	height: 50px;
-	border-top: 1px solid #0C4818;
-	width: 100%;
+	left: inherit;
+	top: 42px;
+	line-height: 15px;
 	overflow: hidden;
+	max-height: 31px;
+	padding-right: 14px;
 }
-
-.grande-sources-container div:nth-child(2) {
-	border-radius: 5px 5px 0px 0px;
+#header .header-logo {
+	margin-right: 10px;
 }
-
-.grande-sources-container div:last-child {
-	border-radius: 0px 0px 5px 5px;
-}
-
-.grande-sources-source:hover {
-	background: #60d778;
-}
-
-.grande-sources-source-icon {
-	width: 30px;
-	height: 30px;
-}
-
-.grande-sources-source-title {
-	color: white;
-	position: absolute;
-	top: 0px;
-	left: 34px;
-	font-size: 110%;
-	padding: 2px;
-
-}
-
-.grande-sources-source-thumb {
-	position: absolute;
-	width: 30px;
-	height: 100%;
-	right: 0px;
-	top: 0px;
-}
-
-.text-menu .options {
-	padding-top: 1px !important;
-	width: 245px !important;
-}
-
-
-/*home button*/
 .home-container {
-	width: 100px;
-	height: 80px;
+	width: 90px;
+	margin: 4px;
+	height: 77px;
+	position: relative;
+	background-color: rgba(255, 255, 255, 0.9) !important;
+	box-shadow: 0 0px 5px 0 #333;
+	z-index: 999;
+	margin: 6px;
+	left: 0px;
 }
-
-.q-editor-container {
-	height: 80px;
-}
-
-
-
-/*status message pane*/
 .home-logo {
 	background: none;
 	background-image: url("evil_sprite.png") !important;
 	background-repeat: no-repeat !important;
-	background-position: -59px -229px !important;
 	cursor: pointer;
 	height: 50px;
 	width: 100%;
-}
-.home-container {
-	position: relative;
-	background-color: rgba(15, 26, 30, 0.55) !important;
+	background-position: -180px -229px !important;
 }
 .home-status {
 	position: absolute;
@@ -274,74 +63,86 @@
 	color: white;
 	text-align: center;
 	font-weight: 500;
-	font-size: 120%;
+	font-size: 110%;
 	cursor: pointer;
+	height: 27px;
+	color: black;
+	opacity: 0.8;
 }
 .q-editor-container {
-	background-color: rgba(255, 255, 255, 0);
+	height: 0px;
+	width: 100px;
+	top: 89px;
+	padding-top: 0px;
 }
-
-/*tiny header*/
-#header {
-	width: 400px;
-	left: 40%;
+.q-editor-menu {
+	top: 0px;
+	margin-top: 0px;
 }
-
-
-
-/*layermenu/baselayer headers*/
-.item-list-header {
-	padding: 5px;
-	font-size: 130%;
-	padding-left: 0px;
+.q-editor-menu-item a {
+	padding-top: 26px;
+	line-height: 18px;
 }
-
-
-/*småting*/
+.q-editor-menu-item .dataLibrary {
+	padding-top: 18px;
+}
+.q-editor-menu-item .users {
+	padding-top: 18px;
+}
+.q-editor-content-item {
+	position: absolute;
+	left: 100px;
+	display: none;
+	padding: 10px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	opacity: 1;
+	top: 0;
+	background-color: rgba(255, 255, 255, 0.9);
+	box-shadow: 0 0 5px 0 black;
+	height: auto;
+	width: 250px;
+	max-height: 70%;
+	margin: 0px;
+}
+	
+.fullpage-documents, .data-library, .fullpage-users {
+	padding-top: 0px;
+	max-height: calc(100% - 100px);
+}
+.data-library .editor-wrapper {
+	overflow: auto;
+}
+.fullpage-users .editor-wrapper {
+	overflow: auto;
+}
+.editor-wrapper {
+	padding-right: 0px;
+}
 .editor-inner-wrapper h4 {
 	cursor: pointer;
 }
-
-
-/*transparent everything style*/
-.editor-clients-container {
-	background: rgba(15, 26, 30, 0.65);
+.editor-scroll-wrapper {
+	width: 111%;
 }
-.project-item {
-	background: rgba(15, 26, 30, 0.65);
-}
-.editor-clients-container:hover {
-	background-color: rgba(0, 0, 0, 0.55);
-}
-.q-editor-container {
-	box-shadow: 0 0px;
-}
-.q-editor-menu {
-	background-color: rgba(0, 0, 0, 0.55);
-}
-#menuslider {
-	background-color: rgba(0, 0, 0, 0.55);
-}
-.editor-inner-wrapper {
-	background-color: rgba(0, 0, 0, 0.55);
-}
-.editor-inner-wrapper:hover {
-	background-color: rgba(0, 0, 0, 0.45);
-}
-#header {
-	background: rgba(0, 0, 0, 0.55);
-	color: white !important;
-}
-.header-title {
-	color: white;
-}
-.header-subtitle {
-	color: white;
+#editor-client-item-new h5, .editor-inner-wrapper h5, #select-basic-themes, #advanced-color-header, .editor-wrapper h4 {
 	font-weight: 400;
 }
-#new-client-button {
-	background: rgba(0, 0, 0, 0.4);
-	right: -15px;
+.documents-folder-item {
+	font-size: 150%;
 }
+#documents-container-textarea p {
+	font-size: 90%;
+}
+#documents-container-leftpane {
+	position: absolute;
+}
+#documents-container-rightpane {
+	top: 20px;
+}
+.leaflet-bottom.leaflet-right {
+	top: 82px;
+}
+
 
 

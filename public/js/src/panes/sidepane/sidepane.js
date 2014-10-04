@@ -1,4 +1,5 @@
 Wu.SidePane = Wu.Class.extend({
+	_ : 'sidepane', 
 
 
 	initialize : function (options) {
@@ -32,21 +33,18 @@ Wu.SidePane = Wu.Class.extend({
 
 		// content pane
 		var className = 'q-editor-content ct1';
-		Wu.app._editorContentPane = Wu.DomUtil.create('content', className, this._container); 
+		app._editorContentPane = Wu.DomUtil.create('content', className, this._container); 
 
 		// menuslider
-		Wu.app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
+		app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
+		app._menuSliderArrow = Wu.DomUtil.createId('div', 'menuslider-arrow', Wu.app._menuSlider);	// refactor app
+
 		Wu.DomUtil.addClass(Wu.app._menuSlider, 'ct1');
 		
 	},
 	
 	render : function () {
 		var pane = this.options.panes;
-
-		// add home button
-		this.Home = new Wu.SidePane.Home({
-			addTo: this._container
-		});
 
 		// render sidepanes
 		if (pane.clients) 	this.Clients 	  = new Wu.SidePane.Clients();
@@ -66,7 +64,8 @@ Wu.SidePane = Wu.Class.extend({
 		if (!height) height = 80;
 
 		// set height
-		this._minHeight = height;
+		// this._minHeight = height + 5;
+		this._minHeight = 0;
 	},
 
 	setHeight : function (height) {
@@ -87,7 +86,9 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	expand : function () {
+		console.log('expand');
 		this._container.style.height = '100%';
+		this.openPane();
 	},
 
 	_getPaneArray : function () {
@@ -165,7 +166,7 @@ Wu.SidePane = Wu.Class.extend({
 	
 	// close sidepane
 	closePane : function () {
-		
+
 		// return if already closed
 		if (!this.paneOpen) return;
 		this.paneOpen = false;
@@ -189,13 +190,16 @@ Wu.SidePane = Wu.Class.extend({
 
 	// open sidepane
 	openPane : function () {
-		
+
 		// return if already open
 		if (this.paneOpen) return;
 		this.paneOpen = true;
 
+		console.log('openPane: container: ', this._container);
+
 		// open
 		this._container.style.width = '400px';
+		Wu.DomUtil.addClass(app._active, 'show');	
 
 		// refresh leaflet
 		setTimeout(function() {

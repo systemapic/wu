@@ -53,6 +53,14 @@ Wu.SidePane.Home = Wu.Class.extend({
 		sidepane.collapse();
 		sidepane.closePane();
 		this.refresh();
+
+		var __map = Wu.DomUtil.get("map"); // (j)
+		Wu.DomUtil.removeClass(__map, "map-blur") // (j) – removes the blur on map if it's set by one of the fullpanes
+
+		// Close menuslider arrow (j)
+		// var _menusliderArrow = Wu.DomUtil.get("menuslider-arrow"); // (j)
+		// _menusliderArrow.style.width = '0px'; // (j)
+
 	},
 
 	addTo : function (wrapper) {

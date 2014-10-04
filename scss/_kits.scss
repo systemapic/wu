@@ -431,7 +431,7 @@ input[type=checkbox] + label.check {
 	}
 			
 .swipe_in_up {
-	-webkit-animation: swipeinup 300ms ease;
+/*	-webkit-animation: swipeinup 300ms ease;
 	-webkit-animation-fill-mode: forwards;
 
 	-moz-animation: swipeinup 300ms ease;
@@ -441,7 +441,7 @@ input[type=checkbox] + label.check {
 	-o-animation-fill-mode: forwards;
 
 	animation: swipeinup 300ms ease;
-	animation-fill-mode: forwards;
+	animation-fill-mode: forwards;*/
 	}
 	
 // Swipe in
@@ -466,7 +466,7 @@ input[type=checkbox] + label.check {
 	}
 
 .swipe_in {
-	-webkit-animation: swipein 300ms ease;
+/*	-webkit-animation: swipein 300ms ease;
 	-webkit-animation-fill-mode: forwards;
 
 	-moz-animation: swipein 300ms ease;
@@ -477,7 +477,7 @@ input[type=checkbox] + label.check {
 
 	animation: swipein 300ms ease;
 	animation-fill-mode: forwards;
-	}
+*/	}
 	
 .legends-collapser-trans {
 	-webkit-transition: opacity 250ms ease, left 250ms ease;	

@@ -58,9 +58,14 @@ module.exports = geo = {
 		console.log('_________ check _________')
 
 
+
+
 		// check if zip and unzip
 		this.file = this.req.files.file.originalFilename; // UNEP-EDE__girls_boys_prim_ed_rate__1398798722.tar.gz
+
+
 		this.path = this.req.files.file.path;		  // /tmp/temfiles.gz  <- actual path of a file
+
 
 		// untar
 		if (this.file.slice(-7).toLowerCase() == '.tar.gz') return this.untar();
@@ -158,7 +163,8 @@ module.exports = geo = {
 
 
 	dive : function () {
-		
+		console.log('dive()');
+
 		this.divedFiles = [];
 
 		// check all files in this.tmpfolder recursively, and just copy the files we can use (.shp, .geojson, .kml, etc)
@@ -176,6 +182,7 @@ module.exports = geo = {
 	},
 
 	dived : function () {
+		console.log('dived!');
 		this.geo.process();
 	},
 
