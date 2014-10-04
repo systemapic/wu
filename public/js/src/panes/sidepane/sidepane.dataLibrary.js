@@ -1,7 +1,8 @@
 Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
-
+	_ : 'sidepane.datalibrary', 
+	
 	type : 'dataLibrary',
-	title : 'Data',
+	title : 'Data <br> Library',
 
 	initContent : function () {
 
@@ -309,8 +310,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.dz = new Dropzone(this._uploader, {
 				url : '/api/upload',
 				createImageThumbnails : false,
-				autoDiscover : false
-				// uploadMultiple : true
+				autoDiscover : false,
+				// uploadMultiple : true,
+				// maxFiles : 10,
+				// parallelUploads : 10,
+				// autoProcessQueue : true
 		});
 
 		// add fullscreen dropzone
@@ -344,11 +348,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.dz.removeAllListeners();
 
 		// set project uuid for dropzone
-		this.dz.options.params.project = this.project.store.uuid;
+		this.dz.options.params.project = this.project.getUuid();
 
 		// set dz events
-		this.dz.on('drop', function () { 
-			console.log('drop'); 
+		this.dz.on('drop', function (e) { 
+			console.log('drop', e); 
 		});
 
 		this.dz.on('dragenter', function () { 
@@ -356,6 +360,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		});
 
 		this.dz.on('addedfile', function (file) { 
+
+			console.log('dz added: ', file);
 
 			// count multiple files
 			that.filecount += 1;
@@ -375,7 +381,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 
 		this.dz.on('complete', function (file) {
-			console.log('complete');
+			console.log('complete111');
 
 			// count multiple files
 			that.filecount -= 1;
@@ -383,8 +389,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			// clean up
 			that.dz.removeFile(file);
 
-			// set status
-			app.setStatus('Done!', 2000);
+			
 		      
 		});
 
@@ -397,22 +402,21 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.dz.on('uploadprogress', function (file, progress) {
 			// set progress
 			that.progress.style.width = progress + '%';
-
-			// console.log('progresS: ', progress);
-
-			// set status
-			// app.setStatus(Math.floor(progress) + '%');
-		})                                                                                                                                                                                                               
+		});                                                                                                                                                                                                               
 
 		this.dz.on('success', function (err, json) {
 			// parse and process
 			var obj = Wu.parse(json);
+			console.log('success::: obj: ', obj);
+
+			// set status
+			app.setStatus('Done!', 2000);
+
 			if (obj) { that.uploaded(obj); }
 		});
 
 		this.dz.on('complete', function (file) {
-			console.log('complete!', file);
-			console.log('filecount: ', that.filecount);
+			console.log('complete333');
 
 			if (!that.filecount) {
 				// reset progressbar
@@ -527,7 +531,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			this.addFile(file);
  
 			// add to project locally (already added on server)
-			this.project.store.files.push(file);
+			// this.project.store.files.push(file);
+			this.project.setFile(file);
 		}, this);
 
 	},

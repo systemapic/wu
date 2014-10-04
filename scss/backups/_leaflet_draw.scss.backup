@@ -314,7 +314,6 @@
 .leaflet-control-container {						// Outer super wrapper
 	/*position: relative;*/
 	height: 100%;	
-	padding-top: 0 !important;
 	}	
 
 .menucollapser {									// Header for "Layers", "Layers inspector" and "Info"
@@ -329,33 +328,15 @@
 	line-height: 2.2;
 	font-weight: $obese;
 	border-bottom: 1px solid #CACACA;
-
-	box-shadow: 0 0 5px rgba(0,0,0,0.3);
-	margin-top: 0px;	
 	}	
 	
 .scroller-frame {									// Layer menu scroller frame
-	/*height: 100%;*/
-	/*padding-bottom: 28px;*/
-
-	/*height: 100%;*/
-	/*overflow: scroll;*/
-	/*position: absolute;*/
-	/*padding-bottom: 27px;*/
-	/*left: 2px;*/
-
 	height: 100%;
-	overflow: scroll;
-	position: absolute;
-	padding-bottom: 27px;
-	left: 2px;	
+	padding-bottom: 28px;	
 	}
 
 .inner-scroller {									// Layer menu innser frame
-	min-height: auto;
-	padding-left: 5px;
-	padding-right: 5px;
-	left: -5px;
+	min-height: 100%;
 	}
 	
 .scroll-up {}
@@ -370,19 +351,15 @@
 
 .leaflet-top.leaflet-right {							// Leaflet : measure outer wrapper
 	right: 232px;
-	/*bottom: 133px;*/
+	bottom: 133px;
 	max-width: 300px;
 	border: 0;
 	text-align: left;
 	top: auto;
-
-	bottom: 4px !important;
 	}
 	
 .leaflet-control-scale {								// Leaflet : Distance scaler
 	margin: 0 !important;
-	padding-left: 0px !important;
-	padding-right: 0px	!important;
 	}
 
 .leaflet-container .leaflet-control-mouseposition {		// Leaflet : Mouse position
@@ -392,10 +369,7 @@
 	color: #333;
 	font: 11px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
 	margin-right: 1px;
-	margin-top: 2px;
-
-	margin-left: 1px;
-	margin-bottom: 1px;	
+	margin-top: 2px;	
 	}
 
 .leaflet-control-scale-line {							// Leaflet : scaler
@@ -420,44 +394,30 @@
 	margin-top: 7px;
 	padding-top: 0px;
 	overflow: visible;
-	/*top: -24px;*/
-	/*width: 220px;*/
-	/*right: 5px;*/
-	/*padding-bottom: 129px;*/
+	top: -24px;
+	width: 220px;
+	right: 5px;
+	padding-bottom: 129px;
 	margin: 0;
 	height: 100%;
-	/*padding-top: 31px;*/
+	padding-top: 31px;
 	position: relative;
 	float: right;
-
-	width: 290px !important;
-	padding-bottom: 198px;
-	top: 0px;
-	padding-top: 6px;
-	right: 1px;	
 	}
 
 .leaflet-control-layermenu {						// Layer menu outer wrapper
 	width: 100%;
-	/*height: 100%;*/
+	height: 100%;
 	right: 0;
 	margin: 0 !important;	
-	/*box-shadow: 0 0 5px rgba(0,0,0,0.5) !important;*/
+	box-shadow: 0 0 5px rgba(0,0,0,0.5) !important;
 	overflow: hidden;
-
-	height: 100%;
-	max-height: 100%;
-	position: relative;
-	/*box-shadow: none !important;*/
-	position: relative;
-	float: none !important;	
 	}	
 
 #bhattan1 {											// Layer menu collapse button
 	position: absolute;
 	top: 3px;
-	/*left: 0px;*/
-	left: 5px;
+	left: 0px;
 	cursor: pointer;
 	background-position: -26px 8px;
 	background-color: transparent;
@@ -471,37 +431,18 @@
 	
 .leaflet-control-inspect {							// Layer inspector : outer wrapper
 	width: 100%;
-	/*border-top: 1px dashed #A9A9A9;*/
-	/*left: 10px;*/
-	/*height: 147px;*/
-	/*background: rgba(255,255,255,0.93);*/
-	/*box-shadow: 0 0 5px rgba(0, 0, 0, 0.5) !important;*/
-
-	/*top: -14px;*/
-	/*border-top: none;*/
-	max-height: 187px;
-	height: auto;
-	/*box-shadow: none !important;*/
-	background-color: transparent !important;	
-
-	float: none !important;
-	left: 0;
-	margin-top: 0px;
-	margin-bottom: 0px !important;	
-	position: absolute;
-	bottom: 5px;
-	top: auto;
+	border-top: 1px dashed #A9A9A9;
+	left: 10px;
+	height: 147px;
+	background: rgba(255,255,255,0.93);
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5) !important;
 	}	
 	
 #inspector-header {									// Layer inspector : header
-	/*top: -9px !important;*/
+	top: -9px !important;
 	position: relative;
 	right: 0;
-	/*border-top: 1px solid #CACACA;*/
-
-	/*border-top: none;*/
-	top: 0 !important;
-	overflow: hidden;	
+	border-top: 1px solid #CACACA;
 	}
 	
 	
@@ -509,14 +450,9 @@
 // ********* Leaflet credits *********
 
 .leaflet-control-attribution {
-	/*position: fixed;*/
-	/*right: 2px;*/
-	/*bottom: 2px;*/
-
 	position: fixed;
-	left: 302px;
-	bottom: 5px;
-	right: auto;	
+	right: 2px;
+	bottom: 2px;
 	}
 
 
@@ -527,27 +463,16 @@
 	}
 	
 .leaflet-control-legends {							// Legends : outer wrapper2
-	/*width: 100%;*/
+	width: 100%;
 	bottom: -3px;
-
-	position: relative;
-	float: left;
-	width: 290px;
-	max-width: 290px;
-	left: 5px;	
 	}
 	
 #legends-control-inner-content {					// Legends : inner wrapper
-	/*width: 100%;*/
+	width: 100%;
 	bottom: 0px;
-	/*padding-left: 287px;*/
-	/*padding-right: 235px;*/
+	padding-left: 287px;
+	padding-right: 235px;
 	padding-right: 335px;
-
-	padding-left: 0;
-	padding-right: 0px;
-	width: auto;
-	max-width: 100%;	
 	}	
 	
 .legends-push-left {								// Legends : inner wrapper pusher
@@ -559,15 +484,12 @@
 	}		
 	
 #legends-inner {									// Legends : inner wrapper 2
-	/*width: 100%;*/
+	width: 100%;
 	height: 120px;
 	background: rgba(255,255,255,0.93);
 	box-shadow: 0 0 5px rgba(0,0,0,0.5);
 	overflow: hidden;
 	position: relative;
-
-	width: auto;
-	max-width: 100%;	
 	}	
 	
 #legends-collapser {								// Legends : close button
@@ -629,18 +551,11 @@
 	width: 320px;
 	position: relative;
 	float: left;
-
-	margin-top: 82px;
-	left: 3px;		
 	}
 	
 .leaflet-left .leaflet-control { 					// Leaflet : Description box, zoom controls, style editor
-	/*margin-left: 3px;*/
-	/*padding-left: 3px;*/
-
-	padding-left: 0;
 	margin-left: 3px;
-
+	padding-left: 3px;
 	}	
 		
 // --- Zoom, draw, etc controls	
@@ -654,8 +569,7 @@
 .leaflet-draw, 										// Leaflet Draw
 .leaflet-control-styleeditor,						// Leaflet edit styles
 .leaflet-control-baselayertoggle {					// Leaflet toggle baselayers
-	/*float: right;*/
-	float: left;
+	float: right;
 	}
 	
 .leaflet-bar a:first-child,							// Make square corners
@@ -681,32 +595,20 @@
 // --- Description / Info box	
 	
 .leaflet-control-description {						// Leaflet description outer wrapper
-	/*width: 100%;*/
-	/*height: 100%;*/
-	/*position: absolute;*/
-	/*padding-right: 37px;*/
-	/*padding-bottom: 13px;*/
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	padding-right: 37px;
+	padding-bottom: 13px;
 	-webkit-box-sizing: border-box;
 	/*z-index: -2;*/
 	z-index: 2;
-
-	height: auto;
-	padding: 0;
-	width: 290px;
-	float: none !important;	
-	margin-bottom: 19px;
-	left: 33px;
-	top: 0px;
-	position: absolute;	
 	}	
 	
 #description-control-inner-content {				// Leaflet description Header wrapper
 	height: 100%;
 	overflow: hidden;
 	box-shadow: 0 0 5px rgba(0,0,0,0.5);
-
-	top: 0px; 
- 	position: relative; 
 	}	
 	
 #bhattan2 {											// Leaflet description small close arrow

@@ -43,6 +43,9 @@ L.Control.Legends = L.Control.extend({
 
 	closeLegends : function () {
 
+		// console.log('this', this);
+		// this._container.style.width = '150px';
+
 		this._legendsInner.style.width = this._legendsInner.offsetWidth + 'px';
 
 		var _1stchild = this._legendsInner.getElementsByTagName('div')[0];		// refactor ?
@@ -61,26 +64,29 @@ L.Control.Legends = L.Control.extend({
 		this._legendsScrollRight.style.display = 'none';
 
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.bottom = '6px';   // refactor?               
+		// Wu.app.MapPane._container.children[1].children[1].style.bottom = '6px';   // refactor?               
 	
 	},
 
 	openLegends : function (e) {
 
 
+		// this._container.style.width = '320px';
+
 		// Hide the little arrow button         
 		this._legendsOpener.className = '';
 		this._legendsOpener.style.opacity = '0';
 
 		// Find out the width of the container
-		var fatherwidth = this._legendsContainer.offsetWidth - 287 - 335; // The numbers are the width of the layer and info menus
-		var hasleft = Wu.DomUtil.hasClass(this._legendsContainer, 'legends-push-left');
-		var hasright = Wu.DomUtil.hasClass(this._legendsContainer, 'legends-push-right');
-		if ( hasleft ) { fatherwidth += 287; }
-		if ( hasright ) { fatherwidth += 335 - 10; }
+		// var fatherwidth = this._legendsContainer.offsetWidth - 287 - 335; // The numbers are the width of the layer and info menus
+		// var hasleft = Wu.DomUtil.hasClass(this._legendsContainer, 'legends-push-left');
+		// var hasright = Wu.DomUtil.hasClass(this._legendsContainer, 'legends-push-right');
+		// if ( hasleft ) { fatherwidth += 287; }
+		// if ( hasright ) { fatherwidth += 335 - 10; }
 
 		// Set the width of the Legends
-		this._legendsInner.style.width = fatherwidth + 'px';  
+		// this._legendsInner.style.width = fatherwidth + 'px';  
+		this._legendsInner.style.width = '295px';  
 
 		// Hacky packy - Pick up the height of the legends from before we collapsed it, 
 		// which is stored in the collapse button as a 'sh' attribute
@@ -88,7 +94,7 @@ L.Control.Legends = L.Control.extend({
 		
 
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.bottom = '133px';  // refactor?                 
+		// Wu.app.MapPane._container.children[1].children[1].style.bottom = '133px';  // refactor?                 
 
 
 		var that = this; // this is different context inside setTimeout

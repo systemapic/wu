@@ -1,5 +1,6 @@
 Wu.SidePane.Item = Wu.Class.extend({
-       
+        _wu : 'sidepane.item', 
+	
 	type : 'item',
 
 	initialize : function () {
@@ -16,7 +17,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 	addHooks : function () {
 		// menu items bindings
-		Wu.DomEvent.on(this._menu, 'click', this._clickActivate, this);          // click
+		Wu.DomEvent.on(this._menu, 'mousedown', this._clickActivate, this);          // click
 		Wu.DomEvent.on(this._menu, 'mouseenter', this._mouseenter, this);   // mouseEnter
 		Wu.DomEvent.on(this._menu, 'mouseleave', this._mouseleave, this);   // mouseLeave
 	},
@@ -31,6 +32,10 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 	// if clicking on already active tab, toggle it
 	_reclick : function () {
+
+		var __map = Wu.DomUtil.get("map"); // (j)
+		var _menusliderArrow = Wu.DomUtil.get("menuslider-arrow"); // (j)
+
 		// if open
 		if (Wu.app.SidePane.paneOpen) {
 
@@ -39,6 +44,12 @@ Wu.SidePane.Item = Wu.Class.extend({
 			
 			// close pane
 			Wu.app.SidePane.closePane();
+
+			// Remove blur on map... (j)
+			Wu.DomUtil.removeClass(__map, "map-blur")
+
+			// Remove menuslider arrow (j)
+			// _menusliderArrow.style.width = '0px';
 		
 		// if closed
 		} else {
@@ -49,6 +60,17 @@ Wu.SidePane.Item = Wu.Class.extend({
 			// open pane
 			Wu.app.SidePane.openPane();
 
+			// Add menuslider arrow (j)
+			// _menusliderArrow.style.width = '9px';
+
+
+			// Blurs the map on full page panes... (j)
+			var clist = Wu.app._active.classList;
+			if ( _.contains(clist, 'fullpage-documents') || _.contains(clist, 'data-library') || _.contains(clist, 'fullpage-users') ) {
+				Wu.DomUtil.addClass(__map, "map-blur");
+			}
+
+
 		}
 	},
 
@@ -57,7 +79,8 @@ Wu.SidePane.Item = Wu.Class.extend({
 	_clickActivate : function (e) {
 
 		// if clicking on already active tab, toggle it
-		if (Wu.app._activeMenu == this) return this._reclick();
+		// if (Wu.app._activeMenu == this) return this._reclick();
+		if (Wu.app._activeMenu == this) return;
 
 		// open pane if not closed
 		if (!Wu.app.SidePane.paneOpen) Wu.app.SidePane.openPane();
@@ -137,28 +160,47 @@ Wu.SidePane.Item = Wu.Class.extend({
 		var w = '100px';
 		if (open) w = '400px';
 	
+		var __map = Wu.DomUtil.get("map");
+
+		// Make sure that menuslider arrow is there (j)
+		var _menusliderArrow = Wu.DomUtil.get("menuslider-arrow"); // (j)
+		_menusliderArrow.style.width = '9px'; // (j)
+
+
 		// check which 
 		if (_.contains(classy, 'clients')) {
 			menuslider.style.top = '0px';
 			Wu.app.SidePane._container.style.width = w;
+
+			Wu.DomUtil.removeClass(__map, "map-blur")
 		}
 
 		if (_.contains(classy, 'map')) {
 			var n = app.SidePane.panes.indexOf('Map');		// calculate position
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = w;
+
+			Wu.DomUtil.removeClass(__map, "map-blur")
+
+
 		}
 	    
 		if (_.contains(classy, 'documents')) {
 			var n = app.SidePane.panes.indexOf('Documents');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
+
+			Wu.DomUtil.addClass(__map, "map-blur")
+
 		}
 	    
 		if (_.contains(classy, 'dataLibrary')) {
 			var n = app.SidePane.panes.indexOf('DataLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
+
+			Wu.DomUtil.addClass(__map, "map-blur")
+
 		}
 	    
 
@@ -166,6 +208,9 @@ Wu.SidePane.Item = Wu.Class.extend({
 			var n = app.SidePane.panes.indexOf('MediaLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
+
+			Wu.DomUtil.addClass(__map, "map-blur")
+
 		}
 
 
@@ -173,6 +218,9 @@ Wu.SidePane.Item = Wu.Class.extend({
 			var n = app.SidePane.panes.indexOf('Users');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
+
+			Wu.DomUtil.addClass(__map, "map-blur")
+
 		}
 				
 		
@@ -193,33 +241,35 @@ Wu.SidePane.Item = Wu.Class.extend({
 		}
 		
 		// Check if we're swiping up or down
-		if ( swfrom > swto ) {
-			swipeOut = 'swipe_out';
-			swipeIn = 'swipe_in';						
-		} else {
-			swipeOut = 'swipe_out_up';
-			swipeIn = 'swipe_in_up';
-		}               
+		// if ( swfrom > swto ) {
+		// 	swipeOut = 'swipe_out';
+		// 	swipeIn = 'swipe_in';						
+		// } else {
+		// 	swipeOut = 'swipe_out_up';
+		// 	swipeIn = 'swipe_in_up';
+		// }
 		    
 		// Hide the Deactivated Pane
 		if (Wu.app._active) {
-			    
-			Wu.DomUtil.addClass(swypefrom, swipeOut);                   
+			    Wu.DomUtil.removeClass(swypefrom, 'show');
+
+
+			// Wu.DomUtil.addClass(swypefrom, swipeOut);                   
 					    
-			// Remove classes from the swiped out element
-			setTimeout(function(){
-				Wu.DomUtil.removeClass(swypefrom, 'show');
-				Wu.DomUtil.removeClass(swypefrom, swipeOut);
-			}, 300);                                
+			// // Remove classes from the swiped out element
+			// setTimeout(function(){
+			// 	Wu.DomUtil.removeClass(swypefrom, 'show');
+			// 	Wu.DomUtil.removeClass(swypefrom, swipeOut);
+			// }, 300);                                
 		};
 					
 		// Swipe this IN
 		Wu.DomUtil.addClass(swypeto, 'show');
-		Wu.DomUtil.addClass(swypeto, swipeIn);              
+		// Wu.DomUtil.addClass(swypeto, swipeIn);              
 		
-		setTimeout(function(){
-			Wu.DomUtil.removeClass(swypeto, swipeIn);   
-		}, 300);
+		// setTimeout(function(){
+		// 	Wu.DomUtil.removeClass(swypeto, swipeIn);   
+		// }, 300);
 			
 	},
 
@@ -235,8 +285,12 @@ Wu.SidePane.Item = Wu.Class.extend({
 		var className = 'q-editor-content-item ' + this.type;
 		this._content = Wu.DomUtil.create('div', className, Wu.app._editorContentPane);
 
+		// scroll wrapper (j)
+		this._scrollWrapper = Wu.DomUtil.create('div', 'editor-scroll-wrapper', this._content);
+
 		// wrapper 
-		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct13', this._content);
+		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct13', this._scrollWrapper);
+
 	},
 
 	initContent : function () {
@@ -255,7 +309,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 	disable : function () {
 
 		// disable click
-		Wu.DomEvent.off(this._menu, 'click', this._clickActivate, this); 
+		Wu.DomEvent.off(this._menu, 'mousedown', this._clickActivate, this); 
 
 		// add disabled class
 		Wu.DomUtil.addClass(this._menu, 'disabled');
@@ -265,7 +319,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 	enable : function () {
 
 		// enable click
-		Wu.DomEvent.on(this._menu, 'click', this._clickActivate, this); 
+		Wu.DomEvent.on(this._menu, 'mousedown', this._clickActivate, this); 
 
 		// remove disabled class
 		Wu.DomUtil.removeClass(this._menu, 'disabled');

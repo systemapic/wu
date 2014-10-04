@@ -1,7 +1,8 @@
 L.Control.Description = L.Control.extend({
 	
 	options: {
-		position : 'topleft' 
+		// position : 'topleft' 
+		position : 'bottomright' 
 	},
 
 	onAdd : function (map) {
@@ -9,6 +10,8 @@ L.Control.Description = L.Control.extend({
 		var className = 'leaflet-control-description',
 		    container = L.DomUtil.create('div', className),
 		    options   = this.options;
+
+		    // console.log('container', container);
 
 		// add html
 		container.innerHTML = ich.descriptionControl(); 
@@ -20,9 +23,12 @@ L.Control.Description = L.Control.extend({
 	initContainer : function () {                
 
 		// Open Menu Button
-		this._uncollapse = Wu.DomUtil.createId('div', 'uncollapse');
-		Wu.DomUtil.addClass(this._uncollapse, 'leaflet-control open-uncollapse');
-		this._uncollapse.innerHTML = 'Show Layer Info';
+
+		// this._uncollapse = Wu.DomUtil.createId('div', 'uncollapse');
+		// Wu.DomUtil.addClass(this._uncollapse, 'leaflet-control open-uncollapse');
+		// this._uncollapse.innerHTML = 'Show Layer Info';
+
+		this._container.style.display = "none";
 
 		// get panes
 		this._content 	= Wu.DomUtil.get('description-control-inner-content');
@@ -94,7 +100,7 @@ L.Control.Description = L.Control.extend({
 		
 		// collapsers
 		Wu.DomEvent.on(this._button,     'mousedown', this.closePane, this);
-		Wu.DomEvent.on(this._uncollapse, 'mousedown', this.openPane,  this);
+		// Wu.DomEvent.on(this._uncollapse, 'mousedown', this.openPane,  this);
 
 		// edit mode
 		if (this.editMode) {
@@ -237,50 +243,44 @@ L.Control.Description = L.Control.extend({
 	// (j)
 	closePane : function () {
 	      
-		this._content.parentNode.parentNode.style.width = '34px';
-		this._firstchildofmine = this._content.parentNode.parentNode.getElementsByTagName('div')[0];
-		this._content.parentNode.parentNode.insertBefore(this._uncollapse, this._firstchildofmine);
+		// console.log('this._content', this._content)
+		this._container.style.display = "none";
+
+		// this._content.parentNode.parentNode.style.width = '34px';
+		// this._firstchildofmine = this._content.parentNode.parentNode.getElementsByTagName('div')[0];
+		// this._content.parentNode.parentNode.insertBefore(this._uncollapse, this._firstchildofmine);
 	      
-		
 
 		// Slide the LEGENDS
-		if (this._legendsContainer) {
-		    Wu.DomUtil.addClass(this._legendsContainer, 'legends-push-left');
-		// this._legendsCollapser.style.left = this._legendsCollapser.offsetLeft - (Math.floor(287/2)) + 'px';
-		}
-
-
+		// if (this._legendsContainer) {
+		//     Wu.DomUtil.addClass(this._legendsContainer, 'legends-push-left');
+		// }
 			      
-		this._uncollapse.className = 'leaflet-control open-uncollapse leaflet-drag-target';
-
-		// var thus = this;	      
-		// Set class name
-		// setTimeout(function(){					
-		// 	thus._uncollapse.className = 'leaflet-control uncollapser-uncollapsed';
-		// }, 500);
+		// this._uncollapse.className = 'leaflet-control open-uncollapse leaflet-drag-target';		
 		
 	},
 	
 	// (j)
 	openPane : function () {
 
+		this._container.style.display = "block";
+
 		// Show Info box
-		this._content.parentNode.parentNode.style.width = '320px';					
+		// this._content.parentNode.parentNode.style.width = '320px';					
 
 		// Animate opener button
-		this._uncollapse.className = 'leaflet-control uncollapse-killer';
+		// this._uncollapse.className = 'leaflet-control uncollapse-killer';
 			
 		// Slide the LEGENDS
-	   	 if (this._legendsContainer) {
-			Wu.DomUtil.removeClass(this._legendsContainer, 'legends-push-left');
-			// this._legendsCollapser.style.left = this._legendsCollapser.offsetLeft + (Math.floor(287/2)) + 'px';
-		}
+	 //   	 if (this._legendsContainer) {
+		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-push-left');
+		// }
 		// Set class name and remove from DOM
-		var that = this;                        
-		setTimeout(function(){
-			that._content.parentNode.parentNode.removeChild(that._uncollapse);
-			that._uncollapse.className = 'leaflet-control open-uncollapse';
-		}, 500);						
+		// var that = this;                        
+		// setTimeout(function(){
+		// 	that._content.parentNode.parentNode.removeChild(that._uncollapse);
+		// 	that._uncollapse.className = 'leaflet-control open-uncollapse';
+		// }, 500);						
 		
 	},
 	

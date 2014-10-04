@@ -1,4 +1,6 @@
 Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
+	_ : 'sidepane.map.mapsetting',
+
 
 	type : 'mapSetting',
 
@@ -38,6 +40,7 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 		// Wu.DomEvent.on( this.mapsettingsContainer, 'mouseleave', this.close, this);	
 		// Wu.DomEvent.on( this._container, 'mousemove', this.pendingOpen, this);
 		// Wu.DomEvent.on( this._container, 'mousedown', this.open, this);
+		
 		Wu.DomEvent.on( this._container, 'mousedown', this.toggleOpen, this);
 		
 	},
@@ -167,6 +170,7 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 
 
 Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.connect', 
 
 	type : 'connect',			
 
@@ -193,6 +197,11 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 		// connect mapbox button
 		Wu.DomEvent.on( this._mapboxConnect, 'click', this.importMapbox, this );
+
+		// stops
+		Wu.DomEvent.on( this._mapboxConnect, 'mousedown', Wu.DomEvent.stop, this );
+		Wu.DomEvent.on( this._mapboxInput, 'mousedown', Wu.DomEvent.stop, this );
+
 	},
 
 	removeHooks : function () {
@@ -297,6 +306,7 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
                                     
 Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.baselayers', 
 
 	type : 'baseLayers',
 
@@ -610,6 +620,7 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
                              
 Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.layermenu', 
 
 	type : 'layerMenu',
 
@@ -622,7 +633,7 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 	initLayout : function () {
 
 		// create title and wrapper (and delete old content)
-		this._container.innerHTML = '<h4>Layer Menu</h4><br>';		
+		this._container.innerHTML = '<h4>Layer Menu</h4>';		
 		this._inner  = Wu.DomUtil.create('div', 'map-layermenu-inner', this._container);
 		this._outer  = Wu.DomUtil.create('div', 'map-layermenu-outer', this._inner);
 		// var status   = 'Enable layer menu in Controls below.';
@@ -816,6 +827,7 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 
 Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.position', 
 
 	type : 'position',
 
@@ -920,6 +932,7 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 
 
 Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.bounds', 
 
 	type : 'bounds',
 
@@ -1188,6 +1201,7 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 
                        
 Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.controls', 
 
 	type : 'controls',
 

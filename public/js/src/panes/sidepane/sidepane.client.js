@@ -115,12 +115,15 @@ Wu.SidePane.Client = Wu.Class.extend({
 			var className = 'smap-button-white new-project-button ct11 ct16 ct18';
 			this._newProjectButton = Wu.DomUtil.create('div', className, this._projectsContainer, '+');
 			Wu.DomEvent.on(this._newProjectButton, 'mousedown', this.createNewProject, this);
+			Wu.DomEvent.on(this._newProjectButton, 'mousedown', Wu.DomEvent.stop, this);
+			Wu.DomEvent.on(this._newProjectButton, 'click', Wu.DomEvent.stop, this);
 		}
 		
 		// remove client button
 		if (app.Account.canDeleteClient(this.client.uuid)) {
 			this._removeClientButton = Wu.DomUtil.create('div', 'client-kill', this._container, 'X');
 			Wu.DomEvent.on(this._removeClientButton, 'mousedown', this.removeClient, this);
+
 		}
 
 	},

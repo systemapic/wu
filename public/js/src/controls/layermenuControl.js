@@ -91,15 +91,15 @@ L.Control.Layermenu = L.Control.extend({
 		this._container.parentNode.appendChild(this._openLayers);
 		
 		// Slide the LEGENDS			
-		if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-push-right');
+		// if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-push-right'); // rem (j)
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.right = '6px';
+		Wu.app.MapPane._container.children[1].children[1].style.right = '5px';
 		
 		// Change class name of open layers button
 		var that = this;
 		setTimeout(function(){					
-			that._openLayers.className = 'leaflet-control layer-opener-opened';					
+			// that._openLayers.className = 'leaflet-control layer-opener-opened'; // rem (j)
 		}, 500);			
 			
 	},
@@ -109,17 +109,16 @@ L.Control.Layermenu = L.Control.extend({
 
 
 		// Open Wrapper
-		this._container.parentNode.style.width = '320px';
+		this._container.parentNode.style.width = '290px';
 
 		// Close the closer :P
 		this._openLayers.className = 'leaflet-control layer-opener-opened close-layer-opener';
 		
 		// Slide the LEGENDS
-		if ( this._legendsContainer ) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-push-right');
-		// this._legendsCollapser.style.left = this._legendsCollapser.offsetLeft - (Math.floor(237/2)) + 'px';
+		// if ( this._legendsContainer ) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-push-right'); // rem (j)
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.right = '332px';                  
+		Wu.app.MapPane._container.children[1].children[1].style.right = '302px';                  
 		
 		// Set correct classname and remove open layer menu button from DOM	
 		var that = this;
@@ -569,7 +568,12 @@ L.Control.Layermenu = L.Control.extend({
 
 		// add to descriptionControl if available
 		var descriptionControl = app.MapPane.descriptionControl;
-		if (descriptionControl) descriptionControl.setLayer(layer);		
+		if (descriptionControl) {
+			descriptionControl.setLayer(layer);
+
+			console.log('descriptionControl._container', descriptionControl._container);
+			descriptionControl._container.style.display = 'block'; // (j)
+			}	
 	},
 
 	
@@ -590,7 +594,13 @@ L.Control.Layermenu = L.Control.extend({
 
 		// remove from descriptionControl if avaialbe
 		var descriptionControl = app.MapPane.descriptionControl;
-		if (descriptionControl) descriptionControl.removeLayer(layer);		
+		if (descriptionControl) {
+			descriptionControl.removeLayer(layer);
+
+			console.log('descriptionControl._container', descriptionControl._container);
+			descriptionControl._container.style.display = 'none'; // (j)
+
+		}
 
 	},
 

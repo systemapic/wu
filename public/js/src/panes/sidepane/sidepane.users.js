@@ -1,7 +1,9 @@
 Wu.SidePane.Users = Wu.SidePane.Item.extend({
+	_ : 'sidepane.users', 
+
 
 	type : 'users',
-	title : 'Users',
+	title : 'User <br> Mngmt',
 
 	initContent : function () {
 

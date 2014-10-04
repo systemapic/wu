@@ -1,18 +1,25 @@
 <!doctype html>
 <html>
 	<head>
-		<title>Systematic</title>
+		<title>Systemapic</title>
 	
+		<link rel="icon" type="image/png" href="//85.10.202.87:8080/favicon.ico">
+
 		<!-- Styles -->
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/grande.js/css/menu.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/grande.js/css/editor.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/bootstrap.min.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/font-awesome.min.css">
+		<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.2/mapbox.css' rel='stylesheet' />
+
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/leaflet/leaflet.css" />
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/leaflet/plugins/styleEditor/Leaflet.StyleEditor.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/powerange/powerange.min.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/style.css">
+		<link rel="stylesheet" href="//85.10.202.87:8080/css/evil.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/knut.css">
+		
+		<div id="styletag"></div>
 
 		
 		<!-- Dependencies -->
@@ -86,11 +93,11 @@
 
 		<!-- Editor / Map / BaseLayer -->
 		<script id="editorMapBaseLayer" type="text/html">
-			<h3>Project Options</h3>
+			<!-- <h3>Project Options</h3> -->
 
-			<div class="client-project-title-wrapper">
-				<h4 id="h4-map-configuration-project-name"></h4>
-			</div>
+			<!-- <div class="client-project-title-wrapper"> -->
+				<!-- <h4 id="h4-map-configuration-project-name"></h4> -->
+			<!-- </div> -->
 
 		<div id="mapsettings-container">
 
@@ -299,7 +306,7 @@
 		<!-- Editor / Clients / container -->
 		<script id="editorClients" type="text/html">
 			
-			<h3>Clients</h3>
+			<!-- <h3>Clients</h3> -->
 			
 
 			<div id="editor-clients"></div>
@@ -976,7 +983,7 @@
 		<script id="datalibraryTableframe" type="text/html">
 		
 			<div id="filelist">
-				<h3>Data Library</h3>			
+				<!-- <h3>Data Library</h3>			 -->
 				<table id="datalibrary-table">
 					<thead>
 					
@@ -1281,7 +1288,7 @@
 
 			<div id="userlist">
 
-			<h3>User Management </h3>
+			<!-- <h3>User Management </h3> -->
 			<h4 id="user-management-client"></h4>
 
 			<div id="users-table-container"></div>
@@ -1611,7 +1618,7 @@
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.item.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.clients.js"></script> 
-		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.home.js"></script> 
+		<!-- <script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.home.js"></script>  -->
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.project.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.client.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.users.js"></script> 
@@ -1638,8 +1645,14 @@
 		<script src="//85.10.202.87:8080/js/src/models/layers.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/models/colorThemes.js"></script>	
 
+
 		<!-- app.js must be added last -->
 		<script src="//85.10.202.87:8080/js/src/core/app.js"></script> 
+
+		<!-- Helper -->
+		<!-- <script src="//85.10.202.87:8080/js/src/help/systempaic_helper.js"></script> -->
+		<script src="//85.10.202.87:8080/js/src/help/themeToggle.js"></script>		 
+		
 
 		<!-- // <script src="//85.10.202.87:8080/js/src/dist/combined/systemapic.combined.min.js"></script>  -->
 

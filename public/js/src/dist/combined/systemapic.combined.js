@@ -1498,6 +1498,8 @@ String.prototype.camelize = function () {
 
 		// menuslider
 		Wu.app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
+		Wu.app._menuSliderArrow = Wu.DomUtil.createId('div', 'menuslider-arrow', Wu.app._menuSlider);
+
 		Wu.DomUtil.addClass(Wu.app._menuSlider, 'ct1');
 		
 	},
@@ -1528,7 +1530,7 @@ String.prototype.camelize = function () {
 		if (!height) height = 80;
 
 		// set height
-		this._minHeight = height;
+		this._minHeight = height + 5;
 	},
 
 	setHeight : function (height) {
@@ -1537,6 +1539,8 @@ String.prototype.camelize = function () {
 
 	collapse : function () {
 		
+
+
 		// calculate
 		this.calculateHeight();
 		
@@ -1716,6 +1720,10 @@ String.prototype.camelize = function () {
 
 	// if clicking on already active tab, toggle it
 	_reclick : function () {
+
+		var __map = Wu.DomUtil.get("map"); // (j)
+		var _menusliderArrow = Wu.DomUtil.get("menuslider-arrow"); // (j)
+
 		// if open
 		if (Wu.app.SidePane.paneOpen) {
 
@@ -1724,6 +1732,12 @@ String.prototype.camelize = function () {
 			
 			// close pane
 			Wu.app.SidePane.closePane();
+
+			// Remove blur on map... (j)
+			Wu.DomUtil.removeClass(__map, "map-blur")
+
+			// Remove menuslider arrow (j)
+			_menusliderArrow.style.width = '0px';
 		
 		// if closed
 		} else {
@@ -1733,6 +1747,17 @@ String.prototype.camelize = function () {
 			
 			// open pane
 			Wu.app.SidePane.openPane();
+
+			// Add menuslider arrow (j)
+			_menusliderArrow.style.width = '9px';
+
+
+			// Blurs the map on full page panes... (j)
+			var clist = Wu.app._active.classList;
+			if ( _.contains(clist, 'fullpage-documents') || _.contains(clist, 'data-library') || _.contains(clist, 'fullpage-users') ) {
+				Wu.DomUtil.addClass(__map, "map-blur");
+			}
+
 
 		}
 	},
@@ -1822,28 +1847,47 @@ String.prototype.camelize = function () {
 		var w = '100px';
 		if (open) w = '400px';
 	
+		var __map = Wu.DomUtil.get("map");
+
+		// Make sure that menuslider arrow is there (j)
+		var _menusliderArrow = Wu.DomUtil.get("menuslider-arrow"); // (j)
+		_menusliderArrow.style.width = '9px'; // (j)
+
+
 		// check which 
 		if (_.contains(classy, 'clients')) {
 			menuslider.style.top = '0px';
 			Wu.app.SidePane._container.style.width = w;
+
+			Wu.DomUtil.removeClass(__map, "map-blur")
 		}
 
 		if (_.contains(classy, 'map')) {
 			var n = app.SidePane.panes.indexOf('Map');		// calculate position
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = w;
+
+			Wu.DomUtil.removeClass(__map, "map-blur")
+
+
 		}
 	    
 		if (_.contains(classy, 'documents')) {
 			var n = app.SidePane.panes.indexOf('Documents');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
+
+			Wu.DomUtil.addClass(__map, "map-blur")
+
 		}
 	    
 		if (_.contains(classy, 'dataLibrary')) {
 			var n = app.SidePane.panes.indexOf('DataLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
+
+			Wu.DomUtil.addClass(__map, "map-blur")
+
 		}
 	    
 
@@ -1851,6 +1895,9 @@ String.prototype.camelize = function () {
 			var n = app.SidePane.panes.indexOf('MediaLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
+
+			Wu.DomUtil.addClass(__map, "map-blur")
+
 		}
 
 
@@ -1858,6 +1905,9 @@ String.prototype.camelize = function () {
 			var n = app.SidePane.panes.indexOf('Users');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
+
+			Wu.DomUtil.addClass(__map, "map-blur")
+
 		}
 				
 		
@@ -1878,33 +1928,35 @@ String.prototype.camelize = function () {
 		}
 		
 		// Check if we're swiping up or down
-		if ( swfrom > swto ) {
-			swipeOut = 'swipe_out';
-			swipeIn = 'swipe_in';						
-		} else {
-			swipeOut = 'swipe_out_up';
-			swipeIn = 'swipe_in_up';
-		}               
+		// if ( swfrom > swto ) {
+		// 	swipeOut = 'swipe_out';
+		// 	swipeIn = 'swipe_in';						
+		// } else {
+		// 	swipeOut = 'swipe_out_up';
+		// 	swipeIn = 'swipe_in_up';
+		// }
 		    
 		// Hide the Deactivated Pane
 		if (Wu.app._active) {
-			    
-			Wu.DomUtil.addClass(swypefrom, swipeOut);                   
+			    Wu.DomUtil.removeClass(swypefrom, 'show');
+
+
+			// Wu.DomUtil.addClass(swypefrom, swipeOut);                   
 					    
-			// Remove classes from the swiped out element
-			setTimeout(function(){
-				Wu.DomUtil.removeClass(swypefrom, 'show');
-				Wu.DomUtil.removeClass(swypefrom, swipeOut);
-			}, 300);                                
+			// // Remove classes from the swiped out element
+			// setTimeout(function(){
+			// 	Wu.DomUtil.removeClass(swypefrom, 'show');
+			// 	Wu.DomUtil.removeClass(swypefrom, swipeOut);
+			// }, 300);                                
 		};
 					
 		// Swipe this IN
 		Wu.DomUtil.addClass(swypeto, 'show');
-		Wu.DomUtil.addClass(swypeto, swipeIn);              
+		// Wu.DomUtil.addClass(swypeto, swipeIn);              
 		
-		setTimeout(function(){
-			Wu.DomUtil.removeClass(swypeto, swipeIn);   
-		}, 300);
+		// setTimeout(function(){
+		// 	Wu.DomUtil.removeClass(swypeto, swipeIn);   
+		// }, 300);
 			
 	},
 
@@ -1920,8 +1972,12 @@ String.prototype.camelize = function () {
 		var className = 'q-editor-content-item ' + this.type;
 		this._content = Wu.DomUtil.create('div', className, Wu.app._editorContentPane);
 
+		// scroll wrapper (j)
+		this._scrollWrapper = Wu.DomUtil.create('div', 'editor-scroll-wrapper', this._content);
+
 		// wrapper 
-		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct13', this._content);
+		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct13', this._scrollWrapper);
+
 	},
 
 	initContent : function () {
@@ -2286,7 +2342,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent.on(this.users, 'mouseenter', this.expandUsers, this);
 		Wu.DomEvent.on(this.users, 'mouseleave', this.collapseUsers, this);
 
-
 		// kill button
 		if (app.Account.canDeleteProject(this.project.store.uuid)) {
 			this.kill = Wu.DomUtil.create('div', 'project-kill', this._container, 'X');
@@ -2320,6 +2375,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent.on(this._container, 'mouseenter', this.open, this);
 		Wu.DomEvent.on(this._container, 'mouseleave', this.close, this);
 		Wu.DomEvent.on(this._container, 'click',      this.select, this);
+		Wu.DomEvent.on( this._container, 'mousedown', Wu.DomEvent.stop, this);
 	
 		// add edit hooks
 		if (this.project.editMode) this.addEditHooks();
@@ -2330,6 +2386,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent.off(this._container, 'mouseenter', this.open, this);
 		Wu.DomEvent.off(this._container, 'mouseleave', this.close, this);
 		Wu.DomEvent.off(this._container, 'click', this.select, this);
+		Wu.DomEvent.off( this._container, 'mousedown', Wu.DomEvent.stop, this);
 
 		// remove edit hooks
 		if (this.project.editMode) this.removeEditHooks();
@@ -2337,6 +2394,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	
 	addEditHooks : function () {
+		console.log('addEditHooks', this.project.editMode);
 
 		// editing hooks
 		if (!this.project.editMode) return;
@@ -2352,7 +2410,10 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	removeEditHooks : function () {
-		if (!this.project.editMode) return;
+		// if (!this.project.editMode) return;
+
+		console.log('addEditHooks', this.project.editMode);
+
 
 		// editing hooks
 		Wu.DomEvent.off(this.name, 	  'dblclick', this.edit, this);
@@ -2439,10 +2500,12 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	},
 
-	select : function () {
+	select : function (e) {
+
+		console.log('select e: ', e);
 
 		// dont select if already active
-		// if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
+		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
 
 		// select project
 		this.project.select();
@@ -2784,15 +2847,18 @@ Wu.SidePane.Client = Wu.Class.extend({
 	
 
 	addHooks : function () {
-		Wu.DomEvent.on( this._container.parentNode, 'mouseleave', this.close, this);	// todo: add click for opening also...
-		Wu.DomEvent.on( this._container, 'mousemove', this.pendingOpen, this);
-		Wu.DomEvent.on( this._container, 'mousedown', this.open, this);
+		// Wu.DomEvent.on( this._container.parentNode, 'mouseleave', this.close, this);	// todo: add click for opening also...
+		// Wu.DomEvent.on( this._container, 'mousemove', this.pendingOpen, this);
+		// Wu.DomEvent.on( this._container, 'mousedown', this.open, this);
+		Wu.DomEvent.on( this._container, 'mousedown', this.toggle, this);
+		
 	},
 
 	removeHooks : function () {
-		Wu.DomEvent.off( this._container.parentNode, 'mouseleave', this.close, this);
-		Wu.DomEvent.off( this._container, 'mousemove', this.pendingOpen, this);
-		Wu.DomEvent.off( this._container, 'mousedown', this.open, this);
+		// Wu.DomEvent.off( this._container.parentNode, 'mouseleave', this.close, this);
+		// Wu.DomEvent.off( this._container, 'mousemove', this.pendingOpen, this);
+		// Wu.DomEvent.off( this._container, 'mousedown', this.open, this);
+		Wu.DomEvent.off( this._container, 'mousedown', this.toggle, this);
 	},
 
 	addEditHooks : function () {
@@ -2960,10 +3026,15 @@ Wu.SidePane.Client = Wu.Class.extend({
 		}, 200);	
 	},
 
+	toggle : function () {
+		this._isOpen ? this.close() : this.open();
+	},
+
 	open : function () {
 		this.calculateHeight();
 		this._container.style.height = this.maxHeight + 'px';          
 		this._isOpen = true;
+		// this._pendingClose = this;
 	},
 
 
@@ -2971,8 +3042,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.calculateHeight();
 		this._container.style.height = this.minHeight + 'px';    
 		this._isOpen = false;
-		app._pendingCloseClient = false;
-		if (app._timerOpenClient) clearTimeout(app._timerOpenClient);
+		// app._pendingCloseClient = false;
+		// if (app._timerOpenClient) clearTimeout(app._timerOpenClient);
 	},
 
 	
@@ -3852,9 +3923,15 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	addHooks : function () {
-		Wu.DomEvent.on( this.mapsettingsContainer, 'mouseleave', this.close, this);	
-		Wu.DomEvent.on( this._container, 'mousemove', this.pendingOpen, this);
-		Wu.DomEvent.on( this._container, 'mousedown', this.open, this);
+		// Wu.DomEvent.on( this.mapsettingsContainer, 'mouseleave', this.close, this);	
+		// Wu.DomEvent.on( this._container, 'mousemove', this.pendingOpen, this);
+		// Wu.DomEvent.on( this._container, 'mousedown', this.open, this);
+		Wu.DomEvent.on( this._container, 'mousedown', this.toggleOpen, this);
+		
+	},
+
+	removeHooks : function () {
+		// todo!!!
 	},
 
 	calculateHeight : function () {
@@ -3872,6 +3949,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 			if (app._pendingClose) app._pendingClose.close();
 			app._pendingClose = that;
 		}, 200);	
+	},
+
+	toggleOpen : function () {
+		this._isOpen ? this.close() : this.open();
 	},
 
 	open : function () {
@@ -3909,6 +3990,64 @@ Wu.SidePane.Client = Wu.Class.extend({
 	getPanes : function () {
 		// noop
 	},
+
+	// sort layers by provider
+	sortLayers : function (layers) {
+		// possible keys in layer.store.data. must add more here later if other sources
+		var keys = ['geojson', 'mapbox'];
+		var results = [];
+		keys.forEach(function (key) {
+			var sort = {
+				key : key,
+				layers : []
+			}
+			for (l in layers) {
+				var layer = layers[l];
+				if (layer.store.data.hasOwnProperty(key)) {
+					sort.layers.push(layer)
+				}
+			}
+			results.push(sort);
+		}, this);
+
+		this.numberOfProviders = results.length;
+		return results;
+	},
+
+	addProvider : function (provider) {
+		var title = '';
+		if (provider == 'geojson') title = 'Data Library';
+		if (provider == 'mapbox') title = 'Mapbox';
+		var header = Wu.DomUtil.create('div', 'item-list-header', this._outer, title)
+	},
+
+	fillLayers : function () {
+
+		this._layers = {};
+
+		// return if no layers
+	       	if (_.isEmpty(this.project.layers)) return;
+	       	
+
+	       	var sortedLayers = this.sortLayers(this.project.layers);
+	       	console.log('sorted layers: ', sortedLayers);
+
+	       	sortedLayers.forEach(function (provider) {
+
+	       		this.addProvider(provider.key);
+
+	       		provider.layers.forEach(function (layer) {
+	       			this.addLayer(layer);
+	       		}, this);
+
+	       	}, this);
+
+	       	// calculate height for wrapper
+	       	this.calculateHeight();
+
+	},
+
+
 	
 
 });
@@ -3943,6 +4082,10 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		// connect mapbox button
 		Wu.DomEvent.on( this._mapboxConnect, 'click', this.importMapbox, this );
 	},
+
+	removeHooks : function () {
+		// todo!!!
+	},	
 
 	calculateHeight : function () {
 		var num = this.project.getMapboxAccounts().length;
@@ -4076,19 +4219,8 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		
 	},
 
-	fillLayers : function () {
-
-		// return if no layers
-	       	if (_.isEmpty(this.project.layers)) return;
-	       	
-	       	// fill in with layers in DOM
-	       	_.each(this.project.layers, function (layer) {
-	       		this.addLayer(layer);
-	       	}, this);
-
-	       	// calculate height for wrapper
-	       	this.calculateHeight();
-
+	removeHooks : function () {
+		// todo!!!
 	},
 
 
@@ -4352,7 +4484,9 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 	},
 
 	calculateHeight : function () {
-		this.maxHeight = _.size(this.project.layers) * 33;
+
+		var padding = this.numberOfProviders * 35;
+		this.maxHeight = _.size(this.project.layers) * 33 + padding;
 		this.minHeight = 0;
 
 		// add 100 if in editMode
@@ -4379,8 +4513,8 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		this._container.innerHTML = '<h4>Layer Menu</h4><br>';		
 		this._inner  = Wu.DomUtil.create('div', 'map-layermenu-inner', this._container);
 		this._outer  = Wu.DomUtil.create('div', 'map-layermenu-outer', this._inner);
-		var status   = 'Enable layer menu in Controls below.';
-		this._status = Wu.DomUtil.create('div', 'layermenu-status', this._outer, status);
+		// var status   = 'Enable layer menu in Controls below.';
+		// this._status = Wu.DomUtil.create('div', 'layermenu-status', this._outer, status);
 
 	},
 
@@ -4402,22 +4536,7 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		
 	},
 
-	fillLayers : function () {
 
-		this._layers = {};
-
-		// return if no layers
-	       	if (_.isEmpty(this.project.layers)) return;
-	       	
-	       	// fill in with layers in DOM
-	       	_.each(this.project.layers, function (layer) {
-	       		this.addLayer(layer);
-	       	}, this);
-
-	       	// calculate height for wrapper
-	       	this.calculateHeight();
-
-	},
 
 	// add layers to layermenu list in sidepane
 	addLayer : function (layer) {
@@ -4483,7 +4602,9 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 	},
 
 	calculateHeight : function () {
-		this.maxHeight = _.size(this.project.layers) * 33 + 20; // add 20 for status msg
+
+		var padding = this.numberOfProviders * 35;
+		this.maxHeight = _.size(this.project.layers) * 33 + padding;
 		this.minHeight = 0;
 
 		// add 100 if in editMode
@@ -4612,6 +4733,10 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 
 	},
 
+	removeHooks : function () {
+		// todo!!!
+	},
+
 	toggleDropdown : function (e) {
 		if ( !this.toggled ) {
 			this.toggled = true;
@@ -4624,12 +4749,8 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 
 	setPosition : function (e) {
 
-		console.log('setPosition!');
-
 		// get actual Project object
 		var project = app.activeProject;
-
-		console.log('project:::::::: ', project);
 
 		// if no active project, do nothing
 		if (!project) return; 
@@ -4638,20 +4759,16 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 		var center = Wu.app._map.getCenter();
 		var zoom   = Wu.app._map.getZoom();
 
-		console.log('cent:ER', center);
-
-		// write directly to Project
+		// set position 
 		var position = {
 			lat  : center.lat,
 			lng  : center.lng,
 			zoom : zoom
 		}
-		console.log('position: ', position);
+
+		// save to project
 		project.setPosition(position);
 	
-		// call update on Project
-		// this.save();
-
 		// call update on view
 		this.update();
 
@@ -4732,6 +4849,10 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		Wu.DomEvent.on( this.panes.bounds,   'mouseup',    this.buttonUp,    this );
 		Wu.DomEvent.on( this.panes.bounds,   'mouseleave', this.buttonUp,    this );
 
+	},
+
+	removeHooks : function () {
+		// todo!!!
 	},
 
 	setBounds : function (e) {
@@ -4995,6 +5116,10 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 	},
 
+	removeHooks : function () {
+		// todo!!!
+	},
+
 	calculateHeight : function () {
 		var x = _.size(this.controls);
 		this.maxHeight = x * 30 + 30;
@@ -5007,6 +5132,9 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		// prevent default checkbox behaviour
 		if (e.type == 'click') return Wu.DomEvent.stop(e);
 		
+		// stop anyway
+		Wu.DomEvent.stop(e);
+
 		// get type (zoom, draw, etc.)
 		var item = e.target.getAttribute('which');
 
@@ -5591,8 +5719,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// filecount
 		this.filecount = 0;
 
-
-
 		// render empty table
 		this._tableContainer.innerHTML = ich.datalibraryTableframe();
 
@@ -5801,6 +5927,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	deleteFiles : function (files) {
 		console.log('deleting ', files);
+
+		// set status
+		app.setStatus('Deleting');
 		
 		// iterate over files and delete
 		var _fids = [];
@@ -5843,6 +5972,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		var string = JSON.stringify(json);
 		Wu.save('/api/file/delete', string); 
 
+		// set status
+		app.setStatus('Deleted!');
+
 	},
 
 
@@ -5870,8 +6002,11 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.dz = new Dropzone(this._uploader, {
 				url : '/api/upload',
 				createImageThumbnails : false,
-				autoDiscover : false
-				// uploadMultiple : true
+				autoDiscover : false,
+				uploadMultiple : true,
+				maxFiles : 10,
+				parallelUploads : 10,
+				// autoProcessQueue : true
 		});
 
 		// add fullscreen dropzone
@@ -5905,11 +6040,11 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.dz.removeAllListeners();
 
 		// set project uuid for dropzone
-		this.dz.options.params.project = this.project.store.uuid;
+		this.dz.options.params.project = this.project.getUuid();
 
 		// set dz events
-		this.dz.on('drop', function () { 
-			console.log('drop'); 
+		this.dz.on('drop', function (e) { 
+			console.log('drop', e); 
 		});
 
 		this.dz.on('dragenter', function () { 
@@ -5917,6 +6052,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		});
 
 		this.dz.on('addedfile', function (file) { 
+
+			console.log('dz added: ', file);
 
 			// count multiple files
 			that.filecount += 1;
@@ -5929,17 +6066,22 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 				that.fullOn();
 				that.fullUpOn();
 			}
+
+			// set status
+			app.setStatus('Uploading');
 		});
 
 
 		this.dz.on('complete', function (file) {
-			console.log('complete');
+			console.log('complete111');
 
 			// count multiple files
 			that.filecount -= 1;
 
 			// clean up
 			that.dz.removeFile(file);
+
+			
 		      
 		});
 
@@ -5952,17 +6094,21 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.dz.on('uploadprogress', function (file, progress) {
 			// set progress
 			that.progress.style.width = progress + '%';
-		})                                                                                                                                                                                                               
+		});                                                                                                                                                                                                               
 
 		this.dz.on('success', function (err, json) {
 			// parse and process
 			var obj = Wu.parse(json);
+			console.log('success::: obj: ', obj);
+
+			// set status
+			app.setStatus('Done!', 2000);
+
 			if (obj) { that.uploaded(obj); }
 		});
 
 		this.dz.on('complete', function (file) {
-			console.log('complete!', file);
-			console.log('filecount: ', that.filecount);
+			console.log('complete333');
 
 			if (!that.filecount) {
 				// reset progressbar
@@ -6077,7 +6223,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			this.addFile(file);
  
 			// add to project locally (already added on server)
-			this.project.store.files.push(file);
+			// this.project.store.files.push(file);
+			this.project.setFile(file);
 		}, this);
 
 	},
@@ -7832,15 +7979,15 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._container.parentNode.appendChild(this._openLayers);
 		
 		// Slide the LEGENDS			
-		if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-push-right');
+		// if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-push-right'); // rem (j)
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.right = '6px';
+		Wu.app.MapPane._container.children[1].children[1].style.right = '5px';
 		
 		// Change class name of open layers button
 		var that = this;
 		setTimeout(function(){					
-			that._openLayers.className = 'leaflet-control layer-opener-opened';					
+			// that._openLayers.className = 'leaflet-control layer-opener-opened'; // rem (j)
 		}, 500);			
 			
 	},
@@ -7850,17 +7997,16 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 
 		// Open Wrapper
-		this._container.parentNode.style.width = '320px';
+		this._container.parentNode.style.width = '290px';
 
 		// Close the closer :P
 		this._openLayers.className = 'leaflet-control layer-opener-opened close-layer-opener';
 		
 		// Slide the LEGENDS
-		if ( this._legendsContainer ) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-push-right');
-		// this._legendsCollapser.style.left = this._legendsCollapser.offsetLeft - (Math.floor(237/2)) + 'px';
+		// if ( this._legendsContainer ) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-push-right'); // rem (j)
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.right = '332px';                  
+		Wu.app.MapPane._container.children[1].children[1].style.right = '302px';                  
 		
 		// Set correct classname and remove open layer menu button from DOM	
 		var that = this;
@@ -8310,7 +8456,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// add to descriptionControl if available
 		var descriptionControl = app.MapPane.descriptionControl;
-		if (descriptionControl) descriptionControl.setLayer(layer);		
+		if (descriptionControl) {
+			descriptionControl.setLayer(layer);
+
+			console.log('descriptionControl._container', descriptionControl._container);
+			descriptionControl._container.style.display = 'block'; // (j)
+			}	
 	},
 
 	
@@ -8331,7 +8482,13 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// remove from descriptionControl if avaialbe
 		var descriptionControl = app.MapPane.descriptionControl;
-		if (descriptionControl) descriptionControl.removeLayer(layer);		
+		if (descriptionControl) {
+			descriptionControl.removeLayer(layer);
+
+			console.log('descriptionControl._container', descriptionControl._container);
+			descriptionControl._container.style.display = 'none'; // (j)
+
+		}
 
 	},
 
@@ -8982,7 +9139,8 @@ L.control.inspect = function (options) {
 };;L.Control.Description = L.Control.extend({
 	
 	options: {
-		position : 'topleft' 
+		// position : 'topleft' 
+		position : 'bottomright' 
 	},
 
 	onAdd : function (map) {
@@ -8990,6 +9148,8 @@ L.control.inspect = function (options) {
 		var className = 'leaflet-control-description',
 		    container = L.DomUtil.create('div', className),
 		    options   = this.options;
+
+		    // console.log('container', container);
 
 		// add html
 		container.innerHTML = ich.descriptionControl(); 
@@ -9001,9 +9161,12 @@ L.control.inspect = function (options) {
 	initContainer : function () {                
 
 		// Open Menu Button
-		this._uncollapse = Wu.DomUtil.createId('div', 'uncollapse');
-		Wu.DomUtil.addClass(this._uncollapse, 'leaflet-control open-uncollapse');
-		this._uncollapse.innerHTML = 'Show Layer Info';
+
+		// this._uncollapse = Wu.DomUtil.createId('div', 'uncollapse');
+		// Wu.DomUtil.addClass(this._uncollapse, 'leaflet-control open-uncollapse');
+		// this._uncollapse.innerHTML = 'Show Layer Info';
+
+		this._container.style.display = "none";
 
 		// get panes
 		this._content 	= Wu.DomUtil.get('description-control-inner-content');
@@ -9075,7 +9238,7 @@ L.control.inspect = function (options) {
 		
 		// collapsers
 		Wu.DomEvent.on(this._button,     'mousedown', this.closePane, this);
-		Wu.DomEvent.on(this._uncollapse, 'mousedown', this.openPane,  this);
+		// Wu.DomEvent.on(this._uncollapse, 'mousedown', this.openPane,  this);
 
 		// edit mode
 		if (this.editMode) {
@@ -9218,50 +9381,44 @@ L.control.inspect = function (options) {
 	// (j)
 	closePane : function () {
 	      
-		this._content.parentNode.parentNode.style.width = '34px';
-		this._firstchildofmine = this._content.parentNode.parentNode.getElementsByTagName('div')[0];
-		this._content.parentNode.parentNode.insertBefore(this._uncollapse, this._firstchildofmine);
+		// console.log('this._content', this._content)
+		this._container.style.display = "none";
+
+		// this._content.parentNode.parentNode.style.width = '34px';
+		// this._firstchildofmine = this._content.parentNode.parentNode.getElementsByTagName('div')[0];
+		// this._content.parentNode.parentNode.insertBefore(this._uncollapse, this._firstchildofmine);
 	      
-		
 
 		// Slide the LEGENDS
-		if (this._legendsContainer) {
-		    Wu.DomUtil.addClass(this._legendsContainer, 'legends-push-left');
-		// this._legendsCollapser.style.left = this._legendsCollapser.offsetLeft - (Math.floor(287/2)) + 'px';
-		}
-
-
+		// if (this._legendsContainer) {
+		//     Wu.DomUtil.addClass(this._legendsContainer, 'legends-push-left');
+		// }
 			      
-		this._uncollapse.className = 'leaflet-control open-uncollapse leaflet-drag-target';
-
-		// var thus = this;	      
-		// Set class name
-		// setTimeout(function(){					
-		// 	thus._uncollapse.className = 'leaflet-control uncollapser-uncollapsed';
-		// }, 500);
+		// this._uncollapse.className = 'leaflet-control open-uncollapse leaflet-drag-target';		
 		
 	},
 	
 	// (j)
 	openPane : function () {
 
+		this._container.style.display = "block";
+
 		// Show Info box
-		this._content.parentNode.parentNode.style.width = '320px';					
+		// this._content.parentNode.parentNode.style.width = '320px';					
 
 		// Animate opener button
-		this._uncollapse.className = 'leaflet-control uncollapse-killer';
+		// this._uncollapse.className = 'leaflet-control uncollapse-killer';
 			
 		// Slide the LEGENDS
-	   	 if (this._legendsContainer) {
-			Wu.DomUtil.removeClass(this._legendsContainer, 'legends-push-left');
-			// this._legendsCollapser.style.left = this._legendsCollapser.offsetLeft + (Math.floor(287/2)) + 'px';
-		}
+	 //   	 if (this._legendsContainer) {
+		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-push-left');
+		// }
 		// Set class name and remove from DOM
-		var that = this;                        
-		setTimeout(function(){
-			that._content.parentNode.parentNode.removeChild(that._uncollapse);
-			that._uncollapse.className = 'leaflet-control open-uncollapse';
-		}, 500);						
+		// var that = this;                        
+		// setTimeout(function(){
+		// 	that._content.parentNode.parentNode.removeChild(that._uncollapse);
+		// 	that._uncollapse.className = 'leaflet-control open-uncollapse';
+		// }, 500);						
 		
 	},
 	
@@ -9318,6 +9475,9 @@ L.control.description = function (options) {
 
 	closeLegends : function () {
 
+		// console.log('this', this);
+		// this._container.style.width = '150px';
+
 		this._legendsInner.style.width = this._legendsInner.offsetWidth + 'px';
 
 		var _1stchild = this._legendsInner.getElementsByTagName('div')[0];		// refactor ?
@@ -9336,26 +9496,29 @@ L.control.description = function (options) {
 		this._legendsScrollRight.style.display = 'none';
 
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.bottom = '6px';   // refactor?               
+		// Wu.app.MapPane._container.children[1].children[1].style.bottom = '6px';   // refactor?               
 	
 	},
 
 	openLegends : function (e) {
 
 
+		// this._container.style.width = '320px';
+
 		// Hide the little arrow button         
 		this._legendsOpener.className = '';
 		this._legendsOpener.style.opacity = '0';
 
 		// Find out the width of the container
-		var fatherwidth = this._legendsContainer.offsetWidth - 287 - 335; // The numbers are the width of the layer and info menus
-		var hasleft = Wu.DomUtil.hasClass(this._legendsContainer, 'legends-push-left');
-		var hasright = Wu.DomUtil.hasClass(this._legendsContainer, 'legends-push-right');
-		if ( hasleft ) { fatherwidth += 287; }
-		if ( hasright ) { fatherwidth += 335 - 10; }
+		// var fatherwidth = this._legendsContainer.offsetWidth - 287 - 335; // The numbers are the width of the layer and info menus
+		// var hasleft = Wu.DomUtil.hasClass(this._legendsContainer, 'legends-push-left');
+		// var hasright = Wu.DomUtil.hasClass(this._legendsContainer, 'legends-push-right');
+		// if ( hasleft ) { fatherwidth += 287; }
+		// if ( hasright ) { fatherwidth += 335 - 10; }
 
 		// Set the width of the Legends
-		this._legendsInner.style.width = fatherwidth + 'px';  
+		// this._legendsInner.style.width = fatherwidth + 'px';  
+		this._legendsInner.style.width = '295px';  
 
 		// Hacky packy - Pick up the height of the legends from before we collapsed it, 
 		// which is stored in the collapse button as a 'sh' attribute
@@ -9363,7 +9526,7 @@ L.control.description = function (options) {
 		
 
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.bottom = '133px';  // refactor?                 
+		// Wu.app.MapPane._container.children[1].children[1].style.bottom = '133px';  // refactor?                 
 
 
 		var that = this; // this is different context inside setTimeout
@@ -9874,7 +10037,6 @@ L.control.baselayerToggle = function (options) {
 		// refresh project and sidepane
 		this._refresh();
 		this.refreshSidepane();
-
 	},
 
 
@@ -9919,6 +10081,9 @@ L.control.baselayerToggle = function (options) {
 	_save : function (string) {
 		console.log('saving...');                                       // TODO: pgp
 		Wu.save('/api/project/update', string);                         // TODO: save only if actual changes! saving too much already
+	
+		// set status
+		app.setStatus('Saved!');
 	},
 
 	_saveNew : function (context) {
@@ -10095,6 +10260,21 @@ L.control.baselayerToggle = function (options) {
 		return this.store.controls;
 	},
 
+
+	setFile : function (file) {
+		console.log('setFile: ', file);
+
+		// add to local store
+		this.store.files.push(file);
+
+		// create layer if geojson
+		
+		
+
+		// save to server (if necessary)
+		this._update('files');
+
+	},
 
 	setLogo : function (path) {
 		this.store.logo = path;
@@ -10861,8 +11041,6 @@ L.control.baselayerToggle = function (options) {
 
 	// save updates to layer (like description)
 	save : function (field) {
-		console.log('Layer.save()', field);
-
 		var json = {};
 		json[field] = this.store[field];
 		json.layer  = this.store.uuid;
@@ -10931,6 +11109,9 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		// do nothing if already loaded
 		if (this.loaded) return; 
 
+		// set status
+		app.setStatus('Loading...');
+
 		// get geojson from server
 		var data = { 'uuid' : this.store.data.geojson }
 		var json = JSON.stringify(data);
@@ -10967,8 +11148,11 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 	dataLoaded : function (that, json) {
 	
 		// parse json into geojson object
-		that.data = JSON.parse(json);
+		try { that.data = JSON.parse(json); }
+		catch (e) { return console.log('error!', json)}
 		
+		console.log('got data: ', that.data);
+
 		// return if error
 		if (that.data.error) return console.log(that.data.error);
 
@@ -10980,6 +11164,9 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		// set opacity
 		that.setOpacity()
+
+		// set status
+		app.setStatus('Loaded!');
 
 	},
 
@@ -14841,6 +15028,9 @@ Wu.App = Wu.Class.extend({
 	options : {
 		id : 'app',
 
+		portalName : 'systemapic',	// plugged in
+		portalLogo : false,		// not plugged in.. using sprites atm..
+
 		// sidepane
 		panes : {
 			// plugged in and working! :)
@@ -14848,20 +15038,14 @@ Wu.App = Wu.Class.extend({
 			mapOptions 	: true,
 			documents 	: true,               	
 			dataLibrary 	: true,               	
-			mediaLibrary    : true,
+			mediaLibrary    : false,
 			users 		: true,
 		},	
-
-		headerPane : true,
-
 		
 		// not plugged in
 		chat : true,
 		colorTheme : true,
 		screenshot : true,
-
-		// plugged in
-		statusPane : true,
 
 		providers : {
 			// default accounts, added to all new (and old?) projects
@@ -15064,20 +15248,6 @@ Wu.App = Wu.Class.extend({
 	},
 
 
-
-
-	// _hasClient : function (slug) {
-
-	// 	// find client slug in Wu.app.Clients
-	// 	var slug = slug || window.hotlink.client;
-	// 	for (c in Wu.app.Clients) {
-	// 		var client = Wu.app.Clients[c];
-	// 		if (slug == client.slug) return client; 
-			
-	// 	}
-	// 	return false;
-	// },
-
 	// check if project exists (for hotlink)
 	_projectExists : function (projectSlug, clientSlug) {
 
@@ -15090,6 +15260,16 @@ Wu.App = Wu.Class.extend({
 			}
 		}
 		return false;
+	},
+
+	// get name provided for portal from options hash 
+	getPortalName : function () {
+		return this.options.portalName;
+	},
+
+	// shorthand for setting status bar
+	setStatus : function (status, timer) {
+		app.SidePane.Home.setStatus(status, timer);
 	}
 
 });

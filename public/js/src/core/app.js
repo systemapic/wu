@@ -1,5 +1,6 @@
 Wu.version = '0.2-dev';
 Wu.App = Wu.Class.extend({
+	_ : 'app',
 
 	// default options
 	options : {
@@ -146,6 +147,12 @@ Wu.App = Wu.Class.extend({
 
 	_initPanes : function () {
 
+		// render status pane
+		// add home button
+		this.StatusPane = new Wu.StatusPane({
+			addTo: this._appPane
+		});
+
 		// render side pane 
 		this.SidePane = new Wu.SidePane();	// todo: add settings more locally? Wu.SidePane({options})
 
@@ -246,7 +253,7 @@ Wu.App = Wu.Class.extend({
 
 	// shorthand for setting status bar
 	setStatus : function (status, timer) {
-		app.SidePane.Home.setStatus(status, timer);
+		app.StatusPane.setStatus(status, timer);
 	}
 
 });

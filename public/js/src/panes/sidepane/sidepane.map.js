@@ -1,4 +1,5 @@
 Wu.SidePane.Map = Wu.SidePane.Item.extend({
+	_ : 'sidepane.map', 
 
 	type : 'map',
 
@@ -11,11 +12,12 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 
 		// content to template
 		this._container.innerHTML = ich.editorMapBaseLayer();
+		this._settingsContainer = Wu.DomUtil.get('mapsettings-container');
 
 		// set panes
 		this._panes = {};
 
-		this._panes.projectTitle = Wu.DomUtil.get('h4-map-configuration-project-name');
+		// this._panes.projectTitle = Wu.DomUtil.get('h4-map-configuration-project-name');
 
 		// init each setting
 		this.mapSettings = {};
@@ -24,7 +26,7 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		this.mapSettings.bounds    = new Wu.SidePane.Map.Bounds();
 		this.mapSettings.position  = new Wu.SidePane.Map.Position();
 		this.mapSettings.controls  = new Wu.SidePane.Map.Controls();
-		this.mapSettings.connect   = new Wu.SidePane.Map.Connect(this._container);  // refactor container, ich.template
+		this.mapSettings.connect   = new Wu.SidePane.Map.Connect(this._settingsContainer);  // refactor container, ich.template
 
 	},
 
@@ -66,7 +68,7 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		}
 
 		// update project name
-		this._panes.projectTitle.innerHTML = this.project.getName();
+		// this._panes.projectTitle.innerHTML = this.project.getName();
 
 	},
 

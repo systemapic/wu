@@ -14,9 +14,7 @@ label {
 	}
 
 h3, h4 {
-	/*color: white;*/
-	color: black;
-	cursor: default;
+	color: white;
 	}	
 	
 h5 {
@@ -41,11 +39,8 @@ h5 {
 	margin-top: 0px;
 	margin-bottom: 15px;
 	opacity: 1;
-	/*font-size: 22px;*/
-	/*font-weight: $lean;*/
-
-	font-size: 18px;
-	font-weight: 200;
+	font-size: 22px;
+	font-weight: $lean;
 	}
 	
 	
@@ -59,13 +54,11 @@ thead tr, thead tr th {
 	}	
 
 tr:nth-child(odd) {
-	/*background-color: $translight;*/
-	background-color: rgba(0, 0, 0, 0.15);
+	background-color: $translight;
 	}
 
 tr:nth-child(even) {
-	/*background-color: $translighter;*/
-	background-color: rgba(0, 0, 0, 0.075);
+	background-color: $translighter;
 	}
 
 tr.new {
@@ -115,11 +108,7 @@ a {
 	
 .active a,										// Link Color
 .editor-wrapper a {
-	/*color: rgb(0,255,255) !important;*/
-
-	color: cadetblue !important;
-	font-weight: 900 !important;
-	text-shadow: -1px 1px 1px rgba(255,255,255,0.3);
+	color: rgb(0,255,255) !important;
 	}	
 		
 	
@@ -176,7 +165,6 @@ a {
 	width: 171px;
 	text-align: left;
 	position: relative;
-	box-shadow: 0 0 3px 0 rgba(0,0,0,0.4) inset;
 	}		
 	
 
@@ -207,17 +195,8 @@ a {
 	cursor: pointer;
 	padding-left: 20px;
 	padding-right: 20px;
-	/*background-color: $translight;*/
-	/*width: 280px;*/
-
-	background-color: rgba(55, 55, 75, 0.15);
-	width: 230px;	
-	}	
-
-.editor-inner-wrapper:hover {
-	/*background-color: rgba(255, 255, 255, 0.05);*/
-
-	background-color: rgba(55, 55, 75, 0.25);
+	background-color: $translight;
+	width: 280px;
 	}	
 	
 .editor-inner-wrapper h5 {						// Client : New Client title
@@ -232,12 +211,10 @@ a {
 
 .editor-inner-wrapper input, 					// Input fields in gray wrapper
 .input-box {
-	/*background: rgba(0,0,0,0.3);*/
+	background: rgba(0,0,0,0.3);
 	padding: 7px;
 	color: white;	
 	font-weight: $lean;
-
-	background: rgba(0, 0, 0, 0.7);
 	}
 
 .input-box {									// Input fields in "Connect to MapBox" and "Upload Layers"
@@ -270,22 +247,17 @@ a {
 		
 .smap-button-gray {								// Button : standard GRAY button
 	height: 33px;
-	/*color: gainsboro;*/
+	color: gainsboro;
 	font-size: 17px;
 	line-height: 1.5;
-	/*background: $translight;*/
+	background: $translight;
 	padding: 5px 10px 5px 10px;
 	text-align: center;
-	/*font-weight: $lean;*/
+	font-weight: $lean;
 	cursor: pointer;
 	font-family: $font;
 	display: inline-block;
 	vertical-align: top;
-
-	background: rgba(0, 0, 0, 0.45);
-	color: white;
-	font-weight: 400;
-	box-shadow: -1px 1px 2px 0 rgba(0,0,0,0.3);	
 	}	
 
 .smap-button-gray:hover {						// ditto
@@ -294,7 +266,7 @@ a {
 
 .smap-button-white {							// Button : standard WHITE button
 	height: 32px;
-	/*color: #666;*/
+	color: #666;
 	text-align: center;
 	margin: 0;
 	margin-bottom: 10px;
@@ -310,19 +282,11 @@ a {
 	display: inline-block;
 	vertical-align: top;
 	
-	/*background: #EAEAEA;*/
-
-	background: rgba(255,255,255,0.75);
-	box-shadow: 0 0 2px 0 rgba(0,0,0,0.7) inset;
-
-	color: #666;
-
+	background: #EAEAEA;
 	}
 	
 .smap-button-white:hover {
-	/*background: white;*/
 	background: white;
-	color: #333;
 	}
 	
 .smap-button-white.small {						// Button : standard WHITE button smaller
@@ -341,7 +305,7 @@ a {
 	height: 32px;
 	margin-bottom: 10px;
 	color: rgba(255,255,255,1);
-	/*background: rgba(0,0,0,0.3);*/
+	background: rgba(0,0,0,0.3);
 	cursor: pointer;
 	border: 0px;
 	line-height: 1;
@@ -354,20 +318,7 @@ a {
 	width: 100%;
 	padding: 0px;
 	opacity: .7;
-
-	background: rgba(0, 0, 0, 0.70);
-
-	-webkit-transition: height 150ms ease;
-	-moz-transition: height 150ms ease;
-	-o-transition: height 150ms ease;
-	transition: height 150ms ease;	
 	}
-
-.item-list-header {
-	margin-top: 10px;
-	margin-bottom: 3px;
-	}
-
 	
 .item-list div,
 .layers-mapbox-item,
@@ -376,27 +327,15 @@ a {
 }	
 	
 .item-list:hover {
-	/*opacity: 1;*/
-	opacity: 0.8;
+	opacity: 1;
 }	
 	
-.item-list, .layer-item, .layers-mapbox-item {
-	color: #333;
-	background: rgba(255,255,255,0.75);
-	box-shadow: -1px 1px 2px -1px rgba(0, 0, 0, 0.6) inset, 1px -1px 2px -1px white inset;
-	}
-
 .item-list.active,
 .layer-item.active,
 .active .layers-mapbox-item {								// List Buttons : Active State
-	/*background-color: white;*/
-	/*color: rgba(0,0,0,0.7);*/
-	/*font-weight: $median;*/
-
-	background-color: black;
-	color: white;
-	font-weight: 400;	
-	opacity: 0.8;	
+	background-color: white;
+	color: rgba(0,0,0,0.7);
+	font-weight: $median;
 	}
 
 
@@ -452,9 +391,8 @@ body {
 	position: absolute;
 	width: 100%;
 	height: 100%;
+	left: 400px;
 	height: 100%;
-	left: 0px;
-	-webkit-transition: -webkit-filter 250ms linear, opacity 250ms linear !important;
 	}
 
 #map:after {
@@ -469,16 +407,12 @@ body {
 	top: 280px;
 	text-align: center;
 	display: block;
-	/*padding-right: 400px;*/
+	padding-right: 400px;
 	font-size: 42px;
 	color: #666;
 	font-weight: $lean;
-	content: 'Select a project';
-	padding-right: 0px;
-
 	}
 	
-
 #map:before {
 	content: '';
 	background-image: url('systemapic_BG.jpg');
@@ -499,19 +433,13 @@ body {
 	
 #header {								// The Header
 	position: absolute;
-	/*top: 0px;*/
-	/*left: 400px;*/
+	top: 0px;
+	left: 400px;
 	height: 120px;
-	/*width: 100%;*/
+	width: 100%;
 	background: rgba(255,255,255,0.93);
 	z-index: 10;
-	/*box-shadow: 0px 0px 5px black;*/
-
-	top: 5px;
-	left: 104px !important;
-	width: 300px;
-	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
-
+	box-shadow: 0px 0px 5px black;
 	}
 
 #headerResizer { 						// The Header
@@ -528,7 +456,6 @@ body {
 
 #header .header-logo {					// The Header
 	position: relative;
-	z-index: 1000;
 	/*height: 120px;*/
 	/*max-width: 200px;*/
 	color: white;	
@@ -547,8 +474,7 @@ body {
 .header-title {							// The Header
 	border: 0px;
 	background: transparent;
-	/*font-size: 40px;*/
-	font-size: 30px;
+	font-size: 40px;
 	font-weight: $lean;
 	}
 
@@ -569,8 +495,7 @@ body {
 	background: transparent;
 	display: block;
 	position: relative;
-	/*top: -8px;*/
-	top: 0;
+	top: -8px;
 	font-style: italic;
 	color: #666;
 	font-size: 16px;
@@ -595,49 +520,27 @@ body {
 	
 .q-editor-container {
 	position: absolute;
-	/*height: 100%;*/
-	/*width: 400px;*/
-	/*background-color: rgba(62,70,82,0.98);*/
+	height: 100%;
+	width: 400px;
+	/*background-color: $ecolor2;*/
+	background-color: rgba(62,70,82,0.98);
 	overflow: hidden;
 	z-index: 2000;	
-	/*box-shadow: 1px 0 0 0 rgba(0,0,0,0.2), 0 0 5px rgba(0,0,0,0.4);*/
-	-webkit-transition: height 250ms ease;
-	width: 95px;
-
-
-	background-color: rgba(255,255,255,0.0);
-	box-shadow: none;
-	top: 3px;
-	left: 4px;
-	padding-top: 2px;
-	height: 80px;
+	box-shadow: 1px 0 0 0 rgba(0,0,0,0.2), 0 0 5px rgba(0,0,0,0.4);
 	}
 
 .disabled {
 	opacity: 0.1;
-	height: 0px !important;
-	}	
-
-.disabled a {
-	opacity: 0;
 	}	
 	
-/*// ColorThemes */
+// ColorThemes .ct0
 .q-editor-menu {
-	/*width: 100px;*/
-	/*height: 100%;*/
-	/*background-color: $ecolor1;*/
+	width: 100px;
+	height: 100%;
+	background-color: $ecolor1;
 	margin: 0;
 	padding: 0;
 	position: absolute;
-
-	box-shadow: 0 0px 5px 0 #333;
-	margin-top: 7px;
-	height: auto;
-	left: 2px;
-	width: 90px;	
-	/*background-color: rgba(0, 0, 0, 0);*/
-	background-color: rgba(255, 255, 255, 0.95);
 	}
 
 .q-editor-menu-item {
@@ -653,7 +556,7 @@ body {
 	font-size: 90%;
 	text-transform: uppercase;
 	font-weight: $fat;
-	/*color: white;*/
+	color: white;
 	bottom: 0px;
 	position: absolute;
 	left: 0px;
@@ -661,13 +564,12 @@ body {
 	height: 100%;
 	line-height: 5;
 	text-decoration: none;
-	color: #666;
 	}
 
 .q-editor-content-item {
 	position: absolute;
-	/*width: 300px;*/
-	/*height: 100%;*/
+	width: 300px;
+	height: 100%;
 	left: 100px;
 	display: none;
 	padding: 10px;
@@ -675,42 +577,27 @@ body {
 	overflow-x: hidden;
 	opacity: 1;
 	top: 0;
-	/*margin-top: 10px;*/
-
-	background-color: rgba(255,255,255,0.90);
-	margin-top: 20px;
-	box-shadow: 0 0 5px 0 black;
-	height: auto;
-	margin-left: 0px;
-	margin-right: 20px;
-	width: 250px;
-	margin-top: 86px;
-	max-height: 70%;	
+	margin-top: 10px;
 	}
 
 // ColorThemes .ct1
 .editor-wrapper { 						// The inner Wrapper of the .q-editor-content-item
-	/*color: white;*/
-	/*width: 310px;*/
+	color: white;
+	width: 310px;
 	height: 100%;
 	overflow-y: scroll;
 	/*padding-right: 16px;*/
-	/*padding-right: 30px;*/
+	padding-right: 30px;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0px;
-
-	color: black;
-	width: 260px;
-	padding-right: 30px;	
 	}
 
 .editor-wrapper h3 {					// q-editor main title
 	text-align: center;
 	font-weight: $lean;
-	/*font-size: 320%;*/
+	font-size: 320%;
 	margin-top: 0;
-	font-size: 220%;
 	}
 
 .swipe_out_up {							// q-editor movers and shakers
@@ -726,43 +613,13 @@ body {
 */	}	
 
 #menuslider {							// The background slider
-	/*width: 100px;*/
+	width: 100px;
 	height: 70px;
-	/*background-color: $ecolor2;*/
+	background-color: $ecolor2;
 	top: 0px;
 	position: absolute;	
-	/*border-right: 1px dashed rgba(120, 120, 120, 0.3);*/
-
-
-	width: 90px;
-	background-color: rgba(0, 0, 0, 0.15);
-	/*border-right: none;	*/
+	border-right: 1px dashed rgba(120, 120, 120, 0.3);
 	}
-
-#menuslider-arrow {
-	border: 0px solid red;
-	position: absolute;
-	right: -9px;
-	width: 9px;
-	height: 72px;
-	overflow: hidden;
-}
-
-#menuslider-arrow:before { 
-	content: '';
-	position: absolute;
-	height: 30px;
-	width: 30px;
-	top: 21px;
-	background-color: rgba(210,210,210,1);
-	-webkit-transform: rotate(45deg);
-	left: -29px;
-	box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
-	z-index: 999;
-	}
-
-
-
 
 #menucloser {							// The menu pane closer
 	position: absolute;
@@ -824,11 +681,6 @@ body {
 .editor-clients-container:hover > .jbutton {	// ditto
 	opacity: 1 !important;
 	}	
-
-.editor-clients-container:hover > .client-kill {
-	display: block;
-	}
-	
 	
 // --- New Client
 	
@@ -869,33 +721,20 @@ body {
 	
 .editor-clients {
 	position: relative;
-	padding-bottom: 48px;
 }
 
 
 .client-title {
 	padding: 5px;
-	/*font-size: 22px;*/
+	font-size: 22px;
 	text-transform: uppercase;
-	/*font-weight: $lean;*/
-
-	font-size: 17px;
-	font-weight: 400;
-	color: #333;	
+	font-weight: $lean;
 	}
 
 .client-logo {
 	position: absolute;
-	/*top: 10px;*/
-	/*right: 10px;	*/
-
-	/*width: 100px;*/
-	/*height: 60px;*/
-
-	width: 70px;
-	height: 50px;	
-	top: 5px;
-	right: 5px;	
+	top: 10px;
+	right: 10px;	
 	}	
 
 .editor-clients-container {					/* // Clients : inner wrapper */
@@ -911,7 +750,7 @@ body {
 	*/
 
 	/*background-color: rgba(98,103,113,0.3);*/
-	/*background-color: rgba(255, 255, 255, 0.15);*/
+	background-color: rgba(255, 255, 255, 0.15);
 
 	padding: 4px 6px 4px 6px;
 	margin: 0px 0px 1px 0px;
@@ -921,15 +760,10 @@ body {
 	overflow: hidden;
 	-webkit-transition: height 300ms ease;
 	/*box-shadow: 0 0 0 1px #626771 inset;*/
-
-	background-color: rgba(55, 55, 75, 0.15);
-	width: 230px !important;	
-	/*width: 280px;*/
 	}
 
 .editor-clients-container:hover {
-	/*background-color: rgba(255, 255, 255, 0.05)*/
-	background-color: rgba(55, 55, 75, 0.09);
+	background-color: rgba(255, 255, 255, 0.05)
 	}	
 
 
@@ -953,21 +787,16 @@ body {
 	background-position: center;
 	top: 4px;*/
 
-	/*width: 75px;*/
-	/*height: 46px;*/
+	width: 75px;
+	height: 46px;
 	position: absolute;
-	/*right: 4px;*/
+	right: 4px;
 	background-repeat: no-repeat;
 	background-size: 100% 100%;
 	background-position: center;
-	/*top: 4px;*/
+	top: 4px;
 	background-color: white;
 	box-shadow: 0 0 2px 0px rgba(0,0,0,0.5);	
-
-	width: 69px;
-	height: 48px;
-	right: 9px;
-	top: 7px;
 	}
 
 .project-item {
@@ -985,20 +814,12 @@ body {
 	margin-bottom: 5px;
 	/*height: 55px;*/
 	position: relative;
-	/*color: white;	*/
-
-	color: #333;
-	height: 111px;
+	color: white;	
 	}
 
 .project-item:hover {
-	/*background: rgba(0, 0, 0, 0.3);*/
-	background: rgba(0, 0, 0, 0.25);
+	background: rgba(0, 0, 0, 0.3);
 	}	
-
-.project-item:hover > .project-kill {
-	display: block;
-}
 
 .project-logo-wrap img {
 	height: 100%;
@@ -1008,14 +829,6 @@ body {
 	position: absolute;
 	left: 10px;
 	top: 10px;
-
-	font-size: 110%;
-	text-shadow: none;
-	font-weight: 500;
-	text-transform: uppercase;
-
-	/*font-size: 120%;*/
-	/*text-shadow: -1px 1px rgba(0,0,0,0.35);	*/
 	}
 
 
@@ -1074,13 +887,13 @@ body {
 #new-client-button {
 	height: 42px;
 	width: 42px;
-	/*color: rgba(255,255,255,0.4);*/
+	color: rgba(255,255,255,0.4);
 	margin: 0;
 	margin-bottom: 10px;
 	padding: 2px 12px 2px 5px;
 	border: 0px;
 	border-radius: 0;
-	/*line-height: 0.55;*/
+	line-height: 0.55;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
 	font-size: 383%;
 	font-weight: $lean;
@@ -1088,15 +901,9 @@ body {
 	position: absolute;
 	display: inline-block;
 	/*background: rgba(255, 255, 255, 0.15);*/
-	/*background-color: #616671;*/
-	/*right: 0px;*/
-	/*bottom: -56px;*/
-
-	bottom: -10px;
+	background-color: #616671;
 	right: 0px;
-	color: #666;
-	line-height: 0.5;
-	background: white;	
+	bottom: -56px;
 	}	
 
 #new-client-button:hover {
@@ -1276,20 +1083,14 @@ body {
 	width: 225px;
 	}
 
-#editor-map-bounds {
-	width: 147px !important;
-	/*width: 198px !important;*/
-}
 // ------	
 	
 				
 .editor-map-item-wrap {					// Map : inner wrapper
 	padding: 10px;
-	/*min-height: 80px;*/
+	min-height: 80px;
 	margin-bottom: 1px;
 	margin-top: 1px;
-
-	min-height: 40px;
 	}	
 	
 .editor-map-item-wrap:last-child {		// Map : "Map Controls" wrapper
@@ -1407,14 +1208,11 @@ body {
 	content: '';
 	position: absolute;
 	top: -20px;
-	/*left: -30px;*/
+	left: -30px;
 	background-color: rgba(255, 255, 255, 0.93);
-	/*width: 320px;*/
+	width: 320px;
 	height: 72px;
 	z-index: -2;
-
-	width: 280px;
-	left: -10px;	
 	}	
 
 	
@@ -1452,15 +1250,11 @@ body {
 	position: relative;
 	color: white;
 	margin: 0;
-	/*padding: 16px;	*/
-	/*padding-top: 10px;*/
-	/*padding-top: 4px;*/
+	padding: 16px;	
+	padding-top: 10px;
+	padding-top: 4px;
 	height: 55px;
-
-	padding: 10px;
-	padding-top: 15px;	
-	/*padding-top: 0px;*/
-	}
+	}	
 	
 #import-mapbox-layers {						// MapBox : connect input field
 	background: rgba(0,0,0,0.3);
@@ -1476,15 +1270,13 @@ body {
 	background: #DADADA;
 	color: #666;	
 	height: 33px;
-	/*width: 75px;*/
+	width: 75px;
 	border-radius: 0;
 	padding: 0;
 	vertical-align: top;
 	margin: 0px;
 	padding-top: 5px;
 	font-size: 110%;
-
-	width: 185px;
 	}		
 	
 // ColorTheme Colors : NOT INTEGRATED
@@ -1530,8 +1322,7 @@ body {
 	}	
 
 .mapbox-list-item:first-child {
-	/*margin-top: 12px;	*/
-	margin-top: 0px;
+	margin-top: 12px;	
 	}
 	
 .layers-mapbox-name {						// MapBox : Account name (ie. 'rawger')
@@ -1550,10 +1341,8 @@ body {
 // ********* Q-EDITOR : DOCUMENTS & DATA LIBRARY *********
 
 .fullpage-documents .editor-wrapper,
-.data-library .editor-wrapper,
-.fullpage-users .editor-wrapper {
+.data-library .editor-wrapper { 
 	width: auto;
-	background-color: rgba(255,255,255,0.9);
 	}
 
 
@@ -1580,13 +1369,9 @@ body {
 	font-weight: $lean;
 	margin: 10px;
 	font-family: $font;
-	/*position: absolute;*/
-	/*width: 300px;*/
-	width: 250px;
-	/*top: 36px;*/
-
-	top: 0px;
-	position: relative;	
+	position: absolute;
+	width: 300px;
+	top: 36px;
 	}
 
 #documents-container-rightpane {			// Documents : right wrapper
@@ -1595,21 +1380,16 @@ body {
 	padding: 20px;
 	font-family: $font;
 	position: absolute;
-	/*left: 300px;*/
+	left: 300px;
 	height: 100%;
-	/*color: gainsboro;*/
+	color: gainsboro;
 	font-size: 20px;
 	overflow-y: auto;
 	overflow-x: hidden;
 	width: 100%;
 	padding-right: 440px;
 	-webkit-box-sizing: border-box;
-	/*top: 45px;*/
-
-	top: 100px;
-	left: 250px;
-	color: #333;
-	padding-top: 0;	
+	top: 45px;
 	}
 
 #documents-folder-list {					// Documents : folder list
@@ -1620,111 +1400,24 @@ body {
 #documents-new-folder {
 	background: none;
 	border: none;
-	/*font-weight: $lean;*/
-	/*font-size: 150%;*/
-	/*width: 75%;*/
+	font-weight: $lean;
+	font-size: 150%;
+	width: 75%;
 	margin: 4px;
 	margin-left: 30px;
 	font-family: $font;
-	/*color: gainsboro;	*/
-	cursor: pointer;
-
-	width: 90%;
-	line-height: 1.2;
-	margin-bottom: 10px;
-	font-weight: 500;
-	font-size: 115%;
-	padding-left: 10px;	
-	}
-
-.documents-folder-delete,
-.documents-folder-item, 
-#documents-new-folder {
-	color: #333;
-	padding-right: 0px;
+	color: gainsboro;	
+	cursor: pointer;	
 	}
 
 #documents-new-folder:hover,				// ditto
 .documents-folder-item:hover {
-	/*color: white;*/
-	color: #000;
-	}
-
-
-
-
-
-
-.documents-folder-delete {
-	float: left;
-	/*font-weight: $lean;*/
-	font-size: 150%;
-	font-family: helvetica neue;
-	/*margin-top: 4px;*/
-	/*padding-left: 10px;*/
-	/*width: 33px;*/
-	visibility: hidden;
-	color: #C8C8C8;
-	cursor: pointer;
-
-	position: absolute;
-	line-height: 0.4;
-	left: -2px;
-	background: rgba(0,0,0,0.2);
-	height: 18px;
-	width: 10px;
-	text-align: center;
-	padding-right: 13px;
-	padding-left: 4px;
-	margin: 0;
-	padding-top: 3px;
-	border-radius: 2px;
-	font-size: 19px;
-	font-weight: 900;
 	color: white;
-	text-shadow: -1px 1px 1px rgba(0,0,0,0.3);
-	margin-top: 1px;	
-}
-
-.documents-folder-delete:hover {
-	color: white;
-	background: #C80000;
-}
-
-.documents-folder-item {
-	margin-left: 10px;
-}
-
-.editor-map-item-wrap:last-child {
-	margin-top: 1px;
-}
-
-.tdcont {
-	cursor: pointer;
-}
-
-.tdcont.email {
-	cursor: default;
-}
-
-
-
-#documents-new-folder {
-	margin-left: 10px;
 	}
-
-
-
-
-
-
-
 
 .text-menu .options {						// Documents : tooltip
 	padding-top: 1px !important;
-	/*width: 215px !important;*/
-
-	width: 245px !important;
+	width: 215px !important;
 	}
 
 .text-menu.options.url-mode .file {			// Documents : tooltip
@@ -1779,10 +1472,9 @@ body {
 .users-controls {							// Users : controls wrapper
 	height: 42px;
 	position: relative;
-	/*color: white;*/
+	color: white;
 	border-bottom: 1px solid;
 	margin-bottom: 20px;
-	color: #666;
 	}
 		
 	
@@ -1895,7 +1587,7 @@ body {
 	}
 	
 .tdcont {									// Data library : table cell 
-	/*color: gainsboro;*/
+	color: gainsboro;
 	opacity: 0.7;
 	font-size: 14px;
 	font-weight: $lean;
@@ -1904,7 +1596,6 @@ body {
 	padding-top: 10px;
 	border-left: 1px dashed rgba(255,255,255,0.05);
 	padding-left: 9px;
-	color: #333;
 	}
 	
 .tdcont:hover {								// ditto
@@ -1916,20 +1607,16 @@ body {
 	}
 	
 .dln {										// Data library : Main name (in table)
-	/*font-weight: $lean;*/
+	font-weight: $lean;
 	margin-left: 30px;
 	font-family: $font;
-	/*color: white;*/
+	color: white;
 	background: none;
 	border: none;
 	font-size : 130%;
 	margin: 0px 10px 0px 0px;
 	padding-bottom: 0;
 	width: 100%;
-
-	font-weight: 400;
-	color: #333;
-
 	}
 
 .smallerText {								// Data library : First name
@@ -1939,8 +1626,7 @@ body {
 	}
 
 .dln:hover {								// ditto
-	/*color: gainsboro;*/
-	color: black;
+	color: gainsboro;
 	}
 
 .dld {										// Data library : file description
@@ -2092,8 +1778,7 @@ body {
 // ********* Q-EDITOR : USERS *********	
 		
 .q-editor-menu-item .users {				// Users : in left menu, white line on top
-	/*border-top: 1px solid white;*/
-	border-top: 1px solid #333;
+	border-top: 1px solid white;
 	}
 	
 .fullpage-users {							// Users : outer wrapper
@@ -2489,7 +2174,6 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 	padding-bottom: 0 !important;
 	top: -8px !important;
 	padding-top: 15px !important;
-
 }
 
 .no-inspector #open-layers {
