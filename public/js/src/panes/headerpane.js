@@ -24,7 +24,7 @@ Wu.HeaderPane = Wu.Class.extend({
 		this._titleWrap = Wu.DomUtil.create('div', 'header-title-wrap', this._container);
 		this._title 	= Wu.DomUtil.create('div', 'header-title editable', this._titleWrap);
 		this._subtitle 	= Wu.DomUtil.create('div', 'header-subtitle editable', this._titleWrap);
-		this._resizer 	= Wu.DomUtil.createId('div', 'headerResizer', this._container);
+		// this._resizer 	= Wu.DomUtil.createId('div', 'headerResizer ', this._container);
 
 		// set
 		this._title.whichTitle = 'title';
@@ -40,7 +40,7 @@ Wu.HeaderPane = Wu.Class.extend({
 	addEditHooks : function () {
 
 		// resizer
-		this.enableResize();
+		// this.enableResize();
 
 		// remove title hooks
 		Wu.DomEvent.on(this._title,    'dblclick', this._enableEdit, this);
@@ -61,7 +61,7 @@ Wu.HeaderPane = Wu.Class.extend({
 	removeEditHooks : function () {
 
 		// resizer
-		this.disableResize();
+		// this.disableResize();
 
 		// remove title hooks
 		Wu.DomEvent.off(this._title,    'dblclick', this._enableEdit, this);
@@ -106,24 +106,27 @@ Wu.HeaderPane = Wu.Class.extend({
 	},
 
 	disableResize : function () {
-		// resizer
-		Wu.DomEvent.off(this._resizer, 'mousedown', this.resize, this);
-		Wu.DomEvent.off(this._resizer, 'mouseup', this._resized, this);
+		return;
 
-		// set default cursor
-		Wu.DomUtil.addClass(this._resizer, 'headerResizerDisabled');
+		// // resizer
+		// Wu.DomEvent.off(this._resizer, 'mousedown', this.resize, this);
+		// Wu.DomEvent.off(this._resizer, 'mouseup', this._resized, this);
+
+		// // set default cursor
+		// Wu.DomUtil.addClass(this._resizer, 'headerResizerDisabled');
 	},
 
 	enableResize : function () {
-
-		if (!this.project.editMode) return;
+		return;
 		
-		// resizer
-		Wu.DomEvent.on(this._resizer, 'mousedown', this.resize, this);
-		Wu.DomEvent.on(this._resizer, 'mouseup', this._resized, this);
+		// if (!this.project.editMode) return;
+		
+		// // resizer
+		// Wu.DomEvent.on(this._resizer, 'mousedown', this.resize, this);
+		// Wu.DomEvent.on(this._resizer, 'mouseup', this._resized, this);
 
-		// set ns cursor
-		Wu.DomUtil.removeClass(this._resizer, 'headerResizerDisabled');
+		// // set ns cursor
+		// Wu.DomUtil.removeClass(this._resizer, 'headerResizerDisabled');
 	},
 
 	

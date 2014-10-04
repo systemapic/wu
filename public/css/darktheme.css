@@ -234,6 +234,9 @@ color: white;
 
 
 
+
+
+
 /*knut candy*/
 .home-status {
 	opacity: 1;
@@ -266,4 +269,7 @@ color: white;
 }
 .q-editor-menu-item a {
 	color: white;
+}
+#menuslider-arrow:before {
+	background-color: rgba(33, 33, 33, 0.75);
 }

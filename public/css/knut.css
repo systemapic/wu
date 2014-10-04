@@ -45,6 +45,7 @@
 	z-index: 999;
 	margin: 6px;
 	left: 0px;
+	overflow: hidden;
 }
 .home-logo {
 	background: none;
@@ -56,7 +57,7 @@
 	background-position: -180px -229px !important;
 }
 .home-status {
-	position: absolute;
+	position: relative;
 	bottom: 0px;
 	width: 100%;
 	height: 0px;
@@ -65,9 +66,13 @@
 	font-weight: 500;
 	font-size: 110%;
 	cursor: pointer;
-	height: 27px;
 	color: black;
-	opacity: 0.8;
+	opacity: 0;
+	-webkit-transition: height 250ms ease, opacity 250ms ease;
+	overflow: hidden;}
+.status-in {
+	opacity: 0.9;
+	height: 27px;
 }
 .q-editor-container {
 	height: 0px;
@@ -143,6 +148,8 @@
 .leaflet-bottom.leaflet-right {
 	top: 82px;
 }
-
+#editor-map-bounds {
+	width: 148px !important;
+}
 
 
