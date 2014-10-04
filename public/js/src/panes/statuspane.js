@@ -18,10 +18,10 @@ Wu.StatusPane = Wu.Class.extend({
 	initContainer : function () {
 
 		// create div
-		var container = this._container = Wu.DomUtil.create('div', 'home-container');
-		var logo = this._logo = Wu.DomUtil.create('div', 'home-logo', container);
-		var statusWrap = this._statusWrap = Wu.DomUtil.create('div', 'home-status-wrap', container);
-		var status1 = Wu.DomUtil.create('div', 'home-status', statusWrap);
+		var container 	= this._container 	= Wu.DomUtil.create('div', 'home-container');
+		var logo 	= this._logo 		= Wu.DomUtil.create('div', 'home-logo', container);
+		var statusWrap 	= this._statusWrap 	= Wu.DomUtil.create('div', 'home-status-wrap', container);
+		var status 				= Wu.DomUtil.create('div', 'home-status', statusWrap);
 
 		// set default status
 		this.clearStatus();
@@ -37,6 +37,13 @@ Wu.StatusPane = Wu.Class.extend({
 
 		// global TAB key toggle
 		Wu.DomEvent.on(document, 'keydown', this.tab, this);
+
+		// debug
+		// Wu.DomEvent.on(this._container, 'mousedown', this.debug, this);
+	},
+
+	debug : function (e) {
+		this.setStatus('debug! ;)', 1000);
 	},
 
 	tab : function (e) {
@@ -60,7 +67,6 @@ Wu.StatusPane = Wu.Class.extend({
 		this.isOpen = false;
 		var sidepane = app.SidePane;
 		sidepane.collapse();
-		// sidepane.closePane();
 		this.refresh();
 
 		var __map = Wu.DomUtil.get("map"); // (j)
@@ -125,21 +131,25 @@ Wu.StatusPane = Wu.Class.extend({
 	
 	},
 
-	getStatus : function () {
-		return this._statusWrap.firstChild.innerHTML;
-	},
-
 	pushStatus : function (div) {
 
 		// get old status div, insertBefore
 		var old = this._statusWrap.firstChild;
 		this._statusWrap.insertBefore(div, old);
 		
-		// set height
-		div.style.height = '27px';
+		// wait 50ms for div to enter DOM
+		setTimeout(function () {
 
-		// remove old
-		Wu.DomUtil.remove(old);
+			// add in class
+			Wu.DomUtil.addClass(div, 'status-in');
+
+			// after css effects done (250ms);
+			setTimeout(function () {
+				// remove old
+				Wu.DomUtil.remove(old);
+			}, 250);
+		}, 50);
+		
 		
 	},
 
@@ -153,5 +163,10 @@ Wu.StatusPane = Wu.Class.extend({
 		// set status
 		this.setStatus(portalName);
 	},
+
+	getStatus : function () {
+		return this._statusWrap.firstChild.innerHTML;
+	},
+
 
 })
