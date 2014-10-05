@@ -430,7 +430,8 @@ module.exports = api = {
 		// find project
 		var model = Project.findOne({ uuid : projectUuid });
 		model.exec(function (err, project) {
-			
+			console.log('project is open exec!!')
+
 			// return error
 			if (err) return res.end(JSON.stringify({ error : 'Error retrieving project.' }));
 			
@@ -491,9 +492,11 @@ module.exports = api = {
 	_enqueueProjectUpdate : function (queries, field, req) {
 		queries[field] = function(callback) {	
 			return Project.findOne({ uuid : req.body.uuid }, function (err, project){
+				console.log('project open!');
 				project[field] = req.body[field];
 				project.markModified(field);
 				project.save(function(err) {
+					console.log('project saved!');
 					if (err) console.error(err); // log error
 				});
 				return callback(err);
@@ -2006,44 +2009,86 @@ module.exports = api = {
 	// delete a file
 	deleteFiles : function (req, res) {
 
-		var _fids  = req.body._fids;
-		var puuid  = req.body.puuid;
-		var userid = req.user.uuid;
+		var _fids  = req.body._fids,
+		    puuid  = req.body.puuid,
+		    userid = req.user.uuid,
+		    uuids = req.body.uuids,
+		    ops = [],
+		    _lids = [];
+
+		console.log('API: deleteFiles');
+		console.log('_fids: ', _fids);
+		console.log('puuid: ', puuid);
+		console.log('userid: ', userid);
+		console.log('uuids: ', uuids);
+
+
 
 		// validate
 		if (!_fids || !puuid || !userid) return res.end('missing!');
 
-		var qu = [];
+		var ops = [];
+
+			// find layer _ids for removing in project
+			ops.push(function (callback) {
+
+				Layers.find({file : {$in : uuids}}, function (err, layers) {
+
+					layers.forEach(function (layer) {
+						_lids.push(layer._id);
+					});
+
+					
+					// todo: delete?
+
+					return callback(err);
+			
+				});
+
+			});
 
 			// delete file from project
-			qu.push(function (callback) {
+			ops.push(function (callback) {
 				
-				return Project.findOne({uuid : puuid}, function (err, project) {
+				Project
+				.findOne({uuid : puuid})
+				// .populate('layers')
+				.exec(function (err, project) {
+					if (err) console.log('find err: ', err);
 
+					console.log('found project: ', project.name);
+
+					// pull files
 					_fids.forEach(function (f) {
 						project.files.pull(f);
+					});
+
+					// pull layers
+					_lids.forEach(function (l) {
+						project.layers.pull(l)
 					})
 					
 					project.markModified('files');
+					project.markModified('layers');
+
 					project.save(function (err) {
-						if (err) console.error(err);
+						if (err) console.error('save err: ', err);
 						console.log('file removed from project');
+						return callback(err);
 					});
-
-					return callback(err);
-
 				});
-
-				
 			});
+
+			
+
 
 	
 		// run queries
-		async.parallel(qu, function(err, doc) {
+		async.series(ops, function(err, doc) {
 
 			if (err) {
-				console.log(err);
-				res.end('{ error : 0 }');
+				console.log('asyn err: ', err);
+				return res.end('{ error : 0 }');
 			}		
 
 			console.log('delete done...?', doc);

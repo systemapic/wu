@@ -597,7 +597,7 @@ module.exports = geo = {
 		}
 
 		// async save to db
-		async.parallel(queue, function (err, results) {
+		async.series(queue, function (err, results) {
 
 			console.log('parallel saved to db...');
 			console.log('err: ', err);
@@ -621,6 +621,7 @@ module.exports = geo = {
 		layer.title 		= rec.name;
 		layer.description 	= 'Layer description';
 		layer.legend 		= 'Layer legend';
+		layer.file  		= rec.uuid;		// add connection to file
 
 		// geojson, todo: other formats
 		layer.data.geojson 	= rec.uuid;
@@ -725,6 +726,8 @@ module.exports = geo = {
 
 			//'records' : this.records
 		}
+
+		if (this.doneLayers) response.layers = this.doneLayers;
 
 		console.log('___________________ done with the upload ________________');
 		console.log(response);

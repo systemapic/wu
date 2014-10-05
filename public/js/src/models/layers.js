@@ -48,6 +48,10 @@ Wu.Layer = Wu.Class.extend({
 		return this.store.title;
 	},
 
+	getUuid : function () {
+		return this.store.uuid;
+	},
+
 	hide : function () {
 		var container = this.getContainer();
 		container.style.visibility = 'hidden';

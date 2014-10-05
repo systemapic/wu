@@ -20,7 +20,7 @@ Wu.HeaderPane = Wu.Class.extend({
 		// create divs
 		this._container = Wu.app._headerPane = Wu.DomUtil.createId('div', 'header', Wu.app._mapContainer);
 		this._logoWrap  = Wu.DomUtil.create('div', 'header-logo', this._container);
-		this._logo 	= Wu.DomUtil.create('img', 'header-logo-img', this._logoWrap);
+		// this._logo 	= Wu.DomUtil.create('img', 'header-logo-img', this._logoWrap);
 		this._titleWrap = Wu.DomUtil.create('div', 'header-title-wrap', this._container);
 		this._title 	= Wu.DomUtil.create('div', 'header-title editable', this._titleWrap);
 		this._subtitle 	= Wu.DomUtil.create('div', 'header-subtitle editable', this._titleWrap);
@@ -77,7 +77,7 @@ Wu.HeaderPane = Wu.Class.extend({
 	addDropzone : function () {
 
 		// create dz
-		this.logodz = new Dropzone(this._logo, {
+		this.logodz = new Dropzone(this._logoWrap, {
 				url : '/api/upload/image',
 				createImageThumbnails : false,
 				autoDiscover : false
@@ -101,7 +101,7 @@ Wu.HeaderPane = Wu.Class.extend({
 		this.project.setHeaderLogo(fullpath);
 
 		// update image in header
-		this._logo.src = this.project.getHeaderLogo();
+		this._logoWrap.style.backgroundImage = this.project.getHeaderLogoBg();
 
 	},
 
@@ -189,17 +189,11 @@ Wu.HeaderPane = Wu.Class.extend({
 		this._container.style.display = 'block';
 
 		// update values
-		this._logo.src 		 = project.getHeaderLogo();
+		this._logoWrap.style.backgroundImage = project.getHeaderLogoBg();
 		this._title.innerHTML 	 = project.getHeaderTitle();
 		this._subtitle.innerHTML = project.getHeaderSubtitle();
 
-		// set height
-		this._headerHeight = project.getHeaderHeight(); // parseInt(header.height);
-		this._container.style.height = this._headerHeight  + 'px';
-		this._container.style.maxHeight = this._headerHeight  + 'px';    
-
 		// add edit hooks
-		console.log('this editmode!???', project.editMode);
 		if (project.editMode) {
 			this.addEditHooks();
 			this.refreshDropzone();
@@ -223,7 +217,7 @@ Wu.HeaderPane = Wu.Class.extend({
 
 	resize : function () {
 		var that = this;
-
+		return;
 		window.onmouseup = function (e) {
 			that._resized();
 			window.onmouseup = null;
@@ -236,7 +230,7 @@ Wu.HeaderPane = Wu.Class.extend({
 	},
 
 	_resize : function (newHeight) {
-	
+		return;
 		// header height
 		this._headerHeight = newHeight;
 		this._container.style.height = this._headerHeight  + 'px';

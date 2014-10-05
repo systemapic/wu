@@ -160,7 +160,6 @@ L.Control.Layermenu = L.Control.extend({
 
 	},
 
-	
 
 	// exit edit mode 
 	disableEdit : function () {
@@ -623,22 +622,55 @@ L.Control.Layermenu = L.Control.extend({
 
 	_getLayermenuItem : function (layerUuid) {
 		var layermenuItem = _.find(this.layers, function (l) { return l.item.layer == layerUuid; });
+		console.log('got: ', layermenuItem);
 		return layermenuItem;
 	},
 
-	remove : function (uuid) {
+
+	// layer deleted from project, remove layermenuitem
+	onDelete : function (layer) {
+		console.log('onDelete: ');
+		console.log('loayer: ', layer);
+
+		var uuid = layer.getUuid();
+		
+		console.log('uuid: ', uuid);
+
+		var layermenuItem = this._getLayermenuItem(uuid);
+
+		console.log('layrmenuIUte: ', layermenuItem);
+
+		// remove from dom in layermenu
+		if (layermenuItem) {
+			var elem = layermenuItem.el;
+			if (elem) elem.parentNode.removeChild(elem);
+		}
+	},
+
+	// // just remove without delete
+	// removeFromDOM : function (uuid) {
+
+	// 	// get layermenuItem
+	// 	var layermenuItem = this.layers[uuid];
+
+	// 	// remove from dom in layermenu
+	// 	var elem = layermenuItem.el;
+	// 	if (elem) elem.parentNode.removeChild(elem);
+	// },
+
+
+	// turn off a layer from options
+	remove : function (uuid) {				// todo: clean up layers vs layermenuitems, see _getLayermenuItem above
 		
 		// get layermenuItem
 		var layermenuItem = this.layers[uuid];
 
-		// remove from dom in layermenu
+		// remove from DOM
 		var elem = layermenuItem.el;
-		elem.parentNode.removeChild(elem);
+		if (elem) elem.parentNode.removeChild(elem);
 
 		// set inactive in sidepane layermenu
-		if (layermenuItem.layer) {
-			app.SidePane.Map.mapSettings.layermenu._off(layermenuItem.layer);
-		}
+		if (layermenuItem.layer) app.SidePane.Map.mapSettings.layermenu._off(layermenuItem.layer);
 
 		// remove from store
 		delete this.layers[uuid];
@@ -650,6 +682,15 @@ L.Control.Layermenu = L.Control.extend({
 		this.save();
 
 	},
+
+	removeLayermenuItem : function () {
+
+	},
+
+	removeLayer : function (layerUuid) {
+
+	},
+
 
 	// remove initiated from sidepane
 	_remove : function (uuid) {

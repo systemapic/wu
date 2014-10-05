@@ -54,6 +54,7 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 		this.minHeight = 0;
 	},
 
+	// fn for open on hover.. not in use atm
 	pendingOpen : function () {
 		if (app._timerOpen) clearTimeout(app._timerOpen);
 		if (this._isOpen) return;
@@ -75,6 +76,9 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 		this._outer.style.height = this.maxHeight + 'px';       
 		this._open(); // local fns   
 		this._isOpen = true;
+
+		if (app._pendingClose) app._pendingClose.close();
+		app._pendingClose = this;
 	},
 
 

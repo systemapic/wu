@@ -4,7 +4,7 @@
 /*LAYER MENU*/
 
 #layer-menu-inner-content {
-	width: 320px;
+	/*width: 320px;*/
 	height: 100%;
 	background: rgba(255, 255, 255, 0.93);
 	/*position: absolute;*/
@@ -13,6 +13,11 @@
 	position: relative;
 	padding-bottom: 5px;
 	padding-top: 5px;	
+
+	width: 280px;
+	box-shadow: 0 0 5px rgba(0,0,0,0.3);
+	left: -2px;
+
 	}
 
 
@@ -31,17 +36,21 @@
 	overflow: hidden;
 	margin: 0;
 	font-family: helvetica,arial,sans-serif;
-	font-size: 15px;
+	/*font-size: 15px;*/
 	z-index: 100;
 	position: relative;
 	padding: 0;
-	height: 29px;
+	/*height: 29px;*/
 	color: #fff;
 	text-shadow: none;
 	color: white;
 	margin-bottom: 1px;
 	/*background-color: rgba(84, 138, 135, 1) !important;*/
 	background-color: #427676;
+
+	font-size: 13px;
+	height: 25px;
+
 	}
 
 
@@ -247,8 +256,8 @@
 
 #open-layers {										// Layers: Open layer menu;
 	position: absolute;
-	top: 29px;
-	right: 0px;
+	/*top: 29px;*/
+	/*right: 0px;*/
 	background: white;
 	text-align: center;
 	line-height: 2;
@@ -257,6 +266,9 @@
 	margin: 0;
 	overflow: hidden;
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+
+	top: 6px;
+	right: 6px;	
 	}
 	
 .layer-opener-opened {								// Layers: Open layer menu mover;
@@ -274,7 +286,7 @@
 // Inspector 
 /*INSPECT LAYERS CONTROL*/
 .inspect-layer {
-	width: 310px;
+	width: 270px;
 	position: relative;
 	height: 25px;
 	margin: 3px 0px 0px 5px;
@@ -377,6 +389,7 @@
 
 #inspect-control-inner-content {
 	background: rgba(255, 255, 255, 0.93);
+	padding-bottom: 1px;
 }
 
 #inspector-list {
@@ -386,6 +399,8 @@
 	padding-bottom: 1px;
 	padding: 0;
 	top: 0;
+	overflow-y: scroll;
+	overflow-x: hidden;
 	}
 
 .inspect-layer:first-child {
@@ -396,3 +411,6 @@
 	margin-bottom: 10px;
 	}
 
+.leaflet-control-container {
+	overflow: hidden;
+}
