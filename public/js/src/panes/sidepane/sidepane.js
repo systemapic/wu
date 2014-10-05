@@ -64,7 +64,6 @@ Wu.SidePane = Wu.Class.extend({
 		if (!height) height = 80;
 
 		// set height
-		// this._minHeight = height + 5;
 		this._minHeight = 0;
 	},
 
@@ -198,7 +197,7 @@ Wu.SidePane = Wu.Class.extend({
 		console.log('openPane: container: ', this._container);
 
 		// open
-		this._container.style.width = '400px';
+		this._container.style.width = '350px';
 		Wu.DomUtil.addClass(app._active, 'show');	
 
 		// refresh leaflet

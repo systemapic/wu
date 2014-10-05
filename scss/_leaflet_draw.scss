@@ -430,7 +430,7 @@
 	position: relative;
 	float: right;
 
-	width: 290px !important;
+	width: 290px;
 	padding-bottom: 198px;
 	top: 0px;
 	padding-top: 6px;
@@ -654,7 +654,6 @@
 .leaflet-draw, 										// Leaflet Draw
 .leaflet-control-styleeditor,						// Leaflet edit styles
 .leaflet-control-baselayertoggle {					// Leaflet toggle baselayers
-	/*float: right;*/
 	float: left;
 	}
 	

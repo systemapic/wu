@@ -208,7 +208,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		console.log('select e: ', e);
 
 		// dont select if already active
-		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
+		// if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
 
 		// select project
 		this.project.select();

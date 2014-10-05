@@ -882,21 +882,6 @@
 
 
 		<!-- Project Header -->
-		<script id="projectHeader" type="text/html">
-
-			<div class="headerLogo">
-				<img id="header-logo-img" src="{{headerLogo}}">
-			</div>
-
-			<!--<input readonly="readonly" id="header-title" class="header-title editable ct15 ct16" value="{{headerTitle}}">-->
-			<!--<input readonly="readonly" id="header-subtitle" class="header-subtitle ct15 ct16" value="{{headerSubtitle}}">-->
-			<div id="header-title" class="header-title editable ct15 ct16">{{headerTitle}}</div>
-			<div id="header-subtitle" class="header-subtitle ct15 ct16">{{headerTitle}}</div>
-
-
-			<div id="headerResizer"></div>
-
-		</script>
 
 		<script id="injectHeaderTitleInput" type="text/html">
 			<input value="{{value}}" class="header-title editable ct15 ct16">
@@ -1248,7 +1233,9 @@
 		<script id="inspectControl" type="text/html">
 			<div id="inspect-control-inner-content">
 				<div id="inspector-header" class="menucollapser ct15 ct16">Layer inspector</div>
-				<div id="inspector-list"></div>
+				<div class="inspector-list-outer-scroller">
+					<div id="inspector-list"></div>
+				</div>
 			</div>
 		</script>
 

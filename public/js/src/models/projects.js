@@ -17,7 +17,6 @@ Wu.Project = Wu.Class.extend({
 		// attach client
 		this._client = Wu.app.Clients[this.store.client];
 
-		
 	},
 
 	initLayers : function () {
@@ -39,6 +38,8 @@ Wu.Project = Wu.Class.extend({
 
 	addLayer : function (layer) {
 		// creates a Wu.Layer object (could be Wu.MapboxLayer, Wu.RasterLayer, etc.)
+		this.store.layers.push(layer);
+		// this._update('layers');
 		this.layers[layer.uuid] = new Wu.createLayer(layer);
 	},
 
@@ -66,6 +67,11 @@ Wu.Project = Wu.Class.extend({
 		// refresh sidepane
 		this.refreshSidepane();
 	
+	},
+
+	addNewLayer : function (layer) {
+		this.addLayer(layer);
+		// this.refreshSidepane();
 	},
 
 	refreshSidepane : function () {
@@ -336,6 +342,13 @@ Wu.Project = Wu.Class.extend({
 		return logo;
 	},
 
+	getHeaderLogoBg : function () {
+		var logo = this.store.header.logo;
+		if (!logo) logo = this.store.logo;
+		var url = "url('" + logo + "')";
+		return url;
+	},
+
 	getHeaderTitle : function () {
 		return this.store.header.title;
 	},
@@ -410,9 +423,66 @@ Wu.Project = Wu.Class.extend({
 
 	setPosition : function (position) {
 		this.store.position = position;
-		console.log('this.store.posiiton: ', this.store.position);
 		this._update('position');
 	},
+
+
+	removeFiles : function (files) {
+
+		var list = app.SidePane.DataLibrary.list,
+		    layerMenu = app.MapPane.layerMenu,
+		    _fids = [],
+		    uuids = [],
+		    that = this;
+
+		// iterate over files and delete
+		files.forEach(function(file, i, arr) {
+
+			// remove from list
+			list.remove('uuid', file.uuid);
+		
+			// remove from local project
+			_.remove(this.store.files, function (item) { return item.uuid == file.uuid; });
+
+			// get layer
+			var layer = _.find(this.layers, function (l) { return l.store.file == file.uuid; });
+
+			// remove from layermenu store
+			var removed = _.remove(this.store.layermenu, function (item) { return item.layer == layer.store.uuid; });
+			
+			// remove from layermenu
+			if (layerMenu) layerMenu.onDelete(layer);
+				
+			// remove locals
+			var a = _.remove(this.store.layers, function (item) { return item.uuid == layer.store.uuid; });	// dobbelt opp, lagt til to ganger! todo
+			delete this.layers[layer.store.uuid];
+			
+			// prepare remove from server
+			_fids.push(file._id);
+			uuids.push(file.uuid);
+
+		}, this);
+
+		// save changes to layermenu
+		this._update('layermenu'); 
+
+		setTimeout(function () {	// ugly hack, cause two records can't be saved at same time, server side.. FUBAR!
+			// remove from server
+			var json = {
+			    '_fids' : _fids,
+			    'puuid' : that.store.uuid,
+			    'uuids' : uuids
+			}
+			var string = JSON.stringify(json);
+			Wu.save('/api/file/delete', string); 
+				
+		}, 1000);
+
+	},
+
+
+
+
 
 
 	getGrandeFiles : function () {

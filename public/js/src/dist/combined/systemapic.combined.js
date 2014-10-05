@@ -1461,6 +1461,7 @@ String.prototype.camelize = function () {
       return c ? c.toUpperCase () : '';
     });
 };Wu.SidePane = Wu.Class.extend({
+	_ : 'sidepane', 
 
 
 	initialize : function (options) {
@@ -1494,11 +1495,11 @@ String.prototype.camelize = function () {
 
 		// content pane
 		var className = 'q-editor-content ct1';
-		Wu.app._editorContentPane = Wu.DomUtil.create('content', className, this._container); 
+		app._editorContentPane = Wu.DomUtil.create('content', className, this._container); 
 
 		// menuslider
-		Wu.app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
-		Wu.app._menuSliderArrow = Wu.DomUtil.createId('div', 'menuslider-arrow', Wu.app._menuSlider);
+		app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
+		app._menuSliderArrow = Wu.DomUtil.createId('div', 'menuslider-arrow', Wu.app._menuSlider);	// refactor app
 
 		Wu.DomUtil.addClass(Wu.app._menuSlider, 'ct1');
 		
@@ -1506,11 +1507,6 @@ String.prototype.camelize = function () {
 	
 	render : function () {
 		var pane = this.options.panes;
-
-		// add home button
-		this.Home = new Wu.SidePane.Home({
-			addTo: this._container
-		});
 
 		// render sidepanes
 		if (pane.clients) 	this.Clients 	  = new Wu.SidePane.Clients();
@@ -1530,7 +1526,7 @@ String.prototype.camelize = function () {
 		if (!height) height = 80;
 
 		// set height
-		this._minHeight = height + 5;
+		this._minHeight = 0;
 	},
 
 	setHeight : function (height) {
@@ -1539,8 +1535,6 @@ String.prototype.camelize = function () {
 
 	collapse : function () {
 		
-
-
 		// calculate
 		this.calculateHeight();
 		
@@ -1553,7 +1547,9 @@ String.prototype.camelize = function () {
 	},
 
 	expand : function () {
+		console.log('expand');
 		this._container.style.height = '100%';
+		this.openPane();
 	},
 
 	_getPaneArray : function () {
@@ -1631,7 +1627,7 @@ String.prototype.camelize = function () {
 	
 	// close sidepane
 	closePane : function () {
-		
+
 		// return if already closed
 		if (!this.paneOpen) return;
 		this.paneOpen = false;
@@ -1655,13 +1651,16 @@ String.prototype.camelize = function () {
 
 	// open sidepane
 	openPane : function () {
-		
+
 		// return if already open
 		if (this.paneOpen) return;
 		this.paneOpen = true;
 
+		console.log('openPane: container: ', this._container);
+
 		// open
-		this._container.style.width = '400px';
+		this._container.style.width = '350px';
+		Wu.DomUtil.addClass(app._active, 'show');	
 
 		// refresh leaflet
 		setTimeout(function() {
@@ -1688,7 +1687,8 @@ String.prototype.camelize = function () {
 		Wu.DomUtil.get('h4-layers-project-name').innerHTML = project.name; 		// set layers subheader
 	}
 });;Wu.SidePane.Item = Wu.Class.extend({
-       
+        _wu : 'sidepane.item', 
+	
 	type : 'item',
 
 	initialize : function () {
@@ -1705,7 +1705,7 @@ String.prototype.camelize = function () {
 
 	addHooks : function () {
 		// menu items bindings
-		Wu.DomEvent.on(this._menu, 'click', this._clickActivate, this);          // click
+		Wu.DomEvent.on(this._menu, 'mousedown', this._clickActivate, this);          // click
 		Wu.DomEvent.on(this._menu, 'mouseenter', this._mouseenter, this);   // mouseEnter
 		Wu.DomEvent.on(this._menu, 'mouseleave', this._mouseleave, this);   // mouseLeave
 	},
@@ -1737,7 +1737,7 @@ String.prototype.camelize = function () {
 			Wu.DomUtil.removeClass(__map, "map-blur")
 
 			// Remove menuslider arrow (j)
-			_menusliderArrow.style.width = '0px';
+			// _menusliderArrow.style.width = '0px';
 		
 		// if closed
 		} else {
@@ -1749,7 +1749,7 @@ String.prototype.camelize = function () {
 			Wu.app.SidePane.openPane();
 
 			// Add menuslider arrow (j)
-			_menusliderArrow.style.width = '9px';
+			// _menusliderArrow.style.width = '9px';
 
 
 			// Blurs the map on full page panes... (j)
@@ -1767,7 +1767,8 @@ String.prototype.camelize = function () {
 	_clickActivate : function (e) {
 
 		// if clicking on already active tab, toggle it
-		if (Wu.app._activeMenu == this) return this._reclick();
+		// if (Wu.app._activeMenu == this) return this._reclick();
+		if (Wu.app._activeMenu == this) return;
 
 		// open pane if not closed
 		if (!Wu.app.SidePane.paneOpen) Wu.app.SidePane.openPane();
@@ -1996,7 +1997,7 @@ String.prototype.camelize = function () {
 	disable : function () {
 
 		// disable click
-		Wu.DomEvent.off(this._menu, 'click', this._clickActivate, this); 
+		Wu.DomEvent.off(this._menu, 'mousedown', this._clickActivate, this); 
 
 		// add disabled class
 		Wu.DomUtil.addClass(this._menu, 'disabled');
@@ -2006,7 +2007,7 @@ String.prototype.camelize = function () {
 	enable : function () {
 
 		// enable click
-		Wu.DomEvent.on(this._menu, 'click', this._clickActivate, this); 
+		Wu.DomEvent.on(this._menu, 'mousedown', this._clickActivate, this); 
 
 		// remove disabled class
 		Wu.DomUtil.removeClass(this._menu, 'disabled');
@@ -2022,6 +2023,9 @@ String.prototype.camelize = function () {
 
 ;// Projects and Clients
 Wu.SidePane.Clients = Wu.SidePane.Item.extend({
+	_ : 'sidepane.clients', 
+
+
 
 	type : 'clients',
 	title : 'Projects',
@@ -2037,8 +2041,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	initContent : function () {
 
 		// h3 title
-		var title = Wu.DomUtil.create('h3', '', this._container);
-		title.innerHTML = 'Clients';
+		// var title = Wu.DomUtil.create('h3', '', this._container);
+		// title.innerHTML = 'Clients';
 
 		// clients container
 		this._clientsContainer = Wu.DomUtil.create('div', 'editor-clients', this._container);
@@ -2505,7 +2509,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		console.log('select e: ', e);
 
 		// dont select if already active
-		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
+		// if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
 
 		// select project
 		this.project.select();
@@ -2724,12 +2728,15 @@ Wu.SidePane.Client = Wu.Class.extend({
 			var className = 'smap-button-white new-project-button ct11 ct16 ct18';
 			this._newProjectButton = Wu.DomUtil.create('div', className, this._projectsContainer, '+');
 			Wu.DomEvent.on(this._newProjectButton, 'mousedown', this.createNewProject, this);
+			Wu.DomEvent.on(this._newProjectButton, 'mousedown', Wu.DomEvent.stop, this);
+			Wu.DomEvent.on(this._newProjectButton, 'click', Wu.DomEvent.stop, this);
 		}
 		
 		// remove client button
 		if (app.Account.canDeleteClient(this.client.uuid)) {
 			this._removeClientButton = Wu.DomUtil.create('div', 'client-kill', this._container, 'X');
 			Wu.DomEvent.on(this._removeClientButton, 'mousedown', this.removeClient, this);
+
 		}
 
 	},
@@ -3066,9 +3073,11 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 
 ;Wu.SidePane.Users = Wu.SidePane.Item.extend({
+	_ : 'sidepane.users', 
+
 
 	type : 'users',
-	title : 'Users',
+	title : 'User <br> Mngmt',
 
 	initContent : function () {
 
@@ -3813,6 +3822,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 
 });;Wu.SidePane.Map = Wu.SidePane.Item.extend({
+	_ : 'sidepane.map', 
 
 	type : 'map',
 
@@ -3825,11 +3835,12 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// content to template
 		this._container.innerHTML = ich.editorMapBaseLayer();
+		this._settingsContainer = Wu.DomUtil.get('mapsettings-container');
 
 		// set panes
 		this._panes = {};
 
-		this._panes.projectTitle = Wu.DomUtil.get('h4-map-configuration-project-name');
+		// this._panes.projectTitle = Wu.DomUtil.get('h4-map-configuration-project-name');
 
 		// init each setting
 		this.mapSettings = {};
@@ -3838,7 +3849,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.mapSettings.bounds    = new Wu.SidePane.Map.Bounds();
 		this.mapSettings.position  = new Wu.SidePane.Map.Position();
 		this.mapSettings.controls  = new Wu.SidePane.Map.Controls();
-		this.mapSettings.connect   = new Wu.SidePane.Map.Connect(this._container);  // refactor container, ich.template
+		this.mapSettings.connect   = new Wu.SidePane.Map.Connect(this._settingsContainer);  // refactor container, ich.template
 
 	},
 
@@ -3880,13 +3891,15 @@ Wu.SidePane.Client = Wu.Class.extend({
 		}
 
 		// update project name
-		this._panes.projectTitle.innerHTML = this.project.getName();
+		// this._panes.projectTitle.innerHTML = this.project.getName();
 
 	},
 
 
 
 });;Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
+	_ : 'sidepane.map.mapsetting',
+
 
 	type : 'mapSetting',
 
@@ -3926,6 +3939,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// Wu.DomEvent.on( this.mapsettingsContainer, 'mouseleave', this.close, this);	
 		// Wu.DomEvent.on( this._container, 'mousemove', this.pendingOpen, this);
 		// Wu.DomEvent.on( this._container, 'mousedown', this.open, this);
+		
 		Wu.DomEvent.on( this._container, 'mousedown', this.toggleOpen, this);
 		
 	},
@@ -4047,14 +4061,12 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	},
 
-
-	
-
 });
 
 
 
 Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.connect', 
 
 	type : 'connect',			
 
@@ -4081,6 +4093,11 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 		// connect mapbox button
 		Wu.DomEvent.on( this._mapboxConnect, 'click', this.importMapbox, this );
+
+		// stops
+		Wu.DomEvent.on( this._mapboxConnect, 'mousedown', Wu.DomEvent.stop, this );
+		Wu.DomEvent.on( this._mapboxInput, 'mousedown', Wu.DomEvent.stopPropagation, this );
+
 	},
 
 	removeHooks : function () {
@@ -4185,6 +4202,7 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
                                     
 Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.baselayers', 
 
 	type : 'baseLayers',
 
@@ -4498,6 +4516,7 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
                              
 Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.layermenu', 
 
 	type : 'layerMenu',
 
@@ -4510,7 +4529,7 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 	initLayout : function () {
 
 		// create title and wrapper (and delete old content)
-		this._container.innerHTML = '<h4>Layer Menu</h4><br>';		
+		this._container.innerHTML = '<h4>Layer Menu</h4>';		
 		this._inner  = Wu.DomUtil.create('div', 'map-layermenu-inner', this._container);
 		this._outer  = Wu.DomUtil.create('div', 'map-layermenu-outer', this._inner);
 		// var status   = 'Enable layer menu in Controls below.';
@@ -4704,6 +4723,7 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 
 Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.position', 
 
 	type : 'position',
 
@@ -4730,6 +4750,11 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 		Wu.DomEvent.on( this.panes.initPos,  'mousedown',      	this.buttonDown,  this );
 		Wu.DomEvent.on( this.panes.initPos,  'mouseup',        	this.buttonUp,    this );
 		Wu.DomEvent.on( this.panes.initPos,  'mouseleave',     	this.buttonUp,    this );
+
+		Wu.DomEvent.on( this.panes.initPos         , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on( this.panes.initPosLatValue , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on( this.panes.initPosLngValue , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on( this.panes.initPosZoomValue, 'mousedown', Wu.DomEvent.stopPropagation, this );
 
 	},
 
@@ -4808,6 +4833,7 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 
 
 Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.bounds', 
 
 	type : 'bounds',
 
@@ -4849,6 +4875,20 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		Wu.DomEvent.on( this.panes.bounds,   'mouseup',    this.buttonUp,    this );
 		Wu.DomEvent.on( this.panes.bounds,   'mouseleave', this.buttonUp,    this );
 
+
+		Wu.DomEvent.on(this.panes.clear 	      , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.bounds           , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.boundsNELatValue , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.boundsNELngValue , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.boundsSWLatValue , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.boundsSWLngValue , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.boundsNE	      , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.boundsSW	      , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.minZoom 	      , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.maxZoom 	      , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.setMinZoom       , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.setMaxZoom       , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		
 	},
 
 	removeHooks : function () {
@@ -5076,6 +5116,7 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 
                        
 Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.controls', 
 
 	type : 'controls',
 
@@ -5692,9 +5733,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	}
 
 });;Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
-
+	_ : 'sidepane.datalibrary', 
+	
 	type : 'dataLibrary',
-	title : 'Data',
+	title : 'Data <br> Library',
 
 	initContent : function () {
 
@@ -5975,6 +6017,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// set status
 		app.setStatus('Deleted!');
 
+		// this.project.refreshSidepane();
+
 	},
 
 
@@ -6003,9 +6047,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 				url : '/api/upload',
 				createImageThumbnails : false,
 				autoDiscover : false,
-				uploadMultiple : true,
-				maxFiles : 10,
-				parallelUploads : 10,
+				// uploadMultiple : true,
+				// maxFiles : 10,
+				// parallelUploads : 10,
 				// autoProcessQueue : true
 		});
 
@@ -6227,6 +6271,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			this.project.setFile(file);
 		}, this);
 
+		// add layers
+		record.layers.forEach(function (layer) {
+			this.project.addLayer(layer);
+		}, this);
+
+		this.project.refreshSidepane();
 	},
 
 	addFile : function (file) {
@@ -6901,6 +6951,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 
 ;Wu.HeaderPane = Wu.Class.extend({
+	_ : 'headerpane', 
+
 
 	initialize : function () {
 		
@@ -6920,10 +6972,11 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// create divs
 		this._container = Wu.app._headerPane = Wu.DomUtil.createId('div', 'header', Wu.app._mapContainer);
 		this._logoWrap  = Wu.DomUtil.create('div', 'header-logo', this._container);
-		this._logo 	= Wu.DomUtil.create('img', 'header-logo-img', this._logoWrap);
-		this._title 	= Wu.DomUtil.create('div', 'header-title editable', this._container);
-		this._subtitle 	= Wu.DomUtil.create('div', 'header-subtitle editable', this._container);
-		this._resizer 	= Wu.DomUtil.createId('div', 'headerResizer', this._container);
+		// this._logo 	= Wu.DomUtil.create('img', 'header-logo-img', this._logoWrap);
+		this._titleWrap = Wu.DomUtil.create('div', 'header-title-wrap', this._container);
+		this._title 	= Wu.DomUtil.create('div', 'header-title editable', this._titleWrap);
+		this._subtitle 	= Wu.DomUtil.create('div', 'header-subtitle editable', this._titleWrap);
+		// this._resizer 	= Wu.DomUtil.createId('div', 'headerResizer ', this._container);
 
 		// set
 		this._title.whichTitle = 'title';
@@ -6939,7 +6992,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	addEditHooks : function () {
 
 		// resizer
-		this.enableResize();
+		// this.enableResize();
 
 		// remove title hooks
 		Wu.DomEvent.on(this._title,    'dblclick', this._enableEdit, this);
@@ -6960,7 +7013,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	removeEditHooks : function () {
 
 		// resizer
-		this.disableResize();
+		// this.disableResize();
 
 		// remove title hooks
 		Wu.DomEvent.off(this._title,    'dblclick', this._enableEdit, this);
@@ -6976,7 +7029,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	addDropzone : function () {
 
 		// create dz
-		this.logodz = new Dropzone(this._logo, {
+		this.logodz = new Dropzone(this._logoWrap, {
 				url : '/api/upload/image',
 				createImageThumbnails : false,
 				autoDiscover : false
@@ -7000,29 +7053,32 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.project.setHeaderLogo(fullpath);
 
 		// update image in header
-		this._logo.src = this.project.getHeaderLogo();
+		this._logoWrap.style.backgroundImage = this.project.getHeaderLogoBg();
 
 	},
 
 	disableResize : function () {
-		// resizer
-		Wu.DomEvent.off(this._resizer, 'mousedown', this.resize, this);
-		Wu.DomEvent.off(this._resizer, 'mouseup', this._resized, this);
+		return;
 
-		// set default cursor
-		Wu.DomUtil.addClass(this._resizer, 'headerResizerDisabled');
+		// // resizer
+		// Wu.DomEvent.off(this._resizer, 'mousedown', this.resize, this);
+		// Wu.DomEvent.off(this._resizer, 'mouseup', this._resized, this);
+
+		// // set default cursor
+		// Wu.DomUtil.addClass(this._resizer, 'headerResizerDisabled');
 	},
 
 	enableResize : function () {
-
-		if (!this.project.editMode) return;
+		return;
 		
-		// resizer
-		Wu.DomEvent.on(this._resizer, 'mousedown', this.resize, this);
-		Wu.DomEvent.on(this._resizer, 'mouseup', this._resized, this);
+		// if (!this.project.editMode) return;
+		
+		// // resizer
+		// Wu.DomEvent.on(this._resizer, 'mousedown', this.resize, this);
+		// Wu.DomEvent.on(this._resizer, 'mouseup', this._resized, this);
 
-		// set ns cursor
-		Wu.DomUtil.removeClass(this._resizer, 'headerResizerDisabled');
+		// // set ns cursor
+		// Wu.DomUtil.removeClass(this._resizer, 'headerResizerDisabled');
 	},
 
 	
@@ -7085,17 +7141,11 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._container.style.display = 'block';
 
 		// update values
-		this._logo.src 		 = project.getHeaderLogo();
+		this._logoWrap.style.backgroundImage = project.getHeaderLogoBg();
 		this._title.innerHTML 	 = project.getHeaderTitle();
 		this._subtitle.innerHTML = project.getHeaderSubtitle();
 
-		// set height
-		this._headerHeight = project.getHeaderHeight(); // parseInt(header.height);
-		this._container.style.height = this._headerHeight  + 'px';
-		this._container.style.maxHeight = this._headerHeight  + 'px';    
-
 		// add edit hooks
-		console.log('this editmode!???', project.editMode);
 		if (project.editMode) {
 			this.addEditHooks();
 			this.refreshDropzone();
@@ -7119,7 +7169,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	resize : function () {
 		var that = this;
-
+		return;
 		window.onmouseup = function (e) {
 			that._resized();
 			window.onmouseup = null;
@@ -7132,7 +7182,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	_resize : function (newHeight) {
-	
+		return;
 		// header height
 		this._headerHeight = newHeight;
 		this._container.style.height = this._headerHeight  + 'px';
@@ -9921,7 +9971,6 @@ L.control.baselayerToggle = function (options) {
 		// attach client
 		this._client = Wu.app.Clients[this.store.client];
 
-		
 	},
 
 	initLayers : function () {
@@ -9943,7 +9992,7 @@ L.control.baselayerToggle = function (options) {
 
 	addLayer : function (layer) {
 		// creates a Wu.Layer object (could be Wu.MapboxLayer, Wu.RasterLayer, etc.)
-		this.layers[layer.uuid] = new Wu.createLayer(layer);
+		return this.layers[layer.uuid] = new Wu.createLayer(layer);
 	},
 
 	setActive : function () {
@@ -9970,6 +10019,11 @@ L.control.baselayerToggle = function (options) {
 		// refresh sidepane
 		this.refreshSidepane();
 	
+	},
+
+	addNewLayer : function (layer) {
+		this.addLayer(layer);
+		// this.refreshSidepane();
 	},
 
 	refreshSidepane : function () {
@@ -10238,6 +10292,13 @@ L.control.baselayerToggle = function (options) {
 		var logo = this.store.header.logo;
 		if (!logo) logo = this.store.logo;
 		return logo;
+	},
+
+	getHeaderLogoBg : function () {
+		var logo = this.store.header.logo;
+		if (!logo) logo = this.store.logo;
+		var url = "url('" + logo + "')";
+		return url;
 	},
 
 	getHeaderTitle : function () {
@@ -15023,6 +15084,7 @@ function layerCollapser(selectWhat, bol) {
 
 ;Wu.version = '0.2-dev';
 Wu.App = Wu.Class.extend({
+	_ : 'app',
 
 	// default options
 	options : {
@@ -15169,6 +15231,12 @@ Wu.App = Wu.Class.extend({
 
 	_initPanes : function () {
 
+		// render status pane
+		// add home button
+		this.StatusPane = new Wu.StatusPane({
+			addTo: this._appPane
+		});
+
 		// render side pane 
 		this.SidePane = new Wu.SidePane();	// todo: add settings more locally? Wu.SidePane({options})
 
@@ -15269,7 +15337,7 @@ Wu.App = Wu.Class.extend({
 
 	// shorthand for setting status bar
 	setStatus : function (status, timer) {
-		app.SidePane.Home.setStatus(status, timer);
+		app.StatusPane.setStatus(status, timer);
 	}
 
 });

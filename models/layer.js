@@ -30,6 +30,8 @@ var layerSchema = mongoose.Schema({
 		osm 		: String,			// osm id?
 	}, 
 
+	file : String 	// file uuid that layer is connected to, if any
+
 
 });
 

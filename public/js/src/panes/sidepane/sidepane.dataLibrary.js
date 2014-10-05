@@ -239,49 +239,14 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// set status
 		app.setStatus('Deleting');
 		
-		// iterate over files and delete
-		var _fids = [];
-		files.forEach(function(file, i, arr) {
-
-			// remove from list
-			this.list.remove('uuid', file.uuid);
-		
-			// remove from local project
-			var i;
-			for (i = this.project.store.files.length - 1; i >= 0; i -= 1) {
-			//this.project.files.forEach(function(f, i, a) {
-				if (this.project.store.files[i].uuid == file.uuid) {
-					this.project.store.files.splice(i, 1);
-				}
-			};
-
-			// remove from layermenu                // todo: remove from actual menu div too
-			// DO use a reverse for-loop:
-			var i;
-			for (i = this.project.store.layermenu.length - 1; i >= 0; i -= 1) {
-				if (this.project.store.layermenu[i].fuuid == file.uuid) {
-					this.project.store.layermenu.splice(i, 1);
-				}
-			}
-			
-			// prepare remove from server
-			_fids.push(file._id);
-
-		}, this);
-
-		// save changes to layermenu
-		this.project._update('layermenu');                                                                                                                                                                                                   
-	       
-		// remove from server
-		var json = {
-		    '_fids' : _fids,
-		    'puuid' : this.project.store.uuid
-		}
-		var string = JSON.stringify(json);
-		Wu.save('/api/file/delete', string); 
+		// remove files n layers from project
+		this.project.removeFiles(files);
 
 		// set status
 		app.setStatus('Deleted!');
+
+		// refresh sidepane
+		this.project.refreshSidepane();
 
 	},
 
@@ -535,6 +500,12 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			this.project.setFile(file);
 		}, this);
 
+		// add layers
+		record.layers.forEach(function (layer) {
+			this.project.addLayer(layer);
+		}, this);
+
+		this.project.refreshSidepane();
 	},
 
 	addFile : function (file) {
