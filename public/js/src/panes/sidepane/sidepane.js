@@ -22,6 +22,7 @@ Wu.SidePane = Wu.Class.extend({
 		
 		// toggle panes button
 		this.paneOpen = false; // default
+		this.whichPaneOpen = 'projects';
 	},
 
 
@@ -143,6 +144,7 @@ Wu.SidePane = Wu.Class.extend({
 		// all panes
 		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users'];
 				
+				
 		// panes to active
 		panes.forEach(function (elem, i, arr) {
 			if (!Wu.app.SidePane[elem]) {
@@ -180,7 +182,16 @@ Wu.SidePane = Wu.Class.extend({
 		}, 300); // time with css
 
 		this._closePane();
-		Wu.DomUtil.removeClass(app._active, 'show');	
+		// console.log('app._active', app._active, this);
+
+		Wu.DomUtil.removeClass(app.SidePane.Documents._content, 'show');
+		Wu.DomUtil.removeClass(app.SidePane.DataLibrary._content, 'show');
+		Wu.DomUtil.removeClass(app.SidePane.Users._content, 'show');
+
+		
+
+		// Wu.DomUtil.removeClass(app._active, 'show');
+
 	},
 
 	_closePane : function () {				// refactor: move to SidePane.Item ... 
@@ -194,7 +205,8 @@ Wu.SidePane = Wu.Class.extend({
 		if (this.paneOpen) return;
 		this.paneOpen = true;
 
-		console.log('openPane: container: ', this._container);
+		// console.log('openPane: this.container: ', this._container);
+		// console.log('openPane: this: ', this);
 
 		// open
 		this._container.style.width = '350px';

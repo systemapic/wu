@@ -48,6 +48,11 @@ Wu.Layer = Wu.Class.extend({
 		return this.store.title;
 	},
 
+	setTitle : function (title) {
+		this.store.title = title;
+		this.save('title');
+	},
+
 	getUuid : function () {
 		return this.store.uuid;
 	},
@@ -136,7 +141,10 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		app.setStatus('Loading...');
 
 		// get geojson from server
-		var data = { 'uuid' : this.store.data.geojson }
+		var data = { 
+			uuid : this.store.data.geojson,
+			projectUuid : app.activeProject.getUuid() 
+		}
 		var json = JSON.stringify(data);
 	
 		
@@ -318,8 +326,12 @@ Wu.MapboxLayer = Wu.Layer.extend({
 	
 	initLayer : function () {
 		
+		// get access token
+
 		// create Leaflet.mapbox tileLayer
-		this.layer = L.mapbox.tileLayer(this.store.data.mapbox);
+		this.layer = L.mapbox.tileLayer(this.store.data.mapbox, {
+			accessToken : this.store.accessToken
+		});
 
 		// create gridLayer if available
 		if ('grids' in this.store) this.gridLayer = L.mapbox.gridLayer(this.store.data.mapbox);

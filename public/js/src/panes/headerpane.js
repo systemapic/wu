@@ -272,7 +272,8 @@ Wu.HeaderPane = Wu.Class.extend({
 		this.project.store.header.height 	= this._headerHeight;
 		this.project.store.header.title 	= this._title.innerHTML;
 		this.project.store.header.subtitle 	= this._subtitle.innerHTML;
-		this.project.store.header.logo 		= this._logo.src;     	
+		var img = this._logoWrap.style.backgroundImage.slice(4).slice(0,-1);
+		this.project.store.header.logo 		= img;     	
 
 		// save to db
 		this._save();

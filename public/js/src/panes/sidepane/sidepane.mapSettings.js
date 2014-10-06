@@ -77,7 +77,10 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 		this._open(); // local fns   
 		this._isOpen = true;
 
-		if (app._pendingClose) app._pendingClose.close();
+		if (app._pendingClose && app._pendingClose != this) {
+			console.log('ap pend: ', app._pendingClose); 
+			app._pendingClose.close();
+		}
 		app._pendingClose = this;
 	},
 
@@ -149,7 +152,6 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 	       	
 
 	       	var sortedLayers = this.sortLayers(this.project.layers);
-	       	console.log('sorted layers: ', sortedLayers);
 
 	       	sortedLayers.forEach(function (provider) {
 
@@ -187,9 +189,11 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		var h4 		  	= Wu.DomUtil.create('div', 'connect-mapbox-title', wrap, 'Mapbox');
 		this._mapboxWrap  	= Wu.DomUtil.create('div', 'mapbox-connect-wrap ct11', this._outer);
 		this._mapboxInput 	= Wu.DomUtil.create('input', 'input-box search import-mapbox-layers', this._mapboxWrap);
-		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-gray ct0 ct11 import-mapbox-layers-button', this._mapboxWrap, 'Connect');
+		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-gray ct0 ct11 import-mapbox-layers-button', this._mapboxWrap, 'Add');
 		this._mapboxAccounts 	= Wu.DomUtil.create('div', 'mapbox-accounts', this._mapboxWrap);
-		this._mapboxInput.setAttribute('placeholder', 'Mapbox username');
+		
+		// clear vars n fields
+		this.resetInput();
 
 	},
 
@@ -211,30 +215,52 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 	calculateHeight : function () {
 		var num = this.project.getMapboxAccounts().length;
-
 		this.maxHeight = 100 + num * 30;
 		this.minHeight = 0;
+	},
+
+	// get mapbox access token
+	tokenMode : function () {
+		this._username = this._mapboxInput.value;
+		this._mapboxInput.value = '';
+		this._askedToken = true;
+		this._mapboxConnect.innerHTML = 'OK';
+		this._mapboxInput.setAttribute('placeholder', 'Enter access token');
+	},
+
+	// reset temp vars
+	resetInput : function () {
+		this._username = null;
+		delete this._username;
+		this._askedToken = false;
+		this._mapboxConnect.innerHTML = 'Add';
+		this._mapboxInput.setAttribute('placeholder', 'Mapbox username');
+		this._mapboxInput.value = '';
 	},
 
 	// on click when adding new mapbox account
 	importMapbox : function () {
 
+		if (!this._askedToken) return this.tokenMode();
+
 		// get username
-		var username = this._mapboxInput.value;
+		var username = this._username;
+		var accessToken = this._mapboxInput.value;
 
 		// clear
-		this._mapboxInput.value = '';
+		this.resetInput();
 
 		// get mapbox account via server
-		this._importMapbox(username);
+		this._importMapbox(username, accessToken);
 
 	},
 
-	_importMapbox : function (username) {
+	_importMapbox : function (username, accessToken) {
 
 		// get mapbox account via server
 		var data = {
 			'username' : username,
+			'accessToken' : accessToken,
 			'projectId' : this.project.store.uuid
 		}
 		// post         path                            json          callback      this
@@ -271,7 +297,7 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		// fill with accounts
 		accounts.forEach(function (account) {
 			var wrap  = Wu.DomUtil.create('div', 'mapbox-listed-account', this._mapboxAccounts);
-			var title = Wu.DomUtil.create('div', 'mapbox-listed-account-title', wrap, account.camelize());
+			var title = Wu.DomUtil.create('div', 'mapbox-listed-account-title', wrap, account.username.camelize());
 
 			// add kill button for editMode... // todo: what about layers in deleted accounts, etc etc??
 			// if (this.project.editMode) {
@@ -322,8 +348,8 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 		// create title and wrapper (and delete old content)
 		this._container.innerHTML = '<h4>Base Layers</h4>';
-		var div 		  = Wu.DomUtil.createId('div', 'select-baselayer-wrap', this._container);
-		this._outer 		  = Wu.DomUtil.create('div', 'select-elems', div);
+		var div = Wu.DomUtil.createId('div', 'select-baselayer-wrap', this._container);
+		this._outer = Wu.DomUtil.create('div', 'select-elems', div);
 		Wu.DomUtil.addClass(div, 'select-wrap');
 	},
 
@@ -339,6 +365,9 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 		// fill in with layers
 		this.fillLayers();
+
+		// mark unavailable layers
+		this.markOccupied();
 		
 	},
 
@@ -350,11 +379,11 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 	addLayer : function (layer) {
 
 		// create and append div
-		var container = Wu.DomUtil.create('div', 'item-list select-elem ct0', this._outer);
+		var container = Wu.DomUtil.create('div', 'item-list select-elem ct0 baselayer', this._outer);
 		container.innerHTML = layer.store.title;
 
 		// append edit button
-		var button = Wu.DomUtil.create('div', 'edit-baselayer', container);
+		// var button = Wu.DomUtil.create('div', 'edit-baselayer', container);
 
 		// append range selectors
 		var rangeOpacity = Wu.DomUtil.create('input', 'baselayer-range-slider-opacity', container);
@@ -388,23 +417,31 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 		}, this );
 
-		// add edit hook
-		Wu.DomEvent.on (button, 'mousedown', function (e) {
-			
-			// prevent other click events
-			Wu.DomEvent.stop(e);
+		this._layers = this._layers || {};
+		this._layers[baseLayer.layer.store.uuid] = baseLayer;
 
-			// toggle editMode
-			this.toggleEdit(baseLayer);
+		// // // add edit hook
+		// Wu.DomEvent.on (button, 'mousedown', function (e) {
+		// 	console.log('butttt');
+		// 	// prevent other click events
+		// 	Wu.DomEvent.stop(e);
+		// 	// Wu.DomEvent.stopPropagation(e);
 
-		}, this);
+		// 	// toggle editMode
+		// 	this.toggleEdit(baseLayer);	// temporarily taken out, cause BETA.. this is opacity edit etc..
+
+		// }, this);
+
+		// add stops
+		// Wu.DomEvent.on(button, 'mousedown', Wu.DomEvent.stop, this);
 
 		
 
 	},
 
 	toggleEdit : function (baseLayer) {
-		if (this.editMode) {
+		var uuid = baseLayer.layer.store.uuid;
+		if (this.editMode[uuid]) {
 			this.editOff(baseLayer);
 		} else {
 			this.editOn(baseLayer);
@@ -498,9 +535,6 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 			layer         : baseLayer.layer
 		});
 
-		// set editMode
-		this.editMode = true;
-
 		// show range selectah
 		baseLayer.container.style.height = '132px';
 
@@ -518,12 +552,33 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		// account for extra height with editor
 		this.calculateHeight();
 		this.open();
+
+
+		// set editMode
+		this.editMode = this.editMode || {};
+
+		this._editsOff();
+
+		var uuid = baseLayer.layer.store.uuid;
+		this.editMode[uuid] = baseLayer;
+
+
+	},
+
+	_editsOff : function () {
+		var baseLayers = this.editMode;
+		for (b in baseLayers) {
+			var baseLayer = baseLayers[b];
+			this.editOff(baseLayer);
+		}
 	},
 
 	editOff : function (baseLayer) {
 
 		// set editMode
-		this.editMode = false;
+		var uuid = baseLayer.layer.store.uuid;
+		// delete this.editMode[uui
+		// this.editMode = false;
 
 		// hide editor
 		baseLayer.container.style.height = '32px';
@@ -589,6 +644,10 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		// refresh baselayerToggleControl
 		var baselayerToggle = app.MapPane.baselayerToggle;
 		if (baselayerToggle) baselayerToggle.update();
+
+		// mark occupied layers in layermenu
+		var layermenuSetting = app.SidePane.Map.mapSettings.layermenu;
+		layermenuSetting.markOccupied();
 	},
 
 	disableLayer : function (baseLayer) {
@@ -604,17 +663,50 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		var baselayerToggle = app.MapPane.baselayerToggle;
 		if (baselayerToggle) baselayerToggle.update();
 
+		// mark occupied layers in layermenu
+		var layermenuSetting = app.SidePane.Map.mapSettings.layermenu;
+		layermenuSetting.markOccupied();
+
 	},
 
 	calculateHeight : function () {
-
+								
+		var min = _.size(this.project.getLayermenuLayers());
 		var padding = this.numberOfProviders * 35;
-		this.maxHeight = _.size(this.project.layers) * 33 + padding;
+		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
 		this.minHeight = 0;
 
 		// add 100 if in editMode
 		if (this.editMode) this.maxHeight += 100;
 	},
+
+	markOccupied : function () {
+
+		// get layers and active baselayers
+		var layermenuLayers = this.project.getLayermenuLayers();
+		var layers = this.project.getLayers();
+
+		// activate layers
+		layers.forEach(function (a) {
+			this.activate(a.store.uuid);
+		}, this);
+
+		layermenuLayers.forEach(function (bl) {
+			var layer = _.find(layers, function (l) { return l.store.uuid == bl.layer; });
+			if (layer) this.deactivate(layer.store.uuid);
+		}, this);
+
+	},
+
+	activate : function (layerUuid) {
+		var layer = this._layers[layerUuid];
+		Wu.DomUtil.removeClass(layer.container, 'deactivated');
+	},
+
+	deactivate : function (layerUuid) {
+		var layer = this._layers[layerUuid];
+		Wu.DomUtil.addClass(layer.container, 'deactivated');
+	}
 });
 
 
@@ -624,8 +716,6 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 	_ : 'sidepane.map.layermenu', 
 
 	type : 'layerMenu',
-
-
 
 	getPanes : function () {
 		this._container = Wu.DomUtil.get('editor-map-layermenu-wrap');
@@ -642,7 +732,6 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	},
 
-
 	update : function () {
 		Wu.SidePane.Map.MapSetting.prototype.update.call(this)	// call update on prototype
 
@@ -657,10 +746,11 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 		// fill in with layers
 		this.fillLayers();
+
+		// mark deactivated layers
+		this.markOccupied();
 		
 	},
-
-
 
 	// add layers to layermenu list in sidepane
 	addLayer : function (layer) {
@@ -682,7 +772,6 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 			layer 		: layer,
 			container 	: container, 
 			active 		: false,
-
 			rangeOpacity 	: rangeOpacity, 
 			rangeZindex 	: rangeZindex
 		}
@@ -727,8 +816,9 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	calculateHeight : function () {
 
+		var min = _.size(this.project.getBaselayers());
 		var padding = this.numberOfProviders * 35;
-		this.maxHeight = _.size(this.project.layers) * 33 + padding;
+		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
 		this.minHeight = 0;
 
 		// add 100 if in editMode
@@ -752,7 +842,6 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		this.layerMenu = this.layerMenu || Wu.app.MapPane.layerMenu;
 		if (!this.layerMenu) this.layerMenu = this.enableLayermenu();
 		
-
 		if (layer.active) {
 			
 			// remove from layermenu
@@ -770,6 +859,10 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 			// set on
 			this.on(layer);
 		}
+
+		// mark occupied layers in layermenu
+		var baselayerSetting = app.SidePane.Map.mapSettings.baselayer;
+		baselayerSetting.markOccupied()
 	},
 
 	toggleEdit : function (layer) {
@@ -821,6 +914,31 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		if (layerMenu) layerMenu.disableEdit();
 	},
 
+	markOccupied : function () {
+
+		// get active baselayers
+		var baseLayers = this.project.getBaselayers();
+		var all = this.project.getLayers();
+
+		all.forEach(function (a) {
+			this.activate(a.store.uuid);
+		}, this);
+
+		baseLayers.forEach(function (bl) {
+			this.deactivate(bl.uuid);
+		}, this);
+
+	},
+
+	activate : function (layerUuid) {
+		var layer = this._layers[layerUuid];
+		Wu.DomUtil.removeClass(layer.container, 'deactivated');
+	},
+
+	deactivate : function (layerUuid) {
+		var layer = this._layers[layerUuid];
+		Wu.DomUtil.addClass(layer.container, 'deactivated');
+	}
 
 });
 
@@ -1237,7 +1355,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		this.panes.controlLegends              	= Wu.DomUtil.get('map-controls-legends').parentNode.parentNode;
 		this.panes.controlMeasure              	= Wu.DomUtil.get('map-controls-measure').parentNode.parentNode;
 		this.panes.controlGeolocation          	= Wu.DomUtil.get('map-controls-geolocation').parentNode.parentNode;
-		this.panes.controlVectorstyle          	= Wu.DomUtil.get('map-controls-vectorstyle').parentNode.parentNode;
+		// this.panes.controlVectorstyle          	= Wu.DomUtil.get('map-controls-vectorstyle').parentNode.parentNode;
 		this.panes.controlMouseposition        	= Wu.DomUtil.get('map-controls-mouseposition').parentNode.parentNode;
 		this.panes.controlBaselayertoggle      	= Wu.DomUtil.get('map-controls-baselayertoggle').parentNode.parentNode;
 	},
@@ -1256,7 +1374,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		Wu.DomEvent.on( this.panes.controlLegends,         'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlMeasure,         'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlGeolocation,     'mousedown click', this.toggleControl, this);
-		Wu.DomEvent.on( this.panes.controlVectorstyle,     'mousedown click', this.toggleControl, this);
+		// Wu.DomEvent.on( this.panes.controlVectorstyle,     'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlMouseposition,   'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlBaselayertoggle, 'mousedown click', this.toggleControl, this);
 
@@ -1349,6 +1467,9 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		Wu.SidePane.Map.MapSetting.prototype.update.call(this)
 
 		this.controls = this.project.getControls();
+		
+		// tmp hack to remove vectrostyle
+		delete this.controls.vectorstyle;
 
 		// toggle each control
 		for (c in this.controls) {

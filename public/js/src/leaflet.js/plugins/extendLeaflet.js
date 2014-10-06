@@ -21,7 +21,7 @@ L.Control.Draw.include({
 		// create wrappers
 		var sectionButton = L.DomUtil.create('div', 'leaflet-draw-section-button', container);
 		var sectionWrapper = L.DomUtil.create('div', 'leaflet-draw-section-wrapper', container);
-		this._wrapper = sectionWrapper;
+		this._wrapper = sectionWrapper;	// shorthand for adding more stuff to this wrapper
 
 		// add hook to button
 		L.DomEvent.on(sectionButton, 'mousedown', function (e) {
@@ -61,52 +61,37 @@ L.Control.Draw.include({
 });
 
 
-L.Control.StyleEdditor.incdlude({
-	
-	// // add to section wrapper instead of control corner
-	// addTo : function (map) {
-	// 	this._map = map;
+// add to section wrapper instead of control corner
+L.Control.StyleEditor.include({
 
-	// 	var container = this._container = this.onAdd(map),
-	// 	    pos = this.getPosition(),
-	// 	    corner = map._controlCorners[pos];
+	addTo : function (map) {
+		this._map = map;
 
-	// 	console.log('L.Control.StyleEditor.addTo(), : ', this.options);
+		var container = this._container = this.onAdd(map),
+		    pos = this.getPosition(),
+		    corner = map._controlCorners[pos];
 
-	// 	L.DomUtil.addClass(container, 'leaflet-control');
+		L.DomUtil.addClass(container, 'leaflet-control');
 
-	// 	var sectionWrapper = this.options.container;
-	// 	sectionWrapper.appendChild(container);
+		var sectionWrapper = this.options.container;
+		sectionWrapper.appendChild(container);
 
-	// 	// if (pos.indexOf('bottom') !== -1) {
-	// 	// 	corner.insertBefore(container, corner.firstChild);
-	// 	// } else {
-	// 	// 	corner.appendChild(container);
-	// 	// }
+		return this;
+	},
 
-	// 	return this;
-	// },
+	removeFrom: function (map) {
+		var pos = this.getPosition(),
+		    corner = map._controlCorners[pos];
 
-	onAdd: function(map) {
-		console.log('L.contains.STYLE');
-		this.options.map = map;
-		return this.createUi();
-	}
+		var sectionWrapper = this.options.container;
+		sectionWrapper.removeChild(this._container);
+		this._map = null;
+
+		if (this.onRemove) {
+			this.onRemove(map);
+		}
+
+		return this;
+	},
+
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

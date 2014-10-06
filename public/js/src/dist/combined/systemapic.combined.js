@@ -1484,6 +1484,7 @@ String.prototype.camelize = function () {
 		
 		// toggle panes button
 		this.paneOpen = false; // default
+		this.whichPaneOpen = 'projects';
 	},
 
 
@@ -1605,6 +1606,7 @@ String.prototype.camelize = function () {
 		// all panes
 		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users'];
 				
+				
 		// panes to active
 		panes.forEach(function (elem, i, arr) {
 			if (!Wu.app.SidePane[elem]) {
@@ -1642,7 +1644,16 @@ String.prototype.camelize = function () {
 		}, 300); // time with css
 
 		this._closePane();
-		Wu.DomUtil.removeClass(app._active, 'show');	
+		// console.log('app._active', app._active, this);
+
+		Wu.DomUtil.removeClass(app.SidePane.Documents._content, 'show');
+		Wu.DomUtil.removeClass(app.SidePane.DataLibrary._content, 'show');
+		Wu.DomUtil.removeClass(app.SidePane.Users._content, 'show');
+
+		
+
+		// Wu.DomUtil.removeClass(app._active, 'show');
+
 	},
 
 	_closePane : function () {				// refactor: move to SidePane.Item ... 
@@ -1656,7 +1667,8 @@ String.prototype.camelize = function () {
 		if (this.paneOpen) return;
 		this.paneOpen = true;
 
-		console.log('openPane: container: ', this._container);
+		// console.log('openPane: this.container: ', this._container);
+		// console.log('openPane: this: ', this);
 
 		// open
 		this._container.style.width = '350px';
@@ -1786,6 +1798,7 @@ String.prototype.camelize = function () {
 		    
 		// active content                       
 		Wu.app._active = this._content;  
+		app._activeMenuItem = this.type;
 
 		// check vertical swipe action    (j)
 		this.checkSwipe(prev);
@@ -1814,7 +1827,7 @@ String.prototype.camelize = function () {
 
 	// check swipe of sidepane on selecting menu item (j)
 	checkSwipe : function (prev) {
-
+		console.log('checkSwipe -> prev: ', prev);
 		if (prev) return this.swiper(prev);
 
 		// Hide the Deactivated Pane
@@ -1832,6 +1845,9 @@ String.prototype.camelize = function () {
 		// set vars
 		var swypefrom = prev._content;
 		var swypeto = Wu.app._active;               
+
+		console.log('prev', prev);
+		console.log('swypefrom', swypefrom);
 
 		// if same, do nothing
 		if (swypefrom == swypeto) return;
@@ -1939,6 +1955,9 @@ String.prototype.camelize = function () {
 		    
 		// Hide the Deactivated Pane
 		if (Wu.app._active) {
+
+				console.log('swypefrom', swypefrom);
+
 			    Wu.DomUtil.removeClass(swypefrom, 'show');
 
 
@@ -2331,20 +2350,22 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.logo = Wu.DomUtil.create('div', 'project-logo', this._container);
 		this.logo.type = 'logo';
 
-		// create createdBy
-		this.createdBy = Wu.DomUtil.create('div', 'project-createdby', this._container);
-
-		// create lastModified
-		this.lastUpdated = Wu.DomUtil.create('div', 'project-lastupdated', this._container);
-
-		// create createdDate
-		this.createdDate = Wu.DomUtil.create('div', 'project-createddate', this._container);
+		
 
 		// create users
 		this.users = Wu.DomUtil.create('div', 'project-users-wrap', this._container);
 		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.users);
 		Wu.DomEvent.on(this.users, 'mouseenter', this.expandUsers, this);
 		Wu.DomEvent.on(this.users, 'mouseleave', this.collapseUsers, this);
+
+		// create createdBy
+		this.createdBy = Wu.DomUtil.create('div', 'project-createdby', this.users);
+
+		// create lastModified
+		this.lastUpdated = Wu.DomUtil.create('div', 'project-lastupdated', this.users);
+
+		// create createdDate
+		this.createdDate = Wu.DomUtil.create('div', 'project-createddate', this.users);
 
 		// kill button
 		if (app.Account.canDeleteProject(this.project.store.uuid)) {
@@ -3890,9 +3911,29 @@ Wu.SidePane.Client = Wu.Class.extend({
 			setting.update();
 		}
 
-		// update project name
-		// this._panes.projectTitle.innerHTML = this.project.getName();
+		// set height of content
+		this.setContentHeight();
+	},
 
+	setContentHeight : function () {
+		this.calculateHeight();
+		this._content.style.maxHeight = this.maxHeight + 'px';
+		console.log('this.scroll', this._scrollWrapper);
+		this._scrollWrapper.style.maxHeight = parseInt(this.maxHeight - 20) + 'px';
+	},
+
+	calculateHeight : function () {
+		var screenHeight = window.innerHeight,
+		    legendsControl = app.MapPane.legendsControl,
+		    height = -107;
+
+		if (legendsControl) {
+			height += parseInt(screenHeight) - parseInt(legendsControl._legendsHeight);
+		} else {
+			height += parseInt(screenHeight) - 6;
+		}
+
+		this.maxHeight = height;
 	},
 
 
@@ -3953,6 +3994,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.minHeight = 0;
 	},
 
+	// fn for open on hover.. not in use atm
 	pendingOpen : function () {
 		if (app._timerOpen) clearTimeout(app._timerOpen);
 		if (this._isOpen) return;
@@ -3974,6 +4016,12 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._outer.style.height = this.maxHeight + 'px';       
 		this._open(); // local fns   
 		this._isOpen = true;
+
+		if (app._pendingClose && app._pendingClose != this) {
+			console.log('ap pend: ', app._pendingClose); 
+			app._pendingClose.close();
+		}
+		app._pendingClose = this;
 	},
 
 
@@ -4082,7 +4130,7 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		var h4 		  	= Wu.DomUtil.create('div', 'connect-mapbox-title', wrap, 'Mapbox');
 		this._mapboxWrap  	= Wu.DomUtil.create('div', 'mapbox-connect-wrap ct11', this._outer);
 		this._mapboxInput 	= Wu.DomUtil.create('input', 'input-box search import-mapbox-layers', this._mapboxWrap);
-		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-gray ct0 ct11 import-mapbox-layers-button', this._mapboxWrap, 'Connect');
+		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-gray ct0 ct11 import-mapbox-layers-button', this._mapboxWrap, 'Add');
 		this._mapboxAccounts 	= Wu.DomUtil.create('div', 'mapbox-accounts', this._mapboxWrap);
 		this._mapboxInput.setAttribute('placeholder', 'Mapbox username');
 
@@ -4106,7 +4154,6 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 	calculateHeight : function () {
 		var num = this.project.getMapboxAccounts().length;
-
 		this.maxHeight = 100 + num * 30;
 		this.minHeight = 0;
 	},
@@ -4234,6 +4281,9 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 		// fill in with layers
 		this.fillLayers();
+
+		// mark unavailable layers
+		this.markOccupied();
 		
 	},
 
@@ -4245,11 +4295,11 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 	addLayer : function (layer) {
 
 		// create and append div
-		var container = Wu.DomUtil.create('div', 'item-list select-elem ct0', this._outer);
+		var container = Wu.DomUtil.create('div', 'item-list select-elem ct0 baselayer', this._outer);
 		container.innerHTML = layer.store.title;
 
 		// append edit button
-		var button = Wu.DomUtil.create('div', 'edit-baselayer', container);
+		// var button = Wu.DomUtil.create('div', 'edit-baselayer', container);
 
 		// append range selectors
 		var rangeOpacity = Wu.DomUtil.create('input', 'baselayer-range-slider-opacity', container);
@@ -4283,23 +4333,31 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 		}, this );
 
-		// add edit hook
-		Wu.DomEvent.on (button, 'mousedown', function (e) {
-			
-			// prevent other click events
-			Wu.DomEvent.stop(e);
+		this._layers = this._layers || {};
+		this._layers[baseLayer.layer.store.uuid] = baseLayer;
 
-			// toggle editMode
-			this.toggleEdit(baseLayer);
+		// // // add edit hook
+		// Wu.DomEvent.on (button, 'mousedown', function (e) {
+		// 	console.log('butttt');
+		// 	// prevent other click events
+		// 	Wu.DomEvent.stop(e);
+		// 	// Wu.DomEvent.stopPropagation(e);
 
-		}, this);
+		// 	// toggle editMode
+		// 	this.toggleEdit(baseLayer);	// temporarily taken out, cause BETA.. this is opacity edit etc..
+
+		// }, this);
+
+		// add stops
+		// Wu.DomEvent.on(button, 'mousedown', Wu.DomEvent.stop, this);
 
 		
 
 	},
 
 	toggleEdit : function (baseLayer) {
-		if (this.editMode) {
+		var uuid = baseLayer.layer.store.uuid;
+		if (this.editMode[uuid]) {
 			this.editOff(baseLayer);
 		} else {
 			this.editOn(baseLayer);
@@ -4393,9 +4451,6 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 			layer         : baseLayer.layer
 		});
 
-		// set editMode
-		this.editMode = true;
-
 		// show range selectah
 		baseLayer.container.style.height = '132px';
 
@@ -4413,12 +4468,33 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		// account for extra height with editor
 		this.calculateHeight();
 		this.open();
+
+
+		// set editMode
+		this.editMode = this.editMode || {};
+
+		this._editsOff();
+
+		var uuid = baseLayer.layer.store.uuid;
+		this.editMode[uuid] = baseLayer;
+
+
+	},
+
+	_editsOff : function () {
+		var baseLayers = this.editMode;
+		for (b in baseLayers) {
+			var baseLayer = baseLayers[b];
+			this.editOff(baseLayer);
+		}
 	},
 
 	editOff : function (baseLayer) {
 
 		// set editMode
-		this.editMode = false;
+		var uuid = baseLayer.layer.store.uuid;
+		// delete this.editMode[uui
+		// this.editMode = false;
 
 		// hide editor
 		baseLayer.container.style.height = '32px';
@@ -4484,6 +4560,10 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		// refresh baselayerToggleControl
 		var baselayerToggle = app.MapPane.baselayerToggle;
 		if (baselayerToggle) baselayerToggle.update();
+
+		// mark occupied layers in layermenu
+		var layermenuSetting = app.SidePane.Map.mapSettings.layermenu;
+		layermenuSetting.markOccupied();
 	},
 
 	disableLayer : function (baseLayer) {
@@ -4499,17 +4579,50 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		var baselayerToggle = app.MapPane.baselayerToggle;
 		if (baselayerToggle) baselayerToggle.update();
 
+		// mark occupied layers in layermenu
+		var layermenuSetting = app.SidePane.Map.mapSettings.layermenu;
+		layermenuSetting.markOccupied();
+
 	},
 
 	calculateHeight : function () {
 
+		var min = _.size(this.project.getLayermenuLayers());
 		var padding = this.numberOfProviders * 35;
-		this.maxHeight = _.size(this.project.layers) * 33 + padding;
+		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
 		this.minHeight = 0;
 
 		// add 100 if in editMode
 		if (this.editMode) this.maxHeight += 100;
 	},
+
+	markOccupied : function () {
+
+		// get layers and active baselayers
+		var layermenuLayers = this.project.getLayermenuLayers();
+		var layers = this.project.getLayers();
+
+		// activate layers
+		layers.forEach(function (a) {
+			this.activate(a.store.uuid);
+		}, this);
+
+		layermenuLayers.forEach(function (bl) {
+			var layer = _.find(layers, function (l) { return l.store.uuid == bl.layer; });
+			if (layer) this.deactivate(layer.store.uuid);
+		}, this);
+
+	},
+
+	activate : function (layerUuid) {
+		var layer = this._layers[layerUuid];
+		Wu.DomUtil.removeClass(layer.container, 'deactivated');
+	},
+
+	deactivate : function (layerUuid) {
+		var layer = this._layers[layerUuid];
+		Wu.DomUtil.addClass(layer.container, 'deactivated');
+	}
 });
 
 
@@ -4519,8 +4632,6 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 	_ : 'sidepane.map.layermenu', 
 
 	type : 'layerMenu',
-
-
 
 	getPanes : function () {
 		this._container = Wu.DomUtil.get('editor-map-layermenu-wrap');
@@ -4537,7 +4648,6 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	},
 
-
 	update : function () {
 		Wu.SidePane.Map.MapSetting.prototype.update.call(this)	// call update on prototype
 
@@ -4552,10 +4662,11 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 		// fill in with layers
 		this.fillLayers();
+
+		// mark deactivated layers
+		this.markOccupied();
 		
 	},
-
-
 
 	// add layers to layermenu list in sidepane
 	addLayer : function (layer) {
@@ -4577,7 +4688,6 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 			layer 		: layer,
 			container 	: container, 
 			active 		: false,
-
 			rangeOpacity 	: rangeOpacity, 
 			rangeZindex 	: rangeZindex
 		}
@@ -4622,8 +4732,9 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	calculateHeight : function () {
 
+		var min = _.size(this.project.getBaselayers());
 		var padding = this.numberOfProviders * 35;
-		this.maxHeight = _.size(this.project.layers) * 33 + padding;
+		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
 		this.minHeight = 0;
 
 		// add 100 if in editMode
@@ -4647,7 +4758,6 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		this.layerMenu = this.layerMenu || Wu.app.MapPane.layerMenu;
 		if (!this.layerMenu) this.layerMenu = this.enableLayermenu();
 		
-
 		if (layer.active) {
 			
 			// remove from layermenu
@@ -4665,6 +4775,10 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 			// set on
 			this.on(layer);
 		}
+
+		// mark occupied layers in layermenu
+		var baselayerSetting = app.SidePane.Map.mapSettings.baselayer;
+		baselayerSetting.markOccupied()
 	},
 
 	toggleEdit : function (layer) {
@@ -4716,6 +4830,31 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		if (layerMenu) layerMenu.disableEdit();
 	},
 
+	markOccupied : function () {
+
+		// get active baselayers
+		var baseLayers = this.project.getBaselayers();
+		var all = this.project.getLayers();
+
+		all.forEach(function (a) {
+			this.activate(a.store.uuid);
+		}, this);
+
+		baseLayers.forEach(function (bl) {
+			this.deactivate(bl.uuid);
+		}, this);
+
+	},
+
+	activate : function (layerUuid) {
+		var layer = this._layers[layerUuid];
+		Wu.DomUtil.removeClass(layer.container, 'deactivated');
+	},
+
+	deactivate : function (layerUuid) {
+		var layer = this._layers[layerUuid];
+		Wu.DomUtil.addClass(layer.container, 'deactivated');
+	}
 
 });
 
@@ -5132,7 +5271,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		this.panes.controlLegends              	= Wu.DomUtil.get('map-controls-legends').parentNode.parentNode;
 		this.panes.controlMeasure              	= Wu.DomUtil.get('map-controls-measure').parentNode.parentNode;
 		this.panes.controlGeolocation          	= Wu.DomUtil.get('map-controls-geolocation').parentNode.parentNode;
-		this.panes.controlVectorstyle          	= Wu.DomUtil.get('map-controls-vectorstyle').parentNode.parentNode;
+		// this.panes.controlVectorstyle          	= Wu.DomUtil.get('map-controls-vectorstyle').parentNode.parentNode;
 		this.panes.controlMouseposition        	= Wu.DomUtil.get('map-controls-mouseposition').parentNode.parentNode;
 		this.panes.controlBaselayertoggle      	= Wu.DomUtil.get('map-controls-baselayertoggle').parentNode.parentNode;
 	},
@@ -5151,7 +5290,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		Wu.DomEvent.on( this.panes.controlLegends,         'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlMeasure,         'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlGeolocation,     'mousedown click', this.toggleControl, this);
-		Wu.DomEvent.on( this.panes.controlVectorstyle,     'mousedown click', this.toggleControl, this);
+		// Wu.DomEvent.on( this.panes.controlVectorstyle,     'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlMouseposition,   'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlBaselayertoggle, 'mousedown click', this.toggleControl, this);
 
@@ -5244,6 +5383,9 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		Wu.SidePane.Map.MapSetting.prototype.update.call(this)
 
 		this.controls = this.project.getControls();
+		
+		// tmp hack to remove vectrostyle
+		delete this.controls.vectorstyle;
 
 		// toggle each control
 		for (c in this.controls) {
@@ -5294,9 +5436,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._rightpane  = Wu.DomUtil.get('documents-container-rightpane');
 		this._textarea   = Wu.DomUtil.get('documents-container-textarea');
 		this._newfolder  = Wu.DomUtil.get('documents-new-folder');
-
-
-
 	},
 
 	initFolders : function () {
@@ -5316,7 +5455,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	addEditHooks : function () {
-		console.log('adding addEditHooks for DOCS');
 
 		// new folder
 		Wu.DomEvent.on(this._newfolder, 'mousedown', this.newFolder, this);
@@ -5327,7 +5465,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// show (+)
 		Wu.DomUtil.removeClass(this._newfolder, 'displayNone');
 
-
 	},
 
 	addGrande : function () {
@@ -5335,9 +5472,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		var nodes = this._textarea;
 
 		// get sources
-		var files = this.project.getFiles();
+		var files   = this.project.getFiles();
 		var sources = this.project.getGrandeFiles(files);
-		var images = this.project.getGrandeImages(files)
+		var images  = this.project.getGrandeImages(files);
+
+		console.log('soruces: ', sources);
+		console.log('images: ', images);
 
 		// set grande options
 		var options = {
@@ -5345,13 +5485,17 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		        	// file attachments
 			        attachments : new G.Attachments(sources, {
-			        	icon : 'fileAttachment.png',
+			        	icon : ['http://85.10.202.87:8080/images/image-c9471cb2-7e0e-417d-a048-2ac501e7e96f',
+			        		'http://85.10.202.87:8080/images/image-7b7cc7e4-404f-4e29-9d7d-11f0f24faf42'],
+			        	className : 'attachment'
 			        }),
 
 			        // image attachments
-			        images :  new G.Attachments(sources, {
-			        	icon : 'imageAttachment.png',
-			        	embedImage : true 			// embed image in text! 
+			        images :  new G.Attachments(images, {
+			        	icon : ['http://85.10.202.87:8080/images/image-0359b349-6312-4fe5-b5d7-346a7a0d3c38',
+			        		'http://85.10.202.87:8080/images/image-087ef5f5-b838-48bb-901f-7e896de7c59e'],
+			        	embedImage : true,			// embed image in text! 
+			        	className : 'image-attachment'
 			        }),
 
 			},
@@ -5369,6 +5513,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	removeGrande : function () {
 
+		this.grande.destroy();
+		delete this.grande;
 
 	},
 	
@@ -5384,6 +5530,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// bind grande.js text editor
 		// Grande.unbind([this._textarea]);
+		this.removeGrande();
 
 		// hide (+)
 		Wu.DomUtil.addClass(this._newfolder, 'displayNone');
@@ -5973,51 +6120,14 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// set status
 		app.setStatus('Deleting');
 		
-		// iterate over files and delete
-		var _fids = [];
-		files.forEach(function(file, i, arr) {
-
-			// remove from list
-			this.list.remove('uuid', file.uuid);
-		
-			// remove from local project
-			var i;
-			for (i = this.project.store.files.length - 1; i >= 0; i -= 1) {
-			//this.project.files.forEach(function(f, i, a) {
-				if (this.project.store.files[i].uuid == file.uuid) {
-					this.project.store.files.splice(i, 1);
-				}
-			};
-
-			// remove from layermenu                // todo: remove from actual menu div too
-			// DO use a reverse for-loop:
-			var i;
-			for (i = this.project.store.layermenu.length - 1; i >= 0; i -= 1) {
-				if (this.project.store.layermenu[i].fuuid == file.uuid) {
-					this.project.store.layermenu.splice(i, 1);
-				}
-			}
-			
-			// prepare remove from server
-			_fids.push(file._id);
-
-		}, this);
-
-		// save changes to layermenu
-		this.project._update('layermenu');                                                                                                                                                                                                   
-	       
-		// remove from server
-		var json = {
-		    '_fids' : _fids,
-		    'puuid' : this.project.store.uuid
-		}
-		var string = JSON.stringify(json);
-		Wu.save('/api/file/delete', string); 
+		// remove files n layers from project
+		this.project.removeFiles(files);
 
 		// set status
 		app.setStatus('Deleted!');
 
-		// this.project.refreshSidepane();
+		// refresh sidepane
+		this.project.refreshSidepane();
 
 	},
 
@@ -6267,15 +6377,15 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			this.addFile(file);
  
 			// add to project locally (already added on server)
-			// this.project.store.files.push(file);
 			this.project.setFile(file);
 		}, this);
 
 		// add layers
-		record.layers.forEach(function (layer) {
-			this.project.addLayer(layer);
-		}, this);
-
+		if (record.layers) {
+			record.layers.forEach(function (layer) {
+				this.project.addLayer(layer);
+			}, this);
+		}
 		this.project.refreshSidepane();
 	},
 
@@ -7224,7 +7334,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.project.store.header.height 	= this._headerHeight;
 		this.project.store.header.title 	= this._title.innerHTML;
 		this.project.store.header.subtitle 	= this._subtitle.innerHTML;
-		this.project.store.header.logo 		= this._logo.src;     	
+		var img = this._logoWrap.style.backgroundImage.slice(4).slice(0,-1);
+		this.project.store.header.logo 		= img;     	
 
 		// save to db
 		this._save();
@@ -7810,10 +7921,15 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	},
 	
-	enableVectorstyle : function () {
+	enableVectorstyle : function (container) {
+		console.log('enable VECTOR')
 		if (this.vectorStyle) return;
-
-		this.vectorStyle = L.control.styleEditor({ position: "topleft" });
+		console.log('2');
+		
+		this.vectorStyle = L.control.styleEditor({ 
+			position: "topleft", 
+			container : container
+		});
 		
 		this._map.addControl(this.vectorStyle);
 	},
@@ -7848,6 +7964,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._map.removeControl(this._drawControl);
 		// this._map.removeLayer(this.editableLayers);	//todo
 		this._drawControl = false;
+
+		// remove vector styling
+		this.disableVectorstyle();
 	},
 
 	addDrawControl : function () {
@@ -7931,6 +8050,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			e.noteLayer._el.focus();
 			map.LeafletDrawEditEnabled = true;
 		});
+
+		// add vector styling control
+		this.enableVectorstyle(drawControl._wrapper);
+
 	}
 
 });
@@ -7994,6 +8117,13 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		Wu.DomEvent.on(this._innerContainer, 'mouseenter', this.cancelEditClose, this);
 		Wu.DomEvent.on(this._innerContainer, 'mouseleave', this.timedEditClose, this);
 
+		// cxxxx
+		console.log('Wu.app.MapPane._container.children[1].children[3]', Wu.app.MapPane._container.children[1].children[3]);
+
+		// Wu.app.MapPane._container.children[1].children;
+		
+		if ( !app.MapPane.inspectControl ) Wu.app.MapPane._container.children[1].children[3].style.paddingBottom = 6 + 'px';
+
 	},
 
 	cancelEditClose : function () {
@@ -8029,10 +8159,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._container.parentNode.appendChild(this._openLayers);
 		
 		// Slide the LEGENDS			
-		// if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-push-right'); // rem (j)
+		if ( this._legendsContainer ) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
+
+		console.log('this._legendsContainer', this._legendsContainer);
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.right = '5px';
+		Wu.app.MapPane._container.children[1].children[1].style.right = '140px';
 		
 		// Change class name of open layers button
 		var that = this;
@@ -8053,10 +8185,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._openLayers.className = 'leaflet-control layer-opener-opened close-layer-opener';
 		
 		// Slide the LEGENDS
-		// if ( this._legendsContainer ) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-push-right'); // rem (j)
+		if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.right = '302px';                  
+		Wu.app.MapPane._container.children[1].children[1].style.right = '295px';                  
 		
 		// Set correct classname and remove open layer menu button from DOM	
 		var that = this;
@@ -8091,14 +8223,13 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._insertMenuFolder();
 
 		// show edit buttons for menu items
-		this._showEditButtons();
+		// this._showEditButtons();
 
 		// open all items in layermenu
 		this.openAll();
 
 	},
 
-	
 
 	// exit edit mode 
 	disableEdit : function () {
@@ -8124,7 +8255,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._removeMenuFolder();
 
 		// hide edit buttons for menu items
-		this._hideEditButtons();
+		// this._hideEditButtons();
 
 		// close all items in layerMenuItem
 		//this.closeAll();
@@ -8132,25 +8263,25 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	_hideEditButtons : function () {	// expensive?? yes!
-		var elems = [];
-		elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
-		elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
-		elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
-		elems = _.flatten(elems);
-		elems.forEach(function (one) {
-			one.style.display = 'none';
-		});
+		// var elems = [];
+		// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
+		// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
+		// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
+		// elems = _.flatten(elems);
+		// elems.forEach(function (one) {
+		// 	one.style.display = 'none';
+		// });
 	},
 
 	_showEditButtons : function () {	// todo: refactor! 
-		var elems = [];
-		elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
-		elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
-		elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
-		elems = _.flatten(elems);
-		elems.forEach(function (one) {
-			one.style.display = 'block';
-		});
+		// var elems = [];
+		// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
+		// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
+		// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
+		// elems = _.flatten(elems);
+		// elems.forEach(function (one) {
+		// 	one.style.display = 'block';
+		// });
 	},
 
 
@@ -8561,22 +8692,55 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	_getLayermenuItem : function (layerUuid) {
 		var layermenuItem = _.find(this.layers, function (l) { return l.item.layer == layerUuid; });
+		console.log('got: ', layermenuItem);
 		return layermenuItem;
 	},
 
-	remove : function (uuid) {
+
+	// layer deleted from project, remove layermenuitem
+	onDelete : function (layer) {
+		console.log('onDelete: ');
+		console.log('loayer: ', layer);
+
+		var uuid = layer.getUuid();
+		
+		console.log('uuid: ', uuid);
+
+		var layermenuItem = this._getLayermenuItem(uuid);
+
+		console.log('layrmenuIUte: ', layermenuItem);
+
+		// remove from dom in layermenu
+		if (layermenuItem) {
+			var elem = layermenuItem.el;
+			if (elem) elem.parentNode.removeChild(elem);
+		}
+	},
+
+	// // just remove without delete
+	// removeFromDOM : function (uuid) {
+
+	// 	// get layermenuItem
+	// 	var layermenuItem = this.layers[uuid];
+
+	// 	// remove from dom in layermenu
+	// 	var elem = layermenuItem.el;
+	// 	if (elem) elem.parentNode.removeChild(elem);
+	// },
+
+
+	// turn off a layer from options
+	remove : function (uuid) {				// todo: clean up layers vs layermenuitems, see _getLayermenuItem above
 		
 		// get layermenuItem
 		var layermenuItem = this.layers[uuid];
 
-		// remove from dom in layermenu
+		// remove from DOM
 		var elem = layermenuItem.el;
-		elem.parentNode.removeChild(elem);
+		if (elem) elem.parentNode.removeChild(elem);
 
 		// set inactive in sidepane layermenu
-		if (layermenuItem.layer) {
-			app.SidePane.Map.mapSettings.layermenu._off(layermenuItem.layer);
-		}
+		if (layermenuItem.layer) app.SidePane.Map.mapSettings.layermenu._off(layermenuItem.layer);
 
 		// remove from store
 		delete this.layers[uuid];
@@ -8589,6 +8753,15 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	},
 
+	removeLayermenuItem : function () {
+
+	},
+
+	removeLayer : function (layerUuid) {
+
+	},
+
+
 	// remove initiated from sidepane
 	_remove : function (uuid) {
 		// uuid: layer-q2e321-qweeqw-dasdas
@@ -8600,6 +8773,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	// add from sidepane
 	add : function (layer) {
+
+		console.log('AD D D D D D D: ', layer);
 
 		// create db item
 		var item = {
@@ -8972,6 +9147,9 @@ L.control.layermenu = function (options) {
 
 	addLayer : function (layer) {
 
+		// Make sure that the layer inspector is visible
+		this._content.style.display = 'block';
+
 		var wrapper 	= Wu.DomUtil.create('div', 'inspect-layer');
 		var arrowsWrap 	= Wu.DomUtil.create('div', 'inspect-arrows-wrap', wrapper);
 		var upArrow 	= Wu.DomUtil.create('div', 'inspect-arrow-up', arrowsWrap);
@@ -9017,6 +9195,7 @@ L.control.layermenu = function (options) {
 		// update zIndex
 		this.updateZIndex();
 
+
 	},
 	
 	// remove by layer
@@ -9027,6 +9206,12 @@ L.control.layermenu = function (options) {
 
 		// remove
 		this._removeLayer(entry);
+
+		// Hise Layer inspector if it's empty
+		if ( this.layers.length == 0 ) this._content.style.display = 'none';
+		
+
+
 	},
 
 	// remove by entry
@@ -9036,6 +9221,10 @@ L.control.layermenu = function (options) {
 
 		// remove from array
 		_.remove(this.layers, function (l) { return l.uuid == entry.uuid; });
+
+		// Hise Layer inspector if it's empty
+		if ( this.layers.length == 0 ) this._content.style.display = 'none';
+
 
 	},
 
@@ -9164,6 +9353,9 @@ L.control.layermenu = function (options) {
 		// remove from descriptionControl if avaialbe
 		var descriptionControl = app.MapPane.descriptionControl;
 		if (descriptionControl) descriptionControl.removeLayer(entry.layer);	
+
+		// Hise Layer inspector if it's empty
+		if ( this.layers.length == 0 ) this._content.style.display = 'none';
 
 	},
 
@@ -9523,63 +9715,94 @@ L.control.description = function (options) {
 
 	},
 
+	checkWidth : function() {
+
+		// Check window width
+		var maxWidth = window.innerWidth;
+
+		// Remove Layer Menu Width from window width, if it exists
+		if ( app.MapPane.layerMenu ) maxWidth -= 300;
+
+		// If the Legends slider is wider than the winodw, add the horizontal scroll buttons
+		if ( this.sliderWidth > maxWidth ) {
+			this._legendsScrollLeft.style.display = 'block';
+			this._legendsScrollRight.style.display = 'block';
+		} else {
+			this._legendsScrollLeft.style.display = 'none';
+			this._legendsScrollRight.style.display = 'none';			
+		}
+
+		// Check if the Layer Menu EXISTS, so that we can add the correct padding to the legends menu
+		if ( app.MapPane.layerMenu ) {
+
+			// Layer menu exists, but add padding to the legends only if the Layer menu is OPEN... 
+			// It's 290px when open, and 10px when closed, so I put 100 just in case...
+			if ( app.MapPane.layerMenu._container.offsetWidth >= 100 ) {
+				Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right');
+			}
+
+		} else {
+			Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right');
+		}
+
+	},	
+
 	closeLegends : function () {
-
-		// console.log('this', this);
-		// this._container.style.width = '150px';
-
-		this._legendsInner.style.width = this._legendsInner.offsetWidth + 'px';
 
 		var _1stchild = this._legendsInner.getElementsByTagName('div')[0];		// refactor ?
 		this._legendsInner.insertBefore(this._legendsOpener, _1stchild);
 		
 		Wu.DomEvent.on(this._legendsOpener, 'click', this.openLegends, this);
 		
-		var sh = this._legendsInner.offsetHeight;
+		// this.calcHeight();
 
-		this._legendsCollapser.setAttribute('sh', sh);	//todo: readable name
-		this._legendsInner.style.width = '150px';
-		this._legendsInner.style.height = '24px'; 
-		this._legendsCollapser.style.display = 'none';
-		this._legendsCollapser.style.opacity = '0'; 
-		this._legendsScrollLeft.style.display = 'none';
-		this._legendsScrollRight.style.display = 'none';
+		this._legendsInner.style.width = this._legendsWidth + 'px';
+		this._legendsInner.style.height = this._legendsHeight + 'px';
 
-		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		// Wu.app.MapPane._container.children[1].children[1].style.bottom = '6px';   // refactor?               
+		var that = this;
+
+		// 
+		setTimeout(function() {
+			that._legendsInner.style.width = '150px';
+			that._legendsInner.style.height = '24px'; 
+			that._legendsScrollLeft.style.display = 'none';
+			that._legendsScrollRight.style.display = 'none';
+		}, 10);
+
+		setTimeout(function() {
+			that._legendsCollapser.style.display = 'none';
+			that._legendsCollapser.style.opacity = '0'; 
+
+			this._openWidth = 0;
+			this._openHeight = 0;
+			this._legendsWidth = 0;
+			this._legendsHeight = 0;
+
+		}, 500);
+
+
+
 	
 	},
 
+
 	openLegends : function (e) {
-
-
-		// this._container.style.width = '320px';
 
 		// Hide the little arrow button         
 		this._legendsOpener.className = '';
 		this._legendsOpener.style.opacity = '0';
 
-		// Find out the width of the container
-		// var fatherwidth = this._legendsContainer.offsetWidth - 287 - 335; // The numbers are the width of the layer and info menus
-		// var hasleft = Wu.DomUtil.hasClass(this._legendsContainer, 'legends-push-left');
-		// var hasright = Wu.DomUtil.hasClass(this._legendsContainer, 'legends-push-right');
-		// if ( hasleft ) { fatherwidth += 287; }
-		// if ( hasright ) { fatherwidth += 335 - 10; }
-
 		// Set the width of the Legends
-		// this._legendsInner.style.width = fatherwidth + 'px';  
-		this._legendsInner.style.width = '295px';  
+		this._legendsInner.style.width = this.sliderWidth + 20 + 'px';
 
-		// Hacky packy - Pick up the height of the legends from before we collapsed it, 
-		// which is stored in the collapse button as a 'sh' attribute
-		this._legendsInner.style.height = this._legendsCollapser.getAttribute('sh') + 'px';         
+
+		this.checkWidth();
+
+		this._legendsInner.style.height = this._openHeight - 5 + 'px';         
+		
 		
 
-		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		// Wu.app.MapPane._container.children[1].children[1].style.bottom = '133px';  // refactor?                 
-
-
-		var that = this; // this is different context inside setTimeout
+		var that = this;
 		setTimeout(function(){                  
 			that._legendsInner.removeAttribute('style');
 			that._legendsOpener.removeAttribute('style');
@@ -9590,9 +9813,6 @@ L.control.description = function (options) {
 			that._legendsCollapser.style.opacity = '1';
 			that._legendsCollapser.style.display = 'block';
 
-			that._legendsScrollLeft.style.display = 'block';
-			that._legendsScrollRight.style.display = 'block';
-	 
 		}, 500);                
 
 	},
@@ -9608,7 +9828,9 @@ L.control.description = function (options) {
 
 		// get vars
 		this.project = project || Wu.app._activeProject;
-		this._content = Wu.DomUtil.get('legends-control-inner-content');                
+		this._content = Wu.DomUtil.get('legends-control-inner-content'); 
+
+		this.calcHeight();
 
 	},
 
@@ -9638,6 +9860,9 @@ L.control.description = function (options) {
 
 	addLegend : function (layer) {
 
+		// Make sure that the container is visible...
+		this._legendsContainer.style.display = 'block';
+
 		var uuid = layer.store.uuid;
 		var legend = layer.store.legend;
 		
@@ -9646,99 +9871,163 @@ L.control.description = function (options) {
 
 		// create legends box
 		// var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInner, legend);
-	    var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInnerSlider, legend);
+	    	var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInnerSlider, legend);
 
-	    var legendWidth = div.offsetWidth; // (j)
+	    	var legendWidth = div.offsetWidth; // (j)
 
 		// add to local store
 		this.legends[uuid] = {
 			layer : layer,
 			div   : div,
 			width : legendWidth             // ADDED BY JØRGEN
-		   }
+			}
 
-	    // Added by Jølle
-	    var tempObj = {
-		id : uuid,
-		width : legendWidth
-		}
+	    	// Added by Jølle
+	    	var tempObj = {
+			id : uuid,
+			width : legendWidth
+			}
 
-	    this.legendsCounter.push(tempObj); // ADDED BY JØLLE
+	    	this.legendsCounter.push(tempObj); // ADDED BY JØLLE
 
-	    this.sliderWidth += legendWidth;    // ADDED BY JØRGEN
+	    	this.sliderWidth += legendWidth;    // ADDED BY JØRGEN
 
-	    // Set the width of the inner slider... (j)
-	    this._legendsInnerSlider.style.width = this.sliderWidth + 20 + 'px';
-	    
+		// Set the width of the inner slider... (j)
+		this._legendsInnerSlider.style.width = this.sliderWidth + 20 + 'px';
+
+		// See if we need the horizontal scrollers or not!
+		this.checkWidth();
+
+		this.calcHeight();
+
 
 	},
 
 	removeLegend : function (layer) {
+	
 		var uuid = layer.store.uuid;
-	    var legend = this.legends[uuid];
-	    if (!legend) return;
+		var legend = this.legends[uuid];
 
-	    this.sliderWidth -= legend.width;     // ADDED BY JØRGEN
+		if (!legend) return;
 
-	    // Remove from array
-	    for ( var i = 0; i<this.legendsCounter.length; i++ ) {
-		if ( this.legendsCounter[i].id == uuid ) this.legendsCounter.splice(i, 1);
-	    }
 
+		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
+		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
+
+		var legendBounds = legend.div.getBoundingClientRect();
+
+		// If the legend was left of the wrapper box ...
+		if ( legendBounds.left < 0 ) {
+
+			// ... remove the CSS animation of the slider
+			Wu.DomUtil.removeClass(this._legendsInnerSlider, "legends-inner-slider-sliding");
+			 
+			// ... add the width of the legend to slider left
+			this._legendsInnerSlider.style.left = this._legendsInnerSlider.offsetLeft + legend.width + 'px';
+
+			// ... remove from the slider offset (counting how many legends that's overflowing to the left of wrapper)
+			this.sliderOffset--;
+		}
+ 		
+ 		// Hacky packy: add CSS animation to slider again
+ 		var that = this;
+		setTimeout(function() {
+			Wu.DomUtil.addClass(that._legendsInnerSlider, "legends-inner-slider-sliding");
+		}, 500) 
 		
-	    // Set the width of the inner slider... (j)
-	    this._legendsInnerSlider.style.width = this.sliderWidth + 20 + 'px';
+		// END OF ADJUST LEGENDS SLIDER
+		// END OF ADJUST LEGENDS SLIDER
+
+
+		this.sliderWidth -= legend.width;     // ADDED BY JØRGEN
+
+		// Remove from array
+		for ( var i = 0; i<this.legendsCounter.length; i++ ) {
+			if ( this.legendsCounter[i].id == uuid ) this.legendsCounter.splice(i, 1);
+		}
+		
+		// Set the width of the inner slider... (j)
+		this._legendsInnerSlider.style.width = this.sliderWidth + 20 + 'px';
 	    
 
-	    var div = legend.div;
+		var div = legend.div;
 		Wu.DomUtil.remove(div);
 		delete this.legends[uuid];
+
+		// See if we need the horizontal scrollers or not!
+		this.checkWidth();
+
+		this.calcHeight();
+
+		// Hide legends if it's empty
+		if ( this.legendsCounter.length == 0 ) this._legendsContainer.style.display = 'none';
+		
 
 
 	},
 
 	legendsScrollLeft : function () {
 
-	if (this.scrolling) return;
-	
-	    if ( this.sliderOffset >= 1 ) {
+		if (this.scrolling) return;
+		
+		if ( this.sliderOffset >= 1 ) {
 
-		this.sliderOffset--;
-		var mover = this.legendsCounter[this.sliderOffset].width;
-		var tempLeft = this._legendsInnerSlider.offsetLeft;
-		this._legendsInnerSlider.style.left = tempLeft + mover + 'px';	
+			this.sliderOffset--;
+			var mover = this.legendsCounter[this.sliderOffset].width;
+			var tempLeft = this._legendsInnerSlider.offsetLeft;
+			this._legendsInnerSlider.style.left = tempLeft + mover + 'px';	
 
-		// Prevent double click
-		this.scrolling = true;
-		var that = this;
-		setTimeout(function () {
-			that.scrolling = false;
-		}, 500);
+			// Prevent double click
+			this.scrolling = true;
+			var that = this;
+			setTimeout(function () {
+				that.scrolling = false;
+			}, 500);
 
-	    }
-	
+		}
+		
 	},
 
 	legendsScrollRight : function () {
 	
-	if (this.scrolling) return;
+		if (this.scrolling) return;
 
-	    if ( this.sliderOffset <= this.legendsCounter.length-1 ) {
-		var mover = this.legendsCounter[this.sliderOffset].width;        
-		var tempLeft = this._legendsInnerSlider.offsetLeft;
+			console.log('scrolling right...')
 
-		this._legendsInnerSlider.style.left = tempLeft - mover + 'px';
-		this.sliderOffset++;
+		    if ( this.sliderOffset <= this.legendsCounter.length-1 ) {
+			var mover = this.legendsCounter[this.sliderOffset].width;        
+			var tempLeft = this._legendsInnerSlider.offsetLeft;
 
-		// Prevent double click
-		this.scrolling = true;
-		var that = this;
-		setTimeout(function () {
-			that.scrolling = false;
-		}, 500);
-	    }
+			var rightOffset = this._legendsInner.offsetWidth - (this._legendsInnerSlider.offsetWidth + tempLeft);
+
+			if ( rightOffset <= 0 ) {
+
+				this._legendsInnerSlider.style.left = tempLeft - mover + 'px';
+				this.sliderOffset++;
+
+				// Prevent double click
+				this.scrolling = true;
+				var that = this;
+				setTimeout(function () {
+					that.scrolling = false;
+				}, 500);
+			}
+
+		}
 
 	},
+
+	calcHeight : function() {
+
+		this._legendsHeight = this._legendsInner.offsetHeight;
+		this._legendsWidth = this._legendsInner.offsetWidth;
+
+		this._openHeight = this._legendsInner.offsetHeight;
+		this._openWidth = this._legendsInner.offsetWidth;
+
+		if ( app.SidePane.Map ) app.SidePane.Map.setContentHeight();
+
+	}
 
 
 });
@@ -9860,9 +10149,9 @@ L.Control.BaselayerToggle = L.Control.extend({
 		var className = 'leaflet-control-baselayertoggle';
 		var container = this._container = L.DomUtil.create('div', className);
 
-		// add hover events
-		Wu.DomEvent.on(container, 'mouseenter', this.expand, this);
-		Wu.DomEvent.on(container, 'mouseleave', this.collapse, this);
+		// add events
+		Wu.DomEvent.on(container, 'mousedown', this.toggle, this);
+		Wu.DomEvent.on(container, 'dblclick', Wu.DomEvent.stop, this);
 
 	},
 
@@ -9939,11 +10228,17 @@ L.Control.BaselayerToggle = L.Control.extend({
 
 	},
 
+	toggle : function () {
+		this._isOpen ? this.collapse() : this.expand();
+	},
+
 	collapse : function () {
+		this._isOpen = false;
 		Wu.DomUtil.addClass(this._list, 'collapsed');
 	},
 
 	expand : function () {
+		this._isOpen = true;
 		Wu.DomUtil.removeClass(this._list, 'collapsed');
 	},
 
@@ -9992,7 +10287,9 @@ L.control.baselayerToggle = function (options) {
 
 	addLayer : function (layer) {
 		// creates a Wu.Layer object (could be Wu.MapboxLayer, Wu.RasterLayer, etc.)
-		return this.layers[layer.uuid] = new Wu.createLayer(layer);
+		this.store.layers.push(layer);
+		// this._update('layers');
+		this.layers[layer.uuid] = new Wu.createLayer(layer);
 	},
 
 	setActive : function () {
@@ -10231,6 +10528,23 @@ L.control.baselayerToggle = function (options) {
 		return this.store.baseLayers;
 	},
 
+	getLayermenuLayers : function () {
+		return this.store.layermenu;		// todo: set layer uuid in layermenuItems
+	},
+
+	getLayers : function () {
+		return _.toArray(this.layers);
+	},
+
+	getLayer : function (uuid) {
+		return this.layers[uuid];
+	},
+
+	getFiles : function () {
+		return this.store.files;
+	},
+
+
 	getBounds : function () {
 		var bounds = this.store.bounds;
 		if (_.isEmpty(bounds)) return false;
@@ -10248,14 +10562,6 @@ L.control.baselayerToggle = function (options) {
 
 	getPosition : function () {
 		return this.getLatLngZoom();
-	},
-
-	getLayer : function (uuid) {
-		return this.layers[uuid];
-	},
-
-	getFiles : function () {
-		return this.store.files;
 	},
 
 	getCollections : function () {
@@ -10375,9 +10681,66 @@ L.control.baselayerToggle = function (options) {
 
 	setPosition : function (position) {
 		this.store.position = position;
-		console.log('this.store.posiiton: ', this.store.position);
 		this._update('position');
 	},
+
+
+	removeFiles : function (files) {
+
+		var list = app.SidePane.DataLibrary.list,
+		    layerMenu = app.MapPane.layerMenu,
+		    _fids = [],
+		    uuids = [],
+		    that = this;
+
+		// iterate over files and delete
+		files.forEach(function(file, i, arr) {
+
+			// remove from list
+			list.remove('uuid', file.uuid);
+		
+			// remove from local project
+			_.remove(this.store.files, function (item) { return item.uuid == file.uuid; });
+
+			// get layer
+			var layer = _.find(this.layers, function (l) { return l.store.file == file.uuid; });
+
+			// remove from layermenu store
+			var removed = _.remove(this.store.layermenu, function (item) { return item.layer == layer.store.uuid; });
+			
+			// remove from layermenu
+			if (layerMenu) layerMenu.onDelete(layer);
+				
+			// remove locals
+			var a = _.remove(this.store.layers, function (item) { return item.uuid == layer.store.uuid; });	// dobbelt opp, lagt til to ganger! todo
+			delete this.layers[layer.store.uuid];
+			
+			// prepare remove from server
+			_fids.push(file._id);
+			uuids.push(file.uuid);
+
+		}, this);
+
+		// save changes to layermenu
+		this._update('layermenu'); 
+
+		setTimeout(function () {	// ugly hack, cause two records can't be saved at same time, server side.. FUBAR!
+			// remove from server
+			var json = {
+			    '_fids' : _fids,
+			    'puuid' : that.store.uuid,
+			    'uuids' : uuids
+			}
+			var string = JSON.stringify(json);
+			Wu.save('/api/file/delete', string); 
+				
+		}, 1000);
+
+	},
+
+
+
+
 
 
 	getGrandeFiles : function () {
@@ -10398,7 +10761,7 @@ L.control.baselayerToggle = function (options) {
 		files.forEach(function (file) {
 			if (file.type == 'image') {
 
-				var thumbnail = '/pixels/' + file.uuid + '?width=50&height=50';
+				var thumbnail = '/pixels/' + file.uuid + '?width=75&height=50';
 				var url = '/pixels/' + file.uuid + '?width=200&height=200';
 
 				var source = {
@@ -11090,6 +11453,10 @@ L.control.baselayerToggle = function (options) {
 		return this.store.title;
 	},
 
+	getUuid : function () {
+		return this.store.uuid;
+	},
+
 	hide : function () {
 		var container = this.getContainer();
 		container.style.visibility = 'hidden';
@@ -11174,7 +11541,10 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		app.setStatus('Loading...');
 
 		// get geojson from server
-		var data = { 'uuid' : this.store.data.geojson }
+		var data = { 
+			uuid : this.store.data.geojson,
+			projectUuid : app.activeProject.getUuid() 
+		}
 		var json = JSON.stringify(data);
 	
 		
@@ -15082,7 +15452,7 @@ function layerCollapser(selectWhat, bol) {
 	}
 }
 
-;Wu.version = '0.2-dev';
+;Wu.version = '0.3-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 

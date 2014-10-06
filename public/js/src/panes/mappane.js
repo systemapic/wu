@@ -568,10 +568,15 @@ Wu.MapPane = Wu.Class.extend({
 
 	},
 	
-	enableVectorstyle : function () {
+	enableVectorstyle : function (container) {
+		console.log('enable VECTOR')
 		if (this.vectorStyle) return;
-
-		this.vectorStyle = L.control.styleEditor({ position: "topleft" });
+		console.log('2');
+		
+		this.vectorStyle = L.control.styleEditor({ 
+			position: "topleft", 
+			container : container
+		});
 		
 		this._map.addControl(this.vectorStyle);
 	},
@@ -606,6 +611,9 @@ Wu.MapPane = Wu.Class.extend({
 		this._map.removeControl(this._drawControl);
 		// this._map.removeLayer(this.editableLayers);	//todo
 		this._drawControl = false;
+
+		// remove vector styling
+		this.disableVectorstyle();
 	},
 
 	addDrawControl : function () {
@@ -689,6 +697,10 @@ Wu.MapPane = Wu.Class.extend({
 			e.noteLayer._el.focus();
 			map.LeafletDrawEditEnabled = true;
 		});
+
+		// add vector styling control
+		this.enableVectorstyle(drawControl._wrapper);
+
 	}
 
 });

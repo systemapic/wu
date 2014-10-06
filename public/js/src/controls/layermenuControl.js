@@ -56,6 +56,13 @@ L.Control.Layermenu = L.Control.extend({
 		Wu.DomEvent.on(this._innerContainer, 'mouseenter', this.cancelEditClose, this);
 		Wu.DomEvent.on(this._innerContainer, 'mouseleave', this.timedEditClose, this);
 
+		// cxxxx
+		console.log('Wu.app.MapPane._container.children[1].children[3]', Wu.app.MapPane._container.children[1].children[3]);
+
+		// Wu.app.MapPane._container.children[1].children;
+		
+		if ( !app.MapPane.inspectControl ) Wu.app.MapPane._container.children[1].children[3].style.paddingBottom = 6 + 'px';
+
 	},
 
 	cancelEditClose : function () {
@@ -91,10 +98,12 @@ L.Control.Layermenu = L.Control.extend({
 		this._container.parentNode.appendChild(this._openLayers);
 		
 		// Slide the LEGENDS			
-		// if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-push-right'); // rem (j)
+		if ( this._legendsContainer ) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
+
+		console.log('this._legendsContainer', this._legendsContainer);
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.right = '5px';
+		Wu.app.MapPane._container.children[1].children[1].style.right = '140px';
 		
 		// Change class name of open layers button
 		var that = this;
@@ -115,10 +124,10 @@ L.Control.Layermenu = L.Control.extend({
 		this._openLayers.className = 'leaflet-control layer-opener-opened close-layer-opener';
 		
 		// Slide the LEGENDS
-		// if ( this._legendsContainer ) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-push-right'); // rem (j)
+		if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.right = '302px';                  
+		Wu.app.MapPane._container.children[1].children[1].style.right = '295px';                  
 		
 		// Set correct classname and remove open layer menu button from DOM	
 		var that = this;
@@ -153,7 +162,7 @@ L.Control.Layermenu = L.Control.extend({
 		this._insertMenuFolder();
 
 		// show edit buttons for menu items
-		this._showEditButtons();
+		// this._showEditButtons();
 
 		// open all items in layermenu
 		this.openAll();
@@ -185,7 +194,7 @@ L.Control.Layermenu = L.Control.extend({
 		this._removeMenuFolder();
 
 		// hide edit buttons for menu items
-		this._hideEditButtons();
+		// this._hideEditButtons();
 
 		// close all items in layerMenuItem
 		//this.closeAll();
@@ -193,25 +202,25 @@ L.Control.Layermenu = L.Control.extend({
 	},
 
 	_hideEditButtons : function () {	// expensive?? yes!
-		var elems = [];
-		elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
-		elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
-		elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
-		elems = _.flatten(elems);
-		elems.forEach(function (one) {
-			one.style.display = 'none';
-		});
+		// var elems = [];
+		// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
+		// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
+		// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
+		// elems = _.flatten(elems);
+		// elems.forEach(function (one) {
+		// 	one.style.display = 'none';
+		// });
 	},
 
 	_showEditButtons : function () {	// todo: refactor! 
-		var elems = [];
-		elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
-		elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
-		elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
-		elems = _.flatten(elems);
-		elems.forEach(function (one) {
-			one.style.display = 'block';
-		});
+		// var elems = [];
+		// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
+		// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
+		// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
+		// elems = _.flatten(elems);
+		// elems.forEach(function (one) {
+		// 	one.style.display = 'block';
+		// });
 	},
 
 
@@ -569,10 +578,8 @@ L.Control.Layermenu = L.Control.extend({
 		var descriptionControl = app.MapPane.descriptionControl;
 		if (descriptionControl) {
 			descriptionControl.setLayer(layer);
-
-			console.log('descriptionControl._container', descriptionControl._container);
 			descriptionControl._container.style.display = 'block'; // (j)
-			}	
+		}	
 	},
 
 	
@@ -595,10 +602,7 @@ L.Control.Layermenu = L.Control.extend({
 		var descriptionControl = app.MapPane.descriptionControl;
 		if (descriptionControl) {
 			descriptionControl.removeLayer(layer);
-
-			console.log('descriptionControl._container', descriptionControl._container);
 			descriptionControl._container.style.display = 'none'; // (j)
-
 		}
 
 	},
@@ -622,23 +626,14 @@ L.Control.Layermenu = L.Control.extend({
 
 	_getLayermenuItem : function (layerUuid) {
 		var layermenuItem = _.find(this.layers, function (l) { return l.item.layer == layerUuid; });
-		console.log('got: ', layermenuItem);
 		return layermenuItem;
 	},
 
-
 	// layer deleted from project, remove layermenuitem
 	onDelete : function (layer) {
-		console.log('onDelete: ');
-		console.log('loayer: ', layer);
 
 		var uuid = layer.getUuid();
-		
-		console.log('uuid: ', uuid);
-
 		var layermenuItem = this._getLayermenuItem(uuid);
-
-		console.log('layrmenuIUte: ', layermenuItem);
 
 		// remove from dom in layermenu
 		if (layermenuItem) {
@@ -646,18 +641,6 @@ L.Control.Layermenu = L.Control.extend({
 			if (elem) elem.parentNode.removeChild(elem);
 		}
 	},
-
-	// // just remove without delete
-	// removeFromDOM : function (uuid) {
-
-	// 	// get layermenuItem
-	// 	var layermenuItem = this.layers[uuid];
-
-	// 	// remove from dom in layermenu
-	// 	var elem = layermenuItem.el;
-	// 	if (elem) elem.parentNode.removeChild(elem);
-	// },
-
 
 	// turn off a layer from options
 	remove : function (uuid) {				// todo: clean up layers vs layermenuitems, see _getLayermenuItem above
@@ -681,6 +664,12 @@ L.Control.Layermenu = L.Control.extend({
 		// save
 		this.save();
 
+		// update Options pane
+		var baseLayer = app.SidePane.Map.mapSettings.baselayer;
+		var layerMenu = app.SidePane.Map.mapSettings.layermenu;
+		if (baseLayer) baseLayer.markOccupied();
+		if (layerMenu) layerMenu.markOccupied();
+
 	},
 
 	removeLayermenuItem : function () {
@@ -694,10 +683,8 @@ L.Control.Layermenu = L.Control.extend({
 
 	// remove initiated from sidepane
 	_remove : function (uuid) {
-		// uuid: layer-q2e321-qweeqw-dasdas
-
-		//find layermenuItem uuid
-		var layermenuItem = this._getLayermenuItem(uuid);
+		// find layermenuItem uuid
+		var layermenuItem = this._getLayermenuItem(uuid); // uuid: layer-q2e321-qweeqw-dasdas
 		this.remove(layermenuItem.item.uuid);
 	},
 
@@ -817,7 +804,8 @@ L.Control.Layermenu = L.Control.extend({
 		var folder = {
 			uuid : 'layerMenuItem-' + Wu.Util.guid(), // unique id for layermenu item
 			caption : 'New folder',
-			pos : 0
+			pos : 0,
+			folder : true
 		}
 
 		var layerItem = {
@@ -835,47 +823,6 @@ L.Control.Layermenu = L.Control.extend({
 	},
 
 
-	// _addFolder : function (folder) { 
-
-	// 	console.log('adding folder! ', folder);
-
-	// 	var uuid   = folder.uuid;
-	// 	var item   = this.layers[uuid] = {};
-	// 	item.layer = false;
-	// 	item.item  = folder;
-
-	// 	// add wrapper to layermenu
-	// 	var wrap = Wu.DomUtil.create('div', 'layer-menu-item-wrap menufolder ct5', this._content);
-	// 	wrap.id  = uuid;
-	// 	Wu.DomUtil.addClass(wrap, 'level-' + folder.pos);
-
-	// 	// fill template
-	// 	wrap.innerHTML = ich.layerMenuFolderItem(folder);
-
-	// 	// get elems
-	// 	var up    = wrap.children[0];
-	// 	var down  = wrap.children[1];
-	// 	var del   = wrap.children[2];
-	// 	var inner = wrap.children[3];
-
-	// 	// add hooks
-	// 	Wu.DomEvent.on(up,    'click',    function (e) { this.upFolder(uuid); }, 	this);
-	// 	Wu.DomEvent.on(down,  'click',    function (e) { this.downFolder(uuid); }, 	this);
-	// 	Wu.DomEvent.on(del,   'click',    function (e) { this.deleteMenuFolder(uuid); },this);
-	// 	Wu.DomEvent.on(inner, 'dblclick', function (e) { this._editFolderTitle(uuid); },this);
-
-	// 	// set el
-	// 	item.el = wrap;
-
-	// 	console.log('wrap: ', wrap);
-		
-	// 	// refresh sorting
-	//        	this.refreshSortable();
-
-	//        	// show edit buttons
-	// 	if (this.editMode) this._showEditButtons();
-
-	// },
 
 	_editFolderTitle : function (uuid) {
 

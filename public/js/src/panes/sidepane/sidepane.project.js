@@ -30,20 +30,22 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.logo = Wu.DomUtil.create('div', 'project-logo', this._container);
 		this.logo.type = 'logo';
 
-		// create createdBy
-		this.createdBy = Wu.DomUtil.create('div', 'project-createdby', this._container);
-
-		// create lastModified
-		this.lastUpdated = Wu.DomUtil.create('div', 'project-lastupdated', this._container);
-
-		// create createdDate
-		this.createdDate = Wu.DomUtil.create('div', 'project-createddate', this._container);
+		
 
 		// create users
 		this.users = Wu.DomUtil.create('div', 'project-users-wrap', this._container);
 		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.users);
 		Wu.DomEvent.on(this.users, 'mouseenter', this.expandUsers, this);
 		Wu.DomEvent.on(this.users, 'mouseleave', this.collapseUsers, this);
+
+		// create createdBy
+		this.createdBy = Wu.DomUtil.create('div', 'project-createdby', this.users);
+
+		// create lastModified
+		this.lastUpdated = Wu.DomUtil.create('div', 'project-lastupdated', this.users);
+
+		// create createdDate
+		this.createdDate = Wu.DomUtil.create('div', 'project-createddate', this.users);
 
 		// kill button
 		if (app.Account.canDeleteProject(this.project.store.uuid)) {

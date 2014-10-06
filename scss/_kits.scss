@@ -16,21 +16,7 @@ body {
 	-o-transition: top 300ms ease, opacity 300ms ease;
 	transition: top 300ms ease, opacity 300ms ease;
 	}
-	
-
-	/*  Transition width på side panes */
-.q-editor-container {
-	/*	
-	-webkit-transition: width 250ms ease;
-	-moz-transition: width 250ms ease;
-	-o-transition: width 250ms ease;
-	transition: width 250ms ease;
-	*/	
-	}	
-	
-	
-	
-	
+		
 @-webkit-keyframes nclient { 
 	0% { height: 0px; opacity: 0; }	
 	100% { height: 300px; opacity: 1; }
