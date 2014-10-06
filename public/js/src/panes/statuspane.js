@@ -36,14 +36,7 @@ Wu.StatusPane = Wu.Class.extend({
 		Wu.DomEvent.on(this._container, 'mousedown', this.toggle, this);
 
 		// global TAB key toggle
-		Wu.DomEvent.on(document, 'keydown', this.tab, this);
-
-		// debug
-		// Wu.DomEvent.on(this._container, 'mousedown', this.debug, this);
-	},
-
-	debug : function (e) {
-		this.setStatus('debug! ;)', 1000);
+		// Wu.DomEvent.on(document, 'keydown', this.tab, this);	// todo: fix tabbing in inputs
 	},
 
 	tab : function (e) {
@@ -60,6 +53,8 @@ Wu.StatusPane = Wu.Class.extend({
 		var sidepane = app.SidePane;
 		sidepane.expand();
 		this.refresh();
+
+		console.log('StatusPane.open(). Currently active menu item:', app._activeMenuItem);
 	},
 
 	// close sidepane menu
@@ -68,6 +63,8 @@ Wu.StatusPane = Wu.Class.extend({
 		var sidepane = app.SidePane;
 		sidepane.collapse();
 		this.refresh();
+
+		console.log('StatusPane.close(). Currently active menu item:', app._activeMenuItem);
 
 		var __map = Wu.DomUtil.get("map"); // (j)
 		Wu.DomUtil.removeClass(__map, "map-blur") // (j) – removes the blur on map if it's set by one of the fullpanes
@@ -169,4 +166,4 @@ Wu.StatusPane = Wu.Class.extend({
 	},
 
 
-})
+});

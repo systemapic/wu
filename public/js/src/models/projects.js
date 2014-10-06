@@ -233,8 +233,6 @@ Wu.Project = Wu.Class.extend({
 		this.colorTheme = savedCSS;
 		this._update('colorTheme');
 
-		console.log('saved color theme,', this.colorTheme.length);
-
 	},
 
 	setColorTheme : function () {
@@ -249,7 +247,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	removeMapboxAccount : function (account) {
-		_.remove(this.store.connectedAccounts.mapbox, function (m) {
+		_.remove(this.store.connectedAccounts.mapbox, function (m) {	// todo: include access token
 			return m == account;
 		});
 		this._update('connectedAccounts');
@@ -279,6 +277,32 @@ Wu.Project = Wu.Class.extend({
 		return this.store.baseLayers;
 	},
 
+	getLayermenuLayers : function () {
+		return _.filter(this.store.layermenu, function (l) {
+			return !l.folder;
+		})
+		// return this.store.layermenu;		// todo: set layer uuid in layermenuItems
+	},
+
+	getLayers : function () {
+		return _.toArray(this.layers);
+	},
+
+	getLayer : function (uuid) {
+		return this.layers[uuid];
+	},
+
+	getLayerFromFile : function (fileUuid) {
+		return _.find(this.layers, function (l) {
+			return l.store.file == fileUuid;
+		});
+	},
+
+	getFiles : function () {
+		return this.store.files;
+	},
+
+
 	getBounds : function () {
 		var bounds = this.store.bounds;
 		if (_.isEmpty(bounds)) return false;
@@ -296,14 +320,6 @@ Wu.Project = Wu.Class.extend({
 
 	getPosition : function () {
 		return this.getLatLngZoom();
-	},
-
-	getLayer : function (uuid) {
-		return this.layers[uuid];
-	},
-
-	getFiles : function () {
-		return this.store.files;
 	},
 
 	getCollections : function () {
@@ -371,14 +387,9 @@ Wu.Project = Wu.Class.extend({
 
 
 	setFile : function (file) {
-		console.log('setFile: ', file);
 
 		// add to local store
 		this.store.files.push(file);
-
-		// create layer if geojson
-		
-		
 
 		// save to server (if necessary)
 		this._update('files');
@@ -480,11 +491,6 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
-
-
-
-
-
 	getGrandeFiles : function () {
 		var files = this.getFiles();
 		var sources = this._formatGrandeFiles(files);
@@ -503,7 +509,7 @@ Wu.Project = Wu.Class.extend({
 		files.forEach(function (file) {
 			if (file.type == 'image') {
 
-				var thumbnail = '/pixels/' + file.uuid + '?width=50&height=50';
+				var thumbnail = '/pixels/' + file.uuid + '?width=75&height=50';
 				var url = '/pixels/' + file.uuid + '?width=200&height=200';
 
 				var source = {

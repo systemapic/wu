@@ -164,7 +164,6 @@
 	}
 
 .legends-item {
-	max-height: 120px;
 	overflow: hidden;
 	padding: 10px;
 	display: inline-block;
@@ -174,8 +173,12 @@
 	border-right: 1px dashed #C8C8C8;
 	max-width: 300px;
 	margin-top: 7px;
-	height: 83px;
+	font-family: helvetica neue !important;
 	}
+
+.legends-item img {
+	max-height: 50px;
+	}	
 
 .legend-title {
 	font-weight: 900;
@@ -210,8 +213,15 @@
 #legends-inner-slider {
 	position: relative;
 	left: 0px;
-	-webkit-transition: left 500ms ease;
+	/*-webkit-transition: left 500ms ease;*/
 	}
+
+.legends-inner-slider-sliding {
+	-webkit-transition: left 500ms ease;
+	-moz-transition: left 500ms ease;
+	transition: left 500ms ease;
+
+}	
 
 #description-control-inner-content-box {
 	background: rgba(255, 255, 255, 0.93);
@@ -225,6 +235,7 @@
 	font-weight: 500;
 	overflow-y: scroll;
 	overflow-x: hidden;
+	max-height: 500px; // OBS! Event listener for this
 	}
 
 #description-control-inner-content-box a {
@@ -296,7 +307,6 @@
 	overflow-x: hidden;
 	height: auto;
 	position: relative;
-	max-height: 500px;
 	width: 110%;
 	}
 
@@ -304,13 +314,14 @@
 	bottom: 5px;
 	right: 5px;
 	position: absolute;
-	background: rgba(255,255,255,0.2);
-	padding: 1px 5px 1px 5px;
+	background: rgba(0,0,0,0.2);
+	padding: 1px 5px 2px 5px;
 	display: none;
 	font-weight: 900;
 	border-radius: 1px;
 	text-shadow: -1px 1px rgba(0, 0, 0, 0.5);
 	font-size: 10px;	
+	color: white;
 	}	
 
 .project-kill:hover,
@@ -407,7 +418,7 @@
 	padding-left: 0px;
 	font-size: 110%;
 	margin-top: 25px;
-	margin-bottom: 75px;
+	/*margin-bottom: 75px;*/
 	}
 
 .valid {
@@ -422,7 +433,7 @@
 	height: 100%;
 	z-index: 5000;
 	left: 0;
-	top: 89px;
+	top: 0px;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	background: rgba(255,255,255,0.97);
@@ -480,6 +491,8 @@
 	position: absolute;
 	top: 18px;
 	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	transform: rotate(45deg);
 	left: 18px;
 	z-index: -1;
 	}	
@@ -570,10 +583,11 @@
 	font-style: italic;
 	}
 
-
-
 .map-blur {
 	-webkit-filter: blur(3px) brightness(0.5) grayscale(0.5);
+	/*-moz-filter: blur(3px) brightness(0.5) grayscale(0.5);*/
+	/*filter: blur(3px) brightness(0.5) grayscale(0.5);*/
+	filter: url(filter.svg#svg-map-filter);
 	opacity: 1;
 	}
 
@@ -586,20 +600,20 @@
 	}
 
 .leaflet-control-baselayertoggle {
-	height: 26px;
-	width: 26px;
+	height: 26px !important;
+	width: 26px !important;
 	background-image: url('');
 	background-position: 4px 4px;
 	background-repeat: no-repeat;
 	display: block;
 	padding: 3px;
 	-moz-border-radius: 4px;
-	box-shadow: 0 1px 7px rgba(0, 0, 0, 0.65);
+	box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);
 	text-align: center;
 	background-color: #FFFFFF;
 	background-image: url('evil_sprite.png');
 	background-repeat: no-repeat;
-	background-position: 2px -233px;
+	background-position: -99px -75px;
 	}
 
 .baselayertoggle-item {
@@ -646,6 +660,7 @@
 	width: 170px;	
 	border-radius: 2px;
 	padding-left: 15px;
+	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	}
 
@@ -658,6 +673,8 @@
 	top: 20px;
 	left: 8px;
 	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	transform: rotate(45deg);
 	z-index: -1;
 	}
 
@@ -666,7 +683,7 @@
 	}
 
 .expand {
-	display: block;
+	display: block !important;
 	}
 
 
@@ -758,8 +775,6 @@
 	color: yellow;
 	}
 
-
-
 .home-container {
 	width: 90px;
 	height: 80px;
@@ -776,6 +791,10 @@
 	background-position: -180px -229px !important;
 	opacity: 0.5;
 	}
+
+.home-container:hover > .home-logo {
+	opacity: 0.7;
+}	
 
 .home-status {
 	position: absolute;
@@ -801,7 +820,7 @@
 
 .home-container {
 	background-color: rgba(255, 255, 255, 0.9) !important;
-	box-shadow: 0 0px 5px 0 #333;
+	box-shadow: 0 0px 5px 0 rgba(0,0,0,0.3) !important; // Override Knut
 	z-index: 999;
 	position: relative;
 	}
@@ -814,9 +833,11 @@
 
 .leaflet-right .leaflet-control {
 	margin-bottom: 2px !important;
-	float: right;
+	/*float: right;*/
 	padding-left: 5px;
 	padding-right: 5px;
+	margin-right: 10px;
+	float: none;
 	}
 
 #editor-map-bounds-max-zoom-value,
@@ -825,21 +846,23 @@
 	}
 
 .project-description {
-	top: 58px;
+	top: 34px;
 	color: #333;
 	text-shadow: none;
 	border-top: 1px dotted rgba(0, 0, 0, 0.5);
-	padding-top: 4px;
+	/*padding-top: 4px;*/
 	position: absolute;
 	left: 10px;
 	height: 50px;
 	overflow: hidden;
-	width: 165px;
+	width: 189px;
 	background: rgba(255, 255, 255, 0);
 	font-size: 12px;
 	padding: 0px;
 	font-weight: 500;
 	line-height: 1.2;
+	padding-top: 6px;
+	padding-right: 73px;
 	}
 
 .project-createdby,
@@ -908,6 +931,8 @@
 	top: -4px;
 	right: 57px;
 	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	transform: rotate(45deg);
 	}
 
 .project-users p {
@@ -948,10 +973,8 @@
 
 .new-project-button {
 	font-size: 359%;
-
 	height: 42px;
 	width: 42px;
-	/*color: rgba(255, 255, 255, 0.4);*/
 	margin: 0;
 	margin-bottom: 10px;
 	padding: 2px 12px 2px 5px;
@@ -984,7 +1007,7 @@
 	}
 
 .description-scroller {
-	width: 217px;
+	width: 258px;
 	padding-bottom: 10px;
 	margin-top: 10px;
 	}	
@@ -1016,3 +1039,52 @@ article {
 hr {
 border-top: 1px solid #333;
 	}
+
+#layer-menu-header {
+	margin-top: 2px !important;
+	}
+
+.legends-padding-right {
+	padding-right: 300px !important;
+	}
+
+
+
+
+
+.leaflet-draw-section-button {
+	width: 26px;
+	height: 26px;
+	background-color: white;
+	margin-bottom: 3px;	
+	background-image: url('evil_sprite.png');
+	background-repeat: no-repeat;
+	background-position: -99px -106px;
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
+	cursor: pointer;
+	}	
+
+.leaflet-draw-section:first-child {
+	margin-top: 6px;
+	}	
+
+.leaflet-draw-section-wrapper {
+	height: 0px;
+	overflow: hidden;
+	-webkit-transition: height 250ms ease;	
+	-moz-transition: height 250ms ease;	
+	transition: height 250ms ease;	
+	padding: 3px;
+	position: relative;
+	left: -3px;
+	overflow: hidden;
+
+	}
+
+.draw-expander {
+	height: 270px;
+}
+
+.open-drawer {
+	-webkit-filter: invert(75%);
+}

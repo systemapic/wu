@@ -36,12 +36,13 @@ var projectSchema = mongoose.Schema({
 		description : String,
 	}],
 
-			// connected accounts
 	connectedAccounts : {
-		mapbox  : [String],
+		mapbox  : [{
+			username : String,
+			accessToken : String
+		}],
 		cartodb : [String]
 	},
-
 
 			// active baselayers
 	baseLayers : [{
@@ -82,7 +83,8 @@ var projectSchema = mongoose.Schema({
 			caption : String, // caption/title in layermenu
 			pos     : String, // position in menu
 			zIndex  : String,
-			opacity : String
+			opacity : String,
+			folder  : { type: Boolean, default: false }
 		}
 	
 	],	

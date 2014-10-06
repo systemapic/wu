@@ -22,9 +22,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._rightpane  = Wu.DomUtil.get('documents-container-rightpane');
 		this._textarea   = Wu.DomUtil.get('documents-container-textarea');
 		this._newfolder  = Wu.DomUtil.get('documents-new-folder');
-
-
-
 	},
 
 	initFolders : function () {
@@ -44,7 +41,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	addEditHooks : function () {
-		console.log('adding addEditHooks for DOCS');
 
 		// new folder
 		Wu.DomEvent.on(this._newfolder, 'mousedown', this.newFolder, this);
@@ -55,7 +51,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// show (+)
 		Wu.DomUtil.removeClass(this._newfolder, 'displayNone');
 
-
 	},
 
 	addGrande : function () {
@@ -63,9 +58,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		var nodes = this._textarea;
 
 		// get sources
-		var files = this.project.getFiles();
+		var files   = this.project.getFiles();
 		var sources = this.project.getGrandeFiles(files);
-		var images = this.project.getGrandeImages(files)
+		var images  = this.project.getGrandeImages(files);
+
+		console.log('soruces: ', sources);
+		console.log('images: ', images);
 
 		// set grande options
 		var options = {
@@ -73,13 +71,17 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		        	// file attachments
 			        attachments : new G.Attachments(sources, {
-			        	icon : 'fileAttachment.png',
+			        	icon : ['http://85.10.202.87:8080/images/image-c9471cb2-7e0e-417d-a048-2ac501e7e96f',
+			        		'http://85.10.202.87:8080/images/image-7b7cc7e4-404f-4e29-9d7d-11f0f24faf42'],
+			        	className : 'attachment'
 			        }),
 
 			        // image attachments
-			        images :  new G.Attachments(sources, {
-			        	icon : 'imageAttachment.png',
-			        	embedImage : true 			// embed image in text! 
+			        images :  new G.Attachments(images, {
+			        	icon : ['http://85.10.202.87:8080/images/image-0359b349-6312-4fe5-b5d7-346a7a0d3c38',
+			        		'http://85.10.202.87:8080/images/image-087ef5f5-b838-48bb-901f-7e896de7c59e'],
+			        	embedImage : true,			// embed image in text! 
+			        	className : 'image-attachment'
 			        }),
 
 			},
@@ -97,6 +99,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	removeGrande : function () {
 
+		this.grande.destroy();
+		delete this.grande;
 
 	},
 	
@@ -112,6 +116,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// bind grande.js text editor
 		// Grande.unbind([this._textarea]);
+		this.removeGrande();
 
 		// hide (+)
 		Wu.DomUtil.addClass(this._newfolder, 'displayNone');

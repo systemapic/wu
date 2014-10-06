@@ -14,7 +14,6 @@ label {
 	}
 
 h3, h4 {
-	/*color: white;*/
 	color: black;
 	cursor: default;
 	}	
@@ -41,9 +40,6 @@ h5 {
 	margin-top: 0px;
 	margin-bottom: 15px;
 	opacity: 1;
-	/*font-size: 22px;*/
-	/*font-weight: $lean;*/
-
 	font-size: 18px;
 	font-weight: 200;
 	}
@@ -59,12 +55,10 @@ thead tr, thead tr th {
 	}	
 
 tr:nth-child(odd) {
-	/*background-color: $translight;*/
 	background-color: rgba(0, 0, 0, 0.15);
 	}
 
 tr:nth-child(even) {
-	/*background-color: $translighter;*/
 	background-color: rgba(0, 0, 0, 0.075);
 	}
 
@@ -72,7 +66,7 @@ tr.new {
 	background-color: rgb(0,255,255) !important;
 	}
 
-// ColorThemes .ct1
+// ColorThemes
 th {
 	background: $ecolor2;
 	cursor: pointer;
@@ -115,8 +109,6 @@ a {
 	
 .active a,										// Link Color
 .editor-wrapper a {
-	/*color: rgb(0,255,255) !important;*/
-
 	color: cadetblue !important;
 	font-weight: 900 !important;
 	text-shadow: -1px 1px 1px rgba(255,255,255,0.3);
@@ -162,7 +154,6 @@ a {
 	text-decoration: underline;
 	}				
 
-		
 .search {										// Search fields
 	margin: 0px;
 	border: none;
@@ -179,9 +170,7 @@ a {
 	box-shadow: 0 0 3px 0 rgba(0,0,0,0.4) inset;
 	}		
 	
-
 .eightyWidth {									// Often used in tables
-/* 	background: rgba(255,255,255,0.2) !important; */
 	background: rgba(0, 0, 0, 0.3);
 	color: white !important;
 	border: 0;
@@ -207,36 +196,25 @@ a {
 	cursor: pointer;
 	padding-left: 20px;
 	padding-right: 20px;
-	/*background-color: $translight;*/
-	/*width: 280px;*/
-
 	background-color: rgba(55, 55, 75, 0.15);
 	width: 230px;	
 	}	
 
 .editor-inner-wrapper:hover {
-	/*background-color: rgba(255, 255, 255, 0.05);*/
-
 	background-color: rgba(55, 55, 75, 0.25);
 	}	
 	
 .editor-inner-wrapper h5 {						// Client : New Client title
-/* 	font-size: 200%; */
-/* 	font-weight: $lean; */
 	padding: 0;
 	position: relative;
-/* 	display: block; */
-/* 	text-align: center; */
 	padding-top: 10px;
 	}
 
 .editor-inner-wrapper input, 					// Input fields in gray wrapper
 .input-box {
-	/*background: rgba(0,0,0,0.3);*/
 	padding: 7px;
 	color: white;	
 	font-weight: $lean;
-
 	background: rgba(0, 0, 0, 0.7);
 	}
 
@@ -248,7 +226,7 @@ a {
 	
 .search {
 	padding: 5px !important;
-}
+	}
 
 
 // ********** BUTTONS **********
@@ -270,18 +248,14 @@ a {
 		
 .smap-button-gray {								// Button : standard GRAY button
 	height: 33px;
-	/*color: gainsboro;*/
 	font-size: 17px;
 	line-height: 1.5;
-	/*background: $translight;*/
 	padding: 5px 10px 5px 10px;
 	text-align: center;
-	/*font-weight: $lean;*/
 	cursor: pointer;
 	font-family: $font;
 	display: inline-block;
 	vertical-align: top;
-
 	background: rgba(0, 0, 0, 0.45);
 	color: white;
 	font-weight: 400;
@@ -294,7 +268,6 @@ a {
 
 .smap-button-white {							// Button : standard WHITE button
 	height: 32px;
-	/*color: #666;*/
 	text-align: center;
 	margin: 0;
 	margin-bottom: 10px;
@@ -309,18 +282,12 @@ a {
 	position: relative;
 	display: inline-block;
 	vertical-align: top;
-	
-	/*background: #EAEAEA;*/
-
 	background: rgba(255,255,255,0.75);
 	box-shadow: 0 0 2px 0 rgba(0,0,0,0.7) inset;
-
 	color: #666;
-
 	}
 	
 .smap-button-white:hover {
-	/*background: white;*/
 	background: white;
 	color: #333;
 	}
@@ -353,7 +320,6 @@ a {
 	width: 100%;
 	padding: 0px;
 	opacity: .7;
-
 	background: rgba(0, 0, 0, 0.70);
 
 	-webkit-transition: height 150ms ease;
@@ -367,16 +333,15 @@ a {
 	margin-bottom: 3px;
 	}
 
-	
 .item-list div,
 .layers-mapbox-item,
 .select-elem {
 	padding: 8px;
-}	
+	}	
 	
 .item-list:hover {
 	opacity: 0.8;
-}	
+	}
 	
 .item-list, .layer-item, .layers-mapbox-item {
 	color: #333;
@@ -387,10 +352,6 @@ a {
 .item-list.active,
 .layer-item.active,
 .active .layers-mapbox-item {								// List Buttons : Active State
-	/*background-color: white;*/
-	/*color: rgba(0,0,0,0.7);*/
-	/*font-weight: $median;*/
-
 	background-color: black;
 	color: white;
 	font-weight: 400;	
@@ -434,7 +395,6 @@ body {
 	
 	-webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
     }
 	
 #app {									// The Outer Super Wrapper	
@@ -453,30 +413,25 @@ body {
 	height: 100%;
 	left: 0px;
 	-webkit-transition: -webkit-filter 250ms linear, opacity 250ms linear !important;
+	-moz-transition: -moz-filter 250ms linear, opacity 250ms linear !important;
+	transition: filter 250ms linear, opacity 250ms linear !important;
 	}
 
 #map:after {
-/*	content: 'No projects selected';
-	background-image: url('sysa_txt.png');
-	background-repeat: no-repeat;
-	background-position: 750px 430px;
-*/	position: relative;
+	position: relative;
 	width: 100%;
 	height: 100%;
 	left: 0;
 	top: 280px;
 	text-align: center;
 	display: block;
-	/*padding-right: 400px;*/
 	font-size: 42px;
 	color: #666;
 	font-weight: $lean;
 	content: 'Select a project';
 	padding-right: 0px;
-
 	}
 	
-
 #map:before {
 	content: '';
 	background-image: url('systemapic_BG.jpg');
@@ -494,22 +449,14 @@ body {
 	position: relative;
 	}
 	
-	
 #header {								// The Header
 	position: absolute;
-	/*top: 0px;*/
-	/*left: 400px;*/
-	height: 120px;
-	/*width: 100%;*/
-	background: rgba(255,255,255,0.93);
+	height: 77px;
 	z-index: 10;
-	/*box-shadow: 0px 0px 5px black;*/
-
 	top: 6px;
 	left: 104px !important;
-	width: auto;
-	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
-
+	width: 100% !important; // To override Knut
+	padding-right: 110px;
 	}
 
 #headerResizer { 						// The Header
@@ -527,14 +474,31 @@ body {
 #header .header-logo {					// The Header
 	position: relative;
 	z-index: 1000;
-	/*height: 120px;*/
-	/*max-width: 200px;*/
 	color: white;	
-	/*margin-right: 20px;*/
 	float: left;
 	max-height: inherit;
 	padding: 5px;
 	margin-right: 10px;
+
+	// To override Knut
+	float: left !important;
+	position: absolute !important;	
+	background-repeat: no-repeat !important;
+	background-position: center !important;
+	left: 3px !important;
+	background-color: transparent !important;
+	background-size: 100% 100% !important;
+	top: 3px !important;
+	height: 71px !important;
+	}
+
+// To override Knut
+.header-title-wrap {
+	background: rgba(255, 255, 255, 0.93) !important; // To override Knut
+	height: 100% !important; // To override Knut
+	width: 100% !important; // To override Knut
+	top: 0 !important; // To override Knut
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
 	}
 
 .header-logo img {						// The Header
@@ -546,45 +510,56 @@ body {
 .header-title {							// The Header
 	border: 0px;
 	background: transparent;
-	/*font-size: 40px;*/
 	font-size: 30px;
 	font-weight: $lean;
+	padding-left: 102px;
 	}
 
 .header-title input {
 	padding: 0;
-}
+	/*padding-left: 102px;*/
+	width: 100%;
+	/*background: red;*/
+	}
 
-.header-subtitle input {
-	margin-top: 7px;
-	width: 300px;
-	color: black;
-}
 
 
 .header-subtitle {						// The Header
 	border: 0px;
 	background: transparent;
 	display: block;
-	/*position: relative;*/
-	/*top: 0;*/
 	font-style: italic;
 	color: #666;
 	font-size: 16px;
 	font-weight: $lean;
-
 	float: left;
 	height: 55px;
 	word-wrap: break-word;
-	position: absolute;
+	position: relative !important;
 	left: inherit;
-	top: 42px;
+	top: 0 !important;
 	line-height: 15px;
 	overflow: hidden;
 	max-height: 31px;
 	padding-right: 14px;
-
+	padding-left: 102px;
 	}
+
+.header-subtitle input {
+	/*margin-top: 7px;*/
+	width: 300px;
+	color: black;
+	/*padding-left: 102px;*/
+	width: 100%;
+	/*background: red;*/
+	margin: 0 !important;
+	padding: 0 !important;
+	left: 0 !important;
+	top: -9px !important;
+	/*position: relative;*/
+	
+	position: absolute;
+	}	
 
 #header input {							// The Header
 	outline: none;
@@ -592,7 +567,6 @@ body {
  
 #header input:focus  {					// The Header
 	border: 1px solid rgb(81, 203, 238);
-
 	}
 	
 
@@ -604,19 +578,17 @@ body {
 	
 .q-editor-container {
 	position: absolute;
-	/*height: 100%;*/
-	/*width: 400px;*/
-	/*background-color: rgba(62,70,82,0.98);*/
 	overflow: hidden;
 	z-index: 2000;	
-	/*box-shadow: 1px 0 0 0 rgba(0,0,0,0.2), 0 0 5px rgba(0,0,0,0.4);*/
-	-webkit-transition: height 250ms ease;
-	width: 95px;
+	-webkit-transition: height 250ms ease, width 250ms ease;
+	-moz-transition: height 250ms ease, width 250ms ease;
+	transition: height 250ms ease, width 250ms ease;
 
+	width: 95px;
 
 	background-color: rgba(255,255,255,0.0);
 	box-shadow: none;
-	top: 3px;
+	top: 84px !important; // To override Knut
 	left: 4px;
 	padding-top: 2px;
 	height: 80px;
@@ -636,13 +608,14 @@ body {
 	margin: 0;
 	padding: 0;
 	position: absolute;
-	box-shadow: 0 0px 5px 0 #333;
+	box-shadow: 0 0px 5px 0 rgba(0,0,0,0.3) !important;
 	margin-top: 7px;
 	height: auto;
 	left: 2px;
 	width: 90px;	
 	background-color: rgba(255, 255, 255, 0.95);
 	top: 79px;
+	top: 6px !important; // To override Knut
 	}
 
 .q-editor-menu-item {
@@ -666,10 +639,13 @@ body {
 	line-height: 5;
 	text-decoration: none;
 	color: #666;
-
 	line-height: 1;
 	padding-top: 20px;
 	}
+
+.q-editor-menu-item a:hover {
+	color: #333;
+	}	
 
 .q-editor-content-item {
 	position: absolute;
@@ -679,30 +655,25 @@ body {
 	overflow-y: auto;
 	overflow-x: hidden;
 	opacity: 1;
-	top: 0;
 	background-color: rgba(255,255,255,0.90);
 	margin-top: 20px;
-	box-shadow: 0 0 5px 0 black;
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3) !important; // To override Knut
 	height: auto;
 	margin-left: 0px;
 	margin-right: 20px;
 	width: 250px;
 	margin-top: 86px;
-	max-height: 70%;	
+	max-height: 70%;
+	top: 6px !important; // To override Knut
 	}
 
 // ColorThemes .ct1
 .editor-wrapper { 						// The inner Wrapper of the .q-editor-content-item
-	/*color: white;*/
-	/*width: 310px;*/
 	height: 100%;
 	overflow-y: scroll;
-	/*padding-right: 16px;*/
-	/*padding-right: 30px;*/
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0px;
-
 	color: black;
 	width: 260px;
 	padding-right: 30px;	
@@ -711,45 +682,25 @@ body {
 .editor-wrapper h3 {					// q-editor main title
 	text-align: center;
 	font-weight: $lean;
-	/*font-size: 320%;*/
 	margin-top: 0;
 	font-size: 220%;
 	}
 
-.swipe_out_up {							// q-editor movers and shakers
-/*	top: -200px;
-	opacity: 0;
-	display: block;
-*/	}
-	
-.swipe_out {							// q-editor movers and shakers
-/*	top: 200px;
-	opacity: 0;
-	display: block;
-*/	}	
-
 #menuslider {							// The background slider
-	/*width: 100px;*/
 	height: 70px;
-	/*background-color: $ecolor2;*/
 	top: 0px;
 	position: absolute;	
-	/*border-right: 1px dashed rgba(120, 120, 120, 0.3);*/
-
-
 	width: 90px;
-	background-color: rgba(0, 0, 0, 0.15);
-	/*border-right: none;	*/
+	background-color: rgba(0, 0, 0, 0.075);
 	}
 
 #menuslider-arrow {
-	border: 0px solid red;
 	position: absolute;
 	right: -9px;
 	width: 9px;
 	height: 72px;
 	overflow: hidden;
-}
+	}
 
 #menuslider-arrow:before { 
 	content: '';
@@ -757,15 +708,14 @@ body {
 	height: 30px;
 	width: 30px;
 	top: 21px;
-	background-color: rgba(210,210,210,1);
+	background-color: #e9e9e9;
 	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	transform: rotate(45deg);
 	left: -29px;
-	box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0.075);
 	z-index: 999;
 	}
-
-
-
 
 #menucloser {							// The menu pane closer
 	position: absolute;
@@ -781,10 +731,14 @@ body {
 	background-repeat: no-repeat;
 	background-position: 4px 8px;
 	-webkit-transform: rotate(270deg);
+	-moz-transform: rotate(270deg);
+	transform: rotate(270deg);
 	}
 	
 .pane-open {							// The menu pane closer in open state
 	-webkit-transform: rotate(90deg) !important;	
+	-moz-transform: rotate(90deg) !important;	
+	transform: rotate(90deg) !important;	
 	}	
 
 .client-project-title-wrapper {
@@ -851,14 +805,11 @@ body {
 	padding: 0;
 	}
 	
-
 #editor-project-item-new {					// PROKJCTS
 	height: 55px;
 	}
 
-
 #editor-client-item-new h5 {				// Client : New Client title
-/* 	font-size: 200%; */
 	padding: 0;
 	position: relative;
 	display: block;
@@ -866,22 +817,18 @@ body {
 	padding-top: 10px;
 	}
 
-
 	
 // --- Client	
 	
 .editor-clients {
 	position: relative;
 	padding-bottom: 48px;
-}
+	}
 
 
 .client-title {
 	padding: 5px;
-	/*font-size: 22px;*/
 	text-transform: uppercase;
-	/*font-weight: $lean;*/
-
 	font-size: 17px;
 	font-weight: 400;
 	color: #333;	
@@ -889,12 +836,6 @@ body {
 
 .client-logo {
 	position: absolute;
-	/*top: 10px;*/
-	/*right: 10px;	*/
-
-	/*width: 100px;*/
-	/*height: 60px;*/
-
 	width: 70px;
 	height: 50px;	
 	top: 5px;
@@ -902,8 +843,6 @@ body {
 	}	
 
 .editor-clients-container {					/* // Clients : inner wrapper */
-	/*	
-	background-color: #626771;
 	padding: 4px 6px 4px 6px;
 	margin: 0px 0px 1px 0px;
 	height: 80px;
@@ -911,30 +850,15 @@ body {
 	cursor: pointer;
 	overflow: hidden;
 	-webkit-transition: height 300ms ease;
-	*/
-
-	/*background-color: rgba(98,103,113,0.3);*/
-	/*background-color: rgba(255, 255, 255, 0.15);*/
-
-	padding: 4px 6px 4px 6px;
-	margin: 0px 0px 1px 0px;
-	height: 80px;
-	position: relative;
-	cursor: pointer;
-	overflow: hidden;
-	-webkit-transition: height 300ms ease;
-	/*box-shadow: 0 0 0 1px #626771 inset;*/
-
+	-moz-transition: height 300ms ease;
+	transition: height 300ms ease;
 	background-color: rgba(55, 55, 75, 0.15);
 	width: 230px !important;	
-	/*width: 280px;*/
 	}
 
 .editor-clients-container:hover {
-	/*background-color: rgba(255, 255, 255, 0.05)*/
 	background-color: rgba(55, 55, 75, 0.09);
 	}	
-
 
 .projects-container	{
 	position: absolute;
@@ -947,61 +871,34 @@ body {
 
 
 .project-logo {
-/*	width: 75px;
-	height: 46px;
 	position: absolute;
-	right: 4px;
 	background-repeat: no-repeat;
 	background-size: 100% 100%;
 	background-position: center;
-	top: 4px;*/
-
-	/*width: 75px;*/
-	/*height: 46px;*/
-	position: absolute;
-	/*right: 4px;*/
-	background-repeat: no-repeat;
-	background-size: 100% 100%;
-	background-position: center;
-	/*top: 4px;*/
 	background-color: white;
 	box-shadow: 0 0 2px 0px rgba(0,0,0,0.5);	
-
 	width: 69px;
 	height: 48px;
 	right: 9px;
-	top: 7px;
+	top: 44px;
 	}
 
 .project-item {
-/*	background: rgba(0, 0, 0, 0.2);
-	opacity: 1;
-	margin-bottom: 1px;
-	height: 55px;
-	position: relative;*/
-
-	/*background: rgba(255, 255, 255, 0.15);*/
-
 	background: rgba(0, 0, 0, 0.15);
-
 	opacity: 1;
 	margin-bottom: 5px;
-	/*height: 55px;*/
 	position: relative;
-	/*color: white;	*/
-
 	color: #333;
 	height: 111px;
 	}
 
 .project-item:hover {
-	/*background: rgba(0, 0, 0, 0.3);*/
 	background: rgba(0, 0, 0, 0.25);
 	}	
 
 .project-item:hover > .project-kill {
 	display: block;
-}
+	}
 
 .project-logo-wrap img {
 	height: 100%;
@@ -1011,17 +908,11 @@ body {
 	position: absolute;
 	left: 10px;
 	top: 10px;
-
 	font-size: 110%;
 	text-shadow: none;
 	font-weight: 500;
 	text-transform: uppercase;
-
-	/*font-size: 120%;*/
-	/*text-shadow: -1px 1px rgba(0,0,0,0.35);	*/
 	}
-
-
 
 .editor-client-title {						// Clients : Title wrapper
 	position: relative;
@@ -1077,26 +968,19 @@ body {
 #new-client-button {
 	height: 42px;
 	width: 42px;
-	/*color: rgba(255,255,255,0.4);*/
 	margin: 0;
 	margin-bottom: 10px;
 	padding: 2px 12px 2px 5px;
 	border: 0px;
 	border-radius: 0;
-	/*line-height: 0.55;*/
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
 	font-size: 383%;
 	font-weight: $lean;
 	cursor: pointer;
 	position: absolute;
 	display: inline-block;
-	/*background: rgba(255, 255, 255, 0.15);*/
-	/*background-color: #616671;*/
-	/*right: 0px;*/
-	/*bottom: -56px;*/
-
 	bottom: -10px;
-	right: 0px;
+	right: 31px !important; // Override Knut
 	color: #666;
 	line-height: 0.5;
 	background: white;	
@@ -1143,6 +1027,8 @@ body {
 	right: -11px;
 	top: -11px;
 	-webkit-transform: rotate(320deg);
+	-moz-transform: rotate(320deg);
+	transform: rotate(320deg);
 	box-shadow: 0 0 0 2px white;	
 	}
 	
@@ -1180,7 +1066,6 @@ body {
 	margin-bottom: 10px;
 	}	
 
-// ColorThemes .ct0
 .editor-projects-item {					// Project : box veiw - Project (clickable) outer wrapper 
 	color: white;
 	overflow: hidden;
@@ -1197,7 +1082,6 @@ body {
 	background: white;
 	}
 
-// .list_view ColorThemes .ct0
 .list_view .editor-projects-item {		// ditto : list view 
 	width: 277px;
 	background: $ecolor1;
@@ -1252,8 +1136,6 @@ body {
 .editor-projects-item:hover > h5 {						
 	opacity: 1;
 	}
-	
-
 		
 .swipe_left {											// Project : swipe toggle
 	left: -300px !important;
@@ -1270,7 +1152,7 @@ body {
 #editor-map-initpos-more,   			// Extends .dropdown-button
 #editor-map-bounds-more {
 	top: 54px;
-}		
+	}
 	
 // Extends .smap-button-white	
 #editor-map-initpos-button,				// Map : Set current possition button
@@ -1281,17 +1163,12 @@ body {
 
 #editor-map-bounds {
 	width: 147px !important;
-	/*width: 198px !important;*/
-}
-// ------	
-	
+	}
 				
 .editor-map-item-wrap {					// Map : inner wrapper
 	padding: 10px;
-	/*min-height: 80px;*/
 	margin-bottom: 1px;
 	margin-top: 1px;
-
 	min-height: 40px;
 	}	
 	
@@ -1304,15 +1181,14 @@ body {
 	display: block;
 	overflow: hidden;
 	-webkit-transition: height 250ms ease;
+	-moz-transition: height 250ms ease;
+	transition: height 250ms ease;
 	margin-top: 8px;
 	}
 	
 .select-baselayer-open {				// Map : base layer list wrapper open
 	height: 297px;
 	}
-
-// ColorThemes .ct0
-.select-elem {}
 
 #editor-map-initpos-coordinates,		// Map : position wrapper
 #editor-map-bounds-coordinates {		// Map : bounds wrapper
@@ -1348,15 +1224,6 @@ body {
 	}
 
 .layers-library-browser-item { 			// The LOGOS : For Data Library & MapBox Library
-/*
-	width: 100px;
-	height: 100px;
-	border: 1px solid gray;
-	float: left;
-	margin: 3px;
-	background-size:100px 100px;
-	cursor: pointer;
-*/
 	width: 100px;
 	height: 100px;
 	border: 1px solid gray;
@@ -1376,10 +1243,6 @@ body {
 	padding-top: 19px;
 	text-transform: uppercase;
 	color: gainsboro;
-	}
-
-#layers-library-browser-datalayers:hover {	// MapBox logo
-/* 	color: white; */
 	}
 
 #layers-library-browser-mapbox {			// MapBox logo
@@ -1404,18 +1267,15 @@ body {
 	line-height: 2.4;
 	background: rgba(255,255,255,1);
 	box-shadow: 0 0 2px 1px rgba(0,0,0,0.3)	
-}
+	}
 	
 .middle-item:after {
 	content: '';
 	position: absolute;
 	top: -20px;
-	/*left: -30px;*/
 	background-color: rgba(255, 255, 255, 0.93);
-	/*width: 320px;*/
 	height: 72px;
 	z-index: -2;
-
 	width: 280px;
 	left: -10px;	
 	}	
@@ -1455,14 +1315,9 @@ body {
 	position: relative;
 	color: white;
 	margin: 0;
-	/*padding: 16px;	*/
-	/*padding-top: 10px;*/
-	/*padding-top: 4px;*/
 	height: 55px;
-
 	padding: 10px;
 	padding-top: 15px;	
-	/*padding-top: 0px;*/
 	}
 	
 #import-mapbox-layers {						// MapBox : connect input field
@@ -1489,14 +1344,12 @@ body {
 	background: #DADADA;
 	color: #666;	
 	height: 33px;
-	/*width: 75px;*/
 	border-radius: 0;
 	padding: 0;
 	vertical-align: top;
 	margin: 0px;
 	padding-top: 5px;
 	font-size: 110%;
-
 	width: 185px;
 	}		
 	
@@ -1533,7 +1386,6 @@ body {
 #layers-library-list,						// Data library : Layer list wrapper
 .mapbox-list-item {							// MapBox : Layer list wrapper for each account
 	margin-top: 12px;
-//	background: rgba(255, 255, 255, 0.15);
 	padding: 10px;
 	}
 	
@@ -1543,7 +1395,6 @@ body {
 	}	
 
 .mapbox-list-item:first-child {
-	/*margin-top: 12px;	*/
 	margin-top: 0px;
 	}
 	
@@ -1567,6 +1418,8 @@ body {
 .fullpage-users .editor-wrapper {
 	width: auto;
 	background-color: rgba(255,255,255,0.9);
+	overflow: hidden;
+	position: relative;
 	}
 
 .fullpage-documents,
@@ -1580,6 +1433,13 @@ body {
 	background: none;
 	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
 	overflow: hidden;
+
+	max-width: 100% !important; // To override Knut
+	width: 100% !important; // To override Knut
+	max-height: 100% !important; // To override Knut
+	height: 100% !important; // To override Knut
+	padding-right: 110px !important; // To override Knut
+	padding-bottom: 95px !important; // To override Knut
 	}
 
 
@@ -1590,11 +1450,8 @@ body {
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	/*background: rgba(63, 70, 82, 1);*/
 	z-index: 3400;
 	display: none;
-	/*left: 100px;	*/
-	/*padding-right: 84px;*/
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	}
@@ -1604,11 +1461,7 @@ body {
 	font-weight: $lean;
 	margin: 10px;
 	font-family: $font;
-	/*position: absolute;*/
-	/*width: 300px;*/
 	width: 250px;
-	/*top: 36px;*/
-
 	top: 0px;
 	position: relative;	
 	}
@@ -1619,21 +1472,19 @@ body {
 	padding: 20px;
 	font-family: $font;
 	position: absolute;
-	/*left: 300px;*/
 	height: 100%;
-	/*color: gainsboro;*/
 	font-size: 20px;
 	overflow-y: auto;
 	overflow-x: hidden;
 	width: 100%;
-	padding-right: 440px;
+	padding-right: 350px;
+	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-	/*top: 45px;*/
-
-	top: 100px;
+	top: 0px !important; // To override Knut
 	left: 250px;
 	color: #333;
 	padding-top: 0;	
+	padding-bottom: 125px;
 	}
 
 #documents-folder-list {					// Documents : folder list
@@ -1644,15 +1495,10 @@ body {
 #documents-new-folder {
 	background: none;
 	border: none;
-	/*font-weight: $lean;*/
-	/*font-size: 150%;*/
-	/*width: 75%;*/
 	margin: 4px;
 	margin-left: 30px;
 	font-family: $font;
-	/*color: gainsboro;	*/
 	cursor: pointer;
-
 	width: 90%;
 	line-height: 1.2;
 	margin-bottom: 10px;
@@ -1670,7 +1516,6 @@ body {
 
 #documents-new-folder:hover,				// ditto
 .documents-folder-item:hover {
-	/*color: white;*/
 	color: #000;
 	}
 
@@ -1683,22 +1528,13 @@ body {
 	color: #C80000;
 	}
 
-
-
-
-
 .documents-folder-delete {
 	float: left;
-	/*font-weight: $lean;*/
 	font-size: 150%;
 	font-family: helvetica neue;
-	/*margin-top: 4px;*/
-	/*padding-left: 10px;*/
-	/*width: 33px;*/
 	visibility: hidden;
 	color: #C8C8C8;
 	cursor: pointer;
-
 	position: absolute;
 	line-height: 0.4;
 	left: -2px;
@@ -1716,47 +1552,36 @@ body {
 	color: white;
 	text-shadow: -1px 1px 1px rgba(0,0,0,0.3);
 	margin-top: 1px;	
-}
+	}
 
 .documents-folder-delete:hover {
 	color: white;
 	background: #C80000;
-}
+	}
 
 .documents-folder-item {
 	margin-left: 10px;
-}
+	}
 
 .editor-map-item-wrap:last-child {
 	margin-top: 1px;
-}
+	}
 
 .tdcont {
 	cursor: pointer;
-}
+	}
 
 .tdcont.email {
 	cursor: default;
-}
-
-
+	}
 
 #documents-new-folder {
 	margin-left: 10px;
 	}
 
-
-
-
-
-
-
-
 .text-menu .options {						// Documents : tooltip
 	padding-top: 1px !important;
-	/*width: 215px !important;*/
-
-	width: 245px !important;
+	width: 245px;
 	}
 
 .text-menu.options.url-mode .file {			// Documents : tooltip
@@ -1865,7 +1690,6 @@ body {
 .users-controls {							// Users : controls wrapper
 	height: 42px;
 	position: relative;
-	/*color: white;*/
 	border-bottom: 1px solid;
 	margin-bottom: 20px;
 	color: #666;
@@ -1920,14 +1744,11 @@ body {
 	text-decoration: none;
 	}	
 
-
-// ColorThemes .ct1	
 .data-library,
 .fullpage-mediaLibrary {								// Data library : outer wrapper
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	/*background: rgba(63, 70, 82, 1);*/
 	z-index: 3400;
 	display: none;
 	left: 104px;
@@ -1964,7 +1785,6 @@ body {
 	opacity: 0.75;
 	}	
 
-
 #datalibrary-download-dialogue:after {		// ditto
 	content: '';
 	position: absolute;
@@ -1993,7 +1813,7 @@ body {
 	}
 	
 .tdcont:hover {								// ditto
-	color:white;
+	color: black;
 	}
 
 .tdcont.access:hover {
@@ -2032,7 +1852,7 @@ body {
 	font-size: 100%;
 	margin: 0 10px 0 0;
 	font-family: $font;
-	color: white;
+	color: #333;
 	background: none;
 	border: none;
 	resize: none;
@@ -2184,7 +2004,6 @@ body {
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	/*background: #3f4652;*/
 	z-index: 3400;
 	display: none;
 	left: 104px;
@@ -2302,6 +2121,8 @@ body {
 	padding-bottom: 0;
 	width: 100%;
 	padding: 0;
+
+	background: red;
 	}	
 	
 .users-projects-namediv {					// Users : Project name in R/W editing mode
@@ -2569,21 +2390,6 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 
 
 
-.no-inspector {
-	padding-bottom: 0 !important;
-	top: -8px !important;
-	padding-top: 15px !important;
-
-}
-
-.no-inspector #open-layers {
-	top: 14px !important;
-}
-
-
-
-
-
 
 
 .help-tooltip {
@@ -2604,8 +2410,7 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 	left: -20px;
 	width: 20px;
 	overflow: hidden;
-
-}
+	}
 
 .help-tooltip-arrow:before {
 	content: '';
@@ -2616,6 +2421,8 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 	left: 10px;
 	background-color: black;
 	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	transform: rotate(45deg);
 	box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
 	border: 2px solid rgba(255,255,255,1);
 	}
@@ -2627,11 +2434,6 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 	font-size: 12px;
 	}
 
-
-
-
-
-
 .inspector-list-outer-scroller {
 	width: 280px;
 	overflow: hidden;
@@ -2640,4 +2442,7 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 #inspector-list {
 	width: 320px;
 	}
+
+
+
 

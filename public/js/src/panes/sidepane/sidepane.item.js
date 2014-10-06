@@ -98,6 +98,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 		    
 		// active content                       
 		Wu.app._active = this._content;  
+		app._activeMenuItem = this.type;
 
 		// check vertical swipe action    (j)
 		this.checkSwipe(prev);
@@ -126,7 +127,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 	// check swipe of sidepane on selecting menu item (j)
 	checkSwipe : function (prev) {
-
+		console.log('checkSwipe -> prev: ', prev);
 		if (prev) return this.swiper(prev);
 
 		// Hide the Deactivated Pane
@@ -144,6 +145,9 @@ Wu.SidePane.Item = Wu.Class.extend({
 		// set vars
 		var swypefrom = prev._content;
 		var swypeto = Wu.app._active;               
+
+		console.log('prev', prev);
+		console.log('swypefrom', swypefrom);
 
 		// if same, do nothing
 		if (swypefrom == swypeto) return;
@@ -251,6 +255,9 @@ Wu.SidePane.Item = Wu.Class.extend({
 		    
 		// Hide the Deactivated Pane
 		if (Wu.app._active) {
+
+				console.log('swypefrom', swypefrom);
+
 			    Wu.DomUtil.removeClass(swypefrom, 'show');
 
 

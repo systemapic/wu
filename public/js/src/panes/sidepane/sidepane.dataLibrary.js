@@ -496,15 +496,15 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			this.addFile(file);
  
 			// add to project locally (already added on server)
-			// this.project.store.files.push(file);
 			this.project.setFile(file);
 		}, this);
 
 		// add layers
-		record.layers.forEach(function (layer) {
-			this.project.addLayer(layer);
-		}, this);
-
+		if (record.layers) {
+			record.layers.forEach(function (layer) {
+				this.project.addLayer(layer);
+			}, this);
+		}
 		this.project.refreshSidepane();
 	},
 
@@ -610,6 +610,15 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// save to server
 		this._save(fuuid, key);
 
+		// save new name to Layer also
+		if (key == 'name') this.updateLayerName(fuuid, value);
+
+	},
+
+	updateLayerName : function (fileUuid, value) {
+		// find and update layer
+		var layer = this.project.getLayerFromFile(fileUuid);
+		if (layer) layer.setTitle(value);
 	},
 
 	_save : function (fuuid, key) {
@@ -624,8 +633,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				var json = {};
 				json[key] = file[key];
 				json.uuid = file.uuid;
-
-				console.log('##$$$ save ::', key, json);
 
 				// update, no callback
 				var string = JSON.stringify(json);

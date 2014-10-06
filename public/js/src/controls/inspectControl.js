@@ -55,6 +55,9 @@ L.Control.Inspect = L.Control.extend({
 
 	addLayer : function (layer) {
 
+		// Make sure that the layer inspector is visible
+		this._content.style.display = 'block';
+
 		var wrapper 	= Wu.DomUtil.create('div', 'inspect-layer');
 		var arrowsWrap 	= Wu.DomUtil.create('div', 'inspect-arrows-wrap', wrapper);
 		var upArrow 	= Wu.DomUtil.create('div', 'inspect-arrow-up', arrowsWrap);
@@ -100,6 +103,7 @@ L.Control.Inspect = L.Control.extend({
 		// update zIndex
 		this.updateZIndex();
 
+
 	},
 	
 	// remove by layer
@@ -110,6 +114,12 @@ L.Control.Inspect = L.Control.extend({
 
 		// remove
 		this._removeLayer(entry);
+
+		// Hise Layer inspector if it's empty
+		if ( this.layers.length == 0 ) this._content.style.display = 'none';
+		
+
+
 	},
 
 	// remove by entry
@@ -119,6 +129,10 @@ L.Control.Inspect = L.Control.extend({
 
 		// remove from array
 		_.remove(this.layers, function (l) { return l.uuid == entry.uuid; });
+
+		// Hise Layer inspector if it's empty
+		if ( this.layers.length == 0 ) this._content.style.display = 'none';
+
 
 	},
 
@@ -247,6 +261,9 @@ L.Control.Inspect = L.Control.extend({
 		// remove from descriptionControl if avaialbe
 		var descriptionControl = app.MapPane.descriptionControl;
 		if (descriptionControl) descriptionControl.removeLayer(entry.layer);	
+
+		// Hise Layer inspector if it's empty
+		if ( this.layers.length == 0 ) this._content.style.display = 'none';
 
 	},
 

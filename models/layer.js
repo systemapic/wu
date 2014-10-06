@@ -17,6 +17,7 @@ var layerSchema = mongoose.Schema({
 	bounds		: String,	// bounds for layer
 	tms 		: Boolean,	
 	attribution     : String,
+	accessToken 	: String, 	// some layers have access tokens, like mapbox
 
 	// data source for layer
 	data : {

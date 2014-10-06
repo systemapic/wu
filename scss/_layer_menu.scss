@@ -4,22 +4,16 @@
 /*LAYER MENU*/
 
 #layer-menu-inner-content {
-	/*width: 320px;*/
 	height: 100%;
 	background: rgba(255, 255, 255, 0.93);
-	/*position: absolute;*/
 	padding: 4px;
-
 	position: relative;
 	padding-bottom: 5px;
 	padding-top: 5px;	
-
 	width: 280px;
 	box-shadow: 0 0 5px rgba(0,0,0,0.3);
 	left: -2px;
-
 	}
-
 
 .layeritem-open {
 	height: 29px;
@@ -36,47 +30,32 @@
 	overflow: hidden;
 	margin: 0;
 	font-family: helvetica,arial,sans-serif;
-	/*font-size: 15px;*/
 	z-index: 100;
 	position: relative;
 	padding: 0;
-	/*height: 29px;*/
 	color: #fff;
 	text-shadow: none;
 	color: white;
 	margin-bottom: 1px;
-	/*background-color: rgba(84, 138, 135, 1) !important;*/
-	background-color: #427676;
-
+	background-color: #34576a;
 	font-size: 13px;
 	height: 25px;
-
-	}
-
-
-.menufolder {
-	/*background-color: #4d7f7c !important;*/
 	}
 
 .layer-menu-item-wrap.menufolder.level-0 {
-	background-color: #713045;
+	background-color: #030406;
 	}
 
 .layer-menu-item-wrap.menufolder.level-1 {
-	background-color: #982e4b;
+	background-color: #20252b;
 	}
 
 .layer-menu-item-wrap.menufolder.level-2 {
-	background-color: #a84158;
+	background-color: #30363e;
 	}
 
-
-
-
 .layer-active {
-	/*background-color: rgba(154, 92, 148, 1);*/
-	background-color: #e05723;
-	
+	background-color: #315949;	
 	}
 
 .layer-menu-item {
@@ -85,6 +64,7 @@
 	padding: 5px;
 	text-align: center;
 	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 	z-index: 2222;
 	line-height: 1.2;
 	}	
@@ -94,73 +74,59 @@
 	padding: 0;
 	background-color: transparent;
 	color: yellow;
-}
-
-
-
+	}
 
 /*layermenu dragging etc*/
 .dragged-ghost {
 	background: red;
-}
-
-
+	}
 
 /*edit mode for layermenu.. todo: maybe mask out errything else, blurred?*/
 .edit-mode {
 	box-shadow: 0px 0px 0px 3px red, 0px 0px 2px 4px black !important;
-}
+	}
+
+
+.edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content .layer-menu-item-wrap:hover > .layer-item-up { display: block; }
+.edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content .layer-menu-item-wrap:hover > .layer-item-down { display: block; }
+.edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content .layer-menu-item-wrap:hover > .layer-item-delete { display: block; }
+
+.edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content {
+	padding-bottom: 100px;
+	}
+
+
 
 /*indent levels*/
 .level-0 {
 	margin-left: 0px;
-}
+	}
 
 .level-1 { 
 	margin-left: 25px;
-}
+	}
 
 .level-2 {
 	margin-left: 50px;
-}
+	}
 
 .level-3 {
 	margin-left: 75px;
-}
+	}
+
 .level-4 {
 	margin-left: 100px;
-}
+	}
 
 .layer-closed {
 	height: 0 !important;
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
-}
-
+	}
 
 /*up/down/delete buttons on layermenu items*/
 .layer-item-up {
 	width: 18px;
-	/*height: 25px;*/
-	background-color: rgba(255,255,255,0.8);
-	position: absolute;
-	left: 2px;
-	padding: 0px 0px 0px 2px;
-	font-size: 160%;
-	display: none;
-	color: transparent;
-	background-image: url(evil_sprite.png);
-	background-repeat: no-repeat;
-	/*background-position: 7px -74px;*/
-	top: 2px;
-
-	height: 21px;
-	background-position: 7px -76px;	
-	}
-
-.layer-item-down {
-	width: 18px;
-	/*height: 25px;*/
 	background-color: rgba(255,255,255,0.8);
 	position: absolute;
 	left: 21px;
@@ -170,13 +136,27 @@
 	color: transparent;
 	background-image: url(evil_sprite.png);
 	background-repeat: no-repeat;
-	/*background-position: -28px -74px;*/
 	top: 2px;
+	height: 21px;
+	background-position: 7px -76px;	
+	}
 
+.layer-item-down {
+	width: 18px;
+	background-color: rgba(255,255,255,0.8);
+	position: absolute;
+	left: 2px;
+	padding: 0px 0px 0px 2px;
+	font-size: 160%;
+	color: transparent;
+	background-image: url(evil_sprite.png);
+	background-repeat: no-repeat;
+	top: 2px;
 	height: 21px;
 	background-position: -28px -76px;
-
+	display: none;
 	}
+
 
 .layer-item-up:hover,
 .layer-item-down:hover {
@@ -185,7 +165,6 @@
 
 .layer-item-delete {
 	width: 18px;
-	/*height: 25px;*/
 	background: rgba(255, 255, 255, 1);
 	position: absolute;
 	right: 2px;
@@ -195,11 +174,9 @@
 	color: transparent;
 	background-image: url(evil_sprite.png);
 	background-repeat: no-repeat;
-	/*background-position: 1px -40px;*/
 	top: 2px;
 	border-radius: 1px;
 	opacity: 0.8;
-
 	height: 21px;
 	background-position: 1px -42px;
 	}
@@ -210,18 +187,8 @@
 
 
 
-
-
-	
-
-	
-
-
 	
 /* Layer menu folders */
-	
-
-
 .layer-menufolder-delete {							// Layer Menu : Folder, delete;
 	width: 20px;
 	height: 100%;
@@ -256,8 +223,6 @@
 
 #open-layers {										// Layers: Open layer menu;
 	position: absolute;
-	/*top: 29px;*/
-	/*right: 0px;*/
 	background: white;
 	text-align: center;
 	line-height: 2;
@@ -266,8 +231,7 @@
 	margin: 0;
 	overflow: hidden;
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-
-	top: 6px;
+	top: 90px;
 	right: 6px;	
 	}
 	
@@ -306,7 +270,6 @@
 	position: absolute;
 	height: 50%;
 	top: 0px;
-	/*background: rgba(255, 0, 0, 0.46);*/
 	width: 20px;
 	background-image: url(evil_sprite.png);
 	background-repeat: no-repeat;
@@ -314,35 +277,35 @@
 	cursor: pointer;
 	}
 
-
 .inspect-arrow-up:hover {
-	/*background: rgba(255, 0, 0, 1);*/
 	background-position: -24px -9px
-}
+	}
+
 .inspect-arrow-down {
 	position: absolute;
 	height: 50%;
 	bottom: 0px;
-	/*background: rgba(255, 0, 0, 0.46);*/
 	width: 20px;
 	background-image: url(evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: 6px 2px;
 	cursor: pointer;
-} 
+	}
+
 .inspect-arrow-down:hover {
 	background-position: -24px 2px;
-}
+	}
+
 .inspect-text {
-/*	color: red;
-	cursor: pointer;
-	padding-left: 25px;
-	font-size: 120%;*/
 	color: black;
 	cursor: pointer;
 	padding-left: 25px;
 	font-size: 115%;
-	line-height: 1.85;	
+	line-height: 1.85;
+	width: 100%;
+	padding-right: 33px;
+	overflow: hidden;	
+	height: 25px;
 	}
 
 .inspect-eye {
@@ -386,11 +349,12 @@
 	background-color: white;
 	}
 
-
 #inspect-control-inner-content {
 	background: rgba(255, 255, 255, 0.93);
 	padding-bottom: 1px;
-}
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
+	display: none;
+	}
 
 #inspector-list {
 	max-height: 160px;
@@ -413,4 +377,12 @@
 
 .leaflet-control-container {
 	overflow: hidden;
-}
+	}
+
+#layer-menu-header {
+	overflow: hidden;
+	}
+
+.layer-menu-header-title {
+	width: 280px
+	}

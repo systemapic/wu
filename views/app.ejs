@@ -6,14 +6,14 @@
 		<link rel="icon" type="image/png" href="//85.10.202.87:8080/favicon.ico">
 
 		<!-- Styles -->
-		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/grande.js/css/menu.css">
-		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/grande.js/css/editor.css">
+		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/grande.js/css/menu.css">
+		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/grande.js/css/editor.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/bootstrap.min.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/font-awesome.min.css">
 		<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.2/mapbox.css' rel='stylesheet' />
 
-		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/leaflet/leaflet.css" />
-		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/leaflet/plugins/styleEditor/Leaflet.StyleEditor.css">
+		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/leaflet.js/leaflet.css" />
+		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/powerange/powerange.min.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/style.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/evil.css">
@@ -28,15 +28,16 @@
 		
 		<!-- Leaflet -->
 		<!-- <script src="//85.10.202.87:8080/js/lib/leaflet/Leaflet/dist/leaflet-src.js"></script> -->
-		<script src="//85.10.202.87:8080/js/src/leaflet/leaflet-0.7.3-src.js"></script>
+		<script src="//85.10.202.87:8080/js/src/leaflet.js/leaflet-0.7.3-src.js"></script>
 		<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.2/mapbox.standalone.js'></script>
-		<script src="//85.10.202.87:8080/js/src/leaflet/plugins/leaflet-omnivore.min.js"></script>
-		<script src="//85.10.202.87:8080/js/src/leaflet/plugins/leaflet.geojson.draw.js"></script>
-		<script src="//85.10.202.87:8080/js/src/leaflet/plugins/leaflet.draw.min.js"></script>
-		<script src="//85.10.202.87:8080/js/src/leaflet/plugins/leaflet.draw.note.js"></script>
-		<script src="//85.10.202.87:8080/js/src/core/extendLeaflet.js"></script>
-		<script src="//85.10.202.87:8080/js/src/leaflet/plugins/styleEditor/Leaflet.StyleEditor.js"></script>
-		<script src="//85.10.202.87:8080/js/src/leaflet/plugins/styleEditor/Leaflet.StyleForms.js"></script>
+		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet-omnivore.min.js"></script>
+		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.geojson.draw.js"></script>
+		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw.min.js"></script>
+		<!-- <script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw-src.js"></script> -->
+		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw.note.js"></script>
+		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.js"></script>
+		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleForms.js"></script>
+		<!-- <script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/extendLeaflet.js"></script> -->
 		
 		<!-- tools -->
 		<script src="//85.10.202.87:8080/js/lib/dropzone.js/dropzone.min.js"></script> 
@@ -45,9 +46,9 @@
 		<script src="//85.10.202.87:8080/js/lib/sortable.js/Sortable.js"></script>
 		<script src="//85.10.202.87:8080/js/lib/powerange/powerange.min.js"></script>
 
-		<script src="//85.10.202.87:8080/js/lib/grande.js/js/grande.class.js"></script>
-		<script src="//85.10.202.87:8080/js/lib/grande.js/js/grande.js"></script>
-		<script src="//85.10.202.87:8080/js/lib/grande.js/js/grande.attachments.js"></script>
+		<script src="//85.10.202.87:8080/js/src/grande.js/js/grande.class.js"></script>
+		<script src="//85.10.202.87:8080/js/src/grande.js/js/grande.js"></script>
+		<script src="//85.10.202.87:8080/js/src/grande.js/js/grande.attachments.js"></script>
 
 		
 		<!-- Minifya dependencies -->
@@ -59,7 +60,6 @@
 		<!--hotlink -->
 		<script>(function(){ window.hotlink = '<%- JSON.stringify(hotlink) %>'; }());</script>
 
-		
 	</head>
 
 	<body>
@@ -93,11 +93,7 @@
 
 		<!-- Editor / Map / BaseLayer -->
 		<script id="editorMapBaseLayer" type="text/html">
-			<!-- <h3>Project Options</h3> -->
-
-			<!-- <div class="client-project-title-wrapper"> -->
-				<!-- <h4 id="h4-map-configuration-project-name"></h4> -->
-			<!-- </div> -->
+			
 
 		<div id="mapsettings-container">
 
@@ -255,21 +251,20 @@
 						</div>
 					</div>
 
-<div class="item-list controls-item">
-	<div class="controls-title" which="baselayertoggle" id="map-controls-title-baselayertoggle">Baselayer Toggle Control</div>
-	<div class="squaredThree inliner">
-		<input type="checkbox" value="None" id="map-controls-baselayertoggle" name="check" />
-<!-- 		<label for="map-controls-baselayertoggle" which="baselayertoggle" id="label-map-controls-baselayertoggle"></label> -->
-	</div>
-</div>
-
 					<div class="item-list controls-item">
+						<div class="controls-title" which="baselayertoggle" id="map-controls-title-baselayertoggle">Baselayer Toggle Control</div>
+						<div class="squaredThree inliner">
+							<input type="checkbox" value="None" id="map-controls-baselayertoggle" name="check" />
+					<!-- 		<label for="map-controls-baselayertoggle" which="baselayertoggle" id="label-map-controls-baselayertoggle"></label> -->
+						</div>
+					</div>
+
+					<!-- <div class="item-list controls-item">
 						<div class="controls-title" which="vectorstyle" id="map-controls-title-vectorstyle">Vector Styling Control</div>
 						<div class="squaredThree inliner">
 							<input type="checkbox" value="None" id="map-controls-vectorstyle" name="check" />
-<!-- 							<label for="map-controls-vectorstyle" which="vectorstyle" id="label-map-controls-vectorstyle"></label> -->
 						</div>
-					</div>
+					</div> -->
 
 					<div class="item-list controls-item">
 						<div class="controls-title" which="mouseposition" id="map-controls-title-mouseposition">Mouse Position Control</div>
@@ -1251,7 +1246,7 @@
 						<div id="legends-scroll-right"></div>
 						
 						
-						<div id="legends-inner-slider"></div>
+						<div id="legends-inner-slider" class="legends-inner-slider-sliding"></div>
 					</div>
 
 			</div>
@@ -1601,7 +1596,7 @@
 
 		<!-- class.js must be added first -->
 		<script src="//85.10.202.87:8080/js/src/core/class.js"></script> 
-		
+		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/extendLeaflet.js"></script>
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.item.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.clients.js"></script> 

@@ -39,9 +39,9 @@ L.Control.BaselayerToggle = L.Control.extend({
 		var className = 'leaflet-control-baselayertoggle';
 		var container = this._container = L.DomUtil.create('div', className);
 
-		// add hover events
-		Wu.DomEvent.on(container, 'mouseenter', this.expand, this);
-		Wu.DomEvent.on(container, 'mouseleave', this.collapse, this);
+		// add events
+		Wu.DomEvent.on(container, 'mousedown', this.toggle, this);
+		Wu.DomEvent.on(container, 'dblclick', Wu.DomEvent.stop, this);
 
 	},
 
@@ -91,7 +91,8 @@ L.Control.BaselayerToggle = L.Control.extend({
 		this._layers[id] = baseLayer;
 
 		// add click event
-		Wu.DomEvent.on(item, 'click', function () {
+		Wu.DomEvent.on(item, 'mousedown', function (e) {
+			Wu.DomEvent.stop(e);
 			this.toggleLayer(baseLayer, item);
 		}, this);
 	},
@@ -118,11 +119,17 @@ L.Control.BaselayerToggle = L.Control.extend({
 
 	},
 
+	toggle : function () {
+		this._isOpen ? this.collapse() : this.expand();
+	},
+
 	collapse : function () {
+		this._isOpen = false;
 		Wu.DomUtil.addClass(this._list, 'collapsed');
 	},
 
 	expand : function () {
+		this._isOpen = true;
 		Wu.DomUtil.removeClass(this._list, 'collapsed');
 	},
 
