@@ -17,7 +17,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 	addHooks : function () {
 		// menu items bindings
-		Wu.DomEvent.on(this._menu, 'mousedown', this._clickActivate, this);          // click
+		Wu.DomEvent.on(this._menu, 'mousedown', this._clickActivate, this); // click
 		Wu.DomEvent.on(this._menu, 'mouseenter', this._mouseenter, this);   // mouseEnter
 		Wu.DomEvent.on(this._menu, 'mouseleave', this._mouseleave, this);   // mouseLeave
 	},
@@ -336,6 +336,26 @@ Wu.SidePane.Item = Wu.Class.extend({
 		delete this._menu;
 		delete this._content;
 		delete this;
+	},
+
+	setContentHeight : function () {
+		this.calculateHeight();
+		this._content.style.maxHeight = this.maxHeight + 'px';
+		this._scrollWrapper.style.maxHeight = parseInt(this.maxHeight - 20) + 'px';
+	},
+
+	calculateHeight : function () {
+		var screenHeight = window.innerHeight,
+		    legendsControl = app.MapPane.legendsControl,
+		    height = -107;
+
+		if (legendsControl) {
+			height += parseInt(screenHeight) - parseInt(legendsControl._legendsHeight);
+		} else {
+			height += parseInt(screenHeight) - 6;
+		}
+
+		this.maxHeight = height;
 	},
 
 });

@@ -136,6 +136,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		Wu.DomEvent.on(email2,  'keyup',     this.checkSameEmail,   this);
 		Wu.DomEvent.on(cancel,  'mousedown', this.cancelInput,      this);
 		Wu.DomEvent.on(confirm, 'mousedown', this.confirmInput,     this);
+
+		// cxxxx
+		// Toggle wrappers
+		this._container.style.display = 'none';
+
 	},
 
 	checkUniqueEmail : function (e) {
@@ -189,6 +194,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	cancelInput : function (e) {
 		Wu.DomUtil.remove(this._inputUser._container);
+		this._container.style.display = 'block';
 	},
 
 	confirmInput : function () {
@@ -213,6 +219,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	
 		// close backpane
 		this.cancelInput();
+
+		// Toggle pane
+		this._container.style.display = 'block';
 	},
 
 
@@ -476,12 +485,18 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var message    = this._inputAccess._message   = Wu.DomUtil.create('div', 'backpane-message',   wrapper, messageText);
 
 		Wu.DomEvent.on(confirm, 'mousedown', this.closeManageAccess,     this);
+
+		// Toggle wrappers
+		this._container.style.display = 'none';
 	},
 
 	closeManageAccess : function () {
+		
 		Wu.DomUtil.remove(this._inputAccess._container);
 
-		// update table
+		// Toggle wrappers
+		this._container.style.display = 'block';
+
 
 	},
 
@@ -531,6 +546,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 			if (managerPriv) Wu.DomEvent.on(manage, 'mousedown', function () { this.toggleManageAccess(item)}, this);
 
 		}, this)
+
 
 		return wrapper;
 	},

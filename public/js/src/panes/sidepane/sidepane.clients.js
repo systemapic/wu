@@ -1,9 +1,6 @@
 // Projects and Clients
 Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	_ : 'sidepane.clients', 
-
-
-
 	type : 'clients',
 	title : 'Projects',
 
@@ -16,6 +13,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	initContent : function () {
+
+		console.log('init clients', this._content, this._scrollWrapper );
 
 		// h3 title
 		// var title = Wu.DomUtil.create('h3', '', this._container);
@@ -31,8 +30,9 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		}, this);
 
       		// insert create client button
-		if (app.Account.canCreateClient()) this._insertNewClientButton();		
-			
+		if (app.Account.canCreateClient()) this._insertNewClientButton();	
+
+
 	},
 
 	_insertNewClientButton : function () {
@@ -57,12 +57,10 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	},
 
-
 	_create : function (client) {
 		var clientDiv = new Wu.SidePane.Client(client);
 		clientDiv.addTo(this._clientsContainer);
 	},
-
 	
 	openClient : function (client) {
 		this._container.style.height = '';
@@ -71,7 +69,6 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	closeClient : function (client) {
 		console.log('close client: ', client.name);
 	},
-
 
 	remove : function () {
 		var client = this;
@@ -241,8 +238,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		
 		// set client name in subheaders
 		Wu.app.SidePane.setSubheaders();
-	},
 
+	},
 
 	refreshSidePane : function () {
 
@@ -251,6 +248,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 		// update SidePane.Users
 		Wu.app.SidePane.Users.update();
+
 	},
 
 	_select : function () {
@@ -271,8 +269,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	update : function () {
 		// noop
-	}
-
+		// this.setContentHeight();
+	},
 
 
 });

@@ -12,6 +12,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// create container (overwrite default)
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct1', this._content);
 
+		// create dialogue 
+		this._downloadList = Wu.DomUtil.createId('div', 'datalibrary-download-dialogue', this._content);
+
 		// create progress bar
 		this.progress = Wu.DomUtil.create('div', 'progress-bar', this._content);
 		
@@ -36,7 +39,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._uploader 		= Wu.DomUtil.get('upload-container');
 		this._deleter 		= Wu.DomUtil.get('datalibrary-delete-file');
 		this._downloader 	= Wu.DomUtil.get('datalibrary-download-files');
-		this._downloadList 	= Wu.DomUtil.get('datalibrary-download-dialogue');
+		// this._downloadList 	= Wu.DomUtil.get('datalibrary-download-dialogue');
 		this._checkall 		= Wu.DomUtil.get('checkbox-all');
 		this._checkallLabel 	= Wu.DomUtil.get('label-checkbox-all');
 
@@ -148,6 +151,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// post         path          json      callback           this
 		Wu.post('/api/file/download', json, this.receivedDownload, this);
 
+		
+
 	},
 
 	receivedDownload : function (that, response) {
@@ -161,24 +166,31 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var btn = Wu.DomUtil.get('download-ready-button');
 		Wu.DomEvent.on(btn, 'click', that.downloadDone, that);
 
+		// hide
+		if (this._downloadList) this._downloadList.style.display = 'none';
+		if (this._container) this._container.style.display = 'block';
+
 	},
 
 	downloadCancel : function () {
-
-		console.log('downloadCancel!');
 		
 		// clear download just in case
 		this._downloadFileList = [];
 
 		// hide
-		this._downloadList.style.display = 'none';
+		if (this._downloadList) this._downloadList.style.display = 'none';
+		if (this._container) this._container.style.display = 'block';
 	},
 
 	downloadDone : function () {
 
 		// close and re-init
-		this.downloadCancel();
-		this.initDownloadTable();
+		var that = this;
+		setTimeout(function () {
+			that.downloadCancel();
+			that.initDownloadTable();
+		}, 1000);
+		
 	},
 
 	downloadConfirm : function (e) {
@@ -204,6 +216,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// show
 		this._downloadList.style.display = 'block';
+		this._container.style.display = 'none';
 	},
 
 	getSelected : function () {
@@ -276,9 +289,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				url : '/api/upload',
 				createImageThumbnails : false,
 				autoDiscover : false,
-				// uploadMultiple : true,
-				// maxFiles : 10,
-				// parallelUploads : 10,
+				uploadMultiple : true,
+				maxFiles : 10,
+				parallelUploads : 10,
 				// autoProcessQueue : true
 		});
 
@@ -488,10 +501,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		}
 		
 		// return if nothing
-		if (!record.files) return;
+		// if (!record.files) return;
 
 		// add files to library
-		record.files.forEach(function (file, i, arr) {
+		record.done.files.forEach(function (file, i, arr) {
 			// add to table
 			this.addFile(file);
  
@@ -500,11 +513,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		}, this);
 
 		// add layers
-		if (record.layers) {
-			record.layers.forEach(function (layer) {
-				this.project.addLayer(layer);
-			}, this);
-		}
+		record.done.layers.forEach(function (layer) {
+			this.project.addLayer(layer);
+		}, this);
+		
 		this.project.refreshSidepane();
 	},
 

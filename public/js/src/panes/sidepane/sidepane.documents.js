@@ -62,9 +62,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		var sources = this.project.getGrandeFiles(files);
 		var images  = this.project.getGrandeImages(files);
 
-		console.log('soruces: ', sources);
-		console.log('images: ', images);
-
 		// set grande options
 		var options = {
 			plugins : {
@@ -98,10 +95,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	removeGrande : function () {
-
+		if (!this.grande) return;
 		this.grande.destroy();
 		delete this.grande;
-
 	},
 	
 
@@ -115,7 +111,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		Wu.DomEvent.off(this._newfolder, 'mousedown', this.newFolder, this);
 
 		// bind grande.js text editor
-		// Grande.unbind([this._textarea]);
 		this.removeGrande();
 
 		// hide (+)

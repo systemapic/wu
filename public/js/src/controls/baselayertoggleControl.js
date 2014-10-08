@@ -78,7 +78,7 @@ L.Control.BaselayerToggle = L.Control.extend({
 	},
 
 	addLayer : function (baseLayer) {
-		console.log('baselayer: ', baseLayer);
+
 		// create div
 		var layerName = baseLayer.layer.getTitle();
 		var item = Wu.DomUtil.create('div', 'baselayertoggle-item active', this._list, layerName);

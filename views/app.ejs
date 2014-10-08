@@ -4,8 +4,7 @@
 		<title>Systemapic</title>
 	
 		<link rel="icon" type="image/png" href="//85.10.202.87:8080/favicon.ico">
-
-		<!-- Styles -->
+<!-- 
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/grande.js/css/menu.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/grande.js/css/editor.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/bootstrap.min.css">
@@ -15,31 +14,37 @@
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/leaflet.js/leaflet.css" />
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/powerange/powerange.min.css">
+		
+		<link rel="stylesheet" href="//85.10.202.87:8080/css/style.css">
+		<link rel="stylesheet" href="//85.10.202.87:8080/css/evil.css">
+		<link rel="stylesheet" href="//85.10.202.87:8080/css/knut.css"> -->
+
+		<!-- concat + cssmin -->
+		<link rel="stylesheet" href="//85.10.202.87:8080/dist/css.dependencies.min.css">
+		<!-- <link rel="stylesheet" href="//85.10.202.87:8080/dist/css.portal.min.css"> -->
+		
+		<!-- dev css -->
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/style.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/evil.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/knut.css">
 		
+
 		<div id="styletag"></div>
 
 		
-		<!-- Dependencies -->
 		<script src="//85.10.202.87:8080/js/lib/lodash/lodash.min.js"></script>
 		<script src="//85.10.202.87:8080/js/lib/parallel.js/parallel.js"></script>
 		
-		<!-- Leaflet -->
-		<!-- <script src="//85.10.202.87:8080/js/lib/leaflet/Leaflet/dist/leaflet-src.js"></script> -->
+		
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/leaflet-0.7.3-src.js"></script>
 		<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.2/mapbox.standalone.js'></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet-omnivore.min.js"></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.geojson.draw.js"></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw.min.js"></script>
-		<!-- <script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw-src.js"></script> -->
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw.note.js"></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.js"></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleForms.js"></script>
-		<!-- <script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/extendLeaflet.js"></script> -->
 		
-		<!-- tools -->
 		<script src="//85.10.202.87:8080/js/lib/dropzone.js/dropzone.min.js"></script> 
 		<script src="//85.10.202.87:8080/js/lib/icanhaz/icanhaz.min.js"></script> 
 		<script src="//85.10.202.87:8080/js/lib/list.js/list.min.js"></script> 
@@ -50,10 +55,7 @@
 		<script src="//85.10.202.87:8080/js/src/grande.js/js/grande.js"></script>
 		<script src="//85.10.202.87:8080/js/src/grande.js/js/grande.attachments.js"></script>
 
-		
-		<!-- Minifya dependencies -->
-		<!-- // <script src="//85.10.202.87:8080/js/src/dist/combined/systemapic.dependencies.combined.min.js"></script>  -->
-
+		<!-- <script src="//85.10.202.87:8080/dist/js.dependencies.min.js"></script> -->
 
 
 	
@@ -951,9 +953,9 @@
 
 		<!-- Data Library -->
 		<script id="datalibraryContainer" type="text/html">
-
+				
 			<div id="datalibrary-container">
-
+				
 
 				<div id="datalibrary-table-container"></div>
 			</div>
@@ -962,6 +964,8 @@
 
 		<script id="datalibraryTableframe" type="text/html">
 		
+	
+			<!-- <div id="datalibrary-download-dialogue"></div>  -->
 			<div id="filelist">
 				<!-- <h3>Data Library</h3>			 -->
 				<table id="datalibrary-table">
@@ -976,7 +980,10 @@
 								<div id="datalibrary-delete-file" class="smap-button-gray">Delete</div>
 								<div id="datalibrary-download-files" class="smap-button-gray">Download</div>
 
-							<div id="datalibrary-download-dialogue"></div>
+
+								<!-- <div id="datalibrary-download-dialogue"></div> -->
+								
+
 							<div id="datalibrary-errors" class="smap-button-gray"></div>
 							
 						</div>
@@ -1600,7 +1607,6 @@
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.item.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.clients.js"></script> 
-		<!-- <script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.home.js"></script>  -->
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.project.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.client.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/panes/sidepane/sidepane.users.js"></script> 
@@ -1626,17 +1632,14 @@
 		<script src="//85.10.202.87:8080/js/src/models/users.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/models/layers.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/models/colorThemes.js"></script>	
+		<script src="//85.10.202.87:8080/js/src/help/themeToggle.js"></script>		 
 
 
-		<!-- app.js must be added last -->
 		<script src="//85.10.202.87:8080/js/src/core/app.js"></script> 
 
-		<!-- Helper -->
-		<!-- <script src="//85.10.202.87:8080/js/src/help/systempaic_helper.js"></script> -->
-		<script src="//85.10.202.87:8080/js/src/help/themeToggle.js"></script>		 
 		
 
-		<!-- // <script src="//85.10.202.87:8080/js/src/dist/combined/systemapic.combined.min.js"></script>  -->
+		<!-- <script src="//85.10.202.87:8080/dist/js.portal.min.js"></script>  -->
 
 		<script>
 

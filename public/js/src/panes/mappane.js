@@ -10,9 +10,12 @@ Wu.MapPane = Wu.Class.extend({
 		
 		// init container
 		this._container = Wu.app._mapPane = Wu.DomUtil.createId('div', 'map', Wu.app._mapContainer);
-		
+	
 		// events
 		Wu.DomEvent.on(window, 'resize', this._updateWidth, this); 
+	
+		// add help pseudo
+		Wu.DomUtil.addClass(this._container, 'click-to-start');
 	},
 
 	_initPanes : function () {
@@ -233,14 +236,14 @@ Wu.MapPane = Wu.Class.extend({
 			}
 
 			// DESCRIPTION CONTROL
+			// DESCRIPTION CONTROL
+			// DESCRIPTION CONTROL
 
 			var _leafletTopLeft = app.MapPane._map._controlContainer.childNodes[0];
 
 			if ( controls.description ) {
 				// console.log('Description Control');
-				_leafletTopLeft.style.width = '320px';
 			} else {				
-				_leafletTopLeft.style.width = '34px';
 			}
 
 			if ( controls.draw ) {
@@ -256,6 +259,8 @@ Wu.MapPane = Wu.Class.extend({
 			}
 
 
+			// LAYER MENU CONTROL
+			// LAYER MENU CONTROL
 			// LAYER MENU CONTROL
 
 			if ( controls.layermenu ) {
@@ -274,6 +279,8 @@ Wu.MapPane = Wu.Class.extend({
 
 			
 			// LEGENDS CONTROL
+			// LEGENDS CONTROL
+			// LEGENDS CONTROL
 
 			if ( controls.legends ) {
 				// console.log('Legends Control');
@@ -282,21 +289,21 @@ Wu.MapPane = Wu.Class.extend({
 
 				// Check for Layer Manu Control
 				if ( controls.layermenu ) {
-					Wu.DomUtil.removeClass(__legendsContainer, 'legends-push-right');
+					Wu.DomUtil.removeClass(__legendsContainer, 'legends-padding-right');
 				} else {
-					Wu.DomUtil.addClass(__legendsContainer, 'legends-push-right');
+					Wu.DomUtil.addClass(__legendsContainer, 'legends-padding-right');
 				}
 
 				// Check for Description Control
 				if ( controls.description ) {
-					Wu.DomUtil.removeClass(__legendsContainer, 'legends-push-left');
 				} else {
-					Wu.DomUtil.addClass(__legendsContainer, 'legends-push-left');
 				}
 
 			}
 
 
+			// SCALE CONTROL
+			// SCALE CONTROL
 			// SCALE CONTROL
 
 			if ( controls.measure ) {
@@ -305,17 +312,17 @@ Wu.MapPane = Wu.Class.extend({
 
 				if ( controls.layermenu ) {
 					// right: 332px;
-					_leafletTopRight.style.right = '332px';
+					_leafletTopRight.style.right = '295px';
 				} else {
 					_leafletTopRight.style.right = '6px';
 					// right: 6px;
 				}
 
 				if ( controls.legends ) {
-					_leafletTopRight.style.bottom = '133px';
+					// _leafletTopRight.style.bottom = '133px';
 					// bottom: 113px;
 				} else {
-					_leafletTopRight.style.bottom = '6px';
+					// _leafletTopRight.style.bottom = '6px';
 					// bottom: 6px;
 				}
 

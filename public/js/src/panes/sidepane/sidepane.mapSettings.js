@@ -380,7 +380,15 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 		// create and append div
 		var container = Wu.DomUtil.create('div', 'item-list select-elem ct0 baselayer', this._outer);
-		container.innerHTML = layer.store.title;
+		var _innerText = Wu.DomUtil.create('div', 'item-list-inner-text', container);
+		
+		_innerText.innerHTML = layer.store.title;
+
+		if ( layer.store.title.length < 32 ) _innerText.style.maxHeight = '12px';
+		
+
+
+		// container.innerHTML = layer.store.title;
 
 		// append edit button
 		// var button = Wu.DomUtil.create('div', 'edit-baselayer', container);
@@ -757,7 +765,15 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 		// create and append div
 		var container = Wu.DomUtil.create('div', 'item-list select-elem ct0', this._outer);
-		container.innerHTML = layer.store.title;
+
+		var _innerText = Wu.DomUtil.create('div', 'item-list-inner-text', container);
+		_innerText.innerHTML = layer.store.title;
+
+		if ( layer.store.title.length < 32 ) _innerText.style.maxHeight = '12px';
+
+		
+
+		// container.innerHTML = layer.store.title;
 
 		// append edit button
 		var button = Wu.DomUtil.create('div', 'edit-layermenu-layer', container);
@@ -1393,6 +1409,8 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 	toggleControl : function (e) {
 		
+		console.log('toggleControl');
+
 		// prevent default checkbox behaviour
 		if (e.type == 'click') return Wu.DomEvent.stop(e);
 		
