@@ -16,12 +16,11 @@ $median: 400;
 $fat: 500;
 $obese: 600;
 
-
-@import 'basics';		// Contains Most CSS rules
+@import 'basics';		// Contains Universal rules, App/Map, and Login Styling
+@import 'controls';		// Everything that goes in the leaflet containers
+@import 'panes';		// Leaflet Draw + Layer menu, Info box, Legends etc
+@import 'custom_imported';	// Rules copied from 3rd party stylesheets
 @import 'kits';			// All the webkit, moz, etc transitions and other properties
-@import 'leaflet_draw';	// Leaflet Draw + Layer menu, Info box, Legends etc
-@import 'color_picker';	// Color Theme selecteur
-@import 'layer_menu';	// The Layer menu
-@import 'knut';			// Knut's pølsin'
-@import 'mediaLibrary';	// Media Library
-@import 'shame';		// ...
+
+/* @import 'color_picker';	// Color picker */
+/* @import 'mediaLibrary';	// Media Library */

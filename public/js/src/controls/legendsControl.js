@@ -80,14 +80,11 @@ L.Control.Legends = L.Control.extend({
 		
 		Wu.DomEvent.on(this._legendsOpener, 'click', this.openLegends, this);
 		
-		// this.calcHeight();
-
 		this._legendsInner.style.width = this._legendsWidth + 'px';
 		this._legendsInner.style.height = this._legendsHeight + 'px';
 
 		var that = this;
 
-		// 
 		setTimeout(function() {
 			that._legendsInner.style.width = '150px';
 			that._legendsInner.style.height = '24px'; 
@@ -106,9 +103,6 @@ L.Control.Legends = L.Control.extend({
 
 		}, 500);
 
-
-
-	
 	},
 
 
@@ -121,13 +115,12 @@ L.Control.Legends = L.Control.extend({
 		// Set the width of the Legends
 		this._legendsInner.style.width = this.sliderWidth + 20 + 'px';
 
-
+		// calculate width
 		this.checkWidth();
+
 
 		this._legendsInner.style.height = this._openHeight - 5 + 'px';         
 		
-		
-
 		var that = this;
 		setTimeout(function(){                  
 			that._legendsInner.removeAttribute('style');
@@ -156,7 +149,7 @@ L.Control.Legends = L.Control.extend({
 		this.project = project || Wu.app._activeProject;
 		this._content = Wu.DomUtil.get('legends-control-inner-content'); 
 
-		this.calcHeight();
+		this.calculateHeight();
 
 	},
 
@@ -186,17 +179,16 @@ L.Control.Legends = L.Control.extend({
 
 	addLegend : function (layer) {
 
-		// Make sure that the container is visible...
-		this._legendsContainer.style.display = 'block';
-
 		var uuid = layer.store.uuid;
 		var legend = layer.store.legend;
 		
 		// return if no legend
 		if (!legend) return;
 
+		// Make sure that the container is visible...
+		this._legendsContainer.style.display = 'block';
+
 		// create legends box
-		// var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInner, legend);
 	    	var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInnerSlider, legend);
 
 	    	var legendWidth = div.offsetWidth; // (j)
@@ -206,13 +198,13 @@ L.Control.Legends = L.Control.extend({
 			layer : layer,
 			div   : div,
 			width : legendWidth             // ADDED BY JØRGEN
-			}
+		}
 
 	    	// Added by Jølle
 	    	var tempObj = {
 			id : uuid,
 			width : legendWidth
-			}
+		}
 
 	    	this.legendsCounter.push(tempObj); // ADDED BY JØLLE
 
@@ -223,9 +215,7 @@ L.Control.Legends = L.Control.extend({
 
 		// See if we need the horizontal scrollers or not!
 		this.checkWidth();
-
-		this.calcHeight();
-
+		this.calculateHeight();
 
 	},
 
@@ -234,8 +224,10 @@ L.Control.Legends = L.Control.extend({
 		var uuid = layer.store.uuid;
 		var legend = this.legends[uuid];
 
-		if (!legend) return;
+		if (!legend) { this._legendsContainer.style.display = 'none'; return; }
 
+
+		console.log('remove legend, yo');
 
 		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
 		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
@@ -283,7 +275,10 @@ L.Control.Legends = L.Control.extend({
 		// See if we need the horizontal scrollers or not!
 		this.checkWidth();
 
-		this.calcHeight();
+		// Store legends height
+		this.calculateHeight();
+
+		console.log('this.legendsCounter.length', this.legendsCounter.length)
 
 		// Hide legends if it's empty
 		if ( this.legendsCounter.length == 0 ) this._legendsContainer.style.display = 'none';
@@ -318,9 +313,7 @@ L.Control.Legends = L.Control.extend({
 	
 		if (this.scrolling) return;
 
-			console.log('scrolling right...')
-
-		    if ( this.sliderOffset <= this.legendsCounter.length-1 ) {
+		if ( this.sliderOffset <= this.legendsCounter.length-1 ) {
 			var mover = this.legendsCounter[this.sliderOffset].width;        
 			var tempLeft = this._legendsInnerSlider.offsetLeft;
 
@@ -343,16 +336,16 @@ L.Control.Legends = L.Control.extend({
 
 	},
 
-	calcHeight : function() {
+	calculateHeight : function() {
 
-		this._legendsHeight = this._legendsInner.offsetHeight;
-		this._legendsWidth = this._legendsInner.offsetWidth;
+		this._legendsHeight 	= this._legendsInner.offsetHeight;
+		this._legendsWidth 	= this._legendsInner.offsetWidth;
+		this._openHeight 	= this._legendsInner.offsetHeight;
+		this._openWidth 	= this._legendsInner.offsetWidth;
 
-		this._openHeight = this._legendsInner.offsetHeight;
-		this._openWidth = this._legendsInner.offsetWidth;
-
-		if ( app.SidePane.Map ) app.SidePane.Map.setContentHeight();
-
+		app.StatusPane.setContentHeights();
+		// if (app.SidePane.Map) app.SidePane.Map.setContentHeight();
+		// if (app.SidePane.Clients) app.SidePane.Clients.setContentHeight();
 	}
 
 

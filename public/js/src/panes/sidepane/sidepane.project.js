@@ -34,22 +34,29 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// create users
 		this.users = Wu.DomUtil.create('div', 'project-users-wrap', this._container);
-		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.users);
-		Wu.DomEvent.on(this.users, 'mouseenter', this.expandUsers, this);
-		Wu.DomEvent.on(this.users, 'mouseleave', this.collapseUsers, this);
+		this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this.users);
+
+		// Wu.DomEvent.on(this.users, 'mouseenter', this.expandUsers, this);
+		// Wu.DomEvent.on(this.users, 'mouseleave', this.collapseUsers, this);
+
+		// Project stats header
+		this.projectStatsHeader = Wu.DomUtil.create('div', 'project-stats', this.usersInnerWrapper);
+		this.projectStatsHeader.innerHTML = 'Project status:'
 
 		// create createdBy
-		this.createdBy = Wu.DomUtil.create('div', 'project-createdby', this.users);
-
-		// create lastModified
-		this.lastUpdated = Wu.DomUtil.create('div', 'project-lastupdated', this.users);
+		this.createdBy = Wu.DomUtil.create('div', 'project-createdby', this.usersInnerWrapper);
 
 		// create createdDate
-		this.createdDate = Wu.DomUtil.create('div', 'project-createddate', this.users);
+		this.createdDate = Wu.DomUtil.create('div', 'project-createddate', this.usersInnerWrapper);
+
+		// create lastModified
+		this.lastUpdated = Wu.DomUtil.create('div', 'project-lastupdated', this.usersInnerWrapper);
+
+		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.usersInnerWrapper);
 
 		// kill button
 		if (app.Account.canDeleteProject(this.project.store.uuid)) {
-			this.kill = Wu.DomUtil.create('div', 'project-kill', this._container, 'X');
+			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');
 		}
 
 		// add hooks
@@ -58,11 +65,11 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	expandUsers : function () {
-		Wu.DomUtil.addClass(this.usersInner, 'expand');
+		// Wu.DomUtil.addClass(this.usersInner, 'expand');
 	},
 
 	collapseUsers : function () {
-		Wu.DomUtil.removeClass(this.usersInner, 'expand');
+		// Wu.DomUtil.removeClass(this.usersInner, 'expand');
 	},
 
 	update : function (project) {
@@ -70,10 +77,10 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.name.innerHTML 		= this.project.store.name;
 		this.description.innerHTML 	= this.project.store.description;
 		this.logo.style.backgroundImage = "url('" + this.project.store.logo + "')";
-		this.createdBy.innerHTML 	= 'Created by:<br> ' + this.project.store.createdByName;
-		this.lastUpdated.innerHTML 	= '<span class="update-header">Last updated: ' + Wu.Util.prettyDate(this.project.store.lastUpdated) + '</span>';
-		this.createdDate.innerHTML 	= Wu.Util.prettyDate(this.project.store.created);
-		this.usersInner.innerHTML       = this.project.getUsersHTML();
+		this.createdBy.innerHTML 	= '<div class="project-info-left">Created by:</div><div class="project-info-right">' + this.project.store.createdByName + "</div>";
+		this.lastUpdated.innerHTML 	= '<div class="project-info-left">Last updated:</div><div class="project-info-right">' + Wu.Util.prettyDate(this.project.store.lastUpdated) + "</div>";
+		this.createdDate.innerHTML 	= '<div class="project-info-left">Created time:</div><div class="project-info-right">' + Wu.Util.prettyDate(this.project.store.created) + "</div>";
+		this.usersInner.innerHTML       = '<div class="project-users-header">Project users:</div>' + this.project.getUsersHTML();
 	},
 
 	addHooks : function () {
@@ -86,7 +93,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		if (this.project.editMode) this.addEditHooks();
 	},
 
-	
 	removeHooks : function () {
 		Wu.DomEvent.off(this._container, 'mouseenter', this.open, this);
 		Wu.DomEvent.off(this._container, 'mouseleave', this.close, this);
@@ -97,7 +103,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		if (this.project.editMode) this.removeEditHooks();
 	},
 
-	
 	addEditHooks : function () {
 		console.log('addEditHooks', this.project.editMode);
 
@@ -131,7 +136,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 			Wu.DomEvent.off(this.kill, 'click', this.deleteProject, this);
 		}
 	},
-
 
 	// edit hook for client logo
 	addLogoDZ : function () {
@@ -197,11 +201,13 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	open : function () {
 		// console.log('open sesame!');
+		if ( this._parent ) this._parent._container.style.overflow = 'visible';
 
 	},
 
 	close : function () {
 		// console.log('close for ali babar!');
+		if ( this._parent ) this._parent._container.style.overflow = 'hidden';
 
 	},
 

@@ -54,6 +54,12 @@ Wu.StatusPane = Wu.Class.extend({
 		sidepane.expand();
 		this.refresh();
 
+		this.checkMapBlur();
+		this.setContentHeights();
+
+		// remove help pseudo
+		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
+
 		console.log('StatusPane.open(). Currently active menu item:', app._activeMenuItem);
 	},
 
@@ -66,12 +72,28 @@ Wu.StatusPane = Wu.Class.extend({
 
 		console.log('StatusPane.close(). Currently active menu item:', app._activeMenuItem);
 
-		var __map = Wu.DomUtil.get("map"); // (j)
-		Wu.DomUtil.removeClass(__map, "map-blur") // (j) – removes the blur on map if it's set by one of the fullpanes
+		// app.MapPane._container
+		Wu.DomUtil.removeClass(app.MapPane._container, "map-blur") // (j) – removes the blur on map if it's set by one of the fullpanes
 
-		// Close menuslider arrow (j)
-		// var _menusliderArrow = Wu.DomUtil.get("menuslider-arrow"); // (j)
-		// _menusliderArrow.style.width = '0px'; // (j)
+	},
+
+	setContentHeights : function () {
+
+		var clientsPane = app.SidePane.Clients;
+		var optionsPane = app.SidePane.Map;
+
+		if (clientsPane) clientsPane.setContentHeight();
+		if (optionsPane) optionsPane.setContentHeight();
+	},
+
+	checkMapBlur : function () {
+
+		if ( 	app._activeMenuItem == 'documents' || 
+			app._activeMenuItem == 'dataLibrary' || 
+			app._activeMenuItem == 'users' ) 
+		{
+			Wu.DomUtil.addClass(app.MapPane._container, "map-blur");
+		}
 
 	},
 

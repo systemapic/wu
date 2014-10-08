@@ -21,7 +21,7 @@ var uploadProgress = require('node-upload-progress');
 var _ = require('lodash-node');
 
 // upload.js for handling uploading of shapefiles
-var geo = require('../routes/upload');
+var upload = require('../routes/upload');
 
 // helper fn's
 var api = require('../routes/helpers')
@@ -245,15 +245,14 @@ module.exports = function(app, passport) {
 	// =====================================
 	// UPLOAD DATA LIBRARY FILES ===========
 	// =====================================
-	// process uploads  					TODO: add isLoggedIn
+	// process uploads  			
 	app.post('/api/upload', isLoggedIn, function (req, res) {
 		console.log('/api/upload');
 
 		// TODO : authentication
-		
-
+	
 		// process upload
-		geo.do(req, res);
+		upload.newUpload(req, res);
 		
 	});
 

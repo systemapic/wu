@@ -56,13 +56,11 @@ L.Control.Layermenu = L.Control.extend({
 		Wu.DomEvent.on(this._innerContainer, 'mouseenter', this.cancelEditClose, this);
 		Wu.DomEvent.on(this._innerContainer, 'mouseleave', this.timedEditClose, this);
 
-		// cxxxx
-		console.log('Wu.app.MapPane._container.children[1].children[3]', Wu.app.MapPane._container.children[1].children[3]);
-
-		// Wu.app.MapPane._container.children[1].children;
-		
-		if ( !app.MapPane.inspectControl ) Wu.app.MapPane._container.children[1].children[3].style.paddingBottom = 6 + 'px';
-
+		// add extra padding		
+		if (!app.MapPane.inspectControl) {
+			var corner = app._map._controlCorners.bottomright;
+			corner.style.paddingBottom = 6 + 'px';
+		}
 	},
 
 	cancelEditClose : function () {
@@ -98,9 +96,7 @@ L.Control.Layermenu = L.Control.extend({
 		this._container.parentNode.appendChild(this._openLayers);
 		
 		// Slide the LEGENDS			
-		if ( this._legendsContainer ) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
-
-		console.log('this._legendsContainer', this._legendsContainer);
+		if (this._legendsContainer) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
 		Wu.app.MapPane._container.children[1].children[1].style.right = '140px';

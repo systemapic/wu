@@ -25,13 +25,13 @@
 	}
 
 .leaflet-draw-toolbar a {
-	background-image: url('leaflet.draw.sprites.png');
+	background-image: url(dev_img/leaflet.draw.sprites.png);
 	background-repeat: no-repeat;
 	background-position-x: -272px;
 	}
 
 .leaflet-retina .leaflet-draw-toolbar a {
-	background-image: url('leaflet.draw.sprites-2x.png');
+	background-image: url(dev_img/leaflet.draw.sprites-2x.png);
 	background-size: 270px 30px;
 	}
 
@@ -84,7 +84,7 @@
     }
 
 .leaflet-draw-actions a {
-	background-color: #919187;
+	background-color: rgba(0,0,0,0.7);
 	border-left: 1px solid #AAA;
 	color: #FFF;
 	font: 11px/19px $font;
@@ -93,6 +93,7 @@
 	padding-left: 10px;
 	padding-right: 10px;
 	height: 28px;
+	font-weight: 500;
 	}
 
 .leaflet-draw-actions-bottom {
@@ -112,7 +113,7 @@
 	}
 
 .leaflet-draw-actions a:hover {
-	background-color: #A0A098;
+	background-color: rgba(0,0,0,0.85);
 	}
 
 .leaflet-draw-actions-top.leaflet-draw-actions-bottom a {
@@ -312,8 +313,9 @@
 // --- universals
 
 .leaflet-control-container {						// Outer super wrapper
-	/*position: relative;*/
 	height: 100%;	
+	padding-top: 0 !important;
+	z-index: 999999999;
 	}	
 
 .menucollapser {									// Header for "Layers", "Layers inspector" and "Info"
@@ -328,38 +330,49 @@
 	line-height: 2.2;
 	font-weight: $obese;
 	border-bottom: 1px solid #CACACA;
+
+	box-shadow: 0 0 5px rgba(0,0,0,0.3);
+	margin-top: 0px;	
 	}	
 	
 .scroller-frame {									// Layer menu scroller frame
 	height: 100%;
-	padding-bottom: 28px;	
+	overflow: scroll;
+	position: absolute;
+	padding-bottom: 27px;
+	left: 2px;	
 	}
 
 .inner-scroller {									// Layer menu innser frame
-	min-height: 100%;
+	min-height: auto;
+	padding-left: 5px;
+	padding-right: 5px;
+	left: -5px;
 	}
 	
-.scroll-up {}
-.scroll-down {}	
-
-.leaflet-top .leaflet-control {
-	margin-top: 7px;	
-	}	
-
 
 // ********* Measure, longitude and latitude *********	
 
 .leaflet-top.leaflet-right {							// Leaflet : measure outer wrapper
-	right: 232px;
-	bottom: 133px;
-	max-width: 300px;
+	right: 295px;
 	border: 0;
 	text-align: left;
 	top: auto;
+	top: 90px;
+	height: 18px;
+	text-align: right;
 	}
+
+
 	
 .leaflet-control-scale {								// Leaflet : Distance scaler
 	margin: 0 !important;
+	padding-left: 0px !important;
+	padding-right: 0px	!important;
+	float: none;
+
+	position: relative;
+	display: inline-block;
 	}
 
 .leaflet-container .leaflet-control-mouseposition {		// Leaflet : Mouse position
@@ -369,22 +382,30 @@
 	color: #333;
 	font: 11px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
 	margin-right: 1px;
-	margin-top: 2px;	
+	margin-top: 2px;
+	margin-left: 1px;
+	margin-bottom: 1px;	
+
+	float: none;
+	position: relative;
+	display: inline-block;
 	}
 
 .leaflet-control-scale-line {							// Leaflet : scaler
 	background-color: rgba(255, 255, 255, 0.7);
 	display: inline-block;
 	vertical-align: top;
-	margin: 1px;
+	/*margin: 1px;*/
 	border: 0px !important;
+	margin-right: 2px;
+	height: 13px;
 	}	
 		
 .leaflet-control-scale-line:not(:first-child) {			// Leaflet : scaler
 	border: 0px;
 	margin-top: 0px;
 	position: relative;
-	top: 1px;
+	top: 0px;
 	}	
 	
 
@@ -394,55 +415,66 @@
 	margin-top: 7px;
 	padding-top: 0px;
 	overflow: visible;
-	top: -24px;
-	width: 220px;
-	right: 5px;
-	padding-bottom: 129px;
 	margin: 0;
 	height: 100%;
-	padding-top: 31px;
 	position: relative;
 	float: right;
+	width: 290px;
+	padding-bottom: 198px;
+	top: 0px;
+	right: 1px;	
+	padding-top: 90px;
 	}
 
 .leaflet-control-layermenu {						// Layer menu outer wrapper
 	width: 100%;
-	height: 100%;
 	right: 0;
 	margin: 0 !important;	
-	box-shadow: 0 0 5px rgba(0,0,0,0.5) !important;
 	overflow: hidden;
+	height: 100%;
+	max-height: 100%;
+	position: relative;
+	position: relative;
+	float: none !important;	
 	}	
+
+.leaflet-control-layermenu .scroller-frame .inner-scroller {
+	width: 320px;
+	}
 
 #bhattan1 {											// Layer menu collapse button
 	position: absolute;
 	top: 3px;
-	left: 0px;
+	left: 5px;
 	cursor: pointer;
 	background-position: -26px 8px;
 	background-color: transparent;
 	}
 	
-
-
 	
 	
 // ********* Layer inspector *********
 	
 .leaflet-control-inspect {							// Layer inspector : outer wrapper
 	width: 100%;
-	border-top: 1px dashed #A9A9A9;
-	left: 10px;
-	height: 147px;
-	background: rgba(255,255,255,0.93);
-	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5) !important;
+	max-height: 187px;
+	height: auto;
+	background-color: transparent !important;	
+	float: none !important;
+	left: 0;
+	margin-top: 0px;
+	margin-bottom: 0px !important;	
+	position: absolute;
+	bottom: 5px;
+	top: auto;
 	}	
 	
 #inspector-header {									// Layer inspector : header
-	top: -9px !important;
 	position: relative;
 	right: 0;
-	border-top: 1px solid #CACACA;
+	top: 0 !important;
+	overflow: hidden;
+	box-shadow: none;
 	}
 	
 	
@@ -451,8 +483,11 @@
 
 .leaflet-control-attribution {
 	position: fixed;
-	right: 2px;
-	bottom: 2px;
+	left: 302px;
+	bottom: 5px;
+	right: auto;	
+
+	display: none; // Temporarily removed... 
 	}
 
 
@@ -463,16 +498,23 @@
 	}
 	
 .leaflet-control-legends {							// Legends : outer wrapper2
-	width: 100%;
 	bottom: -3px;
+	position: relative;
+	float: left;
+	left: 5px;	
+	width: auto;
+	max-width: 100%;
 	}
 	
 #legends-control-inner-content {					// Legends : inner wrapper
-	width: 100%;
 	bottom: 0px;
-	padding-left: 287px;
-	padding-right: 235px;
 	padding-right: 335px;
+	padding-left: 0;
+	padding-right: 13px;
+	width: auto;
+	max-width: 100%;	
+
+	display: none;
 	}	
 	
 .legends-push-left {								// Legends : inner wrapper pusher
@@ -484,12 +526,13 @@
 	}		
 	
 #legends-inner {									// Legends : inner wrapper 2
-	width: 100%;
-	height: 120px;
+	max-height: 220px;
 	background: rgba(255,255,255,0.93);
 	box-shadow: 0 0 5px rgba(0,0,0,0.5);
 	overflow: hidden;
 	position: relative;
+	width: auto;
+	max-width: 100%;	
 	}	
 	
 #legends-collapser {								// Legends : close button
@@ -509,7 +552,7 @@
 	top: 2px;
 	left: 2px;
 	cursor: pointer;
-	background-image: url(evil_sprite.png);
+	background-image: url(images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -26px -168px;
 	opacity: 0.5;
@@ -522,7 +565,7 @@
 	top: 2px;
 	right: 2px;	
 	cursor: pointer;
-	background-image: url(evil_sprite.png);
+	background-image: url(images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: 2px -168px;	
 	opacity: 0.5;
@@ -551,11 +594,28 @@
 	width: 320px;
 	position: relative;
 	float: left;
+	margin-top: 82px;
+	left: 3px;		
 	}
+
+.leaflet-bar a,
+.leaflet-control-baselayertoggle {
+	/*opacity: 0.8;*/
+	background-color: white;
+	cursor: pointer;
+}	
+
+.leaflet-bar a:hover,
+.leaflet-control-baselayertoggle:hover {
+	background-color: #f4f4f4;
+}	
 	
+
 .leaflet-left .leaflet-control { 					// Leaflet : Description box, zoom controls, style editor
+	padding-left: 0;
 	margin-left: 3px;
-	padding-left: 3px;
+	max-height: 70%;
+	height: auto;
 	}	
 		
 // --- Zoom, draw, etc controls	
@@ -563,13 +623,15 @@
 .leaflet-bar {										// Leaflet : Wrapper vertical controls (zoom, draw, style edit)
 	border-radius: 0;
 	padding-left: 0 !important;
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3) !important;
+	border: none;
 	}
 	
 .leaflet-control-zoom,								// Leaflet Zoom
 .leaflet-draw, 										// Leaflet Draw
 .leaflet-control-styleeditor,						// Leaflet edit styles
 .leaflet-control-baselayertoggle {					// Leaflet toggle baselayers
-	float: right;
+	float: left;
 	}
 	
 .leaflet-bar a:first-child,							// Make square corners
@@ -578,37 +640,39 @@
 	border-radius: 0px !important;
 	}	
 	
-.leaflet-control-styleeditor {
-}
-
 .leaflet-control-styleeditor-interior {
-	background-image: url('evil_sprite.png');
+	background-image: url(images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: 2px -271px;
 	background-color: white;
-}
+	}
 
 .enabled:hover {
 	background-color: #FAFAFA;
-}
+	}
 	
 // --- Description / Info box	
 	
 .leaflet-control-description {						// Leaflet description outer wrapper
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	padding-right: 37px;
-	padding-bottom: 13px;
 	-webkit-box-sizing: border-box;
-	/*z-index: -2;*/
+	box-sizing: border-box;
 	z-index: 2;
+	height: auto;
+	padding: 0;
+	width: 290px;
+	float: none !important;	
+	margin-bottom: 19px;
+	left: 33px;
+	top: 0px;
+	position: absolute;	
 	}	
 	
 #description-control-inner-content {				// Leaflet description Header wrapper
 	height: 100%;
 	overflow: hidden;
 	box-shadow: 0 0 5px rgba(0,0,0,0.5);
+	top: 0px; 
+ 	position: relative; 
 	}	
 	
 #bhattan2 {											// Leaflet description small close arrow
@@ -649,12 +713,6 @@
 	margin: 0;
 	}	
 	
-#description-control-inner-content-box {			// Leadflet description Content wrapper
-	/*background: rgba(255, 255, 255, 0.7);*/
-	/*width: 100%;*/
-	/*height: 100%;*/
-	}
-
 
 // ********************************************
 
@@ -665,42 +723,7 @@
 
 
 
-
-
-
-
-
-
-
-
-	
-/*
-
-UNUSED RULES???
-
-#polse {
-	position: absolute;
-	top: 10px;
-	left: 370px;
-	z-index: 4000;	
-	cursor: pointer;
+.leaflet-control-zoom-out,
+.leaflet-control-zoom-in {
+	color: transparent !important;
 	}
-	
-.editor-project-edit-super-wrap {	
-	background: rgba(255,255,255,0.2);
-	height: 231px;
-	width: 270px;
-	opacity: 1;
-	position: relative;
-	left: 4px;
-	padding: 10px;
-	margin-bottom: 10px;
-	top: 0px;
-	overflow: hidden;
-	}
-	
-.over {
-	opacity: 0.5;
-	background-color: white !important;
-	}
-*/

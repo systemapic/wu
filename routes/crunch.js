@@ -9,7 +9,6 @@ var Layers 	= require('../models/layer');
 
 // file handling
 var fs 		= require('fs-extra');
-var fss 	= require("q-io/fs");
 var utf8 	= require("utf8");
 
 // utils
@@ -34,140 +33,130 @@ var IMAGEFOLDER = '/var/www/data/images/';
 module.exports = crunch = {
 
 
+	// processImage : function (data) {
+
+	// 	var res 	= data.res;
+	// 	var req 	= data.req;
+	// 	var ogfilename 	= data.file; 			// original filename
+	// 	var file 	= data.path; 			// /tmp/temfiles.gz  <- actual path of file, tho tmp only
+	// 	var user 	= data.req.user;
+	// 	var projectUuid = data.req.body.project;
+	// 	var fileUuid 	= 'image-' + uuid.v4();
+	// 	var folder 	= IMAGEFOLDER + fileUuid;
+
+	// 	var ops = [];
+	// 	ops.push(function (callback) {
+	// 		// get image meta
+	// 		crunch._processImage(file, callback);
+	// 	});
+	// 	ops.push(function (callback) {
+	// 		// move raw file
+	// 		crunch.moveRawFile(file, cb);
+	// 	});
+	// 	async.series(ops, function (err, results) {
+
+	// 		console.log('processImage async done! :results: ', results);
+
+	// 		// get vars
+	// 		var dimensions 	= results.dimensions;
+	// 		var exif 	= results.identity;
+	// 		var dataSize 	= results.dataSize;
+	// 		var rawFile 	= results.rawFile;
+
+	// 		// create File object
+	// 		var imageFile 		 	 = new File();
+	// 		imageFile.uuid 		  	 = 'file-' + uuid.v4();
+	// 		imageFile.createdBy 	  	 = user.uuid;
+	// 		imageFile.createdByName   	 = user.firstName + ' ' + user.lastName;
+	// 		imageFile.type 		  	 = 'image';
+	// 		imageFile.format 	  	 = ['jpg'];		
+	// 		imageFile.access.users 	  	 = [user.uuid];	
+	// 		imageFile.access.projects 	 = [projectUuid];
+	// 		imageFile.name 	  	  	 = ogfilename;		// original filename
+	// 		imageFile.data.image.file 	 = rawFile;
+	// 		imageFile.data.image.dimensions  = dimensions;
+	// 		imageFile.dataSize        	 = dataSize;
+	// 		imageFile.data.image.created     = crunch.getExif.created(exif);
+	// 		imageFile.data.image.gps         = crunch.getExif.gps(exif);
+	// 		imageFile.data.image.cameraType  = crunch.getExif.cameraType(exif); 
+	// 		imageFile.data.image.orientation = crunch.getExif.orientation(exif);
+
+	// 		// save
+	// 		imageFile.save(function (err, file) {
+	// 			if (err) console.log('imageFile save error: ', err);
+
+	// 			// add to project
+	// 			crunch.addFileToProject(file, projectUuid);
+
+	// 			// return file to client
+	// 			res.end(JSON.stringify({
+	// 				error : err,
+	// 				files  : [file]	// must return as array
+	// 			}));
+	// 		});
+
+	// 	});
+		
+
+
+	// },
+
 
 	// process images straight after upload
-	processImage : function (data) {
+	_processImage : function (entry, callback) {
+		console.log('**********************************')
+		console.log('* fn: crunch._processImage * entry: ', entry);
+		console.log('**********************************')
 
 
-		var res 	= data.res;
-		var req 	= data.req;
-		var ogfilename 	= data.file; 			// original filename
-		var file 	= data.path; 			// /tmp/temfiles.gz  <- actual path of file, tho tmp only
-		var user 	= data.req.user;
-		var projectUuid = data.req.body.project;
-		var fileUuid 	= 'image-' + uuid.v4();
-		var folder 	= IMAGEFOLDER + fileUuid;
-
-		
-
-		// _____p i x e l p o r n_______________________________________________________
-		//
-		//	aight, så da er mye i boks.
-		//	
-		//	det som skjer nå er følgende:
-		//	
-		//	1. Man uploader ei bildefil i Data Library
-		//	2. Bildet går til routes.js (linje 263) -> upload.js (linje 122) -> crunch.js (linje 32)
-		//	3. Fila kommer inn her og blir kjørt igjennom crunch.processImage() (linje 32)
-		//	4. Her blir det kjørt fire resizes på bildet, se options array linje 124. Der kan vi legge inn hva vi vil av defaults, 
-		// 	   og så mange versjoner vi gidder.
-		//	5. Når det er ferdig, lages en File db object, med alle versjonene/størrelsene av bildet lagra under File.data.image
-		// 	6. Denne Fila blir sendt tilbake til client og blir adda til project. Du kan plukke den ut med project.getFiles()
-		//	7. For å finne de forskjellige versjonene, så ser du i File.data.image array - 
-		//	   der ligger det image object { 
-		// 					file   : image-bla1e12e2,    	// dette er filnavnet som kan gå inn i <img src>
-		// 					width  : 500,			// du må bare legge til /images/ i path'en
-		// 					height : 300 			// så full path blir f.eks. <img src="/images/image-adsdas2120-12">
-		// 					} 				// uten .jpg til slutt! 
-		//	8. råfila lagres i File-objectet under File.rawfile.
-		//       
-		// 	9. shitloads TODO, men dette er basic funksjon :)
-		//
-		// 	todo:
-		//		— raw versjon av fila (trenger vi egentlig det client side? holder vel kanskje at den ligger server side?)
-		//		— finne ut av hvordan vi skal gjøre det med crop vs ratio (height false, osv, se rett under...)
-		//		— det jeg ikke har lagd her, er pixel perfect by request - som når man resizer header f.eks, og vil ha en helt ny størrelse, så 
-		//			må det lages on-the-fly. kanskje sette det opp med url query, f.eks. man ber om et bilde fra serveren som heter f.eks.
-		//			/images/image-12313-12fsdfs-12134234?width=300&height=500 så kan vi bare lage størrelsen hvis den ikke finnes.
-		//
-		//
-		//		- OK! rakk å fikse det :) PIXEL PERFECTION!! nå crunches hvert bilde on-the-fly,
-		// 			så hvis man ber om f.eks. /pixels/file-asdlkmd1elkm12?width=300&height=200 får man det i 300x200 :) 
-		// 			GET requests til /pixels/ går til crunch.serverPixelPerfection()
-		//			working example: http://85.10.202.87:8080/pixels/file-c6924bf0-ef1e-406f-8814-3183fe001a54?width=300&height=400
-		// 			NB: det er da file-uuid'en som må passes, ikke image-uuid. 
-		// 			Nye cruncha bilder lagres på fil-objectet under File.data.image, som nevnt over.
-		//		- Det er sikkert en del som kan fikses på, go mental! :) er f.eks. ikke sikker på om høyde/bredde blir riktig, og jeg tok av
-		// 			crop'en, så tror bare en side blir riktig. Hvis du vil legge inn flere options, kan du plukke dem opp i req.query.
-		// 			
-
-
-
-
-		// ======
-		// HANDLE
-		// ======
-
-		var ops = {};
+		var file = entry.permanentPath,
+		    ops = {};
 	
-		ops.dimensions = function (callback) {
-
+		ops.dimensions = function (cb) {
 			// get image size
-			crunch.getImageSize(file, callback);
+			crunch.getImageSize(file, cb);
 		};
 
-		ops.identity = function (callback) {
-
+		ops.identity = function (cb) {
 			// get exif size
-			crunch.getIdentify(file, callback);
+			crunch.getIdentify(file, cb);
 		};
 		
-		ops.dataSize = function (callback) {
-
+		ops.dataSize = function (cb) {
 			// get file size in bytes
-			crunch.getFileSize(file, callback);
+			crunch.getFileSize(file, cb);
 		};
 
-		// move raw file into /images/ folder
-		ops.rawFile = function (callback) {
+		// // move raw file into /images/ folder
+		// ops.rawFile = function (cb) {
 
-			// move raw file
-			crunch.moveRawFile(file, callback);
-		};
-
-		
+		// 	// move raw file
+		// 	crunch.moveRawFile(file, cb);
+		// };
 
 		// run all ops async in series
 		async.series(ops, function (err, results) {
+			if (err) console.error('_processImage err: ', err);
+			
+			var exif 	= results.identity,
+			    dimensions 	= results.dimensions,
+			    dataSize 	= results.dataSize;
 
-			// get vars
-			var dimensions 	= results.dimensions;
-			var exif 	= results.identity;
-			var dataSize 	= results.dataSize;
-			var rawFile 	= results.rawFile;
+			entry.data.image 	     = entry.data.image || {};
+			entry.data.image.dimensions  = dimensions;
+			entry.dataSize        	     = dataSize;
+			entry.data.image.created     = crunch.getExif.created(exif);
+			entry.data.image.gps         = crunch.getExif.gps(exif);
+			entry.data.image.cameraType  = crunch.getExif.cameraType(exif); 
+			entry.data.image.orientation = crunch.getExif.orientation(exif);
 
-			// create File object
-			var imageFile 		 	 = new File();
-			imageFile.uuid 		  	 = 'file-' + uuid.v4();
-			imageFile.createdBy 	  	 = user.uuid;
-			imageFile.createdByName   	 = user.firstName + ' ' + user.lastName;
-			imageFile.type 		  	 = 'image';
-			imageFile.format 	  	 = ['jpg'];		
-			imageFile.access.users 	  	 = [user.uuid];	
-			imageFile.access.projects 	 = [projectUuid];
-			imageFile.name 	  	  	 = ogfilename;		// original filename
-			imageFile.data.image.file 	 = rawFile;
-			imageFile.data.image.dimensions  = dimensions;
-			imageFile.dataSize        	 = dataSize;
-			imageFile.data.image.created     = crunch.getExif.created(exif);
-			imageFile.data.image.gps         = crunch.getExif.gps(exif);
-			imageFile.data.image.cameraType  = crunch.getExif.cameraType(exif); 
-			imageFile.data.image.orientation = crunch.getExif.orientation(exif);
+			console.log('**********************************')
+			console.log('* fn: upload.process * DONE! entry: ', entry);
+			console.log('* results: ', results);
+			console.log('**********************************')
 
-			// save
-			imageFile.save(function (err, file) {
-				if (err) console.log('imageFile save error: ', err);
-
-				// add to project
-				crunch.addFileToProject(file, projectUuid);
-
-				// return file to client
-				res.end(JSON.stringify({
-					error : err,
-					files  : [file]	// must return as array
-				}));
-			});
-
+			// return results to whatever callback
+			callback(err, entry);
 		});
 	},
 

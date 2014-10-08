@@ -56,6 +56,7 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		this._update();
 	},
 
+	// if run on select project
 	_update : function () {
 
 		// use active project
@@ -71,26 +72,26 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		this.setContentHeight();
 	},
 
-	setContentHeight : function () {
-		this.calculateHeight();
-		this._content.style.maxHeight = this.maxHeight + 'px';
-		console.log('this.scroll', this._scrollWrapper);
-		this._scrollWrapper.style.maxHeight = parseInt(this.maxHeight - 20) + 'px';
-	},
+	// setContentHeight : function () {
+	// 	this.calculateHeight();
+	// 	this._content.style.maxHeight = this.maxHeight + 'px';
+	// 	console.log('this.scroll', this._scrollWrapper);
+	// 	this._scrollWrapper.style.maxHeight = parseInt(this.maxHeight - 20) + 'px';
+	// },
 
-	calculateHeight : function () {
-		var screenHeight = window.innerHeight,
-		    legendsControl = app.MapPane.legendsControl,
-		    height = -107;
+	// calculateHeight : function () {
+	// 	var screenHeight = window.innerHeight,
+	// 	    legendsControl = app.MapPane.legendsControl,
+	// 	    height = -107;
 
-		if (legendsControl) {
-			height += parseInt(screenHeight) - parseInt(legendsControl._legendsHeight);
-		} else {
-			height += parseInt(screenHeight) - 6;
-		}
+	// 	if (legendsControl) {
+	// 		height += parseInt(screenHeight) - parseInt(legendsControl._legendsHeight);
+	// 	} else {
+	// 		height += parseInt(screenHeight) - 6;
+	// 	}
 
-		this.maxHeight = height;
-	},
+	// 	this.maxHeight = height;
+	// },
 
 
 

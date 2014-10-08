@@ -1,8 +1,27 @@
-// *********************************************
+/*
+██████╗  █████╗ ███████╗██╗ ██████╗███████╗
+██╔══██╗██╔══██╗██╔════╝██║██╔════╝██╔════╝
+██████╔╝███████║███████╗██║██║     ███████╗
+██╔══██╗██╔══██║╚════██║██║██║     ╚════██║
+██████╔╝██║  ██║███████║██║╚██████╗███████║
+╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝ ╚═════╝╚══════╝
+*/
 
-// UNIVERSALS
-
-// ********************************************
+body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background-color: #ebeced;
+	color: $ecolor2;
+	line-height: 1.4;
+	font-family: $font;
+	font-size: 14px;
+	text-align: left;
+	-webkit-font-smoothing: antialiased;
+    	-moz-osx-font-smoothing: grayscale;
+	-webkit-overflow-scrolling: none;
+	-webkit-user-select: none;    	
+	}	
 
 :focus { 
 	outline: none !important; 
@@ -27,28 +46,12 @@ h5 {
 	width: 100%;
 	text-align: left;
 	}
-	
-	
-// OMG... UNIVERSALS EVERYWHERES...
-	
-#editor-client-item-new h5,
-.editor-inner-wrapper h5,
-#select-basic-themes,
-#advanced-color-header, 
-.editor-wrapper h4 {					// q-editor under title
-	text-align: center;
-	margin-top: 0px;
-	margin-bottom: 15px;
-	opacity: 1;
-	font-size: 18px;
-	font-weight: 200;
-	}
-	
-	
+
 tr {
 	background: rgba(63, 70, 82, 1);
 	}
 	
+/* table */
 thead tr, thead tr th {
 	border: none;
 	background: transparent !important;
@@ -66,7 +69,6 @@ tr.new {
 	background-color: rgb(0,255,255) !important;
 	}
 
-// ColorThemes
 th {
 	background: $ecolor2;
 	cursor: pointer;
@@ -94,1737 +96,18 @@ th.fivep {
 	padding-bottom: 0;
 	padding-top: 22px;
 	}
-	
-path {											// SVG
-	stroke-width: 1.5px;
-	}
-		
-path:hover {									// ditto
-	fill-opacity: .7;
-	}
-	
-a {
-	font-weight: $median;
-	}
-	
-.active a,										// Link Color
-.editor-wrapper a {
-	color: cadetblue !important;
-	font-weight: 900 !important;
-	text-shadow: -1px 1px 1px rgba(255,255,255,0.3);
-	}	
-		
-	
-		
-// *********************************************
-	
-// Handy hooks
 
-// *********************************************
-	
-	
-.box {
-	margin: 4px !important;
-	}	
-
-.die {
-	display: none !important;
-	}
-
-.show {
-	display: block;
-	}
-
-.relative {
-	position: relative;
-	}	
-
-.inline {
-	display: inline-block;
-	vertical-align: top;
-	}
-	
-.inliner {
-	position: absolute;
-	right: 1px;
-	top: 8px;
-	}
-
-.underline {
-	text-decoration: underline;
-	}				
-
-.search {										// Search fields
-	margin: 0px;
-	border: none;
-	padding: 5px;
-	font-family: $font;
-	font-weight: $lean;
-	color: black;
-	background: white;
-	font-size: 120%;
-	padding-left: 11px;
-	width: 171px;
-	text-align: left;
-	position: relative;
-	box-shadow: 0 0 3px 0 rgba(0,0,0,0.4) inset;
-	}		
-	
-.eightyWidth {									// Often used in tables
-	background: rgba(0, 0, 0, 0.3);
-	color: white !important;
-	border: 0;
-	box-shadow: none;
-	border-radius: 0;
-	padding: 6px !important;
-	height: 30px !important;
-	margin-bottom: 10px !important;
-	margin-top: 0 !important;
-	}
-
-
-
-
-// ********** The Gray Background + Input Fields **********
-
-.editor-inner-wrapper {							// The Gray background overlaying in menu...
-	padding: 5px;
-	margin-bottom: 3px;
-	position: relative;
-	margin-top: 8px;
-	border-radius: 0px;
-	cursor: pointer;
-	padding-left: 20px;
-	padding-right: 20px;
-	background-color: rgba(55, 55, 75, 0.15);
-	width: 230px;	
-	}	
-
-.editor-inner-wrapper:hover {
-	background-color: rgba(55, 55, 75, 0.25);
-	}	
-	
-.editor-inner-wrapper h5 {						// Client : New Client title
-	padding: 0;
-	position: relative;
-	padding-top: 10px;
-	}
-
-.editor-inner-wrapper input, 					// Input fields in gray wrapper
-.input-box {
-	padding: 7px;
-	color: white;	
-	font-weight: $lean;
-	background: rgba(0, 0, 0, 0.7);
-	}
-
-.input-box {									// Input fields in "Connect to MapBox" and "Upload Layers"
-	float: left;
-	width: 170px;
-	border: 0;
-	}
-	
-.search {
-	padding: 5px !important;
-	}
-
-
-// ********** BUTTONS **********
-
-
-.dropdown-button {								// Button : little circular button;
-	background-image: url(evil_sprite.png);
-	background-repeat: no-repeat;
-	background-position: 4px 8px;
-	position: absolute;
-	right: 15px;
-	top: 50px;
-	background-color: white;
-	width: 20px;
-	height: 20px;
-	border-radius: 20px;
-	z-index: 99999;
-	}
-		
-.smap-button-gray {								// Button : standard GRAY button
-	height: 33px;
-	font-size: 17px;
-	line-height: 1.5;
-	padding: 5px 10px 5px 10px;
-	text-align: center;
-	cursor: pointer;
-	font-family: $font;
-	display: inline-block;
-	vertical-align: top;
-	background: rgba(0, 0, 0, 0.45);
-	color: white;
-	font-weight: 400;
-	box-shadow: -1px 1px 2px 0 rgba(0,0,0,0.3);	
-	}	
-
-.smap-button-gray:hover {						// ditto
-	color: white;
-	}
-
-.smap-button-white {							// Button : standard WHITE button
-	height: 32px;
-	text-align: center;
-	margin: 0;
-	margin-bottom: 10px;
-	padding: 0px 10px 0px 10px;
-	border: 0px;
-	border-radius: 0;
-	line-height: 2.1;
-	font-family: $font;
-	font-size: 110%;
-	font-weight: $median;
-	cursor: pointer;
-	position: relative;
-	display: inline-block;
-	vertical-align: top;
-	background: rgba(255,255,255,0.75);
-	box-shadow: 0 0 2px 0 rgba(0,0,0,0.7) inset;
-	color: #666;
-	}
-	
-.smap-button-white:hover {
-	background: white;
+article {
 	color: #333;
-	}
-	
-.smap-button-white.small {						// Button : standard WHITE button smaller
-	height: 26px;
-	font-size: 13px;
-	line-height: 2;
-	}	
-	
-.smap-button-white.small.red {					// Button : red button
-	color: white !important;
-	background: #B80077 !important;
-	box-shadow: 0 0 0 1px white inset;
-	}
-	
-.item-list {									// List Buttons (map layers, controls, etc)
-	height: 32px;
-	margin-bottom: 10px;
-	color: rgba(255,255,255,1);
-	cursor: pointer;
-	border: 0px;
-	line-height: 1;
-	border-radius: 0;
-	font-family: $font;
-	font-size: 100%;
-	font-weight: $lean;
-	position: relative;
-	margin-bottom: 1px;
-	width: 100%;
-	padding: 0px;
-	opacity: .7;
-	background: rgba(0, 0, 0, 0.70);
-
-	-webkit-transition: height 150ms ease;
-	-moz-transition: height 150ms ease;
-	-o-transition: height 150ms ease;
-	transition: height 150ms ease;	
-	}
-
-.item-list-header {
-	margin-top: 10px;
-	margin-bottom: 3px;
-	}
-
-.item-list div,
-.layers-mapbox-item,
-.select-elem {
-	padding: 8px;
-	}	
-	
-.item-list:hover {
-	opacity: 0.8;
-	}
-	
-.item-list, .layer-item, .layers-mapbox-item {
-	color: #333;
-	background: rgba(255,255,255,0.75);
-	box-shadow: -1px 1px 2px -1px rgba(0, 0, 0, 0.6) inset, 1px -1px 2px -1px white inset;
-	}
-
-.item-list.active,
-.layer-item.active,
-.active .layers-mapbox-item {								// List Buttons : Active State
-	background-color: black;
-	color: white;
-	font-weight: 400;	
-	opacity: 0.8;	
-	}
-
-
-// ********** EDIT WRAPPER **********
-
-.editor-project-edit-super-wrap {	
-	background: rgba(255,255,255,0.1);
-	height: 231px;
-	width: 270px;
-	opacity: 1;
-	position: relative;
-	left: 2px;
-	padding: 10px;
-	margin-bottom: 10px;
-	top: 0px;
-	overflow: hidden;
-	margin-top: 7px;
-	}
-
-
-// *********************************************
-		
-// General
-
-// *********************************************
-
-body {
-	width: 100%;
-	height: 100%;
-	overflow: hidden;
-	background-color: #ebeced;
-	color: $ecolor2;
-	line-height: 1.4;
-	font-family: $font;
-	font-size: 14px;
-	text-align: left;
-	
-	-webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    }
-	
-#app {									// The Outer Super Wrapper	
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 200;
-	}
-	
-#map {									// Map
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	height: 100%;
-	left: 0px;
-	-webkit-transition: -webkit-filter 250ms linear, opacity 250ms linear !important;
-	-moz-transition: -moz-filter 250ms linear, opacity 250ms linear !important;
-	transition: filter 250ms linear, opacity 250ms linear !important;
-	}
-
-#map:after {
-	position: relative;
-	width: 100%;
-	height: 100%;
-	left: 0;
-	top: 280px;
-	text-align: center;
-	display: block;
-	font-size: 42px;
-	color: #666;
-	font-weight: $lean;
-	content: 'Select a project';
-	padding-right: 0px;
-	}
-	
-#map:before {
-	content: '';
-	background-image: url('systemapic_BG.jpg');
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	left: 0;
-	top: 0;
-	}
-
-.g-body {								// This holds tooltop etc.
-	z-index: 35000;	
-	top: 5px;
-	left: -17px;
-	position: relative;
-	}
-	
-#header {								// The Header
-	position: absolute;
-	height: 77px;
-	z-index: 10;
-	top: 6px;
-	left: 104px !important;
-	width: 100% !important; // To override Knut
-	padding-right: 110px;
-	}
-
-#headerResizer { 						// The Header
-	position: absolute;
-	bottom: 0px;
-	width: 100%;
-	height: 6px;
-	cursor: ns-resize;
-	}
-
-.headerResizerDisabled { 				// The Header
-	cursor: default !important;
-	}
-
-#header .header-logo {					// The Header
-	position: relative;
-	z-index: 1000;
-	color: white;	
-	float: left;
-	max-height: inherit;
-	padding: 5px;
-	margin-right: 10px;
-
-	// To override Knut
-	float: left !important;
-	position: absolute !important;	
-	background-repeat: no-repeat !important;
-	background-position: center !important;
-	left: 3px !important;
-	background-color: transparent !important;
-	background-size: 100% 100% !important;
-	top: 3px !important;
-	height: 71px !important;
-	}
-
-// To override Knut
-.header-title-wrap {
-	background: rgba(255, 255, 255, 0.93) !important; // To override Knut
-	height: 100% !important; // To override Knut
-	width: 100% !important; // To override Knut
-	top: 0 !important; // To override Knut
-	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
-	}
-
-.header-logo img {						// The Header
-	max-height: 100%;
-	padding-bottom: 10px;
-	width: auto;
-	}
-
-.header-title {							// The Header
-	border: 0px;
-	background: transparent;
-	font-size: 30px;
-	font-weight: $lean;
-	padding-left: 102px;
-	}
-
-.header-title input {
-	padding: 0;
-	/*padding-left: 102px;*/
-	width: 100%;
-	/*background: red;*/
-	}
-
-
-
-.header-subtitle {						// The Header
-	border: 0px;
-	background: transparent;
-	display: block;
-	font-style: italic;
-	color: #666;
-	font-size: 16px;
-	font-weight: $lean;
-	float: left;
-	height: 55px;
-	word-wrap: break-word;
-	position: relative !important;
-	left: inherit;
-	top: 0 !important;
-	line-height: 15px;
-	overflow: hidden;
-	max-height: 31px;
-	padding-right: 14px;
-	padding-left: 102px;
-	}
-
-.header-subtitle input {
-	/*margin-top: 7px;*/
-	width: 300px;
-	color: black;
-	/*padding-left: 102px;*/
-	width: 100%;
-	/*background: red;*/
-	margin: 0 !important;
-	padding: 0 !important;
-	left: 0 !important;
-	top: -9px !important;
-	/*position: relative;*/
-	
-	position: absolute;
-	}	
-
-#header input {							// The Header
-	outline: none;
-	}
- 
-#header input:focus  {					// The Header
-	border: 1px solid rgb(81, 203, 238);
-	}
-	
-
-// *********************************************
-
-// THE Q-EDITOR --> The Menu on the Left
-
-// *********************************************
-	
-.q-editor-container {
-	position: absolute;
-	overflow: hidden;
-	z-index: 2000;	
-	-webkit-transition: height 250ms ease, width 250ms ease;
-	-moz-transition: height 250ms ease, width 250ms ease;
-	transition: height 250ms ease, width 250ms ease;
-
-	width: 95px;
-
-	background-color: rgba(255,255,255,0.0);
-	box-shadow: none;
-	top: 84px !important; // To override Knut
-	left: 4px;
-	padding-top: 2px;
-	height: 80px;
-	}
-
-.disabled {
-	opacity: 0.1;
-	height: 0px !important;
-	}	
-
-.disabled a {
-	opacity: 0;
-	}	
-	
-/*// ColorThemes */
-.q-editor-menu {
-	margin: 0;
-	padding: 0;
-	position: absolute;
-	box-shadow: 0 0px 5px 0 rgba(0,0,0,0.3) !important;
-	margin-top: 7px;
-	height: auto;
-	left: 2px;
-	width: 90px;	
-	background-color: rgba(255, 255, 255, 0.95);
-	top: 79px;
-	top: 6px !important; // To override Knut
-	}
-
-.q-editor-menu-item {
-	text-align: center;
-	height: 70px;
-	position: relative;
-	cursor: pointer;
-	z-index: 200;
-	}
-
-.q-editor-menu-item a {
-	width: 100%;
-	font-size: 90%;
-	text-transform: uppercase;
-	font-weight: $fat;
-	bottom: 0px;
-	position: absolute;
-	left: 0px;
-	top: 0;
-	height: 100%;
-	line-height: 5;
-	text-decoration: none;
-	color: #666;
-	line-height: 1;
-	padding-top: 20px;
-	}
-
-.q-editor-menu-item a:hover {
-	color: #333;
-	}	
-
-.q-editor-content-item {
-	position: absolute;
-	left: 100px;
-	display: none;
-	padding: 10px;
-	overflow-y: auto;
-	overflow-x: hidden;
-	opacity: 1;
-	background-color: rgba(255,255,255,0.90);
 	margin-top: 20px;
-	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3) !important; // To override Knut
-	height: auto;
-	margin-left: 0px;
-	margin-right: 20px;
-	width: 250px;
-	margin-top: 86px;
-	max-height: 70%;
-	top: 6px !important; // To override Knut
 	}
 
-// ColorThemes .ct1
-.editor-wrapper { 						// The inner Wrapper of the .q-editor-content-item
-	height: 100%;
-	overflow-y: scroll;
-	padding-top: 0;
-	padding-bottom: 0;
-	padding-left: 0px;
-	color: black;
-	width: 260px;
-	padding-right: 30px;	
-	}
-
-.editor-wrapper h3 {					// q-editor main title
-	text-align: center;
-	font-weight: $lean;
-	margin-top: 0;
-	font-size: 220%;
-	}
-
-#menuslider {							// The background slider
-	height: 70px;
-	top: 0px;
-	position: absolute;	
-	width: 90px;
-	background-color: rgba(0, 0, 0, 0.075);
-	}
-
-#menuslider-arrow {
-	position: absolute;
-	right: -9px;
-	width: 9px;
-	height: 72px;
-	overflow: hidden;
-	}
-
-#menuslider-arrow:before { 
-	content: '';
-	position: absolute;
-	height: 30px;
-	width: 30px;
-	top: 21px;
-	background-color: #e9e9e9;
-	-webkit-transform: rotate(45deg);
-	-moz-transform: rotate(45deg);
-	transform: rotate(45deg);
-	left: -29px;
-	box-shadow: 0 0 5px 0 rgba(0,0,0,0.075);
-	z-index: 999;
-	}
-
-#menucloser {							// The menu pane closer
-	position: absolute;
-	bottom: 20px;
-	left: 40px;
-	background: white;
-	width: 19px;
-	height: 19px;
-	z-index: 99999;
-	border-radius: 20px;
-	cursor: pointer;
-	background-image: url(evil_sprite.png);
-	background-repeat: no-repeat;
-	background-position: 4px 8px;
-	-webkit-transform: rotate(270deg);
-	-moz-transform: rotate(270deg);
-	transform: rotate(270deg);
-	}
-	
-.pane-open {							// The menu pane closer in open state
-	-webkit-transform: rotate(90deg) !important;	
-	-moz-transform: rotate(90deg) !important;	
-	transform: rotate(90deg) !important;	
+hr {
+	border-top: 1px solid #333;
 	}	
 
-.client-project-title-wrapper {
-	text-align: center;
-	margin-bottom: 15px;
-	}
-	
-.client-project-title-wrapper span {
-	opacity: 0.6;
-	margin: 10px;
-	position: relative;
-	left: 3px;
-	}
-
-.client-project-title-wrapper h4 {
-	opacity: 0.6;
-	font-size: 130%;
-	display: inline-block;
-	margin: 0;
-	}
-
-
-
-			
-// ********* Q-EDITOR : CLIENTS *********	
-	
-// --- Buttons
-	
-.new-client {								// Clients : New client button
-	width: 280px;							// Extends .smap-button-white
-	}
-	
-.jbutton {									// Client : drop down buttpn
-	top: 11px !important;
-	right: 10px !important;	
-	color: transparent !important;
-	opacity: 0;
-	}
-	
-.editor-clients-container:hover > .jbutton {	// ditto
-	opacity: 1 !important;
-	}	
-
-.editor-clients-container:hover > .client-kill {
-	display: block;
-	}
-	
-	
-// --- New Client
-	
-.new-client-container {						// Client : New Client inner wrapper
-	position: relative;
-	top: -7px;
-	}	
-	
-.editor-client-edit-wrapper label:nth-child(1) { 	// Push the height of the box from the first label in the container...
-	margin-top: 10px;
-	}	
-		
-#editor-client-item-new {					// Clients : New Client title wrapper
-	height: 55px;
-	width: 280px;
-	text-align: center;
-	padding: 0;
-	}
-	
-#editor-project-item-new {					// PROKJCTS
-	height: 55px;
-	}
-
-#editor-client-item-new h5 {				// Client : New Client title
-	padding: 0;
-	position: relative;
-	display: block;
-	text-align: center;
-	padding-top: 10px;
-	}
-
-	
-// --- Client	
-	
-.editor-clients {
-	position: relative;
-	padding-bottom: 48px;
-	}
-
-
-.client-title {
-	padding: 5px;
-	text-transform: uppercase;
-	font-size: 17px;
-	font-weight: 400;
-	color: #333;	
-	}
-
-.client-logo {
-	position: absolute;
-	width: 70px;
-	height: 50px;	
-	top: 5px;
-	right: 5px;	
-	}	
-
-.editor-clients-container {					/* // Clients : inner wrapper */
-	padding: 4px 6px 4px 6px;
-	margin: 0px 0px 1px 0px;
-	height: 80px;
-	position: relative;
-	cursor: pointer;
-	overflow: hidden;
-	-webkit-transition: height 300ms ease;
-	-moz-transition: height 300ms ease;
-	transition: height 300ms ease;
-	background-color: rgba(55, 55, 75, 0.15);
-	width: 230px !important;	
-	}
-
-.editor-clients-container:hover {
-	background-color: rgba(55, 55, 75, 0.09);
-	}	
-
-.projects-container	{
-	position: absolute;
-	top: 78px;
-	left: 0;
-	width: 100%;
-	height: 50px;
-	padding: 10px;
-	}
-
-
-.project-logo {
-	position: absolute;
-	background-repeat: no-repeat;
-	background-size: 100% 100%;
-	background-position: center;
-	background-color: white;
-	box-shadow: 0 0 2px 0px rgba(0,0,0,0.5);	
-	width: 69px;
-	height: 48px;
-	right: 9px;
-	top: 44px;
-	}
-
-.project-item {
-	background: rgba(0, 0, 0, 0.15);
-	opacity: 1;
-	margin-bottom: 5px;
-	position: relative;
-	color: #333;
-	height: 111px;
-	}
-
-.project-item:hover {
-	background: rgba(0, 0, 0, 0.25);
-	}	
-
-.project-item:hover > .project-kill {
-	display: block;
-	}
-
-.project-logo-wrap img {
-	height: 100%;
-	}
-
-.project-title {
-	position: absolute;
-	left: 10px;
-	top: 10px;
-	font-size: 110%;
-	text-shadow: none;
-	font-weight: 500;
-	text-transform: uppercase;
-	}
-
-.editor-client-title {						// Clients : Title wrapper
-	position: relative;
-	color: white;
-	left: -20px;
-	width: 273px;
-	}	
-		
-.editor-client-title h5 {					// Client : Title
-	top: 5px;
-	padding-left: 60px;
-	text-shadow: none;
-	font-size: 140%;
-	font-weight: $lean;
-	margin: 0;
-	height: 18px;
-	}	
-
-.editor-client-title img {					// Client : Logo
-	max-width: 50px;
-	max-height: 33px;
-	position: absolute;
-	left: 6px;
-	top: 0px;
-	}
-	
-.editor-client-edit-wrapper {				// Client : edit wrapper
-	display: none;
-	padding-left: 10px;
-	padding-right: 10px;
-	border-top: 1px solid rgba(255,255,255,0.5);
-	margin-top: 14px;
-	padding-top: 10px;
-	padding-bottom: 40px;
-	position: relative;
-	left: -10px;
-	width: 261px;	
-	display: block !important;
-	height: 0 !important;
-	overflow: hidden !important;
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;	
-	top: 5px !important;
-	opacity: 0 !important;	
-	}
-
-.client-editor-open {							// ditto : open
-	height: 229px !important;
-	opacity: 1 !important;
-	}
-		
-	
-#new-client-button {
-	height: 42px;
-	width: 42px;
-	margin: 0;
-	margin-bottom: 10px;
-	padding: 2px 12px 2px 5px;
-	border: 0px;
-	border-radius: 0;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
-	font-size: 383%;
-	font-weight: $lean;
-	cursor: pointer;
-	position: absolute;
-	display: inline-block;
-	bottom: -10px;
-	right: 31px !important; // Override Knut
-	color: #666;
-	line-height: 0.5;
-	background: white;	
-	}	
-
-#new-client-button:hover {
-	background: rgba(255, 255, 255, 0.30);
-	color: rgba(255,255,255,0.8);
-	}
-
-
-// ********* Q-EDITOR : PROJECTS *********	
-
-// --- Buttons 
-
-.box .dropdown-button {					// Extend drop down button - box view
-	bottom: 5px;
-	top: auto;
-	left: auto;
-	right: 5px;	
-	opacity: 0;	
-	}
-
-.list .dropdown-button {				// Extend drop down button - list view
-	bottom: auto;
-	left: auto;
-	right: 10px;
-	top: 6px;
-	opacity: 0;
-	}
-	
-.editor-projects-item:hover > .dropdown-button {	// Make buttons visible on hover, yo
-	opacity: 1;
-	}	
-
-.editor-projects-item.ct0.active:before,			// Active client
-.active-client:before {								// Active projects
-	content: '';
-	width: 22px;
-	height: 30px;
-	position: absolute;
-	background: green;
-	z-index: 99999;
-	right: -11px;
-	top: -11px;
-	-webkit-transform: rotate(320deg);
-	-moz-transform: rotate(320deg);
-	transform: rotate(320deg);
-	box-shadow: 0 0 0 2px white;	
-	}
-	
-#new-project-button {					// Projects : New project button
-	width: 100%;
-	display: inline-block;
-	}
-
-.sort-by-clients-projects {				// Project : sort buttons container
-	display: inline-block;
-	vertical-align: top;
-	}
-	
-#editor-projects-sort-by-left {			// Project : box view button
-	border: none !important;
-	border-radius: 0 !important;
-	}	
-
-#editor-projects-sort-by-right {		// Project : list view button
-	border: none !important;
-	border-left: 1px solid !important;
-	border-radius: 0 !important;
-	}
-
-
-// ---
-
-
-.editor-projects-container {			// Projects : inner wrapper
-	min-height: 80px;
-	}
-
-#editor-projects-container-new {		// Projects : New project container
-	padding-bottom: 47px;	
-	margin-bottom: 10px;
-	}	
-
-.editor-projects-item {					// Project : box veiw - Project (clickable) outer wrapper 
-	color: white;
-	overflow: hidden;
-	height: 131px;
-	width: 131px;
-	left: 0px;
-	margin: 2px;
-	margin-left: 0;
-	margin-right: 0;
-	position: relative;
-	display: inline-block;
-	vertical-align: top;
-	cursor: pointer;
-	background: white;
-	}
-
-.list_view .editor-projects-item {		// ditto : list view 
-	width: 277px;
-	background: $ecolor1;
-	height: 41px;
-	}
-	
-.editor-projects-item:hover {			// ditto
-	color: gainsboro;
-	}
-
-.editor-projects-item img {				// Project : Featured image (small, next to project title) 
-	width: auto;
-	position: absolute;
-	height: 200px;
-	}
-	
-.list_view .editor-projects-item img {	// ditto : list view
-	width: 50px;
-	height: 41px;
-	}	
-
-.editor-projects-item h5 {				// Project : title 
-	position: absolute;
-	left: 0px;
-	word-wrap: break-word;
-	margin: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0,0,0,0.8);
-	padding: 12px;
-	padding-top: 9px;
-	opacity: 0;
-	font-family: $font;
-	font-weight: $lean;
-	font-size: 174%;
-	text-align: center;
-	}
-	
-.list_view .editor-projects-item h5 {	// ditto : list view
-	color: white;
-	height: 41px;
-	padding-left: 60px;
-	opacity: 1;
-	background: none;	
-	text-shadow: none;
-	font-size: 140%;
-	z-index: 2344;
-	text-align: left;
-	}
-
-.editor-projects-item:hover > .project-edit-button,		// Project : bring opacity 1 to all overlaying elements
-.editor-projects-item:hover > h5 {						
-	opacity: 1;
-	}
-		
-.swipe_left {											// Project : swipe toggle
-	left: -300px !important;
-	}	
-	
-
-
-
-
-// ********* Q-EDITOR : MAP *********		
-	
-// --- Buttons	
-	
-#editor-map-initpos-more,   			// Extends .dropdown-button
-#editor-map-bounds-more {
-	top: 54px;
-	}
-	
-// Extends .smap-button-white	
-#editor-map-initpos-button,				// Map : Set current possition button
-#editor-map-bounds,						// Map : Set current bounnds button
-.select-title {							// Map : Base layer button				
-	width: 225px;
-	}
-
-#editor-map-bounds {
-	width: 147px !important;
-	}
-				
-.editor-map-item-wrap {					// Map : inner wrapper
-	padding: 10px;
-	margin-bottom: 1px;
-	margin-top: 1px;
-	min-height: 40px;
-	}	
-	
-.editor-map-item-wrap:last-child {		// Map : "Map Controls" wrapper
-	margin-top: 10px;
-	}
-
-.select-elems {							// Map : base layer list wrapper
-	height: 0;
-	display: block;
-	overflow: hidden;
-	-webkit-transition: height 250ms ease;
-	-moz-transition: height 250ms ease;
-	transition: height 250ms ease;
-	margin-top: 8px;
-	}
-	
-.select-baselayer-open {				// Map : base layer list wrapper open
-	height: 297px;
-	}
-
-#editor-map-initpos-coordinates,		// Map : position wrapper
-#editor-map-bounds-coordinates {		// Map : bounds wrapper
-	position: relative;
-	top: 15px;
-	height: 0;
-	overflow: hidden;	
-	}
-
-.coordinates_open {						// Map : position wrapper open
-	height: 192px !important;			
-	}
-
-.bounds_open {							// Map : bounds wrapper open
-	height: 220px !important;
-	}
-
-
-
-
-
-// ********* Q-EDITOR : LAYERS *********
-
-
-#layers-wrapper {						// Wrapper
-	width: 280px;
-	}
-	
-#layers-library-browser {				// Data Library & MapBox Library logo wrapper
-	width: 100%;
-	height: 125px;
-	text-align: center;
-	}
-
-.layers-library-browser-item { 			// The LOGOS : For Data Library & MapBox Library
-	width: 100px;
-	height: 100px;
-	border: 1px solid gray;
-	margin: 3px;
-	background-size: 100px 100px;
-	position: relative;
-	display: inline-block;
-	vertical-align: top;
-	}
-
-#layers-library-browser-datalayers {	// Data Library logo
-	cursor: pointer;
-	font-family: $font;
-	font-size: 140%;
-	font-weight: $lean;
-	text-align: center;
-	padding-top: 19px;
-	text-transform: uppercase;
-	color: gainsboro;
-	}
-
-#layers-library-browser-mapbox {			// MapBox logo
-	background-image: url('http://www.altweeklies.com/imager/b/main/6640192/462f/mapbox-logo-256.jpg');
-	cursor: pointer;
-	}
-
-	
-	
-	
-// *** MIDDLE ITEM	
-.middle-item { 								/*// LAYER FOLDER : For making level buttons on map layer selector*/ /*// Extends .smap-button-white*/
-	width: 260px;							
-	margin: auto;
-	position: relative;
-	display: block;
-	margin-top: 20px;
-	margin-bottom: 20px;
-	color: #666;
-	text-transform: uppercase;
-	font-weight: $obese;
-	line-height: 2.4;
-	background: rgba(255,255,255,1);
-	box-shadow: 0 0 2px 1px rgba(0,0,0,0.3)	
-	}
-	
-.middle-item:after {
-	content: '';
-	position: absolute;
-	top: -20px;
-	background-color: rgba(255, 255, 255, 0.93);
-	height: 72px;
-	z-index: -2;
-	width: 280px;
-	left: -10px;	
-	}	
-
-	
-	
-	
-	
-// *** BACK TO Q-EDITOR : LAYERS ***
-	
-#layers-library,							// Data library : wrapper
-#layers-mapbox {							// MapBox : wrapper
-	position: relative;
-	padding-bottom: 12px;
-	border-bottom: 1px solid;
-	}
-	
-// *** Import Part ***	
-	
-#editor-layers-connect-mapbox,				// MapBox : connect wrapper
-#editor-layers-upload {						// Data library : upload wrapper
-	background: rgba(255, 255, 255, 0.15);
-	height: 40px;
-	padding: 10px;
-	padding-left: 17px;
-	color: white;
-	}	
-	
-#editor-layers-upload-more,					// Data library : Drop down button
-#editor-layers-connect-mapbox-more {		// MapBox : Drop down button
-	top: 10px;
-	right: 5px;
-	}
-	
-.mapbox-connect-wrap,						// MapBox : connect drop down wrapper
-.datalibrary-connect-wrap {					// Data Library : upload drop down wrapper
-	position: relative;
-	color: white;
-	margin: 0;
-	height: 55px;
-	padding: 10px;
-	padding-top: 15px;	
-	}
-	
-#import-mapbox-layers {						// MapBox : connect input field
-	background: rgba(0,0,0,0.3);
-	color: white !important;	
-	font-weight: $lean;
-	border: 0px;
-	float: left;
-	width: 170px;
-	}
-	
-.import-mapbox-layers {
-	width: 100%;
-	margin-bottom: 5px;
-	background: rgba(0, 0, 0, 0.3);
-	color: white !important;
-	font-weight: $lean;
-	border: 0px;
-	float: left;
-	}
-
-#import-mapbox-layers-ok,					// MapBox : connect OK button
-#import-datalibrary-layers-ok {				// Data library : upload OK button
-	background: #DADADA;
-	color: #666;	
-	height: 33px;
-	border-radius: 0;
-	padding: 0;
-	vertical-align: top;
-	margin: 0px;
-	padding-top: 5px;
-	font-size: 110%;
-	width: 185px;
-	}		
-	
-// ColorTheme Colors : NOT INTEGRATED
-#import-mapbox-layers-ok:hover, 			// ditto
-#import-datalibrary-layers-ok:hover	{		// ditto
-	background: white;
-	}
-	
-	
-	
-// *** Layer List ***		
-	
-#layers-library {							// Layer list : outer wrapper
-	display: block;
-	}
-
-#layers-mapbox {							// MapBox : outer wrapper
-	display: none;
-	}
-
-#layers-mapbox h4,							// MapBox : layer list header
-#layers-library h4 {						// Data library : layer list header
-	margin-top:10px;
-	font-size: 200%;
-	border-bottom: 1px solid gainsboro;
-	padding-bottom: 10px;
-	margin-bottom: 0px;
-	color: white;
-	opacity: 1;
-	}
-	
-	
-#layers-library-list,						// Data library : Layer list wrapper
-.mapbox-list-item {							// MapBox : Layer list wrapper for each account
-	margin-top: 12px;
-	padding: 10px;
-	}
-	
-.mapbox-list-item {
-	margin-top: 5px;
-	padding-top: 1px;
-	}	
-
-.mapbox-list-item:first-child {
-	margin-top: 0px;
-	}
-	
-.layers-mapbox-name {						// MapBox : Account name (ie. 'rawger')
-	text-transform: capitalize;
-	margin: 10px;
-	font-size: 170%;
-	font-family: $font;
-	font-weight: $lean;
-	margin-bottom: 4px;
-	margin-left: 4px;
-	opacity: 1;
-	text-align: center;
-	}
-
-
-// ********* Q-EDITOR : DOCUMENTS & DATA LIBRARY *********
-
-.fullpage-documents .editor-wrapper,
-.data-library .editor-wrapper,
-.fullpage-users .editor-wrapper {
-	width: auto;
-	background-color: rgba(255,255,255,0.9);
-	overflow: hidden;
-	position: relative;
-	}
-
-.fullpage-documents,
-.data-library,
-.fullpage-users {	
-	left: 104px;
-	padding-left: 0px;
-	padding-top: 89px;
-	padding-right: 110px;
-	padding-bottom: 7px;
-	background: none;
-	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
-	overflow: hidden;
-
-	max-width: 100% !important; // To override Knut
-	width: 100% !important; // To override Knut
-	max-height: 100% !important; // To override Knut
-	height: 100% !important; // To override Knut
-	padding-right: 110px !important; // To override Knut
-	padding-bottom: 95px !important; // To override Knut
-	}
-
-
-// ********* Q-EDITOR : DOCUMENTS *********
-
-
-.fullpage-documents {						// Documents : outer wrapper
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	z-index: 3400;
-	display: none;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	}
-
-#documents-container-leftpane {				// Documents : left wrapper
-	position: absolute;
-	font-weight: $lean;
-	margin: 10px;
-	font-family: $font;
-	width: 250px;
-	top: 0px;
-	position: relative;	
-	}
-
-#documents-container-rightpane {			// Documents : right wrapper
-	position: absolute;
-	font-weight: $lean;
-	padding: 20px;
-	font-family: $font;
-	position: absolute;
-	height: 100%;
-	font-size: 20px;
-	overflow-y: auto;
-	overflow-x: hidden;
-	width: 100%;
-	padding-right: 350px;
-	box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	top: 0px !important; // To override Knut
-	left: 250px;
-	color: #333;
-	padding-top: 0;	
-	padding-bottom: 125px;
-	}
-
-#documents-folder-list {					// Documents : folder list
-	margin-top: 30px;
-	}
-
-.documents-folder-item,						// Documents : list items
-#documents-new-folder {
-	background: none;
-	border: none;
-	margin: 4px;
-	margin-left: 30px;
-	font-family: $font;
-	cursor: pointer;
-	width: 90%;
-	line-height: 1.2;
-	margin-bottom: 10px;
-	font-weight: 500;
-	font-size: 115%;
-	padding-left: 10px;	
-	}
-
-.documents-folder-delete,
-.documents-folder-item, 
-#documents-new-folder {
-	color: #333;
-	padding-right: 0px;
-	}
-
-#documents-new-folder:hover,				// ditto
-.documents-folder-item:hover {
-	color: #000;
-	}
-
-.documents-folder-item input {
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	font-weight: 500;
-	font-size: 100%;
-	color: #C80000;
-	}
-
-.documents-folder-delete {
-	float: left;
-	font-size: 150%;
-	font-family: helvetica neue;
-	visibility: hidden;
-	color: #C8C8C8;
-	cursor: pointer;
-	position: absolute;
-	line-height: 0.4;
-	left: -2px;
-	background: rgba(0,0,0,0.2);
-	height: 18px;
-	width: 10px;
-	text-align: center;
-	padding-right: 13px;
-	padding-left: 4px;
-	margin: 0;
-	padding-top: 3px;
-	border-radius: 2px;
-	font-size: 19px;
-	font-weight: 900;
-	color: white;
-	text-shadow: -1px 1px 1px rgba(0,0,0,0.3);
-	margin-top: 1px;	
-	}
-
-.documents-folder-delete:hover {
-	color: white;
-	background: #C80000;
-	}
-
-.documents-folder-item {
-	margin-left: 10px;
-	}
-
-.editor-map-item-wrap:last-child {
-	margin-top: 1px;
-	}
-
-.tdcont {
-	cursor: pointer;
-	}
-
-.tdcont.email {
-	cursor: default;
-	}
-
-#documents-new-folder {
-	margin-left: 10px;
-	}
-
-.text-menu .options {						// Documents : tooltip
-	padding-top: 1px !important;
-	width: 245px;
-	}
-
-.text-menu.options.url-mode .file {			// Documents : tooltip
-	display: none;
-	}
-
-.text-menu.active {							// Documents : tooltip
-	z-index: 1500;
-	}
-
-.grande-project-files {						// Documents : tooltip select options menu
-	width: 181px;
-	top: 36px;
-	position: absolute;
-	left: 0px;
-	}	
-	
-.grande-project-files-btn {					// Documents : OK button for select tooltip
-	width: 30px !important;
-	height: 16px !important;
-	background-color: white !important;
-	position: absolute !important;
-	top: 37px !important;
-	right: 0px !important;
-	border-radius: 3px !important;	
-	cursor: pointer;
-	}
-	
-.grande-project-files-btn:before {			// ditto
-	content: 'OK';
-	width: 100%;
-	height: 100%;
-	color: black;
-	position: absolute;
-	text-align: center;
-	font-size: 11px;
-	font-weight: $obese;
-	}
-	
-	
-.grande-sources-container {
-	position: absolute;
-	width: 300px;
-	top: 30px;
-	background: black;
-	border-radius: 5px;
-	}
-
-.grande-sources-topwrap {
-	height: 0px;
-	width: 100%;
-	}
-
-.grande-sources-source {
-	position: relative;
-	height: 50px;
-	border-top: 1px solid #0C4818;
-	width: 100%;
-	overflow: hidden;
-	}
-
-.grande-sources-container div:nth-child(2) {
-	border-radius: 5px 5px 0px 0px;
-	}
-
-.grande-sources-container div:last-child {
-	border-radius: 0px 0px 5px 5px;
-	}
-
-.grande-sources-source:hover {
-	background: #60d778;
-	}
-
-.grande-sources-source-icon {
-	width: 30px;
-	height: 30px;
-	}
-
-.grande-sources-source-title {
-	color: white;
-	position: absolute;
-	top: 0px;
-	left: 34px;
-	font-size: 110%;
-	padding: 2px;
-	}
-
-.grande-sources-source-thumb {
-	position: absolute;
-	width: 30px;
-	height: 100%;
-	right: 0px;
-	top: 0px;
-	}	
-	
-	
-// ********* Q-EDITOR : DATA LIBRARY & USERS *********	
-
-	
-#filelist,									// Data library : inner wrapper
-#userlist {									// Users : inner wrapper
-	margin: 20px;
-	}
-	
-.datalibrary-controls,						// Data library : controls wrapper
-.users-controls {							// Users : controls wrapper
-	height: 42px;
-	position: relative;
-	border-bottom: 1px solid;
-	margin-bottom: 20px;
-	color: #666;
-	}
-		
-	
-// ********* Q-EDITOR : DATA LIBRARY *********	
-
-// --- Buttons
-
-#datalibrary-download-files {				// Data library : download button
-	float: right;
-	}
-	
-#datalibrary-delete-file {					// Data library : delete button
-	float: right;
-	margin-left: 5px;
-	}
-	
-#download-ok-button {						// Data library : download OK button
-	width: 100px;							// Extends .smap-button
-	bottom: 10px;
-	position: absolute;
-	right: 10px;
-	}
-
-#download-cancel-button {					// Data library : dowload cancel button
-	position: absolute;						// Extends .smap-button
-	bottom: 10px;
-	right: 114px;
-	}
-
-#download-ready-button {					// Data library : download ready button
-	width: 106px;							// Extends .smap-button
-	color: white !important;
-	height: 38px;
-	position: relative;
-	margin: auto;
-	display: block;
-	top: 170px;
-	}
-	
-// ---	
-
-#download-ready-button a {					// ditto
-	color: white;
-	text-decoration: none;
-	}
-
-#download-ready-button a:hover {			// ditto
-	color: gainsboro;
-	text-decoration: none;
-	}	
-
-.data-library,
-.fullpage-mediaLibrary {								// Data library : outer wrapper
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	z-index: 3400;
-	display: none;
-	left: 104px;
-	overflow-y: auto;	
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;   
-	padding-right: 84px;
-	}
-		
-#datalibrary-download-dialogue {			// Data library : download box
-	position: fixed;
-	width: 80%;
-	height: 400px;
-	display: none;
-	top: 20%;
-	left: 15%;
-	background: rgba(86, 95, 111, 1);
-	color: white;
-	font-family: $font;
-	font-size: 120%;
-	z-index: 1000;
-	padding: 10px;
-	}
-	
-#datalibrary-download-dialogue:before {		// ditto
-	content: '';
-	position: fixed;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: 0;
-	background: white;
-	z-index: -2;
-	opacity: 0.75;
-	}	
-
-#datalibrary-download-dialogue:after {		// ditto
-	content: '';
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: 0;
-	background: $ecolor2;
-	z-index: -2;
-	}	
-			
-#datalibrary-download-table thead tr {		// Data library : download table head
-	font-size: 80%;
-	}
-	
-.tdcont {									// Data library : table cell 
-	opacity: 0.7;
-	font-size: 14px;
-	font-weight: $lean;
-	letter-spacing: 0.5px;
-	line-height: 1.2;
-	padding-top: 10px;
-	border-left: 1px dashed rgba(255,255,255,0.05);
-	padding-left: 9px;
-	color: #333;
-	}
-	
-.tdcont:hover {								// ditto
-	color: black;
-	}
-
-.tdcont.access:hover {
-	background: rgb(146, 240, 229);
-	}	
-	
-.download-remove {							// Data library : unselect download check box in download window
-	text-align: center;
-	}
-	
-.dln {										// Data library : Main name (in table)
+/* Main name (in table) */
+.dln {
 	margin-left: 30px;
 	font-family: $font;
 	background: none;
@@ -1837,17 +120,12 @@ body {
 	color: #333;
 	}
 
-.smallerText {								// Data library : First name
-	font-size: 100%;
-	opacity: 0.6;
-	font-style: italic;
-	}
-
-.dln:hover {								// ditto
+.dln:hover {
 	color: black;
 	}
 
-.dld {										// Data library : file description
+/* file description */
+.dld {
 	font-weight: $lean;
 	font-size: 100%;
 	margin: 0 10px 0 0;
@@ -1864,368 +142,65 @@ body {
 	font-style: italic;
 	overflow-y: hidden;
 	}
-	
-#datalibrary-errors {						// Data library : Errors
-	font-family: $font;
-	width: 400px;
-	height: 80px;
-	position: absolute;
-	right: 121px;
-	background: white;
-	top: 57px;
-	color: rgb(255, 111, 111);
-	font-size: 140%;
+
+/* table cell */
+.tdcont {
+	opacity: 0.7;
+	font-size: 14px;
 	font-weight: $lean;
-	padding: 5px;
-	background: rgba(86, 95, 111, 1);
-	display: none;
-	}
-
-.grande-project-files-btn {					// Data library : Unknown???
-	width: 30px;
-	height: 30px;
-	background-color: red;
-	}
-
-.grande-project-files-wrap {				// Data library : Unknown???
-	height: auto;
-	display: none;
-	}	
-	
-.dz-details {								// Data library : DropZone style
-	top: 320px;
-	left: 30%;
-	position: fixed;
-	height: 50px;
-	padding: 5px;
-	padding-left: 10px;
-	padding-right: 10px;
-	width: auto;
-	z-index: 20000;
-	font-size: 120%;
-	}
-
-.dz-progress {								// Data library : DropZone style
-	display: none;
-	}
-
-.dz-success-mark {							// Data library : DropZone style
-	display: none;
-	}
-
-.dz-error-mark {							// Data library : DropZone style
-	display: none;
-	}
-	
-.progress-bar {								// Data library : DropZone style
-	position: fixed;
-	width: 0%;
-	height: 6px;
-	top: 0px;
-	left: 0px;
-	background: white;
-	z-index: 20000;
-	margin-left: 100px;
-	}
-
-.fullscreen-drop {							// Data library : DropZone style
-	position: fixed;
-	width: 100%;
-	height: 100%;
-	opacity: 0;
-	background-color: rgba(63, 70, 82, 1);
-	top: 0;
-	left: 0;
-	z-index: -1000;
-	margin-left: 100px;
-	}
-
-.fullscreen-drop::after {					// Data library : DropZone style
-	content: 'Drop files to upload';
-	color: white;
-	font-weight: $lean;
-	font-family: $font;
-	font-size: 400%;
-	position: fixed;
-	top: 30%;
-	left: 25%;
-	}
-
-.fullscreen-dropped {						// Data library : DropZone style
-	position: fixed;
-	width: 100%;
-	height: 100%;
-	opacity: 0;
-	background-color: rgba(63, 70, 82, 1);
-	top: 0;
-	left: 0;
-	z-index: -1000;
-	margin-left: 100px;
-	}
-
-.fullscreen-dropped::after {				// Data library : DropZone style
-	content: 'Uploading';
-	color: white;
-	font-weight: $lean;
-	font-family: $font;
-	font-size: 400%;
-	position: fixed;
-	top: 30%;
-	left: 30%;
-	}
-	
-#squaredThree-checkbox-all {				// Data library : DropZone style
-	top: -4px;
-	}
-		
-.checkbox {									// Data library : DropZone style
-	width: 20px;
-	padding: 0;
-	top: 0px;
-	position: relative;
-	left: 10px;
-	}	
-	
-.dropzone-pane {							// Data library : DropZone style
-	width: 100px;
-	height: 100px;
-	border: white solid 1px;
-	}
-	
-	
-// ********* Q-EDITOR : USERS *********	
-		
-.q-editor-menu-item .users {				// Users : in left menu, white line on top
-	/*border-top: 1px solid white;*/
-	border-top: 1px solid #333;
-	}
-	
-.fullpage-users {							// Users : outer wrapper
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	z-index: 3400;
-	display: none;
-	left: 104px;
-	padding-right: 84px;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	}
-	
-.fullpage-users .editor-wrapper {			// Users : inner wrapper
-	width: auto;
-	}	
-	
-.users-projects-dropwrap {					// Users : The R/W outer wrapper
-	z-index: 4000;
-	position: absolute;
-	background: rgba(255,255,255,0.7);
-	width: 317px;
-	height: auto;
-	padding: 10px;
-	margin-top: 50px;
-	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
-	border-radius: 2px;
-	}	
-	
-.users-projects-top-title {					// Users : The R/W part in the header
-	color: white;
-	font-size: 130%;
+	letter-spacing: 0.5px;
+	line-height: 1.2;
+	padding-top: 10px;
+	border-left: 1px dashed rgba(255,255,255,0.05);
 	padding-left: 9px;
-	font-weight: $lean;
-	background: rgba(0, 0, 0, 0.49);
-	width: 63px;
-	letter-spacing: 2.8px;
-	position: relative;
-	border-bottom: 1px solid white;
-	}	
-	
-.users-projects-checkwrap {					// Users : checkbox wrapper when editing user R/W access
-	left: 0;
-	padding: 10px;
-	background: rgba(0, 0, 0, 0.2);
-	border-right: 1px solid rgba(255, 255, 255, 0.2);
-	width: 64px !important;
-	height: 100% !important;
+	color: #333;
 	}
 	
-.users-projects-checkwrap:before, 			// Users : R/W before
-.users-projects-top-title:before {			// Users : R/W before
-	content: '';
-	width: 0px;
-	height: 37px;
-	left: 30px;
-	position: absolute;
-	top: 0;
-	border-right: 1px dashed rgba(255,255,255,0.1);
-	}	
-	
-.users-projects-itemwrap {					// Users : Project list when editing user R/W access
-	width: 300px;
-	height: 37px;
-	background: rgba(0,0,0,0.5);
-	position: relative;
-	border-bottom: 1px solid white;
-	}	
-	
-.users-projects-itemwrap:nth-child(even) {	// ditto
-	background-color: rgba(0,0,0,0.6);
-	}	
+.tdcont:hover {
+	color: black;
+	}
 
-.users-projects-itemwrap:nth-child(odd) {	// ditto
-	background-color: rgba(0,0,0,0.5);
-	}	
+.tdcont.access:hover {
+	background: rgb(146, 240, 229);
+	}
 	
-.projects-select-cancel {					// Users : Cancel when editing R/W access
-	height: 28px;
-	color: gainsboro;
-	background: #646464;
-	padding: 3px 10px 5px 10px;
-	text-align: center;
-	margin: 0px;
-	font-weight: $lean;
-	cursor: pointer;
-	font-family: $font;
+
+
+.smallerText {
 	font-size: 100%;
-	display: inline-block;
-	vertical-align: top;
-	margin-top: 7px;
 	}	
 
-.projects-select-confirm {					// Users : Confirm when editing R/W access
-	height: 28px;
-	color: gainsboro;
-	background: #646464;
-	padding: 3px 10px 5px 10px;
-	text-align: center;
-	margin: 0px;
-	font-weight: $lean;
-	cursor: pointer;
-	font-family: $font;
-	font-size: 100%;
-	display: inline-block;
-	vertical-align: top;
-	margin-top: 7px;
-	margin-left: 3px;
+	
+/*SVG*/
+path {
+	stroke-width: 1.5px;
+	}
+		
+path:hover {
+	fill-opacity: .7;
 	}
 	
-.inject-input {								// Users : Text fields to input fields
-	font-weight: $lean;
-	margin-left: 30px;
-	font-family: $font;
-	color: white;
-	background: none;
-	border: none;
-	font-size: 100%;
-	margin: 0px 10px 0px 0px;
-	padding-bottom: 0;
-	width: 100%;
-	padding: 0;
+a {
+	font-weight: $median;
+	}
 
-	background: red;
-	}	
-	
-.users-projects-namediv {					// Users : Project name in R/W editing mode
-	position: absolute;
-	width: 90%;
-	left: 60px;
-	top: 0;
-	padding: 7px;
-	color: white;
-	font-size: 120%;
-	font-weight: $lean;
-	padding-left: 13px;
+.active a {
+	color: cadetblue !important;
+	font-weight: 900 !important;
+	text-shadow: -1px 1px 1px rgba(255,255,255,0.3);
 	}	
 
-.check-write-label {						// Users : R/W, Write checkbox
-	right: 9px;
-	left: auto;
-	}
 
-.check-read-label {							// Users : R/W, Read checkbox
-	left: 8px;
-	}			
-
-// *********************************************
-
-// CUSTOM CHECKBOX
-
-// *********************************************
-
-/* SQUARED THREE */
-.squaredThree {
-	position: relative;
-	margin-left: 0px;
-	width: 22px;
-	height: 22px;	
-	}
-
-.squaredThree label {
-	cursor: pointer;
-	position: absolute;
-	width: 15px;
-	height: 15px;
-	z-index: 222;
-	border-radius: 4px;
-	-webkit-box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,.4);
-	-moz-box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,.4);
-	box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,.4);
-
-	background: -webkit-linear-gradient(top, rgba(34,34,34,0.7) 0%, rgba(69,72,77,0.7) 100%);
-	background: -moz-linear-gradient(top, rgba(34,34,34,0.7) 0%, rgba(69,72,77,0.7) 100%);
-	background: -o-linear-gradient(top, rgba(34,34,34,0.7) 0%, rgba(69,72,77,0.7) 100%);
-	background: -ms-linear-gradient(top, rgba(34,34,34,0.7) 0%, rgba(69,72,77,0.7) 100%);
-	background: linear-gradient(top, rgba(34,34,34,0.7) 0%, rgba(69,72,77,0.7) 100%);
-
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#222', endColorstr='#45484d',GradientType=0 );
-	}
-
-.squaredThree label:after {
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-	filter: alpha(opacity=0);
-	opacity: 0;
-	content: '';
-	position: absolute;
-	width: 9px;
-	height: 5px;
-	background: transparent;
-	top: 4px;
-	left: 4px;
-	border: 3px solid #fcfff4;
-	border-top: none;
-	border-right: none;
-	}
-
-.squaredThree label:hover::after {
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
-	filter: alpha(opacity=30);
-	opacity: 0.3;
-	top: 4px;
-	left: 2px;
-	height: 6px;
-	width: 11px;
-
-	}
-
-.squaredThree input[type=checkbox]:checked + label:after {
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
-	filter: alpha(opacity=100);
-	opacity: 1;
-	top: 4px;
-	left: 2px;
-	height: 6px;
-	width: 11px;
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+	background-color: white !important;
+	background: white !important;
 	}
 
 
 
-// *********************************************
-
-// iPhone style
-
-// *********************************************
-
-
+/* FOR IPHONE */
+/* FOR IPHONE */
+/* FOR IPHONE */
 
 ul#checked {
 	width: 100px;
@@ -2304,40 +279,233 @@ label.info {
 	left: 100px;
 	line-height: 32px;
 	width: 200px;
-	}
-	
-	
-	
-// *********************************************
+	}	
 
-// unknown styling
-
-// *********************************************
-	
-
-
-.abs-left-20 {
-	position: absolute;
-	left: 0;
-	width: 20%;
+/* This holds tooltop etc. */
+.g-body {
+	z-index: 35000;	
+	top: 5px;
+	left: -17px;
+	position: relative;
 	}
 
-.abs-right-80 {
+
+/*
+██╗   ██╗███╗   ██╗██╗██╗   ██╗███████╗██████╗ ███████╗ █████╗ ██╗     ███████╗
+██║   ██║████╗  ██║██║██║   ██║██╔════╝██╔══██╗██╔════╝██╔══██╗██║     ██╔════╝
+██║   ██║██╔██╗ ██║██║██║   ██║█████╗  ██████╔╝███████╗███████║██║     ███████╗
+██║   ██║██║╚██╗██║██║╚██╗ ██╔╝██╔══╝  ██╔══██╗╚════██║██╔══██║██║     ╚════██║
+╚██████╔╝██║ ╚████║██║ ╚████╔╝ ███████╗██║  ██║███████║██║  ██║███████╗███████║
+ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝
+*/
+
+
+.unselectable { 
+	-webkit-touch-callout:none;
+	-webkit-user-select:none;
+	-khtml-user-select:none;
+	-moz-user-select:none;
+	-ms-user-select:none;
+	user-select:none
+	}
+
+.box {
+	margin: 4px !important;
+	}	
+
+.die {
+	display: none !important;
+	}
+
+.show {
+	display: block;
+	}
+
+.relative {
+	position: relative;
+	}	
+
+.inline {
+	display: inline-block;
+	vertical-align: top;
+	}
+	
+.inliner {
 	position: absolute;
-	right: 0;
-	width: 80%;
+	right: 1px;
+	top: 8px;
+	}
+
+.underline {
+	text-decoration: underline;
+	}				
+
+/* Search fields */
+.search {
+	margin: 0px;
+	border: none;
+	font-family: $font;
+	font-weight: $lean;
+	color: black;
+	background: white;
+	font-size: 120%;
+	width: 171px;
+	text-align: left;
+	position: relative;
+	box-shadow: 0 0 3px 0 rgba(0,0,0,0.4) inset;
+	padding: 5px;
+	}		
+	
+/* Often used in tables */
+.eightyWidth {
+	background: rgba(0, 0, 0, 0.3);
+	color: white !important;
+	border: 0;
+	box-shadow: none;
+	border-radius: 0;
+	padding: 6px !important;
+	height: 30px !important;
+	margin-bottom: 10px !important;
+	margin-top: 0 !important;
+	}
+
+/* Button */
+.dropdown-button {
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: 4px 8px;
+	position: absolute;
+	right: 15px;
+	top: 50px;
+	background-color: white;
+	width: 20px;
+	height: 20px;
+	border-radius: 20px;
+	z-index: 99999;
+	}
+
+/* Button */
+.smap-button-white,
+.smap-button-gray {
+	height: 30px;
+	text-align: center;
+	margin: 0;
+	margin-bottom: 10px;
+	padding: 0px 10px 0px 10px;
+	border: 0px;
+	border-radius: 0;
+	line-height: 2.1;
+	font-family: $font;
+	font-size: 110%;
+	font-weight: $median;
+	cursor: pointer;
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+	background: rgba(255,255,255,0.75);
+	box-shadow: -1px 1px 2px 0 rgba(0, 0, 0, 0.3);
+	color: #666;
+	}
+
+/* Button */
+.smap-button-gray {
+	background-color: rgba(0, 0, 0, 0.65);
+	color: white;
+	font-weight: 500;
+	}	
+
+/* Button */
+.smap-button-white:active,
+.smap-button-gray:active {
+	box-shadow: -1px 1px 2px 0 rgba(0, 0, 0, 0.0);
+	}
+	
+/* Button */
+.smap-button-white:hover {
+	background: white;
+	color: #333;
+	}
+
+/* Button */
+.smap-button-gray:hover {
+	background: black;
+	}	
+
+/* Button */	
+.smap-button-white.small {
+	height: 26px;
+	font-size: 13px;
+	line-height: 2;
+	}	
+
+/* Button */
+.smap-button-white.small.red {
+	color: white !important;
+	background: #B80077 !important;
+	box-shadow: 0 0 0 1px white inset;
+	}
+
+/* Input field (gray bg – see bounds in Options) */
+.editor-inner-wrapper input,
+.input-box {
+	padding: 7px;
+	color: white;	
+	font-weight: $lean;
+	background: rgba(0, 0, 0, 0.7);
+	}
+
+.input-box {
+	float: left;
+	width: 170px;
+	border: 0;
+	}
+
+.form-control {
+	border-radius: 0px;
+	border: 0px;
 	}	
 	
-	
-	
-	
-	
-// *********************************************
+.displayNone {
+	display: none !important;
+	}
 
-// Login Page
+.valid {
+	background: rgb(108, 255, 135);
+	}
 
-// *********************************************
-	
+.invalid {
+	background: rgb(255, 108, 108);
+	}
+
+.collapsed {
+	visibility: hidden;
+	}
+
+.expand {
+	display: block !important;
+	}
+
+
+/* A bit annoying, but center most headlines */
+#editor-client-item-new h5, 
+.editor-inner-wrapper h5, 
+#select-basic-themes, 
+#advanced-color-header, 
+.editor-wrapper h4 {
+	font-weight: 400;
+	text-align: center;
+	}
+
+
+
+/*	
+██╗      ██████╗  ██████╗ ██╗███╗   ██╗    ██████╗  █████╗  ██████╗ ███████╗
+██║     ██╔═══██╗██╔════╝ ██║████╗  ██║    ██╔══██╗██╔══██╗██╔════╝ ██╔════╝
+██║     ██║   ██║██║  ███╗██║██╔██╗ ██║    ██████╔╝███████║██║  ███╗█████╗  
+██║     ██║   ██║██║   ██║██║██║╚██╗██║    ██╔═══╝ ██╔══██║██║   ██║██╔══╝  
+███████╗╚██████╔╝╚██████╔╝██║██║ ╚████║    ██║     ██║  ██║╚██████╔╝███████╗
+╚══════╝ ╚═════╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝    ╚═╝     ╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+*/
 
 .container {
 	width: 100%;
@@ -2357,92 +525,287 @@ label.info {
 	}
 
 .col-sm-6.col-sm-offset-3 {
-	width: 500px;
+	width: 400px;
 	margin: auto;
 	float: none;
 	margin-top: 150px;	
 	}
 
-.form-control {
-	border-radius: 0px;
-	border: 0px;
+#login-logo {
+	width: 390px;
+	height: 324px;
+	background-image: url(images/systemapic-logo-bw-2.png);
+	background-size: cover;
+	margin: auto;
+	position: relative;
+	top: -53px;
+	left: -11px;
+	}
+
+#login-button {
+	top: -3px;
+	position: relative;
+	}	
+
+#forgot-password {
+	background: none;
+	border: none;
+	float: right;
+	color: white;
+	font-size: 15px;
+	vertical-align: bottom;
+	position: relative;
+	text-align: right;
+	right: -7px;	
+	}
+
+.secure-logn-symbol {
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: -469px 1px;
+	width: 26px;
+	height: 25px;
+	position: relative;
+	display: inline-block;
+	top: 5px;
+	}	
+
+
+/*
+ █████╗ ██████╗ ██████╗   ██╗███╗   ███╗ █████╗ ██████╗ 
+██╔══██╗██╔══██╗██╔══██╗ ██╔╝████╗ ████║██╔══██╗██╔══██╗
+███████║██████╔╝██████╔╝██╔╝ ██╔████╔██║███████║██████╔╝
+██╔══██║██╔═══╝ ██╔═══╝██╔╝  ██║╚██╔╝██║██╔══██║██╔═══╝ 
+██║  ██║██║     ██║   ██╔╝   ██║ ╚═╝ ██║██║  ██║██║     
+╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝    ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     
+*/
+
+
+/* Absolute outer wrapper */
+#app {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 200;
 	}
 	
-
-
-
-
-
-
-input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
-	background-color: white !important;
-	background: white !important;
-	}
-
-
-
-// *********************************************
-
-// Layer Menu
-
-// *********************************************
-
-
-
-
-
-
-.help-tooltip {
-	height: 100px;
-	width: 200px;
-	background-color: black;
+/* Map container */
+#map {
 	position: absolute;
-	z-index: 200;
-	border-radius: 5px;
-	box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
-	border: 2px solid rgba(255,255,255,1);
-	display: none;
+	width: 100%;
+	height: 100%;
+	height: 100%;
+	left: 0px;
 	}
 
-.help-tooltip-arrow {
-	height: 100px;
-	position: absolute;
-	left: -20px;
-	width: 20px;
-	overflow: hidden;
-	}
-
-.help-tooltip-arrow:before {
+/* Gray background when no map is selected */
+#map:before {
 	content: '';
-	width: 20px;
-	height: 20px;
+	background-image: url(images/systemapic_BG.jpg);
 	position: absolute;
-	top: 40px;
-	left: 10px;
-	background-color: black;
-	-webkit-transform: rotate(45deg);
-	-moz-transform: rotate(45deg);
-	transform: rotate(45deg);
-	box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
-	border: 2px solid rgba(255,255,255,1);
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
 	}
 
-.help-tooltip-html {
-	padding: 5px 10px 5px 10px;
-	color: white;
-	font-weight: 600;
-	font-size: 12px;
+/* "Click to start" with arrow to Systempaic logo when no project is selected */
+.click-to-start:after {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	left: 36px;
+	top: 93px;
+	text-align: center;
+	display: block;
+	font-size: 42px;
+	color: #666;
+	font-weight: 200;
+	content: '';
+	padding-right: 0px;
+	position: relative;
+	background-image: url(images/click2start.png);
+	background-repeat: no-repeat;
 	}
 
-.inspector-list-outer-scroller {
-	width: 280px;
+
+/*
+██╗  ██╗███████╗ █████╗ ██████╗ ███████╗██████╗ 
+██║  ██║██╔════╝██╔══██╗██╔══██╗██╔════╝██╔══██╗
+███████║█████╗  ███████║██║  ██║█████╗  ██████╔╝
+██╔══██║██╔══╝  ██╔══██║██║  ██║██╔══╝  ██╔══██╗
+██║  ██║███████╗██║  ██║██████╔╝███████╗██║  ██║
+╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝
+*/
+	
+#header {
+	position: absolute;
+	height: 77px;
+	z-index: 10;
+	top: 6px;
+	left: 104px;
+	width: 100%;
+	padding-right: 110px;
+	display: inline-block;
+	}
+
+#header .header-logo {
+	position: relative;
+	z-index: 1000;
+	color: white;	
+	float: left;
+	max-height: inherit;
+	padding: 5px;
+	margin-right: 10px;
+	position: absolute;	
+	background-repeat: no-repeat;
+	background-position: center;
+	left: 3px;
+	background-color: transparent;
+	background-size: 100% 100%;
+	top: 3px;
+	height: 71px;
+	margin-right: 10px;
+	width: 90px;
+	}
+
+.header-logo.editable:hover {
+	cursor: copy;
+	opacity: 0.7;
+	}	
+
+.header-logo img {
+	max-height: 100%;
+	padding-bottom: 10px;
+	width: auto;
+	}
+
+.header-title-wrap {
+	background: rgba(255, 255, 255, 0.93);
+	height: 100%;
+	width: 100%;
+	top: 0;
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
+	border: 0px;
+	font-size: 30px;
+	font-weight: 200;
+	float: left;
+	padding-right: 22px;	
+	}
+
+.header-title {
+	border: 0px;
+	background: transparent;
+	font-size: 30px;
+	font-weight: $lean;
+	padding-left: 102px;
+	}
+
+.header-title input {
+	padding: 0;
+	width: 100%;
+	}
+
+.header-subtitle {
+	border: 0px;
+	background: transparent;
+	display: block;
+	font-style: italic;
+	color: #666;
+	font-size: 16px;
+	font-weight: 400;
+	float: left;
+	height: 55px;
+	word-wrap: break-word;
+	position: relative;
+	left: inherit;
+	top: 0;
+	line-height: 15px;
 	overflow: hidden;
+	max-height: 31px;
+	padding-right: 14px;
+	padding-left: 102px;
 	}
 
-#inspector-list {
-	width: 320px;
+.header-subtitle input {
+	width: 300px;
+	color: black;
+	width: 100%;
+	margin: 0 !important;
+	padding: 0 !important;
+	left: inherit;
+	position: relative;
+	top: -9px !important;
+	/*position: absolute;*/
+	}	
+
+#header input {
+	outline: none;
+	}
+ 
+#header input:focus  {
+	border: 1px solid rgb(81, 203, 238);
 	}
 
 
 
 
+
+/*
+██╗  ██╗ ██████╗ ███╗   ███╗███████╗     ██████╗ ██████╗ ███╗   ██╗████████╗ █████╗ ██╗███╗   ██╗███████╗██████╗ 
+██║  ██║██╔═══██╗████╗ ████║██╔════╝    ██╔════╝██╔═══██╗████╗  ██║╚══██╔══╝██╔══██╗██║████╗  ██║██╔════╝██╔══██╗
+███████║██║   ██║██╔████╔██║█████╗      ██║     ██║   ██║██╔██╗ ██║   ██║   ███████║██║██╔██╗ ██║█████╗  ██████╔╝
+██╔══██║██║   ██║██║╚██╔╝██║██╔══╝      ██║     ██║   ██║██║╚██╗██║   ██║   ██╔══██║██║██║╚██╗██║██╔══╝  ██╔══██╗
+██║  ██║╚██████╔╝██║ ╚═╝ ██║███████╗    ╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║██║██║ ╚████║███████╗██║  ██║
+╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝     ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝
+*/
+
+.home-container {
+	width: 90px;
+	margin: 4px;
+	height: 77px;
+	position: relative;
+	background-color: rgba(255, 255, 255, 0.9);
+	box-shadow: 0 0px 5px 0 #333;
+	z-index: 999;
+	margin: 6px;
+	left: 0px;
+	overflow: hidden;	
+	}
+
+.home-logo {
+	background: none;
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	cursor: pointer;
+	height: 50px;
+	width: 100%;
+	background-position: -180px -229px;
+	opacity: 0.5;
+	}
+
+.home-container:hover > .home-logo {
+	opacity: 0.7;
+	}
+
+.home-status {
+	position: relative;
+	bottom: 0px;
+	width: 100%;
+	height: 0px;
+	color: white;
+	text-align: center;
+	font-weight: 500;
+	font-size: 110%;
+	cursor: pointer;
+	color: black;
+	opacity: 0;
+	overflow: hidden;	
+	}
+
+.status-in {
+	opacity: 0.9;
+	height: 27px;
+	}

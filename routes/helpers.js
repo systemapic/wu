@@ -22,18 +22,13 @@ var zlib 	= require('zlib');
 var uploadProgress = require('node-upload-progress');
 var crypto      = require('crypto');
 var nodemailer  = require('nodemailer');
-
+var nodepath    = require('path');
 
 // superusers
 var superusers = [
-	'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', // KO
-	'user-e6e5d7d9-3b4c-403b-ad80-a854b0215831'  // J
-]
-
-var DEFAULTMAPBOX = {
-	username : 'systemapic',
-	accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJQMWFRWUZnIn0.yrBvMg13AZC9lyOAAf9rGg'
-}
+			'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', // KO
+			'user-e6e5d7d9-3b4c-403b-ad80-a854b0215831'  // J
+		]
 
 // convenience method for checking hardcoded super user
 function superadmin(user) {
@@ -69,7 +64,7 @@ module.exports = api = {
 		api.addProjectToSuperadmins(project.uuid);
 		
 		// add default mapbox account		  		  // callback
-		api._getMapboxAccount(req, res, project, DEFAULTMAPBOX.username, DEFAULTMAPBOX.accessToken, api._returnProject); // todo:::::
+		api._getMapboxAccount(req, res, project, 'systemapic', api._returnProject); // todo:::::
 		
 
 	},
@@ -150,14 +145,12 @@ module.exports = api = {
 
 		var username 	= req.body.username;
 		var projectUuid = req.body.projectId;
-		var accessToken = req.body.accessToken;
 		var userUuid 	= req.user.uuid;
 
 		console.log('______________________')
 		console.log('API: getMapboxAccount ');
 		console.log('     username: ', username);
 		console.log('     project', projectUuid);
-		console.log('     token: ', accessToken);
 		console.log('______________________')
 
 
@@ -168,17 +161,8 @@ module.exports = api = {
 		.populate('layers')
 		.exec(function (err, project) {
 
-			if (_.find(project.connectedAccounts.mapbox, function (m) { return m == username; })) {
-				console.log(username + ' already connected!');
-				// already existing
-				// return res.end(JSON.stringify({
-				// 	error : 'Account already connected.'
-				// }));
-			}
-
-
 			// get mapbox account
-			api._getMapboxAccount(req, res, project, username, accessToken, api._returnProject);
+			api._getMapboxAccount(req, res, project, username, api._returnProject);
 
 		});
 
@@ -186,26 +170,31 @@ module.exports = api = {
 	},
 
 
-	_getMapboxAccount : function (req, res, project, username, accessToken, callback) {
+
+
+
+
+
+	_getMapboxAccount : function (req, res, project, username, callback) {
 
 		// add ops to async queue
 		var ops = [];
 
 		ops.push(function (callback) {
 			// add default mapbox account: systemapic
-			api.requestMapboxAccount(project, username, accessToken, callback);
+			api.requestMapboxAccount(project, username, callback);
 		});
 
-		ops.push(function (project, mapboxLayers, accessToken, callback) {
+		ops.push(function (project,  mapboxLayers, callback) {
 
 			// create layers from mapbox data
-			api.createLayersFromMapbox(project, mapboxLayers, accessToken, callback);
+			api.createLayersFromMapbox(project, mapboxLayers, callback);
 		});
 
 		ops.push(function (project, layers, callback) {
 
 			// add layers to project
-			api.addLayersToProject(project, layers, username, accessToken, callback); 
+			api.addLayersToProject(project, layers, username, callback); 
 		});
 
 		ops.push(function(project, callback) {
@@ -230,19 +219,17 @@ module.exports = api = {
 	},
 
 	// send request to mapbox
-	requestMapboxAccount : function (project, username, accessToken, callback) {
+	requestMapboxAccount : function (project, username, callback) {
 		
 		console.log('______________________')
 		console.log('API: requestMapboxAccount ');
 		console.log('     username: ', username);
 		console.log('     project', project.uuid);
-		console.log('     accessToken : ', accessToken);
 		console.log('______________________')
 
 		// mapbox url
-		var url = 'https://api.tiles.mapbox.com/v3/' + username + '/maps.json?secure=1&access_token=' + accessToken; 
-		console.log('url: ', url);
-
+		var url = 'http://api.tiles.mapbox.com/v3/' + username + '/maps.json';
+		
 		// send request to mapbox
 		request(url, function (error, response, body) {
 
@@ -256,7 +243,7 @@ module.exports = api = {
 			if (_.isEmpty(mapboxLayers)) return callback({error : 'No layers in account.'}, project);
 
 			// return layers to async ops
-			callback(null, project, mapboxLayers, accessToken);
+			callback(null, project, mapboxLayers);
 
 		});
 
@@ -265,7 +252,7 @@ module.exports = api = {
 
 
 	// mapbox helper fn
-	createLayersFromMapbox : function (project, mapboxLayers, accessToken, callback) {
+	createLayersFromMapbox : function (project, mapboxLayers, callback) {
 		
 		var layers = [];
 
@@ -284,7 +271,6 @@ module.exports = api = {
 			layer.tms		= false;
 			layer.data.mapbox 	= ml.id; 		// eg. rawger.geography-class
 			layer.attribution 	= ml.attribution; 	// html
-			layer.accessToken 	= accessToken;
 
 			// array of Layers objects
 			layers.push(layer);
@@ -308,7 +294,7 @@ module.exports = api = {
 
 
 	// mapbox helper fn
-	addLayersToProject : function (project, layers, username, accessToken, callback) {
+	addLayersToProject : function (project, layers, username, callback) {
 
 		// add new layers
 		layers.forEach(function (add) {
@@ -316,11 +302,7 @@ module.exports = api = {
 		});
 
 		// add account
-		var account = {
-			username : username,
-			accessToken : accessToken
-		}
-		project.connectedAccounts.mapbox.push(account);
+		project.connectedAccounts.mapbox.addToSet(username);
 
 		// return to async ops
 		callback(null, project);
@@ -448,8 +430,7 @@ module.exports = api = {
 		// find project
 		var model = Project.findOne({ uuid : projectUuid });
 		model.exec(function (err, project) {
-			console.log('project is open exec!!')
-
+			
 			// return error
 			if (err) return res.end(JSON.stringify({ error : 'Error retrieving project.' }));
 			
@@ -510,11 +491,9 @@ module.exports = api = {
 	_enqueueProjectUpdate : function (queries, field, req) {
 		queries[field] = function(callback) {	
 			return Project.findOne({ uuid : req.body.uuid }, function (err, project){
-				console.log('project open!');
 				project[field] = req.body[field];
 				project.markModified(field);
 				project.save(function(err) {
-					console.log('project saved!');
 					if (err) console.error(err); // log error
 				});
 				return callback(err);
@@ -2027,86 +2006,44 @@ module.exports = api = {
 	// delete a file
 	deleteFiles : function (req, res) {
 
-		var _fids  = req.body._fids,
-		    puuid  = req.body.puuid,
-		    userid = req.user.uuid,
-		    uuids = req.body.uuids,
-		    ops = [],
-		    _lids = [];
-
-		console.log('API: deleteFiles');
-		console.log('_fids: ', _fids);
-		console.log('puuid: ', puuid);
-		console.log('userid: ', userid);
-		console.log('uuids: ', uuids);
-
-
+		var _fids  = req.body._fids;
+		var puuid  = req.body.puuid;
+		var userid = req.user.uuid;
 
 		// validate
 		if (!_fids || !puuid || !userid) return res.end('missing!');
 
-		var ops = [];
-
-			// find layer _ids for removing in project
-			ops.push(function (callback) {
-
-				Layers.find({file : {$in : uuids}}, function (err, layers) {
-
-					layers.forEach(function (layer) {
-						_lids.push(layer._id);
-					});
-
-					
-					// todo: delete?
-
-					return callback(err);
-			
-				});
-
-			});
+		var qu = [];
 
 			// delete file from project
-			ops.push(function (callback) {
+			qu.push(function (callback) {
 				
-				Project
-				.findOne({uuid : puuid})
-				// .populate('layers')
-				.exec(function (err, project) {
-					if (err) console.log('find err: ', err);
+				return Project.findOne({uuid : puuid}, function (err, project) {
 
-					console.log('found project: ', project.name);
-
-					// pull files
 					_fids.forEach(function (f) {
 						project.files.pull(f);
-					});
-
-					// pull layers
-					_lids.forEach(function (l) {
-						project.layers.pull(l)
 					})
 					
 					project.markModified('files');
-					project.markModified('layers');
-
 					project.save(function (err) {
-						if (err) console.error('save err: ', err);
+						if (err) console.error(err);
 						console.log('file removed from project');
-						return callback(err);
 					});
+
+					return callback(err);
+
 				});
+
+				
 			});
-
-			
-
 
 	
 		// run queries
-		async.series(ops, function(err, doc) {
+		async.parallel(qu, function(err, doc) {
 
 			if (err) {
-				console.log('asyn err: ', err);
-				return res.end('{ error : 0 }');
+				console.log(err);
+				res.end('{ error : 0 }');
 			}		
 
 			console.log('delete done...?', doc);
@@ -2175,23 +2112,14 @@ module.exports = api = {
 		Layers.findOne({'uuid' : layer}, function (err, layer) {
 			if (err) throw err;
 
+			console.log('found layer?', layer);
 			
 			// update description
 			if (req.body.hasOwnProperty('description')) {
 
 				var description = req.body.description;
+				console.log('updating description: ', description);
 				layer.description = description;
-				layer.save(function(err) {
-					if (err) throw err;
-				});
-
-			};
-
-			// update description
-			if (req.body.hasOwnProperty('title')) {
-
-				var title = req.body.title;
-				layer.title = title;
 				layer.save(function(err) {
 					if (err) throw err;
 				});
@@ -2211,24 +2139,17 @@ module.exports = api = {
 		//var file = req.body.file;	//  "ERI0.shp.geojson"
 		var uuid = req.body.uuid;	// file-1091209120-0129029
 		var user = req.user.uuid;	// user-1290192-adasas-1212
-		var projectUuid = req.body.projectUuid;
-
 
 		console.log('uuid: ', uuid);
 		console.log('user: ', user);
-		console.log('project: ', projectUuid);
 
 		// return if invalid
 		if (!uuid || !user) return false;
 
 		// get geojson file path from db
-		File
-		.where('uuid', uuid)							// must have this
-		.or([{'access.users' : user}, {'access.projects' : projectUuid}])	// either of these
-		.limit(1)	// safeguard
-		.exec(function(err, record) {
+		return File.findOne({'access.users' : req.user.uuid, 'uuid' : uuid }, function(err, record) {
 			console.log('found: ', record);
-			return api.sendGeoJsonFile(req, res, record[0]);
+			return api.sendGeoJsonFile(req, res, record);
 		});
 	},
 

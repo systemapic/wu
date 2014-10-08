@@ -71,7 +71,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	},
 
-
 	insertProjects : function (projects) {
 		var client = this.client;
 
@@ -121,7 +120,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		
 		// remove client button
 		if (app.Account.canDeleteClient(this.client.uuid)) {
-			this._removeClientButton = Wu.DomUtil.create('div', 'client-kill', this._container, 'X');
+			this._removeClientButton = Wu.DomUtil.create('div', 'client-kill', this._container, 'Delete client');
 			Wu.DomEvent.on(this._removeClientButton, 'mousedown', this.removeClient, this);
 
 		}
@@ -160,7 +159,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 	createNewProject : function () {
 
 		// create project object
-		
 		var store = {
 			name 		: 'Project title',
 			description 	: 'Project description',
@@ -215,17 +213,11 @@ Wu.SidePane.Client = Wu.Class.extend({
 	_projectCreated : function (project, json) {
 
 		var result = JSON.parse(json);
+		var error  = result.error;
+		var store  = result.project;
 
-		var error = result.error;
-		var store = result.project;
-
-		console.log('error: ', error);
-		console.log('Project created ====>>> ', store);
-
-		if (error) {
-			console.log('there was an error creating new project!', error);
-			return;
-		}
+		// return error
+		if (error) return console.log('there was an error creating new project!', error);			
 
 		// update project store
 		project.setStore(store);
@@ -404,10 +396,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	},
 
-
-	
-
-
 	pendingOpen : function () {
 		if (app._timerOpenClient) clearTimeout(app._timerOpenClient);
 		if (this._isOpen) return;
@@ -428,19 +416,18 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.calculateHeight();
 		this._container.style.height = this.maxHeight + 'px';          
 		this._isOpen = true;
-		// this._pendingClose = this;
-	},
 
+		// close others
+		var clients = app.SidePane.Clients;
+		if (clients._lastOpened && clients._lastOpened != this) clients._lastOpened.close();
+		clients._lastOpened = this;
+	},
 
 	close : function () {   				
 		this.calculateHeight();
 		this._container.style.height = this.minHeight + 'px';    
 		this._isOpen = false;
-		// app._pendingCloseClient = false;
-		// if (app._timerOpenClient) clearTimeout(app._timerOpenClient);
 	},
-
-	
 
 	removeProject : function (project) {
 		_.remove(this.projects, function (p) { return p.store.uuid == project.store.uuid; });
