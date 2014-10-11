@@ -49,6 +49,7 @@ Wu.Project = Wu.Class.extend({
 
 	setEditMode : function () {
 		// set editMode
+		console.log('this: ', this);
 		this.editMode = false;
 		if (app.Account.canUpdateProject(this.store.uuid)) this.editMode = true;
 	},
@@ -440,6 +441,10 @@ Wu.Project = Wu.Class.extend({
 
 	removeFiles : function (files) {
 
+		console.log('*********************')
+		console.log('removeFiles: files: ', files);
+		console.log('*********************')
+
 		var list = app.SidePane.DataLibrary.list,
 		    layerMenu = app.MapPane.layerMenu,
 		    _fids = [],
@@ -449,24 +454,33 @@ Wu.Project = Wu.Class.extend({
 		// iterate over files and delete
 		files.forEach(function(file, i, arr) {
 
+			console.log('removeFiles: ', file);
+			console.log('this.store.files: ', this.store.files);
+			console.log('this.layers: ', this.layers);
+			console.log('this.store.layermenu: ', this.store.layermenu);
+
 			// remove from list
 			list.remove('uuid', file.uuid);
 		
 			// remove from local project
 			_.remove(this.store.files, function (item) { return item.uuid == file.uuid; });
 
-			// get layer
+			// get layer if any
 			var layer = _.find(this.layers, function (l) { return l.store.file == file.uuid; });
 
-			// remove from layermenu store
-			var removed = _.remove(this.store.layermenu, function (item) { return item.layer == layer.store.uuid; });
-			
-			// remove from layermenu
-			if (layerMenu) layerMenu.onDelete(layer);
+			// remove layers
+			if (layer) {
+				// remove from layermenu store
+				var removed = _.remove(this.store.layermenu, function (item) { return item.layer == layer.store.uuid; });
 				
-			// remove locals
-			var a = _.remove(this.store.layers, function (item) { return item.uuid == layer.store.uuid; });	// dobbelt opp, lagt til to ganger! todo
-			delete this.layers[layer.store.uuid];
+				// remove from layermenu
+				if (layerMenu) layerMenu.onDelete(layer);
+					
+				// remove from local store
+				var a = _.remove(this.store.layers, function (item) { return item.uuid == layer.store.uuid; });	// dobbelt opp, lagt til to ganger! todo
+				delete this.layers[layer.store.uuid];	
+			}
+			
 			
 			// prepare remove from server
 			_fids.push(file._id);

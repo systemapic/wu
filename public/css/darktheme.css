@@ -21,6 +21,10 @@ h3, h4 {
 	/*background: black;*/
 	}	
 
+.home-container:hover > .home-logo {
+	opacity: 1;
+}	
+
 #layer-menu-inner-content,
 .leaflet-control-inspect,
 #legends-inner,
@@ -28,7 +32,7 @@ h3, h4 {
 .q-editor-menu,
 .home-container,
 .middle-item:after,
-#header,
+/*#header,*/
 #inspect-control-inner-content,
 #description-control-inner-content-box {
 	color: white;
@@ -130,27 +134,25 @@ h3, h4 {
 	}
 
 .smap-button-white {
-	background: rgba(255, 255, 255, 0.95);
+	/*background: rgba(255, 255, 255, 0.95);*/
+	background-color: rgba(0, 0, 0, 0.5) !important;
+	color: #DADADA;
 	}
 
 #new-client-button {
-	background-color: rgba(255, 255, 255, 0.95) !important;
-	color: #666;
+	background-color: rgba(0, 0, 0, 0.5) !important;
+	color: #DADADA;
 	line-height: 0.45;
 	}
 
-#new-client-button:hover {
-	color: #333;
+#new-client-button:hover,
+.new-project-button:hover {
+	color: #FFF;
 	}
 
 .active a, .editor-wrapper a {
 	color: cyan !important;
 	text-shadow: none;
-}
-
-
-.q-editor-menu-item a {
-	color: #DADADA;
 }
 
 
@@ -247,9 +249,21 @@ color: white;
 .home-container {
 	background-color: rgba(33, 33, 33, 0.75) !important;
 }
-#layer-menu-inner-content, .leaflet-control-inspect, #legends-inner, .q-editor-content-item, .q-editor-menu, .home-container, .middle-item:after, #header, #inspect-control-inner-content, #description-control-inner-content-box {
+
+#layer-menu-inner-content, 
+.leaflet-control-inspect, 
+#legends-inner, 
+.q-editor-content-item, 
+.q-editor-menu, 
+.home-container, 
+.middle-item:after, 
+/*#header, */
+.header-title-wrap,
+#inspect-control-inner-content, 
+#description-control-inner-content-box {
 	background-color: rgba(33, 33, 33, 0.75) !important;	
-}
+	}
+
 .header-title {
 	font-weight: 400;
 }
@@ -267,9 +281,18 @@ color: white;
 #map {
 	-webkit-transition: -webkit-filter 150ms linear, left 250ms ease, width 250ms ease;
 }
+
 .q-editor-menu-item a {
+	color: #DADADA;
+}
+
+.q-editor-menu-item a:hover {
 	color: white;
 }
 #menuslider-arrow:before {
 	background-color: rgba(33, 33, 33, 0.75);
+}
+
+.client-kill {
+	background: rgba(255,255,255,0.5);
 }

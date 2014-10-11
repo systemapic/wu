@@ -131,6 +131,10 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	},
 
+	getGeojsonUuid : function () {
+		return this.store.data.geojson;
+	},
+
 	loadData : function () {
 		var that = this;
 
@@ -142,7 +146,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		// get geojson from server
 		var data = { 
-			uuid : this.store.data.geojson,
+			uuid : this.getGeojsonUuid(),
 			projectUuid : app.activeProject.getUuid() 
 		}
 		var json = JSON.stringify(data);
@@ -177,13 +181,14 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	// callback after loading geojson from server
 	dataLoaded : function (that, json) {
-	
+
 		// parse json into geojson object
 		try { that.data = JSON.parse(json); }
 		catch (e) { return console.log('error!', json)}
 		
-		console.log('got data: ', that.data);
+		console.log('Got geojson: ', that.data);
 
+		if (!that.data) return console.error('no data');
 		// return if error
 		if (that.data.error) return console.log(that.data.error);
 

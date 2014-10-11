@@ -204,9 +204,12 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// populate download window
 		var tr = '';
+		console.log('cheks: ', checks);
 		checks.forEach(function (file, i, arr) {
+			console.log('file: ', file);
 			var tmp = Wu.extend({}, file);
-			tmp.format = tmp.format.join(', ');     // fix format format
+			console.log('tmp:', tmp);
+			// tmp.format = tmp.format.join(', ');     // fix format format
 			tr += ich.datalibraryDownloadRow(tmp);
 		}, this);
 
@@ -524,7 +527,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// clone file object
 		var tmp = Wu.extend({}, file);   
-		
+		console.log('tmp: ', tmp);
+
 		// add record (a bit hacky, but with a cpl of divs inside the Name column)
 		tmp.name = ich.datalibraryTablerowName({
 			name : tmp.name || 'Title',
@@ -534,9 +538,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		});
 
 		// clean arrays
-		tmp.files = tmp.files.join(', ');
+		tmp.type = tmp.type.camelize();
+		// tmp.files = tmp.files.join(', ');
+		tmp.files = this._createFilePopup(tmp.files);
 		tmp.keywords = tmp.keywords.join(', ');
-		tmp.createdDate = new Date(tmp.createdDate).toDateString();
+		tmp.createdDate = new Date(tmp.created).toDateString();
 
 		// add file to list.js
 		var ret = this.list.add(tmp);
@@ -551,6 +557,20 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		if (this.project.editMode) {
 			this._addFileEditHooks(tmp.uuid);
 		} 
+	},
+
+	_createFilePopup : function (files) {
+		var html = '<div class="dataLibrary-file-popup-wrap">';
+		html += '<div class="dataLibrary-file-popup-trigger"></div>';
+		html += '<div class="dataLibrary-file-popup-list">Files:<br>';
+		files.forEach(function (f) {
+			html += '<div class="dataLibrary-file-popup-item">'
+			html += '• ' + f;
+			html += '</div>';
+		}, this);
+		html += '</div>';
+		html += '</div>';
+		return html; // as html, not nodes
 	},
 
 	_addFileEditHooks : function (uuid) {

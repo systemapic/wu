@@ -13,11 +13,12 @@ var File = require('../models/file');
 var Layer = require('../models/layer');
 var Project = require('../models/project');
 
+// image cruncher
 var crunch = require('../routes/crunch');
 
 
-// end results:
-// 
+// global paths
+var FILEFOLDER = '/var/www/data/files/';
 
 
 module.exports = geo = { 
@@ -53,7 +54,7 @@ module.exports = geo = {
 
 		// set paths
 		var base = entry.folder + '/';
-		var fileUuid = 'geojson-' + uuid.v4();
+		var fileUuid = 'geojson-' + uuid.v4() + '.geojson';
 		var fromFile = base + geoFile[0]; 
 		var toFile   = base + fileUuid;
 
@@ -66,6 +67,7 @@ module.exports = geo = {
 			entry.data.type = 'layer';
 			entry.files.push(fileUuid);
 			entry.type = 'layer';
+			entry.title = entry.originalFilename;
 
 			// return
 			callback(null, entry);
@@ -75,25 +77,36 @@ module.exports = geo = {
 
 
 	processGeojsonFile : function (entry, callback) {
+		
+		console.log('*************************')
+		console.log('* geo.processGeojsonFile:', entry);
+		console.log('*************************')
 
 		// create unique filename for geojson, save in same folder
 		var geoFile = _.remove(entry.files, function (f) {
 			return (f.slice(-8) == '.geojson')
 		});
 
+		console.log('geoFile: ', geoFile);
+
 		// set paths
 		var base = entry.folder + '/';
-		var fromFile = base + geoFile[0]; 
-		var toFile   = base + 'geojson-' + uuid.v4();
+		var fromPath = base + geoFile[0]; 
+		var toFile = 'geojson-' + uuid.v4() + '.geojson';
+		var toPath = base + toFile;
 
 		// move file, add to entry, return
-		fs.rename(fromFile, toFile, function (err) {
+		fs.rename(fromPath, toPath, function (err) {
 			if (err) console.log('geojson rename err: ', err);
 
 			// update entry
 			entry.data.geojson = toFile;
 			entry.files.push(toFile);
 			entry.type = 'layer';
+			entry.name = geoFile[0];
+			entry.title = entry.originalFilename;
+
+			console.log('renamed: ', entry);
 
 			// return
 			callback(null, entry);
@@ -111,7 +124,7 @@ module.exports = geo = {
 
 		// set paths
 		var base = entry.folder + '/';
-		var fileUuid = 'geojson-' + uuid.v4();
+		var fileUuid = 'geojson-' + uuid.v4() + '.geojson';
 		var fromFile = base + kmlFile[0]; 
 		var toFile   = base + fileUuid;
 
@@ -127,6 +140,7 @@ module.exports = geo = {
 			entry.data.type = 'layer';
 			entry.files.push(fileUuid);
 			entry.type = 'layer';
+			entry.title = entry.originalFilename;
 
 			// return
 			callback(null, entry);
@@ -143,39 +157,6 @@ module.exports = geo = {
 	processGpxFile : function (entry, callback) {
 
 	},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -203,7 +184,7 @@ module.exports = geo = {
 		})
 
 		// if not all accounted for, return error
-		if (mandatory.length > 0) return callback({error : 'Missing shapefile', files : mandatory});
+		if (mandatory.length > 0) return callback({error : 'Missing shapefile(s)', files : mandatory});
 		
 		// return
 		callback(null);
@@ -213,7 +194,10 @@ module.exports = geo = {
 	_convertShapefile : function (entry, callback) {
 
 		var shapes = entry.files,
-		    folder = entry.folder;
+		    folder = entry.folder + '/';
+
+		// add relative path if any
+		if (entry.relativePath) folder += entry.relativePath;
 
 		// get .shp file
 		for (s in shapes) {
@@ -221,8 +205,10 @@ module.exports = geo = {
 		}
 		
 
-		var inFile = folder + '/' + shp,
-		    outFile = folder + '/' + shp + '.geojson';
+		var inFile = folder + shp,
+		    toFile = 'geojson-' + uuid.v4() + '.geojson';
+		    // outFile = folder + '/' + shp + '.geojson';
+		    outFile = entry.folder + '/' + toFile;
 
 		// execute cmd line conversion 
 		var cmd = 'mapshaper -p 0.1 --encoding utf8 -f geojson -o ' + outFile + ' ' + inFile;		// todo: mapshaper options
@@ -233,10 +219,15 @@ module.exports = geo = {
 			if (err) console.error('mapshaper err: ', err);
 
 			// add to entry
-			entry.layers.push(shp + '.geojson');
-			entry.files.push(shp + '.geojson');
+			entry.layers.push(toFile);
+			entry.files.push(toFile);
 			entry.type = 'layer';
-			entry.data.geojson = entry.uuid;
+			entry.data.geojson = toFile;
+			entry.title = entry.originalFilename;
+
+			console.log('*************************')
+			console.log('* geo._convertShapefile DONE:', entry);
+			console.log('*************************')
 
 			// return
 			callback(null);

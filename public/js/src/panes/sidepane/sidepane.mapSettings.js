@@ -380,23 +380,19 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 		// create and append div
 		var container = Wu.DomUtil.create('div', 'item-list select-elem ct0 baselayer', this._outer);
-		var _innerText = Wu.DomUtil.create('div', 'item-list-inner-text', container);
+		var text = Wu.DomUtil.create('div', 'item-list-inner-text', container);
 		
-		_innerText.innerHTML = layer.store.title;
+		// set title
+		text.innerHTML = layer.store.title;
 
-		if ( layer.store.title.length < 32 ) _innerText.style.maxHeight = '12px';
+		// set height if short title - hacky..
+		if (layer.store.title) { // err if no title
+			if (layer.store.title.length < 32) text.style.maxHeight = '12px';
+		}
 		
-
-
-		// container.innerHTML = layer.store.title;
-
-		// append edit button
-		// var button = Wu.DomUtil.create('div', 'edit-baselayer', container);
-
 		// append range selectors
 		var rangeOpacity = Wu.DomUtil.create('input', 'baselayer-range-slider-opacity', container);
 		var rangeZindex  = Wu.DomUtil.create('input', 'baselayer-range-slider-zindex', container);
-
 
 		// todo: z-index, opacity
 		var baseLayer = {
@@ -766,10 +762,14 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		// create and append div
 		var container = Wu.DomUtil.create('div', 'item-list select-elem ct0', this._outer);
 
-		var _innerText = Wu.DomUtil.create('div', 'item-list-inner-text', container);
-		_innerText.innerHTML = layer.store.title;
+		// create and set title
+		var text = Wu.DomUtil.create('div', 'item-list-inner-text', container);
+		text.innerHTML = layer.store.title;
 
-		if ( layer.store.title.length < 32 ) _innerText.style.maxHeight = '12px';
+		// set height if short title - hacky..
+		if (layer.store.title) { // err if no title
+			if (layer.store.title.length < 32) text.style.maxHeight = '12px';
+		}
 
 		
 
