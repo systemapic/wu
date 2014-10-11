@@ -1,0 +1,30 @@
+.progress-bar {
+	background: white;
+	height: 3px;
+}
+#document-container-textarea img {
+	width: auto;
+	height: 200px;
+	float: left;
+	margin: 10px;
+	margin-left: 0px;
+}
+
+.dataLibrary-file-popup-trigger {
+	width: 25px;
+	height: 25px;
+	background: white;
+}
+.dataLibrary-file-popup-list {
+	display: none;
+	position: absolute;
+	background: white;
+	padding: 10px;
+	border-radius: 3px;
+}
+.dataLibrary-file-popup-trigger:hover + .dataLibrary-file-popup-list {
+	display: block;
+}
+.tdcont {
+	opacity: 1;
+}

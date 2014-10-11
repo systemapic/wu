@@ -29,12 +29,12 @@ var fileSchema = mongoose.Schema({
 	data : {
 
 		shapefiles : [String],        // can be several files 	// todo: remove? no need - all geo is geo/topojson
-		geojson    : String,
+		geojson    : String,		// geojson-adlskmdsalkdsmad-saslkdmasldksa.geojson
 		topojson   : String,
 		document   : String,		// also not needed??
 		other      : [String],		// also not needed??
 
-		image      : {
+		image : {
 			file : String, 
 			dimensions  : {
 				width : Number,

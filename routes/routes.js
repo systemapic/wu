@@ -20,14 +20,13 @@ var uuid = require('node-uuid');
 var uploadProgress = require('node-upload-progress');
 var _ = require('lodash-node');
 
-// upload.js for handling uploading of shapefiles
+// lib's
+var api = require('../routes/helpers')
+var crunch = require('../routes/crunch');
 var upload = require('../routes/upload');
 
-// helper fn's
-var api = require('../routes/helpers')
-
-var crunch = require('../routes/crunch');
-
+// global paths
+var IMAGEFOLDER = '/var/www/data/images/';
 
 // function exports
 module.exports = function(app, passport) {
@@ -154,7 +153,7 @@ module.exports = function(app, passport) {
 		// todo: more auth!
 
 		var file = req.params[0];
-		var path = '/var/www/data/images/' + file;
+		var path = IMAGEFOLDER + file;
 		
 		res.sendfile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
 
@@ -291,7 +290,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// download files on demand
 	app.get('/api/file/download', isLoggedIn, function (req, res) {
-		console.log('/api/file/download'); // req.query
+		console.log('GET /api/file/download'); // req.query
 
 		// get file for download
 		api.getFileDownload(req, res);
@@ -305,7 +304,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// download files on demand
 	app.post('/api/file/download', isLoggedIn, function (req,res) {
-		console.log('/api/file/download');
+		console.log('POST /api/file/download');
 		
 		// zip all files
 		api.zipAndSend(req, res);		// todo: access restrictions

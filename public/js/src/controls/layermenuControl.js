@@ -627,7 +627,7 @@ L.Control.Layermenu = L.Control.extend({
 
 	// layer deleted from project, remove layermenuitem
 	onDelete : function (layer) {
-
+		if (!layer) return console.error('No layer!');
 		var uuid = layer.getUuid();
 		var layermenuItem = this._getLayermenuItem(uuid);
 

@@ -33,73 +33,6 @@ var IMAGEFOLDER = '/var/www/data/images/';
 module.exports = crunch = {
 
 
-	// processImage : function (data) {
-
-	// 	var res 	= data.res;
-	// 	var req 	= data.req;
-	// 	var ogfilename 	= data.file; 			// original filename
-	// 	var file 	= data.path; 			// /tmp/temfiles.gz  <- actual path of file, tho tmp only
-	// 	var user 	= data.req.user;
-	// 	var projectUuid = data.req.body.project;
-	// 	var fileUuid 	= 'image-' + uuid.v4();
-	// 	var folder 	= IMAGEFOLDER + fileUuid;
-
-	// 	var ops = [];
-	// 	ops.push(function (callback) {
-	// 		// get image meta
-	// 		crunch._processImage(file, callback);
-	// 	});
-	// 	ops.push(function (callback) {
-	// 		// move raw file
-	// 		crunch.moveRawFile(file, cb);
-	// 	});
-	// 	async.series(ops, function (err, results) {
-
-	// 		console.log('processImage async done! :results: ', results);
-
-	// 		// get vars
-	// 		var dimensions 	= results.dimensions;
-	// 		var exif 	= results.identity;
-	// 		var dataSize 	= results.dataSize;
-	// 		var rawFile 	= results.rawFile;
-
-	// 		// create File object
-	// 		var imageFile 		 	 = new File();
-	// 		imageFile.uuid 		  	 = 'file-' + uuid.v4();
-	// 		imageFile.createdBy 	  	 = user.uuid;
-	// 		imageFile.createdByName   	 = user.firstName + ' ' + user.lastName;
-	// 		imageFile.type 		  	 = 'image';
-	// 		imageFile.format 	  	 = ['jpg'];		
-	// 		imageFile.access.users 	  	 = [user.uuid];	
-	// 		imageFile.access.projects 	 = [projectUuid];
-	// 		imageFile.name 	  	  	 = ogfilename;		// original filename
-	// 		imageFile.data.image.file 	 = rawFile;
-	// 		imageFile.data.image.dimensions  = dimensions;
-	// 		imageFile.dataSize        	 = dataSize;
-	// 		imageFile.data.image.created     = crunch.getExif.created(exif);
-	// 		imageFile.data.image.gps         = crunch.getExif.gps(exif);
-	// 		imageFile.data.image.cameraType  = crunch.getExif.cameraType(exif); 
-	// 		imageFile.data.image.orientation = crunch.getExif.orientation(exif);
-
-	// 		// save
-	// 		imageFile.save(function (err, file) {
-	// 			if (err) console.log('imageFile save error: ', err);
-
-	// 			// add to project
-	// 			crunch.addFileToProject(file, projectUuid);
-
-	// 			// return file to client
-	// 			res.end(JSON.stringify({
-	// 				error : err,
-	// 				files  : [file]	// must return as array
-	// 			}));
-	// 		});
-
-	// 	});
-		
-
-
-	// },
 
 
 	// process images straight after upload
@@ -127,20 +60,24 @@ module.exports = crunch = {
 			crunch.getFileSize(file, cb);
 		};
 
-		// // move raw file into /images/ folder
-		// ops.rawFile = function (cb) {
+		// move raw file into /images/ folder
+		ops.rawFile = function (cb) {
 
-		// 	// move raw file
-		// 	crunch.moveRawFile(file, cb);
-		// };
+			// move raw file
+			crunch.moveRawFile(file, cb);
+		};
 
 		// run all ops async in series
 		async.series(ops, function (err, results) {
 			if (err) console.error('_processImage err: ', err);
 			
+			console.log('*** _processImage async DONE: reults: ', results);
+
 			var exif 	= results.identity,
 			    dimensions 	= results.dimensions,
-			    dataSize 	= results.dataSize;
+			    dataSize 	= results.dataSize,
+			    file 	= results.rawFile;
+
 
 			entry.data.image 	     = entry.data.image || {};
 			entry.data.image.dimensions  = dimensions;
@@ -149,9 +86,10 @@ module.exports = crunch = {
 			entry.data.image.gps         = crunch.getExif.gps(exif);
 			entry.data.image.cameraType  = crunch.getExif.cameraType(exif); 
 			entry.data.image.orientation = crunch.getExif.orientation(exif);
+			entry.data.image.file        = file;
 
 			console.log('**********************************')
-			console.log('* fn: upload.process * DONE! entry: ', entry);
+			console.log('* fn: crunch._processImage: * DONE! entry: ', entry);
 			console.log('* results: ', results);
 			console.log('**********************************')
 
@@ -384,6 +322,7 @@ module.exports = crunch = {
 		gm(path)
 		.resize(width)						// todo: if h/w is false, calc ratio					
 		// .then()
+		.autoOrient()
 		.crop(cropW, cropH, cropX, cropY)				// x, y is offset from top left corner
 		.noProfile()							// todo: strip of all exif?
 		.setFormat('JPEG')						// todo: watermark systemapic? or client?

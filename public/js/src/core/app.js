@@ -170,6 +170,8 @@ Wu.App = Wu.Class.extend({
 	// init default view on page-load
 	_initView : function () {
 
+		console.log('_initView');
+
 		// runs hotlink
 		if (this._initHotlink()) return;
 
