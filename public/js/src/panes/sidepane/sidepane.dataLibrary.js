@@ -495,8 +495,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	// process file
-	uploaded : function (record) {
+	uploaded : function (record, options) {
 		console.log('Upload done:', record);
+		console.log('options: ', options);
 
 		// handle errors
 		if (record.errors) {
@@ -508,19 +509,46 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// add files to library
 		record.done.files.forEach(function (file, i, arr) {
+			
 			// add to table
 			this.addFile(file);
- 
+
 			// add to project locally (already added on server)
 			this.project.setFile(file);
+
 		}, this);
 
 		// add layers
 		record.done.layers.forEach(function (layer) {
 			this.project.addLayer(layer);
+
+			if (options.autoAdd) {
+				console.log('autoAdd!');
+				console.log(layer)
+				app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
+			}
+
 		}, this);
 		
+		// refresh sidepane
 		this.project.refreshSidepane();
+
+		// if created layer, add to map 
+		if (options.autoAdd) {
+			record.done.layers.forEach(function (layer) {
+
+				console.log('autoAdd!');
+				console.log(layer)
+				var layerItem = app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
+				
+				if (layerItem) {
+					console.log('leyrItem: ', layerItem);
+					app.MapPane.layerMenu.enableLayer(layerItem);
+				}
+			}, this);
+
+		}
+
 	},
 
 	addFile : function (file) {

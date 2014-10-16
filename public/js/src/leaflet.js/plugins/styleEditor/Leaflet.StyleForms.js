@@ -33,7 +33,8 @@ L.StyleForms = L.Class.extend({
 
 
 		//Polygons, Circles get the fill options
-		if (this.options.currentElement.target instanceof L.Polygon){
+		var target = this.options.currentElement.target;
+		if (target instanceof L.Polygon || target instanceof L.Circle){
 
 			this.createFillColor();
 			this.createFillOpacity();

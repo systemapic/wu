@@ -146,7 +146,7 @@ L.Popup.include({
 		width = Math.min(width, this.options.maxWidth);
 		width = Math.max(width, this.options.minWidth);
 
-		style.width = (width + 41) + 'px';
+		style.width = (width + 46) + 'px';
 		style.whiteSpace = '';
 
 		style.height = '';
@@ -164,7 +164,7 @@ L.Popup.include({
 
 		this._containerWidth = this._container.offsetWidth;
 
-		parent_container.style.width = (width + 41) + 'px';
+		parent_container.style.width = (width + 46) + 'px';
 	}
 
 });

@@ -1588,11 +1588,33 @@
 /* Outer Wrapper */
 .leaflet-styleeditor {
 	position: absolute;
-	top: 72px;
+	/*top: 72px;*/
 	right: -14px;
 	z-index: 1000;
-	background-color: rgba(255, 255, 255, 0.93);
+	/*background-color: rgba(255, 255, 255, 0.93);*/
+
+	height: 100%;
+	background: transparent;
+	top: 0;
+	margin: 0;
+	margin-right: 20px;
+	padding-top: 91px;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	padding-bottom: 7px;
+	box-shadow: none;
+	padding-right: 5px;
+	padding-left: 5px;	
 	}
+
+.leaflet-styleeditor-inner {
+	background: white;
+	position: relative;
+	height: 100%;
+	overflow: hidden;
+	box-shadow: 0 1px 7px rgba(0,0,0,.65);	
+	padding-bottom: 68px;
+	}	
 
 /* When the editor is open */
 .editor-enabled {
@@ -1608,6 +1630,7 @@
 	width: 27px;
 	right: 0;
 	z-index: 99999;
+	width: 100%;
 	}
 
 
@@ -1642,13 +1665,36 @@
 	display: none;	
 	}
 
+.leaflet-styleeditor-done {
+	position: relative;
+	bottom: -39px;
+	width: 80px;
+	text-align: center;
+	left: 56px;
+	background: rgba(0, 0, 0, 0.2);
+	padding: 1px 5px 2px 5px;
+	font-weight: 900;
+	border-radius: 1px;
+	text-shadow: -1px 1px rgba(255, 255, 255, 0.3);
+	font-size: 11px;
+	color: #333;
+	cursor: pointer;
+	}
+
+.leaflet-styleeditor-done:hover {
+	background: rgba(0, 0, 0, 0.3);	
+	color: #000;
+	}
+
 /* Inner wrapper */
 .leaflet-styleeditor-interior {
 	width: 220px;
 	left: 5px;	
 	/*height: 390px;*/
-	top: 5px;
+	/*top: 5px;*/
+	top: 30px;
 	height: 100%;
+	padding-bottom: 50px;		
 	}
 
 /* Labels */
@@ -1696,7 +1742,7 @@
 	left: 21px;
 	top: 0;
 	height: 27px;
-	width: 52px;
+	width: 60px;
 	border-radius: 0 3px 3px 0;
 	padding-right: 12px;
 	font-size: 95%;
@@ -1714,8 +1760,8 @@
 	}
 
 .leaflet-styleeditor-pattern {
-	width: 70px;
-	height: 70px;
+	width: 68px;
+	height: 68px;
 	display: inline-block;
 	vertical-align: top;
 	background-repeat: no-repeat;

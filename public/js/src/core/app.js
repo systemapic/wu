@@ -235,6 +235,9 @@ Wu.App = Wu.Class.extend({
 		project.select();
 		app.SidePane.refreshProject(project);
 
+		// remove help pseudo
+		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
+
 		return true;
 		
 	},
