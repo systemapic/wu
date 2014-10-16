@@ -10,7 +10,7 @@ L.Control.StyleEditor = L.Control.extend({
 		markers : ['circle-stroked', 'circle', 'square-stroked', 'square', 'triangle-stroked', 'triangle', 'star-stroked', 'star', 'cross', 'marker-stroked', 'marker', 'religious-jewish', 'religious-christian', 'religious-muslim', 'cemetery', 'rocket', 'airport', 'heliport', 'rail', 'rail-metro', 'rail-light', 'bus', 'fuel', 'parking', 'parking-garage', 'airfield', 'roadblock', 'ferry', 'harbor', 'bicycle', 'park', 'park2', 'museum', 'lodging', 'monument', 'zoo', 'garden', 'campsite', 'theatre', 'art-gallery', 'pitch', 'soccer', 'america-football', 'tennis', 'basketball', 'baseball', 'golf', 'swimming', 'cricket', 'skiing', 'school', 'college', 'library', 'post', 'fire-station', 'town-hall', 'police', 'prison', 'embassy', 'beer', 'restaurant', 'cafe', 'shop', 'fast-food', 'bar', 'bank', 'grocery', 'cinema', 'pharmacy', 'hospital', 'danger', 'industrial', 'warehouse', 'commercial', 'building', 'place-of-worship', 'alcohol-shop', 'logging', 'oil-well', 'slaughterhouse', 'dam', 'water', 'wetland', 'disability', 'telephone', 'emergency-telephone', 'toilets', 'waste-basket', 'music', 'land-use', 'city', 'town', 'village', 'farm', 'bakery', 'dog-park', 'lighthouse', 'clothing-store', 'polling-place', 'playground', 'entrance', 'heart', 'london-underground', 'minefield', 'rail-underground', 'rail-above', 'camera', 'laundry', 'car', 'suitcase', 'hairdresser', 'chemist', 'mobilephone', 'scooter'],
 		editlayers : [],
 		dashArrays : [],
-		openOnLeafletDraw : true,
+		openOnLeafletDraw : false,
 		showTooltip : true,
 		tooltipOffset : {
 			x : 15,
@@ -24,12 +24,14 @@ L.Control.StyleEditor = L.Control.extend({
 		return this.createUi();
 	},
 
-	// added by ko.     
+	// added by wu   
 	onRemove : function (map) {		
 		L.DomEvent.off(this.options.controlDiv, 'click', this.clickHandler, this);
 		L.DomEvent.off(this.options.styleEditorDiv, 'mouseenter', this.disableLeafletActions, this);
 		L.DomEvent.off(this.options.styleEditorDiv, 'mouseleave', this.enableLeafletActions, this);        
+		
 		this.disable();
+
 		if (L.Control.Draw && this.options.openOnLeafletDraw) {
 				this.options.map.off('draw:created', function(layer) {
 					this.initChangeStyle({
@@ -46,11 +48,18 @@ L.Control.StyleEditor = L.Control.extend({
 		controlUI.title = 'Style Editor';
 
 		var styleEditorDiv = this.options.styleEditorDiv = L.DomUtil.create('div', 'leaflet-styleeditor', this.options.map._container);
-		this.options.styleEditorHeader = L.DomUtil.create('div', 'leaflet-styleeditor-header', styleEditorDiv);
-		this.options.styleEditorUi = L.DomUtil.create('div', 'leaflet-styleeditor-interior', styleEditorDiv);
+
+		var wrapper = L.DomUtil.create('div', 'leaflet-styleeditor-inner', styleEditorDiv);
+
+		var header = this.options.styleEditorHeader = L.DomUtil.create('div', 'leaflet-styleeditor-header', wrapper);
+		this.options.styleEditorUi = L.DomUtil.create('div', 'leaflet-styleeditor-interior', wrapper);
+
+		// add another close button
+		var doneButton = this.options.doneButton = L.DomUtil.create('div', 'leaflet-styleeditor-done', wrapper);
+		doneButton.innerHTML = 'Done editing';
 
 		var closeButton = this.options.closeButton = L.DomUtil.create('div', 'leaflet-styleeditor-close displayNone', controlDiv);
-		closeButton.innerHTML = 'Close';
+		closeButton.innerHTML = 'Cancel';
 
 		this.addDomEvents();
 		this.addLeafletDrawEvents();
@@ -65,6 +74,7 @@ L.Control.StyleEditor = L.Control.extend({
 		L.DomEvent.on(this.options.styleEditorDiv, 'mouseleave', this.enableLeafletActions, this);
 		L.DomEvent.on(this.options.controlUI, 'dblclick', L.DomEvent.stop, this);
 		L.DomEvent.on(this.options.closeButton, 'click', this.disable, this);
+		L.DomEvent.on(this.options.doneButton, 'click', this.disable, this);
 	},
 
 	addLeafletDrawEvents: function() {
@@ -155,9 +165,6 @@ L.Control.StyleEditor = L.Control.extend({
 		layer.off('click', this.initChangeStyle, this);
 	},
 
-	hideEditor: function() {
-		L.DomUtil.removeClass(this.options.styleEditorDiv, 'editor-enabled');
-	},
 
 	toggleEditorSize: function() {
 		if (L.DomUtil.hasClass(this.options.styleEditorDiv, 'leaflet-styleeditor-full')) {
@@ -181,7 +188,27 @@ L.Control.StyleEditor = L.Control.extend({
 		}
 
 		// hide other controls (wu)
-		app.
+		app.MapPane.hideControls();
+
+		// esc/enter click to close
+		Wu.DomEvent.on(window, 'keydown', this.closeKey, this);
+	},
+
+
+	hideEditor: function() {
+		L.DomUtil.removeClass(this.options.styleEditorDiv, 'editor-enabled');
+
+		// show other controls (wu)
+		app.MapPane.showControls();
+
+		// esc/enter click to close
+		Wu.DomEvent.off(window, 'keydown', this.closeKey, this);
+	},
+
+	closeKey : function (e) {
+		if (e.keyCode == 13 || e.keyCode == 27 ) {
+			this.disable();
+		}
 	},
 
 	initChangeStyle: function(e) {

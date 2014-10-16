@@ -366,6 +366,19 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
+	// NEW LAYERS ==========================
+	// =====================================
+	// get layers objects for project
+	app.post('/api/layers/new', isLoggedIn, function (req, res) {
+		console.log('/api/layers/new');
+
+		// send layers to client
+		api.createLayer(req, res);
+
+	});
+
+
+	// =====================================
 	// UPDATE LAYERS =======================
 	// =====================================
 	// get layers objects for project

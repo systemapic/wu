@@ -70,10 +70,13 @@ module.exports = geo = {
 			entry.title = entry.originalFilename;
 
 			// add unique id to features
-			geo.addUniqueGeojsonProperties(toFile);
+			geo.addUniqueGeojsonProperties(toFile, function (err) {
+				
+				// return
+				callback(null, entry);
+			});
 
-			// return
-			callback(null, entry);
+			
 
 		});
 	},
@@ -112,12 +115,28 @@ module.exports = geo = {
 			console.log('renamed: ', entry);
 
 			// add unique id to features
-			geo.addUniqueGeojsonProperties(toPath);
+			geo.addUniqueGeojsonProperties(toPath, function (err) {
+				
+				// return
+				callback(null, entry);
+			});
 
-			// return
-			callback(null, entry);
+			
 
 		});	
+	},
+
+
+	createNewGeoJSONLayer : function () {
+
+		// write geojson to file
+		// create new Layer()
+		// create new File()
+		// add to Project
+		// return Layer()
+
+
+
 	},
 
 
@@ -149,10 +168,13 @@ module.exports = geo = {
 			entry.title = entry.originalFilename;
 
 			// add unique id to features
-			geo.addUniqueGeojsonProperties(toFile);
+			geo.addUniqueGeojsonProperties(toFile, function (err) {
+				
+				// return
+				callback(null, entry);
+			});
 
-			// return
-			callback(null, entry);
+			
 
 		});		
 
@@ -239,15 +261,18 @@ module.exports = geo = {
 			console.log('************************************')
 
 			// add unique id to features
-			geo.addUniqueGeojsonProperties(outFile);
+			geo.addUniqueGeojsonProperties(outFile, function (err) {
+				
+				// return
+				callback(null);
+			});
 
-			// return
-			callback(null);
+			
 
 		});
 	},
 
-	addUniqueGeojsonProperties : function (path) {
+	addUniqueGeojsonProperties : function (path, callback) {
 		console.log('addUniqueGeojsonProperties', path);		// todo: remove _systemapic from exported shapes!
 
 		var data;
@@ -279,7 +304,7 @@ module.exports = geo = {
 			console.log('addUniqueGeojsonProperties DONE!');
 
 			// no callback, no point waiting for this
-
+			if (callback) callback(err);
 		});
 
 	},
@@ -287,6 +312,18 @@ module.exports = geo = {
 	_addUniqueProperty : function (data) {
 		var features = data.features;
 		console.log('_addUniqueProperty features: ', features);
+		console.log('data: ', data);
+		
+		// simple geojson (like drawn shapes)
+		if (features == undefined) {
+			if (data.hasOwnProperty('properties')) {
+				data.properties.__sid = uuid.v4();
+				console.log('__ data: ', data);
+			}
+			return data;
+		}
+		
+
 		features.forEach(function (feature) {
 			feature.properties.__sid = uuid.v4();
 		});

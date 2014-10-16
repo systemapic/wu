@@ -144,18 +144,18 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	addLayerHooks : function () {
 
-		console.log('this: ', this);
+		// console.log('this: ', this);
 
 		this.layer.eachLayer(function (layr) {
 
 			
 			var type = layr.feature.geometry.type;
-			console.log('type: ', type);
+			// console.log('type: ', type);
 
 			if (type == 'Polygon') {
 
 
-				console.log('Polygon layer: ', layr);
+				// console.log('Polygon layer: ', layr);
 				Wu.DomEvent.on(layr, 'styleeditor:changed', this.styleChanged, this);
 				// layr.eachLayer(function (multi) {
 
@@ -167,10 +167,10 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 			if (type == 'MultiPolygon') {
 
-				console.log('MultiPolygon layer: ', layr);
+				// console.log('MultiPolygon layer: ', layr);
 
 				layr.eachLayer(function (multi) {
-					console.log('multipart');
+					// console.log('multipart');
 					// console.log('multi: ', multi); // this layer has no 'feature' and no _layers, but needs a listener for change
 
 					Wu.DomEvent.on(multi, 'styleeditor:changed', function (data) {
@@ -529,19 +529,20 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		// create content
 		var string = '';
-		string += feature.geometry.type + '<br>';	// debug
-		string += '-------------------<br>';
-		console.log('PUPUP::: feature: ', feature, layer);
+		// string += feature.geometry.type + '<br>';	// debug
+		// string += '-------------------<br>';
+		// console.log('PUPUP::: feature: ', feature, layer);
 		for (key in feature.properties) {
 			var value = feature.properties[key];
 			// if not empty value
 			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
 				// add features to string
-				string += key + ':: ' + value + '<br>';
+				string += key + ': ' + value + '<br>';
 			}
 		}
 
-		
+		// if nothing, return
+		if (string.length == 0) return;
 
 		// set content
 		popup.setContent(string);

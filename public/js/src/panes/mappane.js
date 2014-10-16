@@ -646,10 +646,10 @@ Wu.MapPane = Wu.Class.extend({
 			draw: {
 				circle: {
 					shapeOptions: {
-						fill: false,
+						fill: true,
 						color: '#FFF',
 						fillOpacity: 0.3,
-						fillColor: '#FFF'
+						// fillColor: '#FFF'
 					}
 				},
 				rectangle: { 
@@ -690,14 +690,35 @@ Wu.MapPane = Wu.Class.extend({
 		Wu.DomEvent.on(drawControl, 'mousemove', L.DomEvent.stop, this);
 		Wu.DomEvent.on(drawControl, 'mouseover', map.closePopup, this);
 
+		var that = this;
+
 		// add circle support
 		map.on('draw:created', function(e) {
+
+			console.log('draw:created!');
 
 			// add circle support
 			e.layer.layerType = e.layerType;            
 
-			// add drawn layer to map
-			editableLayers.addLayer(e.layer);
+			
+
+			console.log('this.project.editMode: ', that.project.editMode);
+			console.log('projecT: ', that.project);
+
+			// if editMode
+			if (that.project.editMode) {
+
+				// create layer and add to project
+				var geojson = e.layer.toGeoJSON();
+				console.log('drawn geojson: ', geojson);
+				that.project.createLayerFromGeoJSON(geojson);
+				
+			} else {
+
+				// add drawn layer to map
+				editableLayers.addLayer(e.layer);
+
+			}
 		});
 
 		// created note
@@ -741,17 +762,6 @@ Wu.MapPane = Wu.Class.extend({
 		return false;
 	},
 	
-	// getEditableLayerParent : function (id) {
-	// 	// return id from _leaflet_id
-	// 	var layers = this.editableLayers._layers;
-	// 	for (l in layers) {
-	// 		for (m in layers[l]._layers) {
-	// 			if (m == id) return layers[l];
-	// 		}
-	// 	}
-	// 	return false;
-	// },
-
 });
 
 

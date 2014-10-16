@@ -1616,6 +1616,8 @@ L.Popup.include({
 		var container = this._contentNode,
 		    style = container.style;
 
+		var parent_container = container.parentNode;  
+
 		style.width = '';
 		style.whiteSpace = 'nowrap';
 
@@ -1623,7 +1625,7 @@ L.Popup.include({
 		width = Math.min(width, this.options.maxWidth);
 		width = Math.max(width, this.options.minWidth);
 
-		style.width = (width + 1) + 'px';
+		style.width = (width + 46) + 'px';
 		style.whiteSpace = '';
 
 		style.height = '';
@@ -1640,6 +1642,8 @@ L.Popup.include({
 		}
 
 		this._containerWidth = this._container.offsetWidth;
+
+		parent_container.style.width = (width + 46) + 'px';
 	}
 
 });
@@ -8304,7 +8308,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 						fill: false,
 						color: '#FFF',
 						fillOpacity: 0.3,
-						fillColor: '#FFF'
+						// fillColor: '#FFF'
 					}
 				},
 				rectangle: { 
@@ -8345,14 +8349,29 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		Wu.DomEvent.on(drawControl, 'mousemove', L.DomEvent.stop, this);
 		Wu.DomEvent.on(drawControl, 'mouseover', map.closePopup, this);
 
+		var that = this;
+
 		// add circle support
 		map.on('draw:created', function(e) {
+
+			console.log('draw:created!');
 
 			// add circle support
 			e.layer.layerType = e.layerType;            
 
 			// add drawn layer to map
 			editableLayers.addLayer(e.layer);
+
+			console.log('this.project.editMode: ', that.project.editMode);
+			console.log('projecT: ', that.project);
+
+			// if editMode
+			if (that.project.editMode) {
+				// create layer and add to project
+				var geojson = e.layer.toGeoJSON();
+				console.log('geojson: ', geojson);
+				that.project.createLayerFromGeoJSON(geojson);
+			}
 		});
 
 		// created note
@@ -8396,17 +8415,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		return false;
 	},
 	
-	// getEditableLayerParent : function (id) {
-	// 	// return id from _leaflet_id
-	// 	var layers = this.editableLayers._layers;
-	// 	for (l in layers) {
-	// 		for (m in layers[l]._layers) {
-	// 			if (m == id) return layers[l];
-	// 		}
-	// 	}
-	// 	return false;
-	// },
-
 });
 
 
@@ -10839,6 +10847,26 @@ L.control.baselayerToggle = function (options) {
 		this.layers[layer.uuid] = new Wu.createLayer(layer);
 	},
 
+	createLayerFromGeoJSON : function (geojson) {
+		console.log('createGeoJSONLayer', geojson);
+
+		var options = {
+			name 		: this.store.name,
+			description 	: this.store.description,
+			keywords 	: this.store.keywords, 
+			client 		: this._client.uuid 			// parent client uuid 
+		}
+		var json = JSON.stringify(options);
+		
+		console.log('POST: _saveNew');
+ 		Wu.Util.postcb('/api/layers/new', json, context._projectCreated, this);
+
+	},
+
+	createLayer : function () {
+
+	},
+
 	setActive : function () {
 		this.select();
 	},
@@ -12107,18 +12135,18 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	addLayerHooks : function () {
 
-		console.log('this: ', this);
+		// console.log('this: ', this);
 
 		this.layer.eachLayer(function (layr) {
 
 			
 			var type = layr.feature.geometry.type;
-			console.log('type: ', type);
+			// console.log('type: ', type);
 
 			if (type == 'Polygon') {
 
 
-				console.log('Polygon layer: ', layr);
+				// console.log('Polygon layer: ', layr);
 				Wu.DomEvent.on(layr, 'styleeditor:changed', this.styleChanged, this);
 				// layr.eachLayer(function (multi) {
 
@@ -12130,10 +12158,10 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 			if (type == 'MultiPolygon') {
 
-				console.log('MultiPolygon layer: ', layr);
+				// console.log('MultiPolygon layer: ', layr);
 
 				layr.eachLayer(function (multi) {
-					console.log('multipart');
+					// console.log('multipart');
 					// console.log('multi: ', multi); // this layer has no 'feature' and no _layers, but needs a listener for change
 
 					Wu.DomEvent.on(multi, 'styleeditor:changed', function (data) {
@@ -12492,15 +12520,15 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		// create content
 		var string = '';
-		string += feature.geometry.type + '<br>';	// debug
-		string += '-------------------<br>';
-		console.log('PUPUP::: feature: ', feature, layer);
+		// string += feature.geometry.type + '<br>';	// debug
+		// string += '-------------------<br>';
+		// console.log('PUPUP::: feature: ', feature, layer);
 		for (key in feature.properties) {
 			var value = feature.properties[key];
 			// if not empty value
 			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
 				// add features to string
-				string += key + ':: ' + value + '<br>';
+				string += key + ': ' + value + '<br>';
 			}
 		}
 
@@ -16617,6 +16645,9 @@ Wu.App = Wu.Class.extend({
 		// select project
 		project.select();
 		app.SidePane.refreshProject(project);
+
+		// remove help pseudo
+		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
 
 		return true;
 		

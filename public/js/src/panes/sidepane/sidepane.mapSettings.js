@@ -830,6 +830,28 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	},
 
+	getLayerByUuid : function (layerUuid) {
+		var layer = _.find(this._layers, function (l) {
+			console.log('l: ', l);
+			return l.layer.store.uuid == layerUuid;	
+		});
+
+		return layer;
+	},
+
+	enableLayerByUuid : function (layerUuid) {
+		var layer = this.getLayerByUuid(layerUuid);
+		if (layer) {
+			this.toggle(layer);
+			console.log('toggled!!');
+
+			return layer;	
+		}
+
+		return false;
+		
+	},
+
 	calculateHeight : function () {
 
 		var min = _.size(this.project.getBaselayers());
@@ -854,6 +876,8 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	toggle : function (layer) {
 		
+		console.log('toggle --> ', layer);
+
 		// ensure layerMenu is active
 		this.layerMenu = this.layerMenu || Wu.app.MapPane.layerMenu;
 		if (!this.layerMenu) this.layerMenu = this.enableLayermenu();

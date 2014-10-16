@@ -43,6 +43,51 @@ Wu.Project = Wu.Class.extend({
 		this.layers[layer.uuid] = new Wu.createLayer(layer);
 	},
 
+	createLayerFromGeoJSON : function (geojson) {
+		console.log('createGeoJSONLayer', geojson);
+
+		var options = {
+			project 	: this.getUuid(),
+			geojson 	: geojson,
+			layerType 	: 'geojson'
+		}
+
+		var json = JSON.stringify(options);
+		
+		console.log('POST createLayerFromGeoJSON');
+
+ 		Wu.Util.postcb('/api/layers/new', json, this._createdLayerFromGeoJSON, this);
+
+	},
+
+	_createdLayerFromGeoJSON : function (context, data) {
+
+		console.log('_createdLayerFromGeoJSON: data, context', data, context);
+		var parsed = JSON.parse(data);
+		console.log('parsed: ', parsed);
+
+		// data = {
+		// 	error : false,
+		// 	done : {
+		// 		files : [{
+
+		// 		}],
+		// 		layers : [{
+
+		// 		}]
+		// 	}
+		// }
+
+		app.SidePane.DataLibrary.uploaded(parsed, {
+			autoAdd : true
+		});
+
+	},
+
+	createLayer : function () {
+
+	},
+
 	setActive : function () {
 		this.select();
 	},

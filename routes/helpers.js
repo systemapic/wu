@@ -363,6 +363,67 @@ module.exports = api = {
 
 
 	
+	// #########################################
+	// ###  API: Create Layer                ###
+	// #########################################
+	createLayer : function (req, res) {
+
+		console.log('API: createLayer:');
+		console.log('req.body: ', req.body);
+
+		var layerType = req.body.layerType;
+
+		if (layerType == 'geojson') return api.createLayerFromGeoJSON(req, res);
+
+		// else
+		res.end(JSON.stringify({
+			layer : 'yo!'
+		}));
+
+
+
+	},
+
+	createLayerFromGeoJSON : function (req, res) {
+		console.log('createLayerFromGeoJSON');
+
+		var geojson = req.body.geojson;
+		var projectUuid = req.body.project;
+
+		var filename = uuid.v4() + '.geojson';
+		var outfile = '/tmp/' + filename;
+		var data = JSON.stringify(geojson);
+		var size = data.length;
+
+		console.log('size: ', size);
+
+		fs.writeFile(outfile, data, function (err) {
+			if (err) console.log('write err: ', err);
+
+
+			var file = [{ 
+				
+				fieldName : 'file[]',
+				originalFilename : filename,
+				path : outfile,
+				size : size || 0,
+				name : 'Created Shape',
+				type : 'application/octet-stream' 
+
+			}];
+
+			req.files = {
+				file : file
+			}
+
+			upload.newUpload(req, res);
+
+
+		});
+
+
+
+	},
 
 
 
@@ -2313,12 +2374,15 @@ module.exports = api = {
 		console.log('path: ', path);
 
 		fs.readJson(path, function (err, data) {
+			console.log('err: ', err);
+
+			console.log('readJson: ', data.length);
 
 			// set filesize
 			var string = JSON.stringify(data);
 
-			string = utf8.encode(string);
-			var length = string.length; //.toString();
+			// string = utf8.encode(string);
+			// var length = string.length; //.toString();
 			res.set({
 				'Content-Type': 'text/json',		// todo: encoding of arabic characters, tc.
 				//'Content-Length': length,		// works fine wihtout conent-length, wrong length w chars
