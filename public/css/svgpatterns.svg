@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="myGradient">
+      <stop offset="0" stop-color="red" />
+      <stop offset="1" stop-color="black" />
+    </linearGradient>
+  </defs>
+</svg>

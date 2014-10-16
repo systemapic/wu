@@ -125,7 +125,7 @@ hr {
 
 /* table cell */
 .tdcont {
-  opacity: 0.7;
+  opacity: 1;
   font-size: 14px;
   font-weight: 200;
   letter-spacing: 0.5px;
@@ -141,15 +141,11 @@ hr {
 .tdcont.access:hover {
   background: #92f0e5; }
 
+.defaultCursor {
+  cursor: default !important; }
+
 .smallerText {
   font-size: 100%; }
-
-/*SVG*/
-path {
-  stroke-width: 1.5px; }
-
-path:hover {
-  fill-opacity: 0.7; }
 
 a {
   font-weight: 400; }
@@ -162,6 +158,17 @@ a {
 input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
   background-color: white !important;
   background: white !important; }
+
+/*SVG*/
+path {
+  stroke-width: 1.5px; }
+
+path {
+  -webkit-transition: fill-opacity 250ms ease;
+  transition: fill-opacity 250ms ease; }
+
+path:hover {
+  fill-opacity: 0.7; }
 
 /* FOR IPHONE */
 /* FOR IPHONE */
@@ -700,10 +707,13 @@ label.info {
 ┴─┘└─┘┴ ┴└  ┴─┘└─┘ ┴   ─┴┘┴└─┴ ┴└┴┘
 */
 .leaflet-draw-section {
-  position: relative; }
+  position: relative;
+  width: 26px;
+  pointer-events: all; }
 
 .leaflet-draw-toolbar {
-  margin-top: 12px; }
+  margin-top: 12px;
+  pointer-events: all; }
 
 .leaflet-draw-toolbar-top {
   margin-top: 0; }
@@ -1103,6 +1113,7 @@ label.info {
 └─┘└─┘└─┘┴ ┴┘  ─┴┘┴└─┴ ┴└┴┘┘  └─┘ ┴ └─┘  └─┘└─┘┘└┘ ┴ ┴└─└─┘┴─┘└─┘
 */
 .leaflet-control-zoom, .leaflet-draw, .leaflet-control-styleeditor, .leaflet-control-baselayertoggle {
+  pointer-events: all;
   float: left; }
 
 /* Make square corners */
@@ -1114,10 +1125,17 @@ label.info {
   background-repeat: no-repeat;
   background-position: 2px -271px;
   background-color: white;
-  margin-left: -3px; }
+  margin-left: -3px;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) !important; }
+
+.leaflet-control-styleeditor-interior.enabled {
+  background-color: #CCFFFF; }
 
 .enabled:hover {
-  background-color: #FAFAFA; }
+  background-color: #CCFFFF; }
 
 /* Disable font color to use bg-image instead */
 .leaflet-control-zoom-out, .leaflet-control-zoom-in {
@@ -1236,14 +1254,16 @@ label.info {
   padding: 3px;
   position: relative;
   left: -3px;
-  overflow: hidden; }
+  overflow: hidden;
+  width: 135px;
+  pointer-events: none;
+  cursor: hand; }
 
 .draw-expander {
-  height: 270px;
-  overflow: visible; }
+  height: 270px; }
 
 .open-drawer {
-  background-color: gainsboro; }
+  background-color: #CCFFFF; }
 
 /*
 ┌┬┐┌─┐┌─┐┬ ┌┬┐┬┌─┐
@@ -1256,10 +1276,16 @@ label.info {
   color: white;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
   font-size: 120%;
-  font-weight: 400; }
+  font-weight: 400;
+  /*	
+	max-height: 150px;	
+	overflow-y: scroll;
+	overflow-x: hidden;	
+*/ }
 
 .leaflet-popup-tip {
-  background: rgba(0, 0, 0, 0.64); }
+  background: rgba(0, 0, 0, 0.64);
+  margin: -11px auto 0; }
 
 /*
 ██╗     ███████╗ ██████╗ ███████╗███╗   ██╗██████╗ ███████╗
@@ -1946,6 +1972,175 @@ label.info {
 .inspecting {
   background-color: white; }
 
+/* STYLE EDITOR */
+/* The tooltip that appears when you click the button to activate the style editor */
+.leaflet-styleeditor-mouseTooltip {
+  z-index: 999999;
+  width: 130px;
+  color: white;
+  font-weight: 500;
+  background-color: rgba(68, 68, 68, 0.7);
+  padding: 7px 8px 3px 8px; }
+
+/* Outer Wrapper */
+.leaflet-styleeditor {
+  position: absolute;
+  top: 72px;
+  right: -14px;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.93); }
+
+/* When the editor is open */
+.editor-enabled {
+  width: 200px; }
+
+/* Style editor header */
+.leaflet-styleeditor-header {
+  background: transparent;
+  height: 27px;
+  position: absolute;
+  width: 27px;
+  right: 0;
+  z-index: 99999; }
+
+/* Header buttons */
+.leaflet-styleeditor-button {
+  padding: 0;
+  width: 17px;
+  height: 17px;
+  background-image: url(images/evil_sprite.png);
+  background-repeat: no-repeat;
+  border-radius: 0;
+  top: 4px;
+  background-color: transparent;
+  position: absolute;
+  cursor: pointer; }
+
+.leaflet-styleeditor-button:hover {
+  background-color: transparent; }
+
+/* Close style editor button */
+.styleeditor-closeBtn {
+  background-position: -27px -43px;
+  right: 4px; }
+
+/* Disable "make full size" button */
+.styleeditor-inBtn {
+  background-position: 4px -9px;
+  left: 4px;
+  display: none; }
+
+/* Inner wrapper */
+.leaflet-styleeditor-interior {
+  width: 220px;
+  left: 5px;
+  /*height: 390px;*/
+  top: 5px;
+  height: 100%; }
+
+/* Labels */
+.leaflet-styleeditor-label {
+  text-transform: uppercase;
+  line-height: 2.2;
+  font-weight: 600;
+  font-size: 12px; }
+
+/* Color swatches – make square */
+.leaflet-styleeditor-color {
+  height: 30px; }
+
+/* Input fields for opacity */
+.leaflet-styleeditor-input:focus, .leaflet-styleeditor-select:focus {
+  border: 1px solid rgba(0, 0, 0, 0.1) !important; }
+
+/* Style Dasharray */
+.leaflet-styleeditor-stroke {
+  opacity: 0.6;
+  border: none; }
+
+.leaflet-styleeditor-stroke:hover {
+  opacity: 1;
+  border: none; }
+
+.leaflet-styleeditor-close {
+  background-color: rgba(0, 0, 0, 0.7);
+  border-left: 1px solid #AAA;
+  color: #FFF;
+  font: 11px/19px "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+  line-height: 28px;
+  height: 28px;
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  left: 21px;
+  top: 0;
+  height: 27px;
+  width: 52px;
+  border-radius: 0 3px 3px 0;
+  padding-right: 12px;
+  font-size: 95%;
+  cursor: pointer; }
+
+.leaflet-styleeditor-close:hover {
+  color: #63b6e5; }
+
+/* Pattern picker */
+.leaflet-styleeditor-patternpicker {
+  width: 150px; }
+
+.leaflet-styleeditor-pattern {
+  width: 70px;
+  height: 70px;
+  display: inline-block;
+  vertical-align: top;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  margin: 2px;
+  border: 2px solid white;
+  cursor: pointer;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5); }
+
+.leaflet-styleeditor-pattern:hover {
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.4); }
+
+.leaflet-styleeditor-pattern:active {
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.3); }
+
+/*
+// bluelines.png
+// cpattern.png
+// crazypattern.png
+// diagonalDots.png
+// diagonalStripes.png
+// dots.png
+// honeycomb.png
+// lines1.png
+*/
+.SVGpattern1 {
+  background-image: url(images/patternPics/SVGpattern1.png); }
+
+.SVGpattern2 {
+  background-image: url(images/patternPics/SVGpattern2.png); }
+
+.SVGpattern3 {
+  background-image: url(images/patternPics/SVGpattern3.png); }
+
+.SVGpattern4 {
+  background-image: url(images/patternPics/SVGpattern4.png); }
+
+.SVGpattern5 {
+  background-image: url(images/patternPics/SVGpattern5.png); }
+
+.SVGpattern6 {
+  background-image: url(images/patternPics/SVGpattern8.png); }
+
+.SVGpattern7 {
+  background-image: url(images/patternPics/SVGpattern7.png); }
+
+.SVGpattern8 {
+  background-image: url(images/patternPics/SVGpattern6.png); }
+
 /*
  ██████╗       ███████╗██████╗ ██╗████████╗ ██████╗ ██████╗ 
 ██╔═══██╗      ██╔════╝██╔══██╗██║╚══██╔══╝██╔═══██╗██╔══██╗
@@ -2158,7 +2353,7 @@ label.info {
   box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.5); }
 
 .client-logo.editable:hover {
-  border: 1px solid yellow;
+  opacity: 0.7;
   cursor: copy; }
 
 .client-kill {
@@ -2238,13 +2433,15 @@ label.info {
 
 .project-title input {
   position: absolute;
-  left: 10px;
-  top: 10px;
-  font-size: 110%;
+  left: 0;
+  top: -2px;
+  font-size: 100%;
   text-shadow: none;
   font-weight: 500;
   text-transform: uppercase;
-  line-height: 0.9; }
+  line-height: 0.9;
+  padding: 0;
+  background-color: transparent; }
 
 .project-description {
   top: 39px;
@@ -2280,7 +2477,7 @@ label.info {
   top: 44px; }
 
 .project-logo.editable:hover {
-  border: 1px solid yellow;
+  opacity: 0.7;
   cursor: copy; }
 
 .project-logo-wrap img {
@@ -2321,7 +2518,8 @@ label.info {
   display: none;
   border-radius: 3px;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.7);
-  padding: 10px; }
+  padding: 10px;
+  margin-bottom: 10px; }
 
 .project-users-inner-wrapper:hover {
   display: block; }
@@ -2703,9 +2901,10 @@ label.info {
   float: left; }
 
 .import-mapbox-layers-button {
-  height: 33px;
+  height: 37px;
   width: 50px;
-  margin-left: 7px; }
+  margin-left: 7px;
+  line-height: 2.4; }
 
 /* List of connected MapBox accounts */
 .mapbox-accounts {
@@ -2902,8 +3101,14 @@ label.info {
   margin-left: 10px; }
 
 /* GRANDE STUFF */
+.text-menu .options .url {
+  color: transparent;
+  background-image: url(images/evil_sprite.png);
+  background-repeat: no-repeat;
+  background-position: -64px -160px; }
+
 blockquote {
-  border-left: 5px solid #52E884; }
+  border-left: 5px solid #262625; }
 
 button.attachment {
   background-repeat: no-repeat;
@@ -2960,7 +3165,6 @@ button.image-attachment {
   font-size: 11px;
   font-weight: 600; }
 
-/* Data library : Unknown??? */
 .grande-project-files-wrap {
   height: auto;
   display: none; }
@@ -2968,10 +3172,13 @@ button.image-attachment {
 .grande-sources-container {
   position: absolute;
   width: 300px;
-  top: 30px;
+  top: 37px;
+  left: -24px;
   background: black;
   border-radius: 5px;
-  cursor: pointer; }
+  cursor: pointer;
+  background-color: #262625;
+  box-shadow: 0 0 2px #262625; }
 
 .grande-sources-topwrap {
   height: 0px;
@@ -2980,12 +3187,13 @@ button.image-attachment {
 .grande-sources-source {
   position: relative;
   height: 50px;
-  border-top: 1px solid #0C4818;
+  border-top: 1px dotted #666;
   width: 100%;
   overflow: hidden; }
 
 .grande-sources-container div:nth-child(2) {
-  border-radius: 5px 5px 0px 0px; }
+  border-radius: 5px 5px 0px 0px;
+  border-top: none; }
 
 .grande-sources-container div:last-child {
   border-radius: 0px 0px 5px 5px; }
@@ -2997,6 +3205,20 @@ button.image-attachment {
   width: 30px;
   height: 30px; }
 
+.grande-sources-source-icon.image {
+  background-image: url(images/evil_sprite.png);
+  background-repeat: no-repeat;
+  background-position: -187px -75px;
+  height: 26px !important;
+  width: 26px !important; }
+
+.grande-sources-source-icon.layer {
+  background-image: url(images/evil_sprite.png);
+  background-repeat: no-repeat;
+  background-position: -144px -75px;
+  height: 26px !important;
+  width: 26px !important; }
+
 .grande-sources-source-title {
   color: white;
   position: absolute;
@@ -3004,14 +3226,17 @@ button.image-attachment {
   left: 34px;
   font-size: 110%;
   padding: 2px;
-  width: 190px; }
+  width: 190px;
+  line-height: 1;
+  padding-top: 8px; }
 
 .grande-sources-source-thumb {
   position: absolute;
-  height: 100%;
-  right: 0px;
-  top: 0px;
-  width: 75px; }
+  height: 39px;
+  right: 5px;
+  top: 5px;
+  width: auto;
+  max-width: 70px; }
 
 #documents-container-textarea h1 {
   font-size: 200%; }
@@ -3052,6 +3277,37 @@ button.image-attachment {
 /* Inner wrapper for users and data library */
 #filelist, #userlist {
   margin: 20px; }
+
+/* The box with the file count */
+.dataLibrary-file-popup-trigger {
+  width: 25px;
+  height: 25px;
+  border-radius: 2px;
+  text-align: center;
+  font-weight: 900;
+  line-height: 1.7;
+  background-color: rgba(0, 0, 0, 0.2); }
+
+/* File list */
+.dataLibrary-file-popup-list {
+  display: none;
+  position: absolute;
+  background: white;
+  padding: 15px;
+  border-radius: 3px;
+  margin-top: 5px;
+  font-weight: 900;
+  font-size: 15px;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3); }
+
+/* The files in the file list */
+.dataLibrary-file-popup-item {
+  font-weight: 400;
+  font-size: 12px; }
+
+/* Show file list on hover */
+.dataLibrary-file-popup-trigger:hover + .dataLibrary-file-popup-list {
+  display: block; }
 
 /* Controls wrapper (with upload, search field, etc) */
 .datalibrary-controls, .users-controls {
@@ -3113,8 +3369,9 @@ button.image-attachment {
   font-size: 16px; }
 
 /* unselect download check box in download window */
-.download-remove {
-  text-align: center; }
+.download-remove .squaredThree {
+  text-align: center;
+  padding-left: 15px; }
 
 /* download OK button "Download" */
 #download-ok-button {
@@ -3128,7 +3385,7 @@ button.image-attachment {
   float: right;
   margin-top: 10px;
   margin-right: 9px;
-  height: 35px; }
+  height: 30px; }
 
 /* dowload cancel button "Cancel" */
 #download-cancel-button {
@@ -3140,7 +3397,7 @@ button.image-attachment {
   bottom: 0;
   float: right;
   margin-top: 10px;
-  height: 35px; }
+  height: 30px; }
 
 /* Download ready button */
 #download-ready-button {
@@ -3164,12 +3421,12 @@ button.image-attachment {
 .progress-bar {
   position: fixed;
   width: 0%;
-  height: 4px;
   top: 0px;
   left: 0px;
-  background: red;
   z-index: 20000;
-  margin-left: 0px; }
+  margin-left: 0px;
+  background: white;
+  height: 3px; }
 
 /* Fullscreen upload : DropZone style */
 .fullscreen-drop {
@@ -3276,6 +3533,26 @@ button.image-attachment {
 /* inner wrapper */
 .fullpage-users .editor-wrapper {
   width: auto; }
+
+/* CREATE NEW USER */
+.backpane-container {
+  background: rgba(255, 255, 255, 0.9);
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden; }
+
+.backpane-wrapper {
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-top: 20px;
+  padding-bottom: 20px; }
+
+.backpane-wrapper .backpane-title {
+  color: #666; }
+
+.backpane-wrapper .backpane-message {
+  margin-bottom: 55px; }
 
 /* USER MANAGEMENT, MANAGE USER PRIVILEGGES */
 .backpane-projectTitle {
@@ -4164,9 +4441,8 @@ input[type=checkbox] + label.check {
 	}
 
 ;.progress-bar {
-	background: white;
-	height: 3px;
 }
+
 #document-container-textarea img {
 	width: auto;
 	height: 200px;
@@ -4175,8 +4451,24 @@ input[type=checkbox] + label.check {
 	margin-left: 0px;
 }
 
-#dataLibrary-file-popup-trigger {
-	width: 50px;
-	height: 50px;
+
+
+.status-progress-bar {
+	position: absolute;
+	width: 0%;
+	top: 0px;
+	left: 0px;
+	z-index: 20000;
+	margin-left: 0px;
 	background: white;
+	float: left;
+	font-size: 12px;
+	line-height: 20px;
+	color: #fff;
+	text-align: center;
+	height: 5px;
+	-webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+	box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+	-webkit-transition: width .2s ease;
+	transition: width .2s ease;
 }

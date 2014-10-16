@@ -45,6 +45,19 @@ Wu.StatusPane = Wu.Class.extend({
 
 	toggle : function () {
 		this.isOpen ? this.close() : this.open();
+	
+		// div cleanups to do when hitting home
+		this.cleaningJobs();
+	},
+
+	cleaningJobs: function () {
+
+		// make sure layermenu edit is disabled
+		var layerMenu = Wu.app.MapPane.layerMenu;
+		if (layerMenu) layerMenu.disableEdit();
+
+		// close all open options
+		app.SidePane.Map.closeAll();
 	},
 
 	// open sidepane menu
@@ -150,6 +163,16 @@ Wu.StatusPane = Wu.Class.extend({
 	
 	},
 
+	// set 3000ms save status
+	setSaveStatus : function () {
+		this.setStatus('Saving...');
+
+		var that = this;
+		setTimeout(function () {
+			that.setStatus('Saved!');
+		}, 1000);
+	},
+
 	pushStatus : function (div) {
 
 		// get old status div, insertBefore
@@ -189,3 +212,59 @@ Wu.StatusPane = Wu.Class.extend({
 
 
 });
+
+Wu.ProgressBar = Wu.Class.extend({
+
+	initialize : function (options) {
+		
+		// set options
+		Wu.setOptions(this, options);
+
+		// init container
+		this.initContainer();
+
+	},
+
+	initContainer : function () {
+
+		// create progress bar
+		this._progressBar = Wu.DomUtil.create('div', 'status-progress-bar', this._container);
+
+		// add to sidepane if assigned container in options
+		if (this.options.addTo) this.addTo(this.options.addTo);
+
+	},
+
+	addTo : function () {
+		var pane = this.options.addTo;
+		pane.appendChild(this._progressBar);
+	},
+
+	setProgress : function (percent) {
+
+		if (percent < this._current + 9) return;
+
+		var bar = this._progressBar;
+		console.log('progress: ', percent);
+		bar.style.opacity = 1;
+		bar.style.width = percent + '%';
+
+		this._current = percent;
+	},
+
+	hideProgress : function () {
+		var bar = this._progressBar;
+		bar.style.opacity = 0;
+	}
+
+
+});
+
+
+
+
+
+
+
+
+

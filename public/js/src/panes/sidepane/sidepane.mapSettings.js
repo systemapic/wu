@@ -73,7 +73,7 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 
 	open : function () {
 		this.calculateHeight();
-		this._outer.style.height = this.maxHeight + 'px';       
+		this._outer.style.height = this.maxHeight + 20 + 'px';       
 		this._open(); // local fns   
 		this._isOpen = true;
 

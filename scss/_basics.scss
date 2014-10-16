@@ -145,7 +145,7 @@ hr {
 
 /* table cell */
 .tdcont {
-	opacity: 0.7;
+	opacity: 1;
 	font-size: 14px;
 	font-weight: $lean;
 	letter-spacing: 0.5px;
@@ -165,20 +165,13 @@ hr {
 	}
 	
 
+.defaultCursor {
+	cursor: default !important;
+	}
 
 .smallerText {
 	font-size: 100%;
 	}	
-
-	
-/*SVG*/
-path {
-	stroke-width: 1.5px;
-	}
-		
-path:hover {
-	fill-opacity: .7;
-	}
 	
 a {
 	font-weight: $median;
@@ -196,6 +189,20 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 	background: white !important;
 	}
 
+
+/*SVG*/
+path {
+	stroke-width: 1.5px;
+	}
+
+path {
+	-webkit-transition: fill-opacity 250ms ease;
+	transition: fill-opacity 250ms ease;
+	}
+		
+path:hover {
+	fill-opacity: .7;
+	}
 
 
 /* FOR IPHONE */

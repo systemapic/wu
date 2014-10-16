@@ -75,6 +75,7 @@ module.exports = upload = {
 			queue : [],
 			processed : [],
 			organized : [],
+			partials : {},
 			cleaned : {
 				files : [],
 				layers : []
@@ -233,18 +234,28 @@ module.exports = upload = {
 			console.log('* hash.queue.length: ',     hash.queue.length);
 			console.log('* hash.organized.length: ', hash.organized.length);
 			console.log('* hash.processed.length: ', hash.processed.length);
+			console.log('* hash.partials.length: ', hash.partials.length);
+			console.log('* hash.partials: ', hash.partials);
 			console.log('**********************************')
 			
+
+			// if partials
+			if (hash.partials.length > 0) {
+				return upload.movePartials(hash, callback);
+			}
+
 			// callback to newUpload, next is process
 			callback(err, hash);
 
-
 		});
-
-
 	}, 
 	
+	movePartials : function (hash, callback) {
 
+		console.log('need to move partials into one folder');
+		callback(null);
+
+	},
 	
 
 	// only one file at a time goes thru here
@@ -301,6 +312,25 @@ module.exports = upload = {
 				upload.unarchive(entry, hash, cb)
 			});
 		
+		}  else if (type == 'partialshape') {
+			console.log('******************************')
+			console.log('* partialshape > ENTRY: ', entry);
+			console.log('******************************')
+
+			// concat partialshapes into one folder
+
+			// get prefix
+			var prefix = originalFilename.split('.')[0];
+			console.log('hash.partials: ', hash.partials, prefix);
+			if (!hash.partials[prefix]) hash.partials[prefix] = [];
+			// hash.partials[prefix] = hash.partials[prefix] || [];
+			console.log('hash.partials: ', hash.partials, prefix);
+			console.log(';;hash.partials[prefix]', hash.partials[prefix]);
+
+			hash.partials[prefix].push(entry);
+
+			callback(null, entry);
+
 		} else {
 
 			// move
@@ -324,6 +354,8 @@ module.exports = upload = {
 
 		async.parallel(ops, function (err, results) {
 			var entry = results[0];
+
+			console.log('__________ results: ', results);
 			
 			// add file to hash
 			hash.organized.push(entry);
@@ -713,7 +745,7 @@ module.exports = upload = {
 		console.log('rel: ', rel);
 
 		if (rel[1] == '/' + originalFilename) {
-			console.log('NO RELATIVE PATH!');
+			console.log('NO RELATIVE PATH!');			// hacky
 			return false;
 		} else {
 			var rel3 = rel[1].split(originalFilename);
@@ -731,11 +763,13 @@ module.exports = upload = {
 		// set folder
 		entry.folder = FILEFOLDER + entry.uuid;
 
+
+
 		// unzip
 		var ops = [];
 
 		ops.push(function (cb) {
-			var cmd = 'unzip -o -d ' + entry.folder + ' ' + entry.temporaryPath; 	// to folder .shp
+			var cmd = 'unzip -o -d "' + entry.folder + '" "' + entry.temporaryPath + '"'; 	// to folder .shp
 			console.log('** Unzipping: cmd: ', cmd);
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
@@ -820,7 +854,7 @@ module.exports = upload = {
 		});
 		// tar cmd
 		ops.push(function (cb) {
-			var cmd = 'tar xzf ' + entry.temporaryPath + ' -C ' + entry.folder;
+			var cmd = 'tar xzf "' + entry.temporaryPath + '" -C "' + entry.folder + '"';
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
 				cb(err);
@@ -928,8 +962,8 @@ module.exports = upload = {
 		// shapefile parts
 		var mandatory 	= ['.shp', '.shx', '.dbf'];
 		var optional  	= ['.prj', '.sbn', '.sbx', '.fbn', '.fbx', '.ain', '.aih', '.ixs', '.mxs', '.atx', '.shp.xml', '.cpg'];
-		if (mandatory.indexOf(name.slice(-4)) > -1) return ['shape', 'partialShape'];
-		if (optional.indexOf(name.slice(-4)) > -1)  return ['shape', 'partialShape'];
+		if (mandatory.indexOf(name.slice(-4)) > -1) return ['shape', 'partialshape'];
+		if (optional.indexOf(name.slice(-4)) > -1)  return ['shape', 'partialshape'];
 
 		// unknown
 		return ['unknown', 'unknown'];
@@ -946,7 +980,7 @@ module.exports = upload = {
 		if (type == 'archive') return true;
 		if (type == 'image') return true;
 		if (type == 'document') return true;
-		if (type == 'shapePartial') return false;
+		if (type == 'partialshape') return false;
 
 		return false;
 	},

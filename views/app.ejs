@@ -40,10 +40,14 @@
 		<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.2/mapbox.standalone.js'></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet-omnivore.min.js"></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.geojson.draw.js"></script>
-		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw.min.js"></script>
+		<!-- <script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw.min.js"></script> -->
+		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw-src.js"></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw.note.js"></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.js"></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleForms.js"></script>
+
+		<!-- <script src="//85.10.202.87:8080/js/lib/d3.js/d3.min.js"></script>  -->
+		<script src="//85.10.202.87:8080/js/lib/d3.js/topojson.v1.min.js"></script> 
 		
 		<script src="//85.10.202.87:8080/js/lib/dropzone.js/dropzone.min.js"></script> 
 		<script src="//85.10.202.87:8080/js/lib/icanhaz/icanhaz.min.js"></script> 
@@ -1086,7 +1090,7 @@
 				<td width="20%" class="tdcont download-category ct23 ct28">{{category}}</td>
 				<td width="10%" class="tdcont download-version ct23 ct28">{{version}}</td>
 				<td width="10%" class="tdcont download-status ct23 ct28">{{status}}</td>
-				<!-- <td width="10%" class="tdcont download-format ct23 ct28">{{format}}</td> -->
+				<td width="10%" class="tdcont download-format ct23 ct28">{{format}}</td>
 				<td width="10%" class="tdcont download-size ct23 ct28">{{size}}</td>
 				<td width="10%" class="tdcont download-remove ct23 ct28">
 				
@@ -1694,6 +1698,86 @@
 <!-- ************************************************************************************************************************ -->
 <!-- ************************************************************************************************************************ -->
 <!-- ************************************************************************************************************************ -->
+
+
+
+
+
+<!-- SVG fill properties: url(#diagonal-dots) // url(#dots) url(#diagonal-circles) url(#diagonal-stripes) url(#grid) -->
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs>
+  
+   <!--  <pattern id="diagonal-dots" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <circle cx="5" cy="5" r="4" style="stroke:none; fill:blue;" />
+    </pattern> -->
+	  
+
+    <!-- PATTERN ONE -->
+	<pattern id="SVGpattern1" width="30" height="30" patternUnits="userSpaceOnUse">
+		<rect width="30" height="30" fill="#00a9f1"></rect>
+		<rect width="30" height="18" fill="#26baf4"></rect>
+	</pattern>
+
+	<!-- PATTERN TWO -->
+	<pattern id="SVGpattern2" width="70" height="70" patternUnits="userSpaceOnUse">
+		<rect width="70" height="70" fill="#bbd817"></rect>
+		<g transform="rotate(45)">
+		<rect width="99" height="25" fill="#a9ce00"></rect>
+		<rect y="-50" width="99" height="25" fill="#a9ce00"></rect>
+		</g>
+	</pattern>
+
+	<!-- PATTERN THREE -->
+	<pattern id="SVGpattern3" width="60" height="30" patternUnits="userSpaceOnUse">
+		<defs>
+		<rect id="r" width="30" height="15" fill="#bb085f" stroke-width="2.5" stroke="#7a054d"></rect>
+		<g id="p">
+		<use xlink:href="#r"></use>
+		<use y="15" xlink:href="#r"></use>
+		<use y="30" xlink:href="#r"></use>
+		<use y="45" xlink:href="#r"></use>
+		</g>
+		</defs>
+		<use xlink:href="#p" transform="translate(0 -25) skewY(40)"></use>
+		<use xlink:href="#p" transform="translate(30 0) skewY(-40)"></use>
+	</pattern>
+
+	<!-- PATTERN FOUR -->
+	<pattern id="SVGpattern4" x="0" y="0" width="56" height="100" patternUnits="userSpaceOnUse">
+		<rect width="56" height="100" fill="#f8d203"></rect>
+		<path d="M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100" fill="none" stroke="#fff629" stroke-width="2"></path>
+		<path d="M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34" fill="none" stroke="#ffe503" stroke-width="2"></path>
+	</pattern>
+
+	<!-- PATTERN FIVE -->
+	<pattern id="SVGpattern5" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <rect x="0" y="0" width="4" height="8" style="stroke:none; fill:purple;" />
+    </pattern>
+
+	<!-- PATTERN SEVEN -->
+	<pattern id="SVGpattern6"  width="40" height="40" viewBox="0 0 20 20" patternUnits="userSpaceOnUse">
+		<rect width="40" height="40" fill="#8a3"></rect>
+		<circle r="9.2" stroke-width="1" stroke="#613" fill="none"></circle>
+		<circle cy="18.4" r="9.2" stroke-width="1px" stroke="#613" fill="none"></circle>
+		<circle cx="18.4" cy="18.4" r="9.2" stroke-width="1" stroke="#613" fill="none"></circle>
+	</pattern>
+
+    <!-- PATTERN SIX -->
+	<pattern id="SVGpattern7" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="2" style="stroke:none; fill:red;" />
+    </pattern>
+
+    <!-- PATTERN EIGHT -->
+	<pattern id="SVGpattern8" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+		<circle cx="5" cy="5" r="4" style="stroke:none; fill:blue;" />
+	</pattern>
+
+
+  
+  </defs>
+</svg>
+
+
 
 	</body>	
 </html>

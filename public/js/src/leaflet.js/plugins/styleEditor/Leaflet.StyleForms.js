@@ -12,7 +12,8 @@ L.StyleForms = L.Class.extend({
 		currentMarkerStyle: {
 			size: 'm',
 			color: '48a'
-		}
+		},
+		changeEventThrottle : 500
 	},
 
 	initialize: function(options) {
@@ -30,11 +31,13 @@ L.StyleForms = L.Class.extend({
 		this.createOpacity();
 		this.createStroke();
 
+
 		//Polygons, Circles get the fill options
 		if (this.options.currentElement.target instanceof L.Polygon){
 
 			this.createFillColor();
 			this.createFillOpacity();
+			this.createPattern();
 		}
 
 	},
@@ -71,9 +74,10 @@ L.StyleForms = L.Class.extend({
 				iconUrl: this.options.markerApi + 'pin-' + markerStyle.size + '-' + markerStyle.icon + '+' + markerStyle.color + '.png',
 				iconSize: iconSize
 			});
-			var currentElement = this.options.currentElement.target;
-			currentElement.setIcon(newIcon);
-			this.fireChangeEvent(currentElement);
+			var element = this.options.currentElement.target;
+			element.setIcon(newIcon);
+			// this.fireChangeEvent(currentElement);
+			element.fire('styleeditor:changed', { icon : newIcon });
 		}
 	},
 
@@ -129,12 +133,25 @@ L.StyleForms = L.Class.extend({
 
 	createColor: function() {
 		var label = L.DomUtil.create('label', 'leaflet-styleeditor-label', this.options.styleEditorUi);
-		label.innerHTML = 'Color:';
+		label.innerHTML = 'Line Color:';
 
 		this.createColorPicker(this.options.styleEditorUi, function(e) {
 			var color = this.rgbToHex(e.target.style.backgroundColor);
 			this.setStyle('color', color);
 		}.bind(this));
+	},
+
+	createPattern : function () {
+
+		var label = L.DomUtil.create('label', 'leaflet-styleeditor-label', this.options.styleEditorUi);
+		label.innerHTML = 'Fill Pattern:';
+
+		this.createPatternPicker(this.options.styleEditorUi, function (e) {
+			// callback
+			var pattern = 'url(#' + e.target.getAttribute('pattern') + ')';
+			this.setStyle('fillColor', pattern);
+		}.bind(this));
+
 	},
 
 	createStroke: function() {
@@ -167,7 +184,7 @@ L.StyleForms = L.Class.extend({
 
 	createOpacity: function() {
 		var label = L.DomUtil.create('label', 'leaflet-styleeditor-label', this.options.styleEditorUi);
-		label.innerHTML = 'Opacity:';
+		label.innerHTML = 'Line Opacity:';
 
 		this.createNumberInput(this.options.styleEditorUi, function(e) {
 			var value = e.target.value;
@@ -198,6 +215,7 @@ L.StyleForms = L.Class.extend({
 
 	createColorPicker: function(parentDiv, callback) {
 		var colorPickerDiv = L.DomUtil.create('div', 'leaflet-styleeditor-colorpicker', parentDiv);
+		
 		this.options.colorRamp.forEach(function(color) {
 			var elem = L.DomUtil.create('div', 'leaflet-styleeditor-color', colorPickerDiv);
 			elem.style.backgroundColor = color;
@@ -209,6 +227,28 @@ L.StyleForms = L.Class.extend({
 		L.DomUtil.create('br', '', parentDiv);
 
 		return colorPickerDiv;
+	},
+
+	createPatternPicker : function (parentDiv, callback) {
+
+		console.log('createPatternPicker!');
+
+		// create container
+		var patternPicker = L.DomUtil.create('div', 'leaflet-styleeditor-patternpicker', parentDiv);
+		
+		// for each pattern
+		this.options.patternRamp.forEach(function (pattern) {
+
+			var elem = L.DomUtil.create('div', 'leaflet-styleeditor-pattern', patternPicker);
+			elem.setAttribute('pattern', pattern);
+			L.DomUtil.addClass(elem, pattern);
+
+			L.DomEvent.on(elem, 'click', callback, this);
+
+		}, this);
+
+		return patternPicker;
+
 	},
 
 	createNumberInput: function(parentDiv, callback, value, min, max, step) {
@@ -243,15 +283,87 @@ L.StyleForms = L.Class.extend({
 	},
 
 	setStyle: function(option, value) {
+		console.log('setStyle(option, value)', option, value);
+		
+		var element = this.options.currentElement.target;
+		console.log('element: ', element);
+		console.log('features: ', element.feature);
+
+		if (!element.hasOwnProperty('feature')) return this.setMultiPolygonStyle(option, value);
+		return this.setPolygonStyle(option, value);
+
+
+		
+	},
+
+	setPolygonStyle : function (option, value) {
+		console.log('setPolygonStyle!')
+
+		// create style object for change event
 		var newStyle = {};
 		newStyle[option] = value;
-		var currentElement = this.options.currentElement.target;
-		currentElement.setStyle(newStyle);
-		this.fireChangeEvent(currentElement);
+
+		console.log('newStyle: ', newStyle);
+
+		// set style
+		var element = this.options.currentElement.target;
+		element.setStyle(newStyle);
+
+
+		
+		console.log('element: ', element);
+
+		// throttle change event
+		if (this._changeTimer) clearTimeout(this._changeTimer);
+		var wait = this.options.changeEventThrottle;
+		this._changeTimer = setTimeout(function () {
+
+			// fire change event
+			console.log('styleeditor:changed fired!');
+			element.fire('styleeditor:changed', { style : newStyle });
+
+		}, wait);  // 500ms
+	},
+
+	setMultiPolygonStyle : function (option, value) {
+		console.log('setMultiPolygonStyle!')
+
+		// create style object for change event
+		var newStyle = {};
+		newStyle[option] = value;
+
+		console.log('newStyle: ', newStyle);
+
+		// set style
+		var element = this.options.currentElement.target;
+		element.setStyle(newStyle);
+
+
+
+		
+		console.log('element: ', element);
+
+		// throttle change event
+		if (this._changeTimer) clearTimeout(this._changeTimer);
+		var wait = this.options.changeEventThrottle;
+		this._changeTimer = setTimeout(function () {
+
+			// fire change event
+			console.log('styleeditor:changed fired!');
+			element.fire('styleeditor:changed', { style : newStyle });
+
+		}, wait);  // 500ms
+
+
 	},
 	
+	// obsolete
 	fireChangeEvent: function(element){
-		this.options.currentElement.target._map.fireEvent('styleeditor:changed', element);
+		// var map = this.options.currentElement.target._map;
+		// console.log('firing :changed event on ', element);
+		// map.fire('styleeditor:changed', element);
+		// element.fire('styleeditor:changed');
+
 	},
 
 	componentToHex: function(c) {

@@ -405,7 +405,10 @@ module.exports = crunch = {
 			File
 			.findOne({uuid : fileUuid})
 			.exec(function (err, file) {
-				if (!file) return callback(err);
+				if (!file) return callback(err, { 
+					image : false, 
+					rawfile : false
+				});
 				
 				// find image with right dimensions (exactly) // todo: % margins
 				var image = _.find(file.data.image.crunched, function (i) {
@@ -423,13 +426,21 @@ module.exports = crunch = {
 				});
 
 				// return found image (if any)
-				var rawfile = file.data.image.file;			
-				callback(err, image, rawfile);
+				var rawfile = file.data.image.file;
+				var vars = {
+					rawfile : file.data.image.file,
+					image : image
+				}			
+
+				callback(err, vars);
 			});
 		});
 
 		// create image if not found
-		ops.push(function (image, rawfile, callback) {
+		ops.push(function (vars, callback) {
+
+			var image = vars.image;
+			var rawfile = vars.rawfile;
 
 			// return image if found
 			if (image) {
@@ -517,7 +528,6 @@ module.exports = crunch = {
 			return crunch.returnImage(req, res, imageFile);
 		});
 		return;
-
 	},
 
 	

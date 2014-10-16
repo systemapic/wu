@@ -69,6 +69,9 @@ module.exports = geo = {
 			entry.type = 'layer';
 			entry.title = entry.originalFilename;
 
+			// add unique id to features
+			geo.addUniqueGeojsonProperties(toFile);
+
 			// return
 			callback(null, entry);
 
@@ -108,6 +111,9 @@ module.exports = geo = {
 
 			console.log('renamed: ', entry);
 
+			// add unique id to features
+			geo.addUniqueGeojsonProperties(toPath);
+
 			// return
 			callback(null, entry);
 
@@ -141,6 +147,9 @@ module.exports = geo = {
 			entry.files.push(fileUuid);
 			entry.type = 'layer';
 			entry.title = entry.originalFilename;
+
+			// add unique id to features
+			geo.addUniqueGeojsonProperties(toFile);
 
 			// return
 			callback(null, entry);
@@ -211,7 +220,7 @@ module.exports = geo = {
 		    outFile = entry.folder + '/' + toFile;
 
 		// execute cmd line conversion 
-		var cmd = 'mapshaper -p 0.1 --encoding utf8 -f geojson -o ' + outFile + ' ' + inFile;		// todo: mapshaper options
+		var cmd = 'mapshaper -p 0.1 --encoding utf8 -f geojson -o "' + outFile + '" "' + inFile + '"';		// todo: mapshaper options
 		console.log('================= m a p s h a p e r ==========================');
 		console.log('cmd: ', cmd);
 		var exec = require('child_process').exec;
@@ -223,16 +232,65 @@ module.exports = geo = {
 			entry.files.push(toFile);
 			entry.type = 'layer';
 			entry.data.geojson = toFile;
-			entry.title = entry.originalFilename;
+			entry.title = shp;
 
-			console.log('*************************')
+			console.log('************************************')
 			console.log('* geo._convertShapefile DONE:', entry);
-			console.log('*************************')
+			console.log('************************************')
+
+			// add unique id to features
+			geo.addUniqueGeojsonProperties(outFile);
 
 			// return
 			callback(null);
 
 		});
+	},
+
+	addUniqueGeojsonProperties : function (path) {
+		console.log('addUniqueGeojsonProperties', path);		// todo: remove _systemapic from exported shapes!
+
+		var data;
+		var ops = [];
+
+		ops.push(function (callback) {
+			fs.readFile(path, function (err, geojson) {
+				if (err) throw err;
+				data = JSON.parse(geojson);
+				data = geo._addUniqueProperty(data);
+
+				// done
+				callback(err);
+			});
+		});
+
+		ops.push(function (callback) {
+			var json = JSON.stringify(data);
+			fs.writeFile(path, json, function (err) {
+				if (err) throw err;
+				
+				// done
+				callback(err);
+			});
+		});
+
+		async.series(ops, function (err) {
+
+			console.log('addUniqueGeojsonProperties DONE!');
+
+			// no callback, no point waiting for this
+
+		});
+
+	},
+
+	_addUniqueProperty : function (data) {
+		var features = data.features;
+		console.log('_addUniqueProperty features: ', features);
+		features.forEach(function (feature) {
+			feature.properties.__sid = uuid.v4();
+		});
+		return data;
 	},
 
 
