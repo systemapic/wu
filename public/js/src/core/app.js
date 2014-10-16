@@ -153,6 +153,12 @@ Wu.App = Wu.Class.extend({
 			addTo: this._appPane
 		});
 
+		// add progress bar
+		this.ProgressBar = new Wu.ProgressBar({
+			color : 'white',
+			addTo : this._appPane
+		});
+
 		// render side pane 
 		this.SidePane = new Wu.SidePane();	// todo: add settings more locally? Wu.SidePane({options})
 
@@ -253,9 +259,12 @@ Wu.App = Wu.Class.extend({
 		return this.options.portalName;
 	},
 
-	// shorthand for setting status bar
+	// shorthands for setting status bar
 	setStatus : function (status, timer) {
 		app.StatusPane.setStatus(status, timer);
-	}
+	},
+	setSaveStatus : function () {
+		app.StatusPane.setSaveStatus();
+	},
 
 });

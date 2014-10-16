@@ -284,6 +284,17 @@ module.exports = function(app, passport) {
 	});
 
 
+	// // =====================================
+	// // UPDATE GEOJSON FILES ================
+	// // =====================================
+	// // get data from store
+	// app.post('/api/geojson/update', isLoggedIn, function (req,res) {
+	// 	console.log('/api/geojson/update');
+
+	// 	// get and send geojson file
+	// 	api.updateGeojsonFile(req, res);
+
+	// });
 	
 	// =====================================
 	// GET FILE DOWNLOAD ===================

@@ -393,7 +393,7 @@ Wu.Project = Wu.Class.extend({
 		this.store.files.push(file);
 
 		// save to server (if necessary)
-		this._update('files');
+		// this._update('files');
 
 	},
 

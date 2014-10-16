@@ -362,6 +362,14 @@ Wu.MapPane = Wu.Class.extend({
 		delete this.baselayerToggle;
 	},
 
+	hideControls : function () {
+		Wu.DomUtil.addClass(app._map._controlContainer, 'displayNone');
+	},
+
+	showControls : function () {
+		Wu.DomUtil.removeClass(app._map._controlContainer, 'displayNone');
+	},
+
 	addLayer : function (layerID) {
 		var layer = L.mapbox.tileLayer(layerID);
 		layer.addTo(this._map);
@@ -708,7 +716,41 @@ Wu.MapPane = Wu.Class.extend({
 		// add vector styling control
 		this.enableVectorstyle(drawControl._wrapper);
 
-	}
+	},
+
+	getEditableLayerParent : function (id) {
+		// return id from _leaflet_id
+		var layers = this.editableLayers._layers;
+		for (l in layers) {
+			for (m in layers[l]._layers) {
+
+				if (m == id) return layers[l];
+
+				var deep = layers[l]._layers[m];
+				for (n in deep) {
+					var shit = deep[n];
+					if (n == id) return deep;
+
+					for (o in shit) {
+						var cunt = shit[o];
+						if (o == id) return shit;
+					}
+				}
+			}
+		}
+		return false;
+	},
+	
+	// getEditableLayerParent : function (id) {
+	// 	// return id from _leaflet_id
+	// 	var layers = this.editableLayers._layers;
+	// 	for (l in layers) {
+	// 		for (m in layers[l]._layers) {
+	// 			if (m == id) return layers[l];
+	// 		}
+	// 	}
+	// 	return false;
+	// },
 
 });
 

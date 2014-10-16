@@ -16,10 +16,13 @@
 
 .leaflet-draw-section {
 	position: relative;
+	width: 26px;
+	pointer-events: all;
 	}
 
 .leaflet-draw-toolbar {
 	margin-top: 12px;
+	pointer-events: all;
 	}
 
 .leaflet-draw-toolbar-top {
@@ -56,6 +59,25 @@
  │ │ ││ ││  ├┴┐├─┤├┬┘└─┐  ├─┤│   │ ││ ││││└─┐  │││├┤ ││││ │
  ┴ └─┘└─┘┴─┘└─┘┴ ┴┴└─└─┘  ┴ ┴└─┘ ┴ ┴└─┘┘└┘└─┘  ┴ ┴└─┘┘└┘└─┘
  */
+
+.leaflet-draw.leaflet-control.elizaveta {
+	pointer-events: none;
+	/*cursor: pointer;*/
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;		
+	}
+
+.leaflet-draw.leaflet-control.elizaveta:active {	
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	}
+
+.leaflet-draw.leaflet-control.elizaveta div,
+.leaflet-draw.leaflet-control.elizaveta a {
+	pointer-events: all;
+	}	
+
 
 .leaflet-draw-actions {
 	display: none;
@@ -514,7 +536,7 @@
 .leaflet-control-zoom,
 .leaflet-draw,
 .leaflet-control-styleeditor,
-.leaflet-control-baselayertoggle {
+.leaflet-control-baselayertoggle {	
 	float: left;
 	}
 	
@@ -531,10 +553,20 @@
 	background-position: 2px -271px;
 	background-color: white;
 	margin-left: -3px;
+	width: 25px;
+	height: 25px;
+	cursor: pointer;
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) !important;
+	}
+
+.leaflet-control-styleeditor-interior.enabled {
+	// background-color: gainsboro;	
+	background-color: #CCFFFF;
 	}
 
 .enabled:hover {
-	background-color: #FAFAFA;
+	// background-color: #FAFAFA;
+	background-color: #CCFFFF;
 	}
 	
 /* Disable font color to use bg-image instead */
@@ -674,16 +706,17 @@
 	position: relative;
 	left: -3px;
 	overflow: hidden;
-
+	width: 135px;
 	}
 
 .draw-expander {
 	height: 270px;
-	overflow: visible;
+	// overflow: visible;
 	}
 
 .open-drawer {
-	background-color: rgba(220,220,220,1);
+	// background-color: rgba(220,220,220,1);
+	background-color: #CCFFFF;
 	}
 
 
@@ -693,6 +726,8 @@
  ┴ └─┘└─┘┴─┘┴ ┴┴  
  */
 
+ .leaflet-popup {}
+
 .leaflet-popup-content-wrapper {
 	background: rgba(0, 0, 0, 0.64);
 	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
@@ -700,11 +735,23 @@
 	font-family: $font;
 	font-size: 120%;
 	font-weight: 400;
+	overflow: hidden;
 	}
+
+.leaflet-popup-content {
+	}
+
+.leaflet-popup-scrolled {
+	padding-right: 40px;
+	border: 0;
+	}	
 
 .leaflet-popup-tip {
 	background: rgba(0, 0, 0, 0.64);
+	margin: -11px auto 0;
 	}
+
+
 
 
 
@@ -1516,3 +1563,235 @@
 .inspecting {
 	background-color: white;
 	}
+
+
+
+
+
+
+
+
+
+
+/* STYLE EDITOR */
+
+/* The tooltip that appears when you click the button to activate the style editor */
+.leaflet-styleeditor-mouseTooltip {
+	z-index: 999999;
+	width: 130px;
+	color: white;
+	font-weight: 500;
+	background-color: rgba(68,68,68,.7);
+	padding: 7px 8px 3px 8px;	 
+	}
+
+/* Outer Wrapper */
+.leaflet-styleeditor {
+	position: absolute;
+	top: 72px;
+	right: -14px;
+	z-index: 1000;
+	background-color: rgba(255, 255, 255, 0.93);
+	}
+
+/* When the editor is open */
+.editor-enabled {
+	width: 200px;
+	}
+
+
+/* Style editor header */
+.leaflet-styleeditor-header {
+	background: transparent;
+	height: 27px;
+	position: absolute;
+	width: 27px;
+	right: 0;
+	z-index: 99999;
+	}
+
+
+/* Header buttons */
+.leaflet-styleeditor-button {
+	padding: 0;
+	width: 17px;
+	height: 17px;
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	border-radius: 0;	
+	top: 4px;
+	background-color: transparent;	
+	position: absolute;	
+	cursor: pointer;	
+	}
+
+.leaflet-styleeditor-button:hover {
+	background-color: transparent;
+	}	
+
+/* Close style editor button */
+.styleeditor-closeBtn {
+	background-position: -27px -43px;	
+	right: 4px;
+	}
+
+/* Disable "make full size" button */
+.styleeditor-inBtn {
+	background-position: 4px -9px;		
+	left: 4px;
+	display: none;	
+	}
+
+/* Inner wrapper */
+.leaflet-styleeditor-interior {
+	width: 220px;
+	left: 5px;	
+	/*height: 390px;*/
+	top: 5px;
+	height: 100%;
+	}
+
+/* Labels */
+.leaflet-styleeditor-label {
+	text-transform: uppercase;
+	line-height: 2.2;
+	font-weight: 600;
+	font-size: 12px;
+	}
+
+/* Color swatches – make square */
+.leaflet-styleeditor-color {
+	height: 30px;
+	}
+
+
+/* Input fields for opacity */
+.leaflet-styleeditor-input:focus, 
+.leaflet-styleeditor-select:focus {
+	border: 1px solid rgba(0,0,0,.1) !important;
+	}	
+
+/* Style Dasharray */
+.leaflet-styleeditor-stroke {
+	opacity: 0.6;
+	border: none;
+	}
+
+.leaflet-styleeditor-stroke:hover {
+	opacity: 1;
+	border: none;
+	}
+
+.leaflet-styleeditor-close {
+	background-color: rgba(0, 0, 0, 0.7);
+	border-left: 1px solid #AAA;
+	color: #FFF;
+	font: 11px/19px "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+	line-height: 28px;
+	height: 28px;
+	font-weight: 500;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	left: 21px;
+	top: 0;
+	height: 27px;
+	width: 52px;
+	border-radius: 0 3px 3px 0;
+	padding-right: 12px;
+	font-size: 95%;
+	cursor: pointer;
+	}
+
+.leaflet-styleeditor-close:hover {
+	color: #63b6e5;
+	}
+
+
+/* Pattern picker */
+.leaflet-styleeditor-patternpicker {
+	width: 150px;
+	}
+
+.leaflet-styleeditor-pattern {
+	width: 70px;
+	height: 70px;
+	display: inline-block;
+	vertical-align: top;
+	background-repeat: no-repeat;
+	background-position: 0 0;
+	margin: 2px;
+	border: 2px solid white;
+	cursor: pointer;
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
+	}
+
+.leaflet-styleeditor-pattern:hover {
+	box-shadow: 0 0 4px 0 rgba(0,0,0,0.4);
+	}	
+
+.leaflet-styleeditor-pattern:active {
+	box-shadow: 0 0 2px 0 rgba(0,0,0,0.3);
+	}
+
+
+/*
+// bluelines.png
+// cpattern.png
+// crazypattern.png
+// diagonalDots.png
+// diagonalStripes.png
+// dots.png
+// honeycomb.png
+// lines1.png
+*/
+
+
+.SVGpattern1 {
+	background-image: url(images/patternPics/SVGpattern1.png);
+	}
+
+.SVGpattern2 {
+	background-image: url(images/patternPics/SVGpattern2.png);
+	}
+
+.SVGpattern3 {
+	background-image: url(images/patternPics/SVGpattern3.png);
+	}
+
+.SVGpattern4 {
+	background-image: url(images/patternPics/SVGpattern4.png);
+	}
+
+.SVGpattern5 {
+	background-image: url(images/patternPics/SVGpattern5.png);
+	}
+
+.SVGpattern6 {
+	background-image: url(images/patternPics/SVGpattern8.png);
+	}
+
+.SVGpattern7 {
+	background-image: url(images/patternPics/SVGpattern7.png);
+	}
+
+.SVGpattern8 {
+	background-image: url(images/patternPics/SVGpattern6.png);
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

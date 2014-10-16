@@ -4572,6 +4572,7 @@ L.Path = L.Class.extend({
 	},
 
 	setStyle: function (style) {
+		
 		L.setOptions(this, style);
 
 		if (this._container) {
@@ -4964,7 +4965,7 @@ L.Path = L.Browser.svg || !L.Browser.vml ? L.Path : L.Path.extend({
 		this._updateStyle();
 	},
 
-	_updateStyle: function () {
+	_updateStyle: function () {		
 		var stroke = this._stroke,
 		    fill = this._fill,
 		    options = this.options,
@@ -5106,6 +5107,8 @@ L.Path = (L.Path.SVG && !window.L_PREFER_CANVAS) || !L.Browser.canvas ? L.Path :
 
 	_updateStyle: function () {
 		var options = this.options;
+
+		console.log('_updateStyle', options);
 
 		if (options.stroke) {
 			this._ctx.lineWidth = options.weight;
@@ -6156,12 +6159,15 @@ L.GeoJSON = L.FeatureGroup.extend({
 	},
 
 	setStyle: function (style) {
+		console.log('L.geoJson setStyle(style)', style)
 		this.eachLayer(function (layer) {
+			console.log('eachlayer, ', layer);
 			this._setLayerStyle(layer, style);
 		}, this);
 	},
 
 	_setLayerStyle: function (layer, style) {
+		console.log('WAHWAHWAHWAH');
 		if (typeof style === 'function') {
 			style = style(layer.feature);
 		}

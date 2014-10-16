@@ -95,3 +95,79 @@ L.Control.StyleEditor.include({
 	},
 
 });
+
+L.Popup.include({
+
+	_initLayout: function () {
+		console.log('L.Popup.include._initLayout');
+
+		var prefix = 'leaflet-popup',
+			containerClass = prefix + ' ' + this.options.className + ' leaflet-zoom-' +
+			        (this._animated ? 'animated' : 'hide'),
+			container = this._container = L.DomUtil.create('div', containerClass),
+			closeButton;
+
+		if (this.options.closeButton) {
+			closeButton = this._closeButton =
+			        L.DomUtil.create('a', prefix + '-close-button', container);
+			closeButton.href = '#close';
+			closeButton.innerHTML = '&#215;';
+			L.DomEvent.disableClickPropagation(closeButton);
+
+			L.DomEvent.on(closeButton, 'click', this._onCloseButtonClick, this);
+		}
+
+		var wrapper = this._wrapper =
+		        L.DomUtil.create('div', prefix + '-content-wrapper', container);
+		L.DomEvent.disableClickPropagation(wrapper);
+
+		this._contentNode = L.DomUtil.create('div', prefix + '-content', wrapper);
+
+		L.DomEvent.disableScrollPropagation(this._contentNode);
+		L.DomEvent.on(wrapper, 'contextmenu', L.DomEvent.stopPropagation);
+
+		this._tipContainer = L.DomUtil.create('div', prefix + '-tip-container', container);
+		this._tip = L.DomUtil.create('div', prefix + '-tip', this._tipContainer);
+	},
+
+
+	_updateLayout: function () {
+		console.log('L.Popup.include._updateLayout');
+
+		var container = this._contentNode,
+		    style = container.style;
+
+		var parent_container = container.parentNode;  
+
+		style.width = '';
+		style.whiteSpace = 'nowrap';
+
+		var width = container.offsetWidth;
+		width = Math.min(width, this.options.maxWidth);
+		width = Math.max(width, this.options.minWidth);
+
+		style.width = (width + 41) + 'px';
+		style.whiteSpace = '';
+
+		style.height = '';
+
+		var height = container.offsetHeight,
+		    maxHeight = this.options.maxHeight,
+		    scrolledClass = 'leaflet-popup-scrolled';
+
+		if (maxHeight && height > maxHeight) {
+			style.height = maxHeight + 'px';
+			L.DomUtil.addClass(container, scrolledClass);
+		} else {
+			L.DomUtil.removeClass(container, scrolledClass);
+		}
+
+		this._containerWidth = this._container.offsetWidth;
+
+		parent_container.style.width = (width + 41) + 'px';
+	}
+
+});
+
+
+

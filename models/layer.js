@@ -31,6 +31,12 @@ var layerSchema = mongoose.Schema({
 		osm 		: String,			// osm id?
 	}, 
 
+	// geojson styling
+	style : [{
+		__sid : String,	// systemapic id added to geojson features
+		style : String  // json of css style object
+	}],
+
 	file : String 	// file uuid that layer is connected to, if any
 
 

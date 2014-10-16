@@ -72,6 +72,19 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		this.setContentHeight();
 	},
 
+	closeAll : function () {
+		console.log('closeAll');
+
+		// close all options folders
+		var options = app.SidePane.Map.mapSettings;
+		for (o in options) {
+			var option = options[o];
+			console.log('option: ', option);
+			if (option._isOpen) option.close();
+		}
+
+	},
+
 	// setContentHeight : function () {
 	// 	this.calculateHeight();
 	// 	this._content.style.maxHeight = this.maxHeight + 'px';

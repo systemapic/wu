@@ -57,6 +57,10 @@ Wu.Layer = Wu.Class.extend({
 		return this.store.uuid;
 	},
 
+	getProjectUuid : function () {
+		return app.activeProject.store.uuid;
+	},
+
 	hide : function () {
 		var container = this.getContainer();
 		container.style.visibility = 'hidden';
@@ -67,14 +71,18 @@ Wu.Layer = Wu.Class.extend({
 		container.style.visibility = 'visible';
 	},
 
-	// save updates to layer (like description)
+	// save updates to layer (like description, style)
 	save : function (field) {
 		var json = {};
 		json[field] = this.store[field];
 		json.layer  = this.store.uuid;
 		json.uuid   = app.activeProject.store.uuid; // project uuid
+
+		this._save(json);
+	},
+
+	_save : function (json) {
 		var string  = JSON.stringify(json);
-		
 		Wu.save('/api/layer/update', string);
 	}
 
@@ -98,7 +106,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 			// create popup
 			onEachFeature : this.createPopup
 		});
-		
+
 	},
 
 	add : function (map) {
@@ -129,6 +137,97 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		var editableLayers = app.MapPane.editableLayers;
 		editableLayers.removeLayer(layer);
 
+		// remove hooks
+		this.removeLayerHooks();
+
+	},
+
+	addLayerHooks : function () {
+
+		console.log('this: ', this);
+
+		this.layer.eachLayer(function (layr) {
+
+			
+			var type = layr.feature.geometry.type;
+			console.log('type: ', type);
+
+			if (type == 'Polygon') {
+
+
+				console.log('Polygon layer: ', layr);
+				Wu.DomEvent.on(layr, 'styleeditor:changed', this.styleChanged, this);
+				// layr.eachLayer(function (multi) {
+
+				// 	console.log('polypart');
+
+				// }, this);
+
+			} 
+
+			if (type == 'MultiPolygon') {
+
+				console.log('MultiPolygon layer: ', layr);
+
+				layr.eachLayer(function (multi) {
+					console.log('multipart');
+					// console.log('multi: ', multi); // this layer has no 'feature' and no _layers, but needs a listener for change
+
+					Wu.DomEvent.on(multi, 'styleeditor:changed', function (data) {
+						this.multiStyleChanged(data, multi, layr);
+					}, this);
+
+
+
+				}, this);
+			
+
+			}
+
+
+
+			// console.log('__this.layer.eachLayer: layer=', layr);
+			// console.log('$$$$$$$$$$$$$');
+			// layr.eachLayer(function (lay) {
+
+			// 	console.log('$$ eachLayer', lay);
+
+			// }, this);
+
+		}, this);	
+
+
+		// for (l in this.layer._layers) {
+		// 	console.log('_________layer___________');
+		// 	console.log('this.layer._layers', this.layer._layers);
+			
+		// 	var layer = this.layer._layers[l];
+		// 	console.log('ADD CHANGE HOOK: ', layer);
+
+		// 	for (ll in layer._layers) {
+		// 		var lay = layer._layers[ll];
+		// 		console.log('BIG BADA DOOM! =>', lay);
+		// 		Wu.DomEvent.on(lay, 'styleeditor:changed', this.styleChanged, this);
+		// 	}
+
+		// 	// listen to changes
+		// 	Wu.DomEvent.on(layer, 'styleeditor:changed', this.styleChanged, this);
+
+		// 	console.log('=====================');
+		// }
+
+		
+	},	
+
+
+
+	removeLayerHooks : function () {
+		for (l in this.layer._layers) {
+			var layer = this.layer._layers[l];
+
+			// listen to changes
+			Wu.DomEvent.off(layer, 'styleeditor:changed', this.styleChanged, this);
+		}
 	},
 
 	getGeojsonUuid : function () {
@@ -143,6 +242,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		// set status
 		app.setStatus('Loading...');
+
 
 		// get geojson from server
 		var data = { 
@@ -161,9 +261,15 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		url += path;
 
 		// track progress
-		http.addEventListener("progress", function (oe) {
-			console.log('progress: ', oe);
-		}, false);
+		var dataSize = this.getDataSize();
+		if (dataSize) {
+			var that = this;
+			http.addEventListener("progress", function (oe) {
+				var percent = Math.round( oe.loaded / dataSize * 100);
+				that.setProgress(percent);
+
+			}, false);
+		}
 		
 		http.open("POST", url, true);
 
@@ -182,15 +288,18 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 	// callback after loading geojson from server
 	dataLoaded : function (that, json) {
 
+		// set progress done
+		that.setProgress(100);
+
 		// parse json into geojson object
 		try { that.data = JSON.parse(json); }
-		catch (e) { return console.log('error!', json)}
+		catch (e) { return console.log('parse error!', json)}
 		
 		console.log('Got geojson: ', that.data);
 
+		// return if errors
 		if (!that.data) return console.error('no data');
-		// return if error
-		if (that.data.error) return console.log(that.data.error);
+		if (that.data.error) return console.error(that.data.error);
 
 		// add data to layer
 		that.layer.addData(that.data);
@@ -201,18 +310,62 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		// set opacity
 		that.setOpacity()
 
+		// render saved styles of geojson
+		that.renderStyle();
+
 		// set status
 		app.setStatus('Loaded!');
+
+		// hide progress bar
+		this.hideProgress();
+
+		// add layer hooks
+		this.addLayerHooks();
+
+		console.log('GEOJSON: ', this);
+
+	},
+
+	getDataSize : function () {
+
+		var fileUuid = this.getFileUuid();
+		if (!fileUuid) return false;
+
+		var file = this.getFile(fileUuid);
+
+		console.log('got file: ', file);
+		console.log('dataSize: ', file.dataSize);
+		return parseInt(file.dataSize);
+
+	},
+
+	getFileUuid : function () {
+		return this.store.file;
+	},
+
+	getFile : function (fileUuid) {
+
+		var files = app.activeProject.getFiles();
+		var file = _.find(files, function (f) {
+			return f.uuid == fileUuid;
+		});
+
+		return file;
 
 	},
 
 	progress : function (p) {
+		this.setProgress(p);
+	},
 
-		// show progress
-		var bar = Wu.app.SidePane.DataLibrary.progress;
-		var perc = p.loaded / p.total * 100;
-		bar.style.opacity = 1;
-		bar.style.width = perc + '%';
+	setProgress : function (percent) {
+		// set progress bar
+		app.ProgressBar.setProgress(percent);
+	},
+
+	hideProgress : function () {
+		// hide progress bar
+		app.ProgressBar.hideProgress();
 	},
 
 	setZIndex : function (zIndex) {
@@ -246,11 +399,101 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 			layer._container.style.visibility = 'hidden';
 		}
 	},
+
+	multiStyleChanged : function (data, multi, layr) {
+
+		console.log('multiStyleChanged: data: ', data, this);
+		console.log('multi: ', multi);
+		console.log('layr: ', layr);
+
+		var layer = layr;
+		var style = data.style;
+		var __sid = layer.feature.properties.__sid;
+
+		layer.setStyle(style);	// good! does the whole multipolgyon (of multipolygons)
+
+		this.saveStyle(style, __sid);	// works
+
+	},
+
+	styleChanged : function (data) {
+
+		console.log('styleChanged: data: ', data, this);
+		// return;
+
+		var style = data.style;
+		var target = data.target;
+
+		var id = target._leaflet_id;
+		var layer = this.getPathParentLayer(id);
+		console.log('PARERRRRRRR ----- layer: ', layer);
+		var __sid = target.feature.properties.__sid;
+
+		// save style
+		this.saveStyle(style, __sid);
+
+	},
+
+	getPathParentLayer : function (id) {
+		return app.MapPane.getEditableLayerParent(id);
+	},
+
+	// getStyle : function () {
+	// 	var style = this.store.style;
+	// 	if (!style) return false;
+	// 	return JSON.parse(style) 
+	// },
+
+	// save style to layer object
+	saveStyle : function (style, __sid) {	
+			
+		var json = this.layer.toGeoJSON();
+		console.log('toGeoJSON: ', json);
+		console.log('__sid: ', __sid);
+		console.log('style: ', style);
+
+		var json = {};
+		json.layer  = this.getUuid();
+		json.uuid   = this.getProjectUuid(); // active project uuid
+
+		json.style = {
+			__sid : __sid,
+			style : style 		// partial
+		}
+
+		// send to server
+		this._save(json);
+
+		// set staus msg
+		app.setSaveStatus();
+
+	},
+
+	renderStyle : function () {
+
+		var styles = this.store.style;
+		var layers = this.layer._layers;
+
+		for (l in layers) {
+			var layer = layers[l];
+			var __sid = layer.feature.properties.__sid;
+
+			var style = _.find(styles, function (s) {
+				return s.__sid == __sid;
+			});
+
+			if (style) {
+				var parsed = JSON.parse(style.style);
+				layer.setStyle(parsed);
+			}
+		}
+
+	},
 	
 	setOpacity : function (opacity) {
 
 		// set opacity for now or later
-		this.opacity = opacity || this.opacity || 0.5;
+		this.opacity = opacity || this.opacity || 0.2;
 		
 		// return if data not loaded yet
 		if (!this.loaded) return;
@@ -264,13 +507,13 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 	},
 
 	getOpacity : function () {
-		return this.opacity || 0.5;
+		return this.opacity || 0.2;
 	},
 
 
 	// create tooltip
 	createPopup : function (feature, layer) {
-		
+
 		// return if no features in geojson
 		if (!feature.properties) return;
 
@@ -278,19 +521,27 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		var popup = L.popup({
 			offset : [0, -5],
 			closeButton : false,
-			zoomAnimation : false
+			zoomAnimation : false,
+			maxWidth : 1000,
+			minWidth : 200,
+			maxHeight : 150
 		});
 
 		// create content
 		var string = '';
+		string += feature.geometry.type + '<br>';	// debug
+		string += '-------------------<br>';
+		console.log('PUPUP::: feature: ', feature, layer);
 		for (key in feature.properties) {
 			var value = feature.properties[key];
 			// if not empty value
-			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined') {
+			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
 				// add features to string
-				string += key + ': ' + value + '<br>';
+				string += key + ':: ' + value + '<br>';
 			}
 		}
+
+		
 
 		// set content
 		popup.setContent(string);
@@ -310,10 +561,86 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 	bindHoverPopup : function () {
 		var that = this;
 
-
-
 	}
 });
+
+
+
+// topojson layer
+Wu.TopojsonLayer = Wu.Layer.extend({
+
+	type : 'topojsonLayer',
+
+	initLayer : function () {
+		var that = this;
+	       
+		// create leaflet geoJson layer
+		this.layer = L.topoJson(false, {
+			// create popup
+			onEachFeature : this.createPopup
+		});
+
+	}	
+});
+
+// extend leaflet geojson with topojson conversion (test) - works! but doesn't solve any problems
+L.TopoJSON = L.GeoJSON.extend({
+	addData: function(jsonData) {    
+		if (jsonData.type === "Topology") {
+			for (key in jsonData.objects) {
+				geojson = topojson.feature(jsonData, jsonData.objects[key]);
+				L.GeoJSON.prototype.addData.call(this, geojson);
+			}
+		} 
+		else {
+			L.GeoJSON.prototype.addData.call(this, jsonData);
+		}
+	}  
+});
+
+L.topoJson = function (json, options) {
+	return new L.TopoJSON(json, options);
+};
+
+
+// // topojson layer with d3.js
+// L.TopojsonLayer = L.Class.extend({
+
+// 	initialize: function (data, options) {
+		
+// 		L.setOptions(this, options);
+// 	},
+
+// 	onAdd: function (map) {
+// 		this._map = map;
+
+// 		// create a DOM element and put it into one of the map panes
+// 		this._el = L.DomUtil.create('div', 'topojson-layer leaflet-zoom-hide');
+// 		map.getPanes().overlayPane.appendChild(this._el);
+
+// 		// add a viewreset event listener for updating layer's position, do the latter
+// 		map.on('viewreset', this._reset, this);
+// 		this._reset();
+// 	},
+
+// 	onRemove: function (map) {
+// 		// remove layer's DOM elements and listeners
+// 		map.getPanes().overlayPane.removeChild(this._el);
+// 		map.off('viewreset', this._reset, this);
+// 	},
+
+// 	_reset: function () {
+// 		// update layer's position
+// 		var pos = this._map.latLngToLayerPoint(this._latlng);
+// 		L.DomUtil.setPosition(this._el, pos);
+// 	}
+// });
+
+// L.topoJson = function (data, options) {
+// 	return new L.TopojsonLayer(data, options);
+// };
+
+
 
 
 
@@ -388,6 +715,8 @@ Wu.createLayer = function (layer) {
 	// geojson
 	if (layer.data.geojson) return new Wu.GeojsonLayer(layer);
 	
+	// geojson
+	if (layer.data.topojson) return new Wu.TopojsonLayer(layer);
 
 	// raster
 	if (layer.data.raster) {

@@ -527,7 +527,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// clone file object
 		var tmp = Wu.extend({}, file);   
-		console.log('tmp: ', tmp);
+		// console.log('tmp: ', tmp);
 
 		// add record (a bit hacky, but with a cpl of divs inside the Name column)
 		tmp.name = ich.datalibraryTablerowName({
@@ -539,7 +539,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// clean arrays
 		tmp.type = tmp.type.camelize();
-		// tmp.files = tmp.files.join(', ');
 		tmp.files = this._createFilePopup(tmp.files);
 		tmp.keywords = tmp.keywords.join(', ');
 		tmp.createdDate = new Date(tmp.created).toDateString();
@@ -560,16 +559,16 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_createFilePopup : function (files) {
+		var length = files.length;
 		var html = '<div class="dataLibrary-file-popup-wrap">';
-		html += '<div class="dataLibrary-file-popup-trigger"></div>';
+		html += '<div class="dataLibrary-file-popup-trigger">' + length + '</div>';
 		html += '<div class="dataLibrary-file-popup-list">Files:<br>';
 		files.forEach(function (f) {
 			html += '<div class="dataLibrary-file-popup-item">'
 			html += '• ' + f;
 			html += '</div>';
 		}, this);
-		html += '</div>';
-		html += '</div>';
+		html += '</div></div>';
 		return html; // as html, not nodes
 	},
 

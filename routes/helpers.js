@@ -2145,19 +2145,25 @@ module.exports = api = {
 	updateLayer : function (req, res) {
 		console.log('updateLayer');
 
-		var layer 	= req.body.layer || false;
+		var layerUuid 	= req.body.layer || false;
 		var user 	= req.user;
 		
+		console.log('req.body: ', req.body);
 
 		// error if no project or user
-		if (!layer) return res.end(JSON.stringify({
+		if (!layerUuid) return res.end(JSON.stringify({
 			error : 'Missing layer uuid.'
 		})); 
 
 
 
-		Layers.findOne({'uuid' : layer}, function (err, layer) {
-			if (err) throw err;
+		Layers.findOne({'uuid' : layerUuid}, function (err, layer) {
+			if (err) console.error('Layer.findOne: ', err);
+
+			// error if no project or user
+			if (!layer) return res.end(JSON.stringify({
+				error : 'Missing layer uuid.'
+			})); 
 
 			console.log('found layer?', layer);
 			
@@ -2174,7 +2180,7 @@ module.exports = api = {
 			};
 
 
-			// update description
+			// update title
 			if (req.body.hasOwnProperty('title')) {
 
 				var title = req.body.title;
@@ -2185,8 +2191,72 @@ module.exports = api = {
 
 			};
 
+			// update style
+			if (req.body.hasOwnProperty('style')) {
+
+				var style = req.body.style;
+
+				console.log('Setting style: ', style);
+
+				// {
+				// 	__sid : '232332',
+				// 	style : {
+				// 		color : "2323"
+				// 	}
+				// }
+
+				var __sid = style.__sid;
+				var newStyle = style.style;
+
+				var existing = _.find(layer.style, function (s) {
+					return s.__sid == __sid;
+				});
+
+				console.log('existing: ', existing);
+				
+				if (existing) {
+					// get style
+					var existingStyle = JSON.parse(existing.style);
+
+					// set style
+					for (t in newStyle) {
+						existingStyle[t] = newStyle[t];
+					}
+
+					// referenced to layer.style, so should save
+					existing.style = JSON.stringify(existingStyle);
+
+
+				} else {
+
+					layer.style.push({
+						__sid : __sid,
+						style : JSON.stringify(newStyle)
+					});
+
+				}
+
+				layer.markModified('style');
+
+				layer.save(function (err) {
+					if (err) throw err;
+				});
+
+
+
+
+
+			};
+
 			res.end('save done');
 		});
+
+	},
+
+	// update geojson file
+	updateGeojsonFile : function (req, res) {
+
+
 
 	},
 
