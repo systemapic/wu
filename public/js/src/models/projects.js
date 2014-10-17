@@ -12,7 +12,7 @@ Wu.Project = Wu.Class.extend({
 		this.lastSaved = {};
 
 		// ensure active project // todo: refactor, take this out
-		if (!app.activeProject) app.activeProject = this;
+		// if (!app.activeProject) app.activeProject = this;
 
 		// attach client
 		this._client = Wu.app.Clients[this.store.client];
@@ -94,7 +94,6 @@ Wu.Project = Wu.Class.extend({
 
 	setEditMode : function () {
 		// set editMode
-		// console.log('this: ', this);
 		this.editMode = false;
 		if (app.Account.canUpdateProject(this.store.uuid)) this.editMode = true;
 	},
@@ -117,7 +116,6 @@ Wu.Project = Wu.Class.extend({
 
 	addNewLayer : function (layer) {
 		this.addLayer(layer);
-		// this.refreshSidepane();
 	},
 
 	refreshSidepane : function () {
@@ -153,6 +151,8 @@ Wu.Project = Wu.Class.extend({
 
 	select : function () {	// refactor, move to view?
  
+		// if (app.activeProject == this) return;
+
 		// set as active
 		app.activeProject = this;
 
@@ -234,7 +234,7 @@ Wu.Project = Wu.Class.extend({
 		app.setStatus('Saved!');
 	},
 
-	_saveNew : function (context) {
+	_saveNew : function (callback) {
 	     
 		var options = {
 			name 		: this.store.name,
@@ -245,7 +245,7 @@ Wu.Project = Wu.Class.extend({
 		var json = JSON.stringify(options);
 		
 		// console.log('POST: _saveNew');
- 		Wu.Util.postcb('/api/project/new', json, context._projectCreated, this);
+ 		Wu.Util.postcb('/api/project/new', json, callback.callback.bind(callback.context), this);
 
 	},
 
@@ -392,11 +392,17 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getUsersHTML : function () {
-		var users = this.getUsers();
-		var html = '';
+		var users = this.getUsers(),
+		    html = '',
+		    silent = app.options.silentUsers;
 
 		users.forEach(function (user) {
-			html += '<p>' + user.store.firstName + ' ' + user.store.lastName + '</p>';
+			var partial = user.store.uuid.slice(0, 13);
+			// remove silentUsers from user list
+			if (silent.indexOf(partial) == -1) {
+				// add user to list
+				html += '<p>' + user.store.firstName + ' ' + user.store.lastName + '</p>';
+			}
 		}, this);
 
 		return html;
@@ -458,8 +464,13 @@ Wu.Project = Wu.Class.extend({
 
 	setSlug : function (name) {
 		var slug = name.replace(/\s+/g, '').toLowerCase();
+		slug = Wu.Util.stripAccents(slug);
 		this.store.slug = slug;
+		console.log('update slug: ', slug);
 		this._update('slug');
+
+		// set new url
+		this._setUrl();
 	},
 
 	setBounds : function (bounds) {

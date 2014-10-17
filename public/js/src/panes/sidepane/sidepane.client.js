@@ -88,7 +88,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.projects.forEach(function (p){
 
 			// new project item view
-			var projectDiv = new Wu.SidePane.Project(p, this);
+			var options = {
+				parent : this
+			}
+			var projectDiv = new Wu.SidePane.Project(p, options);
 
 			// app to client
 			projectDiv.addTo(this._projectsContainer);
@@ -194,13 +197,27 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// create new project with options, and save
 		var project = new Wu.Project(store);
 		project.editMode = true;
-		project._saveNew(this); 
+		var callback = {
+			callback : this._projectCreated,
+			context : this
+		}
+		project._saveNew(callback); 
 		
+	},
+
+	// add project in sidepane
+	_createNewProject : function (project) {
+
+		// console.log('ppp', project);
+
 		// add project to client array
 		this.projects.push(project);
 
 		// new project item view
-		var projectDiv = new Wu.SidePane.Project(project);
+		var options = {
+			parent : this
+		}
+		var projectDiv = new Wu.SidePane.Project(project, options);
 
 		// add to client container
 		projectDiv.addToBefore(this._projectsContainer);
@@ -208,9 +225,14 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// refresh height
 		this.open();
 
+		// select
+		projectDiv.project._menuItem.select();
 	},
 
 	_projectCreated : function (project, json) {
+
+		// console.log('project: ', project);
+		// console.log('json: ', json);
 
 		var result = JSON.parse(json);
 		var error  = result.error;
@@ -226,7 +248,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		app.Account.addProjectAccess(project); // todo!
 
 		// select project
-		project._menuItem.select();
+		// project._menuItem.select();
+
+		// create project in sidepane
+		this._createNewProject(project);
 
 	},
 

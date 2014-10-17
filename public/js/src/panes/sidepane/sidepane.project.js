@@ -1,9 +1,14 @@
 // Subelements under Clients/Client
 Wu.SidePane.Project = Wu.Class.extend({
 
-	initialize : function (project, parent) {
+	initialize : function (project, options) {
+
+		Wu.setOptions(this, options);
+
 		this.project = project;
-		this._parent = parent; // client div container
+		this.project.setEditMode();
+
+		this._parent = this.options.parent; // client div container
 
 		this.project._menuItem = this;
 
@@ -30,14 +35,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.logo = Wu.DomUtil.create('div', 'project-logo', this._container);
 		this.logo.type = 'logo';
 
-		
-
 		// create users
 		this.users = Wu.DomUtil.create('div', 'project-users-wrap', this._container);
 		this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this.users);
-
-		// Wu.DomEvent.on(this.users, 'mouseenter', this.expandUsers, this);
-		// Wu.DomEvent.on(this.users, 'mouseleave', this.collapseUsers, this);
 
 		// Project stats header
 		this.projectStatsHeader = Wu.DomUtil.create('div', 'project-stats', this.usersInnerWrapper);
@@ -55,7 +55,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.usersInnerWrapper);
 
 		// kill button
-		if (app.Account.canDeleteProject(this.project.store.uuid)) {
+		if (app.Account.canDeleteProject(this.project.store.uuid) || this.options.editMode) {
+			console.log('add kill btn');
 			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');
 		}
 
@@ -87,8 +88,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent.on(this._container, 'mouseenter', this.open, this);
 		Wu.DomEvent.on(this._container, 'mouseleave', this.close, this);
 		Wu.DomEvent.on(this._container, 'click',      this.select, this);
-		Wu.DomEvent.on( this._container, 'mousedown', Wu.DomEvent.stop, this);
+		Wu.DomEvent.on(this._container, 'mousedown',  Wu.DomEvent.stopPropagation, this);	// to prevent closing of project pane
 	
+		console.log('addhoooks -> ', this.project.editMode);
 		// add edit hooks
 		if (this.project.editMode) this.addEditHooks();
 	},
@@ -97,26 +99,28 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent.off(this._container, 'mouseenter', this.open, this);
 		Wu.DomEvent.off(this._container, 'mouseleave', this.close, this);
 		Wu.DomEvent.off(this._container, 'click', this.select, this);
-		Wu.DomEvent.off( this._container, 'mousedown', Wu.DomEvent.stop, this);
+		Wu.DomEvent.off( this._container, 'mousedown', Wu.DomEvent.stopPropagation, this);
 
 		// remove edit hooks
 		if (this.project.editMode) this.removeEditHooks();
 	},
 
 	addEditHooks : function () {
-		// console.log('addEditHooks', this.project.editMode);
+		console.log('addEditHooks', this.project.editMode);
+
+		if (!this.project.editMode) return;
 
 		// editing hooks
-		if (!this.project.editMode) return;
 		Wu.DomEvent.on(this.name, 	 'dblclick', this.edit, this);
 		Wu.DomEvent.on(this.description, 'dblclick', this.editDescription, this);
-		Wu.DomEvent.on(this.logo, 	 'click', Wu.DomEvent.stop, this);
-		Wu.DomEvent.on(this.name, 	 'click', Wu.DomEvent.stop, this);
-		Wu.DomEvent.on(this.description, 'click', Wu.DomEvent.stop, this);
+		// Wu.DomEvent.on(this.logo, 	 'click', Wu.DomEvent.stop, this);
+		// Wu.DomEvent.on(this.name, 	 'click', Wu.DomEvent.stop, this);
+		// Wu.DomEvent.on(this.description, 'click', Wu.DomEvent.stop, this);
 		this.addLogoDZ();
 
 		// add kill hook
 		if (app.Account.canDeleteProject(this.project.getUuid())) {
+			console.log('lkill click')
 			Wu.DomEvent.on(this.kill, 'click', this.deleteProject, this);
 		}
 	},
@@ -130,9 +134,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// editing hooks
 		Wu.DomEvent.off(this.name, 	  'dblclick', this.edit, this);
 		Wu.DomEvent.off(this.description, 'dblclick', this.editDescription, this);
-		Wu.DomEvent.off(this.logo, 	  'click', Wu.DomEvent.stop, this);
-		Wu.DomEvent.off(this.name, 	  'click', Wu.DomEvent.stop, this);
-		Wu.DomEvent.off(this.description, 'click', Wu.DomEvent.stop, this);
+		// Wu.DomEvent.off(this.logo, 	  'click', Wu.DomEvent.stop, this);
+		// Wu.DomEvent.off(this.name, 	  'click', Wu.DomEvent.stop, this);
+		// Wu.DomEvent.off(this.description, 'click', Wu.DomEvent.stop, this);
 		this.removeLogoDZ();
 
 		// remove kill hook
@@ -220,7 +224,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// console.log('select e: ', e);
 
 		// dont select if already active
-		// if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
+		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
 
 		// select project
 		this.project.select();
@@ -268,11 +272,11 @@ Wu.SidePane.Project = Wu.Class.extend({
 		div.innerHTML = value;
 
 		// if name, change slug also
-		if (div.type == 'name') this.project.setSlug(value);
+		this.project.setSlug(value);
 
 		// save latest
-		this.project.store[div.type] = value;
-		this.project._update(div.type);
+		this.project.store['name'] = value;
+		this.project._update('name');
 
 		this.editing = false;
 
