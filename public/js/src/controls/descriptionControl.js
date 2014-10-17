@@ -11,8 +11,6 @@ L.Control.Description = L.Control.extend({
 		    container = L.DomUtil.create('div', className),
 		    options   = this.options;
 
-		    // console.log('container', container);
-
 		// add html
 		container.innerHTML = ich.descriptionControl(); 
 
@@ -21,46 +19,33 @@ L.Control.Description = L.Control.extend({
 	},
 
 	initContainer : function () {                
-
-		// Open Menu Button
-
-		// this._uncollapse = Wu.DomUtil.createId('div', 'uncollapse');
-		// Wu.DomUtil.addClass(this._uncollapse, 'leaflet-control open-uncollapse');
-		// this._uncollapse.innerHTML = 'Show Layer Info';
-
+		
+		// hide by default
 		this._container.style.display = "none";
 
 		// get panes
 		this._content 	= Wu.DomUtil.get('description-control-inner-content');
-		// this._inner 	= Wu.DomUtil.get('description-control-inner-content-box'); 
 		this._outer     = Wu.DomUtil.get('description-control-inner-content-box'); 
 		this._button	= Wu.DomUtil.get('description-toggle-button'); 
-		
-		// (J)
-		// create scroller 
-		this._inner = document.createElement("div");
-		Wu.DomUtil.addClass(this._inner, "description-scroller");
-
-		this._outer.appendChild(this._inner);
-
-		// get legends container
 		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
 		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
-
-	       
-
+		
+		// create scroller 
+		this._inner = document.createElement("div");
+		this._outer.appendChild(this._inner);
+		Wu.DomUtil.addClass(this._inner, "description-scroller");
+			       
 	},      
 
 	setDescription : function (layer) {
 		this._inner.innerHTML = layer.store.description;
 	},
 
-	// clear box
+	// clear content
 	clear : function () {
 		this.activeLayer = false;
 		this._inner.innerHTML = '';
 	},
-
 
 	setActiveLayer : function (layer) {
 		this.setLayer(layer);
@@ -99,26 +84,28 @@ L.Control.Description = L.Control.extend({
 	addHooks : function () {
 		
 		// collapsers
-		Wu.DomEvent.on(this._button,     'mousedown', this.closePane, this);
-		// Wu.DomEvent.on(this._uncollapse, 'mousedown', this.openPane,  this);
+		Wu.DomEvent.on(this._button, 'mousedown', this.closePane, this);
 
 		// edit mode
-		if (this.editMode) {
-			Wu.DomEvent.on(this._inner, 'dblclick', this.toggleEdit, this);
-		}
+		if (this.editMode) Wu.DomEvent.on(this._inner, 'dblclick', this.toggleEdit, this);
 
 		// prevent map double clicks
 		Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
+		Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
 
-		// prevent map scrollzoom
-		var map = app._map;
-		Wu.DomEvent.on(this._content, 'mouseenter', function () {
-			map.scrollWheelZoom.disable();
-		}, this);
-		
-		Wu.DomEvent.on(this._content, 'mouseleave', function () {
-			map.scrollWheelZoom.enable();
-		}, this);
+	},
+	
+	removeHooks : function () {
+
+		// collapsers
+		Wu.DomEvent.off(this._button, 'mousedown', this.closePane, this);
+
+		// edit mode
+		if (this.editMode) Wu.DomEvent.off(this._inner, 'dblclick', this.toggleEdit, this);
+
+		// prevent map double clicks
+		Wu.DomEvent.off(this._container, 'dblclick', Wu.DomEvent.stop, this);
+		Wu.DomEvent.off(this._container, 'dblclick', Wu.DomEvent.stop, this);
 
 	},
 
@@ -132,18 +119,39 @@ L.Control.Description = L.Control.extend({
 
 	},
 	
+	editOn : function () {
+
+		if (!this.activeLayer) return;
+
+		this.editing = true;
+
+		// bind text editor
+		this.addGrande();
+
+		// disable dragging
+		app._map.dragging.disable();
+
+		// add class to info box to indicate editMode
+		Wu.DomUtil.addClass(this._inner, 'description-editing');
+
+		// bind keys
+		Wu.DomEvent.on(this._inner, 'keydown', this.keyDown, this);
+
+		// prevent map scrollzoom
+		var map = app._map;
+		map.scrollWheelZoom.disable();
+		
+	},	
+
+	keyDown : function (e) {
+		if (e.keyCode == 27 || e.keyCode == 9) {
+			this.editOff();
+		}
+	},
+
 	editOff : function () {
-		// console.log('editOff');
 		this.editing = false;
 
-		// unbind text editor
-		// grande.unbind([this._inner]);
-
-		// // hide grande menu
-		// var g = document.getElementsByClassName('text-menu')[0];
-		// Wu.DomUtil.removeClass(g, 'active');
-		// Wu.DomUtil.addClass(g, 'hide');
-		
 		// hide grande
 		this.removeGrande();
 
@@ -153,58 +161,38 @@ L.Control.Description = L.Control.extend({
 		// add class to info box to indicate editMode
 		Wu.DomUtil.removeClass(this._inner, 'description-editing');
 
-		// bind click anywhere but on INFO to turn off editing
-		Wu.DomEvent.off(this._inner, 'click', Wu.DomEvent.stop, this);
-		Wu.DomEvent.off(document, 'click', this.editOff, this);
+		// blur
+		this._inner.setAttribute('contenteditable', "false");
+
+		// prevent map scrollzoom
+		var map = app._map;
+		map.scrollWheelZoom.enable();
 
 		// save text
 		if (this.activeLayer) {
-			var text = this._inner.innerHTML;
-			// console.log('saving text: ', text);
-			
+			var text = this._inner.innerHTML;			
 			this.activeLayer.store.description = text;
 			this.activeLayer.save('description');
+
+			// set status
+			app.setSaveStatus();
 		}
 
 	},
 
-	editOn : function () {
-
-		if (!this.activeLayer) {
-			// console.log('no active layer, so fuck it.')
-			return;
-		}
-
-		// console.log('editOn');
-		this.editing = true;
-
-		// bind text editor
-		// grande.bind([this._inner]);
-		this.addGrande();
-
-		// disable dragging
-		app._map.dragging.disable();
-
-		// add class to info box to indicate editMode
-		Wu.DomUtil.addClass(this._inner, 'description-editing');
-
-		// bind click anywhere but on INFO to turn off editing
-		Wu.DomEvent.on(this._inner, 'click', Wu.DomEvent.stop, this);
-		Wu.DomEvent.on(document, 'click', this.editOff, this);
-
-	},
-
-	textChange : function () {
-		// console.log('text Change');
+	textChange : function (editing) {
+		if (!editing) this.editOff();
 	},
 
 	removeGrande : function () {
-
-		
+		if (!this.grande) return;
+		this.grande.destroy();
+		delete this.grande;	
 	},
 
 	addGrande : function () {
-		// get textarea nodes for grande
+
+		// get textarea node for grande
 		var nodes = this._inner;
 
 		// get sources
@@ -218,20 +206,24 @@ L.Control.Description = L.Control.extend({
 
 		        	// file attachments
 			        attachments : new G.Attachments(sources, {
-			        	icon : 'fileAttachment.png',
+			        	icon : ['http://85.10.202.87:8080/images/image-c9471cb2-7e0e-417d-a048-2ac501e7e96f',
+			        		'http://85.10.202.87:8080/images/image-7b7cc7e4-404f-4e29-9d7d-11f0f24faf42'],
+			        	className : 'attachment'
 			        }),
 
 			        // image attachments
-			        images :  new G.Attachments(sources, {
-			        	icon : 'imageAttachment.png',
-			        	embedImage : true 			// embed image in text! 
+			        images :  new G.Attachments(images, {
+			        	icon : ['http://85.10.202.87:8080/images/image-0359b349-6312-4fe5-b5d7-346a7a0d3c38',
+			        		'http://85.10.202.87:8080/images/image-087ef5f5-b838-48bb-901f-7e896de7c59e'],
+			        	embedImage : true,			// embed image in text! 
+			        	className : 'image-attachment'
 			        }),
 
 			},
 			events : {
 
 				// add change event listener
-				change : this.textChange
+				change : this.textChange.bind(this)
 			}
 		}
 
@@ -240,53 +232,14 @@ L.Control.Description = L.Control.extend({
 
 	},
 
-	// (j)
 	closePane : function () {
-	      
-		// console.log('this._content', this._content)
 		this._container.style.display = "none";
-
-		// this._content.parentNode.parentNode.style.width = '34px';
-		// this._firstchildofmine = this._content.parentNode.parentNode.getElementsByTagName('div')[0];
-		// this._content.parentNode.parentNode.insertBefore(this._uncollapse, this._firstchildofmine);
-	      
-
-		// Slide the LEGENDS
-		// if (this._legendsContainer) {
-		//     Wu.DomUtil.addClass(this._legendsContainer, 'legends-push-left');
-		// }
-			      
-		// this._uncollapse.className = 'leaflet-control open-uncollapse leaflet-drag-target';		
-		
 	},
 	
-	// (j)
 	openPane : function () {
-
-		this._container.style.display = "block";
-
-		// Show Info box
-		// this._content.parentNode.parentNode.style.width = '320px';					
-
-		// Animate opener button
-		// this._uncollapse.className = 'leaflet-control uncollapse-killer';
-			
-		// Slide the LEGENDS
-	 //   	 if (this._legendsContainer) {
-		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-push-left');
-		// }
-		// Set class name and remove from DOM
-		// var that = this;                        
-		// setTimeout(function(){
-		// 	that._content.parentNode.parentNode.removeChild(that._uncollapse);
-		// 	that._uncollapse.className = 'leaflet-control open-uncollapse';
-		// }, 500);						
-		
-	},
+		this._container.style.display = "block";				
+	}
 	
-      
-     
-
 });
 
 
