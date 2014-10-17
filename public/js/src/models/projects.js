@@ -111,7 +111,13 @@ Wu.Project = Wu.Class.extend({
 	
 		// refresh sidepane
 		this.refreshSidepane();
-	
+
+		// set active project in sidepane
+		if (this._menuItem) {
+			this._menuItem._markActive();
+		} else {
+			console.log('multioplyyy');
+		}
 	},
 
 	addNewLayer : function (layer) {
@@ -398,14 +404,26 @@ Wu.Project = Wu.Class.extend({
 
 		users.forEach(function (user) {
 			var partial = user.store.uuid.slice(0, 13);
-			// remove silentUsers from user list
-			if (silent.indexOf(partial) == -1) {
+			if (silent.indexOf(partial) == -1) { // filter silentUsers from user list
 				// add user to list
 				html += '<p>' + user.store.firstName + ' ' + user.store.lastName + '</p>';
 			}
 		}, this);
 
 		return html;
+	},
+
+	addAccess : function () {
+
+		var users = app.Users;
+		for (u in users) {
+			var user = users[u];
+			if (user.isSuperadmin()) {
+				user.addProjectAccess(this);
+			}
+		}
+
+		app.Account.addProjectAccess(this);
 	},
 
 	getHeaderLogo : function () {
@@ -498,6 +516,13 @@ Wu.Project = Wu.Class.extend({
 		this._update('position');
 	},
 
+	setSidepane : function (sidepane) {
+		this._menuItem = sidepane;
+	},
+
+	getSidepane : function () {
+		return this._menuItem;
+	},
 
 	removeFiles : function (files) {
 
