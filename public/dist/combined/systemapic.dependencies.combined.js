@@ -5495,7 +5495,7 @@ L.Path = (L.Path.SVG && !window.L_PREFER_CANVAS) || !L.Browser.canvas ? L.Path :
 	_updateStyle: function () {
 		var options = this.options;
 
-		console.log('_updateStyle', options);
+		// console.log('_updateStyle', options);
 
 		if (options.stroke) {
 			this._ctx.lineWidth = options.weight;
@@ -6546,15 +6546,15 @@ L.GeoJSON = L.FeatureGroup.extend({
 	},
 
 	setStyle: function (style) {
-		console.log('L.geoJson setStyle(style)', style)
+		// console.log('L.geoJson setStyle(style)', style)
 		this.eachLayer(function (layer) {
-			console.log('eachlayer, ', layer);
+			// console.log('eachlayer, ', layer);
 			this._setLayerStyle(layer, style);
 		}, this);
 	},
 
 	_setLayerStyle: function (layer, style) {
-		console.log('WAHWAHWAHWAH');
+		// console.log('WAHWAHWAHWAH');
 		if (typeof style === 'function') {
 			style = style(layer.feature);
 		}
@@ -12095,7 +12095,7 @@ G.Rande = G.Class.extend({
 		events : {
 			// fired on changes to text. should be overridden by user, like G.rande.events.change = fn();
 			change : function (e) { 
-				console.log('change options.event!', e); 
+				// console.log('change options.event!', e); 
 			}
 		}
 
@@ -12113,13 +12113,13 @@ G.Rande = G.Class.extend({
 	events : {
 		// fired on changes to text. should be overridden by user, like G.rande.events.change = fn();
 		change : function (e) { 
-			console.log('change event!', e); 
+			// console.log('change event!', e); 
 		}
 	},
 
 	initialize : function (options, nodes) {
 
-		console.log('init grande', options);
+		// console.log('init grande', options);
 
 		// cheatcode
 		G.r = this;
@@ -12159,7 +12159,7 @@ G.Rande = G.Class.extend({
 	},
 
 	destroy : function () {
-		console.log('destroy!');
+		// console.log('destroy!');
 		this.unbind();
 		Wu.DomUtil.remove(this.buttonsContainer);
 		Wu.DomUtil.remove(this.toolbarContainer);
@@ -12401,7 +12401,7 @@ G.Rande = G.Class.extend({
 			reTag = new RegExp(tagClass);
 
 			if (reTag.test(className)) {
-				console.log('LETS DO THE ');
+				// console.log('LETS DO THE ');
 				this._fireOtherClick();	// works for native buttons
 				switch(tag) {
 				
@@ -12893,7 +12893,7 @@ G.Attachments = G.Class.extend({
 
 	initialize : function (source, options) {
 
-		console.log('init grande attachments, ', options);
+		// console.log('init grande attachments, ', options);
 
 		// set options
 		G.setOptions(this, options);
@@ -12919,14 +12919,14 @@ G.Attachments = G.Class.extend({
 
 	// hack cause i dont get it
 	plug : function (grande) {
-		console.log('plug!');
+		// console.log('plug!');
 		// attach grande
 		this.grande = grande;
 		this._initialize();
 	},
 
 	unplug : function (grande) {
-		console.log('unplug!', this);
+		// console.log('unplug!', this);
 		this.removeHooks();
 	},
 
@@ -13014,7 +13014,7 @@ G.Attachments = G.Class.extend({
 		// get sources
 		var sources = this.source;
 
-		console.log('CREATE: ', this.source);
+		// console.log('CREATE: ', this.source);
 
 		// create source div
 		var container = this._popup = Wu.DomUtil.create('div', 'grande-sources-container');
@@ -13097,7 +13097,7 @@ G.Attachments = G.Class.extend({
 	},
 
 	onToolbarClick : function () {
-		console.log('ONTOOLBAR!');
+		// console.log('ONTOOLBAR!');
 		this.closePopup();
 	},
 

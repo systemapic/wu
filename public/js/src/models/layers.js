@@ -295,7 +295,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		try { that.data = JSON.parse(json); }
 		catch (e) { return console.log('parse error!', json)}
 		
-		console.log('Got geojson: ', that.data);
+		// console.log('Got geojson: ', that.data);
 
 		// return if errors
 		if (!that.data) return console.error('no data');
@@ -322,7 +322,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		// add layer hooks
 		this.addLayerHooks();
 
-		console.log('GEOJSON: ', this);
+		// console.log('GEOJSON: ', this);
 
 	},
 
@@ -333,8 +333,8 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		var file = this.getFile(fileUuid);
 
-		console.log('got file: ', file);
-		console.log('dataSize: ', file.dataSize);
+		// console.log('got file: ', file);
+		// console.log('dataSize: ', file.dataSize);
 		return parseInt(file.dataSize);
 
 	},
@@ -402,9 +402,9 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	multiStyleChanged : function (data, multi, layr) {
 
-		console.log('multiStyleChanged: data: ', data, this);
-		console.log('multi: ', multi);
-		console.log('layr: ', layr);
+		// console.log('multiStyleChanged: data: ', data, this);
+		// console.log('multi: ', multi);
+		// console.log('layr: ', layr);
 
 		var layer = layr;
 		var style = data.style;
@@ -418,7 +418,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	styleChanged : function (data) {
 
-		console.log('styleChanged: data: ', data, this);
+		// console.log('styleChanged: data: ', data, this);
 		// return;
 
 		var style = data.style;
@@ -426,7 +426,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		var id = target._leaflet_id;
 		var layer = this.getPathParentLayer(id);
-		console.log('PARERRRRRRR ----- layer: ', layer);
+		// console.log('PARERRRRRRR ----- layer: ', layer);
 		var __sid = target.feature.properties.__sid;
 
 		// save style
@@ -448,9 +448,9 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 	saveStyle : function (style, __sid) {	
 			
 		var json = this.layer.toGeoJSON();
-		console.log('toGeoJSON: ', json);
-		console.log('__sid: ', __sid);
-		console.log('style: ', style);
+		// console.log('toGeoJSON: ', json);
+		// console.log('__sid: ', __sid);
+		// console.log('style: ', style);
 
 		var json = {};
 		json.layer  = this.getUuid();

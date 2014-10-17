@@ -133,7 +133,7 @@ L.Control.Description = L.Control.extend({
 	},
 	
 	editOff : function () {
-		console.log('editOff');
+		// console.log('editOff');
 		this.editing = false;
 
 		// unbind text editor
@@ -160,7 +160,7 @@ L.Control.Description = L.Control.extend({
 		// save text
 		if (this.activeLayer) {
 			var text = this._inner.innerHTML;
-			console.log('saving text: ', text);
+			// console.log('saving text: ', text);
 			
 			this.activeLayer.store.description = text;
 			this.activeLayer.save('description');
@@ -171,11 +171,11 @@ L.Control.Description = L.Control.extend({
 	editOn : function () {
 
 		if (!this.activeLayer) {
-			console.log('no active layer, so fuck it.')
+			// console.log('no active layer, so fuck it.')
 			return;
 		}
 
-		console.log('editOn');
+		// console.log('editOn');
 		this.editing = true;
 
 		// bind text editor
@@ -195,7 +195,7 @@ L.Control.Description = L.Control.extend({
 	},
 
 	textChange : function () {
-		console.log('text Change');
+		// console.log('text Change');
 	},
 
 	removeGrande : function () {

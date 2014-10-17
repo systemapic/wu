@@ -73,7 +73,7 @@ Wu.StatusPane = Wu.Class.extend({
 		// remove help pseudo
 		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
 
-		console.log('StatusPane.open(). Currently active menu item:', app._activeMenuItem);
+		// console.log('StatusPane.open(). Currently active menu item:', app._activeMenuItem);
 	},
 
 	// close sidepane menu
@@ -83,7 +83,7 @@ Wu.StatusPane = Wu.Class.extend({
 		sidepane.collapse();
 		this.refresh();
 
-		console.log('StatusPane.close(). Currently active menu item:', app._activeMenuItem);
+		// console.log('StatusPane.close(). Currently active menu item:', app._activeMenuItem);
 
 		// app.MapPane._container
 		Wu.DomUtil.removeClass(app.MapPane._container, "map-blur") // (j) – removes the blur on map if it's set by one of the fullpanes
@@ -245,7 +245,7 @@ Wu.ProgressBar = Wu.Class.extend({
 		if (percent < this._current + 9) return;
 
 		var bar = this._progressBar;
-		console.log('progress: ', percent);
+		// console.log('progress: ', percent);
 		bar.style.opacity = 1;
 		bar.style.width = percent + '%';
 

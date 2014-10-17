@@ -54,7 +54,7 @@ Wu.User = Wu.Class.extend({
 	},
 
 	setAccess : function (project) {
-		console.log('setAccess to new proejct: ', project);
+		// console.log('setAccess to new proejct: ', project);
 		// todo!
 	},
 
@@ -135,6 +135,7 @@ Wu.User = Wu.Class.extend({
 		var access = {
 			userUuid    : this.getUuid(),
 			projectUuid : project.getUuid(),
+			// clientUuid  : project.getClientUuid(),
 			role        : role, // eg. 'reader'
 			add         : add // true or false
 		}
@@ -143,10 +144,11 @@ Wu.User = Wu.Class.extend({
 		Wu.Util.postcb('/api/user/delegate', JSON.stringify(access), this.delegatedAccess, this);
 
 		// this._saveAccess(access)
+		app.setSaveStatus();
 	},
 
 	delegatedAccess : function (context, result) {
-		console.log('saved access!', context, result);
+		// console.log('saved access!', context, result);
 	},
 	
 

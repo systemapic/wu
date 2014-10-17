@@ -44,7 +44,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	createLayerFromGeoJSON : function (geojson) {
-		console.log('createGeoJSONLayer', geojson);
+		// console.log('createGeoJSONLayer', geojson);
 
 		var options = {
 			project 	: this.getUuid(),
@@ -54,7 +54,7 @@ Wu.Project = Wu.Class.extend({
 
 		var json = JSON.stringify(options);
 		
-		console.log('POST createLayerFromGeoJSON');
+		// console.log('POST createLayerFromGeoJSON');
 
  		Wu.Util.postcb('/api/layers/new', json, this._createdLayerFromGeoJSON, this);
 
@@ -62,9 +62,9 @@ Wu.Project = Wu.Class.extend({
 
 	_createdLayerFromGeoJSON : function (context, data) {
 
-		console.log('_createdLayerFromGeoJSON: data, context', data, context);
+		// console.log('_createdLayerFromGeoJSON: data, context', data, context);
 		var parsed = JSON.parse(data);
-		console.log('parsed: ', parsed);
+		// console.log('parsed: ', parsed);
 
 		// data = {
 		// 	error : false,
@@ -94,7 +94,7 @@ Wu.Project = Wu.Class.extend({
 
 	setEditMode : function () {
 		// set editMode
-		console.log('this: ', this);
+		// console.log('this: ', this);
 		this.editMode = false;
 		if (app.Account.canUpdateProject(this.store.uuid)) this.editMode = true;
 	},
@@ -189,8 +189,8 @@ Wu.Project = Wu.Class.extend({
 
 
 	_update : function (field) {
-		console.log('field: ', field);
-		console.log(this.store);
+		// console.log('field: ', field);
+		// console.log(this.store);
 		var json = {};
 		json[field] = this.store[field];
 		json.uuid = this.store.uuid;
@@ -210,7 +210,7 @@ Wu.Project = Wu.Class.extend({
 		// console.log('this.lastSaved= ', this.lastSaved);
 
 
-		console.log('saving project field: ', json);
+		// console.log('saving project field: ', json);
 
 		var string = JSON.stringify(json);
 		this._save(string);
@@ -227,7 +227,7 @@ Wu.Project = Wu.Class.extend({
 	
 
 	_save : function (string) {
-		console.log('saving...');                                       // TODO: pgp
+		// console.log('saving...');                                       // TODO: pgp
 		Wu.save('/api/project/update', string);                         // TODO: save only if actual changes! saving too much already
 	
 		// set status
@@ -244,7 +244,7 @@ Wu.Project = Wu.Class.extend({
 		}
 		var json = JSON.stringify(options);
 		
-		console.log('POST: _saveNew');
+		// console.log('POST: _saveNew');
  		Wu.Util.postcb('/api/project/new', json, context._projectCreated, this);
 
 	},
@@ -317,6 +317,10 @@ Wu.Project = Wu.Class.extend({
 
 	getClient : function () {
 		return app.Clients[this.store.client];
+	},
+
+	getClientUuid : function () {
+		return this.store.client;
 	},
 
 	getBaselayers : function () {
@@ -486,9 +490,9 @@ Wu.Project = Wu.Class.extend({
 
 	removeFiles : function (files) {
 
-		console.log('*********************')
-		console.log('removeFiles: files: ', files);
-		console.log('*********************')
+		// console.log('*********************')
+		// console.log('removeFiles: files: ', files);
+		// console.log('*********************')
 
 		var list = app.SidePane.DataLibrary.list,
 		    layerMenu = app.MapPane.layerMenu,
@@ -499,10 +503,10 @@ Wu.Project = Wu.Class.extend({
 		// iterate over files and delete
 		files.forEach(function(file, i, arr) {
 
-			console.log('removeFiles: ', file);
-			console.log('this.store.files: ', this.store.files);
-			console.log('this.layers: ', this.layers);
-			console.log('this.store.layermenu: ', this.store.layermenu);
+			// console.log('removeFiles: ', file);
+			// console.log('this.store.files: ', this.store.files);
+			// console.log('this.layers: ', this.layers);
+			// console.log('this.store.layermenu: ', this.store.layermenu);
 
 			// remove from list
 			list.remove('uuid', file.uuid);

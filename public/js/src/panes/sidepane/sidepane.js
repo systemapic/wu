@@ -86,7 +86,7 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	expand : function () {
-		console.log('expand');
+		// console.log('expand');
 		this._container.style.height = '100%';
 		this.openPane();
 	},

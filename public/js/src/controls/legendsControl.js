@@ -227,7 +227,7 @@ L.Control.Legends = L.Control.extend({
 		if (!legend) { this._legendsContainer.style.display = 'none'; return; }
 
 
-		console.log('remove legend, yo');
+		// console.log('remove legend, yo');
 
 		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
 		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
@@ -278,7 +278,7 @@ L.Control.Legends = L.Control.extend({
 		// Store legends height
 		this.calculateHeight();
 
-		console.log('this.legendsCounter.length', this.legendsCounter.length)
+		// console.log('this.legendsCounter.length', this.legendsCounter.length)
 
 		// Hide legends if it's empty
 		if ( this.legendsCounter.length == 0 ) this._legendsContainer.style.display = 'none';

@@ -329,7 +329,7 @@ Wu.Util = {
 
 		http.onreadystatechange = function() {
 		    if(http.readyState == 4 && http.status == 200) {
-			console.log(http.responseText);
+			// console.log(http.responseText);
 		    }
 		}
 		http.send(json);
@@ -337,7 +337,7 @@ Wu.Util = {
 
 	// post with callback
 	postcb : function (path, json, cb, self) {
-		console.log('POST: postcb', JSON.parse(json));
+		// console.log('POST: postcb', JSON.parse(json));
 		var http = new XMLHttpRequest();
 		var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
 		url += path;
@@ -350,9 +350,9 @@ Wu.Util = {
 		    if(http.readyState == 4 && http.status == 200) {
 			if (cb) { 
 				try {
-				console.log('RESPONSE: ', JSON.parse(http.responseText));
+				// console.log('RESPONSE: ', JSON.parse(http.responseText));
 				} catch (e) {
-					console.log('RESPONSE: ', http.responseText);
+					// console.log('RESPONSE: ', http.responseText);
 				}
 
 				cb(self, http.responseText); 
@@ -429,16 +429,16 @@ Wu.Util = {
 
 	// experimental zip fn's
 	generateZip : function (data) {
-		console.log('# generateZip #')
+		// console.log('# generateZip #')
 
 		if (!typeof data == 'string') {
-			console.log('stringify')
+			// console.log('stringify')
 			data = JSON.stringify(data);
 		}
 
-		console.log('string length: ', data.length);
+		// console.log('string length: ', data.length);
 		var compressed = LZString.compress(data);
-		console.log('compressd length: ', compressed.length);
+		// console.log('compressd length: ', compressed.length);
 		
 
 		return compressed;
@@ -448,7 +448,7 @@ Wu.Util = {
 	zipSave : function (path, json) {
 
 		if (!typeof json == 'string') {
-			console.log('stringify')
+			// console.log('stringify')
 			var string = JSON.stringify(json);
 		} else {
 			var string = json;
@@ -457,11 +457,11 @@ Wu.Util = {
 		var my_lzma = new LZMA('//85.10.202.87:8080/js/lib/lzma/lzma_worker.js');
 		my_lzma.compress(string, 1, function (result) {
 		       
-			console.log('my_lzma finished!');
-			console.log(result);
-			console.log(typeof result);
+			// console.log('my_lzma finished!');
+			// console.log(result);
+			// console.log(typeof result);
 			var string = JSON.stringify(result);
-			console.log('string: ', string);
+			// console.log('string: ', string);
 
 			var http = new XMLHttpRequest();
 			var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
@@ -473,7 +473,7 @@ Wu.Util = {
 
 			http.onreadystatechange = function() {
 				if(http.readyState == 4 && http.status == 200) {
-					console.log(http.responseText);
+					// console.log(http.responseText);
 				}
 			}
 			http.send(string);
@@ -483,7 +483,7 @@ Wu.Util = {
 		}, 
 
 		function (percent) {
-			console.log('lzma progress: ', percent);
+			// console.log('lzma progress: ', percent);
 		});
 
 		
@@ -1738,7 +1738,7 @@ L.Popup.include({
 	},
 
 	expand : function () {
-		console.log('expand');
+		// console.log('expand');
 		this._container.style.height = '100%';
 		this.openPane();
 	},
@@ -2017,7 +2017,7 @@ L.Popup.include({
 
 	// check swipe of sidepane on selecting menu item (j)
 	checkSwipe : function (prev) {
-		console.log('checkSwipe -> prev: ', prev);
+		// console.log('checkSwipe -> prev: ', prev);
 		if (prev) return this.swiper(prev);
 
 		// Hide the Deactivated Pane
@@ -2036,8 +2036,8 @@ L.Popup.include({
 		var swypefrom = prev._content;
 		var swypeto = Wu.app._active;               
 
-		console.log('prev', prev);
-		console.log('swypefrom', swypefrom);
+		// console.log('prev', prev);
+		// console.log('swypefrom', swypefrom);
 
 		// if same, do nothing
 		if (swypefrom == swypeto) return;
@@ -2146,7 +2146,7 @@ L.Popup.include({
 		// Hide the Deactivated Pane
 		if (Wu.app._active) {
 
-				console.log('swypefrom', swypefrom);
+				// console.log('swypefrom', swypefrom);
 
 			    Wu.DomUtil.removeClass(swypefrom, 'show');
 
@@ -2266,7 +2266,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	initContent : function () {
 
-		console.log('init clients', this._content, this._scrollWrapper );
+		// console.log('init clients', this._content, this._scrollWrapper );
 
 		// h3 title
 		// var title = Wu.DomUtil.create('h3', '', this._container);
@@ -2319,7 +2319,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	closeClient : function (client) {
-		console.log('close client: ', client.name);
+		// console.log('close client: ', client.name);
 	},
 
 	remove : function () {
@@ -2404,7 +2404,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	_enableConfirm : function () {
 		var target = Wu.DomUtil.get('editor-client-confirm-button');
 		target.style.backgroundColor = '';
-		console.log('Client name OK.');
+		// console.log('Client name OK.');
 	},
 
 	_cancel : function () {
@@ -2450,7 +2450,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	toggleEdit : function (e) { // this = client
-		console.log('toggle.edit');
+		// console.log('toggle.edit');
 
 		// stop propagation
 		if (e) Wu.DomEvent.stop(e); 
@@ -2632,12 +2632,12 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	addEditHooks : function () {
-		console.log('addEditHooks', this.project.editMode);
+		// console.log('addEditHooks', this.project.editMode);
 
 		// editing hooks
 		if (!this.project.editMode) return;
 		Wu.DomEvent.on(this.name, 	 'dblclick', this.edit, this);
-		Wu.DomEvent.on(this.description, 'dblclick', this.edit, this);
+		Wu.DomEvent.on(this.description, 'dblclick', this.editDescription, this);
 		Wu.DomEvent.on(this.logo, 	 'click', Wu.DomEvent.stop, this);
 		this.addLogoDZ();
 
@@ -2650,12 +2650,12 @@ Wu.SidePane.Project = Wu.Class.extend({
 	removeEditHooks : function () {
 		// if (!this.project.editMode) return;
 
-		console.log('addEditHooks', this.project.editMode);
+		// console.log('addEditHooks', this.project.editMode);
 
 
 		// editing hooks
 		Wu.DomEvent.off(this.name, 	  'dblclick', this.edit, this);
-		Wu.DomEvent.off(this.description, 'dblclick', this.edit, this);
+		Wu.DomEvent.off(this.description, 'dblclick', this.editDescription, this);
 		Wu.DomEvent.off(this.logo, 	  'click', Wu.DomEvent.stop, this);
 		this.removeLogoDZ();
 
@@ -2741,7 +2741,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	select : function (e) {
 
-		console.log('select e: ', e);
+		// console.log('select e: ', e);
 
 		// dont select if already active
 		// if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
@@ -2758,7 +2758,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	edit : function (e) {
-		console.log('edit!', e, this);
+		// console.log('edit!', e, this);
 		
 		// return if already editing
 		if (this.editing) return;
@@ -2797,6 +2797,58 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// save latest
 		this.project.store[div.type] = value;
 		this.project._update(div.type);
+
+		this.editing = false;
+
+	},
+
+	editDescription : function (e) {
+		// console.log('edit!', e, this);
+		
+		// return if already editing
+		if (this.editing) return;
+		this.editing = true;
+
+		var div = e.target;
+		var type = div.type;
+		var value = div.innerHTML;
+
+		// var input = ich.injectProjectEditInput({value:value});
+		div.innerHTML = '';
+		var input = Wu.DomUtil.create('textarea', 'project-edit-textarea', div);
+		input.innerHTML = value;
+
+		// focus
+		// var target = div.firstChild;
+		var target = input;
+		target.focus();
+		target.selectionStart = target.selectionEnd;	// prevents text selection
+
+		// save on blur or enter
+		Wu.DomEvent.on( target,  'blur',    this._editDescriptionBlur, this );     // save folder title
+		Wu.DomEvent.on( target,  'keydown', this._editKey,  this );     // save folder title
+
+	},
+
+	_editDescriptionBlur : function (e) {
+		
+		// get value
+		var value = e.target.value;
+
+		// revert to <div>
+		var div = e.target.parentNode;
+		div.innerHTML = value;
+
+		console.log('calue)', value);
+		console.log('div: ', div);
+		console.log('type: ', div.type);
+
+		// if name, change slug also
+		// if (div.type == 'name') this.project.setSlug(value);
+
+		// save latest
+		this.project.store.description = value;
+		this.project._update('description');
 
 		this.editing = false;
 
@@ -3533,7 +3585,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	// reply from server
 	createdUser : function (context, json) {
-		console.log('createdUser: ', context, json);
+		// console.log('createdUser: ', context, json);
 
 		var store = JSON.parse(json);
 		var user = new Wu.User(store);
@@ -3582,7 +3634,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	
 	checkAll : function () {
-		console.log('checkAll');
+		// console.log('checkAll');
 	},
 
 	getSelected : function () {
@@ -3669,7 +3721,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 	getAccessTemplate : function (user) {
 		// get no of projets etc for user
 		var projects = user.getProjects();
-		return projects.length + ' project(s)';
+		if (projects.length > 1) return projects.length + ' projects';
+		return projects.length + ' project';
 	},
 
 	getProjectsTemplate : function (user) {
@@ -3793,6 +3846,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// Toggle wrappers
 		this._container.style.display = 'block';
 
+		// update errythign
+		this.update();
+
 
 	},
 
@@ -3848,7 +3904,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	toggleReadAccess : function (item) {
-		console.log('toggle READ: ', item);
+		// console.log('toggle READ: ', item);
 		var user = item.user;
 
 		// get current state
@@ -3869,7 +3925,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 
 	toggleUpdateAccess : function (item) {
-		console.log('toggle: ', item);
+		// console.log('toggle: ', item);
 		var user = item.user;
 
 		// get current state
@@ -3896,7 +3952,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	toggleManageAccess : function (item) {
-		console.log('toggle: ', item);
+		// console.log('toggle: ', item);
 		var user = item.user;
 
 		// get current state
@@ -4134,13 +4190,13 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	closeAll : function () {
-		console.log('closeAll');
+		// console.log('closeAll');
 
 		// close all options folders
 		var options = app.SidePane.Map.mapSettings;
 		for (o in options) {
 			var option = options[o];
-			console.log('option: ', option);
+			// console.log('option: ', option);
 			if (option._isOpen) option.close();
 		}
 
@@ -4249,7 +4305,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._isOpen = true;
 
 		if (app._pendingClose && app._pendingClose != this) {
-			console.log('ap pend: ', app._pendingClose); 
+			// console.log('ap pend: ', app._pendingClose); 
 			app._pendingClose.close();
 		}
 		app._pendingClose = this;
@@ -4257,7 +4313,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 
 	close : function () {   				// perhaps todo: now it's closing every pane, cause addHooks been run 6 times.
-		console.log('close ', this.type);		// set this to app._pendingclose here for just one close... 
+		// console.log('close ', this.type);		// set this to app._pendingclose here for just one close... 
 		this.calculateHeight();
 		this._outer.style.height = this.minHeight + 'px';        
 		this._close();
@@ -4990,7 +5046,7 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 			// prevent other click events
 			Wu.DomEvent.stop(e);
 
-			return console.log('edit layer!');
+			return;// console.log('edit layer!');
 
 			// toggle editMode
 			this.toggleEdit(layermenuLayer);
@@ -4999,6 +5055,26 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 		
 
+	},
+
+	getLayerByUuid : function (layerUuid) {
+		var layer = _.find(this._layers, function (l) {
+			// console.log('l: ', l);
+			return l.layer.store.uuid == layerUuid;	
+		});
+
+		return layer;
+	},
+
+	enableLayerByUuid : function (layerUuid) {
+		var layer = this.getLayerByUuid(layerUuid);
+		if (layer) {
+			this.toggle(layer);
+			return layer;	
+		}
+
+		return false;
+		
 	},
 
 	calculateHeight : function () {
@@ -5025,6 +5101,8 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	toggle : function (layer) {
 		
+		// console.log('toggle --> ', layer);
+
 		// ensure layerMenu is active
 		this.layerMenu = this.layerMenu || Wu.app.MapPane.layerMenu;
 		if (!this.layerMenu) this.layerMenu = this.enableLayermenu();
@@ -5580,7 +5658,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 	toggleControl : function (e) {
 		
-		console.log('toggleControl');
+		// console.log('toggleControl');
 
 		// prevent default checkbox behaviour
 		if (e.type == 'click') return Wu.DomEvent.stop(e);
@@ -5789,7 +5867,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	
 
 	textChange : function () {
-		console.log('textChange');
+		// console.log('textChange');
 	},
 
 	removeEditHooks : function () {
@@ -5912,12 +5990,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// editMode: hide/show (+) button
 		if (this.project.editMode) {
 			Wu.DomUtil.removeClass(this._newfolder, 'displayNone');
-			console.log('ADDDDDD____');
+			// console.log('ADDDDDD____');
 			// this.addEditHooks();
 		} else {
 			Wu.DomUtil.addClass(this._newfolder, 'displayNone');
 			// this.removeEditHooks();
-			console.log("REMMMM___");
+			// console.log("REMMMM___");
 		}
 
 	},
@@ -5996,7 +6074,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	deleteFolder : function (uuid) {
 		if (confirm('Are you sure you want to delete folder ' + this.folders[uuid].title + '?')) {
-			console.log('delete folder: ', uuid);
+			// console.log('delete folder: ', uuid);
 			delete this.folders[uuid];
 			this.save();
 		}
@@ -6239,7 +6317,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	_deactivate : function () {
-		console.log('deactive sidepane datalib');
+		// console.log('deactive sidepane datalib');
 		this.dz.disable();
 		this.disableFullscreenDZ();
 	},
@@ -6353,11 +6431,11 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// populate download window
 		var tr = '';
-		console.log('cheks: ', checks);
+		// console.log('cheks: ', checks);
 		checks.forEach(function (file, i, arr) {
-			console.log('file: ', file);
+			// console.log('file: ', file);
 			var tmp = Wu.extend({}, file);
-			console.log('tmp:', tmp);
+			// console.log('tmp:', tmp);
 			// tmp.format = tmp.format.join(', ');     // fix format format
 			tr += ich.datalibraryDownloadRow(tmp);
 		}, this);
@@ -6399,7 +6477,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	deleteFiles : function (files) {
-		console.log('deleting ', files);
+		// console.log('deleting ', files);
 
 		// set status
 		app.setStatus('Deleting');
@@ -6482,16 +6560,16 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// set dz events
 		this.dz.on('drop', function (e) { 
-			console.log('drop', e); 
+			// console.log('drop', e); 
 		});
 
 		this.dz.on('dragenter', function () { 
-			console.log('dragenter'); 
+			// console.log('dragenter'); 
 		});
 
 		this.dz.on('addedfile', function (file) { 
 
-			console.log('dz added: ', file);
+			// console.log('dz added: ', file);
 
 			// count multiple files
 			that.filecount += 1;
@@ -6511,7 +6589,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 
 		this.dz.on('complete', function (file) {
-			console.log('complete111');
+			// console.log('complete111');
 
 			// count multiple files
 			that.filecount -= 1;
@@ -6537,7 +6615,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.dz.on('success', function (err, json) {
 			// parse and process
 			var obj = Wu.parse(json);
-			console.log('success::: obj: ', obj);
+			// console.log('success::: obj: ', obj);
 
 			// set status
 			app.setStatus('Done!', 2000);
@@ -6546,7 +6624,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		});
 
 		this.dz.on('complete', function (file) {
-			console.log('complete333');
+			// console.log('complete333');
 
 			if (!that.filecount) {
 				// reset progressbar
@@ -6632,7 +6710,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	handleError : function (error) {
-		console.log('Handling error: ', error);
+		// console.log('Handling error: ', error);
 
 		var html = '';
 		error.forEach(function (err, i, arr) {
@@ -6644,9 +6722,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	// process file
-	uploaded : function (record) {
-		console.log('Upload done:', record);
+	uploaded : function (record, options) {
+		// console.log('Upload done:', record);
+		// console.log('options: ', options);
 
+		var options = options || {};
+		
 		// handle errors
 		if (record.errors) {
 			if (record.errors.length > 0) this.handleError(record.errors);
@@ -6657,19 +6738,46 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// add files to library
 		record.done.files.forEach(function (file, i, arr) {
+			
 			// add to table
 			this.addFile(file);
- 
+
 			// add to project locally (already added on server)
 			this.project.setFile(file);
+
 		}, this);
 
 		// add layers
 		record.done.layers.forEach(function (layer) {
 			this.project.addLayer(layer);
+
+			if (options.autoAdd) {
+				// console.log('autoAdd!');
+				// console.log(layer)
+				app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
+			}
+
 		}, this);
 		
+		// refresh sidepane
 		this.project.refreshSidepane();
+
+		// if created layer, add to map 
+		if (options.autoAdd) {
+			record.done.layers.forEach(function (layer) {
+
+				// console.log('autoAdd!');
+				// console.log(layer)
+				var layerItem = app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
+				
+				if (layerItem) {
+					// console.log('leyrItem: ', layerItem);
+					app.MapPane.layerMenu.enableLayer(layerItem);
+				}
+			}, this);
+
+		}
+
 	},
 
 	addFile : function (file) {
@@ -6737,7 +6845,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	// to prevent selected text
 	stop : function (e) {
-		console.log('stop!');   // not working!
+		// console.log('stop!');   // not working!
 		e.preventDefault();
 		e.stopPropagation();
 	},
@@ -8243,9 +8351,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 	
 	enableVectorstyle : function (container) {
-		console.log('enable VECTOR')
+		// console.log('enable VECTOR')
 		if (this.vectorStyle) return;
-		console.log('2');
+		// console.log('2');
 		
 		this.vectorStyle = L.control.styleEditor({ 
 			position: "topleft", 
@@ -8305,7 +8413,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			draw: {
 				circle: {
 					shapeOptions: {
-						fill: false,
+						fill: true,
 						color: '#FFF',
 						fillOpacity: 0.3,
 						// fillColor: '#FFF'
@@ -8354,23 +8462,29 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// add circle support
 		map.on('draw:created', function(e) {
 
-			console.log('draw:created!');
+			// console.log('draw:created!');
 
 			// add circle support
 			e.layer.layerType = e.layerType;            
 
-			// add drawn layer to map
-			editableLayers.addLayer(e.layer);
+			
 
-			console.log('this.project.editMode: ', that.project.editMode);
-			console.log('projecT: ', that.project);
+			// console.log('this.project.editMode: ', that.project.editMode);
+			// console.log('projecT: ', that.project);
 
 			// if editMode
 			if (that.project.editMode) {
+
 				// create layer and add to project
 				var geojson = e.layer.toGeoJSON();
-				console.log('geojson: ', geojson);
+				// console.log('drawn geojson: ', geojson);
 				that.project.createLayerFromGeoJSON(geojson);
+				
+			} else {
+
+				// add drawn layer to map
+				editableLayers.addLayer(e.layer);
+
 			}
 		});
 
@@ -8493,7 +8607,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// remove help pseudo
 		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
 
-		console.log('StatusPane.open(). Currently active menu item:', app._activeMenuItem);
+		// console.log('StatusPane.open(). Currently active menu item:', app._activeMenuItem);
 	},
 
 	// close sidepane menu
@@ -8503,7 +8617,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		sidepane.collapse();
 		this.refresh();
 
-		console.log('StatusPane.close(). Currently active menu item:', app._activeMenuItem);
+		// console.log('StatusPane.close(). Currently active menu item:', app._activeMenuItem);
 
 		// app.MapPane._container
 		Wu.DomUtil.removeClass(app.MapPane._container, "map-blur") // (j) – removes the blur on map if it's set by one of the fullpanes
@@ -8665,7 +8779,7 @@ Wu.ProgressBar = Wu.Class.extend({
 		if (percent < this._current + 9) return;
 
 		var bar = this._progressBar;
-		console.log('progress: ', percent);
+		// console.log('progress: ', percent);
 		bar.style.opacity = 1;
 		bar.style.width = percent + '%';
 
@@ -10074,7 +10188,7 @@ L.control.inspect = function (options) {
 	},
 	
 	editOff : function () {
-		console.log('editOff');
+		// console.log('editOff');
 		this.editing = false;
 
 		// unbind text editor
@@ -10101,7 +10215,7 @@ L.control.inspect = function (options) {
 		// save text
 		if (this.activeLayer) {
 			var text = this._inner.innerHTML;
-			console.log('saving text: ', text);
+			// console.log('saving text: ', text);
 			
 			this.activeLayer.store.description = text;
 			this.activeLayer.save('description');
@@ -10112,11 +10226,11 @@ L.control.inspect = function (options) {
 	editOn : function () {
 
 		if (!this.activeLayer) {
-			console.log('no active layer, so fuck it.')
+			// console.log('no active layer, so fuck it.')
 			return;
 		}
 
-		console.log('editOn');
+		// console.log('editOn');
 		this.editing = true;
 
 		// bind text editor
@@ -10136,7 +10250,7 @@ L.control.inspect = function (options) {
 	},
 
 	textChange : function () {
-		console.log('text Change');
+		// console.log('text Change');
 	},
 
 	removeGrande : function () {
@@ -10462,7 +10576,7 @@ L.control.description = function (options) {
 		if (!legend) { this._legendsContainer.style.display = 'none'; return; }
 
 
-		console.log('remove legend, yo');
+		// console.log('remove legend, yo');
 
 		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
 		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
@@ -10513,7 +10627,7 @@ L.control.description = function (options) {
 		// Store legends height
 		this.calculateHeight();
 
-		console.log('this.legendsCounter.length', this.legendsCounter.length)
+		// console.log('this.legendsCounter.length', this.legendsCounter.length)
 
 		// Hide legends if it's empty
 		if ( this.legendsCounter.length == 0 ) this._legendsContainer.style.display = 'none';
@@ -10848,18 +10962,43 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	createLayerFromGeoJSON : function (geojson) {
-		console.log('createGeoJSONLayer', geojson);
+		// console.log('createGeoJSONLayer', geojson);
 
 		var options = {
-			name 		: this.store.name,
-			description 	: this.store.description,
-			keywords 	: this.store.keywords, 
-			client 		: this._client.uuid 			// parent client uuid 
+			project 	: this.getUuid(),
+			geojson 	: geojson,
+			layerType 	: 'geojson'
 		}
+
 		var json = JSON.stringify(options);
 		
-		console.log('POST: _saveNew');
- 		Wu.Util.postcb('/api/layers/new', json, context._projectCreated, this);
+		// console.log('POST createLayerFromGeoJSON');
+
+ 		Wu.Util.postcb('/api/layers/new', json, this._createdLayerFromGeoJSON, this);
+
+	},
+
+	_createdLayerFromGeoJSON : function (context, data) {
+
+		// console.log('_createdLayerFromGeoJSON: data, context', data, context);
+		var parsed = JSON.parse(data);
+		// console.log('parsed: ', parsed);
+
+		// data = {
+		// 	error : false,
+		// 	done : {
+		// 		files : [{
+
+		// 		}],
+		// 		layers : [{
+
+		// 		}]
+		// 	}
+		// }
+
+		app.SidePane.DataLibrary.uploaded(parsed, {
+			autoAdd : true
+		});
 
 	},
 
@@ -10873,7 +11012,7 @@ L.control.baselayerToggle = function (options) {
 
 	setEditMode : function () {
 		// set editMode
-		console.log('this: ', this);
+		// console.log('this: ', this);
 		this.editMode = false;
 		if (app.Account.canUpdateProject(this.store.uuid)) this.editMode = true;
 	},
@@ -10968,8 +11107,8 @@ L.control.baselayerToggle = function (options) {
 
 
 	_update : function (field) {
-		console.log('field: ', field);
-		console.log(this.store);
+		// console.log('field: ', field);
+		// console.log(this.store);
 		var json = {};
 		json[field] = this.store[field];
 		json.uuid = this.store.uuid;
@@ -10989,7 +11128,7 @@ L.control.baselayerToggle = function (options) {
 		// console.log('this.lastSaved= ', this.lastSaved);
 
 
-		console.log('saving project field: ', json);
+		// console.log('saving project field: ', json);
 
 		var string = JSON.stringify(json);
 		this._save(string);
@@ -11006,7 +11145,7 @@ L.control.baselayerToggle = function (options) {
 	
 
 	_save : function (string) {
-		console.log('saving...');                                       // TODO: pgp
+		// console.log('saving...');                                       // TODO: pgp
 		Wu.save('/api/project/update', string);                         // TODO: save only if actual changes! saving too much already
 	
 		// set status
@@ -11023,7 +11162,7 @@ L.control.baselayerToggle = function (options) {
 		}
 		var json = JSON.stringify(options);
 		
-		console.log('POST: _saveNew');
+		// console.log('POST: _saveNew');
  		Wu.Util.postcb('/api/project/new', json, context._projectCreated, this);
 
 	},
@@ -11096,6 +11235,10 @@ L.control.baselayerToggle = function (options) {
 
 	getClient : function () {
 		return app.Clients[this.store.client];
+	},
+
+	getClientUuid : function () {
+		return this.store.client;
 	},
 
 	getBaselayers : function () {
@@ -11265,9 +11408,9 @@ L.control.baselayerToggle = function (options) {
 
 	removeFiles : function (files) {
 
-		console.log('*********************')
-		console.log('removeFiles: files: ', files);
-		console.log('*********************')
+		// console.log('*********************')
+		// console.log('removeFiles: files: ', files);
+		// console.log('*********************')
 
 		var list = app.SidePane.DataLibrary.list,
 		    layerMenu = app.MapPane.layerMenu,
@@ -11278,10 +11421,10 @@ L.control.baselayerToggle = function (options) {
 		// iterate over files and delete
 		files.forEach(function(file, i, arr) {
 
-			console.log('removeFiles: ', file);
-			console.log('this.store.files: ', this.store.files);
-			console.log('this.layers: ', this.layers);
-			console.log('this.store.layermenu: ', this.store.layermenu);
+			// console.log('removeFiles: ', file);
+			// console.log('this.store.files: ', this.store.files);
+			// console.log('this.layers: ', this.layers);
+			// console.log('this.store.layermenu: ', this.store.layermenu);
 
 			// remove from list
 			list.remove('uuid', file.uuid);
@@ -11566,7 +11709,7 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	setAccess : function (project) {
-		console.log('setAccess to new proejct: ', project);
+		// console.log('setAccess to new proejct: ', project);
 		// todo!
 	},
 
@@ -11647,6 +11790,7 @@ L.control.baselayerToggle = function (options) {
 		var access = {
 			userUuid    : this.getUuid(),
 			projectUuid : project.getUuid(),
+			// clientUuid  : project.getClientUuid(),
 			role        : role, // eg. 'reader'
 			add         : add // true or false
 		}
@@ -11655,10 +11799,11 @@ L.control.baselayerToggle = function (options) {
 		Wu.Util.postcb('/api/user/delegate', JSON.stringify(access), this.delegatedAccess, this);
 
 		// this._saveAccess(access)
+		app.setSaveStatus();
 	},
 
 	delegatedAccess : function (context, result) {
-		console.log('saved access!', context, result);
+		// console.log('saved access!', context, result);
 	},
 	
 
@@ -12532,7 +12677,8 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 			}
 		}
 
-		
+		// if nothing, return
+		if (string.length == 0) return;
 
 		// set content
 		popup.setContent(string);
@@ -16474,7 +16620,7 @@ Wu.App = Wu.Class.extend({
 	initServer : function () {
 		var serverUrl = this.options.servers.portal;
 
-		console.log('Server: ', serverUrl);
+		console.log('Connected to server: ', serverUrl);
 
 		var data = JSON.stringify(this.options);
 		
@@ -16587,7 +16733,7 @@ Wu.App = Wu.Class.extend({
 	// init default view on page-load
 	_initView : function () {
 
-		console.log('_initView');
+		// console.log('_initView');
 
 		// runs hotlink
 		if (this._initHotlink()) return;
@@ -16631,7 +16777,7 @@ Wu.App = Wu.Class.extend({
 		try { this.hotlink = JSON.parse(window.hotlink); } 
 		catch (e) { this.hotlink = false };
 
-		console.log('this.hotlink: ', this.hotlink);
+		// console.log('this.hotlink: ', this.hotlink);
 
 		// return if no hotlink
 		if (!this.hotlink) return false;

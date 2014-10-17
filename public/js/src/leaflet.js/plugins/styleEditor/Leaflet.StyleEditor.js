@@ -19,7 +19,7 @@ L.Control.StyleEditor = L.Control.extend({
 	},
 
 	onAdd: function(map) {
-		console.log('ADD STYLE.EDITOR');
+		// console.log('ADD STYLE.EDITOR');
 		this.options.map = map;
 		return this.createUi();
 	},
@@ -42,7 +42,7 @@ L.Control.StyleEditor = L.Control.extend({
 	},
 
 	createUi: function() {
-		console.log('createUi');
+		// console.log('createUi');
 		var controlDiv = this.options.controlDiv = L.DomUtil.create('div', 'leaflet-control-styleeditor');
 		var controlUI = this.options.controlUI = L.DomUtil.create('div', 'leaflet-control-styleeditor-interior', controlDiv);
 		controlUI.title = 'Style Editor';
@@ -100,7 +100,7 @@ L.Control.StyleEditor = L.Control.extend({
 
 
 	clickHandler: function(e) {
-		console.log('clickHandler, enabled? ', this.options.enabled);
+		// console.log('clickHandler, enabled? ', this.options.enabled);
 		this.options.enabled ? this.disable() : this.enable();
 	},
 
@@ -133,11 +133,11 @@ L.Control.StyleEditor = L.Control.extend({
 		L.DomUtil.addClass(this.options.controlUI, "enabled");
 		L.DomUtil.removeClass(this.options.closeButton, 'displayNone');
 		this.options.enabled = true;
-		console.log('_enabled? ', this.options.enabled);
+		// console.log('_enabled? ', this.options.enabled);
 	},
 
 	disable: function() {
-		console.log('disable');
+		// console.log('disable');
 		this.options.editlayers.forEach(this.removeEditClickEvents, this);
 		this.options.editlayers = [];
 		this.hideEditor();
@@ -212,7 +212,7 @@ L.Control.StyleEditor = L.Control.extend({
 	},
 
 	initChangeStyle: function(e) {
-		console.log('initChangeStyle');
+		// console.log('initChangeStyle');
 
 		Wu.DomEvent.stop(e);
 
@@ -240,7 +240,7 @@ L.Control.StyleEditor = L.Control.extend({
 	},
 
 	createGeometryForm: function(layer) {
-		console.log('createGeometryForm');
+		// console.log('createGeometryForm');
 		var styleForms = new L.StyleForms({
 			colorRamp: this.options.colorRamp,
 			styleEditorUi: this.options.styleEditorUi,
@@ -252,7 +252,7 @@ L.Control.StyleEditor = L.Control.extend({
 	},
 
 	createMarkerForm: function(layer) {
-		console.log('createMarkerForm');
+		// console.log('createMarkerForm');
 		var styleForms = new L.StyleForms({
 			colorRamp: this.options.colorRamp,
 			styleEditorUi: this.options.styleEditorUi,

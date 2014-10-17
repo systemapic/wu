@@ -1667,18 +1667,19 @@
 
 .leaflet-styleeditor-done {
 	position: relative;
-	bottom: -39px;
-	width: 80px;
+	bottom: -38px;
+	width: 139px;
 	text-align: center;
-	left: 56px;
+	left: 27px;
 	background: rgba(0, 0, 0, 0.2);
 	padding: 1px 5px 2px 5px;
 	font-weight: 900;
 	border-radius: 1px;
 	text-shadow: -1px 1px rgba(255, 255, 255, 0.3);
-	font-size: 11px;
 	color: #333;
 	cursor: pointer;
+	height: 22px;
+	font-size: 13px;
 	}
 
 .leaflet-styleeditor-done:hover {

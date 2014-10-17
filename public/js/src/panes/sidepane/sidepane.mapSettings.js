@@ -78,7 +78,7 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 		this._isOpen = true;
 
 		if (app._pendingClose && app._pendingClose != this) {
-			console.log('ap pend: ', app._pendingClose); 
+			// console.log('ap pend: ', app._pendingClose); 
 			app._pendingClose.close();
 		}
 		app._pendingClose = this;
@@ -86,7 +86,7 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 
 
 	close : function () {   				// perhaps todo: now it's closing every pane, cause addHooks been run 6 times.
-		console.log('close ', this.type);		// set this to app._pendingclose here for just one close... 
+		// console.log('close ', this.type);		// set this to app._pendingclose here for just one close... 
 		this.calculateHeight();
 		this._outer.style.height = this.minHeight + 'px';        
 		this._close();
@@ -819,7 +819,7 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 			// prevent other click events
 			Wu.DomEvent.stop(e);
 
-			return console.log('edit layer!');
+			return;// console.log('edit layer!');
 
 			// toggle editMode
 			this.toggleEdit(layermenuLayer);
@@ -832,7 +832,7 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	getLayerByUuid : function (layerUuid) {
 		var layer = _.find(this._layers, function (l) {
-			console.log('l: ', l);
+			// console.log('l: ', l);
 			return l.layer.store.uuid == layerUuid;	
 		});
 
@@ -843,8 +843,6 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		var layer = this.getLayerByUuid(layerUuid);
 		if (layer) {
 			this.toggle(layer);
-			console.log('toggled!!');
-
 			return layer;	
 		}
 
@@ -876,7 +874,7 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	toggle : function (layer) {
 		
-		console.log('toggle --> ', layer);
+		// console.log('toggle --> ', layer);
 
 		// ensure layerMenu is active
 		this.layerMenu = this.layerMenu || Wu.app.MapPane.layerMenu;
@@ -1433,7 +1431,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 	toggleControl : function (e) {
 		
-		console.log('toggleControl');
+		// console.log('toggleControl');
 
 		// prevent default checkbox behaviour
 		if (e.type == 'click') return Wu.DomEvent.stop(e);

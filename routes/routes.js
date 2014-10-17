@@ -61,6 +61,11 @@ module.exports = function(app, passport) {
 	// get data from store for user
 	app.post('/api/portal', isLoggedIn, function (req, res) {
 		console.log('/api/portal');
+		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *');
+		console.log('* User: ' + req.user.firstName + ' ' + req.user.lastName);
+		console.log('* User uuid: ' + req.user.uuid);
+		console.log('* IP: ' + req._remoteAddress);
+		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *')
 
 		// get user store for this user
 		api.getPortal(req, res);

@@ -232,7 +232,7 @@ L.StyleForms = L.Class.extend({
 
 	createPatternPicker : function (parentDiv, callback) {
 
-		console.log('createPatternPicker!');
+		// console.log('createPatternPicker!');
 
 		// create container
 		var patternPicker = L.DomUtil.create('div', 'leaflet-styleeditor-patternpicker', parentDiv);
@@ -284,11 +284,11 @@ L.StyleForms = L.Class.extend({
 	},
 
 	setStyle: function(option, value) {
-		console.log('setStyle(option, value)', option, value);
+		// console.log('setStyle(option, value)', option, value);
 		
 		var element = this.options.currentElement.target;
-		console.log('element: ', element);
-		console.log('features: ', element.feature);
+		// console.log('element: ', element);
+		// console.log('features: ', element.feature);
 
 		if (!element.hasOwnProperty('feature')) return this.setMultiPolygonStyle(option, value);
 		return this.setPolygonStyle(option, value);
@@ -298,13 +298,13 @@ L.StyleForms = L.Class.extend({
 	},
 
 	setPolygonStyle : function (option, value) {
-		console.log('setPolygonStyle!')
+		// console.log('setPolygonStyle!')
 
 		// create style object for change event
 		var newStyle = {};
 		newStyle[option] = value;
 
-		console.log('newStyle: ', newStyle);
+		// console.log('newStyle: ', newStyle);
 
 		// set style
 		var element = this.options.currentElement.target;
@@ -312,7 +312,7 @@ L.StyleForms = L.Class.extend({
 
 
 		
-		console.log('element: ', element);
+		// console.log('element: ', element);
 
 		// throttle change event
 		if (this._changeTimer) clearTimeout(this._changeTimer);
@@ -320,20 +320,20 @@ L.StyleForms = L.Class.extend({
 		this._changeTimer = setTimeout(function () {
 
 			// fire change event
-			console.log('styleeditor:changed fired!');
+			// console.log('styleeditor:changed fired!');
 			element.fire('styleeditor:changed', { style : newStyle });
 
 		}, wait);  // 500ms
 	},
 
 	setMultiPolygonStyle : function (option, value) {
-		console.log('setMultiPolygonStyle!')
+		// console.log('setMultiPolygonStyle!')
 
 		// create style object for change event
 		var newStyle = {};
 		newStyle[option] = value;
 
-		console.log('newStyle: ', newStyle);
+		// console.log('newStyle: ', newStyle);
 
 		// set style
 		var element = this.options.currentElement.target;
@@ -342,7 +342,7 @@ L.StyleForms = L.Class.extend({
 
 
 		
-		console.log('element: ', element);
+		// console.log('element: ', element);
 
 		// throttle change event
 		if (this._changeTimer) clearTimeout(this._changeTimer);
@@ -350,7 +350,7 @@ L.StyleForms = L.Class.extend({
 		this._changeTimer = setTimeout(function () {
 
 			// fire change event
-			console.log('styleeditor:changed fired!');
+			// console.log('styleeditor:changed fired!');
 			element.fire('styleeditor:changed', { style : newStyle });
 
 		}, wait);  // 500ms
