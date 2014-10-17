@@ -248,7 +248,10 @@ label.info {
   z-index: 35000;
   top: 5px;
   left: -17px;
-  position: relative; }
+  position: relative;
+  top: 42px;
+  left: -31px;
+  position: absolute; }
 
 /*
 ██╗   ██╗███╗   ██╗██╗██╗   ██╗███████╗██████╗ ███████╗ █████╗ ██╗     ███████╗
@@ -628,7 +631,7 @@ label.info {
 .header-subtitle input {
   width: 300px;
   color: black;
-  width: 100%;
+  width: 400px;
   margin: 0 !important;
   padding: 0 !important;
   left: inherit;
@@ -2064,18 +2067,19 @@ label.info {
 
 .leaflet-styleeditor-done {
   position: relative;
-  bottom: -39px;
-  width: 80px;
+  bottom: -38px;
+  width: 139px;
   text-align: center;
-  left: 56px;
+  left: 27px;
   background: rgba(0, 0, 0, 0.2);
   padding: 1px 5px 2px 5px;
   font-weight: 900;
   border-radius: 1px;
   text-shadow: -1px 1px rgba(255, 255, 255, 0.3);
-  font-size: 11px;
   color: #333;
-  cursor: pointer; }
+  cursor: pointer;
+  height: 22px;
+  font-size: 13px; }
 
 .leaflet-styleeditor-done:hover {
   background: rgba(0, 0, 0, 0.3);
@@ -2515,7 +2519,8 @@ label.info {
   padding-right: 73px; }
 
 .project-description input {
-  background-color: transparent; }
+  background-color: transparent;
+  width: 189px; }
 
 .project-logo {
   position: absolute;
@@ -3652,6 +3657,12 @@ button.image-attachment {
   margin-top: 5px;
   width: 310px; }
 
+.backpane-input.valid {
+  background-color: #006e00 !important; }
+
+.backpane-input.invalid {
+  background-color: #6e0000 !important; }
+
 .backpane-message {
   padding: 5px;
   padding-left: 0px;
@@ -4524,4 +4535,22 @@ input[type=checkbox] + label.check {
 	box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
 	-webkit-transition: width .2s ease;
 	transition: width .2s ease;
+}
+
+.disabled {
+	opacity: 0.1;
+	height: 0px !important;
+}	
+
+.disabled a {
+	opacity: 0;
+}
+
+.project-edit-textarea {
+	background: rgba(0,0,0,0);
+	border: none;
+	height: 43px;
+	width: 120px;
+	overflow: hidden;
+	resize: none;
 }

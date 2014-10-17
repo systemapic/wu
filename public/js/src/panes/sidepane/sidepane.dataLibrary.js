@@ -90,7 +90,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_deactivate : function () {
-		console.log('deactive sidepane datalib');
+		// console.log('deactive sidepane datalib');
 		this.dz.disable();
 		this.disableFullscreenDZ();
 	},
@@ -151,7 +151,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// post         path          json      callback           this
 		Wu.post('/api/file/download', json, this.receivedDownload, this);
 
-		
 
 	},
 
@@ -204,11 +203,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// populate download window
 		var tr = '';
-		console.log('cheks: ', checks);
+		// console.log('cheks: ', checks);
 		checks.forEach(function (file, i, arr) {
-			console.log('file: ', file);
+			// console.log('file: ', file);
 			var tmp = Wu.extend({}, file);
-			console.log('tmp:', tmp);
+			// console.log('tmp:', tmp);
 			// tmp.format = tmp.format.join(', ');     // fix format format
 			tr += ich.datalibraryDownloadRow(tmp);
 		}, this);
@@ -250,7 +249,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	deleteFiles : function (files) {
-		console.log('deleting ', files);
+		// console.log('deleting ', files);
 
 		// set status
 		app.setStatus('Deleting');
@@ -333,16 +332,16 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// set dz events
 		this.dz.on('drop', function (e) { 
-			console.log('drop', e); 
+			// console.log('drop', e); 
 		});
 
 		this.dz.on('dragenter', function () { 
-			console.log('dragenter'); 
+			// console.log('dragenter'); 
 		});
 
 		this.dz.on('addedfile', function (file) { 
 
-			console.log('dz added: ', file);
+			// console.log('dz added: ', file);
 
 			// count multiple files
 			that.filecount += 1;
@@ -362,7 +361,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 
 		this.dz.on('complete', function (file) {
-			console.log('complete111');
+			// console.log('complete111');
 
 			// count multiple files
 			that.filecount -= 1;
@@ -388,7 +387,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.dz.on('success', function (err, json) {
 			// parse and process
 			var obj = Wu.parse(json);
-			console.log('success::: obj: ', obj);
+			// console.log('success::: obj: ', obj);
 
 			// set status
 			app.setStatus('Done!', 2000);
@@ -397,7 +396,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		});
 
 		this.dz.on('complete', function (file) {
-			console.log('complete333');
+			// console.log('complete333');
 
 			if (!that.filecount) {
 				// reset progressbar
@@ -483,7 +482,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	handleError : function (error) {
-		console.log('Handling error: ', error);
+		// console.log('Handling error: ', error);
 
 		var html = '';
 		error.forEach(function (err, i, arr) {
@@ -496,9 +495,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	// process file
 	uploaded : function (record, options) {
-		console.log('Upload done:', record);
-		console.log('options: ', options);
+		// console.log('Upload done:', record);
+		// console.log('options: ', options);
 
+		var options = options || {};
+		
 		// handle errors
 		if (record.errors) {
 			if (record.errors.length > 0) this.handleError(record.errors);
@@ -523,8 +524,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			this.project.addLayer(layer);
 
 			if (options.autoAdd) {
-				console.log('autoAdd!');
-				console.log(layer)
+				// console.log('autoAdd!');
+				// console.log(layer)
 				app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
 			}
 
@@ -537,12 +538,12 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		if (options.autoAdd) {
 			record.done.layers.forEach(function (layer) {
 
-				console.log('autoAdd!');
-				console.log(layer)
+				// console.log('autoAdd!');
+				// console.log(layer)
 				var layerItem = app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
 				
 				if (layerItem) {
-					console.log('leyrItem: ', layerItem);
+					// console.log('leyrItem: ', layerItem);
 					app.MapPane.layerMenu.enableLayer(layerItem);
 				}
 			}, this);
@@ -616,7 +617,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	// to prevent selected text
 	stop : function (e) {
-		console.log('stop!');   // not working!
+		// console.log('stop!');   // not working!
 		e.preventDefault();
 		e.stopPropagation();
 	},
@@ -698,6 +699,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				Wu.save('/api/file/update', string); 
 			}
 		});
+
+		app.setSaveStatus();
 	},
 
 	

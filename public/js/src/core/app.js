@@ -63,7 +63,7 @@ Wu.App = Wu.Class.extend({
 	initServer : function () {
 		var serverUrl = this.options.servers.portal;
 
-		console.log('Server: ', serverUrl);
+		console.log('Connected to server: ', serverUrl);
 
 		var data = JSON.stringify(this.options);
 		
@@ -176,7 +176,7 @@ Wu.App = Wu.Class.extend({
 	// init default view on page-load
 	_initView : function () {
 
-		console.log('_initView');
+		// console.log('_initView');
 
 		// runs hotlink
 		if (this._initHotlink()) return;
@@ -220,7 +220,7 @@ Wu.App = Wu.Class.extend({
 		try { this.hotlink = JSON.parse(window.hotlink); } 
 		catch (e) { this.hotlink = false };
 
-		console.log('this.hotlink: ', this.hotlink);
+		// console.log('this.hotlink: ', this.hotlink);
 
 		// return if no hotlink
 		if (!this.hotlink) return false;

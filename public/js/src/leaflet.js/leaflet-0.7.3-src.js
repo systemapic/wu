@@ -5108,7 +5108,7 @@ L.Path = (L.Path.SVG && !window.L_PREFER_CANVAS) || !L.Browser.canvas ? L.Path :
 	_updateStyle: function () {
 		var options = this.options;
 
-		console.log('_updateStyle', options);
+		// console.log('_updateStyle', options);
 
 		if (options.stroke) {
 			this._ctx.lineWidth = options.weight;
@@ -6159,15 +6159,15 @@ L.GeoJSON = L.FeatureGroup.extend({
 	},
 
 	setStyle: function (style) {
-		console.log('L.geoJson setStyle(style)', style)
+		// console.log('L.geoJson setStyle(style)', style)
 		this.eachLayer(function (layer) {
-			console.log('eachlayer, ', layer);
+			// console.log('eachlayer, ', layer);
 			this._setLayerStyle(layer, style);
 		}, this);
 	},
 
 	_setLayerStyle: function (layer, style) {
-		console.log('WAHWAHWAHWAH');
+		// console.log('WAHWAHWAHWAH');
 		if (typeof style === 'function') {
 			style = style(layer.feature);
 		}

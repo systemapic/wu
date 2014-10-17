@@ -329,7 +329,7 @@ Wu.Util = {
 
 		http.onreadystatechange = function() {
 		    if(http.readyState == 4 && http.status == 200) {
-			console.log(http.responseText);
+			// console.log(http.responseText);
 		    }
 		}
 		http.send(json);
@@ -337,7 +337,7 @@ Wu.Util = {
 
 	// post with callback
 	postcb : function (path, json, cb, self) {
-		console.log('POST: postcb', JSON.parse(json));
+		// console.log('POST: postcb', JSON.parse(json));
 		var http = new XMLHttpRequest();
 		var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
 		url += path;
@@ -350,9 +350,9 @@ Wu.Util = {
 		    if(http.readyState == 4 && http.status == 200) {
 			if (cb) { 
 				try {
-				console.log('RESPONSE: ', JSON.parse(http.responseText));
+				// console.log('RESPONSE: ', JSON.parse(http.responseText));
 				} catch (e) {
-					console.log('RESPONSE: ', http.responseText);
+					// console.log('RESPONSE: ', http.responseText);
 				}
 
 				cb(self, http.responseText); 
@@ -429,16 +429,16 @@ Wu.Util = {
 
 	// experimental zip fn's
 	generateZip : function (data) {
-		console.log('# generateZip #')
+		// console.log('# generateZip #')
 
 		if (!typeof data == 'string') {
-			console.log('stringify')
+			// console.log('stringify')
 			data = JSON.stringify(data);
 		}
 
-		console.log('string length: ', data.length);
+		// console.log('string length: ', data.length);
 		var compressed = LZString.compress(data);
-		console.log('compressd length: ', compressed.length);
+		// console.log('compressd length: ', compressed.length);
 		
 
 		return compressed;
@@ -448,7 +448,7 @@ Wu.Util = {
 	zipSave : function (path, json) {
 
 		if (!typeof json == 'string') {
-			console.log('stringify')
+			// console.log('stringify')
 			var string = JSON.stringify(json);
 		} else {
 			var string = json;
@@ -457,11 +457,11 @@ Wu.Util = {
 		var my_lzma = new LZMA('//85.10.202.87:8080/js/lib/lzma/lzma_worker.js');
 		my_lzma.compress(string, 1, function (result) {
 		       
-			console.log('my_lzma finished!');
-			console.log(result);
-			console.log(typeof result);
+			// console.log('my_lzma finished!');
+			// console.log(result);
+			// console.log(typeof result);
 			var string = JSON.stringify(result);
-			console.log('string: ', string);
+			// console.log('string: ', string);
 
 			var http = new XMLHttpRequest();
 			var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
@@ -473,7 +473,7 @@ Wu.Util = {
 
 			http.onreadystatechange = function() {
 				if(http.readyState == 4 && http.status == 200) {
-					console.log(http.responseText);
+					// console.log(http.responseText);
 				}
 			}
 			http.send(string);
@@ -483,7 +483,7 @@ Wu.Util = {
 		}, 
 
 		function (percent) {
-			console.log('lzma progress: ', percent);
+			// console.log('lzma progress: ', percent);
 		});
 
 		

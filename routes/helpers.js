@@ -26,9 +26,10 @@ var nodepath    = require('path');
 
 // superusers
 var superusers = [
-	'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', // KO
-	'user-e6e5d7d9-3b4c-403b-ad80-a854b0215831',  // J
-	'user-9687cd1c-0ca4-4dcd-91c1-775dd9cf820e'  // tester superadmin
+	'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', 	// KO
+	'user-e6e5d7d9-3b4c-403b-ad80-a854b0215831',  	// J
+	'user-5a4b544c-46ff-48e6-885b-c38be91f31b8', 	// rod tester superadmin
+	'user-f36e496e-e3e4-4fac-a37c-f1a98689afda'	// ana tester superadmin
 ]
 
 // global paths
@@ -1217,7 +1218,7 @@ module.exports = api = {
 		var role 	= req.body.role;  		// role that user is given
 		var projectUuid = req.body.projectUuid;   	// project user is given role to
 		var add         = req.body.add; 		// add or revoke, true/false
-
+		// var clientUuid  = req.body.clientUuid;		// client that project belongs to
 
 		// return if missing information
 		if (!userUuid || !role || !projectUuid) return res.end(JSON.stringify({
@@ -1330,12 +1331,17 @@ module.exports = api = {
 						if (api.can.delegate.reader(user, project)) {
 
 							subject.role.reader.projects.pull(project.uuid);
+							subject.role.reader.clients.pull(project.client); // revoke client also
 							subject.markModified('role');
 							subject.save(function (err, result) {
 								if (err) return res.end(JSON.stringify({ error : err }));
 								var message = 'Success!'
 								return res.end(JSON.stringify({ result : message }));
 							});
+
+							
+
+
 
 						} else {
 							console.log('access denied: role: reader, user: ' + subject.firstName + ', project: ' + project.name);
@@ -2027,47 +2033,63 @@ module.exports = api = {
 			console.log('name!');
 			queries.name = function(callback) {
 
-				return File.update(
-		    
-					// conditions
-					{ 'access.users' : userid, uuid : fuuid }, 
+				File
+				.findOne({uuid : fuuid})
+				.exec(function (err, file) {
+					if (err) return callback(err);
 
-					// update objects
-					{ name : req.body.name },
+					// return if not file
+					if (!file) return callback('No such file.');
 
-					// callback
-					function (err, numberAffected, raw) {
-						return callback(err, numberAffected);
-					}
-				);
+					// check access
+					var access = api.can.update.file(req.user, file);
+
+					// return if no access
+					if (!access) return callback('No access.');
+					
+					// update
+					file.name = req.body.name;
+					file.save(function (err) {
+						callback(err);
+					});
+				});
 			}
 		}
 
 		// update description
 		if (req.body.hasOwnProperty('description')) {
-			console.log('description!');
 			queries.description = function(callback) {
 
-				return File.update(
-		    
-					// conditions
-					{ 'access.users' : userid, uuid : fuuid }, 
+				File
+				.findOne({uuid : fuuid})
+				.exec(function (err, file) {
+					if (err) return callback(err);
 
-					// update objects
-					{ description : req.body.description },
+					// return if not file
+					if (!file) return callback('No such file.');
 
-					// callback
-					function (err, numberAffected, raw) {
-						return callback(err, numberAffected);
-					}
-				);
+					// check access
+					var access = api.can.update.file(req.user, file);
+
+					// return if no access
+					if (!access) return callback('No access.');
+					
+					// update
+					file.description = req.body.description;
+					file.save(function (err) {
+						callback(err);
+					});
+				});
+
 			}
 		}
 
 		async.parallel(queries, function(err, doc) {
 
 			// return on error
-			if (err) return res.end('{ error : 0 }');
+			if (err) return res.end(JSON.stringify({
+				error : err
+			}));
 					
 			// return doc
 			res.end(JSON.stringify(doc));
@@ -2638,6 +2660,10 @@ module.exports = api = {
 			client : function (user, client) {
 				if (superadmin(user)) return true;
 
+				// hacky error checking
+				if (!client) return false;
+				if (!user) return false;
+
 				// if admin and has created client oneself
 				if (user.role.admin && client.createdBy == user.uuid)  return true;
 
@@ -2656,6 +2682,18 @@ module.exports = api = {
 				if (subject.uuid == user.uuid) return true;
 
 				return false;				
+			},
+
+			file   : function (user, file) {
+				if (superadmin(user)) return true;
+
+				// if user can update project which contains file, then user can edit file
+				var access = false;
+				file.access.projects.forEach(function (p) { // p = projectUuid
+					if (api.can.update.project(user, p)) access = true;
+				});
+				return access;
+
 			}
 		},
 

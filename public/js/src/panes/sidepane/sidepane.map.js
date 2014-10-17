@@ -73,13 +73,13 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 	},
 
 	closeAll : function () {
-		console.log('closeAll');
+		// console.log('closeAll');
 
 		// close all options folders
 		var options = app.SidePane.Map.mapSettings;
 		for (o in options) {
 			var option = options[o];
-			console.log('option: ', option);
+			// console.log('option: ', option);
 			if (option._isOpen) option.close();
 		}
 

@@ -102,7 +102,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	
 
 	textChange : function () {
-		console.log('textChange');
+		// console.log('textChange');
 	},
 
 	removeEditHooks : function () {
@@ -225,12 +225,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// editMode: hide/show (+) button
 		if (this.project.editMode) {
 			Wu.DomUtil.removeClass(this._newfolder, 'displayNone');
-			console.log('ADDDDDD____');
+			// console.log('ADDDDDD____');
 			// this.addEditHooks();
 		} else {
 			Wu.DomUtil.addClass(this._newfolder, 'displayNone');
 			// this.removeEditHooks();
-			console.log("REMMMM___");
+			// console.log("REMMMM___");
 		}
 
 	},
@@ -309,7 +309,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	deleteFolder : function (uuid) {
 		if (confirm('Are you sure you want to delete folder ' + this.folders[uuid].title + '?')) {
-			console.log('delete folder: ', uuid);
+			// console.log('delete folder: ', uuid);
 			delete this.folders[uuid];
 			this.save();
 		}

@@ -237,7 +237,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	// reply from server
 	createdUser : function (context, json) {
-		console.log('createdUser: ', context, json);
+		// console.log('createdUser: ', context, json);
 
 		var store = JSON.parse(json);
 		var user = new Wu.User(store);
@@ -286,7 +286,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	
 	checkAll : function () {
-		console.log('checkAll');
+		// console.log('checkAll');
 	},
 
 	getSelected : function () {
@@ -373,7 +373,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	getAccessTemplate : function (user) {
 		// get no of projets etc for user
 		var projects = user.getProjects();
-		return projects.length + ' project(s)';
+		if (projects.length > 1) return projects.length + ' projects';
+		return projects.length + ' project';
 	},
 
 	getProjectsTemplate : function (user) {
@@ -497,6 +498,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// Toggle wrappers
 		this._container.style.display = 'block';
 
+		// update errythign
+		this.update();
+
 
 	},
 
@@ -552,7 +556,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	},
 
 	toggleReadAccess : function (item) {
-		console.log('toggle READ: ', item);
+		// console.log('toggle READ: ', item);
 		var user = item.user;
 
 		// get current state
@@ -573,7 +577,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 
 	toggleUpdateAccess : function (item) {
-		console.log('toggle: ', item);
+		// console.log('toggle: ', item);
 		var user = item.user;
 
 		// get current state
@@ -600,7 +604,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	},
 
 	toggleManageAccess : function (item) {
-		console.log('toggle: ', item);
+		// console.log('toggle: ', item);
 		var user = item.user;
 
 		// get current state

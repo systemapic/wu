@@ -14,7 +14,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	initContent : function () {
 
-		console.log('init clients', this._content, this._scrollWrapper );
+		// console.log('init clients', this._content, this._scrollWrapper );
 
 		// h3 title
 		// var title = Wu.DomUtil.create('h3', '', this._container);
@@ -67,7 +67,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	closeClient : function (client) {
-		console.log('close client: ', client.name);
+		// console.log('close client: ', client.name);
 	},
 
 	remove : function () {
@@ -152,7 +152,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	_enableConfirm : function () {
 		var target = Wu.DomUtil.get('editor-client-confirm-button');
 		target.style.backgroundColor = '';
-		console.log('Client name OK.');
+		// console.log('Client name OK.');
 	},
 
 	_cancel : function () {
@@ -198,7 +198,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	toggleEdit : function (e) { // this = client
-		console.log('toggle.edit');
+		// console.log('toggle.edit');
 
 		// stop propagation
 		if (e) Wu.DomEvent.stop(e); 

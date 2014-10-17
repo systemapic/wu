@@ -896,6 +896,10 @@
 			<input value="{{value}}" class="project-edit editable ct15 ct16">
 		</script>
 
+		<script id="injectProjectEditDescriptionInput" type="text/html">
+			<textarea class="project-edit-textarea editable ct15 ct16">{{value}}</textarea>
+		</script>
+
 		<script id="injectClientEditInput" type="text/html">
 			<input value="{{value}}" class="client-edit editable ct15 ct16">
 		</script>
@@ -1772,6 +1776,27 @@
 		<circle cx="5" cy="5" r="4" style="stroke:none; fill:blue;" />
 	</pattern>
 
+	<filter id="f1" x="0" y="0" width="200%" height="200%">
+
+	  <feOffset result="offOut" in="SourceAlpha" dx="5" dy="5" />
+	  <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
+	  <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+	 
+	</filter>
+
+  <filter id="drop-shadow" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur in="SourceAlpha" result="blur-out" stdDeviation="2" />
+    <feOffset in="blur-out" result="the-shadow" dx="-3" dy="3"/> 
+    <feColorMatrix in="the-shadow" result="color-out" type="matrix"
+      values="0 0 0 0   0
+              0 0 0 0   0 
+              0 0 0 0   0 
+              0 0 0 .25 0"/>
+    <feBlend in="SourceGraphic" in2="color-out" mode="normal"/>
+  </filter>
+</defs>
+
+
 
   
   </defs>
@@ -1780,4 +1805,58 @@
 
 
 	</body>	
+
+	<script>
+
+console.log('%c Oh my heavens! ', 'background: #222; color: #bada55');
+
+
+console.log("");
+console.log("");
+console.log("%c                  M,MMMMMMMMMMMMM.            ", 'color: #3333FF');
+console.log("%c              D...  MMMMMMMMMMMMMMMMM         ", 'color: #3333FF');
+console.log("%c            M,    ,MMMMMMMMMMMMMM~MMMN.       ", 'color: #3333FF');
+console.log("%c           MM.   ?MMMMMMMMM.   ZMM.  .  .     ", 'color: #3333FF');
+console.log("%c        .M.M  MMMN MMMMMMZ .:  .      .....   ", 'color: #3333FF');
+console.log("%c       . MMMMMMMMMMMMMMM.N MD.          ....  ", 'color: #3333FF');
+console.log("%c       D  MMMMMMMMMM.N MM 8              ...  ", 'color: #3333FF');
+console.log("%c      . M~MMMMMMMMMMMM                   .... ", 'color: #3333FF');
+console.log("%c       8MMMMMMMMMMMM.    M.M  .MMM. M.    ... ", 'color: #3333FF');
+console.log("%c       MMMMMMMMMMMMM  .MMM.MMN7...  .N    ... ", 'color: #3333FF');
+console.log("%c      MMMMMMMMMMMMMM       MM .M,        .... ", 'color: #3333FF');
+console.log("%c       .MMMMMMMMMMN              M   . MM$.M  ", 'color: #3333FF');
+console.log("%c       .NMMMMMMMNM                M  MMMMMMN  ", 'color: #3333FF');
+console.log("%c        .  MMMMMMMM                  MMMMM=   ", 'color: #3333FF');
+console.log("%c            .MMMMMMMMMMMMM         MMMMMM.    ", 'color: #3333FF');
+console.log("%c            . MMMMMMMMMMMM,       MMMMM       ", 'color: #3333FF');
+console.log("%c              MMMMMMMMMMMM      MM MM         ", 'color: #3333FF');
+console.log("%c                  MMMMMMMMM...MMM          ", 'color: #3333FF');
+console.log("%c        ____.----'          \\\ ", "color: #bc932f");
+console.log("%c        \\\                    \\\ ", "color: #bc932f");
+console.log("%c         \\\                    \\\ ", "color: #bc932f");
+console.log("%c          \\\                    \\\ ", "color: #bc932f");
+console.log("%c           \\\          ____.----'`--.__ ", "color: #bc932f");
+console.log("%c            \\\___.----'          |     `--.____ ", "color: #bc932f");
+console.log("%c           /`-._                |       __.-' \\\ ", "color: #bc932f");
+console.log("%c          /     `-._            ___.---'       \\\ ", "color: #bc932f");
+console.log("%c         /          `-.____.---'                \\\ ", "color: #bc932f");
+console.log("%c        /            / | \\\                       \\\ ", "color: #bc932f");
+console.log("%c       /            /  |  \\\                   _.--' ", "color: #bc932f");
+console.log("%c       `-.         /   |   \\\            __.--'", "color: #bc932f");
+console.log("%c          `-._    /    |    \\\     __.--'     |", "color: #bc932f");
+console.log("%c            | `-./     |     \\\_.-'           |", "color: #bc932f");
+console.log("%c            |          |                     |", "color: #bc932f");
+console.log("%c     _______|          |                     |_______________", "color: #bc932f");
+console.log("%c            `-.        |                  _.-'", "color: #bc932f");
+console.log("%c               `-.     |           __..--'", "color: #bc932f", "  ┌─┐");
+console.log("%c                  `-.  |      __.-'   ", "color: #bc932f", "┌┬┐   └─┐");
+console.log("%c                     `-|__.--'  ","color: #bc932f","┬─┐    ││   └─┘");
+console.log("                           ┌─┐   ├┬┘   ─┴┘   ");
+console.log("                     ┌┐┌   ├┤    ┴└─   ");
+console.log("                     │││   └─┘   ");
+console.log("                     ┘└┘   ");
+		   			   			   
+
+</script>
+
 </html>

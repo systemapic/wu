@@ -30,3 +30,26 @@
 	-webkit-transition: width .2s ease;
 	transition: width .2s ease;
 }
+
+.disabled {
+	opacity: 0.1;
+	height: 0px !important;
+}	
+
+.disabled a {
+	opacity: 0;
+}
+
+.project-edit-textarea {
+	background: rgba(0,0,0,0);
+	border: none;
+	height: 43px;
+	width: 116px;
+	overflow: hidden;
+	resize: none;
+	margin-left: -2px;
+	margin-top: -2px;
+	font-weight: 400;
+	font-size: 12px;
+	line-height: 1.2;
+}

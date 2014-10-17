@@ -584,9 +584,9 @@ Wu.MapPane = Wu.Class.extend({
 	},
 	
 	enableVectorstyle : function (container) {
-		console.log('enable VECTOR')
+		// console.log('enable VECTOR')
 		if (this.vectorStyle) return;
-		console.log('2');
+		// console.log('2');
 		
 		this.vectorStyle = L.control.styleEditor({ 
 			position: "topleft", 
@@ -695,22 +695,22 @@ Wu.MapPane = Wu.Class.extend({
 		// add circle support
 		map.on('draw:created', function(e) {
 
-			console.log('draw:created!');
+			// console.log('draw:created!');
 
 			// add circle support
 			e.layer.layerType = e.layerType;            
 
 			
 
-			console.log('this.project.editMode: ', that.project.editMode);
-			console.log('projecT: ', that.project);
+			// console.log('this.project.editMode: ', that.project.editMode);
+			// console.log('projecT: ', that.project);
 
 			// if editMode
 			if (that.project.editMode) {
 
 				// create layer and add to project
 				var geojson = e.layer.toGeoJSON();
-				console.log('drawn geojson: ', geojson);
+				// console.log('drawn geojson: ', geojson);
 				that.project.createLayerFromGeoJSON(geojson);
 				
 			} else {

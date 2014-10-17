@@ -104,13 +104,15 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	addEditHooks : function () {
-		console.log('addEditHooks', this.project.editMode);
+		// console.log('addEditHooks', this.project.editMode);
 
 		// editing hooks
 		if (!this.project.editMode) return;
 		Wu.DomEvent.on(this.name, 	 'dblclick', this.edit, this);
-		Wu.DomEvent.on(this.description, 'dblclick', this.edit, this);
+		Wu.DomEvent.on(this.description, 'dblclick', this.editDescription, this);
 		Wu.DomEvent.on(this.logo, 	 'click', Wu.DomEvent.stop, this);
+		Wu.DomEvent.on(this.name, 	 'click', Wu.DomEvent.stop, this);
+		Wu.DomEvent.on(this.description, 'click', Wu.DomEvent.stop, this);
 		this.addLogoDZ();
 
 		// add kill hook
@@ -122,13 +124,15 @@ Wu.SidePane.Project = Wu.Class.extend({
 	removeEditHooks : function () {
 		// if (!this.project.editMode) return;
 
-		console.log('addEditHooks', this.project.editMode);
+		// console.log('addEditHooks', this.project.editMode);
 
 
 		// editing hooks
 		Wu.DomEvent.off(this.name, 	  'dblclick', this.edit, this);
-		Wu.DomEvent.off(this.description, 'dblclick', this.edit, this);
+		Wu.DomEvent.off(this.description, 'dblclick', this.editDescription, this);
 		Wu.DomEvent.off(this.logo, 	  'click', Wu.DomEvent.stop, this);
+		Wu.DomEvent.off(this.name, 	  'click', Wu.DomEvent.stop, this);
+		Wu.DomEvent.off(this.description, 'click', Wu.DomEvent.stop, this);
 		this.removeLogoDZ();
 
 		// remove kill hook
@@ -213,7 +217,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	select : function (e) {
 
-		console.log('select e: ', e);
+		// console.log('select e: ', e);
 
 		// dont select if already active
 		// if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
@@ -230,7 +234,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	edit : function (e) {
-		console.log('edit!', e, this);
+		// console.log('edit!', e, this);
 		
 		// return if already editing
 		if (this.editing) return;
@@ -269,6 +273,48 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// save latest
 		this.project.store[div.type] = value;
 		this.project._update(div.type);
+
+		this.editing = false;
+
+	},
+
+	editDescription : function (e) {
+		
+		// return if already editing
+		if (this.editing) return;
+		this.editing = true;
+
+		var div = e.target;
+		var type = div.type;
+		var value = div.innerHTML;
+
+		div.innerHTML = '';
+		var input = Wu.DomUtil.create('textarea', 'project-edit-textarea', div);
+		input.innerHTML = value;
+
+		// focus
+		var target = input;
+		target.focus();
+		target.selectionStart = target.selectionEnd;	// prevents text selection
+
+		// save on blur or enter
+		Wu.DomEvent.on( target,  'blur',    this._editDescriptionBlur, this );     // save folder title
+		Wu.DomEvent.on( target,  'keydown', this._editKey,  this );     // save folder title
+
+	},
+
+	_editDescriptionBlur : function (e) {
+		
+		// get value
+		var value = e.target.value;
+
+		// revert to <div>
+		var div = e.target.parentNode;
+		div.innerHTML = value;
+
+		// save latest
+		this.project.store.description = value;
+		this.project._update('description');
 
 		this.editing = false;
 
