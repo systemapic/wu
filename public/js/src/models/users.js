@@ -148,10 +148,8 @@ Wu.User = Wu.Class.extend({
 	},
 
 	delegatedAccess : function (context, result) {
-		// console.log('saved access!', context, result);
-	},
-	
 
+	},
 
 	// convenience methods
 	addReadProject : function (project) {
@@ -194,7 +192,6 @@ Wu.User = Wu.Class.extend({
 		_.remove(this.store.role.editor.projects, function (p) {
 			return p == project.getUuid();
 		});
-
 	},
 
 
@@ -215,7 +212,6 @@ Wu.User = Wu.Class.extend({
 		_.remove(this.store.role.manager.projects, function (p) {
 			return p == project.getUuid();
 		});
-
 	},
 
 
