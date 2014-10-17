@@ -110,7 +110,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// new folder
 		Wu.DomEvent.off(this._newfolder, 'mousedown', this.newFolder, this);
 
-		// bind grande.js text editor
+		// unbind grande.js text editor
 		this.removeGrande();
 
 		// hide (+)
@@ -118,9 +118,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	},
 
-
-	
-	 
 	_activate : function (e) {                
 
 		// set top
@@ -265,7 +262,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// set folders
 		var folders = this.project.store.folders;
 
-
+		// return if no folders
 		if (!folders) return;
 
 		// delete buttons object
@@ -274,42 +271,45 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// create each folder headline
 		folders.forEach(function (elem, i, arr) {
 
-			// if editMode
-			if (this.project.editMode) {
-				// delete button
-				var btn = Wu.DomUtil.create('div', 'documents-folder-delete', this._folderpane, 'x');
-				// btn.innerHTML = 'x';
-				Wu.DomEvent.on(btn, 'click', function (e) { this.deleteFolder(elem.uuid); }, this);
-				this._deleteButtons[elem.uuid] = btn;
-			}
-
-			// folder item
-			var folder = elem;
-			folder.el = Wu.DomUtil.create('div', 'documents-folder-item ct23 ct28', this._folderpane);
-			folder.el.innerHTML = folder.title;
-		       
-			// set hooks
-			Wu.DomEvent.on( folder.el,  'mousedown', function (e) {
-				this.selectFolder(folder.uuid);
-			}, this );     // select folder
-			
-			// if editMode
-			if (this.project.editMode) {
-				Wu.DomEvent.on( folder.el,  'dblclick', function (e) {
-					this._renameFolder(e, folder.uuid);
-				}, this );      // rename folder
-			}
-
-			// update object
-			this.folders[folder.uuid] = folder;
+			this._createFolder(elem);
 
 		}, this);
 	       
 	},
 
+	_createFolder : function (elem) {
+		// if editMode
+		if (this.project.editMode) {
+			// delete button
+			var btn = Wu.DomUtil.create('div', 'documents-folder-delete', this._folderpane, 'x');
+			// btn.innerHTML = 'x';
+			Wu.DomEvent.on(btn, 'click', function (e) { this.deleteFolder(elem.uuid); }, this);
+			this._deleteButtons[elem.uuid] = btn;
+		}
+
+		// folder item
+		var folder = elem;
+		folder.el = Wu.DomUtil.create('div', 'documents-folder-item ct23 ct28', this._folderpane);
+		folder.el.innerHTML = folder.title;
+	       
+		// set hooks
+		Wu.DomEvent.on( folder.el,  'mousedown', function (e) {
+			this.selectFolder(folder.uuid);
+		}, this );     // select folder
+		
+		// if editMode
+		if (this.project.editMode) {
+			Wu.DomEvent.on( folder.el,  'dblclick', function (e) {
+				this._renameFolder(e, folder.uuid);
+			}, this );      // rename folder
+		}
+
+		// update object
+		this.folders[folder.uuid] = folder;
+	},
+
 	deleteFolder : function (uuid) {
 		if (confirm('Are you sure you want to delete folder ' + this.folders[uuid].title + '?')) {
-			// console.log('delete folder: ', uuid);
 			delete this.folders[uuid];
 			this.save();
 		}
@@ -378,7 +378,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// get folder
 		var folder = this.folders[uuid];
 
-		// clear rightpane
+		// clear rightpane hooks
+		Wu.DomEvent.off(this._textarea, 'keydown mousedown', this.autosave, this ); // auto-save
+
+		// clear rightpane content
 		this._textarea.innerHTML = '';
 		this._textarea.innerHTML = folder.content;
 		this._textarea.fuuid 	 = uuid;
@@ -444,6 +447,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// save project to server
 		this.project._update('folders');
+
+		// set status
+		app.setSaveStatus();
 
 		// refresh
 		this.update();

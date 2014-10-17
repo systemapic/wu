@@ -53,3 +53,21 @@
 	font-size: 12px;
 	line-height: 1.2;
 }
+
+.description-scroller {
+	cursor: pointer;
+}
+
+.description-scroller.description-editing {
+	cursor: text;
+}
+
+
+
+
+
+
+
+
+
+

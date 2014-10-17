@@ -1233,179 +1233,256 @@ module.exports = api = {
 			console.log('Project: ', project.name);
 
 
-			// get user
-			User
-			.findOne({uuid : userUuid})
-			.exec(function (err, subject) {
-				console.log('User: ', subject.firstName, subject.lastName);
 
-				// add access
-				if (add) {
+			Clientel
+			.findOne({uuid : project.client})
+			.exec(function (err, client) {
 
-					console.log('DELEGATING ' + role + ' access to project ' + project.name + ' for user ' + subject.firstName);
-	
-					// read access
-					if (role == 'reader') {
 
-						// check if user is allowed to delegate read access to project
-						if (api.can.delegate.reader(user, project)) {
 
-							subject.role.reader.projects.addToSet(project.uuid);
-							subject.role.reader.clients.addToSet(project.client); // make sure can read client
-							subject.markModified('role');
-							subject.save(function (err, result) {
-								if (err) return res.end(JSON.stringify({ error : err }));
-								var message = 'Success! read'
-								return res.end(JSON.stringify({ result : message }));
-							});
+				// get user
+				User
+				.findOne({uuid : userUuid})
+				.exec(function (err, subject) {
+					console.log('User: ', subject.firstName, subject.lastName);
 
-						} else {
-							console.log('access denied: role: reader, user: ' + subject.firstName + ', project: ' + project.name);
-							var message = 'Unauthorized access delegation attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-							return res.end(JSON.stringify({ error : message }));
+					// add access
+					if (add) {
+
+						console.log('DELEGATING ' + role + ' access to project ' + project.name + ' for user ' + subject.firstName);
+		
+						// read access
+						if (role == 'reader') {
+
+							// check if user is allowed to delegate read access to project
+							if (api.can.delegate.reader(user, project)) {
+
+								subject.role.reader.projects.addToSet(project.uuid);
+								subject.role.reader.clients.addToSet(project.client); // make sure can read client
+								subject.markModified('role');
+								subject.save(function (err, result) {
+									if (err) return res.end(JSON.stringify({ error : err }));
+									var message = 'Success! read'
+									return res.end(JSON.stringify({ result : message }));
+								});
+
+							} else {
+								console.log('access denied: role: reader, user: ' + subject.firstName + ', project: ' + project.name);
+								var message = 'Unauthorized access delegation attempt. Your IP ' + req._remoteAddress + ' has been logged.';
+								return res.end(JSON.stringify({ error : message }));
+							}
+
+
 						}
 
 
-					}
+						// edit access
+						if (role == 'editor') {
 
+							// check if user is allowed to delegate read access to project
+							if (api.can.delegate.editor(user, project)) {
 
-					// edit access
-					if (role == 'editor') {
+								subject.role.editor.projects.addToSet(project.uuid);
+								subject.role.reader.clients.addToSet(project.client); // make sure can read client
+								subject.markModified('role');
+								subject.save(function (err, result) {
+									if (err) return res.end(JSON.stringify({ error : err }));
+									var message = 'Success!'
+									return res.end(JSON.stringify({ result : message }));
+								});
 
-						// check if user is allowed to delegate read access to project
-						if (api.can.delegate.editor(user, project)) {
+							} else {
+								console.log('access denied: role: editor, user: ' + subject.firstName + ', project: ' + project.name);
+								var message = 'Unauthorized access delegation attempt. Your IP ' + req._remoteAddress + ' has been logged.';
+								return res.end(JSON.stringify({ error : message }));
+							}
 
-							subject.role.editor.projects.addToSet(project.uuid);
-							subject.role.reader.clients.addToSet(project.client); // make sure can read client
-							subject.markModified('role');
-							subject.save(function (err, result) {
-								if (err) return res.end(JSON.stringify({ error : err }));
-								var message = 'Success!'
-								return res.end(JSON.stringify({ result : message }));
-							});
-
-						} else {
-							console.log('access denied: role: editor, user: ' + subject.firstName + ', project: ' + project.name);
-							var message = 'Unauthorized access delegation attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-							return res.end(JSON.stringify({ error : message }));
 						}
 
-					}
+						// manager access
+						if (role == 'manager') {
 
-					// manager access
-					if (role == 'manager') {
+							// check if user is allowed to delegate read access to project
+							if (api.can.delegate.manager(user, project)) {
 
-						// check if user is allowed to delegate read access to project
-						if (api.can.delegate.manager(user, project)) {
+								subject.role.manager.projects.addToSet(project.uuid);
+								subject.role.reader.clients.addToSet(project.client); // make sure can read client
+								subject.markModified('role');
+								subject.save(function (err, result) {
+									if (err) return res.end(JSON.stringify({ error : err }));
+									var message = 'Success manager!'
+									return res.end(JSON.stringify({ result : message }));
+								});
 
-							subject.role.manager.projects.addToSet(project.uuid);
-							subject.role.reader.clients.addToSet(project.client); // make sure can read client
-							subject.markModified('role');
-							subject.save(function (err, result) {
-								if (err) return res.end(JSON.stringify({ error : err }));
-								var message = 'Success manager!'
-								return res.end(JSON.stringify({ result : message }));
-							});
-
-						} else {
-							console.log('access denied: role: manager, user: ' + subject.firstName + ', project: ' + project.name);
-							var message = 'Unauthorized access delegation attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-							return res.end(JSON.stringify({ error : message }));
-						}
+							} else {
+								console.log('access denied: role: manager, user: ' + subject.firstName + ', project: ' + project.name);
+								var message = 'Unauthorized access delegation attempt. Your IP ' + req._remoteAddress + ' has been logged.';
+								return res.end(JSON.stringify({ error : message }));
+							}
 
 
-					}
-
-
-
-
-				// revoke access
-				} else {
-
-					console.log('REVOKING ' + role + ' access to project ' + project.name + ' for user ' + subject.firstName);
-					
-					// read access
-					if (role == 'reader') {
-
-						// check if user is allowed to delegate read access to project
-						if (api.can.delegate.reader(user, project)) {
-
-							subject.role.reader.projects.pull(project.uuid);
-							subject.role.reader.clients.pull(project.client); // revoke client also
-							subject.markModified('role');
-							subject.save(function (err, result) {
-								if (err) return res.end(JSON.stringify({ error : err }));
-								var message = 'Success!'
-								return res.end(JSON.stringify({ result : message }));
-							});
-
-							
-
-
-
-						} else {
-							console.log('access denied: role: reader, user: ' + subject.firstName + ', project: ' + project.name);
-							var message = 'Unauthorized access delegation attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-							return res.end(JSON.stringify({ error : message }));
 						}
 
 
-					}
 
 
-					// edit access
-					if (role == 'editor') {
+					// revoke access
+					} else {
 
-						// check if user is allowed to delegate read access to project
-						if (api.can.delegate.editor(user, project)) {
+						console.log('REVOKING ' + role + ' access to project ' + project.name + ' for user ' + subject.firstName);
+						
+						// read access
+						if (role == 'reader') {
 
-							subject.role.editor.projects.pull(project.uuid);
-							subject.markModified('role');
-							subject.save(function (err, result) {
-								if (err) return res.end(JSON.stringify({ error : err }));
-								var message = 'Success!'
-								return res.end(JSON.stringify({ result : message }));
-							});
+							// check if user is allowed to delegate read access to project
+							if (api.can.delegate.reader(user, project)) {
 
-						} else {
-							console.log('access denied: role: editor, user: ' + subject.firstName + ', project: ' + project.name);
-							var message = 'Unauthorized access delegation attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-							return res.end(JSON.stringify({ error : message }));
+
+								return api._revokeClientIfEmpty(user, project, subject, res); //, function (err, subject) {
+
+									// subject.role.reader.projects.pull(project.uuid);
+									// // subject.role.reader.clients.pull(project.client); // revoke client also
+									// // if no more projects in project.client, revoke client
+
+
+
+
+									// subject.markModified('role');
+									// subject.save(function (err, result) {
+									// 	if (err) return res.end(JSON.stringify({ error : err }));
+									// 	var message = 'Success!'
+									// 	return res.end(JSON.stringify({ result : message }));
+									// });
+
+									
+								// });
+								
+
+
+
+							} else {
+								console.log('access denied: role: reader, user: ' + subject.firstName + ', project: ' + project.name);
+								var message = 'Unauthorized access delegation attempt. Your IP ' + req._remoteAddress + ' has been logged.';
+								return res.end(JSON.stringify({ error : message }));
+							}
+
+
 						}
 
 
-					}
+						// edit access
+						if (role == 'editor') {
 
-					// edit access
-					if (role == 'manager') {
+							// check if user is allowed to delegate read access to project
+							if (api.can.delegate.editor(user, project)) {
 
-						// check if user is allowed to delegate read access to project
-						if (api.can.delegate.manager(user, project)) {
+								subject.role.editor.projects.pull(project.uuid);
+								subject.markModified('role');
+								subject.save(function (err, result) {
+									if (err) return res.end(JSON.stringify({ error : err }));
+									var message = 'Success!'
+									return res.end(JSON.stringify({ result : message }));
+								});
 
-							subject.role.manager.projects.pull(project.uuid);
-							subject.markModified('role');
-							subject.save(function (err, result) {
-								if (err) return res.end(JSON.stringify({ error : err }));
-								var message = 'Success!'
-								return res.end(JSON.stringify({ result : message }));
-							});
+							} else {
+								console.log('access denied: role: editor, user: ' + subject.firstName + ', project: ' + project.name);
+								var message = 'Unauthorized access delegation attempt. Your IP ' + req._remoteAddress + ' has been logged.';
+								return res.end(JSON.stringify({ error : message }));
+							}
 
-						} else {
-							console.log('access denied: role: manager, user: ' + subject.firstName + ', project: ' + project.name);
-							var message = 'Unauthorized access delegation attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-							return res.end(JSON.stringify({ error : message }));
+
 						}
-					}
 
-				}	
-			})
+						// edit access
+						if (role == 'manager') {
+
+							// check if user is allowed to delegate read access to project
+							if (api.can.delegate.manager(user, project)) {
+
+								subject.role.manager.projects.pull(project.uuid);
+								subject.markModified('role');
+								subject.save(function (err, result) {
+									if (err) return res.end(JSON.stringify({ error : err }));
+									var message = 'Success!'
+									return res.end(JSON.stringify({ result : message }));
+								});
+
+							} else {
+								console.log('access denied: role: manager, user: ' + subject.firstName + ', project: ' + project.name);
+								var message = 'Unauthorized access delegation attempt. Your IP ' + req._remoteAddress + ' has been logged.';
+								return res.end(JSON.stringify({ error : message }));
+							}
+						}
+
+					}	
+				});
+
+			});
+
 		});
 	},
 
 
 
 
+	_revokeClientIfEmpty : function (user, project, subject, res) {
 
+
+		var clientUuid = project.client;
+
+		Project
+		.find({client : clientUuid})
+		.exec(function (err, projects) {
+			console.log('projects: ', projects);
+
+			// revoke project
+			var current = subject.role.reader.projects.toObject();
+			console.log('curent: ', current, typeof(current));
+
+			subject.role.reader.projects.pull(project.uuid);
+			// subject.role.reader.clients.pull(project.client); // revoke client also
+			// if no more projects in project.client, revoke client
+
+			var cur = [];
+			current.forEach(function (c) {
+				console.log('type: ', typeof(c));
+				cur.push(c.toString());
+			});
+
+			console.log('cur: ', cur);
+
+			// check if last project
+			var clientProjects = [];
+			projects.forEach(function(p) {
+				clientProjects.push(p.uuid);
+			});
+
+			console.log('cP: ', clientProjects);
+
+			var diff = _.difference(clientProjects, cur);
+
+			console.log('diff: ', diff);
+
+			if (diff.length == 0) {
+				console.log('last pro!');
+				subject.role.reader.clients.pull(project.client);
+			}
+
+			subject.markModified('role');
+			subject.save(function (err, result) {
+				if (err) return res.end(JSON.stringify({ error : err }));
+				var message = 'Success!'
+				return res.end(JSON.stringify({ result : message }));
+			});
+
+
+
+		});
+
+		
+
+
+	},
 
 
 	// #########################################
