@@ -39,7 +39,13 @@ Wu.App = Wu.Class.extend({
 			raster : 'http://85.10.202.87:8003/',
 			vector : '',	// tile servers
 			socket : ''	// websocket server
-		}
+		},
+
+		silentUsers : [
+			// redacted
+			'user-9fed4b5f', 	// KO
+			'user-e6e5d7d9' 	// J
+		]
 	},
 
 

@@ -221,9 +221,10 @@ Wu.User = Wu.Class.extend({
 
 	addProjectAccess : function (project) {
 		// add access locally
-		this.store.role.editor.projects.push(project.getUuid());
-		this.store.role.reader.projects.push(project.getUuid());
-		this.store.role.manager.projects.push(project.getUuid());
+		var uuid = project.getUuid();
+		this.store.role.editor.projects.push(uuid);
+		this.store.role.reader.projects.push(uuid);
+		this.store.role.manager.projects.push(uuid);
 	},
 
 
