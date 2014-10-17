@@ -39,7 +39,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._uploader 		= Wu.DomUtil.get('upload-container');
 		this._deleter 		= Wu.DomUtil.get('datalibrary-delete-file');
 		this._downloader 	= Wu.DomUtil.get('datalibrary-download-files');
-		// this._downloadList 	= Wu.DomUtil.get('datalibrary-download-dialogue');
 		this._checkall 		= Wu.DomUtil.get('checkbox-all');
 		this._checkallLabel 	= Wu.DomUtil.get('label-checkbox-all');
 
@@ -71,7 +70,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// delete button
 		Wu.DomEvent.on(this._deleter, 'mousedown', this.deleteConfirm, this);
 		Wu.DomUtil.removeClass(this._deleter, 'displayNone');
-
 	},
 
 	removeEditHooks : function () {
@@ -79,18 +77,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// delete button
 		Wu.DomEvent.off(this._deleter, 'mousedown', this.deleteConfirm, this);
 		Wu.DomUtil.addClass(this._deleter, 'displayNone');
-
-
 	},
 
 	_activate : function () {
-
 		if (this.dz) this.dz.enable();
-
 	},
 
 	_deactivate : function () {
-		// console.log('deactive sidepane datalib');
 		this.dz.disable();
 		this.disableFullscreenDZ();
 	},
@@ -203,12 +196,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// populate download window
 		var tr = '';
-		// console.log('cheks: ', checks);
 		checks.forEach(function (file, i, arr) {
-			// console.log('file: ', file);
 			var tmp = Wu.extend({}, file);
-			// console.log('tmp:', tmp);
-			// tmp.format = tmp.format.join(', ');     // fix format format
 			tr += ich.datalibraryDownloadRow(tmp);
 		}, this);
 
@@ -328,20 +317,20 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.dz.removeAllListeners();
 
 		// set project uuid for dropzone
-		this.dz.options.params.project = this.project.getUuid();
+		this.dz.options.params.project = this.project.getUuid();	// goes to req.body.project
 
 		// set dz events
 		this.dz.on('drop', function (e) { 
 			// console.log('drop', e); 
 		});
 
-		this.dz.on('dragenter', function () { 
-			// console.log('dragenter'); 
+		this.dz.on('dragenter', function (e) { 
+			console.log('dragenter', e); 
 		});
 
 		this.dz.on('addedfile', function (file) { 
 
-			// console.log('dz added: ', file);
+			console.log('dz added: ', file);
 
 			// count multiple files
 			that.filecount += 1;
@@ -351,8 +340,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 			// show fullscreen file info
 			if (!that._fulldrop) {
-				that.fullOn();
-				that.fullUpOn();
+				that.fullOn(file);
+				that.fullUpOn(file);
 			}
 
 			// set status
@@ -369,8 +358,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			// clean up
 			that.dz.removeFile(file);
 
-			
-		      
 		});
 
 		// this.dz.on('totaluploadprogress', function (progress, totalBytes, totalSent) { 
@@ -404,8 +391,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				that.progress.style.width = '0%';
 
 				// reset .fullscreen-drop
-				that.fullUpOff();
 				that.fulldropOff();
+				that.fullUpOff();
 				that._fulldrop = false;
 			}
 		});
@@ -414,11 +401,38 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	
 	// fullscreen when started uploading                                            // TODO: refactor fullUpOn etc..
-	fullUpOn : function () {                                                        //       add support for multiple files
+	fullUpOn : function (file) {                                                    //       add support for multiple files
 		// transform .fullscreen-drop                                           //       bugtest more thourougly
+	
+		// add file info
+		console.log('info: ', this.fulldrop);
+
+		var meta = this._createFileMetaContent(file);
+		this.fulldrop.innerHTML = '';		// clear
+		this.fulldrop.appendChild(meta);	// append meta
+
+		// show
 		Wu.DomUtil.addClass(this.fulldrop, 'fullscreen-dropped');
 	},
+
+	_createFileMetaContent : function (file) {
+
+		var wrapper 	= Wu.DomUtil.create('div', 'drop-meta-wrapper');
+		var name 	= Wu.DomUtil.create('div', 'drop-meta-name', wrapper);
+		var size 	= Wu.DomUtil.create('div', 'drop-meta-size', wrapper);
+		var type 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
+		var ext 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
+
+		name.innerHTML = 'Name: ' + file.name;
+		size.innerHTML = 'Size: ' + Wu.Util.bytesToSize(file.size);
+		type.innerHTML = 'Type: ' + file.type.split('/')[0].camelize();
+		ext.innerHTML  = 'Filetype: ' + file.type.split('/')[1];
+
+		return wrapper;
+	},
+
 	fullUpOff : function () {
+
 		Wu.DomUtil.removeClass(this.fulldrop, 'fullscreen-dropped');
 	},
 

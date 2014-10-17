@@ -69,8 +69,19 @@
 	background: rgba(255, 255, 255, 0.8);
 }
 
+#datalibrary-table th:hover {
+	font-weight: 500;
+}
 
-
+.drop-meta-wrapper {
+	height: 400px;
+	position: absolute;
+	top: 410px;
+	left: 100px;
+	padding: 20px;
+	font-size: 230%;
+	color: white;
+}
 
 
 

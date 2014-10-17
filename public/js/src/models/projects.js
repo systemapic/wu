@@ -9,10 +9,8 @@ Wu.Project = Wu.Class.extend({
 		// set editMode
 		this.setEditMode();
 
+		// ready save object
 		this.lastSaved = {};
-
-		// ensure active project // todo: refactor, take this out
-		// if (!app.activeProject) app.activeProject = this;
 
 		// attach client
 		this._client = Wu.app.Clients[this.store.client];
@@ -39,45 +37,29 @@ Wu.Project = Wu.Class.extend({
 	addLayer : function (layer) {
 		// creates a Wu.Layer object (could be Wu.MapboxLayer, Wu.RasterLayer, etc.)
 		this.store.layers.push(layer);
-		// this._update('layers');
 		this.layers[layer.uuid] = new Wu.createLayer(layer);
 	},
 
 	createLayerFromGeoJSON : function (geojson) {
-		// console.log('createGeoJSONLayer', geojson);
 
-		var options = {
+		// set options
+		var options = JSON.stringify({
 			project 	: this.getUuid(),
 			geojson 	: geojson,
 			layerType 	: 'geojson'
-		}
-
-		var json = JSON.stringify(options);
+		});
 		
-		// console.log('POST createLayerFromGeoJSON');
-
- 		Wu.Util.postcb('/api/layers/new', json, this._createdLayerFromGeoJSON, this);
+		// get new layer from server
+ 		Wu.Util.postcb('/api/layers/new', options, this._createdLayerFromGeoJSON, this);
 
 	},
 
 	_createdLayerFromGeoJSON : function (context, data) {
 
-		// console.log('_createdLayerFromGeoJSON: data, context', data, context);
+		// parse layer data
 		var parsed = JSON.parse(data);
-		// console.log('parsed: ', parsed);
-
-		// data = {
-		// 	error : false,
-		// 	done : {
-		// 		files : [{
-
-		// 		}],
-		// 		layers : [{
-
-		// 		}]
-		// 	}
-		// }
-
+		
+		// callback
 		app.SidePane.DataLibrary.uploaded(parsed, {
 			autoAdd : true
 		});
@@ -155,10 +137,8 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
-	select : function () {	// refactor, move to view?
+	select : function () {	
  
-		// if (app.activeProject == this) return;
-
 		// set as active
 		app.activeProject = this;
 
@@ -195,8 +175,8 @@ Wu.Project = Wu.Class.extend({
 
 
 	_update : function (field) {
-		// console.log('field: ', field);
-		// console.log(this.store);
+
+		// set fields
 		var json = {};
 		json[field] = this.store[field];
 		json.uuid = this.store.uuid;
@@ -216,8 +196,7 @@ Wu.Project = Wu.Class.extend({
 		// console.log('this.lastSaved= ', this.lastSaved);
 
 
-		// console.log('saving project field: ', json);
-
+		// save to server
 		var string = JSON.stringify(json);
 		this._save(string);
 		
@@ -233,11 +212,11 @@ Wu.Project = Wu.Class.extend({
 	
 
 	_save : function (string) {
-		// console.log('saving...');                                       // TODO: pgp
+		// save to server                                       	// TODO: pgp
 		Wu.save('/api/project/update', string);                         // TODO: save only if actual changes! saving too much already
 	
 		// set status
-		app.setStatus('Saved!');
+		app.setSaveStatus();
 	},
 
 	_saveNew : function (callback) {
@@ -336,8 +315,7 @@ Wu.Project = Wu.Class.extend({
 	getLayermenuLayers : function () {
 		return _.filter(this.store.layermenu, function (l) {
 			return !l.folder;
-		})
-		// return this.store.layermenu;		// todo: set layer uuid in layermenuItems
+		});
 	},
 
 	getLayers : function () {
@@ -459,15 +437,8 @@ Wu.Project = Wu.Class.extend({
 		return this.store.controls;
 	},
 
-
 	setFile : function (file) {
-
-		// add to local store
 		this.store.files.push(file);
-
-		// save to server (if necessary)
-		// this._update('files');
-
 	},
 
 	setLogo : function (path) {
@@ -484,7 +455,8 @@ Wu.Project = Wu.Class.extend({
 		var slug = name.replace(/\s+/g, '').toLowerCase();
 		slug = Wu.Util.stripAccents(slug);
 		this.store.slug = slug;
-		console.log('update slug: ', slug);
+		
+		// save slug to server
 		this._update('slug');
 
 		// set new url
@@ -526,10 +498,6 @@ Wu.Project = Wu.Class.extend({
 
 	removeFiles : function (files) {
 
-		// console.log('*********************')
-		// console.log('removeFiles: files: ', files);
-		// console.log('*********************')
-
 		var list = app.SidePane.DataLibrary.list,
 		    layerMenu = app.MapPane.layerMenu,
 		    _fids = [],
@@ -538,11 +506,6 @@ Wu.Project = Wu.Class.extend({
 
 		// iterate over files and delete
 		files.forEach(function(file, i, arr) {
-
-			// console.log('removeFiles: ', file);
-			// console.log('this.store.files: ', this.store.files);
-			// console.log('this.layers: ', this.layers);
-			// console.log('this.store.layermenu: ', this.store.layermenu);
 
 			// remove from list
 			list.remove('uuid', file.uuid);
@@ -566,14 +529,13 @@ Wu.Project = Wu.Class.extend({
 				delete this.layers[layer.store.uuid];	
 			}
 			
-			
 			// prepare remove from server
 			_fids.push(file._id);
 			uuids.push(file.uuid);
 
 		}, this);
 
-		// save changes to layermenu
+		// save changes
 		this._update('layermenu'); 
 
 		setTimeout(function () {	// ugly hack, cause two records can't be saved at same time, server side.. FUBAR!
@@ -607,18 +569,15 @@ Wu.Project = Wu.Class.extend({
 		var sources = [];
 		files.forEach(function (file) {
 			if (file.type == 'image') {
-
-				var thumbnail = '/pixels/' + file.uuid + '?width=75&height=50';
-				var url = '/pixels/' + file.uuid + '?width=200&height=200';
-
+				var thumbnail 	= '/pixels/' + file.uuid + '?width=75&height=50';
+				var url 	= '/pixels/' + file.uuid + '?width=200&height=200';
 				var source = {
-				    	title : file.name, 	// title
+				    	title 	: file.name, 	// title
 				    	thumbnail : thumbnail,  // optional. url to image
-				    	uuid : file.uuid,       // optional
-					type : file.type,
-					url : url
+				    	uuid 	: file.uuid,       // optional
+					type 	: file.type,
+					url 	: url
 				}
-
 				sources.push(source)
 			}
 		}, this);
@@ -630,21 +589,18 @@ Wu.Project = Wu.Class.extend({
 		var sources = [];
 		files.forEach(function (file) {
 			var thumbnail = (file.type == 'image') ? '/pixels/' + file.uuid + '?width=50&height=50' : '';
-			var prefix = (file.type == 'image') ? '/images/' : '/api/file/download/?file=';
-			var suffix = (file.type == 'image') ? '' : '&type=' + file.type;
-			var url = '/pixels/' + file.uuid + '?width=200&height=200';
-			
+			var prefix    = (file.type == 'image') ? '/images/' : '/api/file/download/?file=';
+			var suffix    = (file.type == 'image') ? '' : '&type=' + file.type;
+			var url       = '/pixels/' + file.uuid + '?width=200&height=200';
 			var source = {
-			    	title : file.name, 	// title
+			    	title 	: file.name, 	// title
 			    	thumbnail : thumbnail,  // optional. url to image
-			    	uuid : file.uuid,       // optional
-				type : file.type,
-				url : url
+			    	uuid 	: file.uuid,    // optional
+				type 	: file.type,
+				url 	: url
 			}
-
 			sources.push(source)
 		}, this);
-
 		return sources;
 	},
 });
