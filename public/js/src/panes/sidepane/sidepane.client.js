@@ -205,10 +205,33 @@ Wu.SidePane.Client = Wu.Class.extend({
 		
 	},
 
+	_projectCreated : function (project, json) {
+
+		var result = JSON.parse(json);
+		var error  = result.error;
+		var store  = result.project;
+
+		console.log('results: ', result);
+
+		// return error
+		if (error) return console.log('there was an error creating new project!', error);			
+
+		// add to global store
+		app.Projects[store.uuid] = project;
+
+		// update project store
+		project.setStore(store);
+
+		// add to access locally
+		project.addAccess();
+
+		// create project in sidepane
+		this._createNewProject(project);
+
+	},
+
 	// add project in sidepane
 	_createNewProject : function (project) {
-
-		// console.log('ppp', project);
 
 		// add project to client array
 		this.projects.push(project);
@@ -217,58 +240,23 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var options = {
 			parent : this
 		}
-		var projectDiv = new Wu.SidePane.Project(project, options);
+		var sidepaneProject = new Wu.SidePane.Project(project, options);
 
 		// add to client container
-		projectDiv.addToBefore(this._projectsContainer);
+		sidepaneProject.addToBefore(this._projectsContainer);
 
 		// refresh height
 		this.open();
 
 		// select
-		projectDiv.project._menuItem.select();
+		sidepaneProject.project._menuItem.select();
 	},
-
-	_projectCreated : function (project, json) {
-
-		// console.log('project: ', project);
-		// console.log('json: ', json);
-
-		var result = JSON.parse(json);
-		var error  = result.error;
-		var store  = result.project;
-
-		// return error
-		if (error) return console.log('there was an error creating new project!', error);			
-
-		// update project store
-		project.setStore(store);
-
-		// add to access locally
-		app.Account.addProjectAccess(project); // todo!
-
-		// select project
-		// project._menuItem.select();
-
-		// create project in sidepane
-		this._createNewProject(project);
-
-	},
-
-	
 
 	addHooks : function () {
-		// Wu.DomEvent.on( this._container.parentNode, 'mouseleave', this.close, this);	// todo: add click for opening also...
-		// Wu.DomEvent.on( this._container, 'mousemove', this.pendingOpen, this);
-		// Wu.DomEvent.on( this._container, 'mousedown', this.open, this);
 		Wu.DomEvent.on( this._container, 'mousedown', this.toggle, this);
-		
 	},
 
 	removeHooks : function () {
-		// Wu.DomEvent.off( this._container.parentNode, 'mouseleave', this.close, this);
-		// Wu.DomEvent.off( this._container, 'mousemove', this.pendingOpen, this);
-		// Wu.DomEvent.off( this._container, 'mousedown', this.open, this);
 		Wu.DomEvent.off( this._container, 'mousedown', this.toggle, this);
 	},
 

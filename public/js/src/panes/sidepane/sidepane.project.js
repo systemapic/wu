@@ -3,17 +3,26 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	initialize : function (project, options) {
 
+		// set options
 		Wu.setOptions(this, options);
 
+		// set project
 		this.project = project;
+
+		// set edit mode
 		this.project.setEditMode();
 
+		// set this as sidepane item
+		this.project.setSidepane(this);
+
+		// set parent
 		this._parent = this.options.parent; // client div container
 
-		this.project._menuItem = this;
-
-		this.initLayout(); 	// create divs
-		this.update();		// fill in divs
+		// init layout
+		this.initLayout(); 
+		
+		// update content
+		this.update();
 
 		return this;
 	},
@@ -54,9 +63,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.usersInnerWrapper);
 
-		// kill button
+		// add delete button
 		if (app.Account.canDeleteProject(this.project.store.uuid) || this.options.editMode) {
-			console.log('add kill btn');
 			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');
 		}
 
@@ -90,7 +98,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent.on(this._container, 'click',      this.select, this);
 		Wu.DomEvent.on(this._container, 'mousedown',  Wu.DomEvent.stopPropagation, this);	// to prevent closing of project pane
 	
-		console.log('addhoooks -> ', this.project.editMode);
 		// add edit hooks
 		if (this.project.editMode) this.addEditHooks();
 	},
@@ -106,37 +113,29 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	addEditHooks : function () {
-		console.log('addEditHooks', this.project.editMode);
 
 		if (!this.project.editMode) return;
 
 		// editing hooks
 		Wu.DomEvent.on(this.name, 	 'dblclick', this.edit, this);
 		Wu.DomEvent.on(this.description, 'dblclick', this.editDescription, this);
-		// Wu.DomEvent.on(this.logo, 	 'click', Wu.DomEvent.stop, this);
-		// Wu.DomEvent.on(this.name, 	 'click', Wu.DomEvent.stop, this);
-		// Wu.DomEvent.on(this.description, 'click', Wu.DomEvent.stop, this);
+
+		// add dz to logo
 		this.addLogoDZ();
 
 		// add kill hook
 		if (app.Account.canDeleteProject(this.project.getUuid())) {
-			console.log('lkill click')
 			Wu.DomEvent.on(this.kill, 'click', this.deleteProject, this);
 		}
 	},
 
 	removeEditHooks : function () {
-		// if (!this.project.editMode) return;
-
-		// console.log('addEditHooks', this.project.editMode);
-
 
 		// editing hooks
 		Wu.DomEvent.off(this.name, 	  'dblclick', this.edit, this);
 		Wu.DomEvent.off(this.description, 'dblclick', this.editDescription, this);
-		// Wu.DomEvent.off(this.logo, 	  'click', Wu.DomEvent.stop, this);
-		// Wu.DomEvent.off(this.name, 	  'click', Wu.DomEvent.stop, this);
-		// Wu.DomEvent.off(this.description, 'click', Wu.DomEvent.stop, this);
+
+		// remove dz
 		this.removeLogoDZ();
 
 		// remove kill hook
@@ -208,20 +207,14 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	open : function () {
-		// console.log('open sesame!');
-		if ( this._parent ) this._parent._container.style.overflow = 'visible';
-
+		if (this._parent) this._parent._container.style.overflow = 'visible';
 	},
 
 	close : function () {
-		// console.log('close for ali babar!');
-		if ( this._parent ) this._parent._container.style.overflow = 'hidden';
-
+		if (this._parent) this._parent._container.style.overflow = 'hidden';
 	},
 
 	select : function (e) {
-
-		// console.log('select e: ', e);
 
 		// dont select if already active
 		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
@@ -237,8 +230,21 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	},
 
+	// add class to mark project active in sidepane
+	_markActive : function () {
+		var projects = app.Projects;
+		for (p in projects) {
+			var project = projects[p];
+			project._menuItem._unmarkActive();
+		}
+		Wu.DomUtil.addClass(this._container, 'active-project');
+	},
+	
+	_unmarkActive : function () {
+		Wu.DomUtil.removeClass(this._container, 'active-project');
+	},
+
 	edit : function (e) {
-		// console.log('edit!', e, this);
 		
 		// return if already editing
 		if (this.editing) return;

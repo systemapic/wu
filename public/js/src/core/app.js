@@ -43,8 +43,8 @@ Wu.App = Wu.Class.extend({
 
 		silentUsers : [
 			// redacted
-			'user-9fed4b5f', 	// KO
-			'user-e6e5d7d9' 	// J
+			'user-9fed4b5f', // k
+			'user-e6e5d7d9'  // j
 		]
 	},
 
