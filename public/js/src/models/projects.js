@@ -630,10 +630,10 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	enableDarkTheme : function () {
-		darktheme();
+		app.Style.setDarkTheme();
 	},
 	disableDarkTheme : function () {
-		lighttheme();
+		app.Style.setLightTheme();
 	},
 
 	enableTooltips : function () {
