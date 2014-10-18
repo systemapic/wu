@@ -135,6 +135,9 @@ Wu.Project = Wu.Class.extend({
 		// update color theme
 		this.setColorTheme();
 
+		// set setings
+		this.refreshSettings();
+
 	},
 
 	select : function () {	
@@ -437,6 +440,15 @@ Wu.Project = Wu.Class.extend({
 		return this.store.controls;
 	},
 
+	getSettings : function () {
+		return this.store.settings;
+	},
+
+	setSettings : function (settings) {
+		this.store.settings = settings;
+		this._update('settings');
+	},
+
 	setFile : function (file) {
 		this.store.files.push(file);
 	},
@@ -603,4 +615,94 @@ Wu.Project = Wu.Class.extend({
 		}, this);
 		return sources;
 	},
+
+	refreshSettings : function () {
+		for (setting in this.getSettings()) {
+			this.getSettings()[setting] ? this['enable' + setting.camelize()]() : this['disable' + setting.camelize()]();
+		}
+	},
+
+	// settings
+	toggleSetting : function (setting) {
+		this.getSettings()[setting] ? this['disable' + setting.camelize()]() : this['enable' + setting.camelize()]();
+		this.store.settings[setting] = !this.store.settings[setting];
+		this._update('settings');
+	},
+
+	enableDarkTheme : function () {
+		darktheme();
+	},
+	disableDarkTheme : function () {
+		lighttheme();
+	},
+
+	enableTooltips : function () {
+
+	},
+	disableTooltips : function () {
+
+	},
+
+	enableScreenshot : function () {
+
+	},
+	disableScreenshot : function () {
+
+	},
+
+	enableDocumentsPane : function () {
+
+	},
+	disableDocumentsPane : function () {
+
+	},
+
+	enableDataLibrary : function () {
+
+	},
+	disableDataLibrary : function () {
+
+	},
+
+	enableMediaLibrary : function () {
+
+	},
+	disableMediaLibrary : function () {
+
+	},
+
+	enableSocialSharing : function () {
+
+	},
+	disableSocialSharing : function () {
+
+	},
+
+	enableAutoHelp : function () {
+
+	},
+	disableAutoHelp : function () {
+
+	},
+
+	enableAutoAbout : function () {
+
+	},
+	disableAutoAbout : function () {
+
+	},
+
+	enableMapboxGL : function () {
+
+	},
+	disableMapboxGL : function () {
+
+	},
+
+
+
+
+
+
+
 });

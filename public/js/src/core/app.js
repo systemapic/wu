@@ -24,6 +24,7 @@ Wu.App = Wu.Class.extend({
 		chat : true,
 		colorTheme : true,
 		screenshot : true,
+		socialSharing : true,
 
 		providers : {
 			// default accounts, added to all new (and old?) projects
