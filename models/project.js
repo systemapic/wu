@@ -125,8 +125,20 @@ var projectSchema = mongoose.Schema({
 		baselayertoggle : { type: Boolean, default: false }
 	},
 
-	
+	settings : {
+		screenshot 	: { type: Boolean, default: true },
+		socialSharing 	: { type: Boolean, default: true },
+		documentsPane 	: { type: Boolean, default: true },
+		dataLibrary 	: { type: Boolean, default: true },
+		autoHelp 	: { type: Boolean, default: true },
+		autoAbout 	: { type: Boolean, default: true },
+		darkTheme 	: { type: Boolean, default: true },
+		tooltips 	: { type: Boolean, default: true },
+		mediaLibrary 	: { type: Boolean, default: false },
+		mapboxGL	: { type: Boolean, default: false },
+	}
 
+	
 });
 
 // timestamps plugin

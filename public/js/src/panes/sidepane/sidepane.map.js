@@ -27,6 +27,7 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		this.mapSettings.position  = new Wu.SidePane.Map.Position();
 		this.mapSettings.controls  = new Wu.SidePane.Map.Controls();
 		this.mapSettings.connect   = new Wu.SidePane.Map.Connect(this._settingsContainer);  // refactor container, ich.template
+		this.mapSettings.settings  = new Wu.SidePane.Map.Settings(this._settingsContainer);  // refactor container, ich.template
 
 	},
 

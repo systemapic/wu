@@ -172,165 +172,6 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 
 
 
-Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
-	_ : 'sidepane.map.connect', 
-
-	type : 'connect',			
-
-	initLayout : function (container) {
-		
-		// container, header, outer
-		this._container	 	= Wu.DomUtil.create('div', 'editor-inner-wrapper editor-map-item-wrap ct12 ct17 ct23', container);
-		var h4 			= Wu.DomUtil.create('h4', '', this._container, 'Connected Accounts');
-		this._outer 		= Wu.DomUtil.create('div', 'connect-outer', this._container);
-
-		// mapbox connect
-		var wrap 	  	= Wu.DomUtil.create('div', 'connect-mapbox', this._outer);
-		var h4 		  	= Wu.DomUtil.create('div', 'connect-mapbox-title', wrap, 'Mapbox');
-		this._mapboxWrap  	= Wu.DomUtil.create('div', 'mapbox-connect-wrap ct11', this._outer);
-		this._mapboxInput 	= Wu.DomUtil.create('input', 'input-box search import-mapbox-layers', this._mapboxWrap);
-		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-gray ct0 ct11 import-mapbox-layers-button', this._mapboxWrap, 'Add');
-		this._mapboxAccounts 	= Wu.DomUtil.create('div', 'mapbox-accounts', this._mapboxWrap);
-		
-		// clear vars n fields
-		this.resetInput();
-
-	},
-
-	addHooks : function () {
-		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
-
-		// connect mapbox button
-		Wu.DomEvent.on( this._mapboxConnect, 'click', this.importMapbox, this );
-
-		// stops
-		Wu.DomEvent.on( this._mapboxConnect, 'mousedown', Wu.DomEvent.stop, this );
-		Wu.DomEvent.on( this._mapboxInput, 'mousedown', Wu.DomEvent.stopPropagation, this );
-
-	},
-
-	removeHooks : function () {
-		// todo!!!
-	},	
-
-	calculateHeight : function () {
-		var num = this.project.getMapboxAccounts().length;
-		this.maxHeight = 100 + num * 30;
-		this.minHeight = 0;
-	},
-
-	// get mapbox access token
-	tokenMode : function () {
-		this._username = this._mapboxInput.value;
-		this._mapboxInput.value = '';
-		this._askedToken = true;
-		this._mapboxConnect.innerHTML = 'OK';
-		this._mapboxInput.setAttribute('placeholder', 'Enter access token');
-	},
-
-	// reset temp vars
-	resetInput : function () {
-		this._username = null;
-		delete this._username;
-		this._askedToken = false;
-		this._mapboxConnect.innerHTML = 'Add';
-		this._mapboxInput.setAttribute('placeholder', 'Mapbox username');
-		this._mapboxInput.value = '';
-	},
-
-	// on click when adding new mapbox account
-	importMapbox : function () {
-
-		if (!this._askedToken) return this.tokenMode();
-
-		// get username
-		var username = this._username;
-		var accessToken = this._mapboxInput.value;
-
-		// clear
-		this.resetInput();
-
-		// get mapbox account via server
-		this._importMapbox(username, accessToken);
-
-	},
-
-	_importMapbox : function (username, accessToken) {
-
-		// get mapbox account via server
-		var data = {
-			'username' : username,
-			'accessToken' : accessToken,
-			'projectId' : this.project.store.uuid
-		}
-		// post         path                            json          callback      this
-		Wu.post('/api/util/getmapboxaccount', JSON.stringify(data), this.importedMapbox, this);
-	},
-
-	importedMapbox : function (that, json) {
-		
-		// project store
-		var result = JSON.parse(json);
-		var error = result.error;
-		var store = result.project;
-
-		if (error) {
-			console.log('There was an error importing mapbox: ', error);
-			return;
-		}
-
-		that.project.setStore(store);
-
-	},
-
-	fillMapbox : function () {
-
-		// get accounts
-		var accounts = this.project.getMapboxAccounts();
-
-		// return if no accounts
-		if (!accounts) return;
-
-		// reset
-		this._mapboxAccounts.innerHTML = '';
-		
-		// fill with accounts
-		accounts.forEach(function (account) {
-			var wrap  = Wu.DomUtil.create('div', 'mapbox-listed-account', this._mapboxAccounts);
-			var title = Wu.DomUtil.create('div', 'mapbox-listed-account-title', wrap, account.username.camelize());
-
-			// add kill button for editMode... // todo: what about layers in deleted accounts, etc etc??
-			// if (this.project.editMode) {
-			// 	var kill = Wu.DomUtil.create('div', 'mapbox-listed-account-kill', wrap, 'X');
-				
-			// 	// add hook
-			// 	Wu.DomEvent.on(kill, 'click', function () {
-			// 		this.removeAccount(wrap, account);
-			// 	}, this);
-			// }
-
-		}, this);
-		
-
-	},
-
-	removeAccount : function (div, account) {
-		Wu.DomUtil.remove(div);
-		this.project.removeMapboxAccount(account);
-	},
-
-	update : function () {
-		Wu.SidePane.Map.MapSetting.prototype.update.call(this)	// call update on prototype
-
-		// fill in mapbox accounts
-		this.fillMapbox();
-	},
-
-
-
-})
-
-
                                     
 Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 	_ : 'sidepane.map.baselayers', 
@@ -1533,6 +1374,336 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 			}
 		}
 	},
+
+});
+
+
+
+
+
+
+
+
+Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.connect', 
+
+	type : 'connect',			
+
+	initLayout : function (container) {
+		
+		// container, header, outer
+		this._container	 	= Wu.DomUtil.create('div', 'editor-inner-wrapper editor-map-item-wrap ct12 ct17 ct23', container);
+		var h4 			= Wu.DomUtil.create('h4', '', this._container, 'Connected Accounts');
+		this._outer 		= Wu.DomUtil.create('div', 'connect-outer', this._container);
+
+		// mapbox connect
+		var wrap 	  	= Wu.DomUtil.create('div', 'connect-mapbox', this._outer);
+		var h4 		  	= Wu.DomUtil.create('div', 'connect-mapbox-title', wrap, 'Mapbox');
+		this._mapboxWrap  	= Wu.DomUtil.create('div', 'mapbox-connect-wrap ct11', this._outer);
+		this._mapboxInput 	= Wu.DomUtil.create('input', 'input-box search import-mapbox-layers', this._mapboxWrap);
+		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-gray ct0 ct11 import-mapbox-layers-button', this._mapboxWrap, 'Add');
+		this._mapboxAccounts 	= Wu.DomUtil.create('div', 'mapbox-accounts', this._mapboxWrap);
+		
+		// clear vars n fields
+		this.resetInput();
+
+	},
+
+	addHooks : function () {
+		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
+
+		// connect mapbox button
+		Wu.DomEvent.on( this._mapboxConnect, 'click', this.importMapbox, this );
+
+		// stops
+		Wu.DomEvent.on( this._mapboxConnect, 'mousedown', Wu.DomEvent.stop, this );
+		Wu.DomEvent.on( this._mapboxInput, 'mousedown', Wu.DomEvent.stopPropagation, this );
+
+	},
+
+	removeHooks : function () {
+		// todo!!!
+	},	
+
+	calculateHeight : function () {
+		var num = this.project.getMapboxAccounts().length;
+		this.maxHeight = 100 + num * 30;
+		this.minHeight = 0;
+	},
+
+	// get mapbox access token
+	tokenMode : function () {
+		this._username = this._mapboxInput.value;
+		this._mapboxInput.value = '';
+		this._askedToken = true;
+		this._mapboxConnect.innerHTML = 'OK';
+		this._mapboxInput.setAttribute('placeholder', 'Enter access token');
+	},
+
+	// reset temp vars
+	resetInput : function () {
+		this._username = null;
+		delete this._username;
+		this._askedToken = false;
+		this._mapboxConnect.innerHTML = 'Add';
+		this._mapboxInput.setAttribute('placeholder', 'Mapbox username');
+		this._mapboxInput.value = '';
+	},
+
+	// on click when adding new mapbox account
+	importMapbox : function () {
+
+		if (!this._askedToken) return this.tokenMode();
+
+		// get username
+		var username = this._username;
+		var accessToken = this._mapboxInput.value;
+
+		// clear
+		this.resetInput();
+
+		// get mapbox account via server
+		this._importMapbox(username, accessToken);
+
+	},
+
+	_importMapbox : function (username, accessToken) {
+
+		// get mapbox account via server
+		var data = {
+			'username' : username,
+			'accessToken' : accessToken,
+			'projectId' : this.project.store.uuid
+		}
+		// post         path                            json          callback      this
+		Wu.post('/api/util/getmapboxaccount', JSON.stringify(data), this.importedMapbox, this);
+	},
+
+	importedMapbox : function (that, json) {
+		
+		// project store
+		var result = JSON.parse(json);
+		var error = result.error;
+		var store = result.project;
+
+		if (error) {
+			console.log('There was an error importing mapbox: ', error);
+			return;
+		}
+
+		that.project.setStore(store);
+
+	},
+
+	fillMapbox : function () {
+
+		// get accounts
+		var accounts = this.project.getMapboxAccounts();
+
+		// return if no accounts
+		if (!accounts) return;
+
+		// reset
+		this._mapboxAccounts.innerHTML = '';
+		
+		// fill with accounts
+		accounts.forEach(function (account) {
+			var wrap  = Wu.DomUtil.create('div', 'mapbox-listed-account', this._mapboxAccounts);
+			var title = Wu.DomUtil.create('div', 'mapbox-listed-account-title', wrap, account.username.camelize());
+
+			// add kill button for editMode... // todo: what about layers in deleted accounts, etc etc??
+			// if (this.project.editMode) {
+			// 	var kill = Wu.DomUtil.create('div', 'mapbox-listed-account-kill', wrap, 'X');
+				
+			// 	// add hook
+			// 	Wu.DomEvent.on(kill, 'click', function () {
+			// 		this.removeAccount(wrap, account);
+			// 	}, this);
+			// }
+
+		}, this);
+		
+
+	},
+
+	removeAccount : function (div, account) {
+		Wu.DomUtil.remove(div);
+		this.project.removeMapboxAccount(account);
+	},
+
+	update : function () {
+		Wu.SidePane.Map.MapSetting.prototype.update.call(this)	// call update on prototype
+
+		// fill in mapbox accounts
+		this.fillMapbox();
+	},
+
+
+
+});
+
+
+                       
+Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.settings', 
+
+	type : 'settings',
+
+	options : {
+
+		// include settings
+		screenshot 	: true,
+		socialSharing 	: true,
+		documentsPane 	: true,
+		dataLibrary 	: true,
+		mediaLibrary 	: true,
+		autoHelp 	: true,
+		autoAbout 	: true,
+		darkTheme 	: true,
+		tooltips 	: true,
+		mapboxGL	: false
+
+	},
+
+	initLayout : function (container) {
+
+		// container, header, outer
+		this._container	= Wu.DomUtil.create('div', 'editor-inner-wrapper editor-map-item-wrap ct12 ct17 ct23', container);
+		var h4 		= Wu.DomUtil.create('h4', '', this._container, 'Settings');
+		this._outer 	= Wu.DomUtil.create('div', 'settings-outer', this._container);
+
+	},
+
+	addHooks : function () {
+		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
+
+		Wu.DomEvent.on(this._outer, 'mousedown', Wu.DomEvent.stopPropagation, this);
+
+	},
+
+	removeHooks : function () {
+		// todo!!!
+
+		Wu.DomEvent.off(this._outer, 'mousedown', Wu.DomEvent.stopPropagation, this);
+	},	
+
+	calculateHeight : function () {
+		var num = _.filter(this.options, function (o) { return o; }).length;
+		this.maxHeight = num * 40;
+		this.minHeight = 0;
+	},
+
+	contentLayout : function () {
+
+		// screenshot
+		// social media sharing
+		// documents pane
+		// data library pane
+		// add help/about auto-folders to documents
+		// dark/light theme
+
+		var wrapper = Wu.DomUtil.create('div', 'settings-wrapper');
+
+		if (this.options.screenshot) {
+			var screenshot = this._contentItem('screenshot', 'Screenshots');
+			wrapper.appendChild(screenshot);
+		}
+		if (this.options.socialSharing) {
+			var socialSharing = this._contentItem('socialSharing', 'Social Sharing');
+			wrapper.appendChild(socialSharing);
+		}
+		if (this.options.documentsPane) {
+			var documentsPane = this._contentItem('documentsPane', 'Documents Pane');
+			wrapper.appendChild(documentsPane);
+		}
+		if (this.options.dataLibrary) {
+			var dataLibrary = this._contentItem('dataLibrary', 'Data Library');
+			wrapper.appendChild(dataLibrary);
+		}
+		if (this.options.mediaLibrary) {
+			var mediaLibrary = this._contentItem('mediaLibrary', 'Media Library');
+			wrapper.appendChild(mediaLibrary);
+		}
+		if (this.options.autoHelp) {
+			var autoHelp = this._contentItem('autoHelp', 'Add Help');
+			wrapper.appendChild(autoHelp);
+		}
+		if (this.options.autoAbout) {
+			var autoAbout = this._contentItem('autoAbout', 'Add About');
+			wrapper.appendChild(autoAbout);
+		}
+		if (this.options.darkTheme) {
+			var darkTheme = this._contentItem('darkTheme', 'Dark Theme');
+			wrapper.appendChild(darkTheme);
+		}
+		if (this.options.tooltips) {
+			var tooltips = this._contentItem('tooltips', 'Tooltips');
+			wrapper.appendChild(tooltips);
+		}
+		if (this.options.mapboxGL) {
+			var mapboxGL = this._contentItem('mapboxGL', 'Enable MapboxGL');
+			wrapper.appendChild(mapboxGL);
+		}
+
+		return wrapper;
+	},
+
+	_contentItem : function (setting, title) {
+
+		// create item
+		var className 	= 'settings-item settings-item-' + setting,
+		    div 	= Wu.DomUtil.create('div', className),
+		    titlediv 	= Wu.DomUtil.create('div', 'settings-item-title', div),
+		    switchWrap  = Wu.DomUtil.create('div', 'switch', div),
+		    input 	= Wu.DomUtil.create('input', 'cmn-toggle cmn-toggle-round-flat', switchWrap),
+		    label 	= Wu.DomUtil.create('label', '', switchWrap),
+		    id 		= Wu.Util.guid();
+		
+		// set title etc.
+		titlediv.innerHTML = title;
+		input.setAttribute('type', 'checkbox');
+		if (this._settings[setting]) input.setAttribute('checked', 'checked');
+		input.id = id;
+		label.setAttribute('for', id);
+
+		// set events
+		Wu.DomEvent.on(input, 'click', function (e) {
+			Wu.DomEvent.stopPropagation(e);
+
+			// toggle setting
+			this.project.toggleSetting(setting);
+
+			// refresh settings
+			this._settings = this.project.getSettings();
+			
+		}, this);
+		 
+		Wu.DomEvent.on(switchWrap, 'mousedown', Wu.DomEvent.stopPropagation);
+
+		// return div
+		return div;
+
+	},
+
+	save : function () {
+		this.project.setSettings(this._settings);
+	},
+
+	update : function () {
+		Wu.SidePane.Map.MapSetting.prototype.update.call(this)
+		
+		// get project settings
+		this._settings = this.project.getSettings();
+
+		// create content
+		var content = this.contentLayout();
+		this._outer.innerHTML = '';
+		this._outer.appendChild(content);
+
+	},
+
+
+
 
 });
 

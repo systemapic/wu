@@ -551,7 +551,8 @@ module.exports = api = {
 				'colorTheme',
 				'title',
 				'slug',
-				'connectedAccounts'
+				'connectedAccounts',
+				'settings'
 			];
 	
 			var queries = {};
