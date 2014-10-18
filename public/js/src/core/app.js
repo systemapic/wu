@@ -20,11 +20,13 @@ Wu.App = Wu.Class.extend({
 			users 		: true,
 		},	
 		
-		// not plugged in
-		chat : true,
-		colorTheme : true,
-		screenshot : true,
-		socialSharing : true,
+		// default settings
+		settings : {		// not plugged in
+			chat : true,
+			colorTheme : true,
+			screenshot : true,
+			socialSharing : true,
+		},
 
 		providers : {
 			// default accounts, added to all new (and old?) projects
@@ -36,10 +38,10 @@ Wu.App = Wu.Class.extend({
 
 		servers : {
 			// not used, using window url atm..
-			portal : 'http://85.10.202.87:8080/',
-			raster : 'http://85.10.202.87:8003/',
-			vector : '',	// tile servers
-			socket : ''	// websocket server
+			portal : 'http://85.10.202.87:8080/',	// api
+			raster : 'http://85.10.202.87:8003/',	// raster tile server
+			vector : '',				// vector tile server
+			socket : ''				// websocket server
 		},
 
 		silentUsers : [
@@ -154,13 +156,15 @@ Wu.App = Wu.Class.extend({
 
 	_initPanes : function () {
 
+		// render style handler
+		this.Style = new Wu.Style();
+
 		// render status pane
-		// add home button
 		this.StatusPane = new Wu.StatusPane({
 			addTo: this._appPane
 		});
 
-		// add progress bar
+		// render progress bar
 		this.ProgressBar = new Wu.ProgressBar({
 			color : 'white',
 			addTo : this._appPane
@@ -174,9 +178,6 @@ Wu.App = Wu.Class.extend({
 
 		// render map pane
 		this.MapPane = new Wu.MapPane();
-
-		// render status bar
-		// if (this.options.statusPane) this.StatusPane = new Wu.StatusPane();
 
 	},
 

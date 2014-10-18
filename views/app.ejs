@@ -14,21 +14,20 @@
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/leaflet.js/leaflet.css" />
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/powerange/powerange.min.css">
-		
-		<link rel="stylesheet" href="//85.10.202.87:8080/css/style.css">
-		<link rel="stylesheet" href="//85.10.202.87:8080/css/evil.css">
-		<link rel="stylesheet" href="//85.10.202.87:8080/css/knut.css"> -->
+-->
 
 		<!-- concat + cssmin -->
 		<link rel="stylesheet" href="//85.10.202.87:8080/dist/css.dependencies.min.css">
-		<!-- <link rel="stylesheet" href="//85.10.202.87:8080/dist/css.portal.min.css"> -->
 		
 		<!-- dev css -->
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/style.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/evil.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/css/knut.css">
 		
+		<!-- <link rel="stylesheet" href="//85.10.202.87:8080/dist/css.portal.min.css"> -->
 
+
+		<!-- styletag for injecting css -->
 		<div id="styletag"></div>
 
 		
@@ -40,7 +39,6 @@
 		<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.2/mapbox.standalone.js'></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet-omnivore.min.js"></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.geojson.draw.js"></script>
-		<!-- <script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw.min.js"></script> -->
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw-src.js"></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw.note.js"></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.js"></script>
@@ -1635,13 +1633,13 @@
 		<script src="//85.10.202.87:8080/js/src/controls/legendsControl.js"></script> 				
 		<script src="//85.10.202.87:8080/js/src/controls/mousepositionControl.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/controls/baselayertoggleControl.js"></script> 
+		<script src="//85.10.202.87:8080/js/src/controls/styleControl.js"></script> <!-- themeToggle.js -->	 
 	
 		<script src="//85.10.202.87:8080/js/src/models/projects.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/models/clients.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/models/users.js"></script> 
 		<script src="//85.10.202.87:8080/js/src/models/layers.js"></script> 
-		<script src="//85.10.202.87:8080/js/src/models/colorThemes.js"></script>	
-		<script src="//85.10.202.87:8080/js/src/help/themeToggle.js"></script>		 
+		<!-- <script src="//85.10.202.87:8080/js/src/models/colorThemes.js"></script>	 -->
 
 
 		<script src="//85.10.202.87:8080/js/src/core/app.js"></script> 
@@ -1654,6 +1652,7 @@
 
 
 			// start systemapic app
+			// must be var app
 			var app = new Wu.App({
 					
 					id : 'app',
@@ -1711,11 +1710,6 @@
 <svg xmlns="http://www.w3.org/2000/svg">
   <defs>
   
-   <!--  <pattern id="diagonal-dots" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <circle cx="5" cy="5" r="4" style="stroke:none; fill:blue;" />
-    </pattern> -->
-	  
-
     <!-- PATTERN ONE -->
 	<pattern id="SVGpattern1" width="30" height="30" patternUnits="userSpaceOnUse">
 		<rect width="30" height="30" fill="#00a9f1"></rect>
@@ -1755,8 +1749,8 @@
 
 	<!-- PATTERN FIVE -->
 	<pattern id="SVGpattern5" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
-      <rect x="0" y="0" width="4" height="8" style="stroke:none; fill:purple;" />
-    </pattern>
+      		<rect x="0" y="0" width="4" height="8" style="stroke:none; fill:purple;" />
+    	</pattern>
 
 	<!-- PATTERN SEVEN -->
 	<pattern id="SVGpattern6"  width="40" height="40" viewBox="0 0 20 20" patternUnits="userSpaceOnUse">
@@ -1766,51 +1760,45 @@
 		<circle cx="18.4" cy="18.4" r="9.2" stroke-width="1" stroke="#613" fill="none"></circle>
 	</pattern>
 
-    <!-- PATTERN SIX -->
+    	<!-- PATTERN SIX -->
 	<pattern id="SVGpattern7" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
-      <circle cx="3" cy="3" r="2" style="stroke:none; fill:red;" />
-    </pattern>
+      		<circle cx="3" cy="3" r="2" style="stroke:none; fill:red;" />
+    	</pattern>
 
-    <!-- PATTERN EIGHT -->
+    	<!-- PATTERN EIGHT -->
 	<pattern id="SVGpattern8" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
 		<circle cx="5" cy="5" r="4" style="stroke:none; fill:blue;" />
 	</pattern>
 
+	<!-- FILTERS -->
 	<filter id="f1" x="0" y="0" width="200%" height="200%">
-
-	  <feOffset result="offOut" in="SourceAlpha" dx="5" dy="5" />
-	  <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
-	  <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
-	 
+	  	<feOffset result="offOut" in="SourceAlpha" dx="5" dy="5" />
+	  	<feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
+	 	<feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
 	</filter>
 
-  <filter id="drop-shadow" x="-20%" y="-20%" width="140%" height="140%">
-    <feGaussianBlur in="SourceAlpha" result="blur-out" stdDeviation="2" />
-    <feOffset in="blur-out" result="the-shadow" dx="-3" dy="3"/> 
-    <feColorMatrix in="the-shadow" result="color-out" type="matrix"
-      values="0 0 0 0   0
-              0 0 0 0   0 
-              0 0 0 0   0 
-              0 0 0 .25 0"/>
-    <feBlend in="SourceGraphic" in2="color-out" mode="normal"/>
-  </filter>
+	<filter id="drop-shadow" x="-20%" y="-20%" width="140%" height="140%">
+		<feGaussianBlur in="SourceAlpha" result="blur-out" stdDeviation="2" />
+		<feOffset in="blur-out" result="the-shadow" dx="-3" dy="3"/> 
+		<feColorMatrix in="the-shadow" result="color-out" type="matrix"
+		values="0 0 0 0   0
+		0 0 0 0   0 
+		0 0 0 0   0 
+		0 0 0 .25 0"/>
+		<feBlend in="SourceGraphic" in2="color-out" mode="normal"/>
+	</filter>
+	</defs>
 </defs>
+</svg> 
 
 
 
-  
-  </defs>
-</svg>
+</body>	
 
 
 
-	</body>	
-
-	<script>
-
+<script>
 console.log('%c Oh my heavens! ', 'background: #222; color: #bada55');
-
-
 console.log("");
 console.log("");
 console.log("%c                  M,MMMMMMMMMMMMM.            ", 'color: #3333FF');
@@ -1854,9 +1842,7 @@ console.log("%c                     `-|__.--'  ","color: #bc932f","┬─┐    
 console.log("                           ┌─┐   ├┬┘   ─┴┘   ");
 console.log("                     ┌┐┌   ├┤    ┴└─   ");
 console.log("                     │││   └─┘   ");
-console.log("                     ┘└┘   ");
-		   			   			   
-
+console.log("                     ┘└┘   ");	   			   			  
 </script>
 
 </html>
