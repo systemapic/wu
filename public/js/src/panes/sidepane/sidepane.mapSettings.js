@@ -1556,12 +1556,12 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		socialSharing 	: true,
 		documentsPane 	: true,
 		dataLibrary 	: true,
-		mediaLibrary 	: true,
+		mediaLibrary 	: false,
 		autoHelp 	: true,
 		autoAbout 	: true,
 		darkTheme 	: true,
 		tooltips 	: true,
-		mapboxGL	: false
+		mapboxGL	: false // maybe not as setting
 
 	},
 
@@ -1641,7 +1641,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 			wrapper.appendChild(tooltips);
 		}
 		if (this.options.mapboxGL) {
-			var mapboxGL = this._contentItem('mapboxGL', 'Enable MapboxGL');
+			var mapboxGL = this._contentItem('mapboxGL', 'MapboxGL');
 			wrapper.appendChild(mapboxGL);
 		}
 

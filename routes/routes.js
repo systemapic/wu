@@ -115,6 +115,31 @@ module.exports = function(app, passport) {
 	});
 
 
+	// =====================================
+	// SET PROJECT HASH ====================
+	// =====================================
+	// set saved map state
+	app.post('/api/project/hash/set', isLoggedIn, function (req,res) {
+		console.log('/api/project/hash/set');
+
+		// API: set hashed map state
+		api.setHash(req, res);
+
+	});
+
+	// =====================================
+	// GET PROJECT HASH ====================
+	// =====================================
+	// get saved map state
+	app.post('/api/project/hash/get', isLoggedIn, function (req,res) {
+		console.log('/api/project/hash/get');
+
+		// API: get hashed map state
+		api.getHash(req, res);
+
+	});
+
+
 
 	// =====================================
 	// UPLOAD PROJECT LOGO  ================
@@ -546,6 +571,10 @@ module.exports = function(app, passport) {
 	}));
 
 
+	// app.post('/login', function (req, res) {
+	// 	console.log('__________________');
+	// 	console.log('LOGIN: req: ', req);
+	// });
 
 	app.post('/forgot', function (req, res) {
 

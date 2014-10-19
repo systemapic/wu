@@ -226,7 +226,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.app.SidePane.refreshProject(this.project);
 
 		// set client name in sidepane subheaders
-		Wu.app.SidePane.setSubheaders();	
+		// Wu.app.SidePane.setSubheaders();	
 
 	},
 

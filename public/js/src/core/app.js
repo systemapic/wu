@@ -18,14 +18,16 @@ Wu.App = Wu.Class.extend({
 			dataLibrary 	: true,               	
 			mediaLibrary    : false,
 			users 		: true,
+			share 		: true
 		},	
 		
-		// default settings
-		settings : {		// not plugged in
+		// default settings (overridden by project settings)
+		settings : {		// not plugged in yet
 			chat : true,
 			colorTheme : true,
 			screenshot : true,
 			socialSharing : true,
+			print : true
 		},
 
 		providers : {
@@ -52,6 +54,7 @@ Wu.App = Wu.Class.extend({
 	},
 
 
+
 	initialize : function (options) {
 
 		// set global this
@@ -71,7 +74,6 @@ Wu.App = Wu.Class.extend({
 
 	initServer : function () {
 		var serverUrl = this.options.servers.portal;
-
 		console.log('Connected to server: ', serverUrl);
 
 		var data = JSON.stringify(this.options);
@@ -184,10 +186,14 @@ Wu.App = Wu.Class.extend({
 	// init default view on page-load
 	_initView : function () {
 
-		// console.log('_initView');
+		// check location
+		if (this._initLocation()) return;
 
 		// runs hotlink
 		if (this._initHotlink()) return;
+
+		// set project if only one
+		if (this._lonelyProject()) return;
 
 		// if user is admin or manager, set Projects and Users as default panes
 		var user = app.Account;
@@ -200,35 +206,74 @@ Wu.App = Wu.Class.extend({
 	},
 
 
-	// _singleClient : function () {
-	// 	return;
-	// 	var size = _.size(this.Clients);
-	// 	var can = Wu.can.createClient();
+	_lonelyProject : function () {
+		// check if only one project, 
+		// if so, open it
+		if (_.size(app.Projects) == 1) {
+			for (p in app.Projects) {
+				var project = app.Projects[p];
+				this._setProject(project);
+				return true;
+			}
+		}
+		return false;
+	},
 
-	// 	if (size > 1) return;
-	// 	if (can) return;
+	_initLocation : function () {
 
-	// 	var clientUuid = this.User.options.access.clients.read[0];
-	// 	var client = this.Clients[clientUuid];
+		var path    = window.location.pathname,
+		    client  = path.split('/')[1],
+		    project = path.split('/')[2],
+		    hash    = path.split('/')[3],
+		    search  = window.location.search.split('?'),
+		    params  = Wu.Util.parseUrl();
 
-	// 	// select client
-	// 	this.SidePane.Clients.select(client);
+		console.log('params: ', params);
+		console.log('client: ', client);
+		console.log('project: ', project);
+		console.log('hash: ', hash);
 
-	// 	// open pane
-	// 	this.SidePane.openPane();
-
-	// 	// hide Clients tab
-	// 	this.SidePane.Clients.permanentlyDisabled = true;
 		
-	// },
+
+		if (!client || !project) return false;
+
+		// get project
+		var project = this._projectExists(project, client);
+		
+		// return if no such project
+		if (!project) return false;
+
+		// set project
+		this._setProject(project);
+
+		// check for hash
+		if (hash && hash.length == 6) {
+			console.log('we got a hash!: ', hash);	
+			return this._initHash(project, hash);
+		}
+
+		return true;
+		
+	},
+
+
+
+	_setProject : function (project) {
+		// select project
+		project.select();
+
+		// refresh sidepane
+		app.SidePane.refreshProject(project);
+
+		// remove help pseudo
+		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
+	},
 
 	_initHotlink : function () {
 		
 		// parse error prone content of hotlink..
 		try { this.hotlink = JSON.parse(window.hotlink); } 
-		catch (e) { this.hotlink = false };
-
-		// console.log('this.hotlink: ', this.hotlink);
+		catch (e) { this.hotlink = false; };
 
 		// return if no hotlink
 		if (!this.hotlink) return false;
@@ -239,12 +284,8 @@ Wu.App = Wu.Class.extend({
 		// return if not found
 		if (!project) return false;
 
-		// select project
-		project.select();
-		app.SidePane.refreshProject(project);
-
-		// remove help pseudo
-		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
+		// set project
+		this._setProject(project);
 
 		return true;
 		
@@ -277,5 +318,107 @@ Wu.App = Wu.Class.extend({
 	setSaveStatus : function () {
 		app.StatusPane.setSaveStatus();
 	},
+
+
+	_initHash : function (project, hash) {
+
+		// get hash values from server,
+		this.getHash(hash, project, this._renderHash);
+
+		return true;
+	},
+
+	// get saved hash
+	getHash : function (id, project, callback) {
+
+		var json = {
+			projectUuid : project.getUuid(),
+			id : id
+		}
+
+		// get a saved setup - which layers are active, position, 
+		Wu.post('/api/project/hash/get', JSON.stringify(json), callback, this);
+	},
+
+
+	_renderHash : function (context, json) {
+
+		console.log('this: ', context);
+
+		var result = JSON.parse(json); 
+		console.log('_renderHash', result);
+
+		if (result.error) console.log('error?', result.error);
+
+		var hash = result.hash;
+		console.log('hash->', hash);
+
+		var projectUuid = hash.project;
+
+		app.MapPane.setPosition(hash.position);
+		hash.layers.forEach(function (layerUuid) {
+			var layer = app.Projects[projectUuid].layers[layerUuid];
+
+			if (app.MapPane.layerMenu) {
+				layer.add(); // todo: add from layermenu...
+			} else {
+				layer.add();	// todo: what if activating layermenu afterwards? ... lots of different possible variatons here.. PLAN!
+			}
+
+		}, this);
+
+	},
+
+
+	// save a hash
+	setHash : function (callback) {
+
+		// get active layers
+		var active = app.MapPane.getActiveLayers();
+		var layers = _.map(active, function (l) {
+			return l.item.layer;	// layer uuid
+		});
+
+		// get project;
+		var projectUuid = this.activeProject.getUuid();
+
+		// hash object
+		var json = {
+			projectUuid : projectUuid,
+			hash : {
+				id 	 : Wu.Util.createRandom(6),
+				position : app.MapPane.getPosition(),
+				layers 	 : layers 			// layermenuItem uuids, todo: order as z-index
+			}
+		}
+
+		// save hash to server
+		Wu.post('/api/project/hash/set', JSON.stringify(json), callback, this);
+
+		// return
+		return json.hash;
+
+	},
+
+	
+
+	// phantomjs: loaded layers
+	_loaded : [],
+
+	// phantomjs: load layermenu layers
+	_loadLayers : function (layermenuItems) {
+
+	},
+
+	// phantomjs: check if all layers are loaded
+	_allLoaded : function () {
+
+	},
+
+
+
+
+
+
 
 });

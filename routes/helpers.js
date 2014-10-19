@@ -6,6 +6,7 @@ var Clientel 	= require('../models/client');	// weird name cause 'Client' is res
 var User  	= require('../models/user');
 var File 	= require('../models/file');
 var Layers 	= require('../models/layer');
+var Hash 	= require('../models/hash');
 
 // file handling
 var fs 		= require('fs-extra');
@@ -2596,6 +2597,54 @@ module.exports = api = {
 	},
 
 
+
+	getHash : function (req, res) {
+		console.log('getHash: req.body: ', req.body);
+	
+		var id = req.body.id;
+		var projectUuid = req.body.projectUuid;		// todo: access restrictions
+
+		Hash
+		.findOne({id : id, project : projectUuid})
+		.exec(function (err, doc) {
+
+			res.end(JSON.stringify({
+				error: err,
+				hash : doc
+			}));
+
+		});
+
+	},
+
+	setHash : function (req, res) {
+		console.log('setHash: req.body: ', req.body);
+
+		var projectUuid = req.body.projectUuid,
+		    position 	= req.body.hash.position,
+		    layers 	= req.body.hash.layers,
+		    id 		= req.body.hash.id;
+
+		// create new hash
+		var hash = new Hash();
+		hash.uuid = 'hash-' + uuid.v4();
+		hash.position = position;
+		hash.layers = layers;
+		hash.id = id;
+		hash.createdBy = req.user.uuid;
+		hash.createdByName = req.user.firstName + ' ' + req.user.lastName;
+		hash.project = projectUuid;
+
+		hash.save(function (err, doc) {
+			console.log('hash saved', err, doc);
+			res.end(JSON.stringify({
+				error: err,
+				hash : doc
+			}));
+		});
+
+		
+	},
 
 
 

@@ -137,7 +137,6 @@ var projectSchema = mongoose.Schema({
 		mediaLibrary 	: { type: Boolean, default: false },
 		mapboxGL	: { type: Boolean, default: false },
 	}
-
 	
 });
 

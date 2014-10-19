@@ -12,6 +12,11 @@ Wu.Layer = Wu.Class.extend({
 
 		// create leaflet layers
 		this.initLayer();
+
+		// all visible tiles loaded event
+		Wu.DomEvent.on(this.layer, 'load', function () {
+			app._loaded.push(this.getUuid());
+		}, this);
 	},
 
 	initLayer : function () {
@@ -87,6 +92,9 @@ Wu.Layer = Wu.Class.extend({
 	}
 
 });
+
+
+
 
 
 
@@ -322,6 +330,8 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		// add layer hooks
 		this.addLayerHooks();
 
+		// phantomjs _loaded
+		app._loaded.push(this.getUuid());
 		// console.log('GEOJSON: ', this);
 
 	},

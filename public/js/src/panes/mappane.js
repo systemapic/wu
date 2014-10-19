@@ -128,19 +128,45 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 
-	setPosition : function () {
+	setPosition : function (position) {
 		var map = this._map;
 		
 		// get position
-		var position = this.project.getLatLngZoom();
-		var lat = position.lat;
-		var lng = position.lng;
-		var zoom = position.zoom;
+		var pos = position || this.project.getLatLngZoom();
+		var lat = pos.lat;
+		var lng = pos.lng;
+		var zoom = pos.zoom;
 
 		// set map options
 		if (lat != undefined && lng != undefined && zoom != undefined) {
 			map.setView([lat, lng], zoom);
 		}
+	},
+
+	getPosition : function () {
+		// get current lat/lng/zoom
+		var center = this._map.getCenter();
+		var position = {
+			lat : center.lat,
+			lng : center.lng,
+			zoom : this._map.getZoom()
+		}
+		return position;
+	},
+
+	getActiveLayers : function () {
+		if (!this.layerMenu) return false;
+
+		var layers = this.layerMenu.getLayers();
+		console.log('active layers: ', layers);
+		var active = _.filter(layers, function (l) {
+			return l.on;
+		});
+
+		console.log('active: ', active);
+
+		return active;
+
 	},
 
 
