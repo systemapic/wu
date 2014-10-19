@@ -3,4 +3,4 @@ systemapic.js
 
 GIS Interactive Mapping CMS
 
-![alt tag](app/public/dist/images/SYSLOGO.png)
+![alt tag](public/dist/images/SYSLOGO.png)
