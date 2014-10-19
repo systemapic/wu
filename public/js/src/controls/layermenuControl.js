@@ -763,6 +763,11 @@ L.Control.Layermenu = L.Control.extend({
 
 	},
 
+
+	getLayers : function () {
+		return this.layers;
+	},
+
 	
 	_fill : function () {
 

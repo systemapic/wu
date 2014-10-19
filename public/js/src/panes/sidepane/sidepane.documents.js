@@ -222,12 +222,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// editMode: hide/show (+) button
 		if (this.project.editMode) {
 			Wu.DomUtil.removeClass(this._newfolder, 'displayNone');
-			// console.log('ADDDDDD____');
-			// this.addEditHooks();
 		} else {
 			Wu.DomUtil.addClass(this._newfolder, 'displayNone');
-			// this.removeEditHooks();
-			// console.log("REMMMM___");
 		}
 
 	},

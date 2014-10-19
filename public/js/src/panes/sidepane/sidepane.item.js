@@ -15,6 +15,30 @@ Wu.SidePane.Item = Wu.Class.extend({
 		this.disable();
 	},
 
+
+	initContainer : function () {
+		// menu
+		var className = 'q-editor-menu-item ' + this.type;
+		this._menu = Wu.DomUtil.create('div', className, Wu.app._editorMenuPane);
+		this._title = Wu.DomUtil.create('a', this.type, this._menu);
+		this._title.innerHTML = Wu.Util.capitalize(this.title || this.type);
+
+		// content
+		var className = 'q-editor-content-item ' + this.type;
+		this._content = Wu.DomUtil.create('div', className, Wu.app._editorContentPane);
+
+		// scroll wrapper (j)
+		this._scrollWrapper = Wu.DomUtil.create('div', 'editor-scroll-wrapper', this._content);
+
+		// wrapper 
+		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct13', this._scrollWrapper);
+
+	},
+
+	initContent : function () {
+
+	},
+
 	addHooks : function () {
 		// menu items bindings
 		Wu.DomEvent.on(this._menu, 'mousedown', this._clickActivate, this); // click
@@ -127,7 +151,6 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 	// check swipe of sidepane on selecting menu item (j)
 	checkSwipe : function (prev) {
-		// console.log('checkSwipe -> prev: ', prev);
 		if (prev) return this.swiper(prev);
 
 		// Hide the Deactivated Pane
@@ -145,9 +168,6 @@ Wu.SidePane.Item = Wu.Class.extend({
 		// set vars
 		var swypefrom = prev._content;
 		var swypeto = Wu.app._active;               
-
-		// console.log('prev', prev);
-		// console.log('swypefrom', swypefrom);
 
 		// if same, do nothing
 		if (swypefrom == swypeto) return;
@@ -191,6 +211,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 	    
 		if (_.contains(classy, 'documents')) {
 			var n = app.SidePane.panes.indexOf('Documents');
+			console.log('n: ', n, app.SidePane.panes);
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
 
@@ -227,6 +248,16 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 		}
 				
+
+		if (_.contains(classy, 'share')) {
+			var n = app.SidePane.panes.indexOf('Share');
+			menuslider.style.top = h * n + 'px';
+			Wu.app.SidePane._container.style.width = '100%';
+
+			Wu.DomUtil.removeClass(__map, "map-blur")
+
+		}
+				
 		
 		// Find out what to swipe from
 		// The Sliders Container
@@ -243,66 +274,17 @@ Wu.SidePane.Item = Wu.Class.extend({
 			if ( _under_dogs[a] == prev._menu ) { swfrom = a; }                 
 			if ( _under_dogs[a] == this._menu ) { swto = a; }
 		}
-		
-		// Check if we're swiping up or down
-		// if ( swfrom > swto ) {
-		// 	swipeOut = 'swipe_out';
-		// 	swipeIn = 'swipe_in';						
-		// } else {
-		// 	swipeOut = 'swipe_out_up';
-		// 	swipeIn = 'swipe_in_up';
-		// }
+	
 		    
 		// Hide the Deactivated Pane
-		if (Wu.app._active) {
-
-				// console.log('swypefrom', swypefrom);
-
-			    Wu.DomUtil.removeClass(swypefrom, 'show');
-
-
-			// Wu.DomUtil.addClass(swypefrom, swipeOut);                   
-					    
-			// // Remove classes from the swiped out element
-			// setTimeout(function(){
-			// 	Wu.DomUtil.removeClass(swypefrom, 'show');
-			// 	Wu.DomUtil.removeClass(swypefrom, swipeOut);
-			// }, 300);                                
-		};
-					
+		if (Wu.app._active) Wu.DomUtil.removeClass(swypefrom, 'show');
+			
 		// Swipe this IN
-		Wu.DomUtil.addClass(swypeto, 'show');
-		// Wu.DomUtil.addClass(swypeto, swipeIn);              
-		
-		// setTimeout(function(){
-		// 	Wu.DomUtil.removeClass(swypeto, swipeIn);   
-		// }, 300);
+		Wu.DomUtil.addClass(swypeto, 'show');	
 			
 	},
 
 
-	initContainer : function () {
-		// menu
-		var className = 'q-editor-menu-item ' + this.type;
-		this._menu = Wu.DomUtil.create('div', className, Wu.app._editorMenuPane);
-		this._title = Wu.DomUtil.create('a', this.type, this._menu);
-		this._title.innerHTML = Wu.Util.capitalize(this.title || this.type);
-
-		// content
-		var className = 'q-editor-content-item ' + this.type;
-		this._content = Wu.DomUtil.create('div', className, Wu.app._editorContentPane);
-
-		// scroll wrapper (j)
-		this._scrollWrapper = Wu.DomUtil.create('div', 'editor-scroll-wrapper', this._content);
-
-		// wrapper 
-		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct13', this._scrollWrapper);
-
-	},
-
-	initContent : function () {
-
-	},
 
 	updateContent : function (project) {
 

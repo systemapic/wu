@@ -622,6 +622,7 @@ Wu.Project = Wu.Class.extend({
 		}
 	},
 
+
 	// settings
 	toggleSetting : function (setting) {
 		this.getSettings()[setting] ? this['disable' + setting.camelize()]() : this['enable' + setting.camelize()]();
@@ -644,38 +645,38 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	enableScreenshot : function () {
-
+		app.SidePane.Share.enableScreenshot();
 	},
 	disableScreenshot : function () {
-
+		app.SidePane.Share.disableScreenshot();
 	},
 
 	enableDocumentsPane : function () {
-
+		app.SidePane.addPane('Documents');
 	},
 	disableDocumentsPane : function () {
-
+		app.SidePane.removePane('Documents');
 	},
 
 	enableDataLibrary : function () {
-
+		app.SidePane.addPane('DataLibrary');
 	},
 	disableDataLibrary : function () {
-
+		app.SidePane.removePane('DataLibrary');
 	},
 
 	enableMediaLibrary : function () {
-
+		// app.SidePane.addPane('MediaLibrary');	// not plugged in yet! 
 	},
 	disableMediaLibrary : function () {
-
+		// app.SidePane.removePane('MediaLibrary');
 	},
 
 	enableSocialSharing : function () {
-
+		app.SidePane.Share.enableSocial();
 	},
 	disableSocialSharing : function () {
-
+		app.SidePane.Share.disableSocial();
 	},
 
 	enableAutoHelp : function () {

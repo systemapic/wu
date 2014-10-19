@@ -54,6 +54,7 @@ Wu.SidePane = Wu.Class.extend({
 		if (pane.dataLibrary) 	this.DataLibrary  = new Wu.SidePane.DataLibrary();
 		if (pane.mediaLibrary) 	this.MediaLibrary = new Wu.SidePane.MediaLibrary();
 		if (pane.users) 	this.Users 	  = new Wu.SidePane.Users();
+		if (pane.share) 	this.Share 	  = new Wu.SidePane.Share();
 
 	},
 
@@ -91,24 +92,31 @@ Wu.SidePane = Wu.Class.extend({
 		this.openPane();
 	},
 
-	_getPaneArray : function () {
+	_getPaneArray : function (project) {
 		var panes = [];
 		var pane = this.options.panes;
-		if (pane.clients) 	panes.push('Clients');
-		if (pane.mapOptions) 	panes.push('Map');
-		if (pane.documents) 	panes.push('Documents');
-		if (pane.dataLibrary) 	panes.push('DataLibrary');
-		if (pane.mediaLibrary) 	panes.push('MediaLibrary');
-		if (pane.users) 	panes.push('Users');
+
+		console.log('_getPaneArray sidepane: ');
+		var settings = project.getSettings();
+		console.log('pro settings', settings);
+
+
+		if (pane.clients) 				panes.push('Clients');
+		if (pane.mapOptions) 				panes.push('Map');
+		if (pane.documents   && settings.documentsPane) panes.push('Documents');
+		if (pane.dataLibrary && settings.dataLibrary) 	panes.push('DataLibrary');
+		if (pane.mediaLibrary && settings.mediaLibrary) panes.push('MediaLibrary');
+		if (pane.users) 				panes.push('Users');
+		if (pane.share) 				panes.push('Share');
 		return panes;
 	},
 
 	setProject : function (project) {
 		// update content
-		if (this.Home) this.Home.updateContent(project);
-		if (this.Map) this.Map.updateContent(project);
-		if (this.Documents) this.Documents.updateContent(project);
-		if (this.DataLibrary) this.DataLibrary.updateContent(project);
+		if (this.Home) 		this.Home.updateContent(project);
+		if (this.Map) 		this.Map.updateContent(project);
+		if (this.Documents) 	this.Documents.updateContent(project);
+		if (this.DataLibrary) 	this.DataLibrary.updateContent(project);
 	},
 
 	refreshProject : function (project) {
@@ -116,7 +124,7 @@ Wu.SidePane = Wu.Class.extend({
 		var editMode = project.editMode; // access determined at Wu.Project
 		
 		// default menus in sidepane
-		var panes = this._getPaneArray();
+		var panes = this._getPaneArray(project);
 		
 		// remove Map pane if not editor
 		if (!editMode) _.pull(panes, 'Map');
@@ -142,11 +150,10 @@ Wu.SidePane = Wu.Class.extend({
 		this.panes = [];
 
 		// all panes
-		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users'];
-				
+		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users', 'Share'];
 				
 		// panes to active
-		panes.forEach(function (elem, i, arr) {
+		all.forEach(function (elem, i, arr) {
 			if (!Wu.app.SidePane[elem]) {
 				Wu.app.SidePane[elem] = new Wu.SidePane[elem];
 			}
@@ -164,6 +171,18 @@ Wu.SidePane = Wu.Class.extend({
 
 	},
 
+	removePane : function (pane) {
+		var panes = Wu.extend([], this.panes);
+		_.pull(panes, pane);
+		this.refresh(panes);
+	},
+
+	addPane : function (pane) {
+		var panes = Wu.extend([], this.panes);
+		panes.push(pane);
+		panes = _.unique(panes);
+		this.refresh(panes);
+	},
 	
 	// close sidepane
 	closePane : function () {
@@ -176,21 +195,14 @@ Wu.SidePane = Wu.Class.extend({
 		this._container.style.width = '100px';
 
 		// refresh leaflet
-		setTimeout(function() {
-			var map = Wu.app._map;
-			if (map) map.reframe();
-		}, 300); // time with css
+		this._refreshLeaflet();
 
-		this._closePane();
-		// console.log('app._active', app._active, this);
+		// this._closePane();
 
+		// todo: what if panes not there?
 		Wu.DomUtil.removeClass(app.SidePane.Documents._content, 'show');
 		Wu.DomUtil.removeClass(app.SidePane.DataLibrary._content, 'show');
 		Wu.DomUtil.removeClass(app.SidePane.Users._content, 'show');
-
-		
-
-		// Wu.DomUtil.removeClass(app._active, 'show');
 
 	},
 
@@ -205,35 +217,37 @@ Wu.SidePane = Wu.Class.extend({
 		if (this.paneOpen) return;
 		this.paneOpen = true;
 
-		// console.log('openPane: this.container: ', this._container);
-		// console.log('openPane: this: ', this);
-
 		// open
 		this._container.style.width = '350px';
 		Wu.DomUtil.addClass(app._active, 'show');	
 
 		// refresh leaflet
+		this._refreshLeaflet();
+		
+	},
+
+	_refreshLeaflet : function () {
 		setTimeout(function() {
 			var map = Wu.app._map;
 			if (map) map.reframe();
 		}, 300); // time with css
 	},
 
-	// set subheaders with client/project
-	setSubheaders : function () {
-		return;
-		var client = Wu.app._activeClient; 	// TODO: refactor! _activeClient no longer exists
-		var project = Wu.app.activeProject;
+	// // set subheaders with client/project
+	// setSubheaders : function () {
+	// 	return;
+	// 	var client = Wu.app._activeClient; 	// TODO: refactor! _activeClient no longer exists
+	// 	var project = Wu.app.activeProject;
 
-		// if active client 
-		if (!client) return;
-		Wu.DomUtil.get('h4-projects-client-name').innerHTML = client.name; 		// set projects' subheader
-		Wu.DomUtil.get('h4-map-configuration-client-name').innerHTML = client.name; 	// set map configuration subheader
-		Wu.DomUtil.get('h4-layers-client-name').innerHTML = client.name; 		// set layers subheader
+	// 	// if active client 
+	// 	if (!client) return;
+	// 	Wu.DomUtil.get('h4-projects-client-name').innerHTML = client.name; 		// set projects' subheader
+	// 	Wu.DomUtil.get('h4-map-configuration-client-name').innerHTML = client.name; 	// set map configuration subheader
+	// 	Wu.DomUtil.get('h4-layers-client-name').innerHTML = client.name; 		// set layers subheader
 		
-		// if active project
-		if (!project) return;
-		Wu.DomUtil.get('h4-map-configuration-project-name').innerHTML = project.name; 	// set map configuration subheader
-		Wu.DomUtil.get('h4-layers-project-name').innerHTML = project.name; 		// set layers subheader
-	}
+	// 	// if active project
+	// 	if (!project) return;
+	// 	Wu.DomUtil.get('h4-map-configuration-project-name').innerHTML = project.name; 	// set map configuration subheader
+	// 	Wu.DomUtil.get('h4-layers-project-name').innerHTML = project.name; 		// set layers subheader
+	// }
 });

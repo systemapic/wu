@@ -1,3 +1,5 @@
+// controls global styles
+// full color themeing to come
 Wu.Style = Wu.Class.extend({
 
 	initialize : function () {
@@ -31,6 +33,17 @@ Wu.Style = Wu.Class.extend({
 	},
 
 });
+
+
+
+
+
+
+
+
+
+
+
 
 
 

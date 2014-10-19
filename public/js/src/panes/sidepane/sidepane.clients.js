@@ -14,12 +14,6 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	initContent : function () {
 
-		// console.log('init clients', this._content, this._scrollWrapper );
-
-		// h3 title
-		// var title = Wu.DomUtil.create('h3', '', this._container);
-		// title.innerHTML = 'Clients';
-
 		// clients container
 		this._clientsContainer = Wu.DomUtil.create('div', 'editor-clients', this._container);
 
@@ -31,7 +25,6 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
       		// insert create client button
 		if (app.Account.canCreateClient()) this._insertNewClientButton();	
-
 
 	},
 

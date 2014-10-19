@@ -170,3 +170,41 @@ input.cmn-toggle-round-flat:checked + label:after {
 	background-color: #8ce196;
 }
 
+
+
+.share-screenshot-title {
+	font-size: 120%;
+	font-weight: 500;
+}
+
+.share-screenshot-button {
+	border: 1px solid black;
+	margin: 5px;
+	margin-left: 25%;
+	margin-right: 25%;
+	height: 30px;
+	padding: 4px;
+	text-align: center;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+.share-screenshot-button:hover {
+	background: rgba(195, 195, 195, 0.2);
+}
+
+.share-print-button {
+	border: 1px solid black;
+	margin: 5px;
+	margin-left: 25%;
+	margin-right: 25%;
+	height: 30px;
+	padding: 4px;
+	text-align: center;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+.share-print-button:hover {
+	background: rgba(195, 195, 195, 0.2);
+}

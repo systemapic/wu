@@ -417,6 +417,10 @@ Wu.Util = {
 		return uuid;
 	},
 
+	createRandom : function (digits) {
+		return Math.random().toString(36).slice((digits) * -1).toUpperCase()
+	},
+
 	deselectText : function () {
 		var selection = ('getSelection' in window)
 		? window.getSelection()
@@ -948,6 +952,19 @@ Wu.Util = {
 		var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
 		return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 	},
+
+	parseUrl : function () {
+		var query = window.location.search.substr(1);
+		var result = {};
+		query.split("&").forEach(function(part) {
+			var item = part.split("=");
+			if (item[0] != '') {
+				result[item[0]] = decodeURIComponent(item[1]);
+			}
+		});
+		if (_.size(result)) return result;
+		return false;
+	}
 
 	
 
