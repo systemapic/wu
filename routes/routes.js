@@ -288,7 +288,7 @@ module.exports = function(app, passport) {
 
 	
 	// =====================================
-	// GET MAPBOX ======================
+	// GET MAPBOX ==========================
 	// =====================================
 	// get mapboxdata from mapbox
 	app.post('/api/util/getmapboxaccount', isLoggedIn, function (req, res) {
@@ -296,6 +296,18 @@ module.exports = function(app, passport) {
 
 		// get mapbox account
 		api.getMapboxAccount(req, res);
+
+	});
+
+	// =====================================
+	// CREATE SNAPSHOT =====================
+	// =====================================
+	// get mapboxdata from mapbox
+	app.post('/api/util/snapshot', isLoggedIn, function (req, res) {
+		console.log('/api/util/snapshot');
+
+		// get mapbox account
+		api.createSnapshot(req, res);
 
 	});
 

@@ -49,7 +49,67 @@ var DEFAULTMAPBOX = {
 // function exports
 module.exports = api = {
 
-								    
+					
+
+	// #########################################
+	// ###  API: Create Snapshot             ###
+	// #########################################
+	createSnapshot : function (req, res) {
+
+		console.log('cretae snapshot');
+		console.log('body: ', req.body);
+		console.log('hash: ', req.body.hash);
+
+
+		// run phantomjs cmd	
+		// crunch image
+
+		// var hash = req.body.hash;
+		var projectUuid = req.body.hash.project;
+		
+		var filename = 'snap-' + projectUuid + '-' + req.body.hash.id;
+
+
+
+		var hash = {
+			position : req.body.hash.position,
+			layers : req.body.hash.layers,
+			id : req.body.hash.id
+		}
+
+
+		var args = {
+			projectUuid : projectUuid,
+			hash : hash,
+			filename : filename
+		}
+
+		console.log('-> args: ', args);
+
+		var cmd = "phantomjs /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
+		console.log('cmd: ', cmd);
+
+
+		var exec = require('child_process').exec;
+		exec(cmd, function (err, stdout, stdin) {
+
+			console.log('executed phantomJS');
+			console.log('err: ', err);
+			console.log('stdout: ', stdout);
+			console.log('stdin: ', stdin);
+
+
+
+		});
+
+
+		res.end(JSON.stringify({
+			image : 'killincharisma',
+			error : null
+		}));
+
+
+	},
 
 	// #########################################
 	// ###  API: Create Project              ###

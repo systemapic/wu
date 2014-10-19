@@ -3,7 +3,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 
 	type : 'users',
-	title : 'User <br> Mngmt',
+	title : 'Users',
 
 	initContent : function () {
 
