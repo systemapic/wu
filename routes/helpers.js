@@ -2626,14 +2626,14 @@ module.exports = api = {
 		    id 		= req.body.hash.id;
 
 		// create new hash
-		var hash = new Hash();
-		hash.uuid = 'hash-' + uuid.v4();
-		hash.position = position;
-		hash.layers = layers;
-		hash.id = id;
-		hash.createdBy = req.user.uuid;
+		var hash 	= new Hash();
+		hash.uuid 	= 'hash-' + uuid.v4();
+		hash.position 	= position;
+		hash.layers 	= layers;
+		hash.id 	= id;
+		hash.createdBy 	= req.user.uuid;
 		hash.createdByName = req.user.firstName + ' ' + req.user.lastName;
-		hash.project = projectUuid;
+		hash.project 	= projectUuid;
 
 		hash.save(function (err, doc) {
 			console.log('hash saved', err, doc);

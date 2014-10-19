@@ -49,7 +49,7 @@ Wu.App = Wu.Class.extend({
 		silentUsers : [
 			// redacted
 			'user-9fed4b5f', // k
-			'user-e6e5d7d9'  // j
+			'user-e6e5d7d9'  // j  // todo: add phantomJS user
 		]
 	},
 
@@ -199,8 +199,7 @@ Wu.App = Wu.Class.extend({
 		var user = app.Account;
 		if (user.isAdmin() || user.isSuperadmin() || user.isManager()) {
 			// set panes 
-			var panes = ['Clients', 'Users'];
-			this.SidePane.refresh(panes);
+			this.SidePane.refresh(['Clients', 'Users']);
 		}
 
 	},
@@ -343,26 +342,28 @@ Wu.App = Wu.Class.extend({
 
 	_renderHash : function (context, json) {
 
-		console.log('this: ', context);
-
+		// parse
 		var result = JSON.parse(json); 
-		console.log('_renderHash', result);
 
+		// handle errors
 		if (result.error) console.log('error?', result.error);
 
-		var hash = result.hash;
-		console.log('hash->', hash);
+		// set vars
+		var hash = result.hash,
+		    projectUuid = hash.project;
 
-		var projectUuid = hash.project;
-
+		// set position
 		app.MapPane.setPosition(hash.position);
+
+		// set layers
 		hash.layers.forEach(function (layerUuid) {
 			var layer = app.Projects[projectUuid].layers[layerUuid];
 
 			if (app.MapPane.layerMenu) {
-				layer.add(); // todo: add from layermenu...
+				layer.add(); 	// todo: add from layermenu...
 			} else {
-				layer.add();	// todo: what if activating layermenu afterwards? ... lots of different possible variatons here.. PLAN!
+				layer.add();	// todo: what if activating layermenu afterwards? ... 
+						// lots of different possible variatons here.. PLAN AHEAD!
 			}
 
 		}, this);
@@ -400,7 +401,44 @@ Wu.App = Wu.Class.extend({
 
 	},
 
+	phantomJS : function (options) {
+
+		var client = options.client,
+		    project = options.project,
+	   	    hash = options.hash;
+
+
+	   	if (!client || !project) return false;
+
+		// get project
+		var project = this._projectExists(project, client);
+		
+		// return if no such project
+		if (!project) return false;
+
+		// set project
+		this._setProject(project);
+
+		// hide controls
+		app._map._controlContainer.style.display = 'none'
+
+		// check for hash
+		if (hash && hash.length == 6) {
+			console.log('we got a hash!: ', hash);	
+			this._initHash(project, hash);
+		}
+
+		// avoid Loading! etc in status
+		app.setStatus('systemapic'); // too early
+
+
+	},
 	
+	_phantomJSLoaded : function () {
+		// check if ready for screenshot
+
+	},
+
 
 	// phantomjs: loaded layers
 	_loaded : [],

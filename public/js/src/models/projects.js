@@ -361,14 +361,11 @@ Wu.Project = Wu.Class.extend({
 
 	getCollections : function () {
 		
-
 	},
 
 	setCollection : function () {
 
-
 	},
-
 
 	getUsers : function () {
 		var uuid = this.store.uuid; // project uuid
@@ -395,7 +392,6 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	addAccess : function () {
-
 		var users = app.Users;
 		for (u in users) {
 			var user = users[u];
@@ -679,7 +675,7 @@ Wu.Project = Wu.Class.extend({
 		app.SidePane.Share.disableSocial();
 	},
 
-	enableAutoHelp : function () {
+	enableAutoHelp : function () {		// auto-add folder in Docs
 
 	},
 	disableAutoHelp : function () {

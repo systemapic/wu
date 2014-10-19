@@ -96,54 +96,6 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	},
 
 
-	// getHash : function (id) {
-
-	// 	var json = {
-	// 		projectUuid : this.project.getUuid(),
-	// 		id : id
-	// 	}
-
-	// 	// get a saved setup - which layers are active, position, 
-	// 	Wu.post('/api/project/hash/get', JSON.stringify(json), this.gotHash, this);
-	// },
-
-	// gotHash : function (context, hash) {
-	// 	console.log('gotHash: ', hash, context);
-	// },
-
-	// setHash : function () {
-
-	// 	// get active layers
-	// 	var active = app.MapPane.getActiveLayers();
-	// 	var layers = _.map(active, function (l) {
-	// 		return l.item.uuid;
-	// 	});
-
-
-	// 	var json = {
-	// 		projectUuid : this.project.getUuid(),
-	// 		hash : {
-	// 			id 	 : Wu.Util.createRandom(6),
-	// 			position : app.MapPane.getPosition(),
-	// 			layers 	 : layers 			// layermenuItem uuids, todo: order as z-index
-	// 		}
-	// 	}
-
-	// 	console.log('hash:', json);
-
-
-	// 	// save hash to server
-	// 	Wu.post('/api/project/hash/set', JSON.stringify(json), this.satHash, this);
-
-	// 	// return
-	// 	return json.hash;
-
-	// },
-
-	// satHash : function (context, hash) {
-	// 	console.log('satHash: ', JSON.parse(hash), context);
-	// }
-
 
 });
 

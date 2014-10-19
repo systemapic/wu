@@ -1,4 +1,4 @@
-// app/models/project.js
+// app/models/hash.js
 // load the things we need
 var mongoose = require('mongoose');
 var timestamps = require('mongoose-times');
@@ -7,11 +7,8 @@ var timestamps = require('mongoose-times');
 var hashSchema = mongoose.Schema({
 
 	uuid 	: String,
-	
 	id 	: String,
-
 	project : String, // project uuid
-	
 	createdBy : String,
 	createdByName : String,
 
@@ -22,7 +19,7 @@ var hashSchema = mongoose.Schema({
 	},
 
 	layers : [String]
-	
+
 });
 
 // timestamps plugin
