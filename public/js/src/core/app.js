@@ -401,17 +401,16 @@ Wu.App = Wu.Class.extend({
 
 	},
 
-	phantomJS : function (options) {
+	phantomJS : function (args) {
 
-		var client = options.client,
-		    project = options.project,
-	   	    hash = options.hash;
+		var projectUuid = args.projectUuid,
+	   	    hash    	= args.hash;
 
 
-	   	if (!client || !project) return false;
+	   	if (!projectUuid) return false;
 
 		// get project
-		var project = this._projectExists(project, client);
+		var project = app.Projects[projectUuid];
 		
 		// return if no such project
 		if (!project) return false;
@@ -419,13 +418,22 @@ Wu.App = Wu.Class.extend({
 		// set project
 		this._setProject(project);
 
-		// hide controls
+		// hide controls and make header minimum width		// todo: create and inject PRINT/SCREENSHOT stylesheet
 		app._map._controlContainer.style.display = 'none'
+		app.HeaderPane._container.style.width = 'auto';
 
 		// check for hash
-		if (hash && hash.length == 6) {
+		if (hash) {
+
 			console.log('we got a hash!: ', hash);	
-			this._initHash(project, hash);
+
+			var json = JSON.stringify({
+				hash: hash,
+				project : projectUuid
+			});
+
+			// render hash
+			this._renderHash(this, json);
 		}
 
 		// avoid Loading! etc in status

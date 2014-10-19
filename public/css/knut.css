@@ -173,29 +173,67 @@ input.cmn-toggle-round-flat:checked + label:after {
 
 
 /*Share pane*/
-.share-screenshot-title {
-	font-size: 120%;
-	font-weight: 500;
+
+.share-wrapper {
+	height: 240px;
+	cursor: default;
 }
-.share-screenshot-button {
-	border: 1px solid black;
+
+.share-wrap {
+	position: relative;
+	cursor: pointer;
+}
+
+.share-title {
 	margin: 5px;
-	margin-left: 25%;
-	margin-right: 25%;
 	height: 30px;
 	padding: 4px;
 	text-align: center;
 	font-weight: 500;
 	cursor: pointer;
+	position: absolute;
+}
+
+.share-title {
+	top: 0px;
+	left: 66px;
+	font-size: 120%;
+	margin: 0px;
+}
+
+
+.share-header {
+	font-size: 170%;
+	font-weight: 500;
+	position: relative;
+	text-align: left;
+	padding-bottom: 10px;
+	margin-top: 2px;
+	padding-left: 11px;
+}
+
+.share-subtitle {
+	font-size: 100%;
+}
+
+.share-subtitle {
+	margin: 0px;
+	height: 30px;
+	padding: 4px;
+	text-align: left;
+	font-weight: 400;
+	cursor: pointer;
+	position: absolute;
+	top: 20px;
+	left: 66px;
+	font-size: 100%;
+
 }
 .share-screenshot-button:hover {
 	background: rgba(195, 195, 195, 0.2);
 }
 .share-print-button {
-	border: 1px solid black;
 	margin: 5px;
-	margin-left: 25%;
-	margin-right: 25%;
 	height: 30px;
 	padding: 4px;
 	text-align: center;
@@ -205,7 +243,63 @@ input.cmn-toggle-round-flat:checked + label:after {
 .share-print-button:hover {
 	background: rgba(195, 195, 195, 0.2);
 }
+.share-icon-box {
+	height: 50px;
+	width: 50px;
+	border: 1px solid gray;
+	margin: 10px;
+}
 
+
+.share-link-wrap {
+	padding: 10px;
+}
+.share-link-title {
+	font-size: 120%;
+}
+.share-link-input {
+	border: 1px solid rgba(128, 128, 128, 0.32);
+	padding: 10px;
+	width: 100%;
+	background: rgba(255, 0, 0, 0);
+	border-radius: 1px;
+	color: gray;
+}
+
+.share-image-wrap {
+	position: absolute;
+	left: 275px;
+	border: 1px solid red;
+	width: 487px;
+	height: 500px;
+	top: 33px;
+}
+.share-image-title {
+	font-size: 120%;
+	padding: 10px;
+}
+.share-image-image {
+	border: 1px solid blue;
+	height: 80%;
+	width: 100%;
+	position: absolute;
+	top: 46px;
+}
+
+.share-image-meta-wrap {
+	border: 1px solid yellow;
+	bottom: 0;
+	position: absolute;
+	height: 50px;
+	width: 100%;
+}
+.expand-share-link {
+	height: 350px;
+}
+.expand-share-image {
+	height: 600px;
+	width: 800px;
+}
 
 
 

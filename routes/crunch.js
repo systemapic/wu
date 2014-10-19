@@ -235,12 +235,6 @@ module.exports = crunch = {
 	},
 
 
-	
-
-
-	
-
-
 	getImageSize : function (path, callback) {
 		gm(path)
 		.size(function (err, size) {
