@@ -113,7 +113,7 @@
 	font-weight: 400;
 }
 
-/*switches*/
+/*toggle switches Options/Settings*/
 .switch {
 	margin-top: 9px;
 	margin-left: 144px;
@@ -172,11 +172,11 @@ input.cmn-toggle-round-flat:checked + label:after {
 
 
 
+/*Share pane*/
 .share-screenshot-title {
 	font-size: 120%;
 	font-weight: 500;
 }
-
 .share-screenshot-button {
 	border: 1px solid black;
 	margin: 5px;
@@ -188,11 +188,9 @@ input.cmn-toggle-round-flat:checked + label:after {
 	font-weight: 500;
 	cursor: pointer;
 }
-
 .share-screenshot-button:hover {
 	background: rgba(195, 195, 195, 0.2);
 }
-
 .share-print-button {
 	border: 1px solid black;
 	margin: 5px;
@@ -204,7 +202,76 @@ input.cmn-toggle-round-flat:checked + label:after {
 	font-weight: 500;
 	cursor: pointer;
 }
-
 .share-print-button:hover {
 	background: rgba(195, 195, 195, 0.2);
 }
+
+
+
+
+/**********************************/
+/* experiments w layermenu design */
+/**********************************/
+/* flytte collapse knapper til ytterkant, cleaner */
+#bhattan1 {
+	right: 7px;
+	top: 7px;
+	left: auto;
+}
+#description-toggle-button {
+	left: 4px;
+	opacity: 0.5;
+}
+
+/*flatten*/
+.menucollapser {
+	border-bottom: none;
+	box-shadow: none;
+	background: rgba(255, 255, 255, .93);
+}
+
+/*høyrere */
+.layer-menu-item-wrap {
+	height: 35px;
+	font-size: 127%; 
+}
+.layer-menu-item {
+	line-height: 1.6;
+}
+
+/*større tittel*/
+.layer-menu-header-title {
+	font-size: 120%;
+	font-weight: 500;
+	cursor: default;
+}
+#collapse-descripton {
+	font-size: 120%;
+	font-weight: 500;
+	cursor: default;
+}
+
+/*lysere farger*/
+/*kanskje ikke de fineste fargene, men lysere*/
+.layer-menu-item-wrap {
+	background-color: #55B2E5;
+}
+.layer-menu-item-wrap.menufolder.level-0 {
+	background-color: #3172A0;
+}
+.layer-active {
+	background-color: #71D5AD;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
