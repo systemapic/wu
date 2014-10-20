@@ -73,6 +73,9 @@ Wu.StatusPane = Wu.Class.extend({
 		// remove help pseudo
 		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
 
+		// trigger activation on active menu item
+		app._activeMenu._activate()
+
 		// console.log('StatusPane.open(). Currently active menu item:', app._activeMenuItem);
 	},
 

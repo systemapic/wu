@@ -336,8 +336,8 @@ Wu.Util = {
 	},
 
 	// post with callback
-	postcb : function (path, json, cb, self) {
-		// console.log('POST: postcb', JSON.parse(json));
+	postcb : function (path, json, cb, context) {
+
 		var http = new XMLHttpRequest();
 		var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
 		url += path;
@@ -348,15 +348,7 @@ Wu.Util = {
 
 		http.onreadystatechange = function() {
 		    if(http.readyState == 4 && http.status == 200) {
-			if (cb) { 
-				try {
-				// console.log('RESPONSE: ', JSON.parse(http.responseText));
-				} catch (e) {
-					// console.log('RESPONSE: ', http.responseText);
-				}
-
-				cb(self, http.responseText); 
-			}
+			if (cb) cb(context, http.responseText); 
 		    }
 		}
 		http.send(json);

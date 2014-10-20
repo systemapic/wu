@@ -375,6 +375,20 @@ Wu.Project = Wu.Class.extend({
 		return users;
 	},
 
+	getSlug : function () {
+		return this.store.slug;
+	},
+
+	getSlugs : function () {
+
+		var slugs = {
+			project : this.store.slug,
+			client : this.getClient().getSlug()
+		}
+
+		return slugs;
+	},
+
 	getUsersHTML : function () {
 		var users = this.getUsers(),
 		    html = '',
