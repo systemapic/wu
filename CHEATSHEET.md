@@ -1,7 +1,7 @@
 CHEATSHEET for common commands
 ==============================
 
-#Adding geojson straight to leaflet map:
+###Adding geojson straight to leaflet map:
 	var t = {
 		"type": "GeometryCollection",
 		"geometries": [{
@@ -23,7 +23,7 @@ CHEATSHEET for common commands
 
 
 
-#Getting geojson from url and adding to map
+###Getting geojson from url and adding to map
 
 	Wu.Util._getJSON('http://85.10.202.87:8080/egypt.json', function (json) { 
 
@@ -38,7 +38,7 @@ CHEATSHEET for common commands
 
 
 
-#getting json from object and adding to map d3
+###Getting json from object and adding to map with **d3.js**
 
 Wu.Util._getJSON('http://85.10.202.87:8080/egypt.json', function (json) { d3_to_map(json); }); 
 
@@ -86,7 +86,7 @@ Wu.Util._getJSON('http://85.10.202.87:8080/egypt.json', function (json) { d3_to_
 
 
 
-#re-project .shp file
+###Re-project .shp file
 
 	//	new projection         to              from
 	ogr2ogr  -t_srs EPSG:4269 EGY-level_1C.shp EGY-level_1B.shp
@@ -100,19 +100,19 @@ if from projection is missing, must assign a projection to source first, with -s
 
 
 
-#get info on shp file 
+###Get info on shp file 
 
 
 	ogrinfo -al EGY-level_1.shp | less
 ---------------------------------------------------------------
 
 
-#SSH tunnel with mongodb
+###SSH tunnel with mongodb
 
 	ssh -L 8089:127.0.0.1:27017 -f -C -q -N sx 
 ------------------------
 
-#clone js object
+###Clone javascript object
 	//returns a reference to first arg, with 2nd arg copied (without connection)  
 	a = Wu.extend({} || b, c);
 
