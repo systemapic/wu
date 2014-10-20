@@ -1,5 +1,5 @@
-CHEATSHEET for common commands
-==============================
+CHEATSHEET for common commands:
+===============================
 
 ###Adding geojson straight to leaflet map:
 	var t = {
@@ -114,8 +114,3 @@ If from projection is missing, must assign a projection to source first, with -s
 ###Clone javascript object
 	//returns a reference to first arg, with 2nd arg copied (without connection)  
 	a = Wu.extend({} || b, c);
-
-
-
-
-
