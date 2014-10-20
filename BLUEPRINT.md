@@ -11,5 +11,5 @@ Upload GeoJSON, Shapefiles, anything -> Convert to vector tiles -> Serve as tile
 
 Place to start:
 ----------------
-* [https://www.mapbox.com/blog/vector-tiles/](Mapbox Vector Tiles)
-* [https://github.com/mapbox/mapnik-vector-tile](Vector Tile Renderer)
+* [Mapbox Vector Tiles](https://www.mapbox.com/blog/vector-tiles/)
+* [Vector Tile Renderer](https://github.com/mapbox/mapnik-vector-tile)
