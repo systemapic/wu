@@ -13,4 +13,6 @@ Place to start:
 ----------------
 * [Mapbox Vector Tiles](https://www.mapbox.com/blog/vector-tiles/)
 * [Vector Tile Renderer](https://github.com/mapbox/mapnik-vector-tile)
+* [Node-mapnik](https://github.com/mapnik/node-mapnik) Node.js binding to Mapnik (and can be used to create vector tiles)
+* [Vector Tile Spec](https://github.com/mapbox/vector-tile-spec/wiki/Implementations)
 * [MapboxGL.js](https://github.com/mapbox/mapbox-gl-js) (Not necessary for using vector tiles, but no doubt way of the future.)
