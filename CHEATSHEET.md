@@ -24,7 +24,6 @@ CHEATSHEET for common commands
 
 
 ###Getting geojson from url and adding to map
-
 	Wu.Util._getJSON('http://85.10.202.87:8080/egypt.json', function (json) { 
 
 		window.g2 = json;
@@ -40,8 +39,10 @@ CHEATSHEET for common commands
 
 ###Getting json from object and adding to map with **d3.js**
 
-Wu.Util._getJSON('http://85.10.202.87:8080/egypt.json', function (json) { d3_to_map(json); }); 
+	// get geosjon from server
+	Wu.Util._getJSON('http://85.10.202.87:8080/egypt.json', function (json) { d3_to_map(json); }); 
 
+	// callback
 	function d3_to_map(json) {
 
 		var map = app._map;
@@ -88,11 +89,11 @@ Wu.Util._getJSON('http://85.10.202.87:8080/egypt.json', function (json) { d3_to_
 
 ###Re-project .shp file
 
-	//	new projection         to              from
+	//		new projection         to              from
 	ogr2ogr  -t_srs EPSG:4269 EGY-level_1C.shp EGY-level_1B.shp
 
 
-if from projection is missing, must assign a projection to source first, with -s_srs:
+if from projection is missing, must assign a projection to source first, with -s_srs.
 	// 	   old proj          new proj            to            from
 	ogr2ogr -s_srs EPSG:4269 -t_srs EPSG:3857 EGY-level_1B.shp EGY-level_1.shp
 
@@ -101,8 +102,6 @@ if from projection is missing, must assign a projection to source first, with -s
 
 
 ###Get info on shp file 
-
-
 	ogrinfo -al EGY-level_1.shp | less
 ---------------------------------------------------------------
 
