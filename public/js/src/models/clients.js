@@ -106,6 +106,10 @@ Wu.Client = Wu.Class.extend({
 		return this.uuid;
 	},
 
+	getSlug : function () {
+		return this.slug;
+	},
+
 	setName : function (name) {
 		this.name = name;
 		this.update('name');

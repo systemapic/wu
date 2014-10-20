@@ -269,7 +269,6 @@ input.cmn-toggle-round-flat:checked + label:after {
 .share-image-wrap {
 	position: absolute;
 	left: 275px;
-	border: 1px solid red;
 	width: 487px;
 	height: 500px;
 	top: 33px;
@@ -279,20 +278,32 @@ input.cmn-toggle-round-flat:checked + label:after {
 	padding: 10px;
 }
 .share-image-image {
-	border: 1px solid blue;
 	height: 80%;
 	width: 100%;
 	position: absolute;
 	top: 46px;
+	background-repeat: no-repeat;
 }
 
 .share-image-meta-wrap {
-	border: 1px solid yellow;
 	bottom: 0;
 	position: absolute;
 	height: 50px;
 	width: 100%;
 }
+
+.share-image-download-button {
+	bottom: 0px;
+	position: absolute;
+	right: 0px;
+	padding: 10px;
+}
+
+.share-image-download-button {
+	border: 1px solid red;
+	padding: 10px;
+}
+
 .expand-share-link {
 	height: 350px;
 }

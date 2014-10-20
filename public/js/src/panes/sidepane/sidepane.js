@@ -84,6 +84,20 @@ Wu.SidePane = Wu.Class.extend({
 		// close menu panes if open
 		this.closePane();
 
+		// deactivte submenus
+		this._deactivate();
+
+	},
+
+	// call _deactivate on all items
+	_deactivate : function () {
+		if (this.Clients) 	this.Clients._deactivate();
+		if (this.Map) 		this.Map._deactivate();
+		if (this.Documents) 	this.Documents._deactivate();
+		if (this.DataLibrary) 	this.DataLibrary._deactivate();
+		if (this.MediaLibrary) 	this.MediaLibrary._deactivate();
+		if (this.Users) 	this.Users._deactivate();
+		if (this.Share) 	this.Share._deactivate();
 	},
 
 	expand : function () {

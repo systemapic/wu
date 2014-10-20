@@ -8,7 +8,6 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 		// create layout
 		this.initLayout();
-
 	},
 
 
@@ -28,7 +27,6 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 		// add hooks
 		this.addHooks();
-
 
 	},
 
@@ -81,16 +79,14 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		console.log('create image');
 
 		var that = this;	// callback
-		app.setHash(function (context, hash) {
+		app.setHash(function (ctx, hash) {
 			console.log('hash: ', hash);
 
 			// create image container
 			that._createImageView();
 
-		
-
 			// get snapshot from server
-			Wu.post('/api/util/snapshot', hash, that.createdImage, this);
+			Wu.post('/api/util/snapshot', hash, that.createdImage, that);
 
 		});
 		
@@ -98,8 +94,35 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 	createdImage : function (context, file) {
 		console.log('took screenshot', file);
-		var url = file.url;
-		this._imageContainer.style.backgroundImage = 'url("' + url + '")';
+
+		// parse results
+		var result = JSON.parse(file);
+		var image = result.image;
+
+		// get dimensions of container
+		var height = context._imageContainer.offsetHeight;
+		var width = context._imageContainer.offsetWidth;
+
+		// set path
+		var path = app.options.servers.portal;
+		path += 'pixels/';
+		path += image;
+		path += '?width=' + width;
+		path += '&height=' + height;
+
+		// set url
+		var url = 'url("';
+		url += path;
+		url += '")';
+		console.log('url: ', url);
+
+		// set image
+		context._imageContainer.style.backgroundImage = url;
+
+		
+		// set download link
+		path += '&raw=true'; // add raw to path
+		context._downloadButton.href = path;
 	},
 
 	_createImageView : function () {
@@ -122,11 +145,33 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		var size = Wu.DomUtil.create('div', 'share-image-meta-size', meta);
 		var name = Wu.DomUtil.create('div', 'share-image-meta-name', meta);
 
+		var downloadWrapper = Wu.DomUtil.create('div', 'share-image-download', this._imageWrap);
+		this._downloadButton = Wu.DomUtil.create('a', 'share-image-download-button', downloadWrapper, 'Download');
+		this._downloadButton.setAttribute('target', '_blank');
+
 	},
 
-	_createLinkView : function (hash) {
+	createLink : function () {
+		console.log('create link');
 
-		var url = app.options.servers.portal + hash.id;
+		// create hash, callback
+		var that = this;
+		app.setHash(function (context, hash) {
+
+			// open input box
+			that._createLinkView(hash);
+
+		});
+		
+	},
+
+	_createLinkView : function (result) {
+
+		var parsed 	= JSON.parse(result);
+		var hash 	= parsed.hash;
+		var project 	= app.Projects[hash.project];
+		var slugs 	= project.getSlugs();
+		var url 	= app.options.servers.portal + slugs.client + '/' + slugs.project + '/' + hash.id;
 
 		// remove previous expands
 		this._resetExpands();
@@ -155,15 +200,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		console.log('create print');
 	},
 
-	createLink : function () {
-		console.log('create link');
-
-		var hash = app.setHash();
-		console.log('hash: ', hash);
-
-		// open input box
-		this._createLinkView(hash);
-	},
+	
 
 	_resetExpands : function () {
 
@@ -176,9 +213,6 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		Wu.DomUtil.removeClass(this._content, 'expand-share-print');
 	},
 
-	
-	
-
 	reset : function () {
 
 		// remove hooks
@@ -187,6 +221,19 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		// clear content
 		this._content.innerHTML = '';
 
+		// reset expands
+		this._resetExpands();
+
+	},
+
+	_activate : function () {
+		console.log('_activate s');
+	},
+
+	_deactivate : function () {
+		console.log('_deactivate s');
+		// reset expands
+		this._resetExpands();
 	},
 
 

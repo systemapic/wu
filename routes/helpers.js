@@ -24,6 +24,7 @@ var uploadProgress = require('node-upload-progress');
 var crypto      = require('crypto');
 var nodemailer  = require('nodemailer');
 var nodepath    = require('path');
+var gm 		= require('gm');
 
 // superusers
 var superusers = [
@@ -67,7 +68,8 @@ module.exports = api = {
 		// var hash = req.body.hash;
 		var projectUuid = req.body.hash.project;
 		
-		var filename = 'snap-' + projectUuid + '-' + req.body.hash.id;
+		var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.png';
+		var path = IMAGEFOLDER + filename;
 
 
 
@@ -90,23 +92,78 @@ module.exports = api = {
 		console.log('cmd: ', cmd);
 
 
-		var exec = require('child_process').exec;
-		exec(cmd, function (err, stdout, stdin) {
+		var ops = [];
+		var dataSize;
 
-			console.log('executed phantomJS');
-			console.log('err: ', err);
-			console.log('stdout: ', stdout);
-			console.log('stdin: ', stdin);
+		// phantomJS: create snapshot
+		ops.push(function (callback) {
 
+			var exec = require('child_process').exec;
+			exec(cmd, function (err, stdout, stdin) {
+
+				console.log('executed phantomJS');
+				console.log('err: ', err);
+				console.log('stdout: ', stdout);
+				console.log('stdin: ', stdin);
+
+				callback(err);
+			});
+
+		});
+
+		// get size
+		ops.push(function (callback) {
+
+			
+			fs.stat(path, function (err, stats) {
+				dataSize = stats.size;
+	 			callback(err);
+	 		});
+
+		});
+
+
+		// create File
+		ops.push(function (callback) {
+
+			var f 			= new File();
+			f.uuid 			= 'file-' + uuid.v4();
+			f.createdBy 		= req.user.uuid;
+			f.createdByName    	= req.user.firstName + ' ' + req.user.lastName;
+			f.files 		= filename;
+			f.access.users 		= [req.user.uuid];	
+			f.name 			= filename;
+			f.description 		= 'Snapshot';
+			f.type 			= 'image';
+			f.format 		= 'png';
+			f.dataSize 		= dataSize;
+			f.data.image.file 	= filename; 
+
+			f.save(function (err, doc) {
+				if (err) console.log('File err: ', err);
+				console.log('File saved: ', doc);
+
+				callback(err, doc);
+			});
 
 
 		});
 
 
-		res.end(JSON.stringify({
-			image : 'killincharisma',
-			error : null
-		}));
+		async.series(ops, function (err, results) {
+			console.log('all done: ', err);
+			console.log('results', results);
+
+			var file = results[2]
+
+			res.end(JSON.stringify({
+				image : file.uuid,
+				error : null
+			}));
+		});
+		
+
+		
 
 
 	},

@@ -349,8 +349,8 @@ Wu.App = Wu.Class.extend({
 		if (result.error) console.log('error?', result.error);
 
 		// set vars
-		var hash = result.hash,
-		    projectUuid = hash.project;
+		var hash = result.hash;
+		var projectUuid = hash.project || result.project;	// hacky.. clean up setHash, _renderHash, errything..
 
 		// set position
 		app.MapPane.setPosition(hash.position);

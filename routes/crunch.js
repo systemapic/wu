@@ -409,6 +409,7 @@ module.exports = crunch = {
 					if (!i) return false;
 					if (_.isObject(i.crop)) i.crop = {}; // prevent errors
 
+					// check if crunched is same dimensions
 					return 	parseInt(i.width)   == parseInt(width)    &&  	// width
 						parseInt(i.height)  == parseInt(height)   &&  	// height
 						parseInt(i.quality) == parseInt(quality)  && 	// quality
