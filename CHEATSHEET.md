@@ -92,8 +92,8 @@ CHEATSHEET for common commands
 	//		new projection         to              from
 	ogr2ogr  -t_srs EPSG:4269 EGY-level_1C.shp EGY-level_1B.shp
 
+If from projection is missing, must assign a projection to source first, with -s_srs
 
-if from projection is missing, must assign a projection to source first, with -s_srs.
 	// 	   old proj          new proj            to            from
 	ogr2ogr -s_srs EPSG:4269 -t_srs EPSG:3857 EGY-level_1B.shp EGY-level_1.shp
 
