@@ -1339,6 +1339,8 @@ module.exports = api = {
 		var add         = req.body.add; 		// add or revoke, true/false
 		// var clientUuid  = req.body.clientUuid;		// client that project belongs to
 
+		console.log('delegateUser: ', req.body);
+
 		// return if missing information
 		if (!userUuid || !role || !projectUuid) return res.end(JSON.stringify({
 			error : 'Error delegating accesss, missing information.'
@@ -1349,9 +1351,11 @@ module.exports = api = {
 		Project
 		.findOne({uuid : projectUuid})
 		.exec(function (err, project) {
-			console.log('Project: ', project.name);
+			// console.log('Project: ', project.name);
 
-
+			if (err) return res.end(JSON.stringify({
+				error : 'Error delegating accesss, missing information.'
+			}));
 
 			Clientel
 			.findOne({uuid : project.client})
@@ -2594,17 +2598,21 @@ module.exports = api = {
 		fs.readJson(path, function (err, data) {
 			console.log('err: ', err);
 
+			if (err) return res.end(JSON.stringify({
+				error : 'Error reading file.'
+			}));
+
+			if (!data) return res.end(JSON.stringify({
+				error : 'File not found.'
+			}));
+
 			console.log('readJson: ', data.length);
 
-			// set filesize
+			// ready string
 			var string = JSON.stringify(data);
 
-			// string = utf8.encode(string);
-			// var length = string.length; //.toString();
 			res.set({
 				'Content-Type': 'text/json',		// todo: encoding of arabic characters, tc.
-				//'Content-Length': length,		// works fine wihtout conent-length, wrong length w chars
-				// 'Content-Encoding': 'utf-8'
 			});
 			
 			res.end(string);
@@ -2622,7 +2630,7 @@ module.exports = api = {
 		// for each file
 		async.each(record.files, function (file, callback) {
 			fs.readFile(file, function (err, data) {
-				geo.push(JSON.parse(data));
+				if (data) geo.push(JSON.parse(data));	// added error handling
 				callback(err);
 			})		
 		}, 

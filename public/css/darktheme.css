@@ -266,6 +266,7 @@ color: white;
 
 .header-title {
 	font-weight: 400;
+	color: rgba(255, 255, 255, 0.95);
 }
 .header-subtitle {
 	color: white;
