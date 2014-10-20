@@ -331,13 +331,20 @@ module.exports = upload = {
 
 			callback(null, entry);
 
-		} else {
+		} else if (type == 'document') {
 
 			// move
 			ops.push(function (cb) {
 				upload.move(entry, cb)
+				hash.processed.push(entry);
 			});
 		
+		} else {
+			// move
+			ops.push(function (cb) {
+				upload.move(entry, cb)
+				// hash.processed.push(entry);
+			});
 		}
 
 		ops.push(function (cb) {
@@ -457,6 +464,16 @@ module.exports = upload = {
 					});
 				});
 			}
+
+			// // process docs
+			// if (entry.type == 'document') {
+			// 	console.log('adding docs..., entry: ', entry);
+			// 	ops.push(function (cb) {
+
+
+
+			// 	});
+			// }
 
 
 		}, this);
@@ -925,6 +942,7 @@ module.exports = upload = {
 		});
 		async.series(ops, function (err) {
 			entry.files.push(entry.originalFilename);
+			// hash.processed.push(entry);			// added to fix .docx etc problem
 			callback(err, entry);
 		});
 

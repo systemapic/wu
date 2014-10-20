@@ -242,12 +242,13 @@ module.exports = geo = {
 		    outFile = entry.folder + '/' + toFile;
 
 		// execute cmd line conversion 
+		// ogr2ogr -t_srs EPSG:4269 -f geoJSON Neighbourhoods.json Neighbourhoods.shp
 		var cmd = 'mapshaper -p 0.1 --encoding utf8 -f geojson -o "' + outFile + '" "' + inFile + '"';		// todo: mapshaper options
 		console.log('================= m a p s h a p e r ==========================');
 		console.log('cmd: ', cmd);
 		var exec = require('child_process').exec;
 		exec(cmd, function (err, stdout, stdin) {
-			if (err) console.error('mapshaper err: ', err);
+			if (err) console.error('mapshaper err: ', err, stdout, stdin);
 
 			// add to entry
 			entry.layers.push(toFile);
@@ -280,10 +281,11 @@ module.exports = geo = {
 
 		ops.push(function (callback) {
 			fs.readFile(path, function (err, geojson) {
-				if (err) throw err;
-				data = JSON.parse(geojson);
-				data = geo._addUniqueProperty(data);
-
+				if (err) console.log('err: ', err);
+				if (geojson) {
+					data = JSON.parse(geojson);
+					data = geo._addUniqueProperty(data);
+				}
 				// done
 				callback(err);
 			});
