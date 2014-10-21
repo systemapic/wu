@@ -319,6 +319,7 @@ Wu.App = Wu.Class.extend({
 	},
 
 
+
 	_initHash : function (project, hash) {
 
 		// get hash values from server,

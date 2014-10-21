@@ -663,6 +663,9 @@ Wu.RasterLayer = Wu.Layer.extend({
 
 
 
+
+
+
 Wu.MapboxLayer = Wu.Layer.extend({
 
 	type : 'mapboxLayer',

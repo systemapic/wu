@@ -12094,9 +12094,7 @@ G.Rande = G.Class.extend({
 		imageUpload : true,
 		events : {
 			// fired on changes to text. should be overridden by user, like G.rande.events.change = fn();
-			change : function (e) { 
-				// console.log('change options.event!', e); 
-			}
+			change : function (e) {}
 		}
 
 	},
@@ -12112,14 +12110,10 @@ G.Rande = G.Class.extend({
 	
 	events : {
 		// fired on changes to text. should be overridden by user, like G.rande.events.change = fn();
-		change : function (e) { 
-			// console.log('change event!', e); 
-		}
+		change : function (e) {}
 	},
 
 	initialize : function (options, nodes) {
-
-		// console.log('init grande', options);
 
 		// cheatcode
 		G.r = this;
@@ -12480,7 +12474,7 @@ G.Rande = G.Class.extend({
 			that.reloadMenuState();
 			
 			// fire change event
-			return that.options.events.change();
+			return that.options.events.change(false);
 			
 		}
 
@@ -12500,7 +12494,7 @@ G.Rande = G.Class.extend({
 		that.reloadMenuState();
 
 		// fire change event
-		that.options.events.change();		
+		that.options.events.change(true);		
 	},
 
 	showToolbar : function (selectedText) {

@@ -50,7 +50,133 @@ var DEFAULTMAPBOX = {
 // function exports
 module.exports = api = {
 
-					
+
+
+	// #########################################
+	// ###  API: Create PDF Snapshot         ###
+	// #########################################
+	createPDFSnapshot : function (req, res) {
+		console.log('cretae PDF snapshot');
+		console.log('body: ', req.body);
+		console.log('hash: ', req.body.hash);
+
+
+		// run phantomjs cmd	
+		// crunch image
+
+		// var hash = req.body.hash;
+		var projectUuid = req.body.hash.project;
+		
+		var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.pdf';
+		var fileUuid = 'file-' + uuid.v4();
+		var folder = FILEFOLDER + fileUuid;
+		var path = folder + '/' + filename;
+
+
+		var hash = {
+			position : req.body.hash.position,
+			layers : req.body.hash.layers,
+			id : req.body.hash.id
+		}
+
+
+		var args = {
+			projectUuid : projectUuid,
+			hash : hash,
+			// filename : filename,
+			// folder : FILEFOLDER
+			path : path
+		}
+
+		console.log('-> args: ', args);
+
+		var cmd = "phantomjs /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
+		console.log('cmd: ', cmd);
+
+
+		var ops = [];
+		var dataSize;
+
+
+		// create file folder
+		ops.push(function (callback) {
+
+			fs.ensureDir(folder, function(err) {
+				console.log(err); //null
+				//dir has now been created, including the directory it is to be placed in
+				callback(err);
+			})
+
+
+		});
+
+		// phantomJS: create snapshot
+		ops.push(function (callback) {
+
+			var exec = require('child_process').exec;
+			exec(cmd, function (err, stdout, stdin) {
+
+				console.log('executed phantomJS');
+				console.log('err: ', err);
+				console.log('stdout: ', stdout);
+				console.log('stdin: ', stdin);
+
+				callback(err);
+			});
+
+		});
+
+		// get size
+		ops.push(function (callback) {
+
+			
+			fs.stat(path, function (err, stats) {
+				console.log('err: ', err);
+				dataSize = stats.size;
+	 			callback(err);
+	 		});
+
+		});
+
+
+		// create File
+		ops.push(function (callback) {
+
+			var f 			= new File();
+			f.uuid 			= fileUuid;
+			f.createdBy 		= req.user.uuid;
+			f.createdByName    	= req.user.firstName + ' ' + req.user.lastName;
+			f.files 		= filename;
+			f.access.users 		= [req.user.uuid];	
+			f.name 			= filename;
+			f.description 		= 'PDF Snapshot';
+			f.type 			= 'document';
+			f.format 		= 'pdf';
+			f.dataSize 		= dataSize;
+			f.data.image.file 	= filename; 
+
+			f.save(function (err, doc) {
+				if (err) console.log('File err: ', err);
+				console.log('File saved: ', doc);
+
+				callback(err, doc);
+			});
+
+
+		});
+
+
+		async.series(ops, function (err, results) {
+			console.log('all done: ', err);
+			console.log('results', results);
+
+			res.end(JSON.stringify({
+				pdf : fileUuid,
+				error : null
+			}));
+		});
+
+	},			
 
 	// #########################################
 	// ###  API: Create Snapshot             ###
@@ -83,7 +209,9 @@ module.exports = api = {
 		var args = {
 			projectUuid : projectUuid,
 			hash : hash,
-			filename : filename
+			// filename : filename,
+			// folder : IMAGEFOLDER
+			path : path
 		}
 
 		console.log('-> args: ', args);
@@ -114,7 +242,6 @@ module.exports = api = {
 		// get size
 		ops.push(function (callback) {
 
-			
 			fs.stat(path, function (err, stats) {
 				dataSize = stats.size;
 	 			callback(err);
@@ -162,11 +289,9 @@ module.exports = api = {
 			}));
 		});
 		
-
-		
-
-
 	},
+
+
 
 	// #########################################
 	// ###  API: Create Project              ###

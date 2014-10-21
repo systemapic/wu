@@ -304,6 +304,10 @@ input.cmn-toggle-round-flat:checked + label:after {
 	padding: 10px;
 }
 
+.share-print-download-button {
+	padding: 10px;
+}
+
 .expand-share-link {
 	height: 350px;
 }
