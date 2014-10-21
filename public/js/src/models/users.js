@@ -223,6 +223,19 @@ Wu.User = Wu.Class.extend({
 		this.store.role.manager.projects.push(uuid);
 	},
 
+	removeProjectAccess : function (project) {
+		// remove access locally
+		_.remove(this.store.role.manager.projects, function (p) {
+			return p == project.getUuid();
+		});
+		_.remove(this.store.role.editor.projects, function (p) {
+			return p == project.getUuid();
+		});
+		_.remove(this.store.role.reader.projects, function (p) {
+			return p == project.getUuid();
+		});
+	},
+
 
 
 

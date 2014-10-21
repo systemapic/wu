@@ -257,8 +257,21 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	_deleted : function (project, json) {
+		
+		// remove access from Account locally
+		app.Account.removeProjectAccess(project);
+
+		// remove from all Users 	// not rly needed
+		// var users = app.Users;
+		// for (u in users) {
+		// 	var user = users[u];
+		// 	user.removeProjectAccess(project);
+		// }
+
+
 		// delete object
 		delete Wu.app.Projects[project.uuid];
+
 	},
 
 	saveColorTheme : function () {
