@@ -158,12 +158,9 @@ Wu.MapPane = Wu.Class.extend({
 		if (!this.layerMenu) return false;
 
 		var layers = this.layerMenu.getLayers();
-		// console.log('active layers: ', layers);
 		var active = _.filter(layers, function (l) {
 			return l.on;
 		});
-
-		// console.log('active: ', active);
 
 		return active;
 
@@ -386,6 +383,7 @@ Wu.MapPane = Wu.Class.extend({
 		delete this.inspectControl;
 		delete this.mousepositionControl;
 		delete this.baselayerToggle;
+		delete this.geolocationControl;
 	},
 
 	hideControls : function () {
@@ -480,7 +478,7 @@ Wu.MapPane = Wu.Class.extend({
 
 	disableMouseposition : function () {
 		if (!this.mousepositionControl) return;
-	       
+	       	
 		// remove and delete control
 		this._map.removeControl(this.mousepositionControl);
 		delete this.mousepositionControl;
@@ -491,10 +489,10 @@ Wu.MapPane = Wu.Class.extend({
 
 		// create controls // todo: no info on type of place (city, neighbourhood, street), so not possible to set good zoom level
 		this.geolocationControl = new L.Control.Search({
-			url: 'http://nominatim.openstreetmap.org/search?format=json&q={s}',
-			jsonpParam: 'json_callback',
-			propertyName: 'display_name',
-			propertyLoc: ['lat','lon'],	
+			url : 'http://nominatim.openstreetmap.org/search?format=json&q={s}',
+			jsonpParam : 'json_callback',
+			propertyName : 'display_name',
+			propertyLoc : ['lat','lon'],	
 			boundingBox : 'boundingbox',
 
 			filterJSON : function (json) {
@@ -529,7 +527,9 @@ Wu.MapPane = Wu.Class.extend({
 
 	disableGeolocation : function () {
 		if (!this.geolocationControl) return;
-	       
+	       	
+	       	console.log('disableGeolocation', this.geolocationControl);
+
 		// remove and delete control
 		this._map.removeControl(this.geolocationControl);
 		delete this.geolocationControl;
@@ -651,9 +651,7 @@ Wu.MapPane = Wu.Class.extend({
 	},
 	
 	enableVectorstyle : function (container) {
-		// console.log('enable VECTOR')
 		if (this.vectorStyle) return;
-		// console.log('2');
 		
 		this.vectorStyle = L.control.styleEditor({ 
 			position: "topleft", 
@@ -762,22 +760,14 @@ Wu.MapPane = Wu.Class.extend({
 		// add circle support
 		map.on('draw:created', function(e) {
 
-			// console.log('draw:created!');
-
 			// add circle support
 			e.layer.layerType = e.layerType;            
-
-			
-
-			// console.log('this.project.editMode: ', that.project.editMode);
-			// console.log('projecT: ', that.project);
 
 			// if editMode
 			if (that.project.editMode) {
 
 				// create layer and add to project
 				var geojson = e.layer.toGeoJSON();
-				// console.log('drawn geojson: ', geojson);
 				that.project.createLayerFromGeoJSON(geojson);
 				
 			} else {

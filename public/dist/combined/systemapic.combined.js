@@ -2999,16 +2999,13 @@ Wu.SidePane.Project = Wu.Class.extend({
 	select : function (e) {
 
 		// dont select if already active
-		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
+		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho not active.. fix!
 
 		// select project
 		this.project.select();
 
 		// update sidepane
 		Wu.app.SidePane.refreshProject(this.project);
-
-		// set client name in sidepane subheaders
-		// Wu.app.SidePane.setSubheaders();	
 
 	},
 
@@ -3026,6 +3023,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomUtil.removeClass(this._container, 'active-project');
 	},
 
+	// edit title
 	edit : function (e) {
 		
 		// return if already editing
@@ -3063,8 +3061,13 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.project.setSlug(value);
 
 		// save latest
-		this.project.store['name'] = value;
-		this.project._update('name');
+		this.project.setName(value);
+
+		// save header also
+		this.project.setHeaderTitle(value);
+
+		// update header view
+		app.HeaderPane.setTitle(value);
 
 		this.editing = false;
 
@@ -3104,10 +3107,16 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var div = e.target.parentNode;
 		div.innerHTML = value;
 
-		// save latest
-		this.project.store.description = value;
-		this.project._update('description');
+		// save project description
+		this.project.setDescription(value);
 
+		// save header subtitle also
+		this.project.setHeaderSubtitle(value);
+
+		// update header view
+		app.HeaderPane.setSubtitle(value);
+
+		// mark done
 		this.editing = false;
 
 	},
@@ -7979,8 +7988,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// this.enableResize();
 
 		// remove title hooks
-		Wu.DomEvent.on(this._title,    'dblclick', this._enableEdit, this);
-		Wu.DomEvent.on(this._subtitle, 'dblclick', this._enableEdit, this);
+		// Wu.DomEvent.on(this._title,    'dblclick', this._enableEdit, this);	// todo: add as optional
+		// Wu.DomEvent.on(this._subtitle, 'dblclick', this._enableEdit, this);
 
 		// enable edit on logo
 		if (!this.logodz) {
@@ -8000,8 +8009,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// this.disableResize();
 
 		// remove title hooks
-		Wu.DomEvent.off(this._title,    'dblclick', this._enableEdit, this);
-		Wu.DomEvent.off(this._subtitle, 'dblclick', this._enableEdit, this);
+		// Wu.DomEvent.off(this._title,    'dblclick', this._enableEdit, this);
+		// Wu.DomEvent.off(this._subtitle, 'dblclick', this._enableEdit, this);	
 
 		// disable edit on logo
 		if (this.logodz) this.logodz.disable();
@@ -8107,6 +8116,14 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	_editKey : function (e) {
 		// blur on enter
 		if (event.which == 13 || event.keyCode == 13) e.target.blur();
+	},
+
+	setTitle : function (title) {
+		this._title.innerHTML = title;
+	},
+
+	setSubtitle : function (subtitle) {
+		this._subtitle.innerHTML = subtitle;
 	},
 
 	
@@ -8385,12 +8402,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		if (!this.layerMenu) return false;
 
 		var layers = this.layerMenu.getLayers();
-		// console.log('active layers: ', layers);
 		var active = _.filter(layers, function (l) {
 			return l.on;
 		});
-
-		// console.log('active: ', active);
 
 		return active;
 
@@ -8878,9 +8892,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 	
 	enableVectorstyle : function (container) {
-		// console.log('enable VECTOR')
 		if (this.vectorStyle) return;
-		// console.log('2');
 		
 		this.vectorStyle = L.control.styleEditor({ 
 			position: "topleft", 
@@ -8989,22 +9001,14 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// add circle support
 		map.on('draw:created', function(e) {
 
-			// console.log('draw:created!');
-
 			// add circle support
 			e.layer.layerType = e.layerType;            
-
-			
-
-			// console.log('this.project.editMode: ', that.project.editMode);
-			// console.log('projecT: ', that.project);
 
 			// if editMode
 			if (that.project.editMode) {
 
 				// create layer and add to project
 				var geojson = e.layer.toGeoJSON();
-				// console.log('drawn geojson: ', geojson);
 				that.project.createLayerFromGeoJSON(geojson);
 				
 			} else {
@@ -11904,6 +11908,26 @@ L.control.baselayerToggle = function (options) {
 	setHeaderLogo : function (path) {
 		this.store.header.logo = path;
 		this._update('header');
+	},
+
+	setHeaderTitle : function (title) {
+		this.store.header.title = title;
+		this._update('header');
+	},
+
+	setHeaderSubtitle : function (subtitle) {
+		this.store.header.subtitle = subtitle;
+		this._update('header');
+	},
+
+	setName : function (name) {
+		this.store.name = name;
+		this._update('name');
+	},
+
+	setDescription : function (description) {
+		this.store.description = description;
+		this._update('description');
 	},
 
 	setSlug : function (name) {

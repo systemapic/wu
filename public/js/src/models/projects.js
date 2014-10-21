@@ -473,6 +473,26 @@ Wu.Project = Wu.Class.extend({
 		this._update('header');
 	},
 
+	setHeaderTitle : function (title) {
+		this.store.header.title = title;
+		this._update('header');
+	},
+
+	setHeaderSubtitle : function (subtitle) {
+		this.store.header.subtitle = subtitle;
+		this._update('header');
+	},
+
+	setName : function (name) {
+		this.store.name = name;
+		this._update('name');
+	},
+
+	setDescription : function (description) {
+		this.store.description = description;
+		this._update('description');
+	},
+
 	setSlug : function (name) {
 		var slug = name.replace(/\s+/g, '').toLowerCase();
 		slug = Wu.Util.stripAccents(slug);

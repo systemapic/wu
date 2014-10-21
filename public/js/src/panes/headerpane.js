@@ -43,8 +43,8 @@ Wu.HeaderPane = Wu.Class.extend({
 		// this.enableResize();
 
 		// remove title hooks
-		Wu.DomEvent.on(this._title,    'dblclick', this._enableEdit, this);
-		Wu.DomEvent.on(this._subtitle, 'dblclick', this._enableEdit, this);
+		// Wu.DomEvent.on(this._title,    'dblclick', this._enableEdit, this);	// todo: add as optional
+		// Wu.DomEvent.on(this._subtitle, 'dblclick', this._enableEdit, this);
 
 		// enable edit on logo
 		if (!this.logodz) {
@@ -64,8 +64,8 @@ Wu.HeaderPane = Wu.Class.extend({
 		// this.disableResize();
 
 		// remove title hooks
-		Wu.DomEvent.off(this._title,    'dblclick', this._enableEdit, this);
-		Wu.DomEvent.off(this._subtitle, 'dblclick', this._enableEdit, this);
+		// Wu.DomEvent.off(this._title,    'dblclick', this._enableEdit, this);
+		// Wu.DomEvent.off(this._subtitle, 'dblclick', this._enableEdit, this);	
 
 		// disable edit on logo
 		if (this.logodz) this.logodz.disable();
@@ -171,6 +171,14 @@ Wu.HeaderPane = Wu.Class.extend({
 	_editKey : function (e) {
 		// blur on enter
 		if (event.which == 13 || event.keyCode == 13) e.target.blur();
+	},
+
+	setTitle : function (title) {
+		this._title.innerHTML = title;
+	},
+
+	setSubtitle : function (subtitle) {
+		this._subtitle.innerHTML = subtitle;
 	},
 
 	
