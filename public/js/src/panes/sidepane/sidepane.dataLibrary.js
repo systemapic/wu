@@ -135,7 +135,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		}, this);
 
 		var json = {
-			'files' : this._downloadFileList, //fuuids,
+			'files' : this._downloadFileList, // [fuuids],
 			'puuid' : this.project.store.uuid,
 			'pslug' : this.project.store.slug
 		}
@@ -154,7 +154,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var path = '/api/file/download?file=' + response + '&type=zip';
 		
 		// add <a> for zip file
-		that._downloadList.innerHTML = ich.datalibraryDownloadReady({'url' : path});
+		that._downloadList.innerHTML = ich.datalibraryDownloadReady({'url' : path});	// a href
 		var btn = Wu.DomUtil.get('download-ready-button');
 		Wu.DomEvent.on(btn, 'click', that.downloadDone, that);
 

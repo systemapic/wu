@@ -126,7 +126,7 @@ hr {
 
 /* file description */
 .dld {
-	font-weight: $lean;
+	font-weight: 400;
 	font-size: 100%;
 	margin: 0 10px 0 0;
 	font-family: $font;
@@ -180,7 +180,7 @@ a {
 .active a {
 	color: cadetblue !important;
 	font-weight: 900 !important;
-	text-shadow: -1px 1px 1px rgba(255,255,255,0.3);
+//	text-shadow: -1px 1px 1px rgba(255,255,255,0.3);
 	}	
 
 
@@ -196,8 +196,8 @@ path {
 	}
 
 path {
-	-webkit-transition: fill-opacity 250ms ease;
-	transition: fill-opacity 250ms ease;
+	/*-webkit-transition: fill-opacity 250ms ease;*/
+	/*transition: fill-opacity 250ms ease;*/
 	}
 		
 path:hover {
@@ -239,7 +239,7 @@ ul#checked p:before {
 	padding-left: 5px;
 	color: #fff;
 	font-size: 12px;
-	text-shadow: #093B5C 0px -1px 1px;
+//	text-shadow: #093B5C 0px -1px 1px;
 	}
 
 ul#checked p:after {
@@ -248,7 +248,7 @@ ul#checked p:after {
 	line-height: 23px;
 	color: #fff;
 	font-size: 12px;
-	text-shadow: #093B5C 0px -1px 1px;
+//	text-shadow: #093B5C 0px -1px 1px;
 	}
 
 .check { 
@@ -376,7 +376,8 @@ label.info {
 	border-radius: 0;
 	padding: 6px !important;
 	height: 30px !important;
-	margin-bottom: 10px !important;
+//	margin-bottom: 10px !important;
+	margin-bottom: 10px;
 	margin-top: 0 !important;
 	}
 
@@ -396,8 +397,11 @@ label.info {
 	}
 
 /* Button */
-.smap-button-white,
-.smap-button-gray {
+/*.smap-button-white,
+.smap-button-gray,
+.share-image-download-button {
+	*/
+.smap-button-white {
 	height: 30px;
 	text-align: center;
 	margin: 0;
@@ -419,7 +423,10 @@ label.info {
 	}
 
 /* Button */
-.smap-button-gray {
+/*.smap-button-gray,
+.share-image-download-button {*/
+.smap-button-gray {	
+	@extend .smap-button-white;
 	background-color: rgba(0, 0, 0, 0.65);
 	color: white;
 	font-weight: 500;
@@ -820,3 +827,107 @@ label.info {
 	opacity: 0.9;
 	height: 27px;
 	}
+
+
+
+
+
+
+/* EXTRA ADDONS	*/
+
+/* SWITCH */
+.settings-item {
+	position: relative !important;
+	height: 31px !important;
+	background: rgba(255,255,255,0.5) !important;
+	width: 222px !important;
+	margin-bottom: 1px !important;
+	left: -6px !important;
+	padding-top: 2px !important;
+	}
+
+.settings-item-title {
+	color: #333 !important;
+	font-weight: 400 !important;
+	line-height: 1.6 !important;
+	}
+
+.switch {
+	margin-left: 174px !important;
+	}
+
+input.cmn-toggle-round-flat:checked + label,
+input.cmn-toggle-round-flat:checked + label:after {
+	background-color: #666 !important;
+	}
+
+input.cmn-toggle-round-flat:checked + label:after {
+	margin-left: 28px !important;
+	}
+
+input.cmn-toggle-round-flat + label:after {
+	left: -22px !important;
+	top: -16px !important;
+	width: 18px !important;
+	height: 14px !important;
+	left: -8px !important;
+	}
+
+input.cmn-toggle-round-flat + label {
+	padding: 1px !important;
+	height: 20px !important;
+	width: 42px !important;	
+	}
+
+input.cmn-toggle-round-flat + label:before { 
+	height: 18px !important;
+	width: 40px !important;
+	}	
+
+
+
+/* search-tooltip */
+/*.leaflet-control-search.leaflet-control.search-exp, 
+.leaflet-control-search.leaflet-control,
+.leaflet-control-search.search-button */
+
+.leaflet-control-search {
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	background-color: rgba(255, 255, 255, 1) !important;
+	opacity: 1 !important;
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) !important;
+	}
+
+
+.leaflet-control-search .search-button {
+	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon.png') no-repeat 2px -22px !important;
+	}
+
+.leaflet-control-search .search-button:hover {
+	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon.png') no-repeat 2px 2px !important;
+	}
+
+.search-tooltip	{
+	min-width: none !important;
+	max-height: none !important;
+	background-color: white !important;
+	top: 29px !important;
+	padding: 5px !important;
+	opacity: 0.9 !important;	
+	}
+
+.leaflet-control-search .search-tip {
+	border-radius: 0 !important;
+	}
+
+.leaflet-control-search .search-input {
+	border: none !important;
+	height: 20px;
+	}
+
+.share-image-download-button {
+	@extend .smap-button-gray;
+	border: none !important;
+	line-height: 0.6 !important;
+}	

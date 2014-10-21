@@ -89,6 +89,9 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 			Wu.post('/api/util/snapshot', hash, that.createdImage, that);
 
 		});
+
+		// set progress bar for a 5sec run
+		app.ProgressBar.timedProgress(5000);
 		
 	},
 
@@ -198,7 +201,55 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 	createPrint : function () {
 		console.log('create print');
+
+		var that = this;	// callback
+		app.setHash(function (ctx, hash) {
+			console.log('hash: ', hash);
+
+			// get snapshot from server
+			Wu.post('/api/util/pdfsnapshot', hash, that.createdPrint, that);
+
+		});
+
+		// set progress bar for a 5sec run
+		app.ProgressBar.timedProgress(5000);
 	},
+
+	createdPrint : function (context, file) {
+		console.log('took PDF screenshot', file);
+
+		// parse results
+		var result = JSON.parse(file);
+		var pdf = result.pdf;
+
+		// set path for zip file
+		var path = '/api/file/download?file=' + pdf + '&type=file';
+		
+		// create print view
+		context._createPrintView(path);
+	},
+
+	_createPrintView : function (path) {
+
+		// remove previous expands
+		this._resetExpands();
+
+		// create wrapper
+		this._inputWrap = Wu.DomUtil.create('div', 'share-link-wrap', this._content);
+
+		// create title
+		var title = Wu.DomUtil.create('div', 'share-link-title', this._inputWrap, 'Download the PDF:')
+
+		// create download button
+		var downloadWrapper = Wu.DomUtil.create('div', 'share-print-download', this._inputWrap);
+		this._pdfDownloadButton = Wu.DomUtil.create('a', 'share-print-download-button', downloadWrapper, 'Download');
+		this._pdfDownloadButton.setAttribute('href', path);
+
+		// expand container
+		Wu.DomUtil.addClass(this._content, 'expand-share-link');
+
+	},
+
 
 	
 

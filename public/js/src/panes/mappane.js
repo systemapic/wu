@@ -158,12 +158,12 @@ Wu.MapPane = Wu.Class.extend({
 		if (!this.layerMenu) return false;
 
 		var layers = this.layerMenu.getLayers();
-		console.log('active layers: ', layers);
+		// console.log('active layers: ', layers);
 		var active = _.filter(layers, function (l) {
 			return l.on;
 		});
 
-		console.log('active: ', active);
+		// console.log('active: ', active);
 
 		return active;
 
@@ -487,12 +487,53 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 	enableGeolocation : function () {
+		if (this.geolocationControl) return;
 
+		// create controls // todo: no info on type of place (city, neighbourhood, street), so not possible to set good zoom level
+		this.geolocationControl = new L.Control.Search({
+			url: 'http://nominatim.openstreetmap.org/search?format=json&q={s}',
+			jsonpParam: 'json_callback',
+			propertyName: 'display_name',
+			propertyLoc: ['lat','lon'],	
+			boundingBox : 'boundingbox',
 
+			filterJSON : function (json) {
+				var jsonret = [], i;
+				for (i in json) {
+					var item = json[i];
+					if (item.hasOwnProperty('type')) {
+						var adr = {
+							address : item.display_name,
+							boundingbox : item.boundingbox,
+							latlng : L.latLng(item.lat, item.lon),
+							type : item.type
+						}
+					}
+
+					// push
+					jsonret.push(adr);
+				}
+				
+				var all = _.unique(jsonret, function (j) {
+					if (j) return j.address;
+				});
+
+				return all;
+			}
+		});
+
+		
+		// add to map
+		this.geolocationControl.addTo(this._map);
 	},
 
 	disableGeolocation : function () {
-
+		if (!this.geolocationControl) return;
+	       
+		// remove and delete control
+		this._map.removeControl(this.geolocationControl);
+		delete this.geolocationControl;
+		
 	},
 
 	enableMeasure : function () {

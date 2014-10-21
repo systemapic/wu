@@ -15,6 +15,7 @@
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css">
 		<link rel="stylesheet" href="//85.10.202.87:8080/js/lib/powerange/powerange.min.css">
 -->
+		<link rel="stylesheet"  href="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.css">
 
 		<!-- concat + cssmin -->
 		<link rel="stylesheet" href="//85.10.202.87:8080/dist/css.dependencies.min.css">
@@ -43,6 +44,9 @@
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet.draw.note.js"></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.js"></script>
 		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleForms.js"></script>
+		<!-- <script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet-search/src/google.geocoder.js"></script> -->
+		 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+		<script src="//85.10.202.87:8080/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.js"></script>
 
 		<!-- <script src="//85.10.202.87:8080/js/lib/d3.js/d3.min.js"></script>  -->
 		<script src="//85.10.202.87:8080/js/lib/d3.js/topojson.v1.min.js"></script> 
@@ -128,26 +132,46 @@
 				
 					<div class="initheight" id="map-bounds-inner">				
 						
-						<button id="editor-map-bounds" type="button" class="smap-button-white">Set bounds</button>
+						<button id="editor-map-bounds" type="button" class="smap-button-white">Set all bounds</button>
 						<button id="editor-map-bounds-clear" type="button" class="smap-button-white">Clear</button>
 
-						<label for="editor-map-bounds-NE-lat-value">North-East Corner:</label>
-						<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-NE-lat-value">
-						<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-NE-lng-value">
-						<button id="editor-map-bounds-NE" type="button" class="smap-button-white">Set North-East bounds</button>  
+						<!-- <label for="editor-map-bounds-NE-lat-value">North-East Corner:</label> -->
 
-						<label for="editor-map-bounds-SW-lat-value">South-West Corner:</label>
-						<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-SW-lat-value">
-						<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-SW-lng-value">
-						<button id="editor-map-bounds-SW" type="button" class="smap-button-white">Set South-West bounds</button>  
+						<div class="bounds-wrapper">
 
-						<label for="editor-map-bounds-max-zoom-value">Maximum Zoom Level:</label>
-						<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-max-zoom-value">
-						<button id="editor-map-bounds-set-maxZoom" type="button" class="smap-button-white">Set</button>
+							<button id="editor-map-bounds-NE" type="button" class="smap-button-white">Set North-East bounds</button>  
+							<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-NE-lat-value">
+							<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-NE-lng-value">
 
-						<label for="editor-map-bounds-min-zoom-value">Minimum Zoom Level:</label>
-						<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-min-zoom-value">
-						<button id="editor-map-bounds-set-minZoom" type="button" class="smap-button-white">Set</button>
+						</div>
+						<!-- <label for="editor-map-bounds-SW-lat-value">South-West Corner:</label> -->
+
+
+						<div class="bounds-wrapper">
+
+							<button id="editor-map-bounds-SW" type="button" class="smap-button-white">Set South-West bounds</button>  
+							<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-SW-lat-value">
+							<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-SW-lng-value">
+
+						</div>
+
+						<div class="bounds-wrapper zoom">
+
+							<!-- Set zoom level -->
+
+							<div class="bounds-zoom-half left">								
+								<div class="bounds-zoom-h2">Max Zoom</div>
+								<button id="editor-map-bounds-set-maxZoom" type="button" class="smap-button-white">Set</button>
+								<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-max-zoom-value">
+							</div>
+							
+							<div class="bounds-zoom-half right">								
+								<div class="bounds-zoom-h2">Max Zoom</div>
+								<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-min-zoom-value">
+								<button id="editor-map-bounds-set-minZoom" type="button" class="smap-button-white">Set</button>
+							</div>
+
+						</div>
 
 					</div>
 
@@ -192,15 +216,22 @@
 				<!--  // NB! ikke forandre på classnames her, og heller ikke struktur; 	-->
 				<!-- // bruker det til å plukke opp riktig div..			-->
 					<div class="item-list controls-item">
-						<div class="controls-title" which="zoom" id="map-controls-title-zoom">Zoom Control</div>
-						<div class="squaredThree inliner">
-							<input type="checkbox" value="None" id="map-controls-zoom" name="check" />
-<!-- 							<label for="map-controls-zoom" id="label-map-controls-zoom" which="zoom"></label> -->
+						<div class="controls-title" which="zoom" id="map-controls-title-zoom">Zoom</div>
+						
+
+
+						<div class="switch">
+							<input class="cmn-toggle cmn-toggle-round-flat" type="checkbox" checked="checked" id="map-controls-zoom">
+							<label class="" for="map-controls-zoom"></label>
 						</div>
+
+
+
+
 					</div>
 
 					<div class="item-list controls-item">
-						<div class="controls-title" which="draw" id="map-controls-title-draw">Draw Control</div>
+						<div class="controls-title" which="draw" id="map-controls-title-draw">Draw</div>
 						<div class="squaredThree inliner">
 							<input type="checkbox" value="None" id="map-controls-draw" name="check" />
 <!-- 							<label for="map-controls-draw" id="label-map-controls-draw" which="draw"></label> -->
@@ -208,7 +239,7 @@
 					</div>
 
 					<div class="item-list controls-item">
-						<div class="controls-title" which="inspect" id="map-controls-title-inspect">Inspect Layers Control</div>
+						<div class="controls-title" which="inspect" id="map-controls-title-inspect">Inspect Layers</div>
 						<div class="squaredThree inliner">
 							<input type="checkbox" value="None" id="map-controls-inspect" name="check" />
 <!-- 							<label for="map-controls-inspect" id="label-map-controls-inspect" which="inspect"></label> -->
@@ -216,7 +247,7 @@
 					</div>
 
 					<div class="item-list controls-item">
-						<div class="controls-title" which="description" id="map-controls-title-description">Description Control</div>
+						<div class="controls-title" which="description" id="map-controls-title-description">Description</div>
 						<div class="squaredThree inliner">
 							<input type="checkbox" value="None" id="map-controls-description" name="check" />
 <!-- 							<label for="map-controls-description" id="label-map-controls-description" which="description"></label> -->
@@ -224,7 +255,7 @@
 					</div>
 
 					<div class="item-list controls-item">
-						<div class="controls-title" which="layermenu" id="map-controls-title-layermenu">Layer menu Control</div>
+						<div class="controls-title" which="layermenu" id="map-controls-title-layermenu">Layer menu</div>
 						<div class="squaredThree inliner">
 							<input type="checkbox" value="None" id="map-controls-layermenu" name="check" />
 <!-- 							<label for="map-controls-layermenu"  which="layermenu" id="label-map-controls-layermenu"></label> -->
@@ -232,7 +263,7 @@
 					</div>
 
 					<div class="item-list controls-item">
-						<div class="controls-title" which="legends" id="map-controls-title-legends">Legends Control</div>
+						<div class="controls-title" which="legends" id="map-controls-title-legends">Legends</div>
 						<div class="squaredThree inliner">
 							<input type="checkbox" value="None" id="map-controls-legends" name="check" />
 <!-- 							<label for="map-controls-legends" which="legends" id="label-map-controls-legends"></label> -->
@@ -240,7 +271,7 @@
 					</div>
 
 					<div class="item-list controls-item">
-						<div class="controls-title" which="measure" id="map-controls-title-measure">Scale Control</div>
+						<div class="controls-title" which="measure" id="map-controls-title-measure">Scale</div>
 						<div class="squaredThree inliner">
 							<input type="checkbox" value="None" id="map-controls-measure" name="check" />
 <!-- 							<label for="map-controls-measure" which="measure" id="label-map-controls-measure"></label> -->
@@ -248,7 +279,7 @@
 					</div>
 
 					<div class="item-list controls-item">
-						<div class="controls-title" which="geolocation" id="map-controls-title-geolocation">Geolocation Control</div>
+						<div class="controls-title" which="geolocation" id="map-controls-title-geolocation">Geolocation</div>
 						<div class="squaredThree inliner">
 							<input type="checkbox" value="None" id="map-controls-geolocation" name="check" />
 <!-- 							<label for="map-controls-geolocation" which="geolocation" id="label-map-controls-geolocation"></label> -->
@@ -256,7 +287,7 @@
 					</div>
 
 					<div class="item-list controls-item">
-						<div class="controls-title" which="baselayertoggle" id="map-controls-title-baselayertoggle">Baselayer Toggle Control</div>
+						<div class="controls-title" which="baselayertoggle" id="map-controls-title-baselayertoggle">Baselayer Toggle</div>
 						<div class="squaredThree inliner">
 							<input type="checkbox" value="None" id="map-controls-baselayertoggle" name="check" />
 					<!-- 		<label for="map-controls-baselayertoggle" which="baselayertoggle" id="label-map-controls-baselayertoggle"></label> -->
@@ -264,18 +295,20 @@
 					</div>
 
 					<!-- <div class="item-list controls-item">
-						<div class="controls-title" which="vectorstyle" id="map-controls-title-vectorstyle">Vector Styling Control</div>
+						<div class="controls-title" which="vectorstyle" id="map-controls-title-vectorstyle">Vector Styling</div>
 						<div class="squaredThree inliner">
 							<input type="checkbox" value="None" id="map-controls-vectorstyle" name="check" />
 						</div>
 					</div> -->
 
 					<div class="item-list controls-item">
-						<div class="controls-title" which="mouseposition" id="map-controls-title-mouseposition">Mouse Position Control</div>
+						<div class="controls-title" which="mouseposition" id="map-controls-title-mouseposition">Mouse Position</div>
+
 						<div class="squaredThree inliner">
 							<input type="checkbox" value="None" id="map-controls-mouseposition" name="check" />
 <!-- 							<label for="map-controls-mouseposition" which="mouseposition" id="label-map-controls-mouseposition"></label> -->
 						</div>
+
 					</div>
 
 

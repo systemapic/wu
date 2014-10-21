@@ -302,12 +302,24 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CREATE SNAPSHOT =====================
 	// =====================================
-	// get mapboxdata from mapbox
+	// create snapshot of current map
 	app.post('/api/util/snapshot', isLoggedIn, function (req, res) {
 		console.log('/api/util/snapshot');
 
 		// get mapbox account
 		api.createSnapshot(req, res);
+
+	});
+
+	// =====================================
+	// CREATE PDF SNAPSHOT =================
+	// =====================================
+	// create PDF snapshot of current map
+	app.post('/api/util/pdfsnapshot', isLoggedIn, function (req, res) {
+		console.log('/api/util/pdfsnapshot');
+
+		// get mapbox account
+		api.createPDFSnapshot(req, res);
 
 	});
 
@@ -337,6 +349,7 @@ module.exports = function(app, passport) {
 	// 	api.updateGeojsonFile(req, res);
 
 	// });
+	
 	
 	// =====================================
 	// GET FILE DOWNLOAD ===================

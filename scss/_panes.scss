@@ -71,7 +71,8 @@
 	}
 
 .q-editor-menu-item .users {
-	padding-top: 18px;
+	/*padding-top: 18px;*/
+	padding-top: 25px;
 	}
 
 /* Menuslider with arrow */
@@ -141,7 +142,8 @@
 	height: 100%;
 	overflow-y: scroll;
 	padding-top: 0;
-	padding-bottom: 0;
+	/*padding-bottom: 0;*/
+	padding-bottom: 7px; /*cxxx*/
 	padding-left: 0px;
 	color: black;
 	width: 260px;
@@ -213,6 +215,7 @@
 	font-weight: 400;
 	color: #333;	
 	width: 150px;
+	line-height: 1.2;
 	}
 
 .client-title input {
@@ -257,7 +260,7 @@
 	display: none;
 	font-weight: 900;
 	border-radius: 1px;
-	text-shadow: -1px 1px rgba(255, 255, 255, 0.3);
+//	text-shadow: -1px 1px rgba(255, 255, 255, 0.3);
 	font-size: 11px;
 	color: #333;	
 	}	
@@ -265,7 +268,7 @@
 .client-kill:hover {
 	background: #C80000;
 	color: white;
-	text-shadow: -1px 1px rgba(0, 0, 0, 0.3);
+//	text-shadow: -1px 1px rgba(0, 0, 0, 0.3);
 	}
 
 #new-client-button {
@@ -322,14 +325,29 @@
 	}
 
 .project-title {
-	position: absolute;
+/*	position: absolute;
 	left: 10px;
 	top: 10px;
 	font-size: 110%;
 	text-shadow: none;
 	font-weight: 500;
 	text-transform: uppercase;
-	line-height: 0.9;
+	line-height: 0.9;*/
+
+position: relative;
+left: 10px;
+top: 6px;
+font-size: 110%;
+text-shadow: none;
+font-weight: 500;
+text-transform: uppercase;
+line-height: 1;
+overflow: hidden;
+max-height: 30px;
+height: auto;
+width: 192px;
+display: inline-block;
+vertical-align: bottom;
 	}
 
 .project-title input {
@@ -527,14 +545,14 @@
 	text-align: center;
 	border-radius: 2px;
 	height: 17px;
-	text-shadow: -1px 1px 1px white;
+//	text-shadow: -1px 1px 1px white;
 	float: right;
 	}
 
 .project-delete:hover {
 	background: #C80000;
 	color: white;
-	text-shadow: -1px 1px rgba(0, 0, 0, 0.3);
+//	text-shadow: -1px 1px rgba(0, 0, 0, 0.3);
 	}
 
 /* New project button */
@@ -615,6 +633,10 @@
 .item-list-header {
 	margin-top: 10px;
 	margin-bottom: 3px;
+
+	font-weight: 600;
+	font-size: 14px;
+	color: #666;	
 	}
 
 /* Layer list button */
@@ -754,18 +776,114 @@
 	padding-right: 3px;
 	}	
 
+#map-initpos-inner label {
+	font-weight: 600;
+	font-size: 14px;
+	color: #666;
+	}	
+
+.bounds-zoom-h2 {
+	position: absolute;
+	top: 3px;
+	width: 50%;
+	font-weight: 600;
+	font-size: 13px;
+	color: #666;
+	}
+
+
+
+
+.bounds-zoom-half.left .bounds-zoom-h2 {
+	text-align: left;	
+	}
+
+.bounds-zoom-half.right .bounds-zoom-h2 {
+	text-align: right;
+	padding-right: 5px;
+	}
+
+
+/*The bounds inner wrappers*/
+.bounds-wrapper {
+	padding-top: 12px;
+	padding-bottom: 12px;
+	border-top: 1px dotted rgba(0,0,0,0.3);	
+	position: relative;
+	}
+
+
+
+.bounds-wrapper.zoom {
+	padding-top: 25px;
+	}
+
+
+/*Bounds - Zoom halves*/
+.bounds-zoom-half {
+	display: inline-block;
+	width: 49%;
+	vertical-align: top;
+	}
+
+.bounds-zoom-half input {
+	width: 36px !important;
+	text-align: center;
+	}	
+
+/*Left Bounds - Zoom half*/
+.bounds-zoom-half.left {
+	box-shadow: 1px 0px 0 0 gray;
+	}
+
+/* Left Bounds - Zoom half */
+.bounds-zoom-half.left input {
+	float: right;
+	margin-right: 3px !important;
+	}
+
+
+
+
+/*#map-bounds-inner label {
+	margin-top: 4px;
+	border-top: 1px dotted rgba(0,0,0,0.2);
+	width: 100%;
+	padding-top: 4px;
+	padding-bottom: 7px;
+	}*/
+
+#map-bounds-inner input {
+	width: 49%;
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+	padding-bottom: 0 !important;
+	margin: 0;
+	padding-top: 0px !important;
+
+
+	width: 100%;
+	margin-bottom: 1px;
+	}
+
+#map-bounds-inner input, 
+#map-initpos-inner input {
+	background-color: rgba(0, 0, 0, 0.55) !important;
+	}	
+
 /* "Set bounds" button */
 #editor-map-bounds {
-	width: 139px;
+	width: 143px;
 	}
 
 /* Set North-East and South-West corner buttons */
 #editor-map-bounds-NE,
 #editor-map-bounds-SW {
-	margin-top: 10px;
+	margin-bottom: 5px;
 	}
 
-#editor-map-bounds-NE:before,
+/*#editor-map-bounds-NE:before,
 #editor-map-bounds-SW:before {
 	content: '';
 	position: absolute;
@@ -774,7 +892,7 @@
 	top: -10px;
 	left: 0;
 	border-top: 1px dotted rgba(255,255,255,0.2);
-	}
+	}*/
 
 #editor-map-bounds-NE,
 #editor-map-bounds-SW {
@@ -787,10 +905,11 @@
 
 /* Max zoom button */
 #editor-map-bounds-set-maxZoom {
-	width: 60px;
+	width: 56px;
 	position: relative;
 	display: inline-block;
 	vertical-align: top;
+	margin: 0;
 	}
 
 /* Max zoom value field */
@@ -803,10 +922,11 @@
 
 /* Max zoom button */
 #editor-map-bounds-set-minZoom {
-	width: 60px;
+	width: 56px;
 	position: relative;
 	display: inline-block;
 	vertical-align: top;
+	margin: 0;
 	}
 
 /* Min zoom value field */
@@ -860,12 +980,21 @@
 	}
 
 .connect-mapbox-title {
-	font-size: 130%;
+/*	font-size: 130%;
 	position: relative;
 	text-align: left;
 	padding-top: 10px;
 	margin-bottom: 10px;
-	padding-left: 13px;
+	padding-left: 13px;*/
+	font-size: 14px;
+	position: relative;
+	text-align: left;
+	padding-top: 10px;
+	margin-bottom: 0px;
+	padding-left: 0px;
+	font-weight: 600 !important;
+	color: #666;
+	text-transform: uppercase;	
 	}
 
 .mapbox-connect-wrap {
@@ -874,7 +1003,7 @@
 	margin: 0;
 	height: 55px;
 	padding: 0;
-	padding-top: 15px;
+	padding-top: 8px;
 	}
 
 .import-mapbox-layers {
@@ -1099,7 +1228,7 @@
 	font-size: 19px;
 	font-weight: 900;
 	color: white;
-	text-shadow: -1px 1px 1px rgba(0,0,0,0.3);
+//	text-shadow: -1px 1px 1px rgba(0,0,0,0.3);
 	margin-top: 1px;	
 	}
 
@@ -1675,7 +1804,7 @@ button.image-attachment {
 	font-style: italic;
 	text-indent: 1px;
 	font-weight: 900;
-	text-shadow: 0px 1px 1px black;
+//	text-shadow: 0px 1px 1px black;
 	}	
 
 .backpane-confirm {
@@ -1768,7 +1897,7 @@ button.image-attachment {
 .backpane-title {
 	font-size: 300%;
 	font-weight: 900;
-	text-shadow: -1px 1px 1px black;
+//	text-shadow: -1px 1px 1px black;
 	}
 
 /* Subtitle */
@@ -1786,7 +1915,7 @@ button.image-attachment {
 	position: absolute;
 	padding: 5px;
 	font-weight: 900;
-	text-shadow: 0px 1px 1px rgba(0,0,0,0.4);
+//	text-shadow: 0px 1px 1px rgba(0,0,0,0.4);
 	text-transform: uppercase;
 	top: -35px;
 	box-shadow: 0 0 4px 0 rgba(0,0,0,0.2);

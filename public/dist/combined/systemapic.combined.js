@@ -336,8 +336,8 @@ Wu.Util = {
 	},
 
 	// post with callback
-	postcb : function (path, json, cb, self) {
-		// console.log('POST: postcb', JSON.parse(json));
+	postcb : function (path, json, cb, context) {
+
 		var http = new XMLHttpRequest();
 		var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
 		url += path;
@@ -348,15 +348,7 @@ Wu.Util = {
 
 		http.onreadystatechange = function() {
 		    if(http.readyState == 4 && http.status == 200) {
-			if (cb) { 
-				try {
-				// console.log('RESPONSE: ', JSON.parse(http.responseText));
-				} catch (e) {
-					// console.log('RESPONSE: ', http.responseText);
-				}
-
-				cb(self, http.responseText); 
-			}
+			if (cb) cb(context, http.responseText); 
 		    }
 		}
 		http.send(json);
@@ -415,6 +407,10 @@ Wu.Util = {
 		});
 		if (prefix) { return prefix + '-' + uuid };
 		return uuid;
+	},
+
+	createRandom : function (digits) {
+		return Math.random().toString(36).slice((digits) * -1).toUpperCase()
 	},
 
 	deselectText : function () {
@@ -707,7 +703,262 @@ Wu.Util = {
 						(i > 0 ? token : '');
 			}
 		}
+	},
+
+
+	stripAccents : function (str) {
+		/**
+		* Normalise a string replacing foreign characters
+		*
+		* @param {String} str
+		* @return {String}
+		*/
+
+		var map = {
+			"À": "A",
+			"Á": "A",
+			"Â": "A",
+			"Ã": "A",
+			"Ä": "A",
+			"Å": "A",
+			"Æ": "AE",
+			"Ç": "C",
+			"È": "E",
+			"É": "E",
+			"Ê": "E",
+			"Ë": "E",
+			"Ì": "I",
+			"Í": "I",
+			"Î": "I",
+			"Ï": "I",
+			"Ð": "D",
+			"Ñ": "N",
+			"Ò": "O",
+			"Ó": "O",
+			"Ô": "O",
+			"Õ": "O",
+			"Ö": "O",
+			"Ø": "O",
+			"Ù": "U",
+			"Ú": "U",
+			"Û": "U",
+			"Ü": "U",
+			"Ý": "Y",
+			"ß": "s",
+			"à": "a",
+			"á": "a",
+			"â": "a",
+			"ã": "a",
+			"ä": "a",
+			"å": "a",
+			"æ": "ae",
+			"ç": "c",
+			"è": "e",
+			"é": "e",
+			"ê": "e",
+			"ë": "e",
+			"ì": "i",
+			"í": "i",
+			"î": "i",
+			"ï": "i",
+			"ñ": "n",
+			"ò": "o",
+			"ó": "o",
+			"ô": "o",
+			"õ": "o",
+			"ö": "o",
+			"ø": "o",
+			"ù": "u",
+			"ú": "u",
+			"û": "u",
+			"ü": "u",
+			"ý": "y",
+			"ÿ": "y",
+			"Ā": "A",
+			"ā": "a",
+			"Ă": "A",
+			"ă": "a",
+			"Ą": "A",
+			"ą": "a",
+			"Ć": "C",
+			"ć": "c",
+			"Ĉ": "C",
+			"ĉ": "c",
+			"Ċ": "C",
+			"ċ": "c",
+			"Č": "C",
+			"č": "c",
+			"Ď": "D",
+			"ď": "d",
+			"Đ": "D",
+			"đ": "d",
+			"Ē": "E",
+			"ē": "e",
+			"Ĕ": "E",
+			"ĕ": "e",
+			"Ė": "E",
+			"ė": "e",
+			"Ę": "E",
+			"ę": "e",
+			"Ě": "E",
+			"ě": "e",
+			"Ĝ": "G",
+			"ĝ": "g",
+			"Ğ": "G",
+			"ğ": "g",
+			"Ġ": "G",
+			"ġ": "g",
+			"Ģ": "G",
+			"ģ": "g",
+			"Ĥ": "H",
+			"ĥ": "h",
+			"Ħ": "H",
+			"ħ": "h",
+			"Ĩ": "I",
+			"ĩ": "i",
+			"Ī": "I",
+			"ī": "i",
+			"Ĭ": "I",
+			"ĭ": "i",
+			"Į": "I",
+			"į": "i",
+			"İ": "I",
+			"ı": "i",
+			"Ĳ": "IJ",
+			"ĳ": "ij",
+			"Ĵ": "J",
+			"ĵ": "j",
+			"Ķ": "K",
+			"ķ": "k",
+			"Ĺ": "L",
+			"ĺ": "l",
+			"Ļ": "L",
+			"ļ": "l",
+			"Ľ": "L",
+			"ľ": "l",
+			"Ŀ": "L",
+			"ŀ": "l",
+			"Ł": "l",
+			"ł": "l",
+			"Ń": "N",
+			"ń": "n",
+			"Ņ": "N",
+			"ņ": "n",
+			"Ň": "N",
+			"ň": "n",
+			"ŉ": "n",
+			"Ō": "O",
+			"ō": "o",
+			"Ŏ": "O",
+			"ŏ": "o",
+			"Ő": "O",
+			"ő": "o",
+			"Œ": "OE",
+			"œ": "oe",
+			"Ŕ": "R",
+			"ŕ": "r",
+			"Ŗ": "R",
+			"ŗ": "r",
+			"Ř": "R",
+			"ř": "r",
+			"Ś": "S",
+			"ś": "s",
+			"Ŝ": "S",
+			"ŝ": "s",
+			"Ş": "S",
+			"ş": "s",
+			"Š": "S",
+			"š": "s",
+			"Ţ": "T",
+			"ţ": "t",
+			"Ť": "T",
+			"ť": "t",
+			"Ŧ": "T",
+			"ŧ": "t",
+			"Ũ": "U",
+			"ũ": "u",
+			"Ū": "U",
+			"ū": "u",
+			"Ŭ": "U",
+			"ŭ": "u",
+			"Ů": "U",
+			"ů": "u",
+			"Ű": "U",
+			"ű": "u",
+			"Ų": "U",
+			"ų": "u",
+			"Ŵ": "W",
+			"ŵ": "w",
+			"Ŷ": "Y",
+			"ŷ": "y",
+			"Ÿ": "Y",
+			"Ź": "Z",
+			"ź": "z",
+			"Ż": "Z",
+			"ż": "z",
+			"Ž": "Z",
+			"ž": "z",
+			"ſ": "s",
+			"ƒ": "f",
+			"Ơ": "O",
+			"ơ": "o",
+			"Ư": "U",
+			"ư": "u",
+			"Ǎ": "A",
+			"ǎ": "a",
+			"Ǐ": "I",
+			"ǐ": "i",
+			"Ǒ": "O",
+			"ǒ": "o",
+			"Ǔ": "U",
+			"ǔ": "u",
+			"Ǖ": "U",
+			"ǖ": "u",
+			"Ǘ": "U",
+			"ǘ": "u",
+			"Ǚ": "U",
+			"ǚ": "u",
+			"Ǜ": "U",
+			"ǜ": "u",
+			"Ǻ": "A",
+			"ǻ": "a",
+			"Ǽ": "AE",
+			"ǽ": "ae",
+			"Ǿ": "O",
+			"ǿ": "o"
+		};
+
+		var nonWord = /\W/g;
+
+		var mapping = function (c) {
+			return map[c] || c; 
+		};
+
+		
+		return str.replace(nonWord, mapping);
+	},
+
+	bytesToSize : function (bytes) {
+		var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+		if (bytes == 0) return '0 Byte';
+		var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+		return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+	},
+
+	parseUrl : function () {
+		var query = window.location.search.substr(1);
+		var result = {};
+		query.split("&").forEach(function(part) {
+			var item = part.split("=");
+			if (item[0] != '') {
+				result[item[0]] = decodeURIComponent(item[1]);
+			}
+		});
+		if (_.size(result)) return result;
+		return false;
 	}
+
+	
 
 	
 };
@@ -1706,6 +1957,7 @@ L.Popup.include({
 		if (pane.dataLibrary) 	this.DataLibrary  = new Wu.SidePane.DataLibrary();
 		if (pane.mediaLibrary) 	this.MediaLibrary = new Wu.SidePane.MediaLibrary();
 		if (pane.users) 	this.Users 	  = new Wu.SidePane.Users();
+		if (pane.share) 	this.Share 	  = new Wu.SidePane.Share();
 
 	},
 
@@ -1735,6 +1987,20 @@ L.Popup.include({
 		// close menu panes if open
 		this.closePane();
 
+		// deactivte submenus
+		this._deactivate();
+
+	},
+
+	// call _deactivate on all items
+	_deactivate : function () {
+		if (this.Clients) 	this.Clients._deactivate();
+		if (this.Map) 		this.Map._deactivate();
+		if (this.Documents) 	this.Documents._deactivate();
+		if (this.DataLibrary) 	this.DataLibrary._deactivate();
+		if (this.MediaLibrary) 	this.MediaLibrary._deactivate();
+		if (this.Users) 	this.Users._deactivate();
+		if (this.Share) 	this.Share._deactivate();
 	},
 
 	expand : function () {
@@ -1743,24 +2009,31 @@ L.Popup.include({
 		this.openPane();
 	},
 
-	_getPaneArray : function () {
+	_getPaneArray : function (project) {
 		var panes = [];
 		var pane = this.options.panes;
-		if (pane.clients) 	panes.push('Clients');
-		if (pane.mapOptions) 	panes.push('Map');
-		if (pane.documents) 	panes.push('Documents');
-		if (pane.dataLibrary) 	panes.push('DataLibrary');
-		if (pane.mediaLibrary) 	panes.push('MediaLibrary');
-		if (pane.users) 	panes.push('Users');
+
+		console.log('_getPaneArray sidepane: ');
+		var settings = project.getSettings();
+		console.log('pro settings', settings);
+
+
+		if (pane.clients) 				panes.push('Clients');
+		if (pane.mapOptions) 				panes.push('Map');
+		if (pane.documents   && settings.documentsPane) panes.push('Documents');
+		if (pane.dataLibrary && settings.dataLibrary) 	panes.push('DataLibrary');
+		if (pane.mediaLibrary && settings.mediaLibrary) panes.push('MediaLibrary');
+		if (pane.users) 				panes.push('Users');
+		if (pane.share) 				panes.push('Share');
 		return panes;
 	},
 
 	setProject : function (project) {
 		// update content
-		if (this.Home) this.Home.updateContent(project);
-		if (this.Map) this.Map.updateContent(project);
-		if (this.Documents) this.Documents.updateContent(project);
-		if (this.DataLibrary) this.DataLibrary.updateContent(project);
+		if (this.Home) 		this.Home.updateContent(project);
+		if (this.Map) 		this.Map.updateContent(project);
+		if (this.Documents) 	this.Documents.updateContent(project);
+		if (this.DataLibrary) 	this.DataLibrary.updateContent(project);
 	},
 
 	refreshProject : function (project) {
@@ -1768,7 +2041,7 @@ L.Popup.include({
 		var editMode = project.editMode; // access determined at Wu.Project
 		
 		// default menus in sidepane
-		var panes = this._getPaneArray();
+		var panes = this._getPaneArray(project);
 		
 		// remove Map pane if not editor
 		if (!editMode) _.pull(panes, 'Map');
@@ -1794,11 +2067,10 @@ L.Popup.include({
 		this.panes = [];
 
 		// all panes
-		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users'];
-				
+		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users', 'Share'];
 				
 		// panes to active
-		panes.forEach(function (elem, i, arr) {
+		all.forEach(function (elem, i, arr) {
 			if (!Wu.app.SidePane[elem]) {
 				Wu.app.SidePane[elem] = new Wu.SidePane[elem];
 			}
@@ -1816,6 +2088,18 @@ L.Popup.include({
 
 	},
 
+	removePane : function (pane) {
+		var panes = Wu.extend([], this.panes);
+		_.pull(panes, pane);
+		this.refresh(panes);
+	},
+
+	addPane : function (pane) {
+		var panes = Wu.extend([], this.panes);
+		panes.push(pane);
+		panes = _.unique(panes);
+		this.refresh(panes);
+	},
 	
 	// close sidepane
 	closePane : function () {
@@ -1828,21 +2112,14 @@ L.Popup.include({
 		this._container.style.width = '100px';
 
 		// refresh leaflet
-		setTimeout(function() {
-			var map = Wu.app._map;
-			if (map) map.reframe();
-		}, 300); // time with css
+		this._refreshLeaflet();
 
-		this._closePane();
-		// console.log('app._active', app._active, this);
+		// this._closePane();
 
+		// todo: what if panes not there?
 		Wu.DomUtil.removeClass(app.SidePane.Documents._content, 'show');
 		Wu.DomUtil.removeClass(app.SidePane.DataLibrary._content, 'show');
 		Wu.DomUtil.removeClass(app.SidePane.Users._content, 'show');
-
-		
-
-		// Wu.DomUtil.removeClass(app._active, 'show');
 
 	},
 
@@ -1857,37 +2134,39 @@ L.Popup.include({
 		if (this.paneOpen) return;
 		this.paneOpen = true;
 
-		// console.log('openPane: this.container: ', this._container);
-		// console.log('openPane: this: ', this);
-
 		// open
 		this._container.style.width = '350px';
 		Wu.DomUtil.addClass(app._active, 'show');	
 
 		// refresh leaflet
+		this._refreshLeaflet();
+		
+	},
+
+	_refreshLeaflet : function () {
 		setTimeout(function() {
 			var map = Wu.app._map;
 			if (map) map.reframe();
 		}, 300); // time with css
 	},
 
-	// set subheaders with client/project
-	setSubheaders : function () {
-		return;
-		var client = Wu.app._activeClient; 	// TODO: refactor! _activeClient no longer exists
-		var project = Wu.app.activeProject;
+	// // set subheaders with client/project
+	// setSubheaders : function () {
+	// 	return;
+	// 	var client = Wu.app._activeClient; 	// TODO: refactor! _activeClient no longer exists
+	// 	var project = Wu.app.activeProject;
 
-		// if active client 
-		if (!client) return;
-		Wu.DomUtil.get('h4-projects-client-name').innerHTML = client.name; 		// set projects' subheader
-		Wu.DomUtil.get('h4-map-configuration-client-name').innerHTML = client.name; 	// set map configuration subheader
-		Wu.DomUtil.get('h4-layers-client-name').innerHTML = client.name; 		// set layers subheader
+	// 	// if active client 
+	// 	if (!client) return;
+	// 	Wu.DomUtil.get('h4-projects-client-name').innerHTML = client.name; 		// set projects' subheader
+	// 	Wu.DomUtil.get('h4-map-configuration-client-name').innerHTML = client.name; 	// set map configuration subheader
+	// 	Wu.DomUtil.get('h4-layers-client-name').innerHTML = client.name; 		// set layers subheader
 		
-		// if active project
-		if (!project) return;
-		Wu.DomUtil.get('h4-map-configuration-project-name').innerHTML = project.name; 	// set map configuration subheader
-		Wu.DomUtil.get('h4-layers-project-name').innerHTML = project.name; 		// set layers subheader
-	}
+	// 	// if active project
+	// 	if (!project) return;
+	// 	Wu.DomUtil.get('h4-map-configuration-project-name').innerHTML = project.name; 	// set map configuration subheader
+	// 	Wu.DomUtil.get('h4-layers-project-name').innerHTML = project.name; 		// set layers subheader
+	// }
 });;Wu.SidePane.Item = Wu.Class.extend({
         _wu : 'sidepane.item', 
 	
@@ -1903,6 +2182,30 @@ L.Popup.include({
 		this.initContent();
 		this.addHooks();
 		this.disable();
+	},
+
+
+	initContainer : function () {
+		// menu
+		var className = 'q-editor-menu-item ' + this.type;
+		this._menu = Wu.DomUtil.create('div', className, Wu.app._editorMenuPane);
+		this._title = Wu.DomUtil.create('a', this.type, this._menu);
+		this._title.innerHTML = Wu.Util.capitalize(this.title || this.type);
+
+		// content
+		var className = 'q-editor-content-item ' + this.type;
+		this._content = Wu.DomUtil.create('div', className, Wu.app._editorContentPane);
+
+		// scroll wrapper (j)
+		this._scrollWrapper = Wu.DomUtil.create('div', 'editor-scroll-wrapper', this._content);
+
+		// wrapper 
+		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct13', this._scrollWrapper);
+
+	},
+
+	initContent : function () {
+
 	},
 
 	addHooks : function () {
@@ -2017,7 +2320,6 @@ L.Popup.include({
 
 	// check swipe of sidepane on selecting menu item (j)
 	checkSwipe : function (prev) {
-		// console.log('checkSwipe -> prev: ', prev);
 		if (prev) return this.swiper(prev);
 
 		// Hide the Deactivated Pane
@@ -2035,9 +2337,6 @@ L.Popup.include({
 		// set vars
 		var swypefrom = prev._content;
 		var swypeto = Wu.app._active;               
-
-		// console.log('prev', prev);
-		// console.log('swypefrom', swypefrom);
 
 		// if same, do nothing
 		if (swypefrom == swypeto) return;
@@ -2081,6 +2380,7 @@ L.Popup.include({
 	    
 		if (_.contains(classy, 'documents')) {
 			var n = app.SidePane.panes.indexOf('Documents');
+			console.log('n: ', n, app.SidePane.panes);
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
 
@@ -2117,6 +2417,16 @@ L.Popup.include({
 
 		}
 				
+
+		if (_.contains(classy, 'share')) {
+			var n = app.SidePane.panes.indexOf('Share');
+			menuslider.style.top = h * n + 'px';
+			Wu.app.SidePane._container.style.width = '100%';
+
+			Wu.DomUtil.removeClass(__map, "map-blur")
+
+		}
+				
 		
 		// Find out what to swipe from
 		// The Sliders Container
@@ -2133,66 +2443,17 @@ L.Popup.include({
 			if ( _under_dogs[a] == prev._menu ) { swfrom = a; }                 
 			if ( _under_dogs[a] == this._menu ) { swto = a; }
 		}
-		
-		// Check if we're swiping up or down
-		// if ( swfrom > swto ) {
-		// 	swipeOut = 'swipe_out';
-		// 	swipeIn = 'swipe_in';						
-		// } else {
-		// 	swipeOut = 'swipe_out_up';
-		// 	swipeIn = 'swipe_in_up';
-		// }
+	
 		    
 		// Hide the Deactivated Pane
-		if (Wu.app._active) {
-
-				// console.log('swypefrom', swypefrom);
-
-			    Wu.DomUtil.removeClass(swypefrom, 'show');
-
-
-			// Wu.DomUtil.addClass(swypefrom, swipeOut);                   
-					    
-			// // Remove classes from the swiped out element
-			// setTimeout(function(){
-			// 	Wu.DomUtil.removeClass(swypefrom, 'show');
-			// 	Wu.DomUtil.removeClass(swypefrom, swipeOut);
-			// }, 300);                                
-		};
-					
+		if (Wu.app._active) Wu.DomUtil.removeClass(swypefrom, 'show');
+			
 		// Swipe this IN
-		Wu.DomUtil.addClass(swypeto, 'show');
-		// Wu.DomUtil.addClass(swypeto, swipeIn);              
-		
-		// setTimeout(function(){
-		// 	Wu.DomUtil.removeClass(swypeto, swipeIn);   
-		// }, 300);
+		Wu.DomUtil.addClass(swypeto, 'show');	
 			
 	},
 
 
-	initContainer : function () {
-		// menu
-		var className = 'q-editor-menu-item ' + this.type;
-		this._menu = Wu.DomUtil.create('div', className, Wu.app._editorMenuPane);
-		this._title = Wu.DomUtil.create('a', this.type, this._menu);
-		this._title.innerHTML = Wu.Util.capitalize(this.title || this.type);
-
-		// content
-		var className = 'q-editor-content-item ' + this.type;
-		this._content = Wu.DomUtil.create('div', className, Wu.app._editorContentPane);
-
-		// scroll wrapper (j)
-		this._scrollWrapper = Wu.DomUtil.create('div', 'editor-scroll-wrapper', this._content);
-
-		// wrapper 
-		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct13', this._scrollWrapper);
-
-	},
-
-	initContent : function () {
-
-	},
 
 	updateContent : function (project) {
 
@@ -2266,12 +2527,6 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	initContent : function () {
 
-		// console.log('init clients', this._content, this._scrollWrapper );
-
-		// h3 title
-		// var title = Wu.DomUtil.create('h3', '', this._container);
-		// title.innerHTML = 'Clients';
-
 		// clients container
 		this._clientsContainer = Wu.DomUtil.create('div', 'editor-clients', this._container);
 
@@ -2283,7 +2538,6 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
       		// insert create client button
 		if (app.Account.canCreateClient()) this._insertNewClientButton();	
-
 
 	},
 
@@ -2529,14 +2783,28 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 ;// Subelements under Clients/Client
 Wu.SidePane.Project = Wu.Class.extend({
 
-	initialize : function (project, parent) {
+	initialize : function (project, options) {
+
+		// set options
+		Wu.setOptions(this, options);
+
+		// set project
 		this.project = project;
-		this._parent = parent; // client div container
 
-		this.project._menuItem = this;
+		// set edit mode
+		this.project.setEditMode();
 
-		this.initLayout(); 	// create divs
-		this.update();		// fill in divs
+		// set this as sidepane item
+		this.project.setSidepane(this);
+
+		// set parent
+		this._parent = this.options.parent; // client div container
+
+		// init layout
+		this.initLayout(); 
+		
+		// update content
+		this.update();
 
 		return this;
 	},
@@ -2558,14 +2826,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.logo = Wu.DomUtil.create('div', 'project-logo', this._container);
 		this.logo.type = 'logo';
 
-		
-
 		// create users
 		this.users = Wu.DomUtil.create('div', 'project-users-wrap', this._container);
 		this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this.users);
-
-		// Wu.DomEvent.on(this.users, 'mouseenter', this.expandUsers, this);
-		// Wu.DomEvent.on(this.users, 'mouseleave', this.collapseUsers, this);
 
 		// Project stats header
 		this.projectStatsHeader = Wu.DomUtil.create('div', 'project-stats', this.usersInnerWrapper);
@@ -2582,8 +2845,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.usersInnerWrapper);
 
-		// kill button
-		if (app.Account.canDeleteProject(this.project.store.uuid)) {
+		// add delete button
+		if (app.Account.canDeleteProject(this.project.store.uuid) || this.options.editMode) {
 			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');
 		}
 
@@ -2615,7 +2878,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent.on(this._container, 'mouseenter', this.open, this);
 		Wu.DomEvent.on(this._container, 'mouseleave', this.close, this);
 		Wu.DomEvent.on(this._container, 'click',      this.select, this);
-		Wu.DomEvent.on( this._container, 'mousedown', Wu.DomEvent.stop, this);
+		Wu.DomEvent.on(this._container, 'mousedown',  Wu.DomEvent.stopPropagation, this);	// to prevent closing of project pane
 	
 		// add edit hooks
 		if (this.project.editMode) this.addEditHooks();
@@ -2625,20 +2888,21 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent.off(this._container, 'mouseenter', this.open, this);
 		Wu.DomEvent.off(this._container, 'mouseleave', this.close, this);
 		Wu.DomEvent.off(this._container, 'click', this.select, this);
-		Wu.DomEvent.off( this._container, 'mousedown', Wu.DomEvent.stop, this);
+		Wu.DomEvent.off( this._container, 'mousedown', Wu.DomEvent.stopPropagation, this);
 
 		// remove edit hooks
 		if (this.project.editMode) this.removeEditHooks();
 	},
 
 	addEditHooks : function () {
-		// console.log('addEditHooks', this.project.editMode);
+
+		if (!this.project.editMode) return;
 
 		// editing hooks
-		if (!this.project.editMode) return;
 		Wu.DomEvent.on(this.name, 	 'dblclick', this.edit, this);
 		Wu.DomEvent.on(this.description, 'dblclick', this.editDescription, this);
-		Wu.DomEvent.on(this.logo, 	 'click', Wu.DomEvent.stop, this);
+
+		// add dz to logo
 		this.addLogoDZ();
 
 		// add kill hook
@@ -2648,15 +2912,12 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	removeEditHooks : function () {
-		// if (!this.project.editMode) return;
-
-		// console.log('addEditHooks', this.project.editMode);
-
 
 		// editing hooks
 		Wu.DomEvent.off(this.name, 	  'dblclick', this.edit, this);
 		Wu.DomEvent.off(this.description, 'dblclick', this.editDescription, this);
-		Wu.DomEvent.off(this.logo, 	  'click', Wu.DomEvent.stop, this);
+
+		// remove dz
 		this.removeLogoDZ();
 
 		// remove kill hook
@@ -2728,23 +2989,17 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	open : function () {
-		// console.log('open sesame!');
-		if ( this._parent ) this._parent._container.style.overflow = 'visible';
-
+		if (this._parent) this._parent._container.style.overflow = 'visible';
 	},
 
 	close : function () {
-		// console.log('close for ali babar!');
-		if ( this._parent ) this._parent._container.style.overflow = 'hidden';
-
+		if (this._parent) this._parent._container.style.overflow = 'hidden';
 	},
 
 	select : function (e) {
 
-		// console.log('select e: ', e);
-
 		// dont select if already active
-		// if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
+		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
 
 		// select project
 		this.project.select();
@@ -2753,12 +3008,25 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.app.SidePane.refreshProject(this.project);
 
 		// set client name in sidepane subheaders
-		Wu.app.SidePane.setSubheaders();	
+		// Wu.app.SidePane.setSubheaders();	
 
 	},
 
+	// add class to mark project active in sidepane
+	_markActive : function () {
+		var projects = app.Projects;
+		for (p in projects) {
+			var project = projects[p];
+			project._menuItem._unmarkActive();
+		}
+		Wu.DomUtil.addClass(this._container, 'active-project');
+	},
+	
+	_unmarkActive : function () {
+		Wu.DomUtil.removeClass(this._container, 'active-project');
+	},
+
 	edit : function (e) {
-		// console.log('edit!', e, this);
 		
 		// return if already editing
 		if (this.editing) return;
@@ -2792,18 +3060,17 @@ Wu.SidePane.Project = Wu.Class.extend({
 		div.innerHTML = value;
 
 		// if name, change slug also
-		if (div.type == 'name') this.project.setSlug(value);
+		this.project.setSlug(value);
 
 		// save latest
-		this.project.store[div.type] = value;
-		this.project._update(div.type);
+		this.project.store['name'] = value;
+		this.project._update('name');
 
 		this.editing = false;
 
 	},
 
 	editDescription : function (e) {
-		// console.log('edit!', e, this);
 		
 		// return if already editing
 		if (this.editing) return;
@@ -2813,13 +3080,11 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var type = div.type;
 		var value = div.innerHTML;
 
-		// var input = ich.injectProjectEditInput({value:value});
 		div.innerHTML = '';
 		var input = Wu.DomUtil.create('textarea', 'project-edit-textarea', div);
 		input.innerHTML = value;
 
 		// focus
-		// var target = div.firstChild;
 		var target = input;
 		target.focus();
 		target.selectionStart = target.selectionEnd;	// prevents text selection
@@ -2838,13 +3103,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// revert to <div>
 		var div = e.target.parentNode;
 		div.innerHTML = value;
-
-		console.log('calue)', value);
-		console.log('div: ', div);
-		console.log('type: ', div.type);
-
-		// if name, change slug also
-		// if (div.type == 'name') this.project.setSlug(value);
 
 		// save latest
 		this.project.store.description = value;
@@ -2988,7 +3246,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.projects.forEach(function (p){
 
 			// new project item view
-			var projectDiv = new Wu.SidePane.Project(p, this);
+			var options = {
+				parent : this
+			}
+			var projectDiv = new Wu.SidePane.Project(p, options);
 
 			// app to client
 			projectDiv.addTo(this._projectsContainer);
@@ -3094,20 +3355,12 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// create new project with options, and save
 		var project = new Wu.Project(store);
 		project.editMode = true;
-		project._saveNew(this); 
+		var callback = {
+			callback : this._projectCreated,
+			context : this
+		}
+		project._saveNew(callback); 
 		
-		// add project to client array
-		this.projects.push(project);
-
-		// new project item view
-		var projectDiv = new Wu.SidePane.Project(project);
-
-		// add to client container
-		projectDiv.addToBefore(this._projectsContainer);
-
-		// refresh height
-		this.open();
-
 	},
 
 	_projectCreated : function (project, json) {
@@ -3116,34 +3369,52 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var error  = result.error;
 		var store  = result.project;
 
+		console.log('results: ', result);
+
 		// return error
 		if (error) return console.log('there was an error creating new project!', error);			
+
+		// add to global store
+		app.Projects[store.uuid] = project;
 
 		// update project store
 		project.setStore(store);
 
 		// add to access locally
-		app.Account.addProjectAccess(project); // todo!
+		project.addAccess();
 
-		// select project
-		project._menuItem.select();
+		// create project in sidepane
+		this._createNewProject(project);
 
 	},
 
-	
+	// add project in sidepane
+	_createNewProject : function (project) {
+
+		// add project to client array
+		this.projects.push(project);
+
+		// new project item view
+		var options = {
+			parent : this
+		}
+		var sidepaneProject = new Wu.SidePane.Project(project, options);
+
+		// add to client container
+		sidepaneProject.addToBefore(this._projectsContainer);
+
+		// refresh height
+		this.open();
+
+		// select
+		sidepaneProject.project._menuItem.select();
+	},
 
 	addHooks : function () {
-		// Wu.DomEvent.on( this._container.parentNode, 'mouseleave', this.close, this);	// todo: add click for opening also...
-		// Wu.DomEvent.on( this._container, 'mousemove', this.pendingOpen, this);
-		// Wu.DomEvent.on( this._container, 'mousedown', this.open, this);
 		Wu.DomEvent.on( this._container, 'mousedown', this.toggle, this);
-		
 	},
 
 	removeHooks : function () {
-		// Wu.DomEvent.off( this._container.parentNode, 'mouseleave', this.close, this);
-		// Wu.DomEvent.off( this._container, 'mousemove', this.pendingOpen, this);
-		// Wu.DomEvent.off( this._container, 'mousedown', this.open, this);
 		Wu.DomEvent.off( this._container, 'mousedown', this.toggle, this);
 	},
 
@@ -3351,7 +3622,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 
 	type : 'users',
-	title : 'User <br> Mngmt',
+	title : 'Users',
 
 	initContent : function () {
 
@@ -4144,6 +4415,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.mapSettings.position  = new Wu.SidePane.Map.Position();
 		this.mapSettings.controls  = new Wu.SidePane.Map.Controls();
 		this.mapSettings.connect   = new Wu.SidePane.Map.Connect(this._settingsContainer);  // refactor container, ich.template
+		this.mapSettings.settings  = new Wu.SidePane.Map.Settings(this._settingsContainer);  // refactor container, ich.template
 
 	},
 
@@ -4397,165 +4669,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 });
 
-
-
-Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
-	_ : 'sidepane.map.connect', 
-
-	type : 'connect',			
-
-	initLayout : function (container) {
-		
-		// container, header, outer
-		this._container	 	= Wu.DomUtil.create('div', 'editor-inner-wrapper editor-map-item-wrap ct12 ct17 ct23', container);
-		var h4 			= Wu.DomUtil.create('h4', '', this._container, 'Connected Accounts');
-		this._outer 		= Wu.DomUtil.create('div', 'connect-outer', this._container);
-
-		// mapbox connect
-		var wrap 	  	= Wu.DomUtil.create('div', 'connect-mapbox', this._outer);
-		var h4 		  	= Wu.DomUtil.create('div', 'connect-mapbox-title', wrap, 'Mapbox');
-		this._mapboxWrap  	= Wu.DomUtil.create('div', 'mapbox-connect-wrap ct11', this._outer);
-		this._mapboxInput 	= Wu.DomUtil.create('input', 'input-box search import-mapbox-layers', this._mapboxWrap);
-		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-gray ct0 ct11 import-mapbox-layers-button', this._mapboxWrap, 'Add');
-		this._mapboxAccounts 	= Wu.DomUtil.create('div', 'mapbox-accounts', this._mapboxWrap);
-		
-		// clear vars n fields
-		this.resetInput();
-
-	},
-
-	addHooks : function () {
-		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
-
-		// connect mapbox button
-		Wu.DomEvent.on( this._mapboxConnect, 'click', this.importMapbox, this );
-
-		// stops
-		Wu.DomEvent.on( this._mapboxConnect, 'mousedown', Wu.DomEvent.stop, this );
-		Wu.DomEvent.on( this._mapboxInput, 'mousedown', Wu.DomEvent.stopPropagation, this );
-
-	},
-
-	removeHooks : function () {
-		// todo!!!
-	},	
-
-	calculateHeight : function () {
-		var num = this.project.getMapboxAccounts().length;
-		this.maxHeight = 100 + num * 30;
-		this.minHeight = 0;
-	},
-
-	// get mapbox access token
-	tokenMode : function () {
-		this._username = this._mapboxInput.value;
-		this._mapboxInput.value = '';
-		this._askedToken = true;
-		this._mapboxConnect.innerHTML = 'OK';
-		this._mapboxInput.setAttribute('placeholder', 'Enter access token');
-	},
-
-	// reset temp vars
-	resetInput : function () {
-		this._username = null;
-		delete this._username;
-		this._askedToken = false;
-		this._mapboxConnect.innerHTML = 'Add';
-		this._mapboxInput.setAttribute('placeholder', 'Mapbox username');
-		this._mapboxInput.value = '';
-	},
-
-	// on click when adding new mapbox account
-	importMapbox : function () {
-
-		if (!this._askedToken) return this.tokenMode();
-
-		// get username
-		var username = this._username;
-		var accessToken = this._mapboxInput.value;
-
-		// clear
-		this.resetInput();
-
-		// get mapbox account via server
-		this._importMapbox(username, accessToken);
-
-	},
-
-	_importMapbox : function (username, accessToken) {
-
-		// get mapbox account via server
-		var data = {
-			'username' : username,
-			'accessToken' : accessToken,
-			'projectId' : this.project.store.uuid
-		}
-		// post         path                            json          callback      this
-		Wu.post('/api/util/getmapboxaccount', JSON.stringify(data), this.importedMapbox, this);
-	},
-
-	importedMapbox : function (that, json) {
-		
-		// project store
-		var result = JSON.parse(json);
-		var error = result.error;
-		var store = result.project;
-
-		if (error) {
-			console.log('There was an error importing mapbox: ', error);
-			return;
-		}
-
-		that.project.setStore(store);
-
-	},
-
-	fillMapbox : function () {
-
-		// get accounts
-		var accounts = this.project.getMapboxAccounts();
-
-		// return if no accounts
-		if (!accounts) return;
-
-		// reset
-		this._mapboxAccounts.innerHTML = '';
-		
-		// fill with accounts
-		accounts.forEach(function (account) {
-			var wrap  = Wu.DomUtil.create('div', 'mapbox-listed-account', this._mapboxAccounts);
-			var title = Wu.DomUtil.create('div', 'mapbox-listed-account-title', wrap, account.username.camelize());
-
-			// add kill button for editMode... // todo: what about layers in deleted accounts, etc etc??
-			// if (this.project.editMode) {
-			// 	var kill = Wu.DomUtil.create('div', 'mapbox-listed-account-kill', wrap, 'X');
-				
-			// 	// add hook
-			// 	Wu.DomEvent.on(kill, 'click', function () {
-			// 		this.removeAccount(wrap, account);
-			// 	}, this);
-			// }
-
-		}, this);
-		
-
-	},
-
-	removeAccount : function (div, account) {
-		Wu.DomUtil.remove(div);
-		this.project.removeMapboxAccount(account);
-	},
-
-	update : function () {
-		Wu.SidePane.Map.MapSetting.prototype.update.call(this)	// call update on prototype
-
-		// fill in mapbox accounts
-		this.fillMapbox();
-	},
-
-
-
-})
 
 
                                     
@@ -5763,6 +5876,336 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 });
 
+
+
+
+
+
+
+
+Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.connect', 
+
+	type : 'connect',			
+
+	initLayout : function (container) {
+		
+		// container, header, outer
+		this._container	 	= Wu.DomUtil.create('div', 'editor-inner-wrapper editor-map-item-wrap ct12 ct17 ct23', container);
+		var h4 			= Wu.DomUtil.create('h4', '', this._container, 'Connected Accounts');
+		this._outer 		= Wu.DomUtil.create('div', 'connect-outer', this._container);
+
+		// mapbox connect
+		var wrap 	  	= Wu.DomUtil.create('div', 'connect-mapbox', this._outer);
+		var h4 		  	= Wu.DomUtil.create('div', 'connect-mapbox-title', wrap, 'Mapbox');
+		this._mapboxWrap  	= Wu.DomUtil.create('div', 'mapbox-connect-wrap ct11', this._outer);
+		this._mapboxInput 	= Wu.DomUtil.create('input', 'input-box search import-mapbox-layers', this._mapboxWrap);
+		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-gray ct0 ct11 import-mapbox-layers-button', this._mapboxWrap, 'Add');
+		this._mapboxAccounts 	= Wu.DomUtil.create('div', 'mapbox-accounts', this._mapboxWrap);
+		
+		// clear vars n fields
+		this.resetInput();
+
+	},
+
+	addHooks : function () {
+		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
+
+		// connect mapbox button
+		Wu.DomEvent.on( this._mapboxConnect, 'click', this.importMapbox, this );
+
+		// stops
+		Wu.DomEvent.on( this._mapboxConnect, 'mousedown', Wu.DomEvent.stop, this );
+		Wu.DomEvent.on( this._mapboxInput, 'mousedown', Wu.DomEvent.stopPropagation, this );
+
+	},
+
+	removeHooks : function () {
+		// todo!!!
+	},	
+
+	calculateHeight : function () {
+		var num = this.project.getMapboxAccounts().length;
+		this.maxHeight = 100 + num * 30;
+		this.minHeight = 0;
+	},
+
+	// get mapbox access token
+	tokenMode : function () {
+		this._username = this._mapboxInput.value;
+		this._mapboxInput.value = '';
+		this._askedToken = true;
+		this._mapboxConnect.innerHTML = 'OK';
+		this._mapboxInput.setAttribute('placeholder', 'Enter access token');
+	},
+
+	// reset temp vars
+	resetInput : function () {
+		this._username = null;
+		delete this._username;
+		this._askedToken = false;
+		this._mapboxConnect.innerHTML = 'Add';
+		this._mapboxInput.setAttribute('placeholder', 'Mapbox username');
+		this._mapboxInput.value = '';
+	},
+
+	// on click when adding new mapbox account
+	importMapbox : function () {
+
+		if (!this._askedToken) return this.tokenMode();
+
+		// get username
+		var username = this._username;
+		var accessToken = this._mapboxInput.value;
+
+		// clear
+		this.resetInput();
+
+		// get mapbox account via server
+		this._importMapbox(username, accessToken);
+
+	},
+
+	_importMapbox : function (username, accessToken) {
+
+		// get mapbox account via server
+		var data = {
+			'username' : username,
+			'accessToken' : accessToken,
+			'projectId' : this.project.store.uuid
+		}
+		// post         path                            json          callback      this
+		Wu.post('/api/util/getmapboxaccount', JSON.stringify(data), this.importedMapbox, this);
+	},
+
+	importedMapbox : function (that, json) {
+		
+		// project store
+		var result = JSON.parse(json);
+		var error = result.error;
+		var store = result.project;
+
+		if (error) {
+			console.log('There was an error importing mapbox: ', error);
+			return;
+		}
+
+		that.project.setStore(store);
+
+	},
+
+	fillMapbox : function () {
+
+		// get accounts
+		var accounts = this.project.getMapboxAccounts();
+
+		// return if no accounts
+		if (!accounts) return;
+
+		// reset
+		this._mapboxAccounts.innerHTML = '';
+		
+		// fill with accounts
+		accounts.forEach(function (account) {
+			var wrap  = Wu.DomUtil.create('div', 'mapbox-listed-account', this._mapboxAccounts);
+			var title = Wu.DomUtil.create('div', 'mapbox-listed-account-title', wrap, account.username.camelize());
+
+			// add kill button for editMode... // todo: what about layers in deleted accounts, etc etc??
+			// if (this.project.editMode) {
+			// 	var kill = Wu.DomUtil.create('div', 'mapbox-listed-account-kill', wrap, 'X');
+				
+			// 	// add hook
+			// 	Wu.DomEvent.on(kill, 'click', function () {
+			// 		this.removeAccount(wrap, account);
+			// 	}, this);
+			// }
+
+		}, this);
+		
+
+	},
+
+	removeAccount : function (div, account) {
+		Wu.DomUtil.remove(div);
+		this.project.removeMapboxAccount(account);
+	},
+
+	update : function () {
+		Wu.SidePane.Map.MapSetting.prototype.update.call(this)	// call update on prototype
+
+		// fill in mapbox accounts
+		this.fillMapbox();
+	},
+
+
+
+});
+
+
+                       
+Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
+	_ : 'sidepane.map.settings', 
+
+	type : 'settings',
+
+	options : {
+
+		// include settings
+		screenshot 	: true,
+		socialSharing 	: true,
+		documentsPane 	: true,
+		dataLibrary 	: true,
+		mediaLibrary 	: false,
+		autoHelp 	: true,
+		autoAbout 	: true,
+		darkTheme 	: true,
+		tooltips 	: true,
+		mapboxGL	: false // maybe not as setting
+
+	},
+
+	initLayout : function (container) {
+
+		// container, header, outer
+		this._container	= Wu.DomUtil.create('div', 'editor-inner-wrapper editor-map-item-wrap ct12 ct17 ct23', container);
+		var h4 		= Wu.DomUtil.create('h4', '', this._container, 'Settings');
+		this._outer 	= Wu.DomUtil.create('div', 'settings-outer', this._container);
+
+	},
+
+	addHooks : function () {
+		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
+
+		Wu.DomEvent.on(this._outer, 'mousedown', Wu.DomEvent.stopPropagation, this);
+
+	},
+
+	removeHooks : function () {
+		// todo!!!
+
+		Wu.DomEvent.off(this._outer, 'mousedown', Wu.DomEvent.stopPropagation, this);
+	},	
+
+	calculateHeight : function () {
+		var num = _.filter(this.options, function (o) { return o; }).length;
+		this.maxHeight = num * 40;
+		this.minHeight = 0;
+	},
+
+	contentLayout : function () {
+
+		// screenshot
+		// social media sharing
+		// documents pane
+		// data library pane
+		// add help/about auto-folders to documents
+		// dark/light theme
+
+		var wrapper = Wu.DomUtil.create('div', 'settings-wrapper');
+
+		if (this.options.screenshot) {
+			var screenshot = this._contentItem('screenshot', 'Screenshots');
+			wrapper.appendChild(screenshot);
+		}
+		if (this.options.socialSharing) {
+			var socialSharing = this._contentItem('socialSharing', 'Social Sharing');
+			wrapper.appendChild(socialSharing);
+		}
+		if (this.options.documentsPane) {
+			var documentsPane = this._contentItem('documentsPane', 'Documents Pane');
+			wrapper.appendChild(documentsPane);
+		}
+		if (this.options.dataLibrary) {
+			var dataLibrary = this._contentItem('dataLibrary', 'Data Library');
+			wrapper.appendChild(dataLibrary);
+		}
+		if (this.options.mediaLibrary) {
+			var mediaLibrary = this._contentItem('mediaLibrary', 'Media Library');
+			wrapper.appendChild(mediaLibrary);
+		}
+		if (this.options.autoHelp) {
+			var autoHelp = this._contentItem('autoHelp', 'Add Help');
+			wrapper.appendChild(autoHelp);
+		}
+		if (this.options.autoAbout) {
+			var autoAbout = this._contentItem('autoAbout', 'Add About');
+			wrapper.appendChild(autoAbout);
+		}
+		if (this.options.darkTheme) {
+			var darkTheme = this._contentItem('darkTheme', 'Dark Theme');
+			wrapper.appendChild(darkTheme);
+		}
+		if (this.options.tooltips) {
+			var tooltips = this._contentItem('tooltips', 'Tooltips');
+			wrapper.appendChild(tooltips);
+		}
+		if (this.options.mapboxGL) {
+			var mapboxGL = this._contentItem('mapboxGL', 'MapboxGL');
+			wrapper.appendChild(mapboxGL);
+		}
+
+		return wrapper;
+	},
+
+	_contentItem : function (setting, title) {
+
+		// create item
+		var className 	= 'settings-item settings-item-' + setting,
+		    div 	= Wu.DomUtil.create('div', className),
+		    titlediv 	= Wu.DomUtil.create('div', 'settings-item-title', div),
+		    switchWrap  = Wu.DomUtil.create('div', 'switch', div),
+		    input 	= Wu.DomUtil.create('input', 'cmn-toggle cmn-toggle-round-flat', switchWrap),
+		    label 	= Wu.DomUtil.create('label', '', switchWrap),
+		    id 		= Wu.Util.guid();
+		
+		// set title etc.
+		titlediv.innerHTML = title;
+		input.setAttribute('type', 'checkbox');
+		if (this._settings[setting]) input.setAttribute('checked', 'checked');
+		input.id = id;
+		label.setAttribute('for', id);
+
+		// set events
+		Wu.DomEvent.on(input, 'click', function (e) {
+			Wu.DomEvent.stopPropagation(e);
+
+			// toggle setting
+			this.project.toggleSetting(setting);
+
+			// refresh settings
+			this._settings = this.project.getSettings();
+			
+		}, this);
+		 
+		Wu.DomEvent.on(switchWrap, 'mousedown', Wu.DomEvent.stopPropagation);
+
+		// return div
+		return div;
+
+	},
+
+	save : function () {
+		this.project.setSettings(this._settings);
+	},
+
+	update : function () {
+		Wu.SidePane.Map.MapSetting.prototype.update.call(this)
+		
+		// get project settings
+		this._settings = this.project.getSettings();
+
+		// create content
+		var content = this.contentLayout();
+		this._outer.innerHTML = '';
+		this._outer.appendChild(content);
+
+	},
+
+
+
+
+});
+
 ;// DocumentsPane
 Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	
@@ -5875,7 +6318,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// new folder
 		Wu.DomEvent.off(this._newfolder, 'mousedown', this.newFolder, this);
 
-		// bind grande.js text editor
+		// unbind grande.js text editor
 		this.removeGrande();
 
 		// hide (+)
@@ -5883,9 +6326,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	},
 
-
-	
-	 
 	_activate : function (e) {                
 
 		// set top
@@ -5990,12 +6430,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// editMode: hide/show (+) button
 		if (this.project.editMode) {
 			Wu.DomUtil.removeClass(this._newfolder, 'displayNone');
-			// console.log('ADDDDDD____');
-			// this.addEditHooks();
 		} else {
 			Wu.DomUtil.addClass(this._newfolder, 'displayNone');
-			// this.removeEditHooks();
-			// console.log("REMMMM___");
 		}
 
 	},
@@ -6030,7 +6466,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// set folders
 		var folders = this.project.store.folders;
 
-
+		// return if no folders
 		if (!folders) return;
 
 		// delete buttons object
@@ -6039,42 +6475,45 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// create each folder headline
 		folders.forEach(function (elem, i, arr) {
 
-			// if editMode
-			if (this.project.editMode) {
-				// delete button
-				var btn = Wu.DomUtil.create('div', 'documents-folder-delete', this._folderpane, 'x');
-				// btn.innerHTML = 'x';
-				Wu.DomEvent.on(btn, 'click', function (e) { this.deleteFolder(elem.uuid); }, this);
-				this._deleteButtons[elem.uuid] = btn;
-			}
-
-			// folder item
-			var folder = elem;
-			folder.el = Wu.DomUtil.create('div', 'documents-folder-item ct23 ct28', this._folderpane);
-			folder.el.innerHTML = folder.title;
-		       
-			// set hooks
-			Wu.DomEvent.on( folder.el,  'mousedown', function (e) {
-				this.selectFolder(folder.uuid);
-			}, this );     // select folder
-			
-			// if editMode
-			if (this.project.editMode) {
-				Wu.DomEvent.on( folder.el,  'dblclick', function (e) {
-					this._renameFolder(e, folder.uuid);
-				}, this );      // rename folder
-			}
-
-			// update object
-			this.folders[folder.uuid] = folder;
+			this._createFolder(elem);
 
 		}, this);
 	       
 	},
 
+	_createFolder : function (elem) {
+		// if editMode
+		if (this.project.editMode) {
+			// delete button
+			var btn = Wu.DomUtil.create('div', 'documents-folder-delete', this._folderpane, 'x');
+			// btn.innerHTML = 'x';
+			Wu.DomEvent.on(btn, 'click', function (e) { this.deleteFolder(elem.uuid); }, this);
+			this._deleteButtons[elem.uuid] = btn;
+		}
+
+		// folder item
+		var folder = elem;
+		folder.el = Wu.DomUtil.create('div', 'documents-folder-item ct23 ct28', this._folderpane);
+		folder.el.innerHTML = folder.title;
+	       
+		// set hooks
+		Wu.DomEvent.on( folder.el,  'mousedown', function (e) {
+			this.selectFolder(folder.uuid);
+		}, this );     // select folder
+		
+		// if editMode
+		if (this.project.editMode) {
+			Wu.DomEvent.on( folder.el,  'dblclick', function (e) {
+				this._renameFolder(e, folder.uuid);
+			}, this );      // rename folder
+		}
+
+		// update object
+		this.folders[folder.uuid] = folder;
+	},
+
 	deleteFolder : function (uuid) {
 		if (confirm('Are you sure you want to delete folder ' + this.folders[uuid].title + '?')) {
-			// console.log('delete folder: ', uuid);
 			delete this.folders[uuid];
 			this.save();
 		}
@@ -6143,7 +6582,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// get folder
 		var folder = this.folders[uuid];
 
-		// clear rightpane
+		// clear rightpane hooks
+		Wu.DomEvent.off(this._textarea, 'keydown mousedown', this.autosave, this ); // auto-save
+
+		// clear rightpane content
 		this._textarea.innerHTML = '';
 		this._textarea.innerHTML = folder.content;
 		this._textarea.fuuid 	 = uuid;
@@ -6210,6 +6652,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// save project to server
 		this.project._update('folders');
 
+		// set status
+		app.setSaveStatus();
+
 		// refresh
 		this.update();
 	},
@@ -6266,7 +6711,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._uploader 		= Wu.DomUtil.get('upload-container');
 		this._deleter 		= Wu.DomUtil.get('datalibrary-delete-file');
 		this._downloader 	= Wu.DomUtil.get('datalibrary-download-files');
-		// this._downloadList 	= Wu.DomUtil.get('datalibrary-download-dialogue');
 		this._checkall 		= Wu.DomUtil.get('checkbox-all');
 		this._checkallLabel 	= Wu.DomUtil.get('label-checkbox-all');
 
@@ -6298,7 +6742,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// delete button
 		Wu.DomEvent.on(this._deleter, 'mousedown', this.deleteConfirm, this);
 		Wu.DomUtil.removeClass(this._deleter, 'displayNone');
-
 	},
 
 	removeEditHooks : function () {
@@ -6306,18 +6749,13 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// delete button
 		Wu.DomEvent.off(this._deleter, 'mousedown', this.deleteConfirm, this);
 		Wu.DomUtil.addClass(this._deleter, 'displayNone');
-
-
 	},
 
 	_activate : function () {
-
 		if (this.dz) this.dz.enable();
-
 	},
 
 	_deactivate : function () {
-		// console.log('deactive sidepane datalib');
 		this.dz.disable();
 		this.disableFullscreenDZ();
 	},
@@ -6369,7 +6807,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		}, this);
 
 		var json = {
-			'files' : this._downloadFileList, //fuuids,
+			'files' : this._downloadFileList, // [fuuids],
 			'puuid' : this.project.store.uuid,
 			'pslug' : this.project.store.slug
 		}
@@ -6378,7 +6816,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// post         path          json      callback           this
 		Wu.post('/api/file/download', json, this.receivedDownload, this);
 
-		
 
 	},
 
@@ -6389,7 +6826,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		var path = '/api/file/download?file=' + response + '&type=zip';
 		
 		// add <a> for zip file
-		that._downloadList.innerHTML = ich.datalibraryDownloadReady({'url' : path});
+		that._downloadList.innerHTML = ich.datalibraryDownloadReady({'url' : path});	// a href
 		var btn = Wu.DomUtil.get('download-ready-button');
 		Wu.DomEvent.on(btn, 'click', that.downloadDone, that);
 
@@ -6431,12 +6868,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// populate download window
 		var tr = '';
-		// console.log('cheks: ', checks);
 		checks.forEach(function (file, i, arr) {
-			// console.log('file: ', file);
 			var tmp = Wu.extend({}, file);
-			// console.log('tmp:', tmp);
-			// tmp.format = tmp.format.join(', ');     // fix format format
 			tr += ich.datalibraryDownloadRow(tmp);
 		}, this);
 
@@ -6556,20 +6989,20 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.dz.removeAllListeners();
 
 		// set project uuid for dropzone
-		this.dz.options.params.project = this.project.getUuid();
+		this.dz.options.params.project = this.project.getUuid();	// goes to req.body.project
 
 		// set dz events
 		this.dz.on('drop', function (e) { 
 			// console.log('drop', e); 
 		});
 
-		this.dz.on('dragenter', function () { 
-			// console.log('dragenter'); 
+		this.dz.on('dragenter', function (e) { 
+			console.log('dragenter', e); 
 		});
 
 		this.dz.on('addedfile', function (file) { 
 
-			// console.log('dz added: ', file);
+			console.log('dz added: ', file);
 
 			// count multiple files
 			that.filecount += 1;
@@ -6579,8 +7012,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 			// show fullscreen file info
 			if (!that._fulldrop) {
-				that.fullOn();
-				that.fullUpOn();
+				that.fullOn(file);
+				that.fullUpOn(file);
 			}
 
 			// set status
@@ -6597,8 +7030,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			// clean up
 			that.dz.removeFile(file);
 
-			
-		      
 		});
 
 		// this.dz.on('totaluploadprogress', function (progress, totalBytes, totalSent) { 
@@ -6632,8 +7063,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 				that.progress.style.width = '0%';
 
 				// reset .fullscreen-drop
-				that.fullUpOff();
 				that.fulldropOff();
+				that.fullUpOff();
 				that._fulldrop = false;
 			}
 		});
@@ -6642,11 +7073,38 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	
 	// fullscreen when started uploading                                            // TODO: refactor fullUpOn etc..
-	fullUpOn : function () {                                                        //       add support for multiple files
+	fullUpOn : function (file) {                                                    //       add support for multiple files
 		// transform .fullscreen-drop                                           //       bugtest more thourougly
+	
+		// add file info
+		console.log('info: ', this.fulldrop);
+
+		var meta = this._createFileMetaContent(file);
+		this.fulldrop.innerHTML = '';		// clear
+		this.fulldrop.appendChild(meta);	// append meta
+
+		// show
 		Wu.DomUtil.addClass(this.fulldrop, 'fullscreen-dropped');
 	},
+
+	_createFileMetaContent : function (file) {
+
+		var wrapper 	= Wu.DomUtil.create('div', 'drop-meta-wrapper');
+		var name 	= Wu.DomUtil.create('div', 'drop-meta-name', wrapper);
+		var size 	= Wu.DomUtil.create('div', 'drop-meta-size', wrapper);
+		var type 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
+		var ext 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
+
+		name.innerHTML = 'Name: ' + file.name;
+		size.innerHTML = 'Size: ' + Wu.Util.bytesToSize(file.size);
+		type.innerHTML = 'Type: ' + file.type.split('/')[0].camelize();
+		ext.innerHTML  = 'Filetype: ' + file.type.split('/')[1];
+
+		return wrapper;
+	},
+
 	fullUpOff : function () {
+
 		Wu.DomUtil.removeClass(this.fulldrop, 'fullscreen-dropped');
 	},
 
@@ -6927,6 +7385,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 				Wu.save('/api/file/update', string); 
 			}
 		});
+
+		app.setSaveStatus();
 	},
 
 	
@@ -7895,19 +8355,45 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 
-	setPosition : function () {
+	setPosition : function (position) {
 		var map = this._map;
 		
 		// get position
-		var position = this.project.getLatLngZoom();
-		var lat = position.lat;
-		var lng = position.lng;
-		var zoom = position.zoom;
+		var pos = position || this.project.getLatLngZoom();
+		var lat = pos.lat;
+		var lng = pos.lng;
+		var zoom = pos.zoom;
 
 		// set map options
 		if (lat != undefined && lng != undefined && zoom != undefined) {
 			map.setView([lat, lng], zoom);
 		}
+	},
+
+	getPosition : function () {
+		// get current lat/lng/zoom
+		var center = this._map.getCenter();
+		var position = {
+			lat : center.lat,
+			lng : center.lng,
+			zoom : this._map.getZoom()
+		}
+		return position;
+	},
+
+	getActiveLayers : function () {
+		if (!this.layerMenu) return false;
+
+		var layers = this.layerMenu.getLayers();
+		// console.log('active layers: ', layers);
+		var active = _.filter(layers, function (l) {
+			return l.on;
+		});
+
+		// console.log('active: ', active);
+
+		return active;
+
 	},
 
 
@@ -8228,12 +8714,53 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	enableGeolocation : function () {
+		if (this.geolocationControl) return;
 
+		// create controls // todo: no info on type of place (city, neighbourhood, street), so not possible to set good zoom level
+		this.geolocationControl = new L.Control.Search({
+			url: 'http://nominatim.openstreetmap.org/search?format=json&q={s}',
+			jsonpParam: 'json_callback',
+			propertyName: 'display_name',
+			propertyLoc: ['lat','lon'],	
+			boundingBox : 'boundingbox',
 
+			filterJSON : function (json) {
+				var jsonret = [], i;
+				for (i in json) {
+					var item = json[i];
+					if (item.hasOwnProperty('type')) {
+						var adr = {
+							address : item.display_name,
+							boundingbox : item.boundingbox,
+							latlng : L.latLng(item.lat, item.lon),
+							type : item.type
+						}
+					}
+
+					// push
+					jsonret.push(adr);
+				}
+				
+				var all = _.unique(jsonret, function (j) {
+					if (j) return j.address;
+				});
+
+				return all;
+			}
+		});
+
+		
+		// add to map
+		this.geolocationControl.addTo(this._map);
 	},
 
 	disableGeolocation : function () {
-
+		if (!this.geolocationControl) return;
+	       
+		// remove and delete control
+		this._map.removeControl(this.geolocationControl);
+		delete this.geolocationControl;
+		
 	},
 
 	enableMeasure : function () {
@@ -8607,6 +9134,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// remove help pseudo
 		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
 
+		// trigger activation on active menu item
+		app._activeMenu._activate()
+
 		// console.log('StatusPane.open(). Currently active menu item:', app._activeMenuItem);
 	},
 
@@ -8699,12 +9229,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	// set 3000ms save status
 	setSaveStatus : function () {
-		this.setStatus('Saving...');
-
-		var that = this;
-		setTimeout(function () {
-			that.setStatus('Saved!');
-		}, 1000);
+		this.setStatus('Saved!');
 	},
 
 	pushStatus : function (div) {
@@ -8775,20 +9300,52 @@ Wu.ProgressBar = Wu.Class.extend({
 	},
 
 	setProgress : function (percent) {
-
 		if (percent < this._current + 9) return;
 
 		var bar = this._progressBar;
-		// console.log('progress: ', percent);
 		bar.style.opacity = 1;
 		bar.style.width = percent + '%';
-
 		this._current = percent;
 	},
 
 	hideProgress : function () {
 		var bar = this._progressBar;
 		bar.style.opacity = 0;
+		this._current = 0;
+		bar.style.width = 0;
+	},
+	
+	// do a timed progress
+	timedProgress : function (ms) {
+		var that = this,
+		    duration = ms || 5000, // five seconds default
+		    steps = 10,	 	   // five steps default
+		    p = 0;		   // start percentage
+		
+		// calculate delay
+		var delay = parseInt(duration) / steps;
+
+		// start progress
+		this._timedProgress(p, delay, steps);	
+
+	},
+
+	_timedProgress : function (percent, delay, steps) {
+		var that = this;
+
+		// set progress to percent after delay
+		percent = percent + (100/steps);
+		this.setProgress(percent);
+		
+		setTimeout(function () {
+
+			// play it again sam
+			if (percent < 100) return that._timedProgress(percent, delay, steps);
+
+			// done, hide progress bar
+			that.hideProgress();
+
+		}, delay)
 	}
 
 
@@ -9567,6 +10124,11 @@ Wu.ProgressBar = Wu.Class.extend({
 
 	},
 
+
+	getLayers : function () {
+		return this.layers;
+	},
+
 	
 	_fill : function () {
 
@@ -10066,8 +10628,6 @@ L.control.inspect = function (options) {
 		    container = L.DomUtil.create('div', className),
 		    options   = this.options;
 
-		    // console.log('container', container);
-
 		// add html
 		container.innerHTML = ich.descriptionControl(); 
 
@@ -10076,46 +10636,33 @@ L.control.inspect = function (options) {
 	},
 
 	initContainer : function () {                
-
-		// Open Menu Button
-
-		// this._uncollapse = Wu.DomUtil.createId('div', 'uncollapse');
-		// Wu.DomUtil.addClass(this._uncollapse, 'leaflet-control open-uncollapse');
-		// this._uncollapse.innerHTML = 'Show Layer Info';
-
+		
+		// hide by default
 		this._container.style.display = "none";
 
 		// get panes
 		this._content 	= Wu.DomUtil.get('description-control-inner-content');
-		// this._inner 	= Wu.DomUtil.get('description-control-inner-content-box'); 
 		this._outer     = Wu.DomUtil.get('description-control-inner-content-box'); 
 		this._button	= Wu.DomUtil.get('description-toggle-button'); 
-		
-		// (J)
-		// create scroller 
-		this._inner = document.createElement("div");
-		Wu.DomUtil.addClass(this._inner, "description-scroller");
-
-		this._outer.appendChild(this._inner);
-
-		// get legends container
 		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
 		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
-
-	       
-
+		
+		// create scroller 
+		this._inner = document.createElement("div");
+		this._outer.appendChild(this._inner);
+		Wu.DomUtil.addClass(this._inner, "description-scroller");
+			       
 	},      
 
 	setDescription : function (layer) {
 		this._inner.innerHTML = layer.store.description;
 	},
 
-	// clear box
+	// clear content
 	clear : function () {
 		this.activeLayer = false;
 		this._inner.innerHTML = '';
 	},
-
 
 	setActiveLayer : function (layer) {
 		this.setLayer(layer);
@@ -10154,26 +10701,28 @@ L.control.inspect = function (options) {
 	addHooks : function () {
 		
 		// collapsers
-		Wu.DomEvent.on(this._button,     'mousedown', this.closePane, this);
-		// Wu.DomEvent.on(this._uncollapse, 'mousedown', this.openPane,  this);
+		Wu.DomEvent.on(this._button, 'mousedown', this.closePane, this);
 
 		// edit mode
-		if (this.editMode) {
-			Wu.DomEvent.on(this._inner, 'dblclick', this.toggleEdit, this);
-		}
+		if (this.editMode) Wu.DomEvent.on(this._inner, 'dblclick', this.toggleEdit, this);
 
 		// prevent map double clicks
 		Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
+		Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
 
-		// prevent map scrollzoom
-		var map = app._map;
-		Wu.DomEvent.on(this._content, 'mouseenter', function () {
-			map.scrollWheelZoom.disable();
-		}, this);
-		
-		Wu.DomEvent.on(this._content, 'mouseleave', function () {
-			map.scrollWheelZoom.enable();
-		}, this);
+	},
+	
+	removeHooks : function () {
+
+		// collapsers
+		Wu.DomEvent.off(this._button, 'mousedown', this.closePane, this);
+
+		// edit mode
+		if (this.editMode) Wu.DomEvent.off(this._inner, 'dblclick', this.toggleEdit, this);
+
+		// prevent map double clicks
+		Wu.DomEvent.off(this._container, 'dblclick', Wu.DomEvent.stop, this);
+		Wu.DomEvent.off(this._container, 'dblclick', Wu.DomEvent.stop, this);
 
 	},
 
@@ -10187,18 +10736,39 @@ L.control.inspect = function (options) {
 
 	},
 	
+	editOn : function () {
+
+		if (!this.activeLayer) return;
+
+		this.editing = true;
+
+		// bind text editor
+		this.addGrande();
+
+		// disable dragging
+		app._map.dragging.disable();
+
+		// add class to info box to indicate editMode
+		Wu.DomUtil.addClass(this._inner, 'description-editing');
+
+		// bind keys
+		Wu.DomEvent.on(this._inner, 'keydown', this.keyDown, this);
+
+		// prevent map scrollzoom
+		var map = app._map;
+		map.scrollWheelZoom.disable();
+		
+	},	
+
+	keyDown : function (e) {
+		if (e.keyCode == 27 || e.keyCode == 9) {
+			this.editOff();
+		}
+	},
+
 	editOff : function () {
-		// console.log('editOff');
 		this.editing = false;
 
-		// unbind text editor
-		// grande.unbind([this._inner]);
-
-		// // hide grande menu
-		// var g = document.getElementsByClassName('text-menu')[0];
-		// Wu.DomUtil.removeClass(g, 'active');
-		// Wu.DomUtil.addClass(g, 'hide');
-		
 		// hide grande
 		this.removeGrande();
 
@@ -10208,58 +10778,38 @@ L.control.inspect = function (options) {
 		// add class to info box to indicate editMode
 		Wu.DomUtil.removeClass(this._inner, 'description-editing');
 
-		// bind click anywhere but on INFO to turn off editing
-		Wu.DomEvent.off(this._inner, 'click', Wu.DomEvent.stop, this);
-		Wu.DomEvent.off(document, 'click', this.editOff, this);
+		// blur
+		this._inner.setAttribute('contenteditable', "false");
+
+		// prevent map scrollzoom
+		var map = app._map;
+		map.scrollWheelZoom.enable();
 
 		// save text
 		if (this.activeLayer) {
-			var text = this._inner.innerHTML;
-			// console.log('saving text: ', text);
-			
+			var text = this._inner.innerHTML;			
 			this.activeLayer.store.description = text;
 			this.activeLayer.save('description');
+
+			// set status
+			app.setSaveStatus();
 		}
 
 	},
 
-	editOn : function () {
-
-		if (!this.activeLayer) {
-			// console.log('no active layer, so fuck it.')
-			return;
-		}
-
-		// console.log('editOn');
-		this.editing = true;
-
-		// bind text editor
-		// grande.bind([this._inner]);
-		this.addGrande();
-
-		// disable dragging
-		app._map.dragging.disable();
-
-		// add class to info box to indicate editMode
-		Wu.DomUtil.addClass(this._inner, 'description-editing');
-
-		// bind click anywhere but on INFO to turn off editing
-		Wu.DomEvent.on(this._inner, 'click', Wu.DomEvent.stop, this);
-		Wu.DomEvent.on(document, 'click', this.editOff, this);
-
-	},
-
-	textChange : function () {
-		// console.log('text Change');
+	textChange : function (editing) {
+		if (!editing) this.editOff();
 	},
 
 	removeGrande : function () {
-
-		
+		if (!this.grande) return;
+		this.grande.destroy();
+		delete this.grande;	
 	},
 
 	addGrande : function () {
-		// get textarea nodes for grande
+
+		// get textarea node for grande
 		var nodes = this._inner;
 
 		// get sources
@@ -10273,20 +10823,24 @@ L.control.inspect = function (options) {
 
 		        	// file attachments
 			        attachments : new G.Attachments(sources, {
-			        	icon : 'fileAttachment.png',
+			        	icon : ['http://85.10.202.87:8080/images/image-c9471cb2-7e0e-417d-a048-2ac501e7e96f',
+			        		'http://85.10.202.87:8080/images/image-7b7cc7e4-404f-4e29-9d7d-11f0f24faf42'],
+			        	className : 'attachment'
 			        }),
 
 			        // image attachments
-			        images :  new G.Attachments(sources, {
-			        	icon : 'imageAttachment.png',
-			        	embedImage : true 			// embed image in text! 
+			        images :  new G.Attachments(images, {
+			        	icon : ['http://85.10.202.87:8080/images/image-0359b349-6312-4fe5-b5d7-346a7a0d3c38',
+			        		'http://85.10.202.87:8080/images/image-087ef5f5-b838-48bb-901f-7e896de7c59e'],
+			        	embedImage : true,			// embed image in text! 
+			        	className : 'image-attachment'
 			        }),
 
 			},
 			events : {
 
 				// add change event listener
-				change : this.textChange
+				change : this.textChange.bind(this)
 			}
 		}
 
@@ -10295,53 +10849,14 @@ L.control.inspect = function (options) {
 
 	},
 
-	// (j)
 	closePane : function () {
-	      
-		// console.log('this._content', this._content)
 		this._container.style.display = "none";
-
-		// this._content.parentNode.parentNode.style.width = '34px';
-		// this._firstchildofmine = this._content.parentNode.parentNode.getElementsByTagName('div')[0];
-		// this._content.parentNode.parentNode.insertBefore(this._uncollapse, this._firstchildofmine);
-	      
-
-		// Slide the LEGENDS
-		// if (this._legendsContainer) {
-		//     Wu.DomUtil.addClass(this._legendsContainer, 'legends-push-left');
-		// }
-			      
-		// this._uncollapse.className = 'leaflet-control open-uncollapse leaflet-drag-target';		
-		
 	},
 	
-	// (j)
 	openPane : function () {
-
-		this._container.style.display = "block";
-
-		// Show Info box
-		// this._content.parentNode.parentNode.style.width = '320px';					
-
-		// Animate opener button
-		// this._uncollapse.className = 'leaflet-control uncollapse-killer';
-			
-		// Slide the LEGENDS
-	 //   	 if (this._legendsContainer) {
-		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-push-left');
-		// }
-		// Set class name and remove from DOM
-		// var that = this;                        
-		// setTimeout(function(){
-		// 	that._content.parentNode.parentNode.removeChild(that._uncollapse);
-		// 	that._uncollapse.className = 'leaflet-control open-uncollapse';
-		// }, 500);						
-		
-	},
+		this._container.style.display = "block";				
+	}
 	
-      
-     
-
 });
 
 
@@ -10927,10 +11442,8 @@ L.control.baselayerToggle = function (options) {
 		// set editMode
 		this.setEditMode();
 
+		// ready save object
 		this.lastSaved = {};
-
-		// ensure active project // todo: refactor, take this out
-		if (!app.activeProject) app.activeProject = this;
 
 		// attach client
 		this._client = Wu.app.Clients[this.store.client];
@@ -10957,45 +11470,29 @@ L.control.baselayerToggle = function (options) {
 	addLayer : function (layer) {
 		// creates a Wu.Layer object (could be Wu.MapboxLayer, Wu.RasterLayer, etc.)
 		this.store.layers.push(layer);
-		// this._update('layers');
 		this.layers[layer.uuid] = new Wu.createLayer(layer);
 	},
 
 	createLayerFromGeoJSON : function (geojson) {
-		// console.log('createGeoJSONLayer', geojson);
 
-		var options = {
+		// set options
+		var options = JSON.stringify({
 			project 	: this.getUuid(),
 			geojson 	: geojson,
 			layerType 	: 'geojson'
-		}
-
-		var json = JSON.stringify(options);
+		});
 		
-		// console.log('POST createLayerFromGeoJSON');
-
- 		Wu.Util.postcb('/api/layers/new', json, this._createdLayerFromGeoJSON, this);
+		// get new layer from server
+ 		Wu.Util.postcb('/api/layers/new', options, this._createdLayerFromGeoJSON, this);
 
 	},
 
 	_createdLayerFromGeoJSON : function (context, data) {
 
-		// console.log('_createdLayerFromGeoJSON: data, context', data, context);
+		// parse layer data
 		var parsed = JSON.parse(data);
-		// console.log('parsed: ', parsed);
-
-		// data = {
-		// 	error : false,
-		// 	done : {
-		// 		files : [{
-
-		// 		}],
-		// 		layers : [{
-
-		// 		}]
-		// 	}
-		// }
-
+		
+		// callback
 		app.SidePane.DataLibrary.uploaded(parsed, {
 			autoAdd : true
 		});
@@ -11012,7 +11509,6 @@ L.control.baselayerToggle = function (options) {
 
 	setEditMode : function () {
 		// set editMode
-		// console.log('this: ', this);
 		this.editMode = false;
 		if (app.Account.canUpdateProject(this.store.uuid)) this.editMode = true;
 	},
@@ -11030,12 +11526,17 @@ L.control.baselayerToggle = function (options) {
 	
 		// refresh sidepane
 		this.refreshSidepane();
-	
+
+		// set active project in sidepane
+		if (this._menuItem) {
+			this._menuItem._markActive();
+		} else {
+			console.log('multioplyyy');
+		}
 	},
 
 	addNewLayer : function (layer) {
 		this.addLayer(layer);
-		// this.refreshSidepane();
 	},
 
 	refreshSidepane : function () {
@@ -11067,9 +11568,12 @@ L.control.baselayerToggle = function (options) {
 		// update color theme
 		this.setColorTheme();
 
+		// set setings
+		this.refreshSettings();
+
 	},
 
-	select : function () {	// refactor, move to view?
+	select : function () {	
  
 		// set as active
 		app.activeProject = this;
@@ -11107,8 +11611,8 @@ L.control.baselayerToggle = function (options) {
 
 
 	_update : function (field) {
-		// console.log('field: ', field);
-		// console.log(this.store);
+
+		// set fields
 		var json = {};
 		json[field] = this.store[field];
 		json.uuid = this.store.uuid;
@@ -11128,8 +11632,7 @@ L.control.baselayerToggle = function (options) {
 		// console.log('this.lastSaved= ', this.lastSaved);
 
 
-		// console.log('saving project field: ', json);
-
+		// save to server
 		var string = JSON.stringify(json);
 		this._save(string);
 		
@@ -11145,14 +11648,14 @@ L.control.baselayerToggle = function (options) {
 	
 
 	_save : function (string) {
-		// console.log('saving...');                                       // TODO: pgp
+		// save to server                                       	// TODO: pgp
 		Wu.save('/api/project/update', string);                         // TODO: save only if actual changes! saving too much already
 	
 		// set status
-		app.setStatus('Saved!');
+		app.setSaveStatus();
 	},
 
-	_saveNew : function (context) {
+	_saveNew : function (callback) {
 	     
 		var options = {
 			name 		: this.store.name,
@@ -11163,7 +11666,7 @@ L.control.baselayerToggle = function (options) {
 		var json = JSON.stringify(options);
 		
 		// console.log('POST: _saveNew');
- 		Wu.Util.postcb('/api/project/new', json, context._projectCreated, this);
+ 		Wu.Util.postcb('/api/project/new', json, callback.callback.bind(callback.context), this);
 
 	},
 
@@ -11248,8 +11751,7 @@ L.control.baselayerToggle = function (options) {
 	getLayermenuLayers : function () {
 		return _.filter(this.store.layermenu, function (l) {
 			return !l.folder;
-		})
-		// return this.store.layermenu;		// todo: set layer uuid in layermenuItems
+		});
 	},
 
 	getLayers : function () {
@@ -11292,14 +11794,11 @@ L.control.baselayerToggle = function (options) {
 
 	getCollections : function () {
 		
-
 	},
 
 	setCollection : function () {
 
-
 	},
-
 
 	getUsers : function () {
 		var uuid = this.store.uuid; // project uuid
@@ -11309,15 +11808,46 @@ L.control.baselayerToggle = function (options) {
 		return users;
 	},
 
+	getSlug : function () {
+		return this.store.slug;
+	},
+
+	getSlugs : function () {
+
+		var slugs = {
+			project : this.store.slug,
+			client : this.getClient().getSlug()
+		}
+
+		return slugs;
+	},
+
 	getUsersHTML : function () {
-		var users = this.getUsers();
-		var html = '';
+		var users = this.getUsers(),
+		    html = '',
+		    silent = app.options.silentUsers;
 
 		users.forEach(function (user) {
-			html += '<p>' + user.store.firstName + ' ' + user.store.lastName + '</p>';
+			var partial = user.store.uuid.slice(0, 13);
+			if (silent.indexOf(partial) == -1) { // filter silentUsers from user list
+				// add user to list
+				html += '<p>' + user.store.firstName + ' ' + user.store.lastName + '</p>';
+			}
 		}, this);
 
 		return html;
+	},
+
+	addAccess : function () {
+		var users = app.Users;
+		for (u in users) {
+			var user = users[u];
+			if (user.isSuperadmin()) {
+				user.addProjectAccess(this);
+			}
+		}
+
+		app.Account.addProjectAccess(this);
 	},
 
 	getHeaderLogo : function () {
@@ -11353,15 +11883,17 @@ L.control.baselayerToggle = function (options) {
 		return this.store.controls;
 	},
 
+	getSettings : function () {
+		return this.store.settings;
+	},
+
+	setSettings : function (settings) {
+		this.store.settings = settings;
+		this._update('settings');
+	},
 
 	setFile : function (file) {
-
-		// add to local store
 		this.store.files.push(file);
-
-		// save to server (if necessary)
-		// this._update('files');
-
 	},
 
 	setLogo : function (path) {
@@ -11376,8 +11908,14 @@ L.control.baselayerToggle = function (options) {
 
 	setSlug : function (name) {
 		var slug = name.replace(/\s+/g, '').toLowerCase();
+		slug = Wu.Util.stripAccents(slug);
 		this.store.slug = slug;
+		
+		// save slug to server
 		this._update('slug');
+
+		// set new url
+		this._setUrl();
 	},
 
 	setBounds : function (bounds) {
@@ -11405,12 +11943,15 @@ L.control.baselayerToggle = function (options) {
 		this._update('position');
 	},
 
+	setSidepane : function (sidepane) {
+		this._menuItem = sidepane;
+	},
+
+	getSidepane : function () {
+		return this._menuItem;
+	},
 
 	removeFiles : function (files) {
-
-		// console.log('*********************')
-		// console.log('removeFiles: files: ', files);
-		// console.log('*********************')
 
 		var list = app.SidePane.DataLibrary.list,
 		    layerMenu = app.MapPane.layerMenu,
@@ -11420,11 +11961,6 @@ L.control.baselayerToggle = function (options) {
 
 		// iterate over files and delete
 		files.forEach(function(file, i, arr) {
-
-			// console.log('removeFiles: ', file);
-			// console.log('this.store.files: ', this.store.files);
-			// console.log('this.layers: ', this.layers);
-			// console.log('this.store.layermenu: ', this.store.layermenu);
 
 			// remove from list
 			list.remove('uuid', file.uuid);
@@ -11448,14 +11984,13 @@ L.control.baselayerToggle = function (options) {
 				delete this.layers[layer.store.uuid];	
 			}
 			
-			
 			// prepare remove from server
 			_fids.push(file._id);
 			uuids.push(file.uuid);
 
 		}, this);
 
-		// save changes to layermenu
+		// save changes
 		this._update('layermenu'); 
 
 		setTimeout(function () {	// ugly hack, cause two records can't be saved at same time, server side.. FUBAR!
@@ -11489,18 +12024,15 @@ L.control.baselayerToggle = function (options) {
 		var sources = [];
 		files.forEach(function (file) {
 			if (file.type == 'image') {
-
-				var thumbnail = '/pixels/' + file.uuid + '?width=75&height=50';
-				var url = '/pixels/' + file.uuid + '?width=200&height=200';
-
+				var thumbnail 	= '/pixels/' + file.uuid + '?width=75&height=50';
+				var url 	= '/pixels/' + file.uuid + '?width=200&height=200';
 				var source = {
-				    	title : file.name, 	// title
+				    	title 	: file.name, 	// title
 				    	thumbnail : thumbnail,  // optional. url to image
-				    	uuid : file.uuid,       // optional
-					type : file.type,
-					url : url
+				    	uuid 	: file.uuid,       // optional
+					type 	: file.type,
+					url 	: url
 				}
-
 				sources.push(source)
 			}
 		}, this);
@@ -11512,23 +12044,111 @@ L.control.baselayerToggle = function (options) {
 		var sources = [];
 		files.forEach(function (file) {
 			var thumbnail = (file.type == 'image') ? '/pixels/' + file.uuid + '?width=50&height=50' : '';
-			var prefix = (file.type == 'image') ? '/images/' : '/api/file/download/?file=';
-			var suffix = (file.type == 'image') ? '' : '&type=' + file.type;
-			var url = '/pixels/' + file.uuid + '?width=200&height=200';
-			
+			var prefix    = (file.type == 'image') ? '/images/' : '/api/file/download/?file=';
+			var suffix    = (file.type == 'image') ? '' : '&type=' + file.type;
+			var url       = '/pixels/' + file.uuid + '?width=200&height=200';
 			var source = {
-			    	title : file.name, 	// title
+			    	title 	: file.name, 	// title
 			    	thumbnail : thumbnail,  // optional. url to image
-			    	uuid : file.uuid,       // optional
-				type : file.type,
-				url : url
+			    	uuid 	: file.uuid,    // optional
+				type 	: file.type,
+				url 	: url
 			}
-
 			sources.push(source)
 		}, this);
-
 		return sources;
 	},
+
+	refreshSettings : function () {
+		for (setting in this.getSettings()) {
+			this.getSettings()[setting] ? this['enable' + setting.camelize()]() : this['disable' + setting.camelize()]();
+		}
+	},
+
+
+	// settings
+	toggleSetting : function (setting) {
+		this.getSettings()[setting] ? this['disable' + setting.camelize()]() : this['enable' + setting.camelize()]();
+		this.store.settings[setting] = !this.store.settings[setting];
+		this._update('settings');
+	},
+
+	enableDarkTheme : function () {
+		app.Style.setDarkTheme();
+	},
+	disableDarkTheme : function () {
+		app.Style.setLightTheme();
+	},
+
+	enableTooltips : function () {
+
+	},
+	disableTooltips : function () {
+
+	},
+
+	enableScreenshot : function () {
+		app.SidePane.Share.enableScreenshot();
+	},
+	disableScreenshot : function () {
+		app.SidePane.Share.disableScreenshot();
+	},
+
+	enableDocumentsPane : function () {
+		app.SidePane.addPane('Documents');
+	},
+	disableDocumentsPane : function () {
+		app.SidePane.removePane('Documents');
+	},
+
+	enableDataLibrary : function () {
+		app.SidePane.addPane('DataLibrary');
+	},
+	disableDataLibrary : function () {
+		app.SidePane.removePane('DataLibrary');
+	},
+
+	enableMediaLibrary : function () {
+		// app.SidePane.addPane('MediaLibrary');	// not plugged in yet! 
+	},
+	disableMediaLibrary : function () {
+		// app.SidePane.removePane('MediaLibrary');
+	},
+
+	enableSocialSharing : function () {
+		app.SidePane.Share.enableSocial();
+	},
+	disableSocialSharing : function () {
+		app.SidePane.Share.disableSocial();
+	},
+
+	enableAutoHelp : function () {		// auto-add folder in Docs
+
+	},
+	disableAutoHelp : function () {
+
+	},
+
+	enableAutoAbout : function () {
+
+	},
+	disableAutoAbout : function () {
+
+	},
+
+	enableMapboxGL : function () {
+
+	},
+	disableMapboxGL : function () {
+
+	},
+
+
+
+
+
+
+
 });;Wu.Client = Wu.Class.extend({
 
 	initialize : function (options) {
@@ -11635,6 +12255,10 @@ L.control.baselayerToggle = function (options) {
 
 	getUuid : function () {
 		return this.uuid;
+	},
+
+	getSlug : function () {
+		return this.slug;
 	},
 
 	setName : function (name) {
@@ -11803,10 +12427,8 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	delegatedAccess : function (context, result) {
-		// console.log('saved access!', context, result);
-	},
-	
 
+	},
 
 	// convenience methods
 	addReadProject : function (project) {
@@ -11849,7 +12471,6 @@ L.control.baselayerToggle = function (options) {
 		_.remove(this.store.role.editor.projects, function (p) {
 			return p == project.getUuid();
 		});
-
 	},
 
 
@@ -11870,15 +12491,15 @@ L.control.baselayerToggle = function (options) {
 		_.remove(this.store.role.manager.projects, function (p) {
 			return p == project.getUuid();
 		});
-
 	},
 
 
 	addProjectAccess : function (project) {
 		// add access locally
-		this.store.role.editor.projects.push(project.getUuid());
-		this.store.role.reader.projects.push(project.getUuid());
-		this.store.role.manager.projects.push(project.getUuid());
+		var uuid = project.getUuid();
+		this.store.role.editor.projects.push(uuid);
+		this.store.role.reader.projects.push(uuid);
+		this.store.role.manager.projects.push(uuid);
 	},
 
 
@@ -12148,6 +12769,11 @@ L.control.baselayerToggle = function (options) {
 
 		// create leaflet layers
 		this.initLayer();
+
+		// all visible tiles loaded event
+		Wu.DomEvent.on(this.layer, 'load', function () {
+			app._loaded.push(this.getUuid());
+		}, this);
 	},
 
 	initLayer : function () {
@@ -12223,6 +12849,9 @@ L.control.baselayerToggle = function (options) {
 	}
 
 });
+
+
+
 
 
 
@@ -12431,7 +13060,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		try { that.data = JSON.parse(json); }
 		catch (e) { return console.log('parse error!', json)}
 		
-		console.log('Got geojson: ', that.data);
+		// console.log('Got geojson: ', that.data);
 
 		// return if errors
 		if (!that.data) return console.error('no data');
@@ -12458,7 +13087,9 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		// add layer hooks
 		this.addLayerHooks();
 
-		console.log('GEOJSON: ', this);
+		// phantomjs _loaded
+		app._loaded.push(this.getUuid());
+		// console.log('GEOJSON: ', this);
 
 	},
 
@@ -12469,8 +13100,8 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		var file = this.getFile(fileUuid);
 
-		console.log('got file: ', file);
-		console.log('dataSize: ', file.dataSize);
+		// console.log('got file: ', file);
+		// console.log('dataSize: ', file.dataSize);
 		return parseInt(file.dataSize);
 
 	},
@@ -12538,9 +13169,9 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	multiStyleChanged : function (data, multi, layr) {
 
-		console.log('multiStyleChanged: data: ', data, this);
-		console.log('multi: ', multi);
-		console.log('layr: ', layr);
+		// console.log('multiStyleChanged: data: ', data, this);
+		// console.log('multi: ', multi);
+		// console.log('layr: ', layr);
 
 		var layer = layr;
 		var style = data.style;
@@ -12554,7 +13185,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	styleChanged : function (data) {
 
-		console.log('styleChanged: data: ', data, this);
+		// console.log('styleChanged: data: ', data, this);
 		// return;
 
 		var style = data.style;
@@ -12562,7 +13193,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		var id = target._leaflet_id;
 		var layer = this.getPathParentLayer(id);
-		console.log('PARERRRRRRR ----- layer: ', layer);
+		// console.log('PARERRRRRRR ----- layer: ', layer);
 		var __sid = target.feature.properties.__sid;
 
 		// save style
@@ -12584,9 +13215,9 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 	saveStyle : function (style, __sid) {	
 			
 		var json = this.layer.toGeoJSON();
-		console.log('toGeoJSON: ', json);
-		console.log('__sid: ', __sid);
-		console.log('style: ', style);
+		// console.log('toGeoJSON: ', json);
+		// console.log('__sid: ', __sid);
+		// console.log('style: ', style);
 
 		var json = {};
 		json.layer  = this.getUuid();
@@ -12786,6 +13417,9 @@ Wu.RasterLayer = Wu.Layer.extend({
 	type : 'rasterLayer',
 
 });
+
+
+
 
 
 
@@ -16527,34 +17161,6 @@ function layerCollapser(selectWhat, bol) {
 	}
 }
 
-;function darktheme () {
-
-	var styletag = Wu.DomUtil.get("styletag");
-
-	var _darktheme = document.createElement("link");
-		_darktheme.rel = 'stylesheet';
-		_darktheme.href = '//85.10.202.87:8080/css/darktheme.css';
-
-		styletag.appendChild(_darktheme);
-}
-
-function lighttheme () {
-
-	var styletag = Wu.DomUtil.get("styletag");
-	styletag.innerHTML = '';
-
-}
-
-
-
-
-function initSVGpatterns () {
-	var SVG_patterns = '<!-- SVG fill properties: url(#diagonal-dots) // url(#dots) url(#diagonal-circles) url(#diagonal-stripes) url(#grid) --><svg xmlns="http://www.w3.org/2000/svg"><defs><pattern id="diagonal-dots" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="5" cy="5" r="4" style="stroke:none; fill:blue;" /></pattern></defs><defs><pattern id="dots" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="4" style="stroke:none; fill:red;" /></pattern><pattern id="diagonal-circles" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="5" cy="5" r="4" style="stroke-width:2; stroke:green; fill:none;" /></pattern><pattern id="diagonal-stripes" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><rect x="0" y="0" width="4" height="8" style="stroke:none; fill:purple;" /></pattern><pattern id="grid" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="10" height="4" style="stroke:none; fill:orange;" /><rect x="3" y="3" width="4" height="10" style="stroke:none; fill:orange;" /></pattern></defs></svg>';
-	Wu.DomUtil.get("styletag").innerHTML = SVG_patterns;
-}
-
-
-// colorArray = [ '#334d5c','#45b29d','#8eddb8','#5fffaf','#0ea32b','#47384d','#a84158','#f224ff','#d85fff','#f21b7f','#f40028','#f15e01','#e27a3f','#ffc557','#dbef91','#df4949','#cfc206','#fff417','#4b84e8','#ffffff' ]
 ;Wu.version = '0.3-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
@@ -16575,12 +17181,17 @@ Wu.App = Wu.Class.extend({
 			dataLibrary 	: true,               	
 			mediaLibrary    : false,
 			users 		: true,
+			share 		: true
 		},	
 		
-		// not plugged in
-		chat : true,
-		colorTheme : true,
-		screenshot : true,
+		// default settings (overridden by project settings)
+		settings : {		// not plugged in yet
+			chat : true,
+			colorTheme : true,
+			screenshot : true,
+			socialSharing : true,
+			print : true
+		},
 
 		providers : {
 			// default accounts, added to all new (and old?) projects
@@ -16592,12 +17203,19 @@ Wu.App = Wu.Class.extend({
 
 		servers : {
 			// not used, using window url atm..
-			portal : 'http://85.10.202.87:8080/',
-			raster : 'http://85.10.202.87:8003/',
-			vector : '',	// tile servers
-			socket : ''	// websocket server
-		}
+			portal : 'http://85.10.202.87:8080/',	// api
+			raster : 'http://85.10.202.87:8003/',	// raster tile server
+			vector : '',				// vector tile server
+			socket : ''				// websocket server
+		},
+
+		silentUsers : [
+			// redacted
+			'user-9fed4b5f', // k
+			'user-e6e5d7d9'  // j  // todo: add phantomJS user
+		]
 	},
+
 
 
 	initialize : function (options) {
@@ -16619,7 +17237,6 @@ Wu.App = Wu.Class.extend({
 
 	initServer : function () {
 		var serverUrl = this.options.servers.portal;
-
 		console.log('Connected to server: ', serverUrl);
 
 		var data = JSON.stringify(this.options);
@@ -16704,13 +17321,15 @@ Wu.App = Wu.Class.extend({
 
 	_initPanes : function () {
 
+		// render style handler
+		this.Style = new Wu.Style();
+
 		// render status pane
-		// add home button
 		this.StatusPane = new Wu.StatusPane({
 			addTo: this._appPane
 		});
 
-		// add progress bar
+		// render progress bar
 		this.ProgressBar = new Wu.ProgressBar({
 			color : 'white',
 			addTo : this._appPane
@@ -16725,59 +17344,98 @@ Wu.App = Wu.Class.extend({
 		// render map pane
 		this.MapPane = new Wu.MapPane();
 
-		// render status bar
-		// if (this.options.statusPane) this.StatusPane = new Wu.StatusPane();
-
 	},
 
 	// init default view on page-load
 	_initView : function () {
 
-		// console.log('_initView');
+		// check location
+		if (this._initLocation()) return;
 
 		// runs hotlink
 		if (this._initHotlink()) return;
+
+		// set project if only one
+		if (this._lonelyProject()) return;
 
 		// if user is admin or manager, set Projects and Users as default panes
 		var user = app.Account;
 		if (user.isAdmin() || user.isSuperadmin() || user.isManager()) {
 			// set panes 
-			var panes = ['Clients', 'Users'];
-			this.SidePane.refresh(panes);
+			this.SidePane.refresh(['Clients', 'Users']);
 		}
 
 	},
 
 
-	// _singleClient : function () {
-	// 	return;
-	// 	var size = _.size(this.Clients);
-	// 	var can = Wu.can.createClient();
+	_lonelyProject : function () {
+		// check if only one project, 
+		// if so, open it
+		if (_.size(app.Projects) == 1) {
+			for (p in app.Projects) {
+				var project = app.Projects[p];
+				this._setProject(project);
+				return true;
+			}
+		}
+		return false;
+	},
 
-	// 	if (size > 1) return;
-	// 	if (can) return;
+	_initLocation : function () {
 
-	// 	var clientUuid = this.User.options.access.clients.read[0];
-	// 	var client = this.Clients[clientUuid];
+		var path    = window.location.pathname,
+		    client  = path.split('/')[1],
+		    project = path.split('/')[2],
+		    hash    = path.split('/')[3],
+		    search  = window.location.search.split('?'),
+		    params  = Wu.Util.parseUrl();
 
-	// 	// select client
-	// 	this.SidePane.Clients.select(client);
+		console.log('params: ', params);
+		console.log('client: ', client);
+		console.log('project: ', project);
+		console.log('hash: ', hash);
 
-	// 	// open pane
-	// 	this.SidePane.openPane();
-
-	// 	// hide Clients tab
-	// 	this.SidePane.Clients.permanentlyDisabled = true;
 		
-	// },
+
+		if (!client || !project) return false;
+
+		// get project
+		var project = this._projectExists(project, client);
+		
+		// return if no such project
+		if (!project) return false;
+
+		// set project
+		this._setProject(project);
+
+		// check for hash
+		if (hash && hash.length == 6) {
+			console.log('we got a hash!: ', hash);	
+			return this._initHash(project, hash);
+		}
+
+		return true;
+		
+	},
+
+
+
+	_setProject : function (project) {
+		// select project
+		project.select();
+
+		// refresh sidepane
+		app.SidePane.refreshProject(project);
+
+		// remove help pseudo
+		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
+	},
 
 	_initHotlink : function () {
 		
 		// parse error prone content of hotlink..
 		try { this.hotlink = JSON.parse(window.hotlink); } 
-		catch (e) { this.hotlink = false };
-
-		// console.log('this.hotlink: ', this.hotlink);
+		catch (e) { this.hotlink = false; };
 
 		// return if no hotlink
 		if (!this.hotlink) return false;
@@ -16788,12 +17446,8 @@ Wu.App = Wu.Class.extend({
 		// return if not found
 		if (!project) return false;
 
-		// select project
-		project.select();
-		app.SidePane.refreshProject(project);
-
-		// remove help pseudo
-		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
+		// set project
+		this._setProject(project);
 
 		return true;
 		
@@ -16826,5 +17480,155 @@ Wu.App = Wu.Class.extend({
 	setSaveStatus : function () {
 		app.StatusPane.setSaveStatus();
 	},
+
+
+
+	_initHash : function (project, hash) {
+
+		// get hash values from server,
+		this.getHash(hash, project, this._renderHash);
+
+		return true;
+	},
+
+	// get saved hash
+	getHash : function (id, project, callback) {
+
+		var json = {
+			projectUuid : project.getUuid(),
+			id : id
+		}
+
+		// get a saved setup - which layers are active, position, 
+		Wu.post('/api/project/hash/get', JSON.stringify(json), callback, this);
+	},
+
+
+	_renderHash : function (context, json) {
+
+		// parse
+		var result = JSON.parse(json); 
+
+		// handle errors
+		if (result.error) console.log('error?', result.error);
+
+		// set vars
+		var hash = result.hash;
+		var projectUuid = hash.project || result.project;	// hacky.. clean up setHash, _renderHash, errything..
+
+		// set position
+		app.MapPane.setPosition(hash.position);
+
+		// set layers
+		hash.layers.forEach(function (layerUuid) {
+			var layer = app.Projects[projectUuid].layers[layerUuid];
+
+			if (app.MapPane.layerMenu) {
+				layer.add(); 	// todo: add from layermenu...
+			} else {
+				layer.add();	// todo: what if activating layermenu afterwards? ... 
+						// lots of different possible variatons here.. PLAN AHEAD!
+			}
+
+		}, this);
+
+	},
+
+
+	// save a hash
+	setHash : function (callback) {
+
+		// get active layers
+		var active = app.MapPane.getActiveLayers();
+		var layers = _.map(active, function (l) {
+			return l.item.layer;	// layer uuid
+		});
+
+		// get project;
+		var projectUuid = this.activeProject.getUuid();
+
+		// hash object
+		var json = {
+			projectUuid : projectUuid,
+			hash : {
+				id 	 : Wu.Util.createRandom(6),
+				position : app.MapPane.getPosition(),
+				layers 	 : layers 			// layermenuItem uuids, todo: order as z-index
+			}
+		}
+
+		// save hash to server
+		Wu.post('/api/project/hash/set', JSON.stringify(json), callback, this);
+
+		// return
+		return json.hash;
+
+	},
+
+	phantomJS : function (args) {
+
+		var projectUuid = args.projectUuid,
+	   	    hash    	= args.hash;
+
+
+	   	if (!projectUuid) return false;
+
+		// get project
+		var project = app.Projects[projectUuid];
+		
+		// return if no such project
+		if (!project) return false;
+
+		// set project
+		this._setProject(project);
+
+		// hide controls and make header minimum width		// todo: create and inject PRINT/SCREENSHOT stylesheet
+		app._map._controlContainer.style.display = 'none'
+		app.HeaderPane._container.style.width = 'auto';
+
+		// check for hash
+		if (hash) {
+
+			console.log('we got a hash!: ', hash);	
+
+			var json = JSON.stringify({
+				hash: hash,
+				project : projectUuid
+			});
+
+			// render hash
+			this._renderHash(this, json);
+		}
+
+		// avoid Loading! etc in status
+		app.setStatus('systemapic'); // too early
+
+
+	},
+	
+	_phantomJSLoaded : function () {
+		// check if ready for screenshot
+
+	},
+
+
+	// phantomjs: loaded layers
+	_loaded : [],
+
+	// phantomjs: load layermenu layers
+	_loadLayers : function (layermenuItems) {
+
+	},
+
+	// phantomjs: check if all layers are loaded
+	_allLoaded : function () {
+
+	},
+
+
+
+
+
+
 
 });
