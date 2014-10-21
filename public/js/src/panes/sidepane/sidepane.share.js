@@ -76,11 +76,9 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	},
 
 	createImage : function () {
-		console.log('create image');
 
 		var that = this;	// callback
 		app.setHash(function (ctx, hash) {
-			console.log('hash: ', hash);
 
 			// create image container
 			that._createImageView();
@@ -96,7 +94,6 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	},
 
 	createdImage : function (context, file) {
-		console.log('took screenshot', file);
 
 		// parse results
 		var result = JSON.parse(file);
@@ -110,6 +107,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		var path = app.options.servers.portal;
 		path += 'pixels/';
 		path += image;
+		var raw = path;
 		path += '?width=' + width;
 		path += '&height=' + height;
 
@@ -117,15 +115,14 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		var url = 'url("';
 		url += path;
 		url += '")';
-		console.log('url: ', url);
 
 		// set image
 		context._imageContainer.style.backgroundImage = url;
 
 		
 		// set download link
-		path += '&raw=true'; // add raw to path
-		context._downloadButton.href = path;
+		raw += '?raw=true'; // add raw to path
+		context._downloadButton.href = raw;
 	},
 
 	_createImageView : function () {
@@ -155,7 +152,6 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	},
 
 	createLink : function () {
-		console.log('create link');
 
 		// create hash, callback
 		var that = this;
@@ -200,11 +196,9 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	},
 
 	createPrint : function () {
-		console.log('create print');
 
 		var that = this;	// callback
 		app.setHash(function (ctx, hash) {
-			console.log('hash: ', hash);
 
 			// get snapshot from server
 			Wu.post('/api/util/pdfsnapshot', hash, that.createdPrint, that);
@@ -216,7 +210,6 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	},
 
 	createdPrint : function (context, file) {
-		console.log('took PDF screenshot', file);
 
 		// parse results
 		var result = JSON.parse(file);
@@ -278,30 +271,30 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	},
 
 	_activate : function () {
-		console.log('_activate s');
+		// console.log('_activate s');
 	},
 
 	_deactivate : function () {
-		console.log('_deactivate s');
+		// console.log('_deactivate s');
 		// reset expands
 		this._resetExpands();
 	},
 
 
 	enableSocial : function () {
-		console.log('enableSocial');
+		// console.log('enableSocial');
 	},
 
 	disableSocial : function () {
-		console.log('enableSocial2');
+		// console.log('enableSocial2');
 	},
 
 	enableScreenshot : function () {
-		console.log('enableSocial3');
+		// console.log('enableSocial3');
 	},
 
 	disableScreenshot : function () {
-		console.log('enableSocial4');
+		// console.log('enableSocial4');
 	},
 
 

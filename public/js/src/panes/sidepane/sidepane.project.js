@@ -217,16 +217,13 @@ Wu.SidePane.Project = Wu.Class.extend({
 	select : function (e) {
 
 		// dont select if already active
-		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho no active.. fix!
+		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho not active.. fix!
 
 		// select project
 		this.project.select();
 
 		// update sidepane
 		Wu.app.SidePane.refreshProject(this.project);
-
-		// set client name in sidepane subheaders
-		// Wu.app.SidePane.setSubheaders();	
 
 	},
 
@@ -244,6 +241,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomUtil.removeClass(this._container, 'active-project');
 	},
 
+	// edit title
 	edit : function (e) {
 		
 		// return if already editing
@@ -281,8 +279,13 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.project.setSlug(value);
 
 		// save latest
-		this.project.store['name'] = value;
-		this.project._update('name');
+		this.project.setName(value);
+
+		// save header also
+		this.project.setHeaderTitle(value);
+
+		// update header view
+		app.HeaderPane.setTitle(value);
 
 		this.editing = false;
 
@@ -322,10 +325,16 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var div = e.target.parentNode;
 		div.innerHTML = value;
 
-		// save latest
-		this.project.store.description = value;
-		this.project._update('description');
+		// save project description
+		this.project.setDescription(value);
 
+		// save header subtitle also
+		this.project.setHeaderSubtitle(value);
+
+		// update header view
+		app.HeaderPane.setSubtitle(value);
+
+		// mark done
 		this.editing = false;
 
 	},

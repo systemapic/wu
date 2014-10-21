@@ -840,9 +840,9 @@ label.info {
 	position: relative !important;
 	height: 31px !important;
 	background: rgba(255,255,255,0.5) !important;
-	width: 222px !important;
+	width: 210px !important;
 	margin-bottom: 1px !important;
-	left: -6px !important;
+	left: 0px !important;
 	padding-top: 2px !important;
 	}
 
@@ -853,8 +853,14 @@ label.info {
 	}
 
 .switch {
-	margin-left: 174px !important;
+	margin-left: 160px !important;
 	}
+
+.controls-switch {
+	top: 6px;
+	right: 6px;
+	pointer-events: none;
+}
 
 input.cmn-toggle-round-flat:checked + label,
 input.cmn-toggle-round-flat:checked + label:after {
@@ -886,6 +892,13 @@ input.cmn-toggle-round-flat + label:before {
 
 
 
+#editor-map-controls-inner-wrap .item-list.active {
+	background: rgba(255, 255, 255, 0.4) !important;
+}
+
+#editor-map-controls-inner-wrap .item-list {
+	color: #333;
+}
 /* search-tooltip */
 /*.leaflet-control-search.leaflet-control.search-exp, 
 .leaflet-control-search.leaflet-control,

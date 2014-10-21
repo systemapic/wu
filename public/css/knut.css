@@ -376,7 +376,9 @@ input.cmn-toggle-round-flat:checked + label:after {
 
 
 
-
+.header-title-wrap {
+	cursor: default;
+}
 
 
 
