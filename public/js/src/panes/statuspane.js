@@ -22,6 +22,8 @@ Wu.StatusPane = Wu.Class.extend({
 		var logo 	= this._logo 		= Wu.DomUtil.create('div', 'home-logo', container);
 		var statusWrap 	= this._statusWrap 	= Wu.DomUtil.create('div', 'home-status-wrap', container);
 		var status 				= Wu.DomUtil.create('div', 'home-status', statusWrap);
+		var statusInner 			= Wu.DomUtil.create('div', 'home-status-inner', status);
+
 
 		// set default status
 		this.clearStatus();
@@ -72,6 +74,9 @@ Wu.StatusPane = Wu.Class.extend({
 
 		// remove help pseudo
 		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
+
+		// Remove start pane
+		if (app.StartPane) app.StartPane.deactivate();
 
 		// trigger activation on active menu item
 		app._activeMenu._activate()
@@ -151,10 +156,12 @@ Wu.StatusPane = Wu.Class.extend({
 		if (this.clearTimer) clearTimeout(this.clearTimer);
 
 		// create div
-		var status = Wu.DomUtil.create('div', 'home-status');
+		var status 	= Wu.DomUtil.create('div', 'home-status');
+		var statusInner = Wu.DomUtil.create('div', 'home-status-inner', status);
+
 		
 		// set message
-		status.innerHTML = message;
+		statusInner.innerHTML = message;
 		
 		// push onto dom
 		this.pushStatus(status);
@@ -205,7 +212,7 @@ Wu.StatusPane = Wu.Class.extend({
 	},
 
 	getStatus : function () {
-		return this._statusWrap.firstChild.innerHTML;
+		return this._statusWrap.firstChild.firstChild.innerHTML;
 	},
 
 

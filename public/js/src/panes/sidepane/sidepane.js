@@ -49,7 +49,7 @@ Wu.SidePane = Wu.Class.extend({
 
 		// render sidepanes
 		if (pane.clients) 	this.Clients 	  = new Wu.SidePane.Clients();
-		if (pane.mapOptions) 	this.Map 	  = new Wu.SidePane.Map();
+		if (pane.mapOptions) 	this.Map 	  = new Wu.SidePane.Map();		// Options
 		if (pane.documents) 	this.Documents 	  = new Wu.SidePane.Documents();
 		if (pane.dataLibrary) 	this.DataLibrary  = new Wu.SidePane.DataLibrary();
 		if (pane.mediaLibrary) 	this.MediaLibrary = new Wu.SidePane.MediaLibrary();

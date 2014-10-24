@@ -62,9 +62,47 @@ Wu.Layer = Wu.Class.extend({
 		return this.store.uuid;
 	},
 
+	getFileUuid : function () {
+		return this.store.file;
+	},
+
 	getProjectUuid : function () {
 		return app.activeProject.store.uuid;
 	},
+
+	setCartoid : function (cartoid) {
+		console.log('setCartoCSS');
+		this.store.data.cartoid = cartoid;
+		this.save('data');
+	},
+
+	getCartoid : function () {
+		if (this.store.data) {
+			return this.store.data.cartoid;
+		}
+		return false;
+	},
+
+	setCartoCSS : function (json, callback) {
+		console.log('cartoid!!', json);
+
+		// send to server
+		Wu.post('/api/layers/cartocss/set', JSON.stringify(json), callback, this);
+	
+		// set locally on layer
+		this.setCartoid(json.cartoid);
+	},
+
+	getCartoCSS : function (cartoid, callback) {
+
+		var json = {
+			cartoid : cartoid
+		}
+
+		// get cartocss from server
+		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
+	},
+
 
 	hide : function () {
 		var container = this.getContainer();
@@ -81,7 +119,7 @@ Wu.Layer = Wu.Class.extend({
 		var json = {};
 		json[field] = this.store[field];
 		json.layer  = this.store.uuid;
-		json.uuid   = app.activeProject.store.uuid; // project uuid
+		json.uuid   = app.activeProject.getUuid(); // project uuid
 
 		this._save(json);
 	},
@@ -662,6 +700,92 @@ Wu.RasterLayer = Wu.Layer.extend({
 });
 
 
+Wu.CartoCSSLayer = Wu.Layer.extend({
+
+	initLayer : function () {
+
+		this.update();
+	},
+
+
+	add : function (map) {
+		this.addTo(map);
+	},
+
+	addTo : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		this.layer.addTo(map);
+
+		// add gridLayer if available
+		if (this.gridLayer) this.gridLayer.addTo(map);
+
+	},
+
+	remove : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		map.removeLayer(this.layer);
+
+		// remove gridLayer if available
+		if (this.gridLayer) map.removeLayer(this.gridLayer);   
+	},
+
+
+	update : function () {
+
+		var map = app._map;
+
+		if (this.layer) {
+			console.log('REMOVEING L:AYER!!');
+			map.removeLayer(this.layer);
+
+		}
+
+		console.log('CartoCSSLayer.initLayer');
+
+		var fileUuid = this.store.file;	// file id of geojson
+		// var cartoId = this.store.data.css.id;
+		var cartoid = this.store.data.cartoid || 'cartoid';
+
+		console.log('CARTOID 11 :::::::', cartoid);
+
+		// tile server ip
+		var tileServer = app.options.servers.carto;
+
+		// tile url
+		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png';
+
+		console.log('url: ', url);
+
+
+		console.log('___________ creating new layer!!!');
+
+		// custom raster layer
+		this.layer = L.tileLayer(url, {
+			fileUuid: fileUuid,
+			cartoid : cartoid
+		});
+
+		console.log('this.layer');
+
+
+
+
+	},
+
+	updateStyle : function () {
+		
+		// this.layer.redraw();
+		this.update();
+
+		var map = app._map;
+		this.addTo(map);
+	},
+
+})
 
 
 
@@ -727,7 +851,8 @@ Wu.createLayer = function (layer) {
 	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
 
 	// geojson
-	if (layer.data.geojson) return new Wu.GeojsonLayer(layer);
+	// if (layer.data.geojson) return new Wu.GeojsonLayer(layer);
+	if (layer.data.geojson) return new Wu.CartoCSSLayer(layer);
 	
 	// geojson
 	if (layer.data.topojson) return new Wu.TopojsonLayer(layer);

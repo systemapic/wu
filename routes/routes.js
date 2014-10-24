@@ -445,6 +445,29 @@ module.exports = function(app, passport) {
 	});
 
 
+	// =====================================
+	// SET CARTOCSS ========================
+	// =====================================
+	// get layers objects for project
+	app.post('/api/layers/cartocss/set', isLoggedIn, function (req, res) {
+		console.log('/api/layers/cartocss/set');
+
+		// send layers to client
+		api.setCartoCSS(req, res);
+	});
+
+	// =====================================
+	// GET CARTOCSS ========================
+	// =====================================
+	// get layers objects for project
+	app.post('/api/layers/cartocss/get', isLoggedIn, function (req, res) {
+		console.log('/api/layers/cartocss/get');
+
+		// send layers to client
+		api.getCartoCSS(req, res);
+	});
+
+
 
 	// =====================================
 	// UPDATE USER INFORMATION  ============

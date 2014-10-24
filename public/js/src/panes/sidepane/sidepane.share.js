@@ -78,6 +78,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	createImage : function () {
 
 		var that = this;	// callback
+
 		app.setHash(function (ctx, hash) {
 
 			// create image container

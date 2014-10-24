@@ -18,7 +18,7 @@ Wu.Client = Wu.Class.extend({
 	},
 
 	setActive : function () {
-		
+
 		// set edit mode
 		this.setEditMode();
 

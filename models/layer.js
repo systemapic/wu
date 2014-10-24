@@ -23,6 +23,7 @@ var layerSchema = mongoose.Schema({
 	data : {
 		geojson 	: String,			// file uuid, file saved on server - needs to be if over 4MB (mongodb limit)
 		topojson	: String,			// file uuid ... // simply request, check auth, serve file.
+		cartoid   	: String,
 		
 		rastertile 	: String,			// server raster path: raster/hubble2/hubble
 		vectortile 	: String,			// server vector tile: vector/bigassvector/bigvector

@@ -54,6 +54,21 @@ L.Control.Description = L.Control.extend({
 	setLayer : function (layer) {
 		this.activeLayer = layer;
 		this.setDescription(layer);
+
+		// cxxxxx
+		if ( !layer.store.description ) {
+			
+			console.log('Aint noffin here!');
+
+			this.closePane();
+			this.clear();
+		} else {
+
+
+		}
+
+		
+		console.log('this.setDescription', layer.store.description);
 	},
 
 	removeLayer : function (layer) {
@@ -233,6 +248,7 @@ L.Control.Description = L.Control.extend({
 	},
 
 	closePane : function () {
+//		console.log('closePane');
 		this._container.style.display = "none";
 	},
 	

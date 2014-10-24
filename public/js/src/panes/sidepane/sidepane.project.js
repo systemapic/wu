@@ -370,8 +370,10 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// unload project // todo: doesn't work!
 		if (this.project.selected) this.project.unload();
 	
-		// remove 
+		// remove from client 
 		this._parent.removeProject(this.project);
+		
+		// remove from DOM
 		Wu.DomUtil.remove(this._container);
 
 		// delete

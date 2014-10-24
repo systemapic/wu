@@ -1,7 +1,6 @@
 Wu.HeaderPane = Wu.Class.extend({
 	_ : 'headerpane', 
 
-
 	initialize : function () {
 		
 		// set options
@@ -19,6 +18,8 @@ Wu.HeaderPane = Wu.Class.extend({
 
 		// create divs
 		this._container = Wu.app._headerPane = Wu.DomUtil.createId('div', 'header', Wu.app._mapContainer);
+						  Wu.DomUtil.addClass(Wu.app._headerPane, 'displayNone');
+
 		this._logoWrap  = Wu.DomUtil.create('div', 'header-logo', this._container);
 		// this._logo 	= Wu.DomUtil.create('img', 'header-logo-img', this._logoWrap);
 		this._titleWrap = Wu.DomUtil.create('div', 'header-title-wrap', this._container);

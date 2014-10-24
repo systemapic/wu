@@ -956,6 +956,17 @@ Wu.Util = {
 		});
 		if (_.size(result)) return result;
 		return false;
+	},
+
+
+	getWindowSize : function () {
+
+		var size = {
+			width : window.innerWidth,
+			height : window.innerHeight
+		}
+
+		return size;
 	}
 
 	
@@ -1338,6 +1349,15 @@ Wu.DomUtil = {
 		    Wu.DomUtil.setClass(el, Wu.Util.trim((' ' + Wu.DomUtil.getClass(el) + ' ').replace(' ' + name + ' ', ' ')));
 		}
 	},
+
+
+	classed: function(el, name, bol) {
+		if ( !bol ) {
+			this.removeClass(el,name);
+		} else {
+			this.addClass(el,name);
+		}
+	},	
 
 	setClass: function (el, name) {
 		if (el.className.baseVal === undefined) {

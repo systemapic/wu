@@ -50,7 +50,13 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 	},
 
 	calculateHeight : function () {
+
+		console.log('calculateHeight');
+
 		this.maxHeight = this._inner.offsetHeight + 15;
+
+		console.log('this._inner', this._inner);
+
 		this.minHeight = 0;
 	},
 
@@ -486,13 +492,8 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		});
 		this.save();
 	
-		// refresh baselayerToggleControl
-		var baselayerToggle = app.MapPane.baselayerToggle;
-		if (baselayerToggle) baselayerToggle.update();
-
-		// mark occupied layers in layermenu
-		var layermenuSetting = app.SidePane.Map.mapSettings.layermenu;
-		layermenuSetting.markOccupied();
+		// refresh controls
+		this._refreshControls();
 	},
 
 	disableLayer : function (baseLayer) {
@@ -504,6 +505,13 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		_.remove(this.project.store.baseLayers, function (b) { return b.uuid == baseLayer.layer.store.uuid; });
 		this.save();
 
+		// refresh controls
+		this._refreshControls();
+
+	},
+
+	_refreshControls : function () {
+
 		// refresh baselayerToggleControl
 		var baselayerToggle = app.MapPane.baselayerToggle;
 		if (baselayerToggle) baselayerToggle.update();
@@ -512,10 +520,16 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		var layermenuSetting = app.SidePane.Map.mapSettings.layermenu;
 		layermenuSetting.markOccupied();
 
+		// refresh cartoCssControl
+		var cartoCss = app.MapPane.cartoCss;
+		if (cartoCss) cartoCss.update()
+
 	},
 
 	calculateHeight : function () {
-								
+				
+		// Runs only for base layer menu?
+
 		var min = _.size(this.project.getLayermenuLayers());
 		var padding = this.numberOfProviders * 35;
 		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
@@ -742,6 +756,10 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		// mark occupied layers in layermenu
 		var baselayerSetting = app.SidePane.Map.mapSettings.baselayer;
 		baselayerSetting.markOccupied()
+
+		// refresh cartoCssControl
+		var cartoCss = app.MapPane.cartoCss;
+		if (cartoCss) cartoCss.update()
 	},
 
 	toggleEdit : function (layer) {
@@ -811,12 +829,12 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	activate : function (layerUuid) {
 		var layer = this._layers[layerUuid];
-		Wu.DomUtil.removeClass(layer.container, 'deactivated');
+		if (layer) Wu.DomUtil.removeClass(layer.container, 'deactivated');
 	},
 
 	deactivate : function (layerUuid) {
 		var layer = this._layers[layerUuid];
-		Wu.DomUtil.addClass(layer.container, 'deactivated');
+		if (layer) Wu.DomUtil.addClass(layer.container, 'deactivated');
 	}
 
 });
@@ -1237,6 +1255,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		// this.panes.controlVectorstyle          	= Wu.DomUtil.get('map-controls-vectorstyle').parentNode.parentNode;
 		this.panes.controlMouseposition        	= Wu.DomUtil.get('map-controls-mouseposition').parentNode.parentNode;
 		this.panes.controlBaselayertoggle      	= Wu.DomUtil.get('map-controls-baselayertoggle').parentNode.parentNode;
+		this.panes.controlCartocss 		= Wu.DomUtil.get('map-controls-cartocss').parentNode.parentNode;
 	},
 
 	addHooks : function () {
@@ -1256,6 +1275,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		// Wu.DomEvent.on( this.panes.controlVectorstyle,     'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlMouseposition,   'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlBaselayertoggle, 'mousedown click', this.toggleControl, this);
+		Wu.DomEvent.on( this.panes.controlCartocss, 	   'mousedown click', this.toggleControl, this);
 
 	},
 
@@ -1264,6 +1284,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 	},
 
 	calculateHeight : function () {
+
 		var x = _.size(this.controls);
 		this.maxHeight = x * 30 + 30;
 		this.minHeight = 0;
@@ -1273,7 +1294,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 	toggleControl : function (e) {
 		
 		// console.log('toggleControl');
-
+		console.log('e: ', e);
 		// prevent default checkbox behaviour
 		if (e.type == 'click') return Wu.DomEvent.stop(e);
 		
@@ -1284,6 +1305,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		var item = e.target.getAttribute('which');
 
 		// get checkbox
+		console.log('item: ', item);
 		var target = Wu.DomUtil.get('map-controls-' + item);
 
 		// do action (eg. toggleControlDraw);
@@ -1310,7 +1332,9 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 		// save changes to project
 		this.project.store.controls[item] = on;	// todo
-		this.project._update('controls');		
+		this.project._update('controls');
+
+		console.log('upadte controls!!');		
 
 		// update controls css
 		mapPane.updateControlCss();
@@ -1348,9 +1372,11 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		Wu.SidePane.Map.MapSetting.prototype.update.call(this)
 
 		this.controls = this.project.getControls();
+
+		console.log('update menuSETETETT, contolr=>>', this.controls);
 		
 		// tmp hack to remove vectrostyle
-		delete this.controls.vectorstyle;
+		delete this.controls.vectorstyle;		// todo: remove
 
 		// toggle each control
 		for (c in this.controls) {
@@ -1561,7 +1587,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		autoAbout 	: true,
 		darkTheme 	: true,
 		tooltips 	: true,
-		mapboxGL	: false // maybe not as setting
+		mapboxGL	: false // maybe not as setting ~ I like it.
 
 	},
 
@@ -1589,8 +1615,13 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 
 	calculateHeight : function () {
 		var num = _.filter(this.options, function (o) { return o; }).length;
-		this.maxHeight = num * 40;
+		this.maxHeight = num * 30;
 		this.minHeight = 0;
+
+
+		// var x = _.size(this.controls);
+		// this.maxHeight = x * 30 + 30;
+		// this.minHeight = 0;		
 	},
 
 	contentLayout : function () {

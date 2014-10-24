@@ -25,12 +25,12 @@ module.exports = upload = {
 	newUpload : function (req, res) {
 
 		
-		console.log('******************')
-		console.log('* API fn: newUpload ');
-		console.log('******************')
-		console.log('* files: ');
-		console.dir(req.files.file);
-		console.log('******************')
+		// console.log('******************')
+		// console.log('* API fn: newUpload ');
+		// console.log('******************')
+		// console.log('* files: ');
+		// console.dir(req.files.file);
+		// console.log('******************')
 
 		// * files:
 		// [ [ { fieldName: 'file[]',
@@ -91,14 +91,14 @@ module.exports = upload = {
 		hash.queue = files;
 
 
-		console.log('**********************************')
-		console.log('* newUpload > ');
-		console.log('* hash.queue.length: ',     hash.queue.length);
-		console.log('* hash.organized.length: ', hash.organized.length);
-		console.log('* hash.processed.length: ', hash.processed.length);
-		console.log('* hash.cleaned.files.length: ',   hash.cleaned.files.length);
-		console.log('* hash.cleaned.layers.length: ',   hash.cleaned.layers.length);
-		console.log('**********************************')		
+		// console.log('**********************************')
+		// console.log('* newUpload > ');
+		// console.log('* hash.queue.length: ',     hash.queue.length);
+		// console.log('* hash.organized.length: ', hash.organized.length);
+		// console.log('* hash.processed.length: ', hash.processed.length);
+		// console.log('* hash.cleaned.files.length: ',   hash.cleaned.files.length);
+		// console.log('* hash.cleaned.layers.length: ',   hash.cleaned.layers.length);
+		// console.log('**********************************')		
 
 
 
@@ -107,7 +107,7 @@ module.exports = upload = {
 		upload.queue(hash, function (err, hash) {
 
 			// all queues done
-			console.log(' * D * O * N * E *');
+			// console.log(' * D * O * N * E *');
 			res.end(JSON.stringify({
 				error : 0,
 				done : hash.done
@@ -148,29 +148,29 @@ module.exports = upload = {
 		// async waterfall
 		async.waterfall(ops, function (err) {
 
-			console.log('**********************************')
-			console.log('* fn: queue.waterfall * callback()!');
-			console.log('* hash.queue.length: ',     hash.queue.length);
-			console.log('* hash.organized.length: ', hash.organized.length);
-			console.log('* hash.processed.length: ', hash.processed.length);
-			console.log('* hash.cleaned.files.length: ',   hash.cleaned.files.length);
-			console.log('* hash.cleaned.layers.length: ',   hash.cleaned.layers.length);
-			console.log('**********************************')
+			// console.log('**********************************')
+			// console.log('* fn: queue.waterfall * callback()!');
+			// console.log('* hash.queue.length: ',     hash.queue.length);
+			// console.log('* hash.organized.length: ', hash.organized.length);
+			// console.log('* hash.processed.length: ', hash.processed.length);
+			// console.log('* hash.cleaned.files.length: ',   hash.cleaned.files.length);
+			// console.log('* hash.cleaned.layers.length: ',   hash.cleaned.layers.length);
+			// console.log('**********************************')
 
 			// if queue is finished
 			if (that.hash.queue.length == 0 || that.hash.queue == undefined) {
-				console.log('queue.waterfall queue=0');
+				// console.log('queue.waterfall queue=0');
 
-				console.log('**********************************')
-				console.log('* ALL DONE ALL DONE ALL DONE ALL *');
-				console.log('* hash.queue.length: ',     hash.queue.length);
-				console.log('* hash.organized.length: ', hash.organized.length);
-				console.log('* hash.processed.length: ', hash.processed.length);
-				console.log('* hash.cleaned.files.length: ',   hash.cleaned.files.length);
-				console.log('* hash.cleaned.layers.length: ',   hash.cleaned.layers.length);
-				console.log('* hash.cleaned: ');
-				console.dir(hash.cleaned);
-				console.log('**********************************')
+				// console.log('**********************************')
+				// console.log('* ALL DONE ALL DONE ALL DONE ALL *');
+				// console.log('* hash.queue.length: ',     hash.queue.length);
+				// console.log('* hash.organized.length: ', hash.organized.length);
+				// console.log('* hash.processed.length: ', hash.processed.length);
+				// console.log('* hash.cleaned.files.length: ',   hash.cleaned.files.length);
+				// console.log('* hash.cleaned.layers.length: ',   hash.cleaned.layers.length);
+				// console.log('* hash.cleaned: ');
+				// console.dir(hash.cleaned);
+				// console.log('**********************************')
 
 
 				// end queue
@@ -179,17 +179,17 @@ module.exports = upload = {
 			// if file still left in queue (eg. added from zips)
 			} else {
 
-				console.log('***********************************');
-				console.log('* REQUEUE REQUEUE REQUEUE REQUEUE *');
-				console.log('* _______________________________ *');
-				console.log('* hash.queue.length: ',     hash.queue.length);
-				console.log('* hash.organized.length: ', hash.organized.length);
-				console.log('* hash.processed.length: ', hash.processed.length);
-				console.log('* hash.cleaned.files.length: ',   hash.cleaned.files.length);
-				console.log('* hash.cleaned.layers.length: ',   hash.cleaned.layers.length);
-				console.log('* hash.cleaned: ');
-				console.dir(hash.cleaned);
-				console.log('**********************************')
+				// console.log('***********************************');
+				// console.log('* REQUEUE REQUEUE REQUEUE REQUEUE *');
+				// console.log('* _______________________________ *');
+				// console.log('* hash.queue.length: ',     hash.queue.length);
+				// console.log('* hash.organized.length: ', hash.organized.length);
+				// console.log('* hash.processed.length: ', hash.processed.length);
+				// console.log('* hash.cleaned.files.length: ',   hash.cleaned.files.length);
+				// console.log('* hash.cleaned.layers.length: ',   hash.cleaned.layers.length);
+				// console.log('* hash.cleaned: ');
+				// console.dir(hash.cleaned);
+				// console.log('**********************************')
 
 
 				// do more files
@@ -208,12 +208,12 @@ module.exports = upload = {
 	// array of files from DZ upload
 	organize : function (hash, callback) {
 
-		console.log('**********************************')
-		console.log('* organize > start ');
-		console.log('* hash.queue.length: ',     hash.queue.length);
-		console.log('* hash.organized.length: ', hash.organized.length);
-		console.log('* hash.processed.length: ', hash.processed.length);
-		console.log('**********************************')
+		// console.log('**********************************')
+		// console.log('* organize > start ');
+		// console.log('* hash.queue.length: ',     hash.queue.length);
+		// console.log('* hash.organized.length: ', hash.organized.length);
+		// console.log('* hash.processed.length: ', hash.processed.length);
+		// console.log('**********************************')
 
 
 		var ops = [];
@@ -229,14 +229,14 @@ module.exports = upload = {
 
 			if (err) console.log('organize > callback() > async done err: ', err);
 			
-			console.log('**********************************')
-			console.log('* organize > DONE!  ');
-			console.log('* hash.queue.length: ',     hash.queue.length);
-			console.log('* hash.organized.length: ', hash.organized.length);
-			console.log('* hash.processed.length: ', hash.processed.length);
-			console.log('* hash.partials.length: ', hash.partials.length);
-			console.log('* hash.partials: ', hash.partials);
-			console.log('**********************************')
+			// console.log('**********************************')
+			// console.log('* organize > DONE!  ');
+			// console.log('* hash.queue.length: ',     hash.queue.length);
+			// console.log('* hash.organized.length: ', hash.organized.length);
+			// console.log('* hash.processed.length: ', hash.processed.length);
+			// console.log('* hash.partials.length: ', hash.partials.length);
+			// console.log('* hash.partials: ', hash.partials);
+			// console.log('**********************************')
 			
 
 			// if partials
@@ -252,7 +252,7 @@ module.exports = upload = {
 	
 	movePartials : function (hash, callback) {
 
-		console.log('need to move partials into one folder');
+		// console.log('need to move partials into one folder');
 		callback(null);
 
 	},
@@ -261,13 +261,13 @@ module.exports = upload = {
 	// only one file at a time goes thru here
 	organizeFile : function (file, hash, callback) {
 
-		console.log('**********************************')
-		console.log('* organizeFile > start ');
-		console.log('* hash.queue.length: ',     hash.queue.length);
-		console.log('* hash.organized.length: ', hash.organized.length);
-		console.log('* hash.processed.length: ', hash.processed.length);
-		console.log('* file: ', file);
-		console.log('**********************************')
+		// console.log('**********************************')
+		// console.log('* organizeFile > start ');
+		// console.log('* hash.queue.length: ',     hash.queue.length);
+		// console.log('* hash.organized.length: ', hash.organized.length);
+		// console.log('* hash.processed.length: ', hash.processed.length);
+		// console.log('* file: ', file);
+		// console.log('**********************************')
 
 
 		// check if zip and unzip
@@ -293,9 +293,9 @@ module.exports = upload = {
 			data 		 : {}
 		}
 
-		console.log('******************************')
-		console.log('organizeFile > ENTRY: ', entry);
-		console.log('******************************')
+		// console.log('******************************')
+		// console.log('organizeFile > ENTRY: ', entry);
+		// console.log('******************************')
 
 
 
@@ -313,19 +313,19 @@ module.exports = upload = {
 			});
 		
 		}  else if (type == 'partialshape') {
-			console.log('******************************')
-			console.log('* partialshape > ENTRY: ', entry);
-			console.log('******************************')
+			// console.log('******************************')
+			// console.log('* partialshape > ENTRY: ', entry);
+			// console.log('******************************')
 
 			// concat partialshapes into one folder
 
 			// get prefix
 			var prefix = originalFilename.split('.')[0];
-			console.log('hash.partials: ', hash.partials, prefix);
+			// console.log('hash.partials: ', hash.partials, prefix);
 			if (!hash.partials[prefix]) hash.partials[prefix] = [];
 			// hash.partials[prefix] = hash.partials[prefix] || [];
-			console.log('hash.partials: ', hash.partials, prefix);
-			console.log(';;hash.partials[prefix]', hash.partials[prefix]);
+			// console.log('hash.partials: ', hash.partials, prefix);
+			// console.log(';;hash.partials[prefix]', hash.partials[prefix]);
 
 			hash.partials[prefix].push(entry);
 
@@ -362,7 +362,7 @@ module.exports = upload = {
 		async.parallel(ops, function (err, results) {
 			var entry = results[0];
 
-			console.log('__________ results: ', results);
+			// console.log('__________ results: ', results);
 			
 			// add file to hash
 			hash.organized.push(entry);
@@ -372,13 +372,13 @@ module.exports = upload = {
 				return rf.uuid == entry.ruuid;
 			});
 
-			console.log('**********************************')
-			console.log('* organizeFile * callback()!');
-			console.log('* hash.queue.length: ',     hash.queue.length);
-			console.log('* hash.organized.length: ', hash.organized.length);
-			console.log('* hash.processed.length: ', hash.processed.length);
-			console.log('* err: ', err);
-			console.log('**********************************')
+			// console.log('**********************************')
+			// console.log('* organizeFile * callback()!');
+			// console.log('* hash.queue.length: ',     hash.queue.length);
+			// console.log('* hash.organized.length: ', hash.organized.length);
+			// console.log('* hash.processed.length: ', hash.processed.length);
+			// console.log('* err: ', err);
+			// console.log('**********************************')
 
 
 			// callback
@@ -394,12 +394,12 @@ module.exports = upload = {
 		var entries = hash.organized,
 		    ops = [];
 
-		console.log('**********************************')
-		console.log('* process > start > entries : ', entries);
-		console.log('* hash.queue.length: ',     hash.queue.length);
-		console.log('* hash.organized.length: ', hash.organized.length);
-		console.log('* hash.processed.length: ', hash.processed.length);
-		console.log('**********************************')
+		// console.log('**********************************')
+		// console.log('* process > start > entries : ', entries);
+		// console.log('* hash.queue.length: ',     hash.queue.length);
+		// console.log('* hash.organized.length: ', hash.organized.length);
+		// console.log('* hash.processed.length: ', hash.processed.length);
+		// console.log('**********************************')
 
 
 		// iterate over all files and check for interesting things
@@ -407,13 +407,13 @@ module.exports = upload = {
 
 			var files = entry.files;
 
-			console.log('* entries forEach() entry:', entry);
+			// console.log('* entries forEach() entry:', entry);
 
 
 			// check for geo files
 			files.forEach(function (file) {
 
-				console.log('* files.forEach() file: ', file);
+				// console.log('* files.forEach() file: ', file);
 
 				// .shp
 				if (file.slice(-4) == '.shp') {
@@ -455,7 +455,7 @@ module.exports = upload = {
 
 			// process image files
 			if (entry.type == 'image') {
-				console.log('* adding image crunch, entry: ', entry);
+				// console.log('* adding image crunch, entry: ', entry);
 				ops.push(function (cb) {
 
 					// add to image cruncher     // callback
@@ -487,23 +487,23 @@ module.exports = upload = {
 				// add file to hash
 				hash.processed.push(entry);
 
-				console.log('===>> after process: entry: ', entry);
+				// console.log('===>> after process: entry: ', entry);
 
 				// remove from queue
 				_.remove(hash.organized, function (rf) {
-					console.log('___remove: rf.uuid == entry.ruuid => ' + rf.uuid + ' == ' + entry.ruuid);
-					console.log(rf);
+					// console.log('___remove: rf.uuid == entry.ruuid => ' + rf.uuid + ' == ' + entry.ruuid);
+					// console.log(rf);
 					return rf.ruuid == entry.ruuid;
 				});
 
 			})
 
-			console.log('**********************************')
-			console.log('* fn: upload.process * DONE: RESULTS: ', results);	// []
-			console.log('* hash.queue.length: ',     hash.queue.length);
-			console.log('* hash.organized.length: ', hash.organized.length);
-			console.log('* hash.processed.length: ', hash.processed.length);
-			console.log('**********************************')
+			// console.log('**********************************')
+			// console.log('* fn: upload.process * DONE: RESULTS: ', results);	// []
+			// console.log('* hash.queue.length: ',     hash.queue.length);
+			// console.log('* hash.organized.length: ', hash.organized.length);
+			// console.log('* hash.processed.length: ', hash.processed.length);
+			// console.log('**********************************')
 
 
 			callback(err);
@@ -517,26 +517,26 @@ module.exports = upload = {
 
 		var files = hash.processed.slice();
 
-		console.log('**********************************')
-		console.log('* cleanFiles > start ');
-		console.log('* hash.queue.length: ',     hash.queue.length);
-		console.log('* hash.organized.length: ', hash.organized.length);
-		console.log('* hash.processed.length: ', hash.processed.length);
-		console.log('* files length: ', files.length);
-		console.log('**********************************')
+		// console.log('**********************************')
+		// console.log('* cleanFiles > start ');
+		// console.log('* hash.queue.length: ',     hash.queue.length);
+		// console.log('* hash.organized.length: ', hash.organized.length);
+		// console.log('* hash.processed.length: ', hash.processed.length);
+		// console.log('* files length: ', files.length);
+		// console.log('**********************************')
 
 		files.forEach(function (file) {
 			
-			console.log('**********************************')
-			console.log('*** cleaning files: ', file);
-			console.log('**********************************')
+			// console.log('**********************************')
+			// console.log('*** cleaning files: ', file);
+			// console.log('**********************************')
 
 			delete file.temporaryPath;
 			delete file.permanentPath;
 			delete file.ruuid;
 			// delete file.originalFilename;
 
-			console.log('* cleaned file:', file.uuid);
+			// console.log('* cleaned file:', file.uuid);
 			
 			// add to cleaned
 			hash.cleaned.files.push(file);
@@ -561,15 +561,15 @@ module.exports = upload = {
 	// 
 	register : function (hash, callback) {
 	
-		console.log('**********************************');
-		console.log('****** REGISTER FILES ************');
-		console.log('**********************************');
-		console.log('* hash.queue.length: ',     hash.queue.length);
-		console.log('* hash.organized.length: ', hash.organized.length);
-		console.log('* hash.processed.length: ', hash.processed.length);
-		console.log('* hash.cleaned.files.length: ',   hash.cleaned.files.length);
-		console.log('* hash.cleaned.layers.length: ',   hash.cleaned.layers.length);
-		console.log('**********************************')
+		// console.log('**********************************');
+		// console.log('****** REGISTER FILES ************');
+		// console.log('**********************************');
+		// console.log('* hash.queue.length: ',     hash.queue.length);
+		// console.log('* hash.organized.length: ', hash.organized.length);
+		// console.log('* hash.processed.length: ', hash.processed.length);
+		// console.log('* hash.cleaned.files.length: ',   hash.cleaned.files.length);
+		// console.log('* hash.cleaned.layers.length: ',   hash.cleaned.layers.length);
+		// console.log('**********************************')
 
 		if (hash.queue.length > 0)     console.log('Leftovers from queue: ',     hash.queue);
 		if (hash.organized.length > 0) console.log('Leftovers from organized: ', hash.organized);
@@ -587,18 +587,18 @@ module.exports = upload = {
 
 		files.forEach(function (file) {
 
-			console.log('file...');
-			console.log('*********************');
-			console.log('* File: ');
-			console.log(file);
-			console.log('*********************');
+			// console.log('file...');
+			// console.log('*********************');
+			// console.log('* File: ');
+			// console.log(file);
+			// console.log('*********************');
 
 			var f;
 			var name;
 			var user = hash.req.user;
 			if (file.files[0]) name = file.files[0].split('.')[0];
 
-			console.log('req.user: ', user);
+			// console.log('req.user: ', user);
 
 			// create file
 			ops.push(function (cb) {
@@ -620,7 +620,7 @@ module.exports = upload = {
 
 
 				File.create(f, function (err, doc) {
-					console.log('Saved file!', doc);
+					// console.log('Saved file!', doc);
 					done.files.push(doc);
 					cb(err, doc);
 				});
@@ -644,7 +644,7 @@ module.exports = upload = {
 				layer.file 		= l.uuid;
 
 				Layer.create(layer, function (err, doc) {
-					console.log('Saved layer!', doc);
+					// console.log('Saved layer!', doc);
 					done.layers.push(doc);
 					cb(err, doc);
 				});
@@ -657,9 +657,9 @@ module.exports = upload = {
 		async.parallel(ops, function (err, results) {
 			if (err) console.error('Register error: ', err, hash.req);
 		
-			console.log('**********************************');
-			console.log('****** REGISTER FILES DONE: ', results);
-			console.log('**********************************');
+			// console.log('**********************************');
+			// console.log('****** REGISTER FILES DONE: ', results);
+			// console.log('**********************************');
 
 			var projectUuid = hash.req.body.project;
 
@@ -694,7 +694,7 @@ module.exports = upload = {
 			project.markModified('layers');
 
 			project.save(function (err) {
-				console.log('saved!: err:', err);
+				// console.log('saved!: err:', err);
 				callback(err, done);
 			});
 		});
@@ -759,16 +759,16 @@ module.exports = upload = {
 		var originalFilename = fspath.basename(file);
 		var rel = file.split(folder);
 
-		console.log('rel: ', rel);
+		// console.log('rel: ', rel);
 
 		if (rel[1] == '/' + originalFilename) {
-			console.log('NO RELATIVE PATH!');			// hacky
+			// console.log('NO RELATIVE PATH!');			// hacky
 			return false;
 		} else {
 			var rel3 = rel[1].split(originalFilename);
 			var rel4 = rel3[0].substring(1)
 
-			console.log('RELATIVE PATH::: => ', rel4); // ok
+			// console.log('RELATIVE PATH::: => ', rel4); // ok
 			return rel4;
 		}
 
@@ -787,7 +787,7 @@ module.exports = upload = {
 
 		ops.push(function (cb) {
 			var cmd = 'unzip -o -d "' + entry.folder + '" "' + entry.temporaryPath + '"'; 	// to folder .shp
-			console.log('** Unzipping: cmd: ', cmd);
+			// console.log('** Unzipping: cmd: ', cmd);
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
 				cb(err);
@@ -799,7 +799,7 @@ module.exports = upload = {
 
 				// for each file
 				function(err, file) {
-					console.log('** Diving: file: ', file);
+					// console.log('** Diving: file: ', file);
 
 					var originalFilename = fspath.basename(file);
 
@@ -828,17 +828,17 @@ module.exports = upload = {
 
 					// check if files should be reorganized
 					if (upload._reorganizable(queueFile)) {
-						console.log('####################')
-						console.log('_reorganizable!')
-						console.log(originalFilename);
-						console.log('####################')
+						// console.log('####################')
+						// console.log('_reorganizable!')
+						// console.log(originalFilename);
+						// console.log('####################')
 						hash.queue.push(queueFile);
 
 					// else just push to entry filelist
 					} else {
 						entry.files.push(originalFilename);
 						if (relativePath) entry.relativePath = relativePath;
-						console.log('** DONE ZIP => ', entry);
+						// console.log('** DONE ZIP => ', entry);
 					}
 
 				
@@ -896,10 +896,10 @@ module.exports = upload = {
 
 					// check if files should be reorganized
 					if (upload._reorganizable(queueFile)) {
-						console.log('########## tar ##########')
-						console.log('_reorganizable!')
-						console.log(originalFilename);
-						console.log('####################')
+						// console.log('########## tar ##########')
+						// console.log('_reorganizable!')
+						// console.log(originalFilename);
+						// console.log('####################')
 						hash.queue.push(queueFile);
 
 					// else just push to entry filelist
@@ -951,7 +951,7 @@ module.exports = upload = {
 	
 
 	_getType : function (file) {
-		console.log('file: ', file);
+		// console.log('file: ', file);
 		var name = file.originalFilename.toLowerCase();
 
 		// archives

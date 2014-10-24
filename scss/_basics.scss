@@ -364,7 +364,7 @@ label.info {
 	text-align: left;
 	position: relative;
 	box-shadow: 0 0 3px 0 rgba(0,0,0,0.4) inset;
-	padding: 5px;
+	padding: 4px;
 	}		
 	
 /* Often used in tables */
@@ -447,6 +447,7 @@ label.info {
 /* Button */
 .smap-button-gray:hover {
 	background: black;
+	color: white;
 	}	
 
 /* Button */	
@@ -496,7 +497,8 @@ label.info {
 	}
 
 .collapsed {
-	visibility: hidden;
+	/*visibility: hidden;*/
+	display: none;
 	}
 
 .expand {
@@ -634,8 +636,12 @@ label.info {
 	position: relative;
 	width: 100%;
 	height: 100%;
-	left: 36px;
-	top: 93px;
+/*	left: 36px;
+	top: 93px;*/
+
+	left: 105px;
+	top: 38px;
+
 	text-align: center;
 	display: block;
 	font-size: 42px;
@@ -719,6 +725,8 @@ label.info {
 	font-size: 30px;
 	font-weight: $lean;
 	padding-left: 102px;
+	height: 45px;
+	overflow: hidden;
 	}
 
 .header-title input {
@@ -808,6 +816,13 @@ label.info {
 	opacity: 0.7;
 	}
 
+
+.home-status {
+	-webkit-transition: height 250ms ease, opacity 250ms ease;
+	-moz-transition: height 250ms ease, opacity 250ms ease;
+	transition: height 250ms ease, opacity 250ms ease;
+	}
+
 .home-status {
 	position: relative;
 	bottom: 0px;
@@ -828,119 +843,9 @@ label.info {
 	height: 27px;
 	}
 
-
-
-
-
-
-/* EXTRA ADDONS	*/
-
-/* SWITCH */
-.settings-item {
-	position: relative !important;
-	height: 31px !important;
-	background: rgba(255,255,255,0.5) !important;
-	width: 210px !important;
-	margin-bottom: 1px !important;
-	left: 0px !important;
-	padding-top: 2px !important;
-	}
-
-.settings-item-title {
-	color: #333 !important;
-	font-weight: 400 !important;
-	line-height: 1.6 !important;
-	}
-
-.switch {
-	margin-left: 160px !important;
-	}
-
-.controls-switch {
-	top: 6px;
-	right: 6px;
-	pointer-events: none;
-}
-
-input.cmn-toggle-round-flat:checked + label,
-input.cmn-toggle-round-flat:checked + label:after {
-	background-color: #666 !important;
-	}
-
-input.cmn-toggle-round-flat:checked + label:after {
-	margin-left: 28px !important;
-	}
-
-input.cmn-toggle-round-flat + label:after {
-	left: -22px !important;
-	top: -16px !important;
-	width: 18px !important;
-	height: 14px !important;
-	left: -8px !important;
-	}
-
-input.cmn-toggle-round-flat + label {
-	padding: 1px !important;
-	height: 20px !important;
-	width: 42px !important;	
-	}
-
-input.cmn-toggle-round-flat + label:before { 
-	height: 18px !important;
-	width: 40px !important;
-	}	
-
-
-
-#editor-map-controls-inner-wrap .item-list.active {
-	background: rgba(255, 255, 255, 0.4) !important;
-}
-
-#editor-map-controls-inner-wrap .item-list {
-	color: #333;
-}
-/* search-tooltip */
-/*.leaflet-control-search.leaflet-control.search-exp, 
-.leaflet-control-search.leaflet-control,
-.leaflet-control-search.search-button */
-
-.leaflet-control-search {
-	border-radius: 0 !important;
-	box-shadow: none !important;
-	background-color: rgba(255, 255, 255, 1) !important;
-	opacity: 1 !important;
-	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) !important;
-	}
-
-
-.leaflet-control-search .search-button {
-	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon.png') no-repeat 2px -22px !important;
-	}
-
-.leaflet-control-search .search-button:hover {
-	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon.png') no-repeat 2px 2px !important;
-	}
-
-.search-tooltip	{
-	min-width: none !important;
-	max-height: none !important;
-	background-color: white !important;
-	top: 29px !important;
-	padding: 5px !important;
-	opacity: 0.9 !important;	
-	}
-
-.leaflet-control-search .search-tip {
-	border-radius: 0 !important;
-	}
-
-.leaflet-control-search .search-input {
-	border: none !important;
-	height: 20px;
-	}
-
-.share-image-download-button {
-	@extend .smap-button-gray;
-	border: none !important;
-	line-height: 0.6 !important;
+.home-status-inner {
+	/*border: 1px solid red;*/
+	position: absolute;
+	bottom: 5px;
+	width: 100%;
 }	

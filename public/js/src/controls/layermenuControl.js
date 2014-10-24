@@ -26,14 +26,14 @@ L.Control.Layermenu = L.Control.extend({
 
 		// Create the header    
 		this._layerMenuHeader = Wu.DomUtil.createId('div', 'layer-menu-header');
-		Wu.DomUtil.addClass(this._layerMenuHeader, 'menucollapser ct15 ct16');
+		Wu.DomUtil.addClass(this._layerMenuHeader, 'menucollapser');
 		
 		this._layerMenuHeaderTitle = Wu.DomUtil.create('div', 'layer-menu-header-title', this._layerMenuHeader, 'Layers');
 		// this._layerMenuHeader.innerHTML = 'layers';                                     
 
 		// Create the collapse button
 		this._bhattan1 = Wu.DomUtil.createId('div', 'bhattan1');
-		Wu.DomUtil.addClass(this._bhattan1, 'dropdown-button rotate270 ct31');
+		Wu.DomUtil.addClass(this._bhattan1, 'dropdown-button rotate270');
 		this._layerMenuHeader.appendChild(this._bhattan1);
 
 		// Insert Header at the top
@@ -560,7 +560,7 @@ L.Control.Layermenu = L.Control.extend({
 		layerItem.on = true;
 
 		// add active class
-		Wu.DomUtil.addClass(layerItem.el, 'layer-active ct8');
+		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 
 		// add to inspectControl if available
 		var inspectControl = app.MapPane.inspectControl;		// perhaps refactor this, more centralized
@@ -574,8 +574,12 @@ L.Control.Layermenu = L.Control.extend({
 		var descriptionControl = app.MapPane.descriptionControl;
 		if (descriptionControl) {
 			descriptionControl.setLayer(layer);
-			descriptionControl._container.style.display = 'block'; // (j)
-		}	
+
+			console.log('Layer description is now disabled if it is empty. However, then it will be difficult to write in it, so we need to enable it for admins?')
+			if ( layer.store.description ) { descriptionControl._container.style.display = 'block'; } // (j)
+			else { descriptionControl._container.style.display = 'none'; }
+		
+		}
 	},
 
 	
@@ -617,7 +621,7 @@ L.Control.Layermenu = L.Control.extend({
 
 		// remove active class
 		Wu.DomUtil.removeClass(layermenuItem.el, 'layer-active');
-		Wu.DomUtil.removeClass(layermenuItem.el, 'ct8');
+		// Wu.DomUtil.removeClass(layermenuItem.el, 'ct8');
 	},
 
 	_getLayermenuItem : function (layerUuid) {
@@ -692,7 +696,7 @@ L.Control.Layermenu = L.Control.extend({
 			uuid 	: 'layerMenuItem-' + Wu.Util.guid(), // layermenu item uuid
 			layer   : layer.store.uuid, // layer uuid or _id
 			caption : layer.store.title, // caption/title in layermenu
-			pos     : 1, // position in menu
+			pos     : 0, // position in menu
 			zIndex  : 1,
 			opacity : 1,
 		}
@@ -717,7 +721,7 @@ L.Control.Layermenu = L.Control.extend({
 		var layer = layerItem.layer;
 
 		// create div
-		var className   = 'layer-menu-item-wrap ct5';
+		var className   = 'layer-menu-item-wrap';
 		if (!layer) className += ' menufolder';
 		var wrap 	= Wu.DomUtil.create('div', className);
 		var uuid 	= item.uuid;

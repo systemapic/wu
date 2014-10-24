@@ -8344,10 +8344,12 @@ L.Control = L.Class.extend({
 		var pos = this.getPosition(),
 		    corner = map._controlCorners[pos];
 
+
 		corner.removeChild(this._container);
 		this._map = null;
 
 		if (this.onRemove) {
+			console.log('onRemove');
 			this.onRemove(map);
 		}
 

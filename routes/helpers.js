@@ -25,6 +25,7 @@ var crypto      = require('crypto');
 var nodemailer  = require('nodemailer');
 var nodepath    = require('path');
 var gm 		= require('gm');
+var request 	= require('request');
 
 // superusers
 var superusers = [
@@ -38,6 +39,8 @@ var superusers = [
 var FILEFOLDER = '/var/www/data/files/';
 var IMAGEFOLDER = '/var/www/data/images/';
 var TEMPFOLDER = '/var/www/data/tmp/';
+var CARTOCSSFOLDER = '/var/www/data/cartocss/';
+// var REMOTECARTOCSSFOLDER = '/var/www/DATA/cartocss/'
 
 // default mapbox account
 var DEFAULTMAPBOX = {
@@ -55,10 +58,125 @@ module.exports = api = {
 	// #########################################
 	// ###  API: Create PDF Snapshot         ###
 	// #########################################
-	createPDFSnapshot : function (req, res) {
-		console.log('cretae PDF snapshot');
+	getCartoCSS : function (req, res) {
+		var cartoId = req.body.cartoid;
+		var path = CARTOCSSFOLDER + cartoId + '.mss';
+		fs.readFile(path, {encoding : 'utf8'}, function (err, data) {
+			res.end(data);
+		});
+	},
+
+
+
+	// #########################################
+	// ###  API: Create PDF Snapshot         ###
+	// #########################################
+	setCartoCSS : function (req, res) {
+		console.log('setCartoCSS');
 		console.log('body: ', req.body);
-		console.log('hash: ', req.body.hash);
+
+		// get params
+		var fileUuid 	= req.body.fileUuid;
+		var css 	= req.body.css;
+		var cartoid 	= req.body.cartoid;
+
+		// set path
+		var csspath 	= CARTOCSSFOLDER + cartoid + '.mss';
+
+
+		console.log('vars: ', fileUuid, cartoid, csspath, css);
+
+		// save css to file by cartoId 
+		fs.writeFile(csspath, css, {encoding : 'utf8'}, function (err) {
+			console.log('err?', err);
+		
+
+
+
+			// send to tileserver storage
+			request({
+				method : 'POST',
+				uri : 'http://78.46.107.15:8080/import/cartocss',
+				json : {
+					css : css,
+					cartoid : cartoid
+				}
+			}, 
+
+			// callback
+			function (err, response, body) {
+				console.log('err: ', err);
+				// console.log('response: ', response);
+				// console.log('resp bugfer: ', response.body.toString());
+				console.log('body: ', body);
+		        	
+				// var result = JSON.parse(body);
+
+				// console.log('result:', result);
+				// var result = JSON.parse(body);
+				if (err) {
+					console.log('caught error....');
+		        		return res.end(JSON.stringify({
+		        			ok : false,
+		        			error : err
+		        		}));
+
+				}
+
+
+		        	if (!body.ok) {
+		        		console.log('caught error....');
+		        		return res.end(JSON.stringify({
+		        			ok : false,
+		        			error : body.error
+		        		}));
+		        	}
+
+
+		        	if (!err && response.statusCode == 200) {
+		        		console.log(body)
+
+
+		        		// save ID to file object (as active css)
+					Layers
+					.findOne({file : fileUuid})
+					.exec(function (err, layer) {
+
+						layer.data.cartoid = cartoid;
+						layer.markModified('data');
+						layer.save(function (err, doc) {
+							if (err) console.log('err: ', err);
+							
+							res.end(JSON.stringify({
+				        			ok : true,
+				        			error : null			// todo: save err
+				        		}));
+
+						});
+
+					});
+
+		        	}
+
+
+
+			});
+
+		});
+
+	},
+
+
+
+
+
+	// #########################################
+	// ###  API: Create PDF Snapshot         ###
+	// #########################################
+	createPDFSnapshot : function (req, res) {
+		// console.log('cretae PDF snapshot');
+		// console.log('body: ', req.body);
+		// console.log('hash: ', req.body.hash);
 
 
 		// run phantomjs cmd	
@@ -88,10 +206,10 @@ module.exports = api = {
 			path : path
 		}
 
-		console.log('-> args: ', args);
+		// console.log('-> args: ', args);
 
 		var cmd = "phantomjs /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
-		console.log('cmd: ', cmd);
+		// console.log('cmd: ', cmd);
 
 
 		var ops = [];
@@ -116,10 +234,10 @@ module.exports = api = {
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
 
-				console.log('executed phantomJS');
-				console.log('err: ', err);
-				console.log('stdout: ', stdout);
-				console.log('stdin: ', stdin);
+				// console.log('executed phantomJS');
+				// console.log('err: ', err);
+				// console.log('stdout: ', stdout);
+				// console.log('stdin: ', stdin);
 
 				callback(err);
 			});
@@ -131,7 +249,7 @@ module.exports = api = {
 
 			
 			fs.stat(path, function (err, stats) {
-				console.log('err: ', err);
+				// console.log('err: ', err);
 				dataSize = stats.size;
 	 			callback(err);
 	 		});
@@ -157,7 +275,7 @@ module.exports = api = {
 
 			f.save(function (err, doc) {
 				if (err) console.log('File err: ', err);
-				console.log('File saved: ', doc);
+				// console.log('File saved: ', doc);
 
 				callback(err, doc);
 			});
@@ -167,8 +285,8 @@ module.exports = api = {
 
 
 		async.series(ops, function (err, results) {
-			console.log('all done: ', err);
-			console.log('results', results);
+			// console.log('all done: ', err);
+			// console.log('results', results);
 
 			res.end(JSON.stringify({
 				pdf : fileUuid,
@@ -183,9 +301,9 @@ module.exports = api = {
 	// #########################################
 	createSnapshot : function (req, res) {
 
-		console.log('cretae snapshot');
-		console.log('body: ', req.body);
-		console.log('hash: ', req.body.hash);
+		// console.log('cretae snapshot');
+		// console.log('body: ', req.body);
+		// console.log('hash: ', req.body.hash);
 
 
 		// run phantomjs cmd	
@@ -214,10 +332,10 @@ module.exports = api = {
 			path : path
 		}
 
-		console.log('-> args: ', args);
+		// console.log('-> args: ', args);
 
 		var cmd = "phantomjs /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
-		console.log('cmd: ', cmd);
+		// console.log('cmd: ', cmd);
 
 
 		var ops = [];
@@ -229,10 +347,10 @@ module.exports = api = {
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
 
-				console.log('executed phantomJS');
-				console.log('err: ', err);
-				console.log('stdout: ', stdout);
-				console.log('stdin: ', stdin);
+				// console.log('executed phantomJS');
+				// console.log('err: ', err);
+				// console.log('stdout: ', stdout);
+				// console.log('stdin: ', stdin);
 
 				callback(err);
 			});
@@ -268,7 +386,7 @@ module.exports = api = {
 
 			f.save(function (err, doc) {
 				if (err) console.log('File err: ', err);
-				console.log('File saved: ', doc);
+				// console.log('File saved: ', doc);
 
 				callback(err, doc);
 			});
@@ -278,8 +396,8 @@ module.exports = api = {
 
 
 		async.series(ops, function (err, results) {
-			console.log('all done: ', err);
-			console.log('results', results);
+			// console.log('all done: ', err);
+			// console.log('results', results);
 
 			var file = results[2]
 
@@ -299,9 +417,9 @@ module.exports = api = {
 	createProject : function (req, res) {
 
 
-		console.log('________________');
-		console.log('API: createProject');
-		console.log('_________________');
+		// console.log('________________');
+		// console.log('API: createProject');
+		// console.log('_________________');
 
 		var json = req.body;
 		var user = req.user;
@@ -379,7 +497,7 @@ module.exports = api = {
 
 
 	_returnProject : function (req, res, project, error) {
-		console.log('return project', project, error);
+		// console.log('return project', project, error);
 		if (error) throw error;
 
 		Project
@@ -388,8 +506,8 @@ module.exports = api = {
 		.populate('layers')
 		.exec(function (err, project) {
 			if (err) console.error(err);
-			console.log('err?: ', err);
-			console.log('reutnring project to client: ', project);
+			// console.log('err?: ', err);
+			// console.log('reutnring project to client: ', project);
 			res.end(JSON.stringify({
 				error : err,
 				project: project}
@@ -407,12 +525,12 @@ module.exports = api = {
 		var accessToken = req.body.accessToken;
 		var userUuid 	= req.user.uuid;
 
-		console.log('______________________')
-		console.log('API: getMapboxAccount ');
-		console.log('     username: ', username);
-		console.log('     project', projectUuid);
-		console.log('     token: ', accessToken);
-		console.log('______________________')
+		// console.log('______________________')
+		// console.log('API: getMapboxAccount ');
+		// console.log('     username: ', username);
+		// console.log('     project', projectUuid);
+		// console.log('     token: ', accessToken);
+		// console.log('______________________')
 
 
 
@@ -423,7 +541,7 @@ module.exports = api = {
 		.exec(function (err, project) {
 
 			if (_.find(project.connectedAccounts.mapbox, function (m) { return m == username; })) {
-				console.log(username + ' already connected!');
+				// console.log(username + ' already connected!');
 				// already existing
 				// return res.end(JSON.stringify({
 				// 	error : 'Account already connected.'
@@ -478,7 +596,7 @@ module.exports = api = {
 		async.waterfall(ops, function (err, project) {
 
 			if (err) {
-				console.log('ERROR: ', err);
+				// console.log('ERROR: ', err);
 				return callback(req, res, project, err);
 			}
 
@@ -492,16 +610,16 @@ module.exports = api = {
 	// send request to mapbox
 	requestMapboxAccount : function (project, username, accessToken, callback) {
 		
-		console.log('______________________')
-		console.log('API: requestMapboxAccount ');
-		console.log('     username: ', username);
-		console.log('     project', project.uuid);
-		console.log('     accessToken : ', accessToken);
-		console.log('______________________')
+		// console.log('______________________')
+		// console.log('API: requestMapboxAccount ');
+		// console.log('     username: ', username);
+		// console.log('     project', project.uuid);
+		// console.log('     accessToken : ', accessToken);
+		// console.log('______________________')
 
 		// mapbox url
 		var url = 'https://api.tiles.mapbox.com/v3/' + username + '/maps.json?secure=1&access_token=' + accessToken; 
-		console.log('url: ', url);
+		// console.log('url: ', url);
 
 		// send request to mapbox
 		request(url, function (error, response, body) {
@@ -599,7 +717,7 @@ module.exports = api = {
 				user.role.manager.projects.addToSet(projectUuid);
 				user.markModified('role');
 				user.save(function (err, res) {
-					console.log('addProjectToSuperadmins OK: ' + projectUuid);
+					// console.log('addProjectToSuperadmins OK: ' + projectUuid);
 				});
 			});
 		});
@@ -612,8 +730,8 @@ module.exports = api = {
 	// #########################################
 	createLayer : function (req, res) {
 
-		console.log('API: createLayer:');
-		console.log('req.body: ', req.body);
+		// console.log('API: createLayer:');
+		// console.log('req.body: ', req.body);
 
 		var layerType = req.body.layerType;
 
@@ -629,7 +747,7 @@ module.exports = api = {
 	},
 
 	createLayerFromGeoJSON : function (req, res) {
-		console.log('createLayerFromGeoJSON');
+		// console.log('createLayerFromGeoJSON');
 
 		var geojson = req.body.geojson;
 		var projectUuid = req.body.project;
@@ -639,7 +757,7 @@ module.exports = api = {
 		var data = JSON.stringify(geojson);
 		var size = data.length;
 
-		console.log('size: ', size);
+		// console.log('size: ', size);
 
 		fs.writeFile(outfile, data, function (err) {
 			if (err) console.log('write err: ', err);
@@ -681,7 +799,7 @@ module.exports = api = {
 		var clientUuid 	= req.body.clientUuid;
 		var projectUuid = req.body.projectUuid;
 
-		console.log('deleteProject: ', req.body);
+		// console.log('deleteProject: ', req.body);
 
 		// find project (async)
 		var model = Project.findOne({ uuid : projectUuid });
@@ -696,8 +814,8 @@ module.exports = api = {
 
 			// remove project
 			model.remove(function (err, result) {
-				console.log('Removed project ' + project.name);
-				console.log(err, result);
+				// console.log('Removed project ' + project.name);
+				// console.log(err, result);
 			
 				// todo!!! remove from users 
 				api.removeProjectFromEveryone(project.uuid);

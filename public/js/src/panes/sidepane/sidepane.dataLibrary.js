@@ -9,6 +9,40 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// create new fullscreen page, and set as default content
 		this._content = Wu.DomUtil.create('div', 'data-library ct1', Wu.app._appPane);
 		
+		// Button controller
+		this._controlContainer = Wu.DomUtil.create('div', 'datalibrary-controls', this._content);	
+		this._controlInner = Wu.DomUtil.create('div', 'datalibrary-controls-inner', this._controlContainer);
+
+		// Upload button
+		this._uploadContainer = Wu.DomUtil.createId('div', 'upload-container', this._controlInner);
+		Wu.DomUtil.addClass(this._uploadContainer, 'smap-button-gray ct17');
+		this._uploadContainer.innerHTML = "Upload";
+
+		// Search field
+		this._search = Wu.DomUtil.createId('input', 'datalibrary-search', this._controlInner);
+		Wu.DomUtil.addClass(this._search, 'search ct17');
+		this._search.setAttribute('type', 'text');
+		this._search.setAttribute('placeholder', 'Search files');
+
+		// Delete button
+		this._delete = Wu.DomUtil.createId('div', 'datalibrary-delete-file', this._controlInner);
+		Wu.DomUtil.addClass(this._delete, 'smap-button-gray');
+		this._delete.innerHTML = "Delete";
+
+		// Download button
+		this._download = Wu.DomUtil.createId('div', 'datalibrary-download-files', this._controlInner);
+		Wu.DomUtil.addClass(this._download, 'smap-button-gray');
+		this._download.innerHTML = "Download";		
+
+		// Download button
+		this._errors = Wu.DomUtil.createId('div', 'datalibrary-errors', this._controlInner);
+		Wu.DomUtil.addClass(this._download, 'smap-button-gray');
+		
+
+
+
+
+
 		// create container (overwrite default)
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct1', this._content);
 
@@ -545,8 +579,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		}, this);
 		
-		// refresh sidepane
-		this.project.refreshSidepane();
+		
 
 		// if created layer, add to map 
 		if (options.autoAdd) {
@@ -563,6 +596,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			}, this);
 
 		}
+
+		// refresh sidepane
+		this.project.refreshSidepane();
+
+		// refresh cartoCssControl
+		var cartoCss = app.MapPane.cartoCss;
+		if (cartoCss) cartoCss.update();
 
 	},
 
@@ -742,6 +782,12 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		} else {
 			this.removeEditHooks();
 		}
+
+		// refresh cartoCssControl
+		var cartoCss = app.MapPane.cartoCss;
+		if (cartoCss) cartoCss.update();
+
+
 
 	},
 

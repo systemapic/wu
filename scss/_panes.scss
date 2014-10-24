@@ -220,6 +220,7 @@
 
 .client-title input {
 	padding: 0;
+	width: 150px;
 	background: transparent;
 	text-transform: uppercase;
 	font-size: 17px;
@@ -325,29 +326,21 @@
 	}
 
 .project-title {
-/*	position: absolute;
+	position: relative;
 	left: 10px;
-	top: 10px;
+	top: 6px;
 	font-size: 110%;
 	text-shadow: none;
 	font-weight: 500;
 	text-transform: uppercase;
-	line-height: 0.9;*/
-
-position: relative;
-left: 10px;
-top: 6px;
-font-size: 110%;
-text-shadow: none;
-font-weight: 500;
-text-transform: uppercase;
-line-height: 1;
-overflow: hidden;
-max-height: 30px;
-height: auto;
-width: 192px;
-display: inline-block;
-vertical-align: bottom;
+	line-height: 1;
+	overflow: hidden;
+	max-height: 30px;
+	min-height: 15px;
+	height: auto;
+	width: 192px;
+	display: inline-block;
+	vertical-align: bottom;
 	}
 
 .project-title input {
@@ -361,6 +354,8 @@ vertical-align: bottom;
 	line-height: 0.9;
 	padding: 0;
 	background-color: transparent;
+	width: 192px;
+	height: 100%;
 	}
 
 .project-description {
@@ -1092,6 +1087,10 @@ vertical-align: bottom;
 	overflow: auto;
 	}	
 
+.data-library .editor-wrapper {
+	padding-bottom: 50px;
+	}
+
 .fullpage-documents,
 .data-library,
 .fullpage-users {	
@@ -1452,6 +1451,7 @@ button.image-attachment {
 /* To make progress bar visible */
 .data-library {
 	overflow: visible !important;
+	padding-bottom: 155px;
 	}
 
 /* outer wrapper */
@@ -1517,12 +1517,48 @@ button.image-attachment {
 /* Controls wrapper (with upload, search field, etc) */
 .datalibrary-controls,
 .users-controls {
-	height: 42px;
+/*	height: 42px;
 	position: relative;
 	border-bottom: 1px solid;
 	margin-bottom: 20px;
 	color: #666;
+*/
+
+height: 60px;
+position: relative;
+border-bottom: 1px solid;
+color: #666;
+top: 1px;
+width: 100%;
+padding-right: 129px;
+left: 0px;
+z-index: 999;
+padding-left: 20px;
+padding-top: 15px;
+box-sizing: border-box;
 	}
+
+.users-controls {
+background: #ebedef;		
+}	
+
+.users-controls-inner div {
+	margin-right: 5px;
+}
+
+.datalibrary-controls-inner {
+position: absolute;
+top: 0;
+width: 100%;
+height: 100%;
+left: 0;
+background: #ebedef;	
+padding: 16px;
+}
+
+#datalibrary-search {
+	margin-left: 5px;
+}
 
 /* Delete file button */
 #datalibrary-delete-file {
@@ -1770,6 +1806,8 @@ button.image-attachment {
 	/*padding-right: 84px;*/
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
+
+	padding-bottom: 155px;
 	}
 	
 /* inner wrapper */
