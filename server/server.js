@@ -13,6 +13,7 @@ var compress = require('compression')
 var favicon  = require('serve-favicon');
 
 var configDB = require('../config/database.js');
+var cors = require('cors');
 
 // configuration ===============================================================
 mongoose.connect(configDB.url); // connect to our database
@@ -37,6 +38,8 @@ app.configure(function() {
 
 	// enable compression
 	app.use(compress());
+
+	app.use(cors());
 	
 
 	// static files

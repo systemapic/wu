@@ -103,6 +103,12 @@ Wu.Layer = Wu.Class.extend({
 		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
 	},
 
+	getMeta : function () {
+		var metajson = this.store.metadata;
+		if (metajson) return JSON.parse(metajson);
+		return false;
+	},
+
 
 	hide : function () {
 		var container = this.getContainer();
@@ -130,6 +136,241 @@ Wu.Layer = Wu.Class.extend({
 	}
 
 });
+
+
+
+
+
+
+
+
+
+
+Wu.RasterLayer = Wu.Layer.extend({
+
+	type : 'rasterLayer',
+
+});
+
+
+Wu.CartoCSSLayer = Wu.Layer.extend({
+
+	initLayer : function () {
+
+		this.update();
+		console.log('meta: ', this.getMeta());
+	},
+
+
+	add : function (map) {
+
+		this.addTo(map);
+	
+	},
+
+	addTo : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		this.layer.addTo(map);
+
+		// add gridLayer if available
+		if (this.gridLayer) {
+			// this.gridLayer.addTo(map);
+			map.addLayer(this.gridLayer);
+			// map.addControl(L.mapbox.gridControl(this.gridLayer));
+		}
+
+	},
+
+	remove : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		map.removeLayer(this.layer);
+
+		// remove gridLayer if available
+		if (this.gridLayer) {
+			map.removeLayer(this.gridLayer);
+			// map.removeControl(L.mapbox.gridControl(this.gridLayer));  
+		} 
+	},
+
+
+	update : function () {
+
+		var map = app._map;
+
+		if (this.layer) {
+			map.removeLayer(this.layer);
+
+		}
+
+
+		var fileUuid = this.store.file;	// file id of geojson
+		var cartoid = this.store.data.cartoid || 'cartoid';
+
+
+		// tile server ip
+		var tileServer = app.options.servers.carto;
+
+		// tile url
+		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png';
+
+		
+		// add vector tile raster layer
+		this.layer = L.tileLayer(url, {
+			fileUuid: fileUuid,
+			cartoid : cartoid
+		});
+
+		
+
+		// add gridlayer
+		this.gridLayer = new L.UtfGrid('http://{s}.systemapic.com:8080/utfgrid/' + fileUuid + '/{z}/{x}/{y}.grid.json', {
+			
+			useJsonP: false,
+			
+		});
+
+		// add popup event
+		this.gridLayer.on('click', function(e) {
+			if (!e.data) return;
+
+			// open popup
+		 	this.openPopup(e.data, e.latlng);
+
+		}, this);
+
+	},
+
+	updateStyle : function () {
+		
+		// this.layer.redraw();
+		this.update();
+
+		var map = app._map;
+		this.addTo(map);
+	},
+
+
+	openPopup : function (data, latlng) {
+
+		console.log('open pup');
+		var map = app._map;
+		var content = this._popupContent(data);
+
+
+		// create popup
+		this.popup = L.popup({
+			offset : [18, 0],
+			closeButton : true,
+			zoomAnimation : false,
+			maxWidth : 400,
+			minWidth : 200,
+			maxHeight : 350
+		});
+
+		
+		// set content
+		this.popup.setContent(content);
+		this.popup.setLatLng(latlng);
+		this.popup.openOn(map);
+		
+		
+	},
+
+	_popupContent : function (data) {
+		// create content
+		var string = '';
+		for (key in data) {
+			var value = data[key];
+			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
+				string += key + ': ' + value + '<br>';
+			}
+		}
+
+		return string;
+	},
+
+})
+
+
+
+
+Wu.MapboxLayer = Wu.Layer.extend({
+
+	type : 'mapboxLayer',
+	
+	initLayer : function () {
+		
+		// get access token
+
+		// create Leaflet.mapbox tileLayer
+		this.layer = L.mapbox.tileLayer(this.store.data.mapbox, {
+			accessToken : this.store.accessToken
+		});
+
+		// create gridLayer if available
+		if ('grids' in this.store) this.gridLayer = L.mapbox.gridLayer(this.store.data.mapbox);
+
+		this.loaded = true;
+		
+	},
+
+	add : function (map) {
+		this.addTo(map);
+	},
+
+	addTo : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		this.layer.addTo(map);
+
+		// add gridLayer if available
+		if (this.gridLayer) this.gridLayer.addTo(map);
+
+	},
+
+	remove : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		map.removeLayer(this.layer);
+
+		// remove gridLayer if available
+		if (this.gridLayer) map.removeLayer(this.gridLayer);   
+	},
+
+
+});
+
+
+Wu.CartodbLayer = Wu.Layer.extend({
+
+});
+
+
+// shorthand for creating all kinds of layers
+Wu.createLayer = function (layer) {
+
+	// mapbox
+	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
+
+	// geojson
+	// if (layer.data.geojson) return new Wu.GeojsonLayer(layer);
+	if (layer.data.geojson) return new Wu.CartoCSSLayer(layer);
+	
+	// geojson
+	if (layer.data.topojson) return new Wu.TopojsonLayer(layer);
+
+	// raster
+	if (layer.data.raster) {
+		// todo
+	}
+}
+
 
 
 
@@ -690,175 +931,3 @@ L.topoJson = function (json, options) {
 // };
 
 
-
-
-
-Wu.RasterLayer = Wu.Layer.extend({
-
-	type : 'rasterLayer',
-
-});
-
-
-Wu.CartoCSSLayer = Wu.Layer.extend({
-
-	initLayer : function () {
-
-		this.update();
-	},
-
-
-	add : function (map) {
-		this.addTo(map);
-	},
-
-	addTo : function (map) {
-		var map = map || Wu.app._map;
-
-		// leaflet fn
-		this.layer.addTo(map);
-
-		// add gridLayer if available
-		if (this.gridLayer) this.gridLayer.addTo(map);
-
-	},
-
-	remove : function (map) {
-		var map = map || Wu.app._map;
-
-		// leaflet fn
-		map.removeLayer(this.layer);
-
-		// remove gridLayer if available
-		if (this.gridLayer) map.removeLayer(this.gridLayer);   
-	},
-
-
-	update : function () {
-
-		var map = app._map;
-
-		if (this.layer) {
-			console.log('REMOVEING L:AYER!!');
-			map.removeLayer(this.layer);
-
-		}
-
-		console.log('CartoCSSLayer.initLayer');
-
-		var fileUuid = this.store.file;	// file id of geojson
-		// var cartoId = this.store.data.css.id;
-		var cartoid = this.store.data.cartoid || 'cartoid';
-
-		console.log('CARTOID 11 :::::::', cartoid);
-
-		// tile server ip
-		var tileServer = app.options.servers.carto;
-
-		// tile url
-		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png';
-
-		console.log('url: ', url);
-
-
-		console.log('___________ creating new layer!!!');
-
-		// custom raster layer
-		this.layer = L.tileLayer(url, {
-			fileUuid: fileUuid,
-			cartoid : cartoid
-		});
-
-		console.log('this.layer');
-
-
-
-
-	},
-
-	updateStyle : function () {
-		
-		// this.layer.redraw();
-		this.update();
-
-		var map = app._map;
-		this.addTo(map);
-	},
-
-})
-
-
-
-
-Wu.MapboxLayer = Wu.Layer.extend({
-
-	type : 'mapboxLayer',
-	
-	initLayer : function () {
-		
-		// get access token
-
-		// create Leaflet.mapbox tileLayer
-		this.layer = L.mapbox.tileLayer(this.store.data.mapbox, {
-			accessToken : this.store.accessToken
-		});
-
-		// create gridLayer if available
-		if ('grids' in this.store) this.gridLayer = L.mapbox.gridLayer(this.store.data.mapbox);
-
-		this.loaded = true;
-		
-	},
-
-	add : function (map) {
-		this.addTo(map);
-	},
-
-	addTo : function (map) {
-		var map = map || Wu.app._map;
-
-		// leaflet fn
-		this.layer.addTo(map);
-
-		// add gridLayer if available
-		if (this.gridLayer) this.gridLayer.addTo(map);
-
-	},
-
-	remove : function (map) {
-		var map = map || Wu.app._map;
-
-		// leaflet fn
-		map.removeLayer(this.layer);
-
-		// remove gridLayer if available
-		if (this.gridLayer) map.removeLayer(this.gridLayer);   
-	},
-
-
-});
-
-
-Wu.CartodbLayer = Wu.Layer.extend({
-
-});
-
-
-// shorthand for creating all kinds of layers
-Wu.createLayer = function (layer) {
-
-	// mapbox
-	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
-
-	// geojson
-	// if (layer.data.geojson) return new Wu.GeojsonLayer(layer);
-	if (layer.data.geojson) return new Wu.CartoCSSLayer(layer);
-	
-	// geojson
-	if (layer.data.topojson) return new Wu.TopojsonLayer(layer);
-
-	// raster
-	if (layer.data.raster) {
-		// todo
-	}
-}

@@ -643,6 +643,9 @@ module.exports = upload = {
 				layer.data.geojson 	= l.data.geojson;		// geojson-adlskmdsl-adsdsd.geojson
 				layer.file 		= l.uuid;
 
+				console.log('====> l: ', l);
+				if (l.metadata) layer.metadata = l.metadata;
+
 				Layer.create(layer, function (err, doc) {
 					// console.log('Saved layer!', doc);
 					done.layers.push(doc);

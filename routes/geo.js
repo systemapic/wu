@@ -7,6 +7,7 @@ var fspath = require('path');
 var _ = require('lodash-node');
 var tj = require('togeojson');	// kml to geojson
 var jsdom = require('jsdom').jsdom;
+var mapnikOmnivore = require('mapnik-omnivore');
 
 // models
 var File = require('../models/file');
@@ -43,7 +44,7 @@ module.exports = geo = {
 		// var currentPath = '';
 
 		var remotePath = TILESERVER + fileUuid + '.geojson';
-		var reprojectedPath = currentPath + '.EPSG3857';
+		// var reprojectedPath = currentPath + '.EPSG3857';
 
 		
 		var ops = [];
@@ -137,6 +138,30 @@ module.exports = geo = {
 
 		});
 
+
+
+		// ops.push(function (callback) {
+
+
+
+
+		// 	// mapnikOmnivore.digest(currentPath, function(err, metadata){
+		// 	// 	if(err) return callback(err);
+				
+		// 	// 	console.log('Metadata returned!');
+		// 	// 	console.log(metadata);
+
+		// 	// 	var metastring = JSON.stringify(metadata);
+
+
+
+
+		// 	// });
+
+
+
+		// })
+
 		async.series(ops, function (err, results) {
 
 			console.log('async done!!');
@@ -199,7 +224,7 @@ module.exports = geo = {
 			if (!err) geo.mirrorToTileserver(entry, toFile);
 
 			// add unique id to features
-			geo.addUniqueGeojsonProperties(toFile, function (err) {
+			geo.addUniqueGeojsonProperties(toFile, entry, function (err) {
 				
 				// return
 				callback(null, entry);
@@ -249,7 +274,7 @@ module.exports = geo = {
 			if (!err) geo.mirrorToTileserver(entry, toPath);
 
 			// add unique id to features
-			geo.addUniqueGeojsonProperties(toPath, function (err) {
+			geo.addUniqueGeojsonProperties(toPath, entry, function (err) {
 				
 				// return
 				callback(null, entry);
@@ -305,7 +330,7 @@ module.exports = geo = {
 			if (!err) geo.mirrorToTileserver(entry, toFile);
 
 			// add unique id to features
-			geo.addUniqueGeojsonProperties(toFile, function (err) {
+			geo.addUniqueGeojsonProperties(toFile, entry, function (err) {
 				
 				// return
 				callback(null, entry);
@@ -406,7 +431,7 @@ module.exports = geo = {
 
 			
 			// add unique id to features
-			geo.addUniqueGeojsonProperties(outFile, function (err) {
+			geo.addUniqueGeojsonProperties(outFile, entry, function (err) {
 				
 				// return
 				callback(null);
@@ -420,64 +445,91 @@ module.exports = geo = {
 		});
 	},
 
-	addUniqueGeojsonProperties : function (path, callback) {
+	addUniqueGeojsonProperties : function (path, entry, callback) {
 		// console.log('addUniqueGeojsonProperties', path);		// todo: remove _systemapic from exported shapes!
 
-		var data;
-		var ops = [];
 
-		ops.push(function (callback) {
-			fs.readFile(path, function (err, geojson) {
-				if (err) console.log('err: ', err);
-				if (geojson) {
-					data = JSON.parse(geojson);
-					data = geo._addUniqueProperty(data);
-				}
-				// done
-				callback(err);
-			});
+
+
+		console.log('omnivore path', path);
+
+		mapnikOmnivore.digest(path, function(err, metadata){
+			console.log('METADATA err', err);
+			if(err) return callback(err);
+			
+			console.log('Metadata returned!');
+			console.log(metadata);
+
+			var metastring = JSON.stringify(metadata);
+
+			entry.metadata = metastring;
+
+			callback(null);
+
+
 		});
 
-		ops.push(function (callback) {
-			var json = JSON.stringify(data);
-			fs.writeFile(path, json, function (err) {
-				if (err) throw err;
+
+		
+
+
+
+
+		// var data;
+		// var ops = [];
+
+		// ops.push(function (callback) {
+		// 	fs.readFile(path, function (err, geojson) {
+		// 		if (err) console.log('err: ', err);
+		// 		if (geojson) {
+		// 			data = JSON.parse(geojson);
+		// 			data = geo._addUniqueProperty(data);
+		// 		}
+		// 		// done
+		// 		callback(err);
+		// 	});
+		// });
+
+		// ops.push(function (callback) {
+		// 	var json = JSON.stringify(data);
+		// 	fs.writeFile(path, json, function (err) {
+		// 		if (err) throw err;
 				
-				// done
-				callback(err);
-			});
-		});
+		// 		// done
+		// 		callback(err);
+		// 	});
+		// });
 
-		async.series(ops, function (err) {
+		// async.series(ops, function (err) {
 
-			// console.log('addUniqueGeojsonProperties DONE!');
+		// 	// console.log('addUniqueGeojsonProperties DONE!');
 
-			// no callback, no point waiting for this
-			if (callback) callback(err);
-		});
+		// 	// no callback, no point waiting for this
+		// 	if (callback) callback(err);
+		// });
 
 	},
 
-	_addUniqueProperty : function (data) {
-		var features = data.features;
-		// console.log('_addUniqueProperty features: ', features);
-		// console.log('data: ', data);
+	// _addUniqueProperty : function (data) {
+	// 	var features = data.features;
+	// 	// console.log('_addUniqueProperty features: ', features);
+	// 	// console.log('data: ', data);
 		
-		// simple geojson (like drawn shapes)
-		if (features == undefined) {
-			if (data.hasOwnProperty('properties')) {
-				data.properties.__sid = uuid.v4();
-				console.log('__ data: ', data);
-			}
-			return data;
-		}
+	// 	// simple geojson (like drawn shapes)
+	// 	if (features == undefined) {
+	// 		if (data.hasOwnProperty('properties')) {
+	// 			data.properties.__sid = uuid.v4();
+	// 			console.log('__ data: ', data);
+	// 		}
+	// 		return data;
+	// 	}
 		
 
-		features.forEach(function (feature) {
-			feature.properties.__sid = uuid.v4();
-		});
-		return data;
-	},
+	// 	features.forEach(function (feature) {
+	// 		feature.properties.__sid = uuid.v4();
+	// 	});
+	// 	return data;
+	// },
 
 
 }

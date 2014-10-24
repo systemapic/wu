@@ -30,13 +30,25 @@ var layerSchema = mongoose.Schema({
 		mapbox 		: String,			// mapbox id: rawger.geography-class
 		cartodb 	: String,			// cartodb id: 
 		osm 		: String,			// osm id?
+
+		// attributes 	: [{
+		// 	type : String,	// int, string or whatever
+		// 	value : String 	// MAX_B_H, or whatever
+
+		// }],
+
+		// extent : [Integer, Integer, Integer, Integer]
 	}, 
+
+	metadata : String, // json string with loads of meta
 
 	// geojson styling
 	style : [{
 		__sid : String,	// systemapic id added to geojson features
 		style : String  // json of css style object
 	}],
+
+	
 
 	file : String 	// file uuid that layer is connected to, if any
 

@@ -8349,7 +8349,7 @@ L.Control = L.Class.extend({
 		this._map = null;
 
 		if (this.onRemove) {
-			console.log('onRemove');
+			console.log('onRemove generic');
 			this.onRemove(map);
 		}
 
