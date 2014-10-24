@@ -35,11 +35,13 @@ Wu.SidePane.Home = Wu.Class.extend({
 	},
 
 	toggle : function () {
+		
 		this.isOpen ? this.close() : this.open();
 	},
 
 	// open sidepane menu
 	open : function (e) {
+				
 		this.isOpen = true;
 		var sidepane = app.SidePane;
 		sidepane.expand();

@@ -33,6 +33,7 @@ var fileSchema = mongoose.Schema({
 		topojson   : String,
 		document   : String,		// also not needed??
 		other      : [String],		// also not needed??
+		// cartocss   : String,		// cartocss ID 
 
 		image : {
 			file : String, 

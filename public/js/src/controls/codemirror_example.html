@@ -1,0 +1,31 @@
+<style>
+.CodeMirror { 
+        height: auto; 
+        border: 1px solid #ddd;
+        width: 500px; 
+        }
+
+.CodeMirror-scroll { 
+        max-height: 200px; 
+        }
+
+.CodeMirror pre { 
+        padding-left: 7px; 
+        line-height: 1.25; 
+        }
+</style>
+
+
+<form style="position: relative; margin-top: .5em;">
+<textarea id="demotext"></textarea>
+</form>
+
+
+<!-- Create a simple CodeMirror instance -->
+<script>
+  var editor = CodeMirror.fromTextArea(demotext, {
+    lineNumbers: true,
+    mode: "css",
+    matchBrackets: true  
+  });
+</script>

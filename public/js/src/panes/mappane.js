@@ -115,6 +115,9 @@ Wu.MapPane = Wu.Class.extend({
 		// set header padding
 		this.setHeaderPadding();
 
+		// update controls
+		// this.updateControls();
+
 		// set controls css logic
 		this.updateControlCss();
 		
@@ -372,6 +375,9 @@ Wu.MapPane = Wu.Class.extend({
 
 
 	resetControls : function () {
+
+		console.log("------------> resetControls <------------------ ", this);
+
 		// remove old controls
 		delete this._drawControl;
 		delete this._drawControlLayer;
@@ -384,6 +390,16 @@ Wu.MapPane = Wu.Class.extend({
 		delete this.mousepositionControl;
 		delete this.baselayerToggle;
 		delete this.geolocationControl;
+
+		// remove carto
+		if (this.cartoCss) this.cartoCss.destroy();
+		delete this.cartoCss;
+	},
+
+	refreshControls : function () {
+
+
+
 	},
 
 	hideControls : function () {
@@ -431,7 +447,7 @@ Wu.MapPane = Wu.Class.extend({
 		this._map.scrollWheelZoom.disable();
 		this._map.boxZoom.disable();
 		this._map.keyboard.disable();
-		document.getElementsByClassName('leaflet-control-zoom')[0].style.visibility = 'hidden';
+		document.getElementsByClassName('leaflet-control-zoom')[0].style.display = 'none';
 	}, 
 
 	enableZoom : function () {
@@ -440,7 +456,7 @@ Wu.MapPane = Wu.Class.extend({
 		this._map.scrollWheelZoom.enable();
 		this._map.boxZoom.enable();
 		this._map.keyboard.enable();
-		document.getElementsByClassName('leaflet-control-zoom')[0].style.visibility = 'visible';
+		document.getElementsByClassName('leaflet-control-zoom')[0].style.display = 'block';
 	},
 
 	enableLegends : function () {
@@ -520,7 +536,6 @@ Wu.MapPane = Wu.Class.extend({
 			}
 		});
 
-		
 		// add to map
 		this.geolocationControl.addTo(this._map);
 	},
@@ -588,6 +603,40 @@ Wu.MapPane = Wu.Class.extend({
 		// update control with project
 		this.inspectControl.update();
 
+	},
+
+	enableCartocss : function () {
+
+		console.log('enable cartoCss');
+
+		console.log('******************************');
+		console.log('this.cartoCss', this.cartoCss);
+		console.log('******************************');
+
+
+		if (this.cartoCss) return;
+	
+		// create control
+		this.cartoCss = L.control.cartoCss({
+			position : 'topleft'
+		});
+
+		// add to map
+		this.cartoCss.addTo(this._map);
+
+		// update with latest
+		this.cartoCss.update();
+
+		return this.cartoCss;
+	},
+
+	disableCartocss : function () {
+		console.log('disable carto');
+
+		if (!this.cartoCss) return;
+
+		this._map.removeControl(this.cartoCss);
+		delete this.cartoCss;
 	},
 
 	disableInspect : function () {
@@ -673,6 +722,8 @@ Wu.MapPane = Wu.Class.extend({
 	enableDraw : function () {
 		if (this._drawControl) return;
 		
+		// cxxxx
+
 		// add draw control
 		this.addDrawControl();
 	},
@@ -745,7 +796,12 @@ Wu.MapPane = Wu.Class.extend({
 
 		// add drawControl
 		var drawControl = this._drawControl = new L.Control.Draw(options);
+
+		console.log('Add Draw Control');
+		console.log('OBS! Make sure that this ALWAYS loads at the bottom of the toolbar list! #askKnut')
+
 		map.addControl(drawControl);
+
 		
 		// add class
 		var container = drawControl._container;
@@ -754,6 +810,7 @@ Wu.MapPane = Wu.Class.extend({
 		// close popups on hover
 		Wu.DomEvent.on(drawControl, 'mousemove', L.DomEvent.stop, this);
 		Wu.DomEvent.on(drawControl, 'mouseover', map.closePopup, this);
+
 
 		var that = this;
 

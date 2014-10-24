@@ -140,8 +140,11 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
-	select : function () {	
- 
+	select : function () {
+
+		// console.log('************** set active **************');	
+ 		Wu.DomUtil.removeClass(Wu.app._headerPane, 'displayNone');
+
 		// set as active
 		app.activeProject = this;
 
@@ -316,6 +319,10 @@ Wu.Project = Wu.Class.extend({
 		return this.store.uuid;
 	},
 
+	getLastUpdated : function () {
+		return this.store.lastUpdated;
+	},
+
 	getClient : function () {
 		return app.Clients[this.store.client];
 	},
@@ -338,8 +345,34 @@ Wu.Project = Wu.Class.extend({
 		return _.toArray(this.layers);
 	},
 
+	getActiveLayers : function () {
+		// get all active layers
+		var base = this.getBaselayers();
+		var lm = this.getLayermenuLayers();
+		var all = base.concat(lm);
+		var layers = [];
+		all.forEach(function (a) {
+			if (!a.folder) {
+				var id = a.layer || a.uuid;
+				var layer = this.layers[id];
+				layers.push(layer);
+			}
+		}, this);
+		return layers;
+	},
+
 	getLayer : function (uuid) {
 		return this.layers[uuid];
+	},
+
+	getStylableLayers : function () {
+		// get active baselayers and layermenulayers that are editable (geojson)
+		var all = this.getActiveLayers();
+		var cartoLayers = _.filter(all, function (l) {
+
+			if (l) return l.store.data.hasOwnProperty('geojson');
+		});
+		return cartoLayers;
 	},
 
 	getLayerFromFile : function (fileUuid) {
@@ -352,6 +385,12 @@ Wu.Project = Wu.Class.extend({
 		return this.store.files;
 	},
 
+	getFile : function (fileUuid) {
+		var file = _.find(this.store.files, function (f) {
+			return f.uuid == fileUuid;
+		});
+		return file;
+	},
 
 	getBounds : function () {
 		var bounds = this.store.bounds;
@@ -660,6 +699,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	refreshSettings : function () {
+		console.log('_________ settings', this.getSettings());
 		for (setting in this.getSettings()) {
 			this.getSettings()[setting] ? this['enable' + setting.camelize()]() : this['disable' + setting.camelize()]();
 		}

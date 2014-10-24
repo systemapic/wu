@@ -42,6 +42,7 @@ Wu.App = Wu.Class.extend({
 			// not used, using window url atm..
 			portal : 'http://85.10.202.87:8080/',	// api
 			raster : 'http://85.10.202.87:8003/',	// raster tile server
+			carto  : 'http://78.46.107.15:8080/raster/', 	// cartocss raster tile server
 			vector : '',				// vector tile server
 			socket : ''				// websocket server
 		},
@@ -181,14 +182,16 @@ Wu.App = Wu.Class.extend({
 		// render map pane
 		this.MapPane = new Wu.MapPane();
 
+		
 	},
 
 	// init default view on page-load
 	_initView : function () {
 
+
 		// check location
 		if (this._initLocation()) return;
-
+			
 		// runs hotlink
 		if (this._initHotlink()) return;
 
@@ -199,11 +202,15 @@ Wu.App = Wu.Class.extend({
 		var user = app.Account;
 		if (user.isAdmin() || user.isSuperadmin() || user.isManager()) {
 			// set panes 
-			this.SidePane.refresh(['Clients', 'Users']);
+			this.SidePane.refresh(['Clients', 'Users']);		
 		}
 
-	},
+		// render Start pane?
+		this.StartPane = new Wu.StartPane({
+			projects : this.Projects
+		});
 
+	},
 
 	_lonelyProject : function () {
 		// check if only one project, 

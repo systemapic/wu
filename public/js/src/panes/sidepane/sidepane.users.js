@@ -10,6 +10,38 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// create new fullscreen page, and set as default content
 		this._content = Wu.DomUtil.create('div', 'fullpage-users', Wu.app._appPane);
 		
+
+		// Users Control
+		this._usersControls = Wu.DomUtil.create('div', 'users-controls', this._content);
+		this._usersControlsInner = Wu.DomUtil.create('div', 'users-controls-inner', this._usersControls);
+
+		// Add user button
+		this._addUser = Wu.DomUtil.createId('div', 'users-add-user', this._usersControlsInner);
+		Wu.DomUtil.addClass(this._addUser, 'smap-button-gray users');
+		this._addUser.innerHTML = 'Create user';
+
+		// Delete user button
+		this._delUser = Wu.DomUtil.createId('div', 'users-delete-user', this._usersControlsInner);
+		Wu.DomUtil.addClass(this._delUser, 'smap-button-gray users');
+		this._delUser.innerHTML = 'Delete user';
+
+		// Search users
+		this._searchUser = Wu.DomUtil.createId('input', 'users-search', this._usersControlsInner);
+		Wu.DomUtil.addClass(this._searchUser, 'search ct17');
+		this._searchUser.setAttribute("type", "text");
+		this._searchUser.setAttribute("placeholder", "Search users");
+
+
+						// <div class="users-controls">
+												
+						// 		<div id="users-add-user" class="smap-button-gray users">Create user</div>
+						// 		<div id="users-delete-user" class="smap-button-gray users">Delete user</div>
+								
+						// 		<input type="text" id="users-search" class="search ct17" placeholder="Search users" />
+															
+						// </div>
+
+
 		// create container (overwrite default) and insert template
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content, ich.usersPane());
 

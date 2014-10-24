@@ -421,7 +421,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		}, 200);	
 	},
 
-	toggle : function () {
+	toggle : function () {				
 		this._isOpen ? this.close() : this.open();
 	},
 

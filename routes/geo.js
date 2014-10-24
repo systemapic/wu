@@ -19,9 +19,134 @@ var crunch = require('../routes/crunch');
 
 // global paths
 var FILEFOLDER = '/var/www/data/files/';
+var TILESERVER = '/var/www/DATA/geojson/';
 
+var TILESERVERIP = 'http://78.46.107.15:8080/';
 
 module.exports = geo = { 
+
+	
+
+
+	// send file to tileserver,
+	// only geojson files
+	mirrorToTileserver : function (entry, currentPath) {
+
+		console.log('mirrorToTileserver');
+
+
+		console.log('entry: ', entry);
+		console.log('currentPath', currentPath);
+
+		var fileUuid = entry.uuid;
+
+		// var currentPath = '';
+
+		var remotePath = TILESERVER + fileUuid + '.geojson';
+		var reprojectedPath = currentPath + '.EPSG3857';
+
+		
+		var ops = [];
+
+		// ops.push(function (callback) {
+
+		// 	// re-project to google
+		// 	var cmd = 'ogr2ogr -s_srs EPSG:4269 -t_srs EPSG:3857 -f geoJSON "' + reprojectedPath + '" "' + currentPath + '"';
+		// 	var exec = require('child_process').exec;
+		// 	exec(cmd, function (err, stdout, stdin) {
+
+		// 		console.log('_________ _ _ _ _ _ _ _ _ _ _ __ _ _ _ _ _ _ _ reproejcted!!!');
+		// 		console.log(reprojectedPath);
+		// 		callback(err);
+
+		// 	});
+
+		// });
+		
+		
+		ops.push(function (callback) {
+
+
+
+			fs.readJson(currentPath, function (err, data) {
+				if (err) throw err;
+				console.log('readJson: ', data);
+
+
+
+
+
+				var request = require('request');
+
+
+				request({
+					method : 'POST',
+					uri : 'http://78.46.107.15:8080/import/geojson',
+					json : {
+						geojson : data,
+						uuid : fileUuid,
+						layerName : 'layer'
+					}
+
+
+				}, function (err, response, body) {
+					console.log('request: ', err);
+			        	if (!err && response.statusCode == 200) {
+			        		console.log(body)
+			        	}
+				});
+
+
+				// request.post(TILESERVERIP + 'import/vtile', { 
+				// 		form: { 
+				//     			uuid : fileUuid, 
+				//     			geojson : data,
+				//     			layerName : 'testing'
+				//     		} 
+				// 	},
+				    
+				// 	function (error, response, body) {
+				// 		console.log('request: ', error, response);
+				//         	if (!error && response.statusCode == 200) {
+				//         		console.log(body)
+				//         	}
+				//     }
+				// );
+
+
+
+
+			});
+
+
+			
+
+			// // scp file to tileserver
+			// // var cmd = scp -C ERI_adm.zip.geojson tx:/var/www/DATA/eri.geojson
+			// var cmd = 'scp -C ' + reprojectedPath + ' tx:' + remotePath;
+
+			// console.log('cmd: ', cmd);
+
+			// var exec = require('child_process').exec;
+			// exec(cmd, function (err, stdout, stdin) {
+
+			// 	console.log('scp done!', err, stdout, stdin);
+			// 	callback(err);
+
+			// });
+
+		});
+
+		async.series(ops, function (err, results) {
+
+			console.log('async done!!');
+
+		});
+		
+
+
+
+	},
 
 	
 	processShapefile : function (entry, callback) {
@@ -39,6 +164,7 @@ module.exports = geo = {
 
 		async.series(ops, function (err) {
 			if (err) console.error('processShapefile err: ', err);
+
 			callback(null, entry);	// dont pass err
 		});
 
@@ -69,6 +195,9 @@ module.exports = geo = {
 			entry.type = 'layer';
 			entry.title = entry.originalFilename;
 
+			// mirror to tileserver
+			if (!err) geo.mirrorToTileserver(entry, toFile);
+
 			// add unique id to features
 			geo.addUniqueGeojsonProperties(toFile, function (err) {
 				
@@ -84,22 +213,24 @@ module.exports = geo = {
 
 	processGeojsonFile : function (entry, callback) {
 		
-		console.log('*************************')
-		console.log('* geo.processGeojsonFile:', entry);
-		console.log('*************************')
+		// console.log('*************************')
+		// console.log('* geo.processGeojsonFile:', entry);
+		// console.log('*************************')
 
 		// create unique filename for geojson, save in same folder
 		var geoFile = _.remove(entry.files, function (f) {
 			return (f.slice(-8) == '.geojson')
 		});
 
-		console.log('geoFile: ', geoFile);
+		// console.log('geoFile: ', geoFile);
 
 		// set paths
 		var base = entry.folder + '/';
 		var fromPath = base + geoFile[0]; 
 		var toFile = 'geojson-' + uuid.v4() + '.geojson';
 		var toPath = base + toFile;
+
+
 
 		// move file, add to entry, return
 		fs.rename(fromPath, toPath, function (err) {
@@ -112,7 +243,10 @@ module.exports = geo = {
 			entry.name = geoFile[0];
 			entry.title = entry.originalFilename;
 
-			console.log('renamed: ', entry);
+			// console.log('renamed: ', entry);
+
+			// mirror to tileserver
+			if (!err) geo.mirrorToTileserver(entry, toPath);
 
 			// add unique id to features
 			geo.addUniqueGeojsonProperties(toPath, function (err) {
@@ -166,6 +300,9 @@ module.exports = geo = {
 			entry.files.push(fileUuid);
 			entry.type = 'layer';
 			entry.title = entry.originalFilename;
+
+			// mirror to tileserver
+			if (!err) geo.mirrorToTileserver(entry, toFile);
 
 			// add unique id to features
 			geo.addUniqueGeojsonProperties(toFile, function (err) {
@@ -243,11 +380,15 @@ module.exports = geo = {
 
 		// execute cmd line conversion 
 		// var cmd = 'ogr2ogr -t_srs EPSG:3857 -f geoJSON "' + outFile + '" "' + inFile + '"'; //Neighbourhoods.json Neighbourhoods.shp
-		var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"'; //Neighbourhoods.json Neighbourhoods.shp
-		console.log('================= o g r 2 o g r  ==========================');
+		var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"';
+		
+		// convert to google projection
+		// var cmd = 'ogr2ogr -s_srs EPSG:4269 -t_srs EPSG:3857 -f geoJSON "' + outFile + '" "' + inFile + '"';
+
+		// console.log('================= o g r 2 o g r  ==========================');
 		// var cmd = 'mapshaper -p 0.1 --encoding utf8 -f geojson -o "' + outFile + '" "' + inFile + '"';		// todo: mapshaper options
 		// console.log('================= m a p s h a p e r ==========================');
-		console.log('cmd: ', cmd);
+		// console.log('cmd: ', cmd);
 		var exec = require('child_process').exec;
 		exec(cmd, function (err, stdout, stdin) {
 			if (err) console.error('mapshaper err: ', err, stdout, stdin);
@@ -259,10 +400,11 @@ module.exports = geo = {
 			entry.data.geojson = toFile;
 			entry.title = shp;
 
-			console.log('************************************')
-			console.log('* geo._convertShapefile DONE:', entry);
-			console.log('************************************')
+			// console.log('************************************')
+			// console.log('* geo._convertShapefile DONE:', entry);
+			// console.log('************************************')
 
+			
 			// add unique id to features
 			geo.addUniqueGeojsonProperties(outFile, function (err) {
 				
@@ -270,13 +412,16 @@ module.exports = geo = {
 				callback(null);
 			});
 
-			
+
+			// mirror to tileserver
+			if (!err) geo.mirrorToTileserver(entry, outFile);	// wait for it? add callback?
+
 
 		});
 	},
 
 	addUniqueGeojsonProperties : function (path, callback) {
-		console.log('addUniqueGeojsonProperties', path);		// todo: remove _systemapic from exported shapes!
+		// console.log('addUniqueGeojsonProperties', path);		// todo: remove _systemapic from exported shapes!
 
 		var data;
 		var ops = [];
@@ -305,7 +450,7 @@ module.exports = geo = {
 
 		async.series(ops, function (err) {
 
-			console.log('addUniqueGeojsonProperties DONE!');
+			// console.log('addUniqueGeojsonProperties DONE!');
 
 			// no callback, no point waiting for this
 			if (callback) callback(err);
@@ -315,8 +460,8 @@ module.exports = geo = {
 
 	_addUniqueProperty : function (data) {
 		var features = data.features;
-		console.log('_addUniqueProperty features: ', features);
-		console.log('data: ', data);
+		// console.log('_addUniqueProperty features: ', features);
+		// console.log('data: ', data);
 		
 		// simple geojson (like drawn shapes)
 		if (features == undefined) {
