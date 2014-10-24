@@ -23,7 +23,6 @@ L.Control.CartoCSS = L.Control.extend({
 		// add hooks
 		this.addHooks();
 
-
 		return container;	// automatically becomes this._container;
 
 	},
@@ -56,11 +55,22 @@ L.Control.CartoCSS = L.Control.extend({
 		// create form wrapper
 		this._styleHeaderWrapper = Wu.DomUtil.create('div', 'cartocss-style-header-wrapper', wrapper);
 
-		this._styleHeader = Wu.DomUtil.create('div', 'cartocss-style-header', this._styleHeaderWrapper);
-		this._styleHeader.innerHTML = 'Editing style for:&nbsp;';	
+		// this._styleHeader = Wu.DomUtil.create('div', 'cartocss-style-header', this._styleHeaderWrapper);
+		// this._styleHeader.innerHTML = 'Editing style for:&nbsp;';
 
 		this._styleHeaderLayerName = Wu.DomUtil.create('div', 'cartocss-style-header-layer', this._styleHeaderWrapper);
-		this._styleHeaderLayerName.innerHTML = 'No selected layer'; // todo: dropdown (ie. nicely styled, not ugly default) instead of list???
+		this._styleHeaderLayerName.innerHTML = 'Select layer'; // todo: dropdown (ie. nicely styled, not ugly default) instead of list???
+
+		this._styleHeaderDropDownButton = Wu.DomUtil.create('div', 'cartocss-style-dropdown-arrow', this._styleHeaderWrapper);
+
+
+		// create layer selector
+		this._layerSelectorOuter = Wu.DomUtil.create('div', 'cartocss-layerselector-outer', wrapper);
+
+		this._layerSelector = Wu.DomUtil.create('div', 'cartocss-layerselector', this._layerSelectorOuter);
+
+
+
 
 		// For CodeMirror: create form wrapper
 		this._formWrapper = Wu.DomUtil.create('form', 'cartocss-form-wrapper', wrapper);
@@ -72,18 +82,18 @@ L.Control.CartoCSS = L.Control.extend({
 		this._errorPane = Wu.DomUtil.create('div', 'cartocss-error-pane', wrapper);
 
 		// create attributes header
-		this._attributesHeader = Wu.DomUtil.create('div', 'cartocss-haeder', wrapper);
-		this._attributesHeader.innerHTML = 'Layer attributes:';
+//		this._attributesHeader = Wu.DomUtil.create('div', 'cartocss-header-attrib', wrapper);
+//		this._attributesHeader.innerHTML = 'Layer attributes:';
 
 		// create attributes area
-		this._attributesArea = Wu.DomUtil.create('div', 'cartocss-attributes', wrapper);
+//		this._attributesArea = Wu.DomUtil.create('div', 'cartocss-attributes', wrapper);
 
 		// create layer selector header
-		this._layerSelectorHeader = Wu.DomUtil.create('div', 'cartocss-haeder', wrapper);
-		this._layerSelectorHeader.innerHTML = 'Select layer:';
+//		this._layerSelectorHeader = Wu.DomUtil.create('div', 'cartocss-header-select', wrapper);
+//		this._layerSelectorHeader.innerHTML = 'Select layer:';
 
-		// create layer selector
-		this._layerSelector = Wu.DomUtil.create('div', 'cartocss-layerselector', wrapper);
+		// // create layer selector
+		// this._layerSelector = Wu.DomUtil.create('div', 'cartocss-layerselector', wrapper);
 
 		// create update button
 		this._updateButton = Wu.DomUtil.create('div', 'cartocss-update-button', wrapper);
@@ -143,8 +153,20 @@ L.Control.CartoCSS = L.Control.extend({
 			// hook
 			Wu.DomEvent.on(wrapper, 'mousedown', function () {
 							
+				this.toggleLayerDropDown();
 				this.refresh(layer);
 				this.setSelected(wrapper);
+
+
+				// Set class to show which layer is selected
+				for ( var i = 0; i<wrapper.parentNode.children.length; i++ ) {
+					var child = wrapper.parentNode.children[i];
+
+					Wu.DomUtil.removeClass(child, 'vt-selected', this);
+				}
+
+				Wu.DomUtil.addClass(wrapper, 'vt-selected', this);
+
 
 			}, this);
 
@@ -160,6 +182,7 @@ L.Control.CartoCSS = L.Control.extend({
 
 	_selectLayer : function (layer) {
 		this.refresh(layer);
+
 	},
 
 	addHooks : function () {
@@ -172,6 +195,9 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// remove control
 		Wu.DomEvent.on(this._xButton, 'click', this.toggle, this);
+
+		// Layer drop down
+		Wu.DomEvent.on(this._styleHeaderLayerName, 'click', this.toggleLayerDropDown, this);
 
 		// stops
 		Wu.DomEvent.on(this._editorContainer, 'mousewheel mousedown dblclick', Wu.DomEvent.stop, this);
@@ -197,6 +223,29 @@ L.Control.CartoCSS = L.Control.extend({
 
 	},
 
+	toggleLayerDropDown : function () {
+
+		console.log('toggleLayerDropDown');
+
+		if ( !this._openDropDown ) {
+
+			this._openDropDown = true;
+			var dropDownHeight = this._layers.length * 27;
+			this._layerSelectorOuter.style.height = dropDownHeight + 'px';
+
+
+			Wu.DomUtil.addClass(this._styleHeaderDropDownButton, 'carrow-flipped', this);
+			
+
+		} else {
+
+			this._openDropDown = false;
+			this._layerSelectorOuter.style.height = '0px';
+
+			Wu.DomUtil.removeClass(this._styleHeaderDropDownButton, 'carrow-flipped', this);
+		}		
+
+	},
 	
 	refresh : function (layer) {
 

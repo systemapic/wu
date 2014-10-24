@@ -42,7 +42,7 @@ Wu.App = Wu.Class.extend({
 			// not used, using window url atm..
 			portal : 'http://85.10.202.87:8080/',	// api
 			raster : 'http://85.10.202.87:8003/',	// raster tile server
-			carto  : 'http://78.46.107.15:8080/raster/', 	// cartocss raster tile server
+			carto  : 'http://{s}.systemapic.com:8080/raster/', 	// cartocss raster tile server
 			vector : '',				// vector tile server
 			socket : ''				// websocket server
 		},

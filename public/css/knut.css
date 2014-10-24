@@ -1,15 +1,1 @@
 
-/*codemirror*/
-.gutter-syntax-error {
-	background-color: rgb(255, 254, 189);
-}
-
-.cartocss-error-pane {
-	border: 1px solid red;
-	display: none;
-}
-
-.active-error {
-	display: block;
-}
-

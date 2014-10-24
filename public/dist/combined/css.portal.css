@@ -5188,24 +5188,33 @@ input.cmn-toggle-round-flat + label:before {
 .cartocss-control-wrapper {
   background-color: white;
   height: 100%;
-  padding: 5px;
+  padding: 6px;
   position: relative;
-  padding-bottom: 155px;
+  padding-bottom: 92px;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
   cursor: default;
   pointer-events: all; }
 
 .cartocss-attributes {
   width: 100%;
-  height: 22%;
+  height: 33%;
   background: rgba(0, 0, 0, 0.2);
   margin-bottom: 5px;
   margin-top: 5px; }
 
-.cartocss-haeder {
+.cartocss-header-select {
   position: relative;
-  bottom: -4px; }
+  bottom: -4px;
+  /*margin-top: 25px;*/ }
 
+.cartocss-header-attrib {
+  position: relative;
+  bottom: -4px;
+  margin-top: 25px; }
+
+/*.cartocss-haeder {
+	}
+*/
 .cartocss-input {
   width: 100%;
   height: 100%;
@@ -5213,31 +5222,38 @@ input.cmn-toggle-round-flat + label:before {
 
 .cartocss-form-wrapper {
   width: 100%;
-  height: 56%; }
-
-.cartocss-layerselector {
-  width: 415px;
-  height: 22%;
+  height: 100%;
+  top: 0px;
   position: relative;
+  width: 387px; }
+
+.cartocss-layerselector-outer {
+  width: 414px;
+  position: absolute;
   margin-top: 5px;
   overflow-y: scroll;
   overflow-x: hidden;
-  padding: 4px;
-  padding-right: 25px; }
+  padding: 0;
+  padding-right: 25px;
+  margin-bottom: 6px;
+  top: 31px;
+  z-index: 999;
+  height: 0px;
+  -webkit-transition: height 150ms ease;
+  transition: height 150ms ease; }
 
-.cartocss-layerselector:after {
-  content: '';
-  width: 390px;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.04);
-  z-index: 0; }
-
-.cartocss-layerselector .layer-selector-item-wrap {
-  background: rgba(0, 0, 0, 0.1);
-  margin-bottom: 1px;
+/*.cartocss-layerselector:after {
+	content: '';
+	width: 390px;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: rgba(0,0,0,0.04);
+	z-index: 0;
+	}*/
+.cartocss-layerselector-outer .layer-selector-item-wrap {
+  background: rgba(255, 255, 255, 0.9);
   height: 25px;
   padding: 2px;
   padding-left: 5px;
@@ -5245,9 +5261,21 @@ input.cmn-toggle-round-flat + label:before {
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  width: 382px;
+  width: 385px;
   z-index: 999;
-  position: relative; }
+  position: relative;
+  margin: 2px;
+  top: 2px;
+  margin-bottom: 1px;
+  margin-top: 1px; }
+
+.cartocss-layerselector-outer .layer-selector-item-wrap:hover {
+  background: white; }
+
+.cartocss-layerselector {
+  position: relative;
+  background: #B8B8B8;
+  padding-bottom: 3px; }
 
 .cartocss-update-button {
   background: rgba(0, 0, 0, 0.2);
@@ -5279,12 +5307,23 @@ input.cmn-toggle-round-flat + label:before {
   font-weight: 500;
   margin-bottom: 5px;
   position: relative;
-  top: -2px; }
+  top: 0px;
+  background: rgba(0, 0, 0, 0.15);
+  height: 25px;
+  cursor: pointer;
+  color: #333;
+  line-height: 1.7; }
+
+.cartocss-style-header-layer:hover {
+  background: rgba(0, 0, 0, 0.2); }
 
 .cartocss-style-header-wrapper {
   margin-top: 1px;
-  margin-bottom: 4px;
-  text-align: center; }
+  margin-bottom: 0px;
+  text-align: center;
+  width: 328px;
+  position: relative;
+  left: 30px; }
 
 /* CODE MIRROR */
 .CodeMirror {
@@ -5305,9 +5344,9 @@ input.cmn-toggle-round-flat + label:before {
   height: 20px;
   border-radius: 0;
   background-position: -27px -43px;
-  right: 2px;
+  right: 6px;
   position: absolute;
-  top: 4px;
+  top: 9px;
   cursor: pointer;
   background-color: transparent;
   opacity: 0.5;
@@ -5361,6 +5400,62 @@ input.cmn-toggle-round-flat + label:before {
 .sp-container button:hover, .sp-cancel:hover {
   background: rgba(255, 255, 255, 0.6) !important; }
 
+.vt-selected {
+  background: #badfdf !important; }
+
+.vt-selected:hover {
+  background: #C3E8E8 !important; }
+
+.cartocss-style-dropdown-arrow {
+  background-image: url(images/evil_sprite.png);
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+  width: 13px;
+  height: 10px;
+  position: absolute;
+  top: 10px;
+  left: 8px;
+  opacity: 0.7;
+  pointer-events: none; }
+
+.cartocss-style-header-wrapper:hover > .cartocss-style-dropdown-arrow {
+  opacity: 1; }
+
+.carrow-flipped {
+  background-position: 0px -13px; }
+
+/*codemirror*/
+.gutter-syntax-error {
+  background-color: #fffebd; }
+
+/*.cartocss-error-pane {
+border: 1px solid red;
+display: none;
+margin-top: 5px;
+position: absolute;
+padding-left: 3px;
+background: #fffebd;
+color: red;
+width: 392px;
+}*/
+.cartocss-error-pane {
+  border-top: 1px solid #FFAAAA;
+  display: none;
+  margin-top: 5px;
+  position: absolute;
+  background: #fffebd;
+  color: red;
+  height: 25px;
+  padding-left: 7px;
+  padding-top: 3px;
+  left: 7px;
+  width: 387px;
+  bottom: 60px;
+  z-index: 999; }
+
+.active-error {
+  display: block; }
+
 /* @import 'color_picker';	// Color picker */
 /* @import 'mediaLibrary';	// Media Library */
 /*# sourceMappingURL=style.css.map */;.map-blur {
@@ -5372,16 +5467,3 @@ input.cmn-toggle-round-flat + label:before {
 	}
 
 ;
-/*codemirror*/
-.gutter-syntax-error {
-	background-color: rgb(255, 254, 189);
-}
-
-.cartocss-error-pane {
-	border: 1px solid red;
-	display: none;
-}
-
-.active-error {
-	display: block;
-}

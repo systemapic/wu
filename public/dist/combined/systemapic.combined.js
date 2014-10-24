@@ -1972,7 +1972,7 @@ L.Popup.include({
 
 		// render sidepanes
 		if (pane.clients) 	this.Clients 	  = new Wu.SidePane.Clients();
-		if (pane.mapOptions) 	this.Map 	  = new Wu.SidePane.Map();
+		if (pane.mapOptions) 	this.Map 	  = new Wu.SidePane.Map();		// Options
 		if (pane.documents) 	this.Documents 	  = new Wu.SidePane.Documents();
 		if (pane.dataLibrary) 	this.DataLibrary  = new Wu.SidePane.DataLibrary();
 		if (pane.mediaLibrary) 	this.MediaLibrary = new Wu.SidePane.MediaLibrary();
@@ -8491,6 +8491,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// set header padding
 		this.setHeaderPadding();
 
+		// update controls
+		// this.updateControls();
+
 		// set controls css logic
 		this.updateControlCss();
 		
@@ -8763,7 +8766,16 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		delete this.mousepositionControl;
 		delete this.baselayerToggle;
 		delete this.geolocationControl;
+
+		// remove carto
+		if (this.cartoCss) this.cartoCss.destroy();
 		delete this.cartoCss;
+	},
+
+	refreshControls : function () {
+
+
+
 	},
 
 	hideControls : function () {
@@ -8995,6 +9007,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	disableCartocss : function () {
+		console.log('disable carto');
+
 		if (!this.cartoCss) return;
 
 		this._map.removeControl(this.cartoCss);
@@ -12341,6 +12355,7 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	refreshSettings : function () {
+		console.log('_________ settings', this.getSettings());
 		for (setting in this.getSettings()) {
 			this.getSettings()[setting] ? this['enable' + setting.camelize()]() : this['disable' + setting.camelize()]();
 		}
@@ -13189,6 +13204,198 @@ L.control.baselayerToggle = function (options) {
 
 
 
+
+
+Wu.RasterLayer = Wu.Layer.extend({
+
+	type : 'rasterLayer',
+
+});
+
+
+Wu.CartoCSSLayer = Wu.Layer.extend({
+
+	initLayer : function () {
+
+		this.update();
+	},
+
+
+	add : function (map) {
+
+		this.addTo(map);
+	
+	},
+
+	addTo : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		this.layer.addTo(map);
+
+		// add gridLayer if available
+		if (this.gridLayer) {
+			this.gridLayer.addTo(map);
+			map.addControl(L.mapbox.gridControl(this.gridLayer));
+		}
+
+	},
+
+	remove : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		map.removeLayer(this.layer);
+
+		// remove gridLayer if available
+		if (this.gridLayer) {
+			map.removeLayer(this.gridLayer);
+			map.removeControl(L.mapbox.gridControl(this.gridLayer));  
+		} 
+	},
+
+
+	update : function () {
+
+		var map = app._map;
+
+		if (this.layer) {
+			map.removeLayer(this.layer);
+
+		}
+
+
+		var fileUuid = this.store.file;	// file id of geojson
+		var cartoid = this.store.data.cartoid || 'cartoid';
+
+
+		// tile server ip
+		var tileServer = app.options.servers.carto;
+
+		// tile url
+		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png';
+
+		// 
+		// var url = 'http://{s}.systemapic.com:8080/raster/' + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png';
+
+
+		// custom raster layer
+		this.layer = L.tileLayer(url, {
+			fileUuid: fileUuid,
+			cartoid : cartoid
+		});
+
+		// create gridlayer
+		this.gridLayer = L.mapbox.gridLayer({
+			// tileJson
+			tilejson: '2.1.0',
+			grids : [
+				'http://78.46.107.15:8080/utfgrid/' + fileUuid + '/{z}/{x}/{y}.grid.json'
+			],
+			template: '{{#__teaser__}}{{NAME}}{{/__teaser__}}'
+		});
+
+		console.log('added gridLayer: ', this.gridLayer);
+
+
+
+	},
+
+	updateStyle : function () {
+		
+		// this.layer.redraw();
+		this.update();
+
+		var map = app._map;
+		this.addTo(map);
+	},
+
+})
+
+
+
+
+Wu.MapboxLayer = Wu.Layer.extend({
+
+	type : 'mapboxLayer',
+	
+	initLayer : function () {
+		
+		// get access token
+
+		// create Leaflet.mapbox tileLayer
+		this.layer = L.mapbox.tileLayer(this.store.data.mapbox, {
+			accessToken : this.store.accessToken
+		});
+
+		// create gridLayer if available
+		if ('grids' in this.store) this.gridLayer = L.mapbox.gridLayer(this.store.data.mapbox);
+
+		this.loaded = true;
+		
+	},
+
+	add : function (map) {
+		this.addTo(map);
+	},
+
+	addTo : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		this.layer.addTo(map);
+
+		// add gridLayer if available
+		if (this.gridLayer) this.gridLayer.addTo(map);
+
+	},
+
+	remove : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		map.removeLayer(this.layer);
+
+		// remove gridLayer if available
+		if (this.gridLayer) map.removeLayer(this.gridLayer);   
+	},
+
+
+});
+
+
+Wu.CartodbLayer = Wu.Layer.extend({
+
+});
+
+
+// shorthand for creating all kinds of layers
+Wu.createLayer = function (layer) {
+
+	// mapbox
+	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
+
+	// geojson
+	// if (layer.data.geojson) return new Wu.GeojsonLayer(layer);
+	if (layer.data.geojson) return new Wu.CartoCSSLayer(layer);
+	
+	// geojson
+	if (layer.data.topojson) return new Wu.TopojsonLayer(layer);
+
+	// raster
+	if (layer.data.raster) {
+		// todo
+	}
+}
+
+
+
+
+
+
+
+
+
 Wu.GeojsonLayer = Wu.Layer.extend({
 
 	type : 'geojsonLayer',
@@ -13741,178 +13948,7 @@ L.topoJson = function (json, options) {
 // };
 
 
-
-
-
-Wu.RasterLayer = Wu.Layer.extend({
-
-	type : 'rasterLayer',
-
-});
-
-
-Wu.CartoCSSLayer = Wu.Layer.extend({
-
-	initLayer : function () {
-
-		this.update();
-	},
-
-
-	add : function (map) {
-		this.addTo(map);
-	},
-
-	addTo : function (map) {
-		var map = map || Wu.app._map;
-
-		// leaflet fn
-		this.layer.addTo(map);
-
-		// add gridLayer if available
-		if (this.gridLayer) this.gridLayer.addTo(map);
-
-	},
-
-	remove : function (map) {
-		var map = map || Wu.app._map;
-
-		// leaflet fn
-		map.removeLayer(this.layer);
-
-		// remove gridLayer if available
-		if (this.gridLayer) map.removeLayer(this.gridLayer);   
-	},
-
-
-	update : function () {
-
-		var map = app._map;
-
-		if (this.layer) {
-			console.log('REMOVEING L:AYER!!');
-			map.removeLayer(this.layer);
-
-		}
-
-		console.log('CartoCSSLayer.initLayer');
-
-		var fileUuid = this.store.file;	// file id of geojson
-		// var cartoId = this.store.data.css.id;
-		var cartoid = this.store.data.cartoid || 'cartoid';
-
-		console.log('CARTOID 11 :::::::', cartoid);
-
-		// tile server ip
-		var tileServer = app.options.servers.carto;
-
-		// tile url
-		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png';
-
-		console.log('url: ', url);
-
-
-		console.log('___________ creating new layer!!!');
-
-		// custom raster layer
-		this.layer = L.tileLayer(url, {
-			fileUuid: fileUuid,
-			cartoid : cartoid
-		});
-
-		console.log('this.layer');
-
-
-
-
-	},
-
-	updateStyle : function () {
-		
-		// this.layer.redraw();
-		this.update();
-
-		var map = app._map;
-		this.addTo(map);
-	},
-
-})
-
-
-
-
-Wu.MapboxLayer = Wu.Layer.extend({
-
-	type : 'mapboxLayer',
-	
-	initLayer : function () {
-		
-		// get access token
-
-		// create Leaflet.mapbox tileLayer
-		this.layer = L.mapbox.tileLayer(this.store.data.mapbox, {
-			accessToken : this.store.accessToken
-		});
-
-		// create gridLayer if available
-		if ('grids' in this.store) this.gridLayer = L.mapbox.gridLayer(this.store.data.mapbox);
-
-		this.loaded = true;
-		
-	},
-
-	add : function (map) {
-		this.addTo(map);
-	},
-
-	addTo : function (map) {
-		var map = map || Wu.app._map;
-
-		// leaflet fn
-		this.layer.addTo(map);
-
-		// add gridLayer if available
-		if (this.gridLayer) this.gridLayer.addTo(map);
-
-	},
-
-	remove : function (map) {
-		var map = map || Wu.app._map;
-
-		// leaflet fn
-		map.removeLayer(this.layer);
-
-		// remove gridLayer if available
-		if (this.gridLayer) map.removeLayer(this.gridLayer);   
-	},
-
-
-});
-
-
-Wu.CartodbLayer = Wu.Layer.extend({
-
-});
-
-
-// shorthand for creating all kinds of layers
-Wu.createLayer = function (layer) {
-
-	// mapbox
-	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
-
-	// geojson
-	// if (layer.data.geojson) return new Wu.GeojsonLayer(layer);
-	if (layer.data.geojson) return new Wu.CartoCSSLayer(layer);
-	
-	// geojson
-	if (layer.data.topojson) return new Wu.TopojsonLayer(layer);
-
-	// raster
-	if (layer.data.raster) {
-		// todo
-	}
-};var colorTheme = {};
+;var colorTheme = {};
 var savedCSS;
 
 // The CSS
@@ -17624,7 +17660,7 @@ Wu.App = Wu.Class.extend({
 			// not used, using window url atm..
 			portal : 'http://85.10.202.87:8080/',	// api
 			raster : 'http://85.10.202.87:8003/',	// raster tile server
-			carto  : 'http://78.46.107.15:8080/raster/', 	// cartocss raster tile server
+			carto  : 'http://{s}.systemapic.com:8080/raster/', 	// cartocss raster tile server
 			vector : '',				// vector tile server
 			socket : ''				// websocket server
 		},
