@@ -9,19 +9,22 @@ body {
 }
 
 #cartoref-wrapper {
-
+	padding: 20px;
+max-width: 900px;
+margin: auto;
 }
 
 .mapbox-ref {
 	font-style: italic;
 	margin-top: 10px;
-	margin-bottom: 15px;
+	margin-bottom: 75px;
 }
 
 #cartoref-wrapper h1 {
-	font-size: 38px;
-	margin: 0;
-	padding: 0;
+font-size: 46px;
+margin: 0;
+padding: 0;
+margin-bottom: 20px;
 }
 
 

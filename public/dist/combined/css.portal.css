@@ -1057,7 +1057,8 @@ label.info {
   top: auto;
   top: 90px;
   height: 18px;
-  text-align: right; }
+  text-align: right;
+  z-index: 100; }
 
 /* Inner wrapper */
 .leaflet-right .leaflet-control {
@@ -1131,7 +1132,8 @@ label.info {
   position: relative;
   float: left;
   margin-top: 80px;
-  left: 3px; }
+  left: 3px;
+  z-index: 200; }
 
 /* Wrapper vertical controls (zoom, draw, style edit) */
 .leaflet-bar {
@@ -1444,6 +1446,67 @@ label.info {
   margin-top: 7px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans' !important; }
 
+.legend-header {
+  font-size: 14px;
+  font-weight: 600; }
+
+.legend-list {
+  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 5px; }
+
+.legend-each {
+  width: 49%;
+  max-width: 200px;
+  display: inline-block;
+  vertical-align: top;
+  position: relative;
+  margin-bottom: 3px;
+  margin-top: 3px; }
+
+.legend-feature {
+  border: 1px solid red;
+  width: 21px;
+  height: 20px;
+  position: absolute;
+  display: inline-block;
+  vertical-align: top;
+  top: -2px; }
+
+.legend-feature div {
+  position: relative; }
+
+.legend-feature .rect {
+  width: 100%;
+  height: 12px;
+  background: blue;
+  top: 3px; }
+
+.legend-feature .line {
+  background: blue;
+  height: 3px;
+  top: 8px; }
+
+.legend-feature .dot {
+  width: 14px;
+  height: 14px;
+  background: blue;
+  border-radius: 10px;
+  top: 2px;
+  left: 3px; }
+
+.legend-feature-name {
+  display: inline-block;
+  vertical-align: top;
+  position: relative;
+  left: 25px; }
+
+.legend-source {
+  font-size: 11px;
+  font-style: italic;
+  color: #666; }
+
+/* LEGEND */
 .legends-item img {
   max-height: 50px; }
 
@@ -1904,7 +1967,8 @@ label.info {
   background: rgba(255, 255, 255, 0.93);
   padding-bottom: 1px;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
-  display: none; }
+  display: none;
+  overflow: hidden; }
 
 /* header */
 #inspector-header {
@@ -3776,6 +3840,9 @@ button.image-attachment {
 .fullpage-users .editor-wrapper {
   width: auto; }
 
+.fullpage-users .backpane-container {
+  overflow: hidden; }
+
 /* CREATE NEW USER */
 .backpane-container {
   background: rgba(255, 255, 255, 0.9);
@@ -3953,12 +4020,16 @@ button.image-attachment {
 /* Project title */
 .access-projects-title {
   font-size: 130%;
-  font-weight: 600; }
+  font-weight: 600;
+  height: 25px;
+  overflow: hidden; }
 
 /* Project description */
 .access-projects-description {
   font-size: 100%;
-  font-style: italic; }
+  font-style: italic;
+  height: 20px;
+  overflow: hidden; }
 
 /* READ/EDIT/MANAGE buttons */
 .access-projects-read, .access-projects-write, .access-projects-manage {
@@ -5293,7 +5364,8 @@ input.cmn-toggle-round-flat + label:before {
 .cartocss-layerselector {
   position: relative;
   background: #B8B8B8;
-  padding-bottom: 3px; }
+  padding-bottom: 3px;
+  width: 389px; }
 
 .cartocss-update-button {
   background: rgba(0, 0, 0, 0.2);
@@ -5523,26 +5595,70 @@ width: 392px;
   height: 100%;
   border: 1px solid #ddd; }
 
-.cartocss-tooltip-wrapper {
+.cartocss-tooltip-outer-wrapper {
   width: 389px;
   background: #f8f8f8;
   height: 100%;
-  border: 1px solid #ddd; }
+  border: 1px solid #ddd;
+  padding: 2px;
+  overflow: hidden; }
+
+.cartocss-tooltip-wrapper {
+  width: 410px;
+  padding-right: 28px;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 100%; }
+
+.tooltip-field-wrapper .controls-switch {
+  top: 4px;
+  pointer-events: all; }
 
 .tooltip-field-wrapper {
   position: relative;
   padding: 5px;
   background: rgba(0, 0, 0, 0.1);
-  margin: 2px; }
+  margin: 2px;
+  width: 378px; }
 
 .tooltip-field-key {
-  width: 200px;
+  width: 318px;
   display: inline-block;
-  vertical-align: top; }
+  vertical-align: top;
+  border: none;
+  outline: none;
+  padding: 2px;
+  padding-left: 5px;
+  background: rgba(255, 255, 255, 0.5); }
 
 .tooltip-field-value {
   display: inline-block;
   vertical-align: top; }
+
+#cartocss-tooltip-custom-header {
+  width: 379px;
+  border: 0;
+  outline: 0;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 2px;
+  margin-top: 4px;
+  padding: 5px;
+  font-size: 15px;
+  padding-left: 8px;
+  margin-left: 2px; }
+
+.tooltip-title {
+  font-size: 18px;
+  margin: 0;
+  position: relative;
+  top: -8px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+
+.leaflet-popup-content {
+  padding: 10px 36px 15px 2px; }
 
 /* @import 'color_picker';	// Color picker */
 /* @import 'mediaLibrary';	// Media Library */

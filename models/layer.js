@@ -31,16 +31,11 @@ var layerSchema = mongoose.Schema({
 		cartodb 	: String,			// cartodb id: 
 		osm 		: String,			// osm id?
 
-		// attributes 	: [{
-		// 	type : String,	// int, string or whatever
-		// 	value : String 	// MAX_B_H, or whatever
-
-		// }],
-
-		// extent : [Integer, Integer, Integer, Integer]
 	}, 
 
 	metadata : String, // json string with loads of meta
+	tooltip : String,  // json string with cartocss tooltips
+	legends : String,  // json string with cartocss legends
 
 	// geojson styling
 	style : [{

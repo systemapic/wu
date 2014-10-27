@@ -71,7 +71,7 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	setCartoid : function (cartoid) {
-		console.log('setCartoCSS');
+		console.log('setCartoId');
 		this.store.data.cartoid = cartoid;
 		this.save('data');
 	},
@@ -117,6 +117,44 @@ Wu.Layer = Wu.Class.extend({
 		if (!meta.json.vector_layers[0]) return false;
 		if (!meta.json.vector_layers[0].fields) return false;
 		return meta.json.vector_layers[0].fields;
+	},
+
+	getTooltipMeta : function () {
+		var json = this.store.tooltip;
+		if (!json) return false;
+		var meta = JSON.parse(json);
+		return meta;
+	},
+
+	setTooltipMeta : function (meta) {
+		this.store.tooltip = JSON.stringify(meta);
+		this.save('tooltip');
+	},
+
+	getLegends : function () {
+		console.log('getLegendsMeta');
+		var meta = this.store.legends
+		if (meta) return JSON.parse(meta);
+		return false;
+	},
+
+	setLegends : function (meta) {
+		if (!meta) return;
+		this.store.legends = JSON.stringify(meta);
+		this.save('legends');
+	},
+
+
+	getFeaturesValues : function (callback, ctx) {
+		if (!callback || !ctx) return console.error('must provide callback() and context');
+
+		// get layer feature values for this layer
+		var json = JSON.stringify({
+			fileUuid : this.getFileUuid(),
+			cartoid : this.getCartoid()
+		});
+
+		Wu.post('/api/util/getfeaturesvalues', json, callback.bind(ctx), this)
 	},
 
 
@@ -212,7 +250,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		var map = app._map;
 
 		if (this.layer) {
-			map.removeLayer(this.layer);
+			map.removeLayer(this.layer);		// refactor ? should be removed/added in same place?
 
 		}
 
@@ -222,7 +260,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 
 		// tile server ip
-		var tileServer = app.options.servers.raster;
+		var tileServer = app.options.servers.raster + 'raster/';
 
 		// tile url
 		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png';
@@ -237,7 +275,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		
 
 		// add gridlayer
-		this.gridLayer = new L.UtfGrid('http://{s}.systemapic.com:8080/utfgrid/' + fileUuid + '/{z}/{x}/{y}.grid.json', {
+		var gridServer = app.options.servers.raster + 'utfgrid/';
+		this.gridLayer = new L.UtfGrid(gridServer + fileUuid + '/{z}/{x}/{y}.grid.json', {
 			
 			useJsonP: false,
 			
@@ -291,16 +330,52 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	},
 
 	_popupContent : function (data) {
-		// create content
+
+		console.log('_popupContent data:', data);
+
+		// check for stored tooltip
+		var meta = this.getTooltipMeta();
 		var string = '';
-		for (key in data) {
-			var value = data[key];
-			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
-				string += key + ': ' + value + '<br>';
+		console.log('FOUND TOOLTIP :', meta);
+
+		if (meta) {
+			if (meta.title) string += '<div class="tooltip-title">' + meta.title + '</div>';
+
+			for (var m in meta.fields) {
+				var field = meta.fields[m];
+
+				console.log('F ', field);
+
+				if (field.on) {
+
+					var caption = field.title || field.key;
+					var value = data[field.key];
+
+					console.log('caption', caption, value);
+
+					string += caption + ': ' + value + '<br>';
+
+				}
+
 			}
+
+			return string;
+
+
+		} else {
+
+			// create content
+			var string = '';
+			for (var key in data) {
+				var value = data[key];
+				if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
+					string += key + ': ' + value + '<br>';
+				}
+			}
+			return string;
 		}
 
-		return string;
+
 	},
 
 })

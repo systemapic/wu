@@ -27,6 +27,11 @@ var nodepath    = require('path');
 var gm 		= require('gm');
 var request 	= require('request');
 
+// mapnik
+var mapnik = require('mapnik');
+var carto = require('carto');
+var mapnikOmnivore = require('mapnik-omnivore');
+
 // superusers
 var superusers = [
 	'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', 	// KO
@@ -52,6 +57,486 @@ var DEFAULTMAPBOX = {
 
 // function exports
 module.exports = api = {
+
+
+
+	_createStylesheet : function (css, featureKey, featureValue) {
+
+		console.log('_createStylesheet');
+		console.log('featureKey: ', featureKey);
+		console.log('featureValue', featureValue);
+		console.log('css: ', css);
+
+
+		var properties = {};
+		properties[featureKey] = featureValue;
+
+
+		var geojson = {
+			"type" : "FeatureCollection",
+			"features" : [
+				{
+				"type" : "Feature",
+				"properties" : properties,
+				"geometry": {
+					"type": "Polygon",
+					"coordinates": [
+						[
+						[
+							-20.7421875,
+							-63.704722429433225
+						],
+						[
+							-20.7421875,
+							-41.50857729743933
+						],
+						[
+							48.8671875,
+							-41.50857729743933
+						],
+						[
+							48.8671875,
+							-63.704722429433225
+						],
+						[
+							-20.7421875,
+							-63.704722429433225
+						]
+						]
+						]
+					}
+				}
+			]
+		}
+
+		var toFile = "/var/www/data/static/legendsTemplate.geojson";
+
+		console.log('geojson): ', geojson);
+		console.dir(geojson.features);
+		console.log(geojson.features[0].properties);
+
+		fs.outputFile(toFile, JSON.stringify(geojson), function (err) {
+			console.log('wrote goejson!!!');
+
+			var options = {
+				"srs": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over",
+
+				"Stylesheet": [{
+					"id" : 'layer',
+					"data" : css
+				}],
+
+				"Layer": [{
+					"id" : "layer",	
+					"name" : "layer",
+					"Datasource" : {
+						"file" : toFile,
+						"type" : "geojson"
+					}
+				}]
+			}
+
+			
+
+			var cr = new carto.Renderer({});
+		
+			// get xml from 
+			var xml = cr.render(options);
+			var stylepath = '/var/www/data/static/legendsStylesheet.xml';
+		
+
+			fs.outputFile(stylepath, xml, function (err) {
+				if (err) console.log('carto write err', err);
+
+				api.createLegend(stylepath);
+			});
+
+
+
+
+		});//fs.out
+
+	},
+
+
+
+	createLegend : function (stylepath) {
+
+		var mapnik = require('mapnik');
+		var fs = require('fs');
+
+		// register fonts and datasource plugins
+		mapnik.register_default_fonts();
+		mapnik.register_default_input_plugins();
+
+		var map = new mapnik.Map(256, 256);
+		// map.load('./test/stylesheet.xml', function(err,map) {
+
+		try {
+		map.load(stylepath, function(err,map) {
+			if (err) throw err;
+			map.zoomAll(); // todo: zoom?
+			var im = new mapnik.Image(256, 256);
+			map.render(im, function(err,im) {
+				if (err) throw err;
+				im.encode('png', function(err,buffer) {
+					if (err) throw err;
+					// fs.writeFile('map.png',buffer, function(err) {
+					fs.writeFile('/var/www/data/static/legendsTest.png', buffer, function(err) {
+						if (err) throw err;
+						console.log('saved map image to map.png');
+					});
+				});
+			});
+		});
+
+		} catch (e) { console.log('FIX ERR!!!');}
+
+
+	},
+
+
+
+
+
+	// #########################################
+	// ###  API: Get Layer Feature Values    ###
+	// #########################################	
+	getLayerFeaturesValues : function (req, res) {
+
+		var fileUuid = req.body.fileUuid;
+		var cartoid = req.body.cartoid;
+
+		File
+		.findOne({uuid : fileUuid})
+		.exec(function (err, file) {
+			console.log('err?', err);
+			console.log('found file: ', file);
+
+			// 
+
+
+			var path = FILEFOLDER + file.uuid + '/' + file.data.geojson;
+			console.log('path: ', path);
+
+
+			fs.readJson(path, function (err, data) {
+				if (err) console.log('err: : ', err);
+
+				console.log('read json: ', data);
+
+
+				// prints all features and their unqiue values
+				data.features.forEach(function (feature) {
+
+					var props = feature.properties;
+					console.log('props!! =>>', props);
+
+				}, this);
+
+
+
+				var cartopath = CARTOCSSFOLDER + cartoid + '.mss';
+
+				fs.readFile(cartopath, 'utf8', function (err, buffer) {
+
+					// css as string
+					var css = buffer.toString();
+
+					
+					var env = {};
+					// var parser = new carto.Parser(env);
+					var renderer = new carto.Renderer();
+					// console.log('renderer: ', r);
+
+					// get rules from carto (hacked)
+					var info = renderer.getRules(css);
+
+					// // systemapic hack in carto.renderer.js:
+					// carto.Renderer.prototype.getRules = function render(data) {
+
+					//     var env = _(this.env).defaults({
+					//         benchmark: true,
+					//         validation_data: false,
+					//         effects: []
+					//     });
+
+					//     if (!carto.tree.Reference.setVersion(this.options.mapnik_version)) {
+					//         throw new Error("Could not set mapnik version to " + this.options.mapnik_version);
+					//     }
+
+					   
+					//     var parser = (carto.Parser(env)).parse(data);
+					//     return parser;
+
+					// }
+
+
+					
+
+					var jah = [];
+					var rules = info.rules[0].rules;
+					rules.forEach(function (rrules) {
+						var selectors = rrules.selectors;
+						selectors.forEach(function (s) {
+							var rule = s.filters.filters;
+							for (var r in rule) {
+								var jahrule = rule[r];
+								var ro = {
+									key : jahrule.key.value,
+									value : jahrule.val.value
+								}
+								jah.push(ro);
+							}
+						}, this);
+					}, this);
+
+
+					
+
+
+					console.log('JAH!', jah);
+
+
+
+
+
+
+
+					// console.log('stringgngngng', string);
+
+					// var rules = info.rules;
+					// console.log('rules:::');
+					// console.dir(rules[0][0]);
+
+					// var list = rules[0][0];
+					// console.log('list: ');
+					// console.dir(list);
+
+					// var jah = list.rules[0].value;
+
+					// console.log('jah: ', jah);
+
+
+
+					// console.log('parser', parser);
+
+					// var something = parser.parse(css);
+
+					// console.log('something: ', something);
+
+					// var rule_list = parser.toList(env);
+
+					// console.log('rule_list', rule_list);
+					// console.log('elemetns: ', rule_list[0].elements);
+
+					// var defs = this._inheritDefinitions(rule_list, env);
+
+					// console.log('defs:', defs);
+
+
+
+
+
+				});
+
+
+				
+
+
+
+
+
+			});
+
+
+
+		});
+
+		res.end(JSON.stringify({
+			result : 'nuttin'
+		}))
+
+
+	},
+
+
+
+
+	// #########################################
+	// ###  API: Parse CartoCSS              ###
+	// #########################################	// aka create png for label
+	parseCartoCSS : function (req, res) {
+		console.log('parseCartoCSS', req.body);	
+
+		var css = req.body.css;
+
+		console.log('css: ', css);
+
+
+
+		// apply stylesheet to geojson with 1 tiny #id like #eidsvoll
+		// create png from geojson
+
+		var featureKey = req.body.featureKey;
+		var featureValue = req.body.featureValue;
+
+
+
+		try  {
+			// test create png
+			//api._createStylesheet(css, featureKey, featureValue);
+		} catch (e) {
+			console.log('FIXME!!');
+		}
+
+
+
+		// return;
+
+
+
+		// // ############ xml to json #########
+		// // xml to json
+		// var cr = new carto.Renderer({});
+		// var options = {
+		// 	"srs": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over",
+
+		// 	"Stylesheet": [{
+		// 		"id" : 'lol',
+		// 		"data" : css
+		// 	}],
+		// 	"Layer": [{
+		// 		"id" : "layer",	
+		// 		"name" : "layer"
+		// 	}]
+		// }
+
+		// var xml = cr.render(options);
+
+
+		// // console.log('renderer: ', renderer);
+
+		// // var parsed = cr.render(css);
+
+		// // console.log('parsed: ', parsed);
+
+
+		// var parseString = require('xml2js').parseString;
+		// // var xml = "<root>Hello xml2js!</root>"
+		// parseString(xml, function (err, result) {
+		// 	console.log('xml2json:::', result);
+		// 	// console.dir(result);
+
+		// 	console.log('layer->', result.Map.Layer);
+		// 	console.log('style->', result.Map.Style);
+
+		// 	if (result.Map.Style) {
+
+		// 		console.log('rules->', result.Map.Style[0].Rule);
+			
+		// 		var rules = result.Map.Style[0].Rule;
+
+		// 		rules.forEach(function (rule) {
+		// 			console.log('jah rule->', rule);
+		// 		}, this);
+
+		// 	}
+		// });
+
+		// // ############ xml to json ######### end #####
+
+
+
+
+
+
+		// carto renderer
+		// var cr = new carto.Renderer({
+		// 	filename: cartoid + '.mss',
+		// 	local_data_dir: CARTOCSSPATH,
+		// });
+
+	
+		// // get xml from 
+		// var xml = cr.render(options);
+
+
+		// var env = {};
+		// var parser = (carto.Parser(env)).parse(css);
+
+	
+		// console.log('parser', parser);
+
+		// var rule_list = parser.toList(env);
+
+		// console.log('rule_list', rule_list);
+		// console.log('elemetns: ', rule_list[0].elements);
+
+		// var defs = this._inheritDefinitions(rule_list, env);
+
+		// console.log('defs:', defs);
+
+
+		// return 
+		res.end(JSON.stringify({
+			result : 'ok',
+			css : 'css'
+		}));
+
+
+
+	},
+
+
+
+	_inheritDefinitions : function (definitions, env) {
+		var inheritTime = +new Date();
+		// definitions are ordered by specificity,
+		// high (index 0) to low
+		var byAttachment = {},
+		byFilter = {};
+		var result = [];
+		var current, previous, attachment;
+
+		// Evaluate the filters specified by each definition with the given
+		// environment to correctly resolve variable references
+		definitions.forEach(function(d) {
+			d.filters.ev(env);
+		});
+
+		for (var i = 0; i < definitions.length; i++) {
+
+			attachment = definitions[i].attachment;
+			current = [definitions[i]];
+
+			if (!byAttachment[attachment]) {
+				byAttachment[attachment] = [];
+				byAttachment[attachment].attachment = attachment;
+				byFilter[attachment] = {};
+				result.push(byAttachment[attachment]);
+			}
+
+			// Iterate over all subsequent rules.
+			for (var j = i + 1; j < definitions.length; j++) {
+				if (definitions[j].attachment === attachment) {
+					// Only inherit rules from the same attachment.
+					current = addRules(current, definitions[j], byFilter[attachment], env);
+				}
+			}
+
+			for (var k = 0; k < current.length; k++) {
+				byFilter[attachment][current[k].filters] = current[k];
+				byAttachment[attachment].push(current[k]);
+			}
+		}
+
+		// if (env.benchmark) console.warn('Inheritance time: ' + ((new Date() - inheritTime)) + 'ms');
+
+		return result;
+
+	},
+
 
 
 
@@ -149,6 +634,7 @@ module.exports = api = {
 							
 							res.end(JSON.stringify({
 				        			ok : true,
+				        			cartoid : cartoid,
 				        			error : null			// todo: save err
 				        		}));
 
@@ -2764,6 +3250,17 @@ module.exports = api = {
 				});
 
 			};
+
+			// update tooltip
+			if (req.body.hasOwnProperty('tooltip')) {
+
+				var tooltip = req.body.tooltip;
+				layer.tooltip = tooltip;
+				layer.save(function (err) {
+					if (err) throw err;
+				});
+
+			}
 
 			// update style
 			if (req.body.hasOwnProperty('style')) {

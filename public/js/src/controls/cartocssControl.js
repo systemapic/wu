@@ -61,10 +61,10 @@ L.Control.CartoCSS = L.Control.extend({
 						  this._tabStyling.innerHTML = 'Styling';
 
 		this._tabTooltip 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-tooltip', this._tabsWrapper); // Styling tab		
-						  this._tabTooltip.innerHTML = 'Tooltip';
+		this._tabTooltip.innerHTML = 'Tooltip';
 
 		this._tabLegends 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-legends', this._tabsWrapper); // Styling tab				
-						  this._tabLegends.innerHTML = 'Legend';
+		this._tabLegends.innerHTML = 'Legend';
 
 		this._legendsWrapper		= Wu.DomUtil.create('div', 'cartocss-legends-wrapper displayNone', this._wrapper);
 		
@@ -83,122 +83,10 @@ L.Control.CartoCSS = L.Control.extend({
 
 	},
 
-	initCodeMirror : function () {
-		
-		this._codeMirror = CodeMirror.fromTextArea(this._inputArea, {
-    			lineNumbers: true,    			
-    			mode: {
-    				name : 'carto',
-    				reference : window.cartoRef
-    			},
-    			matchBrackets: true,
-    			lineWrapping: true,
-    			paletteHints : true,
-    			gutters: ['CodeMirror-linenumbers', 'errors']
-  		});
-
-		// set default value
-  		this._codeMirror.setValue('// No layer selected. \n\n// #layer is always base \n#layer { \n  \n}');
-
-		// todo:
-  		// var completer = cartoCompletion(this._codeMirror, window.cartoRef);
-		// this._codeMirror.on('keydown', completer.onKeyEvent);
-		// this._codeMirror.on('change', function() { return window.editor && window.editor.changed(); });
-		// this._codeMirror.setOption('onHighlightComplete', _(completer.setTitles).throttle(100));
-		// console.log(')thi wrapper element', this._codeMirror);
-		// this._codeMirror.getWrapperElement().id = 'code-' + id.replace(/[^\w+]/g,'_');
-	
-	},
-
-	setLayerDescription : function () {
-
-		// get meta fields
-		var fields = this._layer.getMetaFields(); // return false if no fields found
-		
-		// create string
-		var string = '// #layer is always the layer identifyer \n\n';
-		string += '// For a full cartoCSS reference guide:\n // http://projects.ruppellsgriffon.com/docs/cartocss-reference/\n\n';
-		string += '#layer {\n\n';
-		string += '// Available fields in layer:\n';
-
-		// add each field to string
-		for (key in fields) {
-			var type = fields[key];
-			string += '// [' + key + '=' + type + '] {}\n';
-		}
-		
-		string += '\n}';
-
-		// update text
-		this.updateCodeMirror(string);
-
-	},
-
-	updateCodeMirror : function (css) {
-		this._codeMirror.setValue(css);
-	},
-
-	clearCodeMirror : function () {
-		this._codeMirror.setValue('');
-	},
-
-	_fillLayers : function () {
-		
-		// clear
-		this._layerSelector.innerHTML = '';
-
-		// add
-		this._layers.forEach(function (layer) {
-
-			// append
-			var wrapper = Wu.DomUtil.create('div', 'layer-selector-item-wrap');
-			var div = Wu.DomUtil.create('div', 'layer-selector-item', wrapper, layer.getTitle());
-			this._layerSelector.appendChild(wrapper);
-
-			// hook
-			Wu.DomEvent.on(wrapper, 'mousedown', function () {
-				this._selectLayer(layer, wrapper)
-			}, this);
-
-			// add stops
-			Wu.DomEvent.on(wrapper, 'click mousedown mouseup', Wu.DomEvent.stopPropagation, this);
-
-
-		}, this);
-
-	},
-
-	setSelected : function (wrapper) {
-
-		// clear selected
-		this._clearSelected(wrapper);
-
-		// mark selected
-		Wu.DomUtil.addClass(wrapper, 'vt-selected', this);
-	},
-
-	_clearSelected : function (wrapper) {
-		// Set class to show which layer is selected
-		for ( var i = 0; i<wrapper.parentNode.children.length; i++ ) {
-			var child = wrapper.parentNode.children[i];
-			Wu.DomUtil.removeClass(child, 'vt-selected', this);
-		}
-	},
-
-	_selectLayer : function (layer, wrapper) {
-
-		this.toggleLayerDropDown();
-		this.refresh(layer);
-		this.setSelected(wrapper);				
-		this.initTooltip();
-
-
-	},
-
 	addHooks : function () {
 
 		// update button click
-		Wu.DomEvent.on(this._updateButton, 'click', this.updateCss, this);
+		Wu.DomEvent.on(this._updateButton, 'click', this.renderStyling, this);
 
 		// toolbar button click
 		Wu.DomEvent.on(this._toolbarButton, 'click', this.toggle, this);
@@ -227,21 +115,6 @@ L.Control.CartoCSS = L.Control.extend({
 		Wu.DomEvent.on(this._formWrapper, 		'click mousedown mouseup', 		Wu.DomEvent.stopPropagation, this);
 
 
-
-
-		// // hack attempt to fix weird unclickables
-		// Wu.DomEvent.on(this._editorContainer, 'mouseenter', function () {
-		// 	console.log('mousenter!');
-		// 	this._codeMirror.focus();
-		// }, this);
-
-		// // if first u dont succeed
-		// var leafletControlContainer = app._map._controlContainer;
-		// Wu.DomEvent.on(leafletControlContainer, 'mousedown', function () {
-		// 	console.log('mosue');
-		// }, this);
-
-
 		// Update Zoom
 		var map = app._map;
 		map.on('zoomend', function() {
@@ -256,9 +129,158 @@ L.Control.CartoCSS = L.Control.extend({
 
 	},
 
-	toggleLegends : function () {
+	// update: fired from outside, on project.select() etc.
+	update : function () {
 
-		// cxxxx
+		// set active project
+		this.project = app.activeProject;
+
+		// get all active, geojson layers
+		this._layers = this.project.getStylableLayers();
+
+		// fill active layers box
+		this._fillLayers();
+
+		// select a layer
+		this.setLastUpdatedLayer();
+
+	},
+
+
+	
+	initCodeMirror : function () {
+		
+		this._codeMirror = CodeMirror.fromTextArea(this._inputArea, {
+    			lineNumbers: true,    			
+    			mode: {
+    				name : 'carto',
+    				reference : window.cartoRef
+    			},
+    			matchBrackets: true,
+    			lineWrapping: true,
+    			paletteHints : true,
+    			gutters: ['CodeMirror-linenumbers', 'errors']
+  		});
+
+		// set default value
+  		this._codeMirror.setValue('// No layer selected. \n\n// #layer is always base \n#layer { \n  \n}');
+
+		// todo:
+  		// var completer = cartoCompletion(this._codeMirror, window.cartoRef);
+		// this._codeMirror.on('keydown', completer.onKeyEvent);
+		// this._codeMirror.on('change', function() { return window.editor && window.editor.changed(); });
+		// this._codeMirror.setOption('onHighlightComplete', _(completer.setTitles).throttle(100));
+		// console.log(')thi wrapper element', this._codeMirror);
+		// this._codeMirror.getWrapperElement().id = 'code-' + id.replace(/[^\w+]/g,'_');
+	
+	},
+
+	_initStylingDefault : function () {
+
+		// get meta fields
+		var fields = this._layer.getMetaFields(); // return false if no fields found
+		
+		// create string
+		var string = '// #layer is always the layer identifyer \n\n';
+		string += '// For a full cartoCSS reference guide:\n // http://projects.ruppellsgriffon.com/docs/cartocss-reference/\n\n';
+		string += '#layer {\n\n';
+		string += '// Available fields in layer:\n';
+
+		// add each field to string
+		for (key in fields) {
+			var type = fields[key];
+			string += '// [' + key + '=' + type + '] {}\n';
+		}
+		
+		string += '\n}';
+
+		// update text
+		this.updateCodeMirror(string);
+
+	},
+
+	// select last update layer (on update)
+	setLastUpdatedLayer : function () {
+
+		// sort by lastUpdated
+		var layers = this._layers;
+		var sorted = _.sortBy(this._layers, function (l) {
+			return l.store.lastUpdated;
+		});
+
+		// get top hit
+		var last = _.last(sorted);
+
+		// select lastUpdated layer
+		this._selectLayer(last);
+
+	},
+
+	updateCodeMirror : function (css) {
+		this._codeMirror.setValue(css);
+	},
+
+	clearCodeMirror : function () {
+		this._codeMirror.setValue('');
+	},
+
+	_fillLayers : function () {
+		
+		// clear
+		this._layerSelector.innerHTML = '';
+
+		// add
+		this._layers.forEach(function (layer) {
+
+			// append
+			var wrapper = Wu.DomUtil.create('div', 'layer-selector-item-wrap');
+			var div = Wu.DomUtil.create('div', 'layer-selector-item', wrapper, layer.getTitle());
+			this._layerSelector.appendChild(wrapper);
+
+			// hook
+			Wu.DomEvent.on(wrapper, 'mousedown', function () {
+				this._selectLayer(layer)
+				this.setSelected(wrapper);
+			}, this);
+
+			// add stops
+			Wu.DomEvent.on(wrapper, 'click mousedown mouseup', Wu.DomEvent.stopPropagation, this);
+
+
+		}, this);
+
+	},
+
+	setSelected : function (wrapper) {
+
+		// clear selected
+		this._clearSelected(wrapper);
+
+		// mark selected
+		Wu.DomUtil.addClass(wrapper, 'vt-selected', this);
+	},
+
+	_clearSelected : function (wrapper) {
+		// Set class to show which layer is selected
+		for ( var i = 0; i<wrapper.parentNode.children.length; i++ ) {
+			var child = wrapper.parentNode.children[i];
+			Wu.DomUtil.removeClass(child, 'vt-selected', this);
+		}
+	},
+
+	_selectLayer : function (layer) {
+
+		this.toggleLayerDropDown();
+		
+		// init tabs
+		this.initStyling(layer);	
+		this.initTooltip(layer);
+		this.initLegends(layer);
+		
+	},
+
+	
+	toggleLegends : function () {
 
 		// Hide Styler
 		Wu.DomUtil.addClass(this._formWrapper, 'displayNone');
@@ -300,7 +322,6 @@ L.Control.CartoCSS = L.Control.extend({
 
 	toggleTooltip : function () {
 
-
 		// Show Tooltip
 		Wu.DomUtil.removeClass(this._tooltipOuterWrapper, 'displayNone');
 
@@ -310,7 +331,6 @@ L.Control.CartoCSS = L.Control.extend({
 		// Hide Legends Wrapper
 		Wu.DomUtil.addClass(this._legendsWrapper, 'displayNone');
 
-
 		// Set tab to active
 		Wu.DomUtil.addClass(this._tabTooltip, 'cartocss-active-tab');
 		Wu.DomUtil.removeClass(this._tabStyling, 'cartocss-active-tab');
@@ -319,47 +339,269 @@ L.Control.CartoCSS = L.Control.extend({
 
 	},
 
+	initStyling : function (layer) {
+
+		// new layer is active
+		this._layer = layer;
+		this._cartoid = false;
+
+		// insert title in dropdown
+		this._styleHeaderLayerName.innerHTML = layer.store.title.camelize();
+
+		// check for existing css
+		this._cartoid = this._layer.getCartoid();
+
+		// insert into input area
+		if (this._cartoid) {				// callback
+			this._layer.getCartoCSS(this._cartoid, this.insertCss.bind(this));
+		} else {
+			// no style stored on layer yet, set default message
+			this._initStylingDefault();
+		}
+
+	},
+
+	initLegends : function () {
+
+		// clear 
+		this._legendsWrapper.innerHTML = '';
+
+		// return if no layer selected
+		if (!this._layer) return;
+
+		// fill with meta from store
+		var meta = this._layer.getLegends();
+		if (meta) return this._initLegendsStoredMeta(meta);
+
+		// fill with default
+		return this._initLegendsDefaultMeta();
+
+
+	},
+
 	initTooltip : function () {
 
-
+		// clear
 		this._tooltipWrapper.innerHTML = '';
-		// cxxxx
 
-		var tooltipCustomHeader	= Wu.DomUtil.createId('input', 'cartocss-tooltip-custom-header', this._tooltipWrapper);
-		tooltipCustomHeader.setAttribute('placeholder', 'Tooltip header')
+		// return if no layer selected
+		if (!this._layer) return;
+
+		// fill with store tooltip meta
+		var tooltipMeta = this._layer.getTooltipMeta();
+		if (tooltipMeta) return this._initTooltipStoredMeta(tooltipMeta);
+
+		// fill with default meta
+		return this._initTooltipDefaultMeta();
+		
+	},
 
 
-		if ( !this._layer ) return;
 
-		var fields = this._layer.getMetaFields();
+
+	_initLegendsStoredMeta : function (meta) {
+
+		// meta = stored legends
+		console.log('_initTooltipStoredMeta meta: ', meta);
+
+	},
+
+
+	_initLegendsDefaultMeta : function () {
+
+		this._legendsWrapper.innerHTML = 'No legends yet. Style the geo and magic will happen!';
 
 		
-		for ( key in fields ) {
-
-			var value = fields[key];
-			
-			console.log(key, value);
-
-			var fieldWrapper = Wu.DomUtil.create('div', 'tooltip-field-wrapper', this._tooltipWrapper);
-			
-			var fieldKey = Wu.DomUtil.create('input', 'tooltip-field-key', fieldWrapper);
-			fieldKey.setAttribute('type', 'text');
-			fieldKey.setAttribute('placeholder', key);
-
-
-			var fieldSwitch = Wu.DomUtil.create('div', 'switch controls-switch', fieldWrapper);
-			
-			var switchId = 'switch-' + key;
-
-			var fieldSwitchInput = Wu.DomUtil.createId('input', switchId, fieldSwitch);
-				Wu.DomUtil.addClass(fieldSwitchInput, 'cmn-toggle cmn-toggle-round-flat')
-				fieldSwitchInput.setAttribute('type', 'checkbox');
-				fieldSwitchInput.setAttribute('checked', 'checked');
-
-			var fieldSwitchLabel = Wu.DomUtil.create('label', '', fieldSwitch);
-				fieldSwitchLabel.setAttribute('for', switchId)
-		}
 	},
+
+
+	_updateLegends : function (cartoid) {
+
+		// // get css
+		// var css = this._codeMirror.getValue();
+
+		// // json
+		// var json = JSON.stringify({
+		// 	css : css,
+		// 	featureKey : 'NAME_2',
+		// 	featureValue : 'Voss'
+		// });
+
+		// // get default from cartocss
+		// Wu.post('/api/util/parsecarto', json, this._parsedCarto.bind(this), this);
+
+
+		// create legend for each ID mentioned in css
+
+
+		var meta = this._layer.getMeta();
+		var metaFields = this._layer.getMetaFields();
+		console.log('_updateLegends');
+		console.log('meta: ', meta);
+		console.log('fields: ', metaFields);
+
+		var values = this._layer.getFeaturesValues(this._gotFeatures, this);
+
+
+	},
+
+
+	_gotFeatures : function (ctx, json) {
+		console.log('_gotFeatures');
+		console.log('ctx, json, this', ctx, json, this);
+
+
+	},
+
+
+	_initTooltipStoredMeta : function (meta) {
+
+		
+		// create header
+		var tooltipCustomHeader	= Wu.DomUtil.createId('input', 'cartocss-tooltip-custom-header', this._tooltipWrapper);
+		tooltipCustomHeader.setAttribute('placeholder', 'Tooltip title')
+		tooltipCustomHeader.value = meta.title;
+
+		// save
+		Wu.DomEvent.on(tooltipCustomHeader, 'keyup', this._saveTip, this);
+
+		// for each field
+		var fields = meta.fields;
+		fields.forEach(function (field) {
+
+			// create tooltip entry
+			this._createTooltipEntry(field.key, field.title, field.on);
+
+		}, this);
+
+
+	},
+
+
+	_initTooltipDefaultMeta : function () {
+
+		// get default meta
+		var fields = this._layer.getMetaFields();
+
+		// create header
+		var tooltipCustomHeader	= Wu.DomUtil.createId('input', 'cartocss-tooltip-custom-header', this._tooltipWrapper);
+		tooltipCustomHeader.setAttribute('placeholder', 'Tooltip title')
+
+		// save event
+		Wu.DomEvent.on(tooltipCustomHeader, 'keyup', this._saveTip, this);
+
+		// for each field
+		for (key in fields) {
+			var value = fields[key];
+
+			// create tooltip entry
+			this._createTooltipEntry(key, null, true);	
+		}
+
+	},
+
+	_createTooltipEntry : function (defaultKey, key, on) {
+
+		console.log('_createTooltipEntry', defaultKey, key, on);
+
+		// create wrapper
+		var fieldWrapper = Wu.DomUtil.create('div', 'tooltip-field-wrapper', this._tooltipWrapper);
+		
+		// create field title input
+		var fieldKey = Wu.DomUtil.create('input', 'tooltip-field-key', fieldWrapper);
+		fieldKey.setAttribute('type', 'text');
+		fieldKey.setAttribute('placeholder', defaultKey); // set default key
+
+		// set value if set
+		if (key) fieldKey.value = key;
+
+		// create switch
+		var fieldSwitch = Wu.DomUtil.create('div', 'switch controls-switch', fieldWrapper);
+		var switchId = 'switch-' + defaultKey;
+		var fieldSwitchInput = Wu.DomUtil.createId('input', switchId, fieldSwitch);
+		Wu.DomUtil.addClass(fieldSwitchInput, 'cmn-toggle cmn-toggle-round-flat');
+		fieldSwitchInput.setAttribute('type', 'checkbox');
+		var fieldSwitchLabel = Wu.DomUtil.create('label', '', fieldSwitch);
+		fieldSwitchLabel.setAttribute('for', switchId);
+
+		// set checked
+		if (on) fieldSwitchInput.setAttribute('checked', 'checked');
+
+
+
+		// todo: events
+
+		// set save events
+		Wu.DomEvent.on(fieldSwitchInput, 'change', this._saveTip, this);
+		Wu.DomEvent.on(fieldKey, 'keyup', this._saveTip, this);
+
+	},
+
+	_saveTip : function () {
+
+		console.log('save tooltip meta');
+
+		// clear timer, dont save more than erry second
+		if (this._savingTooltip) clearTimeout(this._savingTooltip);
+
+		var that = this;
+		this._savingTooltip = setTimeout(function () {
+
+			// do the save
+			that._saveTooltipMeta();
+
+			// set status
+			app.setSaveStatus()
+	
+		}, 1000);
+
+		
+
+	},
+
+	_saveTooltipMeta : function () {
+
+		var saved = {
+			title : '',
+			fields : []
+		};
+
+		// iterate
+		var childs = this._tooltipWrapper.childNodes;
+		for (var i = 0; i < childs.length; i++) {
+
+			var child = childs[i];
+
+			// get title
+			if (i == 0) {
+				saved.title = child.value;
+				continue;
+			}
+
+			var key = child.childNodes[0].getAttribute('placeholder');
+			var title = child.childNodes[0].value;
+			var checked = child.childNodes[1].querySelector('input:checked');
+			var on = (!checked) ? false : true;
+
+			// get each
+			saved.fields.push({
+				key : key,
+				title : title,
+				on : on
+			});
+		}
+
+		console.log('saved->', saved);
+
+
+
+		// save to server
+		this._layer.setTooltipMeta(saved);
+		
+
+	},
+
+
 
 
 	toggleLayerDropDown : function () {
@@ -387,27 +629,7 @@ L.Control.CartoCSS = L.Control.extend({
 
 	},
 	
-	refresh : function (layer) {
-
-		// new layer is active
-		this._layer = layer;
-		this._cartoid = false;
-
-		// insert title
-		this._styleHeaderLayerName.innerHTML = layer.store.title.camelize();
-
-		// check for existing css
-		this._cartoid = this._layer.getCartoid();
-
-		// insert into input area
-		if (this._cartoid) {				// callback
-			this._layer.getCartoCSS(this._cartoid, this.insertCss.bind(this));
-		} else {
-			// no style stored on layer yet, set welcome message with meta
-			this.setLayerDescription();
-		}
-
-	},
+	
 
 	insertCss : function (ctx, css) {
 
@@ -415,18 +637,7 @@ L.Control.CartoCSS = L.Control.extend({
 		this.updateCodeMirror(css);
 	},
 
-	// update (new project, etc.)
-	update : function () {
-
-		// set active project
-		this.project = app.activeProject;
-
-		// get all active, geojson layers
-		this._layers = this.project.getStylableLayers();
-
-		// fill active layers box
-		this._fillLayers();
-	},
+	
 
 	toggle : function () {
 		this._open ? this.close() : this.open();
@@ -445,7 +656,7 @@ L.Control.CartoCSS = L.Control.extend({
 		Wu.DomUtil.removeClass(this._editorContainer, 'open');
 	},
 
-	updateCss : function () {
+	renderStyling : function () {
 
 		// return if no active layer
 		if (!this._layer) return;
@@ -468,13 +679,13 @@ L.Control.CartoCSS = L.Control.extend({
 		}
 
 		// save to server
-		this._layer.setCartoCSS(json, this.updatedCss.bind(this));
+		this._layer.setCartoCSS(json, this.renderedStyling.bind(this));
 
-		
+
 	},
 
 	
-	updatedCss : function (context, json) {
+	renderedStyling : function (context, json) {
 
 		// parse
 		var result = JSON.parse(json);
@@ -484,6 +695,9 @@ L.Control.CartoCSS = L.Control.extend({
 			
 		// update style on layer
 		this._layer.updateStyle();
+
+		// update legends tab 
+		this._updateLegends(result.cartoid);
 	},
 
 	handleError : function (error) {

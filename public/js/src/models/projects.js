@@ -691,10 +691,10 @@ Wu.Project = Wu.Class.extend({
 			var thumbnail = (file.type == 'image') ? '/pixels/' + file.uuid + '?width=50&height=50' : '';
 
 			var prefix    = (file.type == 'image') ? '/images/' 					: '/api/file/download/?file=';
-			var suffix    = (file.type == 'image') ? '' 						: '&type=zip';// + file.type;
+			// var suffix    = (file.type == 'image') ? '' 						: '&type=zip';// + file.type;
 			
 			// var url       = '/pixels/' + file.uuid + '?width=200&height=200';
-			var url = prefix + file.uuid + suffix
+			var url = prefix + file.uuid;// + suffix
 
 			var source = {
 			    	title 	: file.name, 	// title

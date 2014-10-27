@@ -41,7 +41,8 @@ Wu.App = Wu.Class.extend({
 		servers : {
 			// not used, using window url atm..
 			portal : 'http://projects.ruppellsgriffon.com/',	// api 		//todo: remove hardcoded ip's
-			raster : 'http://{s}.systemapic.com:8080/raster/', 	// cartocss raster tile server tx
+			// raster : 'http://{s}.systemapic.com:8080/raster/', 	// cartocss raster tile server tx
+			raster : 'http://{s}.systemapic.com:8080/', 	// cartocss raster tile server tx
 		},
 
 		silentUsers : [
