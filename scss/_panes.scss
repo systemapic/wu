@@ -229,8 +229,12 @@
 
 .client-description {
 	font-size: 12px;
-	text-indent: 4px;
 	color: #666;
+	width: 134px;
+	text-indent: 0;
+	left: 5px;
+	position: relative;
+	font-weight: 500;
 	}
 
 .client-description input {
@@ -1517,44 +1521,47 @@ button.image-attachment {
 /* Controls wrapper (with upload, search field, etc) */
 .datalibrary-controls,
 .users-controls {
-/*	height: 42px;
+	height: 60px;
 	position: relative;
 	border-bottom: 1px solid;
-	margin-bottom: 20px;
 	color: #666;
-*/
-
-height: 60px;
-position: relative;
-border-bottom: 1px solid;
-color: #666;
-top: 1px;
-width: 100%;
-padding-right: 129px;
-left: 0px;
-z-index: 999;
-padding-left: 20px;
-padding-top: 15px;
-box-sizing: border-box;
+	top: 1px;
+	width: 100%;
+	padding-right: 129px;
+	left: 0px;
+	z-index: 999;
+	padding-left: 20px;
+	padding-top: 15px;
+	box-sizing: border-box;
 	}
 
 .users-controls {
-background: #ebedef;		
-}	
+	background: #ebedef;		
+	}	
+
+.hide-top .users-controls,
+.hide-top .datalibrary-controls {
+	display: none;
+	}
+
+.hide-top {
+	padding-bottom: 95px !important;
+	}
+
 
 .users-controls-inner div {
 	margin-right: 5px;
-}
+	}
 
 .datalibrary-controls-inner {
-position: absolute;
-top: 0;
-width: 100%;
-height: 100%;
-left: 0;
-background: #ebedef;	
-padding: 16px;
-}
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	background: #ebedef;	
+	padding: 16px;
+	}
 
 #datalibrary-search {
 	margin-left: 5px;

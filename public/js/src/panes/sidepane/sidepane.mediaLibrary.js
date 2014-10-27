@@ -169,7 +169,7 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 
 	__leftImageUpdate : function () {
 
-			var crunchPath = 'http://85.10.202.87:8080/pixels/';		
+			var crunchPath = app.options.servers.portal + 'pixels/';		
 
 			var thisImage = this.images[this._currentActiveLeft];
 
@@ -285,7 +285,7 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 
 		imgFrame.Image.img.removeAttribute("style");
 
-		var crunchPath = 'http://85.10.202.87:8080/pixels/';		
+		var crunchPath = app.options.servers.portal + 'pixels/';		
 
 
 		// Request Image

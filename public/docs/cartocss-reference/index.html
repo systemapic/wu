@@ -1,0 +1,148 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<head profile="http://gmpg.org/xfn/11">
+<link type="text/css" rel="stylesheet" href="style.css" />
+
+<script type="text/javascript" src="cartoref.js"></script>
+<script type="text/javascript" src="data.js"></script>
+<script type="text/javascript" src="d3.min.js"></script>
+
+</head>
+
+
+<body>
+
+
+<div id="cartoref-wrapper">
+<div class="cartoref-head-wrapper">
+
+<h1>CartoCSS documentation</h1>
+
+<div class="mapbox-ref">This reference guide is taken from MapBox refernce guide for cartoCSS, and the official documentation can be seen <a href="https://github.com/mapbox/carto/blob/master/docs/latest.md" target="_blank">here</a>.</div>
+
+<h2>Symbolizers</h2>
+
+<p>Mapnik, the rendering software Systemapic is built upon, provides a number of fundamental style types out of which to build complex styles. Each type is called a symbolizer, and has its own set of configurable properties.</p>
+
+<p>There are 10 different symbolizers available in cartoCSS, each of which can be applied to a certain type or types of geometry:</p>
+
+<ul>
+	<li><b><a href="#Line">Line and Line Patterns</a></b> (for lines & polygons)</li>
+	<li><b><a href="#Polygon">Polygon and Polygon patterns</a></b> (for polygons)</li>
+	<li><b><a href="#Point">Point</a></b> (for points)</li>
+	<li><b><a href="#Text">Text</a></b> (for points, lines, and polygons)</li>
+	<li><b><a href="#Shield">Shield</a></b> (for points & lines)</li>
+	<li><b><a href="#Raster">Raster</a></b> (for rasters)</li>
+	<li><b><a href="#Markers">Markers</a></b> (for points, lines, & polygons)</li>
+	<li><b><a href="#Buildings">Buildings</a></b></li>
+</ul>
+
+
+<p>A symbolizer is not present on the map unless it has a style defined, but once one of its style properties is added to the stylesheet default values will apply to the other properties for that symbolizer unless overridden. For example, the default line symbolizer color is black, so if you assign a line-width to a layer that line will be black unless you also assign a different color.</p>
+
+<h2>Multiple symbolizers</h2>
+
+<p>A single layer is not limited to one of each symbolizer type. For example, multiple semi-transparent line symbolizers can be assigned to a polygon to achieve a soft glow or shadow effect. Multiple text symbolizers can be assigned to the same point with different offsets to label it with more than one field.</p>
+
+<p>You can explicitly declare any number of new symbolizers for a layer that will be rendered in addition to styles they would otherwise conflict with. New symbolizers are defined using a double colon syntax inspired by pseudo-elements in CSS3:</p>
+
+<div class="value-code">
+<span class="r">#layer</span> {<br>
+<span class="gray">/* styles for the default symbolizers */</span><br>
+}<br><br>
+<span class="r">#layer::newsymbol</span> {<br>
+<span class="gray">/* styles for a new symbolizer named 'newsymbol' */</span><br>
+}	
+</div>
+
+
+<h2>Styling for Zoom levels</h2>
+
+<p>You may also want to style your map at different zoom levels. This can be done by declaring the zoom level inside your code like in the example below</p>
+	
+
+
+
+<div class="value-code">
+<span class="r">#layer</span> {<br>
+<span class="br">[zoom<=10]</span> {<br>
+<span class="gray">/* Styling for zoom level 10 or lower</span><br>
+}<br>
+<span class="br">[zoom>=10]</span> {<br>
+<span class="gray">/* Styling for zoom level 10 or higher</span><br>
+}<br>
+<span class="br">[zoom=10]</span> {<br>
+<span class="gray">/* Styling for zoom level 10 only</span><br>
+}<br>
+<span class="br">[zoom<=15][zoom>=10]</span> {<br>
+<span class="gray">/* Styling for zoom level 10 to 15</span><br>
+}<br>
+}
+</div>
+
+
+<div class="carto-seperator"></div>
+
+<h1>The Symbolizers</h1>
+
+<h3>Below you will find a list of possible symbolizers in cartoCSS. At the very bottom of the page there is a reference to explain the value terms, such as "float", "string", "color", etc.
+</h3>
+
+<h3>For quick access to what you're looking for, feel free to use the nifty search tool below
+</h3>
+
+
+<input type="text" placeholder="Search" id="searcher"/>
+
+</div>
+
+<div id="hook"></div>
+
+<div class="carto-seperator"></div>
+
+<div id="valuehook"></div>
+
+
+
+
+<script type="text/javascript">
+
+
+
+var searcher = document.getElementById("searcher");
+
+searcher.onfocus  = function() {
+	this.onkeydown = function() {
+		var that = this;
+		setTimeout(function(){
+			var searchValue = that.value;
+			if ( !searchValue || searchValue == '' ) {
+				cartoCSS_ref.showresults(sections)
+			} else {
+				cartoCSS_ref.search(searchValue);	
+			}
+		}, 20)
+	}
+}
+
+
+
+searcher.onblur  = function() {
+
+}
+
+
+
+
+
+cartoCSS_ref.init();
+
+
+
+
+</script>
+
+</div>
+
+</body>
+</html>

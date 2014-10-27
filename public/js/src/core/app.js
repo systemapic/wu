@@ -16,9 +16,9 @@ Wu.App = Wu.Class.extend({
 			mapOptions 	: true,
 			documents 	: true,               	
 			dataLibrary 	: true,               	
-			mediaLibrary    : false,
 			users 		: true,
-			share 		: true
+			share 		: true,
+			mediaLibrary    : false
 		},	
 		
 		// default settings (overridden by project settings)
@@ -40,11 +40,8 @@ Wu.App = Wu.Class.extend({
 
 		servers : {
 			// not used, using window url atm..
-			portal : 'http://85.10.202.87:8080/',	// api
-			raster : 'http://85.10.202.87:8003/',	// raster tile server
-			carto  : 'http://{s}.systemapic.com:8080/raster/', 	// cartocss raster tile server
-			vector : '',				// vector tile server
-			socket : ''				// websocket server
+			portal : 'http://projects.ruppellsgriffon.com/',	// api 		//todo: remove hardcoded ip's
+			raster : 'http://{s}.systemapic.com:8080/raster/', 	// cartocss raster tile server tx
 		},
 
 		silentUsers : [

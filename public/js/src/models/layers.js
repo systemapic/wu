@@ -109,6 +109,16 @@ Wu.Layer = Wu.Class.extend({
 		return false;
 	},
 
+	getMetaFields : function () {
+		var meta = this.getMeta();
+		if (!meta) return false;
+		if (!meta.json) return false;
+		if (!meta.json.vector_layers) return false;
+		if (!meta.json.vector_layers[0]) return false;
+		if (!meta.json.vector_layers[0].fields) return false;
+		return meta.json.vector_layers[0].fields;
+	},
+
 
 	hide : function () {
 		var container = this.getContainer();
@@ -212,7 +222,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 
 		// tile server ip
-		var tileServer = app.options.servers.carto;
+		var tileServer = app.options.servers.raster;
 
 		// tile url
 		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png';

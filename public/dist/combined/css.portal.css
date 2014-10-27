@@ -725,6 +725,20 @@ label.info {
 │  ├┤ ├─┤├┤ │  ├┤  │    ││├┬┘├─┤│││
 ┴─┘└─┘┴ ┴└  ┴─┘└─┘ ┴   ─┴┘┴└─┴ ┴└┴┘
 */
+/* Close button on tooltip on map */
+.leaflet-container a.leaflet-popup-close-button {
+  width: 25px;
+  height: 20px;
+  top: 7px;
+  right: 4px;
+  background-image: url(images/evil_sprite.png);
+  background-repeat: no-repeat;
+  background-position: -22px -44px;
+  opacity: 0.3; }
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+  opacity: 0.5; }
+
 .leaflet-draw-section {
   position: relative;
   width: 26px;
@@ -2431,8 +2445,12 @@ label.info {
 
 .client-description {
   font-size: 12px;
-  text-indent: 4px;
-  color: #666; }
+  color: #666;
+  width: 134px;
+  text-indent: 0;
+  left: 5px;
+  position: relative;
+  font-weight: 500; }
 
 .client-description input {
   background: transparent; }
@@ -3503,12 +3521,6 @@ button.image-attachment {
 
 /* Controls wrapper (with upload, search field, etc) */
 .datalibrary-controls, .users-controls {
-  /*	height: 42px;
-	position: relative;
-	border-bottom: 1px solid;
-	margin-bottom: 20px;
-	color: #666;
-*/
   height: 60px;
   position: relative;
   border-bottom: 1px solid;
@@ -3524,6 +3536,12 @@ button.image-attachment {
 
 .users-controls {
   background: #ebedef; }
+
+.hide-top .users-controls, .hide-top .datalibrary-controls {
+  display: none; }
+
+.hide-top {
+  padding-bottom: 95px !important; }
 
 .users-controls-inner div {
   margin-right: 5px; }
@@ -4715,9 +4733,6 @@ input[type=checkbox] + label.check {
 .active-project:hover {
   background: rgba(255, 255, 255, 0.8); }
 
-#datalibrary-table th:hover {
-  font-weight: 500; }
-
 .drop-meta-wrapper {
   height: 400px;
   position: absolute;
@@ -4808,6 +4823,9 @@ input.cmn-toggle-round-flat:checked + label:after {
   background-color: #8ce196; }
 
 /*Share pane*/
+.q-editor-content-item.share {
+  min-height: 420px; }
+
 .share-wrapper {
   height: 240px;
   cursor: default; }
@@ -5007,7 +5025,7 @@ input.cmn-toggle-round-flat:checked + label:after {
 .controls-switch {
   top: 6px;
   right: 6px;
-  /*pointer-events: none;*/ }
+  pointer-events: none; }
 
 input.cmn-toggle-round-flat:checked + label, input.cmn-toggle-round-flat:checked + label:after {
   background-color: #666 !important; }
@@ -5190,7 +5208,7 @@ input.cmn-toggle-round-flat + label:before {
   height: 100%;
   padding: 6px;
   position: relative;
-  padding-bottom: 92px;
+  padding-bottom: 122px;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
   cursor: default;
   pointer-events: all; }
@@ -5455,6 +5473,76 @@ width: 392px;
 
 .active-error {
   display: block; }
+
+.cartocss-zoomval {
+  position: absolute;
+  width: 26px;
+  text-align: center;
+  top: 7px;
+  left: 6px;
+  height: 25px;
+  line-height: 2.2;
+  background: #ECECEC;
+  font-size: 11px;
+  font-weight: 500; }
+
+.cartocss-tab-wrapper {
+  width: 389px;
+  border: 1px solid #ddd;
+  border-bottom: none;
+  height: 30px; }
+
+.cartocss-tab {
+  width: 129px;
+  float: left;
+  text-align: center;
+  height: 29px;
+  line-height: 2.2;
+  font-size: 13px;
+  background: #EEE;
+  cursor: pointer; }
+
+.cartocss-tab:hover {
+  background: #F6F6F6; }
+
+.cartocss-active-tab {
+  background: #FFF; }
+
+.cartocss-active-tab:hover {
+  background: #FFF; }
+
+.cartocss-tab-styling {
+  border-right: 1px solid #ddd; }
+
+.cartocss-tab-legends {
+  border-left: 1px solid #ddd; }
+
+.cartocss-legends-wrapper {
+  width: 389px;
+  background: #f8f8f8;
+  height: 100%;
+  border: 1px solid #ddd; }
+
+.cartocss-tooltip-wrapper {
+  width: 389px;
+  background: #f8f8f8;
+  height: 100%;
+  border: 1px solid #ddd; }
+
+.tooltip-field-wrapper {
+  position: relative;
+  padding: 5px;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 2px; }
+
+.tooltip-field-key {
+  width: 200px;
+  display: inline-block;
+  vertical-align: top; }
+
+.tooltip-field-value {
+  display: inline-block;
+  vertical-align: top; }
 
 /* @import 'color_picker';	// Color picker */
 /* @import 'mediaLibrary';	// Media Library */

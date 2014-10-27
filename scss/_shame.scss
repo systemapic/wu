@@ -71,7 +71,7 @@
 }
 
 #datalibrary-table th:hover {
-	font-weight: 500;
+//	font-weight: 500;
 }
 
 .drop-meta-wrapper {
@@ -175,6 +175,9 @@ input.cmn-toggle-round-flat:checked + label:after {
 
 
 /*Share pane*/
+.q-editor-content-item.share {
+	min-height: 420px;
+	}
 
 .share-wrapper {
 	height: 240px;
@@ -251,7 +254,6 @@ input.cmn-toggle-round-flat:checked + label:after {
 	border: 1px solid gray;
 	margin: 10px;
 }
-
 
 .share-link-wrap {
 	padding: 10px;
@@ -421,7 +423,7 @@ input.cmn-toggle-round-flat:checked + label:after {
 .controls-switch {
 	top: 6px;
 	right: 6px;
-	/*pointer-events: none;*/
+	pointer-events: none;
 }
 
 input.cmn-toggle-round-flat:checked + label,
@@ -663,7 +665,7 @@ position: relative;
 	padding: 6px;
 	position: relative;
 //	padding-bottom: 295px;
-	padding-bottom: 92px;
+	padding-bottom: 122px;
 	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
 	cursor: default;
 	pointer-events: all;
@@ -993,4 +995,140 @@ z-index: 999;
 
 .active-error {
 	display: block;
+}
+
+
+.cartocss-zoomval {
+	position: absolute;
+	width: 26px;
+	text-align: center;
+	top: 7px;
+	left: 6px;
+	height: 25px;
+	line-height: 2.2;
+	background: #ECECEC;
+	font-size: 11px;
+	font-weight: 500;
+	}
+
+
+
+
+
+
+
+
+
+.cartocss-tab-wrapper {
+	width: 389px;
+	border: 1px solid #ddd;
+	border-bottom: none;
+	height: 30px;
+	}	
+
+.cartocss-tab {
+	width: 129px;
+	float: left;
+	text-align: center;
+	height: 29px;
+	line-height: 2.2;
+	font-size: 13px;
+	background: #EEE;
+	cursor: pointer;
+	}
+
+.cartocss-tab:hover {
+	background: #F6F6F6;
+	}
+
+.cartocss-active-tab {
+	background: #FFF;
+	}
+
+.cartocss-active-tab:hover {
+	background: #FFF;
+	}
+
+
+.cartocss-tab-styling {
+	border-right: 1px solid #ddd;
+	}
+
+.cartocss-tab-tooltip {
+
+}
+
+.cartocss-tab-legends {
+border-left: 1px solid #ddd;
+}
+
+.cartocss-legends-wrapper {
+	width: 389px;
+	background: #f8f8f8;
+	height: 100%;
+	border: 1px solid #ddd;
+}
+
+.cartocss-tooltip-outer-wrapper {
+	width: 389px;
+	background: #f8f8f8;
+	height: 100%;
+	border: 1px solid #ddd;
+	padding: 2px;
+	overflow: hidden;
+}
+
+.cartocss-tooltip-wrapper {
+width: 410px;
+padding-right: 28px;
+box-sizing: border-box;
+-webkit-box-sizing: border-box;
+overflow-x: hidden;
+overflow: scroll;
+height: 100%;
+	}
+
+
+.tooltip-field-wrapper .controls-switch {
+	top: 4px;
+	pointer-events: all;
+}
+
+.tooltip-field-wrapper {
+position: relative;
+padding: 5px;
+background: rgba(0, 0, 0, 0.1);
+margin: 2px;
+width: 378px;
+	}
+	
+
+.tooltip-field-key {
+width: 318px;
+display: inline-block;
+vertical-align: top;
+border: none;
+outline: none;
+padding: 2px;
+padding-left: 5px;
+background: rgba(255,255,255,0.5);
+}
+
+.tooltip-field-value {
+	display: inline-block;
+	vertical-align: top;
+}
+
+
+#cartocss-tooltip-custom-header {
+width: 379px;
+border: 0;
+outline: 0;
+background: rgba(0,0,0,0.1);
+margin: 2px;
+margin-top: 4px;
+padding: 5px;
+font-size: 15px;
+padding-left: 8px;
+margin-left: 2px;
 }
