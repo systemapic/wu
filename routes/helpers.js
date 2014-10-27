@@ -335,7 +335,7 @@ module.exports = api = {
 		// console.log('-> args: ', args);
 
 		var cmd = "phantomjs /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
-		// console.log('cmd: ', cmd);
+		console.log('cmd: ', cmd);
 
 
 		var ops = [];
@@ -347,10 +347,10 @@ module.exports = api = {
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
 
-				// console.log('executed phantomJS');
-				// console.log('err: ', err);
-				// console.log('stdout: ', stdout);
-				// console.log('stdin: ', stdin);
+				console.log('executed phantomJS');
+				console.log('err: ', err);
+				console.log('stdout: ', stdout);
+				console.log('stdin: ', stdin);
 
 				callback(err);
 			});
@@ -361,7 +361,9 @@ module.exports = api = {
 		ops.push(function (callback) {
 
 			fs.stat(path, function (err, stats) {
-				dataSize = stats.size;
+				console.log('err: ', err);
+				console.log('stats: ', stats);
+				if (stats) dataSize = stats.size;
 	 			callback(err);
 	 		});
 
@@ -398,6 +400,8 @@ module.exports = api = {
 		async.series(ops, function (err, results) {
 			// console.log('all done: ', err);
 			// console.log('results', results);
+
+			if (err) console.log('err', err);
 
 			var file = results[2]
 
@@ -1300,6 +1304,10 @@ module.exports = api = {
 		var email     = req.body.email;
 		var lastName  = req.body.lastName;
 		var firstName = req.body.firstName;
+		var company   = req.body.company;
+		var position  = req.body.position;
+		var phone     = req.body.phone;
+
 
 		// return if not authorized
 		if (!api.can.create.user( user )) {
@@ -1322,8 +1330,9 @@ module.exports = api = {
 		newUser.local.password 	= newUser.generateHash(password);
 		newUser.firstName 	= firstName;
 		newUser.lastName 	= lastName;
-		newUser.company 	= 'Company';
-		newUser.position 	= 'Position';
+		newUser.company 	= company;
+		newUser.position 	= position;
+		newUser.phone 		= phone;
 		newUser.createdBy	= user.uuid;
 		
 		// save the user
@@ -2385,18 +2394,52 @@ module.exports = api = {
 			console.log(record);
 
 			// if more than one file, zip it up
-			if (record.files.length > 1) {
-				console.log('lots of files, gonna zip it up...');
+			// if (record.files.length > 1) {
+				console.log('lots of files, gondna zip it up...');
 				
 				// todo: download several files (zipped)
 
-			} else {
-				var path = FILEFOLDER + file + '/' + record.files[0];
-				res.download(path);
-				return;
-			}
+				// '/var/www/data/files/'; //file-8b8df56b-860f-4583-979a-803676c1c35c'
 
-			return res.end('alliscool');
+				
+				var name = record.name.replace(/\s+/g, '');
+
+				// execute cmd line zipping 
+				var out = '/var/www/data/tmp/' + name + '_' + record.type + '.zip';
+				var infile = FILEFOLDER + file + '/*';
+				var working_dir = FILEFOLDER + file;
+				console.log('infile: ', infile);
+				console.log('working_dir', working_dir);
+				var cmd = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store';// + infile; 
+				var exec = require('child_process').exec;				
+				
+				console.log('cmd: ', cmd);
+
+				// run command
+				exec(cmd, { cwd : working_dir }, function (err, stdout, stdin) {
+					if (err) {
+						console.log('err: ', err);
+						return res.end(err); // if err
+					}
+
+					console.log('err:', err);
+					console.log('stdout: ', stdout);
+					console.log('stdin: ', stdin);
+
+					console.log('returning zip file: ', out);
+					// send zip file
+					res.download(out);
+				});
+
+
+
+			// } else {
+			// 	var path = FILEFOLDER + file + '/' + record.files[0];
+			// 	res.download(path);
+			// 	return;
+			// }
+
+			// return res.end('alliscool');
 
 		});
 
@@ -2410,21 +2453,26 @@ module.exports = api = {
 		var folder = TEMPFOLDER + file;
 		var found = false;
 		
+		console.log('dowzip');
+
 		// find zip file
 		dive(folder, 
 
 			// each file callback
 			function(err, file) {
-					
+				// err
+				if (err || !file) return res.end('File not found.');
+
 				if (file.slice(-3) == 'zip') {
 					found = true;
-					res.download(file);
-					return;				// todo: delete zip file
+					return res.download(file);
+								// todo: delete zip file
 				}
 			}, 
 
 			// callback
 			function () { 
+				console.log('found: ', found);
 				if (!found) return res.end('File not found.'); 
 			}	
 		);
@@ -2457,7 +2505,7 @@ module.exports = api = {
 			return api.downloadFile(req, res);
 			
 		} else {
-			console.log('not type file');
+			return api.downloadFile(req, res);
 		}
 		// got nothing to do
 		res.end('Please specifys a file.'); return;

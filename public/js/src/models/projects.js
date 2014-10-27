@@ -612,9 +612,12 @@ Wu.Project = Wu.Class.extend({
 
 			// remove layers
 			if (layer) {
-				// remove from layermenu store
-				var removed = _.remove(this.store.layermenu, function (item) { return item.layer == layer.store.uuid; });
-				
+				// remove from layermenu & baselayer store
+				_.remove(this.store.layermenu, function (item) { return item.layer == layer.store.uuid; });
+				// var baseLayer = _.find(this.store.baseLayers, function (b) { return b.uuid == layer.store.uuid;});
+				// console.log('baseLayer: ', baseLayer, layer);
+				_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.store.uuid; });
+
 				// remove from layermenu
 				if (layerMenu) layerMenu.onDelete(layer);
 					
@@ -680,12 +683,19 @@ Wu.Project = Wu.Class.extend({
 
 	// format files for Grande plugin
 	_formatGrandeFiles : function (files) {
+		console.log('_formatGrandeFiles');
 		var sources = [];
 		files.forEach(function (file) {
+			console.log('file.type', file.type);
+
 			var thumbnail = (file.type == 'image') ? '/pixels/' + file.uuid + '?width=50&height=50' : '';
-			var prefix    = (file.type == 'image') ? '/images/' : '/api/file/download/?file=';
-			var suffix    = (file.type == 'image') ? '' : '&type=' + file.type;
-			var url       = '/pixels/' + file.uuid + '?width=200&height=200';
+
+			var prefix    = (file.type == 'image') ? '/images/' 					: '/api/file/download/?file=';
+			var suffix    = (file.type == 'image') ? '' 						: '&type=zip';// + file.type;
+			
+			// var url       = '/pixels/' + file.uuid + '?width=200&height=200';
+			var url = prefix + file.uuid + suffix
+
 			var source = {
 			    	title 	: file.name, 	// title
 			    	thumbnail : thumbnail,  // optional. url to image

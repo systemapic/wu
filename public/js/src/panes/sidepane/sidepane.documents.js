@@ -68,15 +68,15 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		        	// file attachments
 			        attachments : new G.Attachments(sources, {
-			        	icon : ['http://85.10.202.87:8080/images/image-c9471cb2-7e0e-417d-a048-2ac501e7e96f',
-			        		'http://85.10.202.87:8080/images/image-7b7cc7e4-404f-4e29-9d7d-11f0f24faf42'],
+			        	icon : [app.options.servers.portal + 'images/image-c9471cb2-7e0e-417d-a048-2ac501e7e96f',
+			        		app.options.servers.portal + 'images/image-7b7cc7e4-404f-4e29-9d7d-11f0f24faf42'],
 			        	className : 'attachment'
 			        }),
 
 			        // image attachments
 			        images :  new G.Attachments(images, {
-			        	icon : ['http://85.10.202.87:8080/images/image-0359b349-6312-4fe5-b5d7-346a7a0d3c38',
-			        		'http://85.10.202.87:8080/images/image-087ef5f5-b838-48bb-901f-7e896de7c59e'],
+			        	icon : [app.options.servers.portal + 'images/image-0359b349-6312-4fe5-b5d7-346a7a0d3c38',
+			        		app.options.servers.portal + 'images/image-087ef5f5-b838-48bb-901f-7e896de7c59e'],
 			        	embedImage : true,			// embed image in text! 
 			        	className : 'image-attachment'
 			        }),

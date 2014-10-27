@@ -74,10 +74,13 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 	},
 
 	toggleOpen : function () {
+		console.log('toggle: ', this);
+		console.log('this._isOpen', this._isOpen);
 		this._isOpen ? this.close() : this.open();
 	},
 
 	open : function () {
+		console.log('open!');
 		this.calculateHeight();
 		this._outer.style.height = this.maxHeight + 20 + 'px';       
 		this._open(); // local fns   
@@ -499,7 +502,7 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 	disableLayer : function (baseLayer) {
 
 		// disable layer in map
-		baseLayer.layer.disable(); 
+		if (baseLayer && baseLayer.layer) baseLayer.layer.disable(); 
 
 		// save
 		_.remove(this.project.store.baseLayers, function (b) { return b.uuid == baseLayer.layer.store.uuid; });
@@ -708,10 +711,13 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 	calculateHeight : function () {
 
 		var min = _.size(this.project.getBaselayers());
+		console.log('base: ', min);
 		var padding = this.numberOfProviders * 35;
 		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
+		console.log('this.project.lauers', this.project.layers);
 		this.minHeight = 0;
 
+		console.log('calcheight: ', this.minHeight, this.maxHeight);
 		// add 100 if in editMode
 		if (this.editMode) this.maxHeight += 100;
 	},
@@ -1091,8 +1097,14 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 			var minZoom 	= bounds.minZoom;
 			var maxZoom 	= bounds.maxZoom;
 
-	    		// set bounds
-			map.setMaxBounds(maxBounds);
+	    		if (bounds == this._nullBounds) {
+	    			console.log('NULLBOUNDS!!', bounds, this._nullBounds);
+	    			map.setMaxBounds(false);
+	    		} else {
+	    			console.log("GOTBOUDNS!!", bounds, this._nullBounds);
+	    			map.setMaxBounds(maxBounds);
+	    		}
+			
 
 			// set zoom
 			map.options.minZoom = minZoom;
@@ -1104,6 +1116,21 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 
 	},
 
+
+	_nullBounds : {				
+		northEast : {
+			lat : '90',
+			lng : '180'
+		},
+
+		southWest : {
+			lat : '-90',
+			lng : '-180'
+		},
+		minZoom : '1',
+		maxZoom : '20'
+	},
+
 	clearBounds : function () {
 		
 		// get actual Project object
@@ -1111,25 +1138,18 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		var map = Wu.app._map;
 
 		// set bounds to project
-		project.setBounds({				
-			northEast : {
-				lat : 90,
-				lng : 180
-			},
+		project.setBounds(this._nullBounds);
 
-			southWest : {
-				lat : -90,
-				lng : -180
-			},
-			minZoom : 1,
-			maxZoom : 20
-		});
+
 
 		// call update on view
 		this.update();
 
 		// enforce
 		this.enforceBounds();
+
+		// no bounds
+		map.setMaxBounds(false);
 
 	},
 

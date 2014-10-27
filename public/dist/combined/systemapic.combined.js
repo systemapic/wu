@@ -3660,37 +3660,27 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// create new fullscreen page, and set as default content
 		this._content = Wu.DomUtil.create('div', 'fullpage-users', Wu.app._appPane);
 		
-
 		// Users Control
 		this._usersControls = Wu.DomUtil.create('div', 'users-controls', this._content);
 		this._usersControlsInner = Wu.DomUtil.create('div', 'users-controls-inner', this._usersControls);
 
 		// Add user button
 		this._addUser = Wu.DomUtil.createId('div', 'users-add-user', this._usersControlsInner);
-		Wu.DomUtil.addClass(this._addUser, 'smap-button-gray users');
 		this._addUser.innerHTML = 'Create user';
+		Wu.DomUtil.addClass(this._addUser, 'smap-button-gray users');
 
 		// Delete user button
 		this._delUser = Wu.DomUtil.createId('div', 'users-delete-user', this._usersControlsInner);
-		Wu.DomUtil.addClass(this._delUser, 'smap-button-gray users');
 		this._delUser.innerHTML = 'Delete user';
+		Wu.DomUtil.addClass(this._delUser, 'smap-button-gray users');
 
 		// Search users
-		this._searchUser = Wu.DomUtil.createId('input', 'users-search', this._usersControlsInner);
-		Wu.DomUtil.addClass(this._searchUser, 'search ct17');
-		this._searchUser.setAttribute("type", "text");
-		this._searchUser.setAttribute("placeholder", "Search users");
+		this._search = Wu.DomUtil.createId('input', 'users-search', this._usersControlsInner);
+		this._search.setAttribute("type", "text");
+		this._search.setAttribute("placeholder", "Search users");
+		Wu.DomUtil.addClass(this._search, 'search ct17');
 
-
-						// <div class="users-controls">
-												
-						// 		<div id="users-add-user" class="smap-button-gray users">Create user</div>
-						// 		<div id="users-delete-user" class="smap-button-gray users">Delete user</div>
-								
-						// 		<input type="text" id="users-search" class="search ct17" placeholder="Search users" />
-															
-						// </div>
-
+		console.log('initContent');
 
 		// create container (overwrite default) and insert template
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content, ich.usersPane());
@@ -3714,8 +3704,11 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	},
 
-	addHook : function () {
-		this.addEditHooks();
+	addHooks : function () {
+
+		// search
+		Wu.DomEvent.on(this._search, 'keyup', this.searchList, this);
+
 	},
 
 	addEditHooks : function () {
@@ -3759,6 +3752,23 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	},
 
+	searchList : function (e) {
+		console.log('search!!!', this._search.value);
+
+		if (e.keyCode == 27) { // esc
+			this.list.search(); // show all
+			this._search.value = '';
+			return;
+		}
+
+		// get value and search
+		var value = this._search.value;
+		this.list.search(value);
+	},
+
+
+
+
 	// list.js plugin
 	initList : function () { 
 		
@@ -3790,7 +3800,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// add edit hooks
 		this.addEditHooks();
-	
+
+		// this.addHooks();	
 	},
 
 
@@ -3798,28 +3809,35 @@ Wu.SidePane.Client = Wu.Class.extend({
 	// input fullscreen for new user details
 	inputUser : function () {
 
+
+		// Hide the Create user etc.
+		Wu.DomUtil.addClass(this._content, 'hide-top', this);
+
+
 		this._inputUser  = {};
 		var titleText    = 'Create new user';
 		var subtitleText = 'Enter details for the new user:';
 		var messageText  = 'Password is auto-generated. The user will receive login details on email.';
-		var container  = this._inputUser._container = Wu.DomUtil.create('div',   'backpane-container', this._content);
-		var wrapper    = this._inputUser._wrapper   = Wu.DomUtil.create('div',   'backpane-wrapper',   container);
-		var title      = this._inputUser._title     = Wu.DomUtil.create('div',   'backpane-title',     wrapper, titleText);
-		var subtitle   = this._inputUser._subtitle  = Wu.DomUtil.create('div',   'backpane-subtitle',  wrapper, subtitleText);		
-		var firstName  = this._inputUser._firstName = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'First Name');
-		var lastName   = this._inputUser._lastName  = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Last name');
-		var email      = this._inputUser._email     = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Email');
-		var email2     = this._inputUser._email2    = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Confirm Email');
-		var message    = this._inputUser._message   = Wu.DomUtil.create('div',   'backpane-message',   wrapper, messageText);
-		var cancel     = this._inputUser._cancel    = Wu.DomUtil.create('div',   'backpane-cancel smap-button-gray',    wrapper, 'Cancel');
-		var confirm    = this._inputUser._confirm   = Wu.DomUtil.create('div',   'backpane-confirm smap-button-gray',   wrapper, 'Confirm');
+		var container    = this._inputUser._container = Wu.DomUtil.create('div',   'backpane-container', this._content);
+		var wrapper      = this._inputUser._wrapper   = Wu.DomUtil.create('div',   'backpane-wrapper',   container);
+		var title        = this._inputUser._title     = Wu.DomUtil.create('div',   'backpane-title',     wrapper, titleText);
+		var subtitle     = this._inputUser._subtitle  = Wu.DomUtil.create('div',   'backpane-subtitle',  wrapper, subtitleText);		
+		var firstName    = this._inputUser._firstName = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'First Name');
+		var lastName     = this._inputUser._lastName  = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Last Name');
+		var companyName	 = this._inputUser._companyName = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Company Name');
+		var position	 = this._inputUser._position = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Position');
+		var phoneNo	 = this._inputUser._phoneNo = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Phone Number');
+		var email        = this._inputUser._email     = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Email');
+		var email2       = this._inputUser._email2    = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Confirm Email');
+		var message      = this._inputUser._message   = Wu.DomUtil.create('div',   'backpane-message',   wrapper, messageText);
+		var cancel       = this._inputUser._cancel    = Wu.DomUtil.create('div',   'backpane-cancel smap-button-gray',    wrapper, 'Cancel');
+		var confirm      = this._inputUser._confirm   = Wu.DomUtil.create('div',   'backpane-confirm smap-button-gray',   wrapper, 'Confirm');
 
 		Wu.DomEvent.on(email,   'keyup',     this.checkUniqueEmail, this);
 		Wu.DomEvent.on(email2,  'keyup',     this.checkSameEmail,   this);
 		Wu.DomEvent.on(cancel,  'mousedown', this.cancelInput,      this);
 		Wu.DomEvent.on(confirm, 'mousedown', this.confirmInput,     this);
 
-		// cxxxx
 		// Toggle wrappers
 		this._container.style.display = 'none';
 
@@ -3877,6 +3895,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 	cancelInput : function (e) {
 		Wu.DomUtil.remove(this._inputUser._container);
 		this._container.style.display = 'block';
+
+		// Show the Create user etc.
+		Wu.DomUtil.removeClass(this._content, 'hide-top', this);
+
 	},
 
 	confirmInput : function () {
@@ -3884,6 +3906,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var firstName = this._inputUser._firstName.value;
 		var lastName  = this._inputUser._lastName.value;
 		var email     = this._inputUser._email.value;
+		var companyName	= this._inputUser._companyName.value;
+		var position	= this._inputUser._position.value;
+		var phoneNo	= this._inputUser._phoneNo.value;
+
 
 		if (!firstName) return;
 		if (!lastName) return;
@@ -3893,8 +3919,13 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var input = {
 			lastName  : lastName,
 			firstName : firstName,
-			email     : email
+			email     : email,
+			company   : companyName,
+			position  : position,
+			phone     : phoneNo
 		}
+
+
 
 		// create user
 		this.createUser(input);
@@ -3904,6 +3935,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// Toggle pane
 		this._container.style.display = 'block';
+
+		// Show the Create user etc.
+		Wu.DomUtil.removeClass(this._content, 'hide-top', this);
+
 	},
 
 
@@ -4636,10 +4671,13 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	toggleOpen : function () {
+		console.log('toggle: ', this);
+		console.log('this._isOpen', this._isOpen);
 		this._isOpen ? this.close() : this.open();
 	},
 
 	open : function () {
+		console.log('open!');
 		this.calculateHeight();
 		this._outer.style.height = this.maxHeight + 20 + 'px';       
 		this._open(); // local fns   
@@ -5061,7 +5099,7 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 	disableLayer : function (baseLayer) {
 
 		// disable layer in map
-		baseLayer.layer.disable(); 
+		if (baseLayer && baseLayer.layer) baseLayer.layer.disable(); 
 
 		// save
 		_.remove(this.project.store.baseLayers, function (b) { return b.uuid == baseLayer.layer.store.uuid; });
@@ -5270,10 +5308,13 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 	calculateHeight : function () {
 
 		var min = _.size(this.project.getBaselayers());
+		console.log('base: ', min);
 		var padding = this.numberOfProviders * 35;
 		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
+		console.log('this.project.lauers', this.project.layers);
 		this.minHeight = 0;
 
+		console.log('calcheight: ', this.minHeight, this.maxHeight);
 		// add 100 if in editMode
 		if (this.editMode) this.maxHeight += 100;
 	},
@@ -5653,8 +5694,14 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 			var minZoom 	= bounds.minZoom;
 			var maxZoom 	= bounds.maxZoom;
 
-	    		// set bounds
-			map.setMaxBounds(maxBounds);
+	    		if (bounds == this._nullBounds) {
+	    			console.log('NULLBOUNDS!!', bounds, this._nullBounds);
+	    			map.setMaxBounds(false);
+	    		} else {
+	    			console.log("GOTBOUDNS!!", bounds, this._nullBounds);
+	    			map.setMaxBounds(maxBounds);
+	    		}
+			
 
 			// set zoom
 			map.options.minZoom = minZoom;
@@ -5666,6 +5713,21 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 
 	},
 
+
+	_nullBounds : {				
+		northEast : {
+			lat : '90',
+			lng : '180'
+		},
+
+		southWest : {
+			lat : '-90',
+			lng : '-180'
+		},
+		minZoom : '1',
+		maxZoom : '20'
+	},
+
 	clearBounds : function () {
 		
 		// get actual Project object
@@ -5673,25 +5735,18 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		var map = Wu.app._map;
 
 		// set bounds to project
-		project.setBounds({				
-			northEast : {
-				lat : 90,
-				lng : 180
-			},
+		project.setBounds(this._nullBounds);
 
-			southWest : {
-				lat : -90,
-				lng : -180
-			},
-			minZoom : 1,
-			maxZoom : 20
-		});
+
 
 		// call update on view
 		this.update();
 
 		// enforce
 		this.enforceBounds();
+
+		// no bounds
+		map.setMaxBounds(false);
 
 	},
 
@@ -6370,15 +6425,15 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		        	// file attachments
 			        attachments : new G.Attachments(sources, {
-			        	icon : ['http://85.10.202.87:8080/images/image-c9471cb2-7e0e-417d-a048-2ac501e7e96f',
-			        		'http://85.10.202.87:8080/images/image-7b7cc7e4-404f-4e29-9d7d-11f0f24faf42'],
+			        	icon : [app.options.servers.portal + 'images/image-c9471cb2-7e0e-417d-a048-2ac501e7e96f',
+			        		app.options.servers.portal + 'images/image-7b7cc7e4-404f-4e29-9d7d-11f0f24faf42'],
 			        	className : 'attachment'
 			        }),
 
 			        // image attachments
 			        images :  new G.Attachments(images, {
-			        	icon : ['http://85.10.202.87:8080/images/image-0359b349-6312-4fe5-b5d7-346a7a0d3c38',
-			        		'http://85.10.202.87:8080/images/image-087ef5f5-b838-48bb-901f-7e896de7c59e'],
+			        	icon : [app.options.servers.portal + 'images/image-0359b349-6312-4fe5-b5d7-346a7a0d3c38',
+			        		app.options.servers.portal + 'images/image-087ef5f5-b838-48bb-901f-7e896de7c59e'],
 			        	embedImage : true,			// embed image in text! 
 			        	className : 'image-attachment'
 			        }),
@@ -6781,19 +6836,19 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// Upload button
 		this._uploadContainer = Wu.DomUtil.createId('div', 'upload-container', this._controlInner);
-		Wu.DomUtil.addClass(this._uploadContainer, 'smap-button-gray ct17');
 		this._uploadContainer.innerHTML = "Upload";
+		Wu.DomUtil.addClass(this._uploadContainer, 'smap-button-gray ct17');
 
 		// Search field
 		this._search = Wu.DomUtil.createId('input', 'datalibrary-search', this._controlInner);
-		Wu.DomUtil.addClass(this._search, 'search ct17');
 		this._search.setAttribute('type', 'text');
 		this._search.setAttribute('placeholder', 'Search files');
+		Wu.DomUtil.addClass(this._search, 'search ct17');
 
 		// Delete button
 		this._delete = Wu.DomUtil.createId('div', 'datalibrary-delete-file', this._controlInner);
-		Wu.DomUtil.addClass(this._delete, 'smap-button-gray');
 		this._delete.innerHTML = "Delete";
+		Wu.DomUtil.addClass(this._delete, 'smap-button-gray');
 
 		// Download button
 		this._download = Wu.DomUtil.createId('div', 'datalibrary-download-files', this._controlInner);
@@ -6804,9 +6859,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._errors = Wu.DomUtil.createId('div', 'datalibrary-errors', this._controlInner);
 		Wu.DomUtil.addClass(this._download, 'smap-button-gray');
 		
-
-
-
 
 
 		// create container (overwrite default)
@@ -6861,6 +6913,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// check all button
 		Wu.DomEvent.on(this._checkallLabel, 'mousedown', this.checkAll, this);
+
+		// search button
+		Wu.DomEvent.on(this._search, 'keyup', this.searchList, this);
 	       
 	},
 
@@ -6878,6 +6933,20 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		Wu.DomEvent.off(this._deleter, 'mousedown', this.deleteConfirm, this);
 		Wu.DomUtil.addClass(this._deleter, 'displayNone');
 	},
+
+
+	searchList : function (e) {
+		if (e.keyCode == 27) { // esc
+			this.list.search(); // show all
+			this._search.value = '';
+			return;
+		}
+
+		// get value and search
+		var value = this._search.value;
+		this.list.search(value);
+	},
+
 
 	_activate : function () {
 		if (this.dz) this.dz.enable();
@@ -6945,6 +7014,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		Wu.post('/api/file/download', json, this.receivedDownload, this);
 
 
+
+
 	},
 
 	receivedDownload : function (that, response) {
@@ -6972,6 +7043,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// hide
 		if (this._downloadList) this._downloadList.style.display = 'none';
 		if (this._container) this._container.style.display = 'block';
+
+		// Show toolbar (upload, download, delete, search);
+		Wu.DomUtil.removeClass(this._content, 'hide-top', this);		
 	},
 
 	downloadDone : function () {
@@ -7008,6 +7082,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// show
 		this._downloadList.style.display = 'block';
 		this._container.style.display = 'none';
+
+		// Hide toolbar (upload, download, delete, search);
+		Wu.DomUtil.addClass(this._content, 'hide-top', this);
+	
 	},
 
 	getSelected : function () {
@@ -7309,9 +7387,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	// process file
 	uploaded : function (record, options) {
-		// console.log('Upload done:', record);
-		// console.log('options: ', options);
-
+		
 		var options = options || {};
 		
 		// handle errors
@@ -7338,8 +7414,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			this.project.addLayer(layer);
 
 			if (options.autoAdd) {
-				// console.log('autoAdd!');
-				// console.log(layer)
 				app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
 			}
 
@@ -7351,12 +7425,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		if (options.autoAdd) {
 			record.done.layers.forEach(function (layer) {
 
-				// console.log('autoAdd!');
-				// console.log(layer)
 				var layerItem = app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
 				
 				if (layerItem) {
-					// console.log('leyrItem: ', layerItem);
 					app.MapPane.layerMenu.enableLayer(layerItem);
 				}
 			}, this);
@@ -7376,7 +7447,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// clone file object
 		var tmp = Wu.extend({}, file);   
-		// console.log('tmp: ', tmp);
 
 		// add record (a bit hacky, but with a cpl of divs inside the Name column)
 		tmp.name = ich.datalibraryTablerowName({
@@ -7430,7 +7500,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// set click hooks on title and description
 		Wu.DomEvent.on( title,  'mousedown mouseup click', 	this.stop, 	this ); 
 		Wu.DomEvent.on( title,  'dblclick', 			this.rename, 	this );     // select folder
-		Wu.DomEvent.on( desc,   'mousedown mouseup click', 	this.stop, 	this ); 
+		Wu.DomEvent.on( desc,   'mousedown mouseup click', 	this.stop, 	this ); 	
 		Wu.DomEvent.on( desc,   'dblclick', 			this.rename, 	this );     // select folder
 
 	},
@@ -7754,7 +7824,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	__leftImageUpdate : function () {
 
-			var crunchPath = 'http://85.10.202.87:8080/pixels/';		
+			var crunchPath = app.options.servers.portal + 'pixels/';		
 
 			var thisImage = this.images[this._currentActiveLeft];
 
@@ -7870,7 +7940,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		imgFrame.Image.img.removeAttribute("style");
 
-		var crunchPath = 'http://85.10.202.87:8080/pixels/';		
+		var crunchPath = app.options.servers.portal + 'pixels/';		
 
 
 		// Request Image
@@ -11045,15 +11115,15 @@ L.control.inspect = function (options) {
 
 		        	// file attachments
 			        attachments : new G.Attachments(sources, {
-			        	icon : ['http://85.10.202.87:8080/images/image-c9471cb2-7e0e-417d-a048-2ac501e7e96f',
-			        		'http://85.10.202.87:8080/images/image-7b7cc7e4-404f-4e29-9d7d-11f0f24faf42'],
+			        	icon : [app.options.servers.portal + 'images/image-c9471cb2-7e0e-417d-a048-2ac501e7e96f',
+			        		app.options.servers.portal + 'images/image-7b7cc7e4-404f-4e29-9d7d-11f0f24faf42'],
 			        	className : 'attachment'
 			        }),
 
 			        // image attachments
 			        images :  new G.Attachments(images, {
-			        	icon : ['http://85.10.202.87:8080/images/image-0359b349-6312-4fe5-b5d7-346a7a0d3c38',
-			        		'http://85.10.202.87:8080/images/image-087ef5f5-b838-48bb-901f-7e896de7c59e'],
+			        	icon : [app.options.servers.portal + 'images/image-0359b349-6312-4fe5-b5d7-346a7a0d3c38',
+			        		app.options.servers.portal + 'images/image-087ef5f5-b838-48bb-901f-7e896de7c59e'],
 			        	embedImage : true,			// embed image in text! 
 			        	className : 'image-attachment'
 			        }),
@@ -12268,9 +12338,12 @@ L.control.baselayerToggle = function (options) {
 
 			// remove layers
 			if (layer) {
-				// remove from layermenu store
-				var removed = _.remove(this.store.layermenu, function (item) { return item.layer == layer.store.uuid; });
-				
+				// remove from layermenu & baselayer store
+				_.remove(this.store.layermenu, function (item) { return item.layer == layer.store.uuid; });
+				// var baseLayer = _.find(this.store.baseLayers, function (b) { return b.uuid == layer.store.uuid;});
+				// console.log('baseLayer: ', baseLayer, layer);
+				_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.store.uuid; });
+
 				// remove from layermenu
 				if (layerMenu) layerMenu.onDelete(layer);
 					
@@ -12336,12 +12409,19 @@ L.control.baselayerToggle = function (options) {
 
 	// format files for Grande plugin
 	_formatGrandeFiles : function (files) {
+		console.log('_formatGrandeFiles');
 		var sources = [];
 		files.forEach(function (file) {
+			console.log('file.type', file.type);
+
 			var thumbnail = (file.type == 'image') ? '/pixels/' + file.uuid + '?width=50&height=50' : '';
-			var prefix    = (file.type == 'image') ? '/images/' : '/api/file/download/?file=';
-			var suffix    = (file.type == 'image') ? '' : '&type=' + file.type;
-			var url       = '/pixels/' + file.uuid + '?width=200&height=200';
+
+			var prefix    = (file.type == 'image') ? '/images/' 					: '/api/file/download/?file=';
+			var suffix    = (file.type == 'image') ? '' 						: '&type=zip';// + file.type;
+			
+			// var url       = '/pixels/' + file.uuid + '?width=200&height=200';
+			var url = prefix + file.uuid + suffix
+
 			var source = {
 			    	title 	: file.name, 	// title
 			    	thumbnail : thumbnail,  // optional. url to image
@@ -13169,6 +13249,22 @@ L.control.baselayerToggle = function (options) {
 		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
 	},
 
+	getMeta : function () {
+		var metajson = this.store.metadata;
+		if (metajson) return JSON.parse(metajson);
+		return false;
+	},
+
+	getMetaFields : function () {
+		var meta = this.getMeta();
+		if (!meta) return false;
+		if (!meta.json) return false;
+		if (!meta.json.vector_layers) return false;
+		if (!meta.json.vector_layers[0]) return false;
+		if (!meta.json.vector_layers[0].fields) return false;
+		return meta.json.vector_layers[0].fields;
+	},
+
 
 	hide : function () {
 		var container = this.getContainer();
@@ -13218,6 +13314,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	initLayer : function () {
 
 		this.update();
+		console.log('meta: ', this.getMeta());
 	},
 
 
@@ -13235,8 +13332,9 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 		// add gridLayer if available
 		if (this.gridLayer) {
-			this.gridLayer.addTo(map);
-			map.addControl(L.mapbox.gridControl(this.gridLayer));
+			// this.gridLayer.addTo(map);
+			map.addLayer(this.gridLayer);
+			// map.addControl(L.mapbox.gridControl(this.gridLayer));
 		}
 
 	},
@@ -13250,7 +13348,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		// remove gridLayer if available
 		if (this.gridLayer) {
 			map.removeLayer(this.gridLayer);
-			map.removeControl(L.mapbox.gridControl(this.gridLayer));  
+			// map.removeControl(L.mapbox.gridControl(this.gridLayer));  
 		} 
 	},
 
@@ -13270,34 +13368,35 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 
 		// tile server ip
-		var tileServer = app.options.servers.carto;
+		var tileServer = app.options.servers.raster;
 
 		// tile url
 		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png';
 
-		// 
-		// var url = 'http://{s}.systemapic.com:8080/raster/' + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png';
-
-
-		// custom raster layer
+		
+		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			fileUuid: fileUuid,
 			cartoid : cartoid
 		});
 
-		// create gridlayer
-		this.gridLayer = L.mapbox.gridLayer({
-			// tileJson
-			tilejson: '2.1.0',
-			grids : [
-				'http://78.46.107.15:8080/utfgrid/' + fileUuid + '/{z}/{x}/{y}.grid.json'
-			],
-			template: '{{#__teaser__}}{{NAME}}{{/__teaser__}}'
+		
+
+		// add gridlayer
+		this.gridLayer = new L.UtfGrid('http://{s}.systemapic.com:8080/utfgrid/' + fileUuid + '/{z}/{x}/{y}.grid.json', {
+			
+			useJsonP: false,
+			
 		});
 
-		console.log('added gridLayer: ', this.gridLayer);
+		// add popup event
+		this.gridLayer.on('click', function(e) {
+			if (!e.data) return;
 
+			// open popup
+		 	this.openPopup(e.data, e.latlng);
 
+		}, this);
 
 	},
 
@@ -13308,6 +13407,46 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 		var map = app._map;
 		this.addTo(map);
+	},
+
+
+	openPopup : function (data, latlng) {
+
+		console.log('open pup');
+		var map = app._map;
+		var content = this._popupContent(data);
+
+
+		// create popup
+		this.popup = L.popup({
+			offset : [18, 0],
+			closeButton : true,
+			zoomAnimation : false,
+			maxWidth : 400,
+			minWidth : 200,
+			maxHeight : 350
+		});
+
+		
+		// set content
+		this.popup.setContent(content);
+		this.popup.setLatLng(latlng);
+		this.popup.openOn(map);
+		
+		
+	},
+
+	_popupContent : function (data) {
+		// create content
+		var string = '';
+		for (key in data) {
+			var value = data[key];
+			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
+				string += key + ': ' + value + '<br>';
+			}
+		}
+
+		return string;
 	},
 
 })
@@ -17634,9 +17773,9 @@ Wu.App = Wu.Class.extend({
 			mapOptions 	: true,
 			documents 	: true,               	
 			dataLibrary 	: true,               	
-			mediaLibrary    : false,
 			users 		: true,
-			share 		: true
+			share 		: true,
+			mediaLibrary    : false
 		},	
 		
 		// default settings (overridden by project settings)
@@ -17658,11 +17797,8 @@ Wu.App = Wu.Class.extend({
 
 		servers : {
 			// not used, using window url atm..
-			portal : 'http://85.10.202.87:8080/',	// api
-			raster : 'http://85.10.202.87:8003/',	// raster tile server
-			carto  : 'http://{s}.systemapic.com:8080/raster/', 	// cartocss raster tile server
-			vector : '',				// vector tile server
-			socket : ''				// websocket server
+			portal : 'http://projects.ruppellsgriffon.com/',	// api 		//todo: remove hardcoded ip's
+			raster : 'http://{s}.systemapic.com:8080/raster/', 	// cartocss raster tile server tx
 		},
 
 		silentUsers : [

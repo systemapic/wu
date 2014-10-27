@@ -10,37 +10,27 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// create new fullscreen page, and set as default content
 		this._content = Wu.DomUtil.create('div', 'fullpage-users', Wu.app._appPane);
 		
-
 		// Users Control
 		this._usersControls = Wu.DomUtil.create('div', 'users-controls', this._content);
 		this._usersControlsInner = Wu.DomUtil.create('div', 'users-controls-inner', this._usersControls);
 
 		// Add user button
 		this._addUser = Wu.DomUtil.createId('div', 'users-add-user', this._usersControlsInner);
-		Wu.DomUtil.addClass(this._addUser, 'smap-button-gray users');
 		this._addUser.innerHTML = 'Create user';
+		Wu.DomUtil.addClass(this._addUser, 'smap-button-gray users');
 
 		// Delete user button
 		this._delUser = Wu.DomUtil.createId('div', 'users-delete-user', this._usersControlsInner);
-		Wu.DomUtil.addClass(this._delUser, 'smap-button-gray users');
 		this._delUser.innerHTML = 'Delete user';
+		Wu.DomUtil.addClass(this._delUser, 'smap-button-gray users');
 
 		// Search users
-		this._searchUser = Wu.DomUtil.createId('input', 'users-search', this._usersControlsInner);
-		Wu.DomUtil.addClass(this._searchUser, 'search ct17');
-		this._searchUser.setAttribute("type", "text");
-		this._searchUser.setAttribute("placeholder", "Search users");
+		this._search = Wu.DomUtil.createId('input', 'users-search', this._usersControlsInner);
+		this._search.setAttribute("type", "text");
+		this._search.setAttribute("placeholder", "Search users");
+		Wu.DomUtil.addClass(this._search, 'search ct17');
 
-
-						// <div class="users-controls">
-												
-						// 		<div id="users-add-user" class="smap-button-gray users">Create user</div>
-						// 		<div id="users-delete-user" class="smap-button-gray users">Delete user</div>
-								
-						// 		<input type="text" id="users-search" class="search ct17" placeholder="Search users" />
-															
-						// </div>
-
+		console.log('initContent');
 
 		// create container (overwrite default) and insert template
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content, ich.usersPane());
@@ -64,8 +54,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	},
 
-	addHook : function () {
-		this.addEditHooks();
+	addHooks : function () {
+
+		// search
+		Wu.DomEvent.on(this._search, 'keyup', this.searchList, this);
+
 	},
 
 	addEditHooks : function () {
@@ -109,6 +102,23 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	},
 
+	searchList : function (e) {
+		console.log('search!!!', this._search.value);
+
+		if (e.keyCode == 27) { // esc
+			this.list.search(); // show all
+			this._search.value = '';
+			return;
+		}
+
+		// get value and search
+		var value = this._search.value;
+		this.list.search(value);
+	},
+
+
+
+
 	// list.js plugin
 	initList : function () { 
 		
@@ -140,7 +150,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// add edit hooks
 		this.addEditHooks();
-	
+
+		// this.addHooks();	
 	},
 
 
@@ -148,28 +159,35 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	// input fullscreen for new user details
 	inputUser : function () {
 
+
+		// Hide the Create user etc.
+		Wu.DomUtil.addClass(this._content, 'hide-top', this);
+
+
 		this._inputUser  = {};
 		var titleText    = 'Create new user';
 		var subtitleText = 'Enter details for the new user:';
 		var messageText  = 'Password is auto-generated. The user will receive login details on email.';
-		var container  = this._inputUser._container = Wu.DomUtil.create('div',   'backpane-container', this._content);
-		var wrapper    = this._inputUser._wrapper   = Wu.DomUtil.create('div',   'backpane-wrapper',   container);
-		var title      = this._inputUser._title     = Wu.DomUtil.create('div',   'backpane-title',     wrapper, titleText);
-		var subtitle   = this._inputUser._subtitle  = Wu.DomUtil.create('div',   'backpane-subtitle',  wrapper, subtitleText);		
-		var firstName  = this._inputUser._firstName = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'First Name');
-		var lastName   = this._inputUser._lastName  = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Last name');
-		var email      = this._inputUser._email     = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Email');
-		var email2     = this._inputUser._email2    = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Confirm Email');
-		var message    = this._inputUser._message   = Wu.DomUtil.create('div',   'backpane-message',   wrapper, messageText);
-		var cancel     = this._inputUser._cancel    = Wu.DomUtil.create('div',   'backpane-cancel smap-button-gray',    wrapper, 'Cancel');
-		var confirm    = this._inputUser._confirm   = Wu.DomUtil.create('div',   'backpane-confirm smap-button-gray',   wrapper, 'Confirm');
+		var container    = this._inputUser._container = Wu.DomUtil.create('div',   'backpane-container', this._content);
+		var wrapper      = this._inputUser._wrapper   = Wu.DomUtil.create('div',   'backpane-wrapper',   container);
+		var title        = this._inputUser._title     = Wu.DomUtil.create('div',   'backpane-title',     wrapper, titleText);
+		var subtitle     = this._inputUser._subtitle  = Wu.DomUtil.create('div',   'backpane-subtitle',  wrapper, subtitleText);		
+		var firstName    = this._inputUser._firstName = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'First Name');
+		var lastName     = this._inputUser._lastName  = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Last Name');
+		var companyName	 = this._inputUser._companyName = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Company Name');
+		var position	 = this._inputUser._position = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Position');
+		var phoneNo	 = this._inputUser._phoneNo = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Phone Number');
+		var email        = this._inputUser._email     = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Email');
+		var email2       = this._inputUser._email2    = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Confirm Email');
+		var message      = this._inputUser._message   = Wu.DomUtil.create('div',   'backpane-message',   wrapper, messageText);
+		var cancel       = this._inputUser._cancel    = Wu.DomUtil.create('div',   'backpane-cancel smap-button-gray',    wrapper, 'Cancel');
+		var confirm      = this._inputUser._confirm   = Wu.DomUtil.create('div',   'backpane-confirm smap-button-gray',   wrapper, 'Confirm');
 
 		Wu.DomEvent.on(email,   'keyup',     this.checkUniqueEmail, this);
 		Wu.DomEvent.on(email2,  'keyup',     this.checkSameEmail,   this);
 		Wu.DomEvent.on(cancel,  'mousedown', this.cancelInput,      this);
 		Wu.DomEvent.on(confirm, 'mousedown', this.confirmInput,     this);
 
-		// cxxxx
 		// Toggle wrappers
 		this._container.style.display = 'none';
 
@@ -227,6 +245,10 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	cancelInput : function (e) {
 		Wu.DomUtil.remove(this._inputUser._container);
 		this._container.style.display = 'block';
+
+		// Show the Create user etc.
+		Wu.DomUtil.removeClass(this._content, 'hide-top', this);
+
 	},
 
 	confirmInput : function () {
@@ -234,6 +256,10 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var firstName = this._inputUser._firstName.value;
 		var lastName  = this._inputUser._lastName.value;
 		var email     = this._inputUser._email.value;
+		var companyName	= this._inputUser._companyName.value;
+		var position	= this._inputUser._position.value;
+		var phoneNo	= this._inputUser._phoneNo.value;
+
 
 		if (!firstName) return;
 		if (!lastName) return;
@@ -243,8 +269,13 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var input = {
 			lastName  : lastName,
 			firstName : firstName,
-			email     : email
+			email     : email,
+			company   : companyName,
+			position  : position,
+			phone     : phoneNo
 		}
+
+
 
 		// create user
 		this.createUser(input);
@@ -254,6 +285,10 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// Toggle pane
 		this._container.style.display = 'block';
+
+		// Show the Create user etc.
+		Wu.DomUtil.removeClass(this._content, 'hide-top', this);
+
 	},
 
 

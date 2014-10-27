@@ -14,7 +14,7 @@ Wu.Style = Wu.Class.extend({
 		// append darktheme stylesheet
 		var darktheme = document.createElement("link");
 		darktheme.rel = 'stylesheet';
-		darktheme.href = '//85.10.202.87:8080/css/darktheme.css';
+		darktheme.href = 'css/darktheme.css';
 		this._styletag.appendChild(darktheme);
 
 	},

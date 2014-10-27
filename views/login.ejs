@@ -3,12 +3,8 @@
 <html>
 <head>
 	<title>Systemapic Authentication</title>
-	<!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">  -->
-	<!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">  -->
-	<link rel="stylesheet" href="//85.10.202.87:8080/dist/css.dependencies.min.css">
-	<link rel="stylesheet" href="//85.10.202.87:8080/dist/css.portal.min.css">
-	<!-- <link rel="stylesheet" href="//85.10.202.87:8080/css/style.css"> -->
-	<!-- <link rel="stylesheet" href="//85.10.202.87:8080/css/evil.css"> -->
+	<link rel="stylesheet" href="dist/css.dependencies.min.css">
+	<link rel="stylesheet" href="dist/css.portal.min.css">
 
 </head>
 <body style="padding-top:0px">
@@ -28,12 +24,8 @@
 			<!-- LOGIN FORM -->
 
 			<form action="/login" method="post" id="hitme">
-				<div class="form-group">
-					<input type="text" class="form-control" name="email" placeholder="Enter email...">
-				</div>
-				<div class="form-group">
-					<input type="password" class="form-control" name="password" placeholder="Enter password...">
-				</div>
+				<div class="form-group"><input type="text" class="form-control" name="email" placeholder="Enter email..."></div>
+				<div class="form-group"><input type="password" class="form-control" name="password" placeholder="Enter password..."></div>
 
 				<button type="submit" id="login-button" class="btn btn-default" name="login">Login</button>
 				<button type="submit" id="forgot-password" onclick="javascript: form.action='/forgot';">Forgot password?</button>

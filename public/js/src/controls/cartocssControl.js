@@ -10,6 +10,7 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// create toolbar container
 		var container = Wu.DomUtil.create('div', 'leaflet-control-cartocss leaflet-control');
+		Wu.DomEvent.on(container, 'click mousedown mouseup', Wu.DomEvent.stopPropagation, this);
 
 		// create toolbar button
 		this._toolbarButton = Wu.DomUtil.create('div', 'cartocss-toolbar-button', container);
@@ -23,19 +24,18 @@ L.Control.CartoCSS = L.Control.extend({
 		// add hooks
 		this.addHooks();
 
-		return container;	// automatically becomes this._container;
+		// automatically becomes this._container;
+		return container;	
 
 	},
 
 	onRemove : function () {
 
-		console.log('cartocCSS  onRemove');
-
 		// remove hooks
 		this.removeHooks();
 
+		// remove from DOM
 		Wu.DomUtil.remove(this._codeMirror.getWrapperElement());
-		
 
 		// remove from leaflet-control-container
 		Wu.DomUtil.remove(this._editorContainer);
@@ -43,62 +43,40 @@ L.Control.CartoCSS = L.Control.extend({
 
 	initLayout : function () {
 
-		// editor container
-		this._editorContainer = Wu.DomUtil.create('div', 'cartocss-control-container');
-
-		// the obligatory wrapper
-		var wrapper = Wu.DomUtil.create('div', 'cartocss-control-wrapper', this._editorContainer); 
-
-		// Close button
-		this._xButton = Wu.DomUtil.create('div', 'close-cartocss-editor-x', wrapper);
-
-		// create form wrapper
-		this._styleHeaderWrapper = Wu.DomUtil.create('div', 'cartocss-style-header-wrapper', wrapper);
-
-		// this._styleHeader = Wu.DomUtil.create('div', 'cartocss-style-header', this._styleHeaderWrapper);
-		// this._styleHeader.innerHTML = 'Editing style for:&nbsp;';
-
-		this._styleHeaderLayerName = Wu.DomUtil.create('div', 'cartocss-style-header-layer', this._styleHeaderWrapper);
-		this._styleHeaderLayerName.innerHTML = 'Select layer'; // todo: dropdown (ie. nicely styled, not ugly default) instead of list???
-
+		// create divs
+		this._editorContainer 		= Wu.DomUtil.create('div', 'cartocss-control-container'); // editor container
+		this._wrapper 			= Wu.DomUtil.create('div', 'cartocss-control-wrapper', this._editorContainer); // the obligatory wrapper
+		this._xButton 			= Wu.DomUtil.create('div', 'close-cartocss-editor-x', this._wrapper); // close button
+		this._zoomVal 			= Wu.DomUtil.create('div', 'cartocss-zoomval', this._wrapper, app._map.getZoom()); // Show zoom value
+		this._styleHeaderWrapper 	= Wu.DomUtil.create('div', 'cartocss-style-header-wrapper', this._wrapper); // create form wrapper
+		this._styleHeaderLayerName 	= Wu.DomUtil.create('div', 'cartocss-style-header-layer', this._styleHeaderWrapper);
+		this._styleHeaderLayerName.innerHTML = 'Select layer'; 
 		this._styleHeaderDropDownButton = Wu.DomUtil.create('div', 'cartocss-style-dropdown-arrow', this._styleHeaderWrapper);
+		this._layerSelectorOuter 	= Wu.DomUtil.create('div', 'cartocss-layerselector-outer', this._wrapper); // create layer selector
+		this._layerSelector 		= Wu.DomUtil.create('div', 'cartocss-layerselector', this._layerSelectorOuter);
+		
+		// Tabs
+		this._tabsWrapper 		= Wu.DomUtil.create('div', 'cartocss-tab-wrapper', this._wrapper); // Wrapper for tabs
+		this._tabStyling 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-styling cartocss-active-tab', this._tabsWrapper); // Styling tab
+						  this._tabStyling.innerHTML = 'Styling';
+
+		this._tabTooltip 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-tooltip', this._tabsWrapper); // Styling tab		
+						  this._tabTooltip.innerHTML = 'Tooltip';
+
+		this._tabLegends 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-legends', this._tabsWrapper); // Styling tab				
+						  this._tabLegends.innerHTML = 'Legend';
+
+		this._legendsWrapper		= Wu.DomUtil.create('div', 'cartocss-legends-wrapper displayNone', this._wrapper);
+		
+		this._tooltipOuterWrapper	= Wu.DomUtil.create('div', 'cartocss-tooltip-outer-wrapper displayNone', this._wrapper);
+		this._tooltipWrapper		= Wu.DomUtil.create('div', 'cartocss-tooltip-wrapper', this._tooltipOuterWrapper);
 
 
-		// create layer selector
-		this._layerSelectorOuter = Wu.DomUtil.create('div', 'cartocss-layerselector-outer', wrapper);
-
-		this._layerSelector = Wu.DomUtil.create('div', 'cartocss-layerselector', this._layerSelectorOuter);
-
-
-
-
-		// For CodeMirror: create form wrapper
-		this._formWrapper = Wu.DomUtil.create('form', 'cartocss-form-wrapper', wrapper);
-
-		// For CodeMirror: create text area
-		this._inputArea = Wu.DomUtil.create('textarea', 'cartocss-input', this._formWrapper);
-
-		// error feedback pane
-		this._errorPane = Wu.DomUtil.create('div', 'cartocss-error-pane', wrapper);
-
-		// create attributes header
-//		this._attributesHeader = Wu.DomUtil.create('div', 'cartocss-header-attrib', wrapper);
-//		this._attributesHeader.innerHTML = 'Layer attributes:';
-
-		// create attributes area
-//		this._attributesArea = Wu.DomUtil.create('div', 'cartocss-attributes', wrapper);
-
-		// create layer selector header
-//		this._layerSelectorHeader = Wu.DomUtil.create('div', 'cartocss-header-select', wrapper);
-//		this._layerSelectorHeader.innerHTML = 'Select layer:';
-
-		// // create layer selector
-		// this._layerSelector = Wu.DomUtil.create('div', 'cartocss-layerselector', wrapper);
-
-		// create update button
-		this._updateButton = Wu.DomUtil.create('div', 'cartocss-update-button', wrapper);
-
-		this._updateButton.innerHTML = 'Render layer';
+		this._formWrapper 		= Wu.DomUtil.create('form', 'cartocss-form-wrapper', this._wrapper); // For CodeMirror: create form wrapper
+		this._inputArea 		= Wu.DomUtil.create('textarea', 'cartocss-input', this._formWrapper); // For CodeMirror: create text area
+		this._errorPane 		= Wu.DomUtil.create('div', 'cartocss-error-pane', this._wrapper); // error feedback pane
+		this._updateButton 		= Wu.DomUtil.create('div', 'cartocss-update-button', this._wrapper); // create update button
+		this._updateButton.innerHTML 	= 'Render layer';
 
 		// append to leaflet-control-container
 		app._map.getContainer().appendChild(this._editorContainer);
@@ -119,14 +97,41 @@ L.Control.CartoCSS = L.Control.extend({
     			gutters: ['CodeMirror-linenumbers', 'errors']
   		});
 
+		// set default value
+  		this._codeMirror.setValue('// No layer selected. \n\n// #layer is always base \n#layer { \n  \n}');
+
+		// todo:
   		// var completer = cartoCompletion(this._codeMirror, window.cartoRef);
 		// this._codeMirror.on('keydown', completer.onKeyEvent);
 		// this._codeMirror.on('change', function() { return window.editor && window.editor.changed(); });
 		// this._codeMirror.setOption('onHighlightComplete', _(completer.setTitles).throttle(100));
 		// console.log(')thi wrapper element', this._codeMirror);
 		// this._codeMirror.getWrapperElement().id = 'code-' + id.replace(/[^\w+]/g,'_');
+	
+	},
 
-  		this._codeMirror.setValue('No layer selected. \n\n#layer { \n // base is always #layer \n}');
+	setLayerDescription : function () {
+
+		// get meta fields
+		var fields = this._layer.getMetaFields(); // return false if no fields found
+		
+		// create string
+		var string = '// #layer is always the layer identifyer \n\n';
+		string += '// For a full cartoCSS reference guide:\n // http://projects.ruppellsgriffon.com/docs/cartocss-reference/\n\n';
+		string += '#layer {\n\n';
+		string += '// Available fields in layer:\n';
+
+		// add each field to string
+		for (key in fields) {
+			var type = fields[key];
+			string += '// [' + key + '=' + type + '] {}\n';
+		}
+		
+		string += '\n}';
+
+		// update text
+		this.updateCodeMirror(string);
+
 	},
 
 	updateCodeMirror : function (css) {
@@ -152,36 +157,41 @@ L.Control.CartoCSS = L.Control.extend({
 
 			// hook
 			Wu.DomEvent.on(wrapper, 'mousedown', function () {
-							
-				this.toggleLayerDropDown();
-				this.refresh(layer);
-				this.setSelected(wrapper);
-
-
-				// Set class to show which layer is selected
-				for ( var i = 0; i<wrapper.parentNode.children.length; i++ ) {
-					var child = wrapper.parentNode.children[i];
-
-					Wu.DomUtil.removeClass(child, 'vt-selected', this);
-				}
-
-				Wu.DomUtil.addClass(wrapper, 'vt-selected', this);
-
-
+				this._selectLayer(layer, wrapper)
 			}, this);
+
+			// add stops
+			Wu.DomEvent.on(wrapper, 'click mousedown mouseup', Wu.DomEvent.stopPropagation, this);
 
 
 		}, this);
 
 	},
 
-	setSelected : function (div) {
+	setSelected : function (wrapper) {
 
+		// clear selected
+		this._clearSelected(wrapper);
 
+		// mark selected
+		Wu.DomUtil.addClass(wrapper, 'vt-selected', this);
 	},
 
-	_selectLayer : function (layer) {
+	_clearSelected : function (wrapper) {
+		// Set class to show which layer is selected
+		for ( var i = 0; i<wrapper.parentNode.children.length; i++ ) {
+			var child = wrapper.parentNode.children[i];
+			Wu.DomUtil.removeClass(child, 'vt-selected', this);
+		}
+	},
+
+	_selectLayer : function (layer, wrapper) {
+
+		this.toggleLayerDropDown();
 		this.refresh(layer);
+		this.setSelected(wrapper);				
+		this.initTooltip();
+
 
 	},
 
@@ -199,22 +209,45 @@ L.Control.CartoCSS = L.Control.extend({
 		// Layer drop down
 		Wu.DomEvent.on(this._styleHeaderLayerName, 'click', this.toggleLayerDropDown, this);
 
+		// Toggle legends tab
+		Wu.DomEvent.on(this._tabLegends, 'mousedown', this.toggleLegends, this);
+
+		// Toggle styles tab
+		Wu.DomEvent.on(this._tabStyling, 'mousedown', this.toggleStyles, this);
+
+		// Toggle tooltip tab
+		Wu.DomEvent.on(this._tabTooltip, 'mousedown', this.toggleTooltip, this);
+
+
+
 		// stops
-		Wu.DomEvent.on(this._editorContainer, 'mousewheel mousedown dblclick', Wu.DomEvent.stop, this);
-		Wu.DomEvent.on(this._toolbarButton, 'dblclick', Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._editorContainer, 		'mousewheel mousedown dblclick mouseup click', 	Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._toolbarButton, 		'dblclick', 				Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._styleHeaderLayerName, 	'click mousedown mouseup', 		Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._formWrapper, 		'click mousedown mouseup', 		Wu.DomEvent.stopPropagation, this);
 
-		// hack attempt to fix weird unclickables
-		Wu.DomEvent.on(this._editorContainer, 'mouseenter', function () {
-			console.log('mousenter!');
-			this._codeMirror.focus();
-		}, this);
 
-		// if first u dont succeed
-		var leafletControlContainer = app._map._controlContainer;
-		Wu.DomEvent.on(leafletControlContainer, 'mousedown', function () {
-			console.log('mosue');
-		}, this);
 
+
+		// // hack attempt to fix weird unclickables
+		// Wu.DomEvent.on(this._editorContainer, 'mouseenter', function () {
+		// 	console.log('mousenter!');
+		// 	this._codeMirror.focus();
+		// }, this);
+
+		// // if first u dont succeed
+		// var leafletControlContainer = app._map._controlContainer;
+		// Wu.DomEvent.on(leafletControlContainer, 'mousedown', function () {
+		// 	console.log('mosue');
+		// }, this);
+
+
+		// Update Zoom
+		var map = app._map;
+		map.on('zoomend', function() {
+			this._zoomVal.innerHTML = map.getZoom();
+		}, this)
+		
 	},
 
 	removeHooks : function () {
@@ -223,14 +256,121 @@ L.Control.CartoCSS = L.Control.extend({
 
 	},
 
-	toggleLayerDropDown : function () {
+	toggleLegends : function () {
 
-		console.log('toggleLayerDropDown');
+		// cxxxx
+
+		// Hide Styler
+		Wu.DomUtil.addClass(this._formWrapper, 'displayNone');
+
+		// Hide Tooltip
+		Wu.DomUtil.addClass(this._tooltipOuterWrapper, 'displayNone');
+
+		// Show Legends Wrapper
+		Wu.DomUtil.removeClass(this._legendsWrapper, 'displayNone');
+
+
+		// Set tab to active
+		Wu.DomUtil.removeClass(this._tabTooltip, 'cartocss-active-tab');
+		Wu.DomUtil.removeClass(this._tabStyling, 'cartocss-active-tab');
+		Wu.DomUtil.addClass(this._tabLegends, 'cartocss-active-tab');
+
+
+	},
+
+	toggleStyles : function () {
+
+
+		// Show Styler
+		Wu.DomUtil.removeClass(this._formWrapper, 'displayNone');
+
+		// Hide Tooltip
+		Wu.DomUtil.addClass(this._tooltipOuterWrapper, 'displayNone');
+
+		// Hide Legends Wrapper
+		Wu.DomUtil.addClass(this._legendsWrapper, 'displayNone');
+
+		// Set tab to active
+		Wu.DomUtil.removeClass(this._tabTooltip, 'cartocss-active-tab');
+		Wu.DomUtil.addClass(this._tabStyling, 'cartocss-active-tab');
+		Wu.DomUtil.removeClass(this._tabLegends, 'cartocss-active-tab');
+
+
+	},
+
+	toggleTooltip : function () {
+
+
+		// Show Tooltip
+		Wu.DomUtil.removeClass(this._tooltipOuterWrapper, 'displayNone');
+
+		// Hide Styler
+		Wu.DomUtil.addClass(this._formWrapper, 'displayNone');
+
+		// Hide Legends Wrapper
+		Wu.DomUtil.addClass(this._legendsWrapper, 'displayNone');
+
+
+		// Set tab to active
+		Wu.DomUtil.addClass(this._tabTooltip, 'cartocss-active-tab');
+		Wu.DomUtil.removeClass(this._tabStyling, 'cartocss-active-tab');
+		Wu.DomUtil.removeClass(this._tabLegends, 'cartocss-active-tab');
+
+
+	},
+
+	initTooltip : function () {
+
+
+		this._tooltipWrapper.innerHTML = '';
+		// cxxxx
+
+		var tooltipCustomHeader	= Wu.DomUtil.createId('input', 'cartocss-tooltip-custom-header', this._tooltipWrapper);
+		tooltipCustomHeader.setAttribute('placeholder', 'Tooltip header')
+
+
+		if ( !this._layer ) return;
+
+		var fields = this._layer.getMetaFields();
+
+		
+		for ( key in fields ) {
+
+			var value = fields[key];
+			
+			console.log(key, value);
+
+			var fieldWrapper = Wu.DomUtil.create('div', 'tooltip-field-wrapper', this._tooltipWrapper);
+			
+			var fieldKey = Wu.DomUtil.create('input', 'tooltip-field-key', fieldWrapper);
+			fieldKey.setAttribute('type', 'text');
+			fieldKey.setAttribute('placeholder', key);
+
+
+			var fieldSwitch = Wu.DomUtil.create('div', 'switch controls-switch', fieldWrapper);
+			
+			var switchId = 'switch-' + key;
+
+			var fieldSwitchInput = Wu.DomUtil.createId('input', switchId, fieldSwitch);
+				Wu.DomUtil.addClass(fieldSwitchInput, 'cmn-toggle cmn-toggle-round-flat')
+				fieldSwitchInput.setAttribute('type', 'checkbox');
+				fieldSwitchInput.setAttribute('checked', 'checked');
+
+			var fieldSwitchLabel = Wu.DomUtil.create('label', '', fieldSwitch);
+				fieldSwitchLabel.setAttribute('for', switchId)
+		}
+	},
+
+
+	toggleLayerDropDown : function () {
 
 		if ( !this._openDropDown ) {
 
 			this._openDropDown = true;
 			var dropDownHeight = this._layers.length * 27;
+
+			if ( this._layers.length <= 2 ) dropDownHeight+=2;
+
 			this._layerSelectorOuter.style.height = dropDownHeight + 'px';
 
 
@@ -262,29 +402,27 @@ L.Control.CartoCSS = L.Control.extend({
 		// insert into input area
 		if (this._cartoid) {				// callback
 			this._layer.getCartoCSS(this._cartoid, this.insertCss.bind(this));
+		} else {
+			// no style stored on layer yet, set welcome message with meta
+			this.setLayerDescription();
 		}
 
 	},
 
 	insertCss : function (ctx, css) {
 
-		// 
-		// this._codeMirror.setValue(css);
-
+		// set values
 		this.updateCodeMirror(css);
 	},
 
 	// update (new project, etc.)
 	update : function () {
-		console.log('update!');
 
 		// set active project
 		this.project = app.activeProject;
 
 		// get all active, geojson layers
 		this._layers = this.project.getStylableLayers();
-
-		console.log('this._layers: ', this._layers);
 
 		// fill active layers box
 		this._fillLayers();
@@ -297,7 +435,6 @@ L.Control.CartoCSS = L.Control.extend({
 	open : function () {
 		this._open = true;
 		Wu.DomUtil.addClass(this._editorContainer, 'open');
-		console.log('open!');
 
 		// To make sure the code mirror looks fresh
 		this._codeMirror.refresh();
@@ -306,25 +443,20 @@ L.Control.CartoCSS = L.Control.extend({
 	close : function () {
 		this._open = false;
 		Wu.DomUtil.removeClass(this._editorContainer, 'open');
-		console.log('close');
 	},
 
 	updateCss : function () {
 
-		console.log('updateCss!!!', this._layer);
-
+		// return if no active layer
 		if (!this._layer) return;
 
 		// get css string
 		var css = this._codeMirror.getValue();
 
-		console.log('css => ', css);
-
-
-		// empty
-		if (!css) return; // todo: check valid!!
+		// return if empty
+		if (!css) return;
 		
-
+		// set vars
 		var fileUuid = this._layer.getFileUuid();
 		var cartoid = Wu.Util.createRandom(7);
 
@@ -336,7 +468,6 @@ L.Control.CartoCSS = L.Control.extend({
 		}
 
 		// save to server
-		console.log('settgin!', json);
 		this._layer.setCartoCSS(json, this.updatedCss.bind(this));
 
 		
@@ -344,11 +475,11 @@ L.Control.CartoCSS = L.Control.extend({
 
 	
 	updatedCss : function (context, json) {
-		console.log('updatedCss', context, json);
 
+		// parse
 		var result = JSON.parse(json);
 
-		// handle error
+		// handle errors
 		if (!result.ok) return this.handleError(result.error);
 			
 		// update style on layer
@@ -383,12 +514,12 @@ L.Control.CartoCSS = L.Control.extend({
 		suggestion.splice(0,2);
 		suggestion 	= suggestion.join(' ');
 
-		console.log('err:', err);
-		console.log('line: ', line);
-		console.log('char: ', charr);
-		console.log('problem: ', problem);
-		console.log('word: ', word);
-		console.log('suggestion: ', suggestion);
+		// console.log('err:', err);
+		// console.log('line: ', line);
+		// console.log('char: ', charr);
+		// console.log('problem: ', problem);
+		// console.log('word: ', word);
+		// console.log('suggestion: ', suggestion);
 
 
 		// mark error in codemirror:
@@ -417,7 +548,6 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	_clearError : function (line) {
-		console.log('_clearError');
 
 		// clear error pane
 		this._errorPane.innerHTML = '';
@@ -436,7 +566,6 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	destroy : function () {
-		console.log('destrouy!');
 		this.onRemove();
 	}
 

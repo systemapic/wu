@@ -14,6 +14,22 @@
 ┴─┘└─┘┴ ┴└  ┴─┘└─┘ ┴   ─┴┘┴└─┴ ┴└┴┘
 */
 
+/* Close button on tooltip on map */
+.leaflet-container a.leaflet-popup-close-button {
+	width: 25px;
+	height: 20px;
+	top: 7px;
+	right: 4px;
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: -22px -44px;
+	opacity: 0.3;
+	}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+	opacity: 0.5;
+	}
+
 .leaflet-draw-section {
 	position: relative;
 	width: 26px;

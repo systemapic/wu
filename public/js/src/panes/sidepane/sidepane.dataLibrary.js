@@ -15,19 +15,19 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// Upload button
 		this._uploadContainer = Wu.DomUtil.createId('div', 'upload-container', this._controlInner);
-		Wu.DomUtil.addClass(this._uploadContainer, 'smap-button-gray ct17');
 		this._uploadContainer.innerHTML = "Upload";
+		Wu.DomUtil.addClass(this._uploadContainer, 'smap-button-gray ct17');
 
 		// Search field
 		this._search = Wu.DomUtil.createId('input', 'datalibrary-search', this._controlInner);
-		Wu.DomUtil.addClass(this._search, 'search ct17');
 		this._search.setAttribute('type', 'text');
 		this._search.setAttribute('placeholder', 'Search files');
+		Wu.DomUtil.addClass(this._search, 'search ct17');
 
 		// Delete button
 		this._delete = Wu.DomUtil.createId('div', 'datalibrary-delete-file', this._controlInner);
-		Wu.DomUtil.addClass(this._delete, 'smap-button-gray');
 		this._delete.innerHTML = "Delete";
+		Wu.DomUtil.addClass(this._delete, 'smap-button-gray');
 
 		// Download button
 		this._download = Wu.DomUtil.createId('div', 'datalibrary-download-files', this._controlInner);
@@ -38,9 +38,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._errors = Wu.DomUtil.createId('div', 'datalibrary-errors', this._controlInner);
 		Wu.DomUtil.addClass(this._download, 'smap-button-gray');
 		
-
-
-
 
 
 		// create container (overwrite default)
@@ -95,6 +92,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// check all button
 		Wu.DomEvent.on(this._checkallLabel, 'mousedown', this.checkAll, this);
+
+		// search button
+		Wu.DomEvent.on(this._search, 'keyup', this.searchList, this);
 	       
 	},
 
@@ -112,6 +112,20 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		Wu.DomEvent.off(this._deleter, 'mousedown', this.deleteConfirm, this);
 		Wu.DomUtil.addClass(this._deleter, 'displayNone');
 	},
+
+
+	searchList : function (e) {
+		if (e.keyCode == 27) { // esc
+			this.list.search(); // show all
+			this._search.value = '';
+			return;
+		}
+
+		// get value and search
+		var value = this._search.value;
+		this.list.search(value);
+	},
+
 
 	_activate : function () {
 		if (this.dz) this.dz.enable();
@@ -179,6 +193,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		Wu.post('/api/file/download', json, this.receivedDownload, this);
 
 
+
+
 	},
 
 	receivedDownload : function (that, response) {
@@ -206,6 +222,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// hide
 		if (this._downloadList) this._downloadList.style.display = 'none';
 		if (this._container) this._container.style.display = 'block';
+
+		// Show toolbar (upload, download, delete, search);
+		Wu.DomUtil.removeClass(this._content, 'hide-top', this);		
 	},
 
 	downloadDone : function () {
@@ -242,6 +261,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// show
 		this._downloadList.style.display = 'block';
 		this._container.style.display = 'none';
+
+		// Hide toolbar (upload, download, delete, search);
+		Wu.DomUtil.addClass(this._content, 'hide-top', this);
+	
 	},
 
 	getSelected : function () {
@@ -543,9 +566,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	// process file
 	uploaded : function (record, options) {
-		// console.log('Upload done:', record);
-		// console.log('options: ', options);
-
+		
 		var options = options || {};
 		
 		// handle errors
@@ -572,8 +593,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			this.project.addLayer(layer);
 
 			if (options.autoAdd) {
-				// console.log('autoAdd!');
-				// console.log(layer)
 				app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
 			}
 
@@ -585,12 +604,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		if (options.autoAdd) {
 			record.done.layers.forEach(function (layer) {
 
-				// console.log('autoAdd!');
-				// console.log(layer)
 				var layerItem = app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
 				
 				if (layerItem) {
-					// console.log('leyrItem: ', layerItem);
 					app.MapPane.layerMenu.enableLayer(layerItem);
 				}
 			}, this);
@@ -610,7 +626,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// clone file object
 		var tmp = Wu.extend({}, file);   
-		// console.log('tmp: ', tmp);
 
 		// add record (a bit hacky, but with a cpl of divs inside the Name column)
 		tmp.name = ich.datalibraryTablerowName({
@@ -664,7 +679,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// set click hooks on title and description
 		Wu.DomEvent.on( title,  'mousedown mouseup click', 	this.stop, 	this ); 
 		Wu.DomEvent.on( title,  'dblclick', 			this.rename, 	this );     // select folder
-		Wu.DomEvent.on( desc,   'mousedown mouseup click', 	this.stop, 	this ); 
+		Wu.DomEvent.on( desc,   'mousedown mouseup click', 	this.stop, 	this ); 	
 		Wu.DomEvent.on( desc,   'dblclick', 			this.rename, 	this );     // select folder
 
 	},
