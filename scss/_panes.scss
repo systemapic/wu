@@ -1823,6 +1823,11 @@ button.image-attachment {
 	}
 
 
+.fullpage-users .backpane-container {
+	overflow: hidden;
+}
+
+
 /* CREATE NEW USER */
 .backpane-container {
 	background: rgba(255, 255, 255, 0.9);
@@ -2031,12 +2036,16 @@ button.image-attachment {
 .access-projects-title {
 	font-size: 130%;
 	font-weight: 600;
+	height: 25px;
+	overflow: hidden;
 	}
 
 /* Project description */
 .access-projects-description {
 	font-size: 100%;
 	font-style: italic;
+	height: 20px;
+	overflow: hidden;
 	}
 
 /* READ/EDIT/MANAGE buttons */

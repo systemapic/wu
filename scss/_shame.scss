@@ -769,6 +769,7 @@ background: rgba(255,255,255,1);
 position: relative;
 background: #B8B8B8;
 padding-bottom: 3px;
+width: 389px;
 }	
 
 .cartocss-update-button {
@@ -1083,8 +1084,8 @@ width: 410px;
 padding-right: 28px;
 box-sizing: border-box;
 -webkit-box-sizing: border-box;
+overflow-y: scroll;
 overflow-x: hidden;
-overflow: scroll;
 height: 100%;
 	}
 
@@ -1132,3 +1133,19 @@ font-size: 15px;
 padding-left: 8px;
 margin-left: 2px;
 }
+
+
+
+
+.tooltip-title {
+	font-size: 18px;
+	margin: 0;
+	position: relative;
+	top: -8px;
+	font-weight: 500;
+	border-bottom: 1px solid rgba(255,255,255,0.3);
+	}
+
+.leaflet-popup-content {
+	padding: 10px 36px 15px 2px;
+	}	

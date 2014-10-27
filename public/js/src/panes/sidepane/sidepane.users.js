@@ -522,6 +522,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// open backpane
 		this.manageAccess(user);
+
+		// Hide the Create user etc.
+		Wu.DomUtil.addClass(this._content, 'hide-top', this);
 	},
 
 
@@ -567,6 +570,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// update errythign
 		this.update();
+
+		// Show the Create user etc.
+		Wu.DomUtil.removeClass(this._content, 'hide-top', this);		
 
 
 	},

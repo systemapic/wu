@@ -324,6 +324,31 @@ module.exports = function(app, passport) {
 	});
 
 
+	// =====================================
+	// PARSE CARTOCSS ======================
+	// =====================================
+	// create PDF snapshot of current map
+	app.post('/api/util/parsecarto', isLoggedIn, function (req, res) {
+		console.log('/api/util/parsecarto');
+
+		// parse css
+		api.parseCartoCSS(req, res);
+
+	});
+
+	// =====================================
+	// PARSE CARTOCSS ======================
+	// =====================================
+	// create PDF snapshot of current map
+	app.post('/api/util/getfeaturesvalues', isLoggedIn, function (req, res) {
+		console.log('/api/util/getfeaturesvalues');
+
+		// get features/values for geojson
+		api.getLayerFeaturesValues(req, res);
+
+	});
+
+
 
 	// =====================================
 	// GET GEOJSON FILES ===================

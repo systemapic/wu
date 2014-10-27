@@ -4172,6 +4172,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// open backpane
 		this.manageAccess(user);
+
+		// Hide the Create user etc.
+		Wu.DomUtil.addClass(this._content, 'hide-top', this);
 	},
 
 
@@ -4217,6 +4220,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// update errythign
 		this.update();
+
+		// Show the Create user etc.
+		Wu.DomUtil.removeClass(this._content, 'hide-top', this);		
 
 
 	},
@@ -12417,10 +12423,10 @@ L.control.baselayerToggle = function (options) {
 			var thumbnail = (file.type == 'image') ? '/pixels/' + file.uuid + '?width=50&height=50' : '';
 
 			var prefix    = (file.type == 'image') ? '/images/' 					: '/api/file/download/?file=';
-			var suffix    = (file.type == 'image') ? '' 						: '&type=zip';// + file.type;
+			// var suffix    = (file.type == 'image') ? '' 						: '&type=zip';// + file.type;
 			
 			// var url       = '/pixels/' + file.uuid + '?width=200&height=200';
-			var url = prefix + file.uuid + suffix
+			var url = prefix + file.uuid;// + suffix
 
 			var source = {
 			    	title 	: file.name, 	// title
@@ -13265,6 +13271,31 @@ L.control.baselayerToggle = function (options) {
 		return meta.json.vector_layers[0].fields;
 	},
 
+	getTooltipMeta : function () {
+		var json = this.store.tooltip;
+		if (!json) return false;
+		var meta = JSON.parse(json);
+		return meta;
+	},
+
+	setTooltipMeta : function (meta) {
+		this.store.tooltip = JSON.stringify(meta);
+		this.save('tooltip');
+	},
+
+	getLegendsMeta : function () {
+		console.log('getLegendsMeta');
+		var meta = this.store.legends
+		if (meta) return JSON.parse(meta);
+		return false;
+	},
+
+	setLegendsMeta : function (meta) {
+		if (!meta) return;
+		this.store.legends = JSON.stringify(meta);
+		this.save('legends');
+	},
+
 
 	hide : function () {
 		var container = this.getContainer();
@@ -13368,7 +13399,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 
 		// tile server ip
-		var tileServer = app.options.servers.raster;
+		var tileServer = app.options.servers.raster + 'raster/';
 
 		// tile url
 		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png';
@@ -13383,7 +13414,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		
 
 		// add gridlayer
-		this.gridLayer = new L.UtfGrid('http://{s}.systemapic.com:8080/utfgrid/' + fileUuid + '/{z}/{x}/{y}.grid.json', {
+		var gridServer = app.options.servers.raster + 'utfgrid/';
+		this.gridLayer = new L.UtfGrid(gridServer + fileUuid + '/{z}/{x}/{y}.grid.json', {
 			
 			useJsonP: false,
 			
@@ -13437,16 +13469,52 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	},
 
 	_popupContent : function (data) {
-		// create content
+
+		console.log('_popupContent data:', data);
+
+		// check for stored tooltip
+		var meta = this.getTooltipMeta();
 		var string = '';
-		for (key in data) {
-			var value = data[key];
-			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
-				string += key + ': ' + value + '<br>';
+		console.log('FOUND TOOLTIP :', meta);
+
+		if (meta) {
+			if (meta.title) string += '<div class="tooltip-title">' + meta.title + '</div>';
+
+			for (var m in meta.fields) {
+				var field = meta.fields[m];
+
+				console.log('F ', field);
+
+				if (field.on) {
+
+					var caption = field.title || field.key;
+					var value = data[field.key];
+
+					console.log('caption', caption, value);
+
+					string += caption + ': ' + value + '<br>';
+
+				}
+
 			}
+
+			return string;
+
+
+		} else {
+
+			// create content
+			var string = '';
+			for (var key in data) {
+				var value = data[key];
+				if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
+					string += key + ': ' + value + '<br>';
+				}
+			}
+			return string;
 		}
 
-		return string;
+
 	},
 
 })
@@ -17798,7 +17866,8 @@ Wu.App = Wu.Class.extend({
 		servers : {
 			// not used, using window url atm..
 			portal : 'http://projects.ruppellsgriffon.com/',	// api 		//todo: remove hardcoded ip's
-			raster : 'http://{s}.systemapic.com:8080/raster/', 	// cartocss raster tile server tx
+			// raster : 'http://{s}.systemapic.com:8080/raster/', 	// cartocss raster tile server tx
+			raster : 'http://{s}.systemapic.com:8080/', 	// cartocss raster tile server tx
 		},
 
 		silentUsers : [
