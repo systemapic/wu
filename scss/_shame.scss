@@ -1149,3 +1149,103 @@ margin-left: 2px;
 .leaflet-popup-content {
 	padding: 10px 36px 15px 2px;
 	}	
+
+
+
+
+
+
+
+
+// Legends
+
+
+
+// outer
+.cartocss-legends-wrapper {
+width: 389px;
+background: #f8f8f8;
+height: 100%;
+border: 1px solid #ddd;
+padding: 2px;
+overflow: hidden;
+}
+
+// inner
+.legends-inner-scroller {
+width: 410px;
+padding-right: 28px;
+box-sizing: border-box;
+-webkit-box-sizing: border-box;
+overflow-y: scroll;
+overflow-x: hidden;
+height: 100%;
+}
+
+
+.legend-entry-wrap {
+position: relative;
+padding: 5px;
+background: rgba(0, 0, 0, 0.1);
+margin: 2px;
+width: 378px;
+}
+
+
+
+
+.legend-entry-image {
+width: 25px;
+height: 19px;
+display: inline-block;
+vertical-align: top;
+overflow: hidden;
+
+background-repeat: repeat;
+background-position: 0 0;
+}
+
+/*.legend-entry-image img { 
+	position: relative;
+	left: -4px;
+	}
+*/
+
+.legend-image1,
+.legend-image2 {
+	position: relative;
+	top: -41px;	
+	left: -8px;
+	}
+
+.legend-image1 {
+	 -moz-transform: scaleY(-1);    /* Gecko */
+	  -o-transform: scaley(-1);      /* Operah */
+	  -webkit-transform: scaleY(-1); /* webkit */
+	  transform: scaleY(-1);         /* standard */
+	}
+
+
+.legend-entry-key {
+display: inline-block;
+vertical-align: top;
+width: 153px;
+padding-left: 10px;
+font-style: italic;
+font-size: 13px;
+font-weight: 500;
+}
+
+.legend-entry-value {
+display: inline-block;
+vertical-align: top;
+font-size: 13px;
+font-weight: 500;
+}
+
+
+
+.legend-entry-wrap .controls-switch {
+	top: 2px;
+	pointer-events: all;
+	}

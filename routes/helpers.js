@@ -26,6 +26,7 @@ var nodemailer  = require('nodemailer');
 var nodepath    = require('path');
 var gm 		= require('gm');
 var request 	= require('request');
+var mime 	= require("mime");
 
 // mapnik
 var mapnik = require('mapnik');
@@ -59,18 +60,144 @@ var DEFAULTMAPBOX = {
 module.exports = api = {
 
 
+	createLegends : function (req, res) {
 
-	_createStylesheet : function (css, featureKey, featureValue) {
+		api.generateLegends(req, res, function (err, legends) {
 
-		console.log('_createStylesheet');
-		console.log('featureKey: ', featureKey);
-		console.log('featureValue', featureValue);
-		console.log('css: ', css);
+
+		});
+
+	},
+
+
+	generateLegends : function (req, res, finalcallback) {
+		console.log('createLegends!');
+
+		var fileUuid = req.body.fileUuid;
+		var cartoid = req.body.cartoid;
+		var layerUuid = req.body.layerUuid;
+
+
+
+		var ops = [];
+
+		// get layer features/values
+		ops.push(function (callback) {
+
+			api._getLayerFeaturesValues(fileUuid, cartoid, function (err, result) {
+				if (err) console.error('_getLayerFeaturesValues err: ', err);
+
+				console.log('_GOT SHIT: ', err, result);
+
+				var jah = result.rules;
+				var css = result.css;
+
+				console.log('_getLayerFeaturesValues jah: ', jah);
+				console.log('css: ', css);
+
+				callback(null, result);
+
+			});
+
+		})
+
+
+		// for each rule found
+		ops.push(function (result, callback) {
+			var jah = result.rules;
+			var css = result.css;
+			var legends = [];
+
+			async.each(jah, function (rule, cb) {
+
+				var options = {
+					css : css,
+					key : rule.key,
+					value : rule.value,
+					id : 'legend-' + uuid.v4()
+				}
+
+				api._createStylesheet(options, function (err, result) {
+					if (err) console.log('create stylesheet err: ', err);
+
+					
+					api._createLegend(result, function (err, path) {
+
+
+						// base64 encode png
+
+
+						fs.readFile(path, function (err, data) {
+
+							var base = data.toString('base64');
+							var uri = util.format("data:%s;base64,%s", mime.lookup(path), base);
+
+							console.log('CREATED LEGENDS?!?!?');
+							console.log('base64: ', uri);
+
+							var leg = {
+								base64 	  : uri,
+								key 	  : options.key,
+								value 	  : options.value,
+								id 	  : options.id,
+								fileUuid  : fileUuid,
+								layerUuid : layerUuid,
+								cartoid   : cartoid,
+								on 	  : true
+							}
+
+							legends.push(leg);
+
+							cb(null);
+						});	
+					});
+				}, this);
+
+
+			}, function (err) {
+
+				callback(null, legends);
+
+			});
+
+
+
+		});
+
+
+
+		ops.push(function (legends, callback) {
+
+			console.log('got all legends!', legends);
+
+			res.end(JSON.stringify(legends));
+
+			callback();
+		});
+
+
+		async.waterfall(ops, function (err, legends) {
+			console.log('waterfall done');
+			console.log('err, legends', err, legends);
+			
+		});
+
+
+	},
+
+
+
+	_createStylesheet : function (options, callback) {
+
+		
+		var featureKey = options.key;
+		var featureValue = options.value;
+		var css = options.css;
+		var lid = options.id;
 
 
 		var properties = {};
 		properties[featureKey] = featureValue;
-
 
 		var geojson = {
 			"type" : "FeatureCollection",
@@ -83,25 +210,26 @@ module.exports = api = {
 					"coordinates": [
 						[
 						[
-							-20.7421875,
-							-63.704722429433225
-						],
-						[
-							-20.7421875,
-							-41.50857729743933
-						],
-						[
-							48.8671875,
-							-41.50857729743933
-						],
-						[
-							48.8671875,
-							-63.704722429433225
-						],
-						[
-							-20.7421875,
-							-63.704722429433225
-						]
+					              -180,
+					              0
+					            ],
+					            [
+					              -180,
+					              90
+					            ],
+					            [
+					              0,
+					              90
+					            ],
+					            [
+					              0,
+					              0
+					             
+					            ],
+					            [
+					              -180,
+					              0
+					            ]
 						]
 						]
 					}
@@ -109,14 +237,12 @@ module.exports = api = {
 			]
 		}
 
-		var toFile = "/var/www/data/static/legendsTemplate.geojson";
 
-		console.log('geojson): ', geojson);
-		console.dir(geojson.features);
-		console.log(geojson.features[0].properties);
 
+		// write geojson template to disk
+		var toFile = '/var/www/data/legends/template-' + lid + '.geojson'; 
 		fs.outputFile(toFile, JSON.stringify(geojson), function (err) {
-			console.log('wrote goejson!!!');
+			// console.log('wrote goejson!!!');
 
 			var options = {
 				"srs": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over",
@@ -140,51 +266,59 @@ module.exports = api = {
 
 			var cr = new carto.Renderer({});
 		
-			// get xml from 
+			// get xml
 			var xml = cr.render(options);
-			var stylepath = '/var/www/data/static/legendsStylesheet.xml';
-		
-
+			var stylepath = '/var/www/data/legends/stylesheet-' + lid + '.xml';
 			fs.outputFile(stylepath, xml, function (err) {
 				if (err) console.log('carto write err', err);
 
-				api.createLegend(stylepath);
+				var result = {
+					stylepath : stylepath,
+					lid : lid
+				}
+
+				callback(null, result);
+
 			});
-
-
-
-
 		});//fs.out
 
 	},
 
 
 
-	createLegend : function (stylepath) {
+	_createLegend : function (options, callback) {
 
 		var mapnik = require('mapnik');
 		var fs = require('fs');
+
+
+		var stylepath = options.stylepath;
+		var lid = options.lid;
 
 		// register fonts and datasource plugins
 		mapnik.register_default_fonts();
 		mapnik.register_default_input_plugins();
 
-		var map = new mapnik.Map(256, 256);
+		var map = new mapnik.Map(100, 50);
 		// map.load('./test/stylesheet.xml', function(err,map) {
 
 		try {
 		map.load(stylepath, function(err,map) {
 			if (err) throw err;
 			map.zoomAll(); // todo: zoom?
-			var im = new mapnik.Image(256, 256);
+			var im = new mapnik.Image(100, 50);
 			map.render(im, function(err,im) {
 				if (err) throw err;
 				im.encode('png', function(err,buffer) {
 					if (err) throw err;
 					// fs.writeFile('map.png',buffer, function(err) {
-					fs.writeFile('/var/www/data/static/legendsTest.png', buffer, function(err) {
+					var outpath = '/var/www/data/legends/' + lid + '.png';
+					fs.writeFile(outpath, buffer, function(err) {
 						if (err) throw err;
 						console.log('saved map image to map.png');
+						
+
+						callback(null, outpath);
 					});
 				});
 			});
@@ -202,10 +336,9 @@ module.exports = api = {
 	// #########################################
 	// ###  API: Get Layer Feature Values    ###
 	// #########################################	
-	getLayerFeaturesValues : function (req, res) {
+	// get features from geojson that are active in cartoid.mss (ie. only active/visible layers)
+	_getLayerFeaturesValues : function (fileUuid, cartoid, callback) {
 
-		var fileUuid = req.body.fileUuid;
-		var cartoid = req.body.cartoid;
 
 		File
 		.findOne({uuid : fileUuid})
@@ -213,149 +346,99 @@ module.exports = api = {
 			console.log('err?', err);
 			console.log('found file: ', file);
 
-			// 
-
-
+			// read geojson file
 			var path = FILEFOLDER + file.uuid + '/' + file.data.geojson;
-			console.log('path: ', path);
-
-
 			fs.readJson(path, function (err, data) {
 				if (err) console.log('err: : ', err);
 
-				console.log('read json: ', data);
-
-
-				// prints all features and their unqiue values
-				data.features.forEach(function (feature) {
-
-					var props = feature.properties;
-					console.log('props!! =>>', props);
-
-				}, this);
-
-
-
+				// read css from file
 				var cartopath = CARTOCSSFOLDER + cartoid + '.mss';
-
 				fs.readFile(cartopath, 'utf8', function (err, buffer) {
 
 					// css as string
 					var css = buffer.toString();
 
-					
-					var env = {};
-					// var parser = new carto.Parser(env);
+					// get rules from carto (forked!)
 					var renderer = new carto.Renderer();
-					// console.log('renderer: ', r);
-
-					// get rules from carto (hacked)
 					var info = renderer.getRules(css);
 
-					// // systemapic hack in carto.renderer.js:
-					// carto.Renderer.prototype.getRules = function render(data) {
+					var string = JSON.stringify(info);
 
-					//     var env = _(this.env).defaults({
-					//         benchmark: true,
-					//         validation_data: false,
-					//         effects: []
-					//     });
-
-					//     if (!carto.tree.Reference.setVersion(this.options.mapnik_version)) {
-					//         throw new Error("Could not set mapnik version to " + this.options.mapnik_version);
-					//     }
-
-					   
-					//     var parser = (carto.Parser(env)).parse(data);
-					//     return parser;
-
-					// }
+					console.log('string: ', string);
 
 
-					
-
+					// add rules to jah
 					var jah = [];
-					var rules = info.rules[0].rules;
-					rules.forEach(function (rrules) {
-						var selectors = rrules.selectors;
-						selectors.forEach(function (s) {
-							var rule = s.filters.filters;
-							for (var r in rule) {
-								var jahrule = rule[r];
-								var ro = {
-									key : jahrule.key.value,
-									value : jahrule.val.value
+					var rules1 = info.rules;//[0].rules;
+
+					rules1.forEach(function (rule1) {
+
+						var rules2 = rule1.rules;
+
+
+						if (!rules2) return;				// todo? forEach on rule1?
+						rules2.forEach(function (rrules) {
+							// console.log('rrules:', rrules);
+							if (!rrules.selectors) return;
+
+							rrules.selectors.forEach(function (s) {
+								var rule = s.filters.filters;
+								for (var r in rule) {
+									var jahrule = rule[r];
+									jah.push({
+										key : jahrule.key.value,
+										value : jahrule.val.value
+									});
 								}
-								jah.push(ro);
-							}
-						}, this);
-					}, this);
+							});
+						});
+
+
+					})
+
+					// add #layer
+					jah.push({
+						key : 'layer',
+						value : file.name
+					});
+
+
+					// // add rules to jah
+					// var jah = [];
+					// var rules = info.rules[0].rules;
+					// rules.forEach(function (rrules) {
+					// 	rrules.selectors.forEach(function (s) {
+					// 		var rule = s.filters.filters;
+					// 		for (var r in rule) {
+					// 			var jahrule = rule[r];
+					// 			jah.push({
+					// 				key : jahrule.key.value,
+					// 				value : jahrule.val.value
+					// 			});
+					// 		}
+					// 	});
+					// });
 
 
 					
 
 
-					console.log('JAH!', jah);
+					
+
+					var result = {
+						rules : jah,
+						css : css
+					}
 
 
-
-
-
-
-
-					// console.log('stringgngngng', string);
-
-					// var rules = info.rules;
-					// console.log('rules:::');
-					// console.dir(rules[0][0]);
-
-					// var list = rules[0][0];
-					// console.log('list: ');
-					// console.dir(list);
-
-					// var jah = list.rules[0].value;
-
-					// console.log('jah: ', jah);
-
-
-
-					// console.log('parser', parser);
-
-					// var something = parser.parse(css);
-
-					// console.log('something: ', something);
-
-					// var rule_list = parser.toList(env);
-
-					// console.log('rule_list', rule_list);
-					// console.log('elemetns: ', rule_list[0].elements);
-
-					// var defs = this._inheritDefinitions(rule_list, env);
-
-					// console.log('defs:', defs);
-
-
-
-
+					console.log('JAH!', result);
+					callback(null, result);
 
 				});
-
-
-				
-
-
-
-
-
 			});
-
-
-
 		});
 
-		res.end(JSON.stringify({
-			result : 'nuttin'
-		}))
+		
 
 
 	},
@@ -3253,6 +3336,17 @@ module.exports = api = {
 
 			// update tooltip
 			if (req.body.hasOwnProperty('tooltip')) {
+
+				var tooltip = req.body.tooltip;
+				layer.tooltip = tooltip;
+				layer.save(function (err) {
+					if (err) throw err;
+				});
+
+			}
+
+			// update tooltip
+			if (req.body.hasOwnProperty('legends')) {
 
 				var tooltip = req.body.tooltip;
 				layer.tooltip = tooltip;

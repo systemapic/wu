@@ -119,14 +119,14 @@ Wu.Layer = Wu.Class.extend({
 		return meta.json.vector_layers[0].fields;
 	},
 
-	getTooltipMeta : function () {
+	getTooltip : function () {
 		var json = this.store.tooltip;
 		if (!json) return false;
 		var meta = JSON.parse(json);
 		return meta;
 	},
 
-	setTooltipMeta : function (meta) {
+	setTooltip : function (meta) {
 		this.store.tooltip = JSON.stringify(meta);
 		this.save('tooltip');
 	},
@@ -138,10 +138,24 @@ Wu.Layer = Wu.Class.extend({
 		return false;
 	},
 
-	setLegends : function (meta) {
-		if (!meta) return;
-		this.store.legends = JSON.stringify(meta);
+	setLegends : function (legends) {
+		console.log('setLegends!', legends);
+
+		if (!legends) return;
+		this.store.legends = JSON.stringify(legends);
 		this.save('legends');
+	},
+
+	createLegends : function (callback) {
+
+		// get layer feature values for this layer
+		var json = JSON.stringify({
+			fileUuid : this.getFileUuid(),
+			cartoid : this.getCartoid()
+		});
+
+		Wu.post('/api/layer/createlegends', json, callback, this)
+
 	},
 
 
@@ -334,7 +348,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		console.log('_popupContent data:', data);
 
 		// check for stored tooltip
-		var meta = this.getTooltipMeta();
+		var meta = this.getTooltip();
 		var string = '';
 		console.log('FOUND TOOLTIP :', meta);
 

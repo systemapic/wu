@@ -324,29 +324,42 @@ module.exports = function(app, passport) {
 	});
 
 
+	// // =====================================
+	// // PARSE CARTOCSS ======================
+	// // =====================================
+	// // 
+	// app.post('/api/util/parsecarto', isLoggedIn, function (req, res) {
+	// 	console.log('/api/util/parsecarto');
+
+	// 	// parse css
+	// 	api.parseCartoCSS(req, res);
+
+	// });
+
+	// // =====================================
+	// // GET FEATURES/VALUES FROM GEOJSON ====
+	// // =====================================
+	// // create PDF snapshot of current map
+	// app.post('/api/util/getfeaturesvalues', isLoggedIn, function (req, res) {
+	// 	console.log('/api/util/getfeaturesvalues');
+
+	// 	// get features/values for geojson
+	// 	api.getLayerFeaturesValues(req, res);
+
+	// });
+
 	// =====================================
-	// PARSE CARTOCSS ======================
+	// AUTO-CREATE LEGENDS =================
 	// =====================================
 	// create PDF snapshot of current map
-	app.post('/api/util/parsecarto', isLoggedIn, function (req, res) {
-		console.log('/api/util/parsecarto');
-
-		// parse css
-		api.parseCartoCSS(req, res);
-
-	});
-
-	// =====================================
-	// PARSE CARTOCSS ======================
-	// =====================================
-	// create PDF snapshot of current map
-	app.post('/api/util/getfeaturesvalues', isLoggedIn, function (req, res) {
-		console.log('/api/util/getfeaturesvalues');
+	app.post('/api/layer/createlegends', isLoggedIn, function (req, res) {
+		console.log('/api/layer/createlegends');
 
 		// get features/values for geojson
-		api.getLayerFeaturesValues(req, res);
+		api.createLegends(req, res);
 
 	});
+
 
 
 
