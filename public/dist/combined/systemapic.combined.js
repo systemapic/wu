@@ -11670,7 +11670,9 @@ L.Control.BaselayerToggle = L.Control.extend({
 	},
 
 	addLayer : function (baseLayer) {
-
+		console.log('baselayer: ', baseLayer);
+		if (!baseLayer.layer) return console.error('BUG: fixme!');
+		
 		// create div
 		var layerName = baseLayer.layer.getTitle();
 		var item = Wu.DomUtil.create('div', 'baselayertoggle-item active', this._list, layerName);
@@ -13223,7 +13225,7 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	setCartoid : function (cartoid) {
-		console.log('setCartoCSS');
+		console.log('setCartoId');
 		this.store.data.cartoid = cartoid;
 		this.save('data');
 	},
@@ -13271,29 +13273,56 @@ L.control.baselayerToggle = function (options) {
 		return meta.json.vector_layers[0].fields;
 	},
 
-	getTooltipMeta : function () {
+	getTooltip : function () {
 		var json = this.store.tooltip;
 		if (!json) return false;
 		var meta = JSON.parse(json);
 		return meta;
 	},
 
-	setTooltipMeta : function (meta) {
+	setTooltip : function (meta) {
 		this.store.tooltip = JSON.stringify(meta);
 		this.save('tooltip');
 	},
 
-	getLegendsMeta : function () {
+	getLegends : function () {
 		console.log('getLegendsMeta');
 		var meta = this.store.legends
 		if (meta) return JSON.parse(meta);
 		return false;
 	},
 
-	setLegendsMeta : function (meta) {
-		if (!meta) return;
-		this.store.legends = JSON.stringify(meta);
+	setLegends : function (legends) {
+		console.log('setLegends!', legends);
+
+		if (!legends) return;
+		this.store.legends = JSON.stringify(legends);
 		this.save('legends');
+	},
+
+	createLegends : function (callback) {
+
+		// get layer feature values for this layer
+		var json = JSON.stringify({
+			fileUuid : this.getFileUuid(),
+			cartoid : this.getCartoid()
+		});
+
+		Wu.post('/api/layer/createlegends', json, callback, this)
+
+	},
+
+
+	getFeaturesValues : function (callback, ctx) {
+		if (!callback || !ctx) return console.error('must provide callback() and context');
+
+		// get layer feature values for this layer
+		var json = JSON.stringify({
+			fileUuid : this.getFileUuid(),
+			cartoid : this.getCartoid()
+		});
+
+		Wu.post('/api/util/getfeaturesvalues', json, callback.bind(ctx), this)
 	},
 
 
@@ -13389,7 +13418,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		var map = app._map;
 
 		if (this.layer) {
-			map.removeLayer(this.layer);
+			map.removeLayer(this.layer);		// refactor ? should be removed/added in same place?
 
 		}
 
@@ -13473,7 +13502,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		console.log('_popupContent data:', data);
 
 		// check for stored tooltip
-		var meta = this.getTooltipMeta();
+		var meta = this.getTooltip();
 		var string = '';
 		console.log('FOUND TOOLTIP :', meta);
 

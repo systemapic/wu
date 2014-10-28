@@ -370,8 +370,8 @@ L.Control.CartoCSS = L.Control.extend({
 		if (!this._layer) return;
 
 		// fill with meta from store
-		var meta = this._layer.getLegends();
-		if (meta) return this._initLegendsStoredMeta(meta);
+		var legends = this._layer.getLegends();	// as object!
+		if (legends) return this.fillLegends(legends);
 
 		// fill with default
 		return this._initLegendsDefaultMeta();
@@ -388,7 +388,7 @@ L.Control.CartoCSS = L.Control.extend({
 		if (!this._layer) return;
 
 		// fill with store tooltip meta
-		var tooltipMeta = this._layer.getTooltipMeta();
+		var tooltipMeta = this._layer.getTooltip();
 		if (tooltipMeta) return this._initTooltipStoredMeta(tooltipMeta);
 
 		// fill with default meta
@@ -398,18 +398,120 @@ L.Control.CartoCSS = L.Control.extend({
 
 
 
+	// fill legends tab with legends
+	fillLegends : function (legends) {
+		console.log('fillLegends legends: ', legends);
 
-	_initLegendsStoredMeta : function (meta) {
+		// clear old
+		this._legendsWrapper.innerHTML = '';
 
-		// meta = stored legends
-		console.log('_initTooltipStoredMeta meta: ', meta);
+		// inner wrapper
+		this._legendsWrapperInner = Wu.DomUtil.create('div', 'legends-inner-scroller', this._legendsWrapper);
 
+		// each legend
+		legends.forEach(function (legend) {
+
+			// append legend entry to wrapper
+			var legdiv = this._legendEntry(legend);
+			this._legendsWrapperInner.appendChild(legdiv);
+
+		}, this);
+
+
+	},
+
+	_legendEntry : function (legend) {
+
+		// create divs
+		var wrap 	= Wu.DomUtil.create('div', 'legend-entry-wrap');
+		var imgwrap 	= Wu.DomUtil.create('div', 'legend-entry-image', wrap);
+		var image1	= Wu.DomUtil.create('img', 'legend-image1', imgwrap);
+		var image2	= Wu.DomUtil.create('img', 'legend-image2', imgwrap);
+		var keydiv	= Wu.DomUtil.create('div', 'legend-entry-key', wrap);
+		var valuediv  	= Wu.DomUtil.create('div', 'legend-entry-value', wrap); 
+		var checkbox 	= this._createCheckbox(legend.id);
+		wrap.appendChild(checkbox);
+
+		// set values	
+		image1.src 	   = legend.base64;
+		image2.src 	   = legend.base64;
+		// imgwrap.style.backgroundImage = 'url(' + legend.base64 + ')';
+		keydiv.innerHTML   = this._normalizeKey(legend.key);
+		valuediv.innerHTML = legend.value;
+		wrap.setAttribute('legendid', legend.id);
+		
+		// add toogle hook
+		Wu.DomEvent.on(checkbox, 'change', this._saveLegends, this);
+
+		// return div
+		return wrap;
+	},
+
+	_saveLegends : function () {
+
+		// get legends array
+		var legends = this._layer.getLegends();
+
+		// iterate
+		var childs = this._legendsWrapperInner.childNodes;
+		for (var i = 0; i < childs.length; i++) {
+
+			var child = childs[i];
+
+			console.log('legend child', child);
+
+			// get checked value
+			var checked = child.childNodes[1].querySelector('input:checked');
+			var on = (!checked) ? false : true;
+			var id = child.getAttribute('legendid');
+
+			// find legend to update
+			var legend = _.find(legends, function (l) {
+				return l.id == id;
+			});
+
+			console.log('found leg: ', legend);
+
+			// update toggle
+			legend.on = on;
+			
+		}
+
+		// save
+		this._layer.setLegends(legends);
+
+	},
+
+	// get custom keyname if created (in tooltips)
+	_normalizeKey : function (key) {
+		var tooltips = this._layer.getTooltip();
+		var customKey = _.find(tooltips.fields, function (f) {
+			return key == f.key;
+		});
+		if (customKey && customKey.title) return customKey.title;
+		return key;
+	},
+
+	_createCheckbox : function (id) {
+		// create switch
+		var switchId = 'switch-' + id;
+		var fieldSwitch = Wu.DomUtil.create('div', 'switch controls-switch');
+		var fieldSwitchInput = Wu.DomUtil.createId('input', switchId, fieldSwitch);
+		var fieldSwitchLabel = Wu.DomUtil.create('label', '', fieldSwitch);
+		Wu.DomUtil.addClass(fieldSwitchInput, 'cmn-toggle cmn-toggle-round-flat');
+		fieldSwitchInput.setAttribute('type', 'checkbox');
+		fieldSwitchLabel.setAttribute('for', switchId);
+		return fieldSwitch;
 	},
 
 
 	_initLegendsDefaultMeta : function () {
 
-		this._legendsWrapper.innerHTML = 'No legends yet. Style the geo and magic will happen!';
+		// clear
+		this._legendsWrapper.innerHTML = '';
+
+		// add help text
+		Wu.DomUtil.create('div', 'legends-default-box', this._legendsWrapper, 'No legends yet. Style the geo and magic will happen!');
 
 		
 	},
@@ -417,33 +519,35 @@ L.Control.CartoCSS = L.Control.extend({
 
 	_updateLegends : function (cartoid) {
 
-		// // get css
-		// var css = this._codeMirror.getValue();
-
-		// // json
-		// var json = JSON.stringify({
-		// 	css : css,
-		// 	featureKey : 'NAME_2',
-		// 	featureValue : 'Voss'
-		// });
-
-		// // get default from cartocss
-		// Wu.post('/api/util/parsecarto', json, this._parsedCarto.bind(this), this);
-
-
-		// create legend for each ID mentioned in css
-
-
 		var meta = this._layer.getMeta();
 		var metaFields = this._layer.getMetaFields();
-		console.log('_updateLegends');
-		console.log('meta: ', meta);
-		console.log('fields: ', metaFields);
+		
+		// generate layers on server from active fields
+		// this._layer.createLegends(this._createdLegends.bind(this));
+		this._layer.createLegends(function (ctx, json) {
+			var legends = JSON.parse(json);
 
-		var values = this._layer.getFeaturesValues(this._gotFeatures, this);
+			console.log('legends: ', legends);
 
+			// sort some things: #layer on top
+			var layer = _.remove(legends, function (l) {
+				return l.key == 'layer';
+			});
+			console.log('rem: ', layer);
+			legends.unshift(layer[0]);
+
+			// fill legends tab
+			this.fillLegends(legends);
+
+			// save to layer
+			this._layer.setLegends(legends);
+
+
+		}.bind(this));
 
 	},
+
+
 
 
 	_gotFeatures : function (ctx, json) {
@@ -596,7 +700,7 @@ L.Control.CartoCSS = L.Control.extend({
 
 
 		// save to server
-		this._layer.setTooltipMeta(saved);
+		this._layer.setTooltip(saved);
 		
 
 	},
