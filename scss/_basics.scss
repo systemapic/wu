@@ -551,16 +551,29 @@ label.info {
 	margin-top: 150px;	
 	}
 
-#login-logo {
+/*#login-logo {
 	width: 390px;
 	height: 324px;
-	background-image: url(images/systemapic-logo-bw-2.png);
+	background-image: url(images/ruppellsgriffon_logo.png);
 	background-size: cover;
 	margin: auto;
 	position: relative;
 	top: -53px;
 	left: -11px;
 	}
+*/
+
+#login-logo {
+	width: 390px;
+	height: 324px;
+	background-image: url(images/ruppellsgriffon_logo.png);
+	margin: auto;
+	position: relative;
+	top: 0;
+	left: 0;
+	background-repeat: no-repeat;
+	}
+
 
 #login-button {
 	top: -3px;

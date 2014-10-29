@@ -351,6 +351,29 @@ Wu.Util = {
 			if (cb) cb(context, http.responseText); 
 		    }
 		}
+
+
+
+		http.send(json);
+	},
+
+
+	// post with callback and error handling (do callback.bind(this) for context)
+	send : function (path, json, callback) {
+		var http = new XMLHttpRequest();
+		var url = window.location.origin;
+		url += path;
+		http.open("POST", url, true);
+		http.setRequestHeader('Content-type', 'application/json');
+		http.onreadystatechange = function() {
+			if (http.readyState == 4) {
+				if (http.status == 200) { // ok
+					if (callback) callback(null, http.responseText); 
+				} else { // error
+					if (callback) callback(http.status); 	// ??
+				}
+			}
+		}
 		http.send(json);
 	},
 
@@ -1019,6 +1042,7 @@ Wu.stamp = Wu.Util.stamp;
 Wu.setOptions = Wu.Util.setOptions;
 Wu.save = Wu.Util.post;
 Wu.post = Wu.Util.postcb;
+Wu.send = Wu.Util.send;
 Wu.parse = Wu.Util._parse;
 Wu.zip = Wu.Util.generateZip;
 Wu.zave = Wu.Util.zipSave;

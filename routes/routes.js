@@ -28,6 +28,8 @@ var upload = require('../routes/upload');
 // global paths
 var IMAGEFOLDER = '/var/www/data/images/';
 
+
+
 // function exports
 module.exports = function(app, passport) {
 
@@ -38,14 +40,11 @@ module.exports = function(app, passport) {
 	// ================================
 	app.get('/', function(req, res) {
 
-		console.log('GET / ', req.session.hotlink, req.url);
-
 		// return if not logged in 			redirect to login page
 		if (!req.isAuthenticated()) return res.render('../../views/index.ejs'); // load the index.ejs file
 		
 		// render app html				// todo: hotlink
 		res.render('../../views/app.ejs', {
-			//json : json,
 			hotlink : req.session.hotlink
 		});
 
@@ -170,8 +169,6 @@ module.exports = function(app, passport) {
 
 	
 	
-
-
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
@@ -179,7 +176,6 @@ module.exports = function(app, passport) {
 	app.get('/images/*', isLoggedIn, function (req,res) {
 		console.log('/images');
 
-		
 		// todo: more auth!
 
 		var file = req.params[0];
@@ -286,6 +282,21 @@ module.exports = function(app, passport) {
 	});
 
 
+
+	// // =====================================
+	// // CREATE PERIODIC ACCESS TOKEN ========
+	// // =====================================
+	// // create access token for user to access rasters
+	// app.post('/api/util/token', isLoggedIn, function (req, res) {
+
+
+	// 	// api.createToken(req, res);
+
+	// });
+
+
+
+
 	
 	// =====================================
 	// GET MAPBOX ==========================
@@ -324,29 +335,6 @@ module.exports = function(app, passport) {
 	});
 
 
-	// // =====================================
-	// // PARSE CARTOCSS ======================
-	// // =====================================
-	// // 
-	// app.post('/api/util/parsecarto', isLoggedIn, function (req, res) {
-	// 	console.log('/api/util/parsecarto');
-
-	// 	// parse css
-	// 	api.parseCartoCSS(req, res);
-
-	// });
-
-	// // =====================================
-	// // GET FEATURES/VALUES FROM GEOJSON ====
-	// // =====================================
-	// // create PDF snapshot of current map
-	// app.post('/api/util/getfeaturesvalues', isLoggedIn, function (req, res) {
-	// 	console.log('/api/util/getfeaturesvalues');
-
-	// 	// get features/values for geojson
-	// 	api.getLayerFeaturesValues(req, res);
-
-	// });
 
 	// =====================================
 	// AUTO-CREATE LEGENDS =================
@@ -482,6 +470,17 @@ module.exports = function(app, passport) {
 		api.updateLayer(req, res);
 	});
 
+	// =====================================
+	// RELOAD LAYER METADATA ===============
+	// =====================================
+	// get layers objects for project
+	app.post('/api/layer/reloadmeta', isLoggedIn, function (req, res) {
+		console.log('/api/layer/reloadmeta');
+
+		// update layer
+		api.reloadMeta(req, res);
+	});
+
 
 	// =====================================
 	// SET CARTOCSS ========================
@@ -584,13 +583,13 @@ module.exports = function(app, passport) {
 
 
 
-	app.post('/api/debug/test', isLoggedIn, function (req, res) {
-		console.log('Debug Test Running...');
+	// app.post('/api/debug/test', isLoggedIn, function (req, res) {
+	// 	console.log('Debug Test Running...');
 
-		// run debug test
-		api.debugTest(req, res);
+	// 	// run debug test
+	// 	api.debugTest(req, res);
 
-	});
+	// });
 
 
 
@@ -608,17 +607,17 @@ module.exports = function(app, passport) {
 
 	
 
-	// =====================================
-	// SIGNUP ==============================
-	// =====================================
-	// show the signup form
-	app.get('/signup', function(req, res) {
-		console.log('/signup');
+	// // =====================================
+	// // SIGNUP ==============================
+	// // =====================================
+	// // show the signup form
+	// app.get('/signup', function(req, res) {
+	// 	console.log('/signup');
 
-		// render the page and pass in any flash data if it exists
-		res.render('../../views/signup.ejs', { message: req.flash('signupMessage') });
+	// 	// render the page and pass in any flash data if it exists
+	// 	res.render('../../views/signup.ejs', { message: req.flash('signupMessage') });
 
-	});
+	// });
 
 
 	
@@ -634,15 +633,15 @@ module.exports = function(app, passport) {
 
 
 
-	// =====================================
-	// SIGNUP ==============================
-	// =====================================
-	// process the signup form
-	app.post('/signup', passport.authenticate('local-signup', {
-		successRedirect : '/', // redirect to the secure profile section
-		failureRedirect : '/signup', // redirect back to the signup page if there is an error
-		failureFlash : true // allow flash messages
-	}));
+	// // =====================================
+	// // SIGNUP ==============================
+	// // =====================================
+	// // process the signup form
+	// app.post('/signup', passport.authenticate('local-signup', {
+	// 	successRedirect : '/', // redirect to the secure profile section
+	// 	failureRedirect : '/signup', // redirect back to the signup page if there is an error
+	// 	failureFlash : true // allow flash messages
+	// }));
 
 
 
@@ -657,11 +656,8 @@ module.exports = function(app, passport) {
 	}));
 
 
-	// app.post('/login', function (req, res) {
-	// 	console.log('__________________');
-	// 	console.log('LOGIN: req: ', req);
-	// });
-
+	
+	// forgot password
 	app.post('/forgot', function (req, res) {
 
 		// handle password reset
@@ -671,13 +667,11 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
-	// WILDCARD PATHS ======================		// TODO, much problems here.. 
+	// WILDCARD PATHS ======================		
 	// =====================================
 	// process /client/project url structure
 	app.get('*', function (req, res) {
 		
-		console.log('GET *', req.url);
-
 		// process wildcard path
 		api.processWildcardPath(req, res);
 

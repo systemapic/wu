@@ -38,7 +38,7 @@ var layerSchema = mongoose.Schema({
 	legends : String,  // json string with cartocss legends
 
 	// geojson styling
-	style : [{
+	style : [{											// todo: remove!
 		__sid : String,	// systemapic id added to geojson features
 		style : String  // json of css style object
 	}],

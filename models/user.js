@@ -17,6 +17,9 @@ var userSchema = mongoose.Schema({
         mobile      : String,
         createdBy   : String,
 
+        // tile server auth token
+        token       : String,
+
         role : {
 
                 superadmin : { type: Boolean, default: false },

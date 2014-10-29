@@ -833,7 +833,7 @@
 	
 /* inner wrapper 2 */
 #legends-inner {
-	max-height: 220px;
+//	max-height: 220px;
 	background: rgba(255,255,255,0.93);
 	box-shadow: 0 0 5px rgba(0,0,0,0.5);
 	overflow: hidden;
@@ -911,7 +911,7 @@
 	text-align: left;
 	padding-top: 0px;
 	border-right: 1px dashed #C8C8C8;
-	max-width: 300px;
+//	max-width: 300px;
 	margin-top: 7px;
 	font-family: $font !important;
 	}
@@ -925,11 +925,12 @@
 	width: 100%;
 	margin-top: 5px;
 	margin-bottom: 5px;
+	max-width: 300px;
 	}
 
 .legend-each {
 	width: 49%;
-	max-width: 200px;
+//	max-width: 200px;
 	display: inline-block;
 	vertical-align: top;
 	position: relative;
@@ -938,13 +939,14 @@
 	}
 
 .legend-feature {
-	border: 1px solid red;
+	border: 1px solid;
 	width: 21px;
 	height: 20px;
 	position: absolute;
 	display: inline-block;
 	vertical-align: top;
 	top: -2px;
+	overflow: hidden;
 	}
 
 .legend-feature div {
@@ -978,6 +980,8 @@
 	vertical-align: top;
 	position: relative;
 	left: 25px;
+	padding-right: 28px;
+	line-height: 1.2;
 	}
 
 .legend-source {
