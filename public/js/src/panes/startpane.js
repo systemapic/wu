@@ -23,9 +23,7 @@ Wu.StartPane = Wu.Class.extend({
 		// Reverse so we get newest first
 		projects.reverse();
 
-
 		this._container = Wu.DomUtil.createId('div', 'start-pane', Wu.app._mapContainer);
-		this._inner_container = [];
 
 		// Pull out the latest three Projects	
 		for ( var i = 0; i<projects.length-1; i++ ) {
@@ -49,19 +47,10 @@ Wu.StartPane = Wu.Class.extend({
 		var _lastUpdated	= 	project.getLastUpdated();
 
 
-		// Container for each project
-		var _inner_container_each = {
-
-			container : Wu.DomUtil.create('div', 'start-pane-project', this._container),
-			uuid : _uuid
-
-		}
-
-		// Put the proects in an array, to register hooks on
-		this._inner_container.push(_inner_container_each);
+		var container = Wu.DomUtil.create('div', 'start-pane-project', this._container);
 
 		// Image wrapper
-		var imageWrapper = Wu.DomUtil.create('div', 'start-project-image', _inner_container_each.container);
+		var imageWrapper = Wu.DomUtil.create('div', 'start-project-image', container);
 
 		// If there is a logo, render it
 		if ( _logo ) {
@@ -70,28 +59,21 @@ Wu.StartPane = Wu.Class.extend({
 		}
 		
 		// Project title div
-		var name = Wu.DomUtil.create('div', 'start-project-name', _inner_container_each.container);
+		var name = Wu.DomUtil.create('div', 'start-project-name', container);
 
 		// Adjust for short titles
 		if ( _name.length < 22 ) Wu.DomUtil.addClass(name, 'start-project-short-name');
-		name.innerHTML = _name;	
+		name.innerHTML = _name;
+
+		// Register hook
+		Wu.DomEvent.on(container, 'mousedown', function() { this.activate(_uuid) }, this);
 
 	},
 
 	addHooks : function () {
-
-		Wu.DomEvent.on(this._inner_container[0].container, 'mousedown', function() { this.activate(this._inner_container[0].uuid) }, this);
-		Wu.DomEvent.on(this._inner_container[1].container, 'mousedown', function() { this.activate(this._inner_container[1].uuid) }, this);
-		Wu.DomEvent.on(this._inner_container[2].container, 'mousedown', function() { this.activate(this._inner_container[2].uuid) }, this);
-
 	},
 
 	removeHooks : function () {
-
-		Wu.DomEvent.off(this._inner_container[0].container, 'mousedown', function() { this.activate(this._inner_container[0].uuid) }, this);
-		Wu.DomEvent.off(this._inner_container[1].container, 'mousedown', function() { this.activate(this._inner_container[1].uuid) }, this);
-		Wu.DomEvent.off(this._inner_container[2].container, 'mousedown', function() { this.activate(this._inner_container[2].uuid) }, this);
-
 	},
 
 	activate : function(uuid) {

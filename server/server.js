@@ -4,7 +4,7 @@
 // get all the tools we need
 var express  = require('express');
 var app      = express();
-var port     = process.env.PORT || 80;
+// var port     = process.env.PORT || 80;
 var mongoose = require('mongoose');
 var passport = require('passport');
 var flash    = require('connect-flash');
@@ -14,6 +14,10 @@ var favicon  = require('serve-favicon');
 
 var configDB = require('../config/database.js');
 var cors = require('cors');
+
+
+var port = 3001;
+
 
 // configuration ===============================================================
 mongoose.connect(configDB.url); // connect to our database
@@ -52,7 +56,7 @@ require('../routes/routes.js')(app, passport); // load our routes and pass in ou
 
 
 // launch ======================================================================
-app.listen(port);
+app.listen(port, 'localhost');
 console.log('The magic happens on port ' + port);
 
 

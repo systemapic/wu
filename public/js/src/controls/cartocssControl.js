@@ -340,10 +340,14 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	initStyling : function (layer) {
+		if (!layer) return;
+
 
 		// new layer is active
 		this._layer = layer;
 		this._cartoid = false;
+
+		console.log('layer: ', layer);
 
 		// insert title in dropdown
 		this._styleHeaderLayerName.innerHTML = layer.store.title.camelize();
@@ -362,7 +366,7 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	initLegends : function () {
-
+		
 		// clear 
 		this._legendsWrapper.innerHTML = '';
 
@@ -400,7 +404,6 @@ L.Control.CartoCSS = L.Control.extend({
 
 	// fill legends tab with legends
 	fillLegends : function (legends) {
-		console.log('fillLegends legends: ', legends);
 
 		// clear old
 		this._legendsWrapper.innerHTML = '';
@@ -435,10 +438,10 @@ L.Control.CartoCSS = L.Control.extend({
 		// set values	
 		image1.src 	   = legend.base64;
 		image2.src 	   = legend.base64;
-		// imgwrap.style.backgroundImage = 'url(' + legend.base64 + ')';
 		keydiv.innerHTML   = this._normalizeKey(legend.key);
 		valuediv.innerHTML = legend.value;
 		wrap.setAttribute('legendid', legend.id);
+		if (legend.on) checkbox.firstChild.setAttribute('checked', 'checked');
 		
 		// add toogle hook
 		Wu.DomEvent.on(checkbox, 'change', this._saveLegends, this);
@@ -455,13 +458,10 @@ L.Control.CartoCSS = L.Control.extend({
 		// iterate
 		var childs = this._legendsWrapperInner.childNodes;
 		for (var i = 0; i < childs.length; i++) {
-
 			var child = childs[i];
 
-			console.log('legend child', child);
-
 			// get checked value
-			var checked = child.childNodes[1].querySelector('input:checked');
+			var checked = child.childNodes[3].querySelector('input:checked');
 			var on = (!checked) ? false : true;
 			var id = child.getAttribute('legendid');
 
@@ -470,10 +470,8 @@ L.Control.CartoCSS = L.Control.extend({
 				return l.id == id;
 			});
 
-			console.log('found leg: ', legend);
-
 			// update toggle
-			legend.on = on;
+			legends[i].on = on;
 			
 		}
 
@@ -527,13 +525,10 @@ L.Control.CartoCSS = L.Control.extend({
 		this._layer.createLegends(function (ctx, json) {
 			var legends = JSON.parse(json);
 
-			console.log('legends: ', legends);
-
 			// sort some things: #layer on top
 			var layer = _.remove(legends, function (l) {
 				return l.key == 'layer';
 			});
-			console.log('rem: ', layer);
 			legends.unshift(layer[0]);
 
 			// fill legends tab
@@ -548,14 +543,6 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 
-
-
-	_gotFeatures : function (ctx, json) {
-		console.log('_gotFeatures');
-		console.log('ctx, json, this', ctx, json, this);
-
-
-	},
 
 
 	_initTooltipStoredMeta : function (meta) {
@@ -584,8 +571,10 @@ L.Control.CartoCSS = L.Control.extend({
 
 	_initTooltipDefaultMeta : function () {
 
+
 		// get default meta
 		var fields = this._layer.getMetaFields();
+		console.log('TOOLTIUPD DEAFUALT', fields);
 
 		// create header
 		var tooltipCustomHeader	= Wu.DomUtil.createId('input', 'cartocss-tooltip-custom-header', this._tooltipWrapper);
@@ -605,8 +594,6 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	_createTooltipEntry : function (defaultKey, key, on) {
-
-		console.log('_createTooltipEntry', defaultKey, key, on);
 
 		// create wrapper
 		var fieldWrapper = Wu.DomUtil.create('div', 'tooltip-field-wrapper', this._tooltipWrapper);
@@ -631,10 +618,6 @@ L.Control.CartoCSS = L.Control.extend({
 		// set checked
 		if (on) fieldSwitchInput.setAttribute('checked', 'checked');
 
-
-
-		// todo: events
-
 		// set save events
 		Wu.DomEvent.on(fieldSwitchInput, 'change', this._saveTip, this);
 		Wu.DomEvent.on(fieldKey, 'keyup', this._saveTip, this);
@@ -642,8 +625,6 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	_saveTip : function () {
-
-		console.log('save tooltip meta');
 
 		// clear timer, dont save more than erry second
 		if (this._savingTooltip) clearTimeout(this._savingTooltip);
@@ -695,53 +676,32 @@ L.Control.CartoCSS = L.Control.extend({
 			});
 		}
 
-		console.log('saved->', saved);
-
-
-
 		// save to server
 		this._layer.setTooltip(saved);
 		
-
 	},
-
-
-
 
 	toggleLayerDropDown : function () {
-
-		if ( !this._openDropDown ) {
-
+		if (!this._openDropDown) {
 			this._openDropDown = true;
 			var dropDownHeight = this._layers.length * 27;
-
-			if ( this._layers.length <= 2 ) dropDownHeight+=2;
-
+			if (this._layers.length <= 2) dropDownHeight+=2;
 			this._layerSelectorOuter.style.height = dropDownHeight + 'px';
-
-
 			Wu.DomUtil.addClass(this._styleHeaderDropDownButton, 'carrow-flipped', this);
 			
-
 		} else {
-
 			this._openDropDown = false;
 			this._layerSelectorOuter.style.height = '0px';
-
 			Wu.DomUtil.removeClass(this._styleHeaderDropDownButton, 'carrow-flipped', this);
 		}		
-
 	},
 	
 	
-
 	insertCss : function (ctx, css) {
 
 		// set values
 		this.updateCodeMirror(css);
 	},
-
-	
 
 	toggle : function () {
 		this._open ? this.close() : this.open();

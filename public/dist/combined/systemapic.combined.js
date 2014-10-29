@@ -13225,7 +13225,6 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	setCartoid : function (cartoid) {
-		console.log('setCartoId');
 		this.store.data.cartoid = cartoid;
 		this.save('data');
 	},
@@ -13238,7 +13237,6 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	setCartoCSS : function (json, callback) {
-		console.log('cartoid!!', json);
 
 		// send to server
 		Wu.post('/api/layers/cartocss/set', JSON.stringify(json), callback, this);
@@ -13273,6 +13271,20 @@ L.control.baselayerToggle = function (options) {
 		return meta.json.vector_layers[0].fields;
 	},
 
+	reloadMeta : function (callback) {
+
+		var json = JSON.stringify({
+			fileUuid : this.getFileUuid(),
+			layerUuid : this.getUuid()
+		});
+
+		Wu.post('/api/layer/reloadmeta', json, callback || function (ctx, json) {
+
+			console.log('reloadedMeta', ctx, json, this);
+		}, this);
+
+	},
+
 	getTooltip : function () {
 		var json = this.store.tooltip;
 		if (!json) return false;
@@ -13286,15 +13298,12 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	getLegends : function () {
-		console.log('getLegendsMeta');
 		var meta = this.store.legends
 		if (meta) return JSON.parse(meta);
 		return false;
 	},
 
 	setLegends : function (legends) {
-		console.log('setLegends!', legends);
-
 		if (!legends) return;
 		this.store.legends = JSON.stringify(legends);
 		this.save('legends');
@@ -13392,9 +13401,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 		// add gridLayer if available
 		if (this.gridLayer) {
-			// this.gridLayer.addTo(map);
 			map.addLayer(this.gridLayer);
-			// map.addControl(L.mapbox.gridControl(this.gridLayer));
 		}
 
 	},
@@ -13408,7 +13415,6 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		// remove gridLayer if available
 		if (this.gridLayer) {
 			map.removeLayer(this.gridLayer);
-			// map.removeControl(L.mapbox.gridControl(this.gridLayer));  
 		} 
 	},
 
@@ -13473,7 +13479,6 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 	openPopup : function (data, latlng) {
 
-		console.log('open pup');
 		var map = app._map;
 		var content = this._popupContent(data);
 
@@ -13499,36 +13504,28 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 	_popupContent : function (data) {
 
-		console.log('_popupContent data:', data);
 
 		// check for stored tooltip
 		var meta = this.getTooltip();
 		var string = '';
-		console.log('FOUND TOOLTIP :', meta);
 
 		if (meta) {
 			if (meta.title) string += '<div class="tooltip-title">' + meta.title + '</div>';
 
+			// add meta to tooltip
 			for (var m in meta.fields) {
 				var field = meta.fields[m];
 
-				console.log('F ', field);
-
+				// only add active tooltips
 				if (field.on) {
-
 					var caption = field.title || field.key;
 					var value = data[field.key];
 
-					console.log('caption', caption, value);
-
+					// add to string
 					string += caption + ': ' + value + '<br>';
-
 				}
-
 			}
-
 			return string;
-
 
 		} else {
 
@@ -13542,11 +13539,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			}
 			return string;
 		}
-
-
 	},
-
-})
+});
 
 
 
@@ -13717,49 +13711,12 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 						this.multiStyleChanged(data, multi, layr);
 					}, this);
 
-
-
 				}, this);
-			
-
 			}
 
-
-
-			// console.log('__this.layer.eachLayer: layer=', layr);
-			// console.log('$$$$$$$$$$$$$');
-			// layr.eachLayer(function (lay) {
-
-			// 	console.log('$$ eachLayer', lay);
-
-			// }, this);
-
 		}, this);	
-
-
-		// for (l in this.layer._layers) {
-		// 	console.log('_________layer___________');
-		// 	console.log('this.layer._layers', this.layer._layers);
-			
-		// 	var layer = this.layer._layers[l];
-		// 	console.log('ADD CHANGE HOOK: ', layer);
-
-		// 	for (ll in layer._layers) {
-		// 		var lay = layer._layers[ll];
-		// 		console.log('BIG BADA DOOM! =>', lay);
-		// 		Wu.DomEvent.on(lay, 'styleeditor:changed', this.styleChanged, this);
-		// 	}
-
-		// 	// listen to changes
-		// 	Wu.DomEvent.on(layer, 'styleeditor:changed', this.styleChanged, this);
-
-		// 	console.log('=====================');
-		// }
-
-		
+	
 	},	
-
-
 
 	removeLayerHooks : function () {
 		for (l in this.layer._layers) {
@@ -17894,9 +17851,9 @@ Wu.App = Wu.Class.extend({
 
 		servers : {
 			// not used, using window url atm..
-			portal : 'http://projects.ruppellsgriffon.com/',	// api 		//todo: remove hardcoded ip's
+			portal : 'https://projects.ruppellsgriffon.com/',	// api 		//todo: remove hardcoded ip's
 			// raster : 'http://{s}.systemapic.com:8080/raster/', 	// cartocss raster tile server tx
-			raster : 'http://{s}.systemapic.com:8080/', 	// cartocss raster tile server tx
+			raster : 'https://{s}.systemapic.com/', 	// cartocss raster tile server tx
 		},
 
 		silentUsers : [

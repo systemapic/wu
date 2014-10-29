@@ -452,15 +452,26 @@ label.info {
   float: none;
   margin-top: 150px; }
 
+/*#login-logo {
+	width: 390px;
+	height: 324px;
+	background-image: url(images/ruppellsgriffon_logo.png);
+	background-size: cover;
+	margin: auto;
+	position: relative;
+	top: -53px;
+	left: -11px;
+	}
+*/
 #login-logo {
   width: 390px;
   height: 324px;
-  background-image: url(images/systemapic-logo-bw-2.png);
-  background-size: cover;
+  background-image: url(images/ruppellsgriffon_logo.png);
   margin: auto;
   position: relative;
-  top: -53px;
-  left: -11px; }
+  top: 0;
+  left: 0;
+  background-repeat: no-repeat; }
 
 #login-button {
   top: -3px;
@@ -1373,7 +1384,6 @@ label.info {
 
 /* inner wrapper 2 */
 #legends-inner {
-  max-height: 220px;
   background: rgba(255, 255, 255, 0.93);
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
   overflow: hidden;
@@ -1442,7 +1452,6 @@ label.info {
   text-align: left;
   padding-top: 0px;
   border-right: 1px dashed #C8C8C8;
-  max-width: 300px;
   margin-top: 7px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans' !important; }
 
@@ -1453,11 +1462,11 @@ label.info {
 .legend-list {
   width: 100%;
   margin-top: 5px;
-  margin-bottom: 5px; }
+  margin-bottom: 5px;
+  max-width: 300px; }
 
 .legend-each {
   width: 49%;
-  max-width: 200px;
   display: inline-block;
   vertical-align: top;
   position: relative;
@@ -1465,13 +1474,14 @@ label.info {
   margin-top: 3px; }
 
 .legend-feature {
-  border: 1px solid red;
+  border: 1px solid;
   width: 21px;
   height: 20px;
   position: absolute;
   display: inline-block;
   vertical-align: top;
-  top: -2px; }
+  top: -2px;
+  overflow: hidden; }
 
 .legend-feature div {
   position: relative; }
@@ -1499,7 +1509,9 @@ label.info {
   display: inline-block;
   vertical-align: top;
   position: relative;
-  left: 25px; }
+  left: 25px;
+  padding-right: 28px;
+  line-height: 1.2; }
 
 .legend-source {
   font-size: 11px;
@@ -5691,7 +5703,8 @@ width: 392px;
   vertical-align: top;
   overflow: hidden;
   background-repeat: repeat;
-  background-position: 0 0; }
+  background-position: 0 0;
+  border: 1px solid; }
 
 /*.legend-entry-image img { 
 	position: relative;
@@ -5716,17 +5729,21 @@ width: 392px;
 .legend-entry-key {
   display: inline-block;
   vertical-align: top;
-  width: 153px;
+  width: 120px;
   padding-left: 10px;
   font-style: italic;
   font-size: 13px;
-  font-weight: 500; }
+  font-weight: 500;
+  overflow: hidden; }
 
 .legend-entry-value {
   display: inline-block;
   vertical-align: top;
   font-size: 13px;
-  font-weight: 500; }
+  font-weight: 500;
+  width: 165px;
+  padding-left: 5px;
+  overflow: hidden; }
 
 .legend-entry-wrap .controls-switch {
   top: 2px;

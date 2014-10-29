@@ -71,7 +71,6 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	setCartoid : function (cartoid) {
-		console.log('setCartoId');
 		this.store.data.cartoid = cartoid;
 		this.save('data');
 	},
@@ -84,7 +83,6 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	setCartoCSS : function (json, callback) {
-		console.log('cartoid!!', json);
 
 		// send to server
 		Wu.post('/api/layers/cartocss/set', JSON.stringify(json), callback, this);
@@ -119,6 +117,20 @@ Wu.Layer = Wu.Class.extend({
 		return meta.json.vector_layers[0].fields;
 	},
 
+	reloadMeta : function (callback) {
+
+		var json = JSON.stringify({
+			fileUuid : this.getFileUuid(),
+			layerUuid : this.getUuid()
+		});
+
+		Wu.post('/api/layer/reloadmeta', json, callback || function (ctx, json) {
+
+			console.log('reloadedMeta', ctx, json, this);
+		}, this);
+
+	},
+
 	getTooltip : function () {
 		var json = this.store.tooltip;
 		if (!json) return false;
@@ -132,15 +144,12 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	getLegends : function () {
-		console.log('getLegendsMeta');
 		var meta = this.store.legends
 		if (meta) return JSON.parse(meta);
 		return false;
 	},
 
 	setLegends : function (legends) {
-		console.log('setLegends!', legends);
-
 		if (!legends) return;
 		this.store.legends = JSON.stringify(legends);
 		this.save('legends');
@@ -218,9 +227,7 @@ Wu.RasterLayer = Wu.Layer.extend({
 Wu.CartoCSSLayer = Wu.Layer.extend({
 
 	initLayer : function () {
-
 		this.update();
-		console.log('meta: ', this.getMeta());
 	},
 
 
@@ -238,9 +245,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 		// add gridLayer if available
 		if (this.gridLayer) {
-			// this.gridLayer.addTo(map);
 			map.addLayer(this.gridLayer);
-			// map.addControl(L.mapbox.gridControl(this.gridLayer));
 		}
 
 	},
@@ -254,55 +259,62 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		// remove gridLayer if available
 		if (this.gridLayer) {
 			map.removeLayer(this.gridLayer);
-			// map.removeControl(L.mapbox.gridControl(this.gridLayer));  
 		} 
 	},
 
 
 	update : function () {
-
 		var map = app._map;
 
-		if (this.layer) {
-			map.removeLayer(this.layer);		// refactor ? should be removed/added in same place?
+		// remove layer (todo: z-index)
+		if (this.layer) map.removeLayer(this.layer);		// refactor ? should be removed/added in same place?
 
-		}
+		// prepare raster
+		this._prepareRaster();
 
+		// prepare utfgrid
+		this._prepareGrid();
+		
+	},
 
+	_prepareRaster : function () {
+		
+		// set ids
 		var fileUuid = this.store.file;	// file id of geojson
 		var cartoid = this.store.data.cartoid || 'cartoid';
 
-
 		// tile server ip
-		var tileServer = app.options.servers.raster + 'raster/';
-
-		// tile url
-		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png';
-
+		var tileServer = app.options.servers.tiles;
+		var token = app.accessToken;
+		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 		
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			fileUuid: fileUuid,
-			cartoid : cartoid
+			cartoid : cartoid,
+			subdomains : 'abcd'
 		});
+	},
 
-		
+	_prepareGrid : function () {
+
+		// set ids
+		var fileUuid = this.store.file;	// file id of geojson
+		var cartoid = this.store.data.cartoid || 'cartoid';
 
 		// add gridlayer
-		var gridServer = app.options.servers.raster + 'utfgrid/';
-		this.gridLayer = new L.UtfGrid(gridServer + fileUuid + '/{z}/{x}/{y}.grid.json', {
-			
+		var gridServer = app.options.servers.utfgrid;
+		var token = app.accessToken;
+		var url = gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
+		this.gridLayer = new L.UtfGrid(url, {
 			useJsonP: false,
-			
+			subdomains: 'ghi',
 		});
 
 		// add popup event
 		this.gridLayer.on('click', function(e) {
 			if (!e.data) return;
-
-			// open popup
 		 	this.openPopup(e.data, e.latlng);
-
 		}, this);
 
 	},
@@ -319,7 +331,6 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 	openPopup : function (data, latlng) {
 
-		console.log('open pup');
 		var map = app._map;
 		var content = this._popupContent(data);
 
@@ -345,36 +356,28 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 	_popupContent : function (data) {
 
-		console.log('_popupContent data:', data);
 
 		// check for stored tooltip
 		var meta = this.getTooltip();
 		var string = '';
-		console.log('FOUND TOOLTIP :', meta);
 
 		if (meta) {
 			if (meta.title) string += '<div class="tooltip-title">' + meta.title + '</div>';
 
+			// add meta to tooltip
 			for (var m in meta.fields) {
 				var field = meta.fields[m];
 
-				console.log('F ', field);
-
+				// only add active tooltips
 				if (field.on) {
-
 					var caption = field.title || field.key;
 					var value = data[field.key];
 
-					console.log('caption', caption, value);
-
+					// add to string
 					string += caption + ': ' + value + '<br>';
-
 				}
-
 			}
-
 			return string;
-
 
 		} else {
 
@@ -388,11 +391,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			}
 			return string;
 		}
-
-
 	},
-
-})
+});
 
 
 
@@ -563,49 +563,12 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 						this.multiStyleChanged(data, multi, layr);
 					}, this);
 
-
-
 				}, this);
-			
-
 			}
 
-
-
-			// console.log('__this.layer.eachLayer: layer=', layr);
-			// console.log('$$$$$$$$$$$$$');
-			// layr.eachLayer(function (lay) {
-
-			// 	console.log('$$ eachLayer', lay);
-
-			// }, this);
-
 		}, this);	
-
-
-		// for (l in this.layer._layers) {
-		// 	console.log('_________layer___________');
-		// 	console.log('this.layer._layers', this.layer._layers);
-			
-		// 	var layer = this.layer._layers[l];
-		// 	console.log('ADD CHANGE HOOK: ', layer);
-
-		// 	for (ll in layer._layers) {
-		// 		var lay = layer._layers[ll];
-		// 		console.log('BIG BADA DOOM! =>', lay);
-		// 		Wu.DomEvent.on(lay, 'styleeditor:changed', this.styleChanged, this);
-		// 	}
-
-		// 	// listen to changes
-		// 	Wu.DomEvent.on(layer, 'styleeditor:changed', this.styleChanged, this);
-
-		// 	console.log('=====================');
-		// }
-
-		
+	
 	},	
-
-
 
 	removeLayerHooks : function () {
 		for (l in this.layer._layers) {

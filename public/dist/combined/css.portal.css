@@ -452,15 +452,26 @@ label.info {
   float: none;
   margin-top: 150px; }
 
+/*#login-logo {
+	width: 390px;
+	height: 324px;
+	background-image: url(images/ruppellsgriffon_logo.png);
+	background-size: cover;
+	margin: auto;
+	position: relative;
+	top: -53px;
+	left: -11px;
+	}
+*/
 #login-logo {
   width: 390px;
   height: 324px;
-  background-image: url(images/systemapic-logo-bw-2.png);
-  background-size: cover;
+  background-image: url(images/ruppellsgriffon_logo.png);
   margin: auto;
   position: relative;
-  top: -53px;
-  left: -11px; }
+  top: 0;
+  left: 0;
+  background-repeat: no-repeat; }
 
 #login-button {
   top: -3px;
@@ -5691,7 +5702,8 @@ width: 392px;
   vertical-align: top;
   overflow: hidden;
   background-repeat: repeat;
-  background-position: 0 0; }
+  background-position: 0 0;
+  border: 1px solid; }
 
 /*.legend-entry-image img { 
 	position: relative;
@@ -5716,17 +5728,21 @@ width: 392px;
 .legend-entry-key {
   display: inline-block;
   vertical-align: top;
-  width: 153px;
+  width: 120px;
   padding-left: 10px;
   font-style: italic;
   font-size: 13px;
-  font-weight: 500; }
+  font-weight: 500;
+  overflow: hidden; }
 
 .legend-entry-value {
   display: inline-block;
   vertical-align: top;
   font-size: 13px;
-  font-weight: 500; }
+  font-weight: 500;
+  width: 165px;
+  padding-left: 5px;
+  overflow: hidden; }
 
 .legend-entry-wrap .controls-switch {
   top: 2px;

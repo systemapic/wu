@@ -8,12 +8,10 @@ var File 	= require('../models/file');
 var Layers 	= require('../models/layer');
 var Hash 	= require('../models/hash');
 
-// file handling
+// utils
 var fs 		= require('fs-extra');
 var fss 	= require("q-io/fs");
 var utf8 	= require("utf8");
-
-// utils
 var async 	= require('async');
 var util 	= require('util');
 var request 	= require('request');
@@ -33,6 +31,7 @@ var mapnik = require('mapnik');
 var carto = require('carto');
 var mapnikOmnivore = require('mapnik-omnivore');
 
+
 // superusers
 var superusers = [
 	'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', 	// KO
@@ -41,12 +40,13 @@ var superusers = [
 	'user-f36e496e-e3e4-4fac-a37c-f1a98689afda'	// ana tester superadmin
 ]
 
+
 // global paths
 var FILEFOLDER = '/var/www/data/files/';
 var IMAGEFOLDER = '/var/www/data/images/';
 var TEMPFOLDER = '/var/www/data/tmp/';
 var CARTOCSSFOLDER = '/var/www/data/cartocss/';
-// var REMOTECARTOCSSFOLDER = '/var/www/DATA/cartocss/'
+
 
 // default mapbox account
 var DEFAULTMAPBOX = {
@@ -56,15 +56,100 @@ var DEFAULTMAPBOX = {
 
 
 
+
+
 // function exports
 module.exports = api = {
+
+
+
+	reloadMeta : function (req, res) {
+
+		var fileUuid = req.body.fileUuid;
+		var layerUuid = req.body.layerUuid;
+
+		console.log('reloadmeta body: .', req.body);
+
+		if (!fileUuid || !layerUuid) return res.end(JSON.stringify({
+			error : 'No layer specified.'
+		}));
+
+		// get meta
+		api.getMeta(fileUuid, function (err, meta) {
+
+			if (err) return res.end(JSON.stringify({
+				error : err
+			}));
+
+			// save meta to fil
+			api.setMeta(meta, layerUuid, function (err, result) {
+
+
+				// return meta
+				res.end(JSON.stringify({
+					error : err,
+					meta : meta
+				}));
+
+			})
+
+
+		})
+
+
+
+	},
+
+
+	getMeta : function (fileUuid, callback) {
+
+		File
+		.findOne({uuid : fileUuid})
+		.exec(function (err, file) {
+			if (err) return callback(err);
+
+			// only support for geojson now
+			if (!file.data.geojson) return callback({error : 'No geojson found.'});
+
+			// set path
+			var path = FILEFOLDER + fileUuid + '/' + file.data.geojson;
+
+			// var omnipath = METAPATH + uuid + '.meta.json';
+			fs.readJson(path, function (err, metadata) { 			// expensive
+				callback(err, metadata);
+			});			
+		});
+
+	},
+
+
+
+	setMeta : function (meta, layerUuid, callback) {
+
+		Layers
+		.findOne({uuid : layerUuid})
+		.exec(function (err, layer) {
+
+			layer.metadata = meta; 	// string?
+			layer.save(function (err) {
+
+				callback(err);
+
+			});
+
+
+		})
+
+
+
+	},
 
 
 	createLegends : function (req, res) {
 
 		api.generateLegends(req, res, function (err, legends) {
 
-
+			// todo move res.end here
 		});
 
 	},
@@ -3345,11 +3430,11 @@ module.exports = api = {
 
 			}
 
-			// update tooltip
+			// update legends
 			if (req.body.hasOwnProperty('legends')) {
 
-				var tooltip = req.body.tooltip;
-				layer.tooltip = tooltip;
+				var legends = req.body.legends;
+				layer.legends = legends;
 				layer.save(function (err) {
 					if (err) throw err;
 				});
@@ -3559,7 +3644,48 @@ module.exports = api = {
 
 	
 
+	setRedisToken : function (user) {
 
+
+
+		var key = 'authToken-' + user._id;
+		var tok = crypto.randomBytes(22).toString('hex');
+	
+
+		console.log('user _id', user._id);
+		console.log('redis key: ', key);
+		console.log('redis authToken: ', tok);
+
+
+
+		redisClient.get(key, function (err, reply) {
+			console.log('getting old key err, replu', err, reply);
+
+			if (reply) {
+				console.log('reply: ', reply)
+				console.log('I live: ' + reply.toString());
+			} 
+		});
+
+
+
+		// set key with 2 min expire
+		console.log('setting new token');
+		redisClient.set(key, tok, redis.print);
+		redisClient.expire(key, 120);	// 2 minutes
+
+		redisClient.get(key, function (err, reply) {
+			console.log('getting new key err, replu', err, reply);
+
+			if(reply) {
+				console.log('reply: ', reply)
+				console.log('I live: ' + reply.toString());
+			} 
+		});
+
+		return tok;
+		
+	},
 
 
 
@@ -3567,35 +3693,21 @@ module.exports = api = {
 	// process wildcard paths, including hotlinks
 	processWildcardPath : function (req, res) {
 
-		console.log('processWildcardPath:');
-
 		// get client/project
 		var path 	= req.originalUrl.split('/');
 		var client 	= path[1];
 		var project 	= path[2];
 
-		console.log('q: ', req.query);
-		console.log('path: ', path);
-		console.log('req.originalUrl.', req.originalUrl)
-
 		var hotlink = {
 			client : client,
 			project : project
 		}
-		
 		if (req.isAuthenticated()) {
-			console.log('req.isAuth: hotlink:', hotlink);
-			
-			// send complete user block (TODO: what if not in edit mode, just consuming?)
 			req.session.hotlink = hotlink;
-			//helper.parseUserSchemaJSON(req, res);
 			res.render('../../views/app.ejs', {
-				//json : json,
-				hotlink : hotlink || {}
+				hotlink : hotlink || {},
 			});
 		} else {
-			
-			console.log('req. NOT auth: hotlink:', hotlink);
 			// redirect to login with hotlink embedded
 			req.session.hotlink = hotlink;
 			res.redirect('/login');

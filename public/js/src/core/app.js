@@ -39,10 +39,11 @@ Wu.App = Wu.Class.extend({
 		},
 
 		servers : {
-			// not used, using window url atm..
-			portal : 'http://projects.ruppellsgriffon.com/',	// api 		//todo: remove hardcoded ip's
-			// raster : 'http://{s}.systemapic.com:8080/raster/', 	// cartocss raster tile server tx
-			raster : 'http://{s}.systemapic.com:8080/', 	// cartocss raster tile server tx
+
+			portal   : 'https://projects.ruppellsgriffon.com/',	// api
+			tiles    : 'https://{s}.systemapic.com/tiles/', 	// tiles
+			utfgrid  : 'https://{s}.systemapic.com/utfgrid/' 	// utfgrids
+
 		},
 
 		silentUsers : [
@@ -60,7 +61,7 @@ Wu.App = Wu.Class.extend({
 		Wu.app = this;
 
 		// merge options
-		Wu.setOptions(this, options);    
+		Wu.setOptions(this, options);   
 
 		// set options
 		L.mapbox.config.FORCE_HTTPS = true;
@@ -88,6 +89,7 @@ Wu.App = Wu.Class.extend({
 		// revv it up
 		that.initApp(resp);
 	},
+
 
 	initApp : function (o) {
 
@@ -133,6 +135,9 @@ Wu.App = Wu.Class.extend({
 
 		// main user account
 		this.Account = new Wu.User(this.options.json.account);
+		
+		// set access token
+		this.setToken();
 
 		// create user objects
 		this.Users = {};
@@ -153,6 +158,14 @@ Wu.App = Wu.Class.extend({
 		}, this);
 
 	},
+
+	setToken : function () {
+		this.accessToken = '?token=';
+		this.accessToken += Wu.app.Account.store.token;
+		this.accessToken += '.';
+		this.accessToken += Wu.app.Account.store._id;
+	},
+
 
 
 	_initPanes : function () {
