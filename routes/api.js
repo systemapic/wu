@@ -1,11 +1,15 @@
-// app/routes/helpers.js rsub
+// routes/api.js 
+//
+// deals with portal, database
+//
+//
 
 // database schemas
 var Project 	= require('../models/project');
 var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
 var User  	= require('../models/user');
 var File 	= require('../models/file');
-var Layers 	= require('../models/layer');
+var Layer 	= require('../models/layer');
 var Hash 	= require('../models/hash');
 
 // utils
@@ -32,6 +36,9 @@ var carto = require('carto');
 var mapnikOmnivore = require('mapnik-omnivore');
 
 
+
+
+
 // superusers
 var superusers = [
 	'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', 	// KO
@@ -42,10 +49,10 @@ var superusers = [
 
 
 // global paths
-var FILEFOLDER = '/var/www/data/files/';
-var IMAGEFOLDER = '/var/www/data/images/';
-var TEMPFOLDER = '/var/www/data/tmp/';
-var CARTOCSSFOLDER = '/var/www/data/cartocss/';
+var FILEFOLDER 		= '/var/www/data/files/';
+var IMAGEFOLDER 	= '/var/www/data/images/';
+var TEMPFOLDER 		= '/var/www/data/tmp/';
+var CARTOCSSFOLDER 	= '/var/www/data/cartocss/';
 
 
 // default mapbox account
@@ -60,6 +67,88 @@ var DEFAULTMAPBOX = {
 
 // function exports
 module.exports = api = {
+
+
+
+	dbCreateLayer : function (options, callback) {
+
+		var layer 		= new Layer();
+		layer.uuid 		= options.uuid;
+		layer.title 		= options.title;
+		layer.description 	= options.description || '';
+		layer.data.geojson 	= options.data.geojson;
+		layer.legend 		= options.legend || '';
+		layer.file 		= options.file;
+		layer.metadata 		= options.metadata;
+
+		layer.save(function (err, doc) {
+			callback(err, doc);
+		});
+	},
+
+	dbCreateFile : function (options, callback) {
+
+		var file 		= new File();
+		file.uuid 		= options.uuid;
+		file.createdBy 		= options.createdBy;
+		file.createdByName    	= options.createdByName;
+		file.files 		= options.files;
+		file.access 		= options.access;
+		file.name 		= options.name;
+		file.description 	= options.description;
+		file.type 		= options.type;
+		file.format 		= options.format;
+		file.dataSize 		= options.dataSize;
+		file.data 		= options.data;
+
+		file.save(function (err, doc) {
+			callback(err, doc);
+		});
+
+
+	},
+
+
+	// save file to project (file, layer, project id's)
+	dbAddFileToProject : function (file_id, projectUuid, callback) {
+		Project
+		.findOne({'uuid' : projectUuid })
+		.exec(function (err, project) {
+			project.files.push(file_id);			
+			project.markModified('files');
+			project.save(function (err) {
+				callback && callback(err, done);
+			});
+		});
+	},
+
+	// save file to project (file, layer, project id's)
+	dbAddLayerToProject : function (layer_id, projectUuid, callback) {
+		Project
+		.findOne({'uuid' : projectUuid })
+		.exec(function (err, project) {
+			project.layers.push(layer_id);			
+			project.markModified('layers');
+			project.save(function (err) {
+				callback && callback(err, done);
+			});
+		});
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -126,7 +215,7 @@ module.exports = api = {
 
 	setMeta : function (meta, layerUuid, callback) {
 
-		Layers
+		Layer
 		.findOne({uuid : layerUuid})
 		.exec(function (err, layer) {
 
@@ -749,7 +838,7 @@ module.exports = api = {
 			// send to tileserver storage
 			request({
 				method : 'POST',
-				uri : 'http://78.46.107.15:8080/import/cartocss',
+				uri : 'https://systemapic.com/import/cartocss',
 				json : {
 					css : css,
 					cartoid : cartoid
@@ -791,7 +880,7 @@ module.exports = api = {
 
 
 		        		// save ID to file object (as active css)
-					Layers
+					Layer
 					.findOne({file : fileUuid})
 					.exec(function (err, layer) {
 
@@ -1308,7 +1397,7 @@ module.exports = api = {
 		mapboxLayers.forEach(function (ml) {
 
 			// create Layers object
-			var layer 		= new Layers();
+			var layer 		= new Layer();
 			layer.uuid 		= 'layer-' + uuid.v4(); // unique uuid
 			layer.title 		= ml.name;
 			layer.description 	= ml.description;
@@ -3269,7 +3358,7 @@ module.exports = api = {
 			// find layer _ids for removing in project
 			ops.push(function (callback) {
 
-				Layers.find({file : {$in : uuids}}, function (err, layers) {
+				Layer.find({file : {$in : uuids}}, function (err, layers) {
 
 					layers.forEach(function (layer) {
 						_lids.push(layer._id);
@@ -3353,7 +3442,7 @@ module.exports = api = {
 			if (err) { console.log('got error', err); }
 
 			// got project
-			Layers.find({ 'uuid': { $in: result.layers }}, function(err, docs){
+			Layer.find({ 'uuid': { $in: result.layers }}, function(err, docs){
 				if (err) { console.log('got errorw', err); }
 				
 				// return layers
@@ -3385,7 +3474,7 @@ module.exports = api = {
 
 
 
-		Layers.findOne({'uuid' : layerUuid}, function (err, layer) {
+		Layer.findOne({'uuid' : layerUuid}, function (err, layer) {
 			if (err) console.error('Layer.findOne: ', err);
 
 			// error if no project or user
@@ -3644,48 +3733,48 @@ module.exports = api = {
 
 	
 
-	setRedisToken : function (user) {
+	// setRedisToken : function (user) {
 
 
 
-		var key = 'authToken-' + user._id;
-		var tok = crypto.randomBytes(22).toString('hex');
+	// 	var key = 'authToken-' + user._id;
+	// 	var tok = crypto.randomBytes(22).toString('hex');
 	
 
-		console.log('user _id', user._id);
-		console.log('redis key: ', key);
-		console.log('redis authToken: ', tok);
+	// 	console.log('user _id', user._id);
+	// 	console.log('redis key: ', key);
+	// 	console.log('redis authToken: ', tok);
 
 
 
-		redisClient.get(key, function (err, reply) {
-			console.log('getting old key err, replu', err, reply);
+	// 	redisClient.get(key, function (err, reply) {
+	// 		console.log('getting old key err, replu', err, reply);
 
-			if (reply) {
-				console.log('reply: ', reply)
-				console.log('I live: ' + reply.toString());
-			} 
-		});
+	// 		if (reply) {
+	// 			console.log('reply: ', reply)
+	// 			console.log('I live: ' + reply.toString());
+	// 		} 
+	// 	});
 
 
 
-		// set key with 2 min expire
-		console.log('setting new token');
-		redisClient.set(key, tok, redis.print);
-		redisClient.expire(key, 120);	// 2 minutes
+	// 	// set key with 2 min expire
+	// 	console.log('setting new token');
+	// 	redisClient.set(key, tok, redis.print);
+	// 	redisClient.expire(key, 120);	// 2 minutes
 
-		redisClient.get(key, function (err, reply) {
-			console.log('getting new key err, replu', err, reply);
+	// 	redisClient.get(key, function (err, reply) {
+	// 		console.log('getting new key err, replu', err, reply);
 
-			if(reply) {
-				console.log('reply: ', reply)
-				console.log('I live: ' + reply.toString());
-			} 
-		});
+	// 		if(reply) {
+	// 			console.log('reply: ', reply)
+	// 			console.log('I live: ' + reply.toString());
+	// 		} 
+	// 	});
 
-		return tok;
+	// 	return tok;
 		
-	},
+	// },
 
 
 

@@ -1,4 +1,4 @@
-// app/routes/crunch.js rsub
+// app/routes/pixels.js rsub
 
 // database schemas
 var Project 	= require('../models/project');
@@ -30,7 +30,84 @@ var IMAGEFOLDER = '/var/www/data/images/';
 
 
 // function exports
-module.exports = crunch = {
+module.exports = pixels = {
+
+
+
+	handleImage : function (path, callback) {
+
+		var entry = {};
+		var file = path;
+		var ops = {};
+	
+		ops.dimensions = function (cb) {
+			// get image size
+			pixels.getImageSize(file, cb);
+		};
+
+		ops.identity = function (cb) {
+			// get exif size
+			pixels.getIdentify(file, cb);
+		};
+		
+		ops.dataSize = function (cb) {
+			// get file size in bytes
+			pixels.getFileSize(file, cb);
+		};
+
+		// move raw file into /images/ folder
+		ops.rawFile = function (cb) {
+
+			// copy raw file
+			pixels.copyRawFile(file, cb);
+		};
+
+		// run all ops async in series
+		async.series(ops, function (err, results) {
+			if (err) console.error('_processImage err: ', err);
+			
+			var exif 	= results.identity,
+			    dimensions 	= results.dimensions,
+			    dataSize 	= results.dataSize,
+			    file 	= results.rawFile;
+
+			entry.data 		     = entry.data || {};
+			entry.data.image 	     = entry.data.image || {};
+			entry.data.image.dimensions  = dimensions;
+			entry.dataSize        	     = dataSize;
+			entry.data.image.created     = pixels.getExif.created(exif);
+			entry.data.image.gps         = pixels.getExif.gps(exif);
+			entry.data.image.cameraType  = pixels.getExif.cameraType(exif); 
+			entry.data.image.orientation = pixels.getExif.orientation(exif);
+			entry.data.image.file        = file;
+
+			console.log('**********************************')
+			console.log('* fn: crunch._processImage: * DONE! entry: ', entry);
+			console.log('* results: ', results);
+			console.log('**********************************')
+
+			// return results to whatever callback
+			callback(err, entry);
+		});
+
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -47,24 +124,24 @@ module.exports = crunch = {
 	
 		ops.dimensions = function (cb) {
 			// get image size
-			crunch.getImageSize(file, cb);
+			pixels.getImageSize(file, cb);
 		};
 
 		ops.identity = function (cb) {
 			// get exif size
-			crunch.getIdentify(file, cb);
+			pixels.getIdentify(file, cb);
 		};
 		
 		ops.dataSize = function (cb) {
 			// get file size in bytes
-			crunch.getFileSize(file, cb);
+			pixels.getFileSize(file, cb);
 		};
 
 		// move raw file into /images/ folder
 		ops.rawFile = function (cb) {
 
 			// move raw file
-			crunch.moveRawFile(file, cb);
+			pixels.moveRawFile(file, cb);
 		};
 
 		// run all ops async in series
@@ -82,10 +159,10 @@ module.exports = crunch = {
 			entry.data.image 	     = entry.data.image || {};
 			entry.data.image.dimensions  = dimensions;
 			entry.dataSize        	     = dataSize;
-			entry.data.image.created     = crunch.getExif.created(exif);
-			entry.data.image.gps         = crunch.getExif.gps(exif);
-			entry.data.image.cameraType  = crunch.getExif.cameraType(exif); 
-			entry.data.image.orientation = crunch.getExif.orientation(exif);
+			entry.data.image.created     = pixels.getExif.created(exif);
+			entry.data.image.gps         = pixels.getExif.gps(exif);
+			entry.data.image.cameraType  = pixels.getExif.cameraType(exif); 
+			entry.data.image.orientation = pixels.getExif.orientation(exif);
 			entry.data.image.file        = file;
 
 			console.log('**********************************')
@@ -120,9 +197,9 @@ module.exports = crunch = {
 			if (!profile) return;
 
 			// get numbers
-			var altitude 	= crunch.getExif.getAltitude(profile);
-			var direction 	= crunch.getExif.getDirection(profile);
-			var coords 	= crunch.getExif.getCoords(profile);
+			var altitude 	= pixels.getExif.getAltitude(profile);
+			var direction 	= pixels.getExif.getDirection(profile);
+			var coords 	= pixels.getExif.getCoords(profile);
 			
 			var gps = {
 				lat : coords.lat,
@@ -263,6 +340,19 @@ module.exports = crunch = {
 		});
 	},
 
+	// copy raw file to /images/ folder
+	copyRawFile : function (oldPath, callback) {
+
+		var newFile = 'image-raw-' + uuid.v4();
+		var newPath = IMAGEFOLDER + newFile;
+
+		// copy file
+		fs.copy(oldPath, newPath, function (err) {
+			if (err) console.log('copyRawFile err: ', err);
+			callback(null, newFile);
+		});
+	},
+
 	
 	// add file to project
 	addFileToProject : function (file, projectUuid) {
@@ -388,7 +478,7 @@ module.exports = crunch = {
 		}
 
 		// if raw quality requested, return full image
-		if (raw) return crunch.returnRawfile(req, res);
+		if (raw) return pixels.returnRawfile(req, res);
 
 		// async waterfall (each fn passes results into next fn)
 		var ops = [];
@@ -458,7 +548,7 @@ module.exports = crunch = {
 			}
 
 			// create image with dimensions
-			crunch.resizeImage(template, callback);
+			pixels.resizeImage(template, callback);
 
 		});
 
@@ -466,7 +556,7 @@ module.exports = crunch = {
 		ops.push(function (result, callback) {
 
 			// add image to File object if it was created
-			if (!result.existing) crunch.addImageToFile(result, fileUuid);
+			if (!result.existing) pixels.addImageToFile(result, fileUuid);
 
 			// return result
 			callback(null, result);
@@ -478,7 +568,7 @@ module.exports = crunch = {
 		async.waterfall(ops, function (err, result) {
 
 			// all done, serve file
-			crunch.returnImage(req, res, result);
+			pixels.returnImage(req, res, result);
 
 		});
 		
@@ -520,7 +610,7 @@ module.exports = crunch = {
 
 			// return raw file
 			var imageFile = file.data.image;
-			return crunch.returnImage(req, res, imageFile);
+			return pixels.returnImage(req, res, imageFile);
 		});
 		return;
 	},
@@ -528,274 +618,6 @@ module.exports = crunch = {
 	
 
 
-
-
-
-
-
-
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	// // batch resize multiple images
-	// resizeImages : function (options, callback) {
-
-	// 	// create async queue 
-	// 	var ops = [];
-
-	// 	// resize each image
-	// 	options.forEach(function (option) {
-
-	// 		// add job to queue
-	// 		ops.push(function (callback) {
-
-	// 			// crunch it!
-	// 			crunch.resizeImage(option, callback);
-	// 		});
-
-	// 	});		
-
-	// 	// run parallel async
-	// 	async.parallel(ops, function (err, resizedFiles) {
-	// 		callback(err, resizedFiles);
-	// 	});
-
-	// },
-
-
-
-	// // not in use atm, for reference
-	// createPixelPerfection : function (options, callback) {
-
-
-	// 	// The orientation of the frame
-	// 	var frameOrientation = req.body.orientation;
-
-	// 	// File directory
-	// 	var fileDir = 'app/public/images/';
-
-	// 	// Filename from request
-	// 	var orgFileName = req.body.file;
-
-	// 	// Original file path...
-	// 	var pathToFile = fileDir + orgFileName;
-		
-	// 	// Original file name (without the path)
-	// 	var strippedFile = orgFileName.replace(/\.[^/.]+$/, "");
- 
-	// 	// Remove crunch file name addons... (everything after "-scx")
-	// 	var myRegexp = /-scx(.*)/;
-	// 	var match = myRegexp.exec(strippedFile);
-	// 	if ( match ) strippedFile = strippedFile.substring(0, strippedFile.length - match[0].length);
-		
-		
-	// 	// Look for an Original file (that hasn't been compressed!)
-	// 	var potentialOriginal = fileDir + strippedFile + '.jpg';
-	// 	fs.exists(potentialOriginal, function(exists) {
-	// 		// Use the mother file for better result
-	// 		if (exists) pathToFile = potentialOriginal;
-	// 	});		
-
-
-	// 	// Required Width (from request)
-	// 	var _nw = req.body.width;
-
-	// 	// Required Height (from request)
-	// 	var _nh = req.body.height;
-
-	// 	// Crop number (from request)
-	// 	var _crop = req.body.crop;
-
-	// 	// "Pure" file (without -scx and .fileExtesion), but with path
-	// 	var pureFile = fileDir + strippedFile;
-
-	// 	// Desired new suffix
-	// 	var newSuffix = '-scx_' + _nw + 'x' + _nh + '.jpg';
-
-	// 	// New file NAME (without path)
-	// 	var newFile = strippedFile + newSuffix;
-		
-	// 	// New file with full path = directory + original file + desired suffix
-	// 	var newFilePath = fileDir + newFile;
-	
-
-		
-	// 	// Check if desired file exists
-	// 	// Check if desired file exists
-		
-	// 	fs.exists(newFile, function(exists) { 		
-			
-	// 		if (exists) {
-				
-	// 			// The file already exists
-	// 			res.json({ message: 'File exists!', filepath: newFile });
-			
-	// 		} else { 
-
-	// 			// Nope, this file has to be generated...
-				
-	// 			// Stack a few vars
-	// 			var imgOrientation;
-	// 			var __nw;
-	// 			var __nh;
-	// 			var _cropX;
-	// 			var _cropY;
-	// 			var b4size;
-
-	// 			// Run a couple of operations...
-	// 			async.series([
-
-	// 				function(callback){
-
-	// 					// Figure out proportions, and what size we want the new image to be...
-	// 					// Figure out proportions, and what size we want the new image to be...
-
-	// 					gm(pathToFile)
-
-	// 						.filesize(function (err, size) {		
-	// 							b4size = size;
-	// 							// console.log('Crunching image:', size);
-	// 						})
-
-	// 						.identify(function (err, value){
-	// 							// EXIF info ++
-	// 							// console.log('*************************************************');
-	// 							// console.log('Identify:', value);
-	// 							// console.log('*************************************************');							
-	// 						})							
-
-	// 						.size(function (err, size) {
-	// 							if (!err) 
-
-	// 								// Find the Orientation of the Image
-	// 								var imgProp = size.width / size.height;
-	// 								imgProp <= 1 ? imgOrientation = 'portrait' : imgOrientation = 'landscape';
-
-	// 								// Find the Orientation of the Frame
-	// 								var frameProp = _nw / _nh;
-	// 								frameProp <= 1 ? frameOrientation = 'portrait' : frameOrientation = 'landscape';
-									
-
-	// 								// Frame and Image is Landscape
-	// 								if ( frameOrientation == 'landscape' && frameOrientation == imgOrientation ) {
-										
-	// 									// If the frame is larger than the image : Image is larger than frame
-	// 									frameProp >= imgProp ?  widthCalc() : heightCalc();
-	// 								}
-
-	// 								// Frame and Image is Portrait
-	// 								if ( frameOrientation == 'portrait' && frameOrientation == imgOrientation ) {
-
-	// 									// If the frame is larger than the image : Image is larger than frame
-	// 									frameProp >= imgProp ? widthCalc() : heightCalc();
-	// 								}
-									
-	// 								// Frame is Landscape, Image is Portrait
-	// 								if ( frameOrientation == 'landscape' && frameOrientation != imgOrientation ) {
-	// 									widthCalc();
-	// 								}
-
-	// 								// Frame is Portrait, Image is Landscape
-	// 								if ( frameOrientation == 'portrait' && frameOrientation != imgOrientation ) {									
-	// 									heightCalc();
-	// 								}
-
-
-	// 								// Make a calculation based on WIDTH
-	// 								function widthCalc() {
-
-	// 									// Cropping doesn't work properly... 
-	// 									var maxCrop = Math.abs(size.height - (size.height / imgProp))
-	// 									if ( _crop >= (maxCrop/2) ) _crop = maxCrop/2;
-
-	// 									__nw = _nw;
-	// 									__nh = null;
-	// 									_cropX = null;
-	// 									_cropY = _crop;
-
-	// 								}	
-
-	// 								// Make a calculation based on HEIGHT
-	// 								function heightCalc() {
-
-	// 									// Obscure calculation : I don't know how the cropX function works
-	// 									// ... it seems like it crops from both ends?
-	// 									var maxCrop = Math.abs(size.width - (size.width / imgProp));
-	// 									if ( _crop >= (maxCrop/4 -20) ) _crop = maxCrop/4 -20;
-
-	// 									__nw = null;
-	// 									__nh = _nh;
-	// 									_cropX = _crop;
-	// 									_cropY = null;										
-	// 								}
-
-	// 						callback(null);
-	// 					})
-	// 				},
-
-
-	// 				// WRITE NEW FILE
-	// 				// WRITE NEW FILE
-
-	// 				function(callback){
-	// 					gm(pathToFile)
-	// 						.resize(__nw, __nh)							
-	// 						.crop(_nw, _nh, _cropX, _cropY)
-	// 						.noProfile()
-	// 						.setFormat('JPEG')
-	// 						.quality(60)
-	// 						.write(newFilePath, function (err) {
-	// 							console.log('• Writing new file from: ' + pathToFile + ' (' + b4size + ') ', 'To: ' + newFile);
-	// 						  if (!err) res.json({ message: 'New file created!', filename: newFile });;							
-	// 						callback(null);
-	// 						});
-	// 				}
-	// 			]); // End of Async
-	// 		} // End of Else
-	// 	}); // End of my Life
-	// 	},
 
 
 }

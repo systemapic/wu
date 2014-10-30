@@ -21,8 +21,8 @@ var uploadProgress = require('node-upload-progress');
 var _ = require('lodash-node');
 
 // lib's
-var api = require('../routes/helpers')
-var crunch = require('../routes/crunch');
+var api = require('../routes/api')
+var pixels = require('../routes/pixels');
 var upload = require('../routes/upload');
 
 // global paths
@@ -193,7 +193,7 @@ module.exports = function(app, passport) {
 	app.get('/pixels/*', isLoggedIn, function (req,res) {
 		console.log('/pixels');
 
-		crunch.servePixelPerfection(req, res);
+		pixels.servePixelPerfection(req, res);
 
 	});
 
@@ -274,25 +274,25 @@ module.exports = function(app, passport) {
 	app.post('/api/upload', isLoggedIn, function (req, res) {
 		console.log('/api/upload');
 
-		// TODO : authentication
+		// TODO : more authentication
 	
 		// process upload
-		upload.newUpload(req, res);
+		upload.upload(req, res);
 		
 	});
 
 
 
-	// // =====================================
-	// // CREATE PERIODIC ACCESS TOKEN ========
-	// // =====================================
-	// // create access token for user to access rasters
-	// app.post('/api/util/token', isLoggedIn, function (req, res) {
 
 
-	// 	// api.createToken(req, res);
 
-	// });
+
+
+
+
+
+
+
 
 
 
