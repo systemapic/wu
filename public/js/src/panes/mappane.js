@@ -194,7 +194,7 @@ Wu.MapPane = Wu.Class.extend({
 	createNewMap : function () {
 
 		var options = {
-			worldCopyJump : true,
+			worldCopyJump : true
 		}
 
 		// create new map
@@ -202,7 +202,19 @@ Wu.MapPane = Wu.Class.extend({
 
 		// add editable layer
 		this.addEditableLayer(this._map);
+
+		// add attribution
+		// if (this._attributionControl) this._map.removeControl(this._attributionControl);
+		this._attributionControl = L.control.attribution({
+				position : 'bottomleft',
+				prefix : 'Powered by <a href="https://systemapic.com/" target="_blank">Systemapic</a>'
+		});
+
+
+		this._map.addControl(this._attributionControl);
+
 	},
+
 
 	addEditableLayer : function (map) {
 		// create layer

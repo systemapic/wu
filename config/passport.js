@@ -9,14 +9,24 @@ var LocalStrategy = require('passport-local').Strategy;
 // load up the user model
 var User = require('../models/user');
 
+
+
 // redis, crypto
 var crypto = require('crypto');
 var redis = require('redis');
-var redisClient = redis.createClient(6379, '85.10.202.87');
-redisClient.auth('ujI3x6eBFvA8v8fPfCAafDcmPtIBuyzGjTtktRwwnxMHiI6mSKxRx5y5ClXSuhySIQuxAQ6ehei176vmqETbS46AcZxgCVz9Zeiz');
-redisClient.on('error', function (err) {
-	console.log('Error ' + err);
+var config = require('../config/config');
+
+console.log('redis passport');
+console.log('config.tokenRedis.port', config.tokenRedis.port);
+console.log('config.tokenRedis.ip', config.tokenRedis.host);
+console.log('config.tokenRedis.auth', config.tokenRedis.auth);
+
+var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host)
+r.auth(config.tokenRedis.auth);
+r.on('error', function (err) {
+	console.error(err);
 });
+
 
 // expose this function to our app using module.exports
 module.exports = function(passport) {
@@ -122,13 +132,11 @@ module.exports = function(passport) {
 				return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
 
 
-			
-			console.time('Created token:');
+			// set token, save to user
 			user.token = setRedisToken(user);
 			user.save(function (err) {
-				console.timeEnd('Created token:');
-
 				if (err) console.error(err);
+
 				// all is well, return successful user
 				return done(null, user);
 			});
@@ -137,6 +145,10 @@ module.exports = function(passport) {
 
 	}));
 
+
+	
+
+	
 
 	// tiles access token
 	//
@@ -148,19 +160,15 @@ module.exports = function(passport) {
 	//
 	function setRedisToken(user) {
 
-		console.log('Setting new token (passport)');
-
-
+		// keys
 		var key = 'authToken-' + user._id;
 		var tok = crypto.randomBytes(22).toString('hex');
-	
-		// set key with 2 min expire
-		redisClient.set(key, tok, redis.print);
-		// redisClient.expire(key, 120);	// 2 minutes
 
+		// async set
+		r.set(key, tok);
 		
+		// return token
 		return tok;
-		
 	}
 
 

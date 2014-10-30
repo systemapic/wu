@@ -338,8 +338,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				createImageThumbnails : false,
 				autoDiscover : false,
 				uploadMultiple : true,
+				acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.docx,.pdf,.doc,.txt',
+				// acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.json,.topojson,.kml,.docx,.pdf,.doc,.txt',
 				maxFiles : 10,
-				parallelUploads : 10,
+				parallelUploads : 10
 				// autoProcessQueue : true
 		});
 
@@ -378,19 +380,12 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// set dz events
 		this.dz.on('drop', function (e) { 
-			// console.log('drop', e); 
 		});
 
 		this.dz.on('dragenter', function (e) { 
-			console.log('dragenter', e); 
 		});
 
 		this.dz.on('addedfile', function (file) { 
-
-			console.log('dz added: ', file);
-
-			// count multiple files
-			that.filecount += 1;
 
 			// show progressbar
 			that.progress.style.opacity = 1;
@@ -407,52 +402,43 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 
 		this.dz.on('complete', function (file) {
-			// console.log('complete111');
-
-			// count multiple files
-			that.filecount -= 1;
-
+			
 			// clean up
 			that.dz.removeFile(file);
 
 		});
-
-		// this.dz.on('totaluploadprogress', function (progress, totalBytes, totalSent) { 
-		//         // set progress
-		//         console.log('progress: ', progress);
-		//         that.progress.style.width = progress + '%';
-		// });
 
 		this.dz.on('uploadprogress', function (file, progress) {
 			// set progress
 			that.progress.style.width = progress + '%';
 		});                                                                                                                                                                                                               
 
-		this.dz.on('success', function (err, json) {
+		this.dz.on('successmultiple', function (err, json) {
 			// parse and process
 			var obj = Wu.parse(json);
-			// console.log('success::: obj: ', obj);
 
 			// set status
 			app.setStatus('Done!', 2000);
 
 			if (obj) { that.uploaded(obj); }
+
+			// clear fullpane
+			that.resetProgressbar();
 		});
 
-		this.dz.on('complete', function (file) {
-			// console.log('complete333');
+		
 
-			if (!that.filecount) {
-				// reset progressbar
-				that.progress.style.opacity = 0;
-				that.progress.style.width = '0%';
+	},
 
-				// reset .fullscreen-drop
-				that.fulldropOff();
-				that.fullUpOff();
-				that._fulldrop = false;
-			}
-		});
+	resetProgressbar : function () {
+		// reset progressbar
+		this.progress.style.opacity = 0;
+		this.progress.style.width = '0%';
+
+		// reset .fullscreen-drop
+		this.fulldropOff();
+		this.fullUpOff();
+		this._fulldrop = false;
 
 	},
 
@@ -462,10 +448,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// transform .fullscreen-drop                                           //       bugtest more thourougly
 	
 		// add file info
-		console.log('info: ', this.fulldrop);
-
 		var meta = this._createFileMetaContent(file);
-		this.fulldrop.innerHTML = '';		// clear
 		this.fulldrop.appendChild(meta);	// append meta
 
 		// show
@@ -491,6 +474,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	fullUpOff : function () {
 
 		Wu.DomUtil.removeClass(this.fulldrop, 'fullscreen-dropped');
+		this.fulldrop.innerHTML = '';
 	},
 
 	// fullscreen for dropping on
@@ -510,7 +494,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	// fullscreen for dropping on
 	fullOn : function () {
 		// turn on fullscreen-drop
-		this.fulldrop.style.opacity = 0.9;
+		this.fulldrop.style.opacity = 0.9;				// wow! full up down on dumb! RE.FACTOR!
 		this.fulldrop.style.zIndex = 1000;
 	},
 
@@ -553,7 +537,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	handleError : function (error) {
-		// console.log('Handling error: ', error);
 
 		var html = '';
 		error.forEach(function (err, i, arr) {
@@ -567,51 +550,31 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	// process file
 	uploaded : function (record, options) {
 		
+
 		var options = options || {};
 		
 		// handle errors
-		if (record.errors) {
-			if (record.errors.length > 0) this.handleError(record.errors);
+		if (record.errors && record.errors.length) {
+			this.handleError(record.errors);
 		}
 		
 		// return if nothing
-		// if (!record.files) return;
+		if (!record.files) return;
 
 		// add files to library
-		record.done.files.forEach(function (file, i, arr) {
+		record.files && record.files.forEach(function (file, i, arr) {
 			
-			// add to table
-			this.addFile(file);
-
 			// add to project locally (already added on server)
 			this.project.setFile(file);
 
 		}, this);
 
+
 		// add layers
-		record.done.layers.forEach(function (layer) {
+		record.layers && record.layers.forEach(function (layer, i) {
 			this.project.addLayer(layer);
-
-			if (options.autoAdd) {
-				app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
-			}
-
 		}, this);
 		
-		
-
-		// if created layer, add to map 
-		if (options.autoAdd) {
-			record.done.layers.forEach(function (layer) {
-
-				var layerItem = app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
-				
-				if (layerItem) {
-					app.MapPane.layerMenu.enableLayer(layerItem);
-				}
-			}, this);
-
-		}
 
 		// refresh sidepane
 		this.project.refreshSidepane();
@@ -656,6 +619,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		} 
 	},
 
+
 	_createFilePopup : function (files) {
 		var length = files.length;
 		var html = '<div class="dataLibrary-file-popup-wrap">';
@@ -686,7 +650,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	// to prevent selected text
 	stop : function (e) {
-		// console.log('stop!');   // not working!
 		e.preventDefault();
 		e.stopPropagation();
 	},

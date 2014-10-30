@@ -8,6 +8,10 @@ var _ = require('lodash-node');
 var tj = require('togeojson');	// kml to geojson
 var jsdom = require('jsdom').jsdom;
 var mapnikOmnivore = require('mapnik-omnivore');
+// var request = require('request');
+var request = require('superagent');
+var zlib = require('zlib');
+
 
 // models
 var File = require('../models/file');
@@ -15,18 +19,246 @@ var Layer = require('../models/layer');
 var Project = require('../models/project');
 
 // image cruncher
-var crunch = require('../routes/crunch');
+var pixels = require('../routes/pixels');
 
 
 // global paths
 var FILEFOLDER = '/var/www/data/files/';
 var TILESERVER = '/var/www/DATA/geojson/';
 
-var TILESERVERIP = 'http://78.46.107.15:8080/';
 
 module.exports = geo = { 
 
 	
+
+	handleGeoJSON : function (path, fileUuid, callback) {
+		// send to tx vector tile job queue
+		console.log('GEO: handleGeoJSON', path, fileUuid);
+
+
+		geo.grinderImportGeojson(path, fileUuid, function (err, metadata){ 
+			
+			console.log('grinderImportGeojson done:', err);
+	        	
+	        	
+	        	// console.log('meta???', metadata);
+
+
+	        	var db = {
+	        		// metadata : metadata
+	        	}
+
+	        	// return
+	        	callback(err, db);
+
+		});
+		
+	},
+
+
+	handleTopoJSON : function (path, fileUuid, callback) {
+		// convert to geojson
+		// send to tx vector tile job queue
+
+		console.log('GEO: handleTopoJSON', path, fileUuid);
+
+		callback()
+
+
+	},
+
+
+
+
+	grinderImportGeojson : function (path, fileUuid, callback) {
+		console.log('grinderImportGeojson', path, fileUuid);
+
+
+		fs.readJson(path, function (err, data) {
+			if (err) console.log('readJson err', err);
+
+			if (err) return callback(err);
+
+			// package
+			var pack = {
+				geojson : data,
+				uuid : fileUuid,
+				layerName : 'layer'
+			};
+
+			zlib.gzip(JSON.stringify(pack), function (err, buffer) {
+				if (err) console.log('zlib err: ', err);
+
+				// send to tx
+				request
+				 .post('https://systemapic.com/import/geojson')
+				 .send(buffer)
+				 .set('Accept-Encoding', 'gzip, deflate')
+				 .end(function (err, result) {
+				 	if (err) console.log('request err:', err);
+
+				 	// console.log('result: ', result);
+
+				 	callback(err, null);
+				});
+
+			});
+
+		});
+
+	},
+
+
+
+	handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
+		console.log('GEO: handleShapefile');
+
+
+		fs.readdir(folder, function (err, files) {
+
+			var shapefiles = files.slice();
+
+			var ops = [];
+			ops.push(function (done) {
+				// check if valid shapefile(s)
+				geo.validateshp(files, done);
+			});
+
+			ops.push(function (done) {
+				// convert shapefile to geo/topojson
+				geo.convertshp(files, folder, done);
+			});
+
+			async.series(ops, function (err, results) {
+				console.log('err', err);
+				// 
+				if (err) return callback(err);
+
+				var key = results[1];
+				var path = key.path;
+				var name = key.name;
+
+				// add geojson file to list
+				shapefiles.push(name);
+
+				geo.grinderImportGeojson(path, fileUuid, function (err) {
+
+					var db = {
+						files : shapefiles,
+						data : {
+							geojson : name
+						},
+						title : name
+					}
+
+
+					// signed, sealed, delivered
+					callback(err, db);
+				});	
+			});
+		});
+	},
+
+
+
+	validateshp : function (files, callback) {
+		console.log('validateshp');
+
+		// shape extensions
+		var mandatory 	= ['.shp', '.shx', '.dbf'];
+
+		files.forEach(function (f) {
+			var ext = f.slice(-4);
+			_.pull(mandatory, ext);
+		})
+
+		// if not all accounted for, return error
+		if (mandatory.length > 0) return callback({error : 'Missing shapefile(s)', files : mandatory});
+		
+		// return
+		callback(null);
+
+	},
+
+
+	convertshp : function (shapes, folder, callback) {
+		console.log('convertshp');
+
+		 
+		// get .shp file
+		for (s in shapes) {
+			if (shapes[s].slice(-4) == '.shp') var shp = shapes[s];
+		}
+		
+		// return err if no .shp found
+		if (!shp) return callback('No shapefile?');
+
+
+		var inFile  = folder + '/' + shp;
+		var toFile  = shp + '.geojson';
+		var outFile = folder + '/' + toFile;
+
+		// ogr2ogr shapefile to geojson
+		var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"';		
+		var exec = require('child_process').exec;
+		exec(cmd, function (err, stdout, stdin) {
+			if (err) console.error('mapshaper err: ', err, stdout, stdin);
+
+			callback(err, {path : outFile, name : toFile});
+
+		});
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	// send file to tileserver,
@@ -34,14 +266,11 @@ module.exports = geo = {
 	mirrorToTileserver : function (entry, currentPath) {
 
 		console.log('mirrorToTileserver');
-
-
 		console.log('entry: ', entry);
 		console.log('currentPath', currentPath);
 
-		var fileUuid = entry.uuid;
 
-		// var currentPath = '';
+		var fileUuid = entry.uuid;
 
 		var remotePath = TILESERVER + fileUuid + '.geojson';
 		// var reprojectedPath = currentPath + '.EPSG3857';
@@ -49,21 +278,7 @@ module.exports = geo = {
 		
 		var ops = [];
 
-		// ops.push(function (callback) {
-
-		// 	// re-project to google
-		// 	var cmd = 'ogr2ogr -s_srs EPSG:4269 -t_srs EPSG:3857 -f geoJSON "' + reprojectedPath + '" "' + currentPath + '"';
-		// 	var exec = require('child_process').exec;
-		// 	exec(cmd, function (err, stdout, stdin) {
-
-		// 		console.log('_________ _ _ _ _ _ _ _ _ _ _ __ _ _ _ _ _ _ _ reproejcted!!!');
-		// 		console.log(reprojectedPath);
-		// 		callback(err);
-
-		// 	});
-
-		// });
-		
+	
 		
 		ops.push(function (callback) {
 
@@ -77,7 +292,6 @@ module.exports = geo = {
 
 
 
-				var request = require('request');
 
 
 				request({
