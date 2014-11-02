@@ -1862,7 +1862,7 @@ input.cmn-toggle-round-flat + label:before {
 
 /* Layer item open */
 .layeritem-open {
-  height: 25px; }
+  height: 30px; }
 
 /* Layer item closed */
 .layeritem-closed {
