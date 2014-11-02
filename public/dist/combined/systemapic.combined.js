@@ -351,6 +351,29 @@ Wu.Util = {
 			if (cb) cb(context, http.responseText); 
 		    }
 		}
+
+
+
+		http.send(json);
+	},
+
+
+	// post with callback and error handling (do callback.bind(this) for context)
+	send : function (path, json, callback) {
+		var http = new XMLHttpRequest();
+		var url = window.location.origin;
+		url += path;
+		http.open("POST", url, true);
+		http.setRequestHeader('Content-type', 'application/json');
+		http.onreadystatechange = function() {
+			if (http.readyState == 4) {
+				if (http.status == 200) { // ok
+					if (callback) callback(null, http.responseText); 
+				} else { // error
+					if (callback) callback(http.status); 	// ??
+				}
+			}
+		}
 		http.send(json);
 	},
 
@@ -1019,6 +1042,7 @@ Wu.stamp = Wu.Util.stamp;
 Wu.setOptions = Wu.Util.setOptions;
 Wu.save = Wu.Util.post;
 Wu.post = Wu.Util.postcb;
+Wu.send = Wu.Util.send;
 Wu.parse = Wu.Util._parse;
 Wu.zip = Wu.Util.generateZip;
 Wu.zave = Wu.Util.zipSave;
@@ -5315,8 +5339,14 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 		var min = _.size(this.project.getBaselayers());
 		console.log('base: ', min);
+
+		console.log('this.project.getBaselayers()', this.project.getBaselayers());
+
+
 		var padding = this.numberOfProviders * 35;
 		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
+		
+		
 		console.log('this.project.lauers', this.project.layers);
 		this.minHeight = 0;
 
@@ -7165,8 +7195,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 				createImageThumbnails : false,
 				autoDiscover : false,
 				uploadMultiple : true,
+				acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.docx,.pdf,.doc,.txt',
+				// acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.json,.topojson,.kml,.docx,.pdf,.doc,.txt',
 				maxFiles : 10,
-				parallelUploads : 10,
+				parallelUploads : 10
 				// autoProcessQueue : true
 		});
 
@@ -7205,19 +7237,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// set dz events
 		this.dz.on('drop', function (e) { 
-			// console.log('drop', e); 
 		});
 
 		this.dz.on('dragenter', function (e) { 
-			console.log('dragenter', e); 
 		});
 
 		this.dz.on('addedfile', function (file) { 
-
-			console.log('dz added: ', file);
-
-			// count multiple files
-			that.filecount += 1;
 
 			// show progressbar
 			that.progress.style.opacity = 1;
@@ -7234,52 +7259,43 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 
 		this.dz.on('complete', function (file) {
-			// console.log('complete111');
-
-			// count multiple files
-			that.filecount -= 1;
-
+			
 			// clean up
 			that.dz.removeFile(file);
 
 		});
-
-		// this.dz.on('totaluploadprogress', function (progress, totalBytes, totalSent) { 
-		//         // set progress
-		//         console.log('progress: ', progress);
-		//         that.progress.style.width = progress + '%';
-		// });
 
 		this.dz.on('uploadprogress', function (file, progress) {
 			// set progress
 			that.progress.style.width = progress + '%';
 		});                                                                                                                                                                                                               
 
-		this.dz.on('success', function (err, json) {
+		this.dz.on('successmultiple', function (err, json) {
 			// parse and process
 			var obj = Wu.parse(json);
-			// console.log('success::: obj: ', obj);
 
 			// set status
 			app.setStatus('Done!', 2000);
 
 			if (obj) { that.uploaded(obj); }
+
+			// clear fullpane
+			that.resetProgressbar();
 		});
 
-		this.dz.on('complete', function (file) {
-			// console.log('complete333');
+		
 
-			if (!that.filecount) {
-				// reset progressbar
-				that.progress.style.opacity = 0;
-				that.progress.style.width = '0%';
+	},
 
-				// reset .fullscreen-drop
-				that.fulldropOff();
-				that.fullUpOff();
-				that._fulldrop = false;
-			}
-		});
+	resetProgressbar : function () {
+		// reset progressbar
+		this.progress.style.opacity = 0;
+		this.progress.style.width = '0%';
+
+		// reset .fullscreen-drop
+		this.fulldropOff();
+		this.fullUpOff();
+		this._fulldrop = false;
 
 	},
 
@@ -7289,10 +7305,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// transform .fullscreen-drop                                           //       bugtest more thourougly
 	
 		// add file info
-		console.log('info: ', this.fulldrop);
-
 		var meta = this._createFileMetaContent(file);
-		this.fulldrop.innerHTML = '';		// clear
 		this.fulldrop.appendChild(meta);	// append meta
 
 		// show
@@ -7318,6 +7331,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	fullUpOff : function () {
 
 		Wu.DomUtil.removeClass(this.fulldrop, 'fullscreen-dropped');
+		this.fulldrop.innerHTML = '';
 	},
 
 	// fullscreen for dropping on
@@ -7337,7 +7351,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	// fullscreen for dropping on
 	fullOn : function () {
 		// turn on fullscreen-drop
-		this.fulldrop.style.opacity = 0.9;
+		this.fulldrop.style.opacity = 0.9;				// wow! full up down on dumb! RE.FACTOR!
 		this.fulldrop.style.zIndex = 1000;
 	},
 
@@ -7380,7 +7394,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	handleError : function (error) {
-		// console.log('Handling error: ', error);
 
 		var html = '';
 		error.forEach(function (err, i, arr) {
@@ -7394,51 +7407,31 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	// process file
 	uploaded : function (record, options) {
 		
+
 		var options = options || {};
 		
 		// handle errors
-		if (record.errors) {
-			if (record.errors.length > 0) this.handleError(record.errors);
+		if (record.errors && record.errors.length) {
+			this.handleError(record.errors);
 		}
 		
 		// return if nothing
-		// if (!record.files) return;
+		if (!record.files) return;
 
 		// add files to library
-		record.done.files.forEach(function (file, i, arr) {
+		record.files && record.files.forEach(function (file, i, arr) {
 			
-			// add to table
-			this.addFile(file);
-
 			// add to project locally (already added on server)
 			this.project.setFile(file);
 
 		}, this);
 
+
 		// add layers
-		record.done.layers.forEach(function (layer) {
+		record.layers && record.layers.forEach(function (layer, i) {
 			this.project.addLayer(layer);
-
-			if (options.autoAdd) {
-				app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
-			}
-
 		}, this);
 		
-		
-
-		// if created layer, add to map 
-		if (options.autoAdd) {
-			record.done.layers.forEach(function (layer) {
-
-				var layerItem = app.SidePane.Map.mapSettings.layermenu.enableLayerByUuid(layer.uuid);
-				
-				if (layerItem) {
-					app.MapPane.layerMenu.enableLayer(layerItem);
-				}
-			}, this);
-
-		}
 
 		// refresh sidepane
 		this.project.refreshSidepane();
@@ -7483,6 +7476,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		} 
 	},
 
+
 	_createFilePopup : function (files) {
 		var length = files.length;
 		var html = '<div class="dataLibrary-file-popup-wrap">';
@@ -7513,7 +7507,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	// to prevent selected text
 	stop : function (e) {
-		// console.log('stop!');   // not working!
 		e.preventDefault();
 		e.stopPropagation();
 	},
@@ -8646,7 +8639,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	createNewMap : function () {
 
 		var options = {
-			worldCopyJump : true,
+			worldCopyJump : true
 		}
 
 		// create new map
@@ -8654,7 +8647,19 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// add editable layer
 		this.addEditableLayer(this._map);
+
+		// add attribution
+		// if (this._attributionControl) this._map.removeControl(this._attributionControl);
+		this._attributionControl = L.control.attribution({
+				position : 'bottomleft',
+				prefix : 'Powered by <a href="https://systemapic.com/" target="_blank">Systemapic</a>'
+		});
+
+
+		this._map.addControl(this._attributionControl);
+
 	},
+
 
 	addEditableLayer : function (map) {
 		// create layer
@@ -8763,6 +8768,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			if ( controls.legends ) {
 				// console.log('Legends Control');
 				
+				console.log('thus', thus);
+				console.log('controls.legends', controls.legends);
+
 				var __legendsContainer = thus.legendsControl._legendsContainer;
 
 				// Check for Layer Manu Control
@@ -9692,6 +9700,10 @@ Wu.ProgressBar = Wu.Class.extend({
 		Wu.DomEvent.on(this._bhattan1,   'click', this.closeLayerPane, this);
 		Wu.DomEvent.on(this._openLayers, 'click', this.openLayerPane, this);     
 
+		// Stop Propagation
+		Wu.DomEvent.on(this._openLayers, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._bhattan1, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+
 		// auto-close event
 		Wu.DomEvent.on(this._innerContainer, 'mouseenter', this.cancelEditClose, this);
 		Wu.DomEvent.on(this._innerContainer, 'mouseleave', this.timedEditClose, this);
@@ -9735,9 +9747,10 @@ Wu.ProgressBar = Wu.Class.extend({
 		// Insert opener
 		this._container.parentNode.appendChild(this._openLayers);
 		
-		// Slide the LEGENDS			
-		if (this._legendsContainer) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
-		
+		// Slide the LEGENDS
+		if ( app.MapPane.inspectControl ) {
+			if (this._legendsContainer) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
+		}	
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
 		Wu.app.MapPane._container.children[1].children[1].style.right = '140px';
 		
@@ -9760,7 +9773,9 @@ Wu.ProgressBar = Wu.Class.extend({
 		this._openLayers.className = 'leaflet-control layer-opener-opened close-layer-opener';
 		
 		// Slide the LEGENDS
-		if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
+		if ( app.MapPane.inspectControl ) {
+			if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
+		}
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
 		Wu.app.MapPane._container.children[1].children[1].style.right = '295px';                  
@@ -10207,8 +10222,12 @@ Wu.ProgressBar = Wu.Class.extend({
 		if (inspectControl) inspectControl.addLayer(layer);
 
 		// add to legendsControl if available
-		var legendsControl = app.MapPane.legendsControl;
-		if (legendsControl) legendsControl.addLegend(layer);
+
+		// Removed by Jørgen -> duplicate, legends are already added
+
+//		var legendsControl = app.MapPane.legendsControl;
+//		if (legendsControl) legendsControl.addLegend(layer);
+
 
 		// add to descriptionControl if available
 		var descriptionControl = app.MapPane.descriptionControl;
@@ -10225,6 +10244,7 @@ Wu.ProgressBar = Wu.Class.extend({
 	
 	// disable by layermenuItem
 	disableLayer : function (layermenuItem) {
+
 		var layer = layermenuItem.layer;
 		if (!layer) return;
 
@@ -10388,6 +10408,10 @@ Wu.ProgressBar = Wu.Class.extend({
 		Wu.DomEvent.on(up,   'mousedown', Wu.DomEvent.stop, this);
 		Wu.DomEvent.on(down, 'mousedown', Wu.DomEvent.stop, this);
 		Wu.DomEvent.on(del,  'mousedown', Wu.DomEvent.stop, this);
+
+		// Stop Propagation
+		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+
 
 		// add elem to item object
 		layerItem.el = wrap;
@@ -10712,6 +10736,11 @@ L.control.layermenu = function (options) {
 		Wu.DomEvent.on(text, 	  'dblclick click', function (e) { Wu.DomEvent.stop(e); this.select(entry);	 }, this);
 		Wu.DomEvent.on(wrapper,   'mousedown dblclick click',  	   Wu.DomEvent.stop, 				    this);
 	
+
+		// Stop Propagation
+		Wu.DomEvent.on(this._content, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+
+
 		// update zIndex
 		this.updateZIndex();
 
@@ -11005,9 +11034,11 @@ L.control.inspect = function (options) {
 		if (this.editMode) Wu.DomEvent.on(this._inner, 'dblclick', this.toggleEdit, this);
 
 		// prevent map double clicks
-		Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
-		Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
+		// Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
+		// Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
 
+		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._button, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 	},
 	
 	removeHooks : function () {
@@ -11021,6 +11052,8 @@ L.control.inspect = function (options) {
 		// prevent map double clicks
 		Wu.DomEvent.off(this._container, 'dblclick', Wu.DomEvent.stop, this);
 		Wu.DomEvent.off(this._container, 'dblclick', Wu.DomEvent.stop, this);
+
+		Wu.DomEvent.off(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 
 	},
 
@@ -11202,6 +11235,14 @@ L.control.description = function (options) {
 		// prevent doubleclick
 		Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
 
+
+		// Stop Propagation
+		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._legendsCollapser, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+
+		
+
+
 	},
 
 	checkWidth : function() {
@@ -11221,18 +11262,33 @@ L.control.description = function (options) {
 			this._legendsScrollRight.style.display = 'none';			
 		}
 
-		// Check if the Layer Menu EXISTS, so that we can add the correct padding to the legends menu
-		if ( app.MapPane.layerMenu ) {
 
-			// Layer menu exists, but add padding to the legends only if the Layer menu is OPEN... 
+
+		// Check if the Layer Inspector EXISTS, so that we can add the correct padding to the legends menu
+		if ( app.MapPane.inspectControl ) {
+
+			// Layer inspector exists, but add padding to the legends only if the Layer menu is OPEN... 
 			// It's 290px when open, and 10px when closed, so I put 100 just in case...
-			if ( app.MapPane.layerMenu._container.offsetWidth >= 100 ) {
+			if ( app.MapPane.inspectControl._container.offsetWidth >= 100 ) {
 				Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right');
 			}
 
 		} else {
 			Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right');
 		}
+
+		// // Check if the Layer Menu EXISTS, so that we can add the correct padding to the legends menu
+		// if ( app.MapPane.layerMenu ) {
+
+		// 	// Layer menu exists, but add padding to the legends only if the Layer menu is OPEN... 
+		// 	// It's 290px when open, and 10px when closed, so I put 100 just in case...
+		// 	if ( app.MapPane.layerMenu._container.offsetWidth >= 100 ) {
+		// 		Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right');
+		// 	}
+
+		// } else {
+		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right');
+		// }
 
 	},	
 
@@ -11276,7 +11332,7 @@ L.control.description = function (options) {
 		this._legendsOpener.style.opacity = '0';
 
 		// Set the width of the Legends
-		this._legendsInner.style.width = this.sliderWidth + 20 + 'px';
+		this._legendsInner.style.width = this.sliderWidth + 'px';
 
 		// calculate width
 		this.checkWidth();
@@ -11342,17 +11398,32 @@ L.control.description = function (options) {
 
 	addLegend : function (layer) {
 
+		console.log('running addLegend ~ looking for duplicates...')
+
 		var uuid = layer.store.uuid;
-		var legend = layer.store.legend;
+		
+		var legends = layer.getLegends();
+		// console.log('addLegend!', layer, legend);
 		
 		// return if no legend
-		if (!legend) return;
+		if (!legends) return;
 
 		// Make sure that the container is visible...
 		this._legendsContainer.style.display = 'block';
 
+
 		// create legends box
-	    	var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInnerSlider, legend);
+	    	var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInnerSlider);
+
+	    	// Set the width of the legends container
+		var containerWidth = Math.round(legends.length/4) * 150;
+		if ( containerWidth < 150 ) containerWidth = 150;
+		div.style.width = containerWidth + 'px';
+
+		// Set the width of the legends slider
+		this.sliderWidth += containerWidth;
+		this._legendsInnerSlider.style.width = this.sliderWidth + 'px';
+
 
 	    	var legendWidth = div.offsetWidth; // (j)
 
@@ -11360,25 +11431,57 @@ L.control.description = function (options) {
 		this.legends[uuid] = {
 			layer : layer,
 			div   : div,
-			width : legendWidth             // ADDED BY JØRGEN
+			width : legendWidth
 		}
 
-	    	// Added by Jølle
+
+	    	// Added by Jølle		    	
 	    	var tempObj = {
 			id : uuid,
 			width : legendWidth
 		}
 
-	    	this.legendsCounter.push(tempObj); // ADDED BY JØLLE
+		// Push in array for sliding control
+	    	this.legendsCounter.push(tempObj);
 
-	    	this.sliderWidth += legendWidth;    // ADDED BY JØRGEN
 
-		// Set the width of the inner slider... (j)
-		this._legendsInnerSlider.style.width = this.sliderWidth + 20 + 'px';
+
+
+
+
+		// create legends divs
+		var b = Wu.DomUtil.create('div', 'legend-header', div);
+		this._legendsList = Wu.DomUtil.create('div', 'legend-list', div);
+
+
+		legends.forEach(function (legend) {
+			console.log('_addLegend', legend);
+
+			// create legend divs
+
+			var d = Wu.DomUtil.create('div', 'legend-each', this._legendsList);
+			var e = Wu.DomUtil.create('div', 'legend-feature', d);
+			var f = Wu.DomUtil.create('img', 'legend-image1', e);
+			var g = Wu.DomUtil.create('img', 'legend-image2', e);
+			var h = Wu.DomUtil.create('div', 'legend-feature-name', d, legend.value);
+
+			f.src = legend.base64;
+			g.src = legend.base64;
+
+		}, this);
+
+		
 
 		// See if we need the horizontal scrollers or not!
 		this.checkWidth();
 		this.calculateHeight();
+
+	},
+
+	_addLegend : function (legend) {
+
+		
+
 
 	},
 
@@ -11387,10 +11490,14 @@ L.control.description = function (options) {
 		var uuid = layer.store.uuid;
 		var legend = this.legends[uuid];
 
-		if (!legend) { this._legendsContainer.style.display = 'none'; return; }
 
+		console.log('legend', legend);
 
-		// console.log('remove legend, yo');
+		if (!legend) { 
+			// this._legendsContainer.style.display = 'none'; 
+			return; 
+		}
+
 
 		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
 		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
@@ -11428,7 +11535,7 @@ L.control.description = function (options) {
 		}
 		
 		// Set the width of the inner slider... (j)
-		this._legendsInnerSlider.style.width = this.sliderWidth + 20 + 'px';
+		this._legendsInnerSlider.style.width = this.sliderWidth + 'px';
 	    
 
 		var div = legend.div;
@@ -11441,7 +11548,6 @@ L.control.description = function (options) {
 		// Store legends height
 		this.calculateHeight();
 
-		// console.log('this.legendsCounter.length', this.legendsCounter.length)
 
 		// Hide legends if it's empty
 		if ( this.legendsCounter.length == 0 ) this._legendsContainer.style.display = 'none';
@@ -11451,6 +11557,7 @@ L.control.description = function (options) {
 	},
 
 	legendsScrollLeft : function () {
+
 
 		if (this.scrolling) return;
 		
@@ -11473,13 +11580,13 @@ L.control.description = function (options) {
 	},
 
 	legendsScrollRight : function () {
+
 	
 		if (this.scrolling) return;
 
 		if ( this.sliderOffset <= this.legendsCounter.length-1 ) {
 			var mover = this.legendsCounter[this.sliderOffset].width;        
 			var tempLeft = this._legendsInnerSlider.offsetLeft;
-
 			var rightOffset = this._legendsInner.offsetWidth - (this._legendsInnerSlider.offsetWidth + tempLeft);
 
 			if ( rightOffset <= 0 ) {
@@ -12349,7 +12456,7 @@ L.control.baselayerToggle = function (options) {
 				// remove from layermenu & baselayer store
 				_.remove(this.store.layermenu, function (item) { return item.layer == layer.store.uuid; });
 				// var baseLayer = _.find(this.store.baseLayers, function (b) { return b.uuid == layer.store.uuid;});
-				// console.log('baseLayer: ', baseLayer, layer);
+				console.log('baseLayer: ', baseLayer, layer);
 				_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.store.uuid; });
 
 				// remove from layermenu
@@ -13177,6 +13284,41 @@ L.control.baselayerToggle = function (options) {
 		// create Leaflet layer, load data if necessary
 	},
 
+	add : function (map) {
+		this.addTo(map);
+	},
+
+	addTo : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		this.layer.addTo(map);
+
+		// add gridLayer if available
+		console.log('this.gridLayer', this.gridLayer);
+		// if (this.gridLayer) this.gridLayer.addTo(map);
+		if (this.gridLayer) map.addLayer(this.gridLayer);
+
+		// add legends if active
+		var legendsControl = app.MapPane.legendsControl;
+		legendsControl && legendsControl.addLegend(this);
+
+	},
+
+	remove : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		map.removeLayer(this.layer);
+
+		// remove gridLayer if available
+		if (this.gridLayer) map.removeLayer(this.gridLayer); 
+
+		// remove legends if active
+		var legendsControl = app.MapPane.legendsControl;
+		legendsControl && legendsControl.removeLegend(this);  
+	},
+
 	enable : function () {
 		this.addTo();
 	},
@@ -13257,6 +13399,7 @@ L.control.baselayerToggle = function (options) {
 
 	getMeta : function () {
 		var metajson = this.store.metadata;
+		console.log('meta: ', metajson);
 		if (metajson) return JSON.parse(metajson);
 		return false;
 	},
@@ -13381,88 +13524,94 @@ Wu.RasterLayer = Wu.Layer.extend({
 Wu.CartoCSSLayer = Wu.Layer.extend({
 
 	initLayer : function () {
-
 		this.update();
-		console.log('meta: ', this.getMeta());
 	},
 
 
-	add : function (map) {
+	// add : function (map) {
 
-		this.addTo(map);
+	// 	this.addTo(map);
 	
-	},
+	// },
 
-	addTo : function (map) {
-		var map = map || Wu.app._map;
+	// addTo : function (map) {
+	// 	var map = map || Wu.app._map;
 
-		// leaflet fn
-		this.layer.addTo(map);
+	// 	// leaflet fn
+	// 	this.layer.addTo(map);
 
-		// add gridLayer if available
-		if (this.gridLayer) {
-			map.addLayer(this.gridLayer);
-		}
+	// 	// add gridLayer if available
+	// 	if (this.gridLayer) {
+	// 		map.addLayer(this.gridLayer);
+	// 	}
 
-	},
+	// },
 
-	remove : function (map) {
-		var map = map || Wu.app._map;
+	// remove : function (map) {
+	// 	var map = map || Wu.app._map;
 
-		// leaflet fn
-		map.removeLayer(this.layer);
+	// 	// leaflet fn
+	// 	map.removeLayer(this.layer);
 
-		// remove gridLayer if available
-		if (this.gridLayer) {
-			map.removeLayer(this.gridLayer);
-		} 
-	},
+	// 	// remove gridLayer if available
+	// 	if (this.gridLayer) {
+	// 		map.removeLayer(this.gridLayer);
+	// 	} 
+	// },
 
 
 	update : function () {
-
 		var map = app._map;
 
-		if (this.layer) {
-			map.removeLayer(this.layer);		// refactor ? should be removed/added in same place?
+		// remove layer (todo: z-index)
+		if (this.layer) map.removeLayer(this.layer);		// refactor ? should be removed/added in same place?
 
-		}
+		// prepare raster
+		this._prepareRaster();
 
+		// prepare utfgrid
+		this._prepareGrid();
+		
+	},
 
+	_prepareRaster : function () {
+		
+		// set ids
 		var fileUuid = this.store.file;	// file id of geojson
 		var cartoid = this.store.data.cartoid || 'cartoid';
 
-
 		// tile server ip
-		var tileServer = app.options.servers.raster + 'raster/';
-
-		// tile url
-		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png';
-
+		var tileServer = app.options.servers.tiles;
+		var token = app.accessToken;
+		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 		
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			fileUuid: fileUuid,
-			cartoid : cartoid
+			cartoid : cartoid,
+			subdomains : 'abcd'
 		});
+	},
 
-		
+	_prepareGrid : function () {
+
+		// set ids
+		var fileUuid = this.store.file;	// file id of geojson
+		var cartoid = this.store.data.cartoid || 'cartoid';
 
 		// add gridlayer
-		var gridServer = app.options.servers.raster + 'utfgrid/';
-		this.gridLayer = new L.UtfGrid(gridServer + fileUuid + '/{z}/{x}/{y}.grid.json', {
-			
+		var gridServer = app.options.servers.utfgrid;
+		var token = app.accessToken;
+		var url = gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
+		this.gridLayer = new L.UtfGrid(url, {
 			useJsonP: false,
-			
+			subdomains: 'ghi',
 		});
 
 		// add popup event
 		this.gridLayer.on('click', function(e) {
 			if (!e.data) return;
-
-			// open popup
 		 	this.openPopup(e.data, e.latlng);
-
 		}, this);
 
 	},
@@ -13565,30 +13714,30 @@ Wu.MapboxLayer = Wu.Layer.extend({
 		
 	},
 
-	add : function (map) {
-		this.addTo(map);
-	},
+	// add : function (map) {
+	// 	this.addTo(map);
+	// },
 
-	addTo : function (map) {
-		var map = map || Wu.app._map;
+	// addTo : function (map) {
+	// 	var map = map || Wu.app._map;
 
-		// leaflet fn
-		this.layer.addTo(map);
+	// 	// leaflet fn
+	// 	this.layer.addTo(map);
 
-		// add gridLayer if available
-		if (this.gridLayer) this.gridLayer.addTo(map);
+	// 	// add gridLayer if available
+	// 	if (this.gridLayer) this.gridLayer.addTo(map);
 
-	},
+	// },
 
-	remove : function (map) {
-		var map = map || Wu.app._map;
+	// remove : function (map) {
+	// 	var map = map || Wu.app._map;
 
-		// leaflet fn
-		map.removeLayer(this.layer);
+	// 	// leaflet fn
+	// 	map.removeLayer(this.layer);
 
-		// remove gridLayer if available
-		if (this.gridLayer) map.removeLayer(this.gridLayer);   
-	},
+	// 	// remove gridLayer if available
+	// 	if (this.gridLayer) map.removeLayer(this.gridLayer);   
+	// },
 
 
 });
@@ -17850,10 +17999,11 @@ Wu.App = Wu.Class.extend({
 		},
 
 		servers : {
-			// not used, using window url atm..
-			portal : 'https://projects.ruppellsgriffon.com/',	// api 		//todo: remove hardcoded ip's
-			// raster : 'http://{s}.systemapic.com:8080/raster/', 	// cartocss raster tile server tx
-			raster : 'https://{s}.systemapic.com/', 	// cartocss raster tile server tx
+
+			portal   : 'https://projects.ruppellsgriffon.com/',	// api
+			tiles    : 'https://{s}.systemapic.com/tiles/', 	// tiles
+			utfgrid  : 'https://{s}.systemapic.com/utfgrid/' 	// utfgrids
+
 		},
 
 		silentUsers : [
@@ -17871,7 +18021,7 @@ Wu.App = Wu.Class.extend({
 		Wu.app = this;
 
 		// merge options
-		Wu.setOptions(this, options);    
+		Wu.setOptions(this, options);   
 
 		// set options
 		L.mapbox.config.FORCE_HTTPS = true;
@@ -17899,6 +18049,7 @@ Wu.App = Wu.Class.extend({
 		// revv it up
 		that.initApp(resp);
 	},
+
 
 	initApp : function (o) {
 
@@ -17944,6 +18095,9 @@ Wu.App = Wu.Class.extend({
 
 		// main user account
 		this.Account = new Wu.User(this.options.json.account);
+		
+		// set access token
+		this.setToken();
 
 		// create user objects
 		this.Users = {};
@@ -17964,6 +18118,14 @@ Wu.App = Wu.Class.extend({
 		}, this);
 
 	},
+
+	setToken : function () {
+		this.accessToken = '?token=';
+		this.accessToken += Wu.app.Account.store.token;
+		this.accessToken += '.';
+		this.accessToken += Wu.app.Account.store._id;
+	},
+
 
 
 	_initPanes : function () {

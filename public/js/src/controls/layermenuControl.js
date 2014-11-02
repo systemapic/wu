@@ -52,6 +52,10 @@ L.Control.Layermenu = L.Control.extend({
 		Wu.DomEvent.on(this._bhattan1,   'click', this.closeLayerPane, this);
 		Wu.DomEvent.on(this._openLayers, 'click', this.openLayerPane, this);     
 
+		// Stop Propagation
+		Wu.DomEvent.on(this._openLayers, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._bhattan1, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+
 		// auto-close event
 		Wu.DomEvent.on(this._innerContainer, 'mouseenter', this.cancelEditClose, this);
 		Wu.DomEvent.on(this._innerContainer, 'mouseleave', this.timedEditClose, this);
@@ -95,9 +99,10 @@ L.Control.Layermenu = L.Control.extend({
 		// Insert opener
 		this._container.parentNode.appendChild(this._openLayers);
 		
-		// Slide the LEGENDS			
-		if (this._legendsContainer) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
-		
+		// Slide the LEGENDS
+		if ( app.MapPane.inspectControl ) {
+			if (this._legendsContainer) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
+		}	
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
 		Wu.app.MapPane._container.children[1].children[1].style.right = '140px';
 		
@@ -120,7 +125,9 @@ L.Control.Layermenu = L.Control.extend({
 		this._openLayers.className = 'leaflet-control layer-opener-opened close-layer-opener';
 		
 		// Slide the LEGENDS
-		if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
+		if ( app.MapPane.inspectControl ) {
+			if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
+		}
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
 		Wu.app.MapPane._container.children[1].children[1].style.right = '295px';                  
@@ -567,8 +574,12 @@ L.Control.Layermenu = L.Control.extend({
 		if (inspectControl) inspectControl.addLayer(layer);
 
 		// add to legendsControl if available
-		var legendsControl = app.MapPane.legendsControl;
-		if (legendsControl) legendsControl.addLegend(layer);
+
+		// Removed by Jørgen -> duplicate, legends are already added
+
+//		var legendsControl = app.MapPane.legendsControl;
+//		if (legendsControl) legendsControl.addLegend(layer);
+
 
 		// add to descriptionControl if available
 		var descriptionControl = app.MapPane.descriptionControl;
@@ -585,6 +596,7 @@ L.Control.Layermenu = L.Control.extend({
 	
 	// disable by layermenuItem
 	disableLayer : function (layermenuItem) {
+
 		var layer = layermenuItem.layer;
 		if (!layer) return;
 
@@ -748,6 +760,10 @@ L.Control.Layermenu = L.Control.extend({
 		Wu.DomEvent.on(up,   'mousedown', Wu.DomEvent.stop, this);
 		Wu.DomEvent.on(down, 'mousedown', Wu.DomEvent.stop, this);
 		Wu.DomEvent.on(del,  'mousedown', Wu.DomEvent.stop, this);
+
+		// Stop Propagation
+		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+
 
 		// add elem to item object
 		layerItem.el = wrap;

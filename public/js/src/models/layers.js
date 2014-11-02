@@ -23,6 +23,41 @@ Wu.Layer = Wu.Class.extend({
 		// create Leaflet layer, load data if necessary
 	},
 
+	add : function (map) {
+		this.addTo(map);
+	},
+
+	addTo : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		this.layer.addTo(map);
+
+		// add gridLayer if available
+		console.log('this.gridLayer', this.gridLayer);
+		// if (this.gridLayer) this.gridLayer.addTo(map);
+		if (this.gridLayer) map.addLayer(this.gridLayer);
+
+		// add legends if active
+		var legendsControl = app.MapPane.legendsControl;
+		legendsControl && legendsControl.addLegend(this);
+
+	},
+
+	remove : function (map) {
+		var map = map || Wu.app._map;
+
+		// leaflet fn
+		map.removeLayer(this.layer);
+
+		// remove gridLayer if available
+		if (this.gridLayer) map.removeLayer(this.gridLayer); 
+
+		// remove legends if active
+		var legendsControl = app.MapPane.legendsControl;
+		legendsControl && legendsControl.removeLegend(this);  
+	},
+
 	enable : function () {
 		this.addTo();
 	},
@@ -36,9 +71,18 @@ Wu.Layer = Wu.Class.extend({
 		this.layer.setOpacity(this.opacity);
 	},
 
+	// setZIndex : function (zIndex) {
+	// 	this.zIndex = zIndex || 1;
+	// 	this.layer.setZIndex(this.zIndex);
+	// },
+
 	setZIndex : function (zIndex) {
-		this.zIndex = zIndex || 1;
-		this.layer.setZIndex(this.zIndex);
+		this.store.zIndex = zIndex;
+		this.save('zIndex');
+	},
+
+	getZIndex : function () {
+		return this.store.zIndex;
 	},
 
 	getOpacity : function () {
@@ -103,6 +147,7 @@ Wu.Layer = Wu.Class.extend({
 
 	getMeta : function () {
 		var metajson = this.store.metadata;
+		console.log('meta: ', metajson);
 		if (metajson) return JSON.parse(metajson);
 		return false;
 	},
@@ -231,36 +276,36 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	},
 
 
-	add : function (map) {
+	// add : function (map) {
 
-		this.addTo(map);
+	// 	this.addTo(map);
 	
-	},
+	// },
 
-	addTo : function (map) {
-		var map = map || Wu.app._map;
+	// addTo : function (map) {
+	// 	var map = map || Wu.app._map;
 
-		// leaflet fn
-		this.layer.addTo(map);
+	// 	// leaflet fn
+	// 	this.layer.addTo(map);
 
-		// add gridLayer if available
-		if (this.gridLayer) {
-			map.addLayer(this.gridLayer);
-		}
+	// 	// add gridLayer if available
+	// 	if (this.gridLayer) {
+	// 		map.addLayer(this.gridLayer);
+	// 	}
 
-	},
+	// },
 
-	remove : function (map) {
-		var map = map || Wu.app._map;
+	// remove : function (map) {
+	// 	var map = map || Wu.app._map;
 
-		// leaflet fn
-		map.removeLayer(this.layer);
+	// 	// leaflet fn
+	// 	map.removeLayer(this.layer);
 
-		// remove gridLayer if available
-		if (this.gridLayer) {
-			map.removeLayer(this.gridLayer);
-		} 
-	},
+	// 	// remove gridLayer if available
+	// 	if (this.gridLayer) {
+	// 		map.removeLayer(this.gridLayer);
+	// 	} 
+	// },
 
 
 	update : function () {
@@ -417,30 +462,30 @@ Wu.MapboxLayer = Wu.Layer.extend({
 		
 	},
 
-	add : function (map) {
-		this.addTo(map);
-	},
+	// add : function (map) {
+	// 	this.addTo(map);
+	// },
 
-	addTo : function (map) {
-		var map = map || Wu.app._map;
+	// addTo : function (map) {
+	// 	var map = map || Wu.app._map;
 
-		// leaflet fn
-		this.layer.addTo(map);
+	// 	// leaflet fn
+	// 	this.layer.addTo(map);
 
-		// add gridLayer if available
-		if (this.gridLayer) this.gridLayer.addTo(map);
+	// 	// add gridLayer if available
+	// 	if (this.gridLayer) this.gridLayer.addTo(map);
 
-	},
+	// },
 
-	remove : function (map) {
-		var map = map || Wu.app._map;
+	// remove : function (map) {
+	// 	var map = map || Wu.app._map;
 
-		// leaflet fn
-		map.removeLayer(this.layer);
+	// 	// leaflet fn
+	// 	map.removeLayer(this.layer);
 
-		// remove gridLayer if available
-		if (this.gridLayer) map.removeLayer(this.gridLayer);   
-	},
+	// 	// remove gridLayer if available
+	// 	if (this.gridLayer) map.removeLayer(this.gridLayer);   
+	// },
 
 
 });
@@ -719,15 +764,15 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		app.ProgressBar.hideProgress();
 	},
 
-	setZIndex : function (zIndex) {
+	// setZIndex : function (zIndex) {
 
-		// set zIndex for now or later
-		this.zIndex = zIndex || 1;
+	// 	// set zIndex for now or later
+	// 	this.zIndex = zIndex || 1;
 
-		// return if not yet loaded
-		if (!this.loaded) return;
+	// 	// return if not yet loaded
+	// 	if (!this.loaded) return;
 
-	},
+	// },
 
 	getContainer : function () {
 

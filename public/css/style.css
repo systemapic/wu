@@ -1370,7 +1370,8 @@ label.info {
   float: left;
   left: 5px;
   width: auto;
-  max-width: 100%; }
+  max-width: 100%;
+  max-height: 200px; }
 
 /* inner wrapper */
 #legends-control-inner-content {
@@ -1455,23 +1456,27 @@ label.info {
   margin-top: 7px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans' !important; }
 
+.legends-item:last-child {
+  border-right: none; }
+
 .legend-header {
   font-size: 14px;
   font-weight: 600; }
 
 .legend-list {
-  width: 100%;
+  /*width: 100%;*/
   margin-top: 5px;
   margin-bottom: 5px;
-  max-width: 300px; }
+  /*max-width: 300px;*/ }
 
 .legend-each {
-  width: 49%;
+  /*width: 49%;*/
   display: inline-block;
   vertical-align: top;
   position: relative;
   margin-bottom: 3px;
-  margin-top: 3px; }
+  margin-top: 3px;
+  width: 140px; }
 
 .legend-feature {
   border: 1px solid;
@@ -2086,7 +2091,7 @@ label.info {
   background-position: -94px -43px; }
 
 .inspect-eye.inspecting {
-  background-position: -94px -43px; }
+  background-position: -210px -43px; }
 
 /* Remove layer */
 .inspect-kill {
@@ -5649,7 +5654,7 @@ width: 392px;
   display: inline-block;
   vertical-align: top; }
 
-#cartocss-tooltip-custom-header {
+#cartocss-tooltip-custom-header, .legends-title {
   width: 379px;
   border: 0;
   outline: 0;

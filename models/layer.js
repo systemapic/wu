@@ -14,10 +14,12 @@ var layerSchema = mongoose.Schema({
 	legend 		: String,	// html
 	maxZoom		: String,
 	minZoom		: String,	// which zoom levels layer is active for, todo later..
+	zIndex 		: String,
 	bounds		: String,	// bounds for layer
 	tms 		: Boolean,	
 	attribution     : String,
 	accessToken 	: String, 	// some layers have access tokens, like mapbox
+
 
 	// data source for layer
 	data : {

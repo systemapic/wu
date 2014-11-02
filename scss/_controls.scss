@@ -818,6 +818,7 @@
 	left: 5px;	
 	width: auto;
 	max-width: 100%;
+	max-height: 200px;
 	}
 	
 /* inner wrapper */
@@ -916,26 +917,32 @@
 	font-family: $font !important;
 	}
 
+.legends-item:last-child {
+	border-right: none;
+}	
+
 .legend-header {
 	font-size: 14px;
 	font-weight: 600;	
 	}
 
 .legend-list {
-	width: 100%;
+	/*width: 100%;*/
 	margin-top: 5px;
 	margin-bottom: 5px;
-	max-width: 300px;
+	/*max-width: 300px;*/
 	}
 
 .legend-each {
-	width: 49%;
+	/*width: 49%;*/
 //	max-width: 200px;
 	display: inline-block;
 	vertical-align: top;
 	position: relative;
 	margin-bottom: 3px;
 	margin-top: 3px;	
+
+	width: 140px;
 	}
 
 .legend-feature {
@@ -1663,7 +1670,7 @@
 	}
 
 .inspect-eye.inspecting {
-	background-position: -94px -43px;
+	background-position: -210px -43px;
 	}	
 
 /* Remove layer */

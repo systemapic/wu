@@ -29,7 +29,7 @@ var TILESERVER = '/var/www/DATA/geojson/';
 
 module.exports = geo = { 
 
-	
+
 
 	handleGeoJSON : function (path, fileUuid, callback) {
 		// send to tx vector tile job queue
@@ -42,14 +42,17 @@ module.exports = geo = {
 	        	
 	        	
 	        	// console.log('meta???', metadata);
+	        	mapnikOmnivore.digest(path, function (err, metadata) {
+	        		console.log('fucking meta?!?!?');
+	        		var db = {
+		        		metadata : JSON.stringify(metadata)
+		        	}
 
+		        	// return
+		        	callback(err, db);
+	        	});
 
-	        	var db = {
-	        		// metadata : metadata
-	        	}
-
-	        	// return
-	        	callback(err, db);
+	        	
 
 		});
 		
@@ -152,8 +155,17 @@ module.exports = geo = {
 					}
 
 
-					// signed, sealed, delivered
-					callback(err, db);
+							
+			        	// console.log('meta???', metadata);
+			        	mapnikOmnivore.digest(path, function (err, metadata) {
+			        		console.log('fucking meta?!?!?');
+			        		db.metadata = JSON.stringify(metadata);
+				        	
+
+				        	// return
+				        	callback(err, db);
+			        	});
+
 				});	
 			});
 		});

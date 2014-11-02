@@ -39,6 +39,14 @@ L.Control.Legends = L.Control.extend({
 		// prevent doubleclick
 		Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
 
+
+		// Stop Propagation
+		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._legendsCollapser, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+
+		
+
+
 	},
 
 	checkWidth : function() {
@@ -58,18 +66,33 @@ L.Control.Legends = L.Control.extend({
 			this._legendsScrollRight.style.display = 'none';			
 		}
 
-		// Check if the Layer Menu EXISTS, so that we can add the correct padding to the legends menu
-		if ( app.MapPane.layerMenu ) {
 
-			// Layer menu exists, but add padding to the legends only if the Layer menu is OPEN... 
+
+		// Check if the Layer Inspector EXISTS, so that we can add the correct padding to the legends menu
+		if ( app.MapPane.inspectControl ) {
+
+			// Layer inspector exists, but add padding to the legends only if the Layer menu is OPEN... 
 			// It's 290px when open, and 10px when closed, so I put 100 just in case...
-			if ( app.MapPane.layerMenu._container.offsetWidth >= 100 ) {
+			if ( app.MapPane.inspectControl._container.offsetWidth >= 100 ) {
 				Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right');
 			}
 
 		} else {
 			Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right');
 		}
+
+		// // Check if the Layer Menu EXISTS, so that we can add the correct padding to the legends menu
+		// if ( app.MapPane.layerMenu ) {
+
+		// 	// Layer menu exists, but add padding to the legends only if the Layer menu is OPEN... 
+		// 	// It's 290px when open, and 10px when closed, so I put 100 just in case...
+		// 	if ( app.MapPane.layerMenu._container.offsetWidth >= 100 ) {
+		// 		Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right');
+		// 	}
+
+		// } else {
+		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right');
+		// }
 
 	},	
 
@@ -113,7 +136,7 @@ L.Control.Legends = L.Control.extend({
 		this._legendsOpener.style.opacity = '0';
 
 		// Set the width of the Legends
-		this._legendsInner.style.width = this.sliderWidth + 20 + 'px';
+		this._legendsInner.style.width = this.sliderWidth + 'px';
 
 		// calculate width
 		this.checkWidth();
@@ -179,17 +202,32 @@ L.Control.Legends = L.Control.extend({
 
 	addLegend : function (layer) {
 
+		console.log('running addLegend ~ looking for duplicates...')
+
 		var uuid = layer.store.uuid;
-		var legend = layer.store.legend;
+		
+		var legends = layer.getLegends();
+		// console.log('addLegend!', layer, legend);
 		
 		// return if no legend
-		if (!legend) return;
+		if (!legends) return;
 
 		// Make sure that the container is visible...
 		this._legendsContainer.style.display = 'block';
 
+
 		// create legends box
-	    	var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInnerSlider, legend);
+	    	var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInnerSlider);
+
+	    	// Set the width of the legends container
+		var containerWidth = Math.round(legends.length/4) * 150;
+		if ( containerWidth < 150 ) containerWidth = 150;
+		div.style.width = containerWidth + 'px';
+
+		// Set the width of the legends slider
+		this.sliderWidth += containerWidth;
+		this._legendsInnerSlider.style.width = this.sliderWidth + 'px';
+
 
 	    	var legendWidth = div.offsetWidth; // (j)
 
@@ -197,25 +235,57 @@ L.Control.Legends = L.Control.extend({
 		this.legends[uuid] = {
 			layer : layer,
 			div   : div,
-			width : legendWidth             // ADDED BY JØRGEN
+			width : legendWidth
 		}
 
-	    	// Added by Jølle
+
+	    	// Added by Jølle		    	
 	    	var tempObj = {
 			id : uuid,
 			width : legendWidth
 		}
 
-	    	this.legendsCounter.push(tempObj); // ADDED BY JØLLE
+		// Push in array for sliding control
+	    	this.legendsCounter.push(tempObj);
 
-	    	this.sliderWidth += legendWidth;    // ADDED BY JØRGEN
 
-		// Set the width of the inner slider... (j)
-		this._legendsInnerSlider.style.width = this.sliderWidth + 20 + 'px';
+
+
+
+
+		// create legends divs
+		var b = Wu.DomUtil.create('div', 'legend-header', div);
+		this._legendsList = Wu.DomUtil.create('div', 'legend-list', div);
+
+
+		legends.forEach(function (legend) {
+			console.log('_addLegend', legend);
+
+			// create legend divs
+
+			var d = Wu.DomUtil.create('div', 'legend-each', this._legendsList);
+			var e = Wu.DomUtil.create('div', 'legend-feature', d);
+			var f = Wu.DomUtil.create('img', 'legend-image1', e);
+			var g = Wu.DomUtil.create('img', 'legend-image2', e);
+			var h = Wu.DomUtil.create('div', 'legend-feature-name', d, legend.value);
+
+			f.src = legend.base64;
+			g.src = legend.base64;
+
+		}, this);
+
+		
 
 		// See if we need the horizontal scrollers or not!
 		this.checkWidth();
 		this.calculateHeight();
+
+	},
+
+	_addLegend : function (legend) {
+
+		
+
 
 	},
 
@@ -224,10 +294,14 @@ L.Control.Legends = L.Control.extend({
 		var uuid = layer.store.uuid;
 		var legend = this.legends[uuid];
 
-		if (!legend) { this._legendsContainer.style.display = 'none'; return; }
 
+		console.log('legend', legend);
 
-		// console.log('remove legend, yo');
+		if (!legend) { 
+			// this._legendsContainer.style.display = 'none'; 
+			return; 
+		}
+
 
 		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
 		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
@@ -265,7 +339,7 @@ L.Control.Legends = L.Control.extend({
 		}
 		
 		// Set the width of the inner slider... (j)
-		this._legendsInnerSlider.style.width = this.sliderWidth + 20 + 'px';
+		this._legendsInnerSlider.style.width = this.sliderWidth + 'px';
 	    
 
 		var div = legend.div;
@@ -278,7 +352,6 @@ L.Control.Legends = L.Control.extend({
 		// Store legends height
 		this.calculateHeight();
 
-		// console.log('this.legendsCounter.length', this.legendsCounter.length)
 
 		// Hide legends if it's empty
 		if ( this.legendsCounter.length == 0 ) this._legendsContainer.style.display = 'none';
@@ -288,6 +361,7 @@ L.Control.Legends = L.Control.extend({
 	},
 
 	legendsScrollLeft : function () {
+
 
 		if (this.scrolling) return;
 		
@@ -310,13 +384,13 @@ L.Control.Legends = L.Control.extend({
 	},
 
 	legendsScrollRight : function () {
+
 	
 		if (this.scrolling) return;
 
 		if ( this.sliderOffset <= this.legendsCounter.length-1 ) {
 			var mover = this.legendsCounter[this.sliderOffset].width;        
 			var tempLeft = this._legendsInnerSlider.offsetLeft;
-
 			var rightOffset = this._legendsInner.offsetWidth - (this._legendsInnerSlider.offsetWidth + tempLeft);
 
 			if ( rightOffset <= 0 ) {

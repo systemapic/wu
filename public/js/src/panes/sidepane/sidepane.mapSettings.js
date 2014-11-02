@@ -712,8 +712,14 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 		var min = _.size(this.project.getBaselayers());
 		console.log('base: ', min);
+
+		console.log('this.project.getBaselayers()', this.project.getBaselayers());
+
+
 		var padding = this.numberOfProviders * 35;
 		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
+		
+		
 		console.log('this.project.lauers', this.project.layers);
 		this.minHeight = 0;
 
