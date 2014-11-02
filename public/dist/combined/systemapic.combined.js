@@ -8429,6 +8429,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		var img = this._logoWrap.style.backgroundImage.slice(4).slice(0,-1);
 		this.project.store.header.logo 		= img;     	
 
+
+		console.log('img', img);
 		// save to db
 		this._save();
 	},
