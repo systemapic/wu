@@ -622,6 +622,7 @@ input.cmn-toggle-round-flat:checked + label:after {
 	pointer-events: none;
 	}
 
+/* Switch overriders */
 input.cmn-toggle-round-flat:checked + label,
 input.cmn-toggle-round-flat:checked + label:after {
 	background-color: #666 !important;

@@ -46,9 +46,6 @@
 	cursor: default;
 	}
 
-		
-
-
 /* Outer wrapper */
 .q-editor-container {
 	position: absolute;
@@ -113,7 +110,6 @@
 	}
 
 .q-editor-menu-item .users {
-	/*padding-top: 18px;*/
 	padding-top: 25px;
 	}
 
@@ -145,7 +141,6 @@
 	box-shadow: 0 0 5px 0 rgba(0,0,0,0.075);
 	z-index: 999;
 	}
-
 
 /* Content (to the right) */
 .q-editor-content {
@@ -184,8 +179,7 @@
 	height: 100%;
 	overflow-y: scroll;
 	padding-top: 0;
-	/*padding-bottom: 0;*/
-	padding-bottom: 7px; /*cxxx*/
+	padding-bottom: 7px;
 	padding-left: 0px;
 	color: black;
 	width: 260px;
@@ -293,7 +287,6 @@
 	}
 
 .client-logo.editable:hover {
-	// border: 1px solid yellow;
 	opacity: 0.7;
 	cursor: copy;
 	}
@@ -307,7 +300,6 @@
 	display: none;
 	font-weight: 900;
 	border-radius: 1px;
-//	text-shadow: -1px 1px rgba(255, 255, 255, 0.3);
 	font-size: 11px;
 	color: #333;	
 	}	
@@ -315,7 +307,6 @@
 .client-kill:hover {
 	background: #C80000;
 	color: white;
-//	text-shadow: -1px 1px rgba(0, 0, 0, 0.3);
 	}
 
 #new-client-button {
@@ -442,7 +433,6 @@
 	}
 
 .project-logo.editable:hover {
-//	border: 1px solid yellow;
 	opacity: 0.7;
 	cursor: copy;
 	}
@@ -586,14 +576,12 @@
 	text-align: center;
 	border-radius: 2px;
 	height: 17px;
-//	text-shadow: -1px 1px 1px white;
 	float: right;
 	}
 
 .project-delete:hover {
 	background: #C80000;
 	color: white;
-//	text-shadow: -1px 1px rgba(0, 0, 0, 0.3);
 	}
 
 /* New project button */
@@ -669,12 +657,10 @@
 	margin-top: 1px;
 	}
 
-
 /* "DataLibray" / "MapBox" headers in the "Base Layer" and "Layer Menu" panes */
 .item-list-header {
 	margin-top: 10px;
 	margin-bottom: 3px;
-
 	font-weight: 600;
 	font-size: 14px;
 	color: #666;	
@@ -854,12 +840,9 @@
 	position: relative;
 	}
 
-
-
 .bounds-wrapper.zoom {
 	padding-top: 25px;
 	}
-
 
 /*Bounds - Zoom halves*/
 .bounds-zoom-half {
@@ -884,17 +867,6 @@
 	margin-right: 3px !important;
 	}
 
-
-
-
-/*#map-bounds-inner label {
-	margin-top: 4px;
-	border-top: 1px dotted rgba(0,0,0,0.2);
-	width: 100%;
-	padding-top: 4px;
-	padding-bottom: 7px;
-	}*/
-
 #map-bounds-inner input {
 	width: 49%;
 	position: relative;
@@ -903,8 +875,6 @@
 	padding-bottom: 0 !important;
 	margin: 0;
 	padding-top: 0px !important;
-
-
 	width: 100%;
 	margin-bottom: 1px;
 	}
@@ -924,17 +894,6 @@
 #editor-map-bounds-SW {
 	margin-bottom: 5px;
 	}
-
-/*#editor-map-bounds-NE:before,
-#editor-map-bounds-SW:before {
-	content: '';
-	position: absolute;
-	width: 100%;
-	height: 0px;
-	top: -10px;
-	left: 0;
-	border-top: 1px dotted rgba(255,255,255,0.2);
-	}*/
 
 #editor-map-bounds-NE,
 #editor-map-bounds-SW {
@@ -1010,11 +969,6 @@
 	height: 32px;
 	padding: 8px;
 	font-weight: 500;
-
-	/*position: absolute;*/
-	/*font-size: 110%;*/
-	/*left: 10px;*/
-	/*width: 129px;	*/
 	}	
 
 
@@ -1036,12 +990,6 @@
 	}
 
 .connect-mapbox-title {
-/*	font-size: 130%;
-	position: relative;
-	text-align: left;
-	padding-top: 10px;
-	margin-bottom: 10px;
-	padding-left: 13px;*/
 	font-size: 14px;
 	position: relative;
 	text-align: left;
@@ -1288,7 +1236,6 @@
 	font-size: 19px;
 	font-weight: 900;
 	color: white;
-//	text-shadow: -1px 1px 1px rgba(0,0,0,0.3);
 	margin-top: 1px;	
 	}
 
@@ -1424,7 +1371,6 @@ button.image-attachment {
 	overflow: hidden;
 	}
 
-
 .grande-sources-container div:nth-child(2) {
 	border-radius: 5px 5px 0px 0px;
 	border-top: none;
@@ -1495,7 +1441,6 @@ button.image-attachment {
 	font-size: 90%;
 	}
 
-
 #document-container-textarea img {
 	width: auto;
 	height: 200px;
@@ -1503,7 +1448,6 @@ button.image-attachment {
 	margin: 10px;
 	margin-left: 0px;
 	}
-
 
 
 /*
@@ -1577,10 +1521,6 @@ button.image-attachment {
 	display: block;
 	}
 
-
-
-
-
 /* Controls wrapper (with upload, search field, etc) */
 .datalibrary-controls,
 .users-controls {
@@ -1611,7 +1551,6 @@ button.image-attachment {
 	padding-bottom: 95px !important;
 	}
 
-
 .users-controls-inner div {
 	margin-right: 5px;
 	}
@@ -1628,7 +1567,7 @@ button.image-attachment {
 
 #datalibrary-search {
 	margin-left: 5px;
-}
+	}
 
 /* Delete file button */
 #datalibrary-delete-file {
@@ -1824,7 +1763,6 @@ button.image-attachment {
 	display: none;
 	}
 
- 
 #squaredThree-checkbox-all {
 	top: -4px;
 	}
@@ -1873,10 +1811,8 @@ button.image-attachment {
 	z-index: 3400;
 	display: none;
 	left: 104px;
-	/*padding-right: 84px;*/
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
-
 	padding-bottom: 155px;
 	}
 	
@@ -1888,7 +1824,7 @@ button.image-attachment {
 
 .fullpage-users .backpane-container {
 	overflow: hidden;
-}
+	}
 
 
 /* CREATE NEW USER */
@@ -1923,7 +1859,6 @@ button.image-attachment {
 	font-style: italic;
 	text-indent: 1px;
 	font-weight: 900;
-//	text-shadow: 0px 1px 1px black;
 	}	
 
 .backpane-confirm {
@@ -2016,7 +1951,6 @@ button.image-attachment {
 .backpane-title {
 	font-size: 300%;
 	font-weight: 900;
-//	text-shadow: -1px 1px 1px black;
 	}
 
 /* Subtitle */
@@ -2034,7 +1968,6 @@ button.image-attachment {
 	position: absolute;
 	padding: 5px;
 	font-weight: 900;
-//	text-shadow: 0px 1px 1px rgba(0,0,0,0.4);
 	text-transform: uppercase;
 	top: -35px;
 	box-shadow: 0 0 4px 0 rgba(0,0,0,0.2);
@@ -2170,7 +2103,6 @@ button.image-attachment {
 .backpane-message {
 	margin-bottom: 175px;
 	}
-
 
 
 

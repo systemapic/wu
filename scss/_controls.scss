@@ -78,7 +78,6 @@
 
 .leaflet-draw.leaflet-control.elizaveta {
 	pointer-events: none;
-	/*cursor: pointer;*/
 	cursor: -webkit-grab;
 	cursor:    -moz-grab;		
 	}
@@ -93,7 +92,6 @@
 .leaflet-draw.leaflet-control.elizaveta a {
 	pointer-events: all;
 	}	
-
 
 .leaflet-draw-actions {
 	display: none;
@@ -362,8 +360,6 @@
 
 
 
-
-
 /*
 ███████╗██╗   ██╗██╗██╗         ██╗     ███████╗ █████╗ ███████╗██╗     ███████╗████████╗████████╗██╗███╗   ██╗ ██████╗ 
 ██╔════╝██║   ██║██║██║         ██║     ██╔════╝██╔══██╗██╔════╝██║     ██╔════╝╚══██╔══╝╚══██╔══╝██║████╗  ██║██╔════╝ 
@@ -401,14 +397,10 @@
 	left: auto;
 	text-transform: uppercase;
 	text-align: center;
-	/*background: white;*/
 	height: 24px;
 	line-height: 2.2;
 	font-weight: $obese;
-	/*border-bottom: 1px solid #CACACA;*/
-	/*box-shadow: 0 0 5px rgba(0,0,0,0.3);*/
 	margin-top: 0px;
-
 	border-bottom: none;
 	box-shadow: none;
 	background: rgba(255, 255, 255, .93);	
@@ -513,8 +505,6 @@
 .leaflet-top.leaflet-left {
 	height: 100%;
 	text-align: right;
-//	width: 320px;
-//	width: 100%;
 	position: relative;
 	float: left;
 	margin-top: 80px;
@@ -583,12 +573,10 @@
 	}
 
 .leaflet-control-styleeditor-interior.enabled {
-	// background-color: gainsboro;	
 	background-color: #CCFFFF;
 	}
 
 .enabled:hover {
-	// background-color: #FAFAFA;
 	background-color: #CCFFFF;
 	}
 	
@@ -738,11 +726,9 @@
 
 .draw-expander {
 	height: 270px;
-	// overflow: visible;
 	}
 
 .open-drawer {
-	// background-color: rgba(220,220,220,1);
 	background-color: #CCFFFF;
 	}
 
@@ -777,18 +763,6 @@
 	background: rgba(0, 0, 0, 0.64);
 	margin: -11px auto 0;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -836,7 +810,6 @@
 	
 /* inner wrapper 2 */
 #legends-inner {
-//	max-height: 220px;
 	background: rgba(255,255,255,0.93);
 	box-shadow: 0 0 5px rgba(0,0,0,0.5);
 	overflow: hidden;
@@ -905,7 +878,6 @@
 	}	
 
 /* Actual legend */
-
 .legends-item {
 	overflow: hidden;
 	padding: 10px;
@@ -914,14 +886,13 @@
 	text-align: left;
 	padding-top: 0px;
 	border-right: 1px dashed #C8C8C8;
-//	max-width: 300px;
 	margin-top: 7px;
 	font-family: $font !important;
 	}
 
 .legends-item:last-child {
 	border-right: none;
-}	
+	}	
 
 .legend-header {
 	font-size: 14px;
@@ -929,21 +900,16 @@
 	}
 
 .legend-list {
-	/*width: 100%;*/
 	margin-top: 5px;
 	margin-bottom: 5px;
-	/*max-width: 300px;*/
 	}
 
 .legend-each {
-	/*width: 49%;*/
-//	max-width: 200px;
 	display: inline-block;
 	vertical-align: top;
 	position: relative;
 	margin-bottom: 3px;
 	margin-top: 3px;	
-
 	width: 140px;
 	}
 
@@ -1000,13 +966,6 @@
 	}
 
 /* LEGEND */
-
-
-
-
-
-
-
 
 .legends-item img {
 	max-height: 50px;
@@ -1090,7 +1049,6 @@
 	cursor: pointer;
 	background-color: transparent;
 	opacity: 0.5 !important;
-
 	left: 4px;
 	opacity: 0.5;	
 	}
@@ -1224,14 +1182,10 @@
 /* Layer menu collapse button */
 #bhattan1 {
 	position: absolute;
-	/*top: 3px;*/
-	/*left: 5px;*/
 	cursor: pointer;
 	background-position: -26px 8px;
 	background-color: transparent;
 	opacity: 0.5 !important;
-
-
 	right: 7px;
 	top: 7px;
 	left: auto;	
@@ -1275,7 +1229,6 @@
 
 /* Layer Folder color coding */
 .layer-menu-item-wrap.menufolder.level-0 {
-	/*background-color: #3B596A !important;*/
 	background-color: #3b596a !important;
 	}
 
@@ -1463,8 +1416,6 @@
 	display: none;
 	}
 
-/*.edit-mode.scroller*/	
-
 .layer-item-up:hover,
 .layer-item-down:hover {
 	background-color: rgba(255,255,255,1);
@@ -1610,7 +1561,6 @@
 	margin-bottom: 10px;
 	}
 
-
 /* Up/down arrow wrapper */
 .inspect-arrows-wrap {
 	position: absolute;
@@ -1711,10 +1661,6 @@
 
 
 
-
-
-
-
 /* STYLE EDITOR */
 
 /* The tooltip that appears when you click the button to activate the style editor */
@@ -1730,11 +1676,8 @@
 /* Outer Wrapper */
 .leaflet-styleeditor {
 	position: absolute;
-	/*top: 72px;*/
 	right: -14px;
 	z-index: 1000;
-	/*background-color: rgba(255, 255, 255, 0.93);*/
-
 	height: 100%;
 	background: transparent;
 	top: 0;
@@ -1763,7 +1706,6 @@
 	width: 210px;
 	}
 
-
 /* Style editor header */
 .leaflet-styleeditor-header {
 	background: transparent;
@@ -1774,7 +1716,6 @@
 	z-index: 99999;
 	width: 25px;
 	}
-
 
 /* Header buttons */
 .leaflet-styleeditor-button {
@@ -1832,9 +1773,6 @@
 .leaflet-styleeditor-interior {
 	width: 220px;
 	left: 5px;	
-	/*height: 390px;*/
-	/*top: 5px;*/
-	/*top: 30px;*/
 	top: 8px;
 	height: 100%;
 	padding-bottom: 50px;		
@@ -1852,7 +1790,6 @@
 .leaflet-styleeditor-color {
 	height: 30px;
 	}
-
 
 /* Input fields for opacity */
 .leaflet-styleeditor-input:focus, 
@@ -1895,7 +1832,6 @@
 .leaflet-styleeditor-close:hover {
 	color: #63b6e5;
 	}
-
 
 /* Pattern picker */
 .leaflet-styleeditor-patternpicker {
