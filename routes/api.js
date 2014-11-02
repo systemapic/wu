@@ -1518,7 +1518,7 @@ module.exports = api = {
 				file : file
 			}
 
-			upload.newUpload(req, res);
+			upload.upload(req, res);
 
 
 		});
