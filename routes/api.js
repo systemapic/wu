@@ -3528,6 +3528,20 @@ module.exports = api = {
 					if (err) throw err;
 				});
 
+				console.log('saved legends!!', legends);
+			}
+
+			// update zIndex
+			if (req.body.hasOwnProperty('zIndex')) {
+
+				var zIndex = req.body.zIndex;
+				layer.zIndex = zIndex;
+				layer.save(function (err) {
+					if (err) throw err;
+				});
+
+				console.log('saved zIndex!!', zIndex);
+
 			}
 
 			// update style

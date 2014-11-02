@@ -100,6 +100,11 @@ L.Control.Inspect = L.Control.extend({
 		Wu.DomEvent.on(text, 	  'dblclick click', function (e) { Wu.DomEvent.stop(e); this.select(entry);	 }, this);
 		Wu.DomEvent.on(wrapper,   'mousedown dblclick click',  	   Wu.DomEvent.stop, 				    this);
 	
+
+		// Stop Propagation
+		Wu.DomEvent.on(this._content, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+
+
 		// update zIndex
 		this.updateZIndex();
 
@@ -182,6 +187,8 @@ L.Control.Inspect = L.Control.extend({
 	},
 
 	updateZIndex : function () {
+
+		console.log('updateZIndex, this.layers:', this.layers);
 
 		// update zIndex for all layers depending on position in array
 		var length = this.layers.length;

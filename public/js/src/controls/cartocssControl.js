@@ -61,10 +61,10 @@ L.Control.CartoCSS = L.Control.extend({
 						  this._tabStyling.innerHTML = 'Styling';
 
 		this._tabTooltip 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-tooltip', this._tabsWrapper); // Styling tab		
-		this._tabTooltip.innerHTML = 'Tooltip';
+		this._tabTooltip.innerHTML 	= 'Tooltip';
 
 		this._tabLegends 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-legends', this._tabsWrapper); // Styling tab				
-		this._tabLegends.innerHTML = 'Legend';
+		this._tabLegends.innerHTML 	= 'Legend';
 
 		this._legendsWrapper		= Wu.DomUtil.create('div', 'cartocss-legends-wrapper displayNone', this._wrapper);
 		
@@ -180,9 +180,11 @@ L.Control.CartoCSS = L.Control.extend({
 		// get meta fields
 		var fields = this._layer.getMetaFields(); // return false if no fields found
 		
+		console.log('fields: ', fields);
+
 		// create string
 		var string = '// #layer is always the layer identifyer \n\n';
-		string += '// For a full cartoCSS reference guide:\n // http://projects.ruppellsgriffon.com/docs/cartocss-reference/\n\n';
+		string += '// For a full cartoCSS reference guide:\n // https://projects.ruppellsgriffon.com/docs/cartocss-reference/\n\n';
 		string += '#layer {\n\n';
 		string += '// Available fields in layer:\n';
 
@@ -375,6 +377,7 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// fill with meta from store
 		var legends = this._layer.getLegends();	// as object!
+
 		if (legends) return this.fillLegends(legends);
 
 		// fill with default
@@ -405,11 +408,16 @@ L.Control.CartoCSS = L.Control.extend({
 	// fill legends tab with legends
 	fillLegends : function (legends) {
 
+		// Get title from tooltip
+		var tooltipMeta = this._layer.getTooltip();
+
 		// clear old
 		this._legendsWrapper.innerHTML = '';
 
 		// inner wrapper
 		this._legendsWrapperInner = Wu.DomUtil.create('div', 'legends-inner-scroller', this._legendsWrapper);
+		this._legendsTitle = Wu.DomUtil.create('div', 'legends-title', this._legendsWrapperInner);
+		this._legendsTitle.innerHTML = tooltipMeta.title;
 
 		// each legend
 		legends.forEach(function (legend) {

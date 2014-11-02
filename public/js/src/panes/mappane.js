@@ -323,6 +323,9 @@ Wu.MapPane = Wu.Class.extend({
 			if ( controls.legends ) {
 				// console.log('Legends Control');
 				
+				console.log('thus', thus);
+				console.log('controls.legends', controls.legends);
+
 				var __legendsContainer = thus.legendsControl._legendsContainer;
 
 				// Check for Layer Manu Control
@@ -388,8 +391,6 @@ Wu.MapPane = Wu.Class.extend({
 
 	resetControls : function () {
 
-		console.log("------------> resetControls <------------------ ", this);
-
 		// remove old controls
 		delete this._drawControl;
 		delete this._drawControlLayer;
@@ -432,7 +433,6 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 	disableInteraction : function (noDrag) {
-		// console.log('disableInteraction');
 		var map = this._map;
 		if (noDrag) map.dragging.disable();
 		map.touchZoom.disable();
@@ -443,7 +443,6 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 	enableInteraction : function (noDrag) {
-		// console.log('enableInteraction');
 		var map = this._map;
 		if (noDrag) map.dragging.enable();
 		map.touchZoom.enable();
@@ -619,13 +618,6 @@ Wu.MapPane = Wu.Class.extend({
 
 	enableCartocss : function () {
 
-		console.log('enable cartoCss');
-
-		console.log('******************************');
-		console.log('this.cartoCss', this.cartoCss);
-		console.log('******************************');
-
-
 		if (this.cartoCss) return;
 	
 		// create control
@@ -643,7 +635,6 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 	disableCartocss : function () {
-		console.log('disable carto');
 
 		if (!this.cartoCss) return;
 
@@ -734,8 +725,6 @@ Wu.MapPane = Wu.Class.extend({
 	enableDraw : function () {
 		if (this._drawControl) return;
 		
-		// cxxxx
-
 		// add draw control
 		this.addDrawControl();
 	},

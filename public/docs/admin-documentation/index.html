@@ -36,15 +36,24 @@
 					<li><a href="#users">User Mngmt</a></li>
 				</ol>
 
-			<li>Button Area</li>
-			<li><a href="#styling">Styling</a></li>
-			<li><a href="#layerinfo">Layer Info</a></li>
+			<!-- <li>Button Area</li> -->
+			<li><a href="#misc">Miscellaneous</a></li>
+			<ol>
+				<li><a href="#projectheader">Project Header</a></li>
+				<li><a href="#layerinfo">Layer Info</a></li>
+				<li><a href="#mousepos">Mouse Position</a></li>
+				<li><a href="#scale">Map Scale</a></li>
+			</ol>			
 			<li><a href="#legends">Legends</a></li>
-			<li><a href="#projectheader">Project Header</a></li>
-			<li><a href="#mousepos">Mouse Position</a></li>
-			<li><a href="#scale">Map Scale</a></li>
-			<li><a href="#layermenu">Layer menu</a></li>
 			<li><a href="#layerinspector">Layer Inspector</a></li>
+
+
+			<li><a href="#styling">Styling</a></li>
+				<ol>
+					<li><a href="#CartoCSS">CartoCSS</a></li>
+					<li><a href="#tooltipmaker">Tooltip</a></li>
+					<li><a href="#legendsmaker">Legends</a></li>
+				</ol>
 		</ul>
 	</section>
 
@@ -170,7 +179,7 @@
 							<p><b>Legends</b><br>enables layer legends.</p>
 							<p><b>Scale</b><br>the scale tool in the top right corner.</p>
 							<p><b>Geolocation:</b><br>search for address or location</p>
-							<p><b>Baselayer Toggle</b><br>toggle between satellite, terrain, or which ever layers that's been set as base layers Mouse Position: Tells the long/lat coordinates of the mouse pointer.</p>
+							<p><b>Baselayer Toggle</b><br>toggle between satellite, terrain, or which ever layers that's been set as base layers Mouse Position Control: Tells the long/lat coordinates of the mouse pointer.</p>
 						</div>
 					</div>
 			</div>
@@ -224,7 +233,7 @@
 
 						<div class="right">					
 							<p>Here you will find all acceptable shapefiles/raster files that's been uploaded to the project through the "Data Library" under the "<a href="#datalibrary">Data library</a>" section.</p>
-							<p>When the "Layer Menu" has been activated, and you have selected "Layer Menu" under the "<a href="#controls">Controls</a>" option, you will be able to add these layers to the map by clicking on them. </p>
+							<p>When the "Layer Menu" has been activated, and you have selected "Layer Menu Control" under the "<a href="#controls">Controls</a>" option, you will be able to add these layers to the map by clicking on them. </p>
 							<p>When you have the "Layer Menu" pane activated, a button called "ADD FOLDER" will appear on the top of the Layer Menu.</p>
 						</div>
 					</div>
@@ -272,7 +281,7 @@
 	<section>
 		<a name="legends"></a>
 		<h3>LEGENDS</h3>
-		<p>Legends attached to layer will appear here.Layer legends gets activated through "<a href="#mapmenu">Map Menu</a> > <a href="#options">Options</a> > <a href="#controls">Controls</a> > Legends"</p>
+		<p>Legends attached to layer will appear here.Layer legends gets activated through "<a href="#mapmenu">Map Menu</a> > <a href="#options">Options</a> > <a href="#controls">Controls</a> > Legends Control"</p>
 	</section>
 
 
@@ -285,7 +294,7 @@
 			</div>
 
 			<div class="right">									
-				<p>Layer Inspector activated through "<a href="#mapmenu">Map Menu</a> > <a href="#options">Options</a> > <a href="#controls">Controls</a> > Layer Inspector".</p>
+				<p>Layer Inspector activated through "<a href="#mapmenu">Map Menu</a> > <a href="#options">Options</a> > <a href="#controls">Controls</a> > Layer Inspector Control".</p>
 				<p>All activated layers (from user side) will appear here. The arrows to the left of the layer name will change layer order (z-index). The little eye to the right will isolate layer (hide other layers), and the [X] will disable layer, and remove it from the list.</p>
 			</div>
 		</div>
@@ -314,7 +323,7 @@
 			<div class="right">
 				<a name="layerinfo"></a>
 				<p><b>Layer Info</b></p>								
-				<p>Info box for each layer. Gets activated through "<a href="#mapmenu">Map Menu</a> > <a href="#options">Options</a> > <a href="#controls">Controls</a> > Description". Double click in content area to add text. See section "<a href="#docs">Docs</a>" for text editing details.</p>
+				<p>Info box for each layer. Gets activated through "<a href="#mapmenu">Map Menu</a> > <a href="#options">Options</a> > <a href="#controls">Controls</a> > Description Control". Double click in content area to add text. See section "<a href="#docs">Docs</a>" for text editing details.</p>
 			</div>
 		</div>
 
@@ -326,7 +335,7 @@
 			<div class="right">
 				<a name="mousepos"></a>
 				<p><b>Mouse position</b></p>
-				<p>Tells the geo location of the mouse pointer. Gets activated through "<a href="#mapmenu">Map Menu</a> > <a href="#options">Options</a> > <a href="#controls">Controls</a> > Mouse Position"</p>
+				<p>Tells the geo location of the mouse pointer. Gets activated through "<a href="#mapmenu">Map Menu</a> > <a href="#options">Options</a> > <a href="#controls">Controls</a> > Mouse Position Control"</p>
 			</div>
 		</div>
 
@@ -338,7 +347,7 @@
 			<div class="right">
 				<a name="scale"></a>
 				<p><b>Scale</b></p>
-				<p>Tells the scale of the map. Gets activated through "<a href="#mapmenu">Map Menu</a> > <a href="#options">Options</a> > <a href="#controls">Controls</a> > Scale"</p>
+				<p>Tells the scale of the map. Gets activated through "<a href="#mapmenu">Map Menu</a> > <a href="#options">Options</a> > <a href="#controls">Controls</a> > Scale Control"</p>
 			</div>
 		</div>
 	</section>
@@ -445,13 +454,13 @@
 		</div>
 
 		<p>The datalibray is a fully automated "intelligent" file handling system, that automatically organized your files into the database.</p>
-		<p>Shapefiles will automatically be available as layers or base layers, and can be accessed from "<a href="#options">Options</a> > <a href="#layermenu">Layer Menu</a>" and "<a href="#baselayers">Base Layers</a>"</p>
+		<p>Shapefiles will automatically be available as layers, and can get accessed at the "<a href="#options">Options</a> > <a href="#layermenu">Layer Menu</a>" or as base layers.</p>
 		<p>Image files will be available in the image library shortly.</p>
 		<p>Double click on file names if you wish to rename them</p>
 
 		<p><b>Uploading files</b></p>
 		<p>There are two ways to upload files: to click the "upload" button, or to drag-and-drop the files you wish to upload onto the screen.</p>
-		<p>If you zip a folder with several files, these files will come as one entry, containing several files. This is particularly handy when it comes to shapefiles, where several files depend on each other.  Because of this, shapfiles <b><em style="color: #C80000">HAVE TO BE ZIPPED</em></b> before you upload them!</p>
+		<p>If you zip a folder with several files, these files will come as one entry, containing several files. This is particularly handy when it comes to shapefiles, where several files depend on each other.  Because of this, shapfiles HAVE TO BE ZIPPED before you upload them!</p>
 		<p>When uploading large files, you will see a slim white progress bar at the top of the screen. Do not reload the page, or navigate to another page when you are uploading files.</p>		
 
 		<p><b>Downloading files</b></p>
@@ -470,17 +479,77 @@
 		<p>Once a user is created you can continue to fill inn other information such as company name, phone number, and position.</p>
 		<p>In the last field you will notice it says "0 project(s)". If you wish to give a user access to one or several projects, click on this field, and select what projects you wish to grant access to.</p>
 
-		<p><b>Read</b><br>gives read only access to user. Can upload files, but not delete them. Cannot see other users.</p>
-		<p><b>Edit</b><br>gives access to edit project, including editing layers, upload and delete, but cannot create users.</p>
-		<p><b>Manager</b><br>gives access to edit project, and create users. Cannot see admins.</p>
-		<p><b>Super Admins</b><br>gets full access to all projects, and can see all users on all projects. Super Admins cannot be created in the user interface, and have to be manually hard coded on the server.</p>
+		<p><b>Read:</b> gives read only access to user. Can upload files, but not delete them. Cannot see other users.</p>
+		<p><b>Edit:</b> gives access to edit project, including editing layers, upload and delete, but cannot create users.</p>
+		<p><b>Manage:</b> gives access to edit project, and create users. Cannot see admins.</p>
+		<p><b>Super Admins:</b> gets full access to all projects, and can see all users on all projects.</p>
 	</section>
 
 
+
+	<!-- STYLING -->
+	<!-- STYLING -->
+	<!-- STYLING -->
 	<section>
 		<a name="styling"></a>
 		<h3>STYLING DATA</h3>
-		<p>TODO</p>
+		<p>Since uploaded shapefiles are converted into vector tiles, you have great freedom to style your map layers, and change the way things look.</p>
+		<p>You can enable the styling tool from <a href="#mapmenu">Map Menu</a> > <a href="#options">Options</a> > <a href="#controls">Controls</a> > CartoCSS Editor. You may then activate the styling tools by clicking the <span style="box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);width: 26px;height: 26px;position: relative;padding-top: 8px;padding-bottom: 0;top: 4px;}"><img style="position: relative;top: 3px;"src="images/cartocsseditbutton.png"></span> button in the button area.</p>
+
+		<div class="sub-section">
+			
+
+			<a name="CartoCSS"></a>
+			<div class="leftright">
+				<div class="left">
+					<div class="image inline"><img src="images/styling.png"></div>
+				</div>
+
+				<div class="right">
+					<h4>CartoCSS</h4>
+					<p>CartoCSS is a relatively simple styling language used by Mapnik and MapBox. With a few commands you have complete control over the appearance of your map. Here you can style both vector and raster data alike.</p>
+					<p>For styling puposes you can see the current zoom level in the top left corner of the styling container.</p>
+					<p>For a full reference of the CartoCSS api, you can go to this link:</p>
+					<p><a href="https://projects.ruppellsgriffon.com/docs/cartocss-reference/">CartoCSS reference guide</a></p>
+				</div>		
+
+			</div>
+
+
+			<a name="tooltipmaker"></a>
+			<div class="leftright btop">
+				<div class="left">
+					<div class="image inline"><img src="images/styling_tooltip.png"></div>
+				</div>
+
+				<div class="right">
+					<h4>Tooltip</h4>				
+					<p>Here you will be able to access a list of all features/attributes that comes with the shapefile. In this section you can decide which one of those you want to appear in the tooltip when a user clicks on that feature on the map. You may also write a header, and change the names of the key (description).</p><br><br>
+					<p><em>Here is an example of what a tooltip with the settings from the image to the left will look like.</em></p>
+
+					<div class="image inline"><img src="images/styling_tooltip_tooltip.png"></div>
+				</div>
+			</div>
+
+			<a name="legendsmaker"></a>
+			<div class="leftright btop">
+				<div class="left">
+					<div class="image inline"><img src="images/styling_legends.png"></div>
+				</div>
+
+				<div class="right">
+					<h4>Legends</h4>				
+					<p>Legend data is automatically extracted from your CartoCSS code. When a feature has been styled (made visible on the map), it will appear here. If you don't want a feature to appear in the legends, you may disable it here.</p>
+					<div class="image inline"><img src="images/styling_legends_legends.png"></div>
+				</div>
+			</div>
+
+		</div>
+
+
+
+
+
 	</section>
 
 

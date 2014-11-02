@@ -615,7 +615,7 @@ Wu.Project = Wu.Class.extend({
 				// remove from layermenu & baselayer store
 				_.remove(this.store.layermenu, function (item) { return item.layer == layer.store.uuid; });
 				// var baseLayer = _.find(this.store.baseLayers, function (b) { return b.uuid == layer.store.uuid;});
-				// console.log('baseLayer: ', baseLayer, layer);
+				console.log('baseLayer: ', baseLayer, layer);
 				_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.store.uuid; });
 
 				// remove from layermenu

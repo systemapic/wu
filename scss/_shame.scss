@@ -1121,7 +1121,8 @@ background: rgba(255,255,255,0.5);
 }
 
 
-#cartocss-tooltip-custom-header {
+#cartocss-tooltip-custom-header,
+.legends-title {
 width: 379px;
 border: 0;
 outline: 0;
@@ -1133,6 +1134,7 @@ font-size: 15px;
 padding-left: 8px;
 margin-left: 2px;
 }
+
 
 
 

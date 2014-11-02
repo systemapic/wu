@@ -105,9 +105,11 @@ L.Control.Description = L.Control.extend({
 		if (this.editMode) Wu.DomEvent.on(this._inner, 'dblclick', this.toggleEdit, this);
 
 		// prevent map double clicks
-		Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
-		Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
+		// Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
+		// Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
 
+		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._button, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 	},
 	
 	removeHooks : function () {
@@ -121,6 +123,8 @@ L.Control.Description = L.Control.extend({
 		// prevent map double clicks
 		Wu.DomEvent.off(this._container, 'dblclick', Wu.DomEvent.stop, this);
 		Wu.DomEvent.off(this._container, 'dblclick', Wu.DomEvent.stop, this);
+
+		Wu.DomEvent.off(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 
 	},
 
