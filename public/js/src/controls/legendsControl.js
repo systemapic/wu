@@ -13,14 +13,13 @@ L.Control.Legends = L.Control.extend({
 
 		// add html
 		container.innerHTML = ich.legendsControl(); 
-
-		// NB! content is not ready yet, cause not added to map! 
 	       
 		// create legendsOpener
 		this._legendsOpener = Wu.DomUtil.createId('div', 'legends-opener');
 		this._legendsOpener.innerHTML = 'Open Legends';
 		Wu.DomUtil.addClass(this._legendsOpener, 'opacitizer');
-		
+
+				
 		return container;
 
 	},
@@ -44,9 +43,7 @@ L.Control.Legends = L.Control.extend({
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent.on(this._legendsCollapser, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 
-		
-
-
+	
 	},
 
 	checkWidth : function() {
@@ -55,7 +52,7 @@ L.Control.Legends = L.Control.extend({
 		var maxWidth = window.innerWidth;
 
 		// Remove Layer Menu Width from window width, if it exists
-		if ( app.MapPane.layerMenu ) maxWidth -= 300;
+		if (app.MapPane.layerMenu) maxWidth -= 300;
 
 		// If the Legends slider is wider than the winodw, add the horizontal scroll buttons
 		if ( this.sliderWidth > maxWidth ) {
@@ -66,33 +63,15 @@ L.Control.Legends = L.Control.extend({
 			this._legendsScrollRight.style.display = 'none';			
 		}
 
-
-
 		// Check if the Layer Inspector EXISTS, so that we can add the correct padding to the legends menu
-		if ( app.MapPane.inspectControl ) {
-
-			// Layer inspector exists, but add padding to the legends only if the Layer menu is OPEN... 
-			// It's 290px when open, and 10px when closed, so I put 100 just in case...
-			if ( app.MapPane.inspectControl._container.offsetWidth >= 100 ) {
+		var inspectControl = app.MapPane.inspectControl;
+		if (inspectControl) {
+			if (inspectControl._container.offsetWidth >= 100 ) {
 				Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right');
 			}
-
 		} else {
 			Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right');
 		}
-
-		// // Check if the Layer Menu EXISTS, so that we can add the correct padding to the legends menu
-		// if ( app.MapPane.layerMenu ) {
-
-		// 	// Layer menu exists, but add padding to the legends only if the Layer menu is OPEN... 
-		// 	// It's 290px when open, and 10px when closed, so I put 100 just in case...
-		// 	if ( app.MapPane.layerMenu._container.offsetWidth >= 100 ) {
-		// 		Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right');
-		// 	}
-
-		// } else {
-		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right');
-		// }
 
 	},	
 
@@ -150,8 +129,8 @@ L.Control.Legends = L.Control.extend({
 			that._legendsOpener.removeAttribute('style');
 			that._legendsInner.removeChild(that._legendsOpener);
 
-			Wu.DomUtil.addClass(that._legendsCollapser, 'opacitizer');
 
+			Wu.DomUtil.addClass(that._legendsCollapser, 'opacitizer');
 			that._legendsCollapser.style.opacity = '1';
 			that._legendsCollapser.style.display = 'block';
 
@@ -202,19 +181,14 @@ L.Control.Legends = L.Control.extend({
 
 	addLegend : function (layer) {
 
-		console.log('running addLegend ~ looking for duplicates...')
-
 		var uuid = layer.store.uuid;
-		
 		var legends = layer.getLegends();
-		// console.log('addLegend!', layer, legend);
 		
 		// return if no legend
 		if (!legends) return;
 
 		// Make sure that the container is visible...
 		this._legendsContainer.style.display = 'block';
-
 
 		// create legends box
 	    	var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInnerSlider);
@@ -229,7 +203,7 @@ L.Control.Legends = L.Control.extend({
 		this._legendsInnerSlider.style.width = this.sliderWidth + 'px';
 
 
-	    	var legendWidth = div.offsetWidth; // (j)
+	    	var legendWidth = div.offsetWidth;
 
 		// add to local store
 		this.legends[uuid] = {
@@ -249,20 +223,14 @@ L.Control.Legends = L.Control.extend({
 	    	this.legendsCounter.push(tempObj);
 
 
-
-
-
-
 		// create legends divs
 		var b = Wu.DomUtil.create('div', 'legend-header', div);
 		this._legendsList = Wu.DomUtil.create('div', 'legend-list', div);
 
-
+		// create legends
 		legends.forEach(function (legend) {
-			console.log('_addLegend', legend);
 
 			// create legend divs
-
 			var d = Wu.DomUtil.create('div', 'legend-each', this._legendsList);
 			var e = Wu.DomUtil.create('div', 'legend-feature', d);
 			var f = Wu.DomUtil.create('img', 'legend-image1', e);
@@ -276,7 +244,7 @@ L.Control.Legends = L.Control.extend({
 
 		
 
-		// See if we need the horizontal scrollers or not!
+		// see if we need the horizontal scrollers or not
 		this.checkWidth();
 		this.calculateHeight();
 
@@ -294,54 +262,21 @@ L.Control.Legends = L.Control.extend({
 		var uuid = layer.store.uuid;
 		var legend = this.legends[uuid];
 
-
-		console.log('legend', legend);
-
-		if (!legend) { 
-			// this._legendsContainer.style.display = 'none'; 
-			return; 
-		}
-
-
-		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
-		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
-
-		var legendBounds = legend.div.getBoundingClientRect();
-
-		// If the legend was left of the wrapper box ...
-		if ( legendBounds.left < 0 ) {
-
-			// ... remove the CSS animation of the slider
-			Wu.DomUtil.removeClass(this._legendsInnerSlider, "legends-inner-slider-sliding");
-			 
-			// ... add the width of the legend to slider left
-			this._legendsInnerSlider.style.left = this._legendsInnerSlider.offsetLeft + legend.width + 'px';
-
-			// ... remove from the slider offset (counting how many legends that's overflowing to the left of wrapper)
-			this.sliderOffset--;
-		}
- 		
- 		// Hacky packy: add CSS animation to slider again
- 		var that = this;
-		setTimeout(function() {
-			Wu.DomUtil.addClass(that._legendsInnerSlider, "legends-inner-slider-sliding");
-		}, 500) 
-		
-		// END OF ADJUST LEGENDS SLIDER
-		// END OF ADJUST LEGENDS SLIDER
-
-
-		this.sliderWidth -= legend.width;     // ADDED BY JØRGEN
+		// return if no legend to remove
+		if (!legend) return; 
 
 		// Remove from array
-		for ( var i = 0; i<this.legendsCounter.length; i++ ) {
-			if ( this.legendsCounter[i].id == uuid ) this.legendsCounter.splice(i, 1);
+		for (var i = 0; i < this.legendsCounter.length; i++) {
+			if (this.legendsCounter[i].id == uuid) this.legendsCounter.splice(i, 1);
 		}
 		
+		// adjust legend slider
+		this._adjustLegendSlider(legend);
+
 		// Set the width of the inner slider... (j)
 		this._legendsInnerSlider.style.width = this.sliderWidth + 'px';
 	    
-
+	    	// remove div
 		var div = legend.div;
 		Wu.DomUtil.remove(div);
 		delete this.legends[uuid];
@@ -352,20 +287,48 @@ L.Control.Legends = L.Control.extend({
 		// Store legends height
 		this.calculateHeight();
 
-
 		// Hide legends if it's empty
-		if ( this.legendsCounter.length == 0 ) this._legendsContainer.style.display = 'none';
+		if (this.legendsCounter.length == 0) this._legendsContainer.style.display = 'none';
 		
+	},
 
+
+	_adjustLegendSlider : function (legend) {
+
+		// adjust the legends slider (horizontal scroller)
+		var legendBounds = legend.div.getBoundingClientRect();
+
+		// if the legend was left of the wrapper box
+		if (legendBounds.left < 0) {
+
+			// remove the CSS animation of the slider
+			Wu.DomUtil.removeClass(this._legendsInnerSlider, "legends-inner-slider-sliding");
+			 
+			// add the width of the legend to slider left
+			this._legendsInnerSlider.style.left = this._legendsInnerSlider.offsetLeft + legend.width + 'px';
+
+			// remove from the slider offset (counting how many legends that's overflowing to the left of wrapper)
+			this.sliderOffset--;
+		}
+ 		
+ 		// Hacky packy: add CSS animation to slider again
+ 		var that = this;
+		setTimeout(function() {
+			Wu.DomUtil.addClass(that._legendsInnerSlider, "legends-inner-slider-sliding");
+		}, 500);
+		
+		// adjust slide width
+		this.sliderWidth -= legend.width; 
 
 	},
 
 	legendsScrollLeft : function () {
 
-
+		// return if no scrolling
 		if (this.scrolling) return;
 		
-		if ( this.sliderOffset >= 1 ) {
+		// set offsets
+		if (this.sliderOffset >= 1) {
 
 			this.sliderOffset--;
 			var mover = this.legendsCounter[this.sliderOffset].width;
@@ -378,22 +341,21 @@ L.Control.Legends = L.Control.extend({
 			setTimeout(function () {
 				that.scrolling = false;
 			}, 500);
-
 		}
-		
 	},
 
 	legendsScrollRight : function () {
 
-	
+		// return if no scrolling
 		if (this.scrolling) return;
 
-		if ( this.sliderOffset <= this.legendsCounter.length-1 ) {
+		// set offsets
+		if (this.sliderOffset <= this.legendsCounter.length-1) {
 			var mover = this.legendsCounter[this.sliderOffset].width;        
 			var tempLeft = this._legendsInnerSlider.offsetLeft;
 			var rightOffset = this._legendsInner.offsetWidth - (this._legendsInnerSlider.offsetWidth + tempLeft);
 
-			if ( rightOffset <= 0 ) {
+			if (rightOffset <= 0) {
 
 				this._legendsInnerSlider.style.left = tempLeft - mover + 'px';
 				this.sliderOffset++;
@@ -405,9 +367,7 @@ L.Control.Legends = L.Control.extend({
 					that.scrolling = false;
 				}, 500);
 			}
-
 		}
-
 	},
 
 	calculateHeight : function() {
@@ -418,8 +378,6 @@ L.Control.Legends = L.Control.extend({
 		this._openWidth 	= this._legendsInner.offsetWidth;
 
 		app.StatusPane.setContentHeights();
-		// if (app.SidePane.Map) app.SidePane.Map.setContentHeight();
-		// if (app.SidePane.Clients) app.SidePane.Clients.setContentHeight();
 	}
 
 

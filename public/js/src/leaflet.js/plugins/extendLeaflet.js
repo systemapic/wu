@@ -61,40 +61,40 @@ L.Control.Draw.include({
 });
 
 
-// add to section wrapper instead of control corner
-L.Control.StyleEditor.include({
+// // add to section wrapper instead of control corner
+// L.Control.StyleEditor.include({
 
-	addTo : function (map) {
-		this._map = map;
+// 	addTo : function (map) {
+// 		this._map = map;
 
-		var container = this._container = this.onAdd(map),
-		    pos = this.getPosition(),
-		    corner = map._controlCorners[pos];
+// 		var container = this._container = this.onAdd(map),
+// 		    pos = this.getPosition(),
+// 		    corner = map._controlCorners[pos];
 
-		L.DomUtil.addClass(container, 'leaflet-control');
+// 		L.DomUtil.addClass(container, 'leaflet-control');
 
-		var sectionWrapper = this.options.container;
-		sectionWrapper.appendChild(container);
+// 		var sectionWrapper = this.options.container;
+// 		sectionWrapper.appendChild(container);
 
-		return this;
-	},
+// 		return this;
+// 	},
 
-	removeFrom: function (map) {
-		var pos = this.getPosition(),
-		    corner = map._controlCorners[pos];
+// 	removeFrom: function (map) {
+// 		var pos = this.getPosition(),
+// 		    corner = map._controlCorners[pos];
 
-		var sectionWrapper = this.options.container;
-		sectionWrapper.removeChild(this._container);
-		this._map = null;
+// 		var sectionWrapper = this.options.container;
+// 		sectionWrapper.removeChild(this._container);
+// 		this._map = null;
 
-		if (this.onRemove) {
-			this.onRemove(map);
-		}
+// 		if (this.onRemove) {
+// 			this.onRemove(map);
+// 		}
 
-		return this;
-	},
+// 		return this;
+// 	},
 
-});
+// });
 
 L.Popup.include({
 

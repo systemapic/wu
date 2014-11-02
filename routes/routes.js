@@ -19,6 +19,8 @@ var request = require('request');
 var uuid = require('node-uuid');
 var uploadProgress = require('node-upload-progress');
 var _ = require('lodash-node');
+var colors = require('colors');
+
 
 // lib's
 var api = require('../routes/api')
@@ -60,11 +62,11 @@ module.exports = function(app, passport) {
 	// get data from store for user
 	app.post('/api/portal', isLoggedIn, function (req, res) {
 		console.log('/api/portal');
-		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *');
+		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'.red);
 		console.log('* User: ' + req.user.firstName + ' ' + req.user.lastName);
 		console.log('* User uuid: ' + req.user.uuid);
 		console.log('* IP: ' + req._remoteAddress);
-		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *')
+		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'.red);
 
 		// get user store for this user
 		api.getPortal(req, res);
@@ -280,12 +282,6 @@ module.exports = function(app, passport) {
 		upload.upload(req, res);
 		
 	});
-
-
-
-
-
-
 
 
 

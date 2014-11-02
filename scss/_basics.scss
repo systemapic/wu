@@ -18,7 +18,7 @@ body {
 	font-size: 14px;
 	text-align: left;
 	-webkit-font-smoothing: antialiased;
-    	-moz-osx-font-smoothing: grayscale;
+    -moz-osx-font-smoothing: grayscale;
 	-webkit-overflow-scrolling: none;
 	-webkit-user-select: none;    	
 	}	
@@ -164,7 +164,6 @@ hr {
 	background: rgb(146, 240, 229);
 	}
 	
-
 .defaultCursor {
 	cursor: default !important;
 	}
@@ -180,24 +179,17 @@ a {
 .active a {
 	color: cadetblue !important;
 	font-weight: 900 !important;
-//	text-shadow: -1px 1px 1px rgba(255,255,255,0.3);
 	}	
-
 
 input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 	background-color: white !important;
 	background: white !important;
 	}
 
-
 /*SVG*/
+
 path {
 	stroke-width: 1.5px;
-	}
-
-path {
-	/*-webkit-transition: fill-opacity 250ms ease;*/
-	/*transition: fill-opacity 250ms ease;*/
 	}
 		
 path:hover {
@@ -239,7 +231,6 @@ ul#checked p:before {
 	padding-left: 5px;
 	color: #fff;
 	font-size: 12px;
-//	text-shadow: #093B5C 0px -1px 1px;
 	}
 
 ul#checked p:after {
@@ -248,7 +239,6 @@ ul#checked p:after {
 	line-height: 23px;
 	color: #fff;
 	font-size: 12px;
-//	text-shadow: #093B5C 0px -1px 1px;
 	}
 
 .check { 
@@ -294,7 +284,6 @@ label.info {
 	top: 5px;
 	left: -17px;
 	position: relative;
-
 	top: 42px;
 	left: -31px;
 	position: absolute;	
@@ -376,7 +365,6 @@ label.info {
 	border-radius: 0;
 	padding: 6px !important;
 	height: 30px !important;
-//	margin-bottom: 10px !important;
 	margin-bottom: 10px;
 	margin-top: 0 !important;
 	}
@@ -396,11 +384,6 @@ label.info {
 	z-index: 99999;
 	}
 
-/* Button */
-/*.smap-button-white,
-.smap-button-gray,
-.share-image-download-button {
-	*/
 .smap-button-white {
 	height: 30px;
 	text-align: center;
@@ -422,9 +405,6 @@ label.info {
 	color: #666;
 	}
 
-/* Button */
-/*.smap-button-gray,
-.share-image-download-button {*/
 .smap-button-gray {	
 	@extend .smap-button-white;
 	background-color: rgba(0, 0, 0, 0.65);
@@ -497,7 +477,6 @@ label.info {
 	}
 
 .collapsed {
-	/*visibility: hidden;*/
 	display: none;
 	}
 
@@ -516,6 +495,160 @@ label.info {
 	text-align: center;
 	}
 
+.editor-wrapper h4 {
+	cursor: pointer;
+	}	
+
+.status-progress-bar {
+	position: absolute;
+	width: 0%;
+	top: 0px;
+	left: 0px;
+	z-index: 20000;
+	margin-left: 0px;
+	background: white;
+	float: left;
+	font-size: 12px;
+	line-height: 20px;
+	color: #fff;
+	text-align: center;
+	height: 5px;
+	-webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+	box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+	}
+
+.disabled {
+	opacity: 0.1;
+	height: 0px !important;
+	}	
+
+.disabled a {
+	opacity: 0;
+	}
+
+
+
+/* SWITCH */
+/* SWITCH */
+/* SWITCH */
+
+/*toggle switches Options/Settings*/
+.switch {
+	margin-top: 9px;
+	margin-left: 144px;
+	position: absolute;
+	}
+
+input.cmn-toggle-round-flat + label {
+	padding: 2px;
+	width: 64px;
+	height: 25px;
+	background-color: #C7C7C7;
+	border-radius: 60px;
+	transition: background 0.1s;
+	margin-top: -19px;
+	cursor: -webkit-grab;
+	}
+
+input.cmn-toggle-round-flat + label:active {
+	cursor: -webkit-grabbing;
+	}
+
+input.cmn-toggle-round-flat + label:before,
+input.cmn-toggle-round-flat + label:after {
+	display: block;
+	position: absolute;
+	content: "";
+	}
+
+input.cmn-toggle-round-flat + label:before {
+	top: 0px;
+	left: 0px;
+	bottom: 2px;
+	right: 2px;
+	background-color: #fff;
+	border-radius: 60px;
+	transition: background 0.1s;
+	width: 60px;
+	height: 21px;
+	position: relative;
+	}
+
+input.cmn-toggle-round-flat + label:after {
+	top: -19px;
+	left: -7px;
+	bottom: 4px;
+	width: 22px;
+	background-color: #dddddd;
+	border-radius: 52px;
+	transition: margin 0.1s, background 0.1s;
+	height: 17px;
+	margin-left: 10px;
+	position: relative;
+	}
+
+input.cmn-toggle-round-flat:checked + label {
+	background-color: #8ce196;
+	}
+
+input.cmn-toggle-round-flat:checked + label:after {
+	margin-left: 42px;
+	background-color: #8ce196;
+	}
+
+.settings-item {
+	position: relative !important;
+	height: 31px !important;
+	background: rgba(255,255,255,0.5) !important;
+	width: 210px !important;
+	margin-bottom: 1px !important;
+	left: 0px !important;
+	padding-top: 2px !important;
+	}
+
+.settings-item-title {
+	color: #333 !important;
+	font-weight: 400 !important;
+	line-height: 1.6 !important;
+	}
+
+.switch {
+	margin-left: 160px !important;
+	}
+
+.controls-switch {
+	top: 6px;
+	right: 6px;
+	pointer-events: none;
+	}
+
+input.cmn-toggle-round-flat:checked + label,
+input.cmn-toggle-round-flat:checked + label:after {
+	background-color: #666 !important;
+	}
+
+input.cmn-toggle-round-flat:checked + label:after {
+	margin-left: 28px !important;
+	}
+
+input.cmn-toggle-round-flat + label:after {
+	left: -22px !important;
+	top: -16px !important;
+	width: 18px !important;
+	height: 14px !important;
+	left: -8px !important;
+	}
+
+input.cmn-toggle-round-flat + label {
+	padding: 1px !important;
+	height: 20px !important;
+	width: 42px !important;	
+	}
+
+input.cmn-toggle-round-flat + label:before { 
+	height: 18px !important;
+	width: 40px !important;
+	}
 
 
 /*	
@@ -551,18 +684,6 @@ label.info {
 	margin-top: 150px;	
 	}
 
-/*#login-logo {
-	width: 390px;
-	height: 324px;
-	background-image: url(images/ruppellsgriffon_logo.png);
-	background-size: cover;
-	margin: auto;
-	position: relative;
-	top: -53px;
-	left: -11px;
-	}
-*/
-
 #login-logo {
 	width: 390px;
 	height: 324px;
@@ -573,7 +694,6 @@ label.info {
 	left: 0;
 	background-repeat: no-repeat;
 	}
-
 
 #login-button {
 	top: -3px;
@@ -649,12 +769,8 @@ label.info {
 	position: relative;
 	width: 100%;
 	height: 100%;
-/*	left: 36px;
-	top: 93px;*/
-
 	left: 105px;
 	top: 38px;
-
 	text-align: center;
 	display: block;
 	font-size: 42px;
@@ -729,7 +845,8 @@ label.info {
 	font-size: 30px;
 	font-weight: 200;
 	float: left;
-	padding-right: 22px;	
+	padding-right: 22px;
+	cursor: default;	
 	}
 
 .header-title {
@@ -756,10 +873,7 @@ label.info {
 	font-size: 16px;
 	font-weight: 400;
 	float: left;
-//	height: 55px;
 	height: 16px;
-
-
 	word-wrap: break-word;
 	position: relative;
 	left: inherit;
@@ -780,7 +894,6 @@ label.info {
 	left: inherit;
 	position: relative;
 	top: -9px !important;
-	/*position: absolute;*/
 	}	
 
 #header input {
@@ -832,13 +945,6 @@ label.info {
 	opacity: 0.7;
 	}
 
-
-.home-status {
-	-webkit-transition: height 250ms ease, opacity 250ms ease;
-	-moz-transition: height 250ms ease, opacity 250ms ease;
-	transition: height 250ms ease, opacity 250ms ease;
-	}
-
 .home-status {
 	position: relative;
 	bottom: 0px;
@@ -860,7 +966,6 @@ label.info {
 	}
 
 .home-status-inner {
-	/*border: 1px solid red;*/
 	position: absolute;
 	bottom: 5px;
 	width: 100%;

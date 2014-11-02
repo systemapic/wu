@@ -376,9 +376,11 @@ L.Control.CartoCSS = L.Control.extend({
 		if (!this._layer) return;
 
 		// fill with meta from store
-		var legends = this._layer.getLegends();	// as object!
+		this._legends = this._layer.getLegends();	// as object!
 
-		if (legends) return this.fillLegends(legends);
+
+
+		if (this._legends) return this.fillLegends(this._legends);
 
 		// fill with default
 		return this._initLegendsDefaultMeta();
@@ -419,12 +421,14 @@ L.Control.CartoCSS = L.Control.extend({
 		this._legendsTitle = Wu.DomUtil.create('div', 'legends-title', this._legendsWrapperInner);
 		this._legendsTitle.innerHTML = tooltipMeta.title;
 
+		this._legendsListWrapper = Wu.DomUtil.create('div', 'legends-list-wrapper', this._legendsWrapperInner);
+
 		// each legend
 		legends.forEach(function (legend) {
 
 			// append legend entry to wrapper
 			var legdiv = this._legendEntry(legend);
-			this._legendsWrapperInner.appendChild(legdiv);
+			this._legendsListWrapper.appendChild(legdiv);
 
 		}, this);
 
@@ -460,11 +464,15 @@ L.Control.CartoCSS = L.Control.extend({
 
 	_saveLegends : function () {
 
+		app.setSaveStatus(1000);
+
 		// get legends array
 		var legends = this._layer.getLegends();
 
 		// iterate
-		var childs = this._legendsWrapperInner.childNodes;
+		var childs = this._legendsListWrapper.childNodes;
+
+		// var child = childs[1];
 		for (var i = 0; i < childs.length; i++) {
 			var child = childs[i];
 
@@ -483,7 +491,7 @@ L.Control.CartoCSS = L.Control.extend({
 			
 		}
 
-		// save
+		// save to layer
 		this._layer.setLegends(legends);
 
 	},
@@ -518,7 +526,6 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// add help text
 		Wu.DomUtil.create('div', 'legends-default-box', this._legendsWrapper, 'No legends yet. Style the geo and magic will happen!');
-
 		
 	},
 
@@ -528,9 +535,8 @@ L.Control.CartoCSS = L.Control.extend({
 		var meta = this._layer.getMeta();
 		var metaFields = this._layer.getMetaFields();
 		
-		// generate layers on server from active fields
-		// this._layer.createLegends(this._createdLegends.bind(this));
-		this._layer.createLegends(function (ctx, json) {
+		// generate legends on server from active fields
+		this._layer.createLegends(function (ctx, json) {	// callback
 			var legends = JSON.parse(json);
 
 			// sort some things: #layer on top
@@ -539,11 +545,17 @@ L.Control.CartoCSS = L.Control.extend({
 			});
 			legends.unshift(layer[0]);
 
+			// include old legends settings
+			legends = this._includeLegendsSettings(legends);
+
 			// fill legends tab
 			this.fillLegends(legends);
 
 			// save to layer
 			this._layer.setLegends(legends);
+
+			// save local
+			this._legends = legends;
 
 
 		}.bind(this));
@@ -551,6 +563,21 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 
+	_includeLegendsSettings : function (newLegends) {
+		var oldLegends = this._legends;
+
+		// keep .on setting
+		newLegends.forEach(function (newlegend, i){
+			var oldlegend = _.find(oldLegends, function (o) {
+				return o.value == newlegend.value;
+			});
+
+			if (!oldlegend) return;
+			newLegends[i].on = oldlegend.on;
+		});
+
+		return newLegends;
+	},
 
 
 	_initTooltipStoredMeta : function (meta) {
@@ -770,6 +797,7 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// update legends tab 
 		this._updateLegends(result.cartoid);
+		
 	},
 
 	handleError : function (error) {

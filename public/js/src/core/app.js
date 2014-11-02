@@ -332,8 +332,8 @@ Wu.App = Wu.Class.extend({
 	setStatus : function (status, timer) {
 		app.StatusPane.setStatus(status, timer);
 	},
-	setSaveStatus : function () {
-		app.StatusPane.setSaveStatus();
+	setSaveStatus : function (delay) {
+		app.StatusPane.setSaveStatus(delay);
 	},
 
 

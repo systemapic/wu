@@ -1835,40 +1835,40 @@ L.Control.Draw.include({
 });
 
 
-// add to section wrapper instead of control corner
-L.Control.StyleEditor.include({
+// // add to section wrapper instead of control corner
+// L.Control.StyleEditor.include({
 
-	addTo : function (map) {
-		this._map = map;
+// 	addTo : function (map) {
+// 		this._map = map;
 
-		var container = this._container = this.onAdd(map),
-		    pos = this.getPosition(),
-		    corner = map._controlCorners[pos];
+// 		var container = this._container = this.onAdd(map),
+// 		    pos = this.getPosition(),
+// 		    corner = map._controlCorners[pos];
 
-		L.DomUtil.addClass(container, 'leaflet-control');
+// 		L.DomUtil.addClass(container, 'leaflet-control');
 
-		var sectionWrapper = this.options.container;
-		sectionWrapper.appendChild(container);
+// 		var sectionWrapper = this.options.container;
+// 		sectionWrapper.appendChild(container);
 
-		return this;
-	},
+// 		return this;
+// 	},
 
-	removeFrom: function (map) {
-		var pos = this.getPosition(),
-		    corner = map._controlCorners[pos];
+// 	removeFrom: function (map) {
+// 		var pos = this.getPosition(),
+// 		    corner = map._controlCorners[pos];
 
-		var sectionWrapper = this.options.container;
-		sectionWrapper.removeChild(this._container);
-		this._map = null;
+// 		var sectionWrapper = this.options.container;
+// 		sectionWrapper.removeChild(this._container);
+// 		this._map = null;
 
-		if (this.onRemove) {
-			this.onRemove(map);
-		}
+// 		if (this.onRemove) {
+// 			this.onRemove(map);
+// 		}
 
-		return this;
-	},
+// 		return this;
+// 	},
 
-});
+// });
 
 L.Popup.include({
 
@@ -8836,8 +8836,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	resetControls : function () {
 
-		console.log("------------> resetControls <------------------ ", this);
-
 		// remove old controls
 		delete this._drawControl;
 		delete this._drawControlLayer;
@@ -8880,7 +8878,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	disableInteraction : function (noDrag) {
-		// console.log('disableInteraction');
 		var map = this._map;
 		if (noDrag) map.dragging.disable();
 		map.touchZoom.disable();
@@ -8891,7 +8888,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	enableInteraction : function (noDrag) {
-		// console.log('enableInteraction');
 		var map = this._map;
 		if (noDrag) map.dragging.enable();
 		map.touchZoom.enable();
@@ -8965,7 +8961,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// create controls // todo: no info on type of place (city, neighbourhood, street), so not possible to set good zoom level
 		this.geolocationControl = new L.Control.Search({
-			url : 'http://nominatim.openstreetmap.org/search?format=json&q={s}',
+			url : 'https://nominatim.openstreetmap.org/search?format=json&q={s}',
 			jsonpParam : 'json_callback',
 			propertyName : 'display_name',
 			propertyLoc : ['lat','lon'],	
@@ -9067,13 +9063,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	enableCartocss : function () {
 
-		console.log('enable cartoCss');
-
-		console.log('******************************');
-		console.log('this.cartoCss', this.cartoCss);
-		console.log('******************************');
-
-
 		if (this.cartoCss) return;
 	
 		// create control
@@ -9091,7 +9080,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	disableCartocss : function () {
-		console.log('disable carto');
 
 		if (!this.cartoCss) return;
 
@@ -9160,30 +9148,28 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 	
 	enableVectorstyle : function (container) {
-		if (this.vectorStyle) return;
+		// if (this.vectorStyle) return;
 		
-		this.vectorStyle = L.control.styleEditor({ 
-			position: "topleft", 
-			container : container
-		});
+		// this.vectorStyle = L.control.styleEditor({ 
+		// 	position: "topleft", 
+		// 	container : container
+		// });
 		
-		this._map.addControl(this.vectorStyle);
+		// this._map.addControl(this.vectorStyle);
 	},
 
 	disableVectorstyle : function () {
-		if (!this.vectorStyle) return;
+		// if (!this.vectorStyle) return;
 
-		// remove vectorstyle control
-		this._map.removeControl(this.vectorStyle);             // todo: doesnt clean up after itself!
-		delete this.vectorStyle;   
+		// // remove vectorstyle control
+		// this._map.removeControl(this.vectorStyle);             // todo: doesnt clean up after itself!
+		// delete this.vectorStyle;   
 	},
 
 
 	enableDraw : function () {
 		if (this._drawControl) return;
 		
-		// cxxxx
-
 		// add draw control
 		this.addDrawControl();
 	},
@@ -9515,8 +9501,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	// set 3000ms save status
-	setSaveStatus : function () {
-		this.setStatus('Saved!');
+	setSaveStatus : function (delay) {
+		this.setStatus('Saved!', delay);
 	},
 
 	pushStatus : function (div) {
@@ -10824,6 +10810,8 @@ L.control.layermenu = function (options) {
 
 	updateZIndex : function () {
 
+		console.log('updateZIndex, this.layers:', this.layers);
+
 		// update zIndex for all layers depending on position in array
 		var length = this.layers.length;
 		this.layers.forEach(function (entry, i) {
@@ -11209,14 +11197,13 @@ L.control.description = function (options) {
 
 		// add html
 		container.innerHTML = ich.legendsControl(); 
-
-		// NB! content is not ready yet, cause not added to map! 
 	       
 		// create legendsOpener
 		this._legendsOpener = Wu.DomUtil.createId('div', 'legends-opener');
 		this._legendsOpener.innerHTML = 'Open Legends';
 		Wu.DomUtil.addClass(this._legendsOpener, 'opacitizer');
-		
+
+				
 		return container;
 
 	},
@@ -11240,9 +11227,7 @@ L.control.description = function (options) {
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent.on(this._legendsCollapser, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 
-		
-
-
+	
 	},
 
 	checkWidth : function() {
@@ -11251,7 +11236,7 @@ L.control.description = function (options) {
 		var maxWidth = window.innerWidth;
 
 		// Remove Layer Menu Width from window width, if it exists
-		if ( app.MapPane.layerMenu ) maxWidth -= 300;
+		if (app.MapPane.layerMenu) maxWidth -= 300;
 
 		// If the Legends slider is wider than the winodw, add the horizontal scroll buttons
 		if ( this.sliderWidth > maxWidth ) {
@@ -11262,33 +11247,15 @@ L.control.description = function (options) {
 			this._legendsScrollRight.style.display = 'none';			
 		}
 
-
-
 		// Check if the Layer Inspector EXISTS, so that we can add the correct padding to the legends menu
-		if ( app.MapPane.inspectControl ) {
-
-			// Layer inspector exists, but add padding to the legends only if the Layer menu is OPEN... 
-			// It's 290px when open, and 10px when closed, so I put 100 just in case...
-			if ( app.MapPane.inspectControl._container.offsetWidth >= 100 ) {
+		var inspectControl = app.MapPane.inspectControl;
+		if (inspectControl) {
+			if (inspectControl._container.offsetWidth >= 100 ) {
 				Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right');
 			}
-
 		} else {
 			Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right');
 		}
-
-		// // Check if the Layer Menu EXISTS, so that we can add the correct padding to the legends menu
-		// if ( app.MapPane.layerMenu ) {
-
-		// 	// Layer menu exists, but add padding to the legends only if the Layer menu is OPEN... 
-		// 	// It's 290px when open, and 10px when closed, so I put 100 just in case...
-		// 	if ( app.MapPane.layerMenu._container.offsetWidth >= 100 ) {
-		// 		Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right');
-		// 	}
-
-		// } else {
-		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right');
-		// }
 
 	},	
 
@@ -11346,8 +11313,8 @@ L.control.description = function (options) {
 			that._legendsOpener.removeAttribute('style');
 			that._legendsInner.removeChild(that._legendsOpener);
 
-			Wu.DomUtil.addClass(that._legendsCollapser, 'opacitizer');
 
+			Wu.DomUtil.addClass(that._legendsCollapser, 'opacitizer');
 			that._legendsCollapser.style.opacity = '1';
 			that._legendsCollapser.style.display = 'block';
 
@@ -11398,19 +11365,14 @@ L.control.description = function (options) {
 
 	addLegend : function (layer) {
 
-		console.log('running addLegend ~ looking for duplicates...')
-
 		var uuid = layer.store.uuid;
-		
 		var legends = layer.getLegends();
-		// console.log('addLegend!', layer, legend);
 		
 		// return if no legend
 		if (!legends) return;
 
 		// Make sure that the container is visible...
 		this._legendsContainer.style.display = 'block';
-
 
 		// create legends box
 	    	var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInnerSlider);
@@ -11425,7 +11387,7 @@ L.control.description = function (options) {
 		this._legendsInnerSlider.style.width = this.sliderWidth + 'px';
 
 
-	    	var legendWidth = div.offsetWidth; // (j)
+	    	var legendWidth = div.offsetWidth;
 
 		// add to local store
 		this.legends[uuid] = {
@@ -11445,20 +11407,14 @@ L.control.description = function (options) {
 	    	this.legendsCounter.push(tempObj);
 
 
-
-
-
-
 		// create legends divs
 		var b = Wu.DomUtil.create('div', 'legend-header', div);
 		this._legendsList = Wu.DomUtil.create('div', 'legend-list', div);
 
-
+		// create legends
 		legends.forEach(function (legend) {
-			console.log('_addLegend', legend);
 
 			// create legend divs
-
 			var d = Wu.DomUtil.create('div', 'legend-each', this._legendsList);
 			var e = Wu.DomUtil.create('div', 'legend-feature', d);
 			var f = Wu.DomUtil.create('img', 'legend-image1', e);
@@ -11472,7 +11428,7 @@ L.control.description = function (options) {
 
 		
 
-		// See if we need the horizontal scrollers or not!
+		// see if we need the horizontal scrollers or not
 		this.checkWidth();
 		this.calculateHeight();
 
@@ -11490,54 +11446,21 @@ L.control.description = function (options) {
 		var uuid = layer.store.uuid;
 		var legend = this.legends[uuid];
 
-
-		console.log('legend', legend);
-
-		if (!legend) { 
-			// this._legendsContainer.style.display = 'none'; 
-			return; 
-		}
-
-
-		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
-		// ADJUST THE LEGENDS SLIDER (HORIZONTAL SCROLLER)
-
-		var legendBounds = legend.div.getBoundingClientRect();
-
-		// If the legend was left of the wrapper box ...
-		if ( legendBounds.left < 0 ) {
-
-			// ... remove the CSS animation of the slider
-			Wu.DomUtil.removeClass(this._legendsInnerSlider, "legends-inner-slider-sliding");
-			 
-			// ... add the width of the legend to slider left
-			this._legendsInnerSlider.style.left = this._legendsInnerSlider.offsetLeft + legend.width + 'px';
-
-			// ... remove from the slider offset (counting how many legends that's overflowing to the left of wrapper)
-			this.sliderOffset--;
-		}
- 		
- 		// Hacky packy: add CSS animation to slider again
- 		var that = this;
-		setTimeout(function() {
-			Wu.DomUtil.addClass(that._legendsInnerSlider, "legends-inner-slider-sliding");
-		}, 500) 
-		
-		// END OF ADJUST LEGENDS SLIDER
-		// END OF ADJUST LEGENDS SLIDER
-
-
-		this.sliderWidth -= legend.width;     // ADDED BY JØRGEN
+		// return if no legend to remove
+		if (!legend) return; 
 
 		// Remove from array
-		for ( var i = 0; i<this.legendsCounter.length; i++ ) {
-			if ( this.legendsCounter[i].id == uuid ) this.legendsCounter.splice(i, 1);
+		for (var i = 0; i < this.legendsCounter.length; i++) {
+			if (this.legendsCounter[i].id == uuid) this.legendsCounter.splice(i, 1);
 		}
 		
+		// adjust legend slider
+		this._adjustLegendSlider(legend);
+
 		// Set the width of the inner slider... (j)
 		this._legendsInnerSlider.style.width = this.sliderWidth + 'px';
 	    
-
+	    	// remove div
 		var div = legend.div;
 		Wu.DomUtil.remove(div);
 		delete this.legends[uuid];
@@ -11548,20 +11471,48 @@ L.control.description = function (options) {
 		// Store legends height
 		this.calculateHeight();
 
-
 		// Hide legends if it's empty
-		if ( this.legendsCounter.length == 0 ) this._legendsContainer.style.display = 'none';
+		if (this.legendsCounter.length == 0) this._legendsContainer.style.display = 'none';
 		
+	},
 
+
+	_adjustLegendSlider : function (legend) {
+
+		// adjust the legends slider (horizontal scroller)
+		var legendBounds = legend.div.getBoundingClientRect();
+
+		// if the legend was left of the wrapper box
+		if (legendBounds.left < 0) {
+
+			// remove the CSS animation of the slider
+			Wu.DomUtil.removeClass(this._legendsInnerSlider, "legends-inner-slider-sliding");
+			 
+			// add the width of the legend to slider left
+			this._legendsInnerSlider.style.left = this._legendsInnerSlider.offsetLeft + legend.width + 'px';
+
+			// remove from the slider offset (counting how many legends that's overflowing to the left of wrapper)
+			this.sliderOffset--;
+		}
+ 		
+ 		// Hacky packy: add CSS animation to slider again
+ 		var that = this;
+		setTimeout(function() {
+			Wu.DomUtil.addClass(that._legendsInnerSlider, "legends-inner-slider-sliding");
+		}, 500);
+		
+		// adjust slide width
+		this.sliderWidth -= legend.width; 
 
 	},
 
 	legendsScrollLeft : function () {
 
-
+		// return if no scrolling
 		if (this.scrolling) return;
 		
-		if ( this.sliderOffset >= 1 ) {
+		// set offsets
+		if (this.sliderOffset >= 1) {
 
 			this.sliderOffset--;
 			var mover = this.legendsCounter[this.sliderOffset].width;
@@ -11574,22 +11525,21 @@ L.control.description = function (options) {
 			setTimeout(function () {
 				that.scrolling = false;
 			}, 500);
-
 		}
-		
 	},
 
 	legendsScrollRight : function () {
 
-	
+		// return if no scrolling
 		if (this.scrolling) return;
 
-		if ( this.sliderOffset <= this.legendsCounter.length-1 ) {
+		// set offsets
+		if (this.sliderOffset <= this.legendsCounter.length-1) {
 			var mover = this.legendsCounter[this.sliderOffset].width;        
 			var tempLeft = this._legendsInnerSlider.offsetLeft;
 			var rightOffset = this._legendsInner.offsetWidth - (this._legendsInnerSlider.offsetWidth + tempLeft);
 
-			if ( rightOffset <= 0 ) {
+			if (rightOffset <= 0) {
 
 				this._legendsInnerSlider.style.left = tempLeft - mover + 'px';
 				this.sliderOffset++;
@@ -11601,9 +11551,7 @@ L.control.description = function (options) {
 					that.scrolling = false;
 				}, 500);
 			}
-
 		}
-
 	},
 
 	calculateHeight : function() {
@@ -11614,8 +11562,6 @@ L.control.description = function (options) {
 		this._openWidth 	= this._legendsInner.offsetWidth;
 
 		app.StatusPane.setContentHeights();
-		// if (app.SidePane.Map) app.SidePane.Map.setContentHeight();
-		// if (app.SidePane.Clients) app.SidePane.Clients.setContentHeight();
 	}
 
 
@@ -13295,8 +13241,6 @@ L.control.baselayerToggle = function (options) {
 		this.layer.addTo(map);
 
 		// add gridLayer if available
-		console.log('this.gridLayer', this.gridLayer);
-		// if (this.gridLayer) this.gridLayer.addTo(map);
 		if (this.gridLayer) map.addLayer(this.gridLayer);
 
 		// add legends if active
@@ -13332,9 +13276,18 @@ L.control.baselayerToggle = function (options) {
 		this.layer.setOpacity(this.opacity);
 	},
 
+	// setZIndex : function (zIndex) {
+	// 	this.zIndex = zIndex || 1;
+	// 	this.layer.setZIndex(this.zIndex);
+	// },
+
 	setZIndex : function (zIndex) {
-		this.zIndex = zIndex || 1;
-		this.layer.setZIndex(this.zIndex);
+		this.store.zIndex = zIndex;
+		this.save('zIndex');
+	},
+
+	getZIndex : function () {
+		return this.store.zIndex;
 	},
 
 	getOpacity : function () {
@@ -14016,15 +13969,15 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		app.ProgressBar.hideProgress();
 	},
 
-	setZIndex : function (zIndex) {
+	// setZIndex : function (zIndex) {
 
-		// set zIndex for now or later
-		this.zIndex = zIndex || 1;
+	// 	// set zIndex for now or later
+	// 	this.zIndex = zIndex || 1;
 
-		// return if not yet loaded
-		if (!this.loaded) return;
+	// 	// return if not yet loaded
+	// 	if (!this.loaded) return;
 
-	},
+	// },
 
 	getContainer : function () {
 
@@ -18292,8 +18245,8 @@ Wu.App = Wu.Class.extend({
 	setStatus : function (status, timer) {
 		app.StatusPane.setStatus(status, timer);
 	},
-	setSaveStatus : function () {
-		app.StatusPane.setSaveStatus();
+	setSaveStatus : function (delay) {
+		app.StatusPane.setSaveStatus(delay);
 	},
 
 

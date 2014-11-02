@@ -34,8 +34,6 @@ Wu.Layer = Wu.Class.extend({
 		this.layer.addTo(map);
 
 		// add gridLayer if available
-		console.log('this.gridLayer', this.gridLayer);
-		// if (this.gridLayer) this.gridLayer.addTo(map);
 		if (this.gridLayer) map.addLayer(this.gridLayer);
 
 		// add legends if active

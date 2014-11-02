@@ -145,13 +145,6 @@ module.exports = api = {
 
 
 
-
-
-
-
-
-
-
 	reloadMeta : function (req, res) {
 
 		var fileUuid = req.body.fileUuid;
