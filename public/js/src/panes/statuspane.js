@@ -174,8 +174,8 @@ Wu.StatusPane = Wu.Class.extend({
 	},
 
 	// set 3000ms save status
-	setSaveStatus : function () {
-		this.setStatus('Saved!');
+	setSaveStatus : function (delay) {
+		this.setStatus('Saved!', delay);
 	},
 
 	pushStatus : function (div) {

@@ -401,15 +401,17 @@
 	left: auto;
 	text-transform: uppercase;
 	text-align: center;
-	background: white;
-	/*height: 27px;*/
+	/*background: white;*/
 	height: 24px;
-
 	line-height: 2.2;
 	font-weight: $obese;
-	border-bottom: 1px solid #CACACA;
-	box-shadow: 0 0 5px rgba(0,0,0,0.3);
-	margin-top: 0px;	
+	/*border-bottom: 1px solid #CACACA;*/
+	/*box-shadow: 0 0 5px rgba(0,0,0,0.3);*/
+	margin-top: 0px;
+
+	border-bottom: none;
+	box-shadow: none;
+	background: rgba(255, 255, 255, .93);	
 	}	
 	
 
@@ -1088,6 +1090,9 @@
 	cursor: pointer;
 	background-color: transparent;
 	opacity: 0.5 !important;
+
+	left: 4px;
+	opacity: 0.5;	
 	}
 
 #description-toggle-button:hover {
@@ -1133,11 +1138,13 @@
 	width: 258px;
 	padding-bottom: 10px;
 	margin-top: 10px;
+	cursor: pointer;
 	}	
 
 /* When editin description box */
 .description-editing { 
 	background-color: rgba(132, 236, 255, 0.93) !important
+	cursor: text;
 	}
 
 
@@ -1208,18 +1215,26 @@
 
 /* Layer menu title */
 .layer-menu-header-title {
-	width: 280px
+	width: 280px;
+	font-size: 120%;
+	font-weight: 500;
+	cursor: default;	
 	}
 
 /* Layer menu collapse button */
 #bhattan1 {
 	position: absolute;
-	top: 3px;
-	left: 5px;
+	/*top: 3px;*/
+	/*left: 5px;*/
 	cursor: pointer;
 	background-position: -26px 8px;
 	background-color: transparent;
 	opacity: 0.5 !important;
+
+
+	right: 7px;
+	top: 7px;
+	left: auto;	
 	}
 
 #bhattan1:hover {
@@ -1253,16 +1268,15 @@
 	text-shadow: none;
 	color: white;
 	margin-bottom: 1px;
-	/*background-color: #34576a;*/
-	background-color: #3F9A82 !important;
-	font-size: 13px;
-	/*height: 25px;*/
-	height: 30px !important;
+	background-color: #3f8f9a !important;
+	height: 30px;
+	font-size: 127%; 
 	}
 
 /* Layer Folder color coding */
 .layer-menu-item-wrap.menufolder.level-0 {
-	background-color: #3B596A !important;
+	/*background-color: #3B596A !important;*/
+	background-color: #3b596a !important;
 	}
 
 .layer-menu-item-wrap.menufolder.level-1 {
@@ -1274,8 +1288,7 @@
 	}
 
 .layer-active {
-	/*background-color: #315949;	*/
-	background-color: #AB3454 !important;
+	background-color: #98367d !important;	
 	}
 
 /* Layer item open */
@@ -1298,7 +1311,6 @@
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	z-index: 2222;
-	/*line-height: 1.2;*/
 	line-height: 1.3 !important;
 	}	
 
@@ -1341,7 +1353,6 @@
 .level-4 {
 	margin-left: 100px;
 	}
-
 
 
 /* Open layer menu */
@@ -1912,19 +1923,6 @@
 	box-shadow: 0 0 2px 0 rgba(0,0,0,0.3);
 	}
 
-
-/*
-// bluelines.png
-// cpattern.png
-// crazypattern.png
-// diagonalDots.png
-// diagonalStripes.png
-// dots.png
-// honeycomb.png
-// lines1.png
-*/
-
-
 .SVGpattern1 {
 	background-image: url(images/patternPics/SVGpattern1.png);
 	}
@@ -1960,16 +1958,644 @@
 
 
 
+/* search-tooltip */
+/* search-tooltip */
+/* search-tooltip */
+
+.leaflet-control-search {
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	background-color: rgba(255, 255, 255, 1) !important;
+	opacity: 1 !important;
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) !important;
+	height: 26px !important;	
+	}
+
+.leaflet-control-search .search-button {
+	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon.png') no-repeat 2px -22px !important;
+	}
+
+.leaflet-control-search .search-button:hover {
+	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon.png') no-repeat 2px 2px !important;
+	}
+
+.search-tooltip	{
+	min-width: none !important;
+	max-height: none !important;
+	background-color: white !important;
+	top: 29px !important;
+	padding: 5px !important;
+	opacity: 0.9 !important;	
+	}
+
+.leaflet-control-search .search-tip {
+	border-radius: 0 !important;
+	}
+
+.leaflet-control-search .search-input {
+	border: none !important;
+	height: 20px;
+	padding-right: 20px;
+	}
+
+.share-image-download-button {
+	@extend .smap-button-gray;
+	border: none !important;
+	line-height: 0.6 !important;
+	}
+
+
+/* SETTINGS */
+/* SETTINGS */
+/* SETTINGS */
+
+
+.settings-outer {
+	position: relative;
+	overflow: hidden;
+	height: 0;
+	}
+
+.settings-wrapper {
+	position: absolute;
+	top: 0px !important;
+	}
+
+.settings-item {
+	position: relative;
+	height: 40px;
+	}
+
+.settings-item-title {
+	position: absolute;
+	font-size: 110%;
+	left: 10px;
+	width: 129px;
+	color: rgb(27, 27, 27);
+	font-weight: 400;
+	}
+
+
+
+/*
+ ██████╗ █████╗ ██████╗ ████████╗ ██████╗  ██████╗███████╗███████╗
+██╔════╝██╔══██╗██╔══██╗╚══██╔══╝██╔═══██╗██╔════╝██╔════╝██╔════╝
+██║     ███████║██████╔╝   ██║   ██║   ██║██║     ███████╗███████╗
+██║     ██╔══██║██╔══██╗   ██║   ██║   ██║██║     ╚════██║╚════██║
+╚██████╗██║  ██║██║  ██║   ██║   ╚██████╔╝╚██████╗███████║███████║
+ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝  ╚═════╝╚══════╝╚══════╝
+ */
+
+/* CartoCSS */
+/* CartoCSS */
+/* CartoCSS */
+
+.leaflet-control-cartocss {
+	width: 26px;
+	height: 26px !important;
+	background-color: white;
+	margin-bottom: 3px;
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+	cursor: pointer;
+	position: relative;
+	}
+
+.cartocss-toolbar-button {
+	width: 26px;
+	height: 26px !important;
+	position: absolute;
+	top: 0;
+	left: 0;
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) !important;
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: 2px -271px;	
+	}
+
+.cartocss-toolbar-button:hover {
+	background-color: #f4f4f4;
+	}
+
+.cartocss-control-container.open {
+	width: 400px;
+	height: 100%;
+	position: absolute;
+	right: 6px;
+	top: 0;
+	padding-top: 91px;
+	padding-bottom: 6px;
+	box-sizing: border-box;
+	z-index: 99999999;
+	}
+
+.cartocss-control-wrapper {
+	background-color: white;
+	height: 100%;
+	padding: 6px;
+	position: relative;
+	padding-bottom: 122px;
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
+	cursor: default;
+	pointer-events: all;
+	}
+
+.cartocss-attributes {
+	width: 100%;
+	height: 33%;
+	background: rgba(0,0,0,0.2);
+	margin-bottom: 5px;
+	margin-top: 5px;
+	}
+
+.cartocss-header-select {
+	position: relative;
+	bottom: -4px;
+	}
+
+.cartocss-header-attrib {	
+	position: relative;
+	bottom: -4px;
+	margin-top: 25px;
+	}
+
+.cartocss-input {
+	width: 100%;
+	height: 100%;
+	border: 1px solid gray !important;
+	}	
+
+.cartocss-form-wrapper {
+	width: 100%;
+	height: 100%;
+	top: 0px;
+	position: relative;
+	width: 387px;
+	}
+
+.cartocss-layerselector-outer {
+	width: 414px;
+	position: absolute;
+	margin-top: 5px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding: 0;
+	padding-right: 25px;
+	margin-bottom: 6px;
+	top: 31px;
+	z-index: 999;
+	height: 0px;	
+	}
+
+
+.cartocss-layerselector-outer .layer-selector-item-wrap {
+	background: rgba(255,255,255,0.9);
+	height: 25px;
+	padding: 2px;
+	padding-left: 5px;
+	padding-right: 5px;
+	font-size: 13px;
+	font-weight: 500;
+	cursor: pointer;
+	width: 385px;
+	z-index: 999;
+	position: relative;
+	margin: 2px;
+	top: 2px;
+	margin-bottom: 1px;
+	margin-top: 1px;
+	}	
+
+.cartocss-layerselector-outer .layer-selector-item-wrap:hover {
+	background: rgba(255,255,255,1);
+	}
+
+.cartocss-layerselector {
+	position: relative;
+	background: #B8B8B8;
+	padding-bottom: 3px;
+	width: 389px;
+	}	
+
+.cartocss-update-button {
+	background: rgba(0, 0, 0, 0.2);
+	width: 289px;
+	height: 30px;
+	position: absolute;
+	bottom: 15px;
+	border-radius: 2px;
+	cursor: pointer;
+	left: 55px;
+	text-align: center;
+	line-height: 1.9;
+	font-size: 15px;
+	font-weight: 500;
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0.1);
+	}
+
+.cartocss-update-button:hover {
+	background: rgba(0, 0, 0, 0.225);	
+	}
+
+.cartocss-style-header {
+	font-size: 12px;
+	font-weight: 400;
+	margin-bottom: 0px;
+	position: relative;
+	color: #333;
+	}
+
+.cartocss-style-header-layer {
+	font-size: 14px;
+	font-weight: 500;
+	margin-bottom: 5px;
+	position: relative;
+	top: 0px;
+	background: rgba(0, 0, 0, 0.15);
+	height: 25px;
+	cursor: pointer;
+	color: #333;
+	line-height: 1.7;
+	padding-left: 26px;
+	padding-right: 26px;
+	overflow: hidden;
+	}
+
+.cartocss-style-header-layer:hover {
+	background: rgba(0,0,0,0.2);	
+	}	
+
+.cartocss-style-header-wrapper {
+	margin-top: 1px;
+	margin-bottom: 0px;
+	text-align: center;
+	width: 328px;
+	position: relative;
+	left: 30px;
+	}
+
+/* CODE MIRROR */
+
+.CodeMirror { 
+		height: 100%;
+		border: 1px solid #ddd;
+		visibility: visible !important;
+		position: relative !important;
+		top: 0 !important;
+        }
+
+.CodeMirror pre { 
+        padding-left: 7px; 
+        line-height: 1.25; 
+        }
+
+.close-cartocss-editor-x {
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	width: 20px;
+	height: 20px;
+	border-radius: 0;
+	background-position: -27px -43px;
+	right: 6px;
+	position: absolute;
+	top: 9px;
+	cursor: pointer;
+	background-color: transparent;
+	opacity: 0.5;
+	z-index: 999;
+	}
+
+.close-cartocss-editor-x:hover {
+	opacity: 0.7;
+	}
+
+
+.sp-picker-container, .sp-palette-container {
+	padding-bottom: 6px !important;
+	margin: 0 !important;
+	padding: 10px;
+	border: 0;
+	}
+
+.sp-container {
+	border: none;
+	}
+
+.sp-cancel,
+.sp-cancel:hover {
+	background: rgba(255,255,255,0.5);
+	height: 22px;
+	bottom: 6px;
+	position: absolute;
+	left: 77px;
+	text-shadow: none;
+	color: white !important;
+	font-weight: 900;
+	font-size: 12px;
+	font-family: helvetica neue;
+	width: 49px;
+	text-align: center;
+	text-decoration: none;
+	line-height: 2;
+	border: none;
+	}
+
+.sp-container button,
+.sp-container button:hover {
+	background: rgba(255,255,255,0.5);
+	border: none;
+	position: absolute;
+	bottom: 6px;
+	right: 9px;
+	height: 26px;
+	border-radius: 0 2px 2px 0;
+	text-shadow: none;
+	color: white !important;
+	font-weight: 900;
+	font-size: 12px;
+	font-family: helvetica neue;
+	line-height: 1.45;
+	border: none;
+	}
+
+.sp-container button:hover,
+.sp-cancel:hover {
+	background: rgba(255,255,255,0.6) !important;
+	}
+
+.vt-selected {
+	background: #badfdf !important;
+	}
+
+.vt-selected:hover {
+	background: #C3E8E8 !important;
+	}
+
+.cartocss-style-dropdown-arrow {
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: 0px 0px;
+	width: 13px;
+	height: 10px;
+	position: absolute;
+	top: 10px;
+	left: 8px;
+	opacity: 0.7;
+	pointer-events: none;
+	}
+
+.cartocss-style-header-wrapper:hover > .cartocss-style-dropdown-arrow { 
+	opacity: 1;
+	} 
+
+.carrow-flipped {
+	background-position: 0px -13px;
+	}
+
+/*codemirror*/
+.gutter-syntax-error {
+	background-color: rgb(255, 254, 189);
+	}
+
+
+.cartocss-error-pane {
+	border-top: 1px solid #FFAAAA;
+	display: none;
+	margin-top: 5px;
+	position: absolute;
+	background: #fffebd;
+	color: red;
+	height: 25px;
+	padding-left: 7px;
+	padding-top: 3px;
+	left: 7px;
+	width: 387px;
+	bottom: 60px;
+	z-index: 999;
+	}
+
+.active-error {
+	display: block;
+	}
+
+.cartocss-zoomval {
+	position: absolute;
+	width: 26px;
+	text-align: center;
+	top: 7px;
+	left: 6px;
+	height: 25px;
+	line-height: 2.2;
+	background: #ECECEC;
+	font-size: 11px;
+	font-weight: 500;
+	}
+
+.cartocss-tab-wrapper {
+	width: 389px;
+	border: 1px solid #ddd;
+	border-bottom: none;
+	height: 30px;
+	}	
+
+.cartocss-tab {
+	width: 129px;
+	float: left;
+	text-align: center;
+	height: 29px;
+	line-height: 2.2;
+	font-size: 13px;
+	background: #EEE;
+	cursor: pointer;
+	}
+
+.cartocss-tab:hover {
+	background: #F6F6F6;
+	}
+
+.cartocss-active-tab {
+	background: #FFF;
+	}
+
+.cartocss-active-tab:hover {
+	background: #FFF;
+	}
+
+.cartocss-tab-styling {
+	border-right: 1px solid #ddd;
+	}
+
+.cartocss-tab-legends {
+	border-left: 1px solid #ddd;
+	}
+
+.cartocss-legends-wrapper {
+	width: 389px;
+	background: #f8f8f8;
+	height: 100%;
+	border: 1px solid #ddd;
+	}
+
+.cartocss-tooltip-outer-wrapper {
+	width: 389px;
+	background: #f8f8f8;
+	height: 100%;
+	border: 1px solid #ddd;
+	padding: 2px;
+	overflow: hidden;
+	}
+
+.cartocss-tooltip-wrapper {
+	width: 410px;
+	padding-right: 28px;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	height: 100%;
+	}
+
+.tooltip-field-wrapper .controls-switch {
+	top: 4px;
+	pointer-events: all;
+	}
+
+.tooltip-field-wrapper {
+	position: relative;
+	padding: 5px;
+	background: rgba(0, 0, 0, 0.1);
+	margin: 2px;
+	width: 378px;
+	}
+	
+.tooltip-field-key {
+	width: 318px;
+	display: inline-block;
+	vertical-align: top;
+	border: none;
+	outline: none;
+	padding: 2px;
+	padding-left: 5px;
+	background: rgba(255,255,255,0.5);
+	}
+
+.tooltip-field-value {
+	display: inline-block;
+	vertical-align: top;
+	}
+
+#cartocss-tooltip-custom-header,
+.legends-title {
+	width: 379px;
+	border: 0;
+	outline: 0;
+	background: rgba(0,0,0,0.1);
+	margin: 2px;
+	margin-top: 4px;
+	padding: 5px;
+	font-size: 15px;
+	padding-left: 8px;
+	margin-left: 2px;
+	}
+
+.tooltip-title {
+	font-size: 18px;
+	margin: 0;
+	position: relative;
+	top: -8px;
+	font-weight: 500;
+	border-bottom: 1px solid rgba(255,255,255,0.3);
+	}
+
+.leaflet-popup-content {
+	padding: 10px 36px 15px 2px;
+	}	
 
 
 
 
 
+/* Legends */
+/* Legends */
+/* Legends */
 
+/* outer */
+.cartocss-legends-wrapper {
+	width: 389px;
+	background: #f8f8f8;
+	height: 100%;
+	border: 1px solid #ddd;
+	padding: 2px;
+	overflow: hidden;
+	}
 
+/* inner */
+.legends-inner-scroller {
+	width: 410px;
+	padding-right: 28px;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	height: 100%;
+	}
 
+.legend-entry-wrap {
+	position: relative;
+	padding: 5px;
+	background: rgba(0, 0, 0, 0.1);
+	margin: 2px;
+	width: 378px;
+	}
 
+.legend-entry-image {
+	width: 25px;
+	height: 19px;
+	display: inline-block;
+	vertical-align: top;
+	overflow: hidden;
+	background-repeat: repeat;
+	background-position: 0 0;
+	border: 1px solid;
+	}
 
+.legend-image1,
+.legend-image2 {
+	position: relative;
+	top: -41px;	
+	left: -8px;
+	}
 
+.legend-image1 {
+	-moz-transform: scaleY(-1);    /* Gecko */
+	-o-transform: scaley(-1);      /* Operah */
+	-webkit-transform: scaleY(-1); /* webkit */
+	transform: scaleY(-1);         /* standard */
+	}
+
+.legend-entry-key {
+	display: inline-block;
+	vertical-align: top;
+	width: 120px;
+	padding-left: 10px;
+	font-style: italic;
+	font-size: 13px;
+	font-weight: 500;
+	overflow: hidden;
+	}
+
+.legend-entry-value {
+	display: inline-block;
+	vertical-align: top;
+	font-size: 13px;
+	font-weight: 500;
+	width: 165px;
+	padding-left: 5px;
+	overflow: hidden;
+	}
+
+.legend-entry-wrap .controls-switch {
+	top: 2px;
+	pointer-events: all;
+	}
 
 

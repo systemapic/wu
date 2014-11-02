@@ -7,6 +7,48 @@
  ╚══▀▀═╝       ╚══════╝╚═════╝ ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
 */
 
+
+.active-project {
+	background: rgba(255, 255, 255, 0.5);
+	}
+
+.active-project:hover {
+	background: rgba(255, 255, 255, 0.8);
+	}
+
+.project-edit-textarea {
+	background: rgba(0,0,0,0);
+	border: none;
+	height: 43px;
+	width: 116px;
+	overflow: hidden;
+	resize: none;
+	margin-left: -2px;
+	margin-top: -2px;
+	font-weight: 400;
+	font-size: 12px;
+	line-height: 1.2;
+	}
+
+.drop-meta-wrapper {
+	height: 400px;
+	position: absolute;
+	top: 410px;
+	left: 100px;
+	padding: 20px;
+	font-size: 230%;
+	color: white;
+	}
+
+#collapse-descripton {
+	font-size: 120%;
+	font-weight: 500;
+	cursor: default;
+	}
+
+		
+
+
 /* Outer wrapper */
 .q-editor-container {
 	position: absolute;
@@ -955,6 +997,15 @@
 	height: 0px;
 	}
 
+#editor-map-controls-inner-wrap .item-list.active {
+	background: rgba(255, 255, 255, 0.4) !important;
+	}
+
+#editor-map-controls-inner-wrap .item-list {
+	color: #333;
+	}
+
+
 .controls-title {
 	height: 32px;
 	padding: 8px;
@@ -1263,6 +1314,8 @@
 	margin-left: 10px;
 	}
 
+
+
 /* GRANDE STUFF */
 
 .text-menu .options .url {
@@ -1441,6 +1494,16 @@ button.image-attachment {
 	font-weight: 400;
 	font-size: 90%;
 	}
+
+
+#document-container-textarea img {
+	width: auto;
+	height: 200px;
+	float: left;
+	margin: 10px;
+	margin-left: 0px;
+	}
+
 
 
 /*
@@ -2111,3 +2174,232 @@ button.image-attachment {
 
 
 
+/* SHARE */
+/* SHARE */
+/* SHARE */
+
+.q-editor-content-item.share {
+	min-height: 420px;
+	}
+
+.share-wrapper {
+	height: 240px;
+	cursor: default;
+	}
+
+.share-wrap {
+	position: relative;
+	cursor: pointer;
+	}
+
+.share-title {
+	margin: 5px;
+	height: 30px;
+	padding: 4px;
+	text-align: center;
+	font-weight: 500;
+	cursor: pointer;
+	position: absolute;
+	}
+
+.share-title {
+	top: 0px;
+	left: 66px;
+	font-size: 120%;
+	margin: 0px;
+	}
+
+.share-header {
+	font-size: 170%;
+	font-weight: 500;
+	position: relative;
+	text-align: left;
+	padding-bottom: 10px;
+	margin-top: 2px;
+	padding-left: 11px;
+	}
+
+.share-subtitle {
+	font-size: 100%;
+	}
+
+.share-subtitle {
+	margin: 0px;
+	height: 30px;
+	padding: 4px;
+	text-align: left;
+	font-weight: 400;
+	cursor: pointer;
+	position: absolute;
+	top: 20px;
+	left: 66px;
+	font-size: 100%;
+	}
+
+.share-screenshot-button:hover {
+	background: rgba(195, 195, 195, 0.2);
+	}
+
+.share-print-button {
+	margin: 5px;
+	height: 30px;
+	padding: 4px;
+	text-align: center;
+	font-weight: 500;
+	cursor: pointer;
+	}
+
+.share-print-button:hover {
+	background: rgba(195, 195, 195, 0.2);
+	}
+
+.share-icon-box {
+	height: 50px;
+	width: 50px;
+	border: 1px solid gray;
+	margin: 10px;
+	}
+
+.share-link-wrap {
+	padding: 10px;
+	}
+
+.share-link-title {
+	font-size: 120%;
+	}
+
+.share-link-input {
+	border: 1px solid rgba(128, 128, 128, 0.32);
+	padding: 10px;
+	width: 100%;
+	background: rgba(255, 0, 0, 0);
+	border-radius: 1px;
+	color: gray;
+	}
+
+.share-image-wrap {
+	position: absolute;
+	left: 275px;
+	width: 487px;
+	height: 500px;
+	top: 33px;
+	}
+
+.share-image-title {
+	font-size: 120%;
+	padding: 10px;
+	}
+
+.share-image-image {
+	height: 80%;
+	width: 100%;
+	position: absolute;
+	top: 46px;
+	background-repeat: no-repeat;
+	}
+
+.share-image-meta-wrap {
+	bottom: 0;
+	position: absolute;
+	height: 50px;
+	width: 100%;
+	}
+
+.share-image-download-button {
+	bottom: 0px;
+	position: absolute;
+	right: 0px;
+	padding: 10px;
+	}
+
+.share-image-download-button {
+	border: 1px solid red;
+	padding: 10px;
+	}
+
+.share-print-download-button {
+	padding: 10px;
+	}
+
+.expand-share-link {
+	height: 350px;
+	}
+
+.expand-share-image {
+	height: 600px;
+	width: 800px;
+	}
+
+
+
+
+/*Start pane*/
+/*Start pane*/
+/*Start pane*/
+
+#start-pane {
+	position: absolute;
+	margin: auto;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	padding-top: 300px;
+	}
+
+.start-pane-project {
+	display: inline-block;
+	width: 250px;
+	vertical-align: top;
+	height: 201px;
+	padding: 0px;
+	margin: 12px;
+	text-align: left;
+	background: rgba(255,255,255,0.8);
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+	position: relative;
+	}
+
+.start-pane-project:hover {
+	background: white;
+	}	
+
+.start-pane-project:active {
+	box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.1);
+	}
+
+.start-project-name {
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.1;
+	padding: 4px;
+	padding-top: 2px;
+	height: 38px;
+	overflow: hidden;
+	position: absolute;
+	bottom: 4px;
+	width: 100%;
+	padding-left: 6px;
+	padding-right: 10px;
+	text-align: center;
+	border-top: 1px solid rgba(0,0,0,0.05);
+	color: #666;
+	}	
+
+.start-project-short-name {
+	height: 38px;
+	padding-top: 7px;
+	line-height: 1.7;
+	}	
+
+.start-project-image {
+	height: 156px;
+	overflow: hidden;	
+	}
+
+.start-pane-project img {
+	width: 244px;
+	position: relative;
+	left: 3px;
+	top: 3px;
+	}	

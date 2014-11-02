@@ -516,7 +516,7 @@ Wu.MapPane = Wu.Class.extend({
 
 		// create controls // todo: no info on type of place (city, neighbourhood, street), so not possible to set good zoom level
 		this.geolocationControl = new L.Control.Search({
-			url : 'http://nominatim.openstreetmap.org/search?format=json&q={s}',
+			url : 'https://nominatim.openstreetmap.org/search?format=json&q={s}',
 			jsonpParam : 'json_callback',
 			propertyName : 'display_name',
 			propertyLoc : ['lat','lon'],	
@@ -703,22 +703,22 @@ Wu.MapPane = Wu.Class.extend({
 	},
 	
 	enableVectorstyle : function (container) {
-		if (this.vectorStyle) return;
+		// if (this.vectorStyle) return;
 		
-		this.vectorStyle = L.control.styleEditor({ 
-			position: "topleft", 
-			container : container
-		});
+		// this.vectorStyle = L.control.styleEditor({ 
+		// 	position: "topleft", 
+		// 	container : container
+		// });
 		
-		this._map.addControl(this.vectorStyle);
+		// this._map.addControl(this.vectorStyle);
 	},
 
 	disableVectorstyle : function () {
-		if (!this.vectorStyle) return;
+		// if (!this.vectorStyle) return;
 
-		// remove vectorstyle control
-		this._map.removeControl(this.vectorStyle);             // todo: doesnt clean up after itself!
-		delete this.vectorStyle;   
+		// // remove vectorstyle control
+		// this._map.removeControl(this.vectorStyle);             // todo: doesnt clean up after itself!
+		// delete this.vectorStyle;   
 	},
 
 
