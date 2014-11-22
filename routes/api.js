@@ -57,6 +57,7 @@ var FILEFOLDER 		= '/var/www/data/files/';
 var IMAGEFOLDER 	= '/var/www/data/images/';
 var TEMPFOLDER 		= '/var/www/data/tmp/';
 var CARTOCSSFOLDER 	= '/var/www/data/cartocss/';
+var TOOLSPATH 		= '/var/www/systemapic.com/app/tools/';
 
 
 // default mapbox account
@@ -951,7 +952,8 @@ module.exports = api = {
 
 		console.log('-> PDF args: ', args);
 
-		var cmd = "phantomjs --ssl-protocol=tlsv1 /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
+		var snappath = TOOLSPATH + 'phantomJS-snapshot.js';
+		var cmd = "phantomjs --ssl-protocol=tlsv1 " + snappath + " '" + JSON.stringify(args) + "'";
 		console.log('cmd: ', cmd);
 
 
@@ -1102,7 +1104,9 @@ module.exports = api = {
 
 		// console.log('-> args: ', args);
 
-		var cmd = "phantomjs --ssl-protocol=tlsv1 /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
+		var snappath = TOOLSPATH + 'phantomJS-snapshot.js';
+		var cmd = "phantomjs --ssl-protocol=tlsv1 " + snappath + " '" + JSON.stringify(args) + "'";
+		// var cmd = "phantomjs --ssl-protocol=tlsv1 /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
 		console.log('cmd: ', cmd);
 
 
