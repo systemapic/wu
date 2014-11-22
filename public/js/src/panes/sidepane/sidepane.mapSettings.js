@@ -51,12 +51,7 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 
 	calculateHeight : function () {
 
-		console.log('calculateHeight');
-
 		this.maxHeight = this._inner.offsetHeight + 15;
-
-		console.log('this._inner', this._inner);
-
 		this.minHeight = 0;
 	},
 
@@ -249,7 +244,7 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 			rangeZindex : rangeZindex
 		}
 
-		// // set active or not
+		// set active or not
 		this.project.store.baseLayers.forEach(function (b) {
 			if (layer.store.uuid == b.uuid) {
 				this.on(baseLayer);
@@ -477,32 +472,34 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 	enableLayer : function (baseLayer) {
 
-		// enable layer on map
-		baseLayer.layer.enable();
+		// get layer
+		var layer = baseLayer.layer;
 
-		// get default opacity
-		var opacity = baseLayer.layer.getOpacity();
+		// enable layer on map (without controls)
+		layer._addTo();
 
-		// save
-		this.project.store.baseLayers.push({
-			uuid : baseLayer.layer.store.uuid,
-			zIndex : 1,
-			opacity : opacity
+		// add baselayer
+		this.project.addBaseLayer({
+			uuid : layer.getUuid(),
+			zIndex : 1,			// zindex not determined by layer, but by which layers are currently on map
+			opacity : layer.getOpacity()
 		});
-		this.save();
 	
 		// refresh controls
 		this._refreshControls();
 	},
 
 	disableLayer : function (baseLayer) {
+		if (!baseLayer) return
+
+		// get layer
+		var layer = baseLayer.layer;
 
 		// disable layer in map
-		if (baseLayer && baseLayer.layer) baseLayer.layer.disable(); 
+		if (layer) layer.disable(); 
 
-		// save
-		_.remove(this.project.store.baseLayers, function (b) { return b.uuid == baseLayer.layer.store.uuid; });
-		this.save();
+		// remove from project
+		this.project.removeBaseLayer(layer)
 
 		// refresh controls
 		this._refreshControls();
@@ -528,7 +525,6 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 	calculateHeight : function () {
 				
 		// Runs only for base layer menu?
-
 		var min = _.size(this.project.getLayermenuLayers());
 		var padding = this.numberOfProviders * 35;
 		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
