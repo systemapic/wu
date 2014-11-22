@@ -16,10 +16,10 @@ var crypto = require('crypto');
 var redis = require('redis');
 var config = require('../config/config');
 
-console.log('redis passport');
-console.log('config.tokenRedis.port', config.tokenRedis.port);
-console.log('config.tokenRedis.ip', config.tokenRedis.host);
-console.log('config.tokenRedis.auth', config.tokenRedis.auth);
+// console.log('redis passport');
+// console.log('config.tokenRedis.port', config.tokenRedis.port);
+// console.log('config.tokenRedis.ip', config.tokenRedis.host);
+// console.log('config.tokenRedis.auth', config.tokenRedis.auth);
 
 var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host)
 r.auth(config.tokenRedis.auth);
@@ -63,7 +63,7 @@ module.exports = function(passport) {
 	},
 	function(req, email, password, done) {
 
-		console.log('LOGIN ATTEMPT!', email, password);
+		// console.log('LOGIN ATTEMPT!', email, password);
 
 		// asynchronous
 		// User.findOne wont fire unless data is sent back
@@ -119,7 +119,7 @@ module.exports = function(passport) {
 	function(req, email, password, done) { // callback with email and password from our form
 	  
 
-		console.log('LOGIN ATTEMwPT!', email, password);
+		// console.log('LOGIN ATTEMwPT!', email, password);
 
 		// find a user whose email is the same as the forms email
 		// we are checking to see if the user trying to login already exists
@@ -138,12 +138,12 @@ module.exports = function(passport) {
 			if (!user.validPassword(password))
 				return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
 
-			console.log('redis');
+			// console.log('redis');
 
 			// set token, save to user
 			user.token = setRedisToken(user);
 			user.save(function (err) {
-				console.log('redis save, err', err);
+				// console.log('redis save, err', err);
 				if (err) console.error(err);
 
 				// all is well, return successful user
@@ -169,7 +169,7 @@ module.exports = function(passport) {
 	//
 	function setRedisToken(user) {
 
-		console.log('settoken', user);
+		// console.log('settoken', user);
 
 		// keys
 		var key = 'authToken-' + user._id;
