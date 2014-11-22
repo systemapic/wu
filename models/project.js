@@ -13,6 +13,7 @@ var projectSchema = mongoose.Schema({
 	slug 		: { type: String, default: 'projectslug' },
 	description 	: { type: String, default: 'Description' },
 	keywords 	: [{ type: String, default: '' }],
+	categories 	: [String],
 
 			// image
 	logo		: String, 
@@ -116,7 +117,7 @@ var projectSchema = mongoose.Schema({
 		measure 	: { type: Boolean, default: true  },
 		description 	: { type: Boolean, default: true  },
 		draw 		: { type: Boolean, default: false },
-		layermenu 	: { type: Boolean, default: false },
+		layermenu 	: { type: Boolean, default: true  },
 		legends 	: { type: Boolean, default: false },
 		inspect 	: { type: Boolean, default: false },
 		geolocation 	: { type: Boolean, default: false },

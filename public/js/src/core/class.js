@@ -317,10 +317,19 @@ Wu.Util = {
 		window.history.pushState( {} , '', string );
 	},
 
+	checkDisconnect : function (response) {
+
+		if (response.substring(0,16) == '<!doctype html>')  {
+			console.log('DOCTPE');
+			console.log(response.substring(0,16));
+		}
+	},
+
 	// post without callback
 	post : function (path, json) {
+		var that = this;
 		var http = new XMLHttpRequest();
-		var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
+		var url = window.location.origin; 
 		url += path;
 		http.open("POST", url, true);
 
@@ -330,6 +339,7 @@ Wu.Util = {
 		http.onreadystatechange = function() {
 		    if(http.readyState == 4 && http.status == 200) {
 			// console.log(http.responseText);
+		    	Wu.Util.checkDisconnect(http.responseText);
 		    }
 		}
 		http.send(json);
@@ -337,9 +347,9 @@ Wu.Util = {
 
 	// post with callback
 	postcb : function (path, json, cb, context) {
-
+		var that = context;
 		var http = new XMLHttpRequest();
-		var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
+		var url = window.location.origin; 
 		url += path;
 		http.open("POST", url, true);
 
@@ -348,6 +358,8 @@ Wu.Util = {
 
 		http.onreadystatechange = function() {
 		    if(http.readyState == 4 && http.status == 200) {
+			// console.log(http.responseText);
+		    	Wu.Util.checkDisconnect(http.responseText);
 			if (cb) cb(context, http.responseText); 
 		    }
 		}
@@ -360,6 +372,7 @@ Wu.Util = {
 
 	// post with callback and error handling (do callback.bind(this) for context)
 	send : function (path, json, callback) {
+		var that = this;
 		var http = new XMLHttpRequest();
 		var url = window.location.origin;
 		url += path;
@@ -367,6 +380,8 @@ Wu.Util = {
 		http.setRequestHeader('Content-type', 'application/json');
 		http.onreadystatechange = function() {
 			if (http.readyState == 4) {
+		    		Wu.Util.checkDisconnect(http.responseText);
+				// console.log(http.responseText);
 				if (http.status == 200) { // ok
 					if (callback) callback(null, http.responseText); 
 				} else { // error

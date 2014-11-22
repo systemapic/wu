@@ -18,7 +18,7 @@ var fileSchema = mongoose.Schema({
 	name            :  String,
 	description     :  String,
 	keywords        : [String],
-	category        : [String],
+	category        :  String,
 	version         :  Number,        
 	status          :  String,        // current, archived, etc...
    
@@ -70,9 +70,9 @@ var fileSchema = mongoose.Schema({
 	dataSize : String,              // datasize in bytes, for progress bar
 
 	access : {                      // list of users/projects/clients that can use (RW) this file
-			users   : [String],
-			projects: [String],
-			clients : [String]
+		users   : [String],
+		projects: [String],
+		clients : [String]
 	},
 });
 

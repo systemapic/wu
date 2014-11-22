@@ -220,7 +220,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		app.Projects[store.uuid] = project;
 
 		// update project store
-		project.setStore(store);
+		project.setNewStore(store);
 
 		// add to access locally
 		project.addAccess();
@@ -243,6 +243,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var sidepaneProject = new Wu.SidePane.Project(project, options);
 
 		// add to client container
+		console.log('adding new client div tobefore: ', this._projectsContainer);
 		sidepaneProject.addToBefore(this._projectsContainer);
 
 		// refresh height

@@ -74,20 +74,16 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 	},
 
 	toggleOpen : function () {
-		console.log('toggle: ', this);
-		console.log('this._isOpen', this._isOpen);
 		this._isOpen ? this.close() : this.open();
 	},
 
 	open : function () {
-		console.log('open!');
 		this.calculateHeight();
 		this._outer.style.height = this.maxHeight + 20 + 'px';       
 		this._open(); // local fns   
 		this._isOpen = true;
 
 		if (app._pendingClose && app._pendingClose != this) {
-			// console.log('ap pend: ', app._pendingClose); 
 			app._pendingClose.close();
 		}
 		app._pendingClose = this;
@@ -709,21 +705,11 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 	},
 
 	calculateHeight : function () {
-
 		var min = _.size(this.project.getBaselayers());
-		console.log('base: ', min);
-
-		console.log('this.project.getBaselayers()', this.project.getBaselayers());
-
-
 		var padding = this.numberOfProviders * 35;
 		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
-		
-		
-		console.log('this.project.lauers', this.project.layers);
 		this.minHeight = 0;
 
-		console.log('calcheight: ', this.minHeight, this.maxHeight);
 		// add 100 if in editMode
 		if (this.editMode) this.maxHeight += 100;
 	},
@@ -744,8 +730,10 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		// console.log('toggle --> ', layer);
 
 		// ensure layerMenu is active
-		this.layerMenu = this.layerMenu || Wu.app.MapPane.layerMenu;
+		this.layerMenu = Wu.app.MapPane.layerMenu;
+		// this.layerMenu = this.layerMenu || Wu.app.MapPane.layerMenu;
 		if (!this.layerMenu) this.layerMenu = this.enableLayermenu();
+		this.layerMenu.enableEdit();
 		
 		if (layer.active) {
 			
@@ -805,6 +793,8 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	// post-close
 	_close : function () {
+		this.disableEdit();
+		return;
 		clearTimeout(this.closeEditTimer);
 		var that = this;
 		this.closeEditTimer = setTimeout(function() {
@@ -1104,10 +1094,8 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 			var maxZoom 	= bounds.maxZoom;
 
 	    		if (bounds == this._nullBounds) {
-	    			console.log('NULLBOUNDS!!', bounds, this._nullBounds);
 	    			map.setMaxBounds(false);
 	    		} else {
-	    			console.log("GOTBOUDNS!!", bounds, this._nullBounds);
 	    			map.setMaxBounds(maxBounds);
 	    		}
 			
@@ -1399,8 +1387,6 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 		this.controls = this.project.getControls();
 
-		console.log('update menuSETETETT, contolr=>>', this.controls);
-		
 		// tmp hack to remove vectrostyle
 		delete this.controls.vectorstyle;		// todo: remove
 

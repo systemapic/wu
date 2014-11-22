@@ -17,6 +17,19 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
+	initFiles : function () {
+
+		var files = this.getFiles();
+
+		// files object
+		this.files = {};
+
+		files.forEach(function (file) {
+			this.files[file.uuid] = new Wu.Files(file);
+		}, this);
+
+	},
+
 	initLayers : function () {
 
 		// return if no layers
@@ -42,6 +55,8 @@ Wu.Project = Wu.Class.extend({
 
 	createLayerFromGeoJSON : function (geojson) {
 
+		console.log('createLayerFromGeoJSON', geojson);
+
 		// set options
 		var options = JSON.stringify({
 			project 	: this.getUuid(),
@@ -55,6 +70,8 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	_createdLayerFromGeoJSON : function (context, data) {
+
+		console.log('created!', data);
 
 		// parse layer data
 		var parsed = JSON.parse(data);
@@ -97,9 +114,7 @@ Wu.Project = Wu.Class.extend({
 		// set active project in sidepane
 		if (this._menuItem) {
 			this._menuItem._markActive();
-		} else {
-			console.log('multioplyyy');
-		}
+		} 
 	},
 
 	addNewLayer : function (layer) {
@@ -126,17 +141,20 @@ Wu.Project = Wu.Class.extend({
 		// set editMode
 		this.setEditMode();
 
+		// init files
+		this.initFiles();
+
   		// create layers 
 		this.initLayers();
 
 		// update url
 		this._setUrl();
 
+		// set settings
+		this.refreshSettings();
+		
 		// update color theme
 		this.setColorTheme();
-
-		// set setings
-		this.refreshSettings();
 
 	},
 
@@ -164,6 +182,10 @@ Wu.Project = Wu.Class.extend({
 		Wu.Util.setAddressBar(url);
 	},
 
+	setNewStore : function (store) {
+		this.store = store;
+		this.select();
+	},
 
 	setStore : function (store) {
 		this.store = store;
@@ -346,7 +368,8 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getActiveLayers : function () {
-		// get all active layers
+
+		// get all layers in project
 		var base = this.getBaselayers();
 		var lm = this.getLayermenuLayers();
 		var all = base.concat(lm);
@@ -362,6 +385,8 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getLayer : function (uuid) {
+		// console.log('project.getLayer::', uuid);
+		// console.log('this.layers', this.layers);
 		return this.layers[uuid];
 	},
 
@@ -385,11 +410,19 @@ Wu.Project = Wu.Class.extend({
 		return this.store.files;
 	},
 
-	getFile : function (fileUuid) {
+	getFileObjects : function () {
+		return this.files;
+	},
+
+	getFileStore : function (fileUuid) {
 		var file = _.find(this.store.files, function (f) {
 			return f.uuid == fileUuid;
 		});
 		return file;
+	},
+
+	getFile : function (fileUuid) {
+		return this.files[fileUuid]; // return object
 	},
 
 	getBounds : function () {
@@ -415,13 +448,72 @@ Wu.Project = Wu.Class.extend({
 		
 	},
 
+	// get available categories stored in project
+	getCategories : function () {
+		return this.store.categories;
+		// return ['environment', 'coal', 'wildlife']; // dummy 
+	},
+
+	// add category to project list of cats
+	addCategory : function (category) {
+		console.log('project.addCategory', category);
+
+		// push to list
+		this.store.categories.push(category);
+
+		// save to server
+		this._update('categories');
+	},
+
+	removeCategory : function (category) {
+		console.log('project.removeCategory', category);
+
+		// remove from array
+		_.remove(this.store.categories, function (c) {
+			return c.toLowerCase() == category.toLowerCase();
+		});
+
+		// save to server
+		this._update('categories');
+
+	},
+
 	setCollection : function () {
 
 	},
 
+	setFileAttribute : function (fileUuid, key, value) {
+
+		console.log('setFileAttribute', fileUuid, key, value);
+		return;
+
+		// iterate
+		this.project.store.files.forEach(function(file, i, arr) {
+		     
+			// find hit
+			if (file.uuid == fileUuid) {
+
+				// set locally
+				file[key] = value;
+
+				// create update object
+				var json = {};
+				json[key] = file[key];
+				json.uuid = file.uuid;
+
+				// update, no callback
+				var string = JSON.stringify(json);
+				Wu.save('/api/file/update', string); 
+			}
+		});
+
+		// set save status
+		app.setSaveStatus();
+	},
+
 	getUsers : function () {
 		var uuid = this.store.uuid; // project uuid
-		var users = _.filter(app.Users, function (user) {
+		var users = _.filter(app.Users, function(user) {
 			return user.store.role.reader.projects.indexOf(uuid) > -1;
 		});
 		return users;
@@ -432,12 +524,10 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getSlugs : function () {
-
 		var slugs = {
 			project : this.store.slug,
 			client : this.getClient().getSlug()
 		}
-
 		return slugs;
 	},
 
@@ -453,7 +543,6 @@ Wu.Project = Wu.Class.extend({
 				html += '<p>' + user.store.firstName + ' ' + user.store.lastName + '</p>';
 			}
 		}, this);
-
 		return html;
 	},
 
@@ -465,7 +554,6 @@ Wu.Project = Wu.Class.extend({
 				user.addProjectAccess(this);
 			}
 		}
-
 		app.Account.addProjectAccess(this);
 	},
 
@@ -513,6 +601,7 @@ Wu.Project = Wu.Class.extend({
 
 	setFile : function (file) {
 		this.store.files.push(file);
+		this.files[file.uuid] = new Wu.Files(file);
 	},
 
 	setLogo : function (path) {
@@ -607,6 +696,9 @@ Wu.Project = Wu.Class.extend({
 			// remove from local project
 			_.remove(this.store.files, function (item) { return item.uuid == file.uuid; });
 
+			// remove from this.files
+			delete this.files[file.uuid];
+
 			// get layer if any
 			var layer = _.find(this.layers, function (l) { return l.store.file == file.uuid; });
 
@@ -615,7 +707,7 @@ Wu.Project = Wu.Class.extend({
 				// remove from layermenu & baselayer store
 				_.remove(this.store.layermenu, function (item) { return item.layer == layer.store.uuid; });
 				// var baseLayer = _.find(this.store.baseLayers, function (b) { return b.uuid == layer.store.uuid;});
-				console.log('baseLayer: ', baseLayer, layer);
+				// console.log('baseLayer: ', baseLayer, layer);
 				_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.store.uuid; });
 
 				// remove from layermenu
@@ -634,6 +726,7 @@ Wu.Project = Wu.Class.extend({
 
 		// save changes
 		this._update('layermenu'); 
+		this._update('baseLayers');
 
 		setTimeout(function () {	// ugly hack, cause two records can't be saved at same time, server side.. FUBAR!
 			// remove from server
@@ -683,17 +776,11 @@ Wu.Project = Wu.Class.extend({
 
 	// format files for Grande plugin
 	_formatGrandeFiles : function (files) {
-		console.log('_formatGrandeFiles');
 		var sources = [];
 		files.forEach(function (file) {
-			console.log('file.type', file.type);
 
 			var thumbnail = (file.type == 'image') ? '/pixels/' + file.uuid + '?width=50&height=50' : '';
-
 			var prefix    = (file.type == 'image') ? '/images/' 					: '/api/file/download/?file=';
-			// var suffix    = (file.type == 'image') ? '' 						: '&type=zip';// + file.type;
-			
-			// var url       = '/pixels/' + file.uuid + '?width=200&height=200';
 			var url = prefix + file.uuid;// + suffix
 
 			var source = {
@@ -703,13 +790,14 @@ Wu.Project = Wu.Class.extend({
 				type 	: file.type,
 				url 	: url
 			}
+
 			sources.push(source)
+		
 		}, this);
 		return sources;
 	},
 
 	refreshSettings : function () {
-		console.log('_________ settings', this.getSettings());
 		for (setting in this.getSettings()) {
 			this.getSettings()[setting] ? this['enable' + setting.camelize()]() : this['disable' + setting.camelize()]();
 		}
@@ -792,6 +880,10 @@ Wu.Project = Wu.Class.extend({
 	disableMapboxGL : function () {
 
 	},
+
+
+
+
 
 
 

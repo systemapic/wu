@@ -1,0 +1,16 @@
+@font-face {
+    font-family: 'Helvetica neue';
+    src: url(phantomfont/Open_Sans/OpenSans-Light.ttf);
+	}
+
+.leaflet-bottom.leaflet-right,
+.leaflet-top.leaflet-right,
+.leaflet-top.leaflet-left,
+#legends-collapser,
+#start-pane {
+	display: none !important;
+	}
+
+#header {
+	width: auto !important;
+	}

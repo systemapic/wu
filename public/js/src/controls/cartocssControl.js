@@ -173,6 +173,15 @@ L.Control.CartoCSS = L.Control.extend({
 		// console.log(')thi wrapper element', this._codeMirror);
 		// this._codeMirror.getWrapperElement().id = 'code-' + id.replace(/[^\w+]/g,'_');
 	
+
+		// cxxxx
+		var settings = app.activeProject.getSettings();
+
+
+		if ( settings.darkTheme ) app.Style.themeToggle('dark');
+
+
+
 	},
 
 	_initStylingDefault : function () {
@@ -293,7 +302,6 @@ L.Control.CartoCSS = L.Control.extend({
 		// Show Legends Wrapper
 		Wu.DomUtil.removeClass(this._legendsWrapper, 'displayNone');
 
-
 		// Set tab to active
 		Wu.DomUtil.removeClass(this._tabTooltip, 'cartocss-active-tab');
 		Wu.DomUtil.removeClass(this._tabStyling, 'cartocss-active-tab');
@@ -344,12 +352,9 @@ L.Control.CartoCSS = L.Control.extend({
 	initStyling : function (layer) {
 		if (!layer) return;
 
-
 		// new layer is active
 		this._layer = layer;
 		this._cartoid = false;
-
-		console.log('layer: ', layer);
 
 		// insert title in dropdown
 		this._styleHeaderLayerName.innerHTML = layer.store.title.camelize();
@@ -358,8 +363,13 @@ L.Control.CartoCSS = L.Control.extend({
 		this._cartoid = this._layer.getCartoid();
 
 		// insert into input area
+		var that = this;
 		if (this._cartoid) {				// callback
-			this._layer.getCartoCSS(this._cartoid, this.insertCss.bind(this));
+			// this._layer.getCartoCSS(this._cartoid, this.insertCss.bind(this));
+			this._layer.getCartoCSS(this._cartoid, function (ctx, css) {
+				// set values
+				that.updateCodeMirror(css);
+			});
 		} else {
 			// no style stored on layer yet, set default message
 			this._initStylingDefault();
@@ -375,11 +385,8 @@ L.Control.CartoCSS = L.Control.extend({
 		// return if no layer selected
 		if (!this._layer) return;
 
-		// fill with meta from store
-		this._legends = this._layer.getLegends();	// as object!
-
-
-
+		// fill with legends from layer
+		this._legends = this._layer.getLegends();
 		if (this._legends) return this.fillLegends(this._legends);
 
 		// fill with default
@@ -419,8 +426,7 @@ L.Control.CartoCSS = L.Control.extend({
 		// inner wrapper
 		this._legendsWrapperInner = Wu.DomUtil.create('div', 'legends-inner-scroller', this._legendsWrapper);
 		this._legendsTitle = Wu.DomUtil.create('div', 'legends-title', this._legendsWrapperInner);
-		this._legendsTitle.innerHTML = tooltipMeta.title;
-
+		this._legendsTitle.innerHTML = tooltipMeta.title || 'No title';
 		this._legendsListWrapper = Wu.DomUtil.create('div', 'legends-list-wrapper', this._legendsWrapperInner);
 
 		// each legend
@@ -432,8 +438,8 @@ L.Control.CartoCSS = L.Control.extend({
 
 		}, this);
 
-
 	},
+
 
 	_legendEntry : function (legend) {
 
@@ -494,6 +500,10 @@ L.Control.CartoCSS = L.Control.extend({
 		// save to layer
 		this._layer.setLegends(legends);
 
+		// refresh legends
+		var legendsControl = app.MapPane.legendsControl;
+		if (legendsControl) legendsControl.refreshLegends();
+
 	},
 
 	// get custom keyname if created (in tooltips)
@@ -546,9 +556,9 @@ L.Control.CartoCSS = L.Control.extend({
 			legends.unshift(layer[0]);
 
 			// include old legends settings
-			legends = this._includeLegendsSettings(legends);
+			legends = this._mergePreviousLegendsSettings(legends, this._layer.getLegends());
 
-			// fill legends tab
+			// fill legends tab in editor
 			this.fillLegends(legends);
 
 			// save to layer
@@ -563,8 +573,8 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 
-	_includeLegendsSettings : function (newLegends) {
-		var oldLegends = this._legends;
+	_mergePreviousLegendsSettings : function (newLegends, oldLegends) {
+		// var oldLegends = this._legends;
 
 		// keep .on setting
 		newLegends.forEach(function (newlegend, i){
@@ -609,7 +619,6 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// get default meta
 		var fields = this._layer.getMetaFields();
-		console.log('TOOLTIUPD DEAFUALT', fields);
 
 		// create header
 		var tooltipCustomHeader	= Wu.DomUtil.createId('input', 'cartocss-tooltip-custom-header', this._tooltipWrapper);
@@ -713,6 +722,9 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// save to server
 		this._layer.setTooltip(saved);
+
+		// update legends tab title
+		this._legendsTitle.innerHTML = saved.title;
 		
 	},
 
@@ -797,7 +809,7 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// update legends tab 
 		this._updateLegends(result.cartoid);
-		
+
 	},
 
 	handleError : function (error) {

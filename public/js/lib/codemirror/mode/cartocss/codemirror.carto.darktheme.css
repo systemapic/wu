@@ -1,0 +1,226 @@
+/* CodeMirror CartoCSS Syntax for DarkTheme
+------------------------------------------------------- */
+.CodeMirror,
+.CodeMirror * {
+box-sizing:content-box;
+-moz-box-sizing:content-box;
+}
+.CodeMirror {
+position:absolute;
+background:#f8f8f8;
+top:40px; bottom:0;
+width:100%; height:auto;
+visibility:hidden;
+        font-weight: 900;
+        font-size: 14px;
+        border: 1px solid #000 !important;
+}
+.CodeMirror.active { visibility:visible; }
+
+.CodeMirror-linenumber {
+z-index: 50!important;
+pointer-events: none;
+}
+.CodeMirror-linenumbers {
+width: 30px!important;
+}
+
+.CodeMirror-gutters {
+background:#f8f8f8;
+width:35px!important;
+}
+.CodeMirror-gutters .errors {
+position:absolute;
+width:40px;
+left:0;
+z-index:100;
+}
+.CodeMirror-gutter-wrapper .error {
+background-color:#f1f075;
+position:absolute;
+left:-10px;
+}
+.CodeMirror-gutter-wrapper .error > a {
+padding-top: 60px;
+width: 40px;
+display: block;
+margin-top: -40px;
+}
+.CodeMirror-gutter-wrapper .error > a:focus {
+-webkit-box-shadow:none;
+  box-shadow:none;
+}
+.CodeMirror-gutter-wrapper .error .message {
+background-color:#f1f075;
+padding-right: 20px;
+position:absolute;
+left:40px;
+top: 0;
+color:rgba(0,0,0,0.5);
+display:none;
+width:240px;
+}
+.CodeMirror-gutter-wrapper .error > a:target ~ .message { display:inline-block; }
+
+/* CodeMirror Addon: Search Dialog */
+.CodeMirror-dialog input {
+padding-left: 40px;
+padding-right: 40px;
+}
+
+.CodeMirror-dialog .search-buttons {
+right: 40px;
+}
+
+.CodeMirror-dialog .search-buttons a:last-child { border-radius: 3px; }
+.CodeMirror-dialog .search-buttons.reset a:last-child { border-radius: 0 3px 3px 0;}
+.CodeMirror-dialog .search-buttons.reset a { display: inline-block;}
+
+#search-info ~ .dialog-y,
+#search-info:target ~ .dialog-n { display: none;}
+#search-info:target ~ .dialog-y { display: block;}
+
+.CodeMirror-dialog .hidden:target { display:block; }
+
+span.cm-keyword,
+span.cm-carto-variable           { color:#708; }
+span.cm-carto-color-variable     { color:#B60049; }
+        span.cm-number,
+        span.cm-carto-unit               { color:#9FFFCC; }
+
+        span.cm-atom,
+        span.cm-carto-value              { color:#FF8069; }
+
+        span.cm-carto-valid-value        { color:#039ED7; }
+        span.cm-carto-selector           { color:#FF87CB; }
+span.cm-carto-identifier         { color:#999; }
+        span.cm-carto-valid-identifier   { color:#999; }
+span.cm-carto-important          { color:#03c; }
+span.cm-carto-colorcode          { color:#048; }
+span.cm-carto-punctuation        { color:#666; }
+        span.cm-carto-comment            { color: #666; }
+span.cm-string,
+        span.cm-carto-string             { color:#FBFF66; }
+span.cm-carto-filter             { color:#66475B; }
+
+.dark .CodeMirror { background:transparent; border-top: 1px solid rgba(0,0,0,.2); }
+.dark .CodeMirror-gutters { background:#404040; border-color:rgba(0,0,0,0.2); }
+.dark .CodeMirror pre { background: transparent;}
+.dark .CodeMirror .CodeMirror-cursor { border-color:#ccc; }
+.dark .CodeMirror-selected,
+.dark .CodeMirror-focused .CodeMirror-selected { background:#303030; }
+
+.dark .CodeMirror pre                  { color:#ccc; }
+.dark span.cm-keyword,
+.dark span.cm-carto-variable           { color:#d6e; }
+.dark span.cm-number,
+.dark span.cm-carto-unit               { color:#9d7; }
+.dark span.cm-string,
+.dark span.cm-carto-string             { color:#d7f; }
+.dark span.cm-atom,
+.dark span.cm-carto-value              { color:#d6e; }
+
+
+/* Picker
+------------------------------------------------------- */
+
+/* CodeMirror Addon: palette swatch */
+.CodeMirror .cm-palette-hint {
+display:inline-block;
+box-sizing:border-box;
+margin-right: 2px;
+border-radius:50%;
+vertical-align:middle;
+width:15px;
+height:15px;
+box-shadow:
+inset 0 0 0 1px #ddd,
+inset 0 0 0 3px #fcfcfc;
+}
+
+.CodeMirror .cm-palette-hint:hover {
+cursor: pointer;
+box-shadow:
+inset 0 0 0 1px #888,
+inset 0 0 0 3px #fcfcfc;
+}
+
+.sp-container {
+background: transparent;
+border-width: 0;
+}
+.sp-container * { box-sizing: border-box; }
+.sp-picker-container {
+border-width: 0;
+padding: 10px;
+margin-bottom: 0;
+border-width: 0;
+}
+.sp-picker-container {
+background: #404040;
+border-radius: 3px;
+margin-top: 5px;
+margin-bottom: 5px;
+width: 200px;
+}
+.sp-initial, .sp-color, .sp-hue, .sp-clear { border: 1px solid #313131; }
+.sp-slider {
+height: 5px;
+border-color: #313131;
+}
+.sp-alpha-handle {
+top: -1px;
+bottom: -1px;
+}
+.sp-top { margin-bottom: 10px;}
+.sp-initial {
+z-index: 1;
+position: relative;
+border-radius: 3px;
+overflow: hidden;
+}
+.sp-initial span {
+height: 28px;
+width: 21px;
+}
+.sp-button-container {
+position: absolute;
+bottom: 0;
+left: 0;
+right: 0;
+padding: 0 10px 10px 10px;
+text-align: right;
+}
+.sp-cancel,
+.sp-container button {
+height: 30px;
+padding: 5px 10px;
+background-color: #3887be;
+vertical-align: middle;
+line-height: 20px;
+font-size: 12px;
+font-family: 'Open Sans Bold', sans-serif;
+border-radius: 0 3px 3px 0;
+background-image: none;
+border: none;
+display: inline-block;
+color: white !important;
+text-shadow: none;
+}
+.sp-container button:hover {
+background-color: #3bb2d0;
+background-image: none;
+border: none;
+text-shadow: none;
+}
+.sp-cancel {
+margin: 0;
+border-right: 1px solid #404040;
+border-radius: 3px 0 0 3px;
+background: rgba(255,255,255,0.10);
+}
+.sp-cancel:hover {
+background: rgba(255,255,255,0.25);
+color:white !important;
+text-decoration: none;
+}

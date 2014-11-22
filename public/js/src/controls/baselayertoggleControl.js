@@ -43,6 +43,9 @@ L.Control.BaselayerToggle = L.Control.extend({
 		Wu.DomEvent.on(container, 'mousedown', this.toggle, this);
 		Wu.DomEvent.on(container, 'dblclick', Wu.DomEvent.stop, this);
 
+		// add stops
+		Wu.DomEvent.on(container, 'mousedown dblclick', Wu.DomEvent.stopPropagation, this);
+
 	},
 
 	
@@ -78,7 +81,6 @@ L.Control.BaselayerToggle = L.Control.extend({
 	},
 
 	addLayer : function (baseLayer) {
-		console.log('baselayer: ', baseLayer);
 		if (!baseLayer.layer) return console.error('BUG: fixme!');
 		
 		// create div

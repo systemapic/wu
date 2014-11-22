@@ -115,11 +115,16 @@ module.exports = geo = {
 
 	handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
 		console.log('GEO: handleShapefile');
+		console.log('foldeR: ', folder);
+		console.log('name: ', name);
+		console.log('fileUuid: ', fileUuid);
 
 
 		fs.readdir(folder, function (err, files) {
+			if (!files) return callback({error : 'No shapefiles! Perhaps you put different shapefiles in the same folder?'});
 
 			var shapefiles = files.slice();
+
 
 			var ops = [];
 			ops.push(function (done) {
@@ -140,6 +145,7 @@ module.exports = geo = {
 				var key = results[1];
 				var path = key.path;
 				var name = key.name;
+				var fileUuid = key.fileUuid;
 
 				// add geojson file to list
 				shapefiles.push(name);
@@ -151,7 +157,8 @@ module.exports = geo = {
 						data : {
 							geojson : name
 						},
-						title : name
+						title : name,
+						file : fileUuid
 					}
 
 
@@ -161,7 +168,6 @@ module.exports = geo = {
 			        		console.log('fucking meta?!?!?');
 			        		db.metadata = JSON.stringify(metadata);
 				        	
-
 				        	// return
 				        	callback(err, db);
 			        	});
@@ -192,33 +198,134 @@ module.exports = geo = {
 
 	},
 
+	getTheShape : function (shapes) {
+		// get .shp file
+		var shps = [];
+		for (s in shapes) {
+			if (shapes[s].slice(-4) == '.shp') {
+				// return shapes[s];
+				shps.push(shapes[s]);
+			}
+		}
+		return shps;
+
+	},
+
+	moveShapefiles : function (options, done) {
+
+		var ops = [];
+
+		// move relevant shapefiles to a fresh folder
+		// ie. all files with same name as part of possible shapefile extension types
+		var possible = ['.shp', '.shx', '.dbf', '.prj', '.sbn', '.sbx', '.fbn', '.fbx', '.ain', '.aih', '.ixs', '.mxs', '.atx', '.shp.xml', '.cpg'];
+
+		possible.forEach(function (ex) {
+
+			var p = options.folder + '/' + options.base + ex;
+			var f = options.outfolder + '/' + options.base + ex;
+			
+			ops.push(function (callback) {
+
+				console.time('STATFILE');
+				if (fs.existsSync(p)) {
+					fs.move(p, f, callback);
+					console.log('___fs.move:::', p, f);
+				} else {
+					callback();
+				}
+				console.timeEnd('STATFILE');
+			});
+			
+
+		});
+
+		async.parallel(ops, function (err) {
+			if (err) console.error(err);
+			done();
+		});
+
+
+	},
 
 	convertshp : function (shapes, folder, callback) {
 		console.log('convertshp');
+		console.log('!!!!!!!!!!!_________________________!!!!!!!!!!!!!');
+		console.log('!!!!!!!!!!!_________________________!!!!!!!!!!!!!');
+		console.log('!!!!!!!!!!!_________________________!!!!!!!!!!!!!');
+		console.log('!!!!!!!!!!!_________________________!!!!!!!!!!!!!');
+		console.log('!!!!!!!!!!!_________________________!!!!!!!!!!!!!');
+		console.log('!!!!!!!!!!!_________________________!!!!!!!!!!!!!');
+		console.log('shapes: ', shapes);
 
 		 
-		// get .shp file
-		for (s in shapes) {
-			if (shapes[s].slice(-4) == '.shp') var shp = shapes[s];
-		}
+		// get the .shp file
+		var shps = geo.getTheShape(shapes);
 		
 		// return err if no .shp found
-		if (!shp) return callback('No shapefile?');
+		if (!shps) return callback('No shapefile?');
 
 
-		var inFile  = folder + '/' + shp;
-		var toFile  = shp + '.geojson';
-		var outFile = folder + '/' + toFile;
+		// if (shps.length > 1) {
+		// 	// more than one shapefile in same folder! 
 
-		// ogr2ogr shapefile to geojson
-		var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"';		
-		var exec = require('child_process').exec;
-		exec(cmd, function (err, stdout, stdin) {
-			if (err) console.error('mapshaper err: ', err, stdout, stdin);
 
-			callback(err, {path : outFile, name : toFile});
+		// }
+
+		var shp = shps[0];
+
+		var base = shp.slice(0,-4);
+
+		var fileUuid = 'file-' + uuid.v4();
+
+
+		// var inFile = folder + '/' + shp;
+		var toFile = shp + '.geojson';
+		var outfolder = FILEFOLDER + fileUuid;
+		var outFile = outfolder + '/' + toFile;
+		var inFile = outfolder + '/' + shp;
+		
+		var options = {
+			folder : folder,
+			outfolder : outfolder,
+			base : base
+		}
+						// callback
+		geo.moveShapefiles(options, function (err) {
+
+
+			console.time('ensureDirSync');
+			fs.ensureDirSync(outfolder);			// todo: async!
+			console.timeEnd('ensureDirSync');
+
+			// ogr2ogr shapefile to geojson
+			var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"';		
+			var exec = require('child_process').exec;
+
+			console.time('ogr2ogr');
+			exec(cmd, function (err, stdout, stdin) {
+			console.timeEnd('ogr2ogr');
+
+				if (err) console.error('mapshaper err: ', err, stdout, stdin);
+
+				// move folder with shapefile to new fileUuid folder
+				fs.move(folder, outfolder + '/Shapefiles', function (err) {
+					if (err) console.error(err);
+					console.log('moved shapefiles from/to ', folder, outfolder);
+				});
+
+				// callback
+				callback(err, {path : outFile, name : toFile, fileUuid : fileUuid});
+
+			});
+
+
 
 		});
+
+
+
+		
+		
 	},
 
 
@@ -308,7 +415,8 @@ module.exports = geo = {
 
 				request({
 					method : 'POST',
-					uri : 'http://78.46.107.15:8080/import/geojson',
+					// uri : 'http://78.46.107.15:8080/import/geojson',
+					uri : 'https:/systemapic.com/import/geojson',
 					json : {
 						geojson : data,
 						uuid : fileUuid,

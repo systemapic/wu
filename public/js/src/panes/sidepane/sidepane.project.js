@@ -186,8 +186,15 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// set new image and save
 		this.project.setLogo(fullpath);
 
-		// update image in header
+		console.log('LOGO:: ', fullpath);
+		console.log('this.project', this.project);
+		console.log('logo: ', this.logo);
+
+		// update image 
 		this.logo.style.backgroundImage = "url('" + this.project.getLogo() + "')";
+
+		// update header
+		app.HeaderPane.addedLogo(path);
 	},
 
 	addTo : function (container) {

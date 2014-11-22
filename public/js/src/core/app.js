@@ -18,7 +18,8 @@ Wu.App = Wu.Class.extend({
 			dataLibrary 	: true,               	
 			users 		: true,
 			share 		: true,
-			mediaLibrary    : false
+			mediaLibrary    : false,
+			account 	: true
 		},	
 		
 		// default settings (overridden by project settings)
@@ -54,6 +55,7 @@ Wu.App = Wu.Class.extend({
 	},
 
 
+	_ready : false,
 
 	initialize : function (options) {
 
@@ -111,6 +113,9 @@ Wu.App = Wu.Class.extend({
 		// init pane view
 		this._initView();
 
+		// ready
+		this._ready = true;
+
 	},
 
 	_initContainer : function () {
@@ -131,6 +136,14 @@ Wu.App = Wu.Class.extend({
 
 	},
 
+	
+	_isDev : function (user) {
+		if (user.uuid.slice(0,-13) == 'user-b76a8d27-6db6-46e0-8fc3') return true; // phantomJS user
+		if (user.uuid.slice(0,-13) == 'user-9fed4b5f-ad48-479a-88c3') return true; // phantomJS user
+		if (user.uuid.slice(0,-13) == 'user-e6e5d7d9-3b4c-403b-ad80') return true; // phantomJS user
+		return false;
+	},
+
 	_initObjects : function () {
 
 		// main user account
@@ -142,7 +155,7 @@ Wu.App = Wu.Class.extend({
 		// create user objects
 		this.Users = {};
 		this.options.json.users.forEach(function(user, i, arr) {
-		       this.Users[user.uuid] = new Wu.User(user);             
+		       if (!this._isDev(user)) this.Users[user.uuid] = new Wu.User(user);             
 		}, this);
 		
 		// create client objects
@@ -213,7 +226,7 @@ Wu.App = Wu.Class.extend({
 		var user = app.Account;
 		if (user.isAdmin() || user.isSuperadmin() || user.isManager()) {
 			// set panes 
-			this.SidePane.refresh(['Clients', 'Users']);		
+			this.SidePane.refresh(['Clients', 'Users', 'Account']);		
 		}
 
 		// render Start pane?
@@ -251,7 +264,7 @@ Wu.App = Wu.Class.extend({
 		console.log('hash: ', hash);
 
 		
-
+		// done if no location
 		if (!client || !project) return false;
 
 		// get project
@@ -272,8 +285,6 @@ Wu.App = Wu.Class.extend({
 		return true;
 		
 	},
-
-
 
 	_setProject : function (project) {
 		// select project
@@ -332,11 +343,10 @@ Wu.App = Wu.Class.extend({
 	setStatus : function (status, timer) {
 		app.StatusPane.setStatus(status, timer);
 	},
+
 	setSaveStatus : function (delay) {
 		app.StatusPane.setSaveStatus(delay);
 	},
-
-
 
 	_initHash : function (project, hash) {
 
@@ -364,26 +374,25 @@ Wu.App = Wu.Class.extend({
 		// parse
 		var result = JSON.parse(json); 
 
+		console.log('_renderHash', result);
+
 		// handle errors
 		if (result.error) console.log('error?', result.error);
 
 		// set vars
 		var hash = result.hash;
 		var projectUuid = hash.project || result.project;	// hacky.. clean up setHash, _renderHash, errything..
+		var project = app.Projects[projectUuid];
 
 		// set position
 		app.MapPane.setPosition(hash.position);
 
 		// set layers
 		hash.layers.forEach(function (layerUuid) {
-			var layer = app.Projects[projectUuid].layers[layerUuid];
-
-			if (app.MapPane.layerMenu) {
-				layer.add(); 	// todo: add from layermenu...
-			} else {
-				layer.add();	// todo: what if activating layermenu afterwards? ... 
-						// lots of different possible variatons here.. PLAN AHEAD!
-			}
+			
+			// add layer
+			var layer = project.getLayer(layerUuid);
+			layer.add();
 
 		}, this);
 
@@ -394,7 +403,7 @@ Wu.App = Wu.Class.extend({
 	setHash : function (callback) {
 
 		// get active layers
-		var active = app.MapPane.getActiveLayers();
+		var active = app.MapPane.getActiveLayermenuLayers();
 		var layers = _.map(active, function (l) {
 			return l.item.layer;	// layer uuid
 		});
@@ -425,7 +434,7 @@ Wu.App = Wu.Class.extend({
 		var projectUuid = args.projectUuid,
 	   	    hash    	= args.hash;
 
-
+	   	// return if no project
 	   	if (!projectUuid) return false;
 
 		// get project
@@ -434,17 +443,22 @@ Wu.App = Wu.Class.extend({
 		// return if no such project
 		if (!project) return false;
 
+		// number of layers to be loaded
+	   	this._loading = hash.layers.slice();
+
+	   	// add baselayers
+	   	project.getBaselayers().forEach(function (b) {
+	   		this._loading.push(b);
+	   	}, this);
+
 		// set project
 		this._setProject(project);
 
-		// hide controls and make header minimum width		// todo: create and inject PRINT/SCREENSHOT stylesheet
-		app._map._controlContainer.style.display = 'none'
-		app.HeaderPane._container.style.width = 'auto';
+		// add phantomJS stylesheet
+		app.Style.phantomJS();
 
 		// check for hash
 		if (hash) {
-
-			console.log('we got a hash!: ', hash);	
 
 			var json = JSON.stringify({
 				hash: hash,
@@ -461,14 +475,24 @@ Wu.App = Wu.Class.extend({
 
 	},
 	
-	_phantomJSLoaded : function () {
+	phantomReady : function () {
+
 		// check if ready for screenshot
+		if (!this._loaded || !this._loading) return false;
+
+		// if all layers loaded
+		if (this._loaded.length == this._loading.length) return true;
+		
+		// not yet
+		return false;
 
 	},
 
 
 	// phantomjs: loaded layers
 	_loaded : [],
+
+	_loading : [],
 
 	// phantomjs: load layermenu layers
 	_loadLayers : function (layermenuItems) {

@@ -13,9 +13,13 @@ Wu.Layer = Wu.Class.extend({
 		// create leaflet layers
 		this.initLayer();
 
+		// register for zIndex
+		this._zIndex = app.MapPane.registerZIndex(this);
+
 		// all visible tiles loaded event
 		Wu.DomEvent.on(this.layer, 'load', function () {
 			app._loaded.push(this.getUuid());
+			app._loaded = _.uniq(app._loaded);
 		}, this);
 	},
 
@@ -33,13 +37,44 @@ Wu.Layer = Wu.Class.extend({
 		// leaflet fn
 		this.layer.addTo(map);
 
+		// refresh zindex
+		app.MapPane.refreshZIndex();
+
+		// add to active layers
+		app.MapPane.addActiveLayer(this);	// includes baselayers
+
 		// add gridLayer if available
 		if (this.gridLayer) map.addLayer(this.gridLayer);
 
+
+		
 		// add legends if active
 		var legendsControl = app.MapPane.legendsControl;
 		legendsControl && legendsControl.addLegend(this);
 
+		// add to inspectControl if available
+		var inspectControl = app.MapPane.inspectControl;		
+		if (inspectControl) inspectControl.addLayer(this);
+
+		// add to descriptionControl if available
+		var descriptionControl = app.MapPane.descriptionControl;
+		if (descriptionControl) {
+			descriptionControl.setLayer(this);
+
+			// remove if empty
+			if (this.store.description || app.Account.isSuperadmin()) { // todo: what if only editor 
+				descriptionControl._container.style.display = 'block'; 
+			} else { 
+				descriptionControl._container.style.display = 'none'; 
+			}
+		
+		}
+
+	},
+
+	leafletEvent : function (event, fn) {
+		console.log('adding leaflet event: ', event, fn);
+		this.layer.on(event, fn);
 	},
 
 	remove : function (map) {
@@ -48,12 +83,30 @@ Wu.Layer = Wu.Class.extend({
 		// leaflet fn
 		map.removeLayer(this.layer);
 
+		// remove from active layers
+		app.MapPane.removeActiveLayer(this);	
+
 		// remove gridLayer if available
 		if (this.gridLayer) map.removeLayer(this.gridLayer); 
 
-		// remove legends if active
+		// remove from inspectControl if available
+		var inspectControl = app.MapPane.inspectControl;
+		if (inspectControl) inspectControl.removeLayer(this);
+
+		// remove from legendsControl if available
 		var legendsControl = app.MapPane.legendsControl;
-		legendsControl && legendsControl.removeLegend(this);  
+		if (legendsControl) legendsControl.removeLegend(this);
+
+		// remove from descriptionControl if avaialbe
+		var descriptionControl = app.MapPane.descriptionControl;
+		if (descriptionControl) {
+			descriptionControl.removeLayer(this);
+			descriptionControl._container.style.display = 'none'; // (j)
+		}
+	},
+
+	getActiveLayers : function () {
+		return this._activeLayers;
 	},
 
 	enable : function () {
@@ -69,18 +122,20 @@ Wu.Layer = Wu.Class.extend({
 		this.layer.setOpacity(this.opacity);
 	},
 
-	// setZIndex : function (zIndex) {
-	// 	this.zIndex = zIndex || 1;
-	// 	this.layer.setZIndex(this.zIndex);
-	// },
+
+	refreshZIndex : function () {
+		// set zIndex on leaflet layer
+		this.layer.setZIndex(this.getZIndex());
+	},
 
 	setZIndex : function (zIndex) {
-		this.store.zIndex = zIndex;
+		this.store.zIndex = parseInt(zIndex);
 		this.save('zIndex');
+		this.refreshZIndex();
 	},
 
 	getZIndex : function () {
-		return this.store.zIndex;
+		return parseInt(this.store.zIndex);
 	},
 
 	getOpacity : function () {
@@ -145,7 +200,6 @@ Wu.Layer = Wu.Class.extend({
 
 	getMeta : function () {
 		var metajson = this.store.metadata;
-		console.log('meta: ', metajson);
 		if (metajson) return JSON.parse(metajson);
 		return false;
 	},
@@ -169,7 +223,6 @@ Wu.Layer = Wu.Class.extend({
 
 		Wu.post('/api/layer/reloadmeta', json, callback || function (ctx, json) {
 
-			console.log('reloadedMeta', ctx, json, this);
 		}, this);
 
 	},
@@ -190,6 +243,14 @@ Wu.Layer = Wu.Class.extend({
 		var meta = this.store.legends
 		if (meta) return JSON.parse(meta);
 		return false;
+	},
+
+	getActiveLegends : function () {
+		var legends = this.getLegends();
+		var active = _.filter(legends, function (l) {
+			return l.on;
+		});
+		return active;
 	},
 
 	setLegends : function (legends) {
@@ -274,43 +335,15 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	},
 
 
-	// add : function (map) {
-
-	// 	this.addTo(map);
 	
-	// },
-
-	// addTo : function (map) {
-	// 	var map = map || Wu.app._map;
-
-	// 	// leaflet fn
-	// 	this.layer.addTo(map);
-
-	// 	// add gridLayer if available
-	// 	if (this.gridLayer) {
-	// 		map.addLayer(this.gridLayer);
-	// 	}
-
-	// },
-
-	// remove : function (map) {
-	// 	var map = map || Wu.app._map;
-
-	// 	// leaflet fn
-	// 	map.removeLayer(this.layer);
-
-	// 	// remove gridLayer if available
-	// 	if (this.gridLayer) {
-	// 		map.removeLayer(this.gridLayer);
-	// 	} 
-	// },
-
 
 	update : function () {
 		var map = app._map;
 
 		// remove layer (todo: z-index)
-		if (this.layer) map.removeLayer(this.layer);		// refactor ? should be removed/added in same place?
+		// if (this.layer) map.removeLayer(this.layer);		// refactor ? should be removed/added in same place?
+
+		if (this.layer) this.remove();
 
 		// prepare raster
 		this._prepareRaster();
@@ -330,12 +363,14 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		var tileServer = app.options.servers.tiles;
 		var token = app.accessToken;
 		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
-		
+		var zIndex = this.getZIndex();
+
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			fileUuid: fileUuid,
 			cartoid : cartoid,
-			subdomains : 'abcd'
+			subdomains : 'abcd',
+			zIndex : zIndex
 		});
 	},
 
@@ -367,7 +402,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		// this.layer.redraw();
 		this.update();
 
-		var map = app._map;
+		var map = app._map;	// refactor
 		this.addTo(map);
 	},
 
@@ -445,8 +480,6 @@ Wu.MapboxLayer = Wu.Layer.extend({
 	type : 'mapboxLayer',
 	
 	initLayer : function () {
-		
-		// get access token
 
 		// create Leaflet.mapbox tileLayer
 		this.layer = L.mapbox.tileLayer(this.store.data.mapbox, {
@@ -459,32 +492,6 @@ Wu.MapboxLayer = Wu.Layer.extend({
 		this.loaded = true;
 		
 	},
-
-	// add : function (map) {
-	// 	this.addTo(map);
-	// },
-
-	// addTo : function (map) {
-	// 	var map = map || Wu.app._map;
-
-	// 	// leaflet fn
-	// 	this.layer.addTo(map);
-
-	// 	// add gridLayer if available
-	// 	if (this.gridLayer) this.gridLayer.addTo(map);
-
-	// },
-
-	// remove : function (map) {
-	// 	var map = map || Wu.app._map;
-
-	// 	// leaflet fn
-	// 	map.removeLayer(this.layer);
-
-	// 	// remove gridLayer if available
-	// 	if (this.gridLayer) map.removeLayer(this.gridLayer);   
-	// },
-
 
 });
 

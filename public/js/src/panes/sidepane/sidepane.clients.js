@@ -31,7 +31,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	_insertNewClientButton : function () {
 		// create New Client button
 		var classname = 'smap-button-white new-client ct11 ct16 ct18';
-		var newClientButton = Wu.DomUtil.create('div', classname, this._clientsContainer, '+');
+		var newClientButton = this._newClientButton = Wu.DomUtil.create('div', classname, this._clientsContainer, '+');
 		newClientButton.id = 'new-client-button';
 
 		// add trigger
@@ -87,6 +87,10 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 			
 		// prepend client to container
 		Wu.DomUtil.appendTemplate(this._clientsContainer, ich.editorClientsNew(clientData));
+
+		// move new button to last
+		Wu.DomUtil.remove(this._newClientButton);
+		this._clientsContainer.appendChild(this._newClientButton);
 
 		// set hooks: confirm button
 		var target = Wu.DomUtil.get('editor-client-confirm-button');
@@ -182,12 +186,21 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		// remove edit box
 		var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
 		Wu.DomUtil.remove(old);
-		
+
+		// add permissions
+		var user = app.Account;
+		console.log('adding perm: ', client.getUuid());
+		user.addUpdateClient(client);
+	       		
 		// create client in DOM
 		editor._create(client);
-	       
+
 		// set active
 		client.setActive();
+
+		// move new button to last
+		Wu.DomUtil.remove(editor._newClientButton);
+		editor._clientsContainer.appendChild(editor._newClientButton);
 	},
 
 	toggleEdit : function (e) { // this = client

@@ -924,7 +924,7 @@ input.cmn-toggle-round-flat + label:before {
 	height: 77px;
 	position: relative;
 	background-color: rgba(255, 255, 255, 0.9);
-	box-shadow: 0 0px 5px 0 #333;
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
 	z-index: 999;
 	margin: 6px;
 	left: 0px;

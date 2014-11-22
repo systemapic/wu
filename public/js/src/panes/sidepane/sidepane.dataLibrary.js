@@ -4,17 +4,18 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	type : 'dataLibrary',
 	title : 'Data <br> Library',
 
+
 	initContent : function () {
 
 		// create new fullscreen page, and set as default content
 		this._content = Wu.DomUtil.create('div', 'data-library ct1', Wu.app._appPane);
 		
 		// Button controller
-		this._controlContainer = Wu.DomUtil.create('div', 'datalibrary-controls', this._content);	
-		this._controlInner = Wu.DomUtil.create('div', 'datalibrary-controls-inner', this._controlContainer);
+		this._controlContainer 	= Wu.DomUtil.create('div', 'datalibrary-controls', this._content);	
+		this._controlInner 	= Wu.DomUtil.create('div', 'datalibrary-controls-inner', this._controlContainer);
 
 		// Upload button
-		this._uploadContainer = Wu.DomUtil.createId('div', 'upload-container', this._controlInner);
+		this._uploadContainer 	= Wu.DomUtil.createId('div', 'upload-container', this._controlInner);
 		this._uploadContainer.innerHTML = "Upload";
 		Wu.DomUtil.addClass(this._uploadContainer, 'smap-button-gray ct17');
 
@@ -34,11 +35,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		Wu.DomUtil.addClass(this._download, 'smap-button-gray');
 		this._download.innerHTML = "Download";		
 
-		// Download button
-		this._errors = Wu.DomUtil.createId('div', 'datalibrary-errors', this._controlInner);
-		Wu.DomUtil.addClass(this._download, 'smap-button-gray');
-		
 
+		// error feedback
+		this._errors = Wu.DomUtil.createId('div', 'datalibrary-errors', this._controlInner);
 
 		// create container (overwrite default)
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct1', this._content);
@@ -116,14 +115,18 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	searchList : function (e) {
 		if (e.keyCode == 27) { // esc
-			this.list.search(); // show all
-			this._search.value = '';
-			return;
+			// reset search
+			return this.resetSearch();
 		}
 
 		// get value and search
 		var value = this._search.value;
 		this.list.search(value);
+	},
+
+	resetSearch : function () {
+		this.list.search(); // show all
+		this._search.value = '';
 	},
 
 
@@ -191,9 +194,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// post         path          json      callback           this
 		Wu.post('/api/file/download', json, this.receivedDownload, this);
-
-
-
 
 	},
 
@@ -357,6 +357,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		Wu.DomEvent.on(document, 'dragleave', this.undropping, this);
 		Wu.DomEvent.on(document, 'dragover', this.dragover, this);
 		Wu.DomEvent.on(document, 'drop', this.dropped, this);
+
+
 	},
 
 	disableFullscreenDZ : function () {
@@ -443,19 +445,26 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	
+	// cxxxx
 	// fullscreen when started uploading                                            // TODO: refactor fullUpOn etc..
 	fullUpOn : function (file) {                                                    //       add support for multiple files
 		// transform .fullscreen-drop                                           //       bugtest more thourougly
 	
 		// add file info
 		var meta = this._createFileMetaContent(file);
-		this.fulldrop.appendChild(meta);	// append meta
+		if (meta) this.fulldrop.appendChild(meta);	// append meta
 
 		// show
 		Wu.DomUtil.addClass(this.fulldrop, 'fullscreen-dropped');
+
+
+
 	},
 
 	_createFileMetaContent : function (file) {
+		if (!file) return; 			// todo: file undefined on drag'n drop
+
+		console.log('_createFileMetaContent file:', file);
 
 		var wrapper 	= Wu.DomUtil.create('div', 'drop-meta-wrapper');
 		var name 	= Wu.DomUtil.create('div', 'drop-meta-name', wrapper);
@@ -485,6 +494,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		
 		// remember drop elem
 		this._fulldrop = e.target.className;
+
 	},
 	fulldropOff : function () {
 		// turn off .fullscreen-drop
@@ -493,16 +503,33 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	// fullscreen for dropping on
 	fullOn : function () {
+
 		// turn on fullscreen-drop
-		this.fulldrop.style.opacity = 0.9;				// wow! full up down on dumb! RE.FACTOR!
+		this.fulldrop.style.opacity = 1;				// wow! full up down on dumb! RE.FACTOR!
 		this.fulldrop.style.zIndex = 1000;
+
+		// Hide the background container (j)
+		this._container.style.display = 'none';
+
+		// Hide toolbar (upload, download, delete, search); (j)
+		Wu.DomUtil.addClass(this._content, 'hide-top', this);
+
 	},
 
 	fullOff : function () {
+
 		var that = this;
 		this.fulldrop.style.opacity = 0;
+
+		// Hide the background container (j)
+		this._container.style.display = 'block';
+
+		// Hide toolbar (upload, download, delete, search); (j)
+		Wu.DomUtil.removeClass(this._content, 'hide-top', this);
+
+
 		setTimeout(function () {        // hack for transitions
-			 that.fulldrop.style.zIndex = -10;      
+			 that.fulldrop.style.zIndex = -10;
 		}, 200);
 	},
 
@@ -550,6 +577,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	// process file
 	uploaded : function (record, options) {
 		
+		console.log('########## uploaded #########');
+		console.log('record:', record);
+		console.log('options: ', options);
 
 		var options = options || {};
 		
@@ -583,22 +613,27 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var cartoCss = app.MapPane.cartoCss;
 		if (cartoCss) cartoCss.update();
 
+
+		console.log('refreshing table! -->');
+		this.reset();
+		this.refreshTable();
+
 	},
 
 	addFile : function (file) {
 
 		// clone file object
-		var tmp = Wu.extend({}, file);   
+		var tmp = Wu.extend({}, file.getStore());   
 
 		// add record (a bit hacky, but with a cpl of divs inside the Name column)
 		tmp.name = ich.datalibraryTablerowName({
-			name : tmp.name || 'Title',
-			description : tmp.description || 'Description',
-			nameUuid : 'name-' + tmp.uuid,
-			descUuid : 'description-' + tmp.uuid,
+			name 		: tmp.name || 'Title',
+			description 	: tmp.description || 'Description',
+			nameUuid 	: 'name-' + tmp.uuid,
+			descUuid 	: 'description-' + tmp.uuid,
 		});
 
-		// clean arrays
+		// clean some fields
 		tmp.type = tmp.type.camelize();
 		tmp.files = this._createFilePopup(tmp.files);
 		tmp.keywords = tmp.keywords.join(', ');
@@ -614,9 +649,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		c[1].setAttribute('for', 'checkbox-' + tmp.uuid);      // label
 
 		// add hooks for editing file, if edit access
-		if (this.project.editMode) {
-			this._addFileEditHooks(tmp.uuid);
-		} 
+		if (this.project.editMode) this._addFileEditHooks(tmp.uuid);
+	
 	},
 
 
@@ -640,11 +674,20 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var title = Wu.DomUtil.get('name-' + uuid);
 		var desc = Wu.DomUtil.get('description-' + uuid);
 
+		// get main
+		var tr = Wu.DomUtil.get(uuid);
+		var cat  = tr.children[4];
+		var keyw = tr.children[5];
+
 		// set click hooks on title and description
-		Wu.DomEvent.on( title,  'mousedown mouseup click', 	this.stop, 	this ); 
-		Wu.DomEvent.on( title,  'dblclick', 			this.rename, 	this );     // select folder
-		Wu.DomEvent.on( desc,   'mousedown mouseup click', 	this.stop, 	this ); 	
-		Wu.DomEvent.on( desc,   'dblclick', 			this.rename, 	this );     // select folder
+		Wu.DomEvent.on( title,  'mousedown mouseup click', 	this.stop, 		this ); 
+		Wu.DomEvent.on( title,  'dblclick', 			this.rename, 		this );     // select folder
+		Wu.DomEvent.on( desc,   'mousedown mouseup click', 	this.stop, 		this ); 	
+		Wu.DomEvent.on( desc,   'dblclick', 			this.rename, 		this );     // select folder
+		Wu.DomEvent.on( cat,    'mousedown mouseup click', 	this.stop, 		this ); 	
+		Wu.DomEvent.on( cat,    'dblclick', 			this.injectCategory, 	this );     // select folder
+		Wu.DomEvent.on( keyw,   'mousedown mouseup click', 	this.stop, 		this ); 	
+		Wu.DomEvent.on( keyw,   'dblclick', 			this.injectKeywords, 	this );     // select folder
 
 	},
 
@@ -652,7 +695,240 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	stop : function (e) {
 		e.preventDefault();
 		e.stopPropagation();
+
+		// hacky to close categories on any click
+		this.closeCategories();
 	},
+
+	
+
+	injectCategory : function (e) {
+
+		// close others
+		this.closeCategories();
+
+		// hacky: reset search so no errors 		// TODO!
+		this.resetSearch();
+
+		// get file uuid
+		var fileUuid = this._injectedUuid = e.target.parentNode.id;
+
+		// get file object
+		var file = this.project.getFile(fileUuid);
+
+		// create wrapper
+		var wrapper = this._injected = Wu.DomUtil.create('div', 'datalibrary-category-wrapper');
+
+		// add line per category
+		var categories = this.project.getCategories();
+
+		// for each category
+		categories.forEach(function (c) {
+
+			// create category line
+			this.createCategoryLine(wrapper, c, file);
+
+		}, this);
+
+		// add new category line
+		var newlinewrap = Wu.DomUtil.create('div', 'datalibrary-category-new-wrap', wrapper);
+		var newline = this._injectedNewline = Wu.DomUtil.create('input', 'datalibrary-category-new', newlinewrap);
+		newline.setAttribute('placeholder', 'Add category...');
+
+		// set event on new category
+		Wu.DomEvent.on(newline, 'keydown', this.categoryKeydown, this);
+		Wu.DomEvent.on(newline, 'mousedown', Wu.DomEvent.stopPropagation, this);
+
+		// set position 
+		wrapper.style.position = 'absolute';
+		wrapper.style.left = e.x - 50 + 'px';
+		wrapper.style.top = e.y + 'px';
+
+		// add to body
+		document.body.appendChild(wrapper);
+
+		// add outside click event
+		Wu.DomEvent.on(window, 'mousedown', this._closeCategories, this);
+
+	},
+
+	createCategoryLine : function (wrapper, c, file) {
+
+		// create line item
+		var wrap = Wu.DomUtil.create('div', 'datalibrary-category-line-wrap', wrapper);
+		var div  = Wu.DomUtil.create('div', 'datalibrary-category-line', wrap, c.camelize());
+		var del  = Wu.DomUtil.create('div', 'datalibrary-category-line-del', wrap, 'X');
+
+		// select category
+		Wu.DomEvent.on(div, 'mousedown', function (e) {
+			
+			// stop
+			Wu.DomEvent.stopPropagation(e);
+
+			// set vars
+			var value = c;
+			var key = 'category';
+
+			// save to model
+			file.setCategory(value);
+
+			// close
+			this.closeCategories();
+		
+			// refresh 		// todo: a reset/refresh of table will annul sort
+			this.reset();
+			this.refreshTable();
+
+		}, this);
+
+		// delete category
+		Wu.DomEvent.on(del, 'mousedown', function (e) {
+
+			// stop
+			Wu.DomEvent.stopPropagation(e);
+
+			// remove category
+			var msg = 'Are you sure you want to delete category ' + c.camelize() + '? This will remove the category from all files.';
+			if (confirm(msg)) {
+
+				// remove category
+				this.removeCategory(c);
+			} 
+
+
+		}, this);
+
+	},
+
+	removeCategory : function (category) {
+		console.log('removing cateory:', category);
+
+		// remove from project
+		this.project.removeCategory(category);
+	
+		// remove from all files
+		var files = this.project.getFileObjects();
+		for (f in files) {
+			var file = files[f];
+			if (file.getCategory().toLowerCase() == category.toLowerCase()) {
+				file.setCategory(''); // set blank
+			}
+		}
+
+		// close
+		this.closeCategories();
+	
+		// refresh 		// todo: a reset/refresh of table will annul sort
+		this.reset();
+		this.refreshTable();
+	},
+
+	closeCategories : function () {
+		if (this._injected) Wu.DomUtil.remove(this._injected);
+
+		Wu.DomEvent.off(window, 'mousedown', this._closeCategories, this);
+	},
+
+	_closeCategories : function () {
+		console.log('_closeCategories');
+
+		this.closeCategories();
+	},
+
+	injectCategoryBlur : function () {
+
+		// update file in project
+		this.project.store.files.forEach(function(file, i, arr) {
+			// iterate and find hit
+			// if (file.uuid == fuuid) file[key] = value;
+		}, this);
+
+	},
+
+	categoryKeydown : function (e) {
+		console.log('categoryKeydown!', e.keyCode);
+
+		// on enter
+		if (e.keyCode == 13) {
+
+			var value = this._injectedNewline.value;
+			console.log('value: ', value);
+
+			// create new category
+			this.project.addCategory(value);
+
+			// set category
+			console.log('E e E e ', e);
+			var fileUuid = this._injectedUuid;
+			console.log('injectUuuid', fileUuid);
+
+
+
+			var file = this.project.getFile(fileUuid);
+			file.setCategory(value);
+
+			// close
+			this.closeCategories();
+		
+			// refresh 		// todo: a reset/refresh of table will annul sort
+			this.reset();
+			this.refreshTable();
+
+
+		}
+
+		// on esc
+		if (e.keyCode == 27) {
+			console.log('esc!');
+			
+			// close, do nothing
+			this.closeCategories();
+		}
+	},
+
+	injectKeywords : function (e) {
+		console.log('injectCategory', e);
+
+		var fuuid = e.target.parentNode.id;
+		this._injectedUuid = fuuid;
+
+		// inject <input>
+		var input = Wu.DomUtil.create('input', 'datalibrary-edit-field');
+		input.value = e.target.innerHTML;
+		input.setAttribute('placeholder', 'Enter value');
+		input.removeAttribute('readonly');
+		e.target.innerHTML = '';
+		e.target.appendChild(input);
+		input.focus();
+
+		// save on blur or enter
+		Wu.DomEvent.on(input,  'blur', this.injectKeywordsBlur, this);   // save folder title
+		Wu.DomEvent.on(input,  'keydown', this.editKey, this);    	 // fire blur on key press
+
+	},
+
+	injectKeywordsBlur : function (e) {
+
+		// get value
+		var value = e.target.value;
+
+		// set text 
+		var parent = e.target.parentNode;
+		parent.innerHTML = value;
+
+		// split into array and trim
+		var split = value.split(',');
+		split.forEach(function (s, i, arr) {
+			arr[i] = s.trim();
+		}, this);
+
+		// update file in project
+		var file = this.project.getFile(this._injectedUuid);
+		file.setKeywords(split);
+
+	},
+
+
 
 	rename : function (e) {
 
@@ -765,19 +1041,20 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var cartoCss = app.MapPane.cartoCss;
 		if (cartoCss) cartoCss.update();
 
-
-
 	},
 
 	refreshTable : function () {
 
 		// return if empty filelist
-		if (!this.project.store.files) { return; }
+		// if (!this.project.store.files) { return; }
+		if (!this.project.files) { return; }
 
 		// enter files into table
-		this.project.store.files.forEach(function (file, i, arr) {
-		       this.addFile(file);
-		}, this);
+		// this.project.store.files.forEach(function (file, i, arr) {
+		for (f in this.project.files) {
+			var file = this.project.files[f];
+			this.addFile(file);
+		};
 
 		// sort list by name by default
 		this.list.sort('name', {order : 'asc'});

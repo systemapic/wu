@@ -107,6 +107,12 @@ L.Control.Legends = L.Control.extend({
 
 	},
 
+	// // open if any legends only (for phantomJS)
+	// _openLegends : function () {
+	// 	console.log('_openLe§!!', this.legendsCounter);
+	// 	if (this.legendsCounter.length == 0) return;
+	// 	this.openLegends();
+	// },
 
 	openLegends : function (e) {
 
@@ -170,6 +176,8 @@ L.Control.Legends = L.Control.extend({
 		this.addHooks();
 
 		this.legends = {};
+		this._layers = [];
+
 
 		// ADDED BY JØLLE
 		this.legendsCounter = []; 
@@ -179,10 +187,88 @@ L.Control.Legends = L.Control.extend({
 	},
 
 
+
+
+	// add legend from outside
 	addLegend : function (layer) {
 
-		var uuid = layer.store.uuid;
+		// each layer has its own legends
+		this._layers.push(layer);
+
+		// rebuild
+		this.refreshLegends();
+
+	},
+
+
+
+	removeLegend : function (layer) {
+
+		// remove from local store
+		var rem = _.remove(this._layers, function (l) {
+			return l.store.uuid == layer.store.uuid;
+		});
+			
+		// remove from array (for width setting)
+		_.remove(this._legendsContainer, function (l) {
+			return l.id == layer.store.uuid;
+		})
+
+		// rebuild
+		this.refreshLegends();
+	
+	},
+
+	refreshLegends : function () {
+
+
+		this.legendsCounter = [];
+		this.sliderWidth = 0;
+
+		// remove old legends
+		this._legendsInnerSlider.innerHTML = '';
+
+		// get layers that should have legends (active ones)
+		var layers = this._getActiveLayers();
+
+		// adds to DOM etc
+		layers.forEach(function (layer) {
+
+			// return if no active legends in layer
+			if (!this._legendOn(layer)) return; 
+
+			// add legends
+			this._addLegend(layer);
+
+		}, this);
+
+		// Hide legends if it's empty
+		if (this.legendsCounter.length == 0) this._legendsContainer.style.display = 'none';
+
+	},
+
+	_legendOn : function (layer) {
+		var ons = [];
 		var legends = layer.getLegends();
+		if (!legends) return false;
+		legends.forEach(function (legend) {
+			if (legend.on) ons.push(legend);
+		});
+		return ons.length;
+	},
+
+	_getActiveLayers : function () {
+		// all layers in layermenu that are active
+		// ie. all layers on map
+
+		var layers = app.MapPane.getActiveLayers();
+		return layers;
+	},
+
+
+	_addLegend : function (layer) {
+		var uuid = layer.store.uuid;
+		var legends = layer.getActiveLegends();
 		
 		// return if no legend
 		if (!legends) return;
@@ -195,7 +281,7 @@ L.Control.Legends = L.Control.extend({
 
 	    	// Set the width of the legends container
 		var containerWidth = Math.round(legends.length/4) * 150;
-		if ( containerWidth < 150 ) containerWidth = 150;
+		if (containerWidth < 150) containerWidth = 150;
 		div.style.width = containerWidth + 'px';
 
 		// Set the width of the legends slider
@@ -212,7 +298,6 @@ L.Control.Legends = L.Control.extend({
 			width : legendWidth
 		}
 
-
 	    	// Added by Jølle		    	
 	    	var tempObj = {
 			id : uuid,
@@ -222,13 +307,18 @@ L.Control.Legends = L.Control.extend({
 		// Push in array for sliding control
 	    	this.legendsCounter.push(tempObj);
 
+	    	// get header title
+	    	var headerTitle = this._getLegendHeader(layer);
 
 		// create legends divs
-		var b = Wu.DomUtil.create('div', 'legend-header', div);
+		var b = Wu.DomUtil.create('div', 'legend-header', div, headerTitle); // header
 		this._legendsList = Wu.DomUtil.create('div', 'legend-list', div);
 
 		// create legends
 		legends.forEach(function (legend) {
+
+			// skip disabled legends
+			if (!legend.on) return;
 
 			// create legend divs
 			var d = Wu.DomUtil.create('div', 'legend-each', this._legendsList);
@@ -242,54 +332,22 @@ L.Control.Legends = L.Control.extend({
 
 		}, this);
 
-		
-
 		// see if we need the horizontal scrollers or not
 		this.checkWidth();
 		this.calculateHeight();
 
-	},
-
-	_addLegend : function (legend) {
-
-		
-
 
 	},
 
-	removeLegend : function (layer) {
-	
-		var uuid = layer.store.uuid;
-		var legend = this.legends[uuid];
+	_getLegendHeader : function (layer) {
 
-		// return if no legend to remove
-		if (!legend) return; 
+		var tip = layer.getTooltip();
 
-		// Remove from array
-		for (var i = 0; i < this.legendsCounter.length; i++) {
-			if (this.legendsCounter[i].id == uuid) this.legendsCounter.splice(i, 1);
-		}
-		
-		// adjust legend slider
-		this._adjustLegendSlider(legend);
+		if (!tip) return '';
 
-		// Set the width of the inner slider... (j)
-		this._legendsInnerSlider.style.width = this.sliderWidth + 'px';
-	    
-	    	// remove div
-		var div = legend.div;
-		Wu.DomUtil.remove(div);
-		delete this.legends[uuid];
+		return tip.title;
 
-		// See if we need the horizontal scrollers or not!
-		this.checkWidth();
 
-		// Store legends height
-		this.calculateHeight();
-
-		// Hide legends if it's empty
-		if (this.legendsCounter.length == 0) this._legendsContainer.style.display = 'none';
-		
 	},
 
 
@@ -321,6 +379,7 @@ L.Control.Legends = L.Control.extend({
 		this.sliderWidth -= legend.width; 
 
 	},
+
 
 	legendsScrollLeft : function () {
 

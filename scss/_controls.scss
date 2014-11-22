@@ -910,7 +910,7 @@
 	position: relative;
 	margin-bottom: 3px;
 	margin-top: 3px;	
-	width: 140px;
+	width: 135px;
 	}
 
 .legend-feature {
@@ -923,6 +923,16 @@
 	top: -2px;
 	overflow: hidden;
 	}
+
+.legend-feature:before {
+	content: '';
+	width: 21px;
+	height: 20px;
+	position: absolute;
+	background: white;
+	top: 0;
+	left: 0;
+}	
 
 .legend-feature div {
 	position: relative;
@@ -1228,7 +1238,10 @@
 	}
 
 /* Layer Folder color coding */
-.layer-menu-item-wrap.menufolder.level-0 {
+.menufolder {
+	background-color: #3b596a !important;
+	}
+/*.layer-menu-item-wrap.menufolder.level-0 {
 	background-color: #3b596a !important;
 	}
 
@@ -1239,6 +1252,7 @@
 .layer-menu-item-wrap.menufolder.level-2 {
 	background-color: #30363e;
 	}
+	*/
 
 .layer-active {
 	/*background-color: #98367d !important;	*/
@@ -1609,9 +1623,10 @@
 	font-size: 115%;
 	line-height: 1.85;
 	width: 100%;
-	padding-right: 33px;
+	padding-right: 50px;
 	overflow: hidden;	
 	height: 25px;
+	word-break: break-all;
 	}
 
 /* Eye */
@@ -1625,6 +1640,7 @@
 	background-repeat: no-repeat;
 	background-position: -124px -43px;
 	cursor: pointer;
+	right: 22px;
 	}
 
 .inspect-eye:hover {
@@ -1634,6 +1650,27 @@
 .inspect-eye.inspecting {
 	background-position: -210px -43px;
 	}	
+
+
+/* Fly */
+.inspect-fly {
+	width: 20px;
+	height: 20px;
+	z-index: 99999;
+	position: absolute;
+	top: 3px;
+	right: 42px;
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: -278px -47px;
+	cursor: pointer;
+	opacity: 0.7;
+	}	
+
+.inspect-fly:hover {
+	opacity: 1;
+	}
+
 
 /* Remove layer */
 .inspect-kill {
@@ -2432,6 +2469,7 @@
 	font-size: 15px;
 	padding-left: 8px;
 	margin-left: 2px;
+	height: 32px;
 	}
 
 .tooltip-title {

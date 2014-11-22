@@ -2,7 +2,7 @@ Wu.MapPane = Wu.Class.extend({
 
 	initialize : function () {
 		this._initContainer();
-		this._initPanes();
+		this._activeLayers = [];
 		return this; 
 	},      
 
@@ -18,10 +18,7 @@ Wu.MapPane = Wu.Class.extend({
 		Wu.DomUtil.addClass(this._container, 'click-to-start');
 	},
 
-	_initPanes : function () {
-
-	},
-
+	
     
 	_updateWidth : function () {
 
@@ -115,9 +112,6 @@ Wu.MapPane = Wu.Class.extend({
 		// set header padding
 		this.setHeaderPadding();
 
-		// update controls
-		// this.updateControls();
-
 		// set controls css logic
 		this.updateControlCss();
 		
@@ -157,16 +151,28 @@ Wu.MapPane = Wu.Class.extend({
 		return position;
 	},
 
-	getActiveLayers : function () {
+	getActiveLayermenuLayers : function () {
 		if (!this.layerMenu) return false;
-
 		var layers = this.layerMenu.getLayers();
 		var active = _.filter(layers, function (l) {
 			return l.on;
 		});
-
 		return active;
+	},
 
+	getActiveLayers : function () {
+		return this._activeLayers;
+	},
+
+	addActiveLayer : function (layer) {
+
+		this._activeLayers.push(layer);
+	},
+
+	removeActiveLayer : function (layer) {
+		_.remove(this._activeLayers, function (l) {
+			return l.getUuid() == layer.getUuid();
+		}, this);
 	},
 
 
@@ -194,7 +200,8 @@ Wu.MapPane = Wu.Class.extend({
 	createNewMap : function () {
 
 		var options = {
-			worldCopyJump : true
+			worldCopyJump : true,
+			attributionControl : false
 		}
 
 		// create new map
@@ -206,8 +213,8 @@ Wu.MapPane = Wu.Class.extend({
 		// add attribution
 		// if (this._attributionControl) this._map.removeControl(this._attributionControl);
 		this._attributionControl = L.control.attribution({
-				position : 'bottomleft',
-				prefix : 'Powered by <a href="https://systemapic.com/" target="_blank">Systemapic</a>'
+				position : 'bottomright',
+				prefix : 'Powered by <a href="https://systemapic.com/" target="_blank">Systemapic.com</a> ©'
 		});
 
 
@@ -260,75 +267,49 @@ Wu.MapPane = Wu.Class.extend({
 
 		setTimeout(function(){
 
-			// console.log('_____________ updateControlCss ___________________________________');
-		
+			// get controls
 			var controls = thus.project.getControls();
-
-			// console.log("Active conttrollers:")
-			// console.log(controls);
-			// console.log("====================")
-
+			
+			// get leaflet control corners
+			var _leafletTopLeft = app.MapPane._map._controlContainer.childNodes[0];
+			var _leafletBottomRight = app.MapPane._map._controlContainer.childNodes[3];				
 
 			if ( controls.baselayertoggle ) {
-				// console.log('Baselayer Toggle Control');
 			}
 
-			// DESCRIPTION CONTROL
-			// DESCRIPTION CONTROL
-			// DESCRIPTION CONTROL
+			
 
-			var _leafletTopLeft = app.MapPane._map._controlContainer.childNodes[0];
+			if (controls.description) {
+			} 
 
-			if ( controls.description ) {
-				// console.log('Description Control');
-			} else {				
+			if (controls.draw) {
 			}
 
-			if ( controls.draw ) {
-				// console.log('Draw Control');
+			if (controls.geolocation) {
 			}
 
-			if ( controls.geolocation ) {
-				// console.log('Geolocation Control');
-			}
-
-			if ( controls.inspect ) {
-				// console.log('Inspect Layers Control');
+			if (controls.inspect) {
 			}
 
 
-			// LAYER MENU CONTROL
-			// LAYER MENU CONTROL
-			// LAYER MENU CONTROL
-
-			if ( controls.layermenu ) {
-				// console.log('Layer Menu Control');
+			// layermenu control
+			if (controls.layermenu) {
 				
-				var _leafletBottomRight = app.MapPane._map._controlContainer.childNodes[3];				
-
 				// Check for Layer Inspector
-				if ( controls.inspect ) {
+				if (controls.inspect) {
 					Wu.DomUtil.removeClass(_leafletBottomRight, 'no-inspector');
 				} else {
 					Wu.DomUtil.addClass(_leafletBottomRight, 'no-inspector');
 				}
-
 			}
 
-			
-			// LEGENDS CONTROL
-			// LEGENDS CONTROL
-			// LEGENDS CONTROL
-
-			if ( controls.legends ) {
-				// console.log('Legends Control');
+			// legend control
+			if (controls.legends) {
 				
-				console.log('thus', thus);
-				console.log('controls.legends', controls.legends);
-
+				// get container
 				var __legendsContainer = thus.legendsControl._legendsContainer;
 
-				// Check for Layer Manu Control
+				// Check for Layer Menu Control
 				if ( controls.layermenu ) {
 					Wu.DomUtil.removeClass(__legendsContainer, 'legends-padding-right');
 				} else {
@@ -337,16 +318,12 @@ Wu.MapPane = Wu.Class.extend({
 
 				// Check for Description Control
 				if ( controls.description ) {
-				} else {
-				}
+				} 
 
 			}
 
 
-			// SCALE CONTROL
-			// SCALE CONTROL
-			// SCALE CONTROL
-
+			// scale control
 			if ( controls.measure ) {
 				// console.log('Scale Control', thus._scale._container);
 				var _leafletTopRight = app.MapPane._map._controlContainer.childNodes[1];
@@ -359,33 +336,21 @@ Wu.MapPane = Wu.Class.extend({
 					// right: 6px;
 				}
 
-				if ( controls.legends ) {
-					// _leafletTopRight.style.bottom = '133px';
-					// bottom: 113px;
-				} else {
-					// _leafletTopRight.style.bottom = '6px';
-					// bottom: 6px;
-				}
-
 
 			}
 
 			if ( controls.mouseposition ) {
-				// console.log('Mouse Position');
 			}
 
 			if ( controls.vectorstyle ) {
-				// console.log('Vector Styling Control');
 			}
 
 			if ( controls.zoom ) {
-				// console.log('Zoom Control');
 			}
 
 			
-			// console.log('_____________ updateControlCss ___________________________________');
 
-		}, 50)
+		}, 50)	// css/dom hack
 	},
 
 
@@ -414,6 +379,19 @@ Wu.MapPane = Wu.Class.extend({
 
 
 	},
+
+	refreshZIndex : function () {
+
+		var layers = this.project.getActiveLayers();
+
+
+		layers.forEach(function (layer) {
+			layer.refreshZIndex();
+
+		}, this);
+
+	},
+
 
 	hideControls : function () {
 		Wu.DomUtil.addClass(app._map._controlContainer, 'displayNone');
@@ -514,7 +492,7 @@ Wu.MapPane = Wu.Class.extend({
 	enableGeolocation : function () {
 		if (this.geolocationControl) return;
 
-		// create controls // todo: no info on type of place (city, neighbourhood, street), so not possible to set good zoom level
+		// create controls 
 		this.geolocationControl = new L.Control.Search({
 			url : 'https://nominatim.openstreetmap.org/search?format=json&q={s}',
 			jsonpParam : 'json_callback',
@@ -522,6 +500,7 @@ Wu.MapPane = Wu.Class.extend({
 			propertyLoc : ['lat','lon'],	
 			boundingBox : 'boundingbox',
 
+			// custom filter
 			filterJSON : function (json) {
 				var jsonret = [], i;
 				for (i in json) {
@@ -554,8 +533,6 @@ Wu.MapPane = Wu.Class.extend({
 	disableGeolocation : function () {
 		if (!this.geolocationControl) return;
 	       	
-	       	console.log('disableGeolocation', this.geolocationControl);
-
 		// remove and delete control
 		this._map.removeControl(this.geolocationControl);
 		delete this.geolocationControl;
@@ -635,7 +612,6 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 	disableCartocss : function () {
-
 		if (!this.cartoCss) return;
 
 		this._map.removeControl(this.cartoCss);
@@ -651,9 +627,7 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 	enableLayermenu : function () {      
-
 		if (this.layerMenu) return;
-
 
 		// add control
 		this.layerMenu = L.control.layermenu({
@@ -678,7 +652,6 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 	enableBaselayertoggle : function () {
-
 		if (this.baselayerToggle) return;
 
 		// create control
@@ -695,11 +668,10 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 	disableBaselayertoggle : function () {
-
 		if (!this.baselayerToggle) return
+
 		this._map.removeControl(this.baselayerToggle);
 		delete this.baselayerToggle;
-
 	},
 	
 	enableVectorstyle : function (container) {
@@ -741,6 +713,7 @@ Wu.MapPane = Wu.Class.extend({
 
 		// remove draw control
 		this._map.removeControl(this._drawControl);
+
 		// this._map.removeLayer(this.editableLayers);	//todo
 		this._drawControl = false;
 
@@ -756,10 +729,10 @@ Wu.MapPane = Wu.Class.extend({
 		// Leaflet.Draw options
 		options = {
 			position: 'topleft',
-			edit: {
-				// editable layers
-				featureGroup: editableLayers
-			},
+			// edit: {
+			// 	// editable layers
+			// 	featureGroup: editableLayers
+			// },
 			draw: {
 				circle: {
 					shapeOptions: {
@@ -798,59 +771,63 @@ Wu.MapPane = Wu.Class.extend({
 		// add drawControl
 		var drawControl = this._drawControl = new L.Control.Draw(options);
 
-		console.log('Add Draw Control');
-		console.log('OBS! Make sure that this ALWAYS loads at the bottom of the toolbar list! #askKnut')
-
+		// add to map
 		map.addControl(drawControl);
 
-		
 		// add class
 		var container = drawControl._container;
 		L.DomUtil.addClass(container, 'elizaveta');	// todo: className
 
-		// close popups on hover
+		// close popups on hover, stop clickthrough
 		Wu.DomEvent.on(drawControl, 'mousemove', L.DomEvent.stop, this);
 		Wu.DomEvent.on(drawControl, 'mouseover', map.closePopup, this);
+		Wu.DomEvent.on(container,   'mousedown mouseup click', L.DomEvent.stopPropagation, this);
 
 
-		var that = this;
+		// var that = this;
 
 		// add circle support
 		map.on('draw:created', function(e) {
 
+			// console.log('draw:created!', e);
+
 			// add circle support
 			e.layer.layerType = e.layerType;            
 
-			// if editMode
-			if (that.project.editMode) {
+			// add to map
+			app._map.addLayer(e.layer);
 
-				// create layer and add to project
-				var geojson = e.layer.toGeoJSON();
-				that.project.createLayerFromGeoJSON(geojson);
+			// // if editMode
+			// if (that.project.editMode) {
+
+			// 	console.log('editmode!');
+			// 	// create layer and add to project
+			// 	var geojson = e.layer.toGeoJSON();
+			// 	that.project.createLayerFromGeoJSON(geojson);
 				
-			} else {
+			// } else {
 
-				// add drawn layer to map
-				editableLayers.addLayer(e.layer);
+			// 	// add drawn layer to map
+			// 	editableLayers.addLayer(e.layer);
 
-			}
+			// }
 		});
 
-		// created note
-		map.on('draw:note:created', function(e) {
+		// // created note
+		// map.on('draw:note:created', function(e) {
 
-			// add layers
-			editableLayers.addLayer(e.noteLayer);
-			editableLayers.addLayer(e.rectangleLayer);
+		// 	// add layers
+		// 	editableLayers.addLayer(e.noteLayer);
+		// 	editableLayers.addLayer(e.rectangleLayer);
 
-			// enable edit toolbar and focus Note
-			L.Draw._editshortcut.enable();		// todo, refactor
-			e.noteLayer._el.focus();
-			map.LeafletDrawEditEnabled = true;
-		});
+		// 	// enable edit toolbar and focus Note
+		// 	// L.Draw._editshortcut.enable();		// todo, refactor
+		// 	// e.noteLayer._el.focus();
+		// 	// map.LeafletDrawEditEnabled = true;
+		// });
 
 		// add vector styling control
-		this.enableVectorstyle(drawControl._wrapper);
+		// this.enableVectorstyle(drawControl._wrapper);
 
 	},
 
@@ -876,6 +853,53 @@ Wu.MapPane = Wu.Class.extend({
 		}
 		return false;
 	},
+
+
+
+	_zIndex : [],
+
+	registerZIndex : function (layer) {
+
+		// get zIndex from layer, if any
+		var zIndex = layer.store.zIndex;
+		
+		// if no zIndex, set to last in line (ie. top)
+		if (!zIndex) layer.setZIndex(this._zIndex.length + 1);
+
+		var item = {
+			zIndex : zIndex,
+			layer : layer
+		}
+
+		// add to global zIndex array
+		this.addToZIndex(item);
+
+	},
+
+	addToZIndex : function (item) {
+
+		// if first, just push
+		if (this._zIndex.length == 0) return this._zIndex.push(item);
+
+		// add to appropriate place in zIndex
+		var z = _.findIndex(this._zIndex, function (l) {
+			if (!l) return false;
+
+			return l.zIndex > item.zIndex;
+
+		});
+
+	},
+
+	setZIndex : function (layer, zIndex) {
+
+	},
+
+	getZIndex : function (layer) {
+
+	},
+
+
 	
 });
 

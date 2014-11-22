@@ -42,6 +42,11 @@ module.exports = function(app, passport) {
 	// ================================
 	app.get('/', function(req, res) {
 
+
+		console.log('HOME => / is auth?:', req.isAuthenticated());
+		console.log('req.', req);
+
+
 		// return if not logged in 			redirect to login page
 		if (!req.isAuthenticated()) return res.render('../../views/index.ejs'); // load the index.ejs file
 		
@@ -595,7 +600,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// show the login form
 	app.get('/login', function(req, res) {
-		console.log('/login');
+		console.log('/login§');
 
 		// render page and pass in flash data if applicable
 		res.render('../../views/login.ejs', { message: req.flash('loginMessage') });

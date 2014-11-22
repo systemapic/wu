@@ -258,6 +258,15 @@ input[type=checkbox] + label.check {
 	}
 
 
+.leaflet-top.leaflet-left {
+	-webkit-transition: opacity 250ms ease, width 250ms ease;	
+	-moz-transition: opacity 250ms ease, width 250ms ease;
+	-o-transition: opacity 250ms ease, width 250ms ease;
+	transition: opacity 250ms ease, width 250ms ease;
+	}
+
+
+
 /*
 ██╗  ██╗███████╗██╗ ██████╗ ██╗  ██╗████████╗
 ██║  ██║██╔════╝██║██╔════╝ ██║  ██║╚══██╔══╝
@@ -281,13 +290,15 @@ input[type=checkbox] + label.check {
 .layer-menu-item-wrap,
 .editor-project-edit-super-wrap,
 #editor-map-initpos-coordinates,
-#editor-map-bounds-coordinates {
+#editor-map-bounds-coordinates,
+.settings-outer {
 	-webkit-transition: height 250ms ease;
 	-moz-transition: height 250ms ease;
 	transition: height 250ms ease;
 	}
 
-.item-list { 
+.item-list,
+.cartocss-layerselector-outer { 
 	-webkit-transition: height 150ms ease;
 	-moz-transition: height 150ms ease;
 	-o-transition: height 150ms ease;
@@ -306,15 +317,13 @@ input[type=checkbox] + label.check {
 */
 
 .leaflet-bottom.leaflet-right,
-#upload-container,
-.leaflet-top.leaflet-left {
+#upload-container {
 	-webkit-transition: width 250ms ease;
 	-moz-transition: width 250ms ease;
 	-o-transition: width 250ms ease;
 	transition: width 250ms ease;
 	}
   	
-
 
 /*
 ██╗     ███████╗███████╗████████╗
@@ -371,6 +380,9 @@ input[type=checkbox] + label.check {
 	-o-transition: opacity 300ms ease;
 	transition: opacity 300ms ease;
 	}
+
+
+
 
 .list .dropdown-button,
 .box .dropdown-button,
