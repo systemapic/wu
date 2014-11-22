@@ -53,6 +53,16 @@ Wu.Project = Wu.Class.extend({
 		this.layers[layer.uuid] = new Wu.createLayer(layer);
 	},
 
+	addBaseLayer : function (layer) {
+		this.store.baseLayers.push(layer);
+		this._update('baseLayers');
+	},
+
+	removeBaseLayer : function (layer) {
+		_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.getUuid(); });
+		this._update('baseLayers');
+	},
+
 	createLayerFromGeoJSON : function (geojson) {
 
 		console.log('createLayerFromGeoJSON', geojson);
@@ -451,12 +461,10 @@ Wu.Project = Wu.Class.extend({
 	// get available categories stored in project
 	getCategories : function () {
 		return this.store.categories;
-		// return ['environment', 'coal', 'wildlife']; // dummy 
 	},
 
 	// add category to project list of cats
 	addCategory : function (category) {
-		console.log('project.addCategory', category);
 
 		// push to list
 		this.store.categories.push(category);
@@ -466,7 +474,6 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	removeCategory : function (category) {
-		console.log('project.removeCategory', category);
 
 		// remove from array
 		_.remove(this.store.categories, function (c) {
@@ -802,7 +809,6 @@ Wu.Project = Wu.Class.extend({
 			this.getSettings()[setting] ? this['enable' + setting.camelize()]() : this['disable' + setting.camelize()]();
 		}
 	},
-
 
 	// settings
 	toggleSetting : function (setting) {

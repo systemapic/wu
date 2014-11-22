@@ -32,6 +32,16 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	addTo : function (map) {
+		
+		// add to map
+		this._addTo(map);
+		
+		// add to controls
+		this.addToControls();
+
+	},
+
+	_addTo : function (map) {
 		var map = map || Wu.app._map;
 
 		// leaflet fn
@@ -46,8 +56,10 @@ Wu.Layer = Wu.Class.extend({
 		// add gridLayer if available
 		if (this.gridLayer) map.addLayer(this.gridLayer);
 
+	},
 
-		
+	addToControls : function () {
+
 		// add legends if active
 		var legendsControl = app.MapPane.legendsControl;
 		legendsControl && legendsControl.addLegend(this);
@@ -69,7 +81,6 @@ Wu.Layer = Wu.Class.extend({
 			}
 		
 		}
-
 	},
 
 	leafletEvent : function (event, fn) {

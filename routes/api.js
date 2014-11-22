@@ -950,11 +950,11 @@ module.exports = api = {
 			pdf : true
 		}
 
-		console.log('-> PDF args: ', args);
+		// console.log('-> PDF args: ', args);
 
 		var snappath = TOOLSPATH + 'phantomJS-snapshot.js';
 		var cmd = "phantomjs --ssl-protocol=tlsv1 " + snappath + " '" + JSON.stringify(args) + "'";
-		console.log('cmd: ', cmd);
+		// console.log('cmd: ', cmd);
 
 
 		var ops = [];
@@ -979,10 +979,10 @@ module.exports = api = {
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
 
-				console.log('executed phantomJS');
-				console.log('err: ', err);
-				console.log('stdout: ', stdout);
-				console.log('stdin: ', stdin);
+				// console.log('executed phantomJS');
+				// console.log('err: ', err);
+				// console.log('stdout: ', stdout);
+				// console.log('stdin: ', stdin);
 
 				callback(err);
 			});
@@ -993,7 +993,7 @@ module.exports = api = {
 		ops.push(function (callback) {
 
 
-			console.log('CREATING PDF!!');
+			// console.log('CREATING PDF!!');
 
 			PDFDocument = require('pdfkit');
 			var doc = new PDFDocument({
@@ -1069,9 +1069,9 @@ module.exports = api = {
 	// #########################################
 	createSnapshot : function (req, res) {
 
-		console.log('cretae snapshot');
-		console.log('body: ', req.body);
-		console.log('hash: ', req.body.hash);
+		// console.log('cretae snapshot');
+		// console.log('body: ', req.body);
+		// console.log('hash: ', req.body.hash);
 
 
 		// run phantomjs cmd	
@@ -1091,7 +1091,7 @@ module.exports = api = {
 			id : req.body.hash.id
 		}
 
-		console.log('hash:::', hash);
+		// console.log('hash:::', hash);
 
 		var args = {
 			projectUuid : projectUuid,
@@ -1107,7 +1107,7 @@ module.exports = api = {
 		var snappath = TOOLSPATH + 'phantomJS-snapshot.js';
 		var cmd = "phantomjs --ssl-protocol=tlsv1 " + snappath + " '" + JSON.stringify(args) + "'";
 		// var cmd = "phantomjs --ssl-protocol=tlsv1 /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
-		console.log('cmd: ', cmd);
+		// console.log('cmd: ', cmd);
 
 
 		var ops = [];
@@ -1121,10 +1121,10 @@ module.exports = api = {
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
 
-				console.log('executed phantomJS');
-				console.log('err: ', err);
-				console.log('stdout: ', stdout);
-				console.log('stdin: ', stdin);
+				// console.log('executed phantomJS');
+				// console.log('err: ', err);
+				// console.log('stdout: ', stdout);
+				// console.log('stdin: ', stdin);
 
 				callback(err);
 			});
@@ -1136,8 +1136,8 @@ module.exports = api = {
 
 			console.log('fsstat');
 			fs.stat(path, function (err, stats) {
-				console.log('err: ', err);
-				console.log('stats: ', stats);
+				// console.log('err: ', err);
+				// console.log('stats: ', stats);
 				if (stats) dataSize = stats.size;
 	 			callback(err);
 	 		});
@@ -1148,7 +1148,7 @@ module.exports = api = {
 		// create File
 		ops.push(function (callback) {
 
-			console.log('create file phsj')
+			// console.log('create file phsj')
 
 			var f 			= new File();
 			f.uuid 			= 'file-' + uuid.v4();
@@ -1176,14 +1176,14 @@ module.exports = api = {
 		console.log('running phantom ascyn');
 
 		async.series(ops, function (err, results) {
-			console.log('pahtnom !! all done: ', err);
-			console.log('results', results);
+			// console.log('pahtnom !! all done: ', err);
+			// console.log('results', results);
 
 			if (err) console.log('err', err);
 
 			var file = results[2]
 
-			console.log('file: ', file);
+			// console.log('file: ', file);
 
 			res.end(JSON.stringify({
 				image : file.uuid,
