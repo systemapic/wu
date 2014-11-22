@@ -63,6 +63,8 @@ module.exports = function(passport) {
 	},
 	function(req, email, password, done) {
 
+		console.log('LOGIN ATTEMPT!', email, password);
+
 		// asynchronous
 		// User.findOne wont fire unless data is sent back
 		process.nextTick(function() {
@@ -116,10 +118,15 @@ module.exports = function(passport) {
 	},
 	function(req, email, password, done) { // callback with email and password from our form
 	  
+
+		console.log('LOGIN ATTEMwPT!', email, password);
+
 		// find a user whose email is the same as the forms email
 		// we are checking to see if the user trying to login already exists
 		User.findOne({ 'local.email' :  email }, function(err, user) {
 			// if there are any errors, return the error before anything else
+			console.log('err, user, ', err, user);
+
 			if (err)
 				return done(err);
 
@@ -131,10 +138,12 @@ module.exports = function(passport) {
 			if (!user.validPassword(password))
 				return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
 
+			console.log('redis');
 
 			// set token, save to user
 			user.token = setRedisToken(user);
 			user.save(function (err) {
+				console.log('redis save, err', err);
 				if (err) console.error(err);
 
 				// all is well, return successful user
@@ -159,6 +168,8 @@ module.exports = function(passport) {
 	// - new access token created each time user logs in, then the access token is dead
 	//
 	function setRedisToken(user) {
+
+		console.log('settoken', user);
 
 		// keys
 		var key = 'authToken-' + user._id;

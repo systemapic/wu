@@ -29,6 +29,8 @@ var nodepath    = require('path');
 var gm 		= require('gm');
 var request 	= require('request');
 var mime 	= require("mime");
+var formidable  = require('formidable');
+
 
 // mapnik
 var mapnik = require('mapnik');
@@ -44,8 +46,10 @@ var superusers = [
 	'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', 	// KO
 	'user-e6e5d7d9-3b4c-403b-ad80-a854b0215831',  	// J
 	'user-5a4b544c-46ff-48e6-885b-c38be91f31b8', 	// rod tester superadmin
-	'user-f36e496e-e3e4-4fac-a37c-f1a98689afda'	// ana tester superadmin
+	'user-f36e496e-e3e4-4fac-a37c-f1a98689afda',	// ana tester superadmin
+	'user-b76a8d27-6db6-46e0-8fc3-d022e6ff084f'	// phantomJS
 ]
+
 
 
 // global paths
@@ -149,8 +153,6 @@ module.exports = api = {
 
 		var fileUuid = req.body.fileUuid;
 		var layerUuid = req.body.layerUuid;
-
-		console.log('reloadmeta body: .', req.body);
 
 		if (!fileUuid || !layerUuid) return res.end(JSON.stringify({
 			error : 'No layer specified.'
@@ -921,11 +923,15 @@ module.exports = api = {
 		// var hash = req.body.hash;
 		var projectUuid = req.body.hash.project;
 		
-		var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.pdf';
+		// var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.pdf';
+		var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.png';
 		var fileUuid = 'file-' + uuid.v4();
 		var folder = FILEFOLDER + fileUuid;
 		var path = folder + '/' + filename;
 
+		var pdfpath = folder + '/' + filename.slice(0, -3) + 'pdf';
+
+		console.log('pdfpath: ', pdfpath);
 
 		var hash = {
 			position : req.body.hash.position,
@@ -939,13 +945,14 @@ module.exports = api = {
 			hash : hash,
 			// filename : filename,
 			// folder : FILEFOLDER
-			path : path
+			path : path,
+			pdf : true
 		}
 
-		// console.log('-> args: ', args);
+		console.log('-> PDF args: ', args);
 
-		var cmd = "phantomjs /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
-		// console.log('cmd: ', cmd);
+		var cmd = "phantomjs --ssl-protocol=tlsv1 /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
+		console.log('cmd: ', cmd);
 
 
 		var ops = [];
@@ -970,13 +977,36 @@ module.exports = api = {
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
 
-				// console.log('executed phantomJS');
-				// console.log('err: ', err);
-				// console.log('stdout: ', stdout);
-				// console.log('stdin: ', stdin);
+				console.log('executed phantomJS');
+				console.log('err: ', err);
+				console.log('stdout: ', stdout);
+				console.log('stdin: ', stdin);
 
 				callback(err);
 			});
+
+		});
+
+		// create pdf from snapshot image
+		ops.push(function (callback) {
+
+
+			console.log('CREATING PDF!!');
+
+			PDFDocument = require('pdfkit');
+			var doc = new PDFDocument({
+				margin : 0,
+				layout: 'landscape',
+				size : 'A4'
+			});
+			doc.image(path, {fit : [890, 1140]});
+			
+			doc.pipe(fs.createWriteStream(pdfpath));
+
+			doc.end();
+
+
+			callback();
 
 		});
 
@@ -984,8 +1014,8 @@ module.exports = api = {
 		ops.push(function (callback) {
 
 			
-			fs.stat(path, function (err, stats) {
-				// console.log('err: ', err);
+			fs.stat(pdfpath, function (err, stats) {
+				console.log('err: ', err);
 				dataSize = stats.size;
 	 			callback(err);
 	 		});
@@ -1037,9 +1067,9 @@ module.exports = api = {
 	// #########################################
 	createSnapshot : function (req, res) {
 
-		// console.log('cretae snapshot');
-		// console.log('body: ', req.body);
-		// console.log('hash: ', req.body.hash);
+		console.log('cretae snapshot');
+		console.log('body: ', req.body);
+		console.log('hash: ', req.body.hash);
 
 
 		// run phantomjs cmd	
@@ -1059,18 +1089,20 @@ module.exports = api = {
 			id : req.body.hash.id
 		}
 
+		console.log('hash:::', hash);
 
 		var args = {
 			projectUuid : projectUuid,
 			hash : hash,
 			// filename : filename,
 			// folder : IMAGEFOLDER
-			path : path
+			path : path,
+			pdf : false
 		}
 
 		// console.log('-> args: ', args);
 
-		var cmd = "phantomjs /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
+		var cmd = "phantomjs --ssl-protocol=tlsv1 /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
 		console.log('cmd: ', cmd);
 
 
@@ -1079,6 +1111,8 @@ module.exports = api = {
 
 		// phantomJS: create snapshot
 		ops.push(function (callback) {
+
+			console.log('cmd!! =-> phantomjss');
 
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
@@ -1096,6 +1130,7 @@ module.exports = api = {
 		// get size
 		ops.push(function (callback) {
 
+			console.log('fsstat');
 			fs.stat(path, function (err, stats) {
 				console.log('err: ', err);
 				console.log('stats: ', stats);
@@ -1108,6 +1143,8 @@ module.exports = api = {
 
 		// create File
 		ops.push(function (callback) {
+
+			console.log('create file phsj')
 
 			var f 			= new File();
 			f.uuid 			= 'file-' + uuid.v4();
@@ -1132,14 +1169,17 @@ module.exports = api = {
 
 		});
 
+		console.log('running phantom ascyn');
 
 		async.series(ops, function (err, results) {
-			// console.log('all done: ', err);
-			// console.log('results', results);
+			console.log('pahtnom !! all done: ', err);
+			console.log('results', results);
 
 			if (err) console.log('err', err);
 
 			var file = results[2]
+
+			console.log('file: ', file);
 
 			res.end(JSON.stringify({
 				image : file.uuid,
@@ -1473,6 +1513,9 @@ module.exports = api = {
 		// console.log('API: createLayer:');
 		// console.log('req.body: ', req.body);
 
+		return res.end(JSON.stringify({error : 'Unsupported.'}))
+
+
 		var layerType = req.body.layerType;
 
 		if (layerType == 'geojson') return api.createLayerFromGeoJSON(req, res);
@@ -1653,7 +1696,8 @@ module.exports = api = {
 				'title',
 				'slug',
 				'connectedAccounts',
-				'settings'
+				'settings',
+				'categories'
 			];
 	
 			var queries = {};
@@ -1700,44 +1744,108 @@ module.exports = api = {
 
 	uploadProjectLogo : function (req, res) {
 
-		var from = req.files.file.path;
-		var file = 'image-' + uuid.v4();
-		var to = '/var/www/data/images/' + file;
+		// var from = req.files.file.path;
+		// var file = 'image-' + uuid.v4();
+		// var to = '/var/www/data/images/' + file;
 
-		// rename and move to image folder
-		fs.rename(from, to, function (err) {
+		// // rename and move to image folder
+		// fs.rename(from, to, function (err) {
 			
-			if (err) res.end(JSON.stringify({error : err}));
+		// 	if (err) res.end(JSON.stringify({error : err}));
 			
 
-			res.end(file);	// file will be saved by client
-		});	
+		// 	res.end(file);	// file will be saved by client
+		// });	
+
+		// process from-encoded upload
+		var form = new formidable.IncomingForm({
+			hash : 'sha1',
+			multiples : true,
+			keepExtensions : true,
+		});
+		form.parse(req, function(err, fields, files) {	
+			console.log('formidale: ', util.inspect({fields: fields, files: files}));
+			console.log('files! => ', files);
+ 		
+
+
+			var from = files.file.path;
+			// var from = req.files.file.path;
+			var file = 'image-' + uuid.v4();
+			var to   = IMAGEFOLDER + file;
+			
+			// // rename and move to image folder
+			fs.rename(from, to, function (err) {
+				if (err) res.end(JSON.stringify({error : err}));
+				res.end(file);	// file will be saved by client
+			});		
+	 	});
 	},
 
 
 	uploadClientLogo : function (req, res) {
-		var from = req.files.file.path;
-		var file = 'image-' + uuid.v4();
-		var to   = IMAGEFOLDER + file;
+		// var from = req.files.file.path;
+		// var file = 'image-' + uuid.v4();
+		// var to   = IMAGEFOLDER + file;
 
-		// rename and move to image folder
-		fs.rename(from, to, function (err) {
-			if (err) res.end(JSON.stringify({error : err}));
-			res.end(file);	// file will be saved by client
-		});	
+		// // rename and move to image folder
+		// fs.rename(from, to, function (err) {
+		// 	if (err) res.end(JSON.stringify({error : err}));
+		// 	res.end(file);	// file will be saved by client
+		// });	
+		
+		// process from-encoded upload
+		var form = new formidable.IncomingForm({
+			hash : 'sha1',
+			multiples : true,
+			keepExtensions : true,
+		});
+		form.parse(req, function(err, fields, files) {	
+			console.log('formidale: ', util.inspect({fields: fields, files: files}));
+			console.log('files! => ', files);
+ 		
+
+
+			var from = files.file.path;
+			// var from = req.files.file.path;
+			var file = 'image-' + uuid.v4();
+			var to   = IMAGEFOLDER + file;
+			
+			// // rename and move to image folder
+			fs.rename(from, to, function (err) {
+				if (err) res.end(JSON.stringify({error : err}));
+				res.end(file);	// file will be saved by client
+			});		
+	 	});
 	},
 
 
 	uploadImage : function (req, res) {
-		var from = req.files.file.path;
-		var file = 'image-' + uuid.v4();
-		var to   = IMAGEFOLDER + file;
-		
-		// rename and move to image folder
-		fs.rename(from, to, function (err) {
-			if (err) res.end(JSON.stringify({error : err}));
-			res.end(file);	// file will be saved by client
-		});	
+
+		// process from-encoded upload
+		var form = new formidable.IncomingForm({
+			hash : 'sha1',
+			multiples : true,
+			keepExtensions : true,
+		});
+		form.parse(req, function(err, fields, files) {	
+			console.log('formidale: ', util.inspect({fields: fields, files: files}));
+			console.log('files! => ', files);
+ 		
+
+
+			var from = files.file.path;
+			// var from = req.files.file.path;
+			var file = 'image-' + uuid.v4();
+			var to   = IMAGEFOLDER + file;
+			
+			// // rename and move to image folder
+			fs.rename(from, to, function (err) {
+				if (err) res.end(JSON.stringify({error : err}));
+				res.end(file);	// file will be saved by client
+			});		
+	 	});
+
 	},
 
 
@@ -3255,31 +3363,20 @@ module.exports = api = {
 		var userid = req.user.uuid;
 		var queries = {};
 
+
 		// update name
 		if (req.body.hasOwnProperty('name')) {
 			console.log('name!');
 			queries.name = function(callback) {
 
-				File
-				.findOne({uuid : fuuid})
-				.exec(function (err, file) {
-					if (err) return callback(err);
+				var key = 'name';
+				var value = req.body.name;
 
-					// return if not file
-					if (!file) return callback('No such file.');
-
-					// check access
-					var access = api.can.update.file(req.user, file);
-
-					// return if no access
-					if (!access) return callback('No access.');
-					
-					// update
-					file.name = req.body.name;
-					file.save(function (err) {
-						callback(err);
-					});
+				// update
+				api._updateFile(req, fuuid, key, value, function (result) {
+					return callback(result);
 				});
+
 			}
 		}
 
@@ -3287,29 +3384,83 @@ module.exports = api = {
 		if (req.body.hasOwnProperty('description')) {
 			queries.description = function(callback) {
 
-				File
-				.findOne({uuid : fuuid})
-				.exec(function (err, file) {
-					if (err) return callback(err);
+				var key = 'description';
+				var value = req.body.description;
 
-					// return if not file
-					if (!file) return callback('No such file.');
-
-					// check access
-					var access = api.can.update.file(req.user, file);
-
-					// return if no access
-					if (!access) return callback('No access.');
-					
-					// update
-					file.description = req.body.description;
-					file.save(function (err) {
-						callback(err);
-					});
+				// update
+				api._updateFile(req, fuuid, key, value, function (result) {
+					return callback(result);
 				});
+				
 
 			}
 		}
+
+		// update status
+		if (req.body.hasOwnProperty('status')) {
+			queries.status = function(callback) {
+
+				var key = 'status';
+				var value = req.body.status;
+
+				// update
+				api._updateFile(req, fuuid, key, value, function (result) {
+					return callback(result);
+				});
+				
+
+			}
+		}
+
+		// update keywords
+		if (req.body.hasOwnProperty('keywords')) {
+			queries.keywords = function(callback) {
+
+				var key = 'keywords';
+				var value = req.body.keywords;
+
+				// update
+				api._updateFile(req, fuuid, key, value, function (result) {
+					return callback(result);
+				});
+				
+
+			}
+		}
+
+		// update category
+		if (req.body.hasOwnProperty('category')) {
+			queries.category = function(callback) {
+
+				var key = 'category';
+				var value = req.body.category;
+
+				// update
+				api._updateFile(req, fuuid, key, value, function (result) {
+					return callback(result);
+				});
+				
+
+			}
+		}
+
+		// update version
+		if (req.body.hasOwnProperty('version')) {
+			queries.version = function(callback) {
+
+				var key = 'version';
+				var value = req.body.version;
+
+				// update
+				api._updateFile(req, fuuid, key, value, function (result) {
+					return callback(result);
+				});
+				
+
+			}
+		}
+
+
 
 		async.parallel(queries, function(err, doc) {
 
@@ -3322,6 +3473,32 @@ module.exports = api = {
 			res.end(JSON.stringify(doc));
 
 		});
+
+	},
+
+	_updateFile : function (req, fuuid, key, value, callback) {
+
+		File
+		.findOne({uuid : fuuid})
+		.exec(function (err, file) {
+			if (err) return callback(err);
+
+			// return if not file
+			if (!file) return callback('No such file.');
+
+			// check access
+			var access = api.can.update.file(req.user, file);
+
+			// return if no access
+			if (!access) return callback('No access.');
+			
+			// update
+			file[key] = value;
+			file.save(function (err) {
+				callback(err);
+			});
+		});
+
 
 	},
 

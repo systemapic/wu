@@ -6,12 +6,16 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 	initContent : function () {
 
+		console.log('initContent');
+
 		// create layout
 		this.initLayout();
 	},
 
 
 	update : function () {
+
+		console.log('update)');
 
 		// clear
 		this.reset();
@@ -90,7 +94,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		});
 
 		// set progress bar for a 5sec run
-		app.ProgressBar.timedProgress(5000);
+		app.ProgressBar.timedProgress(2000);
 		
 	},
 
@@ -128,8 +132,12 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 	_createImageView : function () {
 
-		// expand container
+		console.log('_createImageView');
+
+		// reset 
 		this._resetExpands();
+
+		// expand container
 		Wu.DomUtil.addClass(this._content, 'expand-share-image');
 
 		// create image container 
@@ -146,6 +154,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		var size = Wu.DomUtil.create('div', 'share-image-meta-size', meta);
 		var name = Wu.DomUtil.create('div', 'share-image-meta-name', meta);
 
+		// create download button
 		var downloadWrapper = Wu.DomUtil.create('div', 'share-image-download', this._imageWrap);
 		this._downloadButton = Wu.DomUtil.create('a', 'share-image-download-button', downloadWrapper, 'Download');
 		this._downloadButton.setAttribute('target', '_blank');
@@ -207,7 +216,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		});
 
 		// set progress bar for a 5sec run
-		app.ProgressBar.timedProgress(5000);
+		app.ProgressBar.timedProgress(2000);
 	},
 
 	createdPrint : function (context, file) {
@@ -244,9 +253,6 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 	},
 
-
-	
-
 	_resetExpands : function () {
 
 		if (this._inputWrap) Wu.DomUtil.remove(this._inputWrap);
@@ -260,6 +266,8 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 	reset : function () {
 
+		console.log('reset');
+
 		// remove hooks
 		this.removeHooks();
 
@@ -272,15 +280,21 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	},
 
 	_activate : function () {
-		// console.log('_activate s');
+		console.log('_activate');
+
+		// widen container from 350px to 100%
+		app.SidePane.widenContainer();
+
+		// this.update();
 	},
 
 	_deactivate : function () {
-		// console.log('_deactivate s');
+
+		console.log('_deactivate');
 		// reset expands
 		this._resetExpands();
+		// this.reset();
 	},
-
 
 	enableSocial : function () {
 		// console.log('enableSocial');

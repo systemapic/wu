@@ -569,9 +569,9 @@ L.Control.Layermenu = L.Control.extend({
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 
-		// add to inspectControl if available
-		var inspectControl = app.MapPane.inspectControl;		// perhaps refactor this, more centralized
-		if (inspectControl) inspectControl.addLayer(layer);
+		// // add to inspectControl if available
+		// var inspectControl = app.MapPane.inspectControl;		// perhaps refactor this, more centralized
+		// if (inspectControl) inspectControl.addLayer(layer);
 
 		// add to legendsControl if available
 
@@ -581,16 +581,16 @@ L.Control.Layermenu = L.Control.extend({
 //		if (legendsControl) legendsControl.addLegend(layer);
 
 
-		// add to descriptionControl if available
-		var descriptionControl = app.MapPane.descriptionControl;
-		if (descriptionControl) {
-			descriptionControl.setLayer(layer);
+		// // add to descriptionControl if available
+		// var descriptionControl = app.MapPane.descriptionControl;
+		// if (descriptionControl) {
+		// 	descriptionControl.setLayer(layer);
 
-			console.log('Layer description is now disabled if it is empty. However, then it will be difficult to write in it, so we need to enable it for admins?')
-			if ( layer.store.description ) { descriptionControl._container.style.display = 'block'; } // (j)
-			else { descriptionControl._container.style.display = 'none'; }
+		// 	console.log('Layer description is now disabled if it is empty. However, then it will be difficult to write in it, so we need to enable it for admins?')
+		// 	if ( layer.store.description ) { descriptionControl._container.style.display = 'block'; } // (j)
+		// 	else { descriptionControl._container.style.display = 'none'; }
 		
-		}
+		// }
 	},
 
 	
@@ -602,20 +602,20 @@ L.Control.Layermenu = L.Control.extend({
 
 		this._disableLayer(layer);
 
-		// remove from inspectControl if available
-		var inspectControl = app.MapPane.inspectControl;
-		if (inspectControl) inspectControl.removeLayer(layer);
+		// // remove from inspectControl if available
+		// var inspectControl = app.MapPane.inspectControl;
+		// if (inspectControl) inspectControl.removeLayer(layer);
 
-		// remove from legendsControl if available
-		var legendsControl = app.MapPane.legendsControl;
-		if (legendsControl) legendsControl.removeLegend(layer);
+		// // remove from legendsControl if available
+		// var legendsControl = app.MapPane.legendsControl;
+		// if (legendsControl) legendsControl.removeLegend(layer);
 
-		// remove from descriptionControl if avaialbe
-		var descriptionControl = app.MapPane.descriptionControl;
-		if (descriptionControl) {
-			descriptionControl.removeLayer(layer);
-			descriptionControl._container.style.display = 'none'; // (j)
-		}
+		// // remove from descriptionControl if avaialbe
+		// var descriptionControl = app.MapPane.descriptionControl;
+		// if (descriptionControl) {
+		// 	descriptionControl.removeLayer(layer);
+		// 	descriptionControl._container.style.display = 'none'; // (j)
+		// }
 
 	},
 

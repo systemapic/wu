@@ -8,6 +8,8 @@ var _ = require('lodash-node');
 var formidable = require('formidable');
 var exec = require('child_process').exec;
 var kue = require('kue');
+var crypto = require('crypto');
+
 
 // modules
 var pixels = require('./pixels');
@@ -30,14 +32,19 @@ module.exports = filer = {
 	// #########################################
 	// ###  FILER: unzip                     ###
 	// #########################################
-	handleZip : function (inn, fileUuid, callback) {
-		console.log('FILER: Handling zip');
+	// handleZip : function (inn, fileUuid, callback) {
+	handleZip : function (options, callback) {
+		console.log('FILER:  handleZip!!! ', options);
 
-		var out = FILEFOLDER + fileUuid;
+		var inn = options.inn;
+		var fileUuid = options.fileUuid;
+		var out = FILEFOLDER + fileUuid + options.out;
+
+		// var out = FILEFOLDER + fileUuid;
 
 		fs.ensureDir(out, function (err) {
 
-			var cmd = 'unzip -o -d "' + out + '" "' + inn + '"'; 	// to folder .shp
+			var cmd = 'unzip -o -d "' + out + '" "' + inn + '" -x "*DS_Store*" "*__MACOSX*"'; 	// to folder .shp
 			var exec = require('child_process').exec;
 			
 
@@ -51,6 +58,9 @@ module.exports = filer = {
 				
 					// remove __MACOSX
 					fs.remove(out + '/__MACOSX', function (err) {
+
+						console.log('removing __MACOSX', err);
+
 						// return
 						callback(err);
 

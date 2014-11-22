@@ -11,6 +11,7 @@ var _ = require('lodash-node');
 var formidable = require('formidable');
 var exec = require('child_process').exec;
 var kue = require('kue');
+var crypto = require('crypto');
 
 
 // modules
@@ -47,8 +48,8 @@ module.exports = upload = {
 	// entry point
 	upload : function (req, res) {
 
-		console.log('________________ this _____________');
-		console.log(this);
+		console.log('upload.js.upload()'); // _______________ this _____________');
+		console.log('this: ', this);
 
 		// types of possible uploaded files:
 		//
@@ -114,13 +115,20 @@ module.exports = upload = {
 			//
 			//
 
+
+
 			var fileArray = files['file[]'];
 			
 			// var fileArray = [files.file];
 
+			if (!fileArray) return res.end(JSON.stringify({error : 'Error: No files.'}))
+
 			// if just one file, wrap in array
 			if (!fileArray.length) fileArray = [fileArray];
 			
+
+
+			console.log('fileArray: ', fileArray);
 
 
 			var ops = [];
@@ -135,7 +143,8 @@ module.exports = upload = {
 					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
 					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
 					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
-					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
+					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');
+					console.log('results: ', results);				
 					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
 					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
 					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
@@ -288,8 +297,12 @@ module.exports = upload = {
 			// current tmp path
 			// var filepath = file.path;
 
+			// var path = file.path + '/' + file.name;
+			// console.log('______________ _ _ _ _ _ _ path: ', path);
+
 			// type and extension
-			var filetype 	= upload.getFileType(file.name);
+			var filetype 	= upload.getFileType(file.path);
+			// var filetype 	= upload.getFileType(file.name);
 			var extension 	= filetype[0];
 			var type 	= filetype[1];
 
@@ -323,33 +336,51 @@ module.exports = upload = {
 	},
 
 
-	sortZipFolder : function (fileUuid, done) {
+	sortZipFolder : function (options, done) {
 
 		// could be images, docs, etc
 		// could be shapefiles/geojson
 		// could be several
 
+		var fileUuid 	= options.fileUuid;
+		var folder 	= options.folder;
+		// var currentPath = options.currentPath;
+
+
 		console.log('____________________________________UPLOAD: Sorting zip folder');
+		console.log('options.currentFolder', options.currentFolder);
 
+		var currentFolder = options.currentFolder || FILEFOLDER + fileUuid;
 
-		var currentFolder = FILEFOLDER + fileUuid;
+		if (folder) {
+			console.log('isFolder!!!', folder);
+			currentFolder += '/' + folder;
+			console.log('so currentFolder is: ', currentFolder);
+
+			
+		}
+
 		var ops1 = [];
 
 		// read files in folder
 		fs.readdir(currentFolder, function (err, files) {
 
-			console.log('sortZipFolder files: ', files); // ['Africa.shp', 'Africa.prj']
+			console.log('sortZipFolder files: ', files); // ['Africa.shp', 'Africa.prj'] OR 'Zoning' (as folder)
 
 			
 
 			files.forEach(function (name) { 	// 'Africa.shp'
 
-				var filetype 	= upload.getFileType(name);
+				var path = currentFolder + '/' + name; // path 
+
+
+
+				// var filetype 	= upload.getFileType(name);
+				var filetype 	= upload.getFileType(path);
 				var extension 	= filetype[0];
 				var type 	= filetype[1];
 
 
-				var path = currentFolder + '/' + name; // path 
 
 
 				var options = {
@@ -364,6 +395,53 @@ module.exports = upload = {
 
 				console.log('_sortOps: ', ops1, options);
 
+
+
+				// handle zip (within zip)
+				if (options.type == 'application/zip') {
+
+					ops1.push(function (callback) {
+
+						console.log('__handling ZIP FILE 222!');
+
+						var rand = crypto.randomBytes(4).toString('hex');
+						console.log('RANDOMMM!M!!M!M!M', rand);
+
+						// new file uuid !!!
+						var newFileUuid = 'file-' + uuid.v4();
+
+
+						var zipopt = {
+							inn : options.path,
+							// fileUuid : options.fileUuid,
+							fileUuid : newFileUuid,
+							out : '/' + rand
+							// out : 
+						}
+
+						// unzips files to folder
+						filer.handleZip(zipopt, function (err) {
+
+							console.log('filer.handleZip done');
+							console.log('options.path: ', options.path);
+							console.log('options.fioleUuid: ', options.fileUuid);
+
+							var opt = {
+								// fileUuid : options.fileUuid,
+								fileUuid : newFileUuid,
+								folder : rand
+							}
+
+							upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
+								
+								console.log('upload.sortZipFolder done', dbs);
+
+								callback(err, dbs);
+
+							});
+						});
+					});
+				}
 				
 				// // handle zip
 				// if (options.type == 'application/zip') {
@@ -406,6 +484,35 @@ module.exports = upload = {
 				// if (options.type == 'partialshape') return ops; 
 
 
+				// handle folder
+				if (options.type == 'folder') {
+
+					ops1.push(function (callback) {
+
+						console.log('__handling FOLDER 77: options.currentFolder', options.currentFolder);
+						console.log('opitons.name: ', options.name);
+
+						
+						var opt = {
+							fileUuid : options.fileUuid,
+							folder : options.name,
+							currentFolder : options.currentFolder
+						}
+
+						console.log('opt!!-=-=---->', opt);
+
+						upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
+							
+							console.log('upload.sortZipFolder 99 done', dbs);
+
+							callback(err, dbs);
+
+						});
+					});
+				}
+
+
+
 				// handle shapefiles
 				if (options.type == 'shapefile') {					// gotchas: already in file-uuid folder, cause unzip
 					console.log('got shapefile!', options.name);			// 
@@ -419,7 +526,7 @@ module.exports = upload = {
 							// populate db entry
 							db = db || {};
 							db.name = options.name;
-							db.file = options.fileUuid;
+							// db.file = options.fileUuid;
 							db.type = 'Layer';
 
 							// return db
@@ -541,17 +648,66 @@ module.exports = upload = {
 
 		console.log('_sortOps: ', ops, options);
 
+
+
+
+		// handle folder
+		if (options.type == 'folder') {
+
+			ops.push(function (callback) {
+
+				console.log('__handling FOLDER!');
+
+				// unzips files to folder
+				// filer.handleZip(options.path, options.fileUuid, function (err) {
+
+				// 	console.log('filer.handleZip done');
+
+					var opt = {
+						fileUuid : options.fileUuid,
+						folder : options.name,
+						currentFolder : options.currentFolder
+					}
+
+					upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
+						
+						console.log('upload.sortZipFolder 99 done', dbs);
+
+						callback(err, dbs);
+
+					});
+				// });
+			});
+		}
+
 		
 		// handle zip
 		if (options.type == 'application/zip') {
 
 			ops.push(function (callback) {
 
-				// unzips files to folder
-				filer.handleZip(options.path, options.fileUuid, function (err) {
+				console.log('__handling ZIP FILE!');
 
-					upload.sortZipFolder(options.fileUuid, function (err, dbs) {	// gets [db]
+				var opt = {
+					inn : options.path,
+					fileUuid : options.fileUuid,
+					out : ''
+				}
+
+				// unzips files to folder
+				filer.handleZip(opt, function (err) {
+
+					console.log('filer.handleZip done');
+
+					var opt = {
+						fileUuid : options.fileUuid,
+						folder : null
+					}
+
+					upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
 						
+						console.log('upload.sortZipFolder done', dbs);
+
 						callback(err, dbs);
 
 					});
@@ -567,8 +723,13 @@ module.exports = upload = {
 
 				// untars files to folder
 				filer.handleTar(options.path, options.fileUuid, function (err) {
+
+					var opt = {
+						fileUuid : fileUuid,
+						folder : null
+					}
 					
-					upload.sortZipFolder(options.fileUuid, function (err, dbs) {
+					upload.sortZipFolder(opt, function (err, dbs) {
 
 						callback(err, dbs);
 
@@ -596,7 +757,7 @@ module.exports = upload = {
 					// populate db entry
 					db = db || {};
 					db.name = options.name;
-					db.file = options.fileUuid;
+					// db.file = options.fileUuid;
 					db.type = 'Layer';
 
 					// return db
@@ -696,6 +857,13 @@ module.exports = upload = {
 	getFileType : function (name) {
 
 		console.log('getFileType name:', name);
+
+		// check if folder
+		console.time('isFolder');
+		var isFolder = fs.statSync(name).isDirectory();
+		console.log('isFoldeR???', isFolder);
+		console.timeEnd('isFolder');
+		if (isFolder) return ['folder', 'folder'];
 
 		// archives
 		if (name.slice(-7) == '.tar.gz')  return ['tar', 'application/x-gzip'];

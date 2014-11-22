@@ -82,6 +82,12 @@ Wu.StatusPane = Wu.Class.extend({
 		app._activeMenu._activate()
 
 		// console.log('StatusPane.open(). Currently active menu item:', app._activeMenuItem);
+
+		// Hide button section and Layer info when the Home dropdown menu opens (j)
+		app._map._controlCorners.topleft.style.opacity = 0;
+		
+
+
 	},
 
 	// close sidepane menu
@@ -95,6 +101,10 @@ Wu.StatusPane = Wu.Class.extend({
 
 		// app.MapPane._container
 		Wu.DomUtil.removeClass(app.MapPane._container, "map-blur") // (j) – removes the blur on map if it's set by one of the fullpanes
+
+		// Show button section and Layer info when the Home dropdown menu opens (j)
+		app._map._controlCorners.topleft.style.opacity = 1;
+
 
 	},
 

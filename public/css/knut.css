@@ -1,1 +1,88 @@
+.datalibrary-category-wrapper {
+	position:  absolute;
+	border: 1px solid yellow;
+	z-index: 1000;
+	background-color: white;
+	font-size: 120%;
+}
+
+.datalibrary-category-line {
+	font-size: 120%;
+	padding: 5px;
+	border-bottom: 1px solid gray;
+	float: left;
+	width: 85%;
+}
+
+.datalibrary-category-line:hover {
+	background: aqua;
+}
+
+.datalibrary-category-new {
+	border: 0px;
+	background-color: white;
+
+}
+
+.datalibrary-category-line-del {
+	/*position: absolute;*/
+	right: 0px;
+	cursor: pointer;
+	text-align: right;
+}
+.datalibrary-category-line-del:hover {
+	color: red;
+}
+
+.datalibrary-category-line-wrap {
+	height: auto;
+	cursor: pointer;
+}
+
+
+/*bigger logos*/
+.client-logo {
+	height: 70px;
+}
+.project-logo {
+	height: 62px;
+}
+.client-kill {
+	background: rgba(0, 0, 0, 0.5);
+	color: #fff;
+}
+
+/*less empty space experiment*/
+/*.home-container {
+	margin: 0;
+}
+#header {
+	top: 0px;
+	left: 94px;
+	padding-right: 94px;
+}
+.q-editor-container {
+	left: 0px;
+	top: 75px;
+}
+.q-editor-menu {
+	left: 0px;
+}
+.q-editor-content-item {
+	left: 94px;
+}
+.leaflet-bottom.leaflet-right {
+	padding-top: 79px;
+	right: 0px;
+}
+.leaflet-top.leaflet-right {
+	top: 79px;
+}*/
+
+
+
+
+
+
+
 

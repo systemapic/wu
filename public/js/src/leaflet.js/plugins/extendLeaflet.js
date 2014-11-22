@@ -61,45 +61,10 @@ L.Control.Draw.include({
 });
 
 
-// // add to section wrapper instead of control corner
-// L.Control.StyleEditor.include({
-
-// 	addTo : function (map) {
-// 		this._map = map;
-
-// 		var container = this._container = this.onAdd(map),
-// 		    pos = this.getPosition(),
-// 		    corner = map._controlCorners[pos];
-
-// 		L.DomUtil.addClass(container, 'leaflet-control');
-
-// 		var sectionWrapper = this.options.container;
-// 		sectionWrapper.appendChild(container);
-
-// 		return this;
-// 	},
-
-// 	removeFrom: function (map) {
-// 		var pos = this.getPosition(),
-// 		    corner = map._controlCorners[pos];
-
-// 		var sectionWrapper = this.options.container;
-// 		sectionWrapper.removeChild(this._container);
-// 		this._map = null;
-
-// 		if (this.onRemove) {
-// 			this.onRemove(map);
-// 		}
-
-// 		return this;
-// 	},
-
-// });
 
 L.Popup.include({
 
 	_initLayout: function () {
-		console.log('L.Popup.include._initLayout');
 
 		var prefix = 'leaflet-popup',
 			containerClass = prefix + ' ' + this.options.className + ' leaflet-zoom-' +
@@ -132,7 +97,6 @@ L.Popup.include({
 
 
 	_updateLayout: function () {
-		console.log('L.Popup.include._updateLayout');
 
 		var container = this._contentNode,
 		    style = container.style;

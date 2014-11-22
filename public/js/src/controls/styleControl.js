@@ -14,8 +14,11 @@ Wu.Style = Wu.Class.extend({
 		// append darktheme stylesheet
 		var darktheme = document.createElement("link");
 		darktheme.rel = 'stylesheet';
-		darktheme.href = 'css/darktheme.css';
+		darktheme.href = 'https://projects.ruppellsgriffon.com/css/darktheme.css';
 		this._styletag.appendChild(darktheme);
+
+		// Set codemirror cartoCSS to dark theme
+		this.setDarkThemeCartoCSS();
 
 	},
 
@@ -24,7 +27,30 @@ Wu.Style = Wu.Class.extend({
 		// remove darktheme stylesheet
 		this._styletag.innerHTML = '';
 
+		// Set codemirror cartoCSS to light theme
+		this.setLightThemeCartoCSS();
 	},
+
+	setLightThemeCartoCSS : function () {
+		if (!app.MapPane.cartoCss) return;
+		
+		// Set code mirror to light theme
+		var cartoCSStheme = Wu.DomUtil.get('cartoCSStheme');
+		app.MapPane.cartoCss._codeMirror.setOption("theme", "default");
+		cartoCSStheme.setAttribute('href', 'https://projects.ruppellsgriffon.com/js/lib/codemirror/mode/cartocss/codemirror.carto.css');
+
+	},
+
+	setDarkThemeCartoCSS : function () {
+		if (!app.MapPane.cartoCss) return;
+
+		// Set code mirror to darktheme
+		var cartoCSStheme = Wu.DomUtil.get('cartoCSStheme');
+		app.MapPane.cartoCss._codeMirror.setOption("theme", "mbo");
+		cartoCSStheme.setAttribute('href', 'https://projects.ruppellsgriffon.com/js/lib/codemirror/mode/cartocss/codemirror.carto.darktheme.css');
+	
+	},
+
 
 	// todo: will overwrite darktheme??
 	initSVGpatterns : function () {
@@ -32,22 +58,19 @@ Wu.Style = Wu.Class.extend({
 		this._styletag.innerHTML = SVG_patterns; 
 	},
 
+	phantomJS : function () {
+
+		// append darktheme stylesheet
+		var phantom = document.createElement("link");
+		phantom.rel = 'stylesheet';
+		phantom.href = 'https://projects.ruppellsgriffon.com/css/phantomJS.css';
+		this._styletag.appendChild(phantom);
+
+	},
+
+
+
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // keep for handy shortcuts

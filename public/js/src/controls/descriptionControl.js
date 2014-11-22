@@ -31,9 +31,8 @@ L.Control.Description = L.Control.extend({
 		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
 		
 		// create scroller 
-		this._inner = document.createElement("div");
-		this._outer.appendChild(this._inner);
-		Wu.DomUtil.addClass(this._inner, "description-scroller");
+		this._inner = Wu.DomUtil.create('div', 'description-scroller', this._outer);
+		
 			       
 	},      
 
@@ -52,23 +51,15 @@ L.Control.Description = L.Control.extend({
 	},
 
 	setLayer : function (layer) {
+		console.log('setLayer: ', layer);
 		this.activeLayer = layer;
 		this.setDescription(layer);
 
-		// cxxxxx
-		if ( !layer.store.description ) {
-			
-			console.log('Aint noffin here!');
-
+		if ( !layer.store.description && !this.editMode) {
 			this.closePane();
 			this.clear();
-		} else {
+		} 
 
-
-		}
-
-		
-		console.log('this.setDescription', layer.store.description);
 	},
 
 	removeLayer : function (layer) {
@@ -99,23 +90,22 @@ L.Control.Description = L.Control.extend({
 	addHooks : function () {
 		
 		// collapsers
-		Wu.DomEvent.on(this._button, 'mousedown', this.closePane, this);
+		Wu.DomEvent.on(this._button, 'click', this.closePane, this);
 
 		// edit mode
-		if (this.editMode) Wu.DomEvent.on(this._inner, 'dblclick', this.toggleEdit, this);
+		if (this.editMode) Wu.DomEvent.on(this._outer, 'dblclick', this.toggleEdit, this);
 
 		// prevent map double clicks
-		// Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
-		// Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
-
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
-		Wu.DomEvent.on(this._button, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._button,    'mousedown mouseup click dblclick',  Wu.DomEvent.stopPropagation, this);
+
+
 	},
 	
 	removeHooks : function () {
 
 		// collapsers
-		Wu.DomEvent.off(this._button, 'mousedown', this.closePane, this);
+		Wu.DomEvent.off(this._button, 'click', this.closePane, this);
 
 		// edit mode
 		if (this.editMode) Wu.DomEvent.off(this._inner, 'dblclick', this.toggleEdit, this);
@@ -123,12 +113,14 @@ L.Control.Description = L.Control.extend({
 		// prevent map double clicks
 		Wu.DomEvent.off(this._container, 'dblclick', Wu.DomEvent.stop, this);
 		Wu.DomEvent.off(this._container, 'dblclick', Wu.DomEvent.stop, this);
-
 		Wu.DomEvent.off(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.off(this._button,    'mousedown mouseup click dblclick',  Wu.DomEvent.stopPropagation, this);
 
 	},
 
 	toggleEdit : function () {
+
+		console.log('toggleEdit', this.editing);
 
 		// return if already editing
 		if (this.editing) return;
@@ -139,6 +131,8 @@ L.Control.Description = L.Control.extend({
 	},
 	
 	editOn : function () {
+
+		console.log('editOn', this.activeLayer);
 
 		if (!this.activeLayer) return;
 

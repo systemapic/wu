@@ -31,13 +31,19 @@
 	}
 
 .drop-meta-wrapper {
-	height: 400px;
-	position: absolute;
-	top: 410px;
-	left: 100px;
+	/*height: 400px;*/
+	/*position: absolute;*/
+	position: relative;
+	/*top: 410px;*/
+	/*top: 240px;*/
+	/*left: 100px;*/
 	padding: 20px;
-	font-size: 230%;
-	color: white;
+	padding-left: 30px;
+	/*font-size: 230%;*/
+	font-size: 20px;
+	/*color: white;*/
+	color: #666;
+
 	}
 
 #collapse-descripton {
@@ -1485,7 +1491,6 @@ button.image-attachment {
 	margin: 20px;
 	}
 
-
 /* The box with the file count */
 .dataLibrary-file-popup-trigger {
 	width: 25px;
@@ -1528,7 +1533,7 @@ button.image-attachment {
 	position: relative;
 	border-bottom: 1px solid;
 	color: #666;
-	top: 1px;
+	top: 0px;
 	width: 100%;
 	padding-right: 129px;
 	left: 0px;
@@ -1563,6 +1568,8 @@ button.image-attachment {
 	left: 0;
 	background: #ebedef;	
 	padding: 16px;
+	padding-left: 20px;
+	padding-top: 15px;
 	}
 
 #datalibrary-search {
@@ -1602,6 +1609,11 @@ button.image-attachment {
 #datalibrary-table {
 	width: 100%;
 	}
+
+#users-table .fivep {
+	/*width: 43px;*/
+	/*min-width: 43px;*/
+	}	
 	
 /* download dialogue box */
 #datalibrary-download-dialogue {
@@ -1708,7 +1720,7 @@ button.image-attachment {
 	margin-left: 100px;
 	}
 
-.fullscreen-drop::after {
+/*.fullscreen-drop::after {
 	content: 'Drop files to upload';
 	color: white;
 	font-weight: $lean;
@@ -1717,10 +1729,10 @@ button.image-attachment {
 	position: fixed;
 	top: 30%;
 	left: 25%;
-	}
+	}*/
 
 .fullscreen-dropped {
-	position: fixed;
+/*	position: fixed;
 	width: 100%;
 	height: 100%;
 	opacity: 0;
@@ -1729,17 +1741,37 @@ button.image-attachment {
 	left: 0;
 	z-index: -1000;
 	margin-left: 100px;
-	}
+*/	
 
-.fullscreen-dropped::after {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	background-color: rgba(255,255,255,0.9);
+	top: 0;
+	/* left: 140px; */
+	z-index: -1000;
+	margin: 0;
+	height: 100%;
+
+	padding: 90px;
+
+	overflow-y: scroll;
+
+}
+
+.fullscreen-dropped::before {
 	content: 'Uploading';
-	color: white;
+	/*color: white;*/
+	color: #666;
 	font-weight: $lean;
 	font-family: $font;
 	font-size: 400%;
-	position: fixed;
-	top: 30%;
-	left: 30%;
+	/*position: fixed;*/
+	position: relative;
+	/*top: 30%;*/
+	/*left: 30%;*/
+	padding: 20px;
 	}
 
 /* DropZone style */
@@ -1780,6 +1812,9 @@ button.image-attachment {
 	height: 100px;
 	border: white solid 1px;
 	}
+
+
+
 
 
 
@@ -1841,6 +1876,16 @@ button.image-attachment {
 	padding-right: 40px;
 	padding-top: 20px;
 	padding-bottom: 20px;
+
+
+	padding-left: 40px;
+	padding-right: 40px;
+	padding-top: 50px;
+	padding-bottom: 20px;
+	margin: auto;
+	width: 420px;
+
+	
 	}
 
 .backpane-wrapper .backpane-title {
@@ -1924,9 +1969,9 @@ button.image-attachment {
 	top: 0px;
 	overflow-y: scroll;
 	overflow-x: hidden;
-	background: rgba(255,255,255,0.97);
+	background: rgba(255,255,255,0.9);
 	color: #666;
-	border-top: 10px solid white;
+//	border-top: 10px solid white;
 	padding: 0;
 	padding-left: 30px;
 	padding-right: 30px;
@@ -2194,14 +2239,19 @@ button.image-attachment {
 
 .share-link-wrap {
 	padding: 10px;
+	text-align: center;
 	}
 
 .share-link-title {
 	font-size: 120%;
+	padding-top: 28px;
+	border-top: 1px solid #999;
 	}
 
-.share-link-input {
-	border: 1px solid rgba(128, 128, 128, 0.32);
+.share-link-input,
+.share-link-input:focus,
+.share-link-input:active {
+	border: 1px solid rgba(128, 128, 128, 0.32) !important;
 	padding: 10px;
 	width: 100%;
 	background: rgba(255, 0, 0, 0);
@@ -2211,24 +2261,38 @@ button.image-attachment {
 
 .share-image-wrap {
 	position: absolute;
-	left: 275px;
-	width: 487px;
-	height: 500px;
-	top: 33px;
+	left: 254px;
+	width: 518px;
+	height: 100%;
+	top: 0;
+	border-left: 1px solid #999;
+	padding-left: 30px;
+	padding-top: 20px;
 	}
 
+.share-image-wrap:before {
+	content: 'making image';
+	text-align: center;
+	width: 100%;
+	position: absolute;
+	padding-top: 170px;
+	}
+
+
 .share-image-title {
-	font-size: 120%;
-	padding: 10px;
+	font-size: 22px;
+	padding-bottom: 10px;
+	font-weight: 900;
 	}
 
 .share-image-image {
-	height: 80%;
+	height: 328px;
 	width: 100%;
-	position: absolute;
-	top: 46px;
+	position: relative;
+	/*top: 46px;*/
 	background-repeat: no-repeat;
 	}
+
 
 .share-image-meta-wrap {
 	bottom: 0;
@@ -2238,30 +2302,79 @@ button.image-attachment {
 	}
 
 .share-image-download-button {
-	bottom: 0px;
+	bottom: 9px;
 	position: absolute;
 	right: 0px;
 	padding: 10px;
 	}
 
-.share-image-download-button {
-	border: 1px solid red;
-	padding: 10px;
-	}
+.share-image-download-button:hover {
+	text-decoration: none;
+}
 
-.share-print-download-button {
+
+/*.share-print-download-button {
 	padding: 10px;
-	}
+	}*/
 
 .expand-share-link {
 	height: 350px;
 	}
 
 .expand-share-image {
-	height: 600px;
+	height: 450px;
 	width: 800px;
 	}
 
+
+/* Share icons */
+.share-icon-box.image,
+.share-icon-box.print,
+.share-icon-box.link {
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	overflow: hidden;
+	border: none;
+	opacity: 0.5;
+	}
+
+.share-wrap.link:hover > .share-icon-box.link,
+.share-wrap.print:hover > .share-icon-box.print,
+.share-wrap.image:hover > .share-icon-box.image {
+	opacity: 1;
+	}
+
+
+.share-icon-box.image {
+	background-position: -370px -53px;
+	}
+
+.share-icon-box.print {
+	background-position: -370px -113px;
+	}
+
+.share-icon-box.link {
+	background-position: -370px -172px;
+	}
+
+.share-print-download-button {
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: -286px -243px;
+	width: 93px;
+	height: 58px;
+	position: relative;
+	margin: auto;
+	color: transparent;
+	opacity: 0.8;
+	padding: 20px;
+	top: 30px;
+	}
+
+.share-print-download-button:hover {	
+	opacity: 1;
+	color: transparent;
+	}
 
 
 
@@ -2335,3 +2448,7 @@ button.image-attachment {
 	left: 3px;
 	top: 3px;
 	}	
+
+
+
+
