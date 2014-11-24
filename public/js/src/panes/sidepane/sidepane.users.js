@@ -52,6 +52,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// init table
 		this.initList();
 
+
+		// add tooltip
+		app.Tooltip.add(this._menu, '(Editors only) List of all users. Here you can create and delete users, as well as administer user access to projects.');
+		
+
 	},
 
 	addHooks : function () {

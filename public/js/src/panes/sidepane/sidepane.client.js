@@ -119,6 +119,11 @@ Wu.SidePane.Client = Wu.Class.extend({
 			Wu.DomEvent.on(this._newProjectButton, 'mousedown', this.createNewProject, this);
 			Wu.DomEvent.on(this._newProjectButton, 'mousedown', Wu.DomEvent.stop, this);
 			Wu.DomEvent.on(this._newProjectButton, 'click', Wu.DomEvent.stop, this);
+
+
+			// add tooltip
+			app.Tooltip.add(this._newProjectButton, 'Click to create new project.');
+
 		}
 		
 		// remove client button

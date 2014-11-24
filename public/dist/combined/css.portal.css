@@ -825,6 +825,14 @@ input.cmn-toggle-round-flat + label:before {
   bottom: 5px;
   width: 100%; }
 
+/*HELP TOOLTIP CHANGES*/
+.opentip-container {
+  z-index: 9999999 !important; }
+
+.style-systip .opentip {
+  color: white !important;
+  text-shadow: none !important; }
+
 /*
 ██╗     ██╗███████╗████████╗███████╗██████╗     ███████╗██████╗  ██████╗ ███╗   ███╗    ██╗     ███████╗ █████╗ ███████╗██╗     ███████╗████████╗
 ██║     ██║██╔════╝╚══██╔══╝██╔════╝██╔══██╗    ██╔════╝██╔══██╗██╔═══██╗████╗ ████║    ██║     ██╔════╝██╔══██╗██╔════╝██║     ██╔════╝╚══██╔══╝
@@ -4358,10 +4366,6 @@ button.image-attachment {
 #users-table, #datalibrary-table {
   width: 100%; }
 
-#users-table .fivep {
-  width: 43px;
-  min-width: 43px; }
-
 /* download dialogue box */
 #datalibrary-download-dialogue {
   position: relative;
@@ -4882,13 +4886,16 @@ button.image-attachment {
   margin: 10px; }
 
 .share-link-wrap {
-  padding: 10px; }
+  padding: 10px;
+  text-align: center; }
 
 .share-link-title {
-  font-size: 120%; }
+  font-size: 120%;
+  padding-top: 28px;
+  border-top: 1px solid #999; }
 
-.share-link-input {
-  border: 1px solid rgba(128, 128, 128, 0.32);
+.share-link-input, .share-link-input:focus, .share-link-input:active {
+  border: 1px solid rgba(128, 128, 128, 0.32) !important;
   padding: 10px;
   width: 100%;
   background: rgba(255, 0, 0, 0);
@@ -4897,20 +4904,31 @@ button.image-attachment {
 
 .share-image-wrap {
   position: absolute;
-  left: 275px;
-  width: 487px;
-  height: 500px;
-  top: 33px; }
+  left: 254px;
+  width: 518px;
+  height: 100%;
+  top: 0;
+  border-left: 1px solid #999;
+  padding-left: 30px;
+  padding-top: 20px; }
 
-.share-image-title {
-  font-size: 120%;
-  padding: 10px; }
-
-.share-image-image {
-  height: 80%;
+.share-image-wrap:before {
+  content: 'making image';
+  text-align: center;
   width: 100%;
   position: absolute;
-  top: 46px;
+  padding-top: 170px; }
+
+.share-image-title {
+  font-size: 22px;
+  padding-bottom: 10px;
+  font-weight: 900; }
+
+.share-image-image {
+  height: 328px;
+  width: 100%;
+  position: relative;
+  /*top: 46px;*/
   background-repeat: no-repeat; }
 
 .share-image-meta-wrap {
@@ -4920,23 +4938,22 @@ button.image-attachment {
   width: 100%; }
 
 .share-image-download-button {
-  bottom: 0px;
+  bottom: 9px;
   position: absolute;
   right: 0px;
   padding: 10px; }
 
-.share-image-download-button {
-  border: 1px solid red;
-  padding: 10px; }
+.share-image-download-button:hover {
+  text-decoration: none; }
 
-.share-print-download-button {
-  padding: 10px; }
-
+/*.share-print-download-button {
+	padding: 10px;
+	}*/
 .expand-share-link {
   height: 350px; }
 
 .expand-share-image {
-  height: 600px;
+  height: 450px;
   width: 800px; }
 
 /* Share icons */
@@ -4958,6 +4975,23 @@ button.image-attachment {
 
 .share-icon-box.link {
   background-position: -370px -172px; }
+
+.share-print-download-button {
+  background-image: url(images/evil_sprite.png);
+  background-repeat: no-repeat;
+  background-position: -286px -243px;
+  width: 93px;
+  height: 58px;
+  position: relative;
+  margin: auto;
+  color: transparent;
+  opacity: 0.8;
+  padding: 20px;
+  top: 30px; }
+
+.share-print-download-button:hover {
+  opacity: 1;
+  color: transparent; }
 
 /*Start pane*/
 /*Start pane*/

@@ -19,7 +19,6 @@ L.Control.Legends = L.Control.extend({
 		this._legendsOpener.innerHTML = 'Open Legends';
 		Wu.DomUtil.addClass(this._legendsOpener, 'opacitizer');
 
-				
 		return container;
 
 	},
@@ -178,11 +177,14 @@ L.Control.Legends = L.Control.extend({
 		this.legends = {};
 		this._layers = [];
 
-
 		// ADDED BY JØLLE
 		this.legendsCounter = []; 
 		this.sliderWidth = 0;
 		this.sliderOffset = 0;
+
+		// add tooltip
+		app.Tooltip.add(this._legendsInner, 'Shows legends of active layers', { extends : 'systyle', tipJoint : 'top right'});
+
 
 	},
 

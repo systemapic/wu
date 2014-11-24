@@ -23,6 +23,9 @@ L.Control.Draw.include({
 		var sectionWrapper = L.DomUtil.create('div', 'leaflet-draw-section-wrapper', container);
 		this._wrapper = sectionWrapper;	// shorthand for adding more stuff to this wrapper
 
+		// add tooltip
+		app.Tooltip.add(sectionButton, 'Draw on the map');
+
 		// add hook to button
 		L.DomEvent.on(sectionButton, 'mousedown', function (e) {
 			L.DomEvent.stop(e);

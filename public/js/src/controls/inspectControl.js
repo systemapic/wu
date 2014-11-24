@@ -13,6 +13,9 @@ L.Control.Inspect = L.Control.extend({
 		// add html
 		container.innerHTML = ich.inspectControl(); 
 
+		// add tooltip
+		app.Tooltip.add(container, 'Shows a list of active layers', { extends : 'systyle', tipJoint : 'top'});
+
 		// content is not ready yet, cause not added to map! 
 		return container; // this._container
 
@@ -68,6 +71,15 @@ L.Control.Inspect = L.Control.extend({
 		var fly 	= Wu.DomUtil.create('div', 'inspect-fly', wrapper);
 		var eye 	= Wu.DomUtil.create('div', 'inspect-eye', wrapper);
 		var kill 	= Wu.DomUtil.create('div', 'inspect-kill', wrapper);
+
+		// add tooltip
+		app.Tooltip.add(arrowsWrap, 'Arrange layer order', { extends : 'systyle', tipJoint : 'right'});
+		app.Tooltip.add(fly, 'Zoom to layer extent', { extends : 'systyle', tipJoint : 'bottom left'});
+		app.Tooltip.add(eye, 'Isolate layer', { extends : 'systyle', tipJoint : 'bottom left'});
+		app.Tooltip.add(kill, 'Disable layer', { extends : 'systyle', tipJoint : 'bottom left'});
+
+
+
 
 	
 		// add wrapper to list by zIndex

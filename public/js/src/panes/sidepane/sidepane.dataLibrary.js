@@ -81,6 +81,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// init download table
 		this.initDownloadTable();
 
+
+		// add tooltip
+		app.Tooltip.add(this._menu, 'The data library holds all the files uploaded for the project.');
+
+
 	},
 
 	// hooks added automatically on page load

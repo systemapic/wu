@@ -31,6 +31,9 @@ Wu.StatusPane = Wu.Class.extend({
 		// add to sidepane if assigned container in options
 		if (this.options.addTo) this.addTo(this.options.addTo);
 
+		// add tooltip
+		app.Tooltip.add(this._container, 'This is the main menu. Here you can change projects, view documents, download files, etc.', { extends : 'systyle', tipJoint : 'bottom right' });
+
 	},
 
 	addHooks : function () {

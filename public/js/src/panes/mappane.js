@@ -829,6 +829,7 @@ Wu.MapPane = Wu.Class.extend({
 		// add vector styling control
 		// this.enableVectorstyle(drawControl._wrapper);
 
+
 	},
 
 	getEditableLayerParent : function (id) {

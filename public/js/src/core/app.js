@@ -183,6 +183,9 @@ Wu.App = Wu.Class.extend({
 
 	_initPanes : function () {
 
+		// render tooltip
+		this.Tooltip = new Wu.Tooltip();
+
 		// render style handler
 		this.Style = new Wu.Style();
 

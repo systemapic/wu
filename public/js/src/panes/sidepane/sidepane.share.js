@@ -77,6 +77,10 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		    ldesc 	 = Wu.DomUtil.create('div', 'share-subtitle link', this.linkButton, 'Create share link');
 
 		
+		// add tooltip
+		app.Tooltip.add(this._menu, 'Create image, PDF or link to project. The link will hold your current view (zoom, coordinates and active layers).');
+
+
 	},
 
 	createImage : function () {

@@ -33,6 +33,8 @@ L.Control.Description = L.Control.extend({
 		// create scroller 
 		this._inner = Wu.DomUtil.create('div', 'description-scroller', this._outer);
 		
+		// add tooltip
+		app.Tooltip.add(this._container, 'Shows layer information', { extends : 'systyle', tipJoint : 'left' });
 			       
 	},      
 

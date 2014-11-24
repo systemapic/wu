@@ -26,6 +26,10 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
       		// insert create client button
 		if (app.Account.canCreateClient()) this._insertNewClientButton();	
 
+		// add tooltip
+		app.Tooltip.add(this._menu, 'Here is a list of clients and projects you have access to.');
+
+
 	},
 
 	_insertNewClientButton : function () {
@@ -36,6 +40,10 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 		// add trigger
 		this._addHook(newClientButton, 'click', this.newClient, this);
+
+		// add tooltip
+		app.Tooltip.add(newClientButton, 'Click to create new client');
+
 	},
 
 	addHooks : function () {
