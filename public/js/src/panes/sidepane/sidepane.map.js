@@ -29,6 +29,11 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		this.mapSettings.connect   = new Wu.SidePane.Map.Connect(this._settingsContainer);  // refactor container, ich.template
 		this.mapSettings.settings  = new Wu.SidePane.Map.Settings(this._settingsContainer);  // refactor container, ich.template
 
+
+		// add tooltip
+		app.Tooltip.add(this._menu, '(Editors only) In this section you will find all the options for setting up a map.');
+
+
 	},
 
 	

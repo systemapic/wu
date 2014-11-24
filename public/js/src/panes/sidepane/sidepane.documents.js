@@ -22,6 +22,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._rightpane  = Wu.DomUtil.get('documents-container-rightpane');
 		this._textarea   = Wu.DomUtil.get('documents-container-textarea');
 		this._newfolder  = Wu.DomUtil.get('documents-new-folder');
+
+		// add tooltip
+		app.Tooltip.add(this._menu, 'This is the projects document section.');
+		
 	},
 
 	initFolders : function () {

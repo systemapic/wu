@@ -971,3 +971,17 @@ input.cmn-toggle-round-flat + label:before {
 	bottom: 5px;
 	width: 100%;
 }	
+
+
+
+
+/*HELP TOOLTIP CHANGES*/
+
+.opentip-container {
+	z-index: 9999999 !important;
+}
+
+.style-systip .opentip {
+	color: white !important;
+	text-shadow: none !important;
+}

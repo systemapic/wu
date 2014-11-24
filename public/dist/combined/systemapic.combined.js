@@ -4645,12 +4645,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	calculateHeight : function () {
 
-		console.log('calculateHeight');
-
 		this.maxHeight = this._inner.offsetHeight + 15;
-
-		console.log('this._inner', this._inner);
-
 		this.minHeight = 0;
 	},
 
@@ -4791,6 +4786,9 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		var div = Wu.DomUtil.createId('div', 'select-baselayer-wrap', this._container);
 		this._outer = Wu.DomUtil.create('div', 'select-elems', div);
 		Wu.DomUtil.addClass(div, 'select-wrap');
+
+		// add tooltip
+		app.Tooltip.add(this._container, 'Sets the base layers of the map. These layers will not appear in the "Layers" menu. Users may still toggle these layers on and off if the "Base Layer Toggle" option has been set to active in the "Controls" section.' );
 	},
 
 	
@@ -4843,7 +4841,7 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 			rangeZindex : rangeZindex
 		}
 
-		// // set active or not
+		// set active or not
 		this.project.store.baseLayers.forEach(function (b) {
 			if (layer.store.uuid == b.uuid) {
 				this.on(baseLayer);
@@ -5071,32 +5069,34 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 	enableLayer : function (baseLayer) {
 
-		// enable layer on map
-		baseLayer.layer.enable();
+		// get layer
+		var layer = baseLayer.layer;
 
-		// get default opacity
-		var opacity = baseLayer.layer.getOpacity();
+		// enable layer on map (without controls)
+		layer._addTo();
 
-		// save
-		this.project.store.baseLayers.push({
-			uuid : baseLayer.layer.store.uuid,
-			zIndex : 1,
-			opacity : opacity
+		// add baselayer
+		this.project.addBaseLayer({
+			uuid : layer.getUuid(),
+			zIndex : 1,			// zindex not determined by layer, but by which layers are currently on map
+			opacity : layer.getOpacity()
 		});
-		this.save();
 	
 		// refresh controls
 		this._refreshControls();
 	},
 
 	disableLayer : function (baseLayer) {
+		if (!baseLayer) return
+
+		// get layer
+		var layer = baseLayer.layer;
 
 		// disable layer in map
-		if (baseLayer && baseLayer.layer) baseLayer.layer.disable(); 
+		if (layer) layer.disable(); 
 
-		// save
-		_.remove(this.project.store.baseLayers, function (b) { return b.uuid == baseLayer.layer.store.uuid; });
-		this.save();
+		// remove from project
+		this.project.removeBaseLayer(layer)
 
 		// refresh controls
 		this._refreshControls();
@@ -5122,7 +5122,6 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 	calculateHeight : function () {
 				
 		// Runs only for base layer menu?
-
 		var min = _.size(this.project.getLayermenuLayers());
 		var padding = this.numberOfProviders * 35;
 		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
@@ -9614,6 +9613,13 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// add to sidepane if assigned container in options
 		if (this.options.addTo) this.addTo(this.options.addTo);
 
+		// add tooltip
+		console.log('ADDING STATYSPANE TOOLTIP!')
+		app.Tooltip.add(this._container, 'LOL', 'more lol', {
+			showOn : 'click',
+			
+		});
+
 	},
 
 	addHooks : function () {
@@ -12253,6 +12259,16 @@ L.control.baselayerToggle = function (options) {
 		this.layers[layer.uuid] = new Wu.createLayer(layer);
 	},
 
+	addBaseLayer : function (layer) {
+		this.store.baseLayers.push(layer);
+		this._update('baseLayers');
+	},
+
+	removeBaseLayer : function (layer) {
+		_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.getUuid(); });
+		this._update('baseLayers');
+	},
+
 	createLayerFromGeoJSON : function (geojson) {
 
 		console.log('createLayerFromGeoJSON', geojson);
@@ -12651,12 +12667,10 @@ L.control.baselayerToggle = function (options) {
 	// get available categories stored in project
 	getCategories : function () {
 		return this.store.categories;
-		// return ['environment', 'coal', 'wildlife']; // dummy 
 	},
 
 	// add category to project list of cats
 	addCategory : function (category) {
-		console.log('project.addCategory', category);
 
 		// push to list
 		this.store.categories.push(category);
@@ -12666,7 +12680,6 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	removeCategory : function (category) {
-		console.log('project.removeCategory', category);
 
 		// remove from array
 		_.remove(this.store.categories, function (c) {
@@ -13002,7 +13015,6 @@ L.control.baselayerToggle = function (options) {
 			this.getSettings()[setting] ? this['enable' + setting.camelize()]() : this['disable' + setting.camelize()]();
 		}
 	},
-
 
 	// settings
 	toggleSetting : function (setting) {
@@ -13755,6 +13767,16 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	addTo : function (map) {
+		
+		// add to map
+		this._addTo(map);
+		
+		// add to controls
+		this.addToControls();
+
+	},
+
+	_addTo : function (map) {
 		var map = map || Wu.app._map;
 
 		// leaflet fn
@@ -13769,8 +13791,10 @@ L.control.baselayerToggle = function (options) {
 		// add gridLayer if available
 		if (this.gridLayer) map.addLayer(this.gridLayer);
 
+	},
 
-		
+	addToControls : function () {
+
 		// add legends if active
 		var legendsControl = app.MapPane.legendsControl;
 		legendsControl && legendsControl.addLegend(this);
@@ -13792,7 +13816,6 @@ L.control.baselayerToggle = function (options) {
 			}
 		
 		}
-
 	},
 
 	leafletEvent : function (event, fn) {
@@ -18618,6 +18641,9 @@ Wu.App = Wu.Class.extend({
 
 
 	_initPanes : function () {
+
+		// render tooltip
+		this.Tooltip = new Wu.Tooltip();
 
 		// render style handler
 		this.Style = new Wu.Style();

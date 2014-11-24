@@ -825,10 +825,10 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	enableTooltips : function () {
-
+		app.Tooltip.activate();
 	},
 	disableTooltips : function () {
-
+		app.Tooltip.deactivate();
 	},
 
 	enableScreenshot : function () {

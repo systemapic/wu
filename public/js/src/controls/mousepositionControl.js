@@ -40,6 +40,9 @@ L.Control.MousePosition = L.Control.extend({
                 L.DomEvent.disableClickPropagation(this._container);
                 map.on('mousemove', this._onMouseMove, this);
                 
+                // add tooltip
+                app.Tooltip.add(this._container, 'Gives the coordinates of the mouse pointer', { extends : 'systyle', tipJoint : 'bottom middle'});
+
                 return this._container;
         },
 

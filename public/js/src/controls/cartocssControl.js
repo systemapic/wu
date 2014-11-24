@@ -15,6 +15,9 @@ L.Control.CartoCSS = L.Control.extend({
 		// create toolbar button
 		this._toolbarButton = Wu.DomUtil.create('div', 'cartocss-toolbar-button', container);
 
+		// add tooltip
+		app.Tooltip.add(this._toolbarButton, 'CartoCSS editor, tooltip controller, and legends builder');
+
 		// init rest of layout
 		this.initLayout();
 

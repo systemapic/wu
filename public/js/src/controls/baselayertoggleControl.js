@@ -39,6 +39,9 @@ L.Control.BaselayerToggle = L.Control.extend({
 		var className = 'leaflet-control-baselayertoggle';
 		var container = this._container = L.DomUtil.create('div', className);
 
+		// add tooltip
+		app.Tooltip.add(container, 'Toggle between baselayers', { extends : 'systyle', offset : [23, 0]});
+
 		// add events
 		Wu.DomEvent.on(container, 'mousedown', this.toggle, this);
 		Wu.DomEvent.on(container, 'dblclick', Wu.DomEvent.stop, this);

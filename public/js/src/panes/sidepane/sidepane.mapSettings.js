@@ -19,6 +19,7 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 		// add hooks
 		this.addHooks();
 
+
 	},
 
 
@@ -192,6 +193,9 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		var div = Wu.DomUtil.createId('div', 'select-baselayer-wrap', this._container);
 		this._outer = Wu.DomUtil.create('div', 'select-elems', div);
 		Wu.DomUtil.addClass(div, 'select-wrap');
+
+		// add tooltip
+		app.Tooltip.add(this._container, 'Sets the base layers of the map. These layers will not appear in the "Layers" menu to the right of the screen. Users may still toggle these layers if the "Base Layer Toggle" option has been set to active in the "Controls" section.' );
 	},
 
 	
@@ -584,6 +588,10 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 		// var status   = 'Enable layer menu in Controls below.';
 		// this._status = Wu.DomUtil.create('div', 'layermenu-status', this._outer, status);
 
+		// add tooltip
+		app.Tooltip.add(this._container, 'Sets layers that will appear in the layer menu. Selected base layers will be excluded from the Layer Menu list, and vice versa, to avoid duplicates.' );
+
+
 	},
 
 	update : function () {
@@ -856,6 +864,10 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 		this.panes.initPosLngValue     	= Wu.DomUtil.get('editor-map-initpos-lng-value');
 		this.panes.initPosZoomValue    	= Wu.DomUtil.get('editor-map-initpos-zoom-value');
 		this.toggled 	               	= false;
+
+		// add tooltip
+		app.Tooltip.add(this._container, 'Sets the starting position of the map.');
+
 	},
 
 	addHooks : function () {
@@ -973,6 +985,10 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		this.panes.setMinZoom           = Wu.DomUtil.get('editor-map-bounds-set-minZoom'); 
 		this.panes.setMaxZoom           = Wu.DomUtil.get('editor-map-bounds-set-maxZoom'); 
 		this.toggled            	= false;
+
+		// add tooltip
+		app.Tooltip.add(this._container, 'Decides the bounding area and the min/max zoom of the map. If a user moves outside of the bounding area, the map will "bounce" back to fit within the given bounding coordinates.');
+
 	},
 
 	addHooks : function () {
@@ -1130,8 +1146,6 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		// set bounds to project
 		project.setBounds(this._nullBounds);
 
-
-
 		// call update on view
 		this.update();
 
@@ -1266,6 +1280,25 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		this.panes.controlMouseposition        	= Wu.DomUtil.get('map-controls-mouseposition').parentNode.parentNode;
 		this.panes.controlBaselayertoggle      	= Wu.DomUtil.get('map-controls-baselayertoggle').parentNode.parentNode;
 		this.panes.controlCartocss 		= Wu.DomUtil.get('map-controls-cartocss').parentNode.parentNode;
+
+		// add tooltip
+		app.Tooltip.add(this._container, 'Enables the control options that goes on top of the map.');
+
+		// Add tooltip for each option
+		app.Tooltip.add(this.panes.controlZoom, 'Enables zooming on the map. Puts [+] and [-] buttons on the map.');
+		app.Tooltip.add(this.panes.controlDraw, 'Enables drawing on the map.');
+		app.Tooltip.add(this.panes.controlInspect, 'The layer inspector enables users to change the order or selected layers, to isolate layers, and to zoom to layer bounds.', { extends : 'systyle', group : 'controls' });
+		app.Tooltip.add(this.panes.controlDescription, 'Enables layer description boxes.');
+		app.Tooltip.add(this.panes.controlLayermenu, 'Enables the layer menu.');
+		app.Tooltip.add(this.panes.controlLegends, 'Enable layer legends.');
+		app.Tooltip.add(this.panes.controlMeasure, 'Enables scaling tool on the map.');
+		app.Tooltip.add(this.panes.controlGeolocation, 'Enables users to search for address or locations in the world.');
+		app.Tooltip.add(this.panes.controlMouseposition, 'Shows the geolocation of mouse pointer.');
+		app.Tooltip.add(this.panes.controlBaselayertoggle, 'Enables toggelig base layers on and off.');
+		app.Tooltip.add(this.panes.controlCartocss, 'Enables the CartoCSS editor, the tooltip styler, and auto generated layer legends.');
+
+
+
 	},
 
 	addHooks : function () {
@@ -1303,8 +1336,6 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 	toggleControl : function (e) {
 		
-		// console.log('toggleControl');
-		console.log('e: ', e);
 		// prevent default checkbox behaviour
 		if (e.type == 'click') return Wu.DomEvent.stop(e);
 		
@@ -1315,7 +1346,6 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		var item = e.target.getAttribute('which');
 
 		// get checkbox
-		console.log('item: ', item);
 		var target = Wu.DomUtil.get('map-controls-' + item);
 
 		// do action (eg. toggleControlDraw);
@@ -1343,8 +1373,6 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		// save changes to project
 		this.project.store.controls[item] = on;	// todo
 		this.project._update('controls');
-
-		console.log('upadte controls!!');		
 
 		// update controls css
 		mapPane.updateControlCss();
@@ -1383,7 +1411,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 		this.controls = this.project.getControls();
 
-		// tmp hack to remove vectrostyle
+		// tmp hack to remove vectorstyle
 		delete this.controls.vectorstyle;		// todo: remove
 
 		// toggle each control
@@ -1440,6 +1468,11 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		
 		// clear vars n fields
 		this.resetInput();
+
+
+		// add tooltip
+		app.Tooltip.add(this._container, 'Imports layers from MapBox account.');
+
 
 	},
 
@@ -1595,7 +1628,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		autoAbout 	: true,
 		darkTheme 	: true,
 		tooltips 	: true,
-		mapboxGL	: false // maybe not as setting ~ I like it.
+		mapboxGL	: false 
 
 	},
 
@@ -1605,6 +1638,10 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		this._container	= Wu.DomUtil.create('div', 'editor-inner-wrapper editor-map-item-wrap ct12 ct17 ct23', container);
 		var h4 		= Wu.DomUtil.create('h4', '', this._container, 'Settings');
 		this._outer 	= Wu.DomUtil.create('div', 'settings-outer', this._container);
+
+		// add tooltip
+		app.Tooltip.add(this._container, 'Enable additional map settings.');
+
 
 	},
 
@@ -1644,44 +1681,94 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		var wrapper = Wu.DomUtil.create('div', 'settings-wrapper');
 
 		if (this.options.screenshot) {
+
 			var screenshot = this._contentItem('screenshot', 'Screenshots');
 			wrapper.appendChild(screenshot);
+
+			// add tooltip
+			app.Tooltip.add(screenshot, 'Enable users to make screenshots of map');
+
 		}
 		if (this.options.socialSharing) {
+
 			var socialSharing = this._contentItem('socialSharing', 'Social Sharing');
 			wrapper.appendChild(socialSharing);
+
+			// add tooltip
+			app.Tooltip.add(socialSharing, 'Enable social sharing for this map');
+
 		}
 		if (this.options.documentsPane) {
+
 			var documentsPane = this._contentItem('documentsPane', 'Documents Pane');
 			wrapper.appendChild(documentsPane);
+
+			// add tooltip
+			app.Tooltip.add(documentsPane, 'Enable documents pane for this map');
+
 		}
 		if (this.options.dataLibrary) {
+
 			var dataLibrary = this._contentItem('dataLibrary', 'Data Library');
 			wrapper.appendChild(dataLibrary);
+
+			// add tooltip
+			app.Tooltip.add(dataLibrary, 'Enable public data library for this map');
+
 		}
 		if (this.options.mediaLibrary) {
+
 			var mediaLibrary = this._contentItem('mediaLibrary', 'Media Library');
 			wrapper.appendChild(mediaLibrary);
+
+			// add tooltip
+			app.Tooltip.add(mediaLibrary, 'Enable media library for this map');			
+
 		}
 		if (this.options.autoHelp) {
+
 			var autoHelp = this._contentItem('autoHelp', 'Add Help');
 			wrapper.appendChild(autoHelp);
+
+			// add tooltip
+			app.Tooltip.add(autoHelp, 'Add help section to documents');			
+
 		}
 		if (this.options.autoAbout) {
+
 			var autoAbout = this._contentItem('autoAbout', 'Add About');
 			wrapper.appendChild(autoAbout);
+
+			// add tooltip
+			app.Tooltip.add(autoAbout, 'Add about section to documents');			
+
 		}
 		if (this.options.darkTheme) {
+
 			var darkTheme = this._contentItem('darkTheme', 'Dark Theme');
 			wrapper.appendChild(darkTheme);
+
+			// add tooltip
+			app.Tooltip.add(darkTheme, 'Toggle between dark theme and light theme');
+
 		}
 		if (this.options.tooltips) {
+
 			var tooltips = this._contentItem('tooltips', 'Tooltips');
 			wrapper.appendChild(tooltips);
+
+			// add tooltip
+			app.Tooltip.add(tooltips, 'Enable tooltips for map');
+
 		}
 		if (this.options.mapboxGL) {
+			
 			var mapboxGL = this._contentItem('mapboxGL', 'MapboxGL');
 			wrapper.appendChild(mapboxGL);
+
+			// add tooltip
+			app.Tooltip.add(mapboxGL, 'Render map as GL');
+
 		}
 
 		return wrapper;
