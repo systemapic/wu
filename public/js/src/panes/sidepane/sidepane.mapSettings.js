@@ -1767,7 +1767,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 			wrapper.appendChild(mapboxGL);
 
 			// add tooltip
-			app.Tooltip.add(mapboxGL, 'Render map as GL');
+			app.Tooltip.add(mapboxGL, 'Render map with GL');
 
 		}
 
