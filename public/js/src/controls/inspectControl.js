@@ -14,7 +14,7 @@ L.Control.Inspect = L.Control.extend({
 		container.innerHTML = ich.inspectControl(); 
 
 		// add tooltip
-		app.Tooltip.add(container, 'Shows a list of active layers', { extends : 'systyle', tipJoint : 'top'});
+		app.Tooltip.add(container, 'Shows a list of active layers', { extends : 'systyle', tipJoint : 'top', group : 'inspect-control'});
 
 		// content is not ready yet, cause not added to map! 
 		return container; // this._container
@@ -73,10 +73,10 @@ L.Control.Inspect = L.Control.extend({
 		var kill 	= Wu.DomUtil.create('div', 'inspect-kill', wrapper);
 
 		// add tooltip
-		app.Tooltip.add(arrowsWrap, 'Arrange layer order', { extends : 'systyle', tipJoint : 'right'});
-		app.Tooltip.add(fly, 'Zoom to layer extent', { extends : 'systyle', tipJoint : 'bottom left'});
-		app.Tooltip.add(eye, 'Isolate layer', { extends : 'systyle', tipJoint : 'bottom left'});
-		app.Tooltip.add(kill, 'Disable layer', { extends : 'systyle', tipJoint : 'bottom left'});
+		app.Tooltip.add(arrowsWrap, 'Arrange layer order', { extends : 'systyle', tipJoint : 'right', group : 'inspect-control'});
+		app.Tooltip.add(fly, 'Zoom to layer extent', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
+		app.Tooltip.add(eye, 'Isolate layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
+		app.Tooltip.add(kill, 'Disable layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
 
 
 

@@ -18,7 +18,7 @@ Wu.HeaderPane = Wu.Class.extend({
 
 		// create divs
 		this._container = Wu.app._headerPane = Wu.DomUtil.createId('div', 'header', Wu.app._mapContainer);
-						  Wu.DomUtil.addClass(Wu.app._headerPane, 'displayNone');
+		Wu.DomUtil.addClass(Wu.app._headerPane, 'displayNone');
 
 		this._logoWrap  = Wu.DomUtil.create('div', 'header-logo', this._container);
 		// this._logo 	= Wu.DomUtil.create('img', 'header-logo-img', this._logoWrap);
@@ -27,9 +27,17 @@ Wu.HeaderPane = Wu.Class.extend({
 		this._subtitle 	= Wu.DomUtil.create('div', 'header-subtitle editable', this._titleWrap);
 		// this._resizer 	= Wu.DomUtil.createId('div', 'headerResizer ', this._container);
 
-		// set
+		// hack
 		this._title.whichTitle = 'title';
 		this._subtitle.whichTitle = 'subtitle';
+
+		// tooltips
+		app.Tooltip.add(this._container, 'this._container', {group : 'header'});
+		app.Tooltip.add(this._logoWrap, 'this._logoWrap', {group : 'header'});
+		app.Tooltip.add(this._title, 'this._title', {group : 'header'});
+
+		Wu.DomEvent.on(this._logoWrap, 'mouseover', Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._title, 'mouseover', Wu.DomEvent.stopPropagation, this);
 
 	},
 
