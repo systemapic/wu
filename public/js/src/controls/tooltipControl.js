@@ -6,7 +6,8 @@ Wu.Tooltip = Wu.Class.extend({
 		tipJoint : 'middle right', 
 		background : "#333", 
 		borderColor : '#333',
-		className : 'systip'		
+		className : 'systip',
+		delay : 0
 	},
 
 	defaultStyle : {
@@ -15,7 +16,7 @@ Wu.Tooltip = Wu.Class.extend({
 		tipJoint : 'middle right', 
 		background : "#333", 
 		borderColor : '#333',
-		className : 'systip'		
+		className : 'systip'
 	},	
 
 	initialize : function () {
@@ -26,17 +27,16 @@ Wu.Tooltip = Wu.Class.extend({
 		Opentip.styles.systyle = this.defaultStyle;
 	},
 
-	add : function (div, content, title, options) {
+	add : function (div, content, options) {
 
 		// merge options
-		Wu.setOptions(options || {});
+		var opts = _.extend(_.clone(this.options), options);
 
 		// push to list
 		this.tips.push({
 			div : div,
 			content : content,
-			title : title,
-			options : this.options
+			options : opts
 		});
 
 		// add events (if tooltips setting is active)
@@ -52,7 +52,12 @@ Wu.Tooltip = Wu.Class.extend({
 			if (!t.inited)  {
 
 				// create tip
-				var tip = new Opentip(t.div, t.content, t.title, t.options);
+				var tip = new Opentip(t.div, t.content, t.options);
+
+				console.log('************************')
+				console.log('t.div', t.div)
+				console.log('t.options', t.options)
+				console.log('************************')
 
 				// mark inited (for events)
 				t.inited = true;
