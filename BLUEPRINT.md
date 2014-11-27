@@ -29,9 +29,12 @@ Features:
 * Embedding
 * Video raster
 * Medialibrary
-
+* Autostyling CCSS
 
 Structure:
 ----------
 * Hosting
 * Paywall
+* Cluster
+* CDN's
+* Wiki data
