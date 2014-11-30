@@ -132,8 +132,23 @@
 
 
 
-
-
+/*download-dialog*/
+.download-dialog {
+	position: absolute;
+	height: 100px;
+	width: 200px;
+	background: red;
+	top: 200px;
+	left: 200px;
+}
+.download-dialog-button {
+	position: relative;
+	background: yellow;
+	top: 0px;
+	left: 0px;
+	height: 50px;
+	width: 100px;
+}
 
 
 

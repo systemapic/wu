@@ -11,30 +11,26 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._content = Wu.DomUtil.create('div', 'data-library ct1', Wu.app._appPane);
 		
 		// Button controller
-		this._controlContainer 	= Wu.DomUtil.create('div', 'datalibrary-controls', this._content);	
-		this._controlInner 	= Wu.DomUtil.create('div', 'datalibrary-controls-inner', this._controlContainer);
+		this._controlContainer = Wu.DomUtil.create('div', 'datalibrary-controls', this._content);	
+		this._controlInner = Wu.DomUtil.create('div', 'datalibrary-controls-inner', this._controlContainer);
 
 		// Upload button
-		this._uploadContainer 	= Wu.DomUtil.createId('div', 'upload-container', this._controlInner);
-		this._uploadContainer.innerHTML = "Upload";
-		Wu.DomUtil.addClass(this._uploadContainer, 'smap-button-gray ct17');
+		this._uploadContainer = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload');
+		this._uploadContainer.id = 'upload-container';
 
 		// Search field
-		this._search = Wu.DomUtil.createId('input', 'datalibrary-search', this._controlInner);
+		this._search = Wu.DomUtil.create('input', 'search', this._controlInner);
+		this._search.id = 'datalibrary-search';
 		this._search.setAttribute('type', 'text');
 		this._search.setAttribute('placeholder', 'Search files');
-		Wu.DomUtil.addClass(this._search, 'search ct17');
 
 		// Delete button
-		this._delete = Wu.DomUtil.createId('div', 'datalibrary-delete-file', this._controlInner);
-		this._delete.innerHTML = "Delete";
-		Wu.DomUtil.addClass(this._delete, 'smap-button-gray');
+		this._delete = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Delete');
+		this._delete.id = 'datalibrary-delete-file';
 
 		// Download button
-		this._download = Wu.DomUtil.createId('div', 'datalibrary-download-files', this._controlInner);
-		Wu.DomUtil.addClass(this._download, 'smap-button-gray');
-		this._download.innerHTML = "Download";		
-
+		this._download = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Download');
+		this._download.id = 'datalibrary-download-files';
 
 		// error feedback
 		this._errors = Wu.DomUtil.createId('div', 'datalibrary-errors', this._controlInner);
@@ -92,7 +88,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	addHooks : function () {
 	       
 		// download button
-		Wu.DomEvent.on(this._downloader, 'mousedown', this.downloadConfirm, this);
+		// Wu.DomEvent.on(this._downloader, 'mousedown', this.downloadConfirm, this);
+		Wu.DomEvent.on(this._download, 'mousedown', this.downloadFiles, this);
 
 		// check all button
 		Wu.DomEvent.on(this._checkallLabel, 'mousedown', this.checkAll, this);
@@ -184,6 +181,16 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	downloadFiles : function () {
 
+		console.log('downloadFiles');
+
+		// get selected
+		this._downloadFileList = this.getSelected();
+
+		// return if no files selected
+		if (!this._downloadFileList.length) return;
+
+		console.log('this._downloadFileList', this._downloadFileList);
+
 		// create list of uuids only
 		var fuuids = [];
 		this._downloadFileList.forEach(function (file, i, arr) {
@@ -200,24 +207,61 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// post         path          json      callback           this
 		Wu.post('/api/file/download', json, this.receivedDownload, this);
 
+		// create download dialog
+		this.createDownloadDialog();
+
 	},
 
 	receivedDownload : function (that, response) {
 		// this = window
 
+		console.log('receivedDownload', response);
+
 		// set path for zip file
 		var path = '/api/file/download?file=' + response + '&type=zip';
 		
+		// create download dialog
+		that.updateDownloadDialog(path);
+
 		// add <a> for zip file
-		that._downloadList.innerHTML = ich.datalibraryDownloadReady({'url' : path});	// a href
-		var btn = Wu.DomUtil.get('download-ready-button');
-		Wu.DomEvent.on(btn, 'click', that.downloadDone, that);
+		// that._downloadList.innerHTML = ich.datalibraryDownloadReady({'url' : path});	// a href
+		// var btn = Wu.DomUtil.get('download-ready-button');
+		// Wu.DomEvent.on(btn, 'click', that.downloadDone, that);
 
 		// hide
-		if (this._downloadList) this._downloadList.style.display = 'none';
-		if (this._container) this._container.style.display = 'block';
+		// if (this._downloadList) this._downloadList.style.display = 'none';
+		// if (this._container) this._container.style.display = 'block';
 
 	},
+
+	createDownloadDialog : function () {
+
+		// divs
+		var wrapper = this._downloadDialog = Wu.DomUtil.create('div', 'download-dialog', this._content);
+		var downloadBtn = this._downloadDialogBtn = Wu.DomUtil.create('div', 'download-dialog-button', wrapper, 'Processing...');
+		var cancelBtn = Wu.DomUtil.create('div', 'download-dialog-cancel', wrapper, 'Cancel');
+
+		// event
+		Wu.DomEvent.on(cancelBtn, 'mousedown', this.removeDownloadDialog, this);
+		Wu.DomEvent.on(downloadBtn, 'mousedown', this._removeDownloadDialog, this);
+
+	},
+
+	updateDownloadDialog : function (path) {
+		this._downloadDialogBtn.innerHTML = '';
+		var link = Wu.DomUtil.create('a', 'download-dialog-link', this._downloadDialogBtn, 'Download');
+		link.setAttribute('href', path);
+	},
+
+	removeDownloadDialog : function () {
+		Wu.DomUtil.remove(this._downloadDialog);
+	},	
+
+	_removeDownloadDialog : function () {
+		console.log('___removeDownloadDialog');
+		this._downloadDialog.style.opacity = 0;
+		setTimeout(this.removeDownloadDialog.bind(this), 3000);
+	},	
 
 	downloadCancel : function () {
 		

@@ -46,8 +46,11 @@ L.Control.CartoCSS = L.Control.extend({
 
 	initLayout : function () {
 
+
 		// create divs
 		this._editorContainer 		= Wu.DomUtil.create('div', 'cartocss-control-container'); // editor container
+		this._resizeHandle 		= Wu.DomUtil.create('div', 'cartocss-control-resizer', this._editorContainer); // editor container
+
 		this._wrapper 			= Wu.DomUtil.create('div', 'cartocss-control-wrapper', this._editorContainer); // the obligatory wrapper
 		this._xButton 			= Wu.DomUtil.create('div', 'close-cartocss-editor-x', this._wrapper); // close button
 		this._zoomVal 			= Wu.DomUtil.create('div', 'cartocss-zoomval', this._wrapper, app._map.getZoom()); // Show zoom value
@@ -79,10 +82,18 @@ L.Control.CartoCSS = L.Control.extend({
 		this._inputArea 		= Wu.DomUtil.create('textarea', 'cartocss-input', this._formWrapper); // For CodeMirror: create text area
 		this._errorPane 		= Wu.DomUtil.create('div', 'cartocss-error-pane', this._wrapper); // error feedback pane
 		this._updateButton 		= Wu.DomUtil.create('div', 'cartocss-update-button', this._wrapper); // create update button
-		this._updateButton.innerHTML 	= 'Render layer';
+		this._updateButton.innerHTML 	= 'Render changes';
 
 		// append to leaflet-control-container
 		app._map.getContainer().appendChild(this._editorContainer);
+
+		// add tooltip
+		app.Tooltip.add(this._styleHeaderWrapper, 'Shows a list of active layers for this project.', { extends : 'systyle', tipJoint : 'top left'});
+		app.Tooltip.add(this._zoomVal, 'Shows current zoom level.', { extends : 'systyle', tipJoint : 'top left'});
+		app.Tooltip.add(this._tabStyling, 'Style selected layer. Takes CartoCSS code.', { extends : 'systyle', tipJoint : 'top left'});
+		app.Tooltip.add(this._tabTooltip, 'Customize tooltip to appear when clicking on different shapes in layer.', { extends : 'systyle', tipJoint : 'top left'});
+		app.Tooltip.add(this._tabLegends, 'Decide which legends you want to show for selected layer.', { extends : 'systyle', tipJoint : 'top left'});
+				
 
 	},
 
@@ -109,7 +120,8 @@ L.Control.CartoCSS = L.Control.extend({
 		// Toggle tooltip tab
 		Wu.DomEvent.on(this._tabTooltip, 'mousedown', this.toggleTooltip, this);
 
-
+		// Resize container
+		Wu.DomEvent.on(this._resizeHandle, 'mousedown', this.resize, this);
 
 		// stops
 		Wu.DomEvent.on(this._editorContainer, 		'mousewheel mousedown dblclick mouseup click', 	Wu.DomEvent.stopPropagation, this);
@@ -130,6 +142,34 @@ L.Control.CartoCSS = L.Control.extend({
 
 		
 
+	},
+
+	resize : function () {
+
+		// Get position of frame that is going to be scaled
+		this.__cartoContainer_offsetLeft = this._editorContainer.offsetLeft;
+		this.__cartoContainer_width = this._editorContainer.offsetWidth;
+
+		// Log mouse position
+		Wu.DomEvent.on(document, 'mousemove', this.mouselistener, this);
+
+		// Stop listening to mouse on mouse up
+		// OBS! How to self destroy
+		Wu.DomEvent.on(this._resizeHandle, 'mouseup', function() { 
+			Wu.DomEvent.off(document, 'mousemove', this.mouselistener, this);
+		}, this);
+
+	},
+
+	mouselistener : function (e) {
+
+		var mouse = {x: 0};		
+		mouse.x = e.clientX || e.pageX; 
+		
+		var __newWidth = this.__cartoContainer_width + (this.__cartoContainer_offsetLeft - mouse.x);
+		if ( __newWidth >= 300 ) this._editorContainer.style.width = __newWidth + 'px';
+
+		
 	},
 
 	// update: fired from outside, on project.select() etc.

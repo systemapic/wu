@@ -489,10 +489,16 @@
 /* Temporarily removed */
 .leaflet-control-attribution {
 	position: fixed;
-	left: 302px;
-	bottom: 5px;
-	right: auto;	
-	display: none;
+	/*left: 302px;*/
+	/*bottom: 5px;*/
+	/*right: auto;	*/
+	/*display: none;*/
+	/*left: 7px;*/
+
+	right: -2px;
+	top: 63px;
+	background: transparent !important;
+
 	}
 
 /*
@@ -795,6 +801,9 @@
 	width: auto;
 	max-width: 100%;
 	max-height: 200px;
+
+	/* For attributions cxxx */
+	/*bottom: 20px;*/
 	}
 	
 /* inner wrapper */
@@ -1516,6 +1525,9 @@
 	position: absolute;
 	bottom: 5px;
 	top: auto;
+
+	/* For attributions cxxx */
+	/*bottom: 25px;*/
 	}
 
 /* Inner wrapper */
@@ -2034,6 +2046,16 @@
 	position: relative;
 	}
 
+.cartocss-control-resizer {
+	/*background: red;*/
+	width: 6px;
+	height: 100%;
+	position: absolute;
+	z-index: 99999;
+	left: 0;
+	border-right: 0;
+	}
+
 .cartocss-toolbar-button {
 	width: 26px;
 	height: 26px !important;
@@ -2103,11 +2125,12 @@
 	height: 100%;
 	top: 0px;
 	position: relative;
-	width: 387px;
+	/*width: 387px;*/
+	padding-right: 2px;
 	}
 
 .cartocss-layerselector-outer {
-	width: 414px;
+	/*width: 414px;*/
 	position: absolute;
 	margin-top: 5px;
 	overflow-y: scroll;
@@ -2118,6 +2141,12 @@
 	top: 31px;
 	z-index: 999;
 	height: 0px;	
+
+	width: 100%;
+	}
+
+.cartocss-layerselector-outer::-webkit-scrollbar {	
+	display: none !important;
 	}
 
 
@@ -2130,7 +2159,7 @@
 	font-size: 13px;
 	font-weight: 500;
 	cursor: pointer;
-	width: 385px;
+	/*width: 385px;*/
 	z-index: 999;
 	position: relative;
 	margin: 2px;
@@ -2147,11 +2176,11 @@
 	position: relative;
 	background: #B8B8B8;
 	padding-bottom: 3px;
-	width: 389px;
+	/*width: 389px;*/
 	}	
 
 .cartocss-update-button {
-	background: rgba(0, 0, 0, 0.2);
+/*	background: rgba(0, 0, 0, 0.2);
 	width: 289px;
 	height: 30px;
 	position: absolute;
@@ -2164,6 +2193,21 @@
 	font-size: 15px;
 	font-weight: 500;
 	box-shadow: 0 0 5px 0 rgba(0,0,0,0.1);
+*/	
+
+	background: rgba(0, 0, 0, 0.2);
+	width: 289px;
+	height: 30px;
+	bottom: -14px;
+	border-radius: 2px;
+	cursor: pointer;
+	text-align: center;
+	line-height: 1.9;
+	font-size: 15px;
+	font-weight: 500;
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+	margin: auto;
+	position: relative;
 	}
 
 .cartocss-update-button:hover {
@@ -2202,9 +2246,10 @@
 	margin-top: 1px;
 	margin-bottom: 0px;
 	text-align: center;
-	width: 328px;
+	/*width: 328px;*/
 	position: relative;
 	left: 30px;
+	padding-right: 57px;
 	}
 
 /* CODE MIRROR */
@@ -2365,14 +2410,15 @@
 	}
 
 .cartocss-tab-wrapper {
-	width: 389px;
+	/*width: 389px;*/
 	border: 1px solid #ddd;
 	border-bottom: none;
 	height: 30px;
 	}	
 
 .cartocss-tab {
-	width: 129px;
+	/*width: 129px;*/
+	width: 33%;
 	float: left;
 	text-align: center;
 	height: 29px;
@@ -2381,6 +2427,10 @@
 	background: #EEE;
 	cursor: pointer;
 	}
+
+.cartocss-tab-tooltip {
+	width: 34%;
+	}	
 
 .cartocss-tab:hover {
 	background: #F6F6F6;
@@ -2403,14 +2453,15 @@
 	}
 
 .cartocss-legends-wrapper {
-	width: 389px;
+	/*width: 389px;*/
+	width: 100%;
 	background: #f8f8f8;
 	height: 100%;
 	border: 1px solid #ddd;
 	}
 
 .cartocss-tooltip-outer-wrapper {
-	width: 389px;
+	/*width: 389px;*/
 	background: #f8f8f8;
 	height: 100%;
 	border: 1px solid #ddd;
@@ -2419,14 +2470,23 @@
 	}
 
 .cartocss-tooltip-wrapper {
-	width: 410px;
-	padding-right: 28px;
-	box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	/*width: 410px;*/
+	/*padding-right: 28px;*/
+	/*box-sizing: border-box;*/
+	/*-webkit-box-sizing: border-box;*/
 	overflow-y: scroll;
 	overflow-x: hidden;
+
+	overflow: -moz-scrollbars-none;
+	
 	height: 100%;
 	}
+
+.cartocss-tooltip-wrapper::-webkit-scrollbar {
+	display: none !important; 
+	}	
+
+
 
 .tooltip-field-wrapper .controls-switch {
 	top: 4px;
@@ -2437,12 +2497,13 @@
 	position: relative;
 	padding: 5px;
 	background: rgba(0, 0, 0, 0.1);
-	margin: 2px;
-	width: 378px;
+	margin: 2px 0 0 2px;
+	/*width: 378px;*/
+	padding-right: 58px;
 	}
 	
 .tooltip-field-key {
-	width: 318px;
+	/*width: 318px;*/
 	display: inline-block;
 	vertical-align: top;
 	border: none;
@@ -2450,6 +2511,7 @@
 	padding: 2px;
 	padding-left: 5px;
 	background: rgba(255,255,255,0.5);
+	width: 100%;
 	}
 
 .tooltip-field-value {
@@ -2459,7 +2521,8 @@
 
 #cartocss-tooltip-custom-header,
 .legends-title {
-	width: 379px;
+	/*width: 379px;*/
+	width: 100%;
 	border: 0;
 	outline: 0;
 	background: rgba(0,0,0,0.1);
@@ -2495,7 +2558,7 @@
 
 /* outer */
 .cartocss-legends-wrapper {
-	width: 389px;
+	/*width: 389px;*/
 	background: #f8f8f8;
 	height: 100%;
 	border: 1px solid #ddd;
@@ -2505,8 +2568,9 @@
 
 /* inner */
 .legends-inner-scroller {
-	width: 410px;
-	padding-right: 28px;
+	/*width: 410px;*/
+	width: 100%;
+	/*padding-right: 28px;*/
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	overflow-y: scroll;
@@ -2514,12 +2578,17 @@
 	height: 100%;
 	}
 
+.legends-inner-scroller::-webkit-scrollbar {
+	display: none !important; 
+	}	
+
 .legend-entry-wrap {
 	position: relative;
 	padding: 5px;
 	background: rgba(0, 0, 0, 0.1);
-	margin: 2px;
-	width: 378px;
+	margin: 2px 0 0 2px;
+	/*width: 378px;*/
+
 	}
 
 .legend-entry-image {
