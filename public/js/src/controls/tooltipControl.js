@@ -54,11 +54,6 @@ Wu.Tooltip = Wu.Class.extend({
 				// create tip
 				var tip = new Opentip(t.div, t.content, t.options);
 
-				console.log('************************')
-				console.log('t.div', t.div)
-				console.log('t.options', t.options)
-				console.log('************************')
-
 				// mark inited (for events)
 				t.inited = true;
 				t.tip = tip;

@@ -68,6 +68,8 @@ L.Control.Layermenu = L.Control.extend({
 
 		// add tooltip
 		app.Tooltip.add(this._layerMenuHeaderTitle, 'The layer menu lets you choose what layers you want to be on top of the map', { extends : 'systyle', tipJoint : 'right' });
+		app.Tooltip.add(this._bhattan1, 'Minimize the layer menu', { extends : 'systyle', tipJoint : 'left' });		
+	
 
 	},
 

@@ -23,9 +23,9 @@ var colors = require('colors');
 
 
 // lib's
-var api = require('../routes/api')
-var pixels = require('../routes/pixels');
-var upload = require('../routes/upload');
+var api = require('../api/api')
+var pixels = require('../api/pixels');
+var upload = require('../api/upload');
 
 // global paths
 var IMAGEFOLDER = '/var/www/data/images/';

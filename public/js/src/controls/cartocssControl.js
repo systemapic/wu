@@ -181,7 +181,7 @@ L.Control.CartoCSS = L.Control.extend({
 		var settings = app.activeProject.getSettings();
 
 
-		if ( settings.darkTheme ) app.Style.themeToggle('dark');
+		// if ( settings.darkTheme ) app.Style.themeToggle('dark');		// TODO: fires too early.. do this differently
 
 
 

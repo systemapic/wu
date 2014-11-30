@@ -14,7 +14,7 @@ L.Control.Inspect = L.Control.extend({
 		container.innerHTML = ich.inspectControl(); 
 
 		// add tooltip
-		app.Tooltip.add(container, 'Shows a list of active layers', { extends : 'systyle', tipJoint : 'top', group : 'inspect-control'});
+		app.Tooltip.add(container, 'Shows a list of active layers', { extends : 'systyle', tipJoint : 'top left'});
 
 		// content is not ready yet, cause not added to map! 
 		return container; // this._container
