@@ -12,6 +12,8 @@ var mapnikOmnivore = require('mapnik-omnivore');
 var request = require('superagent');
 var zlib = require('zlib');
 var ogr2ogr = require('ogr2ogr');
+var srs = require('srs');
+
 
 // models
 var File = require('../models/file');
@@ -36,7 +38,7 @@ module.exports = geo = {
 		console.log('GEO: handleGeoJSON', path, fileUuid);
 
 
-		geo.grinderImportGeojson(path, fileUuid, function (err, metadata){ 
+		geo.sendToTileserver(path, fileUuid, function (err, metadata){ 
 			
 			console.log('grinderImportGeojson done:', err);
 	        	
@@ -270,6 +272,9 @@ module.exports = geo = {
 		var outfolder = FILEFOLDER + fileUuid;
 		var outFile = outfolder + '/' + toFile;
 		var inFile = outfolder + '/' + shp;
+		var zipFile = outfolder + '/' + base + '.zip';
+
+		var proj = outfolder + '/' + base + '.prj';
 
 		// options		
 		var options = {
@@ -280,39 +285,74 @@ module.exports = geo = {
 						// callback
 		geo.moveShapefiles(options, function (err) {
 
+			// make sure folder exists
+			fs.ensureDirSync(outfolder);					// todo: async!
 
-			fs.ensureDirSync(outfolder);			// todo: async!
+			// make sure projection file exists
+			var exists = fs.existsSync(proj); 				// todo: async!
 
-			// ogr2ogr shapefile to geojson
-			// var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"';		
-			// var exec = require('child_process').exec;
+			// read projection file if exists
+			var projection = exists ? fs.readFileSync(proj) : false; 	// todo: async!
+			
+			// set projection if any
+			var proj4 = projection ? srs.parse(projection).proj4 : false;
 
-			// console.time('ogr2ogr');
-			// exec(cmd, function (err, stdout, stdin) {
-			// console.timeEnd('ogr2ogr');
+			// create ogr object
+			var myfile = ogr2ogr(inFile);
+			
+			// set output format
+			myfile.format('geojson');
 
-			var myfile = ogr2ogr(inFile)
-			// .project('+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs ')
-			.project('+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs')
-			.format('geojson')
-			.exec(function (err, data) {
-				console.log('did ogr2ogr! ____________________');
-				console.log('erR: ', err);
-				console.log('data: ', data);
-			// })
+			// reproject
+			if (proj4)  myfile.project('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ', proj4);
+			if (!proj4) myfile.project('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ');
+			
+			// exec ogr2ogr
+			myfile.exec(function (err, data) {
+				if (err) console.error(err);
 
+
+				// do fallback on error
+
+				if (err) return geo._ogr2ogrFallback(folder, outfolder, toFile, outFile, inFile, fileUuid, callback);
+
+				// if (err) {
+				// 	console.log('doing fallback exec!');
+
+				// 	// make sure dir exists
+				// 	fs.ensureDirSync(outfolder);			// todo: async!
+
+				// 	// ogr2ogr shapefile to geojson
+				// 	var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"';		
+				// 	var exec = require('child_process').exec;
+
+				// 	exec(cmd, function (err, stdout, stdin) {
+				// 		if (err) console.error('mapshaper err: ', err, stdout, stdin);
+
+				// 		// move folder with shapefile to new fileUuid folder
+				// 		fs.move(folder, outfolder + '/Shapefiles', function (err) {
+				// 			if (err) console.error(err);
+				// 		});
+
+				// 		// callback
+				// 		callback(err, {path : outFile, name : toFile, fileUuid : fileUuid});
+
+				// 	});
+
+				// 	// finished
+				// 	return;
+
+				// }
+
+
+				// write file 
 				fs.outputFile(outFile, JSON.stringify(data), function (err) {
 					console.log('wrote file:', err);
-
-
-					
-
-					// if (err) console.error('mapshaper err: ', err, stdout, stdin);
 
 					// move folder with shapefile to new fileUuid folder
 					fs.move(folder, outfolder + '/Shapefiles', function (err) {
 						if (err) console.error(err);
-						console.log('moved shapefiles from/to ', folder, outfolder);
+
 					});
 
 					// callback
@@ -321,47 +361,36 @@ module.exports = geo = {
 
 				})
 			});
-
-			// console.time('ensureDirSync');
-			// fs.ensureDirSync(outfolder);			// todo: async!
-			// console.timeEnd('ensureDirSync');
-
-			// // ogr2ogr shapefile to geojson
-			// var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"';		
-			// var exec = require('child_process').exec;
-
-			// console.time('ogr2ogr');
-			// exec(cmd, function (err, stdout, stdin) {
-			// console.timeEnd('ogr2ogr');
-
-			// 	if (err) console.error('mapshaper err: ', err, stdout, stdin);
-
-			// 	// move folder with shapefile to new fileUuid folder
-			// 	fs.move(folder, outfolder + '/Shapefiles', function (err) {
-			// 		if (err) console.error(err);
-			// 		console.log('moved shapefiles from/to ', folder, outfolder);
-			// 	});
-
-			// 	// callback
-			// 	callback(err, {path : outFile, name : toFile, fileUuid : fileUuid});
-
-			// });
-
-
-
 		});
-
-
-
-		
-		
 	},
 
 
 
 
 
+	_ogr2ogrFallback : function (folder, outfolder, toFile, outFile, inFile, fileUuid, callback) {
 
+		// make sure dir exists
+		fs.ensureDirSync(outfolder);			// todo: async!
+
+		// ogr2ogr shapefile to geojson
+		var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"';		
+		var exec = require('child_process').exec;
+
+		exec(cmd, function (err, stdout, stdin) {
+			if (err) console.error('mapshaper err: ', err, stdout, stdin);
+
+			// move folder with shapefile to new fileUuid folder
+			fs.move(folder, outfolder + '/Shapefiles', function (err) {
+				if (err) console.error(err);
+			});
+
+			// callback
+			callback(err, {path : outFile, name : toFile, fileUuid : fileUuid});
+
+		});
+
+	},
 
 
 

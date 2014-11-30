@@ -495,9 +495,22 @@ label.info {
 	text-align: center;
 	}
 
+/* Titles in the "Options" menu */
 .editor-wrapper h4 {
 	cursor: pointer;
 	}	
+
+/* Background for the titles in the "Options" menu */
+/* Used for help tooltip hovering */
+.editor-wrapper h4:before {
+	content: '';
+	width: 100%;
+	height: 58px;
+	position: absolute;
+	left: 0;
+	opacity: 0.3;
+	top: 0px;
+	}
 
 .status-progress-bar {
 	position: absolute;
