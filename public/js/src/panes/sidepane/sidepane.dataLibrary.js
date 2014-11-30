@@ -140,7 +140,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_deactivate : function () {
-		this.dz.disable();
+		if (this.dz) this.dz.disable();
 		this.disableFullscreenDZ();
 	},
 
@@ -300,7 +300,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	deleteFiles : function (files) {
-		// console.log('deleting ', files);
 
 		// set status
 		app.setStatus('Deleting');
@@ -336,6 +335,17 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	// is only fired once ever
 	initDZ : function () {
 		var that = this;
+
+
+		var dropzone = app.Dropzone;
+		dropzone.initDropzone({
+			uploaded : this.uploaded.bind(this),
+			clickable : this._uploader
+
+		});
+
+		return;
+
 
 		// create dz
 		this.dz = new Dropzone(this._uploader, {
@@ -378,6 +388,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	refreshDZ : function () {
 		var that = this;
+
+
+		var dropzone = app.Dropzone;
+		dropzone.refresh();
+
+		return;
+
 
 		// clean up last dz
 		this.dz.removeAllListeners();
@@ -449,22 +466,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	},
 
-	
-	// cxxxx
-	// fullscreen when started uploading                                            // TODO: refactor fullUpOn etc..
-	fullUpOn : function (file) {                                                    //       add support for multiple files
-		// transform .fullscreen-drop                                           //       bugtest more thourougly
-	
-		// add file info
-		var meta = this._createFileMetaContent(file);
-		if (meta) this.fulldrop.appendChild(meta);	// append meta
-
-		// show
-		Wu.DomUtil.addClass(this.fulldrop, 'fullscreen-dropped');
-
-
-
-	},
 
 	_createFileMetaContent : function (file) {
 		if (!file) return; 			// todo: file undefined on drag'n drop
@@ -484,6 +485,24 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		return wrapper;
 	},
+	
+	// cxxxx
+	// fullscreen when started uploading                                            // TODO: refactor fullUpOn etc..
+	fullUpOn : function (file) {                                                    //       add support for multiple files
+		// transform .fullscreen-drop                                           //       bugtest more thourougly
+	
+		// add file info
+		var meta = this._createFileMetaContent(file);
+		if (meta) this.fulldrop.appendChild(meta);	// append meta
+
+		// show
+		Wu.DomUtil.addClass(this.fulldrop, 'fullscreen-dropped');
+
+
+
+	},
+
+
 
 	fullUpOff : function () {
 
@@ -570,13 +589,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	handleError : function (error) {
 
-		var html = '';
-		error.forEach(function (err, i, arr) {
-			html += err.error;
-			html += '<br>';
-		})
-		this._errors.innerHTML = html;
-		this._errors.style.display = 'block';
+		// set error
+		app.ErrorPane.setError('Upload error:', error.error, 3);
+
 	},
 
 	// process file
@@ -589,7 +604,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var options = options || {};
 		
 		// handle errors
-		if (record.errors && record.errors.length) {
+		if (record.errors) {
 			this.handleError(record.errors);
 		}
 		
@@ -619,7 +634,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		if (cartoCss) cartoCss.update();
 
 
-		console.log('refreshing table! -->');
+		console.log('refreshing table! -->', this);
 		this.reset();
 		this.refreshTable();
 
@@ -696,6 +711,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	},
 
+
 	// to prevent selected text
 	stop : function (e) {
 		e.preventDefault();
@@ -705,7 +721,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.closeCategories();
 	},
 
-	
 
 	injectCategory : function (e) {
 
@@ -932,7 +947,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		file.setKeywords(split);
 
 	},
-
 
 
 	rename : function (e) {

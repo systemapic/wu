@@ -17,28 +17,31 @@ Wu.HeaderPane = Wu.Class.extend({
 	_initContainer : function () {
 
 		// create divs
-		this._container = Wu.app._headerPane = Wu.DomUtil.createId('div', 'header', Wu.app._mapContainer);
-		Wu.DomUtil.addClass(Wu.app._headerPane, 'displayNone');
+		this._container = Wu.app._headerPane = Wu.DomUtil.create('div', 'displayNone', Wu.app._mapContainer);
+		this._container.id = 'header';
 
+		// wrapper for header
+		// this._contentWrap = Wu.DomUtil.create('div', 'header-content-wrap', this._container);
 		this._logoWrap  = Wu.DomUtil.create('div', 'header-logo', this._container);
-		// this._logo 	= Wu.DomUtil.create('img', 'header-logo-img', this._logoWrap);
 		this._titleWrap = Wu.DomUtil.create('div', 'header-title-wrap', this._container);
 		this._title 	= Wu.DomUtil.create('div', 'header-title editable', this._titleWrap);
 		this._subtitle 	= Wu.DomUtil.create('div', 'header-subtitle editable', this._titleWrap);
-		// this._resizer 	= Wu.DomUtil.createId('div', 'headerResizer ', this._container);
 
 		// hack
 		this._title.whichTitle = 'title';
 		this._subtitle.whichTitle = 'subtitle';
 
 		// tooltips
-		app.Tooltip.add(this._container, 'this._container', {group : 'header'});
-		app.Tooltip.add(this._logoWrap, 'this._logoWrap', {group : 'header'});
-		app.Tooltip.add(this._title, 'this._title', {group : 'header'});
+		app.Tooltip.add(this._logoWrap, 'Click to upload a new logo');
 
+		// stops
 		Wu.DomEvent.on(this._logoWrap, 'mouseover', Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent.on(this._title, 'mouseover', Wu.DomEvent.stopPropagation, this);
 
+	},
+
+	getContainer : function () {
+		return this._container;
 	},
 
 	addHooks : function () {

@@ -189,13 +189,15 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 	initLayout : function () {
 
 		// create title and wrapper (and delete old content)
-		this._container.innerHTML = '<h4>Base Layers</h4>';
+		this._container.innerHTML = '<h4 id="h4-base">Base Layers</h4>';
 		var div = Wu.DomUtil.createId('div', 'select-baselayer-wrap', this._container);
 		this._outer = Wu.DomUtil.create('div', 'select-elems', div);
 		Wu.DomUtil.addClass(div, 'select-wrap');
 
 		// add tooltip
-		app.Tooltip.add(this._container, 'Sets the base layers of the map. These layers will not appear in the "Layers" menu to the right of the screen. Users may still toggle these layers if the "Base Layer Toggle" option has been set to active in the "Controls" section.' );
+		var h4 = Wu.DomUtil.get('h4-base');
+		// app.Tooltip.add(this._container, 'Sets the base layers of the map. These layers will not appear in the "Layers" menu to the right of the screen. Users may still toggle these layers if the "Base Layer Toggle" option has been set to active in the "Controls" section.' );
+		app.Tooltip.add(h4, 'Sets the base layers of the map. These layers will not appear in the "Layers" menu to the right of the screen. Users may still toggle these layers if the "Base Layer Toggle" option has been set to active in the "Controls" section.' );
 	},
 
 	
@@ -581,16 +583,20 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	initLayout : function () {
 
+		// cxxx 
 		// create title and wrapper (and delete old content)
-		this._container.innerHTML = '<h4>Layer Menu</h4>';		
+		this._container.innerHTML = '<h4 id="h4-layer">Layer Menu</h4>';
+
+
 		this._inner  = Wu.DomUtil.create('div', 'map-layermenu-inner', this._container);
 		this._outer  = Wu.DomUtil.create('div', 'map-layermenu-outer', this._inner);
 		// var status   = 'Enable layer menu in Controls below.';
 		// this._status = Wu.DomUtil.create('div', 'layermenu-status', this._outer, status);
 
 		// add tooltip
-		app.Tooltip.add(this._container, 'Sets layers that will appear in the layer menu. Selected base layers will be excluded from the Layer Menu list, and vice versa, to avoid duplicates.' );
-
+		var h4 = Wu.DomUtil.get('h4-layer');
+		// app.Tooltip.add(this._container, 'Sets layers that will appear in the layer menu. Selected base layers will be excluded from the Layer Menu list, and vice versa, to avoid duplicates.' );
+		app.Tooltip.add(h4, 'Sets layers that will appear in the layer menu. Selected base layers will be excluded from the Layer Menu list, and vice versa, to avoid duplicates.' );
 
 	},
 
@@ -866,7 +872,9 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 		this.toggled 	               	= false;
 
 		// add tooltip
-		app.Tooltip.add(this._container, 'Sets the starting position of the map.');
+		var h4 = this._container.getElementsByTagName('h4')[0];
+		app.Tooltip.add(h4, 'Sets the starting position of the map.');
+		// app.Tooltip.add(this._container, 'Sets the starting position of the map.');
 
 	},
 
@@ -987,7 +995,9 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		this.toggled            	= false;
 
 		// add tooltip
-		app.Tooltip.add(this._container, 'Decides the bounding area and the min/max zoom of the map. If a user moves outside of the bounding area, the map will "bounce" back to fit within the given bounding coordinates.');
+		var h4 = this._container.getElementsByTagName('h4')[0];
+		// app.Tooltip.add(this._container, 'Decides the bounding area and the min/max zoom of the map. If a user moves outside of the bounding area, the map will "bounce" back to fit within the given bounding coordinates.');
+		app.Tooltip.add(h4, 'Decides the bounding area and the min/max zoom of the map. If a user moves outside of the bounding area, the map will "bounce" back to fit within the given bounding coordinates.');
 
 	},
 
@@ -1282,12 +1292,14 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		this.panes.controlCartocss 		= Wu.DomUtil.get('map-controls-cartocss').parentNode.parentNode;
 
 		// add tooltip
-		app.Tooltip.add(this._container, 'Enables the control options that goes on top of the map.');
+		var h4 = this._container.getElementsByTagName('h4')[0]
+		app.Tooltip.add(h4, 'Enables the control options that goes on top of the map.');
+		// app.Tooltip.add(this._container, 'Enables the control options that goes on top of the map.');
 
 		// Add tooltip for each option
 		app.Tooltip.add(this.panes.controlZoom, 'Enables zooming on the map. Puts [+] and [-] buttons on the map.');
 		app.Tooltip.add(this.panes.controlDraw, 'Enables drawing on the map.');
-		app.Tooltip.add(this.panes.controlInspect, 'The layer inspector enables users to change the order or selected layers, to isolate layers, and to zoom to layer bounds.', { extends : 'systyle', group : 'controls' });
+		app.Tooltip.add(this.panes.controlInspect, 'The layer inspector enables users to change the order or selected layers, to isolate layers, and to zoom to layer bounds.');
 		app.Tooltip.add(this.panes.controlDescription, 'Enables layer description boxes.');
 		app.Tooltip.add(this.panes.controlLayermenu, 'Enables the layer menu.');
 		app.Tooltip.add(this.panes.controlLegends, 'Enable layer legends.');
@@ -1460,7 +1472,7 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 		// mapbox connect
 		var wrap 	  	= Wu.DomUtil.create('div', 'connect-mapbox', this._outer);
-		var h4 		  	= Wu.DomUtil.create('div', 'connect-mapbox-title', wrap, 'Mapbox');
+		var h4_2 		= Wu.DomUtil.create('div', 'connect-mapbox-title', wrap, 'Mapbox');
 		this._mapboxWrap  	= Wu.DomUtil.create('div', 'mapbox-connect-wrap ct11', this._outer);
 		this._mapboxInput 	= Wu.DomUtil.create('input', 'input-box search import-mapbox-layers', this._mapboxWrap);
 		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-gray ct0 ct11 import-mapbox-layers-button', this._mapboxWrap, 'Add');
@@ -1471,7 +1483,8 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 
 		// add tooltip
-		app.Tooltip.add(this._container, 'Imports layers from MapBox account.');
+		app.Tooltip.add(h4, 'Imports layers from MapBox accounts.');
+		// app.Tooltip.add(this._container, 'Imports layers from MapBox account.');
 
 
 	},
@@ -1640,7 +1653,8 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		this._outer 	= Wu.DomUtil.create('div', 'settings-outer', this._container);
 
 		// add tooltip
-		app.Tooltip.add(this._container, 'Enable additional map settings.');
+		// app.Tooltip.add(this._container, 'Enable additional map settings.');
+		app.Tooltip.add(h4, 'Enable additional map settings.');
 
 
 	},

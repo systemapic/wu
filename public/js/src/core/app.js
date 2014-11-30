@@ -195,10 +195,13 @@ Wu.App = Wu.Class.extend({
 		});
 
 		// render progress bar
-		this.ProgressBar = new Wu.ProgressBar({
+		this.ProgressBar = new Wu.ProgressPane({
 			color : 'white',
 			addTo : this._appPane
 		});
+
+		// render dropzone pane
+		this.Dropzone = new Wu.Dropzone();
 
 		// render side pane 
 		this.SidePane = new Wu.SidePane();	// todo: add settings more locally? Wu.SidePane({options})
@@ -208,6 +211,11 @@ Wu.App = Wu.Class.extend({
 
 		// render map pane
 		this.MapPane = new Wu.MapPane();
+
+		// render eror pane
+		this.ErrorPane = new Wu.ErrorPane();
+
+		
 
 		
 	},
