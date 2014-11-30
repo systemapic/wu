@@ -102,46 +102,46 @@ If from projection is missing, must assign a projection to source first, with -s
 
 ###Projection info:
 
-	I haven't worked too much into Leaflet so I cant say much about their implementation but looks like they are doing it the same way as other API's like google maps etc do. Their also you give Lat/Long coordinates and the reason is because you more often deal with GPS data which is in WGS84. Internally it could be doing the conversion to mercator.
+I haven't worked too much into Leaflet so I cant say much about their implementation but looks like they are doing it the same way as other API's like google maps etc do. Their also you give Lat/Long coordinates and the reason is because you more often deal with GPS data which is in WGS84. Internally it could be doing the conversion to mercator.
 
-	If you look at the Leaflet documentation you can see that they use Mercator by default 3857. One way to deal with this is to convert your mercator coordinates into WGS84 lat long (using  proj4js library) and then use it in Leaflet. Something like this
+If you look at the Leaflet documentation you can see that they use Mercator by default 3857. One way to deal with this is to convert your mercator coordinates into WGS84 lat long (using  proj4js library) and then use it in Leaflet. Something like this
 
-	var sourceCRS = new Proj4js.Proj('EPSG:3857'); 
-	var destCRS = new Proj4js.Proj('EPSG:4326'); 
-	var pt = new Proj4js.Point(X,Y);
-	Proj4js.transform(sourceCRS, destCRS, pt);
+var sourceCRS = new Proj4js.Proj('EPSG:3857'); 
+var destCRS = new Proj4js.Proj('EPSG:4326'); 
+var pt = new Proj4js.Point(X,Y);
+Proj4js.transform(sourceCRS, destCRS, pt);
 
-	Where X, Y are in meters
-	(from https://www.quora.com/Why-are-coordinates-in-Leaflet-in-degrees-if-it-uses-the-Google-Mercator-coordinate-reference-system)
-
-
+Where X, Y are in meters
+(from https://www.quora.com/Why-are-coordinates-in-Leaflet-in-degrees-if-it-uses-the-Google-Mercator-coordinate-reference-system)
 
 
 
 
-	There are a few things that you are mixing up.
 
-	Google Earth is in a Geographic coordinate system with the wgs84 datum. (EPSG: 4326)
 
-	Google Maps is in a projected coordinate system that is based on the wgs84 datum. (EPSG 3857)
+There are a few things that you are mixing up.
 
-	The data in Open Street Map database is stored in a gcs with units decimal degrees & datum of wgs84. (EPSG: 4326)
+Google Earth is in a Geographic coordinate system with the wgs84 datum. (EPSG: 4326)
 
-	The Open Street Map tiles and the WMS webservice, are in the projected coordinate system that is based on the wgs84 datum. (EPSG 3857)
+Google Maps is in a projected coordinate system that is based on the wgs84 datum. (EPSG 3857)
 
-	So if you are making a web map, which uses the tiles from Google Maps or tiles from the Open Street Map webservice, they will be in Sperical Mercator (EPSG 3857 or srid: 900913) and hence your map has to have the same projection.
+The data in Open Street Map database is stored in a gcs with units decimal degrees & datum of wgs84. (EPSG: 4326)
 
-	Edit:
+The Open Street Map tiles and the WMS webservice, are in the projected coordinate system that is based on the wgs84 datum. (EPSG 3857)
 
-	I'll like to expand the point raised by mkennedy
+So if you are making a web map, which uses the tiles from Google Maps or tiles from the Open Street Map webservice, they will be in Sperical Mercator (EPSG 3857 or srid: 900913) and hence your map has to have the same projection.
 
-	All of this further confused by that fact that often even though the map is in Web Mercator(EPSG: 3857), the actual coordinates used are in lat-long (EPSG: 4326). This convention is used in many places, such as:
+Edit:
 
-	In Most Mapping API,s You can give the coordinates in Lat-long, and the API automatically transforms it to the appropriate Web Mercator coordinates.
-	While Making a KML, you will always give the coordinates in geographic Lat-long, even though it might be showed on top of a web Mercator map.
-	Most mobile mapping Libraries use lat-long for position, while the map is in web Mercator.
+I'll like to expand the point raised by mkennedy
 
-	(from https://gis.stackexchange.com/questions/48949/epsg-3857-or-4326-for-googlemaps-openstreetmap-and-leaflet)
+All of this further confused by that fact that often even though the map is in Web Mercator(EPSG: 3857), the actual coordinates used are in lat-long (EPSG: 4326). This convention is used in many places, such as:
+
+In Most Mapping API,s You can give the coordinates in Lat-long, and the API automatically transforms it to the appropriate Web Mercator coordinates.
+While Making a KML, you will always give the coordinates in geographic Lat-long, even though it might be showed on top of a web Mercator map.
+Most mobile mapping Libraries use lat-long for position, while the map is in web Mercator.
+
+(from https://gis.stackexchange.com/questions/48949/epsg-3857-or-4326-for-googlemaps-openstreetmap-and-leaflet)
 
 
 
