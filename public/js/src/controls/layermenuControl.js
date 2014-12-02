@@ -71,6 +71,11 @@ L.Control.Layermenu = L.Control.extend({
 		app.Tooltip.add(this._bhattan1, 'Minimize the layer menu', { extends : 'systyle', tipJoint : 'left' });		
 	
 
+		// Store when the pane is open/closed ~ so that the legends container width can be calculated
+		this._open = true;
+
+
+
 	},
 
 	cancelEditClose : function () {
@@ -99,6 +104,8 @@ L.Control.Layermenu = L.Control.extend({
 	// (j)        
 	closeLayerPane : function () {		
 
+		this._open = false;
+
 		// Collapse Wrapper
 		this._container.parentNode.style.width = '0px';
 
@@ -123,6 +130,8 @@ L.Control.Layermenu = L.Control.extend({
 	// (j)
 	openLayerPane : function () {
 
+
+		this._open = true;
 
 		// Open Wrapper
 		this._container.parentNode.style.width = '290px';
@@ -985,7 +994,11 @@ L.Control.Layermenu = L.Control.extend({
 	
 	},
 
+	resizeEvent : function (dimensions) {
 
+		// console.log('dimensions', dimenstions);
+		
+	}
 	
 });
 

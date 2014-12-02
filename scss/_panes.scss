@@ -64,7 +64,7 @@
 	height: 0px;
 	width: 100px;
 	padding-top: 0px;
-	pointer-events: none;
+	/*pointer-events: none;*/
 	}
 
 /* Menu to the left */
@@ -80,7 +80,7 @@
 	top: 79px;
 	top: 6px;
 	margin-top: 0px;
-	pointer-events: all;
+	/*pointer-events: all;*/
 	}
 
 .q-editor-menu-item {
@@ -149,9 +149,9 @@
 	}
 
 /* Content (to the right) */
-.q-editor-content {
+/*.q-editor-content {
 	pointer-events: all;
-	}
+	}*/
 
 .q-editor-content-item {
 	position: absolute;
@@ -384,6 +384,7 @@
 	width: 192px;
 	display: inline-block;
 	vertical-align: bottom;
+	padding-right: 20px;
 	}
 
 .project-title input {

@@ -33,7 +33,7 @@ Wu.SidePane = Wu.Class.extend({
 		Wu.app._editorMenuPane = Wu.DomUtil.create('menu', className, this._container); 
 
 		// content pane
-		var className = 'q-editor-content ct1';
+		var className = 'q-editor-content hide-menu displayNone';
 		app._editorContentPane = Wu.DomUtil.create('content', className, this._container); 
 
 		// menuslider
@@ -92,6 +92,7 @@ Wu.SidePane = Wu.Class.extend({
 
 	// call _deactivate on all items
 	_deactivate : function () {
+
 		if (this.Clients) 	this.Clients._deactivate();
 		if (this.Map) 		this.Map._deactivate();
 		if (this.Documents) 	this.Documents._deactivate();
@@ -104,7 +105,12 @@ Wu.SidePane = Wu.Class.extend({
 
 	expand : function () {
 		// console.log('expand');
-		this._container.style.height = '100%';
+
+		// cxxxx
+		// OBS! Må regne ut hva høyden skal bli!
+		Wu.app._editorMenuPane.style.height = '490px';
+
+
 		this.openPane();
 	},
 
@@ -207,8 +213,16 @@ Wu.SidePane = Wu.Class.extend({
 		if (!this.paneOpen) return;
 		this.paneOpen = false;
 
-		// close
-		this._container.style.width = '100px';
+		// Close drop down menu
+		Wu.app._editorMenuPane.style.height = '0px';
+
+		// Close menu container
+		Wu.DomUtil.addClass(app._editorContentPane, 'hide-menu');
+
+		// Make map clickable behind...
+		setTimeout(function(){
+			Wu.DomUtil.addClass(app._editorContentPane, 'displayNone');	
+		}, 300)
 
 		// refresh leaflet
 		this._refreshLeaflet();
@@ -234,8 +248,16 @@ Wu.SidePane = Wu.Class.extend({
 		this.paneOpen = true;
 
 		// open
-		this._container.style.width = '350px';
-		Wu.DomUtil.addClass(app._active, 'show');	
+		// this._container.style.width = '350px';
+		Wu.DomUtil.addClass(app._active, 'show');
+
+		// Wu.DomUtil.addClass(app._active, 'enable');
+		Wu.DomUtil.removeClass(app._editorContentPane, 'displayNone');
+
+		// Have to set a micro timeout, so that it doesn't interfear with the displayNone class above
+		setTimeout(function() {
+			Wu.DomUtil.removeClass(app._editorContentPane, 'hide-menu');
+		}, 10)
 
 		// refresh leaflet
 		this._refreshLeaflet();

@@ -1121,10 +1121,10 @@ module.exports = api = {
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
 
-				// console.log('executed phantomJS');
-				// console.log('err: ', err);
-				// console.log('stdout: ', stdout);
-				// console.log('stdin: ', stdin);
+				console.log('executed phantomJS');
+				console.log('err: ', err);
+				console.log('stdout: ', stdout);
+				console.log('stdin: ', stdin);
 
 				callback(err);
 			});
@@ -1176,11 +1176,12 @@ module.exports = api = {
 		console.log('running phantom ascyn');
 
 		async.series(ops, function (err, results) {
-			// console.log('pahtnom !! all done: ', err);
-			// console.log('results', results);
+			console.log('pahtnom !! all done: ', err);
+			console.log('results', results);
 
 			if (err) console.log('err', err);
 
+			
 			var file = results[2]
 
 			// console.log('file: ', file);

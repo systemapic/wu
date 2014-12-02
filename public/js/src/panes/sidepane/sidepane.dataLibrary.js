@@ -79,7 +79,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 
 		// add tooltip
-		app.Tooltip.add(this._menu, 'The data library holds all the files uploaded for the project.');
+		app.Tooltip.add(this._menu, 'The data library contains all files uploaded to the project.');
 
 
 	},
@@ -181,15 +181,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	downloadFiles : function () {
 
-		console.log('downloadFiles');
-
 		// get selected
 		this._downloadFileList = this.getSelected();
 
 		// return if no files selected
 		if (!this._downloadFileList.length) return;
-
-		console.log('this._downloadFileList', this._downloadFileList);
 
 		// create list of uuids only
 		var fuuids = [];
@@ -215,22 +211,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	receivedDownload : function (that, response) {
 		// this = window
 
-		console.log('receivedDownload', response);
-
 		// set path for zip file
 		var path = '/api/file/download?file=' + response + '&type=zip';
 		
 		// create download dialog
 		that.updateDownloadDialog(path);
-
-		// add <a> for zip file
-		// that._downloadList.innerHTML = ich.datalibraryDownloadReady({'url' : path});	// a href
-		// var btn = Wu.DomUtil.get('download-ready-button');
-		// Wu.DomEvent.on(btn, 'click', that.downloadDone, that);
-
-		// hide
-		// if (this._downloadList) this._downloadList.style.display = 'none';
-		// if (this._container) this._container.style.display = 'block';
 
 	},
 
@@ -238,8 +223,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// divs
 		var wrapper = this._downloadDialog = Wu.DomUtil.create('div', 'download-dialog', this._content);
-		var downloadBtn = this._downloadDialogBtn = Wu.DomUtil.create('div', 'download-dialog-button', wrapper, 'Processing...');
-		var cancelBtn = Wu.DomUtil.create('div', 'download-dialog-cancel', wrapper, 'Cancel');
+		var inner = Wu.DomUtil.create('div', 'download-dialog-inner', wrapper);
+		var downloadBtn = this._downloadDialogBtn = Wu.DomUtil.create('div', 'download-dialog-button', inner, 'Processing...');
+		var cancelBtn = Wu.DomUtil.create('div', 'download-dialog-cancel', inner, 'Cancel');
 
 		// event
 		Wu.DomEvent.on(cancelBtn, 'mousedown', this.removeDownloadDialog, this);
@@ -258,7 +244,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},	
 
 	_removeDownloadDialog : function () {
-		console.log('___removeDownloadDialog');
 		this._downloadDialog.style.opacity = 0;
 		setTimeout(this.removeDownloadDialog.bind(this), 3000);
 	},	
@@ -541,12 +526,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// show
 		Wu.DomUtil.addClass(this.fulldrop, 'fullscreen-dropped');
-
-
-
 	},
-
-
 
 	fullUpOff : function () {
 

@@ -33,12 +33,12 @@
 .leaflet-draw-section {
 	position: relative;
 	width: 26px;
-	pointer-events: all;
+	/*pointer-events: all;*/
 	}
 
 .leaflet-draw-toolbar {
 	margin-top: 12px;
-	pointer-events: all;
+	/*pointer-events: all;*/
 	}
 
 .leaflet-draw-toolbar-top {
@@ -77,7 +77,11 @@
  */
 
 .leaflet-draw.leaflet-control.elizaveta {
-	pointer-events: none;
+
+	width: 20px;
+	overflow: visible;
+
+	/*pointer-events: none;*/
 	cursor: -webkit-grab;
 	cursor:    -moz-grab;		
 	}
@@ -88,11 +92,11 @@
 	cursor:    -moz-grabbing;
 	}
 
-.leaflet-draw.leaflet-control.elizaveta div,
+/*.leaflet-draw.leaflet-control.elizaveta div,
 .leaflet-draw.leaflet-control.elizaveta a {
 	pointer-events: all;
 	}	
-
+*/
 .leaflet-draw-actions {
 	display: none;
 	list-style: none;
@@ -495,11 +499,19 @@
 	/*display: none;*/
 	/*left: 7px;*/
 
+	font-style: italic;
 	right: -2px;
 	top: 63px;
 	background: transparent !important;
-
 	}
+
+.leaflet-control-attribution a {
+	font-weight: 900;
+}	
+
+.leaflet-control-attribution a:hover {
+	text-decoration: none;
+}
 
 /*
 ┬  ┌─┐┌─┐┌─┐┬  ┌─┐┌┬┐  ┬┌┐┌┌─┐┌─┐  ┌─┐┬  ┬ ┬┌─┐  ┌─┐┌─┐┌─┐┌┬┐   ┬   ┌┬┐┬─┐┌─┐┬ ┬  ┌┬┐┌─┐┌─┐┬  ┌─┐
@@ -727,11 +739,14 @@
 	position: relative;
 	left: -3px;
 	overflow: hidden;
-	width: 135px;
+	/*width: 135px;*/
+	width: 34px;
+	/*overflow: visible;*/
 	}
 
 .draw-expander {
 	height: 270px;
+	overflow: visible;
 	}
 
 .open-drawer {
@@ -788,9 +803,9 @@
 	}
 
 /* Toggle padding right */
-.legends-padding-right {
+/*.legends-padding-right {
 	padding-right: 300px !important;
-	}	
+	}	*/
 	
 /* outer wrapper 2 */
 .leaflet-control-legends {
@@ -1162,7 +1177,7 @@
 	position: relative;
 	float: none !important;	
 	box-shadow: none !important;
-	pointer-events: none;
+	/*pointer-events: none;*/
 	}	
 
 /* Layer menu scroller frame */
@@ -1177,7 +1192,7 @@
 /* Layer menu innser frame */
 .leaflet-control-layermenu .scroller-frame .inner-scroller {
 	width: 320px;
-	pointer-events: all;
+	/*pointer-events: all;*/
 	min-height: auto;
 	padding-left: 5px;
 	padding-right: 5px;
@@ -1186,7 +1201,7 @@
 
 #layer-menu-header {
 	overflow: hidden;
-	pointer-events: all;
+	/*pointer-events: all;*/
 	margin-top: 2px !important;
 	}
 
@@ -1225,7 +1240,7 @@
 	width: 280px;
 	box-shadow: 0 0 5px rgba(0,0,0,0.3);
 	left: -2px;
-	pointer-events: all;		
+	/*pointer-events: all;		*/
 	}
 
 /* Each layer wrap: Universal => on every layer menu item */
@@ -1382,7 +1397,7 @@
 	line-height: 2.4;
 	background: rgba(255,255,255,1);
 	box-shadow: 0 0 2px 1px rgba(0,0,0,0.3);
-	pointer-events: all;
+	/*pointer-events: all;*/
 	}
 	
 .middle-item:after {
@@ -2036,6 +2051,15 @@
 /* CartoCSS */
 /* CartoCSS */
 
+.resize-ghost {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 99999;
+	}
+
 .leaflet-control-cartocss {
 	width: 26px;
 	height: 26px !important;
@@ -2044,16 +2068,17 @@
 	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
 	cursor: pointer;
 	position: relative;
+	z-index: 222;
 	}
 
 .cartocss-control-resizer {
-	/*background: red;*/
 	width: 6px;
 	height: 100%;
 	position: absolute;
 	z-index: 99999;
 	left: 0;
 	border-right: 0;
+	cursor: ew-resize;
 	}
 
 .cartocss-toolbar-button {
@@ -2077,11 +2102,11 @@
 	height: 100%;
 	position: absolute;
 	right: 6px;
-	top: 0;
-	padding-top: 91px;
-	padding-bottom: 6px;
+	top: 91px;
+	/*padding-top: 91px;*/
+	padding-bottom: 96px;
 	box-sizing: border-box;
-	z-index: 99999999;
+	z-index: 9999;
 	}
 
 .cartocss-control-wrapper {
@@ -2092,7 +2117,7 @@
 	padding-bottom: 122px;
 	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
 	cursor: default;
-	pointer-events: all;
+	/*pointer-events: all;*/
 	}
 
 .cartocss-attributes {
@@ -2136,7 +2161,7 @@
 	overflow-y: scroll;
 	overflow-x: hidden;
 	padding: 0;
-	padding-right: 25px;
+	padding-right: 12px;
 	margin-bottom: 6px;
 	top: 31px;
 	z-index: 999;
@@ -2359,7 +2384,7 @@
 	top: 10px;
 	left: 8px;
 	opacity: 0.7;
-	pointer-events: none;
+	/*pointer-events: none;*/
 	}
 
 .cartocss-style-header-wrapper:hover > .cartocss-style-dropdown-arrow { 
@@ -2474,11 +2499,12 @@
 	/*padding-right: 28px;*/
 	/*box-sizing: border-box;*/
 	/*-webkit-box-sizing: border-box;*/
+	
+	/*overflow: -moz-scrollbars-none;*/
 	overflow-y: scroll;
 	overflow-x: hidden;
 
-	overflow: -moz-scrollbars-none;
-	
+
 	height: 100%;
 	}
 
@@ -2490,7 +2516,7 @@
 
 .tooltip-field-wrapper .controls-switch {
 	top: 4px;
-	pointer-events: all;
+	/*pointer-events: all;*/
 	}
 
 .tooltip-field-wrapper {
@@ -2639,7 +2665,7 @@
 
 .legend-entry-wrap .controls-switch {
 	top: 2px;
-	pointer-events: all;
+	/*pointer-events: all;*/
 	}
 
 
