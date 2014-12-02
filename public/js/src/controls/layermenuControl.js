@@ -818,7 +818,7 @@ L.Control.Layermenu = L.Control.extend({
 		this.refreshSortable();
 
 		// show edit buttons
-		if (this.editMode) this._showEditButtons();
+		// if (this.editMode) this._showEditButtons();
 
 		// add to local store
 		this.layers[item.uuid] = layerItem;

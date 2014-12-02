@@ -1353,6 +1353,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 	toggleControl : function (e) {
 		
+		// cxxxx
 
 		// prevent default checkbox behaviour
 		if (e.type == 'click') return Wu.DomEvent.stop(e);
@@ -1411,6 +1412,8 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 	enableControl : function (type) {
 		
+		// cxxx 
+
 		// get vars
 		var target = Wu.DomUtil.get('map-controls-' + type); // checkbox
 		var parent = Wu.DomUtil.get('map-controls-title-' + type).parentNode; // div that gets .active 
@@ -1811,11 +1814,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		input.id = id;
 		label.setAttribute('for', id);
 
-
-		console.log('div', div);
-
 		// set events
-		// Wu.DomEvent.on(input, 'click', function (e) {
 		Wu.DomEvent.on(titlediv, 'click', function (e) {			
 			Wu.DomEvent.stopPropagation(e);
 
@@ -1824,6 +1823,13 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 
 			// refresh settings
 			this._settings = this.project.getSettings();
+
+			// Toggle button
+			if (this._settings[setting]) {
+				 input.setAttribute('checked', 'checked');
+			} else {
+				 input.removeAttribute('checked');
+			}
 			
 		}, this);
 		 
