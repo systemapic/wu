@@ -824,9 +824,9 @@
 /* inner wrapper */
 #legends-control-inner-content {
 	bottom: 0px;
-	padding-right: 335px;
+	/*padding-right: 335px;*/
 	padding-left: 0;
-	padding-right: 13px;
+	/*padding-right: 13px;*/
 	width: auto;
 	max-width: 100%;
 	display: none;
@@ -1183,7 +1183,8 @@
 /* Layer menu scroller frame */
 .leaflet-control-layermenu .scroller-frame {
 	height: 100%;
-	overflow: scroll;
+	overflow-x: hidden;
+	overflow-y: scroll;
 	position: absolute;
 	padding-bottom: 27px;
 	left: 2px;

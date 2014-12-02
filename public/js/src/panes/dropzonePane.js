@@ -2,6 +2,10 @@ Wu.Dropzone = Wu.Class.extend({
 	// dropzone for files to data library
 	// drop anywhere, anytime
 
+	options : {
+		metaDelay : 3000 // ms
+	},
+
 	initialize : function () {
 		this.initLayout();
 	},
@@ -12,13 +16,16 @@ Wu.Dropzone = Wu.Class.extend({
 		this._container = Wu.DomUtil.create('div', 'dropzone-pane', app._appPane);
 		this._content = Wu.DomUtil.create('div', 'dropzone-content', this._container);
 		this._hidden = Wu.DomUtil.create('div', 'dropzone-hidden', this._container);
-		this._meta = Wu.DomUtil.create('div', 'dropzone-meta', this._container);
+		this._meta = Wu.DomUtil.create('div', 'dropzone-meta', app._appPane);
+		this._metaTitle = Wu.DomUtil.create('div', 'drop-meta-title', this._meta, 'Uploading');
+		this._metaWrapper = Wu.DomUtil.create('div', 'dropzone-meta-outer', this._meta);
 
 		// create progress bar
 		this.progress = new Wu.ProgressPane();
 
 		// hide by default
 		this.hide();
+		this.hideMeta();
 	},
 
 	show : function () {
@@ -27,6 +34,69 @@ Wu.Dropzone = Wu.Class.extend({
 
 	hide : function () {
 		Wu.DomUtil.addClass(this._container, 'displayNone');
+	},
+
+	showMeta : function () {
+		if (this._showingMeta) return;
+
+		// mark as showing
+		this._showingMeta = true;
+
+		// show
+		Wu.DomUtil.removeClass(this._meta, 'fadeOut');
+		Wu.DomUtil.removeClass(this._meta, 'displayNone');
+
+		// fade out after n seconds
+		this._fadeTimer = setTimeout(this.fadeMeta.bind(this), this.options.metaDelay);
+
+	},
+
+	fadeMeta : function () {
+
+		// clear timer if already queued
+		if (this._fadeTimer) clearTimeout(this._fadeTimer);
+
+		// fade out
+		Wu.DomUtil.addClass(this._meta, 'fadeOut');
+
+		// hide completely 500ms after fade
+		setTimeout(this.hideMeta.bind(this), 500);
+	},
+
+	hideMeta : function () {
+
+		// hide and clear
+		Wu.DomUtil.addClass(this._meta, 'displayNone');
+		this._clearMeta();
+
+		// mark as not showing
+		this._showingMeta = false;
+	},
+
+	_clearMeta : function () {
+		this._metaWrapper.innerHTML = '';
+	},
+
+	addMeta : function (meta) {
+		var div = this._addMeta(meta);
+		this._metaWrapper.appendChild(div);
+	},
+
+	_addMeta : function (file) {
+		if (!file) return; 			// todo: file undefined on drag'n drop
+
+		var wrapper 	= Wu.DomUtil.create('div', 'drop-meta-wrapper');
+		var name 	= Wu.DomUtil.create('div', 'drop-meta-name', wrapper);
+		var size 	= Wu.DomUtil.create('div', 'drop-meta-size', wrapper);
+		var type 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
+		var ext 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
+
+		name.innerHTML = 'Name: ' + file.name;
+		size.innerHTML = 'Size: ' + Wu.Util.bytesToSize(file.size);
+		type.innerHTML = 'Type: ' + file.type.split('/')[0].camelize();
+		ext.innerHTML  = 'Filetype: ' + file.type.split('/')[1];
+
+		return wrapper;
 	},
 
 
@@ -76,6 +146,14 @@ Wu.Dropzone = Wu.Class.extend({
 
 	},
 
+	disable : function () {
+		this.removeDropzoneEvents();
+	},
+
+	enable : function () {
+		this.addDropzoneEvents();	
+	},
+
 	refresh : function () {
 		var that = this;
 
@@ -93,6 +171,7 @@ Wu.Dropzone = Wu.Class.extend({
 		this.dz.on('drop', function (e) { 
 			console.log('dz.drop');
 			that.hide();
+			// that.showMeta();
 		});
 
 		this.dz.on('dragenter', function (e) { 
@@ -101,15 +180,16 @@ Wu.Dropzone = Wu.Class.extend({
 
 		this.dz.on('addedfile', function (file) { 
 
+			console.log('addedfile dropzonePane', file);
+
+			// show meta screen
+			that.showMeta();
+
 			// show progressbar
-			// that.progress.style.opacity = 1;
 			that.progress.setProgress(0);
 
-			// show fullscreen file info
-			// if (!that._fulldrop) {
-			// 	that.fullOn(file);
-			// 	that.fullUpOn(file);
-			// }
+			// show meta
+			that.addMeta(file);
 
 			// set status
 			app.setStatus('Uploading');
@@ -120,6 +200,9 @@ Wu.Dropzone = Wu.Class.extend({
 		
 			// clean up
 			that.dz.removeFile(file);
+
+			// hide meta
+			that.fadeMeta();
 		});
 
 		this.dz.on('uploadprogress', function (file, progress) {

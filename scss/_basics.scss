@@ -468,6 +468,10 @@ label.info {
 	display: none !important;
 	}
 
+.fadeOut {
+	opacity: 0;
+	}
+
 .valid {
 	background: rgb(108, 255, 135);
 	}
@@ -630,9 +634,10 @@ input.cmn-toggle-round-flat:checked + label:after {
 	}
 
 .controls-switch {
-	top: 6px;
-	right: 6px;
-	/*pointer-events: none;*/
+	top: -27px;
+	right: -1px;
+	z-index: 1;
+	position: relative;
 	}
 
 /* Switch overriders */

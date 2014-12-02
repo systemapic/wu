@@ -379,7 +379,8 @@ input[type=checkbox] + label.check {
  ╚═════╝ ╚═╝     ╚═╝  ╚═╝ ╚═════╝╚═╝   ╚═╝      ╚═╝   
  */
 
-.editor-client-edit-toggle {
+.editor-client-edit-toggle,
+.fadeOut {
 	-webkit-transition: opacity 300ms ease;
 	-moz-transition: opacity 300ms ease;
 	-o-transition: opacity 300ms ease;

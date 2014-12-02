@@ -1043,7 +1043,7 @@
 
 		<script id="layerMenuFrame" type="text/html">
 
-			<div class="scroller-frame">
+			<div id="layermenu-outer" class="scroller-frame">
 				<div class="scroll-up"></div>
 				<div class="inner-scroller">
 					<div id="layer-menu-inner-content" class="ct14"></div>
@@ -1807,95 +1807,6 @@
 <!-- ************************************************************************************************************************ -->
 <!-- ************************************************************************************************************************ -->
 <!-- ************************************************************************************************************************ -->
-
-
-
-
-
-<!-- SVG fill properties: url(#diagonal-dots) // url(#dots) url(#diagonal-circles) url(#diagonal-stripes) url(#grid) -->
-<svg xmlns="http://www.w3.org/2000/svg">
-  <defs>
-  
-    <!-- PATTERN ONE -->
-	<pattern id="SVGpattern1" width="30" height="30" patternUnits="userSpaceOnUse">
-		<rect width="30" height="30" fill="#00a9f1"></rect>
-		<rect width="30" height="18" fill="#26baf4"></rect>
-	</pattern>
-
-	<!-- PATTERN TWO -->
-	<pattern id="SVGpattern2" width="70" height="70" patternUnits="userSpaceOnUse">
-		<rect width="70" height="70" fill="#bbd817"></rect>
-		<g transform="rotate(45)">
-		<rect width="99" height="25" fill="#a9ce00"></rect>
-		<rect y="-50" width="99" height="25" fill="#a9ce00"></rect>
-		</g>
-	</pattern>
-
-	<!-- PATTERN THREE -->
-	<pattern id="SVGpattern3" width="60" height="30" patternUnits="userSpaceOnUse">
-		<defs>
-		<rect id="r" width="30" height="15" fill="#bb085f" stroke-width="2.5" stroke="#7a054d"></rect>
-		<g id="p">
-		<use xlink:href="#r"></use>
-		<use y="15" xlink:href="#r"></use>
-		<use y="30" xlink:href="#r"></use>
-		<use y="45" xlink:href="#r"></use>
-		</g>
-		</defs>
-		<use xlink:href="#p" transform="translate(0 -25) skewY(40)"></use>
-		<use xlink:href="#p" transform="translate(30 0) skewY(-40)"></use>
-	</pattern>
-
-	<!-- PATTERN FOUR -->
-	<pattern id="SVGpattern4" x="0" y="0" width="56" height="100" patternUnits="userSpaceOnUse">
-		<rect width="56" height="100" fill="#f8d203"></rect>
-		<path d="M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100" fill="none" stroke="#fff629" stroke-width="2"></path>
-		<path d="M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34" fill="none" stroke="#ffe503" stroke-width="2"></path>
-	</pattern>
-
-	<!-- PATTERN FIVE -->
-	<pattern id="SVGpattern5" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
-      		<rect x="0" y="0" width="4" height="8" style="stroke:none; fill:purple;" />
-    	</pattern>
-
-	<!-- PATTERN SEVEN -->
-	<pattern id="SVGpattern6"  width="40" height="40" viewBox="0 0 20 20" patternUnits="userSpaceOnUse">
-		<rect width="40" height="40" fill="#8a3"></rect>
-		<circle r="9.2" stroke-width="1" stroke="#613" fill="none"></circle>
-		<circle cy="18.4" r="9.2" stroke-width="1px" stroke="#613" fill="none"></circle>
-		<circle cx="18.4" cy="18.4" r="9.2" stroke-width="1" stroke="#613" fill="none"></circle>
-	</pattern>
-
-    	<!-- PATTERN SIX -->
-	<pattern id="SVGpattern7" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
-      		<circle cx="3" cy="3" r="2" style="stroke:none; fill:red;" />
-    	</pattern>
-
-    	<!-- PATTERN EIGHT -->
-	<pattern id="SVGpattern8" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-		<circle cx="5" cy="5" r="4" style="stroke:none; fill:blue;" />
-	</pattern>
-
-	<!-- FILTERS -->
-	<filter id="f1" x="0" y="0" width="200%" height="200%">
-	  	<feOffset result="offOut" in="SourceAlpha" dx="5" dy="5" />
-	  	<feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
-	 	<feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
-	</filter>
-
-	<filter id="drop-shadow" x="-20%" y="-20%" width="140%" height="140%">
-		<feGaussianBlur in="SourceAlpha" result="blur-out" stdDeviation="2" />
-		<feOffset in="blur-out" result="the-shadow" dx="-3" dy="3"/> 
-		<feColorMatrix in="the-shadow" result="color-out" type="matrix"
-		values="0 0 0 0   0
-		0 0 0 0   0 
-		0 0 0 0   0 
-		0 0 0 .25 0"/>
-		<feBlend in="SourceGraphic" in2="color-out" mode="normal"/>
-	</filter>
-	</defs>
-</defs>
-</svg> 
 
 
 

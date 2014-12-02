@@ -40,9 +40,16 @@
 	padding: 20px;
 	padding-left: 30px;
 	/*font-size: 230%;*/
-	font-size: 20px;
+	/*font-size: 20px;*/
+	font-size: 220%;
 	/*color: white;*/
-	color: #666;
+	/*color: #666;*/
+	color: #dadada;
+	width: 400px;
+	margin: auto;
+	top: 40%;
+
+	white-space: nowrap;
 
 	}
 
@@ -973,9 +980,14 @@
 
 
 .controls-title {
+/*	height: 32px;
+	padding: 8px;
+	font-weight: 500;*/
 	height: 32px;
 	padding: 8px;
 	font-weight: 500;
+	z-index: 999;
+	position: relative;	
 	}	
 
 
