@@ -397,6 +397,9 @@ label.info {
 .displayNone {
   display: none !important; }
 
+.fadeOut {
+  opacity: 0; }
+
 .valid {
   background: #6cff87; }
 
@@ -529,9 +532,10 @@ input.cmn-toggle-round-flat:checked + label:after {
   margin-left: 160px !important; }
 
 .controls-switch {
-  top: 6px;
-  right: 6px;
-  /*pointer-events: none;*/ }
+  top: -27px;
+  right: -1px;
+  z-index: 1;
+  position: relative; }
 
 /* Switch overriders */
 input.cmn-toggle-round-flat:checked + label, input.cmn-toggle-round-flat:checked + label:after {
@@ -1516,9 +1520,9 @@ input.cmn-toggle-round-flat + label:before {
 /* inner wrapper */
 #legends-control-inner-content {
   bottom: 0px;
-  padding-right: 335px;
+  /*padding-right: 335px;*/
   padding-left: 0;
-  padding-right: 13px;
+  /*padding-right: 13px;*/
   width: auto;
   max-width: 100%;
   display: none; }
@@ -1825,7 +1829,8 @@ input.cmn-toggle-round-flat + label:before {
 /* Layer menu scroller frame */
 .leaflet-control-layermenu .scroller-frame {
   height: 100%;
-  overflow: scroll;
+  overflow-x: hidden;
+  overflow-y: scroll;
   position: absolute;
   padding-bottom: 27px;
   left: 2px; }
@@ -3124,9 +3129,15 @@ input.cmn-toggle-round-flat + label:before {
   padding: 20px;
   padding-left: 30px;
   /*font-size: 230%;*/
-  font-size: 20px;
+  /*font-size: 20px;*/
+  font-size: 220%;
   /*color: white;*/
-  color: #666; }
+  /*color: #666;*/
+  color: #dadada;
+  width: 400px;
+  margin: auto;
+  top: 40%;
+  white-space: nowrap; }
 
 #collapse-descripton {
   font-size: 120%;
@@ -3919,9 +3930,14 @@ input.cmn-toggle-round-flat + label:before {
   color: #333; }
 
 .controls-title {
+  /*	height: 32px;
+	padding: 8px;
+	font-weight: 500;*/
   height: 32px;
   padding: 8px;
-  font-weight: 500; }
+  font-weight: 500;
+  z-index: 999;
+  position: relative; }
 
 /* 
 ┌─┐    ┌─┐┌┬┐┬┌┬┐┌─┐┬─┐
@@ -5733,7 +5749,7 @@ input[type=checkbox] + label.check {
 ╚██████╔╝██║     ██║  ██║╚██████╗██║   ██║      ██║   
  ╚═════╝ ╚═╝     ╚═╝  ╚═╝ ╚═════╝╚═╝   ╚═╝      ╚═╝   
  */
-.editor-client-edit-toggle {
+.editor-client-edit-toggle, .fadeOut {
   -webkit-transition: opacity 300ms ease;
   -moz-transition: opacity 300ms ease;
   -o-transition: opacity 300ms ease;

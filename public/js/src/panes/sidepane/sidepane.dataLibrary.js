@@ -440,6 +440,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		this.dz.on('addedfile', function (file) { 
 
+			console.log('addedfile: dataLibrary');
+
 			// show progressbar
 			that.progress.style.opacity = 1;
 

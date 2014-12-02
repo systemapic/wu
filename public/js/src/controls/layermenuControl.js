@@ -13,8 +13,8 @@ L.Control.Layermenu = L.Control.extend({
 		// add html
 		container.innerHTML = ich.layerMenuFrame();  // nb: this._innerContainer = container;
 
-		// add some divs
-		this.initContainer();
+		// add some divsscroller-frame
+		this.initLayout();
 
 		// nb! content is not ready yet, cause not added to map! 
 		return container;
@@ -22,7 +22,7 @@ L.Control.Layermenu = L.Control.extend({
 	},
 
 	// (j)
-	initContainer : function () {		
+	initLayout : function () {		
 
 		// Create the header    
 		this._layerMenuHeader = Wu.DomUtil.createId('div', 'layer-menu-header');
@@ -75,8 +75,29 @@ L.Control.Layermenu = L.Control.extend({
 		this._open = true;
 
 
+	},
+
+	// Runs on window resize. Gets called up in app.js
+	resizeEvent : function (dimensions) {
+		
+		// Window max height (minus padding)
+		var layersMaxHeight = dimensions.height - 135;
+
+		// Set max height of Layers selector container
+		this.setMaxHeight(layersMaxHeight);
 
 	},
+
+	setMaxHeight : function (layersMaxHeight) {
+
+		// Make space for inspect control, if it's there, yo
+		var inspectControl = app.MapPane.inspectControl;
+		if ( inspectControl ) layersMaxHeight -= 120;
+
+		// Set max height of scroller container
+		this._layermenuOuter.style.maxHeight = layersMaxHeight + 'px';
+
+	},	
 
 	cancelEditClose : function () {
 		if (!this.editMode) return;
@@ -120,10 +141,10 @@ L.Control.Layermenu = L.Control.extend({
 		Wu.app.MapPane._container.children[1].children[1].style.right = '140px';
 		
 		// Change class name of open layers button
-		var that = this;
-		setTimeout(function(){					
-			// that._openLayers.className = 'leaflet-control layer-opener-opened'; // rem (j)
-		}, 500);			
+		// var that = this;
+		// setTimeout(function(){					
+		// 	// that._openLayers.className = 'leaflet-control layer-opener-opened'; // rem (j)
+		// }, 500);			
 			
 	},
 
@@ -166,6 +187,9 @@ L.Control.Layermenu = L.Control.extend({
 
 		// turn off dragging etc. on map
 		Wu.app.MapPane.disableInteraction(true);
+
+		// turn off dropzone dragging
+		if (app.Dropzone) app.Dropzone.disable();
 		
 		// enable drag'n drop in layermenu
 		this.enableSortable();
@@ -198,6 +222,9 @@ L.Control.Layermenu = L.Control.extend({
 		
 		// re-enable dragging etc. on map
 		Wu.app.MapPane.enableInteraction(true);
+
+		// turn off dropzone dragging
+		if (app.Dropzone) app.Dropzone.enable();
 		
 		// disable layermenu sorting
 		this.disableSortable();
@@ -219,27 +246,27 @@ L.Control.Layermenu = L.Control.extend({
 
 	},
 
-	_hideEditButtons : function () {	// expensive?? yes!
-		// var elems = [];
-		// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
-		// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
-		// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
-		// elems = _.flatten(elems);
-		// elems.forEach(function (one) {
-		// 	one.style.display = 'none';
-		// });
-	},
+	// _hideEditButtons : function () {	// expensive?? yes!
+	// 	// var elems = [];
+	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
+	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
+	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
+	// 	// elems = _.flatten(elems);
+	// 	// elems.forEach(function (one) {
+	// 	// 	one.style.display = 'none';
+	// 	// });
+	// },
 
-	_showEditButtons : function () {	// todo: refactor! 
-		// var elems = [];
-		// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
-		// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
-		// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
-		// elems = _.flatten(elems);
-		// elems.forEach(function (one) {
-		// 	one.style.display = 'block';
-		// });
-	},
+	// _showEditButtons : function () {	// todo: refactor! 
+	// 	// var elems = [];
+	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
+	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
+	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
+	// 	// elems = _.flatten(elems);
+	// 	// elems.forEach(function (one) {
+	// 	// 	one.style.display = 'block';
+	// 	// });
+	// },
 
 
 	_insertMenuFolder : function () {
@@ -991,13 +1018,17 @@ L.Control.Layermenu = L.Control.extend({
 		Wu.DomEvent.on(this._container, 'mouseleave', function () {
 		    map.scrollWheelZoom.enable();
 		}, this);
+
+
+		// Get the scrol-container that we will set max height value of
+		this._layermenuOuter = Wu.DomUtil.get('layermenu-outer');
+
+		// Check window height
+		var layersMaxHeight = window.innerHeight - 135;
+
+		// Set max height of Layers selector container
+		this.setMaxHeight(layersMaxHeight);		
 	
-	},
-
-	resizeEvent : function (dimensions) {
-
-		// console.log('dimensions', dimenstions);
-		
 	}
 	
 });

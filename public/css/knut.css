@@ -1,0 +1,25 @@
+/*dropzone*/
+.dropzone-meta {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 10001;
+	background-color: rgba(0, 0, 0, 0.69);
+	border: none !important;
+}
+
+.drop-meta-title {
+	font-size: 700%;
+	position: relative;
+	color: white;
+	margin: auto;
+	width: 400px;
+	padding-top: 200px;
+	left: -50px;
+}
+
+.opacityNone {
+	opacity: 0;
+}

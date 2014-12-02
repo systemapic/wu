@@ -1278,6 +1278,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 	getPanes : function () {
 		this._container 			= Wu.DomUtil.get('editor-map-controls-wrap');
 		this._outer 				= Wu.DomUtil.get('editor-map-controls-inner-wrap');
+
 		this.panes.controlZoom                 	= Wu.DomUtil.get('map-controls-zoom').parentNode.parentNode;
 		this.panes.controlDraw                 	= Wu.DomUtil.get('map-controls-draw').parentNode.parentNode;
 		this.panes.controlInspect              	= Wu.DomUtil.get('map-controls-inspect').parentNode.parentNode;
@@ -1318,6 +1319,9 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		// call addHooks on prototype
 		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
 
+
+		console.log('this.panes.controlZoom', this.panes.controlZoom);
+
 		// add events
 		Wu.DomEvent.on( this.panes.controlZoom,            'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlDraw,            'mousedown click', this.toggleControl, this);
@@ -1331,6 +1335,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		Wu.DomEvent.on( this.panes.controlMouseposition,   'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlBaselayertoggle, 'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlCartocss, 	   'mousedown click', this.toggleControl, this);
+
 
 	},
 
@@ -1348,9 +1353,10 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 	toggleControl : function (e) {
 		
+
 		// prevent default checkbox behaviour
 		if (e.type == 'click') return Wu.DomEvent.stop(e);
-		
+	
 		// stop anyway
 		Wu.DomEvent.stop(e);
 
@@ -1364,7 +1370,6 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		var on      = !target.checked;
 		var enable  = 'enable' + item.camelize();
 		var disable = 'disable' + item.camelize();
-
 		var mapPane = app.MapPane;
 
 		// toggle
@@ -1806,8 +1811,12 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		input.id = id;
 		label.setAttribute('for', id);
 
+
+		console.log('div', div);
+
 		// set events
-		Wu.DomEvent.on(input, 'click', function (e) {
+		// Wu.DomEvent.on(input, 'click', function (e) {
+		Wu.DomEvent.on(titlediv, 'click', function (e) {			
 			Wu.DomEvent.stopPropagation(e);
 
 			// toggle setting

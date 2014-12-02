@@ -5920,6 +5920,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 	getPanes : function () {
 		this._container 			= Wu.DomUtil.get('editor-map-controls-wrap');
 		this._outer 				= Wu.DomUtil.get('editor-map-controls-inner-wrap');
+
 		this.panes.controlZoom                 	= Wu.DomUtil.get('map-controls-zoom').parentNode.parentNode;
 		this.panes.controlDraw                 	= Wu.DomUtil.get('map-controls-draw').parentNode.parentNode;
 		this.panes.controlInspect              	= Wu.DomUtil.get('map-controls-inspect').parentNode.parentNode;
@@ -5960,6 +5961,9 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		// call addHooks on prototype
 		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
 
+
+		console.log('this.panes.controlZoom', this.panes.controlZoom);
+
 		// add events
 		Wu.DomEvent.on( this.panes.controlZoom,            'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlDraw,            'mousedown click', this.toggleControl, this);
@@ -5973,6 +5977,7 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		Wu.DomEvent.on( this.panes.controlMouseposition,   'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlBaselayertoggle, 'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlCartocss, 	   'mousedown click', this.toggleControl, this);
+
 
 	},
 
@@ -5990,9 +5995,10 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 	toggleControl : function (e) {
 		
+
 		// prevent default checkbox behaviour
 		if (e.type == 'click') return Wu.DomEvent.stop(e);
-		
+	
 		// stop anyway
 		Wu.DomEvent.stop(e);
 
@@ -6006,7 +6012,6 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		var on      = !target.checked;
 		var enable  = 'enable' + item.camelize();
 		var disable = 'disable' + item.camelize();
-
 		var mapPane = app.MapPane;
 
 		// toggle
@@ -6448,8 +6453,12 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		input.id = id;
 		label.setAttribute('for', id);
 
+
+		console.log('div', div);
+
 		// set events
-		Wu.DomEvent.on(input, 'click', function (e) {
+		// Wu.DomEvent.on(input, 'click', function (e) {
+		Wu.DomEvent.on(titlediv, 'click', function (e) {			
 			Wu.DomEvent.stopPropagation(e);
 
 			// toggle setting
@@ -7398,6 +7407,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		});
 
 		this.dz.on('addedfile', function (file) { 
+
+			console.log('addedfile: dataLibrary');
 
 			// show progressbar
 			that.progress.style.opacity = 1;
@@ -10121,8 +10132,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// add html
 		container.innerHTML = ich.layerMenuFrame();  // nb: this._innerContainer = container;
 
-		// add some divs
-		this.initContainer();
+		// add some divsscroller-frame
+		this.initLayout();
 
 		// nb! content is not ready yet, cause not added to map! 
 		return container;
@@ -10130,7 +10141,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	// (j)
-	initContainer : function () {		
+	initLayout : function () {		
 
 		// Create the header    
 		this._layerMenuHeader = Wu.DomUtil.createId('div', 'layer-menu-header');
@@ -10183,8 +10194,29 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._open = true;
 
 
+	},
+
+	// Runs on window resize. Gets called up in app.js
+	resizeEvent : function (dimensions) {
+		
+		// Window max height (minus padding)
+		var layersMaxHeight = dimensions.height - 135;
+
+		// Set max height of Layers selector container
+		this.setMaxHeight(layersMaxHeight);
 
 	},
+
+	setMaxHeight : function (layersMaxHeight) {
+
+		// Make space for inspect control, if it's there, yo
+		var inspectControl = app.MapPane.inspectControl;
+		if ( inspectControl ) layersMaxHeight -= 120;
+
+		// Set max height of scroller container
+		this._layermenuOuter.style.maxHeight = layersMaxHeight + 'px';
+
+	},	
 
 	cancelEditClose : function () {
 		if (!this.editMode) return;
@@ -10228,10 +10260,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		Wu.app.MapPane._container.children[1].children[1].style.right = '140px';
 		
 		// Change class name of open layers button
-		var that = this;
-		setTimeout(function(){					
-			// that._openLayers.className = 'leaflet-control layer-opener-opened'; // rem (j)
-		}, 500);			
+		// var that = this;
+		// setTimeout(function(){					
+		// 	// that._openLayers.className = 'leaflet-control layer-opener-opened'; // rem (j)
+		// }, 500);			
 			
 	},
 
@@ -10274,6 +10306,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// turn off dragging etc. on map
 		Wu.app.MapPane.disableInteraction(true);
+
+		// turn off dropzone dragging
+		if (app.Dropzone) app.Dropzone.disable();
 		
 		// enable drag'n drop in layermenu
 		this.enableSortable();
@@ -10306,6 +10341,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		
 		// re-enable dragging etc. on map
 		Wu.app.MapPane.enableInteraction(true);
+
+		// turn off dropzone dragging
+		if (app.Dropzone) app.Dropzone.enable();
 		
 		// disable layermenu sorting
 		this.disableSortable();
@@ -10327,27 +10365,27 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	},
 
-	_hideEditButtons : function () {	// expensive?? yes!
-		// var elems = [];
-		// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
-		// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
-		// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
-		// elems = _.flatten(elems);
-		// elems.forEach(function (one) {
-		// 	one.style.display = 'none';
-		// });
-	},
+	// _hideEditButtons : function () {	// expensive?? yes!
+	// 	// var elems = [];
+	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
+	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
+	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
+	// 	// elems = _.flatten(elems);
+	// 	// elems.forEach(function (one) {
+	// 	// 	one.style.display = 'none';
+	// 	// });
+	// },
 
-	_showEditButtons : function () {	// todo: refactor! 
-		// var elems = [];
-		// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
-		// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
-		// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
-		// elems = _.flatten(elems);
-		// elems.forEach(function (one) {
-		// 	one.style.display = 'block';
-		// });
-	},
+	// _showEditButtons : function () {	// todo: refactor! 
+	// 	// var elems = [];
+	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
+	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
+	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
+	// 	// elems = _.flatten(elems);
+	// 	// elems.forEach(function (one) {
+	// 	// 	one.style.display = 'block';
+	// 	// });
+	// },
 
 
 	_insertMenuFolder : function () {
@@ -11099,13 +11137,17 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		Wu.DomEvent.on(this._container, 'mouseleave', function () {
 		    map.scrollWheelZoom.enable();
 		}, this);
+
+
+		// Get the scrol-container that we will set max height value of
+		this._layermenuOuter = Wu.DomUtil.get('layermenu-outer');
+
+		// Check window height
+		var layersMaxHeight = window.innerHeight - 135;
+
+		// Set max height of Layers selector container
+		this.setMaxHeight(layersMaxHeight);		
 	
-	},
-
-	resizeEvent : function (dimensions) {
-
-		// console.log('dimensions', dimenstions);
-		
 	}
 	
 });
@@ -11830,41 +11872,15 @@ L.control.description = function (options) {
 		// Set max width of legends
 		this.setMaxWidth(legendsMaxWidth)
 
-
-		// Remove Layer Menu Width from window width, if it exists
-		if (app.MapPane.layerMenu) legendsMaxWidth -= 290;
-
-		// If the Legends slider is wider than the winodw, add the horizontal scroll buttons
-		if ( this.sliderWidth > legendsMaxWidth ) {
-			this._legendsScrollLeft.style.display = 'block';
-			this._legendsScrollRight.style.display = 'block';
-		} else {
-			this._legendsScrollLeft.style.display = 'none';
-			this._legendsScrollRight.style.display = 'none';			
-		}
-
-
-
-
-
-		// Check if the Layer Inspector EXISTS, so that we can add the correct padding to the legends menu
-		// vvv UTGÅR vvv
-
-		// var inspectControl = app.MapPane.inspectControl;
-		// if (inspectControl) {
-		// 	if (inspectControl._container.offsetWidth >= 100 ) {
-		// 		Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right');
-		// 	}
-		// } else {
-		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right');
-		// }
-
 	},	
 
-
+	// Runs on window resize (from app.js)
 	resizeEvent : function (dimensions) {
 
+		// Check window width
 		var legendsMaxWidth = dimensions.width;
+
+		// Set max width of legends
 		this.setMaxWidth(legendsMaxWidth)
 
 	},
@@ -11872,18 +11888,32 @@ L.control.description = function (options) {
 	setMaxWidth : function (legendsMaxWidth) {
 
 		// Check if the layer meny and end layer inspectors are there
-		var insepctControl = app.MapPane.inspectControl;
+		var inspectControl = app.MapPane.inspectControl;
 		var layermenuControl = app.MapPane.layerMenu;
 
 		// Is there a layer inspector, and is the pane open?
-		if (insepctControl && layermenuControl._open ) legendsMaxWidth -= 290;
+		if (inspectControl && layermenuControl._open ) legendsMaxWidth -= 300;
 
-		// console.log('legendsMaxWidth', legendsMaxWidth);
+		// Set max width of legends container
+		this._container.style.maxWidth = legendsMaxWidth + 'px';
 
-		// console.log('this', this)
+		// Figure out if we need the scrollers or not
+		if ( this.sliderWidth > legendsMaxWidth ) {
+			this.showScrollers() 
+		} else {
+			this.hideScrollers();	
+		} 
 
-		this._container.style.maxWidth = legendsMaxWidth + 'px';	
+	},
 
+	showScrollers : function () {
+		this._legendsScrollLeft.style.display = 'block';
+		this._legendsScrollRight.style.display = 'block';
+	}, 
+
+	hideScrollers : function () {
+		this._legendsScrollLeft.style.display = 'none';
+		this._legendsScrollRight.style.display = 'none';
 	},
 
 

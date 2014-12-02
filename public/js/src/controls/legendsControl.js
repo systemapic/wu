@@ -53,41 +53,15 @@ L.Control.Legends = L.Control.extend({
 		// Set max width of legends
 		this.setMaxWidth(legendsMaxWidth)
 
-
-		// Remove Layer Menu Width from window width, if it exists
-		if (app.MapPane.layerMenu) legendsMaxWidth -= 290;
-
-		// If the Legends slider is wider than the winodw, add the horizontal scroll buttons
-		if ( this.sliderWidth > legendsMaxWidth ) {
-			this._legendsScrollLeft.style.display = 'block';
-			this._legendsScrollRight.style.display = 'block';
-		} else {
-			this._legendsScrollLeft.style.display = 'none';
-			this._legendsScrollRight.style.display = 'none';			
-		}
-
-
-
-
-
-		// Check if the Layer Inspector EXISTS, so that we can add the correct padding to the legends menu
-		// vvv UTGÅR vvv
-
-		// var inspectControl = app.MapPane.inspectControl;
-		// if (inspectControl) {
-		// 	if (inspectControl._container.offsetWidth >= 100 ) {
-		// 		Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right');
-		// 	}
-		// } else {
-		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right');
-		// }
-
 	},	
 
-
+	// Runs on window resize (from app.js)
 	resizeEvent : function (dimensions) {
 
+		// Check window width
 		var legendsMaxWidth = dimensions.width;
+
+		// Set max width of legends
 		this.setMaxWidth(legendsMaxWidth)
 
 	},
@@ -95,18 +69,32 @@ L.Control.Legends = L.Control.extend({
 	setMaxWidth : function (legendsMaxWidth) {
 
 		// Check if the layer meny and end layer inspectors are there
-		var insepctControl = app.MapPane.inspectControl;
+		var inspectControl = app.MapPane.inspectControl;
 		var layermenuControl = app.MapPane.layerMenu;
 
 		// Is there a layer inspector, and is the pane open?
-		if (insepctControl && layermenuControl._open ) legendsMaxWidth -= 290;
+		if (inspectControl && layermenuControl._open ) legendsMaxWidth -= 300;
 
-		// console.log('legendsMaxWidth', legendsMaxWidth);
+		// Set max width of legends container
+		this._container.style.maxWidth = legendsMaxWidth + 'px';
 
-		// console.log('this', this)
+		// Figure out if we need the scrollers or not
+		if ( this.sliderWidth > legendsMaxWidth ) {
+			this.showScrollers() 
+		} else {
+			this.hideScrollers();	
+		} 
 
-		this._container.style.maxWidth = legendsMaxWidth + 'px';	
+	},
 
+	showScrollers : function () {
+		this._legendsScrollLeft.style.display = 'block';
+		this._legendsScrollRight.style.display = 'block';
+	}, 
+
+	hideScrollers : function () {
+		this._legendsScrollLeft.style.display = 'none';
+		this._legendsScrollRight.style.display = 'none';
 	},
 
 
