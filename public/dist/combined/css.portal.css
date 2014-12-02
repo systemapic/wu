@@ -327,7 +327,7 @@ label.info {
   border-radius: 20px;
   z-index: 99999; }
 
-.smap-button-white, .smap-button-gray, .share-image-download-button {
+.smap-button-white, .smap-button-gray, .share-image-download-button, .download-dialog-button, .download-dialog-cancel {
   height: 30px;
   text-align: center;
   margin: 0;
@@ -347,33 +347,33 @@ label.info {
   box-shadow: -1px 1px 2px 0 rgba(0, 0, 0, 0.3);
   color: #666; }
 
-.smap-button-gray, .share-image-download-button {
+.smap-button-gray, .share-image-download-button, .download-dialog-button, .download-dialog-cancel {
   background-color: rgba(0, 0, 0, 0.65);
   color: white;
   font-weight: 500; }
 
 /* Button */
-.smap-button-white:active, .smap-button-gray:active, .share-image-download-button:active, .smap-button-gray:active, .share-image-download-button:active {
+.smap-button-white:active, .smap-button-gray:active, .share-image-download-button:active, .download-dialog-button:active, .download-dialog-cancel:active, .smap-button-gray:active, .share-image-download-button:active, .download-dialog-button:active, .download-dialog-cancel:active {
   box-shadow: -1px 1px 2px 0 rgba(0, 0, 0, 0); }
 
 /* Button */
-.smap-button-white:hover, .smap-button-gray:hover, .share-image-download-button:hover {
+.smap-button-white:hover, .smap-button-gray:hover, .share-image-download-button:hover, .download-dialog-button:hover, .download-dialog-cancel:hover {
   background: white;
   color: #333; }
 
 /* Button */
-.smap-button-gray:hover, .share-image-download-button:hover {
+.smap-button-gray:hover, .share-image-download-button:hover, .download-dialog-button:hover, .download-dialog-cancel:hover {
   background: black;
   color: white; }
 
 /* Button */
-.smap-button-white.small, .small.smap-button-gray, .small.share-image-download-button {
+.smap-button-white.small, .small.smap-button-gray, .small.share-image-download-button, .small.download-dialog-button, .small.download-dialog-cancel {
   height: 26px;
   font-size: 13px;
   line-height: 2; }
 
 /* Button */
-.smap-button-white.small.red, .small.red.smap-button-gray, .small.red.share-image-download-button {
+.smap-button-white.small.red, .small.red.smap-button-gray, .small.red.share-image-download-button, .small.red.download-dialog-button, .small.red.download-dialog-cancel {
   color: white !important;
   background: #B80077 !important;
   box-shadow: 0 0 0 1px white inset; }
@@ -531,7 +531,7 @@ input.cmn-toggle-round-flat:checked + label:after {
 .controls-switch {
   top: 6px;
   right: 6px;
-  pointer-events: none; }
+  /*pointer-events: none;*/ }
 
 /* Switch overriders */
 input.cmn-toggle-round-flat:checked + label, input.cmn-toggle-round-flat:checked + label:after {
@@ -875,11 +875,11 @@ input.cmn-toggle-round-flat + label:before {
 .leaflet-draw-section {
   position: relative;
   width: 26px;
-  pointer-events: all; }
+  /*pointer-events: all;*/ }
 
 .leaflet-draw-toolbar {
   margin-top: 12px;
-  pointer-events: all; }
+  /*pointer-events: all;*/ }
 
 .leaflet-draw-toolbar-top {
   margin-top: 0; }
@@ -910,7 +910,9 @@ input.cmn-toggle-round-flat + label:before {
  ┴ └─┘└─┘┴─┘└─┘┴ ┴┴└─└─┘  ┴ ┴└─┘ ┴ ┴└─┘┘└┘└─┘  ┴ ┴└─┘┘└┘└─┘
  */
 .leaflet-draw.leaflet-control.elizaveta {
-  pointer-events: none;
+  width: 20px;
+  overflow: visible;
+  /*pointer-events: none;*/
   cursor: -webkit-grab;
   cursor: -moz-grab; }
 
@@ -919,9 +921,11 @@ input.cmn-toggle-round-flat + label:before {
   cursor: -webkit-grabbing;
   cursor: -moz-grabbing; }
 
-.leaflet-draw.leaflet-control.elizaveta div, .leaflet-draw.leaflet-control.elizaveta a {
-  pointer-events: all; }
-
+/*.leaflet-draw.leaflet-control.elizaveta div,
+.leaflet-draw.leaflet-control.elizaveta a {
+	pointer-events: all;
+	}	
+*/
 .leaflet-draw-actions {
   display: none;
   list-style: none;
@@ -1251,9 +1255,16 @@ input.cmn-toggle-round-flat + label:before {
   /*right: auto;	*/
   /*display: none;*/
   /*left: 7px;*/
+  font-style: italic;
   right: -2px;
   top: 63px;
   background: transparent !important; }
+
+.leaflet-control-attribution a {
+  font-weight: 900; }
+
+.leaflet-control-attribution a:hover {
+  text-decoration: none; }
 
 /*
 ┬  ┌─┐┌─┐┌─┐┬  ┌─┐┌┬┐  ┬┌┐┌┌─┐┌─┐  ┌─┐┬  ┬ ┬┌─┐  ┌─┐┌─┐┌─┐┌┬┐   ┬   ┌┬┐┬─┐┌─┐┬ ┬  ┌┬┐┌─┐┌─┐┬  ┌─┐
@@ -1441,10 +1452,13 @@ input.cmn-toggle-round-flat + label:before {
   position: relative;
   left: -3px;
   overflow: hidden;
-  width: 135px; }
+  /*width: 135px;*/
+  width: 34px;
+  /*overflow: visible;*/ }
 
 .draw-expander {
-  height: 270px; }
+  height: 270px;
+  overflow: visible; }
 
 .open-drawer {
   background-color: #CCFFFF; }
@@ -1484,9 +1498,9 @@ input.cmn-toggle-round-flat + label:before {
   width: 100%; }
 
 /* Toggle padding right */
-.legends-padding-right {
-  padding-right: 300px !important; }
-
+/*.legends-padding-right {
+	padding-right: 300px !important;
+	}	*/
 /* outer wrapper 2 */
 .leaflet-control-legends {
   bottom: -3px;
@@ -1806,7 +1820,7 @@ input.cmn-toggle-round-flat + label:before {
   position: relative;
   float: none !important;
   box-shadow: none !important;
-  pointer-events: none; }
+  /*pointer-events: none;*/ }
 
 /* Layer menu scroller frame */
 .leaflet-control-layermenu .scroller-frame {
@@ -1819,7 +1833,7 @@ input.cmn-toggle-round-flat + label:before {
 /* Layer menu innser frame */
 .leaflet-control-layermenu .scroller-frame .inner-scroller {
   width: 320px;
-  pointer-events: all;
+  /*pointer-events: all;*/
   min-height: auto;
   padding-left: 5px;
   padding-right: 5px;
@@ -1827,7 +1841,7 @@ input.cmn-toggle-round-flat + label:before {
 
 #layer-menu-header {
   overflow: hidden;
-  pointer-events: all;
+  /*pointer-events: all;*/
   margin-top: 2px !important; }
 
 /* Layer menu title */
@@ -1862,7 +1876,7 @@ input.cmn-toggle-round-flat + label:before {
   width: 280px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   left: -2px;
-  pointer-events: all; }
+  /*pointer-events: all;		*/ }
 
 /* Each layer wrap: Universal => on every layer menu item */
 .layer-menu-item-wrap {
@@ -1996,7 +2010,7 @@ input.cmn-toggle-round-flat + label:before {
   line-height: 2.4;
   background: white;
   box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
-  pointer-events: all; }
+  /*pointer-events: all;*/ }
 
 .middle-item:after {
   content: '';
@@ -2544,6 +2558,14 @@ input.cmn-toggle-round-flat + label:before {
 /* CartoCSS */
 /* CartoCSS */
 /* CartoCSS */
+.resize-ghost {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 99999; }
+
 .leaflet-control-cartocss {
   width: 26px;
   height: 26px !important;
@@ -2551,16 +2573,17 @@ input.cmn-toggle-round-flat + label:before {
   margin-bottom: 3px;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  position: relative; }
+  position: relative;
+  z-index: 222; }
 
 .cartocss-control-resizer {
-  /*background: red;*/
   width: 6px;
   height: 100%;
   position: absolute;
   z-index: 99999;
   left: 0;
-  border-right: 0; }
+  border-right: 0;
+  cursor: ew-resize; }
 
 .cartocss-toolbar-button {
   width: 26px;
@@ -2581,11 +2604,11 @@ input.cmn-toggle-round-flat + label:before {
   height: 100%;
   position: absolute;
   right: 6px;
-  top: 0;
-  padding-top: 91px;
-  padding-bottom: 6px;
+  top: 91px;
+  /*padding-top: 91px;*/
+  padding-bottom: 96px;
   box-sizing: border-box;
-  z-index: 99999999; }
+  z-index: 9999; }
 
 .cartocss-control-wrapper {
   background-color: white;
@@ -2595,7 +2618,7 @@ input.cmn-toggle-round-flat + label:before {
   padding-bottom: 122px;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
   cursor: default;
-  pointer-events: all; }
+  /*pointer-events: all;*/ }
 
 .cartocss-attributes {
   width: 100%;
@@ -2633,7 +2656,7 @@ input.cmn-toggle-round-flat + label:before {
   overflow-y: scroll;
   overflow-x: hidden;
   padding: 0;
-  padding-right: 25px;
+  padding-right: 12px;
   margin-bottom: 6px;
   top: 31px;
   z-index: 999;
@@ -2826,7 +2849,7 @@ input.cmn-toggle-round-flat + label:before {
   top: 10px;
   left: 8px;
   opacity: 0.7;
-  pointer-events: none; }
+  /*pointer-events: none;*/ }
 
 .cartocss-style-header-wrapper:hover > .cartocss-style-dropdown-arrow {
   opacity: 1; }
@@ -2921,8 +2944,9 @@ input.cmn-toggle-round-flat + label:before {
 .cartocss-tooltip-wrapper {
   /*width: 410px;*/
   /*padding-right: 28px;*/
-  box-sizing: border-box;
-  -webkit-box-sizing: border-box;
+  /*box-sizing: border-box;*/
+  /*-webkit-box-sizing: border-box;*/
+  /*overflow: -moz-scrollbars-none;*/
   overflow-y: scroll;
   overflow-x: hidden;
   height: 100%; }
@@ -2932,7 +2956,7 @@ input.cmn-toggle-round-flat + label:before {
 
 .tooltip-field-wrapper .controls-switch {
   top: 4px;
-  pointer-events: all; }
+  /*pointer-events: all;*/ }
 
 .tooltip-field-wrapper {
   position: relative;
@@ -3061,7 +3085,7 @@ input.cmn-toggle-round-flat + label:before {
 
 .legend-entry-wrap .controls-switch {
   top: 2px;
-  pointer-events: all; }
+  /*pointer-events: all;*/ }
 
 /*
  ██████╗       ███████╗██████╗ ██╗████████╗ ██████╗ ██████╗ 
@@ -3121,7 +3145,7 @@ input.cmn-toggle-round-flat + label:before {
   height: 0px;
   width: 100px;
   padding-top: 0px;
-  pointer-events: none; }
+  /*pointer-events: none;*/ }
 
 /* Menu to the left */
 .q-editor-menu {
@@ -3136,7 +3160,7 @@ input.cmn-toggle-round-flat + label:before {
   top: 79px;
   top: 6px;
   margin-top: 0px;
-  pointer-events: all; }
+  /*pointer-events: all;*/ }
 
 .q-editor-menu-item {
   text-align: center;
@@ -3196,9 +3220,9 @@ input.cmn-toggle-round-flat + label:before {
   z-index: 999; }
 
 /* Content (to the right) */
-.q-editor-content {
-  pointer-events: all; }
-
+/*.q-editor-content {
+	pointer-events: all;
+	}*/
 .q-editor-content-item {
   position: absolute;
   left: 100px;
@@ -3400,7 +3424,8 @@ input.cmn-toggle-round-flat + label:before {
   height: auto;
   width: 192px;
   display: inline-block;
-  vertical-align: bottom; }
+  vertical-align: bottom;
+  padding-right: 20px; }
 
 .project-title input {
   position: absolute;
@@ -5562,10 +5587,13 @@ input[type=checkbox] + label.check {
   transition: height 250ms ease, width 250ms ease; }
 
 .q-editor-content-item {
-  -webkit-transition: top 300ms ease, opacity 300ms ease;
-  -moz-transition: top 300ms ease, opacity 300ms ease;
-  -o-transition: top 300ms ease, opacity 300ms ease;
-  transition: top 300ms ease, opacity 300ms ease; }
+  -webkit-transition: opacity 250ms ease;
+  -moz-transition: opacity 250ms ease;
+  transition: opacity 250ms ease;
+  /*	-webkit-transition: height 250ms ease, width 250ms ease, padding 250ms ease;
+	-moz-transition: height 250ms ease, width 250ms ease, padding 250ms ease;
+	transition: height 250ms ease, width 250ms ease, padding 250ms ease;
+*/ }
 
 #header {
   -webkit-transition: left 250ms ease, width 250ms ease;
@@ -5639,7 +5667,7 @@ input[type=checkbox] + label.check {
   -moz-transition: height 300ms ease;
   transition: height 300ms ease; }
 
-.select-elems, #editor-map-controls-inner-wrap, .connect-outer, .map-layermenu-outer, .leaflet-draw-section-wrapper, .layer-menu-item-wrap, .editor-project-edit-super-wrap, #editor-map-initpos-coordinates, #editor-map-bounds-coordinates, .settings-outer {
+.select-elems, #editor-map-controls-inner-wrap, .connect-outer, .map-layermenu-outer, .leaflet-draw-section-wrapper, .layer-menu-item-wrap, .editor-project-edit-super-wrap, #editor-map-initpos-coordinates, #editor-map-bounds-coordinates, .settings-outer, .q-editor-menu {
   -webkit-transition: height 250ms ease;
   -moz-transition: height 250ms ease;
   transition: height 250ms ease; }
@@ -5658,7 +5686,7 @@ input[type=checkbox] + label.check {
 ╚███╔███╔╝██║██████╔╝   ██║   ██║  ██║
  ╚══╝╚══╝ ╚═╝╚═════╝    ╚═╝   ╚═╝  ╚═╝
 */
-.leaflet-bottom.leaflet-right, #upload-container {
+.leaflet-bottom.leaflet-right, .status-progress-bar {
   -webkit-transition: width 250ms ease;
   -moz-transition: width 250ms ease;
   -o-transition: width 250ms ease;
@@ -5799,70 +5827,49 @@ input[type=checkbox] + label.check {
   -o-transform: rotate(45deg);
   transform: rotate(45deg); }
 
-/*@import 'mobile';*/
-/* @import 'color_picker';	// Color picker */
-/* @import 'mediaLibrary';	// Media Library */
-/*# sourceMappingURL=style.css.map */;.map-blur {
-	-webkit-filter: blur(3px) brightness(0.5) grayscale(0.5);
-	-moz-filter: blur(3px) brightness(0.5) grayscale(0.5);
-	filter: blur(3px) brightness(0.5) grayscale(0.5);
-	filter: url(images/filter.svg#svg-map-filter);
-	opacity: 1;
-	}
-
-;.datalibrary-category-wrapper {
-	position:  absolute;
-	border: 1px solid yellow;
-	z-index: 1000;
-	background-color: white;
-	font-size: 120%;
-}
+.datalibrary-category-wrapper {
+  position: absolute;
+  border: 1px solid yellow;
+  z-index: 1000;
+  background-color: white;
+  font-size: 120%; }
 
 .datalibrary-category-line {
-	font-size: 120%;
-	padding: 5px;
-	border-bottom: 1px solid gray;
-	float: left;
-	width: 85%;
-}
+  font-size: 120%;
+  padding: 5px;
+  border-bottom: 1px solid gray;
+  float: left;
+  width: 85%; }
 
 .datalibrary-category-line:hover {
-	background: aqua;
-}
+  background: aqua; }
 
 .datalibrary-category-new {
-	border: 0px;
-	background-color: white;
-
-}
+  border: 0px;
+  background-color: white; }
 
 .datalibrary-category-line-del {
-	/*position: absolute;*/
-	right: 0px;
-	cursor: pointer;
-	text-align: right;
-}
+  right: 0px;
+  cursor: pointer;
+  text-align: right; }
+
 .datalibrary-category-line-del:hover {
-	color: red;
-}
+  color: red; }
 
 .datalibrary-category-line-wrap {
-	height: auto;
-	cursor: pointer;
-}
-
+  height: auto;
+  cursor: pointer; }
 
 /*bigger logos*/
 .client-logo {
-	height: 70px;
-}
+  height: 70px; }
+
 .project-logo {
-	height: 62px;
-}
+  height: 62px; }
+
 .client-kill {
-	background: rgba(0, 0, 0, 0.5);
-	color: #fff;
-}
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff; }
 
 /*less empty space experiment*/
 /*.home-container {
@@ -5890,89 +5897,129 @@ input[type=checkbox] + label.check {
 .leaflet-top.leaflet-right {
 	top: 79px;
 }*/
-
-
-
-
 /* error pane */
-
 .error-pane {
-	position: absolute;
-	top: 6px;
-	left: 104px;
-	width: 92%;
-	height: 77px;
-	z-index: 100;
-}
+  position: absolute;
+  top: 6px;
+  left: 104px;
+  width: 92%;
+  height: 77px;
+  z-index: 100; }
 
 .error-pane-content {
-	background: rgb(255, 122, 122);
-	width: 100%;
-	height: 100%;
-}
+  background: #ff7a7a;
+  width: 100%;
+  height: 100%; }
 
 .error-pane-title {
-	color: white;
-	padding-left: 10px;
-	font-weight: 900;
-	font-size: 200%;
-}
+  color: white;
+  padding-left: 10px;
+  font-weight: 900;
+  font-size: 200%; }
 
 .error-pane-description {
-	color: white;
-	padding-left: 10px;
-	font-weight: 900;
-	font-size: 120%;
-}
-
-
-
+  color: white;
+  padding-left: 10px;
+  font-weight: 900;
+  font-size: 120%; }
 
 /* dropzone */
 .dropzone-pane {
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	top: 0;
-	left: 0;
-	z-index: 10000;
-	/*pointer-events: none;*/
-	background: rgba(0, 0, 0, 0.69);
-}
-
-
-
-
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  /*pointer-events: none;*/
+  background-color: rgba(0, 0, 0, 0.69);
+  background-image: url('images/bigcloud.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  border: none !important; }
 
 /*download-dialog*/
 .download-dialog {
-	position: absolute;
-	height: 100px;
-	width: 200px;
-	background: red;
-	top: 200px;
-	left: 200px;
-}
-.download-dialog-button {
-	position: relative;
-	background: yellow;
-	top: 0px;
-	left: 0px;
-	height: 50px;
-	width: 100px;
-}
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  padding-right: 110px;
+  padding-bottom: 94px; }
 
+.download-dialog-inner {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  padding: 100px;
+  background: rgba(255, 255, 255, 0.8); }
 
+.download-dialog-button, .download-dialog-cancel {
+  position: relative;
+  display: block;
+  /*background: yellow;*/
+  /*top: 0px;*/
+  /*left: 0px;*/
+  font-weight: 500;
+  height: 40px;
+  width: 150px;
+  margin: auto;
+  margin-bottom: 20px;
+  line-height: 2.6; }
 
+.download-dialog-button a, .download-dialog-button a:hover {
+  color: white;
+  text-decoration: none;
+  font-weight: 500; }
 
+.q-editor-container {
+  overflow: visible; }
 
+.q-editor-menu {
+  overflow: hidden;
+  height: 0; }
 
+.q-editor-content-item.show {
+  opacity: 1; }
 
+.hide-menu .q-editor-content-item {
+  opacity: 0; }
 
+#bhattan1 {
+  right: 2px;
+  top: 5px; }
 
+#layer-menu-header {
+  width: 280px;
+  top: 0px;
+  left: 5px;
+  position: relative; }
 
+.leaflet-control-layermenu.leaflet-control {
+  padding: 0;
+  position: absolute;
+  top: 90px;
+  right: 0;
+  height: auto;
+  overflow: visible; }
 
+.leaflet-control-layermenu .scroller-frame {
+  height: auto;
+  padding: 0; }
 
+/*@import 'mobile';*/
+/* @import 'color_picker';	// Color picker */
+/* @import 'mediaLibrary';	// Media Library */
+/*# sourceMappingURL=style.css.map */;.map-blur {
+	-webkit-filter: blur(3px) brightness(0.5) grayscale(0.5);
+	-moz-filter: blur(3px) brightness(0.5) grayscale(0.5);
+	filter: blur(3px) brightness(0.5) grayscale(0.5);
+	filter: url(images/filter.svg#svg-map-filter);
+	opacity: 1;
+	}
 
-
-
+;

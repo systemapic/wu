@@ -47,7 +47,7 @@ L.Control.BaselayerToggle = L.Control.extend({
 		Wu.DomEvent.on(container, 'dblclick', Wu.DomEvent.stop, this);
 
 		// add stops
-		Wu.DomEvent.on(container, 'mousedown dblclick', Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(container, 'mousedown dblclick mouseup click', Wu.DomEvent.stopPropagation, this);
 
 	},
 

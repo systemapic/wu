@@ -59,6 +59,9 @@ Wu.App = Wu.Class.extend({
 
 	initialize : function (options) {
 
+		// prototypes for compatiblity
+		this._compatabilityChecks();
+
 		// set global this
 		Wu.app = this;
 
@@ -72,6 +75,15 @@ Wu.App = Wu.Class.extend({
 		// get objects from server
 		this.initServer();
 
+	},
+
+	_compatabilityChecks : function () {
+		Function.prototype.bind = Function.prototype.bind || function (thisp) {
+			var fn = this;
+			return function () {
+				return fn.apply(thisp, arguments);
+			};
+		};
 	},
 
 	initServer : function () {
@@ -113,9 +125,53 @@ Wu.App = Wu.Class.extend({
 		// init pane view
 		this._initView();
 
+		// init global events
+		this._initEvents();
+
 		// ready
 		this._ready = true;
 
+	},
+
+	_initEvents : function () {
+
+		Wu.DomEvent.on(window, 'resize', this._resizeEvents, this);
+
+	},
+
+	_resizeEvents : function (e) {
+
+		// get window dimensions
+		var dimensions = this._getDimensions(e);
+
+		// mappane resize event
+		if (app.MapPane) app.MapPane.resizeEvent(dimensions);
+
+		// legends control resize
+		var legendsControl = app.MapPane.legendsControl;
+		if (legendsControl) legendsControl.resizeEvent(dimensions);
+
+		// layermenu control resize
+		var layermenuControl = app.MapPane.layerMenu;
+		if (layermenuControl) layermenuControl.resizeEvent(dimensions);
+
+	},
+
+	_getDimensions : function (e) {
+		var w = window,
+		    d = document,
+		    e = d.documentElement,
+		    g = d.getElementsByTagName('body')[0],
+		    x = w.innerWidth || e.clientWidth || g.clientWidth,
+		    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+
+		var d = {
+			height : y,
+			width : x,
+			e : e
+		}
+
+		return d;
 	},
 
 	_initContainer : function () {

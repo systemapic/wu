@@ -189,11 +189,15 @@ input[type=checkbox] + label.check {
 	}	
 
 .q-editor-content-item {
-	-webkit-transition: top 300ms ease, opacity 300ms ease;
-	-moz-transition: top 300ms ease, opacity 300ms ease;
-	-o-transition: top 300ms ease, opacity 300ms ease;
-	transition: top 300ms ease, opacity 300ms ease;
-	}
+
+	-webkit-transition: opacity 250ms ease;
+	-moz-transition: opacity 250ms ease;
+	transition: opacity 250ms ease;
+
+/*	-webkit-transition: height 250ms ease, width 250ms ease, padding 250ms ease;
+	-moz-transition: height 250ms ease, width 250ms ease, padding 250ms ease;
+	transition: height 250ms ease, width 250ms ease, padding 250ms ease;
+*/	}
 
 #header {
 	-webkit-transition: left 250ms ease, width 250ms ease;	
@@ -291,7 +295,8 @@ input[type=checkbox] + label.check {
 .editor-project-edit-super-wrap,
 #editor-map-initpos-coordinates,
 #editor-map-bounds-coordinates,
-.settings-outer {
+.settings-outer,
+.q-editor-menu {
 	-webkit-transition: height 250ms ease;
 	-moz-transition: height 250ms ease;
 	transition: height 250ms ease;
@@ -317,7 +322,7 @@ input[type=checkbox] + label.check {
 */
 
 .leaflet-bottom.leaflet-right,
-#upload-container {
+.status-progress-bar {
 	-webkit-transition: width 250ms ease;
 	-moz-transition: width 250ms ease;
 	-o-transition: width 250ms ease;

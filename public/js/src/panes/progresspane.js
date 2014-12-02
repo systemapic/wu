@@ -29,7 +29,7 @@ Wu.ProgressPane = Wu.Class.extend({
 
 	setProgress : function (percent) {
 		console.log('setProgress', percent, this._current);
-		if (percent < this._current + 9) return;
+		if (percent < this._current + 2) return;
 
 		var bar = this._progressBar;
 		bar.style.opacity = 1;

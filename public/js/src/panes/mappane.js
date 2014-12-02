@@ -11,22 +11,22 @@ Wu.MapPane = Wu.Class.extend({
 		// init container
 		this._container = Wu.app._mapPane = Wu.DomUtil.createId('div', 'map', Wu.app._mapContainer);
 	
-		// events
-		Wu.DomEvent.on(window, 'resize', this._updateWidth, this); 
-	
 		// add help pseudo
 		Wu.DomUtil.addClass(this._container, 'click-to-start');
 	},
 
-	
+	// fired on window resize
+	resizeEvent : function (d) {
+		this._updateWidth(d);
+	},
     
-	_updateWidth : function () {
+	_updateWidth : function (d) {
 
 		var map = this._map;
-		if (!map) return;
+		if (!map || !d) return;
 		
 		// set width
-		map._container.style.width = parseInt(window.innerWidth) - parseInt(map._container.offsetLeft) + 'px';
+		map._container.style.width = d.width - parseInt(map._container.offsetLeft) + 'px';
 		
 		// refresh map size
 		setTimeout(function() {

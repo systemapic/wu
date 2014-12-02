@@ -632,7 +632,7 @@ input.cmn-toggle-round-flat:checked + label:after {
 .controls-switch {
 	top: 6px;
 	right: 6px;
-	pointer-events: none;
+	/*pointer-events: none;*/
 	}
 
 /* Switch overriders */

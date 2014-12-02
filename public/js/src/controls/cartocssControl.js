@@ -50,6 +50,7 @@ L.Control.CartoCSS = L.Control.extend({
 		// create divs
 		this._editorContainer 		= Wu.DomUtil.create('div', 'cartocss-control-container'); // editor container
 		this._resizeHandle 		= Wu.DomUtil.create('div', 'cartocss-control-resizer', this._editorContainer); // editor container
+		// this._resizeHandle.setAttribute('draggable', 'true');
 
 		this._wrapper 			= Wu.DomUtil.create('div', 'cartocss-control-wrapper', this._editorContainer); // the obligatory wrapper
 		this._xButton 			= Wu.DomUtil.create('div', 'close-cartocss-editor-x', this._wrapper); // close button
@@ -82,7 +83,7 @@ L.Control.CartoCSS = L.Control.extend({
 		this._inputArea 		= Wu.DomUtil.create('textarea', 'cartocss-input', this._formWrapper); // For CodeMirror: create text area
 		this._errorPane 		= Wu.DomUtil.create('div', 'cartocss-error-pane', this._wrapper); // error feedback pane
 		this._updateButton 		= Wu.DomUtil.create('div', 'cartocss-update-button', this._wrapper); // create update button
-		this._updateButton.innerHTML 	= 'Render changes';
+		this._updateButton.innerHTML 	= 'Render changes...';
 
 		// append to leaflet-control-container
 		app._map.getContainer().appendChild(this._editorContainer);
@@ -122,12 +123,13 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// Resize container
 		Wu.DomEvent.on(this._resizeHandle, 'mousedown', this.resize, this);
+		// Wu.DomEvent.on(this._resizeHandle, 'ondragstart', this.resize, this);
 
 		// stops
 		Wu.DomEvent.on(this._editorContainer, 		'mousewheel mousedown dblclick mouseup click', 	Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent.on(this._toolbarButton, 		'dblclick', 				Wu.DomEvent.stopPropagation, this);
-		Wu.DomEvent.on(this._styleHeaderLayerName, 	'click mousedown mouseup', 		Wu.DomEvent.stopPropagation, this);
-		Wu.DomEvent.on(this._formWrapper, 		'click mousedown mouseup', 		Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._styleHeaderLayerName, 	'click mousedown', 		Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._formWrapper, 		'click mousedown', 		Wu.DomEvent.stopPropagation, this);
 
 
 		// Update Zoom
@@ -150,26 +152,34 @@ L.Control.CartoCSS = L.Control.extend({
 		this.__cartoContainer_offsetLeft = this._editorContainer.offsetLeft;
 		this.__cartoContainer_width = this._editorContainer.offsetWidth;
 
-		// Log mouse position
-		Wu.DomEvent.on(document, 'mousemove', this.mouselistener, this);
+		// create ghost div
+		this._ghost = Wu.DomUtil.create('div', 'resize-ghost', app._appPane);
 
-		// Stop listening to mouse on mouse up
-		// OBS! How to self destroy
-		Wu.DomEvent.on(this._resizeHandle, 'mouseup', function() { 
-			Wu.DomEvent.off(document, 'mousemove', this.mouselistener, this);
-		}, this);
+		// add release hook
+		Wu.DomEvent.on(this._ghost, 'mouseup', this.removeResizeHooks, this);
+
+		// track mouse position
+		Wu.DomEvent.on(this._ghost, 'mousemove', this.resizeEditor, this);
 
 	},
 
-	mouselistener : function (e) {
+	removeResizeHooks : function () {
 
+		// remove events
+		Wu.DomEvent.off(this._ghost, 'mousemove', this.resizeEditor, this);
+		Wu.DomEvent.off(this._ghost, 'mouseup', this.removeResizeHooks, this);
+
+		// remove ghost div
+		Wu.DomUtil.remove(this._ghost);
+	},
+
+	resizeEditor : function (e) {
+
+		// set new width
 		var mouse = {x: 0};		
 		mouse.x = e.clientX || e.pageX; 
-		
 		var __newWidth = this.__cartoContainer_width + (this.__cartoContainer_offsetLeft - mouse.x);
 		if ( __newWidth >= 300 ) this._editorContainer.style.width = __newWidth + 'px';
-
-		
 	},
 
 	// update: fired from outside, on project.select() etc.
@@ -235,18 +245,18 @@ L.Control.CartoCSS = L.Control.extend({
 		console.log('fields: ', fields);
 
 		// create string
-		var string = '// #layer is always the layer identifyer \n\n';
-		string += '// For a full cartoCSS reference guide:\n // https://projects.ruppellsgriffon.com/docs/cartocss-reference/\n\n';
+		var string = '// CartoCSS reference guide:\n// https://bit.ly/1z5OvXT\n\n\n';
+		string += '// #layer is always the layer identifier \n';
 		string += '#layer {\n\n';
-		string += '// Available fields in layer:\n';
+		string += '    // Available fields in layer:\n\n';
 
 		// add each field to string
 		for (key in fields) {
 			var type = fields[key];
-			string += '// [' + key + '=' + type + '] {}\n';
+			string += '    // [' + key + '=' + type + '] {}\n';
 		}
 		
-		string += '\n}';
+		string += '\n\n}';
 
 		// update text
 		this.updateCodeMirror(string);

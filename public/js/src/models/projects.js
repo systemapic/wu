@@ -171,7 +171,7 @@ Wu.Project = Wu.Class.extend({
 	select : function () {
 
 		// console.log('************** set active **************');	
- 		Wu.DomUtil.removeClass(Wu.app._headerPane, 'displayNone');
+ 		if (app._headerPane) Wu.DomUtil.removeClass(app._headerPane, 'displayNone');
 
 		// set as active
 		app.activeProject = this;

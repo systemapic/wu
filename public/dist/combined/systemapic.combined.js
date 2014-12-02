@@ -1962,7 +1962,7 @@ L.Popup.include({
 		Wu.app._editorMenuPane = Wu.DomUtil.create('menu', className, this._container); 
 
 		// content pane
-		var className = 'q-editor-content ct1';
+		var className = 'q-editor-content hide-menu displayNone';
 		app._editorContentPane = Wu.DomUtil.create('content', className, this._container); 
 
 		// menuslider
@@ -2021,6 +2021,7 @@ L.Popup.include({
 
 	// call _deactivate on all items
 	_deactivate : function () {
+
 		if (this.Clients) 	this.Clients._deactivate();
 		if (this.Map) 		this.Map._deactivate();
 		if (this.Documents) 	this.Documents._deactivate();
@@ -2033,7 +2034,12 @@ L.Popup.include({
 
 	expand : function () {
 		// console.log('expand');
-		this._container.style.height = '100%';
+
+		// cxxxx
+		// OBS! Må regne ut hva høyden skal bli!
+		Wu.app._editorMenuPane.style.height = '490px';
+
+
 		this.openPane();
 	},
 
@@ -2136,8 +2142,16 @@ L.Popup.include({
 		if (!this.paneOpen) return;
 		this.paneOpen = false;
 
-		// close
-		this._container.style.width = '100px';
+		// Close drop down menu
+		Wu.app._editorMenuPane.style.height = '0px';
+
+		// Close menu container
+		Wu.DomUtil.addClass(app._editorContentPane, 'hide-menu');
+
+		// Make map clickable behind...
+		setTimeout(function(){
+			Wu.DomUtil.addClass(app._editorContentPane, 'displayNone');	
+		}, 300)
 
 		// refresh leaflet
 		this._refreshLeaflet();
@@ -2163,8 +2177,16 @@ L.Popup.include({
 		this.paneOpen = true;
 
 		// open
-		this._container.style.width = '350px';
-		Wu.DomUtil.addClass(app._active, 'show');	
+		// this._container.style.width = '350px';
+		Wu.DomUtil.addClass(app._active, 'show');
+
+		// Wu.DomUtil.addClass(app._active, 'enable');
+		Wu.DomUtil.removeClass(app._editorContentPane, 'displayNone');
+
+		// Have to set a micro timeout, so that it doesn't interfear with the displayNone class above
+		setTimeout(function() {
+			Wu.DomUtil.removeClass(app._editorContentPane, 'hide-menu');
+		}, 10)
 
 		// refresh leaflet
 		this._refreshLeaflet();
@@ -7016,7 +7038,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 
 		// add tooltip
-		app.Tooltip.add(this._menu, 'The data library holds all the files uploaded for the project.');
+		app.Tooltip.add(this._menu, 'The data library contains all files uploaded to the project.');
 
 
 	},
@@ -7118,15 +7140,11 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	downloadFiles : function () {
 
-		console.log('downloadFiles');
-
 		// get selected
 		this._downloadFileList = this.getSelected();
 
 		// return if no files selected
 		if (!this._downloadFileList.length) return;
-
-		console.log('this._downloadFileList', this._downloadFileList);
 
 		// create list of uuids only
 		var fuuids = [];
@@ -7152,22 +7170,11 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	receivedDownload : function (that, response) {
 		// this = window
 
-		console.log('receivedDownload', response);
-
 		// set path for zip file
 		var path = '/api/file/download?file=' + response + '&type=zip';
 		
 		// create download dialog
 		that.updateDownloadDialog(path);
-
-		// add <a> for zip file
-		// that._downloadList.innerHTML = ich.datalibraryDownloadReady({'url' : path});	// a href
-		// var btn = Wu.DomUtil.get('download-ready-button');
-		// Wu.DomEvent.on(btn, 'click', that.downloadDone, that);
-
-		// hide
-		// if (this._downloadList) this._downloadList.style.display = 'none';
-		// if (this._container) this._container.style.display = 'block';
 
 	},
 
@@ -7175,8 +7182,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// divs
 		var wrapper = this._downloadDialog = Wu.DomUtil.create('div', 'download-dialog', this._content);
-		var downloadBtn = this._downloadDialogBtn = Wu.DomUtil.create('div', 'download-dialog-button', wrapper, 'Processing...');
-		var cancelBtn = Wu.DomUtil.create('div', 'download-dialog-cancel', wrapper, 'Cancel');
+		var inner = Wu.DomUtil.create('div', 'download-dialog-inner', wrapper);
+		var downloadBtn = this._downloadDialogBtn = Wu.DomUtil.create('div', 'download-dialog-button', inner, 'Processing...');
+		var cancelBtn = Wu.DomUtil.create('div', 'download-dialog-cancel', inner, 'Cancel');
 
 		// event
 		Wu.DomEvent.on(cancelBtn, 'mousedown', this.removeDownloadDialog, this);
@@ -7195,8 +7203,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},	
 
 	_removeDownloadDialog : function () {
-		console.log('___removeDownloadDialog');
-		// Wu.DomUtil.addClass(this._downloadDialog, 'displayNone');
 		this._downloadDialog.style.opacity = 0;
 		setTimeout(this.removeDownloadDialog.bind(this), 3000);
 	},	
@@ -7479,12 +7485,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// show
 		Wu.DomUtil.addClass(this.fulldrop, 'fullscreen-dropped');
-
-
-
 	},
-
-
 
 	fullUpOff : function () {
 
@@ -8890,22 +8891,22 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// init container
 		this._container = Wu.app._mapPane = Wu.DomUtil.createId('div', 'map', Wu.app._mapContainer);
 	
-		// events
-		Wu.DomEvent.on(window, 'resize', this._updateWidth, this); 
-	
 		// add help pseudo
 		Wu.DomUtil.addClass(this._container, 'click-to-start');
 	},
 
-	
+	// fired on window resize
+	resizeEvent : function (d) {
+		this._updateWidth(d);
+	},
     
-	_updateWidth : function () {
+	_updateWidth : function (d) {
 
 		var map = this._map;
-		if (!map) return;
+		if (!map || !d) return;
 		
 		// set width
-		map._container.style.width = parseInt(window.innerWidth) - parseInt(map._container.offsetLeft) + 'px';
+		map._container.style.width = d.width - parseInt(map._container.offsetLeft) + 'px';
 		
 		// refresh map size
 		setTimeout(function() {
@@ -9853,6 +9854,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	// open sidepane menu
 	open : function (e) {
+		
 		this.isOpen = true;
 		var sidepane = app.SidePane;
 		sidepane.expand();
@@ -10177,6 +10179,11 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		app.Tooltip.add(this._bhattan1, 'Minimize the layer menu', { extends : 'systyle', tipJoint : 'left' });		
 	
 
+		// Store when the pane is open/closed ~ so that the legends container width can be calculated
+		this._open = true;
+
+
+
 	},
 
 	cancelEditClose : function () {
@@ -10205,6 +10212,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	// (j)        
 	closeLayerPane : function () {		
 
+		this._open = false;
+
 		// Collapse Wrapper
 		this._container.parentNode.style.width = '0px';
 
@@ -10229,6 +10238,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	// (j)
 	openLayerPane : function () {
 
+
+		this._open = true;
 
 		// Open Wrapper
 		this._container.parentNode.style.width = '290px';
@@ -11091,7 +11102,11 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	
 	},
 
+	resizeEvent : function (dimensions) {
 
+		// console.log('dimensions', dimenstions);
+		
+	}
 	
 });
 
@@ -11810,13 +11825,17 @@ L.control.description = function (options) {
 	checkWidth : function() {
 
 		// Check window width
-		var maxWidth = window.innerWidth;
+		var legendsMaxWidth = window.innerWidth;
+
+		// Set max width of legends
+		this.setMaxWidth(legendsMaxWidth)
+
 
 		// Remove Layer Menu Width from window width, if it exists
-		if (app.MapPane.layerMenu) maxWidth -= 300;
+		if (app.MapPane.layerMenu) legendsMaxWidth -= 290;
 
 		// If the Legends slider is wider than the winodw, add the horizontal scroll buttons
-		if ( this.sliderWidth > maxWidth ) {
+		if ( this.sliderWidth > legendsMaxWidth ) {
 			this._legendsScrollLeft.style.display = 'block';
 			this._legendsScrollRight.style.display = 'block';
 		} else {
@@ -11824,17 +11843,49 @@ L.control.description = function (options) {
 			this._legendsScrollRight.style.display = 'none';			
 		}
 
+
+
+
+
 		// Check if the Layer Inspector EXISTS, so that we can add the correct padding to the legends menu
-		var inspectControl = app.MapPane.inspectControl;
-		if (inspectControl) {
-			if (inspectControl._container.offsetWidth >= 100 ) {
-				Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right');
-			}
-		} else {
-			Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right');
-		}
+		// vvv UTGÅR vvv
+
+		// var inspectControl = app.MapPane.inspectControl;
+		// if (inspectControl) {
+		// 	if (inspectControl._container.offsetWidth >= 100 ) {
+		// 		Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right');
+		// 	}
+		// } else {
+		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right');
+		// }
 
 	},	
+
+
+	resizeEvent : function (dimensions) {
+
+		var legendsMaxWidth = dimensions.width;
+		this.setMaxWidth(legendsMaxWidth)
+
+	},
+
+	setMaxWidth : function (legendsMaxWidth) {
+
+		// Check if the layer meny and end layer inspectors are there
+		var insepctControl = app.MapPane.inspectControl;
+		var layermenuControl = app.MapPane.layerMenu;
+
+		// Is there a layer inspector, and is the pane open?
+		if (insepctControl && layermenuControl._open ) legendsMaxWidth -= 290;
+
+		// console.log('legendsMaxWidth', legendsMaxWidth);
+
+		// console.log('this', this)
+
+		this._container.style.maxWidth = legendsMaxWidth + 'px';	
+
+	},
+
 
 	closeLegends : function () {
 
@@ -12203,7 +12254,6 @@ L.control.description = function (options) {
 		app.StatusPane.setContentHeights();
 	}
 
-
 });
 
 
@@ -12334,7 +12384,7 @@ L.Control.BaselayerToggle = L.Control.extend({
 		Wu.DomEvent.on(container, 'dblclick', Wu.DomEvent.stop, this);
 
 		// add stops
-		Wu.DomEvent.on(container, 'mousedown dblclick', Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(container, 'mousedown dblclick mouseup click', Wu.DomEvent.stopPropagation, this);
 
 	},
 
@@ -12605,7 +12655,7 @@ L.control.baselayerToggle = function (options) {
 	select : function () {
 
 		// console.log('************** set active **************');	
- 		Wu.DomUtil.removeClass(Wu.app._headerPane, 'displayNone');
+ 		if (app._headerPane) Wu.DomUtil.removeClass(app._headerPane, 'displayNone');
 
 		// set as active
 		app.activeProject = this;
@@ -18746,6 +18796,9 @@ Wu.App = Wu.Class.extend({
 
 	initialize : function (options) {
 
+		// prototypes for compatiblity
+		this._compatabilityChecks();
+
 		// set global this
 		Wu.app = this;
 
@@ -18759,6 +18812,15 @@ Wu.App = Wu.Class.extend({
 		// get objects from server
 		this.initServer();
 
+	},
+
+	_compatabilityChecks : function () {
+		Function.prototype.bind = Function.prototype.bind || function (thisp) {
+			var fn = this;
+			return function () {
+				return fn.apply(thisp, arguments);
+			};
+		};
 	},
 
 	initServer : function () {
@@ -18800,9 +18862,53 @@ Wu.App = Wu.Class.extend({
 		// init pane view
 		this._initView();
 
+		// init global events
+		this._initEvents();
+
 		// ready
 		this._ready = true;
 
+	},
+
+	_initEvents : function () {
+
+		Wu.DomEvent.on(window, 'resize', this._resizeEvents, this);
+
+	},
+
+	_resizeEvents : function (e) {
+
+		// get window dimensions
+		var dimensions = this._getDimensions(e);
+
+		// mappane resize event
+		if (app.MapPane) app.MapPane.resizeEvent(dimensions);
+
+		// legends control resize
+		var legendsControl = app.MapPane.legendsControl;
+		if (legendsControl) legendsControl.resizeEvent(dimensions);
+
+		// layermenu control resize
+		var layermenuControl = app.MapPane.layerMenu;
+		if (layermenuControl) layermenuControl.resizeEvent(dimensions);
+
+	},
+
+	_getDimensions : function (e) {
+		var w = window,
+		    d = document,
+		    e = d.documentElement,
+		    g = d.getElementsByTagName('body')[0],
+		    x = w.innerWidth || e.clientWidth || g.clientWidth,
+		    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+
+		var d = {
+			height : y,
+			width : x,
+			e : e
+		}
+
+		return d;
 	},
 
 	_initContainer : function () {

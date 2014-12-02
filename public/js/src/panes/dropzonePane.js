@@ -12,11 +12,10 @@ Wu.Dropzone = Wu.Class.extend({
 		this._container = Wu.DomUtil.create('div', 'dropzone-pane', app._appPane);
 		this._content = Wu.DomUtil.create('div', 'dropzone-content', this._container);
 		this._hidden = Wu.DomUtil.create('div', 'dropzone-hidden', this._container);
+		this._meta = Wu.DomUtil.create('div', 'dropzone-meta', this._container);
 
 		// create progress bar
 		this.progress = new Wu.ProgressPane();
-
-		console.log('drozpone progress::: ', this.progress);
 
 		// hide by default
 		this.hide();
@@ -50,7 +49,6 @@ Wu.Dropzone = Wu.Class.extend({
 				maxFiles : 10,
 				parallelUploads : 10,
 				clickable : this._clickable || false,
-				// autoProcessQueue : true
 		});
 
 		// add fullscreen dropzone
@@ -65,8 +63,6 @@ Wu.Dropzone = Wu.Class.extend({
 		Wu.DomEvent.on(document.body, 'dragleave', this.undropping, this);
 		Wu.DomEvent.on(document.body, 'dragover', this.dragover, this);
 		Wu.DomEvent.on(document.body, 'drop', this.dropped, this);
-
-
 	},
 
 
@@ -101,8 +97,6 @@ Wu.Dropzone = Wu.Class.extend({
 
 		this.dz.on('dragenter', function (e) { 
 		
-			console.log('drageneter dropzonePane');
-
 		});
 
 		this.dz.on('addedfile', function (file) { 
@@ -123,10 +117,9 @@ Wu.Dropzone = Wu.Class.extend({
 
 
 		this.dz.on('complete', function (file) {
-			
+		
 			// clean up
 			that.dz.removeFile(file);
-
 		});
 
 		this.dz.on('uploadprogress', function (file, progress) {
@@ -136,51 +129,21 @@ Wu.Dropzone = Wu.Class.extend({
 		});                                                                                                                                                                                                               
 
 		this.dz.on('successmultiple', function (err, json) {
+		
 			// parse and process
 			var obj = Wu.parse(json);
 
 			// set status
 			app.setStatus('Done!', 2000);
 
+			// callback
 			if (obj) that._uploadedCallback(obj);
 
 			// clear fullpane
 			that.progress.hideProgress();
 		});
-
-		
-		console.log('dz events doen');
-
-
+	
 	},
-
-
-	showProgress : function () {
-
-		
-
-	},
-
-
-	setProgress : function (p) {
-		
-
-
-	},
-
-	resetProgress : function () {
-		
-
-	},
-
-	// show : function () {
-	// 	console.log('show!');
-	// },
-
-	// hide : function () {
-	// 	console.log('hide!');
-	// },
-
 
 	dropping : function (e) {
 		e.preventDefault();
@@ -213,14 +176,6 @@ Wu.Dropzone = Wu.Class.extend({
 
 		// console.log('dragover', e.target);
 	},
-
-
-
-
-
-
-
-
 
 
 
