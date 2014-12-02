@@ -77,10 +77,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// init download table
 		this.initDownloadTable();
 
-
 		// add tooltip
 		app.Tooltip.add(this._menu, 'The data library contains all files uploaded to the project.');
-
 
 	},
 
@@ -88,7 +86,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	addHooks : function () {
 	       
 		// download button
-		// Wu.DomEvent.on(this._downloader, 'mousedown', this.downloadConfirm, this);
 		Wu.DomEvent.on(this._download, 'mousedown', this.downloadFiles, this);
 
 		// check all button
@@ -138,7 +135,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	_deactivate : function () {
 		if (this.dz) this.dz.disable();
-		this.disableFullscreenDZ();
 	},
 
 	initDownloadTable : function () {
@@ -363,255 +359,250 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	// is only fired once ever
 	initDZ : function () {
-		var that = this;
+		if (!app.Dropzone) return;
 
-
-		var dropzone = app.Dropzone;
-		dropzone.initDropzone({
+		// create dropzone
+		app.Dropzone.initDropzone({
 			uploaded : this.uploaded.bind(this),
 			clickable : this._uploader
 
 		});
 
-		return;
 
+		// // create dz
+		// this.dz = new Dropzone(this._uploader, {
+		// 		url : '/api/upload',
+		// 		createImageThumbnails : false,
+		// 		autoDiscover : false,
+		// 		uploadMultiple : true,
+		// 		acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.docx,.pdf,.doc,.txt',
+		// 		// acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.json,.topojson,.kml,.docx,.pdf,.doc,.txt',
+		// 		maxFiles : 10,
+		// 		parallelUploads : 10
+		// 		// autoProcessQueue : true
+		// });
 
-		// create dz
-		this.dz = new Dropzone(this._uploader, {
-				url : '/api/upload',
-				createImageThumbnails : false,
-				autoDiscover : false,
-				uploadMultiple : true,
-				acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.docx,.pdf,.doc,.txt',
-				// acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.json,.topojson,.kml,.docx,.pdf,.doc,.txt',
-				maxFiles : 10,
-				parallelUploads : 10
-				// autoProcessQueue : true
-		});
-
-		// add fullscreen dropzone
-		this.enableFullscreenDZ();                                                                                                                                                                   
+		// // add fullscreen dropzone
+		// this.enableFullscreenDZ();                                                                                                                                                                   
 		
 	},
 
-	enableFullscreenDZ : function () {
+	// enableFullscreenDZ : function () {
 
-		// add fullscreen bridge to dropzone
-		Wu.DomEvent.on(document, 'dragenter', this.dropping, this);
-		Wu.DomEvent.on(document, 'dragleave', this.undropping, this);
-		Wu.DomEvent.on(document, 'dragover', this.dragover, this);
-		Wu.DomEvent.on(document, 'drop', this.dropped, this);
+	// 	// add fullscreen bridge to dropzone
+	// 	Wu.DomEvent.on(document, 'dragenter', this.dropping, this);
+	// 	Wu.DomEvent.on(document, 'dragleave', this.undropping, this);
+	// 	Wu.DomEvent.on(document, 'dragover', this.dragover, this);
+	// 	Wu.DomEvent.on(document, 'drop', this.dropped, this);
 
 
-	},
+	// },
 
-	disableFullscreenDZ : function () {
+	// disableFullscreenDZ : function () {
 
-		// remove fullscreen bridge to dropzone
-		Wu.DomEvent.off(document, 'dragenter', this.dropping, this);
-		Wu.DomEvent.off(document, 'dragleave', this.undropping, this);
-		Wu.DomEvent.off(document, 'dragover', this.dragover, this);
-		Wu.DomEvent.off(document, 'drop', this.dropped, this);
+	// 	// remove fullscreen bridge to dropzone
+	// 	Wu.DomEvent.off(document, 'dragenter', this.dropping, this);
+	// 	Wu.DomEvent.off(document, 'dragleave', this.undropping, this);
+	// 	Wu.DomEvent.off(document, 'dragover', this.dragover, this);
+	// 	Wu.DomEvent.off(document, 'drop', this.dropped, this);
 
-	},
+	// },
 
 	refreshDZ : function () {
-		var that = this;
 
-
+		// refresh dropzone
 		var dropzone = app.Dropzone;
 		dropzone.refresh();
 
-		return;
 
 
-		// clean up last dz
-		this.dz.removeAllListeners();
+		// // clean up last dz
+		// this.dz.removeAllListeners();
 
-		// set project uuid for dropzone
-		this.dz.options.params.project = this.project.getUuid();	// goes to req.body.project
+		// // set project uuid for dropzone
+		// this.dz.options.params.project = this.project.getUuid();	// goes to req.body.project
 
-		// set dz events
-		this.dz.on('drop', function (e) { 
-		});
+		// // set dz events
+		// this.dz.on('drop', function (e) { 
+		// });
 
-		this.dz.on('dragenter', function (e) { 
-		});
+		// this.dz.on('dragenter', function (e) { 
+		// });
 
-		this.dz.on('addedfile', function (file) { 
+		// this.dz.on('addedfile', function (file) { 
 
-			console.log('addedfile: dataLibrary');
+		// 	console.log('addedfile: dataLibrary');
 
-			// show progressbar
-			that.progress.style.opacity = 1;
+		// 	// show progressbar
+		// 	that.progress.style.opacity = 1;
 
-			// show fullscreen file info
-			if (!that._fulldrop) {
-				that.fullOn(file);
-				that.fullUpOn(file);
-			}
+		// 	// show fullscreen file info
+		// 	if (!that._fulldrop) {
+		// 		that.fullOn(file);
+		// 		that.fullUpOn(file);
+		// 	}
 
-			// set status
-			app.setStatus('Uploading');
-		});
+		// 	// set status
+		// 	app.setStatus('Uploading');
+		// });
 
 
-		this.dz.on('complete', function (file) {
+		// this.dz.on('complete', function (file) {
 			
-			// clean up
-			that.dz.removeFile(file);
+		// 	// clean up
+		// 	that.dz.removeFile(file);
 
-		});
+		// });
 
-		this.dz.on('uploadprogress', function (file, progress) {
-			// set progress
-			that.progress.style.width = progress + '%';
-		});                                                                                                                                                                                                               
+		// this.dz.on('uploadprogress', function (file, progress) {
+		// 	// set progress
+		// 	that.progress.style.width = progress + '%';
+		// });                                                                                                                                                                                                               
 
-		this.dz.on('successmultiple', function (err, json) {
-			// parse and process
-			var obj = Wu.parse(json);
+		// this.dz.on('successmultiple', function (err, json) {
+		// 	// parse and process
+		// 	var obj = Wu.parse(json);
 
-			// set status
-			app.setStatus('Done!', 2000);
+		// 	// set status
+		// 	app.setStatus('Done!', 2000);
 
-			if (obj) { that.uploaded(obj); }
+		// 	if (obj) { that.uploaded(obj); }
 
-			// clear fullpane
-			that.resetProgressbar();
-		});
+		// 	// clear fullpane
+		// 	that.resetProgressbar();
+		// });
 
 		
 
 	},
 
-	resetProgressbar : function () {
-		// reset progressbar
-		this.progress.style.opacity = 0;
-		this.progress.style.width = '0%';
+	// resetProgressbar : function () {
+	// 	// reset progressbar
+	// 	this.progress.style.opacity = 0;
+	// 	this.progress.style.width = '0%';
 
-		// reset .fullscreen-drop
-		this.fulldropOff();
-		this.fullUpOff();
-		this._fulldrop = false;
+	// 	// reset .fullscreen-drop
+	// 	this.fulldropOff();
+	// 	this.fullUpOff();
+	// 	this._fulldrop = false;
 
-	},
+	// },
 
 
-	_createFileMetaContent : function (file) {
-		if (!file) return; 			// todo: file undefined on drag'n drop
+	// _createFileMetaContent : function (file) {
+	// 	if (!file) return; 			// todo: file undefined on drag'n drop
 
-		console.log('_createFileMetaContent file:', file);
+	// 	console.log('_createFileMetaContent file:', file);
 
-		var wrapper 	= Wu.DomUtil.create('div', 'drop-meta-wrapper');
-		var name 	= Wu.DomUtil.create('div', 'drop-meta-name', wrapper);
-		var size 	= Wu.DomUtil.create('div', 'drop-meta-size', wrapper);
-		var type 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
-		var ext 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
+	// 	var wrapper 	= Wu.DomUtil.create('div', 'drop-meta-wrapper');
+	// 	var name 	= Wu.DomUtil.create('div', 'drop-meta-name', wrapper);
+	// 	var size 	= Wu.DomUtil.create('div', 'drop-meta-size', wrapper);
+	// 	var type 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
+	// 	var ext 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
 
-		name.innerHTML = 'Name: ' + file.name;
-		size.innerHTML = 'Size: ' + Wu.Util.bytesToSize(file.size);
-		type.innerHTML = 'Type: ' + file.type.split('/')[0].camelize();
-		ext.innerHTML  = 'Filetype: ' + file.type.split('/')[1];
+	// 	name.innerHTML = 'Name: ' + file.name;
+	// 	size.innerHTML = 'Size: ' + Wu.Util.bytesToSize(file.size);
+	// 	type.innerHTML = 'Type: ' + file.type.split('/')[0].camelize();
+	// 	ext.innerHTML  = 'Filetype: ' + file.type.split('/')[1];
 
-		return wrapper;
-	},
+	// 	return wrapper;
+	// },
 	
-	// cxxxx
-	// fullscreen when started uploading                                            // TODO: refactor fullUpOn etc..
-	fullUpOn : function (file) {                                                    //       add support for multiple files
-		// transform .fullscreen-drop                                           //       bugtest more thourougly
+	// // cxxxx
+	// // fullscreen when started uploading                                            // TODO: refactor fullUpOn etc..
+	// fullUpOn : function (file) {                                                    //       add support for multiple files
+	// 	// transform .fullscreen-drop                                           //       bugtest more thourougly
 	
-		// add file info
-		var meta = this._createFileMetaContent(file);
-		if (meta) this.fulldrop.appendChild(meta);	// append meta
+	// 	// add file info
+	// 	var meta = this._createFileMetaContent(file);
+	// 	if (meta) this.fulldrop.appendChild(meta);	// append meta
 
-		// show
-		Wu.DomUtil.addClass(this.fulldrop, 'fullscreen-dropped');
-	},
+	// 	// show
+	// 	Wu.DomUtil.addClass(this.fulldrop, 'fullscreen-dropped');
+	// },
 
-	fullUpOff : function () {
+	// fullUpOff : function () {
 
-		Wu.DomUtil.removeClass(this.fulldrop, 'fullscreen-dropped');
-		this.fulldrop.innerHTML = '';
-	},
+	// 	Wu.DomUtil.removeClass(this.fulldrop, 'fullscreen-dropped');
+	// 	this.fulldrop.innerHTML = '';
+	// },
 
-	// fullscreen for dropping on
-	fulldropOn : function (e) {
+	// // fullscreen for dropping on
+	// fulldropOn : function (e) {
 
-		// turn on fullscreen-drop
-		this.fullOn();
+	// 	// turn on fullscreen-drop
+	// 	this.fullOn();
 		
-		// remember drop elem
-		this._fulldrop = e.target.className;
+	// 	// remember drop elem
+	// 	this._fulldrop = e.target.className;
 
-	},
-	fulldropOff : function () {
-		// turn off .fullscreen-drop
-		this.fullOff();
-	},
+	// },
+	// fulldropOff : function () {
+	// 	// turn off .fullscreen-drop
+	// 	this.fullOff();
+	// },
 
-	// fullscreen for dropping on
-	fullOn : function () {
+	// // fullscreen for dropping on
+	// fullOn : function () {
 
-		// turn on fullscreen-drop
-		this.fulldrop.style.opacity = 1;				// wow! full up down on dumb! RE.FACTOR!
-		this.fulldrop.style.zIndex = 1000;
+	// 	// turn on fullscreen-drop
+	// 	this.fulldrop.style.opacity = 1;				// wow! full up down on dumb! RE.FACTOR!
+	// 	this.fulldrop.style.zIndex = 1000;
 
-		// Hide the background container (j)
-		this._container.style.display = 'none';
+	// 	// Hide the background container (j)
+	// 	this._container.style.display = 'none';
 
-		// Hide toolbar (upload, download, delete, search); (j)
-		Wu.DomUtil.addClass(this._content, 'hide-top', this);
+	// 	// Hide toolbar (upload, download, delete, search); (j)
+	// 	Wu.DomUtil.addClass(this._content, 'hide-top', this);
 
-	},
+	// },
 
-	fullOff : function () {
+	// fullOff : function () {
 
-		var that = this;
-		this.fulldrop.style.opacity = 0;
+	// 	var that = this;
+	// 	this.fulldrop.style.opacity = 0;
 
-		// Hide the background container (j)
-		this._container.style.display = 'block';
+	// 	// Hide the background container (j)
+	// 	this._container.style.display = 'block';
 
-		// Hide toolbar (upload, download, delete, search); (j)
-		Wu.DomUtil.removeClass(this._content, 'hide-top', this);
+	// 	// Hide toolbar (upload, download, delete, search); (j)
+	// 	Wu.DomUtil.removeClass(this._content, 'hide-top', this);
 
 
-		setTimeout(function () {        // hack for transitions
-			 that.fulldrop.style.zIndex = -10;
-		}, 200);
-	},
+	// 	setTimeout(function () {        // hack for transitions
+	// 		 that.fulldrop.style.zIndex = -10;
+	// 	}, 200);
+	// },
 
-	dropping : function (e) {
-		e.preventDefault();
+	// dropping : function (e) {
+	// 	e.preventDefault();
 	    
-		// show .fullscreen-drop
-		this.fulldropOn(e);
-	},
+	// 	// show .fullscreen-drop
+	// 	this.fulldropOn(e);
+	// },
 
-	undropping : function (e) {
-		e.preventDefault();
-		var t = e.target.className;
+	// undropping : function (e) {
+	// 	e.preventDefault();
+	// 	var t = e.target.className;
 
-		// if leaving elem that started drop
-		if (t == this._fulldrop) this.fulldropOff(e);
-	},
+	// 	// if leaving elem that started drop
+	// 	if (t == this._fulldrop) this.fulldropOff(e);
+	// },
 
-	dropped : function (e) {
-		e.preventDefault();
+	// dropped : function (e) {
+	// 	e.preventDefault();
 		
-		// transform .fullscreen-drop
-		this.fullUpOn();
+	// 	// transform .fullscreen-drop
+	// 	this.fullUpOn();
 
-		// fire dropzone
-		this.dz.drop(e);
-	},
+	// 	// fire dropzone
+	// 	this.dz.drop(e);
+	// },
 
-	dragover : function (e) {
-		// needed for drop fn
-		e.preventDefault();
-	},
+	// dragover : function (e) {
+	// 	// needed for drop fn
+	// 	e.preventDefault();
+	// },
 
 	handleError : function (error) {
 
@@ -623,16 +614,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	// process file
 	uploaded : function (record, options) {
 		
-		console.log('########## uploaded #########');
-		console.log('record:', record);
-		console.log('options: ', options);
-
 		var options = options || {};
 		
 		// handle errors
-		if (record.errors) {
-			this.handleError(record.errors);
-		}
+		if (record.errors) this.handleError(record.errors);
 		
 		// return if nothing
 		if (!record.files) return;
@@ -651,7 +636,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			this.project.addLayer(layer);
 		}, this);
 		
-
 		// refresh sidepane
 		this.project.refreshSidepane();
 
@@ -659,8 +643,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var cartoCss = app.MapPane.cartoCss;
 		if (cartoCss) cartoCss.update();
 
-
-		console.log('refreshing table! -->', this);
+		// refresh
 		this.reset();
 		this.refreshTable();
 
@@ -847,7 +830,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	removeCategory : function (category) {
-		console.log('removing cateory:', category);
 
 		// remove from project
 		this.project.removeCategory(category);
@@ -876,8 +858,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_closeCategories : function () {
-		console.log('_closeCategories');
-
 		this.closeCategories();
 	},
 
@@ -897,20 +877,17 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// on enter
 		if (e.keyCode == 13) {
 
+			// get value
 			var value = this._injectedNewline.value;
-			console.log('value: ', value);
 
 			// create new category
 			this.project.addCategory(value);
 
-			// set category
-			console.log('E e E e ', e);
+			// get file
 			var fileUuid = this._injectedUuid;
-			console.log('injectUuuid', fileUuid);
-
-
-
 			var file = this.project.getFile(fileUuid);
+
+			// set category
 			file.setCategory(value);
 
 			// close
@@ -933,7 +910,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	injectKeywords : function (e) {
-		console.log('injectCategory', e);
 
 		var fuuid = e.target.parentNode.id;
 		this._injectedUuid = fuuid;
@@ -1056,8 +1032,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		app.setSaveStatus();
 	},
 
-	
-
 	updateContent : function () {
 		this.update();
 	},
@@ -1091,11 +1065,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	refreshTable : function () {
 
 		// return if empty filelist
-		// if (!this.project.store.files) { return; }
 		if (!this.project.files) { return; }
 
 		// enter files into table
-		// this.project.store.files.forEach(function (file, i, arr) {
 		for (f in this.project.files) {
 			var file = this.project.files[f];
 			this.addFile(file);
@@ -1111,8 +1083,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.list.clear();
 
 		// remove uploading, in case bug
-		this.fullOff();
-		this.fulldropOff();
+		// this.fullOff();
+		// this.fulldropOff();
 
 	}
 

@@ -159,7 +159,6 @@ Wu.Dropzone = Wu.Class.extend({
 
 		// refresh project
 		this.project = app.activeProject;
-		// if (!this.project) return;
 
 		// clean up last dz
 		this.dz.removeAllListeners();
@@ -169,9 +168,7 @@ Wu.Dropzone = Wu.Class.extend({
 
 		// set dz events
 		this.dz.on('drop', function (e) { 
-			console.log('dz.drop');
 			that.hide();
-			// that.showMeta();
 		});
 
 		this.dz.on('dragenter', function (e) { 
@@ -179,8 +176,6 @@ Wu.Dropzone = Wu.Class.extend({
 		});
 
 		this.dz.on('addedfile', function (file) { 
-
-			console.log('addedfile dropzonePane', file);
 
 			// show meta screen
 			that.showMeta();
@@ -207,7 +202,6 @@ Wu.Dropzone = Wu.Class.extend({
 
 		this.dz.on('uploadprogress', function (file, progress) {
 			// set progress
-			// that.progress.style.width = progress + '%';
 			that.progress.setProgress(progress);
 		});                                                                                                                                                                                                               
 
@@ -230,7 +224,6 @@ Wu.Dropzone = Wu.Class.extend({
 
 	dropping : function (e) {
 		e.preventDefault();
-		console.log('dropping');
 	    
 		// show .fullscreen-drop
 		this.show(e);
@@ -247,8 +240,6 @@ Wu.Dropzone = Wu.Class.extend({
 	dropped : function (e) {
 		e.preventDefault();
 
-		console.log('dropped');
-		
 		// fire dropzone
 		this.dz.drop(e);
 	},
@@ -256,8 +247,6 @@ Wu.Dropzone = Wu.Class.extend({
 	dragover : function (e) {
 		// needed for drop fn
 		e.preventDefault();
-
-		// console.log('dragover', e.target);
 	},
 
 
