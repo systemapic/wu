@@ -23,7 +23,37 @@ Wu.StartPane = Wu.Class.extend({
 		// Reverse so we get newest first
 		projects.reverse();
 
-		this._container = Wu.DomUtil.createId('div', 'start-pane', Wu.app._mapContainer);
+		// this._container = Wu.DomUtil.createId('div', 'start-pane', Wu.app._mapContainer);
+
+		// Main container
+		this._container = Wu.DomUtil.createId('div', 'start-panne-canvas-container', Wu.app._mapContainer);
+		
+		// Circle
+		this._circleContainer = Wu.DomUtil.createId('div', 'start-panne-circle-container', this._container);
+		this._circle = Wu.DomUtil.createId('div', 'start-panne-circle', this._circleContainer);
+
+		// Black banner
+		this._bannerContainer = Wu.DomUtil.createId('div', 'start-panne-banner-container', this._container);
+		this._banner = Wu.DomUtil.createId('div', 'start-panne-banner', this._bannerContainer);
+
+		// Big client Logo (Rüppell's Griffon)
+		this._logo = Wu.DomUtil.createId('div', 'start-panne-logo', this._banner);
+
+		// Project list container + header
+		this._recentProjectsContainer = Wu.DomUtil.createId('div', 'start-panne-recent-projects-container', this._banner);
+		this._recentProjectsHeader = Wu.DomUtil.create('h1', '', this._recentProjectsContainer);
+		this._recentProjectsHeader.innerHTML = 'Recent projects';
+
+		// Project list
+		this._projectList = Wu.DomUtil.createId('div', 'start-panne-project-list', this._recentProjectsContainer);
+
+		// Spinning canvas
+		this._spinningCanvasContainer = Wu.DomUtil.createId('div', 'start-panne-spinning-canvas-container', this._container);
+		this._spinningCanvas = Wu.DomUtil.createId('div', 'start-panne-spinning-canvas', this._spinningCanvasContainer);
+		this._bgMap = Wu.DomUtil.createId('div', 'start-panne-bg-map', this._spinningCanvas);
+
+
+
 
 		// Pull out the latest three Projects	
 		for ( var i = 0; i<projects.length-1; i++ ) {
@@ -40,33 +70,33 @@ Wu.StartPane = Wu.Class.extend({
 	createStartProject : function(project) {
 
 		var _name 		= 	project.getName()
-		// var _description	= 	project.getDescription()
-		var _logo		= 	project.getLogo()
-		// var _client		= 	project.getClient()
+		// var _logo		= 	project.getLogo()
 		var _uuid 		= 	project.getUuid();
 		var _lastUpdated	= 	project.getLastUpdated();
 
 
-		var container = Wu.DomUtil.create('div', 'start-pane-project', this._container);
+		// var container = Wu.DomUtil.create('div', 'start-pane-project', this._container);
+		var projectContainer = Wu.DomUtil.create('div', 'start-panne-recent-projects', this._projectList);
 
-		// Image wrapper
-		var imageWrapper = Wu.DomUtil.create('div', 'start-project-image', container);
 
-		// If there is a logo, render it
-		if ( _logo ) {
-			var logo = Wu.DomUtil.create('img', '', imageWrapper);
-			logo.src = _logo;
-		}
+		// // Image wrapper
+		// var imageWrapper = Wu.DomUtil.create('div', 'start-project-image', container);
+
+		// // If there is a logo, render it
+		// if ( _logo ) {
+		// 	var logo = Wu.DomUtil.create('img', '', imageWrapper);
+		// 	logo.src = _logo;
+		// }
 		
 		// Project title div
-		var name = Wu.DomUtil.create('div', 'start-project-name', container);
+		// var name = Wu.DomUtil.create('div', 'start-project-name', container);
 
 		// Adjust for short titles
-		if ( _name.length < 22 ) Wu.DomUtil.addClass(name, 'start-project-short-name');
-		name.innerHTML = _name;
+		if ( _name.length < 22 ) Wu.DomUtil.addClass(projectContainer, 'start-project-short-name');
+		projectContainer.innerHTML = _name;
 
 		// Register hook
-		Wu.DomEvent.on(container, 'mousedown', function() { this.activate(_uuid) }, this);
+		Wu.DomEvent.on(projectContainer, 'mousedown', function() { this.activate(_uuid) }, this);
 
 	},
 

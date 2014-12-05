@@ -329,11 +329,74 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	removeMapboxAccount : function (account) {
-		_.remove(this.store.connectedAccounts.mapbox, function (m) {	// todo: include access token
+		var removed = _.remove(this.store.connectedAccounts.mapbox, function (m) {	// todo: include access token
 			return m == account;
 		});
 		this._update('connectedAccounts');
+
+		console.log('removeMapboxAccount', removed);
+
+		// todo: remove active layers, etc.
+		var layers = this.getLayers();
+		console.log('lauyers: ', layers);
+
+		var lids = [];
+
+		layers.forEach(function (layer) {
+			console.log('layer..', layer);
+			if (!layer.store.data) return;
+			if (!layer.store.data.mapbox) return;
+
+			var mid = layer.store.data.mapbox;
+			var m = mid.split('.')[0];
+			if (m == account.username) {
+				console.log('MATCH!', layer, m, account);
+				this._removeLayer(layer);
+				lids.push(layer.getUuid());
+			}
+		}, this);
+
+		// todo: remove on server, ie. remove layers from project...
+		// remove from server
+		var json = {
+		    projectUuid : this.getUuid(),
+		    layerUuids : lids
+		}
+		console.log('server deleta lyer', json);
+		var string = JSON.stringify(json);
+		Wu.save('/api/layers/delete', string); 
+
 	},
+
+	_removeLayer : function (layer) {
+
+		console.log('___________________');
+		console.log('_removeLayer', layer);
+		console.log('lm: ', this.store.layermenu);
+		console.log('bl: ', this.store.baseLayers);
+		console.log('sl: ', this.store.layers);
+
+		// remove from layermenu & baselayer store
+		_.remove(this.store.layermenu, function (item) { return item.layer == layer.getUuid(); });
+		_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.getUuid(); });
+
+		// remove from layermenu
+		var layerMenu = app.MapPane.layerMenu;
+		if (layerMenu) layerMenu.onDelete(layer);
+
+		// remove from map
+		layer.remove();
+			
+		// remove from local store
+		var a = _.remove(this.store.layers, function (item) { return item.uuid == layer.getUuid(); });	// dobbelt opp, lagt til to ganger! todo
+		delete this.layers[layer.getUuid()];
+
+		// save changes
+		this._update('layermenu'); 
+		this._update('baseLayers');
+
+		
+	},	
 
 	getName : function () {
 		return this.store.name;
@@ -713,12 +776,13 @@ Wu.Project = Wu.Class.extend({
 			if (layer) {
 				// remove from layermenu & baselayer store
 				_.remove(this.store.layermenu, function (item) { return item.layer == layer.store.uuid; });
-				// var baseLayer = _.find(this.store.baseLayers, function (b) { return b.uuid == layer.store.uuid;});
-				// console.log('baseLayer: ', baseLayer, layer);
 				_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.store.uuid; });
 
 				// remove from layermenu
 				if (layerMenu) layerMenu.onDelete(layer);
+
+				// remove from map
+				layer.remove();
 					
 				// remove from local store
 				var a = _.remove(this.store.layers, function (item) { return item.uuid == layer.store.uuid; });	// dobbelt opp, lagt til to ganger! todo
@@ -812,6 +876,7 @@ Wu.Project = Wu.Class.extend({
 
 	// settings
 	toggleSetting : function (setting) {
+		console.log('project toggleSetting', setting);
 		this.getSettings()[setting] ? this['disable' + setting.camelize()]() : this['enable' + setting.camelize()]();
 		this.store.settings[setting] = !this.store.settings[setting];
 		this._update('settings');

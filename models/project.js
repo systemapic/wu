@@ -135,7 +135,7 @@ var projectSchema = mongoose.Schema({
 		autoHelp 	: { type: Boolean, default: false },
 		autoAbout 	: { type: Boolean, default: false },
 		darkTheme 	: { type: Boolean, default: false },
-		tooltips 	: { type: Boolean, default: true },
+		tooltips 	: { type: Boolean, default: false },
 		mediaLibrary 	: { type: Boolean, default: false },
 		mapboxGL	: { type: Boolean, default: false },
 	}

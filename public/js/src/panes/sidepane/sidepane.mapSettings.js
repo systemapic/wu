@@ -1353,8 +1353,6 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 	toggleControl : function (e) {
 		
-		// cxxxx
-
 		// prevent default checkbox behaviour
 		if (e.type == 'click') return Wu.DomEvent.stop(e);
 	
@@ -1551,11 +1549,11 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		this.resetInput();
 
 		// get mapbox account via server
-		this._importMapbox(username, accessToken);
+		this._importMapbox(username, accessToken, this.importedMapbox);
 
 	},
 
-	_importMapbox : function (username, accessToken) {
+	_importMapbox : function (username, accessToken, callback) {
 
 		// get mapbox account via server
 		var data = {
@@ -1564,7 +1562,7 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 			'projectId' : this.project.store.uuid
 		}
 		// post         path                            json          callback      this
-		Wu.post('/api/util/getmapboxaccount', JSON.stringify(data), this.importedMapbox, this);
+		Wu.post('/api/util/getmapboxaccount', JSON.stringify(data), callback, this);
 	},
 
 	importedMapbox : function (that, json) {
@@ -1579,6 +1577,7 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 			return;
 		}
 
+		// update project
 		that.project.setStore(store);
 
 	},
@@ -1596,29 +1595,69 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		
 		// fill with accounts
 		accounts.forEach(function (account) {
-			var wrap  = Wu.DomUtil.create('div', 'mapbox-listed-account', this._mapboxAccounts);
-			var title = Wu.DomUtil.create('div', 'mapbox-listed-account-title', wrap, account.username.camelize());
-
-			// add kill button for editMode... // todo: what about layers in deleted accounts, etc etc??
-			// if (this.project.editMode) {
-			// 	var kill = Wu.DomUtil.create('div', 'mapbox-listed-account-kill', wrap, 'X');
-				
-			// 	// add hook
-			// 	Wu.DomEvent.on(kill, 'click', function () {
-			// 		this.removeAccount(wrap, account);
-			// 	}, this);
-			// }
-
+			this._insertMapboxAccount(account);
 		}, this);
 		
+	},
+
+	_insertMapboxAccount : function (account) {
+
+		// wrap
+		var wrap  = Wu.DomUtil.create('div', 'mapbox-listed-account', this._mapboxAccounts);
+		
+		// title
+		var title = Wu.DomUtil.create('div', 'mapbox-listed-account-title', wrap, account.username.camelize());
+
+		// return if not edit mode
+		if (!this.project.editMode) return;
+
+		// refresh button 
+		var refresh = Wu.DomUtil.create('div', 'mapbox-listed-account-refresh', wrap);
+
+		// delete button
+		var del = Wu.DomUtil.create('div', 'mapbox-listed-account-delete', wrap);
+
+
+		// refresh event
+		Wu.DomEvent.on(refresh, 'mousedown', function (e) {
+			Wu.DomEvent.stop(e);
+			var msg = 'Are you sure you want to refresh the account? This will DELETE old layers and re-import them.';
+			if (confirm(msg)) this._refreshMapboxAccount(wrap, account);
+		}, this);
+
+		// delete event
+		Wu.DomEvent.on(del, 'mousedown', function (e) {
+			Wu.DomEvent.stop(e);
+			console.log('delete account');
+			
+			// remove account
+			var msg = 'Are you sure you want to delete the account? This will DELETE all layers from account in this project.';
+			if (confirm(msg)) this._removeMapboxAccount(wrap, account);
+			
+		}, this);
 
 	},
 
-	removeAccount : function (div, account) {
+	_removeMapboxAccount : function (div, account) {
 		Wu.DomUtil.remove(div);
 		this.project.removeMapboxAccount(account);
 	},
 
+	_refreshMapboxAccount : function (div, account) {
+		console.log('_refreshMapboxAccount', account);
+
+		// delete and re-import
+		this._removeMapboxAccount(div, account);
+
+		// get mapbox account via server
+		var that = this;
+		setTimeout(function () {
+			that._importMapbox(account.username, account.accessToken, that.importedMapbox);
+		}, 1000); // hack! todo!
+
+	},
+
+	
 	update : function () {
 		Wu.SidePane.Map.MapSetting.prototype.update.call(this)	// call update on prototype
 
@@ -1649,7 +1688,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		autoAbout 	: true,
 		darkTheme 	: true,
 		tooltips 	: true,
-		mapboxGL	: false 
+		mapboxGL	: false,
 
 	},
 
@@ -1661,7 +1700,6 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		this._outer 	= Wu.DomUtil.create('div', 'settings-outer', this._container);
 
 		// add tooltip
-		// app.Tooltip.add(this._container, 'Enable additional map settings.');
 		app.Tooltip.add(h4, 'Enable additional map settings.');
 
 
@@ -1669,9 +1707,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 
 	addHooks : function () {
 		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
-
 		Wu.DomEvent.on(this._outer, 'mousedown', Wu.DomEvent.stopPropagation, this);
-
 	},
 
 	removeHooks : function () {
@@ -1683,12 +1719,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 	calculateHeight : function () {
 		var num = _.filter(this.options, function (o) { return o; }).length;
 		this.maxHeight = num * 30;
-		this.minHeight = 0;
-
-
-		// var x = _.size(this.controls);
-		// this.maxHeight = x * 30 + 30;
-		// this.minHeight = 0;		
+		this.minHeight = 0;	
 	},
 
 	contentLayout : function () {
@@ -1815,8 +1846,8 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		label.setAttribute('for', id);
 
 		// set events
-		Wu.DomEvent.on(titlediv, 'click', function (e) {			
-			Wu.DomEvent.stopPropagation(e);
+		Wu.DomEvent.on(div, 'click', function (e) {			
+			Wu.DomEvent.stop(e);
 
 			// toggle setting
 			this.project.toggleSetting(setting);
@@ -1824,17 +1855,11 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 			// refresh settings
 			this._settings = this.project.getSettings();
 
-			// Toggle button
-			if (this._settings[setting]) {
-				 input.setAttribute('checked', 'checked');
-			} else {
-				 input.removeAttribute('checked');
-			}
+			// toggle button
+			this._settings[setting] ? input.setAttribute('checked', 'checked') : input.removeAttribute('checked');
 			
 		}, this);
 		 
-		Wu.DomEvent.on(switchWrap, 'mousedown', Wu.DomEvent.stopPropagation);
-
 		// return div
 		return div;
 

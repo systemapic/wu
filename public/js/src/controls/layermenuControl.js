@@ -456,8 +456,92 @@ L.Control.Layermenu = L.Control.extend({
 		return true;
 	},
 
+	markInvalid : function (invalids) {
+		console.log('markInvalid!!', invalids);
+
+		invalids.forEach(function (invalid) {
+
+			// get div
+			var div = this.layers[invalid.uuid].el;
+			Wu.DomUtil.addClass(div, 'invalidLayermenuitem');
+
+
+		}, this)
+	},
+
+	clearInvalid : function () {
+		console.log('clearInvalid!');
+		for (l in this.layers) {
+			var layer = this.layers[l];
+			Wu.DomUtil.removeClass(layer.el, 'invalidLayermenuitem');
+		}
+	},
+
+
+	// check logic
+	checkLogic : function () {
+
+		// clear prev invalids
+		this.clearInvalid();
+
+		// vars
+		var array = this.project.store.layermenu;
+		var invalid = [];
+
+		// iterate each layermenuitem
+		array.forEach(function (item, i, arr) {
+
+			// rule #1: first item must be at pos 0;
+			if (i==0) {
+				if (item.pos != 0) {
+					return invalid.push(item); // must be 
+				}
+				return invalid;
+			} 
+
+			// rule #2: if item is folder, then it must be at same or lower level than previous (not higher)
+			if (item.folder) {	
+				var thislevel = item.pos;
+				var prevlevel = arr[i-1].pos;
+				if (thislevel > prevlevel) {
+					return invalid.push(item);
+				}
+			}
+
+			// rule #3: if item is deeper than previous, previous must be a folder
+			var thislevel = parseInt(item.pos);
+			var prevlevel = parseInt(arr[i-1].pos);
+			if (thislevel > prevlevel) {
+				if (!arr[i-1].folder) {
+					return invalid.push(item);
+				}
+			}
+
+			// rule #4: if item is deeper than previous, must not be more than one level difference
+			if (parseInt(thislevel) > (parseInt(prevlevel + 1))) {
+				return invalid.push(item);
+			}
+
+		}, this);
+
+		// mark invalid items
+		this.markInvalid(invalid);
+
+		// return
+		return invalid;
+
+	},
+
 	updateLogic : function () {
 
+		// // check validity
+		// var invalid = this.checkLogic();
+		// if (invalid.length) {
+		// 	return console.error('not valid layermenu!', invalid);
+			
+		// } 
+
+		// get vars
 		var array = this.project.store.layermenu;
 		this._logic = this._logic || {};
 
@@ -542,6 +626,11 @@ L.Control.Layermenu = L.Control.extend({
 			panes.forEach(function (pane) {
 				Wu.DomUtil.addClass(pane, 'layeritem-closed')
 				Wu.DomUtil.removeClass(pane, 'layeritem-open');
+
+				// mark closed folder as closed
+				var id = pane.id;
+				if (this._logic[id] && this._logic[id].isOpen) this._logic[id].isOpen = false;
+
 			}, this);
 
 			// mark closed
@@ -611,31 +700,8 @@ L.Control.Layermenu = L.Control.extend({
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 
-		// // add to inspectControl if available
-		// var inspectControl = app.MapPane.inspectControl;		// perhaps refactor this, more centralized
-		// if (inspectControl) inspectControl.addLayer(layer);
-
-		// add to legendsControl if available
-
-		// Removed by Jørgen -> duplicate, legends are already added
-
-//		var legendsControl = app.MapPane.legendsControl;
-//		if (legendsControl) legendsControl.addLegend(layer);
-
-
-		// // add to descriptionControl if available
-		// var descriptionControl = app.MapPane.descriptionControl;
-		// if (descriptionControl) {
-		// 	descriptionControl.setLayer(layer);
-
-		// 	console.log('Layer description is now disabled if it is empty. However, then it will be difficult to write in it, so we need to enable it for admins?')
-		// 	if ( layer.store.description ) { descriptionControl._container.style.display = 'block'; } // (j)
-		// 	else { descriptionControl._container.style.display = 'none'; }
-		
-		// }
 	},
 
-	
 	// disable by layermenuItem
 	disableLayer : function (layermenuItem) {
 
@@ -643,25 +709,7 @@ L.Control.Layermenu = L.Control.extend({
 		if (!layer) return;
 
 		this._disableLayer(layer);
-
-		// // remove from inspectControl if available
-		// var inspectControl = app.MapPane.inspectControl;
-		// if (inspectControl) inspectControl.removeLayer(layer);
-
-		// // remove from legendsControl if available
-		// var legendsControl = app.MapPane.legendsControl;
-		// if (legendsControl) legendsControl.removeLegend(layer);
-
-		// // remove from descriptionControl if avaialbe
-		// var descriptionControl = app.MapPane.descriptionControl;
-		// if (descriptionControl) {
-		// 	descriptionControl.removeLayer(layer);
-		// 	descriptionControl._container.style.display = 'none'; // (j)
-		// }
-
 	},
-
-	
 
 	// disable by layer
 	_disableLayer : function (layer) {
@@ -675,7 +723,6 @@ L.Control.Layermenu = L.Control.extend({
 
 		// remove active class
 		Wu.DomUtil.removeClass(layermenuItem.el, 'layer-active');
-		// Wu.DomUtil.removeClass(layermenuItem.el, 'ct8');
 	},
 
 	_getLayermenuItem : function (layerUuid) {
@@ -797,7 +844,6 @@ L.Control.Layermenu = L.Control.extend({
 		Wu.DomEvent.on(del,  'click', function (e) { this.deleteMenuFolder(uuid); }, this);
 		Wu.DomEvent.on(inner, 'dblclick', function (e) { this._editFolderTitle(uuid); },this);
 
-
 		// prevent layer activation
 		Wu.DomEvent.on(up,   'mousedown', Wu.DomEvent.stop, this);
 		Wu.DomEvent.on(down, 'mousedown', Wu.DomEvent.stop, this);
@@ -805,7 +851,6 @@ L.Control.Layermenu = L.Control.extend({
 
 		// Stop Propagation
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
-
 
 		// add elem to item object
 		layerItem.el = wrap;
@@ -817,9 +862,6 @@ L.Control.Layermenu = L.Control.extend({
 		// refresh sorting
 		this.refreshSortable();
 
-		// show edit buttons
-		// if (this.editMode) this._showEditButtons();
-
 		// add to local store
 		this.layers[item.uuid] = layerItem;
 
@@ -829,7 +871,6 @@ L.Control.Layermenu = L.Control.extend({
 	getLayers : function () {
 		return this.layers;
 	},
-
 	
 	_fill : function () {
 
@@ -894,8 +935,8 @@ L.Control.Layermenu = L.Control.extend({
 
 		var layerItem = this.layers[uuid];
 		var folder = layerItem.el.children[3];
+
 		// inject <input>
-		// var folder = Wu.DomUtil.get('title-' + uuid);
 		var title = folder.innerHTML;
 		folder.innerHTML = '';
 		var input = Wu.DomUtil.create('input', 'layer-item-title-input');
@@ -975,9 +1016,7 @@ L.Control.Layermenu = L.Control.extend({
 
 	},
 
-
 	deleteMenuFolder : function (uuid) {
-
 		// remove
 		this.remove(uuid); // layerMenuItem-32132-123123-adsdsa-sda
 	},
@@ -985,6 +1024,10 @@ L.Control.Layermenu = L.Control.extend({
 
 	save : function () {
 		var that = this;
+
+		// check if valid logic
+		var invalid = this.checkLogic();
+		if (invalid.length) return console.error('not valid layermenu!', invalid);
 
 		// clear timer
 		if (this.saveTimer) clearTimeout(this.saveTimer);

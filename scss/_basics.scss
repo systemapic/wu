@@ -640,6 +640,21 @@ input.cmn-toggle-round-flat:checked + label:after {
 	position: relative;
 	}
 
+.carto-switch-tooltip {
+	top: 4px;
+	right: 6px;
+	z-index: 1;
+	position: absolute;
+	}
+
+.carto-switch-legend {
+	top: 3px;
+	right: 6px;
+	z-index: 1;
+	position: absolute;
+	}
+
+
 /* Switch overriders */
 input.cmn-toggle-round-flat:checked + label,
 input.cmn-toggle-round-flat:checked + label:after {
