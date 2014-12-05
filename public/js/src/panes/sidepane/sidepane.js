@@ -104,11 +104,30 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	expand : function () {
-		// console.log('expand');
 
-		// cxxxx
-		// OBS! Må regne ut hva høyden skal bli!
-		Wu.app._editorMenuPane.style.height = '490px';
+
+		// Set height on main drop down menu – on page load!
+		// Is it nasty JS'ing?
+
+		// Get the panes that are supposed to be there
+		// (I think the result is always 3 ~ if that is so, the loops below is not needed)
+		var children = Wu.app._editorMenuPane.children;
+		var numChild = children.length - 1;
+
+		for ( var i = 0; i<children.length; i++ ) {
+			var clist = children[i].classList;
+			for ( var o = 0; o<clist.length; o++ ) {
+				if ( clist[o] == 'disabled' ) {
+					numChild -= 1;
+				}
+			}
+		}
+
+		// Height pr button
+		var __realHeight = numChild * 70;
+
+		// Set height (this for CSS transition purposes)
+		Wu.app._editorMenuPane.style.height = __realHeight + 'px';
 
 
 		this.openPane();
@@ -129,6 +148,7 @@ Wu.SidePane = Wu.Class.extend({
 		if (pane.users) 				panes.push('Users');
 		if (pane.share) 				panes.push('Share');
 		if (pane.account) 				panes.push('Account');
+
 		return panes;
 	},
 
@@ -146,6 +166,9 @@ Wu.SidePane = Wu.Class.extend({
 		
 		// default menus in sidepane
 		var panes = this._getPaneArray(project);
+
+		// Set height of main drop down menu
+		Wu.app._editorMenuPane.style.height = (panes.length * 70) + 'px';
 		
 		// remove Map pane if not editor
 		if (!editMode) _.pull(panes, 'Map');

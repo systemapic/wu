@@ -474,7 +474,7 @@ module.exports = api = {
 
 		try {
 		map.load(stylepath, function(err,map) {
-			if (err) throw err;
+			if (err) console.error(err); // ie. if wrong path 
 			map.zoomAll(); // todo: zoom?
 			var im = new mapnik.Image(100, 50);
 			map.render(im, function(err,im) {
@@ -1325,15 +1325,6 @@ module.exports = api = {
 		.populate('layers')
 		.exec(function (err, project) {
 
-			if (_.find(project.connectedAccounts.mapbox, function (m) { return m == username; })) {
-				// console.log(username + ' already connected!');
-				// already existing
-				// return res.end(JSON.stringify({
-				// 	error : 'Account already connected.'
-				// }));
-			}
-
-
 			// get mapbox account
 			api._getMapboxAccount(req, res, project, username, accessToken, api._returnProject);
 
@@ -1341,6 +1332,30 @@ module.exports = api = {
 
 
 	},
+
+	// refreshMapboxAccount : function (req, res) {
+
+	// 	var username 	= req.body.username;
+	// 	var projectUuid = req.body.projectId;
+	// 	var accessToken = req.body.accessToken;
+	// 	var userUuid 	= req.user.uuid;
+
+	// 	// add ops to async queue
+	// 	var ops = [];
+
+	// 	ops.push(function (callback) {
+	// 		// add default mapbox account: systemapic
+	// 		api.requestMapboxAccount(null, username, accessToken, callback);
+	// 	});
+
+	// 	async.series(ops, function (err, result) {
+	// 		if (err) console.log(err);
+	// 		console.log('refresh result: ', result);
+	// 		res.end(JSON.stringify(result));
+
+	// 	});
+
+	// },
 
 
 
@@ -1380,11 +1395,10 @@ module.exports = api = {
 		// do async and go to callback
 		async.waterfall(ops, function (err, project) {
 
-			if (err) {
-				// console.log('ERROR: ', err);
-				return callback(req, res, project, err);
-			}
-
+			// return err
+			if (err) return callback(req, res, project, err);
+			
+			// return project
 			callback(req, res, project);
 		});
 	},
@@ -1395,16 +1409,8 @@ module.exports = api = {
 	// send request to mapbox
 	requestMapboxAccount : function (project, username, accessToken, callback) {
 		
-		// console.log('______________________')
-		// console.log('API: requestMapboxAccount ');
-		// console.log('     username: ', username);
-		// console.log('     project', project.uuid);
-		// console.log('     accessToken : ', accessToken);
-		// console.log('______________________')
-
 		// mapbox url
 		var url = 'https://api.tiles.mapbox.com/v3/' + username + '/maps.json?secure=1&access_token=' + accessToken; 
-		// console.log('url: ', url);
 
 		// send request to mapbox
 		request(url, function (error, response, body) {
@@ -1491,9 +1497,6 @@ module.exports = api = {
 
 
 
-
-
-
 	addProjectToSuperadmins : function (projectUuid) {
 		User.find({uuid : {$in : superusers}}, function (err, results) {
 			results.forEach(function (user) {
@@ -1515,9 +1518,7 @@ module.exports = api = {
 	// #########################################
 	createLayer : function (req, res) {
 
-		// console.log('API: createLayer:');
-		// console.log('req.body: ', req.body);
-
+		// lol?
 		return res.end(JSON.stringify({error : 'Unsupported.'}))
 
 
@@ -1525,7 +1526,6 @@ module.exports = api = {
 
 		if (layerType == 'geojson') return api.createLayerFromGeoJSON(req, res);
 
-		// else
 		res.end(JSON.stringify({
 			layer : 'yo!'
 		}));
@@ -1535,7 +1535,6 @@ module.exports = api = {
 	},
 
 	createLayerFromGeoJSON : function (req, res) {
-		// console.log('createLayerFromGeoJSON');
 
 		var geojson = req.body.geojson;
 		var projectUuid = req.body.project;
@@ -1545,7 +1544,6 @@ module.exports = api = {
 		var data = JSON.stringify(geojson);
 		var size = data.length;
 
-		// console.log('size: ', size);
 
 		fs.writeFile(outfile, data, function (err) {
 			if (err) console.log('write err: ', err);
@@ -1602,8 +1600,6 @@ module.exports = api = {
 
 			// remove project
 			model.remove(function (err, result) {
-				// console.log('Removed project ' + project.name);
-				// console.log(err, result);
 			
 				// todo!!! remove from users 
 				api.removeProjectFromEveryone(project.uuid);
@@ -3507,6 +3503,93 @@ module.exports = api = {
 
 	},
 
+
+	deleteLayers : function (req, res) {
+
+		var projectUuid  = req.body.projectUuid,
+		    userid = req.user.uuid,
+		    layerUuids = req.body.layerUuids,
+		    ops = [],
+		    _lids = [];
+
+		console.log('API: deleteLayers');
+		console.log('puuid: ', projectUuid);
+		console.log('userid: ', userid);
+		console.log('uuids: ', layerUuids);
+
+
+		// validate
+		if (!projectUuid || !userid) return res.end('missing!');
+
+		var ops = [];
+
+		// find layer _ids for removing in project
+		ops.push(function (callback) {
+			Layer.find({uuid : {$in : layerUuids}}, function (err, layers) {
+				layers.forEach(function (layer) {
+					_lids.push(layer._id);
+				});
+
+				callback(err);
+			});
+		});
+
+
+
+		// delete layer from project
+		ops.push(function (callback) {
+			
+			Project
+			.findOne({uuid : projectUuid})
+			// .populate('layers')
+			.exec(function (err, project) {
+				if (err) console.log('find err: ', err);
+
+				console.log('found project: ', project.name);
+
+				// // pull files
+				// _fids.forEach(function (f) {
+				// 	project.files.pull(f);
+				// });
+
+				// pull layers
+				_lids.forEach(function (l) {
+					project.layers.pull(l)
+				})
+				
+				// project.markModified('files');
+				project.markModified('layers');
+
+				project.save(function (err) {
+					if (err) console.error('save err: ', err);
+					console.log('file removed from project');
+					return callback(err);
+				});
+			});
+		});
+
+		
+
+
+	
+		// run queries
+		async.series(ops, function(err) {
+
+			if (err) {
+				console.log('asyn err: ', err);
+				return res.end('{ error : 0 }');
+			}		
+
+			console.log('delete done...?');
+			res.end(JSON.stringify({
+				error : err
+			}));
+		});
+
+
+	},
+
+
 	// delete a file
 	deleteFiles : function (req, res) {
 
@@ -3530,57 +3613,57 @@ module.exports = api = {
 
 		var ops = [];
 
-			// find layer _ids for removing in project
-			ops.push(function (callback) {
+		// find layer _ids for removing in project
+		ops.push(function (callback) {
 
-				Layer.find({file : {$in : uuids}}, function (err, layers) {
+			Layer.find({file : {$in : uuids}}, function (err, layers) {
 
-					layers.forEach(function (layer) {
-						_lids.push(layer._id);
-					});
-
-					
-					// todo: delete?
-
-					return callback(err);
-			
+				layers.forEach(function (layer) {
+					_lids.push(layer._id);
 				});
 
-			});
-
-			// delete file from project
-			ops.push(function (callback) {
 				
-				Project
-				.findOne({uuid : puuid})
-				// .populate('layers')
-				.exec(function (err, project) {
-					if (err) console.log('find err: ', err);
+				// todo: delete?
 
-					console.log('found project: ', project.name);
-
-					// pull files
-					_fids.forEach(function (f) {
-						project.files.pull(f);
-					});
-
-					// pull layers
-					_lids.forEach(function (l) {
-						project.layers.pull(l)
-					})
-					
-					project.markModified('files');
-					project.markModified('layers');
-
-					project.save(function (err) {
-						if (err) console.error('save err: ', err);
-						console.log('file removed from project');
-						return callback(err);
-					});
-				});
+				return callback(err);
+		
 			});
 
+		});
+
+		// delete file from project
+		ops.push(function (callback) {
 			
+			Project
+			.findOne({uuid : puuid})
+			// .populate('layers')
+			.exec(function (err, project) {
+				if (err) console.log('find err: ', err);
+
+				console.log('found project: ', project.name);
+
+				// pull files
+				_fids.forEach(function (f) {
+					project.files.pull(f);
+				});
+
+				// pull layers
+				_lids.forEach(function (l) {
+					project.layers.pull(l)
+				})
+				
+				project.markModified('files');
+				project.markModified('layers');
+
+				project.save(function (err) {
+					if (err) console.error('save err: ', err);
+					console.log('file removed from project');
+					return callback(err);
+				});
+			});
+		});
+
+		
 
 
 	

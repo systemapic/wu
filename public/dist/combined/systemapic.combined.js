@@ -6193,11 +6193,11 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		this.resetInput();
 
 		// get mapbox account via server
-		this._importMapbox(username, accessToken);
+		this._importMapbox(username, accessToken, this.importedMapbox);
 
 	},
 
-	_importMapbox : function (username, accessToken) {
+	_importMapbox : function (username, accessToken, callback) {
 
 		// get mapbox account via server
 		var data = {
@@ -6206,7 +6206,7 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 			'projectId' : this.project.store.uuid
 		}
 		// post         path                            json          callback      this
-		Wu.post('/api/util/getmapboxaccount', JSON.stringify(data), this.importedMapbox, this);
+		Wu.post('/api/util/getmapboxaccount', JSON.stringify(data), callback, this);
 	},
 
 	importedMapbox : function (that, json) {
@@ -6221,6 +6221,7 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 			return;
 		}
 
+		// update project
 		that.project.setStore(store);
 
 	},
@@ -6238,29 +6239,66 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		
 		// fill with accounts
 		accounts.forEach(function (account) {
-			var wrap  = Wu.DomUtil.create('div', 'mapbox-listed-account', this._mapboxAccounts);
-			var title = Wu.DomUtil.create('div', 'mapbox-listed-account-title', wrap, account.username.camelize());
-
-			// add kill button for editMode... // todo: what about layers in deleted accounts, etc etc??
-			// if (this.project.editMode) {
-			// 	var kill = Wu.DomUtil.create('div', 'mapbox-listed-account-kill', wrap, 'X');
-				
-			// 	// add hook
-			// 	Wu.DomEvent.on(kill, 'click', function () {
-			// 		this.removeAccount(wrap, account);
-			// 	}, this);
-			// }
-
+			this._insertMapboxAccount(account);
 		}, this);
 		
+	},
+
+	_insertMapboxAccount : function (account) {
+
+		// wrap
+		var wrap  = Wu.DomUtil.create('div', 'mapbox-listed-account', this._mapboxAccounts);
+		
+		// title
+		var title = Wu.DomUtil.create('div', 'mapbox-listed-account-title', wrap, account.username.camelize());
+
+		// return if not edit mode
+		if (!this.project.editMode) return;
+
+		// refresh button 
+		var refresh = Wu.DomUtil.create('div', 'mapbox-listed-account-refresh', wrap);
+
+		// delete button
+		var del = Wu.DomUtil.create('div', 'mapbox-listed-account-delete', wrap);
+
+
+		// refresh event
+		Wu.DomEvent.on(refresh, 'mousedown', function (e) {
+			Wu.DomEvent.stop(e);
+			var msg = 'Are you sure you want to refresh the account. This will DELETE old layers and import them fresh!';
+			if (confirm(msg)) this._refreshMapboxAccount(wrap, account);
+		}, this);
+
+		// delete event
+		Wu.DomEvent.on(del, 'mousedown', function (e) {
+			Wu.DomEvent.stop(e);
+			console.log('delete account');
+			return;
+			
+			// remove account
+			this._removeMapboxAccount(wrap, account);
+			
+		}, this);
 
 	},
 
-	removeAccount : function (div, account) {
+	_removeMapboxAccount : function (div, account) {
 		Wu.DomUtil.remove(div);
 		this.project.removeMapboxAccount(account);
 	},
 
+	_refreshMapboxAccount : function (div, account) {
+		console.log('_refreshMapboxAccount', account);
+
+		// delete and re-import
+		this._removeMapboxAccount(div, account);
+
+		// get mapbox account via server
+		this._importMapbox(account.username, account.accessToken, this.importedMapbox);
+
+	},
+
+	
 	update : function () {
 		Wu.SidePane.Map.MapSetting.prototype.update.call(this)	// call update on prototype
 
@@ -6286,12 +6324,12 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		socialSharing 	: true,
 		documentsPane 	: true,
 		dataLibrary 	: true,
-		mediaLibrary 	: false,
 		autoHelp 	: true,
 		autoAbout 	: true,
 		darkTheme 	: true,
 		tooltips 	: true,
-		mapboxGL	: false 
+		mapboxGL	: false,
+		mediaLibrary 	: false,
 
 	},
 
@@ -9253,10 +9291,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		var layers = this.project.getActiveLayers();
 
-
 		layers.forEach(function (layer) {
-			layer.refreshZIndex();
-
+			if (layer) layer.refreshZIndex();
 		}, this);
 
 	},
@@ -12821,10 +12857,14 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	removeMapboxAccount : function (account) {
-		_.remove(this.store.connectedAccounts.mapbox, function (m) {	// todo: include access token
+		var removed = _.remove(this.store.connectedAccounts.mapbox, function (m) {	// todo: include access token
 			return m == account;
 		});
 		this._update('connectedAccounts');
+
+		console.log('removeMapboxAccount', removed);
+
+		// todo: remove active layers, etc.
 	},
 
 	getName : function () {
@@ -13211,6 +13251,9 @@ L.control.baselayerToggle = function (options) {
 
 				// remove from layermenu
 				if (layerMenu) layerMenu.onDelete(layer);
+
+				// remove from map
+				layer.remove();
 					
 				// remove from local store
 				var a = _.remove(this.store.layers, function (item) { return item.uuid == layer.store.uuid; });	// dobbelt opp, lagt til to ganger! todo

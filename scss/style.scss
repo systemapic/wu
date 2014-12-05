@@ -21,9 +21,9 @@ $obese: 600;
 @import 'panes';		// Leaflet Draw + Layer menu, Info box, Legends etc
 @import 'custom_imported';	// Rules copied from 3rd party stylesheets
 @import 'kits';			// All the webkit, moz, etc transitions and other properties
-@import 'shame';
-
-@import 'pointer_events';
+@import 'startPane';		// Twirling map...
+@import 'shame';		// Basic shamefull CSS writing
+@import 'pointer_events';	// For å rydde opp i pointer eventsa
 
 /*@import 'mobile';*/
 

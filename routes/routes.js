@@ -311,6 +311,18 @@ module.exports = function(app, passport) {
 
 	});
 
+	// // =====================================
+	// // REFRESH MAPBOX ======================
+	// // =====================================
+	// // get mapboxdata from mapbox
+	// app.post('/api/util/refreshmapboxaccount', isLoggedIn, function (req, res) {
+	// 	console.log('/api/util/refreshmapboxaccount');
+
+	// 	// get mapbox account
+	// 	api.refreshMapboxAccount(req, res);
+
+	// });
+
 	// =====================================
 	// CREATE SNAPSHOT =====================
 	// =====================================
@@ -433,6 +445,17 @@ module.exports = function(app, passport) {
 	});
 
 
+	// =====================================
+	// DELETE LAYER(S) =====================
+	// =====================================
+	// delete array of files
+	app.post('/api/layers/delete', isLoggedIn, function (req,res) {
+		console.log('/api/layers/delete');
+
+		// delete file(s)
+		api.deleteLayers(req, res);
+		
+	});
 
 	// =====================================
 	// LAYERS ==============================

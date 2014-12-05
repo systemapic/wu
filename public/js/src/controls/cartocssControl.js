@@ -572,7 +572,7 @@ L.Control.CartoCSS = L.Control.extend({
 	_createCheckbox : function (id) {
 		// create switch
 		var switchId = 'switch-' + id;
-		var fieldSwitch = Wu.DomUtil.create('div', 'switch controls-switch');
+		var fieldSwitch = Wu.DomUtil.create('div', 'switch carto-switch-legend'); // controls-switch
 		var fieldSwitchInput = Wu.DomUtil.createId('input', switchId, fieldSwitch);
 		var fieldSwitchLabel = Wu.DomUtil.create('label', '', fieldSwitch);
 		Wu.DomUtil.addClass(fieldSwitchInput, 'cmn-toggle cmn-toggle-round-flat');
@@ -704,7 +704,7 @@ L.Control.CartoCSS = L.Control.extend({
 		if (key) fieldKey.value = key;
 
 		// create switch
-		var fieldSwitch = Wu.DomUtil.create('div', 'switch controls-switch', fieldWrapper);
+		var fieldSwitch = Wu.DomUtil.create('div', 'switch carto-switch-tooltip', fieldWrapper); //  controls-switch
 		var switchId = 'switch-' + defaultKey;
 		var fieldSwitchInput = Wu.DomUtil.createId('input', switchId, fieldSwitch);
 		Wu.DomUtil.addClass(fieldSwitchInput, 'cmn-toggle cmn-toggle-round-flat');

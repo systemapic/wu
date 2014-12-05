@@ -384,10 +384,8 @@ Wu.MapPane = Wu.Class.extend({
 
 		var layers = this.project.getActiveLayers();
 
-
 		layers.forEach(function (layer) {
-			layer.refreshZIndex();
-
+			if (layer) layer.refreshZIndex();
 		}, this);
 
 	},

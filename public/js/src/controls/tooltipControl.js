@@ -7,7 +7,7 @@ Wu.Tooltip = Wu.Class.extend({
 		background : "#333", 
 		borderColor : '#333',
 		className : 'systip',
-		delay : 0
+		delay : 1
 	},
 
 	defaultStyle : {
@@ -16,7 +16,8 @@ Wu.Tooltip = Wu.Class.extend({
 		tipJoint : 'middle right', 
 		background : "#333", 
 		borderColor : '#333',
-		className : 'systip'
+		className : 'systip',
+		delay : 1
 	},	
 
 	initialize : function () {
