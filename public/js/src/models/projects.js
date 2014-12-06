@@ -170,7 +170,10 @@ Wu.Project = Wu.Class.extend({
 
 	select : function () {
 
-		// console.log('************** set active **************');	
+		// hide startpane if active
+		if (app.StartPane) app.StartPane.deactivate();
+
+		// hide headerpane
  		if (app._headerPane) Wu.DomUtil.removeClass(app._headerPane, 'displayNone');
 
 		// set as active
@@ -296,16 +299,20 @@ Wu.Project = Wu.Class.extend({
 		// remove access from Account locally
 		app.Account.removeProjectAccess(project);
 
-		// remove from all Users 	// not rly needed
-		// var users = app.Users;
-		// for (u in users) {
-		// 	var user = users[u];
-		// 	user.removeProjectAccess(project);
-		// }
-
+		// set address bar
+		var client = project.getClient().getSlug();
+		var url = app.options.servers.portal + client + '/';
+		Wu.Util.setAddressBar(url)
 
 		// delete object
 		delete Wu.app.Projects[project.uuid];
+
+		// activate startpane 
+		var startpane = app._initStartpane();
+		startpane.activate();
+
+		// refresh sidepane
+		app.SidePane.refresh(['Projects', 'Users', 'Account']);
 
 	},
 

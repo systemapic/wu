@@ -67,10 +67,11 @@ Wu.StatusPane = Wu.Class.extend({
 
 	// open sidepane menu
 	open : function (e) {
+
+		console.log('statuspane open');
 		
 		this.isOpen = true;
-		var sidepane = app.SidePane;
-		sidepane.expand();
+		if (app.SidePane) app.SidePane.expand();
 		this.refresh();
 
 		this.checkMapBlur();
@@ -80,25 +81,31 @@ Wu.StatusPane = Wu.Class.extend({
 		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
 
 		// Remove start pane
-		if (app.StartPane) app.StartPane.deactivate();
+		// if (app.StartPane) app.StartPane.deactivate();
 
 		// trigger activation on active menu item
-		app._activeMenu._activate()
+		app._activeMenu._activate();
 
 		// console.log('StatusPane.open(). Currently active menu item:', app._activeMenuItem);
 
 		// Hide button section and Layer info when the Home dropdown menu opens (j)
 		if (app._map) app._map._controlCorners.topleft.style.opacity = 0;
-		
+
+		// close layermenu edit if open  				// refactor all these events.. centralize
+		var layermenu = app.MapPane.layerMenu;
+		if (layermenu) layermenu.disableEdit();
+
 
 
 	},
 
 	// close sidepane menu
 	close : function (e) {
+
+		console.log('statuspane close');
+
 		this.isOpen = false;
-		var sidepane = app.SidePane;
-		sidepane.collapse();
+		if (app.SidePane) app.SidePane.collapse();
 		this.refresh();
 
 		// app.MapPane._container

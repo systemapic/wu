@@ -60,3 +60,26 @@
 .invalidLayermenuitem .layer-menu-item {
 	background: red;
 }
+
+/*inactive new project button*/
+.inactive {
+	color: #333;
+}
+
+body {
+	background: rgba(8, 18, 30, 1);
+}
+
+#map {
+	background: rgba(8, 18, 30, 0.9);
+}
+
+#map:before {
+	opacity: 0.1;
+}
+
+/*.leaflet-map-pane {
+	background: rgb(8, 18, 30);
+}*/
+
+

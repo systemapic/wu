@@ -60,7 +60,7 @@ Wu.App = Wu.Class.extend({
 	initialize : function (options) {
 
 		// prototypes for compatiblity
-		this._compatabilityChecks();
+		// this._compatabilityChecks();
 
 		// set global this
 		Wu.app = this;
@@ -77,18 +77,20 @@ Wu.App = Wu.Class.extend({
 
 	},
 
-	_compatabilityChecks : function () {
-		Function.prototype.bind = Function.prototype.bind || function (thisp) {
-			var fn = this;
-			return function () {
-				return fn.apply(thisp, arguments);
-			};
-		};
-	},
+	// _compatabilityChecks : function () {
+
+	// 	// bind fn for phantomJS
+	// 	Function.prototype.bind = Function.prototype.bind || function (thisp) {
+	// 		var fn = this;
+	// 		return function () {
+	// 			return fn.apply(thisp, arguments);
+	// 		};
+	// 	};
+	// },
 
 	initServer : function () {
 		var serverUrl = this.options.servers.portal;
-		console.log('Connected to server: ', serverUrl);
+		console.log('Secure connection to server: ', serverUrl);
 
 		var data = JSON.stringify(this.options);
 		
@@ -296,11 +298,20 @@ Wu.App = Wu.Class.extend({
 			this.SidePane.refresh(['Clients', 'Users', 'Account']);		
 		}
 
+		// render startpane
+		this._initStartpane();
+
+	},
+
+	_initStartpane : function () {
+		if (this.StartPane) return this.StartPane;
+
 		// render Start pane?
 		this.StartPane = new Wu.StartPane({
 			projects : this.Projects
 		});
 
+		return this.StartPane;
 	},
 
 	_lonelyProject : function () {
@@ -325,12 +336,6 @@ Wu.App = Wu.Class.extend({
 		    search  = window.location.search.split('?'),
 		    params  = Wu.Util.parseUrl();
 
-		console.log('params: ', params);
-		console.log('client: ', client);
-		console.log('project: ', project);
-		console.log('hash: ', hash);
-
-		
 		// done if no location
 		if (!client || !project) return false;
 
@@ -338,7 +343,10 @@ Wu.App = Wu.Class.extend({
 		var project = this._projectExists(project, client);
 		
 		// return if no such project
-		if (!project) return false;
+		if (!project) {
+			Wu.Util.setAddressBar(this.options.servers.portal);
+			return false;
+		}
 
 		// set project
 		this._setProject(project);

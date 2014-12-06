@@ -93,8 +93,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	addHooks : function () {
-		Wu.DomEvent.on(this._container, 'mouseenter', this.open, this);
-		Wu.DomEvent.on(this._container, 'mouseleave', this.close, this);
+		// Wu.DomEvent.on(this._container, 'mouseenter', this.open, this);
+		// Wu.DomEvent.on(this._container, 'mouseleave', this.close, this);
+		// Wu.DomEvent.on(this.users, 'mousedown', this.toggleInfo, this);
 		Wu.DomEvent.on(this._container, 'click',      this.select, this);
 		Wu.DomEvent.on(this._container, 'mousedown',  Wu.DomEvent.stopPropagation, this);	// to prevent closing of project pane
 	
@@ -103,8 +104,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	removeHooks : function () {
-		Wu.DomEvent.off(this._container, 'mouseenter', this.open, this);
-		Wu.DomEvent.off(this._container, 'mouseleave', this.close, this);
+		// Wu.DomEvent.off(this._container, 'mouseenter', this.open, this);
+		// Wu.DomEvent.off(this._container, 'mouseleave', this.close, this);
 		Wu.DomEvent.off(this._container, 'click', this.select, this);
 		Wu.DomEvent.off( this._container, 'mousedown', Wu.DomEvent.stopPropagation, this);
 
@@ -186,10 +187,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// set new image and save
 		this.project.setLogo(fullpath);
 
-		console.log('LOGO:: ', fullpath);
-		console.log('this.project', this.project);
-		console.log('logo: ', this.logo);
-
 		// update image 
 		this.logo.style.backgroundImage = "url('" + this.project.getLogo() + "')";
 
@@ -214,11 +211,20 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	open : function () {
-		if (this._parent) this._parent._container.style.overflow = 'visible';
+		// if (this._parent) this._parent._container.style.overflow = 'visible';
 	},
 
 	close : function () {
-		if (this._parent) this._parent._container.style.overflow = 'hidden';
+		// if (this._parent) this._parent._container.style.overflow = 'hidden';
+	},
+
+	openInfo : function () {
+		console.log('openInfo');
+		this.users.style.opacity = 1;
+	},
+
+	closeInfo : function () {
+		this.users.style.opacity = 0;
 	},
 
 	select : function (e) {

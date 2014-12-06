@@ -23,7 +23,6 @@ L.Control.Inspect = L.Control.extend({
 
 	addTo: function (map) {
 		this._map = map;
-
 		var container = this._container = this.onAdd(map),
 		    pos = this.getPosition(),
 		    corner = map._controlCorners[pos];
@@ -79,42 +78,10 @@ L.Control.Inspect = L.Control.extend({
 		app.Tooltip.add(kill, 'Disable layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
 
 
+		// add to list
+		this._list.appendChild(wrapper);
 
-
-	
-		// add wrapper to list by zIndex
-		var index = this._getIndex(layer);
-
-	
-
-
-		// add wrapper to front of this._list
-		if (!this._list.firstChild) {
-			console.log('first child');
-			this._list.appendChild(wrapper);
-		} else {
-
-			// get nodes
-			var nodes = this._list.childNodes;
-
-			// if index is zero, insert FIRST
-			if (index == 0) {
-				var target = nodes[0];
-				target.parentNode.insertBefore(wrapper, target);
-			
-			// if index is same as node.length, insert LAST
-			} else if (index == nodes.length) { 
-				this._list.appendChild(wrapper);
-			
-			} else {
-
-				// get node to be inserted after
-				var target = nodes[index-1];
-				target.parentNode.insertBefore(wrapper, target.nextSibling);
-			}
-	
-		}
-
+		console.log('app.zIndex: ', app.zIndex);
 	
 		// create object
 		var entry = {
@@ -144,9 +111,7 @@ L.Control.Inspect = L.Control.extend({
 		// Stop Propagation
 		Wu.DomEvent.on(this._content, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 
-		// update zIndex
-		// this.updateZIndex();
-
+		
 
 	},
 
@@ -165,48 +130,48 @@ L.Control.Inspect = L.Control.extend({
 
 	},
 
-	_getIndex : function (layer) {
+	// _getIndex : function (layer) {
 
-		// rewrite zindex:
-		//
-		// must be a store for ALL layers (active, non-active), a list of order, and this list must be validated each time
-		// 	which means the ORDER of the list is king, and numbers, starting at 1000, must be made for it.
-		//	simple nudging wont work!!!
-		//
-		//
-		//
-		//
-		//
-		//
+	// 	// rewrite zindex:
+	// 	//
+	// 	// must be a store for ALL layers (active, non-active), a list of order, and this list must be validated each time
+	// 	// 	which means the ORDER of the list is king, and numbers, starting at 1000, must be made for it.
+	// 	//	simple nudging wont work!!!
+	// 	//
+	// 	//
+	// 	//
+	// 	//
+	// 	//
+	// 	//
 
-		// console.log('_getIndex layer: ', layer);
+	// 	// console.log('_getIndex layer: ', layer);
 		
-		// get index
-		var layerIndex = layer.getZIndex(); // ie. 1002
+	// 	// get index
+	// 	var layerIndex = layer.getZIndex(); // ie. 1002
 
-		// get other items already added to inspector
-		var already = this.layers;
+	// 	// get other items already added to inspector
+	// 	var already = this.layers;
 
-		var above = [];
+	// 	var above = [];
 
-		// console.log('this.layers LENGHT: ', this.layers.length);
+	// 	// console.log('this.layers LENGHT: ', this.layers.length);
 
-		this.layers.forEach(function (l) {
+	// 	this.layers.forEach(function (l) {
 
-			// console.log('l', l);
-			// console.log('others (l) zindex: ', l.layer.store.zIndex, l.layer.store.title);
-			if (l.layer.store.zIndex >= layer.store.zIndex) above.push(l);
+	// 		// console.log('l', l);
+	// 		// console.log('others (l) zindex: ', l.layer.store.zIndex, l.layer.store.title);
+	// 		if (l.layer.store.zIndex >= layer.store.zIndex) above.push(l);
 
-		}, this);
+	// 	}, this);
 
-		// var index = _.sortedIndex(this.layers, layer, 'zIndex');
+	// 	// var index = _.sortedIndex(this.layers, layer, 'zIndex');
 
-		// console.error('_getIndex (num above)', above.length);
-		// console.log('layer zindex: ', layerIndex, layer.getTitle());
+	// 	// console.error('_getIndex (num above)', above.length);
+	// 	// console.log('layer zindex: ', layerIndex, layer.getTitle());
 
-		return above.length;
+	// 	return above.length;
 
-	},
+	// },
 	
 	// remove by layer
 	removeLayer : function (layer) {
@@ -247,6 +212,8 @@ L.Control.Inspect = L.Control.extend({
 
 	moveUp : function (entry) {
 
+		console.log('moveUp', entry);
+
 		// get current position
 		var index = _.findIndex(this.layers, {'uuid' : entry.uuid});
 
@@ -269,6 +236,8 @@ L.Control.Inspect = L.Control.extend({
 	},
 
 	moveDown : function (entry) {
+
+		console.log('moveDown', entry);
 
 		// get current position
 		var index = _.findIndex(this.layers, {'uuid' : entry.uuid});
@@ -302,7 +271,7 @@ L.Control.Inspect = L.Control.extend({
 			var zIndex = length - i + 1000;
 
 			// set layer index
-			layer.setZIndex(zIndex);
+			// layer.setZIndex(zIndex);
 
 		}, this);
 	},

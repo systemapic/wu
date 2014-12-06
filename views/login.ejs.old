@@ -2,43 +2,46 @@
 <!doctype html>
 <html>
 <head>
-<title>Systemapic Authentication</title>
-<link href='dist/css.login.min.css' rel='stylesheet' />
-<script src="dist/combined/login.min.js"></script>
+	<title>Systemapic Authentication</title>
+	<link rel="stylesheet" href="dist/css.dependencies.min.css">
+	<link rel="stylesheet" href="js/src/core/class.js">
+	<link rel="stylesheet" href="js/src/controls/spinningMap.js">
+	<link rel="stylesheet" href="js/src/controls/spinningMap.js">
 
-<style>
-
-	
-	
-	
-
-</style>
 
 </head>
-<body>
-	
+<body style="padding-top:0px">
 
-	<div id="spinning-map"></div>
-	
+	<div id="spinning-map-container"></div>
 
-	<div id="spinning-content">
+	<div class="container">
+
 		<div class="col-sm-6 col-sm-offset-3">
-			<div id="login-logo"></div>
-			<h1 style="font-size: 25px;"><span class="secure-login-symbol"></span> Secure Login</h1>
 
+			<div id="login-logo"></div>
+
+			<h1 style="font-size: 25px;"><span class="secure-logn-symbol"></span> Secure Login</h1>
+
+			<!-- show any messages that come back with authentication -->
 			<% if (message.length > 0) { %>
 				<div class="alert alert-danger"><%= message %></div>
 			<% } %>
 
+			<!-- LOGIN FORM -->
+
 			<form action="/login" method="post" id="hitme">
 				<div class="form-group"><input type="text" class="form-control" name="email" placeholder="Enter email..."></div>
 				<div class="form-group"><input type="password" class="form-control" name="password" placeholder="Enter password..."></div>
+
 				<button type="submit" id="login-button" class="btn btn-default" name="login">Login</button>
 				<button type="submit" id="forgot-password" onclick="javascript: form.action='/forgot';">Forgot password?</button>
+
+
 			</form>
 		</div>
+
 	</div>
 
-	<script> spin(); </script>
+
 </body>
 </html>

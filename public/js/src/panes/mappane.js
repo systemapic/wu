@@ -1,8 +1,16 @@
 Wu.MapPane = Wu.Class.extend({
 
 	initialize : function () {
+		
+		// init container
 		this._initContainer();
+
+		// active layers
 		this._activeLayers = [];
+
+		// connect zindex control
+		this.zIndexControl = new Wu.ZIndexControl();
+		
 		return this; 
 	},      
 

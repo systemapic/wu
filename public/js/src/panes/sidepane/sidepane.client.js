@@ -164,7 +164,23 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	},
 
+	_lockNewProjectButton : function () {
+		Wu.DomEvent.off(this._newProjectButton, 'mousedown', this.createNewProject, this);
+		Wu.DomUtil.addClass(this._newProjectButton, 'inactive');
+
+	},
+
+	_unlockNewProjectButton : function () {
+		Wu.DomEvent.on(this._newProjectButton, 'mousedown', this.createNewProject, this);
+		Wu.DomUtil.removeClass(this._newProjectButton, 'inactive');
+
+	},
+
 	createNewProject : function () {
+
+		// set status and lock + button
+		app.setStatus('Loading...');
+		this._lockNewProjectButton();
 
 		// create project object
 		var store = {
@@ -248,7 +264,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var sidepaneProject = new Wu.SidePane.Project(project, options);
 
 		// add to client container
-		console.log('adding new client div tobefore: ', this._projectsContainer);
 		sidepaneProject.addToBefore(this._projectsContainer);
 
 		// refresh height
@@ -256,6 +271,11 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// select
 		sidepaneProject.project._menuItem.select();
+
+		// set status and unlock + button
+		app.setStatus('Done!');
+		this._unlockNewProjectButton();
+
 	},
 
 	addHooks : function () {

@@ -14,7 +14,7 @@ Wu.Layer = Wu.Class.extend({
 		this.initLayer();
 
 		// register for zIndex
-		this._zIndex = app.MapPane.registerZIndex(this);
+		// this._zIndex = app.MapPane.registerZIndex(this);
 
 		// all visible tiles loaded event
 		Wu.DomEvent.on(this.layer, 'load', function () {
@@ -48,7 +48,7 @@ Wu.Layer = Wu.Class.extend({
 		this.layer.addTo(map);
 
 		// refresh zindex
-		app.MapPane.refreshZIndex();
+		// app.MapPane.refreshZIndex();
 
 		// add to active layers
 		app.MapPane.addActiveLayer(this);	// includes baselayers
@@ -76,7 +76,7 @@ Wu.Layer = Wu.Class.extend({
 			// remove if empty
 			if (this.store.description || app.Account.isSuperadmin()) { // todo: what if only editor 
 				descriptionControl._container.style.display = 'block'; 
-			} else { 
+			} else { 								// refactor to descriptionControl
 				descriptionControl._container.style.display = 'none'; 
 			}
 		
@@ -84,7 +84,6 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	leafletEvent : function (event, fn) {
-		console.log('adding leaflet event: ', event, fn);
 		this.layer.on(event, fn);
 	},
 
@@ -101,7 +100,7 @@ Wu.Layer = Wu.Class.extend({
 		if (this.gridLayer) map.removeLayer(this.gridLayer); 
 
 		// remove from inspectControl if available
-		var inspectControl = app.MapPane.inspectControl;
+		var inspectControl = app.MapPane.inspectControl;			// refactor to events
 		if (inspectControl) inspectControl.removeLayer(this);
 
 		// remove from legendsControl if available
@@ -112,7 +111,7 @@ Wu.Layer = Wu.Class.extend({
 		var descriptionControl = app.MapPane.descriptionControl;
 		if (descriptionControl) {
 			descriptionControl.removeLayer(this);
-			descriptionControl._container.style.display = 'none'; // (j)
+			descriptionControl._container.style.display = 'none'; // (j)		// refactor to descriptionControl
 		}
 	},
 
@@ -133,21 +132,20 @@ Wu.Layer = Wu.Class.extend({
 		this.layer.setOpacity(this.opacity);
 	},
 
+	// refreshZIndex : function () {
+	// 	// set zIndex on leaflet layer
+	// 	this.layer.setZIndex(this.getZIndex());
+	// },
 
-	refreshZIndex : function () {
-		// set zIndex on leaflet layer
-		this.layer.setZIndex(this.getZIndex());
-	},
+	// setZIndex : function (zIndex) {
+	// 	this.store.zIndex = parseInt(zIndex);
+	// 	this.save('zIndex');
+	// 	this.refreshZIndex();
+	// },
 
-	setZIndex : function (zIndex) {
-		this.store.zIndex = parseInt(zIndex);
-		this.save('zIndex');
-		this.refreshZIndex();
-	},
-
-	getZIndex : function () {
-		return parseInt(this.store.zIndex);
-	},
+	// getZIndex : function () {
+	// 	return parseInt(this.store.zIndex);
+	// },
 
 	getOpacity : function () {
 		return this.opacity || 1;
@@ -184,9 +182,7 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	getCartoid : function () {
-		if (this.store.data) {
-			return this.store.data.cartoid;
-		}
+		if (this.store.data) return this.store.data.cartoid;
 		return false;
 	},
 
@@ -345,9 +341,6 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		this.update();
 	},
 
-
-	
-
 	update : function () {
 		var map = app._map;
 
@@ -374,14 +367,14 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		var tileServer = app.options.servers.tiles;
 		var token = app.accessToken;
 		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
-		var zIndex = this.getZIndex();
+		// var zIndex = this.getZIndex();
 
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			fileUuid: fileUuid,
 			cartoid : cartoid,
 			subdomains : 'abcd',
-			zIndex : zIndex
+			// zIndex : zIndex
 		});
 	},
 
