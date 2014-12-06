@@ -46,6 +46,7 @@
 		<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/knut.css">
 		
 		<!-- <link rel="stylesheet" href="https://projects.ruppellsgriffon.com/dist/css.portal.min.css"> -->
+		
 		<!-- styletag for injecting css -->
 		<div id="styletag"></div>
 
@@ -111,6 +112,19 @@
 
 	<body>
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -567,14 +581,6 @@
 
 			<div class="project-inner-wrapper">
 
-				<!-- <div class="sort-by-clients-projects">
-					<div class="btn-group">
-						<button id="editor-projects-sort-by-left" type="button" class="btn btn-default ct11 ct18">
-						<span class="glyphicon glyphicon glyphicon-th"></span></button>
-						<button id="editor-projects-sort-by-right" type="button" class="btn btn-default ct11 ct18">
-						<span class="glyphicon glyphicon glyphicon-th-list"></span></button>
-					</div>
-				</div> -->
 
 								
 				<div id="editor-projects-container"></div>
@@ -632,8 +638,6 @@
 						<div id="darktheme" class="dark selected">Dark</div>						
 						
 					</div>
-<!-- 					<div id="colortheme-light2" class="themeselector">Light 2</div> -->
-	<!-- 					<div id="colortheme-light3" class="themeselector">Light 3</div>																									 -->
 
 					<div id="color-basic-button-container">					
 						<div id="advanced-theme-selector" class="smap-button-white small">Advanced Color Themes</div>
@@ -1093,35 +1097,12 @@
 
 		<script id="datalibraryTableframe" type="text/html">
 		
-
-<!--			
-
-			// <div class="datalibrary-controls">
-
-
-			// 		<div id="upload-container" class="smap-button-gray ct17">Upload</div>
-			// 		<input type="text" id="datalibrary-search" class="search ct17" placeholder="Search files" />
-				
-			// 		<div id="datalibrary-delete-file" class="smap-button-gray">Delete</div>
-			// 		<div id="datalibrary-download-files" class="smap-button-gray">Download</div>					
-
-			// 	<div id="datalibrary-errors" class="smap-button-gray"></div>
-				
-			// </div>
-
--->			
-
 	
-			<!-- <div id="datalibrary-download-dialogue"></div>  -->
 			<div id="filelist">
-				<!-- <h3>Data Library</h3>			 -->
 				<table id="datalibrary-table">
 					<thead>
-					
-
 						
 						<tr> 
-						
 							<th class="fivep" data-sort="checkbox">
 							<div class="squaredThree" id="squaredThree-checkbox-all">
 								<input type="checkbox" value="None" id="checkbox-all" name="check" />
@@ -1169,7 +1150,6 @@
 				<td class="tdcont keywords ct23 ct28">{{keywords}}</td> <!-- Keywords -->
 				<td class="tdcont createdDate ct23 ct28">{{createdDate}}</td> <!-- Date -->
 				<td class="tdcont status ct23 ct28">{{status}}</td> <!-- Status -->
-				<!-- <td class="tdcont action ct23 ct28">{{action}}</td> --> <!-- Action, eg. Add Layer -->
 				<td class="tdcont uuid ct23 ct28" style="display:none">{{uuid}}</td>
 
 			</tr>	
@@ -1228,8 +1208,6 @@
 						<label for="checkbox-uuid"></label>
 					</div>
 					
- 				<!-- <div class="download-remove-button">X</div> -->
-				
 				</td>
 			</tr>
 
@@ -1278,12 +1256,7 @@
 
 
 				<div id="layers-library">
-					
-					<!-- <div class="datalibrary-connect-wrap ct11">
-						<input id="import-datalibrary-layers" class="input-box search" placeholder="Drop files to upload"></input>
-						<div id="import-datalibrary-layers-ok" class="smap-button-gray ct0 ct11">Upload</div>
-					</div> -->
-
+				
 
 					<h4>Data Library Layers</h4>
 					<div id="layers-library-list"></div>
@@ -1414,19 +1387,7 @@
 			<h4 id="user-management-client"></h4>
 
 			<div id="users-table-container"></div>
-			<!--
-			//	
-			//  items: 
-			//		title, first name, last name, company, position, phone, mobile, email, projects
-			//
-			//
-			//
-			//
-			//
-			//
-
-			-->
-
+			
 			</div>
 
 		</script>
@@ -1438,17 +1399,6 @@
 				<table id="users-table">
 					<thead>
 
-<!--					
-						// <div class="users-controls">
-												
-						// 		<div id="users-add-user" class="smap-button-gray users">Create user</div>
-						// 		<div id="users-delete-user" class="smap-button-gray users">Delete user</div>
-								
-						// 		<input type="text" id="users-search" class="search ct17" placeholder="Search users" />
-															
-						// </div>
-
--->						
 						
 						<tr> 
 
@@ -1612,11 +1562,8 @@
 								<div class="mediaLibrary-image-container" id="mediaLibrary-image-container-left">
 									<div id="mediaLibrary-grabgrid-left"></div>
 									
-									<!--
-									<div id="fuckyou">
-										<div id="fuckme"></div>
-									</div>
-									-->
+								
+									
 									
 									<img>
 								</div>
@@ -1727,21 +1674,16 @@
 
 		</script>
 
-		<!-- MEDIA LIBRARY -->
-		<!-- MEDIA LIBRARY -->
-		<!-- MEDIA LIBRARY -->		
-	
+		
 
 
-<!-- ************************************************************************************************************************ -->
-<!-- ************************************************************************************************************************ -->
-<!-- ************************************************************************************************************************ -->
-<!-- ************************************************************************************************************************ -->
-<!-- ************************************************************************************************************************ -->
+
+
 
 		<!-- class.js must be added first -->
 		<script src="https://projects.ruppellsgriffon.com/js/src/core/class.js"></script> 
 		<script src="https://projects.ruppellsgriffon.com/js/src/leaflet.js/plugins/extendLeaflet.js"></script>
+
 		<script src="https://projects.ruppellsgriffon.com/js/src/panes/sidepane/sidepane.js"></script> 
 		<script src="https://projects.ruppellsgriffon.com/js/src/panes/sidepane/sidepane.item.js"></script> 
 		<script src="https://projects.ruppellsgriffon.com/js/src/panes/sidepane/sidepane.clients.js"></script> 
@@ -1792,26 +1734,12 @@
 
 		<script>
 
-
 			// enter the Wu
 			var app = new Wu.App({
-					id : 'app',	// dom element
+					id : 'app',
 			});
-
 
 		</script>
 
-		
-
-<!-- ************************************************************************************************************************ -->
-<!-- ************************************************************************************************************************ -->
-<!-- ************************************************************************************************************************ -->
-<!-- ************************************************************************************************************************ -->
-<!-- ************************************************************************************************************************ -->
-<!-- ************************************************************************************************************************ -->
-
-
-
 </body>	
-
 </html>
