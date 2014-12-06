@@ -77,7 +77,6 @@ Wu.Files = Wu.Class.extend({
 
 
 
-
 	// setters
 	setName : function (name) {
 		this.store.name = name;
@@ -139,6 +138,24 @@ Wu.Files = Wu.Class.extend({
 		Wu.save('/api/file/update', string); // save to server                            
 		app.setSaveStatus();// set status
 	},
+
+
+
+	// todo: move all delete of files here
+	_delete : function () {
+
+	},
+
+
+
+
+
+
+
+
+
+
+
 
 
 

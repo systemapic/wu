@@ -29,7 +29,6 @@ L.Control.Layermenu = L.Control.extend({
 		Wu.DomUtil.addClass(this._layerMenuHeader, 'menucollapser');
 		
 		this._layerMenuHeaderTitle = Wu.DomUtil.create('div', 'layer-menu-header-title', this._layerMenuHeader, 'Layers');
-		// this._layerMenuHeader.innerHTML = 'layers';                                     
 
 		// Create the collapse button
 		this._bhattan1 = Wu.DomUtil.createId('div', 'bhattan1');
@@ -69,11 +68,9 @@ L.Control.Layermenu = L.Control.extend({
 		// add tooltip
 		app.Tooltip.add(this._layerMenuHeaderTitle, 'The layer menu lets you choose what layers you want to be on top of the map', { extends : 'systyle', tipJoint : 'right' });
 		app.Tooltip.add(this._bhattan1, 'Minimize the layer menu', { extends : 'systyle', tipJoint : 'left' });		
-	
 
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
-
 
 	},
 
@@ -139,18 +136,11 @@ L.Control.Layermenu = L.Control.extend({
 		}	
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
 		Wu.app.MapPane._container.children[1].children[1].style.right = '140px';
-		
-		// Change class name of open layers button
-		// var that = this;
-		// setTimeout(function(){					
-		// 	// that._openLayers.className = 'leaflet-control layer-opener-opened'; // rem (j)
-		// }, 500);			
-			
+	
 	},
 
 	// (j)
 	openLayerPane : function () {
-
 
 		this._open = true;
 

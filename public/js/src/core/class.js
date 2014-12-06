@@ -24,6 +24,7 @@
 // _____class.js___________________________________________________________________ 
 // Taken from Class.js in Leaflet.js by Vladimir Agafonkin, @LeafletJS
 
+var ich = ich || {};
 ich.$ = function (elem) { return elem; };
 Wu = {};
 Wu.Class = function () {};
@@ -1786,4 +1787,12 @@ JSON.parseAsync = function(data, callback) {
 		json = JSON.parse( data );
 		callback( json );
 	}
+};
+
+// bind fn for phantomJS
+Function.prototype.bind = Function.prototype.bind || function (thisp) {
+	var fn = this;
+	return function () {
+		return fn.apply(thisp, arguments);
+	};
 };

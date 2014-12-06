@@ -1,4 +1,5 @@
 // app/models/project.js
+
 // load the things we need
 var mongoose = require('mongoose');
 var timestamps = require('mongoose-times');
@@ -53,7 +54,6 @@ var projectSchema = mongoose.Schema({
 	}],
 
 	
-
 	bounds : {
 		northEast : {
 			lat : String,
@@ -75,7 +75,7 @@ var projectSchema = mongoose.Schema({
 	},
 	
 
-			// layermenu for project/map
+			// layermenu for project
 	layermenu : [
 
 		{

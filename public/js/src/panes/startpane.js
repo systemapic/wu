@@ -2,18 +2,121 @@ Wu.StartPane = Wu.Class.extend({
 
 	initialize : function (options) {
 		
+		// set options
 		Wu.setOptions(this, options);
 
+		// create container
 		this.initContainer(options);
 
+		// add events
 		this.addHooks();
 
 	},
 
 	initContainer : function(options) {
 
+		// create container (append to body)
+		this._container = Wu.DomUtil.create('div', 'startpane-canvas-container', document.body);
+		
+		// init spinning map 	// todo!
+		// this.initSpinner();
+
+		// get latest proejcts
+		// this.refreshProjects();
+
+	},
+
+
+	initSpinner : function () {
+
+		// create content for black box
+		var content = this._initSpinnerContent();
+
+		// create map container
+		var map = L.DomUtil.create('div', 'spinning-map', document.body);
+
+		// create spinner instance
+		this._spinner = new L.SpinningMap({
+			autoStart : true,
+			accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q',
+			layer : 'systemapic.kcjonn12',
+			logo : 'images/griffon_logo_drop.png', // todo!
+			content : content, 
+			container : map,
+			speed : 1000,
+			position : {
+				lat : -33.83214,
+				lng : 151.22299,
+				zoom : [4, 17]
+			},
+			circle : {
+				radius : 120, 
+				color : 'rgba(247, 175, 38, 0.3)',
+				border : {
+					px : 4,
+					solid : 'solid',
+					color : 'white'
+				}
+			},
+		});
+
+	},
+
+	_initSpinnerContent : function () {
+
+		// Circle
+		this._circleContainer = Wu.DomUtil.create('div', 'startpane-circle-container', this._container);
+		this._circle = Wu.DomUtil.create('div', 'startpane-circle', this._circleContainer);
+
+		// Black banner
+		this._bannerContainer = Wu.DomUtil.create('div', 'startpane-banner-container', this._container);
+		this._banner = Wu.DomUtil.create('div', 'startpane-banner', this._bannerContainer);
+
+		// Big client Logo (Rüppell's Griffon)
+		this._logo = Wu.DomUtil.create('div', 'startpane-logo', this._banner);
+
+		// Project list container + header
+		this._recentProjectsContainer = Wu.DomUtil.create('div', 'startpane-recent-projects-container', this._banner);
+		this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Recent projects');
+
+		// Project list
+		this._projectList = Wu.DomUtil.create('div', 'startpane-project-list', this._recentProjectsContainer);
+
+		// // Spinning canvas
+		// this._spinningCanvasContainer = Wu.DomUtil.createId('div', 'start-panne-spinning-canvas-container', this._container);
+		// this._spinningCanvas = Wu.DomUtil.createId('div', 'start-panne-spinning-canvas', this._spinningCanvasContainer);
+		// this._bgMap = Wu.DomUtil.createId('div', 'start-panne-bg-map', this._spinningCanvas);
+
+
+	},
+
+
+	refreshProjects : function () {
+
+		// clear old
+		this._projectList.innerHTML = '';
+
+		// get latest projects
+		var projects = this._getLatestProjects();
+		if (!projects) return;
+
+		// Pull out the latest three Projects	
+		projects.forEach(function (project, i) {
+			if (i > 2) return;
+
+			// Create project container
+			this.createStartProject(project);
+		}, this);
+
+			
+
+	},
+
+	_getLatestProjects : function () {
+
 		// Get all projects
-		var projectsUnsorted = this.options.projects;
+		// var projectsUnsorted = this.options.projects;
+		var projectsUnsorted = app.Projects;	
 
 		// Sort them by last updated
 		var projects = _.sortBy(projectsUnsorted, function(p) {
@@ -23,48 +126,7 @@ Wu.StartPane = Wu.Class.extend({
 		// Reverse so we get newest first
 		projects.reverse();
 
-		// this._container = Wu.DomUtil.createId('div', 'start-pane', Wu.app._mapContainer);
-
-		// Main container
-		this._container = Wu.DomUtil.createId('div', 'start-panne-canvas-container', Wu.app._mapContainer);
-		
-		// Circle
-		this._circleContainer = Wu.DomUtil.createId('div', 'start-panne-circle-container', this._container);
-		this._circle = Wu.DomUtil.createId('div', 'start-panne-circle', this._circleContainer);
-
-		// Black banner
-		this._bannerContainer = Wu.DomUtil.createId('div', 'start-panne-banner-container', this._container);
-		this._banner = Wu.DomUtil.createId('div', 'start-panne-banner', this._bannerContainer);
-
-		// Big client Logo (Rüppell's Griffon)
-		this._logo = Wu.DomUtil.createId('div', 'start-panne-logo', this._banner);
-
-		// Project list container + header
-		this._recentProjectsContainer = Wu.DomUtil.createId('div', 'start-panne-recent-projects-container', this._banner);
-		this._recentProjectsHeader = Wu.DomUtil.create('h1', '', this._recentProjectsContainer);
-		this._recentProjectsHeader.innerHTML = 'Recent projects';
-
-		// Project list
-		this._projectList = Wu.DomUtil.createId('div', 'start-panne-project-list', this._recentProjectsContainer);
-
-		// Spinning canvas
-		this._spinningCanvasContainer = Wu.DomUtil.createId('div', 'start-panne-spinning-canvas-container', this._container);
-		this._spinningCanvas = Wu.DomUtil.createId('div', 'start-panne-spinning-canvas', this._spinningCanvasContainer);
-		this._bgMap = Wu.DomUtil.createId('div', 'start-panne-bg-map', this._spinningCanvas);
-
-
-
-
-		// Pull out the latest three Projects	
-		for ( var i = 0; i<projects.length-1; i++ ) {
-
-			// Create project container
-			this.createStartProject(projects[i]);
-
-			// Stop after three projects
-			if ( i == 2 ) break;
-		}
-
+		return projects;
 	},
 
 	createStartProject : function(project) {
@@ -95,8 +157,8 @@ Wu.StartPane = Wu.Class.extend({
 		if ( _name.length < 22 ) Wu.DomUtil.addClass(projectContainer, 'start-project-short-name');
 		projectContainer.innerHTML = _name;
 
-		// Register hook
-		Wu.DomEvent.on(projectContainer, 'mousedown', function() { this.activate(_uuid) }, this);
+		// select project hook
+		Wu.DomEvent.on(projectContainer, 'mousedown', function() { this.selectProject(_uuid) }, this);
 
 	},
 
@@ -106,7 +168,7 @@ Wu.StartPane = Wu.Class.extend({
 	removeHooks : function () {
 	},
 
-	activate : function(uuid) {
+	selectProject : function(uuid) {
 
 		var project = this.options.projects[uuid];
 		
@@ -121,14 +183,23 @@ Wu.StartPane = Wu.Class.extend({
 
 	},
 
-	deactivate : function() {
+	// activate startpane
+	activate : function () {
 
-		Wu.DomUtil.addClass(this._container, 'displayNone');
-		this.removeHooks();
+		// refresh latest projects
+		this.refreshProjects();
 
+		// show
+		Wu.DomUtil.removeClass(this._container, 'displayNone');
 	},
 
+	// deactivate startpane
+	deactivate : function() {
 
+		// hide
+		Wu.DomUtil.addClass(this._container, 'displayNone');
+		this.removeHooks();
+	},
 
 	update : function() {
 
@@ -175,4 +246,16 @@ Wu.StartPane = Wu.Class.extend({
 
 	}
 
-})	
+});
+
+
+
+
+
+
+
+
+
+
+
+

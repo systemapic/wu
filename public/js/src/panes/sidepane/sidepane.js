@@ -105,40 +105,28 @@ Wu.SidePane = Wu.Class.extend({
 
 	expand : function () {
 
+		// set height of menu
+		this._setMenuHeight();
 
-		// Set height on main drop down menu – on page load!
-		// Is it nasty JS'ing?
-
-		// Get the panes that are supposed to be there
-		// (I think the result is always 3 ~ if that is so, the loops below is not needed)
-		var children = Wu.app._editorMenuPane.children;
-		var numChild = children.length - 1;
-
-		for ( var i = 0; i<children.length; i++ ) {
-			var clist = children[i].classList;
-			for ( var o = 0; o<clist.length; o++ ) {
-				if ( clist[o] == 'disabled' ) {
-					numChild -= 1;
-				}
-			}
-		}
-
-		// Height pr button
-		var __realHeight = numChild * 70;
-
-		// Set height (this for CSS transition purposes)
-		Wu.app._editorMenuPane.style.height = __realHeight + 'px';
-
-
+		// open
 		this.openPane();
+
+	},
+
+	_setMenuHeight : function () {
+		var panes = this._getPaneArray();
+		var defaultPanes = app.Account.isManager() ? 3 : 2;		// 3 if manager, 2 if not (ie. only Project, Logout)
+		var height = panes ? panes.length * 70 : defaultPanes * 70;	// if no active project, default 3 menu items
+		app._editorMenuPane.style.height = parseInt(height) + 'px';
 	},
 
 	_getPaneArray : function (project) {
+		var project = project || app.activeProject;
+		if (!project) return;
+
 		var panes = [];
 		var pane = this.options.panes;
-
 		var settings = project.getSettings();
-
 
 		if (pane.clients) 				panes.push('Clients');
 		if (pane.mapOptions) 				panes.push('Map');
@@ -161,15 +149,16 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	refreshProject : function (project) {
+		console.log('prefreshh project', project);
 
 		var editMode = project.editMode; // access determined at Wu.Project
 		
 		// default menus in sidepane
 		var panes = this._getPaneArray(project);
 
-		// Set height of main drop down menu
-		Wu.app._editorMenuPane.style.height = (panes.length * 70) + 'px';
-		
+		// set menu height
+		if (this.paneOpen) this._setMenuHeight();									
+
 		// remove Map pane if not editor
 		if (!editMode) _.pull(panes, 'Map');
 		if (!app.Account.isManager()) _.pull(panes, 'Users');
@@ -250,8 +239,6 @@ Wu.SidePane = Wu.Class.extend({
 		// refresh leaflet
 		this._refreshLeaflet();
 
-		// this._closePane();
-
 		// todo: what if panes not there?
 		Wu.DomUtil.removeClass(app.SidePane.Documents._content, 'show');
 		Wu.DomUtil.removeClass(app.SidePane.DataLibrary._content, 'show');
@@ -271,10 +258,7 @@ Wu.SidePane = Wu.Class.extend({
 		this.paneOpen = true;
 
 		// open
-		// this._container.style.width = '350px';
 		Wu.DomUtil.addClass(app._active, 'show');
-
-		// Wu.DomUtil.addClass(app._active, 'enable');
 		Wu.DomUtil.removeClass(app._editorContentPane, 'displayNone');
 
 		// Have to set a micro timeout, so that it doesn't interfear with the displayNone class above

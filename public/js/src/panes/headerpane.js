@@ -261,8 +261,8 @@ Wu.HeaderPane = Wu.Class.extend({
 		control.style.paddingTop = this._headerHeight + 'px';
 
 		// home height
-		var home = app.SidePane.Home;
-		home.setHeight(newHeight);
+		// var home = app.SidePane.Home;
+		// home.setHeight(newHeight);
 
 		// set height sidepane
 		var sidepane = app.SidePane;

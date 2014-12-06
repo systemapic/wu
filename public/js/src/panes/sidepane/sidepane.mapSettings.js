@@ -635,17 +635,12 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 			if (layer.store.title.length < 32) text.style.maxHeight = '12px';
 		}
 
-		
-
-		// container.innerHTML = layer.store.title;
-
 		// append edit button
 		var button = Wu.DomUtil.create('div', 'edit-layermenu-layer', container);
 
 		// append range selectors
 		var rangeOpacity = Wu.DomUtil.create('input', 'layermenu-range-slider-opacity', container);
 		var rangeZindex  = Wu.DomUtil.create('input', 'layermenu-range-slider-zindex', container);
-
 
 		// todo: z-index, opacity
 		var layermenuLayer = {
@@ -805,11 +800,11 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 	_close : function () {
 		this.disableEdit();
 		return;
-		clearTimeout(this.closeEditTimer);
-		var that = this;
-		this.closeEditTimer = setTimeout(function() {
-			that.disableEdit();
-		}, 3000);
+		// clearTimeout(this.closeEditTimer);
+		// var that = this;
+		// this.closeEditTimer = setTimeout(function() {
+		// 	that.disableEdit();
+		// }, 3000);
 	},
 
 	// enable edit mode on layermenu itself
