@@ -196,7 +196,6 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 		// add tooltip
 		var h4 = Wu.DomUtil.get('h4-base');
-		// app.Tooltip.add(this._container, 'Sets the base layers of the map. These layers will not appear in the "Layers" menu to the right of the screen. Users may still toggle these layers if the "Base Layer Toggle" option has been set to active in the "Controls" section.' );
 		app.Tooltip.add(h4, 'Sets the base layers of the map. These layers will not appear in the "Layers" menu to the right of the screen. Users may still toggle these layers if the "Base Layer Toggle" option has been set to active in the "Controls" section.' );
 	},
 
@@ -258,7 +257,7 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		}, this);
 
 		// add toggle hook
-		Wu.DomEvent.on( container, 'mousedown', function (e) { 
+		Wu.DomEvent.on(container, 'mousedown', function (e) { 
 
 			// prevent other click events
 			Wu.DomEvent.stop(e);
@@ -266,7 +265,7 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 			// toggle layer
 			this.toggle(baseLayer);
 
-		}, this );
+		}, this);
 
 		this._layers = this._layers || {};
 		this._layers[baseLayer.layer.store.uuid] = baseLayer;
@@ -482,7 +481,7 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		var layer = baseLayer.layer;
 
 		// enable layer on map (without controls)
-		layer._addTo();
+		layer._addTo('baselayer');
 
 		// add baselayer
 		this.project.addBaseLayer({

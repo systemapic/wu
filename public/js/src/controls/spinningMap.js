@@ -4,6 +4,7 @@ L.SpinningMap = L.Class.extend({
 	// default options
 	options : {
 
+		gl : false,
 		accessToken : null, // mapbox
 		layer : null,
 		logo : '',
@@ -33,6 +34,12 @@ L.SpinningMap = L.Class.extend({
 			'spinning-reversed90',
 			'spinning-reversed270',
 		],
+		listeners : [{
+			'event' : null,
+			'action' : 'changeView'
+		}],
+		duration : 100000	// ms
+		// duration : 1000	// ms
 
 	},
 
@@ -47,16 +54,29 @@ L.SpinningMap = L.Class.extend({
 		// init 
 		this.initLayout();
 
+		// add hooks
+		this.addHooks();
+
 		// autostart
 		if (this.options.autoStart) this.start();
 
 	},
 
-
-	initLayout : function () { 
+	initLayout : function () {
 
 		// set container
 		this._container = this.options.container;
+
+		// set gl
+		this._gl = this.options.gl && mapboxgl.util.supported();
+		
+		// create map
+		this._gl ? this.initGLMap() : this.initMap();
+		
+	},
+
+
+	initMap : function () { 
 
 		// init wrappers
 		this.initWrappers();
@@ -75,6 +95,30 @@ L.SpinningMap = L.Class.extend({
 
 	},
 
+	initGLMap : function () {
+
+		// extend gl
+		this._extendMapboxGL();
+
+		// create map
+		this.createGLmap();
+
+		// create circle
+		this.createCircle();
+
+	},
+
+
+	_extendMapboxGL : function () {
+
+		// overwrite normalizer
+		mapboxgl.Map.prototype._normalizeBearing = function (bearing) {
+			console.log('_normalizeBearing');
+			return bearing;
+		}
+
+	},
+
 	initWrappers : function () {
 		var mapWrapper = L.DomUtil.create('div', 'map-wrapper', document.body);
 		mapWrapper.appendChild(this._container);
@@ -88,7 +132,7 @@ L.SpinningMap = L.Class.extend({
 		    zoom = this.options.position.zoom;
 
 		// create map
-		var map = this.map = L.mapbox.map(this._container);
+		var map = this._map = L.mapbox.map(this._container);
 
 		// add layer
 		var layer = L.mapbox.tileLayer(this.options.layer, {
@@ -96,7 +140,9 @@ L.SpinningMap = L.Class.extend({
 		}).addTo(map);
 
 		// set map options
-		map.setView([lat, lng], this._getZoomLevel());
+		this.setView(lat, lng, this._getZoomLevel());
+		
+		// set map options
 		map.dragging.disable();
 		map.touchZoom.disable();
 		map.doubleClickZoom.disable();
@@ -105,10 +151,262 @@ L.SpinningMap = L.Class.extend({
 		map.keyboard.disable();
 		map.zoomControl.removeFrom(map);
 		map.attributionControl.removeFrom(map);
+	
+
 	},
 
+	createGLmap : function () {
+
+		// set vars
+		var lat = this.options.position.lat,
+		    lng = this.options.position.lng,
+		    zoom = this._getZoomLevel(),
+		    accessToken = this.options.accessToken,
+		    container = this._container,
+		    tileset = this.options.layer;
+
+		// set access token
+		mapboxgl.accessToken = accessToken;
+
+		// create map
+		var map = this._map = new mapboxgl.Map({
+			container: this._container.id, // container id
+			style: {
+				"version": 6,
+				"sources": {
+					"simple-tiles": {
+						"tiles": "raster",
+						"url": "mapbox://" + tileset,
+						"tileSize": 256,
+						"type": "raster"
+					}
+				},
+				"layers": [{
+					"id": "simple-tiles",
+					"type": "raster",
+					"source": "simple-tiles",
+					"minzoom": 0,
+					"maxzoom": 22
+				}]
+			},
+			// interactive : false,
+			center: [lat, lng], 	// starting position
+			zoom: zoom 		// starting zoom
+		});
+
+	},
+
+	addHooks : function () {
+		// var map = this._map;
+		// // map.on('resize', this._onResize.bind(this));
+		
+		// map.on('moveend', this._onMoveend.bind(this));
+		// map.on('movestart', this._onMovestart.bind(this));
+
+		// // fly on login click
+		// var login = L.DomUtil.get('login-button'); // custom, todo: move to options
+		// var content = L.DomUtil.get('spinning-content'); 
+
+		// L.DomEvent.on(login, 'mousedown', L.DomEvent.stopPropagation, this);
+		// L.DomEvent.on(content, 'mousedown', this.contentClick, this);
+
+	},
+
+	contentClick : function () {
+		this._resetMoves();
+		if (this._gl) this.changeViewGL();
+	},
+
+	// _moveEnd : -1,
+	// _moveStart : false,
+
+	// _onMoveend : function (e) {
+	// 	console.log('on move end', e);
+	// 	this._moveEnd += 1;
+
+	// 	if (this._moveStart && this._moveEnd == 3) {
+	// 		this._realMoveEnd();
+	// 	}
+	// },
+
+	// _onMovestart : function () {
+	// 	console.log('on move start');
+	// 	this._moveStart = true;
+	// },
+
+	// _resetMoves : function () {
+	// 	console.log('clear!');
+	// 	this._moveStart = false;
+	// 	this._moveEnd = 0;
+	// },
+
+	// _realMoveEnd : function () {
+	// 	this._resetMoves();
+	// 	console.log('real end!!');
+	// 	this.restartGLRotation();
+	// },
+
+	// _onZoom : function () {
+	// 	console.log('on zoom');
+	// },
+
+	// _onMove : function () {
+	// 	console.log('move');
+	// },
+
+	_onResize : function () {
+
+		// sizes
+		var newSize = this._container.offsetWidth,
+	    	    oldSize = this._past || newSize,
+	 	    diff = oldSize - newSize,
+	 	    moved = diff/2 * 0.75;
+		this._past = newSize;
+
+		// set centre to circle
+		this._map.panBy([-moved, 0], {
+			duration : 0
+		});
+
+	},
+
+	panGL : function () {
+
+		var w = this._container.offsetWidth;
+		var pan = this._pan = w * 0.375;
+
+		// set centre to circle
+		this._map.panBy([pan, 0], {
+			duration : 0
+		});
+
+	},
+
+	restartGLRotation : function () {
+		clearTimeout(this._rotationTimer);
+		this.startGLRotation();
+	},
+
+	startGLRotation : function () {
+
+		var duration = this.options.duration,
+		    latlng = new mapboxgl.LatLng(37.76, -122.44),
+		    w = this._container.offsetWidth,
+		    left = w * -0.375,
+		    offset = this._getOffset();
+
+		// set bearing
+		if (!this._deg) this._deg = 90;
+
+		// rotate map
+		this._map.rotateTo(this._deg, {
+			duration : duration,
+			offset : offset,
+			easing : function (a) {
+				return a;
+			},
+		});
+
+		// rerun
+		this._rotationTimer = setTimeout(this.startGLRotation.bind(this), duration);
+
+		// change degrees
+		this._deg = this._deg + 90;
+
+	},
+
+	// _adjustContainer : function () {
+	// 	var w = this._container.offsetWidth,
+	// 	    width = w * 1.75,
+	// 	    left = -w + w * 0.250;
+	// 	this._container.style.width = width + 'px';
+	// 	this._container.style.left = left + 'px';
+	// },
+
 	setView : function (lat, lng, zoom) {
-		this.map.setView([lat, lng], zoom);
+		this._map.setView([lat, lng], zoom);
+	},
+
+	changeView : function () {
+		var lat = this.options.position.lat,
+		    lng = this.options.position.lng;
+
+		// set view
+		this.setView(lat, lng, this._getZoomLevel());
+		
+		// restart to change direction
+		this.stop();
+		this.start();
+	},
+
+	changeViewGL : function () {
+
+		
+		// current bearing
+		var currentBearing = this._map.getBearing();
+
+		// random bearing
+		var bearing = this._bearing = this._bearing ? this._bearing + 90 : 90;
+		if (this._bearing >= 360) this._bearing = 0; 
+
+		// difference in bearing. if negative, rotates clockwise
+		var diff = bearing - currentBearing;
+
+		// calc offset
+		var offset = this._getBearingOffset(bearing);
+
+		// get options
+		var lat = this.options.position.lat,
+		    lng = this.options.position.lng,
+		    zoom = this._getZoomLevel(this._map.getZoom());
+
+		// fly to
+		this._map.flyTo([lat, lng], zoom, bearing, {
+			offset : offset,
+			speed : 0.8
+		});
+
+	},
+
+
+	_getBearingOffset : function (bearing) {
+
+		// calc offset
+		var off = this._getOffset(),
+		    left = off[0];
+
+		// decide offset 
+		if (bearing == 90) {
+			// south
+			var offset = [0, left];
+		}
+		if (bearing == 180) {
+			// west
+			var offset = [-left, 0];
+		}
+		if (bearing == 270) {
+			// north
+			var offset = [0, -left];
+		}
+		if (bearing == 360 || bearing == 0) {
+			// east
+			var offset = [left, 0];
+		}
+
+		return offset;
+
+	},
+
+	_randomIntFromInterval : function (min,max) {
+    		return Math.floor(Math.random()*(max-min+1)+min);
+	},
+	
+
+	_getOffset : function (inverse) {
+		var w = this._container.offsetWidth;
+		var left = w * -0.375;
+		if (inverse) return [0, left];
+		return [left, 0];
 	},
 
 	createCircle : function () {
@@ -130,6 +428,9 @@ L.SpinningMap = L.Class.extend({
 		this._circle.style.background = this.options.circle.color;
 		this._circle.style.border = border;
 
+		// change view on click
+		if (!this._gl) L.DomEvent.on(this._circle, 'mousedown', this.changeView, this);
+		if (this._gl) L.DomEvent.on(this._circle, 'mousedown', this.changeViewGL, this);
 	},
 
 	setDimensions : function () {
@@ -165,13 +466,30 @@ L.SpinningMap = L.Class.extend({
 
 	// start spinning
 	start : function () {
-		this._direction = this._getDirection();
-		L.DomUtil.addClass(this._container, this._direction);
+		this._gl ? this._startGL() : this._start();
 	},
 
 	// stop spinning
 	stop : function () {
+		this._gl ? this._stopGL() : this._stop();
+	},
+
+	_start : function () {
+		this._direction = this._getDirection();
+		L.DomUtil.addClass(this._container, this._direction);
+	},
+
+	_stop : function () {
 		L.DomUtil.removeClass(this._container, this._direction);
+	},
+
+	_startGL : function () {
+		this.panGL();
+		this.startGLRotation();
+	},
+
+	_stopGL : function () {
+
 	},
 
 	// get direction of spin
@@ -182,7 +500,7 @@ L.SpinningMap = L.Class.extend({
 	},
 
 	// get zoom level
-	_getZoomLevel : function () {
+	_getZoomLevel : function (current) {
 		var min = this.options.position.zoom[0];
 		var max = this.options.position.zoom[1];
 		var random = Math.floor(Math.random()*(max-min+1)+min);

@@ -1,10 +1,12 @@
 var spinner;
+// var s = spinner;
 function spin () {
 
 	var content = L.DomUtil.get('spinning-content');
 	var map = L.DomUtil.get('spinning-map');
 
 	spinner = new L.SpinningMap({
+		// gl : true,
 		autoStart : true,
 		accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q',
 		layer : 'systemapic.kcjonn12',

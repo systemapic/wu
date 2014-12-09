@@ -13,48 +13,51 @@ Wu.Layer = Wu.Class.extend({
 		// create leaflet layers
 		this.initLayer();
 
-		// register for zIndex
-		// this._zIndex = app.MapPane.registerZIndex(this);
-
 		// all visible tiles loaded event
 		Wu.DomEvent.on(this.layer, 'load', function () {
 			app._loaded.push(this.getUuid());
 			app._loaded = _.uniq(app._loaded);
 		}, this);
+
+		// get zIndex control
+		this._zx = app.getZIndexControls();
 	},
 
 	initLayer : function () {
 		// create Leaflet layer, load data if necessary
 	},
 
-	add : function (map) {
-		this.addTo(map);
+	add : function (type) {
+
+		if (type == 'baselayer') this._isBase = true;
+		this.addTo();
+		console.log('layer.add(), isBase? ', this._isBase);
 	},
 
-	addTo : function (map) {
+	addTo : function () {
 		
 		// add to map
-		this._addTo(map);
+		this._addTo();
 		
 		// add to controls
 		this.addToControls();
 
 	},
 
-	_addTo : function (map) {
-		var map = map || Wu.app._map;
+	_addTo : function (type) {
+		var map = app._map;
 
 		// leaflet fn
 		this.layer.addTo(map);
-
-		// refresh zindex
-		// app.MapPane.refreshZIndex();
 
 		// add to active layers
 		app.MapPane.addActiveLayer(this);	// includes baselayers
 
 		// add gridLayer if available
 		if (this.gridLayer) map.addLayer(this.gridLayer);
+
+		// update zindex
+		this._addToZIndex(type);
 
 	},
 
@@ -87,6 +90,17 @@ Wu.Layer = Wu.Class.extend({
 		this.layer.on(event, fn);
 	},
 
+	_addToZIndex : function (type) {
+		if (type == 'baselayer') this._isBase = true;
+		var zx = this._zx;
+		this._isBase ? zx.b.add(this) : zx.l.add(this); // either base or layermenu
+	},
+
+	_removeFromZIndex : function () {
+		var zx = this._zx;
+		this._isBase ? zx.b.remove(this) : zx.l.remove(this);
+	},
+
 	remove : function (map) {
 		var map = map || Wu.app._map;
 
@@ -98,6 +112,9 @@ Wu.Layer = Wu.Class.extend({
 
 		// remove gridLayer if available
 		if (this.gridLayer) map.removeLayer(this.gridLayer); 
+
+		// remove from zIndex
+		this._removeFromZIndex();
 
 		// remove from inspectControl if available
 		var inspectControl = app.MapPane.inspectControl;			// refactor to events
@@ -132,20 +149,7 @@ Wu.Layer = Wu.Class.extend({
 		this.layer.setOpacity(this.opacity);
 	},
 
-	// refreshZIndex : function () {
-	// 	// set zIndex on leaflet layer
-	// 	this.layer.setZIndex(this.getZIndex());
-	// },
 
-	// setZIndex : function (zIndex) {
-	// 	this.store.zIndex = parseInt(zIndex);
-	// 	this.save('zIndex');
-	// 	this.refreshZIndex();
-	// },
-
-	// getZIndex : function () {
-	// 	return parseInt(this.store.zIndex);
-	// },
 
 	getOpacity : function () {
 		return this.opacity || 1;
@@ -315,7 +319,11 @@ Wu.Layer = Wu.Class.extend({
 	_save : function (json) {
 		var string  = JSON.stringify(json);
 		Wu.save('/api/layer/update', string);
-	}
+	},
+
+	_setZIndex : function (z) {
+		this.layer.setZIndex(z);
+	},
 
 });
 
@@ -344,9 +352,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	update : function () {
 		var map = app._map;
 
-		// remove layer (todo: z-index)
-		// if (this.layer) map.removeLayer(this.layer);		// refactor ? should be removed/added in same place?
-
+		// remove
 		if (this.layer) this.remove();
 
 		// prepare raster
@@ -493,9 +499,12 @@ Wu.MapboxLayer = Wu.Layer.extend({
 		// create gridLayer if available
 		if ('grids' in this.store) this.gridLayer = L.mapbox.gridLayer(this.store.data.mapbox);
 
+		// mark as loaded
 		this.loaded = true;
 		
 	},
+
+
 
 });
 
@@ -512,7 +521,6 @@ Wu.createLayer = function (layer) {
 	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
 
 	// geojson
-	// if (layer.data.geojson) return new Wu.GeojsonLayer(layer);
 	if (layer.data.geojson) return new Wu.CartoCSSLayer(layer);
 	
 	// geojson

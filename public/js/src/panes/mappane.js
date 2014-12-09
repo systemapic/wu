@@ -9,8 +9,8 @@ Wu.MapPane = Wu.Class.extend({
 		this._activeLayers = [];
 
 		// connect zindex control
-		this.zIndexControl = new Wu.ZIndexControl();
-		
+		this._bzIndexControl = new Wu.ZIndexControl.Baselayers();
+		this._lzIndexControl = new Wu.ZIndexControl.Layermenu();
 		return this; 
 	},      
 
@@ -84,10 +84,11 @@ Wu.MapPane = Wu.Class.extend({
 		
 		// Wu.Layer
 		var layer = this.project.layers[baseLayer.uuid];
-		if (layer) {
-			layer.add();
-			layer.setOpacity(baseLayer.opacity);
-		}
+		if (!layer) return;
+		
+		layer.add('baselayer');
+		layer.setOpacity(baseLayer.opacity);
+			
 
 	},
 
@@ -388,15 +389,15 @@ Wu.MapPane = Wu.Class.extend({
 
 	},
 
-	refreshZIndex : function () {
+	// refreshZIndex : function () {
 
-		var layers = this.project.getActiveLayers();
+	// 	var layers = this.project.getActiveLayers();
 
-		layers.forEach(function (layer) {
-			if (layer) layer.refreshZIndex();
-		}, this);
+	// 	layers.forEach(function (layer) {
+	// 		if (layer) layer.refreshZIndex();
+	// 	}, this);
 
-	},
+	// },
 
 
 	hideControls : function () {
@@ -863,48 +864,48 @@ Wu.MapPane = Wu.Class.extend({
 
 
 
-	_zIndex : [],
+	// _zIndex : [],
 
-	registerZIndex : function (layer) {
+	// registerZIndex : function (layer) {
 
-		// get zIndex from layer, if any
-		var zIndex = layer.store.zIndex;
+	// 	// get zIndex from layer, if any
+	// 	var zIndex = layer.store.zIndex;
 		
-		// if no zIndex, set to last in line (ie. top)
-		if (!zIndex) layer.setZIndex(this._zIndex.length + 1);
+	// 	// if no zIndex, set to last in line (ie. top)
+	// 	if (!zIndex) layer.setZIndex(this._zIndex.length + 1);
 
-		var item = {
-			zIndex : zIndex,
-			layer : layer
-		}
+	// 	var item = {
+	// 		zIndex : zIndex,
+	// 		layer : layer
+	// 	}
 
-		// add to global zIndex array
-		this.addToZIndex(item);
+	// 	// add to global zIndex array
+	// 	this.addToZIndex(item);
 
-	},
+	// },
 
-	addToZIndex : function (item) {
+	// addToZIndex : function (item) {
 
-		// if first, just push
-		if (this._zIndex.length == 0) return this._zIndex.push(item);
+	// 	// if first, just push
+	// 	if (this._zIndex.length == 0) return this._zIndex.push(item);
 
-		// add to appropriate place in zIndex
-		var z = _.findIndex(this._zIndex, function (l) {
-			if (!l) return false;
+	// 	// add to appropriate place in zIndex
+	// 	var z = _.findIndex(this._zIndex, function (l) {
+	// 		if (!l) return false;
 
-			return l.zIndex > item.zIndex;
+	// 		return l.zIndex > item.zIndex;
 
-		});
+	// 	});
 
-	},
+	// },
 
-	setZIndex : function (layer, zIndex) {
+	// setZIndex : function (layer, zIndex) {
 
-	},
+	// },
 
-	getZIndex : function (layer) {
+	// getZIndex : function (layer) {
 
-	},
+	// },
 
 
 	
