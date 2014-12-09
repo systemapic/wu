@@ -463,11 +463,11 @@ Wu.App = Wu.Class.extend({
 		app.MapPane.setPosition(hash.position);
 
 		// set layers
-		hash.layers.forEach(function (layerUuid) {
-			
+		hash.layers.forEach(function (layerUuid) { 	// todo: differentiate between baselayers and layermenu
+								// todo: layermenu items are not selected in layermenu itself, altho on map
 			// add layer
 			var layer = project.getLayer(layerUuid);
-			layer.add();
+			layer.add('baselayer'); 
 
 		}, this);
 
@@ -579,6 +579,13 @@ Wu.App = Wu.Class.extend({
 
 	},
 
+	getZIndexControls : function () {
+		var z = {
+			b : app.MapPane._bzIndexControl,
+			l : app.MapPane._lzIndexControl
+		}
+		return z;
+	},
 
 
 

@@ -234,8 +234,20 @@
 	left: -60px;
 	/*border: 4px solid white;*/
 	box-shadow: 0 0 25px 0 black;
+	opacity: 0.8;
+
+	cursor: pointer;
+	-webkit-transition: opacity 200ms ease;
+	transition: opacity 200ms ease;
 	}
 
+.start-pane-circle:hover {
+	opacity: 1;
+}	
+
+.start-pane-circle:active {
+	box-shadow: none;
+}
 
 
 /* Black banner container */
@@ -264,7 +276,7 @@
 	/*width: 100%;*/
 
 	width: 95%;
-	min-width: 800px;
+	min-width: 600px;
 
 	height: 310px;
 	background-color: rgba(0,0,0,0.6);
@@ -348,12 +360,14 @@
 @media screen and (max-width: 1050px) {
 	#login-logo {
 		/*display: none;*/
-		opacity: 0.1;
+		/*opacity: 0.1;*/
 		z-index: 0;
 	}
 
 	.col-sm-6.col-sm-offset-3 h1 {
 		z-index: 999999;
+		font-size: 18px;
+
 	}
 	#hitme {
 		z-index: 999999;
@@ -361,12 +375,41 @@
 	}
 
 	.col-sm-6.col-sm-offset-3 {
-		padding-left: 100px;
+		padding-left: 30px;
+		/*padding-top: 205px;*/
+		padding-top: 215px;
+		top: -225px;
+		height: 450px;		
 	}
 }
 
+#powered-by {
+	background-color: rgba(0,0,0,.6);
+	color: #DADADA;
+	color: #CCC;
+	position: absolute;
+	bottom: -20px;
+	padding: 2px 6px;
+	font-family: helvetica neue;
+	font-size: 11px;
+	font-style: italic;
+	font-weight: 500;
+	right: 0;
+	}
+
+#powered-by a,
+#powered-by a:hover,
+#powered-by a:active {
+	padding-left: 5px;
+	color: #CCC;
+	font-weight: 500;
+	text-decoration: none;
+	}
 
 
+.mapboxgl-ctrl-attrib {
+	display: none !important;
+}
 
 body {
 	margin: 0 !important;
@@ -374,4 +417,18 @@ body {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
+
+	-webkit-user-select: none; /* Chrome/Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+ */
+
+	/* Rules below not implemented in browsers yet */
+	-o-user-select: none;
+	user-select: none;
+	
 	}
+
+
+#spinning-content {
+	/*display: none;*/
+}

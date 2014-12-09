@@ -1,7 +1,8 @@
 L.Control.Inspect = L.Control.extend({
 	
 	options: {
-		position : 'bottomright' 
+		position : 'bottomright',
+		draggable : true
 	},
 
 	onAdd : function (map) {
@@ -17,7 +18,7 @@ L.Control.Inspect = L.Control.extend({
 		app.Tooltip.add(container, 'Shows a list of active layers', { extends : 'systyle', tipJoint : 'top left'});
 
 		// content is not ready yet, cause not added to map! 
-		return container; // this._container
+		return container; 
 
 	},
 
@@ -27,35 +28,57 @@ L.Control.Inspect = L.Control.extend({
 		    pos = this.getPosition(),
 		    corner = map._controlCorners[pos];
 
+		// add class and append to control corner
 		L.DomUtil.addClass(container, 'leaflet-control');
-
 		corner.appendChild(container);
+
+		// stop
+		Wu.DomEvent.on(container, 'mousedown click dblclick', Wu.DomEvent.stop, this);
 
 		return this;
 	},
 
 	update : function (project) {
+		// on project refresh
 
 		// get vars
-		this.project  = project || Wu.app.activeProject;
+		this.project  = project || app.activeProject;
 		this._content = Wu.DomUtil.get('inspect-control-inner-content'); 
 		this._list    = Wu.DomUtil.get('inspector-list');
 
 		// reset layers
 		this.layers = [];           
 
-		// prevent map scrollzoom
-                var map = app._map;
-                Wu.DomEvent.on(this._container, 'mouseenter', function () {
-                        map.scrollWheelZoom.disable();
-                }, this);
-                Wu.DomEvent.on(this._container, 'mouseleave', function () {
-                        map.scrollWheelZoom.enable();
-                }, this);    
+		// prevent scroll
+		this.disableScrollzoom();
+
+		// get zindexControl
+		this._zx = app.getZIndexControls().l; // layermenu zindex control 
 	       
 	},
 
+	disableScrollzoom : function () {
 
+		// reset events
+		this.resetScrollzoom();
+
+		// prevent map scrollzoom
+                var map = app._map;
+                Wu.DomEvent.on(this._container, 'mouseenter', function () { map.scrollWheelZoom.disable(); }, this);
+                Wu.DomEvent.on(this._container, 'mouseleave', function () { map.scrollWheelZoom.enable();  }, this); 
+ 		
+	},
+
+	resetScrollzoom : function () {
+
+		// reset map scrollzoom
+                var map = app._map;
+                Wu.DomEvent.off(this._container, 'mouseenter', function () { map.scrollWheelZoom.disable(); }, this);
+                Wu.DomEvent.off(this._container, 'mouseleave', function () { map.scrollWheelZoom.enable();  }, this); 
+	},
+
+
+	// currently called from layers.js:63 .. refactor.. dont chain, do modules, event emitters
 	addLayer : function (layer) {
 
 		// Make sure that the layer inspector is visible
@@ -77,12 +100,10 @@ L.Control.Inspect = L.Control.extend({
 		app.Tooltip.add(eye, 'Isolate layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
 		app.Tooltip.add(kill, 'Disable layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
 
-
 		// add to list
-		this._list.appendChild(wrapper);
+		// this._list.appendChild(wrapper);
+		this._list.insertBefore(wrapper, this._list.firstChild);
 
-		console.log('app.zIndex: ', app.zIndex);
-	
 		// create object
 		var entry = {
 			wrapper   : wrapper,
@@ -99,97 +120,145 @@ L.Control.Inspect = L.Control.extend({
 		// add object to front of array
 		this.layers.unshift(entry);
 
-		// add hooks
+		// add stops
 		Wu.DomEvent.on(upArrow,   'dblclick click', function (e) { Wu.DomEvent.stop(e); this.moveUp(entry);   	 }, this);
 		Wu.DomEvent.on(downArrow, 'dblclick click', function (e) { Wu.DomEvent.stop(e); this.moveDown(entry); 	 }, this);
 		Wu.DomEvent.on(fly, 	  'dblclick click', function (e) { Wu.DomEvent.stop(e); this.flyTo(entry);	 }, this);
 		Wu.DomEvent.on(eye, 	  'dblclick click', function (e) { Wu.DomEvent.stop(e); this.isolateToggle(entry);}, this);
 		Wu.DomEvent.on(kill, 	  'dblclick click', function (e) { Wu.DomEvent.stop(e); this.killLayer(entry);	 }, this);
 		Wu.DomEvent.on(text, 	  'dblclick click', function (e) { Wu.DomEvent.stop(e); this.select(entry);	 }, this);
-		Wu.DomEvent.on(wrapper,   'mousedown dblclick click',  	   Wu.DomEvent.stop, 				    this);
-	
-		// Stop Propagation
-		Wu.DomEvent.on(this._content, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		// Wu.DomEvent.on(wrapper,   'mousedown dblclick click',  	   Wu.DomEvent.stop, 				    this);		
 
-		
+		// make draggable
+		if (this.options.draggable) this._makeSortable(entry);
 
 	},
 
-	flyTo : function (entry) {
 
-		var layer = entry.layer;
-		var extent = layer.getMeta().extent;
 
-		var southWest = L.latLng(extent[1], extent[0]),
-		    northEast = L.latLng(extent[3], extent[2]),
-		    bounds = L.latLngBounds(southWest, northEast);
+	_makeSortable : function (entry) {
 
-		// fly
-		var map = app._map;
-		map.fitBounds(bounds);
+		var el = entry.wrapper;
+		
+		// drag start
+		Wu.DomEvent.on(el, 'mousedown', function (e) {
+			entry.e = e;
+			this._dragStart(entry);
+		}, this);
+		
+		// init
+		this._initSortable();
 
 	},
 
-	// _getIndex : function (layer) {
+	_initSortable : function () {
+		if (this._initedSortable) return;
+		this._initedSortable = true;
 
-	// 	// rewrite zindex:
-	// 	//
-	// 	// must be a store for ALL layers (active, non-active), a list of order, and this list must be validated each time
-	// 	// 	which means the ORDER of the list is king, and numbers, starting at 1000, must be made for it.
-	// 	//	simple nudging wont work!!!
-	// 	//
-	// 	//
-	// 	//
-	// 	//
-	// 	//
-	// 	//
+		// hooks
+		Wu.DomEvent.on(document, 'mousemove', this._dragMove, this);
+		Wu.DomEvent.on(document, 'mouseup', this._dragStop, this);
+	},
 
-	// 	// console.log('_getIndex layer: ', layer);
+
+	_dragStart : function (entry) {
+
+		this._dragging = entry;
+		this._n = 1;
+		this._m = 1;
+		this._md = 0;
+		var div = entry.wrapper;
+
 		
-	// 	// get index
-	// 	var layerIndex = layer.getZIndex(); // ie. 1002
 
-	// 	// get other items already added to inspector
-	// 	var already = this.layers;
+		console.log('_dragStart');
 
-	// 	var above = [];
+	},
 
-	// 	// console.log('this.layers LENGHT: ', this.layers.length);
+	_dragMove : function (e) {
+		if (!this._dragging) return;
 
-	// 	this.layers.forEach(function (l) {
+		var d = this._dragging,
+		    md = this._md,
+		    movedY = e.y - d.e.y,
+		    div = d.wrapper,
+		    n = this._n,
+		    m = this._m,
+		    k = 18; // how many px to move bf trigger
 
-	// 		// console.log('l', l);
-	// 		// console.log('others (l) zindex: ', l.layer.store.zIndex, l.layer.store.title);
-	// 		if (l.layer.store.zIndex >= layer.store.zIndex) above.push(l);
+		// accumulate movement
+		this._md += e.movementY;
 
-	// 	}, this);
+		// move up/down
+		if (md < -k ) this._moveUp(movedY);
+		if (md >  k ) this._moveDown(movedY);
+		
+		// add dragging class
+		if (!this._dragClassAdded) L.DomUtil.addClass(div, 'dragging');
+	},
 
-	// 	// var index = _.sortedIndex(this.layers, layer, 'zIndex');
+	_dragStop : function (e) {
+		if (!this._dragging) return;
 
-	// 	// console.error('_getIndex (num above)', above.length);
-	// 	// console.log('layer zindex: ', layerIndex, layer.getTitle());
+		// do something
+		var div = this._dragging.wrapper;
+		L.DomUtil.removeClass(div, 'dragging');
 
-	// 	return above.length;
+		this._dragClassAdded = false;;
+		this._dragging = false;
+	},	
 
-	// },
-	
+	_moveUp : function () {		// todo: doesn't work as well going up then back down
+		var d = this._dragging,
+		    div = d.wrapper,
+		    prev = div.previousSibling,
+		    layer = this._dragging.layer;
+
+		if (!prev) return;
+
+		// move div in dom
+		prev.parentNode.insertBefore(div, prev);
+
+		// move up in zindex
+		this._zx.up(layer);
+
+		// reset dragging y count
+		this._md = 0;
+	},
+
+	_moveDown : function () {
+
+		var d = this._dragging,
+		    div = d.wrapper,
+		    next = div.nextSibling,
+		    layer = this._dragging.layer;
+
+		if (!next) return;
+
+		// move div in dom
+		next.parentNode.insertBefore(div, next.nextSibling);
+
+		// move up in zindex
+		this._zx.down(layer);
+
+
+		// reset dragging y count
+		this._md = 0;
+	},
+
+
 	// remove by layer
 	removeLayer : function (layer) {
-
-		console.log('removeLayuer inspect!!', layer);
 
 		// find entry in array
 		var entry = _.find(this.layers, function (l) { return l.uuid == layer.store.uuid; })
 
-		console.log('entyr: ', entry);
-
 		// remove
 		this._removeLayer(entry);
 
-		// Hise Layer inspector if it's empty
+		// Hide Layer inspector if it's empty
 		if ( this.layers.length == 0 ) this._content.style.display = 'none';
 		
-
 
 	},
 
@@ -212,69 +281,58 @@ L.Control.Inspect = L.Control.extend({
 
 	moveUp : function (entry) {
 
-		console.log('moveUp', entry);
+		var d = entry,
+		    div = d.wrapper,
+		    prev = div.previousSibling,
+		    layer = d.layer;
 
-		// get current position
-		var index = _.findIndex(this.layers, {'uuid' : entry.uuid});
+		if (!prev) return;
 
-		// return if already on top
-		if (index == 0) return;
+		// move div in dom
+		prev.parentNode.insertBefore(div, prev);
 
-		var aboveEntry   = this.layers[index - 1];
-		var wrapper 	 = entry.wrapper;
-		var aboveWrapper = aboveEntry.wrapper;
-
-		// move in dom
-		wrapper.parentNode.insertBefore(wrapper, aboveWrapper);
-
-		// move up in array
-		this.layers.moveUp(entry); // Array.prototype.moveUp, in Wu.Class
-
-		// set new z-index...
-		this.updateZIndex();
+		// move up in zindex
+		this._zx.up(layer);
 
 	},
 
 	moveDown : function (entry) {
 
-		console.log('moveDown', entry);
+		var d = entry,
+		    div = d.wrapper,
+		    next = div.nextSibling,
+		    layer = d.layer;
 
-		// get current position
-		var index = _.findIndex(this.layers, {'uuid' : entry.uuid});
+		if (!next) return;
 
-		// return if already on bottom
-		if (index == this.layers.length - 1) return;
+		// move div in dom
+		next.parentNode.insertBefore(div, next.nextSibling);
 
-		var belowEntry 	 = this.layers[index + 1];
-		var wrapper 	 = entry.wrapper;
-		var belowWrapper = belowEntry.wrapper;
+		// move up in zindex
+		this._zx.down(layer);
 
-		// move in dom
-		belowWrapper.parentNode.insertBefore(belowWrapper, wrapper);
-
-		// move down in array
-		this.layers.moveDown(entry);
-
-		// set new zIndex
-		this.updateZIndex();
+		
 	},
 
-	updateZIndex : function () {
+	
+	flyTo : function (entry) {
 
-		console.log('updateZIndex, this.layers:', this.layers);
+		var layer = entry.layer;
+		if (!layer) return;
 
-		// update zIndex for all layers depending on position in array
-		var length = this.layers.length;
-		this.layers.forEach(function (entry, i) {
+		var extent = layer.getMeta().extent;
+		if (!extent) return;
 
-			var layer  = entry.layer;
-			var zIndex = length - i + 1000;
+		var southWest = L.latLng(extent[1], extent[0]),
+		    northEast = L.latLng(extent[3], extent[2]),
+		    bounds = L.latLngBounds(southWest, northEast);
 
-			// set layer index
-			// layer.setZIndex(zIndex);
+		// fly
+		var map = app._map;
+		map.fitBounds(bounds);
 
-		}, this);
 	},
+
 
 
 	isolateToggle : function (entry) {

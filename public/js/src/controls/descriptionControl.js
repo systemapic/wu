@@ -53,7 +53,6 @@ L.Control.Description = L.Control.extend({
 	},
 
 	setLayer : function (layer) {
-		console.log('setLayer: ', layer);
 		this.activeLayer = layer;
 		this.setDescription(layer);
 

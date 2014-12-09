@@ -122,9 +122,8 @@ Wu.Project = Wu.Class.extend({
 		this.refreshSidepane();
 
 		// set active project in sidepane
-		if (this._menuItem) {
-			this._menuItem._markActive();
-		} 
+		if (this._menuItem) this._menuItem._markActive();
+		
 	},
 
 	addNewLayer : function (layer) {
@@ -221,7 +220,6 @@ Wu.Project = Wu.Class.extend({
 		var json = {};
 		json[field] = this.store[field];
 		json.uuid = this.store.uuid;
-
 
 
 		// // dont save if no changes
