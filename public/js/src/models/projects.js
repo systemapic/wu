@@ -929,9 +929,11 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	enableSocialSharing : function () {
+		console.log('enable share!');
 		app.SidePane.addPane('Share');
 	},
 	disableSocialSharing : function () {
+		console.log('sidable share');
 		app.SidePane.removePane('Share');
 	},
 
