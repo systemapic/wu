@@ -39,7 +39,7 @@ L.Control.Inspect = L.Control.extend({
 	},
 
 	update : function (project) {
-		// on project refresh
+		// on project refresh + added control
 
 		// get vars
 		this.project  = project || app.activeProject;
@@ -55,6 +55,17 @@ L.Control.Inspect = L.Control.extend({
 		// get zindexControl
 		this._zx = app.getZIndexControls().l; // layermenu zindex control 
 	       
+	        // add active layers
+	        this._addAlreadyActiveLayers();
+
+	},
+
+	_addAlreadyActiveLayers : function () {
+		var active = app.MapPane.getActiveLayers();
+		active.forEach(function (layer) {
+			// add layermenu layers
+			if (!layer._isBase) this.addLayer(layer);
+		}, this);
 	},
 
 	disableScrollzoom : function () {
