@@ -232,8 +232,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var error  = result.error;
 		var store  = result.project;
 
-		console.log('results: ', result);
-
 		// return error
 		if (error) return console.log('there was an error creating new project!', error);			
 
@@ -452,8 +450,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	open : function () {
-
-		console.log('this open, yo');
 
 		this.calculateHeight();
 		this._container.style.height = this.maxHeight + 'px';          

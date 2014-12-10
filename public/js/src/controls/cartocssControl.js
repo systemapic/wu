@@ -242,7 +242,7 @@ L.Control.CartoCSS = L.Control.extend({
 		// get meta fields
 		var fields = this._layer.getMetaFields(); // return false if no fields found
 		
-		console.log('fields: ', fields);
+		// console.log('fields: ', fields);
 
 		// create string
 		var string = '// CartoCSS reference guide:\n// https://bit.ly/1z5OvXT\n\n\n';
@@ -955,4 +955,3 @@ L.Control.CartoCSS = L.Control.extend({
 L.control.cartoCss = function (options) {
 	return new L.Control.CartoCSS(options);
 };
-console.log('cartocssControl.js');
