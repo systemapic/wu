@@ -452,9 +452,18 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	open : function () {
+
+		console.log('this open, yo');
+
 		this.calculateHeight();
 		this._container.style.height = this.maxHeight + 'px';          
 		this._isOpen = true;
+
+		// Set overflow visible to not cut off info on hover on [i]
+		var that = this;
+		setTimeout(function() {
+			that._container.style.overflow = 'visible';
+		}, 500)
 
 		// close others
 		var clients = app.SidePane.Clients;
@@ -466,6 +475,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.calculateHeight();
 		this._container.style.height = this.minHeight + 'px';    
 		this._isOpen = false;
+
+		// Remove overflow visible to not cut off info on hover on [i]
+		this._container.style.overflow = 'hidden';
+		
 	},
 
 	removeProject : function (project) {

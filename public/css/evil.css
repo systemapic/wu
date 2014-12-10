@@ -1,8 +1,33 @@
 .map-blur {
-	-webkit-filter: blur(3px) brightness(0.5) grayscale(0.5);
+/*	-webkit-filter: blur(3px) brightness(0.5) grayscale(0.5);
 	-moz-filter: blur(3px) brightness(0.5) grayscale(0.5);
 	filter: blur(3px) brightness(0.5) grayscale(0.5);
 	filter: url(images/filter.svg#svg-map-filter);
-	opacity: 1;
+*/	opacity: 1;
 	}
 
+.map-blur:after {
+	content: '';
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	background: rgba(0,0,0,0.7);	
+	z-index: 9999;
+	}
+
+.home-container,
+.status-progress-bar,
+.dropzone-pane,
+.q-editor-container,
+.dropzone-meta,
+.fullpage-documents,
+.data-library,
+.data-library, 
+.fullpage-mediaLibrary,
+#header,
+.fullpage-users,
+.fullpage-mediaLibrary {
+	z-index: 99999;
+}	

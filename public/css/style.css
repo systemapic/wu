@@ -1493,6 +1493,9 @@ input.cmn-toggle-round-flat + label:before {
   font-weight: 400;
   overflow: hidden; }
 
+.leaflet-popup-content hr {
+  margin: 7px 0px; }
+
 .leaflet-popup-scrolled {
   padding-right: 40px;
   border: 0; }

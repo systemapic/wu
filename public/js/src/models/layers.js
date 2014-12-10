@@ -349,6 +349,7 @@ Wu.RasterLayer = Wu.Layer.extend({
 });
 
 
+// systemapic layers
 Wu.CartoCSSLayer = Wu.Layer.extend({
 
 	initLayer : function () {
@@ -372,34 +373,31 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	_prepareRaster : function () {
 		
 		// set ids
-		var fileUuid = this.store.file;	// file id of geojson
-		var cartoid = this.store.data.cartoid || 'cartoid';
-
-		// tile server ip
-		var tileServer = app.options.servers.tiles,
-		    token = app.accessToken,
-		    url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
+		var fileUuid 	= this.store.file,	// file id of geojson
+		    cartoid 	= this.store.data.cartoid || 'cartoid',
+		    tileServer 	= app.options.servers.tiles,
+		    token 	= app.accessToken,
+		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			fileUuid: fileUuid,
 			cartoid : cartoid,
 			subdomains : 'abcd',
-			// zIndex : zIndex
+			maxRequests : 8
 		});
 	},
 
 	_prepareGrid : function () {
 
 		// set ids
-		var fileUuid = this.store.file;	// file id of geojson
-		var cartoid = this.store.data.cartoid || 'cartoid';
-
-		// add gridlayer
-		var gridServer = app.options.servers.utfgrid,
-		    token = app.accessToken,
-		    url = gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
+		var fileUuid 	= this.store.file,	// file id of geojson
+		    cartoid 	= this.store.data.cartoid || 'cartoid',
+		    gridServer 	= app.options.servers.utfgrid,
+		    token 	= app.accessToken,
+		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
 		
+		// create gridlayer
 		this.gridLayer = new L.UtfGrid(url, {
 			useJsonP: false,
 			subdomains: 'ghi',
@@ -411,11 +409,13 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	},
 
 	updateStyle : function () {
-		var map = app._map;	// refactor
+		var map = app._map;	
 		
+		// update
 		this.update();
 
-		this.addTo(map);
+		// add to map
+		this.addTo(map); // refactor
 	},
 
 	_addGridEvents : function () {
@@ -424,9 +424,9 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 		// add click event
 		grid.on('mousedown', function(e) {
-			console.log('grid.mousedown', e.data);
 			if (!e.data) return;
 
+			// pass layer
 			e.layer = this;
 
 			// add to pending
@@ -435,9 +435,9 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		}, this);
 
 		grid.on('mouseup', function (e) {
-			console.log('grid.mouseup', e.data);
 			if (!e.data) return;
 
+			// pass layer
 			e.layer = this;
 
 			// open popup
@@ -445,9 +445,13 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		
 		}, this);
 
-	},
+		grid.on('click', function (e) {
 
-	
+			// clear old
+			app.MapPane._clearPopup();
+		
+		}, this);
+	},
 });
 
 
@@ -469,11 +473,7 @@ Wu.MapboxLayer = Wu.Layer.extend({
 
 		// mark as loaded
 		this.loaded = true;
-		
 	},
-
-
-
 });
 
 
@@ -488,7 +488,7 @@ Wu.createLayer = function (layer) {
 	// mapbox
 	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
 
-	// geojson
+	// systemapic vector tiles todo: store not as geojson, but as vector tiles in project db model?
 	if (layer.data.geojson) return new Wu.CartoCSSLayer(layer);
 	
 	// geojson
@@ -560,34 +560,19 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	addLayerHooks : function () {
 
-		// console.log('this: ', this);
-
 		this.layer.eachLayer(function (layr) {
-
 			
 			var type = layr.feature.geometry.type;
-			// console.log('type: ', type);
 
 			if (type == 'Polygon') {
 
-
-				// console.log('Polygon layer: ', layr);
 				Wu.DomEvent.on(layr, 'styleeditor:changed', this.styleChanged, this);
-				// layr.eachLayer(function (multi) {
-
-				// 	console.log('polypart');
-
-				// }, this);
 
 			} 
 
 			if (type == 'MultiPolygon') {
 
-				// console.log('MultiPolygon layer: ', layr);
-
 				layr.eachLayer(function (multi) {
-					// console.log('multipart');
-					// console.log('multi: ', multi); // this layer has no 'feature' and no _layers, but needs a listener for change
 
 					Wu.DomEvent.on(multi, 'styleeditor:changed', function (data) {
 						this.multiStyleChanged(data, multi, layr);
