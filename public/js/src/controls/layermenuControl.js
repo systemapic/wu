@@ -738,7 +738,7 @@ L.Control.Layermenu = L.Control.extend({
 		// set inactive in sidepane layermenu
 		if (layermenuItem.layer) app.SidePane.Map.mapSettings.layermenu._off(layermenuItem.layer);
 
-		console.log('layermenu remove: ', layermenuItem);
+		// remove layer from map
 		var layer = layermenuItem.layer;
 		if (layer) layer.remove();
 
