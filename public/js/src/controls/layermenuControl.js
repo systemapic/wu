@@ -524,13 +524,6 @@ L.Control.Layermenu = L.Control.extend({
 
 	updateLogic : function () {
 
-		// // check validity
-		// var invalid = this.checkLogic();
-		// if (invalid.length) {
-		// 	return console.error('not valid layermenu!', invalid);
-			
-		// } 
-
 		// get vars
 		var array = this.project.store.layermenu;
 		this._logic = this._logic || {};
@@ -539,7 +532,6 @@ L.Control.Layermenu = L.Control.extend({
 		array.forEach(function (item1, i) {
 			// return if not a folder
 			if (!this._isFolder(item1)) return;
-
 
 			var pos 	= item1.pos; 	// eg 0 for first level
 			var toClose 	= []; 		// all below this pos
@@ -745,6 +737,10 @@ L.Control.Layermenu = L.Control.extend({
 
 		// set inactive in sidepane layermenu
 		if (layermenuItem.layer) app.SidePane.Map.mapSettings.layermenu._off(layermenuItem.layer);
+
+		console.log('layermenu remove: ', layermenuItem);
+		var layer = layermenuItem.layer;
+		if (layer) layer.remove();
 
 		// remove from store
 		delete this.layers[uuid];
