@@ -114,12 +114,9 @@ Wu.SidePane = Wu.Class.extend({
 
 	_setMenuHeight : function () {
 		var panes = this._getPaneArray();
-		console.log('_setMenuHeight panes: ', panes);
 		var defaultPanes = app.Account.isManager() ? 3 : 2;		// 3 if manager, 2 if not (ie. only Project, Logout)
 		var height = panes ? panes.length * 70 : defaultPanes * 70;	// if no active project, default 3 menu items
 		app._editorMenuPane.style.height = parseInt(height) + 'px';
-
-		console.log('setting height: #panes=', panes);
 	},
 
 	_getPaneArray : function (project) {
@@ -130,8 +127,6 @@ Wu.SidePane = Wu.Class.extend({
 		var pane = this.options.panes;
 		var settings = project.getSettings();
 
-		console.log('setting---', settings);
-
 		if (pane.clients) 				panes.push('Clients');
 		if (pane.mapOptions) 				panes.push('Map');
 		if (pane.documents   && settings.documentsPane) panes.push('Documents');
@@ -140,8 +135,6 @@ Wu.SidePane = Wu.Class.extend({
 		if (pane.users) 				panes.push('Users');
 		if (pane.share && settings.socialSharing) 	panes.push('Share');
 		if (pane.account) 				panes.push('Account');
-
-		console.log('panearr', panes);
 
 		return panes;
 	},
@@ -155,7 +148,6 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	refreshProject : function (project) {
-		console.log('prefreshh project', project);
 
 		var editMode = project.editMode; // access determined at Wu.Project
 		
@@ -221,31 +213,15 @@ Wu.SidePane = Wu.Class.extend({
 
 	},
 
-	// _removePane : function (pane) {
-	// 	this.removePane(pane);
-	// 	this._setMenuHeight();
-	// },
 
 	addPane : function (pane) {
-		console.log('addPane: ', pane);
 		var panes = Wu.extend([], this.panes);
-		console.log('panes: ', panes);
 		panes.push(pane);
 		panes = _.unique(panes);
 
-		console.log('uniq panes', panes);
-		console.log('this: ', this);
 		this.refresh(panes);
-	
-		
 	},
 
-	// _addPane : function (pane) {
-
-	// 	this.addPane(pane);
-	// 	this._setMenuHeight();
-	// },
-	
 	// close sidepane
 	closePane : function () {
 

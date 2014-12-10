@@ -411,15 +411,12 @@ Wu.User = Wu.Class.extend({
 
 		// if (user.role.superadmin) return true;
 		// if (user.role.admin)      return true;
-		console.log('canUpdateClient????', this.store.role.editor);
 		if (this.store.role.editor.clients.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-		console.log('nope!');
 		return false;
 	},
 
 	canDeleteClient : function (clientUuid) {
 		var editor = (this.store.role.editor.clients.indexOf(clientUuid) >= 0) ? true : false;
-		console.log('canDeleteClient editor = ', editor);
 		if (this.store.role.superadmin && editor) return true;
 		if (this.store.role.admin && editor)      return true;
 		return false;	

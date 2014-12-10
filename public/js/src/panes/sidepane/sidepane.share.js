@@ -6,16 +6,12 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 	initContent : function () {
 
-		console.log('initContent');
-
 		// create layout
 		this.initLayout();
 	},
 
 
 	update : function () {
-
-		console.log('update)');
 
 		// clear
 		this.reset();
@@ -284,20 +280,15 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	},
 
 	_activate : function () {
-		console.log('_activate');
-
 		// widen container from 350px to 100%
 		app.SidePane.widenContainer();
 
-		// this.update();
 	},
 
 	_deactivate : function () {
 
-		console.log('_deactivate');
 		// reset expands
 		this._resetExpands();
-		// this.reset();
 	},
 
 	enableSocial : function () {

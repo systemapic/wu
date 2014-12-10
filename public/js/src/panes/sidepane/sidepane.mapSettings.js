@@ -1313,9 +1313,6 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		// call addHooks on prototype
 		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
 
-
-		console.log('this.panes.controlZoom', this.panes.controlZoom);
-
 		// add events
 		Wu.DomEvent.on( this.panes.controlZoom,            'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlDraw,            'mousedown click', this.toggleControl, this);

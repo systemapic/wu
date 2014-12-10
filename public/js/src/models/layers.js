@@ -60,7 +60,6 @@ Wu.Layer = Wu.Class.extend({
 
 		// add gridLayer if available
 		if (this.gridLayer) map.addLayer(this.gridLayer);
-		console.log('gridLayer?', this.gridLayer);
 
 		// update zindex
 		this._addToZIndex(type);

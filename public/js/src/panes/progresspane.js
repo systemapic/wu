@@ -8,8 +8,6 @@ Wu.ProgressPane = Wu.Class.extend({
 		// init container
 		this.initContainer();
 
-		console.log('Wu.ProgressPane initialize');
-
 	},
 
 	initContainer : function () {
@@ -28,7 +26,6 @@ Wu.ProgressPane = Wu.Class.extend({
 	},
 
 	setProgress : function (percent) {
-		console.log('setProgress', percent, this._current);
 		if (percent < this._current + 2) return;
 
 		var bar = this._progressBar;
@@ -38,8 +35,6 @@ Wu.ProgressPane = Wu.Class.extend({
 	},
 
 	hideProgress : function () {
-		console.log('hidePoress');
-
 		var bar = this._progressBar;
 		bar.style.opacity = 0;
 		this._current = 0;

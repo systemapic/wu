@@ -30,8 +30,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this._search.setAttribute("placeholder", "Search users");
 		Wu.DomUtil.addClass(this._search, 'search ct17');
 
-		console.log('initContent');
-
 		// create container (overwrite default) and insert template
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content, ich.usersPane());
 
@@ -108,7 +106,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	},
 
 	searchList : function (e) {
-		console.log('search!!!', this._search.value);
 
 		if (e.keyCode == 27) { // esc
 			this.list.search(); // show all
@@ -782,8 +779,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this.save(key, value, userUuid);
 
 	},
-
-
 
 	// rename a div, ie. inject <input>
 	_rename : function (e) {

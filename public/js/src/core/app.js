@@ -59,9 +59,6 @@ Wu.App = Wu.Class.extend({
 
 	initialize : function (options) {
 
-		// prototypes for compatiblity
-		// this._compatabilityChecks();
-
 		// set global this
 		Wu.app = this;
 
@@ -77,20 +74,9 @@ Wu.App = Wu.Class.extend({
 
 	},
 
-	// _compatabilityChecks : function () {
-
-	// 	// bind fn for phantomJS
-	// 	Function.prototype.bind = Function.prototype.bind || function (thisp) {
-	// 		var fn = this;
-	// 		return function () {
-	// 			return fn.apply(thisp, arguments);
-	// 		};
-	// 	};
-	// },
-
 	initServer : function () {
 		var serverUrl = this.options.servers.portal;
-		console.log('Secure connection to server: ', serverUrl);
+		console.log('Securely connected to server: \n', serverUrl);
 
 		var data = JSON.stringify(this.options);
 		
@@ -569,15 +555,15 @@ Wu.App = Wu.Class.extend({
 
 	_loading : [],
 
-	// phantomjs: load layermenu layers
-	_loadLayers : function (layermenuItems) {
+	// // phantomjs: load layermenu layers
+	// _loadLayers : function (layermenuItems) {
 
-	},
+	// },
 
-	// phantomjs: check if all layers are loaded
-	_allLoaded : function () {
+	// // phantomjs: check if all layers are loaded
+	// _allLoaded : function () {
 
-	},
+	// },
 
 	getZIndexControls : function () {
 		var z = {

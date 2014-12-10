@@ -18,6 +18,8 @@ Wu.StartPane = Wu.Class.extend({
 		// create container (append to body)
 		this._container = Wu.DomUtil.create('div', 'startpane-canvas-container', document.body);
 		
+
+		console.log('init startpane');
 		// init spinning map 	// todo!
 		// this.initSpinner();
 
