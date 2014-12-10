@@ -29,7 +29,6 @@ Wu.MapPane = Wu.Class.extend({
 	},
     
 	_updateWidth : function (d) {
-
 		var map = this._map;
 		if (!map || !d) return;
 		
@@ -863,49 +862,124 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 
+	_addPopupContent : function (e) {
+		var content = this._createPopupContent(e),
+		    buffer = '<hr>';
 
-	// _zIndex : [],
-
-	// registerZIndex : function (layer) {
-
-	// 	// get zIndex from layer, if any
-	// 	var zIndex = layer.store.zIndex;
+		// return if no content
+		if (!content) return;
 		
-	// 	// if no zIndex, set to last in line (ie. top)
-	// 	if (!zIndex) layer.setZIndex(this._zIndex.length + 1);
+		if (!this._popupContent) {
+			// create empty
+			this._popupContent = '';
+		} else {
+			// append buffer
+			this._popupContent += buffer;
+		}
 
-	// 	var item = {
-	// 		zIndex : zIndex,
-	// 		layer : layer
-	// 	}
+		// append content
+		this._popupContent += content;
 
-	// 	// add to global zIndex array
-	// 	this.addToZIndex(item);
+	},
 
-	// },
+	_clearPopup : function () {
+		this._popupContent = '';
+		this._popup = null;
+	},
 
-	// addToZIndex : function (item) {
+	
+	openPopup : function (e) {
+		if (this._popup) return;
 
-	// 	// if first, just push
-	// 	if (this._zIndex.length == 0) return this._zIndex.push(item);
+		var popup = this._createPopup(),
+		    content = this._popupContent,
+		    map = app._map,
+		    latlng = e.latlng;
 
-	// 	// add to appropriate place in zIndex
-	// 	var z = _.findIndex(this._zIndex, function (l) {
-	// 		if (!l) return false;
+		// return if no content
+		if (!content) return this._clearPopup();
+		
+		// set popup close event
+		this._addPopupCloseEvent();
 
-	// 		return l.zIndex > item.zIndex;
+		// keep popup while open
+		this._popup = popup;
 
-	// 	});
+		// set content
+		popup.setContent(content);
+		popup.setLatLng(latlng);
+		
+		setTimeout(function () {
+			popup.openOn(map);		// todo: still some minor bugs,
+		}, 100); // hack			// this hack perhaps due to double opening
 
-	// },
+		
+	},
 
-	// setZIndex : function (layer, zIndex) {
+	_createPopup : function () {
 
-	// },
+		// create popup
+		var popup = L.popup({
+			offset : [18, 0],
+			closeButton : true,
+			zoomAnimation : false,
+			maxWidth : 400,
+			minWidth : 200,
+			maxHeight : 350,
+			// closeOnClick : false
+		});
+		return popup;
+	},
 
-	// getZIndex : function (layer) {
 
-	// },
+	_addPopupCloseEvent : function () {
+		if (this._popInit) return;
+		this._popInit = true;	// only run once
+
+		var map = app._map;
+		map.on('popupclose',  this._clearPopup, this);
+	},
+
+	_createPopupContent : function (e) {
+
+		// check for stored tooltip
+		var data = e.data,
+		    layer = e.layer,
+		    meta = layer.getTooltip(),
+		    string = '';
+
+		if (meta) {
+			if (meta.title) string += '<div class="tooltip-title-small">' + meta.title + '</div>';
+
+			// add meta to tooltip
+			for (var m in meta.fields) {
+				var field = meta.fields[m];
+
+				// only add active tooltips
+				if (field.on) {
+					var caption = field.title || field.key;
+					var value = data[field.key];
+
+					// add to string
+					string += caption + ': ' + value + '<br>';
+				}
+			}
+			return string;
+
+		} else {
+
+			// create content
+			var string = '';
+			for (var key in data) {
+				var value = data[key];
+				if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
+					string += key + ': ' + value + '<br>';
+				}
+			}
+			return string;
+		}
+	},
+
 
 
 	

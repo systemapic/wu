@@ -83,8 +83,12 @@ body {
 }
 
 
-
-
+/*tooltip smaller title*/
+.tooltip-title-small {
+	font-size: 100%;
+	border: none;
+	font-weight: 600;
+}
 
 
 

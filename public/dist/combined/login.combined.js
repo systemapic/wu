@@ -46,6 +46,10 @@ L.SpinningMap = L.Class.extend({
 			'spinning-reversed90',
 			'spinning-reversed270',
 		],
+		listeners : [{
+			'event' : null,
+			'action' : 'changeView'
+		}],
 		duration : 100000	// ms
 		// duration : 1000	// ms
 
@@ -61,6 +65,9 @@ L.SpinningMap = L.Class.extend({
 
 		// init 
 		this.initLayout();
+
+		// add hooks
+		this.addHooks();
 
 		// autostart
 		if (this.options.autoStart) this.start();
@@ -199,34 +206,65 @@ L.SpinningMap = L.Class.extend({
 			zoom: zoom 		// starting zoom
 		});
 
-		// events
-		this.addHooks();
-
 	},
 
 	addHooks : function () {
-		var map = this._map;
-		// map.on('resize', this._onResize.bind(this));
+		// var map = this._map;
+		// // map.on('resize', this._onResize.bind(this));
+		
 		// map.on('moveend', this._onMoveend.bind(this));
 		// map.on('movestart', this._onMovestart.bind(this));
 
+		// // fly on login click
+		// var login = L.DomUtil.get('login-button'); // custom, todo: move to options
+		// var content = L.DomUtil.get('spinning-content'); 
+
+		// L.DomEvent.on(login, 'mousedown', L.DomEvent.stopPropagation, this);
+		// L.DomEvent.on(content, 'mousedown', this.contentClick, this);
+
 	},
 
-	_onMoveend : function (e) {
-		console.log('on move end', e);
+	contentClick : function () {
+		this._resetMoves();
+		if (this._gl) this.changeViewGL();
 	},
 
-	_onMovestart : function () {
-		console.log('on move start');
-	},
+	// _moveEnd : -1,
+	// _moveStart : false,
 
-	_onZoom : function () {
-		console.log('on zoom');
-	},
+	// _onMoveend : function (e) {
+	// 	console.log('on move end', e);
+	// 	this._moveEnd += 1;
 
-	_onMove : function () {
-		console.log('move');
-	},
+	// 	if (this._moveStart && this._moveEnd == 3) {
+	// 		this._realMoveEnd();
+	// 	}
+	// },
+
+	// _onMovestart : function () {
+	// 	console.log('on move start');
+	// 	this._moveStart = true;
+	// },
+
+	// _resetMoves : function () {
+	// 	console.log('clear!');
+	// 	this._moveStart = false;
+	// 	this._moveEnd = 0;
+	// },
+
+	// _realMoveEnd : function () {
+	// 	this._resetMoves();
+	// 	console.log('real end!!');
+	// 	this.restartGLRotation();
+	// },
+
+	// _onZoom : function () {
+	// 	console.log('on zoom');
+	// },
+
+	// _onMove : function () {
+	// 	console.log('move');
+	// },
 
 	_onResize : function () {
 
@@ -482,13 +520,14 @@ L.SpinningMap = L.Class.extend({
 		return random;
 	}
 });;var spinner;
+// var s = spinner;
 function spin () {
 
 	var content = L.DomUtil.get('spinning-content');
 	var map = L.DomUtil.get('spinning-map');
 
 	spinner = new L.SpinningMap({
-		gl : true,
+		// gl : true,
 		autoStart : true,
 		accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q',
 		layer : 'systemapic.kcjonn12',
