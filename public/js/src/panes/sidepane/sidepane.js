@@ -2,6 +2,11 @@ Wu.SidePane = Wu.Class.extend({
 	_ : 'sidepane', 
 
 
+	options : {
+
+		panes : ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users', 'Share', 'Account']
+	},
+
 	initialize : function (options) {
 		
 		this.options = options || app.options;
@@ -134,7 +139,7 @@ Wu.SidePane = Wu.Class.extend({
 		if (pane.dataLibrary && settings.dataLibrary) 	panes.push('DataLibrary');
 		if (pane.mediaLibrary && settings.mediaLibrary) panes.push('MediaLibrary');
 		if (pane.users) 				panes.push('Users');
-		if (pane.share) 				panes.push('Share');
+		if (pane.share && settings.socialSharing) 	panes.push('Share');
 		if (pane.account) 				panes.push('Account');
 
 		return panes;
@@ -184,24 +189,25 @@ Wu.SidePane = Wu.Class.extend({
 		this.panes = [];
 
 		// all panes
-		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users', 'Share', 'Account'];
-				
+		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users', 'Share', 'Account'],
+		    sidepane = app.SidePane;
+
 		// panes to active
 		all.forEach(function (elem, i, arr) {
-			if (!Wu.app.SidePane[elem]) {
-				Wu.app.SidePane[elem] = new Wu.SidePane[elem];
+			if (!sidepane[elem]) {
+				sidepane[elem] = new Wu.SidePane[elem];
 			}
-			Wu.app.SidePane[elem].enable();
+			sidepane[elem].enable();
 			this.panes.push(elem);	// stored for calculating the menu slider
 		}, this);
 
 		// panes to deactivate
 		var off = all.diff(panes);
 		off.forEach(function (elem, i, arr) {
-			var dis = Wu.app.SidePane[elem];
-			if (dis)  Wu.app.SidePane[elem].disable();
+			var dis = sidepane[elem];
+			if (dis)  sidepane[elem].disable();
 			_.pull(this.panes, elem);
-		}, this)
+		}, this);
 
 	},
 
@@ -209,6 +215,12 @@ Wu.SidePane = Wu.Class.extend({
 		var panes = Wu.extend([], this.panes);
 		_.pull(panes, pane);
 		this.refresh(panes);
+
+	},
+
+	_removePane : function (pane) {
+		this.removePane(pane);
+		this._setMenuHeight();
 	},
 
 	addPane : function (pane) {
@@ -216,6 +228,12 @@ Wu.SidePane = Wu.Class.extend({
 		panes.push(pane);
 		panes = _.unique(panes);
 		this.refresh(panes);
+	},
+
+	_addPane : function (pane) {
+
+		this.addPane(pane);
+		this._setMenuHeight();
 	},
 	
 	// close sidepane

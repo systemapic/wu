@@ -1673,13 +1673,13 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 	options : {
 
 		// include settings
-		screenshot 	: true,
+		// screenshot 	: true,
 		socialSharing 	: true,
 		documentsPane 	: true,
 		dataLibrary 	: true,
 		mediaLibrary 	: false,
-		autoHelp 	: true,
-		autoAbout 	: true,
+		// autoHelp 	: true,
+		// autoAbout 	: true,
 		darkTheme 	: true,
 		tooltips 	: true,
 		mapboxGL	: false,
@@ -1738,7 +1738,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		}
 		if (this.options.socialSharing) {
 
-			var socialSharing = this._contentItem('socialSharing', 'Social Sharing');
+			var socialSharing = this._contentItem('socialSharing', 'Sharing');
 			wrapper.appendChild(socialSharing);
 
 			// add tooltip
@@ -1796,7 +1796,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 			wrapper.appendChild(darkTheme);
 
 			// add tooltip
-			app.Tooltip.add(darkTheme, 'Toggle between dark theme and light theme');
+			app.Tooltip.add(darkTheme, 'Toggle between dark- and light theme');
 
 		}
 		if (this.options.tooltips) {
@@ -1805,7 +1805,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 			wrapper.appendChild(tooltips);
 
 			// add tooltip
-			app.Tooltip.add(tooltips, 'Enable tooltips for map');
+			app.Tooltip.add(tooltips, 'Enable this tooltip for the portal');
 
 		}
 		if (this.options.mapboxGL) {

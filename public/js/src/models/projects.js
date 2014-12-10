@@ -881,7 +881,6 @@ Wu.Project = Wu.Class.extend({
 
 	// settings
 	toggleSetting : function (setting) {
-		console.log('project toggleSetting', setting);
 		this.getSettings()[setting] ? this['disable' + setting.camelize()]() : this['enable' + setting.camelize()]();
 		this.store.settings[setting] = !this.store.settings[setting];
 		this._update('settings');
@@ -930,10 +929,10 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	enableSocialSharing : function () {
-		app.SidePane.Share.enableSocial();
+		app.SidePane.addPane('Share');
 	},
 	disableSocialSharing : function () {
-		app.SidePane.Share.disableSocial();
+		app.SidePane.removePane('Share');
 	},
 
 	enableAutoHelp : function () {		// auto-add folder in Docs
