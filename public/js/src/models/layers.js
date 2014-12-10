@@ -108,7 +108,7 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	remove : function (map) {
-		var map = map || Wu.app._map;
+		var map = map || app._map;
 
 		// leaflet fn
 		map.removeLayer(this.layer);
