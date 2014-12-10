@@ -89,6 +89,8 @@ L.UtfGrid = L.Class.extend({
 		}
 
 		map.on('click', this._click, this);
+		map.on('mousedown', this._mousedown, this);
+		map.on('mouseup', this._mouseup, this);
 		map.on('mousemove', this._move, this);
 		map.on('moveend', this._update, this);
 	},
@@ -96,6 +98,8 @@ L.UtfGrid = L.Class.extend({
 	onRemove: function () {
 		var map = this._map;
 		map.off('click', this._click, this);
+		map.off('mousedown', this._mousedown, this);
+		map.off('mouseup', this._mouseup, this);
 		map.off('mousemove', this._move, this);
 		map.off('moveend', this._update, this);
 		if (this.options.pointerCursor) {
@@ -117,6 +121,14 @@ L.UtfGrid = L.Class.extend({
 
 	_click: function (e) {
 		this.fire('click', this._objectForEvent(e));
+	},
+
+	_mousedown: function (e) {
+		this.fire('mousedown', this._objectForEvent(e));
+	},
+
+	_mouseup: function (e) {
+		this.fire('mouseup', this._objectForEvent(e));
 	},
 	
 	_move: function (e) {
@@ -167,8 +179,6 @@ L.UtfGrid = L.Class.extend({
 		    key = data.keys[idx],
 		    result = data.data[key];
 
-		// console.log('ley: ',key);
-		// console.log('idx', idx);
 		if (!data.data.hasOwnProperty(key)) {
 			result = null;
 		}

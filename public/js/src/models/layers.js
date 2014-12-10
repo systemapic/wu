@@ -2,6 +2,12 @@ Wu.Layer = Wu.Class.extend({
 
 	type : 'layer',
 
+	options : {
+
+		hoverTooltip : true,	// hover instead of click
+
+	},
+
 	initialize : function (layer) {
 
 		// set source
@@ -31,7 +37,6 @@ Wu.Layer = Wu.Class.extend({
 
 		if (type == 'baselayer') this._isBase = true;
 		this.addTo();
-		console.log('layer.add(), isBase? ', this._isBase);
 	},
 
 	addTo : function () {
@@ -55,6 +60,7 @@ Wu.Layer = Wu.Class.extend({
 
 		// add gridLayer if available
 		if (this.gridLayer) map.addLayer(this.gridLayer);
+		console.log('gridLayer?', this.gridLayer);
 
 		// update zindex
 		this._addToZIndex(type);
@@ -370,10 +376,9 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		var cartoid = this.store.data.cartoid || 'cartoid';
 
 		// tile server ip
-		var tileServer = app.options.servers.tiles;
-		var token = app.accessToken;
-		var url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
-		// var zIndex = this.getZIndex();
+		var tileServer = app.options.servers.tiles,
+		    token = app.accessToken,
+		    url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
@@ -391,95 +396,58 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		var cartoid = this.store.data.cartoid || 'cartoid';
 
 		// add gridlayer
-		var gridServer = app.options.servers.utfgrid;
-		var token = app.accessToken;
-		var url = gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
+		var gridServer = app.options.servers.utfgrid,
+		    token = app.accessToken,
+		    url = gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
+		
 		this.gridLayer = new L.UtfGrid(url, {
 			useJsonP: false,
 			subdomains: 'ghi',
 		});
 
-		// add popup event
-		this.gridLayer.on('click', function(e) {
-			if (!e.data) return;
-		 	this.openPopup(e.data, e.latlng);
-		}, this);
+		// add grid events
+		this._addGridEvents();
 
 	},
 
 	updateStyle : function () {
+		var map = app._map;	// refactor
 		
-		// this.layer.redraw();
 		this.update();
 
-		var map = app._map;	// refactor
 		this.addTo(map);
 	},
 
+	_addGridEvents : function () {
+		var grid = this.gridLayer;
+		if (!grid) return;
 
-	openPopup : function (data, latlng) {
+		// add click event
+		grid.on('mousedown', function(e) {
+			console.log('grid.mousedown', e.data);
+			if (!e.data) return;
 
-		var map = app._map;
-		var content = this._popupContent(data);
+			e.layer = this;
 
+			// add to pending
+			app.MapPane._addPopupContent(e);
 
-		// create popup
-		this.popup = L.popup({
-			offset : [18, 0],
-			closeButton : true,
-			zoomAnimation : false,
-			maxWidth : 400,
-			minWidth : 200,
-			maxHeight : 350
-		});
+		}, this);
 
+		grid.on('mouseup', function (e) {
+			console.log('grid.mouseup', e.data);
+			if (!e.data) return;
+
+			e.layer = this;
+
+			// open popup
+			app.MapPane.openPopup(e);
 		
-		// set content
-		this.popup.setContent(content);
-		this.popup.setLatLng(latlng);
-		this.popup.openOn(map);
-		
-		
+		}, this);
+
 	},
 
-	_popupContent : function (data) {
-
-
-		// check for stored tooltip
-		var meta = this.getTooltip();
-		var string = '';
-
-		if (meta) {
-			if (meta.title) string += '<div class="tooltip-title">' + meta.title + '</div>';
-
-			// add meta to tooltip
-			for (var m in meta.fields) {
-				var field = meta.fields[m];
-
-				// only add active tooltips
-				if (field.on) {
-					var caption = field.title || field.key;
-					var value = data[field.key];
-
-					// add to string
-					string += caption + ': ' + value + '<br>';
-				}
-			}
-			return string;
-
-		} else {
-
-			// create content
-			var string = '';
-			for (var key in data) {
-				var value = data[key];
-				if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
-					string += key + ': ' + value + '<br>';
-				}
-			}
-			return string;
-		}
-	},
+	
 });
 
 

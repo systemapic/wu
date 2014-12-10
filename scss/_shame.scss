@@ -4,7 +4,7 @@
 	z-index: 1000;
 	background-color: white;
 	font-size: 120%;
-}
+	}
 
 .datalibrary-category-line {
 	font-size: 120%;
@@ -12,44 +12,44 @@
 	border-bottom: 1px solid gray;
 	float: left;
 	width: 85%;
-}
+	}
 
 .datalibrary-category-line:hover {
 	background: aqua;
-}
+	}
 
 .datalibrary-category-new {
 	border: 0px;
 	background-color: white;
-}
+	}
 
 .datalibrary-category-line-del {
 	right: 0px;
 	cursor: pointer;
 	text-align: right;
-}
+	}
 
 .datalibrary-category-line-del:hover {
 	color: red;
-}
+	}
 
 .datalibrary-category-line-wrap {
 	height: auto;
 	cursor: pointer;
-}
+	}
 
 
 /*bigger logos*/
 .client-logo {
 	height: 70px;
-}
+	}
 .project-logo {
 	height: 62px;
-}
+	}
 .client-kill {
 	background: rgba(0, 0, 0, 0.5);
 	color: #fff;
-}
+	}
 
 /*less empty space experiment*/
 /*.home-container {
@@ -90,27 +90,27 @@
 	width: 92%;
 	height: 77px;
 	z-index: 100;
-}
+	}
 
 .error-pane-content {
 	background: rgb(255, 122, 122);
 	width: 100%;
 	height: 100%;
-}
+	}
 
 .error-pane-title {
 	color: white;
 	padding-left: 10px;
 	font-weight: 900;
 	font-size: 200%;
-}
+	}
 
 .error-pane-description {
 	color: white;
 	padding-left: 10px;
 	font-weight: 900;
 	font-size: 120%;
-}
+	}
 
 
 
@@ -130,10 +130,6 @@
 	background-repeat: no-repeat;
 	border: none !important;
 	}
-
-
-
-
 
 /*download-dialog*/
 .download-dialog {
@@ -157,16 +153,11 @@
 	background: rgba(255, 255, 255, 0.8);
 	}
 
-
-
 .download-dialog-button,
 .download-dialog-cancel {
 	@extend .smap-button-gray;
 	position: relative;
 	display: block;
-	/*background: yellow;*/
-	/*top: 0px;*/
-	/*left: 0px;*/
 	font-weight: 500;
 	height: 40px;
 	width: 150px;
@@ -181,3 +172,52 @@
 	text-decoration: none;
 	font-weight: 500;
 	}	
+
+
+/* Update or delete MapBox account */
+.mapbox-listed-account-refresh {
+	background-color: #4c4d4f;
+	border: none !important;
+	margin-right: 1px;
+	}
+
+.mapbox-listed-account-refresh:before {
+	content: '';
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	background-image: url(images/evil_sprite.png);
+	background-position: -119px -155px;
+	background-repeat: no-repeat;
+	opacity: 0.5;
+	}
+
+.mapbox-listed-account-refresh:hover:before {
+	opacity: 1;
+	}
+
+.mapbox-listed-account-delete {
+	background-color: #4c4d4f;
+	border: none !important;
+	}	
+
+.mapbox-listed-account-delete:before {
+	content: '';
+	width: 100%;
+	height: 100%;
+	position: absolute;	
+	background-image: url(images/evil_sprite.png);
+	background-position: -157px -155px;
+	background-repeat: no-repeat;
+	opacity: 0.5;
+	}
+
+.mapbox-listed-account-delete:hover:before {
+	opacity: 1;
+	}
+
+
+
+.dragging {
+	background: #92f0e5 !important;
+	}

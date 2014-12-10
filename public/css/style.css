@@ -6123,9 +6123,6 @@ input[type=checkbox] + label.check {
 .download-dialog-button, .download-dialog-cancel {
   position: relative;
   display: block;
-  /*background: yellow;*/
-  /*top: 0px;*/
-  /*left: 0px;*/
   font-weight: 500;
   height: 40px;
   width: 150px;
@@ -6137,6 +6134,45 @@ input[type=checkbox] + label.check {
   color: white;
   text-decoration: none;
   font-weight: 500; }
+
+/* Update or delete MapBox account */
+.mapbox-listed-account-refresh {
+  background-color: #4c4d4f;
+  border: none !important;
+  margin-right: 1px; }
+
+.mapbox-listed-account-refresh:before {
+  content: '';
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-image: url(images/evil_sprite.png);
+  background-position: -119px -155px;
+  background-repeat: no-repeat;
+  opacity: 0.5; }
+
+.mapbox-listed-account-refresh:hover:before {
+  opacity: 1; }
+
+.mapbox-listed-account-delete {
+  background-color: #4c4d4f;
+  border: none !important; }
+
+.mapbox-listed-account-delete:before {
+  content: '';
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-image: url(images/evil_sprite.png);
+  background-position: -157px -155px;
+  background-repeat: no-repeat;
+  opacity: 0.5; }
+
+.mapbox-listed-account-delete:hover:before {
+  opacity: 1; }
+
+.dragging {
+  background: #92f0e5 !important; }
 
 .q-editor-container {
   overflow: visible; }
