@@ -863,9 +863,13 @@ Wu.MapPane = Wu.Class.extend({
 
 
 	_addPopupContent : function (e) {
+
 		var content = this._createPopupContent(e),
 		    buffer = '<hr>';
 
+		// clear old popup
+		this._popup = null;
+		
 		// return if no content
 		if (!content) return;
 		
@@ -944,8 +948,9 @@ Wu.MapPane = Wu.Class.extend({
 
 		// check for stored tooltip
 		var data = e.data,
-		    layer = e.layer,
-		    meta = layer.getTooltip(),
+		    layer = e.layer;
+		console.log('la', layer);
+		var meta = layer.getTooltip(),
 		    string = '';
 
 		if (meta) {
@@ -980,6 +985,7 @@ Wu.MapPane = Wu.Class.extend({
 		}
 	},
 
+	
 
 
 	
