@@ -11,8 +11,6 @@ Wu.Style = Wu.Class.extend({
 
 	setDarkTheme : function () {	
 	
-		console.log('app.Style.setDarkTheme()');
-
 		// append darktheme stylesheet
 		var darktheme = document.createElement("link");
 		darktheme.rel = 'stylesheet';
@@ -45,8 +43,6 @@ Wu.Style = Wu.Class.extend({
 
 	setDarkThemeCartoCSS : function () {
 		
-		console.log('app.MapPane.cartoCss', app.MapPane.cartoCss);
-
 		if (!app.MapPane.cartoCss) return;
 
 		// Set code mirror to darktheme

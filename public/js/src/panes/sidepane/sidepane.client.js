@@ -277,7 +277,19 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// remove startpane if active
 		app.StartPane.deactivate();
 
+		// add defaults to map
+		this._addDefaults();
 
+	},
+
+
+	_addDefaults : function () {
+		// add default baselayer
+		if (!app.SidePane) return;
+		if (!app.SidePane.Map) return;
+		if (!app.SidePane.Map.mapSettings) return;
+		if (!app.SidePane.Map.mapSettings.baselayer) return;
+		app.SidePane.Map.mapSettings.baselayer.setDefaultLayer();
 	},
 
 	addHooks : function () {

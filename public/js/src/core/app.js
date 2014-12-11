@@ -288,16 +288,6 @@ Wu.App = Wu.Class.extend({
 
 	},
 
-	// _initStartpane : function () {
-	// 	if (this.StartPane) return this.StartPane;
-
-	// 	// render Start pane?
-	// 	this.StartPane = new Wu.StartPane({
-	// 		projects : this.Projects
-	// 	});
-
-	// 	return this.StartPane;
-	// },
 
 	_lonelyProject : function () {
 		// check if only one project, 

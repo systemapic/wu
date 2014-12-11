@@ -38,6 +38,11 @@ Wu.StatusPane = Wu.Class.extend({
 		// open sidepane menu on mousedown
 		Wu.DomEvent.on(this._container, 'mousedown', this.toggle, this);
 
+		__GA.push({
+			trigger : this._container,
+			label 	: 'Home button'
+		});
+
 		// global TAB key toggle
 		// Wu.DomEvent.on(document, 'keydown', this.tab, this);	// todo: fix tabbing in inputs
 	},

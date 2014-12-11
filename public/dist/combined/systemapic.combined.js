@@ -2055,18 +2055,13 @@ L.Popup.include({
 		var defaultPanes = app.Account.isManager() ? 3 : 2;		// 3 if manager, 2 if not (ie. only Project, Logout)
 		var height = panes ? panes.length * 70 : defaultPanes * 70;	// if no active project, default 3 menu items
 		app._editorMenuPane.style.height = parseInt(height) + 'px';
-
-		console.log('_setMenuHeight');
-		console.log('panes:', panes);
 	},
 
 	_getPaneArray : function (project) {
-		console.log('_getPaneArray', project);
-
+		
 		var project = project || app.activeProject;
 		if (!project) return;
 
-		console.log('_getPaneArray 2', project);
 		var panes = [];
 		var pane = this.options.panes;
 		var settings = project.getSettings();
@@ -2081,7 +2076,6 @@ L.Popup.include({
 		if (pane.account) 				panes.push('Account');
 
 
-		console.log('_getPaneArray 3', panes);
 		return panes;
 	},
 
@@ -2100,8 +2094,6 @@ L.Popup.include({
 		// default menus in sidepane
 		var panes = this._getPaneArray(project);
 
-		console.log('refreshProject panes', panes);
-
 		// set menu height
 		if (this.paneOpen) this._setMenuHeight();									
 
@@ -2115,15 +2107,12 @@ L.Popup.include({
 
 	refreshClient : function () {
 		
-		console.log('refreshClient????');
-
 		// set panes 
 		var panes = ['Clients'];
 		if (app.Account.isManager()) panes.push('Users');
 		panes.push('Account'); // logout button
 
 		// refresh
-		console.log('CLIENTS??, panes', panes);
 		this.refresh(panes);
 	},
 
@@ -2131,8 +2120,6 @@ L.Popup.include({
 	refresh : function (panes) {
 
 		var panes = panes || this.panes;
-
-		console.error('refresh panes, ', panes);
 
 		this.panes = [];
 
@@ -2173,7 +2160,6 @@ L.Popup.include({
 	},
 
 	_addPane : function (pane) {
-		console.log('addPane', pane);
 		var panes = Wu.extend([], this.panes);
 		panes.push(pane);
 		panes = _.unique(panes);
@@ -2186,7 +2172,6 @@ L.Popup.include({
 	},
 
 	_removePane : function (pane) {
-		console.log('removePane', pane);
 		var panes = Wu.extend([], this.panes);
 		_.pull(panes, pane);
 		return panes;
@@ -2661,7 +2646,6 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	_deactivate : function () {
 		this.clients.forEach(function (client) {
-			console.log('client');
 			client.close();
 		}, this);
 	},
@@ -5217,6 +5201,12 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		// disable in baseLayer menu
 		Wu.DomUtil.removeClass(baseLayer.container, 'active');
 		baseLayer.active = false;
+	},
+
+	setDefaultLayer : function () {
+		var baseLayer = _.sample(this.layers, 1);
+		this.on(baseLayer);
+		this.enableLayer(baseLayer);
 	},
 
 	enableLayer : function (baseLayer) {
@@ -19243,16 +19233,6 @@ Wu.App = Wu.Class.extend({
 
 	},
 
-	// _initStartpane : function () {
-	// 	if (this.StartPane) return this.StartPane;
-
-	// 	// render Start pane?
-	// 	this.StartPane = new Wu.StartPane({
-	// 		projects : this.Projects
-	// 	});
-
-	// 	return this.StartPane;
-	// },
 
 	_lonelyProject : function () {
 		// check if only one project, 

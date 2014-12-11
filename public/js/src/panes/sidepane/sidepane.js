@@ -117,18 +117,13 @@ Wu.SidePane = Wu.Class.extend({
 		var defaultPanes = app.Account.isManager() ? 3 : 2;		// 3 if manager, 2 if not (ie. only Project, Logout)
 		var height = panes ? panes.length * 70 : defaultPanes * 70;	// if no active project, default 3 menu items
 		app._editorMenuPane.style.height = parseInt(height) + 'px';
-
-		console.log('_setMenuHeight');
-		console.log('panes:', panes);
 	},
 
 	_getPaneArray : function (project) {
-		console.log('_getPaneArray', project);
-
+		
 		var project = project || app.activeProject;
 		if (!project) return;
 
-		console.log('_getPaneArray 2', project);
 		var panes = [];
 		var pane = this.options.panes;
 		var settings = project.getSettings();
@@ -143,7 +138,6 @@ Wu.SidePane = Wu.Class.extend({
 		if (pane.account) 				panes.push('Account');
 
 
-		console.log('_getPaneArray 3', panes);
 		return panes;
 	},
 
@@ -162,8 +156,6 @@ Wu.SidePane = Wu.Class.extend({
 		// default menus in sidepane
 		var panes = this._getPaneArray(project);
 
-		console.log('refreshProject panes', panes);
-
 		// set menu height
 		if (this.paneOpen) this._setMenuHeight();									
 
@@ -177,15 +169,12 @@ Wu.SidePane = Wu.Class.extend({
 
 	refreshClient : function () {
 		
-		console.log('refreshClient????');
-
 		// set panes 
 		var panes = ['Clients'];
 		if (app.Account.isManager()) panes.push('Users');
 		panes.push('Account'); // logout button
 
 		// refresh
-		console.log('CLIENTS??, panes', panes);
 		this.refresh(panes);
 	},
 
@@ -193,8 +182,6 @@ Wu.SidePane = Wu.Class.extend({
 	refresh : function (panes) {
 
 		var panes = panes || this.panes;
-
-		console.error('refresh panes, ', panes);
 
 		this.panes = [];
 
@@ -235,7 +222,6 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	_addPane : function (pane) {
-		console.log('addPane', pane);
 		var panes = Wu.extend([], this.panes);
 		panes.push(pane);
 		panes = _.unique(panes);
@@ -248,7 +234,6 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	_removePane : function (pane) {
-		console.log('removePane', pane);
 		var panes = Wu.extend([], this.panes);
 		_.pull(panes, pane);
 		return panes;
