@@ -246,6 +246,10 @@ label.info {
   left: -31px;
   position: absolute; }
 
+/* Hide select all users button, because it doesn't work, and it's not really needed */
+#users-squaredThree-checkbox-all {
+  visibility: hidden; }
+
 /*
 ██╗   ██╗███╗   ██╗██╗██╗   ██╗███████╗██████╗ ███████╗ █████╗ ██╗     ███████╗
 ██║   ██║████╗  ██║██║██║   ██║██╔════╝██╔══██╗██╔════╝██╔══██╗██║     ██╔════╝
@@ -2629,7 +2633,7 @@ input.cmn-toggle-round-flat + label:before {
   /*padding-top: 91px;*/
   padding-bottom: 96px;
   box-sizing: border-box;
-  z-index: 9999; }
+  z-index: 9999999; }
 
 .cartocss-control-wrapper {
   background-color: white;
@@ -4337,6 +4341,9 @@ button.image-attachment {
   top: 5px;
   width: auto;
   max-width: 70px; }
+
+#documents-container-textarea {
+  padding-top: 20px; }
 
 #documents-container-textarea h1 {
   font-size: 200%; }

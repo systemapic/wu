@@ -236,7 +236,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.project.select();
 
 		// update sidepane
-		Wu.app.SidePane.refreshProject(this.project);
+		// Wu.app.SidePane.refreshProject(this.project);	// seems to be not needed anymore..
 
 	},
 
@@ -397,7 +397,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 			// close statuspane
 			app.StatusPane.close()
-
 		}
 
 		// delete

@@ -63,7 +63,7 @@ h3, h4 {
 	}
 
 .client-kill {
-	background: rgba(255,255,255,0.5);
+	background: rgba(0,0,0,0.5);
 	}
 
 #inspector-header,
@@ -298,7 +298,8 @@ tr:nth-child(even) {
 .home-status,
 .leaflet-control-inspect,
 #inspector-header,
-.project-delete:hover {
+.project-delete:hover,
+#documents-container-textarea h2 {
 	color: white !important;
 	}
 
@@ -672,5 +673,5 @@ font-weight: 500;
 
 .leaflet-control-attribution,
 .leaflet-control-attribution a {
-	color: white;
+	color: white !important;
 	}

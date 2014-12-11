@@ -870,11 +870,14 @@ Wu.Project = Wu.Class.extend({
 		for (setting in this.getSettings()) {
 			this.getSettings()[setting] ? this['enable' + setting.camelize()]() : this['disable' + setting.camelize()]();
 		}
+
+		// refresh added/removed sidepanes
+		app.SidePane._refresh();
 	},
 
 	// settings
 	toggleSetting : function (setting) {
-		this.getSettings()[setting] ? this['disable' + setting.camelize()]() : this['enable' + setting.camelize()]();
+		this.getSettings()[setting] ? this['disable' + setting.camelize()](true) : this['enable' + setting.camelize()](true);
 		this.store.settings[setting] = !this.store.settings[setting];
 		this._update('settings');
 	},
@@ -900,18 +903,34 @@ Wu.Project = Wu.Class.extend({
 		app.SidePane.Share.disableScreenshot();
 	},
 
-	enableDocumentsPane : function () {
-		app.SidePane.addPane('Documents');
+	enableDocumentsPane : function (withRefresh) {
+		if (withRefresh) {
+			app.SidePane.addPane('Documents')
+		} else {
+			app.SidePane._addPane('Documents');
+		}
 	},
-	disableDocumentsPane : function () {
-		app.SidePane.removePane('Documents');
+	disableDocumentsPane : function (withRefresh) {
+		if (withRefresh) {
+			app.SidePane.removePane('Documents')
+		} else {
+			app.SidePane._removePane('Documents');
+		}
 	},
 
-	enableDataLibrary : function () {
-		app.SidePane.addPane('DataLibrary');
+	enableDataLibrary : function (withRefresh) {
+		if (withRefresh) {
+			app.SidePane.addPane('DataLibrary')
+		} else {
+			app.SidePane._addPane('DataLibrary');
+		}
 	},
-	disableDataLibrary : function () {
-		app.SidePane.removePane('DataLibrary');
+	disableDataLibrary : function (withRefresh) {
+		if (withRefresh) {
+			app.SidePane.removePane('DataLibrary')
+		} else {
+			app.SidePane._removePane('DataLibrary');
+		}
 	},
 
 	enableMediaLibrary : function () {
@@ -921,11 +940,19 @@ Wu.Project = Wu.Class.extend({
 		// app.SidePane.removePane('MediaLibrary');
 	},
 
-	enableSocialSharing : function () {
-		app.SidePane.addPane('Share');
+	enableSocialSharing : function (withRefresh) {
+		if (withRefresh) {
+			app.SidePane.addPane('Share')
+		} else {
+			app.SidePane._addPane('Share');
+		}
 	},
-	disableSocialSharing : function () {
-		app.SidePane.removePane('Share');
+	disableSocialSharing : function (withRefresh) {
+		if (withRefresh) {
+			app.SidePane.removePane('Share')
+		} else {
+			app.SidePane._removePane('Share');
+		}
 	},
 
 	enableAutoHelp : function () {		// auto-add folder in Docs

@@ -2130,6 +2130,8 @@ L.Popup.include({
 	// display the relevant panes
 	refresh : function (panes) {
 
+		var panes = panes || this.panes;
+
 		console.error('refresh panes, ', panes);
 
 		this.panes = [];
@@ -2159,26 +2161,35 @@ L.Popup.include({
 			
 	},
 
-	removePane : function (pane) {
-
-		console.log('removePane', pane);
-
+	_refresh : function () {
 		var panes = Wu.extend([], this.panes);
-		_.pull(panes, pane);
 		this.refresh(panes);
-
 	},
-
+	
 
 	addPane : function (pane) {
+		var panes = this._addPane(pane);
+		this.refresh(panes);
+	},
 
+	_addPane : function (pane) {
 		console.log('addPane', pane);
-
 		var panes = Wu.extend([], this.panes);
 		panes.push(pane);
 		panes = _.unique(panes);
+		return panes;
+	},
 
+	removePane : function (pane) {
+		var panes = this._removePane(pane);
 		this.refresh(panes);
+	},
+
+	_removePane : function (pane) {
+		console.log('removePane', pane);
+		var panes = Wu.extend([], this.panes);
+		_.pull(panes, pane);
+		return panes;
 	},
 
 	// close sidepane
@@ -2650,6 +2661,9 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	_deactivate : function () {
 		console.log('deeeactivate');
+		this.clients.forEach(function (client) {
+
+		}, this);
 	},
 
 	_create : function (c) {
@@ -3121,7 +3135,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.project.select();
 
 		// update sidepane
-		Wu.app.SidePane.refreshProject(this.project);
+		// Wu.app.SidePane.refreshProject(this.project);	// seems to be not needed anymore..
 
 	},
 
@@ -3282,7 +3296,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 			// close statuspane
 			app.StatusPane.close()
-
 		}
 
 		// delete
@@ -13530,11 +13543,14 @@ L.control.baselayerToggle = function (options) {
 		for (setting in this.getSettings()) {
 			this.getSettings()[setting] ? this['enable' + setting.camelize()]() : this['disable' + setting.camelize()]();
 		}
+
+		// refresh added/removed sidepanes
+		app.SidePane._refresh();
 	},
 
 	// settings
 	toggleSetting : function (setting) {
-		this.getSettings()[setting] ? this['disable' + setting.camelize()]() : this['enable' + setting.camelize()]();
+		this.getSettings()[setting] ? this['disable' + setting.camelize()](true) : this['enable' + setting.camelize()](true);
 		this.store.settings[setting] = !this.store.settings[setting];
 		this._update('settings');
 	},
@@ -13560,18 +13576,34 @@ L.control.baselayerToggle = function (options) {
 		app.SidePane.Share.disableScreenshot();
 	},
 
-	enableDocumentsPane : function () {
-		app.SidePane.addPane('Documents');
+	enableDocumentsPane : function (withRefresh) {
+		if (withRefresh) {
+			app.SidePane.addPane('Documents')
+		} else {
+			app.SidePane._addPane('Documents');
+		}
 	},
-	disableDocumentsPane : function () {
-		app.SidePane.removePane('Documents');
+	disableDocumentsPane : function (withRefresh) {
+		if (withRefresh) {
+			app.SidePane.removePane('Documents')
+		} else {
+			app.SidePane._removePane('Documents');
+		}
 	},
 
-	enableDataLibrary : function () {
-		app.SidePane.addPane('DataLibrary');
+	enableDataLibrary : function (withRefresh) {
+		if (withRefresh) {
+			app.SidePane.addPane('DataLibrary')
+		} else {
+			app.SidePane._addPane('DataLibrary');
+		}
 	},
-	disableDataLibrary : function () {
-		app.SidePane.removePane('DataLibrary');
+	disableDataLibrary : function (withRefresh) {
+		if (withRefresh) {
+			app.SidePane.removePane('DataLibrary')
+		} else {
+			app.SidePane._removePane('DataLibrary');
+		}
 	},
 
 	enableMediaLibrary : function () {
@@ -13581,11 +13613,19 @@ L.control.baselayerToggle = function (options) {
 		// app.SidePane.removePane('MediaLibrary');
 	},
 
-	enableSocialSharing : function () {
-		app.SidePane.addPane('Share');
+	enableSocialSharing : function (withRefresh) {
+		if (withRefresh) {
+			app.SidePane.addPane('Share')
+		} else {
+			app.SidePane._addPane('Share');
+		}
 	},
-	disableSocialSharing : function () {
-		app.SidePane.removePane('Share');
+	disableSocialSharing : function (withRefresh) {
+		if (withRefresh) {
+			app.SidePane.removePane('Share')
+		} else {
+			app.SidePane._removePane('Share');
+		}
 	},
 
 	enableAutoHelp : function () {		// auto-add folder in Docs
