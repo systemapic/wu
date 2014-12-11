@@ -192,6 +192,8 @@ Wu.SidePane = Wu.Class.extend({
 	// display the relevant panes
 	refresh : function (panes) {
 
+		var panes = panes || this.panes;
+
 		console.error('refresh panes, ', panes);
 
 		this.panes = [];
@@ -221,26 +223,35 @@ Wu.SidePane = Wu.Class.extend({
 			
 	},
 
-	removePane : function (pane) {
-
-		console.log('removePane', pane);
-
+	_refresh : function () {
 		var panes = Wu.extend([], this.panes);
-		_.pull(panes, pane);
 		this.refresh(panes);
-
 	},
-
+	
 
 	addPane : function (pane) {
+		var panes = this._addPane(pane);
+		this.refresh(panes);
+	},
 
+	_addPane : function (pane) {
 		console.log('addPane', pane);
-
 		var panes = Wu.extend([], this.panes);
 		panes.push(pane);
 		panes = _.unique(panes);
+		return panes;
+	},
 
+	removePane : function (pane) {
+		var panes = this._removePane(pane);
 		this.refresh(panes);
+	},
+
+	_removePane : function (pane) {
+		console.log('removePane', pane);
+		var panes = Wu.extend([], this.panes);
+		_.pull(panes, pane);
+		return panes;
 	},
 
 	// close sidepane

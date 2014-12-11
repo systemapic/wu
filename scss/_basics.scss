@@ -290,6 +290,11 @@ label.info {
 	}
 
 
+/* Hide select all users button, because it doesn't work, and it's not really needed */
+#users-squaredThree-checkbox-all {
+	visibility: hidden;
+	}
+
 /*
 ██╗   ██╗███╗   ██╗██╗██╗   ██╗███████╗██████╗ ███████╗ █████╗ ██╗     ███████╗
 ██║   ██║████╗  ██║██║██║   ██║██╔════╝██╔══██╗██╔════╝██╔══██╗██║     ██╔════╝
