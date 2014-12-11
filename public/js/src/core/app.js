@@ -122,9 +122,7 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_initEvents : function () {
-
 		Wu.DomEvent.on(window, 'resize', this._resizeEvents, this);
-
 	},
 
 	_resizeEvents : function (e) {
@@ -244,6 +242,11 @@ Wu.App = Wu.Class.extend({
 			addTo : this._appPane
 		});
 
+		// render startpane
+		this.StartPane = new Wu.StartPane({
+			projects : this.Projects
+		});
+
 		// render dropzone pane
 		this.Dropzone = new Wu.Dropzone();
 
@@ -259,14 +262,10 @@ Wu.App = Wu.Class.extend({
 		// render eror pane
 		this.ErrorPane = new Wu.ErrorPane();
 
-		
-
-		
 	},
 
 	// init default view on page-load
 	_initView : function () {
-
 
 		// check location
 		if (this._initLocation()) return;
@@ -284,21 +283,21 @@ Wu.App = Wu.Class.extend({
 			this.SidePane.refresh(['Clients', 'Users', 'Account']);		
 		}
 
-		// render startpane
-		this._initStartpane();
+		// activate startpane
+		this.StartPane.activate();
 
 	},
 
-	_initStartpane : function () {
-		if (this.StartPane) return this.StartPane;
+	// _initStartpane : function () {
+	// 	if (this.StartPane) return this.StartPane;
 
-		// render Start pane?
-		this.StartPane = new Wu.StartPane({
-			projects : this.Projects
-		});
+	// 	// render Start pane?
+	// 	this.StartPane = new Wu.StartPane({
+	// 		projects : this.Projects
+	// 	});
 
-		return this.StartPane;
-	},
+	// 	return this.StartPane;
+	// },
 
 	_lonelyProject : function () {
 		// check if only one project, 

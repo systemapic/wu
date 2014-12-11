@@ -1,4 +1,4 @@
-@keyframes spin {
+/*@keyframes spin {
 	from { transform: rotate(0deg); }
 	to { transform: rotate(360deg); }
 }
@@ -113,7 +113,6 @@
 	width: 300px;
 	top: 55px;
 	position: absolute;
-/*	right: 25%;*/
 	right: 0%;
 	padding-right: 70px;
 	}
@@ -129,10 +128,119 @@
 	width: 300px;
 	}
 
+
+ 
+
+*/
+
+
+
+
+
+
+
+
+/* Start pane circle */
+.startpane-circle-container {
+position: absolute;
+width: 0;
+height: 0;
+top: 50%;
+left: 12.5%;
+}
+
+.startpane-circle {
+position: relative;
+width: 120px;
+height: 120px;
+border-radius: 1000px;
+z-index: 999;
+top: -60px;
+left: -60px;
+box-shadow: 0 0 25px 0 black;
+opacity: 0.8;
+cursor: pointer;
+-webkit-transition: opacity 200ms ease;
+transition: opacity 200ms ease;
+}
+
+.startpane-circle:hover {
+opacity: 1;
+}	
+
+.startpane-circle:active {
+box-shadow: none;
+}
+
+
+
+.startpane-spinning-content {
+	height: 0;
+	width: 100%;
+	position: absolute;
+	top: 50%;
+	}
+
+.startpane-banner-container {
+	/*width: 100%;*/
+	width: 95%;
+	height: 310px;
+	/*background-color: rgba(0, 0, 0, 0.6);*/
+	position: relative;
+	top: -155px;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	left: 25%;
+	padding-right: 25%;
+	}
+
+.startpane-banner {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	top: 0;
+	left: 0;
+	background-color: rgba(0, 0, 0, 0.6);
+	padding-left: 445px;
+	}
+
+.startpane-logo {
+	background-image: url(https://projects.ruppellsgriffon.com/css/images/griffon_logo_drop.png);
+	background-repeat: no-repeat;
+	width: 429px;
+	height: 291px;
+	position: absolute;
+	top: 9px;
+	left: 9px;
+	z-index: 999;
+	}
+
+.startpane-recent-projects-container {
+	width: 100%;
+	left: 0;
+	position: relative;
+	height: 100%;
+	padding-top: 55px;			
+	}
+
+.startpane-header-title {
+	color: #fff;
+	font-family: helvetica neue;
+	font-size: 20px;
+	max-width: 350px;
+	margin: auto;
+	}
+
+.startpane-project-list {
+	max-width: 350px;
+	padding-right: 20px;
+	margin: auto;
+	}
+
 .start-panne-recent-projects {
 	width: 100%;
 	height: 40px;
-	margin: 10px;
+	margin: 10px 0px;
 	background-color: white;
 	font-family: helvetica neue;
 	text-align: center;
@@ -141,9 +249,38 @@
 	font-size: 15px;
 	cursor: pointer;
 	}
- 
-@media screen and (max-width: 1100px) {
-	#start-panne-recent-projects-container {
-		display: none;
+
+
+@media screen and (max-width: 1020px) {
+
+	.startpane-banner-container {
+		padding-left: 30px;
+		padding-top: 215px;
+		height: 510px;
+		top: -255px;
 	}
+
+	.startpane-recent-projects-container {
+		position: absolute;		
+		top: 310px;		
+	}
+
+	.startpane-banner-container {
+		height: 450px;
+		top: -225px;
+		left: 0;
+		background-color: green;
+		width: 445px;
+		margin: auto;
+		padding: 0;
+	}
+
+	.startpane-header-title {
+		text-align: center;
+	}
+
+	.startpane-project-list {
+		padding: 0;
+	}
+
 }

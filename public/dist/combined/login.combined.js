@@ -13,6 +13,8 @@ function r(t,e,r){this.id=t,this.source=e,this.data=r,this.workerID=e.workerID}v
 return t||(t=1/0),a={defer:function(){return p||(l.push(arguments),++f,e()),a},await:function(t){return d=t,u=!1,f||o(),a},awaitAll:function(t){return d=t,u=!0,f||o(),a}}}function r(){}var i=[].slice;t.version="1.0.7","function"==typeof define&&define.amd?define(function(){return t}):"object"==typeof e&&e.exports?e.exports=t:this.queue=t}()},{}],101:[function(t,e){!function(){"use strict";function t(e,r){return this instanceof t?(this._maxEntries=Math.max(4,e||9),this._minEntries=Math.max(2,Math.ceil(.4*this._maxEntries)),r&&this._initFormat(r),void this.clear()):new t(e,r)}function r(t,e){t.bbox=i(t,0,t.children.length,e)}function i(t,e,r,i){for(var a,s=n(),u=e;r>u;u++)a=t.children[u],o(s,t.leaf?i(a):a.bbox);return s}function n(){return[1/0,1/0,-1/0,-1/0]}function o(t,e){return t[0]=Math.min(t[0],e[0]),t[1]=Math.min(t[1],e[1]),t[2]=Math.max(t[2],e[2]),t[3]=Math.max(t[3],e[3]),t}function a(t,e){return t.bbox[0]-e.bbox[0]}function s(t,e){return t.bbox[1]-e.bbox[1]}function u(t){return(t[2]-t[0])*(t[3]-t[1])}function l(t){return t[2]-t[0]+(t[3]-t[1])}function h(t,e){return(Math.max(e[2],t[2])-Math.min(e[0],t[0]))*(Math.max(e[3],t[3])-Math.min(e[1],t[1]))}function c(t,e){var r=Math.max(t[0],e[0]),i=Math.max(t[1],e[1]),n=Math.min(t[2],e[2]),o=Math.min(t[3],e[3]);return Math.max(0,n-r)*Math.max(0,o-i)}function f(t,e){return t[0]<=e[0]&&t[1]<=e[1]&&e[2]<=t[2]&&e[3]<=t[3]}function p(t,e){return e[0]<=t[2]&&e[1]<=t[3]&&e[2]>=t[0]&&e[3]>=t[1]}function d(t,e,r,i,n){for(var o,a=[e,r];a.length;)r=a.pop(),e=a.pop(),i>=r-e||(o=e+Math.ceil((r-e)/i/2)*i,m(t,e,r,o,n),a.push(e,o,o,r))}function m(t,e,r,i,n){for(var o,a,s,u,l,h,c,f,p;r>e;){for(r-e>600&&(o=r-e+1,a=i-e+1,s=Math.log(o),u=.5*Math.exp(2*s/3),l=.5*Math.sqrt(s*u*(o-u)/o)*(0>a-o/2?-1:1),h=Math.max(e,Math.floor(i-a*u/o+l)),c=Math.min(r,Math.floor(i+(o-a)*u/o+l)),m(t,h,c,i,n)),f=t[i],a=e,p=r,v(t,e,i),n(t[r],f)>0&&v(t,e,r);p>a;){for(v(t,a,p),a++,p--;n(t[a],f)<0;)a++;for(;n(t[p],f)>0;)p--}0===n(t[e],f)?v(t,e,p):(p++,v(t,p,r)),i>=p&&(e=p+1),p>=i&&(r=p-1)}}function v(t,e,r){var i=t[e];t[e]=t[r],t[r]=i}t.prototype={all:function(){return this._all(this.data,[])},search:function(t){var e=this.data,r=[],i=this.toBBox;if(!p(t,e.bbox))return r;for(var n,o,a,s,u=[];e;){for(n=0,o=e.children.length;o>n;n++)a=e.children[n],s=e.leaf?i(a):a.bbox,p(t,s)&&(e.leaf?r.push(a):f(t,s)?this._all(a,r):u.push(a));e=u.pop()}return r},load:function(t){if(!t||!t.length)return this;if(t.length<this._minEntries){for(var e=0,r=t.length;r>e;e++)this.insert(t[e]);return this}var i=this._build(t.slice(),0,t.length-1,0);if(this.data.children.length)if(this.data.height===i.height)this._splitRoot(this.data,i);else{if(this.data.height<i.height){var n=this.data;this.data=i,i=n}this._insert(i,this.data.height-i.height-1,!0)}else this.data=i;return this},insert:function(t){return t&&this._insert(t,this.data.height-1),this},clear:function(){return this.data={children:[],height:1,bbox:n(),leaf:!0},this},remove:function(t){if(!t)return this;for(var e,r,i,n,o=this.data,a=this.toBBox(t),s=[],u=[];o||s.length;){if(o||(o=s.pop(),r=s[s.length-1],e=u.pop(),n=!0),o.leaf&&(i=o.children.indexOf(t),-1!==i))return o.children.splice(i,1),s.push(o),this._condense(s),this;n||o.leaf||!f(o.bbox,a)?r?(e++,o=r.children[e],n=!1):o=null:(s.push(o),u.push(e),e=0,r=o,o=o.children[0])}return this},toBBox:function(t){return t},compareMinX:function(t,e){return t[0]-e[0]},compareMinY:function(t,e){return t[1]-e[1]},toJSON:function(){return this.data},fromJSON:function(t){return this.data=t,this},_all:function(t,e){for(var r=[];t;)t.leaf?e.push.apply(e,t.children):r.push.apply(r,t.children),t=r.pop();return e},_build:function(t,e,i,n){var o,a=i-e+1,s=this._maxEntries;if(s>=a)return o={children:t.slice(e,i+1),height:1,bbox:null,leaf:!0},r(o,this.toBBox),o;n||(n=Math.ceil(Math.log(a)/Math.log(s)),s=Math.ceil(a/Math.pow(s,n-1))),o={children:[],height:n,bbox:null};var u,l,h,c,f=Math.ceil(a/s),p=f*Math.ceil(Math.sqrt(s));for(d(t,e,i,p,this.compareMinX),u=e;i>=u;u+=p)for(h=Math.min(u+p-1,i),d(t,u,h,f,this.compareMinY),l=u;h>=l;l+=f)c=Math.min(l+f-1,h),o.children.push(this._build(t,l,c,n-1));return r(o,this.toBBox),o},_chooseSubtree:function(t,e,r,i){for(var n,o,a,s,l,c,f,p;;){if(i.push(e),e.leaf||i.length-1===r)break;for(f=p=1/0,n=0,o=e.children.length;o>n;n++)a=e.children[n],l=u(a.bbox),c=h(t,a.bbox)-l,p>c?(p=c,f=f>l?l:f,s=a):c===p&&f>l&&(f=l,s=a);e=s}return e},_insert:function(t,e,r){var i=this.toBBox,n=r?t.bbox:i(t),a=[],s=this._chooseSubtree(n,this.data,e,a);for(s.children.push(t),o(s.bbox,n);e>=0&&a[e].children.length>this._maxEntries;)this._split(a,e),e--;this._adjustParentBBoxes(n,a,e)},_split:function(t,e){var i=t[e],n=i.children.length,o=this._minEntries;this._chooseSplitAxis(i,o,n);var a={children:i.children.splice(this._chooseSplitIndex(i,o,n)),height:i.height};i.leaf&&(a.leaf=!0),r(i,this.toBBox),r(a,this.toBBox),e?t[e-1].children.push(a):this._splitRoot(i,a)},_splitRoot:function(t,e){this.data={children:[t,e],height:t.height+1},r(this.data,this.toBBox)},_chooseSplitIndex:function(t,e,r){var n,o,a,s,l,h,f,p;for(h=f=1/0,n=e;r-e>=n;n++)o=i(t,0,n,this.toBBox),a=i(t,n,r,this.toBBox),s=c(o,a),l=u(o)+u(a),h>s?(h=s,p=n,f=f>l?l:f):s===h&&f>l&&(f=l,p=n);return p},_chooseSplitAxis:function(t,e,r){var i=t.leaf?this.compareMinX:a,n=t.leaf?this.compareMinY:s,o=this._allDistMargin(t,e,r,i),u=this._allDistMargin(t,e,r,n);u>o&&t.children.sort(i)},_allDistMargin:function(t,e,r,n){t.children.sort(n);var a,s,u=this.toBBox,h=i(t,0,e,u),c=i(t,r-e,r,u),f=l(h)+l(c);for(a=e;r-e>a;a++)s=t.children[a],o(h,t.leaf?u(s):s.bbox),f+=l(h);for(a=r-e-1;a>=e;a--)s=t.children[a],o(c,t.leaf?u(s):s.bbox),f+=l(c);return f},_adjustParentBBoxes:function(t,e,r){for(var i=r;i>=0;i--)o(e[i].bbox,t)},_condense:function(t){for(var e,i=t.length-1;i>=0;i--)0===t[i].children.length?i>0?(e=t[i-1].children,e.splice(e.indexOf(t[i]),1)):this.clear():r(t[i],this.toBBox)},_initFormat:function(t){var e=["return a"," - b",";"];this.compareMinX=new Function("a","b",e.join(t[0])),this.compareMinY=new Function("a","b",e.join(t[1])),this.toBBox=new Function("a","return [a"+t.join(", a")+"];")}},"function"==typeof define&&define.amd?define(function(){return t}):"undefined"!=typeof e?e.exports=t:"undefined"!=typeof self?self.rbush=t:window.rbush=t}()},{}],102:[function(t,e){function r(t,e,r,i){this.cx=3*t,this.bx=3*(r-t)-this.cx,this.ax=1-this.cx-this.bx,this.cy=3*e,this.by=3*(i-e)-this.cy,this.ay=1-this.cy-this.by,this.p1x=t,this.p1y=i,this.p2x=r,this.p2y=i}e.exports=r,r.prototype.sampleCurveX=function(t){return((this.ax*t+this.bx)*t+this.cx)*t},r.prototype.sampleCurveY=function(t){return((this.ay*t+this.by)*t+this.cy)*t},r.prototype.sampleCurveDerivativeX=function(t){return(3*this.ax*t+2*this.bx)*t+this.cx},r.prototype.solveCurveX=function(t,e){"undefined"==typeof e&&(e=1e-6);var r,i,n,o,a;for(n=t,a=0;8>a;a++){if(o=this.sampleCurveX(n)-t,Math.abs(o)<e)return n;var s=this.sampleCurveDerivativeX(n);if(Math.abs(s)<1e-6)break;n-=o/s}if(r=0,i=1,n=t,r>n)return r;if(n>i)return i;for(;i>r;){if(o=this.sampleCurveX(n),Math.abs(o-t)<e)return n;t>o?r=n:i=n,n=.5*(i-r)+r}return n},r.prototype.solve=function(t,e){return this.sampleCurveY(this.solveCurveX(t,e))}},{}],103:[function(t,e){e.exports.VectorTile=t("./lib/vectortile.js"),e.exports.VectorTileFeature=t("./lib/vectortilefeature.js"),e.exports.VectorTileLayer=t("./lib/vectortilelayer.js")},{"./lib/vectortile.js":104,"./lib/vectortilefeature.js":105,"./lib/vectortilelayer.js":106}],104:[function(t,e){"use strict";function r(t,e){for(this.layers={},this._buffer=t,e=e||t.length;t.pos<e;){var r=t.readVarint(),i=r>>3;if(3==i){var n=this.readLayer();n.length&&(this.layers[n.name]=n)}else t.skip(r)}}var i=t("./vectortilelayer");e.exports=r,r.prototype.readLayer=function(){var t=this._buffer,e=t.readVarint(),r=t.pos+e,n=new i(t,r);return t.pos=r,n}},{"./vectortilelayer":106}],105:[function(t,e){"use strict";function r(t,e,r,i,n){for(this.properties={},this.extent=r,this.type=0,this._buffer=t,this._geometry=-1,e=e||t.length;t.pos<e;){var o=t.readVarint(),a=o>>3;if(1==a)this._id=t.readVarint();else if(2==a)for(var s=t.pos+t.readVarint();t.pos<s;){var u=i[t.readVarint()],l=n[t.readVarint()];this.properties[u]=l}else 3==a?this.type=t.readVarint():4==a?(this._geometry=t.pos,t.skip(o)):t.skip(o)}}var i=t("point-geometry");e.exports=r,r.types=["Unknown","Point","LineString","Polygon"],r.prototype.loadGeometry=function(){var t=this._buffer;t.pos=this._geometry;for(var e,r=t.readVarint(),n=t.pos+r,o=1,a=0,s=0,u=0,l=[];t.pos<n;){if(!a){var h=t.readVarint();o=7&h,a=h>>3}if(a--,1===o||2===o)s+=t.readSVarint(),u+=t.readSVarint(),1===o&&(e&&l.push(e),e=[]),e.push(new i(s,u));else{if(7!==o)throw new Error("unknown command "+o);e.push(e[0].clone())}}return e&&l.push(e),l},r.prototype.bbox=function(){var t=this._buffer;t.pos=this._geometry;for(var e=t.readVarint(),r=t.pos+e,i=1,n=0,o=0,a=0,s=1/0,u=-1/0,l=1/0,h=-1/0;t.pos<r;){if(!n){var c=t.readVarint();i=7&c,n=c>>3}if(n--,1===i||2===i)o+=t.readSVarint(),a+=t.readSVarint(),s>o&&(s=o),o>u&&(u=o),l>a&&(l=a),a>h&&(h=a);else if(7!==i)throw new Error("unknown command "+i)}return[s,l,u,h]}},{"point-geometry":99}],106:[function(t,e){"use strict";function r(t,e){this.version=1,this.name=null,this.extent=4096,this.length=0,this._buffer=t,this._keys=[],this._values=[],this._features=[];var r,i;for(e=e||t.length;t.pos<e;)r=t.readVarint(),i=r>>3,15===i?this.version=t.readVarint():1===i?this.name=t.readString():5===i?this.extent=t.readVarint():2===i?(this.length++,this._features.push(t.pos),t.skip(r)):3===i?this._keys.push(t.readString()):4===i?this._values.push(this.readFeatureValue()):t.skip(r)}var i=t("./vectortilefeature.js");e.exports=r,r.prototype.readFeatureValue=function(){for(var t,e,r=this._buffer,i=null,n=r.readVarint(),o=r.pos+n;r.pos<o;)if(t=r.readVarint(),e=t>>3,1==e)i=r.readString();else{if(2==e)throw new Error("read float");if(3==e)i=r.readDouble();else if(4==e)i=r.readVarint();else{if(5==e)throw new Error("read uint");6==e?i=r.readSVarint():7==e?i=Boolean(r.readVarint()):r.skip(t)}}return i},r.prototype.feature=function(t){if(0>t||t>=this._features.length)throw new Error("feature index out of bounds");this._buffer.pos=this._features[t];var e=this._buffer.readVarint()+this._buffer.pos;return new i(this._buffer,e,this.extent,this._keys,this._values)}},{"./vectortilefeature.js":105}]},{},[22]);;// spinning map
 L.SpinningMap = L.Class.extend({
 
+	// todo: refactor GL to own class
+
 	// default options
 	options : {
 
@@ -23,6 +25,7 @@ L.SpinningMap = L.Class.extend({
 		content : '',
 		container : 'map',
 		speed : 1000,
+		tileFormat : 'jpg70',
 		position : {
 			lat : 59.91843,
 			lng : 10.74721,
@@ -38,6 +41,7 @@ L.SpinningMap = L.Class.extend({
 			}
 		},
 		autoStart : false,
+		interactivity : false,
 		spinning : [
 			'spinning',
 			'spinning90',
@@ -51,7 +55,6 @@ L.SpinningMap = L.Class.extend({
 			'action' : 'changeView'
 		}],
 		duration : 100000	// ms
-		// duration : 1000	// ms
 
 	},
 
@@ -76,8 +79,15 @@ L.SpinningMap = L.Class.extend({
 
 	initLayout : function () {
 
+		// set wrapper
+		this._wrapper = this.options.wrapper || L.DomUtil.create('div', 'spinning-wrapper', document.body);
+
 		// set container
-		this._container = this.options.container;
+		this._container = this.options.container; // this is spinning 
+		this._wrapper.appendChild(this._container);
+
+		// create content
+		if (this.options.content) this.initContent();
 
 		// set gl
 		this._gl = this.options.gl && mapboxgl.util.supported();
@@ -87,11 +97,15 @@ L.SpinningMap = L.Class.extend({
 		
 	},
 
+	initContent : function () {
+
+		// get content and append to wrapper
+		var content = this.options.content;
+		this._wrapper.appendChild(content);
+	},	
+
 
 	initMap : function () { 
-
-		// init wrappers
-		this.initWrappers();
 
 		// set dimensions of container
 		this.setDimensions();
@@ -100,42 +114,27 @@ L.SpinningMap = L.Class.extend({
 		this.createMap();
 
 		// create circle
-		this.createCircle();
+		if (!!this.options.circle) this.createCircle();
 
 		// set window resize event listener
 		L.DomEvent.on(window, 'resize', this.setDimensions, this);
 
 	},
 
-	initGLMap : function () {
-
-		// extend gl
-		this._extendMapboxGL();
-
-		// create map
-		this.createGLmap();
-
-		// create circle
-		this.createCircle();
-
+	disable : function () {
+		Wu.DomUtil.remove(this._wrapper);
+		setTimeout(this.kill, 1000);
 	},
 
-
-	_extendMapboxGL : function () {
-
-		// overwrite normalizer
-		mapboxgl.Map.prototype._normalizeBearing = function (bearing) {
-			console.log('_normalizeBearing');
-			return bearing;
-		}
-
+	kill : function () {
+		this._wrapper = null;
+		delete this._wrapper;
+		delete this._map;
+		delete this._container;
+		delete this; // bye!
 	},
 
-	initWrappers : function () {
-		var mapWrapper = L.DomUtil.create('div', 'map-wrapper', document.body);
-		mapWrapper.appendChild(this._container);
-	},
-
+	
 	createMap : function () {
 
 		// set vars
@@ -148,24 +147,177 @@ L.SpinningMap = L.Class.extend({
 
 		// add layer
 		var layer = L.mapbox.tileLayer(this.options.layer, {
-			format : 'jpg70'
+			format : this.options.tileFormat
 		}).addTo(map);
 
 		// set map options
 		this.setView(lat, lng, this._getZoomLevel());
 		
 		// set map options
-		map.dragging.disable();
-		map.touchZoom.disable();
-		map.doubleClickZoom.disable();
-		map.scrollWheelZoom.disable();
-		map.boxZoom.disable();
-		map.keyboard.disable();
+		if (!this.options.interactivity) {
+			map.dragging.disable();
+			map.touchZoom.disable();
+			map.doubleClickZoom.disable();
+			map.scrollWheelZoom.disable();
+			map.boxZoom.disable();
+			map.keyboard.disable();
+		}
+
+		// remove zoom and attribution
 		map.zoomControl.removeFrom(map);
 		map.attributionControl.removeFrom(map);
-	
 
 	},
+
+	setView : function (lat, lng, zoom) {
+		this._map.setView([lat, lng], zoom);
+	},
+
+	changeView : function () {
+		var lat = this.options.position.lat,
+		    lng = this.options.position.lng;
+
+		// set view
+		this.setView(lat, lng, this._getZoomLevel());
+		
+		// restart to change direction
+		this.stop();
+		this.start();
+	},
+
+
+
+	addHooks : function () {
+		var map = this._map;
+		map.on('resize', this._onResize.bind(this));
+	},
+
+	removeHooks : function () {
+		var map = this._map;
+		map.off('resize', this._onResize.bind(this));
+	},
+
+	contentClick : function () {
+		this._resetMoves();
+		if (this._gl) this.changeViewGL();
+	},
+
+	_onResize : function () {
+
+		// sizes
+		var newSize = this._container.offsetWidth,
+	    	    oldSize = this._past || newSize,
+	 	    diff = oldSize - newSize,
+	 	    moved = diff/2 * 0.75;
+		this._past = newSize;
+
+		// set centre to circle
+		this._map.panBy([-moved, 0], {
+			duration : 0
+		});
+
+	},
+
+	createCircle : function () {
+
+		// create divs
+		this._circleContainer = L.DomUtil.create('div', 'startpane-circle-container', this._wrapper);
+		this._circle = L.DomUtil.create('div', 'startpane-circle', this._circleContainer);
+
+		var radius = this.options.circle.radius,
+		    b = this.options.circle.border,
+		    border = b.px + 'px ' + b.solid + ' ' + b.color;
+		
+		// set circle options
+		this._circle.style.width = radius + 'px';
+		this._circle.style.height = radius + 'px';
+		this._circle.style.borderRadius = radius + 'px';
+		this._circle.style.top = radius / -2 + 'px';
+		this._circle.style.left = radius / -2 + 'px';
+		this._circle.style.background = this.options.circle.color;
+		this._circle.style.border = border;
+
+		// change view on click
+		if (!this._gl) L.DomEvent.on(this._circle, 'mousedown', this.changeView, this);
+		if (this._gl) L.DomEvent.on(this._circle, 'mousedown', this.changeViewGL, this);
+	},
+
+	setDimensions : function () {
+		
+		// get dimensions		
+		var d = this._getDimensions();
+
+		var offsetLeft = d.width * 0.125 - d.width,
+		    offsetTop = d.height * 0.5 - d.width;
+
+		// set dimensions
+		this._container.style.height = d.width * 2 + 'px';
+		this._container.style.width = d.width * 2 + 'px';
+		this._container.style.top = offsetTop + 'px';
+		this._container.style.left = offsetLeft + 'px';
+
+	},
+
+	// get window dimensions
+	_getDimensions : function (e) {
+		var w = window,
+		    d = document,
+		    e = d.documentElement,
+		    g = d.getElementsByTagName('body')[0],
+		    x = w.innerWidth || e.clientWidth || g.clientWidth,
+		    y = w.innerHeight|| e.clientHeight|| g.clientHeight,
+		    d = {
+			height : y,
+			width : x
+		    }
+		return d;
+	},
+
+	// start spinning
+	start : function () {
+		this._gl ? this._startGL() : this._start();
+	},
+
+	// stop spinning
+	stop : function () {
+		this._gl ? this._stopGL() : this._stop();
+	},
+
+	_start : function () {
+		this._direction = this._getDirection();
+		L.DomUtil.addClass(this._container, this._direction);
+	},
+
+	_stop : function () {
+		L.DomUtil.removeClass(this._container, this._direction);
+	},
+
+	// get direction of spin
+	_getDirection : function () {
+		var arr = this.options.spinning;
+		var key = Math.floor(Math.random() * arr.length);
+		return arr[key];
+	},
+
+	// get zoom level
+	_getZoomLevel : function (current) {
+		var min = this.options.position.zoom[0];
+		var max = this.options.position.zoom[1];
+		var random = Math.floor(Math.random()*(max-min+1)+min);
+		if (random == 13 || random == 14 || random == 15) return this._getZoomLevel();
+		return random;
+	},
+
+
+
+
+
+
+
+
+
+
+	// GL from here on. refactor to own class
 
 	createGLmap : function () {
 
@@ -208,26 +360,7 @@ L.SpinningMap = L.Class.extend({
 
 	},
 
-	addHooks : function () {
-		// var map = this._map;
-		// // map.on('resize', this._onResize.bind(this));
-		
-		// map.on('moveend', this._onMoveend.bind(this));
-		// map.on('movestart', this._onMovestart.bind(this));
-
-		// // fly on login click
-		// var login = L.DomUtil.get('login-button'); // custom, todo: move to options
-		// var content = L.DomUtil.get('spinning-content'); 
-
-		// L.DomEvent.on(login, 'mousedown', L.DomEvent.stopPropagation, this);
-		// L.DomEvent.on(content, 'mousedown', this.contentClick, this);
-
-	},
-
-	contentClick : function () {
-		this._resetMoves();
-		if (this._gl) this.changeViewGL();
-	},
+	
 
 	// _moveEnd : -1,
 	// _moveStart : false,
@@ -266,21 +399,33 @@ L.SpinningMap = L.Class.extend({
 	// 	console.log('move');
 	// },
 
-	_onResize : function () {
 
-		// sizes
-		var newSize = this._container.offsetWidth,
-	    	    oldSize = this._past || newSize,
-	 	    diff = oldSize - newSize,
-	 	    moved = diff/2 * 0.75;
-		this._past = newSize;
 
-		// set centre to circle
-		this._map.panBy([-moved, 0], {
-			duration : 0
-		});
+	initGLMap : function () {
+
+		// extend gl
+		this._extendMapboxGL();
+
+		// create map
+		this.createGLmap();
+
+		// create circle
+		this.createCircle();
 
 	},
+
+
+	_extendMapboxGL : function () {
+
+		// overwrite normalizer
+		mapboxgl.Map.prototype._normalizeBearing = function (bearing) {
+			console.log('_normalizeBearing');
+			return bearing;
+		}
+
+	},
+
+	
 
 	panGL : function () {
 
@@ -335,22 +480,7 @@ L.SpinningMap = L.Class.extend({
 	// 	this._container.style.left = left + 'px';
 	// },
 
-	setView : function (lat, lng, zoom) {
-		this._map.setView([lat, lng], zoom);
-	},
-
-	changeView : function () {
-		var lat = this.options.position.lat,
-		    lng = this.options.position.lng;
-
-		// set view
-		this.setView(lat, lng, this._getZoomLevel());
-		
-		// restart to change direction
-		this.stop();
-		this.start();
-	},
-
+	
 	changeViewGL : function () {
 
 		
@@ -421,79 +551,7 @@ L.SpinningMap = L.Class.extend({
 		return [left, 0];
 	},
 
-	createCircle : function () {
-
-		// create divs
-		this._circleContainer = L.DomUtil.create('div', 'start-pane-circle-container', document.body);
-		this._circle = L.DomUtil.create('div', 'start-pane-circle', this._circleContainer);
-
-		var radius = this.options.circle.radius,
-		    b = this.options.circle.border,
-		    border = b.px + 'px ' + b.solid + ' ' + b.color;
-		
-		// set circle options
-		this._circle.style.width = radius + 'px';
-		this._circle.style.height = radius + 'px';
-		this._circle.style.borderRadius = radius + 'px';
-		this._circle.style.top = radius / -2 + 'px';
-		this._circle.style.left = radius / -2 + 'px';
-		this._circle.style.background = this.options.circle.color;
-		this._circle.style.border = border;
-
-		// change view on click
-		if (!this._gl) L.DomEvent.on(this._circle, 'mousedown', this.changeView, this);
-		if (this._gl) L.DomEvent.on(this._circle, 'mousedown', this.changeViewGL, this);
-	},
-
-	setDimensions : function () {
-		
-		// get dimensions		
-		var d = this._getDimensions();
-
-		var offsetLeft = d.width * 0.125 - d.width,
-		    offsetTop = d.height * 0.5 - d.width;
-
-		// set dimensions
-		this._container.style.height = d.width * 2 + 'px';
-		this._container.style.width = d.width * 2 + 'px';
-		this._container.style.top = offsetTop + 'px';
-		this._container.style.left = offsetLeft + 'px';
-
-	},
-
-	// get window dimensions
-	_getDimensions : function (e) {
-		var w = window,
-		    d = document,
-		    e = d.documentElement,
-		    g = d.getElementsByTagName('body')[0],
-		    x = w.innerWidth || e.clientWidth || g.clientWidth,
-		    y = w.innerHeight|| e.clientHeight|| g.clientHeight,
-		    d = {
-			height : y,
-			width : x
-		    }
-		return d;
-	},
-
-	// start spinning
-	start : function () {
-		this._gl ? this._startGL() : this._start();
-	},
-
-	// stop spinning
-	stop : function () {
-		this._gl ? this._stopGL() : this._stop();
-	},
-
-	_start : function () {
-		this._direction = this._getDirection();
-		L.DomUtil.addClass(this._container, this._direction);
-	},
-
-	_stop : function () {
-		L.DomUtil.removeClass(this._container, this._direction);
-	},
+	
 
 	_startGL : function () {
 		this.panGL();
@@ -504,27 +562,16 @@ L.SpinningMap = L.Class.extend({
 
 	},
 
-	// get direction of spin
-	_getDirection : function () {
-		var arr = this.options.spinning;
-		var key = Math.floor(Math.random() * arr.length);
-		return arr[key];
-	},
+	
+});
 
-	// get zoom level
-	_getZoomLevel : function (current) {
-		var min = this.options.position.zoom[0];
-		var max = this.options.position.zoom[1];
-		var random = Math.floor(Math.random()*(max-min+1)+min);
-		if (random == 13 || random == 14 || random == 15) return this._getZoomLevel();
-		return random;
-	}
-});;var spinner;
+
+;var spinner;
 // var s = spinner;
 function spin () {
 
 	var content = L.DomUtil.get('spinning-content');
-	var map = L.DomUtil.get('spinning-map');
+	var container = L.DomUtil.get('spinning-map');
 
 	spinner = new L.SpinningMap({
 		// gl : true,
@@ -533,8 +580,9 @@ function spin () {
 		layer : 'systemapic.kcjonn12',
 		// logo : 'images/griffon_logo_drop.png',
 		logo : 'images/systemapic-logo-bw.png',
-		content : content, 
-		container : map,
+		content : content,  // todo
+		wrapper : false,
+		container : container,
 		speed : 1000,
 		position : {
 			lat : -33.83214,

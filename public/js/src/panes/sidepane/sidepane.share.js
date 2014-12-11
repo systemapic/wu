@@ -266,8 +266,6 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 	reset : function () {
 
-		console.log('reset');
-
 		// remove hooks
 		this.removeHooks();
 

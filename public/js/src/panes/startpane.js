@@ -5,91 +5,84 @@ Wu.StartPane = Wu.Class.extend({
 		// set options
 		Wu.setOptions(this, options);
 
+	},
+
+	activate : function () {
+
 		// create container
-		this.initContainer(options);
+		this.initSpinner();
 
 		// add events
 		this.addHooks();
 
+		// refresh latest projects
+		this.refreshProjects();
+
+	},	
+
+	deactivate : function() {
+
+		// remove hooks
+		this.removeHooks();
+
+		// kill spinner
+		this._spinner.disable();
+
+		// delete divs
+		Wu.DomUtil.remove(this._container);
 	},
-
-	initContainer : function(options) {
-
-		// create container (append to body)
-		this._container = Wu.DomUtil.create('div', 'startpane-canvas-container', document.body);
-		
-
-		console.log('init startpane');
-		// init spinning map 	// todo!
-		// this.initSpinner();
-
-		// get latest proejcts
-		// this.refreshProjects();
-
-	},
-
 
 	initSpinner : function () {
 
+		// create container 
+		this._container = Wu.DomUtil.create('div', 'startpane-canvas-container', app._appPane);
+
 		// create content for black box
 		var content = this._initSpinnerContent();
-
-		// create map container
-		var map = L.DomUtil.create('div', 'spinning-map', document.body);
+		var wrapper = Wu.DomUtil.create('div', 'spinning-wrapper', app._appPane);
 
 		// create spinner instance
 		this._spinner = new L.SpinningMap({
 			autoStart : true,
 			accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q',
-			layer : 'systemapic.kcjonn12',
+			layer : 'systemapic.kcjonn12', 	// todo: several layers
 			logo : 'images/griffon_logo_drop.png', // todo!
 			content : content, 
-			container : map,
+			container : this._container,
+			wrapper : wrapper,
 			speed : 1000,
+			tileFormat : 'png', // quality of mapbox tiles
+			interactivity : false,
+			gl : false,
 			position : {
 				lat : -33.83214,
 				lng : 151.22299,
 				zoom : [4, 17]
 			},
-			circle : {
-				radius : 120, 
-				color : 'rgba(247, 175, 38, 0.3)',
-				border : {
-					px : 4,
-					solid : 'solid',
-					color : 'white'
-				}
-			},
+			circle : false,
 		});
-
 	},
 
 	_initSpinnerContent : function () {
 
-		// Circle
-		this._circleContainer = Wu.DomUtil.create('div', 'startpane-circle-container', this._container);
-		this._circle = Wu.DomUtil.create('div', 'startpane-circle', this._circleContainer);
+		// create wrapper
+		var wrapper = Wu.DomUtil.create('div', 'startpane-spinning-content');
 
-		// Black banner
-		this._bannerContainer = Wu.DomUtil.create('div', 'startpane-banner-container', this._container);
+		// black box in centre
+		this._bannerContainer = Wu.DomUtil.create('div', 'startpane-banner-container', wrapper);
 		this._banner = Wu.DomUtil.create('div', 'startpane-banner', this._bannerContainer);
 
-		// Big client Logo (Rüppell's Griffon)
+		// client logo
 		this._logo = Wu.DomUtil.create('div', 'startpane-logo', this._banner);
 
-		// Project list container + header
+		// project list 
 		this._recentProjectsContainer = Wu.DomUtil.create('div', 'startpane-recent-projects-container', this._banner);
 		this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Recent projects');
-
-		// Project list
 		this._projectList = Wu.DomUtil.create('div', 'startpane-project-list', this._recentProjectsContainer);
 
-		// // Spinning canvas
-		// this._spinningCanvasContainer = Wu.DomUtil.createId('div', 'start-panne-spinning-canvas-container', this._container);
-		// this._spinningCanvas = Wu.DomUtil.createId('div', 'start-panne-spinning-canvas', this._spinningCanvasContainer);
-		// this._bgMap = Wu.DomUtil.createId('div', 'start-panne-bg-map', this._spinningCanvas);
-
-
+		// return 
+		return wrapper;
+		
 	},
 
 
@@ -109,15 +102,11 @@ Wu.StartPane = Wu.Class.extend({
 			// Create project container
 			this.createStartProject(project);
 		}, this);
-
-			
-
 	},
 
 	_getLatestProjects : function () {
 
 		// Get all projects
-		// var projectsUnsorted = this.options.projects;
 		var projectsUnsorted = app.Projects;	
 
 		// Sort them by last updated
@@ -133,34 +122,15 @@ Wu.StartPane = Wu.Class.extend({
 
 	createStartProject : function(project) {
 
-		var _name 		= 	project.getName()
-		// var _logo		= 	project.getLogo()
-		var _uuid 		= 	project.getUuid();
-		var _lastUpdated	= 	project.getLastUpdated();
-
-
-		// var container = Wu.DomUtil.create('div', 'start-pane-project', this._container);
+		// create container
 		var projectContainer = Wu.DomUtil.create('div', 'start-panne-recent-projects', this._projectList);
 
-
-		// // Image wrapper
-		// var imageWrapper = Wu.DomUtil.create('div', 'start-project-image', container);
-
-		// // If there is a logo, render it
-		// if ( _logo ) {
-		// 	var logo = Wu.DomUtil.create('img', '', imageWrapper);
-		// 	logo.src = _logo;
-		// }
-		
-		// Project title div
-		// var name = Wu.DomUtil.create('div', 'start-project-name', container);
-
 		// Adjust for short titles
-		if ( _name.length < 22 ) Wu.DomUtil.addClass(projectContainer, 'start-project-short-name');
-		projectContainer.innerHTML = _name;
+		if (project.getName().length < 22) Wu.DomUtil.addClass(projectContainer, 'start-project-short-name');
+		projectContainer.innerHTML = project.getName();;
 
 		// select project hook
-		Wu.DomEvent.on(projectContainer, 'mousedown', function() { this.selectProject(_uuid) }, this);
+		Wu.DomEvent.on(projectContainer, 'mousedown', function() { this.selectProject(project); }, this);
 
 	},
 
@@ -170,10 +140,8 @@ Wu.StartPane = Wu.Class.extend({
 	removeHooks : function () {
 	},
 
-	selectProject : function(uuid) {
+	selectProject : function(project) {
 
-		var project = this.options.projects[uuid];
-		
 		// select project
 		project.select();
 
@@ -185,23 +153,6 @@ Wu.StartPane = Wu.Class.extend({
 
 	},
 
-	// activate startpane
-	activate : function () {
-
-		// refresh latest projects
-		this.refreshProjects();
-
-		// show
-		Wu.DomUtil.removeClass(this._container, 'displayNone');
-	},
-
-	// deactivate startpane
-	deactivate : function() {
-
-		// hide
-		Wu.DomUtil.addClass(this._container, 'displayNone');
-		this.removeHooks();
-	},
 
 	update : function() {
 
@@ -211,14 +162,12 @@ Wu.StartPane = Wu.Class.extend({
 	createImage : function () {
 
 		var that = this;	// callback
-
 		app.setHash(function (ctx, hash) {
 
 			// get snapshot from server
 			Wu.post('/api/util/snapshot', hash, that.createdImage, that);
 
 		});
-		
 	},
 
 	createdImage : function (context, file) {
@@ -226,10 +175,6 @@ Wu.StartPane = Wu.Class.extend({
 		// parse results
 		var result = JSON.parse(file);
 		var image = result.image;
-
-		// get dimensions of container
-		// var height = context._imageContainer.offsetHeight;
-		// var width = context._imageContainer.offsetWidth;
 
 		// set path
 		var path = app.options.servers.portal;
@@ -243,21 +188,6 @@ Wu.StartPane = Wu.Class.extend({
 		var url = 'url("';
 		url += path;
 		url += '")';
-
-		console.log('url');
-
 	}
-
 });
-
-
-
-
-
-
-
-
-
-
-
 

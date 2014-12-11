@@ -389,6 +389,12 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// remove from DOM
 		Wu.DomUtil.remove(this._container);
 
+		// activate startpane
+		app.StartPane.activate();
+
+		// close statuspane
+		app.StatusPane.close()
+
 		// delete
 		this.project._delete();
 		delete this;
