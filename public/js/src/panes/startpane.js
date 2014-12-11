@@ -26,10 +26,11 @@ Wu.StartPane = Wu.Class.extend({
 		this.removeHooks();
 
 		// kill spinner
-		this._spinner.disable();
+		if (this._spinner) this._spinner.disable();
 
 		// delete divs
-		Wu.DomUtil.remove(this._container);
+		if (this._container) Wu.DomUtil.remove(this._container);
+
 	},
 
 	initSpinner : function () {

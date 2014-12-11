@@ -1,7 +1,6 @@
 Wu.StatusPane = Wu.Class.extend({
 	_ : 'statuspane', 
 
-
 	initialize : function (options) {
 		
 		// set options
@@ -23,7 +22,6 @@ Wu.StatusPane = Wu.Class.extend({
 		var statusWrap 	= this._statusWrap 	= Wu.DomUtil.create('div', 'home-status-wrap', container);
 		var status 				= Wu.DomUtil.create('div', 'home-status', statusWrap);
 		var statusInner 			= Wu.DomUtil.create('div', 'home-status-inner', status);
-
 
 		// set default status
 		this.clearStatus();

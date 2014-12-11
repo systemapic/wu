@@ -654,3 +654,23 @@ blockquote {
 	background-color: #FAFAFA !important;
 	color: black !important;
 	}
+
+
+
+
+
+
+
+
+
+
+/*.tooltip-field-key {
+background: rgba(255,255,255,0.2);
+color: black;
+font-weight: 500;
+}*/
+
+.leaflet-control-attribution,
+.leaflet-control-attribution a {
+	color: white;
+	}

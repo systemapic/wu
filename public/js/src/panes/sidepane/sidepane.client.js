@@ -274,6 +274,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		app.setStatus('Done!');
 		this._unlockNewProjectButton();
 
+		// remove startpane if active
+		app.StartPane.deactivate();
+
+
 	},
 
 	addHooks : function () {

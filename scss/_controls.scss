@@ -490,15 +490,12 @@
 ┴─┘└─┘┴ ┴└  ┴─┘└─┘ ┴   └─┘┴└─└─┘─┴┘┴ ┴ └─┘
 */
 
-/* Temporarily removed */
+.leaflet-bottom.leaflet-right {
+	z-index: 999999;
+	}
+
 .leaflet-control-attribution {
 	position: fixed;
-	/*left: 302px;*/
-	/*bottom: 5px;*/
-	/*right: auto;	*/
-	/*display: none;*/
-	/*left: 7px;*/
-
 	font-style: italic;
 	right: -2px;
 	top: 63px;

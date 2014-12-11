@@ -2055,12 +2055,18 @@ L.Popup.include({
 		var defaultPanes = app.Account.isManager() ? 3 : 2;		// 3 if manager, 2 if not (ie. only Project, Logout)
 		var height = panes ? panes.length * 70 : defaultPanes * 70;	// if no active project, default 3 menu items
 		app._editorMenuPane.style.height = parseInt(height) + 'px';
+
+		console.log('_setMenuHeight');
+		console.log('panes:', panes);
 	},
 
 	_getPaneArray : function (project) {
+		console.log('_getPaneArray', project);
+
 		var project = project || app.activeProject;
 		if (!project) return;
 
+		console.log('_getPaneArray 2', project);
 		var panes = [];
 		var pane = this.options.panes;
 		var settings = project.getSettings();
@@ -2074,6 +2080,8 @@ L.Popup.include({
 		if (pane.share && settings.socialSharing) 	panes.push('Share');
 		if (pane.account) 				panes.push('Account');
 
+
+		console.log('_getPaneArray 3', panes);
 		return panes;
 	},
 
@@ -2092,6 +2100,8 @@ L.Popup.include({
 		// default menus in sidepane
 		var panes = this._getPaneArray(project);
 
+		console.log('refreshProject panes', panes);
+
 		// set menu height
 		if (this.paneOpen) this._setMenuHeight();									
 
@@ -2105,17 +2115,22 @@ L.Popup.include({
 
 	refreshClient : function () {
 		
+		console.log('refreshClient????');
+
 		// set panes 
 		var panes = ['Clients'];
 		if (app.Account.isManager()) panes.push('Users');
 		panes.push('Account'); // logout button
 
 		// refresh
+		console.log('CLIENTS??, panes', panes);
 		this.refresh(panes);
 	},
 
 	// display the relevant panes
 	refresh : function (panes) {
+
+		console.error('refresh panes, ', panes);
 
 		this.panes = [];
 
@@ -2145,6 +2160,9 @@ L.Popup.include({
 	},
 
 	removePane : function (pane) {
+
+		console.log('removePane', pane);
+
 		var panes = Wu.extend([], this.panes);
 		_.pull(panes, pane);
 		this.refresh(panes);
@@ -2153,6 +2171,9 @@ L.Popup.include({
 
 
 	addPane : function (pane) {
+
+		console.log('addPane', pane);
+
 		var panes = Wu.extend([], this.panes);
 		panes.push(pane);
 		panes = _.unique(panes);
@@ -2182,7 +2203,7 @@ L.Popup.include({
 		this._refreshLeaflet();
 
 		// todo: what if panes not there?
-		Wu.DomUtil.removeClass(app.SidePane.Documents._content, 'show');
+		Wu.DomUtil.removeClass(app.SidePane.Documents._content, 'show'); 	// refactorrr
 		Wu.DomUtil.removeClass(app.SidePane.DataLibrary._content, 'show');
 		Wu.DomUtil.removeClass(app.SidePane.Users._content, 'show');
 
@@ -2203,7 +2224,7 @@ L.Popup.include({
 		Wu.DomUtil.addClass(app._active, 'show');
 		Wu.DomUtil.removeClass(app._editorContentPane, 'displayNone');
 
-		// Have to set a micro timeout, so that it doesn't interfear with the displayNone class above
+		// Have to set a micro timeout, so that it doesn't mess with the displayNone class above
 		setTimeout(function() {
 			Wu.DomUtil.removeClass(app._editorContentPane, 'hide-menu');
 		}, 10)
@@ -2579,19 +2600,21 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		Wu.SidePane.Item.prototype.initialize.call(this)
 
 		// active by default
-		// Wu.app._active = this._content; // remove already
 		this.activate();      
 	},
 
 	initContent : function () {
 
+		this.clients = [];
+
 		// clients container
 		this._clientsContainer = Wu.DomUtil.create('div', 'editor-clients', this._container);
 
 		// insert clients
-		this.options.json.clients.forEach(function(client, i, arr) {    
-			var clientDiv = new Wu.SidePane.Client(client);
-			clientDiv.addTo(this._clientsContainer);
+		this.options.json.clients.forEach(function(c, i, arr) {    
+			var client = new Wu.SidePane.Client(c);
+			client.addTo(this._clientsContainer);
+			this.clients.push(client);
 		}, this);
 
       		// insert create client button
@@ -2626,12 +2649,13 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	_deactivate : function () {
-
+		console.log('deeeactivate');
 	},
 
-	_create : function (client) {
-		var clientDiv = new Wu.SidePane.Client(client);
-		clientDiv.addTo(this._clientsContainer);
+	_create : function (c) {
+		var client = new Wu.SidePane.Client(c);
+		client.addTo(this._clientsContainer);
+		this.clients.push(client);
 	},
 	
 	openClient : function (client) {
@@ -3241,20 +3265,25 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// remove hooks
 		this.removeHooks();
 	
-		// unload project // todo: doesn't work!
-		if (this.project.selected) this.project.unload();
-	
 		// remove from client 
 		this._parent.removeProject(this.project);
 		
 		// remove from DOM
 		Wu.DomUtil.remove(this._container);
 
-		// activate startpane
-		app.StartPane.activate();
+		// if project is active, unload
+		if (this.project == app.activeProject) {
 
-		// close statuspane
-		app.StatusPane.close()
+			// unload
+			this.project.unload();
+		
+			// activate startpane
+			app.StartPane.activate();
+
+			// close statuspane
+			app.StatusPane.close()
+
+		}
 
 		// delete
 		this.project._delete();
@@ -3540,6 +3569,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// set status and unlock + button
 		app.setStatus('Done!');
 		this._unlockNewProjectButton();
+
+		// remove startpane if active
+		app.StartPane.deactivate();
+
 
 	},
 
@@ -9931,7 +9964,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 ;Wu.StatusPane = Wu.Class.extend({
 	_ : 'statuspane', 
 
-
 	initialize : function (options) {
 		
 		// set options
@@ -9953,7 +9985,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		var statusWrap 	= this._statusWrap 	= Wu.DomUtil.create('div', 'home-status-wrap', container);
 		var status 				= Wu.DomUtil.create('div', 'home-status', statusWrap);
 		var statusInner 			= Wu.DomUtil.create('div', 'home-status-inner', status);
-
 
 		// set default status
 		this.clearStatus();
@@ -12694,8 +12725,6 @@ L.control.baselayerToggle = function (options) {
 
 	createLayerFromGeoJSON : function (geojson) {
 
-		console.log('createLayerFromGeoJSON', geojson);
-
 		// set options
 		var options = JSON.stringify({
 			project 	: this.getUuid(),
@@ -12797,9 +12826,6 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	select : function () {
-
-		// hide startpane if active
-		if (app.StartPane) app.StartPane.deactivate();
 
 		// hide headerpane
  		if (app._headerPane) Wu.DomUtil.removeClass(app._headerPane, 'displayNone');
@@ -12903,6 +12929,7 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	unload : function () {
+		console.log('unload)');
 		Wu.app.MapPane.reset();
 		Wu.app.HeaderPane.reset();
 		this.selected = false;
@@ -12934,9 +12961,14 @@ L.control.baselayerToggle = function (options) {
 		// delete object
 		delete Wu.app.Projects[project.uuid];
 
-		// refresh sidepane
-		app.SidePane.refresh(['Projects', 'Users', 'Account']);
+		// set no active project if was active
+		if (app.activeProject == this) {
+			app.SidePane.refresh(['Projects', 'Users', 'Account']);
+			app.activeProject = null;
+		}
 
+		// set status
+		app.setStatus('Deleted!');
 	},
 
 	saveColorTheme : function () {
@@ -12964,11 +12996,8 @@ L.control.baselayerToggle = function (options) {
 		});
 		this._update('connectedAccounts');
 
-		console.log('removeMapboxAccount', removed);
-
 		// todo: remove active layers, etc.
 		var layers = this.getLayers();
-		console.log('lauyers: ', layers);
 
 		var lids = [];
 
@@ -12992,7 +13021,6 @@ L.control.baselayerToggle = function (options) {
 		    projectUuid : this.getUuid(),
 		    layerUuids : lids
 		}
-		console.log('server deleta lyer', json);
 		var string = JSON.stringify(json);
 		Wu.save('/api/layers/delete', string); 
 
@@ -13000,11 +13028,11 @@ L.control.baselayerToggle = function (options) {
 
 	_removeLayer : function (layer) {
 
-		console.log('___________________');
-		console.log('_removeLayer', layer);
-		console.log('lm: ', this.store.layermenu);
-		console.log('bl: ', this.store.baseLayers);
-		console.log('sl: ', this.store.layers);
+		// console.log('___________________');
+		// console.log('_removeLayer', layer);
+		// console.log('lm: ', this.store.layermenu);
+		// console.log('bl: ', this.store.baseLayers);
+		// console.log('sl: ', this.store.layers);
 
 		// remove from layermenu & baselayer store
 		_.remove(this.store.layermenu, function (item) { return item.layer == layer.getUuid(); });
@@ -13580,16 +13608,6 @@ L.control.baselayerToggle = function (options) {
 	disableMapboxGL : function () {
 
 	},
-
-
-
-
-
-
-
-
-
-
 
 });;Wu.Client = Wu.Class.extend({
 
@@ -19244,6 +19262,7 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_setProject : function (project) {
+		
 		// select project
 		project.select();
 

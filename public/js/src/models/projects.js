@@ -65,8 +65,6 @@ Wu.Project = Wu.Class.extend({
 
 	createLayerFromGeoJSON : function (geojson) {
 
-		console.log('createLayerFromGeoJSON', geojson);
-
 		// set options
 		var options = JSON.stringify({
 			project 	: this.getUuid(),
@@ -168,9 +166,6 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	select : function () {
-
-		// hide startpane if active
-		if (app.StartPane) app.StartPane.deactivate();
 
 		// hide headerpane
  		if (app._headerPane) Wu.DomUtil.removeClass(app._headerPane, 'displayNone');
@@ -274,6 +269,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	unload : function () {
+		console.log('unload)');
 		Wu.app.MapPane.reset();
 		Wu.app.HeaderPane.reset();
 		this.selected = false;
@@ -305,9 +301,14 @@ Wu.Project = Wu.Class.extend({
 		// delete object
 		delete Wu.app.Projects[project.uuid];
 
-		// refresh sidepane
-		app.SidePane.refresh(['Projects', 'Users', 'Account']);
+		// set no active project if was active
+		if (app.activeProject == this) {
+			app.SidePane.refresh(['Projects', 'Users', 'Account']);
+			app.activeProject = null;
+		}
 
+		// set status
+		app.setStatus('Deleted!');
 	},
 
 	saveColorTheme : function () {
@@ -335,11 +336,8 @@ Wu.Project = Wu.Class.extend({
 		});
 		this._update('connectedAccounts');
 
-		console.log('removeMapboxAccount', removed);
-
 		// todo: remove active layers, etc.
 		var layers = this.getLayers();
-		console.log('lauyers: ', layers);
 
 		var lids = [];
 
@@ -363,7 +361,6 @@ Wu.Project = Wu.Class.extend({
 		    projectUuid : this.getUuid(),
 		    layerUuids : lids
 		}
-		console.log('server deleta lyer', json);
 		var string = JSON.stringify(json);
 		Wu.save('/api/layers/delete', string); 
 
@@ -371,11 +368,11 @@ Wu.Project = Wu.Class.extend({
 
 	_removeLayer : function (layer) {
 
-		console.log('___________________');
-		console.log('_removeLayer', layer);
-		console.log('lm: ', this.store.layermenu);
-		console.log('bl: ', this.store.baseLayers);
-		console.log('sl: ', this.store.layers);
+		// console.log('___________________');
+		// console.log('_removeLayer', layer);
+		// console.log('lm: ', this.store.layermenu);
+		// console.log('bl: ', this.store.baseLayers);
+		// console.log('sl: ', this.store.layers);
 
 		// remove from layermenu & baselayer store
 		_.remove(this.store.layermenu, function (item) { return item.layer == layer.getUuid(); });
@@ -951,15 +948,5 @@ Wu.Project = Wu.Class.extend({
 	disableMapboxGL : function () {
 
 	},
-
-
-
-
-
-
-
-
-
-
 
 });
