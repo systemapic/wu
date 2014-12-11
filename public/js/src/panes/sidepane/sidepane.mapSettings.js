@@ -475,6 +475,15 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 		baseLayer.active = false;
 	},
 
+	setDefaultLayer : function () {
+		var baseLayer = _.sample(this._layers, 1)[0];
+		console.log('setDefaultLayer', this._layers);
+		console.log('baseLayer', baseLayer);
+		if (!baseLayer) return;
+		this.on(baseLayer);
+		this.enableLayer(baseLayer);
+	},
+
 	enableLayer : function (baseLayer) {
 
 		// get layer

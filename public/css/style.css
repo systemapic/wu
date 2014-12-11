@@ -1350,7 +1350,9 @@ input.cmn-toggle-round-flat + label:before {
 
 /* Disable font color to use bg-image instead */
 .leaflet-control-zoom-out, .leaflet-control-zoom-in {
-  color: transparent !important; }
+  color: transparent !important;
+  width: 26px !important;
+  height: 26px !important; }
 
 /*
 ┌┐ ┌─┐┌─┐┌─┐┬  ┌─┐┬ ┬┌─┐┬─┐  ┌┬┐┌─┐┌─┐┌─┐┬  ┌─┐
