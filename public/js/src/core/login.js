@@ -3,7 +3,7 @@ var spinner;
 function spin () {
 
 	var content = L.DomUtil.get('spinning-content');
-	var map = L.DomUtil.get('spinning-map');
+	var container = L.DomUtil.get('spinning-map');
 
 	spinner = new L.SpinningMap({
 		// gl : true,
@@ -12,8 +12,9 @@ function spin () {
 		layer : 'systemapic.kcjonn12',
 		// logo : 'images/griffon_logo_drop.png',
 		logo : 'images/systemapic-logo-bw.png',
-		content : content, 
-		container : map,
+		content : content,  // todo
+		wrapper : false,
+		container : container,
 		speed : 1000,
 		position : {
 			lat : -33.83214,

@@ -788,7 +788,7 @@ input.cmn-toggle-round-flat + label:before {
 	}
 
 /* Gray background when no map is selected */
-#map:before {
+/*#map:before {
 	content: '';
 	background-image: url(images/systemapic_BG.jpg);
 	position: absolute;
@@ -796,10 +796,10 @@ input.cmn-toggle-round-flat + label:before {
 	height: 100%;
 	left: 0;
 	top: 0;
-	}
+	}*/
 
 /* "Click to start" with arrow to Systempaic logo when no project is selected */
-.click-to-start:after {
+/*.click-to-start:after {
 	position: relative;
 	width: 100%;
 	height: 100%;
@@ -815,7 +815,7 @@ input.cmn-toggle-round-flat + label:before {
 	position: relative;
 	background-image: url(images/click2start.png);
 	background-repeat: no-repeat;
-	}
+	}*/
 
 
 /*
@@ -1018,3 +1018,5 @@ input.cmn-toggle-round-flat + label:before {
 	color: white !important;
 	text-shadow: none !important;
 }
+
+

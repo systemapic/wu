@@ -1939,7 +1939,6 @@ L.Popup.include({
 ;Wu.SidePane = Wu.Class.extend({
 	_ : 'sidepane', 
 
-
 	initialize : function (options) {
 		
 		this.options = options || app.options;
@@ -2072,7 +2071,7 @@ L.Popup.include({
 		if (pane.dataLibrary && settings.dataLibrary) 	panes.push('DataLibrary');
 		if (pane.mediaLibrary && settings.mediaLibrary) panes.push('MediaLibrary');
 		if (pane.users) 				panes.push('Users');
-		if (pane.share) 				panes.push('Share');
+		if (pane.share && settings.socialSharing) 	panes.push('Share');
 		if (pane.account) 				panes.push('Account');
 
 		return panes;
@@ -2087,7 +2086,6 @@ L.Popup.include({
 	},
 
 	refreshProject : function (project) {
-		console.log('prefreshh project', project);
 
 		var editMode = project.editMode; // access determined at Wu.Project
 		
@@ -2122,40 +2120,46 @@ L.Popup.include({
 		this.panes = [];
 
 		// all panes
-		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users', 'Share', 'Account'];
-				
+		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users', 'Share', 'Account'],
+		    sidepane = app.SidePane;
+
 		// panes to active
 		all.forEach(function (elem, i, arr) {
-			if (!Wu.app.SidePane[elem]) {
-				Wu.app.SidePane[elem] = new Wu.SidePane[elem];
+			if (!sidepane[elem]) {
+				sidepane[elem] = new Wu.SidePane[elem];
 			}
-			Wu.app.SidePane[elem].enable();
+			sidepane[elem].enable();
 			this.panes.push(elem);	// stored for calculating the menu slider
 		}, this);
 
 		// panes to deactivate
 		var off = all.diff(panes);
 		off.forEach(function (elem, i, arr) {
-			var dis = Wu.app.SidePane[elem];
-			if (dis)  Wu.app.SidePane[elem].disable();
+			var dis = sidepane[elem];
+			if (dis)  sidepane[elem].disable();
 			_.pull(this.panes, elem);
-		}, this)
+		}, this);
 
+		if (this.paneOpen) setTimeout(this._setMenuHeight.bind(this), 100); // another ugly hack! todo: refactor to avoid these type errs
+			
 	},
 
 	removePane : function (pane) {
 		var panes = Wu.extend([], this.panes);
 		_.pull(panes, pane);
 		this.refresh(panes);
+
 	},
+
 
 	addPane : function (pane) {
 		var panes = Wu.extend([], this.panes);
 		panes.push(pane);
 		panes = _.unique(panes);
+
 		this.refresh(panes);
 	},
-	
+
 	// close sidepane
 	closePane : function () {
 
@@ -3246,6 +3250,12 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// remove from DOM
 		Wu.DomUtil.remove(this._container);
 
+		// activate startpane
+		app.StartPane.activate();
+
+		// close statuspane
+		app.StatusPane.close()
+
 		// delete
 		this.project._delete();
 		delete this;
@@ -3489,8 +3499,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var error  = result.error;
 		var store  = result.project;
 
-		console.log('results: ', result);
-
 		// return error
 		if (error) return console.log('there was an error creating new project!', error);			
 
@@ -3709,9 +3717,16 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	open : function () {
+
 		this.calculateHeight();
 		this._container.style.height = this.maxHeight + 'px';          
 		this._isOpen = true;
+
+		// Set overflow visible to not cut off info on hover on [i]
+		var that = this;
+		setTimeout(function() {
+			that._container.style.overflow = 'visible';
+		}, 500)
 
 		// close others
 		var clients = app.SidePane.Clients;
@@ -3723,6 +3738,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.calculateHeight();
 		this._container.style.height = this.minHeight + 'px';    
 		this._isOpen = false;
+
+		// Remove overflow visible to not cut off info on hover on [i]
+		this._container.style.overflow = 'hidden';
+		
 	},
 
 	removeProject : function (project) {
@@ -3773,8 +3792,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._search.setAttribute("type", "text");
 		this._search.setAttribute("placeholder", "Search users");
 		Wu.DomUtil.addClass(this._search, 'search ct17');
-
-		console.log('initContent');
 
 		// create container (overwrite default) and insert template
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content, ich.usersPane());
@@ -3852,7 +3869,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	searchList : function (e) {
-		console.log('search!!!', this._search.value);
 
 		if (e.keyCode == 27) { // esc
 			this.list.search(); // show all
@@ -4526,8 +4542,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.save(key, value, userUuid);
 
 	},
-
-
 
 	// rename a div, ie. inject <input>
 	_rename : function (e) {
@@ -5997,9 +6011,6 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		// call addHooks on prototype
 		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
 
-
-		console.log('this.panes.controlZoom', this.panes.controlZoom);
-
 		// add events
 		Wu.DomEvent.on( this.panes.controlZoom,            'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlDraw,            'mousedown click', this.toggleControl, this);
@@ -6357,13 +6368,13 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 	options : {
 
 		// include settings
-		screenshot 	: true,
+		// screenshot 	: true,
 		socialSharing 	: true,
 		documentsPane 	: true,
 		dataLibrary 	: true,
 		mediaLibrary 	: false,
-		autoHelp 	: true,
-		autoAbout 	: true,
+		// autoHelp 	: true,
+		// autoAbout 	: true,
 		darkTheme 	: true,
 		tooltips 	: true,
 		mapboxGL	: false,
@@ -6422,7 +6433,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		}
 		if (this.options.socialSharing) {
 
-			var socialSharing = this._contentItem('socialSharing', 'Social Sharing');
+			var socialSharing = this._contentItem('socialSharing', 'Sharing');
 			wrapper.appendChild(socialSharing);
 
 			// add tooltip
@@ -6480,7 +6491,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 			wrapper.appendChild(darkTheme);
 
 			// add tooltip
-			app.Tooltip.add(darkTheme, 'Toggle between dark theme and light theme');
+			app.Tooltip.add(darkTheme, 'Toggle between dark- and light theme');
 
 		}
 		if (this.options.tooltips) {
@@ -6489,7 +6500,7 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 			wrapper.appendChild(tooltips);
 
 			// add tooltip
-			app.Tooltip.add(tooltips, 'Enable tooltips for map');
+			app.Tooltip.add(tooltips, 'Enable this tooltip for the portal');
 
 		}
 		if (this.options.mapboxGL) {
@@ -9793,41 +9804,61 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 
 	_addPopupContent : function (e) {
-		console.log('_addPopupContent', e);
-		var content = this._createPopupContent(e);
+
+		var content = this._createPopupContent(e),
+		    buffer = '<hr>';
+
+		// clear old popup
+		this._popup = null;
+
+		// return if no content
+		if (!content) return;
+		
+		if (!this._popupContent) {
+			// create empty
+			this._popupContent = '';
+		} else {
+			// append buffer
+			this._popupContent += buffer;
+		}
+
+		// append content
 		this._popupContent += content;
 
 	},
 
-	_clearPopupContent : function () {
+	_clearPopup : function () {
 		this._popupContent = '';
+		this._popup = null;
 	},
 
 	
 	openPopup : function (e) {
-		console.log('openPopup', e);
+		if (this._popup) return;
 
-		// this.openPopup(data, latlng);
 		var popup = this._createPopup(),
 		    content = this._popupContent,
 		    map = app._map,
 		    latlng = e.latlng;
 
-
+		// return if no content
+		if (!content) return this._clearPopup();
+		
 		// set popup close event
 		this._addPopupCloseEvent();
+
+		// keep popup while open
+		this._popup = popup;
 
 		// set content
 		popup.setContent(content);
 		popup.setLatLng(latlng);
-		popup.openOn(map);
-
-		console.log('popup:', popup);
-		console.log('content: ', content);
-		console.log('latlng', latlng);
+		
+		setTimeout(function () {
+			popup.openOn(map);		// todo: still some minor bugs,
+		}, 100); // hack			// this hack perhaps due to double opening
 
 		
-
 	},
 
 	_createPopup : function () {
@@ -9850,8 +9881,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		if (this._popInit) return;
 		this._popInit = true;	// only run once
 
-		// var map = app._map;
-		// map.on('popupclose',  this._clearPopupContent, this);
+		var map = app._map;
+		map.on('popupclose',  this._clearPopup, this);
 	},
 
 	_createPopupContent : function (e) {
@@ -9863,7 +9894,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		    string = '';
 
 		if (meta) {
-			if (meta.title) string += '<div class="tooltip-title">' + meta.title + '</div>';
+			if (meta.title) string += '<div class="tooltip-title-small">' + meta.title + '</div>';
 
 			// add meta to tooltip
 			for (var m in meta.fields) {
@@ -9893,9 +9924,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			return string;
 		}
 	},
-
-
-
 	
 });
 
@@ -10664,13 +10692,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	updateLogic : function () {
 
-		// // check validity
-		// var invalid = this.checkLogic();
-		// if (invalid.length) {
-		// 	return console.error('not valid layermenu!', invalid);
-			
-		// } 
-
 		// get vars
 		var array = this.project.store.layermenu;
 		this._logic = this._logic || {};
@@ -10679,7 +10700,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		array.forEach(function (item1, i) {
 			// return if not a folder
 			if (!this._isFolder(item1)) return;
-
 
 			var pos 	= item1.pos; 	// eg 0 for first level
 			var toClose 	= []; 		// all below this pos
@@ -10885,6 +10905,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// set inactive in sidepane layermenu
 		if (layermenuItem.layer) app.SidePane.Map.mapSettings.layermenu._off(layermenuItem.layer);
+
+		// remove layer from map
+		var layer = layermenuItem.layer;
+		if (layer) layer.remove();
 
 		// remove from store
 		delete this.layers[uuid];
@@ -11250,7 +11274,7 @@ L.control.layermenu = function (options) {
 	},
 
 	update : function (project) {
-		// on project refresh
+		// on project refresh + added control
 
 		// get vars
 		this.project  = project || app.activeProject;
@@ -11266,6 +11290,17 @@ L.control.layermenu = function (options) {
 		// get zindexControl
 		this._zx = app.getZIndexControls().l; // layermenu zindex control 
 	       
+	        // add active layers
+	        this._addAlreadyActiveLayers();
+
+	},
+
+	_addAlreadyActiveLayers : function () {
+		var active = app.MapPane.getActiveLayers();
+		active.forEach(function (layer) {
+			// add layermenu layers
+			if (!layer._isBase) this.addLayer(layer);
+		}, this);
 	},
 
 	disableScrollzoom : function () {
@@ -12899,10 +12934,6 @@ L.control.baselayerToggle = function (options) {
 		// delete object
 		delete Wu.app.Projects[project.uuid];
 
-		// activate startpane 
-		var startpane = app._initStartpane();
-		startpane.activate();
-
 		// refresh sidepane
 		app.SidePane.refresh(['Projects', 'Users', 'Account']);
 
@@ -13475,7 +13506,6 @@ L.control.baselayerToggle = function (options) {
 
 	// settings
 	toggleSetting : function (setting) {
-		console.log('project toggleSetting', setting);
 		this.getSettings()[setting] ? this['disable' + setting.camelize()]() : this['enable' + setting.camelize()]();
 		this.store.settings[setting] = !this.store.settings[setting];
 		this._update('settings');
@@ -13524,10 +13554,10 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	enableSocialSharing : function () {
-		app.SidePane.Share.enableSocial();
+		app.SidePane.addPane('Share');
 	},
 	disableSocialSharing : function () {
-		app.SidePane.Share.disableSocial();
+		app.SidePane.removePane('Share');
 	},
 
 	enableAutoHelp : function () {		// auto-add folder in Docs
@@ -14102,15 +14132,12 @@ L.control.baselayerToggle = function (options) {
 
 		// if (user.role.superadmin) return true;
 		// if (user.role.admin)      return true;
-		console.log('canUpdateClient????', this.store.role.editor);
 		if (this.store.role.editor.clients.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-		console.log('nope!');
 		return false;
 	},
 
 	canDeleteClient : function (clientUuid) {
 		var editor = (this.store.role.editor.clients.indexOf(clientUuid) >= 0) ? true : false;
-		console.log('canDeleteClient editor = ', editor);
 		if (this.store.role.superadmin && editor) return true;
 		if (this.store.role.admin && editor)      return true;
 		return false;	
@@ -14253,7 +14280,6 @@ L.control.baselayerToggle = function (options) {
 
 		// add gridLayer if available
 		if (this.gridLayer) map.addLayer(this.gridLayer);
-		console.log('gridLayer?', this.gridLayer);
 
 		// update zindex
 		this._addToZIndex(type);
@@ -14301,7 +14327,7 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	remove : function (map) {
-		var map = map || Wu.app._map;
+		var map = map || app._map;
 
 		// leaflet fn
 		map.removeLayer(this.layer);
@@ -14542,6 +14568,7 @@ Wu.RasterLayer = Wu.Layer.extend({
 });
 
 
+// systemapic layers
 Wu.CartoCSSLayer = Wu.Layer.extend({
 
 	initLayer : function () {
@@ -14565,34 +14592,31 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	_prepareRaster : function () {
 		
 		// set ids
-		var fileUuid = this.store.file;	// file id of geojson
-		var cartoid = this.store.data.cartoid || 'cartoid';
-
-		// tile server ip
-		var tileServer = app.options.servers.tiles,
-		    token = app.accessToken,
-		    url = tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
+		var fileUuid 	= this.store.file,	// file id of geojson
+		    cartoid 	= this.store.data.cartoid || 'cartoid',
+		    tileServer 	= app.options.servers.tiles,
+		    token 	= app.accessToken,
+		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			fileUuid: fileUuid,
 			cartoid : cartoid,
 			subdomains : 'abcd',
-			// zIndex : zIndex
+			maxRequests : 8
 		});
 	},
 
 	_prepareGrid : function () {
 
 		// set ids
-		var fileUuid = this.store.file;	// file id of geojson
-		var cartoid = this.store.data.cartoid || 'cartoid';
-
-		// add gridlayer
-		var gridServer = app.options.servers.utfgrid,
-		    token = app.accessToken,
-		    url = gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
+		var fileUuid 	= this.store.file,	// file id of geojson
+		    cartoid 	= this.store.data.cartoid || 'cartoid',
+		    gridServer 	= app.options.servers.utfgrid,
+		    token 	= app.accessToken,
+		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
 		
+		// create gridlayer
 		this.gridLayer = new L.UtfGrid(url, {
 			useJsonP: false,
 			subdomains: 'ghi',
@@ -14604,11 +14628,13 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	},
 
 	updateStyle : function () {
-		var map = app._map;	// refactor
+		var map = app._map;	
 		
+		// update
 		this.update();
 
-		this.addTo(map);
+		// add to map
+		this.addTo(map); // refactor
 	},
 
 	_addGridEvents : function () {
@@ -14619,7 +14645,9 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		grid.on('mousedown', function(e) {
 			if (!e.data) return;
 
+			// pass layer
 			e.layer = this;
+
 			// add to pending
 			app.MapPane._addPopupContent(e);
 
@@ -14628,132 +14656,21 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		grid.on('mouseup', function (e) {
 			if (!e.data) return;
 
+			// pass layer
 			e.layer = this;
+
 			// open popup
 			app.MapPane.openPopup(e);
 		
 		}, this);
 
+		grid.on('click', function (e) {
+
+			// clear old
+			app.MapPane._clearPopup();
+		
+		}, this);
 	},
-
-	// _openPopup : function (data, latlng) {
-
-	// 	// this.openPopup(data, latlng);
-
-
-	// 	var popup = this._createPopup();
-
-	// 	var content = this._popupContent(data);
-
-
-	// },
-
-	// _createPopup : function () {
-
-	// 	// create popup
-	// 	var popup = L.popup({
-	// 		offset : [18, 0],
-	// 		closeButton : true,
-	// 		zoomAnimation : false,
-	// 		maxWidth : 400,
-	// 		minWidth : 200,
-	// 		maxHeight : 350,
-	// 		// closeOnClick : false
-	// 	});
-
-	// 	return popup;
-	// },
-
-	// _addToPopup : function (data) {
-
-	// 	var popup = app._popup;
-	// 	console.log('_addToPopup!', popup);
-		
-	// 	var existing = popup.getContent();
-	// 	var content = this._popupContent(data);
-
-	// 	existing += content;
-
-	// 	popup.setContent(existing);
-	// },
-
-	// openPopup : function (data, latlng) {
-	// 	console.log('openPopup', data);
-
-
-	// 	var map = app._map,
-	// 	    content = this._popupContent(data);
-
-		
-		
-	// 	// set content
-	// 	popup.setContent(content);
-	// 	popup.setLatLng(latlng);
-	// 	popup.openOn(map);
-		
-	// 	// set popup close event
-	// 	this._addPopupCloseEvent();
-
-	// 	app._popOpen = true;
-	// 	console.log('open? ', app._popOpen);
-	// },
-
-	// _addPopupCloseEvent : function () {
-	// 	if (app._popEvent) return;
-	// 	app._popEvent = true;
-
-	// 	var map = app._map;
-	// 	map.off('popupclose', this._popupClosed, this);
-	// 	map.on('popupclose',  this._popupClosed, this);
-
-
-	// },
-
-	// _popupClosed : function (popup) {
-	// 	// fired when popup closes
-	// 	console.log('pop close', popup);
-
-	// 	app._popOpen = false;
-	// 	app._popup = null;
-	// },
-
-	// _popupContent : function (data) {
-
-	// 	// check for stored tooltip
-	// 	var meta = this.getTooltip();
-	// 	var string = '';
-
-	// 	if (meta) {
-	// 		if (meta.title) string += '<div class="tooltip-title">' + meta.title + '</div>';
-
-	// 		// add meta to tooltip
-	// 		for (var m in meta.fields) {
-	// 			var field = meta.fields[m];
-
-	// 			// only add active tooltips
-	// 			if (field.on) {
-	// 				var caption = field.title || field.key;
-	// 				var value = data[field.key];
-
-	// 				// add to string
-	// 				string += caption + ': ' + value + '<br>';
-	// 			}
-	// 		}
-	// 		return string;
-
-	// 	} else {
-
-	// 		// create content
-	// 		var string = '';
-	// 		for (var key in data) {
-	// 			var value = data[key];
-	// 			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
-	// 				string += key + ': ' + value + '<br>';
-	// 			}
-	// 		}
-	// 		return string;
-	// 	}
-	// },
 });
 
 
@@ -14775,11 +14692,7 @@ Wu.MapboxLayer = Wu.Layer.extend({
 
 		// mark as loaded
 		this.loaded = true;
-		
 	},
-
-
-
 });
 
 
@@ -14794,7 +14707,7 @@ Wu.createLayer = function (layer) {
 	// mapbox
 	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
 
-	// geojson
+	// systemapic vector tiles todo: store not as geojson, but as vector tiles in project db model?
 	if (layer.data.geojson) return new Wu.CartoCSSLayer(layer);
 	
 	// geojson
@@ -14866,34 +14779,19 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	addLayerHooks : function () {
 
-		// console.log('this: ', this);
-
 		this.layer.eachLayer(function (layr) {
-
 			
 			var type = layr.feature.geometry.type;
-			// console.log('type: ', type);
 
 			if (type == 'Polygon') {
 
-
-				// console.log('Polygon layer: ', layr);
 				Wu.DomEvent.on(layr, 'styleeditor:changed', this.styleChanged, this);
-				// layr.eachLayer(function (multi) {
-
-				// 	console.log('polypart');
-
-				// }, this);
 
 			} 
 
 			if (type == 'MultiPolygon') {
 
-				// console.log('MultiPolygon layer: ', layr);
-
 				layr.eachLayer(function (multi) {
-					// console.log('multipart');
-					// console.log('multi: ', multi); // this layer has no 'feature' and no _layers, but needs a listener for change
 
 					Wu.DomEvent.on(multi, 'styleeditor:changed', function (data) {
 						this.multiStyleChanged(data, multi, layr);
@@ -19058,9 +18956,6 @@ Wu.App = Wu.Class.extend({
 
 	initialize : function (options) {
 
-		// prototypes for compatiblity
-		// this._compatabilityChecks();
-
 		// set global this
 		Wu.app = this;
 
@@ -19076,20 +18971,9 @@ Wu.App = Wu.Class.extend({
 
 	},
 
-	// _compatabilityChecks : function () {
-
-	// 	// bind fn for phantomJS
-	// 	Function.prototype.bind = Function.prototype.bind || function (thisp) {
-	// 		var fn = this;
-	// 		return function () {
-	// 			return fn.apply(thisp, arguments);
-	// 		};
-	// 	};
-	// },
-
 	initServer : function () {
 		var serverUrl = this.options.servers.portal;
-		console.log('Secure connection to server: ', serverUrl);
+		console.log('Securely connected to server: \n', serverUrl);
 
 		var data = JSON.stringify(this.options);
 		
@@ -19135,9 +19019,7 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_initEvents : function () {
-
 		Wu.DomEvent.on(window, 'resize', this._resizeEvents, this);
-
 	},
 
 	_resizeEvents : function (e) {
@@ -19257,6 +19139,11 @@ Wu.App = Wu.Class.extend({
 			addTo : this._appPane
 		});
 
+		// render startpane
+		this.StartPane = new Wu.StartPane({
+			projects : this.Projects
+		});
+
 		// render dropzone pane
 		this.Dropzone = new Wu.Dropzone();
 
@@ -19272,14 +19159,10 @@ Wu.App = Wu.Class.extend({
 		// render eror pane
 		this.ErrorPane = new Wu.ErrorPane();
 
-		
-
-		
 	},
 
 	// init default view on page-load
 	_initView : function () {
-
 
 		// check location
 		if (this._initLocation()) return;
@@ -19297,21 +19180,21 @@ Wu.App = Wu.Class.extend({
 			this.SidePane.refresh(['Clients', 'Users', 'Account']);		
 		}
 
-		// render startpane
-		this._initStartpane();
+		// activate startpane
+		this.StartPane.activate();
 
 	},
 
-	_initStartpane : function () {
-		if (this.StartPane) return this.StartPane;
+	// _initStartpane : function () {
+	// 	if (this.StartPane) return this.StartPane;
 
-		// render Start pane?
-		this.StartPane = new Wu.StartPane({
-			projects : this.Projects
-		});
+	// 	// render Start pane?
+	// 	this.StartPane = new Wu.StartPane({
+	// 		projects : this.Projects
+	// 	});
 
-		return this.StartPane;
-	},
+	// 	return this.StartPane;
+	// },
 
 	_lonelyProject : function () {
 		// check if only one project, 
@@ -19568,15 +19451,15 @@ Wu.App = Wu.Class.extend({
 
 	_loading : [],
 
-	// phantomjs: load layermenu layers
-	_loadLayers : function (layermenuItems) {
+	// // phantomjs: load layermenu layers
+	// _loadLayers : function (layermenuItems) {
 
-	},
+	// },
 
-	// phantomjs: check if all layers are loaded
-	_allLoaded : function () {
+	// // phantomjs: check if all layers are loaded
+	// _allLoaded : function () {
 
-	},
+	// },
 
 	getZIndexControls : function () {
 		var z = {

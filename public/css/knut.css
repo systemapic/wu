@@ -91,6 +91,167 @@ body {
 }
 
 
+/*startpane spinning map (after login)*/
+
+
+/* Spinning class get added to map to start rotating it */
+
+/* Spinning Clockwise */
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	25% { transform: rotate(90deg); }
+	50% { transform: rotate(180deg); }
+	75% { transform: rotate(270deg); }
+	100% { transform: rotate(360deg); }
+	}
+@-webkit-keyframes spin {
+	0% { transform: rotate(0deg); }
+	25% { transform: rotate(90deg); }
+	50% { transform: rotate(180deg); }
+	75% { transform: rotate(270deg); }
+	100% { transform: rotate(360deg); }	
+	}
+
+.spinning {
+	-webkit-animation: spin 500s;
+	animation: spin 500s;
+    	-webkit-animation-timing-function: linear;
+    	animation-timing-function: linear;    	
+    	-webkit-animation-iteration-count:infinite;
+    	animation-iteration-count:infinite;
+	}
+
+
+/* Spinning Clockwise, starting at 90 */
+@keyframes spin90 {
+	0% { transform: rotate(90deg); }
+	25% { transform: rotate(180deg); }
+	50% { transform: rotate(270deg); }
+	75% { transform: rotate(360deg); }
+	100% { transform: rotate(0deg); }
+	}
+@-webkit-keyframes spin90 {
+	0% { transform: rotate(90deg); }
+	25% { transform: rotate(180deg); }
+	50% { transform: rotate(270deg); }
+	75% { transform: rotate(360deg); }
+	100% { transform: rotate(0deg); }
+	}
+
+.spinning90 {
+	-webkit-animation: spin90 500s;
+	animation: spin90 500s;
+    	-webkit-animation-timing-function: linear;
+    	animation-timing-function: linear;    	
+    	-webkit-animation-iteration-count:infinite;
+    	animation-iteration-count:infinite;
+	}
+
+
+/* Spinning Clockwise, starting at 270 */
+@keyframes spin270 {
+	0% { transform: rotate(270deg); }
+	25% { transform: rotate(360deg); }
+	50% { transform: rotate(90deg); }
+	75% { transform: rotate(180deg); }
+	100% { transform: rotate(270deg); }
+	}
+@-webkit-keyframes spin270 {
+	0% { transform: rotate(270deg); }
+	25% { transform: rotate(360deg); }
+	50% { transform: rotate(90deg); }
+	75% { transform: rotate(180deg); }
+	100% { transform: rotate(270deg); }
+	}
+
+.spinning270 {
+	-webkit-animation: spin270 500s;
+	animation: spin270 500s;
+    	-webkit-animation-timing-function: linear;
+    	animation-timing-function: linear;    	
+    	-webkit-animation-iteration-count:infinite;
+    	animation-iteration-count:infinite;
+	}
+
+/* Spinning counter clockwise */
+@keyframes spinrev {
+	0% { transform: rotate(0deg); }
+	25% { transform: rotate(-90deg); }
+	50% { transform: rotate(-180deg); }
+	75% { transform: rotate(-270deg); }
+	100% { transform: rotate(-360deg); }
+	}
+@-webkit-keyframes spinrev {
+	0% { transform: rotate(0deg); }
+	25% { transform: rotate(-90deg); }
+	50% { transform: rotate(-180deg); }
+	75% { transform: rotate(-270deg); }
+	100% { transform: rotate(-360deg); }
+	}
+
+.spinning-reversed {
+	-webkit-animation: spinrev 500s;
+	animation: spinrev 500s;
+    	-webkit-animation-timing-function: linear;
+    	animation-timing-function: linear;    	
+    	-webkit-animation-iteration-count:infinite;
+    	animation-iteration-count:infinite;
+	}	
+
+/* Spinning counter clockwise, starting at 90 */
+@keyframes spinrev90 {
+	0% { transform: rotate(-90deg); }
+	25% { transform: rotate(-180deg); }
+	50% { transform: rotate(-270deg); }
+	75% { transform: rotate(-360deg); }
+	100% { transform: rotate(-0deg); }
+	}
+@-webkit-keyframes spinrev90 {
+	0% { transform: rotate(-90deg); }
+	25% { transform: rotate(-180deg); }
+	50% { transform: rotate(-270deg); }
+	75% { transform: rotate(-360deg); }
+	100% { transform: rotate(-0deg); }
+	}
+
+.spinning-reversed90 {
+	-webkit-animation: spinrev90 500s;
+	animation: spinrev90 500s;
+    	-webkit-animation-timing-function: linear;
+    	animation-timing-function: linear;    	
+    	-webkit-animation-iteration-count:infinite;
+    	animation-iteration-count:infinite;
+	}
+
+/* Spinning Clockwise, starting at 270 */
+@keyframes spinrev270 {
+	0% { transform: rotate(-270deg); }
+	25% { transform: rotate(-360deg); }
+	50% { transform: rotate(-90deg); }
+	75% { transform: rotate(-180deg); }
+	100% { transform: rotate(-270deg); }
+	}
+@-webkit-keyframes spinrev270 {
+	0% { transform: rotate(-270deg); }
+	25% { transform: rotate(-360deg); }
+	50% { transform: rotate(-90deg); }
+	75% { transform: rotate(-180deg); }
+	100% { transform: rotate(-270deg); }
+	}
+
+.spinning-reversed270 {
+	-webkit-animation: spinrev270 500s;
+	animation: spinrev270 500s;
+    	-webkit-animation-timing-function: linear;
+    	animation-timing-function: linear;    	
+    	-webkit-animation-iteration-count:infinite;
+    	animation-iteration-count:infinite;
+	}
+
+
+
+
+
 
 
 

@@ -305,10 +305,6 @@ Wu.Project = Wu.Class.extend({
 		// delete object
 		delete Wu.app.Projects[project.uuid];
 
-		// activate startpane 
-		var startpane = app._initStartpane();
-		startpane.activate();
-
 		// refresh sidepane
 		app.SidePane.refresh(['Projects', 'Users', 'Account']);
 

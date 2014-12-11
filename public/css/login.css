@@ -215,7 +215,7 @@
 	}
 
 /* Start pane circle */
-.start-pane-circle-container {
+.startpane-circle-container {
 	position: absolute;
 	width: 0;
 	height: 0;
@@ -223,7 +223,7 @@
 	left: 12.5%;
 	}
 
-.start-pane-circle {
+.startpane-circle {
 	position: relative;
 	width: 120px;
 	height: 120px;
@@ -241,11 +241,11 @@
 	transition: opacity 200ms ease;
 	}
 
-.start-pane-circle:hover {
+.startpane-circle:hover {
 	opacity: 1;
 }	
 
-.start-pane-circle:active {
+.startpane-circle:active {
 	box-shadow: none;
 }
 

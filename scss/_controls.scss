@@ -1661,6 +1661,11 @@
 	word-break: break-all;
 	}
 
+.inspect-text:active {
+	cursor: -webkit-grab !important;
+	cursor:    -moz-grab !important;
+	}
+	
 /* Eye */
 .inspect-eye {
 	position: absolute;
