@@ -1266,15 +1266,11 @@ input.cmn-toggle-round-flat + label:before {
 /* Temporarily removed */
 .leaflet-control-attribution {
   position: fixed;
-  /*left: 302px;*/
-  /*bottom: 5px;*/
-  /*right: auto;	*/
-  /*display: none;*/
-  /*left: 7px;*/
   font-style: italic;
   right: -2px;
   top: 63px;
-  background: transparent !important; }
+  background: transparent !important;
+  z-index: 9999999; }
 
 .leaflet-control-attribution a {
   font-weight: 900; }
@@ -6100,12 +6096,11 @@ input[type=checkbox] + label.check {
     top: -255px; }
   .startpane-recent-projects-container {
     position: absolute;
-    top: 310px; }
+    top: 245px; }
   .startpane-banner-container {
-    height: 450px;
-    top: -225px;
+    height: 500px;
+    top: -250px;
     left: 0;
-    background-color: green;
     width: 445px;
     margin: auto;
     padding: 0; }

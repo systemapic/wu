@@ -8,19 +8,21 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		Wu.SidePane.Item.prototype.initialize.call(this)
 
 		// active by default
-		// Wu.app._active = this._content; // remove already
 		this.activate();      
 	},
 
 	initContent : function () {
 
+		this.clients = [];
+
 		// clients container
 		this._clientsContainer = Wu.DomUtil.create('div', 'editor-clients', this._container);
 
 		// insert clients
-		this.options.json.clients.forEach(function(client, i, arr) {    
-			var clientDiv = new Wu.SidePane.Client(client);
-			clientDiv.addTo(this._clientsContainer);
+		this.options.json.clients.forEach(function(c, i, arr) {    
+			var client = new Wu.SidePane.Client(c);
+			client.addTo(this._clientsContainer);
+			this.clients.push(client);
 		}, this);
 
       		// insert create client button
@@ -55,12 +57,13 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	_deactivate : function () {
-
+		console.log('deeeactivate');
 	},
 
-	_create : function (client) {
-		var clientDiv = new Wu.SidePane.Client(client);
-		clientDiv.addTo(this._clientsContainer);
+	_create : function (c) {
+		var client = new Wu.SidePane.Client(c);
+		client.addTo(this._clientsContainer);
+		this.clients.push(client);
 	},
 	
 	openClient : function (client) {

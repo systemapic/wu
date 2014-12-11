@@ -380,20 +380,25 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// remove hooks
 		this.removeHooks();
 	
-		// unload project // todo: doesn't work!
-		if (this.project.selected) this.project.unload();
-	
 		// remove from client 
 		this._parent.removeProject(this.project);
 		
 		// remove from DOM
 		Wu.DomUtil.remove(this._container);
 
-		// activate startpane
-		app.StartPane.activate();
+		// if project is active, unload
+		if (this.project == app.activeProject) {
 
-		// close statuspane
-		app.StatusPane.close()
+			// unload
+			this.project.unload();
+		
+			// activate startpane
+			app.StartPane.activate();
+
+			// close statuspane
+			app.StatusPane.close()
+
+		}
 
 		// delete
 		this.project._delete();

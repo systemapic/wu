@@ -347,6 +347,7 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_setProject : function (project) {
+		
 		// select project
 		project.select();
 
