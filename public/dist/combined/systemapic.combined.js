@@ -2660,9 +2660,9 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	_deactivate : function () {
-		console.log('deeeactivate');
 		this.clients.forEach(function (client) {
-
+			console.log('client');
+			client.close();
 		}, this);
 	},
 
