@@ -451,8 +451,25 @@ Wu.App = Wu.Class.extend({
 								// todo: layermenu items are not selected in layermenu itself, altho on map
 			// add layer
 			var layer = project.getLayer(layerUuid);
-			layer.add('baselayer'); 
 
+			// if in layermenu
+			var bases = project.getBaselayers();
+			var base = _.find(bases, function (b) {
+				return b.uuid == layerUuid;
+			});
+
+			if (base) {
+				// add as baselayer
+				layer.add('baselayer'); 
+			} else {
+				// ass as layermenu
+				var lm = app.MapPane.layerMenu;
+				if (lm) {
+					var lmi = lm._getLayermenuItem(layerUuid);
+					lm.enableLayer(lmi);
+				}
+			}
+			
 		}, this);
 
 	},
