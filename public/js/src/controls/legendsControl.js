@@ -4,6 +4,8 @@ L.Control.Legends = L.Control.extend({
 		position : 'bottomleft' 
 	},
 
+	_isOpen : false,
+
 	// automatically run when legends is added to map 
 	onAdd : function (map) {
 
@@ -134,6 +136,8 @@ L.Control.Legends = L.Control.extend({
 
 		}, 500);
 
+		this._setClosed();
+
 	},
 
 	// // open if any legends only (for phantomJS)
@@ -169,7 +173,9 @@ L.Control.Legends = L.Control.extend({
 			that._legendsCollapser.style.opacity = '1';
 			that._legendsCollapser.style.display = 'block';
 
-		}, 500);                
+		}, 500);      
+
+		this._setOpen();    
 
 	},
 
@@ -263,8 +269,6 @@ L.Control.Legends = L.Control.extend({
 
 	refreshLegends : function (layers) {
 
-		console.log('refreshLegends');
-
 
 		this.legendsCounter = [];
 		this.sliderWidth = 0;
@@ -287,8 +291,10 @@ L.Control.Legends = L.Control.extend({
 		}, this);
 
 		// Hide legends if it's empty
-		if (this.legendsCounter.length == 0) this._legendsContainer.style.display = 'none';
-
+		if (this.legendsCounter.length == 0) {
+			this._legendsContainer.style.display = 'none';
+			this._setClosed();
+		} 
 	},
 
 	_legendOn : function (layer) {
@@ -378,11 +384,39 @@ L.Control.Legends = L.Control.extend({
 
 		}, this);
 
+
+		// mark open
+		this._setOpen();
+
 		// see if we need the horizontal scrollers or not
 		this.checkWidth();
 		this.calculateHeight();
 
+		
 
+
+	},
+
+	_setOpen : function () {
+		this._isOpen = true;
+
+		// calc
+		this._setContentHeight();
+	},
+
+	_setClosed : function () {
+		this._isOpen = false;
+
+		// calc
+		this._setContentHeight();
+	},
+
+	_setContentHeight : function () {
+		var clientsPane = app.SidePane.Clients;
+		var optionsPane = app.SidePane.Map;
+
+		if (clientsPane) clientsPane.setContentHeight();
+		if (optionsPane) optionsPane.setContentHeight();
 	},
 
 	_getLegendHeader : function (layer) {

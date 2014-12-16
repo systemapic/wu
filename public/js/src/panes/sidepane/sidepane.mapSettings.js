@@ -50,7 +50,7 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 	},
 
 	calculateHeight : function () {
-
+		console.log('mapsettings item calculateHeight');
 		this.maxHeight = this._inner.offsetHeight + 15;
 		this.minHeight = 0;
 	},
@@ -536,15 +536,16 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 	},
 
 	calculateHeight : function () {
-				
+
 		// Runs only for base layer menu?
-		var min = _.size(this.project.getLayermenuLayers());
-		var padding = this.numberOfProviders * 35;
+		var min = _.size(this.project.getLayermenuLayers()),
+		    padding = this.numberOfProviders * 35;
 		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
 		this.minHeight = 0;
 
 		// add 100 if in editMode
 		if (this.editMode) this.maxHeight += 100;
+
 	},
 
 	markOccupied : function () {

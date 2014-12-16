@@ -72,9 +72,6 @@ Wu.SidePane.Item = Wu.Class.extend({
 			// Remove blur on map... (j)
 			Wu.DomUtil.removeClass(__map, "map-blur")
 
-			// Remove menuslider arrow (j)
-			// _menusliderArrow.style.width = '0px';
-		
 		// if closed
 		} else {
 			
@@ -84,20 +81,18 @@ Wu.SidePane.Item = Wu.Class.extend({
 			// open pane
 			Wu.app.SidePane.openPane();
 
-			// Add menuslider arrow (j)
-			// _menusliderArrow.style.width = '9px';
-
-
 			// Blurs the map on full page panes... (j)
 			var clist = Wu.app._active.classList;
-			if ( _.contains(clist, 'fullpage-documents') || _.contains(clist, 'data-library') || _.contains(clist, 'fullpage-users') ) {
-				Wu.DomUtil.addClass(__map, "map-blur");
-			}
+			if (_.contains(clist, 'fullpage-documents') 	|| 
+			    _.contains(clist, 'data-library') 		|| 
+			    _.contains(clist, 'fullpage-users') 	){
 
+					Wu.DomUtil.addClass(__map, "map-blur");
+
+			}
 
 		}
 	},
-
 
 
 	_clickActivate : function (e) {
@@ -139,6 +134,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 		// update pane
 		this.update();   //todo: refactor: now it's _update, _updateContent, refresh all over tha place
+
 	},
 
 	_activate : function () {
@@ -195,7 +191,6 @@ Wu.SidePane.Item = Wu.Class.extend({
 		if (_.contains(classy, 'clients')) {
 			menuslider.style.top = '0px';
 			Wu.app.SidePane._container.style.width = w;
-
 			Wu.DomUtil.removeClass(__map, "map-blur")
 		}
 
@@ -203,10 +198,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 			var n = app.SidePane.panes.indexOf('Map');		// calculate position
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = w;
-
 			Wu.DomUtil.removeClass(__map, "map-blur")
-
-
 		}
 	    
 		if (_.contains(classy, 'documents')) {
@@ -214,18 +206,14 @@ Wu.SidePane.Item = Wu.Class.extend({
 			console.log('n: ', n, app.SidePane.panes);
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
-
 			Wu.DomUtil.addClass(__map, "map-blur")
-
 		}
 	    
 		if (_.contains(classy, 'dataLibrary')) {
 			var n = app.SidePane.panes.indexOf('DataLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
-
 			Wu.DomUtil.addClass(__map, "map-blur")
-
 		}
 	    
 
@@ -233,9 +221,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 			var n = app.SidePane.panes.indexOf('MediaLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
-
 			Wu.DomUtil.addClass(__map, "map-blur")
-
 		}
 
 
@@ -243,9 +229,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 			var n = app.SidePane.panes.indexOf('Users');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
-
 			Wu.DomUtil.addClass(__map, "map-blur")
-
 		}
 				
 
@@ -253,9 +237,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 			var n = app.SidePane.panes.indexOf('Share');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
-
 			Wu.DomUtil.removeClass(__map, "map-blur")
-
 		}
 				
 		
@@ -326,15 +308,17 @@ Wu.SidePane.Item = Wu.Class.extend({
 		this._scrollWrapper.style.maxHeight = parseInt(this.maxHeight - 20) + 'px';
 	},
 
+	// active for Projects tab (ie. Clients)
 	calculateHeight : function () {
-		var screenHeight = window.innerHeight,
+		var screenHeight   = window.innerHeight,
 		    legendsControl = app.MapPane.legendsControl,
-		    height = -107;
+		    legendsHeight  = parseInt(legendsControl._legendsHeight),
+		    height         = -107 + screenHeight;
 
-		if (legendsControl) {
-			height += parseInt(screenHeight) - parseInt(legendsControl._legendsHeight);
+		if (legendsControl._isOpen) {
+			height -= legendsHeight;
 		} else {
-			height += parseInt(screenHeight) - 6;
+			height -= 6;
 		}
 
 		this.maxHeight = height;
