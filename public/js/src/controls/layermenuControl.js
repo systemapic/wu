@@ -74,6 +74,14 @@ L.Control.Layermenu = L.Control.extend({
 
 	},
 
+	show : function () {
+		Wu.DomUtil.removeClass(this._container, 'displayNone');
+	},
+
+	hide : function () {
+		Wu.DomUtil.addClass(this._container, 'displayNone');
+	},
+
 	// Runs on window resize. Gets called up in app.js
 	resizeEvent : function (dimensions) {
 		

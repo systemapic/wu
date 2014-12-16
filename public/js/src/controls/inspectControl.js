@@ -38,6 +38,14 @@ L.Control.Inspect = L.Control.extend({
 		return this;
 	},
 
+	show : function () {
+		Wu.DomUtil.removeClass(this._container, 'displayNone');
+	},
+
+	hide : function () {
+		Wu.DomUtil.addClass(this._container, 'displayNone');
+	},
+
 	update : function (project) {
 		// on project refresh + added control
 
