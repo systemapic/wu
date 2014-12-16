@@ -1,4 +1,7 @@
+nq = []; // num of reqs
+
 L.Util.ajax = function (url, cb) {
+	// console.log('ajax: ', url);
 	// the following is from JavaScript: The Definitive Guide
 	// and https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest/Using_XMLHttpRequest_in_IE6
 	if (window.XMLHttpRequest === undefined) {
@@ -20,12 +23,14 @@ L.Util.ajax = function (url, cb) {
 			if (window.JSON) {
 				response = JSON.parse(request.responseText);
 			} else {
-				response = eval("(" + request.responseText + ")");
+				// response = eval("(" + request.responseText + ")");
 			}
+
 			cb(response);
 		}
 	};
 	request.send();
+	nq.push(request);
 	return request;
 };
 
@@ -43,8 +48,8 @@ L.UtfGrid = L.Class.extend({
 		useJsonP: true,
 		pointerCursor: true,
 
-		maxRequests: 4,
-		requestTimeout: 60000
+		maxRequests: 4,	
+		requestTimeout: 60000 
 	},
 
 	//The thing the mouse is currently on
@@ -61,14 +66,17 @@ L.UtfGrid = L.Class.extend({
 		this._url = url;
 		this._cache = {};
 
-		//Find a unique id in window we can use for our callbacks
-		//Required for jsonP
-		var i = 0;
-		while (window['lu' + i]) {
-			i++;
+
+		// Find a unique id in window we can use for our callbacks
+		// Required for jsonP
+		if (this.options.useJsonP) {
+			var i = 0;
+			while (window['lu' + i]) {
+				i++;
+			}
+			this._windowKey = 'lu' + i;
+			window[this._windowKey] = {};
 		}
-		this._windowKey = 'lu' + i;
-		window[this._windowKey] = {};
 
 		var subdomains = this.options.subdomains;
 		if (typeof this.options.subdomains === 'string') {
@@ -169,9 +177,7 @@ L.UtfGrid = L.Class.extend({
 		y = (y + max) % max;
 
 		var data = this._cache[map.getZoom() + '_' + x + '_' + y];
-		// console.log('data:', data);
 		if (!data || !data.grid) {
-			// console.log('NO DATA!!');
 			return { latlng: e.latlng, data: null };
 		}
 
@@ -270,7 +276,24 @@ L.UtfGrid = L.Class.extend({
 		});
 	},
 
+	// // trashy
+	// _getTrashy : function () {
+
+	// 	var trash;
+	// 	window.trashy.forEach(function (lu, i) {
+	// 		if (lu) {
+	// 			if (this == lu) trash = i + ' ' + lu._uuid;
+	// 		} 
+	// 	}, this);
+	
+	// 	trash += ''
+	// 	return trash;
+	// },
+
+
+
 	_loadTile: function (zoom, x, y) {
+
 		var url = L.Util.template(this._url, L.Util.extend({
 			s: L.TileLayer.prototype._getSubdomain.call(this, { x: x, y: y }),
 			z: zoom,
@@ -280,11 +303,16 @@ L.UtfGrid = L.Class.extend({
 
 		var key = zoom + '_' + x + '_' + y;
 		var self = this;
-		this._queue_request(key, function(){
+
+
+		this._queue_request(key, function () {
+
+			
 			return L.Util.ajax(url, function (data) {
 				self._cache[key] = data;
 				self._finish_request(key);
 			});
+
 		});
 	},
 
@@ -296,19 +324,23 @@ L.UtfGrid = L.Class.extend({
 		};
 		this._request_queue.push(key);
 		this._process_queued_requests();
+
 	},
 
 	_finish_request: function(key){
+		
 		// Remove from requests in process
 		var pos = this._requests_in_process.indexOf(key);
 		if (pos >= 0) {
 			this._requests_in_process.splice(pos, 1);
 		}
+		
 		// Remove from request queue
 		pos = this._request_queue.indexOf(key);
 		if (pos >= 0){
 			this._request_queue.splice(pos, 1);
 		}
+
 		// Remove the request entry
 		if (this._requests[key]) {
 			if (this._requests[key].timeout) {
@@ -316,11 +348,13 @@ L.UtfGrid = L.Class.extend({
 			}
 			delete this._requests[key];
 		}
+		
 		// Recurse
 		this._process_queued_requests();
 	},
 
 	_abort_request: function(key){
+
 		// Abort the request if possible
 		if (this._requests[key] && this._requests[key].handler){
 			if (typeof this._requests[key].handler.abort === 'function'){
@@ -336,15 +370,19 @@ L.UtfGrid = L.Class.extend({
 	},
 
 	_process_queued_requests: function() {
-		while (this._request_queue.length > 0 && (this.options.maxRequests === 0 ||
-		       this._requests_in_process.length < this.options.maxRequests)){
+		while (this._request_queue.length       > 0 						&& 
+		      (this.options.maxRequests         === 0 						||
+		       this._requests_in_process.length < this.options.maxRequests)) {
+			
 			this._process_request(this._request_queue.pop());
 		}
 	},
 
 	_process_request: function(key){
 		var self = this;
-		if (this._requests[key]){
+
+
+		if (this._requests[key]) {
 			this._requests[key].timeout = window.setTimeout(function(){
 				self._abort_request(key);
 			}, this.options.requestTimeout);

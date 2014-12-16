@@ -109,7 +109,6 @@ Wu.SidePane = Wu.Class.extend({
 
 		// open
 		this.openPane();
-
 	},
 
 	_setMenuHeight : function () {
@@ -124,18 +123,22 @@ Wu.SidePane = Wu.Class.extend({
 		var project = project || app.activeProject;
 		if (!project) return;
 
-		var panes = [];
-		var pane = this.options.panes;
-		var settings = project.getSettings();
+		var panes = [],
+		    pane = this.options.panes,
+		    settings = project.getSettings(),
+		    isEditor = app.Account.canUpdateProject(project.getUuid()),
+		    isManager = app.Account.canManageProject(project.getUuid());
 
-		if (pane.clients) 				panes.push('Clients');
-		if (pane.mapOptions) 				panes.push('Map');
-		if (pane.documents   && settings.documentsPane) panes.push('Documents');
-		if (pane.dataLibrary && settings.dataLibrary) 	panes.push('DataLibrary');
-		if (pane.mediaLibrary && settings.mediaLibrary) panes.push('MediaLibrary');
-		if (pane.users) 				panes.push('Users');
-		if (pane.share && settings.socialSharing) 	panes.push('Share');
-		if (pane.account) 				panes.push('Account');
+
+
+		if (pane.clients) 					panes.push('Clients');
+		if (pane.mapOptions 	&& isEditor) 			panes.push('Map');
+		if (pane.documents   	&& settings.documentsPane) 	panes.push('Documents');
+		if (pane.dataLibrary 	&& settings.dataLibrary) 	panes.push('DataLibrary');
+		if (pane.MediaLibrary 	&& settings.mediaLibrary) 	panes.push('MediaLibrary');
+		if (pane.users 		&& isManager) 			panes.push('Users');
+		if (pane.share 		&& settings.socialSharing) 	panes.push('Share');
+		if (pane.account) 					panes.push('Account');
 
 
 		return panes;
@@ -182,7 +185,6 @@ Wu.SidePane = Wu.Class.extend({
 	refresh : function (panes) {
 
 		var panes = panes || this.panes;
-
 		this.panes = [];
 
 		// all panes
@@ -211,7 +213,8 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	_refresh : function () {
-		var panes = Wu.extend([], this.panes);
+		// var panes = Wu.extend([], this.panes);
+		var panes = this._getPaneArray();
 		this.refresh(panes);
 	},
 	

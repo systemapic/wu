@@ -108,6 +108,9 @@ Wu.MapPane = Wu.Class.extend({
 		
 		this.project = project;
 
+		// get editor privs
+		this._isEditor = app.Account.canUpdateProject(app.activeProject.getUuid());
+
 		// set base layers
 		this.setBaseLayers();
 
@@ -600,9 +603,11 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 	enableCartocss : function () {
-
 		if (this.cartoCss) return;
-	
+
+		// dont allow for editors
+		if (!this._isEditor) return;
+
 		// create control
 		this.cartoCss = L.control.cartoCss({
 			position : 'topleft'

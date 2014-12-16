@@ -12,6 +12,8 @@ Wu.StatusPane = Wu.Class.extend({
 		// add hooks
 		this.addHooks();
 
+		// this.__gaEvents();
+
 	},
 
 	initContainer : function () {
@@ -38,14 +40,10 @@ Wu.StatusPane = Wu.Class.extend({
 		// open sidepane menu on mousedown
 		Wu.DomEvent.on(this._container, 'mousedown', this.toggle, this);
 
-		__GA.push({
-			trigger : this._container,
-			label 	: 'Home button'
-		});
-
 		// global TAB key toggle
 		// Wu.DomEvent.on(document, 'keydown', this.tab, this);	// todo: fix tabbing in inputs
 	},
+
 
 	tab : function (e) {
 		if (e.keyCode == 9) this.toggle();
@@ -83,13 +81,8 @@ Wu.StatusPane = Wu.Class.extend({
 		// remove help pseudo
 		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
 
-		// Remove start pane
-		// if (app.StartPane) app.StartPane.deactivate();
-
 		// trigger activation on active menu item
 		app._activeMenu._activate();
-
-		// console.log('StatusPane.open(). Currently active menu item:', app._activeMenuItem);
 
 		// Hide button section and Layer info when the Home dropdown menu opens (j)
 		if (app._map) app._map._controlCorners.topleft.style.opacity = 0;
@@ -104,10 +97,9 @@ Wu.StatusPane = Wu.Class.extend({
 
 	// close sidepane menu
 	close : function (e) {
-
-		console.log('statuspane close');
-
 		this.isOpen = false;
+
+		// collapse sidepane
 		if (app.SidePane) app.SidePane.collapse();
 		this.refresh();
 
@@ -116,7 +108,6 @@ Wu.StatusPane = Wu.Class.extend({
 
 		// Show button section and Layer info when the Home dropdown menu opens (j)
 		if (app._map) app._map._controlCorners.topleft.style.opacity = 1;
-
 
 	},
 
@@ -218,8 +209,6 @@ Wu.StatusPane = Wu.Class.extend({
 				Wu.DomUtil.remove(old);
 			}, 250);
 		}, 50);
-		
-		
 	},
 
 	clearStatus : function () {

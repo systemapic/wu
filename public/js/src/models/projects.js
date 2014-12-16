@@ -342,14 +342,12 @@ Wu.Project = Wu.Class.extend({
 		var lids = [];
 
 		layers.forEach(function (layer) {
-			console.log('layer..', layer);
 			if (!layer.store.data) return;
 			if (!layer.store.data.mapbox) return;
 
 			var mid = layer.store.data.mapbox;
 			var m = mid.split('.')[0];
 			if (m == account.username) {
-				console.log('MATCH!', layer, m, account);
 				this._removeLayer(layer);
 				lids.push(layer.getUuid());
 			}

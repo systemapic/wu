@@ -2684,7 +2684,7 @@ module.exports = api = {
 			console.log('diff: ', diff);
 
 			if (diff.length == 0) {
-				console.log('last pro!');
+				console.log('last pro!'); 				// todo: wrong! removes client is shudnt remove
 				subject.role.reader.clients.pull(project.client);
 			}
 
