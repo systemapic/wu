@@ -147,6 +147,46 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			this.addEditHooks();
 		}
 
+		// hide other controls
+		this._hideControls();
+
+	},
+
+	_hideControls : function () {
+
+		// layermenu
+		var lm = app.MapPane.layerMenu;
+		if (lm) lm.hide();
+
+		// inspect
+		var ic = app.MapPane.inspectControl;
+		if (ic) ic.hide();
+
+		// legends
+		var lc = app.MapPane.legendsControl;
+		if (lc) lc.hide();
+
+		// description
+		var dc = app.MapPane.descriptionControl;
+		if (dc) dc.hide();
+	},
+
+	_showControls : function () {
+		// layermenu
+		var lm = app.MapPane.layerMenu;
+		if (lm) lm.show();
+
+		// inspect
+		var ic = app.MapPane.inspectControl;
+		if (ic) ic.show();
+
+		// legends
+		var lc = app.MapPane.legendsControl;
+		if (lc) lc.show();
+
+		// description
+		var dc = app.MapPane.descriptionControl;
+		if (dc) dc.show();
 	},
 
 	_deactivate : function () {
@@ -159,6 +199,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// remove edit hooks 
 		this.removeEditHooks();
+
+		// show controls
+		this._showControls();
 	},
 
 
