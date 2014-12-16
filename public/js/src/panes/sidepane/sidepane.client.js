@@ -256,10 +256,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.projects.push(project);
 
 		// new project item view
-		var options = {
+		var sidepaneProject = new Wu.SidePane.Project(project, {
 			parent : this
-		}
-		var sidepaneProject = new Wu.SidePane.Project(project, options);
+		});
 
 		// add to client container
 		sidepaneProject.addToBefore(this._projectsContainer);

@@ -1006,7 +1006,25 @@ Wu.Util = {
 		}
 
 		return size;
-	}
+	},
+
+
+	setStyle : function (tag, rules) {
+
+		// set rules 
+		jss.set(tag, rules);
+
+		// eg: 
+		// jss.set('img', {
+		// 	'border-top': '1px solid red',
+		// 	'border-left': '1px solid red'
+		// });
+		// https://github.com/Box9/jss
+	},
+
+	getStyle : function (tag) {
+		return jss.getAll(tag);
+	},
 
 	
 
@@ -1064,6 +1082,8 @@ Wu.zip = Wu.Util.generateZip;
 Wu.zave = Wu.Util.zipSave;
 Wu.can = Wu.Util.can;
 ichDiv = Wu.Util.templateIch;
+Wu.setStyle = Wu.Util.setStyle;
+Wu.getStyle = Wu.Util.getStyle;
 
 Wu.Evented = Wu.Class.extend({
 

@@ -42,6 +42,14 @@ L.Control.Description = L.Control.extend({
 		this._inner.innerHTML = layer.store.description;
 	},
 
+	show : function () {
+		this._container.style.display = 'block'; 
+	},
+
+	hide : function () {
+		this._container.style.display = 'none'; 
+	},
+
 	// clear content
 	clear : function () {
 		this.activeLayer = false;

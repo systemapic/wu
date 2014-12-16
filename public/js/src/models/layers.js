@@ -68,27 +68,45 @@ Wu.Layer = Wu.Class.extend({
 
 	addToControls : function () {
 
+		this._addToLegends();
+
+		this._addToInspect();
+
+		this._addToDescription();
+		
+	},
+
+	_addToLegends : function () {
+
 		// add legends if active
 		var legendsControl = app.MapPane.legendsControl;
 		legendsControl && legendsControl.addLegend(this);
+	},
+
+	_addToInspect : function () {
 
 		// add to inspectControl if available
 		var inspectControl = app.MapPane.inspectControl;		
 		if (inspectControl) inspectControl.addLayer(this);
 
+	},
+
+	_addToDescription : function () {
+
 		// add to descriptionControl if available
 		var descriptionControl = app.MapPane.descriptionControl;
-		if (descriptionControl) {
-			descriptionControl.setLayer(this);
+		if (!descriptionControl) return;
 
-			// remove if empty
-			if (this.store.description || app.Account.isSuperadmin()) { // todo: what if only editor 
-				descriptionControl._container.style.display = 'block'; 
-			} else { 								// refactor to descriptionControl
-				descriptionControl._container.style.display = 'none'; 
-			}
-		
+		descriptionControl.setLayer(this);
+
+		// hide if empty and not editor
+		var isEditor = app.Account.isSuperadmin() || app.Account.canUpdateProject(app.activeProject.getUuid());
+		if (this.store.description || isEditor) { // todo: what if only editor 
+			descriptionControl.show();
+		} else { 								// refactor to descriptionControl
+			descriptionControl.hide();
 		}
+		
 	},
 
 	leafletEvent : function (event, fn) {
@@ -400,6 +418,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		this.gridLayer = new L.UtfGrid(url, {
 			useJsonP: false,
 			subdomains: 'ghi',
+			maxRequests : 0,
+			requestTimeout : 20000
 		});
 
 		// add grid events

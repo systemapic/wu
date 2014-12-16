@@ -19,7 +19,6 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 		// add hooks
 		this.addHooks();
 
-
 	},
 
 
@@ -1290,15 +1289,13 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		this.panes.controlLegends              	= Wu.DomUtil.get('map-controls-legends').parentNode.parentNode;
 		this.panes.controlMeasure              	= Wu.DomUtil.get('map-controls-measure').parentNode.parentNode;
 		this.panes.controlGeolocation          	= Wu.DomUtil.get('map-controls-geolocation').parentNode.parentNode;
-		// this.panes.controlVectorstyle          	= Wu.DomUtil.get('map-controls-vectorstyle').parentNode.parentNode;
 		this.panes.controlMouseposition        	= Wu.DomUtil.get('map-controls-mouseposition').parentNode.parentNode;
 		this.panes.controlBaselayertoggle      	= Wu.DomUtil.get('map-controls-baselayertoggle').parentNode.parentNode;
 		this.panes.controlCartocss 		= Wu.DomUtil.get('map-controls-cartocss').parentNode.parentNode;
 
 		// add tooltip
-		var h4 = this._container.getElementsByTagName('h4')[0]
+		var h4 = this._container.getElementsByTagName('h4')[0]; // refactor 
 		app.Tooltip.add(h4, 'Enables the control options that goes on top of the map.');
-		// app.Tooltip.add(this._container, 'Enables the control options that goes on top of the map.');
 
 		// Add tooltip for each option
 		app.Tooltip.add(this.panes.controlZoom, 'Enables zooming on the map. Puts [+] and [-] buttons on the map.');
@@ -1331,7 +1328,6 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		Wu.DomEvent.on( this.panes.controlLegends,         'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlMeasure,         'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlGeolocation,     'mousedown click', this.toggleControl, this);
-		// Wu.DomEvent.on( this.panes.controlVectorstyle,     'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlMouseposition,   'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlBaselayertoggle, 'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlCartocss, 	   'mousedown click', this.toggleControl, this);

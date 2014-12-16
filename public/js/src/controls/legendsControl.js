@@ -37,11 +37,9 @@ L.Control.Legends = L.Control.extend({
 		// prevent doubleclick
 		Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
 
-
 		// Stop Propagation
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent.on(this._legendsCollapser, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
-
 	
 	},
 
@@ -218,6 +216,8 @@ L.Control.Legends = L.Control.extend({
 	// add legend from outside
 	addLegend : function (layer) {
 
+		console.log('adding legends: ', layer);
+
 		// each layer has its own legends
 		this._layers.push(layer);
 
@@ -245,7 +245,17 @@ L.Control.Legends = L.Control.extend({
 	
 	},
 
-	refreshLegends : function () {
+	// show baselayers also
+	refreshAllLegends : function () {
+
+		// get all layers (not just base)
+		var layers = app.MapPane.getActiveLayers();
+		this.refreshLegends(layers);
+	},
+
+	refreshLegends : function (layers) {
+
+		console.log('refreshLegends');
 
 
 		this.legendsCounter = [];
@@ -255,7 +265,7 @@ L.Control.Legends = L.Control.extend({
 		this._legendsInnerSlider.innerHTML = '';
 
 		// get layers that should have legends (active ones)
-		var layers = this._getActiveLayers();
+		var layers = layers || this._getActiveLayers();
 
 		// adds to DOM etc
 		layers.forEach(function (layer) {
@@ -284,11 +294,13 @@ L.Control.Legends = L.Control.extend({
 	},
 
 	_getActiveLayers : function () {
-		// all layers in layermenu that are active
-		// ie. all layers on map
 
+		// filter only layermenu layers
 		var layers = app.MapPane.getActiveLayers();
-		return layers;
+		var lm = _.filter(layers, function (l) {
+			return !l._isBase;
+		});
+		return lm;
 	},
 
 

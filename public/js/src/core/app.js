@@ -2,8 +2,11 @@ Wu.version = '0.3-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
+	// debug : true,
+
 	// default options
 	options : {
+		
 		id : 'app',
 
 		portalName : 'systemapic',	// plugged in
@@ -72,6 +75,7 @@ Wu.App = Wu.Class.extend({
 		// get objects from server
 		this.initServer();
 
+
 	},
 
 	initServer : function () {
@@ -87,6 +91,7 @@ Wu.App = Wu.Class.extend({
 
 	initServerResponse : function (that, response) {
 		var resp = JSON.parse(response);
+		console.log('initServerResponse', resp);
 
 		// revv it up
 		that.initApp(resp);
@@ -94,7 +99,7 @@ Wu.App = Wu.Class.extend({
 
 
 	initApp : function (o) {
-
+		console.log('initAp', o);
 		// set vars
 		this.options.json = o;
 
@@ -118,6 +123,9 @@ Wu.App = Wu.Class.extend({
 
 		// ready
 		this._ready = true;
+
+		// debug
+		if (this.debug) this._debug();
 
 	},
 
@@ -505,6 +513,9 @@ Wu.App = Wu.Class.extend({
 		// set project
 		this._setProject(project);
 
+		// remove startpane
+		if (this.StartPane) this.StartPane.deactivate();
+
 		// add phantomJS stylesheet
 		app.Style.phantomJS();
 
@@ -519,6 +530,10 @@ Wu.App = Wu.Class.extend({
 			// render hash
 			this._renderHash(this, json);
 		}
+
+
+		// acticate legends for baselayers
+		app.MapPane.legendsControl.refreshAllLegends()
 
 		// avoid Loading! etc in status
 		app.setStatus('systemapic'); // too early
@@ -564,6 +579,42 @@ Wu.App = Wu.Class.extend({
 	},
 
 
+	// debug mode
+	_debug : function () {
+
+		// set style
+		Wu.setStyle('img', {
+			'border-top': '1px solid rgba(255, 0, 0, 0.65)',
+			'border-left': '1px solid rgba(255, 0, 0, 0.65)'
+		});
+
+		// add map click event
+		app._map.on('mousedown', function (e) {
+
+			var lat = e.latlng.lat,
+			    lng = e.latlng.lng,
+			    zoom = app._map.getZoom();
+
+			var tile = this._getTileURL(lat, lng, zoom);
+			console.log('tile:', tile);
+
+		}, this);
+
+		// extend 
+		if (typeof(Number.prototype.toRad) === "undefined") {
+			Number.prototype.toRad = function() {
+				return this * Math.PI / 180;
+			}
+		}
+
+	},
+
+
+	_getTileURL : function (lat, lon, zoom) {
+		var xtile = parseInt(Math.floor( (lon + 180) / 360 * (1<<zoom) ));
+		var ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat.toRad()) + 1 / Math.cos(lat.toRad())) / Math.PI) / 2 * (1<<zoom) ));
+		return "" + zoom + "/" + xtile + "/" + ytile;
+	}
 
 
 
