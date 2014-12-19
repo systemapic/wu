@@ -1248,6 +1248,9 @@ L.DomUtil = {
 
 	getStyle: function (el, style) {
 
+		// optimizations hacks, shortcuts for common reqs
+		if (el.id == 'map' && style == 'position') return 'absolute';
+
 		var value = el.style[style];
 
 		if (!value && el.currentStyle) {
@@ -1259,6 +1262,7 @@ L.DomUtil = {
 			value = css ? css[style] : null;
 		}
 
+		console.log('value: ', value);
 		return value === 'auto' ? null : value;
 	},
 
@@ -4482,7 +4486,7 @@ L.Popup = L.Class.extend({
 		if (!this.options.autoPan) { return; }
 
 		var map = this._map,
-		    containerHeight = this._container.offsetHeight,
+		    containerHeight = this._container.offsetHeight, // todo: add padding for autoPan before pan
 		    containerWidth = this._containerWidth,
 
 		    layerPos = new L.Point(this._containerLeft, -containerHeight - this._containerBottom);
@@ -12500,6 +12504,8 @@ G.Rande = G.Class.extend({
 	},
 
 	showToolbar : function (selectedText) {
+		console.log('showtoolbar');
+
 		var range = selectedText.getRangeAt(0);
 		var clientRectBounds = range.getBoundingClientRect();
 		this.setTextMenuPosition(
@@ -12700,6 +12706,10 @@ G.Rande = G.Class.extend({
 
 	setTextMenuPosition : function (top, left) {
 
+		// wu hack to prevent menu going outside viewport	
+		if (left < 130) left = 130;
+
+		// set position
 		this.textMenu.style.top = top + "px";
 		this.textMenu.style.left = left + "px";
 
@@ -12711,6 +12721,7 @@ G.Rande = G.Class.extend({
 			}
 		}
 	},
+
 
 	insertHorizontalRule : function (parentParagraph) {
 		var prevSibling,

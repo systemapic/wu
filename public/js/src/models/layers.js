@@ -441,6 +441,40 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		var grid = this.gridLayer;
 		if (!grid) return;
 
+
+		// // // add click event
+		// // grid.on('mousedown', function(e) {
+		// // 	if (!e.data) return;
+
+
+
+		// // 	// pass layer
+		// // 	e.layer = this;
+
+		// // 	// // add to pending
+		// // 	// app.MapPane._addPopupContent(e);
+
+		// // }, this);
+
+		// grid.on('click', function (e) {
+		// 	if (!e.data) return;
+
+		// 	// pass layer
+		// 	e.layer = this;
+
+		// 	app.MapPane._clearPopup();
+
+		// 	// add to pending
+		// 	app.MapPane._addPopupContent(e);
+
+		// 	// open popup
+		// 	app.MapPane.openPopup(e);
+		
+		// }, this);
+
+		// -----
+
+		
 		// add click event
 		grid.on('mousedown', function(e) {
 			if (!e.data) return;
@@ -451,6 +485,14 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			// add to pending
 			app.MapPane._addPopupContent(e);
 
+			var event = e.e.originalEvent;
+			this._event = {
+				x : event.x,
+				y : event.y
+			}
+
+
+
 		}, this);
 
 		grid.on('mouseup', function (e) {
@@ -459,16 +501,23 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			// pass layer
 			e.layer = this;
 
-			// open popup
-			app.MapPane.openPopup(e);
-		
+			var event = e.e.originalEvent;
+
+			if (this._event.x == event.x || this._event === undefined) {
+				// open popup
+				app.MapPane.openPopup(e);
+			} else {
+				// clear old
+				app.MapPane._clearPopup();
+			}
+
 		}, this);
 
 		grid.on('click', function (e) {
 
 			// clear old
 			app.MapPane._clearPopup();
-		
+
 		}, this);
 	},
 });

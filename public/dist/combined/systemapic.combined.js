@@ -1006,7 +1006,25 @@ Wu.Util = {
 		}
 
 		return size;
-	}
+	},
+
+
+	setStyle : function (tag, rules) {
+
+		// set rules 
+		jss.set(tag, rules);
+
+		// eg: 
+		// jss.set('img', {
+		// 	'border-top': '1px solid red',
+		// 	'border-left': '1px solid red'
+		// });
+		// https://github.com/Box9/jss
+	},
+
+	getStyle : function (tag) {
+		return jss.getAll(tag);
+	},
 
 	
 
@@ -1064,6 +1082,8 @@ Wu.zip = Wu.Util.generateZip;
 Wu.zave = Wu.Util.zipSave;
 Wu.can = Wu.Util.can;
 ichDiv = Wu.Util.templateIch;
+Wu.setStyle = Wu.Util.setStyle;
+Wu.getStyle = Wu.Util.getStyle;
 
 Wu.Evented = Wu.Class.extend({
 
@@ -2047,7 +2067,6 @@ L.Popup.include({
 
 		// open
 		this.openPane();
-
 	},
 
 	_setMenuHeight : function () {
@@ -2062,18 +2081,22 @@ L.Popup.include({
 		var project = project || app.activeProject;
 		if (!project) return;
 
-		var panes = [];
-		var pane = this.options.panes;
-		var settings = project.getSettings();
+		var panes = [],
+		    pane = this.options.panes,
+		    settings = project.getSettings(),
+		    isEditor = app.Account.canUpdateProject(project.getUuid()),
+		    isManager = app.Account.canManageProject(project.getUuid());
 
-		if (pane.clients) 				panes.push('Clients');
-		if (pane.mapOptions) 				panes.push('Map');
-		if (pane.documents   && settings.documentsPane) panes.push('Documents');
-		if (pane.dataLibrary && settings.dataLibrary) 	panes.push('DataLibrary');
-		if (pane.mediaLibrary && settings.mediaLibrary) panes.push('MediaLibrary');
-		if (pane.users) 				panes.push('Users');
-		if (pane.share && settings.socialSharing) 	panes.push('Share');
-		if (pane.account) 				panes.push('Account');
+
+
+		if (pane.clients) 					panes.push('Clients');
+		if (pane.mapOptions 	&& isEditor) 			panes.push('Map');
+		if (pane.documents   	&& settings.documentsPane) 	panes.push('Documents');
+		if (pane.dataLibrary 	&& settings.dataLibrary) 	panes.push('DataLibrary');
+		if (pane.MediaLibrary 	&& settings.mediaLibrary) 	panes.push('MediaLibrary');
+		if (pane.users 		&& isManager) 			panes.push('Users');
+		if (pane.share 		&& settings.socialSharing) 	panes.push('Share');
+		if (pane.account) 					panes.push('Account');
 
 
 		return panes;
@@ -2120,7 +2143,6 @@ L.Popup.include({
 	refresh : function (panes) {
 
 		var panes = panes || this.panes;
-
 		this.panes = [];
 
 		// all panes
@@ -2149,7 +2171,8 @@ L.Popup.include({
 	},
 
 	_refresh : function () {
-		var panes = Wu.extend([], this.panes);
+		// var panes = Wu.extend([], this.panes);
+		var panes = this._getPaneArray();
 		this.refresh(panes);
 	},
 	
@@ -2316,9 +2339,6 @@ L.Popup.include({
 			// Remove blur on map... (j)
 			Wu.DomUtil.removeClass(__map, "map-blur")
 
-			// Remove menuslider arrow (j)
-			// _menusliderArrow.style.width = '0px';
-		
 		// if closed
 		} else {
 			
@@ -2328,20 +2348,18 @@ L.Popup.include({
 			// open pane
 			Wu.app.SidePane.openPane();
 
-			// Add menuslider arrow (j)
-			// _menusliderArrow.style.width = '9px';
-
-
 			// Blurs the map on full page panes... (j)
 			var clist = Wu.app._active.classList;
-			if ( _.contains(clist, 'fullpage-documents') || _.contains(clist, 'data-library') || _.contains(clist, 'fullpage-users') ) {
-				Wu.DomUtil.addClass(__map, "map-blur");
-			}
+			if (_.contains(clist, 'fullpage-documents') 	|| 
+			    _.contains(clist, 'data-library') 		|| 
+			    _.contains(clist, 'fullpage-users') 	){
 
+					Wu.DomUtil.addClass(__map, "map-blur");
+
+			}
 
 		}
 	},
-
 
 
 	_clickActivate : function (e) {
@@ -2383,6 +2401,7 @@ L.Popup.include({
 
 		// update pane
 		this.update();   //todo: refactor: now it's _update, _updateContent, refresh all over tha place
+
 	},
 
 	_activate : function () {
@@ -2439,7 +2458,6 @@ L.Popup.include({
 		if (_.contains(classy, 'clients')) {
 			menuslider.style.top = '0px';
 			Wu.app.SidePane._container.style.width = w;
-
 			Wu.DomUtil.removeClass(__map, "map-blur")
 		}
 
@@ -2447,10 +2465,7 @@ L.Popup.include({
 			var n = app.SidePane.panes.indexOf('Map');		// calculate position
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = w;
-
 			Wu.DomUtil.removeClass(__map, "map-blur")
-
-
 		}
 	    
 		if (_.contains(classy, 'documents')) {
@@ -2458,18 +2473,14 @@ L.Popup.include({
 			console.log('n: ', n, app.SidePane.panes);
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
-
 			Wu.DomUtil.addClass(__map, "map-blur")
-
 		}
 	    
 		if (_.contains(classy, 'dataLibrary')) {
 			var n = app.SidePane.panes.indexOf('DataLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
-
 			Wu.DomUtil.addClass(__map, "map-blur")
-
 		}
 	    
 
@@ -2477,9 +2488,7 @@ L.Popup.include({
 			var n = app.SidePane.panes.indexOf('MediaLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
-
 			Wu.DomUtil.addClass(__map, "map-blur")
-
 		}
 
 
@@ -2487,9 +2496,7 @@ L.Popup.include({
 			var n = app.SidePane.panes.indexOf('Users');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
-
 			Wu.DomUtil.addClass(__map, "map-blur")
-
 		}
 				
 
@@ -2497,9 +2504,7 @@ L.Popup.include({
 			var n = app.SidePane.panes.indexOf('Share');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
-
 			Wu.DomUtil.removeClass(__map, "map-blur")
-
 		}
 				
 		
@@ -2570,15 +2575,25 @@ L.Popup.include({
 		this._scrollWrapper.style.maxHeight = parseInt(this.maxHeight - 20) + 'px';
 	},
 
+	// active for Projects tab (ie. Clients)
 	calculateHeight : function () {
-		var screenHeight = window.innerHeight,
+		var screenHeight   = window.innerHeight,
 		    legendsControl = app.MapPane.legendsControl,
-		    height = -107;
+		    height         = -107 + screenHeight;
 
-		if (legendsControl) {
-			height += parseInt(screenHeight) - parseInt(legendsControl._legendsHeight);
+		if (!legendsControl) {
+			this.maxHeight = height - 6;
+			return;
+
+		}
+		
+		var legendsHeight = parseInt(legendsControl._legendsHeight);
+
+
+		if (legendsControl._isOpen) {
+			height -= legendsHeight;
 		} else {
-			height += parseInt(screenHeight) - 6;
+			height -= 6;
 		}
 
 		this.maxHeight = height;
@@ -3549,10 +3564,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.projects.push(project);
 
 		// new project item view
-		var options = {
+		var sidepaneProject = new Wu.SidePane.Project(project, {
 			parent : this
-		}
-		var sidepaneProject = new Wu.SidePane.Project(project, options);
+		});
 
 		// add to client container
 		sidepaneProject.addToBefore(this._projectsContainer);
@@ -3570,7 +3584,19 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// remove startpane if active
 		app.StartPane.deactivate();
 
+		// add defaults to map
+		this._addDefaults();
 
+	},
+
+
+	_addDefaults : function () {
+		// add default baselayer
+		if (!app.SidePane) return;
+		if (!app.SidePane.Map) return;
+		if (!app.SidePane.Map.mapSettings) return;
+		if (!app.SidePane.Map.mapSettings.baselayer) return;
+		app.SidePane.Map.mapSettings.baselayer.setDefaultLayer();
 	},
 
 	addHooks : function () {
@@ -3896,6 +3922,53 @@ Wu.SidePane.Client = Wu.Class.extend({
 	// fired when different sidepane selected, for clean-up
 	_deactivate : function () {
 
+		// show other controls
+		this._showControls();
+
+	},
+
+	_activate : function () {
+
+		// hide other controls
+		this._hideControls();
+
+	},
+
+	_hideControls : function () {
+
+		// layermenu
+		var lm = app.MapPane.layerMenu;
+		if (lm) lm.hide();
+
+		// inspect
+		var ic = app.MapPane.inspectControl;
+		if (ic) ic.hide();
+
+		// legends
+		var lc = app.MapPane.legendsControl;
+		if (lc) lc.hide();
+
+		// description
+		var dc = app.MapPane.descriptionControl;
+		if (dc) dc.hide();
+	},
+
+	_showControls : function () {
+		// layermenu
+		var lm = app.MapPane.layerMenu;
+		if (lm) lm.show();
+
+		// inspect
+		var ic = app.MapPane.inspectControl;
+		if (ic) ic.show();
+
+		// legends
+		var lc = app.MapPane.legendsControl;
+		if (lc) lc.show();
+
+		// description
+		var dc = app.MapPane.descriptionControl;
+		if (dc) dc.show();
 	},
 
 	searchList : function (e) {
@@ -4747,7 +4820,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// add hooks
 		this.addHooks();
 
-
 	},
 
 
@@ -4779,7 +4851,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	calculateHeight : function () {
-
+		console.log('mapsettings item calculateHeight');
 		this.maxHeight = this._inner.offsetHeight + 15;
 		this.minHeight = 0;
 	},
@@ -5204,7 +5276,10 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 	},
 
 	setDefaultLayer : function () {
-		var baseLayer = _.sample(this.layers, 1);
+		var baseLayer = _.sample(this._layers, 1)[0];
+		console.log('setDefaultLayer', this._layers);
+		console.log('baseLayer', baseLayer);
+		if (!baseLayer) return;
 		this.on(baseLayer);
 		this.enableLayer(baseLayer);
 	},
@@ -5262,15 +5337,16 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 	},
 
 	calculateHeight : function () {
-				
+
 		// Runs only for base layer menu?
-		var min = _.size(this.project.getLayermenuLayers());
-		var padding = this.numberOfProviders * 35;
+		var min = _.size(this.project.getLayermenuLayers()),
+		    padding = this.numberOfProviders * 35;
 		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
 		this.minHeight = 0;
 
 		// add 100 if in editMode
 		if (this.editMode) this.maxHeight += 100;
+
 	},
 
 	markOccupied : function () {
@@ -6015,15 +6091,13 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		this.panes.controlLegends              	= Wu.DomUtil.get('map-controls-legends').parentNode.parentNode;
 		this.panes.controlMeasure              	= Wu.DomUtil.get('map-controls-measure').parentNode.parentNode;
 		this.panes.controlGeolocation          	= Wu.DomUtil.get('map-controls-geolocation').parentNode.parentNode;
-		// this.panes.controlVectorstyle          	= Wu.DomUtil.get('map-controls-vectorstyle').parentNode.parentNode;
 		this.panes.controlMouseposition        	= Wu.DomUtil.get('map-controls-mouseposition').parentNode.parentNode;
 		this.panes.controlBaselayertoggle      	= Wu.DomUtil.get('map-controls-baselayertoggle').parentNode.parentNode;
 		this.panes.controlCartocss 		= Wu.DomUtil.get('map-controls-cartocss').parentNode.parentNode;
 
 		// add tooltip
-		var h4 = this._container.getElementsByTagName('h4')[0]
+		var h4 = this._container.getElementsByTagName('h4')[0]; // refactor 
 		app.Tooltip.add(h4, 'Enables the control options that goes on top of the map.');
-		// app.Tooltip.add(this._container, 'Enables the control options that goes on top of the map.');
 
 		// Add tooltip for each option
 		app.Tooltip.add(this.panes.controlZoom, 'Enables zooming on the map. Puts [+] and [-] buttons on the map.');
@@ -6056,7 +6130,6 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		Wu.DomEvent.on( this.panes.controlLegends,         'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlMeasure,         'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlGeolocation,     'mousedown click', this.toggleControl, this);
-		// Wu.DomEvent.on( this.panes.controlVectorstyle,     'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlMouseposition,   'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlBaselayertoggle, 'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlCartocss, 	   'mousedown click', this.toggleControl, this);
@@ -6761,6 +6834,46 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			this.addEditHooks();
 		}
 
+		// hide other controls
+		this._hideControls();
+
+	},
+
+	_hideControls : function () {
+
+		// layermenu
+		var lm = app.MapPane.layerMenu;
+		if (lm) lm.hide();
+
+		// inspect
+		var ic = app.MapPane.inspectControl;
+		if (ic) ic.hide();
+
+		// legends
+		var lc = app.MapPane.legendsControl;
+		if (lc) lc.hide();
+
+		// description
+		var dc = app.MapPane.descriptionControl;
+		if (dc) dc.hide();
+	},
+
+	_showControls : function () {
+		// layermenu
+		var lm = app.MapPane.layerMenu;
+		if (lm) lm.show();
+
+		// inspect
+		var ic = app.MapPane.inspectControl;
+		if (ic) ic.show();
+
+		// legends
+		var lc = app.MapPane.legendsControl;
+		if (lc) lc.show();
+
+		// description
+		var dc = app.MapPane.descriptionControl;
+		if (dc) dc.show();
 	},
 
 	_deactivate : function () {
@@ -6773,6 +6886,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// remove edit hooks 
 		this.removeEditHooks();
+
+		// show controls
+		this._showControls();
 	},
 
 
@@ -7213,10 +7329,54 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	_activate : function () {
 		if (this.dz) this.dz.enable();
+	
+		// hide other controls
+		this._hideControls();
+
+	},
+
+	_hideControls : function () {
+
+		// layermenu
+		var lm = app.MapPane.layerMenu;
+		if (lm) lm.hide();
+
+		// inspect
+		var ic = app.MapPane.inspectControl;
+		if (ic) ic.hide();
+
+		// legends
+		var lc = app.MapPane.legendsControl;
+		if (lc) lc.hide();
+
+		// description
+		var dc = app.MapPane.descriptionControl;
+		if (dc) dc.hide();
+	},
+
+	_showControls : function () {
+		// layermenu
+		var lm = app.MapPane.layerMenu;
+		if (lm) lm.show();
+
+		// inspect
+		var ic = app.MapPane.inspectControl;
+		if (ic) ic.show();
+
+		// legends
+		var lc = app.MapPane.legendsControl;
+		if (lc) lc.show();
+
+		// description
+		var dc = app.MapPane.descriptionControl;
+		if (dc) dc.show();
 	},
 
 	_deactivate : function () {
 		if (this.dz) this.dz.disable();
+
+		// show controls
+		this._showControls();
 	},
 
 	initDownloadTable : function () {
@@ -9085,6 +9245,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		
 		this.project = project;
 
+		// get editor privs
+		this._isEditor = app.Account.canUpdateProject(app.activeProject.getUuid());
+
 		// set base layers
 		this.setBaseLayers();
 
@@ -9577,9 +9740,11 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	enableCartocss : function () {
-
 		if (this.cartoCss) return;
-	
+
+		// dont allow for editors
+		if (!this._isEditor) return;
+
 		// create control
 		this.cartoCss = L.control.cartoCss({
 			position : 'topleft'
@@ -9978,6 +10143,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// add hooks
 		this.addHooks();
 
+		// this.__gaEvents();
+
 	},
 
 	initContainer : function () {
@@ -10007,6 +10174,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// global TAB key toggle
 		// Wu.DomEvent.on(document, 'keydown', this.tab, this);	// todo: fix tabbing in inputs
 	},
+
 
 	tab : function (e) {
 		if (e.keyCode == 9) this.toggle();
@@ -10044,13 +10212,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// remove help pseudo
 		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
 
-		// Remove start pane
-		// if (app.StartPane) app.StartPane.deactivate();
-
 		// trigger activation on active menu item
 		app._activeMenu._activate();
-
-		// console.log('StatusPane.open(). Currently active menu item:', app._activeMenuItem);
 
 		// Hide button section and Layer info when the Home dropdown menu opens (j)
 		if (app._map) app._map._controlCorners.topleft.style.opacity = 0;
@@ -10065,10 +10228,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	// close sidepane menu
 	close : function (e) {
-
-		console.log('statuspane close');
-
 		this.isOpen = false;
+
+		// collapse sidepane
 		if (app.SidePane) app.SidePane.collapse();
 		this.refresh();
 
@@ -10077,7 +10239,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// Show button section and Layer info when the Home dropdown menu opens (j)
 		if (app._map) app._map._controlCorners.topleft.style.opacity = 1;
-
 
 	},
 
@@ -10179,8 +10340,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 				Wu.DomUtil.remove(old);
 			}, 250);
 		}, 50);
-		
-		
 	},
 
 	clearStatus : function () {
@@ -10274,6 +10433,14 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
 
+	},
+
+	show : function () {
+		Wu.DomUtil.removeClass(this._container, 'displayNone');
+	},
+
+	hide : function () {
+		Wu.DomUtil.addClass(this._container, 'displayNone');
 	},
 
 	// Runs on window resize. Gets called up in app.js
@@ -11307,6 +11474,14 @@ L.control.layermenu = function (options) {
 		return this;
 	},
 
+	show : function () {
+		Wu.DomUtil.removeClass(this._container, 'displayNone');
+	},
+
+	hide : function () {
+		Wu.DomUtil.addClass(this._container, 'displayNone');
+	},
+
 	update : function (project) {
 		// on project refresh + added control
 
@@ -11748,6 +11923,14 @@ L.control.inspect = function (options) {
 		this._inner.innerHTML = layer.store.description;
 	},
 
+	show : function () {
+		this._container.style.display = 'block'; 
+	},
+
+	hide : function () {
+		this._container.style.display = 'none'; 
+	},
+
 	// clear content
 	clear : function () {
 		this.activeLayer = false;
@@ -11972,6 +12155,8 @@ L.control.description = function (options) {
 		position : 'bottomleft' 
 	},
 
+	_isOpen : false,
+
 	// automatically run when legends is added to map 
 	onAdd : function (map) {
 
@@ -12005,11 +12190,9 @@ L.control.description = function (options) {
 		// prevent doubleclick
 		Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
 
-
 		// Stop Propagation
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent.on(this._legendsCollapser, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
-
 	
 	},
 
@@ -12022,6 +12205,14 @@ L.control.description = function (options) {
 		this.setMaxWidth(legendsMaxWidth)
 
 	},	
+
+	show : function () {
+		Wu.DomUtil.removeClass(this._container, 'displayNone');
+	},
+
+	hide : function () {
+		Wu.DomUtil.addClass(this._container, 'displayNone');
+	},
 
 	// Runs on window resize (from app.js)
 	resizeEvent : function (dimensions) {
@@ -12096,6 +12287,8 @@ L.control.description = function (options) {
 
 		}, 500);
 
+		this._setClosed();
+
 	},
 
 	// // open if any legends only (for phantomJS)
@@ -12131,7 +12324,9 @@ L.control.description = function (options) {
 			that._legendsCollapser.style.opacity = '1';
 			that._legendsCollapser.style.display = 'block';
 
-		}, 500);                
+		}, 500);      
+
+		this._setOpen();    
 
 	},
 
@@ -12186,6 +12381,8 @@ L.control.description = function (options) {
 	// add legend from outside
 	addLegend : function (layer) {
 
+		console.log('adding legends: ', layer);
+
 		// each layer has its own legends
 		this._layers.push(layer);
 
@@ -12213,7 +12410,15 @@ L.control.description = function (options) {
 	
 	},
 
-	refreshLegends : function () {
+	// show baselayers also
+	refreshAllLegends : function () {
+
+		// get all layers (not just base)
+		var layers = app.MapPane.getActiveLayers();
+		this.refreshLegends(layers);
+	},
+
+	refreshLegends : function (layers) {
 
 
 		this.legendsCounter = [];
@@ -12223,7 +12428,7 @@ L.control.description = function (options) {
 		this._legendsInnerSlider.innerHTML = '';
 
 		// get layers that should have legends (active ones)
-		var layers = this._getActiveLayers();
+		var layers = layers || this._getActiveLayers();
 
 		// adds to DOM etc
 		layers.forEach(function (layer) {
@@ -12237,8 +12442,10 @@ L.control.description = function (options) {
 		}, this);
 
 		// Hide legends if it's empty
-		if (this.legendsCounter.length == 0) this._legendsContainer.style.display = 'none';
-
+		if (this.legendsCounter.length == 0) {
+			this._legendsContainer.style.display = 'none';
+			this._setClosed();
+		} 
 	},
 
 	_legendOn : function (layer) {
@@ -12252,11 +12459,13 @@ L.control.description = function (options) {
 	},
 
 	_getActiveLayers : function () {
-		// all layers in layermenu that are active
-		// ie. all layers on map
 
+		// filter only layermenu layers
 		var layers = app.MapPane.getActiveLayers();
-		return layers;
+		var lm = _.filter(layers, function (l) {
+			return !l._isBase;
+		});
+		return lm;
 	},
 
 
@@ -12326,11 +12535,39 @@ L.control.description = function (options) {
 
 		}, this);
 
+
+		// mark open
+		this._setOpen();
+
 		// see if we need the horizontal scrollers or not
 		this.checkWidth();
 		this.calculateHeight();
 
+		
 
+
+	},
+
+	_setOpen : function () {
+		this._isOpen = true;
+
+		// calc
+		this._setContentHeight();
+	},
+
+	_setClosed : function () {
+		this._isOpen = false;
+
+		// calc
+		this._setContentHeight();
+	},
+
+	_setContentHeight : function () {
+		var clientsPane = app.SidePane.Clients;
+		var optionsPane = app.SidePane.Map;
+
+		if (clientsPane) clientsPane.setContentHeight();
+		if (optionsPane) optionsPane.setContentHeight();
 	},
 
 	_getLegendHeader : function (layer) {
@@ -13005,14 +13242,12 @@ L.control.baselayerToggle = function (options) {
 		var lids = [];
 
 		layers.forEach(function (layer) {
-			console.log('layer..', layer);
 			if (!layer.store.data) return;
 			if (!layer.store.data.mapbox) return;
 
 			var mid = layer.store.data.mapbox;
 			var m = mid.split('.')[0];
 			if (m == account.username) {
-				console.log('MATCH!', layer, m, account);
 				this._removeLayer(layer);
 				lids.push(layer.getUuid());
 			}
@@ -14336,27 +14571,45 @@ L.control.baselayerToggle = function (options) {
 
 	addToControls : function () {
 
+		this._addToLegends();
+
+		this._addToInspect();
+
+		this._addToDescription();
+		
+	},
+
+	_addToLegends : function () {
+
 		// add legends if active
 		var legendsControl = app.MapPane.legendsControl;
 		legendsControl && legendsControl.addLegend(this);
+	},
+
+	_addToInspect : function () {
 
 		// add to inspectControl if available
 		var inspectControl = app.MapPane.inspectControl;		
 		if (inspectControl) inspectControl.addLayer(this);
 
+	},
+
+	_addToDescription : function () {
+
 		// add to descriptionControl if available
 		var descriptionControl = app.MapPane.descriptionControl;
-		if (descriptionControl) {
-			descriptionControl.setLayer(this);
+		if (!descriptionControl) return;
 
-			// remove if empty
-			if (this.store.description || app.Account.isSuperadmin()) { // todo: what if only editor 
-				descriptionControl._container.style.display = 'block'; 
-			} else { 								// refactor to descriptionControl
-				descriptionControl._container.style.display = 'none'; 
-			}
-		
+		descriptionControl.setLayer(this);
+
+		// hide if empty and not editor
+		var isEditor = app.Account.isSuperadmin() || app.Account.canUpdateProject(app.activeProject.getUuid());
+		if (this.store.description || isEditor) { // todo: what if only editor 
+			descriptionControl.show();
+		} else { 								// refactor to descriptionControl
+			descriptionControl.hide();
 		}
+		
 	},
 
 	leafletEvent : function (event, fn) {
@@ -14668,6 +14921,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		this.gridLayer = new L.UtfGrid(url, {
 			useJsonP: false,
 			subdomains: 'ghi',
+			maxRequests : 0,
+			requestTimeout : 20000
 		});
 
 		// add grid events
@@ -14689,8 +14944,22 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		var grid = this.gridLayer;
 		if (!grid) return;
 
-		// add click event
-		grid.on('mousedown', function(e) {
+
+		// // add click event
+		// grid.on('mousedown', function(e) {
+		// 	if (!e.data) return;
+
+
+
+		// 	// pass layer
+		// 	e.layer = this;
+
+		// 	// // add to pending
+		// 	// app.MapPane._addPopupContent(e);
+
+		// }, this);
+
+		grid.on('click', function (e) {
 			if (!e.data) return;
 
 			// pass layer
@@ -14699,25 +14968,47 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			// add to pending
 			app.MapPane._addPopupContent(e);
 
-		}, this);
-
-		grid.on('mouseup', function (e) {
-			if (!e.data) return;
-
-			// pass layer
-			e.layer = this;
-
 			// open popup
 			app.MapPane.openPopup(e);
 		
 		}, this);
 
-		grid.on('click', function (e) {
+		// grid.on('click', function (e) {
 
-			// clear old
-			app.MapPane._clearPopup();
+		// 	// clear old
+		// 	app.MapPane._clearPopup();
 		
-		}, this);
+		// }, this);
+
+		// // add click event
+		// grid.on('mousedown', function(e) {
+		// 	if (!e.data) return;
+
+		// 	// pass layer
+		// 	e.layer = this;
+
+		// 	// add to pending
+		// 	app.MapPane._addPopupContent(e);
+
+		// }, this);
+
+		// grid.on('mouseup', function (e) {
+		// 	if (!e.data) return;
+
+		// 	// pass layer
+		// 	e.layer = this;
+
+		// 	// open popup
+		// 	app.MapPane.openPopup(e);
+		
+		// }, this);
+
+		// grid.on('click', function (e) {
+
+		// 	// clear old
+		// 	app.MapPane._clearPopup();
+		
+		// }, this);
 	},
 });
 
@@ -18947,8 +19238,11 @@ function layerCollapser(selectWhat, bol) {
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
+	// debug : true,
+
 	// default options
 	options : {
+		
 		id : 'app',
 
 		portalName : 'systemapic',	// plugged in
@@ -19017,6 +19311,7 @@ Wu.App = Wu.Class.extend({
 		// get objects from server
 		this.initServer();
 
+
 	},
 
 	initServer : function () {
@@ -19039,7 +19334,6 @@ Wu.App = Wu.Class.extend({
 
 
 	initApp : function (o) {
-
 		// set vars
 		this.options.json = o;
 
@@ -19063,6 +19357,9 @@ Wu.App = Wu.Class.extend({
 
 		// ready
 		this._ready = true;
+
+		// debug
+		this._debug();
 
 	},
 
@@ -19108,7 +19405,7 @@ Wu.App = Wu.Class.extend({
 	_initContainer : function () {
 
 		// find or create container
-		var id = this.options.id
+		var id = this.options.id;
 		this._appPane = Wu.DomUtil.get(id) || Wu.DomUtil.createId('div', id || 'app', document.body);
 
 		// create map container
@@ -19388,8 +19685,25 @@ Wu.App = Wu.Class.extend({
 								// todo: layermenu items are not selected in layermenu itself, altho on map
 			// add layer
 			var layer = project.getLayer(layerUuid);
-			layer.add('baselayer'); 
 
+			// if in layermenu
+			var bases = project.getBaselayers();
+			var base = _.find(bases, function (b) {
+				return b.uuid == layerUuid;
+			});
+
+			if (base) {
+				// add as baselayer
+				layer.add('baselayer'); 
+			} else {
+				// ass as layermenu
+				var lm = app.MapPane.layerMenu;
+				if (lm) {
+					var lmi = lm._getLayermenuItem(layerUuid);
+					lm.enableLayer(lmi);
+				}
+			}
+			
 		}, this);
 
 	},
@@ -19450,6 +19764,9 @@ Wu.App = Wu.Class.extend({
 		// set project
 		this._setProject(project);
 
+		// remove startpane
+		if (this.StartPane) this.StartPane.deactivate();
+
 		// add phantomJS stylesheet
 		app.Style.phantomJS();
 
@@ -19464,6 +19781,10 @@ Wu.App = Wu.Class.extend({
 			// render hash
 			this._renderHash(this, json);
 		}
+
+
+		// acticate legends for baselayers
+		app.MapPane.legendsControl.refreshAllLegends()
 
 		// avoid Loading! etc in status
 		app.setStatus('systemapic'); // too early
@@ -19509,6 +19830,49 @@ Wu.App = Wu.Class.extend({
 	},
 
 
+	// debug mode
+	_debug : function () {
+		if (!this.debug) return;
+		
+
+
+
+
+		// set style
+		Wu.setStyle('img', {
+			'border-top': '1px solid rgba(255, 0, 0, 0.65)',
+			'border-left': '1px solid rgba(255, 0, 0, 0.65)'
+		});
+
+		// add map click event
+		app._map.on('mousedown', function (e) {
+
+			var lat = e.latlng.lat,
+			    lng = e.latlng.lng,
+			    zoom = app._map.getZoom();
+
+			var tile = this._getTileURL(lat, lng, zoom);
+			console.log('tile:', tile);
+
+		}, this);
+
+		// extend 
+		if (typeof(Number.prototype.toRad) === "undefined") {
+			Number.prototype.toRad = function() {
+				return this * Math.PI / 180;
+			}
+		}
+
+
+
+	},
+
+
+	_getTileURL : function (lat, lon, zoom) {
+		var xtile = parseInt(Math.floor( (lon + 180) / 360 * (1<<zoom) ));
+		var ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat.toRad()) + 1 / Math.cos(lat.toRad())) / Math.PI) / 2 * (1<<zoom) ));
+		return "" + zoom + "/" + xtile + "/" + ytile;
+	}
 
 
 

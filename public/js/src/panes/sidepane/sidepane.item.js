@@ -312,8 +312,16 @@ Wu.SidePane.Item = Wu.Class.extend({
 	calculateHeight : function () {
 		var screenHeight   = window.innerHeight,
 		    legendsControl = app.MapPane.legendsControl,
-		    legendsHeight  = parseInt(legendsControl._legendsHeight),
 		    height         = -107 + screenHeight;
+
+		if (!legendsControl) {
+			this.maxHeight = height - 6;
+			return;
+
+		}
+		
+		var legendsHeight = parseInt(legendsControl._legendsHeight);
+
 
 		if (legendsControl._isOpen) {
 			height -= legendsHeight;

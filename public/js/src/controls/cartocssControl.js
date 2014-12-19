@@ -946,7 +946,17 @@ L.Control.CartoCSS = L.Control.extend({
 
 	destroy : function () {
 		this.onRemove();
-	}
+	},
+
+	getPatternList : function () {
+
+
+		var patterns = ['001.png', '002.png', '003.png', '004.png', '005.png', '006.png', '007.png', '008.png', '009.png', '010.png', '011.png', '012.png', '013.png', '014.png', '015.png', '016.png', '017.png', '018.png', '019.png', '020.png', '021.png', 'paperwhite1.png', 'paperwhite2.png', 'paperwhite3.png', 'paperwhite4.png', 'paperwhite5.png', 'paperwhite6.png', 'waves.png', 'waves_white.png'];
+
+		console.log('CartoCSS patterns: ');
+		console.log(patterns);
+
+	},
 
 
 
