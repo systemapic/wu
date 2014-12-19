@@ -91,7 +91,6 @@ Wu.App = Wu.Class.extend({
 
 	initServerResponse : function (that, response) {
 		var resp = JSON.parse(response);
-		console.log('initServerResponse', resp);
 
 		// revv it up
 		that.initApp(resp);
@@ -99,7 +98,6 @@ Wu.App = Wu.Class.extend({
 
 
 	initApp : function (o) {
-		console.log('initAp', o);
 		// set vars
 		this.options.json = o;
 
@@ -125,7 +123,7 @@ Wu.App = Wu.Class.extend({
 		this._ready = true;
 
 		// debug
-		if (this.debug) this._debug();
+		this._debug();
 
 	},
 
@@ -171,7 +169,7 @@ Wu.App = Wu.Class.extend({
 	_initContainer : function () {
 
 		// find or create container
-		var id = this.options.id
+		var id = this.options.id;
 		this._appPane = Wu.DomUtil.get(id) || Wu.DomUtil.createId('div', id || 'app', document.body);
 
 		// create map container
@@ -598,6 +596,11 @@ Wu.App = Wu.Class.extend({
 
 	// debug mode
 	_debug : function () {
+		if (!this.debug) return;
+		
+
+
+
 
 		// set style
 		Wu.setStyle('img', {
@@ -623,6 +626,8 @@ Wu.App = Wu.Class.extend({
 				return this * Math.PI / 180;
 			}
 		}
+
+
 
 	},
 

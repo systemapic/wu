@@ -2591,7 +2591,7 @@ input.cmn-toggle-round-flat + label:before {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 99999; }
+  z-index: 9999999; }
 
 .leaflet-control-cartocss {
   width: 26px;
@@ -4946,7 +4946,7 @@ button.image-attachment {
 /* SHARE */
 /* SHARE */
 .q-editor-content-item.share {
-  min-height: 420px; }
+  min-height: 450px; }
 
 .share-wrapper {
   height: 240px;
@@ -6375,7 +6375,7 @@ input[type=checkbox] + label.check {
 #header,
 .fullpage-users,
 .fullpage-mediaLibrary {
-	z-index: 99999;
+	z-index: 999999;
 }	;/*dropzone*/
 .dropzone-meta {
 	width: 100%;
@@ -6625,12 +6625,6 @@ body {
     	-webkit-animation-iteration-count:infinite;
     	animation-iteration-count:infinite;
 	}
-
-
-
-
-
-
 
 
 

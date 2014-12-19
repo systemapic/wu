@@ -212,6 +212,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 			// get snapshot from server
 			Wu.post('/api/util/pdfsnapshot', hash, that.createdPrint, that);
+			console.log('setn req');
 
 		});
 
@@ -220,7 +221,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	},
 
 	createdPrint : function (context, file) {
-
+		console.log('cb');
 		// parse results
 		var result = JSON.parse(file);
 		var pdf = result.pdf;
