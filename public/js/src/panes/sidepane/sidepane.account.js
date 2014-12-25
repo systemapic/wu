@@ -11,20 +11,6 @@ Wu.SidePane.Account = Wu.SidePane.Item.extend({
 		// clear default content
 		this._content.innerHTML = '';
 
-
-
-		// // get vars
-		// var name = this._account.getName();
-
-		// // create name div
-		// var nameWrap = Wu.DomUtil.create('div', 'account-name-wrap', this._content);
-		// this._name = Wu.DomUtil.create('div', 'account-name', nameWrap, name);
-		
-		// // create logout div
-		// var logoutWrap = Wu.DomUtil.create('div', 'account-logout-wrap', this._content);
-		// this._logoutButton = Wu.DomUtil.create('div', 'account-logout-button', logoutWrap, 'Logout');
-
-
 		// add tooltip
 		app.Tooltip.add(this._menu, 'Logs you out of the portal' );
 
