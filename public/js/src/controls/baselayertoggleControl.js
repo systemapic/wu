@@ -76,7 +76,6 @@ L.Control.BaselayerToggle = L.Control.extend({
 				layer : this.project.getLayer(b.uuid),
 				baseLayer : b
 			}
-			// baseLayer.layer = this.project.getLayer(baseLayer.uuid);
 			this.addLayer(baseLayer);
 		}, this);
 
