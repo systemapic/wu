@@ -34,6 +34,7 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	add : function (type) {
+		console.log('add: ', type);
 
 		if (type == 'baselayer') this._isBase = true;
 		this.addTo();
@@ -41,6 +42,7 @@ Wu.Layer = Wu.Class.extend({
 
 	addTo : function () {
 		
+
 		// add to map
 		this._addTo();
 		
@@ -67,6 +69,7 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	addToControls : function () {
+		if (this._isBase) return;
 
 		this._addToLegends();
 
