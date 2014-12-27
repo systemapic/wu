@@ -875,7 +875,6 @@ L.DomUtil = {
 			value = css ? css[style] : null;
 		}
 
-		console.log('value: ', value);
 		return value === 'auto' ? null : value;
 	},
 
@@ -5112,8 +5111,6 @@ L.Path = (L.Path.SVG && !window.L_PREFER_CANVAS) || !L.Browser.canvas ? L.Path :
 	_updateStyle: function () {
 		var options = this.options;
 
-		// console.log('_updateStyle', options);
-
 		if (options.stroke) {
 			this._ctx.lineWidth = options.weight;
 			this._ctx.strokeStyle = options.color;
@@ -6163,15 +6160,12 @@ L.GeoJSON = L.FeatureGroup.extend({
 	},
 
 	setStyle: function (style) {
-		// console.log('L.geoJson setStyle(style)', style)
 		this.eachLayer(function (layer) {
-			// console.log('eachlayer, ', layer);
 			this._setLayerStyle(layer, style);
 		}, this);
 	},
 
 	_setLayerStyle: function (layer, style) {
-		// console.log('WAHWAHWAHWAH');
 		if (typeof style === 'function') {
 			style = style(layer.feature);
 		}
@@ -7966,7 +7960,6 @@ L.Control = L.Class.extend({
 		this._map = null;
 
 		if (this.onRemove) {
-			console.log('onRemove generic');
 			this.onRemove(map);
 		}
 
