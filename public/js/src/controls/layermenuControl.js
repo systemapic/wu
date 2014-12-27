@@ -16,6 +16,10 @@ L.Control.Layermenu = L.Control.extend({
 		// add some divsscroller-frame
 		this.initLayout();
 
+		// stops
+		Wu.DomEvent.on(container, 'mouseup', Wu.DomEvent.stop, this);
+
+
 		// nb! content is not ready yet, cause not added to map! 
 		return container;
 
@@ -71,6 +75,7 @@ L.Control.Layermenu = L.Control.extend({
 
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
+
 
 	},
 
@@ -236,36 +241,10 @@ L.Control.Layermenu = L.Control.extend({
 		// remove new drag'n drop folder
 		this._removeMenuFolder();
 
-		// hide edit buttons for menu items
-		// this._hideEditButtons();
-
-		// close all items in layerMenuItem
-		//this.closeAll();
-
+		
 	},
 
-	// _hideEditButtons : function () {	// expensive?? yes!
-	// 	// var elems = [];
-	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
-	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
-	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
-	// 	// elems = _.flatten(elems);
-	// 	// elems.forEach(function (one) {
-	// 	// 	one.style.display = 'none';
-	// 	// });
-	// },
-
-	// _showEditButtons : function () {	// todo: refactor! 
-	// 	// var elems = [];
-	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
-	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
-	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
-	// 	// elems = _.flatten(elems);
-	// 	// elems.forEach(function (one) {
-	// 	// 	one.style.display = 'block';
-	// 	// });
-	// },
-
+	
 
 	_insertMenuFolder : function () {
 		

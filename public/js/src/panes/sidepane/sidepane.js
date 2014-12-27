@@ -119,6 +119,8 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	_getPaneArray : function (project) {
+
+		console.error('_getPaneArray');
 		
 		var project = project || app.activeProject;
 		if (!project) return;
@@ -140,6 +142,9 @@ Wu.SidePane = Wu.Class.extend({
 		if (pane.share 		&& settings.socialSharing) 	panes.push('Share');
 		if (pane.account) 					panes.push('Account');
 
+
+		console.log('_getPaneArray', panes);
+		console.log('pane:', pane);
 
 		return panes;
 	},
