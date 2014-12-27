@@ -22,10 +22,15 @@ Wu.Tooltip = Wu.Class.extend({
 
 	initialize : function () {
 		this.tips = [];
-		this.active = true;	// todo: setting active or not
 
 		// set default opentip style
 		Opentip.styles.systyle = this.defaultStyle;
+	},
+
+	_isActive : function () {
+		var project = app.activeProject;
+		if (!project) return false;
+		return project.getSettings().tooltips;
 	},
 
 	add : function (div, content, options) {
@@ -41,10 +46,12 @@ Wu.Tooltip = Wu.Class.extend({
 		});
 
 		// add events (if tooltips setting is active)
-		if (this.active) this.on();
+		if (this._isActive) this.on();
 	},
 
 	on : function () {
+
+		console.error('tooltip on!');
 
 		// create tooltip
 		this.tips.forEach(function (t) {
@@ -84,7 +91,6 @@ Wu.Tooltip = Wu.Class.extend({
 
 	// turn on in settings
 	activate : function () {
-		this.active = true;
 
 		// register events
 		this.on();
@@ -94,7 +100,6 @@ Wu.Tooltip = Wu.Class.extend({
 
 	// turn off in settings
 	deactivate : function () {
-		this.active = false;
 
 		// deregister events
 		this.off();
