@@ -235,9 +235,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// select project
 		this.project.select();
 
-		// update sidepane
-		// Wu.app.SidePane.refreshProject(this.project);	// seems to be not needed anymore..
-
+		// remove startpane if active
+		app.StartPane.deactivate();
 	},
 
 	// add class to mark project active in sidepane
