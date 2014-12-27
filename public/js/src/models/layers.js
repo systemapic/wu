@@ -72,11 +72,8 @@ Wu.Layer = Wu.Class.extend({
 		if (this._isBase) return;
 
 		this._addToLegends();
-
 		this._addToInspect();
-
 		this._addToDescription();
-		
 	},
 
 	_addToLegends : function () {
@@ -444,39 +441,6 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		var grid = this.gridLayer;
 		if (!grid) return;
 
-
-		// // // add click event
-		// // grid.on('mousedown', function(e) {
-		// // 	if (!e.data) return;
-
-
-
-		// // 	// pass layer
-		// // 	e.layer = this;
-
-		// // 	// // add to pending
-		// // 	// app.MapPane._addPopupContent(e);
-
-		// // }, this);
-
-		// grid.on('click', function (e) {
-		// 	if (!e.data) return;
-
-		// 	// pass layer
-		// 	e.layer = this;
-
-		// 	app.MapPane._clearPopup();
-
-		// 	// add to pending
-		// 	app.MapPane._addPopupContent(e);
-
-		// 	// open popup
-		// 	app.MapPane.openPopup(e);
-		
-		// }, this);
-
-		// -----
-
 		
 		// add click event
 		grid.on('mousedown', function(e) {
@@ -770,8 +734,6 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		var file = this.getFile(fileUuid);
 
-		// console.log('got file: ', file);
-		// console.log('dataSize: ', file.dataSize);
 		return parseInt(file.dataSize);
 
 	},
@@ -805,16 +767,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		app.ProgressBar.hideProgress();
 	},
 
-	// setZIndex : function (zIndex) {
-
-	// 	// set zIndex for now or later
-	// 	this.zIndex = zIndex || 1;
-
-	// 	// return if not yet loaded
-	// 	if (!this.loaded) return;
-
-	// },
-
+	
 	getContainer : function () {
 
 		// return
@@ -839,10 +792,6 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	multiStyleChanged : function (data, multi, layr) {
 
-		// console.log('multiStyleChanged: data: ', data, this);
-		// console.log('multi: ', multi);
-		// console.log('layr: ', layr);
-
 		var layer = layr;
 		var style = data.style;
 		var __sid = layer.feature.properties.__sid;
@@ -855,15 +804,10 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	styleChanged : function (data) {
 
-		// console.log('styleChanged: data: ', data, this);
-		// return;
-
 		var style = data.style;
 		var target = data.target;
-
 		var id = target._leaflet_id;
 		var layer = this.getPathParentLayer(id);
-		// console.log('PARERRRRRRR ----- layer: ', layer);
 		var __sid = target.feature.properties.__sid;
 
 		// save style
@@ -875,19 +819,10 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		return app.MapPane.getEditableLayerParent(id);
 	},
 
-	// getStyle : function () {
-	// 	var style = this.store.style;
-	// 	if (!style) return false;
-	// 	return JSON.parse(style) 
-	// },
-
 	// save style to layer object
 	saveStyle : function (style, __sid) {	
 			
 		var json = this.layer.toGeoJSON();
-		// console.log('toGeoJSON: ', json);
-		// console.log('__sid: ', __sid);
-		// console.log('style: ', style);
 
 		var json = {};
 		json.layer  = this.getUuid();
@@ -966,9 +901,6 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		// create content
 		var string = '';
-		// string += feature.geometry.type + '<br>';	// debug
-		// string += '-------------------<br>';
-		// console.log('PUPUP::: feature: ', feature, layer);
 		for (key in feature.properties) {
 			var value = feature.properties[key];
 			// if not empty value
