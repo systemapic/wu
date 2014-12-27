@@ -1184,14 +1184,45 @@ module.exports = api = {
 			
 			var file = results[2]
 
-			// console.log('file: ', file);
-
 			res.end(JSON.stringify({
 				image : file.uuid,
 				error : null
 			}));
 		});
 		
+	},
+
+
+
+	// #########################################
+	// ###  API: Check Unique Slug           ###
+	// #########################################
+	checkUniqueProjectSlug : function (req, res) {
+
+		var value = req.body.value,
+		    clientUuid = req.body.client,
+		    projectUuid = req.body.project,
+		    slugs = [];
+
+		Project
+		.find({client : clientUuid})
+		.exec(function (err, projects) {
+
+			// get slugs
+			projects.forEach(function (p) {
+
+				// dont add self
+				if (p.uuid != projectUuid) slugs.push(p.slug.toLowerCase());
+			});
+
+			// check if slug already exists
+			var unique = !(slugs.indexOf(value.toLowerCase()) > -1);
+
+			// return results
+			res.end(JSON.stringify({
+				unique : unique
+			}));
+		});
 	},
 
 
@@ -1225,25 +1256,24 @@ module.exports = api = {
 	},
 
 	_newProject : function (user, json, callback) {
+
+		console.log('json: ', json);
+
+		var slug =  crypto.randomBytes(3).toString('hex');
 		
 		// new mongo model
 		var project 		= new Project();
 		project.uuid 		= 'project-' + uuid.v4();
 		project.createdBy 	= user.uuid;
 		project.createdByName   = user.firstName + ' ' + user.lastName;
-		project.slug 		= json.name.replace(/\s+/g, '').toLowerCase();
+		project.slug 		= slug;
+		// project.slug 		= json.name.replace(/\s+/g, '').toLowerCase();
 		project.name 		= json.name;
 		project.description 	= json.description;
 		project.keywords 	= json.keywords;
 		project.client 		= json.client;
 
-		// project.save(function (err) {
-		// 	if (err) console.error('Error saving new project: ', err);
-		// 	callback(err, project);
-		// });
-			
-			return project;
-
+		return project;
 	},
 
 	
