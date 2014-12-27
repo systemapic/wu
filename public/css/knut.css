@@ -249,5 +249,9 @@ body {
 	}
 
 
-
+.invalid {
+	background: red !important;
+	color: white;
+	border: 1px solid red;
+}
 

@@ -120,6 +120,18 @@ module.exports = function(app, passport) {
 
 	});
 
+	// =====================================
+	// CHECK UNIQUE SLUG ===================
+	// =====================================
+	// update project
+	app.post('/api/project/unique', isLoggedIn, function (req,res) {
+		console.log('/api/project/unique');
+
+		// API: check slug
+		api.checkUniqueProjectSlug(req, res);
+
+	});
+
 
 	// =====================================
 	// SET PROJECT HASH ====================
@@ -188,7 +200,7 @@ module.exports = function(app, passport) {
 		var file = req.params[0];
 		var path = IMAGEFOLDER + file;
 		
-		res.sendfile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
+		res.sendFile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
 
 	});
 

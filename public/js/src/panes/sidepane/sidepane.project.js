@@ -93,9 +93,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	addHooks : function () {
-		// Wu.DomEvent.on(this._container, 'mouseenter', this.open, this);
-		// Wu.DomEvent.on(this._container, 'mouseleave', this.close, this);
-		// Wu.DomEvent.on(this.users, 'mousedown', this.toggleInfo, this);
+
+		// select, stop
 		Wu.DomEvent.on(this._container, 'click',      this.select, this);
 		Wu.DomEvent.on(this._container, 'mousedown',  Wu.DomEvent.stopPropagation, this);	// to prevent closing of project pane
 	
@@ -104,8 +103,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	removeHooks : function () {
-		// Wu.DomEvent.off(this._container, 'mouseenter', this.open, this);
-		// Wu.DomEvent.off(this._container, 'mouseleave', this.close, this);
+
+		// select, stop
 		Wu.DomEvent.off(this._container, 'click', this.select, this);
 		Wu.DomEvent.off( this._container, 'mousedown', Wu.DomEvent.stopPropagation, this);
 
@@ -219,7 +218,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	openInfo : function () {
-		console.log('openInfo');
 		this.users.style.opacity = 1;
 	},
 
@@ -273,15 +271,18 @@ Wu.SidePane.Project = Wu.Class.extend({
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 
 		// save on blur or enter
-		Wu.DomEvent.on( target,  'blur',    this._editBlur, this );     // save folder title
-		Wu.DomEvent.on( target,  'keydown', this._editKey,  this );     // save folder title
+		Wu.DomEvent.on( target,  'blur',    this._editNameBlur, this );     // save folder title
+		Wu.DomEvent.on( target,  'keyup', this._editKeyName,  this );     // save folder title
 
 	},
 
-	_editBlur : function (e) {
-		
+	_editNameBlur : function (e) {
+
 		// get value
 		var value = e.target.value;
+
+		// if not valid slug, add salt
+		if (!this._valid) value += '_2';
 
 		// revert to <div>
 		var div = e.target.parentNode;
@@ -356,6 +357,47 @@ Wu.SidePane.Project = Wu.Class.extend({
 		if (event.which == 13 || event.keyCode == 13) e.target.blur();
 	},
 
+	_editKeyName : function (e) {
+		// blur on enter
+		if (event.which == 13 || event.keyCode == 13) e.target.blur();
+
+		var value = e.target.value,
+		    that = this;
+
+		// sanitize value: remove white space
+		value = value.replace(/\s+/g, '');
+
+		// check unique slug         // callback	
+		this._checkUniqueSlug(value, function (ctx, json) {
+			var result = JSON.parse(json);
+			!result.unique ? that._notUnique(e.target) : that._unique(e.target);
+		});
+	},
+
+	_unique : function (div) {
+		this._valid = true;
+		Wu.DomUtil.removeClass(div, 'invalid');
+	},
+
+	_notUnique : function (div) {
+		this._valid = false;
+
+		Wu.DomUtil.addClass(div, 'invalid');
+	},
+
+	_checkUniqueSlug : function (value, callback) {
+
+		var json = JSON.stringify({
+			value : value,
+			project : this.project.getUuid(),
+			client : this.project.getClient().getUuid()
+		});
+
+		// post
+		Wu.post('/api/project/unique', json, callback, this);
+	},
+
+
 	deleteProject : function (e) {
 
 		// prevent project select
@@ -406,4 +448,3 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 
 });
-
