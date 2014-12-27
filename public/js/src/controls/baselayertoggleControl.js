@@ -118,7 +118,6 @@ L.Control.BaselayerToggle = L.Control.extend({
 		} else {
 			
 			// enable
-			console.log('b enable');
 			layer.add('baselayer');
 			baseLayer.active = true;
 			Wu.DomUtil.addClass(item, 'active');
