@@ -69,8 +69,6 @@ Wu.StatusPane = Wu.Class.extend({
 	// open sidepane menu
 	open : function (e) {
 
-		console.log('statuspane open');
-		
 		this.isOpen = true;
 		if (app.SidePane) app.SidePane.expand();
 		this.refresh();
