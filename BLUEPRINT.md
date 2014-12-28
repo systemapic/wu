@@ -38,3 +38,28 @@ Structure:
 * Cluster
 * CDN's
 * Wiki data
+
+
+#Server Structure
+
+SX: Host Ruppells Griffon. Later will be moved to server in Sydney.
+TX: Systemapic Portal + homepage. (Currently tileserver.)
+PX: Main tileserver for errything.
+EX: Junk server + webhosting. Dev server.
+FX: Shut down.
+WWX: Move all webhosting here. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
