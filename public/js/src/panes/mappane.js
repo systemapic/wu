@@ -108,6 +108,9 @@ Wu.MapPane = Wu.Class.extend({
 		
 		this.project = project;
 
+		// clear active layers
+		this.clearActiveLayers();
+
 		// get editor privs
 		this._isEditor = app.Account.canUpdateProject(app.activeProject.getUuid());
 
@@ -176,8 +179,11 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 	addActiveLayer : function (layer) {
-
 		this._activeLayers.push(layer);
+	},
+
+	clearActiveLayers : function () {
+		this._activeLayers = [];
 	},
 
 	removeActiveLayer : function (layer) {
