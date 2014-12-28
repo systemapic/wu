@@ -30,7 +30,6 @@ Wu.Tooltip = Wu.Class.extend({
 	_isActive : function () {
 		var project = app.activeProject;
 		if (!project) return false;
-		console.log('_isActive:', project.getSettings());
 		return project.getSettings().tooltips;
 	},
 
@@ -80,8 +79,6 @@ Wu.Tooltip = Wu.Class.extend({
 
 	off : function () {
 
-		console.log('tooltip.off');
-
 		// remove tooltip
 		this.tips.forEach(function (t) {
 
@@ -95,8 +92,6 @@ Wu.Tooltip = Wu.Class.extend({
 	// turn on in settings
 	activate : function () {
 
-		console.log('activate');
-
 		// register events
 		this.on();
 
@@ -105,8 +100,6 @@ Wu.Tooltip = Wu.Class.extend({
 
 	// turn off in settings
 	deactivate : function () {
-
-		console.log('deactivate');
 
 		// deregister events
 		this.off();

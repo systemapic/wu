@@ -34,15 +34,12 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	add : function (type) {
-		console.log('add: ', type);
-
 		if (type == 'baselayer') this._isBase = true;
 		this.addTo();
 	},
 
 	addTo : function () {
 		
-
 		// add to map
 		this._addTo();
 		
@@ -171,8 +168,6 @@ Wu.Layer = Wu.Class.extend({
 		this.opacity = opacity || 1;
 		this.layer.setOpacity(this.opacity);
 	},
-
-
 
 	getOpacity : function () {
 		return this.opacity || 1;

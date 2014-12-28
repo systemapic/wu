@@ -230,8 +230,6 @@ L.Control.Legends = L.Control.extend({
 	// add legend from outside
 	addLegend : function (layer) {
 
-		console.log('adding legends: ', layer);
-
 		// each layer has its own legends
 		this._layers.push(layer);
 
