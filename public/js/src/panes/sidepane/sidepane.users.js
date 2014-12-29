@@ -678,23 +678,75 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	},
 
 	toggleReadAccess : function (item) {
-		// console.log('toggle READ: ', item);
+
+		// get user
 		var user = item.user;
 
 		// get current state
-		var state = (user.store.role.reader.projects.indexOf(item.project.getUuid())  >= 0) ? true : false;
+		var state = (user.store.role.reader.projects.indexOf(item.project.getUuid()) >= 0) ? true : false;
 
-		if (state) {
-			// remove read access
-			user.removeReadProject(item.project);
-			Wu.DomUtil.removeClass(item.read, 'gotAccess');
+		// if (state) {
+		// 	this._removeRead(item);
+		// } else {
+		// 	this._addRead(item);
+		// }
 
-		} else {
-			// add read access
-			user.addReadProject(item.project);
+		// add/remove
+		state ? this._removeRead(item) : this._addRead(item);
+
+	},
+
+	_removeRead : function (item) {
+
+		// remove read access
+		item.user.removeReadProject(item.project);
+		Wu.DomUtil.removeClass(item.read, 'gotAccess');
+
+		// if removing read, also remove edit
+	},
+
+	_addRead : function (item) {
+		// add read access
+		item.user.addReadProject(item.project);
+		Wu.DomUtil.addClass(item.read, 'gotAccess');
+	},
+
+	_removeUpdate : function (item) {
+		// remove read access
+		item.user.removeUpdateProject(item.project);
+		Wu.DomUtil.removeClass(item.edit, 'gotAccess');
+	},
+
+	_addUpdate : function (item) {
+		// add update access
+		item.user.addUpdateProject(item.project);
+		Wu.DomUtil.addClass(item.edit, 'gotAccess');
+
+		// add read access too
+		this._addRead(item);
+
+		// if (!item.user.canReadProject(item.project.getUuid())) {
+			// Wu.DomUtil.addClass(item.read, 'gotAccess');
+			// setTimeout(function () { item.user.addReadProject(item.project); }, 300); // todo: mongodb lock bug
+		// }
+	},
+
+	_removeManage : function (item) {
+		// remove manage access
+		item.user.removeManageProject(item.project);
+		Wu.DomUtil.removeClass(item.manage, 'gotAccess');
+	},
+
+	_addManage : function (item) {
+		// add manage access
+		item.user.addManageProject(item.project);
+		Wu.DomUtil.addClass(item.manage, 'gotAccess');
+
+		// add read access too
+		if (!item.user.canReadProject(item.project.getUuid())) {
 			Wu.DomUtil.addClass(item.read, 'gotAccess');
+			setTimeout(function () { item.user.addReadProject(item.project); }, 300);
 		}
-
 	},
 
 
@@ -705,23 +757,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// get current state
 		var state = (user.store.role.editor.projects.indexOf(item.project.getUuid())  >= 0) ? true : false;
 
-		if (state) {
-			// remove read access
-			user.removeUpdateProject(item.project);
-			Wu.DomUtil.removeClass(item.edit, 'gotAccess');
-
-		} else {
-			// add read access
-			user.addUpdateProject(item.project);
-			Wu.DomUtil.addClass(item.edit, 'gotAccess');
-
-			// add read access too
-			if (!user.canReadProject(item.project.getUuid())) {
-				Wu.DomUtil.addClass(item.read, 'gotAccess');
-				setTimeout(function () { user.addReadProject(item.project); }, 300);
-			}
-
-		}
+		// add/remove update access
+		state ? this._removeUpdate(item) : this._addUpdate(item);
 
 	},
 
@@ -732,41 +769,13 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// get current state
 		var state = (user.store.role.manager.projects.indexOf(item.project.getUuid())  >= 0) ? true : false;
 
-		if (state) {
-			// remove read access
-			user.removeManageProject(item.project);
-			Wu.DomUtil.removeClass(item.manage, 'gotAccess');
-
-		} else {
-			// add manage access
-			user.addManageProject(item.project);
-			Wu.DomUtil.addClass(item.manage, 'gotAccess');
-
-			// add read access too
-			if (!user.canReadProject(item.project.getUuid())) {
-				Wu.DomUtil.addClass(item.read, 'gotAccess');
-				setTimeout(function () { user.addReadProject(item.project); }, 300);
-			}
-
-		}
+		// add/remove manage access
+		state ? this._removeManage(item) : this._addManage(item);
+		
 
 	},
 
 	_getProjectAccessSchema : function () {
-
-		// get all projects for superusers
-		// if (app.Account.isSuperadmin()) {
-		// 	return _.toArray(app.Projects);
-		// }
-
-		// // manager: get projects user is manager for
-		// var readerProjects = [];
-		// app.Account.store.role.reader.projects.forEach(function (project) {
-		// 	readerProjects.push(app.Projects[project]);
-		// }, this);
-		// return _.toArray(readerProjects);
-
-		// todo: other users
 
 		// manager: get projects user is manager for
 		var managerProjects = [];
@@ -774,8 +783,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 			managerProjects.push(app.Projects[project]);
 		}, this);
 		return _.toArray(managerProjects);
-
-
 	},
 
 
@@ -784,8 +791,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		e.preventDefault();
 		e.stopPropagation();
 	},
-
-	
 
 	rename : function (e) {
 

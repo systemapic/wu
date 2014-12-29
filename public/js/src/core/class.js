@@ -1714,7 +1714,7 @@ Wu.DomEvent.removeListener = Wu.DomEvent.off;
     var retina = 'devicePixelRatio' in window && window.devicePixelRatio > 1;
 
     if (!retina && 'matchMedia' in window) {
-	var matches = window.matchMedia('(min-resolution:144dpi)');
+	var matches = window.matchMedia('(min-resolution:1.5dppx)');
 	retina = matches && matches.matches;
     }
 

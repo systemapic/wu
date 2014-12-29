@@ -40,7 +40,7 @@ module.exports = geo = {
 
 		geo.sendToTileserver(path, fileUuid, function (err, metadata){ 
 			
-			console.log('grinderImportGeojson done:', err);
+			console.log('sendToTileserver done:', err);
 	        	
 	        	
 	        	// console.log('meta???', metadata);
@@ -76,7 +76,7 @@ module.exports = geo = {
 
 
 	sendToTileserver : function (path, fileUuid, callback) {
-		console.log('grinderImportGeojson', path, fileUuid);
+		console.log('sendToTileserver', path, fileUuid);
 
 
 		fs.readJson(path, function (err, data) {
