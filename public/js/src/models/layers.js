@@ -465,8 +465,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 			var event = e.e.originalEvent;
 
-			if (this._event.x == event.x || this._event === undefined) {
-				// open popup
+			if (this._event === undefined || this._event.x == event.x) {
+				// open popup 
 				app.MapPane.openPopup(e);
 			} else {
 				// clear old

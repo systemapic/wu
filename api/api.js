@@ -834,7 +834,7 @@ module.exports = api = {
 			// send to tileserver storage
 			request({
 				method : 'POST',
-				uri : 'https://systemapic.com/import/cartocss',
+				uri : 'https://import.systemapic.com/import/cartocss',
 				json : {
 					css : css,
 					cartoid : cartoid

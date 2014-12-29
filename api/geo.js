@@ -96,7 +96,7 @@ module.exports = geo = {
 
 				// send to tx
 				request								// TODO: way too slow, 
-				 .post('https://systemapic.com/import/geojson')
+				 .post('https://import.systemapic.com/import/geojson')
 				 .send(buffer)
 				 .set('Accept-Encoding', 'gzip, deflate')
 				 .end(function (err, result) {
@@ -474,7 +474,7 @@ module.exports = geo = {
 				request({
 					method : 'POST',
 					// uri : 'http://78.46.107.15:8080/import/geojson',
-					uri : 'https:/systemapic.com/import/geojson',
+					uri : 'https:/import.systemapic.com/import/geojson',
 					json : {
 						geojson : data,
 						uuid : fileUuid,
