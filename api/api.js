@@ -270,7 +270,10 @@ module.exports = api = {
 
 					api._createLegend(result, function (err, path) {
 
-						if (err) return cb(err);
+						if (err) {
+							console.log('catchin 33 err: ,', err);
+							return cb(err);
+						}
 
 						// base64 encode png
 						fs.readFile(path, function (err, data) {
@@ -304,9 +307,6 @@ module.exports = api = {
 			}, function (err) {
 				callback(err, legends);
 			});
-
-
-
 		});
 
 
@@ -320,10 +320,11 @@ module.exports = api = {
 		async.waterfall(ops, function (err, legends) {
 			console.log('waterfall done');
 			console.log('err, legends', err, legends);
+			// console.log('err string: ', err.toString());
 
 			// catch err?
 			if (err) res.end(JSON.stringify({
-				err : err
+				err : err.toString()
 			}));
 			
 		});
@@ -448,12 +449,11 @@ module.exports = api = {
 		// map.load('./test/stylesheet.xml', function(err,map) {
 
 		try {
-			map.load(stylepath, function(err,map) {
+			map.load(stylepath, function(err, map) {
 				if (err) console.error('map.load err', err); // eg. if wrong path 
 
 
 				if (err) return callback(err);
-
 
 				map.zoomAll(); // todo: zoom?
 				var im = new mapnik.Image(100, 50);
@@ -461,7 +461,7 @@ module.exports = api = {
 					// if (err) throw err;
 					if (err) console.log('map.render err', err);
 
-					im.encode('png', function(err,buffer) {
+					im.encode('png', function(err, buffer) {
 						// if (err) throw err;
 						if (err) console.log('im.encode err: ', err);
 						// fs.writeFile('map.png',buffer, function(err) {
