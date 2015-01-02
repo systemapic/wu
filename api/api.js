@@ -66,7 +66,6 @@ var IMAGEFOLDER 	= '/var/www/data/images/';
 var TEMPFOLDER 		= '/var/www/data/tmp/';
 var CARTOCSSFOLDER 	= '/var/www/data/cartocss/';
 var TOOLSPATH 		= '/var/www/systemapic.com/app/tools/';
-
 var BASEURI 		= 'https://projects.ruppellsgriffon.com/';
 
 
@@ -155,11 +154,6 @@ module.exports = api = {
 
 
 
-
-
-
-
-
 	reloadMeta : function (req, res) {
 
 		var fileUuid = req.body.fileUuid;
@@ -216,12 +210,9 @@ module.exports = api = {
 		Layer
 		.findOne({uuid : layerUuid})
 		.exec(function (err, layer) {
-
 			layer.metadata = meta; 	// string?
 			layer.save(function (err) {
-
 				callback(err);
-
 			});
 		});
 	},
@@ -237,7 +228,6 @@ module.exports = api = {
 
 
 	generateLegends : function (req, res, finalcallback) {
-		console.log('createLegends!');
 
 		var fileUuid = req.body.fileUuid,
 		    cartoid = req.body.cartoid,
@@ -250,13 +240,8 @@ module.exports = api = {
 			api._getLayerFeaturesValues(fileUuid, cartoid, function (err, result) {
 				if (err) console.error('_getLayerFeaturesValues err: ', err);
 
-				console.log('_GOT SHIT: ', err, result);
-
 				var jah = result.rules;
 				var css = result.css;
-
-				console.log('_getLayerFeaturesValues jah: ', jah);
-				console.log('css: ', css);
 
 				callback(null, result);
 
@@ -283,13 +268,11 @@ module.exports = api = {
 				api._createStylesheet(options, function (err, result) {
 					if (err) console.log('create stylesheet err: ', err);
 
-					
 					api._createLegend(result, function (err, path) {
 
+						if (err) return cb(err);
 
 						// base64 encode png
-
-
 						fs.readFile(path, function (err, data) {
 
 							var base = data.toString('base64');
@@ -314,13 +297,12 @@ module.exports = api = {
 							cb(null);
 						});	
 					});
+
 				}, this);
 
 
 			}, function (err) {
-
-				callback(null, legends);
-
+				callback(err, legends);
 			});
 
 
@@ -330,11 +312,7 @@ module.exports = api = {
 
 
 		ops.push(function (legends, callback) {
-
-			console.log('got all legends!', legends);
-
 			res.end(JSON.stringify(legends));
-
 			callback();
 		});
 
@@ -342,6 +320,11 @@ module.exports = api = {
 		async.waterfall(ops, function (err, legends) {
 			console.log('waterfall done');
 			console.log('err, legends', err, legends);
+
+			// catch err?
+			if (err) res.end(JSON.stringify({
+				err : err
+			}));
 			
 		});
 
@@ -405,7 +388,6 @@ module.exports = api = {
 		// write geojson template to disk
 		var toFile = '/var/www/data/legends/template-' + lid + '.geojson'; 
 		fs.outputFile(toFile, JSON.stringify(geojson), function (err) {
-			// console.log('wrote goejson!!!');
 
 			var options = {
 				"srs": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over",
@@ -466,26 +448,34 @@ module.exports = api = {
 		// map.load('./test/stylesheet.xml', function(err,map) {
 
 		try {
-		map.load(stylepath, function(err,map) {
-			if (err) console.error(err); // ie. if wrong path 
-			map.zoomAll(); // todo: zoom?
-			var im = new mapnik.Image(100, 50);
-			map.render(im, function(err,im) {
-				if (err) throw err;
-				im.encode('png', function(err,buffer) {
-					if (err) throw err;
-					// fs.writeFile('map.png',buffer, function(err) {
-					var outpath = '/var/www/data/legends/' + lid + '.png';
-					fs.writeFile(outpath, buffer, function(err) {
-						if (err) throw err;
-						console.log('saved map image to map.png');
-						
+			map.load(stylepath, function(err,map) {
+				if (err) console.error('map.load err', err); // eg. if wrong path 
 
-						callback(null, outpath);
+
+				if (err) return callback(err);
+
+
+				map.zoomAll(); // todo: zoom?
+				var im = new mapnik.Image(100, 50);
+				map.render(im, function(err,im) {
+					// if (err) throw err;
+					if (err) console.log('map.render err', err);
+
+					im.encode('png', function(err,buffer) {
+						// if (err) throw err;
+						if (err) console.log('im.encode err: ', err);
+						// fs.writeFile('map.png',buffer, function(err) {
+						var outpath = '/var/www/data/legends/' + lid + '.png';
+						fs.writeFile(outpath, buffer, function(err) {
+							if (err) throw err;
+							console.log('saved map image to map.png');
+							
+
+							callback(null, outpath);
+						});
 					});
 				});
 			});
-		});
 
 		} catch (e) { console.log('FIX ERR!!!');}
 
@@ -527,9 +517,6 @@ module.exports = api = {
 
 					var string = JSON.stringify(info);
 
-					console.log('string: ', string);
-
-
 					// add rules to jah
 					var jah = [];
 					var rules1 = info.rules;//[0].rules;
@@ -565,27 +552,6 @@ module.exports = api = {
 						value : file.name
 					});
 
-
-					// // add rules to jah
-					// var jah = [];
-					// var rules = info.rules[0].rules;
-					// rules.forEach(function (rrules) {
-					// 	rrules.selectors.forEach(function (s) {
-					// 		var rule = s.filters.filters;
-					// 		for (var r in rule) {
-					// 			var jahrule = rule[r];
-					// 			jah.push({
-					// 				key : jahrule.key.value,
-					// 				value : jahrule.val.value
-					// 			});
-					// 		}
-					// 	});
-					// });
-
-
-					
-
-
 					
 
 					var result = {
@@ -594,7 +560,6 @@ module.exports = api = {
 					}
 
 
-					console.log('JAH!', result);
 					callback(null, result);
 
 				});
@@ -616,10 +581,6 @@ module.exports = api = {
 		console.log('parseCartoCSS', req.body);	
 
 		var css = req.body.css;
-
-		console.log('css: ', css);
-
-
 
 		// apply stylesheet to geojson with 1 tiny #id like #eidsvoll
 		// create png from geojson
@@ -4068,51 +4029,6 @@ module.exports = api = {
 
 	
 
-	// setRedisToken : function (user) {
-
-
-
-	// 	var key = 'authToken-' + user._id;
-	// 	var tok = crypto.randomBytes(22).toString('hex');
-	
-
-	// 	console.log('user _id', user._id);
-	// 	console.log('redis key: ', key);
-	// 	console.log('redis authToken: ', tok);
-
-
-
-	// 	redisClient.get(key, function (err, reply) {
-	// 		console.log('getting old key err, replu', err, reply);
-
-	// 		if (reply) {
-	// 			console.log('reply: ', reply)
-	// 			console.log('I live: ' + reply.toString());
-	// 		} 
-	// 	});
-
-
-
-	// 	// set key with 2 min expire
-	// 	console.log('setting new token');
-	// 	redisClient.set(key, tok, redis.print);
-	// 	redisClient.expire(key, 120);	// 2 minutes
-
-	// 	redisClient.get(key, function (err, reply) {
-	// 		console.log('getting new key err, replu', err, reply);
-
-	// 		if(reply) {
-	// 			console.log('reply: ', reply)
-	// 			console.log('I live: ' + reply.toString());
-	// 		} 
-	// 	});
-
-	// 	return tok;
-		
-	// },
-
-
-
 
 	// process wildcard paths, including hotlinks
 	processWildcardPath : function (req, res) {
@@ -4142,7 +4058,6 @@ module.exports = api = {
 
 
 	getHash : function (req, res) {
-		console.log('getHash: req.body: ', req.body);
 	
 		var id = req.body.id;
 		var projectUuid = req.body.projectUuid;		// todo: access restrictions
