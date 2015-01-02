@@ -17,14 +17,12 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		// set panes
 		this._panes = {};
 
-		// this._panes.projectTitle = Wu.DomUtil.get('h4-map-configuration-project-name');
-
 		// init each setting
 		this.mapSettings = {};
 		this.mapSettings.baselayer = new Wu.SidePane.Map.BaseLayers();
 		this.mapSettings.layermenu = new Wu.SidePane.Map.LayerMenu();
-		this.mapSettings.bounds    = new Wu.SidePane.Map.Bounds();
 		this.mapSettings.position  = new Wu.SidePane.Map.Position();
+		this.mapSettings.bounds    = new Wu.SidePane.Map.Bounds();
 		this.mapSettings.controls  = new Wu.SidePane.Map.Controls();
 		this.mapSettings.connect   = new Wu.SidePane.Map.Connect(this._settingsContainer);  // refactor container, ich.template
 		this.mapSettings.settings  = new Wu.SidePane.Map.Settings(this._settingsContainer);  // refactor container, ich.template

@@ -50,7 +50,6 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 	},
 
 	calculateHeight : function () {
-		console.log('mapsettings item calculateHeight');
 		this.maxHeight = this._inner.offsetHeight + 15;
 		this.minHeight = 0;
 	},

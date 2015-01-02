@@ -1,9 +1,5 @@
 .map-blur {
-/*	-webkit-filter: blur(3px) brightness(0.5) grayscale(0.5);
-	-moz-filter: blur(3px) brightness(0.5) grayscale(0.5);
-	filter: blur(3px) brightness(0.5) grayscale(0.5);
-	filter: url(images/filter.svg#svg-map-filter);
-*/	opacity: 1;
+	opacity: 1;
 	}
 
 .map-blur:after {
@@ -30,4 +26,8 @@
 .fullpage-users,
 .fullpage-mediaLibrary {
 	z-index: 999999;
-}	
+	}	
+
+.dropzone-meta {
+	z-index: 9999999 !important;
+	}

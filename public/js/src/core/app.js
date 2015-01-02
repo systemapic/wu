@@ -38,7 +38,7 @@ Wu.App = Wu.Class.extend({
 			// default accounts, added to all new (and old?) projects
 			mapbox : [{	
 				username : 'systemapic',
-				accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJQMWFRWUZnIn0.yrBvMg13AZC9lyOAAf9rGg'
+				accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q'
 			}]
 		},
 

@@ -471,10 +471,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._isOpen = true;
 
 		// Set overflow visible to not cut off info on hover on [i]
-		var that = this;
-		setTimeout(function() {
-			that._container.style.overflow = 'visible';
-		}, 500)
+		// var that = this;
+		// setTimeout(function() {
+		// 	that._container.style.overflow = 'visible';
+		// }, 500)
 
 		// close others
 		var clients = app.SidePane.Clients;
@@ -488,7 +488,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._isOpen = false;
 
 		// Remove overflow visible to not cut off info on hover on [i]
-		this._container.style.overflow = 'hidden';
+		// this._container.style.overflow = 'hidden';
 		
 	},
 
