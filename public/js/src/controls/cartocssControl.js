@@ -604,6 +604,11 @@ L.Control.CartoCSS = L.Control.extend({
 		this._layer.createLegends(function (ctx, json) {	// callback
 			var legends = JSON.parse(json);
 
+			if (legends && legends.err) {
+				console.error('legends err', legends);
+				return;
+			}
+
 			// sort some things: #layer on top
 			var layer = _.remove(legends, function (l) {
 				return l.key == 'layer';
