@@ -219,6 +219,8 @@ Wu.Layer = Wu.Class.extend({
 
 	getCartoCSS : function (cartoid, callback) {
 
+		console.log('getCartoCSS', cartoid);
+
 		var json = {
 			cartoid : cartoid
 		}
