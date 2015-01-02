@@ -396,7 +396,10 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			fileUuid: fileUuid,
 			cartoid : cartoid,
 			subdomains : 'abcd',
-			maxRequests : 8
+			// maxRequests : 8,
+			maxRequests : 0,
+			// reuseTiles : true,
+			// unloadInvisibleTiles : true
 		});
 	},
 
@@ -412,10 +415,14 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		// create gridlayer
 		this.gridLayer = new L.UtfGrid(url, {
 			useJsonP: false,
-			subdomains: 'ghi',
+			subdomains: 'ijk',
+			// subdomains: 'ghi',
 			maxRequests : 0,
 			requestTimeout : 20000
 		});
+
+		// debug
+		// this.gridLayer = false;
 
 		// add grid events
 		this._addGridEvents();

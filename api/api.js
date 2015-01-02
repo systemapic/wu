@@ -38,6 +38,14 @@ var carto = require('carto');
 var mapnikOmnivore = require('mapnik-omnivore');
 
 
+// redis
+var config = require('../config/config.js');
+var redis = require('redis');
+var r = redis.createClient(config.temptokenRedis.port, config.temptokenRedis.host)
+r.auth(config.temptokenRedis.auth);
+r.on('error', function (err) {
+	console.error(err);
+});
 
 
 
@@ -169,20 +177,13 @@ module.exports = api = {
 			// save meta to fil
 			api.setMeta(meta, layerUuid, function (err, result) {
 
-
 				// return meta
 				res.end(JSON.stringify({
 					error : err,
 					meta : meta
 				}));
-
-			})
-
-
-		})
-
-
-
+			});
+		});
 	},
 
 
@@ -204,7 +205,6 @@ module.exports = api = {
 				callback(err, metadata);
 			});			
 		});
-
 	},
 
 
@@ -221,19 +221,13 @@ module.exports = api = {
 				callback(err);
 
 			});
-
-
-		})
-
-
-
+		});
 	},
 
 
 	createLegends : function (req, res) {
 
 		api.generateLegends(req, res, function (err, legends) {
-
 			// todo move res.end here
 		});
 
@@ -243,13 +237,10 @@ module.exports = api = {
 	generateLegends : function (req, res, finalcallback) {
 		console.log('createLegends!');
 
-		var fileUuid = req.body.fileUuid;
-		var cartoid = req.body.cartoid;
-		var layerUuid = req.body.layerUuid;
-
-
-
-		var ops = [];
+		var fileUuid = req.body.fileUuid,
+		    cartoid = req.body.cartoid,
+		    layerUuid = req.body.layerUuid,
+		    ops = [];
 
 		// get layer features/values
 		ops.push(function (callback) {
@@ -794,7 +785,7 @@ module.exports = api = {
 
 
 	// #########################################
-	// ###  API: Create PDF Snapshot         ###
+	// ###  API:          ###
 	// #########################################
 	getCartoCSS : function (req, res) {
 		var cartoId = req.body.cartoid;
@@ -807,7 +798,7 @@ module.exports = api = {
 
 
 	// #########################################
-	// ###  API: Create PDF Snapshot         ###
+	// ###  API:          ###
 	// #########################################
 	setCartoCSS : function (req, res) {
 		console.log('setCartoCSS');
@@ -1053,9 +1044,6 @@ module.exports = api = {
 
 
 		async.series(ops, function (err, results) {
-			// console.log('all done: ', err);
-			// console.log('results', results);
-
 			res.end(JSON.stringify({
 				pdf : fileUuid,
 				error : null
@@ -1211,7 +1199,7 @@ module.exports = api = {
 			// get slugs
 			projects.forEach(function (p) {
 
-				// dont add self
+				// add but self
 				if (p.uuid != projectUuid) slugs.push(p.slug.toLowerCase());
 			});
 
@@ -1276,6 +1264,10 @@ module.exports = api = {
 		return project;
 	},
 
+
+
+
+
 	
 
 
@@ -1286,9 +1278,15 @@ module.exports = api = {
 
 		var email = req.body.email;
 
+		console.log('email: ', email);
+
 		User
 		.findOne({'local.email' : email})
 		.exec(function (err, user) {
+
+			console.log('err, user, ', err, user);
+
+			if (err || !user) return res.end();
 
 			var password = crypto.randomBytes(16).toString('hex');
 			user.local.password = user.generateHash(password);
@@ -1303,6 +1301,159 @@ module.exports = api = {
 			});
 		});
 	},
+
+
+
+	requestPasswordReset : function (req, res) {
+
+		// send email with link to confirm pass change.
+
+		console.log('requestPasswordReset');
+		// var user = req.user;
+		console.log('req.useR: ', req.user);
+		console.log('req.body: ', req.body);
+
+		// get email
+		var email = req.body.email;
+
+		User
+		.findOne({'local.email' : email})
+		.exec(function (err, user) {
+
+			console.log('22 err, user', err, user);
+
+			// send password reset email
+			if (!err && user) api.sendPasswordResetEmail(user);
+
+			// finish
+			res.render('../../views/login.ejs', { message: 'Please check your email for further instructions.' });
+			res.end();
+
+		});
+	},
+
+	confirmPasswordReset : function (req, res) {
+
+		console.log('confirm reset');
+
+		var email = req.query.email;
+		var token = req.query.token;
+
+		console.log('email: ', email);
+		console.log('token: ', token);
+
+		User
+		.findOne({'local.email' : email})
+		.exec(function (err, user) {
+
+			// err
+			if (err || !user) console.error('no user ?', err, user);
+
+			// check token
+			api.checkPasswordResetToken(user, token, function (valid) {
+
+				// reset if valid token
+				if (valid) {
+					api.resetPassword(user);
+					var message = 'Please check your email for new login details.';
+				} else {
+					var message = 'Authorization failed. Please try again.';
+				}
+
+				// finish
+				res.render('../../views/login.ejs', { message : message });
+			});
+		});
+
+	},
+
+	resetPassword : function (user) {
+		console.log('resetting passowrd');
+
+		var password = crypto.randomBytes(16).toString('hex');
+		user.local.password = user.generateHash(password);
+		user.markModified('local');
+	
+		// save the user
+		user.save(function(err, doc) { 
+
+			// send email with login details to user
+			api.sendNewUserEmail(user, password);
+		
+		});
+	},
+
+
+	setPasswordResetToken : function (user) {
+
+		console.log('getPasswordResetToken');
+
+		var token = crypto.randomBytes(16).toString('hex');
+		var key = 'resetToken-' + user.uuid;
+
+
+
+		r.set(key, token);  // set temp token
+		r.expire(key, 600); // expire in ten mins
+
+
+		return token;
+
+	},
+
+	checkPasswordResetToken : function (user, token, callback) {
+
+		console.log('checkpass!');
+		console.log(user, token);
+
+		var key = 'resetToken-' + user.uuid;
+
+		r.get(key, function (err, actualToken) {
+
+			console.log('err', err, actualToken);
+
+			// return
+			callback(!err && actualToken && actualToken == token)
+		});
+
+	},
+
+	sendPasswordResetEmail : function (user) {
+		console.log('sending email!', user);
+		
+		// todo: SSL
+		var name    = user.firstName + ' ' + user.lastName;
+		var email   = user.local.email;
+		var token   = api.setPasswordResetToken(user);
+		var link    = 'https://projects.ruppellsgriffon.com/reset?email=' + email + '&token=' + token;
+
+		var from    = 'Systemapic.com <knutole@noerd.biz>'; // todo: change!
+		var to      = email;
+		var subject = 'Please confirm your request for a password reset';
+		var body    = '<h4>You have requested a password reset.</h4>Reset your password by clicking this link: ' + link;
+		body       += '<br><br>The link is valid for ten minutes.<br>If you think you have received this email in error, no further action is required.'
+		var bcc     = ['knutole@noerd.biz']; // todo: add admins, superadmins to bcc
+
+		// hook up to gmail
+		var transporter = nodemailer.createTransport({
+			service: 'gmail',
+			auth: {
+				user: 'knutole@noerd.biz',
+				pass: '***REMOVED***@noerdbiz'
+			}
+		});
+
+		// send email
+		transporter.sendMail({
+			from    : from,
+			to      : to,	
+			bcc     : bcc, 
+			subject : subject,
+			html    : body
+		});
+
+	},
+
 
 
 	_errorUnauthorized : function (req, res) {
@@ -2232,6 +2383,40 @@ module.exports = api = {
 
 
 	sendNewUserEmail : function (newUser, password) {
+		console.log('sending email!')
+		
+		// todo: SSL
+		var name    = newUser.firstName + ' ' + newUser.lastName;
+		var email   = newUser.local.email;
+
+		var from    = 'Systemapic.com <knutole@noerd.biz>';
+		var to      = email;
+		var body    = '<h1>Welcome to Systemapic.com ' + name + '</h1><br><h3>Login to <a href="http://systemapic.com" target="_blank">Systemapic.com</a> with the following details:</h3><br>Username: ' + email + ' <br>Password: ' + password;
+		var subject = 'Congratulations! Here are your access details for Systemapic.com';
+		var bcc     = ['knutole@noerd.biz']; // todo: add admins, superadmins to bcc
+
+		// hook up to gmail
+		var transporter = nodemailer.createTransport({
+			service: 'gmail',
+			auth: {
+				user: 'knutole@noerd.biz',
+				pass: '***REMOVED***@noerdbiz'
+			}
+		});
+
+		// send email
+		transporter.sendMail({
+			from    : from,
+			to      : to,	
+			bcc     : bcc, 
+			subject : subject,
+			html    : body
+		});
+
+	},
+
+
+	sendConfirmPasswordChange : function (newUser, password) {
 		console.log('sending email!')
 		
 		// todo: SSL

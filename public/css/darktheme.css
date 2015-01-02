@@ -1,11 +1,24 @@
 #map {
-	-webkit-transition: -webkit-filter 150ms linear, left 250ms ease, width 250ms ease;
+	/*-webkit-transition: -webkit-filter 150ms linear, left 250ms ease, width 250ms ease;*/
 	}
 
 .map-blur {
-	-webkit-filter: grayscale(0.75) blur(3px);
-	opacity: 0.5;
+	/*-webkit-filter: grayscale(0.75) blur(3px);*/
+	/*opacity: 0.5;*/
 	}
+
+
+.map-blur {
+	opacity: 1;
+	}
+
+.map-blur:after {
+	background: rgba(255,255,255,0.5);	
+	}
+
+
+
+
 
 h3, h4 {
 	color: white;
@@ -556,6 +569,9 @@ input.cmn-toggle-round-flat:checked + label:after {
 .baselayertoggle-item {
 	background: #999;
 	color: black;
+
+	border-top: 1px solid rgba(33, 33, 33, 0.95);
+	border-bottom: 1px solid rgba(33, 33, 33, 0.95);
 	}
 
 .baselayertoggle-item.active {

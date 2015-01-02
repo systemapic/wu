@@ -1714,7 +1714,7 @@ Wu.DomEvent.removeListener = Wu.DomEvent.off;
     var retina = 'devicePixelRatio' in window && window.devicePixelRatio > 1;
 
     if (!retina && 'matchMedia' in window) {
-	var matches = window.matchMedia('(min-resolution:144dpi)');
+	var matches = window.matchMedia('(min-resolution:1.5dppx)');
 	retina = matches && matches.matches;
     }
 
@@ -2077,7 +2077,7 @@ L.Popup.include({
 	},
 
 	_getPaneArray : function (project) {
-		
+
 		var project = project || app.activeProject;
 		if (!project) return;
 
@@ -2087,8 +2087,6 @@ L.Popup.include({
 		    isEditor = app.Account.canUpdateProject(project.getUuid()),
 		    isManager = app.Account.canManageProject(project.getUuid());
 
-
-
 		if (pane.clients) 					panes.push('Clients');
 		if (pane.mapOptions 	&& isEditor) 			panes.push('Map');
 		if (pane.documents   	&& settings.documentsPane) 	panes.push('Documents');
@@ -2097,7 +2095,6 @@ L.Popup.include({
 		if (pane.users 		&& isManager) 			panes.push('Users');
 		if (pane.share 		&& settings.socialSharing) 	panes.push('Share');
 		if (pane.account) 					panes.push('Account');
-
 
 		return panes;
 	},
@@ -2991,9 +2988,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	addHooks : function () {
-		// Wu.DomEvent.on(this._container, 'mouseenter', this.open, this);
-		// Wu.DomEvent.on(this._container, 'mouseleave', this.close, this);
-		// Wu.DomEvent.on(this.users, 'mousedown', this.toggleInfo, this);
+
+		// select, stop
 		Wu.DomEvent.on(this._container, 'click',      this.select, this);
 		Wu.DomEvent.on(this._container, 'mousedown',  Wu.DomEvent.stopPropagation, this);	// to prevent closing of project pane
 	
@@ -3002,8 +2998,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	removeHooks : function () {
-		// Wu.DomEvent.off(this._container, 'mouseenter', this.open, this);
-		// Wu.DomEvent.off(this._container, 'mouseleave', this.close, this);
+
+		// select, stop
 		Wu.DomEvent.off(this._container, 'click', this.select, this);
 		Wu.DomEvent.off( this._container, 'mousedown', Wu.DomEvent.stopPropagation, this);
 
@@ -3117,7 +3113,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	openInfo : function () {
-		console.log('openInfo');
 		this.users.style.opacity = 1;
 	},
 
@@ -3133,9 +3128,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// select project
 		this.project.select();
 
-		// update sidepane
-		// Wu.app.SidePane.refreshProject(this.project);	// seems to be not needed anymore..
-
+		// remove startpane if active
+		app.StartPane.deactivate();
 	},
 
 	// add class to mark project active in sidepane
@@ -3172,15 +3166,18 @@ Wu.SidePane.Project = Wu.Class.extend({
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 
 		// save on blur or enter
-		Wu.DomEvent.on( target,  'blur',    this._editBlur, this );     // save folder title
-		Wu.DomEvent.on( target,  'keydown', this._editKey,  this );     // save folder title
+		Wu.DomEvent.on( target,  'blur',    this._editNameBlur, this );     // save folder title
+		Wu.DomEvent.on( target,  'keyup', this._editKeyName,  this );     // save folder title
 
 	},
 
-	_editBlur : function (e) {
-		
+	_editNameBlur : function (e) {
+
 		// get value
 		var value = e.target.value;
+
+		// if not valid slug, add salt
+		if (!this._valid) value += '_2';
 
 		// revert to <div>
 		var div = e.target.parentNode;
@@ -3255,6 +3252,47 @@ Wu.SidePane.Project = Wu.Class.extend({
 		if (event.which == 13 || event.keyCode == 13) e.target.blur();
 	},
 
+	_editKeyName : function (e) {
+		// blur on enter
+		if (event.which == 13 || event.keyCode == 13) e.target.blur();
+
+		var value = e.target.value,
+		    that = this;
+
+		// sanitize value: remove white space
+		value = value.replace(/\s+/g, '');
+
+		// check unique slug         // callback	
+		this._checkUniqueSlug(value, function (ctx, json) {
+			var result = JSON.parse(json);
+			!result.unique ? that._notUnique(e.target) : that._unique(e.target);
+		});
+	},
+
+	_unique : function (div) {
+		this._valid = true;
+		Wu.DomUtil.removeClass(div, 'invalid');
+	},
+
+	_notUnique : function (div) {
+		this._valid = false;
+
+		Wu.DomUtil.addClass(div, 'invalid');
+	},
+
+	_checkUniqueSlug : function (value, callback) {
+
+		var json = JSON.stringify({
+			value : value,
+			project : this.project.getUuid(),
+			client : this.project.getClient().getUuid()
+		});
+
+		// post
+		Wu.post('/api/project/unique', json, callback, this);
+	},
+
+
 	deleteProject : function (e) {
 
 		// prevent project select
@@ -3304,9 +3342,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 
 
-});
-
-;// subelements in clients sidepane
+});;// subelements in clients sidepane
 Wu.SidePane.Client = Wu.Class.extend({
 
 
@@ -3779,10 +3815,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._isOpen = true;
 
 		// Set overflow visible to not cut off info on hover on [i]
-		var that = this;
-		setTimeout(function() {
-			that._container.style.overflow = 'visible';
-		}, 500)
+		// var that = this;
+		// setTimeout(function() {
+		// 	that._container.style.overflow = 'visible';
+		// }, 500)
 
 		// close others
 		var clients = app.SidePane.Clients;
@@ -3796,7 +3832,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._isOpen = false;
 
 		// Remove overflow visible to not cut off info on hover on [i]
-		this._container.style.overflow = 'hidden';
+		// this._container.style.overflow = 'hidden';
 		
 	},
 
@@ -4497,23 +4533,75 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	toggleReadAccess : function (item) {
-		// console.log('toggle READ: ', item);
+
+		// get user
 		var user = item.user;
 
 		// get current state
-		var state = (user.store.role.reader.projects.indexOf(item.project.getUuid())  >= 0) ? true : false;
+		var state = (user.store.role.reader.projects.indexOf(item.project.getUuid()) >= 0) ? true : false;
 
-		if (state) {
-			// remove read access
-			user.removeReadProject(item.project);
-			Wu.DomUtil.removeClass(item.read, 'gotAccess');
+		// if (state) {
+		// 	this._removeRead(item);
+		// } else {
+		// 	this._addRead(item);
+		// }
 
-		} else {
-			// add read access
-			user.addReadProject(item.project);
+		// add/remove
+		state ? this._removeRead(item) : this._addRead(item);
+
+	},
+
+	_removeRead : function (item) {
+
+		// remove read access
+		item.user.removeReadProject(item.project);
+		Wu.DomUtil.removeClass(item.read, 'gotAccess');
+
+		// if removing read, also remove edit
+	},
+
+	_addRead : function (item) {
+		// add read access
+		item.user.addReadProject(item.project);
+		Wu.DomUtil.addClass(item.read, 'gotAccess');
+	},
+
+	_removeUpdate : function (item) {
+		// remove read access
+		item.user.removeUpdateProject(item.project);
+		Wu.DomUtil.removeClass(item.edit, 'gotAccess');
+	},
+
+	_addUpdate : function (item) {
+		// add update access
+		item.user.addUpdateProject(item.project);
+		Wu.DomUtil.addClass(item.edit, 'gotAccess');
+
+		// add read access too
+		this._addRead(item);
+
+		// if (!item.user.canReadProject(item.project.getUuid())) {
+			// Wu.DomUtil.addClass(item.read, 'gotAccess');
+			// setTimeout(function () { item.user.addReadProject(item.project); }, 300); // todo: mongodb lock bug
+		// }
+	},
+
+	_removeManage : function (item) {
+		// remove manage access
+		item.user.removeManageProject(item.project);
+		Wu.DomUtil.removeClass(item.manage, 'gotAccess');
+	},
+
+	_addManage : function (item) {
+		// add manage access
+		item.user.addManageProject(item.project);
+		Wu.DomUtil.addClass(item.manage, 'gotAccess');
+
+		// add read access too
+		if (!item.user.canReadProject(item.project.getUuid())) {
 			Wu.DomUtil.addClass(item.read, 'gotAccess');
+			setTimeout(function () { item.user.addReadProject(item.project); }, 300);
 		}
-
 	},
 
 
@@ -4524,23 +4612,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// get current state
 		var state = (user.store.role.editor.projects.indexOf(item.project.getUuid())  >= 0) ? true : false;
 
-		if (state) {
-			// remove read access
-			user.removeUpdateProject(item.project);
-			Wu.DomUtil.removeClass(item.edit, 'gotAccess');
-
-		} else {
-			// add read access
-			user.addUpdateProject(item.project);
-			Wu.DomUtil.addClass(item.edit, 'gotAccess');
-
-			// add read access too
-			if (!user.canReadProject(item.project.getUuid())) {
-				Wu.DomUtil.addClass(item.read, 'gotAccess');
-				setTimeout(function () { user.addReadProject(item.project); }, 300);
-			}
-
-		}
+		// add/remove update access
+		state ? this._removeUpdate(item) : this._addUpdate(item);
 
 	},
 
@@ -4551,41 +4624,13 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// get current state
 		var state = (user.store.role.manager.projects.indexOf(item.project.getUuid())  >= 0) ? true : false;
 
-		if (state) {
-			// remove read access
-			user.removeManageProject(item.project);
-			Wu.DomUtil.removeClass(item.manage, 'gotAccess');
-
-		} else {
-			// add manage access
-			user.addManageProject(item.project);
-			Wu.DomUtil.addClass(item.manage, 'gotAccess');
-
-			// add read access too
-			if (!user.canReadProject(item.project.getUuid())) {
-				Wu.DomUtil.addClass(item.read, 'gotAccess');
-				setTimeout(function () { user.addReadProject(item.project); }, 300);
-			}
-
-		}
+		// add/remove manage access
+		state ? this._removeManage(item) : this._addManage(item);
+		
 
 	},
 
 	_getProjectAccessSchema : function () {
-
-		// get all projects for superusers
-		// if (app.Account.isSuperadmin()) {
-		// 	return _.toArray(app.Projects);
-		// }
-
-		// // manager: get projects user is manager for
-		// var readerProjects = [];
-		// app.Account.store.role.reader.projects.forEach(function (project) {
-		// 	readerProjects.push(app.Projects[project]);
-		// }, this);
-		// return _.toArray(readerProjects);
-
-		// todo: other users
 
 		// manager: get projects user is manager for
 		var managerProjects = [];
@@ -4593,8 +4638,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 			managerProjects.push(app.Projects[project]);
 		}, this);
 		return _.toArray(managerProjects);
-
-
 	},
 
 
@@ -4603,8 +4646,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		e.preventDefault();
 		e.stopPropagation();
 	},
-
-	
 
 	rename : function (e) {
 
@@ -4725,14 +4766,12 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// set panes
 		this._panes = {};
 
-		// this._panes.projectTitle = Wu.DomUtil.get('h4-map-configuration-project-name');
-
 		// init each setting
 		this.mapSettings = {};
 		this.mapSettings.baselayer = new Wu.SidePane.Map.BaseLayers();
 		this.mapSettings.layermenu = new Wu.SidePane.Map.LayerMenu();
-		this.mapSettings.bounds    = new Wu.SidePane.Map.Bounds();
 		this.mapSettings.position  = new Wu.SidePane.Map.Position();
+		this.mapSettings.bounds    = new Wu.SidePane.Map.Bounds();
 		this.mapSettings.controls  = new Wu.SidePane.Map.Controls();
 		this.mapSettings.connect   = new Wu.SidePane.Map.Connect(this._settingsContainer);  // refactor container, ich.template
 		this.mapSettings.settings  = new Wu.SidePane.Map.Settings(this._settingsContainer);  // refactor container, ich.template
@@ -4851,7 +4890,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	calculateHeight : function () {
-		console.log('mapsettings item calculateHeight');
 		this.maxHeight = this._inner.offsetHeight + 15;
 		this.minHeight = 0;
 	},
@@ -9245,6 +9283,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		
 		this.project = project;
 
+		// clear active layers
+		this.clearActiveLayers();
+
 		// get editor privs
 		this._isEditor = app.Account.canUpdateProject(app.activeProject.getUuid());
 
@@ -9313,8 +9354,11 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	addActiveLayer : function (layer) {
-
 		this._activeLayers.push(layer);
+	},
+
+	clearActiveLayers : function () {
+		this._activeLayers = [];
 	},
 
 	removeActiveLayer : function (layer) {
@@ -10200,8 +10244,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	// open sidepane menu
 	open : function (e) {
 
-		console.log('statuspane open');
-		
 		this.isOpen = true;
 		if (app.SidePane) app.SidePane.expand();
 		this.refresh();
@@ -10377,6 +10419,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// add some divsscroller-frame
 		this.initLayout();
 
+		// stops
+		Wu.DomEvent.on(container, 'mouseup', Wu.DomEvent.stop, this);
+
+
 		// nb! content is not ready yet, cause not added to map! 
 		return container;
 
@@ -10432,6 +10478,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
+
 
 	},
 
@@ -10597,36 +10644,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// remove new drag'n drop folder
 		this._removeMenuFolder();
 
-		// hide edit buttons for menu items
-		// this._hideEditButtons();
-
-		// close all items in layerMenuItem
-		//this.closeAll();
-
+		
 	},
 
-	// _hideEditButtons : function () {	// expensive?? yes!
-	// 	// var elems = [];
-	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
-	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
-	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
-	// 	// elems = _.flatten(elems);
-	// 	// elems.forEach(function (one) {
-	// 	// 	one.style.display = 'none';
-	// 	// });
-	// },
-
-	// _showEditButtons : function () {	// todo: refactor! 
-	// 	// var elems = [];
-	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-up') ))
-	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-down') ))
-	// 	// elems.push([].slice.call( document.getElementsByClassName('layer-item-delete') ))
-	// 	// elems = _.flatten(elems);
-	// 	// elems.forEach(function (one) {
-	// 	// 	one.style.display = 'block';
-	// 	// });
-	// },
-
+	
 
 	_insertMenuFolder : function () {
 		
@@ -12381,8 +12402,6 @@ L.control.description = function (options) {
 	// add legend from outside
 	addLegend : function (layer) {
 
-		console.log('adding legends: ', layer);
-
 		// each layer has its own legends
 		this._layers.push(layer);
 
@@ -12829,7 +12848,6 @@ L.Control.BaselayerToggle = L.Control.extend({
 				layer : this.project.getLayer(b.uuid),
 				baseLayer : b
 			}
-			// baseLayer.layer = this.project.getLayer(baseLayer.uuid);
 			this.addLayer(baseLayer);
 		}, this);
 
@@ -12872,7 +12890,7 @@ L.Control.BaselayerToggle = L.Control.extend({
 		} else {
 			
 			// enable
-			layer.enable();
+			layer.add('baselayer');
 			baseLayer.active = true;
 			Wu.DomUtil.addClass(item, 'active');
 		}
@@ -14537,7 +14555,6 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	add : function (type) {
-
 		if (type == 'baselayer') this._isBase = true;
 		this.addTo();
 	},
@@ -14570,13 +14587,11 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	addToControls : function () {
+		if (this._isBase) return;
 
 		this._addToLegends();
-
 		this._addToInspect();
-
 		this._addToDescription();
-		
 	},
 
 	_addToLegends : function () {
@@ -14674,8 +14689,6 @@ L.control.baselayerToggle = function (options) {
 		this.opacity = opacity || 1;
 		this.layer.setOpacity(this.opacity);
 	},
-
-
 
 	getOpacity : function () {
 		return this.opacity || 1;
@@ -14904,7 +14917,10 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			fileUuid: fileUuid,
 			cartoid : cartoid,
 			subdomains : 'abcd',
-			maxRequests : 8
+			// maxRequests : 8,
+			maxRequests : 0,
+			// reuseTiles : true,
+			// unloadInvisibleTiles : true
 		});
 	},
 
@@ -14920,10 +14936,14 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		// create gridlayer
 		this.gridLayer = new L.UtfGrid(url, {
 			useJsonP: false,
-			subdomains: 'ghi',
+			subdomains: 'ijk',
+			// subdomains: 'ghi',
 			maxRequests : 0,
 			requestTimeout : 20000
 		});
+
+		// debug
+		// this.gridLayer = false;
 
 		// add grid events
 		this._addGridEvents();
@@ -14944,22 +14964,9 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		var grid = this.gridLayer;
 		if (!grid) return;
 
-
-		// // add click event
-		// grid.on('mousedown', function(e) {
-		// 	if (!e.data) return;
-
-
-
-		// 	// pass layer
-		// 	e.layer = this;
-
-		// 	// // add to pending
-		// 	// app.MapPane._addPopupContent(e);
-
-		// }, this);
-
-		grid.on('click', function (e) {
+		
+		// add click event
+		grid.on('mousedown', function(e) {
 			if (!e.data) return;
 
 			// pass layer
@@ -14968,47 +14975,40 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			// add to pending
 			app.MapPane._addPopupContent(e);
 
-			// open popup
-			app.MapPane.openPopup(e);
-		
+			var event = e.e.originalEvent;
+			this._event = {
+				x : event.x,
+				y : event.y
+			}
+
+
+
 		}, this);
 
-		// grid.on('click', function (e) {
+		grid.on('mouseup', function (e) {
+			if (!e.data) return;
 
-		// 	// clear old
-		// 	app.MapPane._clearPopup();
-		
-		// }, this);
+			// pass layer
+			e.layer = this;
 
-		// // add click event
-		// grid.on('mousedown', function(e) {
-		// 	if (!e.data) return;
+			var event = e.e.originalEvent;
 
-		// 	// pass layer
-		// 	e.layer = this;
+			if (this._event === undefined || this._event.x == event.x) {
+				// open popup 
+				app.MapPane.openPopup(e);
+			} else {
+				// clear old
+				app.MapPane._clearPopup();
+			}
 
-		// 	// add to pending
-		// 	app.MapPane._addPopupContent(e);
+		}, this);
 
-		// }, this);
+		grid.on('click', function (e) {
 
-		// grid.on('mouseup', function (e) {
-		// 	if (!e.data) return;
+			// clear old
+			app.MapPane._clearPopup();
 
-		// 	// pass layer
-		// 	e.layer = this;
-
-		// 	// open popup
-		// 	app.MapPane.openPopup(e);
-		
-		// }, this);
-
-		// grid.on('click', function (e) {
-
-		// 	// clear old
-		// 	app.MapPane._clearPopup();
-		
-		// }, this);
+		}, this);
 	},
 });
 
@@ -15257,8 +15257,6 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		var file = this.getFile(fileUuid);
 
-		// console.log('got file: ', file);
-		// console.log('dataSize: ', file.dataSize);
 		return parseInt(file.dataSize);
 
 	},
@@ -15292,16 +15290,7 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		app.ProgressBar.hideProgress();
 	},
 
-	// setZIndex : function (zIndex) {
-
-	// 	// set zIndex for now or later
-	// 	this.zIndex = zIndex || 1;
-
-	// 	// return if not yet loaded
-	// 	if (!this.loaded) return;
-
-	// },
-
+	
 	getContainer : function () {
 
 		// return
@@ -15326,10 +15315,6 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	multiStyleChanged : function (data, multi, layr) {
 
-		// console.log('multiStyleChanged: data: ', data, this);
-		// console.log('multi: ', multi);
-		// console.log('layr: ', layr);
-
 		var layer = layr;
 		var style = data.style;
 		var __sid = layer.feature.properties.__sid;
@@ -15342,15 +15327,10 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 	styleChanged : function (data) {
 
-		// console.log('styleChanged: data: ', data, this);
-		// return;
-
 		var style = data.style;
 		var target = data.target;
-
 		var id = target._leaflet_id;
 		var layer = this.getPathParentLayer(id);
-		// console.log('PARERRRRRRR ----- layer: ', layer);
 		var __sid = target.feature.properties.__sid;
 
 		// save style
@@ -15362,19 +15342,10 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 		return app.MapPane.getEditableLayerParent(id);
 	},
 
-	// getStyle : function () {
-	// 	var style = this.store.style;
-	// 	if (!style) return false;
-	// 	return JSON.parse(style) 
-	// },
-
 	// save style to layer object
 	saveStyle : function (style, __sid) {	
 			
 		var json = this.layer.toGeoJSON();
-		// console.log('toGeoJSON: ', json);
-		// console.log('__sid: ', __sid);
-		// console.log('style: ', style);
 
 		var json = {};
 		json.layer  = this.getUuid();
@@ -15453,9 +15424,6 @@ Wu.GeojsonLayer = Wu.Layer.extend({
 
 		// create content
 		var string = '';
-		// string += feature.geometry.type + '<br>';	// debug
-		// string += '-------------------<br>';
-		// console.log('PUPUP::: feature: ', feature, layer);
 		for (key in feature.properties) {
 			var value = feature.properties[key];
 			// if not empty value
@@ -19274,7 +19242,7 @@ Wu.App = Wu.Class.extend({
 			// default accounts, added to all new (and old?) projects
 			mapbox : [{	
 				username : 'systemapic',
-				accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJQMWFRWUZnIn0.yrBvMg13AZC9lyOAAf9rGg'
+				accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q'
 			}]
 		},
 

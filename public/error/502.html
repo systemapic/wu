@@ -12,7 +12,7 @@
 		color: #3F4652;
 		line-height: 1.4;
 		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif,'Open Sans';
-		font-size: 14px;
+		font-size: 24px;
 		text-align: left;
 		margin: 0;
 		text-rendering: optimizeLegibility;
@@ -22,16 +22,18 @@
 
 	h3 {
 		color: white;
-		text-transform: uppercase;
-		border-bottom: 1px solid;
+		font-weight: 300;
+		text-align: center;
 		padding-bottom: 10px;
+		font-style: italic;
 		}
 
 	p {
-		font-weight: 500;
+		font-weight: 300;
+		text-align: center;
 		color: white;
 		text-transform: none;
-		font-size: 16px;
+		font-size: 20px;
 		line-height: 2;
 		}
 
@@ -77,11 +79,21 @@
 		<div class="col-sm-6 col-sm-offset-3">
 
 			<div id="login-logo"></div>
-			<h3>The portal is not available at the moment</h3>
+			<h3>The portal is not available <br> at the moment. </h3>
 			<p>Please try again in a little while.</p>
 		</div>
 
 	</div>
 
+
+	<script>
+	function reload () {
+		window.location.reload(true);
+	};
+
+	setTimeout(reload, 2000);
+
+
+	</script>
 
 </body></html>

@@ -1,0 +1,51 @@
+<!-- views/login.ejs -->
+<!doctype html>
+<html>
+<head>
+<title>Systemapic Authentication</title>
+<link href='dist/css.login.min.css' rel='stylesheet' />
+<!-- <script src="dist/combined/login.min.js"></script> -->
+
+<script src='js/lib/mapbox.js/mapbox.2.1.4.js'></script>
+<script src='js/lib/mapbox-gl.js/mapbox-gl.js'></script>
+<script src='js/src/controls/spinningMap.js'></script>
+<script src='js/src/core/login.js'></script>
+
+<style>
+.form-control {
+	font-size: 100%;
+}
+</style>
+</head>
+<body>
+	<div id="spinning-map"></div>
+	<div id="spinning-content">
+		<div class="col-sm-6 col-sm-offset-3">
+			<div id="powered-by">Powered by<a href="http://systemapic.com">Systemapic.com ©</a></div>
+			<div id="login-logo"></div>
+			<h1 style="font-size: 25px;"><span class="secure-login-symbol"></span> Reset your password</h1>
+
+			<% if (message.length > 0) { %>
+				<div class="alert alert-danger"><%= message %></div>
+			<% } %>
+
+			<form action="/reset" method="post" id="hitme">
+				<div class="form-group"><input type="text" class="form-control" name="email" placeholder="Enter your email..."></div>
+				<button type="submit" id="login-button" class="btn btn-default" name="login">Reset</button>
+			</form>
+		</div>
+	</div>
+
+	<script> spin(); </script>
+
+	<script type="text/javascript">
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		ga('create', 'UA-57572003-1', 'auto');
+		ga('send', 'pageview');
+	</script>
+
+</body>
+</html>

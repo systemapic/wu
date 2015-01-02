@@ -911,8 +911,8 @@ L.Mixin.Events.fire = L.Mixin.Events.fireEvent;
 		pointer = (window.PointerEvent && window.navigator.pointerEnabled && window.navigator.maxTouchPoints) ||
 				  msPointer,
 	    retina = ('devicePixelRatio' in window && window.devicePixelRatio > 1) ||
-	             ('matchMedia' in window && window.matchMedia('(min-resolution:144dpi)') &&
-	              window.matchMedia('(min-resolution:144dpi)').matches),
+	             ('matchMedia' in window && window.matchMedia('(min-resolution:1.5dppx)') &&
+	              window.matchMedia('(min-resolution:1.5dppx)').matches),
 
 	    doc = document.documentElement,
 	    ie3d = ie && ('transition' in doc.style),
@@ -1262,7 +1262,6 @@ L.DomUtil = {
 			value = css ? css[style] : null;
 		}
 
-		console.log('value: ', value);
 		return value === 'auto' ? null : value;
 	},
 
@@ -5499,8 +5498,6 @@ L.Path = (L.Path.SVG && !window.L_PREFER_CANVAS) || !L.Browser.canvas ? L.Path :
 	_updateStyle: function () {
 		var options = this.options;
 
-		// console.log('_updateStyle', options);
-
 		if (options.stroke) {
 			this._ctx.lineWidth = options.weight;
 			this._ctx.strokeStyle = options.color;
@@ -6550,15 +6547,12 @@ L.GeoJSON = L.FeatureGroup.extend({
 	},
 
 	setStyle: function (style) {
-		// console.log('L.geoJson setStyle(style)', style)
 		this.eachLayer(function (layer) {
-			// console.log('eachlayer, ', layer);
 			this._setLayerStyle(layer, style);
 		}, this);
 	},
 
 	_setLayerStyle: function (layer, style) {
-		// console.log('WAHWAHWAHWAH');
 		if (typeof style === 'function') {
 			style = style(layer.feature);
 		}
@@ -8353,7 +8347,6 @@ L.Control = L.Class.extend({
 		this._map = null;
 
 		if (this.onRemove) {
-			console.log('onRemove generic');
 			this.onRemove(map);
 		}
 

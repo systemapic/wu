@@ -43,10 +43,6 @@ module.exports = function(app, passport) {
 	app.get('/', function(req, res) {
 
 
-		console.log('HOME => / is auth?:', req.isAuthenticated());
-		console.log('req.', req);
-
-
 		// return if not logged in 			redirect to login page
 		if (!req.isAuthenticated()) return res.render('../../views/index.ejs'); // load the index.ejs file
 		
@@ -67,11 +63,11 @@ module.exports = function(app, passport) {
 	// get data from store for user
 	app.post('/api/portal', isLoggedIn, function (req, res) {
 		console.log('/api/portal');
-		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'.red);
+		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'.yellow);
 		console.log('* User: ' + req.user.firstName + ' ' + req.user.lastName);
 		console.log('* User uuid: ' + req.user.uuid);
 		console.log('* IP: ' + req._remoteAddress);
-		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'.red);
+		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'.yellow);
 
 		// get user store for this user
 		api.getPortal(req, res);
@@ -697,9 +693,28 @@ module.exports = function(app, passport) {
 	app.post('/forgot', function (req, res) {
 
 		// handle password reset
-		api.forgotPassword(req, res);
+		// api.requestForgotPassword(req, res);
+		console.log('/forgot');
+		res.render('../../views/forgot.ejs', {message : ''});
 	});
 
+	// reset password
+	app.post('/reset', function (req, res) {
+
+		// handle password reset
+		api.requestPasswordReset(req, res);
+	});
+
+	// email link 
+	app.get('/reset', function (req, res) {
+
+		console.log('GET /reset');
+
+		// confirm password reset
+		api.confirmPasswordReset(req, res);
+
+
+	});
 
 
 	// =====================================
