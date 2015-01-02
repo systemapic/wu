@@ -67,6 +67,8 @@ var TEMPFOLDER 		= '/var/www/data/tmp/';
 var CARTOCSSFOLDER 	= '/var/www/data/cartocss/';
 var TOOLSPATH 		= '/var/www/systemapic.com/app/tools/';
 
+var BASEURI 		= 'https://projects.ruppellsgriffon.com/';
+
 
 // default mapbox account
 var DEFAULTMAPBOX = {
@@ -1425,7 +1427,7 @@ module.exports = api = {
 		var name    = user.firstName + ' ' + user.lastName;
 		var email   = user.local.email;
 		var token   = api.setPasswordResetToken(user);
-		var link    = 'https://projects.ruppellsgriffon.com/reset?email=' + email + '&token=' + token;
+		var link    = BASEURI + 'reset?email=' + email + '&token=' + token;
 
 		var from    = 'Systemapic.com <knutole@noerd.biz>'; // todo: change!
 		var to      = email;
@@ -1463,7 +1465,6 @@ module.exports = api = {
 
 
 	_returnProject : function (req, res, project, error) {
-		// console.log('return project', project, error);
 		if (error) throw error;
 
 		Project
@@ -1472,8 +1473,6 @@ module.exports = api = {
 		.populate('layers')
 		.exec(function (err, project) {
 			if (err) console.error(err);
-			// console.log('err?: ', err);
-			// console.log('reutnring project to client: ', project);
 			res.end(JSON.stringify({
 				error : err,
 				project: project}
@@ -1491,15 +1490,6 @@ module.exports = api = {
 		var accessToken = req.body.accessToken;
 		var userUuid 	= req.user.uuid;
 
-		// console.log('______________________')
-		// console.log('API: getMapboxAccount ');
-		// console.log('     username: ', username);
-		// console.log('     project', projectUuid);
-		// console.log('     token: ', accessToken);
-		// console.log('______________________')
-
-
-
 		Project
 		.findOne({uuid : projectUuid})
 		.populate('files')
@@ -1513,33 +1503,6 @@ module.exports = api = {
 
 
 	},
-
-	// refreshMapboxAccount : function (req, res) {
-
-	// 	var username 	= req.body.username;
-	// 	var projectUuid = req.body.projectId;
-	// 	var accessToken = req.body.accessToken;
-	// 	var userUuid 	= req.user.uuid;
-
-	// 	// add ops to async queue
-	// 	var ops = [];
-
-	// 	ops.push(function (callback) {
-	// 		// add default mapbox account: systemapic
-	// 		api.requestMapboxAccount(null, username, accessToken, callback);
-	// 	});
-
-	// 	async.series(ops, function (err, result) {
-	// 		if (err) console.log(err);
-	// 		console.log('refresh result: ', result);
-	// 		res.end(JSON.stringify(result));
-
-	// 	});
-
-	// },
-
-
-
 
 
 	_getMapboxAccount : function (req, res, project, username, accessToken, callback) {
@@ -1766,8 +1729,6 @@ module.exports = api = {
 		var clientUuid 	= req.body.clientUuid;
 		var projectUuid = req.body.projectUuid;
 
-		// console.log('deleteProject: ', req.body);
-
 		// find project (async)
 		var model = Project.findOne({ uuid : projectUuid });
 		model.exec(function (err, project) {
@@ -1926,19 +1887,6 @@ module.exports = api = {
 
 	uploadProjectLogo : function (req, res) {
 
-		// var from = req.files.file.path;
-		// var file = 'image-' + uuid.v4();
-		// var to = '/var/www/data/images/' + file;
-
-		// // rename and move to image folder
-		// fs.rename(from, to, function (err) {
-			
-		// 	if (err) res.end(JSON.stringify({error : err}));
-			
-
-		// 	res.end(file);	// file will be saved by client
-		// });	
-
 		// process from-encoded upload
 		var form = new formidable.IncomingForm({
 			hash : 'sha1',
@@ -1946,17 +1894,12 @@ module.exports = api = {
 			keepExtensions : true,
 		});
 		form.parse(req, function(err, fields, files) {	
-			console.log('formidale: ', util.inspect({fields: fields, files: files}));
-			console.log('files! => ', files);
- 		
-
 
 			var from = files.file.path;
-			// var from = req.files.file.path;
 			var file = 'image-' + uuid.v4();
 			var to   = IMAGEFOLDER + file;
 			
-			// // rename and move to image folder
+			// rename and move to image folder
 			fs.rename(from, to, function (err) {
 				if (err) res.end(JSON.stringify({error : err}));
 				res.end(file);	// file will be saved by client
@@ -1966,15 +1909,6 @@ module.exports = api = {
 
 
 	uploadClientLogo : function (req, res) {
-		// var from = req.files.file.path;
-		// var file = 'image-' + uuid.v4();
-		// var to   = IMAGEFOLDER + file;
-
-		// // rename and move to image folder
-		// fs.rename(from, to, function (err) {
-		// 	if (err) res.end(JSON.stringify({error : err}));
-		// 	res.end(file);	// file will be saved by client
-		// });	
 		
 		// process from-encoded upload
 		var form = new formidable.IncomingForm({
@@ -1983,17 +1917,14 @@ module.exports = api = {
 			keepExtensions : true,
 		});
 		form.parse(req, function(err, fields, files) {	
-			console.log('formidale: ', util.inspect({fields: fields, files: files}));
-			console.log('files! => ', files);
+			// console.log('formidale: ', util.inspect({fields: fields, files: files}));
+			// console.log('files! => ', files);
  		
-
-
 			var from = files.file.path;
-			// var from = req.files.file.path;
 			var file = 'image-' + uuid.v4();
 			var to   = IMAGEFOLDER + file;
 			
-			// // rename and move to image folder
+			// rename and move to image folder
 			fs.rename(from, to, function (err) {
 				if (err) res.end(JSON.stringify({error : err}));
 				res.end(file);	// file will be saved by client
@@ -2011,17 +1942,12 @@ module.exports = api = {
 			keepExtensions : true,
 		});
 		form.parse(req, function(err, fields, files) {	
-			console.log('formidale: ', util.inspect({fields: fields, files: files}));
-			console.log('files! => ', files);
- 		
-
 
 			var from = files.file.path;
-			// var from = req.files.file.path;
 			var file = 'image-' + uuid.v4();
 			var to   = IMAGEFOLDER + file;
 			
-			// // rename and move to image folder
+			// rename and move to image folder
 			fs.rename(from, to, function (err) {
 				if (err) res.end(JSON.stringify({error : err}));
 				res.end(file);	// file will be saved by client
@@ -2029,14 +1955,6 @@ module.exports = api = {
 	 	});
 
 	},
-
-
-
-
-
-
-
-
 
 
 
@@ -2187,9 +2105,6 @@ module.exports = api = {
 		var user        = req.user;
 		var queries 	= {};
 		
-		console.log('saving client: ', req.body);
-		
-
 		// find client
 		var model = Clientel.findOne({ uuid : clientUuid });
 		model.exec(function (err, client) {
@@ -2456,8 +2371,6 @@ module.exports = api = {
 	// ######################################### 	// todo: send email notifications on changes?
 	updateUser : function (req, res) {
 
-		console.log('update user: ', req.body);
-
 		var userUuid 	= req.body.uuid;
 		var authUser 	= req.user.uuid;
 		var user        = req.user;
@@ -2474,9 +2387,6 @@ module.exports = api = {
 				var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
 				return res.end(JSON.stringify({ error : message }));
 			};
-
-
-
 
 
 			// create async queue
@@ -2572,8 +2482,6 @@ module.exports = api = {
 				}
 			}
 
-			
-		
 			// run async queries
 			async.parallel(queries, function(err, doc) {
 
@@ -3243,25 +3151,6 @@ module.exports = api = {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
 	getUserManagement : function (req, res) {
 		// todo: access control
 
@@ -3450,56 +3339,25 @@ module.exports = api = {
 		// send the file, simply
 		// get file
 		File.findOne({ 'uuid' : file }, function(err, record) {
-			console.log('GOT download FIEL FILE:');
-			console.log(record);
+			
+			var name = record.name.replace(/\s+/g, '');
 
-			// if more than one file, zip it up
-			// if (record.files.length > 1) {
-				console.log('lots of files, gondna zip it up...');
-				
-				// todo: download several files (zipped)
+			// execute cmd line zipping 
+			var out = '/var/www/data/tmp/' + name + '_' + record.type + '.zip';
+			var infile = FILEFOLDER + file + '/*';
+			var working_dir = FILEFOLDER + file;
+			var cmd = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store';// + infile; 
+			var exec = require('child_process').exec;				
+			
+			// run command
+			exec(cmd, { cwd : working_dir }, function (err, stdout, stdin) {
+				if (err) return res.end(err); // if err
 
-				// '/var/www/data/files/'; //file-8b8df56b-860f-4583-979a-803676c1c35c'
-
-				
-				var name = record.name.replace(/\s+/g, '');
-
-				// execute cmd line zipping 
-				var out = '/var/www/data/tmp/' + name + '_' + record.type + '.zip';
-				var infile = FILEFOLDER + file + '/*';
-				var working_dir = FILEFOLDER + file;
-				console.log('infile: ', infile);
-				console.log('working_dir', working_dir);
-				var cmd = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store';// + infile; 
-				var exec = require('child_process').exec;				
-				
-				console.log('cmd: ', cmd);
-
-				// run command
-				exec(cmd, { cwd : working_dir }, function (err, stdout, stdin) {
-					if (err) {
-						console.log('err: ', err);
-						return res.end(err); // if err
-					}
-
-					console.log('err:', err);
-					console.log('stdout: ', stdout);
-					console.log('stdin: ', stdin);
-
-					console.log('returning zip file: ', out);
-					// send zip file
-					res.download(out);
-				});
+				// send zip file
+				res.download(out);
+			});
 
 
-
-			// } else {
-			// 	var path = FILEFOLDER + file + '/' + record.files[0];
-			// 	res.download(path);
-			// 	return;
-			// }
-
-			// return res.end('alliscool');
 
 		});
 
@@ -3513,8 +3371,6 @@ module.exports = api = {
 		var folder = TEMPFOLDER + file;
 		var found = false;
 		
-		console.log('dowzip');
-
 		// find zip file
 		dive(folder, 
 
@@ -3542,19 +3398,11 @@ module.exports = api = {
 	// handle file download
 	getFileDownload : function (req, res) {
 
-		// console.log('req: ', req);
-		console.log('req.query......', req.query);
-	
 		var file = req.query.file;
 		var type = req.query.type || 'file';
 	
-		console.log('type: ', type);
-		console.log('file: ', file);
-
-		// if (!file) { res.end('Please specify a file.'); return; }
-		if (!file) {
-			console.log('NOT FILE!');
-		}
+		if (!file) console.log('NOT FILE!');
+		
 		// todo: access restrictions
 
 		// zip file
