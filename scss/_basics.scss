@@ -753,7 +753,9 @@ input.cmn-toggle-round-flat + label:before {
 	vertical-align: bottom;
 	position: relative;
 	text-align: right;
-	right: -7px;	
+	right: -7px;
+	cursor: pointer;
+	text-decoration: underline;
 	}
 
 .secure-logn-symbol {

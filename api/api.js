@@ -41,9 +41,9 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // redis
 var config = require('../config/config.js');
 var redis = require('redis');
-var r = redis.createClient(config.temptokenRedis.port, config.temptokenRedis.host)
-r.auth(config.temptokenRedis.auth);
-r.on('error', function (err) {
+var redisStore = redis.createClient(config.temptokenRedis.port, config.temptokenRedis.host)
+redisStore.auth(config.temptokenRedis.auth);
+redisStore.on('error', function (err) {
 	console.error(err);
 });
 
@@ -1393,8 +1393,8 @@ module.exports = api = {
 
 
 
-		r.set(key, token);  // set temp token
-		r.expire(key, 600); // expire in ten mins
+		redisStore.set(key, token);  // set temp token
+		redisStore.expire(key, 600); // expire in ten mins
 
 
 		return token;
@@ -1408,7 +1408,7 @@ module.exports = api = {
 
 		var key = 'resetToken-' + user.uuid;
 
-		r.get(key, function (err, actualToken) {
+		redisStore.get(key, function (err, actualToken) {
 
 			console.log('err', err, actualToken);
 
