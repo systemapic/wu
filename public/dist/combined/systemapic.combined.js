@@ -14740,6 +14740,8 @@ L.control.baselayerToggle = function (options) {
 
 	getCartoCSS : function (cartoid, callback) {
 
+		console.log('getCartoCSS', cartoid);
+
 		var json = {
 			cartoid : cartoid
 		}

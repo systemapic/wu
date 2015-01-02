@@ -3035,8 +3035,8 @@ module.exports = api = {
 			User
 			.find({createdBy : user.uuid})
 			.exec(function(err, result) { 
-				result.forEach(function(r) {
-					createdByChildren.push(r.uuid);
+				result.forEach(function(rr) {
+					createdByChildren.push(rr.uuid);
 				})
 
 				cb(err, result); 
@@ -3048,8 +3048,8 @@ module.exports = api = {
 			User
 			.find({createdBy : { $in : createdByChildren }})
 			.exec(function(err, result) { 
-				result.forEach(function(r) {
-					createdByGrandchildren.push(r.uuid);
+				result.forEach(function(rr) {
+					createdByGrandchildren.push(rr.uuid);
 				})
 				cb(err, result); 
 			});

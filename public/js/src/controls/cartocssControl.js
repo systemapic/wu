@@ -405,6 +405,8 @@ L.Control.CartoCSS = L.Control.extend({
 	initStyling : function (layer) {
 		if (!layer) return;
 
+		console.log('initStyling');
+
 		// new layer is active
 		this._layer = layer;
 		this._cartoid = false;
