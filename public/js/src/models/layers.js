@@ -419,7 +419,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			useJsonP: false,
 			subdomains: 'ijk',
 			// subdomains: 'ghi',
-			maxRequests : 0,
+			maxRequests : 10,
 			requestTimeout : 20000
 		});
 
@@ -439,6 +439,12 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 		// add to map
 		this.addTo(map); // refactor
+
+		console.log('add--> ', this);
+	},
+
+	_typeLayer : function () {
+
 	},
 
 	_addGridEvents : function () {
