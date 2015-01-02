@@ -606,7 +606,8 @@ L.Control.CartoCSS = L.Control.extend({
 
 			if (legends && legends.err) {
 				console.error('legends err', legends);
-				return;
+				return this.handleError(legends.err);
+				// return;
 			}
 
 			// sort some things: #layer on top
@@ -879,9 +880,14 @@ L.Control.CartoCSS = L.Control.extend({
 			return this._handleSyntaxError(error);
 		}
 
-		// handle unrecognized rule
+		// handle invalid code
 		if (typeof(error) == 'string' && error.indexOf('Invalid code') > -1) {
 			return this._handleSyntaxError(error);
+		}
+
+		// handle wrong pattern path
+		if (typeof(error) == 'string' && error.indexOf('Error: file could not be found:') > -1) {
+			return this._handlePathError(error);
 		}
 
 		// todo: other errors
@@ -928,8 +934,26 @@ L.Control.CartoCSS = L.Control.extend({
 			that._clearError(line);
 			
 		});
+	},
 
 
+	_handlePathError : function (error) {
+
+		// get current document
+		var doc = this._codeMirror.getDoc()
+
+		// add error text
+		this._errorPane.innerHTML = 'Wrong path for pattern-file.';
+		Wu.DomUtil.addClass(this._errorPane, 'active-error');
+
+		// clear error on change in codemirror input area
+		// Wu.DomEvent.on(doc, 'change', this._clearError, this);
+
+		var that = this;
+		doc.on('change', function () {
+			that._clearError(0);
+			
+		});
 
 	},
 
