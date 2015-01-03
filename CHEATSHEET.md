@@ -158,3 +158,10 @@ Most mobile mapping Libraries use lat-long for position, while the map is in web
 ###Clone javascript object
 	//returns a reference to first arg, with 2nd arg copied (without connection)  
 	a = Wu.extend({} || b, c);
+
+
+------------------------------
+
+### Put OSM data in PostGIS database
+
+     osm2pgsql -s -U gisuser -d osmdb new-york-latest.osm
