@@ -207,11 +207,19 @@ Some reference
 https://gist.github.com/jpetazzo/5177554    
 http://wiki.openstreetmap.org/wiki/Osm2pgsql/schema
 http://wiki.openstreetmap.org/wiki/User:Species/PostGIS_Tuning
+https://github.com/mapnik/mapnik/wiki/Postgis-async
+https://github.com/mapnik/mapnik/wiki/OptimizeRenderingWithPostGIS
+http://wiki.openstreetmap.org/wiki/OSM_on_Paper
 
 
-If you don't want the exact limits of the cities, but just a center point, look in osm_point, and use the column place:
+
+Some more query examples:
+
+    // If you don't want the exact limits of the cities, but just a center point, look in osm_point, and use the column place:
 
     SELECT name,way FROM planet_osm_point WHERE place IN ('town', 'city');
-
-
+    
     SELECT name FROM planet_osm_line WHERE highway IN ('motorway', 'trunk');
+
+    SELECT name from planet_osm_line where highway is not null and tunnel in ('yes','true','1');
+
