@@ -204,11 +204,23 @@ Get some cities
 
 
 Some reference
+
+// Some basic examples
 https://gist.github.com/jpetazzo/5177554    
+
+// Schema reference
 http://wiki.openstreetmap.org/wiki/Osm2pgsql/schema
+
+// Postgis tuning
 http://wiki.openstreetmap.org/wiki/User:Species/PostGIS_Tuning
+
+// Postgis async
 https://github.com/mapnik/mapnik/wiki/Postgis-async
+
+// Some mapnik rendering shit
 https://github.com/mapnik/mapnik/wiki/OptimizeRenderingWithPostGIS
+
+// Maybe not that relevant, but it's cool
 http://wiki.openstreetmap.org/wiki/OSM_on_Paper
 
 
