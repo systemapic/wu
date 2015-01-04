@@ -188,18 +188,15 @@ Lists all tables in the current database
 
     \dt
 
-
-
-// Example for query
-
+Example for query
     SELECT name, place, ST_XMin(way), ST_YMin(way) FROM planet_osm_point WHERE place='city' ORDER BY name;
     
-    // Get some cities
+Get some cities
     SELECT name FROM planet_osm_polygon WHERE boundary='administrative';
 
 
 
-### Some reference
+// Some reference
 https://gist.github.com/jpetazzo/5177554    
 
 If you don't want the exact limits of the cities, but just a center point, look in osm_point, and use the column place:
