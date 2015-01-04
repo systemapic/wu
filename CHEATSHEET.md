@@ -206,6 +206,7 @@ Get some cities
 Some reference
 https://gist.github.com/jpetazzo/5177554    
 http://wiki.openstreetmap.org/wiki/Osm2pgsql/schema
+http://wiki.openstreetmap.org/wiki/User:Species/PostGIS_Tuning
 
 
 If you don't want the exact limits of the cities, but just a center point, look in osm_point, and use the column place:
