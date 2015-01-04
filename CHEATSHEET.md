@@ -178,7 +178,6 @@ Catalogues in OSMDB
 • planet_osm_polygon
 • planet_osm_roads
 
-
 Lists all databases
 
     \list
@@ -187,6 +186,12 @@ Lists all databases
 Lists all tables in the current database
 
     \dt
+
+Show all tables in a catalogue
+
+    \d planet_osm_line
+
+
 
 Example for query
     SELECT name, place, ST_XMin(way), ST_YMin(way) FROM planet_osm_point WHERE place='city' ORDER BY name;
