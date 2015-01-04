@@ -194,9 +194,11 @@ Show all tables in a catalogue
 
 
 Example for query
+    
     SELECT name, place, ST_XMin(way), ST_YMin(way) FROM planet_osm_point WHERE place='city' ORDER BY name;
     
 Get some cities
+    
     SELECT name FROM planet_osm_polygon WHERE boundary='administrative';
 
 
