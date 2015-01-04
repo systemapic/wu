@@ -165,3 +165,46 @@ Most mobile mapping Libraries use lat-long for position, while the map is in web
 ### Put OSM data in PostGIS database
 
      osm2pgsql -s -U gisuser -d osmdb new-york-latest.osm
+     
+     
+-------------------------------------
+
+### Some postGIS OSM stuff
+
+Catalogues in OSMDB
+
+• planet_osm_line
+• planet_osm_point
+• planet_osm_polygon
+• planet_osm_roads
+
+
+Lists all databases
+
+    \list
+
+
+Lists all tables in the current database
+
+    \dt
+
+
+
+// Example for query
+
+    SELECT name, place, ST_XMin(way), ST_YMin(way) FROM planet_osm_point WHERE place='city' ORDER BY name;
+    
+    // Get some cities
+    SELECT name FROM planet_osm_polygon WHERE boundary='administrative';
+
+
+
+### Some reference
+https://gist.github.com/jpetazzo/5177554    
+
+If you don't want the exact limits of the cities, but just a center point, look in osm_point, and use the column place:
+
+    SELECT name,way FROM planet_osm_point WHERE place IN ('town', 'city');
+
+
+    SELECT name FROM planet_osm_line WHERE highway IN ('motorway', 'trunk');
