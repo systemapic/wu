@@ -68,10 +68,12 @@
 
 #forgot-password {
 	font-size: 90%;
-	text-align: right;
 	text-indent: 20px;
-	float: right;
-	top: -19px;	
+	position: relative;
+	bottom: 0;
+	padding: 0;
+	margin: 0;
+	top: 0;	
 	}	
 
 .form-control {
