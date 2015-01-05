@@ -2074,7 +2074,7 @@ L.Popup.include({
 		if ( !L.Browser.mobile ) {
 			var bHeight = 70;
 		} else {
-			var bHeight = 40;
+			var bHeight = 50;
 		}
 
 		var panes = this._getPaneArray();
@@ -2436,9 +2436,9 @@ L.Popup.include({
 		if ( !L.Browser.mobile ) {
 			var bHeight = 70;
 		} else {
-			var bHeight = 40;
+			var bHeight = 50;
 		}
-		
+
 		// set vars
 		var swypefrom = prev._content;
 		var swypeto = Wu.app._active;               
