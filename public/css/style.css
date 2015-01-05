@@ -6013,6 +6013,46 @@ input[type=checkbox] + label.check {
 	overflow: visible;
 	}
 */
+/*
+██████╗  ██████╗ ██████╗ ████████╗██████╗  █████╗ ██╗████████╗
+██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██║╚══██╔══╝
+██████╔╝██║   ██║██████╔╝   ██║   ██████╔╝███████║██║   ██║   
+██╔═══╝ ██║   ██║██╔══██╗   ██║   ██╔══██╗██╔══██║██║   ██║   
+██║     ╚██████╔╝██║  ██║   ██║   ██║  ██║██║  ██║██║   ██║   
+╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝   ╚═╝   
+*/
+/*IPAD*/
+/*@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
+  .ipad-portrait { color: red; }
+}
+*/
+/*SAMSUNG PAD*/
+@media all and (device-width: 752px) and (device-height: 1280px) and (orientation: portrait) {
+  .col-sm-6.col-sm-offset-3 {
+    background-color: red !important; } }
+
+@media all and (device-width: 1280px) and (device-height: 752px) and (orientation: portrait) {
+  .col-sm-6.col-sm-offset-3 {
+    background-color: red !important; } }
+
+/*
+██╗      █████╗ ███╗   ██╗██████╗ ███████╗ ██████╗ █████╗ ██████╗ ███████╗
+██║     ██╔══██╗████╗  ██║██╔══██╗██╔════╝██╔════╝██╔══██╗██╔══██╗██╔════╝
+██║     ███████║██╔██╗ ██║██║  ██║███████╗██║     ███████║██████╔╝█████╗  
+██║     ██╔══██║██║╚██╗██║██║  ██║╚════██║██║     ██╔══██║██╔═══╝ ██╔══╝  
+███████╗██║  ██║██║ ╚████║██████╔╝███████║╚██████╗██║  ██║██║     ███████╗
+╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝     ╚══════╝
+*/
+/*IPAD*/
+/*@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
+  .ipad-landscape { color: blue; }
+}
+*/
+/*SAMSUNG PAD*/
+@media all and (device-width: 752px) and (device-height: 1280px) and (orientation: landscape) {
+  .ipad-landscape {
+    color: blue; } }
+
 /*@import 'mobile';*/
 /* @import 'color_picker';	// Color picker */
 /* @import 'mediaLibrary';	// Media Library */

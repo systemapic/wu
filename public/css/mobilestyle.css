@@ -1,0 +1,106 @@
+#spinning-map {
+	/*display: none !important;*/
+}
+
+.spinning-wrapper {
+	width: 100%;
+	position: relative;
+	height: 100%;
+	left: 0;
+	top: 0;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	}
+
+/*Remove little dot*/
+.startpane-circle-container {
+	display: none !important;
+	}
+
+
+#spinning-content {
+	padding: 20px;
+	padding-bottom: 34px;
+	top: 0;
+	height: 100%;
+	}
+
+.col-sm-6.col-sm-offset-3 {	
+	min-width: 0 !important;
+	max-width: none !important;
+	width: auto !important;
+	top: 0 !important;
+	height: 100%;
+/*	padding-top: 75%;
+	padding-left: 100px;
+	padding-right: 100px;
+	padding-bottom: 100px;*/
+	padding-top: 75%;
+	padding-left: 10%;
+	padding-right: 10%;
+	padding-bottom: 10%;	
+	}
+
+.col-sm-6.col-sm-offset-3 h1 {
+	/*font-size: 65px !important;*/
+
+	font-size: 170% !important;
+	margin: 0;
+	margin-bottom: 15px;
+	padding: 0;	
+	}
+
+#hitme {
+	width: 100%;
+	padding-right: 20px;
+	position: relative;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;	
+	}
+
+#login-button {
+	padding: 6px 20px 8px;
+	font-size: 110%;
+	border-radius: 2px;
+	color: #666;	
+	}
+
+#forgot-password {
+	font-size: 90%;
+	text-align: right;
+	text-indent: 20px;
+	float: right;
+	top: -19px;	
+	}	
+
+.form-control {
+/*	padding: 20px;
+	margin-bottom: 15px;
+	font-size: 35px;*/
+
+	padding: 10px;
+	margin-bottom: 7px;
+	font-size: 120%;	
+	}	
+
+#login-logo {
+	width: 90%;
+	height: 100%;
+	top: 3%;
+	left: 5%;
+	background-size: contain;
+	}
+
+.col-sm-6.col-sm-offset-3 {
+  	/*background-color: red !important;*/
+	}
+
+
+
+
+#powered-by {
+	position: absolute;
+	bottom: -22px;
+	font-size: 90%;
+	}
