@@ -235,3 +235,7 @@ Some more query examples:
 
     SELECT name from planet_osm_line where highway is not null and tunnel in ('yes','true','1');
 
+
+// Mapnik SQL rendering toolchain performance
+http://www.geofabrik.de/media/2010-07-10-rendering-toolchain-performance.pdf
+
