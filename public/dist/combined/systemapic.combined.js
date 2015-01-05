@@ -1974,7 +1974,7 @@ L.Popup.include({
 	initContainer: function () {
 
 		// create container
-		var className = 'q-editor-container ct1';
+		var className = 'q-editor-container';
 		this._container = Wu.DomUtil.create('div', className, Wu.app._appPane);
 		
 		// toggle panes button
@@ -1986,7 +1986,7 @@ L.Popup.include({
 	initContent : function () {
 		
 		// menu pane
-		var className = 'q-editor-menu ct0';
+		var className = 'q-editor-menu';
 		Wu.app._editorMenuPane = Wu.DomUtil.create('menu', className, this._container); 
 
 		// content pane
@@ -1997,7 +1997,6 @@ L.Popup.include({
 		app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
 		app._menuSliderArrow = Wu.DomUtil.createId('div', 'menuslider-arrow', Wu.app._menuSlider);	// refactor app
 
-		Wu.DomUtil.addClass(Wu.app._menuSlider, 'ct1');
 		
 	},
 	
@@ -2070,9 +2069,17 @@ L.Popup.include({
 	},
 
 	_setMenuHeight : function () {
+
+		// Button height
+		if ( !L.Browser.mobile ) {
+			var bHeight = 70;
+		} else {
+			var bHeight = 40;
+		}
+
 		var panes = this._getPaneArray();
 		var defaultPanes = app.Account.isManager() ? 3 : 2;		// 3 if manager, 2 if not (ie. only Project, Logout)
-		var height = panes ? panes.length * 70 : defaultPanes * 70;	// if no active project, default 3 menu items
+		var height = panes ? panes.length * bHeight : defaultPanes * bHeight;	// if no active project, default 3 menu items
 		app._editorMenuPane.style.height = parseInt(height) + 'px';
 	},
 
@@ -2425,6 +2432,13 @@ L.Popup.include({
 	// do swipe of sidepane when selecting menu item, by jorgen
 	swiper : function (prev) {
 		
+		// Button height
+		if ( !L.Browser.mobile ) {
+			var bHeight = 70;
+		} else {
+			var bHeight = 40;
+		}
+		
 		// set vars
 		var swypefrom = prev._content;
 		var swypeto = Wu.app._active;               
@@ -2433,7 +2447,7 @@ L.Popup.include({
 		if (swypefrom == swypeto) return;
 
 		// update the slider on the left    
-		var h = 70;
+		var h = bHeight;
 		var menuslider = Wu.DomUtil.get('menuslider');
 		   
 		// get classy

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Install script for Mapnik."
-echo "Please make sure you are in a working directory. All dependencies will be installed here."
+echo "Please make sure you are in a working directory and not running fish. All dependencies will be installed here."
 read -p "Are you ready to continue? <y/N> " prompt
 if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]]
 then

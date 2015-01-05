@@ -26,30 +26,33 @@
 		<div class="col-sm-6 col-sm-offset-3">
 			<div id="powered-by">Powered by<a href="http://systemapic.com">Systemapic.com ©</a></div>
 			<div id="login-logo"></div>
-			<h1 style="font-size: 25px;"><span class="secure-login-symbol"></span> Secure Login</h1>
 
-			<% if (message.length > 0) { %>
-				<div class="alert alert-danger"><%= message %></div>
-			<% } %>
+			<div id="login-wrapper">
+				<div id="login-inner-wrapper">
+					<h1 style="font-size: 25px;"><span class="secure-login-symbol"></span> Secure Login</h1>
 
-			<form action="/login" method="post" id="hitme">
-				<div class="form-group"><input type="text" class="form-control" name="email" placeholder="Enter email..."></div>
-				<div class="form-group"><input type="password" class="form-control" name="password" placeholder="Enter password..."></div>
-				<button type="submit" id="login-button" class="btn btn-default" name="login">Login</button>
-				<button type="submit" id="forgot-password" onclick="javascript: form.action='/forgot';">Forgot password?</button>
-			</form>
+					<% if (message.length > 0) { %>
+						<div class="alert alert-danger"><%= message %></div>
+					<% } %>
+
+					<form action="/login" method="post" id="hitme">
+						<div class="form-group"><input type="text" class="form-control" name="email" placeholder="Enter email..."></div>
+						<div class="form-group"><input type="password" class="form-control" name="password" placeholder="Enter password..."></div>
+						<button type="submit" id="login-button" class="btn btn-default" name="login">Login</button>
+						<button type="submit" id="forgot-password" onclick="javascript: form.action='/forgot';">Forgot password?</button>
+					</form>
+				</div>
+			</div>
 		</div>
 	</div>
 
 	<script> spin(); 
 
-		// if (L.Browser.mobile) {
-			// alert('mobile');
+		if (L.Browser.mobile) {
 			var styletag = document.getElementById('styletag');
-			var styleURL = '<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/mobilestyle.css">';
+			var styleURL = '<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/mobilestyle-login.css">';
 			styletag.innerHTML = styleURL;
-
-		// }
+		}
 
 
 

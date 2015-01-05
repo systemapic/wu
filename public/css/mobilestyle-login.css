@@ -7,89 +7,74 @@
  ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
 */                                                                       
 
-.leaflet-control-scale,
-.leaflet-control-mouseposition,
-.leaflet-control-attribution {
+.startpane-circle-container {
 	display: none !important;
-}
+	}
 
+.spinning-wrapper {
+	width: 100%;
+	position: relative;
+	height: 100%;
+	left: 0;
+	top: 0;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	}
 
-.leaflet-control-zoom-out, 
-.leaflet-control-zoom-in {
-	color: black !important;
-	width: 31px !important;
-	height: 31px !important;
-	font-size: 300% !important;
-	line-height: 1.1 !important;
-	background-image: none !important;
+#spinning-content {
+	padding: 20px;
+	padding-bottom: 34px;
+	top: 0;
+	height: 100%;
 	}
 
 
-#open-layers {
-	zoom: 1.3;
-	top: 69px;
-	right: 4px;	
+.col-sm-6.col-sm-offset-3 {	
+	min-width: 0 !important;
+	max-width: none !important;
+	width: auto !important;
+	top: 0 !important;
+	height: 100%;
 	}
 
-
-#header {
-	height: 46px;
-	}
-
-
-#header .header-logo {
-	width: 50px;
-	height: 40px;
+.col-sm-6.col-sm-offset-3 h1 {
+	margin: 0;
+	padding: 0;
 	}	
 
-
-.header-title {
-	font-size: 60%;
-	padding-left: 60px;
-	height: auto;
+#hitme {
+	width: 100%;
+	padding-right: 20px;
+	position: relative;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;	
 	}
 
-.header-subtitle {
-	padding-left: 60px;
-	font-size: 38%;
-	}	
-
-.home-container {
-	height: 46px;
-	}	
-
-
-.q-editor-menu-item {
-	height: 40px;
-	}	
-
-.q-editor-menu-item a {	
-	padding-top: 14px;
-	line-height: 12px;
+#login-button {		
+	border-radius: 2px;
+	color: #666;	
 	}
 
-.q-editor-menu-item .users {
- 	padding-top: 14px; 
-	}
-
-.q-editor-menu-item .dataLibrary {
-	padding-top: 8px;
+#forgot-password {
+	font-size: 90%;
+	text-indent: 20px;
+	position: relative;
+	bottom: 0;
+	padding: 0;
+	margin: 0;
+	top: 8px;	
 	}	
 
-.leaflet-top.leaflet-left {
-	margin-top: 48px;
+.form-control {
+	padding: 10px;
+	margin-bottom: 7px;
 	}
 
-.leaflet-control-layermenu.leaflet-control {
-	top: 57px;
-	}
-
-.q-editor-container {
-	top: 53px;
-	}	
-
-#menuslider {
-	height: 40px;
+#powered-by {
+	position: absolute;
+	bottom: -22px;
+	font-size: 90%;
 	}
 
 /*
@@ -102,6 +87,37 @@
 */
 
 @media all and (orientation: portrait) {
+
+
+	.col-sm-6.col-sm-offset-3 {	
+		padding-top: 75%;
+		padding-left: 10%;
+		padding-right: 10%;
+		padding-bottom: 10%;	
+		}
+
+	.col-sm-6.col-sm-offset-3 h1 {
+		font-size: 170% !important;
+		margin-bottom: 15px;
+		}
+
+	#login-button {
+		padding: 6px 20px 8px;
+		font-size: 110%;
+		}
+
+	.form-control {
+		font-size: 120%;	
+		}	
+
+	#login-logo {
+		width: 90%;
+		height: 100%;
+		top: 3%;
+		left: 5%;
+		background-size: contain;
+		}
+
 }
 
 
@@ -116,4 +132,53 @@
 
 
 @media all and (orientation: landscape) {
+
+	#login-wrapper {
+		position: relative;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		}
+
+	#login-inner-wrapper {
+		position: relative;
+		margin: auto;
+		top: 50%;
+		-webkit-transform: translateY(-50%);
+		-ms-transform: translateY(-50%);
+		transform: translateY(-50%);
+		left: 0;
+		right: 0;
+		bottom: 0;
+		}	
+
+	.col-sm-6.col-sm-offset-3 {	
+		padding-top: 0;
+		padding-left: 49%;
+		padding-right: 6%;
+		}
+
+	.col-sm-6.col-sm-offset-3 h1 {
+		font-size: 150% !important;
+		margin-bottom: 10px;
+		}
+
+	#login-button {
+		padding: 4px 15px 6px;
+		font-size: 100%;
+		}		
+
+	.form-control {
+		font-size: 100%;
+		}	
+
+	#login-logo {
+		width: 40%;
+		height: 60%;
+		top: 20%;
+		left: 4%;
+		background-size: contain;
+		background-position: center;
+		}
+
 }
