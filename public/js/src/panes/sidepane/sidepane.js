@@ -116,7 +116,7 @@ Wu.SidePane = Wu.Class.extend({
 		if ( !L.Browser.mobile ) {
 			var bHeight = 70;
 		} else {
-			var bHeight = 40;
+			var bHeight = 50;
 		}
 
 		var panes = this._getPaneArray();
