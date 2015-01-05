@@ -10,7 +10,7 @@ then
 
 sudo apt-get update
 echo "Adding repositories"
-sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" >> /etc/apt/sources.list.d/postgresql.list'
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt trusty-pgdg main" >> /etc/apt/sources.list'
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 sudo apt-get update
 sudo apt-get upgrade
@@ -24,7 +24,7 @@ sudo apt-get install binutils libproj-dev libgeoip1 libgtk2.0 xsltproc docbook-x
 sudo apt-get install build-essential python-all-dev git vim python-dev python-pip\
  python-software-properties g++ gcc make libssl-dev libreadline6-dev libaio-dev libbz2-dev\
  zlib1g-dev libjpeg62-dev libpcre3-dev libexpat1-dev libxml2 libxml2-dev libjson0\
- libjson0-dev liblzma-dev libevent-dev wget zip unzip
+ libjson0-dev liblzma-dev libevent-dev wget zip unzip osm2pgsql
 
 
 echo "Installing: geos..."

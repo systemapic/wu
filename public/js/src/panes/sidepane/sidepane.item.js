@@ -161,6 +161,13 @@ Wu.SidePane.Item = Wu.Class.extend({
 	// do swipe of sidepane when selecting menu item, by jorgen
 	swiper : function (prev) {
 		
+		// Button height
+		if ( !L.Browser.mobile ) {
+			var bHeight = 70;
+		} else {
+			var bHeight = 40;
+		}
+		
 		// set vars
 		var swypefrom = prev._content;
 		var swypeto = Wu.app._active;               
@@ -169,7 +176,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 		if (swypefrom == swypeto) return;
 
 		// update the slider on the left    
-		var h = 70;
+		var h = bHeight;
 		var menuslider = Wu.DomUtil.get('menuslider');
 		   
 		// get classy

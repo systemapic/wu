@@ -67,6 +67,7 @@
 
 		<!-- styletag for injecting css -->
 		<div id="styletag"></div>
+		<div id="mobilestyle"></div>
 
 
 		<!-- Loader GA her, siden vi trenger analytics.js for å registrere events -->
@@ -1761,6 +1762,19 @@
 			var app = new Wu.App({
 					id : 'app',
 			});
+
+
+
+
+		// if (L.Browser.mobile) {
+			// alert('mobile')	
+			var styletag = document.getElementById('mobilestyle');
+			var styleURL = '<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/mobilestyle.css">';
+			styletag.innerHTML = styleURL;			
+			console.log('styleURL', styleURL);
+			console.log('styletag', styletag);
+		// }
+
 
 		</script>
 

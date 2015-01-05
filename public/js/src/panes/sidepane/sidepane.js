@@ -16,7 +16,7 @@ Wu.SidePane = Wu.Class.extend({
 	initContainer: function () {
 
 		// create container
-		var className = 'q-editor-container ct1';
+		var className = 'q-editor-container';
 		this._container = Wu.DomUtil.create('div', className, Wu.app._appPane);
 		
 		// toggle panes button
@@ -28,7 +28,7 @@ Wu.SidePane = Wu.Class.extend({
 	initContent : function () {
 		
 		// menu pane
-		var className = 'q-editor-menu ct0';
+		var className = 'q-editor-menu';
 		Wu.app._editorMenuPane = Wu.DomUtil.create('menu', className, this._container); 
 
 		// content pane
@@ -39,7 +39,6 @@ Wu.SidePane = Wu.Class.extend({
 		app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
 		app._menuSliderArrow = Wu.DomUtil.createId('div', 'menuslider-arrow', Wu.app._menuSlider);	// refactor app
 
-		Wu.DomUtil.addClass(Wu.app._menuSlider, 'ct1');
 		
 	},
 	
@@ -112,9 +111,17 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	_setMenuHeight : function () {
+
+		// Button height
+		if ( !L.Browser.mobile ) {
+			var bHeight = 70;
+		} else {
+			var bHeight = 40;
+		}
+
 		var panes = this._getPaneArray();
 		var defaultPanes = app.Account.isManager() ? 3 : 2;		// 3 if manager, 2 if not (ie. only Project, Logout)
-		var height = panes ? panes.length * 70 : defaultPanes * 70;	// if no active project, default 3 menu items
+		var height = panes ? panes.length * bHeight : defaultPanes * bHeight;	// if no active project, default 3 menu items
 		app._editorMenuPane.style.height = parseInt(height) + 'px';
 	},
 
