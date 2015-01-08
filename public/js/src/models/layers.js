@@ -157,6 +157,8 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	enable : function () {
+
+		console.log('enable');
 		this.addTo();
 	},
 

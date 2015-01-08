@@ -221,10 +221,17 @@ input[type=checkbox] + label.check {
 	}
 
 #open-layers {
-	-webkit-transition: width 250ms ease, height 250ms ease;	
+/*	-webkit-transition: width 250ms ease, height 250ms ease;	
 	-moz-transition: width 250ms ease, height 250ms ease;	
 	-o-transition: width 250ms ease, height 250ms ease;	
 	transition: width 250ms ease, height 250ms ease;	
+*/	
+	-webkit-transition: right 250ms ease;
+	-moz-transition: right 250ms ease;
+	-o-transition: right 250ms ease;
+	transition: right 250ms ease;
+	
+
 	}
 	
 .legends-collapser-trans {
@@ -235,10 +242,10 @@ input[type=checkbox] + label.check {
 	}
 	
 #legends-inner {
-	-webkit-transition: height 250ms ease, width 250ms ease;
-	-moz-transition: height 250ms ease, width 250ms ease;
-	-o-transition: height 250ms ease, width 250ms ease;
-	transition: height 250ms ease, width 250ms ease;
+	-webkit-transition: height 250ms ease, width 250ms ease, left 250ms ease;
+	-moz-transition: height 250ms ease, width 250ms ease, left 250ms ease;
+	-o-transition: height 250ms ease, width 250ms ease, left 250ms ease;
+	transition: height 250ms ease, width 250ms ease, left 250ms ease;
 	}
 
 .editor-client-edit-wrapper {

@@ -39,6 +39,7 @@ L.Control.Description = L.Control.extend({
 	},      
 
 	setDescription : function (layer) {
+
 		this._inner.innerHTML = layer.store.description;
 	},
 
@@ -99,7 +100,8 @@ L.Control.Description = L.Control.extend({
 	addHooks : function () {
 		
 		// collapsers
-		Wu.DomEvent.on(this._button, 'click', this.closePane, this);
+		// Wu.DomEvent.on(this._button, 'click', this.closePane, this);
+		Wu.DomEvent.on(this._button, 'click', this.toggleCloser, this);
 
 		// edit mode
 		if (this.editMode) Wu.DomEvent.on(this._outer, 'dblclick', this.toggleEdit, this);
@@ -254,13 +256,53 @@ L.Control.Description = L.Control.extend({
 
 	},
 
+	// For Mobile Phones
+	toggleCloser : function () {
+
+		// Close pane if we're on a desktop / pad
+		if ( !Wu.app.mobile ) {
+			this.closePane();
+		
+		// Slide pane if we're on a mobile phone
+		} else {
+			this._isClosed ? this.mobileOpenPane() : this.mobileClosePane();
+		}
+
+	},
+
+	mobileOpenPane : function () {
+
+		Wu.DomUtil.addClass(this._button, 'active-description');
+
+		// Slide In
+		this._content.style.left = '0px';
+		this._isClosed = false;
+
+		// Close other panes if they are open
+		if ( app.MapPane.legendsControl._isOpen ) app.MapPane.legendsControl.MobileCloseLegends();
+		if ( app.MapPane.layerMenu._open ) app.MapPane.layerMenu.closeLayerPane();
+
+
+	},
+
+
+	mobileClosePane : function () {
+
+		Wu.DomUtil.removeClass(this._button, 'active-description');
+
+		// Slide out (only works in portrait format... in landscape it has to be [0] )
+		this._content.style.left = Wu.app.nativeResolution[1] + 'px';
+		this._isClosed = true;
+	},
+
 	closePane : function () {
-//		console.log('closePane');
 		this._container.style.display = "none";
+		this._isClosed = true;
 	},
 	
 	openPane : function () {
-		this._container.style.display = "block";				
+		this._container.style.display = "block";
+		this._isClosed = false;			
 	}
 	
 });

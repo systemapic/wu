@@ -85,9 +85,40 @@ Wu.StatusPane = Wu.Class.extend({
 		// Hide button section and Layer info when the Home dropdown menu opens (j)
 		if (app._map) app._map._controlCorners.topleft.style.opacity = 0;
 
+
+		app.MapPane.descriptionControl;
+
 		// close layermenu edit if open  				// refactor all these events.. centralize
 		var layermenu = app.MapPane.layerMenu;
 		if (layermenu) layermenu.disableEdit();
+
+
+		// Mobile option
+		if (Wu.app.mobile) {
+
+			// Check if there is a map pane there...
+			if ( app.MapPane ) {
+			
+				// Close the Layer Menu control
+				if ( app.MapPane.layerMenu ) {
+					app.MapPane.layerMenu.closeLayerPane();
+					app.MapPane.layerMenu._openLayers.style.opacity = 0;
+				}
+
+				// Close the Legends control
+				if ( app.MapPane.legendsControl ) {
+					if ( app.MapPane.legendsControl._isOpen ) app.MapPane.legendsControl.MobileCloseLegends();
+					app.MapPane.legendsControl._legendsOpener.style.opacity = 0;
+				}
+
+				// Close the description control
+				if ( app.MapPane.descriptionControl ) {
+					if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
+				}
+
+			}
+
+		}
 
 
 
@@ -106,6 +137,33 @@ Wu.StatusPane = Wu.Class.extend({
 
 		// Show button section and Layer info when the Home dropdown menu opens (j)
 		if (app._map) app._map._controlCorners.topleft.style.opacity = 1;
+
+
+
+		// Mobile option : activate default sidepane on close to avoid opening in fullscreen
+		if (Wu.app.mobile) {
+			if ( app.MapPane ) {
+				
+				if ( app.MapPane.layerMenu ) app.MapPane.layerMenu._openLayers.style.opacity = 1;
+				if ( app.MapPane.legendsControl ) app.MapPane.legendsControl._legendsOpener.style.opacity = 1;
+				if ( app.MapPane.descriptionControl ) app.MapPane.descriptionControl._button.style.opacity = 1;
+				
+				// Make sure we reset if we're in fullscreen mode (media library, users, etc)
+				if ( app.SidePane.fullscreen ) app.SidePane.Clients.activate();
+				
+			}	
+		}
+
+
+		// Only open the description box if there is anything inside of it
+		if ( app.MapPane.descriptionControl.activeLayer ) {
+			if ( app.MapPane.descriptionControl.activeLayer.store.description == '' || !app.MapPane.descriptionControl.activeLayer.store.description ) {
+				app.MapPane.descriptionControl.hide();
+			}
+		} else {
+			// If no layers has been activated
+			app.MapPane.descriptionControl.hide();	
+		}
 
 	},
 

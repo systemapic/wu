@@ -27,11 +27,12 @@ Wu.SidePane.Item = Wu.Class.extend({
 		var className = 'q-editor-content-item ' + this.type;
 		this._content = Wu.DomUtil.create('div', className, Wu.app._editorContentPane);
 
-		// scroll wrapper (j)
+		// scroll wrapper
 		this._scrollWrapper = Wu.DomUtil.create('div', 'editor-scroll-wrapper', this._content);
 
 		// wrapper 
-		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct13', this._scrollWrapper);
+		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._scrollWrapper);
+
 
 	},
 
@@ -57,7 +58,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 	// if clicking on already active tab, toggle it
 	_reclick : function () {
 
-		var __map = Wu.DomUtil.get("map"); // (j)
+		// var __map = Wu.DomUtil.get("map"); // (j)
 		var _menusliderArrow = Wu.DomUtil.get("menuslider-arrow"); // (j)
 
 		// if open
@@ -70,7 +71,9 @@ Wu.SidePane.Item = Wu.Class.extend({
 			Wu.app.SidePane.closePane();
 
 			// Remove blur on map... (j)
-			Wu.DomUtil.removeClass(__map, "map-blur")
+			// Wu.DomUtil.removeClass(__map, "map-blur")
+			Wu.DomUtil.removeClass(app._mapPane, "map-blur")
+			
 
 		// if closed
 		} else {
@@ -87,7 +90,8 @@ Wu.SidePane.Item = Wu.Class.extend({
 			    _.contains(clist, 'data-library') 		|| 
 			    _.contains(clist, 'fullpage-users') 	){
 
-					Wu.DomUtil.addClass(__map, "map-blur");
+				// Wu.DomUtil.addClass(__map, "map-blur");
+				Wu.DomUtil.addClass(app._mapPane, "map-blur");
 
 			}
 
@@ -96,6 +100,9 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 
 	_clickActivate : function (e) {
+
+		// To open fullscreen tabs that's been closed
+		if ( Wu.app.mobile ) this.mobileReActivate();
 
 		// if clicking on already active tab, toggle it
 		// if (Wu.app._activeMenu == this) return this._reclick();
@@ -109,13 +116,25 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 	},
 
+	mobileReActivate : function () {
+
+		this.activate();
+
+		if ( app._activeMenuItem == 'documents' || app._activeMenuItem == 'dataLibrary' || app._activeMenuItem == 'users' ) {
+
+			Wu.DomUtil.addClass(Wu.app._active, 'show')						
+			this.mobileFullScreenAdjustment();
+		}
+	},
+
+	// cxxxx
 	activate : function (e) {
-		
+	
 		// set active menu
 		var prev = Wu.app._activeMenu || false;
 		Wu.app._activeMenu = this;
 		    
-		// active content                       
+		// active content                        
 		Wu.app._active = this._content;  
 		app._activeMenuItem = this.type;
 
@@ -137,6 +156,16 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 	},
 
+
+	mobileFullScreenAdjustment : function () {
+			
+		Wu.app._editorMenuPane.style.opacity = 0; // This is .q-editor-content
+		Wu.DomUtil.removeClass(app.SidePane._mobileFullScreenCloser, 'displayNone', this);
+		// app._activeMenuItem = undefined;
+		app.SidePane.fullscreen = true;
+	},
+
+
 	_activate : function () {
 
 	},
@@ -147,10 +176,11 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 	// check swipe of sidepane on selecting menu item (j)
 	checkSwipe : function (prev) {
+
 		if (prev) return this.swiper(prev);
 
 		// Hide the Deactivated Pane
-		if (Wu.app._active) Wu.DomUtil.removeClass(Wu.app._active, 'show')                                             
+		if (Wu.app._active) Wu.DomUtil.removeClass(Wu.app._active, 'show')
 
 		// Show the Activated Pane                              
 		Wu.app._active = this._content;
@@ -160,9 +190,10 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 	// do swipe of sidepane when selecting menu item, by jorgen
 	swiper : function (prev) {
+
 		
 		// Button height
-		if ( !L.Browser.mobile ) {
+		if ( !Wu.app.mobile ) {
 			var bHeight = 70;
 		} else {
 			var bHeight = 50;
@@ -170,10 +201,12 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 		// set vars
 		var swypefrom = prev._content;
-		var swypeto = Wu.app._active;               
+		var swypeto = Wu.app._active;
 
 		// if same, do nothing
+		
 		if (swypefrom == swypeto) return;
+		
 
 		// update the slider on the left    
 		var h = bHeight;
@@ -195,52 +228,74 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 
 		// check which 
-		if (_.contains(classy, 'clients')) {
+		// if (_.contains(classy, 'clients')) {
+		if ( app._activeMenuItem == 'clients' ) {	
 			menuslider.style.top = '0px';
 			Wu.app.SidePane._container.style.width = w;
 			Wu.DomUtil.removeClass(__map, "map-blur")
 		}
 
-		if (_.contains(classy, 'map')) {
+		// if (_.contains(classy, 'map')) {
+		if ( app._activeMenuItem == 'map' ) {
 			var n = app.SidePane.panes.indexOf('Map');		// calculate position
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = w;
 			Wu.DomUtil.removeClass(__map, "map-blur")
 		}
 	    
-		if (_.contains(classy, 'documents')) {
+		// if (_.contains(classy, 'documents')) {
+		if ( app._activeMenuItem == 'documents' ) {	
 			var n = app.SidePane.panes.indexOf('Documents');
-			console.log('n: ', n, app.SidePane.panes);
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
 			Wu.DomUtil.addClass(__map, "map-blur")
+
+			// Mobile option
+			if ( Wu.app.mobile ) this.mobileFullScreenAdjustment();
+
 		}
 	    
-		if (_.contains(classy, 'dataLibrary')) {
+		// if (_.contains(classy, 'dataLibrary')) {
+		if ( app._activeMenuItem == 'dataLibrary' ) {
 			var n = app.SidePane.panes.indexOf('DataLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
-			Wu.DomUtil.addClass(__map, "map-blur")
+			Wu.DomUtil.addClass(__map, "map-blur");
+
+			// Mobile option
+			if ( Wu.app.mobile ) this.mobileFullScreenAdjustment();
+
 		}
 	    
 
-	    	if (_.contains(classy, 'mediaLibrary')) {
+	    	// if (_.contains(classy, 'mediaLibrary')) {
+		if ( app._activeMenuItem == 'mediaLibrary' ) {
 			var n = app.SidePane.panes.indexOf('MediaLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
 			Wu.DomUtil.addClass(__map, "map-blur")
+
+			// Mobile option
+			if ( Wu.app.mobile ) this.mobileFullScreenAdjustment();
+
 		}
 
 
-		if (_.contains(classy, 'users')) {
+		// if (_.contains(classy, 'users')) {
+		if ( app._activeMenuItem == 'users' ) {			
 			var n = app.SidePane.panes.indexOf('Users');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
 			Wu.DomUtil.addClass(__map, "map-blur")
+
+			// Mobile option
+			if ( Wu.app.mobile ) this.mobileFullScreenAdjustment();
+
 		}
 				
 
-		if (_.contains(classy, 'share')) {
+		// if (_.contains(classy, 'share')) {
+		if ( app._activeMenuItem == 'share' ) {
 			var n = app.SidePane.panes.indexOf('Share');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
@@ -270,6 +325,8 @@ Wu.SidePane.Item = Wu.Class.extend({
 			
 		// Swipe this IN
 		Wu.DomUtil.addClass(swypeto, 'show');	
+
+
 			
 	},
 
@@ -317,6 +374,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 	// active for Projects tab (ie. Clients)
 	calculateHeight : function () {
+
 		var screenHeight   = window.innerHeight,
 		    legendsControl = app.MapPane.legendsControl,
 		    height         = -107 + screenHeight;

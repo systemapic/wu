@@ -75,7 +75,48 @@ Wu.App = Wu.Class.extend({
 		// get objects from server
 		this.initServer();
 
+		// Detect mobile devices
+		this.detectMobile();
 
+	},
+
+
+	detectMobile : function() {
+		
+		// Detect if it's a mobile
+		// if ( L.Browser.mobile ) {
+			
+			// Set mobile state to true
+			Wu.app.mobile = false;
+			Wu.app.pad = false;
+			
+			// Get screen resolution
+			var w = screen.height;
+			var h = screen.width;
+
+			// Store resolution
+			Wu.app.nativeResolution = [w, h];
+
+			if ( w >= h ) var smallest = h;
+			else var smallest = w;
+
+			// Mobile phone
+			if ( smallest < 450 ) {
+				Wu.app.mobile = true;
+				var mobilestyle = 'mobilestyle.css'
+			// Tablet
+			} else {
+				Wu.app.pad = true;
+				var mobilestyle = 'padstyle.css'
+			}
+
+			// Get the styletag
+			var styletag = document.getElementById('mobilestyle');
+			// Set stylesheet for 
+			var styleURL = '<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/' + mobilestyle + '">';
+			styletag.innerHTML = styleURL;
+			
+		// }
 	},
 
 	initServer : function () {

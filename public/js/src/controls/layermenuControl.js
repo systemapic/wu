@@ -25,7 +25,7 @@ L.Control.Layermenu = L.Control.extend({
 
 	},
 
-	// (j)
+
 	initLayout : function () {		
 
 		// Create the header    
@@ -45,15 +45,19 @@ L.Control.Layermenu = L.Control.extend({
 		// Create the 'uncollapse' button ... will put in DOM l8r
 		this._openLayers = Wu.DomUtil.createId('div', 'open-layers');
 		this._openLayers.innerHTML = 'Open Layer Menu';
-		Wu.DomUtil.addClass(this._openLayers, 'leaflet-control open-open-layers');
+		Wu.DomUtil.addClass(this._openLayers, 'leaflet-control ol-collapsed');
+
+		// Append to DOM
+		app._map._controlCorners.bottomright.appendChild(this._openLayers);
 
 		// Pick up Elements dealing with the Legends
 		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
 		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
 
-		// Register Click events                                
+		// Register Click events cxxxx                     
 		Wu.DomEvent.on(this._bhattan1,   'click', this.closeLayerPane, this);
-		Wu.DomEvent.on(this._openLayers, 'click', this.openLayerPane, this);     
+		// Wu.DomEvent.on(this._openLayers, 'click', this.openLayerPane, this);
+		Wu.DomEvent.on(this._openLayers, 'click', this.toggleLayerPane, this);     
 
 		// Stop Propagation
 		Wu.DomEvent.on(this._openLayers, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
@@ -132,23 +136,34 @@ L.Control.Layermenu = L.Control.extend({
 	},
 
 
-	// (j)        
-	closeLayerPane : function () {		
+
+	toggleLayerPane : function () {
+
+		if ( this._open ) this.closeLayerPane();
+		else this.openLayerPane();
+
+	},
+
+
+	// (j)
+	closeLayerPane : function () {
 
 		this._open = false;
 
 		// Collapse Wrapper
-		this._container.parentNode.style.width = '0px';
+		app._map._controlCorners.bottomright.style.width = '0px';
 
-		// Insert opener
-		this._container.parentNode.appendChild(this._openLayers);
+		Wu.DomUtil.removeClass(this._openLayers, 'ol-collapsed');
 		
+
 		// Slide the LEGENDS
 		if ( app.MapPane.inspectControl ) {
 			if (this._legendsContainer) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
 		}	
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.right = '140px';
+		app._map._controlCorners.topright.style.right = '140px';
+		
+
 	
 	},
 
@@ -158,10 +173,11 @@ L.Control.Layermenu = L.Control.extend({
 		this._open = true;
 
 		// Open Wrapper
-		this._container.parentNode.style.width = '290px';
+		// this._container.parentNode.style.width = '290px';
+		app._map._controlCorners.bottomright.style.width = '290px';
 
 		// Close the closer :P
-		this._openLayers.className = 'leaflet-control layer-opener-opened close-layer-opener';
+		Wu.DomUtil.addClass(this._openLayers, 'ol-collapsed');
 		
 		// Slide the LEGENDS
 		if ( app.MapPane.inspectControl ) {
@@ -169,14 +185,17 @@ L.Control.Layermenu = L.Control.extend({
 		}
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.right = '295px';                  
+		app._map._controlCorners.topright.style.right = '295px';                
 		
-		// Set correct classname and remove open layer menu button from DOM	
-		var that = this;
-		setTimeout(function(){					
-			that._container.parentNode.removeChild(that._openLayers);
-			that._openLayers.className = 'leaflet-control open-open-layers';												
-		}, 500);
+
+		// If we're on mobile
+		if ( Wu.app.mobile ) {
+
+			// Check if legends is open ~ close it when opening layer menu
+			if ( app.MapPane.legendsControl._isOpen ) app.MapPane.legendsControl.MobileCloseLegends();
+			if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
+		}
+
 	},
 
 
@@ -657,14 +676,17 @@ L.Control.Layermenu = L.Control.extend({
 	},
 		
 	enableLayer : function (layerItem) {
+
 		var layer = layerItem.layer;
 
 		// folder click
 		if (!layer) return this.toggleFolder(layerItem); 
 			
 		// add layer to map
+		console.log('HEY! When adding layer to map, I need to know what fricking function it is that automatically loads the frickin legends... because I don\' want the legends to be loaded when we\'re in frickin mobile world, yo');
 		layer.add();
 		layerItem.on = true;
+
 
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
@@ -789,7 +811,7 @@ L.Control.Layermenu = L.Control.extend({
 
 	},
 
-	_add : function (layerItem) {
+	_add : function (layerItem) {		
 
 		var item  = layerItem.item;
 		var layer = layerItem.layer;

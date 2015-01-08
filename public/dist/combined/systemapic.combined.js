@@ -1980,8 +1980,31 @@ L.Popup.include({
 		// toggle panes button
 		this.paneOpen = false; // default
 		this.whichPaneOpen = 'projects';
+
+		// Mobile option ~ Back button when entering documents/datalibrary/users fullscreen
+		if ( Wu.app.mobile ) {
+
+			this._mobileFullScreenCloser = Wu.DomUtil.create('div', 'q-editor-fullscreen-mobile-close displayNone', this._container);
+			Wu.DomEvent.on(this._mobileFullScreenCloser, 'mousedown', this.closeMobileFullscreen, this);
+		}		
+
 	},
 
+	closeMobileFullscreen : function () {
+
+		if ( app.SidePane.fullscreen ) {
+
+			console.log('close fullscreen');
+			Wu.app._editorMenuPane.style.opacity = 1; // .q-editor-content
+			Wu.DomUtil.addClass(app.SidePane._mobileFullScreenCloser, 'displayNone'); // Hide back button
+			Wu.DomUtil.removeClass(app._mapPane, "map-blur"); // remove map blurring
+			Wu.DomUtil.removeClass(Wu.app._active, 'show'); // Hide current active fullpane
+			
+			app.SidePane.fullscreen = false;
+
+		}
+
+	},
 
 	initContent : function () {
 		
@@ -2071,7 +2094,7 @@ L.Popup.include({
 	_setMenuHeight : function () {
 
 		// Button height
-		if ( !L.Browser.mobile ) {
+		if ( !Wu.app.mobile ) {
 			var bHeight = 70;
 		} else {
 			var bHeight = 50;
@@ -2254,7 +2277,17 @@ L.Popup.include({
 
 		// refresh leaflet
 		this._refreshLeaflet();
+
+		if ( Wu.app.mobile ) this.openOnMobile();
 		
+	},
+
+	// By Jørgen ~ Do not open full screen panes
+	openOnMobile : function () {
+
+		if ( app._activeMenuItem == 'documents' || app._activeMenuItem == 'dataLibrary' || app._activeMenuItem == 'users') {
+			app.SidePane.Clients.activate();	
+		}
 	},
 
 	widenContainer : function () {
@@ -2304,6 +2337,7 @@ L.Popup.include({
 		// wrapper 
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct13', this._scrollWrapper);
 
+
 	},
 
 	initContent : function () {
@@ -2328,7 +2362,7 @@ L.Popup.include({
 	// if clicking on already active tab, toggle it
 	_reclick : function () {
 
-		var __map = Wu.DomUtil.get("map"); // (j)
+		// var __map = Wu.DomUtil.get("map"); // (j)
 		var _menusliderArrow = Wu.DomUtil.get("menuslider-arrow"); // (j)
 
 		// if open
@@ -2341,7 +2375,9 @@ L.Popup.include({
 			Wu.app.SidePane.closePane();
 
 			// Remove blur on map... (j)
-			Wu.DomUtil.removeClass(__map, "map-blur")
+			// Wu.DomUtil.removeClass(__map, "map-blur")
+			Wu.DomUtil.removeClass(app._mapPane, "map-blur")
+			
 
 		// if closed
 		} else {
@@ -2358,7 +2394,8 @@ L.Popup.include({
 			    _.contains(clist, 'data-library') 		|| 
 			    _.contains(clist, 'fullpage-users') 	){
 
-					Wu.DomUtil.addClass(__map, "map-blur");
+				// Wu.DomUtil.addClass(__map, "map-blur");
+				Wu.DomUtil.addClass(app._mapPane, "map-blur");
 
 			}
 
@@ -2367,6 +2404,9 @@ L.Popup.include({
 
 
 	_clickActivate : function (e) {
+
+		// To open fullscreen tabs that's been closed
+		if ( Wu.app.mobile ) this.mobileReActivate();
 
 		// if clicking on already active tab, toggle it
 		// if (Wu.app._activeMenu == this) return this._reclick();
@@ -2380,13 +2420,25 @@ L.Popup.include({
 
 	},
 
+	mobileReActivate : function () {
+
+		this.activate();
+
+		if ( app._activeMenuItem == 'documents' || app._activeMenuItem == 'dataLibrary' || app._activeMenuItem == 'users' ) {
+
+			Wu.DomUtil.addClass(Wu.app._active, 'show')						
+			this.mobileFullScreenAdjustment();
+		}
+	},
+
+	// cxxxx
 	activate : function (e) {
-		
+	
 		// set active menu
 		var prev = Wu.app._activeMenu || false;
 		Wu.app._activeMenu = this;
 		    
-		// active content                       
+		// active content                        
 		Wu.app._active = this._content;  
 		app._activeMenuItem = this.type;
 
@@ -2408,6 +2460,16 @@ L.Popup.include({
 
 	},
 
+
+	mobileFullScreenAdjustment : function () {
+			
+		Wu.app._editorMenuPane.style.opacity = 0; // This is .q-editor-content
+		Wu.DomUtil.removeClass(app.SidePane._mobileFullScreenCloser, 'displayNone', this);
+		// app._activeMenuItem = undefined;
+		app.SidePane.fullscreen = true;
+	},
+
+
 	_activate : function () {
 
 	},
@@ -2418,10 +2480,11 @@ L.Popup.include({
 
 	// check swipe of sidepane on selecting menu item (j)
 	checkSwipe : function (prev) {
+
 		if (prev) return this.swiper(prev);
 
 		// Hide the Deactivated Pane
-		if (Wu.app._active) Wu.DomUtil.removeClass(Wu.app._active, 'show')                                             
+		if (Wu.app._active) Wu.DomUtil.removeClass(Wu.app._active, 'show')
 
 		// Show the Activated Pane                              
 		Wu.app._active = this._content;
@@ -2431,9 +2494,10 @@ L.Popup.include({
 
 	// do swipe of sidepane when selecting menu item, by jorgen
 	swiper : function (prev) {
+
 		
 		// Button height
-		if ( !L.Browser.mobile ) {
+		if ( !Wu.app.mobile ) {
 			var bHeight = 70;
 		} else {
 			var bHeight = 50;
@@ -2441,10 +2505,12 @@ L.Popup.include({
 
 		// set vars
 		var swypefrom = prev._content;
-		var swypeto = Wu.app._active;               
+		var swypeto = Wu.app._active;
 
 		// if same, do nothing
+		
 		if (swypefrom == swypeto) return;
+		
 
 		// update the slider on the left    
 		var h = bHeight;
@@ -2466,52 +2532,74 @@ L.Popup.include({
 
 
 		// check which 
-		if (_.contains(classy, 'clients')) {
+		// if (_.contains(classy, 'clients')) {
+		if ( app._activeMenuItem == 'clients' ) {	
 			menuslider.style.top = '0px';
 			Wu.app.SidePane._container.style.width = w;
 			Wu.DomUtil.removeClass(__map, "map-blur")
 		}
 
-		if (_.contains(classy, 'map')) {
+		// if (_.contains(classy, 'map')) {
+		if ( app._activeMenuItem == 'map' ) {
 			var n = app.SidePane.panes.indexOf('Map');		// calculate position
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = w;
 			Wu.DomUtil.removeClass(__map, "map-blur")
 		}
 	    
-		if (_.contains(classy, 'documents')) {
+		// if (_.contains(classy, 'documents')) {
+		if ( app._activeMenuItem == 'documents' ) {	
 			var n = app.SidePane.panes.indexOf('Documents');
-			console.log('n: ', n, app.SidePane.panes);
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
 			Wu.DomUtil.addClass(__map, "map-blur")
+
+			// Mobile option
+			if ( Wu.app.mobile ) this.mobileFullScreenAdjustment();
+
 		}
 	    
-		if (_.contains(classy, 'dataLibrary')) {
+		// if (_.contains(classy, 'dataLibrary')) {
+		if ( app._activeMenuItem == 'dataLibrary' ) {
 			var n = app.SidePane.panes.indexOf('DataLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
-			Wu.DomUtil.addClass(__map, "map-blur")
+			Wu.DomUtil.addClass(__map, "map-blur");
+
+			// Mobile option
+			if ( Wu.app.mobile ) this.mobileFullScreenAdjustment();
+
 		}
 	    
 
-	    	if (_.contains(classy, 'mediaLibrary')) {
+	    	// if (_.contains(classy, 'mediaLibrary')) {
+		if ( app._activeMenuItem == 'mediaLibrary' ) {
 			var n = app.SidePane.panes.indexOf('MediaLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
 			Wu.DomUtil.addClass(__map, "map-blur")
+
+			// Mobile option
+			if ( Wu.app.mobile ) this.mobileFullScreenAdjustment();
+
 		}
 
 
-		if (_.contains(classy, 'users')) {
+		// if (_.contains(classy, 'users')) {
+		if ( app._activeMenuItem == 'users' ) {			
 			var n = app.SidePane.panes.indexOf('Users');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
 			Wu.DomUtil.addClass(__map, "map-blur")
+
+			// Mobile option
+			if ( Wu.app.mobile ) this.mobileFullScreenAdjustment();
+
 		}
 				
 
-		if (_.contains(classy, 'share')) {
+		// if (_.contains(classy, 'share')) {
+		if ( app._activeMenuItem == 'share' ) {
 			var n = app.SidePane.panes.indexOf('Share');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
@@ -2541,6 +2629,8 @@ L.Popup.include({
 			
 		// Swipe this IN
 		Wu.DomUtil.addClass(swypeto, 'show');	
+
+
 			
 	},
 
@@ -2588,6 +2678,7 @@ L.Popup.include({
 
 	// active for Projects tab (ie. Clients)
 	calculateHeight : function () {
+
 		var screenHeight   = window.innerHeight,
 		    legendsControl = app.MapPane.legendsControl,
 		    height         = -107 + screenHeight;
@@ -3857,9 +3948,21 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	calculateHeight : function () {
-		var min = 150;
-		this.maxHeight = min + _.size(this.projects) * 116;
-		this.minHeight = 80;
+		
+		if ( !Wu.app.mobile ) {
+	
+			var min = 150;
+			this.maxHeight = min + _.size(this.projects) * 116;
+			this.minHeight = 80;
+
+		} else {
+
+			var min = 78;
+			this.maxHeight = min + _.size(this.projects) * 100;
+			this.minHeight = 68; 
+		}
+
+		
 	},
 
 
@@ -3897,7 +4000,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._search = Wu.DomUtil.createId('input', 'users-search', this._usersControlsInner);
 		this._search.setAttribute("type", "text");
 		this._search.setAttribute("placeholder", "Search users");
-		Wu.DomUtil.addClass(this._search, 'search ct17');
+		Wu.DomUtil.addClass(this._search, 'search');
 
 		// create container (overwrite default) and insert template
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content, ich.usersPane());
@@ -4093,8 +4196,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var firstName    = this._inputUser._firstName = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'First Name');
 		var lastName     = this._inputUser._lastName  = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Last Name');
 		var companyName	 = this._inputUser._companyName = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Company Name');
-		var position	 = this._inputUser._position = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Position');
-		var phoneNo	 = this._inputUser._phoneNo = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Phone Number');
+		var position	 = this._inputUser._position  = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Position');
+		var phoneNo	 = this._inputUser._phoneNo   = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Phone Number');
 		var email        = this._inputUser._email     = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Email');
 		var email2       = this._inputUser._email2    = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Confirm Email');
 		var message      = this._inputUser._message   = Wu.DomUtil.create('div',   'backpane-message',   wrapper, messageText);
@@ -10274,9 +10377,50 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// Hide button section and Layer info when the Home dropdown menu opens (j)
 		if (app._map) app._map._controlCorners.topleft.style.opacity = 0;
 
+
+		app.MapPane.descriptionControl;
+
 		// close layermenu edit if open  				// refactor all these events.. centralize
 		var layermenu = app.MapPane.layerMenu;
 		if (layermenu) layermenu.disableEdit();
+
+
+		// Mobile option
+		if (Wu.app.mobile) {
+
+			// Check if there is a map pane there...
+			if ( app.MapPane ) {
+			
+				// Close the Layer Menu control
+				if ( app.MapPane.layerMenu ) {
+					app.MapPane.layerMenu.closeLayerPane();
+					app.MapPane.layerMenu._openLayers.style.opacity = 0;
+				}
+
+				// Close the Legends control
+				if ( app.MapPane.legendsControl ) {
+					if ( app.MapPane.legendsControl._isOpen ) app.MapPane.legendsControl.MobileCloseLegends();
+					app.MapPane.legendsControl._legendsOpener.style.opacity = 0;
+				}
+
+				// Close the description control
+				if ( app.MapPane.descriptionControl ) {
+					if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
+				}
+
+
+			}
+
+			
+
+
+
+			// Make sure we don't open full page panes...
+			// Lugger litt, men funker for nå... 
+			// if ( app._activeMenuItem == undefined ) {
+			// 	app.SidePane.Clients.activate();
+			// }
+		}
 
 
 
@@ -10295,6 +10439,27 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// Show button section and Layer info when the Home dropdown menu opens (j)
 		if (app._map) app._map._controlCorners.topleft.style.opacity = 1;
+
+
+
+		// Mobile option : activate default sidepane on close to avoid opening in fullscreen
+		if (Wu.app.mobile) {
+			app.MapPane.layerMenu._openLayers.style.opacity = 1;
+			if ( app.SidePane.fullscreen ) {
+				app.SidePane.Clients.activate();
+			}			
+		}
+
+
+		// Only open the description box if there is anything inside of it
+		if ( app.MapPane.descriptionControl.activeLayer ) {
+			if ( app.MapPane.descriptionControl.activeLayer.store.description == '' || !app.MapPane.descriptionControl.activeLayer.store.description ) {
+				app.MapPane.descriptionControl.hide();
+			}
+		} else {
+			// If no layers has been activated
+			app.MapPane.descriptionControl.hide();	
+		}
 
 	},
 
@@ -10462,15 +10627,19 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// Create the 'uncollapse' button ... will put in DOM l8r
 		this._openLayers = Wu.DomUtil.createId('div', 'open-layers');
 		this._openLayers.innerHTML = 'Open Layer Menu';
-		Wu.DomUtil.addClass(this._openLayers, 'leaflet-control open-open-layers');
+		Wu.DomUtil.addClass(this._openLayers, 'leaflet-control ol-collapsed');
+
+		// Append to DOM
+		app._map._controlCorners.bottomright.appendChild(this._openLayers);
 
 		// Pick up Elements dealing with the Legends
 		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
 		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
 
-		// Register Click events                                
+		// Register Click events cxxxx                     
 		Wu.DomEvent.on(this._bhattan1,   'click', this.closeLayerPane, this);
-		Wu.DomEvent.on(this._openLayers, 'click', this.openLayerPane, this);     
+		// Wu.DomEvent.on(this._openLayers, 'click', this.openLayerPane, this);
+		Wu.DomEvent.on(this._openLayers, 'click', this.toggleLayerPane, this);     
 
 		// Stop Propagation
 		Wu.DomEvent.on(this._openLayers, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
@@ -10549,36 +10718,49 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 
-	// (j)        
-	closeLayerPane : function () {		
+
+	toggleLayerPane : function () {
+
+		if ( this._open ) this.closeLayerPane();
+		else this.openLayerPane();
+
+	},
+
+
+	// (j) cxxx
+	closeLayerPane : function () {
 
 		this._open = false;
 
 		// Collapse Wrapper
-		this._container.parentNode.style.width = '0px';
+		app._map._controlCorners.bottomright.style.width = '0px';
 
-		// Insert opener
-		this._container.parentNode.appendChild(this._openLayers);
+		Wu.DomUtil.removeClass(this._openLayers, 'ol-collapsed');
 		
+
+
 		// Slide the LEGENDS
 		if ( app.MapPane.inspectControl ) {
 			if (this._legendsContainer) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
 		}	
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.right = '140px';
+		app._map._controlCorners.topright.style.right = '140px';
+		
+
 	
 	},
 
-	// (j)
+	// (j) cxxx
 	openLayerPane : function () {
 
 		this._open = true;
 
 		// Open Wrapper
-		this._container.parentNode.style.width = '290px';
+		// this._container.parentNode.style.width = '290px';
+		app._map._controlCorners.bottomright.style.width = '290px';
 
 		// Close the closer :P
-		this._openLayers.className = 'leaflet-control layer-opener-opened close-layer-opener';
+		Wu.DomUtil.addClass(this._openLayers, 'ol-collapsed');
 		
 		// Slide the LEGENDS
 		if ( app.MapPane.inspectControl ) {
@@ -10586,14 +10768,17 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		}
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		Wu.app.MapPane._container.children[1].children[1].style.right = '295px';                  
+		app._map._controlCorners.topright.style.right = '295px';                
 		
-		// Set correct classname and remove open layer menu button from DOM	
-		var that = this;
-		setTimeout(function(){					
-			that._container.parentNode.removeChild(that._openLayers);
-			that._openLayers.className = 'leaflet-control open-open-layers';												
-		}, 500);
+
+		// If we're on mobile
+		if ( Wu.app.mobile ) {
+
+			// Check if legends is open ~ close it when opening layer menu
+			if ( app.MapPane.legendsControl._isOpen ) app.MapPane.legendsControl.MobileCloseLegends();
+			if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
+		}
+
 	},
 
 
@@ -11074,14 +11259,17 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 		
 	enableLayer : function (layerItem) {
+
 		var layer = layerItem.layer;
 
 		// folder click
 		if (!layer) return this.toggleFolder(layerItem); 
 			
 		// add layer to map
+		console.log('HEY! When adding layer to map, I need to know what fricking function it is that automatically loads the frickin legends... because I don\' want the legends to be loaded when we\'re in frickin mobile world, yo');
 		layer.add();
 		layerItem.on = true;
+
 
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
@@ -11206,7 +11394,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	},
 
-	_add : function (layerItem) {
+	_add : function (layerItem) {		
 
 		var item  = layerItem.item;
 		var layer = layerItem.layer;
@@ -11955,6 +12143,7 @@ L.control.inspect = function (options) {
 	},      
 
 	setDescription : function (layer) {
+
 		this._inner.innerHTML = layer.store.description;
 	},
 
@@ -12015,7 +12204,8 @@ L.control.inspect = function (options) {
 	addHooks : function () {
 		
 		// collapsers
-		Wu.DomEvent.on(this._button, 'click', this.closePane, this);
+		// Wu.DomEvent.on(this._button, 'click', this.closePane, this);
+		Wu.DomEvent.on(this._button, 'click', this.toggleCloser, this);
 
 		// edit mode
 		if (this.editMode) Wu.DomEvent.on(this._outer, 'dblclick', this.toggleEdit, this);
@@ -12170,13 +12360,52 @@ L.control.inspect = function (options) {
 
 	},
 
+	toggleCloser : function () {
+
+		// Close pane if we're on a desktop / pad
+		if ( !Wu.app.mobile ) {
+			this.closePane();
+		
+		// Slide pane if we're on a mobile phone
+		} else {
+			this._isClosed ? this.mobileOpenPane() : this.mobileClosePane();
+		}
+
+	},
+
+	mobileOpenPane : function () {
+
+		Wu.DomUtil.addClass(this._button, 'active-description');
+
+		// Slide In
+		this._content.style.left = '0px';
+		this._isClosed = false;
+
+		// Close other panes if they are open
+		if ( app.MapPane.legendsControl._isOpen ) app.MapPane.legendsControl.MobileCloseLegends();
+		if ( app.MapPane.layerMenu._open ) app.MapPane.layerMenu.closeLayerPane();
+
+
+	},
+
+
+	mobileClosePane : function () {
+
+		Wu.DomUtil.removeClass(this._button, 'active-description');
+
+		// Slide out
+		this._content.style.left = Wu.app.nativeResolution[1] + 'px';
+		this._isClosed = true;
+	},
+
 	closePane : function () {
-//		console.log('closePane');
 		this._container.style.display = "none";
+		this._isClosed = true;
 	},
 	
 	openPane : function () {
-		this._container.style.display = "block";				
+		this._container.style.display = "block";
+		this._isClosed = false;			
 	}
 	
 });
@@ -12200,12 +12429,8 @@ L.control.description = function (options) {
 		    options = this.options;
 
 		// add html
-		container.innerHTML = ich.legendsControl(); 
-	       
-		// create legendsOpener
-		this._legendsOpener = Wu.DomUtil.createId('div', 'legends-opener');
-		this._legendsOpener.innerHTML = 'Open Legends';
-		Wu.DomUtil.addClass(this._legendsOpener, 'opacitizer');
+		container.innerHTML = ich.legendsControl(); 	     
+
 
 		return container;
 
@@ -12214,6 +12439,7 @@ L.control.description = function (options) {
 	addHooks : function () {
 
 		Wu.DomEvent.on(this._legendsCollapser, 'click', this.closeLegends, this);
+		Wu.DomEvent.on(this._legendsOpener, 'click', this.toggleOpen, this);
 
 		// prevent map scrollzoom (OOOBS! BLOCKS ALL SCROLLING)
 		Wu.DomEvent.on(this._container, 'mousewheel', Wu.DomEvent.stop, this);
@@ -12292,19 +12518,47 @@ L.control.description = function (options) {
 	},
 
 
+
+	// Needed for Mobile phones
+	toggleOpen : function(e) {
+
+		// Open / Close Legends for desktop and pad
+		if ( !Wu.app.mobile ) app.MapPane.legendsControl._isOpen ? this.closeLegends() : this.openLegends();
+		
+		// Open / Close Legends for mobile phones
+		else app.MapPane.legendsControl._isOpen ? this.MobileCloseLegends() : this.MobileOpenLegends();
+
+	},
+
+	MobileCloseLegends : function(e) {
+
+		Wu.DomUtil.removeClass(this._legendsOpener, 'legends-open');
+		this._legendsInner.style.left = Wu.app.nativeResolution[1] + 'px';
+		this._setClosed();
+	},
+
+	MobileOpenLegends : function(e) {
+
+		// Close layer menu if it's open
+		if ( app.MapPane.layerMenu._open ) app.MapPane.layerMenu.closeLayerPane();
+		if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
+
+		Wu.DomUtil.addClass(this._legendsOpener, 'legends-open');
+		this._legendsInner.style.left = '3px';
+		this._setOpen();
+	},
+
+
+
 	closeLegends : function () {
 
-		var _1stchild = this._legendsInner.getElementsByTagName('div')[0];		// refactor ?
-		this._legendsInner.insertBefore(this._legendsOpener, _1stchild);
-		
-		Wu.DomEvent.on(this._legendsOpener, 'click', this.openLegends, this);
-		
+		this._legendsOpener.style.display = 'block';	
 		this._legendsInner.style.width = this._legendsWidth + 'px';
 		this._legendsInner.style.height = this._legendsHeight + 'px';
 
 		var that = this;
-
 		setTimeout(function() {
+			that._legendsOpener.style.opacity = '1';
 			that._legendsInner.style.width = '150px';
 			that._legendsInner.style.height = '24px'; 
 			that._legendsScrollLeft.style.display = 'none';
@@ -12312,14 +12566,11 @@ L.control.description = function (options) {
 		}, 10);
 
 		setTimeout(function() {
-			that._legendsCollapser.style.display = 'none';
 			that._legendsCollapser.style.opacity = '0'; 
-
 			this._openWidth = 0;
 			this._openHeight = 0;
 			this._legendsWidth = 0;
 			this._legendsHeight = 0;
-
 		}, 500);
 
 		this._setClosed();
@@ -12333,11 +12584,12 @@ L.control.description = function (options) {
 	// 	this.openLegends();
 	// },
 
+
 	openLegends : function (e) {
 
 		// Hide the little arrow button         
-		this._legendsOpener.className = '';
-		this._legendsOpener.style.opacity = '0';
+		// this._legendsOpener.className = '';
+		if ( !Wu.app.mobile ) this._legendsOpener.style.opacity = '0';
 
 		// Set the width of the Legends
 		this._legendsInner.style.width = this.sliderWidth + 'px';
@@ -12345,23 +12597,16 @@ L.control.description = function (options) {
 		// calculate width
 		this.checkWidth();
 
-
-		this._legendsInner.style.height = this._openHeight - 5 + 'px';         
+		this._legendsInner.style.height = this._openHeight + 'px';
 		
 		var that = this;
 		setTimeout(function(){                  
 			that._legendsInner.removeAttribute('style');
-			that._legendsOpener.removeAttribute('style');
-			that._legendsInner.removeChild(that._legendsOpener);
-
-
-			Wu.DomUtil.addClass(that._legendsCollapser, 'opacitizer');
 			that._legendsCollapser.style.opacity = '1';
-			that._legendsCollapser.style.display = 'block';
-
+			that._legendsOpener.style.display = 'none';
 		}, 500);      
 
-		this._setOpen();    
+		this._setOpen();
 
 	},
 
@@ -12386,6 +12631,8 @@ L.control.description = function (options) {
 	
 		// get elements
 		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
+		this._legendsOpener = Wu.DomUtil.get('legends-opener')
+
 		this._legendsInner = Wu.DomUtil.get('legends-inner');
 		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
 		this._legendsInnerSlider = Wu.DomUtil.get('legends-inner-slider');
@@ -19301,7 +19548,48 @@ Wu.App = Wu.Class.extend({
 		// get objects from server
 		this.initServer();
 
+		// Detect mobile devices
+		this.detectMobile();
 
+	},
+
+
+	detectMobile : function() {
+		
+		// Detect if it's a mobile
+		// if ( L.Browser.mobile ) {
+			
+			// Set mobile state to true
+			Wu.app.mobile = false;
+			Wu.app.pad = false;
+			
+			// Get screen resolution
+			var w = screen.height;
+			var h = screen.width;
+
+			// Store resolution
+			Wu.app.nativeResolution = [w, h];
+
+			if ( w >= h ) var smallest = h;
+			else var smallest = w;
+
+			// Mobile phone
+			if ( smallest < 450 ) {
+				Wu.app.mobile = true;
+				var mobilestyle = 'mobilestyle.css'
+			// Tablet
+			} else {
+				Wu.app.pad = true;
+				var mobilestyle = 'padstyle.css'
+			}
+
+			// Get the styletag
+			var styletag = document.getElementById('mobilestyle');
+			// Set stylesheet for 
+			var styleURL = '<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/' + mobilestyle + '">';
+			styletag.innerHTML = styleURL;
+			
+		// }
 	},
 
 	initServer : function () {

@@ -5673,10 +5673,15 @@ input[type=checkbox] + label.check {
   transition: width 250ms ease, height 250ms ease, left 250ms ease, margin 250ms ease; }
 
 #open-layers {
-  -webkit-transition: width 250ms ease, height 250ms ease;
-  -moz-transition: width 250ms ease, height 250ms ease;
-  -o-transition: width 250ms ease, height 250ms ease;
-  transition: width 250ms ease, height 250ms ease; }
+  /*	-webkit-transition: width 250ms ease, height 250ms ease;	
+	-moz-transition: width 250ms ease, height 250ms ease;	
+	-o-transition: width 250ms ease, height 250ms ease;	
+	transition: width 250ms ease, height 250ms ease;	
+*/
+  -webkit-transition: right 250ms ease;
+  -moz-transition: right 250ms ease;
+  -o-transition: right 250ms ease;
+  transition: right 250ms ease; }
 
 .legends-collapser-trans {
   -webkit-transition: opacity 250ms ease, left 250ms ease;
@@ -5685,10 +5690,10 @@ input[type=checkbox] + label.check {
   transition: opacity 250ms ease, left 250ms ease; }
 
 #legends-inner {
-  -webkit-transition: height 250ms ease, width 250ms ease;
-  -moz-transition: height 250ms ease, width 250ms ease;
-  -o-transition: height 250ms ease, width 250ms ease;
-  transition: height 250ms ease, width 250ms ease; }
+  -webkit-transition: height 250ms ease, width 250ms ease, left 250ms ease;
+  -moz-transition: height 250ms ease, width 250ms ease, left 250ms ease;
+  -o-transition: height 250ms ease, width 250ms ease, left 250ms ease;
+  transition: height 250ms ease, width 250ms ease, left 250ms ease; }
 
 .editor-client-edit-wrapper {
   -webkit-transition: height 300ms ease, opacity 300ms ease;
@@ -6000,6 +6005,29 @@ input[type=checkbox] + label.check {
     text-align: center; }
   .startpane-project-list {
     padding: 0; } }
+
+#open-layers {
+  -webkit-transition: right 250ms ease, opacity 250ms;
+  -moz-transition: right 250ms ease, opacity 250ms;
+  -o-transition: right 250ms ease, opacity 250ms;
+  transition: right 250ms ease, opacity 250ms;
+  width: 130px;
+  top: 92px;
+  right: 5px;
+  opacity: 1; }
+
+#open-layers.ol-collapsed {
+  right: -131px; }
+
+#legends-opener {
+  position: absolute;
+  z-index: 999999999999;
+  height: 24px;
+  width: 150px;
+  opacity: 0; }
+
+#legends-inner {
+  left: 3px; }
 
 /*.hide-menu .q-editor-content-item {
 	opacity: 0;
