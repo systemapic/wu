@@ -33,6 +33,7 @@ Wu.StartPane = Wu.Class.extend({
 
 	},
 
+
 	initSpinner : function () {
 
 		// create container 

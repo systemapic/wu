@@ -1,0 +1,27 @@
+#open-layers {
+	-webkit-transition: right 250ms ease, opacity 250ms;
+	-moz-transition: right 250ms ease, opacity 250ms;
+	-o-transition: right 250ms ease, opacity 250ms;
+	transition: right 250ms ease, opacity 250ms;
+	width: 130px;
+	top: 92px;
+	right: 5px;
+	opacity: 1;
+	}
+
+#open-layers.ol-collapsed {
+	right: -131px;
+	}
+
+#legends-opener {
+	position: absolute;
+	z-index: 999999999999;
+	height: 24px;
+	width: 150px;
+
+	opacity: 0;
+	}
+
+#legends-inner {
+	left: 3px;
+}	

@@ -14,12 +14,8 @@ L.Control.Legends = L.Control.extend({
 		    options = this.options;
 
 		// add html
-		container.innerHTML = ich.legendsControl(); 
-	       
-		// create legendsOpener
-		this._legendsOpener = Wu.DomUtil.createId('div', 'legends-opener');
-		this._legendsOpener.innerHTML = 'Open Legends';
-		Wu.DomUtil.addClass(this._legendsOpener, 'opacitizer');
+		container.innerHTML = ich.legendsControl(); 	     
+
 
 		return container;
 
@@ -28,6 +24,7 @@ L.Control.Legends = L.Control.extend({
 	addHooks : function () {
 
 		Wu.DomEvent.on(this._legendsCollapser, 'click', this.closeLegends, this);
+		Wu.DomEvent.on(this._legendsOpener, 'click', this.toggleOpen, this);
 
 		// prevent map scrollzoom (OOOBS! BLOCKS ALL SCROLLING)
 		Wu.DomEvent.on(this._container, 'mousewheel', Wu.DomEvent.stop, this);
@@ -56,10 +53,12 @@ L.Control.Legends = L.Control.extend({
 	},	
 
 	show : function () {
+
 		Wu.DomUtil.removeClass(this._container, 'displayNone');
 	},
 
 	hide : function () {
+
 		Wu.DomUtil.addClass(this._container, 'displayNone');
 	},
 
@@ -106,19 +105,47 @@ L.Control.Legends = L.Control.extend({
 	},
 
 
+
+	// Needed for Mobile phones
+	toggleOpen : function(e) {
+
+		// Open / Close Legends for desktop and pad
+		if ( !Wu.app.mobile ) app.MapPane.legendsControl._isOpen ? this.closeLegends() : this.openLegends();
+		
+		// Open / Close Legends for mobile phones
+		else app.MapPane.legendsControl._isOpen ? this.MobileCloseLegends() : this.MobileOpenLegends();
+
+	},
+
+	MobileCloseLegends : function(e) {
+
+		Wu.DomUtil.removeClass(this._legendsOpener, 'legends-open');
+		this._legendsInner.style.left = Wu.app.nativeResolution[1] + 'px';
+		this._setClosed();
+	},
+
+	MobileOpenLegends : function(e) {
+
+		// Close layer menu if it's open
+		if ( app.MapPane.layerMenu._open ) app.MapPane.layerMenu.closeLayerPane();
+		if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
+
+		Wu.DomUtil.addClass(this._legendsOpener, 'legends-open');
+		this._legendsInner.style.left = '3px';
+		this._setOpen();
+	},
+
+
+
 	closeLegends : function () {
 
-		var _1stchild = this._legendsInner.getElementsByTagName('div')[0];		// refactor ?
-		this._legendsInner.insertBefore(this._legendsOpener, _1stchild);
-		
-		Wu.DomEvent.on(this._legendsOpener, 'click', this.openLegends, this);
-		
+		this._legendsOpener.style.display = 'block';	
 		this._legendsInner.style.width = this._legendsWidth + 'px';
 		this._legendsInner.style.height = this._legendsHeight + 'px';
 
 		var that = this;
-
 		setTimeout(function() {
+			that._legendsOpener.style.opacity = '1';
 			that._legendsInner.style.width = '150px';
 			that._legendsInner.style.height = '24px'; 
 			that._legendsScrollLeft.style.display = 'none';
@@ -126,14 +153,11 @@ L.Control.Legends = L.Control.extend({
 		}, 10);
 
 		setTimeout(function() {
-			that._legendsCollapser.style.display = 'none';
 			that._legendsCollapser.style.opacity = '0'; 
-
 			this._openWidth = 0;
 			this._openHeight = 0;
 			this._legendsWidth = 0;
 			this._legendsHeight = 0;
-
 		}, 500);
 
 		this._setClosed();
@@ -147,11 +171,12 @@ L.Control.Legends = L.Control.extend({
 	// 	this.openLegends();
 	// },
 
+
 	openLegends : function (e) {
 
 		// Hide the little arrow button         
-		this._legendsOpener.className = '';
-		this._legendsOpener.style.opacity = '0';
+		// this._legendsOpener.className = '';
+		if ( !Wu.app.mobile ) this._legendsOpener.style.opacity = '0';
 
 		// Set the width of the Legends
 		this._legendsInner.style.width = this.sliderWidth + 'px';
@@ -159,23 +184,16 @@ L.Control.Legends = L.Control.extend({
 		// calculate width
 		this.checkWidth();
 
-
-		this._legendsInner.style.height = this._openHeight - 5 + 'px';         
+		this._legendsInner.style.height = this._openHeight + 'px';
 		
 		var that = this;
 		setTimeout(function(){                  
 			that._legendsInner.removeAttribute('style');
-			that._legendsOpener.removeAttribute('style');
-			that._legendsInner.removeChild(that._legendsOpener);
-
-
-			Wu.DomUtil.addClass(that._legendsCollapser, 'opacitizer');
 			that._legendsCollapser.style.opacity = '1';
-			that._legendsCollapser.style.display = 'block';
-
+			that._legendsOpener.style.display = 'none';
 		}, 500);      
 
-		this._setOpen();    
+		this._setOpen();
 
 	},
 
@@ -200,6 +218,8 @@ L.Control.Legends = L.Control.extend({
 	
 		// get elements
 		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
+		this._legendsOpener = Wu.DomUtil.get('legends-opener')
+
 		this._legendsInner = Wu.DomUtil.get('legends-inner');
 		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
 		this._legendsInnerSlider = Wu.DomUtil.get('legends-inner-slider');
@@ -220,6 +240,12 @@ L.Control.Legends = L.Control.extend({
 
 		// add tooltip
 		app.Tooltip.add(this._legendsInner, 'Shows legends of active layers', { extends : 'systyle', tipJoint : 'top right'});
+
+
+
+		// cxxxx
+		this._legendsInner.style.left = Wu.app.nativeResolution[1] + 'px';
+		this._setClosed();
 
 
 	},

@@ -499,9 +499,21 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	calculateHeight : function () {
-		var min = 150;
-		this.maxHeight = min + _.size(this.projects) * 116;
-		this.minHeight = 80;
+		
+		if ( !Wu.app.mobile ) {
+	
+			var min = 150;
+			this.maxHeight = min + _.size(this.projects) * 116;
+			this.minHeight = 80;
+
+		} else {
+
+			var min = 78;
+			this.maxHeight = min + _.size(this.projects) * 100;
+			this.minHeight = 68; 
+		}
+
+		
 	},
 
 

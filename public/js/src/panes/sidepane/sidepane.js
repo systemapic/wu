@@ -22,8 +22,31 @@ Wu.SidePane = Wu.Class.extend({
 		// toggle panes button
 		this.paneOpen = false; // default
 		this.whichPaneOpen = 'projects';
+
+		// Mobile option ~ Back button when entering documents/datalibrary/users fullscreen
+		if ( Wu.app.mobile ) {
+
+			this._mobileFullScreenCloser = Wu.DomUtil.create('div', 'q-editor-fullscreen-mobile-close displayNone', this._container);
+			Wu.DomEvent.on(this._mobileFullScreenCloser, 'mousedown', this.closeMobileFullscreen, this);
+		}		
+
 	},
 
+	closeMobileFullscreen : function () {
+
+		if ( app.SidePane.fullscreen ) {
+
+			console.log('close fullscreen');
+			Wu.app._editorMenuPane.style.opacity = 1; // .q-editor-content
+			Wu.DomUtil.addClass(app.SidePane._mobileFullScreenCloser, 'displayNone'); // Hide back button
+			Wu.DomUtil.removeClass(app._mapPane, "map-blur"); // remove map blurring
+			Wu.DomUtil.removeClass(Wu.app._active, 'show'); // Hide current active fullpane
+			
+			app.SidePane.fullscreen = false;
+
+		}
+
+	},
 
 	initContent : function () {
 		
@@ -113,7 +136,7 @@ Wu.SidePane = Wu.Class.extend({
 	_setMenuHeight : function () {
 
 		// Button height
-		if ( !L.Browser.mobile ) {
+		if ( !Wu.app.mobile ) {
 			var bHeight = 70;
 		} else {
 			var bHeight = 50;
@@ -296,7 +319,17 @@ Wu.SidePane = Wu.Class.extend({
 
 		// refresh leaflet
 		this._refreshLeaflet();
+
+		if ( Wu.app.mobile ) this.openOnMobile();
 		
+	},
+
+	// By Jørgen ~ Do not open full screen panes
+	openOnMobile : function () {
+
+		if ( app._activeMenuItem == 'documents' || app._activeMenuItem == 'dataLibrary' || app._activeMenuItem == 'users') {
+			app.SidePane.Clients.activate();	
+		}
 	},
 
 	widenContainer : function () {

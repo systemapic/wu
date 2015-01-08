@@ -28,7 +28,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this._search = Wu.DomUtil.createId('input', 'users-search', this._usersControlsInner);
 		this._search.setAttribute("type", "text");
 		this._search.setAttribute("placeholder", "Search users");
-		Wu.DomUtil.addClass(this._search, 'search ct17');
+		Wu.DomUtil.addClass(this._search, 'search');
 
 		// create container (overwrite default) and insert template
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content, ich.usersPane());
@@ -224,8 +224,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var firstName    = this._inputUser._firstName = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'First Name');
 		var lastName     = this._inputUser._lastName  = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Last Name');
 		var companyName	 = this._inputUser._companyName = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Company Name');
-		var position	 = this._inputUser._position = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Position');
-		var phoneNo	 = this._inputUser._phoneNo = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Phone Number');
+		var position	 = this._inputUser._position  = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Position');
+		var phoneNo	 = this._inputUser._phoneNo   = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Phone Number');
 		var email        = this._inputUser._email     = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Email');
 		var email2       = this._inputUser._email2    = Wu.DomUtil.create('input', 'backpane-input',     wrapper, 'Confirm Email');
 		var message      = this._inputUser._message   = Wu.DomUtil.create('div',   'backpane-message',   wrapper, messageText);

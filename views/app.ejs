@@ -1136,12 +1136,12 @@
 							</div>
 							</th>
 							<th class="sort thirtyp" data-sort="name" data-insensitive="true">Name</th>
-							<th class="sort" data-sort="type" data-insensitive="true">Type</th>
-							<th class="sort" data-sort="files" data-insensitive="true">Files</th>
-							<th class="sort" data-sort="category" data-insensitive="true">Category</th>
-							<th class="sort" data-sort="keywords" data-insensitive="true">Keywords</th>
-							<th class="sort" data-sort="createdDate" data-insensitive="true">Date</th>
-							<th class="sort" data-sort="status" data-insensitive="true">Status</th>
+							<th class="sort type" data-sort="type" data-insensitive="true">Type</th>
+							<th class="sort files" data-sort="files" data-insensitive="true">Files</th>
+							<th class="sort category" data-sort="category" data-insensitive="true">Category</th>
+							<th class="sort keywords" data-sort="keywords" data-insensitive="true">Keywords</th>
+							<th class="sort createdDate" data-sort="createdDate" data-insensitive="true">Date</th>
+							<th class="sort status" data-sort="status" data-insensitive="true">Status</th>
 							<!-- <th class="sort" data-sort="action" data-insensitive="true">Action</th> -->
 						</tr>
 					</thead>
@@ -1350,10 +1350,14 @@
 
 		<!-- Controls-->
 		<script id="descriptionControl" type="text/html">
+		
+			<div id="description-toggle-button" class="dropdown-button"></div>
+
+
 			<div id="description-control-inner-content">
-			
+		
+
 				<div id="collapse-description" class="menucollapser ct15 ct16">Info
-					<div id="description-toggle-button" class="dropdown-button rotate90 ct31"></div>
 				</div>
 				
 				<div id="description-control-inner-content-box" class="ct14"></div>
@@ -1376,7 +1380,11 @@
 		<script id="legendsControl" type="text/html">
 			<div id="legends-control-inner-content">
 
+					<div id="legends-opener" class="legends-open" style="display: none;">Open Legends</div>
+
+
 					<div id="legends-inner" class="leaflet-drag-target ct14">
+
 						<div id="legends-collapser" class="dropdown-button legends-collapser-trans ct31"></div>
 						
 						<div id="legends-scroll-left"></div>
@@ -1437,14 +1445,16 @@
 								</div>
 							</th>
 
-							<th class="sort thirtyp" data-sort="name" data-insensitive="true">Name</th>
-							<th class="sort" data-sort="company" data-insensitive="true">Company</th>
-							<th class="sort" data-sort="position" data-insensitive="true">Position</th>
-							<th class="sort" data-sort="phone" data-insensitive="true">Phone</th>
+							<th class="sort name thirtyp" data-sort="name" data-insensitive="true">Name</th>
+							<th class="sort company" data-sort="company" data-insensitive="true">Company</th>
+							<th class="sort position" data-sort="position" data-insensitive="true">Position</th>
+							<th class="sort phone" data-sort="phone" data-insensitive="true">Phone</th>
 							
-							<th class="sort" data-sort="email" data-insensitive="true">Email</th>
-							<th class="sort" data-sort="projects" data-insensitive="true">Access</th>
+							<th class="sort email" data-sort="email" data-insensitive="true">Email</th>
+							<th class="sort projects" data-sort="projects" data-insensitive="true">Access</th>
 
+
+							
 							
 						</tr>
 					</thead>
@@ -1474,11 +1484,11 @@
 				</td> 
 
 				<!-- // class determines which value is picked up by list.js -->
-				<td id="company-{{uuid}}" 	uuid="{{uuid}}" key="company" 	class="tdcont company ct23 ct28">	{{company}}</td> <!-- Company -->
-				<td id="position-{{uuid}}"  	uuid="{{uuid}}" key="position" 	class="tdcont position ct23 ct28">{{position}}</td> <!-- Position -->
-				<td id="phone-{{uuid}}"  	uuid="{{uuid}}" key="phone" 	class="tdcont phone ct23 ct28">	{{phone}}</td> <!-- Phone -->
-				<td id="email-{{uuid}}"  	uuid="{{uuid}}" key="email" 	class="tdcont email ct23 ct28">	{{email}}</td> <!-- Email -->
-				<td id="access-{{uuid}}"  	uuid="{{uuid}}" key="access"	class="tdcont access ct23 ct28">{{access}}</td> <!-- Projects -->
+				<td id="company-{{uuid}}" 	uuid="{{uuid}}" key="company" 	class="tdcont company">{{company}}</td> <!-- Company -->
+				<td id="position-{{uuid}}"  	uuid="{{uuid}}" key="position" 	class="tdcont position">{{position}}</td> <!-- Position -->
+				<td id="phone-{{uuid}}"  	uuid="{{uuid}}" key="phone" 	class="tdcont phone">{{phone}}</td> <!-- Phone -->
+				<td id="email-{{uuid}}"  	uuid="{{uuid}}" key="email" 	class="tdcont email">{{email}}</td> <!-- Email -->
+				<td id="access-{{uuid}}"  	uuid="{{uuid}}" key="access"	class="tdcont access">{{access}}</td> <!-- Projects -->
 				
 
 				<td class="tdcont uuid ct23 ct28" style="display:none">{{uuid}}</td>
@@ -1767,13 +1777,12 @@
 
 
 		// if (L.Browser.mobile) {
-			// alert('mobile')	
-			var styletag = document.getElementById('mobilestyle');
-			var styleURL = '<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/mobilestyle.css">';
-			styletag.innerHTML = styleURL;			
-			console.log('styleURL', styleURL);
-			console.log('styletag', styletag);
-		// }
+			// var styletag = document.getElementById('mobilestyle');
+			// var styleURL = '<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/mobilestyle.css">';
+			// styletag.innerHTML = styleURL;			
+			// console.log('styleURL', styleURL);
+			// console.log('styletag', styletag);
+		// }			
 
 
 		</script>
