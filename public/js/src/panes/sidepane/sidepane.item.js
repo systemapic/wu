@@ -379,10 +379,14 @@ Wu.SidePane.Item = Wu.Class.extend({
 		    legendsControl = app.MapPane.legendsControl,
 		    height         = -107 + screenHeight;
 
+		// if ( Wu.app.mobile ) {
+		// 	this.maxHeight = Wu.app.nativeResolution[0] - 87;
+		// 	return;
+		// }
+
 		if (!legendsControl) {
 			this.maxHeight = height - 6;
 			return;
-
 		}
 		
 		var legendsHeight = parseInt(legendsControl._legendsHeight);

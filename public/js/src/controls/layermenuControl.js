@@ -81,6 +81,19 @@ L.Control.Layermenu = L.Control.extend({
 		this._open = true;
 
 
+		if ( Wu.app.mobile ) {
+			// this._content.style.left = Wu.app.nativeResolution[1] + 'px';
+			// this._isClosed = true;
+
+			// Mobile arrow	
+		    	Wu.DomUtil.create('div', 'layers-mobile-arrow', this._innerContainer);
+			
+
+
+
+		}
+
+
 	},
 
 	show : function () {
@@ -194,6 +207,7 @@ L.Control.Layermenu = L.Control.extend({
 			// Check if legends is open ~ close it when opening layer menu
 			if ( app.MapPane.legendsControl._isOpen ) app.MapPane.legendsControl.MobileCloseLegends();
 			if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
+
 		}
 
 	},
@@ -683,7 +697,6 @@ L.Control.Layermenu = L.Control.extend({
 		if (!layer) return this.toggleFolder(layerItem); 
 			
 		// add layer to map
-		console.log('HEY! When adding layer to map, I need to know what fricking function it is that automatically loads the frickin legends... because I don\' want the legends to be loaded when we\'re in frickin mobile world, yo');
 		layer.add();
 		layerItem.on = true;
 
@@ -845,7 +858,7 @@ L.Control.Layermenu = L.Control.extend({
 		Wu.DomEvent.on(del,  'mousedown', Wu.DomEvent.stop, this);
 
 		// Stop Propagation
-		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._container, 'touchstart mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 
 		// add elem to item object
 		layerItem.el = wrap;
@@ -1035,7 +1048,7 @@ L.Control.Layermenu = L.Control.extend({
 	},
 
 	update : function (project) {
-		
+
 		// get vars
 		this.project  = project || Wu.app.activeProject;
 		this._content = Wu.DomUtil.get('layer-menu-inner-content');
@@ -1065,7 +1078,7 @@ L.Control.Layermenu = L.Control.extend({
 		var layersMaxHeight = window.innerHeight - 135;
 
 		// Set max height of Layers selector container
-		this.setMaxHeight(layersMaxHeight);		
+		this.setMaxHeight(layersMaxHeight);
 	
 	}
 	

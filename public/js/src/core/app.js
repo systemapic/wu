@@ -84,7 +84,8 @@ Wu.App = Wu.Class.extend({
 	detectMobile : function() {
 		
 		// Detect if it's a mobile
-		// if ( L.Browser.mobile ) {
+		if ( L.Browser.mobile ) {
+
 			
 			// Set mobile state to true
 			Wu.app.mobile = false;
@@ -102,10 +103,12 @@ Wu.App = Wu.Class.extend({
 
 			// Mobile phone
 			if ( smallest < 450 ) {
+
 				Wu.app.mobile = true;
 				var mobilestyle = 'mobilestyle.css'
 			// Tablet
 			} else {
+
 				Wu.app.pad = true;
 				var mobilestyle = 'padstyle.css'
 			}
@@ -116,7 +119,7 @@ Wu.App = Wu.Class.extend({
 			var styleURL = '<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/' + mobilestyle + '">';
 			styletag.innerHTML = styleURL;
 			
-		// }
+		}
 	},
 
 	initServer : function () {

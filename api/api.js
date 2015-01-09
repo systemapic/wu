@@ -2503,7 +2503,25 @@ module.exports = api = {
 
 
 
+	// request a user delegation
+	requestUserDelegation : function (req, res) {
 
+		var user = req.user,
+		    delegations = req.body.delegations; // array of delegations
+
+
+		// var delegations = [{
+		// 	subject : 'uuid', // user that is being delegated access
+		// 	role : 'reader', // role that is being delegated
+		// 	add : true, // if adding or removing access
+		// 	project : 'uuid', // project uuid
+		// }]
+
+
+
+
+
+	},
 
 
 
@@ -2518,7 +2536,7 @@ module.exports = api = {
 		var role 	= req.body.role;  		// role that user is given
 		var projectUuid = req.body.projectUuid;   	// project user is given role to
 		var add         = req.body.add; 		// add or revoke, true/false
-		// var clientUuid  = req.body.clientUuid;		// client that project belongs to
+		// var clientUuid  = req.body.clientUuid;	// client that project belongs to
 
 		console.log('delegateUser: ', req.body);
 
@@ -2635,32 +2653,19 @@ module.exports = api = {
 
 						console.log('REVOKING ' + role + ' access to project ' + project.name + ' for user ' + subject.firstName);
 						
-						// read access
+						// revoke read access
 						if (role == 'reader') {
 
 							// check if user is allowed to delegate read access to project
 							if (api.can.delegate.reader(user, project)) {
 
 
-								return api._revokeClientIfEmpty(user, project, subject, res); //, function (err, subject) {
+								// revoke project
+								subject.role.reader.projects.pull(project.uuid);
 
-									// subject.role.reader.projects.pull(project.uuid);
-									// // subject.role.reader.clients.pull(project.client); // revoke client also
-									// // if no more projects in project.client, revoke client
+								// revoke client if emtpy
+								api._revokeClientIfEmpty(user, project, subject, res);
 
-
-
-
-									// subject.markModified('role');
-									// subject.save(function (err, result) {
-									// 	if (err) return res.end(JSON.stringify({ error : err }));
-									// 	var message = 'Success!'
-									// 	return res.end(JSON.stringify({ result : message }));
-									// });
-
-									
-								// });
-								
 
 
 
@@ -2674,7 +2679,7 @@ module.exports = api = {
 						}
 
 
-						// edit access
+						// revoke edit access
 						if (role == 'editor') {
 
 							// check if user is allowed to delegate read access to project
@@ -2697,7 +2702,7 @@ module.exports = api = {
 
 						}
 
-						// edit access
+						// revoke manager access
 						if (role == 'manager') {
 
 							// check if user is allowed to delegate read access to project
@@ -2707,7 +2712,7 @@ module.exports = api = {
 								subject.markModified('role');
 								subject.save(function (err, result) {
 									if (err) return res.end(JSON.stringify({ error : err }));
-									var message = 'Success!'
+									var message = 'Success!';
 									return res.end(JSON.stringify({ result : message }));
 								});
 
@@ -2717,12 +2722,9 @@ module.exports = api = {
 								return res.end(JSON.stringify({ error : message }));
 							}
 						}
-
 					}	
 				});
-
 			});
-
 		});
 	},
 
@@ -2730,48 +2732,34 @@ module.exports = api = {
 
 
 	_revokeClientIfEmpty : function (user, project, subject, res) {
-
-
-		var clientUuid = project.client;
+		console.log('Checking if last active project for this client...');
 
 		Project
-		.find({client : clientUuid})
+		.find({client : project.client})
 		.exec(function (err, projects) {
-			console.log('projects: ', projects);
+			
+			// get list of projects left for user
+			var userProjects = subject.role.reader.projects.toObject(),
+			    clientProjects = [],
+			    contains = false;
 
-			// revoke project
-			var current = subject.role.reader.projects.toObject();
-			console.log('curent: ', current, typeof(current));
-
-			subject.role.reader.projects.pull(project.uuid);
-			// subject.role.reader.clients.pull(project.client); // revoke client also
-			// if no more projects in project.client, revoke client
-
-			var cur = [];
-			current.forEach(function (c) {
-				console.log('type: ', typeof(c));
-				cur.push(c.toString());
-			});
-
-			console.log('cur: ', cur);
-
-			// check if last project
-			var clientProjects = [];
+			// as array of uuids
 			projects.forEach(function(p) {
 				clientProjects.push(p.uuid);
 			});
 
-			console.log('cP: ', clientProjects);
+			// check if last 
+			clientProjects.forEach(function (c) {
+				if (userProjects.indexOf(c) > -1) contains = true;
+			});
 
-			var diff = _.difference(clientProjects, cur);
-
-			console.log('diff: ', diff);
-
-			if (diff.length == 0) {
-				console.log('last pro!'); 				// todo: wrong! removes client is shudnt remove
+			// pull if last
+			if (!contains) {
+				console.log('last project, removing client');
 				subject.role.reader.clients.pull(project.client);
 			}
 
+			// save
 			subject.markModified('role');
 			subject.save(function (err, result) {
 				if (err) return res.end(JSON.stringify({ error : err }));
@@ -2779,12 +2767,7 @@ module.exports = api = {
 				return res.end(JSON.stringify({ result : message }));
 			});
 
-
-
 		});
-
-		
-
 
 	},
 
@@ -2805,13 +2788,12 @@ module.exports = api = {
 			if (result) return res.end(JSON.stringify({
 					unique : false
 			}));
-			
 
 			return res.end(JSON.stringify({
 				unique : true
 			}));
 
-		})
+		});
 
 	},
 

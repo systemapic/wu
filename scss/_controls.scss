@@ -810,7 +810,8 @@
 	padding-left: 0;
 	width: auto;
 	max-width: 100%;
-	display: none;
+	/*display: none;*/
+	display: block;
 	}	
 	
 /* inner wrapper 2 */
@@ -820,7 +821,8 @@
 	overflow: hidden;
 	position: relative;
 	width: auto;
-	max-width: 100%;	
+	max-width: 100%;
+	left: 3px;	
 	}	
 	
 /* legends close button (litte arrow) */
@@ -871,10 +873,16 @@
 #legends-opener {
 	text-align: center;
 	background: white;
-	height: 100%;
+	/*height: 100%;*/
 	line-height: 2;
 	font-weight: $obese;	
 	cursor: pointer;
+
+	position: absolute;
+	z-index: 999999999999;
+	height: 24px;
+	width: 150px;
+	opacity: 0;	
 	}	
 
 #legends-inner-slider {
@@ -1335,9 +1343,19 @@
 	margin: 0;
 	overflow: hidden;
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-	top: 90px;
-	right: 6px;	
+	/*top: 90px;*/
+	/*right: 6px;*/
+
+	width: 130px;
+	top: 92px;
+	right: 5px;
+	opacity: 1;	
 	}
+
+#open-layers.ol-collapsed {
+	right: -131px;
+	}
+
 	
 /* Open layer menu mover */
 .layer-opener-opened {
@@ -1852,7 +1870,7 @@
 	background-color: rgba(0, 0, 0, 0.7);
 	border-left: 1px solid #AAA;
 	color: #FFF;
-	font: 11px/19px "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+	font: 11px/19px $font;
 	line-height: 28px;
 	height: 28px;
 	font-weight: 500;
@@ -2291,7 +2309,7 @@
 	color: white !important;
 	font-weight: 900;
 	font-size: 12px;
-	font-family: helvetica neue;
+	font-family: $font;
 	width: 49px;
 	text-align: center;
 	text-decoration: none;
@@ -2312,7 +2330,7 @@
 	color: white !important;
 	font-weight: 900;
 	font-size: 12px;
-	font-family: helvetica neue;
+	font-family: $font;
 	line-height: 1.45;
 	border: none;
 	}

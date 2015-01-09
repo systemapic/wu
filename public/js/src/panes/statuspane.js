@@ -115,9 +115,7 @@ Wu.StatusPane = Wu.Class.extend({
 				if ( app.MapPane.descriptionControl ) {
 					if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
 				}
-
 			}
-
 		}
 
 
@@ -126,6 +124,7 @@ Wu.StatusPane = Wu.Class.extend({
 
 	// close sidepane menu
 	close : function (e) {
+
 		this.isOpen = false;
 
 		// collapse sidepane
@@ -136,7 +135,10 @@ Wu.StatusPane = Wu.Class.extend({
 		Wu.DomUtil.removeClass(app.MapPane._container, "map-blur") // (j) – removes the blur on map if it's set by one of the fullpanes
 
 		// Show button section and Layer info when the Home dropdown menu opens (j)
-		if (app._map) app._map._controlCorners.topleft.style.opacity = 1;
+		if (app._map) {
+			app._map._controlCorners.topleft.style.opacity = 1;
+			app._map._controlCorners.topleft.style.display = 'block';
+		}
 
 
 
@@ -149,9 +151,11 @@ Wu.StatusPane = Wu.Class.extend({
 				if ( app.MapPane.descriptionControl ) app.MapPane.descriptionControl._button.style.opacity = 1;
 				
 				// Make sure we reset if we're in fullscreen mode (media library, users, etc)
-				if ( app.SidePane.fullscreen ) app.SidePane.Clients.activate();
-				
-			}	
+				if ( app.SidePane.fullscreen ) app.SidePane.Clients.activate();	
+			}
+
+			// Show the controllers (has been hidden when a new project is refreshed in projects.js > refresh() )
+			app._map._controlContainer.style.opacity = 1;
 		}
 
 
@@ -202,6 +206,7 @@ Wu.StatusPane = Wu.Class.extend({
 	},
 
 	refresh : function () {
+
 		if (!this.project) return;
 		// set height to project headerHeight
 		var headerHeight = this.project.getHeaderHeight();
@@ -209,6 +214,7 @@ Wu.StatusPane = Wu.Class.extend({
 	},
 
 	updateContent : function (project) {
+
 		this.project = project;
 
 		// refresh height

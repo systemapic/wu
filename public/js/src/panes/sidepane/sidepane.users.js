@@ -50,10 +50,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// init table
 		this.initList();
 
-
 		// add tooltip
 		app.Tooltip.add(this._menu, '(Editors only) List of all users. Here you can create and delete users, as well as administer user access to projects.');
-		
 
 	},
 
@@ -703,6 +701,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		Wu.DomUtil.removeClass(item.read, 'gotAccess');
 
 		// if removing read, also remove edit
+		this._removeUpdate(item);
+		this._removeManage(item);
+
 	},
 
 	_addRead : function (item) {
@@ -742,11 +743,14 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		item.user.addManageProject(item.project);
 		Wu.DomUtil.addClass(item.manage, 'gotAccess');
 
-		// add read access too
-		if (!item.user.canReadProject(item.project.getUuid())) {
-			Wu.DomUtil.addClass(item.read, 'gotAccess');
-			setTimeout(function () { item.user.addReadProject(item.project); }, 300);
-		}
+		// add read 
+		this._addRead(item);
+
+		// // add read access too
+		// if (!item.user.canReadProject(item.project.getUuid())) {
+		// 	Wu.DomUtil.addClass(item.read, 'gotAccess');
+		// 	setTimeout(function () { item.user.addReadProject(item.project); }, 300);
+		// }
 	},
 
 

@@ -14,6 +14,7 @@ L.Control.Legends = L.Control.extend({
 		    options = this.options;
 
 		// add html
+		container.style.display = 'none';
 		container.innerHTML = ich.legendsControl(); 	     
 
 
@@ -110,17 +111,16 @@ L.Control.Legends = L.Control.extend({
 	toggleOpen : function(e) {
 
 		// Open / Close Legends for desktop and pad
-		if ( !Wu.app.mobile ) app.MapPane.legendsControl._isOpen ? this.closeLegends() : this.openLegends();
+		if ( !Wu.app.mobile ) this._isOpen ? this.closeLegends() : this.openLegends();
 		
 		// Open / Close Legends for mobile phones
-		else app.MapPane.legendsControl._isOpen ? this.MobileCloseLegends() : this.MobileOpenLegends();
+		else this._isOpen ? this.MobileCloseLegends() : this.MobileOpenLegends();
 
 	},
 
 	MobileCloseLegends : function(e) {
-
 		Wu.DomUtil.removeClass(this._legendsOpener, 'legends-open');
-		this._legendsInner.style.left = Wu.app.nativeResolution[1] + 'px';
+		this._content.style.left = Wu.app.nativeResolution[1] + 'px';
 		this._setClosed();
 	},
 
@@ -131,7 +131,7 @@ L.Control.Legends = L.Control.extend({
 		if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
 
 		Wu.DomUtil.addClass(this._legendsOpener, 'legends-open');
-		this._legendsInner.style.left = '3px';
+		this._content.style.left = '0px';
 		this._setOpen();
 	},
 
@@ -200,8 +200,8 @@ L.Control.Legends = L.Control.extend({
 	// is called when changing/selecting project
 	update : function (project) {
 	       
-		// init divs
-		this.initContainer();
+		// // init divs
+		// this.initContainer();
 
 		// project is ready only here, so init relevant vars
 		// update is called from enableLayermenu toggle in MapPane
@@ -209,6 +209,9 @@ L.Control.Legends = L.Control.extend({
 		// get vars
 		this.project = project || Wu.app._activeProject;
 		this._content = Wu.DomUtil.get('legends-control-inner-content'); 
+
+		// init divs
+		this.initContainer();		
 
 		this.calculateHeight();
 
@@ -241,11 +244,16 @@ L.Control.Legends = L.Control.extend({
 		// add tooltip
 		app.Tooltip.add(this._legendsInner, 'Shows legends of active layers', { extends : 'systyle', tipJoint : 'top right'});
 
+		// If mobile: start with closed legends pane
+		if ( Wu.app.mobile ) {
+			this._content.style.left = Wu.app.nativeResolution[1] + 'px';
+			this._setClosed();
+
+			// Mobile arrow	
+		    	Wu.DomUtil.create('div', 'legends-mobile-arrow', this._content);
 
 
-		// cxxxx
-		this._legendsInner.style.left = Wu.app.nativeResolution[1] + 'px';
-		this._setClosed();
+		}
 
 
 	},
@@ -316,7 +324,10 @@ L.Control.Legends = L.Control.extend({
 
 		// Hide legends if it's empty
 		if (this.legendsCounter.length == 0) {
-			this._legendsContainer.style.display = 'none';
+
+			// this._legendsContainer.style.display = 'none';
+			this._container.style.display = 'none';
+
 			this._setClosed();
 		} 
 	},
@@ -350,7 +361,9 @@ L.Control.Legends = L.Control.extend({
 		if (!legends) return;
 
 		// Make sure that the container is visible...
-		this._legendsContainer.style.display = 'block';
+		// this._legendsContainer.style.display = 'block';
+		this._container.style.display = 'block';
+		
 
 		// create legends box
 	    	var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInnerSlider);
@@ -409,8 +422,8 @@ L.Control.Legends = L.Control.extend({
 		}, this);
 
 
-		// mark open
-		this._setOpen();
+		// mark open if not on Mobile
+		if ( !Wu.app.mobile ) this._setOpen();
 
 		// see if we need the horizontal scrollers or not
 		this.checkWidth();
@@ -422,6 +435,7 @@ L.Control.Legends = L.Control.extend({
 	},
 
 	_setOpen : function () {
+
 		this._isOpen = true;
 
 		// calc

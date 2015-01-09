@@ -221,17 +221,10 @@ input[type=checkbox] + label.check {
 	}
 
 #open-layers {
-/*	-webkit-transition: width 250ms ease, height 250ms ease;	
-	-moz-transition: width 250ms ease, height 250ms ease;	
-	-o-transition: width 250ms ease, height 250ms ease;	
-	transition: width 250ms ease, height 250ms ease;	
-*/	
-	-webkit-transition: right 250ms ease;
-	-moz-transition: right 250ms ease;
-	-o-transition: right 250ms ease;
-	transition: right 250ms ease;
-	
-
+	-webkit-transition: right 250ms ease, opacity 250ms;
+	-moz-transition: right 250ms ease, opacity 250ms;
+	-o-transition: right 250ms ease, opacity 250ms;
+	transition: right 250ms ease, opacity 250ms;	
 	}
 	
 .legends-collapser-trans {

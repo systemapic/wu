@@ -1,7 +1,7 @@
 Wu.Project = Wu.Class.extend({
 
 	initialize : function (store) {
-		
+
 		// set dB object to store
 		this.store = {};
 		Wu.extend(this.store, store);
@@ -121,6 +121,16 @@ Wu.Project = Wu.Class.extend({
 
 		// set active project in sidepane
 		if (this._menuItem) this._menuItem._markActive();
+
+		if ( app.StatusPane.isOpen ) {
+			app._map._controlCorners.topleft.style.opacity = 0;
+			app._map._controlCorners.topleft.style.display = 'none';
+		}
+
+		// Make sure no controls appear when changing projects on mobile (get's turned on again in sidepane.js > close() )
+		// if ( Wu.app.mobile && app.StatusPane.isOpen ) {
+		// 	app._map._controlContainer.style.opacity = 0;
+		// }
 		
 	},
 
@@ -166,6 +176,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	select : function () {
+
 
 		// hide headerpane
  		if (app._headerPane) Wu.DomUtil.removeClass(app._headerPane, 'displayNone');

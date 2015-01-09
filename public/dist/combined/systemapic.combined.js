@@ -2331,11 +2331,11 @@ L.Popup.include({
 		var className = 'q-editor-content-item ' + this.type;
 		this._content = Wu.DomUtil.create('div', className, Wu.app._editorContentPane);
 
-		// scroll wrapper (j)
+		// scroll wrapper
 		this._scrollWrapper = Wu.DomUtil.create('div', 'editor-scroll-wrapper', this._content);
 
 		// wrapper 
-		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct13', this._scrollWrapper);
+		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._scrollWrapper);
 
 
 	},
@@ -2683,10 +2683,14 @@ L.Popup.include({
 		    legendsControl = app.MapPane.legendsControl,
 		    height         = -107 + screenHeight;
 
+		// if ( Wu.app.mobile ) {
+		// 	this.maxHeight = Wu.app.nativeResolution[0] - 87;
+		// 	return;
+		// }
+
 		if (!legendsControl) {
 			this.maxHeight = height - 6;
 			return;
-
 		}
 		
 		var legendsHeight = parseInt(legendsControl._legendsHeight);
@@ -4022,10 +4026,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// init table
 		this.initList();
 
-
 		// add tooltip
 		app.Tooltip.add(this._menu, '(Editors only) List of all users. Here you can create and delete users, as well as administer user access to projects.');
-		
 
 	},
 
@@ -4675,6 +4677,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		Wu.DomUtil.removeClass(item.read, 'gotAccess');
 
 		// if removing read, also remove edit
+		this._removeUpdate(item);
+		this._removeManage(item);
+
 	},
 
 	_addRead : function (item) {
@@ -4714,11 +4719,14 @@ Wu.SidePane.Client = Wu.Class.extend({
 		item.user.addManageProject(item.project);
 		Wu.DomUtil.addClass(item.manage, 'gotAccess');
 
-		// add read access too
-		if (!item.user.canReadProject(item.project.getUuid())) {
-			Wu.DomUtil.addClass(item.read, 'gotAccess');
-			setTimeout(function () { item.user.addReadProject(item.project); }, 300);
-		}
+		// add read 
+		this._addRead(item);
+
+		// // add read access too
+		// if (!item.user.canReadProject(item.project.getUuid())) {
+		// 	Wu.DomUtil.addClass(item.read, 'gotAccess');
+		// 	setTimeout(function () { item.user.addReadProject(item.project); }, 300);
+		// }
 	},
 
 
@@ -10407,19 +10415,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 				if ( app.MapPane.descriptionControl ) {
 					if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
 				}
-
-
 			}
-
-			
-
-
-
-			// Make sure we don't open full page panes...
-			// Lugger litt, men funker for nå... 
-			// if ( app._activeMenuItem == undefined ) {
-			// 	app.SidePane.Clients.activate();
-			// }
 		}
 
 
@@ -10428,6 +10424,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	// close sidepane menu
 	close : function (e) {
+
 		this.isOpen = false;
 
 		// collapse sidepane
@@ -10444,11 +10441,21 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// Mobile option : activate default sidepane on close to avoid opening in fullscreen
 		if (Wu.app.mobile) {
-			app.MapPane.layerMenu._openLayers.style.opacity = 1;
-			if ( app.SidePane.fullscreen ) {
-				app.SidePane.Clients.activate();
-			}			
+			if ( app.MapPane ) {
+				
+				if ( app.MapPane.layerMenu ) app.MapPane.layerMenu._openLayers.style.opacity = 1;
+				if ( app.MapPane.legendsControl ) app.MapPane.legendsControl._legendsOpener.style.opacity = 1;
+				if ( app.MapPane.descriptionControl ) app.MapPane.descriptionControl._button.style.opacity = 1;
+				
+				// Make sure we reset if we're in fullscreen mode (media library, users, etc)
+				if ( app.SidePane.fullscreen ) app.SidePane.Clients.activate();	
+			}
+
+			// Show the controllers (has been hidden when a new project is refreshed in projects.js > refresh() )
+			// app._map._controlContainer.style.opacity = 1;
 		}
+
+		app._map._controlContainer.style.opacity = 1;
 
 
 		// Only open the description box if there is anything inside of it
@@ -10498,6 +10505,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	refresh : function () {
+
 		if (!this.project) return;
 		// set height to project headerHeight
 		var headerHeight = this.project.getHeaderHeight();
@@ -10505,6 +10513,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	updateContent : function (project) {
+
 		this.project = project;
 
 		// refresh height
@@ -10607,7 +10616,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	},
 
-	// (j)
+
 	initLayout : function () {		
 
 		// Create the header    
@@ -10661,6 +10670,19 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
+
+
+		if ( Wu.app.mobile ) {
+			// this._content.style.left = Wu.app.nativeResolution[1] + 'px';
+			// this._isClosed = true;
+
+			// Mobile arrow	
+		    	Wu.DomUtil.create('div', 'layers-mobile-arrow', this._innerContainer);
+			
+
+
+
+		}
 
 
 	},
@@ -10727,7 +10749,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 
-	// (j) cxxx
+	// (j)
 	closeLayerPane : function () {
 
 		this._open = false;
@@ -10737,7 +10759,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		Wu.DomUtil.removeClass(this._openLayers, 'ol-collapsed');
 		
-
 
 		// Slide the LEGENDS
 		if ( app.MapPane.inspectControl ) {
@@ -10750,7 +10771,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	
 	},
 
-	// (j) cxxx
+	// (j)
 	openLayerPane : function () {
 
 		this._open = true;
@@ -10777,6 +10798,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			// Check if legends is open ~ close it when opening layer menu
 			if ( app.MapPane.legendsControl._isOpen ) app.MapPane.legendsControl.MobileCloseLegends();
 			if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
+
 		}
 
 	},
@@ -11266,7 +11288,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		if (!layer) return this.toggleFolder(layerItem); 
 			
 		// add layer to map
-		console.log('HEY! When adding layer to map, I need to know what fricking function it is that automatically loads the frickin legends... because I don\' want the legends to be loaded when we\'re in frickin mobile world, yo');
 		layer.add();
 		layerItem.on = true;
 
@@ -11428,7 +11449,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		Wu.DomEvent.on(del,  'mousedown', Wu.DomEvent.stop, this);
 
 		// Stop Propagation
-		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._container, 'touchstart mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 
 		// add elem to item object
 		layerItem.el = wrap;
@@ -11618,7 +11639,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	update : function (project) {
-		
+
 		// get vars
 		this.project  = project || Wu.app.activeProject;
 		this._content = Wu.DomUtil.get('layer-menu-inner-content');
@@ -11648,7 +11669,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		var layersMaxHeight = window.innerHeight - 135;
 
 		// Set max height of Layers selector container
-		this.setMaxHeight(layersMaxHeight);		
+		this.setMaxHeight(layersMaxHeight);
 	
 	}
 	
@@ -12140,6 +12161,16 @@ L.control.inspect = function (options) {
 		// add tooltip
 		app.Tooltip.add(this._container, 'Shows layer information', { extends : 'systyle', tipJoint : 'left' });
 			       
+		// If mobile: start closed info/description pane
+		if ( Wu.app.mobile ) {
+			this._content.style.left = Wu.app.nativeResolution[1] + 'px';
+			this._isClosed = true;
+
+			// Mobile arrow	
+		    	Wu.DomUtil.create('div', 'description-mobile-arrow', this._content);
+			
+		}
+
 	},      
 
 	setDescription : function (layer) {
@@ -12360,6 +12391,7 @@ L.control.inspect = function (options) {
 
 	},
 
+	// For Mobile Phones
 	toggleCloser : function () {
 
 		// Close pane if we're on a desktop / pad
@@ -12393,7 +12425,7 @@ L.control.inspect = function (options) {
 
 		Wu.DomUtil.removeClass(this._button, 'active-description');
 
-		// Slide out
+		// Slide out (only works in portrait format... in landscape it has to be [0] )
 		this._content.style.left = Wu.app.nativeResolution[1] + 'px';
 		this._isClosed = true;
 	},
@@ -12429,6 +12461,7 @@ L.control.description = function (options) {
 		    options = this.options;
 
 		// add html
+		container.style.display = 'none';
 		container.innerHTML = ich.legendsControl(); 	     
 
 
@@ -12468,10 +12501,12 @@ L.control.description = function (options) {
 	},	
 
 	show : function () {
+
 		Wu.DomUtil.removeClass(this._container, 'displayNone');
 	},
 
 	hide : function () {
+
 		Wu.DomUtil.addClass(this._container, 'displayNone');
 	},
 
@@ -12523,17 +12558,16 @@ L.control.description = function (options) {
 	toggleOpen : function(e) {
 
 		// Open / Close Legends for desktop and pad
-		if ( !Wu.app.mobile ) app.MapPane.legendsControl._isOpen ? this.closeLegends() : this.openLegends();
+		if ( !Wu.app.mobile ) this._isOpen ? this.closeLegends() : this.openLegends();
 		
 		// Open / Close Legends for mobile phones
-		else app.MapPane.legendsControl._isOpen ? this.MobileCloseLegends() : this.MobileOpenLegends();
+		else this._isOpen ? this.MobileCloseLegends() : this.MobileOpenLegends();
 
 	},
 
 	MobileCloseLegends : function(e) {
-
 		Wu.DomUtil.removeClass(this._legendsOpener, 'legends-open');
-		this._legendsInner.style.left = Wu.app.nativeResolution[1] + 'px';
+		this._content.style.left = Wu.app.nativeResolution[1] + 'px';
 		this._setClosed();
 	},
 
@@ -12544,7 +12578,7 @@ L.control.description = function (options) {
 		if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
 
 		Wu.DomUtil.addClass(this._legendsOpener, 'legends-open');
-		this._legendsInner.style.left = '3px';
+		this._content.style.left = '0px';
 		this._setOpen();
 	},
 
@@ -12613,8 +12647,8 @@ L.control.description = function (options) {
 	// is called when changing/selecting project
 	update : function (project) {
 	       
-		// init divs
-		this.initContainer();
+		// // init divs
+		// this.initContainer();
 
 		// project is ready only here, so init relevant vars
 		// update is called from enableLayermenu toggle in MapPane
@@ -12622,6 +12656,9 @@ L.control.description = function (options) {
 		// get vars
 		this.project = project || Wu.app._activeProject;
 		this._content = Wu.DomUtil.get('legends-control-inner-content'); 
+
+		// init divs
+		this.initContainer();		
 
 		this.calculateHeight();
 
@@ -12653,6 +12690,17 @@ L.control.description = function (options) {
 
 		// add tooltip
 		app.Tooltip.add(this._legendsInner, 'Shows legends of active layers', { extends : 'systyle', tipJoint : 'top right'});
+
+		// If mobile: start with closed legends pane
+		if ( Wu.app.mobile ) {
+			this._content.style.left = Wu.app.nativeResolution[1] + 'px';
+			this._setClosed();
+
+			// Mobile arrow	
+		    	Wu.DomUtil.create('div', 'legends-mobile-arrow', this._content);
+
+
+		}
 
 
 	},
@@ -12723,7 +12771,10 @@ L.control.description = function (options) {
 
 		// Hide legends if it's empty
 		if (this.legendsCounter.length == 0) {
-			this._legendsContainer.style.display = 'none';
+
+			// this._legendsContainer.style.display = 'none';
+			this._container.style.display = 'none';
+
 			this._setClosed();
 		} 
 	},
@@ -12757,7 +12808,9 @@ L.control.description = function (options) {
 		if (!legends) return;
 
 		// Make sure that the container is visible...
-		this._legendsContainer.style.display = 'block';
+		// this._legendsContainer.style.display = 'block';
+		this._container.style.display = 'block';
+		
 
 		// create legends box
 	    	var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInnerSlider);
@@ -12816,8 +12869,8 @@ L.control.description = function (options) {
 		}, this);
 
 
-		// mark open
-		this._setOpen();
+		// mark open if not on Mobile
+		if ( !Wu.app.mobile ) this._setOpen();
 
 		// see if we need the horizontal scrollers or not
 		this.checkWidth();
@@ -12829,6 +12882,7 @@ L.control.description = function (options) {
 	},
 
 	_setOpen : function () {
+
 		this._isOpen = true;
 
 		// calc
@@ -13180,7 +13234,7 @@ L.control.baselayerToggle = function (options) {
 };;Wu.Project = Wu.Class.extend({
 
 	initialize : function (store) {
-		
+
 		// set dB object to store
 		this.store = {};
 		Wu.extend(this.store, store);
@@ -13300,6 +13354,16 @@ L.control.baselayerToggle = function (options) {
 
 		// set active project in sidepane
 		if (this._menuItem) this._menuItem._markActive();
+
+		if ( app.StatusPane.isOpen ) {
+			app._map._controlCorners.topleft.style.opacity = 0;
+			app._map._controlCorners.topleft.style.display = 'none';
+		}
+
+		// Make sure no controls appear when changing projects on mobile (get's turned on again in sidepane.js > close() )
+		// if ( Wu.app.mobile && app.StatusPane.isOpen ) {
+		// 	app._map._controlContainer.style.opacity = 0;
+		// }
 		
 	},
 
@@ -13345,6 +13409,7 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	select : function () {
+
 
 		// hide headerpane
  		if (app._headerPane) Wu.DomUtil.removeClass(app._headerPane, 'displayNone');
@@ -19557,7 +19622,8 @@ Wu.App = Wu.Class.extend({
 	detectMobile : function() {
 		
 		// Detect if it's a mobile
-		// if ( L.Browser.mobile ) {
+		if ( L.Browser.mobile ) {
+
 			
 			// Set mobile state to true
 			Wu.app.mobile = false;
@@ -19575,10 +19641,12 @@ Wu.App = Wu.Class.extend({
 
 			// Mobile phone
 			if ( smallest < 450 ) {
+
 				Wu.app.mobile = true;
 				var mobilestyle = 'mobilestyle.css'
 			// Tablet
 			} else {
+
 				Wu.app.pad = true;
 				var mobilestyle = 'padstyle.css'
 			}
@@ -19589,7 +19657,7 @@ Wu.App = Wu.Class.extend({
 			var styleURL = '<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/' + mobilestyle + '">';
 			styletag.innerHTML = styleURL;
 			
-		// }
+		}
 	},
 
 	initServer : function () {
