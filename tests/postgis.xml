@@ -1,0 +1,13 @@
+ <Layer name="countries" status="on" srs="+proj=latlong +datum=WGS84">
+        <StyleName>countries_style_label</StyleName>
+        <Datasource>
+          <Parameter name="type">postgis</Parameter>
+          <Parameter name="host">localhost</Parameter>
+          <Parameter name="dbname">osmnode</Parameter>
+          <Parameter name="user">node</Parameter>      
+          <Parameter name="password">node</Parameter>
+          <Parameter name="table">(select ST_Buffer(ST_Centroid(geometry),2) as geometry, name  from world_worldborders) as world</Parameter>
+          <Parameter name="estimate_extent">false</Parameter>
+          <Parameter name="extent">-180,-90,180,89.99</Parameter>
+        </Datasource>
+    </Layer>
