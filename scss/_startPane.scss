@@ -79,7 +79,7 @@
 
 .startpane-header-title {
 	color: #fff;
-	font-family: helvetica neue;
+	font-family: $font;
 	font-size: 20px;
 	max-width: 350px;
 	margin: auto;
@@ -96,7 +96,7 @@
 	height: 40px;
 	margin: 10px 0px;
 	background-color: white;
-	font-family: helvetica neue;
+	font-family: $font;
 	text-align: center;
 	line-height: 1.6;
 	font-weight: 900;

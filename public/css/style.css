@@ -1505,7 +1505,8 @@ input.cmn-toggle-round-flat + label:before {
   padding-left: 0;
   width: auto;
   max-width: 100%;
-  display: none; }
+  /*display: none;*/
+  display: block; }
 
 /* inner wrapper 2 */
 #legends-inner {
@@ -1514,7 +1515,8 @@ input.cmn-toggle-round-flat + label:before {
   overflow: hidden;
   position: relative;
   width: auto;
-  max-width: 100%; }
+  max-width: 100%;
+  left: 3px; }
 
 /* legends close button (litte arrow) */
 #legends-collapser {
@@ -1559,10 +1561,15 @@ input.cmn-toggle-round-flat + label:before {
 #legends-opener {
   text-align: center;
   background: white;
-  height: 100%;
+  /*height: 100%;*/
   line-height: 2;
   font-weight: 600;
-  cursor: pointer; }
+  cursor: pointer;
+  position: absolute;
+  z-index: 999999999999;
+  height: 24px;
+  width: 150px;
+  opacity: 0; }
 
 #legends-inner-slider {
   position: relative;
@@ -1958,8 +1965,15 @@ input.cmn-toggle-round-flat + label:before {
   margin: 0;
   overflow: hidden;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-  top: 90px;
-  right: 6px; }
+  /*top: 90px;*/
+  /*right: 6px;*/
+  width: 130px;
+  top: 92px;
+  right: 5px;
+  opacity: 1; }
+
+#open-layers.ol-collapsed {
+  right: -131px; }
 
 /* Open layer menu mover */
 .layer-opener-opened {
@@ -2772,7 +2786,7 @@ input.cmn-toggle-round-flat + label:before {
   color: white !important;
   font-weight: 900;
   font-size: 12px;
-  font-family: helvetica neue;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
   width: 49px;
   text-align: center;
   text-decoration: none;
@@ -2791,7 +2805,7 @@ input.cmn-toggle-round-flat + label:before {
   color: white !important;
   font-weight: 900;
   font-size: 12px;
-  font-family: helvetica neue;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
   line-height: 1.45;
   border: none; }
 
@@ -5673,15 +5687,10 @@ input[type=checkbox] + label.check {
   transition: width 250ms ease, height 250ms ease, left 250ms ease, margin 250ms ease; }
 
 #open-layers {
-  /*	-webkit-transition: width 250ms ease, height 250ms ease;	
-	-moz-transition: width 250ms ease, height 250ms ease;	
-	-o-transition: width 250ms ease, height 250ms ease;	
-	transition: width 250ms ease, height 250ms ease;	
-*/
-  -webkit-transition: right 250ms ease;
-  -moz-transition: right 250ms ease;
-  -o-transition: right 250ms ease;
-  transition: right 250ms ease; }
+  -webkit-transition: right 250ms ease, opacity 250ms;
+  -moz-transition: right 250ms ease, opacity 250ms;
+  -o-transition: right 250ms ease, opacity 250ms;
+  transition: right 250ms ease, opacity 250ms; }
 
 .legends-collapser-trans {
   -webkit-transition: opacity 250ms ease, left 250ms ease;
@@ -5963,7 +5972,7 @@ input[type=checkbox] + label.check {
 
 .startpane-header-title {
   color: #fff;
-  font-family: helvetica neue;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
   font-size: 20px;
   max-width: 350px;
   margin: auto; }
@@ -5978,7 +5987,7 @@ input[type=checkbox] + label.check {
   height: 40px;
   margin: 10px 0px;
   background-color: white;
-  font-family: helvetica neue;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
   text-align: center;
   line-height: 1.6;
   font-weight: 900;
@@ -6006,82 +6015,70 @@ input[type=checkbox] + label.check {
   .startpane-project-list {
     padding: 0; } }
 
+/*
+These rules has already been implemented in the scss files, but I keep them here for a little while in case the order is off :P
+
 #open-layers {
-  -webkit-transition: right 250ms ease, opacity 250ms;
-  -moz-transition: right 250ms ease, opacity 250ms;
-  -o-transition: right 250ms ease, opacity 250ms;
-  transition: right 250ms ease, opacity 250ms;
-  width: 130px;
-  top: 92px;
-  right: 5px;
-  opacity: 1; }
+	-webkit-transition: right 250ms ease, opacity 250ms;
+	-moz-transition: right 250ms ease, opacity 250ms;
+	-o-transition: right 250ms ease, opacity 250ms;
+	transition: right 250ms ease, opacity 250ms;
+	width: 130px;
+	top: 92px;
+	right: 5px;
+	opacity: 1;
+	}
 
 #open-layers.ol-collapsed {
-  right: -131px; }
+	right: -131px;
+	}
 
 #legends-opener {
-  position: absolute;
-  z-index: 999999999999;
-  height: 24px;
-  width: 150px;
-  opacity: 0; }
+	position: absolute;
+	z-index: 999999999999;
+	height: 24px;
+	width: 150px;
+	opacity: 0;
+	}
 
 #legends-inner {
-  left: 3px; }
+	left: 3px;
+}
 
-/*.hide-menu .q-editor-content-item {
-	opacity: 0;
-	}*/
-/*.leaflet-control-layermenu.leaflet-control {
-	padding: 0;
-	position: absolute;
-	top: 90px;
-	right: 0;
-	height: auto;
-	overflow: visible;
+
+#legends-control-inner-content {
+	display: block;
+}
+
+*/
+/*
+┌─┐┬ ┌┬┐┌─┐┬─┐┌┐┌┌─┐┌┬┐┬┬  ┬┌─┐  ┌┬┐┬┌┬┐┬  ┌─┐┌─┐
+├─┤│  │ ├┤ ├┬┘│││├─┤ │ │└┐┌┘├┤    │ │ │ │  ├┤ └─┐
+┴ ┴┴─┘┴ └─┘┴└─┘└┘┴ ┴ ┴ ┴ └┘ └─┘   ┴ ┴ ┴ ┴─┘└─┘└─┘
+*/
+/*
+.header-title-wrap {
+	width: auto;
+	min-width: 250px;
 	}
-*/
-/*
-██████╗  ██████╗ ██████╗ ████████╗██████╗  █████╗ ██╗████████╗
-██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██║╚══██╔══╝
-██████╔╝██║   ██║██████╔╝   ██║   ██████╔╝███████║██║   ██║   
-██╔═══╝ ██║   ██║██╔══██╗   ██║   ██╔══██╗██╔══██║██║   ██║   
-██║     ╚██████╔╝██║  ██║   ██║   ██║  ██║██║  ██║██║   ██║   
-╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝   ╚═╝   
-*/
-/*IPAD*/
-/*@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
-  .ipad-portrait { color: red; }
-}
-*/
-/*SAMSUNG PAD*/
-@media all and (device-width: 752px) and (device-height: 1280px) and (orientation: portrait) {
-  .col-sm-6.col-sm-offset-3 {
-    background-color: red !important; } }
 
-@media all and (device-width: 1280px) and (device-height: 752px) and (orientation: portrait) {
-  .col-sm-6.col-sm-offset-3 {
-    background-color: red !important; } }
+.leaflet-control-layermenu.leaflet-control {
+	top: 5px;
+	}
 
-/*
-██╗      █████╗ ███╗   ██╗██████╗ ███████╗ ██████╗ █████╗ ██████╗ ███████╗
-██║     ██╔══██╗████╗  ██║██╔══██╗██╔════╝██╔════╝██╔══██╗██╔══██╗██╔════╝
-██║     ███████║██╔██╗ ██║██║  ██║███████╗██║     ███████║██████╔╝█████╗  
-██║     ██╔══██║██║╚██╗██║██║  ██║╚════██║██║     ██╔══██║██╔═══╝ ██╔══╝  
-███████╗██║  ██║██║ ╚████║██████╔╝███████║╚██████╗██║  ██║██║     ███████╗
-╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝     ╚══════╝
-*/
-/*IPAD*/
-/*@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
-  .ipad-landscape { color: blue; }
-}
-*/
-/*SAMSUNG PAD*/
-@media all and (device-width: 752px) and (device-height: 1280px) and (orientation: landscape) {
-  .ipad-landscape {
-    color: blue; } }
+.leaflet-top.leaflet-right {
+	top: 5px;
+	}
 
-/*@import 'mobile';*/
+.leaflet-control-attribution {
+	display: none;
+	}
+
+#open-layers {
+	top: 7px;
+	}
+
+*/
 /* @import 'color_picker';	// Color picker */
 /* @import 'mediaLibrary';	// Media Library */
 /*# sourceMappingURL=style.css.map */

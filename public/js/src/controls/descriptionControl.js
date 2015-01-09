@@ -36,6 +36,16 @@ L.Control.Description = L.Control.extend({
 		// add tooltip
 		app.Tooltip.add(this._container, 'Shows layer information', { extends : 'systyle', tipJoint : 'left' });
 			       
+		// If mobile: start closed info/description pane
+		if ( Wu.app.mobile ) {
+			this._content.style.left = Wu.app.nativeResolution[1] + 'px';
+			this._isClosed = true;
+
+			// Mobile arrow	
+		    	Wu.DomUtil.create('div', 'description-mobile-arrow', this._content);
+			
+		}
+
 	},      
 
 	setDescription : function (layer) {

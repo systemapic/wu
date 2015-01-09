@@ -70,14 +70,6 @@
 
 
 
-
-
-
-
-
-
-
-
 /*
 ┬  ┌─┐┌─┐┌─┐┬  ┌─┐┌┬┐  ┌─┐┌─┐┌┐┌┌┬┐┬─┐┌─┐┬  ┌─┐
 │  ├┤ ├─┤├┤ │  ├┤  │   │  │ ││││ │ ├┬┘│ ││  └─┐
@@ -86,11 +78,9 @@
 
 
 /* Button list */
-
-.leaflet-control-scale,
-.leaflet-control-mouseposition,
-.leaflet-control-attribution {
-	display: none !important;
+.leaflet-draw,
+.leaflet-control-cartocss {
+	display: none !important;	
 	}
 
 .leaflet-control-zoom {
@@ -115,6 +105,11 @@
 	border: none;
 	border-right: 1px solid #ccc;
 	}
+
+.leaflet-bar a:last-child {
+	border: none;
+	}
+
 
 /* Project header */
 
@@ -160,6 +155,17 @@
 */
 
 
+/* SKETCHY SKETCHY SKETCHY SKETCHY SKETCHY */
+/* SKETCHY SKETCHY SKETCHY SKETCHY SKETCHY */
+/* SKETCHY SKETCHY SKETCHY SKETCHY SKETCHY */
+.leaflet-top.leaflet-left {
+	position: absolute;
+	width: 100%;
+	margin-top: 52px;
+	}
+/* SKETCHY SKETCHY SKETCHY SKETCHY SKETCHY */
+/* SKETCHY SKETCHY SKETCHY SKETCHY SKETCHY */
+/* SKETCHY SKETCHY SKETCHY SKETCHY SKETCHY */
 
 
 /* Drop down menu */
@@ -180,10 +186,6 @@
 .q-editor-menu-item .dataLibrary {
 	padding-top: 13px;
 	}	
-
-.leaflet-top.leaflet-left {
-	margin-top: 48px;
-	}
 
 .leaflet-control-layermenu.leaflet-control {
 	top: 57px;
@@ -287,12 +289,40 @@ td {
 	line-height: 2.2;
 	}	
 
+.download-dialog {
+	padding-right: 12px;
+	padding-bottom: 63px;
+	}
+
+.download-dialog-button {
+	height: 34px;
+	font-size: 120%;
+	line-height: 2;
+	}	
+
+/* uploading files */
+.drop-meta-title {
+	text-align: center;
+	left: 0;
+	width: 100%;
+	font-size: 200%;
+	}	
+
+.drop-meta-wrapper {
+	padding: 0;
+	font-size: 130%;
+	padding-top: 26px;
+	text-align: center;
+	}
+
+
 
 
 /* Documents */
 
 #documents-container-leftpane {
-	width: 85px;
+	/*width: 85px;*/
+	width: 100px;
 	}
 
 #documents-folder-list {
@@ -305,9 +335,11 @@ td {
 	}	
 
 #documents-container-rightpane {
-	left: 95px;
+	/*left: 95px;*/
+		left: 115px;
 	padding-left: 6px;
-	padding-right: 100px;
+	/*padding-right: 100px;*/
+		padding-right: 130px;
 	padding-bottom: 0;	
 	}
 
@@ -321,6 +353,18 @@ td {
 #documents-container-textarea p {
 	font-size: 110%;
 	}	
+
+.documents-folder-delete {
+	display: none;
+	}
+
+.documents-folder-item {
+	margin-left: 0;
+	}	
+
+.documents-folder-item {
+	word-wrap: break-word;
+}	
 
 
 /* USERS */
@@ -667,30 +711,18 @@ td {
 
 
 
-
-
-/* SKETCHY SKETCHY SKETCHY SKETCHY SKETCHY */
-/* SKETCHY SKETCHY SKETCHY SKETCHY SKETCHY */
-/* SKETCHY SKETCHY SKETCHY SKETCHY SKETCHY */
-.leaflet-top.leaflet-left {
-	position: absolute;
-	width: 100%;
-	}
-/* SKETCHY SKETCHY SKETCHY SKETCHY SKETCHY */
-/* SKETCHY SKETCHY SKETCHY SKETCHY SKETCHY */
-/* SKETCHY SKETCHY SKETCHY SKETCHY SKETCHY */
-
-
-
-
-
-
 /*
 ┌─┐┌─┐┌┐┌┌┬┐┬─┐┌─┐┬  ┌─┐
 │  │ ││││ │ ├┬┘│ ││  └─┐
 └─┘└─┘┘└┘ ┴ ┴└─└─┘┴─┘└─┘
 */
 
+/* Kill these controllers */
+.leaflet-control-scale,
+.leaflet-control-mouseposition,
+.leaflet-control-attribution {
+	display: none !important;
+	}
 
 /* Layer menu */
 
@@ -748,7 +780,16 @@ td {
 	display: none;
 	}
 
-.leaflet-control-layermenu:before {
+.layers-mobile-arrow {
+	width: 30px;
+	height: 15px;
+	position: absolute;
+	left: 236px;
+	opacity: 1;
+	overflow: hidden;
+	}
+
+.layers-mobile-arrow:before {
 	content: '';
 	width: 20px;
 	height: 20px;
@@ -756,8 +797,10 @@ td {
 	bottom: -10px;
 	background: rgba(255, 255, 255, 0.97);
 	-webkit-transform: rotate(45deg);
-	left: 241px;
-	}
+	top: -10px;
+	left: 5px;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+	}	
 
 
 
@@ -804,13 +847,30 @@ td {
 	display: none;
 	}
 
-#legends-inner { /* OBS! Funker sikkert ikke i lengden, men må finne en løsning for den treangel-pilen! */
-	overflow: visible;
-
-	left: 600px;
+#legends-scroll-left,
+#legends-scroll-right {
+	display: none !important;
 	}
 
-#legends-inner:before {
+#legends-control-inner-content {
+	position: relative;
+	-webkit-transition: left 250ms ease;
+	}
+
+#legends-inner-slider {
+	min-width: 170px;
+	}
+
+.legends-mobile-arrow {
+	width: 30px;
+	height: 15px;
+	position: absolute;
+	right: 89px;
+	opacity: 1;
+	overflow: hidden;
+	}
+
+.legends-mobile-arrow:before {
 	content: '';
 	width: 20px;
 	height: 20px;
@@ -818,18 +878,18 @@ td {
 	bottom: -10px;
 	background: rgba(255, 255, 255, 0.97);
 	-webkit-transform: rotate(45deg);
-	right: 94px;
+	top: -10px;
+	left: 5px;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 	}
 
-#legends-inner-slider {
-	min-width: 170px;
-	}
+
 
 
 /*Layer description*/
 
 .leaflet-control-description {
-	bottom: 103px;
+	bottom: 107px;
 	top: auto;
 	width: 100%;
 	position: absolute;
@@ -848,7 +908,8 @@ td {
 	left: auto;
 	height: 31px;
 	width: 70px;
-	opacity: 1 !important;	
+	opacity: 1 !important;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 	}
 
 #description-toggle-button.active-description {
@@ -882,8 +943,20 @@ td {
 	width: 100%;
 	}
 
+.description-scroller {
+	width: 100%;
+	}
 
-#description-control-inner-content:before {
+.description-mobile-arrow {
+	width: 30px;
+	height: 15px;
+	position: absolute;
+	right: 173px;
+	opacity: 1;
+	overflow: hidden;
+	}
+
+.description-mobile-arrow:before {
 	content: '';
 	width: 20px;
 	height: 20px;
@@ -891,12 +964,14 @@ td {
 	bottom: -10px;
 	background: rgba(255, 255, 255, 0.97);
 	-webkit-transform: rotate(45deg);
-	right: 180px;
+	top: -10px;
+	left: 5px;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 	}
 
-.description-scroller {
-	width: 100%;
-	}
+
+
+
 
 
 /*
@@ -924,3 +999,7 @@ td {
 
 @media all and (orientation: landscape) {
 }
+
+
+
+

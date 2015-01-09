@@ -1,3 +1,6 @@
+/*
+These rules has already been implemented in the scss files, but I keep them here for a little while in case the order is off :P
+
 #open-layers {
 	-webkit-transition: right 250ms ease, opacity 250ms;
 	-moz-transition: right 250ms ease, opacity 250ms;
@@ -18,10 +21,48 @@
 	z-index: 999999999999;
 	height: 24px;
 	width: 150px;
-
 	opacity: 0;
 	}
 
 #legends-inner {
 	left: 3px;
-}	
+}
+
+
+#legends-control-inner-content {
+	display: block;
+}
+
+*/
+
+
+
+/*
+┌─┐┬ ┌┬┐┌─┐┬─┐┌┐┌┌─┐┌┬┐┬┬  ┬┌─┐  ┌┬┐┬┌┬┐┬  ┌─┐┌─┐
+├─┤│  │ ├┤ ├┬┘│││├─┤ │ │└┐┌┘├┤    │ │ │ │  ├┤ └─┐
+┴ ┴┴─┘┴ └─┘┴└─┘└┘┴ ┴ ┴ ┴ └┘ └─┘   ┴ ┴ ┴ ┴─┘└─┘└─┘
+*/
+
+/*
+.header-title-wrap {
+	width: auto;
+	min-width: 250px;
+	}
+
+.leaflet-control-layermenu.leaflet-control {
+	top: 5px;
+	}
+
+.leaflet-top.leaflet-right {
+	top: 5px;
+	}
+
+.leaflet-control-attribution {
+	display: none;
+	}
+
+#open-layers {
+	top: 7px;
+	}
+
+*/
