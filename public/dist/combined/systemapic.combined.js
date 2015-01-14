@@ -3246,7 +3246,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var projects = app.Projects;
 		for (p in projects) {
 			var project = projects[p];
-			project._menuItem._unmarkActive();
+			if (project._menuItem) project._menuItem._unmarkActive();
 		}
 		Wu.DomUtil.addClass(this._container, 'active-project');
 	},
@@ -10435,7 +10435,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		Wu.DomUtil.removeClass(app.MapPane._container, "map-blur") // (j) – removes the blur on map if it's set by one of the fullpanes
 
 		// Show button section and Layer info when the Home dropdown menu opens (j)
-		if (app._map) app._map._controlCorners.topleft.style.opacity = 1;
+		if (app._map) {
+			app._map._controlCorners.topleft.style.opacity = 1;
+			app._map._controlCorners.topleft.style.display = 'block';
+		}
 
 
 
@@ -10452,10 +10455,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			}
 
 			// Show the controllers (has been hidden when a new project is refreshed in projects.js > refresh() )
-			// app._map._controlContainer.style.opacity = 1;
+			app._map._controlContainer.style.opacity = 1;
 		}
-
-		app._map._controlContainer.style.opacity = 1;
 
 
 		// Only open the description box if there is anything inside of it
