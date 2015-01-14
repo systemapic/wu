@@ -242,7 +242,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var projects = app.Projects;
 		for (p in projects) {
 			var project = projects[p];
-			project._menuItem._unmarkActive();
+			if (project._menuItem) project._menuItem._unmarkActive();
 		}
 		Wu.DomUtil.addClass(this._container, 'active-project');
 	},
