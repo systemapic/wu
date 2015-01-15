@@ -492,6 +492,20 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
+	// NEW OSM LAYERS ======================
+	// =====================================
+	// get layers objects for project
+	app.post('/api/layers/osm/new', isLoggedIn, function (req, res) {
+		console.log('/api/layers/osm/new');
+
+		// send layers to client
+		api.createOSMLayer(req, res);
+
+	});
+
+
+
+	// =====================================
 	// UPDATE LAYERS =======================
 	// =====================================
 	// get layers objects for project

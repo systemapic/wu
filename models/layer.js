@@ -20,11 +20,11 @@ var layerSchema = mongoose.Schema({
 	attribution     : String,
 	accessToken 	: String, 	// some layers have access tokens, like mapbox
 
-
 	// data source for layer
 	data : {
 		geojson 	: String,			// file uuid, file saved on server - needs to be if over 4MB (mongodb limit)
 		topojson	: String,			// file uuid ... // simply request, check auth, serve file.
+		
 		cartoid   	: String,
 		
 		rastertile 	: String,			// server raster path: raster/hubble2/hubble
@@ -32,7 +32,6 @@ var layerSchema = mongoose.Schema({
 		mapbox 		: String,			// mapbox id: rawger.geography-class
 		cartodb 	: String,			// cartodb id: 
 		osm 		: String,			// osm id?
-
 	}, 
 
 	metadata : String, // json string with loads of meta
@@ -45,10 +44,7 @@ var layerSchema = mongoose.Schema({
 		style : String  // json of css style object
 	}],
 
-	
-
 	file : String 	// file uuid that layer is connected to, if any
-
 
 });
 

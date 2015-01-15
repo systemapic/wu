@@ -144,7 +144,7 @@ module.exports = api = {
 			project.layers.push(layer_id);			
 			project.markModified('layers');
 			project.save(function (err) {
-				callback && callback(err, done);
+				callback && callback(err);
 			});
 		});
 	},
@@ -240,10 +240,10 @@ module.exports = api = {
 			api._getLayerFeaturesValues(fileUuid, cartoid, function (err, result) {
 				if (err) console.error('_getLayerFeaturesValues err: ', err);
 
-				var jah = result.rules;
-				var css = result.css;
+				// var jah = result.rules;
+				// var css = result.css;
 
-				callback(null, result);
+				callback(err, result);
 
 			});
 
@@ -492,6 +492,22 @@ module.exports = api = {
 	// get features from geojson that are active in cartoid.mss (ie. only active/visible layers)
 	_getLayerFeaturesValues : function (fileUuid, cartoid, callback) {
 
+		if (fileUuid == 'osm') {
+			api._getLayerFeaturesValuesOSM(fileUuid, cartoid, callback);
+		} else {
+			api._getLayerFeaturesValuesGeoJSON(fileUuid, cartoid, callback);
+		}
+	},
+
+	_getLayerFeaturesValuesOSM : function (fileUuid, cartoid, callback) {
+
+		console.log('_getLayerFeaturesValuesOSM');
+		callback('debug');
+
+	},
+
+	_getLayerFeaturesValuesGeoJSON : function (fileUuid, cartoid, callback) {
+
 
 		File
 		.findOne({uuid : fileUuid})
@@ -566,12 +582,9 @@ module.exports = api = {
 			});
 		});
 
-		
 
 
 	},
-
-
 
 
 	// #########################################
@@ -771,12 +784,13 @@ module.exports = api = {
 		var fileUuid 	= req.body.fileUuid;
 		var css 	= req.body.css;
 		var cartoid 	= req.body.cartoid;
+		var layerUuid 	= req.body.layerUuid;
 
 		// set path
 		var csspath 	= CARTOCSSFOLDER + cartoid + '.mss';
 
 
-		console.log('vars: ', fileUuid, cartoid, csspath, css);
+		console.log('vars: ', layerUuid, fileUuid, cartoid, csspath, css);
 
 		// save css to file by cartoId 
 		fs.writeFile(csspath, css, {encoding : 'utf8'}, function (err) {
@@ -791,7 +805,8 @@ module.exports = api = {
 				uri : 'https://import.systemapic.com/import/cartocss',
 				json : {
 					css : css,
-					cartoid : cartoid
+					cartoid : cartoid,
+					osm : (fileUuid == 'osm')
 				}
 			}, 
 
@@ -830,9 +845,13 @@ module.exports = api = {
 
 
 		        		// save ID to file object (as active css)
+		        		console.log('save to layer: layerUuid, fileUuid', layerUuid, fileUuid);
 					Layer
-					.findOne({file : fileUuid})
+					.findOne({uuid : layerUuid})
 					.exec(function (err, layer) {
+
+						if (err) console.error(err);
+						console.log('fingind?? ', err, layer);
 
 						layer.data.cartoid = cartoid;
 						layer.markModified('data');
@@ -1639,6 +1658,34 @@ module.exports = api = {
 
 	},
 
+
+
+	createOSMLayer : function (req, res) {
+
+		var projectUuid = req.body.projectUuid;
+		var title = req.body.title;
+
+		var layer 		= new Layer();
+		layer.uuid 		= 'osm-layer-' + uuid.v4();
+		layer.title 		= title;
+		layer.description 	= 'Styleable vector tiles';
+		layer.data.osm 	 	= true;
+		layer.legend 		= '';
+		layer.file 		= 'osm';
+		// layer.metadata 		= options.metadata;
+
+		layer.save(function (err, doc) {
+
+			// return layer to client
+			res.end(JSON.stringify(doc));
+
+			// add to project
+			api.dbAddLayerToProject(layer._id, projectUuid);
+		});
+	},
+
+
+
 	createLayerFromGeoJSON : function (req, res) {
 
 		var geojson = req.body.geojson;
@@ -1649,10 +1696,8 @@ module.exports = api = {
 		var data = JSON.stringify(geojson);
 		var size = data.length;
 
-
 		fs.writeFile(outfile, data, function (err) {
 			if (err) console.log('write err: ', err);
-
 
 			var file = [{ 
 				
@@ -1671,10 +1716,7 @@ module.exports = api = {
 
 			upload.upload(req, res);
 
-
 		});
-
-
 
 	},
 

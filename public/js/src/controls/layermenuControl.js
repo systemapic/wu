@@ -151,10 +151,8 @@ L.Control.Layermenu = L.Control.extend({
 
 
 	toggleLayerPane : function () {
-
 		if ( this._open ) this.closeLayerPane();
 		else this.openLayerPane();
-
 	},
 
 
@@ -799,6 +797,8 @@ L.Control.Layermenu = L.Control.extend({
 
 	// add from sidepane
 	add : function (layer) {
+		
+		console.log('add from sidepaner', layer);
 
 		// create db item
 		var item = {
@@ -825,6 +825,8 @@ L.Control.Layermenu = L.Control.extend({
 	},
 
 	_add : function (layerItem) {		
+
+		console.log('_add layerItem', layerItem);
 
 		var item  = layerItem.item;
 		var layer = layerItem.layer;

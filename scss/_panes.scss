@@ -42,6 +42,14 @@
 	white-space: nowrap;
 	}
 
+.drop-meta-title {
+	left: -30px;
+	}
+
+.drop-meta-wrapper {
+	padding-left: 0px;
+	font-size: 150%;
+	}	
 #collapse-descripton {
 	font-size: 120%;
 	font-weight: 500;
@@ -266,7 +274,11 @@
 	background: transparent;
 	text-transform: uppercase;
 	font-size: 17px;
-	font-weight: 400;	
+	font-weight: 400;
+
+	width: 135px !important;
+	min-width: 135px !important;
+	max-width: 135px !important;		
 	}
 
 .client-description {
@@ -1836,7 +1848,7 @@ button.image-attachment {
 
 
 /* Datalibrary category */
-.datalibrary-category-wrapper {
+/*.datalibrary-category-wrapper {
 	position:  absolute;
 	border: 1px solid yellow;
 	z-index: 1000;
@@ -1875,6 +1887,88 @@ button.image-attachment {
 	height: auto;
 	cursor: pointer;
 	}
+*/
+
+.datalibrary-category-wrapper {		
+	position:  absolute;
+	z-index: 1000;
+	background-color: white;
+	font-size: 120%;
+	padding: 10px;
+	border-radius: 3px;
+	border: 0;
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
+	margin-top: 16px;
+	}
+
+.datalibrary-category-wrapper:before {
+	content: '';
+	background: white;
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	top: -3px;
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	transform: rotate(45deg);		
+	left: 24px;
+	}	
+
+.datalibrary-category-line-wrap {
+	height: auto;
+	cursor: pointer;
+	}
+
+.datalibrary-category-line {
+	float: left;
+	width: 85%;
+	font-size: 80%;
+	position: relative;
+	padding: 0;
+	margin-bottom: 2px;
+	padding-left: 5px;
+	background: rgba(0,0,0,0.1);
+	border: none;
+	border-radius: 2px 0px 0px 2px;
+	height: 21px;
+	}	
+
+.datalibrary-category-line:hover {
+	background: rgba(0,0,0,0.2);
+	}	
+
+.datalibrary-category-new {
+	border: 0px;
+	background-color: white;
+	font-size: 14px;
+	position: relative;
+	cursor: pointer;
+	top: 3px;
+	}
+
+.datalibrary-category-line-del {
+	/*right: 0px;*/		
+	width: 23px;
+	height: 21px;
+	border-radius: 0px 2px 2px 0px;
+	top: 0px;
+	position: relative;
+	float: right;
+	cursor: pointer;
+	background: rgba(0,0,0,0.1);
+	font-weight: 500;
+	font-size: 14px;
+	text-indent: 1px;
+	text-align: center;
+	line-height: 1.4;
+	color: #999;
+	opacity: 0.5;	
+	}
+
+.datalibrary-category-line-del:hover {
+	opacity: 1;
+	}	
+
 
 
 /*download-dialog*/
@@ -1919,7 +2013,31 @@ button.image-attachment {
 	font-weight: 500;
 	}	
 
+/* TABLE ADJUSTMENTS */
+td.tdcont.keywords {
+	max-width: 100px;
+	width: 100px;
+	min-width: 100px;
+	}
 
+td.tdcont.files {
+	max-width: 100px;
+	min-width: 100px;
+	width: 100px;
+	}
+
+#datalibrary-insertrows tr .tdcont {
+	padding-top: 20px;
+	}
+
+td.tdcont.files {
+	padding-top: 18px !important;
+	padding-left: 18px;
+	}
+
+td.tdcont.createdDate {
+	font-size: 80%;
+	}
 
 
 /*

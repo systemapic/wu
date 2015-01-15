@@ -115,7 +115,7 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 	// sort layers by provider
 	sortLayers : function (layers) {
 		// possible keys in layer.store.data. must add more here later if other sources
-		var keys = ['geojson', 'mapbox'];
+		var keys = ['geojson', 'mapbox', 'osm'];
 		var results = [];
 		keys.forEach(function (key) {
 			var sort = {
@@ -139,6 +139,7 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 		var title = '';
 		if (provider == 'geojson') title = 'Data Library';
 		if (provider == 'mapbox') title = 'Mapbox';
+		if (provider == 'osm') title = 'Open Street Map';
 		var header = Wu.DomUtil.create('div', 'item-list-header', this._outer, title)
 	},
 
@@ -212,8 +213,10 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 
 		// mark unavailable layers
 		this.markOccupied();
+
 		
 	},
+
 
 	removeHooks : function () {
 		// todo!!!
@@ -1469,12 +1472,18 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		
 		// container, header, outer
 		this._container	 	= Wu.DomUtil.create('div', 'editor-inner-wrapper editor-map-item-wrap ct12 ct17 ct23', container);
-		var h4 			= Wu.DomUtil.create('h4', '', this._container, 'Connected Accounts');
+		var h4 			= Wu.DomUtil.create('h4', '', this._container, 'Connected Sources');
 		this._outer 		= Wu.DomUtil.create('div', 'connect-outer', this._container);
+
+		// import OSM
+		var box 		= Wu.DomUtil.create('div', 'connect-osm', this._outer);
+		var h4_3		= Wu.DomUtil.create('div', 'connect-title', box, 'Open Street Map');
+		this._osmwrap 		= Wu.DomUtil.create('div', 'osm-connect-wrap', this._outer);
+		this._osmbox 		= Wu.DomUtil.create('div', 'osm-add-box', this._osmwrap, 'Add OSM layer');
 
 		// mapbox connect
 		var wrap 	  	= Wu.DomUtil.create('div', 'connect-mapbox', this._outer);
-		var h4_2 		= Wu.DomUtil.create('div', 'connect-mapbox-title', wrap, 'Mapbox');
+		var h4_2 		= Wu.DomUtil.create('div', 'connect-title', wrap, 'Mapbox');
 		this._mapboxWrap  	= Wu.DomUtil.create('div', 'mapbox-connect-wrap ct11', this._outer);
 		this._mapboxInput 	= Wu.DomUtil.create('input', 'input-box search import-mapbox-layers', this._mapboxWrap);
 		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-gray ct0 ct11 import-mapbox-layers-button', this._mapboxWrap, 'Add');
@@ -1486,7 +1495,6 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 		// add tooltip
 		app.Tooltip.add(h4, 'Imports layers from MapBox accounts.');
-		// app.Tooltip.add(this._container, 'Imports layers from MapBox account.');
 
 
 	},
@@ -1497,9 +1505,16 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		// connect mapbox button
 		Wu.DomEvent.on( this._mapboxConnect, 'click', this.importMapbox, this );
 
+		// add osm button
+		Wu.DomEvent.on( this._osmbox, 'click', this.addOSMLayer, this );
+
+
 		// stops
 		Wu.DomEvent.on( this._mapboxConnect, 'mousedown', Wu.DomEvent.stop, this );
 		Wu.DomEvent.on( this._mapboxInput, 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on( this._osmwrap, 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on( this._osmbox, 'mousedown', Wu.DomEvent.stopPropagation, this );
+
 
 	},
 
@@ -1509,7 +1524,7 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 	calculateHeight : function () {
 		var num = this.project.getMapboxAccounts().length;
-		this.maxHeight = 100 + num * 30;
+		this.maxHeight = 150 + num * 30;
 		this.minHeight = 0;
 	},
 
@@ -1530,6 +1545,30 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		this._mapboxConnect.innerHTML = 'Add';
 		this._mapboxInput.setAttribute('placeholder', 'Mapbox username');
 		this._mapboxInput.value = '';
+	},
+
+	addOSMLayer : function () {
+
+		// console.log('add osm layer', this.project);
+
+		// create layer
+		this.project.createOSMLayer(function (err, layer) {
+
+			// console.log('mapsetting callback! this', this, err, layer);
+
+			// add to baselayer, layermenu
+			this._updateLayerOptions();
+
+
+		}.bind(this));
+
+	},
+
+	_updateLayerOptions : function () {
+
+		// update contents in Options/Baselayers + Layermenu
+		app.SidePane.Map.mapSettings.baselayer.update();
+		app.SidePane.Map.mapSettings.layermenu.update();
 	},
 
 	// on click when adding new mapbox account
@@ -1653,9 +1692,19 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 	},
 
+
+	fillOSM : function () {
+		console.log('fill osm');
+
+
+	},
+
 	
 	update : function () {
 		Wu.SidePane.Map.MapSetting.prototype.update.call(this)	// call update on prototype
+
+		// add OSM options
+		this.fillOSM();
 
 		// fill in mapbox accounts
 		this.fillMapbox();

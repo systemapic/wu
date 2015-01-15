@@ -44,13 +44,16 @@ Wu.Project = Wu.Class.extend({
 	addLayers : function (layers) { // array of layers
 		layers.forEach(function (layer) {
 			this.addLayer(layer);
+
 		}, this);
 	},
 
 	addLayer : function (layer) {
 		// creates a Wu.Layer object (could be Wu.MapboxLayer, Wu.RasterLayer, etc.)
-		this.store.layers.push(layer);
+		this.store.layers.push(layer); /// TODO: WEIRD to add to array here, it's run in line 41?????
 		this.layers[layer.uuid] = new Wu.createLayer(layer);
+
+		return this.layers[layer.uuid];
 	},
 
 	addBaseLayer : function (layer) {
@@ -62,6 +65,44 @@ Wu.Project = Wu.Class.extend({
 		_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.getUuid(); });
 		this._update('baseLayers');
 	},
+
+	createOSMLayer : function (callback) {
+
+		var title = this._getOSMLayerTitle();
+
+		console.log('title!! osm ', title);
+
+		var options = JSON.stringify({
+			projectUuid : this.getUuid(),
+			title : title
+		});
+
+		// get new layer from server
+ 		Wu.Util.postcb('/api/layers/osm/new', options, function (ctx, json) {
+
+ 			var layer = ctx.addLayer(JSON.parse(json));
+
+ 			// callback to wherever intiated
+ 			callback(null, layer);
+
+ 		}, this);
+
+	},
+
+	_getOSMLayerTitle : function () {
+
+		var already = _.filter(this.getLayers(), function (l) {
+			return l.store.data.osm;
+		});
+
+		var title = 'Open Street Map';
+		var num = already.length;
+		if (num) title += ' #' + num;
+
+		return title;
+	},
+
+	
 
 	createLayerFromGeoJSON : function (geojson) {
 
@@ -475,7 +516,13 @@ Wu.Project = Wu.Class.extend({
 		var all = this.getActiveLayers();
 		var cartoLayers = _.filter(all, function (l) {
 
-			if (l) return l.store.data.hasOwnProperty('geojson');
+			if (l) {
+				if (l.store.data.hasOwnProperty('geojson')) return true;
+				if (l.store.data.hasOwnProperty('osm')) return true;
+
+			} else {
+				return false;
+			}
 		});
 		return cartoLayers;
 	},
@@ -561,7 +608,7 @@ Wu.Project = Wu.Class.extend({
 
 	setFileAttribute : function (fileUuid, key, value) {
 
-		console.log('setFileAttribute', fileUuid, key, value);
+		console.log('setFileAttribute : DISABLED! ', fileUuid, key, value);
 		return;
 
 		// iterate

@@ -299,7 +299,6 @@ Wu.Layer = Wu.Class.extend({
 		});
 
 		Wu.post('/api/layer/createlegends', json, callback, this)
-
 	},
 
 
@@ -344,7 +343,56 @@ Wu.Layer = Wu.Class.extend({
 	_setZIndex : function (z) {
 		this.layer.setZIndex(z);
 	},
+	
 
+	_addGridEvents : function () {
+		var grid = this.gridLayer;
+		if (!grid) return;
+
+		
+		// add click event
+		grid.on('mousedown', function(e) {
+			if (!e.data) return;
+
+			// pass layer
+			e.layer = this;
+
+			// add to pending
+			app.MapPane._addPopupContent(e);
+
+			var event = e.e.originalEvent;
+			this._event = {
+				x : event.x,
+				y : event.y
+			}
+
+		}, this);
+
+		grid.on('mouseup', function (e) {
+			if (!e.data) return;
+
+			// pass layer
+			e.layer = this;
+
+			var event = e.e.originalEvent;
+
+			if (this._event === undefined || this._event.x == event.x) {
+				// open popup 
+				app.MapPane.openPopup(e);
+			} else {
+				// clear old
+				app.MapPane._clearPopup();
+			}
+
+		}, this);
+
+		grid.on('click', function (e) {
+
+			// clear old
+			app.MapPane._clearPopup();
+
+		}, this);
+	},
 });
 
 
@@ -376,6 +424,9 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		// remove
 		if (this.layer) this.remove();
 
+		this._fileUuid = this.store.file;
+		this._defaultCartoid = 'cartoid';
+
 		// prepare raster
 		this._prepareRaster();
 
@@ -387,15 +438,15 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	_prepareRaster : function () {
 		
 		// set ids
-		var fileUuid 	= this.store.file,	// file id of geojson
-		    cartoid 	= this.store.data.cartoid || 'cartoid',
+		var fileUuid 	= this._fileUuid,	// file id of geojson
+		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
 		    tileServer 	= app.options.servers.tiles,
 		    token 	= app.accessToken,
 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
-			fileUuid: fileUuid,
+			fileUuid: this._fileUuid,
 			cartoid : cartoid,
 			subdomains : 'abcd',
 			// maxRequests : 8,
@@ -408,23 +459,23 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	_prepareGrid : function () {
 
 		// set ids
-		var fileUuid 	= this.store.file,	// file id of geojson
+		var fileUuid 	= this._fileUuid,	// file id of geojson
 		    cartoid 	= this.store.data.cartoid || 'cartoid',
 		    gridServer 	= app.options.servers.utfgrid,
 		    token 	= app.accessToken,
 		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
 		
 		// create gridlayer
-		this.gridLayer = new L.UtfGrid(url, {
-			useJsonP: false,
-			subdomains: 'ijk',
-			// subdomains: 'ghi',
-			maxRequests : 10,
-			requestTimeout : 20000
-		});
+		// this.gridLayer = new L.UtfGrid(url, {
+		// 	useJsonP: false,
+		// 	subdomains: 'ijk',
+		// 	// subdomains: 'ghi',
+		// 	maxRequests : 10,
+		// 	requestTimeout : 20000
+		// });
 
 		// debug
-		// this.gridLayer = false;
+		this.gridLayer = false;
 
 		// add grid events
 		this._addGridEvents();
@@ -440,63 +491,44 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		// add to map
 		this.addTo(map); // refactor
 
-		console.log('add--> ', this);
 	},
 
 	_typeLayer : function () {
 
 	},
 
-	_addGridEvents : function () {
-		var grid = this.gridLayer;
-		if (!grid) return;
+});
 
+
+
+
+Wu.OSMLayer = Wu.CartoCSSLayer.extend({
+
+
+	update : function () {
+		var map = app._map;
+
+		// remove
+		if (this.layer) this.remove();
+
+		// id of data 
+		this._fileUuid = 'osm';
+		this._defaultCartoid = 'cartoidosm';
+
+		// prepare raster
+		this._prepareRaster();
+
+		// prepare utfgrid
+		this._prepareGrid();
 		
-		// add click event
-		grid.on('mousedown', function(e) {
-			if (!e.data) return;
-
-			// pass layer
-			e.layer = this;
-
-			// add to pending
-			app.MapPane._addPopupContent(e);
-
-			var event = e.e.originalEvent;
-			this._event = {
-				x : event.x,
-				y : event.y
-			}
-
-
-
-		}, this);
-
-		grid.on('mouseup', function (e) {
-			if (!e.data) return;
-
-			// pass layer
-			e.layer = this;
-
-			var event = e.e.originalEvent;
-
-			if (this._event === undefined || this._event.x == event.x) {
-				// open popup 
-				app.MapPane.openPopup(e);
-			} else {
-				// clear old
-				app.MapPane._clearPopup();
-			}
-
-		}, this);
-
-		grid.on('click', function (e) {
-
-			// clear old
-			app.MapPane._clearPopup();
-
-		}, this);
 	},
+
+	getFileUuid : function () {
+		return 'osm';
+	},
+
+
+
 });
 
 
@@ -536,14 +568,54 @@ Wu.createLayer = function (layer) {
 	// systemapic vector tiles todo: store not as geojson, but as vector tiles in project db model?
 	if (layer.data.geojson) return new Wu.CartoCSSLayer(layer);
 	
-	// geojson
-	if (layer.data.topojson) return new Wu.TopojsonLayer(layer);
+	// osm
+	if (layer.data.osm) return new Wu.OSMLayer(layer);
 
-	// raster
-	if (layer.data.raster) {
-		// todo
-	}
+	// topojson
+	if (layer.data.topojson) return new Wu.TopojsonLayer(layer);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
