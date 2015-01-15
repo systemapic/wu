@@ -847,8 +847,11 @@ L.Control.CartoCSS = L.Control.extend({
 		var json = {							// todo: verify valid css
 			css : css,
 			fileUuid : fileUuid,
-			cartoid : cartoid
+			cartoid : cartoid,
+			layerUuid : this._layer.getUuid()
 		}
+
+		console.log('render styling', json);
 
 		// save to server
 		this._layer.setCartoCSS(json, this.renderedStyling.bind(this));
