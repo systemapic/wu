@@ -2,7 +2,7 @@ Wu.version = '0.3-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
-	debug : true,
+	// debug : true,
 
 	// default options
 	options : {
@@ -653,7 +653,7 @@ Wu.App = Wu.Class.extend({
 		});
 
 		// add map click event
-		app._map.on('mousedown', function (e) {
+		if (app._map) app._map.on('mousedown', function (e) {
 
 			var lat = e.latlng.lat,
 			    lng = e.latlng.lng,
