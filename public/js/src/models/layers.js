@@ -398,12 +398,6 @@ Wu.Layer = Wu.Class.extend({
 
 
 
-
-
-
-
-
-
 Wu.RasterLayer = Wu.Layer.extend({
 
 	type : 'rasterLayer',
@@ -449,10 +443,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			fileUuid: this._fileUuid,
 			cartoid : cartoid,
 			subdomains : 'abcd',
-			// maxRequests : 8,
 			maxRequests : 0,
-			// reuseTiles : true,
-			// unloadInvisibleTiles : true
 		});
 	},
 
@@ -523,15 +514,55 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		
 	},
 
+	_prepareRaster : function () {
+		
+		// set ids
+		var fileUuid 	= this._fileUuid,	// file id of geojson
+		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
+		    tileServer 	= app.options.servers.osm,
+		    token 	= app.accessToken,
+		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
+
+		// add vector tile raster layer
+		this.layer = L.tileLayer(url, {
+			fileUuid: this._fileUuid,
+			cartoid : cartoid,
+			subdomains : 'osmp',
+			maxRequests : 0,
+		});
+	},
+
+	_prepareGrid : function () {
+
+		// set ids
+		var fileUuid 	= this._fileUuid,	// file id of geojson
+		    cartoid 	= this.store.data.cartoid || 'cartoid',
+		    gridServer 	= app.options.servers.osm,
+		    token 	= app.accessToken,
+		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
+		
+		// create gridlayer
+		// this.gridLayer = new L.UtfGrid(url, {
+		// 	useJsonP: false,
+		// 	subdomains: 'ijk',
+		// 	// subdomains: 'ghi',
+		// 	maxRequests : 10,
+		// 	requestTimeout : 20000
+		// });
+
+		// debug
+		this.gridLayer = false;
+
+		// add grid events
+		this._addGridEvents();
+
+	},
+
 	getFileUuid : function () {
 		return 'osm';
 	},
 
-
-
 });
-
-
 
 
 Wu.MapboxLayer = Wu.Layer.extend({
