@@ -1549,16 +1549,11 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 	addOSMLayer : function () {
 
-		// console.log('add osm layer', this.project);
-
 		// create layer
 		this.project.createOSMLayer(function (err, layer) {
 
-			// console.log('mapsetting callback! this', this, err, layer);
-
 			// add to baselayer, layermenu
 			this._updateLayerOptions();
-
 
 		}.bind(this));
 

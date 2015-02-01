@@ -30,24 +30,39 @@ L.Control.MousePosition = L.Control.extend({
                 numDigits: 5,
                 lngFormatter: undefined,
                 latFormatter: undefined,
-                prefix: ""
+                prefix: "",
+                zoomLevel : true
         },
 
         onAdd: function (map) {
+                this._map = map;
+
                 this._container = L.DomUtil.create('div', 'leaflet-control-mouseposition');
                 this._container.innerHTML = this.options.emptyString;
                 
                 L.DomEvent.disableClickPropagation(this._container);
+              
                 map.on('mousemove', this._onMouseMove, this);
-                
+               
+                if (this.options.zoomLevel) {
+                        map.on('zoomend', this._updateZoom, this);
+                        this._updateZoom();
+                }                
+
                 // add tooltip
                 app.Tooltip.add(this._container, 'Gives the coordinates of the mouse pointer', { extends : 'systyle', tipJoint : 'bottom middle'});
 
                 return this._container;
         },
 
+        _updateZoom : function () {
+                this._zoom = this._map.getZoom();
+        },
+
         onRemove: function (map) {
                 map.off('mousemove', this._onMouseMove, this);
+               
+                if (this.options.zoomLevel) map.off('zoomend', this._updateZoom, this);
         },
 
         _onMouseMove: function (e) {
@@ -55,6 +70,7 @@ L.Control.MousePosition = L.Control.extend({
                 var lat = this.options.latFormatter ? this.options.latFormatter(e.latlng.lat) : L.Util.formatNum(e.latlng.lat, this.options.numDigits);
                 var value = this.options.lngFirst ? lng + this.options.separator + lat : lat + this.options.separator + lng;
                 var prefixAndValue = this.options.prefix + ' ' + value;
+                if (this.options.zoomLevel) prefixAndValue += ' | ' + this._zoom;
                 this._container.innerHTML = prefixAndValue;
         }
 

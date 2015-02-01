@@ -70,8 +70,6 @@ Wu.Project = Wu.Class.extend({
 
 		var title = this._getOSMLayerTitle();
 
-		console.log('title!! osm ', title);
-
 		var options = JSON.stringify({
 			projectUuid : this.getUuid(),
 			title : title
