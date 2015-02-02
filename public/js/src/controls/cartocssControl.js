@@ -195,6 +195,9 @@ L.Control.CartoCSS = L.Control.extend({
 		// mark updated
 		this._updated = true;
 
+		// refresh codemirror
+		this._codeMirror.refresh();
+
 	},
 
 
@@ -824,9 +827,6 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// update
 		this._update();
-
-		// To make sure the code mirror looks fresh
-		this._codeMirror.refresh();
 
 		// add open class
 		Wu.DomUtil.addClass(this._editorContainer, 'open');
