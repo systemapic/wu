@@ -41,7 +41,12 @@ Wu.StartPane = Wu.Class.extend({
 
 		// create content for black box
 		var content = this._initSpinnerContent();
-		var wrapper = Wu.DomUtil.create('div', 'spinning-wrapper', app._appPane);
+		this._wrapper = Wu.DomUtil.create('div', 'spinning-wrapper', this._container);
+
+		this._wrapper.appendChild(content);
+
+		this._spinner = false;
+		return;
 
 		// create spinner instance
 		this._spinner = new L.SpinningMap({
@@ -51,7 +56,7 @@ Wu.StartPane = Wu.Class.extend({
 			logo : 'images/griffon_logo_drop.png', // todo!
 			content : content, 
 			container : this._container,
-			wrapper : wrapper,
+			wrapper : this._wrapper,
 			speed : 1000,
 			tileFormat : 'png', // quality of mapbox tiles
 			interactivity : false,

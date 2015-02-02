@@ -50,40 +50,27 @@ L.Control.CartoCSS = L.Control.extend({
 		// create divs
 		this._editorContainer 		= Wu.DomUtil.create('div', 'cartocss-control-container'); // editor container
 		this._resizeHandle 		= Wu.DomUtil.create('div', 'cartocss-control-resizer', this._editorContainer); // editor container
-		// this._resizeHandle.setAttribute('draggable', 'true');
-
 		this._wrapper 			= Wu.DomUtil.create('div', 'cartocss-control-wrapper', this._editorContainer); // the obligatory wrapper
 		this._xButton 			= Wu.DomUtil.create('div', 'close-cartocss-editor-x', this._wrapper); // close button
 		this._zoomVal 			= Wu.DomUtil.create('div', 'cartocss-zoomval', this._wrapper, app._map.getZoom()); // Show zoom value
 		this._styleHeaderWrapper 	= Wu.DomUtil.create('div', 'cartocss-style-header-wrapper', this._wrapper); // create form wrapper
-		this._styleHeaderLayerName 	= Wu.DomUtil.create('div', 'cartocss-style-header-layer', this._styleHeaderWrapper);
-		this._styleHeaderLayerName.innerHTML = 'Select layer'; 
+		this._styleHeaderLayerName 	= Wu.DomUtil.create('div', 'cartocss-style-header-layer', this._styleHeaderWrapper, 'Select layer');
 		this._styleHeaderDropDownButton = Wu.DomUtil.create('div', 'cartocss-style-dropdown-arrow', this._styleHeaderWrapper);
 		this._layerSelectorOuter 	= Wu.DomUtil.create('div', 'cartocss-layerselector-outer', this._wrapper); // create layer selector
 		this._layerSelector 		= Wu.DomUtil.create('div', 'cartocss-layerselector', this._layerSelectorOuter);
 		
-		// Tabs
+		// tabs
 		this._tabsWrapper 		= Wu.DomUtil.create('div', 'cartocss-tab-wrapper', this._wrapper); // Wrapper for tabs
-		this._tabStyling 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-styling cartocss-active-tab', this._tabsWrapper); // Styling tab
-						  this._tabStyling.innerHTML = 'Styling';
-
-		this._tabTooltip 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-tooltip', this._tabsWrapper); // Styling tab		
-		this._tabTooltip.innerHTML 	= 'Tooltip';
-
-		this._tabLegends 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-legends', this._tabsWrapper); // Styling tab				
-		this._tabLegends.innerHTML 	= 'Legend';
-
+		this._tabStyling 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-styling cartocss-active-tab', this._tabsWrapper, 'Styling'); // Styling tab
+		this._tabTooltip 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-tooltip', this._tabsWrapper, 'Tooltip'); // Styling tab		
+		this._tabLegends 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-legends', this._tabsWrapper, 'Legend'); // Styling tab				
 		this._legendsWrapper		= Wu.DomUtil.create('div', 'cartocss-legends-wrapper displayNone', this._wrapper);
-		
 		this._tooltipOuterWrapper	= Wu.DomUtil.create('div', 'cartocss-tooltip-outer-wrapper displayNone', this._wrapper);
 		this._tooltipWrapper		= Wu.DomUtil.create('div', 'cartocss-tooltip-wrapper', this._tooltipOuterWrapper);
-
-
 		this._formWrapper 		= Wu.DomUtil.create('form', 'cartocss-form-wrapper', this._wrapper); // For CodeMirror: create form wrapper
 		this._inputArea 		= Wu.DomUtil.create('textarea', 'cartocss-input', this._formWrapper); // For CodeMirror: create text area
 		this._errorPane 		= Wu.DomUtil.create('div', 'cartocss-error-pane', this._wrapper); // error feedback pane
-		this._updateButton 		= Wu.DomUtil.create('div', 'cartocss-update-button', this._wrapper); // create update button
-		this._updateButton.innerHTML 	= 'Render changes...';
+		this._updateButton 		= Wu.DomUtil.create('div', 'cartocss-update-button', this._wrapper, 'Render changes...'); // create update button
 
 		// append to leaflet-control-container
 		app._map.getContainer().appendChild(this._editorContainer);
@@ -123,14 +110,12 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// Resize container
 		Wu.DomEvent.on(this._resizeHandle, 'mousedown', this.resize, this);
-		// Wu.DomEvent.on(this._resizeHandle, 'ondragstart', this.resize, this);
 
 		// stops
 		Wu.DomEvent.on(this._editorContainer, 		'mousewheel mousedown dblclick mouseup click', 	Wu.DomEvent.stopPropagation, this);
-		Wu.DomEvent.on(this._toolbarButton, 		'dblclick', 				Wu.DomEvent.stopPropagation, this);
-		Wu.DomEvent.on(this._styleHeaderLayerName, 	'click mousedown', 		Wu.DomEvent.stopPropagation, this);
-		Wu.DomEvent.on(this._formWrapper, 		'click mousedown', 		Wu.DomEvent.stopPropagation, this);
-
+		Wu.DomEvent.on(this._toolbarButton, 		'dblclick', 					Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._styleHeaderLayerName, 	'click mousedown', 				Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._formWrapper, 		'click mousedown', 				Wu.DomEvent.stopPropagation, this);
 
 		// Update Zoom
 		var map = app._map;
@@ -176,14 +161,24 @@ L.Control.CartoCSS = L.Control.extend({
 	resizeEditor : function (e) {
 
 		// set new width
-		var mouse = {x: 0};		
-		mouse.x = e.clientX || e.pageX; 
-		var __newWidth = this.__cartoContainer_width + (this.__cartoContainer_offsetLeft - mouse.x);
-		if ( __newWidth >= 300 ) this._editorContainer.style.width = __newWidth + 'px';
+		// var mouse = {x: 0};		
+		var mousex = e.clientX || e.pageX || 0,
+		    offleft = this._editorContainer.offsetLeft,
+		    offwidth =  this._editorContainer.offsetWidth,
+		    w = offwidth + (offleft - mousex);
+
+		if ( w >= 300 ) this._editorContainer.style.width = w + 'px';
 	},
 
 	// update: fired from outside, on project.select() etc.
 	update : function () {
+
+		// mark as update needed
+		this._updated = false;
+	},
+
+	_update : function () {
+		if (this._updated) return;
 
 		// set active project
 		this.project = app.activeProject;
@@ -196,6 +191,9 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// select a layer
 		this.setLastUpdatedLayer();
+
+		// mark updated
+		this._updated = true;
 
 	},
 
@@ -216,7 +214,7 @@ L.Control.CartoCSS = L.Control.extend({
   		});
 
 		// set default value
-  		this._codeMirror.setValue('// No layer selected. \n\n// #layer is always base \n#layer { \n  \n}');
+  		// this._codeMirror.setValue('// No layer selected. \n\n// #layer is always base \n#layer { \n  \n}');
 
 		// todo:
   		// var completer = cartoCompletion(this._codeMirror, window.cartoRef);
@@ -228,7 +226,7 @@ L.Control.CartoCSS = L.Control.extend({
 	
 
 		// cxxxx
-		var settings = app.activeProject.getSettings();
+		// var settings = app.activeProject.getSettings();
 
 
 		// if ( settings.darkTheme ) app.Style.themeToggle('dark');		// TODO: fires too early.. do this differently
@@ -242,8 +240,6 @@ L.Control.CartoCSS = L.Control.extend({
 		// get meta fields
 		var fields = this._layer.getMetaFields(); // return false if no fields found
 		
-		// console.log('fields: ', fields);
-
 		// create string
 		var string = '// CartoCSS reference guide:\n// https://bit.ly/1z5OvXT\n\n\n';
 		string += '// #layer is always the layer identifier \n';
@@ -293,6 +289,9 @@ L.Control.CartoCSS = L.Control.extend({
 		// clear
 		this._layerSelector.innerHTML = '';
 
+		// store wrappers
+		this._layerWrapperList = {};
+
 		// add
 		this._layers.forEach(function (layer) {
 
@@ -301,10 +300,12 @@ L.Control.CartoCSS = L.Control.extend({
 			var div = Wu.DomUtil.create('div', 'layer-selector-item', wrapper, layer.getTitle());
 			this._layerSelector.appendChild(wrapper);
 
+			// store wrapper by layer uuid
+			this._layerWrapperList[layer.getUuid()] = wrapper;
+
 			// hook
 			Wu.DomEvent.on(wrapper, 'mousedown', function () {
 				this._selectLayer(layer)
-				this.setSelected(wrapper);
 			}, this);
 
 			// add stops
@@ -315,7 +316,10 @@ L.Control.CartoCSS = L.Control.extend({
 
 	},
 
-	setSelected : function (wrapper) {
+	setSelected : function (layer) {
+
+		// get wrapper
+		var wrapper = this._layerWrapperList[layer.getUuid()];
 
 		// clear selected
 		this._clearSelected(wrapper);
@@ -334,12 +338,16 @@ L.Control.CartoCSS = L.Control.extend({
 
 	_selectLayer : function (layer) {
 
-		this.toggleLayerDropDown();
+		// close dropdown
+		this.closeLayerDropDown();
 		
 		// init tabs
 		this.initStyling(layer);	
 		this.initTooltip(layer);
 		this.initLegends(layer);
+
+		// select in list
+		this.setSelected(layer);
 		
 	},
 
@@ -365,7 +373,6 @@ L.Control.CartoCSS = L.Control.extend({
 
 	toggleStyles : function () {
 
-
 		// Show Styler
 		Wu.DomUtil.removeClass(this._formWrapper, 'displayNone');
 
@@ -379,7 +386,6 @@ L.Control.CartoCSS = L.Control.extend({
 		Wu.DomUtil.removeClass(this._tabTooltip, 'cartocss-active-tab');
 		Wu.DomUtil.addClass(this._tabStyling, 'cartocss-active-tab');
 		Wu.DomUtil.removeClass(this._tabLegends, 'cartocss-active-tab');
-
 
 	},
 
@@ -399,13 +405,10 @@ L.Control.CartoCSS = L.Control.extend({
 		Wu.DomUtil.removeClass(this._tabStyling, 'cartocss-active-tab');
 		Wu.DomUtil.removeClass(this._tabLegends, 'cartocss-active-tab');
 
-
 	},
 
 	initStyling : function (layer) {
 		if (!layer) return;
-
-		console.log('initStyling');
 
 		// new layer is active
 		this._layer = layer;
@@ -417,21 +420,20 @@ L.Control.CartoCSS = L.Control.extend({
 		// check for existing css
 		this._cartoid = this._layer.getCartoid();
 
-		// insert into input area
-		var that = this;
-		if (this._cartoid) {				// callback
-			// this._layer.getCartoCSS(this._cartoid, this.insertCss.bind(this));
-			this._layer.getCartoCSS(this._cartoid, function (ctx, css) {
-				// set values
-				that.updateCodeMirror(css);
-			});
-		} else {
-			// no style stored on layer yet, set default message
-			this._initStylingDefault();
-		}
+		// if no style stored on layer yet, set default message	
+		if (!this._cartoid) return this._initStylingDefault();				
+
+		// else get css from server
+		this._layer.getCartoCSS(this._cartoid, function (ctx, css) {
+			
+			// set css
+			this.updateCodeMirror(css);
+
+		}.bind(this));
 
 	},
 
+	
 	initLegends : function () {
 		
 		// clear 
@@ -442,12 +444,14 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// fill with legends from layer
 		this._legends = this._layer.getLegends();
-		if (this._legends) return this.fillLegends(this._legends);
-
-		// fill with default
-		return this._initLegendsDefaultMeta();
-
-
+		
+		if (this._legends) {
+			// fill legends
+			return this.fillLegends(this._legends);
+		} else {
+			// fill with default
+			return this._initLegendsDefaultMeta();	
+		}
 	},
 
 	initTooltip : function () {
@@ -591,7 +595,6 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// add help text
 		Wu.DomUtil.create('div', 'legends-default-box', this._legendsWrapper, 'No legends yet. Style the geo and magic will happen!');
-		
 	},
 
 
@@ -789,43 +792,56 @@ L.Control.CartoCSS = L.Control.extend({
 		
 	},
 
+	closeLayerDropDown : function () {
+		this._openDropDown = true;
+		this.toggleLayerDropDown();
+	},
+
 	toggleLayerDropDown : function () {
 		if (!this._openDropDown) {
 			this._openDropDown = true;
 			var dropDownHeight = this._layers.length * 27;
 			if (this._layers.length <= 2) dropDownHeight+=2;
 			this._layerSelectorOuter.style.height = dropDownHeight + 'px';
+
 			Wu.DomUtil.addClass(this._styleHeaderDropDownButton, 'carrow-flipped', this);
 			
 		} else {
 			this._openDropDown = false;
 			this._layerSelectorOuter.style.height = '0px';
+			
 			Wu.DomUtil.removeClass(this._styleHeaderDropDownButton, 'carrow-flipped', this);
 		}		
 	},
 	
 	
-	insertCss : function (ctx, css) {
-
-		// set values
-		this.updateCodeMirror(css);
-	},
 
 	toggle : function () {
 		this._open ? this.close() : this.open();
 	},
 
 	open : function () {
-		this._open = true;
-		Wu.DomUtil.addClass(this._editorContainer, 'open');
+
+		// update
+		this._update();
 
 		// To make sure the code mirror looks fresh
 		this._codeMirror.refresh();
+
+		// add open class
+		Wu.DomUtil.addClass(this._editorContainer, 'open');
+		
+		// mark open
+		this._open = true;
 	},
 
 	close : function () {
-		this._open = false;
+
+		// add closed class
 		Wu.DomUtil.removeClass(this._editorContainer, 'open');
+
+		// mark closed
+		this._open = false;
 	},
 
 	renderStyling : function () {
@@ -851,11 +867,8 @@ L.Control.CartoCSS = L.Control.extend({
 			layerUuid : this._layer.getUuid()
 		}
 
-		console.log('render styling', json);
-
 		// save to server
 		this._layer.setCartoCSS(json, this.renderedStyling.bind(this));
-
 
 	},
 
@@ -894,6 +907,8 @@ L.Control.CartoCSS = L.Control.extend({
 		}
 
 		// todo: other errors
+		console.error('Unhandled syntax error: ', error);
+
 	},
 
 	_handleSyntaxError : function (error) {
@@ -955,7 +970,6 @@ L.Control.CartoCSS = L.Control.extend({
 		var that = this;
 		doc.on('change', function () {
 			that._clearError(0);
-			
 		});
 
 	},
@@ -983,13 +997,9 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	getPatternList : function () {
-
-
 		var patterns = ['001.png', '002.png', '003.png', '004.png', '005.png', '006.png', '007.png', '008.png', '009.png', '010.png', '011.png', '012.png', '013.png', '014.png', '015.png', '016.png', '017.png', '018.png', '019.png', '020.png', '021.png', 'paperwhite1.png', 'paperwhite2.png', 'paperwhite3.png', 'paperwhite4.png', 'paperwhite5.png', 'paperwhite6.png', 'waves.png', 'waves_white.png'];
-
 		console.log('CartoCSS patterns: ');
 		console.log(patterns);
-
 	},
 
 

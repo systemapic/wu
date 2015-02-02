@@ -611,7 +611,7 @@ Wu.MapPane = Wu.Class.extend({
 	enableCartocss : function () {
 		if (this.cartoCss) return;
 
-		// dont allow for editors
+		// dont allow for non-editors
 		if (!this._isEditor) return;
 
 		// create control
@@ -623,7 +623,7 @@ Wu.MapPane = Wu.Class.extend({
 		this.cartoCss.addTo(this._map);
 
 		// update with latest
-		this.cartoCss.update();
+		if (app.activeProject) this.cartoCss.update();
 
 		return this.cartoCss;
 	},
