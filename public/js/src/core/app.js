@@ -44,12 +44,22 @@ Wu.App = Wu.Class.extend({
 
 		servers : {
 
+			// portal SX
 			portal   : 'https://projects.ruppellsgriffon.com/',	// api
 			
+			// tiles SX
 			tiles    : 'https://{s}.systemapic.com/tiles/', 	// tiles
 			utfgrid  : 'https://{s}.systemapic.com/utfgrid/', 	// utfgrids
 			
-			osm      : 'https://{s}.systemapic.com/tiles/'
+			// postgis PX
+			osm      : 'https://{s}.systemapic.com/tiles/',
+
+			// osm : 'https://{s}.osm.systemapic.com/r/',
+			// osm : 'https://{s}.osm.systemapic.com/v/',
+
+			// tiles : 'https://{s}.ruppellsgriffon.systemapic.com/r/',
+			// tiles : 'https://{s}.ruppellsgriffon.systemapic.com/v/',
+			// utfgrid : 'https://{s}.ruppellsgriffon.systemapic.com/u/'
 
 		},
 

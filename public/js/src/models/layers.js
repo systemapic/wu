@@ -226,6 +226,7 @@ Wu.Layer = Wu.Class.extend({
 		}
 
 		// get cartocss from server
+		console.log('POST /api/layers/cartocss/get', json);
 		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
 	},
 
