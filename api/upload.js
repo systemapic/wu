@@ -25,11 +25,8 @@ var config = require('../config/config');
 
 
 // global paths
-var FILEFOLDER = '/var/www/data/files/';
-var TEMPFOLDER  = '/var/www/data/tmp/';
-
-
-
+var FILEFOLDER = '/data/files/';
+var TEMPFOLDER  = '/data/tmp/';
 
 
 
@@ -40,16 +37,15 @@ var store = 0;
 
 
 
-
-
-
 module.exports = upload = { 
 
 	// entry point
 	upload : function (req, res) {
 
-		console.log('upload.js.upload()'); // _______________ this _____________');
-		console.log('this: ', this);
+		console.log('API.upload.upload()');
+
+		// console.log('upload.js.upload()'); // _______________ this _____________');
+		// console.log('this: ', this);
 
 		// types of possible uploaded files:
 		//
@@ -78,8 +74,8 @@ module.exports = upload = {
 			keepExtensions : true,
 		});
 		form.parse(req, function(err, fields, files) {	
-			console.log('formidale: ', util.inspect({fields: fields, files: files}));
-			console.log('files! => ', files);
+			// console.log('formidale: ', util.inspect({fields: fields, files: files}));
+			// console.log('files! => ', files);
  			
 			// one file =>
 			// 'file[]': { 
@@ -128,7 +124,7 @@ module.exports = upload = {
 			
 
 
-			console.log('fileArray: ', fileArray);
+			// console.log('fileArray: ', fileArray);
 
 
 			var ops = [];
@@ -138,19 +134,10 @@ module.exports = upload = {
 				// quick sort
 				upload.sortFormFiles(fileArray, function (err, results) {	
 
-					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
-					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
-					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
-					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
-					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
-					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');
-					console.log('results: ', results);				
-					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
-					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
-					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
-					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
-					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
-					console.log('___________@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@__');				
+					console.log('_________ results ______________');
+					console.log('results: ', results);
+					console.log('__________ results end _________');				
+								
 					callback(err, results);
 				});
 			});
@@ -206,9 +193,9 @@ module.exports = upload = {
 			
 
 			async.waterfall(ops, function (err, results) {
-				console.log('async waterfall done, err, results', err, results);
-				console.log('fields: ', fields);
-				console.log('f cl', fields.client);
+				// console.log('async waterfall done, err, results', err, results);
+				// console.log('fields: ', fields);
+				// console.log('f cl', fields.client);
 
 				// organize in sidepane.dataLibrary format
 				var files = [],
@@ -277,18 +264,18 @@ module.exports = upload = {
 	sortFormFiles : function (fileArray, done) {
 
 
-		console.log('UPLOAD: Sorting form files');
+		// console.log('UPLOAD: Sorting form files');
 
 		// quick sort
 		var ops = [];
 		fileArray.forEach(function (file) {
 
-			console.log('-> file: ', 	file);
-			console.log('mime type: ', 	file.type);
-			console.log('path: ', 		file.path);
-			console.log('name: ', 		file.name);
-			console.log('typeof file: ', 	typeof(file));
-			console.log('length rfile: ', 	file.length);
+			// console.log('-> file: ', 	file);
+			// console.log('mime type: ', 	file.type);
+			// console.log('path: ', 		file.path);
+			// console.log('name: ', 		file.name);
+			// console.log('typeof file: ', 	typeof(file));
+			// console.log('length rfile: ', 	file.length);
 
 
 			// each file uuid
@@ -324,8 +311,8 @@ module.exports = upload = {
 		
 
 		async.series(ops, function (err, dbs) {
-			console.log('store:', store);
-			console.log('sortFormFiles 1 done, ', dbs);
+			// console.log('store:', store);
+			// console.log('sortFormFiles 1 done, ', dbs);
 
 
 			done && done(err, dbs);
@@ -347,15 +334,15 @@ module.exports = upload = {
 		// var currentPath = options.currentPath;
 
 
-		console.log('____________________________________UPLOAD: Sorting zip folder');
-		console.log('options.currentFolder', options.currentFolder);
+		// console.log('____________________________________UPLOAD: Sorting zip folder');
+		// console.log('options.currentFolder', options.currentFolder);
 
 		var currentFolder = options.currentFolder || FILEFOLDER + fileUuid;
 
 		if (folder) {
-			console.log('isFolder!!!', folder);
+			// console.log('isFolder!!!', folder);
 			currentFolder += '/' + folder;
-			console.log('so currentFolder is: ', currentFolder);
+			// console.log('so currentFolder is: ', currentFolder);
 
 			
 		}
@@ -365,7 +352,7 @@ module.exports = upload = {
 		// read files in folder
 		fs.readdir(currentFolder, function (err, files) {
 
-			console.log('sortZipFolder files: ', files); // ['Africa.shp', 'Africa.prj'] OR 'Zoning' (as folder)
+			// console.log('sortZipFolder files: ', files); // ['Africa.shp', 'Africa.prj'] OR 'Zoning' (as folder)
 
 			
 
@@ -393,7 +380,7 @@ module.exports = upload = {
 				}
 
 
-				console.log('_sortOps: ', ops1, options);
+				// console.log('_sortOps: ', ops1, options);
 
 
 
@@ -402,10 +389,10 @@ module.exports = upload = {
 
 					ops1.push(function (callback) {
 
-						console.log('__handling ZIP FILE 222!');
+						// console.log('__handling ZIP FILE 222!');
 
 						var rand = crypto.randomBytes(4).toString('hex');
-						console.log('RANDOMMM!M!!M!M!M', rand);
+						// console.log('RANDOMMM!M!!M!M!M', rand);
 
 						// new file uuid !!!
 						var newFileUuid = 'file-' + uuid.v4();
@@ -423,8 +410,8 @@ module.exports = upload = {
 						filer.handleZip(zipopt, function (err) {
 
 							console.log('filer.handleZip done');
-							console.log('options.path: ', options.path);
-							console.log('options.fioleUuid: ', options.fileUuid);
+							// console.log('options.path: ', options.path);
+							// console.log('options.fioleUuid: ', options.fileUuid);
 
 							var opt = {
 								// fileUuid : options.fileUuid,
@@ -489,8 +476,8 @@ module.exports = upload = {
 
 					ops1.push(function (callback) {
 
-						console.log('__handling FOLDER 77: options.currentFolder', options.currentFolder);
-						console.log('opitons.name: ', options.name);
+						// console.log('__handling FOLDER 77: options.currentFolder', options.currentFolder);
+						// console.log('opitons.name: ', options.name);
 
 						
 						var opt = {
@@ -499,11 +486,11 @@ module.exports = upload = {
 							currentFolder : options.currentFolder
 						}
 
-						console.log('opt!!-=-=---->', opt);
+						// console.log('opt!!-=-=---->', opt);
 
 						upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
 							
-							console.log('upload.sortZipFolder 99 done', dbs);
+							// console.log('upload.sortZipFolder 99 done', dbs);
 
 							callback(err, dbs);
 
@@ -515,13 +502,13 @@ module.exports = upload = {
 
 				// handle shapefiles
 				if (options.type == 'shapefile') {					// gotchas: already in file-uuid folder, cause unzip
-					console.log('got shapefile!', options.name);			// 
+					// console.log('got shapefile!', options.name);			// 
 
 					ops1.push(function (callback) {
 
 						// process shapefile (convert, store, vectorize, etc.)
 						filer.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
-							console.log('handled shapefile!', err, db);
+							// console.log('handled shapefile!', err, db);
 
 							// populate db entry
 							db = db || {};
@@ -631,7 +618,7 @@ module.exports = upload = {
 
 			// run ops
 			async.series(ops1, function (err, dbs) {
-				console.log('parallel don1 ', err, dbs);
+				// console.log('parallel don1 ', err, dbs);
 				done && done(err, dbs);
 			});
 
@@ -646,7 +633,7 @@ module.exports = upload = {
 	_sortOps : function (ops, options) {
 
 
-		console.log('_sortOps: ', ops, options);
+		// console.log('_sortOps: ', ops, options);
 
 
 
@@ -656,7 +643,7 @@ module.exports = upload = {
 
 			ops.push(function (callback) {
 
-				console.log('__handling FOLDER!');
+				// console.log('__handling FOLDER!');
 
 				// unzips files to folder
 				// filer.handleZip(options.path, options.fileUuid, function (err) {
@@ -671,7 +658,7 @@ module.exports = upload = {
 
 					upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
 						
-						console.log('upload.sortZipFolder 99 done', dbs);
+						// console.log('upload.sortZipFolder 99 done', dbs);
 
 						callback(err, dbs);
 
@@ -686,7 +673,7 @@ module.exports = upload = {
 
 			ops.push(function (callback) {
 
-				console.log('__handling ZIP FILE!');
+				// console.log('__handling ZIP FILE!');
 
 				var opt = {
 					inn : options.path,
@@ -697,7 +684,7 @@ module.exports = upload = {
 				// unzips files to folder
 				filer.handleZip(opt, function (err) {
 
-					console.log('filer.handleZip done');
+					// console.log('filer.handleZip done');
 
 					var opt = {
 						fileUuid : options.fileUuid,
@@ -706,7 +693,7 @@ module.exports = upload = {
 
 					upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
 						
-						console.log('upload.sortZipFolder done', dbs);
+						// console.log('upload.sortZipFolder done', dbs);
 
 						callback(err, dbs);
 
@@ -746,13 +733,13 @@ module.exports = upload = {
 
 		// handle shapefiles
 		if (options.type == 'shapefile') {					// gotchas: already in file-uuid folder, cause unzip
-			console.log('got shapefile!', options.name);			// 
+			// console.log('got shapefile!', options.name);			// 
 
 			ops.push(function (callback) {
 
 				// process shapefile (convert, store, vectorize, etc.)
 				filer.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
-					console.log('handled shapefile!', err, db);
+					// console.log('handled shapefile!', err, db);
 
 					// populate db entry
 					db = db || {};
@@ -856,13 +843,9 @@ module.exports = upload = {
 
 	getFileType : function (name) {
 
-		console.log('getFileType name:', name);
 
 		// check if folder
-		console.time('isFolder');
 		var isFolder = fs.statSync(name).isDirectory();
-		console.log('isFoldeR???', isFolder);
-		console.timeEnd('isFolder');
 		if (isFolder) return ['folder', 'folder'];
 
 		// archives

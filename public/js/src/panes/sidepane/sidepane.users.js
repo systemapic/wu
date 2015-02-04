@@ -633,46 +633,55 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var projects = this._getProjectAccessSchema();
 		if (projects.length == 0) return;
 
-		// edit/manage delegation only for admins
-		var managerPriv = app.Account.isAdmin() || app.Account.isSuperadmin(); // only super/admins allowed to delegate MANAGER
-		var editorPriv = app.Account.isSuperadmin(); // only superadmins allowed to delegate EDITOR
+		
 
 		// add projects
 		projects.forEach(function (project) {
 			if (!project) return;
 
-			var readClass   = (user.canReadProject(project.getUuid()))   ? 'gotAccess' : '';
-			var editClass   = (user.canUpdateProject(project.getUuid())) ? 'gotAccess' : '';
-			var manageClass = (user.canManageProject(project.getUuid())) ? 'gotAccess' : '';
-			var titleText = project.getName() + ' (' + project.getClient().getName() + ')';
-
-			var wrap    = Wu.DomUtil.create('div', 'access-projects-wrap', 			wrapper);
-			var details = Wu.DomUtil.create('div', 'access-projects-details-wrap', 		wrap);
-			var title   = Wu.DomUtil.create('div', 'access-projects-title', 		details, 	titleText);
-			var desc    = Wu.DomUtil.create('div', 'access-projects-description', 		details, 	project.getDescription());
-			var read    = Wu.DomUtil.create('div', 'access-projects-read ' + readClass, 	wrap, 		'Read');
-			var edit, manage;
-
-			if (editorPriv)    edit = Wu.DomUtil.create('div', 'access-projects-write ' + editClass, 	wrap, 		'Edit');
-			if (managerPriv) manage = Wu.DomUtil.create('div', 'access-projects-manage ' + manageClass, wrap, 	'Manage');
+			this._createManageEntry(user, project, wrapper);
 			
-
-			var item = {
-				user    : user,
-				project : project,
-				read    : read,
-				edit    : edit,
-				manage  : manage
-			}
-
-			Wu.DomEvent.on(read, 'mousedown', function () { this.toggleReadAccess(item)}, this);
-			if (editorPriv) Wu.DomEvent.on(edit,    'mousedown', function () { this.toggleUpdateAccess(item)}, this);
-			if (managerPriv) Wu.DomEvent.on(manage, 'mousedown', function () { this.toggleManageAccess(item)}, this);
-
 		}, this)
 
 
 		return wrapper;
+	},
+
+	_createManageEntry : function (user, project, wrapper) {
+
+		// edit/manage delegation only for admins
+		var managerPriv = app.Account.isAdmin() || app.Account.isSuperadmin(), 
+		    editorPriv 	= app.Account.isSuperadmin(),
+		    pname 	= project.getName(),
+		    cli 	= project.getClient(),
+		    cname 	= cli ? cli.getName() : 'DELETED CLIENT!',
+		    readClass   = (user.canReadProject(project.getUuid()))   ? 'gotAccess' : '',
+		    editClass   = (user.canUpdateProject(project.getUuid())) ? 'gotAccess' : '',
+		    manageClass = (user.canManageProject(project.getUuid())) ? 'gotAccess' : '',
+		    titleText   = pname + ' (' + cname + ')';
+
+		var wrap    = Wu.DomUtil.create('div', 'access-projects-wrap', 			wrapper);
+		var details = Wu.DomUtil.create('div', 'access-projects-details-wrap', 		wrap);
+		var title   = Wu.DomUtil.create('div', 'access-projects-title', 		details, 	titleText);
+		var desc    = Wu.DomUtil.create('div', 'access-projects-description', 		details, 	project.getDescription());
+		var read    = Wu.DomUtil.create('div', 'access-projects-read ' + readClass, 	wrap, 		'Read');
+		var edit, manage;
+
+		if (editorPriv)    edit = Wu.DomUtil.create('div', 'access-projects-write ' + editClass, 	wrap, 		'Edit');
+		if (managerPriv) manage = Wu.DomUtil.create('div', 'access-projects-manage ' + manageClass, wrap, 	'Manage');
+		
+		var item = {
+			user    : user,
+			project : project,
+			read    : read,
+			edit    : edit,
+			manage  : manage
+		}
+
+		Wu.DomEvent.on(read, 'mousedown', function () { this.toggleReadAccess(item)}, this);
+		if (editorPriv) Wu.DomEvent.on(edit,    'mousedown', function () { this.toggleUpdateAccess(item)}, this);
+		if (managerPriv) Wu.DomEvent.on(manage, 'mousedown', function () { this.toggleManageAccess(item)}, this);
+
 	},
 
 	toggleReadAccess : function (item) {
@@ -682,12 +691,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// get current state
 		var state = (user.store.role.reader.projects.indexOf(item.project.getUuid()) >= 0) ? true : false;
-
-		// if (state) {
-		// 	this._removeRead(item);
-		// } else {
-		// 	this._addRead(item);
-		// }
 
 		// add/remove
 		state ? this._removeRead(item) : this._addRead(item);
@@ -726,10 +729,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// add read access too
 		this._addRead(item);
 
-		// if (!item.user.canReadProject(item.project.getUuid())) {
-			// Wu.DomUtil.addClass(item.read, 'gotAccess');
-			// setTimeout(function () { item.user.addReadProject(item.project); }, 300); // todo: mongodb lock bug
-		// }
 	},
 
 	_removeManage : function (item) {
@@ -746,11 +745,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// add read 
 		this._addRead(item);
 
-		// // add read access too
-		// if (!item.user.canReadProject(item.project.getUuid())) {
-		// 	Wu.DomUtil.addClass(item.read, 'gotAccess');
-		// 	setTimeout(function () { item.user.addReadProject(item.project); }, 300);
-		// }
 	},
 
 

@@ -10,7 +10,7 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// create toolbar container
 		var container = Wu.DomUtil.create('div', 'leaflet-control-cartocss leaflet-control');
-		Wu.DomEvent.on(container, 'click mousedown mouseup', Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(container, 'click mousedown ', Wu.DomEvent.stopPropagation, this);
 
 		// create toolbar button
 		this._toolbarButton = Wu.DomUtil.create('div', 'cartocss-toolbar-button', container);
@@ -112,7 +112,7 @@ L.Control.CartoCSS = L.Control.extend({
 		Wu.DomEvent.on(this._resizeHandle, 'mousedown', this.resize, this);
 
 		// stops
-		Wu.DomEvent.on(this._editorContainer, 		'mousewheel mousedown dblclick mouseup click', 	Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._editorContainer, 		'mousewheel mousedown dblclick click', 		Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent.on(this._toolbarButton, 		'dblclick', 					Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent.on(this._styleHeaderLayerName, 	'click mousedown', 				Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent.on(this._formWrapper, 		'click mousedown', 				Wu.DomEvent.stopPropagation, this);
@@ -312,7 +312,7 @@ L.Control.CartoCSS = L.Control.extend({
 			}, this);
 
 			// add stops
-			Wu.DomEvent.on(wrapper, 'click mousedown mouseup', Wu.DomEvent.stopPropagation, this);
+			Wu.DomEvent.on(wrapper, 'click mousedown', Wu.DomEvent.stopPropagation, this);
 
 
 		}, this);
@@ -320,6 +320,7 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	setSelected : function (layer) {
+		if (!layer) return;
 
 		// get wrapper
 		var wrapper = this._layerWrapperList[layer.getUuid()];
@@ -333,7 +334,7 @@ L.Control.CartoCSS = L.Control.extend({
 
 	_clearSelected : function (wrapper) {
 		// Set class to show which layer is selected
-		for ( var i = 0; i<wrapper.parentNode.children.length; i++ ) {
+		for ( var i = 0; i < wrapper.parentNode.children.length; i++ ) {
 			var child = wrapper.parentNode.children[i];
 			Wu.DomUtil.removeClass(child, 'vt-selected', this);
 		}
@@ -613,7 +614,6 @@ L.Control.CartoCSS = L.Control.extend({
 			if (legends && legends.err) {
 				console.error('legends err', legends);
 				return this.handleError(legends.err);
-				// return;
 			}
 
 			// sort some things: #layer on top
@@ -641,7 +641,6 @@ L.Control.CartoCSS = L.Control.extend({
 
 
 	_mergePreviousLegendsSettings : function (newLegends, oldLegends) {
-		// var oldLegends = this._legends;
 
 		// keep .on setting
 		newLegends.forEach(function (newlegend, i){

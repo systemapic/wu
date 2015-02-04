@@ -296,7 +296,8 @@ input[type=checkbox] + label.check {
 #editor-map-initpos-coordinates,
 #editor-map-bounds-coordinates,
 .settings-outer,
-.q-editor-menu {
+.q-editor-menu,
+.project-item {
 	-webkit-transition: height 250ms ease;
 	-moz-transition: height 250ms ease;
 	transition: height 250ms ease;
@@ -494,7 +495,7 @@ input[type=checkbox] + label.check {
 .backpane-admin-box.green:before,
 .backpane-superadmin-box.green:before,
 .baselayertoggle-list:before,
-.project-users-inner-wrapper:before,
+/*.project-users-inner-wrapper:before,*/
 #menuslider-arrow:before,
 .help-tooltip-arrow:before {
 	-webkit-transform: rotate(45deg);

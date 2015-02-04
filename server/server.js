@@ -23,6 +23,12 @@ var configDB = require('../config/database.js');
 var cors = require('cors');
 var port = 3001;
 
+// mute console in production mode
+if (process.argv[2] == 'production') {
+	console.log = function (){};
+	console.time = function () {};
+	console.timeEnd = function () {};
+}
 
 
 

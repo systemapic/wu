@@ -691,13 +691,13 @@ input.cmn-toggle-round-flat + label:before {
   padding-right: 110px;
   display: inline-block; }
 
-#header .header-logo {
+#header .header-logo-container {
   position: relative;
   z-index: 1000;
   color: white;
   float: left;
   max-height: inherit;
-  padding: 5px;
+  /*padding: 5px;*/
   margin-right: 10px;
   position: absolute;
   background-repeat: no-repeat;
@@ -708,16 +708,23 @@ input.cmn-toggle-round-flat + label:before {
   top: 3px;
   height: 71px;
   margin-right: 10px;
-  width: 90px; }
+  width: 90px;
+  overflow: hidden; }
 
-.header-logo.editable:hover {
+.header-logo-container.editable:hover {
   cursor: copy;
   opacity: 0.7; }
 
+/*.header-logo img {
+	max-height: 100%;
+	padding-bottom: 10px;
+	width: auto;
+	}*/
 .header-logo img {
-  max-height: 100%;
-  padding-bottom: 10px;
-  width: auto; }
+  /*max-height: 100%;*/
+  /*padding-bottom: 10px;*/
+  /*width: auto;*/
+  position: relative; }
 
 .header-title-wrap {
   background: rgba(255, 255, 255, 0.93);
@@ -2491,7 +2498,8 @@ input.cmn-toggle-round-flat + label:before {
   background-color: white !important;
   opacity: 1 !important;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) !important;
-  height: 26px !important; }
+  height: 26px !important;
+  font-size: 14px; }
 
 .leaflet-control-search .search-button {
   background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon.png') no-repeat 2px -22px !important; }
@@ -3275,7 +3283,7 @@ input.cmn-toggle-round-flat + label:before {
 
 .client-title {
   padding: 5px;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   font-size: 17px;
   font-weight: 400;
   color: #333;
@@ -3286,7 +3294,7 @@ input.cmn-toggle-round-flat + label:before {
   padding: 0;
   width: 150px;
   background: transparent;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   font-size: 17px;
   font-weight: 400;
   width: 135px !important;
@@ -3305,13 +3313,17 @@ input.cmn-toggle-round-flat + label:before {
 .client-description input {
   background: transparent; }
 
-.client-logo {
+.client-logo-container {
   position: absolute;
-  width: 75px;
+  width: 70px;
   height: 70px;
   top: 5px;
   right: 5px;
-  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.5); }
+  overflow: hidden; }
+
+.client-logo {
+  position: relative;
+  /*box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.5);*/ }
 
 .client-logo.editable:hover {
   opacity: 0.7;
@@ -3372,7 +3384,8 @@ input.cmn-toggle-round-flat + label:before {
   margin-bottom: 5px;
   position: relative;
   color: #333;
-  height: 111px; }
+  height: 111px;
+  overflow: hidden; }
 
 .project-item:hover {
   background: rgba(0, 0, 0, 0.25); }
@@ -3387,7 +3400,7 @@ input.cmn-toggle-round-flat + label:before {
   font-size: 110%;
   text-shadow: none;
   font-weight: 500;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   line-height: 1;
   overflow: hidden;
   max-height: 30px;
@@ -3405,7 +3418,7 @@ input.cmn-toggle-round-flat + label:before {
   font-size: 100%;
   text-shadow: none;
   font-weight: 500;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   line-height: 0.9;
   padding: 0;
   background-color: transparent;
@@ -3434,18 +3447,19 @@ input.cmn-toggle-round-flat + label:before {
   background-color: transparent;
   width: 189px; }
 
-.project-logo {
+.project-logo-container {
   position: absolute;
   background-repeat: no-repeat;
-  background-size: 100% 100%;
-  background-position: center;
-  background-color: white;
-  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.5);
-  width: 69px;
+  width: 62px;
   height: 62px;
-  /*right: 9px;*/
   right: 5px;
-  top: 44px; }
+  top: 44px;
+  overflow: hidden; }
+
+.project-logo {
+  position: relative;
+  /*width: 100%;*/
+  /*height: 100%;*/ }
 
 .project-logo.editable:hover {
   opacity: 0.7;
@@ -3476,35 +3490,52 @@ input.cmn-toggle-round-flat + label:before {
 .project-users-wrap:hover {
   opacity: 1; }
 
-.project-users-wrap:hover > .project-users-inner-wrapper {
-  display: block; }
+.active-project-user-button {
+  display: block !important;
+  opacity: 1 !important; }
 
 /* Project info tooltip */
 .project-users-inner-wrapper {
   width: 220px;
-  position: absolute;
-  top: 29px;
-  right: -11px;
-  background: white;
-  display: none;
-  border-radius: 3px;
-  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.7);
+  /*position: absolute;*/
+  /*top: 29px;*/
+  /*right: -11px;*/
+  /*background: white;*/
+  /*display: none;*/
+  /*border-radius: 3px;*/
+  /*box-shadow: 0 0 5px 0 rgba(0,0,0,0.7);*/
   padding: 10px;
-  margin-bottom: 10px; }
+  /*margin-bottom: 10px;*/
+  /* ••••••• */
+  padding-top: 20px;
+  position: relative;
+  top: 82px;
+  width: 210px;
+  /* ••••••• */ }
 
-.project-users-inner-wrapper:hover {
-  display: block; }
-
-/* Project tooltip arrow */
 .project-users-inner-wrapper:before {
   content: '';
-  width: 15px;
-  height: 15px;
   position: absolute;
-  top: -7px;
-  right: 12px;
-  background-color: white; }
+  left: 0;
+  top: 12px;
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  -webkit-transform: rotate(0deg);
+  -moz-transform: rotate(0deg);
+  -o-transform: rotate(0deg);
+  -ms-transform: rotate(0deg);
+  transform: rotate(0deg); }
 
+/* Project tooltip arrow */
+/*.project-users-inner-wrapper:before {	
+	content: '';
+	width: 15px;
+	height: 15px;
+	position: absolute;
+	top: -7px;
+	right: 12px;
+	background-color: white;
+	}*/
 /* Pseudo element to keep tooltip alive on hover */
 .project-users-inner-wrapper:after {
   content: '';
@@ -3541,7 +3572,7 @@ input.cmn-toggle-round-flat + label:before {
 
 /* Text lines in the tooltip */
 .project-createdby, .project-lastupdated, .update-header, .project-createddate {
-  color: #666;
+  /*color: #666;*/
   font-size: 11px;
   font-weight: 500;
   height: 16px;
@@ -5851,7 +5882,7 @@ input[type=checkbox] + label.check {
   -moz-transition: height 300ms ease;
   transition: height 300ms ease; }
 
-.select-elems, #editor-map-controls-inner-wrap, .connect-outer, .map-layermenu-outer, .leaflet-draw-section-wrapper, .layer-menu-item-wrap, .editor-project-edit-super-wrap, #editor-map-initpos-coordinates, #editor-map-bounds-coordinates, .settings-outer, .q-editor-menu {
+.select-elems, #editor-map-controls-inner-wrap, .connect-outer, .map-layermenu-outer, .leaflet-draw-section-wrapper, .layer-menu-item-wrap, .editor-project-edit-super-wrap, #editor-map-initpos-coordinates, #editor-map-bounds-coordinates, .settings-outer, .q-editor-menu, .project-item {
   -webkit-transition: height 250ms ease;
   -moz-transition: height 250ms ease;
   transition: height 250ms ease; }
@@ -6005,7 +6036,7 @@ input[type=checkbox] + label.check {
   -ms-transform: rotate(-45deg);
   transform: rotate(-45deg); }
 
-.editor-project-edit-super-wrap:before, .backpane-admin-box.green:before, .backpane-superadmin-box.green:before, .baselayertoggle-list:before, .project-users-inner-wrapper:before, #menuslider-arrow:before, .help-tooltip-arrow:before {
+.editor-project-edit-super-wrap:before, .backpane-admin-box.green:before, .backpane-superadmin-box.green:before, .baselayertoggle-list:before, #menuslider-arrow:before, .help-tooltip-arrow:before {
   -webkit-transform: rotate(45deg);
   -moz-transform: rotate(45deg);
   -o-transform: rotate(45deg);

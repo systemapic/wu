@@ -681,7 +681,8 @@ Wu.Project = Wu.Class.extend({
 
 	getHeaderLogo : function () {
 		var logo = this.store.header.logo;
-		if (!logo) logo = this.store.logo;
+		// if (!logo) logo = this.store.logo;
+		if (!logo) logo = '/css/images/defaultProjectLogo.png';
 		return logo;
 	},
 

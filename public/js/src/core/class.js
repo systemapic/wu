@@ -1459,6 +1459,35 @@ Wu.DomUtil = {
 		return container;
 	},
 
+	thumbAdjust : function (imgContainer, dimentions) {
+
+		// Plasserer thumbs sentrert i container
+		// avhengig av kvadratisk ramme!
+
+		var img = new Image();
+		img.src = imgContainer.src;
+		
+		img.onload = function() {
+			
+			var w = this.width;
+			var h = this.height;
+			var wProp = w/dimentions;
+			var hProp = h/dimentions;
+
+			var portrait = true;
+			if ( w>=h ) portrait = false;
+
+			// Plassere bildet i boksen
+			if ( !portrait ) {
+				imgContainer.style.height = '100%';
+				imgContainer.style.left = - Math.floor(wProp)/2 + 'px';
+			} else {
+				imgContainer.style.width = '100%';
+				imgContainer.style.top = - Math.floor(hProp)/2 + 'px';				
+			}
+		}
+	},	
+
 
 
 };

@@ -820,13 +820,13 @@ input.cmn-toggle-round-flat + label:before {
 	display: inline-block;
 	}
 
-#header .header-logo {
+#header .header-logo-container {
 	position: relative;
 	z-index: 1000;
 	color: white;	
 	float: left;
 	max-height: inherit;
-	padding: 5px;
+	/*padding: 5px;*/
 	margin-right: 10px;
 	position: absolute;	
 	background-repeat: no-repeat;
@@ -838,17 +838,27 @@ input.cmn-toggle-round-flat + label:before {
 	height: 71px;
 	margin-right: 10px;
 	width: 90px;
+	overflow: hidden;
 	}
 
-.header-logo.editable:hover {
+
+
+.header-logo-container.editable:hover {
 	cursor: copy;
 	opacity: 0.7;
 	}	
 
-.header-logo img {
+/*.header-logo img {
 	max-height: 100%;
 	padding-bottom: 10px;
 	width: auto;
+	}*/
+
+.header-logo img {
+	/*max-height: 100%;*/
+	/*padding-bottom: 10px;*/
+	/*width: auto;*/
+	position: relative;
 	}
 
 .header-title-wrap {
