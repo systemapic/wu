@@ -22,7 +22,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 	initLayout : function () {
 
 		// create container
-		this._container = Wu.DomUtil.create('div', 'editor-clients-container ct0');
+		this._container = Wu.DomUtil.create('div', 'editor-clients-container');
 
 		// create title
 		this.title = Wu.DomUtil.create('div', 'client-title', this._container);
@@ -31,7 +31,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.description = Wu.DomUtil.create('div', 'client-description', this._container);
 
 		// create logo
-		this.logo = Wu.DomUtil.create('img', 'client-logo', this._container);
+		this.logoContainer = Wu.DomUtil.create('div', 'client-logo-container', this._container);
+		this.logo = Wu.DomUtil.create('img', 'client-logo', this.logoContainer);
+
 
 		// create projects container
 		this._projectsContainer = Wu.DomUtil.create('div', 'projects-container', this._container);
@@ -64,7 +66,13 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// update client meta
 		this.title.innerHTML 	    = this.client.getName();
 		this.description.innerHTML  = this.client.getDescription();
-		this.logo.setAttribute('src', this.client.getLogo());
+		
+		
+		if ( this.client.getLogo() ) var imageAttr = this.client.getLogo();			
+		else var imageAttr = '/css/images/defaultProjectLogo.png';
+		this.logo.src = imageAttr;
+
+		Wu.DomUtil.thumbAdjust(this.logo, 70);
 		
 		// insert client's projects
 		this.insertProjects();
@@ -470,12 +478,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._container.style.height = this.maxHeight + 'px';          
 		this._isOpen = true;
 
-		// Set overflow visible to not cut off info on hover on [i]
-		// var that = this;
-		// setTimeout(function() {
-		// 	that._container.style.overflow = 'visible';
-		// }, 500)
-
 		// close others
 		var clients = app.SidePane.Clients;
 		if (clients._lastOpened && clients._lastOpened != this) clients._lastOpened.close();
@@ -483,13 +485,31 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	close : function () {   				
+
 		this.calculateHeight();
 		this._container.style.height = this.minHeight + 'px';    
 		this._isOpen = false;
 
-		// Remove overflow visible to not cut off info on hover on [i]
-		// this._container.style.overflow = 'hidden';
-		
+
+		this.resetOpenProjectInfo();
+				
+	},
+
+	resetOpenProjectInfo : function () {
+
+		// Set open project info state to false
+		this.projects.forEach(function(project) {
+
+			// Remove active state from button
+			Wu.DomUtil.removeClass(project._menuItem.users, 'active-project-user-button');
+
+			// Remove height from project info container
+			project._menuItem._container.removeAttribute('style');
+
+			// Set open state to false
+			if ( project._menuItem._isOpen ) project._menuItem._isOpen = false;
+		})
+
 	},
 
 	removeProject : function (project) {

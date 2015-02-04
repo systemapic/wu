@@ -36,7 +36,6 @@ Wu.SidePane = Wu.Class.extend({
 
 		if ( app.SidePane.fullscreen ) {
 
-			console.log('close fullscreen');
 			Wu.app._editorMenuPane.style.opacity = 1; // .q-editor-content
 			Wu.DomUtil.addClass(app.SidePane._mobileFullScreenCloser, 'displayNone'); // Hide back button
 			Wu.DomUtil.removeClass(app._mapPane, "map-blur"); // remove map blurring
@@ -151,7 +150,7 @@ Wu.SidePane = Wu.Class.extend({
 	_getPaneArray : function (project) {
 
 		var project = project || app.activeProject;
-		if (!project) return;
+		if (!project) return [];
 
 		var panes = [],
 		    pane = this.options.panes,
@@ -160,7 +159,7 @@ Wu.SidePane = Wu.Class.extend({
 		    isManager = app.Account.canManageProject(project.getUuid());
 
 		if (pane.clients) 					panes.push('Clients');
-		if (pane.mapOptions 	&& isEditor) 			panes.push('Map');
+		if (pane.mapOptions 	&& isEditor) 			panes.push('Map'); 
 		if (pane.documents   	&& settings.documentsPane) 	panes.push('Documents');
 		if (pane.dataLibrary 	&& settings.dataLibrary) 	panes.push('DataLibrary');
 		if (pane.MediaLibrary 	&& settings.mediaLibrary) 	panes.push('MediaLibrary');

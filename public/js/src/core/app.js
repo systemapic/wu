@@ -46,20 +46,25 @@ Wu.App = Wu.Class.extend({
 
 			// portal SX
 			portal   : 'https://projects.ruppellsgriffon.com/',	// api
-			
+
 			// tiles SX
-			tiles    : 'https://{s}.systemapic.com/tiles/', 	// tiles
-			utfgrid  : 'https://{s}.systemapic.com/utfgrid/', 	// utfgrids
-			
-			// postgis PX
-			osm      : 'https://{s}.systemapic.com/tiles/',
+			tiles : {
+				uri : 'https://{s}.systemapic.com/tiles/',
+				subdomains : 'abcd' // sx
+			},
 
-			// osm : 'https://{s}.osm.systemapic.com/r/',
-			// osm : 'https://{s}.osm.systemapic.com/v/',
+			// utfgrid SX
+			utfgrid : {
+				uri : 'https://{s}.systemapic.com/utfgrid/',
+				subdomains : 'abcd' // sx
+			},
 
-			// tiles : 'https://{s}.ruppellsgriffon.systemapic.com/r/',
-			// tiles : 'https://{s}.ruppellsgriffon.systemapic.com/v/',
-			// utfgrid : 'https://{s}.ruppellsgriffon.systemapic.com/u/'
+			// osm PX
+			osm : {
+				uri : 'https://{s}.systemapic.com/r/',
+				subdomains : 'mnop' // px
+			}
+
 
 		},
 

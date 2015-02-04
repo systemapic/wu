@@ -435,7 +435,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		// set ids
 		var fileUuid 	= this._fileUuid,	// file id of geojson
 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
-		    tileServer 	= app.options.servers.tiles,
+		    tileServer 	= app.options.servers.tiles.uri,
+		    subdomains  = app.options.servers.tiles.subdomains,
 		    token 	= app.accessToken,
 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
@@ -443,7 +444,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		this.layer = L.tileLayer(url, {
 			fileUuid: this._fileUuid,
 			cartoid : cartoid,
-			subdomains : 'abcd',
+			subdomains : subdomains,
 			maxRequests : 0,
 		});
 	},
@@ -453,7 +454,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		// set ids
 		var fileUuid 	= this._fileUuid,	// file id of geojson
 		    cartoid 	= this.store.data.cartoid || 'cartoid',
-		    gridServer 	= app.options.servers.utfgrid,
+		    gridServer 	= app.options.servers.utfgrid.uri,
+		    subdomains  = app.options.servers.utfgrid.subdomains,
 		    token 	= app.accessToken,
 		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
 		
@@ -461,6 +463,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		// this.gridLayer = new L.UtfGrid(url, {
 		// 	useJsonP: false,
 		// 	subdomains: 'ijk',
+		// 	subdomains: subdomains
 		// 	// subdomains: 'ghi',
 		// 	maxRequests : 10,
 		// 	requestTimeout : 20000
@@ -520,7 +523,8 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		// set ids
 		var fileUuid 	= this._fileUuid,	// file id of geojson
 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
-		    tileServer 	= app.options.servers.osm,
+		    tileServer 	= app.options.servers.osm.uri,
+		    subdomains  = app.options.servers.osm.subdomains,
 		    token 	= app.accessToken,
 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
@@ -528,7 +532,7 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		this.layer = L.tileLayer(url, {
 			fileUuid: this._fileUuid,
 			cartoid : cartoid,
-			subdomains : 'osmp',
+			subdomains : subdomains,
 			maxRequests : 0,
 		});
 	},
@@ -538,14 +542,16 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		// set ids
 		var fileUuid 	= this._fileUuid,	// file id of geojson
 		    cartoid 	= this.store.data.cartoid || 'cartoid',
-		    gridServer 	= app.options.servers.osm,
+		    gridServer 	= app.options.servers.osm.uri,
+		    subdomains  = app.options.servers.osm.subdomains,
 		    token 	= app.accessToken,
 		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
 		
 		// create gridlayer
 		// this.gridLayer = new L.UtfGrid(url, {
 		// 	useJsonP: false,
-		// 	subdomains: 'ijk',
+		// 	subdomains: subdomains,
+		// 	// subdomains: 'ijk',
 		// 	// subdomains: 'ghi',
 		// 	maxRequests : 10,
 		// 	requestTimeout : 20000

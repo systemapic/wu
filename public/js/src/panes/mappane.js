@@ -222,7 +222,7 @@ Wu.MapPane = Wu.Class.extend({
 		}
 
 		// create new map
-		this._map = Wu.app._map = L.map('map', options).setView([0, 0], 5);
+		this._map = Wu.app._map = L.map('map', options).setView([0, 0], 6); // todo
 
 		// add editable layer
 		this.addEditableLayer(this._map);

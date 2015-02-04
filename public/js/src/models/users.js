@@ -347,45 +347,43 @@ Wu.User = Wu.Class.extend({
 
 	// CRUD
 	canCreateProject : function () {
-		if (this.store.role.superadmin) return true;
-		if (this.store.role.admin)      return true;
+		var user = this.store;
+		if (user.role.superadmin) return true;
+		if (user.role.admin)      return true;
 		return false;
 	},
 
 	canReadProject : function (projectUuid) {
-		// var user = this.store;
-		// if (user.role.superadmin) return true;
+		var user = this.store;
+		if (user.role.superadmin) return true;
 		// if (user.role.admin)      return true;
 		// if (user.role.manager.projects.indexOf(projectUuid) >= 0) return true; // managers can create readers for own projects
 		// if (user.role.editor.projects.indexOf(projectUuid)  >= 0) return true; // managers can create readers for own projects
 		
-		if (this.store.role.reader.projects.indexOf(projectUuid)  >= 0) return true;
+		if (user.role.reader.projects.indexOf(projectUuid)  >= 0) return true;
 		return false;
 	},
 
 	canUpdateProject : function (projectUuid) {
-		// console.log('checking if user ' + this.store.lastName + ' can update project : ' + projectUuid);
-		// var user = this.store;
-		// if (user.role.superadmin) return true;
-		// if (user.role.admin)      return true;
-
-
-		if (this.store.role.editor.projects.indexOf(projectUuid) >= 0) return true; // managers can create readers for own projects
+		var user = this.store;
+		if (user.role.superadmin) return true;
+		if (user.role.editor.projects.indexOf(projectUuid) >= 0) return true; // managers can create readers for own projects
 		return false;
 	},
 
 	canDeleteProject : function (projectUuid) {
-		var editor = (this.store.role.editor.projects.indexOf(projectUuid) >= 0) ? true : false;
-		if (this.store.role.superadmin && editor) return true;
-		if (this.store.role.admin && editor)      return true;
+		var user = this.store;
+		var editor = (user.role.editor.projects.indexOf(projectUuid) >= 0) ? true : false;
+		if (user.role.superadmin && editor) return true;
+		if (user.role.admin && editor)      return true;
 		return false;
 	},
 
 	canManageProject : function (projectUuid) {
-		// var user = this.store;
-		// if (user.role.superadmin) return true;
+		var user = this.store;
+		if (user.role.superadmin) return true;
 		// if (user.role.admin)      return true;
-		if (this.store.role.manager.projects.indexOf(projectUuid) >= 0) return true;
+		if (user.role.manager.projects.indexOf(projectUuid) >= 0) return true;
 		return false;
 	},
 
@@ -397,19 +395,19 @@ Wu.User = Wu.Class.extend({
 	},
 	
 	canReadClient : function (uuid) {
-		// var user = this.store;
-		// if (user.role.superadmin) return true;
+		var user = this.store;
+		if (user.role.superadmin) return true;
 		// if (user.role.admin)      return true;
 		// if (user.role.manager.clients.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
 		// if (user.role.editor.clients.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
-		if (this.store.role.reader.clients.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
+		if (user.role.reader.clients.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
 		return false;
 	},
 
 	canUpdateClient : function (uuid) {
 		// var user = this.store;
 
-		// if (user.role.superadmin) return true;
+		if (user.role.superadmin) return true;
 		// if (user.role.admin)      return true;
 		if (this.store.role.editor.clients.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
 		return false;

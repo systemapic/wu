@@ -26,7 +26,7 @@ var gm 		= require('gm');
 
 
 // globals
-var IMAGEFOLDER = '/var/www/data/images/';
+var IMAGEFOLDER = '/data/images/';
 
 
 // function exports
@@ -417,7 +417,8 @@ module.exports = pixels = {
 			var result = {
 				file   : newFile,
 				height : height,
-				width  : width
+				width  : width,
+				path : newPath
 			}
 
 			// return error and file
@@ -439,11 +440,174 @@ module.exports = pixels = {
 
 
 
+	// cxxxxx 
+
+	serveFitPixelPerfection : function (req, res) {
+
+		// set vars
+		var width      = req.query.width;
+		var height     = req.query.height;
+		var quality    = req.query.quality;
+		var raw        = req.query.raw;
+		var imageId    = req.params[0]; 		// 'file-ccac0f45-ae95-41b9-8d57-0e64767ea9df'		
+		var cropX      = req.query.cropx;	
+		var cropY      = req.query.cropy;
+		var cropW      = req.query.cropw;
+		var cropH      = req.query.croph;
+
+		var fitW      = req.query.fitW;
+		var fitH      = req.query.fitH;				
+
+
+		console.log('imageId', imageId);
+		console.log('width', width);
+		console.log('height', height);
+		console.log('fitW', fitW);
+		console.log('fitH', fitH);
+
+		var newFile 	= 'image-' + uuid.v4();					// unique filename
+		var newPath 	= IMAGEFOLDER + newFile;				// modified file
+
+
+		var imagePath = '/data/images/' + imageId;
+
+
+		pixels.getImageSize(imagePath, function (err, size) {
+
+
+			if ( err || !size ) {
+
+				console.log(err);
+				return res.end();
+
+			}
+
+			var imgWidth = size.width;
+			var imgHeight = size.height;
+
+			if ( imgWidth>=imgHeight ) 	var imgLandscape = true;
+			if ( fitW>=fitH ) 		var fitLandscape = true;
+
+
+			if ( !fitLandscape && imgLandscape ) {
+
+				// Cropping the X-axis
+
+				// regn ut større bredde enn fitW...
+				cropW = fitW * fitH/fitW;
+
+				// Offset the X axis
+				cropX = (cropW - fitW) / 2;
+				cropY = 0;
+
+			} else {
+
+				// Cropping the Y-axis
+				cropW = fitW;
+
+				// Find the image proportion
+				var prop = imgWidth / cropW;
+
+				// Find the image size with overflow
+				cropH = imgHeight / prop;
+
+				cropX = 0;
+
+				// Offset the Y axis
+				cropY = (cropH - fitH) / 2;
+			}
+
+
+			quality = 100;
+
+			// do crunch magic
+			gm(imagePath)
+			.resize(cropW)							// the width of the image BEFORE cropping!
+			.autoOrient()
+			.crop(
+				fitW,	// The actual width of the image 
+				fitH, 	// The actual height of the image
+				cropX, 	// x, y is offset from top left corner
+				cropY
+			)
+			.noProfile()							// todo: strip of all exif?
+			.setFormat('JPEG')						// todo: watermark systemapic? or client?
+			.quality(quality)
+			.write(newPath, function (err) {
+				if (err) console.log('resizeImage error: ', err);
+				
+				var result = {
+					file   : newFile,
+					height : height,
+					width  : width,
+					path : newPath
+				}
+
+				res.sendfile(newPath, {maxAge : 10000000});
+
+			});
+
+		});
+
+		// var tempImg = new Image();
+		// tempImg.src = imagePath;
 
 
 
 
 
+
+
+	},
+
+
+	serveImagePixelPerfection : function (req, res) {
+
+		console.log('lol');
+
+
+		// set vars
+		var width      = req.query.width;
+		var height     = req.query.height;
+		var quality    = req.query.quality;
+		var raw        = req.query.raw;
+		var imageId    = req.params[0]; 		// 'file-ccac0f45-ae95-41b9-8d57-0e64767ea9df'		
+		var cropX      = req.query.cropx;	
+		var cropY      = req.query.cropy;
+		var cropW      = req.query.cropw;
+		var cropH      = req.query.croph;
+	
+		console.log(imageId);
+		console.log(width);
+		console.log(height);
+
+		var imagePath = '/data/images/' + imageId;
+
+		var options = {
+			height: height,
+			width : width,
+			file : imagePath,
+			crop : {
+				x : cropX,
+				y : cropY,
+				h : cropH,
+				w : cropW
+			},
+			quality : quality
+		}
+
+
+		// create image with dimensions
+		pixels.resizeImage(options, function (err, result) {
+			console.log('resized!!!', err, result);
+
+			var path = result.path;
+
+			res.sendfile(path, {maxAge : 10000000});
+		});
+
+
+	},			
 
 
 

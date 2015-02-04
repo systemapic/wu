@@ -25,27 +25,29 @@ var pixels = require('../api/pixels');
 
 
 // global paths
-var FILEFOLDER = '/var/www/data/files/';
-var TILESERVER = '/var/www/DATA/geojson/';
+var FILEFOLDER = '/data/files/';
+var VILEFOLDER = '/data/geojson/';
+// var TILESERVER = '/var/www/DATA/geojson/';
 
 
 module.exports = geo = { 
 
 
+	copyToVileFolder : function (path, fileUuid, callback) {
+		console.time('copyToVileFolder');
+		var dest = VILEFOLDER + fileUuid + '.geojson';
+		fs.copy(path, dest, function(err) {
+			console.timeEnd('copyToVileFolder');
+			callback(err);
+		});
+	},
 
 	handleGeoJSON : function (path, fileUuid, callback) {
-		// send to tx vector tile job queue
-		console.log('GEO: handleGeoJSON', path, fileUuid);
 
+		geo.copyToVileFolder(path, fileUuid, function (err) {
 
-		geo.sendToTileserver(path, fileUuid, function (err, metadata){ 
-			
-			console.log('sendToTileserver done:', err);
-	        	
-	        	
-	        	// console.log('meta???', metadata);
-	        	mapnikOmnivore.digest(path, function (err, metadata) {
-	        		console.log('fucking meta?!?!?');
+			mapnikOmnivore.digest(path, function (err, metadata) {
+        		
 	        		var db = {
 		        		metadata : JSON.stringify(metadata)
 		        	}
@@ -54,73 +56,61 @@ module.exports = geo = {
 		        	callback(err, db);
 	        	});
 
-	        	
-
 		});
-		
+
+        	
 	},
 
 
-	handleTopoJSON : function (path, fileUuid, callback) {
+	handleTopoJSON : function (path, fileUuid, callback) { 			// TODO!
 		// convert to geojson
-		// send to tx vector tile job queue
-
 		console.log('GEO: handleTopoJSON', path, fileUuid);
 
 		callback()
-
-
 	},
 
 
 
 
-	sendToTileserver : function (path, fileUuid, callback) {
-		console.log('sendToTileserver', path, fileUuid);
+	// sendToTileserver : function (path, fileUuid, callback) {
+	// 	console.log('sendToTileserver', path, fileUuid);
 
 
-		fs.readJson(path, function (err, data) {
-			if (err) console.log('readJson err', err);
+	// 	fs.readJson(path, function (err, data) {
+	// 		if (err) console.log('readJson err', err);
 
-			if (err) return callback(err);
+	// 		if (err) return callback(err);
 
-			// package
-			var pack = {
-				geojson : data,
-				uuid : fileUuid,
-				layerName : 'layer'
-			};
+	// 		// package
+	// 		var pack = {
+	// 			geojson : data,
+	// 			uuid : fileUuid,
+	// 			layerName : 'layer'
+	// 		};
 
-			zlib.gzip(JSON.stringify(pack), function (err, buffer) {
-				if (err) console.log('zlib err: ', err);
+	// 		zlib.gzip(JSON.stringify(pack), function (err, buffer) {
+	// 			if (err) console.log('zlib err: ', err);
 
-				// send to tx
-				request								// TODO: way too slow, 
-				 .post('https://import.systemapic.com/import/geojson')
-				 .send(buffer)
-				 .set('Accept-Encoding', 'gzip, deflate')
-				 .end(function (err, result) {
-				 	if (err) console.log('request err:', err);
+	// 			// send to tx
+	// 			request								// TODO: way too slow, 
+	// 			 .post('https://import.systemapic.com/import/geojson')
+	// 			 .send(buffer)
+	// 			 .set('Accept-Encoding', 'gzip, deflate')
+	// 			 .end(function (err, result) {
+	// 			 	if (err) console.log('request err:', err);
+	// 			 	callback(err, null);
+	// 			});
 
-				 	// console.log('result: ', result);
+	// 		});
 
-				 	callback(err, null);
-				});
+	// 	});
 
-			});
-
-		});
-
-	},
+	// },
 
 
 
 	handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
-		console.log('GEO: handleShapefile');
-		console.log('foldeR: ', folder);
-		console.log('name: ', name);
-		console.log('fileUuid: ', fileUuid);
-
+		console.log('handleShapefile...');
 
 		fs.readdir(folder, function (err, files) {
 			if (!files) return callback({error : 'No shapefiles! Perhaps you put different shapefiles in the same folder?'});
@@ -128,18 +118,20 @@ module.exports = geo = {
 			// clone array
 			var shapefiles = files.slice();
 
+			// async ops
 			var ops = [];
+
+			// check if valid shapefile(s)
 			ops.push(function (done) {
-				// check if valid shapefile(s)
 				geo.validateshp(files, done);
 			});
 
+			// convert shapefile to geo/topojson
 			ops.push(function (done) {
-				// convert shapefile to geo/topojson
 				geo.convertshp(files, folder, done);
 			});
 
-			// run jobs
+			// run async jobs
 			async.series(ops, function (err, results) {
 				if (err) return callback(err);
 
@@ -151,28 +143,32 @@ module.exports = geo = {
 				// add geojson file to list
 				shapefiles.push(name);
 
-				geo.sendToTileserver(path, fileUuid, function (err) {
+				// return as db entry
+				var db = {
+					files : shapefiles,
+					data : {
+						geojson : name
+					},
+					title : name,
+					file : fileUuid
+				}
+						
 
-					// return as db entry
-					var db = {
-						files : shapefiles,
-						data : {
-							geojson : name
-						},
-						title : name,
-						file : fileUuid
-					}
-							
+
+				geo.copyToVileFolder(path, fileUuid, function (err) {
+
 					// read meta from file
+					console.log('reading meta...');
 			        	mapnikOmnivore.digest(path, function (err, metadata) {
-			        		console.log('fucking meta?!?!?', err, metadata);
+			        		console.log('got meta?', err, metadata);
 			        		db.metadata = JSON.stringify(metadata);
 				        	
 				        	// return
 				        	callback(err, db);
 			        	});
 
-				});	
+		        	});
+
 			});
 		});
 	},
@@ -180,7 +176,6 @@ module.exports = geo = {
 
 
 	validateshp : function (files, callback) {
-		console.log('validateshp');
 
 		// shape extensions
 		var mandatory 	= ['.shp', '.shx', '.dbf'];
@@ -226,14 +221,11 @@ module.exports = geo = {
 			
 			ops.push(function (callback) {
 
-				console.time('STATFILE');
 				if (fs.existsSync(p)) {
 					fs.move(p, f, callback);
-					console.log('___fs.move:::', p, f);
 				} else {
 					callback();
 				}
-				console.timeEnd('STATFILE');
 			});
 			
 
@@ -248,15 +240,7 @@ module.exports = geo = {
 	},
 
 	convertshp : function (shapes, folder, callback) {
-		console.log('convertshp');
-		console.log('!!!!!!!!!!!_________________________!!!!!!!!!!!!!');
-		console.log('!!!!!!!!!!!_________________________!!!!!!!!!!!!!');
-		console.log('!!!!!!!!!!!_________________________!!!!!!!!!!!!!');
-		console.log('!!!!!!!!!!!_________________________!!!!!!!!!!!!!');
-		console.log('!!!!!!!!!!!_________________________!!!!!!!!!!!!!');
-		console.log('!!!!!!!!!!!_________________________!!!!!!!!!!!!!');
-		console.log('shapes: ', shapes);
-
+		
 		 
 		// get the .shp file
 		var shps = geo.getTheShape(shapes);
@@ -284,6 +268,8 @@ module.exports = geo = {
 		}
 						// callback
 		geo.moveShapefiles(options, function (err) {
+			if (err) console.log('moveShapefiles err', err);
+
 
 			// make sure folder exists
 			fs.ensureDirSync(outfolder);					// todo: async!
@@ -299,6 +285,10 @@ module.exports = geo = {
 
 			// create ogr object
 			var myfile = ogr2ogr(inFile);
+
+			console.log('==> ', projection, proj4, inFile);
+
+			console.log('### ogr2ogr object: ', myfile);
 			
 			// set output format
 			myfile.format('geojson');
@@ -309,41 +299,10 @@ module.exports = geo = {
 			
 			// exec ogr2ogr
 			myfile.exec(function (err, data) {
-				if (err) console.error(err);
-
+				if (err) console.error('exec ogr2ogr err', err, data);
 
 				// do fallback on error
-
 				if (err) return geo._ogr2ogrFallback(folder, outfolder, toFile, outFile, inFile, fileUuid, callback);
-
-				// if (err) {
-				// 	console.log('doing fallback exec!');
-
-				// 	// make sure dir exists
-				// 	fs.ensureDirSync(outfolder);			// todo: async!
-
-				// 	// ogr2ogr shapefile to geojson
-				// 	var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"';		
-				// 	var exec = require('child_process').exec;
-
-				// 	exec(cmd, function (err, stdout, stdin) {
-				// 		if (err) console.error('mapshaper err: ', err, stdout, stdin);
-
-				// 		// move folder with shapefile to new fileUuid folder
-				// 		fs.move(folder, outfolder + '/Shapefiles', function (err) {
-				// 			if (err) console.error(err);
-				// 		});
-
-				// 		// callback
-				// 		callback(err, {path : outFile, name : toFile, fileUuid : fileUuid});
-
-				// 	});
-
-				// 	// finished
-				// 	return;
-
-				// }
-
 
 				// write file 
 				fs.outputFile(outFile, JSON.stringify(data), function (err) {
@@ -369,6 +328,7 @@ module.exports = geo = {
 
 
 	_ogr2ogrFallback : function (folder, outfolder, toFile, outFile, inFile, fileUuid, callback) {
+		console.log('ogr fallback...');
 
 		// make sure dir exists
 		fs.ensureDirSync(outfolder);			// todo: async!
@@ -438,32 +398,115 @@ module.exports = geo = {
 
 
 
-	// send file to tileserver,
-	// only geojson files
-	mirrorToTileserver : function (entry, currentPath) {
-
-		console.log('mirrorToTileserver');
-		console.log('entry: ', entry);
-		console.log('currentPath', currentPath);
 
 
-		var fileUuid = entry.uuid;
 
-		var remotePath = TILESERVER + fileUuid + '.geojson';
-		// var reprojectedPath = currentPath + '.EPSG3857';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// // send file to tileserver,
+	// // only geojson files
+	// mirrorToTileserver : function (entry, currentPath) {
+
+	// 	console.log('mirrorToTileserver...NOT!');
+	// 	return;
+
+	// 	console.log('entry: ', entry);
+	// 	console.log('currentPath', currentPath);
+
+
+	// 	var fileUuid = entry.uuid;
+
+	// 	var remotePath = TILESERVER + fileUuid + '.geojson';
+	// 	// var reprojectedPath = currentPath + '.EPSG3857';
 
 		
-		var ops = [];
+	// 	var ops = [];
 
 	
 		
-		ops.push(function (callback) {
+	// 	ops.push(function (callback) {
 
 
 
-			fs.readJson(currentPath, function (err, data) {
-				if (err) throw err;
-				console.log('readJson: ', data);
+	// 		fs.readJson(currentPath, function (err, data) {
+	// 			if (err) throw err;
+	// 			console.log('readJson: ', data);
 
 
 
@@ -471,457 +514,457 @@ module.exports = geo = {
 
 
 
-				request({
-					method : 'POST',
-					// uri : 'http://78.46.107.15:8080/import/geojson',
-					uri : 'https:/import.systemapic.com/import/geojson',
-					json : {
-						geojson : data,
-						uuid : fileUuid,
-						layerName : 'layer'
-					}
+	// 			request({
+	// 				method : 'POST',
+	// 				// uri : 'http://78.46.107.15:8080/import/geojson',
+	// 				uri : 'https:/import.systemapic.com/import/geojson',
+	// 				json : {
+	// 					geojson : data,
+	// 					uuid : fileUuid,
+	// 					layerName : 'layer'
+	// 				}
 
 
-				}, function (err, response, body) {
-					console.log('request: ', err);
-			        	if (!err && response.statusCode == 200) {
-			        		console.log(body)
-			        	}
-				});
+	// 			}, function (err, response, body) {
+	// 				console.log('request: ', err);
+	// 		        	if (!err && response.statusCode == 200) {
+	// 		        		console.log(body)
+	// 		        	}
+	// 			});
 
 
-				// request.post(TILESERVERIP + 'import/vtile', { 
-				// 		form: { 
-				//     			uuid : fileUuid, 
-				//     			geojson : data,
-				//     			layerName : 'testing'
-				//     		} 
-				// 	},
+	// 			// request.post(TILESERVERIP + 'import/vtile', { 
+	// 			// 		form: { 
+	// 			//     			uuid : fileUuid, 
+	// 			//     			geojson : data,
+	// 			//     			layerName : 'testing'
+	// 			//     		} 
+	// 			// 	},
 				    
-				// 	function (error, response, body) {
-				// 		console.log('request: ', error, response);
-				//         	if (!error && response.statusCode == 200) {
-				//         		console.log(body)
-				//         	}
-				//     }
-				// );
+	// 			// 	function (error, response, body) {
+	// 			// 		console.log('request: ', error, response);
+	// 			//         	if (!error && response.statusCode == 200) {
+	// 			//         		console.log(body)
+	// 			//         	}
+	// 			//     }
+	// 			// );
 
 
 
 
-			});
+	// 		});
 
 
 			
 
-			// // scp file to tileserver
-			// // var cmd = scp -C ERI_adm.zip.geojson tx:/var/www/DATA/eri.geojson
-			// var cmd = 'scp -C ' + reprojectedPath + ' tx:' + remotePath;
+	// 		// // scp file to tileserver
+	// 		// // var cmd = scp -C ERI_adm.zip.geojson tx:/var/www/DATA/eri.geojson
+	// 		// var cmd = 'scp -C ' + reprojectedPath + ' tx:' + remotePath;
 
-			// console.log('cmd: ', cmd);
+	// 		// console.log('cmd: ', cmd);
 
-			// var exec = require('child_process').exec;
-			// exec(cmd, function (err, stdout, stdin) {
+	// 		// var exec = require('child_process').exec;
+	// 		// exec(cmd, function (err, stdout, stdin) {
 
-			// 	console.log('scp done!', err, stdout, stdin);
-			// 	callback(err);
+	// 		// 	console.log('scp done!', err, stdout, stdin);
+	// 		// 	callback(err);
 
-			// });
+	// 		// });
 
-		});
-
-
-
-		// ops.push(function (callback) {
+	// 	});
 
 
 
+	// 	// ops.push(function (callback) {
 
-		// 	// mapnikOmnivore.digest(currentPath, function(err, metadata){
-		// 	// 	if(err) return callback(err);
+
+
+
+	// 	// 	// mapnikOmnivore.digest(currentPath, function(err, metadata){
+	// 	// 	// 	if(err) return callback(err);
 				
-		// 	// 	console.log('Metadata returned!');
-		// 	// 	console.log(metadata);
+	// 	// 	// 	console.log('Metadata returned!');
+	// 	// 	// 	console.log(metadata);
 
-		// 	// 	var metastring = JSON.stringify(metadata);
-
-
-
-
-		// 	// });
+	// 	// 	// 	var metastring = JSON.stringify(metadata);
 
 
 
-		// })
 
-		async.series(ops, function (err, results) {
+	// 	// 	// });
 
-			console.log('async done!!');
 
-		});
+
+	// 	// })
+
+	// 	async.series(ops, function (err, results) {
+
+	// 		console.log('async done!!');
+
+	// 	});
 		
 
 
 
-	},
+	// },
 
 	
-	processShapefile : function (entry, callback) {
+	// processShapefile : function (entry, callback) {
 
-		var ops = [];
-		ops.push(function (cb) {
-			// check if valid shapefile(s)
-			geo._validateShapefile(entry, cb);
-		});
+	// 	var ops = [];
+	// 	ops.push(function (cb) {
+	// 		// check if valid shapefile(s)
+	// 		geo._validateShapefile(entry, cb);
+	// 	});
 
-		ops.push(function (cb) {
-			// convert shapefile to geo/topojson
-			geo._convertShapefile(entry, cb);
-		});
+	// 	ops.push(function (cb) {
+	// 		// convert shapefile to geo/topojson
+	// 		geo._convertShapefile(entry, cb);
+	// 	});
 
-		async.series(ops, function (err) {
-			if (err) console.error('processShapefile err: ', err);
+	// 	async.series(ops, function (err) {
+	// 		if (err) console.error('processShapefile err: ', err);
 
-			callback(null, entry);	// dont pass err
-		});
+	// 		callback(null, entry);	// dont pass err
+	// 	});
 
-	},
+	// },
 
 
-	processJsonFile : function (entry, callback) {
+	// processJsonFile : function (entry, callback) {
 
-		// create unique filename for geojson, save in same folder
-		var geoFile = _.remove(entry.files, function (f) {
-			return (f.slice(-5) == '.json')
-		});
+	// 	// create unique filename for geojson, save in same folder
+	// 	var geoFile = _.remove(entry.files, function (f) {
+	// 		return (f.slice(-5) == '.json')
+	// 	});
 
-		// set paths
-		var base = entry.folder + '/';
-		var fileUuid = 'geojson-' + uuid.v4() + '.geojson';
-		var fromFile = base + geoFile[0]; 
-		var toFile   = base + fileUuid;
+	// 	// set paths
+	// 	var base = entry.folder + '/';
+	// 	var fileUuid = 'geojson-' + uuid.v4() + '.geojson';
+	// 	var fromFile = base + geoFile[0]; 
+	// 	var toFile   = base + fileUuid;
 
-		// move file, add to entry, return
-		fs.rename(fromFile, toFile, function (err) {
-			if (err) console.log('json rename err: ', err);
+	// 	// move file, add to entry, return
+	// 	fs.rename(fromFile, toFile, function (err) {
+	// 		if (err) console.log('json rename err: ', err);
 
-			// update entry
-			entry.data.geojson = fileUuid;
-			entry.data.type = 'layer';
-			entry.files.push(fileUuid);
-			entry.type = 'layer';
-			entry.title = entry.originalFilename;
+	// 		// update entry
+	// 		entry.data.geojson = fileUuid;
+	// 		entry.data.type = 'layer';
+	// 		entry.files.push(fileUuid);
+	// 		entry.type = 'layer';
+	// 		entry.title = entry.originalFilename;
 
-			// mirror to tileserver
-			if (!err) geo.mirrorToTileserver(entry, toFile);
+	// 		// mirror to tileserver
+	// 		if (!err) geo.mirrorToTileserver(entry, toFile);
 
-			// add unique id to features
-			geo.addUniqueGeojsonProperties(toFile, entry, function (err) {
+	// 		// add unique id to features
+	// 		geo.addUniqueGeojsonProperties(toFile, entry, function (err) {
 				
-				// return
-				callback(null, entry);
-			});
+	// 			// return
+	// 			callback(null, entry);
+	// 		});
 
 			
 
-		});
-	},
+	// 	});
+	// },
 
 
-	processGeojsonFile : function (entry, callback) {
+	// processGeojsonFile : function (entry, callback) {
 		
-		// console.log('*************************')
-		// console.log('* geo.processGeojsonFile:', entry);
-		// console.log('*************************')
+	// 	// console.log('*************************')
+	// 	// console.log('* geo.processGeojsonFile:', entry);
+	// 	// console.log('*************************')
 
-		// create unique filename for geojson, save in same folder
-		var geoFile = _.remove(entry.files, function (f) {
-			return (f.slice(-8) == '.geojson')
-		});
+	// 	// create unique filename for geojson, save in same folder
+	// 	var geoFile = _.remove(entry.files, function (f) {
+	// 		return (f.slice(-8) == '.geojson')
+	// 	});
 
-		// console.log('geoFile: ', geoFile);
+	// 	// console.log('geoFile: ', geoFile);
 
-		// set paths
-		var base = entry.folder + '/';
-		var fromPath = base + geoFile[0]; 
-		var toFile = 'geojson-' + uuid.v4() + '.geojson';
-		var toPath = base + toFile;
+	// 	// set paths
+	// 	var base = entry.folder + '/';
+	// 	var fromPath = base + geoFile[0]; 
+	// 	var toFile = 'geojson-' + uuid.v4() + '.geojson';
+	// 	var toPath = base + toFile;
 
 
 
-		// move file, add to entry, return
-		fs.rename(fromPath, toPath, function (err) {
-			if (err) console.log('geojson rename err: ', err);
+	// 	// move file, add to entry, return
+	// 	fs.rename(fromPath, toPath, function (err) {
+	// 		if (err) console.log('geojson rename err: ', err);
 
-			// update entry
-			entry.data.geojson = toFile;
-			entry.files.push(toFile);
-			entry.type = 'layer';
-			entry.name = geoFile[0];
-			entry.title = entry.originalFilename;
+	// 		// update entry
+	// 		entry.data.geojson = toFile;
+	// 		entry.files.push(toFile);
+	// 		entry.type = 'layer';
+	// 		entry.name = geoFile[0];
+	// 		entry.title = entry.originalFilename;
 
-			// console.log('renamed: ', entry);
+	// 		// console.log('renamed: ', entry);
 
-			// mirror to tileserver
-			if (!err) geo.mirrorToTileserver(entry, toPath);
+	// 		// mirror to tileserver
+	// 		if (!err) geo.mirrorToTileserver(entry, toPath);
 
-			// add unique id to features
-			geo.addUniqueGeojsonProperties(toPath, entry, function (err) {
+	// 		// add unique id to features
+	// 		geo.addUniqueGeojsonProperties(toPath, entry, function (err) {
 				
-				// return
-				callback(null, entry);
-			});
+	// 			// return
+	// 			callback(null, entry);
+	// 		});
 
 			
 
-		});	
-	},
+	// 	});	
+	// },
 
 
-	createNewGeoJSONLayer : function () {
+	// createNewGeoJSONLayer : function () {
 
-		// write geojson to file
-		// create new Layer()
-		// create new File()
-		// add to Project
-		// return Layer()
-
-
-
-	},
+	// 	// write geojson to file
+	// 	// create new Layer()
+	// 	// create new File()
+	// 	// add to Project
+	// 	// return Layer()
 
 
-	processKmlFile : function (entry, callback) {
+
+	// },
+
+
+	// processKmlFile : function (entry, callback) {
 		
-		// create unique filename for geojson, save in same folder
-		var kmlFile = _.remove(entry.files, function (f) {
-			return (f.slice(-4) == '.kml')
-		});
+	// 	// create unique filename for geojson, save in same folder
+	// 	var kmlFile = _.remove(entry.files, function (f) {
+	// 		return (f.slice(-4) == '.kml')
+	// 	});
 
-		// set paths
-		var base = entry.folder + '/';
-		var fileUuid = 'geojson-' + uuid.v4() + '.geojson';
-		var fromFile = base + kmlFile[0]; 
-		var toFile   = base + fileUuid;
+	// 	// set paths
+	// 	var base = entry.folder + '/';
+	// 	var fileUuid = 'geojson-' + uuid.v4() + '.geojson';
+	// 	var fromFile = base + kmlFile[0]; 
+	// 	var toFile   = base + fileUuid;
 
-		var ops = [];
-		ops.push(function (cb) {
-			geo._kml2geojson(fromFile, toFile, cb);
-		});
+	// 	var ops = [];
+	// 	ops.push(function (cb) {
+	// 		geo._kml2geojson(fromFile, toFile, cb);
+	// 	});
 
-		async.series(ops, function (err) {
+	// 	async.series(ops, function (err) {
 
-			// update entry
-			entry.data.geojson = fileUuid;
-			entry.data.type = 'layer';
-			entry.files.push(fileUuid);
-			entry.type = 'layer';
-			entry.title = entry.originalFilename;
+	// 		// update entry
+	// 		entry.data.geojson = fileUuid;
+	// 		entry.data.type = 'layer';
+	// 		entry.files.push(fileUuid);
+	// 		entry.type = 'layer';
+	// 		entry.title = entry.originalFilename;
 
-			// mirror to tileserver
-			if (!err) geo.mirrorToTileserver(entry, toFile);
+	// 		// mirror to tileserver
+	// 		if (!err) geo.mirrorToTileserver(entry, toFile);
 
-			// add unique id to features
-			geo.addUniqueGeojsonProperties(toFile, entry, function (err) {
+	// 		// add unique id to features
+	// 		geo.addUniqueGeojsonProperties(toFile, entry, function (err) {
 				
-				// return
-				callback(null, entry);
-			});
+	// 			// return
+	// 			callback(null, entry);
+	// 		});
 
 			
 
-		});		
+	// 	});		
 
-	},
+	// },
 
-	processTopojsonFile : function (entry, callback) {
-
-
-	},
-
-	processGpxFile : function (entry, callback) {
-
-	},
+	// processTopojsonFile : function (entry, callback) {
 
 
+	// },
 
-	// converts fromFile (kml) to toFile (geojson)
-	_kml2geojson : function (fromFile, toFile, callback) {
-		fs.readFile(fromFile, 'utf8', function (err, data) {
-			var kml = jsdom(data);
-			var converted = tj.kml(kml);
-			fs.outputFile(toFile, JSON.stringify(converted), callback);
-		});
-	},
+	// processGpxFile : function (entry, callback) {
+
+	// },
 
 
 
-	_validateShapefile : function (entry, callback) {
-		console.log('validateShapefile');
+	// // converts fromFile (kml) to toFile (geojson)
+	// _kml2geojson : function (fromFile, toFile, callback) {
+	// 	fs.readFile(fromFile, 'utf8', function (err, data) {
+	// 		var kml = jsdom(data);
+	// 		var converted = tj.kml(kml);
+	// 		fs.outputFile(toFile, JSON.stringify(converted), callback);
+	// 	});
+	// },
 
-		// shape extensions
-		var mandatory 	= ['.shp', '.shx', '.dbf'];
-		var files       = entry.files;
 
-		files.forEach(function (f) {
-			var ext = f.slice(-4);
-			_.pull(mandatory, ext);
-		})
 
-		// if not all accounted for, return error
-		if (mandatory.length > 0) return callback({error : 'Missing shapefile(s)', files : mandatory});
+	// _validateShapefile : function (entry, callback) {
+	// 	console.log('validateShapefile');
+
+	// 	// shape extensions
+	// 	var mandatory 	= ['.shp', '.shx', '.dbf'];
+	// 	var files       = entry.files;
+
+	// 	files.forEach(function (f) {
+	// 		var ext = f.slice(-4);
+	// 		_.pull(mandatory, ext);
+	// 	})
+
+	// 	// if not all accounted for, return error
+	// 	if (mandatory.length > 0) return callback({error : 'Missing shapefile(s)', files : mandatory});
 		
-		// return
-		callback(null);
+	// 	// return
+	// 	callback(null);
 
-	},
+	// },
 
-	_convertShapefile : function (entry, callback) {
+	// _convertShapefile : function (entry, callback) {
 
-		var shapes = entry.files,
-		    folder = entry.folder + '/';
+	// 	var shapes = entry.files,
+	// 	    folder = entry.folder + '/';
 
-		// add relative path if any
-		if (entry.relativePath) folder += entry.relativePath;
+	// 	// add relative path if any
+	// 	if (entry.relativePath) folder += entry.relativePath;
 
-		// get .shp file
-		for (s in shapes) {
-			if (shapes[s].slice(-4) == '.shp') var shp = shapes[s];
-		}
-		
-
-		var inFile = folder + shp,
-		    toFile = 'geojson-' + uuid.v4() + '.geojson';
-		    // outFile = folder + '/' + shp + '.geojson';
-		    outFile = entry.folder + '/' + toFile;
-
-		// execute cmd line conversion 
-		// var cmd = 'ogr2ogr -t_srs EPSG:3857 -f geoJSON "' + outFile + '" "' + inFile + '"'; //Neighbourhoods.json Neighbourhoods.shp
-		var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"';
-		
-		// convert to google projection
-		// var cmd = 'ogr2ogr -s_srs EPSG:4269 -t_srs EPSG:3857 -f geoJSON "' + outFile + '" "' + inFile + '"';
-
-		// console.log('================= o g r 2 o g r  ==========================');
-		// var cmd = 'mapshaper -p 0.1 --encoding utf8 -f geojson -o "' + outFile + '" "' + inFile + '"';		// todo: mapshaper options
-		// console.log('================= m a p s h a p e r ==========================');
-		// console.log('cmd: ', cmd);
-		var exec = require('child_process').exec;
-		exec(cmd, function (err, stdout, stdin) {
-			if (err) console.error('mapshaper err: ', err, stdout, stdin);
-
-			// add to entry
-			entry.layers.push(toFile);
-			entry.files.push(toFile);
-			entry.type = 'layer';
-			entry.data.geojson = toFile;
-			entry.title = shp;
-
-			// console.log('************************************')
-			// console.log('* geo._convertShapefile DONE:', entry);
-			// console.log('************************************')
-
-			
-			// add unique id to features
-			geo.addUniqueGeojsonProperties(outFile, entry, function (err) {
-				
-				// return
-				callback(null);
-			});
-
-
-			// mirror to tileserver
-			if (!err) geo.mirrorToTileserver(entry, outFile);	// wait for it? add callback?
-
-
-		});
-	},
-
-	addUniqueGeojsonProperties : function (path, entry, callback) {
-		// console.log('addUniqueGeojsonProperties', path);		// todo: remove _systemapic from exported shapes!
-
-
-
-
-		console.log('omnivore path', path);
-
-		mapnikOmnivore.digest(path, function(err, metadata){
-			console.log('METADATA err', err);
-			if(err) return callback(err);
-			
-			console.log('Metadata returned!');
-			console.log(metadata);
-
-			var metastring = JSON.stringify(metadata);
-
-			entry.metadata = metastring;
-
-			callback(null);
-
-
-		});
-
-
-		
-
-
-
-
-		// var data;
-		// var ops = [];
-
-		// ops.push(function (callback) {
-		// 	fs.readFile(path, function (err, geojson) {
-		// 		if (err) console.log('err: ', err);
-		// 		if (geojson) {
-		// 			data = JSON.parse(geojson);
-		// 			data = geo._addUniqueProperty(data);
-		// 		}
-		// 		// done
-		// 		callback(err);
-		// 	});
-		// });
-
-		// ops.push(function (callback) {
-		// 	var json = JSON.stringify(data);
-		// 	fs.writeFile(path, json, function (err) {
-		// 		if (err) throw err;
-				
-		// 		// done
-		// 		callback(err);
-		// 	});
-		// });
-
-		// async.series(ops, function (err) {
-
-		// 	// console.log('addUniqueGeojsonProperties DONE!');
-
-		// 	// no callback, no point waiting for this
-		// 	if (callback) callback(err);
-		// });
-
-	},
-
-	// _addUniqueProperty : function (data) {
-	// 	var features = data.features;
-	// 	// console.log('_addUniqueProperty features: ', features);
-	// 	// console.log('data: ', data);
-		
-	// 	// simple geojson (like drawn shapes)
-	// 	if (features == undefined) {
-	// 		if (data.hasOwnProperty('properties')) {
-	// 			data.properties.__sid = uuid.v4();
-	// 			console.log('__ data: ', data);
-	// 		}
-	// 		return data;
+	// 	// get .shp file
+	// 	for (s in shapes) {
+	// 		if (shapes[s].slice(-4) == '.shp') var shp = shapes[s];
 	// 	}
 		
 
-	// 	features.forEach(function (feature) {
-	// 		feature.properties.__sid = uuid.v4();
+	// 	var inFile = folder + shp,
+	// 	    toFile = 'geojson-' + uuid.v4() + '.geojson';
+	// 	    // outFile = folder + '/' + shp + '.geojson';
+	// 	    outFile = entry.folder + '/' + toFile;
+
+	// 	// execute cmd line conversion 
+	// 	// var cmd = 'ogr2ogr -t_srs EPSG:3857 -f geoJSON "' + outFile + '" "' + inFile + '"'; //Neighbourhoods.json Neighbourhoods.shp
+	// 	var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"';
+		
+	// 	// convert to google projection
+	// 	// var cmd = 'ogr2ogr -s_srs EPSG:4269 -t_srs EPSG:3857 -f geoJSON "' + outFile + '" "' + inFile + '"';
+
+	// 	// console.log('================= o g r 2 o g r  ==========================');
+	// 	// var cmd = 'mapshaper -p 0.1 --encoding utf8 -f geojson -o "' + outFile + '" "' + inFile + '"';		// todo: mapshaper options
+	// 	// console.log('================= m a p s h a p e r ==========================');
+	// 	// console.log('cmd: ', cmd);
+	// 	var exec = require('child_process').exec;
+	// 	exec(cmd, function (err, stdout, stdin) {
+	// 		if (err) console.error('mapshaper err: ', err, stdout, stdin);
+
+	// 		// add to entry
+	// 		entry.layers.push(toFile);
+	// 		entry.files.push(toFile);
+	// 		entry.type = 'layer';
+	// 		entry.data.geojson = toFile;
+	// 		entry.title = shp;
+
+	// 		// console.log('************************************')
+	// 		// console.log('* geo._convertShapefile DONE:', entry);
+	// 		// console.log('************************************')
+
+			
+	// 		// add unique id to features
+	// 		geo.addUniqueGeojsonProperties(outFile, entry, function (err) {
+				
+	// 			// return
+	// 			callback(null);
+	// 		});
+
+
+	// 		// mirror to tileserver
+	// 		if (!err) geo.mirrorToTileserver(entry, outFile);	// wait for it? add callback?
+
+
 	// 	});
-	// 	return data;
 	// },
+
+	// addUniqueGeojsonProperties : function (path, entry, callback) {
+	// 	// console.log('addUniqueGeojsonProperties', path);		// todo: remove _systemapic from exported shapes!
+
+
+
+
+	// 	console.log('omnivore path', path);
+
+	// 	mapnikOmnivore.digest(path, function(err, metadata){
+	// 		console.log('METADATA err', err);
+	// 		if(err) return callback(err);
+			
+	// 		console.log('Metadata returned!');
+	// 		console.log(metadata);
+
+	// 		var metastring = JSON.stringify(metadata);
+
+	// 		entry.metadata = metastring;
+
+	// 		callback(null);
+
+
+	// 	});
+
+
+		
+
+
+
+
+	// 	// var data;
+	// 	// var ops = [];
+
+	// 	// ops.push(function (callback) {
+	// 	// 	fs.readFile(path, function (err, geojson) {
+	// 	// 		if (err) console.log('err: ', err);
+	// 	// 		if (geojson) {
+	// 	// 			data = JSON.parse(geojson);
+	// 	// 			data = geo._addUniqueProperty(data);
+	// 	// 		}
+	// 	// 		// done
+	// 	// 		callback(err);
+	// 	// 	});
+	// 	// });
+
+	// 	// ops.push(function (callback) {
+	// 	// 	var json = JSON.stringify(data);
+	// 	// 	fs.writeFile(path, json, function (err) {
+	// 	// 		if (err) throw err;
+				
+	// 	// 		// done
+	// 	// 		callback(err);
+	// 	// 	});
+	// 	// });
+
+	// 	// async.series(ops, function (err) {
+
+	// 	// 	// console.log('addUniqueGeojsonProperties DONE!');
+
+	// 	// 	// no callback, no point waiting for this
+	// 	// 	if (callback) callback(err);
+	// 	// });
+
+	// },
+
+	// // _addUniqueProperty : function (data) {
+	// // 	var features = data.features;
+	// // 	// console.log('_addUniqueProperty features: ', features);
+	// // 	// console.log('data: ', data);
+		
+	// // 	// simple geojson (like drawn shapes)
+	// // 	if (features == undefined) {
+	// // 		if (data.hasOwnProperty('properties')) {
+	// // 			data.properties.__sid = uuid.v4();
+	// // 			console.log('__ data: ', data);
+	// // 		}
+	// // 		return data;
+	// // 	}
+		
+
+	// // 	features.forEach(function (feature) {
+	// // 		feature.properties.__sid = uuid.v4();
+	// // 	});
+	// // 	return data;
+	// // },
 
 
 }

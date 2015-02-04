@@ -1459,6 +1459,35 @@ Wu.DomUtil = {
 		return container;
 	},
 
+	thumbAdjust : function (imgContainer, dimentions) {
+
+		// Plasserer thumbs sentrert i container
+		// avhengig av kvadratisk ramme!
+
+		var img = new Image();
+		img.src = imgContainer.src;
+		
+		img.onload = function() {
+			
+			var w = this.width;
+			var h = this.height;
+			var wProp = w/dimentions;
+			var hProp = h/dimentions;
+
+			var portrait = true;
+			if ( w>=h ) portrait = false;
+
+			// Plassere bildet i boksen
+			if ( !portrait ) {
+				imgContainer.style.height = '100%';
+				imgContainer.style.left = - Math.floor(wProp)/2 + 'px';
+			} else {
+				imgContainer.style.width = '100%';
+				imgContainer.style.top = - Math.floor(hProp)/2 + 'px';				
+			}
+		}
+	},	
+
 
 
 };
@@ -1994,7 +2023,6 @@ L.Popup.include({
 
 		if ( app.SidePane.fullscreen ) {
 
-			console.log('close fullscreen');
 			Wu.app._editorMenuPane.style.opacity = 1; // .q-editor-content
 			Wu.DomUtil.addClass(app.SidePane._mobileFullScreenCloser, 'displayNone'); // Hide back button
 			Wu.DomUtil.removeClass(app._mapPane, "map-blur"); // remove map blurring
@@ -2109,7 +2137,7 @@ L.Popup.include({
 	_getPaneArray : function (project) {
 
 		var project = project || app.activeProject;
-		if (!project) return;
+		if (!project) return [];
 
 		var panes = [],
 		    pane = this.options.panes,
@@ -2118,7 +2146,7 @@ L.Popup.include({
 		    isManager = app.Account.canManageProject(project.getUuid());
 
 		if (pane.clients) 					panes.push('Clients');
-		if (pane.mapOptions 	&& isEditor) 			panes.push('Map');
+		if (pane.mapOptions 	&& isEditor) 			panes.push('Map'); 
 		if (pane.documents   	&& settings.documentsPane) 	panes.push('Documents');
 		if (pane.dataLibrary 	&& settings.dataLibrary) 	panes.push('DataLibrary');
 		if (pane.MediaLibrary 	&& settings.mediaLibrary) 	panes.push('MediaLibrary');
@@ -2744,6 +2772,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	_insertNewClientButton : function () {
+		
 		// create New Client button
 		var classname = 'smap-button-white new-client ct11 ct16 ct18';
 		var newClientButton = this._newClientButton = Wu.DomUtil.create('div', classname, this._clientsContainer, '+');
@@ -3045,12 +3074,20 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.description.type = 'description';
 
 		// create logo
-		this.logo = Wu.DomUtil.create('div', 'project-logo', this._container);
+		this.logoContainer = Wu.DomUtil.create('div', 'project-logo-container', this._container)
+		this.logo = Wu.DomUtil.create('img', 'project-logo', this.logoContainer);
 		this.logo.type = 'logo';
 
-		// create users
+		// Project info box (with little "i")
 		this.users = Wu.DomUtil.create('div', 'project-users-wrap', this._container);
-		this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this.users);
+
+
+		// ****************************************************************************
+		// ****************************************************************************
+
+
+		// this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this.users);
+		this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this._container);
 
 		// Project stats header
 		this.projectStatsHeader = Wu.DomUtil.create('div', 'project-stats', this.usersInnerWrapper);
@@ -3072,6 +3109,12 @@ Wu.SidePane.Project = Wu.Class.extend({
 			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');
 		}
 
+
+		// ****************************************************************************
+		// ****************************************************************************
+
+
+
 		// add hooks
 		this.addHooks();
 
@@ -3089,12 +3132,24 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.project 			= project || this.project;
 		this.name.innerHTML 		= this.project.store.name;
 		this.description.innerHTML 	= this.project.store.description;
-		this.logo.style.backgroundImage = "url('" + this.project.store.logo + "')";
+
+
+
+		if ( this.project.store.logo ) { 
+			var logoSliced = this.project.store.logo.slice(8); // remove "/images/" from string
+			var logoPath = '/pixels/fit/' + logoSliced + '?fitW=63&fitH=62';			
+		} else {
+			var logoPath = '/css/images/defaultProjectLogo.png'
+		}
+
+		this.logo.src = logoPath;
+
 		this.createdBy.innerHTML 	= '<div class="project-info-left">Created by:</div><div class="project-info-right">' + this.project.store.createdByName + "</div>";
 		this.lastUpdated.innerHTML 	= '<div class="project-info-left">Last updated:</div><div class="project-info-right">' + Wu.Util.prettyDate(this.project.store.lastUpdated) + "</div>";
 		this.createdDate.innerHTML 	= '<div class="project-info-left">Created time:</div><div class="project-info-right">' + Wu.Util.prettyDate(this.project.store.created) + "</div>";
 		this.usersInner.innerHTML       = '<div class="project-users-header">Project users:</div>' + this.project.getUsersHTML();
 	},
+
 
 	addHooks : function () {
 
@@ -3104,6 +3159,52 @@ Wu.SidePane.Project = Wu.Class.extend({
 	
 		// add edit hooks
 		if (this.project.editMode) this.addEditHooks();
+
+		// Toggle project info box
+		Wu.DomEvent.on(this.users, 'mousedown', this.toggleProjectInfo, this);
+		Wu.DomEvent.on(this.users, 'click mousedown', Wu.DomEvent.stopPropagation, this);
+		
+	},
+
+
+	toggleProjectInfo : function () {
+
+		// Get some heights
+		var parentHeight = this._parent._container.offsetHeight;
+		var projectInfoHeight = this.usersInnerWrapper.offsetHeight;		
+
+		if ( !this.project._menuItem._isOpen ) {
+
+			// Add open state to button
+			Wu.DomUtil.addClass(this.users, 'active-project-user-button');
+
+			// Set Project Height
+			this._container.style.height = projectInfoHeight + 130 + 'px';
+
+			// Set Client container height
+			this._parent._container.style.height = parentHeight + projectInfoHeight + 'px';
+
+			// Set open state
+			this.project._menuItem._isOpen = true;
+
+		} else {
+
+			// Remove open state to button
+			Wu.DomUtil.removeClass(this.users, 'active-project-user-button');
+
+			// Set Project Height
+			this._container.style.height = 111 + 'px';
+
+			// Set Client container height
+			this._parent._container.style.height = parentHeight - projectInfoHeight + 'px';
+
+			// Set open state			
+			this.project._menuItem._isOpen = false;
+
+		}
+
+
+
 	},
 
 	removeHooks : function () {
@@ -3191,7 +3292,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.project.setLogo(fullpath);
 
 		// update image 
-		this.logo.style.backgroundImage = "url('" + this.project.getLogo() + "')";
+		// this.logo.style.backgroundImage = "url('" + this.project.getLogo() + "')";
+		this.logo.src = this.project.getLogo();
+
 
 		// update header
 		app.HeaderPane.addedLogo(path);
@@ -3475,7 +3578,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 	initLayout : function () {
 
 		// create container
-		this._container = Wu.DomUtil.create('div', 'editor-clients-container ct0');
+		this._container = Wu.DomUtil.create('div', 'editor-clients-container');
 
 		// create title
 		this.title = Wu.DomUtil.create('div', 'client-title', this._container);
@@ -3484,7 +3587,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.description = Wu.DomUtil.create('div', 'client-description', this._container);
 
 		// create logo
-		this.logo = Wu.DomUtil.create('img', 'client-logo', this._container);
+		this.logoContainer = Wu.DomUtil.create('div', 'client-logo-container', this._container);
+		this.logo = Wu.DomUtil.create('img', 'client-logo', this.logoContainer);
+
 
 		// create projects container
 		this._projectsContainer = Wu.DomUtil.create('div', 'projects-container', this._container);
@@ -3517,7 +3622,13 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// update client meta
 		this.title.innerHTML 	    = this.client.getName();
 		this.description.innerHTML  = this.client.getDescription();
-		this.logo.setAttribute('src', this.client.getLogo());
+		
+		
+		if ( this.client.getLogo() ) var imageAttr = this.client.getLogo();			
+		else var imageAttr = '/css/images/defaultProjectLogo.png';
+		this.logo.src = imageAttr;
+
+		Wu.DomUtil.thumbAdjust(this.logo, 70);
 		
 		// insert client's projects
 		this.insertProjects();
@@ -3923,12 +4034,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._container.style.height = this.maxHeight + 'px';          
 		this._isOpen = true;
 
-		// Set overflow visible to not cut off info on hover on [i]
-		// var that = this;
-		// setTimeout(function() {
-		// 	that._container.style.overflow = 'visible';
-		// }, 500)
-
 		// close others
 		var clients = app.SidePane.Clients;
 		if (clients._lastOpened && clients._lastOpened != this) clients._lastOpened.close();
@@ -3936,13 +4041,31 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	close : function () {   				
+
 		this.calculateHeight();
 		this._container.style.height = this.minHeight + 'px';    
 		this._isOpen = false;
 
-		// Remove overflow visible to not cut off info on hover on [i]
-		// this._container.style.overflow = 'hidden';
-		
+
+		this.resetOpenProjectInfo();
+				
+	},
+
+	resetOpenProjectInfo : function () {
+
+		// Set open project info state to false
+		this.projects.forEach(function(project) {
+
+			// Remove active state from button
+			Wu.DomUtil.removeClass(project._menuItem.users, 'active-project-user-button');
+
+			// Remove height from project info container
+			project._menuItem._container.removeAttribute('style');
+
+			// Set open state to false
+			if ( project._menuItem._isOpen ) project._menuItem._isOpen = false;
+		})
+
 	},
 
 	removeProject : function (project) {
@@ -4609,46 +4732,55 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var projects = this._getProjectAccessSchema();
 		if (projects.length == 0) return;
 
-		// edit/manage delegation only for admins
-		var managerPriv = app.Account.isAdmin() || app.Account.isSuperadmin(); // only super/admins allowed to delegate MANAGER
-		var editorPriv = app.Account.isSuperadmin(); // only superadmins allowed to delegate EDITOR
+		
 
 		// add projects
 		projects.forEach(function (project) {
 			if (!project) return;
 
-			var readClass   = (user.canReadProject(project.getUuid()))   ? 'gotAccess' : '';
-			var editClass   = (user.canUpdateProject(project.getUuid())) ? 'gotAccess' : '';
-			var manageClass = (user.canManageProject(project.getUuid())) ? 'gotAccess' : '';
-			var titleText = project.getName() + ' (' + project.getClient().getName() + ')';
-
-			var wrap    = Wu.DomUtil.create('div', 'access-projects-wrap', 			wrapper);
-			var details = Wu.DomUtil.create('div', 'access-projects-details-wrap', 		wrap);
-			var title   = Wu.DomUtil.create('div', 'access-projects-title', 		details, 	titleText);
-			var desc    = Wu.DomUtil.create('div', 'access-projects-description', 		details, 	project.getDescription());
-			var read    = Wu.DomUtil.create('div', 'access-projects-read ' + readClass, 	wrap, 		'Read');
-			var edit, manage;
-
-			if (editorPriv)    edit = Wu.DomUtil.create('div', 'access-projects-write ' + editClass, 	wrap, 		'Edit');
-			if (managerPriv) manage = Wu.DomUtil.create('div', 'access-projects-manage ' + manageClass, wrap, 	'Manage');
+			this._createManageEntry(user, project, wrapper);
 			
-
-			var item = {
-				user    : user,
-				project : project,
-				read    : read,
-				edit    : edit,
-				manage  : manage
-			}
-
-			Wu.DomEvent.on(read, 'mousedown', function () { this.toggleReadAccess(item)}, this);
-			if (editorPriv) Wu.DomEvent.on(edit,    'mousedown', function () { this.toggleUpdateAccess(item)}, this);
-			if (managerPriv) Wu.DomEvent.on(manage, 'mousedown', function () { this.toggleManageAccess(item)}, this);
-
 		}, this)
 
 
 		return wrapper;
+	},
+
+	_createManageEntry : function (user, project, wrapper) {
+
+		// edit/manage delegation only for admins
+		var managerPriv = app.Account.isAdmin() || app.Account.isSuperadmin(), 
+		    editorPriv 	= app.Account.isSuperadmin(),
+		    pname 	= project.getName(),
+		    cli 	= project.getClient(),
+		    cname 	= cli ? cli.getName() : 'DELETED CLIENT!',
+		    readClass   = (user.canReadProject(project.getUuid()))   ? 'gotAccess' : '',
+		    editClass   = (user.canUpdateProject(project.getUuid())) ? 'gotAccess' : '',
+		    manageClass = (user.canManageProject(project.getUuid())) ? 'gotAccess' : '',
+		    titleText   = pname + ' (' + cname + ')';
+
+		var wrap    = Wu.DomUtil.create('div', 'access-projects-wrap', 			wrapper);
+		var details = Wu.DomUtil.create('div', 'access-projects-details-wrap', 		wrap);
+		var title   = Wu.DomUtil.create('div', 'access-projects-title', 		details, 	titleText);
+		var desc    = Wu.DomUtil.create('div', 'access-projects-description', 		details, 	project.getDescription());
+		var read    = Wu.DomUtil.create('div', 'access-projects-read ' + readClass, 	wrap, 		'Read');
+		var edit, manage;
+
+		if (editorPriv)    edit = Wu.DomUtil.create('div', 'access-projects-write ' + editClass, 	wrap, 		'Edit');
+		if (managerPriv) manage = Wu.DomUtil.create('div', 'access-projects-manage ' + manageClass, wrap, 	'Manage');
+		
+		var item = {
+			user    : user,
+			project : project,
+			read    : read,
+			edit    : edit,
+			manage  : manage
+		}
+
+		Wu.DomEvent.on(read, 'mousedown', function () { this.toggleReadAccess(item)}, this);
+		if (editorPriv) Wu.DomEvent.on(edit,    'mousedown', function () { this.toggleUpdateAccess(item)}, this);
+		if (managerPriv) Wu.DomEvent.on(manage, 'mousedown', function () { this.toggleManageAccess(item)}, this);
+
 	},
 
 	toggleReadAccess : function (item) {
@@ -4658,12 +4790,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// get current state
 		var state = (user.store.role.reader.projects.indexOf(item.project.getUuid()) >= 0) ? true : false;
-
-		// if (state) {
-		// 	this._removeRead(item);
-		// } else {
-		// 	this._addRead(item);
-		// }
 
 		// add/remove
 		state ? this._removeRead(item) : this._addRead(item);
@@ -4702,10 +4828,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// add read access too
 		this._addRead(item);
 
-		// if (!item.user.canReadProject(item.project.getUuid())) {
-			// Wu.DomUtil.addClass(item.read, 'gotAccess');
-			// setTimeout(function () { item.user.addReadProject(item.project); }, 300); // todo: mongodb lock bug
-		// }
 	},
 
 	_removeManage : function (item) {
@@ -4722,11 +4844,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// add read 
 		this._addRead(item);
 
-		// // add read access too
-		// if (!item.user.canReadProject(item.project.getUuid())) {
-		// 	Wu.DomUtil.addClass(item.read, 'gotAccess');
-		// 	setTimeout(function () { item.user.addReadProject(item.project); }, 300);
-		// }
 	},
 
 
@@ -6514,16 +6631,11 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 	addOSMLayer : function () {
 
-		// console.log('add osm layer', this.project);
-
 		// create layer
 		this.project.createOSMLayer(function (err, layer) {
 
-			// console.log('mapsetting callback! this', this, err, layer);
-
 			// add to baselayer, layermenu
 			this._updateLayerOptions();
-
 
 		}.bind(this));
 
@@ -9058,7 +9170,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// wrapper for header
 		// this._contentWrap = Wu.DomUtil.create('div', 'header-content-wrap', this._container);
-		this._logoWrap  = Wu.DomUtil.create('div', 'header-logo', this._container);
+		this._logoContainer = Wu.DomUtil.create('div', 'header-logo-container', this._container);
+		this._logo  = Wu.DomUtil.create('img', 'header-logo', this._logoContainer);
+
 		this._titleWrap = Wu.DomUtil.create('div', 'header-title-wrap', this._container);
 		this._title 	= Wu.DomUtil.create('div', 'header-title editable', this._titleWrap);
 		this._subtitle 	= Wu.DomUtil.create('div', 'header-subtitle editable', this._titleWrap);
@@ -9068,10 +9182,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._subtitle.whichTitle = 'subtitle';
 
 		// tooltips
-		app.Tooltip.add(this._logoWrap, 'Click to upload a new logo');
+		app.Tooltip.add(this._logo, 'Click to upload a new logo');
 
 		// stops
-		Wu.DomEvent.on(this._logoWrap, 'mouseover', Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._logo, 'mouseover', Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent.on(this._title, 'mouseover', Wu.DomEvent.stopPropagation, this);
 
 	},
@@ -9103,7 +9217,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		}
 
 		// set editable class to logo
-		Wu.DomUtil.addClass(this._logoWrap, 'editable');
+		Wu.DomUtil.addClass(this._logo, 'editable');
 	},
 
 	removeEditHooks : function () {
@@ -9119,13 +9233,13 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		if (this.logodz) this.logodz.disable();
 
 		// remove editable class to logo
-		Wu.DomUtil.removeClass(this._logoWrap, 'editable');
+		Wu.DomUtil.removeClass(this._logo, 'editable');
 	},
 
 	addDropzone : function () {
 
 		// create dz
-		this.logodz = new Dropzone(this._logoWrap, {
+		this.logodz = new Dropzone(this._logo, {
 				url : '/api/upload/image',
 				createImageThumbnails : false,
 				autoDiscover : false
@@ -9149,7 +9263,20 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.project.setHeaderLogo(fullpath);
 
 		// update image in header
-		this._logoWrap.style.backgroundImage = this.project.getHeaderLogoBg();
+		// this._logoWrap.style.backgroundImage = this.project.getHeaderLogoBg();
+
+		// cxxx
+		if ( project.getHeaderLogo() == '/css/images/defaultProjectLogo.png' ) { 
+			headerLogoPath = '/css/images/defaultProjectLogo.png'
+		} else {
+			var headerLogoSliced = project.getHeaderLogo().slice(8); // remove "/images/" from string
+			var headerLogoPath = '/pixels/fit/' + headerLogoSliced + '?fitW=90&fitH=71';
+		}
+
+		this._logo.src = headerLogoPath;
+
+		Wu.DomUtil.thumbAdjust(this._logo, 90);
+
 
 	},
 
@@ -9244,11 +9371,24 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	        // show header
 		this._container.style.display = 'block';
 
+		
+		// cxxx
+		if ( project.getHeaderLogo() == '/css/images/defaultProjectLogo.png' ) { 
+			headerLogoPath = '/css/images/defaultProjectLogo.png'
+		} else {
+			var headerLogoSliced = project.getHeaderLogo().slice(8); // remove "/images/" from string
+			var headerLogoPath = '/pixels/fit/' + headerLogoSliced + '?fitW=90&fitH=71';
+		}
+
+
+
 		// update values
-		this._logoWrap.style.backgroundImage = project.getHeaderLogoBg();
+		this._logo.src = headerLogoPath;
 		this._title.innerHTML 	 = project.getHeaderTitle();
 		this._subtitle.innerHTML = project.getHeaderSubtitle();
 
+		// Wu.DomUtil.thumbAdjust(this._logo, 90);
+		
 		// add edit hooks
 		if (project.editMode) {
 			this.addEditHooks();
@@ -9328,7 +9468,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.project.store.header.height 	= this._headerHeight;
 		this.project.store.header.title 	= this._title.innerHTML;
 		this.project.store.header.subtitle 	= this._subtitle.innerHTML;
-		var img = this._logoWrap.style.backgroundImage.slice(4).slice(0,-1);
+		var img = this._logo.src.slice(4).slice(0,-1);
 		this.project.store.header.logo 		= img;     	
 
 
@@ -9571,7 +9711,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		}
 
 		// create new map
-		this._map = Wu.app._map = L.map('map', options).setView([0, 0], 5);
+		this._map = Wu.app._map = L.map('map', options).setView([0, 0], 6); // todo
 
 		// add editable layer
 		this.addEditableLayer(this._map);
@@ -9960,7 +10100,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	enableCartocss : function () {
 		if (this.cartoCss) return;
 
-		// dont allow for editors
+		// dont allow for non-editors
 		if (!this._isEditor) return;
 
 		// create control
@@ -9972,7 +10112,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.cartoCss.addTo(this._map);
 
 		// update with latest
-		this.cartoCss.update();
+		if (app.activeProject) this.cartoCss.update();
 
 		return this.cartoCss;
 	},
@@ -13093,24 +13233,39 @@ L.Control.MousePosition = L.Control.extend({
                 numDigits: 5,
                 lngFormatter: undefined,
                 latFormatter: undefined,
-                prefix: ""
+                prefix: "",
+                zoomLevel : true
         },
 
         onAdd: function (map) {
+                this._map = map;
+
                 this._container = L.DomUtil.create('div', 'leaflet-control-mouseposition');
                 this._container.innerHTML = this.options.emptyString;
                 
                 L.DomEvent.disableClickPropagation(this._container);
+              
                 map.on('mousemove', this._onMouseMove, this);
-                
+               
+                if (this.options.zoomLevel) {
+                        map.on('zoomend', this._updateZoom, this);
+                        this._updateZoom();
+                }                
+
                 // add tooltip
                 app.Tooltip.add(this._container, 'Gives the coordinates of the mouse pointer', { extends : 'systyle', tipJoint : 'bottom middle'});
 
                 return this._container;
         },
 
+        _updateZoom : function () {
+                this._zoom = this._map.getZoom();
+        },
+
         onRemove: function (map) {
                 map.off('mousemove', this._onMouseMove, this);
+               
+                if (this.options.zoomLevel) map.off('zoomend', this._updateZoom, this);
         },
 
         _onMouseMove: function (e) {
@@ -13118,6 +13273,7 @@ L.Control.MousePosition = L.Control.extend({
                 var lat = this.options.latFormatter ? this.options.latFormatter(e.latlng.lat) : L.Util.formatNum(e.latlng.lat, this.options.numDigits);
                 var value = this.options.lngFirst ? lng + this.options.separator + lat : lat + this.options.separator + lng;
                 var prefixAndValue = this.options.prefix + ' ' + value;
+                if (this.options.zoomLevel) prefixAndValue += ' | ' + this._zoom;
                 this._container.innerHTML = prefixAndValue;
         }
 
@@ -13354,8 +13510,6 @@ L.control.baselayerToggle = function (options) {
 	createOSMLayer : function (callback) {
 
 		var title = this._getOSMLayerTitle();
-
-		console.log('title!! osm ', title);
 
 		var options = JSON.stringify({
 			projectUuid : this.getUuid(),
@@ -13801,7 +13955,13 @@ L.control.baselayerToggle = function (options) {
 		var all = this.getActiveLayers();
 		var cartoLayers = _.filter(all, function (l) {
 
-			if (l) return l.store.data.hasOwnProperty('geojson');
+			if (l) {
+				if (l.store.data.hasOwnProperty('geojson')) return true;
+				if (l.store.data.hasOwnProperty('osm')) return true;
+
+			} else {
+				return false;
+			}
 		});
 		return cartoLayers;
 	},
@@ -13962,7 +14122,8 @@ L.control.baselayerToggle = function (options) {
 
 	getHeaderLogo : function () {
 		var logo = this.store.header.logo;
-		if (!logo) logo = this.store.logo;
+		// if (!logo) logo = this.store.logo;
+		if (!logo) logo = '/css/images/defaultProjectLogo.png';
 		return logo;
 	},
 
@@ -14788,45 +14949,43 @@ L.control.baselayerToggle = function (options) {
 
 	// CRUD
 	canCreateProject : function () {
-		if (this.store.role.superadmin) return true;
-		if (this.store.role.admin)      return true;
+		var user = this.store;
+		if (user.role.superadmin) return true;
+		if (user.role.admin)      return true;
 		return false;
 	},
 
 	canReadProject : function (projectUuid) {
-		// var user = this.store;
-		// if (user.role.superadmin) return true;
+		var user = this.store;
+		if (user.role.superadmin) return true;
 		// if (user.role.admin)      return true;
 		// if (user.role.manager.projects.indexOf(projectUuid) >= 0) return true; // managers can create readers for own projects
 		// if (user.role.editor.projects.indexOf(projectUuid)  >= 0) return true; // managers can create readers for own projects
 		
-		if (this.store.role.reader.projects.indexOf(projectUuid)  >= 0) return true;
+		if (user.role.reader.projects.indexOf(projectUuid)  >= 0) return true;
 		return false;
 	},
 
 	canUpdateProject : function (projectUuid) {
-		// console.log('checking if user ' + this.store.lastName + ' can update project : ' + projectUuid);
-		// var user = this.store;
-		// if (user.role.superadmin) return true;
-		// if (user.role.admin)      return true;
-
-
-		if (this.store.role.editor.projects.indexOf(projectUuid) >= 0) return true; // managers can create readers for own projects
+		var user = this.store;
+		if (user.role.superadmin) return true;
+		if (user.role.editor.projects.indexOf(projectUuid) >= 0) return true; // managers can create readers for own projects
 		return false;
 	},
 
 	canDeleteProject : function (projectUuid) {
-		var editor = (this.store.role.editor.projects.indexOf(projectUuid) >= 0) ? true : false;
-		if (this.store.role.superadmin && editor) return true;
-		if (this.store.role.admin && editor)      return true;
+		var user = this.store;
+		var editor = (user.role.editor.projects.indexOf(projectUuid) >= 0) ? true : false;
+		if (user.role.superadmin && editor) return true;
+		if (user.role.admin && editor)      return true;
 		return false;
 	},
 
 	canManageProject : function (projectUuid) {
-		// var user = this.store;
-		// if (user.role.superadmin) return true;
+		var user = this.store;
+		if (user.role.superadmin) return true;
 		// if (user.role.admin)      return true;
-		if (this.store.role.manager.projects.indexOf(projectUuid) >= 0) return true;
+		if (user.role.manager.projects.indexOf(projectUuid) >= 0) return true;
 		return false;
 	},
 
@@ -14838,19 +14997,19 @@ L.control.baselayerToggle = function (options) {
 	},
 	
 	canReadClient : function (uuid) {
-		// var user = this.store;
-		// if (user.role.superadmin) return true;
+		var user = this.store;
+		if (user.role.superadmin) return true;
 		// if (user.role.admin)      return true;
 		// if (user.role.manager.clients.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
 		// if (user.role.editor.clients.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
-		if (this.store.role.reader.clients.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
+		if (user.role.reader.clients.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
 		return false;
 	},
 
 	canUpdateClient : function (uuid) {
 		// var user = this.store;
 
-		// if (user.role.superadmin) return true;
+		if (user.role.superadmin) return true;
 		// if (user.role.admin)      return true;
 		if (this.store.role.editor.clients.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
 		return false;
@@ -15166,6 +15325,7 @@ L.control.baselayerToggle = function (options) {
 		}
 
 		// get cartocss from server
+		console.log('POST /api/layers/cartocss/get', json);
 		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
 	},
 
@@ -15338,12 +15498,6 @@ L.control.baselayerToggle = function (options) {
 
 
 
-
-
-
-
-
-
 Wu.RasterLayer = Wu.Layer.extend({
 
 	type : 'rasterLayer',
@@ -15365,6 +15519,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		if (this.layer) this.remove();
 
 		this._fileUuid = this.store.file;
+		this._defaultCartoid = 'cartoid';
 
 		// prepare raster
 		this._prepareRaster();
@@ -15378,8 +15533,9 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		
 		// set ids
 		var fileUuid 	= this._fileUuid,	// file id of geojson
-		    cartoid 	= this.store.data.cartoid || 'cartoid',
-		    tileServer 	= app.options.servers.tiles,
+		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
+		    tileServer 	= app.options.servers.tiles.uri,
+		    subdomains  = app.options.servers.tiles.subdomains,
 		    token 	= app.accessToken,
 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
@@ -15387,11 +15543,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		this.layer = L.tileLayer(url, {
 			fileUuid: this._fileUuid,
 			cartoid : cartoid,
-			subdomains : 'abcd',
-			// maxRequests : 8,
+			subdomains : subdomains,
 			maxRequests : 0,
-			// reuseTiles : true,
-			// unloadInvisibleTiles : true
 		});
 	},
 
@@ -15400,7 +15553,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		// set ids
 		var fileUuid 	= this._fileUuid,	// file id of geojson
 		    cartoid 	= this.store.data.cartoid || 'cartoid',
-		    gridServer 	= app.options.servers.utfgrid,
+		    gridServer 	= app.options.servers.utfgrid.uri,
+		    subdomains  = app.options.servers.utfgrid.subdomains,
 		    token 	= app.accessToken,
 		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
 		
@@ -15408,6 +15562,7 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		// this.gridLayer = new L.UtfGrid(url, {
 		// 	useJsonP: false,
 		// 	subdomains: 'ijk',
+		// 	subdomains: subdomains
 		// 	// subdomains: 'ghi',
 		// 	maxRequests : 10,
 		// 	requestTimeout : 20000
@@ -15452,6 +15607,7 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 
 		// id of data 
 		this._fileUuid = 'osm';
+		this._defaultCartoid = 'cartoidosm';
 
 		// prepare raster
 		this._prepareRaster();
@@ -15459,11 +15615,60 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		// prepare utfgrid
 		this._prepareGrid();
 		
-	}
+	},
+
+	_prepareRaster : function () {
+		
+		// set ids
+		var fileUuid 	= this._fileUuid,	// file id of geojson
+		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
+		    tileServer 	= app.options.servers.osm.uri,
+		    subdomains  = app.options.servers.osm.subdomains,
+		    token 	= app.accessToken,
+		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
+
+		// add vector tile raster layer
+		this.layer = L.tileLayer(url, {
+			fileUuid: this._fileUuid,
+			cartoid : cartoid,
+			subdomains : subdomains,
+			maxRequests : 0,
+		});
+	},
+
+	_prepareGrid : function () {
+
+		// set ids
+		var fileUuid 	= this._fileUuid,	// file id of geojson
+		    cartoid 	= this.store.data.cartoid || 'cartoid',
+		    gridServer 	= app.options.servers.osm.uri,
+		    subdomains  = app.options.servers.osm.subdomains,
+		    token 	= app.accessToken,
+		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
+		
+		// create gridlayer
+		// this.gridLayer = new L.UtfGrid(url, {
+		// 	useJsonP: false,
+		// 	subdomains: subdomains,
+		// 	// subdomains: 'ijk',
+		// 	// subdomains: 'ghi',
+		// 	maxRequests : 10,
+		// 	requestTimeout : 20000
+		// });
+
+		// debug
+		this.gridLayer = false;
+
+		// add grid events
+		this._addGridEvents();
+
+	},
+
+	getFileUuid : function () {
+		return 'osm';
+	},
 
 });
-
-
 
 
 Wu.MapboxLayer = Wu.Layer.extend({
@@ -19739,9 +19944,27 @@ Wu.App = Wu.Class.extend({
 
 		servers : {
 
+			// portal SX
 			portal   : 'https://projects.ruppellsgriffon.com/',	// api
-			tiles    : 'https://{s}.systemapic.com/tiles/', 	// tiles
-			utfgrid  : 'https://{s}.systemapic.com/utfgrid/' 	// utfgrids
+
+			// tiles SX
+			tiles : {
+				uri : 'https://{s}.systemapic.com/tiles/',
+				subdomains : 'abcd' // sx
+			},
+
+			// utfgrid SX
+			utfgrid : {
+				uri : 'https://{s}.systemapic.com/utfgrid/',
+				subdomains : 'abcd' // sx
+			},
+
+			// osm PX
+			osm : {
+				uri : 'https://{s}.systemapic.com/r/',
+				subdomains : 'mnop' // px
+			}
+
 
 		},
 
@@ -20348,7 +20571,7 @@ Wu.App = Wu.Class.extend({
 		});
 
 		// add map click event
-		app._map.on('mousedown', function (e) {
+		if (app._map) app._map.on('mousedown', function (e) {
 
 			var lat = e.latlng.lat,
 			    lng = e.latlng.lng,

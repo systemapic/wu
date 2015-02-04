@@ -35,6 +35,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	_insertNewClientButton : function () {
+		
 		// create New Client button
 		var classname = 'smap-button-white new-client ct11 ct16 ct18';
 		var newClientButton = this._newClientButton = Wu.DomUtil.create('div', classname, this._clientsContainer, '+');

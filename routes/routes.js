@@ -28,7 +28,7 @@ var pixels = require('../api/pixels');
 var upload = require('../api/upload');
 
 // global paths
-var IMAGEFOLDER = '/var/www/data/images/';
+var IMAGEFOLDER = '/data/images/';
 
 
 
@@ -205,12 +205,37 @@ module.exports = function(app, passport) {
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	// serve static files like images
+	app.get('/pixels/fit/*', isLoggedIn, function (req,res) {
+		console.log('/pixels/fit/*');
+
+		pixels.serveFitPixelPerfection(req, res);
+
+	});
+
+	// =====================================
+	// SERVE STATIC FILES SECURELY  ========
+	// =====================================
+	// serve static files like images
+	app.get('/pixels/image/*', isLoggedIn, function (req,res) {
+		console.log('/pixels');
+
+		pixels.serveImagePixelPerfection(req, res);
+
+	});
+
+	// =====================================
+	// SERVE STATIC FILES SECURELY  ========
+	// =====================================
+	// serve static files like images
 	app.get('/pixels/*', isLoggedIn, function (req,res) {
 		console.log('/pixels');
 
 		pixels.servePixelPerfection(req, res);
 
 	});
+
+
+
 
 
 
@@ -295,14 +320,6 @@ module.exports = function(app, passport) {
 		upload.upload(req, res);
 		
 	});
-
-
-
-
-
-
-
-
 
 
 

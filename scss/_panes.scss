@@ -260,7 +260,7 @@
 
 .client-title {
 	padding: 5px;
-	text-transform: uppercase;
+	/*text-transform: uppercase;*/
 	font-size: 17px;
 	font-weight: 400;
 	color: #333;	
@@ -272,7 +272,7 @@
 	padding: 0;
 	width: 150px;
 	background: transparent;
-	text-transform: uppercase;
+	/*text-transform: uppercase;*/
 	font-size: 17px;
 	font-weight: 400;
 
@@ -295,13 +295,18 @@
 	background: transparent;
 	}	
 
-.client-logo {
+.client-logo-container {
 	position: absolute;
-	width: 75px;
+	width: 70px;
 	height: 70px;
 	top: 5px;
-	right: 5px;	
-	box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.5);
+	right: 5px;
+	overflow: hidden;	
+	}
+
+.client-logo {
+	position: relative;
+	/*box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.5);*/
 	}
 
 .client-logo.editable:hover {
@@ -370,6 +375,7 @@
 	position: relative;
 	color: #333;
 	height: 111px;
+	overflow: hidden;
 	}
 
 .project-item:hover {
@@ -387,7 +393,7 @@
 	font-size: 110%;
 	text-shadow: none;
 	font-weight: 500;
-	text-transform: uppercase;
+	/*text-transform: uppercase;*/
 	line-height: 1;
 	overflow: hidden;
 	max-height: 30px;
@@ -406,7 +412,7 @@
 	font-size: 100%;
 	text-shadow: none;
 	font-weight: 500;
-	text-transform: uppercase;
+	/*text-transform: uppercase;*/
 	line-height: 0.9;
 	padding: 0;
 	background-color: transparent;
@@ -438,18 +444,21 @@
 	width: 189px;
 	}	
 
-.project-logo {
+
+.project-logo-container {
 	position: absolute;
 	background-repeat: no-repeat;
-	background-size: 100% 100%;
-	background-position: center;
-	background-color: white;
-	box-shadow: 0 0 2px 0px rgba(0,0,0,0.5);	
-	width: 69px;
+	width: 62px;
 	height: 62px;
-	/*right: 9px;*/
 	right: 5px;
 	top: 44px;
+	overflow: hidden;
+	}
+
+.project-logo {
+	position: relative;
+	/*width: 100%;*/
+	/*height: 100%;*/
 	}
 
 .project-logo.editable:hover {
@@ -486,30 +495,54 @@
 	opacity: 1;
 	}
 
-.project-users-wrap:hover > .project-users-inner-wrapper {
-	display: block;
+
+
+.active-project-user-button {
+	display: block !important;
+	opacity: 1 !important;
 	}
+
 
 /* Project info tooltip */
 .project-users-inner-wrapper {
 	width: 220px;
-	position: absolute;
-	top: 29px;
-	right: -11px;
-	background: white;
-	display: none;
-	border-radius: 3px;
-	box-shadow: 0 0 5px 0 rgba(0,0,0,0.7);
+	/*position: absolute;*/
+	/*top: 29px;*/
+	/*right: -11px;*/
+	/*background: white;*/
+	/*display: none;*/
+	/*border-radius: 3px;*/
+	/*box-shadow: 0 0 5px 0 rgba(0,0,0,0.7);*/
 	padding: 10px;
-	margin-bottom: 10px;
+	/*margin-bottom: 10px;*/
+
+	/* ••••••• */
+	padding-top: 20px;
+	position: relative;
+	top: 82px;
+	width: 210px;
+	/* ••••••• */
+
 	}
 
-.project-users-inner-wrapper:hover {
-	display: block;
-	}
+.project-users-inner-wrapper:before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 12px;
+	width: 100%;
+	border-top: 1px solid rgba(255,255,255,0.3);
+	-webkit-transform: rotate(0deg);
+	-moz-transform: rotate(0deg);
+	-o-transform: rotate(0deg);
+	-ms-transform: rotate(0deg);
+	transform: rotate(0deg);
+	}	
+
+
 
 /* Project tooltip arrow */
-.project-users-inner-wrapper:before {	
+/*.project-users-inner-wrapper:before {	
 	content: '';
 	width: 15px;
 	height: 15px;
@@ -517,7 +550,7 @@
 	top: -7px;
 	right: 12px;
 	background-color: white;
-	}
+	}*/
 
 /* Pseudo element to keep tooltip alive on hover */
 .project-users-inner-wrapper:after {
@@ -563,7 +596,7 @@
 .project-lastupdated,
 .update-header,
 .project-createddate {
-	color: #666;
+	/*color: #666;*/
 	font-size: 11px;
 	font-weight: 500;
 	height: 16px;

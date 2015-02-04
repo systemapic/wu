@@ -1,8 +1,4 @@
 // routes/api.js 
-//
-// deals with portal, database
-//
-//
 
 // database schemas
 var Project 	= require('../models/project');
@@ -31,12 +27,10 @@ var request 	= require('request');
 var mime 	= require("mime");
 var formidable  = require('formidable');
 
-
 // mapnik
 var mapnik = require('mapnik');
 var carto = require('carto');
 var mapnikOmnivore = require('mapnik-omnivore');
-
 
 // redis
 var config = require('../config/config.js');
@@ -47,8 +41,6 @@ redisStore.on('error', function (err) {
 	console.error(err);
 });
 
-
-
 // superusers
 var superusers = [
 	'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', 	// KO
@@ -58,25 +50,20 @@ var superusers = [
 	'user-b76a8d27-6db6-46e0-8fc3-d022e6ff084f'	// phantomJS
 ]
 
-
-
 // global paths
-var FILEFOLDER 		= '/var/www/data/files/';
-var IMAGEFOLDER 	= '/var/www/data/images/';
-var TEMPFOLDER 		= '/var/www/data/tmp/';
-var CARTOCSSFOLDER 	= '/var/www/data/cartocss/';
-var TOOLSPATH 		= '/var/www/systemapic.com/app/tools/';
+var FILEFOLDER 		= '/data/files/';
+var IMAGEFOLDER 	= '/data/images/';
+var TEMPFOLDER 		= '/data/tmp/';
+var CARTOCSSFOLDER 	= '/data/cartocss/';
+var TOOLSPATH 		= '../tools/';
 var BASEURI 		= 'https://projects.ruppellsgriffon.com/';
-
+var VILEHOST		= 'http://85.10.202.87:3003/';
 
 // default mapbox account
 var DEFAULTMAPBOX = {
 	username : 'systemapic',
 	accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJQMWFRWUZnIn0.yrBvMg13AZC9lyOAAf9rGg'
 }
-
-
-
 
 
 // function exports
@@ -148,10 +135,6 @@ module.exports = api = {
 			});
 		});
 	},
-
-
-
-
 
 
 	reloadMeta : function (req, res) {
@@ -802,7 +785,8 @@ module.exports = api = {
 			// send to tileserver storage
 			request({
 				method : 'POST',
-				uri : 'https://import.systemapic.com/import/cartocss',
+				// uri : 'https://import.systemapic.com/import/cartocss',
+				uri : VILEHOST + 'import/cartocss',
 				json : {
 					css : css,
 					cartoid : cartoid,
@@ -1727,10 +1711,10 @@ module.exports = api = {
 	// #########################################
 	deleteProject : function (req, res) {
 
-		var user        = req.user;
-		var userUuid 	= req.user.uuid;
-		var clientUuid 	= req.body.clientUuid;
-		var projectUuid = req.body.projectUuid;
+		var user        = req.user,
+		    userUuid 	= req.user.uuid,
+		    clientUuid 	= req.body.clientUuid,
+		    projectUuid = req.body.projectUuid;
 
 		// find project (async)
 		var model = Project.findOne({ uuid : projectUuid });

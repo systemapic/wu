@@ -22,7 +22,9 @@ Wu.HeaderPane = Wu.Class.extend({
 
 		// wrapper for header
 		// this._contentWrap = Wu.DomUtil.create('div', 'header-content-wrap', this._container);
-		this._logoWrap  = Wu.DomUtil.create('div', 'header-logo', this._container);
+		this._logoContainer = Wu.DomUtil.create('div', 'header-logo-container', this._container);
+		this._logo  = Wu.DomUtil.create('img', 'header-logo', this._logoContainer);
+
 		this._titleWrap = Wu.DomUtil.create('div', 'header-title-wrap', this._container);
 		this._title 	= Wu.DomUtil.create('div', 'header-title editable', this._titleWrap);
 		this._subtitle 	= Wu.DomUtil.create('div', 'header-subtitle editable', this._titleWrap);
@@ -32,10 +34,10 @@ Wu.HeaderPane = Wu.Class.extend({
 		this._subtitle.whichTitle = 'subtitle';
 
 		// tooltips
-		app.Tooltip.add(this._logoWrap, 'Click to upload a new logo');
+		app.Tooltip.add(this._logo, 'Click to upload a new logo');
 
 		// stops
-		Wu.DomEvent.on(this._logoWrap, 'mouseover', Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._logo, 'mouseover', Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent.on(this._title, 'mouseover', Wu.DomEvent.stopPropagation, this);
 
 	},
@@ -67,7 +69,7 @@ Wu.HeaderPane = Wu.Class.extend({
 		}
 
 		// set editable class to logo
-		Wu.DomUtil.addClass(this._logoWrap, 'editable');
+		Wu.DomUtil.addClass(this._logo, 'editable');
 	},
 
 	removeEditHooks : function () {
@@ -83,13 +85,13 @@ Wu.HeaderPane = Wu.Class.extend({
 		if (this.logodz) this.logodz.disable();
 
 		// remove editable class to logo
-		Wu.DomUtil.removeClass(this._logoWrap, 'editable');
+		Wu.DomUtil.removeClass(this._logo, 'editable');
 	},
 
 	addDropzone : function () {
 
 		// create dz
-		this.logodz = new Dropzone(this._logoWrap, {
+		this.logodz = new Dropzone(this._logo, {
 				url : '/api/upload/image',
 				createImageThumbnails : false,
 				autoDiscover : false
@@ -113,7 +115,20 @@ Wu.HeaderPane = Wu.Class.extend({
 		this.project.setHeaderLogo(fullpath);
 
 		// update image in header
-		this._logoWrap.style.backgroundImage = this.project.getHeaderLogoBg();
+		// this._logoWrap.style.backgroundImage = this.project.getHeaderLogoBg();
+
+		// cxxx
+		if ( project.getHeaderLogo() == '/css/images/defaultProjectLogo.png' ) { 
+			headerLogoPath = '/css/images/defaultProjectLogo.png'
+		} else {
+			var headerLogoSliced = project.getHeaderLogo().slice(8); // remove "/images/" from string
+			var headerLogoPath = '/pixels/fit/' + headerLogoSliced + '?fitW=90&fitH=71';
+		}
+
+		this._logo.src = headerLogoPath;
+
+		Wu.DomUtil.thumbAdjust(this._logo, 90);
+
 
 	},
 
@@ -208,11 +223,24 @@ Wu.HeaderPane = Wu.Class.extend({
 	        // show header
 		this._container.style.display = 'block';
 
+		
+		// cxxx
+		if ( project.getHeaderLogo() == '/css/images/defaultProjectLogo.png' ) { 
+			headerLogoPath = '/css/images/defaultProjectLogo.png'
+		} else {
+			var headerLogoSliced = project.getHeaderLogo().slice(8); // remove "/images/" from string
+			var headerLogoPath = '/pixels/fit/' + headerLogoSliced + '?fitW=90&fitH=71';
+		}
+
+
+
 		// update values
-		this._logoWrap.style.backgroundImage = project.getHeaderLogoBg();
+		this._logo.src = headerLogoPath;
 		this._title.innerHTML 	 = project.getHeaderTitle();
 		this._subtitle.innerHTML = project.getHeaderSubtitle();
 
+		// Wu.DomUtil.thumbAdjust(this._logo, 90);
+		
 		// add edit hooks
 		if (project.editMode) {
 			this.addEditHooks();
@@ -292,7 +320,7 @@ Wu.HeaderPane = Wu.Class.extend({
 		this.project.store.header.height 	= this._headerHeight;
 		this.project.store.header.title 	= this._title.innerHTML;
 		this.project.store.header.subtitle 	= this._subtitle.innerHTML;
-		var img = this._logoWrap.style.backgroundImage.slice(4).slice(0,-1);
+		var img = this._logo.src.slice(4).slice(0,-1);
 		this.project.store.header.logo 		= img;     	
 
 

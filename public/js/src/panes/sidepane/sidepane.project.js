@@ -41,12 +41,20 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.description.type = 'description';
 
 		// create logo
-		this.logo = Wu.DomUtil.create('div', 'project-logo', this._container);
+		this.logoContainer = Wu.DomUtil.create('div', 'project-logo-container', this._container)
+		this.logo = Wu.DomUtil.create('img', 'project-logo', this.logoContainer);
 		this.logo.type = 'logo';
 
-		// create users
+		// Project info box (with little "i")
 		this.users = Wu.DomUtil.create('div', 'project-users-wrap', this._container);
-		this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this.users);
+
+
+		// ****************************************************************************
+		// ****************************************************************************
+
+
+		// this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this.users);
+		this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this._container);
 
 		// Project stats header
 		this.projectStatsHeader = Wu.DomUtil.create('div', 'project-stats', this.usersInnerWrapper);
@@ -68,6 +76,12 @@ Wu.SidePane.Project = Wu.Class.extend({
 			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');
 		}
 
+
+		// ****************************************************************************
+		// ****************************************************************************
+
+
+
 		// add hooks
 		this.addHooks();
 
@@ -85,12 +99,24 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.project 			= project || this.project;
 		this.name.innerHTML 		= this.project.store.name;
 		this.description.innerHTML 	= this.project.store.description;
-		this.logo.style.backgroundImage = "url('" + this.project.store.logo + "')";
+
+
+
+		if ( this.project.store.logo ) { 
+			var logoSliced = this.project.store.logo.slice(8); // remove "/images/" from string
+			var logoPath = '/pixels/fit/' + logoSliced + '?fitW=63&fitH=62';			
+		} else {
+			var logoPath = '/css/images/defaultProjectLogo.png'
+		}
+
+		this.logo.src = logoPath;
+
 		this.createdBy.innerHTML 	= '<div class="project-info-left">Created by:</div><div class="project-info-right">' + this.project.store.createdByName + "</div>";
 		this.lastUpdated.innerHTML 	= '<div class="project-info-left">Last updated:</div><div class="project-info-right">' + Wu.Util.prettyDate(this.project.store.lastUpdated) + "</div>";
 		this.createdDate.innerHTML 	= '<div class="project-info-left">Created time:</div><div class="project-info-right">' + Wu.Util.prettyDate(this.project.store.created) + "</div>";
 		this.usersInner.innerHTML       = '<div class="project-users-header">Project users:</div>' + this.project.getUsersHTML();
 	},
+
 
 	addHooks : function () {
 
@@ -100,6 +126,52 @@ Wu.SidePane.Project = Wu.Class.extend({
 	
 		// add edit hooks
 		if (this.project.editMode) this.addEditHooks();
+
+		// Toggle project info box
+		Wu.DomEvent.on(this.users, 'mousedown', this.toggleProjectInfo, this);
+		Wu.DomEvent.on(this.users, 'click mousedown', Wu.DomEvent.stopPropagation, this);
+		
+	},
+
+
+	toggleProjectInfo : function () {
+
+		// Get some heights
+		var parentHeight = this._parent._container.offsetHeight;
+		var projectInfoHeight = this.usersInnerWrapper.offsetHeight;		
+
+		if ( !this.project._menuItem._isOpen ) {
+
+			// Add open state to button
+			Wu.DomUtil.addClass(this.users, 'active-project-user-button');
+
+			// Set Project Height
+			this._container.style.height = projectInfoHeight + 130 + 'px';
+
+			// Set Client container height
+			this._parent._container.style.height = parentHeight + projectInfoHeight + 'px';
+
+			// Set open state
+			this.project._menuItem._isOpen = true;
+
+		} else {
+
+			// Remove open state to button
+			Wu.DomUtil.removeClass(this.users, 'active-project-user-button');
+
+			// Set Project Height
+			this._container.style.height = 111 + 'px';
+
+			// Set Client container height
+			this._parent._container.style.height = parentHeight - projectInfoHeight + 'px';
+
+			// Set open state			
+			this.project._menuItem._isOpen = false;
+
+		}
+
+
+
 	},
 
 	removeHooks : function () {
@@ -187,7 +259,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.project.setLogo(fullpath);
 
 		// update image 
-		this.logo.style.backgroundImage = "url('" + this.project.getLogo() + "')";
+		// this.logo.style.backgroundImage = "url('" + this.project.getLogo() + "')";
+		this.logo.src = this.project.getLogo();
+
 
 		// update header
 		app.HeaderPane.addedLogo(path);

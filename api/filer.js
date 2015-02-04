@@ -20,8 +20,8 @@ var filer = require('./filer');
 var config = require('../config/config');
 
 // global paths
-var FILEFOLDER = '/var/www/data/files/';
-var TEMPFOLDER  = '/var/www/data/tmp/';
+var FILEFOLDER = '/data/files/';
+var TEMPFOLDER  = '/data/tmp/';
 
 
 
@@ -40,39 +40,22 @@ module.exports = filer = {
 		var fileUuid = options.fileUuid;
 		var out = FILEFOLDER + fileUuid + options.out;
 
-		// var out = FILEFOLDER + fileUuid;
-
 		fs.ensureDir(out, function (err) {
 
+			// cmd
 			var cmd = 'unzip -o -d "' + out + '" "' + inn + '" -x "*DS_Store*" "*__MACOSX*"'; 	// to folder .shp
 			var exec = require('child_process').exec;
-			
 
 			// unzip
 			exec(cmd, function (err, stdout, stdin) {
-				console.log('unzip done: ', err, stdout, stdin);
-
-				// remove zipfile - important!
+				// remove unnecessary files - important!
 				fs.unlink(inn, function (err) {
-					console.log('deleted zip file', err);
-				
-					// remove __MACOSX
 					fs.remove(out + '/__MACOSX', function (err) {
-
-						console.log('removing __MACOSX', err);
-
-						// return
 						callback(err);
-
 					});
-
-
 				});
-
 			});
-
 		});
-
 	},
 
 	// #########################################
@@ -148,7 +131,6 @@ module.exports = filer = {
 	
 		var out = FILEFOLDER + fileUuid + '/' + name;
 
-
 		// move to folder
 		fs.move(path, out, function (err) {
 			callback(null);
@@ -213,14 +195,7 @@ module.exports = filer = {
 	// ###  FILER: shapefile                 ###
 	// #########################################
 	handleShapefile : function (folder, name, fileUuid, callback) {	// already moved to right place, by unzip
-		console.log('FILER: Handling shape');
-		console.log('handleJson');
-
-
-
 		geo.handleShapefile(folder, name, fileUuid, function (err, db) {
-			console.log('handleShapefile err???', err);
-
 			if (err) {
 				// delete shapefile
 				var path = folder + '/' + name;
@@ -229,9 +204,7 @@ module.exports = filer = {
 				});
 			}
 			callback(err, db);
-
 		});
-
 	},
 
 
