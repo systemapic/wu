@@ -361,6 +361,19 @@ module.exports = function(app, passport) {
 	});
 
 	// =====================================
+	// CREATE SNAPSHOT =====================
+	// =====================================
+	// create snapshot of current map
+	app.post('/api/util/createThumb', isLoggedIn, function (req, res) {
+		console.log('/api/util/createThumb');
+
+		// get mapbox account
+		api.createThumb(req, res);
+
+	});
+
+
+	// =====================================
 	// CREATE PDF SNAPSHOT =================
 	// =====================================
 	// create PDF snapshot of current map

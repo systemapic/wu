@@ -104,15 +104,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.name.innerHTML 		= this.project.store.name;
 		this.description.innerHTML 	= this.project.store.description;
 
-
-
-		if ( this.project.store.logo ) { 
-			var logoSliced = this.project.store.logo.slice(8); // remove "/images/" from string
-			var logoPath = '/pixels/fit/' + logoSliced + '?fitW=63&fitH=62';			
-		} else {
-			var logoPath = '/css/images/defaultProjectLogo.png'
-		}
-
+		var logoPath = this.project.store.logo ? this.project.store.logo :  '/css/images/defaultProjectLogo.png';
 		this.logo.src = logoPath;
 
 		this.createdBy.innerHTML 	= '<div class="project-info-left">Created by:</div><div class="project-info-right">' + this.project.store.createdByName + "</div>";
@@ -224,56 +216,40 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 
 	makeNewThumbnail : function () {
-		console.log('%c *****************************************************', 'background-color: #D80000; color: white;');
 
 		var that = this;	// callback
 
 		app.setHash(function (ctx, hash) {
-
+			var obj = JSON.parse(hash);
+			obj.dimensions = {
+				height : 300,
+				width : 200
+			}
 			// get snapshot from server
-			Wu.post('/api/util/snapshot', hash, that.createdThumb, that);
+			Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdThumb, that);
 
 		});
-
-		console.log('%c *****************************************************', 'background-color: #D80000; color: white;');
-
 	},
 
-	createdThumb : function(context, file) {
-
+	createdThumb : function(context, json) {
 
 		// parse results
-		var result = JSON.parse(file);
-		var image = result.image;
+		var result = JSON.parse(json);
+		// var image = result.image; // filename
+		var image = result.cropped;
 
-		console.log('%cThumb has been created =>', 'color: #339933')
-
-		console.log('result=>', result);
-		console.log('context=>', context.logo);
-
+		var fileUuid = result.fileUuid;
 
 		// get dimensions of container
 		var height = context.logo.offsetHeight;
 		var width = context.logo.offsetWidth;
 
-		// set path
-		var path = app.options.servers.portal;
-		
-		path += 'pixels/';
-		path += image;
-		path += '?width=' + 800;
-		path += '&height=' + 600;
+		var path = '/images/' + image;
 
-
-		console.log('image=>', image);
-
-		// cxx 
 		// set image
 		context.logo.src = path;
-
-
-		// Need to save the frickin logo
-
+		context.project.setLogo(path);
+		app.HeaderPane.addedLogo(image);
 
 	},
 

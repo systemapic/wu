@@ -3622,8 +3622,8 @@ input.cmn-toggle-round-flat + label:before {
   text-align: center;
   border-radius: 2px;
   height: 17px;
-  float: right;
-  /*position: relative;*/
+  /*float: right;	*/
+  position: relative;
   cursor: pointer; }
 
 .new-project-thumb:hover {
@@ -3638,7 +3638,7 @@ input.cmn-toggle-round-flat + label:before {
   text-align: center;
   border-radius: 2px;
   height: 17px;
-  float: right; }
+  /*float: right;*/ }
 
 .project-delete:hover {
   background: #C80000;

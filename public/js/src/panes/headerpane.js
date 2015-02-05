@@ -110,9 +110,11 @@ Wu.HeaderPane = Wu.Class.extend({
 		
 		// set path
 		var fullpath = '/images/' + path;
+
+		var project = this.project;
 		
 		// set new image and save
-		this.project.setHeaderLogo(fullpath);
+		project.setHeaderLogo(fullpath);
 
 		// update image in header
 		// this._logoWrap.style.backgroundImage = this.project.getHeaderLogoBg();

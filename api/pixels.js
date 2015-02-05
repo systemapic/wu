@@ -383,6 +383,7 @@ module.exports = pixels = {
 		console.log('width/height: ', width, height);
 
 		// crop options
+		option.crop = option.crop || {};
 		var cropX   	= option.crop.x || 0;					// default crop is no crop, same dimensions and topleft
 		var cropY   	= option.crop.y || 0;
 		var cropW	= option.crop.w || width;

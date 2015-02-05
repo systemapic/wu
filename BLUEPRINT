@@ -1,0 +1,822 @@
+=========== USERS ============
+
+Feb 2015
+
+
+
+### MAJOR CHANGE:	
+
+Add permissions to projects/clients/files themselves as user id's. This is instead of adding projects/clients/files to users.
+
+PRO's:  When deleting a project, permissions are automatically taken care of, ie. they're gone!
+CON's: 	When deleting USER, user-uuid's must be deleted from PROJECTS/FILES/CLIENTS. (but same vice versa)
+	Careful not to reveal user uuids to others - ie. must clean up ACCESS OBJECT in each model.
+
+
+### OVERVIEW:
+
+// delete: only by Portal Admin, OR user that created project.
+
+
+Each USER is clean.
+-------------------
+
+Each PROJECT has access object:
+-------------------------------	
+	acces : {
+		read : ['user-uuid', 'user-uuid'],
+		write : ['user-uuid']
+	}
+
+	
+Each FILE has access object: 
+----------------------------
+	acces : {
+		read : ['user-uuid', 'user-uuid'],
+		write : ['user-uuid']
+	}
+
+
+Each CLIENT has access object:
+------------------------------
+	acces : {
+		read : ['user-uuid', 'user-uuid'],
+		write : ['user-uuid']
+	}
+
+
+
+
+_________
+
+
+ALTERNATIVE METHOD:
+
+GROUPS
+------
+
+1. Each PROJECT gets a GROUP assigned to it. This GROUP contains PERMISSIONS. 
+2. Each FILE/LAYER in the project gets assigned same GROUP. 
+3. This means that the permissions for PROJECT (read/write/delete) will be the same for the FILES/LAYERS in the project. 
+
+4. Removing USERS means simply removing once from GROUP.
+5. Removing project simply means deleting GROUP.
+
+6. Everybody in a GROUP has SAME PERMISSIONS. ie. there's a READ group, WRITE group, ADMIN group
+
+7. Each project has a READ group and a WRITE group.
+
+
+// not connected to a PROJECT but checked every time
+var group : {
+	name : 'portal_admins',
+	users : [
+		'user-uuids',
+		'user-uuids',
+		'user-uuids'
+	]
+}
+
+// not connected to a PROJECT but checked every time
+var group : {
+	name : 'super_admins',
+	users : [
+		'user-uuids',
+		'user-uuids',
+		'user-uuids'
+	]
+}
+
+// users in this group can CREATE PROJECTS in PORTAL
+var group : {
+	name : 'create_projects',
+	users : [
+		'user-uuids',
+		'user-uuids',
+		'user-uuids'
+	],
+
+	groups : [
+		'portal_admins',
+		'super_admins',
+	]
+
+}
+
+
+// this group is added to PROJECT under group
+var group : {
+	name : 'read_project-uuid', 		
+	users : [
+		'user-uuids'
+	]
+}
+
+// this group is added to PROJECT under group
+var group : {
+	name : 'write_project-uuid', 		
+	users : [
+		'user-uuids'
+	]
+}
+
+// this group is added to PROJECT under group
+var group : {
+	name : 'delete_project-uuid', 		
+	users : [
+		'user-uuids'
+	],
+	groups : [
+		'portal_admins',
+		'super_admins'
+	]
+}
+
+
+
+
+
+
+
+
+
+________________
+
+
+
+
+
+
+
+
+examples: 
+	when Ana creates a map, 
+		ADMINS:   Ana, Rob, (KO, J)		// can do everythign with project, READ, EDIT, MANAGE
+		MANAGERS: John and Jane			// can add READERS to project
+		READERS:  Dick, Jock			// can READ project
+		EDITORS:  Jill				// can EDIT project (but not manage)
+
+
+	what users do current User have access to?
+		ADMINS:   everybody connected to project
+		MANAGERS: everybody that have READ access to project + created by self
+		READERS:  only self
+		EDITORS:  only self
+
+
+
+
+C reate
+R ead
+U pdate
+D elete
+
+ role                  user creation capabilities      				 project capabilities 		    read/update/delete user access
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Superadmin -> can create Superadmin, Admin, Manager, Editor and Reader 	-> can CRUD projects (and clients)	-> can RUD ALL users in portal
+Admin      -> can create Manager and Editor and Reader                  -> can CRUD projects (and clients)	-> can RUD all users createdBy Admins & sons
+Manager    -> can create Reader          				-> can read projects 			-> can RUD all createdBy self (in own projects)
+Editor     -> can not create users 					-> can read/write projects 		-> can R   self (not add projects)
+Reader     -> can not create users                                      -> can read projects 			-> can R   self (not add projects)
+
+
+Basically, Super/Admin/Manager can give away lesser powers than oneself, to projects oneself is in.
+
+
+
+PROBLEM: Portal must fit all needs: 	
+	1. Australian setup 		-> Only one group of admins, they can access all, bascially - then only readers on other side 
+	2. Systemapic setup, 		-> One server, with separate admins. So an admin can't access other admins' stuff.
+	3. Open portal setup..		-> Lots of people, god knows what... MOST FINEGRAINED CONTROL is important.
+
+So just add Admin's projects to their Manager/Editor/Reader roles also...
+
+
+
+
+
+
+
+
+
+==============================
+
+
+
+
+
+
+
+
+layermenu:
+
+layer as model in db - layer in client.
+layermenu consists of layer models objects.
+
+file - added to datalibrary, it's a file - then if it's also a layer, a layer model object is created and attached to project.
+mapbox - when mapbox account added, all ID's are 
+
++++ the important thing is +++ 
+
+  to have ONE common layer model for all layers that go on map
+  to save title, description, meta data for layers in layer object, both client and db
+  same layer model for geojson, mapbox, etc.
+
+  
+____________
+
+when connecting mapbox - all are saved as separate Layer Objects in db and client.
+when adding by upload - same
+
+
+start there - with import. server side, to client...
+
+
+
+addTo på Wu Layer object, som igjen har addTo på leaflet layer. abstract the leaflet layer, only deal with wu layer. wu layer takes care of everything else. 
+
+
+
+12800 linjer js, 1. september 2014.
+
+
+REMEMBER TO SAVE!!
+
+
+
+
+
+
+
+
+
+
+
+							CMS - systemapicdotcom
+					_____________________________________
+
+
+
+ structure
+---------
+
+
+	access:
+	-------
+
+
+		accounts: 
+			def.: logged-in users (with different capabilites)
+			
+			capabilities: 
+		
+				- create clients (folders of projects)
+				- edit clients
+
+				- create projects (maps)				
+				- edit projects (maps)
+				- view projects (maps)
+				
+				- delegate access to users for own projects (add/remove)
+				- delegate capabilites up to own capability (as a capability)
+				
+				- invite users by email, giving that email-account a predefined access-level.  (users would then have to go to site, create password, and log in.)
+
+				- login with facebook/twitter/google; name/avatar incorporated. (low priority)
+
+
+
+		users:
+			def.: anyone coming to the website - either anon or logged-in.
+			cap.: if delegated access, can log in and view specific projects, if these projects are protected.
+
+		clients:
+			def.: a folder of projects
+			cap.: can have custom logo, color scheme, title
+
+		projects:
+			def.: end-result, the map page.
+			access-level: who can see? public? or only list of users.
+
+
+
+		_________
+		
+		Note:
+				Public projects/maps:  an embedded HTML/iframe asks for a project ID - if ok as unauthenticated, served.
+				Private projects:	requires a login. USER must have access to project.
+				
+				Types of users:
+					- superadmin - root all. Create.Read.Update.Delete
+					- admins: 
+							CRUD clients
+							CRUD projects
+							CRUD users
+							
+	
+		_________
+
+
+	models (everything is a model):
+	-------------------------------
+
+		every 'box' that has any dynamic content on front-page:
+
+			- logo
+			- title
+			- layer selector
+			- info-box
+			- legends box
+			- print function
+
+			- the map, leaflet object
+			- documents pane
+			- downloads pane
+			- other
+
+
+		state of page, whether it's in presentation-mode or edit-mode.
+
+
+	persistence:
+	------------
+
+		- live editing, ie. real-time synced saving. 
+		- redis store on node.js server
+		- projects (maps) are stored as projects.
+		- clients stored as clients, with projects.
+		- users stored as users, connected with projects.
+		- admins stored as users with ownership of projects/clients + capability of creating new ones.
+
+
+
+
+
+
+
+front-page (presentation-mode):
+-------------------------------
+
+	map 										leaflet/mapbox/cartodb
+	
+	controls:
+		layer selector							(for mapbox/cartodb/own server)
+		info-box								with custom added info
+		inspect layers							with functionality
+		legends/tooltips						data from layer
+		leaflet.draw							with note
+		layer opacity control
+		reset map
+		satellite or map control 				choose between satellite or map
+
+		chat									interactive collaboration? (
+												last thing in)
+		
+
+	header										with custom logo, title for project
+
+	documents-pane								for custom content, probably just text
+
+	download-pane								for downloading all (selected) layers
+
+	share/print 								for screenshotting
+
+	share location and map-setup				when user gets a share, has to
+												log in, will only see if got access capability.
+
+
+
+
+edit-mode
+---------
+
+
+	map:
+	----
+		- base layer
+			- satellite or map
+		- bounds
+			lat/lng
+			zoom 
+		- init position
+
+	
+	
+	layer-sources:
+	----------------
+
+		providers:
+			- mapbox
+			- cartodb
+			- systemapic server
+			- open source data - that can be plugged into cartodb or systemapic. => wiki
+
+		- accounts (admins) can connect to their respective mapbox/cartodb accounts, and get layers from there and add to map.
+
+
+	layer-selector:
+	---------------
+
+		- adding/removing layers (from respective accounts) to menu.
+		- changing color of layer-menu
+		
+		model: layer-selector is always in one state (per project). edited, saved immediately. 
+
+
+
+	documents-pane:
+	---------------
+		- text 
+
+
+	downloads-pane:
+	---------------
+		- connected with active layers for project (and active layers in layer-menu when user clicks download)
+
+
+	header:
+	-------
+		change logo
+		change color
+		change title
+
+
+	color-scheme (overview):
+	-------------
+
+		change color of layer-menu
+		change color of header
+		change fonts?
+
+
+
+
+
+
+
+
+
+
+
+publish map - when is map published for users?
+
+
+
+
+
+
+
+
+
+
+ M O D E L S :
+---------------
+
+Tab A:
+	1. map-view
+	2. layer-selector
+	3. info-box
+	4. layer-inspector	
+	5. leaflet-plugins (draw, metric, etc)
+
+Tab B:
+	6. documents-pane
+
+Tab C:
+	7. list of selected downloads
+	8. text
+
+All:
+	9. header
+	10. logo
+	11. login/logout/profile
+
+	12. URL=> systemapic.com/client/project
+
+
+
+
+
+
+
+
+
+Storage Models:
+
+	--- one json served, put together server-side.
+
+		- User: 
+			info, 
+			access levels (just for reference, i guess),
+			saved projects,
+
+		- Project(s):
+			map state etc.
+			client parents
+			
+
+
+
+
+
+
+
+
+
+
+More todos:
+	
+	Write Leaflet plugins for 
+		1) multi-mouseover
+		2) leaflet.draw.note
+		3) oblique map 
+
+
+
+
+
+
+
+
+
+
+
+
+
+******************** MAP SERVER **********************
+
+http://www.axismaps.com/blog/2012/01/dont-panic-an-absolute-beginners-guide-to-building-a-map-server/
+
+OpenStreetMap Data –gets stored in->
+PostGIS Database –which is accessed by->
+Mapnik –to draw map tiles for->
+TileStache –which sends them->
+Web Browser
+	
+
+
+
+
+**************************** MAY 2014 ***************************
+
+one model - two views:
+
+	Layermenu - is a model, 
+	Editor.Layermenu - is a view,
+	Map.Layermenu - is a view
+
+	Model: Project
+	Views: Editor.Project
+
+	Model: Client
+	Views: Editor.Client
+
+	Model: Map
+	Views: MapPane
+
+	... most models have but one view.
+
+
+
+-----------------------------
+
+
+Projects - has layermenu - each item a Layer - from Sources - 
+
+
+
+
+
+Wu.Layermenu 	- is an object, the Map.Layermenu gets its data from this, so does the EditorPane.Layermenu
+	     	- this is updated when new project is selected
+	     		- Layermenu is stored in project, as array of Layers (with five keys)
+	     		- 
+
+	     	- this is updated when changes are made in Editor
+	     	- Layermenu is only active when a project is active.
+
+
+
+Layermenu - has OWN PANE in MAP
+	  - is part of MAP in EDITOR
+
+
+
+Layers can be 	- uploaded source (shp -> geojson)
+		- uploaded source (kml -> geojson)
+		- uploaded raster (raster -> tiles)
+		- uploaded vector (big vector -> vectortiles)
+		- mapbox layer
+		- cartodb layer
+		- osm layer
+		- drawn vector in portal -> geojson
+
+
+Where are new layers created?
+	- when adding a SOURCE to project layers
+	- when creating a layer in layer menu
+
+
+___________________________________________________
+
+Project:
+	Layers:
+
+		- geojson 
+			uploaded or converted 
+				uploaded as geojson or shape, kml, etc.
+			url
+				downloaded to server and added as source
+
+		- raster from server
+			uploaded to server
+			uuid
+
+		- vectortiles from server
+			uploaded to server
+			uuid
+			created from all kinds of formats
+		
+		- third-party providers
+			mapbox
+				connected with account
+				list of available layers (all are public)
+			cartodb
+				connected with account
+				list of available layers
+			osm 
+				list
+
+
+	Sources:	
+		where new data is added, listed - ready to add to Layers. 
+		this means all layers must be created from Sources data.
+		Sources 
+
+
+
+
+Sources ARE Layers... - when would anyone add a source that's not a layer for the map? never? But sources are also a file-list, for downloads etc.  
+Downloads list could just be a list of layers though...
+
+Sources is a list of AVAILABLE layers (available to user (not project!)) - Layers is a list of ACTIVE layers in project..
+					
+Layers are self-contained - stores all info needed (incl. file-uuid of source, etc.)
+
+ _______________
+|		|	
+|     LAYERS	|
+|		|	
+|_______________|	
+			Add New
+			-------
+
+
+			
+			Basemaps
+			--------
+
+
+
+			Layermenu
+			---------
+	
+
+
+lol
+
+
+
+________________
+
+
+documents pane - uploads - subheaders - layermenu own object, stored to project - sources out - upload to folders - all filetypes - 
+
+editor pane - also rewrite - is different depending on user and access - hvis vanlig bruker, skal ha menyelementer, hvis editor skal ha map settings etc - så alt blir likt, bare forskjellig access - trenger editor en preview knapp? - 
+
+clients tab goes into projects
+
+________________
+
+
+
+
+====================
+  S T R A T E G Y
+====================
+
+gis data most important; belønning to upload high-quality data from real-time events, like tsunami, news-events. 
+
+nice idea from seh or andy: click on two countries on the map, and you get the history of those two countries.
+
+
+
+
+
+
+
+unfixed bugs:
+1. drag n hold on header resize sometimes pulls out image
+
+2. * routes... gotta figure out a way to server clients better .. /api/ is reserved name for client now, for example.
+
+
+
+
+
+
+
+
+
+
+
+
+todo: thursday:
+
+   ok	1. download files (in zipped folder, etc.)
+   ok	2. links to small places from data library - (insert files into documents folders)
+   not	3. decide if categories and folders are same. perhaps better not. perhaps better yes?
+   ok	4. select all button (ie. select all visible)
+	
+
+todo: friday
+	1. layers, menu
+	2. add other sources - mapbox, raster, etc. upload url's? 
+	
+todo: saturday or sunday:
+	1. users
+
+todo still:
+	1. add more options to map: add controls, etc. (measure, zoom, )
+	2. infobox / description box
+	3. topojson support, https://gist.github.com/rclark/5779673
+
+++++++++++++++++++
+
+
+
+User management :
+
+
+— Users can only READ, sometimes WRITE, projects and clients. Can't add or edit users, except perphas their own name (not username) and reset password.
+
+— Managers can only add Users and READ access to projects they themselves have access to. They can't give WRITE access, nor create Managers. Only give READ access. They can't create projects or clients.
+
+— Admins can create projects and clients and create managers and users and give write access to projects and clients. They can not create users with CREATE project/client access. 
+
+— Superadmins (only us) can create Users with CREATE access.
+
+
+
+$$$$$$$$$$$$
+$$$$$$$$$$$$
+$$$$$$$$$$$$
+$$$$$$$$$$$$
+$$$$$$$$$$$$
+
+Every Portal has an Admin. This Portal-Admin has RWM access to everything in Portal.
+
+Every Client has an Admin. This Client-Admin has RWM access to all Projects in that Client.
+
+Every Project has an Admin. This Project-Admin has RWM access to that Project. Default Admin is creator of Project.
+
+
+
+- where should files' permission go? in file? or list in user? but then all new users must get this list... 
+	virtual access spaces/families?
+
+
+
+
+
+
+_________
+
+a user can have access to WRITE certain projects, but just READ others.. also, can have several client spaces, but also (especially end-users) only have ONE client -> then Clients tab should be removed.
+
+________
+
+
+user logs in:
+	
+	1. if only one client and no [client create] access, then dont show [Clients] tab and select client by default.
+	2. if only one client and one project, then don't show [Projects] tab, and select project by default.
+	3. for each project, check if has write access - if not: only show [Documents], [Data Library], [Users] (named 'Account'), and [Map] is just to show the map, instead of the sidepane... this changes for each project select, depending on if user has write access to project.
+	4. 
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

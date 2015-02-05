@@ -1019,6 +1019,123 @@ module.exports = api = {
 
 	},			
 
+
+	// #########################################
+	// ###  API: Create Thumbnail            ###
+	// #########################################
+	createThumb : function (req, res) {
+
+		// var hash = req.body.hash;
+		var projectUuid = req.body.hash.project;
+
+		var dimensions = req.body.dimensions;
+		
+		var filename = 'thumb-' + uuid.v4() + '.png';
+		var path = IMAGEFOLDER + filename;
+
+
+		var hash = {
+			position : req.body.hash.position,
+			layers : req.body.hash.layers,
+			id : req.body.hash.id
+		}
+
+		var args = {
+			projectUuid : projectUuid,
+			hash : hash,
+			path : path,
+			pdf : false
+		}
+
+		var snappath = TOOLSPATH + 'phantomJS-snapshot.js';
+		var cmd = "phantomjs --ssl-protocol=tlsv1 " + snappath + " '" + JSON.stringify(args) + "'";
+
+		var ops = [];
+		var dataSize;
+
+		// phantomJS: create snapshot
+		ops.push(function (callback) {
+
+			var exec = require('child_process').exec;
+			exec(cmd, function (err, stdout, stdin) {
+
+				callback(err);
+			});
+
+		});
+
+		// get size
+		ops.push(function (callback) {
+			fs.stat(path, function (err, stats) {
+				dataSize = stats ? stats.size : 0;
+	 			callback(null);
+	 		});
+		});
+
+
+		// create File
+		ops.push(function (callback) {
+
+			// console.log('create file phsj')
+
+			var f 			= new File();
+			f.uuid 			= 'file-' + uuid.v4();
+			f.createdBy 		= req.user.uuid;
+			f.createdByName    	= req.user.firstName + ' ' + req.user.lastName;
+			f.files 		= filename;
+			f.access.users 		= [req.user.uuid];	
+			f.name 			= filename;
+			f.description 		= 'Thumbnail';
+			f.type 			= 'image';
+			f.format 		= 'png';
+			f.dataSize 		= dataSize;
+			f.data.image.file 	= filename; 
+
+			f.save(function (err, doc) {
+				if (err) console.log('File err: ', err);
+				console.log('File saved: ', doc);
+				callback(err, doc);
+			});
+
+
+		});
+
+		ops.push(function (callback) {
+
+			var options = {
+				height : dimensions.height,
+				width : dimensions.width,
+				quality : 80,
+				file : path
+
+			}
+
+			pixels.resizeImage(options, callback);
+
+
+		});
+
+		console.log('running phantom ascyn');
+
+		async.series(ops, function (err, results) {
+			console.log('pahtnom THUMB !! all done: ', err);
+			
+			if (err) console.log('err', err);
+			
+			var doc = results[2]
+			var croppedImage = results[3];
+
+			res.end(JSON.stringify({
+				// image : file.uuid,
+				image : filename,
+				fileUuid : doc.uuid,
+				cropped : croppedImage.file,
+				error : null
+			}));
+		});
+	},
+
+
 	// #########################################
 	// ###  API: Create Snapshot             ###
 	// #########################################
