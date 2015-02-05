@@ -856,7 +856,7 @@ input.cmn-toggle-round-flat + label:before {
 	top: 3px;
 	height: 71px;
 	margin-right: 10px;
-	width: 90px;
+	width: 105px;
 	overflow: hidden;
 	}
 
@@ -872,6 +872,11 @@ input.cmn-toggle-round-flat + label:before {
 	padding-bottom: 10px;
 	width: auto;
 	}*/
+
+
+.header-logo {
+	height: 100%;
+	}
 
 .header-logo img {
 	/*max-height: 100%;*/
@@ -899,7 +904,7 @@ input.cmn-toggle-round-flat + label:before {
 	background: transparent;
 	font-size: 30px;
 	font-weight: $lean;
-	padding-left: 102px;
+	padding-left: 120px;
 	height: 45px;
 	overflow: hidden;
 	}
@@ -927,7 +932,7 @@ input.cmn-toggle-round-flat + label:before {
 	overflow: hidden;
 	max-height: 31px;
 	padding-right: 14px;
-	padding-left: 102px;
+	padding-left: 120px;
 	}
 
 .header-subtitle input {

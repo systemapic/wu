@@ -1044,7 +1044,8 @@ module.exports = api = {
 			projectUuid : projectUuid,
 			hash : hash,
 			path : path,
-			pdf : false
+			pdf : false,
+			thumb : true
 		}
 
 		var snappath = TOOLSPATH + 'phantomJS-snapshot.js';

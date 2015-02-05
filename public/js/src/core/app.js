@@ -568,7 +568,8 @@ Wu.App = Wu.Class.extend({
 	phantomJS : function (args) {
 
 		var projectUuid = args.projectUuid,
-	   	    hash    	= args.hash;
+	   	    hash    	= args.hash,
+	   	    isThumb       = args.thumb;
 
 	   	// return if no project
 	   	if (!projectUuid) return false;
@@ -593,8 +594,8 @@ Wu.App = Wu.Class.extend({
 		// remove startpane
 		if (this.StartPane) this.StartPane.deactivate();
 
-		// add phantomJS stylesheet
-		app.Style.phantomJS();
+		// add phantomJS stylesheet		
+		isThumb ? app.Style.phantomJSthumb() : app.Style.phantomJS();
 
 		// check for hash
 		if (hash) {

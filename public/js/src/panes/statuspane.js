@@ -69,6 +69,7 @@ Wu.StatusPane = Wu.Class.extend({
 	// open sidepane menu
 	open : function (e) {
 
+
 		this.isOpen = true;
 		if (app.SidePane) app.SidePane.expand();
 		this.refresh();
@@ -77,7 +78,7 @@ Wu.StatusPane = Wu.Class.extend({
 		this.setContentHeights();
 
 		// remove help pseudo
-		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
+		// Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
 
 		// trigger activation on active menu item
 		app._activeMenu._activate();
