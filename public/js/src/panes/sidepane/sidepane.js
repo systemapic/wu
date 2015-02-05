@@ -80,6 +80,7 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	calculateHeight : function () {
+
 		var header = app.HeaderPane;
 		var height = header.getHeight();
 
@@ -134,6 +135,8 @@ Wu.SidePane = Wu.Class.extend({
 
 	_setMenuHeight : function () {
 
+
+
 		// Button height
 		if ( !Wu.app.mobile ) {
 			var bHeight = 70;
@@ -142,9 +145,14 @@ Wu.SidePane = Wu.Class.extend({
 		}
 
 		var panes = this._getPaneArray();
-		var defaultPanes = app.Account.isManager() ? 3 : 2;		// 3 if manager, 2 if not (ie. only Project, Logout)
-		var height = panes ? panes.length * bHeight : defaultPanes * bHeight;	// if no active project, default 3 menu items
+		var defaultPanes = app.Account.isManager() ? 3 : 2;			// 3 if manager, 2 if not (ie. only Project, Logout)
+
+		// var height = panes ? panes.length * bHeight : defaultPanes * bHeight;	// if no active project, default 3 menu items	
+		if ( panes != 0 ) var height = panes.length * bHeight			
+		else var height = defaultPanes * bHeight;
+	
 		app._editorMenuPane.style.height = parseInt(height) + 'px';
+
 	},
 
 	_getPaneArray : function (project) {
