@@ -485,10 +485,15 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	},
 
 	getAccessTemplate : function (user) {
+
+
+		var divProjectsOpen = '<div class="user-projects-button">';
+		var divProjectsClose = '</div>';
+
 		// get no of projets etc for user
 		var projects = user.getProjects();
-		if (projects.length > 1) return projects.length + ' projects';
-		return projects.length + ' project';
+		if (projects.length > 1) return divProjectsOpen + projects.length + ' projects' + divProjectsClose; //projects
+		return divProjectsOpen + projects.length + ' project' + divProjectsClose;
 	},
 
 	getProjectsTemplate : function (user) {

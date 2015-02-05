@@ -2290,6 +2290,7 @@ L.Popup.include({
 	// open sidepane
 	openPane : function () {
 
+
 		// return if already open
 		if (this.paneOpen) return;
 		this.paneOpen = true;
@@ -2459,8 +2460,10 @@ L.Popup.include({
 		}
 	},
 
-	// cxxxx
+	
 	activate : function (e) {
+
+		console.log('activate sidepane menu item', this);
 	
 		// set active menu
 		var prev = Wu.app._activeMenu || false;
@@ -3106,8 +3109,12 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// add delete button
 		if (app.Account.canDeleteProject(this.project.store.uuid) || this.options.editMode) {
-			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');
+		
+			this.makeThumb = Wu.DomUtil.create('div', 'new-project-thumb', this.usersInnerWrapper, 'Generate thumbnail');
+			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');			
 		}
+
+
 
 
 		// ****************************************************************************
@@ -3231,6 +3238,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// add kill hook
 		if (app.Account.canDeleteProject(this.project.getUuid())) {
 			Wu.DomEvent.on(this.kill, 'click', this.deleteProject, this);
+			Wu.DomEvent.on(this.makeThumb, 'click', this.makeNewThumbnail, this);
 		}
 	},
 
@@ -3246,7 +3254,63 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// remove kill hook
 		if (app.Account.canDeleteProject(this.project.getUuid())) {
 			Wu.DomEvent.off(this.kill, 'click', this.deleteProject, this);
+			Wu.DomEvent.off(this.makeThumb, 'click', this.makeNewThumbnail, this);
 		}
+	},
+
+
+	makeNewThumbnail : function () {
+		console.log('%c *****************************************************', 'background-color: #D80000; color: white;');
+
+		var that = this;	// callback
+
+		app.setHash(function (ctx, hash) {
+
+			// get snapshot from server
+			Wu.post('/api/util/snapshot', hash, that.createdThumb, that);
+
+		});
+
+		console.log('%c *****************************************************', 'background-color: #D80000; color: white;');
+
+	},
+
+	createdThumb : function(context, file) {
+
+
+		// parse results
+		var result = JSON.parse(file);
+		var image = result.image;
+
+		console.log('%cThumb has been created =>', 'color: #339933')
+
+		console.log('result=>', result);
+		console.log('context=>', context.logo);
+
+
+		// get dimensions of container
+		var height = context.logo.offsetHeight;
+		var width = context.logo.offsetWidth;
+
+		// set path
+		var path = app.options.servers.portal;
+		
+		path += 'pixels/';
+		path += image;
+		path += '?width=' + 800;
+		path += '&height=' + 600;
+
+
+		console.log('image=>', image);
+
+		// cxx 
+		// set image
+		context.logo.src = path;
+
+
+		// Need to save the frickin logo
+
+
 	},
 
 	// edit hook for client logo
@@ -3261,7 +3325,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		
 		// set client uuid param for server
 		this.logodz.options.params.project = this.project.getUuid();
-		
+
 		// set callback on successful upload
 		var that = this;
 		this.logodz.on('success', function (err, path) {
@@ -4584,10 +4648,15 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	getAccessTemplate : function (user) {
+
+
+		var divProjectsOpen = '<div class="user-projects-button">';
+		var divProjectsClose = '</div>';
+
 		// get no of projets etc for user
 		var projects = user.getProjects();
-		if (projects.length > 1) return projects.length + ' projects';
-		return projects.length + ' project';
+		if (projects.length > 1) return divProjectsOpen + projects.length + ' projects' + divProjectsClose; //projects
+		return divProjectsOpen + projects.length + ' project' + divProjectsClose;
 	},
 
 	getProjectsTemplate : function (user) {
@@ -9616,7 +9685,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.setHeaderPadding();
 
 		// set controls css logic
-		this.updateControlCss();
+		setTimeout(this.updateControlCss.bind(this), 100); // timeout hack bug
 		
 	},
 
@@ -9710,20 +9779,23 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			attributionControl : false
 		}
 
+		// get project pos
+		var pos = this.project.getLatLngZoom(),
+		    lat = pos.lat,
+		    lng = pos.lng,
+		    zoom = pos.zoom;
+
 		// create new map
-		this._map = Wu.app._map = L.map('map', options).setView([0, 0], 6); // todo
+		this._map = Wu.app._map = L.map('map', options).setView([lat, lng], zoom); 
 
 		// add editable layer
 		this.addEditableLayer(this._map);
 
 		// add attribution
-		// if (this._attributionControl) this._map.removeControl(this._attributionControl);
 		this._attributionControl = L.control.attribution({
 				position : 'bottomright',
 				prefix : 'Powered by <a href="https://systemapic.com/" target="_blank">Systemapic.com</a> ©'
 		});
-
-
 		this._map.addControl(this._attributionControl);
 
 	},
@@ -9741,7 +9813,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		var map = this._map;
 		if (map) {
 			
-
 			// remove each layer
 			map.eachLayer(function(layer) {
 				map.removeLayer(layer);
@@ -9769,94 +9840,63 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	updateControlCss : function () {
 
 
-		var thus = this;
+		// get controls
+		var controls = this.project.getControls(),
+		    corners = app._map._controlCorners,
+		    topleft = corners.topleft,
+		    bottomright = corners.bottomright,
+		    topright = corners.topright;
 
-		setTimeout(function(){
 
-			// get controls
-			var controls = thus.project.getControls();
+		// layermenu control
+		if (controls.layermenu) {
 			
-			// get leaflet control corners
-			var _leafletTopLeft = app.MapPane._map._controlContainer.childNodes[0];
-			var _leafletBottomRight = app.MapPane._map._controlContainer.childNodes[3];				
-
-			if ( controls.baselayertoggle ) {
-			}
-
-			
-
-			if (controls.description) {
-			} 
-
-			if (controls.draw) {
-			}
-
-			if (controls.geolocation) {
-			}
-
+			// Check for Layer Inspector
 			if (controls.inspect) {
+				Wu.DomUtil.removeClass(bottomright, 'no-inspector');
+			} else {
+				Wu.DomUtil.addClass(bottomright, 'no-inspector');
 			}
+		}
 
-
-			// layermenu control
-			if (controls.layermenu) {
-				
-				// Check for Layer Inspector
-				if (controls.inspect) {
-					Wu.DomUtil.removeClass(_leafletBottomRight, 'no-inspector');
-				} else {
-					Wu.DomUtil.addClass(_leafletBottomRight, 'no-inspector');
-				}
-			}
-
-			// legend control
-			if (controls.legends) {
-				
-				// get container
-				var __legendsContainer = thus.legendsControl._legendsContainer;
-
-				// Check for Layer Menu Control
-				if ( controls.layermenu ) {
-					Wu.DomUtil.removeClass(__legendsContainer, 'legends-padding-right');
-				} else {
-					Wu.DomUtil.addClass(__legendsContainer, 'legends-padding-right');
-				}
-
-				// Check for Description Control
-				if ( controls.description ) {
-				} 
-
-			}
-
-
-			// scale control
-			if ( controls.measure ) {
-				// console.log('Scale Control', thus._scale._container);
-				var _leafletTopRight = app.MapPane._map._controlContainer.childNodes[1];
-
-				if ( controls.layermenu ) {
-					// right: 332px;
-					_leafletTopRight.style.right = '295px';
-				} else {
-					_leafletTopRight.style.right = '6px';
-					// right: 6px;
-				}
-
-
-			}
-
-			if ( controls.mouseposition ) {
-			}
-
-			if ( controls.vectorstyle ) {
-			}
-
-			if ( controls.zoom ) {
-			}
-
+		// legend control
+		if (controls.legends) {
 			
+			// get container
+			var legendsContainer = this.legendsControl._legendsContainer;
 
-		}, 50)	// css/dom hack
+			// Check for Layer Menu Control
+			if (controls.layermenu) {
+				Wu.DomUtil.removeClass(legendsContainer, 'legends-padding-right');
+			} else {
+				Wu.DomUtil.addClass(legendsContainer, 'legends-padding-right');
+			}
+
+			// Check for Description Control
+			if (controls.description) {} 
+
+		}
+
+		// scale control
+		if (controls.measure) {
+			if (controls.layermenu) {
+				topright.style.right = '295px';
+			} else {
+				topright.style.right = '6px';
+			}
+		}
+
+
+		// todo?
+		if (controls.mouseposition) {}
+		if (controls.vectorstyle) {}
+		if (controls.zoom) {}
+		if (controls.baselayertoggle) {}
+		if (controls.description) {} 
+		if (controls.draw) {}
+		if (controls.geolocation) {}
+		if (controls.inspect) {}
+
 	},
 
 
@@ -9885,17 +9925,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 
 	},
-
-	// refreshZIndex : function () {
-
-	// 	var layers = this.project.getActiveLayers();
-
-	// 	layers.forEach(function (layer) {
-	// 		if (layer) layer.refreshZIndex();
-	// 	}, this);
-
-	// },
-
 
 	hideControls : function () {
 		Wu.DomUtil.addClass(app._map._controlContainer, 'displayNone');
@@ -10303,38 +10332,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			// add to map
 			app._map.addLayer(e.layer);
 
-			// // if editMode
-			// if (that.project.editMode) {
-
-			// 	console.log('editmode!');
-			// 	// create layer and add to project
-			// 	var geojson = e.layer.toGeoJSON();
-			// 	that.project.createLayerFromGeoJSON(geojson);
-				
-			// } else {
-
-			// 	// add drawn layer to map
-			// 	editableLayers.addLayer(e.layer);
-
-			// }
 		});
-
-		// // created note
-		// map.on('draw:note:created', function(e) {
-
-		// 	// add layers
-		// 	editableLayers.addLayer(e.noteLayer);
-		// 	editableLayers.addLayer(e.rectangleLayer);
-
-		// 	// enable edit toolbar and focus Note
-		// 	// L.Draw._editshortcut.enable();		// todo, refactor
-		// 	// e.noteLayer._el.focus();
-		// 	// map.LeafletDrawEditEnabled = true;
-		// });
-
-		// add vector styling control
-		// this.enableVectorstyle(drawControl._wrapper);
-
 
 	},
 
@@ -19949,13 +19947,13 @@ Wu.App = Wu.Class.extend({
 
 			// tiles SX
 			tiles : {
-				uri : 'https://{s}.systemapic.com/tiles/',
+				uri : 'https://{s}.systemapic.com/r/',
 				subdomains : 'abcd' // sx
 			},
 
 			// utfgrid SX
 			utfgrid : {
-				uri : 'https://{s}.systemapic.com/utfgrid/',
+				uri : 'https://{s}.systemapic.com/u/',
 				subdomains : 'abcd' // sx
 			},
 

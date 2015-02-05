@@ -127,7 +127,7 @@ Wu.MapPane = Wu.Class.extend({
 		this.setHeaderPadding();
 
 		// set controls css logic
-		this.updateControlCss();
+		setTimeout(this.updateControlCss.bind(this), 100); // timeout hack bug
 		
 	},
 
@@ -221,20 +221,23 @@ Wu.MapPane = Wu.Class.extend({
 			attributionControl : false
 		}
 
+		// get project pos
+		var pos = this.project.getLatLngZoom(),
+		    lat = pos.lat,
+		    lng = pos.lng,
+		    zoom = pos.zoom;
+
 		// create new map
-		this._map = Wu.app._map = L.map('map', options).setView([0, 0], 6); // todo
+		this._map = Wu.app._map = L.map('map', options).setView([lat, lng], zoom); 
 
 		// add editable layer
 		this.addEditableLayer(this._map);
 
 		// add attribution
-		// if (this._attributionControl) this._map.removeControl(this._attributionControl);
 		this._attributionControl = L.control.attribution({
 				position : 'bottomright',
 				prefix : 'Powered by <a href="https://systemapic.com/" target="_blank">Systemapic.com</a> ©'
 		});
-
-
 		this._map.addControl(this._attributionControl);
 
 	},
@@ -252,7 +255,6 @@ Wu.MapPane = Wu.Class.extend({
 		var map = this._map;
 		if (map) {
 			
-
 			// remove each layer
 			map.eachLayer(function(layer) {
 				map.removeLayer(layer);
@@ -280,94 +282,63 @@ Wu.MapPane = Wu.Class.extend({
 	updateControlCss : function () {
 
 
-		var thus = this;
+		// get controls
+		var controls = this.project.getControls(),
+		    corners = app._map._controlCorners,
+		    topleft = corners.topleft,
+		    bottomright = corners.bottomright,
+		    topright = corners.topright;
 
-		setTimeout(function(){
 
-			// get controls
-			var controls = thus.project.getControls();
+		// layermenu control
+		if (controls.layermenu) {
 			
-			// get leaflet control corners
-			var _leafletTopLeft = app.MapPane._map._controlContainer.childNodes[0];
-			var _leafletBottomRight = app.MapPane._map._controlContainer.childNodes[3];				
-
-			if ( controls.baselayertoggle ) {
-			}
-
-			
-
-			if (controls.description) {
-			} 
-
-			if (controls.draw) {
-			}
-
-			if (controls.geolocation) {
-			}
-
+			// Check for Layer Inspector
 			if (controls.inspect) {
+				Wu.DomUtil.removeClass(bottomright, 'no-inspector');
+			} else {
+				Wu.DomUtil.addClass(bottomright, 'no-inspector');
 			}
+		}
 
-
-			// layermenu control
-			if (controls.layermenu) {
-				
-				// Check for Layer Inspector
-				if (controls.inspect) {
-					Wu.DomUtil.removeClass(_leafletBottomRight, 'no-inspector');
-				} else {
-					Wu.DomUtil.addClass(_leafletBottomRight, 'no-inspector');
-				}
-			}
-
-			// legend control
-			if (controls.legends) {
-				
-				// get container
-				var __legendsContainer = thus.legendsControl._legendsContainer;
-
-				// Check for Layer Menu Control
-				if ( controls.layermenu ) {
-					Wu.DomUtil.removeClass(__legendsContainer, 'legends-padding-right');
-				} else {
-					Wu.DomUtil.addClass(__legendsContainer, 'legends-padding-right');
-				}
-
-				// Check for Description Control
-				if ( controls.description ) {
-				} 
-
-			}
-
-
-			// scale control
-			if ( controls.measure ) {
-				// console.log('Scale Control', thus._scale._container);
-				var _leafletTopRight = app.MapPane._map._controlContainer.childNodes[1];
-
-				if ( controls.layermenu ) {
-					// right: 332px;
-					_leafletTopRight.style.right = '295px';
-				} else {
-					_leafletTopRight.style.right = '6px';
-					// right: 6px;
-				}
-
-
-			}
-
-			if ( controls.mouseposition ) {
-			}
-
-			if ( controls.vectorstyle ) {
-			}
-
-			if ( controls.zoom ) {
-			}
-
+		// legend control
+		if (controls.legends) {
 			
+			// get container
+			var legendsContainer = this.legendsControl._legendsContainer;
 
-		}, 50)	// css/dom hack
+			// Check for Layer Menu Control
+			if (controls.layermenu) {
+				Wu.DomUtil.removeClass(legendsContainer, 'legends-padding-right');
+			} else {
+				Wu.DomUtil.addClass(legendsContainer, 'legends-padding-right');
+			}
+
+			// Check for Description Control
+			if (controls.description) {} 
+
+		}
+
+		// scale control
+		if (controls.measure) {
+			if (controls.layermenu) {
+				topright.style.right = '295px';
+			} else {
+				topright.style.right = '6px';
+			}
+		}
+
+
+		// todo?
+		if (controls.mouseposition) {}
+		if (controls.vectorstyle) {}
+		if (controls.zoom) {}
+		if (controls.baselayertoggle) {}
+		if (controls.description) {} 
+		if (controls.draw) {}
+		if (controls.geolocation) {}
+		if (controls.inspect) {}
+
 	},
 
 
@@ -396,17 +367,6 @@ Wu.MapPane = Wu.Class.extend({
 
 
 	},
-
-	// refreshZIndex : function () {
-
-	// 	var layers = this.project.getActiveLayers();
-
-	// 	layers.forEach(function (layer) {
-	// 		if (layer) layer.refreshZIndex();
-	// 	}, this);
-
-	// },
-
 
 	hideControls : function () {
 		Wu.DomUtil.addClass(app._map._controlContainer, 'displayNone');
@@ -814,38 +774,7 @@ Wu.MapPane = Wu.Class.extend({
 			// add to map
 			app._map.addLayer(e.layer);
 
-			// // if editMode
-			// if (that.project.editMode) {
-
-			// 	console.log('editmode!');
-			// 	// create layer and add to project
-			// 	var geojson = e.layer.toGeoJSON();
-			// 	that.project.createLayerFromGeoJSON(geojson);
-				
-			// } else {
-
-			// 	// add drawn layer to map
-			// 	editableLayers.addLayer(e.layer);
-
-			// }
 		});
-
-		// // created note
-		// map.on('draw:note:created', function(e) {
-
-		// 	// add layers
-		// 	editableLayers.addLayer(e.noteLayer);
-		// 	editableLayers.addLayer(e.rectangleLayer);
-
-		// 	// enable edit toolbar and focus Note
-		// 	// L.Draw._editshortcut.enable();		// todo, refactor
-		// 	// e.noteLayer._el.focus();
-		// 	// map.LeafletDrawEditEnabled = true;
-		// });
-
-		// add vector styling control
-		// this.enableVectorstyle(drawControl._wrapper);
-
 
 	},
 

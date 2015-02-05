@@ -444,24 +444,29 @@ module.exports = pixels = {
 
 	serveFitPixelPerfection : function (req, res) {
 
+
+		console.log('*****************************************************************');
+		console.log('fit pixels');
+
+
 		// set vars
-		var width      = req.query.width;
-		var height     = req.query.height;
+		// var width      = req.query.width;
+		// var height     = req.query.height;
 		var quality    = req.query.quality;
-		var raw        = req.query.raw;
+		// var raw        = req.query.raw;
 		var imageId    = req.params[0]; 		// 'file-ccac0f45-ae95-41b9-8d57-0e64767ea9df'		
-		var cropX      = req.query.cropx;	
-		var cropY      = req.query.cropy;
-		var cropW      = req.query.cropw;
-		var cropH      = req.query.croph;
+		// var cropX      = req.query.cropx;	
+		// var cropY      = req.query.cropy;
+		// var cropW      = req.query.cropw;
+		// var cropH      = req.query.croph;
 
 		var fitW      = req.query.fitW;
 		var fitH      = req.query.fitH;				
 
 
 		console.log('imageId', imageId);
-		console.log('width', width);
-		console.log('height', height);
+		// console.log('width', width);
+		// console.log('height', height);
 		console.log('fitW', fitW);
 		console.log('fitH', fitH);
 
@@ -485,6 +490,9 @@ module.exports = pixels = {
 			var imgWidth = size.width;
 			var imgHeight = size.height;
 
+			console.log('imgWidth', imgWidth);
+			console.log('imgHeight', imgHeight);
+
 			if ( imgWidth>=imgHeight ) 	var imgLandscape = true;
 			if ( fitW>=fitH ) 		var fitLandscape = true;
 
@@ -492,6 +500,7 @@ module.exports = pixels = {
 			if ( !fitLandscape && imgLandscape ) {
 
 				// Cropping the X-axis
+				console.log('cropping x-axis');
 
 				// regn ut større bredde enn fitW...
 				cropW = fitW * fitH/fitW;
@@ -503,6 +512,8 @@ module.exports = pixels = {
 			} else {
 
 				// Cropping the Y-axis
+				console.log('cropping y-axis');
+
 				cropW = fitW;
 
 				// Find the image proportion
@@ -516,6 +527,16 @@ module.exports = pixels = {
 				// Offset the Y axis
 				cropY = (cropH - fitH) / 2;
 			}
+
+
+			// console.log('');
+			// console.log('cropW', cropW, '(image oversize width)');
+			// console.log('cropH', cropH, '(image oversize height)');
+			// console.log('fitW', fitW, '(image output width)');
+			// console.log('fitH', fitH, '(image output height)');
+			// console.log('cropX', cropX, '(image crop X)');
+			// console.log('cropY', cropW, '(image crop Y)');
+			// console.log('');
 
 
 			quality = 100;
@@ -536,12 +557,14 @@ module.exports = pixels = {
 			.write(newPath, function (err) {
 				if (err) console.log('resizeImage error: ', err);
 				
-				var result = {
-					file   : newFile,
-					height : height,
-					width  : width,
-					path : newPath
-				}
+				// var result = {
+				// 	file   : newFile,
+				// 	height : height,
+				// 	width  : width,
+				// 	path : newPath
+				// }
+
+				console.log('*****************************************************************');
 
 				res.sendfile(newPath, {maxAge : 10000000});
 
