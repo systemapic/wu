@@ -2103,6 +2103,10 @@
 	z-index: 9999999;
 	}
 
+.map-blur .cartocss-control-container {
+	display: none !important;
+}
+
 .cartocss-control-wrapper {
 	background-color: white;
 	height: 100%;

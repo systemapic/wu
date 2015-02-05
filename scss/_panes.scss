@@ -403,6 +403,7 @@
 	display: inline-block;
 	vertical-align: bottom;
 	padding-right: 20px;
+	overflow: visible;
 	}
 
 .project-title input {
@@ -620,6 +621,25 @@
 	float: right;
 	}
 
+.new-project-thumb {
+	font-size: 11px;
+	font-weight: 900;
+	margin-top: 10px;
+	background: #CCC;
+	width: 100%;
+	text-align: center;
+	border-radius: 2px;
+	height: 17px;
+	/*float: right;	*/
+	position: relative;
+	cursor: pointer;
+	}
+
+.new-project-thumb:hover {
+	background: #EEE;
+	}
+
+
 .project-delete {
 	font-size: 11px;
 	font-weight: 900;
@@ -631,6 +651,8 @@
 	height: 17px;
 	float: right;
 	}
+
+
 
 .project-delete:hover {
 	background: #C80000;
@@ -1334,6 +1356,7 @@
 
 .tdcont {
 	cursor: pointer;
+	position: relative;
 	}
 
 .tdcont input {
@@ -1348,6 +1371,9 @@
 #documents-new-folder {
 	margin-left: 10px;
 	}
+
+
+
 
 
 
@@ -2344,7 +2370,8 @@ td.tdcont.createdDate {
 	height: 40px;
 	position: absolute;
 	top: 13px;
-	background: #fe5757;
+	/*background: #fe5757;*/
+	background-color: #a84158;
 	color: white;
 	width: 75px;
 	padding: 5px;
@@ -2355,24 +2382,25 @@ td.tdcont.createdDate {
 	font-weight: 900;
 	line-height: 1.8;
 	text-shadow: 0px 1px 1px rgba(0,0,0,0.4);
-	box-shadow: 0 0 2px 0 rgba(0,0,0,0.4);
+	/*box-shadow: 0 0 2px 0 rgba(0,0,0,0.4);*/
 	}
 
 .access-projects-read:active,
 .access-projects-write:active,
 .access-projects-manage:active {
-	box-shadow: 0 0 2px 0 rgba(0,0,0,0.0);
+	/*box-shadow: 0 0 2px 0 rgba(0,0,0,0.0);*/
 	}
 
 .access-projects-read:hover,
 .access-projects-write:hover,
 .access-projects-manage:hover {
-	background: rgb(0, 225, 255);
+	/*background: rgb(0, 225, 255);*/
+	background-color: #334d5c;
 	}
 
 /* READ access */
 .access-projects-read {
-	border-radius: 3px 0 0 3px;
+	/*border-radius: 3px 0 0 3px;*/
 	right: 162px;
 	}
 
@@ -2383,13 +2411,14 @@ td.tdcont.createdDate {
 
 /* MANAGE access */
 .access-projects-manage {
-	border-radius: 0 3px 3px 0;
+	/*border-radius: 0 3px 3px 0;*/
 	right: 10px;
 	}
 
 /* Color code for projects you've got access for */
 .gotAccess {
-	background-color: #33BB33;
+	/*background-color: #33BB33;*/
+	background-color: #218777;
 	}
 
 /* The description at the bottom ("The guide") */
@@ -2519,11 +2548,16 @@ td.tdcont.createdDate {
 	}
 
 .share-image-wrap:before {
-	content: 'making image';
+	content: '';
+	background-image: url(images/systemapic-grinding.gif);
+	background-repeat: no-repeat;
 	text-align: center;
 	width: 100%;
-	position: absolute;
 	padding-top: 170px;
+	background-position: center;
+	top: 119px;
+	position: absolute;
+	left: 14px;
 	}
 
 
@@ -2600,6 +2634,7 @@ td.tdcont.createdDate {
 	background-position: -370px -172px;
 	}
 
+.share-print-download a,
 .share-print-download-button {
 	background-image: url(images/evil_sprite.png);
 	background-repeat: no-repeat;
@@ -2608,7 +2643,7 @@ td.tdcont.createdDate {
 	height: 58px;
 	position: relative;
 	margin: auto;
-	color: transparent;
+	color: transparent !important;
 	opacity: 0.8;
 	padding: 20px;
 	top: 30px;

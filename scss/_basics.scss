@@ -161,8 +161,27 @@ hr {
 	color: black;
 	}
 
-.tdcont.access:hover {
+/*.tdcont.access:hover {
 	background: rgb(146, 240, 229);
+	}
+*/
+.user-projects-button {
+	/*background: rgba(0,0,0,0.2);*/
+	background: rgba(0, 0, 0, 0.65);
+	padding: 10px;
+	text-align: center;
+	line-height: 1;
+	margin-right: 4px;
+	color: white;
+	font-weight: 500;
+	box-shadow: -1px 1px 2px 0 rgba(0, 0, 0, 0.3);
+	cursor: pointer;
+	}
+
+.user-projects-button:hover {
+	/*background: #66a7a0;*/
+	/*background: #218777;*/
+	background: black;
 	}
 	
 .defaultCursor {

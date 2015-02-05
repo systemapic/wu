@@ -127,8 +127,10 @@ Wu.SidePane.Item = Wu.Class.extend({
 		}
 	},
 
-	// cxxxx
+	
 	activate : function (e) {
+
+		console.log('activate sidepane menu item', this);
 	
 		// set active menu
 		var prev = Wu.app._activeMenu || false;

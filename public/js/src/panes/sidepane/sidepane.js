@@ -303,6 +303,7 @@ Wu.SidePane = Wu.Class.extend({
 	// open sidepane
 	openPane : function () {
 
+
 		// return if already open
 		if (this.paneOpen) return;
 		this.paneOpen = true;

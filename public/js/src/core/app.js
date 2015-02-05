@@ -49,13 +49,13 @@ Wu.App = Wu.Class.extend({
 
 			// tiles SX
 			tiles : {
-				uri : 'https://{s}.systemapic.com/tiles/',
+				uri : 'https://{s}.systemapic.com/r/',
 				subdomains : 'abcd' // sx
 			},
 
 			// utfgrid SX
 			utfgrid : {
-				uri : 'https://{s}.systemapic.com/utfgrid/',
+				uri : 'https://{s}.systemapic.com/u/',
 				subdomains : 'abcd' // sx
 			},
 

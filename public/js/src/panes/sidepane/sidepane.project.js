@@ -73,8 +73,12 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// add delete button
 		if (app.Account.canDeleteProject(this.project.store.uuid) || this.options.editMode) {
-			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');
+		
+			this.makeThumb = Wu.DomUtil.create('div', 'new-project-thumb', this.usersInnerWrapper, 'Generate thumbnail');
+			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');			
 		}
+
+
 
 
 		// ****************************************************************************
@@ -198,6 +202,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// add kill hook
 		if (app.Account.canDeleteProject(this.project.getUuid())) {
 			Wu.DomEvent.on(this.kill, 'click', this.deleteProject, this);
+			Wu.DomEvent.on(this.makeThumb, 'click', this.makeNewThumbnail, this);
 		}
 	},
 
@@ -213,7 +218,63 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// remove kill hook
 		if (app.Account.canDeleteProject(this.project.getUuid())) {
 			Wu.DomEvent.off(this.kill, 'click', this.deleteProject, this);
+			Wu.DomEvent.off(this.makeThumb, 'click', this.makeNewThumbnail, this);
 		}
+	},
+
+
+	makeNewThumbnail : function () {
+		console.log('%c *****************************************************', 'background-color: #D80000; color: white;');
+
+		var that = this;	// callback
+
+		app.setHash(function (ctx, hash) {
+
+			// get snapshot from server
+			Wu.post('/api/util/snapshot', hash, that.createdThumb, that);
+
+		});
+
+		console.log('%c *****************************************************', 'background-color: #D80000; color: white;');
+
+	},
+
+	createdThumb : function(context, file) {
+
+
+		// parse results
+		var result = JSON.parse(file);
+		var image = result.image;
+
+		console.log('%cThumb has been created =>', 'color: #339933')
+
+		console.log('result=>', result);
+		console.log('context=>', context.logo);
+
+
+		// get dimensions of container
+		var height = context.logo.offsetHeight;
+		var width = context.logo.offsetWidth;
+
+		// set path
+		var path = app.options.servers.portal;
+		
+		path += 'pixels/';
+		path += image;
+		path += '?width=' + 800;
+		path += '&height=' + 600;
+
+
+		console.log('image=>', image);
+
+		// cxx 
+		// set image
+		context.logo.src = path;
+
+
+		// Need to save the frickin logo
+
+
 	},
 
 	// edit hook for client logo
@@ -228,7 +289,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		
 		// set client uuid param for server
 		this.logodz.options.params.project = this.project.getUuid();
-		
+
 		// set callback on successful upload
 		var that = this;
 		this.logodz.on('success', function (err, path) {

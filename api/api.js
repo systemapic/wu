@@ -27,13 +27,15 @@ var request 	= require('request');
 var mime 	= require("mime");
 var formidable  = require('formidable');
 
+// config
+var config = require('../config/config.js');
+
 // mapnik
 var mapnik = require('mapnik');
 var carto = require('carto');
 var mapnikOmnivore = require('mapnik-omnivore');
 
 // redis
-var config = require('../config/config.js');
 var redis = require('redis');
 var redisStore = redis.createClient(config.temptokenRedis.port, config.temptokenRedis.host)
 redisStore.auth(config.temptokenRedis.auth);
@@ -50,25 +52,24 @@ var superusers = [
 	'user-b76a8d27-6db6-46e0-8fc3-d022e6ff084f'	// phantomJS
 ]
 
+
+
 // global paths
 var FILEFOLDER 		= '/data/files/';
 var IMAGEFOLDER 	= '/data/images/';
 var TEMPFOLDER 		= '/data/tmp/';
 var CARTOCSSFOLDER 	= '/data/cartocss/';
 var TOOLSPATH 		= '../tools/';
-var BASEURI 		= 'https://projects.ruppellsgriffon.com/';
-var VILEHOST		= 'http://85.10.202.87:3003/';
+
+var BASEURI 		= config.portalserver.uri;
+var VILEHOST		= config.vile.uri;
 
 // default mapbox account
-var DEFAULTMAPBOX = {
-	username : 'systemapic',
-	accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJQMWFRWUZnIn0.yrBvMg13AZC9lyOAAf9rGg'
-}
+var DEFAULTMAPBOX 	= config.defaultMapboxAccount;
 
 
 // function exports
 module.exports = api = {
-
 
 
 	dbCreateLayer : function (options, callback) {
