@@ -69,6 +69,16 @@ Wu.Style = Wu.Class.extend({
 
 	},
 
+	phantomJSthumb : function () {
+
+		// append darktheme stylesheet
+		var phantom = document.createElement("link");
+		phantom.rel = 'stylesheet';
+		phantom.href = 'https://projects.ruppellsgriffon.com/css/phantomJSthumb.css';
+		this._styletag.appendChild(phantom);
+
+	},
+
 
 
 });

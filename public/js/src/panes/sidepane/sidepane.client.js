@@ -136,7 +136,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		
 		// remove client button
 		if (app.Account.canDeleteClient(this.client.uuid)) {
-			this._removeClientButton = Wu.DomUtil.create('div', 'client-kill', this._container, 'Delete client');
+			this._removeClientButton = Wu.DomUtil.create('div', 'client-kill displayNone', this._container, 'Delete client');
 			Wu.DomEvent.on(this._removeClientButton, 'mousedown', this.removeClient, this);
 
 		}
@@ -478,6 +478,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._container.style.height = this.maxHeight + 'px';          
 		this._isOpen = true;
 
+		
+		Wu.DomUtil.removeClass(this._removeClientButton, 'displayNone');
+
+
 		// close others
 		var clients = app.SidePane.Clients;
 		if (clients._lastOpened && clients._lastOpened != this) clients._lastOpened.close();
@@ -490,6 +494,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._container.style.height = this.minHeight + 'px';    
 		this._isOpen = false;
 
+		Wu.DomUtil.addClass(this._removeClientButton, 'displayNone');
 
 		this.resetOpenProjectInfo();
 				

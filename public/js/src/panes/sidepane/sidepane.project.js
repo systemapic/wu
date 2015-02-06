@@ -194,7 +194,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// add kill hook
 		if (app.Account.canDeleteProject(this.project.getUuid())) {
 			Wu.DomEvent.on(this.kill, 'click', this.deleteProject, this);
-			Wu.DomEvent.on(this.makeThumb, 'click', this.makeNewThumbnail, this);
+
+			Wu.DomEvent.on( this.makeThumb, 'click', this.makeNewThumbnail, this );
+			Wu.DomEvent.on( this.makeThumb, 'mousedown click', Wu.DomEvent.stopPropagation, this );
 		}
 	},
 
@@ -210,26 +212,80 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// remove kill hook
 		if (app.Account.canDeleteProject(this.project.getUuid())) {
 			Wu.DomEvent.off(this.kill, 'click', this.deleteProject, this);
-			Wu.DomEvent.off(this.makeThumb, 'click', this.makeNewThumbnail, this);
+
+			Wu.DomEvent.off( this.makeThumb, 'click', this.makeNewThumbnail, this );
+			Wu.DomEvent.off( this.makeThumb, 'mousedown click', Wu.DomEvent.stopPropagation, this );
 		}
 	},
 
 
 	makeNewThumbnail : function () {
 
-		var that = this;	// callback
+		var that = this; // callback
 
-		app.setHash(function (ctx, hash) {
-			var obj = JSON.parse(hash);
-			obj.dimensions = {
-				height : 300,
-				width : 200
-			}
-			// get snapshot from server
-			Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdThumb, that);
+		// If current project is active
+		if ( this.project.store.uuid == app.activeProject.getUuid() ) {
+			
+			app.setHash(function (ctx, hash) {
 
-		});
+				var obj = JSON.parse(hash);				
+
+				obj.dimensions = {
+					height : 233,
+					width : 350,			
+				}
+
+				// get snapshot from server
+				Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdThumb, that);
+
+			})
+
+		// We're making a thumb on a project that is not active
+		} else {
+
+
+			this.setNewHash(function (ctx, hash) {
+
+				var obj = JSON.parse(hash);				
+
+				obj.dimensions = {
+					height : 233,
+					width : 350,			
+				}
+
+				// get snapshot from server
+				Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdThumbNotActive, that);
+
+			})
+		}
 	},
+
+
+
+	// save a hash
+	setNewHash : function (callback) {
+
+		// get project;
+		var projectUuid = this.project.store.uuid;
+
+		// hash object
+		var json = {
+			projectUuid : projectUuid,
+			hash : {
+				id 	 : Wu.Util.createRandom(6),
+				position : this.project.store.position,
+				layers 	 : [] 			// layermenuItem uuids, todo: order as z-index
+			}
+		}
+
+		// save hash to server
+		Wu.post('/api/project/hash/set', JSON.stringify(json), callback, this);
+
+		// return
+		return json.hash;
+
+	},
+
 
 	createdThumb : function(context, json) {
 
@@ -249,9 +305,33 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// set image
 		context.logo.src = path;
 		context.project.setLogo(path);
+
 		app.HeaderPane.addedLogo(image);
 
 	},
+
+
+	createdThumbNotActive : function(context, json) {
+
+		// parse results
+		var result = JSON.parse(json);
+		// var image = result.image; // filename
+		var image = result.cropped;
+
+		var fileUuid = result.fileUuid;
+
+		// get dimensions of container
+		var height = context.logo.offsetHeight;
+		var width = context.logo.offsetWidth;
+
+		var path = '/images/' + image;
+
+		// set image
+		context.logo.src = path;
+		context.project.setLogo(path);
+
+	},
+
 
 	// edit hook for client logo
 	addLogoDZ : function () {

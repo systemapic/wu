@@ -18,6 +18,11 @@ Wu.StartPane = Wu.Class.extend({
 		// refresh latest projects
 		this.refreshProjects();
 
+		// Show the header pane.
+		Wu.DomUtil.removeClass(Wu.app.HeaderPane._container, 'displayNone');
+
+		// Wu.app.HeaderPane.setSubtitle(app.Account.getName());
+
 	},	
 
 	deactivate : function() {
@@ -79,12 +84,12 @@ Wu.StartPane = Wu.Class.extend({
 		this._bannerContainer = Wu.DomUtil.create('div', 'startpane-banner-container', wrapper);
 		this._banner = Wu.DomUtil.create('div', 'startpane-banner', this._bannerContainer);
 
-		// client logo
-		this._logo = Wu.DomUtil.create('div', 'startpane-logo', this._banner);
-
-		// project list 
 		this._recentProjectsContainer = Wu.DomUtil.create('div', 'startpane-recent-projects-container', this._banner);
-		this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Recent projects');
+
+		// this._userName = Wu.DomUtil.create('div', 'startpane-user-name', this._recentProjectsContainer);
+		// this._userName.innerHTML = app.Account.getName();
+
+		this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Recent projects:');
 		this._projectList = Wu.DomUtil.create('div', 'startpane-project-list', this._recentProjectsContainer);
 
 		// return 
@@ -104,7 +109,7 @@ Wu.StartPane = Wu.Class.extend({
 
 		// Pull out the latest three Projects	
 		projects.forEach(function (project, i) {
-			if (i > 2) return;
+			if (i > 5) return;
 
 			// Create project container
 			this.createStartProject(project);
@@ -124,20 +129,44 @@ Wu.StartPane = Wu.Class.extend({
 		// Reverse so we get newest first
 		projects.reverse();
 
+
 		return projects;
 	},
 
 	createStartProject : function(project) {
 
+		// Client info
+		var clientID = project.store.client;
+		var clientName = app.Clients[clientID].name;
+		var clientLogo = app.Clients[clientID].logo;
+
 		// create container
-		var projectContainer = Wu.DomUtil.create('div', 'start-panne-recent-projects', this._projectList);
+		var _projectContainer = Wu.DomUtil.create('div', 'start-panne-recent-projects', this._projectList);
+		
+		var _projectThumb = Wu.DomUtil.create('img', '', _projectContainer);
+		_projectThumb.src = project.store.logo;
+
+		var _projectTitle = Wu.DomUtil.create('div', 'start-project-name', _projectContainer);
+		_projectTitle.innerHTML = project.getName();
+
+		var _clientName = Wu.DomUtil.create('div', 'start-project-client-name', _projectContainer);
+		_clientName.innerHTML = clientName;
+
+		var _clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', _projectContainer);
+		_clientLogo.src = clientLogo;
+
 
 		// Adjust for short titles
-		if (project.getName().length < 22) Wu.DomUtil.addClass(projectContainer, 'start-project-short-name');
-		projectContainer.innerHTML = project.getName();;
+		if (project.getName().length < 22) Wu.DomUtil.addClass(_projectTitle, 'short-name');
+		
+
+		var client
+
+
+
 
 		// select project hook
-		Wu.DomEvent.on(projectContainer, 'mousedown', function() { this.selectProject(project); }, this);
+		Wu.DomEvent.on(_projectContainer, 'mousedown', function() { this.selectProject(project); }, this);
 
 	},
 
