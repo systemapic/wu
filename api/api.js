@@ -61,7 +61,7 @@ var TEMPFOLDER 		= '/data/tmp/';
 var CARTOCSSFOLDER 	= '/data/cartocss/';
 var TOOLSPATH 		= '../tools/';
 
-var BASEURI 		= config.portalserver.uri;
+var BASEURI 		= config.portalServer.uri;
 var VILEHOST		= config.vile.uri;
 var VILEOSMHOST 	= config.vileosm.uri;
 
@@ -797,7 +797,8 @@ module.exports = api = {
 		var hash = {
 			position : req.body.hash.position,
 			layers : req.body.hash.layers,
-			id : req.body.hash.id
+			id : req.body.hash.id,
+			
 		}
 
 
@@ -807,7 +808,9 @@ module.exports = api = {
 			// filename : filename,
 			// folder : FILEFOLDER
 			path : path,
-			pdf : true
+			pdf : true,
+			serverUrl : config.portalServer.uri + 'login',
+			serverData : config.phantomJS.data
 		}
 
 		// console.log('-> PDF args: ', args);
@@ -947,7 +950,9 @@ module.exports = api = {
 			hash : hash,
 			path : path,
 			pdf : false,
-			thumb : true
+			thumb : true,
+			serverUrl : config.portalServer.uri + 'login',
+			serverData : config.phantomJS.data
 		}
 
 		var snappath = TOOLSPATH + 'phantomJS-snapshot.js';
@@ -1066,24 +1071,19 @@ module.exports = api = {
 			id : req.body.hash.id
 		}
 
-		// console.log('hash:::', hash);
 
 		var args = {
 			projectUuid : projectUuid,
 			hash : hash,
-			// filename : filename,
-			// folder : IMAGEFOLDER
 			path : path,
-			pdf : false
+			pdf : false,
+			serverUrl : config.portalServer.uri + 'login',
+			serverData : config.phantomJS.data
 		}
 
-		// console.log('-> args: ', args);
 
 		var snappath = TOOLSPATH + 'phantomJS-snapshot.js';
 		var cmd = "phantomjs --ssl-protocol=tlsv1 " + snappath + " '" + JSON.stringify(args) + "'";
-		// var cmd = "phantomjs --ssl-protocol=tlsv1 /var/www/tools/phantomJS/snapshot.js " + "'" + JSON.stringify(args) + "'";
-		// console.log('cmd: ', cmd);
-
 
 		var ops = [];
 		var dataSize;
@@ -1091,7 +1091,7 @@ module.exports = api = {
 		// phantomJS: create snapshot
 		ops.push(function (callback) {
 
-			console.log('cmd!! =-> phantomjss');
+			console.log('cmd!! =-> phantomjs2s', cmd);
 
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
@@ -3329,6 +3329,8 @@ module.exports = api = {
 		// send the file, simply
 		// get file
 		File.findOne({ 'uuid' : file }, function(err, record) {
+
+			console.log('found? , ', err, record);
 			
 			var name = record.name.replace(/\s+/g, '');
 
