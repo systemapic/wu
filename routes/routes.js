@@ -683,17 +683,17 @@ module.exports = function(app, passport) {
 
 	
 
-	// // =====================================
-	// // SIGNUP ==============================
-	// // =====================================
-	// // show the signup form
-	// app.get('/signup', function(req, res) {
-	// 	console.log('/signup');
+	// =====================================
+	// SIGNUP ==============================
+	// =====================================
+	// show the signup form
+	app.get('/signup', function(req, res) {
+		console.log('/signup');
 
-	// 	// render the page and pass in any flash data if it exists
-	// 	res.render('../../views/signup.ejs', { message: req.flash('signupMessage') });
+		// render the page and pass in any flash data if it exists
+		res.render('../../views/signup.ejs', { message: req.flash('signupMessage') });
 
-	// });
+	});
 
 
 	
@@ -709,15 +709,15 @@ module.exports = function(app, passport) {
 
 
 
-	// // =====================================
-	// // SIGNUP ==============================
-	// // =====================================
-	// // process the signup form
-	// app.post('/signup', passport.authenticate('local-signup', {
-	// 	successRedirect : '/', // redirect to the secure profile section
-	// 	failureRedirect : '/signup', // redirect back to the signup page if there is an error
-	// 	failureFlash : true // allow flash messages
-	// }));
+	// =====================================
+	// SIGNUP ==============================
+	// =====================================
+	// process the signup form
+	app.post('/signup', passport.authenticate('local-signup', {
+		successRedirect : '/', // redirect to the secure profile section
+		failureRedirect : '/signup', // redirect back to the signup page if there is an error
+		failureFlash : true // allow flash messages
+	}));
 
 
 

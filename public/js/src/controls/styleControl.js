@@ -14,7 +14,7 @@ Wu.Style = Wu.Class.extend({
 		// append darktheme stylesheet
 		var darktheme = document.createElement("link");
 		darktheme.rel = 'stylesheet';
-		darktheme.href = 'https://projects.ruppellsgriffon.com/css/darktheme.css';
+		darktheme.href = app.options.servers.portal + 'css/darktheme.css';
 		this._styletag.appendChild(darktheme);
 
 		// Set codemirror cartoCSS to dark theme
@@ -37,7 +37,7 @@ Wu.Style = Wu.Class.extend({
 		// Set code mirror to light theme
 		var cartoCSStheme = Wu.DomUtil.get('cartoCSStheme');
 		app.MapPane.cartoCss._codeMirror.setOption("theme", "default");
-		cartoCSStheme.setAttribute('href', 'https://projects.ruppellsgriffon.com/js/lib/codemirror/mode/cartocss/codemirror.carto.css');
+		cartoCSStheme.setAttribute('href', app.options.servers.portal + 'js/lib/codemirror/mode/cartocss/codemirror.carto.css');
 
 	},
 
@@ -48,7 +48,7 @@ Wu.Style = Wu.Class.extend({
 		// Set code mirror to darktheme
 		var cartoCSStheme = Wu.DomUtil.get('cartoCSStheme');
 		app.MapPane.cartoCss._codeMirror.setOption("theme", "mbo");
-		cartoCSStheme.setAttribute('href', 'https://projects.ruppellsgriffon.com/js/lib/codemirror/mode/cartocss/codemirror.carto.darktheme.css');
+		cartoCSStheme.setAttribute('href', app.options.servers.portal + 'js/lib/codemirror/mode/cartocss/codemirror.carto.darktheme.css');
 	
 	},
 
@@ -64,7 +64,7 @@ Wu.Style = Wu.Class.extend({
 		// append darktheme stylesheet
 		var phantom = document.createElement("link");
 		phantom.rel = 'stylesheet';
-		phantom.href = 'https://projects.ruppellsgriffon.com/css/phantomJS.css';
+		phantom.href = app.options.servers.portal + 'css/phantomJS.css';
 		this._styletag.appendChild(phantom);
 
 	},

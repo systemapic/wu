@@ -130,29 +130,36 @@ Wu.StatusPane = Wu.Class.extend({
 
 		// collapse sidepane
 		if (app.SidePane) app.SidePane.collapse();
+		
+		// refresh
 		this.refresh();
 
-		// app.MapPane._container
-		Wu.DomUtil.removeClass(app.MapPane._container, "map-blur") // (j) – removes the blur on map if it's set by one of the fullpanes
+
+		var mp = app.MapPane,
+		    descriptionControl = mp.descriptionControl;
+
+		// removes the blur on map if it's set by one of the fullpanes
+		Wu.DomUtil.removeClass(app.MapPane._container, "map-blur");
 
 		// Show button section and Layer info when the Home dropdown menu opens (j)
 		if (app._map) {
-			app._map._controlCorners.topleft.style.opacity = 1;
-			app._map._controlCorners.topleft.style.display = 'block';
+			var topleft = app._map._controlCorners.topleft;
+		    	topleft.style.opacity = 1;
+			topleft.style.display = 'block';
 		}
 
 
 
 		// Mobile option : activate default sidepane on close to avoid opening in fullscreen
-		if (Wu.app.mobile) {
-			if ( app.MapPane ) {
+		if (app.mobile) {
+			if (mp) {
 				
-				if ( app.MapPane.layerMenu ) app.MapPane.layerMenu._openLayers.style.opacity = 1;
-				if ( app.MapPane.legendsControl ) app.MapPane.legendsControl._legendsOpener.style.opacity = 1;
-				if ( app.MapPane.descriptionControl ) app.MapPane.descriptionControl._button.style.opacity = 1;
+				if (mp.layerMenu) 		mp.layerMenu._openLayers.style.opacity = 1;
+				if (mp.legendsControl)		mp.legendsControl._legendsOpener.style.opacity = 1;
+				if (mp.descriptionControl) 	mp.descriptionControl._button.style.opacity = 1;
 				
 				// Make sure we reset if we're in fullscreen mode (media library, users, etc)
-				if ( app.SidePane.fullscreen ) app.SidePane.Clients.activate();	
+				if (app.SidePane.fullscreen) app.SidePane.Clients.activate();	
 			}
 
 			// Show the controllers (has been hidden when a new project is refreshed in projects.js > refresh() )
@@ -161,14 +168,15 @@ Wu.StatusPane = Wu.Class.extend({
 
 
 		// Only open the description box if there is anything inside of it
-		if ( app.MapPane.descriptionControl.activeLayer ) {
-			if ( app.MapPane.descriptionControl.activeLayer.store.description == '' || !app.MapPane.descriptionControl.activeLayer.store.description ) {
-				app.MapPane.descriptionControl.hide();
+		if (descriptionControl && descriptionControl.activeLayer) {
+			if (descriptionControl.activeLayer.store.description == '' || !descriptionControl.activeLayer.store.description ) {
+				descriptionControl.hide();
 			}
-		} else {
-			// If no layers has been activated
-			app.MapPane.descriptionControl.hide();	
-		}
+		} 
+		//else {
+		// 	// If no layers has been activated
+		// 	descriptionControl.hide();	
+		// }
 
 	},
 

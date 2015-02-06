@@ -30,6 +30,9 @@ var formidable  = require('formidable');
 // config
 var config = require('../config/config.js');
 
+// permission
+var permission = require('./permission');
+
 // mapnik
 var mapnik = require('mapnik');
 var carto = require('carto');
@@ -45,11 +48,8 @@ redisStore.on('error', function (err) {
 
 // superusers
 var superusers = [
-	'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', 	// KO
-	'user-e6e5d7d9-3b4c-403b-ad80-a854b0215831',  	// J
-	'user-5a4b544c-46ff-48e6-885b-c38be91f31b8', 	// rod tester superadmin
-	'user-f36e496e-e3e4-4fac-a37c-f1a98689afda',	// ana tester superadmin
-	'user-b76a8d27-6db6-46e0-8fc3-d022e6ff084f'	// phantomJS
+	'user-f151263a-8a2f-4bfd-86f0-53e71083fb39', 	// KO
+	
 ]
 
 
@@ -107,8 +107,6 @@ module.exports = api = {
 		file.save(function (err, doc) {
 			callback(err, doc);
 		});
-
-
 	},
 
 
@@ -144,6 +142,7 @@ module.exports = api = {
 		var fileUuid = req.body.fileUuid;
 		var layerUuid = req.body.layerUuid;
 
+		// return on err
 		if (!fileUuid || !layerUuid) return res.end(JSON.stringify({
 			error : 'No layer specified.'
 		}));
@@ -151,6 +150,7 @@ module.exports = api = {
 		// get meta
 		api.getMeta(fileUuid, function (err, meta) {
 
+			// return on err
 			if (err) return res.end(JSON.stringify({
 				error : err
 			}));
@@ -224,15 +224,9 @@ module.exports = api = {
 
 			api._getLayerFeaturesValues(fileUuid, cartoid, function (err, result) {
 				if (err) console.error('_getLayerFeaturesValues err: ', err);
-
-				// var jah = result.rules;
-				// var css = result.css;
-
 				callback(err, result);
-
 			});
-
-		})
+		});
 
 
 		// for each rule found
@@ -393,8 +387,6 @@ module.exports = api = {
 				}]
 			}
 
-			
-
 			var cr = new carto.Renderer({});
 		
 			// get xml
@@ -409,7 +401,6 @@ module.exports = api = {
 				}
 
 				callback(null, result);
-
 			});
 		});//fs.out
 
@@ -508,13 +499,16 @@ module.exports = api = {
 				// read css from file
 				var cartopath = CARTOCSSFOLDER + cartoid + '.mss';
 				fs.readFile(cartopath, 'utf8', function (err, buffer) {
+					if (err) console.error(err, cartopath);
 
 					// css as string
 					var css = buffer.toString();
 
-					// get rules from carto (forked!)
+					// get rules from carto (forked! see explain below...)
 					var renderer = new carto.Renderer();
 					var info = renderer.getRules(css);
+
+					console.log('-====> info', info);
 
 					var string = JSON.stringify(info);
 
@@ -529,7 +523,6 @@ module.exports = api = {
 
 						if (!rules2) return;				// todo? forEach on rule1?
 						rules2.forEach(function (rrules) {
-							// console.log('rrules:', rrules);
 							if (!rrules.selectors) return;
 
 							rrules.selectors.forEach(function (s) {
@@ -571,127 +564,31 @@ module.exports = api = {
 
 	},
 
+	// ================== DO NOT DELETE ===================================================================
+	//
+	// 	This is an added prototype fn to the node_module carto/lib/carto/renderer.js:12.
+	//
+	// 		-add it!  
+	//
+	// ======================================================================================================
+	//
+	// 	// systemapic hack
+	// carto.Renderer.prototype.getRules = function render(data) {
 
-	// #########################################
-	// ###  API: Parse CartoCSS              ###
-	// #########################################	// aka create png for label
-	parseCartoCSS : function (req, res) {
-		console.log('parseCartoCSS', req.body);	
+	//     var env = _(this.env).defaults({
+	//         benchmark: true,
+	//         validation_data: false,
+	//         effects: []
+	//     });
 
-		var css = req.body.css;
+	//     if (!carto.tree.Reference.setVersion(this.options.mapnik_version)) {
+	//         throw new Error("Could not set mapnik version to " + this.options.mapnik_version);
+	//     }
+	//     var parser = (carto.Parser(env)).parse(data);
+	//     return parser;
+	// }
+	// ======================================================================================================
 
-		// apply stylesheet to geojson with 1 tiny #id like #eidsvoll
-		// create png from geojson
-
-		var featureKey = req.body.featureKey;
-		var featureValue = req.body.featureValue;
-
-
-
-		try  {
-			// test create png
-			//api._createStylesheet(css, featureKey, featureValue);
-		} catch (e) {
-			console.log('FIXME!!');
-		}
-
-
-
-		// return;
-
-
-
-		// // ############ xml to json #########
-		// // xml to json
-		// var cr = new carto.Renderer({});
-		// var options = {
-		// 	"srs": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over",
-
-		// 	"Stylesheet": [{
-		// 		"id" : 'lol',
-		// 		"data" : css
-		// 	}],
-		// 	"Layer": [{
-		// 		"id" : "layer",	
-		// 		"name" : "layer"
-		// 	}]
-		// }
-
-		// var xml = cr.render(options);
-
-
-		// // console.log('renderer: ', renderer);
-
-		// // var parsed = cr.render(css);
-
-		// // console.log('parsed: ', parsed);
-
-
-		// var parseString = require('xml2js').parseString;
-		// // var xml = "<root>Hello xml2js!</root>"
-		// parseString(xml, function (err, result) {
-		// 	console.log('xml2json:::', result);
-		// 	// console.dir(result);
-
-		// 	console.log('layer->', result.Map.Layer);
-		// 	console.log('style->', result.Map.Style);
-
-		// 	if (result.Map.Style) {
-
-		// 		console.log('rules->', result.Map.Style[0].Rule);
-			
-		// 		var rules = result.Map.Style[0].Rule;
-
-		// 		rules.forEach(function (rule) {
-		// 			console.log('jah rule->', rule);
-		// 		}, this);
-
-		// 	}
-		// });
-
-		// // ############ xml to json ######### end #####
-
-
-
-
-
-
-		// carto renderer
-		// var cr = new carto.Renderer({
-		// 	filename: cartoid + '.mss',
-		// 	local_data_dir: CARTOCSSPATH,
-		// });
-
-	
-		// // get xml from 
-		// var xml = cr.render(options);
-
-
-		// var env = {};
-		// var parser = (carto.Parser(env)).parse(css);
-
-	
-		// console.log('parser', parser);
-
-		// var rule_list = parser.toList(env);
-
-		// console.log('rule_list', rule_list);
-		// console.log('elemetns: ', rule_list[0].elements);
-
-		// var defs = this._inheritDefinitions(rule_list, env);
-
-		// console.log('defs:', defs);
-
-
-		// return 
-		res.end(JSON.stringify({
-			result : 'ok',
-			css : 'css'
-		}));
-
-
-
-	},
 
 
 
@@ -1319,7 +1216,7 @@ module.exports = api = {
 		var user = req.user;
 
 		// return if not authorized
-		if (!api.can.create.project( user )) return api._errorUnauthorized(req, res);
+		if (!permission.to.create.project(user)) return api._errorUnauthorized(req, res);
 
 		// create new project
 		var project = api._newProject(user, json);
@@ -1845,7 +1742,7 @@ module.exports = api = {
 		model.exec(function (err, project) {
 			
 			// return if not authorized
-			if (!api.can.remove.project( user, project )) {
+			if (!permission.to.remove.project( user, project )) {
 				var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
 				return res.end(JSON.stringify({ error : message }));
 			};
@@ -1926,7 +1823,7 @@ module.exports = api = {
 			if (err) return res.end(JSON.stringify({ error : 'Error retrieving project.' }));
 			
 			// return if not authorized
-			if (!api.can.update.project(user, project)) {
+			if (!permission.to.update.project(user, project)) {
 				var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
 				return res.end(JSON.stringify({ error : message }));
 			};
@@ -2080,7 +1977,7 @@ module.exports = api = {
 		var json = req.body;
 
 		// return if not authorized
-		if (!api.can.create.client( user )) {
+		if (!permission.to.create.client( user )) {
 			var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
 			return res.end(JSON.stringify({ error : message }));
 		};
@@ -2143,7 +2040,7 @@ module.exports = api = {
 			if (err) return res.end(JSON.stringify({ error : 'Error retrieving client.' }));
 			
 			// return if not authorized
-			if (!api.can.remove.client(user, client)) {
+			if (!permission.to.remove.client(user, client)) {
 				var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
 				return res.end(JSON.stringify({ error : message }));
 			};
@@ -2224,7 +2121,7 @@ module.exports = api = {
 			if (err) return res.end(JSON.stringify({ error : 'Error retrieving client.' }));
 			
 			// return if not authorized
-			if (!api.can.update.client(user, client)) {
+			if (!permission.to.update.client(user, client)) {
 				var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
 				return res.end(JSON.stringify({ error : message }));
 			};
@@ -2362,7 +2259,7 @@ module.exports = api = {
 
 
 		// return if not authorized
-		if (!api.can.create.user( user )) {
+		if (!permission.to.create.user( user )) {
 			var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
 			return res.end(JSON.stringify({ error : message }));
 		};
@@ -2494,7 +2391,7 @@ module.exports = api = {
 			if (err) return res.end(JSON.stringify({ error : 'Error retrieving client.' }));
 			
 			// return if not authorized
-			if (!api.can.update.user(user, subject)) {
+			if (!permission.to.update.user(user, subject)) {
 				var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
 				return res.end(JSON.stringify({ error : message }));
 			};
@@ -2629,7 +2526,7 @@ module.exports = api = {
 			if (err) return res.end(JSON.stringify({ error : 'Error retrieving user.' }));
 			
 			// return if not authorized
-			if (!api.can.remove.user(user, subject)) {
+			if (!permission.to.remove.user(user, subject)) {
 				var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
 				return res.end(JSON.stringify({ error : message }));
 			};
@@ -2727,7 +2624,7 @@ module.exports = api = {
 						if (role == 'reader') {
 
 							// check if user is allowed to delegate read access to project
-							if (api.can.delegate.reader(user, project)) {
+							if (permission.to.delegate.reader(user, project)) {
 
 								subject.role.reader.projects.addToSet(project.uuid);
 								subject.role.reader.clients.addToSet(project.client); // make sure can read client
@@ -2752,7 +2649,7 @@ module.exports = api = {
 						if (role == 'editor') {
 
 							// check if user is allowed to delegate read access to project
-							if (api.can.delegate.editor(user, project)) {
+							if (permission.to.delegate.editor(user, project)) {
 
 								subject.role.editor.projects.addToSet(project.uuid);
 								subject.role.reader.clients.addToSet(project.client); // make sure can read client
@@ -2775,7 +2672,7 @@ module.exports = api = {
 						if (role == 'manager') {
 
 							// check if user is allowed to delegate read access to project
-							if (api.can.delegate.manager(user, project)) {
+							if (permission.to.delegate.manager(user, project)) {
 
 								subject.role.manager.projects.addToSet(project.uuid);
 								subject.role.reader.clients.addToSet(project.client); // make sure can read client
@@ -2807,7 +2704,7 @@ module.exports = api = {
 						if (role == 'reader') {
 
 							// check if user is allowed to delegate read access to project
-							if (api.can.delegate.reader(user, project)) {
+							if (permission.to.delegate.reader(user, project)) {
 
 
 								// revoke project
@@ -2833,7 +2730,7 @@ module.exports = api = {
 						if (role == 'editor') {
 
 							// check if user is allowed to delegate read access to project
-							if (api.can.delegate.editor(user, project)) {
+							if (permission.to.delegate.editor(user, project)) {
 
 								subject.role.editor.projects.pull(project.uuid);
 								subject.markModified('role');
@@ -2856,7 +2753,7 @@ module.exports = api = {
 						if (role == 'manager') {
 
 							// check if user is allowed to delegate read access to project
-							if (api.can.delegate.manager(user, project)) {
+							if (permission.to.delegate.manager(user, project)) {
 
 								subject.role.manager.projects.pull(project.uuid);
 								subject.markModified('role');
@@ -3644,7 +3541,7 @@ module.exports = api = {
 			if (!file) return callback('No such file.');
 
 			// check access
-			var access = api.can.update.file(req.user, file);
+			var access = permission.to.update.file(req.user, file);
 
 			// return if no access
 			if (!access) return callback('No access.');
@@ -4232,8 +4129,6 @@ module.exports = api = {
 				hash : doc
 			}));
 		});
-
-		
 	},
 
 
@@ -4256,207 +4151,207 @@ module.exports = api = {
 
 
 
-	// CRUD capabilities
-	can : {
+	// // CRUD capabilities
+	// can : {
 
-		create : {
-			project : function (user) {
-				if (superadmin(user)) return true;
-				if (user.role.admin)  return true;
-				return false;
-			},
-			client : function (user) {
-				if (superadmin(user)) return true;
-				if (user.role.admin)  return true;
-				return false;
-			},
+	// 	create : {
+	// 		project : function (user) {
+	// 			if (superadmin(user)) return true;
+	// 			if (user.role.admin)  return true;
+	// 			return false;
+	// 		},
+	// 		client : function (user) {
+	// 			if (superadmin(user)) return true;
+	// 			if (user.role.admin)  return true;
+	// 			return false;
+	// 		},
 			
-			user : function (user) {
+	// 		user : function (user) {
 
-				// can create users without any CRUD privileges
-				if (superadmin(user)) return true;
-				if (user.role.admin) return true;
+	// 			// can create users without any CRUD privileges
+	// 			if (superadmin(user)) return true;
+	// 			if (user.role.admin) return true;
 
-				// if user is manager anywhere
-				if (user.role.manager.projects.length > 0) return true;
-				return false;
-			}
-		},
+	// 			// if user is manager anywhere
+	// 			if (user.role.manager.projects.length > 0) return true;
+	// 			return false;
+	// 		}
+	// 	},
 
-		delegate : {
-			superadmin : function (user) {
-				if (superadmin(user)) return true;
-				return false;
-			},
-			admin : function (user) {
-				if (superadmin(user)) return true;
-				return false;
-			},
-			manager : function (user, project) {
-				if (superadmin(user)) return true;
+	// 	delegate : {
+	// 		superadmin : function (user) {
+	// 			if (superadmin(user)) return true;
+	// 			return false;
+	// 		},
+	// 		admin : function (user) {
+	// 			if (superadmin(user)) return true;
+	// 			return false;
+	// 		},
+	// 		manager : function (user, project) {
+	// 			if (superadmin(user)) return true;
 
-				// can add managers for own projects
-				if (user.role.admin && project.createdBy == user.uuid) return true; 
+	// 			// can add managers for own projects
+	// 			if (user.role.admin && project.createdBy == user.uuid) return true; 
 
-				// if admin and got --U- for someone else's project
-				if (user.role.admin && api.can.update.project(user, project)) return true;
+	// 			// if admin and got --U- for someone else's project
+	// 			if (user.role.admin && permission.to.update.project(user, project)) return true;
 
-				return false;
-			},
-			editor : function (user, project) { // project or client
-				if (superadmin(user)) return true;
+	// 			return false;
+	// 		},
+	// 		editor : function (user, project) { // project or client
+	// 			if (superadmin(user)) return true;
 				
-				// can create editors for own projects
-				if (user.role.admin && project.createdBy == user.uuid)  return true;
+	// 			// can create editors for own projects
+	// 			if (user.role.admin && project.createdBy == user.uuid)  return true;
 
-				// if admin and got --U- for someone else's project
-				if (user.role.admin && api.can.update.project(user, project)) return true;
+	// 			// if admin and got --U- for someone else's project
+	// 			if (user.role.admin && permission.to.update.project(user, project)) return true;
 
-				return false;
-			},
-			reader : function (user, project) { // project or client
-				if (superadmin(user)) return true;
+	// 			return false;
+	// 		},
+	// 		reader : function (user, project) { // project or client
+	// 			if (superadmin(user)) return true;
 
-				// can create readers for own projects
-				if (user.role.admin && project.createdBy == user.uuid)  return true;
+	// 			// can create readers for own projects
+	// 			if (user.role.admin && project.createdBy == user.uuid)  return true;
 
-				// if admin and got --U- for someone else's project
-				if (user.role.admin && api.can.update.project(user, project)) return true;
+	// 			// if admin and got --U- for someone else's project
+	// 			if (user.role.admin && permission.to.update.project(user, project)) return true;
 
-				// managers can create readers for own projects
-				if (user.role.manager.projects.indexOf(project.uuid) >= 0) return true;
+	// 			// managers can create readers for own projects
+	// 			if (user.role.manager.projects.indexOf(project.uuid) >= 0) return true;
 
-				return false;
-			},
+	// 			return false;
+	// 		},
 
 
-		},
+	// 	},
 
-		read : {
-			project : function (user, project) {
-				if (superadmin(user)) return true;
+	// 	read : {
+	// 		project : function (user, project) {
+	// 			if (superadmin(user)) return true;
 
-				// admin can -R-- own projects
-				if (user.role.admin && project.createdBy == user.uuid)  return true;
+	// 			// admin can -R-- own projects
+	// 			if (user.role.admin && project.createdBy == user.uuid)  return true;
 
-				// if manager, editor or reder
-				// if (user.role.manager.projects.indexOf(uuid) >= 0) return true;
-				// if (user.role.editor.projects.indexOf(uuid)  >= 0) return true;
-				if (user.role.reader.projects.indexOf(uuid)  >= 0) return true;
+	// 			// if manager, editor or reder
+	// 			// if (user.role.manager.projects.indexOf(uuid) >= 0) return true;
+	// 			// if (user.role.editor.projects.indexOf(uuid)  >= 0) return true;
+	// 			if (user.role.reader.projects.indexOf(uuid)  >= 0) return true;
 
-				return false;
-			},
-			client : function (user, client) {
-				if (superadmin(user)) return true;
+	// 			return false;
+	// 		},
+	// 		client : function (user, client) {
+	// 			if (superadmin(user)) return true;
 
-				// admin can -R-- own clients
-				if (user.role.admin && client.createdBy == user.uuid)  return true;
+	// 			// admin can -R-- own clients
+	// 			if (user.role.admin && client.createdBy == user.uuid)  return true;
 
-				// if manager, editor, reader
-				// if (user.role.manager.clients.indexOf(client.uuid) >= 0) return true; 
-				// if (user.role.editor.clients.indexOf(client.uuid)  >= 0) return true; 
-				if (user.role.reader.clients.indexOf(client.uuid)  >= 0) return true; 
+	// 			// if manager, editor, reader
+	// 			// if (user.role.manager.clients.indexOf(client.uuid) >= 0) return true; 
+	// 			// if (user.role.editor.clients.indexOf(client.uuid)  >= 0) return true; 
+	// 			if (user.role.reader.clients.indexOf(client.uuid)  >= 0) return true; 
 
-				return false;
-			}
-		},
+	// 			return false;
+	// 		}
+	// 	},
 
-		update : {
-			project : function (user, project) {
-				if (superadmin(user)) return true;
+	// 	update : {
+	// 		project : function (user, project) {
+	// 			if (superadmin(user)) return true;
 
-				// if admin and has created project oneself
-				if (user.role.admin && project.createdBy == user.uuid) return true;
+	// 			// if admin and has created project oneself
+	// 			if (user.role.admin && project.createdBy == user.uuid) return true;
 
-				// if editor of project
-				if (user.role.editor.projects.indexOf(project.uuid) >= 0) return true; 
+	// 			// if editor of project
+	// 			if (user.role.editor.projects.indexOf(project.uuid) >= 0) return true; 
 
-				return false;
+	// 			return false;
 
-			},
-			client : function (user, client) {
-				if (superadmin(user)) return true;
+	// 		},
+	// 		client : function (user, client) {
+	// 			if (superadmin(user)) return true;
 
-				// hacky error checking
-				if (!client) return false;
-				if (!user) return false;
+	// 			// hacky error checking
+	// 			if (!client) return false;
+	// 			if (!user) return false;
 
-				// if admin and has created client oneself
-				if (user.role.admin && client.createdBy == user.uuid)  return true;
+	// 			// if admin and has created client oneself
+	// 			if (user.role.admin && client.createdBy == user.uuid)  return true;
 
-				// if editor of client
-				if (user.role.editor.clients.indexOf(client.uuid) >= 0) return true; // managers can create readers for own projects
+	// 			// if editor of client
+	// 			if (user.role.editor.clients.indexOf(client.uuid) >= 0) return true; // managers can create readers for own projects
 
-				return false;
-			},
-			user   : function (user, subject, uuid) {  // update of user info, not adding roles
-				if (superadmin(user)) return true;
+	// 			return false;
+	// 		},
+	// 		user   : function (user, subject, uuid) {  // update of user info, not adding roles
+	// 			if (superadmin(user)) return true;
 
-				// if user is created by User (as admin, manager)
-				if (subject.createdBy == user.uuid) return true; 
+	// 			// if user is created by User (as admin, manager)
+	// 			if (subject.createdBy == user.uuid) return true; 
 				
-				// if is self
-				if (subject.uuid == user.uuid) return true;
+	// 			// if is self
+	// 			if (subject.uuid == user.uuid) return true;
 
-				return false;				
-			},
+	// 			return false;				
+	// 		},
 
-			file   : function (user, file) {
-				if (superadmin(user)) return true;
+	// 		file   : function (user, file) {
+	// 			if (superadmin(user)) return true;
 
-				// if user can update project which contains file, then user can edit file
-				var access = false;
-				file.access.projects.forEach(function (p) { // p = projectUuid
-					if (api.can.update.project(user, p)) access = true;
-				});
-				return access;
+	// 			// if user can update project which contains file, then user can edit file
+	// 			var access = false;
+	// 			file.access.projects.forEach(function (p) { // p = projectUuid
+	// 				if (permission.to.update.project(user, p)) access = true;
+	// 			});
+	// 			return access;
 
-			}
-		},
+	// 		}
+	// 	},
 
-		remove : {
-			project : function (user, project) {
-				if (superadmin(user)) return true;
+	// 	remove : {
+	// 		project : function (user, project) {
+	// 			if (superadmin(user)) return true;
 
-				// can remove own project
-				if (user.role.admin && project.createdBy == user.uuid) return true;
+	// 			// can remove own project
+	// 			if (user.role.admin && project.createdBy == user.uuid) return true;
 
-				// if admin and editor of project
-				if (user.role.admin && user.role.editor.projects.indexOf(project.uuid) >= 0) return true;
+	// 			// if admin and editor of project
+	// 			if (user.role.admin && user.role.editor.projects.indexOf(project.uuid) >= 0) return true;
 				
-				// editors can not remove projects
+	// 			// editors can not remove projects
 
-				return false;
+	// 			return false;
 
-			},
-			client : function (user, client) {
-				if (superadmin(user)) return true;
+	// 		},
+	// 		client : function (user, client) {
+	// 			if (superadmin(user)) return true;
 
-				// can remove own project
-				if (user.role.admin && client.createdBy == user.uuid) return true;
+	// 			// can remove own project
+	// 			if (user.role.admin && client.createdBy == user.uuid) return true;
 
-				// if admin and editor of project
-				if (user.role.admin && user.role.editor.clients.indexOf(client.uuid) >= 0) return true;
+	// 			// if admin and editor of project
+	// 			if (user.role.admin && user.role.editor.clients.indexOf(client.uuid) >= 0) return true;
 				
-				// editors can not remove projects
-				return false;				
-			},
+	// 			// editors can not remove projects
+	// 			return false;				
+	// 		},
 
 
-			user : function (user, subject) {
+	// 		user : function (user, subject) {
 
-				// can remove users
-				if (superadmin(user)) return true;
+	// 			// can remove users
+	// 			if (superadmin(user)) return true;
 
-				// can remove user if admin and created by self
-				if (user.role.admin && subject.createdBy == user.uuid) return true;
+	// 			// can remove user if admin and created by self
+	// 			if (user.role.admin && subject.createdBy == user.uuid) return true;
 
-				// if user is manager anywhere and created by self
-				if (user.role.manager.projects.length > 0 && subject.createdBy == user.uuid) return true;
-				return false;
-			}
-		},
-	},
+	// 			// if user is manager anywhere and created by self
+	// 			if (user.role.manager.projects.length > 0 && subject.createdBy == user.uuid) return true;
+	// 			return false;
+	// 		}
+	// 	},
+	// },
 
 				
 
