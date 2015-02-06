@@ -405,7 +405,7 @@ Wu.User = Wu.Class.extend({
 	},
 
 	canUpdateClient : function (uuid) {
-		// var user = this.store;
+		var user = this.store;
 
 		if (user.role.superadmin) return true;
 		// if (user.role.admin)      return true;
@@ -427,7 +427,7 @@ Wu.User = Wu.Class.extend({
 	},
 
 	canCreateAdmin : function () {
-		// var user = this.store;
+		var user = this.store;
 		if (user.role.superadmin) return true;
 		if (user.role.admin)      return true; 	// admins can create other admins
 		return false;
