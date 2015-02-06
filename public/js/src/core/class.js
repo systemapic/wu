@@ -347,10 +347,10 @@ Wu.Util = {
 	},
 
 	// post with callback
-	postcb : function (path, json, cb, context) {
+	postcb : function (path, json, cb, context, baseurl) {
 		var that = context;
 		var http = new XMLHttpRequest();
-		var url = window.location.origin; 
+		var url = baseurl || window.location.origin; 
 		url += path;
 		http.open("POST", url, true);
 

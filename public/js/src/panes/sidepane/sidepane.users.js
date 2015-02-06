@@ -585,8 +585,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		var titleText    = 'Manage access for ' + user.getName();
 		var subtitleText = 'Manage read, write and manage access for this user.';
-		var messageText  = '<h4>Guide:</h4>Managers can add READ access to projects they are managers for.';
-		messageText     += '<br>Admins can add READ, WRITE and MANAGE access to projects they have created themselves.'
+		// var messageText  = '<h4>Guide:</h4>Managers can add READ access to projects they are managers for.';
+		// messageText     += '<br>Admins can add READ, WRITE and MANAGE access to projects they have created themselves.'
 		var saClass      = user.isSuperadmin() ? 'green' : 'red';
 		var aClass       = user.isAdmin() ? 'green' : 'red';
 
@@ -605,7 +605,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var subtitle2  = this._inputAccess._projectTitle  = Wu.DomUtil.create('div', 'backpane-projectTitle', 	  wrapper, 'Projects:');	
 		var projectsWrap = this._inputAccess._projectsWrap = this.insertProjectWrap(user);	
 		var confirm    = this._inputAccess._confirm   = Wu.DomUtil.create('div', 'backpane-confirm smap-button-gray',   wrapper, 'Done');
-		var message    = this._inputAccess._message   = Wu.DomUtil.create('div', 'backpane-message',   wrapper, messageText);
+		// var message    = this._inputAccess._message   = Wu.DomUtil.create('div', 'backpane-message',   wrapper, messageText);
 
 		Wu.DomEvent.on(confirm, 'mousedown', this.closeManageAccess,     this);
 

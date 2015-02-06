@@ -63,6 +63,7 @@ var TOOLSPATH 		= '../tools/';
 
 var BASEURI 		= config.portalserver.uri;
 var VILEHOST		= config.vile.uri;
+var VILEOSMHOST 	= config.vileosm.uri;
 
 // default mapbox account
 var DEFAULTMAPBOX 	= config.defaultMapboxAccount;
@@ -773,6 +774,11 @@ module.exports = api = {
 		// set path
 		var csspath 	= CARTOCSSFOLDER + cartoid + '.mss';
 
+		var isOSM = (fileUuid == 'osm');
+
+		var host = isOSM ? VILEOSMHOST : VILEHOST;
+
+		console.log('setCartoCSS HOST: ', host);
 
 		console.log('vars: ', layerUuid, fileUuid, cartoid, csspath, css);
 
@@ -786,8 +792,7 @@ module.exports = api = {
 			// send to tileserver storage
 			request({
 				method : 'POST',
-				// uri : 'https://import.systemapic.com/import/cartocss',
-				uri : VILEHOST + 'import/cartocss',
+				uri : host + 'import/cartocss',
 				json : {
 					css : css,
 					cartoid : cartoid,
@@ -797,7 +802,7 @@ module.exports = api = {
 
 			// callback
 			function (err, response, body) {
-				console.log('err: ', err);
+				console.log('import carto response: err: ', err);
 				// console.log('response: ', response);
 				// console.log('resp bugfer: ', response.body.toString());
 				console.log('body: ', body);

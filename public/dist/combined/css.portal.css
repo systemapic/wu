@@ -4991,7 +4991,8 @@ td.tdcont.createdDate {
   padding-right: 30px;
   width: auto;
   position: relative;
-  right: 110px; }
+  right: 110px;
+  padding-bottom: 150px; }
 
 /* Manage user inner wrapper */
 .backpane-access-wrapper {
@@ -6068,7 +6069,7 @@ input[type=checkbox] + label.check {
   height: 100%;
   overflow: visible;
   padding-bottom: 0%;
-  padding-top: 130px; }
+  padding-top: 150px; }
 
 .startpane-spinning-content {
   width: 100%;

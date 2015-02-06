@@ -569,6 +569,31 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		return 'osm';
 	},
 
+	setCartoCSS : function (json, callback) {
+
+		// send to server
+		Wu.post('/api/layers/cartocss/set', JSON.stringify(json), callback, this);
+		// Wu.post('api/layers/cartocss/set', JSON.stringify(json), callback, this, app.options.servers.osm.base);
+	
+		// set locally on layer
+		this.setCartoid(json.cartoid);
+	},
+
+	getCartoCSS : function (cartoid, callback) {
+
+		console.log('getCartoCSS', cartoid);
+
+		var json = {
+			cartoid : cartoid
+		}
+
+		// get cartocss from server
+		console.log('POST /api/layers/cartocss/get', json);
+		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
+		// Wu.post('api/layers/cartocss/get', JSON.stringify(json), callback, this, app.options.servers.osm.base);
+	},
+
+
 });
 
 
