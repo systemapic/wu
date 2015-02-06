@@ -22,6 +22,7 @@ var projectUuid = args.projectUuid;
 var hash        = args.hash;
 var path        = args.path;
 var isPdf 	= args.pdf;
+var isThumb     = args.thumb;
 
 // set file path
 var outfile = path;

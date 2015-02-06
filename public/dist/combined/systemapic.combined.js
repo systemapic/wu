@@ -347,10 +347,10 @@ Wu.Util = {
 	},
 
 	// post with callback
-	postcb : function (path, json, cb, context) {
+	postcb : function (path, json, cb, context, baseurl) {
 		var that = context;
 		var http = new XMLHttpRequest();
-		var url = window.location.origin; 
+		var url = baseurl || window.location.origin; 
 		url += path;
 		http.open("POST", url, true);
 
@@ -2067,6 +2067,7 @@ L.Popup.include({
 	},
 
 	calculateHeight : function () {
+
 		var header = app.HeaderPane;
 		var height = header.getHeight();
 
@@ -2121,6 +2122,8 @@ L.Popup.include({
 
 	_setMenuHeight : function () {
 
+
+
 		// Button height
 		if ( !Wu.app.mobile ) {
 			var bHeight = 70;
@@ -2129,9 +2132,14 @@ L.Popup.include({
 		}
 
 		var panes = this._getPaneArray();
-		var defaultPanes = app.Account.isManager() ? 3 : 2;		// 3 if manager, 2 if not (ie. only Project, Logout)
-		var height = panes ? panes.length * bHeight : defaultPanes * bHeight;	// if no active project, default 3 menu items
+		var defaultPanes = app.Account.isManager() ? 3 : 2;			// 3 if manager, 2 if not (ie. only Project, Logout)
+
+		// var height = panes ? panes.length * bHeight : defaultPanes * bHeight;	// if no active project, default 3 menu items	
+		if ( panes != 0 ) var height = panes.length * bHeight			
+		else var height = defaultPanes * bHeight;
+	
 		app._editorMenuPane.style.height = parseInt(height) + 'px';
+
 	},
 
 	_getPaneArray : function (project) {
@@ -3230,7 +3238,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// add kill hook
 		if (app.Account.canDeleteProject(this.project.getUuid())) {
 			Wu.DomEvent.on(this.kill, 'click', this.deleteProject, this);
-			Wu.DomEvent.on(this.makeThumb, 'click', this.makeNewThumbnail, this);
+
+			Wu.DomEvent.on( this.makeThumb, 'click', this.makeNewThumbnail, this );
+			Wu.DomEvent.on( this.makeThumb, 'mousedown click', Wu.DomEvent.stopPropagation, this );
 		}
 	},
 
@@ -3246,38 +3256,82 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// remove kill hook
 		if (app.Account.canDeleteProject(this.project.getUuid())) {
 			Wu.DomEvent.off(this.kill, 'click', this.deleteProject, this);
-			Wu.DomEvent.off(this.makeThumb, 'click', this.makeNewThumbnail, this);
+
+			Wu.DomEvent.off( this.makeThumb, 'click', this.makeNewThumbnail, this );
+			Wu.DomEvent.off( this.makeThumb, 'mousedown click', Wu.DomEvent.stopPropagation, this );
 		}
 	},
 
 
 	makeNewThumbnail : function () {
-		console.log('%c *****************************************************', 'background-color: #D80000; color: white;');
 
-		var that = this;	// callback
+		var that = this; // callback
 
-		app.setHash(function (ctx, hash) {
+		// If current project is active
+		if ( this.project.store.uuid == app.activeProject.getUuid() ) {
+			
+			app.setHash(function (ctx, hash) {
 
-			console.log('has: ',JSON.parse(hash));
+				var obj = JSON.parse(hash);				
 
-			var obj = JSON.parse(hash);
+				obj.dimensions = {
+					height : 233,
+					width : 350,			
+				}
 
-			obj.dimensions = {
-				height : 300,
-				width : 200
+				// get snapshot from server
+				Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdThumb, that);
+
+			})
+
+		// We're making a thumb on a project that is not active
+		} else {
+
+
+			this.setNewHash(function (ctx, hash) {
+
+				var obj = JSON.parse(hash);				
+
+				obj.dimensions = {
+					height : 233,
+					width : 350,			
+				}
+
+				// get snapshot from server
+				Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdThumbNotActive, that);
+
+			})
+		}
+	},
+
+
+
+	// save a hash
+	setNewHash : function (callback) {
+
+		// get project;
+		var projectUuid = this.project.store.uuid;
+
+		// hash object
+		var json = {
+			projectUuid : projectUuid,
+			hash : {
+				id 	 : Wu.Util.createRandom(6),
+				position : this.project.store.position,
+				layers 	 : [] 			// layermenuItem uuids, todo: order as z-index
 			}
+		}
 
-			// get snapshot from server
-			Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdThumb, that);
+		// save hash to server
+		Wu.post('/api/project/hash/set', JSON.stringify(json), callback, this);
 
-		});
-
-		console.log('%c *****************************************************', 'background-color: #D80000; color: white;');
+		// return
+		return json.hash;
 
 	},
 
-	createdThumb : function(context, json) {
 
+	createdThumb : function(context, json) {
 
 		// parse results
 		var result = JSON.parse(json);
@@ -3286,40 +3340,42 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		var fileUuid = result.fileUuid;
 
-		console.log('%cThumb has been created =>', 'color: #339933')
+		// get dimensions of container
+		var height = context.logo.offsetHeight;
+		var width = context.logo.offsetWidth;
 
-		console.log('result=>', result);
-		console.log('context=>', context.logo);
+		var path = '/images/' + image;
 
+		// set image
+		context.logo.src = path;
+		context.project.setLogo(path);
+
+		app.HeaderPane.addedLogo(image);
+
+	},
+
+
+	createdThumbNotActive : function(context, json) {
+
+		// parse results
+		var result = JSON.parse(json);
+		// var image = result.image; // filename
+		var image = result.cropped;
+
+		var fileUuid = result.fileUuid;
 
 		// get dimensions of container
 		var height = context.logo.offsetHeight;
 		var width = context.logo.offsetWidth;
 
-		// set path
-		// var path = app.options.servers.portal;
-		
-		// path += 'pixels/';
-		// path += image;
-		// path += '?width=' + 800;
-		// path += '&height=' + 600;
-
 		var path = '/images/' + image;
 
-		console.log('image=>', image);
-
-		// cxx 
 		// set image
 		context.logo.src = path;
-
 		context.project.setLogo(path);
 
-		app.HeaderPane.addedLogo(image);
-
-		// Need to save the frickin logo
-
-
 	},
+
 
 	// edit hook for client logo
 	addLogoDZ : function () {
@@ -3764,7 +3820,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		
 		// remove client button
 		if (app.Account.canDeleteClient(this.client.uuid)) {
-			this._removeClientButton = Wu.DomUtil.create('div', 'client-kill', this._container, 'Delete client');
+			this._removeClientButton = Wu.DomUtil.create('div', 'client-kill displayNone', this._container, 'Delete client');
 			Wu.DomEvent.on(this._removeClientButton, 'mousedown', this.removeClient, this);
 
 		}
@@ -4106,6 +4162,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._container.style.height = this.maxHeight + 'px';          
 		this._isOpen = true;
 
+		
+		Wu.DomUtil.removeClass(this._removeClientButton, 'displayNone');
+
+
 		// close others
 		var clients = app.SidePane.Clients;
 		if (clients._lastOpened && clients._lastOpened != this) clients._lastOpened.close();
@@ -4118,6 +4178,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._container.style.height = this.minHeight + 'px';    
 		this._isOpen = false;
 
+		Wu.DomUtil.addClass(this._removeClientButton, 'displayNone');
 
 		this.resetOpenProjectInfo();
 				
@@ -4756,8 +4817,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		var titleText    = 'Manage access for ' + user.getName();
 		var subtitleText = 'Manage read, write and manage access for this user.';
-		var messageText  = '<h4>Guide:</h4>Managers can add READ access to projects they are managers for.';
-		messageText     += '<br>Admins can add READ, WRITE and MANAGE access to projects they have created themselves.'
+		// var messageText  = '<h4>Guide:</h4>Managers can add READ access to projects they are managers for.';
+		// messageText     += '<br>Admins can add READ, WRITE and MANAGE access to projects they have created themselves.'
 		var saClass      = user.isSuperadmin() ? 'green' : 'red';
 		var aClass       = user.isAdmin() ? 'green' : 'red';
 
@@ -4776,7 +4837,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var subtitle2  = this._inputAccess._projectTitle  = Wu.DomUtil.create('div', 'backpane-projectTitle', 	  wrapper, 'Projects:');	
 		var projectsWrap = this._inputAccess._projectsWrap = this.insertProjectWrap(user);	
 		var confirm    = this._inputAccess._confirm   = Wu.DomUtil.create('div', 'backpane-confirm smap-button-gray',   wrapper, 'Done');
-		var message    = this._inputAccess._message   = Wu.DomUtil.create('div', 'backpane-message',   wrapper, messageText);
+		// var message    = this._inputAccess._message   = Wu.DomUtil.create('div', 'backpane-message',   wrapper, messageText);
 
 		Wu.DomEvent.on(confirm, 'mousedown', this.closeManageAccess,     this);
 
@@ -10566,6 +10627,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	// open sidepane menu
 	open : function (e) {
 
+
 		this.isOpen = true;
 		if (app.SidePane) app.SidePane.expand();
 		this.refresh();
@@ -10574,7 +10636,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.setContentHeights();
 
 		// remove help pseudo
-		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
+		// Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
 
 		// trigger activation on active menu item
 		app._activeMenu._activate();
@@ -15676,6 +15738,31 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		return 'osm';
 	},
 
+	setCartoCSS : function (json, callback) {
+
+		// send to server
+		Wu.post('/api/layers/cartocss/set', JSON.stringify(json), callback, this);
+		// Wu.post('api/layers/cartocss/set', JSON.stringify(json), callback, this, app.options.servers.osm.base);
+	
+		// set locally on layer
+		this.setCartoid(json.cartoid);
+	},
+
+	getCartoCSS : function (cartoid, callback) {
+
+		console.log('getCartoCSS', cartoid);
+
+		var json = {
+			cartoid : cartoid
+		}
+
+		// get cartocss from server
+		console.log('POST /api/layers/cartocss/get', json);
+		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
+		// Wu.post('api/layers/cartocss/get', JSON.stringify(json), callback, this, app.options.servers.osm.base);
+	},
+
+
 });
 
 
@@ -19969,6 +20056,7 @@ Wu.App = Wu.Class.extend({
 
 			// osm PX
 			osm : {
+				base : 'https://m.systemapic.com/',
 				uri : 'https://{s}.systemapic.com/r/',
 				subdomains : 'mnop' // px
 			}
@@ -20476,7 +20564,8 @@ Wu.App = Wu.Class.extend({
 	phantomJS : function (args) {
 
 		var projectUuid = args.projectUuid,
-	   	    hash    	= args.hash;
+	   	    hash    	= args.hash,
+	   	    isThumb       = args.thumb;
 
 	   	// return if no project
 	   	if (!projectUuid) return false;
@@ -20501,8 +20590,8 @@ Wu.App = Wu.Class.extend({
 		// remove startpane
 		if (this.StartPane) this.StartPane.deactivate();
 
-		// add phantomJS stylesheet
-		app.Style.phantomJS();
+		// add phantomJS stylesheet		
+		isThumb ? app.Style.phantomJSthumb() : app.Style.phantomJS();
 
 		// check for hash
 		if (hash) {

@@ -726,7 +726,7 @@ input.cmn-toggle-round-flat + label:before {
   top: 3px;
   height: 71px;
   margin-right: 10px;
-  width: 90px;
+  width: 105px;
   overflow: hidden; }
 
 .header-logo-container.editable:hover {
@@ -738,6 +738,9 @@ input.cmn-toggle-round-flat + label:before {
 	padding-bottom: 10px;
 	width: auto;
 	}*/
+.header-logo {
+  height: 100%; }
+
 .header-logo img {
   /*max-height: 100%;*/
   /*padding-bottom: 10px;*/
@@ -762,7 +765,7 @@ input.cmn-toggle-round-flat + label:before {
   background: transparent;
   font-size: 30px;
   font-weight: 200;
-  padding-left: 102px;
+  padding-left: 120px;
   height: 45px;
   overflow: hidden; }
 
@@ -788,7 +791,7 @@ input.cmn-toggle-round-flat + label:before {
   overflow: hidden;
   max-height: 31px;
   padding-right: 14px;
-  padding-left: 102px; }
+  padding-left: 120px; }
 
 .header-subtitle input {
   width: 300px;
@@ -3472,16 +3475,17 @@ input.cmn-toggle-round-flat + label:before {
 .project-logo-container {
   position: absolute;
   background-repeat: no-repeat;
-  width: 62px;
-  height: 62px;
-  right: 5px;
-  top: 44px;
-  overflow: hidden; }
+  width: 75px;
+  height: 60px;
+  right: 6px;
+  top: 45px;
+  overflow: hidden;
+  text-align: center; }
 
 .project-logo {
   position: relative;
   /*width: 100%;*/
-  /*height: 100%;*/ }
+  height: 100%; }
 
 .project-logo.editable:hover {
   opacity: 0.7;
@@ -4987,7 +4991,8 @@ td.tdcont.createdDate {
   padding-right: 30px;
   width: auto;
   position: relative;
-  right: 110px; }
+  right: 110px;
+  padding-bottom: 150px; }
 
 /* Manage user inner wrapper */
 .backpane-access-wrapper {
@@ -5310,68 +5315,6 @@ td.tdcont.createdDate {
 .share-print-download-button:hover {
   opacity: 1;
   color: transparent; }
-
-/*Start pane*/
-/*Start pane*/
-/*Start pane*/
-#start-pane {
-  position: absolute;
-  margin: auto;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  padding-top: 300px; }
-
-.start-pane-project {
-  display: inline-block;
-  width: 250px;
-  vertical-align: top;
-  height: 201px;
-  padding: 0px;
-  margin: 12px;
-  text-align: left;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  position: relative; }
-
-.start-pane-project:hover {
-  background: white; }
-
-.start-pane-project:active {
-  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.1); }
-
-.start-project-name {
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.1;
-  padding: 4px;
-  padding-top: 2px;
-  height: 38px;
-  overflow: hidden;
-  position: absolute;
-  bottom: 4px;
-  width: 100%;
-  padding-left: 6px;
-  padding-right: 10px;
-  text-align: center;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-  color: #666; }
-
-.start-project-short-name {
-  height: 38px;
-  padding-top: 7px;
-  line-height: 1.7; }
-
-.start-project-image {
-  height: 156px;
-  overflow: hidden; }
-
-.start-pane-project img {
-  width: 244px;
-  position: relative;
-  left: 3px;
-  top: 3px; }
 
 /*
 ┌─┐┬─┐┬─┐┌─┐┬─┐  ┌─┐┌─┐┌┐┌┌─┐
@@ -6114,63 +6057,60 @@ input[type=checkbox] + label.check {
 .startpane-circle:active {
   box-shadow: none; }
 
-.startpane-spinning-content {
-  height: 0;
-  width: 100%;
+.startpane-canvas-container {
   position: absolute;
-  top: 50%; }
+  top: 0;
+  width: 100%;
+  height: 100%; }
 
-.startpane-banner-container {
-  width: 95%;
-  height: 310px;
-  position: relative;
-  top: -155px;
-  box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  left: 25%;
-  padding-right: 25%; }
+.spinning-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  padding-bottom: 0%;
+  padding-top: 150px; }
 
-.startpane-banner {
+.startpane-spinning-content {
   width: 100%;
   height: 100%;
   position: relative;
-  top: 0;
+  padding-top: 0;
+  box-sizing: border-box;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  padding-left: 445px; }
+  text-align: center; }
 
-.startpane-logo {
-  background-image: url(https://projects.ruppellsgriffon.com/css/images/griffon_logo_drop.png);
-  background-repeat: no-repeat;
-  width: 429px;
-  height: 291px;
+.startpane-banner {
+  overflow: scroll;
   position: absolute;
-  top: 9px;
-  left: 9px;
-  z-index: 999; }
+  width: 100%;
+  height: 100%; }
 
 .startpane-recent-projects-container {
   width: 100%;
+  max-width: 1070px;
   left: 0;
   position: relative;
   height: 100%;
-  padding-top: 55px; }
+  margin: auto;
+  text-align: center; }
 
 .startpane-header-title {
   color: #fff;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
   font-size: 20px;
-  max-width: 350px;
-  margin: auto; }
+  margin: 0;
+  margin-bottom: 15px;
+  text-align: left;
+  padding-left: 5px; }
 
 .startpane-project-list {
-  max-width: 350px;
-  padding-right: 20px;
-  margin: auto; }
+  margin: auto;
+  padding-bottom: 200px; }
 
 .start-panne-recent-projects {
-  width: 100%;
-  height: 40px;
+  width: 350px;
+  height: 233px;
   margin: 10px 0px;
   background-color: white;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
@@ -6178,29 +6118,163 @@ input[type=checkbox] + label.check {
   line-height: 1.6;
   font-weight: 900;
   font-size: 15px;
-  cursor: pointer; }
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  margin: 2px;
+  margin-bottom: 0;
+  margin-top: 0;
+  overflow: hidden;
+  opacity: 0.9;
+  -webkit-transition: opacity 250ms ease;
+  -moz-transition: opacity 250ms ease;
+  -ms-transition: opacity 250ms ease;
+  transition: opacity 250ms ease; }
 
-@media screen and (max-width: 1020px) {
-  .startpane-banner-container {
-    padding-left: 30px;
-    padding-top: 215px;
-    height: 510px;
-    top: -255px; }
+.start-panne-recent-projects:hover {
+  opacity: 1; }
+
+.start-panne-recent-projects img {
+  width: 100%; }
+
+/*Start pane*/
+/*Start pane*/
+/*Start pane*/
+#start-pane {
+  position: absolute;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  padding-top: 300px; }
+
+.start-pane-project {
+  display: inline-block;
+  width: 250px;
+  vertical-align: top;
+  height: 201px;
+  padding: 0px;
+  margin: 12px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  position: relative; }
+
+.start-pane-project:hover {
+  background: white; }
+
+.start-pane-project:active {
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.1); }
+
+.start-project-name {
+  font-size: 15px;
+  font-weight: 600;
+  overflow: hidden;
+  position: absolute;
+  bottom: 4px;
+  text-align: center;
+  color: #FFF;
+  background: rgba(0, 0, 0, 0.4);
+  right: 4px;
+  line-height: 1.3;
+  padding-left: 10px;
+  padding-right: 10px;
+  max-width: 282px;
+  padding-top: 6px;
+  padding-bottom: 6px; }
+
+img.start-project-client-logo {
+  position: absolute;
+  z-index: 999;
+  bottom: 6px;
+  left: 6px;
+  width: 50px;
+  opacity: 0.7; }
+
+.start-project-short-name {
+  height: 38px;
+  padding-top: 7px;
+  line-height: 1.7; }
+
+.start-project-image {
+  height: 156px;
+  overflow: hidden; }
+
+.start-pane-project img {
+  width: 244px;
+  position: relative;
+  left: 3px;
+  top: 3px; }
+
+.startpane-user-name {
+  color: white;
+  text-align: left;
+  padding-left: 6px;
+  padding-bottom: 20px;
+  font-size: 15px;
+  font-style: italic; }
+
+.startpane-user-last-login {
+  color: white;
+  text-align: left;
+  padding-left: 6px; }
+
+.start-project-client-name {
+  position: absolute;
+  bottom: 36px;
+  background: rgba(0, 0, 0, 0.4);
+  right: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+  font-size: 14px;
+  color: white;
+  padding-bottom: 2px;
+  padding-top: 1px;
+  max-width: 282px; }
+
+@media screen and (max-width: 1090px) {
   .startpane-recent-projects-container {
-    position: absolute;
-    top: 245px; }
-  .startpane-banner-container {
-    height: 500px;
-    top: -250px;
-    left: 0;
-    width: 445px;
-    margin: auto;
-    padding: 0; }
-  .startpane-header-title {
-    text-align: center; }
-  .startpane-project-list {
-    padding: 0; } }
+    max-width: 718px; } }
 
+@media screen and (max-width: 760px) {
+  .startpane-recent-projects-container {
+    max-width: 363px; } }
+
+/*
+@media screen and (max-width: 1020px) {
+
+	.startpane-banner-container {
+		padding-left: 30px;
+		padding-top: 215px;
+		height: 510px;
+		top: -255px;
+	}
+
+	.startpane-recent-projects-container {
+		position: absolute;		
+		top: 245px;		
+	}
+
+	.startpane-banner-container {
+		height: 500px;
+		top: -250px;
+		left: 0;
+		width: 445px;
+		margin: auto;
+		padding: 0;
+	}
+
+	.startpane-header-title {
+		text-align: center;
+	}
+
+	.startpane-project-list {
+		padding: 0;
+	}
+
+}
+*/
 /* @import 'color_picker';	// Color picker */
 /* @import 'mediaLibrary';	// Media Library */
 /*# sourceMappingURL=style.css.map */
