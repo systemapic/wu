@@ -45,18 +45,18 @@ Wu.App = Wu.Class.extend({
 		servers : {
 
 			// portal SX
-			portal   : 'https://projects.ruppellsgriffon.com/',	// api
+			portal   : 'https://dev.systemapic.com/',	// api
 
 			// tiles SX
 			tiles : {
 				uri : 'https://{s}.systemapic.com/r/',
-				subdomains : 'abcd' // sx
+				subdomains : 'efgh' // sx
 			},
 
 			// utfgrid SX
 			utfgrid : {
 				uri : 'https://{s}.systemapic.com/u/',
-				subdomains : 'abcd' // sx
+				subdomains : 'efgh' // sx
 			},
 
 			// osm PX
