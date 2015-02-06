@@ -2068,6 +2068,7 @@ L.Popup.include({
 
 	calculateHeight : function () {
 
+
 		var header = app.HeaderPane;
 		var height = header.getHeight();
 
@@ -2079,6 +2080,7 @@ L.Popup.include({
 	},
 
 	setHeight : function (height) {
+		console.error('setHeight: ', height);
 		this._container.style.height = height + 'px';
 	},
 
@@ -10688,29 +10690,36 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// collapse sidepane
 		if (app.SidePane) app.SidePane.collapse();
+		
+		// refresh
 		this.refresh();
 
-		// app.MapPane._container
-		Wu.DomUtil.removeClass(app.MapPane._container, "map-blur") // (j) – removes the blur on map if it's set by one of the fullpanes
+
+		var mp = app.MapPane,
+		    descriptionControl = mp.descriptionControl;
+
+		// removes the blur on map if it's set by one of the fullpanes
+		Wu.DomUtil.removeClass(app.MapPane._container, "map-blur");
 
 		// Show button section and Layer info when the Home dropdown menu opens (j)
 		if (app._map) {
-			app._map._controlCorners.topleft.style.opacity = 1;
-			app._map._controlCorners.topleft.style.display = 'block';
+			var topleft = app._map._controlCorners.topleft;
+		    	topleft.style.opacity = 1;
+			topleft.style.display = 'block';
 		}
 
 
 
 		// Mobile option : activate default sidepane on close to avoid opening in fullscreen
-		if (Wu.app.mobile) {
-			if ( app.MapPane ) {
+		if (app.mobile) {
+			if (mp) {
 				
-				if ( app.MapPane.layerMenu ) app.MapPane.layerMenu._openLayers.style.opacity = 1;
-				if ( app.MapPane.legendsControl ) app.MapPane.legendsControl._legendsOpener.style.opacity = 1;
-				if ( app.MapPane.descriptionControl ) app.MapPane.descriptionControl._button.style.opacity = 1;
+				if (mp.layerMenu) 		mp.layerMenu._openLayers.style.opacity = 1;
+				if (mp.legendsControl)		mp.legendsControl._legendsOpener.style.opacity = 1;
+				if (mp.descriptionControl) 	mp.descriptionControl._button.style.opacity = 1;
 				
 				// Make sure we reset if we're in fullscreen mode (media library, users, etc)
-				if ( app.SidePane.fullscreen ) app.SidePane.Clients.activate();	
+				if (app.SidePane.fullscreen) app.SidePane.Clients.activate();	
 			}
 
 			// Show the controllers (has been hidden when a new project is refreshed in projects.js > refresh() )
@@ -10719,14 +10728,15 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 
 		// Only open the description box if there is anything inside of it
-		if ( app.MapPane.descriptionControl.activeLayer ) {
-			if ( app.MapPane.descriptionControl.activeLayer.store.description == '' || !app.MapPane.descriptionControl.activeLayer.store.description ) {
-				app.MapPane.descriptionControl.hide();
+		if (descriptionControl && descriptionControl.activeLayer) {
+			if (descriptionControl.activeLayer.store.description == '' || !descriptionControl.activeLayer.store.description ) {
+				descriptionControl.hide();
 			}
-		} else {
-			// If no layers has been activated
-			app.MapPane.descriptionControl.hide();	
-		}
+		} 
+		//else {
+		// 	// If no layers has been activated
+		// 	descriptionControl.hide();	
+		// }
 
 	},
 
@@ -15077,7 +15087,7 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	canUpdateClient : function (uuid) {
-		// var user = this.store;
+		var user = this.store;
 
 		if (user.role.superadmin) return true;
 		// if (user.role.admin)      return true;
@@ -15099,7 +15109,7 @@ L.control.baselayerToggle = function (options) {
 	},
 
 	canCreateAdmin : function () {
-		// var user = this.store;
+		var user = this.store;
 		if (user.role.superadmin) return true;
 		if (user.role.admin)      return true; 	// admins can create other admins
 		return false;
@@ -20000,76 +20010,7 @@ Wu.App = Wu.Class.extend({
 	// debug : true,
 
 	// default options
-	options : {
-		
-		id : 'app',
-
-		portalName : 'systemapic',	// plugged in
-		portalLogo : false,		// not plugged in.. using sprites atm..
-
-		// sidepane
-		panes : {
-			// plugged in and working! :)
-			clients 	: true,
-			mapOptions 	: true,
-			documents 	: true,               	
-			dataLibrary 	: true,               	
-			users 		: true,
-			share 		: true,
-			mediaLibrary    : false,
-			account 	: true
-		},	
-		
-		// default settings (overridden by project settings)
-		settings : {		// not plugged in yet
-			chat : true,
-			colorTheme : true,
-			screenshot : true,
-			socialSharing : true,
-			print : true
-		},
-
-		providers : {
-			// default accounts, added to all new (and old?) projects
-			mapbox : [{	
-				username : 'systemapic',
-				accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q'
-			}]
-		},
-
-		servers : {
-
-			// portal SX
-			portal   : 'https://projects.ruppellsgriffon.com/',	// api
-
-			// tiles SX
-			tiles : {
-				uri : 'https://{s}.systemapic.com/r/',
-				subdomains : 'abcd' // sx
-			},
-
-			// utfgrid SX
-			utfgrid : {
-				uri : 'https://{s}.systemapic.com/u/',
-				subdomains : 'abcd' // sx
-			},
-
-			// osm PX
-			osm : {
-				base : 'https://m.systemapic.com/',
-				uri : 'https://{s}.systemapic.com/r/',
-				subdomains : 'mnop' // px
-			}
-
-
-		},
-
-		silentUsers : [
-			// redacted
-			'user-9fed4b5f', // k
-			'user-e6e5d7d9'  // j  // todo: add phantomJS user
-		]
-	},
+	options : systemapicConfigOptions, // global var from config.js... perhaps refactor.
 
 
 	_ready : false,
