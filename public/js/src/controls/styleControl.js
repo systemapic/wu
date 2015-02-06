@@ -74,7 +74,7 @@ Wu.Style = Wu.Class.extend({
 		// append darktheme stylesheet
 		var phantom = document.createElement("link");
 		phantom.rel = 'stylesheet';
-		phantom.href = 'https://projects.ruppellsgriffon.com/css/phantomJSthumb.css';
+		phantom.href = app.options.servers.portal + 'css/phantomJSthumb.css';
 		this._styletag.appendChild(phantom);
 
 	},
