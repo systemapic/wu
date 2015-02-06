@@ -49,6 +49,7 @@
     "redis": "^0.10.1",
     "request": "^2.36.0",
     "serve-favicon": "^2.1.5",
+    "srs": "^0.4.6",
     "superagent": "^0.20.0",
     "togeojson": "^0.8.0",
     "topojson": "^1.6.8",
