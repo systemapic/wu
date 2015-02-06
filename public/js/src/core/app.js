@@ -69,15 +69,14 @@ Wu.App = Wu.Class.extend({
 			// Get the styletag
 			var styletag = document.getElementById('mobilestyle');
 			// Set stylesheet for 
-			var styleURL = '<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/' + mobilestyle + '">';
+			var styleURL = '<link rel="stylesheet" href="' + app.options.servers.portal + 'css/' + mobilestyle + '">';
 			styletag.innerHTML = styleURL;
 			
 		}
 	},
 
 	initServer : function () {
-		var serverUrl = this.options.servers.portal;
-		console.log('Securely connected to server: \n', serverUrl);
+		console.log('Securely connected to server: \n', app.options.servers.portal);
 
 		var data = JSON.stringify(this.options);
 		
@@ -595,10 +594,6 @@ Wu.App = Wu.Class.extend({
 	// debug mode
 	_debug : function () {
 		if (!this.debug) return;
-		
-
-
-
 
 		// set style
 		Wu.setStyle('img', {
@@ -624,8 +619,6 @@ Wu.App = Wu.Class.extend({
 				return this * Math.PI / 180;
 			}
 		}
-
-
 
 	},
 
