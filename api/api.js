@@ -46,13 +46,6 @@ redisStore.on('error', function (err) {
 	console.error(err);
 });
 
-// superusers
-var superusers = [
-	'user-f151263a-8a2f-4bfd-86f0-53e71083fb39', 	// KO
-	
-]
-
-
 
 // global paths
 var FILEFOLDER 		= '/data/files/';
@@ -60,6 +53,7 @@ var IMAGEFOLDER 	= '/data/images/';
 var TEMPFOLDER 		= '/data/tmp/';
 var CARTOCSSFOLDER 	= '/data/cartocss/';
 var TOOLSPATH 		= '../tools/';
+var LEGENDSPATH 	= '/data/legends/';
 
 var BASEURI 		= config.portalServer.uri;
 var VILEHOST		= config.vile.uri;
@@ -366,7 +360,7 @@ module.exports = api = {
 
 
 		// write geojson template to disk
-		var toFile = '/var/www/data/legends/template-' + lid + '.geojson'; 
+		var toFile = LEGENDSPATH + 'template-' + lid + '.geojson'; 
 		fs.outputFile(toFile, JSON.stringify(geojson), function (err) {
 
 			var options = {
@@ -391,7 +385,7 @@ module.exports = api = {
 		
 			// get xml
 			var xml = cr.render(options);
-			var stylepath = '/var/www/data/legends/stylesheet-' + lid + '.xml';
+			var stylepath = LEGENDSPATH + 'stylesheet-' + lid + '.xml';
 			fs.outputFile(stylepath, xml, function (err) {
 				if (err) console.log('carto write err', err);
 
@@ -441,7 +435,7 @@ module.exports = api = {
 						// if (err) throw err;
 						if (err) console.log('im.encode err: ', err);
 						// fs.writeFile('map.png',buffer, function(err) {
-						var outpath = '/var/www/data/legends/' + lid + '.png';
+						var outpath = LEGENDSPATH + lid + '.png';
 						fs.writeFile(outpath, buffer, function(err) {
 							if (err) throw err;
 							console.log('saved map image to map.png');
@@ -3289,7 +3283,6 @@ module.exports = api = {
 
 				// set paths
 				var dest = maindir + '/' + filename;
-				// var src = '/var/www/data/geo/' + file.uuid ; // folder
 				var src = FILEFOLDER + file.uuid ; // folder
 
 				// copy
@@ -3335,7 +3328,7 @@ module.exports = api = {
 			var name = record.name.replace(/\s+/g, '');
 
 			// execute cmd line zipping 
-			var out = '/var/www/data/tmp/' + name + '_' + record.type + '.zip';
+			var out = TEMPFOLDER + name + '_' + record.type + '.zip';
 			var infile = FILEFOLDER + file + '/*';
 			var working_dir = FILEFOLDER + file;
 			var cmd = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store';// + infile; 
