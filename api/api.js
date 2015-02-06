@@ -33,6 +33,8 @@ var config = require('../config/config.js');
 // permission
 var permission = require('./permission');
 
+var superusers = permission.superusers;
+
 // mapnik
 var mapnik = require('mapnik');
 var carto = require('carto');
