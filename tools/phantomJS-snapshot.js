@@ -1,19 +1,8 @@
+// create page
 var page = require('webpage').create(),
 	system = require('system'),
 	address, output, size;
 
-var page = require('webpage').create(),
-	server = 'https://projects.ruppellsgriffon.com/login',
-	// server = 'https://127.0.0.1:3001/login',
-	// data = 'email=knutole@noerd.biz&password=***REMOVED***@noerdbiz';    // unhashed passwords, rly? pgp?
-	data = 'email=foudroyant@gmail.com&password=75d5ba93298d733b25159eab2a49876c';    // phantomJS account
-									// todo: create phantomjs user with changing password..
-
-
-console.log('server: ', server);
-console.log('data: ', data);
-
-console.log('args:::::!: ', args);
 // parse args
 var args = JSON.parse(system.args[1]);
 
@@ -23,9 +12,22 @@ var hash        = args.hash;
 var path        = args.path;
 var isPdf 	= args.pdf;
 var isThumb     = args.thumb;
+var serverUrl   = args.serverUrl;
+var serverData  = args.serverData;
+
+console.log('_____ server phantomJS: ', serverUrl, serverData);
 
 // set file path
 var outfile = path;
+
+
+// connect
+var page = require('webpage').create(),
+	server = serverUrl,
+	// server = 'https://127.0.0.1:3001/login',
+	// data = 'email=knutole@noerd.biz&password=***REMOVED***@noerdbiz';    // unhashed passwords, rly? pgp?
+	data = serverData;    // phantomJS account
+									// todo: create phantomjs user with changing password..
 
 // revv phantomjs
 page.viewportSize = { width : 1620, height: 1080 };	// set size...
