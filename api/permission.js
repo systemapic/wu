@@ -28,7 +28,9 @@ var formidable  = require('formidable');
 
 // superusers
 var superusers = [
-	'user-f151263a-8a2f-4bfd-86f0-53e71083fb39', 	// KO
+	'user-f151263a-8a2f-4bfd-86f0-53e71083fb39', 	// KO dev
+	'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', 	// KO rg
+	'user-e6e5d7d9-3b4c-403b-ad80-a854b0215831',    //  J rg
 	
 ]
 
