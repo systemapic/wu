@@ -395,8 +395,6 @@ module.exports = pixels = {
 		var newFile 	= 'image-' + uuid.v4();					// unique filename
 		var newPath 	= IMAGEFOLDER + newFile;				// modified file
 
-		console.log('resizeImage OPTION: ', option);
-
 
 		gm.prototype.checkSize = function (action) {
 			action()
@@ -406,14 +404,13 @@ module.exports = pixels = {
 		// do crunch magic
 		gm(path)
 		.resize(width)						// todo: if h/w is false, calc ratio					
-		// .then()
 		.autoOrient()
 		.crop(cropW, cropH, cropX, cropY)				// x, y is offset from top left corner
 		.noProfile()							// todo: strip of all exif?
 		.setFormat('JPEG')						// todo: watermark systemapic? or client?
 		.quality(quality)
 		.write(newPath, function (err) {
-			if (err) console.log('resizeImage error: ', err);
+			if (err) console.log('22 resizeImage error: ', err);
 			
 			var result = {
 				file   : newFile,
@@ -445,63 +442,31 @@ module.exports = pixels = {
 
 	serveFitPixelPerfection : function (req, res) {
 
-
-		console.log('*****************************************************************');
-		console.log('fit pixels');
-
-
 		// set vars
-		// var width      = req.query.width;
-		// var height     = req.query.height;
 		var quality    = req.query.quality;
-		// var raw        = req.query.raw;
 		var imageId    = req.params[0]; 		// 'file-ccac0f45-ae95-41b9-8d57-0e64767ea9df'		
-		// var cropX      = req.query.cropx;	
-		// var cropY      = req.query.cropy;
-		// var cropW      = req.query.cropw;
-		// var cropH      = req.query.croph;
-
-		var fitW      = req.query.fitW;
-		var fitH      = req.query.fitH;				
-
-
-		console.log('imageId', imageId);
-		// console.log('width', width);
-		// console.log('height', height);
-		console.log('fitW', fitW);
-		console.log('fitH', fitH);
+		var fitW       = req.query.fitW;
+		var fitH       = req.query.fitH;				
 
 		var newFile 	= 'image-' + uuid.v4();					// unique filename
 		var newPath 	= IMAGEFOLDER + newFile;				// modified file
 
-
 		var imagePath = '/data/images/' + imageId;
-
 
 		pixels.getImageSize(imagePath, function (err, size) {
 
-
 			if ( err || !size ) {
-
 				console.log(err);
 				return res.end();
-
 			}
 
 			var imgWidth = size.width;
 			var imgHeight = size.height;
 
-			console.log('imgWidth', imgWidth);
-			console.log('imgHeight', imgHeight);
-
-			if ( imgWidth>=imgHeight ) 	var imgLandscape = true;
-			if ( fitW>=fitH ) 		var fitLandscape = true;
-
+			if (imgWidth >= imgHeight) 	var imgLandscape = true;
+			if (fitW >= fitH) 		var fitLandscape = true;
 
 			if ( !fitLandscape && imgLandscape ) {
-
-				// Cropping the X-axis
-				console.log('cropping x-axis');
 
 				// regn ut større bredde enn fitW...
 				cropW = fitW * fitH/fitW;
@@ -511,9 +476,6 @@ module.exports = pixels = {
 				cropY = 0;
 
 			} else {
-
-				// Cropping the Y-axis
-				console.log('cropping y-axis');
 
 				cropW = fitW;
 
@@ -528,16 +490,6 @@ module.exports = pixels = {
 				// Offset the Y axis
 				cropY = (cropH - fitH) / 2;
 			}
-
-
-			// console.log('');
-			// console.log('cropW', cropW, '(image oversize width)');
-			// console.log('cropH', cropH, '(image oversize height)');
-			// console.log('fitW', fitW, '(image output width)');
-			// console.log('fitH', fitH, '(image output height)');
-			// console.log('cropX', cropX, '(image crop X)');
-			// console.log('cropY', cropW, '(image crop Y)');
-			// console.log('');
 
 
 			quality = 100;
@@ -556,38 +508,17 @@ module.exports = pixels = {
 			.setFormat('JPEG')						// todo: watermark systemapic? or client?
 			.quality(quality)
 			.write(newPath, function (err) {
-				if (err) console.log('resizeImage error: ', err);
+				if (err) console.log('px resizeImage error: ', err);
 				
-				// var result = {
-				// 	file   : newFile,
-				// 	height : height,
-				// 	width  : width,
-				// 	path : newPath
-				// }
-
-				console.log('*****************************************************************');
-
 				res.sendfile(newPath, {maxAge : 10000000});
-
 			});
-
 		});
-
-		// var tempImg = new Image();
-		// tempImg.src = imagePath;
-
-
-
-
-
 
 
 	},
 
 
 	serveImagePixelPerfection : function (req, res) {
-
-		console.log('lol');
 
 
 		// set vars
@@ -601,10 +532,6 @@ module.exports = pixels = {
 		var cropW      = req.query.cropw;
 		var cropH      = req.query.croph;
 	
-		console.log(imageId);
-		console.log(width);
-		console.log(height);
-
 		var imagePath = '/data/images/' + imageId;
 
 		var options = {
@@ -620,17 +547,14 @@ module.exports = pixels = {
 			quality : quality
 		}
 
-
 		// create image with dimensions
 		pixels.resizeImage(options, function (err, result) {
 			console.log('resized!!!', err, result);
 
 			var path = result.path;
 
-			res.sendfile(path, {maxAge : 10000000});
+			res.sendFile(path, {maxAge : 10000000});
 		});
-
-
 	},			
 
 
@@ -641,12 +565,6 @@ module.exports = pixels = {
 
 	// serve images without wasting a pixel
 	servePixelPerfection : function (req, res) {
-		// todo: more auth!
-
-		// url query ?width=300&height=400&etc...
-		console.log('query: ', req.query);
-
-		// todo: crop queries, etc.
 
 		// set vars
 		var width      = req.query.width;
@@ -659,11 +577,8 @@ module.exports = pixels = {
 		var cropW      = req.query.cropw;
 		var cropH      = req.query.croph;
 
-
-		if (!req.query) {
-			console.log('no query!')
-			return res.end();
-		}
+		// return if invalid
+		if (!req.query) return res.end();
 
 		// if raw quality requested, return full image
 		if (raw) return pixels.returnRawfile(req, res);
@@ -677,6 +592,7 @@ module.exports = pixels = {
 			File
 			.findOne({uuid : fileUuid})
 			.exec(function (err, file) {
+
 				if (!file) return callback(err, { 
 					image : false, 
 					rawfile : false
@@ -697,7 +613,7 @@ module.exports = pixels = {
 						parseInt(i.crop.w)  == parseInt(cropW); 	// crop
 						
 				});
-
+				
 				// return found image (if any)
 				var rawfile = file.data.image.file;
 				var vars = {
@@ -754,12 +670,9 @@ module.exports = pixels = {
 
 		// run all async ops
 		async.waterfall(ops, function (err, result) {
-
 			// all done, serve file
 			pixels.returnImage(req, res, result);
-
 		});
-		
 	},
 
 
@@ -803,12 +716,5 @@ module.exports = pixels = {
 		return;
 	},
 
-	
-
-
-
 
 }
-
-
-
