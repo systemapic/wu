@@ -18,6 +18,11 @@ Wu.StartPane = Wu.Class.extend({
 		// refresh latest projects
 		this.refreshProjects();
 
+		// Show the header pane.
+		Wu.DomUtil.removeClass(Wu.app.HeaderPane._container, 'displayNone');
+
+		// Wu.app.HeaderPane.setSubtitle(app.Account.getName());
+
 	},	
 
 	deactivate : function() {

@@ -33,7 +33,7 @@ Wu.SidePane.Account = Wu.SidePane.Item.extend({
 	// overrides the sidepane menu item button
 	_clickActivate : function () {
 		if (confirm('Are you sure you want to log out?')) {
-			window.location.href = 'https://projects.ruppellsgriffon.com/logout';
+			window.location.href = app.options.servers.portal + 'logout';
 		}
 	},
 

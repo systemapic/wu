@@ -61,6 +61,7 @@ Wu.App = Wu.Class.extend({
 
 			// osm PX
 			osm : {
+				base : 'https://m.systemapic.com/',
 				uri : 'https://{s}.systemapic.com/r/',
 				subdomains : 'mnop' // px
 			}

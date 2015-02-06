@@ -160,6 +160,14 @@
     	animation-iteration-count:infinite;
 	}
 
+.spinning-wrapper {
+	width: 100%;
+	position: absolute;
+	height: 100%;
+	top: 0;
+	left: 0;
+	overflow: hidden;	
+	}
 
 .map-wrapper {
 	position: absolute;
