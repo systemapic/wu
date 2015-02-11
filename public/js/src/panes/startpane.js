@@ -5,9 +5,22 @@ Wu.StartPane = Wu.Class.extend({
 		// set options
 		Wu.setOptions(this, options);
 
+
+		this.dimensions = {
+			screenW 	: 	0,
+			screenH 	: 	0,
+			boxW 		: 	350,
+			boxH 		: 	233,
+			sizeMode 	: 	'',
+			projectNo 	: 	0
+		}
+
+		this.projectContainers	= [];
 	},
 
 	activate : function () {
+
+		this.isOpen = true;
 
 		// create container
 		this.initSpinner();
@@ -21,11 +34,17 @@ Wu.StartPane = Wu.Class.extend({
 		// Show the header pane.
 		Wu.DomUtil.removeClass(Wu.app.HeaderPane._container, 'displayNone');
 
-		// Wu.app.HeaderPane.setSubtitle(app.Account.getName());
+
+		// screendimentions
+		// app._getDimensions()
+	
+
 
 	},	
 
 	deactivate : function() {
+
+		this.isOpen = false;
 
 		// remove hooks
 		this.removeHooks();
@@ -41,6 +60,8 @@ Wu.StartPane = Wu.Class.extend({
 
 	initSpinner : function () {
 
+		console.log('initSpinner');
+
 		// create container 
 		this._container = Wu.DomUtil.create('div', 'startpane-canvas-container', app._appPane);
 
@@ -51,6 +72,9 @@ Wu.StartPane = Wu.Class.extend({
 		this._wrapper.appendChild(content);
 
 		this._spinner = false;
+
+
+
 		return;
 
 		// create spinner instance
@@ -73,6 +97,7 @@ Wu.StartPane = Wu.Class.extend({
 			},
 			circle : false,
 		});
+
 	},
 
 	_initSpinnerContent : function () {
@@ -85,9 +110,6 @@ Wu.StartPane = Wu.Class.extend({
 		this._banner = Wu.DomUtil.create('div', 'startpane-banner', this._bannerContainer);
 
 		this._recentProjectsContainer = Wu.DomUtil.create('div', 'startpane-recent-projects-container', this._banner);
-
-		// this._userName = Wu.DomUtil.create('div', 'startpane-user-name', this._recentProjectsContainer);
-		// this._userName.innerHTML = app.Account.getName();
 
 		this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Recent projects:');
 		this._projectList = Wu.DomUtil.create('div', 'startpane-project-list', this._recentProjectsContainer);
@@ -104,20 +126,33 @@ Wu.StartPane = Wu.Class.extend({
 		this._projectList.innerHTML = '';
 
 		// get latest projects
-		var projects = this._getLatestProjects();
-		if (!projects) return;
+		this.projects = this._getLatestProjects();
+
+		// set number of projects 
+		this.dimensions.projectNo = this.projects.length;
+
+		if (!this.projects) return;
 
 		// Pull out the latest three Projects	
-		projects.forEach(function (project, i) {
+		this.projects.forEach(function (project, i) {
 			if (i > 5) return;
-
 			// Create project container
 			this.createStartProject(project);
 		}, this);
+
+
+		// Get screen dimensions
+		var dims = app._getDimensions();
+
+		// Store width and height
+		this.dimensions.screenW = dims.width;
+		this.dimensions.screenH = dims.height;	
+
+		// run sizer
+		this.positionSpinner(dims);
 	},
 
 	_getLatestProjects : function () {
-
 		// Get all projects
 		var projectsUnsorted = app.Projects;	
 
@@ -129,7 +164,6 @@ Wu.StartPane = Wu.Class.extend({
 		// Reverse so we get newest first
 		projects.reverse();
 
-
 		return projects;
 	},
 
@@ -140,33 +174,34 @@ Wu.StartPane = Wu.Class.extend({
 		var clientName = app.Clients[clientID].name;
 		var clientLogo = app.Clients[clientID].logo;
 
+		var newProject = {};
 		// create container
-		var _projectContainer = Wu.DomUtil.create('div', 'start-panne-recent-projects', this._projectList);
+		newProject._projectContainer = Wu.DomUtil.create('div', 'start-panne-recent-projects', this._projectList);
 		
-		var _projectThumb = Wu.DomUtil.create('img', '', _projectContainer);
-		_projectThumb.src = project.store.logo;
+		newProject._projectThumb = Wu.DomUtil.create('img', '', newProject._projectContainer);
+		newProject._projectThumb.src = project.store.logo;
 
-		var _projectTitle = Wu.DomUtil.create('div', 'start-project-name', _projectContainer);
-		_projectTitle.innerHTML = project.getName();
+		newProject._projectTitle = Wu.DomUtil.create('div', 'start-project-name', newProject._projectContainer);
+		newProject._projectTitle.innerHTML = project.getName();
 
-		var _clientName = Wu.DomUtil.create('div', 'start-project-client-name', _projectContainer);
-		_clientName.innerHTML = clientName;
+		newProject._clientName = Wu.DomUtil.create('div', 'start-project-client-name', newProject._projectContainer);
+		newProject._clientName.innerHTML = clientName;
 
-		var _clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', _projectContainer);
-		_clientLogo.src = clientLogo;
+		newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
+		newProject._clientLogo.src = clientLogo;
+
+
+		this.projectContainers.push(newProject);
 
 
 		// Adjust for short titles
-		if (project.getName().length < 22) Wu.DomUtil.addClass(_projectTitle, 'short-name');
+		if (project.getName().length < 22) Wu.DomUtil.addClass(newProject._projectTitle, 'short-name');
 		
 
-		var client
-
-
-
+		// var client
 
 		// select project hook
-		Wu.DomEvent.on(_projectContainer, 'mousedown', function() { this.selectProject(project); }, this);
+		Wu.DomEvent.on(newProject._projectContainer, 'mousedown', function() { this.selectProject(project); }, this);
 
 	},
 
@@ -224,6 +259,141 @@ Wu.StartPane = Wu.Class.extend({
 		var url = 'url("';
 		url += path;
 		url += '")';
+	},
+
+
+	resizeEvent : function (dimensions) {
+
+		this.positionSpinner(dimensions);
+
+	},
+
+	positionSpinner : function (dimensions) {
+		
+		var w = dimensions.width;
+		var h = dimensions.height;
+
+		if ( h != this.dimensions.screenH ) {
+			this.dimensions.screenH = h;
+			this.changeHeight(dimensions);
+		}
+
+
+		// 3 blocks wide
+		if ( w >= 1091 ) {
+			if ( this.dimensions.sizeMode == 'full' ) return;
+			this.dimensions.sizeMode = 'full';
+			this.setYposition(dimensions);
+		}
+
+		// 2 blocks wide
+		if ( w <= 1090 && w >= 761) {
+			if ( this.dimensions.sizeMode == 'medium' ) return;
+			this.dimensions.sizeMode = 'medium';
+			this.setYposition(dimensions);
+		} 
+
+		// 1 block wide
+		if ( w <= 760 ) {
+			if ( this.dimensions.sizeMode == 'small' ) return;
+			this.dimensions.sizeMode = 'small';
+			this.setYposition(dimensions);
+		}
+
+	},
+
+	changeHeight : function (dimensions) {
+
+		console.log('change the height');
+		this.setYposition(dimensions);
+
+
+	},
+
+	setYposition : function (dimensions) {
+
+		var w = dimensions.width;
+		var h = dimensions.height;
+
+		// 3 projects wide
+		if ( this.dimensions.sizeMode == 'full' ) {
+			
+			// Decide how many projects we want to show based on height
+			if ( h >= 691 ) 		this.showBoxes(6);
+			if ( h <= 690 ) 		this.showBoxes(3);
+
+			// figure out padding
+			if ( this.dimensions.projectNo >= 4 ) 	var fullH = this.dimensions.boxH * 2;
+			else 					var fullH = this.dimensions.boxH;
+
+			// calculate padding
+			this.calcPadding(h, fullH);
+
+		}
+
+		// 2 projects wide
+		if ( this.dimensions.sizeMode == 'medium' ) {
+		
+			// Decide how many projects we want to show based on height
+			if ( h >= 921 ) 		this.showBoxes(6);		
+			if ( h <= 920 && h >= 661 ) 	this.showBoxes(4);	
+			if ( h <= 660 ) 		this.showBoxes(2);		
+		
+			// figure out padding
+			if ( this.dimensions.projectNo >= 5 )						var fullH = this.dimensions.boxH * 3;	// 3 rows (5 or 6 projects)
+			else if ( this.dimensions.projectNo >= 3 && this.dimensions.projectNo <=4 )	var fullH = this.dimensions.boxH * 2; 	// 2 rows (3 or 4 projects)
+			else 										var fullH = this.dimensions.boxH;	// 1 row  (1 or 2 projects)	
+
+			// calculate padding
+			this.calcPadding(h, fullH);
+
+		}
+
+		// 1 project wide
+		if ( this.dimensions.sizeMode == 'small' ) {
+		
+			// Decide how many projects we want to show based on height
+			if ( h >= 921 ) 		this.showBoxes(3);	
+			if ( h <= 920 && h >= 661 ) 	this.showBoxes(2);
+			if ( h <= 660 ) 		this.showBoxes(1);
+		
+			// figure out padding
+			if ( this.dimensions.projectNo >= 3 )						var fullH = this.dimensions.boxH * 3;
+			else if ( this.dimensions.projectNo == 2 )					var fullH = this.dimensions.boxH * 2;
+			else if ( this.dimensions.projectNo == 1 )					var fullH = this.dimensions.boxH;
+
+			// calculate padding
+			this.calcPadding(h, fullH);
+
+		}
+
+
+	},
+
+	showBoxes : function (no) {
+
+		// Store how many projects we want to show
+		this.dimensions.projectNo = no;
+
+		for ( var i = 0; i < this.projects.length-1; i++ ) {
+			if ( i < no ) 	Wu.DomUtil.removeClass(this.projectContainers[i]._projectContainer, 'displayNone');
+			else		Wu.DomUtil.addClass(this.projectContainers[i]._projectContainer, 'displayNone');
+		}
+
+	},
+
+	// Calculates top padding of container
+	calcPadding : function(screenHeight, boxesHeight) {
+
+			// Calculate padding
+			var padding = Math.floor((screenHeight - boxesHeight)/2);
+
+			// Minimum padding is 100 pixels
+			if ( padding <= 100 ) padding = 100;
+
+			// Set padding
+			this._wrapper.style.paddingTop = padding + 'px';
+
 	}
 });
 

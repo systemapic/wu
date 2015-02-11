@@ -313,7 +313,6 @@ Wu.Project = Wu.Class.extend({
 		}
 		var json = JSON.stringify(options);
 		
-		// console.log('POST: _saveNew');
  		Wu.Util.postcb('/api/project/new', json, callback.callback.bind(callback.context), this);
 
 	},
@@ -349,13 +348,18 @@ Wu.Project = Wu.Class.extend({
 		Wu.Util.setAddressBar(url)
 
 		// delete object
-		delete Wu.app.Projects[project.uuid];
+		// delete Wu.app.Projects[project.uuid];
+		delete Wu.app.Projects[project.store.uuid];
 
 		// set no active project if was active
 		if (app.activeProject == this) {
 			app.SidePane.refresh(['Projects', 'Users', 'Account']);
 			app.activeProject = null;
 		}
+
+		// Remove from app.Projects array
+		var deleteID = project.store.uuid;
+		delete app.Projects[deleteID];	
 
 		// set status
 		app.setStatus('Deleted!');
@@ -769,6 +773,15 @@ Wu.Project = Wu.Class.extend({
 		this._setUrl();
 	},
 
+	setThumbCreated : function (bool) {
+		this.store.thumbCreated = bool;
+		this._update('thumbCreated');
+	},
+
+	getThumbCreated : function () {
+		return this.store.thumbCreated;
+	},
+
 	setBounds : function (bounds) {
 		this.store.bounds = bounds;
 		this._update('bounds');
@@ -1030,5 +1043,60 @@ Wu.Project = Wu.Class.extend({
 	disableMapboxGL : function () {
 
 	},
+
+	// CXX – Now this is all over the place... see sidepane.project.js > makeNewThumbnail() etc...
+	createProjectThumb : function () {
+
+		console.log('createProjectThumb');
+
+		// Set the grinding wheel until logo is updated
+		this.setTempLogo();
+
+		app.setHash(function (ctx, hash) {
+
+			var obj = JSON.parse(hash);
+
+			console.log('obj', obj);
+
+			obj.dimensions = {
+				height : 233,
+				width : 350
+			}
+
+			// get snapshot from server
+			Wu.post('/api/util/createThumb', JSON.stringify(obj), this.createdProjectThumb, this);
+
+		}.bind(this), this);
+
+	},
+
+
+	createdProjectThumb : function(context, json) {
+
+		// parse results
+		var result = JSON.parse(json);
+		var image = result.cropped;
+
+		var fileUuid = result.fileUuid;
+
+		var path = '/images/' + image;
+
+		// Store new logo paths
+		context.setLogo(path);
+		context.setHeaderLogo(path);
+
+		context._menuItem.logo.src = path;
+
+		// Set logo in header pane
+		if (context == app.activeProject) app.HeaderPane.addedLogo(image);
+
+	},	
+
+	setTempLogo : function () {
+		this._sidePaneLogoContainer.src = '/css/images/grinders/BG-grinder-small-grayDark-on-white.gif';
+	}	
+
+
+
 
 });

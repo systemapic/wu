@@ -1024,7 +1024,14 @@ module.exports = api = {
 		async.series(ops, function (err, results) {
 			console.log('pahtnom THUMB !! all done: ', err);
 			
-			if (err) console.log('err', err);
+			if (err) {
+				
+				console.log('err', err);
+				return res.end(JSON.stringify({
+					error : err
+				}));
+			}
+
 			
 			var doc = results[2]
 			var croppedImage = results[3];
@@ -1844,7 +1851,8 @@ module.exports = api = {
 				'slug',
 				'connectedAccounts',
 				'settings',
-				'categories'
+				'categories',
+				'thumbCreated'
 			];
 	
 			var queries = {};

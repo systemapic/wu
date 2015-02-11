@@ -2737,6 +2737,10 @@ input.cmn-toggle-round-flat + label:before {
 .cartocss-update-button:hover {
   background: rgba(0, 0, 0, 0.225); }
 
+.cartocss-update-button:active {
+  box-shadow: none;
+  background: rgba(0, 0, 0, 0.15); }
+
 .cartocss-style-header {
   font-size: 12px;
   font-weight: 400;
@@ -3417,6 +3421,16 @@ input.cmn-toggle-round-flat + label:before {
 .project-item:hover > .project-kill {
   display: block; }
 
+.project-item.active-project:before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  background: green;
+  position: absolute;
+  border-radius: 10px;
+  top: 14px;
+  left: 3px; }
+
 .project-title {
   position: relative;
   left: 10px;
@@ -3515,6 +3529,9 @@ input.cmn-toggle-round-flat + label:before {
 
 .project-users-wrap:hover {
   opacity: 1; }
+
+.project-users-wrap:active {
+  background-color: rgba(255, 255, 255, 0.5); }
 
 .active-project-user-button {
   display: block !important;
@@ -3636,6 +3653,7 @@ input.cmn-toggle-round-flat + label:before {
 .project-delete {
   font-size: 11px;
   font-weight: 900;
+  margin: auto;
   margin-top: 10px;
   background: #CCC;
   width: 100px;
@@ -5235,7 +5253,7 @@ td.tdcont.createdDate {
 
 .share-image-wrap:before {
   content: '';
-  background-image: url(images/systemapic-grinding.gif);
+  background-image: url(images/grinders/cloud-large-grinder-grayLight-on-white.gif);
   background-repeat: no-repeat;
   text-align: center;
   width: 100%;

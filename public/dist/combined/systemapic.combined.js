@@ -1391,6 +1391,7 @@ Wu.DomUtil = {
 	},
 
 	addClass: function (el, name) {
+		if (!el) return console.error('addClass: div undefined. fix!');
 		if (el.classList !== undefined) {
 		    var classes = Wu.Util.splitWords(name);
 		    for (var i = 0, len = classes.length; i < len; i++) {
@@ -1403,6 +1404,7 @@ Wu.DomUtil = {
 	},
 
 	removeClass: function (el, name) {
+		if (!el) return console.error('removeClass: div undefined. fix!');
 		if (el.classList !== undefined) {
 		    el.classList.remove(name);
 		} else {
@@ -3118,7 +3120,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.usersInnerWrapper);
 
 		// add delete button
-		if (app.Account.canDeleteProject(this.project.store.uuid) || this.options.editMode) {
+		var canDelete = app.Account.canDeleteProject(this.project.store.uuid);
+		console.log('canDelete? ', canDelete);
+		if (canDelete || this.options.editMode) {
 		
 			this.makeThumb = Wu.DomUtil.create('div', 'new-project-thumb', this.usersInnerWrapper, 'Generate thumbnail');
 			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');			
@@ -3130,10 +3134,25 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// ****************************************************************************
 		// ****************************************************************************
 
+		this.hookThumb();
 
 
 		// add hooks
 		this.addHooks();
+
+	},
+
+	hookThumb : function () {
+
+		// This project ID
+		var thisID = this.project.store.uuid;
+
+		app.Projects[thisID].store.sidePaneLogo = {
+
+			_container 	: this.logo,
+			manuallyUpdated : false
+
+		}
 
 	},
 
@@ -3146,6 +3165,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	update : function (project) {
+
 		this.project 			= project || this.project;
 		this.name.innerHTML 		= this.project.store.name;
 		this.description.innerHTML 	= this.project.store.description;
@@ -3182,13 +3202,15 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var parentHeight = this._parent._container.offsetHeight;
 		var projectInfoHeight = this.usersInnerWrapper.offsetHeight;		
 
+		console.log('toggleProjecTInfo', this.users);
+
 		if ( !this.project._menuItem._isOpen ) {
 
 			// Add open state to button
 			Wu.DomUtil.addClass(this.users, 'active-project-user-button');
 
 			// Set Project Height
-			this._container.style.height = projectInfoHeight + 130 + 'px';
+			this._container.style.height = projectInfoHeight + 110 + 'px';
 
 			// Set Client container height
 			this._parent._container.style.height = parentHeight + projectInfoHeight + 'px';
@@ -3267,45 +3289,36 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	makeNewThumbnail : function () {
 
+		// Set state to manually updated to prevet overriding
+		app.Projects[this.project.store.uuid].store.sidePaneLogo.manuallyUpdated = true;
+
 		var that = this; // callback
 
 		// If current project is active
 		if ( this.project.store.uuid == app.activeProject.getUuid() ) {
-			
-			app.setHash(function (ctx, hash) {
 
-				var obj = JSON.parse(hash);				
-
-				obj.dimensions = {
-					height : 233,
-					width : 350,			
-				}
-
-				// get snapshot from server
-				Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdThumb, that);
-
-			})
+			app.createProjectThumb(); // Litt repetisjon her... mye av det samme skjer i app.js => 	
 
 		// We're making a thumb on a project that is not active
 		} else {
 
 
+			// Set the grinding wheel until logo is updated
+			var activeProjectID = this.project.store.uuid;
+			app.Projects[activeProjectID].store.sidePaneLogo._container.src = '/css/images/grinders/BG-grinder-small-grayDark-on-white.gif';
+
+
 			this.setNewHash(function (ctx, hash) {
-
 				var obj = JSON.parse(hash);				
-
 				obj.dimensions = {
 					height : 233,
 					width : 350,			
 				}
-
 				// get snapshot from server
-				Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdThumbNotActive, that);
-
+				Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdThumb, that);
 			})
 		}
 	},
-
 
 
 	// save a hash
@@ -3335,29 +3348,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	createdThumb : function(context, json) {
 
-		// parse results
-		var result = JSON.parse(json);
-		// var image = result.image; // filename
-		var image = result.cropped;
-
-		var fileUuid = result.fileUuid;
-
-		// get dimensions of container
-		var height = context.logo.offsetHeight;
-		var width = context.logo.offsetWidth;
-
-		var path = '/images/' + image;
-
-		// set image
-		context.logo.src = path;
-		context.project.setLogo(path);
-
-		app.HeaderPane.addedLogo(image);
-
-	},
-
-
-	createdThumbNotActive : function(context, json) {
 
 		// parse results
 		var result = JSON.parse(json);
@@ -3375,6 +3365,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// set image
 		context.logo.src = path;
 		context.project.setLogo(path);
+		
+		// save new header image
+		context.project.setHeaderLogo(path);		
 
 	},
 
@@ -3415,6 +3408,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	editedLogo : function (path) {
 
+		// Set state to manually updated to prevet overriding
+		app.Projects[thisID].store.sidePaneLogo.manuallyUpdated = true;
+
 		// set path
 		var fullpath = '/images/' + path;
 		
@@ -3424,7 +3420,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// update image 
 		// this.logo.style.backgroundImage = "url('" + this.project.getLogo() + "')";
 		this.logo.src = this.project.getLogo();
-
 
 		// update header
 		app.HeaderPane.addedLogo(path);
@@ -3671,10 +3666,13 @@ Wu.SidePane.Project = Wu.Class.extend({
 			this.project.unload();
 		
 			// activate startpane
-			app.StartPane.activate();
-
+			// running a little timer on this, otherwise it's not deleted properly and thumb will still show on startpane...
+			setTimeout(function() {
+				app.StartPane.activate();
+			}, 200)
+			
 			// close statuspane
-			app.StatusPane.close()
+			app.StatusPane.close();
 		}
 
 		// delete
@@ -3808,7 +3806,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// create project button
 		if (app.Account.canCreateProject()) {
-			var className = 'smap-button-white new-project-button ct11 ct16 ct18';
+			var className = 'smap-button-white new-project-button';
 			this._newProjectButton = Wu.DomUtil.create('div', className, this._projectsContainer, '+');
 			Wu.DomEvent.on(this._newProjectButton, 'mousedown', this.createNewProject, this);
 			Wu.DomEvent.on(this._newProjectButton, 'mousedown', Wu.DomEvent.stop, this);
@@ -3917,8 +3915,38 @@ Wu.SidePane.Client = Wu.Class.extend({
 			context : this
 		}
 		project._saveNew(callback); 
+
+		// cxxxx
+		// generate project thumb 
+		// if no timeout: 	creates thumb on active project before new was selected
+		// 			active project (project object) is not ready when _markActive gets triggered)
+
+		// Of course dodgy ~ 500ms er ikke nok...
+
+		var that = this;
+		setTimeout(function() {
+			app.createProjectThumb();
+			that._markActive(project);
+		}, 750);
+
+		// Mark this project as active
+		
+
 		
 	},
+
+	_markActive : function (newProject) {
+		var projects = app.Projects;
+		for (p in projects) {
+			var project = projects[p];
+			if (project._menuItem) project._menuItem._unmarkActive();
+		}
+		Wu.DomUtil.addClass(newProject._menuItem._container, 'active-project');
+	},
+	
+	_unmarkActive : function () {
+		Wu.DomUtil.removeClass(this._container, 'active-project');
+	},	
 
 	_projectCreated : function (project, json) {
 
@@ -4159,6 +4187,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	open : function () {
+
+		// Close open project info to prevent overflow
+		this.resetOpenProjectInfo();
 
 		this.calculateHeight();
 		this._container.style.height = this.maxHeight + 'px';          
@@ -5684,6 +5715,17 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 			this.on(baseLayer);
 			this.enableLayer(baseLayer);
 		}
+
+
+		// generate project thumb (if it hasn't been manually set before)
+		if ( !app.activeProject.store.sidePaneLogo.manuallyUpdated ) {
+			setTimeout(function() {
+				app.createProjectThumb();
+			}, 500);
+		}
+
+		
+
 	},
 
 	on : function (baseLayer) {
@@ -6158,6 +6200,9 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 
 		// save to project
 		project.setPosition(position);
+
+		// generate project thumb (if it hasn't been manually set before)
+		if ( !app.activeProject.store.sidePaneLogo.manuallyUpdated ) app.createProjectThumb();
 	
 		// call update on view
 		this.update();
@@ -9405,19 +9450,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		project.setHeaderLogo(fullpath);
 
 		// update image in header
-		// this._logoWrap.style.backgroundImage = this.project.getHeaderLogoBg();
-
-		// cxxx
-		if ( project.getHeaderLogo() == '/css/images/defaultProjectLogo.png' ) { 
-			headerLogoPath = '/css/images/defaultProjectLogo.png'
-		} else {
-			var headerLogoSliced = project.getHeaderLogo().slice(8); // remove "/images/" from string
-			var headerLogoPath = '/pixels/fit/' + headerLogoSliced + '?fitW=90&fitH=71';
-		}
-
+		var headerLogoPath = project.getHeaderLogo() ? project.getHeaderLogo() :  '/css/images/defaultProjectLogo.png';
 		this._logo.src = headerLogoPath;
 
-		Wu.DomUtil.thumbAdjust(this._logo, 90);
+		// Wu.DomUtil.thumbAdjust(this._logo, 90);
 
 
 	},
@@ -9514,22 +9550,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._container.style.display = 'block';
 
 		
-		// cxxx
-		if ( project.getHeaderLogo() == '/css/images/defaultProjectLogo.png' ) { 
-			headerLogoPath = '/css/images/defaultProjectLogo.png'
-		} else {
-			var headerLogoSliced = project.getHeaderLogo().slice(8); // remove "/images/" from string
-			var headerLogoPath = '/pixels/fit/' + headerLogoSliced + '?fitW=90&fitH=71';
-		}
-
-
+		var headerLogoPath = project.getHeaderLogo() ? project.getHeaderLogo() :  '/css/images/defaultProjectLogo.png';
+		this._logo.src = headerLogoPath;
 
 		// update values
-		this._logo.src = headerLogoPath;
 		this._title.innerHTML 	 = project.getHeaderTitle();
 		this._subtitle.innerHTML = project.getHeaderSubtitle();
-
-		// Wu.DomUtil.thumbAdjust(this._logo, 90);
 		
 		// add edit hooks
 		if (project.editMode) {
@@ -9546,7 +9572,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	reset : function () {
 		// hide header
-		this._container.style.display = 'none';
+		// this._container.style.display = 'none';
+		
+		// Keep header, but remove it's content from DOM
+		Wu.app.HeaderPane._title.innerHTML = '';
+		Wu.app.HeaderPane._subtitle.innerHTML = '';
+		Wu.app.HeaderPane._logo.src = '';
 	},
 
 	_resetView : function () {
@@ -13834,7 +13865,6 @@ L.control.baselayerToggle = function (options) {
 		}
 		var json = JSON.stringify(options);
 		
-		// console.log('POST: _saveNew');
  		Wu.Util.postcb('/api/project/new', json, callback.callback.bind(callback.context), this);
 
 	},
@@ -13870,13 +13900,18 @@ L.control.baselayerToggle = function (options) {
 		Wu.Util.setAddressBar(url)
 
 		// delete object
-		delete Wu.app.Projects[project.uuid];
+		// delete Wu.app.Projects[project.uuid];
+		delete Wu.app.Projects[project.store.uuid];
 
 		// set no active project if was active
 		if (app.activeProject == this) {
 			app.SidePane.refresh(['Projects', 'Users', 'Account']);
 			app.activeProject = null;
 		}
+
+		// Remove from app.Projects array
+		var deleteID = project.store.uuid;
+		delete app.Projects[deleteID];	
 
 		// set status
 		app.setStatus('Deleted!');
@@ -15056,7 +15091,8 @@ L.control.baselayerToggle = function (options) {
 	canDeleteProject : function (projectUuid) {
 		var user = this.store;
 		var editor = (user.role.editor.projects.indexOf(projectUuid) >= 0) ? true : false;
-		if (user.role.superadmin && editor) return true;
+		if (user.role.superadmin) return true;
+		// if (user.role.superadmin && editor) return true;
 		if (user.role.admin && editor)      return true;
 		return false;
 	},
@@ -20027,6 +20063,9 @@ Wu.App = Wu.Class.extend({
 		L.mapbox.config.FORCE_HTTPS = true;
 		L.mapbox.accessToken = this.options.providers.mapbox[0].accessToken; // todo: move to relevant place
 
+		// set page title
+		document.title = this.options.portalTitle;
+
 		// get objects from server
 		this.initServer();
 
@@ -20071,15 +20110,14 @@ Wu.App = Wu.Class.extend({
 			// Get the styletag
 			var styletag = document.getElementById('mobilestyle');
 			// Set stylesheet for 
-			var styleURL = '<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/' + mobilestyle + '">';
+			var styleURL = '<link rel="stylesheet" href="' + app.options.servers.portal + 'css/' + mobilestyle + '">';
 			styletag.innerHTML = styleURL;
 			
 		}
 	},
 
 	initServer : function () {
-		var serverUrl = this.options.servers.portal;
-		console.log('Securely connected to server: \n', serverUrl);
+		console.log('Securely connected to server: \n', this.options.servers.portal);
 
 		var data = JSON.stringify(this.options);
 		
@@ -20134,6 +20172,9 @@ Wu.App = Wu.Class.extend({
 
 		// get window dimensions
 		var dimensions = this._getDimensions(e);
+
+		// startpane resize event
+		if ( app.StartPane.isOpen ) app.StartPane.resizeEvent(dimensions);
 
 		// mappane resize event
 		if (app.MapPane) app.MapPane.resizeEvent(dimensions);
@@ -20597,10 +20638,6 @@ Wu.App = Wu.Class.extend({
 	// debug mode
 	_debug : function () {
 		if (!this.debug) return;
-		
-
-
-
 
 		// set style
 		Wu.setStyle('img', {
@@ -20627,8 +20664,6 @@ Wu.App = Wu.Class.extend({
 			}
 		}
 
-
-
 	},
 
 
@@ -20636,9 +20671,69 @@ Wu.App = Wu.Class.extend({
 		var xtile = parseInt(Math.floor( (lon + 180) / 360 * (1<<zoom) ));
 		var ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat.toRad()) + 1 / Math.cos(lat.toRad())) / Math.PI) / 2 * (1<<zoom) ));
 		return "" + zoom + "/" + xtile + "/" + ytile;
-	}
+	},
 
 
+	// CXX – Now this is all over the place... see sidepane.project.js > makeNewThumbnail() etc...
+	createProjectThumb : function () {
+
+		console.log('createProjectThumb');
+
+		// Set the grinding wheel until logo is updated
+		var activeProjectID = app.activeProject.store.uuid;
+		app.Projects[activeProjectID].store.sidePaneLogo._container.src = '/css/images/grinders/BG-grinder-small-grayDark-on-white.gif';
+
+
+		console.log(activeProjectID);
+
+
+
+		var that = this; // callback	
+
+		app.setHash(function (ctx, hash) {
+
+			var obj = JSON.parse(hash);
+
+			console.log('obj', obj);
+
+			obj.dimensions = {
+				height : 233,
+				width : 350
+			}
+
+			// get snapshot from server
+			Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdProjectThumb, that);
+
+		})
+
+	},
+
+
+	createdProjectThumb : function(context, json) {
+
+		// parse results
+		var result = JSON.parse(json);
+		var image = result.cropped;
+
+		var fileUuid = result.fileUuid;
+
+		var path = '/images/' + image;
+
+		var activeProjectID = app.activeProject.store.uuid;
+
+		// Store new logo paths
+		app.Projects[activeProjectID].setLogo(path);
+		app.Projects[activeProjectID].setHeaderLogo(path);
+
+		// Set logo in the side pane menu
+		app.Projects[activeProjectID].store.sidePaneLogo._container.src = path;
+
+		// Set logo in header pane
+		app.HeaderPane.addedLogo(image);
+
+
+
+	},	
 
 
 });

@@ -1391,6 +1391,7 @@ Wu.DomUtil = {
 	},
 
 	addClass: function (el, name) {
+		if (!el) return console.error('addClass: div undefined. fix!');
 		if (el.classList !== undefined) {
 		    var classes = Wu.Util.splitWords(name);
 		    for (var i = 0, len = classes.length; i < len; i++) {
@@ -1403,6 +1404,7 @@ Wu.DomUtil = {
 	},
 
 	removeClass: function (el, name) {
+		if (!el) return console.error('removeClass: div undefined. fix!');
 		if (el.classList !== undefined) {
 		    el.classList.remove(name);
 		} else {
