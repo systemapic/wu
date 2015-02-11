@@ -973,6 +973,17 @@ td {
 
 
 
+/* KILLERS */
+
+.leaflet-control-mouseposition,
+.leaflet-control-scale,
+.leaflet-control-cartocss,
+.leaflet-control-draw {
+	display: none !important;
+}
+
+
+
 
 /*
 ██████╗  ██████╗ ██████╗ ████████╗██████╗  █████╗ ██╗████████╗

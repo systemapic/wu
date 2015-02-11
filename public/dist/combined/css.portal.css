@@ -4471,7 +4471,8 @@ button.image-attachment {
   margin-top: 5px;
   font-weight: 900;
   font-size: 15px;
-  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3); }
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+  z-index: 999; }
 
 /* The files in the file list */
 .dataLibrary-file-popup-item {
@@ -6099,10 +6100,15 @@ input[type=checkbox] + label.check {
   text-align: center; }
 
 .startpane-banner {
-  overflow: scroll;
+  overflow: hidden;
   position: absolute;
   width: 100%;
-  height: 100%; }
+  height: 100%;
+  -webkit-transition: opacity 250ms ease;
+  -moz-transition: opacity 250ms ease;
+  -ms-transition: opacity 250ms ease;
+  -o-transition: opacity 250ms ease;
+  transition: opacity 250ms ease; }
 
 .startpane-recent-projects-container {
   width: 100%;

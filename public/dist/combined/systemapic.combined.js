@@ -3145,14 +3145,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 	hookThumb : function () {
 
 		// This project ID
-		var thisID = this.project.store.uuid;
-
-		app.Projects[thisID].store.sidePaneLogo = {
-
-			_container 	: this.logo,
-			manuallyUpdated : false
-
-		}
+		this.project._sidePaneLogoContainer = this.logo;
 
 	},
 
@@ -3290,87 +3283,11 @@ Wu.SidePane.Project = Wu.Class.extend({
 	makeNewThumbnail : function () {
 
 		// Set state to manually updated to prevet overriding
-		app.Projects[this.project.store.uuid].store.sidePaneLogo.manuallyUpdated = true;
-
-		var that = this; // callback
-
-		// If current project is active
-		if ( this.project.store.uuid == app.activeProject.getUuid() ) {
-
-			app.createProjectThumb(); // Litt repetisjon her... mye av det samme skjer i app.js => 	
-
-		// We're making a thumb on a project that is not active
-		} else {
-
-
-			// Set the grinding wheel until logo is updated
-			var activeProjectID = this.project.store.uuid;
-			app.Projects[activeProjectID].store.sidePaneLogo._container.src = '/css/images/grinders/BG-grinder-small-grayDark-on-white.gif';
-
-
-			this.setNewHash(function (ctx, hash) {
-				var obj = JSON.parse(hash);				
-				obj.dimensions = {
-					height : 233,
-					width : 350,			
-				}
-				// get snapshot from server
-				Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdThumb, that);
-			})
-		}
-	},
-
-
-	// save a hash
-	setNewHash : function (callback) {
-
-		// get project;
-		var projectUuid = this.project.store.uuid;
-
-		// hash object
-		var json = {
-			projectUuid : projectUuid,
-			hash : {
-				id 	 : Wu.Util.createRandom(6),
-				position : this.project.store.position,
-				layers 	 : [] 			// layermenuItem uuids, todo: order as z-index
-			}
-		}
-
-		// save hash to server
-		Wu.post('/api/project/hash/set', JSON.stringify(json), callback, this);
-
-		// return
-		return json.hash;
+		// app.Projects[this.project.store.uuid].store.sidePaneLogo.manuallyUpdated = true;
+		this.project.setThumbCreated(true);
+		this.project.createProjectThumb();
 
 	},
-
-
-	createdThumb : function(context, json) {
-
-
-		// parse results
-		var result = JSON.parse(json);
-		// var image = result.image; // filename
-		var image = result.cropped;
-
-		var fileUuid = result.fileUuid;
-
-		// get dimensions of container
-		var height = context.logo.offsetHeight;
-		var width = context.logo.offsetWidth;
-
-		var path = '/images/' + image;
-
-		// set image
-		context.logo.src = path;
-		context.project.setLogo(path);
-		
-		// save new header image
-		context.project.setHeaderLogo(path);		
-
-	},
-
 
 	// edit hook for client logo
 	addLogoDZ : function () {
@@ -3923,11 +3840,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// Of course dodgy ~ 500ms er ikke nok...
 
-		var that = this;
-		setTimeout(function() {
-			app.createProjectThumb();
-			that._markActive(project);
-		}, 750);
+	
 
 		// Mark this project as active
 		
@@ -3968,6 +3881,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// create project in sidepane
 		this._createNewProject(project);
+		
+	
 
 	},
 
@@ -4001,6 +3916,11 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// add defaults to map
 		this._addDefaults();
 
+		// create project thumb
+		project.createProjectThumb();
+
+		// mark project div in sidepane as active
+		this._markActive(project);
 	},
 
 
@@ -5716,15 +5636,9 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 			this.enableLayer(baseLayer);
 		}
 
-
-		// generate project thumb (if it hasn't been manually set before)
-		if ( !app.activeProject.store.sidePaneLogo.manuallyUpdated ) {
-			setTimeout(function() {
-				app.createProjectThumb();
-			}, 500);
-		}
-
-		
+		var project = this.activeProject;
+		var thumbCreated = project.getThumbCreated();
+		if ( !thumbCreated ) project.createProjectThumb();		
 
 	},
 
@@ -6202,8 +6116,9 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 		project.setPosition(position);
 
 		// generate project thumb (if it hasn't been manually set before)
-		if ( !app.activeProject.store.sidePaneLogo.manuallyUpdated ) app.createProjectThumb();
-	
+		var thumbCreated = project.getThumbCreated();
+		if ( !thumbCreated ) project.createProjectThumb();
+
 		// call update on view
 		this.update();
 
@@ -10685,6 +10600,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		if (layermenu) layermenu.disableEdit();
 
 
+		// Face out startpane if it's open
+		if ( app.StartPane.isOpen ) app.StartPane._banner.style.opacity = '0.1';
+
+
 		// Mobile option
 		if (Wu.app.mobile) {
 
@@ -10739,7 +10658,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			topleft.style.display = 'block';
 		}
 
-
+		// Face out startpane if it's open
+		if ( app.StartPane.isOpen ) app.StartPane._banner.style.opacity = '1';
 
 		// Mobile option : activate default sidepane on close to avoid opening in fullscreen
 		if (app.mobile) {
@@ -14325,6 +14245,15 @@ L.control.baselayerToggle = function (options) {
 		this._setUrl();
 	},
 
+	setThumbCreated : function (bool) {
+		this.store.thumbCreated = bool;
+		this._update('thumbCreated');
+	},
+
+	getThumbCreated : function () {
+		return this.store.thumbCreated;
+	},
+
 	setBounds : function (bounds) {
 		this.store.bounds = bounds;
 		this._update('bounds');
@@ -14586,6 +14515,61 @@ L.control.baselayerToggle = function (options) {
 	disableMapboxGL : function () {
 
 	},
+
+	// CXX – Now this is all over the place... see sidepane.project.js > makeNewThumbnail() etc...
+	createProjectThumb : function () {
+
+		console.log('createProjectThumb');
+
+		// Set the grinding wheel until logo is updated
+		this.setTempLogo();
+
+		app.setHash(function (ctx, hash) {
+
+			var obj = JSON.parse(hash);
+
+			console.log('obj', obj);
+
+			obj.dimensions = {
+				height : 233,
+				width : 350
+			}
+
+			// get snapshot from server
+			Wu.post('/api/util/createThumb', JSON.stringify(obj), this.createdProjectThumb, this);
+
+		}.bind(this), this);
+
+	},
+
+
+	createdProjectThumb : function(context, json) {
+
+		// parse results
+		var result = JSON.parse(json);
+		var image = result.cropped;
+
+		var fileUuid = result.fileUuid;
+
+		var path = '/images/' + image;
+
+		// Store new logo paths
+		context.setLogo(path);
+		context.setHeaderLogo(path);
+
+		context._menuItem.logo.src = path;
+
+		// Set logo in header pane
+		if (context == app.activeProject) app.HeaderPane.addedLogo(image);
+
+	},	
+
+	setTempLogo : function () {
+		this._sidePaneLogoContainer.src = '/css/images/grinders/BG-grinder-small-grayDark-on-white.gif';
+	}	
+
+
+
 
 });;Wu.Client = Wu.Class.extend({
 
@@ -15563,11 +15547,15 @@ L.control.baselayerToggle = function (options) {
 
 	_addGridEvents : function () {
 		var grid = this.gridLayer;
+		console.log('grid: ', grid);
+
 		if (!grid) return;
 
 		
 		// add click event
 		grid.on('mousedown', function(e) {
+			console.log('grid md', e);
+
 			if (!e.data) return;
 
 			// pass layer
@@ -15585,6 +15573,8 @@ L.control.baselayerToggle = function (options) {
 		}, this);
 
 		grid.on('mouseup', function (e) {
+			console.log('grid mu', e);
+
 			if (!e.data) return;
 
 			// pass layer
@@ -15603,6 +15593,7 @@ L.control.baselayerToggle = function (options) {
 		}, this);
 
 		grid.on('click', function (e) {
+			console.log('grid click', e);
 
 			// clear old
 			app.MapPane._clearPopup();
@@ -15675,17 +15666,17 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
 		
 		// create gridlayer
-		// this.gridLayer = new L.UtfGrid(url, {
-		// 	useJsonP: false,
-		// 	subdomains: 'ijk',
-		// 	subdomains: subdomains
-		// 	// subdomains: 'ghi',
-		// 	maxRequests : 10,
-		// 	requestTimeout : 20000
-		// });
+		this.gridLayer = new L.UtfGrid(url, {
+			useJsonP: false,
+			// subdomains: 'ijk',
+			subdomains: subdomains,
+			// subdomains: 'ghi',
+			maxRequests : 10,
+			requestTimeout : 20000
+		});
 
 		// debug
-		this.gridLayer = false;
+		// this.gridLayer = false;
 
 		// add grid events
 		this._addGridEvents();
@@ -15903,396 +15894,396 @@ Wu.createLayer = function (layer) {
 
 
 
-Wu.GeojsonLayer = Wu.Layer.extend({
+// Wu.GeojsonLayer = Wu.Layer.extend({
 
-	type : 'geojsonLayer',
+// 	type : 'geojsonLayer',
 
 
-	initLayer : function () {
-		var that = this;
+// 	initLayer : function () {
+// 		var that = this;
 	       
-		// create leaflet geoJson layer
-		this.layer = L.geoJson(false, {
+// 		// create leaflet geoJson layer
+// 		this.layer = L.geoJson(false, {
 
-			// create popup
-			onEachFeature : this.createPopup
-		});
+// 			// create popup
+// 			onEachFeature : this.createPopup
+// 		});
 
-	},
+// 	},
 
-	add : function (map) {
-		this.addTo(map);
-	},
+// 	add : function (map) {
+// 		this.addTo(map);
+// 	},
 
-	addTo : function (map) {
-		var map   = map || Wu.app._map;
-		var layer = this.layer;
+// 	addTo : function (map) {
+// 		var map   = map || Wu.app._map;
+// 		var layer = this.layer;
 		
-		// load data if not loaded
-		if (!this.loaded) this.loadData();
+// 		// load data if not loaded
+// 		if (!this.loaded) this.loadData();
 				
-		// set hover popup
-		this.bindHoverPopup();
+// 		// set hover popup
+// 		this.bindHoverPopup();
 
-		// add to drawControl
-		var drawControl = app.MapPane.editableLayers;
-		drawControl.addLayer(layer);
+// 		// add to drawControl
+// 		var drawControl = app.MapPane.editableLayers;
+// 		drawControl.addLayer(layer);
 
-	},
+// 	},
 
-	remove : function (map) {
-		var map = map || Wu.app._map;
-		var layer = this.layer;
+// 	remove : function (map) {
+// 		var map = map || Wu.app._map;
+// 		var layer = this.layer;
 		
-		// remove from editableLayers 
-		var editableLayers = app.MapPane.editableLayers;
-		editableLayers.removeLayer(layer);
+// 		// remove from editableLayers 
+// 		var editableLayers = app.MapPane.editableLayers;
+// 		editableLayers.removeLayer(layer);
 
-		// remove hooks
-		this.removeLayerHooks();
+// 		// remove hooks
+// 		this.removeLayerHooks();
 
-	},
+// 	},
 
-	addLayerHooks : function () {
+// 	addLayerHooks : function () {
 
-		this.layer.eachLayer(function (layr) {
+// 		this.layer.eachLayer(function (layr) {
 			
-			var type = layr.feature.geometry.type;
+// 			var type = layr.feature.geometry.type;
 
-			if (type == 'Polygon') {
+// 			if (type == 'Polygon') {
 
-				Wu.DomEvent.on(layr, 'styleeditor:changed', this.styleChanged, this);
+// 				Wu.DomEvent.on(layr, 'styleeditor:changed', this.styleChanged, this);
 
-			} 
+// 			} 
 
-			if (type == 'MultiPolygon') {
+// 			if (type == 'MultiPolygon') {
 
-				layr.eachLayer(function (multi) {
+// 				layr.eachLayer(function (multi) {
 
-					Wu.DomEvent.on(multi, 'styleeditor:changed', function (data) {
-						this.multiStyleChanged(data, multi, layr);
-					}, this);
+// 					Wu.DomEvent.on(multi, 'styleeditor:changed', function (data) {
+// 						this.multiStyleChanged(data, multi, layr);
+// 					}, this);
 
-				}, this);
-			}
+// 				}, this);
+// 			}
 
-		}, this);	
+// 		}, this);	
 	
-	},	
+// 	},	
 
-	removeLayerHooks : function () {
-		for (l in this.layer._layers) {
-			var layer = this.layer._layers[l];
+// 	removeLayerHooks : function () {
+// 		for (l in this.layer._layers) {
+// 			var layer = this.layer._layers[l];
 
-			// listen to changes
-			Wu.DomEvent.off(layer, 'styleeditor:changed', this.styleChanged, this);
-		}
-	},
+// 			// listen to changes
+// 			Wu.DomEvent.off(layer, 'styleeditor:changed', this.styleChanged, this);
+// 		}
+// 	},
 
-	getGeojsonUuid : function () {
-		return this.store.data.geojson;
-	},
+// 	getGeojsonUuid : function () {
+// 		return this.store.data.geojson;
+// 	},
 
-	loadData : function () {
-		var that = this;
+// 	loadData : function () {
+// 		var that = this;
 
-		// do nothing if already loaded
-		if (this.loaded) return; 
+// 		// do nothing if already loaded
+// 		if (this.loaded) return; 
 
-		// set status
-		app.setStatus('Loading...');
+// 		// set status
+// 		app.setStatus('Loading...');
 
 
-		// get geojson from server
-		var data = { 
-			uuid : this.getGeojsonUuid(),
-			projectUuid : app.activeProject.getUuid() 
-		}
-		var json = JSON.stringify(data);
+// 		// get geojson from server
+// 		var data = { 
+// 			uuid : this.getGeojsonUuid(),
+// 			projectUuid : app.activeProject.getUuid() 
+// 		}
+// 		var json = JSON.stringify(data);
 	
 		
-		// post with callback:   path       data    callback   context of cb
-		// Wu.Util.postcb('/api/geojson', json, this._loaded, this);
-		var path = '/api/geojson';
+// 		// post with callback:   path       data    callback   context of cb
+// 		// Wu.Util.postcb('/api/geojson', json, this._loaded, this);
+// 		var path = '/api/geojson';
 		
-		var http = new XMLHttpRequest();
-		var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
-		url += path;
+// 		var http = new XMLHttpRequest();
+// 		var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
+// 		url += path;
 
-		// track progress
-		var dataSize = this.getDataSize();
-		if (dataSize) {
-			var that = this;
-			http.addEventListener("progress", function (oe) {
-				var percent = Math.round( oe.loaded / dataSize * 100);
-				that.setProgress(percent);
+// 		// track progress
+// 		var dataSize = this.getDataSize();
+// 		if (dataSize) {
+// 			var that = this;
+// 			http.addEventListener("progress", function (oe) {
+// 				var percent = Math.round( oe.loaded / dataSize * 100);
+// 				that.setProgress(percent);
 
-			}, false);
-		}
+// 			}, false);
+// 		}
 		
-		http.open("POST", url, true);
+// 		http.open("POST", url, true);
 
-		//Send the proper header information along with the request
-		http.setRequestHeader("Content-type", "application/json");
+// 		//Send the proper header information along with the request
+// 		http.setRequestHeader("Content-type", "application/json");
 
-		http.onreadystatechange = function() {
-			if (http.readyState == 4 && http.status == 200) {			// todo: refactor
-				that.dataLoaded(that, http.responseText);
-			}
-		}
-		http.send(json);
+// 		http.onreadystatechange = function() {
+// 			if (http.readyState == 4 && http.status == 200) {			// todo: refactor
+// 				that.dataLoaded(that, http.responseText);
+// 			}
+// 		}
+// 		http.send(json);
 
-	},
+// 	},
 
-	// callback after loading geojson from server
-	dataLoaded : function (that, json) {
+// 	// callback after loading geojson from server
+// 	dataLoaded : function (that, json) {
 
-		// set progress done
-		that.setProgress(100);
+// 		// set progress done
+// 		that.setProgress(100);
 
-		// parse json into geojson object
-		try { that.data = JSON.parse(json); }
-		catch (e) { return console.log('parse error!', json)}
+// 		// parse json into geojson object
+// 		try { that.data = JSON.parse(json); }
+// 		catch (e) { return console.log('parse error!', json)}
 		
-		// console.log('Got geojson: ', that.data);
+// 		// console.log('Got geojson: ', that.data);
 
-		// return if errors
-		if (!that.data) return console.error('no data');
-		if (that.data.error) return console.error(that.data.error);
+// 		// return if errors
+// 		if (!that.data) return console.error('no data');
+// 		if (that.data.error) return console.error(that.data.error);
 
-		// add data to layer
-		that.layer.addData(that.data);
+// 		// add data to layer
+// 		that.layer.addData(that.data);
 
-		// mark loaded
-		that.loaded = true;
+// 		// mark loaded
+// 		that.loaded = true;
 
-		// set opacity
-		that.setOpacity()
+// 		// set opacity
+// 		that.setOpacity()
 
-		// render saved styles of geojson
-		that.renderStyle();
+// 		// render saved styles of geojson
+// 		that.renderStyle();
 
-		// set status
-		app.setStatus('Loaded!');
+// 		// set status
+// 		app.setStatus('Loaded!');
 
-		// hide progress bar
-		this.hideProgress();
+// 		// hide progress bar
+// 		this.hideProgress();
 
-		// add layer hooks
-		this.addLayerHooks();
+// 		// add layer hooks
+// 		this.addLayerHooks();
 
-		// phantomjs _loaded
-		app._loaded.push(this.getUuid());
-		// console.log('GEOJSON: ', this);
+// 		// phantomjs _loaded
+// 		app._loaded.push(this.getUuid());
+// 		// console.log('GEOJSON: ', this);
 
-	},
+// 	},
 
-	getDataSize : function () {
+// 	getDataSize : function () {
 
-		var fileUuid = this.getFileUuid();
-		if (!fileUuid) return false;
+// 		var fileUuid = this.getFileUuid();
+// 		if (!fileUuid) return false;
 
-		var file = this.getFile(fileUuid);
+// 		var file = this.getFile(fileUuid);
 
-		return parseInt(file.dataSize);
+// 		return parseInt(file.dataSize);
 
-	},
+// 	},
 
-	getFileUuid : function () {
-		return this.store.file;
-	},
+// 	getFileUuid : function () {
+// 		return this.store.file;
+// 	},
 
-	getFile : function (fileUuid) {
+// 	getFile : function (fileUuid) {
 
-		var files = app.activeProject.getFiles();
-		var file = _.find(files, function (f) {
-			return f.uuid == fileUuid;
-		});
+// 		var files = app.activeProject.getFiles();
+// 		var file = _.find(files, function (f) {
+// 			return f.uuid == fileUuid;
+// 		});
 
-		return file;
+// 		return file;
 
-	},
+// 	},
 
-	progress : function (p) {
-		this.setProgress(p);
-	},
+// 	progress : function (p) {
+// 		this.setProgress(p);
+// 	},
 
-	setProgress : function (percent) {
-		// set progress bar
-		app.ProgressBar.setProgress(percent);
-	},
+// 	setProgress : function (percent) {
+// 		// set progress bar
+// 		app.ProgressBar.setProgress(percent);
+// 	},
 
-	hideProgress : function () {
-		// hide progress bar
-		app.ProgressBar.hideProgress();
-	},
+// 	hideProgress : function () {
+// 		// hide progress bar
+// 		app.ProgressBar.hideProgress();
+// 	},
 
 	
-	getContainer : function () {
+// 	getContainer : function () {
 
-		// return
+// 		// return
 
-	},
+// 	},
 
-	// set visibility : visible on layer
-	show : function () {
-		for (l in this.layer._layers) {
-			var layer = this.layer._layers[l];
-			layer._container.style.visibility = 'visible';
-		}
-	},
+// 	// set visibility : visible on layer
+// 	show : function () {
+// 		for (l in this.layer._layers) {
+// 			var layer = this.layer._layers[l];
+// 			layer._container.style.visibility = 'visible';
+// 		}
+// 	},
 
-	// set visibility : hidden on layer
-	hide : function () {
-		for (l in this.layer._layers) {
-			var layer = this.layer._layers[l];
-			layer._container.style.visibility = 'hidden';
-		}
-	},
+// 	// set visibility : hidden on layer
+// 	hide : function () {
+// 		for (l in this.layer._layers) {
+// 			var layer = this.layer._layers[l];
+// 			layer._container.style.visibility = 'hidden';
+// 		}
+// 	},
 
-	multiStyleChanged : function (data, multi, layr) {
+// 	multiStyleChanged : function (data, multi, layr) {
 
-		var layer = layr;
-		var style = data.style;
-		var __sid = layer.feature.properties.__sid;
+// 		var layer = layr;
+// 		var style = data.style;
+// 		var __sid = layer.feature.properties.__sid;
 
-		layer.setStyle(style);	// good! does the whole multipolgyon (of multipolygons)
+// 		layer.setStyle(style);	// good! does the whole multipolgyon (of multipolygons)
 
-		this.saveStyle(style, __sid);	// works
+// 		this.saveStyle(style, __sid);	// works
 
-	},
+// 	},
 
-	styleChanged : function (data) {
+// 	styleChanged : function (data) {
 
-		var style = data.style;
-		var target = data.target;
-		var id = target._leaflet_id;
-		var layer = this.getPathParentLayer(id);
-		var __sid = target.feature.properties.__sid;
+// 		var style = data.style;
+// 		var target = data.target;
+// 		var id = target._leaflet_id;
+// 		var layer = this.getPathParentLayer(id);
+// 		var __sid = target.feature.properties.__sid;
 
-		// save style
-		this.saveStyle(style, __sid);
+// 		// save style
+// 		this.saveStyle(style, __sid);
 
-	},
+// 	},
 
-	getPathParentLayer : function (id) {
-		return app.MapPane.getEditableLayerParent(id);
-	},
+// 	getPathParentLayer : function (id) {
+// 		return app.MapPane.getEditableLayerParent(id);
+// 	},
 
-	// save style to layer object
-	saveStyle : function (style, __sid) {	
+// 	// save style to layer object
+// 	saveStyle : function (style, __sid) {	
 			
-		var json = this.layer.toGeoJSON();
+// 		var json = this.layer.toGeoJSON();
 
-		var json = {};
-		json.layer  = this.getUuid();
-		json.uuid   = this.getProjectUuid(); // active project uuid
+// 		var json = {};
+// 		json.layer  = this.getUuid();
+// 		json.uuid   = this.getProjectUuid(); // active project uuid
 
-		json.style = {
-			__sid : __sid,
-			style : style 		// partial
-		}
+// 		json.style = {
+// 			__sid : __sid,
+// 			style : style 		// partial
+// 		}
 
-		// send to server
-		this._save(json);
+// 		// send to server
+// 		this._save(json);
 
-		// set staus msg
-		app.setSaveStatus();
+// 		// set staus msg
+// 		app.setSaveStatus();
 
-	},
+// 	},
 
-	renderStyle : function () {
+// 	renderStyle : function () {
 
-		var styles = this.store.style;
-		var layers = this.layer._layers;
+// 		var styles = this.store.style;
+// 		var layers = this.layer._layers;
 
-		for (l in layers) {
-			var layer = layers[l];
-			var __sid = layer.feature.properties.__sid;
+// 		for (l in layers) {
+// 			var layer = layers[l];
+// 			var __sid = layer.feature.properties.__sid;
 
-			var style = _.find(styles, function (s) {
-				return s.__sid == __sid;
-			});
+// 			var style = _.find(styles, function (s) {
+// 				return s.__sid == __sid;
+// 			});
 
-			if (style) {
-				var parsed = JSON.parse(style.style);
-				layer.setStyle(parsed);
-			}
-		}
+// 			if (style) {
+// 				var parsed = JSON.parse(style.style);
+// 				layer.setStyle(parsed);
+// 			}
+// 		}
 
-	},
+// 	},
 	
-	setOpacity : function (opacity) {
+// 	setOpacity : function (opacity) {
 
-		// set opacity for now or later
-		this.opacity = opacity || this.opacity || 0.2;
+// 		// set opacity for now or later
+// 		this.opacity = opacity || this.opacity || 0.2;
 		
-		// return if data not loaded yet
-		if (!this.loaded) return;
+// 		// return if data not loaded yet
+// 		if (!this.loaded) return;
 
-		// set style 
-		this.layer.setStyle({
-			opacity : this.opacity, 
-			fillOpacity : this.opacity
-		});
+// 		// set style 
+// 		this.layer.setStyle({
+// 			opacity : this.opacity, 
+// 			fillOpacity : this.opacity
+// 		});
 
-	},
+// 	},
 
-	getOpacity : function () {
-		return this.opacity || 0.2;
-	},
+// 	getOpacity : function () {
+// 		return this.opacity || 0.2;
+// 	},
 
 
-	// create tooltip
-	createPopup : function (feature, layer) {
+// 	// create tooltip
+// 	createPopup : function (feature, layer) {
 
-		// return if no features in geojson
-		if (!feature.properties) return;
+// 		// return if no features in geojson
+// 		if (!feature.properties) return;
 
-		// create popup
-		var popup = L.popup({
-			offset : [0, -5],
-			closeButton : false,
-			zoomAnimation : false,
-			maxWidth : 1000,
-			minWidth : 200,
-			maxHeight : 150
-		});
+// 		// create popup
+// 		var popup = L.popup({
+// 			offset : [0, -5],
+// 			closeButton : false,
+// 			zoomAnimation : false,
+// 			maxWidth : 1000,
+// 			minWidth : 200,
+// 			maxHeight : 150
+// 		});
 
-		// create content
-		var string = '';
-		for (key in feature.properties) {
-			var value = feature.properties[key];
-			// if not empty value
-			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
-				// add features to string
-				string += key + ': ' + value + '<br>';
-			}
-		}
+// 		// create content
+// 		var string = '';
+// 		for (key in feature.properties) {
+// 			var value = feature.properties[key];
+// 			// if not empty value
+// 			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
+// 				// add features to string
+// 				string += key + ': ' + value + '<br>';
+// 			}
+// 		}
 
-		// if nothing, return
-		if (string.length == 0) return;
+// 		// if nothing, return
+// 		if (string.length == 0) return;
 
-		// set content
-		popup.setContent(string);
+// 		// set content
+// 		popup.setContent(string);
 		
-		// bind popup to layer
-		layer.bindPopup(popup);
+// 		// bind popup to layer
+// 		layer.bindPopup(popup);
 		
-	},
+// 	},
 
 
-	setPopupPosition : function (e) {
-		var popup = e.layer._popup;
-		var latlng = app._map.mouseEventToLatLng(e.originalEvent);
-		popup.setLatLng(latlng);
-	},
+// 	setPopupPosition : function (e) {
+// 		var popup = e.layer._popup;
+// 		var latlng = app._map.mouseEventToLatLng(e.originalEvent);
+// 		popup.setLatLng(latlng);
+// 	},
 
-	bindHoverPopup : function () {
-		var that = this;
+// 	bindHoverPopup : function () {
+// 		var that = this;
 
-	}
-});
+// 	}
+// });
 
 
 
@@ -20043,7 +20034,7 @@ function layerCollapser(selectWhat, bol) {
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
-	// debug : true,
+	debug : true,
 
 	// default options
 	options : systemapicConfigOptions, // global var from config.js... perhaps refactor.
@@ -20514,7 +20505,7 @@ Wu.App = Wu.Class.extend({
 
 
 	// save a hash
-	setHash : function (callback) {
+	setHash : function (callback, project) {
 
 		// get active layers
 		var active = app.MapPane.getActiveLayermenuLayers();
@@ -20522,8 +20513,10 @@ Wu.App = Wu.Class.extend({
 			return l.item.layer;	// layer uuid
 		});
 
+
+		var project = project || this.activeProject;
 		// get project;
-		var projectUuid = this.activeProject.getUuid();
+		var projectUuid = project.getUuid();
 
 		// hash object
 		var json = {
@@ -20671,69 +20664,7 @@ Wu.App = Wu.Class.extend({
 		var xtile = parseInt(Math.floor( (lon + 180) / 360 * (1<<zoom) ));
 		var ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat.toRad()) + 1 / Math.cos(lat.toRad())) / Math.PI) / 2 * (1<<zoom) ));
 		return "" + zoom + "/" + xtile + "/" + ytile;
-	},
-
-
-	// CXX – Now this is all over the place... see sidepane.project.js > makeNewThumbnail() etc...
-	createProjectThumb : function () {
-
-		console.log('createProjectThumb');
-
-		// Set the grinding wheel until logo is updated
-		var activeProjectID = app.activeProject.store.uuid;
-		app.Projects[activeProjectID].store.sidePaneLogo._container.src = '/css/images/grinders/BG-grinder-small-grayDark-on-white.gif';
-
-
-		console.log(activeProjectID);
-
-
-
-		var that = this; // callback	
-
-		app.setHash(function (ctx, hash) {
-
-			var obj = JSON.parse(hash);
-
-			console.log('obj', obj);
-
-			obj.dimensions = {
-				height : 233,
-				width : 350
-			}
-
-			// get snapshot from server
-			Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdProjectThumb, that);
-
-		})
-
-	},
-
-
-	createdProjectThumb : function(context, json) {
-
-		// parse results
-		var result = JSON.parse(json);
-		var image = result.cropped;
-
-		var fileUuid = result.fileUuid;
-
-		var path = '/images/' + image;
-
-		var activeProjectID = app.activeProject.store.uuid;
-
-		// Store new logo paths
-		app.Projects[activeProjectID].setLogo(path);
-		app.Projects[activeProjectID].setHeaderLogo(path);
-
-		// Set logo in the side pane menu
-		app.Projects[activeProjectID].store.sidePaneLogo._container.src = path;
-
-		// Set logo in header pane
-		app.HeaderPane.addedLogo(image);
-
-
-
-	},	
+	}
 
 
 });
