@@ -76,7 +76,7 @@ Wu.App = Wu.Class.extend({
 	},
 
 	initServer : function () {
-		console.log('Securely connected to server: \n', app.options.servers.portal);
+		console.log('Securely connected to server: \n', this.options.servers.portal);
 
 		var data = JSON.stringify(this.options);
 		
@@ -131,6 +131,9 @@ Wu.App = Wu.Class.extend({
 
 		// get window dimensions
 		var dimensions = this._getDimensions(e);
+
+		// startpane resize event
+		if ( app.StartPane.isOpen ) app.StartPane.resizeEvent(dimensions);
 
 		// mappane resize event
 		if (app.MapPane) app.MapPane.resizeEvent(dimensions);
@@ -470,7 +473,7 @@ Wu.App = Wu.Class.extend({
 
 
 	// save a hash
-	setHash : function (callback) {
+	setHash : function (callback, project) {
 
 		// get active layers
 		var active = app.MapPane.getActiveLayermenuLayers();
@@ -478,8 +481,10 @@ Wu.App = Wu.Class.extend({
 			return l.item.layer;	// layer uuid
 		});
 
+
+		var project = project || this.activeProject;
 		// get project;
-		var projectUuid = this.activeProject.getUuid();
+		var projectUuid = project.getUuid();
 
 		// hash object
 		var json = {
@@ -628,8 +633,6 @@ Wu.App = Wu.Class.extend({
 		var ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat.toRad()) + 1 / Math.cos(lat.toRad())) / Math.PI) / 2 * (1<<zoom) ));
 		return "" + zoom + "/" + xtile + "/" + ytile;
 	}
-
-
 
 
 });

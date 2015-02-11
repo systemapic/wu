@@ -117,19 +117,10 @@ Wu.HeaderPane = Wu.Class.extend({
 		project.setHeaderLogo(fullpath);
 
 		// update image in header
-		// this._logoWrap.style.backgroundImage = this.project.getHeaderLogoBg();
-
-		// cxxx
-		if ( project.getHeaderLogo() == '/css/images/defaultProjectLogo.png' ) { 
-			headerLogoPath = '/css/images/defaultProjectLogo.png'
-		} else {
-			var headerLogoSliced = project.getHeaderLogo().slice(8); // remove "/images/" from string
-			var headerLogoPath = '/pixels/fit/' + headerLogoSliced + '?fitW=90&fitH=71';
-		}
-
+		var headerLogoPath = project.getHeaderLogo() ? project.getHeaderLogo() :  '/css/images/defaultProjectLogo.png';
 		this._logo.src = headerLogoPath;
 
-		Wu.DomUtil.thumbAdjust(this._logo, 90);
+		// Wu.DomUtil.thumbAdjust(this._logo, 90);
 
 
 	},
@@ -226,22 +217,12 @@ Wu.HeaderPane = Wu.Class.extend({
 		this._container.style.display = 'block';
 
 		
-		// cxxx
-		if ( project.getHeaderLogo() == '/css/images/defaultProjectLogo.png' ) { 
-			headerLogoPath = '/css/images/defaultProjectLogo.png'
-		} else {
-			var headerLogoSliced = project.getHeaderLogo().slice(8); // remove "/images/" from string
-			var headerLogoPath = '/pixels/fit/' + headerLogoSliced + '?fitW=90&fitH=71';
-		}
-
-
+		var headerLogoPath = project.getHeaderLogo() ? project.getHeaderLogo() :  '/css/images/defaultProjectLogo.png';
+		this._logo.src = headerLogoPath;
 
 		// update values
-		this._logo.src = headerLogoPath;
 		this._title.innerHTML 	 = project.getHeaderTitle();
 		this._subtitle.innerHTML = project.getHeaderSubtitle();
-
-		// Wu.DomUtil.thumbAdjust(this._logo, 90);
 		
 		// add edit hooks
 		if (project.editMode) {
@@ -258,7 +239,12 @@ Wu.HeaderPane = Wu.Class.extend({
 
 	reset : function () {
 		// hide header
-		this._container.style.display = 'none';
+		// this._container.style.display = 'none';
+		
+		// Keep header, but remove it's content from DOM
+		Wu.app.HeaderPane._title.innerHTML = '';
+		Wu.app.HeaderPane._subtitle.innerHTML = '';
+		Wu.app.HeaderPane._logo.src = '';
 	},
 
 	_resetView : function () {

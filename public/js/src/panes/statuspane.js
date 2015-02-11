@@ -94,6 +94,10 @@ Wu.StatusPane = Wu.Class.extend({
 		if (layermenu) layermenu.disableEdit();
 
 
+		// Face out startpane if it's open
+		if ( app.StartPane.isOpen ) app.StartPane._banner.style.opacity = '0.1';
+
+
 		// Mobile option
 		if (Wu.app.mobile) {
 
@@ -148,7 +152,8 @@ Wu.StatusPane = Wu.Class.extend({
 			topleft.style.display = 'block';
 		}
 
-
+		// Face out startpane if it's open
+		if ( app.StartPane.isOpen ) app.StartPane._banner.style.opacity = '1';
 
 		// Mobile option : activate default sidepane on close to avoid opening in fullscreen
 		if (app.mobile) {

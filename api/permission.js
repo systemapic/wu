@@ -35,6 +35,8 @@ module.exports = permission = {
 		
 		'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', 	// KO rg
 		'user-e6e5d7d9-3b4c-403b-ad80-a854b0215831',    //  J rg
+
+		'user-f36e496e-e3e4-4fac-a37c-f1a98689afda'   	// dev1@noerd.biz
 		
 	],
 

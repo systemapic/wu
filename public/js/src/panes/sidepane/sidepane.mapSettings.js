@@ -462,6 +462,11 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 			this.on(baseLayer);
 			this.enableLayer(baseLayer);
 		}
+
+		var project = this.activeProject;
+		var thumbCreated = project.getThumbCreated();
+		if ( !thumbCreated ) project.createProjectThumb();		
+
 	},
 
 	on : function (baseLayer) {
@@ -936,7 +941,11 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 
 		// save to project
 		project.setPosition(position);
-	
+
+		// generate project thumb (if it hasn't been manually set before)
+		var thumbCreated = project.getThumbCreated();
+		if ( !thumbCreated ) project.createProjectThumb();
+
 		// call update on view
 		this.update();
 
