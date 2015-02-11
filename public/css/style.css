@@ -4471,7 +4471,8 @@ button.image-attachment {
   margin-top: 5px;
   font-weight: 900;
   font-size: 15px;
-  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3); }
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+  z-index: 999; }
 
 /* The files in the file list */
 .dataLibrary-file-popup-item {

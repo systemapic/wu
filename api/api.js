@@ -3860,62 +3860,62 @@ module.exports = api = {
 
 			}
 
-			// update style
-			if (req.body.hasOwnProperty('style')) {
+			// // update style
+			// if (req.body.hasOwnProperty('style')) {
 
-				var style = req.body.style;
+			// 	var style = req.body.style;
 
-				console.log('Setting style: ', style);
+			// 	console.log('Setting style: ', style);
 
-				// {
-				// 	__sid : '232332',
-				// 	style : {
-				// 		color : "2323"
-				// 	}
-				// }
+			// 	// {
+			// 	// 	__sid : '232332',
+			// 	// 	style : {
+			// 	// 		color : "2323"
+			// 	// 	}
+			// 	// }
 
-				var __sid = style.__sid;
-				var newStyle = style.style;
+			// 	var __sid = style.__sid;
+			// 	var newStyle = style.style;
 
-				var existing = _.find(layer.style, function (s) {
-					return s.__sid == __sid;
-				});
+			// 	var existing = _.find(layer.style, function (s) {
+			// 		return s.__sid == __sid;
+			// 	});
 
-				console.log('existing: ', existing);
+			// 	console.log('existing: ', existing);
 				
-				if (existing) {
-					// get style
-					var existingStyle = JSON.parse(existing.style);
+			// 	if (existing) {
+			// 		// get style
+			// 		var existingStyle = JSON.parse(existing.style);
 
-					// set style
-					for (t in newStyle) {
-						existingStyle[t] = newStyle[t];
-					}
+			// 		// set style
+			// 		for (t in newStyle) {
+			// 			existingStyle[t] = newStyle[t];
+			// 		}
 
-					// referenced to layer.style, so should save
-					existing.style = JSON.stringify(existingStyle);
-
-
-				} else {
-
-					layer.style.push({
-						__sid : __sid,
-						style : JSON.stringify(newStyle)
-					});
-
-				}
-
-				layer.markModified('style');
-
-				layer.save(function (err) {
-					if (err) throw err;
-				});
+			// 		// referenced to layer.style, so should save
+			// 		existing.style = JSON.stringify(existingStyle);
 
 
+			// 	} else {
+
+			// 		layer.style.push({
+			// 			__sid : __sid,
+			// 			style : JSON.stringify(newStyle)
+			// 		});
+
+			// 	}
+
+			// 	layer.markModified('style');
+
+			// 	layer.save(function (err) {
+			// 		if (err) throw err;
+			// 	});
 
 
 
-			};
+
+
+			// };
 
 			res.end('save done');
 		});
