@@ -404,7 +404,6 @@
 	font-size: 110%;
 	text-shadow: none;
 	font-weight: 500;
-	/*text-transform: uppercase;*/
 	line-height: 1;
 	overflow: hidden;
 	max-height: 30px;
@@ -415,21 +414,23 @@
 	vertical-align: bottom;
 	padding-right: 20px;
 	overflow: visible;
+	padding-bottom: 5px;
+	top: 9px;	
 	}
 
 .project-title input {
-	position: absolute;
+	position: relative;
 	left: 0;
-	top: -2px;
+	top: -1px;
 	font-size: 100%;
 	text-shadow: none;
 	font-weight: 500;
-	/*text-transform: uppercase;*/
 	line-height: 0.9;
 	padding: 0;
 	background-color: transparent;
 	width: 192px;
 	height: 100%;
+	overflow: visible;
 	}
 
 .project-description {
@@ -466,6 +467,7 @@
 	top: 45px;
 	overflow: hidden;
 	text-align: center;
+	z-index: 999;
 	}
 
 .project-logo {

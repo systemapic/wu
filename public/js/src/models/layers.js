@@ -71,6 +71,14 @@ Wu.Layer = Wu.Class.extend({
 		this._addToLegends();
 		this._addToInspect();
 		this._addToDescription();
+		this._addToLayermenu();
+	},
+
+	_addToLayermenu : function () {
+
+		// activate in layermenu
+		var layerMenu = app.MapPane.layerMenu;
+		layerMenu && layerMenu._enableLayer(this.getUuid());
 	},
 
 	_addToLegends : function () {
@@ -226,7 +234,6 @@ Wu.Layer = Wu.Class.extend({
 		}
 
 		// get cartocss from server
-		console.log('POST /api/layers/cartocss/get', json);
 		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
 	},
 
@@ -348,15 +355,11 @@ Wu.Layer = Wu.Class.extend({
 
 	_addGridEvents : function () {
 		var grid = this.gridLayer;
-		console.log('grid: ', grid);
-
 		if (!grid) return;
 
 		
 		// add click event
 		grid.on('mousedown', function(e) {
-			console.log('grid md', e);
-
 			if (!e.data) return;
 
 			// pass layer
@@ -374,8 +377,6 @@ Wu.Layer = Wu.Class.extend({
 		}, this);
 
 		grid.on('mouseup', function (e) {
-			console.log('grid mu', e);
-
 			if (!e.data) return;
 
 			// pass layer
@@ -394,8 +395,6 @@ Wu.Layer = Wu.Class.extend({
 		}, this);
 
 		grid.on('click', function (e) {
-			console.log('grid click', e);
-
 			// clear old
 			app.MapPane._clearPopup();
 
@@ -487,6 +486,14 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	updateStyle : function () {
 		var map = app._map;	
 		
+
+		// if (this.layer) {
+		// 	this.update();
+		// 	this.addTo(map);
+		// } else {
+		// 	this.update();
+		// }
+
 		// update
 		this.update();
 
@@ -580,7 +587,6 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 
 		// send to server
 		Wu.post('/api/layers/cartocss/set', JSON.stringify(json), callback, this);
-		// Wu.post('api/layers/cartocss/set', JSON.stringify(json), callback, this, app.options.servers.osm.base);
 	
 		// set locally on layer
 		this.setCartoid(json.cartoid);
@@ -588,16 +594,12 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 
 	getCartoCSS : function (cartoid, callback) {
 
-		console.log('getCartoCSS', cartoid);
-
 		var json = {
 			cartoid : cartoid
 		}
 
 		// get cartocss from server
-		console.log('POST /api/layers/cartocss/get', json);
 		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
-		// Wu.post('api/layers/cartocss/get', JSON.stringify(json), callback, this, app.options.servers.osm.base);
 	},
 
 

@@ -278,7 +278,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 	editedLogo : function (path) {
 
 		// Set state to manually updated to prevet overriding
-		app.Projects[thisID].store.sidePaneLogo.manuallyUpdated = true;
+		this.project.setThumbCreated(true);
 
 		// set path
 		var fullpath = '/images/' + path;
@@ -287,7 +287,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.project.setLogo(fullpath);
 
 		// update image 
-		// this.logo.style.backgroundImage = "url('" + this.project.getLogo() + "')";
 		this.logo.src = this.project.getLogo();
 
 		// update header

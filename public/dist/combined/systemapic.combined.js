@@ -3326,7 +3326,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 	editedLogo : function (path) {
 
 		// Set state to manually updated to prevet overriding
-		app.Projects[thisID].store.sidePaneLogo.manuallyUpdated = true;
+		this.project.setThumbCreated(true);
 
 		// set path
 		var fullpath = '/images/' + path;
@@ -3335,7 +3335,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.project.setLogo(fullpath);
 
 		// update image 
-		// this.logo.style.backgroundImage = "url('" + this.project.getLogo() + "')";
 		this.logo.src = this.project.getLogo();
 
 		// update header
@@ -5194,7 +5193,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	},
 
-
 	buttonDown : function (e) {
 		Wu.DomUtil.addClass(e.target, 'btn-info');
 	},
@@ -5636,9 +5634,9 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 			this.enableLayer(baseLayer);
 		}
 
-		var project = this.activeProject;
-		var thumbCreated = project.getThumbCreated();
-		if ( !thumbCreated ) project.createProjectThumb();		
+		var project = app.activeProject;
+		var thumbCreated = project.getThumbCreated(); 			// refactor
+		if (!thumbCreated) project.createProjectThumb();		
 
 	},
 
@@ -6871,9 +6869,6 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 
 	fillOSM : function () {
-		console.log('fill osm');
-
-
 	},
 
 	
@@ -9246,7 +9241,359 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 });
 
 
-;Wu.HeaderPane = Wu.Class.extend({
+;Wu.SidePane.Share = Wu.SidePane.Item.extend({
+	
+	type : 'share',
+	title : 'Share',
+
+
+	initContent : function () {
+
+		// create layout
+		this.initLayout();
+	},
+
+
+	update : function () {
+
+		// clear
+		this.reset();
+
+		// set project
+		this.project = app.activeProject;
+
+		// create screenshot divs
+		if (this.options.panes.share && this.project.getSettings().share) this.initLayout();
+
+		// create layout
+		this.initLayout();
+
+		// add hooks
+		this.addHooks();
+
+	},
+
+	addHooks : function () {
+
+		// clear hooks
+		this.removeHooks();
+
+		// add hooks
+		Wu.DomEvent.on(this.imageButton, 'click', this.createImage, this);
+		Wu.DomEvent.on(this.printButton, 'click', this.createPrint, this);
+		Wu.DomEvent.on(this.linkButton, 'click', this.createLink, this);
+	},
+
+	removeHooks : function () {
+		// remove hooks
+		Wu.DomEvent.off(this.imageButton, 'click', this.createImage, this);
+		Wu.DomEvent.off(this.printButton, 'click', this.createPrint, this);
+		Wu.DomEvent.off(this.linkButton, 'click', this.createLink, this);
+	},
+
+	initLayout : function () {
+
+		// wrapper
+		var wrap 	 = Wu.DomUtil.create('div', 'share-wrapper', this._content),
+		    sstitle 	 = Wu.DomUtil.create('div', 'share-header', wrap, 'Publish');
+
+		// image
+		this.imageButton = Wu.DomUtil.create('div', 'share-wrap image', wrap);
+		var ssbox	 = Wu.DomUtil.create('div', 'share-icon-box image', this.imageButton),
+		    ssbutton 	 = Wu.DomUtil.create('div', 'share-title image', this.imageButton, 'Image'),
+		    ssdesc 	 = Wu.DomUtil.create('div', 'share-subtitle image', this.imageButton, 'Create snapshot of map');
+
+		// print
+		this.printButton = Wu.DomUtil.create('div', 'share-wrap print', wrap);
+		var pbox	 = Wu.DomUtil.create('div', 'share-icon-box print', this.printButton),
+		    pbutton 	 = Wu.DomUtil.create('div', 'share-title print', this.printButton, 'PDF'),
+		    pdesc 	 = Wu.DomUtil.create('div', 'share-subtitle print', this.printButton, 'Create printable map');
+
+		// link
+		this.linkButton  = Wu.DomUtil.create('div', 'share-wrap link', wrap);
+		var lbox	 = Wu.DomUtil.create('div', 'share-icon-box link', this.linkButton),
+		    lbutton 	 = Wu.DomUtil.create('div', 'share-title link', this.linkButton, 'Link'),
+		    ldesc 	 = Wu.DomUtil.create('div', 'share-subtitle link', this.linkButton, 'Create share link');
+
+		
+		// add tooltip
+		app.Tooltip.add(this._menu, 'Create image, PDF or link to project. The link will hold your current view (zoom, coordinates and active layers).');
+
+
+	},
+
+	createImage : function () {
+
+		var that = this;	// callback
+
+		app.setHash(function (ctx, hash) {
+
+			// create image container
+			that._createImageView();
+
+			// get snapshot from server
+			Wu.post('/api/util/snapshot', hash, that.createdImage, that);
+
+		});
+
+		// set progress bar for a 5sec run
+		app.ProgressBar.timedProgress(2000);
+		
+	},
+
+	createdImage : function (context, file) {
+
+		// parse results
+		var result = JSON.parse(file);
+		var image = result.image;
+
+		// get dimensions of container
+		var height = context._imageContainer.offsetHeight;
+		var width = context._imageContainer.offsetWidth;
+
+		// set path
+		var path = app.options.servers.portal;
+		path += 'pixels/';
+		path += image;
+		var raw = path;
+		path += '?width=' + width;
+		path += '&height=' + height;
+
+		// set url
+		var url = 'url("';
+		url += path;
+		url += '")';
+
+		// set image
+		context._imageContainer.style.backgroundImage = url;
+
+		
+		// set download link
+		raw += '?raw=true'; // add raw to path
+		context._downloadButton.href = raw;
+	},
+
+	_createImageView : function () {
+
+		console.log('_createImageView');
+
+		// reset 
+		this._resetExpands();
+
+		// expand container
+		Wu.DomUtil.addClass(this._content, 'expand-share-image');
+
+		// create image container 
+		this._imageWrap = Wu.DomUtil.create('div', 'share-image-wrap', this._content);
+
+		// create title
+		var title = Wu.DomUtil.create('div', 'share-image-title', this._imageWrap, 'Created image:');
+
+		// create image container
+		this._imageContainer = Wu.DomUtil.create('div', 'share-image-image', this._imageWrap);
+
+		// create meta information
+		var meta = Wu.DomUtil.create('div', 'share-image-meta-wrap', this._imageWrap);
+		var size = Wu.DomUtil.create('div', 'share-image-meta-size', meta);
+		var name = Wu.DomUtil.create('div', 'share-image-meta-name', meta);
+
+		// create download button
+		var downloadWrapper = Wu.DomUtil.create('div', 'share-image-download', this._imageWrap);
+		this._downloadButton = Wu.DomUtil.create('a', 'share-image-download-button', downloadWrapper, 'Download');
+		this._downloadButton.setAttribute('target', '_blank');
+
+	},
+
+	createLink : function () {
+
+		// create hash, callback
+		var that = this;
+		app.setHash(function (context, hash) {
+
+			// open input box
+			that._createLinkView(hash);
+
+		});
+		
+	},
+
+	_createLinkView : function (result) {
+
+		var parsed 	= JSON.parse(result);
+		var hash 	= parsed.hash;
+		var project 	= app.Projects[hash.project];
+		var slugs 	= project.getSlugs();
+		var url 	= app.options.servers.portal + slugs.client + '/' + slugs.project + '/' + hash.id;
+
+		// remove previous expands
+		this._resetExpands();
+
+		// create wrapper
+		this._inputWrap = Wu.DomUtil.create('div', 'share-link-wrap', this._content);
+
+		// create title
+		var title = Wu.DomUtil.create('div', 'share-link-title', this._inputWrap, 'Share this link:')
+
+		// create input box
+		var input = Wu.DomUtil.create('input', 'share-link-input', this._inputWrap);
+		input.value = url;
+
+		// select all on focus
+		Wu.DomEvent.on(input, 'click', function () {
+			input.setSelectionRange(0, input.value.length);
+		}, this);
+
+		// expand container
+		Wu.DomUtil.addClass(this._content, 'expand-share-link');
+
+	},
+
+	createPrint : function () {
+
+		var that = this;	// callback
+		app.setHash(function (ctx, hash) {
+
+			// get snapshot from server
+			Wu.post('/api/util/pdfsnapshot', hash, that.createdPrint, that);
+			console.log('setn req');
+
+		});
+
+		// set progress bar for a 5sec run
+		app.ProgressBar.timedProgress(2000);
+	},
+
+	createdPrint : function (context, file) {
+		console.log('cb');
+		// parse results
+		var result = JSON.parse(file);
+		var pdf = result.pdf;
+
+		// set path for zip file
+		var path = '/api/file/download?file=' + pdf + '&type=file';
+		
+		// create print view
+		context._createPrintView(path);
+	},
+
+	_createPrintView : function (path) {
+
+		// remove previous expands
+		this._resetExpands();
+
+		// create wrapper
+		this._inputWrap = Wu.DomUtil.create('div', 'share-link-wrap', this._content);
+
+		// create title
+		var title = Wu.DomUtil.create('div', 'share-link-title', this._inputWrap, 'Download the PDF:')
+
+		// create download button
+		var downloadWrapper = Wu.DomUtil.create('div', 'share-print-download', this._inputWrap);
+		this._pdfDownloadButton = Wu.DomUtil.create('a', 'share-print-download-button', downloadWrapper, 'Download');
+		this._pdfDownloadButton.setAttribute('href', path);
+
+		// expand container
+		Wu.DomUtil.addClass(this._content, 'expand-share-link');
+
+	},
+
+	_resetExpands : function () {
+
+		if (this._inputWrap) Wu.DomUtil.remove(this._inputWrap);
+		if (this._imageWrap) Wu.DomUtil.remove(this._imageWrap);
+		if (this._printWrap) Wu.DomUtil.remove(this._printWrap);
+
+		Wu.DomUtil.removeClass(this._content, 'expand-share-link');
+		Wu.DomUtil.removeClass(this._content, 'expand-share-image');
+		Wu.DomUtil.removeClass(this._content, 'expand-share-print');
+	},
+
+	reset : function () {
+
+		// remove hooks
+		this.removeHooks();
+
+		// clear content
+		this._content.innerHTML = '';
+
+		// reset expands
+		this._resetExpands();
+
+	},
+
+	_activate : function () {
+		// widen container from 350px to 100%
+		app.SidePane.widenContainer();
+
+	},
+
+	_deactivate : function () {
+
+		// reset expands
+		this._resetExpands();
+	},
+
+	enableSocial : function () {
+		// console.log('enableSocial');
+	},
+
+	disableSocial : function () {
+		// console.log('enableSocial2');
+	},
+
+	enableScreenshot : function () {
+		// console.log('enableSocial3');
+	},
+
+	disableScreenshot : function () {
+		// console.log('enableSocial4');
+	},
+
+
+
+});
+
+
+;Wu.SidePane.Account = Wu.SidePane.Item.extend({
+	_ : 'sidepane.account', 
+
+
+	type : 'account',
+	title : 'Logout', // just simple logout button for now
+
+	initContent : function () {
+		this._account = app.Account;
+
+		// clear default content
+		this._content.innerHTML = '';
+
+		// add tooltip
+		app.Tooltip.add(this._menu, 'Logs you out of the portal' );
+
+
+	},
+
+	addHooks : function () {
+
+		// Wu.DomEvent.on(this._logoutButton, 'mousedown', this._logout, this);
+
+	},
+
+	update : function () {
+	},
+
+	_logout : function () {
+
+	},
+
+	// overrides the sidepane menu item button
+	_clickActivate : function () {
+		if (confirm('Are you sure you want to log out?')) {
+			window.location.href = app.options.servers.portal + 'logout';
+		}
+	},
+
+});;Wu.HeaderPane = Wu.Class.extend({
 	_ : 'headerpane', 
 
 	initialize : function () {
@@ -9575,7 +9922,84 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._update(project);
 	}
 });
-;Wu.MapPane = Wu.Class.extend({
+;Wu.ProgressPane = Wu.Class.extend({
+
+	initialize : function (options) {
+		
+		// set options
+		Wu.setOptions(this, options);
+
+		// init container
+		this.initContainer();
+
+	},
+
+	initContainer : function () {
+
+		// create progress bar (share dom with other instances of Wu.ProgressPane)
+		this._progressBar = app._progressBar = app._progressBar || Wu.DomUtil.create('div', 'status-progress-bar', app._appPane);
+
+		// add to sidepane if assigned container in options
+		if (this.options.addTo) this.addTo(this.options.addTo);
+
+	},
+
+	addTo : function () {
+		var pane = this.options.addTo;
+		pane.appendChild(this._progressBar);
+	},
+
+	setProgress : function (percent) {
+		if (percent < this._current + 2) return;
+
+		var bar = this._progressBar;
+		bar.style.opacity = 1;
+		bar.style.width = percent + '%';
+		this._current = percent;
+	},
+
+	hideProgress : function () {
+		var bar = this._progressBar;
+		bar.style.opacity = 0;
+		this._current = 0;
+		bar.style.width = 0;
+	},
+	
+	// do a timed progress
+	timedProgress : function (ms) {
+		var that = this,
+		    duration = ms || 5000, // five seconds default
+		    steps = 10,	 	   // five steps default
+		    p = 0;		   // start percentage
+		
+		// calculate delay
+		var delay = parseInt(duration) / steps;
+
+		// start progress
+		this._timedProgress(p, delay, steps);	
+
+	},
+
+	_timedProgress : function (percent, delay, steps) {
+		var that = this;
+
+		// set progress to percent after delay
+		percent = percent + (100/steps);
+		this.setProgress(percent);
+		
+		setTimeout(function () {
+
+			// play it again sam
+			if (percent < 100) return that._timedProgress(percent, delay, steps);
+
+			// done, hide progress bar
+			that.hideProgress();
+
+		}, delay)
+	}
+
+
+});;Wu.MapPane = Wu.Class.extend({
 
 	initialize : function () {
 		
@@ -9588,13 +10012,14 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// connect zindex control
 		this._bzIndexControl = new Wu.ZIndexControl.Baselayers();
 		this._lzIndexControl = new Wu.ZIndexControl.Layermenu();
+
 		return this; 
 	},      
 
 	_initContainer : function () {
 		
 		// init container
-		this._container = Wu.app._mapPane = Wu.DomUtil.createId('div', 'map', Wu.app._mapContainer);
+		this._container = app._mapPane = Wu.DomUtil.createId('div', 'map', app._mapContainer);
 	
 		// add help pseudo
 		Wu.DomUtil.addClass(this._container, 'click-to-start');
@@ -9743,12 +10168,24 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	getActiveLayermenuLayers : function () {
-		if (!this.layerMenu) return false;
+		if (!this.layerMenu) return;
+
+		var zIndexControl = app.zIndex;
+
 		var layers = this.layerMenu.getLayers();
 		var active = _.filter(layers, function (l) {
 			return l.on;
 		});
-		return active;
+
+		var sorted = _.sortBy(active, function (l) {
+
+			return zIndexControl.get(l);
+
+		});
+
+		console.log('getActiveLayermenuLayers active: ', active);
+		console.log('sorted: ', sorted);
+		return sorted;
 	},
 
 	getActiveLayers : function () {
@@ -10810,6 +11247,867 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 
 });
+;Wu.StartPane = Wu.Class.extend({
+
+	initialize : function (options) {
+		
+		// set options
+		Wu.setOptions(this, options);
+
+
+		this.dimensions = {
+			screenW 	: 	0,
+			screenH 	: 	0,
+			boxW 		: 	350,
+			boxH 		: 	233,
+			sizeMode 	: 	'',
+			projectNo 	: 	0
+		}
+
+		this.projectContainers	= [];
+	},
+
+	activate : function () {
+
+		this.isOpen = true;
+
+		// create container
+		this.initSpinner();
+
+		// add events
+		this.addHooks();
+
+		// refresh latest projects
+		this.refreshProjects();
+
+		// Show the header pane.
+		Wu.DomUtil.removeClass(Wu.app.HeaderPane._container, 'displayNone');
+
+
+		// screendimentions
+		// app._getDimensions()
+	
+
+
+	},	
+
+	deactivate : function() {
+
+		this.isOpen = false;
+
+		// remove hooks
+		this.removeHooks();
+
+		// kill spinner
+		if (this._spinner) this._spinner.disable();
+
+		// delete divs
+		if (this._container) Wu.DomUtil.remove(this._container);
+
+	},
+
+
+	initSpinner : function () {
+
+		console.log('initSpinner');
+
+		// create container 
+		this._container = Wu.DomUtil.create('div', 'startpane-canvas-container', app._appPane);
+
+		// create content for black box
+		var content = this._initSpinnerContent();
+		this._wrapper = Wu.DomUtil.create('div', 'spinning-wrapper', this._container);
+
+		this._wrapper.appendChild(content);
+
+		this._spinner = false;
+
+
+
+		return;
+
+		// create spinner instance
+		this._spinner = new L.SpinningMap({
+			autoStart : true,
+			accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q',
+			layer : 'systemapic.kcjonn12', 	// todo: several layers
+			logo : 'images/griffon_logo_drop.png', // todo!
+			content : content, 
+			container : this._container,
+			wrapper : this._wrapper,
+			speed : 1000,
+			tileFormat : 'png', // quality of mapbox tiles
+			interactivity : false,
+			gl : false,
+			position : {
+				lat : -33.83214,
+				lng : 151.22299,
+				zoom : [4, 17]
+			},
+			circle : false,
+		});
+
+	},
+
+	_initSpinnerContent : function () {
+
+		// create wrapper
+		var wrapper = Wu.DomUtil.create('div', 'startpane-spinning-content');
+
+		// black box in centre
+		this._bannerContainer = Wu.DomUtil.create('div', 'startpane-banner-container', wrapper);
+		this._banner = Wu.DomUtil.create('div', 'startpane-banner', this._bannerContainer);
+
+		this._recentProjectsContainer = Wu.DomUtil.create('div', 'startpane-recent-projects-container', this._banner);
+
+		this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Recent projects:');
+		this._projectList = Wu.DomUtil.create('div', 'startpane-project-list', this._recentProjectsContainer);
+
+		// return 
+		return wrapper;
+		
+	},
+
+
+	refreshProjects : function () {
+
+		// clear old
+		this._projectList.innerHTML = '';
+
+		// get latest projects
+		this.projects = this._getLatestProjects();
+
+		// set number of projects 
+		this.dimensions.projectNo = this.projects.length;
+
+		if (!this.projects) return;
+
+		// Pull out the latest three Projects	
+		this.projects.forEach(function (project, i) {
+			if (i > 5) return;
+			// Create project container
+			this.createStartProject(project);
+		}, this);
+
+
+		// Get screen dimensions
+		var dims = app._getDimensions();
+
+		// Store width and height
+		this.dimensions.screenW = dims.width;
+		this.dimensions.screenH = dims.height;	
+
+		// run sizer
+		this.positionSpinner(dims);
+	},
+
+	_getLatestProjects : function () {
+		// Get all projects
+		var projectsUnsorted = app.Projects;	
+
+		// Sort them by last updated
+		var projects = _.sortBy(projectsUnsorted, function(p) {
+			return p.getLastUpdated();
+		});
+
+		// Reverse so we get newest first
+		projects.reverse();
+
+		return projects;
+	},
+
+	createStartProject : function(project) {
+
+		// Client info
+		var clientID = project.store.client;
+		var clientName = app.Clients[clientID].name;
+		var clientLogo = app.Clients[clientID].logo;
+
+		var newProject = {};
+		// create container
+		newProject._projectContainer = Wu.DomUtil.create('div', 'start-panne-recent-projects', this._projectList);
+		
+		newProject._projectThumb = Wu.DomUtil.create('img', '', newProject._projectContainer);
+		newProject._projectThumb.src = project.store.logo;
+
+		newProject._projectTitle = Wu.DomUtil.create('div', 'start-project-name', newProject._projectContainer);
+		newProject._projectTitle.innerHTML = project.getName();
+
+		newProject._clientName = Wu.DomUtil.create('div', 'start-project-client-name', newProject._projectContainer);
+		newProject._clientName.innerHTML = clientName;
+
+		newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
+		newProject._clientLogo.src = clientLogo;
+
+
+		this.projectContainers.push(newProject);
+
+
+		// Adjust for short titles
+		if (project.getName().length < 22) Wu.DomUtil.addClass(newProject._projectTitle, 'short-name');
+		
+
+		// var client
+
+		// select project hook
+		Wu.DomEvent.on(newProject._projectContainer, 'mousedown', function() { this.selectProject(project); }, this);
+
+	},
+
+	addHooks : function () {
+	},
+
+	removeHooks : function () {
+	},
+
+	selectProject : function(project) {
+
+		// select project
+		project.select();
+
+		// refresh sidepane
+		app.SidePane.refreshProject(project);
+
+		// Hide the Start Pane
+		this.deactivate();
+
+	},
+
+
+	update : function() {
+
+	},
+
+
+	createImage : function () {
+
+		var that = this;	// callback
+		app.setHash(function (ctx, hash) {
+
+			// get snapshot from server
+			Wu.post('/api/util/snapshot', hash, that.createdImage, that);
+
+		});
+	},
+
+	createdImage : function (context, file) {
+
+		// parse results
+		var result = JSON.parse(file);
+		var image = result.image;
+
+		// set path
+		var path = app.options.servers.portal;
+		path += 'pixels/';
+		path += image;
+		var raw = path;
+		path += '?width=' + 250;
+		path += '&height=' + 150;
+
+		// set url
+		var url = 'url("';
+		url += path;
+		url += '")';
+	},
+
+
+	resizeEvent : function (dimensions) {
+
+		this.positionSpinner(dimensions);
+
+	},
+
+	positionSpinner : function (dimensions) {
+		
+		var w = dimensions.width;
+		var h = dimensions.height;
+
+		if ( h != this.dimensions.screenH ) {
+			this.dimensions.screenH = h;
+			this.changeHeight(dimensions);
+		}
+
+
+		// 3 blocks wide
+		if ( w >= 1091 ) {
+			if ( this.dimensions.sizeMode == 'full' ) return;
+			this.dimensions.sizeMode = 'full';
+			this.setYposition(dimensions);
+		}
+
+		// 2 blocks wide
+		if ( w <= 1090 && w >= 761) {
+			if ( this.dimensions.sizeMode == 'medium' ) return;
+			this.dimensions.sizeMode = 'medium';
+			this.setYposition(dimensions);
+		} 
+
+		// 1 block wide
+		if ( w <= 760 ) {
+			if ( this.dimensions.sizeMode == 'small' ) return;
+			this.dimensions.sizeMode = 'small';
+			this.setYposition(dimensions);
+		}
+
+	},
+
+	changeHeight : function (dimensions) {
+
+		console.log('change the height');
+		this.setYposition(dimensions);
+
+
+	},
+
+	setYposition : function (dimensions) {
+
+		var w = dimensions.width;
+		var h = dimensions.height;
+
+		// 3 projects wide
+		if ( this.dimensions.sizeMode == 'full' ) {
+			
+			// Decide how many projects we want to show based on height
+			if ( h >= 691 ) 		this.showBoxes(6);
+			if ( h <= 690 ) 		this.showBoxes(3);
+
+			// figure out padding
+			if ( this.dimensions.projectNo >= 4 ) 	var fullH = this.dimensions.boxH * 2;
+			else 					var fullH = this.dimensions.boxH;
+
+			// calculate padding
+			this.calcPadding(h, fullH);
+
+		}
+
+		// 2 projects wide
+		if ( this.dimensions.sizeMode == 'medium' ) {
+		
+			// Decide how many projects we want to show based on height
+			if ( h >= 921 ) 		this.showBoxes(6);		
+			if ( h <= 920 && h >= 661 ) 	this.showBoxes(4);	
+			if ( h <= 660 ) 		this.showBoxes(2);		
+		
+			// figure out padding
+			if ( this.dimensions.projectNo >= 5 )						var fullH = this.dimensions.boxH * 3;	// 3 rows (5 or 6 projects)
+			else if ( this.dimensions.projectNo >= 3 && this.dimensions.projectNo <=4 )	var fullH = this.dimensions.boxH * 2; 	// 2 rows (3 or 4 projects)
+			else 										var fullH = this.dimensions.boxH;	// 1 row  (1 or 2 projects)	
+
+			// calculate padding
+			this.calcPadding(h, fullH);
+
+		}
+
+		// 1 project wide
+		if ( this.dimensions.sizeMode == 'small' ) {
+		
+			// Decide how many projects we want to show based on height
+			if ( h >= 921 ) 		this.showBoxes(3);	
+			if ( h <= 920 && h >= 661 ) 	this.showBoxes(2);
+			if ( h <= 660 ) 		this.showBoxes(1);
+		
+			// figure out padding
+			if ( this.dimensions.projectNo >= 3 )						var fullH = this.dimensions.boxH * 3;
+			else if ( this.dimensions.projectNo == 2 )					var fullH = this.dimensions.boxH * 2;
+			else if ( this.dimensions.projectNo == 1 )					var fullH = this.dimensions.boxH;
+
+			// calculate padding
+			this.calcPadding(h, fullH);
+
+		}
+
+
+	},
+
+	showBoxes : function (no) {
+
+		// Store how many projects we want to show
+		this.dimensions.projectNo = no;
+
+		for ( var i = 0; i < this.projects.length-1; i++ ) {
+			if ( i < no ) 	Wu.DomUtil.removeClass(this.projectContainers[i]._projectContainer, 'displayNone');
+			else		Wu.DomUtil.addClass(this.projectContainers[i]._projectContainer, 'displayNone');
+		}
+
+	},
+
+	// Calculates top padding of container
+	calcPadding : function(screenHeight, boxesHeight) {
+
+			// Calculate padding
+			var padding = Math.floor((screenHeight - boxesHeight)/2);
+
+			// Minimum padding is 100 pixels
+			if ( padding <= 100 ) padding = 100;
+
+			// Set padding
+			this._wrapper.style.paddingTop = padding + 'px';
+
+	}
+});
+
+;Wu.ErrorPane = Wu.Class.extend({
+
+	options : {
+
+		clearTimer : false,
+		clearDelay : 1000,
+		severityColors : {
+			1 : 'yellow',
+			2 : 'cyan',
+			3 : 'rgb(255, 122, 122)'
+		}
+
+	},
+
+	initialize : function () {
+
+		// init layout
+		this.initLayout();
+
+	},
+
+	initLayout : function () {
+
+		// create divs
+		this._container = Wu.DomUtil.create('div', 'error-pane displayNone', app._mapContainer);
+		this._content = Wu.DomUtil.create('div', 'error-pane-content', this._container);
+
+		this._title = Wu.DomUtil.create('div', 'error-pane-title', this._content);
+		this._description = Wu.DomUtil.create('div', 'error-pane-description', this._content);
+		this._icon = Wu.DomUtil.create('div', 'error-pane-icon', this._content);
+
+		// events
+		this.addEvents();
+
+	},
+
+	addEvents : function () {
+
+		// close on click
+		Wu.DomEvent.on(this._container, 'mousedown', this.clear, this);
+
+	},
+
+	setError : function (title, description, severity) {
+
+		// set view
+		if (title) this.setTitle(title);
+		if (description) this.setDescription(description);
+		if (severity) this.setSeverity(severity);
+
+		// show
+		this.show();
+
+		// clear after timeout
+		this.clearTimer();
+
+	},
+
+	clearTimer : function (delay) {
+		if (!this.options.clearTimer) return;
+		this._clearTimer = setTimeout(this.clear.bind(this), delay || this.options.clearDelay);
+	},
+
+	clear : function () {
+		this.hide();
+	},
+
+	setTitle : function (title) {
+		this._title.innerHTML = title;
+	},
+
+	setDescription : function (description) {
+		this._description.innerHTML = description;
+	},
+
+	setSeverity : function (s) {
+		if (s) this.setBackground(this.options.severityColors[s]);
+	},
+
+	setBackground : function (color) {
+		this._content.style.background = color;
+	},
+
+	hide : function () {
+		Wu.DomUtil.addClass(this._container, 'displayNone');
+	},
+
+	show : function () {
+		Wu.DomUtil.removeClass(this._container, 'displayNone');
+	}
+
+
+
+
+});;Wu.Dropzone = Wu.Class.extend({
+	// dropzone for files to data library
+	// drop anywhere, anytime
+
+	options : {
+		metaDelay : 3000 // ms
+	},
+
+	initialize : function () {
+		this.initLayout();
+	},
+
+	initLayout : function () {
+
+		// create divs
+		this._container = Wu.DomUtil.create('div', 'dropzone-pane', app._appPane);
+		this._content = Wu.DomUtil.create('div', 'dropzone-content', this._container);
+		this._hidden = Wu.DomUtil.create('div', 'dropzone-hidden', this._container);
+		this._meta = Wu.DomUtil.create('div', 'dropzone-meta', app._appPane);
+		this._metaTitle = Wu.DomUtil.create('div', 'drop-meta-title', this._meta, 'Uploading');
+		this._metaWrapper = Wu.DomUtil.create('div', 'dropzone-meta-outer', this._meta);
+
+		// create progress bar
+		this.progress = new Wu.ProgressPane();
+
+		// hide by default
+		this.hide();
+		this.hideMeta();
+	},
+
+	show : function () {
+		Wu.DomUtil.removeClass(this._container, 'displayNone');
+	},
+
+	hide : function () {
+		Wu.DomUtil.addClass(this._container, 'displayNone');
+	},
+
+	showMeta : function () {
+		if (this._showingMeta) return;
+
+		// mark as showing
+		this._showingMeta = true;
+
+		// show
+		Wu.DomUtil.removeClass(this._meta, 'fadeOut');
+		Wu.DomUtil.removeClass(this._meta, 'displayNone');
+
+		// fade out after n seconds
+		this._fadeTimer = setTimeout(this.fadeMeta.bind(this), this.options.metaDelay);
+
+	},
+
+	fadeMeta : function () {
+
+		// clear timer if already queued
+		if (this._fadeTimer) clearTimeout(this._fadeTimer);
+
+		// fade out
+		Wu.DomUtil.addClass(this._meta, 'fadeOut');
+
+		// hide completely 500ms after fade
+		setTimeout(this.hideMeta.bind(this), 500);
+	},
+
+	hideMeta : function () {
+
+		// hide and clear
+		Wu.DomUtil.addClass(this._meta, 'displayNone');
+		this._clearMeta();
+
+		// mark as not showing
+		this._showingMeta = false;
+	},
+
+	_clearMeta : function () {
+		this._metaWrapper.innerHTML = '';
+	},
+
+	addMeta : function (meta) {
+		var div = this._addMeta(meta);
+		this._metaWrapper.appendChild(div);
+	},
+
+	_addMeta : function (file) {
+		if (!file) return; 			// todo: file undefined on drag'n drop
+
+		var wrapper 	= Wu.DomUtil.create('div', 'drop-meta-wrapper');
+		var name 	= Wu.DomUtil.create('div', 'drop-meta-name', wrapper);
+		var size 	= Wu.DomUtil.create('div', 'drop-meta-size', wrapper);
+		var type 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
+		var ext 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
+
+		name.innerHTML = 'Name: ' + file.name;
+		size.innerHTML = 'Size: ' + Wu.Util.bytesToSize(file.size);
+		type.innerHTML = 'Type: ' + file.type.split('/')[0].camelize();
+		ext.innerHTML  = 'Filetype: ' + file.type.split('/')[1];
+
+		return wrapper;
+	},
+
+
+	initDropzone : function (options) {
+		
+		// get callback
+		this._uploadedCallback = options.uploaded;
+
+		// get clickable divs
+		this._clickable = options.clickable;
+
+		// create dz
+		this.dz = new Dropzone(this._container, {
+				url : '/api/upload',
+				createImageThumbnails : false,
+				autoDiscover : false,
+				uploadMultiple : true,
+				acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.docx,.pdf,.doc,.txt',
+				// acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.json,.topojson,.kml,.docx,.pdf,.doc,.txt',
+				maxFiles : 10,
+				parallelUploads : 10,
+				clickable : this._clickable || false,
+		});
+
+		// add fullscreen dropzone
+		this.addDropzoneEvents();     
+		
+	},
+
+	addDropzoneEvents : function () {
+
+		// add fullscreen bridge to dropzone
+		Wu.DomEvent.on(document.body, 'dragenter', this.dropping, this);
+		Wu.DomEvent.on(document.body, 'dragleave', this.undropping, this);
+		Wu.DomEvent.on(document.body, 'dragover', this.dragover, this);
+		Wu.DomEvent.on(document.body, 'drop', this.dropped, this);
+	},
+
+
+	removeDropzoneEvents : function () {
+
+		// remove fullscreen bridge to dropzone
+		Wu.DomEvent.off(document.body, 'dragenter', this.dropping, this);
+		Wu.DomEvent.off(document.body, 'dragleave', this.undropping, this);
+		Wu.DomEvent.off(document.body, 'dragover', this.dragover, this);
+		Wu.DomEvent.off(document.body, 'drop', this.dropped, this);
+
+	},
+
+	disable : function () {
+		this.removeDropzoneEvents();
+	},
+
+	enable : function () {
+		this.addDropzoneEvents();	
+	},
+
+	refresh : function () {
+		var that = this;
+
+		// refresh project
+		this.project = app.activeProject;
+
+		// clean up last dz
+		this.dz.removeAllListeners();
+
+		// set project uuid for dropzone
+		this.dz.options.params.project = this.project.getUuid();	// goes to req.body.project
+
+		// set dz events
+		this.dz.on('drop', function (e) { 
+			that.hide();
+		});
+
+		this.dz.on('dragenter', function (e) { 
+		
+		});
+
+		this.dz.on('addedfile', function (file) { 
+
+			// show meta screen
+			that.showMeta();
+
+			// show progressbar
+			that.progress.setProgress(0);
+
+			// show meta
+			that.addMeta(file);
+
+			// set status
+			app.setStatus('Uploading');
+		});
+
+
+		this.dz.on('complete', function (file) {
+		
+			// clean up
+			that.dz.removeFile(file);
+
+			// hide meta
+			that.fadeMeta();
+		});
+
+		this.dz.on('uploadprogress', function (file, progress) {
+			// set progress
+			that.progress.setProgress(progress);
+		});                                                                                                                                                                                                               
+
+		this.dz.on('successmultiple', function (err, json) {
+		
+			// parse and process
+			var obj = Wu.parse(json);
+
+			// set status
+			app.setStatus('Done!', 2000);
+
+			// callback
+			if (obj) that._uploadedCallback(obj);
+
+			// clear fullpane
+			that.progress.hideProgress();
+		});
+	
+	},
+
+	dropping : function (e) {
+		e.preventDefault();
+	    
+		// show .fullscreen-drop
+		this.show(e);
+	},
+
+	undropping : function (e) {
+		e.preventDefault();
+		var t = e.target;
+
+		// hide
+		if (t == this._container) this.hide();
+	},
+
+	dropped : function (e) {
+		e.preventDefault();
+
+		// fire dropzone
+		this.dz.drop(e);
+	},
+
+	dragover : function (e) {
+		// needed for drop fn
+		e.preventDefault();
+	},
+
+
+
+
+});Wu.ZIndexControl = Wu.Class.extend({
+
+	initialize : function () {
+		
+		// store
+		this._index = [];
+
+		// add shortcut
+		app.zIndex = this;
+	},
+
+	add : function (layer) {
+
+		// add to top of zindex
+		this._index.push(layer);
+
+		// enforce zindex
+		this.enforce();
+	},
+
+	remove : function (layer) {
+		_.remove(this._index, function (l) {
+			return l == layer;
+		});
+
+		// enforce zindex
+		this.enforce();
+	},
+
+	set : function (z, layer) {
+
+	},
+
+	get : function (layer) {
+		// get current index
+		return _.findIndex(this._index, function (l) { return layer == l; });
+	},
+
+	up : function (layer) {
+
+		// get current index
+		var cur = this.get(layer);
+
+		// move up in index array
+		this._move(cur, cur + 1);
+
+		// update zindex on map
+		this.enforce();
+	},
+
+	_move : function (from, to) {
+		 this._index.splice(to, 0, this._index.splice(from, 1)[0]);
+	},
+
+	down : function (layer) {
+
+		// get current index
+		var cur = this.get(layer);
+
+		// move down in index array
+		this._move(cur, cur - 1);
+
+		// update zindex on map
+		this.enforce();
+
+	},
+
+	top : function (layer) {
+
+	},
+
+	bottom : function (layer) {
+
+	},
+
+	// enforce zindexes
+	enforce : function () {
+		var layers = this._index;
+		layers.forEach(function (layer, i) {
+			var zindex = i + this._z; 
+			layer._setZIndex(zindex);
+			console.log('enforce: ', layer, zindex);
+		}, this);
+	},
+
+});
+
+Wu.ZIndexControl.Baselayers = Wu.ZIndexControl.extend({
+
+	// baselayers start with zindex 0
+	_z : 0,
+	_me : 'base',
+
+});
+
+Wu.ZIndexControl.Layermenu = Wu.ZIndexControl.extend({
+
+	// layermenu start w zindex 1000, to stay on top of baselayers
+	_z : 1000,
+	_me : 'layermenu',
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
 ;L.Control.Layermenu = L.Control.extend({
 
 	options: {
@@ -10899,9 +12197,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 			// Mobile arrow	
 		    	Wu.DomUtil.create('div', 'layers-mobile-arrow', this._innerContainer);
-			
-
-
 
 		}
 
@@ -10963,8 +12258,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 
 	toggleLayerPane : function () {
-		if ( this._open ) this.closeLayerPane();
-		else this.openLayerPane();
+		this._open ? this.closeLayerPane() : this.openLayerPane();
 	},
 
 
@@ -10996,7 +12290,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._open = true;
 
 		// Open Wrapper
-		// this._container.parentNode.style.width = '290px';
 		app._map._controlCorners.bottomright.style.width = '290px';
 
 		// Close the closer :P
@@ -11498,6 +12791,19 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			this.enableLayer(item);
 		}       
 	},
+
+	_enableLayer : function (layerUuid) {
+
+		// get layerItem
+		var layerItem = _.find(this.layers, function (l) {
+			return l.item.layer == layerUuid;
+		});
+	
+		// mark active
+		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
+		layerItem.on = true;
+
+	},
 		
 	enableLayer : function (layerItem) {
 
@@ -11610,8 +12916,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	// add from sidepane
 	add : function (layer) {
 		
-		console.log('add from sidepaner', layer);
-
 		// create db item
 		var item = {
 			uuid 	: 'layerMenuItem-' + Wu.Util.guid(), // layermenu item uuid
@@ -11637,8 +12941,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	_add : function (layerItem) {		
-
-		console.log('_add layerItem', layerItem);
 
 		var item  = layerItem.item;
 		var layer = layerItem.layer;
@@ -11965,6 +13267,8 @@ L.control.layermenu = function (options) {
 
 		// get zindexControl
 		this._zx = app.getZIndexControls().l; // layermenu zindex control 
+
+		console.log('ZX: ', this._zx);
 	       
 	        // add active layers
 	        this._addAlreadyActiveLayers();
@@ -13470,7 +14774,1778 @@ L.Control.BaselayerToggle = L.Control.extend({
 
 L.control.baselayerToggle = function (options) {
 	return new L.Control.BaselayerToggle(options);
-};;Wu.Project = Wu.Class.extend({
+};;// controls global styles
+// full color themeing to come
+Wu.Style = Wu.Class.extend({
+
+	initialize : function () {
+		
+		// get style tag
+		this._styletag = Wu.DomUtil.get("styletag");
+
+	},
+
+	setDarkTheme : function () {	
+	
+		// append darktheme stylesheet
+		var darktheme = document.createElement("link");
+		darktheme.rel = 'stylesheet';
+		darktheme.href = app.options.servers.portal + 'css/darktheme.css';
+		this._styletag.appendChild(darktheme);
+
+		// Set codemirror cartoCSS to dark theme
+		this.setDarkThemeCartoCSS();
+
+	},
+
+	setLightTheme : function () {
+
+		// remove darktheme stylesheet
+		this._styletag.innerHTML = '';
+
+		// Set codemirror cartoCSS to light theme
+		this.setLightThemeCartoCSS();
+	},
+
+	setLightThemeCartoCSS : function () {
+		if (!app.MapPane.cartoCss) return;
+		
+		// Set code mirror to light theme
+		var cartoCSStheme = Wu.DomUtil.get('cartoCSStheme');
+		app.MapPane.cartoCss._codeMirror.setOption("theme", "default");
+		cartoCSStheme.setAttribute('href', app.options.servers.portal + 'js/lib/codemirror/mode/cartocss/codemirror.carto.css');
+
+	},
+
+	setDarkThemeCartoCSS : function () {
+		
+		if (!app.MapPane.cartoCss) return;
+
+		// Set code mirror to darktheme
+		var cartoCSStheme = Wu.DomUtil.get('cartoCSStheme');
+		app.MapPane.cartoCss._codeMirror.setOption("theme", "mbo");
+		cartoCSStheme.setAttribute('href', app.options.servers.portal + 'js/lib/codemirror/mode/cartocss/codemirror.carto.darktheme.css');
+	
+	},
+
+
+	// todo: will overwrite darktheme??
+	initSVGpatterns : function () {
+		var SVG_patterns = '<!-- SVG fill properties: url(#diagonal-dots) // url(#dots) url(#diagonal-circles) url(#diagonal-stripes) url(#grid) --><svg xmlns="http://www.w3.org/2000/svg"><defs><pattern id="diagonal-dots" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="5" cy="5" r="4" style="stroke:none; fill:blue;" /></pattern></defs><defs><pattern id="dots" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="4" style="stroke:none; fill:red;" /></pattern><pattern id="diagonal-circles" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="5" cy="5" r="4" style="stroke-width:2; stroke:green; fill:none;" /></pattern><pattern id="diagonal-stripes" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><rect x="0" y="0" width="4" height="8" style="stroke:none; fill:purple;" /></pattern><pattern id="grid" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="10" height="4" style="stroke:none; fill:orange;" /><rect x="3" y="3" width="4" height="10" style="stroke:none; fill:orange;" /></pattern></defs></svg>';
+		this._styletag.innerHTML = SVG_patterns; 
+	},
+
+	phantomJS : function () {
+
+		// append darktheme stylesheet
+		var phantom = document.createElement("link");
+		phantom.rel = 'stylesheet';
+		phantom.href = app.options.servers.portal + 'css/phantomJS.css';
+		this._styletag.appendChild(phantom);
+
+	},
+
+	phantomJSthumb : function () {
+
+		// append darktheme stylesheet
+		var phantom = document.createElement("link");
+		phantom.rel = 'stylesheet';
+		phantom.href = app.options.servers.portal + 'css/phantomJSthumb.css';
+		this._styletag.appendChild(phantom);
+
+	},
+
+
+
+});
+
+
+// keep for handy shortcuts
+function darktheme () {
+	console.log('darktheme() moved to app.Style.setDarkTheme()')	
+}
+
+function lighttheme () {
+	console.log('lighttheme() moved to app.Style.setLightTheme()')	
+}
+
+function initSVGpatterns () {
+	var SVG_patterns = '<!-- SVG fill properties: url(#diagonal-dots) // url(#dots) url(#diagonal-circles) url(#diagonal-stripes) url(#grid) --><svg xmlns="http://www.w3.org/2000/svg"><defs><pattern id="diagonal-dots" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="5" cy="5" r="4" style="stroke:none; fill:blue;" /></pattern></defs><defs><pattern id="dots" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="4" style="stroke:none; fill:red;" /></pattern><pattern id="diagonal-circles" x="0" y="0" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="5" cy="5" r="4" style="stroke-width:2; stroke:green; fill:none;" /></pattern><pattern id="diagonal-stripes" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><rect x="0" y="0" width="4" height="8" style="stroke:none; fill:purple;" /></pattern><pattern id="grid" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="10" height="4" style="stroke:none; fill:orange;" /><rect x="3" y="3" width="4" height="10" style="stroke:none; fill:orange;" /></pattern></defs></svg>';
+	Wu.DomUtil.get("styletag").innerHTML = SVG_patterns;
+}
+// colorArray = [ '#334d5c','#45b29d','#8eddb8','#5fffaf','#0ea32b','#47384d','#a84158','#f224ff','#d85fff','#f21b7f','#f40028','#f15e01','#e27a3f','#ffc557','#dbef91','#df4949','#cfc206','#fff417','#4b84e8','#ffffff' ]
+;L.Control.CartoCSS = L.Control.extend({
+	
+	options: {
+		position : 'topleft' 
+	},
+
+	_laidout : false,
+
+	onAdd : function () {
+
+		// create toolbar container
+		var container = Wu.DomUtil.create('div', 'leaflet-control-cartocss leaflet-control');
+		Wu.DomEvent.on(container, 'click mousedown ', Wu.DomEvent.stopPropagation, this);
+
+		// create toolbar button
+		this._toolbarButton = Wu.DomUtil.create('div', 'cartocss-toolbar-button', container);
+
+		// add tooltip
+		app.Tooltip.add(this._toolbarButton, 'CartoCSS editor, tooltip controller, and legends builder');
+
+		// init rest of layout
+		this.initLayout();
+
+		// init code mirror
+		this.initCodeMirror();
+
+		// add hooks
+		this.addHooks();
+
+		// automatically becomes this._container;
+		return container;	
+
+	},
+
+	onRemove : function () {
+
+		// remove hooks
+		this.removeHooks();
+
+		// remove from DOM
+		Wu.DomUtil.remove(this._codeMirror.getWrapperElement());
+
+		// remove from leaflet-control-container
+		Wu.DomUtil.remove(this._editorContainer);
+	},
+
+	initLayout : function () {
+
+
+		// create divs
+		this._editorContainer 		= Wu.DomUtil.create('div', 'cartocss-control-container'); // editor container
+		this._resizeHandle 		= Wu.DomUtil.create('div', 'cartocss-control-resizer', this._editorContainer); // editor container
+		this._wrapper 			= Wu.DomUtil.create('div', 'cartocss-control-wrapper', this._editorContainer); // the obligatory wrapper
+		this._xButton 			= Wu.DomUtil.create('div', 'close-cartocss-editor-x', this._wrapper); // close button
+		this._zoomVal 			= Wu.DomUtil.create('div', 'cartocss-zoomval', this._wrapper, app._map.getZoom()); // Show zoom value
+		this._styleHeaderWrapper 	= Wu.DomUtil.create('div', 'cartocss-style-header-wrapper', this._wrapper); // create form wrapper
+		this._styleHeaderLayerName 	= Wu.DomUtil.create('div', 'cartocss-style-header-layer', this._styleHeaderWrapper, 'Select layer');
+		this._styleHeaderDropDownButton = Wu.DomUtil.create('div', 'cartocss-style-dropdown-arrow', this._styleHeaderWrapper);
+		this._layerSelectorOuter 	= Wu.DomUtil.create('div', 'cartocss-layerselector-outer', this._wrapper); // create layer selector
+		this._layerSelector 		= Wu.DomUtil.create('div', 'cartocss-layerselector', this._layerSelectorOuter);
+		
+		// tabs
+		this._tabsWrapper 		= Wu.DomUtil.create('div', 'cartocss-tab-wrapper', this._wrapper); // Wrapper for tabs
+		this._tabStyling 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-styling cartocss-active-tab', this._tabsWrapper, 'Styling'); // Styling tab
+		this._tabTooltip 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-tooltip', this._tabsWrapper, 'Tooltip'); // Styling tab		
+		this._tabLegends 		= Wu.DomUtil.create('div', 'cartocss-tab cartocss-tab-legends', this._tabsWrapper, 'Legend'); // Styling tab				
+		this._legendsWrapper		= Wu.DomUtil.create('div', 'cartocss-legends-wrapper displayNone', this._wrapper);
+		this._tooltipOuterWrapper	= Wu.DomUtil.create('div', 'cartocss-tooltip-outer-wrapper displayNone', this._wrapper);
+		this._tooltipWrapper		= Wu.DomUtil.create('div', 'cartocss-tooltip-wrapper', this._tooltipOuterWrapper);
+		this._formWrapper 		= Wu.DomUtil.create('form', 'cartocss-form-wrapper', this._wrapper); // For CodeMirror: create form wrapper
+		this._inputArea 		= Wu.DomUtil.create('textarea', 'cartocss-input', this._formWrapper); // For CodeMirror: create text area
+		this._errorPane 		= Wu.DomUtil.create('div', 'cartocss-error-pane', this._wrapper); // error feedback pane
+		this._updateButton 		= Wu.DomUtil.create('div', 'cartocss-update-button', this._wrapper, 'Render changes...'); // create update button
+
+		// append to leaflet-control-container
+		app._map.getContainer().appendChild(this._editorContainer);
+
+		// add tooltip
+		app.Tooltip.add(this._styleHeaderWrapper, 'Shows a list of active layers for this project.', { extends : 'systyle', tipJoint : 'top left'});
+		app.Tooltip.add(this._zoomVal, 'Shows current zoom level.', { extends : 'systyle', tipJoint : 'top left'});
+		app.Tooltip.add(this._tabStyling, 'Style selected layer. Takes CartoCSS code.', { extends : 'systyle', tipJoint : 'top left'});
+		app.Tooltip.add(this._tabTooltip, 'Customize tooltip to appear when clicking on different shapes in layer.', { extends : 'systyle', tipJoint : 'top left'});
+		app.Tooltip.add(this._tabLegends, 'Decide which legends you want to show for selected layer.', { extends : 'systyle', tipJoint : 'top left'});
+				
+
+	},
+
+	addHooks : function () {
+
+		// update button click
+		Wu.DomEvent.on(this._updateButton, 'click', this.renderStyling, this);
+
+		// toolbar button click
+		Wu.DomEvent.on(this._toolbarButton, 'click', this.toggle, this);
+
+		// remove control
+		Wu.DomEvent.on(this._xButton, 'click', this.toggle, this);
+
+		// Layer drop down
+		Wu.DomEvent.on(this._styleHeaderLayerName, 'click', this.toggleLayerDropDown, this);
+
+		// Toggle legends tab
+		Wu.DomEvent.on(this._tabLegends, 'mousedown', this.toggleLegends, this);
+
+		// Toggle styles tab
+		Wu.DomEvent.on(this._tabStyling, 'mousedown', this.toggleStyles, this);
+
+		// Toggle tooltip tab
+		Wu.DomEvent.on(this._tabTooltip, 'mousedown', this.toggleTooltip, this);
+
+		// Resize container
+		Wu.DomEvent.on(this._resizeHandle, 'mousedown', this.resize, this);
+
+		// stops
+		Wu.DomEvent.on(this._editorContainer, 		'mousewheel mousedown dblclick click', 		Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._toolbarButton, 		'dblclick', 					Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._styleHeaderLayerName, 	'click mousedown', 				Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._formWrapper, 		'click mousedown', 				Wu.DomEvent.stopPropagation, this);
+
+		// Update Zoom
+		var map = app._map;
+		map.on('zoomend', function() {
+			this._zoomVal.innerHTML = map.getZoom();
+		}, this)
+		
+	},
+
+	removeHooks : function () {
+
+		
+
+	},
+
+	resize : function () {
+
+		// Get position of frame that is going to be scaled
+		this.__cartoContainer_offsetLeft = this._editorContainer.offsetLeft;
+		this.__cartoContainer_width = this._editorContainer.offsetWidth;
+
+		// create ghost div
+		this._ghost = Wu.DomUtil.create('div', 'resize-ghost', app._appPane);
+
+		// add release hook
+		Wu.DomEvent.on(this._ghost, 'mouseup', this.removeResizeHooks, this);
+
+		// track mouse position
+		Wu.DomEvent.on(this._ghost, 'mousemove', this.resizeEditor, this);
+
+	},
+
+	removeResizeHooks : function () {
+
+		// remove events
+		Wu.DomEvent.off(this._ghost, 'mousemove', this.resizeEditor, this);
+		Wu.DomEvent.off(this._ghost, 'mouseup', this.removeResizeHooks, this);
+
+		// remove ghost div
+		Wu.DomUtil.remove(this._ghost);
+	},
+
+	resizeEditor : function (e) {
+
+		// set new width
+		// var mouse = {x: 0};		
+		var mousex = e.clientX || e.pageX || 0,
+		    offleft = this._editorContainer.offsetLeft,
+		    offwidth =  this._editorContainer.offsetWidth,
+		    w = offwidth + (offleft - mousex);
+
+		if ( w >= 300 ) this._editorContainer.style.width = w + 'px';
+	},
+
+	// update: fired from outside, on project.select() etc.
+	update : function () {
+
+		// mark as update needed
+		this._updated = false;
+	},
+
+	_update : function () {
+		if (this._updated) return;
+
+		// set active project
+		this.project = app.activeProject;
+
+		// get all active, geojson layers
+		this._layers = this.project.getStylableLayers();
+
+		// fill active layers box
+		this._fillLayers();
+
+		// select a layer
+		this.setLastUpdatedLayer();
+
+		// mark updated
+		this._updated = true;
+
+		// refresh codemirror
+		this._codeMirror.refresh();
+
+	},
+
+
+	
+	initCodeMirror : function () {
+		
+		this._codeMirror = CodeMirror.fromTextArea(this._inputArea, {
+    			lineNumbers: true,    			
+    			mode: {
+    				name : 'carto',
+    				reference : window.cartoRef
+    			},
+    			matchBrackets: true,
+    			lineWrapping: true,
+    			paletteHints : true,
+    			gutters: ['CodeMirror-linenumbers', 'errors']
+  		});
+
+		// set default value
+  		// this._codeMirror.setValue('// No layer selected. \n\n// #layer is always base \n#layer { \n  \n}');
+
+		// todo:
+  		// var completer = cartoCompletion(this._codeMirror, window.cartoRef);
+		// this._codeMirror.on('keydown', completer.onKeyEvent);
+		// this._codeMirror.on('change', function() { return window.editor && window.editor.changed(); });
+		// this._codeMirror.setOption('onHighlightComplete', _(completer.setTitles).throttle(100));
+		// console.log(')thi wrapper element', this._codeMirror);
+		// this._codeMirror.getWrapperElement().id = 'code-' + id.replace(/[^\w+]/g,'_');
+	
+
+		// cxxxx
+		// var settings = app.activeProject.getSettings();
+
+
+		// if ( settings.darkTheme ) app.Style.themeToggle('dark');		// TODO: fires too early.. do this differently
+
+
+
+	},
+
+	_initStylingDefault : function () {
+
+		// get meta fields
+		var fields = this._layer.getMetaFields(); // return false if no fields found
+		
+		// create string
+		var string = '// CartoCSS reference guide:\n// https://bit.ly/1z5OvXT\n\n\n';
+		string += '// #layer is always the layer identifier \n';
+		string += '#layer {\n\n';
+		string += '    // Available fields in layer:\n\n';
+
+		// add each field to string
+		for (key in fields) {
+			var type = fields[key];
+			string += '    // [' + key + '=' + type + '] {}\n';
+		}
+		
+		string += '\n\n}';
+
+		// update text
+		this.updateCodeMirror(string);
+
+	},
+
+	// select last update layer (on update)
+	setLastUpdatedLayer : function () {
+
+		// sort by lastUpdated
+		var layers = this._layers;
+		var sorted = _.sortBy(this._layers, function (l) {
+			return l.store.lastUpdated;
+		});
+
+		// get top hit
+		var last = _.last(sorted);
+
+		// select lastUpdated layer
+		this._selectLayer(last);
+
+	},
+
+	updateCodeMirror : function (css) {
+		this._codeMirror.setValue(css);
+	},
+
+	clearCodeMirror : function () {
+		this._codeMirror.setValue('');
+	},
+
+	_fillLayers : function () {
+		
+		// clear
+		this._layerSelector.innerHTML = '';
+
+		// store wrappers
+		this._layerWrapperList = {};
+
+		// add
+		this._layers.forEach(function (layer) {
+
+			// append
+			var wrapper = Wu.DomUtil.create('div', 'layer-selector-item-wrap');
+			var div = Wu.DomUtil.create('div', 'layer-selector-item', wrapper, layer.getTitle());
+			this._layerSelector.appendChild(wrapper);
+
+			// store wrapper by layer uuid
+			this._layerWrapperList[layer.getUuid()] = wrapper;
+
+			// hook
+			Wu.DomEvent.on(wrapper, 'mousedown', function () {
+				this._selectLayer(layer)
+			}, this);
+
+			// add stops
+			Wu.DomEvent.on(wrapper, 'click mousedown', Wu.DomEvent.stopPropagation, this);
+
+
+		}, this);
+
+	},
+
+	setSelected : function (layer) {
+		if (!layer) return;
+
+		// get wrapper
+		var wrapper = this._layerWrapperList[layer.getUuid()];
+
+		// clear selected
+		this._clearSelected(wrapper);
+
+		// mark selected
+		Wu.DomUtil.addClass(wrapper, 'vt-selected', this);
+	},
+
+	_clearSelected : function (wrapper) {
+		// Set class to show which layer is selected
+		for ( var i = 0; i < wrapper.parentNode.children.length; i++ ) {
+			var child = wrapper.parentNode.children[i];
+			Wu.DomUtil.removeClass(child, 'vt-selected', this);
+		}
+	},
+
+	_selectLayer : function (layer) {
+
+		// close dropdown
+		this.closeLayerDropDown();
+		
+		// init tabs
+		this.initStyling(layer);	
+		this.initTooltip(layer);
+		this.initLegends(layer);
+
+		// select in list
+		this.setSelected(layer);
+		
+	},
+
+	
+	toggleLegends : function () {
+
+		// Hide Styler
+		Wu.DomUtil.addClass(this._formWrapper, 'displayNone');
+
+		// Hide Tooltip
+		Wu.DomUtil.addClass(this._tooltipOuterWrapper, 'displayNone');
+
+		// Show Legends Wrapper
+		Wu.DomUtil.removeClass(this._legendsWrapper, 'displayNone');
+
+		// Set tab to active
+		Wu.DomUtil.removeClass(this._tabTooltip, 'cartocss-active-tab');
+		Wu.DomUtil.removeClass(this._tabStyling, 'cartocss-active-tab');
+		Wu.DomUtil.addClass(this._tabLegends, 'cartocss-active-tab');
+
+
+	},
+
+	toggleStyles : function () {
+
+		// Show Styler
+		Wu.DomUtil.removeClass(this._formWrapper, 'displayNone');
+
+		// Hide Tooltip
+		Wu.DomUtil.addClass(this._tooltipOuterWrapper, 'displayNone');
+
+		// Hide Legends Wrapper
+		Wu.DomUtil.addClass(this._legendsWrapper, 'displayNone');
+
+		// Set tab to active
+		Wu.DomUtil.removeClass(this._tabTooltip, 'cartocss-active-tab');
+		Wu.DomUtil.addClass(this._tabStyling, 'cartocss-active-tab');
+		Wu.DomUtil.removeClass(this._tabLegends, 'cartocss-active-tab');
+
+	},
+
+	toggleTooltip : function () {
+
+		// Show Tooltip
+		Wu.DomUtil.removeClass(this._tooltipOuterWrapper, 'displayNone');
+
+		// Hide Styler
+		Wu.DomUtil.addClass(this._formWrapper, 'displayNone');
+
+		// Hide Legends Wrapper
+		Wu.DomUtil.addClass(this._legendsWrapper, 'displayNone');
+
+		// Set tab to active
+		Wu.DomUtil.addClass(this._tabTooltip, 'cartocss-active-tab');
+		Wu.DomUtil.removeClass(this._tabStyling, 'cartocss-active-tab');
+		Wu.DomUtil.removeClass(this._tabLegends, 'cartocss-active-tab');
+
+	},
+
+	initStyling : function (layer) {
+		if (!layer) return;
+
+		// new layer is active
+		this._layer = layer;
+		this._cartoid = false;
+
+		// insert title in dropdown
+		this._styleHeaderLayerName.innerHTML = layer.store.title.camelize();
+
+		// check for existing css
+		this._cartoid = this._layer.getCartoid();
+
+		// if no style stored on layer yet, set default message	
+		if (!this._cartoid) return this._initStylingDefault();				
+
+		// else get css from server
+		this._layer.getCartoCSS(this._cartoid, function (ctx, css) {
+			
+			// set css
+			this.updateCodeMirror(css);
+
+		}.bind(this));
+
+	},
+
+	
+	initLegends : function () {
+		
+		// clear 
+		this._legendsWrapper.innerHTML = '';
+
+		// return if no layer selected
+		if (!this._layer) return;
+
+		// fill with legends from layer
+		this._legends = this._layer.getLegends();
+		
+		if (this._legends) {
+			// fill legends
+			return this.fillLegends(this._legends);
+		} else {
+			// fill with default
+			return this._initLegendsDefaultMeta();	
+		}
+	},
+
+	initTooltip : function () {
+
+		// clear
+		this._tooltipWrapper.innerHTML = '';
+
+		// return if no layer selected
+		if (!this._layer) return;
+
+		// fill with store tooltip meta
+		var tooltipMeta = this._layer.getTooltip();
+		if (tooltipMeta) return this._initTooltipStoredMeta(tooltipMeta);
+
+		// fill with default meta
+		return this._initTooltipDefaultMeta();
+		
+	},
+
+
+
+	// fill legends tab with legends
+	fillLegends : function (legends) {
+
+		// Get title from tooltip
+		var tooltipMeta = this._layer.getTooltip();
+
+		// clear old
+		this._legendsWrapper.innerHTML = '';
+
+		// inner wrapper
+		this._legendsWrapperInner = Wu.DomUtil.create('div', 'legends-inner-scroller', this._legendsWrapper);
+		this._legendsTitle = Wu.DomUtil.create('div', 'legends-title', this._legendsWrapperInner);
+		this._legendsTitle.innerHTML = tooltipMeta.title || 'No title';
+		this._legendsListWrapper = Wu.DomUtil.create('div', 'legends-list-wrapper', this._legendsWrapperInner);
+
+		// each legend
+		legends.forEach(function (legend) {
+
+			// append legend entry to wrapper
+			var legdiv = this._legendEntry(legend);
+			this._legendsListWrapper.appendChild(legdiv);
+
+		}, this);
+
+	},
+
+
+	_legendEntry : function (legend) {
+
+		// create divs
+		var wrap 	= Wu.DomUtil.create('div', 'legend-entry-wrap');
+		var imgwrap 	= Wu.DomUtil.create('div', 'legend-entry-image', wrap);
+		var image1	= Wu.DomUtil.create('img', 'legend-image1', imgwrap);
+		var image2	= Wu.DomUtil.create('img', 'legend-image2', imgwrap);
+		var keydiv	= Wu.DomUtil.create('div', 'legend-entry-key', wrap);
+		var valuediv  	= Wu.DomUtil.create('div', 'legend-entry-value', wrap); 
+		var checkbox 	= this._createCheckbox(legend.id);
+		wrap.appendChild(checkbox);
+
+		// set values	
+		image1.src 	   = legend.base64;
+		image2.src 	   = legend.base64;
+		keydiv.innerHTML   = this._normalizeKey(legend.key);
+		valuediv.innerHTML = legend.value;
+		wrap.setAttribute('legendid', legend.id);
+		if (legend.on) checkbox.firstChild.setAttribute('checked', 'checked');
+		
+		// add toogle hook
+		Wu.DomEvent.on(checkbox, 'change', this._saveLegends, this);
+
+		// return div
+		return wrap;
+	},
+
+	_saveLegends : function () {
+
+		app.setSaveStatus(1000);
+
+		// get legends array
+		var legends = this._layer.getLegends();
+
+		// iterate
+		var childs = this._legendsListWrapper.childNodes;
+
+		// var child = childs[1];
+		for (var i = 0; i < childs.length; i++) {
+			var child = childs[i];
+
+			// get checked value
+			var checked = child.childNodes[3].querySelector('input:checked');
+			var on = (!checked) ? false : true;
+			var id = child.getAttribute('legendid');
+
+			// find legend to update
+			var legend = _.find(legends, function (l) {
+				return l.id == id;
+			});
+
+			// update toggle
+			legends[i].on = on;
+			
+		}
+
+		// save to layer
+		this._layer.setLegends(legends);
+
+		// refresh legends
+		var legendsControl = app.MapPane.legendsControl;
+		if (legendsControl) legendsControl.refreshLegends();
+
+	},
+
+	// get custom keyname if created (in tooltips)
+	_normalizeKey : function (key) {
+		var tooltips = this._layer.getTooltip();
+		var customKey = _.find(tooltips.fields, function (f) {
+			return key == f.key;
+		});
+		if (customKey && customKey.title) return customKey.title;
+		return key;
+	},
+
+	_createCheckbox : function (id) {
+		// create switch
+		var switchId = 'switch-' + id;
+		var fieldSwitch = Wu.DomUtil.create('div', 'switch carto-switch-legend'); // controls-switch
+		var fieldSwitchInput = Wu.DomUtil.createId('input', switchId, fieldSwitch);
+		var fieldSwitchLabel = Wu.DomUtil.create('label', '', fieldSwitch);
+		Wu.DomUtil.addClass(fieldSwitchInput, 'cmn-toggle cmn-toggle-round-flat');
+		fieldSwitchInput.setAttribute('type', 'checkbox');
+		fieldSwitchLabel.setAttribute('for', switchId);
+		return fieldSwitch;
+	},
+
+
+	_initLegendsDefaultMeta : function () {
+
+		// clear
+		this._legendsWrapper.innerHTML = '';
+
+		// add help text
+		Wu.DomUtil.create('div', 'legends-default-box', this._legendsWrapper, 'No legends yet. Style the geo and magic will happen!');
+	},
+
+
+	_updateLegends : function (cartoid) { // refactor: move to layers.js
+
+		var meta = this._layer.getMeta();
+		var metaFields = this._layer.getMetaFields();
+		
+		// generate legends on server from active fields
+		this._layer.createLegends(function (ctx, json) {	// callback
+			var legends = JSON.parse(json);
+
+			if (legends && legends.err) {
+				console.error('legends err', legends);
+				return this.handleError(legends.err);
+			}
+
+			// sort some things: #layer on top
+			var layer = _.remove(legends, function (l) {
+				return l.key == 'layer';
+			});
+			legends.unshift(layer[0]);
+
+			// include old legends settings
+			legends = this._mergePreviousLegendsSettings(legends, this._layer.getLegends());
+
+			// fill legends tab in editor
+			this.fillLegends(legends);
+
+			// save to layer
+			this._layer.setLegends(legends);
+
+			// save local
+			this._legends = legends;
+
+
+		}.bind(this));
+
+	},
+
+
+	_mergePreviousLegendsSettings : function (newLegends, oldLegends) {
+
+		// keep .on setting
+		newLegends.forEach(function (newlegend, i){
+			var oldlegend = _.find(oldLegends, function (o) {
+				return o.value == newlegend.value;
+			});
+
+			if (!oldlegend) return;
+			newLegends[i].on = oldlegend.on;
+		});
+
+		return newLegends;
+	},
+
+
+	_initTooltipStoredMeta : function (meta) {
+
+		
+		// create header
+		var tooltipCustomHeader	= Wu.DomUtil.createId('input', 'cartocss-tooltip-custom-header', this._tooltipWrapper);
+		tooltipCustomHeader.setAttribute('placeholder', 'Tooltip title')
+		tooltipCustomHeader.value = meta.title;
+
+		// save
+		Wu.DomEvent.on(tooltipCustomHeader, 'keyup', this._saveTip, this);
+
+		// for each field
+		var fields = meta.fields;
+		fields.forEach(function (field) {
+
+			// create tooltip entry
+			this._createTooltipEntry(field.key, field.title, field.on);
+
+		}, this);
+
+
+	},
+
+
+	_initTooltipDefaultMeta : function () {
+
+
+		// get default meta
+		var fields = this._layer.getMetaFields();
+
+		// create header
+		var tooltipCustomHeader	= Wu.DomUtil.createId('input', 'cartocss-tooltip-custom-header', this._tooltipWrapper);
+		tooltipCustomHeader.setAttribute('placeholder', 'Tooltip title')
+
+		// save event
+		Wu.DomEvent.on(tooltipCustomHeader, 'keyup', this._saveTip, this);
+
+		// for each field
+		for (key in fields) {
+			var value = fields[key];
+
+			// create tooltip entry
+			this._createTooltipEntry(key, null, true);	
+		}
+
+	},
+
+	_createTooltipEntry : function (defaultKey, key, on) {
+
+		// create wrapper
+		var fieldWrapper = Wu.DomUtil.create('div', 'tooltip-field-wrapper', this._tooltipWrapper);
+		
+		// create field title input
+		var fieldKey = Wu.DomUtil.create('input', 'tooltip-field-key', fieldWrapper);
+		fieldKey.setAttribute('type', 'text');
+		fieldKey.setAttribute('placeholder', defaultKey); // set default key
+
+		// set value if set
+		if (key) fieldKey.value = key;
+
+		// create switch
+		var fieldSwitch = Wu.DomUtil.create('div', 'switch carto-switch-tooltip', fieldWrapper); //  controls-switch
+		var switchId = 'switch-' + defaultKey;
+		var fieldSwitchInput = Wu.DomUtil.createId('input', switchId, fieldSwitch);
+		Wu.DomUtil.addClass(fieldSwitchInput, 'cmn-toggle cmn-toggle-round-flat');
+		fieldSwitchInput.setAttribute('type', 'checkbox');
+		var fieldSwitchLabel = Wu.DomUtil.create('label', '', fieldSwitch);
+		fieldSwitchLabel.setAttribute('for', switchId);
+
+		// set checked
+		if (on) fieldSwitchInput.setAttribute('checked', 'checked');
+
+		// set save events
+		Wu.DomEvent.on(fieldSwitchInput, 'change', this._saveTip, this);
+		Wu.DomEvent.on(fieldKey, 'keyup', this._saveTip, this);
+
+	},
+
+	_saveTip : function () {
+
+		// clear timer, dont save more than erry second
+		if (this._savingTooltip) clearTimeout(this._savingTooltip);
+
+		var that = this;
+		this._savingTooltip = setTimeout(function () {
+
+			// do the save
+			that._saveTooltipMeta();
+
+			// set status
+			app.setSaveStatus()
+	
+		}, 1000);
+
+		
+
+	},
+
+	_saveTooltipMeta : function () {
+
+		var saved = {
+			title : '',
+			fields : []
+		};
+
+		// iterate
+		var childs = this._tooltipWrapper.childNodes;
+		for (var i = 0; i < childs.length; i++) {
+
+			var child = childs[i];
+
+			// get title
+			if (i == 0) {
+				saved.title = child.value;
+				continue;
+			}
+
+			var key = child.childNodes[0].getAttribute('placeholder');
+			var title = child.childNodes[0].value;
+			var checked = child.childNodes[1].querySelector('input:checked');
+			var on = (!checked) ? false : true;
+
+			// get each
+			saved.fields.push({
+				key : key,
+				title : title,
+				on : on
+			});
+		}
+
+		// save to server
+		this._layer.setTooltip(saved);
+
+		// update legends tab title
+		this._legendsTitle.innerHTML = saved.title;
+		
+	},
+
+	closeLayerDropDown : function () {
+		this._openDropDown = true;
+		this.toggleLayerDropDown();
+	},
+
+	toggleLayerDropDown : function () {
+		if (!this._openDropDown) {
+			this._openDropDown = true;
+			var dropDownHeight = this._layers.length * 27;
+			if (this._layers.length <= 2) dropDownHeight+=2;
+			this._layerSelectorOuter.style.height = dropDownHeight + 'px';
+
+			Wu.DomUtil.addClass(this._styleHeaderDropDownButton, 'carrow-flipped', this);
+			
+		} else {
+			this._openDropDown = false;
+			this._layerSelectorOuter.style.height = '0px';
+			
+			Wu.DomUtil.removeClass(this._styleHeaderDropDownButton, 'carrow-flipped', this);
+		}		
+	},
+	
+	
+
+	toggle : function () {
+		this._open ? this.close() : this.open();
+	},
+
+	open : function () {
+
+		// update
+		this._update();
+
+		// add open class
+		Wu.DomUtil.addClass(this._editorContainer, 'open');
+		
+		// mark open
+		this._open = true;
+	},
+
+	close : function () {
+
+		// add closed class
+		Wu.DomUtil.removeClass(this._editorContainer, 'open');
+
+		// mark closed
+		this._open = false;
+	},
+
+	renderStyling : function () {
+
+		// return if no active layer
+		if (!this._layer) return;
+
+		// get css string
+		var css = this._codeMirror.getValue();
+
+		// return if empty
+		if (!css) return;
+		
+		// set vars
+		var fileUuid = this._layer.getFileUuid();
+		var cartoid = Wu.Util.createRandom(7);
+
+		// send to server
+		var json = {							// todo: verify valid css
+			css : css,
+			fileUuid : fileUuid,
+			cartoid : cartoid,
+			layerUuid : this._layer.getUuid()
+		}
+
+		// save to server
+		this._layer.setCartoCSS(json, this.renderedStyling.bind(this));
+
+	},
+
+	
+	renderedStyling : function (context, json) {
+
+		// parse
+		var result = JSON.parse(json);
+
+		// handle errors
+		if (!result.ok) return this.handleError(result.error);
+			
+		// update style on layer
+		this._layer.updateStyle();
+
+		// update legends tab 
+		this._updateLegends(result.cartoid);
+
+	},
+
+	handleError : function (error) {
+
+		// handle unrecognized rule
+		if (typeof(error) == 'string' && error.indexOf('Unrecognized rule') > -1) {
+			return this._handleSyntaxError(error);
+		}
+
+		// handle invalid code
+		if (typeof(error) == 'string' && error.indexOf('Invalid code') > -1) {
+			return this._handleSyntaxError(error);
+		}
+
+		// handle wrong pattern path
+		if (typeof(error) == 'string' && error.indexOf('Error: file could not be found:') > -1) {
+			return this._handlePathError(error);
+		}
+
+		// don't handle debug errors
+		if (typeof(error) == 'string' && error.indexOf('debug') > -1) {
+			return;
+		}
+
+		// catch-all for unhandled errors
+		this._setError(error);
+
+		console.error('Unhandled syntax error: ', error);
+
+	},
+
+	_handleSyntaxError : function (error) {
+
+		// parse error
+		var err = error.split(':');
+		var line 	= parseInt(err[2].trim()) - 1;
+		var charr 	= err[3].split(' ')[0].trim();
+		var problem 	= err[3].split(' ')[1] + ' ' + err[3].split(' ')[2];
+		problem 	= problem.trim().camelize();
+		var word 	= err[4].split(' ')[1].trim();
+		var suggestion 	= err[4].split(' ');
+		suggestion.splice(0,2);
+		suggestion 	= suggestion.join(' ');
+
+		// set error text
+		var errorText = problem + ': ' + word + '. ' + suggestion;
+	
+		// set error
+		this._setError(errorText, line);
+
+	},
+
+	_setError : function (error, line) {
+
+		// get codemirror doc
+		var doc = this._codeMirror.getDoc()
+
+		// if line supplied, mark line in codemirror
+		if (line) doc.addLineClass(line, 'wrap', 'gutter-syntax-error');
+
+		// set error text
+		this._errorPane.innerHTML = error;
+
+		// add error class
+		Wu.DomUtil.addClass(this._errorPane, 'active-error');
+
+		// clear error on change
+		doc.on('change', function () {
+			this._clearError(line || 0);
+		}.bind(this));
+	},
+
+
+	_handlePathError : function (error) {
+
+		console.log('_handlePathError', error);
+
+		// set error text
+		var errorText = 'Wrong path for pattern-file.';
+		
+		// set error
+		this._setError(errorText);
+
+	},
+
+	_clearError : function (line) {
+
+		// clear error pane
+		this._errorPane.innerHTML = '';
+		Wu.DomUtil.removeClass(this._errorPane, 'active-error');
+		
+		// remove line class
+		var doc = this._codeMirror.getDoc();
+		doc.removeLineClass(line, 'wrap'); // removes all classes
+
+		// remove event (doesn't work.. see here instead: http://codemirror.net/doc/manual.html#events)
+		doc.off('change', function () {
+			this._clearError(line || 0);
+		}.bind(this));
+
+	},
+
+	destroy : function () {
+		this.onRemove();
+	},
+
+	getPatternList : function () {
+		var patterns = ['001.png', '002.png', '003.png', '004.png', '005.png', '006.png', '007.png', '008.png', '009.png', '010.png', '011.png', '012.png', '013.png', '014.png', '015.png', '016.png', '017.png', '018.png', '019.png', '020.png', '021.png', 'paperwhite1.png', 'paperwhite2.png', 'paperwhite3.png', 'paperwhite4.png', 'paperwhite5.png', 'paperwhite6.png', 'waves.png', 'waves_white.png'];
+		console.log('CartoCSS patterns: ');
+		console.log(patterns);
+	},
+
+
+
+	
+});
+L.control.cartoCss = function (options) {
+	return new L.Control.CartoCSS(options);
+};
+;Wu.Tooltip = Wu.Class.extend({
+
+	options : {
+		fixed : true,
+		target : true, 
+		tipJoint : 'middle right', 
+		background : "#333", 
+		borderColor : '#333',
+		className : 'systip',
+		delay : 1
+	},
+
+	defaultStyle : {
+		fixed : true,
+		target : true, 
+		tipJoint : 'middle right', 
+		background : "#333", 
+		borderColor : '#333',
+		className : 'systip',
+		delay : 1
+	},	
+
+	initialize : function () {
+		this.tips = [];
+
+		// set default opentip style
+		Opentip.styles.systyle = this.defaultStyle;
+	},
+
+	_isActive : function () {
+		var project = app.activeProject;
+		if (!project) return false;
+		return project.getSettings().tooltips;
+	},
+
+	add : function (div, content, options) {
+
+		// merge options
+		var opts = _.extend(_.clone(this.options), options);
+
+		// push to list
+		this.tips.push({
+			div : div,
+			content : content,
+			options : opts
+		});
+
+		// add events (if tooltips setting is active)
+		this._isActive() ? this.on() : this.off();
+	},
+
+	on : function () { 				
+
+		// console.error('tooltip on!'); // todo optimize: too many event registered?
+
+		// create tooltip
+		this.tips.forEach(function (t) {
+
+			// only init once
+			if (!t.inited)  {
+
+				// create tip
+				var tip = new Opentip(t.div, t.content, t.options);
+
+				// mark inited (for events)
+				t.inited = true;
+				t.tip = tip;
+				
+				// done
+				return;
+			} 
+
+			// activate
+			if (t.tip) t.tip.activate();
+
+		}, this);
+
+	},
+
+	off : function () {
+
+		// remove tooltip
+		this.tips.forEach(function (t) {
+
+			// deactivate
+			if (t.tip) t.tip.deactivate();
+
+		}, this);
+
+	},
+
+	// turn on in settings
+	activate : function () {
+
+		// register events
+		this.on();
+
+
+	},
+
+	// turn off in settings
+	deactivate : function () {
+
+		// deregister events
+		this.off();
+
+	},
+
+});;// spinning map
+L.SpinningMap = L.Class.extend({
+
+	// todo: refactor GL to own class
+
+	// default options
+	options : {
+
+		gl : false,
+		accessToken : null, // mapbox
+		layer : null,
+		logo : '',
+		content : '',
+		container : 'map',
+		speed : 1000,
+		tileFormat : 'jpg70',
+		position : {
+			lat : 59.91843,
+			lng : 10.74721,
+			zoom : [4, 17]
+		},
+		circle : {
+			radius : 120, // px
+			color : 'rgba(33,33,33,0.5)',
+			border : {
+				px : 4,
+				solid : 'solid',
+				color : 'white'
+			}
+		},
+		autoStart : false,
+		interactivity : false,
+		spinning : [
+			'spinning',
+			'spinning90',
+			'spinning270',
+			'spinning-reversed',
+			'spinning-reversed90',
+			'spinning-reversed270',
+		],
+		listeners : [{
+			'event' : null,
+			'action' : 'changeView'
+		}],
+		duration : 100000	// ms
+
+	},
+
+	initialize : function (options) {
+
+		// merge options
+		L.setOptions(this, options);
+
+		// set access token
+		L.mapbox.accessToken = this.options.accessToken;
+
+		// init 
+		this.initLayout();
+
+		// add hooks
+		this.addHooks();
+
+		// autostart
+		if (this.options.autoStart) this.start();
+
+	},
+
+	initLayout : function () {
+
+		// set wrapper
+		this._wrapper = this.options.wrapper || L.DomUtil.create('div', 'spinning-wrapper', document.body);
+
+		// set container
+		this._container = this.options.container; // this is spinning 
+		this._wrapper.appendChild(this._container);
+
+		// create content
+		if (this.options.content) this.initContent();
+
+		// set gl
+		this._gl = this.options.gl && mapboxgl.util.supported();
+		
+		// create map
+		this._gl ? this.initGLMap() : this.initMap();
+		
+	},
+
+	initContent : function () {
+
+		// get content and append to wrapper
+		var content = this.options.content;
+		this._wrapper.appendChild(content);
+	},	
+
+
+	initMap : function () { 
+
+		// set dimensions of container
+		this.setDimensions();
+		
+		// create map
+		this.createMap();
+
+		// create circle
+		if (!!this.options.circle) this.createCircle();
+
+		// set window resize event listener
+		L.DomEvent.on(window, 'resize', this.setDimensions, this);
+
+	},
+
+	disable : function () {
+		Wu.DomUtil.remove(this._wrapper);
+		setTimeout(this.kill, 1000);
+	},
+
+	kill : function () {
+		this._wrapper = null;
+		delete this._wrapper;
+		delete this._map;
+		delete this._container;
+		delete this; // bye!
+	},
+
+	
+	createMap : function () {
+
+		// set vars
+		var lat = this.options.position.lat,
+		    lng = this.options.position.lng,
+		    zoom = this.options.position.zoom;
+
+		// create map
+		var map = this._map = L.mapbox.map(this._container);
+
+		// add layer
+		var layer = L.mapbox.tileLayer(this.options.layer, {
+			format : this.options.tileFormat
+		}).addTo(map);
+
+		// set map options
+		this.setView(lat, lng, this._getZoomLevel());
+		
+		// set map options
+		if (!this.options.interactivity) {
+			map.dragging.disable();
+			map.touchZoom.disable();
+			map.doubleClickZoom.disable();
+			map.scrollWheelZoom.disable();
+			map.boxZoom.disable();
+			map.keyboard.disable();
+		}
+
+		// remove zoom and attribution
+		map.zoomControl.removeFrom(map);
+		map.attributionControl.removeFrom(map);
+
+	},
+
+	setView : function (lat, lng, zoom) {
+		this._map.setView([lat, lng], zoom);
+	},
+
+	changeView : function () {
+		var lat = this.options.position.lat,
+		    lng = this.options.position.lng;
+
+		// set view
+		this.setView(lat, lng, this._getZoomLevel());
+		
+		// restart to change direction
+		this.stop();
+		this.start();
+	},
+
+
+
+	addHooks : function () {
+		var map = this._map;
+		map.on('resize', this._onResize.bind(this));
+	},
+
+	removeHooks : function () {
+		var map = this._map;
+		map.off('resize', this._onResize.bind(this));
+	},
+
+	contentClick : function () {
+		this._resetMoves();
+		if (this._gl) this.changeViewGL();
+	},
+
+	_onResize : function () {
+
+		// sizes
+		var newSize = this._container.offsetWidth,
+	    	    oldSize = this._past || newSize,
+	 	    diff = oldSize - newSize,
+	 	    moved = diff/2 * 0.75;
+		this._past = newSize;
+
+		// set centre to circle
+		this._map.panBy([-moved, 0], {
+			duration : 0
+		});
+
+	},
+
+	createCircle : function () {
+
+		// create divs
+		this._circleContainer = L.DomUtil.create('div', 'startpane-circle-container', this._wrapper);
+		this._circle = L.DomUtil.create('div', 'startpane-circle', this._circleContainer);
+
+		var radius = this.options.circle.radius,
+		    b = this.options.circle.border,
+		    border = b.px + 'px ' + b.solid + ' ' + b.color;
+		
+		// set circle options
+		this._circle.style.width = radius + 'px';
+		this._circle.style.height = radius + 'px';
+		this._circle.style.borderRadius = radius + 'px';
+		this._circle.style.top = radius / -2 + 'px';
+		this._circle.style.left = radius / -2 + 'px';
+		this._circle.style.background = this.options.circle.color;
+		this._circle.style.border = border;
+
+		// change view on click
+		if (!this._gl) L.DomEvent.on(this._circle, 'mousedown', this.changeView, this);
+		if (this._gl) L.DomEvent.on(this._circle, 'mousedown', this.changeViewGL, this);
+	},
+
+	setDimensions : function () {
+		
+		// get dimensions		
+		var d = this._getDimensions();
+
+		var offsetLeft = d.width * 0.125 - d.width,
+		    offsetTop = d.height * 0.5 - d.width;
+
+		// set dimensions
+		this._container.style.height = d.width * 2 + 'px';
+		this._container.style.width = d.width * 2 + 'px';
+		this._container.style.top = offsetTop + 'px';
+		this._container.style.left = offsetLeft + 'px';
+
+	},
+
+	// get window dimensions
+	_getDimensions : function (e) {
+		var w = window,
+		    d = document,
+		    e = d.documentElement,
+		    g = d.getElementsByTagName('body')[0],
+		    x = w.innerWidth || e.clientWidth || g.clientWidth,
+		    y = w.innerHeight|| e.clientHeight|| g.clientHeight,
+		    d = {
+			height : y,
+			width : x
+		    }
+		return d;
+	},
+
+	// start spinning
+	start : function () {
+		this._gl ? this._startGL() : this._start();
+	},
+
+	// stop spinning
+	stop : function () {
+		this._gl ? this._stopGL() : this._stop();
+	},
+
+	_start : function () {
+		this._direction = this._getDirection();
+		L.DomUtil.addClass(this._container, this._direction);
+	},
+
+	_stop : function () {
+		L.DomUtil.removeClass(this._container, this._direction);
+	},
+
+	// get direction of spin
+	_getDirection : function () {
+		var arr = this.options.spinning;
+		var key = Math.floor(Math.random() * arr.length);
+		return arr[key];
+	},
+
+	// get zoom level
+	_getZoomLevel : function (current) {
+		var min = this.options.position.zoom[0];
+		var max = this.options.position.zoom[1];
+		var random = Math.floor(Math.random()*(max-min+1)+min);
+		if (random == 13 || random == 14 || random == 15) return this._getZoomLevel();
+		return random;
+	},
+
+
+
+
+
+
+
+
+
+
+	// GL from here on. refactor to own class
+
+	createGLmap : function () {
+
+		// set vars
+		var lat = this.options.position.lat,
+		    lng = this.options.position.lng,
+		    zoom = this._getZoomLevel(),
+		    accessToken = this.options.accessToken,
+		    container = this._container,
+		    tileset = this.options.layer;
+
+		// set access token
+		mapboxgl.accessToken = accessToken;
+
+		// create map
+		var map = this._map = new mapboxgl.Map({
+			container: this._container.id, // container id
+			style: {
+				"version": 6,
+				"sources": {
+					"simple-tiles": {
+						"tiles": "raster",
+						"url": "mapbox://" + tileset,
+						"tileSize": 256,
+						"type": "raster"
+					}
+				},
+				"layers": [{
+					"id": "simple-tiles",
+					"type": "raster",
+					"source": "simple-tiles",
+					"minzoom": 0,
+					"maxzoom": 22
+				}]
+			},
+			// interactive : false,
+			center: [lat, lng], 	// starting position
+			zoom: zoom 		// starting zoom
+		});
+
+	},
+
+	
+
+	// _moveEnd : -1,
+	// _moveStart : false,
+
+	// _onMoveend : function (e) {
+	// 	console.log('on move end', e);
+	// 	this._moveEnd += 1;
+
+	// 	if (this._moveStart && this._moveEnd == 3) {
+	// 		this._realMoveEnd();
+	// 	}
+	// },
+
+	// _onMovestart : function () {
+	// 	console.log('on move start');
+	// 	this._moveStart = true;
+	// },
+
+	// _resetMoves : function () {
+	// 	console.log('clear!');
+	// 	this._moveStart = false;
+	// 	this._moveEnd = 0;
+	// },
+
+	// _realMoveEnd : function () {
+	// 	this._resetMoves();
+	// 	console.log('real end!!');
+	// 	this.restartGLRotation();
+	// },
+
+	// _onZoom : function () {
+	// 	console.log('on zoom');
+	// },
+
+	// _onMove : function () {
+	// 	console.log('move');
+	// },
+
+
+
+	initGLMap : function () {
+
+		// extend gl
+		this._extendMapboxGL();
+
+		// create map
+		this.createGLmap();
+
+		// create circle
+		this.createCircle();
+
+	},
+
+
+	_extendMapboxGL : function () {
+
+		// overwrite normalizer
+		mapboxgl.Map.prototype._normalizeBearing = function (bearing) {
+			console.log('_normalizeBearing');
+			return bearing;
+		}
+
+	},
+
+	
+
+	panGL : function () {
+
+		var w = this._container.offsetWidth;
+		var pan = this._pan = w * 0.375;
+
+		// set centre to circle
+		this._map.panBy([pan, 0], {
+			duration : 0
+		});
+
+	},
+
+	restartGLRotation : function () {
+		clearTimeout(this._rotationTimer);
+		this.startGLRotation();
+	},
+
+	startGLRotation : function () {
+
+		var duration = this.options.duration,
+		    latlng = new mapboxgl.LatLng(37.76, -122.44),
+		    w = this._container.offsetWidth,
+		    left = w * -0.375,
+		    offset = this._getOffset();
+
+		// set bearing
+		if (!this._deg) this._deg = 90;
+
+		// rotate map
+		this._map.rotateTo(this._deg, {
+			duration : duration,
+			offset : offset,
+			easing : function (a) {
+				return a;
+			},
+		});
+
+		// rerun
+		this._rotationTimer = setTimeout(this.startGLRotation.bind(this), duration);
+
+		// change degrees
+		this._deg = this._deg + 90;
+
+	},
+
+	// _adjustContainer : function () {
+	// 	var w = this._container.offsetWidth,
+	// 	    width = w * 1.75,
+	// 	    left = -w + w * 0.250;
+	// 	this._container.style.width = width + 'px';
+	// 	this._container.style.left = left + 'px';
+	// },
+
+	
+	changeViewGL : function () {
+
+		
+		// current bearing
+		var currentBearing = this._map.getBearing();
+
+		// random bearing
+		var bearing = this._bearing = this._bearing ? this._bearing + 90 : 90;
+		if (this._bearing >= 360) this._bearing = 0; 
+
+		// difference in bearing. if negative, rotates clockwise
+		var diff = bearing - currentBearing;
+
+		// calc offset
+		var offset = this._getBearingOffset(bearing);
+
+		// get options
+		var lat = this.options.position.lat,
+		    lng = this.options.position.lng,
+		    zoom = this._getZoomLevel(this._map.getZoom());
+
+		// fly to
+		this._map.flyTo([lat, lng], zoom, bearing, {
+			offset : offset,
+			speed : 0.8
+		});
+
+	},
+
+
+	_getBearingOffset : function (bearing) {
+
+		// calc offset
+		var off = this._getOffset(),
+		    left = off[0];
+
+		// decide offset 
+		if (bearing == 90) {
+			// south
+			var offset = [0, left];
+		}
+		if (bearing == 180) {
+			// west
+			var offset = [-left, 0];
+		}
+		if (bearing == 270) {
+			// north
+			var offset = [0, -left];
+		}
+		if (bearing == 360 || bearing == 0) {
+			// east
+			var offset = [left, 0];
+		}
+
+		return offset;
+
+	},
+
+	_randomIntFromInterval : function (min,max) {
+    		return Math.floor(Math.random()*(max-min+1)+min);
+	},
+	
+
+	_getOffset : function (inverse) {
+		var w = this._container.offsetWidth;
+		var left = w * -0.375;
+		if (inverse) return [0, left];
+		return [left, 0];
+	},
+
+	
+
+	_startGL : function () {
+		this.panGL();
+		this.startGLRotation();
+	},
+
+	_stopGL : function () {
+
+	},
+
+	
+});
+
+
+;Wu.Project = Wu.Class.extend({
 
 	initialize : function (store) {
 
@@ -15270,6 +18345,14 @@ L.control.baselayerToggle = function (options) {
 		this._addToLegends();
 		this._addToInspect();
 		this._addToDescription();
+		this._addToLayermenu();
+	},
+
+	_addToLayermenu : function () {
+
+		// activate in layermenu
+		var layerMenu = app.MapPane.layerMenu;
+		layerMenu && layerMenu._enableLayer(this.getUuid());
 	},
 
 	_addToLegends : function () {
@@ -15425,7 +18508,6 @@ L.control.baselayerToggle = function (options) {
 		}
 
 		// get cartocss from server
-		console.log('POST /api/layers/cartocss/get', json);
 		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
 	},
 
@@ -15547,15 +18629,11 @@ L.control.baselayerToggle = function (options) {
 
 	_addGridEvents : function () {
 		var grid = this.gridLayer;
-		console.log('grid: ', grid);
-
 		if (!grid) return;
 
 		
 		// add click event
 		grid.on('mousedown', function(e) {
-			console.log('grid md', e);
-
 			if (!e.data) return;
 
 			// pass layer
@@ -15573,8 +18651,6 @@ L.control.baselayerToggle = function (options) {
 		}, this);
 
 		grid.on('mouseup', function (e) {
-			console.log('grid mu', e);
-
 			if (!e.data) return;
 
 			// pass layer
@@ -15593,8 +18669,6 @@ L.control.baselayerToggle = function (options) {
 		}, this);
 
 		grid.on('click', function (e) {
-			console.log('grid click', e);
-
 			// clear old
 			app.MapPane._clearPopup();
 
@@ -15686,6 +18760,14 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	updateStyle : function () {
 		var map = app._map;	
 		
+
+		// if (this.layer) {
+		// 	this.update();
+		// 	this.addTo(map);
+		// } else {
+		// 	this.update();
+		// }
+
 		// update
 		this.update();
 
@@ -15779,7 +18861,6 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 
 		// send to server
 		Wu.post('/api/layers/cartocss/set', JSON.stringify(json), callback, this);
-		// Wu.post('api/layers/cartocss/set', JSON.stringify(json), callback, this, app.options.servers.osm.base);
 	
 		// set locally on layer
 		this.setCartoid(json.cartoid);
@@ -15787,16 +18868,12 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 
 	getCartoCSS : function (cartoid, callback) {
 
-		console.log('getCartoCSS', cartoid);
-
 		var json = {
 			cartoid : cartoid
 		}
 
 		// get cartocss from server
-		console.log('POST /api/layers/cartocss/get', json);
 		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
-		// Wu.post('api/layers/cartocss/get', JSON.stringify(json), callback, this, app.options.servers.osm.base);
 	},
 
 
@@ -16362,3683 +19439,248 @@ L.topoJson = function (json, options) {
 // };
 
 
-;var colorTheme = {};
-var savedCSS;
+;Wu.Files = Wu.Class.extend({
 
-// The CSS
-var _CTheader = document.getElementsByTagName('head')[0],
-	jcss;
+	_ : 'file',
 
-	jcss = document.createElement('style');
-	jcss.setAttribute('type', 'text/css');
-	jcss.setAttribute('rel', 'stylesheet');	
-	_CTheader.appendChild(jcss);
-	
-	
+	initialize : function (store) {
 
-function injectCSS() {
+		// set store
+		this.store = store;
+
+	},
+
+	getStore : function () {
+		return this.store;
+	},
+
+	// getters
+	getName : function () {
+		return this.store.name;
+	},
+
+	getType : function () {
+		return this.store.type;
+	},
+
+	getUuid : function () {
+		return this.store.uuid;
+	},
+
+	getLastUpdated : function () {
+		return this.store.lastUpdated;
+	},
+
+	getKeywords : function () {
+		return this.store.keywords;
+	},
+
+	getFormat : function () {
+		return this.store.format;
+	},
+
+	getFileList : function () {
+		return this.store.files;
+	},
+
+	getDatasize : function () {
+		return this.store.dataSize;
+	},
+
+	getCreatedByName : function () {
+		return this.store.createdByName;
+	},
+
+	getCreatedBy : function () {
+		return this.store.createdBy;
+	},
+
+	getCreated : function () {
+		return this.store.created;
+	},
+
+	getCategory : function () {
+		return this.store.category;
+	},
+
+	getStatus : function () {
+		return this.store.status;
+	},
+
+	getVersion : function () {
+		return this.store.version;
+	},
+
+	getDescription : function () {
+		return this.store.description;
+	},
+
+
+
+
+	// setters
+	setName : function (name) {
+		this.store.name = name;
+		this.save('name');
+	},
+
+	setKeywords : function (keywords) {
+		this.store.keywords = keywords; // todo: must be array
+		this.save('keywords');
+	},
+
+	setFormat : function (format) {
+		this.store.format = format;
+		this.save('format');
+	},
+
+	setCategory : function (category) {
+		console.log('Wu.Files.setCategory: ', category);
+
+		this.store.category = category; // should be string
+		this.save('category');
+	},
+
+	setStatus : function (status) {
+		this.store.status = status;
+		this.save('status');
+	},
+
+	setVersion : function (version) {
+		this.store.version = version;
+		this.save('version');
+	},
+
+	setDescription : function (description) {
+		this.store.description = description;
+		this.save('description');
+	},
+
+
+
+
+	// save field to server
+	save : function (field) {
+
+		// set fields
+		var json = {};
+		json[field] = this.store[field];
+		json.uuid = this.store.uuid;
+
+		// save to server
+		var string = JSON.stringify(json);
+		this._save(string);
+
+	},
+
+	// save json to server
+	_save : function (string) {
+		// TODO: save only if actual changes! saving too much already
+		Wu.save('/api/file/update', string); // save to server                            
+		app.setSaveStatus();// set status
+	},
+
+
+
+	// todo: move all delete of files here
+	_delete : function () {
+
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+});;var systemapicConfigOptions = {
+		
+	id : 'app',
+
+	portalName : 'systemapic',	// plugged in
+	portalLogo : false,		// not plugged in.. using sprites atm..
+	portalTitle : 'Systemapic Secure Portal: Rüppells Griffon',
 	
-	colorTheme = JSON.parse(savedCSS);
+	// sidepane
+	panes : {
+		// plugged in and working! :)
+		clients 	: true,
+		mapOptions 	: true,
+		documents 	: true,               	
+		dataLibrary 	: true,               	
+		users 		: true,
+		share 		: true,
+		mediaLibrary    : false,
+		account 	: true
+	},	
 	
-	var _CSSstring = '';
-	for (var i = 0; i<colorTheme.css.length;i++) {			
-		if ( colorTheme.css[i].value ) {			
-			_CSSstring += colorTheme.css[i].classes.join() + ' { ' + colorTheme.css[i].pre + ': ' + colorTheme.css[i].value + ' !important } ';
+	// default settings (overridden by project settings)
+	settings : {		// not plugged in yet
+		chat : true,
+		colorTheme : true,
+		screenshot : true,
+		socialSharing : true,
+		print : true
+	},
+
+	providers : {
+		// default accounts, added to all new (and old?) projects
+		mapbox : [{	
+			username : 'systemapic',
+			accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q'
+		}]
+	},
+
+	servers : {
+
+		// portal SX
+		portal   : 'https://projects.ruppellsgriffon.com/',	// api
+
+		// tiles SX
+		tiles : {
+			uri : 'https://{s}.systemapic.com/r/',
+			subdomains : 'abcd' // sx
+		},
+
+		// utfgrid SX
+		utfgrid : {
+			uri : 'https://{s}.systemapic.com/u/',
+			subdomains : 'abcd' // sx
+		},
+
+		// osm PX
+		osm : {
+			base : 'https://m.systemapic.com/',
+			uri : 'https://{s}.systemapic.com/r/',
+			subdomains : 'mnop' // px
 		}
-	}		
 
-	jcss.innerHTML = _CSSstring;	
+
+	},
+
+	silentUsers : [
+		// redacted
+		'user-9fed4b5f', // k
+		'user-e6e5d7d9'  // j  // todo: add phantomJS user
+	]
 }
-
-
-
-//**********************************************************************//			
-//**********************************************************************//
-//									//
-//	 ________  _________    ___    ___ ___       _______          	//
-//	|\   ____\|\___   ___\ |\  \  /  /|\  \     |\  ___ \         	//
-//	\ \  \___|\|___ \  \_| \ \  \/  / | \  \    \ \   __/|        	//
-//	 \ \_____  \   \ \  \   \ \    / / \ \  \    \ \  \_|/__      	//
-//	  \|____|\  \   \ \  \   \/  /  /   \ \  \____\ \  \_|\ \     	//
-//	    ____\_\  \   \ \__\__/  / /      \ \_______\ \_______\    	//
-//	   |\_________\   \|__|\___/ /        \|_______|\|_______|    	//
-//	   \|_________|       \|___|/                                 	//
-//	                                                              	//
-//	                                                              	//
-//	 _______   ________  ___  _________  ________  ________       	//
-//	|\  ___ \ |\   ___ \|\  \|\___   ___\\   __  \|\   __  \      	//
-//	\ \   __/|\ \  \_|\ \ \  \|___ \  \_\ \  \|\  \ \  \|\  \     	//
-//	 \ \  \_|/_\ \  \ \\ \ \  \   \ \  \ \ \  \\\  \ \   _  _\    	//
-//	  \ \  \_|\ \ \  \_\\ \ \  \   \ \  \ \ \  \\\  \ \  \\  \|   	//
-//	   \ \_______\ \_______\ \__\   \ \__\ \ \_______\ \__\\ _\   	//
-//	    \|_______|\|_______|\|__|    \|__|  \|_______|\|__|\|__|  	//
-//	                                                              	//
-//	                                                              	//
-//                                                              	//
-//**********************************************************************//
-//**********************************************************************//
-
-
-
-function startColorThemes() {
-	
-	
-	// Bruker denne når en ny klasse legges til...
-	// Grunnen til det er at det LAGREDE color theme objektet må oppdateres med riktig array,
-	// så hvis det har blitt endring i klasselisten må alle prosjekter reloades i color theme
-	// med rezet som true state, yo.
-	
-	var rezet = true;
-	
-	
-	var tempjcss, 				// The tag in the head where the CSS gets injected
-		draggingSlider = false, 	// If we are dragging, and what bar is being dragged
-	
-		// For Color Theme
-		haschanged = false, 		// If individual colors has been changed or not (for overriding feedback purposes)
-		changingColors = false, 	// For editing mode (To know what color we're editing )
-	
-		// These must follow on save
-	
-		basecolor,					
-		RGB, HSV,
-		
-		css = [], 					// The CSS array
-		tempCSS = {}, 				// The CSS array
-	
-		cssstring = '',		 		// The CSS string
-	
-		lightColor = [],			// Static colors
-		darkColor = [],				// Static colors
-		brightColor = [],			// Static colors
-		
-		complimentaryColor = [], 	// Dynamically changing colors
-		matchingColor = [],		 	// Dynamically changing colors
-		customColor = [],		 	// For custom made colors
-	
-		eVars = {},					// Contains div objects from the DOM (picked up by ID)
-		theClassArray = [];
-	
-	
-		// These Follows the Color Theme
-	
-		colorTheme.darktheme = true;
-		colorTheme.cTheme = false;
-		colorTheme.cThemeDarkMenu = true;
-		colorTheme.cThemeDarkHeader = false;
-		colorTheme.cThemeDarkBox = false;
-		
-
-		if ( !colorTheme.css || rezet ) colorTheme.css = [];
-	
-		// The Swatch CSS
-		tempjcss = document.createElement('style');
-		tempjcss.setAttribute('type', 'text/css');
-		tempjcss.setAttribute('rel', 'stylesheet');	
-		_CTheader.appendChild(tempjcss);
-	
-	
-			
-	// *****************************************
-				
-	// CORE FUNCTIONS
-	// CORE FUNCTIONS
-	// CORE FUNCTIONS
-
-	// *****************************************
-	
-	var eCol = {
-	
-		// GENERAL
-		// GENERAL
-	
-		// Create a HSV object
-		HSVobject : function (hue, saturation, value) {
-		// Object definition.
-		this.h = hue; this.s = saturation; this.v = value;
-		this.validate = function () {
-			if (this.h <= 0) {this.h = 0;}
-			if (this.s <= 0) {this.s = 0;}
-			if (this.v <= 0) {this.v = 0;}
-			if (this.h > 360) {this.h = 360;}
-			if (this.s > 100) {this.s = 100;}
-			if (this.v > 100) {this.v = 100;}
-		}		
-	},
-		
-		// Create a RGB objec
-		RGBobject : function (red, green, blue) {
-		// Object definition.
-		this.r = red; this.g = green; this.b = blue;
-		this.validate = function () {
-			if (this.r <= 0) {this.r = 0;}
-			if (this.g <= 0) {this.g = 0;}
-			if (this.b <= 0) {this.b = 0;}
-			if (this.r > 255) {this.r = 255;}
-			if (this.g > 255) {this.g = 255;}
-			if (this.b > 255) {this.b = 255;}
-		}	
-	},
-		
-		
-		// CONVERTERS
-		// CONVERTERS	
-		
-		convert : {
-			
-			// Decimals to hex (only 3 digits)
-			hexify : function (number) {
-			var digits = '0123456789ABCDEF';
-			var lsd = number % 16;
-			var msd = (number - lsd) / 16;
-			var hexified = digits.charAt(msd) + digits.charAt(lsd);
-			return hexified;		
-		},
-			
-			// Hex to decimals (only 2 digits)
-			decimalize : function (hexNumber) {
-			var digits = '0123456789ABCDEF';
-			return ((digits.indexOf(hexNumber.charAt(0).toUpperCase()) * 16) + digits.indexOf(hexNumber.charAt(1).toUpperCase()));		
-		},
-			
-			// HEX to RGB
-			HEX2RGB : function (colorString, RGB) {
-			
-			RGB.r = this.decimalize(colorString.substring(1,3));
-			RGB.g = this.decimalize(colorString.substring(3,5));
-			RGB.b = this.decimalize(colorString.substring(5,7));		
-		},
-			
-			// RGB to HEX
-			RGB2HEX : function (RGB) {
-			return "#" + this.hexify(RGB.r) + this.hexify(RGB.g) + this.hexify(RGB.b);		
-		},
-			
-			// RGB to HSV
-			RGB2HSV : function (RGB, HSV) {
-			r = RGB.r / 255; g = RGB.g / 255; b = RGB.b / 255; // Scale to unity.
-		
-			var minVal = Math.min(r, g, b);
-			var maxVal = Math.max(r, g, b);
-			var delta = maxVal - minVal;
-		
-			HSV.v = maxVal;
-		
-			if (delta == 0) {
-				HSV.h = 0;
-				HSV.s = 0;
-			} else {
-				HSV.s = delta / maxVal;
-				var del_R = (((maxVal - r) / 6) + (delta / 2)) / delta;
-				var del_G = (((maxVal - g) / 6) + (delta / 2)) / delta;
-				var del_B = (((maxVal - b) / 6) + (delta / 2)) / delta;
-		
-				if (r == maxVal) {HSV.h = del_B - del_G;}
-				else if (g == maxVal) {HSV.h = (1 / 3) + del_R - del_B;}
-				else if (b == maxVal) {HSV.h = (2 / 3) + del_G - del_R;}
-				
-				if (HSV.h < 0) {HSV.h += 1;}
-				if (HSV.h > 1) {HSV.h -= 1;}
-			}
-			HSV.h *= 360;
-			HSV.s *= 100;
-			HSV.v *= 100;		
-		},
-			
-			// HSV to RGB
-			HSV2RGB : function (HSV, RGB) {
-			var h = HSV.h / 360; var s = HSV.s / 100; var v = HSV.v / 100;
-			if (s == 0) {
-				RGB.r = v * 255;
-				RGB.g = v * 255;
-				RGB.b = v * 255;
-			} else {
-				var_h = h * 6;
-				var_i = Math.floor(var_h);
-				var_1 = v * (1 - s);
-				var_2 = v * (1 - s * (var_h - var_i));
-				var_3 = v * (1 - s * (1 - (var_h - var_i)));
-				
-				if (var_i == 0) {var_r = v; var_g = var_3; var_b = var_1}
-				else if (var_i == 1) {var_r = var_2; var_g = v; var_b = var_1}
-				else if (var_i == 2) {var_r = var_1; var_g = v; var_b = var_3}
-				else if (var_i == 3) {var_r = var_1; var_g = var_2; var_b = v}
-				else if (var_i == 4) {var_r = var_3; var_g = var_1; var_b = v}
-				else {var_r = v; var_g = var_1; var_b = var_2};
-				
-				RGB.r = var_r * 255;
-				RGB.g = var_g * 255;
-				RGB.b = var_b * 255;
-			}		
-		},
-			
-			// HSV to HEX
-			HSV2HEX : function (_hval, _sval, _vval) {
-			var RGB = new eCol.RGBobject();
-			var HSV = new eCol.HSVobject(_hval, _sval, _vval);	
-			HSV.validate();
-			this.HSV2RGB (HSV, RGB);
-			var _nHEX = this.RGB2HEX(RGB);
-			return(_nHEX);				
-		}
-			
-		},
-	
-	
-		// UPDATERS
-		// UPDATERS
-		
-		update : {
-	
-			// Creates a string from the CSS array	
-			CSSstring : function () {
-				
-				// Turn CSS into string
-				cssstring = '';
-				for (var i = 0; i < colorTheme.css.length; i++) {			
-					if ( colorTheme.css[i].value ) {			
-						cssstring += colorTheme.css[i].classes.join() + ' { ' + colorTheme.css[i].pre + ': ' + colorTheme.css[i].value + ' !important } ';
-					}
-				}					
-
-				// Make a saved CSS object
-				savedCSS = JSON.stringify(colorTheme);
-
-				// save to project
-				if (Wu.app._activeProject) Wu.app._activeProject.saveColorTheme();	// (k)
-			
-			},
-			
-			// Creates 4 Colmplimetary colors in cArray[0] - cArray[4]
-			makeComplimentary : function (_hex) {
-			
-			// Updating the color swatches that contains the BASE color
-			eVars._yourswatch.style.backgroundColor = _hex;
-			var colorString = _hex;
-			
-			// Create RGB and HSV values from HEX
-			var RGB = new eCol.RGBobject(0,0,0);
-			var HSV = new eCol.HSVobject(0,0,0);
-			eCol.convert.HEX2RGB(colorString, RGB);
-			eCol.convert.RGB2HSV (RGB, HSV);
-			
-			// Update sliders
-			eCol.sliders.updateAllSliders(RGB, HSV);
-				
-			// Update the BASE COLOR in cArray	
-			complimentaryColor[0] = [];		
-			complimentaryColor[0][0] = {};
-			complimentaryColor[0][0].HEX = _hex;		
-			complimentaryColor[0][0].RGB = { r: RGB.r, g: RGB.g, b: RGB.b };
-			complimentaryColor[0][0].HSV = { 'h': HSV.h, 's': HSV.s, 'v': HSV.v };
-
-
-			// MAKE COMPLIMENTARY COLORS
-			
-			// Hue position
-			var hpos = 360-complimentaryColor[0][0].HSV.h;
-			// Go down cArray[0] - cArray[4] and make COMPLIMENTARY colors from the original value			
-			for ( var i=0; i<4;i++ ) {
-					
-				var hstep = complimentaryColor[0][0].HSV.h + (90*i);
-					
-				if ( hstep > 360 ) {
-					hstep = hstep - 360;
-				}
-				
-				hstep = Math.floor(hstep);		
-		
-				HSV.h = hstep;
-				HSV.s = complimentaryColor[0][0].HSV.s;
-				HSV.v = complimentaryColor[0][0].HSV.v;
-			
-				// Declare the Array that contains all the colors
-				complimentaryColor[i] = [];
-				complimentaryColor[i][0] = {};
-								
-				eCol.convert.HSV2RGB(HSV, RGB);
-				var nhex = eCol.convert.RGB2HEX(RGB);
-				
-				complimentaryColor[i][0].HEX = nhex;
-				complimentaryColor[i][0].RGB = {'r':RGB.r, 'g':RGB.g, 'b':RGB.b};
-				complimentaryColor[i][0].HSV = {'h':HSV.h, 's':HSV.s, 'v':HSV.v};
-				
-	
-				
-				// Make lighter color versions
-				this.colorGrade(complimentaryColor, i, HSV);
-			}
-			
-		},
-			
-			// Create 5 Matching colors
-			matchColors : function() {
-		
-			// Set back RGB and HSV to BASE color value
-			RGB = complimentaryColor[0][0].RGB;
-			HSV = complimentaryColor[0][0].HSV;			
-		
-			// Finds matching colors, and puts them in matchBlend[1] - matchBlend[5]
-			// ... and updates the matching color swatches
-			eCol.cMatch.domatch(HSV);
-
-			
-			// Update the MATCHING colors in cArray
-			// Not sure if this is so smart... perhaps it would be better to keep the arrays separated
-			
-			// Match Color 1 GRADER
-			this.colorGrade(matchingColor, 0, matchingColor[0][0].HSV);
-					
-			// Match Color 2 GRADER
-			this.colorGrade(matchingColor, 1, matchingColor[1][0].HSV);
-		
-			// Match Color 3 GRADER
-			this.colorGrade(matchingColor, 2, matchingColor[2][0].HSV);
-			
-			// Match Color 4 GRADER
-			this.colorGrade(matchingColor, 3, matchingColor[3][0].HSV);
-		
-			// Match Color 5 GRADER
-			this.colorGrade(matchingColor, 4, matchingColor[4][0].HSV);
-
-		},
-			
-			// Creates 6 lighter colors from original HSV
-			colorGrade : function (thisArray, arrayNumber, HSV) {										
- 			
-			// Go down the swatches
-			for ( var a=0; a<6;a++) {			
-			
-				var RGB = new eCol.RGBobject(0,0,0);
-		
-				// Value
-				var vval = HSV.v;
-				var valdiff = 100-vval;	
-				var valstep = valdiff/6;	
-				HSV.v = Math.floor(vval + (valstep*a));
-				
-				// Lightness
-				var sval = HSV.s;
-				var svalstep = sval/6;
-				HSV.s = Math.floor(sval - (svalstep*a));
-				
-				// Set RGB
-				eCol.convert.HSV2RGB(HSV, RGB);
-				
-				// Set HEX
-				var nhex = eCol.convert.RGB2HEX(RGB);
-				
-
-				// Update the array with all the colors
-				thisArray[arrayNumber][a] = {};
-				
-				thisArray[arrayNumber][a].HEX = nhex;
-				thisArray[arrayNumber][a].RGB = {'r': RGB.r, 'g': RGB.g, 'b': RGB.b };
-				thisArray[arrayNumber][a].HSV = {'h': HSV.h, 's': HSV.s, 'v': HSV.v };			
-			}				
-		},
-			
-			// When there is a change in RGB (gets used by slider only)
-			RGB : function(RGB) {
-			
-			var HSV = new eCol.HSVobject(0,0,0);
-			
-			eCol.convert.RGB2HSV(RGB, HSV);
-			
-			eVars._hexColor.value = eCol.convert.RGB2HEX(RGB);
-			eVars._rChannel.value = Math.round(RGB.r);
-			eVars._gChannel.value = Math.round(RGB.g);
-			eVars._bChannel.value = Math.round(RGB.b);
-			eVars._hChannel.value = Math.round(HSV.h);
-			eVars._sChannel.value = Math.round(HSV.s);
-			eVars._vChannel.value = Math.round(HSV.v);
-									
-		},
-	
-			// When there is a change in HSV (gets used by slider only)
-			HSV : function(HSV) {
-				
-			var RGB = new eCol.RGBobject(0,0,0);
-			eCol.convert.HSV2RGB(HSV, RGB);
-			
-			eVars._hexColor.value = eCol.convert.RGB2HEX(RGB);
-			eVars._rChannel.value = Math.round(RGB.r);
-			eVars._gChannel.value = Math.round(RGB.g);
-			eVars._bChannel.value = Math.round(RGB.b);
-			eVars._hChannel.value = Math.round(HSV.h);
-			eVars._sChannel.value = Math.round(HSV.s);
-			eVars._vChannel.value = Math.round(HSV.v);
-					
-		},
-	
-			// When there is a change in HEX (clicking new colors)
-			HEX : function (colorString) {
-				
-			var RGB = new eCol.RGBobject(0,0,0);
-			var HSV = new eCol.HSVobject(0,0,0);
-			eCol.convert.HEX2RGB(colorString, RGB);
-			eCol.convert.RGB2HSV (RGB, HSV);
-			
-			eVars._rChannel.value = Math.round(RGB.r);
-			eVars._gChannel.value = Math.round(RGB.g);
-			eVars._bChannel.value = Math.round(RGB.b);
-			eVars._hChannel.value = Math.round(HSV.h);
-			eVars._sChannel.value = Math.round(HSV.s);
-			eVars._vChannel.value = Math.round(HSV.v);
-			
-		},
-			
-			inputFields : function (fromWhat) {
-			
-			var RGB = new Object();
-			var HSV = new Object();
-			
-			if ( fromWhat == 'HEX' ) {
-												
-				var tHEX = eVars._hexColor.value;
-				
-				eCol.convert.HEX2RGB(tHEX, RGB);
-				eCol.convert.RGB2HSV(RGB, HSV);
-				
-				eVars._rChannel.value = Math.floor(RGB.r);
-				eVars._gChannel.value = Math.floor(RGB.g);
-				eVars._bChannel.value = Math.floor(RGB.b);
-
-				eVars._hChannel.value = Math.floor(HSV.h);
-				eVars._sChannel.value = Math.floor(HSV.s);
-				eVars._vChannel.value = Math.floor(HSV.v);
-				
-				
-			}
-
-			if ( fromWhat == 'RGB' ) {
-				
-				RGB.r = eVars._rChannel.value;
-				RGB.g = eVars._gChannel.value;
-				RGB.b = eVars._bChannel.value;
-
-				eCol.convert.RGB2HSV(RGB, HSV);				
-				var tHEX = eCol.convert.RGB2HEX(RGB);								
-												
-				eVars._hexColor.value = tHEX;
-
-				eVars._hChannel.value = Math.floor(HSV.h);
-				eVars._sChannel.value = Math.floor(HSV.s);
-				eVars._vChannel.value = Math.floor(HSV.v);
-			}
-			
-			if ( fromWhat == 'HSV' ) {
-				
-				HSV.r = eVars._hChannel.value;
-				HSV.g = eVars._sChannel.value;
-				HSV.b = eVars._vChannel.value;
-
-				eCol.convert.HSV2RGB(HSV, RGB);				
-				var tHEX = eCol.convert.RGB2HEX(RGB);								
-												
-				eVars._hexColor.value = tHEX;
-
-				eVars._rChannel.value = Math.floor(RGB.r);
-				eVars._gChannel.value = Math.floor(RGB.g);
-				eVars._bChannel.value = Math.floor(RGB.b);
-				
-			}
-			
-			eCol.sliders.updateAllSliders(RGB,HSV);
-									
-		},
-			
-			// Updates the Swatch we've selected from NEW color!
-			customColors : function() {
-		
-		
-			if ( changingColors == 'all' ) {
-
-				var newHEX = eVars._hexColor.value;
-
-				this.makeComplimentary(newHEX);
-				this.matchColors();
-				
-				updateTempSwatches();
-
-
-				if ( colorTheme.cThemeDarkMenu ) {
-					darkMenu(newHEX);					
-				} else {
-					lightMenu(newHEX);
-				}
-
-
-				// Link Color
-				colorTheme.css[4].value = matchingColor[2][0].HEX;				
-				
-				// Inactive Layers
-				colorTheme.css[5].value = complimentaryColor[0][0].HEX;
-				colorTheme.css[6].value = complimentaryColor[0][3].HEX;	
-				colorTheme.css[7].value = complimentaryColor[0][4].HEX;
-
-				// Active Layers
-				colorTheme.css[8].value = complimentaryColor[2][0].HEX;
-				colorTheme.css[9].value = complimentaryColor[2][4].HEX;
-	
-				
-				
-
-			}
-			
-			// Menu color
-			if ( changingColors == 1 ) {
-				
-				var HSV = { 'h': parseInt(eVars._hChannel.value), 's': parseInt(eVars._sChannel.value), 'v': parseInt(eVars._vChannel.value)  }
-
-				customColor[1] = [];
-				this.colorGrade(customColor, 1, HSV);
-
-
-				if ( colorTheme.cThemeDarkMenu ) {
-					darkMenu(customColor[1][0].HEX);					
-				} else {
-					lightMenu(customColor[1][0].HEX);
-				}
-
-				// cxxxx
-
-				
-			}
-		
-			// Inactive Layers
-			if ( changingColors == 2 ) {
-			
-				var HSV = { 'h': parseInt(eVars._hChannel.value), 's': parseInt(eVars._sChannel.value), 'v': parseInt(eVars._vChannel.value)  }
-
-				customColor[2] = [];
-				this.colorGrade(customColor, 2, HSV);
-											
-				colorTheme.css[5].value = customColor[2][0].HEX;
-				colorTheme.css[6].value = customColor[2][3].HEX;	
-				colorTheme.css[7].value = customColor[2][4].HEX;
-				
-			}
-
-			// Active Layers
-			if ( changingColors == 3 ) {
-
-				var HSV = { 'h': parseInt(eVars._hChannel.value), 's': parseInt(eVars._sChannel.value), 'v': parseInt(eVars._vChannel.value)  }
-
-				customColor[3] = [];
-				this.colorGrade(customColor, 3, HSV);
-				
-				colorTheme.css[8].value = customColor[3][0].HEX;
-				colorTheme.css[9].value = customColor[3][4].HEX;
-
-			}
-
-			// Link Color
-			if ( changingColors == 4 ) {
-			
-				var HSV = { 'h': parseInt(eVars._hChannel.value), 's': parseInt(eVars._sChannel.value), 'v': parseInt(eVars._vChannel.value)  }
-
-				customColor[4] = [];
-				this.colorGrade(customColor, 4, HSV);
-				
-				colorTheme.css[4].value = customColor[4][0].HEX;
-				
-			}
-
-			// Update the color in the CSS
-			eCol.update.CSSstring();
-			jcss.innerHTML = cssstring;
-
-
-		}
-					
-		},
-		
-			
-		
-		// SLIDERS
-		// SLIDERS	
-		
-		sliders : {
-			
-			updateAllSliders : function (RGB, HSV) {
-	
-			
-			// HSV
-			if ( draggingSlider != 'range-slider-1' ) {
-				this.slideupdater('range-slider-1', 'hChannel', 360, HSV, RGB);
-			}
-		
-			if ( draggingSlider != 'range-slider-2' ) {
-				this.slideupdater('range-slider-2', 'sChannel', 100, HSV, RGB);	
-			}
-		
-			if ( draggingSlider != 'range-slider-3' ) {
-				this.slideupdater('range-slider-3', 'vChannel', 100, HSV, RGB);	
-			}
-		
-		
-			// RGB
-			if ( draggingSlider != 'range-slider-r' ) {
-				this.slideupdater('range-slider-r', 'rChannel', 255, HSV, RGB);		
-			}
-		
-			if ( draggingSlider != 'range-slider-g' ) {
-				this.slideupdater('range-slider-g', 'gChannel', 255, HSV, RGB);
-			}
-		
-			if ( draggingSlider != 'range-slider-b' ) {
-				this.slideupdater('range-slider-b', 'bChannel', 255, HSV, RGB);
-			}				
-			
-		},
-					
-			rangeSlider : function (id, rrange, onDrag) {
-
-		    var range = Wu.DomUtil.get(id),
-		        dragger = range.children[0],
-		        draggerWidth = 10, // width of your dragger
-		        rangeWidth, rangeLeft,
-		        down = false;
-		
-		    dragger.style.width = draggerWidth + 'px';
-		    dragger.style.left = -draggerWidth + 'px';
-		    dragger.style.marginLeft = (draggerWidth / 2) + 'px';
-		
-		    var thus = this;
-		
-		    range.addEventListener("mousedown", function(e) {
-		
-				rangeWidth = 215;
-		        rangeLeft = 150;
-		        
-		        draggingSlider = id;        
-		        
-		        down = true;
-		        thus.updateDragger(e, dragger, rrange, down, rangeLeft, rangeWidth, draggerWidth, onDrag, thus);
-		        return false;
-		    });
-		
-		    document.addEventListener("mousemove", function(e) {
-		   
-		        thus.updateDragger(e, dragger, rrange, down, rangeLeft, rangeWidth, draggerWidth, onDrag, thus);
-		    });
-		
-		    document.addEventListener("mouseup", function() {
-		        down = false;
-				draggingSlider = false;                
-		    });
-					
-		},
-			
-			updateDragger : function (e, dragger, rrange, down, rangeLeft, rangeWidth, draggerWidth, onDrag, thus) {				   
-				           
-
-				           
-		        if (down && e.pageX >= rangeLeft && e.pageX <= (rangeLeft + rangeWidth)) {
-		        		   
-		            dragger.style.left = e.pageX - rangeLeft - draggerWidth + 'px';
-
-		            if ( typeof onDrag == "function" ) {
-		            	 
-		            	var dragVal = Math.round(((e.pageX - rangeLeft) / rangeWidth) * rrange);
-  	
-		            	onDrag(dragVal);
-		            	
-		            	}
-		        }
-			
-		},
-			
-			slideupdater : function (id, updater, nrng, HSV, RGB) {
-		
-			// Updating one of the HSV sliders: update all the RGB sliders
-			if ( draggingSlider == 'range-slider-1' || draggingSlider == 'range-slider-2' || draggingSlider == 'range-slider-3' ) {
-		
-				var rr = Wu.DomUtil.get('range-slider-r').children[0];
-				var rrrange = Math.floor(RGB.r*(205/255));
-					rr.style.left = rrrange + 'px';
-				
-				var gg = Wu.DomUtil.get('range-slider-g').children[0];
-				var ggrange = Math.floor(RGB.g*(205/255));
-					gg.style.left =ggrange + 'px';
-					
-				var bb = Wu.DomUtil.get('range-slider-b').children[0];
-				var bbrange = Math.floor(RGB.b*(205/255));
-					bb.style.left = bbrange + 'px';		
-			}
-			
-			
-			// Updating one of the RGB sliders: update all the HSV sliders	
-			if ( draggingSlider == 'range-slider-r' || draggingSlider == 'range-slider-g' || draggingSlider == 'range-slider-b' ) {
-							
-				var hh = Wu.DomUtil.get('range-slider-1').children[0];
-				var hhrange = Math.floor(HSV.h*(205/360));
-					hh.style.left = hhrange + 'px';
-				
-				var ss = Wu.DomUtil.get('range-slider-2').children[0];
-				var ssrange = Math.floor(HSV.s*(205/100));
-					ss.style.left = ssrange + 'px';
-					
-				var vv = Wu.DomUtil.get('range-slider-3').children[0];
-				var vvrange = Math.floor(HSV.v*(205/100));
-					vv.style.left = vvrange + 'px';	
-			
-			}
-		
-		
-		
-			if ( !draggingSlider ) {
-			
-			    var range = Wu.DomUtil.get(id),
-			        dragger = range.children[0];
-			        			                
-			    var newRange;
-			
-			    if ( updater == 'hChannel' ) {
-				    newRange = HSV.h;	
-			    }
-			
-			    if ( updater == 'sChannel' ) {
-				    newRange = HSV.s;
-			    }
-			    
-			    if ( updater == 'vChannel' ) {
-				    newRange = HSV.v;
-			    }        
-		
-		
-			    if ( updater == 'rChannel' ) {
-				    newRange = RGB.r;	
-			    }
-			
-			    if ( updater == 'gChannel' ) {
-				    newRange = RGB.g;
-			    }
-			    
-			    if ( updater == 'bChannel' ) {
-				    newRange = RGB.b;
-			    }        
-			    
-			    
-			
-				if ( newRange >= nrng ) {
-			    	newRange = nrng;
-				}
-			
-			
-				var prop = 205/nrng;
-			    newRange = Math.floor(newRange*prop);        
-			
-			    dragger.style.left = newRange + 'px';
-		    
-		    }
-		
-		
-			
-		}
-			
-		},
-		
-	
-		// COLOR MATCHER 
-		// COLOR MATCHER
-		
-		
-		cMatch : {
-			
-			domatch : function (HSV) {
-		
-			var hs = HSV;
-		
-			// Color matching algorithm. All work is done in HSV color space, because all
-			// calculations are based on hue, saturation and value of the working color.
-			// The hue spectrum is divided into sections, are the matching colors are
-			// calculated differently depending on the hue of the color.
-			
-			var z=new Object();
-			var y=new Object();
-			var yx=new Object();
-			y.s=hs.s;
-			y.h=hs.h;
-			if(hs.v>70){y.v=hs.v-30}else{y.v=hs.v+30};
-		
-			var RGB=new Object();
-			eCol.convert.HSV2RGB(y, RGB);
-			z = RGB;
-			
-			this.outp("0",z);
-			if((hs.h>=0)&&(hs.h<30)){
-				yx.h=y.h=hs.h+30;yx.s=y.s=hs.s;y.v=hs.v;
-				if(hs.v>70){yx.v=hs.v-30}else{yx.v=hs.v+30}
-			}
-			if((hs.h>=30)&&(hs.h<60)){yx.h=y.h=hs.h+150;
-				y.s=this.rc(hs.s-30,100);
-				y.v=this.rc(hs.v-20,100);
-				yx.s=this.rc(hs.s-50,100);
-				yx.v=this.rc(hs.v+20,100);
-			}
-			if((hs.h>=60)&&(hs.h<180)){
-				yx.h=y.h=hs.h-40;
-				y.s=yx.s=hs.s;
-				y.v=hs.v;if(hs.v>70){yx.v=hs.v-30}else{yx.v=hs.v+30}
-			}
-			if((hs.h>=180)&&(hs.h<220)){
-				yx.h=hs.h-170;
-				y.h=hs.h-160;
-				yx.s=y.s=hs.s;
-				y.v=hs.v;
-				if(hs.v>70){yx.v=hs.v-30}else{yx.v=hs.v+30}
-			}if((hs.h>=220)&&(hs.h<300)){
-				yx.h=y.h=hs.h;
-				yx.s=y.s=this.rc(hs.s-40,100);
-				y.v=hs.v;
-				if(hs.v>70){yx.v=hs.v-30}else{yx.v=hs.v+30}
-			}
-			if(hs.h>=300){
-				if(hs.s>50){y.s=yx.s=hs.s-40}else{y.s=yx.s=hs.s+40}yx.h=y.h=(hs.h+20)%360;
-				y.v=hs.v;
-				if(hs.v>70){yx.v=hs.v-30}else{yx.v=hs.v+30}
-			}
-		
-		
-			var RGB=new Object();
-			eCol.convert.HSV2RGB(y, RGB);
-			z = RGB;	
-			this.outp("1",z);
-			
-			var RGB=new Object();
-			eCol.convert.HSV2RGB(yx, RGB);
-			z = RGB;	
-			this.outp("2",z);
-		
-			y.h=0;
-			y.s=0;
-			y.v=100-hs.v;
-			var RGB=new Object();
-			eCol.convert.HSV2RGB(y, RGB);
-			z = RGB;
-			this.outp("3",z);
-		
-			y.h=0;
-			y.s=0;
-			y.v=hs.v;
-			var RGB=new Object();
-			eCol.convert.HSV2RGB(y, RGB);
-			z = RGB;
-			this.outp("4",z);		
-			
-		},
-			
-			outp: function (x, RGB) {
-		
-			matchingColor[x] = [];
-			matchingColor[x][0] = {};
-			matchingColor[x][0].HEX="#"+eCol.convert.hexify(RGB.r)+eCol.convert.hexify(RGB.g)+eCol.convert.hexify(RGB.b);
-			
-			var RGB=new Object();			
-			var HSV=new Object();			
-			
-			eCol.convert.HEX2RGB(matchingColor[x][0].HEX, RGB);
-			eCol.convert.RGB2HSV(RGB, HSV);
-			
-			matchingColor[x][0].RGB = {'r': RGB.r, 'g': RGB.g, 'b': RGB.b };
-			matchingColor[x][0].HSV = {'h': HSV.h, 's': HSV.s, 'v': HSV.v };			
-				
-			
-		},
-			
-			rc : function (x,m) {
-		
-			if(x>m){return m}
-			if(x<0){return 0}else{return x}			
-		
-		}
-			
-		},
-	
-		
-		// COLOR PICKER
-		// COLOR PICKER ~ TODO: Kill off the micro image
-	
-		cPicker : {
-	
-			img2canvas : function () {
-
-			istat=true;
-			cnvWidth=120;
-			cnvHeight=70;
-			
-			c = eVars._myCanvas;
-			ctx=c.getContext("2d");
-		
-			cPix = eVars._pixCanvas;
-			ctxPix=cPix.getContext("2d");
-		
-			ctxPix.mozImageSmoothingEnabled = false;
-			ctxPix.webkitImageSmoothingEnabled = false;
-		
-			img = eVars._canvimg;
-			imgHeight = img.height;
-			imgWidth = img.width;
-					
-			if (imgHeight<cnvHeight && imgWidth<cnvWidth){
-				ctx.mozImageSmoothingEnabled = false;
-				ctx.webkitImageSmoothingEnabled = false;
-			}
-		
-			if ((imgWidth/imgHeight)<1.56667){
-				cnvWidth=imgWidth/imgHeight*cnvHeight;
-			}else{
-				cnvHeight=cnvWidth/(imgWidth/imgHeight);
-			}
-			ctx.clearRect(0, 0, c.width, c.height);
-			ctx.drawImage(img,0,0,cnvWidth,cnvHeight);
-			
-			var thus = this;			
-			var onclickListener = function (evt) {
-	
-				if ( haschanged ) {
-					if ( changingColors == 'all' ) {
-					    if (confirm("This action will regenerate a color palette for you. By proceding all your changes will be lost!") == true) {
-						   haschanged = false;
-
-						   eCol.update.HEX(eVars._hexColor.value);
-						   eCol.update.inputFields('HEX');
-					    }
-					} else {
-			
-						imageData = ctxPix.getImageData(0,0,150,150);
-						var barva='#'+thus.d2h(imageData.data[45300+0])+thus.d2h(imageData.data[45300+1])+thus.d2h(imageData.data[45300+2]);
-
-						eVars._hexColor.value=barva;
-						eCol.update.HEX(eVars._hexColor.value);
-											
-						// Update Colors						
-					    eCol.update.customColors();
-
-					}
-				} else {
-					
-					imageData = ctxPix.getImageData(0,0,150,150);
-					var barva='#'+thus.d2h(imageData.data[45300+0])+thus.d2h(imageData.data[45300+1])+thus.d2h(imageData.data[45300+2]);
-					eVars._hexColor.value=barva;
-
-
-					eCol.update.HEX(eVars._hexColor.value);
-
-					// Update Colors
-				    eCol.update.customColors();					
-				} 			
-			};
-			var onmoveListener = function(evt) {
-			
-				ev=1;
-				if (istat){
-					mousePos = thus.getMousePos(c, evt);
-					thus.drawPix(cPix, ctxPix, img, Math.round(mousePos.x*(imgWidth/cnvWidth)), Math.round(mousePos.y*(imgHeight/cnvHeight)));
-				}
-			};
-			
-			c.addEventListener('mousemove', onmoveListener, false);
-			c.addEventListener('mousedown', onclickListener, false);
-				  
-			
-		},
-	
-			drawPix : function (cPix, ctxPix, img, x, y) {
-
-			ctxPix.clearRect(0, 0, cPix.width, cPix.height);
-			if (x<5) x=5;
-			if (y<5) y=5;
-			if (x>imgWidth-4) x=imgWidth-4;
-			if (y>imgHeight-4) y=imgHeight-4;
-			ctxPix.drawImage(img,x-5,y-5,9,9,0,0,cPix.width,cPix.height);
-			
-		},
-	
-			getMousePos : function (canvas, evt) {
-		
-			var rect = canvas.getBoundingClientRect();
-			return { x: evt.clientX - rect.left, y: evt.clientY - rect.top	};			
-		
-		},
-	
-			d2h : function (d) {
-		
-			return ("0"+d.toString(16)).slice(-2).toUpperCase();
-		
-		}
-			
-		},
-		
-	
-		// FINDS THE MOST DOMINANT COLOR IN THE PICTURE ~ TODO: Disable white and black as dominant colors	
-		cFind : function (colorFactorCallback) {
-			
-		  this.callback = colorFactorCallback;
-		  this.getMostProminentColor = function(imgEl) {
-	    var rgb = null;
-	    if (!this.callback) this.callback = function() { return 1; };
-	    var data = this.getImageData(imgEl);
-	    rgb = this.getMostProminentRGBImpl(data, 6, rgb, this.callback);
-	    rgb = this.getMostProminentRGBImpl(data, 4, rgb, this.callback);
-	    rgb = this.getMostProminentRGBImpl(data, 2, rgb, this.callback);
-	    rgb = this.getMostProminentRGBImpl(data, 0, rgb, this.callback);
-	    return rgb;
-	  };
-		  this.getImageData = function(imgEl, degrade, rgbMatch, colorFactorCallback) {
-	    
-	    var rgb,
-	        canvas = document.createElement('canvas'),
-	        context = canvas.getContext && canvas.getContext('2d'),
-	        data, width, height, key,
-	        i = -4,
-	        db={},
-	        length,r,g,b,
-	        count = 0;
-	    
-	    if (!context) {
-	      return defaultRGB;
-	    }
-	    
-	    height = canvas.height = imgEl.naturalHeight || imgEl.offsetHeight || imgEl.height;
-	    width = canvas.width = imgEl.naturalWidth || imgEl.offsetWidth || imgEl.width;
-	    
-	    context.drawImage(imgEl, 0, 0);
-	    
-	    try {
-	      data = context.getImageData(0, 0, width, height);
-	    } catch(e) {
-	      return null;
-	    }
-	
-	    length = data.data.length;
-	    
-	    var factor = Math.max(1,Math.round(length/5000));
-	    var result = {};
-	    
-	    while ( (i += 4*factor) < length ) {
-	      if (data.data[i+3]>32) {
-	        key = (data.data[i]>>degrade) + "," + (data.data[i+1]>>degrade) + "," + (data.data[i+2]>>degrade);
-	        if (!result.hasOwnProperty(key)) {
-	          rgb = {r:data.data[i], g:data.data[i+1], b:data.data[i+2],count:1};
-	          rgb.weight = this.callback(rgb.r, rgb.g, rgb.b);
-	          if (rgb.weight<=0) rgb.weight = 1e-10;
-	          result[key]=rgb;
-	        } else {
-	          rgb=result[key];
-	          rgb.count++;
-	        }
-	      }
-	    }
-	    return result;
-	  };
-		  this.getMostProminentRGBImpl = function(pixels, degrade, rgbMatch, colorFactorCallback) {
-	    
-	    var rgb = {r:0,g:0,b:0,count:0,d:degrade},
-	        db={},
-	        pixel,pixelKey,pixelGroupKey,
-	        length,r,g,b,
-	        count = 0;
-	    
-	    
-	    for (pixelKey in pixels) {
-	      pixel = pixels[pixelKey];
-	      totalWeight = pixel.weight * pixel.count;
-	      ++count;
-	      if (this.doesRgbMatch(rgbMatch, pixel.r, pixel.g, pixel.b)) {
-	        pixelGroupKey = (pixel.r>>degrade) + "," + (pixel.g>>degrade) + "," + (pixel.b>>degrade);
-	        if (db.hasOwnProperty(pixelGroupKey))
-	          db[pixelGroupKey]+=totalWeight;
-	        else
-	          db[pixelGroupKey]=totalWeight;
-	      }
-	    }
-	    
-	    for (i in db) {
-	      data = i.split(",");
-	      r = data[0];
-	      g = data[1];
-	      b = data[2];
-	      count = db[i];
-	      
-	      if (count>rgb.count) {
-	        rgb.count = count;
-	        data = i.split(",");
-	        rgb.r = r;
-	        rgb.g = g;
-	        rgb.b = b;
-	      }
-	    }
-	    
-	    return rgb;
-	    
-	  };
-		  this.doesRgbMatch = function(rgb,r,g,b) {
-	    if (rgb==null) return true;
-	    r = r >> rgb.d;
-	    g = g >> rgb.d;
-	    b = b >> rgb.d;
-	    return rgb.r == r && rgb.g == g && rgb.b == b;
-	  }
-			
-			
-		}, // OBS
-		
-		// Makes light base colors (dark theme) ~ STATIC COLORS
-		makeLightColors : function (arrno,h) {
-
-		lightColor[arrno] = [];
-		lightColor[arrno][0] = {};
-		lightColor[arrno][0].HSV = {};
-		lightColor[arrno][0].HSV.h = h; 
-		lightColor[arrno][0].HSV.s = 15; 
-		lightColor[arrno][0].HSV.v = 80;
-		lightColor[arrno][0].HEX = this.convert.HSV2HEX(h, 15, 80);	 
-		lightColor[arrno][0].RGB = {};
-		this.convert.HSV2RGB(lightColor[arrno][0].HSV, lightColor[arrno][0].RGB);
-	
-		lightColor[arrno][1] = {};	
-		lightColor[arrno][1].HSV = {};
-		lightColor[arrno][1].HSV.h = h; 
-		lightColor[arrno][1].HSV.s = 1; 
-		lightColor[arrno][1].HSV.v = 99;
-		lightColor[arrno][1].HEX = this.convert.HSV2HEX(h, 1, 99);	 
-		lightColor[arrno][1].RGB = {};
-		this.convert.HSV2RGB(lightColor[arrno][1].HSV, lightColor[arrno][1].RGB);
-	
-		lightColor[arrno][2] = {};	
-		lightColor[arrno][2].HSV = {};
-		lightColor[arrno][2].HSV.h = h; 
-		lightColor[arrno][2].HSV.s = 30; 
-		lightColor[arrno][2].HSV.v = 25;
-		lightColor[arrno][2].HEX = this.convert.HSV2HEX(h, 30, 25);	 
-		lightColor[arrno][2].RGB = {};
-		this.convert.HSV2RGB(lightColor[arrno][2].HSV, lightColor[arrno][2].RGB);
-		
-	},
-		
-		// Makes dark base colors (light theme) ~ STATIC COLORS
-		makeDarkColors : function (arrno,h) {
-		
-		darkColor[arrno] = [];
-		darkColor[arrno][0] = {};
-		darkColor[arrno][0].HSV = {};
-		darkColor[arrno][0].HSV.h = h; 
-		darkColor[arrno][0].HSV.s = 50; 
-		darkColor[arrno][0].HSV.v = 12;
-		darkColor[arrno][0].HEX = this.convert.HSV2HEX(h, 50, 12);	 
-		darkColor[arrno][0].RGB = {};
-		this.convert.HSV2RGB(darkColor[arrno][0].HSV, darkColor[arrno][0].RGB);
-	
-		darkColor[arrno][1] = {};	
-		darkColor[arrno][1].HSV = {};
-		darkColor[arrno][1].HSV.h = h; 
-		darkColor[arrno][1].HSV.s = 30; 
-		darkColor[arrno][1].HSV.v = 25;
-		darkColor[arrno][1].HEX = this.convert.HSV2HEX(h, 30, 25);	 
-		darkColor[arrno][1].RGB = {};
-		this.convert.HSV2RGB(darkColor[arrno][1].HSV, darkColor[arrno][1].RGB);
-	
-		darkColor[arrno][2] = {};	
-		darkColor[arrno][2].HSV = {};
-		darkColor[arrno][2].HSV.h = h; 
-		darkColor[arrno][2].HSV.s = 15; 
-		darkColor[arrno][2].HSV.v = 70;
-		darkColor[arrno][2].HEX = this.convert.HSV2HEX(h, 15, 70);	 
-		darkColor[arrno][2].RGB = {};
-		this.convert.HSV2RGB(darkColor[arrno][2].HSV, darkColor[arrno][2].RGB);
-				
-	},
-		
-	}	
-	
-	// *****************************************
-	
-	
-	
-	
-	
-	// *****************************************
-		
-	// START COLOR THEME
-	// START COLOR THEME
-	// START COLOR THEME
-
-	// *****************************************
-
-	initBegin();	
-	function initBegin() {
-	
-		initInputFields();
-	
-		// BASIC
-		// Chose between preset color themes
-		
-		// Get some triggers
-		eVars._dark1 = Wu.DomUtil.get('colortheme-dark1');
-		eVars._dark2 = Wu.DomUtil.get('colortheme-dark2');
-		eVars._dark3 = Wu.DomUtil.get('colortheme-dark3');
-		eVars._light1 = Wu.DomUtil.get('colortheme-light1');		
-		
-		
-		eVars._darktheme = Wu.DomUtil.get('darktheme')
-		eVars._lighttheme = Wu.DomUtil.get('lighttheme')
-	
-		// Get the wrappers
-		eVars._color_Inner_wrapper = Wu.DomUtil.get('project-color-theme').parentNode;
-		eVars._color_Outer_wrapper = Wu.DomUtil.get('project-color-theme').parentNode.parentNode;
-		
-		// Get the ADVANCED color theme button
-		eVars._advanced = Wu.DomUtil.get('advanced-theme-selector');	
-	
-	
-		// Set wrapper size...
-	
-		// Bring in the BASIC color theme part
-		eVars._color_Inner_wrapper.style.left = '-310px';
-		
-		// Set the height of the outer wrapper
-		eVars._color_Outer_wrapper.style.height = '182px';		
-	
-	
-		// Clickers
-	
-		// DARK COLOR THEMES
-		eVars._dark1.onclick = function() { 
-		
-			Wu.DomUtil.addClass(eVars._light1, 'colortheme-light1-on')
-			prethemes('one'); 
-			
-		}
-
-		eVars._dark2.onclick = function() {
-		
-			Wu.DomUtil.addClass(eVars._light1, 'colortheme-light1-on')		
-			prethemes('two');
-			
-			}
-			
-		eVars._dark3.onclick = function() {
-		
-			Wu.DomUtil.addClass(eVars._light1, 'colortheme-light1-on')
-			prethemes('three');
-			
-			}
-		
-		
-		
-		
-		// Dark / light color theme togglers
-		eVars._darktheme.onclick = function() {
-			Wu.DomUtil.addClass(this, 'selected');
-			Wu.DomUtil.removeClass(eVars._lighttheme, 'selected');
-			colorTheme.darktheme = true;	
-			prethemes(colorTheme.cTheme);
-		}
-	
-		eVars._lighttheme.onclick = function() {
-			Wu.DomUtil.addClass(this, 'selected');
-			Wu.DomUtil.removeClass(eVars._darktheme, 'selected');
-			colorTheme.darktheme = false;
-			prethemes(colorTheme.cTheme);
-		}	
-		
-		
-		// Go to Advanced
-		eVars._advanced.onclick = function() {
-			advancedColorThemes.init();
-			Wu.DomUtil.removeClass(eVars._light1, 'colortheme-light1-on')			
-		}
-	
-
-	
-	}
-
-	// *****************************************
-
-
-
-
-		
-	// *****************************************
-		
-	// Set up the Array of the css[] Classes 
-	// Set up the Array of the css[] Classes 
-	// Set up the Array of the css[] Classes 
-
-	// *****************************************
-	
-	var	initClassArray = {
-		
-			// Start it all, yo
-			go : function () {
-
-			// If there is no Color Theme, make a blank one
-
-				if ( !colorTheme.css || rezet ) {
-					this.stackClasses(theClassArray);
-					this.makeCSSelements(theClassArray);
-					this.makeCSSel();
-				}
-			
-			
-		},
-				
-			// These are the CSS classes that will get affected
-			stackClasses : function (theClassArray) {
-										
-										
-				// MENU BACKGROUND COLORS
-				// MENU BACKGROUND COLORS
-							
-				theClassArray[0] = ['.ct0', 									
-						'#content',
-						'.item-list.controls-item',
-						'.item-list.layer-item',
-						'.item-list.layers-mapbox-item'
-						];
-
-				theClassArray[1] = ['.ct1',
-						'#selectedTab span',
-						'#editorPanel > .content',
-						'#editor',
-						'#datalibrary-download-dialogue:after',
-						'.fullpage-users'
-						];
-									
-				theClassArray[2] = ['.ct2'];
-
-
-
-				// I DON'T KNOW...
-				// I DON'T KNOW...
-
-				theClassArray[3] = ['.ct3'];
-									
-
-				// LINK COLOR
-				// LINK COLOR
-								
-				// OK
-				theClassArray[4] = ['.ct4','.active a','.editor-wrapper a'];
-									
-									
-
-				// INACTIVE LAYERS
-				// INACTIVE LAYERS
-
-				// OK
-				theClassArray[5] = ['.ct5', '.level-0'];
-					
-				// OK				
-				theClassArray[6] = ['.ct6', '.level-1'];
-
-				// OK
-				theClassArray[7] = ['.ct7', '.level-2'];
-
-
-
-				// ACTIVE LAYERS
-				// ACTIVE LAYERS
-
-				// OK -
-				theClassArray[8] = [ '.ct8', 'layer-active'];
-				
-				// OK
-				theClassArray[9] = ['.ct9'];
-
-
-
-				// OTHER COLORS
-				// OTHER COLORS
-
-
-
-				theClassArray[10] = ['.ct10'];			
-				
-				// color
-				theClassArray[11] = ['.ct11',
-						 '.editor-projects-item:hover', 
-						 '.smap-button-gray', 
-						 '.smap-button-white',
-						 '.item-list.controls-item.active',
-						 '.item-list.layer-item.active',
-						 '.active .layers-mapbox-item',
-						 '.item-list.active', 
-						 '.layer-item.active'
-						 ];
-				
-				theClassArray[12] = ['.ct12'];
-									 
-				theClassArray[13] = ['.ct13',
-						 '.editor-wrapper h3',
-						 '.editor-wrapper h4',
-						 '.editor-inner-wrapper h5'];									
-
-				theClassArray[14] = ['.ct14'];
-				
-				theClassArray[15] = ['.ct15',
-						 '#header'];
-				
-				theClassArray[16] = ['.ct16',
-						 '#header',
-						 '#header input'
-						 ];
-				
-				theClassArray[17] = ['.ct17',
-						 '.editor-project-edit-super-wrap'									 
-						 ];
-	
-				// BG
-				theClassArray[18] = ['.ct18', 
-						 '.smap-button-gray', 
-						 '.smap-button-white', 
-						 ];
-									 
-									
-				// BG
-				theClassArray[19] = ['.ct19',
-						 'tr:nth-child(odd)',
-						 ];
-						 
-
-				theClassArray[20] = ['.ct20',
-						 'tr:nth-child(even)',
-						 '.ccontainer'];
-
-				theClassArray[21] = ['.ct21'];
-									  
-				theClassArray[22] = ['.ct22', '.mat_swatches', '#darness-selector'];
-				
-				// GRAY TEXT
-				theClassArray[23] = [ '.ct23',
-						  '.editor-wrapper h3', 
-						  '.editor-wrapper h4', 
-						  '.documents-folder-item:hover', 
-						  '.editor-map-item-wrap input', 
-						  '.form-control input', 
-						  'th',
-						  '.datalibrary-controls',
-						  '.input-box', '.search'
-						  ];
-
-			
-				// WHITE BG
-				theClassArray[24] = ['.ct24', 
-						  '.editor-map-item-wrap input', 
-						  '.form-control input'
-						  ];
-			
-			
-
-				theClassArray[25] = ['.ct25'];
-				theClassArray[26] = ['.ct26'];
-				theClassArray[27] = ['.ct27'];
-			
-				// Font weight
-				theClassArray[28] = ['.ct28', 
-						 'th', 
-						 '#select-basic-themes',
-						 '#advanced-color-header',
-						 '.editor-inner-wrapper h5',
-						 '.editor-map-item-wrap h4',
-						 '.client-project-title-wrapper h4',
-						 '.editor-projects-item h5',
-						 '.editor-client-title h5',
-						 '#userlist h4',
-						 ];
-						  
-				theClassArray[29] = ['hr'];
-			
-				theClassArray[30] = ['blockquote'];
-			
-				theClassArray[31] = ['.ct31'];
-				
-				// Active List items BG
-				theClassArray[32] = [
-						 '.item-list.controls-item.active',
-						 '.item-list.layer-item.actve',
-						 '.active .layers-mapbox-item',									 
-						 '.item-list.active', 
-						 '.layer-item.active'];	
-
-				// Active List items color
-				theClassArray[33] = [
-						 '.item-list.controls-item.active',
-						 '.item-list.layer-item.active',
-						 '.active .layers-mapbox-item',									 
-						 '.item-list.active', 
-						 '.layer-item.active',									 
-	
-						];
-				
-				theClassArray[34] = ['.search'];
- 
-									 
-			},						
-						
-			makeCSSelements : function (theClassArray) {
-			 
-
-				// Base Colors			
-				this.makeCSSel(0, 'background-color', '');
-				this.makeCSSel(1, 'background-color', '');
-				this.makeCSSel(2, 'background-color', '');	
-			 
-				// I DON'T KNOW...	 
-				this.makeCSSel(3, 'color', '');
-		
-				// Link Color
-				this.makeCSSel(4, 'color', '');
-					 
-				// Inactive Layers			 
-				this.makeCSSel(5, 'background-color', '');	
-				this.makeCSSel(6, 'background-color', '');	
-				this.makeCSSel(7, 'background-color', '');	
-		
-				// Active Layers
-				this.makeCSSel(8, 'background-color', '');	
-				this.makeCSSel(9, 'background-color', '');	
-		
-				// Other Colors
-				this.makeCSSel(10, 'color', '');
-				this.makeCSSel(11, 'color', 'white');
-				this.makeCSSel(12, 'color', 'black');
-				this.makeCSSel(13, 'color', 'white');
-				this.makeCSSel(14, 'background-color', '');
-				this.makeCSSel(15, 'background-color', '');
-				this.makeCSSel(16, 'color', '');
-				this.makeCSSel(17, 'background-color', '');
-				this.makeCSSel(18, 'background-color', '');
-		
-		
-				 // EXTRA CLASSES FOR TOGGELIG BETWEEN LIGHT AND DARK THEMES!!!		
-				this.makeCSSel(19, 'background-color', '');
-				this.makeCSSel(20, 'background-color', '');
-				this.makeCSSel(21, 'border-bottom', '' );
-				this.makeCSSel(22, 'background-color', '' );
-				this.makeCSSel(23, 'color', '' );
-				this.makeCSSel(24, 'background-color', '' );
-				this.makeCSSel(25, 'color', '' );
-				this.makeCSSel(26, 'background', '' );
-				this.makeCSSel(27, 'font-weight', '' );
-				this.makeCSSel(28, 'font-weight', '' );
-				this.makeCSSel(29, 'border-top', '' );
-				this.makeCSSel(30, 'border-left', '' );
-				this.makeCSSel(31, 'background-position', '' );
-
-				this.makeCSSel(32, 'background-color', '' );
-				this.makeCSSel(33, 'color', '' );				
-
-				this.makeCSSel(34, 'background-color', '' );				
-		
-		
-		
-			}, 
-	
-			// Sets up the CSS elements in the Array			
-			makeCSSel : function (va, pre, val) {
-				colorTheme.css[va] = {};
-				colorTheme.css[va].classes = theClassArray[va];
-				colorTheme.css[va].pre = pre;
-				colorTheme.css[va].value = val;					
-			}
-		}		
-		
-	initClassArray.go();
-	
-	// *****************************************
-	
-	
-
-	
-
-	// *****************************************
-	
-	// LOAD THE PREDEFINED COLOR THEMES (BASIC)
-	// LOAD THE PREDEFINED COLOR THEMES (BASIC)
-	// LOAD THE PREDEFINED COLOR THEMES (BASIC)
-	
-	// *****************************************
-	
-	function prethemes(theme) {
-	
-		if ( theme == 'one' ) {
-		colorTheme.cTheme = 'one';
-		if ( colorTheme.darktheme ) {
-		
-			// Base Colors			
-			preval_0 = '#0F1A1E';
-			preval_1 = '#3F4652';
-			preval_2 = '#97ABB2';
-			
-			preval_3 = '#424242';
-	
-			// Link Color
-			preval_4 = 'cyan';
-						
-			// Inactive Layers
-			preval_5 = '#63A3A0';
-			preval_6 = '#CCE2E1';
-			preval_7 = '#EDF4F4';
-	
-			// Active Layers
-			preval_8 = '#B80077';
-			preval_9 = '#F7E1EF';
-			
-			// Other Colors
-			preval_10 = 'white';						// Text color on Side Pane and Layer Selector
-			
-			preval_11 = 'white';						// Text on Active AND Inactive Layers – Level 1
-			preval_12 = '#333';							// Text on ONLY Inactive Layer – Level 2
-			preval_13 = 'white';						// Text color on Main Menu Shade 2 (Plus the white buttons, but that's not right...)
-//			preval_14 = 'rgba(255,255,255,0.7)';		// Background color on Map Boxes
-			preval_15 = 'white';						// Background color on HEADER and Map Box Headers on Map
-			preval_16 = '#333';							// TEXT color on Header and Map Box Headers on Map
-			preval_17 = 'rgba(255, 255, 255, 0.15)';	// Background color Boxes on sidepane (New client box, etc)
-			preval_18 = 'white';						// Bacground color Buttons
-			
-			colorTheme.cThemeDarkBox = true;
-			colorTheme.cThemeDarkHeader = false;
-			colorTheme.cThemeDarkMenu = true;
-
-		} else {
-			
-	
-			var RGB = {}, HSV = {}, base = '#ADC3CC';
-	
-			eCol.convert.HEX2RGB (base, RGB);			
-			eCol.convert.RGB2HSV (RGB, HSV);			
-	
-			var newhex = eCol.convert.HSV2HEX(HSV.h, 3, 98);
-	
-			eCol.convert.HEX2RGB (base, RGB);
-			var rgba_50 = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',0.5)';		
-	
-	
-			// Base Colors
-			preval_0 = base;
-			preval_1 = newhex;
-			preval_2 = 'red';			
-			
-			preval_3 = 'white';
-			
-			// Link
-			preval_4 = '#309EB2';
-			
-			// Inactive Layers
-			preval_5 = '#63A3A0';
-			preval_6 = '#CCE2E1';
-			preval_7 = '#EDF4F4';
-	
-			// Active Layers
-			preval_8 = '#B80077';
-			preval_9 = '#F7E1EF';
-			
-			// Other Colors
-			preval_10 = 'white';				// Text color on Side Pane and Layer Selector
-			
-			preval_11 = 'white';				// Text on Active AND Inactive Layers – Level 1
-			preval_12 = 'white';				// Text on ONLY Inactive Layer – Level 2
-			preval_13 = 'black';				// Text color on Main Menu Shade 2 (Plus the white buttons, but that's not right...)
-//			preval_14 = 'rgba(0,0,0,0.7)';		// Background color on Map Boxes
-			preval_15 = '#333';					// Background color on HEADER and Map Box Headers on Map
-			preval_16 = 'white';				// TEXT color on Header and Map Box Headers on Map
-			preval_17 = rgba_50;				// Background color Boxes on sidepane (New client box, etc)
-			preval_18 = base;					// Bacground color Buttons
-					
-						
-			colorTheme.cThemeDarkBox = false;
-			colorTheme.cThemeDarkHeader = false;
-			colorTheme.cThemeDarkMenu = false;			
-						
-		}
-	}	
-		if ( theme == 'two' ) {
-
-		colorTheme.cTheme = 'two';
-
-		if ( colorTheme.darktheme ) {
-
-			// Base Colors
-			preval_0 = '#0F1A1E';
-			preval_1 = '#2C3A3F';
-			preval_2 = '#A6B7BF';
-	
-			preval_3 = '#424242';
-	
-			// Link
-			preval_4 = '#FF5300';
-		
-	
-			// Inactive Layers
-			preval_5 = '#63A3A0';
-			preval_6 = '#CCE2E1';
-			preval_7 = '#EDF4F4';
-	
-			// Active Layers
-			preval_8 = '#F98752';
-			preval_9 = '#FCF2ED';
-			
-			// Other Colors			
-			preval_10 = 'white';						// Text color on Side Pane and Layer Selector
-			preval_11 = 'white';						// Text on Active AND Inactive Layers – Level 1
-			preval_12 = '#333';							// Text on ONLY Inactive Layer – Level 2
-			preval_13 = 'white';						// Text color on Main Menu Shade 2 (Plus the white buttons, but that's not right...)
-//			preval_14 = 'rgba(255,255,255,0.7)';		// Background color on Map Boxes
-			preval_15 = 'white';						// Background color on HEADER and Map Box Headers on Map
-			preval_16 = '#333';							// TEXT color on Header and Map Box Headers on Map
-			preval_17 = 'rgba(255, 255, 255, 0.15)';	// Background color Boxes on sidepane (New client box, etc)			
-			preval_18 = 'white';						// Bacground color Buttons
-			
-			colorTheme.cThemeDarkBox = true;
-			colorTheme.cThemeDarkHeader = false;
-			colorTheme.cThemeDarkMenu = true;
-
-
-		} else {
-			
-			var RGB = {}, HSV = {}, base = '#CCBFAD';
-	
-			eCol.convert.HEX2RGB (base, RGB);			
-			eCol.convert.RGB2HSV (RGB, HSV);			
-	
-			var newhex = eCol.convert.HSV2HEX(HSV.h, 3, 98);
-	
-			eCol.convert.HEX2RGB (base, RGB);
-			var rgba_50 = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',0.5)';		
-	
-	
-	
-			// Base Color
-			preval_0 = base;
-			preval_1 = newhex;			
-			preval_2 = 'red';
-						
-			preval_3 = 'white';
-	
-			// Link
-			preval_4 = '#2B889E';
-	
-			// Inactive Layers
-			preval_5 = '#63A3A0';
-			preval_6 = '#CCE2E1';
-			preval_7 = '#EDF4F4';
-	
-			// Active Layers
-			preval_8 = '#B80077';
-			preval_9 = '#F7E1EF';
-			
-			// Other Colors
-			preval_10 = 'white';				// Text color on Side Pane and Layer Selector
-			preval_11 = 'white';				// Text on Active AND Inactive Layers – Level 1
-			preval_12 = 'white';				// Text on ONLY Inactive Layer – Level 2
-			preval_13 = 'black';				// Text color on Main Menu Shade 2 (Plus the white buttons, but that's not right...)
-//			preval_14 = 'rgba(0,0,0,0.7)';		// Background color on Map Boxes
-			preval_15 = '#333';					// Background color on HEADER and Map Box Headers on Map
-			preval_16 = 'white';				// TEXT color on Header and Map Box Headers on Map
-			preval_17 = rgba_50;				// Background color Boxes on sidepane (New client box, etc)
-			preval_18 = base;					// Bacground color Buttons
-			
-					
-			colorTheme.cThemeDarkBox = false;
-			colorTheme.cThemeDarkHeader = false;
-			colorTheme.cThemeDarkMenu = false;			
-			
-			
-			
-		}
-	}
-		if ( theme == 'three' ) {
-	
-			colorTheme.cTheme = 'three';
-		
-			if ( colorTheme.darktheme ) {
-					
-				// Base Colors
-				preval_0 = '#0F1A1E';
-				preval_1 = '#333333';
-				preval_2 = '#A6A6A6';
-		
-				preval_3 = '#424242';
-		
-				// Link
-				preval_4 = '#FF00AA';
-		
-				// Inactive Layers
-				preval_5 = '#63A3A0';
-				preval_6 = '#CCE2E1';
-				preval_7 = '#EDF4F4';
-		
-				// Active Layers
-				preval_8 = '#B80077';
-				preval_9 = '#F7E1EF';
-				
-				// Other Colors
-				preval_10 = 'white';						// Text color on Side Pane and Layer Selector
-				preval_11 = 'white';						// Text on Active AND Inactive Layers – Level 1
-				preval_12 = '#333';							// Text on ONLY Inactive Layer – Level 2
-				preval_13 = 'white';						// Text color on Main Menu Shade 2 (Plus the white buttons, but that's not right...)
-	//			preval_14 = 'rgba(255,255,255,0.7)';		// Background color on Map Boxes
-				preval_15 = 'white';						// Background color on HEADER and Map Box Headers on Map
-				preval_16 = '#333';							// TEXT color on Header and Map Box Headers on Map
-				preval_17 = 'rgba(255, 255, 255, 0.15)';	// Background color Boxes on sidepane (New client box, etc)			
-				preval_18 = 'white';						// Bacground color Buttons
-				
-				colorTheme.cThemeDarkBox = true;
-				colorTheme.cThemeDarkHeader = false;
-				colorTheme.cThemeDarkMenu = true;
-	
-	
-			} else {
-				
-				var RGB = {}, HSV = {}, base = '#BCBCBC';
-		
-				eCol.convert.HEX2RGB (base, RGB);			
-				eCol.convert.RGB2HSV (RGB, HSV);			
-		
-				var newhex = eCol.convert.HSV2HEX(HSV.h, 0, 98);
-		
-				eCol.convert.HEX2RGB (base, RGB);
-				var rgba_50 = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',0.5)';
-		
-			
-				// Base Colors
-				preval_0 = base;
-				preval_1 = newhex;
-				preval_2 = 'red';
-		
-				preval_3 = 'white';
-		
-				// Link
-				preval_4 = '#AE2B95';
-		
-				// Inactive Layers
-				preval_5 = '#63A3A0';
-				preval_6 = '#CCE2E1';
-				preval_7 = '#EDF4F4';
-		
-				// Active Layers
-				preval_8 = '#B80077';
-				preval_9 = '#F7E1EF';
-		
-				// Other Colors
-				preval_10 = 'white';				// Text color on Side Pane and Layer Selector
-				
-				preval_11 = 'white';				// Text on Active AND Inactive Layers – Level 1
-				preval_12 = 'white';				// Text on ONLY Inactive Layer – Level 2
-				preval_13 = 'black';				// Text color on Main Menu Shade 2 (Plus the white buttons, but that's not right...)
-	//			preval_14 = 'rgba(0,0,0,0.7)';		// Background color on Map Boxes
-				preval_15 = '#333';					// Background color on HEADER and Map Box Headers on Map
-				preval_16 = 'white';				// TEXT color on Header and Map Box Headers on Map
-				preval_17 = rgba_50;				// Background color Boxes on sidepane (New client box, etc)
-				preval_18 = base;					// Bacground color Buttons
-	
-				colorTheme.cThemeDarkBox = false;
-				colorTheme.cThemeDarkHeader = false;
-				colorTheme.cThemeDarkMenu = false;			
-			}		
-	}
-	
-	
-	
-	
-		colorTheme.css[3].value = preval_3;	
-	
-		// Link
-		colorTheme.css[4].value = preval_4;
-		
-		// Inactive Layers
-		colorTheme.css[5].value = preval_5;	
-		colorTheme.css[6].value = preval_6;	
-		colorTheme.css[7].value = preval_7;	
-		
-		// Active Layers	
-		colorTheme.css[8].value = preval_8;	
-		colorTheme.css[9].value = preval_9;
-	
-	
-		// MENU : LIGHT OR DARK
-		
-		if ( colorTheme.cThemeDarkMenu ) {
-			darkMenu(preval_1);		
-		} else {
-			lightMenu(preval_1);
-		}
-		
-	
-		// BOXES : LIGHT OR DARK
-		
-		if ( colorTheme.cThemeDarkBox ) {
-			colorTheme.css[14].value = 'rgba(0,0,0,0.7)';
-			colorTheme.css[31].value = '-56px 8px';		
-		} else {
-			colorTheme.css[14].value = 'rgba(255, 255, 255, 0.7)';		
-			colorTheme.css[31].value = '';
-		}
-		
-		// HEADERS: LIGHT OR DARK
-		
-		if ( colorTheme.cThemeDarkHeader ) {
-			colorTheme.css[15].value = 'rgba(0,0,0,0.8)';
-			colorTheme.css[16].value = 'white';			
-		} else {
-			colorTheme.css[15].value = 'rgba(255,255,255,0.92)';	
-			colorTheme.css[16].value = '#333';	
-		}
-		
-	
-		// Other Colors
-	
-		colorTheme.css[10].value = preval_10;	// Link on white background
-			
-		eCol.update.CSSstring();
-		jcss.innerHTML = cssstring;
-	
-	}
-	
-	// *****************************************
-		
-	
-	
-	
-	// *****************************************
-	
-	// Advanced Color Theme Mode
-	// Advanced Color Theme Mode
-	// Advanced Color Theme Mode
-
-	// *****************************************
-	
-	var advancedColorThemes = {
-	
-	init : function() {
-
-	
-		// For CSS animating height of container
-		var pheight1 = '342px';
-		var pheight2 = '490px';
-	
-	
-		// Slide in the ADVANCED options
-		eVars._color_Inner_wrapper.style.left = '-580px';		
-		eVars._color_Outer_wrapper.style.height = pheight1;
-		
-		// Basic elements
-		eVars._b2basic = Wu.DomUtil.get('back-to-basic');
-		eVars._yourswatch = Wu.DomUtil.get('yourswatch');	
-		eVars._myCanvas = Wu.DomUtil.get("myCanvas");
-		eVars._pixCanvas = Wu.DomUtil.get("pixCanvas");
-		eVars._canvimg = Wu.DomUtil.get("canvimg");
-				
-		// Edit Color Buttons
-		eVars._coloption1 = Wu.DomUtil.get('coloption1');
-		eVars._coloption2 = Wu.DomUtil.get('coloption2');
-		eVars._coloption3 = Wu.DomUtil.get('coloption3');	
-		eVars._yourcolLink1 = Wu.DomUtil.get('yourcol_link1');
-		eVars._regen = Wu.DomUtil.get('regen');				
-		
-		// Swatch containers
-		eVars._normalSwatches = Wu.DomUtil.get('normal-swatches');
-		eVars._darkSwatches = Wu.DomUtil.get('dark-swatches');
-		eVars._linkSwatches = Wu.DomUtil.get('link-swatches');
-		eVars._colorSuggestions = Wu.DomUtil.get('color-suggestions');		
-		
-		// Toggle buttons
-		eVars._hsvToggle = Wu.DomUtil.get('hsv-toggle');
-		eVars._rgbToggle = Wu.DomUtil.get('rgb-toggle'); 					
-		eVars._paletteToggle = Wu.DomUtil.get('palette-toggle');
-		eVars._sliderToggle = Wu.DomUtil.get('slider-toggle'); 	
-		eVars._imageToggle = Wu.DomUtil.get('image-toggle'); 			
-		
-		// Dark/light tickers
-		eVars._tickMenuLight = Wu.DomUtil.get('tick-menu-light');
-		eVars._tickMenuDark = Wu.DomUtil.get('tick-menu-dark');		
-
-		eVars._tickHeaderLight = Wu.DomUtil.get('tick-header-light');
-		eVars._tickHeaderDark = Wu.DomUtil.get('tick-header-dark');		
-
-		eVars._tickMboxLight = Wu.DomUtil.get('tick-mbox-light');
-		eVars._tickMboxDark = Wu.DomUtil.get('tick-mbox-dark');	
-		
-		// Dark Color Swatches
-		eVars._dark_swatch_0 = Wu.DomUtil.get('dark_swatch_0');		
-		eVars._dark_swatch_1 = Wu.DomUtil.get('dark_swatch_1');		
-		eVars._dark_swatch_2 = Wu.DomUtil.get('dark_swatch_2');		
-		eVars._dark_swatch_3 = Wu.DomUtil.get('dark_swatch_3');		
-		eVars._dark_swatch_4 = Wu.DomUtil.get('dark_swatch_4');		
-		eVars._dark_swatch_5 = Wu.DomUtil.get('dark_swatch_5');
-		
-		eVars._dark_swatch_0.onclick = function() { passcolor('dark',0); }
-		eVars._dark_swatch_1.onclick = function() { passcolor('dark',1); }
-		eVars._dark_swatch_2.onclick = function() { passcolor('dark',2); }
-		eVars._dark_swatch_3.onclick = function() { passcolor('dark',3); }
-		eVars._dark_swatch_4.onclick = function() { passcolor('dark',4); }
-		eVars._dark_swatch_5.onclick = function() { passcolor('dark',5); }
-		
-
-		// Light Color Swatches
-		eVars._light_swatch_0 = Wu.DomUtil.get('light_swatch_0');		
-		eVars._light_swatch_1 = Wu.DomUtil.get('light_swatch_1');		
-		eVars._light_swatch_2 = Wu.DomUtil.get('light_swatch_2');		
-		eVars._light_swatch_3 = Wu.DomUtil.get('light_swatch_3');		
-		eVars._light_swatch_4 = Wu.DomUtil.get('light_swatch_4');		
-		eVars._light_swatch_5 = Wu.DomUtil.get('light_swatch_5');		
-		
-		eVars._light_swatch_0.onclick = function() { passcolor('light',0); }		
-		eVars._light_swatch_1.onclick = function() { passcolor('light',1); }		
-		eVars._light_swatch_2.onclick = function() { passcolor('light',2); }		
-		eVars._light_swatch_3.onclick = function() { passcolor('light',3); }		
-		eVars._light_swatch_4.onclick = function() { passcolor('light',4); }		
-		eVars._light_swatch_5.onclick = function() { passcolor('light',5); }		
-		
-		
-		// Complimetary Color Swatches
-		eVars._complimentary_swatch_0 = Wu.DomUtil.get('complimentary_swatch_0');		
-		eVars._complimentary_swatch_1 = Wu.DomUtil.get('complimentary_swatch_1');		
-		eVars._complimentary_swatch_2 = Wu.DomUtil.get('complimentary_swatch_2');		
-		eVars._complimentary_swatch_3 = Wu.DomUtil.get('complimentary_swatch_3');		
-
-		eVars._complimentary_swatch_0.onclick = function() { passcolor('complimentary',0); }		
-		eVars._complimentary_swatch_1.onclick = function() { passcolor('complimentary',1); }		
-		eVars._complimentary_swatch_2.onclick = function() { passcolor('complimentary',2); }		
-		eVars._complimentary_swatch_3.onclick = function() { passcolor('complimentary',3); }		
-
-
-		// Matching Color Swatches
-		eVars._matching_swatch_0 = Wu.DomUtil.get('matching_swatch_0');		
-		eVars._matching_swatch_1 = Wu.DomUtil.get('matching_swatch_1');		
-		eVars._matching_swatch_2 = Wu.DomUtil.get('matching_swatch_2');		
-		eVars._matching_swatch_3 = Wu.DomUtil.get('matching_swatch_3');		
-		eVars._matching_swatch_4 = Wu.DomUtil.get('matching_swatch_4');	
-		
-		eVars._matching_swatch_0.onclick = function() { passcolor('matching',0); }		
-		eVars._matching_swatch_1.onclick = function() { passcolor('matching',1); }		
-		eVars._matching_swatch_2.onclick = function() { passcolor('matching',2); }		
-		eVars._matching_swatch_3.onclick = function() { passcolor('matching',3); }		
-		eVars._matching_swatch_4.onclick = function() { passcolor('matching',4); }		
-			
-
-		// Bright Color Swatches
-		eVars._bright_swatch_0 = Wu.DomUtil.get('bright_swatch_0');		
-		eVars._bright_swatch_1 = Wu.DomUtil.get('bright_swatch_1');		
-		eVars._bright_swatch_2 = Wu.DomUtil.get('bright_swatch_2');		
-		eVars._bright_swatch_3 = Wu.DomUtil.get('bright_swatch_3');		
-		eVars._bright_swatch_4 = Wu.DomUtil.get('bright_swatch_4');		
-		eVars._bright_swatch_5 = Wu.DomUtil.get('bright_swatch_5');		
-		eVars._bright_swatch_6 = Wu.DomUtil.get('bright_swatch_6');		
-		eVars._bright_swatch_7 = Wu.DomUtil.get('bright_swatch_7');		
-		eVars._bright_swatch_8 = Wu.DomUtil.get('bright_swatch_8');		
-		eVars._bright_swatch_9 = Wu.DomUtil.get('bright_swatch_9');		
-		eVars._bright_swatch_10 = Wu.DomUtil.get('bright_swatch_10');		
-		
-		eVars._bright_swatch_0.onclick = function() { passcolor('bright',0); }				
-		eVars._bright_swatch_1.onclick = function() { passcolor('bright',1); }				
-		eVars._bright_swatch_2.onclick = function() { passcolor('bright',2); }				
-		eVars._bright_swatch_3.onclick = function() { passcolor('bright',3); }				
-		eVars._bright_swatch_4.onclick = function() { passcolor('bright',4); }				
-		eVars._bright_swatch_5.onclick = function() { passcolor('bright',5); }				
-		eVars._bright_swatch_6.onclick = function() { passcolor('bright',6); }				
-		eVars._bright_swatch_7.onclick = function() { passcolor('bright',7); }				
-		eVars._bright_swatch_8.onclick = function() { passcolor('bright',8); }				
-		eVars._bright_swatch_9.onclick = function() { passcolor('bright',9); }				
-		eVars._bright_swatch_10.onclick = function() { passcolor('bright',10); }
-		
-		
-		
-		
-		
-		
-		// SET RIGHT TOGGLE STATES...
-		
-		if ( colorTheme.cThemeDarkMenu ) {
-			Wu.DomUtil.addClass(eVars._tickMenuDark, 'active-toggle');
-			Wu.DomUtil.removeClass(eVars._tickMenuLight, 'active-toggle');
-		} else {
-			Wu.DomUtil.removeClass(eVars._tickMenuDark, 'active-toggle');
-			Wu.DomUtil.addClass(eVars._tickMenuLight, 'active-toggle');
-		}
-		
-		if ( colorTheme.cThemeDarkBox ) {
-			Wu.DomUtil.addClass(eVars._tickMboxDark, 'active-toggle');
-			Wu.DomUtil.removeClass(eVars._tickMboxLight, 'active-toggle');
-		} else {
-			Wu.DomUtil.removeClass(eVars._tickMboxDark, 'active-toggle');
-			Wu.DomUtil.addClass(eVars._tickMboxLight, 'active-toggle');
-		}
-
-		if ( colorTheme.cThemeDarkHeader ) {
-			Wu.DomUtil.addClass(eVars._tickHeaderDark, 'active-toggle');
-			Wu.DomUtil.removeClass(eVars._tickHeaderLight, 'active-toggle');
-		} else {
-			Wu.DomUtil.removeClass(eVars._tickHeaderDark, 'active-toggle');
-			Wu.DomUtil.addClass(eVars._tickHeaderLight, 'active-toggle');
-		}
-		
-			
-		
-		
-		
-						
-		// Set background color of MAIN swatch
-		eVars._yourswatch.style.backgroundColor = basecolor;	
-		
-		// Back to BASIC mode
-		eVars._b2basic.onclick = function() {
-		
-			// Reset
-			if ( changingColors == 1 ) eVars._coloption1.click();		
-			if ( changingColors == 2 ) eVars._coloption2.click();
-			if ( changingColors == 3 ) eVars._coloption3.click();
-			if ( changingColors == 4 ) eVars._yourcolLink1.click();
-			if ( changingColors == 'all' ) eVars._regen.click();
-
-			eVars._color_Inner_wrapper.style.left = '-310px';
-			eVars._color_Outer_wrapper.style.height = '182px';				
-		
-		}
-	
-		// INIT SLIDERS				
-		this.initSliders();
-	
-		// Find the right image to use for the color picker...
-		// OBS! Image must be stored locally (same url as server) for it to work...
-		var uggid = Wu.DomUtil.get('project-color-theme').parentNode.getAttribute('uuid');
-		var ulist =	Wu.DomUtil.get('editor-projects-container');
-			ulist = ulist.getElementsByTagName('div');
-
-		// Color picker
-		eCol.cPicker.img2canvas();
-			
-		// INIT CHANGING COLORS
-		this.initComplimentaryColors();
-		this.initMatchingColors();
-		
-		// INIT STATIC COLORS
-		this.initDarkColors();
-		this.initLightColors();
-		this.initBrightColors();	
-	
-		updateTempSwatches();
-	
-	
-		// Load default color theme if there ain't nothin there...
-		if ( !colorTheme.css || rezet ) prethemes('one');
-	
-	
-		
-		// TRIGGERS / CLICKS 
-
-
-		// 1 ~ Background color
-		eVars._coloption1.onclick = function() {
-			
-			
-				haschanged = true;
-		
-				// If we are already editing this color
-				if ( changingColors == 1 ) {
-				
-					eVars._color_Outer_wrapper.style.height = pheight1;
-								
-					// Disable editing state									
-					changingColors = false;
-					
-					// Remove red box around this element				
-					Wu.DomUtil.removeClass(this, 'changing');
-					
-					// Set back to default swatches								
-					Wu.DomUtil.removeClass(eVars._normalSwatches, 'die');
-					Wu.DomUtil.addClass(eVars._darkSwatches, 'die');
-					Wu.DomUtil.addClass(eVars._linkSwatches, 'die');					
-	
-					// Close the swatch selector												
-					Wu.DomUtil.addClass(eVars._colorSuggestions, 'collapsed-color-suggestions');
-									
-									
-				} else {
-				
-					eVars._color_Outer_wrapper.style.height = pheight2;			
-				
-					// Set edit state			
-					changingColors = 1;
-					
-					// Put red box around this element		
-					Wu.DomUtil.addClass(this, 'changing');							
-	
-					// What swatches to show
-					Wu.DomUtil.removeClass(eVars._darkSwatches, 'die');
-					Wu.DomUtil.addClass(eVars._linkSwatches, 'die');
-					Wu.DomUtil.addClass(eVars._normalSwatches, 'die');
-	
-					// Remove red frame from other elements
-					Wu.DomUtil.removeClass(eVars._coloption2, 'changing');																
-					Wu.DomUtil.removeClass(eVars._coloption3, 'changing');																
-					Wu.DomUtil.removeClass(eVars._yourcolLink1, 'changing');																
-//					Wu.DomUtil.removeClass(eVars._yourcolLink2, 'changing');																
-					Wu.DomUtil.removeClass(eVars._regen, 'changing');										
-					
-					
-					// Update the Alfra Omega swatch
-					eVars._yourswatch.style.backgroundColor = colorTheme.css[0].value;
-					
-					// Set the HEX value in the input field
-					eVars._hexColor.value = colorTheme.css[0].value;				
-					
-					// Open the swatch selector
-					Wu.DomUtil.removeClass(eVars._colorSuggestions, 'collapsed-color-suggestions');
-
-					// Bring back the Palette Toggle Button
-					eVars._paletteToggle.removeAttribute('style');
-
-					// Update Value					
-					eCol.update.HEX(eVars._hexColor.value);				
-					eCol.update.inputFields('HEX');
-	
-				}
-			}
-	
-		// 2 ~ The menu color
-		eVars._coloption2.onclick = function() {
-	
-	
-				haschanged = true;
-	
-				// If we are already editing this color
-				if ( changingColors == 2 ) {
-	
-					eVars._color_Outer_wrapper.style.height = pheight1;
-								
-					// Disable editing state						
-					changingColors = false;
-					
-					// Remove red box around this element
-					Wu.DomUtil.removeClass(this, 'changing');								
-					
-					// Close the swatch selector								
-					Wu.DomUtil.addClass(eVars._colorSuggestions, 'collapsed-color-suggestions');
-									
-				} else {
-				
-					eVars._color_Outer_wrapper.style.height = pheight2;
-				
-					// Set edit state			
-					changingColors = 2;
-					
-					// Put red box around this element
-					Wu.DomUtil.addClass(this, 'changing');								
-						
-					// What swatches to show
-					Wu.DomUtil.removeClass(eVars._normalSwatches, 'die');	
-					Wu.DomUtil.addClass(eVars._linkSwatches, 'die');	
-					Wu.DomUtil.addClass(eVars._darkSwatches, 'die');	
-					
-	
-					// Remove red frame from other elements					
-					Wu.DomUtil.removeClass(eVars._coloption1, 'changing');															
-					Wu.DomUtil.removeClass(eVars._coloption3, 'changing');															
-					Wu.DomUtil.removeClass(eVars._yourcolLink1, 'changing');															
-//					Wu.DomUtil.removeClass(eVars._yourcolLink2, 'changing');															
-					Wu.DomUtil.removeClass(eVars._regen, 'changing');															
-					
-					// Update the Alfra Omega swatch
-					eVars._yourswatch.style.backgroundColor = colorTheme.css[5].value;
-	
-					// Set the HEX value in the input field
-					eVars._hexColor.value = colorTheme.css[5].value;		
-									
-					// Open the swatch selector
-					Wu.DomUtil.removeClass(eVars._colorSuggestions, 'collapsed-color-suggestions');
-					
-					eCol.update.HEX(eVars._hexColor.value);
-
-					eCol.update.inputFields('HEX');
-					
-					
-					// Bring back the Palette Toggle Button
-					eVars._paletteToggle.removeAttribute('style');
-					
-					
-				}
-			}
-
-		// 3 ~ Selected / active colors
-		eVars._coloption3.onclick = function() {
-	
-				haschanged = true;
-	
-				// If we are already editing this color
-				if ( changingColors == 3 ) {
-				
-					eVars._color_Outer_wrapper.style.height = pheight1;			
-				
-					// Disable editing state			
-					changingColors = false;
-					
-					// Remove red box around this element
-					Wu.DomUtil.removeClass(this, 'changing');
-					
-					// Close the swatch selector				
-					Wu.DomUtil.addClass(eVars._colorSuggestions, 'collapsed-color-suggestions');
-					
-				} else {
-				
-					eVars._color_Outer_wrapper.style.height = pheight2;
-								
-					// Set edit state			
-					changingColors = 3;
-					
-					// Put red box around this element
-					Wu.DomUtil.addClass(this, 'changing');
-	
-					// What swatches to show
-					Wu.DomUtil.removeClass(eVars._normalSwatches, 'die');
-					Wu.DomUtil.addClass(eVars._linkSwatches, 'die');
-					Wu.DomUtil.addClass(eVars._darkSwatches, 'die');
-
-					// Remove red frame from other elements
-					Wu.DomUtil.removeClass(eVars._coloption1, 'changing');					
-					Wu.DomUtil.removeClass(eVars._coloption2, 'changing');					
-					Wu.DomUtil.removeClass(eVars._yourcolLink1, 'changing');					
-//					Wu.DomUtil.removeClass(eVars._yourcolLink2, 'changing');					
-					Wu.DomUtil.removeClass(eVars._regen, 'changing');		
-	
-					// Update the Alfra Omega swatch				
-					eVars._yourswatch.style.backgroundColor = colorTheme.css[8].value;
-	
-					// Set the HEX value in the input field
-					eVars._hexColor.value = colorTheme.css[8].value;
-												
-					// Open the swatch selector				
-					Wu.DomUtil.removeClass(eVars._colorSuggestions, 'collapsed-color-suggestions');
-	
-					eCol.update.HEX(eVars._hexColor.value);
-
-					eCol.update.inputFields('HEX');
-					
-					
-					// Bring back the Palette Toggle Button
-					eVars._paletteToggle.removeAttribute('style');
-
-					
-				}
-			}
-			
-		// 4 ~ Link color
-		eVars._yourcolLink1.onclick = function() {
-			
-				haschanged = true;
-			
-				// If we are already editing this color
-				if ( changingColors == 4 ) {
-			
-					eVars._color_Outer_wrapper.style.height = pheight1;
-							
-					// Disable editing state
-					changingColors = false;
-					
-					// Remove red box around this element
-					Wu.DomUtil.removeClass(this, 'changing');					
-
-					
-					// Set back to default swatches
-					Wu.DomUtil.addClass(eVars._linkSwatches, 'die');					
-					Wu.DomUtil.addClass(eVars._darkSwatches, 'die');					
-					Wu.DomUtil.removeClass(eVars._normalSwatches, 'die');					
-
-	
-					// Close the swatch selector
-					Wu.DomUtil.addClass(eVars._colorSuggestions, 'collapsed-color-suggestions');					
-	
-	
-				} else {
-						
-					eVars._color_Outer_wrapper.style.height = pheight2;
-										
-					// Set edit state
-					changingColors = 4;
-					
-					// Put red box around this element
-					Wu.DomUtil.addClass(this, 'changing');					
-
-			
-					// What swatches to show
-					Wu.DomUtil.removeClass(eVars._linkSwatches, 'die');					
-					Wu.DomUtil.addClass(eVars._darkSwatches, 'die');					
-					Wu.DomUtil.addClass(eVars._normalSwatches, 'die');					
-					
-					// Remove red frame from other elements
-					Wu.DomUtil.removeClass(eVars._coloption1, 'changing');
-					Wu.DomUtil.removeClass(eVars._coloption2, 'changing');
-					Wu.DomUtil.removeClass(eVars._coloption3, 'changing');
-//					Wu.DomUtil.removeClass(eVars._yourcolLink2, 'changing');
-					Wu.DomUtil.removeClass(eVars._regen, 'changing');									
-					
-					// Update the Alfra Omega swatch
-					eVars._yourswatch.style.backgroundColor = colorTheme.css[4].value;
-	
-					// Set the HEX value in the input field
-					eVars._hexColor.value = colorTheme.css[4].value;
-					
-					// Open the swatch selector
-					Wu.DomUtil.removeClass(eVars._colorSuggestions, 'collapsed-color-suggestions');					
-					
-					eCol.update.HEX(eVars._hexColor.value);
-					eCol.update.inputFields('HEX');				
-					
-					
-					// Bring back the Palette Toggle Button
-					eVars._paletteToggle.removeAttribute('style');
-									
-
-				}
-			}
-	
-		// all ~ Change Complimentary & Matching Colors
-		eVars._regen.onclick = function() {
-			
-			
-				// If we are already editing this color
-				if ( changingColors == 'all' ) {
-				
-					eVars._color_Outer_wrapper.style.height = pheight1;			
-			
-					// Disable editing state
-					changingColors = false;
-					
-					// Remove red box around this element
-					Wu.DomUtil.removeClass(this, 'changing');
-
-					// Set back to default swatches
-					Wu.DomUtil.removeClass(eVars._normalSwatches, 'die');					
-					Wu.DomUtil.addClass(eVars._linkSwatches, 'die');
-					Wu.DomUtil.addClass(eVars._darkSwatches, 'die');					
-																	
-					// Bring back the Palette Toggle Button
-					eVars._paletteToggle.removeAttribute('style');
-					
-					// Close the swatch selector
-					Wu.DomUtil.addClass(eVars._colorSuggestions, 'collapsed-color-suggestions');
-
-				} else {
-	
-					eVars._color_Outer_wrapper.style.height = pheight2;			
-						
-					// Set edit state
-					changingColors = 'all';
-					
-					// Put red box around this element
-					Wu.DomUtil.addClass(this, 'changing');
-	
-					// What swatches to show
-					Wu.DomUtil.removeClass(eVars._normalSwatches, 'die');										
-					Wu.DomUtil.addClass(eVars._linkSwatches, 'die');					
-					Wu.DomUtil.addClass(eVars._darkSwatches, 'die');					
-											
-					// Remove red frame from other elements
-					Wu.DomUtil.removeClass(eVars._coloption1, 'changing');
-					Wu.DomUtil.removeClass(eVars._coloption2, 'changing');
-					Wu.DomUtil.removeClass(eVars._coloption3, 'changing');
-					Wu.DomUtil.removeClass(eVars._yourcolLink1, 'changing');
-
-					// Update the Alfra Omega swatch
-					eVars._yourswatch.style.backgroundColor = complimentaryColor[0][0].HEX;
-
-					// Set the HEX value in the input field
-					eVars._hexColor.value = complimentaryColor[0][0].HEX;
-	
-					// Open the swatch selector
-					Wu.DomUtil.removeClass(eVars._colorSuggestions, 'collapsed-color-suggestions');
-
-					// Snap out of Palette Mode
-					eVars._sliderToggle.click();
-					eVars._paletteToggle.setAttribute('style', 'opacity: 0.2; cursor: normal');
-	
-					eCol.update.HEX(eVars._hexColor.value);
-					eCol.update.inputFields('HEX');					
-					
-				}
-
-
-			
-		}
-	
-		// Toggle between RGB and HSV slider mode, yo			
-		eVars._hsvToggle.onclick = function() {		
-				var togclass = this.className;		
-				if ( togclass == 'active-toggle' ) {
-					this.className = '';
-					eVars._rgbToggle.className = 'active-toggle';				
-					Wu.DomUtil.get('rgb-slider-container').className = '';
-					Wu.DomUtil.get('hsv-slider-container').className = 'die';	
-				} else {
-					this.className = 'active-toggle';
-					eVars._rgbToggle.className = '';
-					Wu.DomUtil.get('rgb-slider-container').className = 'die';
-					Wu.DomUtil.get('hsv-slider-container').className = '';	
-				}
-			}
-		eVars._rgbToggle.onclick = function() {
-				var togclass = this.className;			
-				if ( togclass == 'active-toggle' ) {
-					this.className = '';
-					eVars._hsvToggle.className = 'active-toggle';				
-					Wu.DomUtil.get('rgb-slider-container').className = 'die';
-					Wu.DomUtil.get('hsv-slider-container').className = '';	
-				} else {
-					this.className = 'active-toggle';
-					eVars._hsvToggle.className = '';			
-					Wu.DomUtil.get('rgb-slider-container').className = '';
-					Wu.DomUtil.get('hsv-slider-container').className = 'die';	
-				}
-			}
-
-		// Toggle between Swatch sample, sliders, and image sampler
-		eVars._paletteToggle.onclick = function() {		
-
-			if ( changingColors != 'all' ) {
-
-				Wu.DomUtil.addClass(this, 'active-toggle');
-				Wu.DomUtil.removeClass(eVars._sliderToggle, 'active-toggle');			
-				Wu.DomUtil.removeClass(eVars._imageToggle, 'active-toggle');			
-	
-				Wu.DomUtil.get('s-watches').style.display = 'block';
-	
-				Wu.DomUtil.get('sliders').style.display = 'none';
-				Wu.DomUtil.get('canvascontainer').style.display = 'none';		
-				
-			}
-
-		}
-		eVars._sliderToggle.onclick = function() {
-
-			Wu.DomUtil.addClass(this, 'active-toggle');
-			Wu.DomUtil.removeClass(eVars._paletteToggle, 'active-toggle');			
-			Wu.DomUtil.removeClass(eVars._imageToggle, 'active-toggle');						
-
-			Wu.DomUtil.get('sliders').style.display = 'block';
-			
-			Wu.DomUtil.get('s-watches').style.display = 'none';
-			Wu.DomUtil.get('canvascontainer').style.display = 'none';
-
-
-		}
-		eVars._imageToggle.onclick = function() {
-
-			Wu.DomUtil.addClass(this, 'active-toggle');
-			Wu.DomUtil.removeClass(eVars._paletteToggle, 'active-toggle');	
-			Wu.DomUtil.removeClass(eVars._sliderToggle, 'active-toggle');							
-
-
-			Wu.DomUtil.get('canvascontainer').style.display = 'block';
-			Wu.DomUtil.get('sliders').style.display = 'none';
-			Wu.DomUtil.get('s-watches').style.display = 'none';
-
-
-		}
-
-		// Toggle DARK / LIGHT values
-		// cxxxxx
-
-		// MENU TOGGLER
-		eVars._tickMenuLight.onclick = function() {
-
-			colorTheme.cThemeDarkMenu = false;
-			updateMenuLightDarkToggleButtons();
-			
-			var tempHEX = colorTheme.css[0].value;
-			lightMenu(tempHEX);
-
-			eCol.update.CSSstring();
-			jcss.innerHTML = cssstring;
-			
-		}
-		
-		eVars._tickMenuDark.onclick = function() {
-	
-			colorTheme.cThemeDarkMenu = true;	
-			updateMenuLightDarkToggleButtons();
-	
-			var tempHEX = colorTheme.css[0].value;
-			
-			darkMenu(tempHEX);
-
-			eCol.update.CSSstring();
-			jcss.innerHTML = cssstring;			
-
-		}	
-		
-		
-		
-		
-		
-		// HEADER TOGGLER
-		eVars._tickHeaderLight.onclick = function() {
-
-			Wu.DomUtil.addClass(this, 'active-toggle');
-			Wu.DomUtil.removeClass(eVars._tickHeaderDark, 'active-toggle');			
-
-			colorTheme.css[15].value = 'rgba(255,255,255,0.92)';	
-			colorTheme.css[16].value = '#333';	
-
-			eCol.update.CSSstring();
-			jcss.innerHTML = cssstring;
-			
-		}
-		eVars._tickHeaderDark.onclick = function() {
-	
-			Wu.DomUtil.addClass(this, 'active-toggle');
-			Wu.DomUtil.removeClass(eVars._tickHeaderLight, 'active-toggle');			
-		
-			colorTheme.css[15].value = 'rgba(0,0,0,0.8)';
-			colorTheme.css[16].value = 'white';			
-			
-			eCol.update.CSSstring();
-			jcss.innerHTML = cssstring;			
-
-		}	
-		
-		// MAP BOXES TOGGLER
-		eVars._tickMboxLight.onclick = function() {
-
-			Wu.DomUtil.addClass(this, 'active-toggle');
-			Wu.DomUtil.removeClass(eVars._tickMboxDark, 'active-toggle');			
-
-			colorTheme.css[14].value = 'rgba(255, 255, 255, 0.7)';
-
-			eCol.update.CSSstring();
-			jcss.innerHTML = cssstring;
-			
-		}
-		eVars._tickMboxDark.onclick = function() {
-	
-			Wu.DomUtil.addClass(this, 'active-toggle');
-			Wu.DomUtil.removeClass(eVars._tickMboxLight, 'active-toggle');			
-	
-			colorTheme.css[14].value = 'rgba(0,0,0,0.7)';
-			
-			eCol.update.CSSstring();
-			jcss.innerHTML = cssstring;			
-
-		}					
-			
-	
-	
-		// If no color theme has been loaded, run the default one
-		if ( cssstring == '' || !cssstring ) prethemes('dark1');
-		
-	},
-	
-	initSliders : function() {
-
-		// Update slider 1 - H
-		eCol.sliders.rangeSlider('range-slider-1', 360, function(value) {
-	
-		    eVars._hChannel.value = value;
-	
-		    var HSV = new eCol.HSVobject(0,0,0);
-		    HSV = {'h': eVars._hChannel.value, 's': eVars._sChannel.value, 'v': eVars._vChannel.value };
-	
-		    // Update the input fields
-		    eCol.update.HSV(HSV);
-		    
-		    // Update the MAIN swatch
-		    eVars._yourswatch.style.backgroundColor = eVars._hexColor.value;
-		    		    
-		    // Update the swatch we have SELECTED
-		    eCol.update.customColors();
-		    
-	
-		});
-	
-		// Update slider 2 - S
-		eCol.sliders.rangeSlider('range-slider-2', 100, function(value) {
-	
-		    eVars._sChannel.value = value;
-	
-		    var HSV = new eCol.HSVobject(0,0,0);
-		    HSV = {'h': eVars._hChannel.value, 's': eVars._sChannel.value, 'v': eVars._vChannel.value };
-	
-		    // Update the input fields
-		    eCol.update.HSV(HSV);
-		    
-		    // Update the MAIN swatch
-		    eVars._yourswatch.style.backgroundColor = eVars._hexColor.value;	    
-	
-		    // Update the swatch we have SELECTED
-		    eCol.update.customColors();
-		});
-	
-		// Update slider 3 - V
-		eCol.sliders.rangeSlider('range-slider-3', 100, function(value) {
-	
-		    eVars._vChannel.value = value;
-	
-		    var HSV = new eCol.HSVobject(0,0,0);
-		    HSV = {'h': eVars._hChannel.value, 's': eVars._sChannel.value, 'v': eVars._vChannel.value };
-	
-		    // Update the input fields
-		    eCol.update.HSV(HSV);
-		    
-		    // Update the MAIN swatch
-		    eVars._yourswatch.style.backgroundColor = eVars._hexColor.value;	    
-	
-		    // Update the swatch we have SELECTED
-		    eCol.update.customColors();
-		});
-	
-		// Update slider R
-		eCol.sliders.rangeSlider('range-slider-r', 255, function(value) {
-	
-		    eVars._rChannel.value = value;
-	
-	
-		    var RGB = new eCol.RGBobject(0,0,0);
-		    RGB = {'r': eVars._rChannel.value, 'g': eVars._gChannel.value, 'b': eVars._bChannel.value };
-	
-	
-		    // Update the input fields
-		    eCol.update.RGB(RGB);
-	
-		    // Update the MAIN swatch
-		    eVars._yourswatch.style.backgroundColor = eVars._hexColor.value;	    
-	
-		    // Update the swatch we have SELECTED
-		    eCol.update.customColors();
-		});
-	
-		// Update slider G
-		eCol.sliders.rangeSlider('range-slider-g', 255, function(value) {
-	
-		    eVars._gChannel.value = value;
-	
-		    var RGB = new eCol.RGBobject(0,0,0);
-		    RGB = {'r': eVars._rChannel.value, 'g': eVars._gChannel.value, 'b': eVars._bChannel.value };
-	
-		    // Update the input fields
-		    eCol.update.RGB(RGB);
-	
-		    // Update the MAIN swatch
-		    eVars._yourswatch.style.backgroundColor = eVars._hexColor.value;	    
-	
-		    // Update the swatch we have SELECTED
-		    eCol.update.customColors();
-		});
-	
-		// Update slider B
-		eCol.sliders.rangeSlider('range-slider-b', 255, function(value) {
-	
-		    eVars._bChannel.value = value;
-	
-		    var RGB = new eCol.RGBobject(0,0,0);
-		    RGB = {'r': eVars._rChannel.value, 'g': eVars._gChannel.value, 'b': eVars._bChannel.value };
-	
-		    // Update the input fields
-		    eCol.update.RGB(RGB);
-	
-		    // Update the MAIN swatch
-		    eVars._yourswatch.style.backgroundColor = eVars._hexColor.value;	    
-	
-		    // Update the swatch we have SELECTED
-		    eCol.update.customColors();
-		});			
-	},
-	
-	initComplimentaryColors : function() {
-		
-		var _hex = colorTheme.css[5].value;		
-			
-		eCol.update.HEX(_hex);
-	
-		// Make 4 complimentary colors
-		eCol.update.makeComplimentary(_hex);
-		
-	},
-	initMatchingColors : function() {
-
-//		var _hex = eVars._hexColor.value;
-		var _hex = colorTheme.css[5].value;	
-			
-		HSV = new Object();
-		RGB = new Object();
-	
-		eCol.convert.HEX2RGB(_hex, RGB);
-		eCol.convert.RGB2HSV(RGB, HSV);
-		
-		// Finds matching colors
-		eCol.cMatch.domatch(HSV);
-		
-		
-		// Update the MATCHING colors in cArray
-		
-		// Match Color 1 GRADER
-		eCol.update.colorGrade(matchingColor, 0, matchingColor[0][0].HSV);
-	
-		// Match Color 2 GRADER
-		eCol.update.colorGrade(matchingColor, 1, matchingColor[1][0].HSV);
-			
-		// Match Color 3 GRADER
-		eCol.update.colorGrade(matchingColor, 2, matchingColor[2][0].HSV);
-				
-		// Match Color 4 GRADER	
-		eCol.update.colorGrade(matchingColor, 3, matchingColor[3][0].HSV);
-			
-		// Match Color 5 GRADER
-		eCol.update.colorGrade(matchingColor, 4, matchingColor[4][0].HSV);
-		
-	},
-	initDarkColors : function() {
-		
-		// These are all STATIC COLORS
-		eCol.makeDarkColors(0,215);
-		eCol.makeDarkColors(1,196);
-		eCol.makeDarkColors(2,319);
-		eCol.makeDarkColors(3,354);
-		eCol.makeDarkColors(4,22);
-		
-			
-		// Make a neutral dark color!
-		darkColor[5] = [];
-		darkColor[5][0] = {};
-		darkColor[5][0].HSV = {};
-		darkColor[5][0].HSV.h = 100; 
-		darkColor[5][0].HSV.s = 0; 
-		darkColor[5][0].HSV.v = 10;
-		darkColor[5][0].HEX = eCol.convert.HSV2HEX(100, 0, 10);	 
-		darkColor[5][0].RGB = {};
-		eCol.convert.HSV2RGB(darkColor[5][0].HSV, darkColor[5][0].RGB);
-	
-		darkColor[5][1] = {};	
-		darkColor[5][1].HSV = {};
-		darkColor[5][1].HSV.h = 100; 
-		darkColor[5][1].HSV.s = 0; 
-		darkColor[5][1].HSV.v = 20;
-		darkColor[5][1].HEX = eCol.convert.HSV2HEX(100, 0, 20);	 
-		darkColor[5][1].RGB = {};
-		eCol.convert.HSV2RGB(darkColor[5][1].HSV, darkColor[5][1].RGB);
-	
-		darkColor[5][2] = {};	
-		darkColor[5][2].HSV = {};
-		darkColor[5][2].HSV.h = 100; 
-		darkColor[5][2].HSV.s = 0; 
-		darkColor[5][2].HSV.v = 70;
-		darkColor[5][2].HEX = eCol.convert.HSV2HEX(100, 0, 70);	 
-		darkColor[5][2].RGB = {};
-		eCol.convert.HSV2RGB(darkColor[5][2].HSV, darkColor[5][2].RGB);
-				
-	},
-	initLightColors : function() {
-			
-		eCol.makeLightColors(0,215);
-		eCol.makeLightColors(1,196);
-		eCol.makeLightColors(2,319);
-		eCol.makeLightColors(3,76);
-		eCol.makeLightColors(4,354);
-		
-		lightColor[5] = [];
-		lightColor[5][0] = {};
-		lightColor[5][0].HSV = {};
-		lightColor[5][0].HSV.h = 22; 
-		lightColor[5][0].HSV.s = 0; 
-		lightColor[5][0].HSV.v = 70;
-		lightColor[5][0].HEX = eCol.convert.HSV2HEX(22, 0, 70);	 
-		lightColor[5][0].RGB = {};
-		eCol.convert.HSV2RGB(lightColor[5][0].HSV, lightColor[5][0].RGB);
-	
-		lightColor[5][1] = {};	
-		lightColor[5][1].HSV = {};
-		lightColor[5][1].HSV.h = 22; 
-		lightColor[5][1].HSV.s = 0; 
-		lightColor[5][1].HSV.v = 93;
-		lightColor[5][1].HEX = eCol.convert.HSV2HEX(22, 0, 93);	 
-		lightColor[5][1].RGB = {};
-		eCol.convert.HSV2RGB(lightColor[5][1].HSV, lightColor[5][1].RGB);
-	
-		lightColor[5][2] = {};	
-		lightColor[5][2].HSV = {};
-		lightColor[5][2].HSV.h = 22; 
-		lightColor[5][2].HSV.s = 0; 
-		lightColor[5][2].HSV.v = 25;
-		lightColor[5][2].HEX = eCol.convert.HSV2HEX(22, 0, 25);	 
-		lightColor[5][2].RGB = {};
-		eCol.convert.HSV2RGB(lightColor[5][2].HSV, lightColor[5][2].RGB);
-			
-		
-	},
-	initBrightColors : function() {
-		
-		// Additional BRIGHT presets for links ... again, these are static colors
-		brightColor[0] = [];
-		brightColor[0][0] = {};		
-		brightColor[0][0].HEX = '#FF00FF';
-		brightColor[0][0].HSV = {};
-		brightColor[0][0].HSV.h = 300;
-		brightColor[0][0].HSV.s = 100;
-		brightColor[0][0].HSV.v = 100;		
-		brightColor[0][0].RGB = {};
-		brightColor[0][0].RGB.r = 255;	
-		brightColor[0][0].RGB.g = 0;	
-		brightColor[0][0].RGB.b = 255;	
-	
-		
-		brightColor[1] = [];
-		brightColor[1][0] = {};	
-		brightColor[1][0].HEX = '#FF00AA';
-		brightColor[1][0].HSV = {};
-		brightColor[1][0].HSV.h = 320;
-		brightColor[1][0].HSV.s = 100;
-		brightColor[1][0].HSV.v = 100;		
-		brightColor[1][0].RGB = {};
-		brightColor[1][0].RGB.r = 255;	
-		brightColor[1][0].RGB.g = 0;	
-		brightColor[1][0].RGB.b = 170;				
-	
-		brightColor[2] = [];
-		brightColor[2][0] = {};	
-		brightColor[2][0].HEX = '#FF0055';
-		brightColor[2][0].HSV = {};
-		brightColor[2][0].HSV.h = 340;
-		brightColor[2][0].HSV.s = 100;
-		brightColor[2][0].HSV.v = 100;		
-		brightColor[2][0].RGB = {};
-		brightColor[2][0].RGB.r = 255;	
-		brightColor[2][0].RGB.g = 0;	
-		brightColor[2][0].RGB.b = 85;				
-			
-		brightColor[3] = [];
-		brightColor[3][0] = {};		
-		brightColor[3][0].HEX = '#FF0000';
-		brightColor[3][0].HSV = {};
-		brightColor[3][0].HSV.h = 0;
-		brightColor[3][0].HSV.s = 100;
-		brightColor[3][0].HSV.v = 100;		
-		brightColor[3][0].RGB = {};
-		brightColor[3][0].RGB.r = 255;	
-		brightColor[3][0].RGB.g = 0;	
-		brightColor[3][0].RGB.b = 0;
-		
-		brightColor[4] = [];
-		brightColor[4][0] = {};	
-		brightColor[4][0].HEX = '#FF5400';
-		brightColor[4][0].HSV = {};
-		brightColor[4][0].HSV.h = 20;
-		brightColor[4][0].HSV.s = 100;
-		brightColor[4][0].HSV.v = 100;		
-		brightColor[4][0].RGB = {};
-		brightColor[4][0].RGB.r = 255;	
-		brightColor[4][0].RGB.g = 84;	
-		brightColor[4][0].RGB.b = 0;
-		
-		brightColor[5] = [];
-		brightColor[5][0] = {};	
-		brightColor[5][0].HEX = '#FF9400';
-		brightColor[5][0].HSV = {};
-		brightColor[5][0].HSV.h = 35;
-		brightColor[5][0].HSV.s = 100;
-		brightColor[5][0].HSV.v = 100;		
-		brightColor[5][0].RGB = {};
-		brightColor[5][0].RGB.r = 255;	
-		brightColor[5][0].RGB.g = 148;	
-		brightColor[5][0].RGB.b = 0;	
-	
-		brightColor[6] = [];
-		brightColor[6][0] = {};	
-		brightColor[6][0].HEX = '#FFD400';
-		brightColor[6][0].HSV = {};
-		brightColor[6][0].HSV.h = 50;
-		brightColor[6][0].HSV.s = 100;
-		brightColor[6][0].HSV.v = 100;		
-		brightColor[6][0].RGB = {};
-		brightColor[6][0].RGB.r = 255;	
-		brightColor[6][0].RGB.g = 212;	
-		brightColor[6][0].RGB.b = 0;	
-		
-		brightColor[7] = [];
-		brightColor[7][0] = {};	
-		brightColor[7][0].HEX = '#FFFF00';
-		brightColor[7][0].HSV = {};
-		brightColor[7][0].HSV.h = 60;
-		brightColor[7][0].HSV.s = 100;
-		brightColor[7][0].HSV.v = 100;		
-		brightColor[7][0].RGB = {};
-		brightColor[7][0].RGB.r = 255;	
-		brightColor[7][0].RGB.g = 255;	
-		brightColor[7][0].RGB.b = 0;
-	
-		brightColor[8] = [];
-		brightColor[8][0] = {};	
-		brightColor[8][0].HEX = '#00FFD4';
-		brightColor[8][0].HSV = {};
-		brightColor[8][0].HSV.h = 170;
-		brightColor[8][0].HSV.s = 100;
-		brightColor[8][0].HSV.v = 100;		
-		brightColor[8][0].RGB = {};
-		brightColor[8][0].RGB.r = 0;	
-		brightColor[8][0].RGB.g = 255;	
-		brightColor[8][0].RGB.b = 212;	
-	
-		brightColor[9] = [];
-		brightColor[9][0] = {};	
-		brightColor[9][0].HEX = '#00FFFF';
-		brightColor[9][0].HSV = {};
-		brightColor[9][0].HSV.h = 180;
-		brightColor[9][0].HSV.s = 100;
-		brightColor[9][0].HSV.v = 100;		
-		brightColor[9][0].RGB = {};
-		brightColor[9][0].RGB.r = 0;	
-		brightColor[9][0].RGB.g = 255;	
-		brightColor[9][0].RGB.b = 255;				
-	
-		brightColor[10] = [];
-		brightColor[10][0] = {};	
-		brightColor[10][0].HEX = '#54FF00';
-		brightColor[10][0].HSV = {};
-		brightColor[10][0].HSV.h = 100;
-		brightColor[10][0].HSV.s = 100;
-		brightColor[10][0].HSV.v = 100;		
-		brightColor[10][0].RGB = {};
-		brightColor[10][0].RGB.r = 85;	
-		brightColor[10][0].RGB.g = 255;	
-		brightColor[10][0].RGB.b = 0;
-				
-	}
-}
-	
-	function initInputFields() {
-
-		// HEX
-		eVars._hexColor = Wu.DomUtil.get('hexColor');
-	
-		// RGB
-		eVars._rChannel = Wu.DomUtil.get('rChannel');
-		eVars._gChannel = Wu.DomUtil.get('gChannel');
-		eVars._bChannel = Wu.DomUtil.get('bChannel');
-		
-		// HSV
-		eVars._hChannel = Wu.DomUtil.get('hChannel');
-		eVars._sChannel = Wu.DomUtil.get('sChannel');
-		eVars._vChannel = Wu.DomUtil.get('vChannel');
-
-
-		// CLICK TRIGGERS
-				
-		eVars._hexColor.onblur = function() {
-			eCol.update.HEX(eVars._hexColor.value);
-			eCol.update.inputFields('HEX');
-		}
-	
-		eVars._rChannel.onblur = function() {
-			eCol.update.RGB(RGB);
-			eCol.update.inputFields('RGB');
-		}
-	
-		eVars._gChannel.onblur = function() {
-			eCol.update.RGB(RGB);
-			eCol.update.inputFields('RGB');
-		}
-	
-		eVars._bChannel.onblur = function() {
-			eCol.update.RGB(RGB);
-			eCol.update.inputFields('RGB');
-		}
-	
-		eVars._hChannel.onblur = function() {
-			eCol.update.HSV(HSV);
-			eCol.update.inputFields('HSV');
-		}
-	
-		eVars._sChannel.onblur = function() {
-			eCol.update.HSV(HSV);
-			eCol.update.inputFields('HSV');
-		}
-		
-		eVars._vChannel.onblur = function() {
-			eCol.update.HSV(HSV);
-			eCol.update.inputFields('HSV');
-		}	
-		
-	};
-	
-	// These are the template swatches...
-	function updateTempSwatches() {
-	
-	// CHANGING COLORS
-	// CHANGING COLORS
-	// CHANGING COLORS
-			
-	// Complimentary Colors
-	tempCSS.complimentary = [];
-	tempCSS.complimentary[0] = '#complimentary_swatch_0 { background-color: ' + complimentaryColor[0][0].HEX + ' !important }';
-	tempCSS.complimentary[1] = '#complimentary_swatch_1 { background-color: ' + complimentaryColor[1][0].HEX + ' !important }';
-	tempCSS.complimentary[2] = '#complimentary_swatch_2 { background-color: ' + complimentaryColor[2][0].HEX + ' !important }';
-	tempCSS.complimentary[3] = '#complimentary_swatch_3 { background-color: ' + complimentaryColor[3][0].HEX + ' !important }';
-
-	// Complimentary Colors
-	tempCSS.matching = [];
-	tempCSS.matching[0] = '#matching_swatch_0 { background-color: ' + matchingColor[0][0].HEX + ' !important }';
-	tempCSS.matching[1] = '#matching_swatch_1 { background-color: ' + matchingColor[1][0].HEX + ' !important }';
-	tempCSS.matching[2] = '#matching_swatch_2 { background-color: ' + matchingColor[2][0].HEX + ' !important }';
-	tempCSS.matching[3] = '#matching_swatch_3 { background-color: ' + matchingColor[3][0].HEX + ' !important }';
-	tempCSS.matching[4] = '#matching_swatch_4 { background-color: ' + matchingColor[4][0].HEX + ' !important }';
-
-	
-	
-	// STATIC COLORS	
-	// STATIC COLORS	
-	// STATIC COLORS	
-	
-	// Dark Colors
-	tempCSS.dark = [];
-	tempCSS.dark[0] = '#dark_swatch_0 { background-color: ' + darkColor[0][0].HEX + ' !important }';
-	tempCSS.dark[1] = '#dark_swatch_1 { background-color: ' + darkColor[1][0].HEX + ' !important }';
-	tempCSS.dark[2] = '#dark_swatch_2 { background-color: ' + darkColor[2][0].HEX + ' !important }';
-	tempCSS.dark[3] = '#dark_swatch_3 { background-color: ' + darkColor[3][0].HEX + ' !important }';
-	tempCSS.dark[4] = '#dark_swatch_4 { background-color: ' + darkColor[4][0].HEX + ' !important }';
-	tempCSS.dark[5] = '#dark_swatch_5 { background-color: ' + darkColor[5][0].HEX + ' !important }';
-
-	// Light Colors
-	tempCSS.light = [];
-	tempCSS.light[0] = '#light_swatch_0 { background-color: ' + lightColor[0][0].HEX + ' !important }';
-	tempCSS.light[1] = '#light_swatch_1 { background-color: ' + lightColor[1][0].HEX + ' !important }';
-	tempCSS.light[2] = '#light_swatch_2 { background-color: ' + lightColor[2][0].HEX + ' !important }';
-	tempCSS.light[3] = '#light_swatch_3 { background-color: ' + lightColor[3][0].HEX + ' !important }';
-	tempCSS.light[4] = '#light_swatch_4 { background-color: ' + lightColor[4][0].HEX + ' !important }';
-	tempCSS.light[5] = '#light_swatch_5 { background-color: ' + lightColor[5][0].HEX + ' !important }';
-	
-	// Bright Colors
-	tempCSS.bright = [];
-	tempCSS.bright[0] = '#bright_swatch_0 { background-color: ' + brightColor[0][0].HEX + ' !important }';
-	tempCSS.bright[1] = '#bright_swatch_1 { background-color: ' + brightColor[1][0].HEX + ' !important }';
-	tempCSS.bright[2] = '#bright_swatch_2 { background-color: ' + brightColor[2][0].HEX + ' !important }';
-	tempCSS.bright[3] = '#bright_swatch_3 { background-color: ' + brightColor[3][0].HEX + ' !important }';
-	tempCSS.bright[4] = '#bright_swatch_4 { background-color: ' + brightColor[4][0].HEX + ' !important }';
-	tempCSS.bright[5] = '#bright_swatch_5 { background-color: ' + brightColor[5][0].HEX + ' !important }';
-	tempCSS.bright[6] = '#bright_swatch_6 { background-color: ' + brightColor[6][0].HEX + ' !important }';
-	tempCSS.bright[7] = '#bright_swatch_7 { background-color: ' + brightColor[7][0].HEX + ' !important }';
-	tempCSS.bright[8] = '#bright_swatch_8 { background-color: ' + brightColor[8][0].HEX + ' !important }';
-	tempCSS.bright[9] = '#bright_swatch_9 { background-color: ' + brightColor[9][0].HEX + ' !important }';
-	tempCSS.bright[10] = '#bright_swatch_10 { background-color: ' + brightColor[10][0].HEX + ' !important }';	
-	
-	
-	var tempCSSstring = '';
-	tempCSSstring += tempCSS.dark.join(' ');
-	tempCSSstring += tempCSS.light.join(' ');
-	tempCSSstring += tempCSS.complimentary.join(' ');
-	tempCSSstring += tempCSS.matching.join(' ');
-	tempCSSstring += tempCSS.bright.join(' ');
-	
-	
-	tempjcss.innerHTML = tempCSSstring;
-}
-	
-	// *****************************************
-
-
-
-	
-	// *****************************************	
-	
-	// PASS COLORS WHEN CLICKING ON THE SWATCHES
-	// PASS COLORS WHEN CLICKING ON THE SWATCHES
-	// PASS COLORS WHEN CLICKING ON THE SWATCHES
-
-	// *****************************************
-	
-	function passcolor(whatArray, arrn1) {
-
-		if ( whatArray == 'light') colorTheme.cThemeDarkMenu = false;
-		if ( whatArray == 'dark') colorTheme.cThemeDarkMenu = true;
-
-		updateMenuLightDarkToggleButtons();
-
-				
-		// Changing the Menu Base Color
-		if ( changingColors == 1 ) {
-
-			// Changing the background color to LIGHT colors
-			if ( whatArray == 'light' ) {	
-			
-				lightMenu(lightColor[arrn1][0].HEX);			
-
-				// Update the HEX value in the HEX VALUE INPUT FIELD				
-				eVars._hexColor.value = lightColor[arrn1][0].HEX;
-			
-			}		
-		
-			// Changing the background color to DARK colors			
-			if ( whatArray == 'dark' ) {
-
-				darkMenu(darkColor[arrn1][0].HEX);
-
-				// Update the HEX value in the HEX VALUE INPUT FIELD
-				eVars._hexColor.value = darkColor[arrn1][0].HEX;
-			} 
-			
-		} 
-		
-		// Changing the Layer INACTIVE color
-		if ( changingColors == 2 ) {		
-		
-			// Changing to a COMPLIMENTARY color
-			if ( whatArray == 'complimentary' ) {		
-				colorTheme.css[5].value = complimentaryColor[arrn1][0].HEX;
-				colorTheme.css[6].value = complimentaryColor[arrn1][3].HEX;	
-				colorTheme.css[7].value = complimentaryColor[arrn1][4].HEX;
-				
-				// Update the HEX value in the HEX VALUE INPUT FIELD				
-				eVars._hexColor.value = complimentaryColor[arrn1][0].HEX;
-			}
-
-			// Canging to a MATCHING color
-			if ( whatArray == 'matching' ) {
-				colorTheme.css[5].value = matchingColor[arrn1][0].HEX;
-				colorTheme.css[6].value = matchingColor[arrn1][2].HEX;	
-				colorTheme.css[7].value = matchingColor[arrn1][4].HEX;
-
-				// Update the HEX value in the HEX VALUE INPUT FIELD
-				eVars._hexColor.value = matchingColor[arrn1][0].HEX;								
-			}
-
-		}
-
-		// Changing the Layer ACTIVE color
-		if ( changingColors == 3 ) {		
-
-
-			// Changing to a COMPLIMENTARY color
-			if ( whatArray == 'complimentary' ) {
-				colorTheme.css[8].value = complimentaryColor[arrn1][0].HEX;
-				colorTheme.css[9].value = complimentaryColor[arrn1][4].HEX;
-				
-				// Update the HEX value in the HEX VALUE INPUT FIELD				
-				eVars._hexColor.value = complimentaryColor[arrn1][0].HEX;								
-								
-			}
-
-			// Canging to a MATCHING color
-			if ( whatArray == 'matching' ) {
-				colorTheme.css[8].value = matchingColor[arrn1][0].HEX;
-				colorTheme.css[9].value = matchingColor[arrn1][4].HEX;
-				
-				// Update the HEX value in the HEX VALUE INPUT FIELD				
-				eVars._hexColor.value = matchingColor[arrn1][0].HEX;
-							
-			}
-		}
-				
-		// Changing the LINK color
-		if ( changingColors == 4 ) {		
-
-			// To a BRIGHT color
-			if ( whatArray == 'bright' ) {
-				colorTheme.css[4].value = brightColor[arrn1][0].HEX;
-				
-				// Update the HEX value in the HEX VALUE INPUT FIELD
-				eVars._hexColor.value = brightColor[arrn1][0].HEX;
-			}
-		}
-		
-
-		// Update the input fields, and the sliders...
-		eCol.update.inputFields('HEX');
-
-		// Set background color of MAIN swatch
-		eVars._yourswatch.style.backgroundColor = eVars._hexColor.value;
-
-		eCol.update.CSSstring();			
-		jcss.innerHTML = cssstring;						
-
-}
-	
-	// *****************************************
-
-	
-	
-	
-	// *****************************************	
-	
-	// 		DARK AND LIGHT MENU STYLERS
-	// 		DARK AND LIGHT MENU STYLERS
-	// 		DARK AND LIGHT MENU STYLERS
-
-	// *****************************************	
-		
-	// Creates Styling for Dark Menu Options	
-	function darkMenu(tempHEX) {
-
-	var RGB = new Object;
-	var HSV = new Object;			
-	eCol.convert.HEX2RGB(tempHEX, RGB);
-	eCol.convert.RGB2HSV(RGB, HSV);
-	var h = HSV.h;
-	
-	var c1HEX = eCol.convert.HSV2HEX(h, 50, 12);	 
-	var c2HEX = eCol.convert.HSV2HEX(h, 30, 25);	 		
-	var c3HEX = eCol.convert.HSV2HEX(h, 15, 70);	 
-		
-	colorTheme.css[0].value = c1HEX;
-	colorTheme.css[1].value = c2HEX;
-	colorTheme.css[2].value = c3HEX;
-
-	colorTheme.css[11].value = '#666';			
-	colorTheme.css[12].value = '#FFF';						// Text on ONLY Inactive Layer – Level 2
-	colorTheme.css[13].value = '#FFFFFF';					// Text color on Main Menu Shade 2 (Plus the white buttons, but that's not right...)
-
-	colorTheme.css[17].value = '';							// Background color Boxes on sidepane (New client box, etc) .. rgba(255, 255, 255, 0.15)
-	colorTheme.css[18].value = 'white';						// Bacground color Buttons
-
-	// Transparent Table Row Colors
-	colorTheme.css[19].value = ''; 							// The darkest background color in file list
-	colorTheme.css[20].value = ''; 							// The lightest background color in file list
-
-	colorTheme.css[22].value = '';
-	colorTheme.css[23].value = ''; 							// The gray text that goes in the Menu (on top of color theme menu, buttons, etc)
-	colorTheme.css[24].value = '';							// Search Fields
-	colorTheme.css[25].value = '';							// Map Controls Buttons – Color 
-	colorTheme.css[26].value = ''; 							// Map Controls Buttons – Background
-	colorTheme.css[27].value = '';							// Map Controls Buttons – Font Weight
-	colorTheme.css[28].value = '';							// General ~ Turn 100 font-weight to 200 (looks too slim on white)
-
-
-	colorTheme.css[32].value = 'white';						// Active List Items BG
-	colorTheme.css[33].value = 'black';						// Active List Items Color
-
-	colorTheme.css[34].value = 'rgba(0,0,0,0.4)';			// SEARCH FIELD
-	
-}; 					
-
-	
-	// Creates Styling for Light Menu Options
-	function lightMenu(tempHEX) {
-	
-	var RGB = new Object;
-	var HSV = new Object;			
-	eCol.convert.HEX2RGB(tempHEX, RGB);
-	eCol.convert.RGB2HSV(RGB, HSV);
-	var h = HSV.h;
-	
-	// Make light colors
-	var c1HEX = eCol.convert.HSV2HEX(h, 15, 80);	 
-	var c2HEX = eCol.convert.HSV2HEX(h, 1, 99);	 		
-	var c3HEX = eCol.convert.HSV2HEX(h, 30, 25);
-	
-	// Make see through light colors
-	var RGB = {};
-	eCol.convert.HEX2RGB(c1HEX, RGB);
-	var rgba_50 = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',0.5)';
-	var rgba_25 = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',0.25)';
-	
-	
-
-	// MAKE COMPLIMENTARY COLOR
-				
-	var hstep = h + 150;
-		
-	if ( hstep > 360 ) {
-		hstep = hstep - 360;
-	}
-	
-	var _complimentary = eCol.convert.HSV2HEX(hstep, 20, 60);	
-	
-	
-	
-	
-
-
-
-	colorTheme.css[0].value = c1HEX;
-	colorTheme.css[1].value = c2HEX;
-	colorTheme.css[2].value = c3HEX;
-
-	colorTheme.css[11].value = '#FFFFFF';
-	colorTheme.css[12].value = '#FFFFFF';					// Text on ONLY Inactive Layer – Level 2
-
-	colorTheme.css[13].value = '#666';						// Text color on Main Menu Shade 2 (Plus the white buttons, but that's not right...)
-	
-	colorTheme.css[17].value = rgba_50;						// Bacground color Buttons			
-	colorTheme.css[18].value = c1HEX;						// Background color Boxes on sidepane (New client box, etc)
-
-	// Transparent Table Row Colors
-	colorTheme.css[19].value = rgba_50; 					// The darkest background color in file list
-	colorTheme.css[20].value = rgba_25; 					// The lightest background color in file list
-
-	colorTheme.css[22].value = 'transparent';
-	colorTheme.css[23].value = '#666'; 						// The gray text that goes in the Menu (on top of color theme menu, buttons, etc)
-	colorTheme.css[24].value = 'white';						// Search Fields
-	colorTheme.css[25].value = 'rgba(0, 0, 0, 0.5)';		// Map Controls Buttons – Color 
-	colorTheme.css[26].value = 'rgba(0, 0, 0, 0.1)'; 		// Map Controls Buttons – Background
-	colorTheme.css[27].value = '600';						// Map Controls Buttons – Font Weight
-	colorTheme.css[28].value = '200';						// General ~ Turn 100 font-weight to 200 (looks too slim on white)
-
-
-	//cxxxx 
-	colorTheme.css[32].value = _complimentary;				// Active List Items BG
-	colorTheme.css[33].value = 'white';						// Active List Items Color
-	
-	colorTheme.css[34].value = 'rgba(0,0,0,0.6)';			// SEARCH FIELD	
-
-	
-};					
-
-
-// *****************************************
-
-
-
-
-	// Updates the Toggle between dark and light menu options
-	function updateMenuLightDarkToggleButtons() {
-
-	if ( !colorTheme.cThemeDarkMenu ) {
-		Wu.DomUtil.addClass(eVars._tickMenuLight, 'active-toggle');
-		Wu.DomUtil.removeClass(eVars._tickMenuDark, 'active-toggle');							
-	} else {
-		Wu.DomUtil.addClass(eVars._tickMenuDark, 'active-toggle');	
-		Wu.DomUtil.removeClass(eVars._tickMenuLight, 'active-toggle');					
-	}
-
-};	
-
-
-}
-
-
-
-
-
-// *****************************************
-// *****************************************
-// *****************************************
-// *****************************************
-// *****************************************
-
-
-var menuList = [];
-
-function layer_menu_j() {
-
-	var listcounter = 0;
-	
-	var list = Wu.DomUtil.get('layer-menu-inner-content');
-	var inner_list = list.getElementsByTagName('div');
-
-	// Go thorough the divs
-	for ( var i=0; i<inner_list.length;i++) {
-
-		var layer_classes = inner_list[i].classList;
-		
-		// Go through the classes in the div
-		for ( var p = 0; p<layer_classes.length; p++) {
-			
-			// Find all Div's with LEVEL-XXX
-			if ( layer_classes[p].indexOf("level-")==0 ) {
-				
-				menuList[listcounter] = {};
-				menuList[listcounter].level = layer_classes[p];	
-				menuList[listcounter].el = inner_list[i];
-				menuList[listcounter].el.no = parseInt(listcounter)+1;
-				menuList[listcounter].open = false;
-				listcounter++;
-
-			}
-		} // end of p loop
-	} // end of i loop
-
-
-	// Add to array if it's a menufolder or not
-	for ( var i = 0; i<menuList.length;i++ ) {
-		if ( Wu.DomUtil.hasClass(menuList[i].el, 'menufolder') ) {
-			menuList[i].folder = true;
-		} else {
-			menuList[i].folder = false;			
-		}
-	}
-
-	// Register Children AND Clicks...
-	var tempMenu = false;
-	for ( var i = 0; i<menuList.length;i++ ) {
-
-		// It's a folder
-		if ( menuList[i].folder ) {
-			
-			tempMenu = menuList[i];
-			menuList[i].subLayers = [];
-			menuList[i].subFolders = [];
-			menuList[i].attached = false;
-
-
-			// Check it's a sub folder... 
-			if ( menuList[i].level != 'level-0' ) {
-
-				// Find nearest parent folder...
-				for ( var f=0;f<menuList.length;f++ ) { // Go through all the Elements in menuList
-
-					if ( menuList[f].folder ) { // If it's a folder
-
-						var lastChar = parseInt(menuList[i].level.charAt(menuList[i].level.length-1));
-						var matchThis = 'level-'+(lastChar-1);
-
-						// Find ONE level up
-						if ( menuList[f].level == matchThis) {  // This one adds it to ALL layers up...
-															
-							// Which menufolder is it attached to...
-							// This overwrites previous entry,
-							// so that we always land on the LAST
-							// folder it's attached to!
-
-							// Adding one too many, so that we don't end up with 0, which is false...
-							menuList[i].attached = f+1; 
-						}
-					}
-				}
-			}
-
-			// Attach SUBFOLDERS as children to folder...
-			if ( menuList[i].attached-1 >= 0 ) {
-				menuList[menuList[i].attached-1].subFolders.push(menuList[i]);	
-			}
-
-		// If the folder has direct layers as children
-		// Stack Children LAYERS in Array
-		} else {
-			tempMenu.subLayers.push(menuList[i]);
-		}
-	
-		// Register Click Event
-		menuList[i].el.onclick = function() {
-			menuFolderSelected(menuList[this.no-1]);
-		}
-	}
-}
-
-
-
-// Open and collapse on click, yo
-function menuFolderSelected(selectWhat) {
-
-	// Close/open LAST level > aka. the folder with LAYERS
-	if ( selectWhat.subLayers ) {
-		if ( selectWhat.subLayers.length >= 1 ) {
-			if ( selectWhat.open ) {
-				selectWhat.open = false;
-			} else {
-				selectWhat.open = true;
-			}
-			layerCollapser(selectWhat, selectWhat.open);
-		}
-	}
-
-	// Close/open FOLDERS!
-	if ( selectWhat.subFolders ) {
-		if ( selectWhat.subFolders.length >= 1 ) {
-			
-			if ( selectWhat.open ) {
-				selectWhat.open = false;
-			} else {
-				selectWhat.open = true;
-			}
-			collapse_folders(selectWhat, selectWhat.open);
-		}
-	}
-}
-	
-
-function collapse_folders(selectWhat, bol) {
-
-	var collapseFromThisFolder = selectWhat.subFolders;
-
-	for ( var g=0; g<collapseFromThisFolder.length;g++ ) {
-
-		// Collapsing folder
-
-		if ( !bol ) { // Open
-
-			collapseFromThisFolder[g].open = true;
-			Wu.DomUtil.removeClass(collapseFromThisFolder[g].el, 'layer-closed');
-
-		} else {  // Close
-
-			collapseFromThisFolder[g].open = false;
-			Wu.DomUtil.addClass(collapseFromThisFolder[g].el, 'layer-closed');
-			layerCollapser(collapseFromThisFolder[g], true);
-
-			// IF THERE IS SUBFOLDERS, run internal loop
-			if ( collapseFromThisFolder[g].subFolders.length >= 1 ) {
-				collapseFromThisFolder[g].open = bol;
-				collapse_folders(collapseFromThisFolder[g], bol);
-			}
-		}
-	}	
-}
-
-
-
-
-function layerCollapser(selectWhat, bol) {
-	var collapseFromThisFolder = selectWhat.subLayers;
-	for ( var g=0;g<collapseFromThisFolder.length;g++) {	
-		var collapseThisElement = collapseFromThisFolder[g].el;
-		if ( !bol ) {			
-			collapseFromThisFolder[g].open = false;
-			Wu.DomUtil.removeClass(collapseThisElement, 'layer-closed');
-		} else {
-			collapseFromThisFolder[g].open = true;
-			Wu.DomUtil.addClass(collapseThisElement, 'layer-closed');
-		}
-	}
-}
-
 ;Wu.version = '0.3-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
-	debug : true,
+	// debug : true,
 
 	// default options
 	options : systemapicConfigOptions, // global var from config.js... perhaps refactor.
-
 
 	_ready : false,
 
@@ -20071,7 +19713,6 @@ Wu.App = Wu.Class.extend({
 		// Detect if it's a mobile
 		if ( L.Browser.mobile ) {
 
-			
 			// Set mobile state to true
 			Wu.app.mobile = false;
 			Wu.app.pad = false;
@@ -20513,14 +20154,15 @@ Wu.App = Wu.Class.extend({
 			return l.item.layer;	// layer uuid
 		});
 
+		console.log('setHash layers:', layers);
 
-		var project = project || this.activeProject;
+
 		// get project;
-		var projectUuid = project.getUuid();
+		var project = project || this.activeProject;
 
 		// hash object
 		var json = {
-			projectUuid : projectUuid,
+			projectUuid : project.getUuid(),
 			hash : {
 				id 	 : Wu.Util.createRandom(6),
 				position : app.MapPane.getPosition(),
@@ -20580,13 +20222,11 @@ Wu.App = Wu.Class.extend({
 			this._renderHash(this, json);
 		}
 
-
 		// acticate legends for baselayers
 		app.MapPane.legendsControl.refreshAllLegends()
 
 		// avoid Loading! etc in status
 		app.setStatus('systemapic'); // too early
-
 
 	},
 	
@@ -20621,8 +20261,8 @@ Wu.App = Wu.Class.extend({
 
 	getZIndexControls : function () {
 		var z = {
-			b : app.MapPane._bzIndexControl,
-			l : app.MapPane._lzIndexControl
+			b : app.MapPane._bzIndexControl, // base
+			l : app.MapPane._lzIndexControl  // layermenu
 		}
 		return z;
 	},
