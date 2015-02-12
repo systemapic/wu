@@ -21,7 +21,6 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 
 	},
 
-
 	buttonDown : function (e) {
 		Wu.DomUtil.addClass(e.target, 'btn-info');
 	},
@@ -463,9 +462,9 @@ Wu.SidePane.Map.BaseLayers = Wu.SidePane.Map.MapSetting.extend({
 			this.enableLayer(baseLayer);
 		}
 
-		var project = this.activeProject;
-		var thumbCreated = project.getThumbCreated();
-		if ( !thumbCreated ) project.createProjectThumb();		
+		var project = app.activeProject;
+		var thumbCreated = project.getThumbCreated(); 			// refactor
+		if (!thumbCreated) project.createProjectThumb();		
 
 	},
 
@@ -1698,9 +1697,6 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 
 	fillOSM : function () {
-		console.log('fill osm');
-
-
 	},
 
 	

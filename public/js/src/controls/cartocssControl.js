@@ -602,7 +602,7 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 
-	_updateLegends : function (cartoid) {
+	_updateLegends : function (cartoid) { // refactor: move to layers.js
 
 		var meta = this._layer.getMeta();
 		var metaFields = this._layer.getMetaFields();
@@ -905,7 +905,14 @@ L.Control.CartoCSS = L.Control.extend({
 			return this._handlePathError(error);
 		}
 
-		// todo: other errors
+		// don't handle debug errors
+		if (typeof(error) == 'string' && error.indexOf('debug') > -1) {
+			return;
+		}
+
+		// catch-all for unhandled errors
+		this._setError(error);
+
 		console.error('Unhandled syntax error: ', error);
 
 	},
@@ -923,53 +930,44 @@ L.Control.CartoCSS = L.Control.extend({
 		suggestion.splice(0,2);
 		suggestion 	= suggestion.join(' ');
 
-		// console.log('err:', err);
-		// console.log('line: ', line);
-		// console.log('char: ', charr);
-		// console.log('problem: ', problem);
-		// console.log('word: ', word);
-		// console.log('suggestion: ', suggestion);
+		// set error text
+		var errorText = problem + ': ' + word + '. ' + suggestion;
+	
+		// set error
+		this._setError(errorText, line);
 
+	},
 
-		// mark error in codemirror:
+	_setError : function (error, line) {
 
-		// get current document
+		// get codemirror doc
 		var doc = this._codeMirror.getDoc()
-		
-		// add class to line with error 
-		//   		 line, [text, background or wrap], className
-		doc.addLineClass(line, 'wrap', 'gutter-syntax-error');
 
-		// add error text
-		this._errorPane.innerHTML = problem + ': ' + word + '. ' + suggestion;
+		// if line supplied, mark line in codemirror
+		if (line) doc.addLineClass(line, 'wrap', 'gutter-syntax-error');
+
+		// set error text
+		this._errorPane.innerHTML = error;
+
+		// add error class
 		Wu.DomUtil.addClass(this._errorPane, 'active-error');
 
-		// clear error on change in codemirror input area
-		var that = this;
-		Wu.DomEvent.on(doc, 'change', this._clearError, this);
+		// clear error on change
 		doc.on('change', function () {
-			that._clearError(line);
-			
-		});
+			this._clearError(line || 0);
+		}.bind(this));
 	},
 
 
 	_handlePathError : function (error) {
 
-		// get current document
-		var doc = this._codeMirror.getDoc()
+		console.log('_handlePathError', error);
 
-		// add error text
-		this._errorPane.innerHTML = 'Wrong path for pattern-file.';
-		Wu.DomUtil.addClass(this._errorPane, 'active-error');
-
-		// clear error on change in codemirror input area
-		// Wu.DomEvent.on(doc, 'change', this._clearError, this);
-
-		var that = this;
-		doc.on('change', function () {
-			that._clearError(0);
-		});
+		// set error text
+		var errorText = 'Wrong path for pattern-file.';
+		
+		// set error
+		this._setError(errorText);
 
 	},
 
@@ -984,10 +982,9 @@ L.Control.CartoCSS = L.Control.extend({
 		doc.removeLineClass(line, 'wrap'); // removes all classes
 
 		// remove event (doesn't work.. see here instead: http://codemirror.net/doc/manual.html#events)
-		var that = this;
 		doc.off('change', function () {
-			that._clearError(line);
-		});
+			this._clearError(line || 0);
+		}.bind(this));
 
 	},
 

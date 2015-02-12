@@ -7,9 +7,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-sass'); 	// Non Ruby C++ sass 
 	grunt.loadNpmTasks('grunt-contrib-concat');    	// Slå sammen JS filer 
 	grunt.loadNpmTasks('grunt-contrib-uglify');	// JS minifyer 
-
-	grunt.loadNpmTasks('grunt-preprocess');		// Preprocess conditional HTML tags
-	grunt.loadNpmTasks('grunt-env');		// Set environment for conditional HTML 
 					
 	grunt.initConfig(    {  
 		
@@ -313,51 +310,7 @@ module.exports = function(grunt) {
 				}
 			},
 
-		},
-
-
-		// Set environment for conditional HTML
-		env : {
-
-			options : {
-
-			/* Shared Options Hash */
-			//globalOption : 'foo'
-
-			},
-
-			dev: {
-
-				NODE_ENV : 'DEVELOPMENT'
-
-			},
-
-			prod : {
-
-				NODE_ENV : 'PRODUCTION'
-
-			}
-
-		},
-
-
-		// Preprocess – for conditional HTML tags
-		preprocess : {
-
-			dev : {
-
-				src : 'views/templ/app.ejs',
-				dest : 'views/app_dev.ejs'
-
-			},
-
-			prod : {
-
-				src : 'views/templ/app.ejs',
-				dest : 'views/app_prod.ejs'
-			}
 		}
-
 	}    ); 
   
   
@@ -403,10 +356,7 @@ module.exports = function(grunt) {
 				'uglify:jsPortal'
 			]);
 		}
-	);
-
-	grunt.registerTask('prod', function () { grunt.task.run([ 'preprocess:prod' ])});
-	grunt.registerTask('dev',  function () { grunt.task.run([ 'preprocess:dev' ])});	
+	)
 
 	grunt.registerTask('default', ['waiter']);
 }

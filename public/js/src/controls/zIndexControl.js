@@ -79,6 +79,7 @@ Wu.ZIndexControl = Wu.Class.extend({
 		layers.forEach(function (layer, i) {
 			var zindex = i + this._z; 
 			layer._setZIndex(zindex);
+			console.log('enforce: ', layer, zindex);
 		}, this);
 	},
 

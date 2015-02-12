@@ -2,11 +2,10 @@ Wu.version = '0.3-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
-	debug : true,
+	// debug : true,
 
 	// default options
 	options : systemapicConfigOptions, // global var from config.js... perhaps refactor.
-
 
 	_ready : false,
 
@@ -39,7 +38,6 @@ Wu.App = Wu.Class.extend({
 		// Detect if it's a mobile
 		if ( L.Browser.mobile ) {
 
-			
 			// Set mobile state to true
 			Wu.app.mobile = false;
 			Wu.app.pad = false;
@@ -481,14 +479,15 @@ Wu.App = Wu.Class.extend({
 			return l.item.layer;	// layer uuid
 		});
 
+		console.log('setHash layers:', layers);
 
-		var project = project || this.activeProject;
+
 		// get project;
-		var projectUuid = project.getUuid();
+		var project = project || this.activeProject;
 
 		// hash object
 		var json = {
-			projectUuid : projectUuid,
+			projectUuid : project.getUuid(),
 			hash : {
 				id 	 : Wu.Util.createRandom(6),
 				position : app.MapPane.getPosition(),
@@ -548,13 +547,11 @@ Wu.App = Wu.Class.extend({
 			this._renderHash(this, json);
 		}
 
-
 		// acticate legends for baselayers
 		app.MapPane.legendsControl.refreshAllLegends()
 
 		// avoid Loading! etc in status
 		app.setStatus('systemapic'); // too early
-
 
 	},
 	
@@ -589,8 +586,8 @@ Wu.App = Wu.Class.extend({
 
 	getZIndexControls : function () {
 		var z = {
-			b : app.MapPane._bzIndexControl,
-			l : app.MapPane._lzIndexControl
+			b : app.MapPane._bzIndexControl, // base
+			l : app.MapPane._lzIndexControl  // layermenu
 		}
 		return z;
 	},

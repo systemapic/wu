@@ -11,13 +11,14 @@ Wu.MapPane = Wu.Class.extend({
 		// connect zindex control
 		this._bzIndexControl = new Wu.ZIndexControl.Baselayers();
 		this._lzIndexControl = new Wu.ZIndexControl.Layermenu();
+
 		return this; 
 	},      
 
 	_initContainer : function () {
 		
 		// init container
-		this._container = Wu.app._mapPane = Wu.DomUtil.createId('div', 'map', Wu.app._mapContainer);
+		this._container = app._mapPane = Wu.DomUtil.createId('div', 'map', app._mapContainer);
 	
 		// add help pseudo
 		Wu.DomUtil.addClass(this._container, 'click-to-start');
@@ -166,12 +167,24 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 	getActiveLayermenuLayers : function () {
-		if (!this.layerMenu) return false;
+		if (!this.layerMenu) return;
+
+		var zIndexControl = app.zIndex;
+
 		var layers = this.layerMenu.getLayers();
 		var active = _.filter(layers, function (l) {
 			return l.on;
 		});
-		return active;
+
+		var sorted = _.sortBy(active, function (l) {
+
+			return zIndexControl.get(l);
+
+		});
+
+		console.log('getActiveLayermenuLayers active: ', active);
+		console.log('sorted: ', sorted);
+		return sorted;
 	},
 
 	getActiveLayers : function () {

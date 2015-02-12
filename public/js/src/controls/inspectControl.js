@@ -62,6 +62,8 @@ L.Control.Inspect = L.Control.extend({
 
 		// get zindexControl
 		this._zx = app.getZIndexControls().l; // layermenu zindex control 
+
+		console.log('ZX: ', this._zx);
 	       
 	        // add active layers
 	        this._addAlreadyActiveLayers();

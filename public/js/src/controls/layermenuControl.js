@@ -87,9 +87,6 @@ L.Control.Layermenu = L.Control.extend({
 
 			// Mobile arrow	
 		    	Wu.DomUtil.create('div', 'layers-mobile-arrow', this._innerContainer);
-			
-
-
 
 		}
 
@@ -151,8 +148,7 @@ L.Control.Layermenu = L.Control.extend({
 
 
 	toggleLayerPane : function () {
-		if ( this._open ) this.closeLayerPane();
-		else this.openLayerPane();
+		this._open ? this.closeLayerPane() : this.openLayerPane();
 	},
 
 
@@ -184,7 +180,6 @@ L.Control.Layermenu = L.Control.extend({
 		this._open = true;
 
 		// Open Wrapper
-		// this._container.parentNode.style.width = '290px';
 		app._map._controlCorners.bottomright.style.width = '290px';
 
 		// Close the closer :P
@@ -686,6 +681,19 @@ L.Control.Layermenu = L.Control.extend({
 			this.enableLayer(item);
 		}       
 	},
+
+	_enableLayer : function (layerUuid) {
+
+		// get layerItem
+		var layerItem = _.find(this.layers, function (l) {
+			return l.item.layer == layerUuid;
+		});
+	
+		// mark active
+		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
+		layerItem.on = true;
+
+	},
 		
 	enableLayer : function (layerItem) {
 
@@ -798,8 +806,6 @@ L.Control.Layermenu = L.Control.extend({
 	// add from sidepane
 	add : function (layer) {
 		
-		console.log('add from sidepaner', layer);
-
 		// create db item
 		var item = {
 			uuid 	: 'layerMenuItem-' + Wu.Util.guid(), // layermenu item uuid
@@ -825,8 +831,6 @@ L.Control.Layermenu = L.Control.extend({
 	},
 
 	_add : function (layerItem) {		
-
-		console.log('_add layerItem', layerItem);
 
 		var item  = layerItem.item;
 		var layer = layerItem.layer;
