@@ -94,6 +94,11 @@ L.SpinningMap = L.Class.extend({
 		
 		// create map
 		this._gl ? this.initGLMap() : this.initMap();
+
+		// set logo
+		this._logo = L.DomUtil.get('login-logo');
+		var img = 'url("' + this.options.logo + '")';
+		this._logo.style.backgroundImage = img;
 		
 	},
 
@@ -566,7 +571,11 @@ L.SpinningMap = L.Class.extend({
 });
 
 
-;var spinner;
+;var loginConfig = {
+
+	logo : 'images/griffon_logo_drop.png',
+	
+};var spinner;
 // var s = spinner;
 function spin () {
 
@@ -578,8 +587,7 @@ function spin () {
 		autoStart : true,
 		accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q',
 		layer : 'systemapic.kcjonn12',
-		// logo : 'images/griffon_logo_drop.png',
-		logo : 'images/systemapic-logo-bw.png',
+		logo : loginConfig.logo,
 		content : content,  // todo
 		wrapper : false,
 		container : container,
