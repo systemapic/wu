@@ -34,7 +34,7 @@
     "mapnik": "^3.0.5",
     "mapnik-omnivore": "^2.0.0",
     "mime": "^1.2.11",
-    "mongoose": "^3.8.8",
+    "mongoose": "3.8",
     "mongoose-times": "^0.1.0",
     "morgan": "^1.4.1",
     "node-upload-progress": "0.0.1",
