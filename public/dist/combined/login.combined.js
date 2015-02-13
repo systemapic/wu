@@ -585,9 +585,13 @@ function spin () {
 		container : container,
 		speed : 1000,
 		position : {
-			lat : -33.83214,
-			lng : 151.22299,
-			zoom : [4, 17]
+			// lat : -33.83214,
+			// lng : 151.22299,
+
+			lat : 59.94338,
+			lng : 10.71445,
+
+			zoom : [4, 15]
 		},
 		circle : {
 			radius : 120, 
