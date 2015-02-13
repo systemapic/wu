@@ -82,6 +82,11 @@ L.SpinningMap = L.Class.extend({
 		
 		// create map
 		this._gl ? this.initGLMap() : this.initMap();
+
+		// set logo
+		this._logo = L.DomUtil.get('login-logo');
+		var img = 'url("' + this.options.logo + '")';
+		this._logo.style.backgroundImage = img;
 		
 	},
 
