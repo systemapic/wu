@@ -109,34 +109,69 @@ module.exports = function(grunt) {
 				src : [  
 
 
-					// dependencies 
+					// // dependencies 
+					// 'public/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js',
+					// 'public/js/lib/lodash/lodash.min.js',
+					// 'public/js/lib/parallel.js/parallel.js',
+					// 'public/js/lib/async/async.js',
+					
+					// // leaflet + mapbox
+					// 'public/js/src/leaflet.js/leaflet-0.7.3-src.js',
+					// 'public/js/lib/mapbox.js/mapbox.standalone.uncompressed.js', // DO NOT REPLACE! has custom edits:4648!
+					// 'public/js/src/leaflet.js/plugins/leaflet.geojson.draw.js',
+					// 'public/js/src/leaflet.js/plugins/leaflet.draw-src.js',
+					// 'public/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.js',
+					// 'public/js/src/leaflet.js/plugins/leaflet.utfgrid.js',
+
+					// // tools
+					// 'public/js/lib/d3.js/topojson.v1.min.js',
+					// 'public/js/lib/dropzone.js/dropzone.min.js',
+					// 'public/js/lib/icanhaz/icanhaz.min.js',
+					// 'public/js/lib/list.js/list.min.js',
+					// 'public/js/lib/sortable.js/Sortable.js',
+					// 'public/js/lib/powerange/powerange.min.js',
+
+					// // grande
+					// 'public/js/src/grande.js/js/grande.class.js',
+					// 'public/js/src/grande.js/js/grande.js',
+					// 'public/js/src/grande.js/js/grande.attachments.js',
+
+					// // codemirror
+					// 'public/js/lib/codemirror/mode/cartocss/cartoref.js',
+					// 'public/js/lib/codemirror/lib/codemirror.js',
+					// 'public/js/lib/codemirror/mode/cartocss/runmode.js',
+					// 'public/js/lib/codemirror/mode/cartocss/searchcursor.js',
+					// 'public/js/lib/codemirror/mode/cartocss/codemirror.carto.js',
+					// 'public/js/lib/codemirror/mode/cartocss/codemirror.carto.complete.js',
+					// 'public/js/lib/codemirror/mode/cartocss/codemirror.search.js',
+					// 'public/js/lib/codemirror/mode/cartocss/codemirror.palette.js',
+					// 'public/js/lib/codemirror/mode/cartocss/sexagesimal.js',
+					// 'public/js/lib/codemirror/mode/cartocss/spectrum.js',
+
+					// // extra
+					// 'public/js/lib/opentip/opentip-native.js',
+					// 'public/js/lib/jss.js/jss.js'
+
+
 					'public/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js',
 					'public/js/lib/lodash/lodash.min.js',
 					'public/js/lib/parallel.js/parallel.js',
 					'public/js/lib/async/async.js',
-					
-					// leaflet + mapbox
 					'public/js/src/leaflet.js/leaflet-0.7.3-src.js',
-					'public/js/lib/mapbox.js/mapbox.standalone.uncompressed.js', // DO NOT REPLACE! has custom edits:4648!
+					'public/js/lib/mapbox.js/mapbox.standalone.uncompressed.js',
 					'public/js/src/leaflet.js/plugins/leaflet.geojson.draw.js',
 					'public/js/src/leaflet.js/plugins/leaflet.draw-src.js',
 					'public/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.js',
 					'public/js/src/leaflet.js/plugins/leaflet.utfgrid.js',
-
-					// tools
-					'public/js/lib/d3.js/topojson.v1.min.js',
-					'public/js/lib/dropzone.js/dropzone.min.js',
-					'public/js/lib/icanhaz/icanhaz.min.js',
-					'public/js/lib/list.js/list.min.js',
+					'public/js/lib/d3.js/topojson.v1.min.js"',
+					'public/js/lib/dropzone.js/dropzone.min.js"',
+					'public/js/lib/icanhaz/icanhaz.min.js"',
+					'public/js/lib/list.js/list.min.js"',
 					'public/js/lib/sortable.js/Sortable.js',
 					'public/js/lib/powerange/powerange.min.js',
-
-					// grande
 					'public/js/src/grande.js/js/grande.class.js',
 					'public/js/src/grande.js/js/grande.js',
 					'public/js/src/grande.js/js/grande.attachments.js',
-
-					// codemirror
 					'public/js/lib/codemirror/mode/cartocss/cartoref.js',
 					'public/js/lib/codemirror/lib/codemirror.js',
 					'public/js/lib/codemirror/mode/cartocss/runmode.js',
@@ -147,12 +182,9 @@ module.exports = function(grunt) {
 					'public/js/lib/codemirror/mode/cartocss/codemirror.palette.js',
 					'public/js/lib/codemirror/mode/cartocss/sexagesimal.js',
 					'public/js/lib/codemirror/mode/cartocss/spectrum.js',
-
-					// extra
 					'public/js/lib/opentip/opentip-native.js',
 					'public/js/lib/jss.js/jss.js'
-
-
+					
 				],
 				
 				dest : 'public/dist/combined/systemapic.dependencies.combined.js',
