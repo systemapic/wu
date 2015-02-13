@@ -101,13 +101,12 @@ module.exports = function(grunt) {
 			options : {  
 				separator:';',
 			},
-			
+																	
 
 			// Goes in header
 			jsDependencies : {  
 				
 				src : [  
-
 
 					// dependencies 
 					'public/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js',
@@ -150,7 +149,7 @@ module.exports = function(grunt) {
 
 					// extra
 					'public/js/lib/opentip/opentip-native.js',
-					'public/js/lib/jss.js/jss.js'
+					'public/js/lib/jss.js/jss.js'			
 
 
 				],
@@ -228,6 +227,7 @@ module.exports = function(grunt) {
 				
 				src : [  
 
+
 					'public/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.css',
 					'public/js/src/grande.js/css/menu.css',                    
 					'public/js/src/grande.js/css/editor.css',
@@ -242,7 +242,8 @@ module.exports = function(grunt) {
 					'public/js/lib/codemirror/mode/cartocss/codemirror.fetta.css',
 					'public/js/lib/codemirror/mode/cartocss/spectrum.css',
 					'public/js/lib/codemirror/theme/mbo.css',
-					'public/css/opentip.css'
+					'public/css/opentip.css',
+
 				],
 				
 				dest : 'public/dist/combined/css.dependencies.css'
@@ -346,15 +347,15 @@ module.exports = function(grunt) {
 
 			dev : {
 
-				src : 'views/templ/app.ejs',
-				dest : 'views/app_dev.ejs'
+				src : 'views/app.template.ejs',
+				dest : 'views/app.ejs'
 
 			},
 
 			prod : {
 
-				src : 'views/templ/app.ejs',
-				dest : 'views/app_prod.ejs'
+				src : 'views/app.template.ejs',
+				dest : 'views/app.ejs'
 			}
 		}
 
@@ -382,7 +383,7 @@ module.exports = function(grunt) {
 		}    
 	); 
 
-	grunt.registerTask('cssdeps', 
+	grunt.registerTask('css', 
 		function () {
 			grunt.task.run([
 				'concat:cssDependencies',
@@ -394,7 +395,7 @@ module.exports = function(grunt) {
 
 	);
 
-	grunt.registerTask('jsdeps', 
+	grunt.registerTask('js', 
 		function () {
 			grunt.task.run([
 				'concat:jsDependencies',
@@ -405,7 +406,20 @@ module.exports = function(grunt) {
 		}
 	);
 
-	grunt.registerTask('prod', function () { grunt.task.run([ 'env:prod', 'preprocess:prod' ])});
+	// Prepares production mode (creates the app.ejs file with minifyed everything)
+	grunt.registerTask('prod', function () { grunt.task.run([ 
+			'concat:cssDependencies',
+			'cssmin:cssDependencies',
+			'concat:cssPortal',
+			'cssmin:cssPortal',
+			'concat:jsDependencies',
+			'uglify:jsDependencies',
+			'concat:jsPortal',
+			'uglify:jsPortal',
+			'env:prod', 
+			'preprocess:prod' 
+		])});
+
 	grunt.registerTask('dev',  function () { grunt.task.run([ 'env:dev', 'preprocess:dev' ])});	
 
 	grunt.registerTask('default', ['waiter']);
