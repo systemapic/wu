@@ -405,8 +405,8 @@ module.exports = function(grunt) {
 		}
 	);
 
-	grunt.registerTask('prod', function () { grunt.task.run([ 'preprocess:prod' ])});
-	grunt.registerTask('dev',  function () { grunt.task.run([ 'preprocess:dev' ])});	
+	grunt.registerTask('prod', function () { grunt.task.run([ 'env:prod', 'preprocess:prod' ])});
+	grunt.registerTask('dev',  function () { grunt.task.run([ 'env:dev', 'preprocess:dev' ])});	
 
 	grunt.registerTask('default', ['waiter']);
 }

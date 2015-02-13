@@ -2265,12 +2265,14 @@ module.exports = api = {
 		// return if not authorized
 		if (!permission.to.create.user( user )) {
 			var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
+			console.log(message);
 			return res.end(JSON.stringify({ error : message }));
 		};
 
 		// return if no email, or if email already in use
 		if (!email) {
 			var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
+			console.log(message);
 			return res.end(JSON.stringify({ error : message }));
 		};
 
@@ -2290,6 +2292,8 @@ module.exports = api = {
 		
 		// save the user
 		newUser.save(function(err, doc) { 
+			console.log('newUser save', err, doc);
+			
 			if (err) return res.end(JSON.stringify({
 				error : 'Error creating user.'
 			}));
