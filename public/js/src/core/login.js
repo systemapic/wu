@@ -10,8 +10,7 @@ function spin () {
 		autoStart : true,
 		accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q',
 		layer : 'systemapic.kcjonn12',
-		// logo : 'images/griffon_logo_drop.png',
-		logo : 'images/systemapic-logo-bw.png',
+		logo : loginConfig.logo,
 		content : content,  // todo
 		wrapper : false,
 		container : container,
