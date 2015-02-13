@@ -658,7 +658,6 @@ L.Control.CartoCSS = L.Control.extend({
 
 	_initTooltipStoredMeta : function (meta) {
 
-		
 		// create header
 		var tooltipCustomHeader	= Wu.DomUtil.createId('input', 'cartocss-tooltip-custom-header', this._tooltipWrapper);
 		tooltipCustomHeader.setAttribute('placeholder', 'Tooltip title')

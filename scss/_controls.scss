@@ -2265,11 +2265,13 @@
 
 /* CODE MIRROR */
 .CodeMirror { 
-	height: 100%;
+	height: 100% !important;
 	border: 1px solid #ddd;
 	visibility: visible !important;
 	position: relative !important;
 	top: 0 !important;
+	font-size: 14px;
+	font-family: 'Open Sans Bold', sans-serif;
         }
 
 .CodeMirror pre { 

@@ -422,6 +422,9 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	update : function () {
 		var map = app._map;
 
+		this._zindex = app.zIndex.get(this);
+		console.log('=> zindex: ', this._zindex);
+
 		// remove
 		if (this.layer) this.remove();
 
@@ -499,6 +502,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 		// add to map
 		this.addTo(map); // refactor
+
+		// if (this._zindex >= 0) app.zIndex.set(this._zindex, this.layer);
 
 	},
 

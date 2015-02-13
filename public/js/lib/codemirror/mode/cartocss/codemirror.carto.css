@@ -219,3 +219,16 @@ span.cm-carto-filter             { color:#66475B; }
   color:white !important;
   text-decoration: none;
 }
+
+
+
+
+.CodeMirror { 
+  height: 100% !important;
+  border: 1px solid #ddd;
+  visibility: visible !important;
+  position: relative !important;
+  top: 0 !important;
+  font-size: 14px;
+  font-family: 'Open Sans Bold', sans-serif;
+        }
