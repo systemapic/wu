@@ -3,8 +3,10 @@
 
 if [ "$1" == "prod" ];then
 	PRODUCTIONMODE=true
+	grunt prod
 else 
 	PRODUCTIONMODE=false
+	grunt dev
 fi;
 
 cd server
