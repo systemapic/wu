@@ -24,8 +24,6 @@ var outfile = path;
 // connect
 var page = require('webpage').create(),
 	server = serverUrl,
-	// server = 'https://127.0.0.1:3001/login',
-	// data = 'email=knutole@noerd.biz&password=***REMOVED***@noerdbiz';    // unhashed passwords, rly? pgp?
 	data = serverData;    // phantomJS account
 									// todo: create phantomjs user with changing password..
 
