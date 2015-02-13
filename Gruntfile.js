@@ -406,8 +406,9 @@ module.exports = function(grunt) {
 		}
 	);
 
-	// Prepares production mode (creates the app.ejs file with minifyed everything)
+
 	grunt.registerTask('prod', function () { grunt.task.run([ 
+		
 			'concat:cssDependencies',
 			'cssmin:cssDependencies',
 			'concat:cssPortal',
@@ -418,7 +419,8 @@ module.exports = function(grunt) {
 			'uglify:jsPortal',
 			'env:prod', 
 			'preprocess:prod' 
-		])});
+
+	])});
 
 	grunt.registerTask('dev',  function () { grunt.task.run([ 'env:dev', 'preprocess:dev' ])});	
 
