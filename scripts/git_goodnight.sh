@@ -36,5 +36,8 @@ done
 
 cd /var/www/systemapic.js
 git add .
-git commit -m $1
-git push origin $BRANCH
+git commit -m "$1"
+git push origin "$BRANCH"
+
+echo ''
+echo 'All done. Have a good one!'
