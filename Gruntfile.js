@@ -347,14 +347,14 @@ module.exports = function(grunt) {
 			dev : {
 
 				src : 'views/templ/app.ejs',
-				dest : 'views/app_dev.ejs'
+				dest : 'views/app.ejs'
 
 			},
 
 			prod : {
 
 				src : 'views/templ/app.ejs',
-				dest : 'views/app_prod.ejs'
+				dest : 'views/app.ejs'
 			}
 		}
 
