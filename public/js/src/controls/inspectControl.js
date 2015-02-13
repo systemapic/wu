@@ -102,6 +102,8 @@ L.Control.Inspect = L.Control.extend({
 	// currently called from layers.js:63 .. refactor.. dont chain, do modules, event emitters
 	addLayer : function (layer) {
 
+		console.log('______daddLayer', layer);
+
 		// Make sure that the layer inspector is visible
 		this._content.style.display = 'block';
 

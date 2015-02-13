@@ -177,13 +177,9 @@ Wu.MapPane = Wu.Class.extend({
 		});
 
 		var sorted = _.sortBy(active, function (l) {
-
-			return zIndexControl.get(l);
-
+			return zIndexControl.get(l.layer);
 		});
 
-		console.log('getActiveLayermenuLayers active: ', active);
-		console.log('sorted: ', sorted);
 		return sorted;
 	},
 
