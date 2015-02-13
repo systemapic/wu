@@ -250,7 +250,7 @@
 	}
 
 #login-logo {
-	background-image: url(https://maps.systemapic.com/css/images/systemapic-login-logo.png);
+	background-image: url(https://maps.systemapic.com/css/images/griffon_logo_drop.png);
 	background-repeat: no-repeat;
 	width: 429px;
 	height: 291px;
@@ -260,7 +260,7 @@
 	z-index: 999;
 
 	background-position: center;
-	border-right: 1px solid white;	
+	/*border-right: 1px solid white;	*/
 	}
 
 /* Main container (black background) */
