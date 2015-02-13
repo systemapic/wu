@@ -407,6 +407,7 @@ module.exports = function(grunt) {
 		}
 	);
 
+
 	grunt.registerTask('prod', function () { grunt.task.run([ 
 		
 			'concat:cssDependencies',
@@ -419,8 +420,8 @@ module.exports = function(grunt) {
 			'uglify:jsPortal',
 			'env:prod', 
 			'preprocess:prod' 
-		
-		])});
+
+	])});
 
 	grunt.registerTask('dev',  function () { grunt.task.run([ 'env:dev', 'preprocess:dev' ])});	
 
