@@ -42,7 +42,6 @@ Wu.Style = Wu.Class.extend({
 	},
 
 	setDarkThemeCartoCSS : function () {
-		
 		if (!app.MapPane.cartoCss) return;
 
 		// Set code mirror to darktheme
