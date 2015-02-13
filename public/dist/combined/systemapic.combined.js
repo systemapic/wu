@@ -19608,7 +19608,7 @@ L.topoJson = function (json, options) {
 
 	portalName : 'systemapic',	// plugged in
 	portalLogo : false,		// not plugged in.. using sprites atm..
-	portalTitle : 'Systemapic Secure Portal: Rüppells Griffon',
+	portalTitle : 'Systemapic Secure Portal',
 	
 	// sidepane
 	panes : {
@@ -19642,19 +19642,19 @@ L.topoJson = function (json, options) {
 
 	servers : {
 
-		// portal SX
-		portal   : 'https://projects.ruppellsgriffon.com/',	// api
+		// portal MX
+		portal   : 'https://maps.systemapic.com/',	// api
 
-		// tiles SX
+		// tiles MX
 		tiles : {
 			uri : 'https://{s}.systemapic.com/r/',
-			subdomains : 'abcd' // sx
+			subdomains : 'ijkl' // mx
 		},
 
-		// utfgrid SX
+		// utfgrid MX
 		utfgrid : {
 			uri : 'https://{s}.systemapic.com/u/',
-			subdomains : 'abcd' // sx
+			subdomains : 'ijkl' // mx
 		},
 
 		// osm PX
@@ -19669,8 +19669,9 @@ L.topoJson = function (json, options) {
 
 	silentUsers : [
 		// redacted
-		'user-9fed4b5f', // k
-		'user-e6e5d7d9'  // j  // todo: add phantomJS user
+		'user-9fed4b5f',  // k
+		'user-e6e5d7d9',  // j  // todo: add phantomJS user
+		'user-a15e2219'
 	]
 }
 ;Wu.version = '0.3-dev';
