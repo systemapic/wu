@@ -3438,7 +3438,6 @@ input.cmn-toggle-round-flat + label:before {
   font-size: 110%;
   text-shadow: none;
   font-weight: 500;
-  /*text-transform: uppercase;*/
   line-height: 1;
   overflow: hidden;
   max-height: 30px;
@@ -3448,21 +3447,23 @@ input.cmn-toggle-round-flat + label:before {
   display: inline-block;
   vertical-align: bottom;
   padding-right: 20px;
-  overflow: visible; }
+  overflow: visible;
+  padding-bottom: 5px;
+  top: 9px; }
 
 .project-title input {
-  position: absolute;
+  position: relative;
   left: 0;
-  top: -2px;
+  top: -1px;
   font-size: 100%;
   text-shadow: none;
   font-weight: 500;
-  /*text-transform: uppercase;*/
   line-height: 0.9;
   padding: 0;
   background-color: transparent;
   width: 192px;
-  height: 100%; }
+  height: 100%;
+  overflow: visible; }
 
 .project-description {
   top: 39px;
@@ -3494,7 +3495,8 @@ input.cmn-toggle-round-flat + label:before {
   right: 6px;
   top: 45px;
   overflow: hidden;
-  text-align: center; }
+  text-align: center;
+  z-index: 999; }
 
 .project-logo {
   position: relative;
@@ -6301,39 +6303,7 @@ img.start-project-client-logo {
 */
 /* @import 'color_picker';	// Color picker */
 /* @import 'mediaLibrary';	// Media Library */
-/*# sourceMappingURL=style.css.map */;.map-blur {
-	opacity: 1;
-	}
-
-.map-blur:after {
-	content: '';
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	left: 0;
-	top: 0;
-	background: rgba(0,0,0,0.7);	
-	z-index: 9999;
-	}
-
-.home-container,
-.status-progress-bar,
-.dropzone-pane,
-.q-editor-container,
-.dropzone-meta,
-.fullpage-documents,
-.data-library,
-.data-library, 
-.fullpage-mediaLibrary,
-#header,
-.fullpage-users,
-.fullpage-mediaLibrary {
-	z-index: 999999;
-	}	
-
-.dropzone-meta {
-	z-index: 9999999 !important;
-	};/*dropzone*/
+/*# sourceMappingURL=style.css.map */;/*dropzone*/
 .dropzone-meta {
 	width: 100%;
 	height: 100%;
@@ -6632,3 +6602,36 @@ body {
 
 
 
+;.map-blur {
+	opacity: 1;
+	}
+
+.map-blur:after {
+	content: '';
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	background: rgba(0,0,0,0.7);	
+	z-index: 9999;
+	}
+
+.home-container,
+.status-progress-bar,
+.dropzone-pane,
+.q-editor-container,
+.dropzone-meta,
+.fullpage-documents,
+.data-library,
+.data-library, 
+.fullpage-mediaLibrary,
+#header,
+.fullpage-users,
+.fullpage-mediaLibrary {
+	z-index: 999999;
+	}	
+
+.dropzone-meta {
+	z-index: 9999999 !important;
+	}
