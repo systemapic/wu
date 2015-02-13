@@ -6,9 +6,6 @@ var page = require('webpage').create(),
 // parse args
 var args = JSON.parse(system.args[1]);
 
-
-// lol branch
-
 // get vars
 var projectUuid = args.projectUuid;
 var hash        = args.hash;
