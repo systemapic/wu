@@ -75,11 +75,14 @@ module.exports = pixels = {
 			entry.data.image 	     = entry.data.image || {};
 			entry.data.image.dimensions  = dimensions;
 			entry.dataSize        	     = dataSize;
-			entry.data.image.created     = pixels.getExif.created(exif);
-			entry.data.image.gps         = pixels.getExif.gps(exif);
-			entry.data.image.cameraType  = pixels.getExif.cameraType(exif); 
-			entry.data.image.orientation = pixels.getExif.orientation(exif);
 			entry.data.image.file        = file;
+			
+			if (exif) {
+				entry.data.image.created     = pixels.getExif.created(exif);
+				entry.data.image.gps         = pixels.getExif.gps(exif);
+				entry.data.image.cameraType  = pixels.getExif.cameraType(exif); 
+				entry.data.image.orientation = pixels.getExif.orientation(exif);
+			}
 
 			console.log('**********************************')
 			console.log('* fn: crunch._processImage: * DONE! entry: ', entry);
@@ -87,7 +90,7 @@ module.exports = pixels = {
 			console.log('**********************************')
 
 			// return results to whatever callback
-			callback(err, entry);
+			callback(null, entry);
 		});
 
 	},
@@ -182,6 +185,7 @@ module.exports = pixels = {
 	// helper fn to parse exif
 	getExif : {
 		created : function (exif) {
+			if (!exif) return;
 			var time = '';
 			var profile = exif['Profile-EXIF']
 			if (profile) time = profile['Date Time'];			// todo: other date formats

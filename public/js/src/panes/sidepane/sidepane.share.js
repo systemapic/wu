@@ -164,13 +164,12 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	createLink : function () {
 
 		// create hash, callback
-		var that = this;
 		app.setHash(function (context, hash) {
 
 			// open input box
-			that._createLinkView(hash);
+			this._createLinkView(hash);
 
-		});
+		}.bind(this));
 		
 	},
 

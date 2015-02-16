@@ -15,20 +15,14 @@ var isThumb     = args.thumb;
 var serverUrl   = args.serverUrl;
 var serverData  = args.serverData;
 
-console.log('_____ server phantomJS: ', serverUrl, serverData);
-
 // set file path
 var outfile = path;
-
 
 // connect
 var page = require('webpage').create(),
 	server = serverUrl,
-	// server = 'https://127.0.0.1:3001/login',
-	// data = 'email=knutole@noerd.biz&password=***REMOVED***@noerdbiz';    // unhashed passwords, rly? pgp?
 	data = serverData;    // phantomJS account
 									// todo: create phantomjs user with changing password..
-
 // revv phantomjs
 page.viewportSize = { width : 1620, height: 1080 };	// set size...
 page.open(server, 'post', data, function (status, why) {

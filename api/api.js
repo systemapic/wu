@@ -1026,7 +1026,14 @@ module.exports = api = {
 		async.series(ops, function (err, results) {
 			console.log('pahtnom THUMB !! all done: ', err);
 			
-			if (err) console.log('err', err);
+			if (err) {
+				
+				console.log('err', err);
+				return res.end(JSON.stringify({
+					error : err
+				}));
+			}
+
 			
 			var doc = results[2]
 			var croppedImage = results[3];
@@ -1879,7 +1886,8 @@ module.exports = api = {
 				'slug',
 				'connectedAccounts',
 				'settings',
-				'categories'
+				'categories',
+				'thumbCreated'
 			];
 	
 			var queries = {};
@@ -2292,12 +2300,14 @@ module.exports = api = {
 		// return if not authorized
 		if (!permission.to.create.user( user )) {
 			var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
+			console.log(message);
 			return res.end(JSON.stringify({ error : message }));
 		};
 
 		// return if no email, or if email already in use
 		if (!email) {
 			var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
+			console.log(message);
 			return res.end(JSON.stringify({ error : message }));
 		};
 
@@ -2317,6 +2327,8 @@ module.exports = api = {
 		
 		// save the user
 		newUser.save(function(err, doc) { 
+			console.log('newUser save', err, doc);
+			
 			if (err) return res.end(JSON.stringify({
 				error : 'Error creating user.'
 			}));
@@ -3918,62 +3930,62 @@ module.exports = api = {
 
 			}
 
-			// update style
-			if (req.body.hasOwnProperty('style')) {
+			// // update style
+			// if (req.body.hasOwnProperty('style')) {
 
-				var style = req.body.style;
+			// 	var style = req.body.style;
 
-				console.log('Setting style: ', style);
+			// 	console.log('Setting style: ', style);
 
-				// {
-				// 	__sid : '232332',
-				// 	style : {
-				// 		color : "2323"
-				// 	}
-				// }
+			// 	// {
+			// 	// 	__sid : '232332',
+			// 	// 	style : {
+			// 	// 		color : "2323"
+			// 	// 	}
+			// 	// }
 
-				var __sid = style.__sid;
-				var newStyle = style.style;
+			// 	var __sid = style.__sid;
+			// 	var newStyle = style.style;
 
-				var existing = _.find(layer.style, function (s) {
-					return s.__sid == __sid;
-				});
+			// 	var existing = _.find(layer.style, function (s) {
+			// 		return s.__sid == __sid;
+			// 	});
 
-				console.log('existing: ', existing);
+			// 	console.log('existing: ', existing);
 				
-				if (existing) {
-					// get style
-					var existingStyle = JSON.parse(existing.style);
+			// 	if (existing) {
+			// 		// get style
+			// 		var existingStyle = JSON.parse(existing.style);
 
-					// set style
-					for (t in newStyle) {
-						existingStyle[t] = newStyle[t];
-					}
+			// 		// set style
+			// 		for (t in newStyle) {
+			// 			existingStyle[t] = newStyle[t];
+			// 		}
 
-					// referenced to layer.style, so should save
-					existing.style = JSON.stringify(existingStyle);
-
-
-				} else {
-
-					layer.style.push({
-						__sid : __sid,
-						style : JSON.stringify(newStyle)
-					});
-
-				}
-
-				layer.markModified('style');
-
-				layer.save(function (err) {
-					if (err) throw err;
-				});
+			// 		// referenced to layer.style, so should save
+			// 		existing.style = JSON.stringify(existingStyle);
 
 
+			// 	} else {
+
+			// 		layer.style.push({
+			// 			__sid : __sid,
+			// 			style : JSON.stringify(newStyle)
+			// 		});
+
+			// 	}
+
+			// 	layer.markModified('style');
+
+			// 	layer.save(function (err) {
+			// 		if (err) throw err;
+			// 	});
 
 
 
-			};
+
+
+			// };
 
 			res.end('save done');
 		});

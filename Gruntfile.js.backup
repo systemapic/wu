@@ -7,9 +7,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-sass'); 	// Non Ruby C++ sass 
 	grunt.loadNpmTasks('grunt-contrib-concat');    	// Slå sammen JS filer 
 	grunt.loadNpmTasks('grunt-contrib-uglify');	// JS minifyer 
-
-	grunt.loadNpmTasks('grunt-preprocess');		// Preprocess conditional HTML tags
-	grunt.loadNpmTasks('grunt-env');		// Set environment for conditional HTML 
 					
 	grunt.initConfig(    {  
 		
@@ -101,12 +98,13 @@ module.exports = function(grunt) {
 			options : {  
 				separator:';',
 			},
-																	
+			
 
 			// Goes in header
 			jsDependencies : {  
 				
 				src : [  
+
 
 					// dependencies 
 					'public/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js',
@@ -149,7 +147,7 @@ module.exports = function(grunt) {
 
 					// extra
 					'public/js/lib/opentip/opentip-native.js',
-					'public/js/lib/jss.js/jss.js'			
+					'public/js/lib/jss.js/jss.js'
 
 
 				],
@@ -227,7 +225,6 @@ module.exports = function(grunt) {
 				
 				src : [  
 
-
 					'public/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.css',
 					'public/js/src/grande.js/css/menu.css',                    
 					'public/js/src/grande.js/css/editor.css',
@@ -242,8 +239,7 @@ module.exports = function(grunt) {
 					'public/js/lib/codemirror/mode/cartocss/codemirror.fetta.css',
 					'public/js/lib/codemirror/mode/cartocss/spectrum.css',
 					'public/js/lib/codemirror/theme/mbo.css',
-					'public/css/opentip.css',
-
+					'public/css/opentip.css'
 				],
 				
 				dest : 'public/dist/combined/css.dependencies.css'
@@ -277,7 +273,6 @@ module.exports = function(grunt) {
 					'public/js/lib/mapbox.js/mapbox.2.1.4.js',
 					'public/js/lib/mapbox-gl.js/mapbox-gl.js',					
 					'public/js/src/controls/spinningMap.js',
-					'public/js/src/core/config/login.config.js',
 					'public/js/src/core/login.js',
 				],
 
@@ -315,51 +310,7 @@ module.exports = function(grunt) {
 				}
 			},
 
-		},
-
-
-		// Set environment for conditional HTML
-		env : {
-
-			options : {
-
-			/* Shared Options Hash */
-			//globalOption : 'foo'
-
-			},
-
-			dev: {
-
-				NODE_ENV : 'DEVELOPMENT'
-
-			},
-
-			prod : {
-
-				NODE_ENV : 'PRODUCTION'
-
-			}
-
-		},
-
-
-		// Preprocess – for conditional HTML tags
-		preprocess : {
-
-			dev : {
-
-				src : 'views/app.template.ejs',
-				dest : 'views/app.ejs'
-
-			},
-
-			prod : {
-
-				src : 'views/app.template.ejs',
-				dest : 'views/app.ejs'
-			}
 		}
-
 	}    ); 
   
   
@@ -384,7 +335,7 @@ module.exports = function(grunt) {
 		}    
 	); 
 
-	grunt.registerTask('css', 
+	grunt.registerTask('cssdeps', 
 		function () {
 			grunt.task.run([
 				'concat:cssDependencies',
@@ -396,7 +347,7 @@ module.exports = function(grunt) {
 
 	);
 
-	grunt.registerTask('js', 
+	grunt.registerTask('jsdeps', 
 		function () {
 			grunt.task.run([
 				'concat:jsDependencies',
@@ -405,24 +356,7 @@ module.exports = function(grunt) {
 				'uglify:jsPortal'
 			]);
 		}
-	);
-
-	grunt.registerTask('prod', function () { grunt.task.run([ 
-		
-			'concat:cssDependencies',
-			'cssmin:cssDependencies',
-			'concat:cssPortal',
-			'cssmin:cssPortal',
-			'concat:jsDependencies',
-			'uglify:jsDependencies',
-			'concat:jsPortal',
-			'uglify:jsPortal',
-			'env:prod', 
-			'preprocess:prod' 
-		
-		])});
-
-	grunt.registerTask('dev',  function () { grunt.task.run([ 'env:dev', 'preprocess:dev' ])});	
+	)
 
 	grunt.registerTask('default', ['waiter']);
 }
