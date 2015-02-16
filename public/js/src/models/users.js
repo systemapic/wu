@@ -129,33 +129,33 @@ Wu.User = Wu.Class.extend({
 
 
 	// set project access
-	delegateAccess : function (project, role, add) {
+	setAccess : function (project, capability, add) {
 
 		// save to server, only specific access
-		var access = {
+		var json = {
 			userUuid    : this.getUuid(),
 			projectUuid : project.getUuid(),
-			// clientUuid  : project.getClientUuid(),
-			role        : role, // eg. 'reader'
-			add         : add // true or false
+			capability  : capability, 	// read, readwrite, manage
+			add         : add 		// boolean
 		}
 
 		// post              path 	             data               callback     context of cb
-		Wu.Util.postcb('/api/user/delegate', JSON.stringify(access), this.delegatedAccess, this);
+		// Wu.Util.postcb('/api/user/delegate', JSON.stringify(json), this.setAccessDone, this);
+		Wu.Util.postcb('/api/access/set', JSON.stringify(json), this.setAccessDone, this);
 
-		// this._saveAccess(access)
+		// set status
 		app.setSaveStatus();
 	},
 
-	delegatedAccess : function (context, result) {
-
+	setAccessDone : function (context, result) {
+		console.log('setAccessDone', result);
 	},
 
 	// convenience methods
 	addReadProject : function (project) {
 
 		// save to server, only specific access
-		this.delegateAccess(project, 'reader', true);
+		this.setAccess(project, 'read', true);
 
 		// add access locally
 		this.store.role.reader.projects.push(project.getUuid());
@@ -165,7 +165,7 @@ Wu.User = Wu.Class.extend({
 	removeReadProject : function (project) {
 
 		// save to server, only specific access
-		this.delegateAccess(project, 'reader', false);
+		this.setAccess(project, 'read', false);
 
 		// remove access locally
 		_.remove(this.store.role.reader.projects, function (p) {
@@ -185,7 +185,7 @@ Wu.User = Wu.Class.extend({
 	addUpdateProject : function (project) {
 		
 		// save to server, only specific access
-		this.delegateAccess(project, 'editor', true);
+		this.setAccess(project, 'readwrite', true);
 
 		// add access locally
 		this.store.role.editor.projects.push(project.getUuid());
@@ -194,7 +194,7 @@ Wu.User = Wu.Class.extend({
 	removeUpdateProject : function (project) {
 
 		// save to server, only specific access
-		this.delegateAccess(project, 'editor', false);
+		this.setAccess(project, 'readwrite', false);
 
 		// remove access
 		_.remove(this.store.role.editor.projects, function (p) {
@@ -205,7 +205,7 @@ Wu.User = Wu.Class.extend({
 
 	addManageProject : function (project) {
 		// save to server, only specific access
-		this.delegateAccess(project, 'manager', true);
+		this.setAccess(project, 'manage', true);
 
 		// add access locally
 		this.store.role.manager.projects.push(project.getUuid());
@@ -214,7 +214,7 @@ Wu.User = Wu.Class.extend({
 	removeManageProject : function (project) {
 
 		// save to server, only specific access
-		this.delegateAccess(project, 'manager', false);
+		this.setAccess(project, 'manage', false);
 
 		// remove access
 		_.remove(this.store.role.manager.projects, function (p) {
