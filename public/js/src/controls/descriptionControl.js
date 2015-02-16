@@ -12,7 +12,24 @@ L.Control.Description = L.Control.extend({
 		    options   = this.options;
 
 		// add html
-		container.innerHTML = ich.descriptionControl(); 
+		// container.innerHTML = ich.descriptionControl(); 
+
+
+		// #description-toggle-button
+		this._button = Wu.DomUtil.create('div', 'dropdown-button description-toggle-button', container)
+
+		// // #description-control-inner-content
+		this._content = Wu.DomUtil.create('div', 'description-control-inner-content', container)
+
+		// //  #collapse-description
+		this._collapser = Wu.DomUtil.create('div', 'menucollapser collapse-description', this._content, 'Info');
+
+		// // #description-control-inner-content-box
+		this._outer = Wu.DomUtil.create('div', 'description-control-inner-content-box', this._content)
+
+			
+
+
 
 		return container; // turns into this._container on return
 
@@ -24,11 +41,10 @@ L.Control.Description = L.Control.extend({
 		this._container.style.display = "none";
 
 		// get panes
-		this._content 	= Wu.DomUtil.get('description-control-inner-content');
-		this._outer     = Wu.DomUtil.get('description-control-inner-content-box'); 
-		this._button	= Wu.DomUtil.get('description-toggle-button'); 
-		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
-		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
+		// this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
+		// this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
+		this._legendsContainer = app.MapPane.legendsControl._legendsContainer;
+		this._legendsCollapser = app.MapPane.legendsControl._legendsCollapser;
 		
 		// create scroller 
 		this._inner = Wu.DomUtil.create('div', 'description-scroller', this._outer);
