@@ -158,14 +158,18 @@ Wu.HeaderPane = Wu.Class.extend({
 		var whichTitle 	= e.target.whichTitle;
 
 		if (!whichTitle) return;
-		if (whichTitle == 'title')	var input = ich.injectHeaderTitleInput({ value : value });
-		if (whichTitle == 'subtitle')   var input = ich.injectHeaderSubtitleInput({ value : value });
+		// if (whichTitle == 'title')	var input = ich.injectHeaderTitleInput({ value : value });
+		// if (whichTitle == 'subtitle')   var input = ich.injectHeaderSubtitleInput({ value : value });
+		if (whichTitle == 'title')	var input = Wu.DomUtil.create('input', 'header-title editable');
+		if (whichTitle == 'subtitle')   var input = Wu.DomUtil.create('input', 'header-subtitle');
 
-		// inject <input>
-		div.innerHTML = input;
+		input.value = value;
+
+		div.innerHTML = '';
+		div.appendChild(input);
 
 		// focus
-		var target = div.firstChild;
+		var target = input;
 		target.focus();
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 

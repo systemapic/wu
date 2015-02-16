@@ -12,7 +12,22 @@ L.Control.Inspect = L.Control.extend({
 		    options   = this.options;
 
 		// add html
-		container.innerHTML = ich.inspectControl(); 
+		// container.innerHTML = ich.inspectControl(); 
+
+		// #description-toggle-button
+		this._content = Wu.DomUtil.create('div', 'inspect-control-inner-content', container);
+
+		// #inspector-header
+		this._header = Wu.DomUtil.create('div', 'menucollapser inspector-header', this._content, 'Layer inspector');
+
+		//  #collapse-description
+		this._scroller = Wu.DomUtil.create('div', 'inspector-list-outer-scroller', this._content);
+
+		// #inspector-list
+		this._list = Wu.DomUtil.create('div', 'inspector-list', this._scroller);
+
+
+
 
 		// add tooltip
 		app.Tooltip.add(container, 'Shows a list of active layers', { extends : 'systyle', tipJoint : 'top left'});
@@ -51,8 +66,8 @@ L.Control.Inspect = L.Control.extend({
 
 		// get vars
 		this.project  = project || app.activeProject;
-		this._content = Wu.DomUtil.get('inspect-control-inner-content'); 
-		this._list    = Wu.DomUtil.get('inspector-list');
+		// this._content = Wu.DomUtil.get('inspect-control-inner-content'); 
+		// this._list    = Wu.DomUtil.get('inspector-list');
 
 		// reset layers
 		this.layers = [];           

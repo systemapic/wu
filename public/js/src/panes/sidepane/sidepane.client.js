@@ -362,10 +362,15 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// inject <input>
 		var div = this.title;
 		var value = div.innerHTML;
-		div.innerHTML = ich.injectClientEditInput({ value : value }); 
+
+		var input = Wu.DomUtil.create('input', 'client-edit editable');
+		input.value = value;
+
+		div.innerHTML = ''; 
+		div.appendChild(input);
 
 		// focus
-		var target = div.firstChild;
+		var target = input;
 		target.focus();
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 

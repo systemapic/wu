@@ -15,14 +15,10 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this._usersControlsInner = Wu.DomUtil.create('div', 'users-controls-inner', this._usersControls);
 
 		// Add user button
-		this._addUser = Wu.DomUtil.createId('div', 'users-add-user', this._usersControlsInner);
-		this._addUser.innerHTML = 'Create user';
-		Wu.DomUtil.addClass(this._addUser, 'smap-button-gray users');
+		this._addUser = Wu.DomUtil.create('div', 'users-add-user smap-button-gray users', this._usersControlsInner, 'Create user');
 
 		// Delete user button
-		this._delUser = Wu.DomUtil.createId('div', 'users-delete-user', this._usersControlsInner);
-		this._delUser.innerHTML = 'Delete user';
-		Wu.DomUtil.addClass(this._delUser, 'smap-button-gray users');
+		this._deleteUser = Wu.DomUtil.create('div', 'users-delete-user smap-button-gray users', this._usersControlsInner, 'Delete user');
 
 		// Search users
 		this._search = Wu.DomUtil.createId('input', 'users-search', this._usersControlsInner);
@@ -31,21 +27,71 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		Wu.DomUtil.addClass(this._search, 'search');
 
 		// create container (overwrite default) and insert template
-		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content, ich.usersPane());
+		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content);
 
-		// get handles
-		this._tableContainer = Wu.DomUtil.get('users-table-container');
+		// #userlist
+		this._userList = Wu.DomUtil.create('div', 'userlist', this._container);
 
-		// render empty table
-		this._tableContainer.innerHTML = ich.usersTableFrame();
+		// #user-management-client
+		this._mainTitle = Wu.DomUtil.create('h4', 'user-management-client', this._userList);
 
-		// get more handles
-		this._table 	    = Wu.DomUtil.get('users-insertrows');
-		this._addUser       = Wu.DomUtil.get('users-add-user');
-		this._mainTitle     = Wu.DomUtil.get('user-management-client');
-		this._deleteUser    = Wu.DomUtil.get('users-delete-user');
-		this._checkall      = Wu.DomUtil.get('users-checkbox-all');
-		this._checkallLabel = Wu.DomUtil.get('label-users-checkbox-all');
+		// #users-table-container
+		this._tableContainer = Wu.DomUtil.create('div', 'users-table-container', this._userList);
+
+
+		// #userslist
+		this._uList = Wu.DomUtil.createId('div', 'userslist', this._tableContainer);
+
+		// #users-table
+		var table = Wu.DomUtil.create('table', 'users-table', this._uList)
+		var thead = Wu.DomUtil.create('thead', '', table);
+		var tr = Wu.DomUtil.create('tr', '', thead);
+		
+		var th1 = Wu.DomUtil.create('th', 'fivep', tr);
+		th1.setAttribute('data-sort', 'checkbox');
+
+		// #users-squaredThree-checkbox-all
+		var th1_CBcontainer = Wu.DomUtil.create('div', 'squaredThree users-squaredThree-checkbox-all', th1);
+
+		// #users-checkbox-all
+		this._checkall = Wu.DomUtil.create('input', 'users-checkbox-all', th1_CBcontainer);
+		this._checkall.setAttribute('type', 'checkbox');
+		this._checkall.setAttribute('name', 'check');
+		this._checkall.setAttribute('value', 'None');
+		
+		// #label-users-checkbox-all
+		this._checkallLabel = Wu.DomUtil.create('label', 'label-users-checkbox-all', th1);
+		this._checkallLabel.setAttribute('for', 'users-checkbox-all');
+
+		var th2 = Wu.DomUtil.create('th', 'sort name thirtyp', tr, 'Name');
+		th2.setAttribute('data-sort', 'name');
+		th2.setAttribute('data-insensitive', 'true');
+
+		var th3 = Wu.DomUtil.create('th', 'sort company', tr, 'Company');
+		th3.setAttribute('data-sort', 'company');
+		th3.setAttribute('data-insensitive', 'true');
+
+		var th4 = Wu.DomUtil.create('th', 'sort position', tr, 'Position');
+		th4.setAttribute('data-sort', 'position');
+		th4.setAttribute('data-insensitive', 'true');
+
+		var th5 = Wu.DomUtil.create('th', 'sort phone', tr, 'Phone');
+		th5.setAttribute('data-sort', 'phone');
+		th5.setAttribute('data-insensitive', 'true');
+
+		var th6 = Wu.DomUtil.create('th', 'sort email', tr, 'Email');
+		th6.setAttribute('data-sort', 'email');
+		th6.setAttribute('data-insensitive', 'true');
+
+		var th7 = Wu.DomUtil.create('th', 'sort projects', tr, 'Access');
+		th7.setAttribute('data-sort', 'projects');
+		th7.setAttribute('data-insensitive', 'true');	
+
+
+		// #users-insertrows
+		this._table = Wu.DomUtil.createId('tbody', 'users-insertrows', table)
+		this._table.className = 'list';
+
 
 		// init table
 		this.initList();
@@ -168,11 +214,54 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	// list.js plugin
 	initList : function () { 
+
 		
 		// add dummy entry
-		var tr = Wu.DomUtil.createId('tr', 'dummy-table-entry');
-		tr.innerHTML = ich.usersTablerow({'type' : 'dummy-table-entry'});
-		this._table.appendChild(tr);
+		var _tr = Wu.DomUtil.createId('tr', 'dummy-table-entry');
+
+		this._table.appendChild(_tr);
+
+
+		var _td1 = Wu.DomUtil.create('td', 'checkbox', _tr);
+		var _cBox = Wu.DomUtil.create('div', 'squaredThree', _td1);
+		var _cBoxInput = Wu.DomUtil.create('input', '', _cBox);
+		_cBoxInput.setAttribute('type', 'checkbox');
+		_cBoxInput.setAttribute('value', 'None');
+		_cBoxInput.setAttribute('name', 'check');
+		var _cBoxLabel = Wu.DomUtil.create('label', '', _cBox);
+
+		
+		var _td2 = Wu.DomUtil.create('td', 'name', _tr);
+
+		var _td3 = Wu.DomUtil.create('td', 'tdcont company', _tr);
+		_td3.setAttribute('key', 'company');
+		_td3.setAttribute('id', 'company-');
+		_td3.setAttribute('uuid', '');
+
+		var _td4 = Wu.DomUtil.create('td', 'tdcont position', _tr);
+		_td4.setAttribute('key', 'position');	
+		_td4.setAttribute('id', 'position-');
+		_td4.setAttribute('uuid', '');		
+
+		var _td5 = Wu.DomUtil.create('td', 'tdcont phone', _tr);
+		_td5.setAttribute('key', 'phone');
+		_td5.setAttribute('id', 'phone-');
+		_td5.setAttribute('uuid', '');		
+
+		var _td6 = Wu.DomUtil.create('td', 'tdcont email', _tr);
+		_td6.setAttribute('key', 'email');		
+		_td6.setAttribute('id', 'email-');
+		_td6.setAttribute('uuid', '');		
+
+		var _td7 = Wu.DomUtil.create('td', 'tdcont access', _tr);
+		_td7.setAttribute('key', 'access');	
+		_td7.setAttribute('id', 'access-');
+		_td7.setAttribute('uuid', '');		
+
+		var _td8 = Wu.DomUtil.create('td', 'tdcont uuid', _tr);
+		_td8.style.display = 'none';		
+
+
 
 		// init list.js
 		var options = { valueNames : ['name', 'company', 'position', 'phone', 'email', 'access'] };
@@ -444,12 +533,29 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// prepare template values
 		var template = {};   
-		template.name = ich.usersTablerowName({
+
+		// template.name = ich.usersTablerowName({
+		// 	firstName     : user.getFirstName() || 'First name',
+		// 	lastName      : user.getLastName()  || 'Last name',
+		// 	lastNameUuid  : 'lastName-'  + user.getUuid(),
+		// 	firstNameUuid : 'firstName-' + user.getUuid(),
+		// });
+
+
+		var tmpData = {
 			firstName     : user.getFirstName() || 'First name',
 			lastName      : user.getLastName()  || 'Last name',
 			lastNameUuid  : 'lastName-'  + user.getUuid(),
-			firstNameUuid : 'firstName-' + user.getUuid(),
-		});     
+			firstNameUuid : 'firstName-' + user.getUuid()			
+		}
+
+		// These must for some obscure reason be as strings...
+		var tmpLastNameString = '<input value="' + tmpData.lastName + '" id="' + tmpData.lastNameUuid + '" class="dln" readonly="readonly">';
+		var tmpFirstNameString = '<input value="' + tmpData.firstName + '" id="' + tmpData.firstNameUuid + '" class="dln smallerText" readonly="readonly">';
+
+		template.name = tmpLastNameString + tmpFirstNameString;
+
+
 		template.email    = user.getEmail();
 		template.position = user.getPosition();
 		template.company  = user.getCompany();
@@ -509,7 +615,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 					description 	: project.store.description,
 					uuid 		: project.store.uuid
 				}
-				template += ich.usersTableProjectItem(content);
+				template += '<div class="users-table-project-item" title="' + content.description + '" >' + content.name + '</div>';
+
+				
 			}
 			return template;
 		}
@@ -525,7 +633,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 				description 	: project.store.description,
 				uuid 		: project.store.uuid
 			}
-			template += ich.usersTableProjectItem(content);
+			template += '<div class="users-table-project-item" title="' + content.description + '" >' + content.name + '</div>';
 		}, this);
 		return template;
 	},
@@ -843,14 +951,26 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var key   = e.target.getAttribute('key');
 		var uuid  = e.target.getAttribute('uuid');
 
-		var input = ich.injectInput({ 
+		var inputData = { 
 			value : value, 
 			key   : key , 
 			uuid  : uuid 
-		});
+		};
 		
+
+		div.innerHTML = '';
+
+		var input = Wu.DomUtil.create('input', 'inject-input', div);
+		input.setAttribute('key', inputData.key);
+		input.setAttribute('value', inputData.value);
+		input.setAttribute('uuid', inputData.uuid);
+
+
+		// <input key="{{key}}" value="{{value}}" uuid="{{uuid}}" class="inject-input">
+
+
 		// inject <input>
-		div.innerHTML = input;
+		// div.innerHTML = input;
 
 		var target = div.firstChild;
 

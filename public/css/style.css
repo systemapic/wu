@@ -230,7 +230,7 @@ ul#checked p:after {
   border-radius: 3px;
   -moz-border-radius: 3px;
   background: -moz-linear-gradient(19% 75% 90deg, #FFFFFF, #A1A1A1);
-  background: #ffffff-webkit-gradient(linear, 0% 0%, 0% 100%, from(#A1A1A1), to(#FFFFFF));
+  background: #fff -webkit-gradient(linear, 0% 0%, 0% 100%, from(#A1A1A1), to(#FFFFFF));
   border: 1px solid #e5e5e5;
   position: absolute;
   top: 0px;
@@ -266,7 +266,7 @@ label.info {
   position: absolute; }
 
 /* Hide select all users button, because it doesn't work, and it's not really needed */
-#users-squaredThree-checkbox-all {
+.users-squaredThree-checkbox-all {
   visibility: hidden; }
 
 /*
@@ -436,7 +436,8 @@ label.info {
   display: block !important; }
 
 /* A bit annoying, but center most headlines */
-#editor-client-item-new h5, .editor-inner-wrapper h5, #select-basic-themes, #advanced-color-header, .editor-wrapper h4 {
+/*#editor-client-item-new h5, */
+.editor-client-title h5, .editor-inner-wrapper h5, #select-basic-themes, #advanced-color-header, .editor-wrapper h4 {
   font-weight: 400;
   text-align: center; }
 
@@ -1375,7 +1376,8 @@ input.cmn-toggle-round-flat + label:before {
   content: '';
   background-image: url(images/evil_sprite.png);
   background-repeat: no-repeat;
-  background-position: -145px -75px;
+  /*background-position: -145px -75px;*/
+  background-position: -99px -75px;
   height: 26px !important;
   width: 26px !important;
   position: absolute;
@@ -1529,7 +1531,7 @@ input.cmn-toggle-round-flat + label:before {
   max-height: 200px; }
 
 /* inner wrapper */
-#legends-control-inner-content {
+.legends-control-inner-content {
   bottom: 0px;
   padding-left: 0;
   width: auto;
@@ -1538,7 +1540,7 @@ input.cmn-toggle-round-flat + label:before {
   display: block; }
 
 /* inner wrapper 2 */
-#legends-inner {
+.legends-inner {
   background: rgba(255, 255, 255, 0.97);
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
   overflow: hidden;
@@ -1548,7 +1550,7 @@ input.cmn-toggle-round-flat + label:before {
   left: 3px; }
 
 /* legends close button (litte arrow) */
-#legends-collapser {
+.legends-collapser {
   background-position: -26px 8px;
   background-color: transparent;
   top: -3px;
@@ -1558,7 +1560,7 @@ input.cmn-toggle-round-flat + label:before {
   left: 0; }
 
 /* legends scroll left */
-#legends-scroll-left {
+.legends-scroll-left {
   width: 20px;
   height: 13px;
   position: absolute;
@@ -1583,11 +1585,11 @@ input.cmn-toggle-round-flat + label:before {
   background-position: 2px -168px;
   opacity: 0.5; }
 
-#legends-scroll-left:hover, #legends-scroll-right:hover {
+.legends-scroll-left:hover, .legends-scroll-right:hover {
   opacity: 1; }
 
 /* open closed legends */
-#legends-opener {
+.legends-opener {
   text-align: center;
   background: white;
   /*height: 100%;*/
@@ -1600,7 +1602,7 @@ input.cmn-toggle-round-flat + label:before {
   width: 150px;
   opacity: 0; }
 
-#legends-inner-slider {
+.legends-inner-slider {
   position: relative;
   left: 0px; }
 
@@ -1742,7 +1744,7 @@ input.cmn-toggle-round-flat + label:before {
   position: absolute; }
 
 /* Leaflet description Header wrapper */
-#description-control-inner-content {
+.description-control-inner-content {
   height: 100%;
   overflow: hidden;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
@@ -1750,7 +1752,7 @@ input.cmn-toggle-round-flat + label:before {
   position: relative; }
 
 /* Close Description box button */
-#description-toggle-button {
+.description-toggle-button {
   border-radius: 0;
   background-position: -27px -43px;
   right: 4px;
@@ -1762,11 +1764,11 @@ input.cmn-toggle-round-flat + label:before {
   left: 4px;
   opacity: 0.5; }
 
-#description-toggle-button:hover {
+.description-toggle-button:hover {
   opacity: 1 !important; }
 
 /* Description inner wrapper */
-#description-control-inner-content-box {
+.description-control-inner-content-box {
   background: rgba(255, 255, 255, 0.97);
   width: 320px;
   height: 100%;
@@ -1780,18 +1782,18 @@ input.cmn-toggle-round-flat + label:before {
   overflow-x: hidden;
   max-height: 500px; }
 
-#description-control-inner-content-box a {
+.description-control-inner-content-box a {
   font-weight: 900; }
 
-#description-control-inner-content-box h1 {
+.description-control-inner-content-box h1 {
   font-size: 25px;
   margin: 10px 0px 10px 0px; }
 
-#description-control-inner-content-box h2 {
+.description-control-inner-content-box h2 {
   font-size: 16px;
   margin: 15px 0px 5px 0px; }
 
-#description-control-inner-content-box hr {
+.description-control-inner-content-box hr {
   border-top: 1px solid black; }
 
 /* Description inner scroller */
@@ -2158,7 +2160,7 @@ input.cmn-toggle-round-flat + label:before {
   top: auto; }
 
 /* Inner wrapper */
-#inspect-control-inner-content {
+.inspect-control-inner-content {
   background: rgba(255, 255, 255, 0.97);
   padding-bottom: 1px;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
@@ -2166,7 +2168,7 @@ input.cmn-toggle-round-flat + label:before {
   overflow: hidden; }
 
 /* header */
-#inspector-header {
+.inspector-header {
   position: relative;
   right: 0;
   top: 0 !important;
@@ -2179,7 +2181,7 @@ input.cmn-toggle-round-flat + label:before {
   overflow: hidden; }
 
 /* Inner wrapper */
-#inspector-list {
+.inspector-list {
   max-height: 160px;
   height: auto;
   padding-top: 10px;
@@ -2486,30 +2488,6 @@ input.cmn-toggle-round-flat + label:before {
 .leaflet-styleeditor-pattern:active {
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.3); }
 
-.SVGpattern1 {
-  background-image: url(images/patternPics/SVGpattern1.png); }
-
-.SVGpattern2 {
-  background-image: url(images/patternPics/SVGpattern2.png); }
-
-.SVGpattern3 {
-  background-image: url(images/patternPics/SVGpattern3.png); }
-
-.SVGpattern4 {
-  background-image: url(images/patternPics/SVGpattern4.png); }
-
-.SVGpattern5 {
-  background-image: url(images/patternPics/SVGpattern5.png); }
-
-.SVGpattern6 {
-  background-image: url(images/patternPics/SVGpattern8.png); }
-
-.SVGpattern7 {
-  background-image: url(images/patternPics/SVGpattern7.png); }
-
-.SVGpattern8 {
-  background-image: url(images/patternPics/SVGpattern6.png); }
-
 /* search-tooltip */
 /* search-tooltip */
 /* search-tooltip */
@@ -2523,10 +2501,10 @@ input.cmn-toggle-round-flat + label:before {
   font-size: 14px; }
 
 .leaflet-control-search .search-button {
-  background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon.png') no-repeat 2px -22px !important; }
+  background: url('images/search-icon.png') no-repeat 2px -22px !important; }
 
 .leaflet-control-search .search-button:hover {
-  background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon.png') no-repeat 2px 2px !important; }
+  background: url('images/search-icon.png') no-repeat 2px 2px !important; }
 
 .search-tooltip {
   min-width: none !important;
@@ -2815,20 +2793,24 @@ input.cmn-toggle-round-flat + label:before {
 
 .sp-cancel, .sp-cancel:hover {
   background: rgba(255, 255, 255, 0.5);
-  height: 22px;
+  /*height: 22px;*/
   bottom: 6px;
   position: absolute;
-  left: 77px;
+  /*left: 77px;*/
   text-shadow: none;
   color: white !important;
   font-weight: 900;
   font-size: 12px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
-  width: 49px;
+  /*width: 49px;*/
   text-align: center;
   text-decoration: none;
   line-height: 2;
-  border: none; }
+  border: none;
+  line-height: 1.5 !important;
+  left: 67px !important;
+  height: 26px !important;
+  width: 59px !important; }
 
 .sp-container button, .sp-container button:hover {
   background: rgba(255, 255, 255, 0.5);
@@ -3701,7 +3683,8 @@ input.cmn-toggle-round-flat + label:before {
   right: 83px; }
 
 /* New Client title */
-#editor-client-item-new h5 {
+/*#editor-client-item-new h5 {*/
+.editor-client-title h5 {
   padding: 0;
   position: relative;
   display: block;
@@ -4154,7 +4137,7 @@ input.cmn-toggle-round-flat + label:before {
   box-sizing: border-box; }
 
 /* left wrapper */
-#documents-container-leftpane {
+.documents-container-leftpane {
   position: absolute;
   font-weight: 200;
   margin: 10px;
@@ -4163,7 +4146,7 @@ input.cmn-toggle-round-flat + label:before {
   top: 0px; }
 
 /* right wrapper */
-#documents-container-rightpane {
+.documents-container-rightpane {
   position: absolute;
   font-weight: 200;
   padding: 20px;
@@ -4184,11 +4167,11 @@ input.cmn-toggle-round-flat + label:before {
   padding-bottom: 125px; }
 
 /* folder list */
-#documents-folder-list {
+.documents-folder-list {
   margin-top: 30px; }
 
 /* list items */
-.documents-folder-item, #documents-new-folder {
+.documents-folder-item, .documents-new-folder {
   background: none;
   border: none;
   margin: 4px;
@@ -4202,11 +4185,11 @@ input.cmn-toggle-round-flat + label:before {
   font-size: 115%;
   padding-left: 10px; }
 
-.documents-folder-delete, .documents-folder-item, #documents-new-folder {
+.documents-folder-delete, .documents-folder-item, .documents-new-folder {
   color: #333;
   padding-right: 0px; }
 
-#documents-new-folder:hover, .documents-folder-item:hover {
+.documents-new-folder:hover, .documents-folder-item:hover {
   color: #000; }
 
 .documents-folder-item input {
@@ -4260,7 +4243,7 @@ input.cmn-toggle-round-flat + label:before {
 .tdcont.email {
   cursor: default; }
 
-#documents-new-folder {
+.documents-new-folder {
   margin-left: 10px; }
 
 /* GRANDE STUFF */
@@ -4402,17 +4385,17 @@ button.image-attachment {
   width: auto;
   max-width: 70px; }
 
-#documents-container-textarea {
+.documents-container-textarea {
   padding-top: 20px; }
 
-#documents-container-textarea h1 {
+.documents-container-textarea h1 {
   font-size: 200%; }
 
-#documents-container-textarea h2 {
+.documents-container-textarea h2 {
   color: #333;
   font-size: 120%; }
 
-#documents-container-textarea p {
+.documents-container-textarea p {
   color: #333;
   font-weight: 400;
   font-size: 90%; }
@@ -4450,7 +4433,7 @@ button.image-attachment {
   box-sizing: border-box; }
 
 /* Inner wrapper for users and data library */
-#filelist, #userlist {
+#filelist, .userlist {
   margin: 20px; }
 
 /* The box with the file count */
@@ -4552,7 +4535,7 @@ button.image-attachment {
   display: none; }
 
 /* Main Table with file list */
-#users-table, #datalibrary-table {
+.users-table, .datalibrary-table {
   width: 100%; }
 
 /* download dialogue box */
@@ -4570,7 +4553,7 @@ button.image-attachment {
   padding: 10px; }
 
 /* download table head */
-#datalibrary-download-table thead tr {
+.datalibrary-download-table thead tr {
   font-size: 80%; }
 
 /* download table head "Name" */
@@ -4583,7 +4566,7 @@ button.image-attachment {
   padding-left: 15px; }
 
 /* download OK button "Download" */
-#download-ok-button {
+.download-ok-button {
   width: 100px;
   position: relative;
   font-size: 17px;
@@ -4597,7 +4580,7 @@ button.image-attachment {
   height: 30px; }
 
 /* dowload cancel button "Cancel" */
-#download-cancel-button {
+.download-cancel-button {
   position: relative;
   font-size: 17px;
   line-height: 1.7;
@@ -6082,7 +6065,9 @@ input[type=checkbox] + label.check {
   position: absolute;
   top: 0;
   width: 100%;
-  height: 100%; }
+  height: 100%;
+  background-image: url('images/startpane-faint-bg.png');
+  background-size: cover; }
 
 .spinning-wrapper {
   position: absolute;
@@ -6152,6 +6137,7 @@ input[type=checkbox] + label.check {
   margin-top: 0;
   overflow: hidden;
   opacity: 0.9;
+  border-radius: 2px;
   -webkit-transition: opacity 250ms ease;
   -moz-transition: opacity 250ms ease;
   -ms-transition: opacity 250ms ease;
@@ -6303,4 +6289,3 @@ img.start-project-client-logo {
 */
 /* @import 'color_picker';	// Color picker */
 /* @import 'mediaLibrary';	// Media Library */
-/*# sourceMappingURL=style.css.map */

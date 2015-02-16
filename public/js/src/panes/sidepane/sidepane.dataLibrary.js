@@ -45,10 +45,14 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.progress = Wu.DomUtil.create('div', 'progress-bar', this._content);
 		
 		// insert template
-		this._container.innerHTML = ich.datalibraryContainer();
+		// this._container.innerHTML = ich.datalibraryContainer();
 
-		// get element handlers
-		this._tableContainer = Wu.DomUtil.get('datalibrary-table-container');
+		// #datalibrary-container
+		this._dataLibraryContainer = Wu.DomUtil.create('div', 'datalibrary-container', this._container);
+	
+		// #datalibrary-table-container
+		this._tableContainer = Wu.DomUtil.create('div', 'datalibrary-table-container', this._dataLibraryContainer);
+
 	      
 		// create fullscreen dropzone
 		this.fulldrop = Wu.DomUtil.create('div', 'fullscreen-drop', this._content);
@@ -56,17 +60,71 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// filecount
 		this.filecount = 0;
 
-		// render empty table
-		this._tableContainer.innerHTML = ich.datalibraryTableframe();
+		
 
 		// get elements
-		this._table 		= Wu.DomUtil.get('datalibrary-insertrows');
 		this._errors 		= Wu.DomUtil.get('datalibrary-errors');
 		this._uploader 		= Wu.DomUtil.get('upload-container');
 		this._deleter 		= Wu.DomUtil.get('datalibrary-delete-file');
 		this._downloader 	= Wu.DomUtil.get('datalibrary-download-files');
-		this._checkall 		= Wu.DomUtil.get('checkbox-all');
-		this._checkallLabel 	= Wu.DomUtil.get('label-checkbox-all');
+
+
+		
+		// RENDER EMPTY TABLE
+
+		this._fileList = Wu.DomUtil.createId('div', 'filelist', this._tableContainer);
+		this._tableFrame = Wu.DomUtil.create('table', 'datalibrary-table', this._fileList);
+		this._tableHead = Wu.DomUtil.create('thead', '', this._tableFrame);
+		this._tableHeadRow = Wu.DomUtil.create('tr', '', this._tableHead);
+
+		this._th1 = Wu.DomUtil.create('th', 'fivep', this._tableHeadRow);
+		this._th1.setAttribute('data-sort', 'checkbox');
+
+		this._th1checkBox = Wu.DomUtil.createId('div', 'squaredThree-checkbox-all');
+		this._th1checkBox.className = 'squaredThree';
+
+		this._checkall = Wu.DomUtil.createId('input', 'checkbox-all', this._th1checkBox);
+		this._checkall.setAttribute('type', 'checkbox');
+		this._checkall.setAttribute('name', 'check');
+		this._checkall.setAttribute('value', 'None');
+
+		this._checkallLabel = Wu.DomUtil.createId('label', 'label-checkbox-all', this._th1checkBox);
+		this._checkallLabel.setAttribute('for', 'checkbox-all');
+
+		this._th2 = Wu.DomUtil.create('th', 'sort thirtyp', this._tableHeadRow, 'Name');
+		this._th2.setAttribute('data-sort', 'name');
+		this._th2.setAttribute('data-insensitive', 'true');
+
+		this._th3 = Wu.DomUtil.create('th', 'sort type', this._tableHeadRow, 'Type');
+		this._th3.setAttribute('data-sort', 'type');
+		this._th3.setAttribute('data-insensitive', 'true');
+
+		this._th4 = Wu.DomUtil.create('th', 'sort files', this._tableHeadRow, 'Files');
+		this._th4.setAttribute('data-sort', 'files');
+		this._th4.setAttribute('data-insensitive', 'true');
+
+		this._th5 = Wu.DomUtil.create('th', 'sort category', this._tableHeadRow, 'Category');
+		this._th5.setAttribute('data-sort', 'category');
+		this._th5.setAttribute('data-insensitive', 'true');
+
+		this._th6 = Wu.DomUtil.create('th', 'sort keywords', this._tableHeadRow, 'Keywords');
+		this._th6.setAttribute('data-sort', 'keywords');
+		this._th6.setAttribute('data-insensitive', 'true');
+
+		this._th7 = Wu.DomUtil.create('th', 'sort createdDate', this._tableHeadRow, 'Date');
+		this._th7.setAttribute('data-sort', 'createdDate');
+		this._th7.setAttribute('data-insensitive', 'true');
+
+		this._th8 = Wu.DomUtil.create('th', 'sort status', this._tableHeadRow, 'Status');
+		this._th8.setAttribute('data-sort', 'status');
+		this._th8.setAttribute('data-insensitive', 'true');										
+
+
+		// #datalibrary-insertrows
+		this._table = Wu.DomUtil.create('tbody', 'list datalibrary-insertrows', this._tableFrame);
+
+		// END OF EMPTY TABLE
+
 
 		// init table
 		this.initList();
@@ -183,12 +241,29 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	initDownloadTable : function () {
 
-		var table = ich.datalibraryTableDownload();
-		this._downloadList.innerHTML = table;
+		// var table = ich.datalibraryTableDownload();
+		// this._downloadList.innerHTML = table;
 
-		// get elems 
-		this._downloadOK = Wu.DomUtil.get('download-ok-button');
-		this._downloadCancel = Wu.DomUtil.get('download-cancel-button');
+		// #datalibrary-download-table
+		var table = Wu.DomUtil.create('table', 'datalibrary-download-table', this._downloadList);
+		var tableHead = Wu.DomUtil.create('thead', '', table);
+		var tr = Wu.DomUtil.create('tr', '', tableHead);
+		var th1 = Wu.DomUtil.create('div', 'download-name', tr, 'Name');
+		var th2 = Wu.DomUtil.create('div', 'download-category', tr, 'Category');
+		var th3 = Wu.DomUtil.create('div', 'download-version', tr, 'Version');
+		var th4 = Wu.DomUtil.create('div', 'download-status', tr, 'Status');
+		var th5 = Wu.DomUtil.create('div', 'download-format', tr, 'Format');
+		var th6 = Wu.DomUtil.create('div', 'download-size', tr, 'Size');
+		var th7 = Wu.DomUtil.create('div', 'download-remove', tr, 'Remove');
+
+		// #datalibrary-download-insertrows
+		this.tBody = Wu.DomUtil.create('tbody', 'datalibrary-download-insertrows', table);
+
+		// #download-cancel-button
+		this._downloadCancel = Wu.DomUtil.create('div', 'smap-button-gray download-cancel-button', this._downloadList, 'Cancel');
+
+		// #download-ok-button
+		this._downloadOK = Wu.DomUtil.create('div', 'smap-button-gray download-ok-button', this._downloadList, 'Download');
 	
 		// set hooks
 		Wu.DomEvent.on(this._downloadOK, 'mousedown', this.downloadFiles, this);
@@ -238,6 +313,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			'puuid' : this.project.store.uuid,
 			'pslug' : this.project.store.slug
 		}
+
+
+		console.log(json);
+		
 		var json = JSON.stringify(json);
 
 		// post         path          json      callback           this
@@ -329,7 +408,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		}, this);
 
 		// get table and insert
-		var table = Wu.DomUtil.get('datalibrary-download-insertrows');
+		var table = this.tBody;
 		table.innerHTML = tr;
 
 		// show
@@ -389,9 +468,29 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	initList : function () { 
 		
 		// add dummy entry
-		var tr = Wu.DomUtil.createId('tr', 'dummy-table-entry');
-		tr.innerHTML = ich.datalibraryTablerow({'type' : 'dummy-table-entry'});
-		this._table.appendChild(tr);
+		var _tr = Wu.DomUtil.createId('tr', 'dummy-table-entry', this._table);
+
+		_tr.innerHTML = '';
+
+		var _td1 = Wu.DomUtil.create('td', 'checkbox', _tr);
+		var _td1Button = Wu.DomUtil.create('div', 'squaredThree', _td1);
+
+		var _td1Input = Wu.DomUtil.createId('input', '', _td1Button);
+		_td1Input.setAttribute('type', 'checkbox');
+		_td1Input.setAttribute('value', 'None');
+		_td1Input.setAttribute('name', 'check');
+
+		var _td1Label = Wu.DomUtil.create('label', '', _td1Button);
+		var _td2 = Wu.DomUtil.create('td', 'name', _tr);
+		var _td3 = Wu.DomUtil.create('td', 'tdcont type', _tr);
+		var _td4 = Wu.DomUtil.create('td', 'tdcont files', _tr);
+		var _td5 = Wu.DomUtil.create('td', 'tdcont category', _tr);
+		var _td6 = Wu.DomUtil.create('td', 'tdcont keywords', _tr);
+		var _td7 = Wu.DomUtil.create('td', 'tdcont createdDate', _tr);
+		var _td8 = Wu.DomUtil.create('td', 'tdcont status', _tr);
+		var _td9 = Wu.DomUtil.create('td', 'tdcont uuid', _tr);
+		Wu.DomUtil.addClass(_td9, 'displayNone');
+		
 
 		// init list.js
 		var options = { valueNames : ['name', 'file', 'category', 'keywords', 'date', 'status', 'type'] };
@@ -696,15 +795,21 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	addFile : function (file) {
 
 		// clone file object
-		var tmp = Wu.extend({}, file.getStore());   
+		var tmp = Wu.extend({}, file.getStore()); 
 
-		// add record (a bit hacky, but with a cpl of divs inside the Name column)
-		tmp.name = ich.datalibraryTablerowName({
+		var tmpData = {
 			name 		: tmp.name || 'Title',
 			description 	: tmp.description || 'Description',
 			nameUuid 	: 'name-' + tmp.uuid,
-			descUuid 	: 'description-' + tmp.uuid,
-		});
+			descUuid 	: 'description-' + tmp.uuid,			
+		}
+
+		// DOM elements must be string...
+		var tmpNameString = '<input value="' + tmpData.name + '" id="' + tmpData.nameUuid + '" class="dln" readonly="readonly">';
+		tmpNameString += '<textarea  id="' + tmpData.descUuid + '" class="dld" readonly="readonly">' + tmpData.description + '</textarea>';
+
+		// add record (a bit hacky, but with a cpl of divs inside the Name column)
+		tmp.name = tmpNameString;
 
 		// clean some fields
 		tmp.type = tmp.type.camelize();
@@ -715,9 +820,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// add file to list.js
 		var ret = this.list.add(tmp);
 		
-		// ugly hack: manually add uuids
+		// ugly hack: manually add uuids			// TODO: FIX
 		ret[0].elm.id = tmp.uuid;                              // <tr>
 		var c = ret[0].elm.children[0].children[0].children;    
+
 		c[0].id = 'checkbox-' + tmp.uuid;                      // checkbox
 		c[1].setAttribute('for', 'checkbox-' + tmp.uuid);      // label
 

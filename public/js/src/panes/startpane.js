@@ -187,8 +187,10 @@ Wu.StartPane = Wu.Class.extend({
 		newProject._clientName = Wu.DomUtil.create('div', 'start-project-client-name', newProject._projectContainer);
 		newProject._clientName.innerHTML = clientName;
 
-		newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
-		newProject._clientLogo.src = clientLogo;
+		if ( clientLogo ) {
+			newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
+			newProject._clientLogo.src = clientLogo;
+		}
 
 
 		this.projectContainers.push(newProject);

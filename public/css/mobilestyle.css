@@ -373,15 +373,15 @@ td {
 	padding-right: 0;
 	}
 
-#users-insertrows tr .checkbox {
+.users-insertrows tr .checkbox {
 	display: none;
 	}
 
-#users-insertrows tr .tdcont {
+.users-insertrows tr .tdcont {
 	font-size: 77%;
 	}
 
-#users-table thead tr .fivep {
+.users-table thead tr .fivep {
 	display: none;
 	}
 
@@ -400,22 +400,22 @@ td {
 	display: none;
 	}
 
-#users-insertrows tr .name {
+.users-insertrows tr .name {
 	width: 85px;
 	min-width: 85px;
 	}
 
-#users-insertrows tr .name input {
+.users-insertrows tr .name input {
 	padding: 0px 0px 0px 5px;
 	position: relative;
 	}
 
-#users-insertrows tr .name .dln { /*Last name*/
+.users-insertrows tr .name .dln { /*Last name*/
 	font-size: 110%;
 	top: 3px;
 	}
 
-#users-insertrows tr .name .smallerText { /*First name*/
+.users-insertrows tr .name .smallerText { /*First name*/
 	top: 0px;
 	font-weight: 200;
 	font-style: italic;
@@ -814,7 +814,7 @@ td {
 	float: right;
 	}
 
-#legends-opener {
+.legends-opener {
 	display: block !important;
 	opacity: 1;
 	position: absolute;
@@ -827,11 +827,11 @@ td {
 	background: rgba(200,200,200,1);
 	}
 
-#legends-opener.legends-open {
+.legends-opener.legends-open {
 	background: white;
 	}	
 
-#legends-opener:before {
+.legends-opener:before {
 	content: 'Legends';
 	color: #333;
 	text-align: center;
@@ -899,7 +899,7 @@ td {
 	margin: 0;
 	}
 
-#description-toggle-button {
+.description-toggle-button {
 	position: absolute;
 	right: 155px;
 	background: rgba(200,200,200,1);
@@ -912,11 +912,11 @@ td {
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 	}
 
-#description-toggle-button.active-description {
+.description-toggle-button.active-description {
 	background: white;
 	}	
 
-#description-toggle-button:before {
+.description-toggle-button:before {
 	content: 'Info';
 	color: #333;
 	text-align: center;
@@ -929,7 +929,7 @@ td {
 	line-height: 2.6;
 	}
 
-#description-control-inner-content {
+.description-control-inner-content {
 	padding-right: 10px;
 	left: 0;
 	overflow: visible;
@@ -939,7 +939,7 @@ td {
 	transition: left 250ms ease;
 	}	
 
-#description-control-inner-content-box {
+.description-control-inner-content-box {
 	width: 100%;
 	}
 

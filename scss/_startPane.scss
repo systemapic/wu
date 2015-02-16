@@ -32,11 +32,12 @@
 
 .startpane-canvas-container {
 	position: absolute;
-top: 0;
-width: 100%;
-height: 100%;
-
-}
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-image: url('images/startpane-faint-bg.png');
+	background-size: cover;
+	}
 
 .spinning-wrapper {
 	position: absolute;
@@ -113,6 +114,7 @@ height: 100%;
 	margin-top: 0;
 	overflow: hidden;
 	opacity: 0.9;
+	border-radius: 2px;
 	-webkit-transition: opacity 250ms ease;
 	-moz-transition: opacity 250ms ease;
 	-ms-transition: opacity 250ms ease;
