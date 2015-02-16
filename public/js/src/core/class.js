@@ -27,6 +27,7 @@
 var ich = ich || {};
 ich.$ = function (elem) { return elem; };
 Wu = {};
+Wu.config = {};
 Wu.Class = function () {};
 Wu.Class.extend = function (props) {
 

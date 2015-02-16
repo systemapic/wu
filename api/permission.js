@@ -5,6 +5,7 @@ var User  	= require('../models/user');
 var File 	= require('../models/file');
 var Layer 	= require('../models/layer');
 var Hash 	= require('../models/hash');
+var Group 	= require('../models/group');
 
 // utils
 var fs 		= require('fs-extra');
@@ -146,7 +147,7 @@ module.exports = permission = {
 			}
 		},
 
-		update : {
+		write : {
 			project : function (user, project) {
 				if (superadmin(user)) return true;
 

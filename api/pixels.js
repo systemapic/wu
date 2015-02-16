@@ -510,7 +510,7 @@ module.exports = pixels = {
 			.write(newPath, function (err) {
 				if (err) console.log('px resizeImage error: ', err);
 				
-				res.sendfile(newPath, {maxAge : 10000000});
+				res.sendFile(newPath, {maxAge : 10000000});
 			});
 		});
 
@@ -694,7 +694,7 @@ module.exports = pixels = {
 	returnImage : function (req, res, imageFile) {
 		// send file back to client, just need file path
 		var path = IMAGEFOLDER + imageFile.file;
-		res.sendfile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
+		res.sendFile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
 	},
 
 
