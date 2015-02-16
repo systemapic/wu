@@ -80,19 +80,19 @@ module.exports = function(grunt) {
 
 				
 			cssDependencies:{  
-				src : 'public/dist/combined/css.dependencies.css',
-				dest : 'public/dist/css.dependencies.min.css'
+				src : 'dist/tmp/css.dependencies.css',
+				dest : 'dist/css/css.dependencies.min.css'
 				
 			},
 
 			cssPortal : {
-				src : 'public/dist/combined/css.portal.css',
-				dest : 'public/dist/css.portal.min.css'
+				src : 'dist/tmp/css.portal.css',
+				dest : 'dist/css/css.portal.min.css'
 			},
 
 			cssLogin : {
-				src : 'public/dist/combined/css.login.combined.css',
-				dest : 'public/dist/css.login.min.css'
+				src : 'dist/tmp/css.login.combined.css',
+				dest : 'dist/css/login.min.css'
 			}			
 		},
 
@@ -157,7 +157,7 @@ module.exports = function(grunt) {
 
 				],
 				
-				dest : 'public/dist/combined/systemapic.dependencies.combined.js',
+				dest : 'dist/tmp/systemapic.dependencies.combined.js',
 
 			},
 
@@ -221,7 +221,7 @@ module.exports = function(grunt) {
 					'public/js/src/core/app.js'
 				],
 				
-				dest : 'public/dist/combined/systemapic.combined.js',
+				dest : 'dist/tmp/systemapic.combined.js',
 
 			},
 
@@ -234,9 +234,9 @@ module.exports = function(grunt) {
 					'public/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.css',
 					'public/js/src/grande.js/css/menu.css',                    
 					'public/js/src/grande.js/css/editor.css',
-					'public/css/dependencies/bootstrap.min.css',
-					'public/css/dependencies/font-awesome.min.css',
-					'public/css/dependencies/mapbox.css',        
+					'public/css/bootstrap.min.css',
+					'public/css/font-awesome.min.css',
+					'public/css/mapbox.css',        
 					'public/js/src/leaflet.js/leaflet.css',
 					'public/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css',
 					'public/js/lib/powerange/powerange.min.css',
@@ -249,7 +249,7 @@ module.exports = function(grunt) {
 
 				],
 				
-				dest : 'public/dist/combined/css.dependencies.css'
+				dest : 'dist/tmp/css.dependencies.css'
 			},
 
 
@@ -257,10 +257,10 @@ module.exports = function(grunt) {
 
 				src : [
 					'public/js/lib/codemirror/mode/cartocss/spectrum.css', // Does not work when merged with other css dependency files'			
-					'public/dist/css.dependencies.min.css'
+					'dist/css/css.dependencies.min.css'
 				],
 
-				dest : 'public/dist/css.dependencies.min.css'
+				dest : 'dist/css/css.dependencies.min.css'
 
 			},
 
@@ -272,7 +272,7 @@ module.exports = function(grunt) {
 					'public/css/evil.css'	// jorgen's overrider					
 				],
 
-				dest : 'public/dist/combined/css.portal.css'
+				dest : 'dist/tmp/css.portal.css'
 			},
 
 			cssLogin : {
@@ -282,7 +282,7 @@ module.exports = function(grunt) {
 					'public/css/login.css'					
 				],
 
-				dest : 'public/dist/combined/css.login.combined.css'
+				dest : 'dist/tmp/css.login.combined.css'
 			},
 
 
@@ -290,13 +290,13 @@ module.exports = function(grunt) {
 				
 				src : [
 					'public/js/lib/mapbox.js/mapbox.2.1.4.js',
-					'public/js/lib/mapbox-gl.js/mapbox-gl.js',					
+					// 'public/js/lib/mapbox-gl.js/mapbox-gl.js',					
 					'public/js/src/controls/spinningMap.js',
 					'public/js/src/config/login.config.js',
 					'public/js/src/core/login.js',
 				],
 
-				dest : 'public/dist/combined/login.combined.js'
+				dest : 'dist/tmp/login.combined.js'
 			}			
 
 		},
@@ -312,21 +312,21 @@ module.exports = function(grunt) {
 			
 			jsPortal:{  
 				files:{  
-					'public/dist/js.portal.min.js' : 'public/dist/combined/systemapic.combined.js',
+					'dist/js/js.portal.min.js' : 'dist/tmp/systemapic.combined.js',
 
 				}
 			},
 
 			jsDependencies : {  
 				files : {  
-					'public/dist/js.dependencies.min.js' : 'public/dist/combined/systemapic.dependencies.combined.js',
+					'dist/js/js.dependencies.min.js' : 'dist/tmp/systemapic.dependencies.combined.js',
 				}
 			},
 
 
 			jsLogin : {  
 				files : {  
-					'public/dist/combined/login.min.js' : 'public/dist/combined/login.combined.js',	
+					'dist/js/login.min.js' : 'dist/tmp/login.combined.js',	
 				}
 			},
 
@@ -372,6 +372,11 @@ module.exports = function(grunt) {
 
 				src : 'views/app.template.ejs',
 				dest : 'views/app.temp.ejs'
+			},
+
+			login : {
+				src : 'views/login.template.ejs',
+				dest : 'views/login.ejs'
 			}
 		},
 
@@ -448,6 +453,8 @@ module.exports = function(grunt) {
 			'uglify:jsPortal',
 			'env:prod', 
 			'preprocess:prod',
+			'login',
+			'preprocess:login',
 			'htmlmin'
 
 	])});
@@ -458,7 +465,10 @@ module.exports = function(grunt) {
 			'cssmin:cssDependencies',
 			'concat:cssDepAddToMinified',
 			'env:dev', 
-			'preprocess:dev' 
+			'preprocess:dev',
+			'login',
+			'preprocess:login',
+
 	])});	
 
 	grunt.registerTask('default', ['waiter']);

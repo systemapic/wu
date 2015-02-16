@@ -1,4 +1,4 @@
 config/*
 public/js/src/config/*
 log/*
-public/dist/*
+dist/tmp/*

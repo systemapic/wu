@@ -7,12 +7,26 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
 
-			<!-- DEPENDENCIES STYLESHEETS -->
-			<!-- concat + cssmin -->
-			<link rel="stylesheet" href="/dist/css.dependencies.min.css">			
+					
 						
 
 		<!-- @if NODE_ENV == 'DEVELOPMENT' -->
+
+			<!-- DEPENDENCIES STYLESHEETS -->
+			<link rel="stylesheet" href='/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.css'>
+			<link rel="stylesheet" href='/js/src/grande.js/css/menu.css'>
+			<link rel="stylesheet" href='/js/src/grande.js/css/editor.css'>
+			<link rel="stylesheet" href='/css/bootstrap.min.css'>
+			<link rel="stylesheet" href='/css/font-awesome.min.css'>
+			<link rel="stylesheet" href='/css/mapbox.css'>        
+			<link rel="stylesheet" href='/js/src/leaflet.js/leaflet.css'>
+			<link rel="stylesheet" href='/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css'>
+			<link rel="stylesheet" href='/js/lib/powerange/powerange.min.css'>
+			<link rel="stylesheet" href='/js/lib/codemirror/lib/codemirror.css'>
+			<link rel="stylesheet" href='/js/lib/codemirror/mode/cartocss/codemirror.carto.css'>
+			<link rel="stylesheet" href='/js/lib/codemirror/mode/cartocss/codemirror.fetta.css'>
+			<link rel="stylesheet" href='/js/lib/codemirror/theme/mbo.css'>
+			<link rel="stylesheet" href='/css/opentip.css'>
 
 			<!-- dev css -->
 			<link rel="stylesheet" href="/css/style.css">
@@ -70,8 +84,12 @@
 
 		<!-- @if NODE_ENV == 'PRODUCTION' -->
 
-			<link rel="stylesheet" href="/dist/css.portal.min.css">
-			<script src="/dist/js.dependencies.min.js"></script>
+			<!-- DEPENDENCIES STYLESHEETS -->
+			<!-- concat + cssmin -->
+			<link rel="stylesheet" href="/css/css.dependencies.min.css">	
+
+			<link rel="stylesheet" href="/css/css.portal.min.css">
+			<script src="/js/js.dependencies.min.js"></script>
 	
 		<!-- @endif -->
 
@@ -141,7 +159,6 @@
 			<script src="/js/src/models/layers.js"></script> 
 			<script src="/js/src/models/files.js"></script> 
 
-
 			<!-- config file -->
 			<script src="/js/src/config/config.js"></script> 		
 			<script src="/js/src/core/app.js"></script>
@@ -150,7 +167,7 @@
 
 		<!-- @if NODE_ENV == 'PRODUCTION' -->		
 
-			<script src="/dist/js.portal.min.js"></script>
+			<script src="/js/js.portal.min.js"></script>
 
 		<!-- @endif -->
 
