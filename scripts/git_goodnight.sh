@@ -11,7 +11,7 @@ clear
 echo ''
 echo ''
 echo '***************************'
-echo '********* GITHUB **********' 
+echo '******     GITHUB    ******' 
 echo '***************************'
 echo '******               ******'
 echo '******   GOODNIGHT!  ******'
@@ -37,6 +37,23 @@ done
 cd /var/www/systemapic.js
 git add .
 git commit -m "$1"
+git fetch upstream
+git merge upstream/master
+
+
+while true; do
+    echo ''
+    echo ''
+    echo ''
+    read -p "Did everything go OK? If no commit problems above, then continue. If not, press n! (y/n)" yn
+    case $yn in
+        [Yy]* ) echo "Pushing branch $BRANCH to MASTER"; break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+
 git push origin "$BRANCH"
 
 echo ''

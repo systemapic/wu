@@ -11,7 +11,14 @@ L.Control.Layermenu = L.Control.extend({
 		    options   = this.options;
 
 		// add html
-		container.innerHTML = ich.layerMenuFrame();  // nb: this._innerContainer = container;
+		// container.innerHTML = ich.layerMenuFrame();  // nb: this._innerContainer = container;
+
+		this._layermenuOuter 	= Wu.DomUtil.create('div', 'scroller-frame');
+		var _scrollUp 		= Wu.DomUtil.create('div', 'scroll-up', this._layermenuOuter);
+		var _innerScroller 	= Wu.DomUtil.create('div', 'inner-scroller', this._layermenuOuter);
+		this._content 		= Wu.DomUtil.createId('div', 'layer-menu-inner-content', _innerScroller);
+
+		container.appendChild(this._layermenuOuter);
 
 		// add some divsscroller-frame
 		this.initLayout();
@@ -326,7 +333,8 @@ L.Control.Layermenu = L.Control.extend({
 		};
 
 		// set hooks
-		var bin = Wu.DomUtil.get('layer-menu-inner-content');
+		// var bin = Wu.DomUtil.get('layer-menu-inner-content');
+		var bin = this._content;
 		if (bin) {
 			Wu.DomEvent.on(bin, 'dragover',  this.drag.over,  this);
 			Wu.DomEvent.on(bin, 'dragleave', this.drag.leave, this);
@@ -339,7 +347,8 @@ L.Control.Layermenu = L.Control.extend({
 	resetSortable : function () {
 
 		// remove hooks
-		var bin = Wu.DomUtil.get('layer-menu-inner-content');
+		// var bin = Wu.DomUtil.get('layer-menu-inner-content');
+		var bin = this._content;
 		if (!bin) return;
 		
 		Wu.DomEvent.off(bin, 'dragover',  this.drag.over,  this);
@@ -840,11 +849,35 @@ L.Control.Layermenu = L.Control.extend({
 		if (!layer) className += ' menufolder';
 		var wrap 	= Wu.DomUtil.create('div', className);
 		var uuid 	= item.uuid;
-		wrap.innerHTML 	= ich.layerMenuItem(item);
+		
+
+		// For some reason, HTML must come as string. 
+
+		// var up = Wu.DomUtil.create('div', 'layer-item-up', wrap);
+		// var down = Wu.DomUtil.create('div', 'layer-item-down', wrap);
+		// var del = Wu.DomUtil.create('div', 'layer-item-delete', wrap);
+		// var inner = Wu.DomUtil.create('div', 'layer-menu-item', wrap, item.caption);
+
+		var _iH = 	'<div class="layer-item-up">></div>' +
+			  	'<div class="layer-item-down"><</div>' +
+				'<div class="layer-item-delete">x</div>' +
+				'<div type="layerItem" class="layer-menu-item">' +
+				item.caption +
+				'</div>';
+
+		wrap.innerHTML 	= _iH;
+
+
 		wrap.id 	= uuid;
 		Wu.DomUtil.addClass(wrap, 'level-' + item.pos);
 		wrap.setAttribute('draggable', true); 	// mark as draggable
 		this._content.appendChild(wrap); 	// append to layermenu
+
+
+
+
+
+
 
 		// get elems
 		var up    = wrap.children[0];
@@ -1057,7 +1090,7 @@ L.Control.Layermenu = L.Control.extend({
 
 		// get vars
 		this.project  = project || Wu.app.activeProject;
-		this._content = Wu.DomUtil.get('layer-menu-inner-content');
+//		this._content = Wu.DomUtil.get('layer-menu-inner-content'); // cxxxx
 		this.layers   = {};
 		
 		// create layermenu
@@ -1078,7 +1111,7 @@ L.Control.Layermenu = L.Control.extend({
 
 
 		// Get the scrol-container that we will set max height value of
-		this._layermenuOuter = Wu.DomUtil.get('layermenu-outer');
+		// this._layermenuOuter = Wu.DomUtil.get('layermenu-outer');
 
 		// Check window height
 		var layersMaxHeight = window.innerHeight - 135;

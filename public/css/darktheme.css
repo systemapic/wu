@@ -79,8 +79,8 @@ h3, h4 {
 	background: rgba(0,0,0,0.5);
 	}
 
-#inspector-header,
-#legends-opener {
+.inspector-header,
+.legends-opener {
 	color: black;
 	}	
 
@@ -147,7 +147,7 @@ h3, h4 {
 	color: #DADADA;
 	}
 
-#new-client-button {
+.datalibrary-container {
 	background-color: rgba(0, 0, 0, 0.5) !important;
 	color: #DADADA;
 	line-height: 0.45;
@@ -208,13 +208,13 @@ tr:nth-child(even) {
 	}
 
 #layer-menu-inner-content,
-#legends-inner,
+.legends-inner,
 .q-editor-content-item,
 .q-editor-menu,
 .home-container,
 .middle-item:after,
 #inspect-control-inner-content,
-#description-control-inner-content-box,
+.description-control-inner-content-box,
 .leaflet-container .leaflet-control-search,
 .leaflet-control-cartocss,
 .leaflet-control-baselayertoggle:after,
@@ -240,7 +240,7 @@ tr:nth-child(even) {
 .leaflet-control-scale-line,
 .leaflet-control-mouseposition,
 #layer-menu-inner-content, 
-#legends-inner, 
+.legends-inner, 
 .q-editor-content-item, 
 .q-editor-menu, 
 .home-container, 
@@ -248,8 +248,8 @@ tr:nth-child(even) {
 .menucollapser,
 .header-title-wrap,
 #inspect-control-inner-content, 
-#description-control-inner-content-box,
-#legends-opener,
+.description-control-inner-content-box,
+.legends-opener,
 #open-layers,
 .home-container,
 .home-container {
@@ -263,19 +263,19 @@ tr:nth-child(even) {
 	}		
 
 .leaflet-control-inspect,
-#inspector-header,
+.inspector-header,
 .datalibrary-controls-inner {
 	background-color: transparent !important;
 	}
 
 #layer-menu-inner-content,
-#legends-inner,
+.legends-inner,
 .q-editor-content-item,
 .q-editor-menu,
 .home-container,
 .middle-item:after,
 #inspect-control-inner-content,
-#description-control-inner-content-box,
+.description-control-inner-content-box,
 .leaflet-container .leaflet-control-search,
 .leaflet-control-cartocss,
 .leaflet-control-baselayertoggle:after,
@@ -290,7 +290,7 @@ tr:nth-child(even) {
 .leaflet-control-scale-line,
 .leaflet-control-mouseposition,
 #layer-menu-inner-content, 
-#legends-inner, 
+.legends-inner, 
 .q-editor-content-item, 
 .q-editor-menu, 
 .home-container, 
@@ -298,8 +298,8 @@ tr:nth-child(even) {
 .menucollapser,
 .header-title-wrap,
 #inspect-control-inner-content, 
-#description-control-inner-content-box,
-#legends-opener,
+.description-control-inner-content-box,
+.legends-opener,
 #open-layers,
 .smap-button-white:hover, 
 .smap-button-gray:hover, 
@@ -310,9 +310,9 @@ tr:nth-child(even) {
 .dln:hover,
 .home-status,
 .leaflet-control-inspect,
-#inspector-header,
+.inspector-header,
 .project-delete:hover,
-#documents-container-textarea h2 {
+.documents-container-textarea h2 {
 	color: white !important;
 	}
 
@@ -327,17 +327,17 @@ tr:nth-child(even) {
 .project-createddate,
 .datalibrary-controls, 
 .users-controls,
-#new-client-button:hover,
+.datalibrary-container:hover,
 .new-project-button:hover,
 table,
 article,
-#documents-container-textarea,
-#documents-container-textarea h1,
-#documents-container-textarea p,
+.documents-container-textarea,
+.documents-container-textarea h1,
+.documents-container-textarea p,
 .documents-folder-delete, 
 .documents-folder-item, 
-#documents-new-folder,
-#documents-new-folder:hover, 
+.documents-new-folder,
+.documents-new-folder:hover, 
 .documents-folder-item:hover  {
 	color: white;
 	}
@@ -522,8 +522,8 @@ input.cmn-toggle-round-flat:checked + label:after {
 .leaflet-control-baselayertoggle:after,
 .leaflet-draw-section-button,
 .dropdown-button,
-#legends-scroll-left,
-#legends-scroll-right,
+.legends-scroll-left,
+.legends-scroll-right,
 .cartocss-style-dropdown-arrow {
 	background-image: url(images/evil_sprite_inverted.png);
 	}
@@ -613,7 +613,7 @@ input.cmn-toggle-round-flat:checked + label:after {
 	background: black !important;
 	}	
 
-#description-control-inner-content-box hr, hr {
+.description-control-inner-content-box hr, hr {
 	border-top: 1px solid white;
 	}
 

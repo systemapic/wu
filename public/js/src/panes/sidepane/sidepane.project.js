@@ -362,11 +362,16 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var type = div.type;
 		var value = div.innerHTML;
 
-		var input = ich.injectProjectEditInput({value:value});
-		div.innerHTML = input;
+		// var input = ich.injectProjectEditInput({value:value});
+		var input = Wu.DomUtil.create('input', 'project-edit editable');
+		input.value = value;
+		input.setAttribute('maxLength', '30');
+
+		div.innerHTML = '';
+		div.appendChild(input);
 
 		// focus
-		var target = div.firstChild;
+		var target = input;
 		target.focus();
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 
