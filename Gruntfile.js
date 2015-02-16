@@ -215,7 +215,7 @@ module.exports = function(grunt) {
 					'public/js/src/models/files.js',
 
 					// Config file
-					'public/js/src/core/config.js',
+					'public/js/src/config/config.js',
 
 					// App 
 					'public/js/src/core/app.js'
@@ -292,7 +292,7 @@ module.exports = function(grunt) {
 					'public/js/lib/mapbox.js/mapbox.2.1.4.js',
 					'public/js/lib/mapbox-gl.js/mapbox-gl.js',					
 					'public/js/src/controls/spinningMap.js',
-					'public/js/src/core/config/login.config.js',
+					'public/js/src/config/login.config.js',
 					'public/js/src/core/login.js',
 				],
 
