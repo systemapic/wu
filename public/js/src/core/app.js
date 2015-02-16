@@ -1,4 +1,4 @@
-Wu.version = '0.3-dev';
+Wu.version = '0.4-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -446,6 +446,8 @@ Wu.App = Wu.Class.extend({
 								// todo: layermenu items are not selected in layermenu itself, altho on map
 			// add layer
 			var layer = project.getLayer(layerUuid);
+
+			console.log('hash layer: ', layer.getTitle());
 
 			// if in layermenu
 			var bases = project.getBaselayers();

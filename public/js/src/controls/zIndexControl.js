@@ -32,10 +32,19 @@ Wu.ZIndexControl = Wu.Class.extend({
 	},
 
 	get : function (layer) {
-		// get current index
-		// var lay = layer.layer;
-		var ix = _.findIndex(this._index, function (l) { return layer == l; });
-		return ix;
+		// get all
+		if (!layer) return this._index;
+
+		// if layer, get layer xindex
+		return _.findIndex(this._index, function (l) { return layer == l; });
+	},
+
+	getIndex : function () {
+		var clear = []
+		this._index.forEach(function (l) {
+			clear.push(l.getTitle());
+		});
+		return clear;
 	},
 
 	up : function (layer) {
