@@ -62,10 +62,12 @@
     "grunt": "^0.4.5",
     "grunt-contrib-concat": "^0.4.0",
     "grunt-contrib-cssmin": "^0.9.0",
+    "grunt-contrib-htmlmin": "^0.4.0",
     "grunt-contrib-uglify": "^0.5.0",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-env": "^0.4.2",
     "grunt-preprocess": "^4.1.0",
-    "grunt-sass": "^0.13.1"
+    "grunt-sass": "^0.13.1",
+    "grunt-uncss": "^0.4.0"
   }
 }
