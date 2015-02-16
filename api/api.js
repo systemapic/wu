@@ -1264,7 +1264,7 @@ module.exports = api = {
 	forgotPassword : function (req, res) {
 
 		// render page and pass in flash data if applicable
-		res.render('../../views/login.ejs', { message: 'Please check ' + req.body.email + ' for new login details.' });
+		res.render('../../views/login.serve.ejs', { message: 'Please check ' + req.body.email + ' for new login details.' });
 
 		var email = req.body.email;
 
@@ -1316,7 +1316,7 @@ module.exports = api = {
 			if (!err && user) api.sendPasswordResetEmail(user);
 
 			// finish
-			res.render('../../views/login.ejs', { message: 'Please check your email for further instructions.' });
+			res.render('../../views/login.serve.ejs', { message: 'Please check your email for further instructions.' });
 			res.end();
 
 		});
@@ -1351,7 +1351,7 @@ module.exports = api = {
 				}
 
 				// finish
-				res.render('../../views/login.ejs', { message : message });
+				res.render('../../views/login.serve.ejs', { message : message });
 			});
 		});
 
@@ -4082,7 +4082,7 @@ module.exports = api = {
 		}
 		if (req.isAuthenticated()) {
 			req.session.hotlink = hotlink;
-			res.render('../../views/app.ejs', {
+			res.render('../../views/app.serve.ejs', {
 				hotlink : hotlink || {},
 			});
 		} else {
