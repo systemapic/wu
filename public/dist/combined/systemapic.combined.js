@@ -1351,6 +1351,7 @@ Wu.DomUtil = {
 
 		return el;
 	},
+<<<<<<< HEAD
 
 	makeit : function (m) {
 
@@ -1366,6 +1367,8 @@ Wu.DomUtil = {
 		return hook;
 
 	},
+=======
+>>>>>>> upstream/master
 	
 	createId : function(tagName, id, container) {
 		// https://github.com/Leaflet/Leaflet/blob/master/src/dom/DomUtil.js
@@ -1862,8 +1865,12 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
 		return fn.apply(thisp, arguments);
 	};
 };
+<<<<<<< HEAD
 
 L.Map.include({
+=======
+;L.Map.include({
+>>>>>>> upstream/master
 
 	// refresh map container size
 	reframe: function (options) {
@@ -2003,8 +2010,12 @@ L.Popup.include({
 
 
 
+<<<<<<< HEAD
 
 Wu.SidePane = Wu.Class.extend({
+=======
+;Wu.SidePane = Wu.Class.extend({
+>>>>>>> upstream/master
 	_ : 'sidepane', 
 
 	initialize : function (options) {
@@ -2230,7 +2241,11 @@ Wu.SidePane = Wu.Class.extend({
 		this.panes = [];
 
 		// all panes
+<<<<<<< HEAD
 		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'Users', 'Share', 'Account'], // MediaLibrary
+=======
+		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users', 'Share', 'Account'],
+>>>>>>> upstream/master
 		    sidepane = app.SidePane;
 
 		// panes to active
@@ -2360,8 +2375,12 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	
+<<<<<<< HEAD
 });
 Wu.SidePane.Item = Wu.Class.extend({
+=======
+});;Wu.SidePane.Item = Wu.Class.extend({
+>>>>>>> upstream/master
         _wu : 'sidepane.item', 
 	
 	type : 'item',
@@ -2768,8 +2787,12 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 });
 
+<<<<<<< HEAD
 
 // Projects and Clients
+=======
+;// Projects and Clients
+>>>>>>> upstream/master
 Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	_ : 'sidepane.clients', 
 	type : 'clients',
@@ -2808,7 +2831,11 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	_insertNewClientButton : function () {
 		
 		// create New Client button
+<<<<<<< HEAD
 		var classname = 'smap-button-white new-client';
+=======
+		var classname = 'smap-button-white new-client ct11 ct16 ct18';
+>>>>>>> upstream/master
 		var newClientButton = this._newClientButton = Wu.DomUtil.create('div', classname, this._clientsContainer, '+');
 		newClientButton.id = 'new-client-button';
 
@@ -2871,6 +2898,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		}
 			
 		// prepend client to container
+<<<<<<< HEAD
 		// Wu.DomUtil.appendTemplate(this._clientsContainer, ich.editorClientsNew(clientData));
 
 
@@ -2914,12 +2942,16 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		this._newClient._cancelButton		= 	Wu.DomUtil.create('div', 'smap-button-white small', this._newClient._innerWrapper, 'Cancel');
 
 
+=======
+		Wu.DomUtil.appendTemplate(this._clientsContainer, ich.editorClientsNew(clientData));
+>>>>>>> upstream/master
 
 		// move new button to last
 		Wu.DomUtil.remove(this._newClientButton);
 		this._clientsContainer.appendChild(this._newClientButton);
 
 		// set hooks: confirm button
+<<<<<<< HEAD
 		// var target = Wu.DomUtil.get('editor-client-confirm-button');
 		var target = this._newClient._confirmButton;
 		this._addHook(target, 'click', this._confirm, this);
@@ -2932,6 +2964,17 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		// set hooks: writing name
 		// var name = Wu.DomUtil.get('editor-client-name-new');
 		var name = this._newClient._NameInput;
+=======
+		var target = Wu.DomUtil.get('editor-client-confirm-button');
+		this._addHook(target, 'click', this._confirm, this);
+
+		// cancel button
+		var target = Wu.DomUtil.get('editor-client-cancel-button');
+		this._addHook(target, 'click', this._cancel, this);
+
+		// set hooks: writing name
+		var name = Wu.DomUtil.get('editor-client-name-new');
+>>>>>>> upstream/master
 		this._addHook(name, 'keyup', this._checkSlug, this);
 
 
@@ -2945,8 +2988,12 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		// check
 		var that = this;
 		this._timer = setTimeout(function() {
+<<<<<<< HEAD
 			// var name = Wu.DomUtil.get('editor-client-name-new'),
 			var name = this._newClient._NameInput,
+=======
+			var name = Wu.DomUtil.get('editor-client-name-new'),
+>>>>>>> upstream/master
 			    slug = Wu.Util.trimAll(name.value).toLowerCase(),
 			    json = JSON.stringify({ 'slug' : slug}),
 			    path = '/api/client/unique';
@@ -2972,36 +3019,54 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	_disableConfirm : function () {
+<<<<<<< HEAD
 		// var target = Wu.DomUtil.get('editor-client-confirm-button');           // TODO: real block of button
 		var target = this._newClient._confirmButton;
+=======
+		var target = Wu.DomUtil.get('editor-client-confirm-button');           // TODO: real block of button
+>>>>>>> upstream/master
 		target.style.backgroundColor = 'red';
 		console.log('Client name is not unique.')
 	},
 
 	_enableConfirm : function () {
+<<<<<<< HEAD
 		// var target = Wu.DomUtil.get('editor-client-confirm-button');
 		var target = this._newClient._confirmButton;
+=======
+		var target = Wu.DomUtil.get('editor-client-confirm-button');
+>>>>>>> upstream/master
 		target.style.backgroundColor = '';
 		// console.log('Client name OK.');
 	},
 
 	_cancel : function () {
 		// remove edit box
+<<<<<<< HEAD
 		// var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
 		var old = this._newClient._wrapper;
 
+=======
+		var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
+>>>>>>> upstream/master
 		Wu.DomUtil.remove(old);
 	},
 
 	_confirm : function () {
 
 		// get client vars
+<<<<<<< HEAD
 		// var clientName = Wu.DomUtil.get('editor-client-name-new').value;
 		var clientName = this._newClient._NameInput.value;
 		// var clientDescription = Wu.DomUtil.get('editor-client-description-new').value;
 		var clientDescription = this._newClient._DescriptionInput.value;
 		// var clientKeywords = Wu.DomUtil.get('editor-client-keywords-new').value;
 		var clientKeywords = this._newClient._keywordsInput;
+=======
+		var clientName = Wu.DomUtil.get('editor-client-name-new').value;
+		var clientDescription = Wu.DomUtil.get('editor-client-description-new').value;
+		var clientKeywords = Wu.DomUtil.get('editor-client-keywords-new').value;
+>>>>>>> upstream/master
 		
 		var options = {
 			name : clientName,
@@ -3022,8 +3087,12 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		Wu.app.Clients[client.uuid] = client;
 
 		// remove edit box
+<<<<<<< HEAD
 		// var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
 		var old = this._newClient._wrapper;
+=======
+		var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
+>>>>>>> upstream/master
 		Wu.DomUtil.remove(old);
 
 		// add permissions
@@ -3119,8 +3188,12 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 
 });
+<<<<<<< HEAD
 
 // Subelements under Clients/Client
+=======
+;// Subelements under Clients/Client
+>>>>>>> upstream/master
 Wu.SidePane.Project = Wu.Class.extend({
 
 	initialize : function (project, options) {
@@ -3484,6 +3557,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var type = div.type;
 		var value = div.innerHTML;
 
+<<<<<<< HEAD
 		// var input = ich.injectProjectEditInput({value:value});
 		var input = Wu.DomUtil.create('input', 'project-edit editable');
 		input.value = value;
@@ -3494,6 +3568,13 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// focus
 		var target = input;
+=======
+		var input = ich.injectProjectEditInput({value:value});
+		div.innerHTML = input;
+
+		// focus
+		var target = div.firstChild;
+>>>>>>> upstream/master
 		target.focus();
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 
@@ -3677,8 +3758,12 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 
 
+<<<<<<< HEAD
 });
 // subelements in clients sidepane
+=======
+});;// subelements in clients sidepane
+>>>>>>> upstream/master
 Wu.SidePane.Client = Wu.Class.extend({
 
 
@@ -4042,6 +4127,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// inject <input>
 		var div = this.title;
 		var value = div.innerHTML;
+<<<<<<< HEAD
 
 		var input = Wu.DomUtil.create('input', 'client-edit editable');
 		input.value = value;
@@ -4051,6 +4137,12 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// focus
 		var target = input;
+=======
+		div.innerHTML = ich.injectClientEditInput({ value : value }); 
+
+		// focus
+		var target = div.firstChild;
+>>>>>>> upstream/master
 		target.focus();
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 
@@ -4267,8 +4359,12 @@ Wu.SidePane.Client = Wu.Class.extend({
 });
 
 
+<<<<<<< HEAD
 
 Wu.SidePane.Users = Wu.SidePane.Item.extend({
+=======
+;Wu.SidePane.Users = Wu.SidePane.Item.extend({
+>>>>>>> upstream/master
 	_ : 'sidepane.users', 
 
 
@@ -4285,10 +4381,21 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this._usersControlsInner = Wu.DomUtil.create('div', 'users-controls-inner', this._usersControls);
 
 		// Add user button
+<<<<<<< HEAD
 		this._addUser = Wu.DomUtil.create('div', 'users-add-user smap-button-gray users', this._usersControlsInner, 'Create user');
 
 		// Delete user button
 		this._deleteUser = Wu.DomUtil.create('div', 'users-delete-user smap-button-gray users', this._usersControlsInner, 'Delete user');
+=======
+		this._addUser = Wu.DomUtil.createId('div', 'users-add-user', this._usersControlsInner);
+		this._addUser.innerHTML = 'Create user';
+		Wu.DomUtil.addClass(this._addUser, 'smap-button-gray users');
+
+		// Delete user button
+		this._delUser = Wu.DomUtil.createId('div', 'users-delete-user', this._usersControlsInner);
+		this._delUser.innerHTML = 'Delete user';
+		Wu.DomUtil.addClass(this._delUser, 'smap-button-gray users');
+>>>>>>> upstream/master
 
 		// Search users
 		this._search = Wu.DomUtil.createId('input', 'users-search', this._usersControlsInner);
@@ -4297,6 +4404,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		Wu.DomUtil.addClass(this._search, 'search');
 
 		// create container (overwrite default) and insert template
+<<<<<<< HEAD
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content);
 
 		// #userlist
@@ -4362,6 +4470,23 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this._table = Wu.DomUtil.createId('tbody', 'users-insertrows', table)
 		this._table.className = 'list';
 
+=======
+		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content, ich.usersPane());
+
+		// get handles
+		this._tableContainer = Wu.DomUtil.get('users-table-container');
+
+		// render empty table
+		this._tableContainer.innerHTML = ich.usersTableFrame();
+
+		// get more handles
+		this._table 	    = Wu.DomUtil.get('users-insertrows');
+		this._addUser       = Wu.DomUtil.get('users-add-user');
+		this._mainTitle     = Wu.DomUtil.get('user-management-client');
+		this._deleteUser    = Wu.DomUtil.get('users-delete-user');
+		this._checkall      = Wu.DomUtil.get('users-checkbox-all');
+		this._checkallLabel = Wu.DomUtil.get('label-users-checkbox-all');
+>>>>>>> upstream/master
 
 		// init table
 		this.initList();
@@ -4484,6 +4609,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	// list.js plugin
 	initList : function () { 
+<<<<<<< HEAD
 
 		
 		// add dummy entry
@@ -4532,6 +4658,13 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		_td8.style.display = 'none';		
 
 
+=======
+		
+		// add dummy entry
+		var tr = Wu.DomUtil.createId('tr', 'dummy-table-entry');
+		tr.innerHTML = ich.usersTablerow({'type' : 'dummy-table-entry'});
+		this._table.appendChild(tr);
+>>>>>>> upstream/master
 
 		// init list.js
 		var options = { valueNames : ['name', 'company', 'position', 'phone', 'email', 'access'] };
@@ -4803,6 +4936,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// prepare template values
 		var template = {};   
+<<<<<<< HEAD
 
 		// template.name = ich.usersTablerowName({
 		// 	firstName     : user.getFirstName() || 'First name',
@@ -4826,6 +4960,14 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		template.name = tmpLastNameString + tmpFirstNameString;
 
 
+=======
+		template.name = ich.usersTablerowName({
+			firstName     : user.getFirstName() || 'First name',
+			lastName      : user.getLastName()  || 'Last name',
+			lastNameUuid  : 'lastName-'  + user.getUuid(),
+			firstNameUuid : 'firstName-' + user.getUuid(),
+		});     
+>>>>>>> upstream/master
 		template.email    = user.getEmail();
 		template.position = user.getPosition();
 		template.company  = user.getCompany();
@@ -4885,9 +5027,13 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 					description 	: project.store.description,
 					uuid 		: project.store.uuid
 				}
+<<<<<<< HEAD
 				template += '<div class="users-table-project-item" title="' + content.description + '" >' + content.name + '</div>';
 
 				
+=======
+				template += ich.usersTableProjectItem(content);
+>>>>>>> upstream/master
 			}
 			return template;
 		}
@@ -4903,7 +5049,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 				description 	: project.store.description,
 				uuid 		: project.store.uuid
 			}
+<<<<<<< HEAD
 			template += '<div class="users-table-project-item" title="' + content.description + '" >' + content.name + '</div>';
+=======
+			template += ich.usersTableProjectItem(content);
+>>>>>>> upstream/master
 		}, this);
 		return template;
 	},
@@ -5221,6 +5371,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var key   = e.target.getAttribute('key');
 		var uuid  = e.target.getAttribute('uuid');
 
+<<<<<<< HEAD
 		var inputData = { 
 			value : value, 
 			key   : key , 
@@ -5241,6 +5392,16 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// inject <input>
 		// div.innerHTML = input;
+=======
+		var input = ich.injectInput({ 
+			value : value, 
+			key   : key , 
+			uuid  : uuid 
+		});
+		
+		// inject <input>
+		div.innerHTML = input;
+>>>>>>> upstream/master
 
 		var target = div.firstChild;
 
@@ -5285,8 +5446,12 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	},
 
 
+<<<<<<< HEAD
 });
 Wu.SidePane.Map = Wu.SidePane.Item.extend({
+=======
+});;Wu.SidePane.Map = Wu.SidePane.Item.extend({
+>>>>>>> upstream/master
 	_ : 'sidepane.map', 
 
 	type : 'map',
@@ -5299,9 +5464,13 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		this.app = Wu.app;
 
 		// content to template
+<<<<<<< HEAD
 		this.buildHTML();
 
 		// this._container.innerHTML = ich.editorMapBaseLayer();
+=======
+		this._container.innerHTML = ich.editorMapBaseLayer();
+>>>>>>> upstream/master
 		this._settingsContainer = Wu.DomUtil.get('mapsettings-container');
 
 		// set panes
@@ -5324,6 +5493,7 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 
 	},
 
+<<<<<<< HEAD
 
 	buildHTML : function () {
 
@@ -5506,6 +5676,8 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 
 	},
 
+=======
+>>>>>>> upstream/master
 	
 	addHooks : function () {
 		
@@ -5561,8 +5733,12 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 
 	},
 
+<<<<<<< HEAD
 });
 Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
+=======
+});;Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
+>>>>>>> upstream/master
 	_ : 'sidepane.map.mapsetting',
 
 
@@ -7496,8 +7672,12 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 
 });
 
+<<<<<<< HEAD
 
 // DocumentsPane
+=======
+;// DocumentsPane
+>>>>>>> upstream/master
 Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	
 	type : 'documents',
@@ -7507,6 +7687,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	initContent : function () {
 
 		// create new fullscreen page, and set as default content
+<<<<<<< HEAD
 		this._content = Wu.DomUtil.create('div', 'fullpage-documents', Wu.app._appPane);
 		
 		// create container (overwrite default)
@@ -7529,6 +7710,22 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// #documents-container-textarea
 		this._textarea = Wu.DomUtil.create('article', 'documents-container-textarea', this._rightpane);
+=======
+		this._content = Wu.DomUtil.create('div', 'fullpage-documents ct1', Wu.app._appPane);
+		
+		// create container (overwrite default)
+		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct11', this._content);
+
+		// insert template
+		this._container.innerHTML = ich.documentsContainer();
+
+		// get element handlers
+		this._leftpane 	 = Wu.DomUtil.get('documents-container-leftpane');
+		this._folderpane = Wu.DomUtil.get('documents-folder-list');
+		this._rightpane  = Wu.DomUtil.get('documents-container-rightpane');
+		this._textarea   = Wu.DomUtil.get('documents-container-textarea');
+		this._newfolder  = Wu.DomUtil.get('documents-new-folder');
+>>>>>>> upstream/master
 
 		// add tooltip
 		app.Tooltip.add(this._menu, 'This is the projects document section.');
@@ -7875,6 +8072,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// set values 
 		var div   = e.target;
 		var value = e.target.innerHTML;
+<<<<<<< HEAD
 		div.innerHTML = '';
 
 		var input = Wu.DomUtil.create('input', 'documents-folder-item', div);
@@ -7887,6 +8085,15 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// var target = div.firstChild;
 		var target = input;
 
+=======
+		var input = ich.injectFolderTitleInput({ value : value });
+		
+		// inject <input>
+		div.innerHTML = input;
+
+		// focus
+		var target = div.firstChild;
+>>>>>>> upstream/master
 		target.focus();
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 
@@ -8021,8 +8228,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.folders = {};
 	}
 
+<<<<<<< HEAD
 });
 Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
+=======
+});;Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
+>>>>>>> upstream/master
 	_ : 'sidepane.datalibrary', 
 	
 	type : 'dataLibrary',
@@ -8069,6 +8280,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.progress = Wu.DomUtil.create('div', 'progress-bar', this._content);
 		
 		// insert template
+<<<<<<< HEAD
 		// this._container.innerHTML = ich.datalibraryContainer();
 
 		// #datalibrary-container
@@ -8077,6 +8289,12 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// #datalibrary-table-container
 		this._tableContainer = Wu.DomUtil.create('div', 'datalibrary-table-container', this._dataLibraryContainer);
 
+=======
+		this._container.innerHTML = ich.datalibraryContainer();
+
+		// get element handlers
+		this._tableContainer = Wu.DomUtil.get('datalibrary-table-container');
+>>>>>>> upstream/master
 	      
 		// create fullscreen dropzone
 		this.fulldrop = Wu.DomUtil.create('div', 'fullscreen-drop', this._content);
@@ -8084,13 +8302,22 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// filecount
 		this.filecount = 0;
 
+<<<<<<< HEAD
 		
 
 		// get elements
+=======
+		// render empty table
+		this._tableContainer.innerHTML = ich.datalibraryTableframe();
+
+		// get elements
+		this._table 		= Wu.DomUtil.get('datalibrary-insertrows');
+>>>>>>> upstream/master
 		this._errors 		= Wu.DomUtil.get('datalibrary-errors');
 		this._uploader 		= Wu.DomUtil.get('upload-container');
 		this._deleter 		= Wu.DomUtil.get('datalibrary-delete-file');
 		this._downloader 	= Wu.DomUtil.get('datalibrary-download-files');
+<<<<<<< HEAD
 
 
 		
@@ -8149,6 +8376,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// END OF EMPTY TABLE
 
+=======
+		this._checkall 		= Wu.DomUtil.get('checkbox-all');
+		this._checkallLabel 	= Wu.DomUtil.get('label-checkbox-all');
+>>>>>>> upstream/master
 
 		// init table
 		this.initList();
@@ -8265,6 +8496,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	initDownloadTable : function () {
 
+<<<<<<< HEAD
 		// var table = ich.datalibraryTableDownload();
 		// this._downloadList.innerHTML = table;
 
@@ -8288,6 +8520,14 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// #download-ok-button
 		this._downloadOK = Wu.DomUtil.create('div', 'smap-button-gray download-ok-button', this._downloadList, 'Download');
+=======
+		var table = ich.datalibraryTableDownload();
+		this._downloadList.innerHTML = table;
+
+		// get elems 
+		this._downloadOK = Wu.DomUtil.get('download-ok-button');
+		this._downloadCancel = Wu.DomUtil.get('download-cancel-button');
+>>>>>>> upstream/master
 	
 		// set hooks
 		Wu.DomEvent.on(this._downloadOK, 'mousedown', this.downloadFiles, this);
@@ -8337,10 +8577,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			'puuid' : this.project.store.uuid,
 			'pslug' : this.project.store.slug
 		}
+<<<<<<< HEAD
 
 
 		console.log(json);
 		
+=======
+>>>>>>> upstream/master
 		var json = JSON.stringify(json);
 
 		// post         path          json      callback           this
@@ -8432,7 +8675,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		}, this);
 
 		// get table and insert
+<<<<<<< HEAD
 		var table = this.tBody;
+=======
+		var table = Wu.DomUtil.get('datalibrary-download-insertrows');
+>>>>>>> upstream/master
 		table.innerHTML = tr;
 
 		// show
@@ -8492,6 +8739,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	initList : function () { 
 		
 		// add dummy entry
+<<<<<<< HEAD
 		var _tr = Wu.DomUtil.createId('tr', 'dummy-table-entry', this._table);
 
 		_tr.innerHTML = '';
@@ -8515,6 +8763,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var _td9 = Wu.DomUtil.create('td', 'tdcont uuid', _tr);
 		Wu.DomUtil.addClass(_td9, 'displayNone');
 		
+=======
+		var tr = Wu.DomUtil.createId('tr', 'dummy-table-entry');
+		tr.innerHTML = ich.datalibraryTablerow({'type' : 'dummy-table-entry'});
+		this._table.appendChild(tr);
+>>>>>>> upstream/master
 
 		// init list.js
 		var options = { valueNames : ['name', 'file', 'category', 'keywords', 'date', 'status', 'type'] };
@@ -8819,6 +9072,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	addFile : function (file) {
 
 		// clone file object
+<<<<<<< HEAD
 		var tmp = Wu.extend({}, file.getStore()); 
 
 		var tmpData = {
@@ -8834,6 +9088,17 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// add record (a bit hacky, but with a cpl of divs inside the Name column)
 		tmp.name = tmpNameString;
+=======
+		var tmp = Wu.extend({}, file.getStore());   
+
+		// add record (a bit hacky, but with a cpl of divs inside the Name column)
+		tmp.name = ich.datalibraryTablerowName({
+			name 		: tmp.name || 'Title',
+			description 	: tmp.description || 'Description',
+			nameUuid 	: 'name-' + tmp.uuid,
+			descUuid 	: 'description-' + tmp.uuid,
+		});
+>>>>>>> upstream/master
 
 		// clean some fields
 		tmp.type = tmp.type.camelize();
@@ -8844,10 +9109,16 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// add file to list.js
 		var ret = this.list.add(tmp);
 		
+<<<<<<< HEAD
 		// ugly hack: manually add uuids			// TODO: FIX
 		ret[0].elm.id = tmp.uuid;                              // <tr>
 		var c = ret[0].elm.children[0].children[0].children;    
 
+=======
+		// ugly hack: manually add uuids
+		ret[0].elm.id = tmp.uuid;                              // <tr>
+		var c = ret[0].elm.children[0].children[0].children;    
+>>>>>>> upstream/master
 		c[0].id = 'checkbox-' + tmp.uuid;                      // checkbox
 		c[1].setAttribute('for', 'checkbox-' + tmp.uuid);      // label
 
@@ -9263,8 +9534,12 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	}
 
 });
+<<<<<<< HEAD
 
 Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
+=======
+;Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
+>>>>>>> upstream/master
 
 	type : 'mediaLibrary',
 	title : 'Media',
@@ -9755,8 +10030,12 @@ Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 });
 
 
+<<<<<<< HEAD
 
 Wu.SidePane.Share = Wu.SidePane.Item.extend({
+=======
+;Wu.SidePane.Share = Wu.SidePane.Item.extend({
+>>>>>>> upstream/master
 	
 	type : 'share',
 	title : 'Share',
@@ -10068,8 +10347,12 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 });
 
 
+<<<<<<< HEAD
 
 Wu.SidePane.Account = Wu.SidePane.Item.extend({
+=======
+;Wu.SidePane.Account = Wu.SidePane.Item.extend({
+>>>>>>> upstream/master
 	_ : 'sidepane.account', 
 
 
@@ -10108,8 +10391,12 @@ Wu.SidePane.Account = Wu.SidePane.Item.extend({
 		}
 	},
 
+<<<<<<< HEAD
 });
 Wu.HeaderPane = Wu.Class.extend({
+=======
+});;Wu.HeaderPane = Wu.Class.extend({
+>>>>>>> upstream/master
 	_ : 'headerpane', 
 
 	initialize : function () {
@@ -10269,6 +10556,7 @@ Wu.HeaderPane = Wu.Class.extend({
 		var whichTitle 	= e.target.whichTitle;
 
 		if (!whichTitle) return;
+<<<<<<< HEAD
 		// if (whichTitle == 'title')	var input = ich.injectHeaderTitleInput({ value : value });
 		// if (whichTitle == 'subtitle')   var input = ich.injectHeaderSubtitleInput({ value : value });
 		if (whichTitle == 'title')	var input = Wu.DomUtil.create('input', 'header-title editable');
@@ -10281,6 +10569,16 @@ Wu.HeaderPane = Wu.Class.extend({
 
 		// focus
 		var target = input;
+=======
+		if (whichTitle == 'title')	var input = ich.injectHeaderTitleInput({ value : value });
+		if (whichTitle == 'subtitle')   var input = ich.injectHeaderSubtitleInput({ value : value });
+
+		// inject <input>
+		div.innerHTML = input;
+
+		// focus
+		var target = div.firstChild;
+>>>>>>> upstream/master
 		target.focus();
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 
@@ -10442,8 +10740,12 @@ Wu.HeaderPane = Wu.Class.extend({
 		this._update(project);
 	}
 });
+<<<<<<< HEAD
 
 Wu.ProgressPane = Wu.Class.extend({
+=======
+;Wu.ProgressPane = Wu.Class.extend({
+>>>>>>> upstream/master
 
 	initialize : function (options) {
 		
@@ -10520,8 +10822,12 @@ Wu.ProgressPane = Wu.Class.extend({
 	}
 
 
+<<<<<<< HEAD
 });
 Wu.MapPane = Wu.Class.extend({
+=======
+});;Wu.MapPane = Wu.Class.extend({
+>>>>>>> upstream/master
 
 	initialize : function () {
 		
@@ -10732,6 +11038,10 @@ Wu.MapPane = Wu.Class.extend({
 		}, this);
 	},
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 	setMaxBounds : function () {
 		var map = app._map;
 		var bounds = this.project.getBounds();
@@ -10767,18 +11077,28 @@ Wu.MapPane = Wu.Class.extend({
 		    zoom = pos.zoom;
 
 		// create new map
+<<<<<<< HEAD
 		this._map = app._map = L.map('map', options).setView([lat, lng], zoom); 
+=======
+		this._map = Wu.app._map = L.map('map', options).setView([lat, lng], zoom); 
+>>>>>>> upstream/master
 
 		// add editable layer
 		this.addEditableLayer(this._map);
 
 		// add attribution
 		this._attributionControl = L.control.attribution({
+<<<<<<< HEAD
 			position : 'bottomright',
 			prefix : 'Powered by <a href="http://systemapic.com/" target="_blank">Systemapic.com</a> ©'
 		});
 
 		// add control to map
+=======
+				position : 'bottomright',
+				prefix : 'Powered by <a href="https://systemapic.com/" target="_blank">Systemapic.com</a> ©'
+		});
+>>>>>>> upstream/master
 		this._map.addControl(this._attributionControl);
 
 	},
@@ -10822,6 +11142,10 @@ Wu.MapPane = Wu.Class.extend({
 
 	updateControlCss : function () {
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 		// get controls
 		var controls = this.project.getControls(),
 		    corners = app._map._controlCorners,
@@ -11415,6 +11739,10 @@ Wu.MapPane = Wu.Class.extend({
 		return popup;
 	},
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 	_addPopupCloseEvent : function () {
 		if (this._popInit) return;
 		this._popInit = true;	// only run once
@@ -11466,8 +11794,12 @@ Wu.MapPane = Wu.Class.extend({
 });
 
 
+<<<<<<< HEAD
 
 Wu.StatusPane = Wu.Class.extend({
+=======
+;Wu.StatusPane = Wu.Class.extend({
+>>>>>>> upstream/master
 	_ : 'statuspane', 
 
 	initialize : function (options) {
@@ -11773,8 +12105,12 @@ Wu.StatusPane = Wu.Class.extend({
 
 
 });
+<<<<<<< HEAD
 
 Wu.StartPane = Wu.Class.extend({
+=======
+;Wu.StartPane = Wu.Class.extend({
+>>>>>>> upstream/master
 
 	initialize : function (options) {
 		
@@ -11963,10 +12299,15 @@ Wu.StartPane = Wu.Class.extend({
 		newProject._clientName = Wu.DomUtil.create('div', 'start-project-client-name', newProject._projectContainer);
 		newProject._clientName.innerHTML = clientName;
 
+<<<<<<< HEAD
 		if ( clientLogo ) {
 			newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
 			newProject._clientLogo.src = clientLogo;
 		}
+=======
+		newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
+		newProject._clientLogo.src = clientLogo;
+>>>>>>> upstream/master
 
 
 		this.projectContainers.push(newProject);
@@ -12178,8 +12519,12 @@ Wu.StartPane = Wu.Class.extend({
 	}
 });
 
+<<<<<<< HEAD
 
 Wu.ErrorPane = Wu.Class.extend({
+=======
+;Wu.ErrorPane = Wu.Class.extend({
+>>>>>>> upstream/master
 
 	options : {
 
@@ -12273,8 +12618,12 @@ Wu.ErrorPane = Wu.Class.extend({
 
 
 
+<<<<<<< HEAD
 });
 Wu.Dropzone = Wu.Class.extend({
+=======
+});;Wu.Dropzone = Wu.Class.extend({
+>>>>>>> upstream/master
 	// dropzone for files to data library
 	// drop anywhere, anytime
 
@@ -12528,8 +12877,12 @@ Wu.Dropzone = Wu.Class.extend({
 
 
 
+<<<<<<< HEAD
 })
 Wu.ZIndexControl = Wu.Class.extend({
+=======
+});Wu.ZIndexControl = Wu.Class.extend({
+>>>>>>> upstream/master
 
 	initialize : function () {
 		
@@ -12653,8 +13006,12 @@ Wu.ZIndexControl.Layermenu = Wu.ZIndexControl.extend({
 
 
 
+<<<<<<< HEAD
 
 L.Control.Layermenu = L.Control.extend({
+=======
+;L.Control.Layermenu = L.Control.extend({
+>>>>>>> upstream/master
 
 	options: {
 		position : 'bottomright' 
@@ -12667,6 +13024,7 @@ L.Control.Layermenu = L.Control.extend({
 		    options   = this.options;
 
 		// add html
+<<<<<<< HEAD
 		// container.innerHTML = ich.layerMenuFrame();  // nb: this._innerContainer = container;
 
 		this._layermenuOuter 	= Wu.DomUtil.create('div', 'scroller-frame');
@@ -12675,6 +13033,9 @@ L.Control.Layermenu = L.Control.extend({
 		this._content 		= Wu.DomUtil.createId('div', 'layer-menu-inner-content', _innerScroller);
 
 		container.appendChild(this._layermenuOuter);
+=======
+		container.innerHTML = ich.layerMenuFrame();  // nb: this._innerContainer = container;
+>>>>>>> upstream/master
 
 		// add some divsscroller-frame
 		this.initLayout();
@@ -12989,8 +13350,12 @@ L.Control.Layermenu = L.Control.extend({
 		};
 
 		// set hooks
+<<<<<<< HEAD
 		// var bin = Wu.DomUtil.get('layer-menu-inner-content');
 		var bin = this._content;
+=======
+		var bin = Wu.DomUtil.get('layer-menu-inner-content');
+>>>>>>> upstream/master
 		if (bin) {
 			Wu.DomEvent.on(bin, 'dragover',  this.drag.over,  this);
 			Wu.DomEvent.on(bin, 'dragleave', this.drag.leave, this);
@@ -13003,8 +13368,12 @@ L.Control.Layermenu = L.Control.extend({
 	resetSortable : function () {
 
 		// remove hooks
+<<<<<<< HEAD
 		// var bin = Wu.DomUtil.get('layer-menu-inner-content');
 		var bin = this._content;
+=======
+		var bin = Wu.DomUtil.get('layer-menu-inner-content');
+>>>>>>> upstream/master
 		if (!bin) return;
 		
 		Wu.DomEvent.off(bin, 'dragover',  this.drag.over,  this);
@@ -13505,6 +13874,7 @@ L.Control.Layermenu = L.Control.extend({
 		if (!layer) className += ' menufolder';
 		var wrap 	= Wu.DomUtil.create('div', className);
 		var uuid 	= item.uuid;
+<<<<<<< HEAD
 		
 
 		// For some reason, HTML must come as string. 
@@ -13524,17 +13894,23 @@ L.Control.Layermenu = L.Control.extend({
 		wrap.innerHTML 	= _iH;
 
 
+=======
+		wrap.innerHTML 	= ich.layerMenuItem(item);
+>>>>>>> upstream/master
 		wrap.id 	= uuid;
 		Wu.DomUtil.addClass(wrap, 'level-' + item.pos);
 		wrap.setAttribute('draggable', true); 	// mark as draggable
 		this._content.appendChild(wrap); 	// append to layermenu
 
+<<<<<<< HEAD
 
 
 
 
 
 
+=======
+>>>>>>> upstream/master
 		// get elems
 		var up    = wrap.children[0];
 		var down  = wrap.children[1];
@@ -13746,7 +14122,11 @@ L.Control.Layermenu = L.Control.extend({
 
 		// get vars
 		this.project  = project || Wu.app.activeProject;
+<<<<<<< HEAD
 //		this._content = Wu.DomUtil.get('layer-menu-inner-content'); // cxxxx
+=======
+		this._content = Wu.DomUtil.get('layer-menu-inner-content');
+>>>>>>> upstream/master
 		this.layers   = {};
 		
 		// create layermenu
@@ -13767,7 +14147,11 @@ L.Control.Layermenu = L.Control.extend({
 
 
 		// Get the scrol-container that we will set max height value of
+<<<<<<< HEAD
 		// this._layermenuOuter = Wu.DomUtil.get('layermenu-outer');
+=======
+		this._layermenuOuter = Wu.DomUtil.get('layermenu-outer');
+>>>>>>> upstream/master
 
 		// Check window height
 		var layersMaxHeight = window.innerHeight - 135;
@@ -13782,8 +14166,12 @@ L.Control.Layermenu = L.Control.extend({
 
 L.control.layermenu = function (options) {
 	return new L.Control.Layermenu(options);
+<<<<<<< HEAD
 };
 L.Control.Inspect = L.Control.extend({
+=======
+};;L.Control.Inspect = L.Control.extend({
+>>>>>>> upstream/master
 	
 	options: {
 		position : 'bottomright',
@@ -13797,6 +14185,7 @@ L.Control.Inspect = L.Control.extend({
 		    options   = this.options;
 
 		// add html
+<<<<<<< HEAD
 		// container.innerHTML = ich.inspectControl(); 
 
 		// #description-toggle-button
@@ -13813,6 +14202,9 @@ L.Control.Inspect = L.Control.extend({
 
 
 
+=======
+		container.innerHTML = ich.inspectControl(); 
+>>>>>>> upstream/master
 
 		// add tooltip
 		app.Tooltip.add(container, 'Shows a list of active layers', { extends : 'systyle', tipJoint : 'top left'});
@@ -13851,8 +14243,13 @@ L.Control.Inspect = L.Control.extend({
 
 		// get vars
 		this.project  = project || app.activeProject;
+<<<<<<< HEAD
 		// this._content = Wu.DomUtil.get('inspect-control-inner-content'); 
 		// this._list    = Wu.DomUtil.get('inspector-list');
+=======
+		this._content = Wu.DomUtil.get('inspect-control-inner-content'); 
+		this._list    = Wu.DomUtil.get('inspector-list');
+>>>>>>> upstream/master
 
 		// reset layers
 		this.layers = [];           
@@ -14247,8 +14644,12 @@ L.Control.Inspect = L.Control.extend({
 
 L.control.inspect = function (options) {
 	return new L.Control.Inspect(options);
+<<<<<<< HEAD
 };
 L.Control.Description = L.Control.extend({
+=======
+};;L.Control.Description = L.Control.extend({
+>>>>>>> upstream/master
 	
 	options: {
 		// position : 'topleft' 
@@ -14262,6 +14663,7 @@ L.Control.Description = L.Control.extend({
 		    options   = this.options;
 
 		// add html
+<<<<<<< HEAD
 		// container.innerHTML = ich.descriptionControl(); 
 
 
@@ -14280,6 +14682,9 @@ L.Control.Description = L.Control.extend({
 			
 
 
+=======
+		container.innerHTML = ich.descriptionControl(); 
+>>>>>>> upstream/master
 
 		return container; // turns into this._container on return
 
@@ -14291,10 +14696,18 @@ L.Control.Description = L.Control.extend({
 		this._container.style.display = "none";
 
 		// get panes
+<<<<<<< HEAD
 		// this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
 		// this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
 		this._legendsContainer = app.MapPane.legendsControl._legendsContainer;
 		this._legendsCollapser = app.MapPane.legendsControl._legendsCollapser;
+=======
+		this._content 	= Wu.DomUtil.get('description-control-inner-content');
+		this._outer     = Wu.DomUtil.get('description-control-inner-content-box'); 
+		this._button	= Wu.DomUtil.get('description-toggle-button'); 
+		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
+		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
+>>>>>>> upstream/master
 		
 		// create scroller 
 		this._inner = Wu.DomUtil.create('div', 'description-scroller', this._outer);
@@ -14586,8 +14999,12 @@ L.Control.Description = L.Control.extend({
 
 L.control.description = function (options) {
 	return new L.Control.Description(options);
+<<<<<<< HEAD
 };
 L.Control.Legends = L.Control.extend({
+=======
+};;L.Control.Legends = L.Control.extend({
+>>>>>>> upstream/master
 	
 	options: {
 		position : 'bottomleft' 
@@ -14604,6 +15021,7 @@ L.Control.Legends = L.Control.extend({
 
 		// add html
 		container.style.display = 'none';
+<<<<<<< HEAD
 
 		// #legends-opener
 		this._legendsOpener = Wu.DomUtil.create('div', 'legends-opener', container, 'Open Legends');
@@ -14627,6 +15045,10 @@ L.Control.Legends = L.Control.extend({
 		// #legends-inner-slider
 		this._legendsInnerSlider = Wu.DomUtil.create('div', 'legends-inner-slider', this._legendsInner);
 			
+=======
+		container.innerHTML = ich.legendsControl(); 	     
+
+>>>>>>> upstream/master
 
 		return container;
 
@@ -14818,8 +15240,12 @@ L.Control.Legends = L.Control.extend({
 
 		// get vars
 		this.project = project || Wu.app._activeProject;
+<<<<<<< HEAD
 		// this._content = Wu.DomUtil.get('legends-control-inner-content'); 
 		this._content = this._legendsContainer;
+=======
+		this._content = Wu.DomUtil.get('legends-control-inner-content'); 
+>>>>>>> upstream/master
 
 		// init divs
 		this.initContainer();		
@@ -14830,6 +15256,7 @@ L.Control.Legends = L.Control.extend({
 
 	initContainer : function () {
 	
+<<<<<<< HEAD
 		// // get elements
 		// this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
 		// this._legendsOpener = Wu.DomUtil.get('legends-opener')
@@ -14840,6 +15267,18 @@ L.Control.Legends = L.Control.extend({
 
 		// this._legendsScrollLeft = Wu.DomUtil.get('legends-scroll-left'); // (j)
 		// this._legendsScrollRight = Wu.DomUtil.get('legends-scroll-right'); // (j)
+=======
+		// get elements
+		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
+		this._legendsOpener = Wu.DomUtil.get('legends-opener')
+
+		this._legendsInner = Wu.DomUtil.get('legends-inner');
+		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
+		this._legendsInnerSlider = Wu.DomUtil.get('legends-inner-slider');
+
+		this._legendsScrollLeft = Wu.DomUtil.get('legends-scroll-left'); // (j)
+		this._legendsScrollRight = Wu.DomUtil.get('legends-scroll-right'); // (j)
+>>>>>>> upstream/master
 
 		// add hooks
 		this.addHooks();
@@ -15173,8 +15612,12 @@ L.Control.Legends = L.Control.extend({
 
 L.control.legends = function (options) {
 	return new L.Control.Legends(options);
+<<<<<<< HEAD
 };
 /*
+=======
+};;/*
+>>>>>>> upstream/master
 Copyright 2012 Ardhi Lukianto
 
 Permission is hereby granted, free of charge, to any person obtaining
@@ -15266,8 +15709,12 @@ L.Map.addInitHook(function () {
 L.control.mouseposition = function (options) {
         return new L.Control.MousePosition(options);
 };
+<<<<<<< HEAD
 
 /*
+=======
+;/*
+>>>>>>> upstream/master
  * L.Control.Layers is a control to allow users to switch between different layers on the map.
  * https://raw.githubusercontent.com/Leaflet/Leaflet/master/src/control/Control.Layers.js
  */
@@ -15413,8 +15860,12 @@ L.Control.BaselayerToggle = L.Control.extend({
 
 L.control.baselayerToggle = function (options) {
 	return new L.Control.BaselayerToggle(options);
+<<<<<<< HEAD
 };
 // controls global styles
+=======
+};;// controls global styles
+>>>>>>> upstream/master
 // full color themeing to come
 Wu.Style = Wu.Class.extend({
 
@@ -15513,8 +15964,12 @@ function initSVGpatterns () {
 	Wu.DomUtil.get("styletag").innerHTML = SVG_patterns;
 }
 // colorArray = [ '#334d5c','#45b29d','#8eddb8','#5fffaf','#0ea32b','#47384d','#a84158','#f224ff','#d85fff','#f21b7f','#f40028','#f15e01','#e27a3f','#ffc557','#dbef91','#df4949','#cfc206','#fff417','#4b84e8','#ffffff' ]
+<<<<<<< HEAD
 
 L.Control.CartoCSS = L.Control.extend({
+=======
+;L.Control.CartoCSS = L.Control.extend({
+>>>>>>> upstream/master
 	
 	options: {
 		position : 'topleft' 
@@ -16521,8 +16976,12 @@ L.Control.CartoCSS = L.Control.extend({
 L.control.cartoCss = function (options) {
 	return new L.Control.CartoCSS(options);
 };
+<<<<<<< HEAD
 
 Wu.Tooltip = Wu.Class.extend({
+=======
+;Wu.Tooltip = Wu.Class.extend({
+>>>>>>> upstream/master
 
 	options : {
 		fixed : true,
@@ -16630,8 +17089,12 @@ Wu.Tooltip = Wu.Class.extend({
 
 	},
 
+<<<<<<< HEAD
 });
 // spinning map
+=======
+});;// spinning map
+>>>>>>> upstream/master
 L.SpinningMap = L.Class.extend({
 
 	// todo: refactor GL to own class
@@ -17192,8 +17655,12 @@ L.SpinningMap = L.Class.extend({
 });
 
 
+<<<<<<< HEAD
 
 Wu.Project = Wu.Class.extend({
+=======
+;Wu.Project = Wu.Class.extend({
+>>>>>>> upstream/master
 
 	initialize : function (store) {
 
@@ -18294,8 +18761,12 @@ Wu.Project = Wu.Class.extend({
 
 
 
+<<<<<<< HEAD
 });
 Wu.Client = Wu.Class.extend({
+=======
+});;Wu.Client = Wu.Class.extend({
+>>>>>>> upstream/master
 
 	initialize : function (options) {
 
@@ -18423,8 +18894,12 @@ Wu.Client = Wu.Class.extend({
 	},
 
 
+<<<<<<< HEAD
 });
 Wu.User = Wu.Class.extend({ 
+=======
+});;Wu.User = Wu.Class.extend({ 
+>>>>>>> upstream/master
 
 	initialize : function (store) {
 		this.store = store;
@@ -18922,8 +19397,12 @@ Wu.User = Wu.Class.extend({
 		return json;
 	},
 
+<<<<<<< HEAD
 });
 Wu.Layer = Wu.Class.extend({
+=======
+});;Wu.Layer = Wu.Class.extend({
+>>>>>>> upstream/master
 
 	type : 'layer',
 
@@ -19138,6 +19617,10 @@ Wu.Layer = Wu.Class.extend({
 
 	getCartoid : function () {
 		if (this.store.data) return this.store.data.cartoid;
+<<<<<<< HEAD
+=======
+		return false;
+>>>>>>> upstream/master
 	},
 
 	setCartoCSS : function (json, callback) {
@@ -19330,7 +19813,13 @@ Wu.Layer = Wu.Class.extend({
 
 
 Wu.RasterLayer = Wu.Layer.extend({
+<<<<<<< HEAD
 	type : 'rasterLayer',
+=======
+
+	type : 'rasterLayer',
+
+>>>>>>> upstream/master
 });
 
 
@@ -19385,15 +19874,27 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		    gridServer 	= app.options.servers.utfgrid.uri,
 		    subdomains  = app.options.servers.utfgrid.subdomains,
 		    token 	= app.accessToken,
+<<<<<<< HEAD
 		    url 	= gridServer + '{fileUuid}/{z}/{x}/{y}.grid.json' + token;
+=======
+		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
+>>>>>>> upstream/master
 		
 		// create gridlayer
 		this.gridLayer = new L.UtfGrid(url, {
 			useJsonP: false,
+<<<<<<< HEAD
 			subdomains: subdomains,
 			maxRequests : 20,
 			requestTimeout : 20000,
 			fileUuid : fileUuid
+=======
+			// subdomains: 'ijk',
+			subdomains: subdomains,
+			// subdomains: 'ghi',
+			maxRequests : 10,
+			requestTimeout : 20000
+>>>>>>> upstream/master
 		});
 
 		// debug
@@ -19405,10 +19906,35 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	},
 
 	updateStyle : function () {
+<<<<<<< HEAD
 		// set new options and redraw
 		if (this.layer) this.layer.setOptions({
 			cartoid : this.getCartoid(),
 		});
+=======
+		var map = app._map;	
+		
+
+		// if (this.layer) {
+		// 	this.update();
+		// 	this.addTo(map);
+		// } else {
+		// 	this.update();
+		// }
+
+		console.log('this._zx: ', this._zx);
+
+		// var zindex = this._zx.get(this);
+
+		// console.log('zindeX: ', zindex);
+
+		// update
+		this.update();
+
+		// add to map
+		this.addTo(map); // refactor
+
+>>>>>>> upstream/master
 	},
 
 	_typeLayer : function () {
@@ -19511,6 +20037,7 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
 	},
 
+<<<<<<< HEAD
 	updateStyle : function () {
 
 		// set new options and redraw
@@ -19521,6 +20048,8 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 	},
 
 
+=======
+>>>>>>> upstream/master
 
 });
 
@@ -19575,20 +20104,74 @@ Wu.createLayer = function (layer) {
 
 
 
+<<<<<<< HEAD
 // // topojson layer
 // Wu.TopojsonLayer = Wu.Layer.extend({
 
 // 	type : 'topojsonLayer',
+=======
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Wu.GeojsonLayer = Wu.Layer.extend({
+
+// 	type : 'geojsonLayer',
+
+>>>>>>> upstream/master
 
 // 	initLayer : function () {
 // 		var that = this;
 	       
 // 		// create leaflet geoJson layer
+<<<<<<< HEAD
 // 		this.layer = L.topoJson(false, {
+=======
+// 		this.layer = L.geoJson(false, {
+
+>>>>>>> upstream/master
 // 			// create popup
 // 			onEachFeature : this.createPopup
 // 		});
 
+<<<<<<< HEAD
 // 	}	
 // });
 
@@ -19639,6 +20222,462 @@ L.UtfGrid.include({
 });
 
 Wu.Files = Wu.Class.extend({
+=======
+// 	},
+
+// 	add : function (map) {
+// 		this.addTo(map);
+// 	},
+
+// 	addTo : function (map) {
+// 		var map   = map || Wu.app._map;
+// 		var layer = this.layer;
+		
+// 		// load data if not loaded
+// 		if (!this.loaded) this.loadData();
+				
+// 		// set hover popup
+// 		this.bindHoverPopup();
+
+// 		// add to drawControl
+// 		var drawControl = app.MapPane.editableLayers;
+// 		drawControl.addLayer(layer);
+
+// 	},
+
+// 	remove : function (map) {
+// 		var map = map || Wu.app._map;
+// 		var layer = this.layer;
+		
+// 		// remove from editableLayers 
+// 		var editableLayers = app.MapPane.editableLayers;
+// 		editableLayers.removeLayer(layer);
+
+// 		// remove hooks
+// 		this.removeLayerHooks();
+
+// 	},
+
+// 	addLayerHooks : function () {
+
+// 		this.layer.eachLayer(function (layr) {
+			
+// 			var type = layr.feature.geometry.type;
+
+// 			if (type == 'Polygon') {
+
+// 				Wu.DomEvent.on(layr, 'styleeditor:changed', this.styleChanged, this);
+
+// 			} 
+
+// 			if (type == 'MultiPolygon') {
+
+// 				layr.eachLayer(function (multi) {
+
+// 					Wu.DomEvent.on(multi, 'styleeditor:changed', function (data) {
+// 						this.multiStyleChanged(data, multi, layr);
+// 					}, this);
+
+// 				}, this);
+// 			}
+
+// 		}, this);	
+	
+// 	},	
+
+// 	removeLayerHooks : function () {
+// 		for (l in this.layer._layers) {
+// 			var layer = this.layer._layers[l];
+
+// 			// listen to changes
+// 			Wu.DomEvent.off(layer, 'styleeditor:changed', this.styleChanged, this);
+// 		}
+// 	},
+
+// 	getGeojsonUuid : function () {
+// 		return this.store.data.geojson;
+// 	},
+
+// 	loadData : function () {
+// 		var that = this;
+
+// 		// do nothing if already loaded
+// 		if (this.loaded) return; 
+
+// 		// set status
+// 		app.setStatus('Loading...');
+
+
+// 		// get geojson from server
+// 		var data = { 
+// 			uuid : this.getGeojsonUuid(),
+// 			projectUuid : app.activeProject.getUuid() 
+// 		}
+// 		var json = JSON.stringify(data);
+	
+		
+// 		// post with callback:   path       data    callback   context of cb
+// 		// Wu.Util.postcb('/api/geojson', json, this._loaded, this);
+// 		var path = '/api/geojson';
+		
+// 		var http = new XMLHttpRequest();
+// 		var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
+// 		url += path;
+
+// 		// track progress
+// 		var dataSize = this.getDataSize();
+// 		if (dataSize) {
+// 			var that = this;
+// 			http.addEventListener("progress", function (oe) {
+// 				var percent = Math.round( oe.loaded / dataSize * 100);
+// 				that.setProgress(percent);
+
+// 			}, false);
+// 		}
+		
+// 		http.open("POST", url, true);
+
+// 		//Send the proper header information along with the request
+// 		http.setRequestHeader("Content-type", "application/json");
+
+// 		http.onreadystatechange = function() {
+// 			if (http.readyState == 4 && http.status == 200) {			// todo: refactor
+// 				that.dataLoaded(that, http.responseText);
+// 			}
+// 		}
+// 		http.send(json);
+
+// 	},
+
+// 	// callback after loading geojson from server
+// 	dataLoaded : function (that, json) {
+
+// 		// set progress done
+// 		that.setProgress(100);
+
+// 		// parse json into geojson object
+// 		try { that.data = JSON.parse(json); }
+// 		catch (e) { return console.log('parse error!', json)}
+		
+// 		// console.log('Got geojson: ', that.data);
+
+// 		// return if errors
+// 		if (!that.data) return console.error('no data');
+// 		if (that.data.error) return console.error(that.data.error);
+
+// 		// add data to layer
+// 		that.layer.addData(that.data);
+
+// 		// mark loaded
+// 		that.loaded = true;
+
+// 		// set opacity
+// 		that.setOpacity()
+
+// 		// render saved styles of geojson
+// 		that.renderStyle();
+
+// 		// set status
+// 		app.setStatus('Loaded!');
+
+// 		// hide progress bar
+// 		this.hideProgress();
+
+// 		// add layer hooks
+// 		this.addLayerHooks();
+
+// 		// phantomjs _loaded
+// 		app._loaded.push(this.getUuid());
+// 		// console.log('GEOJSON: ', this);
+
+// 	},
+
+// 	getDataSize : function () {
+
+// 		var fileUuid = this.getFileUuid();
+// 		if (!fileUuid) return false;
+
+// 		var file = this.getFile(fileUuid);
+
+// 		return parseInt(file.dataSize);
+
+// 	},
+
+// 	getFileUuid : function () {
+// 		return this.store.file;
+// 	},
+
+// 	getFile : function (fileUuid) {
+
+// 		var files = app.activeProject.getFiles();
+// 		var file = _.find(files, function (f) {
+// 			return f.uuid == fileUuid;
+// 		});
+
+// 		return file;
+
+// 	},
+
+// 	progress : function (p) {
+// 		this.setProgress(p);
+// 	},
+
+// 	setProgress : function (percent) {
+// 		// set progress bar
+// 		app.ProgressBar.setProgress(percent);
+// 	},
+
+// 	hideProgress : function () {
+// 		// hide progress bar
+// 		app.ProgressBar.hideProgress();
+// 	},
+
+	
+// 	getContainer : function () {
+
+// 		// return
+
+// 	},
+
+// 	// set visibility : visible on layer
+// 	show : function () {
+// 		for (l in this.layer._layers) {
+// 			var layer = this.layer._layers[l];
+// 			layer._container.style.visibility = 'visible';
+// 		}
+// 	},
+
+// 	// set visibility : hidden on layer
+// 	hide : function () {
+// 		for (l in this.layer._layers) {
+// 			var layer = this.layer._layers[l];
+// 			layer._container.style.visibility = 'hidden';
+// 		}
+// 	},
+
+// 	multiStyleChanged : function (data, multi, layr) {
+
+// 		var layer = layr;
+// 		var style = data.style;
+// 		var __sid = layer.feature.properties.__sid;
+
+// 		layer.setStyle(style);	// good! does the whole multipolgyon (of multipolygons)
+
+// 		this.saveStyle(style, __sid);	// works
+
+// 	},
+
+// 	styleChanged : function (data) {
+
+// 		var style = data.style;
+// 		var target = data.target;
+// 		var id = target._leaflet_id;
+// 		var layer = this.getPathParentLayer(id);
+// 		var __sid = target.feature.properties.__sid;
+
+// 		// save style
+// 		this.saveStyle(style, __sid);
+
+// 	},
+
+// 	getPathParentLayer : function (id) {
+// 		return app.MapPane.getEditableLayerParent(id);
+// 	},
+
+// 	// save style to layer object
+// 	saveStyle : function (style, __sid) {	
+			
+// 		var json = this.layer.toGeoJSON();
+
+// 		var json = {};
+// 		json.layer  = this.getUuid();
+// 		json.uuid   = this.getProjectUuid(); // active project uuid
+
+// 		json.style = {
+// 			__sid : __sid,
+// 			style : style 		// partial
+// 		}
+
+// 		// send to server
+// 		this._save(json);
+
+// 		// set staus msg
+// 		app.setSaveStatus();
+
+// 	},
+
+// 	renderStyle : function () {
+
+// 		var styles = this.store.style;
+// 		var layers = this.layer._layers;
+
+// 		for (l in layers) {
+// 			var layer = layers[l];
+// 			var __sid = layer.feature.properties.__sid;
+
+// 			var style = _.find(styles, function (s) {
+// 				return s.__sid == __sid;
+// 			});
+
+// 			if (style) {
+// 				var parsed = JSON.parse(style.style);
+// 				layer.setStyle(parsed);
+// 			}
+// 		}
+
+// 	},
+	
+// 	setOpacity : function (opacity) {
+
+// 		// set opacity for now or later
+// 		this.opacity = opacity || this.opacity || 0.2;
+		
+// 		// return if data not loaded yet
+// 		if (!this.loaded) return;
+
+// 		// set style 
+// 		this.layer.setStyle({
+// 			opacity : this.opacity, 
+// 			fillOpacity : this.opacity
+// 		});
+
+// 	},
+
+// 	getOpacity : function () {
+// 		return this.opacity || 0.2;
+// 	},
+
+
+// 	// create tooltip
+// 	createPopup : function (feature, layer) {
+
+// 		// return if no features in geojson
+// 		if (!feature.properties) return;
+
+// 		// create popup
+// 		var popup = L.popup({
+// 			offset : [0, -5],
+// 			closeButton : false,
+// 			zoomAnimation : false,
+// 			maxWidth : 1000,
+// 			minWidth : 200,
+// 			maxHeight : 150
+// 		});
+
+// 		// create content
+// 		var string = '';
+// 		for (key in feature.properties) {
+// 			var value = feature.properties[key];
+// 			// if not empty value
+// 			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
+// 				// add features to string
+// 				string += key + ': ' + value + '<br>';
+// 			}
+// 		}
+
+// 		// if nothing, return
+// 		if (string.length == 0) return;
+
+// 		// set content
+// 		popup.setContent(string);
+		
+// 		// bind popup to layer
+// 		layer.bindPopup(popup);
+		
+// 	},
+
+
+// 	setPopupPosition : function (e) {
+// 		var popup = e.layer._popup;
+// 		var latlng = app._map.mouseEventToLatLng(e.originalEvent);
+// 		popup.setLatLng(latlng);
+// 	},
+
+// 	bindHoverPopup : function () {
+// 		var that = this;
+
+// 	}
+// });
+
+
+
+// topojson layer
+Wu.TopojsonLayer = Wu.Layer.extend({
+
+	type : 'topojsonLayer',
+
+	initLayer : function () {
+		var that = this;
+	       
+		// create leaflet geoJson layer
+		this.layer = L.topoJson(false, {
+			// create popup
+			onEachFeature : this.createPopup
+		});
+
+	}	
+});
+
+// extend leaflet geojson with topojson conversion (test) - works! but doesn't solve any problems
+L.TopoJSON = L.GeoJSON.extend({
+	addData: function(jsonData) {    
+		if (jsonData.type === "Topology") {
+			for (key in jsonData.objects) {
+				geojson = topojson.feature(jsonData, jsonData.objects[key]);
+				L.GeoJSON.prototype.addData.call(this, geojson);
+			}
+		} 
+		else {
+			L.GeoJSON.prototype.addData.call(this, jsonData);
+		}
+	}  
+});
+
+L.topoJson = function (json, options) {
+	return new L.TopoJSON(json, options);
+};
+
+
+// // topojson layer with d3.js
+// L.TopojsonLayer = L.Class.extend({
+
+// 	initialize: function (data, options) {
+		
+// 		L.setOptions(this, options);
+// 	},
+
+// 	onAdd: function (map) {
+// 		this._map = map;
+
+// 		// create a DOM element and put it into one of the map panes
+// 		this._el = L.DomUtil.create('div', 'topojson-layer leaflet-zoom-hide');
+// 		map.getPanes().overlayPane.appendChild(this._el);
+
+// 		// add a viewreset event listener for updating layer's position, do the latter
+// 		map.on('viewreset', this._reset, this);
+// 		this._reset();
+// 	},
+
+// 	onRemove: function (map) {
+// 		// remove layer's DOM elements and listeners
+// 		map.getPanes().overlayPane.removeChild(this._el);
+// 		map.off('viewreset', this._reset, this);
+// 	},
+
+// 	_reset: function () {
+// 		// update layer's position
+// 		var pos = this._map.latLngToLayerPoint(this._latlng);
+// 		L.DomUtil.setPosition(this._el, pos);
+// 	}
+// });
+
+// L.topoJson = function (data, options) {
+// 	return new L.TopojsonLayer(data, options);
+// };
+
+
+;Wu.Files = Wu.Class.extend({
+>>>>>>> upstream/master
 
 	_ : 'file',
 
@@ -19801,8 +20840,12 @@ Wu.Files = Wu.Class.extend({
 
 
 
+<<<<<<< HEAD
 });
 var systemapicConfigOptions = {
+=======
+});;var systemapicConfigOptions = {
+>>>>>>> upstream/master
 		
 	id : 'app',
 
@@ -19873,8 +20916,12 @@ var systemapicConfigOptions = {
 		'user-e6e5d7d9'  // j  // todo: add phantomJS user
 	]
 }
+<<<<<<< HEAD
 
 Wu.version = '0.4-dev';
+=======
+;Wu.version = '0.4-dev';
+>>>>>>> upstream/master
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
