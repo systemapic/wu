@@ -230,7 +230,7 @@ ul#checked p:after {
   border-radius: 3px;
   -moz-border-radius: 3px;
   background: -moz-linear-gradient(19% 75% 90deg, #FFFFFF, #A1A1A1);
-  background: #ffffff-webkit-gradient(linear, 0% 0%, 0% 100%, from(#A1A1A1), to(#FFFFFF));
+  background: #fff -webkit-gradient(linear, 0% 0%, 0% 100%, from(#A1A1A1), to(#FFFFFF));
   border: 1px solid #e5e5e5;
   position: absolute;
   top: 0px;
@@ -6303,4 +6303,4 @@ img.start-project-client-logo {
 */
 /* @import 'color_picker';	// Color picker */
 /* @import 'mediaLibrary';	// Media Library */
-/*# sourceMappingURL=style.css.map */
+/*# sourceMappingURL=../../scss/public/css/style.css.map */
