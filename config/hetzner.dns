@@ -1,0 +1,27 @@
+$TTL 600
+@   IN SOA ns1.first-ns.de. postmaster.robot.first-ns.de. (
+    2015020409   ; serial
+    14400        ; refresh
+    1800         ; retry
+    604800       ; expire
+    86400 )      ; minimum
+ 
+@                        			IN NS      robotns3.second-ns.com.
+@                        			IN NS      robotns2.second-ns.de.
+@                        			IN NS      ns1.first-ns.de.
+ 			
+@                        			IN A       5.9.158.68
+localhost                			IN A       127.0.0.1
+mail                     			IN A       85.10.202.87
+osm.systemapic.com.      			IN A       5.9.117.212
+*.osm.systemapic.com.    			IN A       5.9.117.212
+ruppellsgriffon.systemapic.com.          	IN A       85.10.202.87
+*.ruppellsgriffon.systemapic.com.        	IN A       85.10.202.87
+loopback                 			IN CNAME   localhost
+sgilohtyzzgf             			IN CNAME   gv-pb75j2hbcsgdpo.dv.googlehosted.com
+@                        			IN MX 10   aspmx2.googlemail.com
+@                        			IN MX 10   aspmx3.googlemail.com
+@                        			IN MX 10   alt1.aspmx.l.google.com
+@                        			IN MX 10   alt2.aspmx.l.google.com
+@                        			IN MX 10   aspmx.l.google.com
+			
