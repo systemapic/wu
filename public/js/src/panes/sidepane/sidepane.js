@@ -224,7 +224,7 @@ Wu.SidePane = Wu.Class.extend({
 		this.panes = [];
 
 		// all panes
-		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users', 'Share', 'Account'],
+		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'Users', 'Share', 'Account'], // MediaLibrary
 		    sidepane = app.SidePane;
 
 		// panes to active
