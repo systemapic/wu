@@ -442,6 +442,7 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('prod', function () { grunt.task.run([ 
 		
+			'sass',
 			'concat:cssDependencies',
 			'cssmin:cssDependencies',
 			'concat:cssDepAddToMinified',
@@ -461,6 +462,7 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('dev',  function () { grunt.task.run([ 
 		
+			'sass',
 			'concat:cssDependencies',
 			'cssmin:cssDependencies',
 			'concat:cssDepAddToMinified',
