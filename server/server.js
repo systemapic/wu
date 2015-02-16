@@ -23,11 +23,14 @@ var configDB = require('../config/database.js');
 var cors = require('cors');
 var port = 3001;
 
+var prodMode;
+
 // mute console in production mode
 if (process.argv[2] == 'production') {
 	console.log = function (){};
 	console.time = function () {};
 	console.timeEnd = function () {};
+	prodMode = true;
 }
 
 
@@ -61,7 +64,7 @@ require('../config/passport')(passport); // pass passport for configuration
 	app.use(passport.initialize());
 	app.use(passport.session()); // persistent login sessions
 	app.use(flash()); // use connect-flash for flash messages stored in session
-	app.use(favicon(__dirname + '/../public/dist/favicon.ico'));
+	app.use(favicon(__dirname + '/../dist/css/favicon.ico'));
 
 	// enable compression
 	app.use(compress());
@@ -70,7 +73,11 @@ require('../config/passport')(passport); // pass passport for configuration
 	
 
 	// static files
-	app.use(express.static(path.join(__dirname, '../public')));
+	if (prodMode) {
+		app.use(express.static(path.join(__dirname, '../dist')));
+	} else {
+		app.use(express.static(path.join(__dirname, '../public')));
+	}
 
 // });
 

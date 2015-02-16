@@ -7,6 +7,8 @@
 
 
 
+		<!-- @if NODE_ENV == 'DEVELOPMENT' -->
+
 			<!-- stylesheet -->
 			<link href='css/mapbox.css' rel='stylesheet' />
 			<link href='css/login.css' rel='stylesheet' />
@@ -16,6 +18,22 @@
 			<script src='js/src/controls/spinningMap.js'></script>
 			<script src='js/src/config/login.config.js'></script>
 			<script src='js/src/core/login.js'></script>
+
+
+		<!-- @endif -->
+
+
+		<!-- @if NODE_ENV == 'PRODUCTION' -->
+
+			<!-- stylesheet -->
+			<link href='/css/login.min.css' rel='stylesheet' />
+
+			<!-- javascript -->
+			<script src='/js/login.min.js'></script>
+
+
+
+		<!-- @endif -->
 
 
 <style>
