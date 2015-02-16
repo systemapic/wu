@@ -1,4 +1,4 @@
-Wu.version = '0.3-dev';
+Wu.version = '0.4-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -447,6 +447,8 @@ Wu.App = Wu.Class.extend({
 			// add layer
 			var layer = project.getLayer(layerUuid);
 
+			console.log('hash layer: ', layer.getTitle());
+
 			// if in layermenu
 			var bases = project.getBaselayers();
 			var base = _.find(bases, function (b) {
@@ -584,13 +586,7 @@ Wu.App = Wu.Class.extend({
 
 	// },
 
-	getZIndexControls : function () {
-		var z = {
-			b : app.MapPane._bzIndexControl, // base
-			l : app.MapPane._lzIndexControl  // layermenu
-		}
-		return z;
-	},
+	
 
 
 	// debug mode

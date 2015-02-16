@@ -311,7 +311,7 @@ label.info {
 
 
 /* Hide select all users button, because it doesn't work, and it's not really needed */
-#users-squaredThree-checkbox-all {
+.users-squaredThree-checkbox-all {
 	visibility: hidden;
 	}
 
@@ -515,7 +515,8 @@ label.info {
 
 
 /* A bit annoying, but center most headlines */
-#editor-client-item-new h5, 
+/*#editor-client-item-new h5, */
+.editor-client-title h5,
 .editor-inner-wrapper h5, 
 #select-basic-themes, 
 #advanced-color-header, 

@@ -4,12 +4,15 @@ var path = require('path');
 module.exports = function(grunt) {  
 	grunt.loadNpmTasks('grunt-contrib-watch');	// Watches folders for filechanges 
 	grunt.loadNpmTasks('grunt-contrib-cssmin');	// CSS Minifyer 
-	grunt.loadNpmTasks('grunt-sass'); 	// Non Ruby C++ sass 
+	grunt.loadNpmTasks('grunt-sass'); 		// Non Ruby C++ sass 
 	grunt.loadNpmTasks('grunt-contrib-concat');    	// Slå sammen JS filer 
 	grunt.loadNpmTasks('grunt-contrib-uglify');	// JS minifyer 
 
 	grunt.loadNpmTasks('grunt-preprocess');		// Preprocess conditional HTML tags
 	grunt.loadNpmTasks('grunt-env');		// Set environment for conditional HTML 
+	grunt.loadNpmTasks('grunt-contrib-htmlmin');	// HTML minifyer
+
+	// grunt.loadNpmTasks('grunt-uncss');		// Cleans up unused CSS ~ must have a HTML file to match up with...
 					
 	grunt.initConfig(    {  
 		
@@ -59,7 +62,7 @@ module.exports = function(grunt) {
 				// another target 
 				options:{  
 					// dictionary of render options 
-					sourceMap:true,
+					sourceMap:false,
 						extDot:'last'
 					},
 					files:{  
@@ -99,15 +102,14 @@ module.exports = function(grunt) {
 		concat:{  
 
 			options : {  
-				separator:';',
+				// separator:';',
 			},
-			
+																	
 
 			// Goes in header
 			jsDependencies : {  
 				
 				src : [  
-
 
 					// dependencies 
 					'public/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js',
@@ -150,7 +152,7 @@ module.exports = function(grunt) {
 
 					// extra
 					'public/js/lib/opentip/opentip-native.js',
-					'public/js/lib/jss.js/jss.js'
+					'public/js/lib/jss.js/jss.js'			
 
 
 				],
@@ -213,7 +215,7 @@ module.exports = function(grunt) {
 					'public/js/src/models/files.js',
 
 					// Config file
-					'public/js/src/core/config.js',
+					'public/js/src/config/config.js',
 
 					// App 
 					'public/js/src/core/app.js'
@@ -228,6 +230,7 @@ module.exports = function(grunt) {
 				
 				src : [  
 
+
 					'public/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.css',
 					'public/js/src/grande.js/css/menu.css',                    
 					'public/js/src/grande.js/css/editor.css',
@@ -240,12 +243,25 @@ module.exports = function(grunt) {
 					'public/js/lib/codemirror/lib/codemirror.css',
 					'public/js/lib/codemirror/mode/cartocss/codemirror.carto.css',
 					'public/js/lib/codemirror/mode/cartocss/codemirror.fetta.css',
-					'public/js/lib/codemirror/mode/cartocss/spectrum.css',
 					'public/js/lib/codemirror/theme/mbo.css',
-					'public/css/opentip.css'
+					'public/css/opentip.css',
+					// 'public/js/lib/codemirror/mode/cartocss/spectrum.css', // Does not work when merged with other css dependency files
+
 				],
 				
 				dest : 'public/dist/combined/css.dependencies.css'
+			},
+
+
+			cssDepAddToMinified : {
+
+				src : [
+					'public/js/lib/codemirror/mode/cartocss/spectrum.css', // Does not work when merged with other css dependency files'			
+					'public/dist/css.dependencies.min.css'
+				],
+
+				dest : 'public/dist/css.dependencies.min.css'
+
 			},
 
 			cssPortal : {
@@ -276,6 +292,7 @@ module.exports = function(grunt) {
 					'public/js/lib/mapbox.js/mapbox.2.1.4.js',
 					'public/js/lib/mapbox-gl.js/mapbox-gl.js',					
 					'public/js/src/controls/spinningMap.js',
+					'public/js/src/config/login.config.js',
 					'public/js/src/core/login.js',
 				],
 
@@ -346,19 +363,31 @@ module.exports = function(grunt) {
 
 			dev : {
 
-				src : 'views/templ/app.ejs',
-				dest : 'views/app_dev.ejs'
+				src : 'views/app.template.ejs',
+				dest : 'views/app.ejs'
 
 			},
 
 			prod : {
 
-				src : 'views/templ/app.ejs',
-				dest : 'views/app_prod.ejs'
+				src : 'views/app.template.ejs',
+				dest : 'views/app.temp.ejs'
 			}
-		}
+		},
 
-	}    ); 
+
+		htmlmin: {
+			dist: {
+			options: {
+			removeComments: true,
+			collapseWhitespace: true
+			},
+			files: {
+				'views/app.ejs': 'views/app.temp.ejs',     // 'destination': 'source'
+			}
+		}}
+
+	}    );
   
   
 
@@ -382,7 +411,7 @@ module.exports = function(grunt) {
 		}    
 	); 
 
-	grunt.registerTask('cssdeps', 
+	grunt.registerTask('css', 
 		function () {
 			grunt.task.run([
 				'concat:cssDependencies',
@@ -394,7 +423,7 @@ module.exports = function(grunt) {
 
 	);
 
-	grunt.registerTask('jsdeps', 
+	grunt.registerTask('js', 
 		function () {
 			grunt.task.run([
 				'concat:jsDependencies',
@@ -405,8 +434,32 @@ module.exports = function(grunt) {
 		}
 	);
 
-	grunt.registerTask('prod', function () { grunt.task.run([ 'env:prod', 'preprocess:prod' ])});
-	grunt.registerTask('dev',  function () { grunt.task.run([ 'env:dev', 'preprocess:dev' ])});	
+
+	grunt.registerTask('prod', function () { grunt.task.run([ 
+		
+			'concat:cssDependencies',
+			'cssmin:cssDependencies',
+			'concat:cssDepAddToMinified',
+			'concat:cssPortal',
+			'cssmin:cssPortal',
+			'concat:jsDependencies',
+			'uglify:jsDependencies',
+			'concat:jsPortal',
+			'uglify:jsPortal',
+			'env:prod', 
+			'preprocess:prod',
+			'htmlmin'
+
+	])});
+
+	grunt.registerTask('dev',  function () { grunt.task.run([ 
+		
+			'concat:cssDependencies',
+			'cssmin:cssDependencies',
+			'concat:cssDepAddToMinified',
+			'env:dev', 
+			'preprocess:dev' 
+	])});	
 
 	grunt.registerTask('default', ['waiter']);
 }
