@@ -1604,14 +1604,7 @@ input.cmn-toggle-round-flat + label:before {
 
 .legends-inner-slider {
   position: relative;
-  left: 0px; 
-  background: white;
-  /*WEIRD !! veit ikke hvorfor det ble forandra!*/
-}
-.legends-inner-slider {
-   background: white;
-}
-
+  left: 0px; }
 
 /* Actual legend */
 .legends-item {
@@ -1927,23 +1920,18 @@ input.cmn-toggle-round-flat + label:before {
   padding: 0;
   color: #fff;
   text-shadow: none;
-  color: white !important;
+  color: white;
   margin-bottom: 1px;
-  background-color: #4E5868 !important;
+  background-color: #3f8f9a !important;
   height: 30px;
-  font-size: 127%; 
-}
+  font-size: 127%; }
 
 /* Layer Folder color coding */
 .menufolder {
-  background-color: #3C4759 !important; 
-  color: white !important;
-}
+  background-color: #3b596a !important; }
 
 .layer-active {
-  background-color: #CFD0D2 !important; 
-  color: black !important;
-}
+  background-color: #c07c0c !important; }
 
 /* Layer item open */
 .layeritem-open {
