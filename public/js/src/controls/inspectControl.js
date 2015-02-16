@@ -61,7 +61,7 @@ L.Control.Inspect = L.Control.extend({
 		this.disableScrollzoom();
 
 		// get zindexControl
-		this._zx = app.getZIndexControls().l; // layermenu zindex control 
+		this._zx = app.MapPane.getZIndexControls().l; // layermenu zindex control 
 
 	        // add active layers
 	        this._addAlreadyActiveLayers();

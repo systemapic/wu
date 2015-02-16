@@ -586,13 +586,7 @@ Wu.App = Wu.Class.extend({
 
 	// },
 
-	getZIndexControls : function () {
-		var z = {
-			b : app.MapPane._bzIndexControl, // base
-			l : app.MapPane._lzIndexControl  // layermenu
-		}
-		return z;
-	},
+	
 
 
 	// debug mode
