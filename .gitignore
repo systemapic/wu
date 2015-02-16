@@ -1,2 +1,3 @@
-public/js/src/core/config/*
+public/js/src/config/*
 public/dist/*
+log/*
