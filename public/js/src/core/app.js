@@ -5,7 +5,7 @@ Wu.App = Wu.Class.extend({
 	// debug : true,
 
 	// default options
-	options : systemapicConfigOptions, // global var from config.js... perhaps refactor.
+	options : Wu.config.options, // global var from config.js... perhaps refactor.
 
 
 	_ready : false,
@@ -76,7 +76,7 @@ Wu.App = Wu.Class.extend({
 	},
 
 	initServer : function () {
-		console.log('Securely connected to server: \n', app.options.servers.portal);
+		console.log('Securely connected to server: \n', this.options.servers.portal);
 
 		var data = JSON.stringify(this.options);
 		

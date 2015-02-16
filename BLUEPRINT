@@ -13,6 +13,13 @@ CON's: 	When deleting USER, user-uuid's must be deleted from PROJECTS/FILES/CLIE
 	Careful not to reveal user uuids to others - ie. must clean up ACCESS OBJECT in each model.
 
 
+
+
+
+
+
+
+
 ### OVERVIEW:
 
 // delete: only by Portal Admin, OR user that created project.
@@ -67,9 +74,11 @@ GROUPS
 7. Each project has a READ group and a WRITE group.
 
 
+
+
 // not connected to a PROJECT but checked every time
 var group : {
-	name : 'portal_admins',
+	name : 'super_admins',
 	users : [
 		'user-uuids',
 		'user-uuids',
@@ -79,7 +88,7 @@ var group : {
 
 // not connected to a PROJECT but checked every time
 var group : {
-	name : 'super_admins',
+	name : 'portal_admins',
 	users : [
 		'user-uuids',
 		'user-uuids',
@@ -94,15 +103,8 @@ var group : {
 		'user-uuids',
 		'user-uuids',
 		'user-uuids'
-	],
-
-	groups : [
-		'portal_admins',
-		'super_admins',
 	]
-
 }
-
 
 // this group is added to PROJECT under group
 var group : {
@@ -114,7 +116,7 @@ var group : {
 
 // this group is added to PROJECT under group
 var group : {
-	name : 'write_project-uuid', 		
+	name : 'readwrite_project-uuid', 		
 	users : [
 		'user-uuids'
 	]
@@ -122,25 +124,253 @@ var group : {
 
 // this group is added to PROJECT under group
 var group : {
-	name : 'delete_project-uuid', 		
+	name : 'readwritedelete_project-uuid', 		
 	users : [
 		'user-uuids'
-	],
-	groups : [
-		'portal_admins',
-		'super_admins'
+	]
+}
+
+// this group is added to PROJECT under group
+var group : {
+	name : 'manage_project-uuid', 		
+	users : [
+		'user-uuids'
 	]
 }
 
 
+groups for:
+-----------
+  
+  PROJECTS - delegated: (1) READ, (2) READWRITE, (3) MANAGE (ie. add users)
 
+  CLIENTS - write/delete only for portal admins
 
+  FILES (inherited from project)
 
+  LAYERS (inherited from project)
+
+  USERS - write/delete only for portal admins OR creator of user
 
 
 
 
 ________________
+
+
+
+Delegation ACTIONS:
+
+
+	Give READ / WRITE access for project to USER
+
+	Give MANAGE ACCESS to user (s/he can create users - but only give READ/WRITE based on above)
+
+
+
+
+SUPERADMINS
+
+	can DO WHATEVER THE FUCK THEY WANT
+
+
+PORTAL ADMINS
+
+	can CREATE PROJECTS
+	can CREATE MANAGERS
+	can CREATE PORTAL ADMIN
+
+	cannot CREATE superadmins
+
+	nobody below can CREATE PROJECT
+
+
+---------------------
+
+ACTIONS
+
+
+	
+	client
+	---------------------
+	create client - GROUP
+	---------------------
+	edit client   - CLIENT_WRITE_GROUP 
+	read client   - CLIENT_READ_GROUP 
+	delete client - CLIENT_DELETE_GROUP         (if (EDIT client && createdBy self) || admin)
+
+		project
+		----------------------
+		create project - GROUP
+		----------------------
+		edit project    - PROJECT_WRITE_GROUP
+		read project    - PROJECT_READ_GROUP
+		delete project  - PROJECT_DELETE_GROUP
+
+			file
+			--------------- [inherit from PROJECT GROUPS]
+			create file (and layers)   (if WRITE project)
+			edit file 		   (if WRITE project)
+			read file 		   (if READ project)
+			delete file 		   (if (WRITE PROJECT && createdBy self) || admin)
+
+
+	user
+	---------------------
+	create user - GROUP (aka. managers)
+	---------------------
+	edit user     - USER_WRITE_GROUP
+	read user?    - USER_READ_GROUP
+	delete user   - USER_DELETE_GROUP
+
+
+		
+
+	create portal admins
+	create superadmins
+
+
+	-----
+
+
+setAccess ACTIONS:
+
+	give read access to USER for PROJECT 	(READ_projectUuid_GROUP,  MANAGER_GROUP)
+	give write access to USER for project 	(WRITE_projectUuid_GROUP, MANAGER_GROUP)
+	give create access for projects 	(CREATE_PROJECT_GROUP)
+	give delete access 			(DELETE_projectUuid_GROUP)
+
+	give manage access (create user) 	(MANAGER_GROUP)
+
+
+_______________________________________________
+
+	VISITOR_GROUP
+		- create_project
+		- delete_own_project
+		- 
+
+	PORTAL_ADMIN_GROUP
+		- create_projects
+		- delete_projects
+
+
+
+
+
+
+	READER
+		- read_project
+		- 
+
+
+
+
+
+
+
+	SUPER_ADMIN
+		- errything
+
+
+	PORTAL_ADMIN
+		-
+
+-=========================
+
+Super Admin 	– somebody with access to the site network administration features and all other features. See the Create a Network article.
+Administrator 	– somebody who has access to all the administration features within a single site.
+Editor 		– somebody who can publish and manage posts including the posts of other users.
+Author 		– somebody who can publish and manage their own posts.
+Contributor 	– somebody who can write and manage their own posts but cannot publish them.
+Subscriber 	– somebody who can only manage their profile.
+
+
+
+__________
+
+which roles do we need?
+
+Super_Admin 	- KO/J
+
+Portal_Admin 	- Ana/Rod
+
+Project_Manager 	- a client that Ana created a project for. needs to be able to EDIT project and add EDITORS to it.
+
+Project_Editor 		- a client that Ana created a project for. needs to be able to EDIT project.
+
+Project_Reader    	- a client that Ana created a project for. needs to be able to READ project.
+
+Portal_Visitor          - a visitor to eg. dev.systemapic.com, should be able to CREATE a PROJECT (1 only), read, edit, but NOT add any users / share.
+
+
+
+WHERE TO STORE WHICH PROJECTS USER IS MANAGER FOR ?!??!??!?!?!?!?!?!?!?!!?!??!?!
+
+
+
+CAPABILITIES:
+
+share_snapshot
+share_pdf
+share_link
+
+download_file
+
+
+================
+_____________________
+
+
+
+CREATOR
+
+	can CREATE PROJECT (antall?)
+
+	cannot create USERS
+
+
+READ/WRITER
+	
+	can READ/WRITE project
+
+	cannot CREATE users
+	cannot CREATE projects
+
+
+READ
+	can READ project
+
+	cannot WRITE to project
+
+
+MANAGERS 
+	
+	- can only create user without any capability -
+	- independent of projects - 
+
+	1. can CREATE USERS
+	2. can GIVE READ/WRITE (only same access) to own projects
+
+	cannot CREATE managers
+	cannot CREATE projects
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -621,14 +621,14 @@ module.exports = function(app, passport) {
 	});
 
 	// =====================================
-	// DELETE USER =========================
+	// SET ACCESS  =========================
 	// =====================================
 	// create a new user
-	app.post('/api/user/delegate', isLoggedIn, function (req,res) {
-		console.log('/api/user/delegate');
+	app.post('/api/access/set', isLoggedIn, function (req,res) {
+		console.log('/api/access/set');
 		
 		// create new user
-		api.delegateUser(req, res);
+		api.setAccess(req, res);
 	
 	});
 

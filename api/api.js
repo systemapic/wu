@@ -7,6 +7,7 @@ var User  	= require('../models/user');
 var File 	= require('../models/file');
 var Layer 	= require('../models/layer');
 var Hash 	= require('../models/hash');
+var Group 	= require('../models/group');
 
 // utils
 var fs 		= require('fs-extra');
@@ -33,6 +34,7 @@ var config = require('../config/config.js');
 // permission
 var permission = require('./permission');
 
+// superusers
 var superusers = permission.superusers;
 
 // mapnik
@@ -54,9 +56,8 @@ var FILEFOLDER 		= '/data/files/';
 var IMAGEFOLDER 	= '/data/images/';
 var TEMPFOLDER 		= '/data/tmp/';
 var CARTOCSSFOLDER 	= '/data/cartocss/';
-var TOOLSPATH 		= '../tools/';
+var TOOLSPATH 		= '../api/';
 var LEGENDSPATH 	= '/data/legends/';
-
 var BASEURI 		= config.portalServer.uri;
 var VILEHOST		= config.vile.uri;
 var VILEOSMHOST 	= config.vileosm.uri;
@@ -962,6 +963,7 @@ module.exports = api = {
 
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
+				console.log('cmd ran: ', err, stdout, stdin);
 
 				callback(err);
 			});
@@ -1215,10 +1217,18 @@ module.exports = api = {
 		if (!permission.to.create.project(user)) return api._errorUnauthorized(req, res);
 
 		// create new project
-		var project = api._newProject(user, json);
+		var project = api.createNewProject(user, json);
+
+		// create empty access group (read, readwrite, manage)
+		var groups = api.createProjectGroups(project);
+
+		// add user to groups
+		api.addUserToGroups(user, groups, function (err) {
+			console.log('addUserToGroups', err);
+		});
 
 		// add to superadmins: just add the uuid to User(s)
-		api.addProjectToSuperadmins(project.uuid);
+		// api.addProjectToSuperadmins(project.uuid);
 		
 		// add default mapbox account		  		  // callback
 		api._getMapboxAccount(req, res, project, DEFAULTMAPBOX.username, DEFAULTMAPBOX.accessToken, api._returnProject); // todo:::::
@@ -1226,9 +1236,7 @@ module.exports = api = {
 
 	},
 
-	_newProject : function (user, json, callback) {
-
-		console.log('json: ', json);
+	createNewProject : function (user, json, callback) {
 
 		var slug =  crypto.randomBytes(3).toString('hex');
 		
@@ -1238,7 +1246,6 @@ module.exports = api = {
 		project.createdBy 	= user.uuid;
 		project.createdByName   = user.firstName + ' ' + user.lastName;
 		project.slug 		= slug;
-		// project.slug 		= json.name.replace(/\s+/g, '').toLowerCase();
 		project.name 		= json.name;
 		project.description 	= json.description;
 		project.keywords 	= json.keywords;
@@ -1247,9 +1254,37 @@ module.exports = api = {
 		return project;
 	},
 
+	createProjectGroups : function (project) {
+
+		var groups = [];
+
+		groups.push(api.createGroup('read', 	 project));
+		groups.push(api.createGroup('readwrite', project));
+		groups.push(api.createGroup('manage', 	 project));
+
+		return groups;
+	},
 
 
+	createGroup : function (capability, entity) {
 
+		// create new group
+		var group = new Group();
+		group.uuid = 'group-' + uuid.v4();
+		group.name = capability + '-' + entity.uuid; // eg. read-project-2342342-23423-adsdasd-23e32
+
+		return group;
+	},
+
+
+	addUserToGroups : function (user, groups, done) {
+		async.each(groups, function (group, callback) {
+			group.users.push(user.uuid);
+			group.save(function (err) {
+				callback(err);
+			})
+		}, done);
+	},
 
 	
 
@@ -1445,8 +1480,8 @@ module.exports = api = {
 	},
 
 
-	_returnProject : function (req, res, project, error) {
-		if (error) throw error;
+	_returnProject : function (req, res, project, err) {
+		if (err) console.error(err);
 
 		Project
 		.findOne({uuid : project.uuid})
@@ -2567,19 +2602,50 @@ module.exports = api = {
 	},
 
 
+	// delegateUser : function (req, res) {
+	setAccess : function (req, res) {
+
+		var user 	= req.user; 		      	// user that is giving access
+		var userUuid 	= req.body.userUuid;      	// user that is getting access
+		var capability 	= req.body.capability;  	// capability that user is given
+		var projectUuid = req.body.projectUuid;   	// project user is given role to
+		var add         = req.body.add; 		// add or revoke, true/false
+
+		// return if missing information
+		if (!userUuid || !capability || !projectUuid) return res.end(JSON.stringify({
+			error : 'Error setting accesss, missing information.'
+		}));
+
+
+		console.log('DELEGATING ' + capability + ' access to project ' + projectUuid + ' for user ' + userUuid);
+
+
+		// check if user can delegate
+		// if (!permission.to.delegate.project(user, project)) return api._errorUnauthorized(req, res);
+
+
+		
+
+		res.end(JSON.stringify({
+			result : 'lol'
+		}));
+
+
+	},
+
+
 
 	// #########################################
 	// ###  API: Delegate User               ###
 	// #########################################
 	// add access to projects 
-	delegateUser : function (req, res) {
+	delegateUser_old : function (req, res) {
 
 		var user 	= req.user; 		      	// user that is giving access
 		var userUuid 	= req.body.userUuid;      	// user that is getting access
 		var role 	= req.body.role;  		// role that user is given
 		var projectUuid = req.body.projectUuid;   	// project user is given role to
 		var add         = req.body.add; 		// add or revoke, true/false
-		// var clientUuid  = req.body.clientUuid;	// client that project belongs to
 
 		console.log('delegateUser: ', req.body);
 
