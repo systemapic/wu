@@ -5,3 +5,6 @@ log/*
 dist/tmp/*
 views/tmp/*
 views/*.serve.*
+public/css/fonts
+public/css/images
+public/css/style.css
