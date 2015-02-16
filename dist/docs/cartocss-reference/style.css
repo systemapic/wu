@@ -1,0 +1,218 @@
+body {
+	font-family: helvetica neue;
+	font-size: 14px;
+}
+
+#hook,
+#valuehook {
+	padding: 10px;
+}
+
+#cartoref-wrapper {
+	padding: 20px;
+max-width: 900px;
+margin: auto;
+}
+
+.mapbox-ref {
+	font-style: italic;
+	margin-top: 10px;
+	margin-bottom: 75px;
+}
+
+#cartoref-wrapper h1 {
+font-size: 46px;
+margin: 0;
+padding: 0;
+margin-bottom: 20px;
+}
+
+
+#cartoref-wrapper ul {
+	line-height: 1.8;
+	font-size: 16px;
+	margin-top: 50px;
+	margin-bottom: 50px;	
+	}
+
+#cartoref-wrapper ul li a,
+#cartoref-wrapper ul li a:active {
+	text-decoration: none;
+	color: #333;
+	font-size: 16px;
+	}
+
+.cartoref-head-wrapper {
+	padding: 10px;
+}
+
+.cartoref-head-wrapper h2 {
+margin-top: 30px;
+font-size: 26px;
+}
+
+.cartoref-head-wrapper p {
+font-size: 15px;
+line-height: 1.5;
+}
+
+.displayNone {
+	display: none;
+}
+
+section {
+margin-top: 10px;
+margin-bottom: 10px;
+padding: 10px;
+padding-left: 20px;
+padding-right: 20px;
+border: 1px solid #C8C8C8;
+padding-top: 19px;
+}
+
+section .h3,
+section h3,
+section a {
+font-size: 32px;
+font-weight: 600;
+margin: 0;
+margin-bottom: 25px;
+}
+
+.carto-css-identifyer-wrapper {
+border-bottom: 1px dashed #C8C8C8;
+padding-bottom: 10px;
+padding-top: 10px;
+}
+
+.carto-css-identifyer {
+margin-top: 10px;
+margin-bottom: 17px;
+}
+
+.carto-css-identifyer-name {
+font-weight: 900;
+font-size: 16px;
+}
+
+.carto-css-identifyer-value {
+padding: 2px;
+padding-left: 5px;
+padding-right: 5px;
+background: #DADADA;
+font-size: 14px;
+color: #666;
+margin-left: 0px;
+position: relative;
+top: 0px;
+border-radius: 3px;
+}
+
+.carto-css-default-value {
+font-style: italic;
+color: #666;
+line-height: 1.7;
+}
+
+
+.carto-css-descrition {
+margin-top: 20px;
+margin-bottom: 5px;
+line-height: 1.7;
+}
+
+
+
+.valid-values {
+	margin-top: 15px;
+}
+.valid-values-header {
+font-style: italic;
+color: #666;
+margin-bottom: 5px;
+}
+
+
+.valid-values span {
+	background: #DADADA;
+	margin-right: 2px;
+	margin-bottom: 2px;
+	padding: 0px;
+	line-height: 1.6;
+	font-size: 13px;
+	border-radius: 2px;
+	padding-left: 5px;
+	padding-right: 5px;
+	white-space: nowrap;
+	display: inline-block;
+	color: #666;
+}
+
+
+.value-code {
+background: #DADADA;
+padding: 25px;
+margin-bottom: 10px;
+margin-top: 10px;
+border-radius: 3px;
+color: #333;
+line-height: 1.8;
+}
+
+span.r {
+color: #AD00AD;
+font-weight: 900;
+}
+
+span.br {
+color: #FF0033;
+font-weight: 900;
+}
+
+span.b {
+color: #003DAD;
+font-weight: 900;
+}
+
+span.gray {
+color: #666;
+}
+
+span.c {
+padding: 2px;
+padding-left: 5px;
+padding-right: 5px;
+background: #DADADA;
+font-size: 14px;
+color: #666;
+margin-left: 0px;
+position: relative;
+top: 0px;
+border-radius: 3px;
+}
+
+
+.value-description {
+	line-height: 1.5;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.carto-seperator {
+	width: 100%;
+	height: 2px;
+	margin-top: 50px;
+	margin-bottom: 50px;
+	background: #999;
+}
+
+
+#searcher,
+#searcher:focus {
+padding: 4px;
+font-size: 15px;
+border: 1px solid #C8C8C8;
+margin-bottom: 15px;
+margin-top: 15px;
+outline: none;
+}
