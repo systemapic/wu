@@ -363,20 +363,20 @@ module.exports = function(grunt) {
 
 			dev : {
 
-				src : 'views/app.template.ejs',
-				dest : 'views/app.ejs'
+				src : 'views/app.ejs',
+				dest : 'views/app.serve.ejs'
 
 			},
 
 			prod : {
 
-				src : 'views/app.template.ejs',
-				dest : 'views/app.temp.ejs'
+				src : 'views/app.ejs',
+				dest : 'views/tmp/app.temp.ejs'
 			},
 
 			login : {
-				src : 'views/login.template.ejs',
-				dest : 'views/login.ejs'
+				src : 'views/login.ejs',
+				dest : 'views/login.serve.ejs'
 			}
 		},
 
@@ -388,7 +388,7 @@ module.exports = function(grunt) {
 			collapseWhitespace: true
 			},
 			files: {
-				'views/app.ejs': 'views/app.temp.ejs',     // 'destination': 'source'
+				'views/app.serve.ejs': 'views/tmp/app.temp.ejs',     // 'destination': 'source'
 			}
 		}}
 

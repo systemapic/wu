@@ -2,3 +2,5 @@ config/*
 public/js/src/config/*
 log/*
 dist/tmp/*
+views/tmp/*
+views/*.serve.*

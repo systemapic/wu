@@ -47,7 +47,7 @@ module.exports = function(app, passport) {
 		if (!req.isAuthenticated()) return res.render('../../views/index.ejs'); // load the index.ejs file
 		
 		// render app html				// todo: hotlink
-		res.render('../../views/app.ejs', {
+		res.render('../../views/app.serve.ejs', {
 			hotlink : req.session.hotlink
 		});
 
@@ -678,7 +678,7 @@ module.exports = function(app, passport) {
 		console.log('/login§');
 
 		// render page and pass in flash data if applicable
-		res.render('../../views/login.ejs', { message: req.flash('loginMessage') });
+		res.render('../../views/login.serve.ejs', { message: req.flash('loginMessage') });
 	});
 
 	
