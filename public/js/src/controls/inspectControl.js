@@ -61,8 +61,8 @@ L.Control.Inspect = L.Control.extend({
 		this.disableScrollzoom();
 
 		// get zindexControl
-		this._zx = app.getZIndexControls().l; // layermenu zindex control 
-	       
+		this._zx = app.MapPane.getZIndexControls().l; // layermenu zindex control 
+
 	        // add active layers
 	        this._addAlreadyActiveLayers();
 
@@ -120,7 +120,6 @@ L.Control.Inspect = L.Control.extend({
 		app.Tooltip.add(kill, 'Disable layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
 
 		// add to list
-		// this._list.appendChild(wrapper);
 		this._list.insertBefore(wrapper, this._list.firstChild);
 
 		// create object
@@ -188,10 +187,6 @@ L.Control.Inspect = L.Control.extend({
 		this._md = 0;
 		var div = entry.wrapper;
 
-		
-
-		console.log('_dragStart');
-
 	},
 
 	_dragMove : function (e) {
@@ -209,8 +204,8 @@ L.Control.Inspect = L.Control.extend({
 		this._md += e.movementY;
 
 		// move up/down
-		if (md < -k ) this._moveUp(movedY);
-		if (md >  k ) this._moveDown(movedY);
+		if (md < -k) this._moveUp(movedY);
+		if (md >  k) this._moveDown(movedY);
 		
 		// add dragging class
 		if (!this._dragClassAdded) L.DomUtil.addClass(div, 'dragging');
@@ -259,7 +254,6 @@ L.Control.Inspect = L.Control.extend({
 
 		// move up in zindex
 		this._zx.down(layer);
-
 
 		// reset dragging y count
 		this._md = 0;
@@ -329,7 +323,6 @@ L.Control.Inspect = L.Control.extend({
 
 		// move up in zindex
 		this._zx.down(layer);
-
 		
 	},
 
@@ -351,8 +344,6 @@ L.Control.Inspect = L.Control.extend({
 		map.fitBounds(bounds);
 
 	},
-
-
 
 	isolateToggle : function (entry) {
 		if (entry.isolated) {
@@ -376,7 +367,7 @@ L.Control.Inspect = L.Control.extend({
 
 	_noneAreIsolated : function () {
 		var any = _.filter(this.layers, function (entry) { return entry.isolated == true; });
-		if (any.length == 0) return true;
+		if (!any.length) return true;
 		return false;
 	},
 
@@ -420,7 +411,7 @@ L.Control.Inspect = L.Control.extend({
 		if (descriptionControl) descriptionControl.removeLayer(entry.layer);	
 
 		// Hise Layer inspector if it's empty
-		if ( this.layers.length == 0 ) this._content.style.display = 'none';
+		if (!this.layers.length) this._content.style.display = 'none';
 
 	},
 
@@ -434,7 +425,20 @@ L.Control.Inspect = L.Control.extend({
 		// set currently active entry
 		this.activeEntry = entry;
 
-	}
+	},
+
+	getListPosition : function () {
+		console.log('getPosition');
+		console.log('index: ', this._zx.getIndex());
+		console.log('list: ', this._list);
+
+
+	},
+
+	setListPosition : function (position, layer) {
+
+
+	},
 
 
 

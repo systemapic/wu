@@ -122,7 +122,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// create project button
 		if (app.Account.canCreateProject()) {
-			var className = 'smap-button-white new-project-button ct11 ct16 ct18';
+			var className = 'smap-button-white new-project-button';
 			this._newProjectButton = Wu.DomUtil.create('div', className, this._projectsContainer, '+');
 			Wu.DomEvent.on(this._newProjectButton, 'mousedown', this.createNewProject, this);
 			Wu.DomEvent.on(this._newProjectButton, 'mousedown', Wu.DomEvent.stop, this);
@@ -231,8 +231,34 @@ Wu.SidePane.Client = Wu.Class.extend({
 			context : this
 		}
 		project._saveNew(callback); 
+
+		// cxxxx
+		// generate project thumb 
+		// if no timeout: 	creates thumb on active project before new was selected
+		// 			active project (project object) is not ready when _markActive gets triggered)
+
+		// Of course dodgy ~ 500ms er ikke nok...
+
+	
+
+		// Mark this project as active
+		
+
 		
 	},
+
+	_markActive : function (newProject) {
+		var projects = app.Projects;
+		for (p in projects) {
+			var project = projects[p];
+			if (project._menuItem) project._menuItem._unmarkActive();
+		}
+		Wu.DomUtil.addClass(newProject._menuItem._container, 'active-project');
+	},
+	
+	_unmarkActive : function () {
+		Wu.DomUtil.removeClass(this._container, 'active-project');
+	},	
 
 	_projectCreated : function (project, json) {
 
@@ -254,6 +280,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// create project in sidepane
 		this._createNewProject(project);
+		
+	
 
 	},
 
@@ -287,6 +315,11 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// add defaults to map
 		this._addDefaults();
 
+		// create project thumb
+		project.createProjectThumb();
+
+		// mark project div in sidepane as active
+		this._markActive(project);
 	},
 
 
@@ -473,6 +506,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	open : function () {
+
+		// Close open project info to prevent overflow
+		this.resetOpenProjectInfo();
 
 		this.calculateHeight();
 		this._container.style.height = this.maxHeight + 'px';          

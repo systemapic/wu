@@ -72,7 +72,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.usersInnerWrapper);
 
 		// add delete button
-		if (app.Account.canDeleteProject(this.project.store.uuid) || this.options.editMode) {
+		var canDelete = app.Account.canDeleteProject(this.project.store.uuid);
+		console.log('canDelete? ', canDelete);
+		if (canDelete || this.options.editMode) {
 		
 			this.makeThumb = Wu.DomUtil.create('div', 'new-project-thumb', this.usersInnerWrapper, 'Generate thumbnail');
 			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');			
@@ -84,10 +86,18 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// ****************************************************************************
 		// ****************************************************************************
 
+		this.hookThumb();
 
 
 		// add hooks
 		this.addHooks();
+
+	},
+
+	hookThumb : function () {
+
+		// This project ID
+		this.project._sidePaneLogoContainer = this.logo;
 
 	},
 
@@ -100,6 +110,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	update : function (project) {
+
 		this.project 			= project || this.project;
 		this.name.innerHTML 		= this.project.store.name;
 		this.description.innerHTML 	= this.project.store.description;
@@ -136,13 +147,15 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var parentHeight = this._parent._container.offsetHeight;
 		var projectInfoHeight = this.usersInnerWrapper.offsetHeight;		
 
+		console.log('toggleProjecTInfo', this.users);
+
 		if ( !this.project._menuItem._isOpen ) {
 
 			// Add open state to button
 			Wu.DomUtil.addClass(this.users, 'active-project-user-button');
 
 			// Set Project Height
-			this._container.style.height = projectInfoHeight + 130 + 'px';
+			this._container.style.height = projectInfoHeight + 110 + 'px';
 
 			// Set Client container height
 			this._parent._container.style.height = parentHeight + projectInfoHeight + 'px';
@@ -221,117 +234,12 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	makeNewThumbnail : function () {
 
-		var that = this; // callback
-
-		// If current project is active
-		if ( this.project.store.uuid == app.activeProject.getUuid() ) {
-			
-			app.setHash(function (ctx, hash) {
-
-				var obj = JSON.parse(hash);				
-
-				obj.dimensions = {
-					height : 233,
-					width : 350,			
-				}
-
-				// get snapshot from server
-				Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdThumb, that);
-
-			})
-
-		// We're making a thumb on a project that is not active
-		} else {
-
-
-			this.setNewHash(function (ctx, hash) {
-
-				var obj = JSON.parse(hash);				
-
-				obj.dimensions = {
-					height : 233,
-					width : 350,			
-				}
-
-				// get snapshot from server
-				Wu.post('/api/util/createThumb', JSON.stringify(obj), that.createdThumbNotActive, that);
-
-			})
-		}
-	},
-
-
-
-	// save a hash
-	setNewHash : function (callback) {
-
-		// get project;
-		var projectUuid = this.project.store.uuid;
-
-		// hash object
-		var json = {
-			projectUuid : projectUuid,
-			hash : {
-				id 	 : Wu.Util.createRandom(6),
-				position : this.project.store.position,
-				layers 	 : [] 			// layermenuItem uuids, todo: order as z-index
-			}
-		}
-
-		// save hash to server
-		Wu.post('/api/project/hash/set', JSON.stringify(json), callback, this);
-
-		// return
-		return json.hash;
+		// Set state to manually updated to prevet overriding
+		// app.Projects[this.project.store.uuid].store.sidePaneLogo.manuallyUpdated = true;
+		this.project.setThumbCreated(true);
+		this.project.createProjectThumb();
 
 	},
-
-
-	createdThumb : function(context, json) {
-
-		// parse results
-		var result = JSON.parse(json);
-		// var image = result.image; // filename
-		var image = result.cropped;
-
-		var fileUuid = result.fileUuid;
-
-		// get dimensions of container
-		var height = context.logo.offsetHeight;
-		var width = context.logo.offsetWidth;
-
-		var path = '/images/' + image;
-
-		// set image
-		context.logo.src = path;
-		context.project.setLogo(path);
-
-		app.HeaderPane.addedLogo(image);
-
-	},
-
-
-	createdThumbNotActive : function(context, json) {
-
-		// parse results
-		var result = JSON.parse(json);
-		// var image = result.image; // filename
-		var image = result.cropped;
-
-		var fileUuid = result.fileUuid;
-
-		// get dimensions of container
-		var height = context.logo.offsetHeight;
-		var width = context.logo.offsetWidth;
-
-		var path = '/images/' + image;
-
-		// set image
-		context.logo.src = path;
-		context.project.setLogo(path);
-
-	},
-
 
 	// edit hook for client logo
 	addLogoDZ : function () {
@@ -369,6 +277,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	editedLogo : function (path) {
 
+		// Set state to manually updated to prevet overriding
+		this.project.setThumbCreated(true);
+
 		// set path
 		var fullpath = '/images/' + path;
 		
@@ -376,9 +287,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.project.setLogo(fullpath);
 
 		// update image 
-		// this.logo.style.backgroundImage = "url('" + this.project.getLogo() + "')";
 		this.logo.src = this.project.getLogo();
-
 
 		// update header
 		app.HeaderPane.addedLogo(path);
@@ -625,10 +534,13 @@ Wu.SidePane.Project = Wu.Class.extend({
 			this.project.unload();
 		
 			// activate startpane
-			app.StartPane.activate();
-
+			// running a little timer on this, otherwise it's not deleted properly and thumb will still show on startpane...
+			setTimeout(function() {
+				app.StartPane.activate();
+			}, 200)
+			
 			// close statuspane
-			app.StatusPane.close()
+			app.StatusPane.close();
 		}
 
 		// delete

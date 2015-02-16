@@ -386,6 +386,17 @@
 	display: block;
 	}
 
+.project-item.active-project:before {
+	content: '';
+	width: 5px;
+	height: 5px;
+	background: green;
+	position: absolute;
+	border-radius: 10px;
+	top: 14px;
+	left: 3px;
+	}	
+
 .project-title {
 	position: relative;
 	left: 10px;
@@ -393,7 +404,6 @@
 	font-size: 110%;
 	text-shadow: none;
 	font-weight: 500;
-	/*text-transform: uppercase;*/
 	line-height: 1;
 	overflow: hidden;
 	max-height: 30px;
@@ -404,21 +414,23 @@
 	vertical-align: bottom;
 	padding-right: 20px;
 	overflow: visible;
+	padding-bottom: 5px;
+	top: 9px;	
 	}
 
 .project-title input {
-	position: absolute;
+	position: relative;
 	left: 0;
-	top: -2px;
+	top: -1px;
 	font-size: 100%;
 	text-shadow: none;
 	font-weight: 500;
-	/*text-transform: uppercase;*/
 	line-height: 0.9;
 	padding: 0;
 	background-color: transparent;
 	width: 192px;
 	height: 100%;
+	overflow: visible;
 	}
 
 .project-description {
@@ -455,6 +467,7 @@
 	top: 45px;
 	overflow: hidden;
 	text-align: center;
+	z-index: 999;
 	}
 
 .project-logo {
@@ -497,7 +510,9 @@
 	opacity: 1;
 	}
 
-
+.project-users-wrap:active {
+	background-color: rgba(255, 255, 255, 0.5);
+	}
 
 .active-project-user-button {
 	display: block !important;
@@ -644,6 +659,7 @@
 .project-delete {
 	font-size: 11px;
 	font-weight: 900;
+	margin: auto;
 	margin-top: 10px;
 	background: #CCC;
 	width: 100px;
@@ -1629,6 +1645,7 @@ button.image-attachment {
 	font-weight: 900;
 	font-size: 15px;
 	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
+	z-index: 999;
 	}
 
 /* The files in the file list */
@@ -2552,7 +2569,7 @@ td.tdcont.createdDate {
 
 .share-image-wrap:before {
 	content: '';
-	background-image: url(images/systemapic-grinding.gif);
+	background-image: url(images/grinders/cloud-large-grinder-grayLight-on-white.gif);
 	background-repeat: no-repeat;
 	text-align: center;
 	width: 100%;

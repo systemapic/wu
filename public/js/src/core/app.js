@@ -1,4 +1,4 @@
-Wu.version = '0.3-dev';
+Wu.version = '0.4-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -6,7 +6,6 @@ Wu.App = Wu.Class.extend({
 
 	// default options
 	options : Wu.config.options, // global var from config.js... perhaps refactor.
-
 
 	_ready : false,
 
@@ -39,7 +38,6 @@ Wu.App = Wu.Class.extend({
 		// Detect if it's a mobile
 		if ( L.Browser.mobile ) {
 
-			
 			// Set mobile state to true
 			Wu.app.mobile = false;
 			Wu.app.pad = false;
@@ -131,6 +129,9 @@ Wu.App = Wu.Class.extend({
 
 		// get window dimensions
 		var dimensions = this._getDimensions(e);
+
+		// startpane resize event
+		if ( app.StartPane.isOpen ) app.StartPane.resizeEvent(dimensions);
 
 		// mappane resize event
 		if (app.MapPane) app.MapPane.resizeEvent(dimensions);
@@ -446,6 +447,8 @@ Wu.App = Wu.Class.extend({
 			// add layer
 			var layer = project.getLayer(layerUuid);
 
+			console.log('hash layer: ', layer.getTitle());
+
 			// if in layermenu
 			var bases = project.getBaselayers();
 			var base = _.find(bases, function (b) {
@@ -470,7 +473,7 @@ Wu.App = Wu.Class.extend({
 
 
 	// save a hash
-	setHash : function (callback) {
+	setHash : function (callback, project) {
 
 		// get active layers
 		var active = app.MapPane.getActiveLayermenuLayers();
@@ -478,12 +481,15 @@ Wu.App = Wu.Class.extend({
 			return l.item.layer;	// layer uuid
 		});
 
+		console.log('setHash layers:', layers);
+
+
 		// get project;
-		var projectUuid = this.activeProject.getUuid();
+		var project = project || this.activeProject;
 
 		// hash object
 		var json = {
-			projectUuid : projectUuid,
+			projectUuid : project.getUuid(),
 			hash : {
 				id 	 : Wu.Util.createRandom(6),
 				position : app.MapPane.getPosition(),
@@ -543,13 +549,11 @@ Wu.App = Wu.Class.extend({
 			this._renderHash(this, json);
 		}
 
-
 		// acticate legends for baselayers
 		app.MapPane.legendsControl.refreshAllLegends()
 
 		// avoid Loading! etc in status
 		app.setStatus('systemapic'); // too early
-
 
 	},
 	
@@ -582,13 +586,7 @@ Wu.App = Wu.Class.extend({
 
 	// },
 
-	getZIndexControls : function () {
-		var z = {
-			b : app.MapPane._bzIndexControl,
-			l : app.MapPane._lzIndexControl
-		}
-		return z;
-	},
+	
 
 
 	// debug mode
@@ -628,8 +626,6 @@ Wu.App = Wu.Class.extend({
 		var ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat.toRad()) + 1 / Math.cos(lat.toRad())) / Math.PI) / 2 * (1<<zoom) ));
 		return "" + zoom + "/" + xtile + "/" + ytile;
 	}
-
-
 
 
 });

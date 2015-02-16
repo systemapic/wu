@@ -9,15 +9,16 @@ Wu.MapPane = Wu.Class.extend({
 		this._activeLayers = [];
 
 		// connect zindex control
-		this._bzIndexControl = new Wu.ZIndexControl.Baselayers();
-		this._lzIndexControl = new Wu.ZIndexControl.Layermenu();
+		this._baselayerZIndex = new Wu.ZIndexControl.Baselayers();
+		this._layermenuZIndex = new Wu.ZIndexControl.Layermenu();
+
 		return this; 
 	},      
 
 	_initContainer : function () {
 		
 		// init container
-		this._container = Wu.app._mapPane = Wu.DomUtil.createId('div', 'map', Wu.app._mapContainer);
+		this._container = app._mapPane = Wu.DomUtil.createId('div', 'map', app._mapContainer);
 	
 		// add help pseudo
 		Wu.DomUtil.addClass(this._container, 'click-to-start');
@@ -45,6 +46,14 @@ Wu.MapPane = Wu.Class.extend({
 		this.project = project;
 		this.reset();
 		this.update(project);
+	},
+
+	getZIndexControls : function () {
+		var z = {
+			b : this._baselayerZIndex, // base
+			l : this._layermenuZIndex  // layermenu
+		}
+		return z;
 	},
 
 
@@ -166,12 +175,20 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 	getActiveLayermenuLayers : function () {
-		if (!this.layerMenu) return false;
+		if (!this.layerMenu) return;
+
+		var zIndexControl = app.zIndex;
+
 		var layers = this.layerMenu.getLayers();
 		var active = _.filter(layers, function (l) {
 			return l.on;
 		});
-		return active;
+
+		var sorted = _.sortBy(active, function (l) {
+			return zIndexControl.get(l.layer);
+		});
+
+		return sorted;
 	},
 
 	getActiveLayers : function () {
@@ -191,7 +208,6 @@ Wu.MapPane = Wu.Class.extend({
 			return l.getUuid() == layer.getUuid();
 		}, this);
 	},
-
 
 	setMaxBounds : function () {
 		var map = app._map;
@@ -228,16 +244,18 @@ Wu.MapPane = Wu.Class.extend({
 		    zoom = pos.zoom;
 
 		// create new map
-		this._map = Wu.app._map = L.map('map', options).setView([lat, lng], zoom); 
+		this._map = app._map = L.map('map', options).setView([lat, lng], zoom); 
 
 		// add editable layer
 		this.addEditableLayer(this._map);
 
 		// add attribution
 		this._attributionControl = L.control.attribution({
-				position : 'bottomright',
-				prefix : 'Powered by <a href="https://systemapic.com/" target="_blank">Systemapic.com</a> ©'
+			position : 'bottomright',
+			prefix : 'Powered by <a href="http://systemapic.com/" target="_blank">Systemapic.com</a> ©'
 		});
+
+		// add control to map
 		this._map.addControl(this._attributionControl);
 
 	},
@@ -280,7 +298,6 @@ Wu.MapPane = Wu.Class.extend({
 	},
 
 	updateControlCss : function () {
-
 
 		// get controls
 		var controls = this.project.getControls(),
@@ -874,7 +891,6 @@ Wu.MapPane = Wu.Class.extend({
 		});
 		return popup;
 	},
-
 
 	_addPopupCloseEvent : function () {
 		if (this._popInit) return;

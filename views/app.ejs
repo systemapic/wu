@@ -7,98 +7,66 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
 
+			<!-- DEPENDENCIES STYLESHEETS -->
+			<!-- concat + cssmin -->
+			<link rel="stylesheet" href="/dist/css.dependencies.min.css">			
+						
 
-		<link rel="stylesheet"  href="/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.css">
+			<!-- dev css -->
+			<link rel="stylesheet" href="/css/style.css">
+			<link rel="stylesheet" href="/css/evil.css">
+			<link rel="stylesheet" href="/css/knut.css">			
+			
+			<!-- JAVASCRIPTS -->
+			<!-- JAVASCRIPTS -->
+			<!-- JAVASCRIPTS -->
 
-		<!-- concat + cssmin -->
-		<link rel="stylesheet" href="/dist/css.dependencies.min.css">
+			<!-- dep libs -->
+			<script src="/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js"></script>
+			<script src="/js/lib/lodash/lodash.min.js"></script>
+			<script src="/js/lib/parallel.js/parallel.js"></script>
+			<script src="/js/lib/async/async.js"></script>
+			
+			<!-- leaflet.js -->
+			<script src="/js/src/leaflet.js/leaflet-0.7.3-src.js"></script>
+			<script src="/js/lib/mapbox.js/mapbox.standalone.uncompressed.js"></script> <!-- DO NOT REPLACE! has custom edits:4648! -->
+			<script src="/js/src/leaflet.js/plugins/leaflet.geojson.draw.js"></script>
+			<script src="/js/src/leaflet.js/plugins/leaflet.draw-src.js"></script>
+			<script src="/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.js"></script>
+			<script src="/js/src/leaflet.js/plugins/leaflet.utfgrid.js"></script>
 
-		<!-- codemirror -->
-		<link rel="stylesheet" href="/js/lib/codemirror/lib/codemirror.css">
-		<link id="cartoCSStheme" rel="stylesheet" href="/js/lib/codemirror/mode/cartocss/codemirror.carto.css">
-		<!-- <link rel="stylesheet" href="/js/lib/codemirror/mode/cartocss/codemirror.carto.darktheme.css"> -->
-		
-		
+			<!-- Other stuff -->
+			<script src="/js/lib/d3.js/topojson.v1.min.js"></script> 
+			<script src="/js/lib/dropzone.js/dropzone.min.js"></script> 
+			<script src="/js/lib/icanhaz/icanhaz.min.js"></script> 
+			<script src="/js/lib/list.js/list.min.js"></script> 
+			<script src="/js/lib/sortable.js/Sortable.js"></script>
+			<script src="/js/lib/powerange/powerange.min.js"></script>
 
-		<link rel="stylesheet" href="/js/lib/codemirror/mode/cartocss/codemirror.fetta.css">
-		<link rel="stylesheet" href="/js/lib/codemirror/mode/cartocss/spectrum.css">
+			<!-- grande.js -->
+			<script src="/js/src/grande.js/js/grande.class.js"></script>
+			<script src="/js/src/grande.js/js/grande.js"></script>
+			<script src="/js/src/grande.js/js/grande.attachments.js"></script>
 
-		
+			<!-- codemirror -->
+			<script src="/js/lib/codemirror/mode/cartocss/cartoref.js"></script>
+			<script src="/js/lib/codemirror/lib/codemirror.js"></script>
+			<script src="/js/lib/codemirror/mode/cartocss/runmode.js"></script>
+			<script src="/js/lib/codemirror/mode/cartocss/searchcursor.js"></script>
+			<script src="/js/lib/codemirror/mode/cartocss/codemirror.carto.js"></script>
+			<script src="/js/lib/codemirror/mode/cartocss/codemirror.carto.complete.js"></script>
+			<script src="/js/lib/codemirror/mode/cartocss/codemirror.search.js"></script>
+			<script src="/js/lib/codemirror/mode/cartocss/codemirror.palette.js"></script>
+			<script src="/js/lib/codemirror/mode/cartocss/sexagesimal.js"></script>
+			<script src="/js/lib/codemirror/mode/cartocss/spectrum.js"></script>
 
-		<!-- Opentip  -->
-		<link rel="stylesheet" href="/css/opentip.css">
-
-		<!-- Codemirror Dark Theme -->
-		<link rel="stylesheet" href="/js/lib/codemirror/theme/mbo.css">
-		
-		<!-- dev css -->
-		<link rel="stylesheet" href="/css/style.css">
-		<link rel="stylesheet" href="/css/evil.css">
-		<link rel="stylesheet" href="/css/knut.css">
-		
-		<!-- <link rel="stylesheet" href="/dist/css.portal.min.css"> -->
-		
-
-
-
+			<script src="/js/lib/opentip/opentip-native.js"></script>
+			<script src="/js/lib/jss.js/jss.js"></script>
 
 		<!-- styletag for injecting css -->
 		<div id="styletag"></div>
-		<div id="mobilestyle"></div>
-
-
-		<!-- Loader GA her, siden vi trenger analytics.js for å registrere events -->
-
-
-		<!-- dep libs -->
-		<script src="/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js"></script>
-		<script src="/js/lib/lodash/lodash.min.js"></script>
-		<script src="/js/lib/parallel.js/parallel.js"></script>
-		<script src="/js/lib/async/async.js"></script>
-		
-		<!-- leaflet.js -->
-		<script src="/js/src/leaflet.js/leaflet-0.7.3-src.js"></script>
-		<script src="/js/lib/mapbox.js/mapbox.standalone.uncompressed.js"></script> <!-- DO NOT REPLACE! has custom edits:4648! -->
-		<script src="/js/src/leaflet.js/plugins/leaflet.geojson.draw.js"></script>
-		<script src="/js/src/leaflet.js/plugins/leaflet.draw-src.js"></script>
-		<!-- <script src="/js/src/leaflet.js/plugins/leaflet.draw.note.js"></script> -->
-		<!-- <script src="/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.js"></script> -->
-		<!-- <script src="/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleForms.js"></script> -->
-		<script src="/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.js"></script>
-		<script src="/js/src/leaflet.js/plugins/leaflet.utfgrid.js"></script>
-
-		<!-- <script src="/js/lib/d3.js/d3.min.js"></script>  -->
-		<script src="/js/lib/d3.js/topojson.v1.min.js"></script> 
-		<script src="/js/lib/dropzone.js/dropzone.min.js"></script> 
-		<script src="/js/lib/icanhaz/icanhaz.min.js"></script> 
-		<script src="/js/lib/list.js/list.min.js"></script> 
-		<script src="/js/lib/sortable.js/Sortable.js"></script>
-		<script src="/js/lib/powerange/powerange.min.js"></script>
-
-		<!-- grande.js -->
-		<script src="/js/src/grande.js/js/grande.class.js"></script>
-		<script src="/js/src/grande.js/js/grande.js"></script>
-		<script src="/js/src/grande.js/js/grande.attachments.js"></script>
-
-		<!-- codemirror -->
-		<script src="/js/lib/codemirror/mode/cartocss/cartoref.js"></script>
-		<script src="/js/lib/codemirror/lib/codemirror.js"></script>
-		<script src="/js/lib/codemirror/mode/cartocss/runmode.js"></script>
-		<script src="/js/lib/codemirror/mode/cartocss/searchcursor.js"></script>
-		<script src="/js/lib/codemirror/mode/cartocss/codemirror.carto.js"></script>
-		<script src="/js/lib/codemirror/mode/cartocss/codemirror.carto.complete.js"></script>
-		<script src="/js/lib/codemirror/mode/cartocss/codemirror.search.js"></script>
-		<script src="/js/lib/codemirror/mode/cartocss/codemirror.palette.js"></script>
-		<script src="/js/lib/codemirror/mode/cartocss/sexagesimal.js"></script>
-		<script src="/js/lib/codemirror/mode/cartocss/spectrum.js"></script>
-
-		<script src="/js/lib/opentip/opentip-native.js"></script>
-		<!-- <script src="/js/lib/draggabilly.js/draggabilly.pkgd.min.js"></script> -->
-		<script src="/js/lib/jss.js/jss.js"></script>
-
-		<!-- <script src="/dist/js.dependencies.min.js"></script> -->
-
-
+		<div id="mobilestyle"></div>	
+		<div id="cartoCSStheme"></div>		
 	
 		<!-- hotlink -->
 		<script>
@@ -109,40 +77,8 @@
 		</script>
 
 	</head>
-
 	<body>
 	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 		<!-- ****************** -->
 		<!-- Mustache Templates -->
@@ -158,12 +94,12 @@
 
 		<div id="mapsettings-container">
 
-			<div class="editor-inner-wrapper editor-map-item-wrap ct12 ct17 ct23" id="editor-map-baselayer-wrap">
+			<div class="editor-inner-wrapper editor-map-item-wrap" id="editor-map-baselayer-wrap">
 				<h4>Base Layers </h4>
 				
 			</div>
 
-			<div class="editor-inner-wrapper editor-map-item-wrap ct12 ct17 ct23" id="editor-map-layermenu-wrap">
+			<div class="editor-inner-wrapper editor-map-item-wrap" id="editor-map-layermenu-wrap">
 				<h4>Layermenu</h4>
 
 				<div id="editor-map-layermenu">
@@ -176,7 +112,7 @@
 
 			</div>
 
-			<div class="editor-inner-wrapper editor-map-item-wrap ct12 ct17 ct23" id="editor-map-position-wrap">
+			<div class="editor-inner-wrapper editor-map-item-wrap" id="editor-map-position-wrap">
 				<h4>Position</h4>
 				
 				<!-- <div class="dropdown-button" id="editor-map-initpos-more"></div> -->
@@ -188,13 +124,13 @@
 						<button id="editor-map-initpos-button" type="button" class="smap-button-white">Set current position</button> 
 										
 						<label for="editor-map-initpos-lat-value">Latitude:</label>
-						<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-initpos-lat-value"> 
+						<input class="form-control margined eightyWidth" id="editor-map-initpos-lat-value"> 
 						 
 						<label for="editor-map-initpos-lng-value">Longitude:</label>
-						<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-initpos-lng-value"> 
+						<input class="form-control margined eightyWidth" id="editor-map-initpos-lng-value"> 
 						
 						<label for="editor-map-initpos-zoom-value">Zoom-level:</label>
-						<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-initpos-zoom-value"> 
+						<input class="form-control margined eightyWidth" id="editor-map-initpos-zoom-value"> 
 
 					</div>
 
@@ -204,7 +140,7 @@
 
 
 			
-			<div class="editor-inner-wrapper editor-map-item-wrap ct12 ct17 ct23" id="editor-map-bounds-wrap">
+			<div class="editor-inner-wrapper editor-map-item-wrap" id="editor-map-bounds-wrap">
 				<h4>Bounds</h4>
 				  
 
@@ -220,8 +156,8 @@
 						<div class="bounds-wrapper">
 
 							<button id="editor-map-bounds-NE" type="button" class="smap-button-white">Set North-East bounds</button>  
-							<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-NE-lat-value">
-							<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-NE-lng-value">
+							<input class="form-control margined eightyWidth" id="editor-map-bounds-NE-lat-value">
+							<input class="form-control margined eightyWidth" id="editor-map-bounds-NE-lng-value">
 
 						</div>
 						<!-- <label for="editor-map-bounds-SW-lat-value">South-West Corner:</label> -->
@@ -230,8 +166,8 @@
 						<div class="bounds-wrapper">
 
 							<button id="editor-map-bounds-SW" type="button" class="smap-button-white">Set South-West bounds</button>  
-							<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-SW-lat-value">
-							<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-SW-lng-value">
+							<input class="form-control margined eightyWidth" id="editor-map-bounds-SW-lat-value">
+							<input class="form-control margined eightyWidth" id="editor-map-bounds-SW-lng-value">
 
 						</div>
 
@@ -242,12 +178,12 @@
 							<div class="bounds-zoom-half left">								
 								<div class="bounds-zoom-h2">Max Zoom</div>
 								<button id="editor-map-bounds-set-maxZoom" type="button" class="smap-button-white">Set</button>
-								<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-max-zoom-value">
+								<input class="form-control margined eightyWidth" id="editor-map-bounds-max-zoom-value">
 							</div>
 							
 							<div class="bounds-zoom-half right">								
 								<div class="bounds-zoom-h2">Max Zoom</div>
-								<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-map-bounds-min-zoom-value">
+								<input class="form-control margined eightyWidth" id="editor-map-bounds-min-zoom-value">
 								<button id="editor-map-bounds-set-minZoom" type="button" class="smap-button-white">Set</button>
 							</div>
 
@@ -502,13 +438,13 @@
 			<div class="editor-client-edit-wrapper" id="editor-client-edit-wrapper-{{clientID}}">
 				
 				<label for="editor-client-name-{{clientID}}">Name:</label>
-				<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-client-name-{{clientID}}" value="{{clientName}}">
+				<input class="form-control margined eightyWidth" id="editor-client-name-{{clientID}}" value="{{clientName}}">
 				
 				<label for="editor-client-description-{{clientID}}">Description:</label>
-				<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-client-description-{{clientID}}">
+				<input class="form-control margined eightyWidth" id="editor-client-description-{{clientID}}">
 				
 				<label for="editor-client-keywords-{{clientID}}">Keywords:</label>
-				<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-client-keywords-{{clientID}}">
+				<input class="form-control margined eightyWidth" id="editor-client-keywords-{{clientID}}">
 				
 			</div>
 
@@ -518,7 +454,7 @@
 		<!-- Editor / Clients / client -->
 		<script id="editorClientsItem" type="text/html">
 		
-			<div class="editor-clients-container ct0"  id="editor-clients-container-{{clientID}}">
+			<div class="editor-clients-container"  id="editor-clients-container-{{clientID}}">
 				
 				<div class="editor-client-title" id="editor-client-item-{{clientID}}">
 					<h5>{{clientName}}</h5>
@@ -529,11 +465,11 @@
 				
 				<div class="editor-client-edit-wrapper" id="editor-client-edit-wrapper-{{clientID}}">
 					<label for="editor-client-name-{{clientID}}">Name:</label>
-					<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-client-name-{{clientID}}" value="{{clientName}}">
+					<input class="form-control margined eightyWidth" id="editor-client-name-{{clientID}}" value="{{clientName}}">
 					<label for="editor-client-description-{{clientID}}">Description:</label>
-					<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-client-description-{{clientID}}">
+					<input class="form-control margined eightyWidth" id="editor-client-description-{{clientID}}">
 					<label for="editor-client-keywords-{{clientID}}">Keywords:</label>
-					<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-client-keywords-{{clientID}}">
+					<input class="form-control margined eightyWidth" id="editor-client-keywords-{{clientID}}">
 					
 					<div id="editor-client-save-{{clientID}}" class="smap-button-white small editor-client-save-button">Save</div>
 					<div id="editor-client-cancel-{{clientID}}" class="smap-button-white small editor-client-cancel-button">Cancel</div>					
@@ -549,7 +485,7 @@
 
 		<!-- Editor / Projects / NEW -->
 		<script id="editorProjectsNew" type="text/html">
-			<div class="editor-inner-wrapper editor-projects-container ct12 ct17 ct23" id="editor-projects-container-new">
+			<div class="editor-inner-wrapper editor-projects-container" id="editor-projects-container-new">
 				
 				<div class="editor-project-title" id="editor-project-item-new">
 					<h5>{{projectName}}</h5>
@@ -557,13 +493,13 @@
 				</div>
 
 				<label for="editor-project-name-new{{clientID}}">Name:</label>				
-				<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-project-name-new" value="{{projectName}}">
+				<input class="form-control margined eightyWidth" id="editor-project-name-new" value="{{projectName}}">
 
 				<label for="editor-project-description-new{{clientID}}">Description:</label>				
-				<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-project-description-new">
+				<input class="form-control margined eightyWidth" id="editor-project-description-new">
 
 				<label for="editor-project-keywords-new{{clientID}}">Keywords:</label>				
-				<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-project-keywords-new">
+				<input class="form-control margined eightyWidth" id="editor-project-keywords-new">
 				
 
 				<div id="editor-project-confirm-button" class="smap-button-white small">Confirm</div>
@@ -613,11 +549,11 @@
 				<div id="project-basic-info">
 			
 					<label for="editor-project-name-{{uuid}}">Name:</label>
-					<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-project-name-{{uuid}}" value="{{name}}">
+					<input class="form-control margined eightyWidth" id="editor-project-name-{{uuid}}" value="{{name}}">
 					<label for="editor-project-description-{{uuid}}">Description:</label>
-					<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-project-description-{{uuid}}" value="{{description}}">
+					<input class="form-control margined eightyWidth" id="editor-project-description-{{uuid}}" value="{{description}}">
 					<label for="editor-project-keywords-{{uuid}}">Keywords:</label>
-					<input class="form-control margined eightyWidth ct12 ct23 ct24" id="editor-project-keywords-{{uuid}}" value="{{keywords}}">
+					<input class="form-control margined eightyWidth" id="editor-project-keywords-{{uuid}}" value="{{keywords}}">
 					
 					<div id="editor-project-colors" class="smap-button-white small" onclick="startColorThemes()">Color Themes</div>				
 					<div id="editor-project-delete-{{uuid}}" class="smap-button-white small red editor-project-delete-button">Delete</div>
@@ -628,7 +564,7 @@
 
 
 				<div id="basic-themes" class="theme-selector-container">
-					<div id="select-basic-themes" class="ct13">Select color theme</div>
+					<div id="select-basic-themes" class="">Select color theme</div>
 				
 					<div id="colortheme-dark1" class="themeselector">One</div>
 					<div id="colortheme-dark2" class="themeselector">Two</div>
@@ -654,9 +590,9 @@
 				<!-- Color theme -->				
 				<div id="project-color-theme">
 
-					<div id="advanced-themes" class="ccontainer ct22 ct23">
+					<div id="advanced-themes" class="ccontainer">
 					
-					  <div class="mat_swatches ct22">
+					  <div class="mat_swatches">
 					    <div id="advanced-color-header" class="palette-header ">
 					      Your colors:
 					    </div>
@@ -1012,23 +948,23 @@
 		<!-- Project Header -->
 
 		<script id="injectHeaderTitleInput" type="text/html">
-			<input value="{{value}}" class="header-title editable ct15 ct16">
+			<input value="{{value}}" class="header-title editable">
 		</script>
 		<script id="injectHeaderSubtitleInput" type="text/html">
-			<input value="{{value}}" class="header-subtitle ct15 ct16">
+			<input value="{{value}}" class="header-subtitle">
 		</script>
 
 
 		<script id="injectProjectEditInput" type="text/html">
-			<input maxLength="30" value="{{value}}" class="project-edit editable ct15 ct16">
+			<input maxLength="30" value="{{value}}" class="project-edit editable">
 		</script>
 
 		<script id="injectProjectEditDescriptionInput" type="text/html">
-			<textarea class="project-edit-textarea editable ct15 ct16">{{value}}</textarea>
+			<textarea class="project-edit-textarea editable">{{value}}</textarea>
 		</script>
 
 		<script id="injectClientEditInput" type="text/html">
-			<input value="{{value}}" class="client-edit editable ct15 ct16">
+			<input value="{{value}}" class="client-edit editable">
 		</script>
 
 
@@ -1052,7 +988,7 @@
 			<div id="layermenu-outer" class="scroller-frame">
 				<div class="scroll-up"></div>
 				<div class="inner-scroller">
-					<div id="layer-menu-inner-content" class="ct14"></div>
+					<div id="layer-menu-inner-content" class=""></div>
 				</div>
 			</div>
 			
@@ -1064,12 +1000,12 @@
 			<div id="documents-container-leftpane">
 				<div class="documents-folders">
 					<div id="documents-folder-list"></div>
-					<div id="documents-new-folder" class="ct23 ct28">(+)</div>
+					<div id="documents-new-folder" class="">(+)</div>
 				</div>
 			</div>
 
-			<div id="documents-container-rightpane" class="ct28">
-				<article id="documents-container-textarea" class="ct23"></article>
+			<div id="documents-container-rightpane" class="">
+				<article id="documents-container-textarea" class=""></article>
 			</div>
 
 		</script>
@@ -1146,13 +1082,13 @@
 				</td> 
 
 				<!-- // class determines which value is picked up by list.js -->
-				<td class="tdcont type ct23 ct28">{{type}}</td> <!-- Type -->
-				<td class="tdcont files ct23 ct28">{{file}}</td> <!-- Files -->
-				<td class="tdcont category ct23 ct28">{{category}}</td> <!-- Category -->
-				<td class="tdcont keywords ct23 ct28">{{keywords}}</td> <!-- Keywords -->
-				<td class="tdcont createdDate ct23 ct28">{{createdDate}}</td> <!-- Date -->
-				<td class="tdcont status ct23 ct28">{{status}}</td> <!-- Status -->
-				<td class="tdcont uuid ct23 ct28" style="display:none">{{uuid}}</td>
+				<td class="tdcont type">{{type}}</td> <!-- Type -->
+				<td class="tdcont files">{{file}}</td> <!-- Files -->
+				<td class="tdcont category">{{category}}</td> <!-- Category -->
+				<td class="tdcont keywords">{{keywords}}</td> <!-- Keywords -->
+				<td class="tdcont createdDate">{{createdDate}}</td> <!-- Date -->
+				<td class="tdcont status">{{status}}</td> <!-- Status -->
+				<td class="tdcont uuid" style="display:none">{{uuid}}</td>
 
 			</tr>	
 
@@ -1160,8 +1096,8 @@
 
 		<script id="datalibraryTablerowName" type="text/html">
 
-				<input value="{{name}}" id={{nameUuid}} class="dln ct23" readonly="readonly">
-				<textarea  id={{descUuid}} class="dld ct23" readonly="readonly">{{description}}</textarea>	
+				<input value="{{name}}" id={{nameUuid}} class="dln" readonly="readonly">
+				<textarea  id={{descUuid}} class="dld" readonly="readonly">{{description}}</textarea>	
 		</script>
 
 
@@ -1197,12 +1133,12 @@
 
 			<tr id="download-{{uuid}}">
 				<td width="43%" class="download-name">{{name}}</td>
-				<td width="20%" class="tdcont download-category ct23 ct28">{{category}}</td>
-				<td width="10%" class="tdcont download-version ct23 ct28">{{version}}</td>
-				<td width="10%" class="tdcont download-status ct23 ct28">{{status}}</td>
-				<td width="10%" class="tdcont download-format ct23 ct28">{{format}}</td>
-				<td width="10%" class="tdcont download-size ct23 ct28">{{size}}</td>
-				<td width="10%" class="tdcont download-remove ct23 ct28">
+				<td width="20%" class="tdcont download-category">{{category}}</td>
+				<td width="10%" class="tdcont download-version">{{version}}</td>
+				<td width="10%" class="tdcont download-status">{{status}}</td>
+				<td width="10%" class="tdcont download-format">{{format}}</td>
+				<td width="10%" class="tdcont download-size">{{size}}</td>
+				<td width="10%" class="tdcont download-remove">
 				
 				
 					<div class="squaredThree">
@@ -1269,9 +1205,9 @@
 					
 
 					<h4>Mapbox Layers</h4>
-					<div class="mapbox-connect-wrap ct11">
+					<div class="mapbox-connect-wrap">
 						<input id="import-mapbox-layers" class="input-box search" placeholder="Mapbox username"></input>
-						<div id="import-mapbox-layers-ok" class="smap-button-gray ct0 ct11">Connect</div>
+						<div id="import-mapbox-layers-ok" class="smap-button-gray">Connect</div>
 					</div>
 					<div id="layers-mapbox-list-wrap"></div>
 				</div >
@@ -1335,10 +1271,10 @@
 			<div id="description-control-inner-content">
 		
 
-				<div id="collapse-description" class="menucollapser ct15 ct16">Info
+				<div id="collapse-description" class="menucollapser">Info
 				</div>
 				
-				<div id="description-control-inner-content-box" class="ct14"></div>
+				<div id="description-control-inner-content-box" class=""></div>
 				
 			</div>
 		</script>
@@ -1346,7 +1282,7 @@
 
 		<script id="inspectControl" type="text/html">
 			<div id="inspect-control-inner-content">
-				<div id="inspector-header" class="menucollapser ct15 ct16">Layer inspector</div>
+				<div id="inspector-header" class="menucollapser">Layer inspector</div>
 				<div class="inspector-list-outer-scroller">
 					<div id="inspector-list"></div>
 				</div>
@@ -1364,9 +1300,9 @@
 					
 
 
-					<div id="legends-inner" class="leaflet-drag-target ct14">
+					<div id="legends-inner" class="leaflet-drag-target">
 
-						<div id="legends-collapser" class="dropdown-button legends-collapser-trans ct31"></div>
+						<div id="legends-collapser" class="dropdown-button legends-collapser-trans"></div>
 						
 						<div id="legends-scroll-left"></div>
 						<div id="legends-scroll-right"></div>
@@ -1478,8 +1414,8 @@
 		</script>
 
 		<script id="usersTablerowName" type="text/html">
-			<input value="{{lastName}}" id={{lastNameUuid}} class="dln ct23" readonly="readonly">
-			<input value="{{firstName}}" id={{firstNameUuid}} class="dln smallerText ct23" readonly="readonly">
+			<input value="{{lastName}}" id={{lastNameUuid}} class="dln" readonly="readonly">
+			<input value="{{firstName}}" id={{firstNameUuid}} class="dln smallerText" readonly="readonly">
 		</script>
 
 		<script id="injectInput" type="text/html">
@@ -1506,7 +1442,7 @@
 
 
 		<script id="injectFolderTitleInput" type="text/html">
-			<input key="{{key}}" value="{{value}}" class="documents-folder-item ct23 ct28">
+			<input key="{{key}}" value="{{value}}" class="documents-folder-item">
 		</script>
 
 
@@ -1693,63 +1629,58 @@
 
 
 
+			<!-- class.js must be added first -->
+			<script src="/js/src/core/class.js"></script> 
+			<script src="/js/src/leaflet.js/plugins/extendLeaflet.js"></script>
 
-		<!-- class.js must be added first -->
-		<script src="/js/src/core/class.js"></script> 
-		<script src="/js/src/leaflet.js/plugins/extendLeaflet.js"></script>
+			<script src="/js/src/panes/sidepane/sidepane.js"></script> 
+			<script src="/js/src/panes/sidepane/sidepane.item.js"></script> 
+			<script src="/js/src/panes/sidepane/sidepane.clients.js"></script> 
+			<script src="/js/src/panes/sidepane/sidepane.project.js"></script> 
+			<script src="/js/src/panes/sidepane/sidepane.client.js"></script> 
+			<script src="/js/src/panes/sidepane/sidepane.users.js"></script> 
+			<script src="/js/src/panes/sidepane/sidepane.map.js"></script> 
+			<script src="/js/src/panes/sidepane/sidepane.mapSettings.js"></script> 
+			<script src="/js/src/panes/sidepane/sidepane.documents.js"></script> 
+			<script src="/js/src/panes/sidepane/sidepane.dataLibrary.js"></script> 
+			<script src="/js/src/panes/sidepane/sidepane.mediaLibrary.js"></script> 
+			<script src="/js/src/panes/sidepane/sidepane.share.js"></script> 
+			<script src="/js/src/panes/sidepane/sidepane.account.js"></script> 
 
-		<script src="/js/src/panes/sidepane/sidepane.js"></script> 
-		<script src="/js/src/panes/sidepane/sidepane.item.js"></script> 
-		<script src="/js/src/panes/sidepane/sidepane.clients.js"></script> 
-		<script src="/js/src/panes/sidepane/sidepane.project.js"></script> 
-		<script src="/js/src/panes/sidepane/sidepane.client.js"></script> 
-		<script src="/js/src/panes/sidepane/sidepane.users.js"></script> 
-		<script src="/js/src/panes/sidepane/sidepane.map.js"></script> 
-		<script src="/js/src/panes/sidepane/sidepane.mapSettings.js"></script> 
-		<script src="/js/src/panes/sidepane/sidepane.documents.js"></script> 
-		<script src="/js/src/panes/sidepane/sidepane.dataLibrary.js"></script> 
-		<script src="/js/src/panes/sidepane/sidepane.mediaLibrary.js"></script> 
-		<script src="/js/src/panes/sidepane/sidepane.share.js"></script> 
-		<script src="/js/src/panes/sidepane/sidepane.account.js"></script> 
-
-		<script src="/js/src/panes/headerpane.js"></script> 
-		<script src="/js/src/panes/progresspane.js"></script> 
-		<script src="/js/src/panes/mappane.js"></script>
-		<script src="/js/src/panes/statuspane.js"></script>
-		<script src="/js/src/panes/startpane.js"></script>
-		<script src="/js/src/panes/errorpane.js"></script>
-		<script src="/js/src/panes/dropzonePane.js"></script>
+			<script src="/js/src/panes/headerpane.js"></script> 
+			<script src="/js/src/panes/progresspane.js"></script> 
+			<script src="/js/src/panes/mappane.js"></script>
+			<script src="/js/src/panes/statuspane.js"></script>
+			<script src="/js/src/panes/startpane.js"></script>
+			<script src="/js/src/panes/errorpane.js"></script>
+			<script src="/js/src/panes/dropzonePane.js"></script>
+			
+			<script src="/js/src/controls/zIndexControl.js"></script> 
+			<script src="/js/src/controls/layermenuControl.js"></script> 
+			<script src="/js/src/controls/inspectControl.js"></script> 		
+			<script src="/js/src/controls/descriptionControl.js"></script> 
+			<script src="/js/src/controls/legendsControl.js"></script> 				
+			<script src="/js/src/controls/mousepositionControl.js"></script> 
+			<script src="/js/src/controls/baselayertoggleControl.js"></script> 
+			<script src="/js/src/controls/styleControl.js"></script> <!-- themeToggle.js -->	 
+			<script src="/js/src/controls/cartocssControl.js"></script>  
+			<script src="/js/src/controls/tooltipControl.js"></script>
+			<script src="/js/src/controls/spinningMap.js"></script>
 		
-		<script src="/js/src/controls/zIndexControl.js"></script> 
-		<script src="/js/src/controls/layermenuControl.js"></script> 
-		<script src="/js/src/controls/inspectControl.js"></script> 		
-		<script src="/js/src/controls/descriptionControl.js"></script> 
-		<script src="/js/src/controls/legendsControl.js"></script> 				
-		<script src="/js/src/controls/mousepositionControl.js"></script> 
-		<script src="/js/src/controls/baselayertoggleControl.js"></script> 
-		<script src="/js/src/controls/styleControl.js"></script> <!-- themeToggle.js -->	 
-		<script src="/js/src/controls/cartocssControl.js"></script>  
-		<script src="/js/src/controls/tooltipControl.js"></script>
-		<script src="/js/src/controls/spinningMap.js"></script>
-	
-		<script src="/js/src/models/projects.js"></script> 
-		<script src="/js/src/models/clients.js"></script> 
-		<script src="/js/src/models/users.js"></script> 
-		<script src="/js/src/models/layers.js"></script> 
-		<script src="/js/src/models/files.js"></script> 
-		<!-- <script src="/js/src/models/colorThemes.js"></script>	 -->
-
-
+			<script src="/js/src/models/projects.js"></script> 
+			<script src="/js/src/models/clients.js"></script> 
+			<script src="/js/src/models/users.js"></script> 
+			<script src="/js/src/models/layers.js"></script> 
+			<script src="/js/src/models/files.js"></script> 
 
 		<!-- config file -->
 		<script src="/js/src/core/config.js"></script> 
 		<script src="/js/src/core/permission.js"></script> 
 
-		
-		<script src="/js/src/core/app.js"></script> 
-		
 
-		<!-- <script src="/dist/js.portal.min.js"></script>  -->
+			<!-- config file -->
+			<script src="/js/src/core/config.js"></script> 		
+			<script src="/js/src/core/app.js"></script>
 
 		<script>
 
@@ -1758,21 +1689,10 @@
 					id : 'app'
 			});
 
-
-
-
-		// if (L.Browser.mobile) {
-			// var styletag = document.getElementById('mobilestyle');
-			// var styleURL = '<link rel="stylesheet" href="/css/mobilestyle.css">';
-			// styletag.innerHTML = styleURL;			
-			// console.log('styleURL', styleURL);
-			// console.log('styletag', styletag);
-		// }			
-
-
 		</script>
 
 
+		<!--
 
 		<script type="text/javascript">
 		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -1783,8 +1703,8 @@
 		  ga('send', 'pageview');
 		</script>
 
+		-->
+
 
 </body>	
-
-
 </html>

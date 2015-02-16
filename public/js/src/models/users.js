@@ -374,7 +374,8 @@ Wu.User = Wu.Class.extend({
 	canDeleteProject : function (projectUuid) {
 		var user = this.store;
 		var editor = (user.role.editor.projects.indexOf(projectUuid) >= 0) ? true : false;
-		if (user.role.superadmin && editor) return true;
+		if (user.role.superadmin) return true;
+		// if (user.role.superadmin && editor) return true;
 		if (user.role.admin && editor)      return true;
 		return false;
 	},

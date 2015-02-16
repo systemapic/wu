@@ -36,6 +36,12 @@ module.exports = permission = {
 		
 		'user-9fed4b5f-ad48-479a-88c3-50f9ab44b17b', 	// KO rg
 		'user-e6e5d7d9-3b4c-403b-ad80-a854b0215831',    //  J rg
+
+		'user-5be55fcd-b8c2-4532-8932-c65e608a1f81', 	// ko m.s
+		'user-d4d45439-72bc-4124-95a1-9104b482e50e', 	// j m.s
+		'user-a15e2219-4ce2-4cf2-b741-eecfe5520f7d',  	// phantom @ maps.systemapic.com
+
+		'user-f36e496e-e3e4-4fac-a37c-f1a98689afda'   	// dev1@noerd.biz
 		
 	],
 

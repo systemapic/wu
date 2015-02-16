@@ -1602,7 +1602,14 @@ input.cmn-toggle-round-flat + label:before {
 
 #legends-inner-slider {
   position: relative;
-  left: 0px; }
+  left: 0px; 
+  background: white;
+  /*WEIRD !! veit ikke hvorfor det ble forandra!*/
+}
+.legends-inner-slider {
+   background: white;
+}
+
 
 /* Actual legend */
 .legends-item {
@@ -1918,18 +1925,23 @@ input.cmn-toggle-round-flat + label:before {
   padding: 0;
   color: #fff;
   text-shadow: none;
-  color: white;
+  color: white !important;
   margin-bottom: 1px;
-  background-color: #3f8f9a !important;
+  background-color: #4E5868 !important;
   height: 30px;
-  font-size: 127%; }
+  font-size: 127%; 
+}
 
 /* Layer Folder color coding */
 .menufolder {
-  background-color: #3b596a !important; }
+  background-color: #3C4759 !important; 
+  color: white !important;
+}
 
 .layer-active {
-  background-color: #c07c0c !important; }
+  background-color: #CFD0D2 !important; 
+  color: black !important;
+}
 
 /* Layer item open */
 .layeritem-open {
@@ -2737,6 +2749,10 @@ input.cmn-toggle-round-flat + label:before {
 .cartocss-update-button:hover {
   background: rgba(0, 0, 0, 0.225); }
 
+.cartocss-update-button:active {
+  box-shadow: none;
+  background: rgba(0, 0, 0, 0.15); }
+
 .cartocss-style-header {
   font-size: 12px;
   font-weight: 400;
@@ -3417,6 +3433,16 @@ input.cmn-toggle-round-flat + label:before {
 .project-item:hover > .project-kill {
   display: block; }
 
+.project-item.active-project:before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  background: green;
+  position: absolute;
+  border-radius: 10px;
+  top: 14px;
+  left: 3px; }
+
 .project-title {
   position: relative;
   left: 10px;
@@ -3424,7 +3450,6 @@ input.cmn-toggle-round-flat + label:before {
   font-size: 110%;
   text-shadow: none;
   font-weight: 500;
-  /*text-transform: uppercase;*/
   line-height: 1;
   overflow: hidden;
   max-height: 30px;
@@ -3434,21 +3459,23 @@ input.cmn-toggle-round-flat + label:before {
   display: inline-block;
   vertical-align: bottom;
   padding-right: 20px;
-  overflow: visible; }
+  overflow: visible;
+  padding-bottom: 5px;
+  top: 9px; }
 
 .project-title input {
-  position: absolute;
+  position: relative;
   left: 0;
-  top: -2px;
+  top: -1px;
   font-size: 100%;
   text-shadow: none;
   font-weight: 500;
-  /*text-transform: uppercase;*/
   line-height: 0.9;
   padding: 0;
   background-color: transparent;
   width: 192px;
-  height: 100%; }
+  height: 100%;
+  overflow: visible; }
 
 .project-description {
   top: 39px;
@@ -3480,7 +3507,8 @@ input.cmn-toggle-round-flat + label:before {
   right: 6px;
   top: 45px;
   overflow: hidden;
-  text-align: center; }
+  text-align: center;
+  z-index: 999; }
 
 .project-logo {
   position: relative;
@@ -3515,6 +3543,9 @@ input.cmn-toggle-round-flat + label:before {
 
 .project-users-wrap:hover {
   opacity: 1; }
+
+.project-users-wrap:active {
+  background-color: rgba(255, 255, 255, 0.5); }
 
 .active-project-user-button {
   display: block !important;
@@ -3636,6 +3667,7 @@ input.cmn-toggle-round-flat + label:before {
 .project-delete {
   font-size: 11px;
   font-weight: 900;
+  margin: auto;
   margin-top: 10px;
   background: #CCC;
   width: 100px;
@@ -4453,7 +4485,8 @@ button.image-attachment {
   margin-top: 5px;
   font-weight: 900;
   font-size: 15px;
-  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3); }
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+  z-index: 999; }
 
 /* The files in the file list */
 .dataLibrary-file-popup-item {
@@ -5235,7 +5268,7 @@ td.tdcont.createdDate {
 
 .share-image-wrap:before {
   content: '';
-  background-image: url(images/systemapic-grinding.gif);
+  background-image: url(images/grinders/cloud-large-grinder-grayLight-on-white.gif);
   background-repeat: no-repeat;
   text-align: center;
   width: 100%;
@@ -6081,10 +6114,15 @@ input[type=checkbox] + label.check {
   text-align: center; }
 
 .startpane-banner {
-  overflow: scroll;
+  overflow: hidden;
   position: absolute;
   width: 100%;
-  height: 100%; }
+  height: 100%;
+  -webkit-transition: opacity 250ms ease;
+  -moz-transition: opacity 250ms ease;
+  -ms-transition: opacity 250ms ease;
+  -o-transition: opacity 250ms ease;
+  transition: opacity 250ms ease; }
 
 .startpane-recent-projects-container {
   width: 100%;

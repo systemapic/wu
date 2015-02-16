@@ -19,6 +19,8 @@ var projectSchema = mongoose.Schema({
 			// image
 	logo		: String, 
 
+	thumbCreated 	: Boolean,
+
 			// css string for colorTheme of project
 	colorTheme 	: String,
 
