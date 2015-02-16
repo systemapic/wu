@@ -713,7 +713,8 @@
 	}
 
 /* New Client title */
-#editor-client-item-new h5 {
+/*#editor-client-item-new h5 {*/
+.editor-client-title h5 {	
 	padding: 0;
 	position: relative;
 	display: block;
@@ -1263,7 +1264,7 @@
 	}
 
 /* left wrapper */
-#documents-container-leftpane {
+.documents-container-leftpane {
 	position: absolute;
 	font-weight: $lean;
 	margin: 10px;
@@ -1273,7 +1274,7 @@
 	}
 
 /* right wrapper */
-#documents-container-rightpane {
+.documents-container-rightpane {
 	position: absolute;
 	font-weight: $lean;
 	padding: 20px;
@@ -1295,13 +1296,13 @@
 	}
 
 /* folder list */
-#documents-folder-list {
+.documents-folder-list {
 	margin-top: 30px;
 	}
 
 /* list items */
 .documents-folder-item,
-#documents-new-folder {
+.documents-new-folder {
 	background: none;
 	border: none;
 	margin: 4px;
@@ -1318,12 +1319,12 @@
 
 .documents-folder-delete,
 .documents-folder-item, 
-#documents-new-folder {
+.documents-new-folder {
 	color: #333;
 	padding-right: 0px;
 	}
 
-#documents-new-folder:hover,
+.documents-new-folder:hover,
 .documents-folder-item:hover {
 	color: #000;
 	}
@@ -1386,7 +1387,7 @@
 	cursor: default;
 	}
 
-#documents-new-folder {
+.documents-new-folder {
 	margin-left: 10px;
 	}
 
@@ -1560,20 +1561,20 @@ button.image-attachment {
 	max-width: 70px;
 	}	
 
-#documents-container-textarea {
+.documents-container-textarea {
 	padding-top: 20px;
 	}
 
-#documents-container-textarea h1 {
+.documents-container-textarea h1 {
 	font-size: 200%;
 	}
 
-#documents-container-textarea h2 {
+.documents-container-textarea h2 {
 	color: #333;
 	font-size: 120%;
 	}
 
-#documents-container-textarea p {
+.documents-container-textarea p {
 	color: #333;
 	font-weight: 400;
 	font-size: 90%;
@@ -1619,7 +1620,7 @@ button.image-attachment {
 
 /* Inner wrapper for users and data library */
 #filelist,
-#userlist {
+.userlist {
 	margin: 20px;
 	}
 
@@ -1738,12 +1739,12 @@ button.image-attachment {
 	}
 
 /* Main Table with file list */
-#users-table,
-#datalibrary-table {
+.users-table,
+.datalibrary-table {
 	width: 100%;
 	}
 
-#users-table .fivep {
+.users-table .fivep {
 	/*width: 43px;*/
 	/*min-width: 43px;*/
 	}	
@@ -1764,7 +1765,7 @@ button.image-attachment {
 	}
 	
 /* download table head */
-#datalibrary-download-table thead tr {
+.datalibrary-download-table thead tr {
 	font-size: 80%;
 	}
 
@@ -1780,7 +1781,7 @@ button.image-attachment {
 	}
 	
 /* download OK button "Download" */
-#download-ok-button {
+.download-ok-button {
 	width: 100px;
 	position: relative;
 	font-size: 17px;
@@ -1795,7 +1796,7 @@ button.image-attachment {
 	}
 
 /* dowload cancel button "Cancel" */
-#download-cancel-button {
+.download-cancel-button {
 	position: relative;
 	font-size: 17px;
 	line-height: 1.7;

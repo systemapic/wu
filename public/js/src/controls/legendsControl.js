@@ -15,8 +15,29 @@ L.Control.Legends = L.Control.extend({
 
 		// add html
 		container.style.display = 'none';
-		container.innerHTML = ich.legendsControl(); 	     
 
+		// #legends-opener
+		this._legendsOpener = Wu.DomUtil.create('div', 'legends-opener', container, 'Open Legends');
+		this._legendsOpener.style.display = 'none';
+
+		// #legends-control-inner-content
+		this._legendsContainer = Wu.DomUtil.create('div', 'legends-control-inner-content', container);
+
+		// #legends-inner
+		this._legendsInner = Wu.DomUtil.create('div', 'leaflet-drag-target legends-inner', this._legendsContainer);
+
+		// #legends-collapser
+		this._legendsCollapser = Wu.DomUtil.create('div', 'legends-collapser dropdown-button legends-collapser-trans', this._legendsInner);
+
+		// #legends-scroll-left
+		this._legendsScrollLeft = Wu.DomUtil.create('div', 'legends-scroll-left', this._legendsInner);
+		 
+		// #legends-scroll-right		 
+		this._legendsScrollRight = Wu.DomUtil.create('div', 'legends-scroll-right', this._legendsInner);
+
+		// #legends-inner-slider
+		this._legendsInnerSlider = Wu.DomUtil.create('div', 'legends-inner-slider', this._legendsInner);
+			
 
 		return container;
 
@@ -208,7 +229,8 @@ L.Control.Legends = L.Control.extend({
 
 		// get vars
 		this.project = project || Wu.app._activeProject;
-		this._content = Wu.DomUtil.get('legends-control-inner-content'); 
+		// this._content = Wu.DomUtil.get('legends-control-inner-content'); 
+		this._content = this._legendsContainer;
 
 		// init divs
 		this.initContainer();		
@@ -219,16 +241,16 @@ L.Control.Legends = L.Control.extend({
 
 	initContainer : function () {
 	
-		// get elements
-		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
-		this._legendsOpener = Wu.DomUtil.get('legends-opener')
+		// // get elements
+		// this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
+		// this._legendsOpener = Wu.DomUtil.get('legends-opener')
 
-		this._legendsInner = Wu.DomUtil.get('legends-inner');
-		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
-		this._legendsInnerSlider = Wu.DomUtil.get('legends-inner-slider');
+		// this._legendsInner = Wu.DomUtil.get('legends-inner');
+		// this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
+		// this._legendsInnerSlider = Wu.DomUtil.get('legends-inner-slider');
 
-		this._legendsScrollLeft = Wu.DomUtil.get('legends-scroll-left'); // (j)
-		this._legendsScrollRight = Wu.DomUtil.get('legends-scroll-right'); // (j)
+		// this._legendsScrollLeft = Wu.DomUtil.get('legends-scroll-left'); // (j)
+		// this._legendsScrollRight = Wu.DomUtil.get('legends-scroll-right'); // (j)
 
 		// add hooks
 		this.addHooks();

@@ -1351,6 +1351,21 @@ Wu.DomUtil = {
 
 		return el;
 	},
+
+	makeit : function (m) {
+
+		var hook = document.createElement(m.type);
+		if ( m.id ) { hook.id = m.id; }
+		if ( m.cname ) { hook.className = m.cname; }
+		if ( m.style ) { hook.setAttribute("style", m.style) }	
+		if ( m.hlink ) { hook.setAttribute("href", m.hlink); }
+		if ( m.source ) { hook.src = m.source }
+		if ( m.inner ) { hook.innerHTML = m.inner; }
+		if ( m.appendto ) { m.appendto.appendChild(hook); }
+		if ( m.attr ) { m.attr.forEach(function(att) { hook.setAttribute(att[0], att[1]) }) }
+		return hook;
+
+	},
 	
 	createId : function(tagName, id, container) {
 		// https://github.com/Leaflet/Leaflet/blob/master/src/dom/DomUtil.js

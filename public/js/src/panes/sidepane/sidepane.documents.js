@@ -8,20 +8,28 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	initContent : function () {
 
 		// create new fullscreen page, and set as default content
-		this._content = Wu.DomUtil.create('div', 'fullpage-documents ct1', Wu.app._appPane);
+		this._content = Wu.DomUtil.create('div', 'fullpage-documents', Wu.app._appPane);
 		
 		// create container (overwrite default)
-		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct11', this._content);
+		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content);
 
 		// insert template
-		this._container.innerHTML = ich.documentsContainer();
+		// #documents-container-leftpane
+		this._leftpane = Wu.DomUtil.create('div', 'documents-container-leftpane', this._container);
+		
+		this._documentsFolders = Wu.DomUtil.create('div', 'documents-folders', this._leftpane);
+		
+		// #documents-folder-list
+		this._folderpane = Wu.DomUtil.create('div', 'documents-folder-list', this._documentsFolders);
+		
+		// #documents-new-folder
+		this._newfolder = Wu.DomUtil.create('div', 'documents-new-folder', this._documentsFolders, '(+)');
 
-		// get element handlers
-		this._leftpane 	 = Wu.DomUtil.get('documents-container-leftpane');
-		this._folderpane = Wu.DomUtil.get('documents-folder-list');
-		this._rightpane  = Wu.DomUtil.get('documents-container-rightpane');
-		this._textarea   = Wu.DomUtil.get('documents-container-textarea');
-		this._newfolder  = Wu.DomUtil.get('documents-new-folder');
+		// #documents-container-rightpane
+		this._rightpane = Wu.DomUtil.create('div', 'documents-container-rightpane', this._container);
+
+		// #documents-container-textarea
+		this._textarea = Wu.DomUtil.create('article', 'documents-container-textarea', this._rightpane);
 
 		// add tooltip
 		app.Tooltip.add(this._menu, 'This is the projects document section.');
@@ -368,13 +376,18 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// set values 
 		var div   = e.target;
 		var value = e.target.innerHTML;
-		var input = ich.injectFolderTitleInput({ value : value });
-		
-		// inject <input>
-		div.innerHTML = input;
+		div.innerHTML = '';
+
+		var input = Wu.DomUtil.create('input', 'documents-folder-item', div);
+		input.setAttribute('key', '');
+		input.setAttribute('value', value);
+
+
 
 		// focus
-		var target = div.firstChild;
+		// var target = div.firstChild;
+		var target = input;
+
 		target.focus();
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 
