@@ -167,7 +167,7 @@ Wu.StartPane = Wu.Class.extend({
 		return projects;
 	},
 
-	createStartProject : function(project) {
+	createStartProject : function (project) {
 
 		// Client info
 		var clientID = project.store.client;
@@ -187,8 +187,10 @@ Wu.StartPane = Wu.Class.extend({
 		newProject._clientName = Wu.DomUtil.create('div', 'start-project-client-name', newProject._projectContainer);
 		newProject._clientName.innerHTML = clientName;
 
-		newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
-		newProject._clientLogo.src = clientLogo;
+		if ( clientLogo ) {
+			newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
+			newProject._clientLogo.src = clientLogo;
+		}
 
 
 		this.projectContainers.push(newProject);
@@ -375,9 +377,12 @@ Wu.StartPane = Wu.Class.extend({
 		// Store how many projects we want to show
 		this.dimensions.projectNo = no;
 
-		for ( var i = 0; i < this.projects.length; i++ ) {
-			if ( i < no ) 	Wu.DomUtil.removeClass(this.projectContainers[i]._projectContainer, 'displayNone');
-			else		Wu.DomUtil.addClass(this.projectContainers[i]._projectContainer, 'displayNone');
+		for (var i = 0; i < this.projects.length - 1; i++) {
+			if (i < no) {
+				Wu.DomUtil.removeClass(this.projectContainers[i]._projectContainer, 'displayNone');
+			} else {
+				Wu.DomUtil.addClass(this.projectContainers[i]._projectContainer, 'displayNone');
+			}	    
 		}
 
 	},

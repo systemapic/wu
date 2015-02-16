@@ -616,7 +616,10 @@
 	content: '';
 	background-image: url(images/evil_sprite.png);
 	background-repeat: no-repeat;
-	background-position: -145px -75px;
+	/*background-position: -145px -75px;*/
+	background-position: -99px -75px;
+
+
 	height: 26px !important;
 	width: 26px !important;
 	position: absolute;
@@ -805,7 +808,7 @@
 	}
 	
 /* inner wrapper */
-#legends-control-inner-content {
+.legends-control-inner-content {
 	bottom: 0px;
 	padding-left: 0;
 	width: auto;
@@ -815,7 +818,7 @@
 	}	
 	
 /* inner wrapper 2 */
-#legends-inner {
+.legends-inner {
 	background: rgba(255,255,255,0.97);
 	box-shadow: 0 0 5px rgba(0,0,0,0.5);
 	overflow: hidden;
@@ -826,7 +829,7 @@
 	}	
 	
 /* legends close button (litte arrow) */
-#legends-collapser {
+.legends-collapser {
 	background-position: -26px 8px;
 	background-color: transparent;
 	top: -3px;
@@ -837,7 +840,7 @@
 	}
 
 /* legends scroll left */
-#legends-scroll-left {
+.legends-scroll-left {
 	width: 20px;
 	height: 13px;
 	position: absolute;
@@ -864,13 +867,13 @@
 	opacity: 0.5;
 	}
 
-#legends-scroll-left:hover, 
-#legends-scroll-right:hover {
+.legends-scroll-left:hover, 
+.legends-scroll-right:hover {
 	opacity: 1;
 	}
 
 /* open closed legends */
-#legends-opener {
+.legends-opener {
 	text-align: center;
 	background: white;
 	/*height: 100%;*/
@@ -885,7 +888,7 @@
 	opacity: 0;	
 	}	
 
-#legends-inner-slider {
+.legends-inner-slider {
 	position: relative;
 	left: 0px;
 	}	
@@ -1053,7 +1056,7 @@
 	}	
 	
 /* Leaflet description Header wrapper */
-#description-control-inner-content {
+.description-control-inner-content {
 	height: 100%;
 	overflow: hidden;
 	box-shadow: 0 0 5px rgba(0,0,0,0.5);
@@ -1062,7 +1065,7 @@
 	}	
 	
 /* Close Description box button */
-#description-toggle-button {
+.description-toggle-button {
 	border-radius: 0;
 	background-position: -27px -43px;
 	right: 4px;
@@ -1075,12 +1078,12 @@
 	opacity: 0.5;	
 	}
 
-#description-toggle-button:hover {
+.description-toggle-button:hover {
 	opacity: 1 !important;
 	}
 
 /* Description inner wrapper */
-#description-control-inner-content-box {
+.description-control-inner-content-box {
 	background: rgba(255, 255, 255, 0.97);
 	width: 320px;
 	height: 100%;
@@ -1095,21 +1098,21 @@
 	max-height: 500px; // OBS! Event listener for this
 	}
 
-#description-control-inner-content-box a {
+.description-control-inner-content-box a {
 	font-weight: 900;
 	}	
 
-#description-control-inner-content-box h1 {	
+.description-control-inner-content-box h1 {	
 	font-size: 25px;
 	margin: 10px 0px 10px 0px;
 	}
 
-#description-control-inner-content-box h2 {	
+.description-control-inner-content-box h2 {	
 	font-size: 16px;
 	margin: 15px 0px 5px 0px;
 	}
 
-#description-control-inner-content-box hr {
+.description-control-inner-content-box hr {
 	border-top: 1px solid black;
 	}
 
@@ -1537,7 +1540,7 @@
 	}
 
 /* Inner wrapper */
-#inspect-control-inner-content {
+.inspect-control-inner-content {
 	background: rgba(255, 255, 255, 0.97);
 	padding-bottom: 1px;
 	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
@@ -1546,7 +1549,7 @@
 	}		
 	
 /* header */
-#inspector-header {
+.inspector-header {
 	position: relative;
 	right: 0;
 	top: 0 !important;
@@ -1561,7 +1564,7 @@
 	}
 
 /* Inner wrapper */
-#inspector-list {
+.inspector-list {
 	max-height: 160px;
 	height: auto;
 	padding-top: 10px;
@@ -1917,40 +1920,6 @@
 	box-shadow: 0 0 2px 0 rgba(0,0,0,0.3);
 	}
 
-.SVGpattern1 {
-	background-image: url(images/patternPics/SVGpattern1.png);
-	}
-
-.SVGpattern2 {
-	background-image: url(images/patternPics/SVGpattern2.png);
-	}
-
-.SVGpattern3 {
-	background-image: url(images/patternPics/SVGpattern3.png);
-	}
-
-.SVGpattern4 {
-	background-image: url(images/patternPics/SVGpattern4.png);
-	}
-
-.SVGpattern5 {
-	background-image: url(images/patternPics/SVGpattern5.png);
-	}
-
-.SVGpattern6 {
-	background-image: url(images/patternPics/SVGpattern8.png);
-	}
-
-.SVGpattern7 {
-	background-image: url(images/patternPics/SVGpattern7.png);
-	}
-
-.SVGpattern8 {
-	background-image: url(images/patternPics/SVGpattern6.png);
-	}
-
-
-
 
 /* search-tooltip */
 /* search-tooltip */
@@ -1967,12 +1936,14 @@
 	}
 
 .leaflet-control-search .search-button {
-	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon.png') no-repeat 2px -22px !important;
+	background: url('images/search-icon.png') no-repeat 2px -22px !important;
 	}
 
 .leaflet-control-search .search-button:hover {
-	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon.png') no-repeat 2px 2px !important;
+	background: url('images/search-icon.png') no-repeat 2px 2px !important;
 	}
+
+
 
 .search-tooltip	{
 	min-width: none !important;
@@ -2311,20 +2282,26 @@
 .sp-cancel,
 .sp-cancel:hover {
 	background: rgba(255,255,255,0.5);
-	height: 22px;
+	/*height: 22px;*/
 	bottom: 6px;
 	position: absolute;
-	left: 77px;
+	/*left: 77px;*/
 	text-shadow: none;
 	color: white !important;
 	font-weight: 900;
 	font-size: 12px;
 	font-family: $font;
-	width: 49px;
+	/*width: 49px;*/
 	text-align: center;
 	text-decoration: none;
 	line-height: 2;
 	border: none;
+
+
+	line-height: 1.5 !important;
+	left: 67px !important;
+	height: 26px !important;
+	width: 59px !important;
 	}
 
 .sp-container button,

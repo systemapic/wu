@@ -37,7 +37,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	_insertNewClientButton : function () {
 		
 		// create New Client button
-		var classname = 'smap-button-white new-client ct11 ct16 ct18';
+		var classname = 'smap-button-white new-client';
 		var newClientButton = this._newClientButton = Wu.DomUtil.create('div', classname, this._clientsContainer, '+');
 		newClientButton.id = 'new-client-button';
 
@@ -100,22 +100,67 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		}
 			
 		// prepend client to container
-		Wu.DomUtil.appendTemplate(this._clientsContainer, ich.editorClientsNew(clientData));
+		// Wu.DomUtil.appendTemplate(this._clientsContainer, ich.editorClientsNew(clientData));
+
+
+		this._newClient = {};
+
+		this._newClient._wrapper 		= 	Wu.DomUtil.create('div', 'editor-clients-new-wrapper', this._clientsContainer);
+
+		// #editor-clients-container-new OK
+		this._newClient._innerWrapper		= 	Wu.DomUtil.create('div', 'editor-inner-wrapper editor-projects-container', this._newClient._wrapper);
+
+		// #editor-client-item-new
+		this._newClient._clientTitleWrapper	= 	Wu.DomUtil.create('div', 'editor-client-title', this._newClient._innerWrapper);
+		this._newClient._title 			= 	Wu.DomUtil.create('h5', '', this._newClient._clientTitleWrapper, clientData.clientName);
+		this._newClient._logo 			= 	Wu.DomUtil.create('img', '', this._newClient._clientTitleWrapper);
+
+		this._newClient._container 		= 	Wu.DomUtil.create('div', 'new-client-container', this._newClient._innerWrapper);
+
+		this._newClient._NameLabel		= 	Wu.DomUtil.create('label', '', this._newClient._container, 'Name:');
+		this._newClient._NameLabel.setAttribute('for', 'editor-client-name-new');
+
+		// #editor-client-name-new
+		this._newClient._NameInput		= 	Wu.DomUtil.create('input', 'form-control margined eightyWidth', this._newClient._container);
+		this._newClient._NameInput.value 	= 	clientData.clientName;
+
+		this._newClient._DescriptionLabel	= 	Wu.DomUtil.create('label', '', this._newClient._container, 'Description:');
+		this._newClient._DescriptionLabel.setAttribute('for', 'editor-client-description-new');
+
+		// #editor-client-description-new
+		this._newClient._DescriptionInput	= 	Wu.DomUtil.create('input', 'form-control margined eightyWidth', this._newClient._container);
+
+		this._newClient._keywordsLabel		= 	Wu.DomUtil.create('label', '', this._newClient._container, 'Keywords:');
+		this._newClient._keywordsLabel.setAttribute('for', 'editor-client-keywords-new');
+		
+		// #editor-client-keywords-new
+		this._newClient._keywordsInput		= 	Wu.DomUtil.create('input', 'form-control margined eightyWidth', this._newClient._container);
+
+		// #editor-client-confirm-button
+		this._newClient._confirmButton		= 	Wu.DomUtil.create('div', 'smap-button-white small', this._newClient._innerWrapper, 'Confirm');
+
+		// #editor-client-cancel-button
+		this._newClient._cancelButton		= 	Wu.DomUtil.create('div', 'smap-button-white small', this._newClient._innerWrapper, 'Cancel');
+
+
 
 		// move new button to last
 		Wu.DomUtil.remove(this._newClientButton);
 		this._clientsContainer.appendChild(this._newClientButton);
 
 		// set hooks: confirm button
-		var target = Wu.DomUtil.get('editor-client-confirm-button');
+		// var target = Wu.DomUtil.get('editor-client-confirm-button');
+		var target = this._newClient._confirmButton;
 		this._addHook(target, 'click', this._confirm, this);
 
 		// cancel button
-		var target = Wu.DomUtil.get('editor-client-cancel-button');
+		// var target = Wu.DomUtil.get('editor-client-cancel-button');
+		var target = this._newClient._cancelButton;
 		this._addHook(target, 'click', this._cancel, this);
 
 		// set hooks: writing name
-		var name = Wu.DomUtil.get('editor-client-name-new');
+		// var name = Wu.DomUtil.get('editor-client-name-new');
+		var name = this._newClient._NameInput;
 		this._addHook(name, 'keyup', this._checkSlug, this);
 
 
@@ -129,7 +174,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		// check
 		var that = this;
 		this._timer = setTimeout(function() {
-			var name = Wu.DomUtil.get('editor-client-name-new'),
+			// var name = Wu.DomUtil.get('editor-client-name-new'),
+			var name = this._newClient._NameInput,
 			    slug = Wu.Util.trimAll(name.value).toLowerCase(),
 			    json = JSON.stringify({ 'slug' : slug}),
 			    path = '/api/client/unique';
@@ -155,29 +201,36 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	_disableConfirm : function () {
-		var target = Wu.DomUtil.get('editor-client-confirm-button');           // TODO: real block of button
+		// var target = Wu.DomUtil.get('editor-client-confirm-button');           // TODO: real block of button
+		var target = this._newClient._confirmButton;
 		target.style.backgroundColor = 'red';
 		console.log('Client name is not unique.')
 	},
 
 	_enableConfirm : function () {
-		var target = Wu.DomUtil.get('editor-client-confirm-button');
+		// var target = Wu.DomUtil.get('editor-client-confirm-button');
+		var target = this._newClient._confirmButton;
 		target.style.backgroundColor = '';
 		// console.log('Client name OK.');
 	},
 
 	_cancel : function () {
 		// remove edit box
-		var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
+		// var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
+		var old = this._newClient._wrapper;
+
 		Wu.DomUtil.remove(old);
 	},
 
 	_confirm : function () {
 
 		// get client vars
-		var clientName = Wu.DomUtil.get('editor-client-name-new').value;
-		var clientDescription = Wu.DomUtil.get('editor-client-description-new').value;
-		var clientKeywords = Wu.DomUtil.get('editor-client-keywords-new').value;
+		// var clientName = Wu.DomUtil.get('editor-client-name-new').value;
+		var clientName = this._newClient._NameInput.value;
+		// var clientDescription = Wu.DomUtil.get('editor-client-description-new').value;
+		var clientDescription = this._newClient._DescriptionInput.value;
+		// var clientKeywords = Wu.DomUtil.get('editor-client-keywords-new').value;
+		var clientKeywords = this._newClient._keywordsInput;
 		
 		var options = {
 			name : clientName,
@@ -198,7 +251,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		Wu.app.Clients[client.uuid] = client;
 
 		// remove edit box
-		var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
+		// var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
+		var old = this._newClient._wrapper;
 		Wu.DomUtil.remove(old);
 
 		// add permissions

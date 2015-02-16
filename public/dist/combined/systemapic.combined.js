@@ -1351,6 +1351,21 @@ Wu.DomUtil = {
 
 		return el;
 	},
+
+	makeit : function (m) {
+
+		var hook = document.createElement(m.type);
+		if ( m.id ) { hook.id = m.id; }
+		if ( m.cname ) { hook.className = m.cname; }
+		if ( m.style ) { hook.setAttribute("style", m.style) }	
+		if ( m.hlink ) { hook.setAttribute("href", m.hlink); }
+		if ( m.source ) { hook.src = m.source }
+		if ( m.inner ) { hook.innerHTML = m.inner; }
+		if ( m.appendto ) { m.appendto.appendChild(hook); }
+		if ( m.attr ) { m.attr.forEach(function(att) { hook.setAttribute(att[0], att[1]) }) }
+		return hook;
+
+	},
 	
 	createId : function(tagName, id, container) {
 		// https://github.com/Leaflet/Leaflet/blob/master/src/dom/DomUtil.js
@@ -1847,7 +1862,8 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
 		return fn.apply(thisp, arguments);
 	};
 };
-;L.Map.include({
+
+L.Map.include({
 
 	// refresh map container size
 	reframe: function (options) {
@@ -1987,7 +2003,8 @@ L.Popup.include({
 
 
 
-;Wu.SidePane = Wu.Class.extend({
+
+Wu.SidePane = Wu.Class.extend({
 	_ : 'sidepane', 
 
 	initialize : function (options) {
@@ -2213,7 +2230,7 @@ L.Popup.include({
 		this.panes = [];
 
 		// all panes
-		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'MediaLibrary', 'Users', 'Share', 'Account'],
+		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'Users', 'Share', 'Account'], // MediaLibrary
 		    sidepane = app.SidePane;
 
 		// panes to active
@@ -2343,7 +2360,8 @@ L.Popup.include({
 	},
 
 	
-});;Wu.SidePane.Item = Wu.Class.extend({
+});
+Wu.SidePane.Item = Wu.Class.extend({
         _wu : 'sidepane.item', 
 	
 	type : 'item',
@@ -2750,7 +2768,8 @@ L.Popup.include({
 
 });
 
-;// Projects and Clients
+
+// Projects and Clients
 Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	_ : 'sidepane.clients', 
 	type : 'clients',
@@ -2789,7 +2808,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	_insertNewClientButton : function () {
 		
 		// create New Client button
-		var classname = 'smap-button-white new-client ct11 ct16 ct18';
+		var classname = 'smap-button-white new-client';
 		var newClientButton = this._newClientButton = Wu.DomUtil.create('div', classname, this._clientsContainer, '+');
 		newClientButton.id = 'new-client-button';
 
@@ -2852,22 +2871,67 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		}
 			
 		// prepend client to container
-		Wu.DomUtil.appendTemplate(this._clientsContainer, ich.editorClientsNew(clientData));
+		// Wu.DomUtil.appendTemplate(this._clientsContainer, ich.editorClientsNew(clientData));
+
+
+		this._newClient = {};
+
+		this._newClient._wrapper 		= 	Wu.DomUtil.create('div', 'editor-clients-new-wrapper', this._clientsContainer);
+
+		// #editor-clients-container-new OK
+		this._newClient._innerWrapper		= 	Wu.DomUtil.create('div', 'editor-inner-wrapper editor-projects-container', this._newClient._wrapper);
+
+		// #editor-client-item-new
+		this._newClient._clientTitleWrapper	= 	Wu.DomUtil.create('div', 'editor-client-title', this._newClient._innerWrapper);
+		this._newClient._title 			= 	Wu.DomUtil.create('h5', '', this._newClient._clientTitleWrapper, clientData.clientName);
+		this._newClient._logo 			= 	Wu.DomUtil.create('img', '', this._newClient._clientTitleWrapper);
+
+		this._newClient._container 		= 	Wu.DomUtil.create('div', 'new-client-container', this._newClient._innerWrapper);
+
+		this._newClient._NameLabel		= 	Wu.DomUtil.create('label', '', this._newClient._container, 'Name:');
+		this._newClient._NameLabel.setAttribute('for', 'editor-client-name-new');
+
+		// #editor-client-name-new
+		this._newClient._NameInput		= 	Wu.DomUtil.create('input', 'form-control margined eightyWidth', this._newClient._container);
+		this._newClient._NameInput.value 	= 	clientData.clientName;
+
+		this._newClient._DescriptionLabel	= 	Wu.DomUtil.create('label', '', this._newClient._container, 'Description:');
+		this._newClient._DescriptionLabel.setAttribute('for', 'editor-client-description-new');
+
+		// #editor-client-description-new
+		this._newClient._DescriptionInput	= 	Wu.DomUtil.create('input', 'form-control margined eightyWidth', this._newClient._container);
+
+		this._newClient._keywordsLabel		= 	Wu.DomUtil.create('label', '', this._newClient._container, 'Keywords:');
+		this._newClient._keywordsLabel.setAttribute('for', 'editor-client-keywords-new');
+		
+		// #editor-client-keywords-new
+		this._newClient._keywordsInput		= 	Wu.DomUtil.create('input', 'form-control margined eightyWidth', this._newClient._container);
+
+		// #editor-client-confirm-button
+		this._newClient._confirmButton		= 	Wu.DomUtil.create('div', 'smap-button-white small', this._newClient._innerWrapper, 'Confirm');
+
+		// #editor-client-cancel-button
+		this._newClient._cancelButton		= 	Wu.DomUtil.create('div', 'smap-button-white small', this._newClient._innerWrapper, 'Cancel');
+
+
 
 		// move new button to last
 		Wu.DomUtil.remove(this._newClientButton);
 		this._clientsContainer.appendChild(this._newClientButton);
 
 		// set hooks: confirm button
-		var target = Wu.DomUtil.get('editor-client-confirm-button');
+		// var target = Wu.DomUtil.get('editor-client-confirm-button');
+		var target = this._newClient._confirmButton;
 		this._addHook(target, 'click', this._confirm, this);
 
 		// cancel button
-		var target = Wu.DomUtil.get('editor-client-cancel-button');
+		// var target = Wu.DomUtil.get('editor-client-cancel-button');
+		var target = this._newClient._cancelButton;
 		this._addHook(target, 'click', this._cancel, this);
 
 		// set hooks: writing name
-		var name = Wu.DomUtil.get('editor-client-name-new');
+		// var name = Wu.DomUtil.get('editor-client-name-new');
+		var name = this._newClient._NameInput;
 		this._addHook(name, 'keyup', this._checkSlug, this);
 
 
@@ -2881,7 +2945,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		// check
 		var that = this;
 		this._timer = setTimeout(function() {
-			var name = Wu.DomUtil.get('editor-client-name-new'),
+			// var name = Wu.DomUtil.get('editor-client-name-new'),
+			var name = this._newClient._NameInput,
 			    slug = Wu.Util.trimAll(name.value).toLowerCase(),
 			    json = JSON.stringify({ 'slug' : slug}),
 			    path = '/api/client/unique';
@@ -2907,29 +2972,36 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	_disableConfirm : function () {
-		var target = Wu.DomUtil.get('editor-client-confirm-button');           // TODO: real block of button
+		// var target = Wu.DomUtil.get('editor-client-confirm-button');           // TODO: real block of button
+		var target = this._newClient._confirmButton;
 		target.style.backgroundColor = 'red';
 		console.log('Client name is not unique.')
 	},
 
 	_enableConfirm : function () {
-		var target = Wu.DomUtil.get('editor-client-confirm-button');
+		// var target = Wu.DomUtil.get('editor-client-confirm-button');
+		var target = this._newClient._confirmButton;
 		target.style.backgroundColor = '';
 		// console.log('Client name OK.');
 	},
 
 	_cancel : function () {
 		// remove edit box
-		var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
+		// var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
+		var old = this._newClient._wrapper;
+
 		Wu.DomUtil.remove(old);
 	},
 
 	_confirm : function () {
 
 		// get client vars
-		var clientName = Wu.DomUtil.get('editor-client-name-new').value;
-		var clientDescription = Wu.DomUtil.get('editor-client-description-new').value;
-		var clientKeywords = Wu.DomUtil.get('editor-client-keywords-new').value;
+		// var clientName = Wu.DomUtil.get('editor-client-name-new').value;
+		var clientName = this._newClient._NameInput.value;
+		// var clientDescription = Wu.DomUtil.get('editor-client-description-new').value;
+		var clientDescription = this._newClient._DescriptionInput.value;
+		// var clientKeywords = Wu.DomUtil.get('editor-client-keywords-new').value;
+		var clientKeywords = this._newClient._keywordsInput;
 		
 		var options = {
 			name : clientName,
@@ -2950,7 +3022,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		Wu.app.Clients[client.uuid] = client;
 
 		// remove edit box
-		var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
+		// var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
+		var old = this._newClient._wrapper;
 		Wu.DomUtil.remove(old);
 
 		// add permissions
@@ -3046,7 +3119,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 
 });
-;// Subelements under Clients/Client
+
+// Subelements under Clients/Client
 Wu.SidePane.Project = Wu.Class.extend({
 
 	initialize : function (project, options) {
@@ -3410,11 +3484,16 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var type = div.type;
 		var value = div.innerHTML;
 
-		var input = ich.injectProjectEditInput({value:value});
-		div.innerHTML = input;
+		// var input = ich.injectProjectEditInput({value:value});
+		var input = Wu.DomUtil.create('input', 'project-edit editable');
+		input.value = value;
+		input.setAttribute('maxLength', '30');
+
+		div.innerHTML = '';
+		div.appendChild(input);
 
 		// focus
-		var target = div.firstChild;
+		var target = input;
 		target.focus();
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 
@@ -3598,7 +3677,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 
 
-});;// subelements in clients sidepane
+});
+// subelements in clients sidepane
 Wu.SidePane.Client = Wu.Class.extend({
 
 
@@ -3962,10 +4042,15 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// inject <input>
 		var div = this.title;
 		var value = div.innerHTML;
-		div.innerHTML = ich.injectClientEditInput({ value : value }); 
+
+		var input = Wu.DomUtil.create('input', 'client-edit editable');
+		input.value = value;
+
+		div.innerHTML = ''; 
+		div.appendChild(input);
 
 		// focus
-		var target = div.firstChild;
+		var target = input;
 		target.focus();
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 
@@ -4182,7 +4267,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 });
 
 
-;Wu.SidePane.Users = Wu.SidePane.Item.extend({
+
+Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	_ : 'sidepane.users', 
 
 
@@ -4199,14 +4285,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._usersControlsInner = Wu.DomUtil.create('div', 'users-controls-inner', this._usersControls);
 
 		// Add user button
-		this._addUser = Wu.DomUtil.createId('div', 'users-add-user', this._usersControlsInner);
-		this._addUser.innerHTML = 'Create user';
-		Wu.DomUtil.addClass(this._addUser, 'smap-button-gray users');
+		this._addUser = Wu.DomUtil.create('div', 'users-add-user smap-button-gray users', this._usersControlsInner, 'Create user');
 
 		// Delete user button
-		this._delUser = Wu.DomUtil.createId('div', 'users-delete-user', this._usersControlsInner);
-		this._delUser.innerHTML = 'Delete user';
-		Wu.DomUtil.addClass(this._delUser, 'smap-button-gray users');
+		this._deleteUser = Wu.DomUtil.create('div', 'users-delete-user smap-button-gray users', this._usersControlsInner, 'Delete user');
 
 		// Search users
 		this._search = Wu.DomUtil.createId('input', 'users-search', this._usersControlsInner);
@@ -4215,21 +4297,71 @@ Wu.SidePane.Client = Wu.Class.extend({
 		Wu.DomUtil.addClass(this._search, 'search');
 
 		// create container (overwrite default) and insert template
-		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content, ich.usersPane());
+		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content);
 
-		// get handles
-		this._tableContainer = Wu.DomUtil.get('users-table-container');
+		// #userlist
+		this._userList = Wu.DomUtil.create('div', 'userlist', this._container);
 
-		// render empty table
-		this._tableContainer.innerHTML = ich.usersTableFrame();
+		// #user-management-client
+		this._mainTitle = Wu.DomUtil.create('h4', 'user-management-client', this._userList);
 
-		// get more handles
-		this._table 	    = Wu.DomUtil.get('users-insertrows');
-		this._addUser       = Wu.DomUtil.get('users-add-user');
-		this._mainTitle     = Wu.DomUtil.get('user-management-client');
-		this._deleteUser    = Wu.DomUtil.get('users-delete-user');
-		this._checkall      = Wu.DomUtil.get('users-checkbox-all');
-		this._checkallLabel = Wu.DomUtil.get('label-users-checkbox-all');
+		// #users-table-container
+		this._tableContainer = Wu.DomUtil.create('div', 'users-table-container', this._userList);
+
+
+		// #userslist
+		this._uList = Wu.DomUtil.createId('div', 'userslist', this._tableContainer);
+
+		// #users-table
+		var table = Wu.DomUtil.create('table', 'users-table', this._uList)
+		var thead = Wu.DomUtil.create('thead', '', table);
+		var tr = Wu.DomUtil.create('tr', '', thead);
+		
+		var th1 = Wu.DomUtil.create('th', 'fivep', tr);
+		th1.setAttribute('data-sort', 'checkbox');
+
+		// #users-squaredThree-checkbox-all
+		var th1_CBcontainer = Wu.DomUtil.create('div', 'squaredThree users-squaredThree-checkbox-all', th1);
+
+		// #users-checkbox-all
+		this._checkall = Wu.DomUtil.create('input', 'users-checkbox-all', th1_CBcontainer);
+		this._checkall.setAttribute('type', 'checkbox');
+		this._checkall.setAttribute('name', 'check');
+		this._checkall.setAttribute('value', 'None');
+		
+		// #label-users-checkbox-all
+		this._checkallLabel = Wu.DomUtil.create('label', 'label-users-checkbox-all', th1);
+		this._checkallLabel.setAttribute('for', 'users-checkbox-all');
+
+		var th2 = Wu.DomUtil.create('th', 'sort name thirtyp', tr, 'Name');
+		th2.setAttribute('data-sort', 'name');
+		th2.setAttribute('data-insensitive', 'true');
+
+		var th3 = Wu.DomUtil.create('th', 'sort company', tr, 'Company');
+		th3.setAttribute('data-sort', 'company');
+		th3.setAttribute('data-insensitive', 'true');
+
+		var th4 = Wu.DomUtil.create('th', 'sort position', tr, 'Position');
+		th4.setAttribute('data-sort', 'position');
+		th4.setAttribute('data-insensitive', 'true');
+
+		var th5 = Wu.DomUtil.create('th', 'sort phone', tr, 'Phone');
+		th5.setAttribute('data-sort', 'phone');
+		th5.setAttribute('data-insensitive', 'true');
+
+		var th6 = Wu.DomUtil.create('th', 'sort email', tr, 'Email');
+		th6.setAttribute('data-sort', 'email');
+		th6.setAttribute('data-insensitive', 'true');
+
+		var th7 = Wu.DomUtil.create('th', 'sort projects', tr, 'Access');
+		th7.setAttribute('data-sort', 'projects');
+		th7.setAttribute('data-insensitive', 'true');	
+
+
+		// #users-insertrows
+		this._table = Wu.DomUtil.createId('tbody', 'users-insertrows', table)
+		this._table.className = 'list';
+
 
 		// init table
 		this.initList();
@@ -4352,11 +4484,54 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	// list.js plugin
 	initList : function () { 
+
 		
 		// add dummy entry
-		var tr = Wu.DomUtil.createId('tr', 'dummy-table-entry');
-		tr.innerHTML = ich.usersTablerow({'type' : 'dummy-table-entry'});
-		this._table.appendChild(tr);
+		var _tr = Wu.DomUtil.createId('tr', 'dummy-table-entry');
+
+		this._table.appendChild(_tr);
+
+
+		var _td1 = Wu.DomUtil.create('td', 'checkbox', _tr);
+		var _cBox = Wu.DomUtil.create('div', 'squaredThree', _td1);
+		var _cBoxInput = Wu.DomUtil.create('input', '', _cBox);
+		_cBoxInput.setAttribute('type', 'checkbox');
+		_cBoxInput.setAttribute('value', 'None');
+		_cBoxInput.setAttribute('name', 'check');
+		var _cBoxLabel = Wu.DomUtil.create('label', '', _cBox);
+
+		
+		var _td2 = Wu.DomUtil.create('td', 'name', _tr);
+
+		var _td3 = Wu.DomUtil.create('td', 'tdcont company', _tr);
+		_td3.setAttribute('key', 'company');
+		_td3.setAttribute('id', 'company-');
+		_td3.setAttribute('uuid', '');
+
+		var _td4 = Wu.DomUtil.create('td', 'tdcont position', _tr);
+		_td4.setAttribute('key', 'position');	
+		_td4.setAttribute('id', 'position-');
+		_td4.setAttribute('uuid', '');		
+
+		var _td5 = Wu.DomUtil.create('td', 'tdcont phone', _tr);
+		_td5.setAttribute('key', 'phone');
+		_td5.setAttribute('id', 'phone-');
+		_td5.setAttribute('uuid', '');		
+
+		var _td6 = Wu.DomUtil.create('td', 'tdcont email', _tr);
+		_td6.setAttribute('key', 'email');		
+		_td6.setAttribute('id', 'email-');
+		_td6.setAttribute('uuid', '');		
+
+		var _td7 = Wu.DomUtil.create('td', 'tdcont access', _tr);
+		_td7.setAttribute('key', 'access');	
+		_td7.setAttribute('id', 'access-');
+		_td7.setAttribute('uuid', '');		
+
+		var _td8 = Wu.DomUtil.create('td', 'tdcont uuid', _tr);
+		_td8.style.display = 'none';		
+
+
 
 		// init list.js
 		var options = { valueNames : ['name', 'company', 'position', 'phone', 'email', 'access'] };
@@ -4628,12 +4803,29 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// prepare template values
 		var template = {};   
-		template.name = ich.usersTablerowName({
+
+		// template.name = ich.usersTablerowName({
+		// 	firstName     : user.getFirstName() || 'First name',
+		// 	lastName      : user.getLastName()  || 'Last name',
+		// 	lastNameUuid  : 'lastName-'  + user.getUuid(),
+		// 	firstNameUuid : 'firstName-' + user.getUuid(),
+		// });
+
+
+		var tmpData = {
 			firstName     : user.getFirstName() || 'First name',
 			lastName      : user.getLastName()  || 'Last name',
 			lastNameUuid  : 'lastName-'  + user.getUuid(),
-			firstNameUuid : 'firstName-' + user.getUuid(),
-		});     
+			firstNameUuid : 'firstName-' + user.getUuid()			
+		}
+
+		// These must for some obscure reason be as strings...
+		var tmpLastNameString = '<input value="' + tmpData.lastName + '" id="' + tmpData.lastNameUuid + '" class="dln" readonly="readonly">';
+		var tmpFirstNameString = '<input value="' + tmpData.firstName + '" id="' + tmpData.firstNameUuid + '" class="dln smallerText" readonly="readonly">';
+
+		template.name = tmpLastNameString + tmpFirstNameString;
+
+
 		template.email    = user.getEmail();
 		template.position = user.getPosition();
 		template.company  = user.getCompany();
@@ -4693,7 +4885,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 					description 	: project.store.description,
 					uuid 		: project.store.uuid
 				}
-				template += ich.usersTableProjectItem(content);
+				template += '<div class="users-table-project-item" title="' + content.description + '" >' + content.name + '</div>';
+
+				
 			}
 			return template;
 		}
@@ -4709,7 +4903,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 				description 	: project.store.description,
 				uuid 		: project.store.uuid
 			}
-			template += ich.usersTableProjectItem(content);
+			template += '<div class="users-table-project-item" title="' + content.description + '" >' + content.name + '</div>';
 		}, this);
 		return template;
 	},
@@ -5027,14 +5221,26 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var key   = e.target.getAttribute('key');
 		var uuid  = e.target.getAttribute('uuid');
 
-		var input = ich.injectInput({ 
+		var inputData = { 
 			value : value, 
 			key   : key , 
 			uuid  : uuid 
-		});
+		};
 		
+
+		div.innerHTML = '';
+
+		var input = Wu.DomUtil.create('input', 'inject-input', div);
+		input.setAttribute('key', inputData.key);
+		input.setAttribute('value', inputData.value);
+		input.setAttribute('uuid', inputData.uuid);
+
+
+		// <input key="{{key}}" value="{{value}}" uuid="{{uuid}}" class="inject-input">
+
+
 		// inject <input>
-		div.innerHTML = input;
+		// div.innerHTML = input;
 
 		var target = div.firstChild;
 
@@ -5079,7 +5285,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 
-});;Wu.SidePane.Map = Wu.SidePane.Item.extend({
+});
+Wu.SidePane.Map = Wu.SidePane.Item.extend({
 	_ : 'sidepane.map', 
 
 	type : 'map',
@@ -5092,7 +5299,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.app = Wu.app;
 
 		// content to template
-		this._container.innerHTML = ich.editorMapBaseLayer();
+		this.buildHTML();
+
+		// this._container.innerHTML = ich.editorMapBaseLayer();
 		this._settingsContainer = Wu.DomUtil.get('mapsettings-container');
 
 		// set panes
@@ -5112,6 +5321,188 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// add tooltip
 		app.Tooltip.add(this._menu, '(Editors only) In this section you will find all the options for setting up a map.');
 
+
+	},
+
+
+	buildHTML : function () {
+
+		this._HTML = {};
+
+		var HTML = this._HTML;
+
+		// Outer wrapper
+		HTML._mapSettingsContainer = Wu.DomUtil.makeit({type : 'div', id : 'mapsettings-container', appendto : this._container});
+
+
+		// BASE LAYERS
+
+		// Wrappers
+		HTML._baseLayerWrap = Wu.DomUtil.makeit({type: 'div', id : 'editor-map-baselayer-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapSettingsContainer});
+		HTML._baseLayerH4 = Wu.DomUtil.makeit({type: 'h4', inner : 'Base Layers', appendto : HTML._baseLayerWrap});
+
+
+		// LAYER MENU
+
+		// Wrappers
+		HTML._layerMenuWrap = Wu.DomUtil.makeit({type: 'div', id : 'editor-map-layermenu-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapSettingsContainer});
+		HTML._layerMenuH4 = Wu.DomUtil.makeit({type: 'h4', inner : 'Layermenu', appendto : HTML._layerMenuWrap});
+		HTML._layerMenu = Wu.DomUtil.makeit({type:'div', id : 'editor-map-layermenu', appendto : HTML._layerMenuWrap});
+		HTML._layerMenuInner = Wu.DomUtil.makeit({type : 'div', id : 'map-layermenu-inner', cname : 'initheight', appendto : HTML._layerMenu});
+
+
+		// POSITION
+
+		// Wrappers
+		HTML._mapPositionWrap = Wu.DomUtil.makeit({type : 'div', id : 'editor-map-position-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapSettingsContainer});
+		HTML._mapPositionH4 = Wu.DomUtil.makeit({type: 'h4', inner : 'Position', appendto : HTML._mapPositionWrap});
+		HTML._initPosCoord = Wu.DomUtil.makeit({type: 'div', id : "editor-map-initpos-coordinates", appendto : HTML._mapPositionWrap});
+		HTML._initPosInner = Wu.DomUtil.makeit({type: 'div', id : 'map-initpos-inner', cname : 'initheight', appendto: HTML._initPosCoord });
+
+		// Set position button
+		HTML._setCurrentPost = Wu.DomUtil.makeit({type: 'button', id: 'editor-map-initpos-button', cname : 'smap-button-white', inner : 'Set current position', appendto : HTML._initPosInner, attr : [['type', 'button']]});
+
+		// Latitude
+		HTML._latLabel = Wu.DomUtil.makeit({type : 'label', inner : 'Latitude:', appendto: HTML._initPosInner, attr : [['for', 'editor-map-initpos-lat-value']]});
+		HTML._latInput = Wu.DomUtil.makeit({type : 'input', cname : 'form-control margined eightyWidth', id : 'editor-map-initpos-lat-value', appendto : HTML._initPosInner });
+
+		// Longitude
+		HTML._lngLabel = Wu.DomUtil.makeit({type : 'label', inner : 'Longitude:', appendto: HTML._initPosInner, attr : [['for', 'editor-map-initpos-lng-value']]});
+		HTML._lngInput = Wu.DomUtil.makeit({type : 'input', cname : 'form-control margined eightyWidth', id : 'editor-map-initpos-lng-value', appendto : HTML._initPosInner });
+
+		// Zoom
+		HTML._zoomLabel = Wu.DomUtil.makeit({type : 'label', inner : 'Zoom-level:', appendto: HTML._initPosInner, attr : [['for', 'editor-map-initpos-zoom-value']]});
+		HTML._zoomInput = Wu.DomUtil.makeit({type : 'input', cname : 'form-control margined eightyWidth', id : 'editor-map-initpos-zoom-value', appendto : HTML._initPosInner });
+
+
+		// BOUNDS
+
+		// Wrapper
+		HTML._boundsWrapper = Wu.DomUtil.makeit({type : 'div', id : 'editor-map-bounds-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapSettingsContainer});
+		HTML._boundsH4 = Wu.DomUtil.makeit({type: 'h4', inner : 'Bounds', appendto : HTML._boundsWrapper});
+		HTML._boundsCoords = Wu.DomUtil.makeit({type : 'div', id : 'editor-map-bounds-coordinates', appendto : HTML._boundsWrapper});
+		HTML._boundsInner = Wu.DomUtil.makeit({type: 'div', id : 'map-bounds-inner', cname : 'initheight', appendto : HTML._boundsCoords});
+		
+		// Set bounds button
+		HTML._setBoundsButton = Wu.DomUtil.makeit({type: 'button', id : 'editor-map-bounds', cname : 'smap-button-white', inner : 'Set all bounds', appendto : HTML._boundsInner, attr : [['type', 'button']]});
+
+		// Clear bounds button
+		HTML._clearBoundsButton = Wu.DomUtil.makeit({type: 'button', id : 'editor-map-bounds-clear', cname : 'smap-button-white', inner : 'Clear', appendto : HTML._boundsInner, attr : [['type', 'button']]});
+
+		// North East Bounds
+		HTML._NEwrapper = Wu.DomUtil.makeit({type : 'div', cname : 'bounds-wrapper', appendto : HTML._boundsInner});
+		HTML._NEbutton = Wu.DomUtil.makeit({type : 'button', id : 'editor-map-bounds-NE', cname : 'smap-button-white', inner : 'Set North-East bounds', appendto : HTML._NEwrapper, attr : [['type', 'button']]});
+		HTML._NElatInput = Wu.DomUtil.makeit({type : 'input', cname : 'form-control margined eightyWidth', id : 'editor-map-bounds-NE-lat-value', appendto : HTML._NEwrapper});
+		HTML._NElngInput = Wu.DomUtil.makeit({type : 'input', cname : 'form-control margined eightyWidth', id : 'editor-map-bounds-NE-lng-value', appendto : HTML._NEwrapper});
+
+		// South West Bounds
+		HTML._SWwrapper = Wu.DomUtil.makeit({type : 'div', cname : 'bounds-wrapper', appendto : HTML._boundsInner});
+		HTML._SWbutton = Wu.DomUtil.makeit({type : 'button', id : 'editor-map-bounds-SW', cname : 'smap-button-white', inner : 'Set South-West bounds', appendto : HTML._SWwrapper, attr : [['type', 'button']]});
+		HTML._SWlatInput = Wu.DomUtil.makeit({type : 'input', cname : 'form-control margined eightyWidth', id : 'editor-map-bounds-SW-lat-value', appendto : HTML._SWwrapper});
+		HTML._SWlngInput = Wu.DomUtil.makeit({type : 'input', cname : 'form-control margined eightyWidth', id : 'editor-map-bounds-SW-lng-value', appendto : HTML._SWwrapper});
+						
+		// Zoom Bounds
+		HTML._zoomBounds = Wu.DomUtil.makeit({type : 'div', cname : 'bounds-wrapper zoom', appendto : HTML._boundsInner});
+
+		// Max Zoom
+		HTML._zoomBoundsLeft = Wu.DomUtil.makeit({type : 'div', cname : 'bounds-zoom-half left', appendto : HTML._zoomBounds});
+		HTML._zoomBoundsLeftHeader = Wu.DomUtil.makeit({type : 'div', cname : 'bounds-zoom-h2', inner : 'Max Zoom', appendto : HTML._zoomBoundsLeft});
+		HTML._zoomBoundsLeftBtn = Wu.DomUtil.makeit({type : 'button', id : 'editor-map-bounds-set-maxZoom', cname : 'smap-button-white', inner : 'Set', appendto : HTML._zoomBoundsLeft, attr : [['type', 'button']]});
+		HTML._zoomBoundsLeftInput = Wu.DomUtil.makeit({type : 'input', id : 'editor-map-bounds-max-zoom-value', cname : 'form-control margined eightyWidth', appendto : HTML._zoomBoundsLeft});
+
+		// Min Zoom
+		HTML._zoomBoundsRight = Wu.DomUtil.makeit({type : 'div', cname : 'bounds-zoom-half left', appendto : HTML._zoomBounds});
+		HTML._zoomBoundsRightHeader = Wu.DomUtil.makeit({type : 'div', cname : 'bounds-zoom-h2', inner : 'Min Zoom', appendto : HTML._zoomBoundsRight});
+		HTML._zoomBoundsRightBtn = Wu.DomUtil.makeit({type : 'button', id : 'editor-map-bounds-set-minZoom', cname : 'smap-button-white', inner : 'Set', appendto : HTML._zoomBoundsRight, attr : [['type', 'button']]});
+		HTML._zoomBoundsRightInput = Wu.DomUtil.makeit({type : 'input', id : 'editor-map-bounds-min-zoom-value', cname : 'form-control margined eightyWidth', appendto : HTML._zoomBoundsRight});
+
+
+
+		// CONTROLS 
+
+		// Wrapper
+		HTML._mapControlsWrap = Wu.DomUtil.makeit({type: 'div', id : 'editor-map-controls-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapSettingsContainer});
+		HTML._controlsH4 = Wu.DomUtil.makeit({type: 'h4', inner : 'Controls', appendto : HTML._mapControlsWrap});
+		HTML._controlsInner = Wu.DomUtil.makeit({type : 'div', id : 'editor-map-controls-inner-wrap', appendto : HTML._mapControlsWrap});
+
+		// ZOOM
+		HTML._controlZoomWrapper = Wu.DomUtil.makeit({type : 'div', cname : 'item-list controls-item', appendto : HTML._controlsInner});
+		HTML._controlZoomTitle = Wu.DomUtil.makeit({type : 'div', cname : 'controls-title', id : 'map-controls-title-zoom', inner : 'Zoom', appendto : HTML._controlZoomWrapper, attr : [['which', 'zoom']]});
+		HTML._controlZoomSwitch = Wu.DomUtil.makeit({type : 'div', cname : 'switch controls-switch', appendto : HTML._controlZoomWrapper});
+		HTML._controlZoomSwitchInput = Wu.DomUtil.makeit({type : 'input', cname : 'cmn-toggle cmn-toggle-round-flat', id : 'map-controls-zoom', appendto : HTML._controlZoomSwitch, attr : [['type', 'checkbox'], ['checked', 'checked']]});
+		HTML._controlZoomSwitchLabel = Wu.DomUtil.makeit({type : 'label', appendto : HTML._controlZoomSwitch, attr : [['for', 'map-controls-zoom']]});
+
+		// DRAW
+		HTML._controlDrawWrapper = Wu.DomUtil.makeit({type : 'div', cname : 'item-list controls-item', appendto : HTML._controlsInner});
+		HTML._controlDrawTitle = Wu.DomUtil.makeit({type : 'div', cname : 'controls-title', id : 'map-controls-title-draw', inner : 'Draw', appendto : HTML._controlDrawWrapper, attr : [['which', 'draw']]});
+		HTML._controlDrawSwitch = Wu.DomUtil.makeit({type : 'div', cname : 'switch controls-switch', appendto : HTML._controlDrawWrapper});
+		HTML._controlDrawSwitchInput = Wu.DomUtil.makeit({type : 'input', cname : 'cmn-toggle cmn-toggle-round-flat', id : 'map-controls-draw', appendto : HTML._controlDrawSwitch, attr : [['type', 'checkbox'], ['checked', 'checked']]});
+		HTML._controlDrawSwitchLabel = Wu.DomUtil.makeit({type : 'label', appendto : HTML._controlDrawSwitch, attr : [['for', 'map-controls-draw']]});
+
+		// INSPECT
+		HTML._controlInspectWrapper = Wu.DomUtil.makeit({type : 'div', cname : 'item-list controls-item', appendto : HTML._controlsInner});
+		HTML._controlInspectTitle = Wu.DomUtil.makeit({type : 'div', cname : 'controls-title', id : 'map-controls-title-inspect', inner : 'Inspect layers', appendto : HTML._controlInspectWrapper, attr : [['which', 'inspect']]});
+		HTML._controlInspectSwitch = Wu.DomUtil.makeit({type : 'div', cname : 'switch controls-switch', appendto : HTML._controlInspectWrapper});
+		HTML._controlInspectSwitchInput = Wu.DomUtil.makeit({type : 'input', cname : 'cmn-toggle cmn-toggle-round-flat', id : 'map-controls-inspect', appendto : HTML._controlInspectSwitch, attr : [['type', 'checkbox'], ['checked', 'checked']]});
+		HTML._controlInspectSwitchLabel = Wu.DomUtil.makeit({type : 'label', appendto : HTML._controlInspectSwitch, attr : [['for', 'map-controls-inspect']]});
+
+		// DESCRIPTION
+		HTML._controlDescriptionWrapper = Wu.DomUtil.makeit({type : 'div', cname : 'item-list controls-item', appendto : HTML._controlsInner});
+		HTML._controlDescriptionTitle = Wu.DomUtil.makeit({type : 'div', cname : 'controls-title', id : 'map-controls-title-description', inner : 'Description', appendto : HTML._controlDescriptionWrapper, attr : [['which', 'description']]});
+		HTML._controlDescriptionSwitch = Wu.DomUtil.makeit({type : 'div', cname : 'switch controls-switch', appendto : HTML._controlDescriptionWrapper});
+		HTML._controlDescriptionSwitchInput = Wu.DomUtil.makeit({type : 'input', cname : 'cmn-toggle cmn-toggle-round-flat', id : 'map-controls-description', appendto : HTML._controlDescriptionSwitch, attr : [['type', 'checkbox'], ['checked', 'checked']]});
+		HTML._controlDescriptionSwitchLabel = Wu.DomUtil.makeit({type : 'label', appendto : HTML._controlDescriptionSwitch, attr : [['for', 'map-controls-description']]});
+
+		// LAYER MENU
+		HTML._controlLayermenuWrapper = Wu.DomUtil.makeit({type : 'div', cname : 'item-list controls-item', appendto : HTML._controlsInner});
+		HTML._controlLayermenuTitle = Wu.DomUtil.makeit({type : 'div', cname : 'controls-title', id : 'map-controls-title-layermenu', inner : 'Layer menu', appendto : HTML._controlLayermenuWrapper, attr : [['which', 'layermenu']]});
+		HTML._controlLayermenuSwitch = Wu.DomUtil.makeit({type : 'div', cname : 'switch controls-switch', appendto : HTML._controlLayermenuWrapper});
+		HTML._controlLayermenuSwitchInput = Wu.DomUtil.makeit({type : 'input', cname : 'cmn-toggle cmn-toggle-round-flat', id : 'map-controls-layermenu', appendto : HTML._controlLayermenuSwitch, attr : [['type', 'checkbox'], ['checked', 'checked']]});
+		HTML._controlLayermenuSwitchLabel = Wu.DomUtil.makeit({type : 'label', appendto : HTML._controlLayermenuSwitch, attr : [['for', 'map-controls-layermenu']]});
+
+		// LEGENDS
+		HTML._controlLegendsWrapper = Wu.DomUtil.makeit({type : 'div', cname : 'item-list controls-item', appendto : HTML._controlsInner});
+		HTML._controlLegendsTitle = Wu.DomUtil.makeit({type : 'div', cname : 'controls-title', id : 'map-controls-title-legends', inner : 'Legends', appendto : HTML._controlLegendsWrapper, attr : [['which', 'legends']]});
+		HTML._controlLegendsSwitch = Wu.DomUtil.makeit({type : 'div', cname : 'switch controls-switch', appendto : HTML._controlLegendsWrapper});
+		HTML._controlLegendsSwitchInput = Wu.DomUtil.makeit({type : 'input', cname : 'cmn-toggle cmn-toggle-round-flat', id : 'map-controls-legends', appendto : HTML._controlLegendsSwitch, attr : [['type', 'checkbox'], ['checked', 'checked']]});
+		HTML._controlLegendsSwitchLabel = Wu.DomUtil.makeit({type : 'label', appendto : HTML._controlLegendsSwitch, attr : [['for', 'map-controls-legends']]});
+
+		// SCALE / MEASURE
+		HTML._controlMeasureWrapper = Wu.DomUtil.makeit({type : 'div', cname : 'item-list controls-item', appendto : HTML._controlsInner});
+		HTML._controlMeasureTitle = Wu.DomUtil.makeit({type : 'div', cname : 'controls-title', id : 'map-controls-title-measure', inner : 'Scale', appendto : HTML._controlMeasureWrapper, attr : [['which', 'measure']]});
+		HTML._controlMeasureSwitch = Wu.DomUtil.makeit({type : 'div', cname : 'switch controls-switch', appendto : HTML._controlMeasureWrapper});
+		HTML._controlMeasureSwitchInput = Wu.DomUtil.makeit({type : 'input', cname : 'cmn-toggle cmn-toggle-round-flat', id : 'map-controls-measure', appendto : HTML._controlMeasureSwitch, attr : [['type', 'checkbox'], ['checked', 'checked']]});
+		HTML._controlMeasureSwitchLabel = Wu.DomUtil.makeit({type : 'label', appendto : HTML._controlMeasureSwitch, attr : [['for', 'map-controls-measure']]});
+
+		// GEO LOCATION
+		HTML._controlGeoWrapper = Wu.DomUtil.makeit({type : 'div', cname : 'item-list controls-item', appendto : HTML._controlsInner});
+		HTML._controlGeoTitle = Wu.DomUtil.makeit({type : 'div', cname : 'controls-title', id : 'map-controls-title-geolocation', inner : 'Geolocation', appendto : HTML._controlGeoWrapper, attr : [['which', 'geolocation']]});
+		HTML._controlGeoSwitch = Wu.DomUtil.makeit({type : 'div', cname : 'switch controls-switch', appendto : HTML._controlGeoWrapper});
+		HTML._controlGeoSwitchInput = Wu.DomUtil.makeit({type : 'input', cname : 'cmn-toggle cmn-toggle-round-flat', id : 'map-controls-geolocation', appendto : HTML._controlGeoSwitch, attr : [['type', 'checkbox'], ['checked', 'checked']]});
+		HTML._controlGeoSwitchLabel = Wu.DomUtil.makeit({type : 'label', appendto : HTML._controlGeoSwitch, attr : [['for', 'map-controls-geolocation']]});
+
+		// BASELAYER TOGGLE
+		HTML._controlBaselayerToggleWrapper = Wu.DomUtil.makeit({type : 'div', cname : 'item-list controls-item', appendto : HTML._controlsInner});
+		HTML._controlBaselayerToggleTitle = Wu.DomUtil.makeit({type : 'div', cname : 'controls-title', id : 'map-controls-title-baselayertoggle', inner : 'Baselayer toggle', appendto : HTML._controlBaselayerToggleWrapper, attr : [['which', 'baselayertoggle']]});
+		HTML._controlBaselayerToggleSwitch = Wu.DomUtil.makeit({type : 'div', cname : 'switch controls-switch', appendto : HTML._controlBaselayerToggleWrapper});
+		HTML._controlBaselayerToggleSwitchInput = Wu.DomUtil.makeit({type : 'input', cname : 'cmn-toggle cmn-toggle-round-flat', id : 'map-controls-baselayertoggle', appendto : HTML._controlBaselayerToggleSwitch, attr : [['type', 'checkbox'], ['checked', 'checked']]});
+		HTML._controlBaselayerToggleSwitchLabel = Wu.DomUtil.makeit({type : 'label', appendto : HTML._controlBaselayerToggleSwitch, attr : [['for', 'map-controls-baselayertoggle']]});
+
+		// CARTO CSS 
+		HTML._controlCartoCSSWrapper = Wu.DomUtil.makeit({type : 'div', cname : 'item-list controls-item', appendto : HTML._controlsInner});
+		HTML._controlCartoCSSTitle = Wu.DomUtil.makeit({type : 'div', cname : 'controls-title', id : 'map-controls-title-cartocss', inner : 'CartoCSS Editor', appendto : HTML._controlCartoCSSWrapper, attr : [['which', 'cartocss']]});
+		HTML._controlCartoCSSSwitch = Wu.DomUtil.makeit({type : 'div', cname : 'switch controls-switch', appendto : HTML._controlCartoCSSWrapper});
+		HTML._controlCartoCSSSwitchInput = Wu.DomUtil.makeit({type : 'input', cname : 'cmn-toggle cmn-toggle-round-flat', id : 'map-controls-cartocss', appendto : HTML._controlCartoCSSSwitch, attr : [['type', 'checkbox'], ['checked', 'checked']]});
+		HTML._controlCartoCSSSwitchLabel = Wu.DomUtil.makeit({type : 'label', appendto : HTML._controlCartoCSSSwitch, attr : [['for', 'map-controls-cartocss']]});
+
+		// MOUSE POSITION
+		HTML._controlMousePosWrapper = Wu.DomUtil.makeit({type : 'div', cname : 'item-list controls-item', appendto : HTML._controlsInner});
+		HTML._controlMousePosTitle = Wu.DomUtil.makeit({type : 'div', cname : 'controls-title', id : 'map-controls-title-mouseposition', inner : 'Mouse position', appendto : HTML._controlMousePosWrapper, attr : [['which', 'mouseposition']]});
+		HTML._controlMousePosSwitch = Wu.DomUtil.makeit({type : 'div', cname : 'switch controls-switch', appendto : HTML._controlMousePosWrapper});
+		HTML._controlMousePosSwitchInput = Wu.DomUtil.makeit({type : 'input', cname : 'cmn-toggle cmn-toggle-round-flat', id : 'map-controls-mouseposition', appendto : HTML._controlMousePosSwitch, attr : [['type', 'checkbox'], ['checked', 'checked']]});
+		HTML._controlMousePosSwitchLabel = Wu.DomUtil.makeit({type : 'label', appendto : HTML._controlMousePosSwitch, attr : [['for', 'map-controls-mouseposition']]});
+
+		
 
 	},
 
@@ -5170,7 +5561,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	},
 
-});;Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
+});
+Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 	_ : 'sidepane.map.mapsetting',
 
 
@@ -7104,7 +7496,8 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 
 });
 
-;// DocumentsPane
+
+// DocumentsPane
 Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	
 	type : 'documents',
@@ -7114,20 +7507,28 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	initContent : function () {
 
 		// create new fullscreen page, and set as default content
-		this._content = Wu.DomUtil.create('div', 'fullpage-documents ct1', Wu.app._appPane);
+		this._content = Wu.DomUtil.create('div', 'fullpage-documents', Wu.app._appPane);
 		
 		// create container (overwrite default)
-		this._container = Wu.DomUtil.create('div', 'editor-wrapper ct11', this._content);
+		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content);
 
 		// insert template
-		this._container.innerHTML = ich.documentsContainer();
+		// #documents-container-leftpane
+		this._leftpane = Wu.DomUtil.create('div', 'documents-container-leftpane', this._container);
+		
+		this._documentsFolders = Wu.DomUtil.create('div', 'documents-folders', this._leftpane);
+		
+		// #documents-folder-list
+		this._folderpane = Wu.DomUtil.create('div', 'documents-folder-list', this._documentsFolders);
+		
+		// #documents-new-folder
+		this._newfolder = Wu.DomUtil.create('div', 'documents-new-folder', this._documentsFolders, '(+)');
 
-		// get element handlers
-		this._leftpane 	 = Wu.DomUtil.get('documents-container-leftpane');
-		this._folderpane = Wu.DomUtil.get('documents-folder-list');
-		this._rightpane  = Wu.DomUtil.get('documents-container-rightpane');
-		this._textarea   = Wu.DomUtil.get('documents-container-textarea');
-		this._newfolder  = Wu.DomUtil.get('documents-new-folder');
+		// #documents-container-rightpane
+		this._rightpane = Wu.DomUtil.create('div', 'documents-container-rightpane', this._container);
+
+		// #documents-container-textarea
+		this._textarea = Wu.DomUtil.create('article', 'documents-container-textarea', this._rightpane);
 
 		// add tooltip
 		app.Tooltip.add(this._menu, 'This is the projects document section.');
@@ -7474,13 +7875,18 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// set values 
 		var div   = e.target;
 		var value = e.target.innerHTML;
-		var input = ich.injectFolderTitleInput({ value : value });
-		
-		// inject <input>
-		div.innerHTML = input;
+		div.innerHTML = '';
+
+		var input = Wu.DomUtil.create('input', 'documents-folder-item', div);
+		input.setAttribute('key', '');
+		input.setAttribute('value', value);
+
+
 
 		// focus
-		var target = div.firstChild;
+		// var target = div.firstChild;
+		var target = input;
+
 		target.focus();
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 
@@ -7615,7 +8021,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.folders = {};
 	}
 
-});;Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
+});
+Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	_ : 'sidepane.datalibrary', 
 	
 	type : 'dataLibrary',
@@ -7662,10 +8069,14 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.progress = Wu.DomUtil.create('div', 'progress-bar', this._content);
 		
 		// insert template
-		this._container.innerHTML = ich.datalibraryContainer();
+		// this._container.innerHTML = ich.datalibraryContainer();
 
-		// get element handlers
-		this._tableContainer = Wu.DomUtil.get('datalibrary-table-container');
+		// #datalibrary-container
+		this._dataLibraryContainer = Wu.DomUtil.create('div', 'datalibrary-container', this._container);
+	
+		// #datalibrary-table-container
+		this._tableContainer = Wu.DomUtil.create('div', 'datalibrary-table-container', this._dataLibraryContainer);
+
 	      
 		// create fullscreen dropzone
 		this.fulldrop = Wu.DomUtil.create('div', 'fullscreen-drop', this._content);
@@ -7673,17 +8084,71 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// filecount
 		this.filecount = 0;
 
-		// render empty table
-		this._tableContainer.innerHTML = ich.datalibraryTableframe();
+		
 
 		// get elements
-		this._table 		= Wu.DomUtil.get('datalibrary-insertrows');
 		this._errors 		= Wu.DomUtil.get('datalibrary-errors');
 		this._uploader 		= Wu.DomUtil.get('upload-container');
 		this._deleter 		= Wu.DomUtil.get('datalibrary-delete-file');
 		this._downloader 	= Wu.DomUtil.get('datalibrary-download-files');
-		this._checkall 		= Wu.DomUtil.get('checkbox-all');
-		this._checkallLabel 	= Wu.DomUtil.get('label-checkbox-all');
+
+
+		
+		// RENDER EMPTY TABLE
+
+		this._fileList = Wu.DomUtil.createId('div', 'filelist', this._tableContainer);
+		this._tableFrame = Wu.DomUtil.create('table', 'datalibrary-table', this._fileList);
+		this._tableHead = Wu.DomUtil.create('thead', '', this._tableFrame);
+		this._tableHeadRow = Wu.DomUtil.create('tr', '', this._tableHead);
+
+		this._th1 = Wu.DomUtil.create('th', 'fivep', this._tableHeadRow);
+		this._th1.setAttribute('data-sort', 'checkbox');
+
+		this._th1checkBox = Wu.DomUtil.createId('div', 'squaredThree-checkbox-all');
+		this._th1checkBox.className = 'squaredThree';
+
+		this._checkall = Wu.DomUtil.createId('input', 'checkbox-all', this._th1checkBox);
+		this._checkall.setAttribute('type', 'checkbox');
+		this._checkall.setAttribute('name', 'check');
+		this._checkall.setAttribute('value', 'None');
+
+		this._checkallLabel = Wu.DomUtil.createId('label', 'label-checkbox-all', this._th1checkBox);
+		this._checkallLabel.setAttribute('for', 'checkbox-all');
+
+		this._th2 = Wu.DomUtil.create('th', 'sort thirtyp', this._tableHeadRow, 'Name');
+		this._th2.setAttribute('data-sort', 'name');
+		this._th2.setAttribute('data-insensitive', 'true');
+
+		this._th3 = Wu.DomUtil.create('th', 'sort type', this._tableHeadRow, 'Type');
+		this._th3.setAttribute('data-sort', 'type');
+		this._th3.setAttribute('data-insensitive', 'true');
+
+		this._th4 = Wu.DomUtil.create('th', 'sort files', this._tableHeadRow, 'Files');
+		this._th4.setAttribute('data-sort', 'files');
+		this._th4.setAttribute('data-insensitive', 'true');
+
+		this._th5 = Wu.DomUtil.create('th', 'sort category', this._tableHeadRow, 'Category');
+		this._th5.setAttribute('data-sort', 'category');
+		this._th5.setAttribute('data-insensitive', 'true');
+
+		this._th6 = Wu.DomUtil.create('th', 'sort keywords', this._tableHeadRow, 'Keywords');
+		this._th6.setAttribute('data-sort', 'keywords');
+		this._th6.setAttribute('data-insensitive', 'true');
+
+		this._th7 = Wu.DomUtil.create('th', 'sort createdDate', this._tableHeadRow, 'Date');
+		this._th7.setAttribute('data-sort', 'createdDate');
+		this._th7.setAttribute('data-insensitive', 'true');
+
+		this._th8 = Wu.DomUtil.create('th', 'sort status', this._tableHeadRow, 'Status');
+		this._th8.setAttribute('data-sort', 'status');
+		this._th8.setAttribute('data-insensitive', 'true');										
+
+
+		// #datalibrary-insertrows
+		this._table = Wu.DomUtil.create('tbody', 'list datalibrary-insertrows', this._tableFrame);
+
+		// END OF EMPTY TABLE
+
 
 		// init table
 		this.initList();
@@ -7800,12 +8265,29 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	initDownloadTable : function () {
 
-		var table = ich.datalibraryTableDownload();
-		this._downloadList.innerHTML = table;
+		// var table = ich.datalibraryTableDownload();
+		// this._downloadList.innerHTML = table;
 
-		// get elems 
-		this._downloadOK = Wu.DomUtil.get('download-ok-button');
-		this._downloadCancel = Wu.DomUtil.get('download-cancel-button');
+		// #datalibrary-download-table
+		var table = Wu.DomUtil.create('table', 'datalibrary-download-table', this._downloadList);
+		var tableHead = Wu.DomUtil.create('thead', '', table);
+		var tr = Wu.DomUtil.create('tr', '', tableHead);
+		var th1 = Wu.DomUtil.create('div', 'download-name', tr, 'Name');
+		var th2 = Wu.DomUtil.create('div', 'download-category', tr, 'Category');
+		var th3 = Wu.DomUtil.create('div', 'download-version', tr, 'Version');
+		var th4 = Wu.DomUtil.create('div', 'download-status', tr, 'Status');
+		var th5 = Wu.DomUtil.create('div', 'download-format', tr, 'Format');
+		var th6 = Wu.DomUtil.create('div', 'download-size', tr, 'Size');
+		var th7 = Wu.DomUtil.create('div', 'download-remove', tr, 'Remove');
+
+		// #datalibrary-download-insertrows
+		this.tBody = Wu.DomUtil.create('tbody', 'datalibrary-download-insertrows', table);
+
+		// #download-cancel-button
+		this._downloadCancel = Wu.DomUtil.create('div', 'smap-button-gray download-cancel-button', this._downloadList, 'Cancel');
+
+		// #download-ok-button
+		this._downloadOK = Wu.DomUtil.create('div', 'smap-button-gray download-ok-button', this._downloadList, 'Download');
 	
 		// set hooks
 		Wu.DomEvent.on(this._downloadOK, 'mousedown', this.downloadFiles, this);
@@ -7855,6 +8337,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			'puuid' : this.project.store.uuid,
 			'pslug' : this.project.store.slug
 		}
+
+
+		console.log(json);
+		
 		var json = JSON.stringify(json);
 
 		// post         path          json      callback           this
@@ -7946,7 +8432,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		}, this);
 
 		// get table and insert
-		var table = Wu.DomUtil.get('datalibrary-download-insertrows');
+		var table = this.tBody;
 		table.innerHTML = tr;
 
 		// show
@@ -8006,9 +8492,29 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	initList : function () { 
 		
 		// add dummy entry
-		var tr = Wu.DomUtil.createId('tr', 'dummy-table-entry');
-		tr.innerHTML = ich.datalibraryTablerow({'type' : 'dummy-table-entry'});
-		this._table.appendChild(tr);
+		var _tr = Wu.DomUtil.createId('tr', 'dummy-table-entry', this._table);
+
+		_tr.innerHTML = '';
+
+		var _td1 = Wu.DomUtil.create('td', 'checkbox', _tr);
+		var _td1Button = Wu.DomUtil.create('div', 'squaredThree', _td1);
+
+		var _td1Input = Wu.DomUtil.createId('input', '', _td1Button);
+		_td1Input.setAttribute('type', 'checkbox');
+		_td1Input.setAttribute('value', 'None');
+		_td1Input.setAttribute('name', 'check');
+
+		var _td1Label = Wu.DomUtil.create('label', '', _td1Button);
+		var _td2 = Wu.DomUtil.create('td', 'name', _tr);
+		var _td3 = Wu.DomUtil.create('td', 'tdcont type', _tr);
+		var _td4 = Wu.DomUtil.create('td', 'tdcont files', _tr);
+		var _td5 = Wu.DomUtil.create('td', 'tdcont category', _tr);
+		var _td6 = Wu.DomUtil.create('td', 'tdcont keywords', _tr);
+		var _td7 = Wu.DomUtil.create('td', 'tdcont createdDate', _tr);
+		var _td8 = Wu.DomUtil.create('td', 'tdcont status', _tr);
+		var _td9 = Wu.DomUtil.create('td', 'tdcont uuid', _tr);
+		Wu.DomUtil.addClass(_td9, 'displayNone');
+		
 
 		// init list.js
 		var options = { valueNames : ['name', 'file', 'category', 'keywords', 'date', 'status', 'type'] };
@@ -8313,15 +8819,21 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	addFile : function (file) {
 
 		// clone file object
-		var tmp = Wu.extend({}, file.getStore());   
+		var tmp = Wu.extend({}, file.getStore()); 
 
-		// add record (a bit hacky, but with a cpl of divs inside the Name column)
-		tmp.name = ich.datalibraryTablerowName({
+		var tmpData = {
 			name 		: tmp.name || 'Title',
 			description 	: tmp.description || 'Description',
 			nameUuid 	: 'name-' + tmp.uuid,
-			descUuid 	: 'description-' + tmp.uuid,
-		});
+			descUuid 	: 'description-' + tmp.uuid,			
+		}
+
+		// DOM elements must be string...
+		var tmpNameString = '<input value="' + tmpData.name + '" id="' + tmpData.nameUuid + '" class="dln" readonly="readonly">';
+		tmpNameString += '<textarea  id="' + tmpData.descUuid + '" class="dld" readonly="readonly">' + tmpData.description + '</textarea>';
+
+		// add record (a bit hacky, but with a cpl of divs inside the Name column)
+		tmp.name = tmpNameString;
 
 		// clean some fields
 		tmp.type = tmp.type.camelize();
@@ -8332,9 +8844,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// add file to list.js
 		var ret = this.list.add(tmp);
 		
-		// ugly hack: manually add uuids
+		// ugly hack: manually add uuids			// TODO: FIX
 		ret[0].elm.id = tmp.uuid;                              // <tr>
 		var c = ret[0].elm.children[0].children[0].children;    
+
 		c[0].id = 'checkbox-' + tmp.uuid;                      // checkbox
 		c[1].setAttribute('for', 'checkbox-' + tmp.uuid);      // label
 
@@ -8750,7 +9263,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	}
 
 });
-;Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
+
+Wu.SidePane.MediaLibrary = Wu.SidePane.Item.extend({
 
 	type : 'mediaLibrary',
 	title : 'Media',
@@ -9241,7 +9755,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 });
 
 
-;Wu.SidePane.Share = Wu.SidePane.Item.extend({
+
+Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	
 	type : 'share',
 	title : 'Share',
@@ -9407,13 +9922,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	createLink : function () {
 
 		// create hash, callback
-		var that = this;
 		app.setHash(function (context, hash) {
 
 			// open input box
-			that._createLinkView(hash);
+			this._createLinkView(hash);
 
-		});
+		}.bind(this));
 		
 	},
 
@@ -9554,7 +10068,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 });
 
 
-;Wu.SidePane.Account = Wu.SidePane.Item.extend({
+
+Wu.SidePane.Account = Wu.SidePane.Item.extend({
 	_ : 'sidepane.account', 
 
 
@@ -9593,7 +10108,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		}
 	},
 
-});;Wu.HeaderPane = Wu.Class.extend({
+});
+Wu.HeaderPane = Wu.Class.extend({
 	_ : 'headerpane', 
 
 	initialize : function () {
@@ -9753,14 +10269,18 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		var whichTitle 	= e.target.whichTitle;
 
 		if (!whichTitle) return;
-		if (whichTitle == 'title')	var input = ich.injectHeaderTitleInput({ value : value });
-		if (whichTitle == 'subtitle')   var input = ich.injectHeaderSubtitleInput({ value : value });
+		// if (whichTitle == 'title')	var input = ich.injectHeaderTitleInput({ value : value });
+		// if (whichTitle == 'subtitle')   var input = ich.injectHeaderSubtitleInput({ value : value });
+		if (whichTitle == 'title')	var input = Wu.DomUtil.create('input', 'header-title editable');
+		if (whichTitle == 'subtitle')   var input = Wu.DomUtil.create('input', 'header-subtitle');
 
-		// inject <input>
-		div.innerHTML = input;
+		input.value = value;
+
+		div.innerHTML = '';
+		div.appendChild(input);
 
 		// focus
-		var target = div.firstChild;
+		var target = input;
 		target.focus();
 		target.selectionStart = target.selectionEnd;	// prevents text selection
 
@@ -9922,7 +10442,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._update(project);
 	}
 });
-;Wu.ProgressPane = Wu.Class.extend({
+
+Wu.ProgressPane = Wu.Class.extend({
 
 	initialize : function (options) {
 		
@@ -9999,7 +10520,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	}
 
 
-});;Wu.MapPane = Wu.Class.extend({
+});
+Wu.MapPane = Wu.Class.extend({
 
 	initialize : function () {
 		
@@ -10010,8 +10532,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._activeLayers = [];
 
 		// connect zindex control
-		this._bzIndexControl = new Wu.ZIndexControl.Baselayers();
-		this._lzIndexControl = new Wu.ZIndexControl.Layermenu();
+		this._baselayerZIndex = new Wu.ZIndexControl.Baselayers();
+		this._layermenuZIndex = new Wu.ZIndexControl.Layermenu();
 
 		return this; 
 	},      
@@ -10047,6 +10569,14 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.project = project;
 		this.reset();
 		this.update(project);
+	},
+
+	getZIndexControls : function () {
+		var z = {
+			b : this._baselayerZIndex, // base
+			l : this._layermenuZIndex  // layermenu
+		}
+		return z;
 	},
 
 
@@ -10178,13 +10708,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		});
 
 		var sorted = _.sortBy(active, function (l) {
-
-			return zIndexControl.get(l);
-
+			return zIndexControl.get(l.layer);
 		});
 
-		console.log('getActiveLayermenuLayers active: ', active);
-		console.log('sorted: ', sorted);
 		return sorted;
 	},
 
@@ -10205,7 +10731,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			return l.getUuid() == layer.getUuid();
 		}, this);
 	},
-
 
 	setMaxBounds : function () {
 		var map = app._map;
@@ -10242,16 +10767,18 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		    zoom = pos.zoom;
 
 		// create new map
-		this._map = Wu.app._map = L.map('map', options).setView([lat, lng], zoom); 
+		this._map = app._map = L.map('map', options).setView([lat, lng], zoom); 
 
 		// add editable layer
 		this.addEditableLayer(this._map);
 
 		// add attribution
 		this._attributionControl = L.control.attribution({
-				position : 'bottomright',
-				prefix : 'Powered by <a href="https://systemapic.com/" target="_blank">Systemapic.com</a> ©'
+			position : 'bottomright',
+			prefix : 'Powered by <a href="http://systemapic.com/" target="_blank">Systemapic.com</a> ©'
 		});
+
+		// add control to map
 		this._map.addControl(this._attributionControl);
 
 	},
@@ -10294,7 +10821,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	updateControlCss : function () {
-
 
 		// get controls
 		var controls = this.project.getControls(),
@@ -10889,7 +11415,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		return popup;
 	},
 
-
 	_addPopupCloseEvent : function () {
 		if (this._popInit) return;
 		this._popInit = true;	// only run once
@@ -10941,7 +11466,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 });
 
 
-;Wu.StatusPane = Wu.Class.extend({
+
+Wu.StatusPane = Wu.Class.extend({
 	_ : 'statuspane', 
 
 	initialize : function (options) {
@@ -11247,7 +11773,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 
 });
-;Wu.StartPane = Wu.Class.extend({
+
+Wu.StartPane = Wu.Class.extend({
 
 	initialize : function (options) {
 		
@@ -11416,7 +11943,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		return projects;
 	},
 
-	createStartProject : function(project) {
+	createStartProject : function (project) {
 
 		// Client info
 		var clientID = project.store.client;
@@ -11436,8 +11963,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		newProject._clientName = Wu.DomUtil.create('div', 'start-project-client-name', newProject._projectContainer);
 		newProject._clientName.innerHTML = clientName;
 
-		newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
-		newProject._clientLogo.src = clientLogo;
+		if ( clientLogo ) {
+			newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
+			newProject._clientLogo.src = clientLogo;
+		}
 
 
 		this.projectContainers.push(newProject);
@@ -11624,9 +12153,12 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// Store how many projects we want to show
 		this.dimensions.projectNo = no;
 
-		for ( var i = 0; i < this.projects.length; i++ ) {
-			if ( i < no ) 	Wu.DomUtil.removeClass(this.projectContainers[i]._projectContainer, 'displayNone');
-			else		Wu.DomUtil.addClass(this.projectContainers[i]._projectContainer, 'displayNone');
+		for (var i = 0; i < this.projects.length - 1; i++) {
+			if (i < no) {
+				Wu.DomUtil.removeClass(this.projectContainers[i]._projectContainer, 'displayNone');
+			} else {
+				Wu.DomUtil.addClass(this.projectContainers[i]._projectContainer, 'displayNone');
+			}	    
 		}
 
 	},
@@ -11646,7 +12178,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	}
 });
 
-;Wu.ErrorPane = Wu.Class.extend({
+
+Wu.ErrorPane = Wu.Class.extend({
 
 	options : {
 
@@ -11740,7 +12273,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 
 
-});;Wu.Dropzone = Wu.Class.extend({
+});
+Wu.Dropzone = Wu.Class.extend({
 	// dropzone for files to data library
 	// drop anywhere, anytime
 
@@ -11994,7 +12528,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 
 
-});Wu.ZIndexControl = Wu.Class.extend({
+})
+Wu.ZIndexControl = Wu.Class.extend({
 
 	initialize : function () {
 		
@@ -12028,8 +12563,19 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	get : function (layer) {
-		// get current index
+		// get all
+		if (!layer) return this._index;
+
+		// if layer, get layer xindex
 		return _.findIndex(this._index, function (l) { return layer == l; });
+	},
+
+	getIndex : function () {
+		var clear = []
+		this._index.forEach(function (l) {
+			clear.push(l.getTitle());
+		});
+		return clear;
 	},
 
 	up : function (layer) {
@@ -12075,7 +12621,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		layers.forEach(function (layer, i) {
 			var zindex = i + this._z; 
 			layer._setZIndex(zindex);
-			console.log('enforce: ', layer, zindex);
 		}, this);
 	},
 
@@ -12108,7 +12653,8 @@ Wu.ZIndexControl.Layermenu = Wu.ZIndexControl.extend({
 
 
 
-;L.Control.Layermenu = L.Control.extend({
+
+L.Control.Layermenu = L.Control.extend({
 
 	options: {
 		position : 'bottomright' 
@@ -12121,7 +12667,14 @@ Wu.ZIndexControl.Layermenu = Wu.ZIndexControl.extend({
 		    options   = this.options;
 
 		// add html
-		container.innerHTML = ich.layerMenuFrame();  // nb: this._innerContainer = container;
+		// container.innerHTML = ich.layerMenuFrame();  // nb: this._innerContainer = container;
+
+		this._layermenuOuter 	= Wu.DomUtil.create('div', 'scroller-frame');
+		var _scrollUp 		= Wu.DomUtil.create('div', 'scroll-up', this._layermenuOuter);
+		var _innerScroller 	= Wu.DomUtil.create('div', 'inner-scroller', this._layermenuOuter);
+		this._content 		= Wu.DomUtil.createId('div', 'layer-menu-inner-content', _innerScroller);
+
+		container.appendChild(this._layermenuOuter);
 
 		// add some divsscroller-frame
 		this.initLayout();
@@ -12436,7 +12989,8 @@ Wu.ZIndexControl.Layermenu = Wu.ZIndexControl.extend({
 		};
 
 		// set hooks
-		var bin = Wu.DomUtil.get('layer-menu-inner-content');
+		// var bin = Wu.DomUtil.get('layer-menu-inner-content');
+		var bin = this._content;
 		if (bin) {
 			Wu.DomEvent.on(bin, 'dragover',  this.drag.over,  this);
 			Wu.DomEvent.on(bin, 'dragleave', this.drag.leave, this);
@@ -12449,7 +13003,8 @@ Wu.ZIndexControl.Layermenu = Wu.ZIndexControl.extend({
 	resetSortable : function () {
 
 		// remove hooks
-		var bin = Wu.DomUtil.get('layer-menu-inner-content');
+		// var bin = Wu.DomUtil.get('layer-menu-inner-content');
+		var bin = this._content;
 		if (!bin) return;
 		
 		Wu.DomEvent.off(bin, 'dragover',  this.drag.over,  this);
@@ -12950,11 +13505,35 @@ Wu.ZIndexControl.Layermenu = Wu.ZIndexControl.extend({
 		if (!layer) className += ' menufolder';
 		var wrap 	= Wu.DomUtil.create('div', className);
 		var uuid 	= item.uuid;
-		wrap.innerHTML 	= ich.layerMenuItem(item);
+		
+
+		// For some reason, HTML must come as string. 
+
+		// var up = Wu.DomUtil.create('div', 'layer-item-up', wrap);
+		// var down = Wu.DomUtil.create('div', 'layer-item-down', wrap);
+		// var del = Wu.DomUtil.create('div', 'layer-item-delete', wrap);
+		// var inner = Wu.DomUtil.create('div', 'layer-menu-item', wrap, item.caption);
+
+		var _iH = 	'<div class="layer-item-up">></div>' +
+			  	'<div class="layer-item-down"><</div>' +
+				'<div class="layer-item-delete">x</div>' +
+				'<div type="layerItem" class="layer-menu-item">' +
+				item.caption +
+				'</div>';
+
+		wrap.innerHTML 	= _iH;
+
+
 		wrap.id 	= uuid;
 		Wu.DomUtil.addClass(wrap, 'level-' + item.pos);
 		wrap.setAttribute('draggable', true); 	// mark as draggable
 		this._content.appendChild(wrap); 	// append to layermenu
+
+
+
+
+
+
 
 		// get elems
 		var up    = wrap.children[0];
@@ -13167,7 +13746,7 @@ Wu.ZIndexControl.Layermenu = Wu.ZIndexControl.extend({
 
 		// get vars
 		this.project  = project || Wu.app.activeProject;
-		this._content = Wu.DomUtil.get('layer-menu-inner-content');
+//		this._content = Wu.DomUtil.get('layer-menu-inner-content'); // cxxxx
 		this.layers   = {};
 		
 		// create layermenu
@@ -13188,7 +13767,7 @@ Wu.ZIndexControl.Layermenu = Wu.ZIndexControl.extend({
 
 
 		// Get the scrol-container that we will set max height value of
-		this._layermenuOuter = Wu.DomUtil.get('layermenu-outer');
+		// this._layermenuOuter = Wu.DomUtil.get('layermenu-outer');
 
 		// Check window height
 		var layersMaxHeight = window.innerHeight - 135;
@@ -13203,7 +13782,8 @@ Wu.ZIndexControl.Layermenu = Wu.ZIndexControl.extend({
 
 L.control.layermenu = function (options) {
 	return new L.Control.Layermenu(options);
-};;L.Control.Inspect = L.Control.extend({
+};
+L.Control.Inspect = L.Control.extend({
 	
 	options: {
 		position : 'bottomright',
@@ -13217,7 +13797,22 @@ L.control.layermenu = function (options) {
 		    options   = this.options;
 
 		// add html
-		container.innerHTML = ich.inspectControl(); 
+		// container.innerHTML = ich.inspectControl(); 
+
+		// #description-toggle-button
+		this._content = Wu.DomUtil.create('div', 'inspect-control-inner-content', container);
+
+		// #inspector-header
+		this._header = Wu.DomUtil.create('div', 'menucollapser inspector-header', this._content, 'Layer inspector');
+
+		//  #collapse-description
+		this._scroller = Wu.DomUtil.create('div', 'inspector-list-outer-scroller', this._content);
+
+		// #inspector-list
+		this._list = Wu.DomUtil.create('div', 'inspector-list', this._scroller);
+
+
+
 
 		// add tooltip
 		app.Tooltip.add(container, 'Shows a list of active layers', { extends : 'systyle', tipJoint : 'top left'});
@@ -13256,8 +13851,8 @@ L.control.layermenu = function (options) {
 
 		// get vars
 		this.project  = project || app.activeProject;
-		this._content = Wu.DomUtil.get('inspect-control-inner-content'); 
-		this._list    = Wu.DomUtil.get('inspector-list');
+		// this._content = Wu.DomUtil.get('inspect-control-inner-content'); 
+		// this._list    = Wu.DomUtil.get('inspector-list');
 
 		// reset layers
 		this.layers = [];           
@@ -13266,10 +13861,8 @@ L.control.layermenu = function (options) {
 		this.disableScrollzoom();
 
 		// get zindexControl
-		this._zx = app.getZIndexControls().l; // layermenu zindex control 
+		this._zx = app.MapPane.getZIndexControls().l; // layermenu zindex control 
 
-		console.log('ZX: ', this._zx);
-	       
 	        // add active layers
 	        this._addAlreadyActiveLayers();
 
@@ -13327,7 +13920,6 @@ L.control.layermenu = function (options) {
 		app.Tooltip.add(kill, 'Disable layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
 
 		// add to list
-		// this._list.appendChild(wrapper);
 		this._list.insertBefore(wrapper, this._list.firstChild);
 
 		// create object
@@ -13395,10 +13987,6 @@ L.control.layermenu = function (options) {
 		this._md = 0;
 		var div = entry.wrapper;
 
-		
-
-		console.log('_dragStart');
-
 	},
 
 	_dragMove : function (e) {
@@ -13416,8 +14004,8 @@ L.control.layermenu = function (options) {
 		this._md += e.movementY;
 
 		// move up/down
-		if (md < -k ) this._moveUp(movedY);
-		if (md >  k ) this._moveDown(movedY);
+		if (md < -k) this._moveUp(movedY);
+		if (md >  k) this._moveDown(movedY);
 		
 		// add dragging class
 		if (!this._dragClassAdded) L.DomUtil.addClass(div, 'dragging');
@@ -13466,7 +14054,6 @@ L.control.layermenu = function (options) {
 
 		// move up in zindex
 		this._zx.down(layer);
-
 
 		// reset dragging y count
 		this._md = 0;
@@ -13536,7 +14123,6 @@ L.control.layermenu = function (options) {
 
 		// move up in zindex
 		this._zx.down(layer);
-
 		
 	},
 
@@ -13558,8 +14144,6 @@ L.control.layermenu = function (options) {
 		map.fitBounds(bounds);
 
 	},
-
-
 
 	isolateToggle : function (entry) {
 		if (entry.isolated) {
@@ -13583,7 +14167,7 @@ L.control.layermenu = function (options) {
 
 	_noneAreIsolated : function () {
 		var any = _.filter(this.layers, function (entry) { return entry.isolated == true; });
-		if (any.length == 0) return true;
+		if (!any.length) return true;
 		return false;
 	},
 
@@ -13627,7 +14211,7 @@ L.control.layermenu = function (options) {
 		if (descriptionControl) descriptionControl.removeLayer(entry.layer);	
 
 		// Hise Layer inspector if it's empty
-		if ( this.layers.length == 0 ) this._content.style.display = 'none';
+		if (!this.layers.length) this._content.style.display = 'none';
 
 	},
 
@@ -13641,7 +14225,20 @@ L.control.layermenu = function (options) {
 		// set currently active entry
 		this.activeEntry = entry;
 
-	}
+	},
+
+	getListPosition : function () {
+		console.log('getPosition');
+		console.log('index: ', this._zx.getIndex());
+		console.log('list: ', this._list);
+
+
+	},
+
+	setListPosition : function (position, layer) {
+
+
+	},
 
 
 
@@ -13650,7 +14247,8 @@ L.control.layermenu = function (options) {
 
 L.control.inspect = function (options) {
 	return new L.Control.Inspect(options);
-};;L.Control.Description = L.Control.extend({
+};
+L.Control.Description = L.Control.extend({
 	
 	options: {
 		// position : 'topleft' 
@@ -13664,7 +14262,24 @@ L.control.inspect = function (options) {
 		    options   = this.options;
 
 		// add html
-		container.innerHTML = ich.descriptionControl(); 
+		// container.innerHTML = ich.descriptionControl(); 
+
+
+		// #description-toggle-button
+		this._button = Wu.DomUtil.create('div', 'dropdown-button description-toggle-button', container)
+
+		// // #description-control-inner-content
+		this._content = Wu.DomUtil.create('div', 'description-control-inner-content', container)
+
+		// //  #collapse-description
+		this._collapser = Wu.DomUtil.create('div', 'menucollapser collapse-description', this._content, 'Info');
+
+		// // #description-control-inner-content-box
+		this._outer = Wu.DomUtil.create('div', 'description-control-inner-content-box', this._content)
+
+			
+
+
 
 		return container; // turns into this._container on return
 
@@ -13676,11 +14291,10 @@ L.control.inspect = function (options) {
 		this._container.style.display = "none";
 
 		// get panes
-		this._content 	= Wu.DomUtil.get('description-control-inner-content');
-		this._outer     = Wu.DomUtil.get('description-control-inner-content-box'); 
-		this._button	= Wu.DomUtil.get('description-toggle-button'); 
-		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
-		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
+		// this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
+		// this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
+		this._legendsContainer = app.MapPane.legendsControl._legendsContainer;
+		this._legendsCollapser = app.MapPane.legendsControl._legendsCollapser;
 		
 		// create scroller 
 		this._inner = Wu.DomUtil.create('div', 'description-scroller', this._outer);
@@ -13972,7 +14586,8 @@ L.control.inspect = function (options) {
 
 L.control.description = function (options) {
 	return new L.Control.Description(options);
-};;L.Control.Legends = L.Control.extend({
+};
+L.Control.Legends = L.Control.extend({
 	
 	options: {
 		position : 'bottomleft' 
@@ -13989,8 +14604,29 @@ L.control.description = function (options) {
 
 		// add html
 		container.style.display = 'none';
-		container.innerHTML = ich.legendsControl(); 	     
 
+		// #legends-opener
+		this._legendsOpener = Wu.DomUtil.create('div', 'legends-opener', container, 'Open Legends');
+		this._legendsOpener.style.display = 'none';
+
+		// #legends-control-inner-content
+		this._legendsContainer = Wu.DomUtil.create('div', 'legends-control-inner-content', container);
+
+		// #legends-inner
+		this._legendsInner = Wu.DomUtil.create('div', 'leaflet-drag-target legends-inner', this._legendsContainer);
+
+		// #legends-collapser
+		this._legendsCollapser = Wu.DomUtil.create('div', 'legends-collapser dropdown-button legends-collapser-trans', this._legendsInner);
+
+		// #legends-scroll-left
+		this._legendsScrollLeft = Wu.DomUtil.create('div', 'legends-scroll-left', this._legendsInner);
+		 
+		// #legends-scroll-right		 
+		this._legendsScrollRight = Wu.DomUtil.create('div', 'legends-scroll-right', this._legendsInner);
+
+		// #legends-inner-slider
+		this._legendsInnerSlider = Wu.DomUtil.create('div', 'legends-inner-slider', this._legendsInner);
+			
 
 		return container;
 
@@ -14182,7 +14818,8 @@ L.control.description = function (options) {
 
 		// get vars
 		this.project = project || Wu.app._activeProject;
-		this._content = Wu.DomUtil.get('legends-control-inner-content'); 
+		// this._content = Wu.DomUtil.get('legends-control-inner-content'); 
+		this._content = this._legendsContainer;
 
 		// init divs
 		this.initContainer();		
@@ -14193,16 +14830,16 @@ L.control.description = function (options) {
 
 	initContainer : function () {
 	
-		// get elements
-		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
-		this._legendsOpener = Wu.DomUtil.get('legends-opener')
+		// // get elements
+		// this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
+		// this._legendsOpener = Wu.DomUtil.get('legends-opener')
 
-		this._legendsInner = Wu.DomUtil.get('legends-inner');
-		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
-		this._legendsInnerSlider = Wu.DomUtil.get('legends-inner-slider');
+		// this._legendsInner = Wu.DomUtil.get('legends-inner');
+		// this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
+		// this._legendsInnerSlider = Wu.DomUtil.get('legends-inner-slider');
 
-		this._legendsScrollLeft = Wu.DomUtil.get('legends-scroll-left'); // (j)
-		this._legendsScrollRight = Wu.DomUtil.get('legends-scroll-right'); // (j)
+		// this._legendsScrollLeft = Wu.DomUtil.get('legends-scroll-left'); // (j)
+		// this._legendsScrollRight = Wu.DomUtil.get('legends-scroll-right'); // (j)
 
 		// add hooks
 		this.addHooks();
@@ -14536,7 +15173,8 @@ L.control.description = function (options) {
 
 L.control.legends = function (options) {
 	return new L.Control.Legends(options);
-};;/*
+};
+/*
 Copyright 2012 Ardhi Lukianto
 
 Permission is hereby granted, free of charge, to any person obtaining
@@ -14628,7 +15266,8 @@ L.Map.addInitHook(function () {
 L.control.mouseposition = function (options) {
         return new L.Control.MousePosition(options);
 };
-;/*
+
+/*
  * L.Control.Layers is a control to allow users to switch between different layers on the map.
  * https://raw.githubusercontent.com/Leaflet/Leaflet/master/src/control/Control.Layers.js
  */
@@ -14774,7 +15413,8 @@ L.Control.BaselayerToggle = L.Control.extend({
 
 L.control.baselayerToggle = function (options) {
 	return new L.Control.BaselayerToggle(options);
-};;// controls global styles
+};
+// controls global styles
 // full color themeing to come
 Wu.Style = Wu.Class.extend({
 
@@ -14818,7 +15458,6 @@ Wu.Style = Wu.Class.extend({
 	},
 
 	setDarkThemeCartoCSS : function () {
-		
 		if (!app.MapPane.cartoCss) return;
 
 		// Set code mirror to darktheme
@@ -14874,7 +15513,8 @@ function initSVGpatterns () {
 	Wu.DomUtil.get("styletag").innerHTML = SVG_patterns;
 }
 // colorArray = [ '#334d5c','#45b29d','#8eddb8','#5fffaf','#0ea32b','#47384d','#a84158','#f224ff','#d85fff','#f21b7f','#f40028','#f15e01','#e27a3f','#ffc557','#dbef91','#df4949','#cfc206','#fff417','#4b84e8','#ffffff' ]
-;L.Control.CartoCSS = L.Control.extend({
+
+L.Control.CartoCSS = L.Control.extend({
 	
 	options: {
 		position : 'topleft' 
@@ -15881,7 +16521,8 @@ function initSVGpatterns () {
 L.control.cartoCss = function (options) {
 	return new L.Control.CartoCSS(options);
 };
-;Wu.Tooltip = Wu.Class.extend({
+
+Wu.Tooltip = Wu.Class.extend({
 
 	options : {
 		fixed : true,
@@ -15989,7 +16630,8 @@ L.control.cartoCss = function (options) {
 
 	},
 
-});;// spinning map
+});
+// spinning map
 L.SpinningMap = L.Class.extend({
 
 	// todo: refactor GL to own class
@@ -16073,6 +16715,11 @@ L.SpinningMap = L.Class.extend({
 		
 		// create map
 		this._gl ? this.initGLMap() : this.initMap();
+
+		// set logo
+		this._logo = L.DomUtil.get('login-logo');
+		var img = 'url("' + this.options.logo + '")';
+		this._logo.style.backgroundImage = img;
 		
 	},
 
@@ -16545,7 +17192,8 @@ L.SpinningMap = L.Class.extend({
 });
 
 
-;Wu.Project = Wu.Class.extend({
+
+Wu.Project = Wu.Class.extend({
 
 	initialize : function (store) {
 
@@ -17646,7 +18294,8 @@ L.SpinningMap = L.Class.extend({
 
 
 
-});;Wu.Client = Wu.Class.extend({
+});
+Wu.Client = Wu.Class.extend({
 
 	initialize : function (options) {
 
@@ -17774,7 +18423,8 @@ L.SpinningMap = L.Class.extend({
 	},
 
 
-});;Wu.User = Wu.Class.extend({ 
+});
+Wu.User = Wu.Class.extend({ 
 
 	initialize : function (store) {
 		this.store = store;
@@ -18272,7 +18922,8 @@ L.SpinningMap = L.Class.extend({
 		return json;
 	},
 
-});;Wu.Layer = Wu.Class.extend({
+});
+Wu.Layer = Wu.Class.extend({
 
 	type : 'layer',
 
@@ -18300,7 +18951,7 @@ L.SpinningMap = L.Class.extend({
 		}, this);
 
 		// get zIndex control
-		this._zx = app.getZIndexControls();
+		this._zx = app.MapPane.getZIndexControls();
 	},
 
 	initLayer : function () {
@@ -18487,7 +19138,6 @@ L.SpinningMap = L.Class.extend({
 
 	getCartoid : function () {
 		if (this.store.data) return this.store.data.cartoid;
-		return false;
 	},
 
 	setCartoCSS : function (json, callback) {
@@ -18680,9 +19330,7 @@ L.SpinningMap = L.Class.extend({
 
 
 Wu.RasterLayer = Wu.Layer.extend({
-
 	type : 'rasterLayer',
-
 });
 
 
@@ -18737,16 +19385,15 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		    gridServer 	= app.options.servers.utfgrid.uri,
 		    subdomains  = app.options.servers.utfgrid.subdomains,
 		    token 	= app.accessToken,
-		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
+		    url 	= gridServer + '{fileUuid}/{z}/{x}/{y}.grid.json' + token;
 		
 		// create gridlayer
 		this.gridLayer = new L.UtfGrid(url, {
 			useJsonP: false,
-			// subdomains: 'ijk',
 			subdomains: subdomains,
-			// subdomains: 'ghi',
-			maxRequests : 10,
-			requestTimeout : 20000
+			maxRequests : 20,
+			requestTimeout : 20000,
+			fileUuid : fileUuid
 		});
 
 		// debug
@@ -18758,22 +19405,10 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	},
 
 	updateStyle : function () {
-		var map = app._map;	
-		
-
-		// if (this.layer) {
-		// 	this.update();
-		// 	this.addTo(map);
-		// } else {
-		// 	this.update();
-		// }
-
-		// update
-		this.update();
-
-		// add to map
-		this.addTo(map); // refactor
-
+		// set new options and redraw
+		if (this.layer) this.layer.setOptions({
+			cartoid : this.getCartoid(),
+		});
 	},
 
 	_typeLayer : function () {
@@ -18876,6 +19511,16 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
 	},
 
+	updateStyle : function () {
+
+		// set new options and redraw
+		if (this.layer) this.layer.setOptions({
+			cartoid : this.getCartoid(),
+		});
+
+	},
+
+
 
 });
 
@@ -18930,516 +19575,70 @@ Wu.createLayer = function (layer) {
 
 
 
+// // topojson layer
+// Wu.TopojsonLayer = Wu.Layer.extend({
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Wu.GeojsonLayer = Wu.Layer.extend({
-
-// 	type : 'geojsonLayer',
-
+// 	type : 'topojsonLayer',
 
 // 	initLayer : function () {
 // 		var that = this;
 	       
 // 		// create leaflet geoJson layer
-// 		this.layer = L.geoJson(false, {
-
+// 		this.layer = L.topoJson(false, {
 // 			// create popup
 // 			onEachFeature : this.createPopup
 // 		});
 
-// 	},
-
-// 	add : function (map) {
-// 		this.addTo(map);
-// 	},
-
-// 	addTo : function (map) {
-// 		var map   = map || Wu.app._map;
-// 		var layer = this.layer;
-		
-// 		// load data if not loaded
-// 		if (!this.loaded) this.loadData();
-				
-// 		// set hover popup
-// 		this.bindHoverPopup();
-
-// 		// add to drawControl
-// 		var drawControl = app.MapPane.editableLayers;
-// 		drawControl.addLayer(layer);
-
-// 	},
-
-// 	remove : function (map) {
-// 		var map = map || Wu.app._map;
-// 		var layer = this.layer;
-		
-// 		// remove from editableLayers 
-// 		var editableLayers = app.MapPane.editableLayers;
-// 		editableLayers.removeLayer(layer);
-
-// 		// remove hooks
-// 		this.removeLayerHooks();
-
-// 	},
-
-// 	addLayerHooks : function () {
-
-// 		this.layer.eachLayer(function (layr) {
-			
-// 			var type = layr.feature.geometry.type;
-
-// 			if (type == 'Polygon') {
-
-// 				Wu.DomEvent.on(layr, 'styleeditor:changed', this.styleChanged, this);
-
-// 			} 
-
-// 			if (type == 'MultiPolygon') {
-
-// 				layr.eachLayer(function (multi) {
-
-// 					Wu.DomEvent.on(multi, 'styleeditor:changed', function (data) {
-// 						this.multiStyleChanged(data, multi, layr);
-// 					}, this);
-
-// 				}, this);
-// 			}
-
-// 		}, this);	
-	
-// 	},	
-
-// 	removeLayerHooks : function () {
-// 		for (l in this.layer._layers) {
-// 			var layer = this.layer._layers[l];
-
-// 			// listen to changes
-// 			Wu.DomEvent.off(layer, 'styleeditor:changed', this.styleChanged, this);
-// 		}
-// 	},
-
-// 	getGeojsonUuid : function () {
-// 		return this.store.data.geojson;
-// 	},
-
-// 	loadData : function () {
-// 		var that = this;
-
-// 		// do nothing if already loaded
-// 		if (this.loaded) return; 
-
-// 		// set status
-// 		app.setStatus('Loading...');
-
-
-// 		// get geojson from server
-// 		var data = { 
-// 			uuid : this.getGeojsonUuid(),
-// 			projectUuid : app.activeProject.getUuid() 
-// 		}
-// 		var json = JSON.stringify(data);
-	
-		
-// 		// post with callback:   path       data    callback   context of cb
-// 		// Wu.Util.postcb('/api/geojson', json, this._loaded, this);
-// 		var path = '/api/geojson';
-		
-// 		var http = new XMLHttpRequest();
-// 		var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
-// 		url += path;
-
-// 		// track progress
-// 		var dataSize = this.getDataSize();
-// 		if (dataSize) {
-// 			var that = this;
-// 			http.addEventListener("progress", function (oe) {
-// 				var percent = Math.round( oe.loaded / dataSize * 100);
-// 				that.setProgress(percent);
-
-// 			}, false);
-// 		}
-		
-// 		http.open("POST", url, true);
-
-// 		//Send the proper header information along with the request
-// 		http.setRequestHeader("Content-type", "application/json");
-
-// 		http.onreadystatechange = function() {
-// 			if (http.readyState == 4 && http.status == 200) {			// todo: refactor
-// 				that.dataLoaded(that, http.responseText);
-// 			}
-// 		}
-// 		http.send(json);
-
-// 	},
-
-// 	// callback after loading geojson from server
-// 	dataLoaded : function (that, json) {
-
-// 		// set progress done
-// 		that.setProgress(100);
-
-// 		// parse json into geojson object
-// 		try { that.data = JSON.parse(json); }
-// 		catch (e) { return console.log('parse error!', json)}
-		
-// 		// console.log('Got geojson: ', that.data);
-
-// 		// return if errors
-// 		if (!that.data) return console.error('no data');
-// 		if (that.data.error) return console.error(that.data.error);
-
-// 		// add data to layer
-// 		that.layer.addData(that.data);
-
-// 		// mark loaded
-// 		that.loaded = true;
-
-// 		// set opacity
-// 		that.setOpacity()
-
-// 		// render saved styles of geojson
-// 		that.renderStyle();
-
-// 		// set status
-// 		app.setStatus('Loaded!');
-
-// 		// hide progress bar
-// 		this.hideProgress();
-
-// 		// add layer hooks
-// 		this.addLayerHooks();
-
-// 		// phantomjs _loaded
-// 		app._loaded.push(this.getUuid());
-// 		// console.log('GEOJSON: ', this);
-
-// 	},
-
-// 	getDataSize : function () {
-
-// 		var fileUuid = this.getFileUuid();
-// 		if (!fileUuid) return false;
-
-// 		var file = this.getFile(fileUuid);
-
-// 		return parseInt(file.dataSize);
-
-// 	},
-
-// 	getFileUuid : function () {
-// 		return this.store.file;
-// 	},
-
-// 	getFile : function (fileUuid) {
-
-// 		var files = app.activeProject.getFiles();
-// 		var file = _.find(files, function (f) {
-// 			return f.uuid == fileUuid;
-// 		});
-
-// 		return file;
-
-// 	},
-
-// 	progress : function (p) {
-// 		this.setProgress(p);
-// 	},
-
-// 	setProgress : function (percent) {
-// 		// set progress bar
-// 		app.ProgressBar.setProgress(percent);
-// 	},
-
-// 	hideProgress : function () {
-// 		// hide progress bar
-// 		app.ProgressBar.hideProgress();
-// 	},
-
-	
-// 	getContainer : function () {
-
-// 		// return
-
-// 	},
-
-// 	// set visibility : visible on layer
-// 	show : function () {
-// 		for (l in this.layer._layers) {
-// 			var layer = this.layer._layers[l];
-// 			layer._container.style.visibility = 'visible';
-// 		}
-// 	},
-
-// 	// set visibility : hidden on layer
-// 	hide : function () {
-// 		for (l in this.layer._layers) {
-// 			var layer = this.layer._layers[l];
-// 			layer._container.style.visibility = 'hidden';
-// 		}
-// 	},
-
-// 	multiStyleChanged : function (data, multi, layr) {
-
-// 		var layer = layr;
-// 		var style = data.style;
-// 		var __sid = layer.feature.properties.__sid;
-
-// 		layer.setStyle(style);	// good! does the whole multipolgyon (of multipolygons)
-
-// 		this.saveStyle(style, __sid);	// works
-
-// 	},
-
-// 	styleChanged : function (data) {
-
-// 		var style = data.style;
-// 		var target = data.target;
-// 		var id = target._leaflet_id;
-// 		var layer = this.getPathParentLayer(id);
-// 		var __sid = target.feature.properties.__sid;
-
-// 		// save style
-// 		this.saveStyle(style, __sid);
-
-// 	},
-
-// 	getPathParentLayer : function (id) {
-// 		return app.MapPane.getEditableLayerParent(id);
-// 	},
-
-// 	// save style to layer object
-// 	saveStyle : function (style, __sid) {	
-			
-// 		var json = this.layer.toGeoJSON();
-
-// 		var json = {};
-// 		json.layer  = this.getUuid();
-// 		json.uuid   = this.getProjectUuid(); // active project uuid
-
-// 		json.style = {
-// 			__sid : __sid,
-// 			style : style 		// partial
-// 		}
-
-// 		// send to server
-// 		this._save(json);
-
-// 		// set staus msg
-// 		app.setSaveStatus();
-
-// 	},
-
-// 	renderStyle : function () {
-
-// 		var styles = this.store.style;
-// 		var layers = this.layer._layers;
-
-// 		for (l in layers) {
-// 			var layer = layers[l];
-// 			var __sid = layer.feature.properties.__sid;
-
-// 			var style = _.find(styles, function (s) {
-// 				return s.__sid == __sid;
-// 			});
-
-// 			if (style) {
-// 				var parsed = JSON.parse(style.style);
-// 				layer.setStyle(parsed);
-// 			}
-// 		}
-
-// 	},
-	
-// 	setOpacity : function (opacity) {
-
-// 		// set opacity for now or later
-// 		this.opacity = opacity || this.opacity || 0.2;
-		
-// 		// return if data not loaded yet
-// 		if (!this.loaded) return;
-
-// 		// set style 
-// 		this.layer.setStyle({
-// 			opacity : this.opacity, 
-// 			fillOpacity : this.opacity
-// 		});
-
-// 	},
-
-// 	getOpacity : function () {
-// 		return this.opacity || 0.2;
-// 	},
-
-
-// 	// create tooltip
-// 	createPopup : function (feature, layer) {
-
-// 		// return if no features in geojson
-// 		if (!feature.properties) return;
-
-// 		// create popup
-// 		var popup = L.popup({
-// 			offset : [0, -5],
-// 			closeButton : false,
-// 			zoomAnimation : false,
-// 			maxWidth : 1000,
-// 			minWidth : 200,
-// 			maxHeight : 150
-// 		});
-
-// 		// create content
-// 		var string = '';
-// 		for (key in feature.properties) {
-// 			var value = feature.properties[key];
-// 			// if not empty value
-// 			if (value != 'NULL' && value!= 'null' && value != null && value != '' && value != 'undefined' && key != '__sid') {
-// 				// add features to string
-// 				string += key + ': ' + value + '<br>';
-// 			}
-// 		}
-
-// 		// if nothing, return
-// 		if (string.length == 0) return;
-
-// 		// set content
-// 		popup.setContent(string);
-		
-// 		// bind popup to layer
-// 		layer.bindPopup(popup);
-		
-// 	},
-
-
-// 	setPopupPosition : function (e) {
-// 		var popup = e.layer._popup;
-// 		var latlng = app._map.mouseEventToLatLng(e.originalEvent);
-// 		popup.setLatLng(latlng);
-// 	},
-
-// 	bindHoverPopup : function () {
-// 		var that = this;
-
-// 	}
+// 	}	
 // });
 
-
-
-// topojson layer
-Wu.TopojsonLayer = Wu.Layer.extend({
-
-	type : 'topojsonLayer',
-
-	initLayer : function () {
-		var that = this;
-	       
-		// create leaflet geoJson layer
-		this.layer = L.topoJson(false, {
-			// create popup
-			onEachFeature : this.createPopup
-		});
-
-	}	
-});
-
-// extend leaflet geojson with topojson conversion (test) - works! but doesn't solve any problems
-L.TopoJSON = L.GeoJSON.extend({
-	addData: function(jsonData) {    
-		if (jsonData.type === "Topology") {
-			for (key in jsonData.objects) {
-				geojson = topojson.feature(jsonData, jsonData.objects[key]);
-				L.GeoJSON.prototype.addData.call(this, geojson);
-			}
-		} 
-		else {
-			L.GeoJSON.prototype.addData.call(this, jsonData);
-		}
-	}  
-});
-
-L.topoJson = function (json, options) {
-	return new L.TopoJSON(json, options);
-};
-
-
-// // topojson layer with d3.js
-// L.TopojsonLayer = L.Class.extend({
-
-// 	initialize: function (data, options) {
-		
-// 		L.setOptions(this, options);
-// 	},
-
-// 	onAdd: function (map) {
-// 		this._map = map;
-
-// 		// create a DOM element and put it into one of the map panes
-// 		this._el = L.DomUtil.create('div', 'topojson-layer leaflet-zoom-hide');
-// 		map.getPanes().overlayPane.appendChild(this._el);
-
-// 		// add a viewreset event listener for updating layer's position, do the latter
-// 		map.on('viewreset', this._reset, this);
-// 		this._reset();
-// 	},
-
-// 	onRemove: function (map) {
-// 		// remove layer's DOM elements and listeners
-// 		map.getPanes().overlayPane.removeChild(this._el);
-// 		map.off('viewreset', this._reset, this);
-// 	},
-
-// 	_reset: function () {
-// 		// update layer's position
-// 		var pos = this._map.latLngToLayerPoint(this._latlng);
-// 		L.DomUtil.setPosition(this._el, pos);
-// 	}
+// // extend leaflet geojson with topojson conversion (test) - works! but doesn't solve any problems
+// L.TopoJSON = L.GeoJSON.extend({
+// 	addData: function(jsonData) {    
+// 		if (jsonData.type === "Topology") {
+// 			for (key in jsonData.objects) {
+// 				geojson = topojson.feature(jsonData, jsonData.objects[key]);
+// 				L.GeoJSON.prototype.addData.call(this, geojson);
+// 			}
+// 		} 
+// 		else {
+// 			L.GeoJSON.prototype.addData.call(this, jsonData);
+// 		}
+// 	}  
 // });
 
-// L.topoJson = function (data, options) {
-// 	return new L.TopojsonLayer(data, options);
+// L.topoJson = function (json, options) {
+// 	return new L.TopoJSON(json, options);
 // };
 
 
-;Wu.Files = Wu.Class.extend({
+
+
+
+
+
+
+
+
+
+
+
+// update options and redraw
+L.TileLayer.include({
+	setOptions : function (options) {
+		L.setOptions(this, options);
+		this.redraw();
+	}
+});
+
+L.UtfGrid.include({
+	setOptions : function (options) {
+		L.setOptions(this, options);
+		this.redraw();
+	}
+});
+
+Wu.Files = Wu.Class.extend({
 
 	_ : 'file',
 
@@ -19602,7 +19801,8 @@ L.topoJson = function (json, options) {
 
 
 
-});;var systemapicConfigOptions = {
+});
+var systemapicConfigOptions = {
 		
 	id : 'app',
 
@@ -19674,7 +19874,8 @@ L.topoJson = function (json, options) {
 		'user-a15e2219'
 	]
 }
-;Wu.version = '0.3-dev';
+
+Wu.version = '0.4-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -20123,6 +20324,8 @@ Wu.App = Wu.Class.extend({
 			// add layer
 			var layer = project.getLayer(layerUuid);
 
+			console.log('hash layer: ', layer.getTitle());
+
 			// if in layermenu
 			var bases = project.getBaselayers();
 			var base = _.find(bases, function (b) {
@@ -20260,13 +20463,7 @@ Wu.App = Wu.Class.extend({
 
 	// },
 
-	getZIndexControls : function () {
-		var z = {
-			b : app.MapPane._bzIndexControl, // base
-			l : app.MapPane._lzIndexControl  // layermenu
-		}
-		return z;
-	},
+	
 
 
 	// debug mode

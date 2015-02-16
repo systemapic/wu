@@ -12,6 +12,8 @@
 			<link rel="stylesheet" href="/dist/css.dependencies.min.css">			
 						
 
+		<!-- @if NODE_ENV == 'DEVELOPMENT' -->
+
 			<!-- dev css -->
 			<link rel="stylesheet" href="/css/style.css">
 			<link rel="stylesheet" href="/css/evil.css">
@@ -63,6 +65,17 @@
 			<script src="/js/lib/opentip/opentip-native.js"></script>
 			<script src="/js/lib/jss.js/jss.js"></script>
 
+		<!-- @endif -->
+
+
+		<!-- @if NODE_ENV == 'PRODUCTION' -->
+
+			<link rel="stylesheet" href="/dist/css.portal.min.css">
+			<script src="/dist/js.dependencies.min.js"></script>
+	
+		<!-- @endif -->
+
+
 		<!-- styletag for injecting css -->
 		<div id="styletag"></div>
 		<div id="mobilestyle"></div>		
@@ -81,6 +94,8 @@
 
 
 
+
+		<!-- @if NODE_ENV == 'DEVELOPMENT' -->
 
 			<!-- class.js must be added first -->
 			<script src="/js/src/core/class.js"></script> 
@@ -130,6 +145,15 @@
 			<!-- config file -->
 			<script src="/js/src/core/config.js"></script> 		
 			<script src="/js/src/core/app.js"></script>
+
+		<!-- @endif -->
+
+		<!-- @if NODE_ENV == 'PRODUCTION' -->		
+
+			<script src="/dist/js.portal.min.js"></script>
+
+		<!-- @endif -->
+
 
 		<script>
 

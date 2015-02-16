@@ -27,24 +27,24 @@
 
 @media all and (orientation: portrait) {
 
-	#users-table thead tr .fivep {
+	.users-table thead tr .fivep {
 		display: none;
 	}
 
-	#users-table thead tr .name {
+	.users-table thead tr .name {
 		min-width: 100px;
 	}
 
-	#users-table thead tr .position {
+	.users-table thead tr .position {
 		display: none;
 	}	
 
 
-	#users-insertrows tr .checkbox {
+	.users-insertrows tr .checkbox {
 		display: none;
 	}
 
-	#users-insertrows tr .position {
+	.users-insertrows tr .position {
 		display: none;
 	}
 
