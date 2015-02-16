@@ -130,8 +130,6 @@ Wu.SidePane.Item = Wu.Class.extend({
 	
 	activate : function (e) {
 
-		console.log('activate sidepane menu item', this);
-	
 		// set active menu
 		var prev = Wu.app._activeMenu || false;
 		Wu.app._activeMenu = this;
@@ -163,7 +161,6 @@ Wu.SidePane.Item = Wu.Class.extend({
 			
 		Wu.app._editorMenuPane.style.opacity = 0; // This is .q-editor-content
 		Wu.DomUtil.removeClass(app.SidePane._mobileFullScreenCloser, 'displayNone', this);
-		// app._activeMenuItem = undefined;
 		app.SidePane.fullscreen = true;
 	},
 
