@@ -16,6 +16,8 @@ var projectSchema = mongoose.Schema({
 	keywords 	: [{ type: String, default: '' }],
 	categories 	: [String],
 
+	accessGroup     : { type: mongoose.Schema.Types.ObjectId, ref: 'Group' },
+
 			// image
 	logo		: String, 
 

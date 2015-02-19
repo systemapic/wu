@@ -63,6 +63,9 @@ Wu.Client = Wu.Class.extend({
 			description 	: this.description,
 			keywords 	: this.keywords
 		}
+
+		console.log('options', options);
+		
 		var json   = JSON.stringify(options);
 		var editor = Wu.app.SidePane.Clients;
 

@@ -1,4 +1,4 @@
-Wu.version = '0.4-dev';
+Wu.version = '0.5-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -6,6 +6,13 @@ Wu.App = Wu.Class.extend({
 
 	// default options
 	options : systemapicConfigOptions, // global var from config.js... perhaps refactor.
+
+	// permission : function () {
+	// 	console.log('as');
+	// 	var p = new Wu.Permission();
+	// 	console.log('p', p);
+	// },	
+
 
 	_ready : false,
 
@@ -91,18 +98,21 @@ Wu.App = Wu.Class.extend({
 	},
 
 
-	initApp : function (o) {
+	initApp : function (options) {
 		// set vars
-		this.options.json = o;
+		this.options.json = options;
+
+		// load json model
+		this._initObjects();
+
+		// permissions
+		this._initPermissions();
 
 		// create app container
 		this._initContainer();
 
 		// load dependencies
 		this._initDependencies();
-
-		// load json model
-		this._initObjects();
 
 		// create panes
 		this._initPanes();
@@ -131,7 +141,7 @@ Wu.App = Wu.Class.extend({
 		var dimensions = this._getDimensions(e);
 
 		// startpane resize event
-		if ( app.StartPane.isOpen ) app.StartPane.resizeEvent(dimensions);
+		if (app.StartPane.isOpen) app.StartPane.resizeEvent(dimensions);
 
 		// mappane resize event
 		if (app.MapPane) app.MapPane.resizeEvent(dimensions);
@@ -172,6 +182,10 @@ Wu.App = Wu.Class.extend({
 		// create map container
 		this._mapContainer = Wu.DomUtil.createId('div', 'map-container', this._appPane);
 
+	},
+
+	_initPermissions : function () {
+		this.Permissions = new Wu.Permissions(this.options);
 	},
 
 	_initDependencies : function () {

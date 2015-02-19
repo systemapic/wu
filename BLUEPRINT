@@ -52,6 +52,217 @@ _________
 
 ALTERNATIVE METHOD:
 
+NEEDS:
+	Type of user access needed:
+	1. a simple user to access maps.systemapic.com - can create project (<2), update, invite (<2)
+	2. a superadmin
+	3. in invited user, can read project, client, can upload, can edit, 
+	--
+
+	eg: 
+
+	1. try-out user @ maps.systemapic.com:
+		+ create_client
+		+ edit_client
+		+ delete_client
+		+ read_client
+		+ create_project
+		+ edit_project
+		+ delete_project
+		+ read_project
+		+ upload_file
+		+ download_file
+		+ create_version
+		+ delete_version
+		+ delete_file
+		+ share_project
+		=
+		- delete_other_client
+		- delete_other_project
+		- delete_other_file
+		- create_user
+		- edit_user
+		- edit_other_user
+		- delete_user
+		- delete_other_user
+		- read_analytics
+		- manage_analytics
+		- delegate_to_user 
+
+
+	2. superadmin
+		+ create_client 	
+		+ edit_client 		
+		+ edit_other_client 	
+		+ delete_client 	
+		+ delete_other_client  
+		+ read_client 		
+		+ create_project 	
+		+ edit_project 	
+		+ edit_other_project 	
+		+ delete_project 	
+		+ delete_other_project
+		+ read_project 	
+		+ upload_file 	
+		+ download_file 	
+		+ create_version 	
+		+ delete_version 	
+		+ delete_file 	
+		+ delete_other_file 	
+		+ create_user 	
+		+ edit_user 		
+		+ edit_other_user 	
+		+ delete_user 	
+		+ delete_other_user 	
+		+ share_project 	
+		+ read_analytics 	
+		+ manage_analytics 	
+		+ delegate_to_user 	
+
+	3. portal_admin
+		+ create_client 	
+		+ edit_client 		
+		+ edit_other_client 	
+		+ delete_client 	
+		+ delete_other_client  
+		+ read_client 		
+		+ create_project 	
+		+ edit_project 	
+		+ edit_other_project 	
+		+ delete_project 	
+		+ delete_other_project
+		+ read_project 	
+		+ upload_file 	
+		+ download_file 	
+		+ create_version 	
+		+ delete_version 	
+		+ delete_file 	
+		+ delete_other_file 	
+		+ create_user 	
+		+ edit_user 		
+		+ edit_other_user 	
+		+ delete_user 	
+		+ delete_other_user 	
+		+ share_project 	
+		+ read_analytics 	
+		+ manage_analytics 	
+		+ delegate_to_user 	
+
+
+	4. manager 
+
+
+
+ACTIONS:
+										  which?
+										---------
+	1. create_clients 	=> create client 				- any 
+	2. edit_clients		=> edit own client 				- created by self
+	3. edit_other_clients 	=> edit others' client 				- any client
+	4. delete_clients 	=> delete own client 				- created by self
+	5. delete_other_clients => delete others' client 			- any client
+	6. read_clients		=> read client 					- invited to........
+	--
+	7. create_project 	=> create project
+	8. edit_project 	=> edit own projects
+	9. edit_certain_project => edit a certain project (must check in list)
+	10. edit_any_project    => edit any project
+	// 9. edit_other_project 	=> edit others' project
+	10. delete_project 	=> delete own project
+	11. delete_other_project > delete others' project
+	12. read_project 	=> read project
+	--
+	13. upload_file 	=> upload file to project
+	14. download_file 	=> download file from project
+	15. create_version 	=> create version of file
+	16. delete_version 	=> delete version of file
+	17. delete_file 	=> delete own file
+	18. delete_other_file 	=> delete others' file
+	--
+	19. create_users 	=> create user  				- any
+	20. edit_users 		=> edit user createdby self 			- created by self
+	21. edit_other_users 	=> edit user created by others 			- any user
+	22. delete_users 	=> delete user createdby self 					
+	23. delete_other_users 	=> delete user created by others
+	--
+	24. share_project 	=> share project 
+	25. read_analytics 	=> read analytics
+	26. manage_analytics 	=> manage analytics
+	--
+	27. delegate_to_user 	   => 	delegate OWN CAPABILITES to user (never delegate capabilites that user doesnt have him/herself.. what's the point?)
+	28. delegate_to_other_user => 	delegate OWN CAPABILITES to user created by others
+
+
+
+PROBLEMS:
+	
+	1. MANAGER -> can only edit/delete users that s/he created him/herself 
+		ideal: edit/del any that s/he's got delegated...
+
+	2. READ one project, WRITE another... 
+
+	3. READ one, READ/MANAGE another..
+
+
+
+
+FLOW:
+
+	- each user can be in several groups... 
+		- superuser
+		- portal admin
+		- project read member
+		- project edit member
+		- manager
+
+	- asking for capability, eg. [create_project]
+	- find all groups that has USER + CAPABILITY.
+		- if group found => OK
+		- if not found => NO ACCESS
+
+
+
+
+
+
+
+PAIN:
+
+	- each project has own roles - OWNER, READER, EDITOR, MANAGER, ETC. ? 
+
+	 	- each ROLE has members, capabilites: 
+
+	 		- OWNER 
+	 			- capabilities:
+		 			- edit_project
+		 			- delete_project
+	 				- etc.
+
+	 			- members:
+	 				- uuid-asdasd
+	 				- uuid-asdasd
+
+
+	 		- EDITOR
+	 			- capabilites: 
+	 				-
+	 				-
+
+	 			- members 
+	 				- uuid-asdads
+	 				- uuid-dsa
+
+	 		- MANAGER
+	 			- capabilites:
+	 				-
+	 				-
+	 			- members
+	 				- uuid-ddsd
+
+
+
+
+
 GROUPS
 ------
 
