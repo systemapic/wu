@@ -52,15 +52,47 @@
 	}
 
 .leaflet-draw-toolbar a {
-	background-image: url(dev_img/leaflet.draw.sprites.png);
-	background-repeat: no-repeat;
-	background-position-x: -272px;
+	background-image: none !important;
+	position: relative;
 	}
 
-.leaflet-retina .leaflet-draw-toolbar a {
-	background-image: url(dev_img/leaflet.draw.sprites-2x.png);
-	background-size: 270px 30px;
+.leaflet-draw-toolbar a:before {
+	content: '';
+	background-image: url(images/leaflet.draw.sprites.png);
+	background-repeat: no-repeat;
+	width: 26px;
+	height: 26px;
+	top: 0;
+	right: 0;
+	position: absolute;
+	opacity: 0.75;
 	}
+
+.leaflet-draw-toolbar a:hover:before {
+	opacity: 1
+	}
+
+
+.leaflet-draw-draw-polyline:before {
+	background-position: -2px -2px !important;	
+	}
+
+.leaflet-draw-draw-polygon:before {
+	background-position: -31px -2px !important;
+	}
+
+.leaflet-draw-draw-rectangle:before {
+	background-position: -62px -2px !important;
+	}
+
+.leaflet-draw-draw-circle:before {
+	background-position: -92px -2px !important;
+	}
+
+.leaflet-draw-draw-marker:before {
+	background-position: -122px -2px !important;
+	}
+
 
 .leaflet-draw a {
 	display: block;
@@ -169,25 +201,25 @@
 ─┴┘┴└─┴ ┴└┴┘   ┴ └─┘└─┘┴─┘└─┘┴ ┴┴└─
 */
 
-.leaflet-draw-toolbar .leaflet-draw-draw-polyline {
-	background-position: -2px -2px;
+/*.leaflet-draw-draw-polyline a:before {
+	background-position: -2px -2px !important;
 	}
 
-.leaflet-draw-toolbar .leaflet-draw-draw-polygon {
-	background-position: -31px -2px;
+.leaflet-draw-draw-polygon a:before {
+	background-position: -31px -2px !important;
 	}
 
-.leaflet-draw-toolbar .leaflet-draw-draw-rectangle {
-	background-position: -62px -2px;
+.leaflet-draw-draw-rectangle a:before {
+	background-position: -62px -2px !important;
 	}
 
-.leaflet-draw-toolbar .leaflet-draw-draw-circle {
-	background-position: -92px -2px;
+.leaflet-draw-draw-circle a:before {
+	background-position: -92px -2px !important;
 	}
 
-.leaflet-draw-toolbar .leaflet-draw-draw-marker {
-	background-position: -122px -2px;
-	}
+.leaflet-draw-draw-marker a:before {
+	background-position: -122px -2px !important;
+	}*/
 
 
 /*
@@ -529,9 +561,13 @@
 .leaflet-control-baselayertoggle {
 	background-color: white;
 	cursor: pointer;
-	}	
+	}
 
-.leaflet-bar a:hover,
+.leaflet-bar a:hover {
+	background-color: white;
+}	
+
+/*.leaflet-bar a:hover,*/
 .leaflet-control-baselayertoggle:hover {
 	background-color: #f4f4f4;
 	}	
@@ -616,22 +652,35 @@
 	content: '';
 	background-image: url(images/evil_sprite.png);
 	background-repeat: no-repeat;
-	/*background-position: -145px -75px;*/
-	background-position: -99px -75px;
-
-
+	/*background-position: -99px -75px;*/
+	background-position: -145px -75px;
 	height: 26px !important;
 	width: 26px !important;
 	position: absolute;
 	top: 0;
 	left: 0;
-	background-color: white;
 	box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3);	
 	}
 
 .leaflet-control-baselayertoggle:hover:after {
 	background-position: -99px -75px;
 	}
+
+
+.leaflet-control-baselayertoggle:after {
+	background-color: white;
+	}
+
+.leaflet-control-baselayertoggle.open:after {
+	background-color: #e5e5e5;
+	}
+
+
+
+
+
+
+
 
 .baselayertoggle-item {
 	width: auto;
@@ -686,6 +735,11 @@
 	padding-left: 15px;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
+	display: none;
+	}
+
+.leaflet-control-baselayertoggle.open > .baselayertoggle-list {
+	display: block;
 	}
 
 .baselayertoggle-list:before {
@@ -698,6 +752,10 @@
 	left: 8px;
 	z-index: -1;
 	}
+
+/*.baselayertoggle-list.collapsed:before {
+	background-color: ;
+	}*/
 
 
 	
@@ -712,12 +770,26 @@
 	height: 26px;
 	background-color: white;
 	margin-bottom: 3px;	
-	background-image: url(images/evil_sprite.png);
-	background-repeat: no-repeat;
-	background-position: -99px -106px;
 	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
 	cursor: pointer;
 	}	
+
+.leaflet-draw-section-button:before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 26px;
+	height: 26px;
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: -99px -106px;
+	opacity: 0.75;
+	}
+
+.leaflet-draw-section-button:hover:before {
+	opacity: 1;
+	}
 
 .leaflet-draw-section:first-child {
 	margin-top: 6px;
@@ -739,7 +811,7 @@
 	}
 
 .open-drawer {
-	background-color: #CCFFFF;
+	background-color: #e5e5e5;
 	}
 
 
@@ -2053,13 +2125,32 @@
 	top: 0;
 	left: 0;
 	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) !important;
-	background-image: url(images/evil_sprite.png);
-	background-repeat: no-repeat;
-	background-position: 2px -271px;	
 	}
 
+.cartocss-toolbar-button:hover:before {
+	opacity: 1;
+	}
+
+.cartocss-toolbar-button:before {
+	content: '';
+	width: 26px;
+	height: 26px;
+	top: 0;
+	left: 0;
+	position: absolute;
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: 2px -271px;
+	opacity: 0.7;
+	}
+
+
+.cartocss-toolbar-button.open {
+	background-color: #e5e5e5;
+	}	
+
 .cartocss-toolbar-button:hover {
-	background-color: #f4f4f4;
+	/*background-color: #f4f4f4;*/
 	}
 
 .cartocss-control-container.open {

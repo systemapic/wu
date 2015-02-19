@@ -184,6 +184,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 	createLink : function () {
 
+
 		// create hash, callback
 		app.setHash(function (context, hash) {
 
