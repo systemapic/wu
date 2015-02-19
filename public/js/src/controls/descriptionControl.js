@@ -157,6 +157,9 @@ L.Control.Description = L.Control.extend({
 		// turn on editing
 		this.editOn();
 
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'Description: edit content']);
+
 	},
 	
 	editOn : function () {
@@ -285,6 +288,11 @@ L.Control.Description = L.Control.extend({
 		} else {
 			this._isClosed ? this.mobileOpenPane() : this.mobileClosePane();
 		}
+
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'Description toggle']);
+
 
 	},
 

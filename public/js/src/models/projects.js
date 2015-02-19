@@ -363,6 +363,11 @@ Wu.Project = Wu.Class.extend({
 
 		// set status
 		app.setStatus('Deleted!');
+
+		// Save new project name to GA
+		var deletedProjectName = project.getName();
+		ga('set', 'dimension9', deletedProjectName);
+
 	},
 
 	saveColorTheme : function () {

@@ -160,6 +160,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// twice confirmed, delete
 		this.confirmDeleteClient();
 
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: delete client']);
+
+
 	},
 
 	confirmDeleteClient : function () {
@@ -230,18 +234,11 @@ Wu.SidePane.Client = Wu.Class.extend({
 			callback : this._projectCreated,
 			context : this
 		}
-		project._saveNew(callback); 
+		project._saveNew(callback);
 
-		// cxxxx
-		// generate project thumb 
-		// if no timeout: 	creates thumb on active project before new was selected
-		// 			active project (project object) is not ready when _markActive gets triggered)
 
-		// Of course dodgy ~ 500ms er ikke nok...
-
-	
-
-		// Mark this project as active
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: new project']);
 		
 
 		
@@ -262,12 +259,16 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	_projectCreated : function (project, json) {
 
+
 		var result = JSON.parse(json);
 		var error  = result.error;
 		var store  = result.project;
 
 		// return error
 		if (error) return console.log('there was an error creating new project!', error);			
+
+		// GA – Register new project ID (This project has no title yet, so it's useless to save title)
+		ga('set', 'dimension8', store.uuid);	
 
 		// add to global store
 		app.Projects[store.uuid] = project;
@@ -277,6 +278,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// add to access locally
 		project.addAccess();
+
 
 		// create project in sidepane
 		this._createNewProject(project);
@@ -378,6 +380,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		Wu.DomEvent.on( target,  'blur',    this.editedName, this );     	// save title
 		Wu.DomEvent.on( target,  'keydown', this.editKeyed,  this );           // save title
 
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: edit client name']);
+
+
 	},
 
 	editedName : function (e) {
@@ -423,6 +429,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// save on blur or enter
 		Wu.DomEvent.on( target,  'blur',    this.editedDescription, this );     // save title
 		Wu.DomEvent.on( target,  'keydown', this.editKeyed,   	    this );     // save title
+
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: edit client description']);
 
 	},
 

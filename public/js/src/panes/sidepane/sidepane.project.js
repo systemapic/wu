@@ -68,6 +68,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// add delete button
 		var canDelete = app.Account.canDeleteProject(this.project.store.uuid);
+
 		if (canDelete || this.options.editMode) {
 			this.makeThumb = Wu.DomUtil.create('div', 'new-project-thumb', this.usersInnerWrapper, 'Generate thumbnail');
 			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');			
@@ -164,6 +165,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		}
 
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: toggle project info']);
+
 
 
 	},
@@ -181,6 +185,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 	addEditHooks : function () {
 
 		if (!this.project.editMode) return;
+
+		// cxxxxxx
 
 		// editing hooks
 		Wu.DomEvent.on(this.name, 	 'dblclick', this.edit, this);
@@ -222,6 +228,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// Set state to manually updated to prevet overriding
 		this.project.setThumbCreated(true);
 		this.project.createProjectThumb();
+
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: make new thumbnail']);
 
 	},
 
@@ -314,11 +323,16 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// dont select if already active
 		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho not active.. fix!
 
+		// Google Analytics
+		var _prodID = this.project.getUuid();
+		app.Analytics.setGaProject(_prodID);	
+
 		// select project
-		this.project.select();
+		this.project.select();		
 
 		// remove startpane if active
 		app.StartPane.deactivate();
+
 	},
 
 	// add class to mark project active in sidepane
@@ -362,6 +376,10 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// save on blur or enter
 		Wu.DomEvent.on( target,  'blur',    this._editNameBlur, this );     // save folder title
 		Wu.DomEvent.on( target,  'keyup', this._editKeyName,  this );     // save folder title
+
+
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: edit project title']);
 
 	},
 
@@ -416,6 +434,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent.on( target,  'blur',    this._editDescriptionBlur, this );     // save folder title
 		Wu.DomEvent.on( target,  'keydown', this._editKey,  this );     // save folder title
 
+
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: edit project description']);
 	},
 
 	_editDescriptionBlur : function (e) {
@@ -502,6 +523,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// twice confirmed, delete
 		this.confirmDelete();
+
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: delete project']);
 
 	},
 
