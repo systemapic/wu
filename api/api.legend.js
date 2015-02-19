@@ -140,7 +140,6 @@ module.exports = api.legend = {
 		async.waterfall(ops, function (err, legends) {
 			console.log('waterfall done');
 			console.log('err, legends', err, legends);
-			// console.log('err string: ', err.toString());
 
 			// catch err?
 			if (err) res.end(JSON.stringify({
@@ -166,26 +165,20 @@ module.exports = api.legend = {
 		mapnik.register_default_input_plugins();
 
 		var map = new mapnik.Map(100, 50);
-		// map.load('./test/stylesheet.xml', function(err,map) {
 
 		try {
 			map.load(stylepath, function(err, map) {
 				if (err) console.error('map.load err', err); // eg. if wrong path 
-
 
 				if (err) return callback(err);
 
 				map.zoomAll(); // todo: zoom?
 				var im = new mapnik.Image(100, 50);
 				map.render(im, function(err,im) {
-					// if (err) throw err;
 					if (err) console.log('map.render err', err);
 
 					im.encode('png', function(err, buffer) {
-						// if (err) throw err;
 						if (err) console.log('im.encode err: ', err);
-						// fs.writeFile('map.png',buffer, function(err) {
-						// var outpath = LEGENDSPATH + lid + '.png';
 						var outpath = api.config.path.legends + lid + '.png';
 						fs.writeFile(outpath, buffer, function(err) {
 							if (err) throw err;

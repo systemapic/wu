@@ -985,3 +985,20 @@ module.exports = api.layer = {
 
 
 }
+
+// systemapic hack
+carto.Renderer.prototype.getRules = function render(data) {
+
+    var env = _(this.env).defaults({
+        benchmark: true,
+        validation_data: false,
+        effects: []
+    });
+
+    if (!carto.tree.Reference.setVersion(this.options.mapnik_version)) {
+        throw new Error("Could not set mapnik version to " + this.options.mapnik_version);
+    }
+    var parser = (carto.Parser(env)).parse(data);
+    return parser;
+}
+
