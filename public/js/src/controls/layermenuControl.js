@@ -18,6 +18,7 @@ L.Control.Layermenu = L.Control.extend({
 
 		container.appendChild(this._layermenuOuter);
 
+
 		// add some divsscroller-frame
 		this.initLayout();
 
@@ -31,6 +32,7 @@ L.Control.Layermenu = L.Control.extend({
 
 
 	initLayout : function () {		
+
 
 		// Create the header    
 		this._layerMenuHeader = Wu.DomUtil.createId('div', 'layer-menu-header');
@@ -61,7 +63,6 @@ L.Control.Layermenu = L.Control.extend({
 			this._legendsCollapser = app.MapPane.legendsControl._legendsCollapser;
 		}
 
-		// Register Click events cxxxx                     
 		Wu.DomEvent.on(this._bhattan1,   'click', this.closeLayerPane, this);
 		Wu.DomEvent.on(this._openLayers, 'click', this.toggleLayerPane, this);     
 
@@ -90,6 +91,9 @@ L.Control.Layermenu = L.Control.extend({
 			// Mobile arrow	
 		    	Wu.DomUtil.create('div', 'layers-mobile-arrow', this._innerContainer);
 		}
+
+
+
 
 	},
 
@@ -217,6 +221,9 @@ L.Control.Layermenu = L.Control.extend({
 
 		if (this.editMode) return;
 
+		// Make container visible
+		Wu.DomUtil.removeClass(this._parentWrapper, 'displayNone');
+
 		// set editMode
 		this.editMode = true;
 
@@ -225,6 +232,10 @@ L.Control.Layermenu = L.Control.extend({
 
 		// turn off dropzone dragging
 		if (app.Dropzone) app.Dropzone.disable();
+
+
+		// Set attribute draggable to true on all divs
+		this.enableDraggable();
 		
 		// enable drag'n drop in layermenu
 		this.enableSortable();
@@ -252,6 +263,11 @@ L.Control.Layermenu = L.Control.extend({
 
 		if (!this.editMode) return;
 
+		if (!this.project.store.layermenu || this.project.store.layermenu.length == 0 ) {
+			// Hide parent wrapper if empty
+			Wu.DomUtil.addClass(this._parentWrapper, 'displayNone');
+		}		
+
 		// set editMode
 		this.editMode = false;
 		
@@ -260,6 +276,9 @@ L.Control.Layermenu = L.Control.extend({
 
 		// turn off dropzone dragging
 		if (app.Dropzone) app.Dropzone.enable();
+
+		// Set attribute draggable to true on all divs
+		this.disableDraggable();		
 		
 		// disable layermenu sorting
 		this.disableSortable();
@@ -325,7 +344,7 @@ L.Control.Layermenu = L.Control.extend({
 			var el = items[i];
 			
 			// set attrs
-			el.setAttribute('draggable', 'true');
+			// el.setAttribute('draggable', 'true');
 			
 			// set dragstart event
 			Wu.DomEvent.on(el, 'dragstart', this.drag.start, this);
@@ -341,6 +360,30 @@ L.Control.Layermenu = L.Control.extend({
 		} 
 
 
+	},
+
+	enableDraggable : function () {
+
+		// iterate over all layers
+		var items = document.getElementsByClassName('layer-menu-item-wrap');
+		for (var i = 0; i < items.length; i++) {
+			var el = items[i];
+			
+			// set attrs
+			el.setAttribute('draggable', true);
+		};
+	},
+
+	disableDraggable : function () {
+		
+		// iterate over all layers
+		var items = document.getElementsByClassName('layer-menu-item-wrap');
+		for (var i = 0; i < items.length; i++) {
+			var el = items[i];
+			
+			// set attrs
+			el.setAttribute('draggable', false);
+		};		
 	},
 
 	resetSortable : function () {
@@ -872,7 +915,7 @@ L.Control.Layermenu = L.Control.extend({
 
 		wrap.id 	= uuid;
 		Wu.DomUtil.addClass(wrap, 'level-' + item.pos);
-		wrap.setAttribute('draggable', true); 	// mark as draggable
+		wrap.setAttribute('draggable', false); 	// mark as draggable
 		this._content.appendChild(wrap); 	// append to layermenu
 
 		// get elems
@@ -917,8 +960,26 @@ L.Control.Layermenu = L.Control.extend({
 	
 	_fill : function () {
 
+
+		// Get parent wrapper
+		this._parentWrapper = this._container.parentNode;
+
+
 		// return if empty layermenu
-		if (!this.project.store.layermenu) return;
+		if (!this.project.store.layermenu || this.project.store.layermenu.length == 0 ) {
+
+			// Hide parent wrapper if empty
+			Wu.DomUtil.addClass(this._parentWrapper, 'displayNone');
+
+			return;
+
+		}
+
+		// Show parent wrapper if not empty
+		Wu.DomUtil.removeClass(this._parentWrapper, 'displayNone');
+
+
+		// console.log('layers are there, yo!', this.project.store.layermenu.length);
 
 		// iterate layermenu array and fill in to layermenu
 		this.project.store.layermenu.forEach(function (item) {
