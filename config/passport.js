@@ -9,16 +9,17 @@ var LocalStrategy = require('passport-local').Strategy;
 // load up the user model
 var User = require('../models/user');
 
+
 // redis, crypto
 var crypto = require('crypto');
 var redis = require('redis');
 var config = require('../config/config');
 
-// redis config
+
 var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host)
 r.auth(config.tokenRedis.auth);
 r.on('error', function (err) {
-	console.error('Redis Error: ', err);
+	console.error(err);
 });
 
 
@@ -65,6 +66,7 @@ module.exports = function(passport) {
 			// we are checking to see if the user trying to login already exists
 			User.findOne({ 'local.email' :  email }, function(err, user) {
 				// if there are any errors, return the error
+<<<<<<< HEAD
 				if (err) return done(err);
 
 				// check to see if there's already a user with that email
@@ -84,6 +86,7 @@ module.exports = function(passport) {
 					if (err) console.error(err);
 					return done(null, newUser);
 				});
+
 
 			});    
 
@@ -112,6 +115,7 @@ module.exports = function(passport) {
 		// we are checking to see if the user trying to login already exists
 		User.findOne({ 'local.email' :  email }, function(err, user) {
 			// if there are any errors, return the error before anything else
+
 			if (err) return done(err);
 
 			// if no user is found, return the message
@@ -123,6 +127,7 @@ module.exports = function(passport) {
 			// set token, save to user
 			user.token = setRedisToken(user);
 			user.save(function (err) {
+
 				if (err) console.error(err);
 
 				// all is well, return successful user
@@ -139,6 +144,7 @@ module.exports = function(passport) {
 	
 
 	// tiles access token
+
 	// - set an access token for each time user logs in
 	// - access token stored in redis
 	// - redis replicated securely on tx
@@ -158,7 +164,6 @@ module.exports = function(passport) {
 		// return token
 		return tok;
 	}
-
 
 
 };
