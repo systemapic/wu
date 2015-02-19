@@ -123,10 +123,10 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		HTML._zoomBoundsLeftInput = Wu.DomUtil.makeit({type : 'input', id : 'editor-map-bounds-max-zoom-value', cname : 'form-control margined eightyWidth', appendto : HTML._zoomBoundsLeft});
 
 		// Min Zoom
-		HTML._zoomBoundsRight = Wu.DomUtil.makeit({type : 'div', cname : 'bounds-zoom-half left', appendto : HTML._zoomBounds});
+		HTML._zoomBoundsRight = Wu.DomUtil.makeit({type : 'div', cname : 'bounds-zoom-half right', appendto : HTML._zoomBounds});
 		HTML._zoomBoundsRightHeader = Wu.DomUtil.makeit({type : 'div', cname : 'bounds-zoom-h2', inner : 'Min Zoom', appendto : HTML._zoomBoundsRight});
-		HTML._zoomBoundsRightBtn = Wu.DomUtil.makeit({type : 'button', id : 'editor-map-bounds-set-minZoom', cname : 'smap-button-white', inner : 'Set', appendto : HTML._zoomBoundsRight, attr : [['type', 'button']]});
 		HTML._zoomBoundsRightInput = Wu.DomUtil.makeit({type : 'input', id : 'editor-map-bounds-min-zoom-value', cname : 'form-control margined eightyWidth', appendto : HTML._zoomBoundsRight});
+		HTML._zoomBoundsRightBtn = Wu.DomUtil.makeit({type : 'button', id : 'editor-map-bounds-set-minZoom', cname : 'smap-button-white', inner : 'Set', appendto : HTML._zoomBoundsRight, attr : [['type', 'button']]});
 
 
 

@@ -850,6 +850,10 @@ L.Control.CartoCSS = L.Control.extend({
 
 	open : function () {
 
+
+		// Set button to open
+		Wu.DomUtil.addClass(this._toolbarButton, 'open');
+
 		// update
 		this._update();
 
@@ -861,6 +865,9 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	close : function () {
+
+		// Set button to closed
+		Wu.DomUtil.removeClass(this._toolbarButton, 'open');
 
 		// add closed class
 		Wu.DomUtil.removeClass(this._editorContainer, 'open');
