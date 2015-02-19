@@ -16,6 +16,12 @@
 // (unique ID for maps.systemapic.com => 98026334)
 
 
+
+
+// Må ingorere IP adressen til phantom på i GA... 
+// http://web-design-weekly.com/snippets/exclude-ip-address-from-google-analytics/
+
+
 // ****************************** //
 // * CUSTOM DIMENSIONS OVERVIEW * //
 // ****************************** //
@@ -32,6 +38,7 @@
 // dimension10 = New User (ID)
 // dimension11 = New User (Name)
 // dimension12 = Delted User (Name)
+// dimension13 = User IP (Session)
 
 
 
@@ -84,9 +91,11 @@ Wu.Analytics = Wu.Class.extend({
 		var dimension5Value = userId;
 		ga('set', 'dimension5', dimension5Value);
 
-		this._userSet = true;
+		// TODO
+		// UserIP ~ Custom dimension 
+		// ga('set', 'dimension13', userIP);
 
-		// TODO: set user IP address (if google dosn't do this already... which they probably do)
+		this._userSet = true;
 
 	},
 

@@ -1522,14 +1522,14 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		var box 		= Wu.DomUtil.create('div', 'connect-osm', this._outer);
 		var h4_3		= Wu.DomUtil.create('div', 'connect-title', box, 'Open Street Map');
 		this._osmwrap 		= Wu.DomUtil.create('div', 'osm-connect-wrap', this._outer);
-		this._osmbox 		= Wu.DomUtil.create('div', 'osm-add-box', this._osmwrap, 'Add OSM layer');
+		this._osmbox 		= Wu.DomUtil.create('div', 'osm-add-box smap-button-white', this._osmwrap, 'Add OSM layer');
 
 		// mapbox connect
 		var wrap 	  	= Wu.DomUtil.create('div', 'connect-mapbox', this._outer);
 		var h4_2 		= Wu.DomUtil.create('div', 'connect-title', wrap, 'Mapbox');
-		this._mapboxWrap  	= Wu.DomUtil.create('div', 'mapbox-connect-wrap ct11', this._outer);
+		this._mapboxWrap  	= Wu.DomUtil.create('div', 'mapbox-connect-wrap', this._outer);
 		this._mapboxInput 	= Wu.DomUtil.create('input', 'input-box search import-mapbox-layers', this._mapboxWrap);
-		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-gray ct0 ct11 import-mapbox-layers-button', this._mapboxWrap, 'Add');
+		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-white import-mapbox-layers-button', this._mapboxWrap, 'Add');
 		this._mapboxAccounts 	= Wu.DomUtil.create('div', 'mapbox-accounts', this._mapboxWrap);
 		
 		// clear vars n fields
@@ -1696,10 +1696,10 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		if (!this.project.editMode) return;
 
 		// refresh button 
-		var refresh = Wu.DomUtil.create('div', 'mapbox-listed-account-refresh', wrap);
+		var refresh = Wu.DomUtil.create('div', 'mapbox-listed-account-refresh smap-button-white', wrap);
 
 		// delete button
-		var del = Wu.DomUtil.create('div', 'mapbox-listed-account-delete', wrap);
+		var del = Wu.DomUtil.create('div', 'mapbox-listed-account-delete smap-button-white', wrap);
 
 
 		// refresh event
