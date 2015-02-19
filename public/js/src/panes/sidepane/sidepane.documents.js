@@ -306,6 +306,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// refresh
 		this.update();
 
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Documents: New folder']);
+
 	},
 
 	createFolders : function () {
@@ -364,6 +368,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			delete this.folders[uuid];
 			this.save();
 		}
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Documents: Delete folder']);
+
 	},
 
 	_renameFolder : function (e, uuid) {

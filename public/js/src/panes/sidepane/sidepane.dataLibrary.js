@@ -325,6 +325,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// create download dialog
 		this.createDownloadDialog();
 
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Data library: download files']);
+
+
 	},
 
 	receivedDownload : function (that, response) {
@@ -377,7 +382,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		if (this._container) this._container.style.display = 'block';
 
 		// Show toolbar (upload, download, delete, search);
-		Wu.DomUtil.removeClass(this._content, 'hide-top', this);		
+		Wu.DomUtil.removeClass(this._content, 'hide-top', this);	
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Data library: cancel download']);
 	},
 
 	downloadDone : function () {
@@ -445,6 +453,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		if (confirm('Are you sure you want to delete these ' + checks.length + ' files?')) {    
 			this.deleteFiles(checks);
 		} 
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Data library: delete files']);
+
 	},
 
 	deleteFiles : function (files) {
@@ -929,6 +941,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// add outside click event
 		Wu.DomEvent.on(window, 'mousedown', this._closeCategories, this);
 
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Data library: inject category']);
+
+
 	},
 
 	createCategoryLine : function (wrapper, c, file) {
@@ -1077,6 +1094,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		Wu.DomEvent.on(input,  'blur', this.injectKeywordsBlur, this);   // save folder title
 		Wu.DomEvent.on(input,  'keydown', this.editKey, this);    	 // fire blur on key press
 
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Data library: inject keywords']);
 	},
 
 	injectKeywordsBlur : function (e) {
@@ -1114,6 +1133,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// save on blur or enter
 		Wu.DomEvent.on( e.target,  'blur', this.editBlur, this );     // save folder title
 		Wu.DomEvent.on( e.target,  'keydown', this.editKey, this );     // save folder title
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Data library: rename ' + e.target.fieldKey]);
 
 	},
 

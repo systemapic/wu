@@ -137,6 +137,11 @@ L.Control.Legends = L.Control.extend({
 		// Open / Close Legends for mobile phones
 		else this._isOpen ? this.MobileCloseLegends() : this.MobileOpenLegends();
 
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'Legends: toggle open']);
+
+
 	},
 
 	MobileCloseLegends : function(e) {

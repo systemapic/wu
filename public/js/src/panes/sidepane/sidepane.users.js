@@ -207,6 +207,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// get value and search
 		var value = this._search.value;
 		this.list.search(value);
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Users: Search users', value]);
+
+
 	},
 
 
@@ -294,6 +299,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	
 	// input fullscreen for new user details
 	inputUser : function () {
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Users: Create new user']);
 
 
 		// Hide the Create user etc.
@@ -385,6 +393,10 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// Show the Create user etc.
 		Wu.DomUtil.removeClass(this._content, 'hide-top', this);
 
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Users: Cancel create new user']);
+
+
 	},
 
 	confirmInput : function () {
@@ -425,6 +437,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// Show the Create user etc.
 		Wu.DomUtil.removeClass(this._content, 'hide-top', this);
 
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Users: Confirm new user', firstName + ' ' + lastName]);
+
 	},
 
 
@@ -440,17 +455,30 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	// reply from server
 	createdUser : function (context, json) {
+
 		// console.log('createdUser: ', context, json);
 
 		var store = JSON.parse(json);
 		var user = new Wu.User(store);
 		user.attachToApp();
 		context.addTableItem(user); 	// todo: add user to top
+
+
+		// GA – New User ID
+		ga('set', 'dimension10', store.uuid);
+
+		// GA – New User Name
+		var newUserName = user.getFullName();
+		ga('set', 'dimension11', newUserName);
+		
+
+
+
 	},
 
 
 
-	deleteUser : function () {
+	deleteUser : function () {		
 
 		var checked = this.getSelected();
 
@@ -471,14 +499,24 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 				if (confirm('Are you REALLY SURE you want to delete user ' + name + '?')) {
 					this.confirmDelete(user);
 				}			
-			}	
+			}
+
+			// Google Analytics event tracking
+			app.Analytics.ga(['Side Pane', 'Users: Delete user', name]);
+
 		}, this);
 		
 	},
 
 	confirmDelete : function (user) {
+
 		// delete user      cb
 		user.deleteUser(this, 'deletedUser');
+
+		// GA – Deleted Username
+		var _delUsrName = user.getFullName();
+		ga('set', 'dimension12', _delUsrName);		
+		
 	},
 
 	deletedUser : function (context) {
@@ -678,6 +716,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	},
 
 	editAccess : function (uuid) {
+
 		var user = app.Users[uuid];
 
 		// open backpane
@@ -685,6 +724,13 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// Hide the Create user etc.
 		Wu.DomUtil.addClass(this._content, 'hide-top', this);
+
+		// Google Analytics event tracking
+		var _uId = user.getUuid();
+		var _uName = user.getName()
+		app.Analytics.ga(['Side Pane', 'Users: Edit access', _uName + ' (' + _uId + ' )']);
+
+
 	},
 
 
@@ -732,8 +778,10 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this.update();
 
 		// Show the Create user etc.
-		Wu.DomUtil.removeClass(this._content, 'hide-top', this);		
+		Wu.DomUtil.removeClass(this._content, 'hide-top', this);	
 
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Users: Close manage access']);
 
 	},
 
@@ -808,6 +856,13 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// add/remove
 		state ? this._removeRead(item) : this._addRead(item);
 
+
+		// Google Analytics event tracking
+		var _uId = user.getUuid();
+		var _uName = user.getName()
+		app.Analytics.ga(['Side Pane', 'Users: Toggle read access' + state, _uName + ' (' + _uId + ' )']);
+
+
 	},
 
 	_removeRead : function (item) {
@@ -871,6 +926,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// add/remove update access
 		state ? this._removeUpdate(item) : this._addUpdate(item);
 
+		// Google Analytics event tracking
+		var _uId = user.getUuid();
+		var _uName = user.getName()
+		app.Analytics.ga(['Side Pane', 'Users: Toggle editor access' + state, _uName + ' (' + _uId + ' )']);
+
 	},
 
 	toggleManageAccess : function (item) {
@@ -883,6 +943,10 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// add/remove manage access
 		state ? this._removeManage(item) : this._addManage(item);
 		
+		// Google Analytics event tracking
+		var _uId = user.getUuid();
+		var _uName = user.getName()
+		app.Analytics.ga(['Side Pane', 'Users: Toggle manager access' + state, _uName + ' (' + _uId + ' )']);
 
 	},
 
@@ -916,6 +980,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// save on blur or enter
 		Wu.DomEvent.on( e.target, 'blur',    this.editBlur, this );
 		Wu.DomEvent.on( e.target, 'keydown', this.editKey,  this );
+
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Users: Edit ' + e.target.fieldKey]);
+
 
 	},
 

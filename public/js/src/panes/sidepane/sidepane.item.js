@@ -114,6 +114,10 @@ Wu.SidePane.Item = Wu.Class.extend({
 		// continue tab activation
 		this.activate();
 
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Select: ' + this.type]);
+
+
 	},
 
 	mobileReActivate : function () {
@@ -130,7 +134,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 	
 	activate : function (e) {
 
-		console.log('activate sidepane menu item', this);
+		// console.log('activate sidepane menu item', this);
 	
 		// set active menu
 		var prev = Wu.app._activeMenu || false;

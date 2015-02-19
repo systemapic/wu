@@ -215,6 +215,9 @@ Wu.StartPane = Wu.Class.extend({
 
 	selectProject : function(project) {
 
+		// Google Analytics
+		app.Analytics.setGaProject(project.store.uuid);
+
 		// select project
 		project.select();
 
@@ -223,6 +226,9 @@ Wu.StartPane = Wu.Class.extend({
 
 		// Hide the Start Pane
 		this.deactivate();
+
+		// // Google Analytics event trackign
+		// app.Analytics.ga(['Start Pane', 'select project', project.getName()]);
 
 	},
 

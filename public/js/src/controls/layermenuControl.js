@@ -176,6 +176,10 @@ L.Control.Layermenu = L.Control.extend({
 		}	
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
 		app._map._controlCorners.topright.style.right = '140px';
+
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'Layers: close']);
 		
 
 	
@@ -209,6 +213,9 @@ L.Control.Layermenu = L.Control.extend({
 			if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
 
 		}
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'Layers: open']);
 
 	},
 
@@ -683,12 +690,24 @@ L.Control.Layermenu = L.Control.extend({
 	toggleLayer : function (item) {
 		if (this.editMode) return;
 
+		// if ( item.layer ) { var _layerName = item.layer.getTitle(); }
+		// else { var _layerName = 'folder'; }
+		
+		var layer = item.layer;
+		var _layerName = layer ? layer.getTitle() : 'Folder';
+		// var _layerName = item.layer.store.title;
+
 		// toggle
 		if (item.on) {
 			this.disableLayer(item);
+			// Google Analytics event tracking
+			app.Analytics.ga(['Controls', 'Layer hide: ' + _layerName ]);
 		} else {
 			this.enableLayer(item);
-		}       
+			// Google Analytics event tracking
+			app.Analytics.ga(['Controls', 'Layer show: ' + _layerName ]);
+		}    
+
 	},
 
 	_enableLayer : function (layerUuid) {
