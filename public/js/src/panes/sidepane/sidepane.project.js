@@ -48,11 +48,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// Project info box (with little "i")
 		this.users = Wu.DomUtil.create('div', 'project-users-wrap', this._container);
 
-
-		// ****************************************************************************
-		// ****************************************************************************
-
-
 		// this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this.users);
 		this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this._container);
 
@@ -79,14 +74,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');			
 		}
 
-
-
-
-		// ****************************************************************************
-		// ****************************************************************************
-
+		// set logo??
 		this.hookThumb();
-
 
 		// add hooks
 		this.addHooks();
@@ -237,7 +226,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 	makeNewThumbnail : function () {
 
 		// Set state to manually updated to prevet overriding
-		// app.Projects[this.project.store.uuid].store.sidePaneLogo.manuallyUpdated = true;
 		this.project.setThumbCreated(true);
 		this.project.createProjectThumb();
 

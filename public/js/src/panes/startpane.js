@@ -383,11 +383,13 @@ Wu.StartPane = Wu.Class.extend({
 		// Store how many projects we want to show
 		this.dimensions.projectNo = no;
 
-		for (var i = 0; i < this.projects.length - 1; i++) {
+		for (var i = 0; i < this.projects.length; i++) {
 			if (i < no) {
-				Wu.DomUtil.removeClass(this.projectContainers[i]._projectContainer, 'displayNone');
+				var project = this.projectContainers[i];
+				if (project) Wu.DomUtil.removeClass(project._projectContainer, 'displayNone');
 			} else {
-				Wu.DomUtil.addClass(this.projectContainers[i]._projectContainer, 'displayNone');
+				var project = this.projectContainers[i];
+				if (project) Wu.DomUtil.addClass(project._projectContainer, 'displayNone');
 			}	    
 		}
 

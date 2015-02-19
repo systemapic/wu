@@ -11,8 +11,6 @@ L.Control.Layermenu = L.Control.extend({
 		    options   = this.options;
 
 		// add html
-		// container.innerHTML = ich.layerMenuFrame();  // nb: this._innerContainer = container;
-
 		this._layermenuOuter 	= Wu.DomUtil.create('div', 'scroller-frame');
 		var _scrollUp 		= Wu.DomUtil.create('div', 'scroll-up', this._layermenuOuter);
 		var _innerScroller 	= Wu.DomUtil.create('div', 'inner-scroller', this._layermenuOuter);
@@ -26,7 +24,6 @@ L.Control.Layermenu = L.Control.extend({
 		// stops
 		Wu.DomEvent.on(container, 'mouseup', Wu.DomEvent.stop, this);
 
-
 		// nb! content is not ready yet, cause not added to map! 
 		return container;
 
@@ -39,6 +36,7 @@ L.Control.Layermenu = L.Control.extend({
 		this._layerMenuHeader = Wu.DomUtil.createId('div', 'layer-menu-header');
 		Wu.DomUtil.addClass(this._layerMenuHeader, 'menucollapser');
 		
+		// title
 		this._layerMenuHeaderTitle = Wu.DomUtil.create('div', 'layer-menu-header-title', this._layerMenuHeader, 'Layers');
 
 		// Create the collapse button
@@ -58,12 +56,13 @@ L.Control.Layermenu = L.Control.extend({
 		app._map._controlCorners.bottomright.appendChild(this._openLayers);
 
 		// Pick up Elements dealing with the Legends
-		this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
-		this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
+		if (app.MapPane.legendsControl) {
+			this._legendsContainer = app.MapPane.legendsControl._legendsContainer;
+			this._legendsCollapser = app.MapPane.legendsControl._legendsCollapser;
+		}
 
 		// Register Click events cxxxx                     
 		Wu.DomEvent.on(this._bhattan1,   'click', this.closeLayerPane, this);
-		// Wu.DomEvent.on(this._openLayers, 'click', this.openLayerPane, this);
 		Wu.DomEvent.on(this._openLayers, 'click', this.toggleLayerPane, this);     
 
 		// Stop Propagation
@@ -87,16 +86,10 @@ L.Control.Layermenu = L.Control.extend({
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
 
-
-		if ( Wu.app.mobile ) {
-			// this._content.style.left = Wu.app.nativeResolution[1] + 'px';
-			// this._isClosed = true;
-
+		if (app.mobile) {
 			// Mobile arrow	
 		    	Wu.DomUtil.create('div', 'layers-mobile-arrow', this._innerContainer);
-
 		}
-
 
 	},
 
@@ -166,14 +159,13 @@ L.Control.Layermenu = L.Control.extend({
 
 		// Collapse Wrapper
 		app._map._controlCorners.bottomright.style.width = '0px';
-
 		Wu.DomUtil.removeClass(this._openLayers, 'ol-collapsed');
 		
-
 		// Slide the LEGENDS
-		if ( app.MapPane.inspectControl ) {
-			if (this._legendsContainer) Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
+		if (app.MapPane.inspectControl && this._legendsContainer) {
+			Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
 		}	
+		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
 		app._map._controlCorners.topright.style.right = '140px';
 
@@ -484,12 +476,10 @@ L.Control.Layermenu = L.Control.extend({
 			var div = this.layers[invalid.uuid].el;
 			Wu.DomUtil.addClass(div, 'invalidLayermenuitem');
 
-
 		}, this)
 	},
 
 	clearInvalid : function () {
-		console.log('clearInvalid!');
 		for (l in this.layers) {
 			var layer = this.layers[l];
 			Wu.DomUtil.removeClass(layer.el, 'invalidLayermenuitem');
@@ -871,12 +861,6 @@ L.Control.Layermenu = L.Control.extend({
 		
 
 		// For some reason, HTML must come as string. 
-
-		// var up = Wu.DomUtil.create('div', 'layer-item-up', wrap);
-		// var down = Wu.DomUtil.create('div', 'layer-item-down', wrap);
-		// var del = Wu.DomUtil.create('div', 'layer-item-delete', wrap);
-		// var inner = Wu.DomUtil.create('div', 'layer-menu-item', wrap, item.caption);
-
 		var _iH = 	'<div class="layer-item-up">></div>' +
 			  	'<div class="layer-item-down"><</div>' +
 				'<div class="layer-item-delete">x</div>' +
@@ -886,17 +870,10 @@ L.Control.Layermenu = L.Control.extend({
 
 		wrap.innerHTML 	= _iH;
 
-
 		wrap.id 	= uuid;
 		Wu.DomUtil.addClass(wrap, 'level-' + item.pos);
 		wrap.setAttribute('draggable', true); 	// mark as draggable
 		this._content.appendChild(wrap); 	// append to layermenu
-
-
-
-
-
-
 
 		// get elems
 		var up    = wrap.children[0];
@@ -1109,7 +1086,6 @@ L.Control.Layermenu = L.Control.extend({
 
 		// get vars
 		this.project  = project || Wu.app.activeProject;
-//		this._content = Wu.DomUtil.get('layer-menu-inner-content'); // cxxxx
 		this.layers   = {};
 		
 		// create layermenu
@@ -1128,9 +1104,6 @@ L.Control.Layermenu = L.Control.extend({
 		    map.scrollWheelZoom.enable();
 		}, this);
 
-
-		// Get the scrol-container that we will set max height value of
-		// this._layermenuOuter = Wu.DomUtil.get('layermenu-outer');
 
 		// Check window height
 		var layersMaxHeight = window.innerHeight - 135;
