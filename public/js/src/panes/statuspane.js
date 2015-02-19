@@ -54,6 +54,10 @@ Wu.StatusPane = Wu.Class.extend({
 	
 		// div cleanups to do when hitting home
 		this.cleaningJobs();
+
+		// Google Analytics event trackign
+		app.Analytics.ga(['Status Pane', 'toggle']);
+
 	},
 
 	cleaningJobs: function () {

@@ -87,26 +87,29 @@ L.Control.CartoCSS = L.Control.extend({
 
 	addHooks : function () {
 
+
+		// cxxxx
+
 		// update button click
-		Wu.DomEvent.on(this._updateButton, 'click', this.renderStyling, this);
+		Wu.DomEvent.on(this._updateButton, 'click', this.renderStyling, this); // GA OK
 
 		// toolbar button click
-		Wu.DomEvent.on(this._toolbarButton, 'click', this.toggle, this);
+		Wu.DomEvent.on(this._toolbarButton, 'click', this.toggle, this); // GA OK
 
 		// remove control
-		Wu.DomEvent.on(this._xButton, 'click', this.toggle, this);
+		Wu.DomEvent.on(this._xButton, 'click', this.toggle, this); // GA OK
 
 		// Layer drop down
 		Wu.DomEvent.on(this._styleHeaderLayerName, 'click', this.toggleLayerDropDown, this);
 
 		// Toggle legends tab
-		Wu.DomEvent.on(this._tabLegends, 'mousedown', this.toggleLegends, this);
+		Wu.DomEvent.on(this._tabLegends, 'mousedown', this.toggleLegends, this); // GA OK
 
 		// Toggle styles tab
-		Wu.DomEvent.on(this._tabStyling, 'mousedown', this.toggleStyles, this);
+		Wu.DomEvent.on(this._tabStyling, 'mousedown', this.toggleStyles, this); // GA OK
 
 		// Toggle tooltip tab
-		Wu.DomEvent.on(this._tabTooltip, 'mousedown', this.toggleTooltip, this);
+		Wu.DomEvent.on(this._tabTooltip, 'mousedown', this.toggleTooltip, this);  // GA OK
 
 		// Resize container
 		Wu.DomEvent.on(this._resizeHandle, 'mousedown', this.resize, this);
@@ -342,6 +345,10 @@ L.Control.CartoCSS = L.Control.extend({
 
 	_selectLayer : function (layer) {
 
+		// Google Analytics event tracking
+		var _layerTitle = layer.store.title;
+		app.Analytics.ga(['Controls', 'CartoCSS select layer: ' + _layerTitle]);
+
 		// close dropdown
 		this.closeLayerDropDown();
 		
@@ -372,6 +379,10 @@ L.Control.CartoCSS = L.Control.extend({
 		Wu.DomUtil.removeClass(this._tabStyling, 'cartocss-active-tab');
 		Wu.DomUtil.addClass(this._tabLegends, 'cartocss-active-tab');
 
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'CartoCSS toggle legends']);
+
+
 
 	},
 
@@ -391,6 +402,10 @@ L.Control.CartoCSS = L.Control.extend({
 		Wu.DomUtil.addClass(this._tabStyling, 'cartocss-active-tab');
 		Wu.DomUtil.removeClass(this._tabLegends, 'cartocss-active-tab');
 
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'CartoCSS toggle styles']);
+
+
 	},
 
 	toggleTooltip : function () {
@@ -408,6 +423,9 @@ L.Control.CartoCSS = L.Control.extend({
 		Wu.DomUtil.addClass(this._tabTooltip, 'cartocss-active-tab');
 		Wu.DomUtil.removeClass(this._tabStyling, 'cartocss-active-tab');
 		Wu.DomUtil.removeClass(this._tabLegends, 'cartocss-active-tab');
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'CartoCSS toggle tooltip']);		
 
 	},
 
@@ -800,26 +818,34 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	toggleLayerDropDown : function () {
+
 		if (!this._openDropDown) {
+
 			this._openDropDown = true;
 			var dropDownHeight = this._layers.length * 27;
 			if (this._layers.length <= 2) dropDownHeight+=2;
 			this._layerSelectorOuter.style.height = dropDownHeight + 'px';
-
 			Wu.DomUtil.addClass(this._styleHeaderDropDownButton, 'carrow-flipped', this);
 			
+
 		} else {
 			this._openDropDown = false;
 			this._layerSelectorOuter.style.height = '0px';
 			
 			Wu.DomUtil.removeClass(this._styleHeaderDropDownButton, 'carrow-flipped', this);
-		}		
+		}
+
 	},
 	
 	
 
 	toggle : function () {
+		
 		this._open ? this.close() : this.open();
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'CartoCSS toggle']);
+
 	},
 
 	open : function () {
@@ -844,6 +870,10 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	renderStyling : function () {
+
+		// Google Analytics event tracking
+		var _layerTitle = this._layer.store.title;
+		app.Analytics.ga(['Controls', 'CartoCSS render layer: ' + _layerTitle]);
 
 		// return if no active layer
 		if (!this._layer) return;
