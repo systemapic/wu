@@ -61,12 +61,12 @@ Wu.HeaderPane = Wu.Class.extend({
 		// Wu.DomEvent.on(this._subtitle, 'dblclick', this._enableEdit, this);
 
 		// enable edit on logo
-		if (!this.logodz) {
-			// create on first load
-			this.addDropzone();
-		} else {
-			this.logodz.enable();
-		}
+		// if (!this.logodz) {
+		// 	// create on first load
+		// 	this.addDropzone();
+		// } else {
+		// 	this.logodz.enable();
+		// }
 
 		// set editable class to logo
 		Wu.DomUtil.addClass(this._logo, 'editable');
@@ -231,7 +231,7 @@ Wu.HeaderPane = Wu.Class.extend({
 		// add edit hooks
 		if (project.editMode) {
 			this.addEditHooks();
-			this.refreshDropzone();
+			// this.refreshDropzone();
 		} else {
 			this.removeEditHooks();
 		}

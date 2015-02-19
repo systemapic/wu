@@ -64,12 +64,12 @@ module.exports = function(grunt) {
 					// dictionary of render options 
 					sourceMap:false,
 						extDot:'last'
-					},
-					files:{  
-						'public/css/style.css':'scss/style.scss'
-					}
+				},
+				files:{  
+					'public/css/style.css':'scss/style.scss'
 				}
-			},
+			}
+		},
 
 		// TASK: Minify CSS 
 		cssmin:{  
@@ -250,9 +250,7 @@ module.exports = function(grunt) {
 					'public/js/lib/codemirror/mode/cartocss/codemirror.carto.css',
 					'public/js/lib/codemirror/mode/cartocss/codemirror.fetta.css',
 					'public/js/lib/codemirror/theme/mbo.css',
-					'public/css/opentip.css',
-					// 'public/js/lib/codemirror/mode/cartocss/spectrum.css', // Does not work when merged with other css dependency files
-
+					'public/css/opentip.css'
 				],
 				
 				dest : 'dist/tmp/css.dependencies.css'

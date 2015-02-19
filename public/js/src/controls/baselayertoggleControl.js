@@ -64,7 +64,7 @@ L.Control.BaselayerToggle = L.Control.extend({
 		this._layers = {};
 
 		// create wrapper
-		this._list = L.DomUtil.create('div', 'baselayertoggle-list collapsed', this._container);
+		this._list = L.DomUtil.create('div', 'baselayertoggle-list', this._container);
 		Wu.DomEvent.on(this._list, 'dblclick', Wu.DomEvent.stop, this);
 
 		// build menu
@@ -141,12 +141,12 @@ L.Control.BaselayerToggle = L.Control.extend({
 
 	collapse : function () {
 		this._isOpen = false;
-		Wu.DomUtil.addClass(this._list, 'collapsed');
+		Wu.DomUtil.removeClass(this._container, 'open');
 	},
 
 	expand : function () {
 		this._isOpen = true;
-		Wu.DomUtil.removeClass(this._list, 'collapsed');
+		Wu.DomUtil.addClass(this._container, 'open');
 	},
 
 

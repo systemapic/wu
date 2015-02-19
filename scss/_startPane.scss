@@ -94,6 +94,7 @@
 .startpane-project-list {
 	margin: auto;
 	padding-bottom: 200px;
+	text-align: left;
 	}
 
 .start-panne-recent-projects {
@@ -114,11 +115,8 @@
 	margin-top: 0;
 	overflow: hidden;
 	opacity: 0.9;
-	border-radius: 2px;
-	-webkit-transition: opacity 250ms ease;
-	-moz-transition: opacity 250ms ease;
-	-ms-transition: opacity 250ms ease;
-	transition: opacity 250ms ease;
+
+	box-shadow: 0 0 0 1px rgba(255,255,255,0.15);
 	}
 
 .start-panne-recent-projects:hover {
