@@ -123,10 +123,20 @@ L.Control.BaselayerToggle = L.Control.extend({
 			Wu.DomUtil.addClass(item, 'active');
 		}
 
+		// Google Analytics event tracking
+		var _layerTitle = layer.getTitle();
+		app.Analytics.ga(['Controls', 'Baselayer toggle: ' + _layerTitle]);
+
+
 	},
 
 	toggle : function () {
+		
 		this._isOpen ? this.collapse() : this.expand();
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'Baselayer toggle click']);
+
 	},
 
 	collapse : function () {

@@ -12,7 +12,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-env');		// Set environment for conditional HTML 
 	grunt.loadNpmTasks('grunt-contrib-htmlmin');	// HTML minifyer
 
-	// grunt.loadNpmTasks('grunt-uncss');		// Cleans up unused CSS ~ must have a HTML file to match up with...
+	grunt.loadNpmTasks('grunt-contrib-jshint');	// Checks JS
 					
 	grunt.initConfig(    {  
 		
@@ -214,6 +214,9 @@ module.exports = function(grunt) {
 					'public/js/src/models/layers.js',
 					'public/js/src/models/files.js',
 
+					// Analytics
+					'public/js/src/core/analytics.js',
+
 					// Config file
 					'public/js/src/config/config.js',
 
@@ -290,7 +293,6 @@ module.exports = function(grunt) {
 				
 				src : [
 					'public/js/lib/mapbox.js/mapbox.2.1.4.js',
-					// 'public/js/lib/mapbox-gl.js/mapbox-gl.js',					
 					'public/js/src/controls/spinningMap.js',
 					'public/js/src/config/login.config.js',
 					'public/js/src/core/login.js',
@@ -390,9 +392,18 @@ module.exports = function(grunt) {
 			files: {
 				'views/app.serve.ejs': 'views/tmp/app.temp.ejs',     // 'destination': 'source'
 			}
-		}}
+		},
 
-	}    );
+		// jshint: {
+		// 	ignore_warning: {
+		// 		options: {
+		// 			'-W015': true,
+		// 		},
+		// 		src: ['dist/tmp/systemapic.combined.js'],
+		// 	},
+		// },		
+
+	}});
   
   
 

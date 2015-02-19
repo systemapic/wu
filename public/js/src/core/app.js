@@ -15,7 +15,10 @@ Wu.App = Wu.Class.extend({
 		Wu.app = this;
 
 		// merge options
-		Wu.setOptions(this, options);   
+		Wu.setOptions(this, options);
+
+		// Init analytics
+		this.Analytics = new Wu.Analytics();
 
 		// set options
 		L.mapbox.config.FORCE_HTTPS = true;
@@ -29,6 +32,7 @@ Wu.App = Wu.Class.extend({
 
 		// Detect mobile devices
 		this.detectMobile();
+
 
 	},
 
@@ -95,14 +99,18 @@ Wu.App = Wu.Class.extend({
 		// set vars
 		this.options.json = o;
 
+		// load json model
+		this._initObjects();
+
+
+
+
+
 		// create app container
 		this._initContainer();
 
 		// load dependencies
 		this._initDependencies();
-
-		// load json model
-		this._initObjects();
 
 		// create panes
 		this._initPanes();
