@@ -153,6 +153,9 @@ L.Control.Inspect = L.Control.extend({
 		// add object to front of array
 		this.layers.unshift(entry);
 
+
+		// cxxxx
+
 		// add stops
 		Wu.DomEvent.on(upArrow,   'dblclick click', function (e) { Wu.DomEvent.stop(e); this.moveUp(entry);   	 }, this);
 		Wu.DomEvent.on(downArrow, 'dblclick click', function (e) { Wu.DomEvent.stop(e); this.moveDown(entry); 	 }, this);
@@ -253,6 +256,11 @@ L.Control.Inspect = L.Control.extend({
 
 		// reset dragging y count
 		this._md = 0;
+
+		// Google Analytics event tracking
+		var _layerName = layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);
+
 	},
 
 	_moveDown : function () {
@@ -272,6 +280,12 @@ L.Control.Inspect = L.Control.extend({
 
 		// reset dragging y count
 		this._md = 0;
+
+
+		// Google Analytics event tracking
+		var _layerName = layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);
+
 	},
 
 
@@ -286,6 +300,11 @@ L.Control.Inspect = L.Control.extend({
 
 		// Hide Layer inspector if it's empty
 		if ( this.layers.length == 0 ) this._content.style.display = 'none';
+
+
+		// Google Analytics event tracking
+		var _layerName = layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Remove layer > ' + _layerName]);
 		
 
 	},
@@ -322,6 +341,11 @@ L.Control.Inspect = L.Control.extend({
 		// move up in zindex
 		this._zx.up(layer);
 
+
+		// Google Analytics event tracking
+		var _layerName = layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);		
+
 	},
 
 	moveDown : function (entry) {
@@ -338,6 +362,10 @@ L.Control.Inspect = L.Control.extend({
 
 		// move up in zindex
 		this._zx.down(layer);
+
+		// Google Analytics event tracking
+		var _layerName = layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);		
 		
 	},
 
@@ -357,6 +385,10 @@ L.Control.Inspect = L.Control.extend({
 		// fly
 		var map = app._map;
 		map.fitBounds(bounds);
+
+		// Google Analytics event tracking
+		var _layerName = layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Fly to bounds for > ' + _layerName]);
 
 	},
 
@@ -378,6 +410,11 @@ L.Control.Inspect = L.Control.extend({
 			// add class to eye
 			Wu.DomUtil.addClass(entry.eye, 'inspecting');
 		}
+
+		// Google Analytics event tracking
+		var _layerName = entry.layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Toggle isolate > ' + _layerName]);	
+
 	},
 
 	_noneAreIsolated : function () {
@@ -405,7 +442,6 @@ L.Control.Inspect = L.Control.extend({
 			}
 		}, this);
 
-		
 	},
 
 	killLayer : function (entry) {

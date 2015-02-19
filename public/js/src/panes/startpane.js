@@ -170,26 +170,33 @@ Wu.StartPane = Wu.Class.extend({
 	createStartProject : function (project) {
 
 		// Client info
-		var clientID = project.store.client;
-		var clientName = app.Clients[clientID].name;
-		var clientLogo = app.Clients[clientID].logo;
+
+		if (!project) return;
+
+		var client = project.getClient();
+
+		if (!client) return;
+
+		// var clientID = project.store.client;
+		// var clientName = app.Clients[clientID].name;
+		// var clientLogo = app.Clients[clientID].logo;
 
 		var newProject = {};
 		// create container
 		newProject._projectContainer = Wu.DomUtil.create('div', 'start-panne-recent-projects', this._projectList);
 		
 		newProject._projectThumb = Wu.DomUtil.create('img', '', newProject._projectContainer);
-		newProject._projectThumb.src = project.store.logo;
+		newProject._projectThumb.src = project.getLogo();
 
 		newProject._projectTitle = Wu.DomUtil.create('div', 'start-project-name', newProject._projectContainer);
 		newProject._projectTitle.innerHTML = project.getName();
 
 		newProject._clientName = Wu.DomUtil.create('div', 'start-project-client-name', newProject._projectContainer);
-		newProject._clientName.innerHTML = clientName;
+		newProject._clientName.innerHTML = client.getName();
 
-		if ( clientLogo ) {
+		if (client.getLogo()) {
 			newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
-			newProject._clientLogo.src = clientLogo;
+			newProject._clientLogo.src = client.getLogo();
 		}
 
 
@@ -215,6 +222,9 @@ Wu.StartPane = Wu.Class.extend({
 
 	selectProject : function(project) {
 
+		// Google Analytics
+		app.Analytics.setGaProject(project.store.uuid);
+
 		// select project
 		project.select();
 
@@ -223,6 +233,9 @@ Wu.StartPane = Wu.Class.extend({
 
 		// Hide the Start Pane
 		this.deactivate();
+
+		// // Google Analytics event trackign
+		// app.Analytics.ga(['Start Pane', 'select project', project.getName()]);
 
 	},
 
