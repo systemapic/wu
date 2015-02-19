@@ -217,12 +217,12 @@ var api = {
 
 
 
-	_debugCreateRole : function (req, res) {
+	// _debugCreateRole : function (req, res) {
 
-		// create role
-		api.permission._debugCreateRole(req, res);
+	// 	// create role
+	// 	api.permission._debugCreateRole(req, res);
 
-	},
+	// },
 
 
 
@@ -605,6 +605,7 @@ module.exports.email = require('./api.email');
 module.exports.error = require('./api.error');
 module.exports.debug = require('./api.debug');
 module.exports.upload = require('./api.upload');
+module.exports.legend = require('./api.legend');
 module.exports.pixels = require('./api.pixels');
 module.exports.client = require('./api.client');
 module.exports.project = require('./api.project');
