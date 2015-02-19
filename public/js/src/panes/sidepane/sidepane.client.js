@@ -122,12 +122,15 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// create project button
 		if (app.Account.canCreateProject()) {
+			
+			// create divs
 			var className = 'smap-button-white new-project-button';
 			this._newProjectButton = Wu.DomUtil.create('div', className, this._projectsContainer, '+');
-			Wu.DomEvent.on(this._newProjectButton, 'mousedown', this.createNewProject, this);
-			Wu.DomEvent.on(this._newProjectButton, 'mousedown', Wu.DomEvent.stop, this);
-			Wu.DomEvent.on(this._newProjectButton, 'click', Wu.DomEvent.stop, this);
 
+			// events
+			Wu.DomEvent.on(this._newProjectButton, 'mousedown', 	this.createNewProject, this);
+			Wu.DomEvent.on(this._newProjectButton, 'mousedown', 	Wu.DomEvent.stop, this);
+			Wu.DomEvent.on(this._newProjectButton, 'click', 	Wu.DomEvent.stop, this);
 
 			// add tooltip
 			app.Tooltip.add(this._newProjectButton, 'Click to create new project.');
@@ -194,8 +197,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var store = {
 			name 		: 'Project title',
 			description 	: 'Project description',
-			created 	: new Date().toJSON(),
-			lastUpdated 	: new Date().toJSON(),
+			// created 	: new Date().toJSON(),
+			// lastUpdated 	: new Date().toJSON(),
 			createdByName 	: app.Account.getName(),
 			keywords 	: '',
 			client 		: this.client.uuid,
@@ -218,10 +221,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 			folders : []
 
 		}
-		var options = {
-			store : store
-		}
-
+	
 
 		// create new project with options, and save
 		var project = new Wu.Project(store);
@@ -232,16 +232,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		}
 		project._saveNew(callback); 
 
-		// cxxxx
-		// generate project thumb 
-		// if no timeout: 	creates thumb on active project before new was selected
-		// 			active project (project object) is not ready when _markActive gets triggered)
-
-		// Of course dodgy ~ 500ms er ikke nok...
-
 	
-
-		// Mark this project as active
 		
 
 		
@@ -266,8 +257,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var error  = result.error;
 		var store  = result.project;
 
+		console.log('created project=>', project);
+
 		// return error
-		if (error) return console.log('there was an error creating new project!', error);			
+		if (error) return console.log('There was an error creating new project!', error);			
 
 		// add to global store
 		app.Projects[store.uuid] = project;
@@ -281,7 +274,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// create project in sidepane
 		this._createNewProject(project);
 		
-	
 
 	},
 

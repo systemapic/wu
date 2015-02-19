@@ -214,6 +214,9 @@ module.exports = function(grunt) {
 					'public/js/src/models/layers.js',
 					'public/js/src/models/files.js',
 
+					// Permissions
+					'public/js/src/core/permissions.js',
+
 					// Config file
 					'public/js/src/config/config.js',
 

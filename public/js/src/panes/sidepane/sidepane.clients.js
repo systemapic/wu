@@ -183,7 +183,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 			// post       path   data    callback   context of cb
 			Wu.Util.postcb(path, json, that._checkedSlug, that);
 
-		}, 500);               
+		}.bind(this), 500);               
 	},
 
 	_checkedSlug : function (editor, raw) {
@@ -225,12 +225,9 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	_confirm : function () {
 
 		// get client vars
-		// var clientName = Wu.DomUtil.get('editor-client-name-new').value;
 		var clientName = this._newClient._NameInput.value;
-		// var clientDescription = Wu.DomUtil.get('editor-client-description-new').value;
 		var clientDescription = this._newClient._DescriptionInput.value;
-		// var clientKeywords = Wu.DomUtil.get('editor-client-keywords-new').value;
-		var clientKeywords = this._newClient._keywordsInput;
+		var clientKeywords = this._newClient._keywordsInput.value;
 		
 		var options = {
 			name : clientName,
@@ -251,8 +248,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		Wu.app.Clients[client.uuid] = client;
 
 		// remove edit box
-		// var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
-		var old = this._newClient._wrapper;
+		var old = app.SidePane.Clients._newClient._wrapper;
 		Wu.DomUtil.remove(old);
 
 		// add permissions
