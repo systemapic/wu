@@ -1,3 +1,5 @@
+// app.MapPane.descriptionControl
+
 L.Control.Description = L.Control.extend({
 	
 	options: {
@@ -11,9 +13,6 @@ L.Control.Description = L.Control.extend({
 		    container = L.DomUtil.create('div', className),
 		    options   = this.options;
 
-		// add html
-		// container.innerHTML = ich.descriptionControl(); 
-
 
 		// #description-toggle-button
 		this._button = Wu.DomUtil.create('div', 'dropdown-button description-toggle-button', container)
@@ -26,10 +25,6 @@ L.Control.Description = L.Control.extend({
 
 		// // #description-control-inner-content-box
 		this._outer = Wu.DomUtil.create('div', 'description-control-inner-content-box', this._content)
-
-			
-
-
 
 		return container; // turns into this._container on return
 

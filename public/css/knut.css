@@ -254,31 +254,24 @@ body {
 
 
 
-/* Each layer wrap: Universal => on every layer menu item */
+/* LAYER NENU */
+
+
+/* Buttons */
 .layer-menu-item-wrap {
-  cursor: pointer;
-  overflow: hidden;
-  margin: 0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
-  z-index: 100;
-  position: relative;
-  padding: 0;
-  color: #fff;
-  text-shadow: none;
-  color: white !important;
-  margin-bottom: 1px;
-  background-color: #4E5868 !important;
-  height: 30px;
-  font-size: 127%; 
-}
+	background-color: #a8aab3 !important;
+	color: #000;
+	}
 
-/* Layer Folder color coding */
+/* Menufolder */
 .menufolder {
-  background-color: #3C4759 !important; 
-  color: white !important;
-}
+	background-color: #3C4759 !important; 
+	color: white !important;
+	}
 
-.layer-active {
-  background-color: #CFD0D2 !important; 
-  color: black !important;
-}
+/* Button active */
+.layer-active {  
+	background-color: #cfd0d2 !important;
+	/*background-color: #a3b29e !important;*/
+	color: #000 !important;
+	}

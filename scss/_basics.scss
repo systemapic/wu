@@ -27,6 +27,11 @@ body {
 	outline: none !important; 
 	border: 0 !important 
 	}
+
+/* Internet explorer puts an "X" to clear input fields...*/
+input::-ms-clear {
+    display: none;
+	}	
 	
 label {
 	margin-bottom: 0px !important;
@@ -591,6 +596,7 @@ label.info {
 
 .dragging {
 	background: #92f0e5 !important;
+	cursor: pointer;
 	cursor: -webkit-grab !important;
 	cursor:    -moz-grab !important;
 	}
@@ -615,11 +621,15 @@ input.cmn-toggle-round-flat + label {
 	border-radius: 60px;
 	transition: background 0.1s;
 	margin-top: -19px;
+	cursor: pointer;
 	cursor: -webkit-grab;
+	cursor:    -moz-grab;
 	}
 
 input.cmn-toggle-round-flat + label:active {
+	cursor: pointer;
 	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
 	}
 
 input.cmn-toggle-round-flat + label:before,

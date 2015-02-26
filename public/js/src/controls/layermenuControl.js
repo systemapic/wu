@@ -1,3 +1,5 @@
+// app.MapPane.layerMenu
+
 L.Control.Layermenu = L.Control.extend({
 
 	options: {
@@ -18,7 +20,6 @@ L.Control.Layermenu = L.Control.extend({
 
 		container.appendChild(this._layermenuOuter);
 
-
 		// add some divsscroller-frame
 		this.initLayout();
 
@@ -32,7 +33,6 @@ L.Control.Layermenu = L.Control.extend({
 
 
 	initLayout : function () {		
-
 
 		// Create the header    
 		this._layerMenuHeader = Wu.DomUtil.createId('div', 'layer-menu-header');
@@ -915,7 +915,12 @@ L.Control.Layermenu = L.Control.extend({
 
 		wrap.id 	= uuid;
 		Wu.DomUtil.addClass(wrap, 'level-' + item.pos);
-		wrap.setAttribute('draggable', false); 	// mark as draggable
+
+		// mark as draggable if we're in editing mode
+		if ( this.editMode ) { wrap.setAttribute('draggable', true) }
+		else { wrap.setAttribute('draggable', false); }
+
+	
 		this._content.appendChild(wrap); 	// append to layermenu
 
 		// get elems

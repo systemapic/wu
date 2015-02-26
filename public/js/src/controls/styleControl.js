@@ -1,5 +1,7 @@
 // controls global styles
 // full color themeing to come
+// app.Style
+
 Wu.Style = Wu.Class.extend({
 
 	initialize : function () {
