@@ -23,7 +23,10 @@ Wu.StartPane = Wu.Class.extend({
 		this.isOpen = true;
 
 		// create container
-		this.initSpinner();
+		this.initContainer();
+
+		// init spinner
+		// this.initSpinner();
 
 		// add events
 		this.addHooks();
@@ -33,12 +36,6 @@ Wu.StartPane = Wu.Class.extend({
 
 		// Show the header pane.
 		Wu.DomUtil.removeClass(Wu.app.HeaderPane._container, 'displayNone');
-
-
-		// screendimentions
-		// app._getDimensions()
-	
-
 
 	},	
 
@@ -58,25 +55,22 @@ Wu.StartPane = Wu.Class.extend({
 	},
 
 
-	initSpinner : function () {
-
-		console.log('initSpinner');
+	initContainer : function () {
 
 		// create container 
 		this._container = Wu.DomUtil.create('div', 'startpane-canvas-container', app._appPane);
 
 		// create content for black box
-		var content = this._initSpinnerContent();
+		var content = this._initContent();
 		this._wrapper = Wu.DomUtil.create('div', 'spinning-wrapper', this._container);
 
 		this._wrapper.appendChild(content);
 
-		this._spinner = false;
+	},
 
+	initSpinner : function () {
 
-
-		return;
-
+		
 		// create spinner instance
 		this._spinner = new L.SpinningMap({
 			autoStart : true,
@@ -100,7 +94,7 @@ Wu.StartPane = Wu.Class.extend({
 
 	},
 
-	_initSpinnerContent : function () {
+	_initContent : function () {
 
 		// create wrapper
 		var wrapper = Wu.DomUtil.create('div', 'startpane-spinning-content');
@@ -223,7 +217,7 @@ Wu.StartPane = Wu.Class.extend({
 	selectProject : function(project) {
 
 		// Google Analytics
-		app.Analytics.setGaProject(project.store.uuid);
+		app.Analytics.setGaProject(project.getUuid());
 
 		// select project
 		project.select();
@@ -318,11 +312,7 @@ Wu.StartPane = Wu.Class.extend({
 	},
 
 	changeHeight : function (dimensions) {
-
-		console.log('change the height');
 		this.setYposition(dimensions);
-
-
 	},
 
 	setYposition : function (dimensions) {

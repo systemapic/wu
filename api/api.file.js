@@ -37,11 +37,9 @@ var mapnikOmnivore = require('mapnik-omnivore');
 
 // api
 var api = module.parent.exports;
-console.log('FILER === api=>', api);
 
 // exports
 module.exports = api.file = {
-
 
 
 	// zip a file and send to client
@@ -106,48 +104,44 @@ module.exports = api.file = {
 
 	// handle file downloads
 	downloadFile : function (req, res) {
+		var fileUuid = req.query.file,
+		    account = req.user,
+		    ops = [];
+
+
+
+		if (!fileUuid) return api.error.missingInformation(req, res);
 		
-		var file = req.query.file;
-		
-		console.log('downloadFile: ', file);
-								// todo: access
-								// 	 download several files (zipped)
+		ops.push(function (callback) {
+			File
+			.findOne({uuid : fileUuid})
+			.exec(callback);
+		});
 
-		// send the file, simply
-		// get file
-		File.findOne({ 'uuid' : file }, function(err, record) {
+		ops.push(function (file, callback) {
+			api.access.to.download_file({
+				file : file,
+				user : account
+			}, callback);
+		});
 
-			console.log('found? , ', err, record);
+		ops.push(function (options, callback) {
+			var record = options.file,
+			    name = record.name.replace(/\s+/g, ''),
+			    out = api.config.path.temp + name + '_' + record.type + '.zip',
+			    cwd = api.config.path.file + fileUuid,
+			    command = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store',
+			    exec = require('child_process').exec;				
 			
-			var name = record.name.replace(/\s+/g, '');
-
-			// execute cmd line zipping 
-			// var out = TEMPFOLDER + name + '_' + record.type + '.zip';
-			var out = api.config.path.temp + name + '_' + record.type + '.zip';
-			// var infile = FILEFOLDER + file + '/*';
-			var infile = api.config.path.file + file + '/*';
-			
-			// var working_dir = FILEFOLDER + file; 
-			var working_dir = api.config.path.file + file; 
-			var cmd = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store';// + infile;  		// TODO: only pdf.. 
-			var exec = require('child_process').exec;				
-			
-			console.log('working_dir: ', working_dir);
-			console.log('out: ', out);
-
 			// run command
-			exec(cmd, { cwd : working_dir }, function (err, stdout, stdin) {
-				if (err)  {
-					console.log('download exec err: ', err, stdout, stdin);
-					return res.end(JSON.stringify({error : err})); // if err
-				}
-
-				// send zip file
-				res.download(out);
+			exec(command, {cwd : cwd}, function (err, stdout, stdin) {
+				callback(err, out);
 			});
+		});
 
-
-
+		async.waterfall(ops, function (err, path) {
+			if (err) return api.error.general(req, res, err);
+			res.download(path);
 		});
 
 	},
@@ -155,68 +149,59 @@ module.exports = api.file = {
 
 	// download zip
 	downloadZip : function (req, res) {
-		var file = req.query.file;
-		var dive = require('dive');
-		// var folder = TEMPFOLDER + file;
-		var folder = api.config.path.temp + file;
-		var found = false;
+		var file = req.query.file,
+		    dive = require('dive'),
+		    folder = api.config.path.temp + file,
+		    found,
+		    ops = [];
+
+
+	
+		// todo: this is fucked. not even dealing with a file object here, just paths.. 
+		// 	not solid! FIX!
+
 		
 		// find zip file
 		dive(folder, 
 
 			// each file callback
 			function(err, file) {
-				// err
-				if (err || !file) return res.end('File not found.');
+				if (err || !file) return api.error.general(req, res, 'File not found.');
 
 				if (file.slice(-3) == 'zip') {
 					found = true;
 					return res.download(file);
-								// todo: delete zip file
+					// todo: delete zip file
 				}
 			}, 
 
 			// callback
 			function () { 
-				console.log('found: ', found);
-				if (!found) return res.end('File not found.'); 
+				if (!found) return api.error.general(req, res, 'File not found.');
 			}	
 		);
 	},
 
 
 	// handle file download
-	// getFileDownload : function (req, res) {
 	download : function (req, res) {
 
-		var file = req.query.file;
-		var type = req.query.type || 'file';
+		var file = req.query.file,
+		    type = req.query.type || 'file';
 	
-		if (!file) console.log('NOT FILE!');
-
-		console.log('file, type', file, type);
+		if (!file) return api.error.missingInformation(req, res);
 		
-		// todo: access restrictions
-
 		// zip file
 		if (type == 'zip') return api.file.downloadZip(req, res);
 			
 		// normal file
-		if (type == 'file') {
-			return api.file.downloadFile(req, res);
-			
-		} else {
-			return api.file.downloadFile(req, res);
-		}
-		// got nothing to do
-		res.end('Please specify a file.'); return;
-
+		return api.file.downloadFile(req, res);
+		
 	},
 
 
-		// delete a file
+	// delete a file
 	deleteFiles : function (req, res) {
-
 		var _fids  = req.body._fids,
 		    puuid  = req.body.puuid,
 		    userid = req.user.uuid,
@@ -309,151 +294,87 @@ module.exports = api.file = {
 
 
 	// update a file
-	// updateFile : function (req, res) {
 	update : function (req, res) {
-		var fuuid = req.body.uuid;
-		var userid = req.user.uuid;
-		var queries = {};
+		var fileUuid = req.body.uuid,
+		    account = req.user,
+		    ops = [];
+		
 
-
-		// update name
-		if (req.body.hasOwnProperty('name')) {
-			console.log('name!');
-			queries.name = function(callback) {
-
-				var key = 'name';
-				var value = req.body.name;
-
-				// update
-				api.file._updateFile(req, fuuid, key, value, function (result) {
-					return callback(result);
-				});
-
-			}
-		}
-
-		// update description
-		if (req.body.hasOwnProperty('description')) {
-			queries.description = function(callback) {
-
-				var key = 'description';
-				var value = req.body.description;
-
-				// update
-				api.file._updateFile(req, fuuid, key, value, function (result) {
-					return callback(result);
-				});
-				
-
-			}
-		}
-
-		// update status
-		if (req.body.hasOwnProperty('status')) {
-			queries.status = function(callback) {
-
-				var key = 'status';
-				var value = req.body.status;
-
-				// update
-				api.file._updateFile(req, fuuid, key, value, function (result) {
-					return callback(result);
-				});
-				
-
-			}
-		}
-
-		// update keywords
-		if (req.body.hasOwnProperty('keywords')) {
-			queries.keywords = function(callback) {
-
-				var key = 'keywords';
-				var value = req.body.keywords;
-
-				// update
-				api.file._updateFile(req, fuuid, key, value, function (result) {
-					return callback(result);
-				});
-				
-
-			}
-		}
-
-		// update category
-		if (req.body.hasOwnProperty('category')) {
-			queries.category = function(callback) {
-
-				var key = 'category';
-				var value = req.body.category;
-
-				// update
-				api.file._updateFile(req, fuuid, key, value, function (result) {
-					return callback(result);
-				});
-				
-
-			}
-		}
-
-		// update version
-		if (req.body.hasOwnProperty('version')) {
-			queries.version = function(callback) {
-
-				var key = 'version';
-				var value = req.body.version;
-
-				// update
-				api.file._updateFile(req, fuuid, key, value, function (result) {
-					return callback(result);
-				});
-				
-
-			}
-		}
-
-
-
-		async.parallel(queries, function(err, doc) {
-
-			// return on error
-			if (err) return res.end(JSON.stringify({
-				error : err
-			}));
-					
-			// return doc
-			res.end(JSON.stringify(doc));
-
+		ops.push(function (callback) {
+			File
+			.findOne({uuid : fileUuid})
+			.exec(callback);
 		});
+
+
+		ops.push(function (file, callback) {
+			api.access.to.edit_file({
+				file : file,
+				user : account
+			}, callback);
+		});
+
+		ops.push(function (options, callback) {
+			api.file._update({
+				file : options.file,
+				options : req.body
+			}, callback);
+		});
+
+		async.waterfall(ops, function (err, file) {
+			if (err) return api.error.general(req, res, err);
+			res.end(JSON.stringify(file));
+		});
+
 
 	},
 
-	_updateFile : function (req, fuuid, key, value, callback) {
+	_update : function (job, callback) {
+		var file = job.file,
+		    options = job.options,
+		    queries = {};
 
-		File
-		.findOne({uuid : fuuid})
-		.exec(function (err, file) {
-			if (err) return callback(err);
+		// valid fields
+		var valid = [
+			'name', 
+			'description', 
+			'keywords', 
+			'status',
+			'category',
+			'version',
+		];
 
-			// return if not file
-			if (!file) return callback('No such file.');
-
-			// check access
-			var access = api.permission.to.update.file(req.user, file);
-
-			// return if no access
-			if (!access) return callback('No access.');
-			
-			// update
-			file[key] = value;
-			file.save(function (err) {
-				callback(err);
+ 		// enqueue queries for valid fields
+		valid.forEach(function (field) {
+			if (options[field]) queries = api.file._enqueueUpdate({
+				queries : queries,
+				field : field,
+				file : file,
+				options : options
 			});
 		});
 
+		// run queries to database
+		async.parallel(queries, callback);
 
 	},
 
+
+	// async mongo update queue
+	_enqueueUpdate : function (job) {
+		var queries = job.queries,
+		    field = job.field,
+		    file = job.file,
+		    options = job.options;
+
+		// create update queue op
+		queries[field] = function(callback) {	
+			file[field] = options[field];
+			file.markModified(field);
+			file.save(callback);
+		};
+		return queries;
+	},
 
 
 
@@ -513,18 +434,10 @@ module.exports = api.file = {
 					fs.remove(out + '/__MACOSX', function (err) {
 						// return
 						callback(err);
-
 					});
-
-					
 				});
 			});
-
-
 		});
-
-
-		
 	},
 
 	// #########################################
@@ -544,7 +457,6 @@ module.exports = api.file = {
 				callback(err, db);
 			});
 		});
-
 	},
 
 
@@ -579,7 +491,6 @@ module.exports = api.file = {
 		// move to folder
 		fs.move(inn, out, function (err) {
 
-
 			if (type == 'geojson') {
 				// process geo
 				return api.geo.handleGeoJSON(out, fileUuid, function (err, db) {
@@ -590,21 +501,14 @@ module.exports = api.file = {
 					}
 					db.title = name;
 
-
 					callback(err, db);
 
 				});	
 			}
 
-
 			// catch err
 			callback(err);
-
 		});
-
-		
-
-
 
 	},
 
@@ -629,13 +533,12 @@ module.exports = api.file = {
 	// todo: possibly old, to be removed?
 	// get geojson
 	getGeojsonFile : function (req, res) {
-
-		var uuid = req.body.uuid;	// file-1091209120-0129029
-		var user = req.user.uuid;	// user-1290192-adasas-1212
-		var projectUuid = req.body.projectUuid;
+		var uuid = req.body.uuid,	// file-1091209120-0129029
+		    user = req.user.uuid,	// user-1290192-adasas-1212
+		    projectUuid = req.body.projectUuid;
 
 		// return if invalid
-		if (!uuid || !user) return false;
+		if (!uuid || !user) return api.error.missingInformation(req, res);
 
 		// get geojson file path from db
 		File
@@ -656,41 +559,26 @@ module.exports = api.file = {
 	sendGeoJsonFile : function (req, res, record) {
 
 		// return if nothing
-		if (!record) return res.end(JSON.stringify({
-			error: 'No such file.'
-		}));
+		if (!record) return api.error.missingInformation(req, res);
 
 		// get geosjon
-		var geojson = record.data.geojson;
+		var geojson = record.data.geojson,
+		    uuid = record.uuid,
+		    path = api.config.path.file + uuid + '/' + geojson;
 
 		// return if nothing
-		if (!geojson) return res.end(JSON.stringify({
-			error : 'No such file.'
-		}));
+		if (!geojson) return api.error.missingInformation(req, res);
 
 		// read file and ship it
-		var uuid = record.uuid;
-		var path = api.config.path.file + uuid + '/' + geojson;
-
 		fs.readJson(path, function (err, data) {
-			if (err) console.error('err: ', err);
-
-			if (err) return res.end(JSON.stringify({
-				error : 'Error reading file.'
-			}));
-
-			if (!data) return res.end(JSON.stringify({
-				error : 'File not found.'
-			}));
+			if (err || !data) return api.error.general(req, res, err || 'No file.');
 
 			// set header
 			res.set({'Content-Type': 'text/json'});		// todo: encoding of arabic characters, tc.
 			
 			// return
 			res.end(JSON.stringify(data));
-
 		});
-
 	},
 
 
@@ -746,7 +634,6 @@ module.exports = api.file = {
 		});
 	},
 
-
 	// save file to project (file, layer, project id's)
 	addToProject : function (file_id, projectUuid, callback) {
 		Project
@@ -760,21 +647,13 @@ module.exports = api.file = {
 		});
 	},
 
-
-
-
 	sendImage : function (req, res) {
-
-		var file = req.params[0];
-		var path = api.config.path.image + file;
+		var file = req.params[0],
+		    path = api.config.path.image + file;
 		
+		// send
 		res.sendFile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
-
 	},
-
-
-
-
 
 
 

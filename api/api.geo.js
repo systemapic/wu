@@ -16,6 +16,7 @@ var fs 		= require('fs-extra');
 var gm 		= require('gm');
 var kue 	= require('kue');
 var fss 	= require("q-io/fs");
+var srs 	= require('srs');
 var zlib 	= require('zlib');
 var uuid 	= require('node-uuid');
 var util 	= require('util');
@@ -29,6 +30,7 @@ var crypto      = require('crypto');
 var fspath 	= require('path');
 var mapnik 	= require('mapnik');
 var request 	= require('request');
+var ogr2ogr 	= require('ogr2ogr');
 var nodepath    = require('path');
 var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
@@ -37,8 +39,6 @@ var mapnikOmnivore = require('mapnik-omnivore');
 
 // api
 var api = module.parent.exports;
-console.log('GEO === api=>', api);
-
 
 // exports
 module.exports = api.geo = { 

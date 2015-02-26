@@ -121,7 +121,8 @@ Wu.MapPane = Wu.Class.extend({
 		this.clearActiveLayers();
 
 		// get editor privs
-		this._isEditor = app.Account.canUpdateProject(app.activeProject.getUuid());
+		// this._isEditor = app.Account.canUpdateProject(app.activeProject.getUuid());
+		this._isEditor = app.access.to.edit_project(project);
 
 		// set base layers
 		this.setBaseLayers();

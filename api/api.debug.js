@@ -37,7 +37,6 @@ var mapnikOmnivore = require('mapnik-omnivore');
 
 // api
 var api = module.parent.exports;
-console.log('DEBUG === api=>', api);
 
 // exports
 module.exports = api.debug = { 
@@ -66,10 +65,10 @@ module.exports = api.debug = {
 		    ops = [];
 
 		// create role
-		api.permission._createRole({
+		api.access._createRole({
 			template : template,
 			members : [userUuid],
-			capabilites : [],
+			capabilities : [],
 			name : 'Superadmin'
 		}, function (err, role) {
 

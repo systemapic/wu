@@ -15,6 +15,20 @@ Wu.Project = Wu.Class.extend({
 		// attach client
 		this._client = Wu.app.Clients[this.store.client];
 
+		// init roles
+		this.initRoles();
+
+	},
+
+	initRoles : function () {
+		var roles = this.store.roles;
+		this._roles = {};
+		_.each(roles, function (role) {
+			this._roles[role.uuid] = new Wu.Role({
+				role : role,
+				project : this
+			});
+		}, this);
 	},
 
 	initFiles : function () {
@@ -141,7 +155,8 @@ Wu.Project = Wu.Class.extend({
 	setEditMode : function () {
 		// set editMode
 		this.editMode = false;
-		if (app.Account.canUpdateProject(this.store.uuid)) this.editMode = true;
+		// if (app.Account.canUpdateProject(this.store.uuid)) this.editMode = true;
+		this.editMode = app.access.to.edit_project(this);
 	},
 
 	refresh : function () {
@@ -203,6 +218,9 @@ Wu.Project = Wu.Class.extend({
   		// create layers 
 		this.initLayers();
 
+		// init roles
+		this.initRoles();
+
 		// update url
 		this._setUrl();
 
@@ -240,6 +258,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	setNewStore : function (store) {
+		console.error('________ setting new store: ', store);
 		this.store = store;
 		this.select();
 	},
@@ -457,6 +476,10 @@ Wu.Project = Wu.Class.extend({
 		return this.store.name;
 	},
 
+	getTitle : function () {
+		return this.getName();
+	},
+
 	getDescription : function () {
 		return this.store.description;
 	},
@@ -582,6 +605,10 @@ Wu.Project = Wu.Class.extend({
 		
 	},
 
+	getRoles : function () {
+		return this._roles;
+	},
+
 	// get available categories stored in project
 	getCategories : function () {
 		return this.store.categories;
@@ -613,34 +640,34 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
-	setFileAttribute : function (fileUuid, key, value) {
+	// setFileAttribute : function (fileUuid, key, value) {
 
-		console.log('setFileAttribute : DISABLED! ', fileUuid, key, value);
-		return;
+	// 	console.log('setFileAttribute : DISABLED! ', fileUuid, key, value);
+	// 	return;
 
-		// iterate
-		this.project.store.files.forEach(function(file, i, arr) {
+	// 	// iterate
+	// 	this.project.store.files.forEach(function(file, i, arr) {
 		     
-			// find hit
-			if (file.uuid == fileUuid) {
+	// 		// find hit
+	// 		if (file.uuid == fileUuid) {
 
-				// set locally
-				file[key] = value;
+	// 			// set locally
+	// 			file[key] = value;
 
-				// create update object
-				var json = {};
-				json[key] = file[key];
-				json.uuid = file.uuid;
+	// 			// create update object
+	// 			var json = {};
+	// 			json[key] = file[key];
+	// 			json.uuid = file.uuid;
 
-				// update, no callback
-				var string = JSON.stringify(json);
-				Wu.save('/api/file/update', string); 
-			}
-		});
+	// 			// update, no callback
+	// 			var string = JSON.stringify(json);
+	// 			Wu.save('/api/file/update', string); 
+	// 		}
+	// 	});
 
-		// set save status
-		app.setSaveStatus();
-	},
+	// 	// set save status
+	// 	app.setSaveStatus();
+	// },
 
 	getUsers : function () {
 		var uuid = this.store.uuid; // project uuid

@@ -8,7 +8,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.client = app.Clients[client.uuid];
 
 		// set edit mode
-		this.editable = app.Account.canCreateClient();
+		// this.editable = app.Account.canCreateClient();
+		this.editable = app.access.to.create_client();
 
 		// init layout
 		this.initLayout(); 
@@ -82,6 +83,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 	insertProjects : function (projects) {
 		var client = this.client;
 
+		this._sidepaneProjects = {};
+
 		// get client's projects
 		this.projects = _.filter(Wu.app.Projects, function (p) { return p.store.client == client.getUuid(); });
 
@@ -93,16 +96,19 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.projects.reverse();								// sort descending
 
 		// for each
-		this.projects.forEach(function (p){
+		this.projects.forEach(function (project){
 
 			// new project item view
-			var options = {
-				parent : this
-			}
-			var projectDiv = new Wu.SidePane.Project(p, options);
+			var sidepaneProject = new Wu.SidePane.Project({
+				project : project,
+				caller : this
+			});
+			
+			// save for later
+			this._sidepaneProjects[project.getUuid()] = sidepaneProject;
 
 			// app to client
-			projectDiv.addTo(this._projectsContainer);
+			sidepaneProject.addTo(this._projectsContainer);
 
 		}, this);
 
@@ -121,7 +127,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		if (this._removeClientButton) Wu.DomUtil.remove(this._removeClientButton);
 
 		// create project button
-		if (app.Account.canCreateProject()) {
+		if (app.access.to.create_project()) {
 			
 			// create divs
 			var className = 'smap-button-white new-project-button';
@@ -138,7 +144,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 		}
 		
 		// remove client button
-		if (app.Account.canDeleteClient(this.client.uuid)) {
+		// if (app.Account.canDeleteClient(this.client.uuid)) {
+		if (app.access.to.delete_client()) {
 			this._removeClientButton = Wu.DomUtil.create('div', 'client-kill displayNone', this._container, 'Delete client');
 			Wu.DomEvent.on(this._removeClientButton, 'mousedown', this.removeClient, this);
 
@@ -150,8 +157,28 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// client not empty
 		var p = this.projects.length;
-		if (p > 0) return alert('The client ' + this.client.getName() + ' has ' + p + ' projects. You must delete these individually first before deleting client.');
-		
+		if (p > 0) {
+			var message = 'The client ' + this.client.getName() + ' has ' + p + ' projects. ';
+			if (!app.access.is.superAdmin()) {
+				message += 'You must delete these individually first before deleting client.'
+				return alert(message);
+			}
+			
+			message += 'Superadmin access: Do you want to delete all projects and client?'
+			var makesure = confirm(message);
+			if (!makesure) return;
+
+			// confirm
+			var answer = confirm('Are you sure you want to delete all projects in client ' + this.client.getName() + '?');
+			if (!answer) return;
+
+			_.each(this._sidepaneProjects, function (sidepaneProject) {
+				sidepaneProject.confirmDelete();
+			}, this);
+
+			console.log('All projects deleted!');
+		}
+
 		// confirm
 		var answer = confirm('Are you sure you want to delete client ' + this.client.getName() + '?');
 		if (!answer) return;
@@ -280,7 +307,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		project.setNewStore(store);
 
 		// add to access locally
-		project.addAccess();
+		// project.addAccess();
 
 
 		// create project in sidepane
@@ -296,8 +323,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.projects.push(project);
 
 		// new project item view
-		var sidepaneProject = new Wu.SidePane.Project(project, {
-			parent : this
+		var sidepaneProject = new Wu.SidePane.Project({
+			project : project,
+			caller : this
 		});
 
 		// add to client container
@@ -319,8 +347,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// add defaults to map
 		this._addDefaults();
 
-		// create project thumb
-		project.createProjectThumb();
+		// create project thumb .. no point, wrong position anyway
+		// project.createProjectThumb();
 
 		// mark project div in sidepane as active
 		this._markActive(project);

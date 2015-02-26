@@ -1,3 +1,24 @@
+minors
+
+- dropdown
+	- roles
+	- selected role, only one
+	- create custom role (in project)
+		- add/remove capabilities
+		- set name
+		- delete
+	- set No Role
+	- 
+
+
+_______
+
+
+
+
+
+
+
 =========== USERS ============
 
 Feb 2015
@@ -6,9 +27,9 @@ Feb 2015
 
 ### MAJOR CHANGE:	
 
-Add permissions to projects/clients/files themselves as user id's. This is instead of adding projects/clients/files to users.
+Add accesss to projects/clients/files themselves as user id's. This is instead of adding projects/clients/files to users.
 
-PRO's:  When deleting a project, permissions are automatically taken care of, ie. they're gone!
+PRO's:  When deleting a project, accesss are automatically taken care of, ie. they're gone!
 CON's: 	When deleting USER, user-uuid's must be deleted from PROJECTS/FILES/CLIENTS. (but same vice versa)
 	Careful not to reveal user uuids to others - ie. must clean up ACCESS OBJECT in each model.
 
@@ -189,8 +210,8 @@ ACTIONS:
 	25. read_analytics 	=> read analytics
 	26. manage_analytics 	=> manage analytics
 	--
-	27. delegate_to_user 	   => 	delegate OWN CAPABILITES to user (never delegate capabilites that user doesnt have him/herself.. what's the point?)
-	28. delegate_to_other_user => 	delegate OWN CAPABILITES to user created by others
+	27. delegate_to_user 	   => 	delegate OWN capabilities to user (never delegate capabilities that user doesnt have him/herself.. what's the point?)
+	28. delegate_to_other_user => 	delegate OWN capabilities to user created by others
 
 
 
@@ -230,7 +251,7 @@ PAIN:
 
 	- each project has own roles - OWNER, READER, EDITOR, MANAGER, ETC. ? 
 
-	 	- each ROLE has members, capabilites: 
+	 	- each ROLE has members, capabilities: 
 
 	 		- OWNER 
 	 			- capabilities:
@@ -244,7 +265,7 @@ PAIN:
 
 
 	 		- EDITOR
-	 			- capabilites: 
+	 			- capabilities: 
 	 				-
 	 				-
 
@@ -253,9 +274,10 @@ PAIN:
 	 				- uuid-dsa
 
 	 		- MANAGER
-	 			- capabilites:
+	 			- capabilities:
 	 				-
 	 				-
+	 				
 	 			- members
 	 				- uuid-ddsd
 
@@ -266,14 +288,14 @@ PAIN:
 GROUPS
 ------
 
-1. Each PROJECT gets a GROUP assigned to it. This GROUP contains PERMISSIONS. 
+1. Each PROJECT gets a GROUP assigned to it. This GROUP contains accessS. 
 2. Each FILE/LAYER in the project gets assigned same GROUP. 
-3. This means that the permissions for PROJECT (read/write/delete) will be the same for the FILES/LAYERS in the project. 
+3. This means that the accesss for PROJECT (read/write/delete) will be the same for the FILES/LAYERS in the project. 
 
 4. Removing USERS means simply removing once from GROUP.
 5. Removing project simply means deleting GROUP.
 
-6. Everybody in a GROUP has SAME PERMISSIONS. ie. there's a READ group, WRITE group, ADMIN group
+6. Everybody in a GROUP has SAME accessS. ie. there's a READ group, WRITE group, ADMIN group
 
 7. Each project has a READ group and a WRITE group.
 
@@ -477,7 +499,7 @@ REMEMBER TO SAVE!!
 
 
 		accounts: 
-			def.: logged-in users (with different capabilites)
+			def.: logged-in users (with different capabilities)
 			
 			capabilities: 
 		
@@ -489,7 +511,7 @@ REMEMBER TO SAVE!!
 				- view projects (maps)
 				
 				- delegate access to users for own projects (add/remove)
-				- delegate capabilites up to own capability (as a capability)
+				- delegate capabilities up to own capability (as a capability)
 				
 				- invite users by email, giving that email-account a predefined access-level.  (users would then have to go to site, create password, and log in.)
 
@@ -993,7 +1015,7 @@ Every Project has an Admin. This Project-Admin has RWM access to that Project. D
 
 
 
-- where should files' permission go? in file? or list in user? but then all new users must get this list... 
+- where should files' access go? in file? or list in user? but then all new users must get this list... 
 	virtual access spaces/families?
 
 

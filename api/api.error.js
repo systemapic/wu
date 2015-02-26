@@ -37,17 +37,30 @@ var mapnikOmnivore = require('mapnik-omnivore');
 
 // api
 var api = module.parent.exports;
-console.log('ERROR === api=>', api);
 
 // exports
 module.exports = api.error = { 
 
 
 	unauthorized : function (req, res) {
-		var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-		res.end(JSON.stringify({ error : message }));
+		var message = "Don't be cheeky! All your IP are belong to us.";
+		res.end(JSON.stringify({ 
+			error : message 
+		}));
 	},
 
+	missingInformation : function (req, res) {
+		var message = 'Missing information. Stay with the program!';
+		res.end(JSON.stringify({ 
+			error : message 
+		}));
+	},
+
+	general : function (req, res, err) {
+		res.end(JSON.stringify({
+			error : err
+		}));
+	},
 	
 
 

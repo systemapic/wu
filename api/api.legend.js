@@ -38,7 +38,6 @@ var mapnikOmnivore = require('mapnik-omnivore');
 
 // api
 var api = module.parent.exports;
-console.log('api.legend === api=>', api);
 
 // exports
 module.exports = api.legend = { 

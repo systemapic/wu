@@ -379,10 +379,39 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
+	// access: GET ROLE  ===============
+	// =====================================
+	app.post('/api/access/getrole', isLoggedIn, function (req,res) {
+		api.access.getRole(req, res);
+	});
+
+	// =====================================
+	// access: SET ROLE  ===============
+	// =====================================
+	app.post('/api/access/setrolemember', isLoggedIn, function (req,res) {
+		api.access.setRoleMember(req, res);
+	});
+
+	// =====================================
+	// access: SET ROLE SUPERADMIN =========
+	// =====================================
+	app.post('/api/access/super/setrolemember', isLoggedIn, function (req,res) {
+		api.access.setSuperRoleMember(req, res);
+	});
+
+	// =====================================
+	// access: SET ROLE  ===============
+	// =====================================
+	app.post('/api/access/portal/setrolemember', isLoggedIn, function (req,res) {
+		api.access.setPortalRoleMember(req, res);
+	});
+
+
+	// =====================================
 	// RESET PASSWORD ======================
 	// =====================================
 	app.post('/reset', function (req, res) {
-		api.permission.requestPasswordReset(req, res);
+		api.access.requestPasswordReset(req, res);
 	});
 
 
@@ -390,7 +419,7 @@ module.exports = function(app, passport) {
 	// RESET PASSWORD ======================
 	// ===================================== 
 	app.get('/reset', function (req, res) {
-		api.permission.confirmPasswordReset(req, res);
+		api.access.confirmPasswordReset(req, res);
 	});
 
 

@@ -1188,7 +1188,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.project.store.files.forEach(function(file, i, arr) {
 		     
 			// iterate and find hit
-			if (file.uuid == fuuid) {
+			if (file.uuid == fuuid) {	// refactor to file object?
 
 				// create update object
 				var json = {};

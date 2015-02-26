@@ -38,7 +38,6 @@ var mapnikOmnivore = require('mapnik-omnivore');
 
 // api
 var api = module.parent.exports;
-console.log('api.layer === api=>', api);
 
 // exports
 module.exports = api.layer = { 
@@ -62,6 +61,12 @@ module.exports = api.layer = {
 
 
 	},
+
+	// _create : function (options, callback) {
+
+		
+
+	// },
 
 	// create OSM layer
 	createOSM : function (req, res) {
@@ -126,8 +131,8 @@ module.exports = api.layer = {
 	// get layers and send to client
 	get : function (req, res) {
 
-		var project 	= req.body.project 	|| false;
-		var user 	= req.user.uuid 	|| false;
+		var project 	= req.body.project;
+		var user 	= req.user.uuid;
 
 		// error if no project or user
 		if (!project) return res.end("{ 'error' : 'no project id?'}"); 

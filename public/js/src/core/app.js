@@ -1,4 +1,4 @@
-Wu.version = '0.5-dev';
+Wu.version = '0.5.1-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -6,13 +6,6 @@ Wu.App = Wu.Class.extend({
 
 	// default options
 	options : systemapicConfigOptions, // global var from config.js... perhaps refactor.
-
-	// permission : function () {
-	// 	console.log('as');
-	// 	var p = new Wu.Permission();
-	// 	console.log('p', p);
-	// },	
-
 
 	_ready : false,
 
@@ -106,18 +99,14 @@ Wu.App = Wu.Class.extend({
 		// set vars
 		this.options.json = options;
 
-		// load json model
-		this._initObjects();
-
-		// permissions
-		this._initPermissions();
+		// accesss
+		this._initAccess();
 
 		// load json model
 		this._initObjects();
 
-
-
-
+		// load json model
+		this._initObjects();
 
 		// create app container
 		this._initContainer();
@@ -195,8 +184,8 @@ Wu.App = Wu.Class.extend({
 
 	},
 
-	_initPermissions : function () {
-		this.Permissions = new Wu.Permissions(this.options);
+	_initAccess : function () {
+		this.Access = new Wu.Access(this.options.json.access);
 	},
 
 	_initDependencies : function () {
@@ -306,7 +295,14 @@ Wu.App = Wu.Class.extend({
 
 		// if user is admin or manager, set Projects and Users as default panes
 		var user = app.Account;
-		if (user.isAdmin() || user.isSuperadmin() || user.isManager()) {
+		if (
+			// user.isAdmin() || 
+			// user.isSuperadmin() || 
+			// user.isManager()
+			app.access.is.superAdmin() ||
+			app.access.is.portalAdmin() 
+			// app.account.
+		   ) {
 			// set panes 
 			this.SidePane.refresh(['Clients', 'Users', 'Account']);		
 		}
@@ -370,7 +366,7 @@ Wu.App = Wu.Class.extend({
 		project.select();
 
 		// refresh sidepane
-		app.SidePane.refreshProject(project);
+		// app.SidePane.refreshProject(project);
 
 		// remove help pseudo
 		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');

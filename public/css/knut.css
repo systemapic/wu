@@ -282,3 +282,160 @@ body {
   background-color: #CFD0D2 !important; 
   color: black !important;
 }
+
+
+
+
+
+
+
+
+
+
+
+/*
+.access-role-dropdown-wrap {
+	right: 0;
+	position: absolute;
+	top: 0;
+	width: 200px;
+}
+
+.access-role {
+	font-size: 220%;
+	vertical-align: middle;
+	text-align: center;
+	padding: 11px;
+	height: 65px;
+}
+
+.access-role.current {
+	background: yellow;
+}
+.access-role.possible {
+	background: gray;
+}
+.access-role:hover {
+	background:green;
+}
+.access-possible-wrap {
+	position: absolute;
+	width: 100%;
+	border: 2px solid black;
+	border-radius: 5px;
+	z-index: 10;
+	background: red;
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+.manage-access-container {
+	background : rgba(255, 255, 255, 0.9);
+	height: 100%;
+	overflow: auto;
+	color: #3F4652;
+}
+
+.manage-access-client-meta-wrap {
+	position: relative;
+	height: 80px;
+}
+
+.manage-access-client-logo {
+	width: 100px;
+	max-height: 100px;
+	position: absolute;
+	left: 0px;
+	margin: 5px;
+}
+
+.manage-access-client-title {
+	position: absolute;
+	left: 110px;
+	font-size: 140%;
+	margin: 10px;
+}
+
+.manage-access-project-item {
+	margin-top: 5px;
+	position: relative;
+}
+
+.manage-access-project-item:nth-child(odd) {
+	background: rgba(255, 255, 255, 0.63);
+}
+
+.manage-access-project-item-meta {
+	position: relative;
+	height: 80px;
+}
+
+.manage-access-project-item-logo {
+	width: 100px;
+	max-height: 67px;
+	position: absolute;
+	left: 0px;
+}
+
+.manage-access-project-item-title {
+	position: absolute;
+	left: 120px;
+	font-size: 120%;
+}
+
+.manage-access-project-item-description {
+	position: absolute;
+	left: 120px;
+	bottom: 10px;
+	font-size: 100%;
+}
+
+.manage-access-client-projects-wrap {
+	margin-left: 50px;
+	position: relative;
+}
+
+.manage-access-roles-wrapper {
+	position: absolute;
+	left: 400px;
+	top: 30px;
+	z-index: 1000;
+}
+
+.manage-access-current-role {
+	font-size: 120%;
+	border: 1px solid blue;
+}
+
+
+.manage-access-dropdown {
+	border: 1px solid black;
+	z-index: 1000;
+}
+
+.manage-access-available-role:hover {
+	background: white;
+}
+
+
+
+
+
+*/
