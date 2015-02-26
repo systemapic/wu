@@ -1,3 +1,4 @@
+// app.Tooltip
 Wu.Tooltip = Wu.Class.extend({
 
 	options : {

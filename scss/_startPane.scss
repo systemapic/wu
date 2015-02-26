@@ -124,8 +124,10 @@
 }
 
 .start-panne-recent-projects img {
-	width: 100%;
-}
+	/*width: 100%;*/
+	position: absolute;
+	left: 0;
+	}
 
 
 /*Start pane*/

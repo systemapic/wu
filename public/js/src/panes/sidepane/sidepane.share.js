@@ -1,3 +1,4 @@
+// app.SidePane.Share
 Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	
 	type : 'share',
