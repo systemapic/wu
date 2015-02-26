@@ -1,3 +1,5 @@
+// app.MapPane.legendsControl
+
 L.Control.Legends = L.Control.extend({
 	
 	options: {

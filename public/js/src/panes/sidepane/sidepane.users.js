@@ -1,3 +1,4 @@
+// app.SidePane.Users
 Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	_ : 'sidepane.users', 
 
@@ -226,7 +227,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		this._table.appendChild(_tr);
 
-
 		var _td1 = Wu.DomUtil.create('td', 'checkbox', _tr);
 		var _cBox = Wu.DomUtil.create('div', 'squaredThree', _td1);
 		var _cBoxInput = Wu.DomUtil.create('input', '', _cBox);
@@ -234,7 +234,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		_cBoxInput.setAttribute('value', 'None');
 		_cBoxInput.setAttribute('name', 'check');
 		var _cBoxLabel = Wu.DomUtil.create('label', '', _cBox);
-
 		
 		var _td2 = Wu.DomUtil.create('td', 'name', _tr);
 
@@ -569,16 +568,10 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	addTableItem : function (user) {
 
+		console.log('addTableItem', user);
+
 		// prepare template values
 		var template = {};   
-
-		// template.name = ich.usersTablerowName({
-		// 	firstName     : user.getFirstName() || 'First name',
-		// 	lastName      : user.getLastName()  || 'Last name',
-		// 	lastNameUuid  : 'lastName-'  + user.getUuid(),
-		// 	firstNameUuid : 'firstName-' + user.getUuid(),
-		// });
-
 
 		var tmpData = {
 			firstName     : user.getFirstName() || 'First name',
@@ -1014,7 +1007,10 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	// rename a div, ie. inject <input>
 	_rename : function (e) {
-		
+
+		// To make sure that no other fields are being edited
+		if ( this._isFocus )  this._forceStopBlur(this._previousTarget);
+
 		var div   = e.target;
 		var value = e.target.innerHTML;
 		var key   = e.target.getAttribute('key');
@@ -1025,8 +1021,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 			key   : key , 
 			uuid  : uuid 
 		};
-		
 
+		// clear namespace
 		div.innerHTML = '';
 
 		var input = Wu.DomUtil.create('input', 'inject-input', div);
@@ -1034,32 +1030,61 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		input.setAttribute('value', inputData.value);
 		input.setAttribute('uuid', inputData.uuid);
 
-
-		// <input key="{{key}}" value="{{value}}" uuid="{{uuid}}" class="inject-input">
-
-
-		// inject <input>
-		// div.innerHTML = input;
-
 		var target = div.firstChild;
 
+		// Store previous target, in case it's still in focus when we enter edit mode.
+		this._previousTarget = target;
+
 		// enable editing on input box
-		//e.target.removeAttribute('readonly'); 
 		target.focus();
+
 		target.selectionStart = target.selectionEnd;
 
+		// We're in focus mode – in case it doesn't snap out of it.
+		this._isFocus = true;
+
 		// save on blur or enter
-		Wu.DomEvent.on( target,  'blur', this._editBlur, this );     // save folder title
+		Wu.DomEvent.on( target,  'blur', this._editBlur, this );       // save folder title
 		Wu.DomEvent.on( target,  'keydown', this._editKey, this );     // save folder title
+
 
 	},
 
 	_editKey : function (e) {
+
 		// blur on enter
 		if (event.which == 13 || event.keyCode == 13) e.target.blur();
 	},
 
+
+	// Like _editBlur below, but if we go from editing one field to another one, the first one doesn't snap out of editing mode
+	// this function will take care of that.
+	_forceStopBlur : function (el) {
+
+		// Snap out of focus mode
+		this._isFocus = false;
+
+		// get value
+		var value = el.value;
+		var key   = el.getAttribute('key');
+		var user  = el.getAttribute('uuid');
+
+		// revert to <div>
+		var div = el.parentNode;
+
+		//refresh list
+		this.list.update();
+
+		// save to server
+		this.save(key, value, user);		
+
+
+	},
+
 	_editBlur : function (e) {
+
+		// Snap out of focus mode
+		this._isFocus = false;
 
 		// get value
 		var value = e.target.value;
