@@ -10,7 +10,6 @@ var LocalStrategy = require('passport-local').Strategy;
 var User = require('../models/user');
 
 
-
 // redis, crypto
 var crypto = require('crypto');
 var redis = require('redis');
@@ -59,8 +58,6 @@ module.exports = function(passport) {
 	},
 	function(req, email, password, done) {
 
-		// console.log('LOGIN ATTEMPT!', email, password);
-
 		// asynchronous
 		// User.findOne wont fire unless data is sent back
 		process.nextTick(function() {
@@ -69,30 +66,26 @@ module.exports = function(passport) {
 			// we are checking to see if the user trying to login already exists
 			User.findOne({ 'local.email' :  email }, function(err, user) {
 				// if there are any errors, return the error
-				if (err)
-					return done(err);
+				if (err) return done(err);
 
 				// check to see if there's already a user with that email
-				if (user) {
-					return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
-				} else {
+				if (user) return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
 
-					// if there is no user with that email
-					// create the user
-					var newUser            = new User();
+				// if there is no user with that email,
+				// create the user
+				var newUser            = new User();
 
-					// set the user's local credentials
-					newUser.local.email    = email;
-					newUser.local.password = newUser.generateHash(password);
-					newUser.uuid = 'user-' + uuid.v4();
+				// set the user's local credentials
+				newUser.local.email    = email;
+				newUser.local.password = newUser.generateHash(password);
+				newUser.uuid = 'user-' + uuid.v4();
 
-					// save the user
-					newUser.save(function(err) {
-						if (err)
-							throw err;
-						return done(null, newUser);
-					});
-				}
+				// save the user
+				newUser.save(function(err) {
+					if (err) console.error(err);
+					return done(null, newUser);
+				});
+
 
 			});    
 
@@ -121,7 +114,6 @@ module.exports = function(passport) {
 		// we are checking to see if the user trying to login already exists
 		User.findOne({ 'local.email' :  email }, function(err, user) {
 			// if there are any errors, return the error before anything else
-			// console.log('err, user, ', err, user);
 
 			if (err) return done(err);
 
@@ -131,12 +123,10 @@ module.exports = function(passport) {
 			// if the user is found but the password is wrong
 			if (!user.validPassword(password)) return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
 
-			// console.log('redis');
-
 			// set token, save to user
 			user.token = setRedisToken(user);
 			user.save(function (err) {
-				// console.log('redis save, err', err);
+
 				if (err) console.error(err);
 
 				// all is well, return successful user
@@ -153,16 +143,15 @@ module.exports = function(passport) {
 	
 
 	// tiles access token
-	//
+
 	// - set an access token for each time user logs in
 	// - access token stored in redis
 	// - redis replicated securely on tx
 	// - checks if access token exists - lives forever
 	// - new access token created each time user logs in, then the access token is dead
-	//
-	function setRedisToken(user) {
 
-		// console.log('settoken', user);
+	// helper fn
+	function setRedisToken(user) {
 
 		// keys
 		var key = 'authToken-' + user._id;
@@ -174,12 +163,6 @@ module.exports = function(passport) {
 		// return token
 		return tok;
 	}
-
-
-
-
-
-
 
 
 };

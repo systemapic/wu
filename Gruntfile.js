@@ -187,6 +187,7 @@ module.exports = function(grunt) {
 					'public/js/src/panes/sidepane/sidepane.mediaLibrary.js',
 					'public/js/src/panes/sidepane/sidepane.share.js',
 					'public/js/src/panes/sidepane/sidepane.account.js',
+					'public/js/src/panes/sidepane/sidepane.manage.js',
 
 					// Other Panes 
 					'public/js/src/panes/headerpane.js',
@@ -216,7 +217,11 @@ module.exports = function(grunt) {
 					'public/js/src/models/users.js',
 					'public/js/src/models/layers.js',
 					'public/js/src/models/files.js',
+					'public/js/src/models/roles.js',
 
+					// Access
+					'public/js/src/core/access.js',
+			
 					// Analytics
 					'public/js/src/core/analytics.js',
 

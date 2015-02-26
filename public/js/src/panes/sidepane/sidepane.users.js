@@ -22,10 +22,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this._deleteUser = Wu.DomUtil.create('div', 'users-delete-user smap-button-gray users', this._usersControlsInner, 'Delete user');
 
 		// Search users
-		this._search = Wu.DomUtil.createId('input', 'users-search', this._usersControlsInner);
+		this._search = Wu.DomUtil.createId('input', 'users-search search', this._usersControlsInner);
 		this._search.setAttribute("type", "text");
 		this._search.setAttribute("placeholder", "Search users");
-		Wu.DomUtil.addClass(this._search, 'search');
 
 		// create container (overwrite default) and insert template
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content);
@@ -88,11 +87,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		th7.setAttribute('data-sort', 'projects');
 		th7.setAttribute('data-insensitive', 'true');	
 
-
 		// #users-insertrows
 		this._table = Wu.DomUtil.createId('tbody', 'users-insertrows', table)
 		this._table.className = 'list';
-
 
 		// init table
 		this.initList();
@@ -157,6 +154,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// hide other controls
 		this._hideControls();
+
+		// hide manage if open
+		if (this._manage) this._manage.close();
 
 	},
 
@@ -341,15 +341,14 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		clearTimeout(this._checkUniqeEmailTimer);
 		
 		// check
-		var context = this;
 		this._checkUniqeEmailTimer = setTimeout(function() {
-			var email = context._inputUser._email.value;
+			var email = this._inputUser._email.value;
 			var json = JSON.stringify({ 
 				email : email
 			});
 			// post              path          data           callback        context of cb
-			Wu.Util.postcb('/api/user/unique', json, context.checkedUniqueEmail, context);
-		}, 250);         
+			Wu.Util.postcb('/api/user/unique', json, this.checkedUniqueEmail, this);
+		}.bind(this), 250);         
 	},
 
 	checkedUniqueEmail : function (context, data) {
@@ -407,7 +406,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var position	= this._inputUser._position.value;
 		var phoneNo	= this._inputUser._phoneNo.value;
 
-
+		// return on missing info
 		if (!firstName) return;
 		if (!lastName) return;
 		if (!email) return;
@@ -421,8 +420,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 			position  : position,
 			phone     : phoneNo
 		}
-
-
 
 		// create user
 		this.createUser(input);
@@ -443,21 +440,25 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 
 	// send new user request to server
-	createUser : function (input) {
-		var data = JSON.stringify(input);
+	createUser : function (data) {
 		if (!data) return;
 
+		// managers only have create_user access on project, so include project
+		if (app.activeProject) data.project = app.activeProject.getUuid();
+
 		// get new user from server
-		Wu.post('/api/user/new', data, this.createdUser, this);
+		Wu.post('/api/user/new', JSON.stringify(data), this.createdUser, this);
 
 	},
 
 	// reply from server
 	createdUser : function (context, json) {
 
-		// console.log('createdUser: ', context, json);
+		console.log('createdUser: ', context, json);
 
 		var store = JSON.parse(json);
+		if (store.error) return console.error(result.error);
+
 		var user = new Wu.User(store);
 		user.attachToApp();
 		context.addTableItem(user); 	// todo: add user to top
@@ -493,7 +494,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// delete each selected user
 		checked.forEach(function (user){
 			// confirm delete
-			var name = user.store.firstName + ' ' + user.store.lastName;
+			var name = user.getFirstName() + ' ' + user.getLastName();
 			if (confirm('Are you sure you want to delete user ' + name + '?')) {
 				if (confirm('Are you REALLY SURE you want to delete user ' + name + '?')) {
 					this.confirmDelete(user);
@@ -514,7 +515,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// GA – Deleted Username
 		var _delUsrName = user.getFullName();
-		ga('set', 'dimension12', _delUsrName);		
+		ga('set', 'dimension12', _delUsrName);	 	// todo	
 		
 	},
 
@@ -543,10 +544,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	},
 
 	
-	
-
 	refreshTable : function () {
-		
 		this.users = app.Users;
 
 		for (u in this.users) {
@@ -556,16 +554,16 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		
 		// sort list by name by default
 		this.list.sort('name', {order : 'asc'});
-
 	},
 
 	
-
 	reset : function () {
 		// clear table
 		this.list.clear();
 	},
 
+
+	// add user entry to table
 	addTableItem : function (user) {
 
 		console.log('addTableItem', user);
@@ -584,9 +582,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var tmpLastNameString = '<input value="' + tmpData.lastName + '" id="' + tmpData.lastNameUuid + '" class="dln" readonly="readonly">';
 		var tmpFirstNameString = '<input value="' + tmpData.firstName + '" id="' + tmpData.firstNameUuid + '" class="dln smallerText" readonly="readonly">';
 
-		template.name = tmpLastNameString + tmpFirstNameString;
-
-
+		template.name 	  = tmpLastNameString + tmpFirstNameString;
 		template.email    = user.getEmail();
 		template.position = user.getPosition();
 		template.company  = user.getCompany();
@@ -618,63 +614,25 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	
 		// add edit hooks
 		this.setEditHooks(user.getUuid());
-
 	},
 
-	getAccessTemplate : function (user) {
 
+	// # of projects box in user entry
+	getAccessTemplate : function (user) {
 
 		var divProjectsOpen = '<div class="user-projects-button">';
 		var divProjectsClose = '</div>';
 
 		// get no of projets etc for user
 		var projects = user.getProjects();
-		if (projects.length > 1) return divProjectsOpen + projects.length + ' projects' + divProjectsClose; //projects
-		return divProjectsOpen + projects.length + ' project' + divProjectsClose;
+
+		var numProjects = projects ? projects.length : 0;
+
+		console.log('projects: ', projects);
+
+		if (numProjects == 1) return divProjectsOpen + numProjects + ' project' + divProjectsClose; //projects
+		return divProjectsOpen + numProjects + ' projects' + divProjectsClose;
 	},
-
-	getProjectsTemplate : function (user) {
-		var template = '';
-
-		// all projects	for superusers
-		if (user.isSuperuser()) {	
-			for (p in app.Projects) {
-				var project = app.Projects[p];
-				if (!project) return;
-				content = {
-					name 		: project.store.name,
-					description 	: project.store.description,
-					uuid 		: project.store.uuid
-				}
-				template += '<div class="users-table-project-item" title="' + content.description + '" >' + content.name + '</div>';
-
-				
-			}
-			return template;
-		}
-		
-		// otherwise projects that user read/update/manage
-		var projects = user.getProjects();
-		if (!projects || projects.length == 0) return template;
-		projects.forEach(function (uuid) {
-			var project = app.Projects[uuid];
-			if (!project) return;
-			content = {
-				name 		: project.store.name,
-				description 	: project.store.description,
-				uuid 		: project.store.uuid
-			}
-			template += '<div class="users-table-project-item" title="' + content.description + '" >' + content.name + '</div>';
-		}, this);
-		return template;
-	},
-
-
-
-	checkEscape : function (e) {
-		if (e.keyCode == 27) this._popupCancel(); // esc key
-	},
-
 
 
 	setEditHooks : function (uuid, onoff) {
@@ -708,135 +666,41 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	},
 
+	// on click on # of projects box
 	editAccess : function (uuid) {
-
 		var user = app.Users[uuid];
 
 		// open backpane
-		this.manageAccess(user);
+		this._manage = new Wu.SidePane.Manage({
+			user : user,
+			caller : this
+		});
 
-		// Hide the Create user etc.
+		this._manage.addTo(this._content);
+
+		// hide top bar
 		Wu.DomUtil.addClass(this._content, 'hide-top', this);
 
 		// Google Analytics event tracking
-		var _uId = user.getUuid();
-		var _uName = user.getName()
-		app.Analytics.ga(['Side Pane', 'Users: Edit access', _uName + ' (' + _uId + ' )']);
-
-
+		app.Analytics.ga(['Side Pane', 'Users: Edit access', user.getName() + ' (' + user.getUuid() + ' )']);
 	},
 
 
-	// fullscreen input for new user details
-	manageAccess : function (user) {
 
-		var titleText    = 'Manage access for ' + user.getName();
-		var subtitleText = 'Manage read, write and manage access for this user.';
-		// var messageText  = '<h4>Guide:</h4>Managers can add READ access to projects they are managers for.';
-		// messageText     += '<br>Admins can add READ, WRITE and MANAGE access to projects they have created themselves.'
-		var saClass      = user.isSuperadmin() ? 'green' : 'red';
-		var aClass       = user.isAdmin() ? 'green' : 'red';
 
-		var projects     = '';
 
-		this._inputAccess = {};
-		var container  = this._inputAccess._container     = Wu.DomUtil.create('div', 'backpane-access-container', this._content);
-		var wrapper    = this._inputAccess._wrapper       = Wu.DomUtil.create('div', 'backpane-access-wrapper',   container);
-		var title      = this._inputAccess._title         = Wu.DomUtil.create('div', 'backpane-title',     	  wrapper, titleText);
-		var subtitle   = this._inputAccess._subtitle  	  = Wu.DomUtil.create('div', 'backpane-subtitle',  	  wrapper, subtitleText);		
-		
-		// admin boxes to display super/admin status
-		var superadmin = this._inputAccess._superadmin    = Wu.DomUtil.create('div', 'backpane-superadmin-box ' + saClass, wrapper, 'Superadmin');
-		var admin      = this._inputAccess._admin         = Wu.DomUtil.create('div', 'backpane-admin-box ' + aClass, wrapper, 'Admin');
-
-		var subtitle2  = this._inputAccess._projectTitle  = Wu.DomUtil.create('div', 'backpane-projectTitle', 	  wrapper, 'Projects:');	
-		var projectsWrap = this._inputAccess._projectsWrap = this.insertProjectWrap(user);	
-		var confirm    = this._inputAccess._confirm   = Wu.DomUtil.create('div', 'backpane-confirm smap-button-gray',   wrapper, 'Done');
-		// var message    = this._inputAccess._message   = Wu.DomUtil.create('div', 'backpane-message',   wrapper, messageText);
-
-		Wu.DomEvent.on(confirm, 'mousedown', this.closeManageAccess,     this);
-
-		// Toggle wrappers
-		this._container.style.display = 'none';
+	_hide : function () {
+		Wu.DomUtil.addClass(this._container, 'displayNone');
+		Wu.DomUtil.addClass(this._content, 'hide-top');	
 	},
 
-	closeManageAccess : function () {
-		
-		Wu.DomUtil.remove(this._inputAccess._container);
-
-		// Toggle wrappers
-		this._container.style.display = 'block';
-
-		// update errythign
-		this.update();
-
-		// Show the Create user etc.
-		Wu.DomUtil.removeClass(this._content, 'hide-top', this);	
-
-		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Users: Close manage access']);
-
+	_show : function () {
+		Wu.DomUtil.removeClass(this._content, 'hide-top');	
+		Wu.DomUtil.removeClass(this._container, 'displayNone');	
 	},
 
-	insertProjectWrap : function (user) {
-
-		// create wrapper
-		var wrapper = Wu.DomUtil.create('div', 'backpane-projects-wrap', this._inputAccess._wrapper);
-
-		// array of projects
-		var projects = this._getProjectAccessSchema();
-		if (projects.length == 0) return;
-
-		
-
-		// add projects
-		projects.forEach(function (project) {
-			if (!project) return;
-
-			this._createManageEntry(user, project, wrapper);
-			
-		}, this)
 
 
-		return wrapper;
-	},
-
-	_createManageEntry : function (user, project, wrapper) {
-
-		// edit/manage delegation only for admins
-		var managerPriv = app.Account.isAdmin() || app.Account.isSuperadmin(), 
-		    editorPriv 	= app.Account.isSuperadmin(),
-		    pname 	= project.getName(),
-		    cli 	= project.getClient(),
-		    cname 	= cli ? cli.getName() : 'DELETED CLIENT!',
-		    readClass   = (user.canReadProject(project.getUuid()))   ? 'gotAccess' : '',
-		    editClass   = (user.canUpdateProject(project.getUuid())) ? 'gotAccess' : '',
-		    manageClass = (user.canManageProject(project.getUuid())) ? 'gotAccess' : '',
-		    titleText   = pname + ' (' + cname + ')';
-
-		var wrap    = Wu.DomUtil.create('div', 'access-projects-wrap', 			wrapper);
-		var details = Wu.DomUtil.create('div', 'access-projects-details-wrap', 		wrap);
-		var title   = Wu.DomUtil.create('div', 'access-projects-title', 		details, 	titleText);
-		var desc    = Wu.DomUtil.create('div', 'access-projects-description', 		details, 	project.getDescription());
-		var read    = Wu.DomUtil.create('div', 'access-projects-read ' + readClass, 	wrap, 		'Read');
-		var edit, manage;
-
-		if (editorPriv)    edit = Wu.DomUtil.create('div', 'access-projects-write ' + editClass, 	wrap, 		'Edit');
-		if (managerPriv) manage = Wu.DomUtil.create('div', 'access-projects-manage ' + manageClass, wrap, 	'Manage');
-		
-		var item = {
-			user    : user,
-			project : project,
-			read    : read,
-			edit    : edit,
-			manage  : manage
-		}
-
-		Wu.DomEvent.on(read, 'mousedown', function () { this.toggleReadAccess(item)}, this);
-		if (editorPriv) Wu.DomEvent.on(edit,    'mousedown', function () { this.toggleUpdateAccess(item)}, this);
-		if (managerPriv) Wu.DomEvent.on(manage, 'mousedown', function () { this.toggleManageAccess(item)}, this);
-
-	},
 
 	toggleReadAccess : function (item) {
 
@@ -844,16 +708,13 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var user = item.user;
 
 		// get current state
-		var state = (user.store.role.reader.projects.indexOf(item.project.getUuid()) >= 0) ? true : false;
+		var state = (user.store.role.reader.projects.indexOf(item.project.getUuid()) >= 0);
 
 		// add/remove
 		state ? this._removeRead(item) : this._addRead(item);
 
-
 		// Google Analytics event tracking
-		var _uId = user.getUuid();
-		var _uName = user.getName()
-		app.Analytics.ga(['Side Pane', 'Users: Toggle read access' + state, _uName + ' (' + _uId + ' )']);
+		app.Analytics.ga(['Side Pane', 'Users: Toggle read access' + state, user.getName() + ' (' + user.getUuid() + ' )']);
 
 
 	},
@@ -907,7 +768,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this._addRead(item);
 
 	},
-
 
 	toggleUpdateAccess : function (item) {
 		// console.log('toggle: ', item);

@@ -1,41 +1,53 @@
-var fs = require('fs-extra');
-var async = require('async');
-var util = require('util');
-var uuid = require('node-uuid');
-var dive = require('dive');
-var fspath = require('path');
-var _ = require('lodash-node');
-var tj = require('togeojson');	// kml to geojson
-var jsdom = require('jsdom').jsdom;
+// API: api.geo.js
+
+// database schemas
+var Project 	= require('../models/project');
+var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
+var User  	= require('../models/user');
+var File 	= require('../models/file');
+var Layer 	= require('../models/layer');
+var Hash 	= require('../models/hash');
+var Role 	= require('../models/role');
+var Group 	= require('../models/group');
+
+// utils
+var _ 		= require('lodash-node');
+var fs 		= require('fs-extra');
+var gm 		= require('gm');
+var kue 	= require('kue');
+var fss 	= require("q-io/fs");
+var srs 	= require('srs');
+var zlib 	= require('zlib');
+var uuid 	= require('node-uuid');
+var util 	= require('util');
+var utf8 	= require("utf8");
+var mime 	= require("mime");
+var exec 	= require('child_process').exec;
+var dive 	= require('dive');
+var async 	= require('async');
+var carto 	= require('carto');
+var crypto      = require('crypto');
+var fspath 	= require('path');
+var mapnik 	= require('mapnik');
+var request 	= require('request');
+var ogr2ogr 	= require('ogr2ogr');
+var nodepath    = require('path');
+var formidable  = require('formidable');
+var nodemailer  = require('nodemailer');
+var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
-// var request = require('request');
-var request = require('superagent');
-var zlib = require('zlib');
-var ogr2ogr = require('ogr2ogr');
-var srs = require('srs');
 
+// api
+var api = module.parent.exports;
 
-// models
-var File = require('../models/file');
-var Layer = require('../models/layer');
-var Project = require('../models/project');
-
-// image cruncher
-var pixels = require('../api/pixels');
-
-
-// global paths
-var FILEFOLDER = '/data/files/';
-var VILEFOLDER = '/data/geojson/';
-// var TILESERVER = '/var/www/DATA/geojson/';
-
-
-module.exports = geo = { 
+// exports
+module.exports = api.geo = { 
 
 
 	copyToVileFolder : function (path, fileUuid, callback) {
 		console.time('copyToVileFolder');
-		var dest = VILEFOLDER + fileUuid + '.geojson';
+		// var dest = VILEFOLDER + fileUuid + '.geojson';
+		var dest = api.config.path.geojson + fileUuid + '.geojson';
 		fs.copy(path, dest, function(err) {
 			console.timeEnd('copyToVileFolder');
 			callback(err);
@@ -44,7 +56,7 @@ module.exports = geo = {
 
 	handleGeoJSON : function (path, fileUuid, callback) {
 
-		geo.copyToVileFolder(path, fileUuid, function (err) {
+		api.geo.copyToVileFolder(path, fileUuid, function (err) {
 
 			mapnikOmnivore.digest(path, function (err, metadata) {
         		
@@ -123,12 +135,12 @@ module.exports = geo = {
 
 			// check if valid shapefile(s)
 			ops.push(function (done) {
-				geo.validateshp(files, done);
+				api.geo.validateshp(files, done);
 			});
 
 			// convert shapefile to geo/topojson
 			ops.push(function (done) {
-				geo.convertshp(files, folder, done);
+				api.geo.convertshp(files, folder, done);
 			});
 
 			// run async jobs
@@ -155,7 +167,7 @@ module.exports = geo = {
 						
 
 
-				geo.copyToVileFolder(path, fileUuid, function (err) {
+				api.geo.copyToVileFolder(path, fileUuid, function (err) {
 
 					// read meta from file
 					console.log('reading meta...');
@@ -243,7 +255,7 @@ module.exports = geo = {
 		
 		 
 		// get the .shp file
-		var shps = geo.getTheShape(shapes);
+		var shps = api.geo.getTheShape(shapes);
 		
 		// return err if no .shp found
 		if (!shps) return callback('No shapefile?');
@@ -253,7 +265,8 @@ module.exports = geo = {
 		var base = shp.slice(0,-4);
 		var fileUuid = 'file-' + uuid.v4();
 		var toFile = shp + '.geojson';
-		var outfolder = FILEFOLDER + fileUuid;
+		// var outfolder = FILEFOLDER + fileUuid;
+		var outfolder = api.config.path.file + fileUuid;
 		var outFile = outfolder + '/' + toFile;
 		var inFile = outfolder + '/' + shp;
 		var zipFile = outfolder + '/' + base + '.zip';
@@ -267,7 +280,7 @@ module.exports = geo = {
 			base : base
 		}
 						// callback
-		geo.moveShapefiles(options, function (err) {
+		api.geo.moveShapefiles(options, function (err) {
 			if (err) console.log('moveShapefiles err', err);
 
 
@@ -302,7 +315,7 @@ module.exports = geo = {
 				if (err) console.error('exec ogr2ogr err', err, data);
 
 				// do fallback on error
-				if (err) return geo._ogr2ogrFallback(folder, outfolder, toFile, outFile, inFile, fileUuid, callback);
+				if (err) return api.geo._ogr2ogrFallback(folder, outfolder, toFile, outFile, inFile, fileUuid, callback);
 
 				// write file 
 				fs.outputFile(outFile, JSON.stringify(data), function (err) {
@@ -968,12 +981,3 @@ module.exports = geo = {
 
 
 }
-
-
-
-
-
-
-
-
-
