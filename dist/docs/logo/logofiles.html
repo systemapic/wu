@@ -1,0 +1,147 @@
+<html>
+<head>
+<style>
+
+body {
+	font-family: helvetica neue;
+}
+
+.image-category-container {
+	border-bottom: 1px solid black;
+	border-top: 1px solid white;
+	padding-top: 30px;
+	}
+
+.image-container {
+	display: inline-block;
+	vertical-align: top;
+	margin-right: 50px;
+}
+.image-container img {
+	display: block;
+	margin-bottom: 10px;
+	cursor: pointer;
+}
+
+.image-category-header {
+/*text-align: center;*/
+margin-bottom: 20px;
+font-size: 30px;
+
+}
+
+.image-dim-header {
+	text-align: center;
+	margin-bottom: 10px;
+}
+</style>
+</head>
+<body style="background-color: pink">
+
+
+Set background color<br><br>
+<input type='text' value='pink' id='bgc'>
+<button id="setColor">Set</button>
+<br><br>
+<br><br>
+
+<div id="inHere"></div>
+
+
+
+
+
+</body>
+
+<script type="text/javascript">
+	
+var container = document.getElementById('inHere');
+
+
+
+var list = [
+
+	{
+		folder : 'Normal',
+		names : [ 'black', 'white', 'white-shadow', 'grayDark', 'grayLight', 'grayLight-shadow'],
+		dims : ['72x60', '144x120', '287x240', '575x480']
+
+	},
+
+	{
+		folder : 'Just_Circle',
+		names : [ 'black', 'white', 'white-shadow', 'grayDark', 'grayLight', 'grayLight-shadow'],
+		dims : ['60x60', '120x120', '240x240', '480x480']
+
+	},
+
+	{
+		folder : 'Sideways',
+		names : [ 'black', 'white', 'white-shadow', 'grayDark', 'grayLight', 'grayLight-shadow'],
+		dims : ['72x20', '126x35', '216x60', '323x90', '467x130', '611x170', '719x200']
+
+	}
+
+	];
+
+
+list.forEach(function(folder) {
+
+
+	var eachCont = document.createElement('div');
+	eachCont.className = 'image-category-container';
+	container.appendChild(eachCont);
+
+	var eachContHeader = document.createElement('div');
+	eachContHeader.className = 'image-category-header';
+	eachContHeader.innerHTML = folder.folder;
+	eachCont.appendChild(eachContHeader);
+
+	folder.dims.forEach(function(dim) {
+
+		var eachDim = document.createElement('div');
+		eachDim.className = 'image-container';
+		eachCont.appendChild(eachDim);
+
+		var eachDimHeader = document.createElement('div');
+		eachDimHeader.className = 'image-dim-header';
+		eachDimHeader.innerHTML = dim;
+		eachDim.appendChild(eachDimHeader);		
+
+
+		folder.names.forEach(function(name) {
+
+			if ( folder.folder == 'Just_Circle' ) var ext = 'circle-';
+			if ( folder.folder == 'Sideways' ) var ext = 'sideways-';
+			if ( folder.folder == 'Normal' ) var ext = '';						
+
+			var eachPath = folder.folder + '/' + dim + '/' + name + '-systemapic-logo-' + ext + dim + '.png';
+			console.log(eachPath);
+
+			var eachImg = document.createElement('img');
+			eachImg.src = eachPath
+			eachDim.appendChild(eachImg);
+
+			eachImg.onclick = function() {
+				alert(eachPath);
+			}		
+		
+		})
+
+
+	})
+
+})
+
+var body = document.getElementsByTagName('body')[0];
+var field = document.getElementById('bgc');
+var button = document.getElementById('setColor');
+
+button.onclick = function() {
+
+	body.style.backgroundColor = field.value;
+}
+
+
+</script>
+</html>

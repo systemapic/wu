@@ -1,15 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 	<head>
 		<title>Systemapic Secure Portal</title>
 	
 		<link rel="icon" type="image/png" href="favicon.ico">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
-
-					
-						
-
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	
 		<!-- @if NODE_ENV == 'DEVELOPMENT' -->
 
 			<!-- DEPENDENCIES STYLESHEETS -->
@@ -28,59 +24,12 @@
 			<link rel="stylesheet" href='/js/lib/codemirror/mode/cartocss/codemirror.fetta.css'>
 			<link rel="stylesheet" href='/js/lib/codemirror/theme/mbo.css'>
 			<link rel="stylesheet" href='/css/opentip.css'>
-
-			
-
-			<!-- dev css -->
+		
+			<!-- SYSTEMAPIC STYLESHEETS -->
 			<link rel="stylesheet" href="/css/style.css">			
 			<link rel="stylesheet" href="/css/knut.css">
 			<link rel="stylesheet" href="/css/evil.css">			
 			
-			<!-- JAVASCRIPTS -->
-			<!-- JAVASCRIPTS -->
-			<!-- JAVASCRIPTS -->
-
-			<!-- dep libs -->
-			<script src="/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js"></script>
-			<script src="/js/lib/lodash/lodash.min.js"></script>
-			<script src="/js/lib/parallel.js/parallel.js"></script>
-			<script src="/js/lib/async/async.js"></script>
-			
-			<!-- leaflet.js -->
-			<script src="/js/src/leaflet.js/leaflet-0.7.3-src.js"></script>
-			<script src="/js/lib/mapbox.js/mapbox.standalone.uncompressed.js"></script> <!-- DO NOT REPLACE! has custom edits:4648! -->
-			<script src="/js/src/leaflet.js/plugins/leaflet.geojson.draw.js"></script>
-			<script src="/js/src/leaflet.js/plugins/leaflet.draw-src.js"></script>
-			<script src="/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.js"></script>
-			<script src="/js/src/leaflet.js/plugins/leaflet.utfgrid.js"></script>
-
-			<!-- Other stuff -->
-			<script src="/js/lib/d3.js/topojson.v1.min.js"></script> 
-			<script src="/js/lib/dropzone.js/dropzone.min.js"></script> 
-			<script src="/js/lib/icanhaz/icanhaz.min.js"></script> 
-			<script src="/js/lib/list.js/list.min.js"></script> 
-			<script src="/js/lib/sortable.js/Sortable.js"></script>
-			<script src="/js/lib/powerange/powerange.min.js"></script>
-
-			<!-- grande.js -->
-			<script src="/js/src/grande.js/js/grande.class.js"></script>
-			<script src="/js/src/grande.js/js/grande.js"></script>
-			<script src="/js/src/grande.js/js/grande.attachments.js"></script>
-
-			<!-- codemirror -->
-			<script src="/js/lib/codemirror/mode/cartocss/cartoref.js"></script>
-			<script src="/js/lib/codemirror/lib/codemirror.js"></script>
-			<script src="/js/lib/codemirror/mode/cartocss/runmode.js"></script>
-			<script src="/js/lib/codemirror/mode/cartocss/searchcursor.js"></script>
-			<script src="/js/lib/codemirror/mode/cartocss/codemirror.carto.js"></script>
-			<script src="/js/lib/codemirror/mode/cartocss/codemirror.carto.complete.js"></script>
-			<script src="/js/lib/codemirror/mode/cartocss/codemirror.search.js"></script>
-			<script src="/js/lib/codemirror/mode/cartocss/codemirror.palette.js"></script>
-			<script src="/js/lib/codemirror/mode/cartocss/sexagesimal.js"></script>
-			<script src="/js/lib/codemirror/mode/cartocss/spectrum.js"></script>
-
-			<script src="/js/lib/opentip/opentip-native.js"></script>
-			<script src="/js/lib/jss.js/jss.js"></script>
 
 		<!-- @endif -->
 
@@ -88,35 +37,87 @@
 		<!-- @if NODE_ENV == 'PRODUCTION' -->
 
 			<!-- DEPENDENCIES STYLESHEETS -->
-			<!-- concat + cssmin -->
-			<link rel="stylesheet" href="/css/css.dependencies.min.css">	
+			<link rel="stylesheet" href="/css/css.dependencies.min.css">
 
+			<!-- SYSTEMAPIC STYLESHEETS -->
 			<link rel="stylesheet" href="/css/css.portal.min.css">
-			<script src="/js/js.dependencies.min.js"></script>
 	
 		<!-- @endif -->
 
 
-		<!-- styletag for injecting css -->
-		<div id="styletag"></div>
-		<div id="mobilestyle"></div>		
-		<div id="cartoCSStheme"></div>
-	
-		<!-- hotlink -->
-		<script>
-			(function(){ 
-				window.hotlink = '<%- JSON.stringify(hotlink) %>'; 
-			}());
-			
-		</script>
-
 	</head>
+
+	<div id="styletag"></div>
+	<div id="mobilestyle"></div>
+	<div id="cartoCSStheme"></div>
+
+
 	<body>
-
-
-
-
+		
+		
 		<!-- @if NODE_ENV == 'DEVELOPMENT' -->
+
+
+			<!-- JAVASCRIPTS -->
+			<!-- JAVASCRIPTS -->
+			<!-- JAVASCRIPTS -->
+
+			<!-- DEPENDECIES -->
+			<!-- DEPENDECIES -->
+			<!-- DEPENDECIES -->
+
+			<!-- D3.js -->
+			<script type="text/javascript" src="/js/lib/d3.js/d3.js"></script>
+
+			<!-- dep libs -->
+			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js"></script>
+			<script type="text/javascript" src="/js/lib/lodash/lodash.min.js"></script>
+			<script type="text/javascript" src="/js/lib/parallel.js/parallel.js"></script>
+			<script type="text/javascript" src="/js/lib/async/async.js"></script>
+			
+			<!-- leaflet.js -->
+			<script type="text/javascript" src="/js/src/leaflet.js/leaflet-0.7.3-src.js"></script>
+			<script type="text/javascript" src="/js/lib/mapbox.js/mapbox.standalone.uncompressed.js"></script> <!-- DO NOT REPLACE! has custom edits:4648! -->
+			<script type="text/javascript" src="/js/src/leaflet.js/plugins/leaflet.geojson.draw.js"></script>
+			<script type="text/javascript" src="/js/src/leaflet.js/plugins/leaflet.draw-src.js"></script>
+			<script type="text/javascript" src="/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.js"></script>
+			<script type="text/javascript" src="/js/src/leaflet.js/plugins/leaflet.utfgrid.js"></script>
+
+			<!-- Other stuff -->
+			<script type="text/javascript" src="/js/lib/d3.js/topojson.v1.min.js"></script> 
+			<script type="text/javascript" src="/js/lib/dropzone.js/dropzone.min.js"></script> 
+			<script type="text/javascript" src="/js/lib/icanhaz/icanhaz.min.js"></script> 
+			<script type="text/javascript" src="/js/lib/list.js/list.min.js"></script> 
+			<script type="text/javascript" src="/js/lib/sortable.js/Sortable.js"></script>
+			<script type="text/javascript" src="/js/lib/powerange/powerange.min.js"></script>
+
+			<!-- grande.js -->
+			<script type="text/javascript" src="/js/src/grande.js/js/grande.class.js"></script>
+			<script type="text/javascript" src="/js/src/grande.js/js/grande.js"></script>
+			<script type="text/javascript" src="/js/src/grande.js/js/grande.attachments.js"></script>
+
+			<!-- codemirror -->
+			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/cartoref.js"></script>
+			<script type="text/javascript" src="/js/lib/codemirror/lib/codemirror.js"></script>
+			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/runmode.js"></script>
+			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/searchcursor.js"></script>
+			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/codemirror.carto.js"></script>
+			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/codemirror.carto.complete.js"></script>
+			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/codemirror.search.js"></script>
+			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/codemirror.palette.js"></script>
+			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/sexagesimal.js"></script>
+			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/spectrum.js"></script>
+
+			<script type="text/javascript" src="/js/lib/opentip/opentip-native.js"></script>
+			<script type="text/javascript" src="/js/lib/jss.js/jss.js"></script>
+
+			<script type="text/javascript">(function(){window.hotlink = '<%- JSON.stringify(hotlink) %>';}());</script>
+
+
+
+			<!-- LIBRARY -->
+			<!-- LIBRARY -->
+			<!-- LIBRARY -->
 
 			<!-- class.js must be added first -->
 			<script src="/js/src/core/class.js"></script>  <!-- Wu = {} -->
@@ -164,7 +165,8 @@
 			<script src="/js/src/models/files.js"></script> 
 			<script src="/js/src/models/roles.js"></script> 
 
-			<script src="/js/src/core/analytics.js"></script>
+
+			<script type="text/javascript" src="/js/src/core/analytics.js"></script>
 
 			<!-- config file -->
 			<script src="/js/src/config/config.js"></script> 		
@@ -177,12 +179,17 @@
 
 		<!-- @if NODE_ENV == 'PRODUCTION' -->		
 
-			<script src="/js/js.portal.min.js"></script>
+			<!-- DEPENDENCIES -->
+			<script type="text/javascript" src="/js/js.dependencies.min.js"></script>
+			<script type="text/javascript">(function(){window.hotlink = '<%- JSON.stringify(hotlink) %>';}());</script>
+
+			<!-- LIBRARY -->
+			<script type="text/javascript" src="/js/js.portal.min.js"></script>
 
 		<!-- @endif -->
 
 
-		<script>
+		<script type="text/javascript">
 
 			// enter the Wu
 			var app = new Wu.App({
@@ -194,4 +201,5 @@
 
 
 </body>	
+
 </html>

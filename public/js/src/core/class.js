@@ -328,6 +328,7 @@ Wu.Util = {
 
 	// post without callback
 	post : function (path, json) {
+		
 		var that = this;
 		var http = new XMLHttpRequest();
 		var url = window.location.origin; 
@@ -351,7 +352,9 @@ Wu.Util = {
 	postcb : function (path, json, cb, context, baseurl) {
 		var that = context;
 		var http = new XMLHttpRequest();
+		
 		var url = baseurl || window.location.origin; 
+		
 		url += path;
 		http.open("POST", url, true);
 

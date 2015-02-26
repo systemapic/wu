@@ -83,7 +83,8 @@ Wu.App = Wu.Class.extend({
 		var data = JSON.stringify(this.options);
 		
 		// post         path          json      callback    this
-		Wu.post('/api/portal', data, this.initServerResponse, this);
+		Wu.post('api/portal', data, this.initServerResponse, this, this.options.servers.portal);
+
 
 	},
 

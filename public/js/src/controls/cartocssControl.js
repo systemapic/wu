@@ -1,3 +1,5 @@
+// app.MapPane.cartoCss
+
 L.Control.CartoCSS = L.Control.extend({
 	
 	options: {
@@ -87,29 +89,26 @@ L.Control.CartoCSS = L.Control.extend({
 
 	addHooks : function () {
 
-
-		// cxxxx
-
 		// update button click
-		Wu.DomEvent.on(this._updateButton, 'click', this.renderStyling, this); // GA OK
+		Wu.DomEvent.on(this._updateButton, 'click', this.renderStyling, this);
 
 		// toolbar button click
-		Wu.DomEvent.on(this._toolbarButton, 'click', this.toggle, this); // GA OK
+		Wu.DomEvent.on(this._toolbarButton, 'click', this.toggle, this);
 
 		// remove control
-		Wu.DomEvent.on(this._xButton, 'click', this.toggle, this); // GA OK
+		Wu.DomEvent.on(this._xButton, 'click', this.toggle, this);
 
 		// Layer drop down
 		Wu.DomEvent.on(this._styleHeaderLayerName, 'click', this.toggleLayerDropDown, this);
 
 		// Toggle legends tab
-		Wu.DomEvent.on(this._tabLegends, 'mousedown', this.toggleLegends, this); // GA OK
+		Wu.DomEvent.on(this._tabLegends, 'mousedown', this.toggleLegends, this);
 
 		// Toggle styles tab
-		Wu.DomEvent.on(this._tabStyling, 'mousedown', this.toggleStyles, this); // GA OK
+		Wu.DomEvent.on(this._tabStyling, 'mousedown', this.toggleStyles, this);
 
 		// Toggle tooltip tab
-		Wu.DomEvent.on(this._tabTooltip, 'mousedown', this.toggleTooltip, this);  // GA OK
+		Wu.DomEvent.on(this._tabTooltip, 'mousedown', this.toggleTooltip, this);
 
 		// Resize container
 		Wu.DomEvent.on(this._resizeHandle, 'mousedown', this.resize, this);
@@ -181,6 +180,7 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	_update : function () {
+
 		if (this._updated) return;
 
 		// set active project
@@ -218,27 +218,6 @@ L.Control.CartoCSS = L.Control.extend({
     			paletteHints : true,
     			gutters: ['CodeMirror-linenumbers', 'errors']
   		});
-
-		// set default value
-  		// this._codeMirror.setValue('// No layer selected. \n\n// #layer is always base \n#layer { \n  \n}');
-
-		// todo:
-  		// var completer = cartoCompletion(this._codeMirror, window.cartoRef);
-		// this._codeMirror.on('keydown', completer.onKeyEvent);
-		// this._codeMirror.on('change', function() { return window.editor && window.editor.changed(); });
-		// this._codeMirror.setOption('onHighlightComplete', _(completer.setTitles).throttle(100));
-		// console.log(')thi wrapper element', this._codeMirror);
-		// this._codeMirror.getWrapperElement().id = 'code-' + id.replace(/[^\w+]/g,'_');
-	
-
-		// cxxxx
-		// var settings = app.activeProject.getSettings();
-
-
-		// if ( settings.darkTheme ) app.Style.themeToggle('dark');		// TODO: fires too early.. do this differently
-
-
-
 	},
 
 	_initStylingDefault : function () {
@@ -247,10 +226,10 @@ L.Control.CartoCSS = L.Control.extend({
 		var fields = this._layer.getMetaFields(); // return false if no fields found
 		
 		// create string
-		var string = '// CartoCSS reference guide:\n// https://bit.ly/1z5OvXT\n\n\n';
-		string += '// #layer is always the layer identifier \n';
-		string += '#layer {\n\n';
-		string += '    // Available fields in layer:\n\n';
+		var string =	'// CartoCSS reference guide:\n// https://bit.ly/1z5OvXT\n\n\n';
+		string += 	'// #layer is always the layer identifier \n';
+		string += 	'#layer {\n\n';
+		string += 	'// Available fields in layer:\n\n';
 
 		// add each field to string
 		for (key in fields) {
@@ -344,6 +323,9 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	_selectLayer : function (layer) {
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'CartoCSS select layer: ' + layer.getTitle()]);
 
 		// close dropdown
 		this.closeLayerDropDown();
@@ -499,24 +481,83 @@ L.Control.CartoCSS = L.Control.extend({
 		// Get title from tooltip
 		var tooltipMeta = this._layer.getTooltip();
 
-		// clear old
+		// Clear old
 		this._legendsWrapper.innerHTML = '';
 
-		// inner wrapper
+		// Inner wrapper
 		this._legendsWrapperInner = Wu.DomUtil.create('div', 'legends-inner-scroller', this._legendsWrapper);
-		this._legendsTitle = Wu.DomUtil.create('div', 'legends-title', this._legendsWrapperInner);
-		this._legendsTitle.innerHTML = tooltipMeta.title || 'No title';
+
+		// Title wrapper
+		this._legentTitleWrapper = Wu.DomUtil.create('div', 'legend-title-wrapper', this._legendsWrapperInner)
+
+		// Title
+		this._legendsTitle = Wu.DomUtil.create('input', 'legends-title', this._legentTitleWrapper);
+		this._legendsTitle.setAttribute('placeholder', 'Legend title');
+		this._legendsTitle.innerHTML = tooltipMeta.title || '';
+
+		// Select all switch
+		var switchWrapper 	= Wu.DomUtil.create('div', 'cartoCSS-tooltip-switch-all-wrapper', this._legentTitleWrapper)
+		var switchTitle 	= Wu.DomUtil.create('div', 'cartoCSS-tooltip-switch-all-title', switchWrapper, 'All')
+		var fieldSwitch 	= Wu.DomUtil.create('div', 'switch carto-switch-tooltip', switchWrapper); //  controls-switch
+		var switchId 		= 'switch-legends-all';
+		
+		var fieldSwitchInput 	= Wu.DomUtil.createId('input', switchId, fieldSwitch);
+		fieldSwitchInput.setAttribute('type', 'checkbox');				
+		Wu.DomUtil.addClass(fieldSwitchInput, 'cmn-toggle cmn-toggle-round-flat');
+
+		var fieldSwitchLabel = Wu.DomUtil.create('label', '', fieldSwitch);
+		fieldSwitchLabel.setAttribute('for', switchId);
+
+		// Legends list
 		this._legendsListWrapper = Wu.DomUtil.create('div', 'legends-list-wrapper', this._legendsWrapperInner);
 
-		// each legend
+		// Set blank array of tooltip switches
+		this._legendsSwitches = [];
+		var onCounter = 0;
+
+		// Each legend
 		legends.forEach(function (legend) {
 
-			// append legend entry to wrapper
+			// Append legend entry to wrapper
 			var legdiv = this._legendEntry(legend);
 			this._legendsListWrapper.appendChild(legdiv);
 
+			if ( legend.on ) onCounter++;
+
 		}, this);
 
+		// Set switch to active if more than 50% of the switches are active
+		if ( onCounter >= legends.length/2 ) {
+			fieldSwitchInput.checked = true;
+			fieldSwitchInput.setAttribute('checked', 'checked');
+		}
+
+		// Save toggle all tooltip switch 
+		this._legendSelectAllSwitch = fieldSwitchInput;
+
+		Wu.DomEvent.on(fieldSwitchInput, 'change', this._toggleAllLegend, this);		
+
+	},
+
+	_toggleAllLegend : function () {
+
+		// Get checked state from the select all switch
+		var isChecked = this._legendSelectAllSwitch.getAttribute('checked');
+		
+		// Set checked state to the select all switch
+		isChecked ? this._legendSelectAllSwitch.removeAttribute('checked') : this._legendSelectAllSwitch.setAttribute('checked', 'checked');
+		
+		// Update all the switches
+		this._legendsSwitches.forEach(function(_switch) {
+
+			var on = _switch.checked;
+			isChecked ? _switch.checked = false : _switch.checked = true;
+
+			// Save legends
+			this._saveLegends();
+			
+		}, this);		
+		
 	},
 
 
@@ -540,6 +581,9 @@ L.Control.CartoCSS = L.Control.extend({
 		wrap.setAttribute('legendid', legend.id);
 		if (legend.on) checkbox.firstChild.setAttribute('checked', 'checked');
 		
+		// Put legends checkboxes in array
+		this._legendsSwitches.push(checkbox.firstChild);
+
 		// add toogle hook
 		Wu.DomEvent.on(checkbox, 'change', this._saveLegends, this);
 
@@ -674,14 +718,32 @@ L.Control.CartoCSS = L.Control.extend({
 
 	_initTooltipStoredMeta : function (meta) {
 
-		
 		// create header
-		var tooltipCustomHeader	= Wu.DomUtil.createId('input', 'cartocss-tooltip-custom-header', this._tooltipWrapper);
+		var tooltipHeaderContainer = Wu.DomUtil.create('div', 'cartocss-tooltip-header-container', this._tooltipWrapper);
+		var tooltipCustomHeader	= Wu.DomUtil.createId('input', 'cartocss-tooltip-custom-header', tooltipHeaderContainer);
+
 		tooltipCustomHeader.setAttribute('placeholder', 'Tooltip title')
-		tooltipCustomHeader.value = meta.title;
+
+		var metaTitle = meta.title ? meta.title : '';
+		tooltipCustomHeader.value = metaTitle;
+
+		// create switch
+		var switchWrapper = Wu.DomUtil.create('div', 'cartoCSS-tooltip-switch-all-wrapper', tooltipHeaderContainer)
+		var switchTitle = Wu.DomUtil.create('div', 'cartoCSS-tooltip-switch-all-title', switchWrapper, 'All')
+		var fieldSwitch = Wu.DomUtil.create('div', 'switch carto-switch-tooltip', switchWrapper); //  controls-switch
+		var switchId = 'switch-' + 'tooltip-all';
+		var fieldSwitchInput = Wu.DomUtil.createId('input', switchId, fieldSwitch);
+		Wu.DomUtil.addClass(fieldSwitchInput, 'cmn-toggle cmn-toggle-round-flat');
+		fieldSwitchInput.setAttribute('type', 'checkbox');
+		var fieldSwitchLabel = Wu.DomUtil.create('label', '', fieldSwitch);
+		fieldSwitchLabel.setAttribute('for', switchId);
 
 		// save
 		Wu.DomEvent.on(tooltipCustomHeader, 'keyup', this._saveTip, this);
+
+		// Set blank array of tooltip switches
+		this._toolTipSwitches = [];
+		var onCounter = 0;
 
 		// for each field
 		var fields = meta.fields;
@@ -690,24 +752,53 @@ L.Control.CartoCSS = L.Control.extend({
 			// create tooltip entry
 			this._createTooltipEntry(field.key, field.title, field.on);
 
+			if ( field.on) onCounter++;
+
 		}, this);
 
+
+		if ( onCounter >= fields.length/2 ) {
+			fieldSwitchInput.checked = true;
+			fieldSwitchInput.setAttribute('checked', 'checked')
+		}
+
+		// Save toggle all tooltip switch 
+		this._tooltipSelectAllSwitch = fieldSwitchInput;
+
+		Wu.DomEvent.on(fieldSwitchInput, 'change', this._toggleAllTooltip, this);
 
 	},
 
 
 	_initTooltipDefaultMeta : function () {
 
-
 		// get default meta
 		var fields = this._layer.getMetaFields();
 
 		// create header
-		var tooltipCustomHeader	= Wu.DomUtil.createId('input', 'cartocss-tooltip-custom-header', this._tooltipWrapper);
+		var tooltipHeaderContainer = Wu.DomUtil.create('div', 'cartocss-tooltip-header-container', this._tooltipWrapper);
+		var tooltipCustomHeader	= Wu.DomUtil.createId('input', 'cartocss-tooltip-custom-header', tooltipHeaderContainer);
+
+		// create switch
+		var switchWrapper = Wu.DomUtil.create('div', 'cartoCSS-tooltip-switch-all-wrapper', tooltipHeaderContainer)
+		var switchTitle = Wu.DomUtil.create('div', 'cartoCSS-tooltip-switch-all-title', switchWrapper, 'All')
+		var fieldSwitch = Wu.DomUtil.create('div', 'switch carto-switch-tooltip', switchWrapper); //  controls-switch
+		var switchId = 'switch-' + 'tooltip-all';
+		var fieldSwitchInput = Wu.DomUtil.createId('input', switchId, fieldSwitch);
+		Wu.DomUtil.addClass(fieldSwitchInput, 'cmn-toggle cmn-toggle-round-flat');
+		fieldSwitchInput.setAttribute('type', 'checkbox');
+		var fieldSwitchLabel = Wu.DomUtil.create('label', '', fieldSwitch);
+		fieldSwitchLabel.setAttribute('for', switchId);
 		tooltipCustomHeader.setAttribute('placeholder', 'Tooltip title')
+
+		fieldSwitchInput.checked = true;
+		fieldSwitchInput.setAttribute('checked', 'checked')		
 
 		// save event
 		Wu.DomEvent.on(tooltipCustomHeader, 'keyup', this._saveTip, this);
+
+		// Set blank array of tooltip switches
+		this._toolTipSwitches = [];
 
 		// for each field
 		for (key in fields) {
@@ -715,7 +806,31 @@ L.Control.CartoCSS = L.Control.extend({
 
 			// create tooltip entry
 			this._createTooltipEntry(key, null, true);	
-		}
+		}		
+
+		// Save toggle all tooltip switch 
+		this._tooltipSelectAllSwitch = fieldSwitchInput;
+
+		Wu.DomEvent.on(fieldSwitchInput, 'change', this._toggleAllTooltip, this);
+
+	},
+
+	_toggleAllTooltip : function () {		
+
+		// Get checked state from the select all switch
+		var isChecked = this._tooltipSelectAllSwitch.getAttribute('checked');
+		
+		// Set checked state to the select all switch
+		isChecked ? this._tooltipSelectAllSwitch.removeAttribute('checked') : this._tooltipSelectAllSwitch.setAttribute('checked', 'checked');
+		
+		// Update all the switches
+		this._toolTipSwitches.forEach(function(_switch) {
+
+			var on = _switch.checked;
+			isChecked ? _switch.checked = false : _switch.checked = true;
+			this._saveTip();
+			
+		}, this);
 
 	},
 
@@ -740,6 +855,8 @@ L.Control.CartoCSS = L.Control.extend({
 		fieldSwitchInput.setAttribute('type', 'checkbox');
 		var fieldSwitchLabel = Wu.DomUtil.create('label', '', fieldSwitch);
 		fieldSwitchLabel.setAttribute('for', switchId);
+
+		this._toolTipSwitches.push(fieldSwitchInput);
 
 		// set checked
 		if (on) fieldSwitchInput.setAttribute('checked', 'checked');
@@ -766,9 +883,8 @@ L.Control.CartoCSS = L.Control.extend({
 	
 		}, 1000);
 
-		
-
 	},
+
 
 	_saveTooltipMeta : function () {
 
@@ -847,6 +963,17 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	open : function () {
+
+		// set active project
+		this.project = app.activeProject;
+
+		// get all active, geojson layers
+		this._layers = this.project.getStylableLayers();
+
+		if ( !this._layers || this._layers.length == 0 ) {
+			console.log('No layers to edit ~ don\'t open container');
+			return;
+		}
 
 
 		// Set button to open

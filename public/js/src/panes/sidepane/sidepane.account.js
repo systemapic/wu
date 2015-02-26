@@ -1,11 +1,11 @@
 Wu.SidePane.Account = Wu.SidePane.Item.extend({
 	_ : 'sidepane.account', 
 
-
 	type : 'account',
 	title : 'Logout', // just simple logout button for now
 
 	initContent : function () {
+		
 		this._account = app.Account;
 
 		// clear default content

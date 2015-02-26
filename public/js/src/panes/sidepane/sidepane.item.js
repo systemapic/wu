@@ -17,6 +17,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 
 	initContainer : function () {
+		
 		// menu
 		var className = 'q-editor-menu-item ' + this.type;
 		this._menu = Wu.DomUtil.create('div', className, Wu.app._editorMenuPane);

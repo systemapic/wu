@@ -111,6 +111,9 @@ module.exports = function(grunt) {
 				
 				src : [  
 
+					// d3
+					'public/js/lib/d3.js/d3.js',
+
 					// dependencies 
 					'public/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js',
 					'public/js/lib/lodash/lodash.min.js',
