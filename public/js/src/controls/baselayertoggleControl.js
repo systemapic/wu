@@ -3,7 +3,10 @@
  * https://raw.githubusercontent.com/Leaflet/Leaflet/master/src/control/Control.Layers.js
  */
 
+// app.MapPane.baselayerToggle
+
 L.Control.BaselayerToggle = L.Control.extend({
+
 	options: {
 		collapsed: true,
 		position: 'topleft',
@@ -11,12 +14,14 @@ L.Control.BaselayerToggle = L.Control.extend({
 	},
 
 	onAdd: function () {
+
 		this._initLayout();
 		this.update();
 		return this._container;
 	},
 
 	addTo: function (map) {
+
 		this._map = map;
 
 		var container = this._container = this.onAdd(map),
@@ -45,9 +50,18 @@ L.Control.BaselayerToggle = L.Control.extend({
 		// add events
 		Wu.DomEvent.on(container, 'mousedown', this.toggle, this);
 		Wu.DomEvent.on(container, 'dblclick', Wu.DomEvent.stop, this);
+		Wu.DomEvent.on(container, 'mouseleave', this.mouseOut, this);
 
 		// add stops
 		Wu.DomEvent.on(container, 'mousedown dblclick mouseup click', Wu.DomEvent.stopPropagation, this);
+
+	},
+
+
+	mouseOut : function () {
+
+		if ( this._isOpen ) { this.collapse() }
+		else { return };
 
 	},
 
@@ -115,6 +129,7 @@ L.Control.BaselayerToggle = L.Control.extend({
 			layer.disable();
 			baseLayer.active = false;
 			Wu.DomUtil.removeClass(item, 'active');
+			
 		} else {
 			
 			// enable

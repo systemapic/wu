@@ -1,4 +1,5 @@
 // Subelements under Clients/Client
+// app.SidePane.Clients.clients[x].projects
 Wu.SidePane.Project = Wu.Class.extend({
 
 	initialize : function (project, options) {
@@ -375,7 +376,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// save on blur or enter
 		Wu.DomEvent.on( target,  'blur',    this._editNameBlur, this );     // save folder title
-		Wu.DomEvent.on( target,  'keyup', this._editKeyName,  this );     // save folder title
+		Wu.DomEvent.on( target,  'keyup', this._editKeyName,  this );       // save folder title
 
 
 		// Google Analytics event trackign

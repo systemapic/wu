@@ -1,3 +1,5 @@
+// app.ZIndexControl
+
 Wu.ZIndexControl = Wu.Class.extend({
 
 	initialize : function () {

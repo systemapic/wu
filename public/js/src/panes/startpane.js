@@ -1,3 +1,5 @@
+// app.StartPane
+
 Wu.StartPane = Wu.Class.extend({
 
 	initialize : function (options) {
@@ -34,10 +36,8 @@ Wu.StartPane = Wu.Class.extend({
 		// Show the header pane.
 		Wu.DomUtil.removeClass(Wu.app.HeaderPane._container, 'displayNone');
 
-
 		// screendimentions
 		// app._getDimensions()
-	
 
 
 	},	
@@ -103,16 +103,16 @@ Wu.StartPane = Wu.Class.extend({
 	_initSpinnerContent : function () {
 
 		// create wrapper
-		var wrapper = Wu.DomUtil.create('div', 'startpane-spinning-content');
+		var wrapper 			= Wu.DomUtil.create('div', 'startpane-spinning-content');
 
 		// black box in centre
-		this._bannerContainer = Wu.DomUtil.create('div', 'startpane-banner-container', wrapper);
-		this._banner = Wu.DomUtil.create('div', 'startpane-banner', this._bannerContainer);
+		this._bannerContainer    	= Wu.DomUtil.create('div', 'startpane-banner-container', wrapper);
+		this._banner 			= Wu.DomUtil.create('div', 'startpane-banner', this._bannerContainer);
 
-		this._recentProjectsContainer = Wu.DomUtil.create('div', 'startpane-recent-projects-container', this._banner);
+		this._recentProjectsContainer 	= Wu.DomUtil.create('div', 'startpane-recent-projects-container', this._banner);
 
-		this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Recent projects:');
-		this._projectList = Wu.DomUtil.create('div', 'startpane-project-list', this._recentProjectsContainer);
+		this._recentProjectsHeader 	= Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Recent projects:');
+		this._projectList 		= Wu.DomUtil.create('div', 'startpane-project-list', this._recentProjectsContainer);
 
 		// return 
 		return wrapper;
@@ -153,6 +153,7 @@ Wu.StartPane = Wu.Class.extend({
 	},
 
 	_getLatestProjects : function () {
+
 		// Get all projects
 		var projectsUnsorted = app.Projects;	
 
@@ -169,24 +170,40 @@ Wu.StartPane = Wu.Class.extend({
 
 	createStartProject : function (project) {
 
-		// Client info
-
 		if (!project) return;
 
 		var client = project.getClient();
 
 		if (!client) return;
 
-		// var clientID = project.store.client;
-		// var clientName = app.Clients[clientID].name;
-		// var clientLogo = app.Clients[clientID].logo;
-
 		var newProject = {};
+
 		// create container
 		newProject._projectContainer = Wu.DomUtil.create('div', 'start-panne-recent-projects', this._projectList);
-		
 		newProject._projectThumb = Wu.DomUtil.create('img', '', newProject._projectContainer);
-		newProject._projectThumb.src = project.getLogo();
+
+		// Load image in memory before we paste it (to see image orientation)
+		var img = new Image();
+		var ssrc = project.getLogo();
+		img.src = ssrc;
+
+		img.onload = function() {
+
+			if ( img.width >= img.height ) {
+			
+				// landscape
+				newProject._projectThumb.style.height = '100%';
+				newProject._projectThumb.style.width = 'auto';
+			
+			} else {
+				
+				// landscape
+				newProject._projectThumb.style.height = 'auto';
+				newProject._projectThumb.style.width = '100%';
+			}
+
+			newProject._projectThumb.src = project.getLogo();
+		}
 
 		newProject._projectTitle = Wu.DomUtil.create('div', 'start-project-name', newProject._projectContainer);
 		newProject._projectTitle.innerHTML = project.getName();
@@ -199,16 +216,11 @@ Wu.StartPane = Wu.Class.extend({
 			newProject._clientLogo.src = client.getLogo();
 		}
 
-
 		this.projectContainers.push(newProject);
-
 
 		// Adjust for short titles
 		if (project.getName().length < 22) Wu.DomUtil.addClass(newProject._projectTitle, 'short-name');
 		
-
-		// var client
-
 		// select project hook
 		Wu.DomEvent.on(newProject._projectContainer, 'mousedown', function() { this.selectProject(project); }, this);
 
@@ -234,8 +246,9 @@ Wu.StartPane = Wu.Class.extend({
 		// Hide the Start Pane
 		this.deactivate();
 
-		// // Google Analytics event trackign
-		// app.Analytics.ga(['Start Pane', 'select project', project.getName()]);
+		// Google Analytics event trackign
+		var projectID = project.getUuid();
+		app.Analytics.setGaProject(projectID);
 
 	},
 

@@ -94,14 +94,16 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	newClient : function () {
 
+		if ( this._creatingNewClient ) return;
+
+		// Set creating new client state to true to prevent doubling
+		this._creatingNewClient = true;
+
 		// add new client box
 		var clientData = {
 			clientName : 'New client'
 		}
 			
-		// prepend client to container
-		// Wu.DomUtil.appendTemplate(this._clientsContainer, ich.editorClientsNew(clientData));
-
 
 		this._newClient = {};
 
@@ -137,10 +139,10 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		this._newClient._keywordsInput		= 	Wu.DomUtil.create('input', 'form-control margined eightyWidth', this._newClient._container);
 
 		// #editor-client-confirm-button
-		this._newClient._confirmButton		= 	Wu.DomUtil.create('div', 'smap-button-white small', this._newClient._innerWrapper, 'Confirm');
+		this._newClient._confirmButton		= 	Wu.DomUtil.create('div', 'smap-button-white small confirm-new-client', this._newClient._innerWrapper, 'Confirm');
 
 		// #editor-client-cancel-button
-		this._newClient._cancelButton		= 	Wu.DomUtil.create('div', 'smap-button-white small', this._newClient._innerWrapper, 'Cancel');
+		this._newClient._cancelButton		= 	Wu.DomUtil.create('div', 'smap-button-white small cancel-new-client', this._newClient._innerWrapper, 'Cancel');
 
 
 
@@ -224,6 +226,9 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		var old = this._newClient._wrapper;
 
 		Wu.DomUtil.remove(old);
+
+		// Set create new client state to false
+		this._creatingNewClient = false;
 	},
 
 	_confirm : function () {
@@ -273,10 +278,14 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		// move new button to last
 		Wu.DomUtil.remove(editor._newClientButton);
 		editor._clientsContainer.appendChild(editor._newClientButton);
+
+		// Set creating new client to false
+		this._creatingNewClient = false;
 	},
 
 	toggleEdit : function (e) { // this = client
-		// console.log('toggle.edit');
+
+		
 
 		// stop propagation
 		if (e) Wu.DomEvent.stop(e); 

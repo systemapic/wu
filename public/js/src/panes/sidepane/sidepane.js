@@ -93,7 +93,7 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	setHeight : function (height) {
-		console.error('setHeight: ', height);
+
 		this._container.style.height = height + 'px';
 	},
 
