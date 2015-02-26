@@ -1,3 +1,4 @@
+// app.SidePane.Share
 Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	
 	type : 'share',
@@ -39,6 +40,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		Wu.DomEvent.on(this.imageButton, 'click', this.createImage, this);
 		Wu.DomEvent.on(this.printButton, 'click', this.createPrint, this);
 		Wu.DomEvent.on(this.linkButton, 'click', this.createLink, this);
+
 	},
 
 	removeHooks : function () {
@@ -46,6 +48,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		Wu.DomEvent.off(this.imageButton, 'click', this.createImage, this);
 		Wu.DomEvent.off(this.printButton, 'click', this.createPrint, this);
 		Wu.DomEvent.off(this.linkButton, 'click', this.createLink, this);
+
 	},
 
 	initLayout : function () {
@@ -95,6 +98,11 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 		// set progress bar for a 5sec run
 		app.ProgressBar.timedProgress(2000);
+
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Share: create image']);
+
 		
 	},
 
@@ -128,6 +136,12 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		// set download link
 		raw += '?raw=true'; // add raw to path
 		context._downloadButton.href = raw;
+
+
+		// For GA
+		Wu.DomEvent.on(context._downloadButton, 'click', context.downloadButtonClick, context);		
+
+
 	},
 
 	_createImageView : function () {
@@ -161,7 +175,16 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 	},
 
+	downloadButtonClick : function  () {
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Share: download image']);
+
+		
+	},
+
 	createLink : function () {
+
 
 		// create hash, callback
 		app.setHash(function (context, hash) {
@@ -170,6 +193,9 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 			this._createLinkView(hash);
 
 		}.bind(this));
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Share: create link']);
 		
 	},
 
@@ -230,6 +256,9 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		
 		// create print view
 		context._createPrintView(path);
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Share: create print']);
 	},
 
 	_createPrintView : function (path) {

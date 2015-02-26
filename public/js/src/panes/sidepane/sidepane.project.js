@@ -1,13 +1,14 @@
 // Subelements under Clients/Client
+// app.SidePane.Clients.clients[x].projects
 Wu.SidePane.Project = Wu.Class.extend({
 
-	initialize : function (project, options) {
+	initialize : function (options) {
 
 		// set options
 		Wu.setOptions(this, options);
 
 		// set project
-		this.project = project;
+		this.project = options.project;
 
 		// set edit mode
 		this.project.setEditMode();
@@ -16,7 +17,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.project.setSidepane(this);
 
 		// set parent
-		this._parent = this.options.parent; // client div container
+		this._parent = this.options.caller; // client div container
 
 		// init layout
 		this.initLayout(); 
@@ -48,11 +49,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// Project info box (with little "i")
 		this.users = Wu.DomUtil.create('div', 'project-users-wrap', this._container);
 
-
-		// ****************************************************************************
-		// ****************************************************************************
-
-
 		// this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this.users);
 		this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this._container);
 
@@ -72,22 +68,16 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.usersInnerWrapper);
 
 		// add delete button
-		var canDelete = app.Account.canDeleteProject(this.project.store.uuid);
-		console.log('canDelete? ', canDelete);
+		// var canDelete = app.Account.canDeleteProject(this.project.store.uuid);
+		var canDelete = app.access.to.delete_project(this.project);
+
 		if (canDelete || this.options.editMode) {
-		
 			this.makeThumb = Wu.DomUtil.create('div', 'new-project-thumb', this.usersInnerWrapper, 'Generate thumbnail');
 			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');			
 		}
 
-
-
-
-		// ****************************************************************************
-		// ****************************************************************************
-
+		// set logo??
 		this.hookThumb();
-
 
 		// add hooks
 		this.addHooks();
@@ -147,8 +137,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var parentHeight = this._parent._container.offsetHeight;
 		var projectInfoHeight = this.usersInnerWrapper.offsetHeight;		
 
-		console.log('toggleProjecTInfo', this.users);
-
 		if ( !this.project._menuItem._isOpen ) {
 
 			// Add open state to button
@@ -179,6 +167,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		}
 
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: toggle project info']);
+
 
 
 	},
@@ -197,6 +188,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		if (!this.project.editMode) return;
 
+		// cxxxxxx
+
 		// editing hooks
 		Wu.DomEvent.on(this.name, 	 'dblclick', this.edit, this);
 		Wu.DomEvent.on(this.description, 'dblclick', this.editDescription, this);
@@ -205,7 +198,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.addLogoDZ();
 
 		// add kill hook
-		if (app.Account.canDeleteProject(this.project.getUuid())) {
+		// if (app.Account.canDeleteProject(this.project.getUuid())) {
+		if (app.access.to.delete_project(this.project.getUuid())) {
 			Wu.DomEvent.on(this.kill, 'click', this.deleteProject, this);
 
 			Wu.DomEvent.on( this.makeThumb, 'click', this.makeNewThumbnail, this );
@@ -223,7 +217,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.removeLogoDZ();
 
 		// remove kill hook
-		if (app.Account.canDeleteProject(this.project.getUuid())) {
+		// if (app.Account.canDeleteProject(this.project.getUuid())) {
+		if (app.access.to.delete_project(this.project.getUuid())) {
 			Wu.DomEvent.off(this.kill, 'click', this.deleteProject, this);
 
 			Wu.DomEvent.off( this.makeThumb, 'click', this.makeNewThumbnail, this );
@@ -235,9 +230,11 @@ Wu.SidePane.Project = Wu.Class.extend({
 	makeNewThumbnail : function () {
 
 		// Set state to manually updated to prevet overriding
-		// app.Projects[this.project.store.uuid].store.sidePaneLogo.manuallyUpdated = true;
 		this.project.setThumbCreated(true);
 		this.project.createProjectThumb();
+
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: make new thumbnail']);
 
 	},
 
@@ -330,11 +327,16 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// dont select if already active
 		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho not active.. fix!
 
+		// Google Analytics
+		var _prodID = this.project.getUuid();
+		app.Analytics.setGaProject(_prodID);	
+
 		// select project
-		this.project.select();
+		this.project.select();		
 
 		// remove startpane if active
 		app.StartPane.deactivate();
+
 	},
 
 	// add class to mark project active in sidepane
@@ -377,7 +379,11 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// save on blur or enter
 		Wu.DomEvent.on( target,  'blur',    this._editNameBlur, this );     // save folder title
-		Wu.DomEvent.on( target,  'keyup', this._editKeyName,  this );     // save folder title
+		Wu.DomEvent.on( target,  'keyup', this._editKeyName,  this );       // save folder title
+
+
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: edit project title']);
 
 	},
 
@@ -432,6 +438,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent.on( target,  'blur',    this._editDescriptionBlur, this );     // save folder title
 		Wu.DomEvent.on( target,  'keydown', this._editKey,  this );     // save folder title
 
+
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: edit project description']);
 	},
 
 	_editDescriptionBlur : function (e) {
@@ -518,6 +527,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// twice confirmed, delete
 		this.confirmDelete();
+
+		// Google Analytics event trackign
+		app.Analytics.ga(['Side Pane', 'Clients: delete project']);
 
 	},
 

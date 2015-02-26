@@ -105,7 +105,8 @@ Wu.Layer = Wu.Class.extend({
 		descriptionControl.setLayer(this);
 
 		// hide if empty and not editor
-		var isEditor = app.Account.isSuperadmin() || app.Account.canUpdateProject(app.activeProject.getUuid());
+		// var isEditor = app.Account.isSuperadmin() || app.Account.canUpdateProject(app.activeProject.getUuid());
+		var isEditor = app.access.to.edit_project(app.activeProject.getUuid());
 		if (this.store.description || isEditor) { // todo: what if only editor 
 			descriptionControl.show();
 		} else { 								// refactor to descriptionControl

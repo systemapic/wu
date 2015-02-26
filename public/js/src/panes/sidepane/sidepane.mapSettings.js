@@ -68,6 +68,11 @@ Wu.SidePane.Map.MapSetting = Wu.SidePane.Map.extend({
 
 	toggleOpen : function () {
 		this._isOpen ? this.close() : this.open();
+
+		// Google Analytics event trackign
+		var _name = this._container.childNodes[0].innerHTML;
+		app.Analytics.ga(['Side Pane', 'Options select: ' + _name]);
+
 	},
 
 	open : function () {
@@ -597,7 +602,6 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	initLayout : function () {
 
-		// cxxx 
 		// create title and wrapper (and delete old content)
 		this._container.innerHTML = '<h4 id="h4-layer">Layer Menu</h4>';
 
@@ -823,6 +827,9 @@ Wu.SidePane.Map.LayerMenu = Wu.SidePane.Map.MapSetting.extend({
 
 	// enable edit mode on layermenu itself
 	enableEdit : function () {
+
+		if ( !app.MapPane.layerMenu._open ) app.MapPane.layerMenu.toggleLayerPane();		
+
 		var layerMenu = Wu.app.MapPane.layerMenu;
 		if (layerMenu) layerMenu.enableEdit();
 	},
@@ -892,6 +899,8 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 		// call addHooks on prototype
 		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
 
+		// cxxxxxxxxxxxxxxxxxx
+
 		// add events
 		Wu.DomEvent.on( this.panes.initPos,  'click', 		this.setPosition, this );
 		Wu.DomEvent.on( this.panes.initPos,  'mousedown',      	this.buttonDown,  this );
@@ -948,6 +957,8 @@ Wu.SidePane.Map.Position = Wu.SidePane.Map.MapSetting.extend({
 		// call update on view
 		this.update();
 
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Options > Position: set position']);
 	},
 
 
@@ -1019,30 +1030,32 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		// call addHooks on prototype
 		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
 
-		// add events
-		Wu.DomEvent.on( this.panes.bounds,   'click', this.setBounds,   this );
-		Wu.DomEvent.on( this.panes.clear,    'click', this.clearBounds, this );
-		Wu.DomEvent.on( this.panes.boundsNE, 'click', this.setBoundsNE, this );
-		Wu.DomEvent.on( this.panes.boundsSW, 'click', this.setBoundsSW, this );
+		// cxxxxxxxx
 
-		Wu.DomEvent.on( this.panes.setMinZoom, 'click', this.setMinZoom, this );
-		Wu.DomEvent.on( this.panes.setMaxZoom, 'click', this.setMaxZoom, this );
+		// add events
+		Wu.DomEvent.on( this.panes.bounds,   'click', this.setBounds,   this ); // GA
+		Wu.DomEvent.on( this.panes.clear,    'click', this.clearBounds, this ); // GA
+		Wu.DomEvent.on( this.panes.boundsNE, 'click', this.setBoundsNE, this ); // GA
+		Wu.DomEvent.on( this.panes.boundsSW, 'click', this.setBoundsSW, this ); // GA
+
+		Wu.DomEvent.on( this.panes.setMinZoom, 'click', this.setMinZoom, this ); // GA
+		Wu.DomEvent.on( this.panes.setMaxZoom, 'click', this.setMaxZoom, this ); // GA
 
 		Wu.DomEvent.on( this.panes.bounds,   'mousedown',  this.buttonDown,  this );
 		Wu.DomEvent.on( this.panes.bounds,   'mouseup',    this.buttonUp,    this );
 		Wu.DomEvent.on( this.panes.bounds,   'mouseleave', this.buttonUp,    this );
 
 
-		Wu.DomEvent.on(this.panes.clear 	      , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.clear 	   , 'mousedown', Wu.DomEvent.stopPropagation, this );
 		Wu.DomEvent.on(this.panes.bounds           , 'mousedown', Wu.DomEvent.stopPropagation, this );
 		Wu.DomEvent.on(this.panes.boundsNELatValue , 'mousedown', Wu.DomEvent.stopPropagation, this );
 		Wu.DomEvent.on(this.panes.boundsNELngValue , 'mousedown', Wu.DomEvent.stopPropagation, this );
 		Wu.DomEvent.on(this.panes.boundsSWLatValue , 'mousedown', Wu.DomEvent.stopPropagation, this );
 		Wu.DomEvent.on(this.panes.boundsSWLngValue , 'mousedown', Wu.DomEvent.stopPropagation, this );
-		Wu.DomEvent.on(this.panes.boundsNE	      , 'mousedown', Wu.DomEvent.stopPropagation, this );
-		Wu.DomEvent.on(this.panes.boundsSW	      , 'mousedown', Wu.DomEvent.stopPropagation, this );
-		Wu.DomEvent.on(this.panes.minZoom 	      , 'mousedown', Wu.DomEvent.stopPropagation, this );
-		Wu.DomEvent.on(this.panes.maxZoom 	      , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.boundsNE	   , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.boundsSW	   , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.minZoom 	   , 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on(this.panes.maxZoom 	   , 'mousedown', Wu.DomEvent.stopPropagation, this );
 		Wu.DomEvent.on(this.panes.setMinZoom       , 'mousedown', Wu.DomEvent.stopPropagation, this );
 		Wu.DomEvent.on(this.panes.setMaxZoom       , 'mousedown', Wu.DomEvent.stopPropagation, this );
 		
@@ -1085,6 +1098,10 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		// enforce new bounds
 		this.enforceBounds();
 
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Options > Bounds: set bounds']);
+
 	},
 
 	setMinZoom : function () {
@@ -1098,6 +1115,10 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		
 		// update view
 		this.update();
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Options > Bounds: set min zoom']);
+
 	},
 
 	setMaxZoom : function () {
@@ -1111,6 +1132,10 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		
 		// update view
 		this.update();
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Options > Bounds: set max zoom']);
+
 	},
 
 	enforceBounds : function () {
@@ -1178,6 +1203,9 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		// no bounds
 		map.setMaxBounds(false);
 
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Options > Bounds: clear bounds']);
+
 	},
 
 	setBoundsSW : function (e) {
@@ -1207,6 +1235,9 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 		// update map
 		map.setMaxBounds(bounds);
 
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Options > Bounds: set SW bounds']);
+
 
 	},
 
@@ -1228,6 +1259,9 @@ Wu.SidePane.Map.Bounds = Wu.SidePane.Map.MapSetting.extend({
 
 		// update view
 		this.update();
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Options > Bounds: set NE bounds']);
 
 	},
 
@@ -1400,6 +1434,9 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 		// update controls css
 		mapPane.updateControlCss();
 
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Options > Controls toggle: ' + item]);
+
 	},
 
 
@@ -1417,8 +1454,6 @@ Wu.SidePane.Map.Controls = Wu.SidePane.Map.MapSetting.extend({
 
 	enableControl : function (type) {
 		
-		// cxxx 
-
 		// get vars
 		var target = Wu.DomUtil.get('map-controls-' + type); // checkbox
 		var parent = Wu.DomUtil.get('map-controls-title-' + type).parentNode; // div that gets .active 
@@ -1487,14 +1522,14 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		var box 		= Wu.DomUtil.create('div', 'connect-osm', this._outer);
 		var h4_3		= Wu.DomUtil.create('div', 'connect-title', box, 'Open Street Map');
 		this._osmwrap 		= Wu.DomUtil.create('div', 'osm-connect-wrap', this._outer);
-		this._osmbox 		= Wu.DomUtil.create('div', 'osm-add-box', this._osmwrap, 'Add OSM layer');
+		this._osmbox 		= Wu.DomUtil.create('div', 'osm-add-box smap-button-white', this._osmwrap, 'Add OSM layer');
 
 		// mapbox connect
 		var wrap 	  	= Wu.DomUtil.create('div', 'connect-mapbox', this._outer);
 		var h4_2 		= Wu.DomUtil.create('div', 'connect-title', wrap, 'Mapbox');
-		this._mapboxWrap  	= Wu.DomUtil.create('div', 'mapbox-connect-wrap ct11', this._outer);
+		this._mapboxWrap  	= Wu.DomUtil.create('div', 'mapbox-connect-wrap', this._outer);
 		this._mapboxInput 	= Wu.DomUtil.create('input', 'input-box search import-mapbox-layers', this._mapboxWrap);
-		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-gray ct0 ct11 import-mapbox-layers-button', this._mapboxWrap, 'Add');
+		this._mapboxConnect 	= Wu.DomUtil.create('div', 'smap-button-white import-mapbox-layers-button', this._mapboxWrap, 'Add');
 		this._mapboxAccounts 	= Wu.DomUtil.create('div', 'mapbox-accounts', this._mapboxWrap);
 		
 		// clear vars n fields
@@ -1508,7 +1543,11 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 	},
 
 	addHooks : function () {
+
 		Wu.SidePane.Map.MapSetting.prototype.addHooks.call(this)
+
+
+		// cxxxx
 
 		// connect mapbox button
 		Wu.DomEvent.on( this._mapboxConnect, 'click', this.importMapbox, this );
@@ -1565,6 +1604,9 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 		}.bind(this));
 
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Options > Connected Src: add osm layer']);
+
 	},
 
 	_updateLayerOptions : function () {
@@ -1588,6 +1630,10 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 		// get mapbox account via server
 		this._importMapbox(username, accessToken, this.importedMapbox);
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Options > Connected Src: import mapbox']);
+
 
 	},
 
@@ -1650,10 +1696,10 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		if (!this.project.editMode) return;
 
 		// refresh button 
-		var refresh = Wu.DomUtil.create('div', 'mapbox-listed-account-refresh', wrap);
+		var refresh = Wu.DomUtil.create('div', 'mapbox-listed-account-refresh smap-button-white', wrap);
 
 		// delete button
-		var del = Wu.DomUtil.create('div', 'mapbox-listed-account-delete', wrap);
+		var del = Wu.DomUtil.create('div', 'mapbox-listed-account-delete smap-button-white', wrap);
 
 
 		// refresh event
@@ -1891,7 +1937,10 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 		label.setAttribute('for', id);
 
 		// set events
-		Wu.DomEvent.on(div, 'click', function (e) {			
+		Wu.DomEvent.on(div, 'click', function (e) {	
+
+			console.log('click, settings', setting);
+			
 			Wu.DomEvent.stop(e);
 
 			// toggle setting
@@ -1902,6 +1951,9 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 
 			// toggle button
 			this._settings[setting] ? input.setAttribute('checked', 'checked') : input.removeAttribute('checked');
+
+			// Google Analytics event tracking
+			app.Analytics.ga(['Side Pane', 'Options > Settings: ' + setting]);
 			
 		}, this);
 		 
@@ -1931,4 +1983,3 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 
 
 });
-

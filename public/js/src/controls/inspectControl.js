@@ -1,3 +1,5 @@
+// app.MapPane.inspectControl
+
 L.Control.Inspect = L.Control.extend({
 	
 	options: {
@@ -12,22 +14,10 @@ L.Control.Inspect = L.Control.extend({
 		    options   = this.options;
 
 		// add html
-		// container.innerHTML = ich.inspectControl(); 
-
-		// #description-toggle-button
-		this._content = Wu.DomUtil.create('div', 'inspect-control-inner-content', container);
-
-		// #inspector-header
-		this._header = Wu.DomUtil.create('div', 'menucollapser inspector-header', this._content, 'Layer inspector');
-
-		//  #collapse-description
-		this._scroller = Wu.DomUtil.create('div', 'inspector-list-outer-scroller', this._content);
-
-		// #inspector-list
-		this._list = Wu.DomUtil.create('div', 'inspector-list', this._scroller);
-
-
-
+		this._content 	= Wu.DomUtil.create('div', 'inspect-control-inner-content', container);
+		this._header 	= Wu.DomUtil.create('div', 'menucollapser inspector-header', this._content, 'Layer inspector');
+		this._scroller  = Wu.DomUtil.create('div', 'inspector-list-outer-scroller', this._content);
+		this._list 	= Wu.DomUtil.create('div', 'inspector-list', this._scroller);
 
 		// add tooltip
 		app.Tooltip.add(container, 'Shows a list of active layers', { extends : 'systyle', tipJoint : 'top left'});
@@ -38,7 +28,9 @@ L.Control.Inspect = L.Control.extend({
 	},
 
 	addTo: function (map) {
+
 		this._map = map;
+
 		var container = this._container = this.onAdd(map),
 		    pos = this.getPosition(),
 		    corner = map._controlCorners[pos];
@@ -84,6 +76,7 @@ L.Control.Inspect = L.Control.extend({
 	},
 
 	_addAlreadyActiveLayers : function () {
+
 		var active = app.MapPane.getActiveLayers();
 		active.forEach(function (layer) {
 			// add layermenu layers
@@ -185,6 +178,7 @@ L.Control.Inspect = L.Control.extend({
 	},
 
 	_initSortable : function () {
+
 		if (this._initedSortable) return;
 		this._initedSortable = true;
 
@@ -205,6 +199,7 @@ L.Control.Inspect = L.Control.extend({
 	},
 
 	_dragMove : function (e) {
+
 		if (!this._dragging) return;
 
 		var d = this._dragging,
@@ -227,6 +222,7 @@ L.Control.Inspect = L.Control.extend({
 	},
 
 	_dragStop : function (e) {
+
 		if (!this._dragging) return;
 
 		// do something
@@ -238,6 +234,7 @@ L.Control.Inspect = L.Control.extend({
 	},	
 
 	_moveUp : function () {		// todo: doesn't work as well going up then back down
+
 		var d = this._dragging,
 		    div = d.wrapper,
 		    prev = div.previousSibling,
@@ -253,6 +250,11 @@ L.Control.Inspect = L.Control.extend({
 
 		// reset dragging y count
 		this._md = 0;
+
+		// Google Analytics event tracking
+		var _layerName = layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);
+
 	},
 
 	_moveDown : function () {
@@ -272,6 +274,11 @@ L.Control.Inspect = L.Control.extend({
 
 		// reset dragging y count
 		this._md = 0;
+
+		// Google Analytics event tracking
+		var _layerName = layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);
+
 	},
 
 
@@ -286,6 +293,11 @@ L.Control.Inspect = L.Control.extend({
 
 		// Hide Layer inspector if it's empty
 		if ( this.layers.length == 0 ) this._content.style.display = 'none';
+
+
+		// Google Analytics event tracking
+		var _layerName = layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Remove layer > ' + _layerName]);
 		
 
 	},
@@ -322,6 +334,11 @@ L.Control.Inspect = L.Control.extend({
 		// move up in zindex
 		this._zx.up(layer);
 
+
+		// Google Analytics event tracking
+		var _layerName = layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);		
+
 	},
 
 	moveDown : function (entry) {
@@ -338,6 +355,10 @@ L.Control.Inspect = L.Control.extend({
 
 		// move up in zindex
 		this._zx.down(layer);
+
+		// Google Analytics event tracking
+		var _layerName = layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);		
 		
 	},
 
@@ -358,9 +379,14 @@ L.Control.Inspect = L.Control.extend({
 		var map = app._map;
 		map.fitBounds(bounds);
 
+		// Google Analytics event tracking
+		var _layerName = layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Fly to bounds for > ' + _layerName]);
+
 	},
 
 	isolateToggle : function (entry) {
+
 		if (entry.isolated) {
 
 			// deisolate layer
@@ -378,9 +404,15 @@ L.Control.Inspect = L.Control.extend({
 			// add class to eye
 			Wu.DomUtil.addClass(entry.eye, 'inspecting');
 		}
+
+		// Google Analytics event tracking
+		var _layerName = entry.layer.store.title;
+		app.Analytics.ga(['Controls', 'Inspect layers: Toggle isolate > ' + _layerName]);	
+
 	},
 
 	_noneAreIsolated : function () {
+		
 		var any = _.filter(this.layers, function (entry) { return entry.isolated == true; });
 		if (!any.length) return true;
 		return false;
@@ -405,7 +437,6 @@ L.Control.Inspect = L.Control.extend({
 			}
 		}, this);
 
-		
 	},
 
 	killLayer : function (entry) {

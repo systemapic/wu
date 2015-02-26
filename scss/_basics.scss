@@ -27,6 +27,14 @@ body {
 	outline: none !important; 
 	border: 0 !important 
 	}
+
+.z999999 {
+	z-index: 99999999999;
+}	
+/* Internet explorer puts an "X" to clear input fields...*/
+input::-ms-clear {
+    display: none;
+	}	
 	
 label {
 	margin-bottom: 0px !important;
@@ -151,12 +159,32 @@ hr {
 	letter-spacing: 0.5px;
 	line-height: 1.2;
 	padding-top: 10px;
-	/*border-left: 1px dashed rgba(255,255,255,0.05);*/
 	border-left: 1px dashed rgba(255, 255, 255, 0.15);	
 	padding-left: 9px;
 	color: #333;
 	}
 	
+
+.tdcont.company {}
+.tdcont.position {}
+.tdcont.phone {}
+
+/*.tdcont.company input {
+	background: red !important;
+	}
+
+.tdcont.position input {
+	background: red !important;
+	}
+
+.tdcont.phone input {
+	background: red !important;
+	}
+*/
+
+
+
+
 .tdcont:hover {
 	color: black;
 	}
@@ -165,8 +193,10 @@ hr {
 	background: rgb(146, 240, 229);
 	}
 */
+
+.manage-access-button-done,
+.manage-access-current-role,
 .user-projects-button {
-	/*background: rgba(0,0,0,0.2);*/
 	background: rgba(0, 0, 0, 0.65);
 	padding: 10px;
 	text-align: center;
@@ -178,6 +208,8 @@ hr {
 	cursor: pointer;
 	}
 
+.manage-access-button-done:hover,
+.manage-access-current-role:hover,
 .user-projects-button:hover {
 	/*background: #66a7a0;*/
 	/*background: #218777;*/
@@ -571,6 +603,7 @@ label.info {
 
 .dragging {
 	background: #92f0e5 !important;
+	cursor: pointer;
 	cursor: -webkit-grab !important;
 	cursor:    -moz-grab !important;
 	}
@@ -595,11 +628,15 @@ input.cmn-toggle-round-flat + label {
 	border-radius: 60px;
 	transition: background 0.1s;
 	margin-top: -19px;
+	cursor: pointer;
 	cursor: -webkit-grab;
+	cursor:    -moz-grab;
 	}
 
 input.cmn-toggle-round-flat + label:active {
+	cursor: pointer;
 	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
 	}
 
 input.cmn-toggle-round-flat + label:before,

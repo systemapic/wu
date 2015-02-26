@@ -1,3 +1,5 @@
+// app.StartPane
+
 Wu.StartPane = Wu.Class.extend({
 
 	initialize : function (options) {
@@ -23,7 +25,10 @@ Wu.StartPane = Wu.Class.extend({
 		this.isOpen = true;
 
 		// create container
-		this.initSpinner();
+		this.initContainer();
+
+		// init spinner
+		// this.initSpinner();
 
 		// add events
 		this.addHooks();
@@ -33,11 +38,6 @@ Wu.StartPane = Wu.Class.extend({
 
 		// Show the header pane.
 		Wu.DomUtil.removeClass(Wu.app.HeaderPane._container, 'displayNone');
-
-
-		// screendimentions
-		// app._getDimensions()
-	
 
 
 	},	
@@ -58,25 +58,22 @@ Wu.StartPane = Wu.Class.extend({
 	},
 
 
-	initSpinner : function () {
-
-		console.log('initSpinner');
+	initContainer : function () {
 
 		// create container 
 		this._container = Wu.DomUtil.create('div', 'startpane-canvas-container', app._appPane);
 
 		// create content for black box
-		var content = this._initSpinnerContent();
+		var content = this._initContent();
 		this._wrapper = Wu.DomUtil.create('div', 'spinning-wrapper', this._container);
 
 		this._wrapper.appendChild(content);
 
-		this._spinner = false;
+	},
 
+	initSpinner : function () {
 
-
-		return;
-
+		
 		// create spinner instance
 		this._spinner = new L.SpinningMap({
 			autoStart : true,
@@ -100,19 +97,19 @@ Wu.StartPane = Wu.Class.extend({
 
 	},
 
-	_initSpinnerContent : function () {
+	_initContent : function () {
 
 		// create wrapper
-		var wrapper = Wu.DomUtil.create('div', 'startpane-spinning-content');
+		var wrapper 			= Wu.DomUtil.create('div', 'startpane-spinning-content');
 
 		// black box in centre
-		this._bannerContainer = Wu.DomUtil.create('div', 'startpane-banner-container', wrapper);
-		this._banner = Wu.DomUtil.create('div', 'startpane-banner', this._bannerContainer);
+		this._bannerContainer    	= Wu.DomUtil.create('div', 'startpane-banner-container', wrapper);
+		this._banner 			= Wu.DomUtil.create('div', 'startpane-banner', this._bannerContainer);
 
-		this._recentProjectsContainer = Wu.DomUtil.create('div', 'startpane-recent-projects-container', this._banner);
+		this._recentProjectsContainer 	= Wu.DomUtil.create('div', 'startpane-recent-projects-container', this._banner);
 
-		this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Recent projects:');
-		this._projectList = Wu.DomUtil.create('div', 'startpane-project-list', this._recentProjectsContainer);
+		this._recentProjectsHeader 	= Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Recent projects:');
+		this._projectList 		= Wu.DomUtil.create('div', 'startpane-project-list', this._recentProjectsContainer);
 
 		// return 
 		return wrapper;
@@ -153,6 +150,7 @@ Wu.StartPane = Wu.Class.extend({
 	},
 
 	_getLatestProjects : function () {
+
 		// Get all projects
 		var projectsUnsorted = app.Projects;	
 
@@ -169,39 +167,57 @@ Wu.StartPane = Wu.Class.extend({
 
 	createStartProject : function (project) {
 
-		// Client info
-		var clientID = project.store.client;
-		var clientName = app.Clients[clientID].name;
-		var clientLogo = app.Clients[clientID].logo;
+		if (!project) return;
+
+		var client = project.getClient();
+
+		if (!client) return;
 
 		var newProject = {};
+
 		// create container
 		newProject._projectContainer = Wu.DomUtil.create('div', 'start-panne-recent-projects', this._projectList);
-		
 		newProject._projectThumb = Wu.DomUtil.create('img', '', newProject._projectContainer);
-		newProject._projectThumb.src = project.store.logo;
+
+		// Load image in memory before we paste it (to see image orientation)
+		var img = new Image();
+		var ssrc = project.getLogo();
+		img.src = ssrc;
+
+		img.onload = function() {
+
+			if ( img.width >= img.height ) {
+			
+				// landscape
+				newProject._projectThumb.style.height = '100%';
+				newProject._projectThumb.style.width = 'auto';
+			
+			} else {
+				
+				// landscape
+				newProject._projectThumb.style.height = 'auto';
+				newProject._projectThumb.style.width = '100%';
+			}
+
+			newProject._projectThumb.src = project.getLogo();
+		}
 
 		newProject._projectTitle = Wu.DomUtil.create('div', 'start-project-name', newProject._projectContainer);
 		newProject._projectTitle.innerHTML = project.getName();
 
 		newProject._clientName = Wu.DomUtil.create('div', 'start-project-client-name', newProject._projectContainer);
-		newProject._clientName.innerHTML = clientName;
+		newProject._clientName.innerHTML = client.getName();
 
-		if ( clientLogo ) {
+		if (client.getLogo()) {
 			newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
-			newProject._clientLogo.src = clientLogo;
+			newProject._clientLogo.src = client.getLogo();
 		}
 
-
 		this.projectContainers.push(newProject);
-
 
 		// Adjust for short titles
 		if (project.getName().length < 22) Wu.DomUtil.addClass(newProject._projectTitle, 'short-name');
 		
-
-		// var client
-
 		// select project hook
 		Wu.DomEvent.on(newProject._projectContainer, 'mousedown', function() { this.selectProject(project); }, this);
 
@@ -215,6 +231,9 @@ Wu.StartPane = Wu.Class.extend({
 
 	selectProject : function(project) {
 
+		// Google Analytics
+		app.Analytics.setGaProject(project.getUuid());
+
 		// select project
 		project.select();
 
@@ -223,6 +242,10 @@ Wu.StartPane = Wu.Class.extend({
 
 		// Hide the Start Pane
 		this.deactivate();
+
+		// Google Analytics event trackign
+		var projectID = project.getUuid();
+		app.Analytics.setGaProject(projectID);
 
 	},
 
@@ -305,11 +328,7 @@ Wu.StartPane = Wu.Class.extend({
 	},
 
 	changeHeight : function (dimensions) {
-
-		console.log('change the height');
 		this.setYposition(dimensions);
-
-
 	},
 
 	setYposition : function (dimensions) {
@@ -377,11 +396,13 @@ Wu.StartPane = Wu.Class.extend({
 		// Store how many projects we want to show
 		this.dimensions.projectNo = no;
 
-		for (var i = 0; i < this.projects.length - 1; i++) {
+		for (var i = 0; i < this.projects.length; i++) {
 			if (i < no) {
-				Wu.DomUtil.removeClass(this.projectContainers[i]._projectContainer, 'displayNone');
+				var project = this.projectContainers[i];
+				if (project) Wu.DomUtil.removeClass(project._projectContainer, 'displayNone');
 			} else {
-				Wu.DomUtil.addClass(this.projectContainers[i]._projectContainer, 'displayNone');
+				var project = this.projectContainers[i];
+				if (project) Wu.DomUtil.addClass(project._projectContainer, 'displayNone');
 			}	    
 		}
 

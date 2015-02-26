@@ -1,0 +1,420 @@
+/* Remove all leaflet buttons, if any */
+.leaflet-control-container {
+	display: none;
+	}
+
+.leaflet-tile-container  {
+	cursor: auto;
+	}
+
+/* Spinning class get added to map to start rotating it */
+
+/* Spinning Clockwise */
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	25% { transform: rotate(90deg); }
+	50% { transform: rotate(180deg); }
+	75% { transform: rotate(270deg); }
+	100% { transform: rotate(360deg); }
+	}
+@-webkit-keyframes spin {
+	0% { transform: rotate(0deg); }
+	25% { transform: rotate(90deg); }
+	50% { transform: rotate(180deg); }
+	75% { transform: rotate(270deg); }
+	100% { transform: rotate(360deg); }	
+	}
+
+.spinning {
+	-webkit-animation: spin 500s;
+	animation: spin 500s;
+    	-webkit-animation-timing-function: linear;
+    	animation-timing-function: linear;    	
+    	-webkit-animation-iteration-count:infinite;
+    	animation-iteration-count:infinite;
+	}
+
+/* Spinning Clockwise, starting at 90 */
+@keyframes spin90 {
+	0% { transform: rotate(90deg); }
+	25% { transform: rotate(180deg); }
+	50% { transform: rotate(270deg); }
+	75% { transform: rotate(360deg); }
+	100% { transform: rotate(0deg); }
+	}
+@-webkit-keyframes spin90 {
+	0% { transform: rotate(90deg); }
+	25% { transform: rotate(180deg); }
+	50% { transform: rotate(270deg); }
+	75% { transform: rotate(360deg); }
+	100% { transform: rotate(0deg); }
+	}
+
+.spinning90 {
+	-webkit-animation: spin90 500s;
+	animation: spin90 500s;
+    	-webkit-animation-timing-function: linear;
+    	animation-timing-function: linear;    	
+    	-webkit-animation-iteration-count:infinite;
+    	animation-iteration-count:infinite;
+	}
+
+
+/* Spinning Clockwise, starting at 270 */
+@keyframes spin270 {
+	0% { transform: rotate(270deg); }
+	25% { transform: rotate(360deg); }
+	50% { transform: rotate(90deg); }
+	75% { transform: rotate(180deg); }
+	100% { transform: rotate(270deg); }
+	}
+@-webkit-keyframes spin270 {
+	0% { transform: rotate(270deg); }
+	25% { transform: rotate(360deg); }
+	50% { transform: rotate(90deg); }
+	75% { transform: rotate(180deg); }
+	100% { transform: rotate(270deg); }
+	}
+
+.spinning270 {
+	-webkit-animation: spin270 500s;
+	animation: spin270 500s;
+    	-webkit-animation-timing-function: linear;
+    	animation-timing-function: linear;    	
+    	-webkit-animation-iteration-count:infinite;
+    	animation-iteration-count:infinite;
+	}
+
+/* Spinning counter clockwise */
+@keyframes spinrev {
+	0% { transform: rotate(0deg); }
+	25% { transform: rotate(-90deg); }
+	50% { transform: rotate(-180deg); }
+	75% { transform: rotate(-270deg); }
+	100% { transform: rotate(-360deg); }
+	}
+@-webkit-keyframes spinrev {
+	0% { transform: rotate(0deg); }
+	25% { transform: rotate(-90deg); }
+	50% { transform: rotate(-180deg); }
+	75% { transform: rotate(-270deg); }
+	100% { transform: rotate(-360deg); }
+	}
+
+.spinning-reversed {
+	-webkit-animation: spinrev 500s;
+	animation: spinrev 500s;
+    	-webkit-animation-timing-function: linear;
+    	animation-timing-function: linear;    	
+    	-webkit-animation-iteration-count:infinite;
+    	animation-iteration-count:infinite;
+	}	
+
+/* Spinning counter clockwise, starting at 90 */
+@keyframes spinrev90 {
+	0% { transform: rotate(-90deg); }
+	25% { transform: rotate(-180deg); }
+	50% { transform: rotate(-270deg); }
+	75% { transform: rotate(-360deg); }
+	100% { transform: rotate(-0deg); }
+	}
+@-webkit-keyframes spinrev90 {
+	0% { transform: rotate(-90deg); }
+	25% { transform: rotate(-180deg); }
+	50% { transform: rotate(-270deg); }
+	75% { transform: rotate(-360deg); }
+	100% { transform: rotate(-0deg); }
+	}
+
+.spinning-reversed90 {
+	-webkit-animation: spinrev90 500s;
+	animation: spinrev90 500s;
+    	-webkit-animation-timing-function: linear;
+    	animation-timing-function: linear;    	
+    	-webkit-animation-iteration-count:infinite;
+    	animation-iteration-count:infinite;
+	}
+
+/* Spinning Clockwise, starting at 270 */
+@keyframes spinrev270 {
+	0% { transform: rotate(-270deg); }
+	25% { transform: rotate(-360deg); }
+	50% { transform: rotate(-90deg); }
+	75% { transform: rotate(-180deg); }
+	100% { transform: rotate(-270deg); }
+	}
+@-webkit-keyframes spinrev270 {
+	0% { transform: rotate(-270deg); }
+	25% { transform: rotate(-360deg); }
+	50% { transform: rotate(-90deg); }
+	75% { transform: rotate(-180deg); }
+	100% { transform: rotate(-270deg); }
+	}
+
+.spinning-reversed270 {
+	-webkit-animation: spinrev270 500s;
+	animation: spinrev270 500s;
+    	-webkit-animation-timing-function: linear;
+    	animation-timing-function: linear;    	
+    	-webkit-animation-iteration-count:infinite;
+    	animation-iteration-count:infinite;
+	}
+
+.spinning-wrapper {
+	width: 100%;
+	position: absolute;
+	height: 100%;
+	top: 0;
+	left: 0;
+	overflow: hidden;	
+	}
+
+.map-wrapper {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	overflow: hidden;
+	}
+
+#spinning-map {
+	position: absolute;
+	background: rgb(8, 18, 30);
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	}
+
+.opacityFull {
+	opacity: 1;
+	}
+
+.opacityNone {
+	opacity: 0;
+	}
+
+/* The content that is NOT spinning */
+#spinning-content {
+	height: 0;
+	width: 75%;
+	position: absolute;
+	top: 50%;
+	padding-left: 25%;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;	
+	z-index: 999;
+	}
+
+/* Start pane circle */
+.startpane-circle-container {
+	position: absolute;
+	width: 0;
+	height: 0;
+	top: 50%;
+	left: 12.5%;
+	}
+
+.startpane-circle {
+	position: relative;
+	width: 120px;
+	height: 120px;
+	border-radius: 1000px;
+	z-index: 999;
+	top: -60px;
+	left: -60px;
+	box-shadow: 0 0 25px 0 black;
+	opacity: 0.8;
+	cursor: pointer;
+	-webkit-transition: opacity 200ms ease;
+	transition: opacity 200ms ease;
+	}
+
+.startpane-circle:hover {
+	opacity: 1;
+	}
+
+.startpane-circle:active {
+	box-shadow: none;
+	}
+
+
+/* Black banner container */
+#spinning-content {
+	height: 0;
+	width: 100%;
+	position: absolute;
+	top: 50%;
+	padding-left: 25%;
+	}
+
+#login-logo {
+	/*background-image: url(https://maps.systemapic.com/css/images/griffon_logo_drop.png);*/
+	background-repeat: no-repeat;
+	width: 429px;
+	height: 291px;
+	position: absolute;
+	top: 9px;
+	left: 9px;
+	z-index: 999;
+
+	background-position: center;
+	/*border-right: 1px solid white;	*/
+	}
+
+/* Main container (black background) */
+.col-sm-6.col-sm-offset-3 {
+	width: 95%;
+	min-width: 600px;
+	max-width: 850px;
+	height: 310px;
+	background-color: rgba(0,0,0,0.6);
+	position: relative;
+	top: -155px;
+	padding-left: 520px;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;	
+	}
+
+/* Login title */
+.col-sm-6.col-sm-offset-3 h1 {
+	font-size: 20px;
+	color: white;
+	font-family: helvetica neue;
+	padding-top: 75px;
+	padding-bottom: 8px;
+	margin-bottom: 0;
+	}
+
+/* Login form */
+#hitme {
+	width: 220px;
+	}
+
+#form-group {
+	width: 100%
+	}
+
+.form-control {
+	width: 100%;
+	padding: 5px;
+	margin-bottom: 3px;
+	border: none;
+	}
+
+#login-button {
+	background: white;
+	border: none;
+	padding: 3px 10px 4px 10px;
+	font-size: 16px;
+	font-family: helvetica neue;
+	font-weight: 900;
+	border-radius: 2px;	
+	margin-top: 10px;
+	cursor: pointer;
+	}
+
+#login-button:hover {
+	background: #DADADA;
+	}
+
+#forgot-password {
+	background: none;
+	border: none;
+	color: white;
+	font-size: 12px;
+	position: relative;
+	top: 2px;
+	cursor: pointer;
+	text-decoration: underline;
+	}
+
+.alert,
+.alert-danger {
+	font-family: helvetica neue;
+	/*color: #C80000;*/
+	color: #FF0000;
+	position: relative;
+	top: -7px;
+	font-size: 15px;
+	padding-right: 25px;
+	/*font-style: italic;	*/
+	font-weight: 900;
+	/*text-transform: uppercase;*/
+	}
+
+#powered-by {
+	background-color: rgba(0,0,0,.6);
+	color: #DADADA;
+	color: #CCC;
+	position: absolute;
+	bottom: -20px;
+	padding: 2px 6px;
+	font-family: helvetica neue;
+	font-size: 11px;
+	font-style: italic;
+	font-weight: 500;
+	right: 0;
+	}
+
+#powered-by a,
+#powered-by a:hover,
+#powered-by a:active {
+	padding-left: 5px;
+	color: #CCC;
+	font-weight: 500;
+	text-decoration: none;
+	}
+
+
+.mapboxgl-ctrl-attrib {
+	display: none !important;
+	}
+
+body {
+	margin: 0 !important;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+
+	-webkit-user-select: none; /* Chrome/Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+ */
+
+	/* Rules below not implemented in browsers yet */
+	-o-user-select: none;
+	user-select: none;
+	
+	}
+
+
+
+@media screen and (max-width: 1050px) {
+	#login-logo {
+		z-index: 0;
+	}
+
+	.col-sm-6.col-sm-offset-3 h1 {
+		z-index: 999999;
+		font-size: 18px;
+
+	}
+	#hitme {
+		z-index: 999999;
+		position: absolute;
+		width: 375px;
+	}
+
+	.col-sm-6.col-sm-offset-3 {
+		padding-left: 30px;
+		padding-top: 215px;
+		/*top: -225px;*/
+		top: -245px;
+		/*height: 450px;*/
+		height: 490px;
+		width: 445px;
+		min-width: 445px;	
+	}
+}

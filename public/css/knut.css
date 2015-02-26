@@ -26,34 +26,7 @@
 }
 
 
-/*mapsettings connect mapbox*/
-.mapbox-listed-account {
-	border: 1px solid rgb(200, 200, 200);
-}
-..mapbox-listed-account-title:before {
-	content: '';
-}
-.mapbox-listed-account-title {
-	text-indent: 0;
-	padding: 4px;
-}
-.mapbox-listed-account {
-	padding: 0;
-}
-.mapbox-listed-account-refresh {
-	position: absolute;
-	border: 1px solid black;
-	height: 100%;
-	width: 30px;
-	right: 30px;
-}
-.mapbox-listed-account-delete {
-	position: absolute;
-	border: 1px solid red;
-	height: 100%;
-	width: 30px;
-	right: 0px;
-}	
+
 
 
 /*layermenu logic check*/
@@ -270,24 +243,35 @@ body {
 	text-transform: uppercase;
 }
 
-.osm-add-box {
+/*.osm-add-box {
 	width: 100%;
-	height: 30px;
-	border: 1px solid gray;
-	font-size: 110%;
-	padding: 3px;
-	text-align: center;
-	color: rgb(50, 50, 50);
-	font-weight: 500;
+	top: 6px;
 }
-
-.osm-add-box:hover {
-
+*/
+/*.osm-add-box:hover {
 	background: rgba(152, 152, 152, 0.8);
-
-
-}
-
+}*/
 
 
 
+/* LAYER NENU */
+
+
+/* Buttons */
+.layer-menu-item-wrap {
+	background-color: #a8aab3 !important;
+	color: #000;
+	}
+
+/* Menufolder */
+.menufolder {
+	background-color: #3C4759 !important; 
+	color: white !important;
+	}
+
+
+/* Button active */
+.layer-active {  
+	background-color: #cfd0d2 !important;
+	color: #000 !important;
+	}

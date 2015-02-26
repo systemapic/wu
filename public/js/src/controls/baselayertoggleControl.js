@@ -3,7 +3,10 @@
  * https://raw.githubusercontent.com/Leaflet/Leaflet/master/src/control/Control.Layers.js
  */
 
+// app.MapPane.baselayerToggle
+
 L.Control.BaselayerToggle = L.Control.extend({
+
 	options: {
 		collapsed: true,
 		position: 'topleft',
@@ -11,12 +14,14 @@ L.Control.BaselayerToggle = L.Control.extend({
 	},
 
 	onAdd: function () {
+
 		this._initLayout();
 		this.update();
 		return this._container;
 	},
 
 	addTo: function (map) {
+
 		this._map = map;
 
 		var container = this._container = this.onAdd(map),
@@ -45,9 +50,18 @@ L.Control.BaselayerToggle = L.Control.extend({
 		// add events
 		Wu.DomEvent.on(container, 'mousedown', this.toggle, this);
 		Wu.DomEvent.on(container, 'dblclick', Wu.DomEvent.stop, this);
+		Wu.DomEvent.on(container, 'mouseleave', this.mouseOut, this);
 
 		// add stops
 		Wu.DomEvent.on(container, 'mousedown dblclick mouseup click', Wu.DomEvent.stopPropagation, this);
+
+	},
+
+
+	mouseOut : function () {
+
+		if ( this._isOpen ) { this.collapse() }
+		else { return };
 
 	},
 
@@ -64,7 +78,7 @@ L.Control.BaselayerToggle = L.Control.extend({
 		this._layers = {};
 
 		// create wrapper
-		this._list = L.DomUtil.create('div', 'baselayertoggle-list collapsed', this._container);
+		this._list = L.DomUtil.create('div', 'baselayertoggle-list', this._container);
 		Wu.DomEvent.on(this._list, 'dblclick', Wu.DomEvent.stop, this);
 
 		// build menu
@@ -115,6 +129,7 @@ L.Control.BaselayerToggle = L.Control.extend({
 			layer.disable();
 			baseLayer.active = false;
 			Wu.DomUtil.removeClass(item, 'active');
+			
 		} else {
 			
 			// enable
@@ -123,20 +138,30 @@ L.Control.BaselayerToggle = L.Control.extend({
 			Wu.DomUtil.addClass(item, 'active');
 		}
 
+		// Google Analytics event tracking
+		var _layerTitle = layer.getTitle();
+		app.Analytics.ga(['Controls', 'Baselayer toggle: ' + _layerTitle]);
+
+
 	},
 
 	toggle : function () {
+		
 		this._isOpen ? this.collapse() : this.expand();
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'Baselayer toggle click']);
+
 	},
 
 	collapse : function () {
 		this._isOpen = false;
-		Wu.DomUtil.addClass(this._list, 'collapsed');
+		Wu.DomUtil.removeClass(this._container, 'open');
 	},
 
 	expand : function () {
 		this._isOpen = true;
-		Wu.DomUtil.removeClass(this._list, 'collapsed');
+		Wu.DomUtil.addClass(this._container, 'open');
 	},
 
 

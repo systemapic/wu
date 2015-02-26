@@ -136,7 +136,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.adjustTop();
 
 		// turn off header resizing and icon
-		Wu.app.HeaderPane.disableResize();
+		// Wu.app.HeaderPane.disableResize();
 
 		// select first title (create fake e object)
 		var folders = this.project.store.folders;
@@ -200,7 +200,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	_deactivate : function () {
 
 		// turn off header resizing
-		Wu.app.HeaderPane.enableResize();
+		// Wu.app.HeaderPane.enableResize();
 
 		// remove shift key edit hook
 		this.disableShift();
@@ -306,6 +306,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// refresh
 		this.update();
 
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Documents: New folder']);
+
 	},
 
 	createFolders : function () {
@@ -364,6 +368,10 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			delete this.folders[uuid];
 			this.save();
 		}
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Side Pane', 'Documents: Delete folder']);
+
 	},
 
 	_renameFolder : function (e, uuid) {
