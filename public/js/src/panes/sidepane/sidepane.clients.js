@@ -26,7 +26,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		}, this);
 
       		// insert create client button
-		if (app.Account.canCreateClient()) this._insertNewClientButton();	
+		if (app.access.to.create_client()) this._insertNewClientButton();	
 
 		// add tooltip
 		app.Tooltip.add(this._menu, 'Here is a list of clients and projects you have access to.');
@@ -189,7 +189,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 			// post       path   data    callback   context of cb
 			Wu.Util.postcb(path, json, that._checkedSlug, that);
 
-		}, 500);               
+		}.bind(this), 500);               
 	},
 
 	_checkedSlug : function (editor, raw) {
@@ -234,12 +234,9 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	_confirm : function () {
 
 		// get client vars
-		// var clientName = Wu.DomUtil.get('editor-client-name-new').value;
 		var clientName = this._newClient._NameInput.value;
-		// var clientDescription = Wu.DomUtil.get('editor-client-description-new').value;
 		var clientDescription = this._newClient._DescriptionInput.value;
-		// var clientKeywords = Wu.DomUtil.get('editor-client-keywords-new').value;
-		var clientKeywords = this._newClient._keywordsInput;
+		var clientKeywords = this._newClient._keywordsInput.value;
 		
 		var options = {
 			name : clientName,
@@ -251,33 +248,41 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		client.saveNew(); // callback = this._created below
 	},
 
-	_created : function(client, json) {       // this is the http callback        
-		var editor = Wu.app.SidePane.Clients;
+	_created : function(client, json) {       // this is the http callback    
+
+		console.log('new client, callback: ', client, json);
+
+		var sidepaneClients = Wu.app.SidePane.Clients;
 		var options = JSON.parse(json);
 	       
+		if (options.error) {
+			console.log('error creating client.', options.error);
+			// remove old box
+			sidepaneClients._cancel();
+			return;
+		} 
+
 		// update Client object
 		Wu.extend(client, options);
 		Wu.app.Clients[client.uuid] = client;
 
 		// remove edit box
-		// var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
-		var old = this._newClient._wrapper;
+		var old = app.SidePane.Clients._newClient._wrapper;
 		Wu.DomUtil.remove(old);
 
 		// add permissions
-		var user = app.Account;
-		console.log('adding perm: ', client.getUuid());
-		user.addUpdateClient(client);
+		// var user = app.Account;
+		// user.addUpdateClient(client);
 	       		
 		// create client in DOM
-		editor._create(client);
+		sidepaneClients._create(client);
 
 		// set active
 		client.setActive();
 
 		// move new button to last
-		Wu.DomUtil.remove(editor._newClientButton);
-		editor._clientsContainer.appendChild(editor._newClientButton);
+		Wu.DomUtil.remove(sidepaneClients._newClientButton);
+		sidepaneClients._clientsContainer.appendChild(sidepaneClients._newClientButton);
 
 		// Set creating new client to false
 		this._creatingNewClient = false;

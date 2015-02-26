@@ -1,718 +1,463 @@
-// app/routes/routes.js rsub
-
-// database schemas
-var Project = require('../models/project');
-var Clientel = require('../models/client');	// weird name cause restricted name
-var User  = require('../models/user');
-var File = require('../models/file');
-var Layers = require('../models/layer');
-
-// file handling
-var fs = require('fs-extra');
-var fss = require("q-io/fs");
-var utf8 = require("utf8");
+// ROUTE: routes.js 
 
 // utils
-var async = require('async');
-var util = require('util');
-var request = require('request');
-var uuid = require('node-uuid');
+var _ 		= require('lodash-node');
+var fs 		= require('fs-extra');
+var gm 		= require('gm');
+var kue 	= require('kue');
+var fss 	= require("q-io/fs");
+var zlib 	= require('zlib');
+var uuid 	= require('node-uuid');
+var util 	= require('util');
+var utf8 	= require("utf8");
+var mime 	= require("mime");
+var exec 	= require('child_process').exec;
+var dive 	= require('dive');
+var async 	= require('async');
+var carto 	= require('carto');
+var colors 	= require('colors');
+var crypto      = require('crypto');
+var fspath 	= require('path');
+var mapnik 	= require('mapnik');
+var request 	= require('request');
+var nodepath    = require('path');
+var formidable  = require('formidable');
+var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
-var _ = require('lodash-node');
-var colors = require('colors');
+var mapnikOmnivore = require('mapnik-omnivore');
 
-
-// lib's
-var api = require('../api/api')
-var pixels = require('../api/pixels');
-var upload = require('../api/upload');
-
-// global paths
-var IMAGEFOLDER = '/data/images/';
-
-
+// api
+var api = require('../api/api');
 
 // function exports
 module.exports = function(app, passport) {
-
 
 
 	// ================================
 	// HOME PAGE (with login links) ===
 	// ================================
 	app.get('/', function(req, res) {
-
-
-		// return if not logged in 			redirect to login page
-		if (!req.isAuthenticated()) return res.render('../../views/index.ejs'); // load the index.ejs file
-		
-		// render app html				// todo: hotlink
-		res.render('../../views/app.serve.ejs', {
-			hotlink : req.session.hotlink
-		});
-
-		// reset hotlink
-		req.session.hotlink = {};
+		api.getBase(req, res);
 	});
-
 
 
 	// =====================================
 	// GET WHOLE SETUP FOR PORTAL ==========
 	// =====================================
-	// get data from store for user
 	app.post('/api/portal', isLoggedIn, function (req, res) {
-		console.log('/api/portal');
-		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'.yellow);
-		console.log('* User: ' + req.user.firstName + ' ' + req.user.lastName);
-		console.log('* User uuid: ' + req.user.uuid);
-		console.log('* IP: ' + req._remoteAddress);
-		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'.yellow);
-
-		// get user store for this user
 		api.getPortal(req, res);
-
 	});
-
-
-
 
 
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
 	app.post('/api/project/new', isLoggedIn, function (req,res) {
-		console.log('/api/project/new');
-
-		// API: create new project
-		api.createProject(req, res);
-
+		api.project.create(req, res);
 	});
-
 
 
 	// =====================================
 	// DELETE PROJECT   ====================
 	// =====================================
 	app.post('/api/project/delete', isLoggedIn, function (req, res) {
-		console.log('/api/project/delete');
-
-		// API: delete project
-		api.deleteProject(req, res);
-
+		api.project.deleteProject(req, res);
 	});
-
 
 
 	// =====================================
 	// UPDATE PROJECT ======================
 	// =====================================
-	// update project
 	app.post('/api/project/update', isLoggedIn, function (req,res) {
-		console.log('/api/project/update');
-
-		// API: update project
-		api.updateProject(req, res);
-
+		api.project.update(req, res);
 	});
+
 
 	// =====================================
 	// CHECK UNIQUE SLUG ===================
 	// =====================================
-	// update project
 	app.post('/api/project/unique', isLoggedIn, function (req,res) {
-		console.log('/api/project/unique');
-
-		// API: check slug
-		api.checkUniqueProjectSlug(req, res);
-
+		api.project.checkUniqueSlug(req, res);
 	});
 
 
 	// =====================================
 	// SET PROJECT HASH ====================
 	// =====================================
-	// set saved map state
 	app.post('/api/project/hash/set', isLoggedIn, function (req,res) {
-		console.log('/api/project/hash/set');
-
-		// API: set hashed map state
-		api.setHash(req, res);
-
+		api.project.setHash(req, res);
 	});
+
 
 	// =====================================
 	// GET PROJECT HASH ====================
 	// =====================================
-	// get saved map state
 	app.post('/api/project/hash/get', isLoggedIn, function (req,res) {
-		console.log('/api/project/hash/get');
-
-		// API: get hashed map state
-		api.getHash(req, res);
-
+		api.project.getHash(req, res);
 	});
-
 
 
 	// =====================================
 	// UPLOAD PROJECT LOGO  ================
 	// =====================================
-	// upload new logo to project
 	app.post('/api/project/uploadlogo', isLoggedIn, function (req,res) {
-		console.log('/api/project/uploadlogo');
-
-		
-		// API: upload project logo
-		api.uploadProjectLogo(req, res);
-
+		api.upload.projectLogo(req, res);
 	});
 
 
 	// =====================================
 	// UPLOAD IMAGE ========================
 	// =====================================
-	// upload new logo to project
 	app.post('/api/upload/image', isLoggedIn, function (req,res) {
-		console.log('/api/upload/image');
-
-		// API: upload project logo
-		api.uploadImage(req, res);
-
+		api.upload.image(req, res);
 	});
 
 
-	
-	
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
-	// serve static files like images
 	app.get('/images/*', isLoggedIn, function (req,res) {
-		console.log('/images');
-
-		// todo: more auth!
-
-		var file = req.params[0];
-		var path = IMAGEFOLDER + file;
-		
-		res.sendFile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
-
+		api.file.sendImage(req, res);
 	});
 
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
-	// serve static files like images
 	app.get('/pixels/fit/*', isLoggedIn, function (req,res) {
-		console.log('/pixels/fit/*');
-
-		pixels.serveFitPixelPerfection(req, res);
-
+		api.pixels.serveFitPixelPerfection(req, res);
 	});
+
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
-	// serve static files like images
 	app.get('/pixels/image/*', isLoggedIn, function (req,res) {
-		console.log('/pixels');
-
-		pixels.serveImagePixelPerfection(req, res);
-
+		api.pixels.serveImagePixelPerfection(req, res);
 	});
+
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
-	// serve static files like images
 	app.get('/pixels/*', isLoggedIn, function (req,res) {
-		console.log('/pixels');
-
-		pixels.servePixelPerfection(req, res);
-
+		api.pixels.servePixelPerfection(req, res);
 	});
 
 
-
-
-
-
-
 	// =====================================
-	// NEW CLIENT   ========================
+	// CREATE NEW CLIENT ===================
 	// =====================================
-	// set data to store
 	app.post('/api/client/new', isLoggedIn, function (req,res) {
-		console.log('/api/client/new');
-
-		// create new client
-		api.createClient(req, res);
-
+		api.client.create(req, res);
 	});
-
 
 
 	// =====================================
 	// CHECK IF UNIQUE CLIENT NAME   =======
 	// =====================================
 	app.post('/api/client/unique', isLoggedIn, function (req,res) {
-		console.log('/api/client/unique');
-
-		// find any client with this slug
-		api.checkClientUnique(req, res);
-
+		api.client.checkUniqueSlug(req, res);
 	});
 
 
-
 	// =====================================
-	// DELETE CLIENT   =======
+	// DELETE CLIENT =======================
 	// =====================================
 	app.post('/api/client/delete', isLoggedIn, function (req,res) {
-		console.log('/api/client/delete');
-
-		// delete client
-		api.deleteClient(req, res);
+		api.client.deleteClient(req, res);
 	});
 
 
 	// =====================================
 	// UPLOAD CLIENT LOGO  =================
 	// =====================================
-	// upload new logo to client
 	app.post('/api/client/uploadlogo', isLoggedIn, function (req,res) {
-		console.log('/api/client/uploadlogo');
-
-		// API: upload client logo
-		api.uploadClientLogo(req, res);
-
+		api.upload.clientLogo(req, res);
 	});
 
 
-
-
 	// =====================================
-	// SET DATA API ========================
+	// UPDATE CLIENT =======================
 	// =====================================
-	// save client
 	app.post('/api/client/update', isLoggedIn, function (req,res) {
-		console.log('/api/client/update');
-
-		// update client
-		api.updateClient(req, res);
+		api.client.update(req, res);
 	});
-
-
 
 
 	// =====================================
 	// UPLOAD DATA LIBRARY FILES ===========
 	// =====================================
-	// process uploads  			
 	app.post('/api/upload', isLoggedIn, function (req, res) {
-		console.log('/api/upload');
-
-		// TODO : more authentication
-	
-		// process upload
-		upload.upload(req, res);
-		
+		api.upload.file(req, res);
 	});
 
-
-
 	
 	// =====================================
-	// GET MAPBOX ==========================
+	// GET MAPBOX ACCOUNT ==================
 	// =====================================
-	// get mapboxdata from mapbox
 	app.post('/api/util/getmapboxaccount', isLoggedIn, function (req, res) {
-		console.log('/api/util/getmapboxaccount');
-
-		// get mapbox account
-		api.getMapboxAccount(req, res);
-
+		api.provider.mapbox.getAccount(req, res);
 	});
 
-	// // =====================================
-	// // REFRESH MAPBOX ======================
-	// // =====================================
-	// // get mapboxdata from mapbox
-	// app.post('/api/util/refreshmapboxaccount', isLoggedIn, function (req, res) {
-	// 	console.log('/api/util/refreshmapboxaccount');
-
-	// 	// get mapbox account
-	// 	api.refreshMapboxAccount(req, res);
-
-	// });
-
+	
 	// =====================================
 	// CREATE SNAPSHOT =====================
 	// =====================================
 	// create snapshot of current map
 	app.post('/api/util/snapshot', isLoggedIn, function (req, res) {
-		console.log('/api/util/snapshot');
-
-		// get mapbox account
-		api.createSnapshot(req, res);
-
+		api.pixels.createSnapshot(req, res);
 	});
 
+
 	// =====================================
-	// CREATE SNAPSHOT =====================
+	// CREATE THUMBNAIL ====================
 	// =====================================
-	// create snapshot of current map
 	app.post('/api/util/createThumb', isLoggedIn, function (req, res) {
-		console.log('/api/util/createThumb');
-
-		// get mapbox account
-		api.createThumb(req, res);
-
+		api.pixels.createThumb(req, res);
 	});
 
 
 	// =====================================
 	// CREATE PDF SNAPSHOT =================
 	// =====================================
-	// create PDF snapshot of current map
 	app.post('/api/util/pdfsnapshot', isLoggedIn, function (req, res) {
-		console.log('/api/util/pdfsnapshot');
-
-		// get mapbox account
-		api.createPDFSnapshot(req, res);
-
+		api.pixels.createPDFSnapshot(req, res);
 	});
-
 
 
 	// =====================================
 	// AUTO-CREATE LEGENDS =================
 	// =====================================
-	// create PDF snapshot of current map
 	app.post('/api/layer/createlegends', isLoggedIn, function (req, res) {
-		console.log('/api/layer/createlegends');
-
-		// get features/values for geojson
-		api.createLegends(req, res);
-
+		api.legend.create(req, res);
 	});
-
-
 
 
 	// =====================================
 	// GET GEOJSON FILES ===================
 	// =====================================
-	// get data from store
 	app.post('/api/geojson', isLoggedIn, function (req,res) {
-		console.log('/api/geojson');
-
-		// get and send geojson file
-		api.getGeojsonFile(req, res);
-
+		api.file.getGeojsonFile(req, res);
 	});
 
-
-	// // =====================================
-	// // UPDATE GEOJSON FILES ================
-	// // =====================================
-	// // get data from store
-	// app.post('/api/geojson/update', isLoggedIn, function (req,res) {
-	// 	console.log('/api/geojson/update');
-
-	// 	// get and send geojson file
-	// 	api.updateGeojsonFile(req, res);
-
-	// });
-	
 	
 	// =====================================
 	// GET FILE DOWNLOAD ===================
 	// =====================================
-	// download files on demand
 	app.get('/api/file/download', isLoggedIn, function (req, res) {
-		console.log('GET /api/file/download'); // req.query
-
-		// get file for download
-		api.getFileDownload(req, res);
-		
+		api.file.download(req, res);
 	});
 
 
-
 	// =====================================
-	// REQUEST FILE DOWNLOAD ===============
+	// REQUEST FILE DOWNLOAD (zip'n send) ==
 	// =====================================
-	// download files on demand
 	app.post('/api/file/download', isLoggedIn, function (req,res) {
-		console.log('POST /api/file/download');
-		
-		// zip all files
-		api.zipAndSend(req, res);		// todo: access restrictions
-
+		api.file.zipAndSend(req, res);
 	});
-
 
 	
 	// =====================================
 	// UPDATE FILE ===================
 	// =====================================
-	// update data on file
 	app.post('/api/file/update', isLoggedIn, function (req,res) {
-		console.log('/api/file/update');
-
-		// update file meta
-		api.updateFile(req, res);
-
+		api.file.update(req, res);
 	});
-
 
 
 	// =====================================
 	// DELETE FILE(S) ===================
 	// =====================================
-	// delete array of files
 	app.post('/api/file/delete', isLoggedIn, function (req,res) {
-		console.log('/api/file/delete');
-
-		// delete file(s)
-		api.deleteFiles(req, res);
-		
+		api.file.deleteFiles(req, res);
 	});
 
 
 	// =====================================
 	// DELETE LAYER(S) =====================
 	// =====================================
-	// delete array of files
 	app.post('/api/layers/delete', isLoggedIn, function (req,res) {
-		console.log('/api/layers/delete');
-
-		// delete file(s)
-		api.deleteLayers(req, res);
-		
+		api.layer.deleteLayer(req, res);
 	});
+
 
 	// =====================================
 	// LAYERS ==============================
 	// =====================================
-	// get layers objects for project
-	app.post('/api/layers', isLoggedIn, function (req, res) {
-		console.log('/api/layers');
-
-		// send layers to client
-		api.getLayers(req, res);
-
+	app.post('/api/layers', isLoggedIn, function (req, res) { 	// todo: layer/layers !! make all same...
+		api.layer.get(req, res);
 	});
 
 
 	// =====================================
-	// NEW LAYERS ==========================
+	// CREATE NEW LAYER ====================
 	// =====================================
-	// get layers objects for project
 	app.post('/api/layers/new', isLoggedIn, function (req, res) {
-		console.log('/api/layers/new');
-
-		// send layers to client
-		api.createLayer(req, res);
-
+		api.layer.create(req, res);
 	});
 
 
 	// =====================================
 	// NEW OSM LAYERS ======================
 	// =====================================
-	// get layers objects for project
 	app.post('/api/layers/osm/new', isLoggedIn, function (req, res) {
-		console.log('/api/layers/osm/new');
-
-		// send layers to client
-		api.createOSMLayer(req, res);
-
+		api.layer.createOSM(req, res);  	// todo: api.layer.osm.create()
 	});
-
 
 
 	// =====================================
 	// UPDATE LAYERS =======================
 	// =====================================
-	// get layers objects for project
 	app.post('/api/layer/update', isLoggedIn, function (req, res) {
-		console.log('/api/layer/update');
-
-		// update layer
-		api.updateLayer(req, res);
+		api.layer.update(req, res);
 	});
+
 
 	// =====================================
 	// RELOAD LAYER METADATA ===============
 	// =====================================
-	// get layers objects for project
 	app.post('/api/layer/reloadmeta', isLoggedIn, function (req, res) {
-		console.log('/api/layer/reloadmeta');
-
-		// update layer
-		api.reloadMeta(req, res);
+		api.layer.reloadMeta(req, res);
 	});
 
 
 	// =====================================
 	// SET CARTOCSS ========================
 	// =====================================
-	// get layers objects for project
 	app.post('/api/layers/cartocss/set', isLoggedIn, function (req, res) {
-		console.log('/api/layers/cartocss/set');
-
-		// send layers to client
-		api.setCartoCSS(req, res);
+		api.layer.setCartoCSS(req, res);
 	});
+
 
 	// =====================================
 	// GET CARTOCSS ========================
 	// =====================================
-	// get layers objects for project
 	app.post('/api/layers/cartocss/get', isLoggedIn, function (req, res) {
-		console.log('/api/layers/cartocss/get');
-
-		// send layers to client
-		api.getCartoCSS(req, res);
+		api.layer.getCartoCSS(req, res);
 	});
-
 
 
 	// =====================================
 	// UPDATE USER INFORMATION  ============
 	// =====================================
-	// download files on demand
 	app.post('/api/user/update', isLoggedIn, function (req,res) {
-		console.log('/api/user/update');
-		
-		// update user
-		api.updateUser(req, res);
-
+		api.user.update(req, res);
 	});
-
 
 
 	// =====================================
 	// CREATE NEW USER =====================
 	// =====================================
-	// create a new user
 	app.post('/api/user/new', isLoggedIn, function (req,res) {
-		console.log('/api/user/new');
-		
-		// create new user
-		api.createUser(req, res);
-	
+		api.user.create(req, res);
 	});
+
 
 	// =====================================
 	// DELETE USER =========================
 	// =====================================
-	// create a new user
 	app.post('/api/user/delete', isLoggedIn, function (req,res) {
-		console.log('/api/user/delete');
-		
-		// create new user
-		api.deleteUser(req, res);
-	
+		api.user.deleteUser(req, res);
 	});
+
 
 	// =====================================
 	// DELETE USER =========================
 	// =====================================
-	// create a new user
 	app.post('/api/user/delegate', isLoggedIn, function (req,res) {
-		console.log('/api/user/delegate');
-		
-		// create new user
 		api.delegateUser(req, res);
-	
 	});
 
+
 	// =====================================
-	// CHECK UNIQUE EMAIL ==================
+	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
-	// create a new user
 	app.post('/api/user/unique', isLoggedIn, function (req,res) {
-		console.log('/api/user/unique');
-		
-		// create new user
-		api.checkUniqueEmail(req, res);
-	
+		api.user.checkUniqueEmail(req, res);
 	});
 
 
 	// =====================================
-	// GET USERS FOR MANAGEMENT ============
+	// access: GET ROLE  ===============
 	// =====================================
-	// get all users that User can manage
-	app.post('/api/user/management', isLoggedIn, function (req,res) {
-		console.log('/api/user/management');
-		
-		// create new user
-		api.getUserManagement(req, res);
-	
+	app.post('/api/access/getrole', isLoggedIn, function (req,res) {
+		api.access.getRole(req, res);
+	});
+
+	// =====================================
+	// access: SET ROLE  ===============
+	// =====================================
+	app.post('/api/access/setrolemember', isLoggedIn, function (req,res) {
+		api.access.setRoleMember(req, res);
+	});
+
+	// =====================================
+	// access: SET ROLE SUPERADMIN =========
+	// =====================================
+	app.post('/api/access/super/setrolemember', isLoggedIn, function (req,res) {
+		api.access.setSuperRoleMember(req, res);
+	});
+
+	// =====================================
+	// access: SET ROLE  ===============
+	// =====================================
+	app.post('/api/access/portal/setrolemember', isLoggedIn, function (req,res) {
+		api.access.setPortalRoleMember(req, res);
 	});
 
 
-
-	// app.post('/api/debug/test', isLoggedIn, function (req, res) {
-	// 	console.log('Debug Test Running...');
-
-	// 	// run debug test
-	// 	api.debugTest(req, res);
-
-	// });
+	// =====================================
+	// RESET PASSWORD ======================
+	// =====================================
+	app.post('/reset', function (req, res) {
+		api.access.requestPasswordReset(req, res);
+	});
 
 
+	// =====================================
+	// RESET PASSWORD ======================
+	// ===================================== 
+	app.get('/reset', function (req, res) {
+		api.access.confirmPasswordReset(req, res);
+	});
+
+
+	// =====================================
+	// DEBUG: CREATE ROLE ==================
+	// ===================================== 
+	app.post('/api/debug/createRole', isLoggedIn, function (req, res) {
+		api.debug.createRole(req, res);
+	});
 
 
 	// =====================================
 	// LOGIN ===============================
 	// =====================================
-	// show the login form
 	app.get('/login', function(req, res) {
-		console.log('/login§');
-
-		// render page and pass in flash data if applicable
-		res.render('../../views/login.serve.ejs', { message: req.flash('loginMessage') });
+		api.login(req, res);
 	});
 
-	
 
 	// =====================================
 	// SIGNUP ==============================
 	// =====================================
-	// show the signup form
 	app.get('/signup', function(req, res) {
-		console.log('/signup');
-
-		// render the page and pass in any flash data if it exists
-		res.render('../../views/signup.ejs', { message: req.flash('signupMessage') });
-
+		api.signup(req, res);
 	});
 
 
-	
 	// =====================================
 	// LOGOUT ==============================
 	// =====================================
 	app.get('/logout', function(req, res) {
-		console.log('/logout');
-
-		req.logout();
-		res.redirect('/');
+		api.logout(req, res);
 	});
-
 
 
 	// =====================================
 	// SIGNUP ==============================
 	// =====================================
-	// process the signup form
 	app.post('/signup', passport.authenticate('local-signup', {
 		successRedirect : '/', // redirect to the secure profile section
 		failureRedirect : '/signup', // redirect back to the signup page if there is an error
@@ -720,58 +465,30 @@ module.exports = function(app, passport) {
 	}));
 
 
-
 	// =====================================
 	// LOGIN ===============================
 	// =====================================
-	// process the login form
 	app.post('/login', passport.authenticate('local-login', {
 		successRedirect : '/', // redirect to the portal
 		failureRedirect : '/login', // redirect back to the signup page if there is an error
 		failureFlash : true // allow flash messages
 	}));
 
-
 	
-	// forgot password
+	// =====================================
+	// FORGOT PASSWORD =====================
+	// =====================================
 	app.post('/forgot', function (req, res) {
-
-		// handle password reset
-		// api.requestForgotPassword(req, res);
-		console.log('/forgot');
-		res.render('../../views/forgot.ejs', {message : ''});
-	});
-
-	// reset password
-	app.post('/reset', function (req, res) {
-
-		// handle password reset
-		api.requestPasswordReset(req, res);
-	});
-
-	// email link 
-	app.get('/reset', function (req, res) {
-
-		console.log('GET /reset');
-
-		// confirm password reset
-		api.confirmPasswordReset(req, res);
-
-
+		api.forgotPassword(res, req);
 	});
 
 
 	// =====================================
 	// WILDCARD PATHS ======================		
 	// =====================================
-	// process /client/project url structure
 	app.get('*', function (req, res) {
-		
-		// process wildcard path
-		api.processWildcardPath(req, res);
-
+		api.wildcard(req, res);
 	});
-
 
 
 	// helper function : if is logged in

@@ -1,46 +1,151 @@
-var fs = require('fs-extra');
-var async = require('async');
-var util = require('util');
-var uuid = require('node-uuid');
-var File = require('../models/file');
-var Layer = require('../models/layer');
-var Project = require('../models/project');
-var dive = require('dive');
-var fspath = require('path');
-var _ = require('lodash-node');
-var formidable = require('formidable');
-var exec = require('child_process').exec;
-var kue = require('kue');
-var crypto = require('crypto');
+// API: api.upload.js
+
+// database schemas
+var Project 	= require('../models/project');
+var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
+var User  	= require('../models/user');
+var File 	= require('../models/file');
+var Layer 	= require('../models/layer');
+var Hash 	= require('../models/hash');
+var Role 	= require('../models/role');
+var Group 	= require('../models/group');
+
+// utils
+var _ 		= require('lodash-node');
+var fs 		= require('fs-extra');
+var gm 		= require('gm');
+var kue 	= require('kue');
+var fss 	= require("q-io/fs");
+var zlib 	= require('zlib');
+var uuid 	= require('node-uuid');
+var util 	= require('util');
+var utf8 	= require("utf8");
+var mime 	= require("mime");
+var exec 	= require('child_process').exec;
+var dive 	= require('dive');
+var async 	= require('async');
+var carto 	= require('carto');
+var crypto      = require('crypto');
+var fspath 	= require('path');
+var mapnik 	= require('mapnik');
+var request 	= require('request');
+var nodepath    = require('path');
+var formidable  = require('formidable');
+var nodemailer  = require('nodemailer');
+var uploadProgress = require('node-upload-progress');
+var mapnikOmnivore = require('mapnik-omnivore');
+
+// api
+var api = module.parent.exports;
+
+// exports
+module.exports = api.upload = { 
 
 
-// modules
-var pixels = require('./pixels');
-var geo = require('./geo');
-var filer = require('./filer');
-// var api = require('./api');
+	projectLogo : function (req, res) {
 
-// config
-var config = require('../config/config');
+		console.log('api.upload.projectLogo');
+
+		console.log('API ==> module.parent: ', module.parent);
+		console.log('...api => ', api);
+
+		// process from-encoded upload
+		var form = new formidable.IncomingForm({
+			hash : 'sha1',
+			multiples : true,
+			keepExtensions : true,
+		});
+		form.parse(req, function(err, fields, files) {	
+
+			var from = files.file.path;
+			var file = 'image-' + uuid.v4();
+			// var to   = IMAGEFOLDER + file;
+			var to   = api.config.path.image + file;
+			
+			// rename and move to image folder
+			fs.rename(from, to, function (err) {
+				if (err) res.end(JSON.stringify({error : err}));
+				res.end(file);	// file will be saved by client
+			});		
+	 	});
+	},
 
 
-// global paths
-var FILEFOLDER = '/data/files/';
-var TEMPFOLDER  = '/data/tmp/';
+	// uploadProjectLogo : function (req, res) {
+
+	// 	// process from-encoded upload
+	// 	var form = new formidable.IncomingForm({
+	// 		hash : 'sha1',
+	// 		multiples : true,
+	// 		keepExtensions : true,
+	// 	});
+	// 	form.parse(req, function(err, fields, files) {	
+
+	// 		var from = files.file.path;
+	// 		var file = 'image-' + uuid.v4();
+	// 		var to   = IMAGEFOLDER + file;
+			
+	// 		// rename and move to image folder
+	// 		fs.rename(from, to, function (err) {
+	// 			if (err) res.end(JSON.stringify({error : err}));
+	// 			res.end(file);	// file will be saved by client
+	// 		});		
+	//  	});
+	// },
 
 
+	clientLogo : function (req, res) {
+		
+		// process from-encoded upload
+		var form = new formidable.IncomingForm({
+			hash : 'sha1',
+			multiples : true,
+			keepExtensions : true,
+		});
+		form.parse(req, function(err, fields, files) {	
+			// console.log('formidale: ', util.inspect({fields: fields, files: files}));
+			// console.log('files! => ', files);
+ 		
+			var from = files.file.path;
+			var file = 'image-' + uuid.v4();
+			// var to   = IMAGEFOLDER + file;
+			var to   = api.config.path.image + file;
+			
+			// rename and move to image folder
+			fs.rename(from, to, function (err) {
+				if (err) res.end(JSON.stringify({error : err}));
+				res.end(file);	// file will be saved by client
+			});		
+	 	});
+	},
 
 
+	image : function (req, res) {
 
+		// process from-encoded upload
+		var form = new formidable.IncomingForm({
+			hash : 'sha1',
+			multiples : true,
+			keepExtensions : true,
+		});
+		form.parse(req, function(err, fields, files) {	
 
-var store = 0;
+			var from = files.file.path;
+			var file = 'image-' + uuid.v4();
+			// var to   = IMAGEFOLDER + file;
+			var to   = api.config.path.image + file;
+			
+			// rename and move to image folder
+			fs.rename(from, to, function (err) {
+				if (err) res.end(JSON.stringify({error : err}));
+				res.end(file);	// file will be saved by client
+			});		
+	 	});
 
-
-
-module.exports = upload = { 
+	},
 
 	// entry point
-	upload : function (req, res) {
+	file : function (req, res) {
 
 		console.log('API.upload.upload()');
 
@@ -131,8 +236,13 @@ module.exports = upload = {
 
 			ops.push(function (callback) {
 
+				// console.log('_________________ api: ', api);
+				// console.log('__________________api upload: ', api.upload);
+				// console.log('__________ api.exports', api.exports);
+				// console.log('------ api.exports.upload', api.exports.upload);
+
 				// quick sort
-				upload.sortFormFiles(fileArray, function (err, results) {	
+				api.upload.sortFormFiles(fileArray, function (err, results) {	
 
 					console.log('_________ results ______________');
 					console.log('results: ', results);
@@ -162,7 +272,7 @@ module.exports = upload = {
 
 					// create db for file
 					ops.push(function (cb) {
-						api.dbCreateFile(db, function (err, doc) {
+						api.file.createModel(db, function (err, doc) {
 							cb(err, { file : doc });
 						});
 					});
@@ -171,7 +281,7 @@ module.exports = upload = {
 					if (db.type == 'Layer') {
 						ops.push(function (cb) {
 							db.uuid = 'layer-' + uuid.v4();
-							api.dbCreateLayer(db, function (err, doc) {
+							api.layer.createModel(db, function (err, doc) {
 								cb(err, { layer : doc });
 							});
 						});
@@ -183,8 +293,10 @@ module.exports = upload = {
 				async.series(ops, function (err, docs) {
 					// add _ids to project
 					docs && docs.forEach(function (doc) {
-						doc.layer && api.dbAddLayerToProject(doc.layer._id, fields.project)
-						doc.file  && api.dbAddFileToProject(doc.file._id, fields.project)
+						// doc.layer && api.dbAddLayerToProject(doc.layer._id, fields.project)
+						doc.layer && api.layer.addToProject(doc.layer._id, fields.project)
+						// doc.file  && api.dbAddFileToProject(doc.file._id, fields.project)
+						doc.file  && api.file.addToProject(doc.file._id, fields.project)
 					});
 					callback(err, docs);
 				});
@@ -288,7 +400,7 @@ module.exports = upload = {
 			// console.log('______________ _ _ _ _ _ _ path: ', path);
 
 			// type and extension
-			var filetype 	= upload.getFileType(file.path);
+			var filetype 	= api.upload.getFileType(file.path);
 			// var filetype 	= upload.getFileType(file.name);
 			var extension 	= filetype[0];
 			var type 	= filetype[1];
@@ -303,7 +415,7 @@ module.exports = upload = {
 			}
 
 			// add async ops
-			ops = upload._sortOps(ops, options);
+			ops = api.upload._sortOps(ops, options);
 
 		
 		});
@@ -337,7 +449,8 @@ module.exports = upload = {
 		// console.log('____________________________________UPLOAD: Sorting zip folder');
 		// console.log('options.currentFolder', options.currentFolder);
 
-		var currentFolder = options.currentFolder || FILEFOLDER + fileUuid;
+		// var currentFolder = options.currentFolder || FILEFOLDER + fileUuid;
+		var currentFolder = options.currentFolder || api.config.path.file + fileUuid;
 
 		if (folder) {
 			// console.log('isFolder!!!', folder);
@@ -363,7 +476,7 @@ module.exports = upload = {
 
 
 				// var filetype 	= upload.getFileType(name);
-				var filetype 	= upload.getFileType(path);
+				var filetype 	= api.upload.getFileType(path);
 				var extension 	= filetype[0];
 				var type 	= filetype[1];
 
@@ -407,7 +520,7 @@ module.exports = upload = {
 						}
 
 						// unzips files to folder
-						filer.handleZip(zipopt, function (err) {
+						api.file.handleZip(zipopt, function (err) {
 
 							console.log('filer.handleZip done');
 							// console.log('options.path: ', options.path);
@@ -419,7 +532,7 @@ module.exports = upload = {
 								folder : rand
 							}
 
-							upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
+							api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
 								
 								console.log('upload.sortZipFolder done', dbs);
 
@@ -488,7 +601,7 @@ module.exports = upload = {
 
 						// console.log('opt!!-=-=---->', opt);
 
-						upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
+						api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
 							
 							// console.log('upload.sortZipFolder 99 done', dbs);
 
@@ -507,7 +620,7 @@ module.exports = upload = {
 					ops1.push(function (callback) {
 
 						// process shapefile (convert, store, vectorize, etc.)
-						filer.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
+						api.file.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
 							// console.log('handled shapefile!', err, db);
 
 							// populate db entry
@@ -531,7 +644,7 @@ module.exports = upload = {
 					ops1.push(function (callback) {
 
 						// puts file in folder
-						filer.handleImage(options.path, options.name, options.fileUuid, function (err, db) {
+						api.file.handleImage(options.path, options.name, options.fileUuid, function (err, db) {
 
 							// populate db entry
 							db = db || {};
@@ -558,7 +671,7 @@ module.exports = upload = {
 					ops1.push(function (callback) {
 
 						// processes geojson, puts file in folder
-						filer.handleJson(options.path, options.name, options.extension, options.fileUuid, function (err, db) {
+						api.file.handleJson(options.path, options.name, options.extension, options.fileUuid, function (err, db) {
 							
 							// populate db entry
 							db = db || {};
@@ -584,7 +697,7 @@ module.exports = upload = {
 					ops1.push(function (callback) {
 
 						// puts file in folder
-						filer.handleDocument(options.path, options.name, options.fileUuid, function (err, db) {
+						api.file.handleDocument(options.path, options.name, options.fileUuid, function (err, db) {
 
 							// populate db entry
 							db = db || {};
@@ -656,7 +769,7 @@ module.exports = upload = {
 						currentFolder : options.currentFolder
 					}
 
-					upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
+					api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
 						
 						// console.log('upload.sortZipFolder 99 done', dbs);
 
@@ -682,7 +795,7 @@ module.exports = upload = {
 				}
 
 				// unzips files to folder
-				filer.handleZip(opt, function (err) {
+				api.file.handleZip(opt, function (err) {
 
 					// console.log('filer.handleZip done');
 
@@ -691,7 +804,7 @@ module.exports = upload = {
 						folder : null
 					}
 
-					upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
+					api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
 						
 						// console.log('upload.sortZipFolder done', dbs);
 
@@ -709,14 +822,14 @@ module.exports = upload = {
 			ops.push(function (callback) {
 
 				// untars files to folder
-				filer.handleTar(options.path, options.fileUuid, function (err) {
+				api.file.handleTar(options.path, options.fileUuid, function (err) {
 
 					var opt = {
 						fileUuid : fileUuid,
 						folder : null
 					}
 					
-					upload.sortZipFolder(opt, function (err, dbs) {
+					api.upload.sortZipFolder(opt, function (err, dbs) {
 
 						callback(err, dbs);
 
@@ -738,7 +851,7 @@ module.exports = upload = {
 			ops.push(function (callback) {
 
 				// process shapefile (convert, store, vectorize, etc.)
-				filer.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
+				api.file.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
 					// console.log('handled shapefile!', err, db);
 
 					// populate db entry
@@ -763,7 +876,7 @@ module.exports = upload = {
 			ops.push(function (callback) {
 
 				// puts file in folder
-				filer.handleImage(options.path, options.name, options.fileUuid, function (err, db) {
+				api.file.handleImage(options.path, options.name, options.fileUuid, function (err, db) {
 
 					// populate db entry
 					db = db || {};
@@ -790,7 +903,7 @@ module.exports = upload = {
 			ops.push(function (callback) {
 
 				// processes geojson, puts file in folder
-				filer.handleJson(options.path, options.name, options.extension, options.fileUuid, function (err, db) {
+				api.file.handleJson(options.path, options.name, options.extension, options.fileUuid, function (err, db) {
 					
 					// populate db entry
 					db = db || {};
@@ -816,7 +929,7 @@ module.exports = upload = {
 			ops.push(function (callback) {
 
 				// puts file in folder
-				filer.handleDocument(options.path, options.name, options.fileUuid, function (err, db) {
+				api.file.handleDocument(options.path, options.name, options.fileUuid, function (err, db) {
 
 					// populate db entry
 					db = db || {};

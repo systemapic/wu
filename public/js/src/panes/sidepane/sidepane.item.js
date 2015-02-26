@@ -91,7 +91,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 			    _.contains(clist, 'data-library') 		|| 
 			    _.contains(clist, 'fullpage-users') 	){
 
-				// Wu.DomUtil.addClass(__map, "map-blur");
+				// blur
 				Wu.DomUtil.addClass(app._mapPane, "map-blur");
 
 			}
@@ -103,11 +103,11 @@ Wu.SidePane.Item = Wu.Class.extend({
 	_clickActivate : function (e) {
 
 		// To open fullscreen tabs that's been closed
-		if ( Wu.app.mobile ) this.mobileReActivate();
+		if (Wu.app.mobile) this.mobileReActivate();
 
 		// if clicking on already active tab, toggle it
 		// if (Wu.app._activeMenu == this) return this._reclick();
-		if (Wu.app._activeMenu == this) return;
+		// if (Wu.app._activeMenu == this) return;
 
 		// open pane if not closed
 		if (!Wu.app.SidePane.paneOpen) Wu.app.SidePane.openPane();
@@ -198,20 +198,14 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 		
 		// Button height
-		if ( !Wu.app.mobile ) {
-			var bHeight = 70;
-		} else {
-			var bHeight = 50;
-		}
+		var bHeight = app.mobile ? 50 : 70;
 
 		// set vars
 		var swypefrom = prev._content;
 		var swypeto = Wu.app._active;
 
 		// if same, do nothing
-		
 		if (swypefrom == swypeto) return;
-		
 
 		// update the slider on the left    
 		var h = bHeight;
@@ -323,15 +317,12 @@ Wu.SidePane.Item = Wu.Class.extend({
 			if ( _under_dogs[a] == prev._menu ) { swfrom = a; }                 
 			if ( _under_dogs[a] == this._menu ) { swto = a; }
 		}
-	
 		    
 		// Hide the Deactivated Pane
 		if (Wu.app._active) Wu.DomUtil.removeClass(swypefrom, 'show');
 			
 		// Swipe this IN
 		Wu.DomUtil.addClass(swypeto, 'show');	
-
-
 			
 	},
 
