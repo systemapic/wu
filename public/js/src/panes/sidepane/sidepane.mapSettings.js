@@ -1983,4 +1983,3 @@ Wu.SidePane.Map.Settings = Wu.SidePane.Map.MapSetting.extend({
 
 
 });
-

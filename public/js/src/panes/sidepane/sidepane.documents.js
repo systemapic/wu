@@ -136,7 +136,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.adjustTop();
 
 		// turn off header resizing and icon
-		Wu.app.HeaderPane.disableResize();
+		// Wu.app.HeaderPane.disableResize();
 
 		// select first title (create fake e object)
 		var folders = this.project.store.folders;
@@ -200,7 +200,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	_deactivate : function () {
 
 		// turn off header resizing
-		Wu.app.HeaderPane.enableResize();
+		// Wu.app.HeaderPane.enableResize();
 
 		// remove shift key edit hook
 		this.disableShift();
