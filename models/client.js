@@ -13,7 +13,10 @@ var clientSchema = mongoose.Schema({
 	name 		: {  type: String,  default: 'Client name' },
 	slug 		: {  type: String,  default: 'clientslug'  },
 	description 	: {  type: String,  default: 'Description' },
-	public 		: {  type: Boolean, default: false}
+	public 		: {  type: Boolean, default: false},
+
+	// roles     : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
+	
 });
 
 // timestamps plugin

@@ -1,4 +1,7 @@
+// app.StatusPane
+
 Wu.StatusPane = Wu.Class.extend({
+
 	_ : 'statuspane', 
 
 	initialize : function (options) {
@@ -11,8 +14,6 @@ Wu.StatusPane = Wu.Class.extend({
 
 		// add hooks
 		this.addHooks();
-
-		// this.__gaEvents();
 
 	},
 
@@ -37,6 +38,7 @@ Wu.StatusPane = Wu.Class.extend({
 	},
 
 	addHooks : function () {
+
 		// open sidepane menu on mousedown
 		Wu.DomEvent.on(this._container, 'mousedown', this.toggle, this);
 
@@ -46,14 +48,20 @@ Wu.StatusPane = Wu.Class.extend({
 
 
 	tab : function (e) {
+
 		if (e.keyCode == 9) this.toggle();
 	},
 
 	toggle : function () {
+
 		this.isOpen ? this.close() : this.open();
 	
 		// div cleanups to do when hitting home
 		this.cleaningJobs();
+
+		// Google Analytics event trackign
+		app.Analytics.ga(['Status Pane', 'toggle']);
+
 	},
 
 	cleaningJobs: function () {
@@ -69,7 +77,6 @@ Wu.StatusPane = Wu.Class.extend({
 	// open sidepane menu
 	open : function (e) {
 
-
 		this.isOpen = true;
 		if (app.SidePane) app.SidePane.expand();
 		this.refresh();
@@ -77,15 +84,11 @@ Wu.StatusPane = Wu.Class.extend({
 		this.checkMapBlur();
 		this.setContentHeights();
 
-		// remove help pseudo
-		// Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
-
 		// trigger activation on active menu item
 		app._activeMenu._activate();
 
 		// Hide button section and Layer info when the Home dropdown menu opens (j)
 		if (app._map) app._map._controlCorners.topleft.style.opacity = 0;
-
 
 		app.MapPane.descriptionControl;
 
@@ -178,10 +181,7 @@ Wu.StatusPane = Wu.Class.extend({
 				descriptionControl.hide();
 			}
 		} 
-		//else {
-		// 	// If no layers has been activated
-		// 	descriptionControl.hide();	
-		// }
+		
 
 	},
 

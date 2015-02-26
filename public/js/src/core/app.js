@@ -1,4 +1,4 @@
-Wu.version = '0.4-dev';
+Wu.version = '0.5.1-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -15,7 +15,10 @@ Wu.App = Wu.Class.extend({
 		Wu.app = this;
 
 		// merge options
-		Wu.setOptions(this, options);   
+		Wu.setOptions(this, options);
+
+		// Init analytics
+		this.Analytics = new Wu.Analytics();
 
 		// set options
 		L.mapbox.config.FORCE_HTTPS = true;
@@ -29,6 +32,7 @@ Wu.App = Wu.Class.extend({
 
 		// Detect mobile devices
 		this.detectMobile();
+
 
 	},
 
@@ -79,7 +83,8 @@ Wu.App = Wu.Class.extend({
 		var data = JSON.stringify(this.options);
 		
 		// post         path          json      callback    this
-		Wu.post('/api/portal', data, this.initServerResponse, this);
+		Wu.post('api/portal', data, this.initServerResponse, this, this.options.servers.portal);
+
 
 	},
 
@@ -91,18 +96,24 @@ Wu.App = Wu.Class.extend({
 	},
 
 
-	initApp : function (o) {
+	initApp : function (options) {
 		// set vars
-		this.options.json = o;
+		this.options.json = options;
+
+		// accesss
+		this._initAccess();
+
+		// load json model
+		this._initObjects();
+
+		// load json model
+		this._initObjects();
 
 		// create app container
 		this._initContainer();
 
 		// load dependencies
 		this._initDependencies();
-
-		// load json model
-		this._initObjects();
 
 		// create panes
 		this._initPanes();
@@ -131,7 +142,7 @@ Wu.App = Wu.Class.extend({
 		var dimensions = this._getDimensions(e);
 
 		// startpane resize event
-		if ( app.StartPane.isOpen ) app.StartPane.resizeEvent(dimensions);
+		if (app.StartPane.isOpen) app.StartPane.resizeEvent(dimensions);
 
 		// mappane resize event
 		if (app.MapPane) app.MapPane.resizeEvent(dimensions);
@@ -172,6 +183,10 @@ Wu.App = Wu.Class.extend({
 		// create map container
 		this._mapContainer = Wu.DomUtil.createId('div', 'map-container', this._appPane);
 
+	},
+
+	_initAccess : function () {
+		this.Access = new Wu.Access(this.options.json.access);
 	},
 
 	_initDependencies : function () {
@@ -281,7 +296,14 @@ Wu.App = Wu.Class.extend({
 
 		// if user is admin or manager, set Projects and Users as default panes
 		var user = app.Account;
-		if (user.isAdmin() || user.isSuperadmin() || user.isManager()) {
+		if (
+			// user.isAdmin() || 
+			// user.isSuperadmin() || 
+			// user.isManager()
+			app.access.is.superAdmin() ||
+			app.access.is.portalAdmin() 
+			// app.account.
+		   ) {
 			// set panes 
 			this.SidePane.refresh(['Clients', 'Users', 'Account']);		
 		}
@@ -345,7 +367,7 @@ Wu.App = Wu.Class.extend({
 		project.select();
 
 		// refresh sidepane
-		app.SidePane.refreshProject(project);
+		// app.SidePane.refreshProject(project);
 
 		// remove help pseudo
 		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');

@@ -3,14 +3,14 @@
 // Copyright (c) 2014 Vladimir Agafonkin. Original: https://github.com/Leaflet/Leaflet/tree/master/src/core
 // Copyright (c) 2014 @kosjoli           
 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// access is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
 // the Software without restriction, including without limitation the rights to
 // use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
 // the Software, and to permit persons to whom the Software is furnished to do so,
 // subject to the following conditions:
 
-// The above copyright notice and this permission notice shall be included in all
+// The above copyright notice and this access notice shall be included in all
 // copies or substantial portions of the Software.
 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -328,6 +328,7 @@ Wu.Util = {
 
 	// post without callback
 	post : function (path, json) {
+		
 		var that = this;
 		var http = new XMLHttpRequest();
 		var url = window.location.origin; 
@@ -339,8 +340,9 @@ Wu.Util = {
 
 		http.onreadystatechange = function() {
 		    if(http.readyState == 4 && http.status == 200) {
-			// console.log(http.responseText);
 		    	Wu.Util.checkDisconnect(http.responseText);
+			if (app.debug) Wu.Util.debugXML(http.responseText);
+		    	
 		    }
 		}
 		http.send(json);
@@ -350,7 +352,9 @@ Wu.Util = {
 	postcb : function (path, json, cb, context, baseurl) {
 		var that = context;
 		var http = new XMLHttpRequest();
+		
 		var url = baseurl || window.location.origin; 
+		
 		url += path;
 		http.open("POST", url, true);
 
@@ -359,8 +363,7 @@ Wu.Util = {
 
 		http.onreadystatechange = function() {
 		    if(http.readyState == 4 && http.status == 200) {
-			// console.log(http.responseText);
-		    	Wu.Util.checkDisconnect(http.responseText);
+			if (app.debug) Wu.Util.debugXML(http.responseText);
 			if (cb) cb(context, http.responseText); 
 		    }
 		}
@@ -371,18 +374,30 @@ Wu.Util = {
 	},
 
 
+	debugXML : function (json) {
+		console.log('==== debugXML ====');
+		try {
+			var obj = JSON.parse(json);
+			console.log(obj);
+		} catch (e) {
+			console.log(json);
+		}
+		console.log('==================');
+	},
+
 	// post with callback and error handling (do callback.bind(this) for context)
 	send : function (path, json, callback) {
 		var that = this;
 		var http = new XMLHttpRequest();
 		var url = window.location.origin;
 		url += path;
+		console.log('url; ', url);
 		http.open("POST", url, true);
 		http.setRequestHeader('Content-type', 'application/json');
 		http.onreadystatechange = function() {
 			if (http.readyState == 4) {
 		    		Wu.Util.checkDisconnect(http.responseText);
-				// console.log(http.responseText);
+				if (app.debug) Wu.Util.debugXML(http.responseText);
 				if (http.status == 200) { // ok
 					if (callback) callback(null, http.responseText); 
 				} else { // error
@@ -390,6 +405,10 @@ Wu.Util = {
 				}
 			}
 		}
+		// stringify objects
+		if (Wu.Util.isObject(json)) json = JSON.stringify(json);
+		
+		// send string
 		http.send(json);
 	},
 
@@ -415,12 +434,8 @@ Wu.Util = {
 
 		http.onreadystatechange = function() {
 		    if(http.readyState == 4 && http.status == 200) {
-			
-			//var json = JSON.parse(http.responseText);
-			
+			if (app.debug) Wu.Util.debugXML(http.responseText);
 			callback(http.responseText); 
-
-
 		    }
 		}
 		http.send(null);
@@ -1344,6 +1359,8 @@ Wu.DomUtil = {
 				el.setAttribute('placeholder', content);
 			} else if (tagName == 'image') {
 				el.src = content;
+			} else if (tagName == 'img') {
+				el.src = content;
 			} else {
 				el.innerHTML = content;
 			}
@@ -1435,6 +1452,13 @@ Wu.DomUtil = {
 			this.addClass(el,name);
 		}
 	},	
+
+	clearChildClasses : function (parent, divclass) {
+		for (var i=0; i < parent.children.length; i++) {
+			var child = parent.children[i];
+			Wu.DomUtil.removeClass(child, divclass);
+		}
+	},
 
 	setClass: function (el, name) {
 		if (el.className.baseVal === undefined) {

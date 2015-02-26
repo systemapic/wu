@@ -4,6 +4,8 @@ var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
 var timestamps = require('mongoose-times');
 
+// property => group => role => capabilities + members
+
 // define the schema for our user model
 var userSchema = mongoose.Schema({
 
@@ -64,7 +66,8 @@ var userSchema = mongoose.Schema({
                 token        : String,
                 email        : String,
                 name         : String
-        }
+        },
+        // slack : {}
 });
 
 // methods ======================
@@ -76,6 +79,10 @@ userSchema.methods.generateHash = function(password) {
 // checking if password is valid
 userSchema.methods.validPassword = function(password) {
     return bcrypt.compareSync(password, this.local.password);
+};
+
+userSchema.methods.getUuid = function () {
+    return this.uuid;
 };
 
 // timestamps plugin

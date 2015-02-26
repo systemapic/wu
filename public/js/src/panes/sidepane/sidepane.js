@@ -93,7 +93,7 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	setHeight : function (height) {
-		console.error('setHeight: ', height);
+
 		this._container.style.height = height + 'px';
 	},
 
@@ -137,7 +137,7 @@ Wu.SidePane = Wu.Class.extend({
 
 	_setMenuHeight : function () {
 
-
+		var project = app.activeProject;
 
 		// Button height
 		if ( !Wu.app.mobile ) {
@@ -147,36 +147,43 @@ Wu.SidePane = Wu.Class.extend({
 		}
 
 		var panes = this._getPaneArray();
-		var defaultPanes = app.Account.isManager() ? 3 : 2;			// 3 if manager, 2 if not (ie. only Project, Logout)
+		var defaultPanes = app.access.to.edit_user(project) ? 3 : 2;
 
-		// var height = panes ? panes.length * bHeight : defaultPanes * bHeight;	// if no active project, default 3 menu items	
-		if ( panes != 0 ) var height = panes.length * bHeight			
-		else var height = defaultPanes * bHeight;
-	
+		console.log('defaultPanes: ', defaultPanes);
+
+		if (panes != 0) {
+			var height = panes.length * bHeight;
+		} else {
+			var height = defaultPanes * bHeight;
+		}
+
 		app._editorMenuPane.style.height = parseInt(height) + 'px';
-
 	},
 
 	_getPaneArray : function (project) {
-
+		console.log('_getPaneArray', project);
 		var project = project || app.activeProject;
-		if (!project) return [];
+
+		if (!project) return ['Clients', 'Users', 'Account'];
 
 		var panes = [],
 		    pane = this.options.panes,
 		    settings = project.getSettings(),
-		    isEditor = app.Account.canUpdateProject(project.getUuid()),
-		    isManager = app.Account.canManageProject(project.getUuid());
+		    user = app.Account,
+		    canEdit = app.access.to.edit_project(project, user),
+		    canManage = app.access.to.edit_user(project, user);
+
 
 		if (pane.clients) 					panes.push('Clients');
-		if (pane.mapOptions 	&& isEditor) 			panes.push('Map'); 
+		if (pane.mapOptions 	&& canEdit) 			panes.push('Map'); 
 		if (pane.documents   	&& settings.documentsPane) 	panes.push('Documents');
 		if (pane.dataLibrary 	&& settings.dataLibrary) 	panes.push('DataLibrary');
 		if (pane.MediaLibrary 	&& settings.mediaLibrary) 	panes.push('MediaLibrary');
-		if (pane.users 		&& isManager) 			panes.push('Users');
+		if (pane.users 		&& canManage) 			panes.push('Users');
 		if (pane.share 		&& settings.socialSharing) 	panes.push('Share');
 		if (pane.account) 					panes.push('Account');
 
+		console.log('panes: ', panes);
 		return panes;
 	},
 
@@ -190,6 +197,8 @@ Wu.SidePane = Wu.Class.extend({
 
 	refreshProject : function (project) {
 
+		console.log('refreshProject', project);
+
 		var editMode = project.editMode; // access determined at Wu.Project
 		
 		// default menus in sidepane
@@ -200,13 +209,16 @@ Wu.SidePane = Wu.Class.extend({
 
 		// remove Map pane if not editor
 		if (!editMode) _.pull(panes, 'Map');
-		if (!app.Account.isManager()) _.pull(panes, 'Users');
+
+		if (!app.access.to.edit_user(project)) _.pull(panes, 'Users');
 
 		// refresh
 		this.refresh(panes);
 	},
 
 	refreshClient : function () {
+
+		console.log('refreshClient')
 		
 		// set panes 
 		var panes = ['Clients'];
@@ -219,6 +231,8 @@ Wu.SidePane = Wu.Class.extend({
 
 	// display the relevant panes
 	refresh : function (panes) {
+		
+		console.log('sidepane.refresh panes: ', panes);
 
 		var panes = panes || this.panes;
 		this.panes = [];

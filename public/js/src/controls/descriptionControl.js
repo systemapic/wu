@@ -1,3 +1,5 @@
+// app.MapPane.descriptionControl
+
 L.Control.Description = L.Control.extend({
 	
 	options: {
@@ -10,9 +12,6 @@ L.Control.Description = L.Control.extend({
 		var className = 'leaflet-control-description',
 		    container = L.DomUtil.create('div', className),
 		    options   = this.options;
-
-		// add html
-		// container.innerHTML = ich.descriptionControl(); 
 
 
 		// #description-toggle-button
@@ -27,10 +26,6 @@ L.Control.Description = L.Control.extend({
 		// // #description-control-inner-content-box
 		this._outer = Wu.DomUtil.create('div', 'description-control-inner-content-box', this._content)
 
-			
-
-
-
 		return container; // turns into this._container on return
 
 	},
@@ -40,12 +35,6 @@ L.Control.Description = L.Control.extend({
 		// hide by default
 		this._container.style.display = "none";
 
-		// get panes
-		// this._legendsContainer = Wu.DomUtil.get('legends-control-inner-content');
-		// this._legendsCollapser = Wu.DomUtil.get('legends-collapser');
-		this._legendsContainer = app.MapPane.legendsControl._legendsContainer;
-		this._legendsCollapser = app.MapPane.legendsControl._legendsCollapser;
-		
 		// create scroller 
 		this._inner = Wu.DomUtil.create('div', 'description-scroller', this._outer);
 		
@@ -59,9 +48,7 @@ L.Control.Description = L.Control.extend({
 
 			// Mobile arrow	
 		    	Wu.DomUtil.create('div', 'description-mobile-arrow', this._content);
-			
 		}
-
 	},      
 
 	setDescription : function (layer) {
@@ -164,6 +151,9 @@ L.Control.Description = L.Control.extend({
 		
 		// turn on editing
 		this.editOn();
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'Description: edit content']);
 
 	},
 	
@@ -293,6 +283,11 @@ L.Control.Description = L.Control.extend({
 		} else {
 			this._isClosed ? this.mobileOpenPane() : this.mobileClosePane();
 		}
+
+
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'Description toggle']);
+
 
 	},
 

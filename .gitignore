@@ -1,2 +1,10 @@
-public/js/src/core/config/*
-public/dist/*
+node_modules/*
+config/config.js
+public/js/src/config/*
+log/*
+dist/tmp/*
+views/tmp/*
+views/*.serve.*
+public/css/fonts
+public/css/images
+public/css/style.css

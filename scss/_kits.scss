@@ -16,6 +16,25 @@ may need to be adjusted to function on all browsers.
 ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 */
 
+
+.share-link-input {
+	-webkit-animation: linkFader 2500ms ease;
+	-webkit-animation-fill-mode: forwards;
+	-moz-animation: linkFader 2500ms ease;
+	-moz-animation-fill-mode: forwards;
+	-o-animation: linkFader 2500ms ease;
+	-o-animation-fill-mode: forwards;
+	animation: linkFader 2500ms ease;
+	animation-fill-mode: forwards;
+
+	}
+
+	@-webkit-keyframes linkFader {	0% { background-color: #fefae2; } 100% { background-color: white; }}	
+	@-moz-keyframes linkFader {	0% { background-color: #fefae2; } 100% { background-color: white; }}	
+	@-o-keyframes linkFader {	0% { background-color: #fefae2; } 100% { background-color: white; }}	
+	@keyframes linkFader {		0% { background-color: #fefae2; } 100% { background-color: white; }}	
+
+
 /* Open Info Menu */
 /*IS THIS ONE STILL VALID???*/
 .open-uncollapse {
@@ -234,7 +253,7 @@ input[type=checkbox] + label.check {
 	transition: opacity 250ms ease, left 250ms ease;	
 	}
 	
-#legends-inner {
+.legends-inner {
 	-webkit-transition: height 250ms ease, width 250ms ease, left 250ms ease;
 	-moz-transition: height 250ms ease, width 250ms ease, left 250ms ease;
 	-o-transition: height 250ms ease, width 250ms ease, left 250ms ease;
@@ -389,12 +408,11 @@ input[type=checkbox] + label.check {
 	}
 
 
-
-
 .list .dropdown-button,
 .box .dropdown-button,
 #legends-opener,
-.editor-projects-item h5 {
+.editor-projects-item h5,
+.start-panne-recent-projects  {
 	-webkit-transition: opacity 250ms ease;	
 	-moz-transition: opacity 250ms ease;	
 	-o-transition: opacity 250ms ease;	
