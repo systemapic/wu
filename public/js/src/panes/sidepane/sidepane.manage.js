@@ -189,7 +189,7 @@ Wu.SidePane.Manage = Wu.Class.extend({
 			// add event for available role click
 			Wu.DomEvent.on(div, 'click', function (e) {
 				console.log('role click');
-				Wu.DomUtil.stop(e);
+				Wu.DomEvent.stop(e);
 
 				// remove divs
 				Wu.DomUtil.remove(dropdown);

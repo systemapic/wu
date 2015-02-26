@@ -2956,6 +2956,17 @@ td.tdcont.createdDate {
 	background: #F1FCFD;
 	}
 
+.manage-access-button-done {
+	position: absolute;
+	top: 67px;
+	right: 118px;
+	z-index: 999999999;
+	padding: 12px 25px;
+	}
+
+.manage-access-button-done:before {
+	content: 'DONE';
+	}
 
 .manage-access-ghost {
 	position: fixed;
