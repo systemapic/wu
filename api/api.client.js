@@ -37,7 +37,6 @@ var mapnikOmnivore = require('mapnik-omnivore');
 
 // api
 var api = module.parent.exports;
-console.log('CLIENT === api=>', api);
 
 // exports
 module.exports = api.client = { 
@@ -48,76 +47,101 @@ module.exports = api.client = {
 	// #########################################
 	create : function (req, res) {
 
-		// set vars
-		var user = req.user;
-		var json = req.body;
+		console.log('c client');
 
-		// return if not authorized
-		if (!api.permission.to.create.client( user )) {
-			var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-			return res.end(JSON.stringify({ error : message }));
-		};
+		// set vars
+		var account = req.user,
+		    store = req.body,
+		    ops = [];
+
+		ops.push(function (callback) {
+
+			// check access
+			api.access.to.create_client({
+				user : account
+			}, callback);
+
+		});
+
+		ops.push(function (options, callback) {
+
+			// create client
+			api.client._create({
+				user : options.user,
+				store : store
+			}, callback);
+
+		});
+
+		async.waterfall(ops, function (err, client) {
+			if (err) return api.error.general(req, res, err);
+
+			// saved ok
+			res.end(JSON.stringify(client));
+		});
+
+	},
+
+	_create : function (options, callback) {
+		var user = options.user,
+		    store = options.store;
 
 		// create new client
 		var client 		= new Clientel();
 		client.uuid 		= 'client-' + uuid.v4();
 		client.createdBy 	= user.uuid;
-		client.slug 		= json.name.replace(/\s+/g, '').toLowerCase();	// TODO: check if unique?
-		client.name 		= json.name;
-		client.description 	= json.description;
-		client.keywords 	= json.keywords;
+		client.createdByName    = user.firstName + ' ' + user.lastName;
+		client.slug 		= store.name.replace(/\s+/g, '').toLowerCase();	// TODO: check if unique?
+		client.name 		= store.name;
+		client.description 	= store.description;
+		client.keywords 	= store.keywords;
 
-		// save new client
-		client.save(function(err) {
-			if (err) return res.end(JSON.stringify({
-				error : 'Error creating client.'
-			}));
-			
-			// add to superadmins
-			api.addClientToSuperadmins(client.uuid);
+		// save 
+		client.save(callback);
 
-			// saved ok
-			res.end(JSON.stringify(client));
-		});
 	},
 
 	// #########################################
 	// ###  API: Delete Client               ###
 	// #########################################
 	deleteClient : function (req, res) {
-		var clientUuid = req.body.cid;
-		var userUuid = req.user.uuid;
-		var user = req.user;
+		var clientUuid = req.body.cid,
+		    account = req.user,
+		    ops = [];
 
 
 		// find client
-		var model = Clientel.findOne({ uuid : clientUuid });
-		model.exec(function (err, client) {
-			
-			// return error
-			if (err) return res.end(JSON.stringify({ error : 'Error retrieving client.' }));
-			
-			// return if not authorized
-			if (!api.permission.to.remove.client(user, client)) {
-				var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-				return res.end(JSON.stringify({ error : message }));
-			};
+		ops.push(function (callback) {
 
-			// remove client		
-			model.remove(function(err, result) { 
-				if (err) return res.end(JSON.stringify({
-					error : 'Error removing client.'
-				}));
-
-				console.log('Removed client ', client.name);
-
-				// remove from superadmins
-				api.removeClientFromEveryone(client.uuid);
-
-				// return
-				res.end(JSON.stringify(result)); 
-			});
+			Clientel
+			.findOne({uuid : clientUuid})
+			.exec(callback);
 		});
+
+		// check access
+		ops.push(function (client, callback) {
+
+			api.access.to.delete_client({
+				user : account,
+				client : client
+			}, callback);
+
+		});
+
+		// delete client
+		ops.push(function (options, callback) {
+
+			// delete
+			options.client.remove(callback);
+		});
+
+		// run ops
+		async.waterfall(ops, function (err, result) {
+			if (err) return api.error.general(req, res, err);
+			res.end(JSON.stringify(result));
+		});
+
+		
 	},
 
 	// #########################################
@@ -126,93 +150,98 @@ module.exports = api.client = {
 	update : function (req, res) {
 
 		var clientUuid 	= req.body.uuid;
-		var userid 	= req.user.uuid;
-		var user        = req.user;
+		var account     = req.user;
 		var queries 	= {};
-		
+		var ops = [];
+
+		// return if missing info
+		if (!clientUuid) return api.error.missingInformation(req, res);
+
+
 		// find client
-		var model = Clientel.findOne({ uuid : clientUuid });
-		model.exec(function (err, client) {
-			
-			// return error
-			if (err) return res.end(JSON.stringify({ error : 'Error retrieving client.' }));
-			
-			// return if not authorized
-			if (!api.permission.to.update.client(user, client)) {
-				var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-				return res.end(JSON.stringify({ error : message }));
-			};
+		ops.push(function (callback) {
 
-
-			// add projects to client
-			if (isObject(req.body.projects)) {
-				queries.projects = function(callback) {
-					return Clientel.findOne({ uuid : clientUuid }, function (err, client){
-						client.projects = req.body.projects;
-						client.save(function(err) {
-							if (err) return res.end(JSON.stringify({
-								error : 'Error updating client.'
-							}));
-						});
-						return callback(err);
-					});
-				}
-			}
-
-			// update name
-			if (req.body.name) {
-				queries.name = function(callback) {
-					return Clientel.findOne({ uuid : clientUuid }, function (err, client){
-						client.name = req.body.name;
-						client.save(function(err) {
-							if (err) return res.end(JSON.stringify({
-								error : 'Error updating client.'
-							}));
-						});
-						return callback(err);
-					});
-				}
-			}
-
-			// update description
-			if (req.body.description) {
-				queries.description = function(callback) {
-					return Clientel.findOne({ uuid : clientUuid }, function (err, client){
-						client.description = req.body.description;
-						client.save(function(err) {
-							if (err) return res.end(JSON.stringify({
-								error : 'Error updating client.'
-							}));
-						});
-						return callback(err);
-					});
-				}
-			}
-
-			// update description
-			if (req.body.logo) {
-				queries.logo = function(callback) {
-					return Clientel.findOne({ uuid : clientUuid }, function (err, client){
-						client.logo = req.body.logo;
-						client.save(function(err) {
-							if (err) return res.end(JSON.stringify({
-								error : 'Error updating client.'
-							}));
-						});
-						return callback(err);
-					});
-				}
-			}
-
-			async.series(queries, function(err, doc) {
-				if (err) return res.end(JSON.stringify({
-					error : 'Error updating client.'
-				}));		
-
-				// return
-				res.end(JSON.stringify(doc));
-			});
+			Clientel
+			.findOne({uuid : clientUuid})
+			.exec(callback);
 		});
+
+		// check access
+		ops.push(function (client, callback) {
+
+			api.access.to.edit_client({
+				user : account, 
+				client : client 
+			}, callback);
+
+		});
+
+		// update client
+		ops.push(function (options, callback) {
+
+			api.client._update({
+				client : options.client, 
+				options : req.body
+			}, callback);
+
+		});
+
+		// run ops
+		async.waterfall(ops, function (err, client) {
+			if (err) return api.error.general(req, res, err);
+
+			// return
+			res.end(JSON.stringify(client));
+		});
+		
+	},
+
+
+	_update : function (options, callback) {
+
+		var client = options.client,
+		    options = options.options,
+		    queries = {};
+
+		// valid fields
+		var valid = [
+			'name', 
+			'logo', 
+			'description', 
+			'projects', 
+		];
+
+		// enqueue updates for valid fields
+		valid.forEach(function (field) {
+			if (options[field]) {
+				queries = api.client._enqueueUpdate({
+					queries : queries,
+					field : field,
+					options : options,
+					client : client
+				});
+			}
+		});
+
+		// do updates
+		async.parallel(queries, callback);
+
+
+	},
+
+	_enqueueUpdate : function (job) {
+		var queries = job.queries,
+		    options = job.options,
+		    field = job.field,
+		    client = job.client;
+
+		// create update op
+		queries[field] = function(callback) {	
+			client[field] = options[field];
+			client.markModified(field);
+			client.save(callback);
+		};
+		return queries;
 	},
 
 
@@ -226,78 +255,132 @@ module.exports = api.client = {
 	},
 
 
+	getAll : function (options, done) {
+		var user = options.user;
 
-	getAll : function (callback, user) {
+		// check if admin
+		api.access.is.admin({
+			user : user
+		}, function (err, isAdmin) {
+			console.log('getAll client, is admin, err, isAdmin', err, isAdmin);
 
-		// async queries
-		var a = {};
-
-
-
-		// is superadmin, get all projects
-		if (api.permission.superadmin(user)) {
-			a.superadminClients = function (cb) {
-				Clientel
-				.find()
-				.exec(function(err, result) { 
-					cb(err, result); 
-				});
-			}
-		}
-		
-		// get all projects created by user
-		a.createdBy = function (cb) {
-			Clientel
-			.find({createdBy : user.uuid})
-			.exec(function(err, result) { 
-				cb(err, result); 
-			});
-		}
-
-		// get all projects that user is editor for
-		a.editor = function (cb) {
-			Clientel
-			.find({ uuid : { $in : user.role.editor.clients } })
-			.exec(function(err, result) { 
-				cb(err, result); 
-			});
-		}
-
-		// get all projects user is reader for
-		a.reader = function (cb) {
-			Clientel
-			.find({ uuid : { $in : user.role.reader.clients } })
-			.exec(function(err, result) { 
-				cb(err, result); 
-			});
-		}
-
-
-		// do async 
-		async.parallel(a, function (err, result) {
+			// not admin, get all users manually
+			if (err || !isAdmin) return api.client._getAllFiltered(options, done);
 			
-			// return error
-			if (err) return callback(err);
-
-			// flatten into one array
-			var array = [];
-			for (r in result) {
-				array.push(result[r]);
-			}
-
-			
-			// flatten
-			var flat = _.flatten(array)
-
-			// remove duplicates
-			var unique = _.unique(flat, 'uuid');
-
-			callback(err, unique);
+			// is admin, get all
+			api.client._getAll(options, done);
 		});
+	},
+
+	_getAll : function (options, done) {
+		Clientel
+		.find()
+		.exec(done);
+	},
+
+
+	_getAllFiltered : function (options, done) {
+		var user = options.user,
+		    ops = [];
+
+		    console.log('getALL ---- clients!!');
+
+		// if not admin
+		ops.push(function (callback) {
+			// get account's projects (read_project)
+			api.project.getAll({
+				user: user,
+			}, function (err, projects) {
+				var clientUuids = [];
+				_.each(projects, function (project) {
+					clientUuids.push(project.client);
+				});
+				callback(err, clientUuids);
+			});
+		});
+
+		ops.push(function (clientUuids, callback) {
+			Clientel
+			.find()
+			.where('uuid').in(clientUuids)
+			.exec(callback);
+		});
+
+		async.waterfall(ops, done);
+	},
+
+
+	// getAll : function (callback, user) {
+
+	// 	// async queries
+	// 	var a = {};
+
+
+
+	// 	// is superadmin, get all projects
+	// 	if (api.access.superadmin(user)) {
+	// 		a.superadminClients = function (cb) {
+	// 			Clientel
+	// 			.find()
+	// 			.exec(function(err, result) { 
+	// 				cb(err, result); 
+	// 			});
+	// 		}
+	// 	}
+		
+	// 	// get all projects created by user
+	// 	a.createdBy = function (cb) {
+	// 		Clientel
+	// 		.find({createdBy : user.uuid})
+	// 		.exec(function(err, result) { 
+	// 			cb(err, result); 
+	// 		});
+	// 	}
+
+	// 	// get all projects that user is editor for
+	// 	a.editor = function (cb) {
+	// 		Clientel
+	// 		.find({ uuid : { $in : user.role.editor.clients } })
+	// 		.exec(function(err, result) { 
+	// 			cb(err, result); 
+	// 		});
+	// 	}
+
+	// 	// get all projects user is reader for
+	// 	a.reader = function (cb) {
+	// 		Clientel
+	// 		.find({ uuid : { $in : user.role.reader.clients } })
+	// 		.exec(function(err, result) { 
+	// 			cb(err, result); 
+	// 		});
+	// 	}
+
+
+	// 	// do async 
+	// 	async.parallel(a, function (err, result) {
+			
+	// 		// return error
+	// 		if (err) return callback(err);
+
+	// 		// flatten into one array
+	// 		var array = [];
+	// 		for (r in result) {
+	// 			array.push(result[r]);
+	// 		}
+
+			
+	// 		// flatten
+	// 		var flat = _.flatten(array)
+
+	// 		// remove duplicates
+	// 		var unique = _.unique(flat, 'uuid');
+
+	// 		callback(err, unique);
+	// 	});
 		
 		
 
-	},
+	// },
 
 
 

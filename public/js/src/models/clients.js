@@ -13,8 +13,10 @@ Wu.Client = Wu.Class.extend({
 
 	setEditMode : function () {
 		// set editMode
-		this.editMode = false;
-		if (app.Account.canUpdateClient(this.uuid)) this.editMode = true;
+		// this.editMode = false;
+		// if (app.Account.canUpdateClient(this.uuid)) this.editMode = true;
+		// if (app.access.to.edit_client(this.getUuid())) this.editMode = true;
+		this.editMode = app.access.to.edit_client(this.getUuid())
 	},
 
 	setActive : function () {
@@ -97,6 +99,10 @@ Wu.Client = Wu.Class.extend({
 		return this.name;
 	},
 
+	getTitle : function () {
+		return this.getName();
+	},
+
 	getDescription : function () {
 		return this.description;
 	},
@@ -105,12 +111,24 @@ Wu.Client = Wu.Class.extend({
 		return this.logo;
 	},
 
+	getPixelLogo : function (options) {
+
+			
+
+	},
+
 	getUuid : function () {
 		return this.uuid;
 	},
 
 	getSlug : function () {
 		return this.slug;
+	},
+
+	getProjects : function () {
+		return _.filter(app.Projects, function (p) {
+			return p.getClientUuid() == this.getUuid();
+		}, this);
 	},
 
 	setName : function (name) {

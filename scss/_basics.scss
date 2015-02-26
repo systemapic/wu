@@ -27,6 +27,10 @@ body {
 	outline: none !important; 
 	border: 0 !important 
 	}
+
+.z999999 {
+	z-index: 99999999999;
+}	
 	
 label {
 	margin-bottom: 0px !important;
@@ -185,8 +189,9 @@ hr {
 	background: rgb(146, 240, 229);
 	}
 */
+
+.manage-access-current-role,
 .user-projects-button {
-	/*background: rgba(0,0,0,0.2);*/
 	background: rgba(0, 0, 0, 0.65);
 	padding: 10px;
 	text-align: center;
@@ -198,6 +203,7 @@ hr {
 	cursor: pointer;
 	}
 
+.manage-access-current-role:hover,
 .user-projects-button:hover {
 	/*background: #66a7a0;*/
 	/*background: #218777;*/

@@ -38,7 +38,6 @@ var mapnikOmnivore = require('mapnik-omnivore');
 
 // api
 var api = module.parent.exports;
-console.log('api.legend === api=>', api);
 
 // exports
 module.exports = api.user = { 
@@ -47,330 +46,408 @@ module.exports = api.user = {
 	// create user
 	create : function (req, res) {
 
-		var user      = req.user,
-		    email     = req.body.email,
-		    lastName  = req.body.lastName,
-		    firstName = req.body.firstName,
-		    company   = req.body.company,
-		    position  = req.body.position,
-		    phone     = req.body.phone;
+		// user not added to any roles on creation
+		// blank user with no access - must be given project access, etc.
 
-		// return if not authorized
-		if (!api.permission.to.create.user(user)) {
-			var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-			return res.end(JSON.stringify({ 
-				error : message 
-			}));
-		};
+		var account = req.user,
+		    projectUuid = req.body.project,
+		    options = req.body;
+		    ops = [];
 
-		// return if no email, or if email already in use
-		if (!email) {
-			var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-			return res.end(JSON.stringify({ 
-				error : message 
-			}));
-		};
+		// return on missing info
+		if (!options.email) return api.error.missingInformation(req, res);
 
-		// create the user
-		var newUser            	= new User();
-		var password 		= crypto.randomBytes(16).toString('hex');
-		newUser.uuid 		= 'user-' + uuid.v4();
-		newUser.local.email    	= email;	
-		newUser.local.password 	= newUser.generateHash(password);
-		newUser.firstName 	= firstName;
-		newUser.lastName 	= lastName;
-		newUser.company 	= company;
-		newUser.position 	= position;
-		newUser.phone 		= phone;
-		newUser.createdBy	= user.uuid;
-		
-		// save the user
-		newUser.save(function(err, doc) { 
-			
-			if (err) return res.end(JSON.stringify({
-				error : 'Error creating user.'
-			}));
+		console.log('create user', account, projectUuid, options);
 
-			// send email with login details to user
-			api.email.sendNewUserEmail(newUser, password);
-			
-			// return success
-			res.end(JSON.stringify(doc));
+		ops.push(function (callback) {
+			Project
+			.findOne({uuid : projectUuid})
+			.exec(callback);
 		});
 
+
+		// check access
+		ops.push(function (project, callback) {
+			console.log('lets check', project);
+			api.access.to.create_user({
+				user : account,
+				project : project
+			}, callback);
+		});
+
+		// create user
+		ops.push(function (options, callback) {
+			console.log()
+			api.user._create({
+				options : req.body,
+				account : account
+			}, callback);
+		});
+
+		// send email
+		ops.push(function (user, password, callback) {
+			api.email.sendWelcomeEmail(user, password);  // refactor plain pass
+			callback(null, user);
+		});
+
+		// run ops
+		async.waterfall(ops, function (err, user) {
+			console.log('_______done checking yo!!', err, user);
+			if (err) return api.error.general(req, res, err);
+
+			// done
+			res.end(JSON.stringify(user));
+		});
+
+	},
+
+	_create : function (job, callback) {
+		var options = job.options,
+		    account = job.account;
+
+		// create the user
+		var user            	= new User();
+		var password 		= crypto.randomBytes(16).toString('hex');
+		user.uuid 		= 'user-' + uuid.v4();
+		user.local.email    	= options.email;	
+		user.local.password 	= user.generateHash(password);
+		user.firstName 		= options.firstName;
+		user.lastName 		= options.lastName;
+		user.company 		= options.company;
+		user.position 		= options.position;
+		user.phone 		= options.phone;
+		user.createdBy		= account.getUuid();
+		
+		// save the user
+		user.save(function(err, user) { 
+			callback(err, user, password); // todo: password plaintext
+		});
 	},
 
 
 	// update user 	// todo: send email notifications on changes?
 	update : function (req, res) {
-
-		var userUuid 	= req.body.uuid;
-		var authUser 	= req.user.uuid;
-		var user        = req.user;
-
-		// find user
-		var model = User.findOne({ uuid : userUuid });
-		model.exec(function (err, subject) {
-			
-			// return error
-			if (err) return res.end(JSON.stringify({ error : 'Error retrieving client.' }));
-			
-			// return if not authorized
-			if (!api.permission.to.update.user(user, subject)) {
-				var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-				return res.end(JSON.stringify({ error : message }));
-			};
+		var userUuid = req.body.uuid,
+		    account = req.user,
+		    projectUuid = req.body.project,
+		    ops = [];
 
 
-			// create async queue
-			var queries = {};
+		ops.push(function (callback) {
+			User
+			.findOne({uuid : userUuid})
+			.exec(callback);
+		});
 
-			// save company
-			if (req.body.company) {
-				queries.company = function(callback) {
-					return User.findOne({ uuid : userUuid }, function (err, user) {
-						// set and save
-						user.company = req.body.company;
-						user.save(function(err) {
-							if (err) console.error(err); // log error
-						});
-						// async callback
-						return callback(err, user);
-					});
-				}
-			}
-
-			// save position
-			if (req.body.position) {
-				queries.position = function(callback) {
-					return User.findOne({ uuid : userUuid }, function (err, user) {
-						// set and save
-						user.position = req.body.position;
-						user.save(function(err) {
-							if (err) console.error(err); // log error
-						});
-						// async callback
-						return callback(err, user);
-					});
-				}
-			}
-
-			// save phone
-			if (req.body.phone) {
-				queries.phone = function(callback) {
-					return User.findOne({ uuid : userUuid }, function (err, user) {
-						// set and save
-						user.phone = req.body.phone;
-						user.save(function(err) {
-							if (err) console.error(err); // log error
-						});
-						// async callback
-						return callback(err, user);
-					});
-				}
-			}
-
-			// // save email
-			// if (req.body.email) {
-			// 	queries.email = function(callback) {
-			// 		return User.findOne({ uuid : userUuid }, function (err, user) {
-			// 			// set and save
-			// 			user.local.email = req.body.email;
-			// 			user.save(function(err) {
-			// 				if (err) console.error(err); // log error
-			// 			});
-			// 			// async callback
-			// 			return callback(err, user);
-			// 		});
-			// 	}
-			// }
-
-			// save company
-			if (req.body.firstName) {
-				queries.firstName = function(callback) {
-					return User.findOne({ uuid : userUuid }, function (err, user) {
-						// set and save
-						user.firstName = req.body.firstName;
-						user.save(function(err) {
-							if (err) console.error(err); // log error
-						});
-						// async callback
-						return callback(err, user);
-					});
-				}
-			}
-
-			// save company
-			if (req.body.lastName) {
-				queries.lastName = function(callback) {
-					return User.findOne({ uuid : userUuid }, function (err, user) {
-						// set and save
-						user.lastName = req.body.lastName;
-						user.save(function(err) {
-							if (err) console.error(err); // log error
-						});
-						// async callback
-						return callback(err, user);
-					});
-				}
-			}
-
-			// run async queries
-			async.parallel(queries, function(err, doc) {
-
-				// return error
-				if (err) return res.end(JSON.stringify({
-					error : 'Error updating user.'
-				}));	
-				
-				// return success
-				res.end(JSON.stringify(doc));
+		ops.push(function (user, callback) {
+			Project
+			.findOne({uuid : projectUuid})
+			.exec(function (err, project) {
+				callback(null, user, project);
 			});
 		});
+
+
+		ops.push(function (user, project, callback)  {
+			api.access.to.edit_user({
+				user : account,
+				subject : user,
+				project : project
+			}, callback);
+		});
+
+		ops.push(function (options, callback) {
+			api.user._update({
+				options : req.body,
+				user : options.subject
+			}, callback);
+		});
+
+		async.waterfall(ops, function (err, user) {
+			if (err) api.error.general(req, res, err);
+			res.end(JSON.stringify(user));
+		});
+
 	},
 
 
+	_update : function (options, callback) {
+
+		var user = options.user,
+		    options = options.options,
+		    queries = {};
+
+		// valid fields
+		var valid = [
+			'company', 
+			'position', 
+			'phone', 
+			'firstName',
+			'lastName', 
+		];
+
+		// enqueue updates for valid fields
+		valid.forEach(function (field) {
+			if (options[field]) {
+				queries = api.user._enqueueUpdate({
+					queries : queries,
+					field : field,
+					options : options,
+					user : user
+				});
+			}
+		});
+
+		// do updates
+		async.parallel(queries, callback);
+
+	},
+
+	_enqueueUpdate : function (job) {
+		var queries = job.queries,
+		    options = job.options,
+		    field = job.field,
+		    user = job.user;
+
+		// create update op
+		queries[field] = function(callback) {	
+			user[field] = options[field];
+			user.markModified(field);
+			user.save(callback);
+		};
+		return queries;
+	},
 
 		
-	// delete user  	// todo: send email notifications?
+	// delete user  	
 	deleteUser : function (req, res) {
 
-		var userUuid 	= req.body.uuid;
-		var authUser 	= req.user.uuid;
-		var user        = req.user;
 
-		// find user
-		var model = User.findOne({ uuid : userUuid });
-		model.exec(function (err, subject) {
-			
-			// return error
-			if (err) return res.end(JSON.stringify({ error : 'Error retrieving user.' }));
-			
-			// return if not authorized
-			if (!api.permission.to.remove.user(user, subject)) {
-				var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-				return res.end(JSON.stringify({ error : message }));
-			};
+		var userUuid = req.body.uuid,
+		    account = req.user,
+		    ops = [];
 
-			model.remove().exec(function (err, result) {
 
-				// return error
-				if (err) return res.end(JSON.stringify({ error : 'Error retrieving user.' }));
-
-				return res.end(JSON.stringify({ 
-					message : 'User deleted.',
-					result : result 
-				}));
-
-			})
+		ops.push(function (callback) {
+			User
+			.findOne({uuid : userUuid})
+			.exec(callback);
 		});
+
+		ops.push(function (user, callback) {
+			api.access.to.delete_user({
+				user : account,
+				subject : user
+			}, callback);
+		});
+
+		ops.push(function (options, callback) {
+			options.subject.remove(callback);
+		});
+
+		async.waterfall(ops, function (err, user) {
+			if (err) api.error.general(req, res, err);
+
+			// done
+			res.end(JSON.stringify(user));
+
+			// todo: send email notifications?
+		});
+
 	},
 
 
 	// check unique email
 	checkUniqueEmail : function (req, res) {
-
 		var user = req.user,
-		    email = req.body.email;
+		    email = req.body.email,
+		    unique = false;
 
 		User.findOne({'local.email' : email}, function (err, result) {
-			if (err) return res.end(JSON.stringify({
-				error : 'Error checking email.'
-			}));
-
-			if (result) return res.end(JSON.stringify({
-					unique : false
-			}));
-
+			if (err) return api.error.general(req, res, 'Error checking email.');
+			if (!result) unique = true; 
 			return res.end(JSON.stringify({
-				unique : true
+				unique : unique
 			}));
+		});
+	},
 
+
+
+
+
+
+	getAll : function (options, done) {
+		var user = options.user;
+
+		// check if admin
+		api.access.is.admin({
+			user : user
+		}, function (err, isAdmin) {
+
+			console.log('getAll user, is admin, err, isAdmin', err, isAdmin);
+
+			// not admin, get all users manually
+			if (err || !isAdmin) return api.user._getAllFiltered(options, done);
+			
+			// is admin, get all
+			api.user._getAll(options, done);
 		});
 
 	},
 
-	// get app users for Account 	// todo: refactor anyway
-	getAll : function (callback, user) {
+	_getAll : function (options, done) {
+		User
+		.find()
+		.exec(done);
+	},
 
-		var a = {};
-		var createdByChildren = [];
-		var createdByGrandchildren = [];
 
-		// is superadmin, get all users
-		if (api.permission.superadmin(user)) {
-			a.superadminUsers = function (cb) {
-				User
-				.find()
-				.exec(function(err, result) { 
-					cb(err, result); 
+	_getAllFiltered : function (options, done) {
+
+		// get all role members in all projects that account has edit_user access to
+		var user = options.user,
+		    ops = [];
+
+		ops.push(function (callback) {
+			console.log('api.user -> project.getAll');
+			// get account's projects
+			api.project.getAll({
+				user: user,
+				cap_filter : 'edit_user'
+			}, callback);
+		});
+
+
+		ops.push(function (projects, callback) {
+
+			console.log('fpund projects', projects.length);
+			
+			// get all roles of all projects
+			var allRoles = [];
+			_.each(projects, function (project) {
+				_.each(project.roles, function (role) {
+					allRoles.push(role);
 				});
-			}
-		}
+			});
+			callback(null, allRoles)
+		});
+
+
+		ops.push(function (roles, callback) {
+			// get users in roles
+
+			var allUsers = [];
+
+			_.each(roles, function (role) {
+				_.each(role.members, function (member) {
+					allUsers.push(member);
+				});
+			});
+
+			callback(null, allUsers);
+		});
+
 		
-		// get all users created by user
-		a.createdBy = function (cb) {
+		// get user models
+		ops.push(function (users, callback) {
+
 			User
-			.find({createdBy : user.uuid})
-			.exec(function(err, result) { 
-				result.forEach(function(rr) {
-					createdByChildren.push(rr.uuid);
-				})
+			.find()
+			.or([
+				{ uuid : { $in : users }}, 		// roles
+				{ createdBy : user.getUuid()}, 	// createdBy self
+				{ uuid : user.getUuid()} 		// self
+			])
+			.exec(callback);
+		});
 
-				cb(err, result); 
-			});
-		}
 
-		// get all users created by children, ie. created by a user that User created
-		a.createdByChildren = function (cb) {
-			User
-			.find({createdBy : { $in : createdByChildren }})
-			.exec(function(err, result) { 
-				result.forEach(function(rr) {
-					createdByGrandchildren.push(rr.uuid);
-				})
-				cb(err, result); 
-			});
-		}
-
-		// get all users created by grandchildren
-		a.createdByChildren = function (cb) {
-			User
-			.find({createdBy : { $in : createdByGrandchildren }})
-			.exec(function(err, result) { 
-				cb(err, result); 
-			});
-		}
-
-		async.series(a, function (err, allUsers) {
-
-			// return error
-			if (err) return callback(err);
-
-			// flatten into one array
-			var array = [];
-			for (r in allUsers) {
-				array.push(allUsers[r]);
-			}
-
-			// flatten
-			var flat = _.flatten(array);
-
-			// remove duplicates
-			var unique = _.unique(flat, 'uuid');
-
-			// return callback
-			callback(err, unique);
-
+		async.waterfall(ops, function (err, users) {
+			console.log('ops done!')
+			console.log('found users: ', users.length);
+			done(err, users);
 		});
 
 	},
 
 
-}
 
-// convenience method for checking hardcoded super user
-function superadmin(user) {
-	if (superusers.indexOf(user.uuid) >= 0) return true;
-	return false;
+	// // get app users for Account 	// todo: refactor anyway
+	// getAll : function (callback, user) {
+
+	// 	var a = {};
+	// 	var createdByChildren = [];
+	// 	var createdByGrandchildren = [];
+
+	// 	// is superadmin, get all users
+	// 	if (api.access.superadmin(user)) {
+	// 		a.superadminUsers = function (cb) {
+	// 			User
+	// 			.find()
+	// 			.exec(function(err, result) { 
+	// 				cb(err, result); 
+	// 			});
+	// 		}
+	// 	}
+		
+	// 	// get all users created by user
+	// 	a.createdBy = function (cb) {
+	// 		User
+	// 		.find({createdBy : user.uuid})
+	// 		.exec(function(err, result) { 
+	// 			result.forEach(function(rr) {
+	// 				createdByChildren.push(rr.uuid);
+	// 			})
+
+	// 			cb(err, result); 
+	// 		});
+	// 	}
+
+	// 	// get all users created by children, ie. created by a user that User created
+	// 	a.createdByChildren = function (cb) {
+	// 		User
+	// 		.find({createdBy : { $in : createdByChildren }})
+	// 		.exec(function(err, result) { 
+	// 			result.forEach(function(rr) {
+	// 				createdByGrandchildren.push(rr.uuid);
+	// 			})
+	// 			cb(err, result); 
+	// 		});
+	// 	}
+
+	// 	// get all users created by grandchildren
+	// 	a.createdByChildren = function (cb) {
+	// 		User
+	// 		.find({createdBy : { $in : createdByGrandchildren }})
+	// 		.exec(function(err, result) { 
+	// 			cb(err, result); 
+	// 		});
+	// 	}
+
+	// 	async.series(a, function (err, allUsers) {
+
+	// 		// return error
+	// 		if (err) return callback(err);
+
+	// 		// flatten into one array
+	// 		var array = [];
+	// 		for (r in allUsers) {
+	// 			array.push(allUsers[r]);
+	// 		}
+
+	// 		// flatten
+	// 		var flat = _.flatten(array);
+
+	// 		// remove duplicates
+	// 		var unique = _.unique(flat, 'uuid');
+
+	// 		// return callback
+	// 		callback(err, unique);
+
+	// 	});
+
+	// },
+
+
 }

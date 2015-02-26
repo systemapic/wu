@@ -37,7 +37,6 @@ var config = require('../config/config.js');
 
 // api
 var api = module.parent.exports;
-console.log('PIXELS2 === api=>', api);
 
 
 // function exports
@@ -442,9 +441,12 @@ module.exports = api.pixels = {
 			console.log('results', results);
 
 			if (err) console.log('err', err);
-
+			
+			if (err) return api.error.general(req, res, err);
 			
 			var file = results[2]
+
+			if (!file) return api.error.general(req, res);
 
 			res.end(JSON.stringify({
 				image : file.uuid,

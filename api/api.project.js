@@ -37,8 +37,6 @@ var mapnikOmnivore = require('mapnik-omnivore');
 
 // api
 var api = module.parent.exports;
-console.log('PROJECT === api=>', api);
-
 
 
 // exports
@@ -50,92 +48,64 @@ module.exports = api.project = {
 	// #########################################
 	// createProject : function (req, res) {
 	create : function (req, res) {
-
-
-		console.log('________________');
-		console.log('API: createProject');
-		console.log('_________________');
-
 		var store = req.body,
-		    user = req.user,
+		    account = req.user,
 		    ops = [];
 
-		// return if not authorized
-		if (!api.permission.to.create.project(user)) return api.error.unauthorized(req, res);
+		// return if missing info
+		if (!store) return api.error.missingInformation(req, res);
 
-		return api.error.unauthorized(req, res);
-
-
-		// create role
+		// check access
 		ops.push(function (callback) {
-
-			// create role for projectOwner
-			api.permission._createRole({
-				template : 'projectOwner',
-				members : [user.uuid],
-				capabilities : [],
-				name : 'Project Owner'
+			api.access.to.create_project({
+				user : account
 			}, callback);
-
 		});
 
-		// create access group
-		ops.push(function (role, callback) {
-
-			// create access group for project with role
-			api.permission._createAccessGroup({
-				roles : [role]
+		// create role
+		ops.push(function (options, callback) {
+			api.access._createDefaultRoles({
+				user : account,
 			}, callback);
-
 		});
 
 		// create project
-		ops.push(function (group, callback) {
+		ops.push(function (roles, callback) {
 
-			// create project
+			console.log('received roles: ', roles);
+			
 			api.project._create({
-				user : user,
-				group : group,
+				user : account,
+				roles : roles,
 				store : store
 			}, callback);
-
 		});
 
-
+		// set default mapbox account
 		ops.push(function (project, callback) {
-
-			// set default mapbox account
-			// api._setDefaultMapbox({
 			api.provider.mapbox.setDefault({
 				project : project
 			}, callback);
-
 		});
 
-
+		// run ops
 		async.waterfall(ops, function (err, project) {
+			if (err) return api.error.general(req, res, err);
 
-			// return project to client
+			// return
 			api.project._returnProject(req, res, project);
-
 		});
-
-
 	},
 
 
 
-	_create : function (options, callback) {
-
-		console.log('DEV: _createProject', options);
-
-
+	_create : function (options, done) {
 		var user = options.user,
-		    group = options.group,
+		    roles = options.roles,
 		    store = options.store,
 		    slug = crypto.randomBytes(3).toString('hex');
 		
-		// create mongo
+		// create model
 		var project 		= new Project();
 		project.uuid 		= 'project-' + uuid.v4();
 		project.createdBy 	= user.uuid;
@@ -145,135 +115,183 @@ module.exports = api.project = {
 		project.description 	= store.description;
 		project.keywords 	= store.keywords;
 		project.client 		= store.client;
-		project.accessGroup 	= group._id;
 
-		callback(null, project);
+		// add roles
+		roles.forEach(function (role) {
 
-		console.log('craeted project', project);
+			console.log('adding role ======> ', role);
+
+			project.roles.addToSet(role._id);
+		});
+
+		// save
+		project.save(function (err, project, numAffected) { 	// major GOTCHA!!! product.save(function (err, product, numberAffected) 
+			console.log('saved project88', project);
+			done(err, project);				// returns three args!!!
+		});
 	},
+
 
 	// #########################################
 	// ###  API: Delete Project              ###
 	// #########################################
 	deleteProject : function (req, res) {
 
-		var user        = req.user,
-		    userUuid 	= req.user.uuid,
+		var account     = req.user,
 		    clientUuid 	= req.body.clientUuid,
 		    projectUuid = req.body.projectUuid;
 
-		// find project (async)
-		var model = Project.findOne({ uuid : projectUuid });
-		model.exec(function (err, project) {
-			
-			// return if not authorized
-			if (!api.permission.to.remove.project( user, project )) {
-				var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-				return res.end(JSON.stringify({ error : message }));
-			};
 
+		var ops = [];
 
-			// remove project
-			model.remove(function (err, result) {
-			
-				// todo!!! remove from users 
-				api.removeProjectFromEveryone(project.uuid);
+		ops.push(function (callback) {
 
-				// return success
-				return res.end(JSON.stringify({
-					result : 'Project ' + project.name + ' deleted.'
-				}));
-			});
+			Project
+			.findOne({uuid : projectUuid})
+			.populate('roles')
+			.exec(callback);
+
 		});
+
+
+		ops.push(function (project, callback) {
+
+			api.access.to.delete_project({
+				user : account, 
+				project : project
+			}, callback);
+		});
+
+		ops.push(function (options, callback) {
+
+			options.project.remove(callback);
+		});
+
+
+		async.waterfall(ops, function (err, project) {
+			if (err) return api.error.general(req, res, err);
+
+			// done
+			res.end(JSON.stringify({
+				project : project.uuid,
+				deleted : true
+			}));
+		})
+
+
 	},
 
 	// #########################################
 	// ###  API: Update Project              ###
 	// #########################################
 	update : function (req, res) {
+		var account = req.user,
+		    projectUuid = req.body.uuid,
+		    ops = [];
+
 		console.log('Updating project.', req.body);
 
-		var user        = req.user;
-		var userid 	= req.user.uuid;
-		var projectUuid = req.body.uuid;
 
-		// find project
-		var model = Project.findOne({ uuid : projectUuid });
-		model.exec(function (err, project) {
-			
-			// return error
-			if (err) return res.end(JSON.stringify({ error : 'Error retrieving project.' }));
-			
-			// return if not authorized
-			if (!api.permission.to.update.project(user, project)) {
-				var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-				return res.end(JSON.stringify({ error : message }));
-			};
+		// return on missing
+		if (!projectUuid) return api.error.missingInformation(req, res);
 
 
-					
-			// valid fields
-			var valid = [
-				'name', 
-				'logo', 
-				'header', 
-				'baseLayers',
-				'position',
-				'bounds',
-				'layermenu', 
-				'folders', 
-				'controls', 
-				'description', 
-				'keywords', 
-				'colorTheme',
-				'title',
-				'slug',
-				'connectedAccounts',
-				'settings',
-				'categories',
-				'thumbCreated'
-			];
-	
-			var queries = {};
+		ops.push(function (callback) {
 
-			// enqueue queries for valid fields
-			valid.forEach(function (field) {
-				if (req.body[field]) {
-					console.log('Updating project field: ', field);
+			// find project
+			Project
+			.findOne({uuid : projectUuid})
+			.populate('roles')
+			.exec(callback);
+		});
 
-					// enqueue update
-					queries = api.project._enqueueProjectUpdate(queries, field, req);
-				}
-			});
+		ops.push(function (project, callback) {
 
-			// run queries to database
-			async.parallel(queries, function(err, doc) {
-				// handle err
-				if (err) return res.end(JSON.stringify({ 
-					error : "Error updating project." 
-				}));
-							
-				// return doc
-				res.end(JSON.stringify(doc));
+			// check access
+			api.access.to.edit_project({
+				user : account,
+				project : project
+			}, callback);
+		});
+
+		ops.push(function (options, callback) {
+
+			// update project
+			api.project._update({
+				project : options.project,
+				options : req.body
+			}, callback);
+		});
+
+		async.waterfall(ops, function (err, project) {
+			if (err) return api.error.general(req, res, err);
+
+			// done
+			res.end(JSON.stringify(project));
+		});
+
+		
+	},
+
+	_update : function (job, callback) {
+		var project = job.project,
+		    options = job.options,
+		    queries = {};
+
+		// valid fields
+		var valid = [
+			'name', 
+			'logo', 
+			'header', 
+			'baseLayers',
+			'position',
+			'bounds',
+			'layermenu', 
+			'folders', 
+			'controls', 
+			'description', 
+			'keywords', 
+			'colorTheme',
+			'title',
+			'slug',
+			'connectedAccounts',
+			'settings',
+			'categories',
+			'thumbCreated'
+		];
+
+ 		// enqueue queries for valid fields
+		valid.forEach(function (field) {
+			if (options[field]) queries = api.project._enqueueUpdate({
+				queries : queries,
+				field : field,
+				project : project,
+				options : options
 			});
 		});
+
+		// run queries to database
+		async.parallel(queries, callback);
+
 	},
 
 
 	// async mongo update queue
-	_enqueueProjectUpdate : function (queries, field, req) {
+	_enqueueUpdate : function (job) {
+		var queries = job.queries,
+		    field = job.field,
+		    project = job.project,
+		    options = job.options;
+
+		// create update queue op
 		queries[field] = function(callback) {	
-			return Project.findOne({ uuid : req.body.uuid }, function (err, project){
-				project[field] = req.body[field];
-				project.markModified(field);
-				project.save(function(err) {
-					if (err) console.error(err); // log error
-				});
-				return callback(err);
-			});
+			project[field] = options[field];
+			project.markModified(field);
+			project.save(callback);
 		};
 		return queries;
 	},
+
 
 	// #########################################
 	// ###  API: Check Unique Slug           ###
@@ -291,7 +309,6 @@ module.exports = api.project = {
 
 			// get slugs
 			projects.forEach(function (p) {
-
 				// add but self
 				if (p.uuid != projectUuid) slugs.push(p.slug.toLowerCase());
 			});
@@ -313,20 +330,14 @@ module.exports = api.project = {
 		.findOne({uuid : project.uuid})
 		.populate('files')
 		.populate('layers')
-		.populate('accessGroup')
-		// .populate('accessGroup.roles')
-		// .populate({path : 'accessGroup', select : 'roles'})
+		.populate('roles')
 		.exec(function (err, project) {
 			if (err) console.error(err);
-
-			// project.populate('accessGroup.roles');
-			
 			res.end(JSON.stringify({
 				error : err,
 				project: project
 			}));
 		});
-
 	},
 
 
@@ -338,14 +349,11 @@ module.exports = api.project = {
 		Hash
 		.findOne({id : id, project : projectUuid})
 		.exec(function (err, doc) {
-
 			res.end(JSON.stringify({
 				error: err,
 				hash : doc
 			}));
-
 		});
-
 	},
 
 	setHash : function (req, res) {
@@ -367,7 +375,6 @@ module.exports = api.project = {
 		hash.project 	= projectUuid;
 
 		hash.save(function (err, doc) {
-			console.log('hash saved', err, doc);
 			res.end(JSON.stringify({
 				error: err,
 				hash : doc
@@ -376,83 +383,151 @@ module.exports = api.project = {
 	},	
 
 
+	getAll : function (options, done) {
+		var user = options.user;
 
-	getAll : function (callback, user) {
-		
-		// async queries
-		var a = {};
+		// check if admin
+		api.access.is.admin({
+			user : user
+		}, function (err, isAdmin) {
 
-		// is superadmin, get all projects
-		if (api.permission.superadmin(user)) {
-			a.superadminProjects = function (cb) {
-				Project
-				.find()
-				.populate('files')
-				.populate('layers')
-				.exec(function(err, result) { 
-					cb(err, result); 
-				});
-			}
-		}
-		
-		// get all projects created by user
-		a.createdBy = function (cb) {
-			Project
-			.find({createdBy : user.uuid})
-			.populate('files')
-			.populate('layers')
-			.exec(function(err, result) { 
-				cb(err, result); 
-			});
-		}
+			console.log('getAll project, is admin, err, isAdmin', err, isAdmin);
 
-		// get all projects that user is editor for
-		a.editor = function (cb) {
-			Project
-			.find({ uuid : { $in : user.role.editor.projects } })
-			.populate('files')
-			.populate('layers')
-			.exec(function(err, result) { 
-				cb(err, result); 
-			});
-		}
-
-		// get all projects user is reader for
-		a.reader = function (cb) {
-			Project
-			.find({ uuid : { $in : user.role.reader.projects } })
-			.populate('files')
-			.populate('layers')
-			.exec(function(err, result) { 
-				cb(err, result); 
-			});
-		}
-
-
-		// do async 
-		async.parallel(a, function (err, result) {
+			// not admin, get all users manually
+			if (err || !isAdmin) return api.project._getAllFiltered(options, done);
 			
-			// return error
-			if (err) return callback(err);
-
-			// move into one array
-			var array = [];
-			for (r in result) {
-				array.push(result[r]);
-			}
-
-			// flatten
-			var flat = _.flatten(array)
-
-			// remove duplicates
-			var unique = _.unique(flat, 'uuid');
-
-			callback(err, unique);
+			// is admin, get all
+			api.project._getAll(options, done);
 		});
+	},
+
+	_getAll : function (options, done) {
+		Project
+		.find()
+		.populate('files')
+		.populate('roles')
+		.populate('layers')
+		.exec(done);
+	},
+
+
+	_getAllFiltered : function (options, done) {
+		var user = options.user,
+		    filter = options.cap_filter || 'read_project',
+		    cap_filter = 'capabilities.' + filter,
+		    ops = [];
+
+
+		ops.push(function (callback) {
+
+			// get all roles with user as read_project
+			Role
+			.find({ members : user.uuid })
+			.where(cap_filter, true)
+			.exec(callback);
+		});
+
+
+		ops.push(function (roles, callback) {
+
+			var roleIds = [];
+			roles.forEach(function (role) {
+				roleIds.push(role._id);
+			});
+
+			Project
+			.find({roles : { $in : roleIds }}) // todo: doesnt work?
+			.populate('files')
+			.populate('roles')
+			.populate('layers')
+			.exec(callback);
+		});
+
+
+		async.waterfall(ops, done);
+	},
+
+
+	// _getAll : function (callback, user) {
+		
+	// 	// async queries
+	// 	var a = {};
+
+	// 	// is superadmin, get all projects
+	// 	if (api.access.superadmin(user)) {
+	// 		a.superadminProjects = function (cb) {
+	// 			Project
+	// 			.find()
+	// 			.populate('files')
+	// 			.populate('roles')
+	// 			.populate('layers')
+	// 			.exec(function(err, result) { 
+	// 				cb(err, result); 
+	// 			});
+	// 		}
+	// 	}
+		
+	// 	// get all projects created by user
+	// 	a.createdBy = function (cb) {
+	// 		Project
+	// 		.find({createdBy : user.uuid})
+	// 		.populate('roles')
+	// 		.populate('files')
+	// 		.populate('layers')
+	// 		.exec(function(err, result) { 
+	// 			cb(err, result); 
+	// 		});
+	// 	}
+
+	// 	// get all projects that user is editor for
+	// 	a.editor = function (cb) {
+	// 		Project
+	// 		.find({ uuid : { $in : user.role.editor.projects } })
+	// 		.populate('files')
+	// 		.populate('layers')
+	// 		.populate('roles')
+	// 		.exec(function(err, result) { 
+	// 			cb(err, result); 
+	// 		});
+	// 	}
+
+	// 	// get all projects user is reader for
+	// 	a.reader = function (cb) {
+	// 		Project
+	// 		.find({ uuid : { $in : user.role.reader.projects } })
+	// 		.populate('files')
+	// 		.populate('roles')
+	// 		.populate('layers')
+	// 		.exec(function(err, result) { 
+	// 			cb(err, result); 
+	// 		});
+	// 	}
+
+
+	// 	// do async 
+	// 	async.parallel(a, function (err, result) {
+			
+	// 		// return error
+	// 		if (err) return callback(err);
+
+	// 		// move into one array
+	// 		var array = [];
+	// 		for (r in result) {
+	// 			array.push(result[r]);
+	// 		}
+
+	// 		// flatten
+	// 		var flat = _.flatten(array)
+
+	// 		// remove duplicates
+	// 		var unique = _.unique(flat, 'uuid');
+
+	// 		callback(err, unique);
+	// 	});
 		
 		
 
-	},
+	// },
 
 	
 

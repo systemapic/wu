@@ -3,6 +3,13 @@
 var mongoose = require('mongoose');
 var timestamps = require('mongoose-times');
 
+
+// => group is connected to property - eg. project. 
+// => group contains roles. 
+// => roles contains capabilites and members.
+
+// property => group => role => capabilities + members
+
 // define the schema for our project model
 var groupSchema = mongoose.Schema({
 

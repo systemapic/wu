@@ -67,6 +67,7 @@ var api = {
 	// global config
 	config : config,
 
+
 	// process wildcard paths, including hotlinks
 	wildcard : function (req, res) {
 
@@ -101,7 +102,10 @@ var api = {
 	},
 
 	signup : function (req, res) {
-		return api.login(req, res); // debug
+		
+		// debug
+		// return api.login(req, res); 
+
 		res.render('../../views/signup.ejs', { message: req.flash('signupMessage') });
 	},
 
@@ -164,66 +168,60 @@ var api = {
 		console.log('* User uuid: ' + req.user.uuid);
 		console.log('* IP: ' + req._remoteAddress);
 		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'.yellow);
+		console.time('getPortal');
 
 		
-		var json 	= {};
-		var clients 	= [{}];
-		var sources 	= [{}];
-		var app 	= {};
-		var hotlink 	= req.session.hotlink;
-		var user        = req.user;
+		var account = req.user,
+		    a = {};
 
-		// var for passing in async series
-		var model = {};
-
-		// build async query
-		var a = {};
 
 		// get projects
 		a.projects = function (callback) { 
-			api.project.getAll(callback, user);
+			api.project.getAll({
+				user : account
+			}, callback);
 		}
 
 		// get clients
 		a.clients = function (callback) {
-			api.client.getAll(callback, user);
+			api.client.getAll({
+				user : account
+			}, callback);
 		}
 
 		// get users
 		a.users = function (callback) {
-			api.user.getAll(callback, user);
+			api.user.getAll({
+				user : account
+			}, callback);
 		}
 
-		async.series(a, function (err, result) {
+		// portal access
+		a.access = function (callback) {
+			api.access.getAll({
+				user : account
+			}, callback);
+		}
 
-			// add user
-			result.account 	= user;
+		// series
+		async.series(a, function (err, result) {
+			if (err) console.log('getPortal err: ', err);
+			if (err) console.log('and res: ', result);
+
+			// add user account
+			result.account = account;
 
 			// return result gzipped
 			res.writeHead(200, {'Content-Type': 'application/json', 'Content-Encoding': 'gzip'});
 			zlib.gzip(JSON.stringify(result), function (err, zipped) {
 				res.end(zipped);
 			});
+
+			console.log('---------------- err, result', err, result);
+			console.timeEnd('getPortal');
 		});
 
-
 	},
-
-
-	// _errorUnauthorized : function (req, res) {
-	// 	var message = 'Unauthorized access attempt. Your IP ' + req._remoteAddress + ' has been logged.';
-	// 	res.end(JSON.stringify({ error : message }));
-	// },
-
-
-
-	// _debugCreateRole : function (req, res) {
-
-	// 	// create role
-	// 	api.permission._debugCreateRole(req, res);
-
-	// },
-
 
 
 
@@ -392,7 +390,7 @@ var api = {
 						if (role == 'reader') {
 
 							// check if user is allowed to delegate read access to project
-							if (api.permission.to.delegate.reader(user, project)) {
+							if (api.access.to.delegate.reader(user, project)) {
 
 								subject.role.reader.projects.addToSet(project.uuid);
 								subject.role.reader.clients.addToSet(project.client); // make sure can read client
@@ -417,7 +415,7 @@ var api = {
 						if (role == 'editor') {
 
 							// check if user is allowed to delegate read access to project
-							if (permission.to.delegate.editor(user, project)) {
+							if (api.access.to.delegate.editor(user, project)) {
 
 								subject.role.editor.projects.addToSet(project.uuid);
 								subject.role.reader.clients.addToSet(project.client); // make sure can read client
@@ -440,7 +438,7 @@ var api = {
 						if (role == 'manager') {
 
 							// check if user is allowed to delegate read access to project
-							if (api.permission.to.delegate.manager(user, project)) {
+							if (api.access.to.delegate.manager(user, project)) {
 
 								subject.role.manager.projects.addToSet(project.uuid);
 								subject.role.reader.clients.addToSet(project.client); // make sure can read client
@@ -472,7 +470,7 @@ var api = {
 						if (role == 'reader') {
 
 							// check if user is allowed to delegate read access to project
-							if (api.permission.to.delegate.reader(user, project)) {
+							if (api.access.to.delegate.reader(user, project)) {
 
 
 								// revoke project
@@ -498,7 +496,7 @@ var api = {
 						if (role == 'editor') {
 
 							// check if user is allowed to delegate read access to project
-							if (api.permission.to.delegate.editor(user, project)) {
+							if (api.access.to.delegate.editor(user, project)) {
 
 								subject.role.editor.projects.pull(project.uuid);
 								subject.markModified('role');
@@ -521,7 +519,7 @@ var api = {
 						if (role == 'manager') {
 
 							// check if user is allowed to delegate read access to project
-							if (api.permission.to.delegate.manager(user, project)) {
+							if (api.access.to.delegate.manager(user, project)) {
 
 								subject.role.manager.projects.pull(project.uuid);
 								subject.markModified('role');
@@ -607,8 +605,9 @@ module.exports.debug = require('./api.debug');
 module.exports.upload = require('./api.upload');
 module.exports.legend = require('./api.legend');
 module.exports.pixels = require('./api.pixels');
+module.exports.access = require('./api.access');
 module.exports.client = require('./api.client');
 module.exports.project = require('./api.project');
 module.exports.provider = require('./api.provider');
-module.exports.permission = require('./api.permission');
+// module.exports.access = require('./api.access');
 

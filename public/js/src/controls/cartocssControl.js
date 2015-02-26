@@ -345,10 +345,6 @@ L.Control.CartoCSS = L.Control.extend({
 
 	_selectLayer : function (layer) {
 
-		// Google Analytics event tracking
-		var _layerTitle = layer.store.title;
-		app.Analytics.ga(['Controls', 'CartoCSS select layer: ' + _layerTitle]);
-
 		// close dropdown
 		this.closeLayerDropDown();
 		
@@ -360,6 +356,9 @@ L.Control.CartoCSS = L.Control.extend({
 		// select in list
 		this.setSelected(layer);
 		
+		// Google Analytics event tracking
+		if (layer) app.Analytics.ga(['Controls', 'CartoCSS select layer: ' + layer.getTitle()]);
+
 	},
 
 	
@@ -382,9 +381,8 @@ L.Control.CartoCSS = L.Control.extend({
 		// Google Analytics event tracking
 		app.Analytics.ga(['Controls', 'CartoCSS toggle legends']);
 
-
-
 	},
+	
 
 	toggleStyles : function () {
 

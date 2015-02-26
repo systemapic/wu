@@ -1,13 +1,13 @@
 // Subelements under Clients/Client
 Wu.SidePane.Project = Wu.Class.extend({
 
-	initialize : function (project, options) {
+	initialize : function (options) {
 
 		// set options
 		Wu.setOptions(this, options);
 
 		// set project
-		this.project = project;
+		this.project = options.project;
 
 		// set edit mode
 		this.project.setEditMode();
@@ -16,7 +16,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.project.setSidepane(this);
 
 		// set parent
-		this._parent = this.options.parent; // client div container
+		this._parent = this.options.caller; // client div container
 
 		// init layout
 		this.initLayout(); 
@@ -67,7 +67,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.usersInnerWrapper);
 
 		// add delete button
-		var canDelete = app.Account.canDeleteProject(this.project.store.uuid);
+		// var canDelete = app.Account.canDeleteProject(this.project.store.uuid);
+		var canDelete = app.access.to.delete_project(this.project);
 
 		if (canDelete || this.options.editMode) {
 			this.makeThumb = Wu.DomUtil.create('div', 'new-project-thumb', this.usersInnerWrapper, 'Generate thumbnail');
@@ -196,7 +197,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.addLogoDZ();
 
 		// add kill hook
-		if (app.Account.canDeleteProject(this.project.getUuid())) {
+		// if (app.Account.canDeleteProject(this.project.getUuid())) {
+		if (app.access.to.delete_project(this.project.getUuid())) {
 			Wu.DomEvent.on(this.kill, 'click', this.deleteProject, this);
 
 			Wu.DomEvent.on( this.makeThumb, 'click', this.makeNewThumbnail, this );
@@ -214,7 +216,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.removeLogoDZ();
 
 		// remove kill hook
-		if (app.Account.canDeleteProject(this.project.getUuid())) {
+		// if (app.Account.canDeleteProject(this.project.getUuid())) {
+		if (app.access.to.delete_project(this.project.getUuid())) {
 			Wu.DomEvent.off(this.kill, 'click', this.deleteProject, this);
 
 			Wu.DomEvent.off( this.makeThumb, 'click', this.makeNewThumbnail, this );
