@@ -15,7 +15,7 @@ dist/js/js.portal.min.js
 dist/js/login.min.js
 public/css/login.css
 public/css/style.min.css
-public/js/lib/zenpen 
+public/js/lib/zenpen/*
 public/js/src/leaflet.js/plugins/leaflet-search
 dist/css/mobilestyle-login.css
 dist/css/mobilestyle.css
