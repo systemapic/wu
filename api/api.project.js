@@ -121,6 +121,7 @@ module.exports = api.project = {
 		project.description 	= store.description;
 		project.keywords 	= store.keywords;
 		project.client 		= store.client;
+		project.position 	= store.position;
 
 		// add roles
 		roles.forEach(function (role) {

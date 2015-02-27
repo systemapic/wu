@@ -51,7 +51,7 @@ L.Control.Layermenu = L.Control.extend({
 
 		// Create the 'uncollapse' button ... will put in DOM l8r
 		this._openLayers = Wu.DomUtil.createId('div', 'open-layers');
-		this._openLayers.innerHTML = 'Open Layer Menu';
+		this._openLayers.innerHTML = 'Layers';
 		Wu.DomUtil.addClass(this._openLayers, 'leaflet-control ol-collapsed');
 
 		// Append to DOM
