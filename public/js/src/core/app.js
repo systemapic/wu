@@ -192,7 +192,7 @@ Wu.App = Wu.Class.extend({
 	_initDependencies : function () {
 
 		// icanhaz templates
-		ich.grabTemplates()
+		// ich.grabTemplates()
 
 	},
 
