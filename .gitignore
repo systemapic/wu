@@ -12,6 +12,7 @@ dist/css/css.dependencies.min.css
 dist/css/css.portal.min.css
 dist/css/login.min.css
 dist/js/js.portal.min.js
+dist/js/js.dependencies.min.js
 dist/js/login.min.js
 public/css/login.css
 public/css/style.min.css
