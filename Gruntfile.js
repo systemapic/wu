@@ -93,7 +93,36 @@ module.exports = function(grunt) {
 			cssLogin : {
 				src : 'dist/tmp/css.login.combined.css',
 				dest : 'dist/css/login.min.css'
-			}			
+			},
+
+			phantomJSthumb : {
+				 
+					src : 'public/css/phantomJSthumb.css',
+					dest : 'dist/css/phantomJSthumb.css'
+			},
+
+			phantomJS : {
+				 
+					src : 'public/css/phantomJS.css',
+					dest : 'dist/css/phantomJS.css'
+			},
+
+			mobilestyle : {
+				 
+					src : 'public/css/mobilestyle.css',
+					dest : 'dist/css/mobilestyle.css'
+			},
+
+			mobilestyleLogin : {
+				 
+					src : 'public/css/mobilestyle-login.css',
+					dest : 'dist/css/mobilestyle-login.css'
+			},
+			padstyle : {
+				 
+					src : 'public/css/padstyle.css',
+					dest : 'dist/css/padstyle.css'
+			},	
 		},
 
 
@@ -465,6 +494,11 @@ module.exports = function(grunt) {
 			'concat:cssDepAddToMinified',
 			'concat:cssPortal',
 			'cssmin:cssPortal',
+			'cssmin:phantomJSthumb',
+			'cssmin:phantomJS',
+			'cssmin:mobilestyle',
+			'cssmin:mobilestyleLogin',
+			'cssmin:padstyle',
 			'concat:jsDependencies',
 			'uglify:jsDependencies',
 			'concat:jsPortal',
