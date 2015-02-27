@@ -309,10 +309,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// update project store
 		project.setNewStore(store);
 
-		// add to access locally
-		// project.addAccess();
-
-
 		// create project in sidepane
 		this._createNewProject(project);
 		
