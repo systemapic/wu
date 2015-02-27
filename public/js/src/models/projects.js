@@ -596,7 +596,6 @@ Wu.Project = Wu.Class.extend({
 			lng  : this.store.position.lng,
 			zoom : this.store.position.zoom
 		};
-		console.log('position: ', position);
 		return position;
 	},
 
