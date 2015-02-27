@@ -601,6 +601,7 @@ module.exports.user = require('./api.user');
 module.exports.layer = require('./api.layer');
 module.exports.email = require('./api.email');
 module.exports.error = require('./api.error');
+module.exports.slack = require('./api.slack');
 module.exports.debug = require('./api.debug');
 module.exports.upload = require('./api.upload');
 module.exports.legend = require('./api.legend');
