@@ -7,11 +7,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-sass'); 		// Non Ruby C++ sass 
 	grunt.loadNpmTasks('grunt-contrib-concat');    	// Slå sammen JS filer 
 	grunt.loadNpmTasks('grunt-contrib-uglify');	// JS minifyer 
-
 	grunt.loadNpmTasks('grunt-preprocess');		// Preprocess conditional HTML tags
 	grunt.loadNpmTasks('grunt-env');		// Set environment for conditional HTML 
 	grunt.loadNpmTasks('grunt-contrib-htmlmin');	// HTML minifyer
-
 	grunt.loadNpmTasks('grunt-contrib-jshint');	// Checks JS
 					
 	grunt.initConfig(    {  
@@ -146,7 +144,6 @@ module.exports = function(grunt) {
 					// dependencies 
 					'public/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js',
 					'public/js/lib/lodash/lodash.min.js',
-					'public/js/lib/parallel.js/parallel.js',
 					'public/js/lib/async/async.js',
 					
 					// leaflet + mapbox
@@ -158,12 +155,9 @@ module.exports = function(grunt) {
 					'public/js/src/leaflet.js/plugins/leaflet.utfgrid.js',
 
 					// tools
-					'public/js/lib/d3.js/topojson.v1.min.js',
 					'public/js/lib/dropzone.js/dropzone.min.js',
-					'public/js/lib/icanhaz/icanhaz.min.js',
 					'public/js/lib/list.js/list.min.js',
 					'public/js/lib/sortable.js/Sortable.js',
-					'public/js/lib/powerange/powerange.min.js',
 
 					// grande
 					'public/js/src/grande.js/js/grande.class.js',
@@ -269,7 +263,6 @@ module.exports = function(grunt) {
 			cssDependencies : {  
 				
 				src : [  
-
 
 					'public/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.css',
 					'public/js/src/grande.js/css/menu.css',                    
