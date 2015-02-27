@@ -1,5 +1,4 @@
-// API: api.upload.js
-
+//API: api.upload.js
 // database schemas
 var Project 	= require('../models/project');
 var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
@@ -179,8 +178,8 @@ module.exports = api.upload = {
 			keepExtensions : true,
 		});
 		form.parse(req, function(err, fields, files) {	
-			// console.log('formidale: ', util.inspect({fields: fields, files: files}));
-			// console.log('files! => ', files);
+			console.log('formidale: ', util.inspect({fields: fields, files: files}));
+			console.log('files! => ', files);
  			
 			// one file =>
 			// 'file[]': { 
@@ -235,11 +234,6 @@ module.exports = api.upload = {
 			var ops = [];
 
 			ops.push(function (callback) {
-
-				// console.log('_________________ api: ', api);
-				// console.log('__________________api upload: ', api.upload);
-				// console.log('__________ api.exports', api.exports);
-				// console.log('------ api.exports.upload', api.exports.upload);
 
 				// quick sort
 				api.upload.sortFormFiles(fileArray, function (err, results) {	
@@ -498,7 +492,7 @@ module.exports = api.upload = {
 
 
 				// handle zip (within zip)
-				if (options.type == 'application/zip') {
+				if (options.type == 'application/zip' || options.type == 'application/x-zip-compressed') {
 
 					ops1.push(function (callback) {
 
@@ -782,7 +776,7 @@ module.exports = api.upload = {
 
 		
 		// handle zip
-		if (options.type == 'application/zip') {
+		if (options.type == 'application/zip' || options.type == 'application/x-zip-compressed') {
 
 			ops.push(function (callback) {
 
