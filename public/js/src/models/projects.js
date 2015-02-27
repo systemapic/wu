@@ -322,17 +322,19 @@ Wu.Project = Wu.Class.extend({
 		app.setSaveStatus();
 	},
 
-	_saveNew : function (callback) {
-	     
+	_saveNew : function (opts) {
+	     	var callback = opts.callback;
+
 		var options = {
 			name 		: this.store.name,
 			description 	: this.store.description,
 			keywords 	: this.store.keywords, 
+			position 	: this.store.position,
 			client 		: this._client.uuid 			// parent client uuid 
 		}
 		var json = JSON.stringify(options);
 		
- 		Wu.Util.postcb('/api/project/new', json, callback.callback.bind(callback.context), this);
+ 		Wu.Util.postcb('/api/project/new', json, callback.bind(opts.context), this);
 
 	},
 
@@ -594,6 +596,7 @@ Wu.Project = Wu.Class.extend({
 			lng  : this.store.position.lng,
 			zoom : this.store.position.zoom
 		};
+		console.log('position: ', position);
 		return position;
 	},
 
