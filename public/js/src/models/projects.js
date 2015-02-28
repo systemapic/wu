@@ -132,8 +132,6 @@ Wu.Project = Wu.Class.extend({
 
 	_createdLayerFromGeoJSON : function (context, data) {
 
-		console.log('created!', data);
-
 		// parse layer data
 		var parsed = JSON.parse(data);
 		
@@ -155,9 +153,7 @@ Wu.Project = Wu.Class.extend({
 	setEditMode : function () {
 		// set editMode
 		this.editMode = false;
-		console.log('checking edit mode:');
 		this.editMode = app.access.to.edit_project(this);
-		console.log('editMode:==-=>', this.editMode);
 	},
 
 	refresh : function () {
@@ -182,11 +178,6 @@ Wu.Project = Wu.Class.extend({
 			app._map._controlCorners.topleft.style.display = 'none';
 		}
 
-		// Make sure no controls appear when changing projects on mobile (get's turned on again in sidepane.js > close() )
-		// if ( Wu.app.mobile && app.StatusPane.isOpen ) {
-		// 	app._map._controlContainer.style.opacity = 0;
-		// }
-		
 	},
 
 	addNewLayer : function (layer) {

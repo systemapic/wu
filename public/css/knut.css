@@ -278,8 +278,12 @@ body {
 
 
 
-
-
+/*manage access info box*/
+.manage-access-info {
+	left: 451px;
+	position: absolute;
+	top: 54px;
+}
 
 
 

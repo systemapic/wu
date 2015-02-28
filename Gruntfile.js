@@ -250,6 +250,7 @@ module.exports = function(grunt) {
 
 					// Config file
 					'public/js/src/config/config.js',
+					'public/js/src/config/language.english.js',
 
 					// App 
 					'public/js/src/core/app.js'
