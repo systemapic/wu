@@ -406,6 +406,13 @@ module.exports = function(app, passport) {
 		api.access.setPortalRoleMember(req, res);
 	});
 
+	// =====================================
+	// access: SET NO ROLE  ================
+	// =====================================
+	app.post('/api/access/setnorole', isLoggedIn, function (req,res) {
+		api.access.setNoRole(req, res);
+	});
+
 
 	// =====================================
 	// RESET PASSWORD ======================

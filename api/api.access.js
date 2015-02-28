@@ -347,7 +347,49 @@ module.exports = api.access = {
 				delegate_to_user 	: false,
 				have_superpowers 	: false, 
 			},
+		},
+
+		// can read
+		noRole : {
+			name : 'No Role',
+			capabilities : {
+				read_project 		: false, 	
+				download_file 		: false, 	
+				share_project 		: false, 	
+
+				create_client 		: false,	
+				read_client 		: false, 		
+				edit_client 		: false, 		
+				edit_other_client 	: false, 	
+				delete_client 		: false, 	
+				delete_other_client 	: false,  
+				create_project 		: false, 	
+				edit_project 		: false, 	
+				edit_other_project 	: false, 	
+				delete_project 		: false, 	
+				delete_other_project 	: false,
+				upload_file 		: false, 	
+				edit_file 		: false, 	
+				edit_other_file 	: false, 	
+				create_version 		: false, 	
+				delete_version 		: false, 	
+				delete_other_version 	: false,
+				delete_file 		: false, 	
+				delete_other_file 	: false, 	
+				create_user 		: false, 	
+				read_user 		: false,
+				read_other_user		: false,
+				edit_user 		: false, 		
+				edit_other_user 	: false, 	
+				delete_user 		: false, 	
+				delete_other_user 	: false, 	
+				read_analytics 		: false, 	
+				manage_analytics	: false, 	
+				delegate_to_user 	: false,
+				have_superpowers 	: false, 
+			},
 		}
+
 
 	},
 
@@ -380,8 +422,10 @@ module.exports = api.access = {
 
 			Role
 			.findOne({uuid : superRoleUuid})
-			.exec(callback);
-
+			.exec(function (err, superRole) {
+				var isMember = superRole.isMember(account);
+				isMember ? callback(err, superRole) : callback(err, false);
+			});
 		}
 
 		ops.portal = function (callback) {
@@ -389,8 +433,10 @@ module.exports = api.access = {
 
 			Role
 			.findOne({uuid : portalRoleUuid})
-			.exec(callback);
-
+			.exec(function (err, portalRole) {
+				var isMember = portalRole.isMember(account);
+				isMember ? callback(err, portalRole) : callback(err, false);
+			});
 		}
 
 
@@ -399,7 +445,6 @@ module.exports = api.access = {
 			var role = _.find(roles, function (role) {
 				return _.contains(role.members, account.getUuid());
 			});
-
 			callback(null, role);
 		}
 		
@@ -407,8 +452,8 @@ module.exports = api.access = {
 			if (roles.super) return done(null, roles.super);
 			if (roles.portal) return done(null, roles.portal);
 			if (roles.project) return done(null, roles.project);
+			done(null, false);
 		});
-
 	},
 
 
@@ -445,6 +490,7 @@ module.exports = api.access = {
 		var project = options.project,
 		    account = options.account,
 		    role = options.role,
+		    currentRole = options.currentRole,
 		    ops = [];
 
 
@@ -458,20 +504,40 @@ module.exports = api.access = {
 			}, callback);
 		});
 
-		// check if user's role has all capabilities necessary (ie. all in delegating role)
+		// check if accounts's role has all capabilities necessary (ie. all in delegating role + in currentRole)
 		ops.push(function (accountRole, callback) {
-			var lacking;
+			if (!accountRole) return callback('No access.');
+
+			var lacking1,
+			    lacking2,
+			    p1,
+			    p2;
+
+			// check new role
 			_.each(role.capabilities, function (cap, key) {
-				if (cap) if (!accountRole.capabilities[key]) lacking = true;
+				if (cap == true) if (!accountRole.capabilities[key]) lacking1 = true;
 			});
-			var hasPermission = !lacking && accountRole.capabilities.delegate_to_user;
-			callback(!hasPermission);
+			p1 = !lacking1 && accountRole.capabilities.delegate_to_user;
+
+			// check old role
+			if (currentRole) {
+				_.each(currentRole.capabilities, function (cap, key) {
+					if (cap == true) if (!accountRole.capabilities[key]) lacking2 = true;
+				});
+				p2 = !lacking2 && accountRole.capabilities.delegate_to_user;
+
+			} else {
+				p2 = true;
+			}
+
+			// return
+			p1 && p2 ? callback(null, accountRole) : callback('No access.');
+			
 		});
 
 		async.waterfall(ops, function (err) {
 			done(err, options);
 		});
-
 	},
 
 	setSuperRoleMember : function (req, res) {
@@ -486,6 +552,7 @@ module.exports = api.access = {
 		var projectUuid = req.body.projectUuid,
 		    userUuid = req.body.userUuid,
 		    roleUuid = req.body.roleUuid,
+		    currentRoleUuid = req.body.currentRoleUuid,
 		    account = req.user,
 		    ops = [];
 
@@ -502,15 +569,28 @@ module.exports = api.access = {
 			}, callback);
 		});
 
-		// get project
+		// get currentRole 
 		ops.push(function (role, callback) {
+			api.access.getRole({
+				roleUuid : currentRoleUuid
+			}, function (err, currentRole) {
+				callback(err, {
+					role : role, 
+					currentRole : currentRole
+				});
+			});
+		});
+
+		// get project
+		ops.push(function (roles, callback) {
 			Project
 			.findOne({uuid : projectUuid})
 			.populate('roles')
 			.exec(function (err, project) {
 				var options = {
 					project : project,
-					role : role
+					role : roles.role,
+					currentRole : roles.currentRole
 				}
 				callback(err, options);
 			});
@@ -519,12 +599,14 @@ module.exports = api.access = {
 		// check if permission to add member to role
 		ops.push(function (options, callback) {
 			var project = options.project,
-			    role = options.role;
+			    role = options.role,
+			    currentRole = options.currentRole;
 
 			api.access.permissionToAddRole({
 				role : role,
 				project : project,
-				account : account
+				account : account,
+				currentRole : currentRole
 			}, callback);
 		});
 
@@ -545,6 +627,7 @@ module.exports = api.access = {
 			var role = options.role,
 			    project = options.project;
 
+			console.log('addToRole'.yellow, options);
 			api.access.addToRole({
 				role : role,
 				userUuid : userUuid,
@@ -563,10 +646,8 @@ module.exports = api.access = {
 		// return updated project
 		async.waterfall(ops, function (err, project) {
 			if (err) return api.error.general(req, res, err);
-			
 			res.end(JSON.stringify(project));
 		});
-
 	},
 
 	addToRole : function (options, callback) {
@@ -591,36 +672,43 @@ module.exports = api.access = {
 		}, function (err) {
 			done(err, options);
 		});
-		
 	},
 
 
-	// filter : {
+	setNoRole : function (req, res) {
+		var opts = req.body,
+		    projectUuid = opts.projectUuid,
+		    userUuid = opts.userUuid;
 
-	// 	// get roles which role can delegate to
-	// 	roles : function (options) {
-	// 		var role = options.role,
-	// 		    noAdmins = options.noAdmins,
-	// 		    project = options.project,
-	// 		    available = [];
+		// get project
+		ops.push(function (role, callback) {
+			Project
+			.findOne({uuid : projectUuid})
+			.populate('roles')
+			.exec(callback);
+		});
 
-	// 		// iterate each project role
-	// 		_.each(project.getRoles(), function (template) {
-	// 			var lacking = false;
-				
-	// 			_.each(template.capabilities, function (cap, key) {
-	// 				if (cap) if (!role.capabilities[key]) lacking = true;
-	// 			});
+		// check if permission to add member to role
+		ops.push(function (project, callback) {
+			api.access.permissionToAddRole({
+				project : project,
+				account : account
+			}, callback);
+		});
 
-	// 			// if not lacking any cap, add to available
-	// 			if (!lacking) available.push(template);
-	// 		});
+		// remove user from all project roles
+		ops.push(function (options, callback) {	
+			var role = options.role,
+			    project = options.project;
 
-	// 		return available;
-	// 	},
-	// },
-
-
+			api.access.removeFromProjectRoles({
+				project : project,
+				userUuid : userUuid,
+				role : role
+			}, callback);
+		});
+	},
+	
 
 	requestPasswordReset : function (req, res) {
 
@@ -702,7 +790,6 @@ module.exports = api.access = {
 	},
 
 
-
 	_createRole : function (options, callback) {
 
 		// create model
@@ -722,10 +809,12 @@ module.exports = api.access = {
 
 	},
 
+
 	// create default roles for new project
 	_createDefaultRoles : function (options, done) {
 		var user = options.user,
 		    ops = [];
+
 
 		ops.push(function (callback) {
 			api.access._createRole({
@@ -760,6 +849,13 @@ module.exports = api.access = {
 			api.access._createRole({
 				name : 'Project Reader',
 				template : 'projectReader',
+			}, callback);
+		});
+
+		ops.push(function (callback) {
+			api.access._createRole({
+				name : 'No role',
+				template : 'noRole',
 			}, callback);
 		});
 
@@ -798,12 +894,8 @@ module.exports = api.access = {
 			    additionalCapabilities = options.capabilities;
 
 			// get capabilities from template
-			if (template == 'superAdmin') capabilities = api.access.roleTemplates.superAdmin.capabilities;
-			if (template == 'portalAdmin') capabilities = api.access.roleTemplates.portalAdmin.capabilities;
-			if (template == 'projectOwner') capabilities = api.access.roleTemplates.projectOwner.capabilities;
-			if (template == 'projectEditor') capabilities = api.access.roleTemplates.projectEditor.capabilities;
-			if (template == 'projectReader') capabilities = api.access.roleTemplates.projectReader.capabilities;
-			if (template == 'projectManager') capabilities = api.access.roleTemplates.projectManager.capabilities;
+			var role = api.access.roleTemplates[template];
+			if (role) capabilities = role.capabilities;
 				
 			// add extra capabilities
 			if (additionalCapabilities) _.each(additionalCapabilities, function (value, key) {
@@ -812,10 +904,7 @@ module.exports = api.access = {
 
 			// return capabilities as {}
 			return capabilities;
-
 		},
-
-
 	},
 
 	
@@ -857,7 +946,6 @@ module.exports = api.access = {
 		},
 
 		superAdmin : function (options, callback) {
-
 			var user = options.user,
 			    roleUuid = api.config.portal.roles.superAdmin;
 
@@ -906,8 +994,6 @@ module.exports = api.access = {
 			    project = options.project,
 			    roles = project.roles,
 			    access = false;
-
-			console.log('has.project_cap roles:', roles);
 			
 			if (roles) roles.forEach(function (role) {
 				// if user in role
@@ -939,9 +1025,7 @@ module.exports = api.access = {
 			var hasCapability = role.capabilities[capability];
 
 			done(null, hasCapability);
-
 		}
-
 	},
 
 	// CRUD capabilities
@@ -957,7 +1041,6 @@ module.exports = api.access = {
 
 		// TODO!! : pass to _other_ if !createdBy self
 
-		// TODO: remove super/portal altogether, simply check those roles for account... 
 
 		// still to go thru 1st round:
 		// 	download_file -> move to POST
@@ -975,13 +1058,13 @@ module.exports = api.access = {
 			    ops = {};
 
 			ops.admin = function (callback) {
-
 				// if is admin
 				api.access.is.admin(options, callback);
 			};
 
-			ops.capable = function (callback) {
 
+
+			ops.capable = function (callback) {
 				// if has capability
 				api.access.has.capability({
 					user : user,
@@ -994,15 +1077,10 @@ module.exports = api.access = {
 				if (!err && is.admin || is.capable) return done(null, options);
 				done('No access.');
 			});
-
 		},
 
 
-
-
-
 		create_client : function (options, callback) {  			// todo: client roles
-			console.log('to.create_client', options);
 			api.access.is.admin(options, function (err, isAdmin) {
 				if (err || !isAdmin) return callback('No access.');
 				callback(null, options);
@@ -1076,8 +1154,6 @@ module.exports = api.access = {
 		},
 		
 		download_file : function (options, done) { 
-			console.log('api.access.to.download_file', options);
-			
 			// some files not attached to projects, like temp-files (pdfs, etc)
 			// so, if created by self, it's ok..
 			if (api.access.is.createdBy(options.file, options.user)) return done(null, options);
@@ -1093,14 +1169,11 @@ module.exports = api.access = {
 
 			ops.push(function (project, callback) {
 				if (!project) return callback('No access.');
-
 				options.project = project;
-				
 				api.access.to._check(options, 'download_file', callback);
 			});
 
 			async.waterfall(ops, done);
-
 		},
 		
 		create_version : function (options, done) { 
@@ -1115,7 +1188,6 @@ module.exports = api.access = {
 			api.access.to._check(options, 'delete_other_version', done);
 		},
 
-		
 		edit_file : function (options, done) {
 			api.access.to._check(options, 'edit_file', done); 			// todo: if not createdBy self, pass to _other_
 		},
@@ -1152,7 +1224,6 @@ module.exports = api.access = {
 			    subject = options.subject,
 			    project = options.project,
 			    ops = {};
-
 
 			ops.super = function (callback) {
 				api.access.is.superAdmin(options, callback);
@@ -1203,7 +1274,6 @@ module.exports = api.access = {
 			    subject = options.subject,
 			    project = options.project,
 			    ops = {};
-
 
 			ops.super = function (callback) {
 				api.access.is.superAdmin(options, callback);
@@ -1259,13 +1329,4 @@ module.exports = api.access = {
 	superadmin : function (user) {
 		return (api.access.superusers.indexOf(user.uuid) >= 0)
 	}
-
 }
-
-
-
-// // convenience method for checking hardcoded super user
-// function superadmin(user) {
-// 	if (api.access.superusers.indexOf(user.uuid) >= 0) return true;
-// 	return false;
-// }

@@ -149,8 +149,6 @@ Wu.SidePane = Wu.Class.extend({
 		var panes = this._getPaneArray();
 		var defaultPanes = app.access.to.edit_user(project) ? 3 : 2;
 
-		console.log('defaultPanes: ', defaultPanes);
-
 		if (panes != 0) {
 			var height = panes.length * bHeight;
 		} else {
