@@ -28,13 +28,9 @@ Wu.Access = Wu.Class.extend({
 		    project = opts.project,
 		    role = opts.role;
 
-		console.log('adding ', user.getName(), ' to role ', role.getName());
-
 		// get user's current role in project
 		var currentRole = app.access.get.role(opts);
 		var currentRoleUuid = currentRole ? currentRole.getUuid() : false;
-
-		console.log('currentRole: ', currentRole);
 
 		var options = {
 			userUuid : user.getUuid(),
@@ -42,8 +38,6 @@ Wu.Access = Wu.Class.extend({
 			roleUuid : role.getUuid(),
 			currentRoleUuid : currentRoleUuid
 		}
-
-		console.log('options', options);
 
 		// send
 		Wu.send('/api/access/setrolemember', options, function (err, json) {
@@ -53,7 +47,6 @@ Wu.Access = Wu.Class.extend({
 			if (err) return callback(err);
 
 			var result = JSON.parse(json);
-			console.log('result', result);
 
 			// return on no access
 			if (result.error) {
@@ -123,10 +116,6 @@ Wu.Access = Wu.Class.extend({
 				project : project
 			});
 
-			console.log('.get.availableRoles');
-			console.log('role: ', role);
-
-
 			// if doesn't have delegate_to_user, can't delegate any roles
 			if (!role.getCapabilities().delegate_to_user) return [];
 
@@ -136,8 +125,6 @@ Wu.Access = Wu.Class.extend({
 				project : project,
 				noAdmins : noAdmins
 			});
-
-			console.log('filtered roles: ', roles);
 
 			return roles;
 
@@ -158,8 +145,6 @@ Wu.Access = Wu.Class.extend({
 
 		roles : function (options) {
 			// get roles which options.role can delegate to
-			console.log('filter roles: ::::: ', options);
-
 			var role = options.role,
 			    noAdmins = options.noAdmins,
 			    project = options.project,
@@ -170,10 +155,8 @@ Wu.Access = Wu.Class.extend({
 			// iterate each project role
 			_.each(project.getRoles(), function (projectRole) {
 				var lacking = false;
-
 				var caps = projectRole.getCapabilities();
 				if (!caps) lacking = true;
-
 				_.each(projectRole.getCapabilities(), function (cap, key) {
 					if (cap) {
 						if (!role.getCapabilities()[key]) lacking = true;
@@ -183,7 +166,6 @@ Wu.Access = Wu.Class.extend({
 				// if not lacking any cap, add to available
 				if (!lacking) available.push(projectRole);
 			});
-
 			return available;
 		},
 	},
