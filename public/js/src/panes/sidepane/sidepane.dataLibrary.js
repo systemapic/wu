@@ -15,8 +15,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._controlInner = Wu.DomUtil.create('div', 'datalibrary-controls-inner', this._controlContainer);
 
 		// Upload button
-		this._uploadContainer = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload');
-		this._uploadContainer.id = 'upload-container';
+		this._uploader = Wu.DomUtil.create('div', 'smap-button-gray diplayNone', this._controlInner, 'Upload');
 
 		// Search field
 		this._search = Wu.DomUtil.create('input', 'search', this._controlInner);
@@ -25,12 +24,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._search.setAttribute('placeholder', 'Search files');
 
 		// Delete button
-		this._delete = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Delete');
-		this._delete.id = 'datalibrary-delete-file';
+		this._deleter = Wu.DomUtil.create('div', 'smap-button-gray diplayNone', this._controlInner, 'Delete');
 
 		// Download button
-		this._download = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Download');
-		this._download.id = 'datalibrary-download-files';
+		this._downloader = Wu.DomUtil.create('div', 'smap-button-gray diplayNone', this._controlInner, 'Download');
 
 		// error feedback
 		this._errors = Wu.DomUtil.createId('div', 'datalibrary-errors', this._controlInner);
@@ -44,9 +41,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// create progress bar
 		this.progress = Wu.DomUtil.create('div', 'progress-bar', this._content);
 		
-		// insert template
-		// this._container.innerHTML = ich.datalibraryContainer();
-
 		// #datalibrary-container
 		this._dataLibraryContainer = Wu.DomUtil.create('div', 'datalibrary-container', this._container);
 	
@@ -60,18 +54,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// filecount
 		this.filecount = 0;
 
-		
 
-		// get elements
-		this._errors 		= Wu.DomUtil.get('datalibrary-errors');
-		this._uploader 		= Wu.DomUtil.get('upload-container');
-		this._deleter 		= Wu.DomUtil.get('datalibrary-delete-file');
-		this._downloader 	= Wu.DomUtil.get('datalibrary-download-files');
-
-
-		
 		// RENDER EMPTY TABLE
-
 		this._fileList = Wu.DomUtil.createId('div', 'filelist', this._tableContainer);
 		this._tableFrame = Wu.DomUtil.create('table', 'datalibrary-table', this._fileList);
 		this._tableHead = Wu.DomUtil.create('thead', '', this._tableFrame);
@@ -123,9 +107,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// #datalibrary-insertrows
 		this._table = Wu.DomUtil.create('tbody', 'list datalibrary-insertrows', this._tableFrame);
 
-		// END OF EMPTY TABLE
-
-
 		// init table
 		this.initList();
 
@@ -140,11 +121,28 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	},
 
+
 	// hooks added automatically on page load
 	addHooks : function () {
 	       
-		// download button
-		Wu.DomEvent.on(this._download, 'mousedown', this.downloadFiles, this);
+		// delete button
+		if (app.access.to.delete_project(this.project)) {
+			Wu.DomEvent.on(this._deleter, 'mousedown', this.deleteConfirm, this);
+			Wu.DomUtil.removeClass(this._deleter, 'displayNone');
+		}
+
+		// upload button 
+		if (app.access.to.upload_file(this.project)) {
+			Wu.DomUtil.removeClass(this._uploader, 'displayNone');
+			app.Dropzone.enable();
+		}
+
+		// download 
+		if (app.access.to.download_file(this.project)) {
+			// download button
+			Wu.DomEvent.on(this._downloader, 'mousedown', this.downloadFiles, this);
+			Wu.DomUtil.removeClass(this._downloader, 'displayNone');
+		}
 
 		// check all button
 		Wu.DomEvent.on(this._checkallLabel, 'mousedown', this.checkAll, this);
@@ -154,21 +152,28 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	       
 	},
 
-
-	addEditHooks : function () {
-
-		// delete button
-		Wu.DomEvent.on(this._deleter, 'mousedown', this.deleteConfirm, this);
-		Wu.DomUtil.removeClass(this._deleter, 'displayNone');
-	},
-
-	removeEditHooks : function () {
-
+	// hooks added automatically on page load
+	removeHooks : function () {
+	       
 		// delete button
 		Wu.DomEvent.off(this._deleter, 'mousedown', this.deleteConfirm, this);
 		Wu.DomUtil.addClass(this._deleter, 'displayNone');
-	},
 
+		// upload button 
+		Wu.DomUtil.addClass(this._uploader, 'displayNone');
+		app.Dropzone.disable();
+
+		// download 
+		Wu.DomEvent.off(this._downloader, 'mousedown', this.downloadFiles, this);
+		Wu.DomUtil.addClass(this._downloader, 'displayNone');
+
+		// check all button
+		Wu.DomEvent.off(this._checkallLabel, 'mousedown', this.checkAll, this);
+
+		// search button
+		Wu.DomEvent.off(this._search, 'keyup', this.searchList, this);
+	       
+	},
 
 	searchList : function (e) {
 		if (e.keyCode == 27) { // esc
@@ -186,13 +191,22 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._search.value = '';
 	},
 
-
 	_activate : function () {
-		if (this.dz) this.dz.enable();
-	
+
+		// add hooks
+		this.addHooks();
+
 		// hide other controls
 		this._hideControls();
+	},
+	
+	_deactivate : function () {
+		
+		// remove hooks
+		this.removeHooks();
 
+		// show controls
+		this._showControls();
 	},
 
 	_hideControls : function () {
@@ -230,13 +244,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// description
 		var dc = app.MapPane.descriptionControl;
 		if (dc) dc.show();
-	},
-
-	_deactivate : function () {
-		if (this.dz) this.dz.disable();
-
-		// show controls
-		this._showControls();
 	},
 
 	initDownloadTable : function () {
@@ -314,8 +321,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			'pslug' : this.project.store.slug
 		}
 
-
-		console.log(json);
 		
 		var json = JSON.stringify(json);
 
@@ -325,10 +330,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// create download dialog
 		this.createDownloadDialog();
 
-
 		// Google Analytics event tracking
 		app.Analytics.ga(['Side Pane', 'Data library: download files']);
-
 
 	},
 
@@ -340,7 +343,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		
 		// create download dialog
 		that.updateDownloadDialog(path);
-
 	},
 
 	createDownloadDialog : function () {
@@ -354,7 +356,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// event
 		Wu.DomEvent.on(cancelBtn, 'mousedown', this.removeDownloadDialog, this);
 		Wu.DomEvent.on(downloadBtn, 'mousedown', this._removeDownloadDialog, this);
-
 	},
 
 	updateDownloadDialog : function (path) {
@@ -396,7 +397,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			that.downloadCancel();
 			that.initDownloadTable();
 		}, 1000);
-		
+
 	},
 
 	downloadConfirm : function (e) {
@@ -475,7 +476,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	},
 
-
 	// list.js plugin
 	initList : function () { 
 		
@@ -520,245 +520,23 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		app.Dropzone.initDropzone({
 			uploaded : this.uploaded.bind(this),
 			clickable : this._uploader
-
 		});
-
-
-		// // create dz
-		// this.dz = new Dropzone(this._uploader, {
-		// 		url : '/api/upload',
-		// 		createImageThumbnails : false,
-		// 		autoDiscover : false,
-		// 		uploadMultiple : true,
-		// 		acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.docx,.pdf,.doc,.txt',
-		// 		// acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.json,.topojson,.kml,.docx,.pdf,.doc,.txt',
-		// 		maxFiles : 10,
-		// 		parallelUploads : 10
-		// 		// autoProcessQueue : true
-		// });
-
-		// // add fullscreen dropzone
-		// this.enableFullscreenDZ();                                                                                                                                                                   
-		
+                    
 	},
-
-	// enableFullscreenDZ : function () {
-
-	// 	// add fullscreen bridge to dropzone
-	// 	Wu.DomEvent.on(document, 'dragenter', this.dropping, this);
-	// 	Wu.DomEvent.on(document, 'dragleave', this.undropping, this);
-	// 	Wu.DomEvent.on(document, 'dragover', this.dragover, this);
-	// 	Wu.DomEvent.on(document, 'drop', this.dropped, this);
-
-
-	// },
-
-	// disableFullscreenDZ : function () {
-
-	// 	// remove fullscreen bridge to dropzone
-	// 	Wu.DomEvent.off(document, 'dragenter', this.dropping, this);
-	// 	Wu.DomEvent.off(document, 'dragleave', this.undropping, this);
-	// 	Wu.DomEvent.off(document, 'dragover', this.dragover, this);
-	// 	Wu.DomEvent.off(document, 'drop', this.dropped, this);
-
-	// },
 
 	refreshDZ : function () {
 
-		// refresh dropzone
 		var dropzone = app.Dropzone;
-		dropzone.refresh();
 
-
-
-		// // clean up last dz
-		// this.dz.removeAllListeners();
-
-		// // set project uuid for dropzone
-		// this.dz.options.params.project = this.project.getUuid();	// goes to req.body.project
-
-		// // set dz events
-		// this.dz.on('drop', function (e) { 
-		// });
-
-		// this.dz.on('dragenter', function (e) { 
-		// });
-
-		// this.dz.on('addedfile', function (file) { 
-
-		// 	console.log('addedfile: dataLibrary');
-
-		// 	// show progressbar
-		// 	that.progress.style.opacity = 1;
-
-		// 	// show fullscreen file info
-		// 	if (!that._fulldrop) {
-		// 		that.fullOn(file);
-		// 		that.fullUpOn(file);
-		// 	}
-
-		// 	// set status
-		// 	app.setStatus('Uploading');
-		// });
-
-
-		// this.dz.on('complete', function (file) {
-			
-		// 	// clean up
-		// 	that.dz.removeFile(file);
-
-		// });
-
-		// this.dz.on('uploadprogress', function (file, progress) {
-		// 	// set progress
-		// 	that.progress.style.width = progress + '%';
-		// });                                                                                                                                                                                                               
-
-		// this.dz.on('successmultiple', function (err, json) {
-		// 	// parse and process
-		// 	var obj = Wu.parse(json);
-
-		// 	// set status
-		// 	app.setStatus('Done!', 2000);
-
-		// 	if (obj) { that.uploaded(obj); }
-
-		// 	// clear fullpane
-		// 	that.resetProgressbar();
-		// });
-
-		
-
+		if (app.access.to.upload_file(this.project)) {
+			// refresh dropzone
+			dropzone.refresh();
+		} else {
+			dropzone.disable();
+		}
 	},
 
-	// resetProgressbar : function () {
-	// 	// reset progressbar
-	// 	this.progress.style.opacity = 0;
-	// 	this.progress.style.width = '0%';
-
-	// 	// reset .fullscreen-drop
-	// 	this.fulldropOff();
-	// 	this.fullUpOff();
-	// 	this._fulldrop = false;
-
-	// },
-
-
-	// _createFileMetaContent : function (file) {
-	// 	if (!file) return; 			// todo: file undefined on drag'n drop
-
-	// 	console.log('_createFileMetaContent file:', file);
-
-	// 	var wrapper 	= Wu.DomUtil.create('div', 'drop-meta-wrapper');
-	// 	var name 	= Wu.DomUtil.create('div', 'drop-meta-name', wrapper);
-	// 	var size 	= Wu.DomUtil.create('div', 'drop-meta-size', wrapper);
-	// 	var type 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
-	// 	var ext 	= Wu.DomUtil.create('div', 'drop-meta-type', wrapper);
-
-	// 	name.innerHTML = 'Name: ' + file.name;
-	// 	size.innerHTML = 'Size: ' + Wu.Util.bytesToSize(file.size);
-	// 	type.innerHTML = 'Type: ' + file.type.split('/')[0].camelize();
-	// 	ext.innerHTML  = 'Filetype: ' + file.type.split('/')[1];
-
-	// 	return wrapper;
-	// },
 	
-	// // cxxxx
-	// // fullscreen when started uploading                                            // TODO: refactor fullUpOn etc..
-	// fullUpOn : function (file) {                                                    //       add support for multiple files
-	// 	// transform .fullscreen-drop                                           //       bugtest more thourougly
-	
-	// 	// add file info
-	// 	var meta = this._createFileMetaContent(file);
-	// 	if (meta) this.fulldrop.appendChild(meta);	// append meta
-
-	// 	// show
-	// 	Wu.DomUtil.addClass(this.fulldrop, 'fullscreen-dropped');
-	// },
-
-	// fullUpOff : function () {
-
-	// 	Wu.DomUtil.removeClass(this.fulldrop, 'fullscreen-dropped');
-	// 	this.fulldrop.innerHTML = '';
-	// },
-
-	// // fullscreen for dropping on
-	// fulldropOn : function (e) {
-
-	// 	// turn on fullscreen-drop
-	// 	this.fullOn();
-		
-	// 	// remember drop elem
-	// 	this._fulldrop = e.target.className;
-
-	// },
-	// fulldropOff : function () {
-	// 	// turn off .fullscreen-drop
-	// 	this.fullOff();
-	// },
-
-	// // fullscreen for dropping on
-	// fullOn : function () {
-
-	// 	// turn on fullscreen-drop
-	// 	this.fulldrop.style.opacity = 1;				// wow! full up down on dumb! RE.FACTOR!
-	// 	this.fulldrop.style.zIndex = 1000;
-
-	// 	// Hide the background container (j)
-	// 	this._container.style.display = 'none';
-
-	// 	// Hide toolbar (upload, download, delete, search); (j)
-	// 	Wu.DomUtil.addClass(this._content, 'hide-top', this);
-
-	// },
-
-	// fullOff : function () {
-
-	// 	var that = this;
-	// 	this.fulldrop.style.opacity = 0;
-
-	// 	// Hide the background container (j)
-	// 	this._container.style.display = 'block';
-
-	// 	// Hide toolbar (upload, download, delete, search); (j)
-	// 	Wu.DomUtil.removeClass(this._content, 'hide-top', this);
-
-
-	// 	setTimeout(function () {        // hack for transitions
-	// 		 that.fulldrop.style.zIndex = -10;
-	// 	}, 200);
-	// },
-
-	// dropping : function (e) {
-	// 	e.preventDefault();
-	    
-	// 	// show .fullscreen-drop
-	// 	this.fulldropOn(e);
-	// },
-
-	// undropping : function (e) {
-	// 	e.preventDefault();
-	// 	var t = e.target.className;
-
-	// 	// if leaving elem that started drop
-	// 	if (t == this._fulldrop) this.fulldropOff(e);
-	// },
-
-	// dropped : function (e) {
-	// 	e.preventDefault();
-		
-	// 	// transform .fullscreen-drop
-	// 	this.fullUpOn();
-
-	// 	// fire dropzone
-	// 	this.dz.drop(e);
-	// },
-
-	// dragover : function (e) {
-	// 	// needed for drop fn
-	// 	e.preventDefault();
-	// },
-
 	handleError : function (error) {
 
 		// set error
@@ -844,7 +622,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	
 	},
 
-
 	_createFilePopup : function (files) {
 		var length = files.length;
 		var html = '<div class="dataLibrary-file-popup-wrap">';
@@ -882,7 +659,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	},
 
-
 	// to prevent selected text
 	stop : function (e) {
 		e.preventDefault();
@@ -891,7 +667,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// hacky to close categories on any click
 		this.closeCategories();
 	},
-
 
 	injectCategory : function (e) {
 
@@ -941,10 +716,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// add outside click event
 		Wu.DomEvent.on(window, 'mousedown', this._closeCategories, this);
 
-
 		// Google Analytics event tracking
 		app.Analytics.ga(['Side Pane', 'Data library: inject category']);
-
 
 	},
 
@@ -1063,8 +836,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			// refresh 		// todo: a reset/refresh of table will annul sort
 			this.reset();
 			this.refreshTable();
-
-
 		}
 
 		// on esc
@@ -1116,7 +887,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// update file in project
 		var file = this.project.getFile(this._injectedUuid);
 		file.setKeywords(split);
-
 	},
 
 
@@ -1136,7 +906,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Side Pane', 'Data library: rename ' + e.target.fieldKey]);
-
 	},
 
 
@@ -1173,7 +942,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// save new name to Layer also
 		if (key == 'name') this.updateLayerName(fuuid, value);
-
 	},
 
 	updateLayerName : function (fileUuid, value) {
@@ -1222,16 +990,17 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// refresh table entries
 		this.refreshTable();
 
-		if (this.project.editMode) {
-			this.addEditHooks();
-		} else {
-			this.removeEditHooks();
-		}
+		// refresh 
+		this.refreshHooks();
 
 		// refresh cartoCssControl
 		var cartoCss = app.MapPane.cartoCss;
 		if (cartoCss) cartoCss.update();
+	},
 
+	refreshHooks : function () {
+		this.removeHooks()
+		this.addHooks();
 	},
 
 	refreshTable : function () {
@@ -1253,11 +1022,5 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// clear table
 		this.list.clear();
-
-		// remove uploading, in case bug
-		// this.fullOff();
-		// this.fulldropOff();
-
 	}
-
 });

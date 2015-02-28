@@ -7,20 +7,14 @@ Wu.Role = Wu.Class.extend({
 	},
 
 	addMember : function (user, callback) {
-		console.log('adding ', user.getName(), ' to role ', this.getName());
 
 		var options = {
-			userUuid : user.getUuid(),
-			projectUuid : this._project.getUuid(),
-			roleUuid : this.getUuid()
+			user : user,
+			project : this._project,
+			role : this
 		}
 
-		// send
-		Wu.send('/api/access/setrolemember', options, function (err, json) {
-			console.log('/api/access/setrolemember', err, json);
-			if (err) console.error(err);
-			callback(err, json);
-		});
+		app.access.addRoleMember(options, callback);
 
 	},
 

@@ -457,7 +457,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		console.log('createdUser: ', context, json);
 
 		var store = JSON.parse(json);
-		if (store.error) return console.error(result.error);
+		if (store.error) return console.error(store.error);
 
 		var user = new Wu.User(store);
 		user.attachToApp();

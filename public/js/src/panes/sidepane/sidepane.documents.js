@@ -14,7 +14,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content);
 
 		// insert template
-		// #documents-container-leftpane
 		this._leftpane = Wu.DomUtil.create('div', 'documents-container-leftpane', this._container);
 		
 		this._documentsFolders = Wu.DomUtil.create('div', 'documents-folders', this._leftpane);

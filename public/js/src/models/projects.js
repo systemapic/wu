@@ -155,8 +155,9 @@ Wu.Project = Wu.Class.extend({
 	setEditMode : function () {
 		// set editMode
 		this.editMode = false;
-		// if (app.Account.canUpdateProject(this.store.uuid)) this.editMode = true;
+		console.log('checking edit mode:');
 		this.editMode = app.access.to.edit_project(this);
+		console.log('editMode:==-=>', this.editMode);
 	},
 
 	refresh : function () {
@@ -258,7 +259,6 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	setNewStore : function (store) {
-		console.error('________ setting new store: ', store);
 		this.store = store;
 		this.select();
 	},
@@ -266,6 +266,11 @@ Wu.Project = Wu.Class.extend({
 	setStore : function (store) {
 		this.store = store;
 		this.refresh();
+	},
+
+	setRolesStore : function (roles) {
+		this.store.roles = roles;
+		this._refresh();
 	},
 
 	setMapboxAccount : function (store) {
