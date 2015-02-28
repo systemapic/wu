@@ -88,7 +88,6 @@ Wu.SidePane.Manage = Wu.Class.extend({
 
 
 	_insertProject : function (options) {
-
 		var project = options.project,
 		    projectsWrapper = options.projectsWrapper,
 		    logo = project.getLogo() || '/css/images/defaultProjectLogo.png';
@@ -109,7 +108,7 @@ Wu.SidePane.Manage = Wu.Class.extend({
 		});
 	},
 
-	_insertRoles : function (options) { 	// todo: refactor, no need to create all the available-roles-divs b4 clicking
+	_insertRoles : function (options) {
 		var wrapper = options.wrapper,
 		    project = options.project;
 
@@ -119,14 +118,24 @@ Wu.SidePane.Manage = Wu.Class.extend({
 			project : project
 		});
 
-
-		var roleName = currentRole ? currentRole.getName() : 'No role.';
+		// role name
+		var roleName = currentRole ? currentRole.getName() : 'No role';
 		
 		// wrapper for all roles
 		var rolesWrapper = Wu.DomUtil.create('div', 'manage-access-roles-wrapper', wrapper);
 
 		// create div for current role
 		var div_currentRole = Wu.DomUtil.create('div', 'manage-access-current-role', rolesWrapper, roleName);
+
+		// tooltip
+		var tooltip = app.language.tooltips.roles.dropdown;
+		app.Tooltip.add(div_currentRole, tooltip);
+
+		// role explanation
+		var infoDiv = Wu.DomUtil.create('div', 'manage-access-info', wrapper);
+		var role = currentRole ? currentRole.getSlug() : 'noRole';
+		var infoText = app.language.tooltips.roles[role];
+		infoDiv.innerHTML = infoText;
 
 		// dont allow changes to admins
 		if (!app.access.is.admin(this._user)) {
@@ -146,7 +155,8 @@ Wu.SidePane.Manage = Wu.Class.extend({
 					user : this._user,
 					addTo : rolesWrapper,
 					currentRoleDiv : div_currentRole,
-					wrapper : wrapper
+					wrapper : wrapper,
+					infoDiv : infoDiv
 				});
 
 			}, this);
@@ -156,12 +166,12 @@ Wu.SidePane.Manage = Wu.Class.extend({
 	
 
 	_insertAvailableRoles : function (options) {
-
 		var project = options.project,
 		    wrapper = options.wrapper,
 		    user = options.user,
 		    addTo = options.addTo,
-		    currentRoleDiv = options.currentRoleDiv;
+		    currentRoleDiv = options.currentRoleDiv,
+		    infoDiv = options.infoDiv;
 
 
 		var availableRoles = app.access.get.availableRoles({
@@ -170,14 +180,12 @@ Wu.SidePane.Manage = Wu.Class.extend({
 			noAdmins : true
 		});
 
-
 		// create dropdown for available roles
 		var dropdown = Wu.DomUtil.create('div', 'manage-access-dropdown', addTo);
 
 		// click outside dropdown ghost
 		var ghost = Wu.DomUtil.create('div', 'manage-access-ghost', addTo);
 		Wu.DomEvent.on(ghost, 'click', function (e) {
-			console.log('ghost click');
 			Wu.DomUtil.remove(dropdown);
 			Wu.DomUtil.remove(ghost);
 			Wu.DomUtil.removeClass(currentRoleDiv, 'displayNone');
@@ -186,9 +194,12 @@ Wu.SidePane.Manage = Wu.Class.extend({
 
 		// create dropdown entries
 		_.each(availableRoles, function (avrole) {
-
 			// role div
 			var div = Wu.DomUtil.create('div', 'manage-access-available-role', dropdown, avrole.getName());
+
+			// add tooltip
+			var tooltip = app.language.tooltips.roles[avrole.getSlug()] || 'Custom role.';
+			app.Tooltip.add(div, tooltip);
 
 			// add event for available role click
 			Wu.DomEvent.on(div, 'click', function (e) {
@@ -202,7 +213,8 @@ Wu.SidePane.Manage = Wu.Class.extend({
 					wrapper : wrapper,
 					ghost : ghost,
 					dropdown : dropdown,
-					currentRoleDiv : currentRoleDiv
+					currentRoleDiv : currentRoleDiv,
+					infoDiv : infoDiv
 				});
 
 			}, this);
@@ -213,7 +225,6 @@ Wu.SidePane.Manage = Wu.Class.extend({
 
 	_selectRole : function (options) {
 
-		console.log('role click');
 		Wu.DomEvent.stop(options.e);
 
 		// remove divs
@@ -228,6 +239,10 @@ Wu.SidePane.Manage = Wu.Class.extend({
 
 		// set name
 		options.currentRoleDiv.innerHTML = options.role ? options.role.getName() : 'No role';
+
+		// set info
+		var infoText = options.role ? app.language.tooltips.roles[options.role.getSlug()] : 'Custom role.';
+		options.infoDiv.innerHTML = infoText;
 
 		// select role
 		this._setRole({
@@ -244,8 +259,6 @@ Wu.SidePane.Manage = Wu.Class.extend({
 		    user = options.user,
 		    role = options.role;
 
-		console.log('_setRole', options);
-		
 		// add member 
 		if (role) role.addMember(user, function (err, projectStore) {
 			console.log('added role', err, projectStore);

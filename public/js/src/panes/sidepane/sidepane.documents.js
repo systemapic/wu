@@ -389,10 +389,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		input.setAttribute('key', '');
 		input.setAttribute('value', value);
 
-
-
-		// focus
-		// var target = div.firstChild;
 		var target = input;
 
 		target.focus();
@@ -432,7 +428,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// add shift key edit hook
 		this.enableShift();
-
 	},
 
 
@@ -517,8 +512,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		// refresh
 		this.update();
 	},
-
-      
 
 	reset : function () {
 

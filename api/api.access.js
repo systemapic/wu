@@ -191,7 +191,7 @@ module.exports = api.access = {
 				create_project 		: true, 	
 				read_project 		: true, 	
 				edit_project 		: true, 
-				delete_project 		: true, 	
+				delete_project 		: false, 	
 				upload_file 		: true, 	
 				download_file 		: true, 	
 				edit_file 		: true, 
@@ -796,6 +796,7 @@ module.exports = api.access = {
 		var role 	= new Role();
 		role.uuid 	= 'role-' + uuid.v4();
 		role.name 	= options.name;
+		role.slug 	= options.template;
 		role.capabilities = api.access.get.capabilities(options);
 		
 		if (options.members) {

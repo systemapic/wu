@@ -35,6 +35,10 @@ Wu.Role = Wu.Class.extend({
 		return this.store.uuid;
 	},
 
+	getSlug : function () {
+		return this.store.slug;
+	},
+
 	hasMember : function (member) {
 		return _.contains(this.getMembers(), member.getUuid());
 	},
