@@ -102,7 +102,6 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	_getOSMLayerTitle : function () {
-
 		var already = _.filter(this.getLayers(), function (l) {
 			return l.store.data.osm;
 		});
@@ -173,11 +172,10 @@ Wu.Project = Wu.Class.extend({
 		// set active project in sidepane
 		if (this._menuItem) this._menuItem._markActive();
 
-		if ( app.StatusPane.isOpen ) {
+		if (app.StatusPane.isOpen) {
 			app._map._controlCorners.topleft.style.opacity = 0;
 			app._map._controlCorners.topleft.style.display = 'none';
 		}
-
 	},
 
 	addNewLayer : function (layer) {
@@ -226,7 +224,6 @@ Wu.Project = Wu.Class.extend({
 
 	select : function () {
 
-
 		// hide headerpane
  		if (app._headerPane) Wu.DomUtil.removeClass(app._headerPane, 'displayNone');
 
@@ -238,7 +235,6 @@ Wu.Project = Wu.Class.extend({
 
 		// refresh project
 		this.refresh();
-		
 	},
 
 	_setUrl : function () {
@@ -335,7 +331,6 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	unload : function () {
-		console.log('unload)');
 		Wu.app.MapPane.reset();
 		Wu.app.HeaderPane.reset();
 		this.selected = false;
@@ -442,12 +437,6 @@ Wu.Project = Wu.Class.extend({
 
 	_removeLayer : function (layer) {
 
-		// console.log('___________________');
-		// console.log('_removeLayer', layer);
-		// console.log('lm: ', this.store.layermenu);
-		// console.log('bl: ', this.store.baseLayers);
-		// console.log('sl: ', this.store.layers);
-
 		// remove from layermenu & baselayer store
 		_.remove(this.store.layermenu, function (item) { return item.layer == layer.getUuid(); });
 		_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.getUuid(); });
@@ -467,7 +456,6 @@ Wu.Project = Wu.Class.extend({
 		this._update('layermenu'); 
 		this._update('baseLayers');
 
-		
 	},	
 
 	getName : function () {
@@ -534,8 +522,6 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getLayer : function (uuid) {
-		// console.log('project.getLayer::', uuid);
-		// console.log('this.layers', this.layers);
 		return this.layers[uuid];
 	},
 
@@ -638,34 +624,6 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
-	// setFileAttribute : function (fileUuid, key, value) {
-
-	// 	console.log('setFileAttribute : DISABLED! ', fileUuid, key, value);
-	// 	return;
-
-	// 	// iterate
-	// 	this.project.store.files.forEach(function(file, i, arr) {
-		     
-	// 		// find hit
-	// 		if (file.uuid == fileUuid) {
-
-	// 			// set locally
-	// 			file[key] = value;
-
-	// 			// create update object
-	// 			var json = {};
-	// 			json[key] = file[key];
-	// 			json.uuid = file.uuid;
-
-	// 			// update, no callback
-	// 			var string = JSON.stringify(json);
-	// 			Wu.save('/api/file/update', string); 
-	// 		}
-	// 	});
-
-	// 	// set save status
-	// 	app.setSaveStatus();
-	// },
 
 	getUsers : function () {
 		var uuid = this.store.uuid; // project uuid
@@ -1077,16 +1035,12 @@ Wu.Project = Wu.Class.extend({
 	// CXX – Now this is all over the place... see sidepane.project.js > makeNewThumbnail() etc...
 	createProjectThumb : function () {
 
-		console.log('createProjectThumb');
-
 		// Set the grinding wheel until logo is updated
 		this.setTempLogo();
 
 		app.setHash(function (ctx, hash) {
 
 			var obj = JSON.parse(hash);
-
-			console.log('obj', obj);
 
 			obj.dimensions = {
 				height : 233,
