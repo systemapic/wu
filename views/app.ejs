@@ -10,14 +10,14 @@
 
 			<!-- DEPENDENCIES STYLESHEETS -->
 			<link rel="stylesheet" href='/js/lib/codemirror/mode/cartocss/spectrum.css'>
-			<link rel="stylesheet" href='/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.css'>
-			<link rel="stylesheet" href='/js/src/grande.js/css/menu.css'>
-			<link rel="stylesheet" href='/js/src/grande.js/css/editor.css'>
+			<link rel="stylesheet" href='/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.css'>
+			<link rel="stylesheet" href='/js/lib/grande.js/css/menu.css'>
+			<link rel="stylesheet" href='/js/lib/grande.js/css/editor.css'>
 			<link rel="stylesheet" href='/css/bootstrap.min.css'>
 			<link rel="stylesheet" href='/css/font-awesome.min.css'>
 			<link rel="stylesheet" href='/css/mapbox.css'>        
-			<link rel="stylesheet" href='/js/src/leaflet.js/leaflet.css'>
-			<link rel="stylesheet" href='/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css'>
+			<link rel="stylesheet" href='/js/lib/leaflet.js/leaflet.css'>
+			<link rel="stylesheet" href='/js/lib/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css'>
 			<link rel="stylesheet" href='/js/lib/powerange/powerange.min.css'>
 			<link rel="stylesheet" href='/js/lib/codemirror/lib/codemirror.css'>
 			<link rel="stylesheet" href='/js/lib/codemirror/mode/cartocss/codemirror.carto.css'>
@@ -73,29 +73,25 @@
 			<!-- dep libs -->
 			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js"></script>
 			<script type="text/javascript" src="/js/lib/lodash/lodash.min.js"></script>
-			<!-- <script type="text/javascript" src="/js/lib/parallel.js/parallel.js"></script> -->
 			<script type="text/javascript" src="/js/lib/async/async.js"></script>
 			
 			<!-- leaflet.js -->
-			<script type="text/javascript" src="/js/src/leaflet.js/leaflet-0.7.3-src.js"></script>
+			<script type="text/javascript" src="/js/lib/leaflet.js/leaflet-0.7.3-src.js"></script>
 			<script type="text/javascript" src="/js/lib/mapbox.js/mapbox.standalone.uncompressed.js"></script> <!-- DO NOT REPLACE! has custom edits:4648! -->
-			<script type="text/javascript" src="/js/src/leaflet.js/plugins/leaflet.geojson.draw.js"></script>
-			<script type="text/javascript" src="/js/src/leaflet.js/plugins/leaflet.draw-src.js"></script>
-			<script type="text/javascript" src="/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.js"></script>
-			<script type="text/javascript" src="/js/src/leaflet.js/plugins/leaflet.utfgrid.js"></script>
+			<script type="text/javascript" src="/js/lib/leaflet.js/plugins/leaflet.geojson.draw.js"></script>
+			<script type="text/javascript" src="/js/lib/leaflet.js/plugins/leaflet.draw-src.js"></script>
+			<script type="text/javascript" src="/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.js"></script>
+			<script type="text/javascript" src="/js/lib/leaflet.js/plugins/leaflet.utfgrid.js"></script>
 
 			<!-- Other stuff -->
-			<!-- <script type="text/javascript" src="/js/lib/d3.js/topojson.v1.min.js"></script>  -->
 			<script type="text/javascript" src="/js/lib/dropzone.js/dropzone.min.js"></script> 
-			<!-- <script type="text/javascript" src="/js/lib/icanhaz/icanhaz.min.js"></script>  -->
 			<script type="text/javascript" src="/js/lib/list.js/list.min.js"></script> 
 			<script type="text/javascript" src="/js/lib/sortable.js/Sortable.js"></script>
-			<!-- <script type="text/javascript" src="/js/lib/powerange/powerange.min.js"></script> -->
 
 			<!-- grande.js -->
-			<script type="text/javascript" src="/js/src/grande.js/js/grande.class.js"></script>
-			<script type="text/javascript" src="/js/src/grande.js/js/grande.js"></script>
-			<script type="text/javascript" src="/js/src/grande.js/js/grande.attachments.js"></script>
+			<script type="text/javascript" src="/js/lib/grande.js/js/grande.class.js"></script>
+			<script type="text/javascript" src="/js/lib/grande.js/js/grande.js"></script>
+			<script type="text/javascript" src="/js/lib/grande.js/js/grande.attachments.js"></script>
 
 			<!-- codemirror -->
 			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/cartoref.js"></script>
@@ -122,7 +118,7 @@
 
 			<!-- class.js must be added first -->
 			<script src="/js/src/core/class.js"></script>  <!-- Wu = {} -->
-			<script src="/js/src/leaflet.js/plugins/extendLeaflet.js"></script>
+			<script src="/js/src/ext/extendLeaflet.js"></script>
 
 			<script src="/js/src/panes/sidepane/sidepane.js"></script> 
 			<script src="/js/src/panes/sidepane/sidepane.item.js"></script> 
@@ -139,36 +135,36 @@
 			<script src="/js/src/panes/sidepane/sidepane.account.js"></script> 
 			<script src="/js/src/panes/sidepane/sidepane.manage.js"></script> 
 
-			<script src="/js/src/panes/headerpane.js"></script> 
-			<script src="/js/src/panes/progresspane.js"></script> 
-			<script src="/js/src/panes/mappane.js"></script>
-			<script src="/js/src/panes/statuspane.js"></script>
-			<script src="/js/src/panes/startpane.js"></script>
-			<script src="/js/src/panes/errorpane.js"></script>
-			<script src="/js/src/panes/dropzonePane.js"></script>
+			<script src="/js/src/panes/pane.header.js"></script> 
+			<script src="/js/src/panes/pane.progress.js"></script> 
+			<script src="/js/src/panes/pane.map.js"></script>
+			<script src="/js/src/panes/pane.status.js"></script>
+			<script src="/js/src/panes/pane.start.js"></script>
+			<script src="/js/src/panes/pane.error.js"></script>
+			<script src="/js/src/panes/pane.dropzone.js"></script>
 			
-			<script src="/js/src/controls/zIndexControl.js"></script> 
-			<script src="/js/src/controls/layermenuControl.js"></script> 
-			<script src="/js/src/controls/inspectControl.js"></script> 		
-			<script src="/js/src/controls/descriptionControl.js"></script> 
-			<script src="/js/src/controls/legendsControl.js"></script> 				
-			<script src="/js/src/controls/mousepositionControl.js"></script> 
-			<script src="/js/src/controls/baselayertoggleControl.js"></script> 
-			<script src="/js/src/controls/styleControl.js"></script> 	 
-			<script src="/js/src/controls/cartocssControl.js"></script>  
-			<script src="/js/src/controls/tooltipControl.js"></script>
-			<script src="/js/src/controls/spinningMap.js"></script>
+			<script src="/js/src/controls/control.zindex.js"></script> 
+			<script src="/js/src/controls/control.layermenu.js"></script> 
+			<script src="/js/src/controls/control.inspect.js"></script> 		
+			<script src="/js/src/controls/control.description.js"></script> 
+			<script src="/js/src/controls/control.legends.js"></script> 				
+			<script src="/js/src/controls/control.mouseposition.js"></script> 
+			<script src="/js/src/controls/control.baselayertoggle.js"></script> 
+			<script src="/js/src/controls/control.style.js"></script> 	 
+			<script src="/js/src/controls/control.cartocss.js"></script>  
+			<script src="/js/src/controls/control.tooltip.js"></script>
+			<script src="/js/src/controls/control.spinningmap.js"></script>
 		
-			<script src="/js/src/models/projects.js"></script> 
-			<script src="/js/src/models/clients.js"></script> 
-			<script src="/js/src/models/users.js"></script> 
-			<script src="/js/src/models/layers.js"></script> 
-			<script src="/js/src/models/files.js"></script> 
-			<script src="/js/src/models/roles.js"></script> 
+			<script src="/js/src/models/model.projects.js"></script> 
+			<script src="/js/src/models/model.clients.js"></script> 
+			<script src="/js/src/models/model.users.js"></script> 
+			<script src="/js/src/models/model.layers.js"></script> 
+			<script src="/js/src/models/model.files.js"></script> 
+			<script src="/js/src/models/model.roles.js"></script> 
 
-			<script src="/js/src/core/analytics.js"></script>
+			<script src="/js/src/ext/analytics.js"></script>
 
-			<script src="/js/src/config/language.english.js"></script> 		
+			<script src="/js/src/lang/language.english.js"></script> 		
 			<script src="/js/src/config/config.js"></script> 		
 			<script src="/js/src/core/access.js"></script> 		
 			<script src="/js/src/core/app.js"></script>
