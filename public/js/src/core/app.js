@@ -7,6 +7,8 @@ Wu.App = Wu.Class.extend({
 	// default options
 	options : systemapicConfigOptions, // global var from config.js... perhaps refactor.
 
+	language : language,
+
 	_ready : false,
 
 	initialize : function (options) {

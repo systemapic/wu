@@ -33,8 +33,6 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 		// wrapper 
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._scrollWrapper);
-
-
 	},
 
 	initContent : function () {
@@ -105,10 +103,6 @@ Wu.SidePane.Item = Wu.Class.extend({
 		// To open fullscreen tabs that's been closed
 		if (Wu.app.mobile) this.mobileReActivate();
 
-		// if clicking on already active tab, toggle it
-		// if (Wu.app._activeMenu == this) return this._reclick();
-		// if (Wu.app._activeMenu == this) return;
-
 		// open pane if not closed
 		if (!Wu.app.SidePane.paneOpen) Wu.app.SidePane.openPane();
 
@@ -117,15 +111,13 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 		// Google Analytics event trackign
 		app.Analytics.ga(['Side Pane', 'Select: ' + this.type]);
-
-
 	},
 
 	mobileReActivate : function () {
 
 		this.activate();
 
-		if ( app._activeMenuItem == 'documents' || app._activeMenuItem == 'dataLibrary' || app._activeMenuItem == 'users' ) {
+		if (app._activeMenuItem == 'documents' || app._activeMenuItem == 'dataLibrary' || app._activeMenuItem == 'users') {
 
 			Wu.DomUtil.addClass(Wu.app._active, 'show')						
 			this.mobileFullScreenAdjustment();
@@ -164,12 +156,10 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 
 	mobileFullScreenAdjustment : function () {
-			
 		Wu.app._editorMenuPane.style.opacity = 0; // This is .q-editor-content
 		Wu.DomUtil.removeClass(app.SidePane._mobileFullScreenCloser, 'displayNone', this);
 		app.SidePane.fullscreen = true;
 	},
-
 
 	_activate : function () {
 
@@ -325,8 +315,6 @@ Wu.SidePane.Item = Wu.Class.extend({
 		Wu.DomUtil.addClass(swypeto, 'show');	
 			
 	},
-
-
 
 	updateContent : function (project) {
 

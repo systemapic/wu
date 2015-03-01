@@ -199,7 +199,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// add kill hook
 		// if (app.Account.canDeleteProject(this.project.getUuid())) {
-		if (app.access.to.delete_project(this.project.getUuid())) {
+		if (app.access.to.delete_project(this.project)) {
 			Wu.DomEvent.on(this.kill, 'click', this.deleteProject, this);
 
 			Wu.DomEvent.on( this.makeThumb, 'click', this.makeNewThumbnail, this );
@@ -218,7 +218,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// remove kill hook
 		// if (app.Account.canDeleteProject(this.project.getUuid())) {
-		if (app.access.to.delete_project(this.project.getUuid())) {
+		if (app.access.to.delete_project(this.project)) {
 			Wu.DomEvent.off(this.kill, 'click', this.deleteProject, this);
 
 			Wu.DomEvent.off( this.makeThumb, 'click', this.makeNewThumbnail, this );
