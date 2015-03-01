@@ -23,6 +23,48 @@ Wu.Access = Wu.Class.extend({
 	},
 
 
+	addRoleMember : function (opts, callback) {
+		var user = opts.user,
+		    project = opts.project,
+		    role = opts.role;
+
+		// get user's current role in project
+		var currentRole = app.access.get.role(opts);
+		var currentRoleUuid = currentRole ? currentRole.getUuid() : false;
+
+		var options = {
+			userUuid : user.getUuid(),
+			projectUuid : project.getUuid(),
+			roleUuid : role.getUuid(),
+			currentRoleUuid : currentRoleUuid
+		}
+
+		// send
+		Wu.send('/api/access/setrolemember', options, function (err, json) {
+			console.log('/api/access/setrolemember', err);
+
+			// return on err
+			if (err) return callback(err);
+
+			var result = JSON.parse(json);
+
+			// return on no access
+			if (result.error) {
+				console.error(result);
+				return callback(result.error);
+			}
+			// set locally
+			var store = result
+			project.setRolesStore(store.roles);
+
+			// return
+			callback(err, store);
+
+		});
+
+	},
+
+
 	get : {
 
 		// get role of user in project
@@ -103,26 +145,27 @@ Wu.Access = Wu.Class.extend({
 
 		roles : function (options) {
 			// get roles which options.role can delegate to
-			console.log('filtering: ', options);
-
 			var role = options.role,
 			    noAdmins = options.noAdmins,
 			    project = options.project,
 			    available = [];
 
+			    // return project.getRoles();
 
 			// iterate each project role
 			_.each(project.getRoles(), function (projectRole) {
 				var lacking = false;
-
-				_.each(projectRole.capabilities, function (cap, key) {
-					if (cap) if (!role.capabilities[key]) lacking = true;
+				var caps = projectRole.getCapabilities();
+				if (!caps) lacking = true;
+				_.each(projectRole.getCapabilities(), function (cap, key) {
+					if (cap) {
+						if (!role.getCapabilities()[key]) lacking = true;
+					}
 				});
 
 				// if not lacking any cap, add to available
 				if (!lacking) available.push(projectRole);
 			});
-
 			return available;
 		},
 	},
@@ -167,7 +210,9 @@ Wu.Access = Wu.Class.extend({
 
 
 			_.each(roles, function (role) {
-				if (role.hasMember(user) && role.hasCapability(capability)) permission = true;
+				if (role.hasMember(user)) {
+					if (role.hasCapability(capability)) permission = true;
+				}
 			});
 			return permission;
 		},
@@ -202,59 +247,70 @@ Wu.Access = Wu.Class.extend({
 	to : {
 
 		create_client : function (user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'create_client')) return true;
 			return false;
 		},
 		
 		edit_client : function (client, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_client')) return true;
 			return false;
 		},
 		
 		edit_other_client : function (client, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_other_client')) return true;
 			return false;
 		},
 		
 		delete_client		: function (client, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_client')) return true;
 			return false;
 		},
 		
 		delete_other_client  	: function (client, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_other_client')) return true;
 			return false;
 		},
 		
 		read_client		: function (client, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'read_client')) return true;
 			return false;
 		},
 		
 		// who else can create projects? students! 
 		create_project 		: function (user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'create_project')) return true;
 			return false;
 		},
 		
 		edit_project 		: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_project')) return true;
 			if (app.access.has.project_capability(user, project, 'edit_project')) return true;
 			return false;
 		},
 		
 		edit_other_project 	: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_other_project')) return true;
 			return false;
 		},
 		
 		delete_project		: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_project')) return true;
 			if (app.access.has.project_capability(user, project, 'delete_project')) return true;
 			return false;
 		},
 		
 		delete_other_project	: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_other_project')) return true;
 		},
 		
@@ -264,12 +320,14 @@ Wu.Access = Wu.Class.extend({
 		},
 		
 		upload_file 		: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'upload_file')) return true;
 			if (app.access.has.project_capability(user, project, 'upload_file')) return true;
 			return false;
 		},
 		
 		download_file 		: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'download_file')) return true;
 			if (app.access.has.project_capability(user, project, 'download_file')) return true;
 			return false;
@@ -278,77 +336,91 @@ Wu.Access = Wu.Class.extend({
 		// todo: edit_file, edit_other_file
 		
 		create_version 		: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'create_version')) return true;
 			if (app.access.has.project_capability(user, project, 'create_version')) return true;
 			return false;
 		},
 		
 		delete_version 		: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_version')) return true;
 			if (app.access.has.project_capability(user, project, 'delete_version')) return true;
 			return false;
 		},
 
 		delete_other_version    : function (project, user) {
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_other_version')) return true;
 			return false;
 		},
 		
 		delete_file 		: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_file')) return true;
 			if (app.access.has.project_capability(user, project, 'delete_file')) return true;
 			return false;
 		},
 		
 		delete_other_file 	: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_other_file')) return true;
 			return false;
 		},
 		
 		create_user		: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'create_user')) return true;
 			if (app.access.has.project_capability(user, project, 'create_user')) return true;
 			return false;
 		},
 		
 		edit_user 		: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_user')) return true;
 			if (app.access.has.project_capability(user, project, 'edit_user')) return true;
 			return false;
 		},
 		
 		edit_other_user 	: function (user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_other_user')) return true;
 			return false;
 		},
 		
 		delete_user		: function (user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_user')) return true;
 			return false;
 		},
 		
 		delete_other_user 	: function (user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_user')) return true;
 			return false;
 		},
 		
 		share_project		: function (user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'share_project')) return true;
 			if (app.access.has.project_capability(user, project, 'share_project')) return true;
 			return false;
 		},
 		
 		read_analytics 		: function (user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_user')) return true;
 			return false;
 		},
 		
 		manage_analytics 	: function (user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_user')) return true;
 			return false;
 		},
 		
 		delegate_to_user 	: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delegate_to_user')) return true;
 			if (app.access.has.project_capability(user, project, 'delegate_to_user')) return true;
 			return false;

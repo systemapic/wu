@@ -88,7 +88,6 @@ Wu.SidePane.Manage = Wu.Class.extend({
 
 
 	_insertProject : function (options) {
-
 		var project = options.project,
 		    projectsWrapper = options.projectsWrapper,
 		    logo = project.getLogo() || '/css/images/defaultProjectLogo.png';
@@ -109,7 +108,7 @@ Wu.SidePane.Manage = Wu.Class.extend({
 		});
 	},
 
-	_insertRoles : function (options) { 	// todo: refactor, no need to create all the available-roles-divs b4 clicking
+	_insertRoles : function (options) {
 		var wrapper = options.wrapper,
 		    project = options.project;
 
@@ -119,8 +118,8 @@ Wu.SidePane.Manage = Wu.Class.extend({
 			project : project
 		});
 
-
-		var roleName = currentRole ? currentRole.getName() : 'No role.';
+		// role name
+		var roleName = currentRole ? currentRole.getName() : 'No role';
 		
 		// wrapper for all roles
 		var rolesWrapper = Wu.DomUtil.create('div', 'manage-access-roles-wrapper', wrapper);
@@ -128,36 +127,51 @@ Wu.SidePane.Manage = Wu.Class.extend({
 		// create div for current role
 		var div_currentRole = Wu.DomUtil.create('div', 'manage-access-current-role', rolesWrapper, roleName);
 
-		
-		// add event for current role click
-		Wu.DomEvent.on(div_currentRole, 'click', function () {
+		// tooltip
+		var tooltip = app.language.tooltips.roles.dropdown;
+		app.Tooltip.add(div_currentRole, tooltip);
 
-			// show hide
-			Wu.DomUtil.addClass(div_currentRole, 'displayNone');
+		// role explanation
+		var infoDiv = Wu.DomUtil.create('div', 'manage-access-info', wrapper);
+		var role = currentRole ? currentRole.getSlug() : 'noRole';
+		var infoText = app.language.tooltips.roles[role];
+		infoDiv.innerHTML = infoText;
 
-			// Put current project wrapper on top (z-index: 999999);
-			Wu.DomUtil.addClass(wrapper, 'z999999');
+		// dont allow changes to admins
+		if (!app.access.is.admin(this._user)) {
 
-			// insert dropdown
-			this._insertAvailableRoles({
-				project : project,
-				user : this._user,
-				addTo : rolesWrapper,
-				currentRoleDiv : div_currentRole,
-				wrapper : wrapper
-			});
+			// add event for current role click
+			Wu.DomEvent.on(div_currentRole, 'click', function () {
 
-		}, this);
+				// show hide
+				Wu.DomUtil.addClass(div_currentRole, 'displayNone');
 
+				// Put current project wrapper on top (z-index: 999999);
+				Wu.DomUtil.addClass(wrapper, 'z999999');
+
+				// insert dropdown
+				this._insertAvailableRoles({
+					project : project,
+					user : this._user,
+					addTo : rolesWrapper,
+					currentRoleDiv : div_currentRole,
+					wrapper : wrapper,
+					infoDiv : infoDiv
+				});
+
+			}, this);
+		}
 	},
 
-	_insertAvailableRoles : function (options) {
+	
 
+	_insertAvailableRoles : function (options) {
 		var project = options.project,
 		    wrapper = options.wrapper,
 		    user = options.user,
 		    addTo = options.addTo,
-		    currentRoleDiv = options.currentRoleDiv;
+		    currentRoleDiv = options.currentRoleDiv,
+		    infoDiv = options.infoDiv;
 
 
 		var availableRoles = app.access.get.availableRoles({
@@ -166,14 +180,12 @@ Wu.SidePane.Manage = Wu.Class.extend({
 			noAdmins : true
 		});
 
-
 		// create dropdown for available roles
 		var dropdown = Wu.DomUtil.create('div', 'manage-access-dropdown', addTo);
 
 		// click outside dropdown ghost
 		var ghost = Wu.DomUtil.create('div', 'manage-access-ghost', addTo);
 		Wu.DomEvent.on(ghost, 'click', function (e) {
-			console.log('ghost click');
 			Wu.DomUtil.remove(dropdown);
 			Wu.DomUtil.remove(ghost);
 			Wu.DomUtil.removeClass(currentRoleDiv, 'displayNone');
@@ -182,54 +194,80 @@ Wu.SidePane.Manage = Wu.Class.extend({
 
 		// create dropdown entries
 		_.each(availableRoles, function (avrole) {
-
 			// role div
 			var div = Wu.DomUtil.create('div', 'manage-access-available-role', dropdown, avrole.getName());
 
+			// add tooltip
+			var tooltip = app.language.tooltips.roles[avrole.getSlug()] || 'Custom role.';
+			app.Tooltip.add(div, tooltip);
+
 			// add event for available role click
 			Wu.DomEvent.on(div, 'click', function (e) {
-				console.log('role click');
-				Wu.DomEvent.stop(e);
-
-				// remove divs
-				Wu.DomUtil.remove(dropdown);
-				Wu.DomUtil.remove(ghost);
-
-				// show current role
-				Wu.DomUtil.removeClass(currentRoleDiv, 'displayNone');
 				
-				// Remove project wrapper z-index
-				Wu.DomUtil.removeClass(wrapper, 'z999999');
-
-				// set name
-				currentRoleDiv.innerHTML = avrole.getName();
-
 				// select role
-				this._setRole({
+				this._selectRole({
+					e : e,
 					project : project,
 					user : this._user,
 					role : avrole,
+					wrapper : wrapper,
+					ghost : ghost,
+					dropdown : dropdown,
+					currentRoleDiv : currentRoleDiv,
+					infoDiv : infoDiv
 				});
 
 			}, this);
 
 		}, this);
+	},
+
+
+	_selectRole : function (options) {
+
+		Wu.DomEvent.stop(options.e);
+
+		// remove divs
+		Wu.DomUtil.remove(options.dropdown);
+		Wu.DomUtil.remove(options.ghost);
+
+		// show current role
+		Wu.DomUtil.removeClass(options.currentRoleDiv, 'displayNone');
+		
+		// Remove project wrapper z-index
+		Wu.DomUtil.removeClass(options.wrapper, 'z999999');
+
+		// set name
+		options.currentRoleDiv.innerHTML = options.role ? options.role.getName() : 'No role';
+
+		// set info
+		var infoText = options.role ? app.language.tooltips.roles[options.role.getSlug()] : 'Custom role.';
+		options.infoDiv.innerHTML = infoText;
+
+		// select role
+		this._setRole({
+			project : options.project,
+			user : options.user,
+			role : options.role,
+		});
 
 	},
+
 
 	_setRole : function (options) {
 		var project = options.project,
 		    user = options.user,
 		    role = options.role;
 
-		console.log('_setRole', options);
-
 		// add member 
-		role.addMember(user, function (err, result) {
-			console.log('added role', err, JSON.parse(result));
+		if (role) role.addMember(user, function (err, projectStore) {
+			console.log('added role', err, projectStore);
 		});
 
-
+		// add 'No role'
+		if (!role) app.access.addNoRole(options, function (err, result) {
+			console.log('addNoRole callback: ', err, result);
+		});
 	},
 
 
