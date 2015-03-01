@@ -46,31 +46,24 @@ module.exports = api.client = {
 	// ###  API: Create Client               ###
 	// #########################################
 	create : function (req, res) {
-
-		console.log('c client');
-
 		// set vars
 		var account = req.user,
 		    store = req.body,
 		    ops = [];
 
 		ops.push(function (callback) {
-
 			// check access
 			api.access.to.create_client({
 				user : account
 			}, callback);
-
 		});
 
 		ops.push(function (options, callback) {
-
 			// create client
 			api.client._create({
 				user : options.user,
 				store : store
 			}, callback);
-
 		});
 
 		async.waterfall(ops, function (err, client) {
@@ -81,6 +74,7 @@ module.exports = api.client = {
 		});
 
 	},
+
 
 	_create : function (options, callback) {
 		var user = options.user,
@@ -101,6 +95,7 @@ module.exports = api.client = {
 
 	},
 
+
 	// #########################################
 	// ###  API: Delete Client               ###
 	// #########################################
@@ -109,10 +104,8 @@ module.exports = api.client = {
 		    account = req.user,
 		    ops = [];
 
-
 		// find client
 		ops.push(function (callback) {
-
 			Clientel
 			.findOne({uuid : clientUuid})
 			.exec(callback);
@@ -120,17 +113,14 @@ module.exports = api.client = {
 
 		// check access
 		ops.push(function (client, callback) {
-
 			api.access.to.delete_client({
 				user : account,
 				client : client
 			}, callback);
-
 		});
 
 		// delete client
 		ops.push(function (options, callback) {
-
 			// delete
 			options.client.remove(callback);
 		});
@@ -140,27 +130,24 @@ module.exports = api.client = {
 			if (err) return api.error.general(req, res, err);
 			res.end(JSON.stringify(result));
 		});
-
-		
 	},
+
 
 	// #########################################
 	// ###  API: Update Client               ###
 	// #########################################
 	update : function (req, res) {
 
-		var clientUuid 	= req.body.uuid;
-		var account     = req.user;
-		var queries 	= {};
-		var ops = [];
+		var clientUuid	= req.body.uuid,
+		    account = req.user,
+		    queries = {},
+		    ops = [];
 
 		// return if missing info
 		if (!clientUuid) return api.error.missingInformation(req, res);
 
-
 		// find client
 		ops.push(function (callback) {
-
 			Clientel
 			.findOne({uuid : clientUuid})
 			.exec(callback);
@@ -168,22 +155,18 @@ module.exports = api.client = {
 
 		// check access
 		ops.push(function (client, callback) {
-
 			api.access.to.edit_client({
 				user : account, 
 				client : client 
 			}, callback);
-
 		});
 
 		// update client
 		ops.push(function (options, callback) {
-
 			api.client._update({
 				client : options.client, 
 				options : req.body
 			}, callback);
-
 		});
 
 		// run ops
@@ -193,12 +176,10 @@ module.exports = api.client = {
 			// return
 			res.end(JSON.stringify(client));
 		});
-		
 	},
 
 
 	_update : function (options, callback) {
-
 		var client = options.client,
 		    options = options.options,
 		    queries = {};
@@ -225,9 +206,8 @@ module.exports = api.client = {
 
 		// do updates
 		async.parallel(queries, callback);
-
-
 	},
+
 
 	_enqueueUpdate : function (job) {
 		var queries = job.queries,
@@ -243,7 +223,6 @@ module.exports = api.client = {
 		};
 		return queries;
 	},
-
 
 
 	// check if slug is unique
@@ -262,7 +241,6 @@ module.exports = api.client = {
 		api.access.is.admin({
 			user : user
 		}, function (err, isAdmin) {
-			console.log('getAll client, is admin, err, isAdmin', err, isAdmin);
 
 			// not admin, get all users manually
 			if (err || !isAdmin) return api.client._getAllFiltered(options, done);
@@ -271,6 +249,7 @@ module.exports = api.client = {
 			api.client._getAll(options, done);
 		});
 	},
+	
 
 	_getAll : function (options, done) {
 		Clientel
@@ -282,8 +261,6 @@ module.exports = api.client = {
 	_getAllFiltered : function (options, done) {
 		var user = options.user,
 		    ops = [];
-
-		    console.log('getALL ---- clients!!');
 
 		// if not admin
 		ops.push(function (callback) {
@@ -308,82 +285,6 @@ module.exports = api.client = {
 
 		async.waterfall(ops, done);
 	},
-
-
-	// getAll : function (callback, user) {
-
-	// 	// async queries
-	// 	var a = {};
-
-
-
-	// 	// is superadmin, get all projects
-	// 	if (api.access.superadmin(user)) {
-	// 		a.superadminClients = function (cb) {
-	// 			Clientel
-	// 			.find()
-	// 			.exec(function(err, result) { 
-	// 				cb(err, result); 
-	// 			});
-	// 		}
-	// 	}
-		
-	// 	// get all projects created by user
-	// 	a.createdBy = function (cb) {
-	// 		Clientel
-	// 		.find({createdBy : user.uuid})
-	// 		.exec(function(err, result) { 
-	// 			cb(err, result); 
-	// 		});
-	// 	}
-
-	// 	// get all projects that user is editor for
-	// 	a.editor = function (cb) {
-	// 		Clientel
-	// 		.find({ uuid : { $in : user.role.editor.clients } })
-	// 		.exec(function(err, result) { 
-	// 			cb(err, result); 
-	// 		});
-	// 	}
-
-	// 	// get all projects user is reader for
-	// 	a.reader = function (cb) {
-	// 		Clientel
-	// 		.find({ uuid : { $in : user.role.reader.clients } })
-	// 		.exec(function(err, result) { 
-	// 			cb(err, result); 
-	// 		});
-	// 	}
-
-
-	// 	// do async 
-	// 	async.parallel(a, function (err, result) {
-			
-	// 		// return error
-	// 		if (err) return callback(err);
-
-	// 		// flatten into one array
-	// 		var array = [];
-	// 		for (r in result) {
-	// 			array.push(result[r]);
-	// 		}
-
-			
-	// 		// flatten
-	// 		var flat = _.flatten(array)
-
-	// 		// remove duplicates
-	// 		var unique = _.unique(flat, 'uuid');
-
-	// 		callback(err, unique);
-	// 	});
-		
-		
-
-	// },
-
-
-
 }
 
 // helper function 
