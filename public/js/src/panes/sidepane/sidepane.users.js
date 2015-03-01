@@ -457,7 +457,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		console.log('createdUser: ', context, json);
 
 		var store = JSON.parse(json);
-		if (store.error) return console.error(result.error);
+		if (store.error) return console.error(store.error);
 
 		var user = new Wu.User(store);
 		user.attachToApp();
@@ -566,8 +566,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	// add user entry to table
 	addTableItem : function (user) {
 
-		console.log('addTableItem', user);
-
 		// prepare template values
 		var template = {};   
 
@@ -627,8 +625,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var projects = user.getProjects();
 
 		var numProjects = projects ? projects.length : 0;
-
-		console.log('projects: ', projects);
 
 		if (numProjects == 1) return divProjectsOpen + numProjects + ' project' + divProjectsClose; //projects
 		return divProjectsOpen + numProjects + ' projects' + divProjectsClose;
@@ -698,9 +694,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		Wu.DomUtil.removeClass(this._content, 'hide-top');	
 		Wu.DomUtil.removeClass(this._container, 'displayNone');	
 	},
-
-
-
 
 	toggleReadAccess : function (item) {
 

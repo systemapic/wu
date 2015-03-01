@@ -27,7 +27,7 @@ module.exports = function(grunt) {
 			},
 
 			jsLogin : {
-				files: [ 'public/js/src/controls/spinningMap.js', 'public/js/src/core/login.js' ],
+				files: [ 'public/js/src/controls/control.spinningmap.js', 'public/js/src/core/login.js' ],
 				tasks:[  'concat:jsLogin', 'uglify:jsLogin' ]
 			},
 
@@ -147,12 +147,12 @@ module.exports = function(grunt) {
 					'public/js/lib/async/async.js',
 					
 					// leaflet + mapbox
-					'public/js/src/leaflet.js/leaflet-0.7.3-src.js',
+					'public/js/lib/leaflet.js/leaflet-0.7.3-src.js',
 					'public/js/lib/mapbox.js/mapbox.standalone.uncompressed.js', // DO NOT REPLACE! has custom edits:4648!
-					'public/js/src/leaflet.js/plugins/leaflet.geojson.draw.js',
-					'public/js/src/leaflet.js/plugins/leaflet.draw-src.js',
-					'public/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.js',
-					'public/js/src/leaflet.js/plugins/leaflet.utfgrid.js',
+					'public/js/lib/leaflet.js/plugins/leaflet.geojson.draw.js',
+					'public/js/lib/leaflet.js/plugins/leaflet.draw-src.js',
+					'public/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.js',
+					'public/js/lib/leaflet.js/plugins/leaflet.utfgrid.js',
 
 					// tools
 					'public/js/lib/dropzone.js/dropzone.min.js',
@@ -160,9 +160,9 @@ module.exports = function(grunt) {
 					'public/js/lib/sortable.js/Sortable.js',
 
 					// grande
-					'public/js/src/grande.js/js/grande.class.js',
-					'public/js/src/grande.js/js/grande.js',
-					'public/js/src/grande.js/js/grande.attachments.js',
+					'public/js/lib/grande.js/js/grande.class.js',
+					'public/js/lib/grande.js/js/grande.js',
+					'public/js/lib/grande.js/js/grande.attachments.js',
 
 					// codemirror
 					'public/js/lib/codemirror/mode/cartocss/cartoref.js',
@@ -194,7 +194,7 @@ module.exports = function(grunt) {
 					'public/js/src/core/class.js',
 
 					// Extend Leaflet
-					'public/js/src/leaflet.js/plugins/extendLeaflet.js',
+					'public/js/src/ext/extendLeaflet.js',
 
 					// Sidepane 
 					'public/js/src/panes/sidepane/sidepane.js',
@@ -213,43 +213,44 @@ module.exports = function(grunt) {
 					'public/js/src/panes/sidepane/sidepane.manage.js',
 
 					// Other Panes 
-					'public/js/src/panes/headerpane.js',
-					'public/js/src/panes/progresspane.js',
-					'public/js/src/panes/mappane.js',
-					'public/js/src/panes/statuspane.js',
-					'public/js/src/panes/startpane.js',
-					'public/js/src/panes/errorpane.js',
-					'public/js/src/panes/dropzonePane.js',
+					'public/js/src/panes/pane.header.js',
+					'public/js/src/panes/pane.progress.js',
+					'public/js/src/panes/pane.map.js',
+					'public/js/src/panes/pane.status.js',
+					'public/js/src/panes/pane.start.js',
+					'public/js/src/panes/pane.error.js',
+					'public/js/src/panes/pane.dropzone.js',
 
 					// Controls 
-					'public/js/src/controls/zIndexControl.js',
-					'public/js/src/controls/layermenuControl.js',
-					'public/js/src/controls/inspectControl.js',
-					'public/js/src/controls/descriptionControl.js',
-					'public/js/src/controls/legendsControl.js',
-					'public/js/src/controls/mousepositionControl.js',
-					'public/js/src/controls/baselayertoggleControl.js',
-					'public/js/src/controls/styleControl.js',
-					'public/js/src/controls/cartocssControl.js',
-					'public/js/src/controls/tooltipControl.js',
-					'public/js/src/controls/spinningMap.js',
+					'public/js/src/controls/control.zindex.js',
+					'public/js/src/controls/control.layermenu.js',
+					'public/js/src/controls/control.inspect.js',
+					'public/js/src/controls/control.description.js',
+					'public/js/src/controls/control.legends.js',
+					'public/js/src/controls/control.mouseposition.js',
+					'public/js/src/controls/control.baselayertoggle.js',
+					'public/js/src/controls/control.style.js',
+					'public/js/src/controls/control.cartocss.js',
+					'public/js/src/controls/control.tooltip.js',
+					'public/js/src/controls/control.spinningmap.js',
 
 					// Models 
-					'public/js/src/models/projects.js',
-					'public/js/src/models/clients.js',
-					'public/js/src/models/users.js',
-					'public/js/src/models/layers.js',
-					'public/js/src/models/files.js',
-					'public/js/src/models/roles.js',
+					'public/js/src/models/model.projects.js',
+					'public/js/src/models/model.clients.js',
+					'public/js/src/models/model.users.js',
+					'public/js/src/models/model.layers.js',
+					'public/js/src/models/model.files.js',
+					'public/js/src/models/model.roles.js',
 
 					// Access
 					'public/js/src/core/access.js',
 			
 					// Analytics
-					'public/js/src/core/analytics.js',
+					'public/js/src/ext/analytics.js',
 
 					// Config file
 					'public/js/src/config/config.js',
+					'public/js/src/lang/language.english.js',
 
 					// App 
 					'public/js/src/core/app.js'
@@ -264,14 +265,14 @@ module.exports = function(grunt) {
 				
 				src : [  
 
-					'public/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.css',
-					'public/js/src/grande.js/css/menu.css',                    
-					'public/js/src/grande.js/css/editor.css',
+					'public/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.css',
+					'public/js/lib/grande.js/css/menu.css',                    
+					'public/js/lib/grande.js/css/editor.css',
 					'public/css/bootstrap.min.css',
 					'public/css/font-awesome.min.css',
 					'public/css/mapbox.css',        
-					'public/js/src/leaflet.js/leaflet.css',
-					'public/js/src/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css',
+					'public/js/lib/leaflet.js/leaflet.css',
+					'public/js/lib/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css',
 					'public/js/lib/powerange/powerange.min.css',
 					'public/js/lib/codemirror/lib/codemirror.css',
 					'public/js/lib/codemirror/mode/cartocss/codemirror.carto.css',
@@ -321,7 +322,7 @@ module.exports = function(grunt) {
 				
 				src : [
 					'public/js/lib/mapbox.js/mapbox.2.1.4.js',
-					'public/js/src/controls/spinningMap.js',
+					'public/js/src/controls/control.spinningmap.js',
 					'public/js/src/config/login.config.js',
 					'public/js/src/core/login.js',
 				],
