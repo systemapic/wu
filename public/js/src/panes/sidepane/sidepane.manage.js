@@ -132,6 +132,7 @@ Wu.SidePane.Manage = Wu.Class.extend({
 		app.Tooltip.add(div_currentRole, tooltip);
 
 		// role explanation
+		console.log('setting infor: cur role: ', currentRole);
 		var infoDiv = Wu.DomUtil.create('div', 'manage-access-info', wrapper);
 		var role = currentRole ? currentRole.getSlug() : 'noRole';
 		var infoText = app.language.tooltips.roles[role];
