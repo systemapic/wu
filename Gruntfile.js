@@ -147,12 +147,12 @@ module.exports = function(grunt) {
 					'public/js/lib/async/async.js',
 					
 					// leaflet + mapbox
-					'public/js/src/leaflet.js/leaflet-0.7.3-src.js',
+					'public/js/lib/leaflet.js/leaflet-0.7.3-src.js',
 					'public/js/lib/mapbox.js/mapbox.standalone.uncompressed.js', // DO NOT REPLACE! has custom edits:4648!
-					'public/js/src/leaflet.js/plugins/leaflet.geojson.draw.js',
-					'public/js/src/leaflet.js/plugins/leaflet.draw-src.js',
-					'public/js/src/leaflet.js/plugins/leaflet-search/src/leaflet-search.js',
-					'public/js/src/leaflet.js/plugins/leaflet.utfgrid.js',
+					'public/js/lib/leaflet.js/plugins/leaflet.geojson.draw.js',
+					'public/js/lib/leaflet.js/plugins/leaflet.draw-src.js',
+					'public/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.js',
+					'public/js/lib/leaflet.js/plugins/leaflet.utfgrid.js',
 
 					// tools
 					'public/js/lib/dropzone.js/dropzone.min.js',
@@ -160,9 +160,9 @@ module.exports = function(grunt) {
 					'public/js/lib/sortable.js/Sortable.js',
 
 					// grande
-					'public/js/src/grande.js/js/grande.class.js',
-					'public/js/src/grande.js/js/grande.js',
-					'public/js/src/grande.js/js/grande.attachments.js',
+					'public/js/lib/grande.js/js/grande.class.js',
+					'public/js/lib/grande.js/js/grande.js',
+					'public/js/lib/grande.js/js/grande.attachments.js',
 
 					// codemirror
 					'public/js/lib/codemirror/mode/cartocss/cartoref.js',
@@ -194,7 +194,7 @@ module.exports = function(grunt) {
 					'public/js/src/core/class.js',
 
 					// Extend Leaflet
-					'public/js/src/leaflet.js/plugins/extendLeaflet.js',
+					'public/js/lib/leaflet.js/plugins/extendLeaflet.js',
 
 					// Sidepane 
 					'public/js/src/panes/sidepane/sidepane.js',

@@ -126,7 +126,6 @@ Wu.Project = Wu.Class.extend({
 		
 		// get new layer from server
  		Wu.Util.postcb('/api/layers/new', options, this._createdLayerFromGeoJSON, this);
-
 	},
 
 	_createdLayerFromGeoJSON : function (context, data) {
@@ -138,7 +137,6 @@ Wu.Project = Wu.Class.extend({
 		app.SidePane.DataLibrary.uploaded(parsed, {
 			autoAdd : true
 		});
-
 	},
 
 	createLayer : function () {
@@ -219,7 +217,6 @@ Wu.Project = Wu.Class.extend({
 		
 		// update color theme
 		this.setColorTheme();
-
 	},
 
 	select : function () {
@@ -294,7 +291,6 @@ Wu.Project = Wu.Class.extend({
 		// save to server
 		var string = JSON.stringify(json);
 		this._save(string);
-		
 	},
 
 
@@ -302,7 +298,6 @@ Wu.Project = Wu.Class.extend({
 
 		// save all fields that has changed since last save (or if no last save...?)
 		// todo
-
 	},
 	
 
@@ -327,7 +322,6 @@ Wu.Project = Wu.Class.extend({
 		var json = JSON.stringify(options);
 		
  		Wu.Util.postcb('/api/project/new', json, callback.bind(opts.context), this);
-
 	},
 
 	unload : function () {
@@ -387,7 +381,6 @@ Wu.Project = Wu.Class.extend({
 		// save color theme to project 
 		this.colorTheme = savedCSS;
 		this._update('colorTheme');
-
 	},
 
 	setColorTheme : function () {
