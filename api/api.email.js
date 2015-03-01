@@ -104,12 +104,7 @@ module.exports = api.email = {
 		var email   = newUser.local.email;
 
 		// email body
-		// var html = '<h1>Welcome to Systemapic.com ' + name + '</h1>';
-		// html    += '<br><h3>Login to <a href="http://systemapic.com" target="_blank">Systemapic.com</a> with the following details:</h3>';
-		// html    += '<br>Username: ' + email; 
-		// html    += '<br>Password: ' + password;
 		var body    = '<div style="background-color: #f8f8f8; padding: 0; margin: 0; font-family: helvetica neue, helvetica, \'Open Sans\'; position: relative; top: 0; left: 0;width: 100%; height: 100%; padding-top: 100px;"><div style="width: 500px; margin: auto; background-color: white; border-radius: 20px; padding: 20px; color: #3f4652; position: relative; margin-bottom: 25px;"><div style="text-align: center;background: white;width: 140px;min-height: 140px;border-radius: 100px;position: relative;top: 0;margin: auto;"><img style="position: relative; top: 10px;" src="http://systemapic.com/logo/Just_Circle/120x120/grayDark-systemapic-logo-circle-120x120.png">	</div><h1 style="font-weight: 500;font-size: 23px;text-align: center;margin: 10px;">Welcome to <a href="http://systemapic.com" style="text-decoration: none; color: #3f4652">Systemapic.com</a></h1><h1 style="font-weight: 500;font-size: 36px;text-align: center;margin: 0;">' + name + '</h1><div style="border-top: 1px dashed #3f4652;margin-top: 40px;margin-bottom: 40px;opacity: 0.15;"></div><h4 style="font-size: 17px;padding: 0;margin: 5px;margin-bottom: 20px;line-height: 1.4;">You can now log into <a style="text-decoration: none; color: #4a89f7" href="https://maps.systemapic.com">maps.systemapic.com</a> with the following details:</h4><h5 style="font-size: 14px; padding: 0; margin: 5px;">Username: <a style="color: #4a89f7; text-decoration: none; href="#">' + email + '</a></h5><h5 style="font-size: 14px; padding: 0; margin: 5px;">Password: <span style="color: #4a89f7">' + password + '</span></h5><div style="border-top: 1px dashed #3f4652;margin-top: 40px;margin-bottom: 30px;opacity: 0.15;"></div><div style="font-size: 13px;line-height: 1.3;font-style: italic;padding-bottom: 20px;opacity: 0.5;">Keep your password stored in a safe place. <br>For security reasons, you may not change your password.<br></div></div><div style="left: 0;font-size: 12px;font-style: italic;width: 100%;text-align: center; margin-bottom: 100px; padding-bottom: 100px;"><a style="text-decoration: none; color: #3f4652;" href="mailto:info@systemapic.com">info@systemapic.com</a> ~ <a style="text-decoration: none; color:#3f4652;" href="http:/systemapic.com">Systemapic.com</a> &copy;</div></div>';
-
 
 		// send email
 		api.email._send({
@@ -147,8 +142,5 @@ module.exports = api.email = {
 		});
 
 	},
-
-
-
 
 }

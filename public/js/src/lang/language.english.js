@@ -6,6 +6,8 @@ var language = {
 
 		roles : {
 
+			superAdmin : 'Rules the kingdom.',
+			portalAdmin : 'Full access to everything.',
 			projectOwner : "Can do everything with project, including deleting others's content.",
 			projectEditor : "Can do everything with project, except deleting other's content and project.",
 			projectManager : "Can read project and delegate users up to same level, but not edit.",

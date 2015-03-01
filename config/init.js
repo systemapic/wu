@@ -103,6 +103,7 @@ function create_models() {
 		role.uuid = 'role-' + uuid.v4();
 		role.name = 'Super Admin';
 		role.members.push(user.uuid);
+		role.slug = 'superAdmin';
 		role.save(function (err, role) {
 			// set all capabilities to true
 			_.each(role.capabilities, function (cap, key) {
@@ -127,6 +128,7 @@ function create_models() {
 		var role = new Role();
 		role.uuid = 'role-' + uuid.v4();
 		role.name = 'Portal Admin';
+		role.slug = 'portalAdmin';
 		role.save(function (err, role) {
 			// set all capabilities to true
 			_.each(role.capabilities, function (cap, key) {
