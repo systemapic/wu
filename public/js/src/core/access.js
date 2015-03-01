@@ -378,6 +378,7 @@ Wu.Access = Wu.Class.extend({
 		edit_user 		: function (project, user) { 
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_user')) return true;
+			if (!project) return false;
 			if (app.access.has.project_capability(user, project, 'edit_user')) return true;
 			return false;
 		},

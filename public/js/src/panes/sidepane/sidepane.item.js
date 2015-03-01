@@ -226,7 +226,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 		// if (_.contains(classy, 'map')) {
 		if ( app._activeMenuItem == 'map' ) {
-			var n = app.SidePane.panes.indexOf('Map');		// calculate position
+			var n = app.SidePane._panes.indexOf('Map');		// calculate position
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = w;
 			Wu.DomUtil.removeClass(__map, "map-blur")
@@ -234,7 +234,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 	    
 		// if (_.contains(classy, 'documents')) {
 		if ( app._activeMenuItem == 'documents' ) {	
-			var n = app.SidePane.panes.indexOf('Documents');
+			var n = app.SidePane._panes.indexOf('Documents');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
 			Wu.DomUtil.addClass(__map, "map-blur")
@@ -246,7 +246,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 	    
 		// if (_.contains(classy, 'dataLibrary')) {
 		if ( app._activeMenuItem == 'dataLibrary' ) {
-			var n = app.SidePane.panes.indexOf('DataLibrary');
+			var n = app.SidePane._panes.indexOf('DataLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
 			Wu.DomUtil.addClass(__map, "map-blur");
@@ -259,7 +259,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 	    	// if (_.contains(classy, 'mediaLibrary')) {
 		if ( app._activeMenuItem == 'mediaLibrary' ) {
-			var n = app.SidePane.panes.indexOf('MediaLibrary');
+			var n = app.SidePane._panes.indexOf('MediaLibrary');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
 			Wu.DomUtil.addClass(__map, "map-blur")
@@ -272,7 +272,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 		// if (_.contains(classy, 'users')) {
 		if ( app._activeMenuItem == 'users' ) {			
-			var n = app.SidePane.panes.indexOf('Users');
+			var n = app.SidePane._panes.indexOf('Users');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
 			Wu.DomUtil.addClass(__map, "map-blur")
@@ -285,7 +285,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 		// if (_.contains(classy, 'share')) {
 		if ( app._activeMenuItem == 'share' ) {
-			var n = app.SidePane.panes.indexOf('Share');
+			var n = app.SidePane._panes.indexOf('Share');
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = '100%';
 			Wu.DomUtil.removeClass(__map, "map-blur")
@@ -333,6 +333,8 @@ Wu.SidePane.Item = Wu.Class.extend({
 		// add disabled class
 		Wu.DomUtil.addClass(this._menu, 'disabled');
 
+		this._enabled = false;
+
 	},
 
 	enable : function () {
@@ -342,6 +344,8 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 		// remove disabled class
 		Wu.DomUtil.removeClass(this._menu, 'disabled');
+
+		this._enabled = true;
 	},
 
 	remove : function () {

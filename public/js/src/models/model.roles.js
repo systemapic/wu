@@ -18,6 +18,9 @@ Wu.Role = Wu.Class.extend({
 
 	},
 
+	noRole : function () {
+		return this.store.slug == 'noRole';
+	},
 
 	getName : function () {
 		return this.store.name;

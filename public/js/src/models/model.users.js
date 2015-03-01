@@ -296,11 +296,11 @@ Wu.User = Wu.Class.extend({
 		var projects = [];
 
 		_.each(allProjects, function (p) {
-
 			var roles = p.getRoles();
-
 			_.each(roles, function (r) {
-				if (r.hasMember(this)) projects.push(p);
+				if (r.hasMember(this) && !r.noRole()) {
+					projects.push(p);
+				}
 			}, this)
 
 		}, this);
