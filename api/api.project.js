@@ -92,6 +92,12 @@ module.exports = api.project = {
 		async.waterfall(ops, function (err, project) {
 			if (err) return api.error.general(req, res, err);
 
+			// slack
+			api.slack.createdProject({
+				project : project, 
+				user : account
+			});
+
 			// return
 			api.project._returnProject(req, res, project);
 		});
@@ -115,6 +121,7 @@ module.exports = api.project = {
 		project.description 	= store.description;
 		project.keywords 	= store.keywords;
 		project.client 		= store.client;
+		project.position 	= store.position;
 
 		// add roles
 		roles.forEach(function (role) {
@@ -171,6 +178,13 @@ module.exports = api.project = {
 		async.waterfall(ops, function (err, project) {
 			if (err) return api.error.general(req, res, err);
 
+
+			// slack
+			api.slack.deletedProject({
+				project : project,
+				user : account
+			});
+
 			// done
 			res.end(JSON.stringify({
 				project : project.uuid,
@@ -225,6 +239,8 @@ module.exports = api.project = {
 
 		async.waterfall(ops, function (err, project) {
 			if (err) return api.error.general(req, res, err);
+
+
 
 			// done
 			res.end(JSON.stringify(project));
@@ -446,91 +462,5 @@ module.exports = api.project = {
 
 		async.waterfall(ops, done);
 	},
-
-
-	// _getAll : function (callback, user) {
-		
-	// 	// async queries
-	// 	var a = {};
-
-	// 	// is superadmin, get all projects
-	// 	if (api.access.superadmin(user)) {
-	// 		a.superadminProjects = function (cb) {
-	// 			Project
-	// 			.find()
-	// 			.populate('files')
-	// 			.populate('roles')
-	// 			.populate('layers')
-	// 			.exec(function(err, result) { 
-	// 				cb(err, result); 
-	// 			});
-	// 		}
-	// 	}
-		
-	// 	// get all projects created by user
-	// 	a.createdBy = function (cb) {
-	// 		Project
-	// 		.find({createdBy : user.uuid})
-	// 		.populate('roles')
-	// 		.populate('files')
-	// 		.populate('layers')
-	// 		.exec(function(err, result) { 
-	// 			cb(err, result); 
-	// 		});
-	// 	}
-
-	// 	// get all projects that user is editor for
-	// 	a.editor = function (cb) {
-	// 		Project
-	// 		.find({ uuid : { $in : user.role.editor.projects } })
-	// 		.populate('files')
-	// 		.populate('layers')
-	// 		.populate('roles')
-	// 		.exec(function(err, result) { 
-	// 			cb(err, result); 
-	// 		});
-	// 	}
-
-	// 	// get all projects user is reader for
-	// 	a.reader = function (cb) {
-	// 		Project
-	// 		.find({ uuid : { $in : user.role.reader.projects } })
-	// 		.populate('files')
-	// 		.populate('roles')
-	// 		.populate('layers')
-	// 		.exec(function(err, result) { 
-	// 			cb(err, result); 
-	// 		});
-	// 	}
-
-
-	// 	// do async 
-	// 	async.parallel(a, function (err, result) {
-			
-	// 		// return error
-	// 		if (err) return callback(err);
-
-	// 		// move into one array
-	// 		var array = [];
-	// 		for (r in result) {
-	// 			array.push(result[r]);
-	// 		}
-
-	// 		// flatten
-	// 		var flat = _.flatten(array)
-
-	// 		// remove duplicates
-	// 		var unique = _.unique(flat, 'uuid');
-
-	// 		callback(err, unique);
-	// 	});
-		
-		
-
-	// },
-
-	
-
-
 
 }

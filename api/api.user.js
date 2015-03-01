@@ -62,12 +62,14 @@ module.exports = api.user = {
 		ops.push(function (callback) {
 			Project
 			.findOne({uuid : projectUuid})
+			.populate('roles')
 			.exec(callback);
 		});
 
 
 		// check access
 		ops.push(function (project, callback) {
+			console.log('checking access'.cyan);
 			console.log('lets check', project);
 			api.access.to.create_user({
 				user : account,
@@ -77,7 +79,7 @@ module.exports = api.user = {
 
 		// create user
 		ops.push(function (options, callback) {
-			console.log()
+			console.log('looks liek got access!'.yellow, options)
 			api.user._create({
 				options : req.body,
 				account : account
@@ -86,7 +88,8 @@ module.exports = api.user = {
 
 		// send email
 		ops.push(function (user, password, callback) {
-			api.email.sendWelcomeEmail(user, password);  // refactor plain pass
+			console.log('got password: ', password);
+			// api.email.sendWelcomeEmail(user, password);  // refactor plain pass
 			callback(null, user);
 		});
 
