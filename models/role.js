@@ -8,6 +8,7 @@ var roleSchema = mongoose.Schema({
 
 	uuid 	: String,
 	name    : String, // projectOwner, projectEditor, projectManager, etc.
+	slug 	: String, // template name, sometimes
 
 	capabilities : {
 		

@@ -275,3 +275,74 @@ body {
 	background-color: #cfd0d2 !important;
 	color: #000 !important;
 	}
+
+
+
+/*manage access info box*/
+.manage-access-info {
+	left: 451px;
+	position: absolute;
+	top: 54px;
+}
+
+
+
+/*LIGHTER DESIGN EXPERIMENT #1*/
+
+.header-title-wrap {
+	width: auto;
+}
+/*.header-title-wrap {
+	width: auto;
+	background: rgba(0,0,0, 0.36);
+	border-radius: 3px;
+}
+.header-title {
+	color: white;
+	font-weight: 400;
+}
+.header-subtitle {
+	color: white;
+	font-weight: 500;
+}
+
+
+.home-container {
+	background: rgba(0,0,0, 0.36);
+}
+.home-logo {
+	background-position: -64px -229px;
+	opacity: 0.9;
+}
+.home-status {
+	color: white;
+}
+
+.q-editor-menu {
+	background: rgba(0, 0, 0, 0.36);
+}
+#menuslider {
+	rgba(0, 0, 0, 0.16);
+}
+.q-editor-menu a {
+	color: white;
+}
+.active a {
+	background: rgb(167, 219, 249) !important;
+}
+
+
+*/
+
+
+
+
+
+
+/*dont remove*/
+.displayNone {
+	display: none;
+}
+
+
+
