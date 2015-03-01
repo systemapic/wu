@@ -106,7 +106,6 @@ module.exports = api.portal = {
 		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'.yellow);
 		console.log('* User: ' + req.user.firstName + ' ' + req.user.lastName);
 		console.log('* User uuid: ' + req.user.uuid);
-		// console.log('* IP: ' + req._remoteAddress);
 		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'.yellow);
 		console.time('getPortal');
 
