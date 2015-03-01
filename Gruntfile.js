@@ -148,7 +148,7 @@ module.exports = function(grunt) {
 					
 					// leaflet + mapbox
 					'public/js/lib/leaflet.js/leaflet-0.7.3-src.js',
-					'public/js/lib/mapbox.js/mapbox.standalone.uncompressed.js', // DO NOT REPLACE! has custom edits:4648!
+					'public/js/lib/mapbox.js/mapbox.standalone.uncompressed.js',
 					'public/js/lib/leaflet.js/plugins/leaflet.geojson.draw.js',
 					'public/js/lib/leaflet.js/plugins/leaflet.draw-src.js',
 					'public/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.js',
