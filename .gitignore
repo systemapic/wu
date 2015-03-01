@@ -1,6 +1,6 @@
 node_modules/*
 config/config.js
-public/js/src/config/*
+public/js/src/config/config.js
 log/*
 dist/tmp/*
 views/tmp/*
@@ -8,16 +8,12 @@ views/*.serve.*
 public/css/fonts
 public/css/images
 public/css/style.css
-dist/css/css.dependencies.min.css
-dist/css/css.portal.min.css
-dist/css/login.min.css
-dist/js/js.portal.min.js
-dist/js/js.dependencies.min.js
-dist/js/login.min.js
+dist/css/*.min.css
+dist/js/*.min.js
 public/css/login.css
 public/css/style.min.css
 public/js/lib/zenpen/*
-public/js/src/leaflet.js/plugins/leaflet-search
+public/js/lib/leaflet.js/plugins/leaflet-search
 dist/css/mobilestyle-login.css
 dist/css/mobilestyle.css
 dist/css/padstyle.css
