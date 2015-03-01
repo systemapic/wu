@@ -1,6 +1,6 @@
 node_modules/*
 config/config.js
-public/js/src/config/*
+public/js/src/config/config.js
 log/*
 dist/tmp/*
 views/tmp/*
@@ -8,3 +8,14 @@ views/*.serve.*
 public/css/fonts
 public/css/images
 public/css/style.css
+dist/css/*.min.css
+dist/js/*.min.js
+public/css/login.css
+public/css/style.min.css
+public/js/lib/zenpen/*
+public/js/lib/leaflet.js/plugins/leaflet-search
+dist/css/mobilestyle-login.css
+dist/css/mobilestyle.css
+dist/css/padstyle.css
+dist/css/phantomJS.css
+dist/css/phantomJSthumb.css
