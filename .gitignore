@@ -1,6 +1,7 @@
 node_modules/*
 config/config.js
 public/js/src/config/config.js
+public/js/src/config/login.config.js
 log/*
 dist/tmp/*
 views/tmp/*
