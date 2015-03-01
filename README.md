@@ -5,4 +5,4 @@ See [wiki](https://github.com/noerdbiz/systemapic.js/wiki) for details.
 
 GIS Interactive Mapping CMS
 
-![alt tag](public/css/images/systemapic-logo-bw-2.png)
+![alt tag](public/docs/logo/Sideways/719x200/black-systemapic-logo-sideways-719x200.png)
