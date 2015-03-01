@@ -224,6 +224,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 		app.setStatus('Loading...');
 		this._lockNewProjectButton();
 
+		var position = app.options.defaults.project.position;
+
 		// create project object
 		var store = {
 			name 		: 'Project title',
@@ -233,7 +235,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 			createdByName 	: app.Account.getName(),
 			keywords 	: '',
 			client 		: this.client.uuid,
-			position 	: {},
+			position 	: position || {},
 			bounds : {
 				northEast : {
 					lat : 0,
@@ -257,12 +259,13 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// create new project with options, and save
 		var project = new Wu.Project(store);
 		project.editMode = true;
-		var callback = {
+		var options = {
+			store : store,
 			callback : this._projectCreated,
 			context : this
 		}
 
-		project._saveNew(callback);
+		project._saveNew(options);
 
 
 		// Google Analytics event trackign
@@ -305,10 +308,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// update project store
 		project.setNewStore(store);
-
-		// add to access locally
-		// project.addAccess();
-
 
 		// create project in sidepane
 		this._createNewProject(project);

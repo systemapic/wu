@@ -7,6 +7,8 @@ Wu.App = Wu.Class.extend({
 	// default options
 	options : systemapicConfigOptions, // global var from config.js... perhaps refactor.
 
+	language : language,
+
 	_ready : false,
 
 	initialize : function (options) {
@@ -192,7 +194,7 @@ Wu.App = Wu.Class.extend({
 	_initDependencies : function () {
 
 		// icanhaz templates
-		ich.grabTemplates()
+		// ich.grabTemplates()
 
 	},
 
@@ -316,9 +318,11 @@ Wu.App = Wu.Class.extend({
 
 	_lonelyProject : function () {
 		// check if only one project, 
+		console.log('lonelyprojects');
 		// if so, open it
 		if (_.size(app.Projects) == 1) {
 			for (p in app.Projects) {
+				console.log('yup!?', app.Projects);
 				var project = app.Projects[p];
 				this._setProject(project);
 				return true;
@@ -388,6 +392,8 @@ Wu.App = Wu.Class.extend({
 		// return if not found
 		if (!project) return false;
 
+		console.log('hotlink!?', this.hotlink);
+		
 		// set project
 		this._setProject(project);
 

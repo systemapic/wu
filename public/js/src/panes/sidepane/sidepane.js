@@ -149,8 +149,6 @@ Wu.SidePane = Wu.Class.extend({
 		var panes = this._getPaneArray();
 		var defaultPanes = app.access.to.edit_user(project) ? 3 : 2;
 
-		console.log('defaultPanes: ', defaultPanes);
-
 		if (panes != 0) {
 			var height = panes.length * bHeight;
 		} else {
@@ -161,7 +159,6 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	_getPaneArray : function (project) {
-		console.log('_getPaneArray', project);
 		var project = project || app.activeProject;
 
 		if (!project) return ['Clients', 'Users', 'Account'];
@@ -183,7 +180,6 @@ Wu.SidePane = Wu.Class.extend({
 		if (pane.share 		&& settings.socialSharing) 	panes.push('Share');
 		if (pane.account) 					panes.push('Account');
 
-		console.log('panes: ', panes);
 		return panes;
 	},
 
@@ -197,7 +193,6 @@ Wu.SidePane = Wu.Class.extend({
 
 	refreshProject : function (project) {
 
-		console.log('refreshProject', project);
 
 		var editMode = project.editMode; // access determined at Wu.Project
 		
@@ -218,8 +213,6 @@ Wu.SidePane = Wu.Class.extend({
 
 	refreshClient : function () {
 
-		console.log('refreshClient')
-		
 		// set panes 
 		var panes = ['Clients'];
 		if (app.Account.isManager()) panes.push('Users');
@@ -232,7 +225,6 @@ Wu.SidePane = Wu.Class.extend({
 	// display the relevant panes
 	refresh : function (panes) {
 		
-		console.log('sidepane.refresh panes: ', panes);
 
 		var panes = panes || this.panes;
 		this.panes = [];
