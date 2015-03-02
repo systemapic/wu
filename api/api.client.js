@@ -80,6 +80,8 @@ module.exports = api.client = {
 		var user = options.user,
 		    store = options.store;
 
+		if (!user || !store) return callback('Missing information.13');
+
 		// create new client
 		var client 		= new Clientel();
 		client.uuid 		= 'client-' + uuid.v4();
@@ -121,6 +123,8 @@ module.exports = api.client = {
 
 		// delete client
 		ops.push(function (options, callback) {
+			if (!options.client) return callback('No client.');
+
 			// delete
 			options.client.remove(callback);
 		});
@@ -137,7 +141,6 @@ module.exports = api.client = {
 	// ###  API: Update Client               ###
 	// #########################################
 	update : function (req, res) {
-
 		var clientUuid	= req.body.uuid,
 		    account = req.user,
 		    queries = {},
@@ -285,9 +288,4 @@ module.exports = api.client = {
 
 		async.waterfall(ops, done);
 	},
-}
-
-// helper function 
-function isObject(obj) {
-	return (Object.prototype.toString.call(obj) === '[object Object]' || Object.prototype.toString.call(obj) === '[object Array]');
 }

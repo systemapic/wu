@@ -83,38 +83,36 @@ module.exports = api.layer = {
 		layer.file 		= 'osm';
 
 		layer.save(function (err, doc) {
+			if (err || !doc) return api.error.general(req, res, err || "Couldn't create layer.");
 
 			// return layer to client
 			res.end(JSON.stringify(doc));
 
 			// add to project
-			api.dbAddLayerToProject(layer._id, projectUuid);
+			doc && api.layer.addToProject(doc._id, projectUuid);
 		});
 	},
 
+
 	// create layer from geojson
 	createLayerFromGeoJSON : function (req, res) {
-
-		var geojson = req.body.geojson;
-		var projectUuid = req.body.project;
-
-		var filename = uuid.v4() + '.geojson';
-		var outfile = '/tmp/' + filename;
-		var data = JSON.stringify(geojson);
-		var size = data.length;
+		var geojson = req.body.geojson,
+		    projectUuid = req.body.project,
+		    filename = uuid.v4() + '.geojson',
+		    outfile = '/tmp/' + filename,
+		    data = JSON.stringify(geojson),
+		    size = data.length;
 
 		fs.writeFile(outfile, data, function (err) {
-			if (err) console.log('write err: ', err);
+			if (err) return api.error.general(req, res, err);
 
 			var file = [{ 
-				
 				fieldName : 'file[]',
 				originalFilename : filename,
 				path : outfile,
 				size : size || 0,
 				name : 'Created Shape',
 				type : 'application/octet-stream' 
-
 			}];
 
 			req.files = {
@@ -123,36 +121,31 @@ module.exports = api.layer = {
 
 			// upload.upload(req, res);
 			api.upload.file(req, res);
-
 		});
-
 	},
+
 
 	// get layers and send to client
 	get : function (req, res) {
-
-		var project 	= req.body.project;
-		var user 	= req.user.uuid;
+		var project = req.body.project,
+		    user = req.user.uuid;
 
 		// error if no project or user
-		if (!project) return res.end("{ 'error' : 'no project id?'}"); 
-		if (!user)    return res.end("{ 'error' : 'no user id?'}"); 
-
+		if (!project || !user) return api.error.missingInformation(req, res);
 
 		// get project
 		Project.find({ 'access.read' : user, 'uuid' : project }, function(err, result) { 
-			if (err) { console.log('got error', err); }
+			if (err || !result) api.error.general(req, res, err);
 
 			// got project
 			Layer.find({ 'uuid': { $in: result.layers }}, function(err, docs){
-				if (err) { console.log('got errorw', err); }
+				if (err || !docs) api.error.general(req, res, err);
 				
 				// return layers
 				res.end(JSON.stringify(docs));
 			});
 		});
 	},
-
 
 
 	// update layer
@@ -162,82 +155,47 @@ module.exports = api.layer = {
 		var layerUuid 	= req.body.layer || false;
 		var user 	= req.user;
 		
-		console.log('req.body: ', req.body);
-
 		// error if no project or user
-		if (!layerUuid) return res.end(JSON.stringify({
-			error : 'Missing layer uuid.'
-		})); 
-
+		if (!layerUuid) return api.error.missingInformation(req, res);
 
 
 		Layer.findOne({'uuid' : layerUuid}, function (err, layer) {
-			if (err) console.error('Layer.findOne: ', err);
-
-			// error if no project or user
-			if (!layer) return res.end(JSON.stringify({
-				error : 'Missing layer uuid.'
-			})); 
+			if (err || !layer) return api.error.missingInformation(req, res);
 
 			// update description
 			if (req.body.hasOwnProperty('description')) {
-
 				var description = req.body.description;
-				console.log('updating description: ', description);
 				layer.description = description;
-				layer.save(function(err) {
-					if (err) throw err;
-				});
-
+				layer.save();
 			};
 
 			// update title
 			if (req.body.hasOwnProperty('title')) {
-
 				var title = req.body.title;
 				layer.title = title;
-				layer.save(function(err) {
-					if (err) throw err;
-				});
-
+				layer.save();
 			};
 
 			// update tooltip
 			if (req.body.hasOwnProperty('tooltip')) {
-
 				var tooltip = req.body.tooltip;
 				layer.tooltip = tooltip;
-				layer.save(function (err) {
-					if (err) throw err;
-				});
-
+				layer.save();
 			}
 
 			// update legends
 			if (req.body.hasOwnProperty('legends')) {
-
 				var legends = req.body.legends;
 				layer.legends = legends;
-				layer.save(function (err) {
-					if (err) throw err;
-				});
-
-				console.log('saved legends!!', legends);
+				layer.save();
 			}
 
 			// update zIndex
 			if (req.body.hasOwnProperty('zIndex')) {
-
 				var zIndex = req.body.zIndex;
 				layer.zIndex = zIndex;
-				layer.save(function (err) {
-					if (err) throw err;
-				});
-
-				console.log('saved zIndex!!', zIndex);
-
+				layer.save();
 			}
-
 
 			res.end('save done');
 		});
@@ -258,15 +216,14 @@ module.exports = api.layer = {
 		console.log('userid: ', userid);
 		console.log('uuids: ', layerUuids);
 
-
 		// validate
-		if (!projectUuid || !userid) return res.end('missing!');
-
-		var ops = [];
+		if (!projectUuid || !userid) return api.error.missingInformation(req, res);
 
 		// find layer _ids for removing in project
 		ops.push(function (callback) {
 			Layer.find({uuid : {$in : layerUuids}}, function (err, layers) {
+				if (err || !layers) return callback(err || 'No layers.');
+
 				layers.forEach(function (layer) {
 					_lids.push(layer._id);
 				});
@@ -282,16 +239,8 @@ module.exports = api.layer = {
 			
 			Project
 			.findOne({uuid : projectUuid})
-			// .populate('layers')
 			.exec(function (err, project) {
-				if (err) console.log('find err: ', err);
-
-				console.log('found project: ', project.name);
-
-				// // pull files
-				// _fids.forEach(function (f) {
-				// 	project.files.pull(f);
-				// });
+				if (err || !project) return callback(err || 'No project.');
 
 				// pull layers
 				_lids.forEach(function (l) {
@@ -300,54 +249,38 @@ module.exports = api.layer = {
 				
 				// project.markModified('files');
 				project.markModified('layers');
-
 				project.save(function (err) {
-					if (err) console.error('save err: ', err);
-					console.log('file removed from project');
-					return callback(err);
+					callback(err);
 				});
 			});
 		});
 
-		
-
-
 	
 		// run queries
 		async.series(ops, function(err) {
+			if (err) return api.error.general(req, res, err);		
 
-			if (err) {
-				console.log('asyn err: ', err);
-				return res.end('{ error : 0 }');
-			}		
-
-			console.log('delete done...?');
 			res.end(JSON.stringify({
 				error : err
 			}));
 		});
 
-
 	},
+
 
 	// reload layer meta
 	reloadMeta : function (req, res) {
-
 		var fileUuid = req.body.fileUuid;
 		var layerUuid = req.body.layerUuid;
 
 		// return on err
-		if (!fileUuid || !layerUuid) return res.end(JSON.stringify({
-			error : 'No layer specified.'
-		}));
+		if (!fileUuid || !layerUuid) return api.error.missingInformation(req, res);
 
 		// get meta
 		api.layer.getMeta(fileUuid, function (err, meta) {
 
 			// return on err
-			if (err) return res.end(JSON.stringify({
-				error : err
-			}));
+			if (err || !meta) return api.error.general(req, res, err || 'No meta.');
 
 			// save meta to fil
 			api.layer.setMeta(meta, layerUuid, function (err, result) {
@@ -361,19 +294,19 @@ module.exports = api.layer = {
 		});
 	},
 
+
 	// get layer meta
 	getMeta : function (fileUuid, callback) {
 
 		File
 		.findOne({uuid : fileUuid})
 		.exec(function (err, file) {
-			if (err) return callback(err);
+			if (err || !file) return callback(err || 'No file.');
 
 			// only support for geojson now
-			if (!file.data.geojson) return callback({error : 'No geojson found.'});
+			if (!file.data || !file.data.geojson) return callback({error : 'No geojson found.'});
 
 			// set path
-			// var path = FILEFOLDER + fileUuid + '/' + file.data.geojson;
 			var path = api.config.path.file + fileUuid + '/' + file.data.geojson;
 
 			// var omnipath = METAPATH + uuid + '.meta.json';
@@ -383,12 +316,15 @@ module.exports = api.layer = {
 		});
 	},
 
+
 	// set layer meta
 	setMeta : function (meta, layerUuid, callback) {
 
 		Layer
 		.findOne({uuid : layerUuid})
 		.exec(function (err, layer) {
+			if (err || !layer) return callback(err || 'No layer.');
+
 			layer.metadata = meta; 	// string?
 			layer.save(function (err) {
 				callback(err);
@@ -399,9 +335,10 @@ module.exports = api.layer = {
 	// get cartocss
 	getCartoCSS : function (req, res) {
 		var cartoId = req.body.cartoid;
-		// var path = CARTOCSSFOLDER + cartoId + '.mss';
 		var path = api.config.path.cartocss + cartoId + '.mss';
 		fs.readFile(path, {encoding : 'utf8'}, function (err, data) {
+			if (err || !data) return api.error.general(req, res, err || 'No data.');
+
 			res.end(data);
 		});
 	},
@@ -432,9 +369,7 @@ module.exports = api.layer = {
 
 		// save css to file by cartoId 
 		fs.writeFile(csspath, css, {encoding : 'utf8'}, function (err) {
-			console.log('err?', err);
-		
-
+			if (err) return api.error.general(req, res);
 
 
 			// send to tileserver storage
@@ -450,191 +385,55 @@ module.exports = api.layer = {
 
 			// callback
 			function (err, response, body) {
-				console.log('import carto response: err: ', err);
-				// console.log('response: ', response);
-				// console.log('resp bugfer: ', response.body.toString());
-				console.log('body: ', body);
-		        	
-				// var result = JSON.parse(body);
 
-				// console.log('result:', result);
-				// var result = JSON.parse(body);
+				// custom error handling
 				if (err) {
-					console.log('caught error....');
-		        		return res.end(JSON.stringify({
+					return res.end(JSON.stringify({
 		        			ok : false,
 		        			error : err
 		        		}));
-
 				}
-
-
+				// pass syntax errors to client
 		        	if (!body.ok) {
-		        		console.log('caught error....');
 		        		return res.end(JSON.stringify({
 		        			ok : false,
 		        			error : body.error
 		        		}));
 		        	}
 
-
 		        	if (!err && response.statusCode == 200) {
-		        		console.log(body)
-
-
-		        		// save ID to file object (as active css)
-		        		console.log('save to layer: layerUuid, fileUuid', layerUuid, fileUuid);
+				
 					Layer
 					.findOne({uuid : layerUuid})
 					.exec(function (err, layer) {
-
-						if (err) console.error(err);
-						console.log('fingind?? ', err, layer);
+						if (err || !layer) return api.error.general(req, res, err || 'No layer.');
 
 						layer.data.cartoid = cartoid;
 						layer.markModified('data');
 						layer.save(function (err, doc) {
-							if (err) console.log('err: ', err);
-							
+							if (err || !doc) return api.error.general(req, res, err || 'No layer.');
+
 							res.end(JSON.stringify({
 				        			ok : true,
 				        			cartoid : cartoid,
 				        			error : null			// todo: save err
 				        		}));
-
 						});
-
 					});
 
+		        	} else {
+		        		return api.error.general(req, res, 'setCartoCss !200');
 		        	}
-
-
-
 			});
-
 		});
-
 	},
 
 
-	// createLegends : function (req, res) {
-
-	// 	api.generateLegends(req, res, function (err, legends) {
-	// 		// todo move res.end here
-	// 	});
-
-	// },
-
-
-	// generateLegends : function (req, res, finalcallback) {
-
-	// 	var fileUuid = req.body.fileUuid,
-	// 	    cartoid = req.body.cartoid,
-	// 	    layerUuid = req.body.layerUuid,
-	// 	    ops = [];
-
-	// 	// get layer features/values
-	// 	ops.push(function (callback) {
-
-	// 		api.layer._getLayerFeaturesValues(fileUuid, cartoid, function (err, result) {
-	// 			if (err) console.error('_getLayerFeaturesValues err: ', err);
-	// 			callback(err, result);
-	// 		});
-	// 	});
-
-
-	// 	// for each rule found
-	// 	ops.push(function (result, callback) {
-	// 		var jah = result.rules;
-	// 		var css = result.css;
-	// 		var legends = [];
-
-	// 		async.each(jah, function (rule, cb) {
-
-	// 			var options = {
-	// 				css : css,
-	// 				key : rule.key,
-	// 				value : rule.value,
-	// 				id : 'legend-' + uuid.v4()
-	// 			}
-
-	// 			api._createStylesheet(options, function (err, result) {
-	// 				if (err) console.log('create stylesheet err: ', err);
-
-	// 				api._createLegend(result, function (err, path) {
-
-	// 					if (err) {
-	// 						console.log('catchin 33 err: ,', err);
-	// 						return cb(err);
-	// 					}
-
-	// 					// base64 encode png
-	// 					fs.readFile(path, function (err, data) {
-
-	// 						var base = data.toString('base64');
-	// 						var uri = util.format("data:%s;base64,%s", mime.lookup(path), base);
-
-	// 						console.log('CREATED LEGENDS?!?!?');
-	// 						console.log('base64: ', uri);
-
-	// 						var leg = {
-	// 							base64 	  : uri,
-	// 							key 	  : options.key,
-	// 							value 	  : options.value,
-	// 							id 	  : options.id,
-	// 							fileUuid  : fileUuid,
-	// 							layerUuid : layerUuid,
-	// 							cartoid   : cartoid,
-	// 							on 	  : true
-	// 						}
-
-	// 						legends.push(leg);
-
-	// 						cb(null);
-	// 					});	
-	// 				});
-
-	// 			}, this);
-
-
-	// 		}, function (err) {
-	// 			callback(err, legends);
-	// 		});
-	// 	});
-
-
-
-	// 	ops.push(function (legends, callback) {
-	// 		res.end(JSON.stringify(legends));
-	// 		callback();
-	// 	});
-
-
-	// 	async.waterfall(ops, function (err, legends) {
-	// 		console.log('waterfall done');
-	// 		console.log('err, legends', err, legends);
-	// 		// console.log('err string: ', err.toString());
-
-	// 		// catch err?
-	// 		if (err) res.end(JSON.stringify({
-	// 			err : err.toString()
-	// 		}));
-			
-	// 	});
-
-
-	// },
-
-
-
 	_createStylesheet : function (options, callback) {
-
-		
 		var featureKey = options.key;
 		var featureValue = options.value;
 		var css = options.css;
 		var lid = options.id;
-
 
 		var properties = {};
 		properties[featureKey] = featureValue;
@@ -678,11 +477,11 @@ module.exports = api.layer = {
 		}
 
 
-
 		// write geojson template to disk
-		// var toFile = LEGENDSPATH + 'template-' + lid + '.geojson'; 
 		var toFile = api.config.path.legends + 'template-' + lid + '.geojson'; 
+
 		fs.outputFile(toFile, JSON.stringify(geojson), function (err) {
+			if (err) return callback(err);
 
 			var options = {
 				"srs": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over",
@@ -702,81 +501,31 @@ module.exports = api.layer = {
 				}]
 			}
 
-			var cr = new carto.Renderer({});
-		
-			// get xml
-			var xml = cr.render(options);
-			// var stylepath = LEGENDSPATH + 'stylesheet-' + lid + '.xml';
-			var stylepath = api.config.path.legends + 'stylesheet-' + lid + '.xml';
-			fs.outputFile(stylepath, xml, function (err) {
-				if (err) console.log('carto write err', err);
+			try {
+				var cr = new carto.Renderer({});
+			
+				// get xml
+				var xml = cr.render(options);
+				var stylepath = api.config.path.legends + 'stylesheet-' + lid + '.xml';
 
-				var result = {
-					stylepath : stylepath,
-					lid : lid
-				}
+				fs.outputFile(stylepath, xml, function (err) {
+					if (err) return callback(err);
 
-				callback(null, result);
-			});
-		});//fs.out
+					var result = {
+						stylepath : stylepath,
+						lid : lid
+					}
+
+					callback(null, result);
+				});
+
+			} catch (e) {
+				callback(e);
+			}
+
+		});
 
 	},
-
-
-
-	// _createLegend : function (options, callback) {
-
-	// 	var mapnik = require('mapnik');
-	// 	var fs = require('fs');
-
-
-	// 	var stylepath = options.stylepath;
-	// 	var lid = options.lid;
-
-	// 	// register fonts and datasource plugins
-	// 	mapnik.register_default_fonts();
-	// 	mapnik.register_default_input_plugins();
-
-	// 	var map = new mapnik.Map(100, 50);
-	// 	// map.load('./test/stylesheet.xml', function(err,map) {
-
-	// 	try {
-	// 		map.load(stylepath, function(err, map) {
-	// 			if (err) console.error('map.load err', err); // eg. if wrong path 
-
-
-	// 			if (err) return callback(err);
-
-	// 			map.zoomAll(); // todo: zoom?
-	// 			var im = new mapnik.Image(100, 50);
-	// 			map.render(im, function(err,im) {
-	// 				// if (err) throw err;
-	// 				if (err) console.log('map.render err', err);
-
-	// 				im.encode('png', function(err, buffer) {
-	// 					// if (err) throw err;
-	// 					if (err) console.log('im.encode err: ', err);
-	// 					// fs.writeFile('map.png',buffer, function(err) {
-	// 					// var outpath = LEGENDSPATH + lid + '.png';
-	// 					var outpath = api.config.path.legends + lid + '.png';
-	// 					fs.writeFile(outpath, buffer, function(err) {
-	// 						if (err) throw err;
-	// 						console.log('saved map image to map.png');
-							
-
-	// 						callback(null, outpath);
-	// 					});
-	// 				});
-	// 			});
-	// 		});
-
-	// 	} catch (e) { console.log('FIX ERR!!!');}
-
-
-	// },
-
-
-
 
 
 	// #########################################
@@ -784,6 +533,7 @@ module.exports = api.layer = {
 	// #########################################	
 	// get features from geojson that are active in cartoid.mss (ie. only active/visible layers)
 	_getLayerFeaturesValues : function (fileUuid, cartoid, callback) {
+		if (!fileUuid || !cartoid) return callback('Missing information.1');
 
 		if (fileUuid == 'osm') {
 			api.layer._getLayerFeaturesValuesOSM(fileUuid, cartoid, callback);
@@ -793,168 +543,142 @@ module.exports = api.layer = {
 	},
 
 	_getLayerFeaturesValuesOSM : function (fileUuid, cartoid, callback) {
-
 		console.log('_getLayerFeaturesValuesOSM');
 		callback('debug');
-
 	},
 
 	_getLayerFeaturesValuesGeoJSON : function (fileUuid, cartoid, callback) {
-
+		if (!fileUuid || !cartoid) return callback('Missing information.2');
 
 		File
 		.findOne({uuid : fileUuid})
 		.exec(function (err, file) {
-			console.log('err?', err);
-			console.log('found file: ', file);
+			if (err || !file) return callback(err || 'No file.');
+
 
 			// read geojson file
-			// var path = FILEFOLDER + file.uuid + '/' + file.data.geojson;
 			var path = api.config.path.file + file.uuid + '/' + file.data.geojson;
+			
 			fs.readJson(path, function (err, data) {
-				if (err) console.log('err: : ', err);
+				if (err || !data) return callback(err || 'No data.');
 
 				// read css from file
-				// var cartopath = CARTOCSSFOLDER + cartoid + '.mss';
 				var cartopath = api.config.path.cartocss + cartoid + '.mss';
+				
 				fs.readFile(cartopath, 'utf8', function (err, buffer) {
-					if (err) console.error(err, cartopath);
+					if (err || !buffer) return callback(err || 'No data.');
 
 					// css as string
 					var css = buffer.toString();
 
-					// get rules from carto (forked! see explain below...)
-					var renderer = new carto.Renderer();
-					var info = renderer.getRules(css);
+					try {
 
-					console.log('-====> info', info);
+						// get rules from carto (forked! see explain below...)
+						var renderer = new carto.Renderer();
+						var info = renderer.getRules(css);
 
-					var string = JSON.stringify(info);
+						console.log('-====> info', info);
 
-					// add rules to jah
-					var jah = [];
-					var rules1 = info.rules;//[0].rules;
+						var string = JSON.stringify(info);
 
-					rules1.forEach(function (rule1) {
+						// add rules to jah
+						var jah = [];
+						var rules1 = info.rules;//[0].rules;
 
-						var rules2 = rule1.rules;
+						rules1.forEach(function (rule1) {
+
+							var rules2 = rule1.rules;
 
 
-						if (!rules2) return;				// todo? forEach on rule1?
-						rules2.forEach(function (rrules) {
-							if (!rrules.selectors) return;
+							if (!rules2) return;				// todo? forEach on rule1?
+							rules2.forEach(function (rrules) {
+								if (!rrules.selectors) return;
 
-							rrules.selectors.forEach(function (s) {
-								var rule = s.filters.filters;
-								for (var r in rule) {
-									var jahrule = rule[r];
-									jah.push({
-										key : jahrule.key.value,
-										value : jahrule.val.value
-									});
-								}
+								rrules.selectors.forEach(function (s) {
+									var rule = s.filters.filters;
+									for (var r in rule) {
+										var jahrule = rule[r];
+										jah.push({
+											key : jahrule.key.value,
+											value : jahrule.val.value
+										});
+									}
+								});
 							});
 						});
 
+						// add #layer
+						jah.push({
+							key : 'layer',
+							value : file.name
+						});
 
-					})
+						var result = {
+							rules : jah,
+							css : css
+						}
 
-					// add #layer
-					jah.push({
-						key : 'layer',
-						value : file.name
-					});
+						callback(null, result);
 
-					
-
-					var result = {
-						rules : jah,
-						css : css
+					} catch (e) {
+						callback(e);
 					}
-
-
-					callback(null, result);
-
 				});
 			});
 		});
-
-
-
 	},
 
-	// ================== DO NOT DELETE ===================================================================
-	//
-	// 	This is an added prototype fn to the node_module carto/lib/carto/renderer.js:12.
-	//
-	// 		-add it!  
-	//
-	// ======================================================================================================
-	//
-	// 	// systemapic hack
-	// carto.Renderer.prototype.getRules = function render(data) {
-
-	//     var env = _(this.env).defaults({
-	//         benchmark: true,
-	//         validation_data: false,
-	//         effects: []
-	//     });
-
-	//     if (!carto.tree.Reference.setVersion(this.options.mapnik_version)) {
-	//         throw new Error("Could not set mapnik version to " + this.options.mapnik_version);
-	//     }
-	//     var parser = (carto.Parser(env)).parse(data);
-	//     return parser;
-	// }
-	// ======================================================================================================
-
-
-
+	
 
 	_inheritDefinitions : function (definitions, env) {
-		var inheritTime = +new Date();
-		// definitions are ordered by specificity,
-		// high (index 0) to low
-		var byAttachment = {},
-		byFilter = {};
-		var result = [];
-		var current, previous, attachment;
+		
+		try {
+			var inheritTime = +new Date();
+			// definitions are ordered by specificity,
+			// high (index 0) to low
+			var byAttachment = {},
+			byFilter = {};
+			var result = [];
+			var current, previous, attachment;
 
-		// Evaluate the filters specified by each definition with the given
-		// environment to correctly resolve variable references
-		definitions.forEach(function(d) {
-			d.filters.ev(env);
-		});
+			// Evaluate the filters specified by each definition with the given
+			// environment to correctly resolve variable references
+			definitions.forEach(function(d) {
+				d.filters.ev(env);
+			});
 
-		for (var i = 0; i < definitions.length; i++) {
+			for (var i = 0; i < definitions.length; i++) {
 
-			attachment = definitions[i].attachment;
-			current = [definitions[i]];
+				attachment = definitions[i].attachment;
+				current = [definitions[i]];
 
-			if (!byAttachment[attachment]) {
-				byAttachment[attachment] = [];
-				byAttachment[attachment].attachment = attachment;
-				byFilter[attachment] = {};
-				result.push(byAttachment[attachment]);
-			}
+				if (!byAttachment[attachment]) {
+					byAttachment[attachment] = [];
+					byAttachment[attachment].attachment = attachment;
+					byFilter[attachment] = {};
+					result.push(byAttachment[attachment]);
+				}
 
-			// Iterate over all subsequent rules.
-			for (var j = i + 1; j < definitions.length; j++) {
-				if (definitions[j].attachment === attachment) {
-					// Only inherit rules from the same attachment.
-					current = addRules(current, definitions[j], byFilter[attachment], env);
+				// Iterate over all subsequent rules.
+				for (var j = i + 1; j < definitions.length; j++) {
+					if (definitions[j].attachment === attachment) {
+						// Only inherit rules from the same attachment.
+						current = addRules(current, definitions[j], byFilter[attachment], env);
+					}
+				}
+
+				for (var k = 0; k < current.length; k++) {
+					byFilter[attachment][current[k].filters] = current[k];
+					byAttachment[attachment].push(current[k]);
 				}
 			}
 
-			for (var k = 0; k < current.length; k++) {
-				byFilter[attachment][current[k].filters] = current[k];
-				byAttachment[attachment].push(current[k]);
-			}
+			// if (env.benchmark) console.warn('Inheritance time: ' + ((new Date() - inheritTime)) + 'ms');
+
+			return result;
+		} catch (e) {
+			return [];
 		}
-
-		// if (env.benchmark) console.warn('Inheritance time: ' + ((new Date() - inheritTime)) + 'ms');
-
-		return result;
 
 	},
 
@@ -971,7 +695,7 @@ module.exports = api.layer = {
 		layer.metadata 		= options.metadata;
 
 		layer.save(function (err, doc) {
-			callback(err, doc);
+			callback && callback(err, doc);
 		});
 	},
 
@@ -980,6 +704,8 @@ module.exports = api.layer = {
 		Project
 		.findOne({'uuid' : projectUuid })
 		.exec(function (err, project) {
+			if (err || !project) return callback(err || 'No project.');
+
 			project.layers.push(layer_id);			
 			project.markModified('layers');
 			project.save(function (err) {
@@ -987,13 +713,10 @@ module.exports = api.layer = {
 			});
 		});
 	},
-
-
 }
 
 // systemapic hack
 carto.Renderer.prototype.getRules = function render(data) {
-
     var env = _(this.env).defaults({
         benchmark: true,
         validation_data: false,

@@ -41,28 +41,66 @@ var api = module.parent.exports;
 // exports
 module.exports = api.error = { 
 
-
 	unauthorized : function (req, res) {
+		console.log('api.error.unauthorized'.red);
+		
 		var message = "Don't be cheeky! All your IP are belong to us.";
 		res.end(JSON.stringify({ 
 			error : message 
 		}));
+
+		api.error.log('unauthorized');
 	},
 
 	missingInformation : function (req, res) {
+		console.log('api.error.missingInformation'.red);
+		
 		var message = 'Missing information. Stay with the program!';
 		res.end(JSON.stringify({ 
 			error : message 
 		}));
+		
+		api.error.log('missingInformation');
 	},
 
 	general : function (req, res, err) {
+		console.log('api.error.general'.red, err);
+
 		res.end(JSON.stringify({
-			error : err
+			error : api.error.pretty(err)
 		}));
+		
+		api.error.log(err);
 	},
-	
+
+	pretty : function (err) {
+		if (!err) return err;
+
+		// return message if available		
+		if (err.message) return err.message;
+
+		// return ugly
+		return err;
+	},
+
+	log : function (err) {
+		if (!err) return;
+
+		// print
+		if (err.stack) console.log('stack:'.red, err.stack);
+		if (err.message) console.log('message'.red, err.message);
+		
+
+		for (item in err) {
+			console.log('err items: ', err[item]);
+		}
+
+		// todo: slack, ga.js, log, etc.
+	},
+
 
 
 
 }
+
+

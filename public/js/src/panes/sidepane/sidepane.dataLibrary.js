@@ -518,7 +518,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// create dropzone
 		app.Dropzone.initDropzone({
-			uploaded : this.uploaded.bind(this),
+			uploadedCallback : this.uploaded.bind(this),
 			clickable : this._uploader
 		});
                     
@@ -537,10 +537,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	
-	handleError : function (error) {
+	handleError : function (err) {
+		console.error(err);
 
 		// set error
-		app.ErrorPane.setError('Upload error:', error.error, 3);
+		app.ErrorPane.setError('Upload error: ', err, 3);
 
 	},
 
@@ -550,7 +551,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var options = options || {};
 		
 		// handle errors
-		if (record.errors) this.handleError(record.errors);
+		if (record.error) this.handleError(record.error);
 		
 		// return if nothing
 		if (!record.files) return;

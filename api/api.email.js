@@ -42,7 +42,7 @@ var api = module.parent.exports;
 // exports
 module.exports = api.email = { 
 
-	_send : function (options, callback) {
+	_send : function (options) {
 
 		// hook up to gmail
 		var transporter = nodemailer.createTransport(api.config.nodemailer);
@@ -56,11 +56,10 @@ module.exports = api.email = {
 		// overwrite to // debug
 		options.to = 'knutole@noerd.biz';
 
-
 		// send email
 		transporter.sendMail(options);
 
-		// var options = {
+		// transporter options = {
 		// 	from    : from,
 		// 	to      : to,	
 		// 	bcc     : bcc, 
@@ -68,17 +67,18 @@ module.exports = api.email = {
 		// 	html    : body
 		// }
 
+		console.log('Sent email!'.yellow, options);
 	},
 
 
 	sendPasswordResetEmail : function (user) {
-		console.log('sending email!', user);
-		
+		if (!user) return;
+
 		// todo: SSL
 		var name    = user.firstName + ' ' + user.lastName;
 		var email   = user.local.email;
 		var token   = api.access.setPasswordResetToken(user);
-		var link    = config.portalServer.uri + 'reset?email=' + email + '&token=' + token;
+		var link    = api.config.portalServer.uri + 'reset?email=' + email + '&token=' + token;
 
 		var to      = email;
 		var subject = 'Please confirm your request for a password reset';
@@ -89,8 +89,6 @@ module.exports = api.email = {
 			to : to,
 			body : body,
 			subject : subject
-		}, function (err, result) {
-			console.log('sent email!', err, result);
 		});
 
 
@@ -98,7 +96,8 @@ module.exports = api.email = {
 
 
 	sendWelcomeEmail : function (newUser, password) {
-		
+		if (!newUser || !newUser.local) return;
+
 		// todo: SSL
 		var name    = newUser.firstName + ' ' + newUser.lastName;
 		var email   = newUser.local.email;
@@ -111,16 +110,12 @@ module.exports = api.email = {
 			to      : email,	
 			subject : 'Congratulations! Here are your access details for Systemapic.com',
 			html    : body
-		}, function (err, result) {
-			console.log('sent email: ', err, result);
 		});
-
-
 	},
 
 
 	sendConfirmPasswordChange : function (newUser, password) {
-		console.log('sending email!')
+		if (!newUser || !newUser.local) return;
 		
 		// todo: SSL
 		var name    = newUser.firstName + ' ' + newUser.lastName;
@@ -137,10 +132,7 @@ module.exports = api.email = {
 			to : to,
 			body : body,
 			subject : subject
-		}, function (err, result) {
-			console.log('sent email!', err, result);
 		});
-
 	},
 
 }

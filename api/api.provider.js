@@ -44,15 +44,16 @@ module.exports = api.provider = {
 	mapbox : {
 
 		setDefault : function (options, sodone) {	
+			if (!options) return sodone('No options provided.');
 
 			var project = options.project,
 			    username = api.config.defaultMapboxAccount.username,
 			    accessToken = api.config.defaultMapboxAccount.accessToken,
 			    ops = [];
 
-			ops.push(function (callback) {
-				console.log('callback1', callback);
+			if (!project) return sodone('No project.');
 
+			ops.push(function (callback) {
 				// add default mapbox account: systemapic
 				api.provider.mapbox.requestAccount({
 					project : project, 
@@ -62,8 +63,6 @@ module.exports = api.provider = {
 			});
 
 			ops.push(function (options, callback) {
-				console.log('callback2', callback);
-
 				// create layers from mapbox data
 				api.provider.mapbox.createLayers({
 					project : project, 
@@ -73,8 +72,6 @@ module.exports = api.provider = {
 			});
 
 			ops.push(function (options, callback) {
-				console.log('callback3', callback);
-
 				// add layers to project
 				api.provider.mapbox.addLayersToProject({
 					project : project, 
@@ -85,8 +82,6 @@ module.exports = api.provider = {
 			});
 
 			ops.push(function (options, callback) {
-				console.log('callback4', callback);
-
 				var project = options.project;
 
 				// save project
@@ -97,7 +92,7 @@ module.exports = api.provider = {
 
 			// do async and go to callback
 			async.waterfall(ops, function (err, result) {
-				console.log('water fall done', err, result);
+				if (err) return sodone(err);
 				sodone(null, result);
 			});
 
@@ -106,13 +101,14 @@ module.exports = api.provider = {
 
 		// mapbox helper fn
 		addLayersToProject : function (options, callback) {
-
-			console.log('callback5', callback);
+			if (!options) return callback('No options.');
 
 			var project = options.project,
 			    layers = options.layers,
 			    username = options.username,
 			    accessToken = options.accessToken;
+
+			if (!project) return callback('No project.');
 
 			// add new layers
 			layers.forEach(function (add) {
@@ -131,81 +127,10 @@ module.exports = api.provider = {
 		},
 
 
-		// import mapbox account from username, create Layer Objects of all layers, return Layers to client
-		// called from routes /api/util/getmapboxaccount
-		// getAccount : function (req, res) {
-
-		// 	var username 	= req.body.username,
-		// 	    projectUuid = req.body.projectId,
-		// 	    accessToken = req.body.accessToken,
-		// 	    userUuid 	= req.user.uuid,
-		// 	    ops = [];
-
-		// 	ops.push(function (callback) {
-		// 		Project
-		// 		.findOne({uuid : projectUuid})
-		// 		.populate('files')
-		// 		.populate('layers')
-		// 		.exec(callback);
-		// 	});
-
-		// 	ops.push(function (project, callback) {
-		// 		api.provider.mapbox._getAccount({
-		// 			username : username,
-		// 			project : project,
-		// 			accessToken : accessToken
-		// 		}, callback);
-		// 	});
-
-		// 	async.waterfall(ops, function (err, project) {
-		// 		if (err) api.error.general(req, res, err);
-
-		// 		// return project
-		// 		api.project._returnProject(req, res, project);
-		// 	});
-
-		// },
-
-
-		// _getAccount : function (options, done) {
-
-		// 	// req, res, project, username, accessToken
-
-		// 	// add ops to async queue
-		// 	var ops = [];
-
-		// 	ops.push(function (callback) {
-		// 		// add default mapbox account: systemapic
-		// 		api.provider.mapbox.requestAccount(options, callback);
-		// 	});
-
-		// 	ops.push(function (options, callback) {
-		// 		// create layers from mapbox data
-		// 		api.provider.mapbox.createLayers(options, callback);
-		// 	});
-
-		// 	ops.push(function (options, callback) {
-		// 		// add layers to project
-		// 		api.provider.mapbox.addLayersToProject(options, callback); 
-		// 	});
-
-		// 	ops.push(function(project, callback) {
-		// 		// save project
-		// 		project.markModified('layers');
-		// 		project.markModified('connectedAccounts');
-		// 		project.save(callback);
-		// 	});
-
-		// 	// do async and done
-		// 	async.waterfall(ops, done);
-		// },
-
-
-
-
 		// send request to mapbox
 		requestAccount : function (options, callback) {
-			
+			if (!options) return callback('No options.');
+
 			var project = options.project,
 			    username = options.username,
 			    accessToken = options.accessToken,
@@ -216,24 +141,22 @@ module.exports = api.provider = {
 
 			// send request to mapbox
 			request(url, function (error, response, body) {
-
 				// err handling
-				if (error || response.statusCode != 200) err = error || response.statusCode;
+				if (error || response.statusCode != 200 || !body || body == '[]') return callback(error || 'Not 200.');
 
 				// parse result
 				options.mapboxLayers = JSON.parse(body);
 
 				// return layers to async ops
 				callback(null, options);
-
 			});
-
 		},
 
 
 		// mapbox helper fn
 		createLayers : function (options, callback) {
-			
+			if (!options) return callback('No options.');
+
 			var project = options.project,
 			    mapboxLayers = options.mapboxLayers,
 			    accessToken = options.accessToken,
@@ -274,16 +197,107 @@ module.exports = api.provider = {
 			});
 
 			async.series(ops, function (err, results) {
-				if (err) console.error('createLayers err: ', err);
+				if (err) return callback(err);
 
 				options.layers = layers;
-
 				callback(null, options);
 			});
 		},
 
 
-		
+		// import mapbox account from username, create Layer Objects of all layers, return Layers to client
+		// called from routes /api/util/getmapboxaccount
+		getAccount : function (req, res) {
+
+			var username 	= req.body.username,
+			    projectUuid = req.body.projectId,
+			    accessToken = req.body.accessToken,
+			    userUuid 	= req.user.uuid,
+			    ops = [];
+
+			ops.push(function (callback) {
+				Project
+				.findOne({uuid : projectUuid})
+				.populate('files')
+				.populate('layers')
+				.exec(callback);
+			});
+
+			// make sure not already added?
+
+			ops.push(function (project, callback) {
+				api.provider.mapbox._getAccount({
+					username : username,
+					project : project,
+					accessToken : accessToken
+				}, callback);
+			});
+
+			async.waterfall(ops, function (err, project) {
+				if (err) api.error.general(req, res, err);
+
+				// return project
+				api.project._returnProject(req, res, project);
+			});
+
+		},
+
+		_getAccount : function (options, done) {
+			// req, res, project, username, accessToken
+
+			// add ops to async queue
+			var ops = [];
+
+			ops.push(function (callback) {
+				// get account
+				api.provider.mapbox.requestAccount(options, callback);
+			});
+
+			// check if access token is valid
+			ops.push(function (options, callback) {
+				api.provider.mapbox.verifyToken(options, callback);
+			});
+
+			ops.push(function (options, callback) {
+				// create layers from mapbox data
+				api.provider.mapbox.createLayers(options, callback);
+			});
+
+			ops.push(function (options, callback) {
+				// add layers to project
+				api.provider.mapbox.addLayersToProject(options, callback); 
+			});
+
+			ops.push(function(options, callback) {
+				var project = options.project;
+				
+				// save project
+				project.markModified('layers');
+				project.markModified('connectedAccounts');
+				project.save(callback);
+			});
+
+			// do async and done
+			async.waterfall(ops, done);
+		},
+
+
+		verifyToken : function (options, done) {
+
+			var url = 'http://api.tiles.mapbox.com/v4/mapbox.streets/features.json?access_token=' + options.accessToken;//pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q'
+
+			// send request to mapbox
+			request(url, function (error, response, body) {
+
+				// invalid access token
+				if (response.statusCode == 401) return done('Invalid access token.');
+					
+				// valid
+				done(null, options);
+			});
+
+		},
+
 
 	}
 
