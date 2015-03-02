@@ -1619,6 +1619,10 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 	// on click when adding new mapbox account
 	importMapbox : function () {
 
+		// check if already added
+		if (this._existingMapboxAccount()) return;
+
+		// get access token
 		if (!this._askedToken) return this.tokenMode();
 
 		// get username
@@ -1633,9 +1637,20 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Side Pane', 'Options > Connected Src: import mapbox']);
-
-
 	},
+
+	_existingMapboxAccount : function () {
+		var username = this._mapboxInput.value;
+		var usernames = _.pluck(this.project.getMapboxAccounts(), 'username');
+		if (_.contains(usernames, username)) {
+			console.log('cant add already existing account!');
+			this._mapboxInput.value = '';
+			this._mapboxInput.setAttribute('placeholder', 'Already exists!');
+			return true;
+		}
+		return false;
+	},
+
 
 	_importMapbox : function (username, accessToken, callback) {
 
@@ -1652,11 +1667,12 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 	importedMapbox : function (that, json) {
 		
 		// project store
-		var result = JSON.parse(json);
+		var result = Wu.parse(json);
 		var error = result.error;
 		var store = result.project;
 
 		if (error) {
+			// todo: error pane
 			console.log('There was an error importing mapbox: ', error);
 			return;
 		}
@@ -1664,6 +1680,13 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 		// update project
 		that.project.setStore(store);
 
+		// make sure height is updated
+		that._refreshHeight();
+	},
+
+	_refreshHeight : function () {
+		this.calculateHeight();
+		this._outer.style.height = this.maxHeight + 20 + 'px';
 	},
 
 	fillMapbox : function () {
@@ -1725,6 +1748,8 @@ Wu.SidePane.Map.Connect = Wu.SidePane.Map.MapSetting.extend({
 	_removeMapboxAccount : function (div, account) {
 		Wu.DomUtil.remove(div);
 		this.project.removeMapboxAccount(account);
+
+		this._refreshHeight();
 	},
 
 	_refreshMapboxAccount : function (div, account) {
