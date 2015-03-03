@@ -14,7 +14,6 @@ Wu.Role = Wu.Class.extend({
 		}
 
 		app.access.addRoleMember(options, callback);
-
 	},
 
 	noRole : function () {
@@ -50,6 +49,8 @@ Wu.Role = Wu.Class.extend({
 	},
 
 	hasCapability : function (cap) {
+		var caps = this.getCapabilities();
+		if (!caps) return false;
 		return this.getCapabilities()[cap];
 	},
 
