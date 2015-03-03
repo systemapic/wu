@@ -19,10 +19,14 @@ Wu.Layer = Wu.Class.extend({
 		// create leaflet layers
 		this.initLayer();
 
-		// all visible tiles loaded event
+		// all visible tiles loaded event (for phantomJS)
 		Wu.DomEvent.on(this.layer, 'load', function () {
 			app._loaded.push(this.getUuid());
 			app._loaded = _.uniq(app._loaded);
+		}, this);
+		Wu.DomEvent.on(this.layer, 'loading', function () {
+			app._loading.push(this.getUuid());
+			app._loading = _.uniq(app._loading);
 		}, this);
 
 		// get zIndex control
