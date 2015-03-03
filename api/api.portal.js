@@ -142,8 +142,7 @@ module.exports = api.portal = {
 
 		// series
 		async.series(a, function (err, result) {
-			if (err) console.log('getPortal err: ', err);
-			if (err) console.log('and res: ', result);
+			if (err || !result) return api.error.general(req, res, err || 'No result.');
 
 			// add user account
 			result.account = account;

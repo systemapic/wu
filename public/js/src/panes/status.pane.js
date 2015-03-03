@@ -71,7 +71,7 @@ Wu.StatusPane = Wu.Class.extend({
 		if (layerMenu) layerMenu.disableEdit();
 
 		// close all open options
-		app.SidePane.Map.closeAll();
+		app.SidePane.Options.closeAll();
 	},
 
 	// open sidepane menu

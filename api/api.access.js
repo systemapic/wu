@@ -38,13 +38,6 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
-// redis store for temp passwords // todo: move to api
-var redis = require('redis');
-var redisStore = redis.createClient(api.config.temptokenRedis.port, api.config.temptokenRedis.host)
-redisStore.auth(api.config.temptokenRedis.auth);
-redisStore.on('error', function (err) { console.error('redis err: ', err); });
-
-
 module.exports = api.access = {
 	
 	roleTemplates : {
@@ -399,6 +392,8 @@ module.exports = api.access = {
 		    roles = project.roles,
 		    ops = {};
 
+		// error catching
+		if (!project || !account || !roles) return callback(null, false);
 
 		ops.super = function (callback) {
 			var superRoleUuid = api.config.portal.roles.superAdmin;
@@ -406,6 +401,8 @@ module.exports = api.access = {
 			Role
 			.findOne({uuid : superRoleUuid})
 			.exec(function (err, superRole) {
+				if (err || !superRole) return callback(err, false);
+
 				var isMember = superRole.isMember(account);
 				isMember ? callback(err, superRole) : callback(err, false);
 			});
@@ -417,6 +414,8 @@ module.exports = api.access = {
 			Role
 			.findOne({uuid : portalRoleUuid})
 			.exec(function (err, portalRole) {
+				if (err || !portalRole) return callback(err, false);
+
 				var isMember = portalRole.isMember(account);
 				isMember ? callback(err, portalRole) : callback(err, false);
 			});
@@ -467,6 +466,8 @@ module.exports = api.access = {
 		    currentRole = options.currentRole,
 		    ops = [];
 
+		if (!project || !account || !role) return callback('No access.');
+
 		// get account's role in project
 		ops.push(function (callback) {
 			api.access.getUserRole({
@@ -488,14 +489,14 @@ module.exports = api.access = {
 			_.each(role.capabilities, function (cap, key) {
 				if (cap == true) if (!accountRole.capabilities[key]) lacking1 = true;
 			});
-			p1 = !lacking1 && accountRole.capabilities.delegate_to_user;
+			p1 = !lacking1 && accountRole.capabilities && accountRole.capabilities.delegate_to_user;
 
 			// check old role
 			if (currentRole) {
 				_.each(currentRole.capabilities, function (cap, key) {
 					if (cap == true) if (!accountRole.capabilities[key]) lacking2 = true;
 				});
-				p2 = !lacking2 && accountRole.capabilities.delegate_to_user;
+				p2 = !lacking2 && accountRole.capabilities && accountRole.capabilities.delegate_to_user;
 
 			} else {
 				p2 = true;
@@ -668,7 +669,6 @@ module.exports = api.access = {
 			}, callback);
 		});
 	},
-	
 
 	
 	_createRole : function (options, callback) {
@@ -813,6 +813,8 @@ module.exports = api.access = {
 			Role
 			.findOne({ uuid : roleUuid})
 			.exec(function (err, role) {
+				if (err || !role) return callback(err, false);
+				
 				var isAdmin = role.isMember(user);
 				callback(err, isAdmin);
 			});
@@ -825,6 +827,8 @@ module.exports = api.access = {
 			Role
 			.findOne({ uuid : roleUuid})
 			.exec(function (err, role) {
+				if (err || !role) return callback(err, false);
+				
 				var isAdmin = role.isMember(user);
 				callback(err, isAdmin);
 			});
@@ -833,7 +837,6 @@ module.exports = api.access = {
 		createdBy : function (user, account) {
 			return user.createdBy == account.getUuid();
 		},
-
 	},
 
 	as : {

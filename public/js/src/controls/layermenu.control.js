@@ -7,7 +7,6 @@ L.Control.Layermenu = L.Control.extend({
 	},
 
 	onAdd : function (map) {
-
 		var className = 'leaflet-control-layermenu',
 		    container = this._innerContainer = L.DomUtil.create('div', className),
 		    options   = this.options;
@@ -92,9 +91,6 @@ L.Control.Layermenu = L.Control.extend({
 		    	Wu.DomUtil.create('div', 'layers-mobile-arrow', this._innerContainer);
 		}
 
-
-
-
 	},
 
 	show : function () {
@@ -131,10 +127,10 @@ L.Control.Layermenu = L.Control.extend({
 		if (!this.editMode) return;
 
 		// cancel close initiated from sidepane layermeny mouseleave
-		var timer = app.SidePane.Map.mapSettings.layermenu.closeEditTimer;
+		var timer = app.SidePane.Options.settings.layermenu.closeEditTimer;
 		clearTimeout(timer);
 		setTimeout(function () {  // bit hacky, but due to 300ms _close delay in sidepane
-			var timer = app.SidePane.Map.mapSettings.layermenu.closeEditTimer;
+			var timer = app.SidePane.Options.settings.layermenu.closeEditTimer;
 			clearTimeout(timer);
 		}, 301);
 	},
@@ -144,17 +140,14 @@ L.Control.Layermenu = L.Control.extend({
 
 		// close after three seconds after mouseleave
 		var that = this;
-		var timer = app.SidePane.Map.mapSettings.layermenu.closeEditTimer = setTimeout(function () {
+		var timer = app.SidePane.Options.settings.layermenu.closeEditTimer = setTimeout(function () {
 			that.disableEdit();
 		}, 3000);
 	},
 
-
-
 	toggleLayerPane : function () {
 		this._open ? this.closeLayerPane() : this.openLayerPane();
 	},
-
 
 	// (j)
 	closeLayerPane : function () {
@@ -176,8 +169,6 @@ L.Control.Layermenu = L.Control.extend({
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Controls', 'Layers: close']);
-		
-
 	
 	},
 
@@ -200,13 +191,12 @@ L.Control.Layermenu = L.Control.extend({
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
 		app._map._controlCorners.topright.style.right = '295px';                
 		
-
 		// If we're on mobile
-		if ( Wu.app.mobile ) {
+		if (app.mobile) {
 
 			// Check if legends is open ~ close it when opening layer menu
-			if ( app.MapPane.legendsControl._isOpen ) app.MapPane.legendsControl.MobileCloseLegends();
-			if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
+			if (app.MapPane.legendsControl._isOpen) app.MapPane.legendsControl.MobileCloseLegends();
+			if (!app.MapPane.descriptionControl._isClosed) app.MapPane.descriptionControl.mobileClosePane();
 
 		}
 
@@ -218,7 +208,6 @@ L.Control.Layermenu = L.Control.extend({
 
 	// enter edit mode of layermenu
 	enableEdit : function () {
-
 		if (this.editMode) return;
 
 		// Make container visible
@@ -232,7 +221,6 @@ L.Control.Layermenu = L.Control.extend({
 
 		// turn off dropzone dragging
 		if (app.Dropzone) app.Dropzone.disable();
-
 
 		// Set attribute draggable to true on all divs
 		this.enableDraggable();
@@ -249,9 +237,6 @@ L.Control.Layermenu = L.Control.extend({
 		// add the drag'n drop new folder
 		this._insertMenuFolder();
 
-		// show edit buttons for menu items
-		// this._showEditButtons();
-
 		// open all items in layermenu
 		this.openAll();
 
@@ -260,7 +245,6 @@ L.Control.Layermenu = L.Control.extend({
 
 	// exit edit mode 
 	disableEdit : function () {
-
 		if (!this.editMode) return;
 
 		if (!this.project.store.layermenu || this.project.store.layermenu.length == 0 ) {
@@ -291,10 +275,8 @@ L.Control.Layermenu = L.Control.extend({
 
 		// remove new drag'n drop folder
 		this._removeMenuFolder();
-
 		
 	},
-
 	
 
 	_insertMenuFolder : function () {
@@ -825,7 +807,7 @@ L.Control.Layermenu = L.Control.extend({
 		if (elem) elem.parentNode.removeChild(elem);
 
 		// set inactive in sidepane layermenu
-		if (layermenuItem.layer) app.SidePane.Map.mapSettings.layermenu._off(layermenuItem.layer);
+		if (layermenuItem.layer) app.SidePane.Options.settings.layermenu._off(layermenuItem.layer);
 
 		// remove layer from map
 		var layer = layermenuItem.layer;
@@ -841,8 +823,8 @@ L.Control.Layermenu = L.Control.extend({
 		this.save();
 
 		// update Options pane
-		var baseLayer = app.SidePane.Map.mapSettings.baselayer;
-		var layerMenu = app.SidePane.Map.mapSettings.layermenu;
+		var baseLayer = app.SidePane.Options.settings.baselayer;
+		var layerMenu = app.SidePane.Options.settings.layermenu;
 		if (baseLayer) baseLayer.markOccupied();
 		if (layerMenu) layerMenu.markOccupied();
 
@@ -965,10 +947,8 @@ L.Control.Layermenu = L.Control.extend({
 	
 	_fill : function () {
 
-
 		// Get parent wrapper
 		this._parentWrapper = this._container.parentNode;
-
 
 		// return if empty layermenu
 		if (!this.project.store.layermenu || this.project.store.layermenu.length == 0 ) {
@@ -982,9 +962,6 @@ L.Control.Layermenu = L.Control.extend({
 
 		// Show parent wrapper if not empty
 		Wu.DomUtil.removeClass(this._parentWrapper, 'displayNone');
-
-
-		// console.log('layers are there, yo!', this.project.store.layermenu.length);
 
 		// iterate layermenu array and fill in to layermenu
 		this.project.store.layermenu.forEach(function (item) {
@@ -1038,8 +1015,8 @@ L.Control.Layermenu = L.Control.extend({
 
 
 	_editFolderTitle : function (uuid) {
-
 		if (!this.editMode || this.currentlyEditing) return;
+
 		this.currentlyEditing = true;
 
 		var layerItem = this.layers[uuid];
@@ -1178,9 +1155,7 @@ L.Control.Layermenu = L.Control.extend({
 		this.setMaxHeight(layersMaxHeight);
 	
 	}
-	
 });
-
 
 L.control.layermenu = function (options) {
 	return new L.Control.Layermenu(options);

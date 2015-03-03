@@ -357,10 +357,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 	_addDefaults : function () {
 		// add default baselayer
 		if (!app.SidePane) return;
-		if (!app.SidePane.Map) return;
-		if (!app.SidePane.Map.mapSettings) return;
-		if (!app.SidePane.Map.mapSettings.baselayer) return;
-		app.SidePane.Map.mapSettings.baselayer.setDefaultLayer();
+		if (!app.SidePane.Options) return; 	// refactor
+		if (!app.SidePane.Options.settings) return;
+		if (!app.SidePane.Options.settings.baselayer) return;
+		app.SidePane.Options.settings.baselayer.setDefaultLayer();
 	},
 
 	addHooks : function () {

@@ -44,27 +44,48 @@ module.exports = api.legend = {
 
 
 	create : function (req, res) {
+		console.log('api.legend.create'.yellow);
 
-		api.legend.generate(req, res, function (err, legends) {
-			// todo move res.end here
+		var options = {
+			fileUuid : req.body.fileUuid,
+		    	cartoid : req.body.cartoid,
+		    	layerUuid : req.body.layerUuid
+		}
+
+		api.legend.generate(options, function (err, legends) {
+			if (err) console.log('api.legend.generate err'.red, err);
+
+			if (err) return api.error.general(req, res, err);
+
+			// return legends
+			res.end(JSON.stringify(legends));
 		});
 
 	},
 
 
-	generate : function (req, res, finalcallback) {
-
-		var fileUuid = req.body.fileUuid,
-		    cartoid = req.body.cartoid,
-		    layerUuid = req.body.layerUuid,
+	generate : function (options, done) {
+		var fileUuid = options.fileUuid,
+		    cartoid = options.cartoid,
+		    layerUuid = options.layerUuid,
 		    ops = [];
+
+		// if (!fileUuid || !cartoid || !layerUuid) return done('Missing information.4');
+		if (!fileUuid || !cartoid) return done('Missing information.4');
+
+		console.log('ap.legend.generate'.cyan);
+		console.log('fiuleUuid: ', fileUuid);
+		console.log('cartoid: ', cartoid);
+		console.log('layerUuid:', layerUuid);
 
 		// get layer features/values
 		ops.push(function (callback) {
-
 			api.layer._getLayerFeaturesValues(fileUuid, cartoid, function (err, result) {
-				if (err) console.error('_getLayerFeaturesValues err: ', err);
-				callback(err, result);
+				if (err) console.log('_getLayerFeaturesValues err'.red, err);
+
+				if (err) return callback(err);
+				
+				callback(null, result);
 			});
 		});
 
@@ -76,6 +97,9 @@ module.exports = api.legend = {
 			var legends = [];
 
 			async.each(jah, function (rule, cb) {
+				if (!rule) console.log('no role'.red);
+
+				if (!rule) return cb('No rule.');
 
 				var options = {
 					css : css,
@@ -85,23 +109,24 @@ module.exports = api.legend = {
 				}
 
 				api.layer._createStylesheet(options, function (err, result) {
-					if (err) console.log('create stylesheet err: ', err);
+					if (err || !result) console.log('_createStylesheet err'.red, err, result);
+
+					if (err || !result) return cb(err || 'No stylesheet.');
 
 					api.legend._create(result, function (err, path) {
+						if (err || !path) console.log('api.legend._create err'.red, err, path);
+						
+						if (err || !path) return cb(err || 'No path.');
 
-						if (err) {
-							console.log('catchin 33 err: ,', err);
-							return cb(err);
-						}
 
 						// base64 encode png
 						fs.readFile(path, function (err, data) {
+							if (err || !data) console.log('legend readFile err'.red, err, data);
+
+							if (err || !data) return cb(err || 'No data.');
 
 							var base = data.toString('base64');
 							var uri = util.format("data:%s;base64,%s", mime.lookup(path), base);
-
-							console.log('CREATED LEGENDS?!?!?');
-							console.log('base64: ', uri);
 
 							var leg = {
 								base64 	  : uri,
@@ -109,7 +134,7 @@ module.exports = api.legend = {
 								value 	  : options.value,
 								id 	  : options.id,
 								fileUuid  : fileUuid,
-								layerUuid : layerUuid,
+								// layerUuid : layerUuid,
 								cartoid   : cartoid,
 								on 	  : true
 							}
@@ -122,39 +147,24 @@ module.exports = api.legend = {
 
 				}, this);
 
-
 			}, function (err) {
 				callback(err, legends);
 			});
 		});
 
 
-
-		ops.push(function (legends, callback) {
-			res.end(JSON.stringify(legends));
-			callback();
-		});
-
-
 		async.waterfall(ops, function (err, legends) {
-			console.log('waterfall done');
-			console.log('err, legends', err, legends);
+			if (err) console.log('legend.generate err: '.red, err);
 
-			// catch err?
-			if (err) res.end(JSON.stringify({
-				err : err.toString()
-			}));
-			
+			if (err) return done(err);
+
+			done(null, legends);
 		});
-
 
 	},
 
+
 	_create : function (options, callback) {
-
-		var mapnik = require('mapnik');
-		var fs = require('fs');
-
 
 		var stylepath = options.stylepath;
 		var lid = options.lid;
@@ -166,35 +176,39 @@ module.exports = api.legend = {
 		var map = new mapnik.Map(100, 50);
 
 		try {
-			map.load(stylepath, function(err, map) {
-				if (err) console.error('map.load err', err); // eg. if wrong path 
-
+			map.load(stylepath, function (err, map) {
 				if (err) return callback(err);
 
 				map.zoomAll(); // todo: zoom?
 				var im = new mapnik.Image(100, 50);
-				map.render(im, function(err,im) {
-					if (err) console.log('map.render err', err);
+				
+				map.render(im, function (err, im) {
+					if (err) console.log('map.render err'.red, err);
+
+					if (err) return callback(err);
 
 					im.encode('png', function(err, buffer) {
-						if (err) console.log('im.encode err: ', err);
-						var outpath = api.config.path.legends + lid + '.png';
-						fs.writeFile(outpath, buffer, function(err) {
-							if (err) throw err;
-							console.log('saved map image to map.png');
-							
+						if (err) console.log('im.encode err'.red, err);
 
+						if (err) return callback(err);
+
+						var outpath = api.config.path.legends + lid + '.png';
+						
+						fs.writeFile(outpath, buffer, function (err) {
+							if (err) console.log('legend._create writefile err:'.red, err);
+
+							if (err) return callback(err);
+							
 							callback(null, outpath);
 						});
 					});
 				});
 			});
 
-		} catch (e) { console.log('FIX ERR!!!');}
-
-
+		} catch (e) { 
+			console.log('legend._create try catch'.red, e);
+			callback(e);
+		}
 	},
-
-
 
 }

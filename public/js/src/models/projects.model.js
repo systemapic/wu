@@ -303,8 +303,14 @@ Wu.Project = Wu.Class.extend({
 
 	_save : function (string) {
 		// save to server                                       	// TODO: pgp
-		Wu.save('/api/project/update', string);                         // TODO: save only if actual changes! saving too much already
+		Wu.send('/api/project/update', string, this._saved.bind(this));                         // TODO: save only if actual changes! saving too much already
 	
+		
+	},
+
+	// callback for save
+	_saved : function (ctx, json) {
+
 		// set status
 		app.setSaveStatus();
 	},
@@ -1043,7 +1049,7 @@ Wu.Project = Wu.Class.extend({
 	},	
 
 	setTempLogo : function () {
-		this._sidePaneLogoContainer.src = app.config.logos.projectDefault;
+		this._sidePaneLogoContainer.src = app.options.logos.projectDefault;
 	}	
 
 });
