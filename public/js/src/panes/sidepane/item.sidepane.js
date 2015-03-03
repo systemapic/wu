@@ -225,8 +225,8 @@ Wu.SidePane.Item = Wu.Class.extend({
 		}
 
 		// if (_.contains(classy, 'map')) {
-		if ( app._activeMenuItem == 'map' ) {
-			var n = app.SidePane._panes.indexOf('Map');		// calculate position
+		if ( app._activeMenuItem == 'mapoptions' ) {
+			var n = app.SidePane._panes.indexOf('Options');		// calculate position
 			menuslider.style.top = h * n + 'px';
 			Wu.app.SidePane._container.style.width = w;
 			Wu.DomUtil.removeClass(__map, "map-blur")
