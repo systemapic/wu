@@ -43,7 +43,7 @@ module.exports = api.provider = {
 
 	mapbox : {
 
-		setDefault : function (options, sodone) {	
+		setDefault : function (options, done) {	
 			if (!options) return sodone('No options provided.');
 
 			var project = options.project,
@@ -51,7 +51,7 @@ module.exports = api.provider = {
 			    accessToken = api.config.defaultMapboxAccount.accessToken,
 			    ops = [];
 
-			if (!project) return sodone('No project.');
+			if (!project) return done('No project.');
 
 			ops.push(function (callback) {
 				// add default mapbox account: systemapic
@@ -92,8 +92,8 @@ module.exports = api.provider = {
 
 			// do async and go to callback
 			async.waterfall(ops, function (err, result) {
-				if (err) return sodone(err);
-				sodone(null, result);
+				if (err) return done(err);
+				done(null, result);
 			});
 
 		},
@@ -208,12 +208,13 @@ module.exports = api.provider = {
 		// import mapbox account from username, create Layer Objects of all layers, return Layers to client
 		// called from routes /api/util/getmapboxaccount
 		getAccount : function (req, res) {
-
 			var username 	= req.body.username,
 			    projectUuid = req.body.projectId,
 			    accessToken = req.body.accessToken,
 			    userUuid 	= req.user.uuid,
 			    ops = [];
+
+			console.log('getAccount'.bgYellow);
 
 			ops.push(function (callback) {
 				Project
@@ -224,6 +225,20 @@ module.exports = api.provider = {
 			});
 
 			// make sure not already added?
+			ops.push(function (project, callback) {
+
+				var mapboxAccounts = project.connectedAccounts.mapbox;
+
+				var exists = _.find(mapboxAccounts, function (m) {
+					return m.username == username;
+				});
+
+				if (exists) {
+					console.log('Account already exists'.red);
+					return callback('Account already connected.');
+				}
+				callback(null, project);
+			});
 
 			ops.push(function (project, callback) {
 				api.provider.mapbox._getAccount({
