@@ -311,6 +311,9 @@ Wu.Project = Wu.Class.extend({
 	// callback for save
 	_saved : function (ctx, json) {
 
+		var result = Wu.parse(json);
+		if (result.error) return app.error.set("Could not update project", result.error);
+
 		// set status
 		app.setSaveStatus();
 	},
@@ -753,15 +756,7 @@ Wu.Project = Wu.Class.extend({
 		this._setUrl();
 	},
 
-	setThumbCreated : function (bool) {
-		this.store.thumbCreated = bool;
-		this._update('thumbCreated');
-	},
-
-	getThumbCreated : function () {
-		return this.store.thumbCreated;
-	},
-
+	
 	setBounds : function (bounds) {
 		this.store.bounds = bounds;
 		this._update('bounds');
@@ -1038,14 +1033,23 @@ Wu.Project = Wu.Class.extend({
 		    path = '/images/' + image;
 
 		// Store new logo paths
-		context.setLogo(path);
-		context.setHeaderLogo(path);
+		context.setLogo(path); 		// trigger server-save
+		context.setHeaderLogo(path); 	// triggers server-save
 
 		context._menuItem.logo.src = path;
 
 		// Set logo in header pane
-		if (context == app.activeProject) app.HeaderPane.addedLogo(image);
+		if (context == app.activeProject) app.HeaderPane.addedLogo(image); // triggers this.setHeaderLogo -- triggers save
 
+	},
+
+	setThumbCreated : function (bool) {
+		this.store.thumbCreated = bool;
+		this._update('thumbCreated');
+	},
+
+	getThumbCreated : function () {
+		return this.store.thumbCreated;
 	},	
 
 	setTempLogo : function () {
