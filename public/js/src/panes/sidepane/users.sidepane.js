@@ -291,7 +291,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// add edit hooks
 		this.addEditHooks();
 
-		// this.addHooks();	
 	},
 
 
@@ -393,8 +392,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Side Pane', 'Users: Cancel create new user']);
-
-
 	},
 
 	confirmInput : function () {
@@ -543,15 +540,23 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		return checks;
 	},
 
+	_filteredUsers : function () {
+		// if superadmin, get all
+		if (app.Access.is.superAdmin(app.Account)) return app.Users;
+
+		// filter out superadmins
+		return _.filter(app.Users, function (u) {
+			return !app.Access.is.superAdmin(u);
+		});
+	},
 	
 	refreshTable : function () {
-		this.users = app.Users;
+		this.users = this._filteredUsers();
 
-		for (u in this.users) {
-			var user = this.users[u];
+		_.each(this.users, function (user) {
 			this.addTableItem(user);
-		}
-		
+		}, this);			
+
 		// sort list by name by default
 		this.list.sort('name', {order : 'asc'});
 	},
