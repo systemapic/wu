@@ -3,7 +3,7 @@ Wu.Dropzone = Wu.Class.extend({
 	// drop anywhere, anytime
 
 	options : {
-		metaDelay : 3000 // ms
+		metaDelay : 30000 // ms
 	},
 
 	initialize : function () {
