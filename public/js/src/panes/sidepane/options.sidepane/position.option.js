@@ -75,7 +75,7 @@ Wu.SidePane.Options.Position = Wu.SidePane.Options.Item.extend({
 
 		// generate project thumb (if it hasn't been manually set before)
 		var thumbCreated = project.getThumbCreated();
-		if ( !thumbCreated ) project.createProjectThumb();
+		if (!thumbCreated) project.createProjectThumb();
 
 		// call update on view
 		this.update();

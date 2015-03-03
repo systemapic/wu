@@ -541,7 +541,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		console.error(err);
 
 		// set error
-		app.ErrorPane.setError('Upload error: ', err, 3);
+		app.ErrorPane.setError('Upload error', err);
 
 	},
 

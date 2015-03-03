@@ -7,7 +7,6 @@ Wu.Role = Wu.Class.extend({
 	},
 
 	addMember : function (user, callback) {
-
 		var options = {
 			user : user,
 			project : this._project,
@@ -54,12 +53,6 @@ Wu.Role = Wu.Class.extend({
 		return this.getCapabilities()[cap];
 	},
 
-	_save : function () {
-
-		// save to server
-
-
-	},
 });
 
 
@@ -67,20 +60,14 @@ Wu.Role = Wu.Class.extend({
 Wu.Role.Super = Wu.Role.extend({
 
 	addMember : function (user, callback) {
-		console.log('adding ', user.getName(), ' to role ', this.getName());
-
 		
 		var options = {
 			userUuid : user.getUuid(),
 			roleUuid : this.getUuid()
 		}
 
-		console.log('addMember', options);
-		
 		// send
 		Wu.send('/api/access/super/setrolemember', options, function (err, json) {
-			console.log('/api/access/super/setrolemember', err, json);
-			if (err) console.error(err);
 			callback(err, json);
 		});
 
@@ -92,19 +79,14 @@ Wu.Role.Super = Wu.Role.extend({
 Wu.Role.Portal = Wu.Role.extend({
 
 	addMember : function (user, callback) {
-		console.log('adding ', user.getName(), ' to role ', this.getName());
 
 		var options = {
 			userUuid : user.getUuid(),
 			roleUuid : this.getUuid()
 		}
-
-		console.log('addMember', options);
 		
 		// send
 		Wu.send('/api/access/portal/setrolemember', options, function (err, json) {
-			console.log('/api/access/portal/setrolemember', err, json);
-			if (err) console.error(err);
 			callback(err, json);
 		});
 

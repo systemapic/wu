@@ -1,5 +1,3 @@
-// app.StatusPane
-
 Wu.StatusPane = Wu.Class.extend({
 
 	_ : 'statuspane', 
@@ -188,7 +186,7 @@ Wu.StatusPane = Wu.Class.extend({
 	setContentHeights : function () {
 
 		var clientsPane = app.SidePane.Clients;
-		var optionsPane = app.SidePane.Map;
+		var optionsPane = app.SidePane.Options;
 
 		if (clientsPane) clientsPane.setContentHeight();
 		if (optionsPane) optionsPane.setContentHeight();

@@ -827,7 +827,7 @@ module.exports = api.pixels = {
 			.quality(quality)
 			.write(newPath, function (err) {
 				if (err) return api.error.general(req, res, err);
-				res.sendfile(newPath, {maxAge : 10000000});
+				res.sendFile(newPath, {maxAge : 10000000});
 			});
 		});
 	},
@@ -1008,7 +1008,7 @@ module.exports = api.pixels = {
 	returnImage : function (req, res, imageFile) {
 		// send file back to client, just need file path
 		var path = api.config.path.image + imageFile.file;
-		res.sendfile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
+		res.sendFile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
 	},
 
 
