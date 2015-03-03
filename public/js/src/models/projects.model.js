@@ -167,6 +167,8 @@ Wu.Project = Wu.Class.extend({
 		// refresh sidepane
 		this.refreshSidepane();
 
+
+
 		// set active project in sidepane
 		if (this._menuItem) this._menuItem._markActive();
 
@@ -217,6 +219,9 @@ Wu.Project = Wu.Class.extend({
 		
 		// update color theme
 		this.setColorTheme();
+
+		// update project in sidepane
+		if (this._menuItem) this._menuItem.update();
 	},
 
 	select : function () {
@@ -626,10 +631,12 @@ Wu.Project = Wu.Class.extend({
 		    roles = this._roles;
 
 		_.each(roles, function (role) {
-			_.each(role.getMembers(), function (uuid) {
-				var user = app.Users[uuid];
-				if (user) users.push(user);
-			});
+			if (role.hasCapability('read_project')) {
+				_.each(role.getMembers(), function (uuid) {
+					var user = app.Users[uuid];
+					if (user) users.push(user);
+				});
+			}
 		});
 		return users;
 	},
