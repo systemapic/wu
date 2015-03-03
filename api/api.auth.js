@@ -72,9 +72,7 @@ module.exports = api.auth = {
 		User
 		.findOne({'local.email' : email})
 		.exec(function (err, user) {
-
-			// err
-			if (err || !user) console.error('no user ?', err, user);
+			if (err || !user) api.error.general(req, res, err || 'No such user. Maybe. ;)');
 
 			// check token
 			api.auth.checkPasswordResetToken(user, token, function (valid) {
@@ -111,15 +109,15 @@ module.exports = api.auth = {
 		var token = crypto.randomBytes(16).toString('hex'),
 		    key = 'resetToken-' + user.uuid;
 
-		redisStore.set(key, token);  // set temp token
-		redisStore.expire(key, 600); // expire in ten mins
+		api.redis.set(key, token);  // set temp token
+		api.redis.expire(key, 600); // expire in ten mins
 		return token;
 	},
 
 
 	checkPasswordResetToken : function (user, token, callback) {
 		var key = 'resetToken-' + user.uuid;
-		redisStore.get(key, function (err, actualToken) {
+		api.redis.get(key, function (err, actualToken) {
 			callback(!err && actualToken && actualToken == token)
 		});
 	},

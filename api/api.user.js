@@ -45,6 +45,7 @@ module.exports = api.user = {
 
 	// create user
 	create : function (req, res) {
+		if (!req.body || !req.body.project) return api.error.missingInformation(req, res);
 
 		// user not added to any roles on creation
 		// blank user with no access - must be given project access, etc.
@@ -69,8 +70,6 @@ module.exports = api.user = {
 
 		// check access
 		ops.push(function (project, callback) {
-			console.log('checking access'.cyan);
-			console.log('lets check', project);
 			api.access.to.create_user({
 				user : account,
 				project : project
@@ -106,6 +105,8 @@ module.exports = api.user = {
 		var options = job.options,
 		    account = job.account;
 
+		if (!options || !account) return callback('Missing information.5');
+
 		// create the user
 		var user            	= new User();
 		var password 		= crypto.randomBytes(16).toString('hex');
@@ -128,11 +129,14 @@ module.exports = api.user = {
 
 	// update user 	// todo: send email notifications on changes?
 	update : function (req, res) {
+		if (!req.body) return api.error.missingInformation(req, res);
+
 		var userUuid = req.body.uuid,
 		    account = req.user,
 		    projectUuid = req.body.project,
 		    ops = [];
 
+		if (!userUuid || !account || !projectUuid) return api.error.missingInformation(req, res);
 
 		ops.push(function (callback) {
 			User
@@ -144,6 +148,7 @@ module.exports = api.user = {
 			Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
+				if (err) return callback(err);
 				callback(null, user, project);
 			});
 		});
@@ -165,14 +170,15 @@ module.exports = api.user = {
 		});
 
 		async.waterfall(ops, function (err, user) {
-			if (err) api.error.general(req, res, err);
+			if (err || !user) api.error.general(req, res, err || 'No user.');
+
 			res.end(JSON.stringify(user));
 		});
-
 	},
 
 
 	_update : function (options, callback) {
+		if (!options) return callback('Missing information.6');
 
 		var user = options.user,
 		    options = options.options,
@@ -205,6 +211,8 @@ module.exports = api.user = {
 	},
 
 	_enqueueUpdate : function (job) {
+		if (!job) return;
+
 		var queries = job.queries,
 		    options = job.options,
 		    field = job.field,
@@ -222,10 +230,11 @@ module.exports = api.user = {
 		
 	// delete user  	
 	deleteUser : function (req, res) {
+		if (!req.body) return api.error.missingInformation(req, res);
+	
 		var userUuid = req.body.uuid,
 		    account = req.user,
 		    ops = [];
-
 
 		ops.push(function (callback) {
 			User
@@ -241,11 +250,13 @@ module.exports = api.user = {
 		});
 
 		ops.push(function (options, callback) {
+			if (!options || !options.subject) return callback('Missing information.7');
+
 			options.subject.remove(callback);
 		});
 
 		async.waterfall(ops, function (err, user) {
-			if (err) api.error.general(req, res, err);
+			if (err || !user) api.error.general(req, res, err);
 
 			// done
 			res.end(JSON.stringify(user));
@@ -257,6 +268,8 @@ module.exports = api.user = {
 
 	// check unique email
 	checkUniqueEmail : function (req, res) {
+		if (!req.body) return api.error.missingInformation(req, res);
+
 		var user = req.user,
 		    email = req.body.email,
 		    unique = false;
@@ -272,6 +285,8 @@ module.exports = api.user = {
 
 
 	getAll : function (options, done) {
+		if (!options) return done('No options.');
+
 		var user = options.user;
 
 		// check if admin
@@ -295,6 +310,8 @@ module.exports = api.user = {
 
 
 	_getAllFiltered : function (options, done) {
+		if (!options) return done('No options.');
+
 		// get all role members in all projects that account has edit_user access to
 		var user = options.user,
 		    ops = [];
@@ -320,13 +337,11 @@ module.exports = api.user = {
 
 		ops.push(function (roles, callback) {
 			var allUsers = [];
-
 			_.each(roles, function (role) {
 				_.each(role.members, function (member) {
 					allUsers.push(member);
 				});
 			});
-
 			callback(null, allUsers);
 		});
 		
@@ -343,10 +358,7 @@ module.exports = api.user = {
 		});
 
 		async.waterfall(ops, function (err, users) {
-			console.log('ops done!')
-			console.log('found users: ', users.length);
 			done(err, users);
 		});
 	},
-
 }

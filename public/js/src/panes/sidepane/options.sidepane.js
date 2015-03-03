@@ -1,7 +1,7 @@
-Wu.SidePane.Map = Wu.SidePane.Item.extend({
+Wu.SidePane.Options = Wu.SidePane.Item.extend({
 
-	_ : 'sidepane.map', 
-	type : 'map',
+	_ : 'sidepane.options', 
+	type : 'mapoptions',
 	title : 'Options',
 
 	initContent : function () {
@@ -19,19 +19,18 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		this._panes = {};
 
 		// init each setting
-		this.mapSettings = {};
-		this.mapSettings.baselayer = new Wu.SidePane.Map.BaseLayers();
-		this.mapSettings.layermenu = new Wu.SidePane.Map.LayerMenu();
-		this.mapSettings.position  = new Wu.SidePane.Map.Position();
-		this.mapSettings.bounds    = new Wu.SidePane.Map.Bounds();
-		this.mapSettings.controls  = new Wu.SidePane.Map.Controls();
-		this.mapSettings.connect   = new Wu.SidePane.Map.Connect(this._settingsContainer);  // refactor container, ich.template
-		this.mapSettings.settings  = new Wu.SidePane.Map.Settings(this._settingsContainer);  // refactor container, ich.template
+		this.settings = {};
+		this.settings.baselayer = new Wu.SidePane.Options.BaseLayers();
+		this.settings.layermenu = new Wu.SidePane.Options.LayerMenu();
+		this.settings.position  = new Wu.SidePane.Options.Position();
+		this.settings.bounds    = new Wu.SidePane.Options.Bounds();
+		this.settings.controls  = new Wu.SidePane.Options.Controls();
+		this.settings.connect   = new Wu.SidePane.Options.Connect(this._settingsContainer);  // refactor container, ich.template
+		this.settings.settings  = new Wu.SidePane.Options.Settings(this._settingsContainer);  // refactor container, ich.template
 
 
 		// add tooltip
 		app.Tooltip.add(this._menu, '(Editors only) In this section you will find all the options for setting up a map.');
-
 
 	},
 
@@ -43,13 +42,13 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		var HTML = this._HTML;
 
 		// Outer wrapper
-		HTML._mapSettingsContainer = Wu.DomUtil.makeit({type : 'div', id : 'mapsettings-container', appendto : this._container});
+		HTML._mapOptionsContainer = Wu.DomUtil.makeit({type : 'div', id : 'mapsettings-container', appendto : this._container});
 
 		// BASE LAYERS
 
 		// Wrappers
 		HTML.baseLayer = {};
-		HTML.baseLayer._wrap = Wu.DomUtil.makeit({type: 'div', id : 'editor-map-baselayer-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapSettingsContainer});
+		HTML.baseLayer._wrap = Wu.DomUtil.makeit({type: 'div', id : 'editor-map-baselayer-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapOptionsContainer});
 		HTML.baseLayer._H4 = Wu.DomUtil.makeit({type: 'h4', inner : 'Base Layers', appendto : HTML.baseLayer._wrap});
 
 
@@ -57,7 +56,7 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 
 		// Wrappers
 		HTML.layerMenu = {}
-		HTML.layerMenu._wrap = Wu.DomUtil.makeit({type: 'div', id : 'editor-map-layermenu-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapSettingsContainer});
+		HTML.layerMenu._wrap = Wu.DomUtil.makeit({type: 'div', id : 'editor-map-layermenu-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapOptionsContainer});
 		HTML.layerMenu._H4 = Wu.DomUtil.makeit({type: 'h4', inner : 'Layermenu', appendto : HTML.layerMenu._wrap});
 		HTML.layerMenu._menu = Wu.DomUtil.makeit({type:'div', id : 'editor-map-layermenu', appendto : HTML.layerMenu._wrap});
 		HTML.layerMenu._inner = Wu.DomUtil.makeit({type : 'div', id : 'map-layermenu-inner', cname : 'initheight', appendto : HTML.layerMenu._menu});
@@ -67,7 +66,7 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 
 		// Wrappers
 		HTML.position = {};
-		HTML.position._wrap = Wu.DomUtil.makeit({type : 'div', id : 'editor-map-position-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapSettingsContainer});
+		HTML.position._wrap = Wu.DomUtil.makeit({type : 'div', id : 'editor-map-position-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapOptionsContainer});
 		HTML.position._H4 = Wu.DomUtil.makeit({type: 'h4', inner : 'Position', appendto : HTML.position._wrap});
 		HTML.position._initPosCoord = Wu.DomUtil.makeit({type: 'div', id : "editor-map-initpos-coordinates", appendto : HTML.position._wrap});
 		HTML.position._initPosInner = Wu.DomUtil.makeit({type: 'div', id : 'map-initpos-inner', cname : 'initheight', appendto: HTML.position._initPosCoord });
@@ -92,7 +91,7 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 
 		// Wrapper
 		HTML.bounds = {};
-		HTML.bounds._wrapper = Wu.DomUtil.makeit({type : 'div', id : 'editor-map-bounds-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapSettingsContainer});
+		HTML.bounds._wrapper = Wu.DomUtil.makeit({type : 'div', id : 'editor-map-bounds-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapOptionsContainer});
 		HTML.bounds._H4 = Wu.DomUtil.makeit({type: 'h4', inner : 'Bounds', appendto : HTML.bounds._wrapper});
 		HTML.bounds._boundsCoords = Wu.DomUtil.makeit({type : 'div', id : 'editor-map-bounds-coordinates', appendto : HTML.bounds._wrapper});
 		HTML.bounds._boundsInner = Wu.DomUtil.makeit({type: 'div', id : 'map-bounds-inner', cname : 'initheight', appendto : HTML.bounds._boundsCoords});
@@ -136,7 +135,7 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 
 		// Wrapper
 		HTML.controls = {};
-		HTML.controls._wrap = Wu.DomUtil.makeit({type: 'div', id : 'editor-map-controls-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapSettingsContainer});
+		HTML.controls._wrap = Wu.DomUtil.makeit({type: 'div', id : 'editor-map-controls-wrap', cname : 'editor-inner-wrapper editor-map-item-wrap', appendto : HTML._mapOptionsContainer});
 		HTML.controls._H4 = Wu.DomUtil.makeit({type: 'h4', inner : 'Controls', appendto : HTML.controls._wrap });
 		HTML.controls._inner = Wu.DomUtil.makeit({type : 'div', id : 'editor-map-controls-inner-wrap', appendto : HTML.controls._wrap });
 
@@ -254,8 +253,8 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		this.project = app.activeProject;
 
 		// update map settings
-		for (s in this.mapSettings) {
-			var setting = this.mapSettings[s];
+		for (s in this.settings) {
+			var setting = this.settings[s];
 			setting.update();
 		}
 
@@ -267,7 +266,7 @@ Wu.SidePane.Map = Wu.SidePane.Item.extend({
 		// console.log('closeAll');
 
 		// close all options folders
-		var options = app.SidePane.Map.mapSettings;
+		var options = app.SidePane.Options.settings;
 		for (o in options) {
 			var option = options[o];
 			// console.log('option: ', option);

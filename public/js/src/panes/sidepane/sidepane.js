@@ -4,7 +4,7 @@ Wu.SidePane = Wu.Class.extend({
 
 	_allPanes : [
 		'Clients', 
-		'Map', 
+		'Options', 
 		'Documents', 
 		'DataLibrary', 
 		'Users', 
@@ -81,7 +81,7 @@ Wu.SidePane = Wu.Class.extend({
 
 		// render sidepanes
 		if (pane.clients) 	this.Clients 	  = new Wu.SidePane.Clients();
-		if (pane.mapOptions) 	this.Map 	  = new Wu.SidePane.Map();		// Options
+		if (pane.options) 	this.Options 	  = new Wu.SidePane.Options();		// Options
 		if (pane.documents) 	this.Documents 	  = new Wu.SidePane.Documents();
 		if (pane.dataLibrary) 	this.DataLibrary  = new Wu.SidePane.DataLibrary();
 		if (pane.mediaLibrary) 	this.MediaLibrary = new Wu.SidePane.MediaLibrary();
@@ -124,7 +124,7 @@ Wu.SidePane = Wu.Class.extend({
 	// call _deactivate on all items
 	_deactivate : function () {
 		if (this.Clients) 	this.Clients._deactivate();
-		if (this.Map) 		this.Map._deactivate();
+		if (this.Options) 	this.Options._deactivate();
 		if (this.Documents) 	this.Documents._deactivate();
 		if (this.DataLibrary) 	this.DataLibrary._deactivate();
 		if (this.MediaLibrary) 	this.MediaLibrary._deactivate();
@@ -153,7 +153,7 @@ Wu.SidePane = Wu.Class.extend({
 	setProject : function (project) {
 		// update content
 		if (this.Home) 		this.Home.updateContent(project);
-		if (this.Map) 		this.Map.updateContent(project);
+		if (this.Options)	this.Options.updateContent(project);
 		if (this.Documents) 	this.Documents.updateContent(project);
 		if (this.DataLibrary) 	this.DataLibrary.updateContent(project);
 	},
@@ -230,7 +230,7 @@ Wu.SidePane = Wu.Class.extend({
 		    canManage = app.access.to.edit_user(project, user);
 
 		if (pane.clients) 					panes.push('Clients');
-		if (pane.mapOptions 	&& canEdit) 			panes.push('Map'); 
+		if (pane.options 	&& canEdit) 			panes.push('Options'); 
 		if (pane.documents   	&& settings.documentsPane) 	panes.push('Documents');
 		if (pane.dataLibrary 	&& settings.dataLibrary) 	panes.push('DataLibrary');
 		if (pane.MediaLibrary 	&& settings.mediaLibrary) 	panes.push('MediaLibrary');
