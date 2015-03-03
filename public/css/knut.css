@@ -289,9 +289,9 @@ body {
 
 /*LIGHTER DESIGN EXPERIMENT #1*/
 
-.header-title-wrap {
-	width: auto;
-}
+/*.header-title-wrap {
+	width: 100%;
+}*/
 /*.header-title-wrap {
 	width: auto;
 	background: rgba(0,0,0, 0.36);
