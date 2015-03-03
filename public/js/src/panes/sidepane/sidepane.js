@@ -179,7 +179,6 @@ Wu.SidePane = Wu.Class.extend({
 
 		// get currently active panes
 		var active = _.filter(this._allPanes, function (pane) {
-			console.log('pane: ', pane);
 			return this[pane]._enabled;
 		}, this);
 
@@ -188,7 +187,6 @@ Wu.SidePane = Wu.Class.extend({
 
 		// disable all
 		_.each(this._allPanes, function (pane) {
-			console.log('pane: ', pane);
 			this[pane].disable();
 		}, this);
 

@@ -14,9 +14,8 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 		// create title and wrapper (and delete old content)
 		this._container.innerHTML = '<h4 id="h4-base">Base Layers</h4>';
-		var div = Wu.DomUtil.createId('div', 'select-baselayer-wrap', this._container);
+		var div = Wu.DomUtil.createId('div', 'select-baselayer-wrap select-wrap', this._container);
 		this._outer = Wu.DomUtil.create('div', 'select-elems', div);
-		Wu.DomUtil.addClass(div, 'select-wrap');
 
 		// add tooltip
 		var h4 = Wu.DomUtil.get('h4-base');
@@ -38,8 +37,6 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 		// mark unavailable layers
 		this.markOccupied();
-
-		
 	},
 
 
@@ -58,7 +55,7 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 		text.innerHTML = layer.store.title;
 
 		// set height if short title - hacky..
-		if (layer.store.title) { // err if no title
+		if (layer.store.title) { 
 			if (layer.store.title.length < 32) text.style.maxHeight = '12px';
 		}
 		
@@ -96,32 +93,11 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 		this._layers = this._layers || {};
 		this._layers[baseLayer.layer.store.uuid] = baseLayer;
 
-		// // // add edit hook
-		// Wu.DomEvent.on (button, 'mousedown', function (e) {
-		// 	console.log('butttt');
-		// 	// prevent other click events
-		// 	Wu.DomEvent.stop(e);
-		// 	// Wu.DomEvent.stopPropagation(e);
-
-		// 	// toggle editMode
-		// 	this.toggleEdit(baseLayer);	// temporarily taken out, cause BETA.. this is opacity edit etc..
-
-		// }, this);
-
-		// add stops
-		// Wu.DomEvent.on(button, 'mousedown', Wu.DomEvent.stop, this);
-
-		
-
 	},
 
 	toggleEdit : function (baseLayer) {
 		var uuid = baseLayer.layer.store.uuid;
-		if (this.editMode[uuid]) {
-			this.editOff(baseLayer);
-		} else {
-			this.editOn(baseLayer);
-		}
+		this.editMode[uuid] ? this.editOff(baseLayer) : this.editOn(baseLayer);
 	},
 
 	setOpacity : function () {
