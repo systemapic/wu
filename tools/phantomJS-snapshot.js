@@ -54,8 +54,6 @@ page.open(server, 'post', data, function (status, why) {
 	
 	waitFor(function () {
 
-		// wait for all ready
-
 		// Check in the page if a specific element is now visible
 		return page.evaluate(function() {
 			if (!app) return false;
@@ -65,32 +63,14 @@ page.open(server, 'post', data, function (status, why) {
 
 	// callback
 	function () {
-		// interact with page
-		// page.evaluate(function(args) {
-			
-		// 	// init for phantomJS
-		// 	if (app) app.phantomJS(args);
-
-		// }, args);
-
+		
 		console.log('loaded!!');
 
 		page.viewportSize = { width : 1620, height: 1080 };
 		page.render(outfile);
 		phantom.exit();
 
-
-
 	});
-
-	// capture
-	// window.setTimeout(function () {
-	// 	page.viewportSize = { width : 1620, height: 1080 };
-	// 	page.render(outfile);
-	// 	phantom.exit();
-	// }, 7000);
-	
-
 });
 
 

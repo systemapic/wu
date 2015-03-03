@@ -694,6 +694,9 @@ L.Control.CartoCSS = L.Control.extend({
 			// save local
 			this._legends = legends;
 
+			// refresh legends
+			app.MapPane.legendsControl.refreshLegends()
+
 
 		}.bind(this));
 
@@ -1003,10 +1006,6 @@ L.Control.CartoCSS = L.Control.extend({
 
 	renderStyling : function () {
 
-		// Google Analytics event tracking
-		var _layerTitle = this._layer.store.title;
-		app.Analytics.ga(['Controls', 'CartoCSS render layer: ' + _layerTitle]);
-
 		// return if no active layer
 		if (!this._layer) return;
 
@@ -1031,13 +1030,16 @@ L.Control.CartoCSS = L.Control.extend({
 		// save to server
 		this._layer.setCartoCSS(json, this.renderedStyling.bind(this));
 
+		// Google Analytics event tracking
+		app.Analytics.ga(['Controls', 'CartoCSS render layer: ' + this._layer.getTitle()]);
+
 	},
 
 	
 	renderedStyling : function (context, json) {
 
 		// parse
-		var result = JSON.parse(json);
+		var result = Wu.parse(json);
 
 		// handle errors
 		if (!result.ok) return this.handleError(result.error);
@@ -1082,7 +1084,7 @@ L.Control.CartoCSS = L.Control.extend({
 	_handleSyntaxError : function (error) {
 
 		// parse error
-		var err = error.split(':');
+		var err 	= error.split(':');
 		var line 	= parseInt(err[2].trim()) - 1;
 		var charr 	= err[3].split(' ')[0].trim();
 		var problem 	= err[3].split(' ')[1] + ' ' + err[3].split(' ')[2];

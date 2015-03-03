@@ -37,14 +37,9 @@ Wu.FeedbackPane = Wu.Class.extend({
 
 		// events
 		this.addEvents();
-
 	},
 
 	addEvents : function () {
-
-		// close on click
-		// Wu.DomEvent.on(this._container, 'click', this.clear, this);
-
 		Wu.DomEvent.on(this._x, 'click', this.clear, this);
 	},
 
@@ -64,7 +59,6 @@ Wu.FeedbackPane = Wu.Class.extend({
 
 		// clear after timeout
 		this.clearTimer();
-
 	},
 
 	clearTimer : function (delay) {
@@ -98,9 +92,6 @@ Wu.FeedbackPane = Wu.Class.extend({
 
 	show : function () {
 		Wu.DomUtil.removeClass(this._container, 'displayNone');
-	}
-
-
-
+	},
 
 });
