@@ -22,29 +22,6 @@ var userSchema = mongoose.Schema({
         // tile server auth token
         token       : String,
 
-        role : {
-
-                superadmin : { type: Boolean, default: false },
-
-                admin      : { type: Boolean, default: false },
-
-                manager : {
-                        projects : [],
-                        clients : []
-                },
-
-                editor : {
-                        projects : [],
-                        clients : []
-                },
-
-                reader : {
-                        projects : [],
-                        clients : []
-                },
-
-        },
-
         local : {
                 email        : String,      // login name
                 password     : String,
