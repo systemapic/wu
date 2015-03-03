@@ -303,8 +303,17 @@ Wu.Project = Wu.Class.extend({
 
 	_save : function (string) {
 		// save to server                                       	// TODO: pgp
-		Wu.save('/api/project/update', string);                         // TODO: save only if actual changes! saving too much already
+		Wu.send('/api/project/update', string, this._saved.bind(this));                         // TODO: save only if actual changes! saving too much already
 	
+		
+	},
+
+	// callback for save
+	_saved : function (ctx, json) {
+
+		var result = Wu.parse(json);
+		if (result.error) return app.error.set("Could not update project", result.error);
+
 		// set status
 		app.setSaveStatus();
 	},
@@ -610,13 +619,7 @@ Wu.Project = Wu.Class.extend({
 
 		// save to server
 		this._update('categories');
-
 	},
-
-	setCollection : function () {
-
-	},
-
 
 	getUsers : function () {
 		var uuid = this.store.uuid; // project uuid
@@ -666,7 +669,6 @@ Wu.Project = Wu.Class.extend({
 
 	getHeaderLogo : function () {
 		var logo = this.store.header.logo;
-		// if (!logo) logo = this.store.logo;
 		if (!logo) logo = '/css/images/defaultProjectLogo.png';
 		return logo;
 	},
@@ -754,15 +756,7 @@ Wu.Project = Wu.Class.extend({
 		this._setUrl();
 	},
 
-	setThumbCreated : function (bool) {
-		this.store.thumbCreated = bool;
-		this._update('thumbCreated');
-	},
-
-	getThumbCreated : function () {
-		return this.store.thumbCreated;
-	},
-
+	
 	setBounds : function (bounds) {
 		this.store.bounds = bounds;
 		this._update('bounds');
@@ -926,7 +920,15 @@ Wu.Project = Wu.Class.extend({
 
 	// settings
 	toggleSetting : function (setting) {
-		this.getSettings()[setting] ? this['disable' + setting.camelize()](true) : this['enable' + setting.camelize()](true);
+		
+		// switch setting in store
+		this._switchSetting(setting);
+
+		// enable/disable
+		this.getSettings()[setting] ?  this['enable' + setting.camelize()]() : this['disable' + setting.camelize()]();
+	},
+
+	_switchSetting : function (setting) {
 		this.store.settings[setting] = !this.store.settings[setting];
 		this._update('settings');
 	},
@@ -952,56 +954,32 @@ Wu.Project = Wu.Class.extend({
 		app.SidePane.Share.disableScreenshot();
 	},
 
-	enableDocumentsPane : function (withRefresh) {
-		if (withRefresh) {
-			app.SidePane.addPane('Documents')
-		} else {
-			app.SidePane._addPane('Documents');
-		}
+	enableDocumentsPane : function () {
+		app.SidePane.refreshMenu();
 	},
-	disableDocumentsPane : function (withRefresh) {
-		if (withRefresh) {
-			app.SidePane.removePane('Documents')
-		} else {
-			app.SidePane._removePane('Documents');
-		}
+	disableDocumentsPane : function () {
+		app.SidePane.refreshMenu();
 	},
 
-	enableDataLibrary : function (withRefresh) {
-		if (withRefresh) {
-			app.SidePane.addPane('DataLibrary')
-		} else {
-			app.SidePane._addPane('DataLibrary');
-		}
+	enableDataLibrary : function () {
+		app.SidePane.refreshMenu();
 	},
-	disableDataLibrary : function (withRefresh) {
-		if (withRefresh) {
-			app.SidePane.removePane('DataLibrary')
-		} else {
-			app.SidePane._removePane('DataLibrary');
-		}
+	disableDataLibrary : function () {
+		app.SidePane.refreshMenu();
 	},
 
 	enableMediaLibrary : function () {
-		// app.SidePane.addPane('MediaLibrary');	// not plugged in yet! 
+		app.SidePane.refreshMenu();
 	},
 	disableMediaLibrary : function () {
-		// app.SidePane.removePane('MediaLibrary');
+		app.SidePane.refreshMenu();
 	},
 
-	enableSocialSharing : function (withRefresh) {
-		if (withRefresh) {
-			app.SidePane.addPane('Share')
-		} else {
-			app.SidePane._addPane('Share');
-		}
+	enableSocialSharing : function () {
+		app.SidePane.refreshMenu();
 	},
-	disableSocialSharing : function (withRefresh) {
-		if (withRefresh) {
-			app.SidePane.removePane('Share')
-		} else {
-			app.SidePane._removePane('Share');
-		}
+	disableSocialSharing : function () {
+		app.SidePane.refreshMenu();
 	},
 
 	enableAutoHelp : function () {		// auto-add folder in Docs
@@ -1032,7 +1010,6 @@ Wu.Project = Wu.Class.extend({
 		this.setTempLogo();
 
 		app.setHash(function (ctx, hash) {
-
 			var obj = JSON.parse(hash);
 
 			obj.dimensions = {
@@ -1044,36 +1021,39 @@ Wu.Project = Wu.Class.extend({
 			Wu.post('/api/util/createThumb', JSON.stringify(obj), this.createdProjectThumb, this);
 
 		}.bind(this), this);
-
 	},
 
 
 	createdProjectThumb : function(context, json) {
 
 		// parse results
-		var result = JSON.parse(json);
-		var image = result.cropped;
-
-		var fileUuid = result.fileUuid;
-
-		var path = '/images/' + image;
+		var result = JSON.parse(json),
+		    image = result.cropped,
+		    fileUuid = result.fileUuid,
+		    path = '/images/' + image;
 
 		// Store new logo paths
-		context.setLogo(path);
-		context.setHeaderLogo(path);
+		context.setLogo(path); 		// trigger server-save
+		context.setHeaderLogo(path); 	// triggers server-save
 
 		context._menuItem.logo.src = path;
 
 		// Set logo in header pane
-		if (context == app.activeProject) app.HeaderPane.addedLogo(image);
+		if (context == app.activeProject) app.HeaderPane.addedLogo(image); // triggers this.setHeaderLogo -- triggers save
 
+	},
+
+	setThumbCreated : function (bool) {
+		this.store.thumbCreated = bool;
+		this._update('thumbCreated');
+	},
+
+	getThumbCreated : function () {
+		return this.store.thumbCreated;
 	},	
 
 	setTempLogo : function () {
-		this._sidePaneLogoContainer.src = '/css/images/grinders/BG-grinder-small-grayDark-on-white.gif';
+		this._sidePaneLogoContainer.src = app.options.logos.projectDefault;
 	}	
-
-
-
 
 });

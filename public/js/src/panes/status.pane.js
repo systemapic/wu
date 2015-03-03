@@ -1,5 +1,3 @@
-// app.StatusPane
-
 Wu.StatusPane = Wu.Class.extend({
 
 	_ : 'statuspane', 
@@ -71,7 +69,7 @@ Wu.StatusPane = Wu.Class.extend({
 		if (layerMenu) layerMenu.disableEdit();
 
 		// close all open options
-		app.SidePane.Map.closeAll();
+		app.SidePane.Options.closeAll();
 	},
 
 	// open sidepane menu
@@ -188,7 +186,7 @@ Wu.StatusPane = Wu.Class.extend({
 	setContentHeights : function () {
 
 		var clientsPane = app.SidePane.Clients;
-		var optionsPane = app.SidePane.Map;
+		var optionsPane = app.SidePane.Options;
 
 		if (clientsPane) clientsPane.setContentHeight();
 		if (optionsPane) optionsPane.setContentHeight();

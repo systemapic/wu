@@ -2726,6 +2726,7 @@ L.TileLayer = L.Class.extend({
 		if (this.options.unloadInvisibleTiles || this.options.reuseTiles) {
 			this._removeOtherTiles(tileBounds);
 		}
+
 	},
 
 	_addTilesFromCenterOut: function (bounds) {

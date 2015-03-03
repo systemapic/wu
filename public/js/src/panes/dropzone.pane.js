@@ -103,7 +103,7 @@ Wu.Dropzone = Wu.Class.extend({
 	initDropzone : function (options) {
 		
 		// get callback
-		this._uploadedCallback = options.uploaded;
+		this._uploadedCallback = options.uploadedCallback;
 
 		// get clickable divs
 		this._clickable = options.clickable;
@@ -205,19 +205,21 @@ Wu.Dropzone = Wu.Class.extend({
 			that.progress.setProgress(progress);
 		});                                                                                                                                                                                                               
 
-		this.dz.on('successmultiple', function (err, json) {
-		
-			// parse and process
-			var obj = Wu.parse(json);
+		this.dz.on('successmultiple', function (dz, json, xml) {
+			console.log('dz, json, xml', dz, json, xml);
+
+			// clear fullpane
+			that.progress.hideProgress();
 
 			// set status
 			app.setStatus('Done!', 2000);
 
-			// callback
-			if (obj) that._uploadedCallback(obj);
+			// parse and process
+			var resp = Wu.parse(json);
 
-			// clear fullpane
-			that.progress.hideProgress();
+			// callback
+			if (resp) that._uploadedCallback(resp);
+			
 		});
 	
 	},

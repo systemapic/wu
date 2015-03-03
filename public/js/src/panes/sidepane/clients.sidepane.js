@@ -18,20 +18,30 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		// clients container
 		this._clientsContainer = Wu.DomUtil.create('div', 'editor-clients', this._container);
 
+		var clients = this.options.json.clients;
+
 		// insert clients
-		this.options.json.clients.forEach(function(c, i, arr) {    
+		clients.forEach(function(c, i, arr) {    
 			var client = new Wu.SidePane.Client(c);
 			client.addTo(this._clientsContainer);
 			this.clients.push(client);
 		}, this);
 
       		// insert create client button
-		if (app.access.to.create_client()) this._insertNewClientButton();	
+      		var canCreate = app.access.to.create_client();
+		if (canCreate) this._insertNewClientButton();	
+
+		// insert text if no access at all
+		if (!clients.length && !canCreate) this._insertEmptyText();
 
 		// add tooltip
 		app.Tooltip.add(this._menu, 'Here is a list of clients and projects you have access to.');
 
 
+	},
+
+	_insertEmptyText : function () {
+		var emptyText = Wu.DomUtil.create('div', 'empty-clients-holder', this._clientsContainer, 'Currently no projects available.');
 	},
 
 	_insertNewClientButton : function () {
@@ -336,7 +346,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	refreshSidePane : function () {
 
 		// refresh
-		Wu.app.SidePane.refreshClient();
+		Wu.app.SidePane.refreshMenu();
 
 		// update SidePane.Users
 		Wu.app.SidePane.Users.update();

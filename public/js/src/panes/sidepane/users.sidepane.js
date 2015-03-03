@@ -623,16 +623,14 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// get no of projets etc for user
 		var projects = user.getProjects();
-
 		var numProjects = projects ? projects.length : 0;
+		var projectsText = numProjects == 1 ? ' project' : ' projects';
 
-		if (numProjects == 1) return divProjectsOpen + numProjects + ' project' + divProjectsClose; //projects
-		return divProjectsOpen + numProjects + ' projects' + divProjectsClose;
+		return divProjectsOpen + numProjects + projectsText + divProjectsClose;
 	},
 
 
 	setEditHooks : function (uuid, onoff) {
-
 		var onoff = onoff || 'on';
 
 		// get <input>'s
@@ -659,8 +657,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 			[onoff]( email,          'mousedown mouseup click',     this.stop,      this ) 
 			// [onoff]( email,          'dblclick',                    this._rename,   this )     
 			[onoff]( access,         'click',                    function () { this.editAccess(uuid); }, this )     
-
 	},
+
 
 	// on click on # of projects box
 	editAccess : function (uuid) {
@@ -682,19 +680,18 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	},
 
 
-
-
-
 	_hide : function () {
 		Wu.DomUtil.addClass(this._container, 'displayNone');
 		Wu.DomUtil.addClass(this._content, 'hide-top');	
 	},
 
+	
 	_show : function () {
 		Wu.DomUtil.removeClass(this._content, 'hide-top');	
 		Wu.DomUtil.removeClass(this._container, 'displayNone');	
 	},
 
+	
 	toggleReadAccess : function (item) {
 
 		// get user
@@ -708,10 +705,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Side Pane', 'Users: Toggle read access' + state, user.getName() + ' (' + user.getUuid() + ' )']);
-
-
 	},
 
+	
 	_removeRead : function (item) {
 
 		// remove read access
@@ -721,8 +717,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// if removing read, also remove edit
 		this._removeUpdate(item);
 		this._removeManage(item);
-
 	},
+
 
 	_addRead : function (item) {
 		// add read access
@@ -730,11 +726,13 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		Wu.DomUtil.addClass(item.read, 'gotAccess');
 	},
 
+
 	_removeUpdate : function (item) {
 		// remove read access
 		item.user.removeUpdateProject(item.project);
 		Wu.DomUtil.removeClass(item.edit, 'gotAccess');
 	},
+
 
 	_addUpdate : function (item) {
 		// add update access
@@ -743,14 +741,15 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// add read access too
 		this._addRead(item);
-
 	},
+
 
 	_removeManage : function (item) {
 		// remove manage access
 		item.user.removeManageProject(item.project);
 		Wu.DomUtil.removeClass(item.manage, 'gotAccess');
 	},
+
 
 	_addManage : function (item) {
 		// add manage access
@@ -759,8 +758,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// add read 
 		this._addRead(item);
-
 	},
+
 
 	toggleUpdateAccess : function (item) {
 		// console.log('toggle: ', item);
@@ -776,8 +775,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var _uId = user.getUuid();
 		var _uName = user.getName()
 		app.Analytics.ga(['Side Pane', 'Users: Toggle editor access' + state, _uName + ' (' + _uId + ' )']);
-
 	},
+
 
 	toggleManageAccess : function (item) {
 		// console.log('toggle: ', item);
@@ -793,8 +792,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var _uId = user.getUuid();
 		var _uName = user.getName()
 		app.Analytics.ga(['Side Pane', 'Users: Toggle manager access' + state, _uName + ' (' + _uId + ' )']);
-
 	},
+
 
 	_getProjectAccessSchema : function () {
 
@@ -813,6 +812,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		e.stopPropagation();
 	},
 
+
 	rename : function (e) {
 
 		// enable editing on input box
@@ -830,14 +830,14 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Side Pane', 'Users: Edit ' + e.target.fieldKey]);
-
-
 	},
+
 
 	editKey : function (e) {
 		// blur on enter
 		if (event.which == 13 || event.keyCode == 13) e.target.blur();
 	},
+
 
 	editBlur : function (e) {
 
@@ -855,8 +855,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// save to server
 		this.save(key, value, userUuid);
-
 	},
+
 
 	// rename a div, ie. inject <input>
 	_rename : function (e) {
