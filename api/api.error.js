@@ -91,8 +91,10 @@ module.exports = api.error = {
 		if (err.message) console.log('message'.red, err.message);
 		
 
-		for (item in err) {
-			console.log('err items: ', err[item]);
+		if (_.isObject(err)) {
+			for (item in err) {
+				console.log('err items: ', err[item]);
+			}
 		}
 
 		// todo: slack, ga.js, log, etc.

@@ -2775,11 +2775,12 @@ td.tdcont.createdDate {
 
 .error-pane {
 	position: absolute;
-	bottom: 6px;
-	left: 6px;
+	bottom: 0;
+	left: 0;
 	width: auto;
 	height: 110px;
 	z-index: 999999999;
+	margin: 10px;
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }

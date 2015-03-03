@@ -1,7 +1,6 @@
 Wu.Access = Wu.Class.extend({
 
 	initialize : function (options) {
-		console.log('Wu.Access', options);
 
 		// shortcut
 		app.access = this;

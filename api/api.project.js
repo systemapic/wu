@@ -52,6 +52,7 @@ module.exports = api.project = {
 		    account = req.user,
 		    ops = [];
 
+
 		// return if missing info
 		if (!store) return api.error.missingInformation(req, res);
 
@@ -99,7 +100,6 @@ module.exports = api.project = {
 			api.project._returnProject(req, res, project);
 		});
 	},
-
 
 
 	_create : function (options, done) {
@@ -196,6 +196,7 @@ module.exports = api.project = {
 		    ops = [];
 
 		console.log('Updating project.'.yellow);
+		console.log('body: ', req.body);
 
 		// return on missing
 		if (!projectUuid) return api.error.missingInformation(req, res);
