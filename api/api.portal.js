@@ -96,18 +96,17 @@ module.exports = api.portal = {
 		req.session.hotlink = {};
 	},
 
+
+
+
 	// #########################################
 	// ###  API: Get Portal                  ###
 	// #########################################
 	// served at initalization of Portal
 	getPortal : function (req, res) {
 
-		console.log('/api/portal');
-		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'.yellow);
-		console.log('* User: ' + req.user.firstName + ' ' + req.user.lastName);
-		console.log('* User uuid: ' + req.user.uuid);
-		console.log('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *'.yellow);
-		console.time('getPortal');
+		// print debug
+		api.portal.printDebug(req);
 
 		var account = req.user,
 		    a = {};
@@ -154,6 +153,28 @@ module.exports = api.portal = {
 			});
 
 		});
+	},
+
+	printDebug : function (req) {
+		console.log('\033[2J');
+		console.log('Logged in user:'.yellow);
+		console.log('  Name:  ' + req.user.firstName + ' ' + req.user.lastName);
+		console.log('  Uuid:  ' + req.user.uuid);
+		console.log('  Email: ' + req.user.local.email);
+		console.log('  IP:    ' + req.headers['x-real-ip']);
+		console.log('_______________________________________________________________________'.yellow);
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+		console.time('getPortal');
 	},
 
 }
