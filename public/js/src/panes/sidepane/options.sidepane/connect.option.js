@@ -27,10 +27,8 @@ Wu.SidePane.Options.Connect = Wu.SidePane.Options.Item.extend({
 		// clear vars n fields
 		this.resetInput();
 
-
 		// add tooltip
 		app.Tooltip.add(h4, 'Imports layers from MapBox accounts.');
-
 
 	},
 
@@ -38,22 +36,17 @@ Wu.SidePane.Options.Connect = Wu.SidePane.Options.Item.extend({
 
 		Wu.SidePane.Options.Item.prototype.addHooks.call(this)
 
-
-		// cxxxx
-
 		// connect mapbox button
 		Wu.DomEvent.on( this._mapboxConnect, 'click', this.importMapbox, this );
 
 		// add osm button
 		Wu.DomEvent.on( this._osmbox, 'click', this.addOSMLayer, this );
 
-
 		// stops
 		Wu.DomEvent.on( this._mapboxConnect, 'mousedown', Wu.DomEvent.stop, this );
 		Wu.DomEvent.on( this._mapboxInput, 'mousedown', Wu.DomEvent.stopPropagation, this );
 		Wu.DomEvent.on( this._osmwrap, 'mousedown', Wu.DomEvent.stopPropagation, this );
 		Wu.DomEvent.on( this._osmbox, 'mousedown', Wu.DomEvent.stopPropagation, this );
-
 
 	},
 
@@ -148,10 +141,8 @@ Wu.SidePane.Options.Connect = Wu.SidePane.Options.Item.extend({
 		var error = result.error;
 		var store = result.project;
 
-		if (error) {
-			console.log('There was an error importing mapbox: ', error);
-			return;
-		}
+		if (error) return app.error.set('Error importing Mapbox', error);
+
 
 		// update project
 		that.project.setStore(store);
