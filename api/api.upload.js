@@ -117,6 +117,8 @@ module.exports = api.upload = {
 	// entry point
 	file : function (req, res) {
 
+		// todo: check for upload access!;
+
 		console.log('API.upload.upload()');
 
 		// console.log('upload.js.upload()'); // _______________ this _____________');

@@ -167,6 +167,8 @@ Wu.Project = Wu.Class.extend({
 		// refresh sidepane
 		this.refreshSidepane();
 
+
+
 		// set active project in sidepane
 		if (this._menuItem) this._menuItem._markActive();
 
@@ -217,6 +219,9 @@ Wu.Project = Wu.Class.extend({
 		
 		// update color theme
 		this.setColorTheme();
+
+		// update project in sidepane
+		if (this._menuItem) this._menuItem.update();
 	},
 
 	select : function () {
@@ -622,11 +627,27 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getUsers : function () {
-		var uuid = this.store.uuid; // project uuid
-		var users = _.filter(app.Users, function(user) {
-			return user.store.role.reader.projects.indexOf(uuid) > -1;
+		var users = [],
+		    roles = this._roles;
+
+		_.each(roles, function (role) {
+			if (role.hasCapability('read_project')) {
+				_.each(role.getMembers(), function (uuid) {
+					var user = app.Users[uuid];
+					if (user) users.push(user);
+				});
+			}
 		});
 		return users;
+	},
+
+	_filteredUsers : function () {
+		var allProjectUsers = this.getUsers();
+
+		// filter out superadmins
+		return _.filter(allProjectUsers, function (u) {
+			return !app.Access.is.superAdmin(u);
+		});
 	},
 
 	getSlug : function () {
@@ -642,30 +663,15 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getUsersHTML : function () {
-		var users = this.getUsers(),
-		    html = '',
-		    silent = app.options.silentUsers;
+		var users = this._filteredUsers(),
+		    html = '';
 
-		users.forEach(function (user) {
-			var partial = user.store.uuid.slice(0, 13);
-			if (silent.indexOf(partial) == -1) { // filter silentUsers from user list
-				// add user to list
-				html += '<p>' + user.store.firstName + ' ' + user.store.lastName + '</p>';
-			}
-		}, this);
+		_.each(users, function (user) {
+			html += '<p>' + user.getFullName() + '</p>';
+		});
 		return html;
 	},
 
-	addAccess : function () {
-		var users = app.Users;
-		for (u in users) {
-			var user = users[u];
-			if (user.isSuperadmin()) {
-				user.addProjectAccess(this);
-			}
-		}
-		app.Account.addProjectAccess(this);
-	},
 
 	getHeaderLogo : function () {
 		var logo = this.store.header.logo;

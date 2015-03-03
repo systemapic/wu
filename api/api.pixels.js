@@ -294,10 +294,13 @@ module.exports = api.pixels = {
 		var ops = [];
 		var dataSize;
 
+		console.log('cmd: ', cmd);
+
 		// phantomJS: create snapshot
 		ops.push(function (callback) {
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
+				console.log('err--> ', err, stdout, stdin);
 				callback(err);
 			});
 		});

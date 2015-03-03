@@ -52,11 +52,6 @@ Wu.User = Wu.Class.extend({
 		if (key == 'email'    ) return this.setEmail(value);
 	},
 
-	setAccess : function (project) {
-		// console.log('setAccess to new proejct: ', project);
-		// todo!
-	},
-
 
 	// save 
 	save : function (key) {
@@ -86,13 +81,9 @@ Wu.User = Wu.Class.extend({
 	},
 
 
-
-
 	attachToApp : function () {
 		app.Users[this.getUuid()] = this;
 	},
-
-
 
 
 	deleteUser : function (context, callback) {
@@ -111,140 +102,6 @@ Wu.User = Wu.Class.extend({
 
 	},
 
-	// set project access
-	delegateAccess : function (project, role, add) {
-
-		// save to server, only specific access
-		var access = {
-			userUuid    : this.getUuid(),
-			projectUuid : project.getUuid(),
-			// clientUuid  : project.getClientUuid(),
-			role        : role, // eg. 'reader'
-			add         : add // true or false
-		}
-
-		// post              path 	             data               callback     context of cb
-		Wu.Util.postcb('/api/user/delegate', JSON.stringify(access), this.delegatedAccess, this);
-
-		// this._saveAccess(access)
-		app.setSaveStatus();
-	},
-
-	delegatedAccess : function (context, result) {
-
-	},
-
-	// convenience methods
-	addReadProject : function (project) {
-
-		// save to server, only specific access
-		this.delegateAccess(project, 'reader', true);
-
-		// add access locally
-		this.store.role.reader.projects.push(project.getUuid());
-
-	},
-
-	removeReadProject : function (project) {
-
-		// save to server, only specific access
-		this.delegateAccess(project, 'reader', false);
-
-		// remove access locally
-		_.remove(this.store.role.reader.projects, function (p) {
-			return p == project.getUuid();
-		});
-	},
-
-	addUpdateClient : function (client) {
-		
-		// save to server, only specific access
-		// this.delegateAccess(client, 'editor', true);
-
-		// add access locally
-		this.store.role.editor.clients.push(client.getUuid());
-	},
-
-	addUpdateProject : function (project) {
-		
-		// save to server, only specific access
-		this.delegateAccess(project, 'editor', true);
-
-		// add access locally
-		this.store.role.editor.projects.push(project.getUuid());
-	},
-
-	removeUpdateProject : function (project) {
-
-		// save to server, only specific access
-		this.delegateAccess(project, 'editor', false);
-
-		// remove access
-		_.remove(this.store.role.editor.projects, function (p) {
-			return p == project.getUuid();
-		});
-	},
-
-
-	addManageProject : function (project) {
-		// save to server, only specific access
-		this.delegateAccess(project, 'manager', true);
-
-		// add access locally
-		this.store.role.manager.projects.push(project.getUuid());
-	},
-
-	removeManageProject : function (project) {
-
-		// save to server, only specific access
-		this.delegateAccess(project, 'manager', false);
-
-		// remove access
-		_.remove(this.store.role.manager.projects, function (p) {
-			return p == project.getUuid();
-		});
-	},
-
-
-	addProjectAccess : function (project) {
-		// add access locally
-		var uuid = project.getUuid();
-		this.store.role.editor.projects.push(uuid);
-		this.store.role.reader.projects.push(uuid);
-		this.store.role.manager.projects.push(uuid);
-	},
-
-	removeProjectAccess : function (project) {
-		// remove access locally
-		_.remove(this.store.role.manager.projects, function (p) {
-			return p == project.getUuid();
-		});
-		_.remove(this.store.role.editor.projects, function (p) {
-			return p == project.getUuid();
-		});
-		_.remove(this.store.role.reader.projects, function (p) {
-			return p == project.getUuid();
-		});
-	},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
 	// get functions
 	getKey : function (key) {
 		return this.store[key];
@@ -288,41 +145,20 @@ Wu.User = Wu.Class.extend({
 
 	getProjects : function () {
 		// get projects which user has a role in
-		var allProjects = app.Projects;
+		var allProjects = app.Projects,
+		    projects = [];
 
 		// return all if admin
 		if (app.access.is.admin(this)) return _.values(allProjects);
 
-		var projects = [];
-
 		_.each(allProjects, function (p) {
-			var roles = p.getRoles();
-			_.each(roles, function (r) {
+			_.each(p.getRoles(), function (r) {
 				if (r.hasMember(this) && !r.noRole()) {
 					projects.push(p);
 				}
 			}, this)
-
 		}, this);
-
 		return projects;
-
-
-	},
-
-	getProjectsByRole : function () {
-		var projects    = {};
-		projects.read   = this.store.role.reader.projects;
-		projects.update = this.store.role.editor.projects;
-		projects.manage = this.store.role.manager.projects;
-		return projects;
-	},
-
-	getClients : function () {
-		var clients = {};
-		clients.read = this.store.role.reader.clients;
-		clients.update = this.store.role.editor.clients;
-		return clients;
 	},
 
 	getUuid : function () {
@@ -330,17 +166,8 @@ Wu.User = Wu.Class.extend({
 	},
 
 
-
-
-
-
-
-
-
-
-
-
 	// find changes to user.store for saving to server. works for two levels deep // todo: refactor, move to class?
+	// hacky for realz! no good!!
 	_findChanges : function () {
 		var clone   = _.cloneDeep(this.store);
 		var last    = _.cloneDeep(this.lastSaved);

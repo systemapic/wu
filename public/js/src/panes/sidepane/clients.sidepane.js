@@ -203,7 +203,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	_checkedSlug : function (editor, raw) {
-		var json = JSON.parse(raw);  
+		var json = Wu.parse(raw);  
 
 		// return enabled if unique
 		if (json.unique) return editor._enableConfirm();
