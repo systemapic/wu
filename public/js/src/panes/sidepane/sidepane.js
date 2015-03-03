@@ -179,6 +179,7 @@ Wu.SidePane = Wu.Class.extend({
 
 		// get currently active panes
 		var active = _.filter(this._allPanes, function (pane) {
+			console.log('pane: ', pane);
 			return this[pane]._enabled;
 		}, this);
 
