@@ -14,7 +14,6 @@
 	}
 
 .home-container,
-.status-progress-bar,
 .dropzone-pane,
 .q-editor-container,
 .dropzone-meta,
@@ -25,11 +24,14 @@
 #header,
 .fullpage-users,
 .fullpage-mediaLibrary {
-	z-index: 999999;
+	z-index: 10001;
 	}	
 
+.status-progress-bar {
+	z-index: 10010;
+}
 .dropzone-meta {
-	z-index: 9999999 !important;
+	z-index: 10002 !important;
 	}
 
 

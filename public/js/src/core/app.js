@@ -538,7 +538,7 @@ Wu.App = Wu.Class.extend({
 
 		var projectUuid = args.projectUuid,
 	   	    hash    	= args.hash,
-	   	    isThumb       = args.thumb;
+	   	    isThumb     = args.thumb;
 
 	   	// return if no project
 	   	if (!projectUuid) return false;
@@ -548,14 +548,6 @@ Wu.App = Wu.Class.extend({
 		
 		// return if no such project
 		if (!project) return false;
-
-		// number of layers to be loaded
-	   	this._loading = hash.layers.slice();
-
-	   	// add baselayers
-	   	project.getBaselayers().forEach(function (b) {
-	   		this._loading.push(b);
-	   	}, this);
 
 		// set project
 		this._setProject(project);
@@ -587,13 +579,17 @@ Wu.App = Wu.Class.extend({
 	},
 	
 	phantomReady : function () {
-
+		// return true;
 		// check if ready for screenshot
-		if (!this._loaded || !this._loading) return false;
+		// if (!this._loaded || !this._loading) return false;
+
+		console.log(this._loaded.length, this._loading.length);
 
 		// if all layers loaded
 		if (this._loaded.length == this._loading.length) return true;
 		
+
+
 		// not yet
 		return false;
 

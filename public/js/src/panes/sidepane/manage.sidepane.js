@@ -253,6 +253,7 @@ Wu.SidePane.Manage = Wu.Class.extend({
 			role : options.role,
 		});
 
+		
 	},
 
 

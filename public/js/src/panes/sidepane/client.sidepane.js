@@ -35,7 +35,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.logoContainer = Wu.DomUtil.create('div', 'client-logo-container', this._container);
 		this.logo = Wu.DomUtil.create('img', 'client-logo', this.logoContainer);
 
-
 		// create projects container
 		this._projectsContainer = Wu.DomUtil.create('div', 'projects-container', this._container);
 
@@ -65,19 +64,15 @@ Wu.SidePane.Client = Wu.Class.extend({
 	update : function () {
 
 		// update client meta
-		this.title.innerHTML 	    = this.client.getName();
-		this.description.innerHTML  = this.client.getDescription();
+		this.title.innerHTML = this.client.getName();
+		this.description.innerHTML = this.client.getDescription();
 		
-		
-		if ( this.client.getLogo() ) var imageAttr = this.client.getLogo();			
-		else var imageAttr = '/css/images/defaultProjectLogo.png';
-		this.logo.src = imageAttr;
+		this.logo.src = this.client.getLogo() ? this.client.getLogo() : '/css/images/defaultProjectLogo.png';
 
 		Wu.DomUtil.thumbAdjust(this.logo, 70);
 		
 		// insert client's projects
 		this.insertProjects();
-
 	},
 
 	insertProjects : function (projects) {
@@ -144,13 +139,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		}
 		
 		// remove client button
-		// if (app.Account.canDeleteClient(this.client.uuid)) {
 		if (app.access.to.delete_client()) {
 			this._removeClientButton = Wu.DomUtil.create('div', 'client-kill displayNone', this._container, 'Delete client');
 			Wu.DomEvent.on(this._removeClientButton, 'mousedown', this.removeClient, this);
-
 		}
-
 	},
 
 	removeClient : function (e) {
@@ -193,7 +185,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// Google Analytics event trackign
 		app.Analytics.ga(['Side Pane', 'Clients: delete client']);
 
-
 	},
 
 	confirmDeleteClient : function () {
@@ -203,7 +194,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// delete client
 		this.client.destroy();
-
 	},
 
 	_lockNewProjectButton : function () {
@@ -215,7 +205,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 	_unlockNewProjectButton : function () {
 		Wu.DomEvent.on(this._newProjectButton, 'mousedown', this.createNewProject, this);
 		Wu.DomUtil.removeClass(this._newProjectButton, 'inactive');
-
 	},
 
 	createNewProject : function () {
@@ -267,20 +256,17 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		project._saveNew(options);
 
-
 		// Google Analytics event trackign
 		app.Analytics.ga(['Side Pane', 'Clients: new project']);
-		
-
 		
 	},
 
 	_markActive : function (newProject) {
 		var projects = app.Projects;
-		for (p in projects) {
-			var project = projects[p];
+		_.each(projects, function (project) {
 			if (project._menuItem) project._menuItem._unmarkActive();
-		}
+		});
+	
 		Wu.DomUtil.addClass(newProject._menuItem._container, 'active-project');
 	},
 	
@@ -289,20 +275,15 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},	
 
 	_projectCreated : function (project, json) {
+		var result = Wu.parse(json),
+		    error  = result.error,
+		    store  = result.project;
 
-
-		var result = JSON.parse(json);
-		var error  = result.error;
-		var store  = result.project;
-
-		console.log('created project=>', project);
+		console.log('Created project:', project);
 
 		// return error
-		if (error) return console.log('There was an error creating new project!', error);			
-
-		// GA – Register new project ID (This project has no title yet, so it's useless to save title)
-		ga('set', 'dimension8', store.uuid);	
-
+		if (error) return app.error.set('There was an error creating new project!', error);
+			
 		// add to global store
 		app.Projects[store.uuid] = project;
 
@@ -311,7 +292,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// create project in sidepane
 		this._createNewProject(project);
-		
+
+		// GA – Register new project ID (This project has no title yet, so it's useless to save title)
+		ga('set', 'dimension8', store.uuid);	
 
 	},
 
@@ -346,9 +329,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// add defaults to map
 		this._addDefaults();
 
-		// create project thumb .. no point, wrong position anyway
-		// project.createProjectThumb();
-
 		// mark project div in sidepane as active
 		this._markActive(project);
 	},
@@ -372,15 +352,19 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	addEditHooks : function () {
-		Wu.DomEvent.on( this.title, 	  'dblclick', this.editName, 	    this );
-		Wu.DomEvent.on( this.description, 'dblclick', this.editDescription, this );
-		this.addLogoDZ();
+		if (app.access.to.edit_client()) {
+			Wu.DomEvent.on(this.title, 'dblclick', this.editName, this);
+			Wu.DomEvent.on(this.description, 'dblclick', this.editDescription, this);
+			this.addLogoDZ();
+		}
 	},
 
 	removeEditHooks : function () {
-		Wu.DomEvent.off( this.title, 	   'dblclick', this.editName, 	     this );
-		Wu.DomEvent.off( this.description, 'dblclick', this.editDescription, this );
-		this.removeLogoDZ();
+		if (app.access.to.edit_client()) {
+			Wu.DomEvent.off(this.title, 'dblclick', this.editName, this);
+			Wu.DomEvent.off(this.description, 'dblclick', this.editDescription, this);
+			this.removeLogoDZ();
+		}
 	},
 
 
@@ -499,14 +483,12 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.logodz.options.params.client = this.client.getUuid();
 		
 		// set callback on successful upload
-		var that = this;
 		this.logodz.on('success', function (err, path) {
-			that.editedLogo(path);
-		});
+			this.editedLogo(path);
+		}.bind(this));
 
 		// set image frame with editable clas
 		Wu.DomUtil.addClass(this.logo, 'editable');
-
 	},
 
 	removeLogoDZ : function () {
@@ -536,12 +518,11 @@ Wu.SidePane.Client = Wu.Class.extend({
 		if (app._timerOpenClient) clearTimeout(app._timerOpenClient);
 		if (this._isOpen) return;
 
-		var that = this;
 		app._timerOpenClient = setTimeout(function () {
-			that.open();
+			this.open();
 			if (app._pendingCloseClient) app._pendingCloseClient.close();
-			app._pendingCloseClient = that;
-		}, 200);	
+			app._pendingCloseClient = this;
+		}.bind(this), 200);	
 	},
 
 	toggle : function () {				
@@ -557,9 +538,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._container.style.height = this.maxHeight + 'px';          
 		this._isOpen = true;
 
-		
 		Wu.DomUtil.removeClass(this._removeClientButton, 'displayNone');
-
 
 		// close others
 		var clients = app.SidePane.Clients;
@@ -576,7 +555,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		Wu.DomUtil.addClass(this._removeClientButton, 'displayNone');
 
 		this.resetOpenProjectInfo();
-				
 	},
 
 	resetOpenProjectInfo : function () {
@@ -591,8 +569,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 			project._menuItem._container.removeAttribute('style');
 
 			// Set open state to false
-			if ( project._menuItem._isOpen ) project._menuItem._isOpen = false;
-		})
+			if (project._menuItem._isOpen) project._menuItem._isOpen = false;
+		});
 
 	},
 
@@ -603,21 +581,15 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	calculateHeight : function () {
-		
-		if ( !Wu.app.mobile ) {
-	
+		if (!app.mobile) {
 			var min = 150;
 			this.maxHeight = min + _.size(this.projects) * 116;
 			this.minHeight = 80;
-
 		} else {
-
 			var min = 78;
 			this.maxHeight = min + _.size(this.projects) * 100;
 			this.minHeight = 68; 
 		}
-
-		
 	},
 
 
