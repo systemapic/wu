@@ -208,7 +208,7 @@ function init_screen() {
 	console.log('');                     
 	console.log('                             - create a User');
 	console.log('                             - create a Super Admin Role');
-	console.log('                               |_ and add the User to it');
+	console.log('                               ↳  and add the User to it');
 	console.log('                             - create a Portal Admin Role');
 	console.log('');
 	// console.log('                               That\'s all for now.'.yellow);
@@ -276,7 +276,6 @@ function confirm_input(err, result) {
 function reconfirm_input(err, result) {
 	if (err) return err_exit();
 	if (result.confirm == 'yes') return init_portal();
-
 	return err_exit();
 }
 
@@ -303,6 +302,7 @@ function err_exit(err) {
 	console.log('Cancelled!'.red, ' Nothing accomplished.'.white);
 	console.log('');
 	console.log('');
+	process.exit();
 }
 
 function done(msg) {

@@ -40,11 +40,7 @@ var api = module.parent.exports;
 // exports
 module.exports = api.upload = { 
 
-
 	projectLogo : function (req, res) {
-		console.log('api.upload.projectLogo');
-		console.log('API ==> module.parent: ', module.parent);
-		console.log('...api => ', api);
 
 		// process from-encoded upload
 		var form = new formidable.IncomingForm({

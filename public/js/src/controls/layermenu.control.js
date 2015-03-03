@@ -493,8 +493,6 @@ L.Control.Layermenu = L.Control.extend({
 	},
 
 	markInvalid : function (invalids) {
-		console.log('markInvalid!!', invalids);
-
 		invalids.forEach(function (invalid) {
 
 			// get div
@@ -705,12 +703,8 @@ L.Control.Layermenu = L.Control.extend({
 	toggleLayer : function (item) {
 		if (this.editMode) return;
 
-		// if ( item.layer ) { var _layerName = item.layer.getTitle(); }
-		// else { var _layerName = 'folder'; }
-		
 		var layer = item.layer;
 		var _layerName = layer ? layer.getTitle() : 'Folder';
-		// var _layerName = item.layer.store.title;
 
 		// toggle
 		if (item.on) {
