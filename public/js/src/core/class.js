@@ -319,71 +319,85 @@ Wu.Util = {
 	},
 
 	checkDisconnect : function (response) {
+		var string = response.substring(0,15);
+		if (string == '<!doctype html>')  {
+			// we got a disconnect!!!
+			app.error.set('You have been logged out.', 'Please reload the page to log back in.');
 
-		if (response.substring(0,16) == '<!doctype html>')  {
-			console.log('DOCTPE');
-			console.log(response.substring(0,16));
+			return false;
 		}
+
+		return true;
+	},
+
+	debugXML : function (json) {
+		console.log('==== debugXML ====');
+
+		var obj = Wu.parse(json);
+		obj ? console.log(obj) : console.log(json);
+
+		console.log('==================');
+	},
+
+	verifyResponse : function (response) {
+		
+		// print response if debug
+		if (app.debug) Wu.Util.debugXML(response);
+
+		// check for disconnect (<html> response)
+		return Wu.Util.checkDisconnect(response);
+		
 	},
 
 	// post without callback
 	post : function (path, json) {
-		
-		var that = this;
-		var http = new XMLHttpRequest();
-		var url = window.location.origin; 
+		var that = this,
+		    http = new XMLHttpRequest(),
+		    url = window.location.origin; 
 		url += path;
+		
 		http.open("POST", url, true);
 
 		//Send the proper header information along with the request
 		http.setRequestHeader("Content-type", "application/json");
 
 		http.onreadystatechange = function() {
-		    if(http.readyState == 4 && http.status == 200) {
-		    	Wu.Util.checkDisconnect(http.responseText);
-			if (app.debug) Wu.Util.debugXML(http.responseText);
-		    	
-		    }
+			if(http.readyState == 4 && http.status == 200) {
+				var valid = Wu.verify(http.responseText);
+			}
 		}
 		http.send(json);
 	},
 
 	// post with callback
 	postcb : function (path, json, cb, context, baseurl) {
-		var that = context;
-		var http = new XMLHttpRequest();
-		
-		var url = baseurl || window.location.origin; 
+		var that = context,
+		    http = new XMLHttpRequest(),
+		    url = baseurl || window.location.origin;
 		
 		url += path;
+
 		http.open("POST", url, true);
 
 		//Send the proper header information along with the request
 		http.setRequestHeader('Content-type', 'application/json');
 
 		http.onreadystatechange = function() {
-		    if(http.readyState == 4 && http.status == 200) {
-			if (app.debug) Wu.Util.debugXML(http.responseText);
-			if (cb) cb(context, http.responseText); 
-		    }
+			if(http.readyState == 4 && http.status == 200) {
+
+				// verify response
+				var valid = Wu.verify(http.responseText);
+
+				// callback
+				if (cb && valid) cb(context, http.responseText); 
+			}
 		}
-
-
 
 		http.send(json);
 	},
 
 
-	debugXML : function (json) {
-		console.log('==== debugXML ====');
-		try {
-			var obj = JSON.parse(json);
-			console.log(obj);
-		} catch (e) {
-			console.log(json);
-		}
-		console.log('==================');
-	},
+	
 
 	// post with callback and error handling (do callback.bind(this) for context)
 	send : function (path, json, callback) {
@@ -391,26 +405,48 @@ Wu.Util = {
 		var http = new XMLHttpRequest();
 		var url = window.location.origin;
 		url += path;
-		console.log('url; ', url);
+
 		http.open("POST", url, true);
 		http.setRequestHeader('Content-type', 'application/json');
 		http.onreadystatechange = function() {
 			if (http.readyState == 4) {
-		    		Wu.Util.checkDisconnect(http.responseText);
-				if (app.debug) Wu.Util.debugXML(http.responseText);
-				if (http.status == 200) { // ok
+		    		
+				var valid = Wu.verify(http.responseText);
+
+				if (http.status == 200 && valid) { // ok
 					if (callback) callback(null, http.responseText); 
-				} else { // error
-					if (callback) callback(http.status); 	// ??
+				} else { 
+					if (callback) callback(http.status);
 				}
 			}
 		}
+		
 		// stringify objects
 		if (Wu.Util.isObject(json)) json = JSON.stringify(json);
 		
 		// send string
 		http.send(json);
 	},
+
+
+	// get with callback
+	_getJSON : function (url, callback) {
+		var http = new XMLHttpRequest();
+		http.open("GET", url, true);
+
+		//Send the proper header information along with the request
+		http.setRequestHeader("Content-type", "application/json");
+
+		http.onreadystatechange = function() {
+		    if(http.readyState == 4 && http.status == 200) {
+			var valid = Wu.verify(http.responseText);
+			
+			if (valid) callback(http.responseText); 
+		    }
+		}
+		http.send(null);
+	},
+	
 
 	// parse with error handling
 	_parse : function (json) {
@@ -423,23 +459,6 @@ Wu.Util = {
 
 	},
 
-	// get with callback
-	_getJSON : function (url, callback) {
-
-		var http = new XMLHttpRequest();
-		http.open("GET", url, true);
-
-		//Send the proper header information along with the request
-		http.setRequestHeader("Content-type", "application/json");
-
-		http.onreadystatechange = function() {
-		    if(http.readyState == 4 && http.status == 200) {
-			if (app.debug) Wu.Util.debugXML(http.responseText);
-			callback(http.responseText); 
-		    }
-		}
-		http.send(null);
-	},
 
 	_getParentClientID : function (pid) {
 		var cid = '';
@@ -552,121 +571,7 @@ Wu.Util = {
 
 	},
 
-	can : {
-
-		create : {
-			project : function () {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				return false;
-			},
-			client : function () {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				return false;
-			},
-			superadmin : function () {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				return false;
-			},
-			admin : function () {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true; 	// admins can create other admins
-				return false;
-			},
-			manager : function (uuid) { // project uuid
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				return false;
-			},
-			editor : function () {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				return false;
-			},
-			reader : function () {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				if (user.role.manager.projects.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-				return false;
-			}
-		},
-
-		read : {
-			project : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				if (user.role.manager.projects.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-				if (user.role.editor.projects.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
-				if (user.role.reader.projects.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
-				return false;
-			},
-			client : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				if (user.role.manager.clients.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-				if (user.role.editor.clients.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
-				if (user.role.reader.clients.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
-				return false;
-			}
-		},
-
-		update : {
-			project : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				if (user.role.editor.projects.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-				return false;
-
-			},
-			client : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				if (user.role.editor.clients.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-				return false;
-			},
-			user   : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-
-				// var subject = app.
-				if (user.role.manager.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-				return false;				
-			}
-		},
-
-		remove : {
-			project : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				return false;
-
-			},
-			client : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				return false;				
-			}
-		}, 
-
-
-	},
 	
-
 	prettyDate : function(date, compareTo){
 		/*
 		 * Javascript Humane Dates
@@ -1099,6 +1004,7 @@ Wu.can = Wu.Util.can;
 ichDiv = Wu.Util.templateIch;
 Wu.setStyle = Wu.Util.setStyle;
 Wu.getStyle = Wu.Util.getStyle;
+Wu.verify = Wu.Util.verifyResponse;
 
 Wu.Evented = Wu.Class.extend({
 

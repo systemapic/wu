@@ -40,13 +40,7 @@ var api = module.parent.exports;
 // exports
 module.exports = api.upload = { 
 
-
 	projectLogo : function (req, res) {
-
-		console.log('api.upload.projectLogo');
-
-		console.log('API ==> module.parent: ', module.parent);
-		console.log('...api => ', api);
 
 		// process from-encoded upload
 		var form = new formidable.IncomingForm({
@@ -54,43 +48,21 @@ module.exports = api.upload = {
 			multiples : true,
 			keepExtensions : true,
 		});
-		form.parse(req, function(err, fields, files) {	
 
-			var from = files.file.path;
-			var file = 'image-' + uuid.v4();
-			// var to   = IMAGEFOLDER + file;
-			var to   = api.config.path.image + file;
+		form.parse(req, function(err, fields, files) {	
+			if (err || !files || !files.file) return api.error.general(req, res, err || 'No files1.');
+
+			var from = files.file.path,
+			    file = 'image-' + uuid.v4(),
+			    to = api.config.path.image + file;
 			
 			// rename and move to image folder
 			fs.rename(from, to, function (err) {
-				if (err) res.end(JSON.stringify({error : err}));
+				if (err) return api.error.general(req, res, err);
 				res.end(file);	// file will be saved by client
 			});		
 	 	});
 	},
-
-
-	// uploadProjectLogo : function (req, res) {
-
-	// 	// process from-encoded upload
-	// 	var form = new formidable.IncomingForm({
-	// 		hash : 'sha1',
-	// 		multiples : true,
-	// 		keepExtensions : true,
-	// 	});
-	// 	form.parse(req, function(err, fields, files) {	
-
-	// 		var from = files.file.path;
-	// 		var file = 'image-' + uuid.v4();
-	// 		var to   = IMAGEFOLDER + file;
-			
-	// 		// rename and move to image folder
-	// 		fs.rename(from, to, function (err) {
-	// 			if (err) res.end(JSON.stringify({error : err}));
-	// 			res.end(file);	// file will be saved by client
-	// 		});		
-	//  	});
-	// },
 
 
 	clientLogo : function (req, res) {
@@ -102,17 +74,15 @@ module.exports = api.upload = {
 			keepExtensions : true,
 		});
 		form.parse(req, function(err, fields, files) {	
-			// console.log('formidale: ', util.inspect({fields: fields, files: files}));
-			// console.log('files! => ', files);
- 		
-			var from = files.file.path;
-			var file = 'image-' + uuid.v4();
-			// var to   = IMAGEFOLDER + file;
-			var to   = api.config.path.image + file;
+			if (err || !files || !files.file) return api.error.general(req, res, err || 'No files2.');
+			
+			var from = files.file.path,
+			    file = 'image-' + uuid.v4(),
+			    to = api.config.path.image + file;
 			
 			// rename and move to image folder
 			fs.rename(from, to, function (err) {
-				if (err) res.end(JSON.stringify({error : err}));
+				if (err) return api.error.general(req, res, err);
 				res.end(file);	// file will be saved by client
 			});		
 	 	});
@@ -127,16 +97,17 @@ module.exports = api.upload = {
 			multiples : true,
 			keepExtensions : true,
 		});
-		form.parse(req, function(err, fields, files) {	
 
-			var from = files.file.path;
-			var file = 'image-' + uuid.v4();
-			// var to   = IMAGEFOLDER + file;
-			var to   = api.config.path.image + file;
+		form.parse(req, function(err, fields, files) {	
+			if (err || !files || !files.file) return api.error.general(req, res, err || 'No files3.');
+
+			var from = files.file.path,
+			    file = 'image-' + uuid.v4(),
+			    to   = api.config.path.image + file;
 			
 			// rename and move to image folder
 			fs.rename(from, to, function (err) {
-				if (err) res.end(JSON.stringify({error : err}));
+				if (err) return api.error.general(req, res, err);
 				res.end(file);	// file will be saved by client
 			});		
 	 	});
@@ -177,7 +148,12 @@ module.exports = api.upload = {
 			multiples : true,
 			keepExtensions : true,
 		});
+
 		form.parse(req, function(err, fields, files) {	
+			console.log(err, files, fields);
+			if (err || !files || !fields) return api.error.general(req, res, err || 'No files4.');
+
+
 			console.log('formidale: ', util.inspect({fields: fields, files: files}));
 			console.log('files! => ', files);
  			
@@ -219,17 +195,12 @@ module.exports = api.upload = {
 
 			var fileArray = files['file[]'];
 			
-			// var fileArray = [files.file];
 
-			if (!fileArray) return res.end(JSON.stringify({error : 'Error: No files.'}))
+			if (!fileArray) return api.error.general(req, res, 'No files5.');
 
 			// if just one file, wrap in array
 			if (!fileArray.length) fileArray = [fileArray];
 			
-
-
-			// console.log('fileArray: ', fileArray);
-
 
 			var ops = [];
 
@@ -237,23 +208,24 @@ module.exports = api.upload = {
 
 				// quick sort
 				api.upload.sortFormFiles(fileArray, function (err, results) {	
+					if (err || !results) return callback(err || 'Nothing to sort.');
 
 					console.log('_________ results ______________');
 					console.log('results: ', results);
 					console.log('__________ results end _________');				
 								
-					callback(err, results);
+					callback(null, results);
 				});
 			});
 
 
 			ops.push(function (dbs, callback) {
+				if (!dbs) return callback('Nothing to do.');
 
 				var dbss = _.flatten(dbs);
 				var ops = [];
 
 				dbss.forEach(function (db) {
-
 
 					db.uuid = db.file; 
 					db.createdBy = req.user.uuid;
@@ -285,23 +257,21 @@ module.exports = api.upload = {
 
 				// async
 				async.series(ops, function (err, docs) {
+					if (err || !docs) return callback(err || 'No docs.');
+
 					// add _ids to project
 					docs && docs.forEach(function (doc) {
-						// doc.layer && api.dbAddLayerToProject(doc.layer._id, fields.project)
 						doc.layer && api.layer.addToProject(doc.layer._id, fields.project)
-						// doc.file  && api.dbAddFileToProject(doc.file._id, fields.project)
-						doc.file  && api.file.addToProject(doc.file._id, fields.project)
+						doc.file && api.file.addToProject(doc.file._id, fields.project)
 					});
-					callback(err, docs);
+
+					callback(null, docs);
 				});
-				
 			});
 			
 
 			async.waterfall(ops, function (err, results) {
-				// console.log('async waterfall done, err, results', err, results);
-				// console.log('fields: ', fields);
-				// console.log('f cl', fields.client);
+				if (err || !results) return api.error.general(req, res, err || 'No results.');
 
 				// organize in sidepane.dataLibrary format
 				var files = [],
@@ -315,7 +285,7 @@ module.exports = api.upload = {
 				var pack = {
 					files  : files,
 					layers :layers,
-					errors : err
+					error : err
 				}
 
 				// all done
@@ -356,19 +326,12 @@ module.exports = api.upload = {
 
 			
 		});
-
-
 	},
-
-
-
-
-
-
 
 
 	sortFormFiles : function (fileArray, done) {
 
+		if (!fileArray) return done('No files6.');
 
 		// console.log('UPLOAD: Sorting form files');
 
@@ -376,26 +339,11 @@ module.exports = api.upload = {
 		var ops = [];
 		fileArray.forEach(function (file) {
 
-			// console.log('-> file: ', 	file);
-			// console.log('mime type: ', 	file.type);
-			// console.log('path: ', 		file.path);
-			// console.log('name: ', 		file.name);
-			// console.log('typeof file: ', 	typeof(file));
-			// console.log('length rfile: ', 	file.length);
-
-
 			// each file uuid
 			var fileUuid = 'file-' + uuid.v4();
 
-			// current tmp path
-			// var filepath = file.path;
-
-			// var path = file.path + '/' + file.name;
-			// console.log('______________ _ _ _ _ _ _ path: ', path);
-
 			// type and extension
 			var filetype 	= api.upload.getFileType(file.path);
-			// var filetype 	= upload.getFileType(file.name);
 			var extension 	= filetype[0];
 			var type 	= filetype[1];
 
@@ -410,22 +358,12 @@ module.exports = api.upload = {
 
 			// add async ops
 			ops = api.upload._sortOps(ops, options);
-
 		
 		});
-
-		
 
 		async.series(ops, function (err, dbs) {
-			// console.log('store:', store);
-			// console.log('sortFormFiles 1 done, ', dbs);
-
-
 			done && done(err, dbs);
-
 		});
-				
-
 	},
 
 
@@ -437,11 +375,6 @@ module.exports = api.upload = {
 
 		var fileUuid 	= options.fileUuid;
 		var folder 	= options.folder;
-		// var currentPath = options.currentPath;
-
-
-		// console.log('____________________________________UPLOAD: Sorting zip folder');
-		// console.log('options.currentFolder', options.currentFolder);
 
 		// var currentFolder = options.currentFolder || FILEFOLDER + fileUuid;
 		var currentFolder = options.currentFolder || api.config.path.file + fileUuid;
@@ -458,24 +391,15 @@ module.exports = api.upload = {
 
 		// read files in folder
 		fs.readdir(currentFolder, function (err, files) {
+			if (err || !files) return callback(err || 'No files7.');
 
-			// console.log('sortZipFolder files: ', files); // ['Africa.shp', 'Africa.prj'] OR 'Zoning' (as folder)
-
-			
 
 			files.forEach(function (name) { 	// 'Africa.shp'
 
-				var path = currentFolder + '/' + name; // path 
-
-
-
-				// var filetype 	= upload.getFileType(name);
+				var path 	= currentFolder + '/' + name; // path 
 				var filetype 	= api.upload.getFileType(path);
 				var extension 	= filetype[0];
 				var type 	= filetype[1];
-
-
-
 
 				var options = {
 					path : path,
@@ -487,105 +411,43 @@ module.exports = api.upload = {
 				}
 
 
-				// console.log('_sortOps: ', ops1, options);
-
-
-
 				// handle zip (within zip)
 				if (options.type == 'application/zip' || options.type == 'application/x-zip-compressed') {
 
 					ops1.push(function (callback) {
 
-						// console.log('__handling ZIP FILE 222!');
-
 						var rand = crypto.randomBytes(4).toString('hex');
-						// console.log('RANDOMMM!M!!M!M!M', rand);
-
-						// new file uuid !!!
 						var newFileUuid = 'file-' + uuid.v4();
-
 
 						var zipopt = {
 							inn : options.path,
-							// fileUuid : options.fileUuid,
 							fileUuid : newFileUuid,
 							out : '/' + rand
-							// out : 
 						}
 
 						// unzips files to folder
 						api.file.handleZip(zipopt, function (err) {
-
-							console.log('filer.handleZip done');
-							// console.log('options.path: ', options.path);
-							// console.log('options.fioleUuid: ', options.fileUuid);
+							if (err) return callback(err);
 
 							var opt = {
-								// fileUuid : options.fileUuid,
 								fileUuid : newFileUuid,
 								folder : rand
 							}
 
 							api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
-								
-								console.log('upload.sortZipFolder done', dbs);
+								if (err) return callback(err);
 
 								callback(err, dbs);
-
 							});
 						});
 					});
 				}
 				
-				// // handle zip
-				// if (options.type == 'application/zip') {
-
-				// 	ops1.push(function (callback) {
-
-				// 		// unzips files to folder
-				// 		filer.handleZip(options.path, options.fileUuid, function (err) {
-
-				// 			upload.sortZipFolder(options.fileUuid, function (err, dbs) {	// gets [db]
-								
-				// 				callback(err, dbs);
-
-				// 			});
-				// 		});
-				// 	});
-				// }
-
-
-				// // handle tar.gz
-				// if (options.type == 'application/x-gzip') {
-
-				// 	ops1.push(function (callback) {
-
-				// 		// untars files to folder
-				// 		filer.handleTar(options.path, options.fileUuid, function (err) {
-							
-				// 			upload.sortZipFolder(options.fileUuid, function (err, dbs) {
-
-				// 				callback(err, dbs);
-
-				// 			});
-				// 		});
-				// 	});
-				// }
-
-
-
-				// skip partials, catch on shapefile
-				// if (options.type == 'partialshape') return ops; 
-
-
+				
 				// handle folder
 				if (options.type == 'folder') {
 
 					ops1.push(function (callback) {
-
-						// console.log('__handling FOLDER 77: options.currentFolder', options.currentFolder);
-						// console.log('opitons.name: ', options.name);
-
 						
 						var opt = {
 							fileUuid : options.fileUuid,
@@ -593,39 +455,30 @@ module.exports = api.upload = {
 							currentFolder : options.currentFolder
 						}
 
-						// console.log('opt!!-=-=---->', opt);
-
 						api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
-							
-							// console.log('upload.sortZipFolder 99 done', dbs);
-
-							callback(err, dbs);
-
+							if (err) return callback(err);
+							callback(null, dbs);
 						});
 					});
 				}
 
 
-
 				// handle shapefiles
 				if (options.type == 'shapefile') {					// gotchas: already in file-uuid folder, cause unzip
-					// console.log('got shapefile!', options.name);			// 
 
 					ops1.push(function (callback) {
 
 						// process shapefile (convert, store, vectorize, etc.)
 						api.file.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
-							// console.log('handled shapefile!', err, db);
+							if (err) return callback(err);
 
 							// populate db entry
 							db = db || {};
 							db.name = options.name;
-							// db.file = options.fileUuid;
 							db.type = 'Layer';
 
 							// return db
-							callback(err, db);
-
+							callback(null, db);
 						});
 					});
 				}
@@ -639,6 +492,7 @@ module.exports = api.upload = {
 
 						// puts file in folder
 						api.file.handleImage(options.path, options.name, options.fileUuid, function (err, db) {
+							if (err) return callback(err);
 
 							// populate db entry
 							db = db || {};
@@ -648,7 +502,7 @@ module.exports = api.upload = {
 							db.files = [options.name];
 
 							// return db
-							callback(err, db);
+							callback(null, db);
 						});
 					});
 				}
@@ -661,11 +515,11 @@ module.exports = api.upload = {
 					// only process geofiles
 					if (options.extension != 'geojson' && options.extension != 'topojson' && options.extension != 'json') return ops;
 
-
 					ops1.push(function (callback) {
 
 						// processes geojson, puts file in folder
 						api.file.handleJson(options.path, options.name, options.extension, options.fileUuid, function (err, db) {
+							if (err) return callback(err);
 							
 							// populate db entry
 							db = db || {};
@@ -675,8 +529,7 @@ module.exports = api.upload = {
 							db.files = [options.name];
 
 							// return db
-							callback(err, db);
-						
+							callback(null, db);
 						});
 					});
 				}
@@ -692,6 +545,7 @@ module.exports = api.upload = {
 
 						// puts file in folder
 						api.file.handleDocument(options.path, options.name, options.fileUuid, function (err, db) {
+							if (err) return callback(err);
 
 							// populate db entry
 							db = db || {};
@@ -701,76 +555,39 @@ module.exports = api.upload = {
 							db.files = [options.name];
 
 							// return db
-							callback(err, db);
+							callback(null, db);
 
 						});
 					});
 				}
-
-
-
-
-
-
-
-
-
-				// add async ops
-				// ops1 = upload._sortOps(ops1, options);
-
-		
 			});
-		
-
 
 			// run ops
 			async.series(ops1, function (err, dbs) {
-				// console.log('parallel don1 ', err, dbs);
 				done && done(err, dbs);
 			});
-
-
-
 		});
-
 	},
 
 
 
 	_sortOps : function (ops, options) {
 
-
-		// console.log('_sortOps: ', ops, options);
-
-
-
-
 		// handle folder
 		if (options.type == 'folder') {
 
 			ops.push(function (callback) {
 
-				// console.log('__handling FOLDER!');
+				var opt = {
+					fileUuid : options.fileUuid,
+					folder : options.name,
+					currentFolder : options.currentFolder
+				}
 
-				// unzips files to folder
-				// filer.handleZip(options.path, options.fileUuid, function (err) {
-
-				// 	console.log('filer.handleZip done');
-
-					var opt = {
-						fileUuid : options.fileUuid,
-						folder : options.name,
-						currentFolder : options.currentFolder
-					}
-
-					api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
-						
-						// console.log('upload.sortZipFolder 99 done', dbs);
-
-						callback(err, dbs);
-
-					});
-				// });
+				api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
+					if (err) return callback(err);
+					callback(null, dbs);
+				});
 			});
 		}
 
@@ -780,8 +597,6 @@ module.exports = api.upload = {
 
 			ops.push(function (callback) {
 
-				// console.log('__handling ZIP FILE!');
-
 				var opt = {
 					inn : options.path,
 					fileUuid : options.fileUuid,
@@ -790,8 +605,7 @@ module.exports = api.upload = {
 
 				// unzips files to folder
 				api.file.handleZip(opt, function (err) {
-
-					// console.log('filer.handleZip done');
+					if (err) return callback(err);
 
 					var opt = {
 						fileUuid : options.fileUuid,
@@ -799,11 +613,9 @@ module.exports = api.upload = {
 					}
 
 					api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
+						if (err) return callback(err);
 						
-						// console.log('upload.sortZipFolder done', dbs);
-
 						callback(err, dbs);
-
 					});
 				});
 			});
@@ -817,16 +629,16 @@ module.exports = api.upload = {
 
 				// untars files to folder
 				api.file.handleTar(options.path, options.fileUuid, function (err) {
+					if (err) return callback(err);
 
 					var opt = {
-						fileUuid : fileUuid,
+						fileUuid : options.fileUuid,
 						folder : null
 					}
 					
 					api.upload.sortZipFolder(opt, function (err, dbs) {
-
-						callback(err, dbs);
-
+						if (err) return callback(err);
+						callback(null, dbs);
 					});
 				});
 			});
@@ -834,34 +646,25 @@ module.exports = api.upload = {
 
 
 
-		// skip partials, catch on shapefile
-		// if (options.type == 'partialshape') return ops; 
-
-
 		// handle shapefiles
 		if (options.type == 'shapefile') {					// gotchas: already in file-uuid folder, cause unzip
-			// console.log('got shapefile!', options.name);			// 
 
 			ops.push(function (callback) {
 
 				// process shapefile (convert, store, vectorize, etc.)
 				api.file.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
-					// console.log('handled shapefile!', err, db);
+					if (err) return callback(err);
 
 					// populate db entry
 					db = db || {};
 					db.name = options.name;
-					// db.file = options.fileUuid;
 					db.type = 'Layer';
 
 					// return db
-					callback(err, db);
-
-
+					callback(null, db);
 				});
 			});
 		}
-
 
 
 		// handle images
@@ -871,6 +674,7 @@ module.exports = api.upload = {
 
 				// puts file in folder
 				api.file.handleImage(options.path, options.name, options.fileUuid, function (err, db) {
+					if (err) return callback(err);
 
 					// populate db entry
 					db = db || {};
@@ -880,7 +684,7 @@ module.exports = api.upload = {
 					db.files = [options.name];
 
 					// return db
-					callback(err, db);
+					callback(null, db);
 				});
 			});
 		}
@@ -898,6 +702,7 @@ module.exports = api.upload = {
 
 				// processes geojson, puts file in folder
 				api.file.handleJson(options.path, options.name, options.extension, options.fileUuid, function (err, db) {
+					if (err) return callback(err);
 					
 					// populate db entry
 					db = db || {};
@@ -907,7 +712,7 @@ module.exports = api.upload = {
 					db.files = [options.name];
 
 					// return db
-					callback(err, db);
+					callback(null, db);
 				
 				});
 			});
@@ -924,6 +729,7 @@ module.exports = api.upload = {
 
 				// puts file in folder
 				api.file.handleDocument(options.path, options.name, options.fileUuid, function (err, db) {
+					if (err) return callback(err);
 
 					// populate db entry
 					db = db || {};
@@ -933,7 +739,7 @@ module.exports = api.upload = {
 					db.files = [options.name];
 
 					// return db
-					callback(err, db);
+					callback(null, db);
 
 				});
 			});
@@ -942,14 +748,12 @@ module.exports = api.upload = {
 
 		return ops;
 
-
 	},
 
 
 
-
 	getFileType : function (name) {
-
+		if (!name) return ['unknown', 'unknown'];
 
 		// check if folder
 		var isFolder = fs.statSync(name).isDirectory();
@@ -990,13 +794,4 @@ module.exports = api.upload = {
 		return ['unknown', 'unknown'];
 	},
 
-
-
-
 }
-
-
-
-
-
-

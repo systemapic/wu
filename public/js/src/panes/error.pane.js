@@ -7,7 +7,7 @@ Wu.ErrorPane = Wu.Class.extend({
 		severityColors : {
 			1 : 'yellow',
 			2 : 'cyan',
-			3 : 'rgb(255, 122, 122)'
+			3 : 'rgba(255, 0, 0, 0.81)'
 		}
 
 	},
@@ -17,17 +17,23 @@ Wu.ErrorPane = Wu.Class.extend({
 		// init layout
 		this.initLayout();
 
+		// shortcut
+		app.error = this;
+
 	},
 
 	initLayout : function () {
 
 		// create divs
-		this._container = Wu.DomUtil.create('div', 'error-pane displayNone', app._mapContainer);
+		this._container = Wu.DomUtil.create('div', 'error-pane displayNone', app._appPane);
 		this._content = Wu.DomUtil.create('div', 'error-pane-content', this._container);
 
 		this._title = Wu.DomUtil.create('div', 'error-pane-title', this._content);
 		this._description = Wu.DomUtil.create('div', 'error-pane-description', this._content);
 		this._icon = Wu.DomUtil.create('div', 'error-pane-icon', this._content);
+
+		// x
+		this._x = Wu.DomUtil.create('div', 'error-pane-x', this._container, 'X');
 
 		// events
 		this.addEvents();
@@ -37,8 +43,13 @@ Wu.ErrorPane = Wu.Class.extend({
 	addEvents : function () {
 
 		// close on click
-		Wu.DomEvent.on(this._container, 'mousedown', this.clear, this);
+		// Wu.DomEvent.on(this._container, 'click', this.clear, this);
 
+		Wu.DomEvent.on(this._x, 'click', this.clear, this);
+	},
+
+	set : function (title, description, severity) {
+		this.setError(title, description, severity);
 	},
 
 	setError : function (title, description, severity) {

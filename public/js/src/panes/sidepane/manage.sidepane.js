@@ -127,18 +127,15 @@ Wu.SidePane.Manage = Wu.Class.extend({
 		// create div for current role
 		var div_currentRole = Wu.DomUtil.create('div', 'manage-access-current-role', rolesWrapper, roleName);
 
-		// tooltip
-		var tooltip = app.language.tooltips.roles.dropdown;
-		app.Tooltip.add(div_currentRole, tooltip);
-
+		
 		// role explanation
 		var infoDiv = Wu.DomUtil.create('div', 'manage-access-info', wrapper);
 		var role = currentRole ? currentRole.getSlug() : 'noRole';
 		var infoText = app.language.tooltips.roles[role];
 		infoDiv.innerHTML = infoText;
 
-		// dont allow changes to admins
-		if (!app.access.is.admin(this._user)) {
+		// dont allow changes to admins or self
+		if (!app.access.is.admin(this._user) && this._user.getUuid() != app.Account.getUuid()) {
 
 			// add event for current role click
 			Wu.DomEvent.on(div_currentRole, 'click', function () {
@@ -161,6 +158,11 @@ Wu.SidePane.Manage = Wu.Class.extend({
 
 			}, this);
 		}
+
+		// tooltip
+		var tooltip = app.language.tooltips.roles.dropdown;
+		app.Tooltip.add(div_currentRole, tooltip);
+
 	},
 
 	
@@ -261,12 +263,14 @@ Wu.SidePane.Manage = Wu.Class.extend({
 
 		// add member 
 		if (role) role.addMember(user, function (err, projectStore) {
-			console.log('added role', err, projectStore);
+			if (err) app.error.set('Access denied', err);
+			app.setSaveStatus();
 		});
 
 		// add 'No role'
 		if (!role) app.access.addNoRole(options, function (err, result) {
-			console.log('addNoRole callback: ', err, result);
+			if (err) app.error.set('Access denied', err);
+			app.setSaveStatus();
 		});
 	},
 

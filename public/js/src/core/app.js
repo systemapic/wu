@@ -15,6 +15,7 @@ Wu.App = Wu.Class.extend({
 
 		// set global this
 		Wu.app = this;
+		window.app = this;
 
 		// merge options
 		Wu.setOptions(this, options);

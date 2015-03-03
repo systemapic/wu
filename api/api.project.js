@@ -52,6 +52,7 @@ module.exports = api.project = {
 		    account = req.user,
 		    ops = [];
 
+
 		// return if missing info
 		if (!store) return api.error.missingInformation(req, res);
 
@@ -71,9 +72,6 @@ module.exports = api.project = {
 
 		// create project
 		ops.push(function (roles, callback) {
-
-			console.log('received roles: ', roles);
-			
 			api.project._create({
 				user : account,
 				roles : roles,
@@ -104,13 +102,16 @@ module.exports = api.project = {
 	},
 
 
-
 	_create : function (options, done) {
+		if (!options) return done('No options.');
+
 		var user = options.user,
 		    roles = options.roles,
 		    store = options.store,
 		    slug = crypto.randomBytes(3).toString('hex');
 		
+		if (!store || !user) return done('Missing information.8');
+
 		// create model
 		var project 		= new Project();
 		project.uuid 		= 'project-' + uuid.v4();
@@ -125,15 +126,11 @@ module.exports = api.project = {
 
 		// add roles
 		roles.forEach(function (role) {
-
-			console.log('adding role ======> ', role);
-
 			project.roles.addToSet(role._id);
 		});
 
 		// save
 		project.save(function (err, project, numAffected) { 	// major GOTCHA!!! product.save(function (err, product, numberAffected) 
-			console.log('saved project88', project);
 			done(err, project);				// returns three args!!!
 		});
 	},
@@ -143,26 +140,22 @@ module.exports = api.project = {
 	// ###  API: Delete Project              ###
 	// #########################################
 	deleteProject : function (req, res) {
+		if (!req.body) return api.error.missingInformation(req, res);
 
 		var account     = req.user,
 		    clientUuid 	= req.body.clientUuid,
 		    projectUuid = req.body.projectUuid;
 
-
 		var ops = [];
 
 		ops.push(function (callback) {
-
 			Project
 			.findOne({uuid : projectUuid})
 			.populate('roles')
 			.exec(callback);
-
 		});
 
-
 		ops.push(function (project, callback) {
-
 			api.access.to.delete_project({
 				user : account, 
 				project : project
@@ -170,14 +163,13 @@ module.exports = api.project = {
 		});
 
 		ops.push(function (options, callback) {
+			if (!options || !options.project) return callback('No project.');
 
 			options.project.remove(callback);
 		});
 
-
 		async.waterfall(ops, function (err, project) {
-			if (err) return api.error.general(req, res, err);
-
+			if (err || !project) return api.error.general(req, res, err);
 
 			// slack
 			api.slack.deletedProject({
@@ -191,28 +183,25 @@ module.exports = api.project = {
 				deleted : true
 			}));
 		})
-
-
 	},
 
 	// #########################################
 	// ###  API: Update Project              ###
 	// #########################################
 	update : function (req, res) {
+		if (!req.body) return api.error.missingInformation(req, res);
+		
 		var account = req.user,
 		    projectUuid = req.body.uuid,
 		    ops = [];
 
-		console.log('Updating project.', req.body);
-
+		console.log('Updating project.'.yellow);
+		console.log('body: ', req.body);
 
 		// return on missing
 		if (!projectUuid) return api.error.missingInformation(req, res);
 
-
 		ops.push(function (callback) {
-
-			// find project
 			Project
 			.findOne({uuid : projectUuid})
 			.populate('roles')
@@ -220,8 +209,6 @@ module.exports = api.project = {
 		});
 
 		ops.push(function (project, callback) {
-
-			// check access
 			api.access.to.edit_project({
 				user : account,
 				project : project
@@ -229,8 +216,6 @@ module.exports = api.project = {
 		});
 
 		ops.push(function (options, callback) {
-
-			// update project
 			api.project._update({
 				project : options.project,
 				options : req.body
@@ -240,16 +225,15 @@ module.exports = api.project = {
 		async.waterfall(ops, function (err, project) {
 			if (err) return api.error.general(req, res, err);
 
-
-
 			// done
 			res.end(JSON.stringify(project));
 		});
-
-		
 	},
 
+
 	_update : function (job, callback) {
+		if (!job) return callback('Missing job.');
+
 		var project = job.project,
 		    options = job.options,
 		    queries = {};
@@ -288,12 +272,13 @@ module.exports = api.project = {
 
 		// run queries to database
 		async.parallel(queries, callback);
-
 	},
 
 
 	// async mongo update queue
 	_enqueueUpdate : function (job) {
+		if (!job) return;
+
 		var queries = job.queries,
 		    field = job.field,
 		    project = job.project,
@@ -313,6 +298,7 @@ module.exports = api.project = {
 	// ###  API: Check Unique Slug           ###
 	// #########################################
 	checkUniqueSlug : function (req, res) {
+		if (!req.body) return api.error.general(req, res);
 
 		var value = req.body.value,
 		    clientUuid = req.body.client,
@@ -322,6 +308,7 @@ module.exports = api.project = {
 		Project
 		.find({client : clientUuid})
 		.exec(function (err, projects) {
+			if (err) return api.error.general(req, res, err);
 
 			// get slugs
 			projects.forEach(function (p) {
@@ -339,16 +326,15 @@ module.exports = api.project = {
 		});
 	},
 
-	_returnProject : function (req, res, project, error) {
-		if (error) console.error(error);
-
+	_returnProject : function (req, res, project, err) {
+		if (!project) return api.error.general(req, res, err);
+		
 		Project
 		.findOne({uuid : project.uuid})
 		.populate('files')
 		.populate('layers')
 		.populate('roles')
 		.exec(function (err, project) {
-			if (err) console.error(err);
 			res.end(JSON.stringify({
 				error : err,
 				project: project
@@ -358,9 +344,10 @@ module.exports = api.project = {
 
 
 	getHash : function (req, res) {
+		if (!req.body) return api.error.general(req, res);
 	
-		var id = req.body.id;
-		var projectUuid = req.body.projectUuid;		// todo: access restrictions
+		var id = req.body.id,
+		    projectUuid = req.body.projectUuid;		// todo: access restrictions
 
 		Hash
 		.findOne({id : id, project : projectUuid})
@@ -373,7 +360,7 @@ module.exports = api.project = {
 	},
 
 	setHash : function (req, res) {
-		console.log('setHash: req.body: ', req.body);
+		if (!req.body || !req.user) return api.error.general(req, res);
 
 		var projectUuid = req.body.projectUuid,
 		    position 	= req.body.hash.position,
@@ -400,14 +387,14 @@ module.exports = api.project = {
 
 
 	getAll : function (options, done) {
+		if (!options) return done('No options.');
+
 		var user = options.user;
 
 		// check if admin
 		api.access.is.admin({
 			user : user
 		}, function (err, isAdmin) {
-
-			console.log('getAll project, is admin, err, isAdmin', err, isAdmin);
 
 			// not admin, get all users manually
 			if (err || !isAdmin) return api.project._getAllFiltered(options, done);
@@ -428,14 +415,14 @@ module.exports = api.project = {
 
 
 	_getAllFiltered : function (options, done) {
+		if (!options) return done('No options.');
+
 		var user = options.user,
 		    filter = options.cap_filter || 'read_project',
 		    cap_filter = 'capabilities.' + filter,
 		    ops = [];
 
-
 		ops.push(function (callback) {
-
 			// get all roles with user as read_project
 			Role
 			.find({ members : user.uuid })
@@ -443,10 +430,9 @@ module.exports = api.project = {
 			.exec(callback);
 		});
 
-
 		ops.push(function (roles, callback) {
-
 			var roleIds = [];
+
 			roles.forEach(function (role) {
 				roleIds.push(role._id);
 			});

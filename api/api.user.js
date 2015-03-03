@@ -45,6 +45,7 @@ module.exports = api.user = {
 
 	// create user
 	create : function (req, res) {
+		if (!req.body || !req.body.project) return api.error.missingInformation(req, res);
 
 		// user not added to any roles on creation
 		// blank user with no access - must be given project access, etc.
@@ -69,8 +70,6 @@ module.exports = api.user = {
 
 		// check access
 		ops.push(function (project, callback) {
-			console.log('checking access'.cyan);
-			console.log('lets check', project);
 			api.access.to.create_user({
 				user : account,
 				project : project
@@ -79,7 +78,6 @@ module.exports = api.user = {
 
 		// create user
 		ops.push(function (options, callback) {
-			console.log('looks liek got access!'.yellow, options)
 			api.user._create({
 				options : req.body,
 				account : account
@@ -88,25 +86,26 @@ module.exports = api.user = {
 
 		// send email
 		ops.push(function (user, password, callback) {
-			console.log('got password: ', password);
+			console.log('got password: '.yellow, password);
 			// api.email.sendWelcomeEmail(user, password);  // refactor plain pass
 			callback(null, user);
 		});
 
 		// run ops
 		async.waterfall(ops, function (err, user) {
-			console.log('_______done checking yo!!', err, user);
 			if (err) return api.error.general(req, res, err);
 
 			// done
 			res.end(JSON.stringify(user));
 		});
-
 	},
+
 
 	_create : function (job, callback) {
 		var options = job.options,
 		    account = job.account;
+
+		if (!options || !account) return callback('Missing information.5');
 
 		// create the user
 		var user            	= new User();
@@ -130,11 +129,14 @@ module.exports = api.user = {
 
 	// update user 	// todo: send email notifications on changes?
 	update : function (req, res) {
+		if (!req.body) return api.error.missingInformation(req, res);
+
 		var userUuid = req.body.uuid,
 		    account = req.user,
 		    projectUuid = req.body.project,
 		    ops = [];
 
+		if (!userUuid || !account || !projectUuid) return api.error.missingInformation(req, res);
 
 		ops.push(function (callback) {
 			User
@@ -146,6 +148,7 @@ module.exports = api.user = {
 			Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
+				if (err) return callback(err);
 				callback(null, user, project);
 			});
 		});
@@ -167,14 +170,15 @@ module.exports = api.user = {
 		});
 
 		async.waterfall(ops, function (err, user) {
-			if (err) api.error.general(req, res, err);
+			if (err || !user) api.error.general(req, res, err || 'No user.');
+
 			res.end(JSON.stringify(user));
 		});
-
 	},
 
 
 	_update : function (options, callback) {
+		if (!options) return callback('Missing information.6');
 
 		var user = options.user,
 		    options = options.options,
@@ -207,6 +211,8 @@ module.exports = api.user = {
 	},
 
 	_enqueueUpdate : function (job) {
+		if (!job) return;
+
 		var queries = job.queries,
 		    options = job.options,
 		    field = job.field,
@@ -224,12 +230,11 @@ module.exports = api.user = {
 		
 	// delete user  	
 	deleteUser : function (req, res) {
-
-
+		if (!req.body) return api.error.missingInformation(req, res);
+	
 		var userUuid = req.body.uuid,
 		    account = req.user,
 		    ops = [];
-
 
 		ops.push(function (callback) {
 			User
@@ -245,23 +250,26 @@ module.exports = api.user = {
 		});
 
 		ops.push(function (options, callback) {
+			if (!options || !options.subject) return callback('Missing information.7');
+
 			options.subject.remove(callback);
 		});
 
 		async.waterfall(ops, function (err, user) {
-			if (err) api.error.general(req, res, err);
+			if (err || !user) api.error.general(req, res, err);
 
 			// done
 			res.end(JSON.stringify(user));
 
 			// todo: send email notifications?
 		});
-
 	},
 
 
 	// check unique email
 	checkUniqueEmail : function (req, res) {
+		if (!req.body) return api.error.missingInformation(req, res);
+
 		var user = req.user,
 		    email = req.body.email,
 		    unique = false;
@@ -276,28 +284,23 @@ module.exports = api.user = {
 	},
 
 
-
-
-
-
 	getAll : function (options, done) {
+		if (!options) return done('No options.');
+
 		var user = options.user;
 
 		// check if admin
 		api.access.is.admin({
 			user : user
 		}, function (err, isAdmin) {
-
-			console.log('getAll user, is admin, err, isAdmin', err, isAdmin);
-
 			// not admin, get all users manually
 			if (err || !isAdmin) return api.user._getAllFiltered(options, done);
 			
 			// is admin, get all
 			api.user._getAll(options, done);
 		});
-
 	},
+
 
 	_getAll : function (options, done) {
 		User
@@ -307,13 +310,13 @@ module.exports = api.user = {
 
 
 	_getAllFiltered : function (options, done) {
+		if (!options) return done('No options.');
 
 		// get all role members in all projects that account has edit_user access to
 		var user = options.user,
 		    ops = [];
 
 		ops.push(function (callback) {
-			console.log('api.user -> project.getAll');
 			// get account's projects
 			api.project.getAll({
 				user: user,
@@ -321,11 +324,7 @@ module.exports = api.user = {
 			}, callback);
 		});
 
-
 		ops.push(function (projects, callback) {
-
-			console.log('fpund projects', projects.length);
-			
 			// get all roles of all projects
 			var allRoles = [];
 			_.each(projects, function (project) {
@@ -336,25 +335,18 @@ module.exports = api.user = {
 			callback(null, allRoles)
 		});
 
-
 		ops.push(function (roles, callback) {
-			// get users in roles
-
 			var allUsers = [];
-
 			_.each(roles, function (role) {
 				_.each(role.members, function (member) {
 					allUsers.push(member);
 				});
 			});
-
 			callback(null, allUsers);
 		});
-
 		
 		// get user models
 		ops.push(function (users, callback) {
-
 			User
 			.find()
 			.or([
@@ -365,92 +357,8 @@ module.exports = api.user = {
 			.exec(callback);
 		});
 
-
 		async.waterfall(ops, function (err, users) {
-			console.log('ops done!')
-			console.log('found users: ', users.length);
 			done(err, users);
 		});
-
 	},
-
-
-
-	// // get app users for Account 	// todo: refactor anyway
-	// getAll : function (callback, user) {
-
-	// 	var a = {};
-	// 	var createdByChildren = [];
-	// 	var createdByGrandchildren = [];
-
-	// 	// is superadmin, get all users
-	// 	if (api.access.superadmin(user)) {
-	// 		a.superadminUsers = function (cb) {
-	// 			User
-	// 			.find()
-	// 			.exec(function(err, result) { 
-	// 				cb(err, result); 
-	// 			});
-	// 		}
-	// 	}
-		
-	// 	// get all users created by user
-	// 	a.createdBy = function (cb) {
-	// 		User
-	// 		.find({createdBy : user.uuid})
-	// 		.exec(function(err, result) { 
-	// 			result.forEach(function(rr) {
-	// 				createdByChildren.push(rr.uuid);
-	// 			})
-
-	// 			cb(err, result); 
-	// 		});
-	// 	}
-
-	// 	// get all users created by children, ie. created by a user that User created
-	// 	a.createdByChildren = function (cb) {
-	// 		User
-	// 		.find({createdBy : { $in : createdByChildren }})
-	// 		.exec(function(err, result) { 
-	// 			result.forEach(function(rr) {
-	// 				createdByGrandchildren.push(rr.uuid);
-	// 			})
-	// 			cb(err, result); 
-	// 		});
-	// 	}
-
-	// 	// get all users created by grandchildren
-	// 	a.createdByChildren = function (cb) {
-	// 		User
-	// 		.find({createdBy : { $in : createdByGrandchildren }})
-	// 		.exec(function(err, result) { 
-	// 			cb(err, result); 
-	// 		});
-	// 	}
-
-	// 	async.series(a, function (err, allUsers) {
-
-	// 		// return error
-	// 		if (err) return callback(err);
-
-	// 		// flatten into one array
-	// 		var array = [];
-	// 		for (r in allUsers) {
-	// 			array.push(allUsers[r]);
-	// 		}
-
-	// 		// flatten
-	// 		var flat = _.flatten(array);
-
-	// 		// remove duplicates
-	// 		var unique = _.unique(flat, 'uuid');
-
-	// 		// return callback
-	// 		callback(err, unique);
-
-	// 	});
-
-	// },
-
-
 }

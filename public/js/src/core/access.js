@@ -1,7 +1,6 @@
 Wu.Access = Wu.Class.extend({
 
 	initialize : function (options) {
-		console.log('Wu.Access', options);
 
 		// shortcut
 		app.access = this;
@@ -12,7 +11,7 @@ Wu.Access = Wu.Class.extend({
 		// set templates
 		this.roles.templates = options.templates;
 
-		// init super roles
+		// init admin roles
 		this._superRole = new Wu.Role.Super({ 
 			role : app.options.json.access.superRole
 		});
@@ -26,11 +25,9 @@ Wu.Access = Wu.Class.extend({
 	addRoleMember : function (opts, callback) {
 		var user = opts.user,
 		    project = opts.project,
-		    role = opts.role;
-
-		// get user's current role in project
-		var currentRole = app.access.get.role(opts);
-		var currentRoleUuid = currentRole ? currentRole.getUuid() : false;
+		    role = opts.role,
+		    currentRole = app.access.get.role(opts), // get user's current role in project
+		    currentRoleUuid = currentRole ? currentRole.getUuid() : false;
 
 		var options = {
 			userUuid : user.getUuid(),
@@ -41,25 +38,19 @@ Wu.Access = Wu.Class.extend({
 
 		// send
 		Wu.send('/api/access/setrolemember', options, function (err, json) {
-			console.log('/api/access/setrolemember', err);
-
-			// return on err
 			if (err) return callback(err);
 
-			var result = JSON.parse(json);
+			var result = Wu.parse(json);
+			if (!result) return callback('Malformed response: ' + json);
 
 			// return on no access
-			if (result.error) {
-				console.error(result);
-				return callback(result.error);
-			}
+			if (result.error) return callback(result.error);
+
 			// set locally
-			var store = result
-			project.setRolesStore(store.roles);
+			project.setRolesStore(result.roles);
 
 			// return
-			callback(err, store);
-
+			callback(err, result);
 		});
 
 	},
@@ -378,6 +369,7 @@ Wu.Access = Wu.Class.extend({
 		edit_user 		: function (project, user) { 
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_user')) return true;
+			if (!project) return false;
 			if (app.access.has.project_capability(user, project, 'edit_user')) return true;
 			return false;
 		},

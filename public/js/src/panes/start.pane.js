@@ -238,7 +238,7 @@ Wu.StartPane = Wu.Class.extend({
 		project.select();
 
 		// refresh sidepane
-		app.SidePane.refreshProject(project);
+		app.SidePane.refreshMenu();
 
 		// Hide the Start Pane
 		this.deactivate();

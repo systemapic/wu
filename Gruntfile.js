@@ -27,7 +27,7 @@ module.exports = function(grunt) {
 			},
 
 			jsLogin : {
-				files: [ 'public/js/src/controls/control.spinningmap.js', 'public/js/src/core/login.js' ],
+				files: [ 'public/js/src/controls/spinningmap.control.js', 'public/js/src/core/login.js' ],
 				tasks:[  'concat:jsLogin', 'uglify:jsLogin' ]
 			},
 
@@ -148,7 +148,7 @@ module.exports = function(grunt) {
 					
 					// leaflet + mapbox
 					'public/js/lib/leaflet.js/leaflet-0.7.3-src.js',
-					'public/js/lib/mapbox.js/mapbox.standalone.uncompressed.js', // DO NOT REPLACE! has custom edits:4648!
+					'public/js/lib/mapbox.js/mapbox.standalone.uncompressed.js',
 					'public/js/lib/leaflet.js/plugins/leaflet.geojson.draw.js',
 					'public/js/lib/leaflet.js/plugins/leaflet.draw-src.js',
 					'public/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.js',
@@ -198,49 +198,57 @@ module.exports = function(grunt) {
 
 					// Sidepane 
 					'public/js/src/panes/sidepane/sidepane.js',
-					'public/js/src/panes/sidepane/sidepane.item.js',
-					'public/js/src/panes/sidepane/sidepane.clients.js',
-					'public/js/src/panes/sidepane/sidepane.project.js',
-					'public/js/src/panes/sidepane/sidepane.client.js',
-					'public/js/src/panes/sidepane/sidepane.users.js',
-					'public/js/src/panes/sidepane/sidepane.map.js',
-					'public/js/src/panes/sidepane/sidepane.mapSettings.js',
-					'public/js/src/panes/sidepane/sidepane.documents.js',
-					'public/js/src/panes/sidepane/sidepane.dataLibrary.js',
-					'public/js/src/panes/sidepane/sidepane.mediaLibrary.js',
-					'public/js/src/panes/sidepane/sidepane.share.js',
-					'public/js/src/panes/sidepane/sidepane.account.js',
-					'public/js/src/panes/sidepane/sidepane.manage.js',
+					'public/js/src/panes/sidepane/item.sidepane.js',
+					'public/js/src/panes/sidepane/clients.sidepane.js',
+					'public/js/src/panes/sidepane/project.sidepane.js',
+					'public/js/src/panes/sidepane/client.sidepane.js',
+					'public/js/src/panes/sidepane/users.sidepane.js',
+					// 'public/js/src/panes/sidepane/map.sidepane.js',
+					'public/js/src/panes/sidepane/documents.sidepane.js',
+					'public/js/src/panes/sidepane/datalibrary.sidepane.js',
+					'public/js/src/panes/sidepane/medialibrary.sidepane.js',
+					'public/js/src/panes/sidepane/share.sidepane.js',
+					'public/js/src/panes/sidepane/account.sidepane.js',
+					'public/js/src/panes/sidepane/manage.sidepane.js',
+
+					'public/js/src/panes/sidepane/options.sidepane.js',
+					'public/js/src/panes/sidepane/options.sidepane/item.option.js',
+					'public/js/src/panes/sidepane/options.sidepane/baselayers.option.js',
+					'public/js/src/panes/sidepane/options.sidepane/bounds.option.js',
+					'public/js/src/panes/sidepane/options.sidepane/connect.option.js',
+					'public/js/src/panes/sidepane/options.sidepane/controls.option.js',
+					'public/js/src/panes/sidepane/options.sidepane/layermenu.option.js',
+					'public/js/src/panes/sidepane/options.sidepane/position.option.js',
+					'public/js/src/panes/sidepane/options.sidepane/settings.option.js',
 
 					// Other Panes 
-					'public/js/src/panes/pane.header.js',
-					'public/js/src/panes/pane.progress.js',
-					'public/js/src/panes/pane.map.js',
-					'public/js/src/panes/pane.status.js',
-					'public/js/src/panes/pane.start.js',
-					'public/js/src/panes/pane.error.js',
-					'public/js/src/panes/pane.dropzone.js',
+					'public/js/src/panes/header.pane.js',
+					'public/js/src/panes/progress.pane.js',
+					'public/js/src/panes/map.pane.js',
+					'public/js/src/panes/status.pane.js',
+					'public/js/src/panes/start.pane.js',
+					'public/js/src/panes/error.pane.js',
+					'public/js/src/panes/dropzone.pane.js',
 
 					// Controls 
-					'public/js/src/controls/control.zindex.js',
-					'public/js/src/controls/control.layermenu.js',
-					'public/js/src/controls/control.inspect.js',
-					'public/js/src/controls/control.description.js',
-					'public/js/src/controls/control.legends.js',
-					'public/js/src/controls/control.mouseposition.js',
-					'public/js/src/controls/control.baselayertoggle.js',
-					'public/js/src/controls/control.style.js',
-					'public/js/src/controls/control.cartocss.js',
-					'public/js/src/controls/control.tooltip.js',
-					'public/js/src/controls/control.spinningmap.js',
-
+					'public/js/src/controls/zindex.control.js',
+					'public/js/src/controls/layermenu.control.js',
+					'public/js/src/controls/inspect.control.js',
+					'public/js/src/controls/description.control.js',
+					'public/js/src/controls/legends.control.js',
+					'public/js/src/controls/mouseposition.control.js',
+					'public/js/src/controls/baselayertoggle.control.js',
+					'public/js/src/controls/style.control.js',
+					'public/js/src/controls/cartocss.control.js',
+					'public/js/src/controls/tooltip.control.js',
+					'public/js/src/controls/spinningmap.control.js',
 					// Models 
-					'public/js/src/models/model.projects.js',
-					'public/js/src/models/model.clients.js',
-					'public/js/src/models/model.users.js',
-					'public/js/src/models/model.layers.js',
-					'public/js/src/models/model.files.js',
-					'public/js/src/models/model.roles.js',
+					'public/js/src/models/projects.model.js',
+					'public/js/src/models/clients.model.js',
+					'public/js/src/models/users.model.js',
+					'public/js/src/models/layers.model.js',
+					'public/js/src/models/files.model.js',
+					'public/js/src/models/roles.model.js',
 
 					// Access
 					'public/js/src/core/access.js',
@@ -322,7 +330,7 @@ module.exports = function(grunt) {
 				
 				src : [
 					'public/js/lib/mapbox.js/mapbox.2.1.4.js',
-					'public/js/src/controls/control.spinningmap.js',
+					'public/js/src/controls/spinningmap.control.js',
 					'public/js/src/config/login.config.js',
 					'public/js/src/core/login.js',
 				],
