@@ -430,12 +430,12 @@ module.exports = function(app, passport) {
 	});
 
 
-	// =====================================
-	// DEBUG: CREATE ROLE ==================
-	// ===================================== 
-	app.post('/api/debug/createRole', isLoggedIn, function (req, res) {
-		api.debug.createRole(req, res);
-	});
+	// // =====================================
+	// // DEBUG: CREATE ROLE ==================
+	// // ===================================== 
+	// app.post('/api/debug/createRole', isLoggedIn, function (req, res) {
+	// 	api.debug.createRole(req, res);
+	// });
 
 
 	// =====================================
