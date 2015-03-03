@@ -146,6 +146,8 @@ module.exports = api.client = {
 		    queries = {},
 		    ops = [];
 
+		    console.log('update client: '.yellow, req.body);
+
 		// return if missing info
 		if (!clientUuid) return api.error.missingInformation(req, res);
 
@@ -193,6 +195,7 @@ module.exports = api.client = {
 			'logo', 
 			'description', 
 			'projects', 
+			'slug',
 		];
 
 		// enqueue updates for valid fields

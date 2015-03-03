@@ -47,6 +47,12 @@ Wu.Client = Wu.Class.extend({
 		Wu.Util.setAddressBar(url);
 	},
 
+	_refreshUrl : function () {
+		var project = app.activeProject ? app.activeProject.getSlug() : '';
+		var url = '/' + this.slug + '/' + project;
+		Wu.Util.setAddressBar(url);
+	},
+
 	update : function (field) {
 		var json    = {};
 		json[field] = this[field];
@@ -56,7 +62,25 @@ Wu.Client = Wu.Class.extend({
 	},
 
 	_save : function (string) {
-		Wu.save('/api/client/update', string);  // TODO: pgp & callback
+		Wu.send('/api/client/update', string, this._saved.bind(this));  // TODO: pgp & callback
+	},
+
+	_saved : function (err, json) {
+		console.log('client saved', err, json);
+
+		var result = Wu.parse(json);
+		console.log('result: ', result);
+		if (result.error) return app.error.set('Client not updated', result.error);
+
+		if (result.name) {
+			// name has been updated, add slug also
+			var slug = result.name[0].name.replace(/\s+/g, '').toLowerCase();
+			this.setSlug(slug);
+		}
+
+		if (result.slug) {
+			this._refreshUrl();
+		}
 	},
 
 	saveNew : function () {
@@ -144,6 +168,11 @@ Wu.Client = Wu.Class.extend({
 	setLogo : function (logo) {
 		this.logo = logo;
 		this.update('logo');
+	},
+
+	setSlug : function (slug) {
+		this.slug = slug;
+		this.update('slug');
 	},
 
 
