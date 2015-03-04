@@ -359,17 +359,13 @@ Wu.Project = Wu.Class.extend({
 
 	_deleted : function (project, json) {
 		
-		// remove access from Account locally
-		app.Account.removeProjectAccess(project);
-
 		// set address bar
 		var client = project.getClient().getSlug();
 		var url = app.options.servers.portal + client + '/';
 		Wu.Util.setAddressBar(url)
 
 		// delete object
-		// delete Wu.app.Projects[project.uuid];
-		delete Wu.app.Projects[project.store.uuid];
+		delete Wu.app.Projects[project.getUuid()];
 
 		// set no active project if was active
 		if (app.activeProject == this) {
