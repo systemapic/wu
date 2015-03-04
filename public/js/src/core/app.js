@@ -213,7 +213,7 @@ Wu.App = Wu.Class.extend({
 		this.Account = new Wu.User(this.options.json.account);
 		
 		// set access token
-		this.setToken();
+		// this.setToken();
 
 		// create user objects
 		this.Users = {};
@@ -235,12 +235,12 @@ Wu.App = Wu.Class.extend({
 
 	},
 
-	setToken : function () {
-		this.accessToken = '?token=';
-		this.accessToken += Wu.app.Account.store.token;
-		this.accessToken += '.';
-		this.accessToken += Wu.app.Account.store._id;
-	},
+	// setToken : function () {
+	// 	this.accessToken = '?token=';
+	// 	this.accessToken += Wu.app.Account.store.token;
+	// 	this.accessToken += '.';
+	// 	this.accessToken += Wu.app.Account.store._id;
+	// },
 
 
 
