@@ -445,7 +445,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
 		    tileServer 	= app.options.servers.tiles.uri,
 		    subdomains  = app.options.servers.tiles.subdomains,
-		    token 	= app.accessToken,
+		    // token 	= app.accessToken,
+		    token 	= '?token=' + app.Account.getToken(),
 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		// add vector tile raster layer
@@ -464,7 +465,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		    cartoid 	= this.store.data.cartoid || 'cartoid',
 		    gridServer 	= app.options.servers.utfgrid.uri,
 		    subdomains  = app.options.servers.utfgrid.subdomains,
-		    token 	= app.accessToken,
+		    // token 	= app.accessToken,
+		    token 	= '?token=' + app.Account.getToken(),
 		    url 	= gridServer + '{fileUuid}/{z}/{x}/{y}.grid.json' + token;
 		
 		// create gridlayer
