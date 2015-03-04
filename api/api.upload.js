@@ -333,9 +333,9 @@ module.exports = api.upload = {
 
 	sortFormFiles : function (fileArray, done) {
 
-		if (!fileArray) return done('No files6.');
+		// if (!fileArray) return done('No files6.');
 
-		// console.log('UPLOAD: Sorting form files');
+		console.log('UPLOAD: Sorting form files');
 
 		// quick sort
 		var ops = [];
@@ -357,6 +357,9 @@ module.exports = api.upload = {
 				extension : extension,
 				currentFolder : null
 			}
+
+			console.log('##############'.cyan);
+			console.log('options: ', options);
 
 			// add async ops
 			ops = api.upload._sortOps(ops, options);
@@ -413,6 +416,8 @@ module.exports = api.upload = {
 				}
 
 
+				console.log('############'.yellow, options);
+
 				// handle zip (within zip)
 				if (options.type == 'application/zip' || options.type == 'application/x-zip-compressed') {
 
@@ -443,6 +448,40 @@ module.exports = api.upload = {
 							});
 						});
 					});
+				}
+
+
+				if (options.type == 'application/octet-stream' && options.extension == 'zip') {
+
+					ops1.push(function (callback) {
+
+						var rand = crypto.randomBytes(4).toString('hex');
+						var newFileUuid = 'file-' + uuid.v4();
+
+						var zipopt = {
+							inn : options.path,
+							fileUuid : newFileUuid,
+							out : '/' + rand
+						}
+
+						// unzips files to folder
+						api.file.handleZip(zipopt, function (err) {
+							if (err) return callback(err);
+
+							var opt = {
+								fileUuid : newFileUuid,
+								folder : rand
+							}
+
+							api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
+								if (err) return callback(err);
+
+								callback(err, dbs);
+							});
+						});
+					});
+
+
 				}
 				
 				
@@ -621,6 +660,36 @@ module.exports = api.upload = {
 					});
 				});
 			});
+		}
+
+
+		if (options.type == 'application/octet-stream' && options.extension == 'zip') {
+
+			ops.push(function (callback) {
+
+				var opt = {
+					inn : options.path,
+					fileUuid : options.fileUuid,
+					out : ''
+				}
+
+				// unzips files to folder
+				api.file.handleZip(opt, function (err) {
+					if (err) return callback(err);
+
+					var opt = {
+						fileUuid : options.fileUuid,
+						folder : null
+					}
+
+					api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
+						if (err) return callback(err);
+						
+						callback(err, dbs);
+					});
+				});
+			});
+
 		}
 
 
