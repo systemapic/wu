@@ -49,6 +49,7 @@ module.exports = api.geo = {
 
 		var dest = api.config.path.geojson + fileUuid + '.geojson';
 		fs.copy(path, dest, function(err) {
+			if (err) console.log('copy err!'.red + err);
 			callback(err);
 		});
 	},
@@ -57,22 +58,22 @@ module.exports = api.geo = {
 		if (!path || !fileUuid) return callback('Missing information.15');
 
 		api.geo.copyToVileFolder(path, fileUuid, function (err) {
-			if (err) return callback(err);
+			if (err) return callback('copyvile hg err: ' + err);
 
 			try {
 				mapnikOmnivore.digest(path, function (err, metadata) {
-	        			if (err || !metadata) return callback(err || 'No metadata.');
+	        			if (err || !metadata) return callback('No metadata. gj' + err);
 
 		        		var db = {
 			        		metadata : JSON.stringify(metadata)
 			        	}
 
 			        	// return
-			        	callback(err, db);
+			        	callback(null, db);
 		        	});
 			
 			} catch (e) {
-				callback(e);
+				callback('omni crash gj: ' + e);
 			}
 
 		});
@@ -97,13 +98,15 @@ module.exports = api.geo = {
 		if (!folder || !name || !fileUuid) return callback('Missing info.');
 
 		fs.readdir(folder, function (err, files) {
-			if (err || !files) return callback({error : 'No shapefiles! Perhaps you put different shapefiles in the same folder?'});
+			if (err || !files) return callback('Some files were rejected. Please upload <br>only one shapefile per zip.');
 
 			// clone array
 			var shapefiles = files.slice();
 
 			// async ops
 			var ops = [];
+
+			console.log('_______#_#_#_#_#__'.cyan, 'READISHIT!!');
 
 			// check if valid shapefile(s)
 			ops.push(function (done) {
@@ -117,6 +120,7 @@ module.exports = api.geo = {
 
 			// run async jobs
 			async.series(ops, function (err, results) {
+				if (err) console.log('MOFO!!'.red, err);
 				if (err) return callback(err);
 
 				var key = results[1];
@@ -140,22 +144,24 @@ module.exports = api.geo = {
 				}
 
 				api.geo.copyToVileFolder(path, fileUuid, function (err) {
-					if (err) return callback(err);
+					if (err) console.log('ADSDALSKMDSALDSAMDSAL'.red);
+
+					if (err) return callback('copytToVile err: ' + err);
 
 					try {
 						// read meta from file
 				        	mapnikOmnivore.digest(path, function (err, metadata) {
-				        		if (err || !metadata) return callback(err || 'No metadata.');
+				        		if (err || !metadata) return callback('No metadata: ' + err);
 
 				        		console.log('got meta?', err, metadata);
 				        		db.metadata = JSON.stringify(metadata);
 					        	
 					        	// return
-					        	callback(err, db);
+					        	callback(null, db);
 				        	});
 
 				        } catch (e) {
-				        	callback(e);
+				        	callback('meta fail: ' + e);
 				        }
 		        	});
 			});
@@ -175,8 +181,10 @@ module.exports = api.geo = {
 		})
 
 		// if not all accounted for, return error
-		if (mandatory.length > 0) return callback({error : 'Missing shapefile(s)', files : mandatory});
-		
+		if (mandatory.length > 0) {
+			var message = 'Missing shapefile(s): ' + mandatory.join(' ');
+			return callback({message : message});
+		}
 		// return
 		callback(null);
 
@@ -202,12 +210,15 @@ module.exports = api.geo = {
 
 		possible.forEach(function (ex) {
 
+			console.log('foreach possigle'.magenta, ex);
+
 			var p = options.folder + '/' + options.base + ex;
 			var f = options.outfolder + '/' + options.base + ex;
 			
 			ops.push(function (callback) {
 
 				if (fs.existsSync(p)) {
+					console.log('existsssss'.red);
 					fs.move(p, f, callback);
 				} else {
 					callback();
@@ -218,6 +229,7 @@ module.exports = api.geo = {
 		});
 
 		async.parallel(ops, function (err) {
+			if (err) console.log('moveShapefiles err: '.red + err)
 			done(err);
 		});
 
@@ -226,7 +238,8 @@ module.exports = api.geo = {
 
 	convertshp : function (shapes, folder, callback) {
 		
-		 
+		console.log('########### CONVERT SHAPE'.cyan);
+
 		// get the .shp file
 		var shps = api.geo.getTheShape(shapes);
 		
@@ -252,7 +265,12 @@ module.exports = api.geo = {
 		}
 						// callback
 		api.geo.moveShapefiles(options, function (err) {
+			console.log('made it here!!'.cyan)
+			if (err) console.log('geomove err: '.red + err);
+
 			if (err) return callback(err);
+
+			console.log('made it here 22!!'.cyan)
 
 			// make sure folder exists
 			fs.ensureDirSync(outfolder);					// todo: async!
@@ -279,14 +297,17 @@ module.exports = api.geo = {
 			// exec ogr2ogr
 			myfile.exec(function (err, data) {
 				// do fallback on error
+				if (err) console.log('ogr2ogr11 err: '.red + err);
 				if (err) return api.geo._ogr2ogrFallback(folder, outfolder, toFile, outFile, inFile, fileUuid, callback);
 
 				// write file 
 				fs.outputFile(outFile, JSON.stringify(data), function (err) {
+					if (err) console.log('geo write err: '.red + err);
 					if (err) return callback(err);
 
 					// move folder with shapefile to new fileUuid folder
 					fs.move(folder, outfolder + '/Shapefiles', function (err) {
+						if (err) console.log('geomove2 err: '.red + err);
 						if (err) return callback(err);
 						
 						// callback
@@ -309,10 +330,12 @@ module.exports = api.geo = {
 		var exec = require('child_process').exec;
 
 		exec(cmd, function (err, stdout, stdin) {
+			if (err) console.log('ogre fb err: '.red + err);
 			if (err) return callback(err);
 
 			// move folder with shapefile to new fileUuid folder
 			fs.move(folder, outfolder + '/Shapefiles', function (err) {
+				if (err) console.log('ogre mvoe err: '.red + err);
 				if (err) return callback(err);
 
 				// callback

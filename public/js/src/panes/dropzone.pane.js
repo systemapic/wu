@@ -48,7 +48,6 @@ Wu.Dropzone = Wu.Class.extend({
 
 		// fade out after n seconds
 		this._fadeTimer = setTimeout(this.fadeMeta.bind(this), this.options.metaDelay);
-
 	},
 
 	fadeMeta : function () {
@@ -113,12 +112,28 @@ Wu.Dropzone = Wu.Class.extend({
 				url : '/api/upload',
 				createImageThumbnails : false,
 				autoDiscover : false,
-				uploadMultiple : true,
-				acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.docx,.pdf,.doc,.txt',
+				uploadMultiple : false,
+				// acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.docx,.pdf,.doc,.txt',
 				// acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.json,.topojson,.kml,.docx,.pdf,.doc,.txt',
-				maxFiles : 10,
-				parallelUploads : 10,
+				// maxFiles : 10,
+				// parallelUploads : 10,
+				parallelUploads : 1,
 				clickable : this._clickable || false,
+				accept : function (file, done) {
+
+					var ext = file.name.split('.').reverse()[0];
+					var acceptedFiles = ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt'];
+					var accepted = _.contains(acceptedFiles, ext);
+					var errorTitle = 'Upload not allowed';
+					var errorMessage ='The file <strong>' + file.name + '</strong> is not an accepted filetype.';
+
+					if (!accepted) app.feedback.setError({ 
+						title : errorTitle, 
+						description : errorMessage
+					});
+
+					done(!accepted);
+				} 
 		});
 
 		// add fullscreen dropzone
@@ -164,6 +179,7 @@ Wu.Dropzone = Wu.Class.extend({
 		this.dz.removeAllListeners();
 
 		// set project uuid for dropzone
+		this.dz.options.params.projectUuid = this.project.getUuid();	// goes to req.body.project
 		this.dz.options.params.project = this.project.getUuid();	// goes to req.body.project
 
 		// set dz events
@@ -205,7 +221,8 @@ Wu.Dropzone = Wu.Class.extend({
 			that.progress.setProgress(progress);
 		});                                                                                                                                                                                                               
 
-		this.dz.on('successmultiple', function (dz, json, xml) {
+		// this.dz.on('successmultiple', function (dz, json, xml) {
+		this.dz.on('success', function (dz, json, xml) {
 			console.log('dz, json, xml', dz, json, xml);
 
 			// clear fullpane

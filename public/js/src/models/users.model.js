@@ -143,6 +143,10 @@ Wu.User = Wu.Class.extend({
 		return this.store.local.email;
 	},
 
+	getToken : function () {
+		return this.store.token;
+	},
+
 	getProjects : function () {
 		// get projects which user has a role in
 		var allProjects = app.Projects,

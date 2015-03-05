@@ -110,7 +110,7 @@ Wu.Layer = Wu.Class.extend({
 
 		// hide if empty and not editor
 		// var isEditor = app.Account.isSuperadmin() || app.Account.canUpdateProject(app.activeProject.getUuid());
-		var isEditor = app.access.to.edit_project(app.activeProject.getUuid());
+		var isEditor = app.access.to.edit_project(app.activeProject);
 		if (this.store.description || isEditor) { // todo: what if only editor 
 			descriptionControl.show();
 		} else { 								// refactor to descriptionControl
@@ -445,7 +445,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
 		    tileServer 	= app.options.servers.tiles.uri,
 		    subdomains  = app.options.servers.tiles.subdomains,
-		    token 	= app.accessToken,
+		    // token 	= app.accessToken,
+		    token 	= '?token=' + app.Account.getToken(),
 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		// add vector tile raster layer
@@ -464,7 +465,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		    cartoid 	= this.store.data.cartoid || 'cartoid',
 		    gridServer 	= app.options.servers.utfgrid.uri,
 		    subdomains  = app.options.servers.utfgrid.subdomains,
-		    token 	= app.accessToken,
+		    // token 	= app.accessToken,
+		    token 	= '?token=' + app.Account.getToken(),
 		    url 	= gridServer + '{fileUuid}/{z}/{x}/{y}.grid.json' + token;
 		
 		// create gridlayer
@@ -528,7 +530,8 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
 		    tileServer 	= app.options.servers.osm.uri,
 		    subdomains  = app.options.servers.osm.subdomains,
-		    token 	= app.accessToken,
+		    // token 	= app.accessToken,
+		    token 	= '?token=' + app.Account.getToken(),
 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		// add vector tile raster layer
@@ -547,7 +550,8 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		    cartoid 	= this.store.data.cartoid || 'cartoid',
 		    gridServer 	= app.options.servers.osm.uri,
 		    subdomains  = app.options.servers.osm.subdomains,
-		    token 	= app.accessToken,
+		    // token 	= app.accessToken,
+		    token 	= '?token=' + app.Account.getToken(),
 		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
 		
 		// create gridlayer
