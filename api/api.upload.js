@@ -40,109 +40,13 @@ var api = module.parent.exports;
 // exports
 module.exports = api.upload = { 
 
-	projectLogo : function (req, res) {
 
-		// process from-encoded upload
-		var form = new formidable.IncomingForm({
-			hash : 'sha1',
-			multiples : true,
-			keepExtensions : true,
-		});
-
-		form.parse(req, function(err, fields, files) {	
-			if (err || !files || !files.file) return api.error.general(req, res, err || 'No files1.');
-
-			var from = files.file.path,
-			    file = 'image-' + uuid.v4(),
-			    to = api.config.path.image + file;
-			
-			// rename and move to image folder
-			fs.rename(from, to, function (err) {
-				if (err) return api.error.general(req, res, err);
-				res.end(file);	// file will be saved by client
-			});		
-	 	});
-	},
-
-
-	clientLogo : function (req, res) {
-		
-		// process from-encoded upload
-		var form = new formidable.IncomingForm({
-			hash : 'sha1',
-			multiples : true,
-			keepExtensions : true,
-		});
-		form.parse(req, function(err, fields, files) {	
-			if (err || !files || !files.file) return api.error.general(req, res, err || 'No files2.');
-			
-			var from = files.file.path,
-			    file = 'image-' + uuid.v4(),
-			    to = api.config.path.image + file;
-			
-			// rename and move to image folder
-			fs.rename(from, to, function (err) {
-				if (err) return api.error.general(req, res, err);
-				res.end(file);	// file will be saved by client
-			});		
-	 	});
-	},
-
-
-	image : function (req, res) {
-
-		// process from-encoded upload
-		var form = new formidable.IncomingForm({
-			hash : 'sha1',
-			multiples : true,
-			keepExtensions : true,
-		});
-
-		form.parse(req, function(err, fields, files) {	
-			if (err || !files || !files.file) return api.error.general(req, res, err || 'No files3.');
-
-			var from = files.file.path,
-			    file = 'image-' + uuid.v4(),
-			    to   = api.config.path.image + file;
-			
-			// rename and move to image folder
-			fs.rename(from, to, function (err) {
-				if (err) return api.error.general(req, res, err);
-				res.end(file);	// file will be saved by client
-			});		
-	 	});
-
-	},
 
 	// entry point
 	file : function (req, res) {
-
 		// todo: check for upload access!;
-
-		console.log('API.upload.upload()');
-
-		// console.log('upload.js.upload()'); // _______________ this _____________');
-		// console.log('this: ', this);
-
-		// types of possible uploaded files:
-		//
-		// - zipped shapefiles
-		// - zipped geojson
-		// - zipped image, docs, anything
-		// - zipped zip-files with anything inside
-		//
-		// - geojson
-		// - shapefiles (shp, dbf, prj, etc)
-		// - 
-
-		//
-		// check files, unzip to own folder -> pick out files, if found a .shp file, check for other shapfile.*
-		// image, geojson, docs, pdf -> straight done
-		//
-
-		// 
-		//
-		//
+		console.log('API.upload.upload()'.cyan);
+		console.log('___________________'.cyan);
 
 		// process from-encoded upload
 		var form = new formidable.IncomingForm({
@@ -152,65 +56,26 @@ module.exports = api.upload = {
 		});
 
 		form.parse(req, function(err, fields, files) {	
-			console.log(err, files, fields);
-			if (err || !files || !fields) return api.error.general(req, res, err || 'No files4.');
+			if (err) console.log('ERR 1'.red, err);
+			if (err || !files || !fields || !files.file) return api.error.general(req, res, err || 'No files4.');
 
 
-			console.log('formidale: ', util.inspect({fields: fields, files: files}));
-			console.log('files! => ', files);
+			console.log('files! => '.yellow, files);
  			
-			// one file =>
-			// 'file[]': { 
-			// 	domain: null,
-			// 	_events: {},
-			// 	_maxListeners: 10,
-			// 	size: 1936180,
-			// 	path: '/tmp/3834f14d2b74a95a4896cae5be47873a.zip',
-			// 	name: 'Africa_SHP.zip',
-			// 	type: 'application/zip',
-			// 	hash: null,
-			// 	lastModifiedDate: Thu Oct 30 2014 00:49:16 GMT+0100 (CET),
-			// 	_writeStream: 
-			// 	{ _writableState: [Object],
-			// 		writable: true,
-			// 		domain: null,
-			// 		_events: {},
-			// 		_maxListeners: 10,
-			// 		path: '/tmp/3834f14d2b74a95a4896cae5be47873a',
-			// 		fd: null,
-			// 		flags: 'w',
-			// 		mode: 438,
-			// 		start: undefined,
-			// 		pos: undefined,
-			// 		bytesWritten: 1936180,
-			// 		closed: true 
-			// 	} 
-			// } 
-			
-			// ##################
-			// here only single files enter: .zip, png, etc.. (no .shps etc)
-			//
-			//
-			//
-
-
-
-			var fileArray = files['file[]'];
 			
 
-			if (!fileArray) return api.error.general(req, res, 'No files5.');
-
-			// if just one file, wrap in array
-			if (!fileArray.length) fileArray = [fileArray];
-			
+			var fileArray = [files.file];
 
 			var ops = [];
 
+			// sort files
 			ops.push(function (callback) {
 
 				// quick sort
-				api.upload.sortFormFiles(fileArray, function (err, results) {	
-					if (err || !results) return callback(err || 'Nothing to sort.');
+				api.upload.sortFormFiles(fileArray, function (err, results) {
+					if (err) console.log('ERR 18'.red, err);
+
+					if (err || !results) return callback(err || 'There were no valid files in the upload.');
 
 					console.log('_________ results ______________');
 					console.log('results: ', results);
@@ -220,60 +85,29 @@ module.exports = api.upload = {
 				});
 			});
 
+			// register files in mongo and to project
+			ops.push(function (entriesArray, callback) {
+				if (!entriesArray) return callback('Nothing to do.');
 
-			ops.push(function (dbs, callback) {
-				if (!dbs) return callback('Nothing to do.');
+				var options = {
+					entriesArray : entriesArray,
+					userUuid : req.user.uuid,
+					userFullName :  req.user.firstName + ' ' + req.user.lastName,
+					projectUuid : fields.project
+				}
 
-				var dbss = _.flatten(dbs);
-				var ops = [];
-
-				dbss.forEach(function (db) {
-
-					db.uuid = db.file; 
-					db.createdBy = req.user.uuid;
-					db.createdByName = req.user.firstName + ' ' + req.user.lastName;
-					db.access = {
-						users : req.user.uuid,
-						projects : fields.project,
-						clients : fields.client
-					}
-
-					// create db for file
-					ops.push(function (cb) {
-						api.file.createModel(db, function (err, doc) {
-							cb(err, { file : doc });
-						});
-					});
-
-					// create db for layer
-					if (db.type == 'Layer') {
-						ops.push(function (cb) {
-							db.uuid = 'layer-' + uuid.v4();
-							api.layer.createModel(db, function (err, doc) {
-								cb(err, { layer : doc });
-							});
-						});
-					};
-
-				})
-
-				// async
-				async.series(ops, function (err, docs) {
-					if (err || !docs) return callback(err || 'No docs.');
-
-					// add _ids to project
-					docs && docs.forEach(function (doc) {
-						doc.layer && api.layer.addToProject(doc.layer._id, fields.project)
-						doc.file && api.file.addToProject(doc.file._id, fields.project)
-					});
-
-					callback(null, docs);
+				// register files in mongo and to project
+				api.upload._registerFiles(options, function (err, results) {
+					if (err) console.log('ERR 17'.red, err);
+					callback(err, results);
 				});
+				
 			});
 			
 
 			async.waterfall(ops, function (err, results) {
-				if (err || !results) return api.error.general(req, res, err || 'No results.');
+				if (err) console.log('ERR 2'.red, err);
+				if (err || !results || !results.length) return api.error.general(req, res, err || 'There were no valid files in the upload.');
 
 				// organize in sidepane.dataLibrary format
 				var files = [],
@@ -293,42 +127,67 @@ module.exports = api.upload = {
 				// all done
 				res.end(JSON.stringify(pack));
 			});
-
-
-		// new Layer()
-		// var options = {
-		// 	title : title,
-		// 	uuid : uuid,
-		// 	data : {
-		// 		geojson : geojson
-		// 	},
-		// 	fileUuid : fileUuid,
-		// 	metadata : metadata,
-		// 	legend : legend
-		// }
-
-		// new File()
-		// var options = {
-		// 	uuid : uuid,
-		// 	createdBy : 
-		// 	createdByName :
-		// 	files : []
-		// 	access : {
-		// 		users : 
-		// 	},
-		// 	name :
-		// 	description : 
-		// 	type : 
-		// 	format : 
-		// 	dataSize : 
-		// 	data : {
-
-		// 	}
-		// }
-
-			
 		});
 	},
+
+
+
+	_registerFiles : function (options, done) {
+		var entriesArray = options.entriesArray,
+		    userFullName = options.userFullName,
+		    userUuid = options.userUuid,
+		    entries = _.flatten(entriesArray),
+		    projectUuid = options.projectUuid,
+		    ops = [];
+
+
+		entries.forEach(function (entry) {
+
+			// set meta
+			entry.uuid = entry.file; 
+			entry.createdBy = userUuid;
+			entry.createdByName = userFullName;
+
+			// create entry for file
+			ops.push(function (callback) {
+				api.file.createModel(entry, function (err, doc) {
+					if (err) console.log('ERR 21'.red, err);
+					callback(err, { file : doc });
+				});
+			});
+
+			if (entry.type != 'Layer') return;
+
+			// create entry for layer
+			ops.push(function (callback) {
+				entry.uuid = 'layer-' + uuid.v4();
+				api.layer.createModel(entry, function (err, doc) {
+					if (err) console.log('ERR 20'.red, err);
+					callback(err, { layer : doc });
+				});
+			});
+		});
+
+
+		// async
+		async.series(ops, function (err, docs) {
+			if (err) console.log('_registerFiles err: '.red + err);
+			if (err) console.log('ERR 19'.red, err);
+			if (err || !docs || !_.isArray(docs)) return done(err || 'No docs.');
+
+			// add files/layers to project
+			_.each(docs, function (doc) {
+				if (doc.file) api.file.addToProject(doc.file._id, projectUuid);
+				if (doc.layer) api.layer.addToProject(doc.layer._id, projectUuid);
+			});
+
+			done(null, docs);
+		});
+
+	},
+
+
+
 
 
 	sortFormFiles : function (fileArray, done) {
@@ -367,6 +226,7 @@ module.exports = api.upload = {
 		});
 
 		async.series(ops, function (err, dbs) {
+			if (err) console.log('ERR 22'.red, err);
 			done && done(err, dbs);
 		});
 	},
@@ -385,21 +245,17 @@ module.exports = api.upload = {
 		var currentFolder = options.currentFolder || api.config.path.file + fileUuid;
 
 		if (folder) {
-			// console.log('isFolder!!!', folder);
 			currentFolder += '/' + folder;
-			// console.log('so currentFolder is: ', currentFolder);
-
-			
 		}
 
 		var ops1 = [];
 
 		// read files in folder
 		fs.readdir(currentFolder, function (err, files) {
+			if (err) console.log('ERR 23'.red, err);
 			if (err || !files) return callback(err || 'No files7.');
 
-
-			files.forEach(function (name) { 	// 'Africa.shp'
+			_.each(files, function (name) { 	// 'Africa.shp'
 
 				var path 	= currentFolder + '/' + name; // path 
 				var filetype 	= api.upload.getFileType(path);
@@ -415,102 +271,28 @@ module.exports = api.upload = {
 					currentFolder : currentFolder
 				}
 
-
-				console.log('############'.yellow, options);
-
-				// handle zip (within zip)
-				if (options.type == 'application/zip' || options.type == 'application/x-zip-compressed') {
-
-					ops1.push(function (callback) {
-
-						var rand = crypto.randomBytes(4).toString('hex');
-						var newFileUuid = 'file-' + uuid.v4();
-
-						var zipopt = {
-							inn : options.path,
-							fileUuid : newFileUuid,
-							out : '/' + rand
-						}
-
-						// unzips files to folder
-						api.file.handleZip(zipopt, function (err) {
-							if (err) return callback(err);
-
-							var opt = {
-								fileUuid : newFileUuid,
-								folder : rand
-							}
-
-							api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
-								if (err) return callback(err);
-
-								callback(err, dbs);
-							});
-						});
-					});
+				// fuck doing zip within zip!!
+				if (extension == 'zip') {
+					var message = 'The file ' + options.name + ' was rejected. Please upload only <br>one set of files within a zipped archive.';
+					done(message);
+					return false;
 				}
-
-
-				if (options.type == 'application/octet-stream' && options.extension == 'zip') {
-
-					ops1.push(function (callback) {
-
-						var rand = crypto.randomBytes(4).toString('hex');
-						var newFileUuid = 'file-' + uuid.v4();
-
-						var zipopt = {
-							inn : options.path,
-							fileUuid : newFileUuid,
-							out : '/' + rand
-						}
-
-						// unzips files to folder
-						api.file.handleZip(zipopt, function (err) {
-							if (err) return callback(err);
-
-							var opt = {
-								fileUuid : newFileUuid,
-								folder : rand
-							}
-
-							api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
-								if (err) return callback(err);
-
-								callback(err, dbs);
-							});
-						});
-					});
-
-
-				}
-				
 				
 				// handle folder
 				if (options.type == 'folder') {
-
-					ops1.push(function (callback) {
-						
-						var opt = {
-							fileUuid : options.fileUuid,
-							folder : options.name,
-							currentFolder : options.currentFolder
-						}
-
-						api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
-							if (err) return callback(err);
-							callback(null, dbs);
-						});
-					});
+					done("Upload rejected. Please don't include <br>folders inside zipped archives.");
+					return false;
 				}
-
-
+				
 				// handle shapefiles
-				if (options.type == 'shapefile') {					// gotchas: already in file-uuid folder, cause unzip
+				if (extension == 'shp') {
+				// if (options.type == 'shapefile') {					// gotchas: already in file-uuid folder, cause unzip
 
 					ops1.push(function (callback) {
 
 						// process shapefile (convert, store, vectorize, etc.)
 						api.file.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
+							if (err) console.log('ERR 29'.red, err);
 							if (err) return callback(err);
 
 							// populate db entry
@@ -525,14 +307,14 @@ module.exports = api.upload = {
 				}
 
 
-
 				// handle images
-				if (options.type == 'image/png' || options.type == 'image/jpeg') {
+				if (extension == 'jpg' || extension == 'png' || extension == 'jpeg') {
 
 					ops1.push(function (callback) {
 
 						// puts file in folder
 						api.file.handleImage(options.path, options.name, options.fileUuid, function (err, db) {
+							if (err) console.log('ERR 30'.red, err);
 							if (err) return callback(err);
 
 							// populate db entry
@@ -549,17 +331,14 @@ module.exports = api.upload = {
 				}
 
 
-				// handle json
-				if (options.type == 'application/octet-stream') {
-					// seems to be geojson/json/topojson
-
-					// only process geofiles
-					if (options.extension != 'geojson' && options.extension != 'topojson' && options.extension != 'json') return ops;
+				
+				if (extension == 'geojson') {
 
 					ops1.push(function (callback) {
 
 						// processes geojson, puts file in folder
 						api.file.handleJson(options.path, options.name, options.extension, options.fileUuid, function (err, db) {
+							if (err) console.log('ERR 31'.red, err);
 							if (err) return callback(err);
 							
 							// populate db entry
@@ -576,16 +355,14 @@ module.exports = api.upload = {
 				}
 
 
-				// handle docs/pdf
-				if (	options.type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
-					options.type == 'application/msword' ||
-					options.type == 'application/pdf' ||
-					options.type == 'text/plain' ) {
+
+				if (extension == 'doc' || extension == 'pdf' || extension == 'docx' || extension == 'txt') {
 
 					ops1.push(function (callback) {
 
 						// puts file in folder
 						api.file.handleDocument(options.path, options.name, options.fileUuid, function (err, db) {
+							if (err) console.log('ERR 32'.red, err);
 							if (err) return callback(err);
 
 							// populate db entry
@@ -605,6 +382,7 @@ module.exports = api.upload = {
 
 			// run ops
 			async.series(ops1, function (err, dbs) {
+				if (err) console.log('ERR 33'.red, err);
 				done && done(err, dbs);
 			});
 		});
@@ -613,6 +391,8 @@ module.exports = api.upload = {
 
 
 	_sortOps : function (ops, options) {
+
+		var ext = options.extension;
 
 		// handle folder
 		if (options.type == 'folder') {
@@ -626,6 +406,7 @@ module.exports = api.upload = {
 				}
 
 				api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
+					if (err) console.log('ERR 34'.red, err);
 					if (err) return callback(err);
 					callback(null, dbs);
 				});
@@ -633,8 +414,9 @@ module.exports = api.upload = {
 		}
 
 		
+		
 		// handle zip
-		if (options.type == 'application/zip' || options.type == 'application/x-zip-compressed') {
+		if (ext == 'zip') {
 
 			ops.push(function (callback) {
 
@@ -646,6 +428,7 @@ module.exports = api.upload = {
 
 				// unzips files to folder
 				api.file.handleZip(opt, function (err) {
+					if (err) console.log('ERR 34'.red, err);
 					if (err) return callback(err);
 
 					var opt = {
@@ -654,52 +437,23 @@ module.exports = api.upload = {
 					}
 
 					api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
+						if (err) console.log('ERR 35'.red, err);
 						if (err) return callback(err);
 						
 						callback(err, dbs);
 					});
 				});
 			});
-		}
-
-
-		if (options.type == 'application/octet-stream' && options.extension == 'zip') {
-
-			ops.push(function (callback) {
-
-				var opt = {
-					inn : options.path,
-					fileUuid : options.fileUuid,
-					out : ''
-				}
-
-				// unzips files to folder
-				api.file.handleZip(opt, function (err) {
-					if (err) return callback(err);
-
-					var opt = {
-						fileUuid : options.fileUuid,
-						folder : null
-					}
-
-					api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
-						if (err) return callback(err);
-						
-						callback(err, dbs);
-					});
-				});
-			});
-
 		}
 
 
 		// handle tar.gz
-		if (options.type == 'application/x-gzip') {
-
+		if (ext == 'gz' || ext == 'tar.gz') {
 			ops.push(function (callback) {
 
 				// untars files to folder
 				api.file.handleTar(options.path, options.fileUuid, function (err) {
+					if (err) console.log('ERR 38'.red, err);
 					if (err) return callback(err);
 
 					var opt = {
@@ -708,6 +462,7 @@ module.exports = api.upload = {
 					}
 					
 					api.upload.sortZipFolder(opt, function (err, dbs) {
+						if (err) console.log('ERR 39'.red, err);
 						if (err) return callback(err);
 						callback(null, dbs);
 					});
@@ -718,12 +473,13 @@ module.exports = api.upload = {
 
 
 		// handle shapefiles
-		if (options.type == 'shapefile') {					// gotchas: already in file-uuid folder, cause unzip
-
+		if (ext == 'shp') {
 			ops.push(function (callback) {
 
 				// process shapefile (convert, store, vectorize, etc.)
 				api.file.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
+					if (err) console.log('ERR 40'.red, err);
+					if (err) console.log('### SORTOPS HANDLESHAPEFILE ERR'.red, err);
 					if (err) return callback(err);
 
 					// populate db entry
@@ -739,12 +495,12 @@ module.exports = api.upload = {
 
 
 		// handle images
-		if (options.type == 'image/png' || options.type == 'image/jpeg') {
-
+		if (ext == 'jpg' || ext == 'png' || ext == 'jpeg') {
 			ops.push(function (callback) {
 
 				// puts file in folder
 				api.file.handleImage(options.path, options.name, options.fileUuid, function (err, db) {
+					if (err) console.log('ERR 41'.red, err);
 					if (err) return callback(err);
 
 					// populate db entry
@@ -761,18 +517,13 @@ module.exports = api.upload = {
 		}
 
 
-		// handle json
-		if (options.type == 'application/octet-stream') {
-			// seems to be geojson/json/topojson
-
-			// only process geofiles
-			if (options.extension != 'geojson' && options.extension != 'topojson' && options.extension != 'json') return ops;
-
-
+		if (ext == 'geojson') {
 			ops.push(function (callback) {
 
 				// processes geojson, puts file in folder
 				api.file.handleJson(options.path, options.name, options.extension, options.fileUuid, function (err, db) {
+					if (err) console.log('ERR 42'.red, err);
+					if (err) console.log('### SORTOPS HANDLEjson ERR'.red, err);
 					if (err) return callback(err);
 					
 					// populate db entry
@@ -790,16 +541,12 @@ module.exports = api.upload = {
 		}
 
 
-		// handle docs/pdf
-		if (	options.type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
-			options.type == 'application/msword' ||
-			options.type == 'application/pdf' ||
-			options.type == 'text/plain' ) {
-
+		if (ext == 'doc' || ext == 'pdf' || ext == 'docx' || ext == 'txt') {
 			ops.push(function (callback) {
 
 				// puts file in folder
 				api.file.handleDocument(options.path, options.name, options.fileUuid, function (err, db) {
+					if (err) console.log('ERR 43'.red, err);
 					if (err) return callback(err);
 
 					// populate db entry
@@ -811,17 +558,117 @@ module.exports = api.upload = {
 
 					// return db
 					callback(null, db);
-
 				});
 			});
 		}
 
-
 		return ops;
+	},
+
+
+	projectLogo : function (req, res) {
+
+		// process from-encoded upload
+		var form = new formidable.IncomingForm({
+			hash : 'sha1',
+			multiples : true,
+			keepExtensions : true,
+		});
+
+		form.parse(req, function(err, fields, files) {	
+			if (err) console.log('ERR 3'.red, err);
+			if (err || !files || !files.file) return api.error.general(req, res, err || 'No files1.');
+
+			var from = files.file.path,
+			    file = 'image-' + uuid.v4(),
+			    to = api.config.path.image + file;
+			
+			// rename and move to image folder
+			fs.rename(from, to, function (err) {
+				if (err) console.log('ERR 4'.red, err);
+				if (err) return api.error.general(req, res, err);
+				res.end(file);	// file will be saved by client
+			});		
+	 	});
+	},
+
+
+	clientLogo : function (req, res) {
+		
+		// process from-encoded upload
+		var form = new formidable.IncomingForm({
+			hash : 'sha1',
+			multiples : true,
+			keepExtensions : true,
+		});
+		form.parse(req, function(err, fields, files) {	
+			if (err) console.log('ERR 5'.red, err);
+			if (err || !files || !files.file) return api.error.general(req, res, err || 'No files2.');
+			
+			var from = files.file.path,
+			    file = 'image-' + uuid.v4(),
+			    to = api.config.path.image + file;
+			
+			// rename and move to image folder
+			fs.rename(from, to, function (err) {
+				if (err) console.log('ERR 6'.red, err);
+				if (err) return api.error.general(req, res, err);
+				res.end(file);	// file will be saved by client
+			});		
+	 	});
+	},
+
+
+	image : function (req, res) {
+
+		// process from-encoded upload
+		var form = new formidable.IncomingForm({
+			hash : 'sha1',
+			multiples : true,
+			keepExtensions : true,
+		});
+
+		form.parse(req, function(err, fields, files) {	
+			if (err) console.log('ERR 7'.red, err);
+			if (err || !files || !files.file) return api.error.general(req, res, err || 'No files3.');
+
+			var from = files.file.path,
+			    file = 'image-' + uuid.v4(),
+			    to   = api.config.path.image + file;
+			
+			// rename and move to image folder
+			fs.rename(from, to, function (err) {
+				if (err) console.log('ERR 8'.red, err);
+
+				if (err) return api.error.general(req, res, err);
+				res.end(file);	// file will be saved by client
+			});		
+	 	});
 
 	},
 
 
+	getExtension : function (name) {
+		try {
+			var arr = name.split('.').reverse();
+			var ext = arr[0];
+			return ext;
+		} catch (e) {
+			return false
+		}
+	},
+
+	getOriginalName : function (name) {
+		try {
+			var arr = name.split('.').reverse();
+			var ext = arr[0];
+			arr.splice(0,1);
+			var originalName = arr.reverse().join('');
+			return originalName;
+		} catch (e) {
+			return false
+		}
+	},
 
 	getFileType : function (name) {
 		if (!name) return ['unknown', 'unknown'];
@@ -844,9 +691,7 @@ module.exports = api.upload = {
 		// images
 		if (name.slice(-5) == '.jpeg') 	  return ['jpg',  'image/jpeg'];
 		if (name.slice(-4) == '.jpg') 	  return ['jpg',  'image/jpeg'];
-		// if (name.slice(-4) == '.gif') 	  return ['gif',  'image'];
 		if (name.slice(-4) == '.png') 	  return ['png',  'image/png'];
-		// if (name.slice(-5) == '.tiff') 	  return ['tiff', 'image'];
 	
 		// docs
 		if (name.slice(-4) == '.pdf') 	  return ['pdf',  'application/pdf'];
@@ -856,8 +701,8 @@ module.exports = api.upload = {
 
 		// shapefile parts
 		if (name.slice('-4') == '.shp')   return ['shp', 'shapefile'];
-		var mandatory 	= ['.shp', '.shx', '.dbf'];
-		var optional  	= ['.prj', '.sbn', '.sbx', '.fbn', '.fbx', '.ain', '.aih', '.ixs', '.mxs', '.atx', '.shp.xml', '.cpg'];
+		var mandatory = ['.shp', '.shx', '.dbf'];
+		var optional = ['.prj', '.sbn', '.sbx', '.fbn', '.fbx', '.ain', '.aih', '.ixs', '.mxs', '.atx', '.shp.xml', '.cpg'];
 		if (mandatory.indexOf(name.slice(-4)) > -1) return ['shape', 'partialshape'];
 		if (optional.indexOf(name.slice(-4)) > -1)  return ['shape', 'partialshape'];
 

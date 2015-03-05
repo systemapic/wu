@@ -235,7 +235,8 @@ Wu.MapPane = Wu.Class.extend({
 
 		var options = {
 			worldCopyJump : true,
-			attributionControl : false
+			attributionControl : false,
+			maxZoom : 18
 		}
 
 		// get project pos
@@ -249,15 +250,6 @@ Wu.MapPane = Wu.Class.extend({
 
 		// add editable layer
 		this.addEditableLayer(this._map);
-
-		// add attribution
-		this._attributionControl = L.control.attribution({
-			position : 'bottomright',
-			prefix : 'Powered by <a href="http://systemapic.com/" target="_blank">Systemapic.com</a> ©'
-		});
-
-		// add control to map
-		this._map.addControl(this._attributionControl);
 
 	},
 

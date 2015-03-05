@@ -54,7 +54,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// filecount
 		this.filecount = 0;
 
-
 		// RENDER EMPTY TABLE
 		this._fileList = Wu.DomUtil.createId('div', 'filelist', this._tableContainer);
 		this._tableFrame = Wu.DomUtil.create('table', 'datalibrary-table', this._fileList);
@@ -103,7 +102,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._th8.setAttribute('data-sort', 'status');
 		this._th8.setAttribute('data-insensitive', 'true');										
 
-
 		// #datalibrary-insertrows
 		this._table = Wu.DomUtil.create('tbody', 'list datalibrary-insertrows', this._tableFrame);
 
@@ -118,7 +116,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// add tooltip
 		app.Tooltip.add(this._menu, 'The data library contains all files uploaded to the project.');
-
 	},
 
 
@@ -149,8 +146,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// search button
 		Wu.DomEvent.on(this._search, 'keyup', this.searchList, this);
-	       
 	},
+
 
 	// hooks added automatically on page load
 	removeHooks : function () {
@@ -174,6 +171,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		Wu.DomEvent.off(this._search, 'keyup', this.searchList, this);
 	       
 	},
+
 
 	searchList : function (e) {
 		if (e.keyCode == 27) { // esc
@@ -247,9 +245,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	initDownloadTable : function () {
-
-		// var table = ich.datalibraryTableDownload();
-		// this._downloadList.innerHTML = table;
 
 		// #datalibrary-download-table
 		var table = Wu.DomUtil.create('table', 'datalibrary-download-table', this._downloadList);
@@ -462,6 +457,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	deleteFiles : function (files) {
 
+		console.log('delete files: ', files);
+
 		// set status
 		app.setStatus('Deleting');
 		
@@ -474,6 +471,21 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// refresh sidepane
 		this.project.refreshSidepane();
 
+
+		app.feedback.setMessage({
+			title : 'Files deleted',
+			description : this._getPrettyFileNames(files)
+		});
+
+	},
+
+	_getPrettyFileNames : function (files) {
+		var names = [];
+		_.each(files, function (file) {
+			names.push(file.name);
+		});
+
+		return names.join(', ');
 	},
 
 	// list.js plugin
@@ -538,16 +550,18 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	
 	handleError : function (err) {
-		console.error(err);
+		console.log('handleError: ', err);
 
 		// set error
-		app.ErrorPane.setError('Upload error', err);
+		app.feedback.setError({
+			title : 'Upload error',
+			description : err,
+		});
 
 	},
 
 	// process file
 	uploaded : function (result) {
-
 		console.log('uploaded!!!', result);
 		
 		// handle errors
@@ -562,13 +576,25 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			// add to project locally (already added on server)
 			this.project.setFile(file);
 
+			app.feedback.setSuccess({
+				title : 'Upload success',
+				description : 'Added ' + file.name + ' to the Data Library.'
+			});
+
 		}, this);
 
 		// add layers
 		result.layers && result.layers.forEach(function (layer, i) {
 			this.project.addLayer(layer);
+
+			app.feedback.setMessage({
+				title : 'Layer recognized',
+				description : layer.title + ' was added to the Data Library.'
+			});
+
+
 		}, this);
-		
+
 		// refresh sidepane
 		this.project.refreshSidepane();
 

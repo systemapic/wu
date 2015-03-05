@@ -227,7 +227,7 @@ module.exports = function(grunt) {
 					'public/js/src/panes/map.pane.js',
 					'public/js/src/panes/status.pane.js',
 					'public/js/src/panes/start.pane.js',
-					'public/js/src/panes/error.pane.js',
+					'public/js/src/panes/feedback.pane.js',
 					'public/js/src/panes/dropzone.pane.js',
 
 					// Controls 

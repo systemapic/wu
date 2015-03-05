@@ -70,7 +70,10 @@ Wu.Client = Wu.Class.extend({
 
 		var result = Wu.parse(json);
 		console.log('result: ', result);
-		if (result.error) return app.error.set('Client not updated', result.error);
+		if (result.error) return app.feedback.setError({
+			title : 'Client not updated', 
+			description : result.error
+		});
 
 		if (result.name) {
 			// name has been updated, add slug also

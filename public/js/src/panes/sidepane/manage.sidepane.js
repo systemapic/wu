@@ -264,13 +264,21 @@ Wu.SidePane.Manage = Wu.Class.extend({
 
 		// add member 
 		if (role) role.addMember(user, function (err, projectStore) {
-			if (err) app.error.set('Access denied', err);
+			if (err) return app.feedback.setError({
+				title : 'Access denied', 
+				description : err
+			});
+			
 			app.setSaveStatus();
 		});
 
 		// add 'No role'
 		if (!role) app.access.addNoRole(options, function (err, result) {
-			if (err) app.error.set('Access denied', err);
+			if (err) return app.feedback.setError({
+				title : 'Access denied', 
+				description : err
+			});
+			
 			app.setSaveStatus();
 		});
 	},
