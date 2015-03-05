@@ -684,6 +684,7 @@ module.exports = api.layer = {
 
 
 	createModel : function (options, callback) {
+		console.log('api.layer.createModel'.yellow, options);
 
 		var layer 		= new Layer();
 		layer.uuid 		= options.uuid;

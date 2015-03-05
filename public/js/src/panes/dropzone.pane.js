@@ -113,11 +113,12 @@ Wu.Dropzone = Wu.Class.extend({
 				url : '/api/upload',
 				createImageThumbnails : false,
 				autoDiscover : false,
-				uploadMultiple : true,
+				uploadMultiple : false,
 				acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.docx,.pdf,.doc,.txt',
 				// acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.json,.topojson,.kml,.docx,.pdf,.doc,.txt',
-				maxFiles : 10,
-				parallelUploads : 10,
+				// maxFiles : 10,
+				// parallelUploads : 10,
+				parallelUploads : 1,
 				clickable : this._clickable || false,
 		});
 
@@ -164,7 +165,7 @@ Wu.Dropzone = Wu.Class.extend({
 		this.dz.removeAllListeners();
 
 		// set project uuid for dropzone
-		this.dz.options.params.project = this.project.getUuid();	// goes to req.body.project
+		this.dz.options.params.projectUuid = this.project.getUuid();	// goes to req.body.project
 
 		// set dz events
 		this.dz.on('drop', function (e) { 
@@ -205,7 +206,8 @@ Wu.Dropzone = Wu.Class.extend({
 			that.progress.setProgress(progress);
 		});                                                                                                                                                                                                               
 
-		this.dz.on('successmultiple', function (dz, json, xml) {
+		// this.dz.on('successmultiple', function (dz, json, xml) {
+		this.dz.on('success', function (dz, json, xml) {
 			console.log('dz, json, xml', dz, json, xml);
 
 			// clear fullpane

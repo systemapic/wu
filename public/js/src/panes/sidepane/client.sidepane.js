@@ -480,7 +480,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		});
 		
 		// set client uuid param for server
-		this.logodz.options.params.client = this.client.getUuid();
+		// this.logodz.options.params.clientUuid = this.client.getUuid();
 		
 		// set callback on successful upload
 		this.logodz.on('success', function (err, path) {
