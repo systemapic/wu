@@ -546,27 +546,26 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	// process file
-	uploaded : function (record, options) {
-		
-		var options = options || {};
+	uploaded : function (result) {
+
+		console.log('uploaded!!!', result);
 		
 		// handle errors
-		if (record.error) this.handleError(record.error);
+		if (result.error) this.handleError(result.error);
 		
 		// return if nothing
-		if (!record.files) return;
+		if (!result.files) return;
 
 		// add files to library
-		record.files && record.files.forEach(function (file, i, arr) {
+		result.files && result.files.forEach(function (file, i, arr) {
 			
 			// add to project locally (already added on server)
 			this.project.setFile(file);
 
 		}, this);
 
-
 		// add layers
-		record.layers && record.layers.forEach(function (layer, i) {
+		result.layers && result.layers.forEach(function (layer, i) {
 			this.project.addLayer(layer);
 		}, this);
 		
@@ -574,8 +573,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.project.refreshSidepane();
 
 		// refresh cartoCssControl
-		var cartoCss = app.MapPane.cartoCss;
-		if (cartoCss) cartoCss.update();
+		var ccss = app.MapPane.cartoCss;
+		if (ccss) ccss.update();
 
 		// refresh
 		this.reset();
