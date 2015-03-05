@@ -2768,7 +2768,7 @@ td.tdcont.createdDate {
 
 
 /*
-┌─┐┬─┐┬─┐┌─┐┬─┐  ┌─┐┌─┐┌┐┌┌─┐
+┌─┐┬─┐┬─┐┌─┐┬─┐  ┌─┐┌─┐┌┐┌┌─┐ 	// rename to feedback pane, see knut.css
 ├┤ ├┬┘├┬┘│ │├┬┘  ├─┘├─┤│││├┤ 
 └─┘┴└─┴└─└─┘┴└─  ┴  ┴ ┴┘└┘└─┘
 */
@@ -2778,11 +2778,14 @@ td.tdcont.createdDate {
 	bottom: 0;
 	left: 0;
 	width: auto;
-	height: 110px;
 	z-index: 999999999;
 	margin: 10px;
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
+	max-width: 500px;
+	max-height: 400px;
+
+
 }
 
 .error-pane-content {
@@ -2793,6 +2796,12 @@ td.tdcont.createdDate {
 	cursor: default;
 	border-radius: 3px;
 	margin-right: 50px;
+	max-height: inherit;
+  	overflow: hidden;
+
+  	/*-webkit-box-shadow: 2px 5px 44px -10px rgba(0,0,0,1);
+	-moz-box-shadow: 2px 5px 44px -10px rgba(0,0,0,1);
+	box-shadow: 2px 5px 44px -10px rgba(0,0,0,1);*/
 }
 
 .error-pane-title {
@@ -2807,6 +2816,7 @@ td.tdcont.createdDate {
 	padding-left: 10px;
 	font-weight: 400;
 	font-size: 120%;
+	margin: 5px;
 }
 
 .error-pane-x {

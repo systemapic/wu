@@ -281,7 +281,7 @@ Wu.App = Wu.Class.extend({
 		this.MapPane = new Wu.MapPane();
 
 		// render eror pane
-		this.ErrorPane = new Wu.ErrorPane();
+		this.FeedbackPane = new Wu.FeedbackPane();
 
 	},
 

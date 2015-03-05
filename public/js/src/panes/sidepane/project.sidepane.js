@@ -250,6 +250,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		
 		// set client uuid param for server
 		this.logodz.options.params.projectUuid = this.project.getUuid();
+		this.logodz.options.params.project = this.project.getUuid();
 
 		// set callback on successful upload
 		var that = this;

@@ -1,64 +1,147 @@
 Wu.FeedbackPane = Wu.Class.extend({
 
-	options : {
-
-		clearTimer : false,
-		clearDelay : 1000,
-		severityColors : {
-			1 : 'yellow',
-			2 : 'cyan',
-			3 : 'rgba(255, 0, 0, 0.81)'
-		}
-
-	},
-
 	initialize : function () {
 
+		// create container
+		this.initContainer();
+
+		// shortcut	
+		app.feedback = this;
+
+		// concurrent messages stored here
+		this._messages = {};
+	},
+
+	initContainer : function () {
+		this._container = Wu.DomUtil.create('div', 'feedback-pane', app._appPane);
+	},
+
+	set : function (options) {
+		this.add(options);
+	},
+
+	
+	setMessage : function (options) {
+		this.add(options, 1); 	// neutral message
+	},
+
+	setSuccess : function (options) {
+		this.add(options, 2);	// success message
+	},
+	
+	setError : function (options) {
+		this.add(options, 3); 	// error message
+	},
+
+	add : function (message, severity) {
+
+		var id = Wu.Util.createRandom(5);
+
+		// create and save in stack
+		this._messages[id] = new Wu.FeedbackPane.Message({
+			message : message,
+			container : this._container,
+			id : id,
+			severity : severity || 3 // error default
+		});
+	},
+
+	remove : function (id) {
+		// delete container and object
+		var pane = this._messages[id];
+		if (!pane) return;
+
+		var container = pane._content;
+		Wu.DomUtil.remove(container);
+		delete this._messages[id];
+	},
+});
+
+
+
+Wu.FeedbackPane.Message = Wu.Class.extend({
+
+	options : {
+
+		clearTimer : true,
+		clearDelay : 10000,
+		transitionDelay : 0.5, 
+		severityStyle : {
+			1 : 'message',
+			2 : 'success',
+			3 : 'error'
+		}
+	},
+
+	initialize : function (options) {
+		
+		// set options
+		Wu.setOptions(this, options);
+
+		console.log('this.options, ', this.options);
+		
 		// init layout
 		this.initLayout();
 
-		// shortcut
-		app.feedback = this;
+		// set message
+		this.set();
 
 	},
 
 	initLayout : function () {
 
 		// create divs
-		this._container = Wu.DomUtil.create('div', 'error-pane displayNone', app._appPane);
-		this._content = Wu.DomUtil.create('div', 'error-pane-content', this._container);
+		this._content = Wu.DomUtil.create('div', 'feedback-pane-content', this.options.container);
 
-		this._title = Wu.DomUtil.create('div', 'error-pane-title', this._content);
-		this._description = Wu.DomUtil.create('div', 'error-pane-description', this._content);
-		this._icon = Wu.DomUtil.create('div', 'error-pane-icon', this._content);
+		this._title = Wu.DomUtil.create('div', 'feedback-pane-title', this._content);
+		this._description = Wu.DomUtil.create('div', 'feedback-pane-description', this._content);
+		this._icon = Wu.DomUtil.create('div', 'feedback-pane-icon', this._content);
+
+		// set transition
+		this._content.style.opacity = 0;
+		this._content.style.webkitTransition = 'opacity ' + this.options.transitionDelay + 's';
+		this._content.style.transition = 'opacity ' + this.options.transitionDelay + 's';
 
 		// x
-		this._x = Wu.DomUtil.create('div', 'error-pane-x', this._container, 'X');
+		this._x = Wu.DomUtil.create('div', 'feedback-pane-x', this._content, 'X');
 
 		// events
 		this.addEvents();
+
 	},
 
 	addEvents : function () {
+		// close on click
 		Wu.DomEvent.on(this._x, 'click', this.clear, this);
+
+		Wu.DomEvent.on(this._content, 'mouseenter', this._mouseEnter, this);
+		Wu.DomEvent.on(this._content, 'mouseleave', this._mouseLeave, this);
 	},
 
-	set : function (title, description, severity) {
-		this.setError(title, description, severity);
-	},
-
-	setError : function (title, description, severity) {
-
+	set : function () {
+	
 		// set view
-		if (title) this.setTitle(title);
-		if (description) this.setDescription(description);
-		if (severity) this.setSeverity(severity);
+		this.setTitle();
+		this.setDescription();
+		this.setSeverity();
 
 		// show
 		this.show();
 
 		// clear after timeout
 		this.clearTimer();
+	},
+
+	_mouseEnter : function () {
+		this._cancelTimer();
+	},
+
+	_mouseLeave : function () {
+		this.clearTimer(this.options.clearDelay/4);
+	},
+
+	_cancelTimer : function () {
+		if (this._clearTimer) clearTimeout(this._clearTimer);
 	},
 
 	clearTimer : function (delay) {
@@ -70,16 +153,21 @@ Wu.FeedbackPane = Wu.Class.extend({
 		this.hide();
 	},
 
-	setTitle : function (title) {
-		this._title.innerHTML = title;
+	setTitle : function () {
+		this._title.innerHTML = this.options.message.title;
 	},
 
-	setDescription : function (description) {
-		this._description.innerHTML = description;
+	setDescription : function () {
+		this._description.innerHTML = this.options.message.description;
 	},
 
 	setSeverity : function (s) {
-		if (s) this.setBackground(this.options.severityColors[s]);
+		var s = this.options.severity;
+		if (s) this.setStyle(this.options.severityStyle[s]);
+	},
+
+	setStyle : function (style) {
+		Wu.DomUtil.addClass(this._content, style);
 	},
 
 	setBackground : function (color) {
@@ -87,11 +175,18 @@ Wu.FeedbackPane = Wu.Class.extend({
 	},
 
 	hide : function () {
-		Wu.DomUtil.addClass(this._container, 'displayNone');
+		this._content.style.opacity = 0;
+		setTimeout(function () {
+			app.feedback.remove(this.options.id);
+		}.bind(this), this.options.transitionDelay * 1000); // timed with css transition
 	},
 
 	show : function () {
-		Wu.DomUtil.removeClass(this._container, 'displayNone');
-	},
+		setTimeout(function () {
+			this._content.style.opacity = 1;
+		}.bind(this), 5); // dom hack
+	}
 
 });
+
+

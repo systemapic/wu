@@ -317,7 +317,10 @@ Wu.Project = Wu.Class.extend({
 	_saved : function (ctx, json) {
 
 		var result = Wu.parse(json);
-		if (result.error) return app.error.set("Could not update project", result.error);
+		if (result.error) return app.feedback.setError({
+			title : "Could not update project", 
+			description : result.error
+		});
 
 		// set status
 		app.setSaveStatus();

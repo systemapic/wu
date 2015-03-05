@@ -58,6 +58,8 @@ module.exports = api.file = {
 		var maindir 	= basedir + '/' + pslug;
 		
 		fs.mkdirs(maindir, function (err) {		// refactor
+			if (err) console.log('ERR 9'.red, err);
+			
 			if (err) return api.error.general(req, res, err);
 			
 			// for each file
@@ -82,6 +84,8 @@ module.exports = api.file = {
 
 			// final callback
 			function (err) {	// todo: err handling
+				if (err) console.log('ERR 10'.red, err);
+
 				if (err) return api.error.general(req, res, err);
 
 				// execute cmd line zipping 
@@ -91,6 +95,8 @@ module.exports = api.file = {
 				
 				// run command
 				exec(cmd, { cwd : maindir }, function (err, stdout, stdin) {
+					if (err) console.log('ERR 11'.red, err);
+
 					if (err) return api.error.general(req, res, err); // if err
 
 					// send zip uuid
@@ -137,6 +143,8 @@ module.exports = api.file = {
 		});
 
 		async.waterfall(ops, function (err, path) {
+			if (err) console.log('ERR 12'.red, err);
+
 			if (err) return api.error.general(req, res, err);
 			res.download(path);
 		});
@@ -159,6 +167,8 @@ module.exports = api.file = {
 
 			// each file callback
 			function(err, file) {
+				if (err) console.log('ERR 13'.red, err);
+
 				if (err || !file) return api.error.general(req, res, 'File not found.');
 
 				if (file.slice(-3) == 'zip') {
@@ -170,6 +180,8 @@ module.exports = api.file = {
 
 			// callback
 			function () { 
+				if (err) console.log('ERR 14'.red, err);
+
 				if (!found) return api.error.general(req, res, 'File not found.');
 			}	
 		);
@@ -263,6 +275,7 @@ module.exports = api.file = {
 	
 		// run queries
 		async.series(ops, function(err) {
+			if (err) console.log('ERR 15'.red, err);
 			if (err) return api.error.general(req, res, err);		
 
 			res.end(JSON.stringify({
@@ -302,6 +315,8 @@ module.exports = api.file = {
 		});
 
 		async.waterfall(ops, function (err, file) {
+			if (err) console.log('file update err: '.red + err);
+			if (err) console.log('ERR 16'.red, err);
 			if (err || !file) return api.error.general(req, res, err);
 
 			res.end(JSON.stringify(file));
@@ -370,6 +385,7 @@ module.exports = api.file = {
 
 
 		fs.ensureDir(out, function (err) {
+			if (err) console.log('handlezip 903 err: '.red + err);
 			if (err) return callback(err);
 
 			// cmd
@@ -378,13 +394,16 @@ module.exports = api.file = {
 
 			// unzip
 			exec(cmd, function (err, stdout, stdin) {
+				if (err) console.log('handleziup 00 err: '.red + err);
 				if (err) return callback(err);
 
 				// remove unnecessary files - important!
 				fs.unlink(inn, function (err) {
+					if (err) console.log('handle zip unlink  err: '.red + err);
 					if (err) return callback(err);
 
 					fs.remove(out + '/__MACOSX', function (err) {
+						if (err) console.log('handle zip remove : '.red + err);
 						callback(err);
 					});
 				});
@@ -463,37 +482,62 @@ module.exports = api.file = {
 	// #########################################
 	// ###  FILER: geo/topo/json             ###
 	// #########################################
-	handleJson : function (inn, name, type, fileUuid, callback) {
-		if (!inn || !name || !fileUuid) return callback('Missing information.11');
+	handleJson : function (inn, name, type, fileUuid, done) {
+		if (!inn || !name || !fileUuid) return done('Missing information.11');
 	
 		// set path
 		var out = api.config.path.file + fileUuid + '/' + name;
 
-		// move to folder
-		fs.move(inn, out, function (err) {
-			if (err) return callback(err);
+		console.log('--------------------'.red);
+		console.log('--------------------'.red);
+		console.log('--------------------'.red);
+		console.log('inn: ', inn);
+		console.log('out: ', out);
+		console.log('name: ', name);
+		console.log('type: ', type);
+		console.log('fileUuid: ', fileUuid);
+		console.log('---------------------'.red);
+
+
+		var ops = {};
+
+		// move if not already in right place
+		if (inn != out) {
+			ops.move = function (callback) {
+				fs.move(inn, out, callback);
+			};
+		}
+
+		ops.geo = function (callback) {
 
 			// process geo
-			if (type == 'geojson') {
-				return api.geo.handleGeoJSON(out, fileUuid, function (err, db) {
-					if (err || !db) return callback(err || 'No db.');
+			if (type != 'geojson') return callback('Not a valid .geojson file.');
 
-					// populate db 
-					db.data = {
-						geojson : name
-					}
-					db.title = name;
 
-					callback(err, db);
+			api.geo.handleGeoJSON(out, fileUuid, function (err, db) {
+				if (err) console.log('ERR 51'.red, err);
+				if (err || !db) return callback(err || 'No db.');
 
-				});	
+				// populate db 
+				db.data = {
+					geojson : name
+				}
+				db.title = name;
+
+				callback(err, db);
+
+			});	
 			
-			} else {
 
-				// catch err
-				callback(err);
-			}
+		};
+
+
+		async.series(ops, function (err, results) {
+			if (err) console.log('ERR 60'.red, err);
+
+			done(err, results.geo);
 		});
+
 	},
 
 
@@ -502,14 +546,19 @@ module.exports = api.file = {
 	// #########################################
 	handleShapefile : function (folder, name, fileUuid, callback) {	// already moved to right place, by unzip
 		api.geo.handleShapefile(folder, name, fileUuid, function (err, db) {
+			if (err) console.log('ahndle shape ERRR 909: '.red + err);
+			if (err) console.log(err);
 			if (err) {
 				// delete shapefile
 				var path = folder + '/' + name;
-				fs.unlink(path, function (err) {
-					console.log('unlinked?', err);
-					callback(err, db);
+				fs.unlink(path, function (er) {
+					console.log('------------'.yellow, 'unlinked: ', path)
+					if (er) console.log('handle shape unlink err: '.red + er);
+					console.log('unlinked?', er);
+					callback(err);
 				});
 			} else {
+				console.log('============='.red, 'no err?');
 				callback(null, db);
 			}
 		});
@@ -533,6 +582,7 @@ module.exports = api.file = {
 		.limit(1)	// safeguard
 		.exec(function(err, record) {
 			console.log('found: ', record);
+			if (err) console.log('get geo exec err: '.red + err);
 			return api.file.sendGeoJsonFile(req, res, record[0]);
 		});
 	},
@@ -557,6 +607,8 @@ module.exports = api.file = {
 
 		// read file and ship it
 		fs.readJson(path, function (err, data) {
+			if (err) console.log('send geo json err: '.red + err);
+			if (err) console.log('ERR 17'.red, err);
 			if (err || !data) return api.error.general(req, res, err || 'No file.');
 
 			// set header
@@ -584,6 +636,8 @@ module.exports = api.file = {
 
 		// final callback
 		function (err) {
+			if (err) console.log('___send geo json  e err: '.red + err);
+			if (err) console.log('ERR 18'.red, err);
 			if (err || !geofile) return api.error.general(req, res, err);
 
 			// set filesize
