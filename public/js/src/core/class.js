@@ -324,7 +324,8 @@ Wu.Util = {
 			// we got a disconnect!!!
 			app.feedback.setError({
 				title : 'You have been logged out.', 
-				description : 'Please reload the page to log back in.'
+				description : 'Please reload the page to log back in.',
+				clearTimer : false
 			});
 
 			return false;

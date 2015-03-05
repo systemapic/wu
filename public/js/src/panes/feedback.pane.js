@@ -37,13 +37,16 @@ Wu.FeedbackPane = Wu.Class.extend({
 
 		var id = Wu.Util.createRandom(5);
 
-		// create and save in stack
-		this._messages[id] = new Wu.FeedbackPane.Message({
-			message : message,
+		var options = {
 			container : this._container,
 			id : id,
 			severity : severity || 3 // error default
-		});
+		}
+
+
+
+		// create and save in stack
+		this._messages[id] = new Wu.FeedbackPane.Message(Wu.extend(options, message));
 	},
 
 	remove : function (id) {
@@ -154,11 +157,11 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 	},
 
 	setTitle : function () {
-		this._title.innerHTML = this.options.message.title;
+		this._title.innerHTML = this.options.title;
 	},
 
 	setDescription : function () {
-		this._description.innerHTML = this.options.message.description;
+		this._description.innerHTML = this.options.description;
 	},
 
 	setSeverity : function (s) {
