@@ -282,7 +282,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		console.log('Created project:', project);
 
 		// return error
-		if (error) return app.error.set('There was an error creating new project!', error);
+		if (error) return app.feedback.setError({
+			title : 'There was an error creating new project!', 
+			description : error
+		});
 			
 		// add to global store
 		app.Projects[store.uuid] = project;
@@ -480,6 +483,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		});
 		
 		// set client uuid param for server
+		this.logodz.options.params.clientUuid = this.client.getUuid();
 		this.logodz.options.params.client = this.client.getUuid();
 		
 		// set callback on successful upload

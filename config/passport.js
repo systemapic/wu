@@ -2,6 +2,7 @@
 
 // node-uuid
 var uuid = require('node-uuid');
+var colors = require('colors');
 
 // load all the things we need
 var LocalStrategy = require('passport-local').Strategy;
@@ -108,13 +109,12 @@ module.exports = function(passport) {
 	function(req, email, password, done) { // callback with email and password from our form
 	  
 
-		// console.log('LOGIN ATTEMwPT!', email, password);
+		// console.log('LOGIN ATTEMPT!', email, password);
 
 		// find a user whose email is the same as the forms email
 		// we are checking to see if the user trying to login already exists
 		User.findOne({ 'local.email' :  email }, function(err, user) {
 			// if there are any errors, return the error before anything else
-
 			if (err) return done(err);
 
 			// if no user is found, return the message
@@ -132,9 +132,7 @@ module.exports = function(passport) {
 				// all is well, return successful user
 				return done(null, user);
 			});
-			
 		});
-
 	}));
 
 
@@ -153,15 +151,20 @@ module.exports = function(passport) {
 	// helper fn
 	function setRedisToken(user) {
 
-		// keys
-		var key = 'authToken-' + user._id;
-		var tok = crypto.randomBytes(22).toString('hex');
+		// user id
+		var uid = user.uuid.split('-').reverse()[0]; // last block of user-uuid
+
+		// key
+		var key = 'token-' + uid;	// token-asdd333dd // from user-uuid
+
+		// token
+		var token = key + '.' + crypto.randomBytes(12).toString('hex');  // ASFSAlkdmflsdkfmdslk2lk  // random string
 
 		// async set
-		r.set(key, tok);
+		r.set(key, token);
 		
 		// return token
-		return tok;
+		return token;
 	}
 
 

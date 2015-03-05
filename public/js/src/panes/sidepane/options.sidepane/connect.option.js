@@ -141,7 +141,10 @@ Wu.SidePane.Options.Connect = Wu.SidePane.Options.Item.extend({
 		var error = result.error;
 		var store = result.project;
 
-		if (error) return app.error.set('Error importing Mapbox', error);
+		if (error) return app.feedback.setError({
+			title : 'Error importing Mapbox',
+			description:  error
+		});
 
 
 		// update project
