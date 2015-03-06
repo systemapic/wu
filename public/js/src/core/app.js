@@ -615,8 +615,9 @@ Wu.App = Wu.Class.extend({
 
 
 	// debug mode
-	_debug : function () {
-		if (!this.debug) return;
+	_debug : function (debug) {
+		if (!debug && !this.debug) return;
+		this.debug = true;
 
 		// set style
 		Wu.setStyle('img', {

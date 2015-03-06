@@ -435,7 +435,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// inject <input>
 		var div = this.description;
 		var value = div.innerHTML;
-		div.innerHTML = ich.injectClientEditInput({ value : value }); 
+		// div.innerHTML = ich.injectClientEditInput({ value : value }); 
+		// todo: insert input
+		div.innerHTML = '<input value="'+ value +'" class="client-edit editable ct15 ct16">';
 
 		// focus
 		var target = div.firstChild;

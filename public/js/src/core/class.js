@@ -24,8 +24,6 @@
 // _____class.js___________________________________________________________________ 
 // Taken from Class.js in Leaflet.js by Vladimir Agafonkin, @LeafletJS
 
-var ich = ich || {};
-ich.$ = function (elem) { return elem; };
 Wu = {};
 Wu.Class = function () {};
 Wu.Class.extend = function (props) {
@@ -284,24 +282,6 @@ Wu.Util = {
 	// minimal image URI, set to an image when disposing to flush memory
 	emptyImageUrl: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
 
-	
-	// WU functions
-	// returns DOM elements instead of HTML string for icanhaz templates
-	templateIch : function (template, data, container) {
-		var dummy = Wu.DomUtil.create('div', '');
-		dummy.innerHTML = ich[template](data);
-
-		if (container) {
-			var d = dummy;
-			for (var i = 0; i < d.children.length; i++) {
-				container.appendChild(d.children[i]);
-			}
-			return container.children[0];
-		}
-		
-		return dummy.children;
-	},
-
 	isArray: Array.isArray || function (obj) {
 		return (Object.prototype.toString.call(obj) === '[object Array]');
 	},
@@ -419,6 +399,8 @@ Wu.Util = {
 			if (http.readyState == 4) {
 		    		
 				var valid = Wu.verify(http.responseText);
+
+				console.log('got callback?', callback, valid);
 
 				if (http.status == 200 && valid) { // ok
 					if (callback) callback(null, http.responseText); 
@@ -1008,7 +990,6 @@ Wu.parse = Wu.Util._parse;
 Wu.zip = Wu.Util.generateZip;
 Wu.zave = Wu.Util.zipSave;
 Wu.can = Wu.Util.can;
-ichDiv = Wu.Util.templateIch;
 Wu.setStyle = Wu.Util.setStyle;
 Wu.getStyle = Wu.Util.getStyle;
 Wu.verify = Wu.Util.verifyResponse;

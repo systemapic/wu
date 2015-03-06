@@ -127,7 +127,6 @@ module.exports = api.access = {
 		projectOwner : {
 			name : 'Project Owner',
 			capabilities : {
-				create_project 		: true, 	
 				read_project 		: true, 	
 				edit_project 		: true, 	
 				delete_project 		: true, 	
@@ -148,6 +147,7 @@ module.exports = api.access = {
 				share_project 		: true, 	
 				delegate_to_user 	: true,
 
+				create_project 		: false, 	
 				create_client 		: false,	
 				read_client 		: false, 		
 				edit_client 		: false, 		
@@ -168,10 +168,8 @@ module.exports = api.access = {
 		projectEditor : {
 			name : 'Editor',
 			capabilities : {
-				create_project 		: true, 	
 				read_project 		: true, 	
 				edit_project 		: true, 
-				delete_project 		: false, 	
 				upload_file 		: true, 	
 				download_file 		: true, 	
 				edit_file 		: true, 
@@ -186,6 +184,8 @@ module.exports = api.access = {
 				share_project 		: true, 	
 				delegate_to_user 	: true,
 
+				create_project 		: false, 	
+				delete_project 		: false, 	
 				create_client 		: false,	
 				read_client 		: false, 		
 				edit_client 		: false, 		
