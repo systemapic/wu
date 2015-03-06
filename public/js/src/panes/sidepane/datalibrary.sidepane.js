@@ -15,7 +15,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._controlInner = Wu.DomUtil.create('div', 'datalibrary-controls-inner', this._controlContainer);
 
 		// Upload button
-		this._uploader = Wu.DomUtil.create('div', 'smap-button-gray diplayNone', this._controlInner, 'Upload');
+		this._uploader = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload');
 
 		// Search field
 		this._search = Wu.DomUtil.create('input', 'search', this._controlInner);
@@ -24,10 +24,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._search.setAttribute('placeholder', 'Search files');
 
 		// Delete button
-		this._deleter = Wu.DomUtil.create('div', 'smap-button-gray diplayNone', this._controlInner, 'Delete');
+		this._deleter = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Delete');
 
 		// Download button
-		this._downloader = Wu.DomUtil.create('div', 'smap-button-gray diplayNone', this._controlInner, 'Download');
+		this._downloader = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Download');
 
 		// error feedback
 		this._errors = Wu.DomUtil.createId('div', 'datalibrary-errors', this._controlInner);
@@ -365,7 +365,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	_removeDownloadDialog : function () {
 		this._downloadDialog.style.opacity = 0;
-		setTimeout(this.removeDownloadDialog.bind(this), 3000);
+		setTimeout(this.removeDownloadDialog.bind(this), 500);
 	},	
 
 	downloadCancel : function () {
@@ -392,7 +392,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			that.downloadCancel();
 			that.initDownloadTable();
 		}, 1000);
-
 	},
 
 	downloadConfirm : function (e) {
@@ -408,7 +407,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var tr = '';
 		checks.forEach(function (file, i, arr) {
 			var tmp = Wu.extend({}, file);
-			tr += ich.datalibraryDownloadRow(tmp);
+			tr += this._createDownloadRow(tmp);
+			// todo: fix
 		}, this);
 
 		// get table and insert
@@ -422,6 +422,28 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// Hide toolbar (upload, download, delete, search);
 		Wu.DomUtil.addClass(this._content, 'hide-top', this);
 	
+	},
+
+	_createDownloadRow : function (file) {
+		var html = '';
+		html += '<tr id="download-'+ file.uuid +'">;';
+		html += '	<td width="43%" class="download-name">'+ file.name +'</td>';
+		html += '	<td width="20%" class="tdcont download-category ct23 ct28">'+ file.category +'</td>';
+		html += '	<td width="10%" class="tdcont download-version ct23 ct28">'+ file.version +'</td>';
+		html += '	<td width="10%" class="tdcont download-status ct23 ct28">'+ file.status +'</td>';
+		html += '	<td width="10%" class="tdcont download-format ct23 ct28">'+ file.format +'</td>';
+		html += '	<td width="10%" class="tdcont download-size ct23 ct28">'+ file.size +'</td>';
+		html += '	<td width="10%" class="tdcont download-remove ct23 ct28">';
+		html += '	';
+		html += '	';
+		html += '		<div class="squaredThree">';
+		html += '			<input type="checkbox" value="None" id="checkbox-uuid" name="check" />';
+		html += '			<label for="checkbox-uuid"></label>';
+		html += '		</div>';
+		html += '		';
+		html += '	</td>';
+		html += '</tr>';
+		return html;
 	},
 
 	getSelected : function () {
@@ -576,9 +598,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			// add to project locally (already added on server)
 			this.project.setFile(file);
 
+			// set icon if image
+			var icon = (file.data && file.data.image) ? this._getImagePath(file.uuid, 100, 100) : null;
+
 			app.feedback.setSuccess({
-				title : 'Upload success',
-				description : 'Added ' + file.name + ' to the Data Library.'
+				title : 'Upload success!',
+				description : 'Added <strong>' + file.name + '</strong> to the Data Library.',
+				icon : icon
 			});
 
 		}, this);
@@ -587,9 +613,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		result.layers && result.layers.forEach(function (layer, i) {
 			this.project.addLayer(layer);
 
-			app.feedback.setMessage({
-				title : 'Layer recognized',
-				description : layer.title + ' was added to the Data Library.'
+			// todo: set layer icon
+
+			app.feedback.setAction({
+				title : 'Layer created',
+				description : 'Added <strong>' + layer.title + '</strong> to available layers.'
 			});
 
 
@@ -606,6 +634,26 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.reset();
 		this.refreshTable();
 
+	},
+
+	_getImagePath : function (fileUuid, width, height, backgroundImage) {
+		var path = app.options.servers.portal;
+		path += 'pixels/';
+		path += fileUuid;
+		var raw = path;
+		path += '?width=' + width || 100;
+		path += '&height=' + height || 100;
+
+		// set url
+		if (backgroundImage) {
+			var url = 'url("';
+			url += path;
+			url += '")';
+		} else {
+			var url = path;
+		}
+
+		return url;
 	},
 
 	addFile : function (file) {

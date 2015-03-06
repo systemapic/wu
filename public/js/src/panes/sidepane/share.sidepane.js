@@ -84,17 +84,20 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 	createImage : function () {
 
-		var that = this;	// callback
-
 		app.setHash(function (ctx, hash) {
 
 			// create image container
-			that._createImageView();
+			this._createImageView();
 
+			console.log('mmm');
 			// get snapshot from server
-			Wu.post('/api/util/snapshot', hash, that.createdImage, that);
+			Wu.send('/api/util/snapshot', hash, function (a, b) {
+				console.log('cb!!');
+				this.createdImage(a, b);
+			}.bind(this), this);
+			console.log('mmm');
 
-		});
+		}.bind(this));
 
 		// set progress bar for a 5sec run
 		app.ProgressBar.timedProgress(2000);
@@ -106,15 +109,15 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		
 	},
 
-	createdImage : function (context, file) {
+	createdImage : function (context, file, c) {
 
 		// parse results
-		var result = JSON.parse(file);
+		var result = Wu.parse(file);
 		var image = result.image;
 
 		// get dimensions of container
-		var height = context._imageContainer.offsetHeight;
-		var width = context._imageContainer.offsetWidth;
+		var height = this._imageContainer.offsetHeight;
+		var width = this._imageContainer.offsetWidth;
 
 		// set path
 		var path = app.options.servers.portal;
@@ -130,16 +133,16 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		url += '")';
 
 		// set image
-		context._imageContainer.style.backgroundImage = url;
+		this._imageContainer.style.backgroundImage = url;
 
 		
 		// set download link
 		raw += '?raw=true'; // add raw to path
-		context._downloadButton.href = raw;
+		this._downloadButton.href = raw;
 
 
 		// For GA
-		Wu.DomEvent.on(context._downloadButton, 'click', context.downloadButtonClick, context);		
+		Wu.DomEvent.on(this._downloadButton, 'click', this.downloadButtonClick, this);		
 
 
 	},

@@ -179,7 +179,7 @@ module.exports = api.file = {
 			}, 
 
 			// callback
-			function () { 
+			function (err) { 
 				if (err) console.log('ERR 14'.red, err);
 
 				if (!found) return api.error.general(req, res, 'File not found.');

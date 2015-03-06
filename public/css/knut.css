@@ -428,23 +428,49 @@ aka feedback pane
 
 
 .feedback-pane-content.error {
-	background-color: rgba(255, 0, 0, 0.81);
+	background-color: rgba(255, 43, 43, 0.81);
 }
 .feedback-pane-content.message {
-	background-color: rgba(77, 87, 102, 1);
+	background-color: rgba(77, 87, 102, 0.81);
 }
 .feedback-pane-content.success {
 	background-color: rgba(36, 198, 12, 0.81);
 }
+.feedback-pane-content.action {
+	background-color: rgba(0, 94, 193, 0.81);
+}
+
+.feedback-pane-icon {
+	max-width: 100px;
+	max-height: 100px;
+	top: 0;
+	left: 0;
+	position: relative;
+	float: left;
+	margin: 5px;
+	border-radius: 3px;
+	border: 0;
+	float: left;
+}
+.feedback-pane-icon-img {
+	border-radius: 3px;
+}
 
 
 
 
 
+.download-dialog-link {
+	height: 100%;
+  	width: 100%;
+  	position: absolute;
+  	left: 0;
+  	top: 0;
+}
 
-
-
-
+.smap-button-gray  {
+	margin-left: 5px;
+}
 
 
 

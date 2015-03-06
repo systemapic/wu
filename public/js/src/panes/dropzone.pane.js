@@ -169,6 +169,22 @@ Wu.Dropzone = Wu.Class.extend({
 		this.addDropzoneEvents();	
 	},
 
+	_showMetaFeedback : function (file) {
+
+		var name = 'Name: <strong>' + file.name + '</strong>';
+		var size = 'Size: <strong>' + Wu.Util.bytesToSize(file.size) + '</strong>';
+		var ext = 'Filetype: <strong>' + file.type.split('/')[1] + '</strong>';
+		var icon = null;
+		var string = name + '<br>' + size + ' | ' + ext;
+
+		app.feedback.setMessage({
+			title : 'Uploading file',
+			description : string,
+			icon : icon
+		});
+
+	},
+
 	refresh : function () {
 		var that = this;
 
@@ -194,13 +210,15 @@ Wu.Dropzone = Wu.Class.extend({
 		this.dz.on('addedfile', function (file) { 
 
 			// show meta screen
-			that.showMeta();
+			// that.showMeta();
+
+			that._showMetaFeedback(file);
 
 			// show progressbar
 			that.progress.setProgress(0);
 
 			// show meta
-			that.addMeta(file);
+			// that.addMeta(file);
 
 			// set status
 			app.setStatus('Uploading');

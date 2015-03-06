@@ -33,6 +33,10 @@ Wu.FeedbackPane = Wu.Class.extend({
 		this.add(options, 3); 	// error message
 	},
 
+	setAction : function (options) {
+		this.add(options, 4); 	// action message
+	},
+
 	add : function (message, severity) {
 
 		var id = Wu.Util.createRandom(5);
@@ -42,8 +46,6 @@ Wu.FeedbackPane = Wu.Class.extend({
 			id : id,
 			severity : severity || 3 // error default
 		}
-
-
 
 		// create and save in stack
 		this._messages[id] = new Wu.FeedbackPane.Message(Wu.extend(options, message));
@@ -72,7 +74,8 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 		severityStyle : {
 			1 : 'message',
 			2 : 'success',
-			3 : 'error'
+			3 : 'error',
+			4 : 'action'
 		}
 	},
 
@@ -97,9 +100,10 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 		this._content = Wu.DomUtil.create('div', 'feedback-pane-content', this.options.container);
 
 		this._title = Wu.DomUtil.create('div', 'feedback-pane-title', this._content);
-		this._description = Wu.DomUtil.create('div', 'feedback-pane-description', this._content);
 		this._icon = Wu.DomUtil.create('div', 'feedback-pane-icon', this._content);
-
+		this._iconImg = Wu.DomUtil.create('img', 'feedback-pane-icon-img', this._icon);
+		this._description = Wu.DomUtil.create('div', 'feedback-pane-description', this._content);
+		
 		// set transition
 		this._content.style.opacity = 0;
 		this._content.style.webkitTransition = 'opacity ' + this.options.transitionDelay + 's';
@@ -127,6 +131,7 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 		this.setTitle();
 		this.setDescription();
 		this.setSeverity();
+		this.setIcon();
 
 		// show
 		this.show();
@@ -144,11 +149,11 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 	},
 
 	_cancelTimer : function () {
-		if (this._clearTimer) clearTimeout(this._clearTimer);
+		if (this._clearTimer && !app.debug) clearTimeout(this._clearTimer);
 	},
 
 	clearTimer : function (delay) {
-		if (!this.options.clearTimer) return;
+		if (!this.options.clearTimer || app.debug) return;
 		this._clearTimer = setTimeout(this.clear.bind(this), delay || this.options.clearDelay);
 	},
 
@@ -162,6 +167,11 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 
 	setDescription : function () {
 		this._description.innerHTML = this.options.description;
+	},
+
+	setIcon : function () {
+		if (!this.options.icon) return;
+		this._iconImg.setAttribute('src', this.options.icon);
 	},
 
 	setSeverity : function (s) {
