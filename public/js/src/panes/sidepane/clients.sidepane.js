@@ -104,6 +104,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	newClient : function () {
 
+		console.log('newClient!', this._creatingNewClient);
+
 		if ( this._creatingNewClient ) return;
 
 		// Set creating new client state to true to prevent doubling
@@ -295,7 +297,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		sidepaneClients._clientsContainer.appendChild(sidepaneClients._newClientButton);
 
 		// Set creating new client to false
-		this._creatingNewClient = false;
+		sidepaneClients._creatingNewClient = false;
 	},
 
 	toggleEdit : function (e) { // this = client

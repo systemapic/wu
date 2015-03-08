@@ -85,10 +85,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	hookThumb : function () {
-
 		// This project ID
 		this.project._sidePaneLogoContainer = this.logo;
-
 	},
 
 	expandUsers : function () {
@@ -114,7 +112,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.usersInner.innerHTML       = '<div class="project-users-header">Project users:</div>' + this.project.getUsersHTML();
 	},
 
-
 	addHooks : function () {
 
 		// select, stop
@@ -127,7 +124,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// Toggle project info box
 		Wu.DomEvent.on(this.users, 'mousedown', this.toggleProjectInfo, this);
 		Wu.DomEvent.on(this.users, 'click mousedown', Wu.DomEvent.stopPropagation, this);
-		
 	},
 
 
@@ -226,7 +222,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		}
 	},
 
-
 	makeNewThumbnail : function () {
 
 		// Set state to manually updated to prevet overriding
@@ -271,7 +266,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// set image frame without editable clas
 		Wu.DomUtil.removeClass(this.logo, 'editable');
 	},
-
 
 	editedLogo : function (path) {
 
@@ -337,7 +331,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// remove startpane if active
 		app.StartPane.deactivate();
-
 	},
 
 	// add class to mark project active in sidepane
@@ -385,7 +378,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// Google Analytics event trackign
 		app.Analytics.ga(['Side Pane', 'Clients: edit project title']);
-
 	},
 
 	_editNameBlur : function (e) {
@@ -413,7 +405,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		app.HeaderPane.setTitle(value);
 
 		this.editing = false;
-
 	},
 
 	editDescription : function (e) {
@@ -464,7 +455,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// mark done
 		this.editing = false;
-
 	},
 
 	_editKey : function (e) {
@@ -512,13 +502,10 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.post('/api/project/unique', json, callback, this);
 	},
 
-
 	deleteProject : function (e) {
 
 		// prevent project select
 		Wu.DomEvent.stop(e);
-
-		// todo: add extra access checks? no better security really... 
 
 		var answer = confirm('Are you sure you want to delete project ' + this.project.store.name + '?');
 		if (!answer) return;
@@ -551,21 +538,12 @@ Wu.SidePane.Project = Wu.Class.extend({
 			// unload
 			this.project.unload();
 		
-			// activate startpane
-			// running a little timer on this, otherwise it's not deleted properly and thumb will still show on startpane...
-			setTimeout(function() {
-				app.StartPane.activate();
-			}, 200)
-			
-			// close statuspane
-			app.StatusPane.close();
 		}
 
 		// delete
 		this.project._delete();
 		delete this;
 	}
-
 
 
 });

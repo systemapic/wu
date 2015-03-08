@@ -543,6 +543,8 @@ Wu.App = Wu.Class.extend({
 	   	// return if no project
 	   	if (!projectUuid) return false;
 
+	   	this._phantomHash = hash;
+
 		// get project
 		var project = app.Projects[projectUuid];
 		
@@ -585,11 +587,19 @@ Wu.App = Wu.Class.extend({
 
 		console.log(this._loaded.length, this._loading.length);
 
+
+		var hashLayers = _.size(this._phantomHash.layers);
+		var baseLayers = _.size(app.activeProject.getBaselayers());
+
+		var numLayers = hashLayers + baseLayers;
+
+		if (numLayers == 0) return true;
+
+		if (this._loaded.length == 0 ) return false; 
+
 		// if all layers loaded
 		if (this._loaded.length == this._loading.length) return true;
 		
-
-
 		// not yet
 		return false;
 
@@ -600,19 +610,6 @@ Wu.App = Wu.Class.extend({
 	_loaded : [],
 
 	_loading : [],
-
-	// // phantomjs: load layermenu layers
-	// _loadLayers : function (layermenuItems) {
-
-	// },
-
-	// // phantomjs: check if all layers are loaded
-	// _allLoaded : function () {
-
-	// },
-
-	
-
 
 	// debug mode
 	_debug : function (debug) {
