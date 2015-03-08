@@ -179,6 +179,8 @@ module.exports = api.pixels = {
 			id : req.body.hash.id
 		}
 
+
+
 		var args = {
 			projectUuid : projectUuid,
 			hash : hash,
@@ -191,6 +193,8 @@ module.exports = api.pixels = {
 
 		var snappath = api.config.path.tools + 'phantomJS-snapshot.js';
 		var cmd = "phantomjs --ssl-protocol=tlsv1 " + snappath + " '" + JSON.stringify(args) + "'";
+
+		console.log('command:'.yellow, cmd);
 
 		var ops = [];
 		var dataSize;
@@ -240,7 +244,7 @@ module.exports = api.pixels = {
 			var options = {
 				height : dimensions.height,
 				width : dimensions.width,
-				quality : 80,
+				quality : 90,
 				file : path
 
 			}
@@ -699,7 +703,7 @@ module.exports = api.pixels = {
 		// basic options
 		var width   	= parseInt(option.width) || null;
 		var height  	= parseInt(option.height) || null;
-		var quality 	= parseInt(option.quality) || 60;			// default quality 60
+		var quality 	= parseInt(option.quality) || 90;			// default quality 60
 
 		// crop options
 		option.crop = option.crop || {};

@@ -2,7 +2,6 @@
 Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	_ : 'sidepane.users', 
 
-
 	type : 'users',
 	title : 'Users',
 
@@ -215,9 +214,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	},
 
-
-
-
 	// list.js plugin
 	initList : function () { 
 
@@ -275,7 +271,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this.list.clear();
 	},
 
-
 	updateContent : function () {
 		this.update();
 	},
@@ -292,8 +287,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this.addEditHooks();
 
 	},
-
-
 	
 	// input fullscreen for new user details
 	inputUser : function () {
@@ -366,7 +359,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		}
 	},
 
-
 	checkSameEmail : function (e) {
 		var email1 = this._inputUser._email;
 		var email2 = this._inputUser._email2;
@@ -435,7 +427,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	},
 
-
 	// send new user request to server
 	createUser : function (data) {
 		if (!data) return;
@@ -451,15 +442,15 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	// reply from server
 	createdUser : function (context, json) {
 
-		console.log('createdUser: ', context, json);
-
 		var store = JSON.parse(json);
 		if (store.error) return console.error(store.error);
 
 		var user = new Wu.User(store);
 		user.attachToApp();
-		context.addTableItem(user); 	// todo: add user to top
 
+		// update table
+		context.reset();
+		context.refreshTable();
 
 		// GA – New User ID
 		ga('set', 'dimension10', store.uuid);
@@ -467,20 +458,15 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// GA – New User Name
 		var newUserName = user.getFullName();
 		ga('set', 'dimension11', newUserName);
-		
-
-
 
 	},
-
-
 
 	deleteUser : function () {		
 
 		var checked = this.getSelected();
 
 		// prevent seppuku
-		var authUser = Wu.app.Account.store.uuid;
+		var authUser = app.Account.getUuid();
 		var seppuku = false;
 		checked.forEach(function (check) {
 			if (check.uuid == authUser) seppuku = true;
@@ -489,7 +475,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		
 
 		// delete each selected user
-		checked.forEach(function (user){
+		_.each(checked, function (user) {
 			// confirm delete
 			var name = user.getFirstName() + ' ' + user.getLastName();
 			if (confirm('Are you sure you want to delete user ' + name + '?')) {
@@ -521,7 +507,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		context.reset();
 		context.refreshTable();
 	},
-
 	
 	checkAll : function () {
 		// console.log('checkAll');
@@ -529,14 +514,20 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	getSelected : function () {
 
+		console.log('getSelected:', this.users);
+
 		// get selected files
 		var checks = [];
-		for (u in this.users) {
-			var user = this.users[u];
-			var checkbox = Wu.DomUtil.get('users-checkbox-' + user.store.uuid);
+		// for (u in this.users) {
+		_.each(this.users, function (user) {
+			console.log('user: ', user);
+			var checkbox = Wu.DomUtil.get('users-checkbox-' + user.getUuid());
 			if (checkbox) var checked = checkbox.checked; 
 			if (checked) checks.push(user); 
-		};
+		});
+
+		console.log('cheks:', checks);
+			
 		return checks;
 	},
 
@@ -560,13 +551,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// sort list by name by default
 		this.list.sort('name', {order : 'asc'});
 	},
-
 	
 	reset : function () {
 		// clear table
 		this.list.clear();
 	},
-
 
 	// add user entry to table
 	addTableItem : function (user) {
@@ -634,7 +623,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		return divProjectsOpen + numProjects + projectsText + divProjectsClose;
 	},
 
-
 	setEditHooks : function (uuid, onoff) {
 		var onoff = onoff || 'on';
 
@@ -664,7 +652,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 			[onoff]( access,         'click',                    function () { this.editAccess(uuid); }, this )     
 	},
 
-
 	// on click on # of projects box
 	editAccess : function (uuid) {
 		var user = app.Users[uuid];
@@ -684,26 +671,21 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		app.Analytics.ga(['Side Pane', 'Users: Edit access', user.getName() + ' (' + user.getUuid() + ' )']);
 	},
 
-
 	_hide : function () {
 		Wu.DomUtil.addClass(this._container, 'displayNone');
 		Wu.DomUtil.addClass(this._content, 'hide-top');	
 	},
 
-	
 	_show : function () {
 		Wu.DomUtil.removeClass(this._content, 'hide-top');	
 		Wu.DomUtil.removeClass(this._container, 'displayNone');	
 	},
-
-	
 
 	// to prevent selected text
 	stop : function (e) {
 		e.preventDefault();
 		e.stopPropagation();
 	},
-
 
 	rename : function (e) {
 
@@ -724,12 +706,10 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		app.Analytics.ga(['Side Pane', 'Users: Edit ' + e.target.fieldKey]);
 	},
 
-
 	editKey : function (e) {
 		// blur on enter
 		if (event.which == 13 || event.keyCode == 13) e.target.blur();
 	},
-
 
 	editBlur : function (e) {
 
@@ -748,7 +728,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// save to server
 		this.save(key, value, userUuid);
 	},
-
 
 	// rename a div, ie. inject <input>
 	_rename : function (e) {
@@ -801,7 +780,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		if (event.which == 13 || event.keyCode == 13) e.target.blur();
 	},
 
-
 	// Like _editBlur below, but if we go from editing one field to another one, the first one doesn't snap out of editing mode
 	// this function will take care of that.
 	_forceStopBlur : function (el) {
@@ -822,8 +800,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// save to server
 		this.save(key, value, user);		
-
-
 	},
 
 	_editBlur : function (e) {
@@ -845,13 +821,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// save to server
 		this.save(key, value, user);
-
 	},
 
 	save : function (key, value, userUuid) {
 		var user = app.Users[userUuid];
 		user.setKey(key, value);
 	},
-
 
 });

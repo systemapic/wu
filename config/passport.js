@@ -16,6 +16,8 @@ var crypto = require('crypto');
 var redis = require('redis');
 var config = require('../config/config');
 
+// api
+var api = require('../api/api');
 
 var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host)
 r.auth(config.tokenRedis.auth);
@@ -88,6 +90,8 @@ module.exports = function(passport) {
 				});
 
 
+
+
 			});    
 
 		});
@@ -126,8 +130,10 @@ module.exports = function(passport) {
 			// set token, save to user
 			user.token = setRedisToken(user);
 			user.save(function (err) {
-
 				if (err) console.error(err);
+
+				// slack
+				api.slack.loggedIn({user : user});
 
 				// all is well, return successful user
 				return done(null, user);

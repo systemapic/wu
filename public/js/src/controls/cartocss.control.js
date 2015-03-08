@@ -323,9 +323,10 @@ L.Control.CartoCSS = L.Control.extend({
 	},
 
 	_selectLayer : function (layer) {
+		if (!layer) return;
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'CartoCSS select layer: ' + layer.getTitle()]);
+		if (layer) app.Analytics.ga(['Controls', 'CartoCSS select layer: ' + layer.getTitle()]);
 
 		// close dropdown
 		this.closeLayerDropDown();
@@ -340,7 +341,6 @@ L.Control.CartoCSS = L.Control.extend({
 		
 		// Google Analytics event tracking
 		if (layer) app.Analytics.ga(['Controls', 'CartoCSS select layer: ' + layer.getTitle()]);
-
 	},
 
 	
@@ -362,7 +362,6 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Controls', 'CartoCSS toggle legends']);
-
 	},
 	
 
@@ -406,7 +405,6 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Controls', 'CartoCSS toggle tooltip']);		
-
 	},
 
 	initStyling : function (layer) {
@@ -432,9 +430,7 @@ L.Control.CartoCSS = L.Control.extend({
 			this.updateCodeMirror(css);
 
 		}.bind(this));
-
 	},
-
 	
 	initLegends : function () {
 		
@@ -470,10 +466,7 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// fill with default meta
 		return this._initTooltipDefaultMeta();
-		
 	},
-
-
 
 	// fill legends tab with legends
 	fillLegends : function (legends) {
@@ -536,7 +529,6 @@ L.Control.CartoCSS = L.Control.extend({
 		this._legendSelectAllSwitch = fieldSwitchInput;
 
 		Wu.DomEvent.on(fieldSwitchInput, 'change', this._toggleAllLegend, this);		
-
 	},
 
 	_toggleAllLegend : function () {
@@ -559,7 +551,6 @@ L.Control.CartoCSS = L.Control.extend({
 		}, this);		
 		
 	},
-
 
 	_legendEntry : function (legend) {
 
@@ -651,7 +642,6 @@ L.Control.CartoCSS = L.Control.extend({
 		return fieldSwitch;
 	},
 
-
 	_initLegendsDefaultMeta : function () {
 
 		// clear
@@ -660,7 +650,6 @@ L.Control.CartoCSS = L.Control.extend({
 		// add help text
 		Wu.DomUtil.create('div', 'legends-default-box', this._legendsWrapper, 'No legends yet. Style the geo and magic will happen!');
 	},
-
 
 	_updateLegends : function (cartoid) { // refactor: move to layers.js
 
@@ -973,10 +962,10 @@ L.Control.CartoCSS = L.Control.extend({
 		// get all active, geojson layers
 		this._layers = this.project.getStylableLayers();
 
-		if ( !this._layers || this._layers.length == 0 ) {
-			console.log('No layers to edit ~ don\'t open container');
-			return;
-		}
+		// if ( !this._layers || this._layers.length == 0 ) {
+		// 	console.log('No layers to edit ~ don\'t open container');
+		// 	return;
+		// }
 
 
 		// Set button to open
