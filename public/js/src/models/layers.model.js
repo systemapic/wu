@@ -18,19 +18,57 @@ Wu.Layer = Wu.Class.extend({
 
 		// create leaflet layers
 		this.initLayer();
+		// console.log('init layer: ', this.getTitle());
 
-		// all visible tiles loaded event (for phantomJS)
-		Wu.DomEvent.on(this.layer, 'load', function () {
-			app._loaded.push(this.getUuid());
-			app._loaded = _.uniq(app._loaded);
-		}, this);
-		Wu.DomEvent.on(this.layer, 'loading', function () {
-			app._loading.push(this.getUuid());
-			app._loading = _.uniq(app._loading);
-		}, this);
+		this.addHooks();
 
 		// get zIndex control
 		this._zx = app.MapPane.getZIndexControls();
+	},
+
+	addHooks : function () {
+		this._setHooks('on');
+	},
+
+	removeHooks : function  () {
+		this._setHooks('off');
+		this._removeGridEvents();
+	},
+
+	_setHooks : function (on) {
+
+		// all visible tiles loaded event (for phantomJS)
+		Wu.DomEvent[on](this.layer, 'load', this._onLayerLoaded, this);
+		Wu.DomEvent[on](this.layer, 'loading', this._onLayerLoading, this);
+
+		Wu.Mixin.Events[on]('projectSelected', this._unload, this);
+
+	},
+
+	
+	_unload : function (e) {
+		// console.log('layer unload: ', this.getTitle(), e);
+		
+		// delete lal
+		this.removeHooks();
+		// this.layer = null;
+		// delete this.layer;
+		// _.each(this, function (t) {
+			// this[t] = null;
+			// delete this[t];
+		// }, this);
+		// delete this;
+		// console.log(this);
+	},
+
+	_onLayerLoaded : function () {
+		app._loaded.push(this.getUuid());
+		app._loaded = _.uniq(app._loaded);
+	},
+
+	_onLayerLoading : function () {
+		app._loading.push(this.getUuid());
+		app._loading = _.uniq(app._loading);
 	},
 
 	initLayer : function () {
@@ -358,52 +396,62 @@ Wu.Layer = Wu.Class.extend({
 	
 
 	_addGridEvents : function () {
+		this._setGridEvents('on');
+	},
+
+	_setGridEvents : function (on) {
 		var grid = this.gridLayer;
-		if (!grid) return;
+		if (!grid || !on) return;
+		grid[on]('mousedown', this._gridOnMousedown, this);
+		grid[on]('mouseup', this._gridOnMouseup, this);
+		grid[on]('click', this._gridOnClick, this);
+	},
 
-		
-		// add click event
-		grid.on('mousedown', function(e) {
-			if (!e.data) return;
+	_removeGridEvents : function () {
+		this._setGridEvents('off');
+	},
 
-			// pass layer
-			e.layer = this;
+	_gridOnMousedown : function(e) {
+		if (!e.data) return;
 
-			// add to pending
-			app.MapPane._addPopupContent(e);
+		// pass layer
+		e.layer = this;
 
-			var event = e.e.originalEvent;
-			this._event = {
-				x : event.x,
-				y : event.y
-			}
+		// add to pending
+		app.MapPane._addPopupContent(e);
 
-		}, this);
+		var event = e.e.originalEvent;
+		this._event = {
+			x : event.x,
+			y : event.y
+		}
 
-		grid.on('mouseup', function (e) {
-			if (!e.data) return;
+	},
 
-			// pass layer
-			e.layer = this;
+	_gridOnMouseup : function (e) {
+		if (!e.data) return;
 
-			var event = e.e.originalEvent;
+		// pass layer
+		e.layer = this;
 
-			if (this._event === undefined || this._event.x == event.x) {
-				// open popup 
-				app.MapPane.openPopup(e);
-			} else {
-				// clear old
-				app.MapPane._clearPopup();
-			}
+		var event = e.e.originalEvent;
 
-		}, this);
-
-		grid.on('click', function (e) {
+		if (this._event === undefined || this._event.x == event.x) {
+			// open popup 
+			app.MapPane.openPopup(e);
+		} else {
 			// clear old
 			app.MapPane._clearPopup();
+		}
 
-		}, this);
 	},
+
+	_gridOnClick : function (e) {
+		// clear old
+		app.MapPane._clearPopup();
+
+	},
+
 });
 
 
@@ -455,6 +503,10 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			cartoid : cartoid,
 			subdomains : subdomains,
 			maxRequests : 0,
+			// reuseTiles : true,
+			// unloadInvisibleTiles : false,
+			// updateWhenIdle : true,
+			
 		});
 	},
 
@@ -617,7 +669,11 @@ Wu.MapboxLayer = Wu.Layer.extend({
 
 		// create Leaflet.mapbox tileLayer
 		this.layer = L.mapbox.tileLayer(this.store.data.mapbox, {
-			accessToken : this.store.accessToken
+			accessToken : this.store.accessToken,
+			reuseTiles : true,
+			// tileSize : 512,
+			// unloadInvisibleTiles : true,
+			// updateWhenIdle : true,
 		});
 
 		// create gridLayer if available

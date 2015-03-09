@@ -58,13 +58,12 @@ Wu.Project = Wu.Class.extend({
 	addLayers : function (layers) { // array of layers
 		layers.forEach(function (layer) {
 			this.addLayer(layer);
-
 		}, this);
 	},
 
 	addLayer : function (layer) {
 		// creates a Wu.Layer object (could be Wu.MapboxLayer, Wu.RasterLayer, etc.)
-		this.store.layers.push(layer); /// TODO: WEIRD to add to array here, it's run in line 41?????
+		// this.store.layers.push(layer); /// TODO: WEIRD to add to array here, it's run in line 41?????
 		this.layers[layer.uuid] = new Wu.createLayer(layer);
 
 		return this.layers[layer.uuid];
@@ -167,8 +166,6 @@ Wu.Project = Wu.Class.extend({
 		// refresh sidepane
 		this.refreshSidepane();
 
-
-
 		// set active project in sidepane
 		if (this._menuItem) this._menuItem._markActive();
 
@@ -197,7 +194,19 @@ Wu.Project = Wu.Class.extend({
 		if (Wu.Util.isObject(Wu.app.MapPane)) Wu.app.MapPane.setProject(this);
 	},
 
+
+	_reset : function () {
+		// this.removeHooks();
+
+
+
+	},
+
+
 	_refresh : function () {
+
+		// flush
+		this._reset();
 
 		// set editMode
 		this.setEditMode();
@@ -226,6 +235,10 @@ Wu.Project = Wu.Class.extend({
 
 	select : function () {
 
+		console.log('tooltip size', _.size(this.tips));
+
+		Wu.Mixin.Events.fire('projectSelected', {detail : this});
+
 		// hide headerpane
  		if (app._headerPane) Wu.DomUtil.removeClass(app._headerPane, 'displayNone');
 
@@ -237,6 +250,7 @@ Wu.Project = Wu.Class.extend({
 
 		// refresh project
 		this.refresh();
+
 	},
 
 	_setUrl : function () {
@@ -342,8 +356,8 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	unload : function () {
-		Wu.app.MapPane.reset();
-		Wu.app.HeaderPane.reset();
+		app.MapPane.reset();
+		app.HeaderPane.reset();
 		this.selected = false;
 	},
 
@@ -365,26 +379,29 @@ Wu.Project = Wu.Class.extend({
 		// set address bar
 		var client = project.getClient().getSlug();
 		var url = app.options.servers.portal + client + '/';
+		var deletedProjectName = project.getName();
+
+		// set url
 		Wu.Util.setAddressBar(url)
 
 		// delete object
-		delete Wu.app.Projects[project.getUuid()];
+		app.Projects[project.getUuid()] = null;
+		delete app.Projects[project.getUuid()];
 
 		// set no active project if was active
 		if (app.activeProject == this) {
 			app.SidePane.refresh(['Projects', 'Users', 'Account']);
 			app.activeProject = null;
+			delete app.activeProject;
 		}
 
-		// Remove from app.Projects array
-		var deleteID = project.store.uuid;
-		delete app.Projects[deleteID];	
+		project = null;
+		delete project;
 
 		// set status
 		app.setStatus('Deleted!');
 
 		// Save new project name to GA
-		var deletedProjectName = project.getName();
 		ga('set', 'dimension9', deletedProjectName);
 
 	},

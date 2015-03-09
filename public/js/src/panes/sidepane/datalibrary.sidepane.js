@@ -119,58 +119,106 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 
-	// hooks added automatically on page load
-	addHooks : function () {
-	       
+	_setHooks : function (on) {
+
 		// delete button
 		if (app.access.to.delete_project(this.project)) {
-			Wu.DomEvent.on(this._deleter, 'mousedown', this.deleteConfirm, this);
-			Wu.DomUtil.removeClass(this._deleter, 'displayNone');
-		}
-
-		// upload button 
-		if (app.access.to.upload_file(this.project)) {
-			Wu.DomUtil.removeClass(this._uploader, 'displayNone');
-			app.Dropzone.enable();
+			Wu.DomEvent[on](this._deleter, 'mousedown', this.deleteConfirm, this);
 		}
 
 		// download 
 		if (app.access.to.download_file(this.project)) {
 			// download button
-			Wu.DomEvent.on(this._downloader, 'mousedown', this.downloadFiles, this);
-			Wu.DomUtil.removeClass(this._downloader, 'displayNone');
+			Wu.DomEvent[on](this._downloader, 'mousedown', this.downloadFiles, this);
 		}
 
 		// check all button
-		Wu.DomEvent.on(this._checkallLabel, 'mousedown', this.checkAll, this);
+		Wu.DomEvent[on](this._checkallLabel, 'mousedown', this.checkAll, this);
 
 		// search button
-		Wu.DomEvent.on(this._search, 'keyup', this.searchList, this);
+		Wu.DomEvent[on](this._search, 'keyup', this.searchList, this);
+
+		// 
+		console.log('set project un load');
+		Wu.Mixin.Events[on]('projectSelected', this._onProjectSelected, this);
 	},
 
+	_onProjectSelected : function (e) {
+		this._unload(e);
+	},
+
+	_unload : function (e) {
+		var project = e.details;
+
+		this.removeHooks();
+		console.log('_unload datalib');
+
+		this._reset();
+	},
+
+	_reset : function () {
+		// this._resetList();
+	},
 
 	// hooks added automatically on page load
-	removeHooks : function () {
-	       
-		// delete button
-		Wu.DomEvent.off(this._deleter, 'mousedown', this.deleteConfirm, this);
-		Wu.DomUtil.addClass(this._deleter, 'displayNone');
+	addHooks : function () {
+		
+		this._setHooks('on');
 
-		// upload button 
-		Wu.DomUtil.addClass(this._uploader, 'displayNone');
-		app.Dropzone.disable();
+		if (app.access.to.delete_project(this.project)) {
+			Wu.DomUtil.removeClass(this._deleter, 'displayNone');
+		};
 
-		// download 
-		Wu.DomEvent.off(this._downloader, 'mousedown', this.downloadFiles, this);
-		Wu.DomUtil.addClass(this._downloader, 'displayNone');
+		if (app.access.to.upload_file(this.project)) {
+			Wu.DomUtil.removeClass(this._uploader, 'displayNone');
+			app.Dropzone.enable();
+		}
 
-		// check all button
-		Wu.DomEvent.off(this._checkallLabel, 'mousedown', this.checkAll, this);
-
-		// search button
-		Wu.DomEvent.off(this._search, 'keyup', this.searchList, this);
-	       
+		if (app.access.to.download_file(this.project)) {
+			Wu.DomUtil.removeClass(this._downloader, 'displayNone');
+		}
 	},
+
+	removeHooks : function () {
+		
+		this._setHooks('off');
+		
+		if (app.access.to.delete_project(this.project)) {
+			Wu.DomUtil.addClass(this._deleter, 'displayNone');
+		};
+
+		if (app.access.to.upload_file(this.project)) {
+			Wu.DomUtil.addClass(this._uploader, 'displayNone');
+			app.Dropzone.disable();
+		}
+
+		if (app.access.to.download_file(this.project)) {
+			Wu.DomUtil.addClass(this._downloader, 'displayNone');
+		}
+	},
+
+	// // hooks added automatically on page load
+	// removeHooks : function () {
+	       
+	// 	// delete button
+	// 	Wu.DomEvent.off(this._deleter, 'mousedown', this.deleteConfirm, this);
+	// 	Wu.DomUtil.addClass(this._deleter, 'displayNone');
+
+	// 	// upload button 
+	// 	Wu.DomUtil.addClass(this._uploader, 'displayNone');
+	// 	app.Dropzone.disable();
+
+	// 	// download 
+	// 	Wu.DomEvent.off(this._downloader, 'mousedown', this.downloadFiles, this);
+	// 	Wu.DomUtil.addClass(this._downloader, 'displayNone');
+
+	// 	// check all button
+	// 	Wu.DomEvent.off(this._checkallLabel, 'mousedown', this.checkAll, this);
+
+	// 	// search button
+	// 	Wu.DomEvent.off(this._search, 'keyup', this.searchList, this);
+	       
+	// },
 
 
 	searchList : function (e) {
@@ -512,6 +560,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	// list.js plugin
 	initList : function () { 
+
+		// console.error('init list!');
 		
 		// add dummy entry
 		var _tr = Wu.DomUtil.createId('tr', 'dummy-table-entry', this._table);
@@ -537,6 +587,14 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var _td9 = Wu.DomUtil.create('td', 'tdcont uuid', _tr);
 		Wu.DomUtil.addClass(_td9, 'displayNone');
 		
+
+		this._resetList();
+	},
+
+	_resetList : function () {
+
+		this.list = null;
+		delete this.list;
 
 		// init list.js
 		var options = { valueNames : ['name', 'file', 'category', 'keywords', 'date', 'status', 'type'] };
@@ -656,9 +714,19 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		return url;
 	},
 
+	_removeFile : function (file) {
+		this._domFiles[file.uuid] = null;
+		delete this._domFiles[file.uuid];
+	},
+
 	addFile : function (file) {
 
+		this._domFiles = this._domFiles || {};
+
+		this._removeFile(file);
+
 		// clone file object
+		// console.log('fuie', file);
 		var tmp = Wu.extend({}, file.getStore()); 
 
 		var tmpData = {
@@ -693,7 +761,15 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// add hooks for editing file, if edit access
 		if (this.project.editMode) this._addFileEditHooks(tmp.uuid);
-	
+
+		// add
+		this._domFiles[file.uuid] = {
+			divs : tmp,
+			list : ret
+		};
+
+		tmp = null;
+		delete tmp;
 	},
 
 	_createFilePopup : function (files) {
@@ -711,6 +787,16 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_addFileEditHooks : function (uuid) {
+		// console.log('add file hooks', uuid);
+		this._setFileEditHooks('off', uuid);
+		this._setFileEditHooks('on', uuid);
+	},
+
+	_removeFileEditHooks : function (uuid) {
+		this._setFileEditHooks('off', uuid);
+	},
+
+	_setFileEditHooks : function (on, uuid) {
 
 		// get <input>'s
 		var title = Wu.DomUtil.get('name-' + uuid);
@@ -722,14 +808,14 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var keyw = tr.children[5];
 
 		// set click hooks on title and description
-		Wu.DomEvent.on( title,  'mousedown mouseup click', 	this.stop, 		this ); 
-		Wu.DomEvent.on( title,  'dblclick', 			this.rename, 		this );     // select folder
-		Wu.DomEvent.on( desc,   'mousedown mouseup click', 	this.stop, 		this ); 	
-		Wu.DomEvent.on( desc,   'dblclick', 			this.rename, 		this );     // select folder
-		Wu.DomEvent.on( cat,    'mousedown mouseup click', 	this.stop, 		this ); 	
-		Wu.DomEvent.on( cat,    'dblclick', 			this.injectCategory, 	this );     // select folder
-		Wu.DomEvent.on( keyw,   'mousedown mouseup click', 	this.stop, 		this ); 	
-		Wu.DomEvent.on( keyw,   'dblclick', 			this.injectKeywords, 	this );     // select folder
+		Wu.DomEvent[on](title,  'mousedown mouseup click', 	this.stop, 		this); 
+		Wu.DomEvent[on](title,  'dblclick', 			this.rename, 		this);     // select folder
+		Wu.DomEvent[on](desc,   'mousedown mouseup click', 	this.stop, 		this); 	
+		Wu.DomEvent[on](desc,   'dblclick', 			this.rename, 		this);     // select folder
+		Wu.DomEvent[on](cat,    'mousedown mouseup click', 	this.stop, 		this); 	
+		Wu.DomEvent[on](cat,    'dblclick', 			this.injectCategory, 	this);     // select folder
+		Wu.DomEvent[on](keyw,   'mousedown mouseup click', 	this.stop, 		this); 	
+		Wu.DomEvent[on](keyw,   'dblclick', 			this.injectKeywords, 	this);     // select folder
 
 	},
 
@@ -838,7 +924,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				this.removeCategory(c);
 			} 
 
-
 		}, this);
 
 	},
@@ -867,7 +952,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	closeCategories : function () {
 		if (this._injected) Wu.DomUtil.remove(this._injected);
-
 		Wu.DomEvent.off(window, 'mousedown', this._closeCategories, this);
 	},
 
@@ -882,7 +966,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			// iterate and find hit
 			// if (file.uuid == fuuid) file[key] = value;
 		}, this);
-
 	},
 
 	categoryKeydown : function (e) {
@@ -1077,7 +1160,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.addHooks();
 	},
 
+
 	refreshTable : function () {
+
+		// this._resetList();
 
 		// return if empty filelist
 		if (!this.project.files) { return; }
