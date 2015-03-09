@@ -29,6 +29,7 @@ Wu.Tooltip = Wu.Class.extend({
 	},
 
 	_isActive : function () {
+		return false;//
 		var project = app.activeProject;
 		if (!project) return false;
 		return project.getSettings().tooltips;
@@ -51,7 +52,7 @@ Wu.Tooltip = Wu.Class.extend({
 	},
 
 	on : function () { 				
-
+		return;
 		// console.error('tooltip on!'); // todo optimize: too many event registered?
 
 		// create tooltip

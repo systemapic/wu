@@ -994,6 +994,27 @@ Wu.setStyle = Wu.Util.setStyle;
 Wu.getStyle = Wu.Util.getStyle;
 Wu.verify = Wu.Util.verifyResponse;
 
+
+// Wu.CustomEvents = {
+
+// 	on : function (obj, type, fn, ctx) {
+// 		// var event = new CustomEvent('build', { 'detail': elem.dataset.time });
+// 		// document.addEventListener(type, fn, false);
+// 		Wu.DomEvent.on(obj, type, fn, ctx)
+// 	},
+
+// 	off : function (obj, type, fn, ctx) {
+// 		Wu.DomEvent.off(obj, type, fn, ctx)
+// 	},
+
+// 	fire : function (type, data) {
+// 		var event = new CustomEvent(type, data);
+// 		document.dispatchEvent(event);
+// 	},
+
+// };
+
+
 Wu.Evented = Wu.Class.extend({
 
 	on: function (types, fn, context) {
@@ -1217,7 +1238,12 @@ proto.addOneTimeEventListener = proto.once;
 proto.fireEvent = proto.fire;
 proto.hasEventListeners = proto.listens;
 
+
 Wu.Mixin = {Events: proto};
+
+Wu._on = proto.on;
+Wu._off = proto.off;
+Wu._fire = proto.fire;
 
 
 // DOM Utilities
@@ -1869,6 +1895,9 @@ Wu.DomEvent.addListener = Wu.DomEvent.on;
 Wu.DomEvent.removeListener = Wu.DomEvent.off;
 
 
+// Wu.on = Wu.Mixin.Events.on;
+// Wu.off = Wu.Mixin.Events.off;
+// Wu.fire = Wu.Mixin.Events.fire;
 
 Array.prototype.diff = function(a) {
     return this.filter(function(i) {return a.indexOf(i) < 0;});

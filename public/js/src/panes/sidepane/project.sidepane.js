@@ -112,19 +112,173 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.usersInner.innerHTML       = '<div class="project-users-header">Project users:</div>' + this.project.getUsersHTML();
 	},
 
-	addHooks : function () {
+	_setHooks : function (on) {
 
 		// select, stop
-		Wu.DomEvent.on(this._container, 'click',      this.select, this);
-		Wu.DomEvent.on(this._container, 'mousedown',  Wu.DomEvent.stopPropagation, this);	// to prevent closing of project pane
+		Wu.DomEvent[on](this._container, 'click',      this.select, this);
+		Wu.DomEvent[on](this._container, 'mousedown',  Wu.DomEvent.stopPropagation, this);	// to prevent closing of project pane
 	
-		// add edit hooks
-		if (this.project.editMode) this.addEditHooks();
-
 		// Toggle project info box
-		Wu.DomEvent.on(this.users, 'mousedown', this.toggleProjectInfo, this);
-		Wu.DomEvent.on(this.users, 'click mousedown', Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent[on](this.users, 'mousedown', this.toggleProjectInfo, this);
+		Wu.DomEvent[on](this.users, 'click mousedown', Wu.DomEvent.stopPropagation, this);
+
+		// edit hooks
+		// editing hooks
+		if (app.access.to.edit_project(this.project)) {
+			Wu.DomEvent[on](this.name, 	 'dblclick', this.edit, this);
+			Wu.DomEvent[on](this.description, 'dblclick', this.editDescription, this);
+			Wu.DomEvent[on](this.makeThumb, 'click', this.makeNewThumbnail, this );
+			Wu.DomEvent[on](this.makeThumb, 'mousedown click', Wu.DomEvent.stopPropagation, this );
+		}
+
+		// add dz to logo
+		if (app.access.to.upload_file(this.project)) this._setDZ(on);
+
+		// add kill hook
+		if (app.access.to.delete_project(this.project)) {
+			Wu.DomEvent[on](this.kill, 'click', this.deleteProject, this);
+			
+		}
+
 	},
+
+
+	addHooks : function () {
+		console.error('addhooks');
+		this._setHooks('on');
+	},
+
+	removeHooks : function () {
+		console.error('remhooks');
+
+		this._setHooks('off');
+
+		// // select, stop
+		// Wu.DomEvent.off(this._container, 'click', this.select, this);
+		// Wu.DomEvent.off( this._container, 'mousedown', Wu.DomEvent.stopPropagation, this);
+
+		// // remove edit hooks
+		// if (this.project.editMode) this.removeEditHooks();
+	},
+
+
+	_setDZ : function (on) {
+		if (on == 'on') {
+			this.addLogoDZ();
+		} else {
+			this.removeLogoDZ();
+		}
+	},
+
+
+	// edit hook for client logo
+	addLogoDZ : function () {
+
+		// create dz
+		this.logodz = new Dropzone(this.logo, {
+				url : '/api/project/uploadlogo',
+				createImageThumbnails : false,
+				autoDiscover : false
+		});
+		
+		// set client uuid param for server
+		this.logodz.options.params.projectUuid = this.project.getUuid();
+		this.logodz.options.params.project = this.project.getUuid();
+
+		// set callback on successful upload
+		this.logodz.on('success', this.editedLogo, this);
+
+		// set image frame with editable clas
+		Wu.DomUtil.addClass(this.logo, 'editable');
+
+	},
+
+	removeLogoDZ : function () {
+		// disable edit on logo
+		console.log('remLog DXZ');
+
+		if (this.logodz) this.logodz.disable();
+		this.logodz.off('success', this.editedLogo, this);
+		this.logodz = null;
+		delete this.logodz;
+
+		// set image frame without editable clas
+		Wu.DomUtil.removeClass(this.logo, 'editable');
+	},
+
+
+	// addHooks : function () {
+
+	// 	this.removeHooks();
+
+	// 	// select, stop
+	// 	Wu.DomEvent.on(this._container, 'click',      this.select, this);
+	// 	Wu.DomEvent.on(this._container, 'mousedown',  Wu.DomEvent.stopPropagation, this);	// to prevent closing of project pane
+	
+	// 	// add edit hooks
+	// 	// if (this.project.editMode) this.addEditHooks();
+
+	// 	// Toggle project info box
+	// 	Wu.DomEvent.on(this.users, 'mousedown', this.toggleProjectInfo, this);
+	// 	Wu.DomEvent.on(this.users, 'click mousedown', Wu.DomEvent.stopPropagation, this);
+
+	// },
+
+	// _setHooks : function () {
+	// 	// ..
+	// },
+
+	// removeHooks : function () {
+
+	// 	// select, stop
+	// 	// Wu.DomEvent.off(this._container, 'click', this.select, this);
+	// 	// Wu.DomEvent.off( this._container, 'mousedown', Wu.DomEvent.stopPropagation, this);
+
+	// 	// remove edit hooks
+	// 	// if (this.project.editMode) this.removeEditHooks();
+	// },
+
+	// addEditHooks : function () {
+
+	// 	if (!this.project.editMode) return;
+
+	// 	// cxxxxxx
+
+	// 	// editing hooks
+	// 	Wu.DomEvent.on(this.name, 	 'dblclick', this.edit, this);
+	// 	Wu.DomEvent.on(this.description, 'dblclick', this.editDescription, this);
+
+	// 	// add dz to logo
+	// 	this.addLogoDZ();
+
+	// 	// add kill hook
+	// 	// if (app.Account.canDeleteProject(this.project.getUuid())) {
+	// 	if (app.access.to.delete_project(this.project)) {
+	// 		Wu.DomEvent.on(this.kill, 'click', this.deleteProject, this);
+
+	// 		Wu.DomEvent.on( this.makeThumb, 'click', this.makeNewThumbnail, this );
+	// 		Wu.DomEvent.on( this.makeThumb, 'mousedown click', Wu.DomEvent.stopPropagation, this );
+	// 	}
+	// },
+
+	// removeEditHooks : function () {
+
+	// 	// editing hooks
+	// 	Wu.DomEvent.off(this.name, 	  'dblclick', this.edit, this);
+	// 	Wu.DomEvent.off(this.description, 'dblclick', this.editDescription, this);
+
+	// 	// remove dz
+	// 	this.removeLogoDZ();
+
+	// 	// remove kill hook
+	// 	// if (app.Account.canDeleteProject(this.project.getUuid())) {
+	// 	if (app.access.to.delete_project(this.project)) {
+	// 		Wu.DomEvent.off(this.kill, 'click', this.deleteProject, this);
+
+	// 		Wu.DomEvent.off( this.makeThumb, 'click', this.makeNewThumbnail, this );
+	// 		Wu.DomEvent.off( this.makeThumb, 'mousedown click', Wu.DomEvent.stopPropagation, this );
+	// 	}
+	// },
 
 
 	toggleProjectInfo : function () {
@@ -170,57 +324,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	},
 
-	removeHooks : function () {
 
-		// select, stop
-		Wu.DomEvent.off(this._container, 'click', this.select, this);
-		Wu.DomEvent.off( this._container, 'mousedown', Wu.DomEvent.stopPropagation, this);
-
-		// remove edit hooks
-		if (this.project.editMode) this.removeEditHooks();
-	},
-
-	addEditHooks : function () {
-
-		if (!this.project.editMode) return;
-
-		// cxxxxxx
-
-		// editing hooks
-		Wu.DomEvent.on(this.name, 	 'dblclick', this.edit, this);
-		Wu.DomEvent.on(this.description, 'dblclick', this.editDescription, this);
-
-		// add dz to logo
-		this.addLogoDZ();
-
-		// add kill hook
-		// if (app.Account.canDeleteProject(this.project.getUuid())) {
-		if (app.access.to.delete_project(this.project)) {
-			Wu.DomEvent.on(this.kill, 'click', this.deleteProject, this);
-
-			Wu.DomEvent.on( this.makeThumb, 'click', this.makeNewThumbnail, this );
-			Wu.DomEvent.on( this.makeThumb, 'mousedown click', Wu.DomEvent.stopPropagation, this );
-		}
-	},
-
-	removeEditHooks : function () {
-
-		// editing hooks
-		Wu.DomEvent.off(this.name, 	  'dblclick', this.edit, this);
-		Wu.DomEvent.off(this.description, 'dblclick', this.editDescription, this);
-
-		// remove dz
-		this.removeLogoDZ();
-
-		// remove kill hook
-		// if (app.Account.canDeleteProject(this.project.getUuid())) {
-		if (app.access.to.delete_project(this.project)) {
-			Wu.DomEvent.off(this.kill, 'click', this.deleteProject, this);
-
-			Wu.DomEvent.off( this.makeThumb, 'click', this.makeNewThumbnail, this );
-			Wu.DomEvent.off( this.makeThumb, 'mousedown click', Wu.DomEvent.stopPropagation, this );
-		}
-	},
 
 	makeNewThumbnail : function () {
 
@@ -233,41 +337,52 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	},
 
-	// edit hook for client logo
-	addLogoDZ : function () {
+	// // edit hook for client logo
+	// addLogoDZ : function () {
 
-		// create dz
-		this.logodz = new Dropzone(this.logo, {
-				url : '/api/project/uploadlogo',
-				createImageThumbnails : false,
-				autoDiscover : false
-		});
+	// 	// create dz
+	// 	this.logodz = new Dropzone(this.logo, {
+	// 			url : '/api/project/uploadlogo',
+	// 			createImageThumbnails : false,
+	// 			autoDiscover : false
+	// 	});
 		
-		// set client uuid param for server
-		this.logodz.options.params.projectUuid = this.project.getUuid();
-		this.logodz.options.params.project = this.project.getUuid();
+	// 	// set client uuid param for server
+	// 	this.logodz.options.params.projectUuid = this.project.getUuid();
+	// 	this.logodz.options.params.project = this.project.getUuid();
 
-		// set callback on successful upload
-		var that = this;
-		this.logodz.on('success', function (err, path) {
-			that.editedLogo(path);
-		});
+	// 	// set callback on successful upload
+	// 	var that = this;
+	// 	// this.logodz.on('success', function (err, path) {
+	// 	// 	that.editedLogo(path);
+	// 	// });
 
-		// set image frame with editable clas
-		Wu.DomUtil.addClass(this.logo, 'editable');
+	// 	this.logodz.on('success', this.editedLogo, this);
 
-	},
+	// 	// set image frame with editable clas
+	// 	Wu.DomUtil.addClass(this.logo, 'editable');
 
-	removeLogoDZ : function () {
-		// disable edit on logo
-		if (this.logodz) this.logodz.disable();
-		delete this.logodz;
+	// },
 
-		// set image frame without editable clas
-		Wu.DomUtil.removeClass(this.logo, 'editable');
-	},
+	// removeLogoDZ : function () {
+	// 	// disable edit on logo
+	// 	console.log('removeLogoDZ');
+	// 	this.logodz.off('success', this.editedLogo, this);
 
-	editedLogo : function (path) {
+	// 	if (this.logodz) this.logodz.disable();
+	// 	this.logodz = null;
+	// 	delete this.logodz;
+
+	// 	console.log(this.logodz);
+
+
+		
+
+	// 	// set image frame without editable clas
+	// 	Wu.DomUtil.removeClass(this.logo, 'editable');
+	// },
+
+	editedLogo : function (err, path) {
 
 		// Set state to manually updated to prevet overriding
 		this.project.setThumbCreated(true);
