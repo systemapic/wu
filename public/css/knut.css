@@ -338,7 +338,10 @@ body {
 
 
 
-
+/*create user error feedback*/
+.backpane-message.error {
+	color: red;
+}
 
 
 /*dont remove*/

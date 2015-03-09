@@ -99,10 +99,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	},
 
 	addHooks : function () {
-
 		// search
 		Wu.DomEvent.on(this._search, 'keyup', this.searchList, this);
-
 	},
 
 	addEditHooks : function () {
@@ -120,7 +118,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		Wu.DomUtil.removeClass(this._addUser, 'displayNone');
 		Wu.DomUtil.removeClass(this._deleteUser, 'displayNone');
 		Wu.DomUtil.removeClass(this._addUser, 'displayNone');
-	       
 	},
 
 	removeEditHooks : function () {
@@ -146,7 +143,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// show other controls
 		this._showControls();
-
 	},
 
 	_activate : function () {
@@ -156,7 +152,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// hide manage if open
 		if (this._manage) this._manage.close();
-
 	},
 
 	_hideControls : function () {
@@ -210,14 +205,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Side Pane', 'Users: Search users', value]);
-
-
 	},
 
 	// list.js plugin
 	initList : function () { 
 
-		
 		// add dummy entry
 		var _tr = Wu.DomUtil.createId('tr', 'dummy-table-entry');
 
@@ -261,8 +253,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var _td8 = Wu.DomUtil.create('td', 'tdcont uuid', _tr);
 		_td8.style.display = 'none';		
 
-
-
 		// init list.js
 		var options = { valueNames : ['name', 'company', 'position', 'phone', 'email', 'access'] };
 		this.list = new List('userslist', options);
@@ -294,10 +284,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// Google Analytics event tracking
 		app.Analytics.ga(['Side Pane', 'Users: Create new user']);
 
-
 		// Hide the Create user etc.
 		Wu.DomUtil.addClass(this._content, 'hide-top', this);
-
 
 		this._inputUser  = {};
 		var titleText    = 'Create new user';
@@ -325,7 +313,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// Toggle wrappers
 		this._container.style.display = 'none';
-
 	},
 
 	checkUniqueEmail : function (e) {
@@ -386,6 +373,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		app.Analytics.ga(['Side Pane', 'Users: Cancel create new user']);
 	},
 
+	_setMissingField : function (field) {
+		Wu.DomUtil.addClass(this._inputUser._message, 'error');
+		this._inputUser._message.innerHTML = 'Missing field: ' +  field;
+	},
+
 	confirmInput : function () {
 
 		var firstName = this._inputUser._firstName.value;
@@ -396,9 +388,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var phoneNo	= this._inputUser._phoneNo.value;
 
 		// return on missing info
-		if (!firstName) return;
-		if (!lastName) return;
-		if (!email) return;
+		if (!firstName) return this._setMissingField('First name');
+		if (!lastName) return this._setMissingField('Last name');;
+		if (!email) return this._setMissingField('Email');;
 		if (!(this._inputUser.validEmail2 && this._inputUser.validEmail)) return;
 
 		var input = {
