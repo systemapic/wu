@@ -15,6 +15,10 @@ Wu.App = Wu.Class.extend({
 
 		// set global this
 		Wu.app = this;
+		window.app = this;
+
+		// error handling
+		this._initErrorHandling();
 
 		// merge options
 		Wu.setOptions(this, options);
@@ -36,6 +40,26 @@ Wu.App = Wu.Class.extend({
 		this.detectMobile();
 
 
+	},
+
+	_initErrorHandling : function () {
+		window.onerror = function (message, file, line, char, ref) {
+			
+			var stack = ref.stack;
+			var project = app.activeProject ? app.activeProject.getTitle() : 'None';
+			var username = app.Account ? app.Account.getName() : 'No name';
+			
+			var options = JSON.stringify({
+				message : message,
+				file : file,
+				line : line,
+				user : username,
+				stack : stack,
+				project : project
+			});
+
+			Wu.save('/api/error/log', options);
+		}
 	},
 
 
@@ -212,7 +236,7 @@ Wu.App = Wu.Class.extend({
 		this.Account = new Wu.User(this.options.json.account);
 		
 		// set access token
-		this.setToken();
+		// this.setToken();
 
 		// create user objects
 		this.Users = {};
@@ -234,12 +258,12 @@ Wu.App = Wu.Class.extend({
 
 	},
 
-	setToken : function () {
-		this.accessToken = '?token=';
-		this.accessToken += Wu.app.Account.store.token;
-		this.accessToken += '.';
-		this.accessToken += Wu.app.Account.store._id;
-	},
+	// setToken : function () {
+	// 	this.accessToken = '?token=';
+	// 	this.accessToken += Wu.app.Account.store.token;
+	// 	this.accessToken += '.';
+	// 	this.accessToken += Wu.app.Account.store._id;
+	// },
 
 
 
@@ -280,7 +304,7 @@ Wu.App = Wu.Class.extend({
 		this.MapPane = new Wu.MapPane();
 
 		// render eror pane
-		this.ErrorPane = new Wu.ErrorPane();
+		this.FeedbackPane = new Wu.FeedbackPane();
 
 	},
 
@@ -537,24 +561,18 @@ Wu.App = Wu.Class.extend({
 
 		var projectUuid = args.projectUuid,
 	   	    hash    	= args.hash,
-	   	    isThumb       = args.thumb;
+	   	    isThumb     = args.thumb;
 
 	   	// return if no project
 	   	if (!projectUuid) return false;
+
+	   	this._phantomHash = hash;
 
 		// get project
 		var project = app.Projects[projectUuid];
 		
 		// return if no such project
 		if (!project) return false;
-
-		// number of layers to be loaded
-	   	this._loading = hash.layers.slice();
-
-	   	// add baselayers
-	   	project.getBaselayers().forEach(function (b) {
-	   		this._loading.push(b);
-	   	}, this);
 
 		// set project
 		this._setProject(project);
@@ -586,9 +604,21 @@ Wu.App = Wu.Class.extend({
 	},
 	
 	phantomReady : function () {
-
+		// return true;
 		// check if ready for screenshot
-		if (!this._loaded || !this._loading) return false;
+		// if (!this._loaded || !this._loading) return false;
+
+		console.log(this._loaded.length, this._loading.length);
+
+
+		var hashLayers = _.size(this._phantomHash.layers);
+		var baseLayers = _.size(app.activeProject.getBaselayers());
+
+		var numLayers = hashLayers + baseLayers;
+
+		if (numLayers == 0) return true;
+
+		if (this._loaded.length == 0 ) return false; 
 
 		// if all layers loaded
 		if (this._loaded.length == this._loading.length) return true;
@@ -604,22 +634,10 @@ Wu.App = Wu.Class.extend({
 
 	_loading : [],
 
-	// // phantomjs: load layermenu layers
-	// _loadLayers : function (layermenuItems) {
-
-	// },
-
-	// // phantomjs: check if all layers are loaded
-	// _allLoaded : function () {
-
-	// },
-
-	
-
-
 	// debug mode
-	_debug : function () {
-		if (!this.debug) return;
+	_debug : function (debug) {
+		if (!debug && !this.debug) return;
+		this.debug = true;
 
 		// set style
 		Wu.setStyle('img', {

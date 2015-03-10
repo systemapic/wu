@@ -32,12 +32,8 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
-// config
-var config = require('../config/config.js');
-
 // api
 var api = module.parent.exports;
-
 
 // function exports
 module.exports = api.pixels = {
@@ -49,119 +45,85 @@ module.exports = api.pixels = {
 	// ###  API: Create PDF Snapshot         ###
 	// #########################################
 	createPDFSnapshot : function (req, res) {
-		// console.log('cretae PDF snapshot');
-		// console.log('body: ', req.body);
-		// console.log('hash: ', req.body.hash);
+		if (!req.body || !req.body.hash) return api.error.missingInformation(req, res);
 
-
-		// run phantomjs cmd	
-		// crunch image
-
-		// var hash = req.body.hash;
 		var projectUuid = req.body.hash.project;
-		
-		// var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.pdf';
 		var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.png';
 		var fileUuid = 'file-' + uuid.v4();
-		// var folder = FILEFOLDER + fileUuid;
 		var folder = api.config.path.file + fileUuid;
 		var path = folder + '/' + filename;
-
 		var pdfpath = folder + '/' + filename.slice(0, -3) + 'pdf';
-
-		console.log('pdfpath: ', pdfpath);
 
 		var hash = {
 			position : req.body.hash.position,
 			layers : req.body.hash.layers,
 			id : req.body.hash.id,
-			
 		}
-
 
 		var args = {
 			projectUuid : projectUuid,
 			hash : hash,
-			// filename : filename,
-			// folder : FILEFOLDER
 			path : path,
 			pdf : true,
-			serverUrl : config.portalServer.uri + 'login',
-			serverData : config.phantomJS.data
+			serverUrl : api.config.portalServer.uri + 'login',
+			serverData : api.config.phantomJS.data
 		}
 
-		// console.log('-> PDF args: ', args);
 
 		var snappath = api.config.path.tools + 'phantomJS-snapshot.js';
 		var cmd = "phantomjs --ssl-protocol=tlsv1 " + snappath + " '" + JSON.stringify(args) + "'";
-		// console.log('cmd: ', cmd);
-
-
 		var ops = [];
 		var dataSize;
 
-
 		// create file folder
 		ops.push(function (callback) {
-
 			fs.ensureDir(folder, function(err) {
-				console.log(err); //null
-				//dir has now been created, including the directory it is to be placed in
-				callback(err);
-			})
-
-
+				if (err) return callback(err);
+				callback(null);
+			});
 		});
 
 		// phantomJS: create snapshot
 		ops.push(function (callback) {
-
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
-
-				// console.log('executed phantomJS');
-				// console.log('err: ', err);
-				// console.log('stdout: ', stdout);
-				// console.log('stdin: ', stdin);
-
-				callback(err);
+				if (err) return callback(err);
+				callback(null);
 			});
-
 		});
 
 		// create pdf from snapshot image
 		ops.push(function (callback) {
 
+			try {
+				
+				PDFDocument = require('pdfkit');
+				var doc = new PDFDocument({
+					margin : 0,
+					layout: 'landscape',
+					size : 'A4'
+				});
 
-			// console.log('CREATING PDF!!');
+				doc.image(path, {fit : [890, 1140]});
+				doc.pipe(fs.createWriteStream(pdfpath));
+				doc.end();
 
-			PDFDocument = require('pdfkit');
-			var doc = new PDFDocument({
-				margin : 0,
-				layout: 'landscape',
-				size : 'A4'
-			});
-			doc.image(path, {fit : [890, 1140]});
-			
-			doc.pipe(fs.createWriteStream(pdfpath));
+				callback(null);
 
-			doc.end();
-
-
-			callback();
+			} catch (e) {
+				callback(e);
+			}
 
 		});
 
 		// get size
 		ops.push(function (callback) {
-
-			
 			fs.stat(pdfpath, function (err, stats) {
-				console.log('err: ', err);
-				dataSize = stats.size;
-	 			callback(err);
-	 		});
+				if (err) return callback(err);
 
+				dataSize = stats.size;
+	 			callback(null);
+	 		});
 		});
 
 
@@ -182,17 +144,15 @@ module.exports = api.pixels = {
 			f.data.image.file 	= filename; 
 
 			f.save(function (err, doc) {
-				if (err) console.log('File err: ', err);
-				// console.log('File saved: ', doc);
-
-				callback(err, doc);
+				if (err) return callback(err);
+				callback(null, doc);
 			});
-
-
 		});
 
 
 		async.series(ops, function (err, results) {
+			if (err) return api.error.general(req, res, err);
+
 			res.end(JSON.stringify({
 				pdf : fileUuid,
 				error : null
@@ -206,16 +166,12 @@ module.exports = api.pixels = {
 	// ###  API: Create Thumbnail            ###
 	// #########################################
 	createThumb : function (req, res) {
+		if (!req.body || !req.body.hash) return api.error.missingInformation(req, res);
 
-		// var hash = req.body.hash;
 		var projectUuid = req.body.hash.project;
-
 		var dimensions = req.body.dimensions;
-		
 		var filename = 'thumb-' + uuid.v4() + '.png';
-		// var path = IMAGEFOLDER + filename;
 		var path = api.config.path.image + filename;
-
 
 		var hash = {
 			position : req.body.hash.position,
@@ -223,36 +179,39 @@ module.exports = api.pixels = {
 			id : req.body.hash.id
 		}
 
+
+
 		var args = {
 			projectUuid : projectUuid,
 			hash : hash,
 			path : path,
 			pdf : false,
 			thumb : true,
-			serverUrl : config.portalServer.uri + 'login',
-			serverData : config.phantomJS.data
+			serverUrl : api.config.portalServer.uri + 'login',
+			serverData : api.config.phantomJS.data
 		}
 
 		var snappath = api.config.path.tools + 'phantomJS-snapshot.js';
 		var cmd = "phantomjs --ssl-protocol=tlsv1 " + snappath + " '" + JSON.stringify(args) + "'";
+
+		console.log('command:'.yellow, cmd);
 
 		var ops = [];
 		var dataSize;
 
 		// phantomJS: create snapshot
 		ops.push(function (callback) {
-
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
-
 				callback(err);
 			});
-
 		});
 
 		// get size
 		ops.push(function (callback) {
 			fs.stat(path, function (err, stats) {
+				if (err) return callback(err);
+
 				dataSize = stats ? stats.size : 0;
 	 			callback(null);
 	 		});
@@ -261,8 +220,6 @@ module.exports = api.pixels = {
 
 		// create File
 		ops.push(function (callback) {
-
-			// console.log('create file phsj')
 
 			var f 			= new File();
 			f.uuid 			= 'file-' + uuid.v4();
@@ -278,48 +235,29 @@ module.exports = api.pixels = {
 			f.data.image.file 	= filename; 
 
 			f.save(function (err, doc) {
-				if (err) console.log('File err: ', err);
-				console.log('File saved: ', doc);
-				callback(err, doc);
+				if (err) return callback(err);
+				callback(null, doc);
 			});
-
-
 		});
 
 		ops.push(function (callback) {
-
 			var options = {
 				height : dimensions.height,
 				width : dimensions.width,
-				quality : 80,
+				quality : 90,
 				file : path
 
 			}
-
 			api.pixels.resizeImage(options, callback);
-
-
 		});
 
-		console.log('running phantom ascyn');
-
 		async.series(ops, function (err, results) {
-			console.log('pahtnom THUMB !! all done: ', err);
-			
-			if (err) {
-				
-				console.log('err', err);
-				return res.end(JSON.stringify({
-					error : err
-				}));
-			}
+			if (err || !results) return api.error.general(req, res, err || 'No results.');
 
-			
 			var doc = results[2]
 			var croppedImage = results[3];
 
 			res.end(JSON.stringify({
-				// image : file.uuid,
 				image : filename,
 				fileUuid : doc.uuid,
 				cropped : croppedImage.file,
@@ -333,23 +271,11 @@ module.exports = api.pixels = {
 	// ###  API: Create Snapshot             ###
 	// #########################################
 	createSnapshot : function (req, res) {
+		if (!req.body || !req.body.hash) return api.error.missingInformation(req, res);
 
-		// console.log('cretae snapshot');
-		// console.log('body: ', req.body);
-		// console.log('hash: ', req.body.hash);
-
-
-		// run phantomjs cmd	
-		// crunch image
-
-		// var hash = req.body.hash;
 		var projectUuid = req.body.hash.project;
-		
 		var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.png';
-		// var path = IMAGEFOLDER + filename;
 		var path = api.config.path.image + filename;
-
-
 
 		var hash = {
 			position : req.body.hash.position,
@@ -357,50 +283,38 @@ module.exports = api.pixels = {
 			id : req.body.hash.id
 		}
 
-
 		var args = {
 			projectUuid : projectUuid,
 			hash : hash,
 			path : path,
 			pdf : false,
-			serverUrl : config.portalServer.uri + 'login',
-			serverData : config.phantomJS.data
+			serverUrl : api.config.portalServer.uri + 'login',
+			serverData : api.config.phantomJS.data
 		}
 
 
 		var snappath = api.config.path.tools + 'phantomJS-snapshot.js';
 		var cmd = "phantomjs --ssl-protocol=tlsv1 " + snappath + " '" + JSON.stringify(args) + "'";
-
 		var ops = [];
 		var dataSize;
 
+		console.log('cmd: ', cmd);
+
 		// phantomJS: create snapshot
 		ops.push(function (callback) {
-
-			console.log('cmd!! =-> phantomjs2s', cmd);
-
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
-
-				console.log('executed phantomJS');
-				console.log('err: ', err);
-				console.log('stdout: ', stdout);
-				console.log('stdin: ', stdin);
-
+				console.log('err--> ', err, stdout, stdin);
 				callback(err);
 			});
-
 		});
 
 		// get size
 		ops.push(function (callback) {
-
-			console.log('fsstat');
 			fs.stat(path, function (err, stats) {
-				// console.log('err: ', err);
-				// console.log('stats: ', stats);
+				if (err) return callback(err);
 				if (stats) dataSize = stats.size;
-	 			callback(err);
+	 			callback(null);
 	 		});
 
 		});
@@ -408,8 +322,6 @@ module.exports = api.pixels = {
 
 		// create File
 		ops.push(function (callback) {
-
-			// console.log('create file phsj')
 
 			var f 			= new File();
 			f.uuid 			= 'file-' + uuid.v4();
@@ -425,27 +337,15 @@ module.exports = api.pixels = {
 			f.data.image.file 	= filename; 
 
 			f.save(function (err, doc) {
-				if (err) console.log('File err: ', err);
-				// console.log('File saved: ', doc);
-
 				callback(err, doc);
 			});
-
-
 		});
 
-		console.log('running phantom ascyn');
 
 		async.series(ops, function (err, results) {
-			console.log('pahtnom !! all done: ', err);
-			console.log('results', results);
-
-			if (err) console.log('err', err);
-			
-			if (err) return api.error.general(req, res, err);
+			if (err || !results) return api.error.general(req, res, err || 'No results.');
 			
 			var file = results[2]
-
 			if (!file) return api.error.general(req, res);
 
 			res.end(JSON.stringify({
@@ -482,15 +382,14 @@ module.exports = api.pixels = {
 
 		// move raw file into /images/ folder
 		ops.rawFile = function (cb) {
-
 			// copy raw file
 			api.pixels.copyRawFile(file, cb);
 		};
 
 		// run all ops async in series
 		async.series(ops, function (err, results) {
-			if (err) console.error('_processImage err: ', err);
-			
+			if (err || !results) return callback(err || 'No results.');
+
 			var exif 	= results.identity,
 			    dimensions 	= results.dimensions,
 			    dataSize 	= results.dataSize,
@@ -509,16 +408,22 @@ module.exports = api.pixels = {
 				entry.data.image.orientation = api.pixels.getExif.orientation(exif);
 			}
 
-			console.log('**********************************')
-			console.log('* fn: crunch._processImage: * DONE! entry: ', entry);
-			console.log('* results: ', results);
-			console.log('**********************************')
-
 			// return results to whatever callback
 			callback(null, entry);
 		});
-
 	},
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -574,15 +479,12 @@ module.exports = api.pixels = {
 
 		// run all ops async in series
 		async.series(ops, function (err, results) {
-			if (err) console.error('_processImage err: ', err);
-			
-			console.log('*** _processImage async DONE: reults: ', results);
+			if (err || !results) return callback(err || 'No results.');
 
 			var exif 	= results.identity,
 			    dimensions 	= results.dimensions,
 			    dataSize 	= results.dataSize,
 			    file 	= results.rawFile;
-
 
 			entry.data.image 	     = entry.data.image || {};
 			entry.data.image.dimensions  = dimensions;
@@ -593,13 +495,8 @@ module.exports = api.pixels = {
 			entry.data.image.orientation = api.pixels.getExif.orientation(exif);
 			entry.data.image.file        = file;
 
-			console.log('**********************************')
-			console.log('* fn: crunch._processImage: * DONE! entry: ', entry);
-			console.log('* results: ', results);
-			console.log('**********************************')
-
 			// return results to whatever callback
-			callback(err, entry);
+			callback(null, entry);
 		});
 	},
 
@@ -630,6 +527,8 @@ module.exports = api.pixels = {
 			var direction 	= api.pixels.getExif.getDirection(profile);
 			var coords 	= api.pixels.getExif.getCoords(profile);
 			
+			if (!coords) return;
+
 			var gps = {
 				lat : coords.lat,
 				lng : coords.lng,
@@ -681,7 +580,6 @@ module.exports = api.pixels = {
 			var x = alt[0];
 			var y = alt[1];
 			var altitude = parseInt(x) / parseInt(y);
-			console.log('Altitude!: ', altitude);
 			return altitude;
 		},
 
@@ -693,7 +591,6 @@ module.exports = api.pixels = {
 			var x = dir[0];
 			var y = dir[1];
 			var direction = parseInt(x) / parseInt(y);
-			console.log('Direction!: ', direction);
 			return direction;
 		},
 
@@ -760,26 +657,22 @@ module.exports = api.pixels = {
 	moveRawFile : function (oldPath, callback) {
 
 		var newFile = 'image-raw-' + uuid.v4();
-		// var newPath = IMAGEFOLDER + newFile;
 		var newPath = api.config.path.image + newFile;
 
 		// move file
 		fs.rename(oldPath, newPath, function (err) {
-			if (err) console.log('fs.rename error: ', err);
 			callback(err, newFile);
 		});
 	},
 
 	// copy raw file to /images/ folder
 	copyRawFile : function (oldPath, callback) {
-
 		var newFile = 'image-raw-' + uuid.v4();
 		var newPath = api.config.path.image + newFile;
 
 		// copy file
 		fs.copy(oldPath, newPath, function (err) {
-			if (err) console.log('copyRawFile err: ', err);
-			callback(null, newFile);
+			callback(err, newFile);
 		});
 	},
 
@@ -789,6 +682,8 @@ module.exports = api.pixels = {
 		Project
 		.findOne({uuid : projectUuid})
 		.exec(function (err, project) {
+			if (err || !project) return;
+
 			project.files.push(file._id);
 			project.markModified('files');
 			project.save(function (err, doc) {
@@ -803,14 +698,12 @@ module.exports = api.pixels = {
 
 	// resize single image
 	resizeImage : function (option, callback) {
-
+		if (!option) return callback('No options provided.');
 
 		// basic options
 		var width   	= parseInt(option.width) || null;
 		var height  	= parseInt(option.height) || null;
-		var quality 	= parseInt(option.quality) || 60;			// default quality 60
-
-		console.log('width/height: ', width, height);
+		var quality 	= parseInt(option.quality) || 90;			// default quality 60
 
 		// crop options
 		option.crop = option.crop || {};
@@ -825,34 +718,39 @@ module.exports = api.pixels = {
 		var newFile 	= 'image-' + uuid.v4();					// unique filename
 		var newPath 	= api.config.path.image + newFile;				// modified file
 
-
+		// wtf
 		gm.prototype.checkSize = function (action) {
 			action()
 			return this;
 		}
 
-		// do crunch magic
-		gm(path)
-		.resize(width)						// todo: if h/w is false, calc ratio					
-		.autoOrient()
-		.crop(cropW, cropH, cropX, cropY)				// x, y is offset from top left corner
-		.noProfile()							// todo: strip of all exif?
-		.setFormat('JPEG')						// todo: watermark systemapic? or client?
-		.quality(quality)
-		.write(newPath, function (err) {
-			if (err) console.log('22 resizeImage error: ', err);
-			
-			var result = {
-				file   : newFile,
-				height : height,
-				width  : width,
-				path : newPath
-			}
+		try {
+			// do crunch magic
+			gm(path)
+			.resize(width)						// todo: if h/w is false, calc ratio					
+			.autoOrient()
+			.crop(cropW, cropH, cropX, cropY)				// x, y is offset from top left corner
+			.noProfile()							// todo: strip of all exif?
+			.setFormat('JPEG')						// todo: watermark systemapic? or client?
+			.quality(quality)
+			.write(newPath, function (err) {
+				if (err) return callback(err);
+				
+				var result = {
+					file   : newFile,
+					height : height,
+					width  : width,
+					path : newPath
+				}
 
-			// return error and file
-			callback(err, result);
+				// return error and file
+				callback(null, result);
 
-		});
+			});
+
+		} catch (e) {
+			callback(e);
+		}
 	},
 
 
@@ -871,30 +769,27 @@ module.exports = api.pixels = {
 	// cxxxxx 
 
 	serveFitPixelPerfection : function (req, res) {
+		if (!req.query) return api.error.missingInformation(req, res);
 
 		// set vars
-		var quality    = req.query.quality;
-		var imageId    = req.params[0]; 		// 'file-ccac0f45-ae95-41b9-8d57-0e64767ea9df'		
-		var fitW       = req.query.fitW;
-		var fitH       = req.query.fitH;				
-
+		var quality     = req.query.quality;
+		var imageId     = req.params[0]; 		// 'file-ccac0f45-ae95-41b9-8d57-0e64767ea9df'		
+		var fitW        = req.query.fitW;
+		var fitH        = req.query.fitH;				
 		var newFile 	= 'image-' + uuid.v4();					// unique filename
 		var newPath 	= api.config.path.image + newFile;				// modified file
-
-		var imagePath = '/data/images/' + imageId;
+		var imagePath 	= '/data/images/' + imageId;
 
 		api.pixels.getImageSize(imagePath, function (err, size) {
-
-			if ( err || !size ) {
-				console.log(err);
-				return res.end();
-			}
+			if (err || !size) return api.error.general(req, res, err || 'No size.');
 
 			var imgWidth = size.width;
 			var imgHeight = size.height;
+			var imgLandscape;
+			var fitLandscape;
 
-			if (imgWidth >= imgHeight) 	var imgLandscape = true;
-			if (fitW >= fitH) 		var fitLandscape = true;
+			if (imgWidth >= imgHeight) 	imgLandscape = true;
+			if (fitW >= fitH) 		fitLandscape = true;
 
 			if ( !fitLandscape && imgLandscape ) {
 
@@ -938,17 +833,15 @@ module.exports = api.pixels = {
 			.setFormat('JPEG')						// todo: watermark systemapic? or client?
 			.quality(quality)
 			.write(newPath, function (err) {
-				if (err) console.log('px resizeImage error: ', err);
-				
-				res.sendfile(newPath, {maxAge : 10000000});
+				if (err) return api.error.general(req, res, err);
+				res.sendFile(newPath, {maxAge : 10000000});
 			});
 		});
-
-
 	},
 
 
 	serveImagePixelPerfection : function (req, res) {
+		if (!req.query) return api.error.missingInformation(req, res);
 
 
 		// set vars
@@ -979,10 +872,8 @@ module.exports = api.pixels = {
 
 		// create image with dimensions
 		api.pixels.resizeImage(options, function (err, result) {
-			console.log('resized!!!', err, result);
-
+			if (err || !result) return api.error.general(req, res, err || 'No result.');
 			var path = result.path;
-
 			res.sendFile(path, {maxAge : 10000000});
 		});
 	},			
@@ -991,10 +882,10 @@ module.exports = api.pixels = {
 
 
 
-
-
 	// serve images without wasting a pixel
 	servePixelPerfection : function (req, res) {
+		if (!req.query) return api.error.missingInformation(req, res);
+
 
 		// set vars
 		var width      = req.query.width;
@@ -1007,9 +898,7 @@ module.exports = api.pixels = {
 		var cropW      = req.query.cropw;
 		var cropH      = req.query.croph;
 
-		// return if invalid
-		if (!req.query) return res.end();
-
+		
 		// if raw quality requested, return full image
 		if (raw) return api.pixels.returnRawfile(req, res);
 
@@ -1022,12 +911,8 @@ module.exports = api.pixels = {
 			File
 			.findOne({uuid : fileUuid})
 			.exec(function (err, file) {
+				if (err || !file) return callback(err || 'No file.');
 
-				if (!file) return callback(err, { 
-					image : false, 
-					rawfile : false
-				});
-				
 				// find image with right dimensions (exactly) // todo: % margins
 				var image = _.find(file.data.image.crunched, function (i) {
 					if (!i) return false;
@@ -1051,12 +936,13 @@ module.exports = api.pixels = {
 					image : image
 				}			
 
-				callback(err, vars);
+				callback(null, vars);
 			});
 		});
 
 		// create image if not found
 		ops.push(function (vars, callback) {
+			if (!vars) return callback('Missing vars.');
 
 			var image = vars.image;
 			var rawfile = vars.rawfile;
@@ -1100,7 +986,8 @@ module.exports = api.pixels = {
 
 		// run all async ops
 		async.waterfall(ops, function (err, result) {
-			// all done, serve file
+			if (err || !result) return api.error.general(req, res, err || 'No result.');
+
 			api.pixels.returnImage(req, res, result);
 		});
 	},
@@ -1111,6 +998,10 @@ module.exports = api.pixels = {
 		File
 		.findOne({uuid : fileUuid})
 		.exec(function (err, file) {
+			if (err || !file) {
+				callback && callback(err || 'No file.');
+				return;
+			}
 			file.data.image.crunched.addToSet(result);	
 			file.markModified('data');
 			file.save(function (err) {
@@ -1124,26 +1015,23 @@ module.exports = api.pixels = {
 	returnImage : function (req, res, imageFile) {
 		// send file back to client, just need file path
 		var path = api.config.path.image + imageFile.file;
-		res.sendfile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
+		res.sendFile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
 	},
 
 
 	returnRawfile : function (req, res) {
-
-		// get file uuid
 		var fileUuid = req.params[0]; 
 
 		// get raw file
 		File
 		.findOne({uuid : fileUuid})
 		.exec(function (err, file) {
-			if (!file) return callback(err);
+			if (err || !file) return api.error.general(req, res, err || 'No file.')
 
 			// return raw file
 			var imageFile = file.data.image;
 			return api.pixels.returnImage(req, res, imageFile);
 		});
-		return;
 	},
 
 

@@ -24,8 +24,6 @@
 // _____class.js___________________________________________________________________ 
 // Taken from Class.js in Leaflet.js by Vladimir Agafonkin, @LeafletJS
 
-var ich = ich || {};
-ich.$ = function (elem) { return elem; };
 Wu = {};
 Wu.Class = function () {};
 Wu.Class.extend = function (props) {
@@ -284,24 +282,6 @@ Wu.Util = {
 	// minimal image URI, set to an image when disposing to flush memory
 	emptyImageUrl: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
 
-	
-	// WU functions
-	// returns DOM elements instead of HTML string for icanhaz templates
-	templateIch : function (template, data, container) {
-		var dummy = Wu.DomUtil.create('div', '');
-		dummy.innerHTML = ich[template](data);
-
-		if (container) {
-			var d = dummy;
-			for (var i = 0; i < d.children.length; i++) {
-				container.appendChild(d.children[i]);
-			}
-			return container.children[0];
-		}
-		
-		return dummy.children;
-	},
-
 	isArray: Array.isArray || function (obj) {
 		return (Object.prototype.toString.call(obj) === '[object Array]');
 	},
@@ -319,98 +299,143 @@ Wu.Util = {
 	},
 
 	checkDisconnect : function (response) {
+		var string = response.substring(0,15);
+		if (string == '<!doctype html>')  {
+			// we got a disconnect!!!
+			app.feedback.setError({
+				title : 'You have been logged out.', 
+				description : 'Please reload the page to log back in.',
+				clearTimer : false
+			});
 
-		if (response.substring(0,16) == '<!doctype html>')  {
-			console.log('DOCTPE');
-			console.log(response.substring(0,16));
+			return false;
 		}
+
+		return true;
+	},
+
+	debugXML : function (json) {
+		console.log('==== debugXML ====');
+
+		var obj = Wu.parse(json);
+		obj ? console.log(obj) : console.log(json);
+
+		console.log('==================');
+	},
+
+	verifyResponse : function (response) {
+		
+		// print response if debug
+		if (app.debug) Wu.Util.debugXML(response);
+
+		// check for disconnect (<html> response)
+		return Wu.Util.checkDisconnect(response);
+		
 	},
 
 	// post without callback
 	post : function (path, json) {
-		
-		var that = this;
-		var http = new XMLHttpRequest();
-		var url = window.location.origin; 
+		var that = this,
+		    http = new XMLHttpRequest(),
+		    // url = window.location.origin;
+		    url = Wu.Util._getServerUrl(); 
 		url += path;
+		
 		http.open("POST", url, true);
 
 		//Send the proper header information along with the request
 		http.setRequestHeader("Content-type", "application/json");
 
 		http.onreadystatechange = function() {
-		    if(http.readyState == 4 && http.status == 200) {
-		    	Wu.Util.checkDisconnect(http.responseText);
-			if (app.debug) Wu.Util.debugXML(http.responseText);
-		    	
-		    }
+			if(http.readyState == 4 && http.status == 200) {
+				var valid = Wu.verify(http.responseText);
+			}
 		}
 		http.send(json);
 	},
 
 	// post with callback
 	postcb : function (path, json, cb, context, baseurl) {
-		var that = context;
-		var http = new XMLHttpRequest();
-		
-		var url = baseurl || window.location.origin; 
+		var that = context,
+		    http = new XMLHttpRequest(),
+		    url = baseurl || Wu.Util._getServerUrl();
 		
 		url += path;
+
 		http.open("POST", url, true);
 
 		//Send the proper header information along with the request
 		http.setRequestHeader('Content-type', 'application/json');
 
 		http.onreadystatechange = function() {
-		    if(http.readyState == 4 && http.status == 200) {
-			if (app.debug) Wu.Util.debugXML(http.responseText);
-			if (cb) cb(context, http.responseText); 
-		    }
+			if(http.readyState == 4 && http.status == 200) {
+
+				// verify response
+				var valid = Wu.verify(http.responseText);
+
+				// callback
+				if (cb && valid) cb(context, http.responseText); 
+			}
 		}
-
-
 
 		http.send(json);
 	},
 
 
-	debugXML : function (json) {
-		console.log('==== debugXML ====');
-		try {
-			var obj = JSON.parse(json);
-			console.log(obj);
-		} catch (e) {
-			console.log(json);
-		}
-		console.log('==================');
+	_getServerUrl : function () {
+		return app.options.servers.portal.slice(0,-1);
 	},
 
 	// post with callback and error handling (do callback.bind(this) for context)
 	send : function (path, json, callback) {
 		var that = this;
 		var http = new XMLHttpRequest();
-		var url = window.location.origin;
+		var url = Wu.Util._getServerUrl();
 		url += path;
-		console.log('url; ', url);
+
 		http.open("POST", url, true);
 		http.setRequestHeader('Content-type', 'application/json');
 		http.onreadystatechange = function() {
 			if (http.readyState == 4) {
-		    		Wu.Util.checkDisconnect(http.responseText);
-				if (app.debug) Wu.Util.debugXML(http.responseText);
-				if (http.status == 200) { // ok
+		    		
+				var valid = Wu.verify(http.responseText);
+
+				console.log('got callback?', callback, valid);
+
+				if (http.status == 200 && valid) { // ok
 					if (callback) callback(null, http.responseText); 
-				} else { // error
-					if (callback) callback(http.status); 	// ??
+				} else { 
+					if (callback) callback(http.status);
 				}
 			}
 		}
+		
 		// stringify objects
 		if (Wu.Util.isObject(json)) json = JSON.stringify(json);
 		
 		// send string
 		http.send(json);
 	},
+
+
+	// get with callback
+	_getJSON : function (url, callback) {
+		var http = new XMLHttpRequest();
+		http.open("GET", url, true);
+
+		//Send the proper header information along with the request
+		http.setRequestHeader("Content-type", "application/json");
+
+		http.onreadystatechange = function() {
+		    if(http.readyState == 4 && http.status == 200) {
+			var valid = Wu.verify(http.responseText);
+			
+			if (valid) callback(http.responseText); 
+		    }
+		}
+		http.send(null);
+	},
+	
 
 	// parse with error handling
 	_parse : function (json) {
@@ -423,23 +448,6 @@ Wu.Util = {
 
 	},
 
-	// get with callback
-	_getJSON : function (url, callback) {
-
-		var http = new XMLHttpRequest();
-		http.open("GET", url, true);
-
-		//Send the proper header information along with the request
-		http.setRequestHeader("Content-type", "application/json");
-
-		http.onreadystatechange = function() {
-		    if(http.readyState == 4 && http.status == 200) {
-			if (app.debug) Wu.Util.debugXML(http.responseText);
-			callback(http.responseText); 
-		    }
-		}
-		http.send(null);
-	},
 
 	_getParentClientID : function (pid) {
 		var cid = '';
@@ -552,121 +560,7 @@ Wu.Util = {
 
 	},
 
-	can : {
-
-		create : {
-			project : function () {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				return false;
-			},
-			client : function () {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				return false;
-			},
-			superadmin : function () {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				return false;
-			},
-			admin : function () {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true; 	// admins can create other admins
-				return false;
-			},
-			manager : function (uuid) { // project uuid
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				return false;
-			},
-			editor : function () {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				return false;
-			},
-			reader : function () {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				if (user.role.manager.projects.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-				return false;
-			}
-		},
-
-		read : {
-			project : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				if (user.role.manager.projects.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-				if (user.role.editor.projects.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
-				if (user.role.reader.projects.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
-				return false;
-			},
-			client : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				if (user.role.manager.clients.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-				if (user.role.editor.clients.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
-				if (user.role.reader.clients.indexOf(uuid)  >= 0) return true; // managers can create readers for own projects
-				return false;
-			}
-		},
-
-		update : {
-			project : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				if (user.role.editor.projects.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-				return false;
-
-			},
-			client : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				if (user.role.editor.clients.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-				return false;
-			},
-			user   : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-
-				// var subject = app.
-				if (user.role.manager.indexOf(uuid) >= 0) return true; // managers can create readers for own projects
-				return false;				
-			}
-		},
-
-		remove : {
-			project : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				return false;
-
-			},
-			client : function (uuid) {
-				var user = app.User.store;
-				if (user.role.superadmin) return true;
-				if (user.role.admin)      return true;
-				return false;				
-			}
-		}, 
-
-
-	},
 	
-
 	prettyDate : function(date, compareTo){
 		/*
 		 * Javascript Humane Dates
@@ -1096,9 +990,30 @@ Wu.parse = Wu.Util._parse;
 Wu.zip = Wu.Util.generateZip;
 Wu.zave = Wu.Util.zipSave;
 Wu.can = Wu.Util.can;
-ichDiv = Wu.Util.templateIch;
 Wu.setStyle = Wu.Util.setStyle;
 Wu.getStyle = Wu.Util.getStyle;
+Wu.verify = Wu.Util.verifyResponse;
+
+
+// Wu.CustomEvents = {
+
+// 	on : function (obj, type, fn, ctx) {
+// 		// var event = new CustomEvent('build', { 'detail': elem.dataset.time });
+// 		// document.addEventListener(type, fn, false);
+// 		Wu.DomEvent.on(obj, type, fn, ctx)
+// 	},
+
+// 	off : function (obj, type, fn, ctx) {
+// 		Wu.DomEvent.off(obj, type, fn, ctx)
+// 	},
+
+// 	fire : function (type, data) {
+// 		var event = new CustomEvent(type, data);
+// 		document.dispatchEvent(event);
+// 	},
+
+// };
+
 
 Wu.Evented = Wu.Class.extend({
 
@@ -1323,7 +1238,12 @@ proto.addOneTimeEventListener = proto.once;
 proto.fireEvent = proto.fire;
 proto.hasEventListeners = proto.listens;
 
+
 Wu.Mixin = {Events: proto};
+
+Wu._on = proto.on;
+Wu._off = proto.off;
+Wu._fire = proto.fire;
 
 
 // DOM Utilities
@@ -1754,9 +1674,6 @@ Wu.DomEvent = {
     }
 };
 
-Wu.DomEvent.addListener = Wu.DomEvent.on;
-Wu.DomEvent.removeListener = Wu.DomEvent.off;
-
 
 // Wu.Browser
 (function () {
@@ -1820,6 +1737,167 @@ Wu.DomEvent.removeListener = Wu.DomEvent.off;
     };
 
 }());
+
+Wu.extend(Wu.DomEvent, {
+
+	//static
+	POINTER_DOWN: Wu.Browser.msPointer ? 'MSPointerDown' : 'pointerdown',
+	POINTER_MOVE: Wu.Browser.msPointer ? 'MSPointerMove' : 'pointermove',
+	POINTER_UP: Wu.Browser.msPointer ? 'MSPointerUp' : 'pointerup',
+	POINTER_CANCEL: Wu.Browser.msPointer ? 'MSPointerCancel' : 'pointercancel',
+
+	_pointers: [],
+	_pointerDocumentListener: false,
+
+	// Provides a touch events wrapper for (ms)pointer events.
+	// Based on changes by veproza https://github.com/CloudMade/Leaflet/pull/1019
+	//ref http://www.w3.org/TR/pointerevents/ https://www.w3.org/Bugs/Public/show_bug.cgi?id=22890
+
+	addPointerListener: function (obj, type, handler, id) {
+		console.log('addPointerListener', type);
+		switch (type) {
+		case 'touchstart':
+			return this.addPointerListenerStart(obj, type, handler, id);
+		case 'touchend':
+			return this.addPointerListenerEnd(obj, type, handler, id);
+		case 'touchmove':
+			return this.addPointerListenerMove(obj, type, handler, id);
+		default:
+			throw 'Unknown touch event type';
+		}
+	},
+
+	addPointerListenerStart: function (obj, type, handler, id) {
+		var pre = '_leaflet_',
+		    pointers = this._pointers;
+
+		var cb = function (e) {
+
+			Wu.DomEvent.preventDefault(e);
+
+			var alreadyInArray = false;
+			for (var i = 0; i < pointers.length; i++) {
+				if (pointers[i].pointerId === e.pointerId) {
+					alreadyInArray = true;
+					break;
+				}
+			}
+			if (!alreadyInArray) {
+				pointers.push(e);
+			}
+
+			e.touches = pointers.slice();
+			e.changedTouches = [e];
+
+			handler(e);
+		};
+
+		obj[pre + 'touchstart' + id] = cb;
+		obj.addEventListener(this.POINTER_DOWN, cb, false);
+
+		// need to also listen for end events to keep the _pointers list accurate
+		// this needs to be on the body and never go away
+		if (!this._pointerDocumentListener) {
+			var internalCb = function (e) {
+				for (var i = 0; i < pointers.length; i++) {
+					if (pointers[i].pointerId === e.pointerId) {
+						pointers.splice(i, 1);
+						break;
+					}
+				}
+			};
+			//We listen on the documentElement as any drags that end by moving the touch off the screen get fired there
+			document.documentElement.addEventListener(this.POINTER_UP, internalCb, false);
+			document.documentElement.addEventListener(this.POINTER_CANCEL, internalCb, false);
+
+			this._pointerDocumentListener = true;
+		}
+
+		return this;
+	},
+
+	addPointerListenerMove: function (obj, type, handler, id) {
+		var pre = '_leaflet_',
+		    touches = this._pointers;
+
+		function cb(e) {
+
+			// don't fire touch moves when mouse isn't down
+			if ((e.pointerType === e.MSPOINTER_TYPE_MOUSE || e.pointerType === 'mouse') && e.buttons === 0) { return; }
+
+			for (var i = 0; i < touches.length; i++) {
+				if (touches[i].pointerId === e.pointerId) {
+					touches[i] = e;
+					break;
+				}
+			}
+
+			e.touches = touches.slice();
+			e.changedTouches = [e];
+
+			handler(e);
+		}
+
+		obj[pre + 'touchmove' + id] = cb;
+		obj.addEventListener(this.POINTER_MOVE, cb, false);
+
+		return this;
+	},
+
+	addPointerListenerEnd: function (obj, type, handler, id) {
+		var pre = '_leaflet_',
+		    touches = this._pointers;
+
+		var cb = function (e) {
+			for (var i = 0; i < touches.length; i++) {
+				if (touches[i].pointerId === e.pointerId) {
+					touches.splice(i, 1);
+					break;
+				}
+			}
+
+			e.touches = touches.slice();
+			e.changedTouches = [e];
+
+			handler(e);
+		};
+
+		obj[pre + 'touchend' + id] = cb;
+		obj.addEventListener(this.POINTER_UP, cb, false);
+		obj.addEventListener(this.POINTER_CANCEL, cb, false);
+
+		return this;
+	},
+
+	removePointerListener: function (obj, type, id) {
+		var pre = '_leaflet_',
+		    cb = obj[pre + type + id];
+
+		switch (type) {
+		case 'touchstart':
+			obj.removeEventListener(this.POINTER_DOWN, cb, false);
+			break;
+		case 'touchmove':
+			obj.removeEventListener(this.POINTER_MOVE, cb, false);
+			break;
+		case 'touchend':
+			obj.removeEventListener(this.POINTER_UP, cb, false);
+			obj.removeEventListener(this.POINTER_CANCEL, cb, false);
+			break;
+		}
+
+		return this;
+	}
+});
+
+
+Wu.DomEvent.addListener = Wu.DomEvent.on;
+Wu.DomEvent.removeListener = Wu.DomEvent.off;
+
+
+// Wu.on = Wu.Mixin.Events.on;
+// Wu.off = Wu.Mixin.Events.off;
+// Wu.fire = Wu.Mixin.Events.fire;
 
 Array.prototype.diff = function(a) {
     return this.filter(function(i) {return a.indexOf(i) < 0;});
