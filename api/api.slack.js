@@ -49,18 +49,22 @@ module.exports = api.slack = {
 
 
 	_send : function (options) {
-		var text = options.text;
-		
+		var text = options.text,
+		    attachments = options.attachments,
+		    icon = options.icon,
+		    channel = options.channel;
+
 		// send to slack
 		slack.send({
-			text: text,
-			channel: api.config.slack.channel,
-			username: api.config.slack.botname,
-			icon_url : api.config.slack.icon,
-			unfurl_links: true,
-			link_names: 1
-			// attachments: attachment_array,
-			// icon_emoji: 'taco',
+			text 		: text,
+			channel 	: channel || api.config.slack.channel,
+			username 	: api.config.slack.botname,
+			icon_url 	: icon || api.config.slack.icon,
+			unfurl_links 	: true,
+			link_names 	: 1,
+			attachments 	: attachments,
+		}, function (err, ok) {
+			console.log('sent slack!!!!!', err, ok);
 		});
 	},
 
