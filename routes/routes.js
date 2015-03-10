@@ -37,7 +37,7 @@ module.exports = function(app, passport) {
 	// HOME PAGE (with login links) ===
 	// ================================
 	app.get('/', function(req, res) {
-		api.getBase(req, res);
+		api.portal.getBase(req, res);
 	});
 
 
@@ -45,7 +45,15 @@ module.exports = function(app, passport) {
 	// GET WHOLE SETUP FOR PORTAL ==========
 	// =====================================
 	app.post('/api/portal', isLoggedIn, function (req, res) {
-		api.getPortal(req, res);
+		api.portal.getPortal(req, res);
+	});
+
+	
+	// =====================================
+	// ERROR LOGGING =======================
+	// =====================================
+	app.post('/api/error/log', isLoggedIn, function (req, res) {
+		api.error.clientLog(req, res);
 	});
 
 
@@ -418,7 +426,7 @@ module.exports = function(app, passport) {
 	// RESET PASSWORD ======================
 	// =====================================
 	app.post('/reset', function (req, res) {
-		api.access.requestPasswordReset(req, res);
+		api.auth.requestPasswordReset(req, res);
 	});
 
 
@@ -426,23 +434,23 @@ module.exports = function(app, passport) {
 	// RESET PASSWORD ======================
 	// ===================================== 
 	app.get('/reset', function (req, res) {
-		api.access.confirmPasswordReset(req, res);
+		api.auth.confirmPasswordReset(req, res);
 	});
 
 
-	// =====================================
-	// DEBUG: CREATE ROLE ==================
-	// ===================================== 
-	app.post('/api/debug/createRole', isLoggedIn, function (req, res) {
-		api.debug.createRole(req, res);
-	});
+	// // =====================================
+	// // DEBUG: CREATE ROLE ==================
+	// // ===================================== 
+	// app.post('/api/debug/createRole', isLoggedIn, function (req, res) {
+	// 	api.debug.createRole(req, res);
+	// });
 
 
 	// =====================================
 	// LOGIN ===============================
 	// =====================================
 	app.get('/login', function(req, res) {
-		api.login(req, res);
+		api.portal.login(req, res);
 	});
 
 
@@ -450,7 +458,7 @@ module.exports = function(app, passport) {
 	// SIGNUP ==============================
 	// =====================================
 	app.get('/signup', function(req, res) {
-		api.signup(req, res);
+		api.portal.signup(req, res);
 	});
 
 
@@ -458,7 +466,7 @@ module.exports = function(app, passport) {
 	// LOGOUT ==============================
 	// =====================================
 	app.get('/logout', function(req, res) {
-		api.logout(req, res);
+		api.portal.logout(req, res);
 	});
 
 
@@ -486,7 +494,7 @@ module.exports = function(app, passport) {
 	// FORGOT PASSWORD =====================
 	// =====================================
 	app.post('/forgot', function (req, res) {
-		api.forgotPassword(res, req);
+		api.auth.forgotPassword(res, req);
 	});
 
 
@@ -494,7 +502,7 @@ module.exports = function(app, passport) {
 	// WILDCARD PATHS ======================		
 	// =====================================
 	app.get('*', function (req, res) {
-		api.wildcard(req, res);
+		api.portal.wildcard(req, res);
 	});
 
 

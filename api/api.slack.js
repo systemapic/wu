@@ -48,6 +48,27 @@ var slack = new nodeSlack(api.config.slack.webhook);
 module.exports = api.slack = { 
 
 
+	_send : function (options) {
+		var text = options.text,
+		    attachments = options.attachments,
+		    icon = options.icon,
+		    channel = options.channel;
+
+		// send to slack
+		slack.send({
+			text 		: text,
+			channel 	: channel || api.config.slack.channel,
+			username 	: api.config.slack.botname,
+			icon_url 	: icon || api.config.slack.icon,
+			unfurl_links 	: true,
+			link_names 	: 1,
+			attachments 	: attachments,
+		}, function (err, ok) {
+			console.log('sent slack!!!!!', err, ok);
+		});
+	},
+
+
 	createdProject : function (options) {
 		var project = options.project,
 		    user = options.user;
@@ -65,20 +86,13 @@ module.exports = api.slack = {
 			    url 	= baseurl + slugs,
 			    text 	= fullName + ' created a project for client ' + clientName + ': ' + url;
 
-			// send to slack
-			slack.send({
-				text: text,
-				channel: api.config.slack.channel,
-				username: api.config.slack.botname,
-				icon_url : api.config.slack.icon,
-				unfurl_links: true,
-				link_names: 1
-				// attachments: attachment_array,
-				// icon_emoji: 'taco',
-			});
+			// send
+			api.slack._send({text : text});
+			
 		});
 	},
 
+	
 
 	deletedProject : function (options) {
 		var project = options.project,
@@ -98,16 +112,7 @@ module.exports = api.slack = {
 			    text 	= fullName + ' deleted a project: ' + projectName;
 
 			// send to slack
-			slack.send({
-				text: text,
-				channel: api.config.slack.channel,
-				username: api.config.slack.botname,
-				icon_url : api.config.slack.icon,
-				unfurl_links: true,
-				link_names: 1
-				// attachments: attachment_array,
-				// icon_emoji: 'taco',
-			});
+			api.slack._send({text: text});
 		});
 	},
 
@@ -118,6 +123,17 @@ module.exports = api.slack = {
 	},
 
 
+
+	loggedIn : function (options) {
+		var user = options.user,
+		    fullName = user.firstName + ' ' + user.lastName;	
+		var text = fullName + ' logged in to project.ruppellsgriffon.com.'
+
+		// send
+		api.slack._send({ text : text });
+
+
+	},
 
 
 

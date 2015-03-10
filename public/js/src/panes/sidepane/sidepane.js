@@ -1,10 +1,25 @@
 Wu.SidePane = Wu.Class.extend({
 	_ : 'sidepane', 
 
+
+	_allPanes : [
+		'Clients', 
+		'Options', 
+		'Documents', 
+		'DataLibrary', 
+		'Users', 
+		'Share', 
+		'Account'
+	],
+
+
 	initialize : function (options) {
-		
 		this.options = options || app.options;
 
+		// panes
+		this._panes = [];
+
+		// render
 		this.initContainer();
 		this.initContent();
 		this.render();     
@@ -24,28 +39,26 @@ Wu.SidePane = Wu.Class.extend({
 		this.whichPaneOpen = 'projects';
 
 		// Mobile option ~ Back button when entering documents/datalibrary/users fullscreen
-		if ( Wu.app.mobile ) {
-
-			this._mobileFullScreenCloser = Wu.DomUtil.create('div', 'q-editor-fullscreen-mobile-close displayNone', this._container);
-			Wu.DomEvent.on(this._mobileFullScreenCloser, 'mousedown', this.closeMobileFullscreen, this);
-		}		
-
+		if (app.mobile) this._initMobileContainer();
 	},
 
+
+	_initMobileContainer : function () {
+		this._mobileFullScreenCloser = Wu.DomUtil.create('div', 'q-editor-fullscreen-mobile-close displayNone', this._container);
+		Wu.DomEvent.on(this._mobileFullScreenCloser, 'mousedown', this.closeMobileFullscreen, this);
+	},
+
+
 	closeMobileFullscreen : function () {
-
-		if ( app.SidePane.fullscreen ) {
-
+		if (app.SidePane.fullscreen) {
 			Wu.app._editorMenuPane.style.opacity = 1; // .q-editor-content
 			Wu.DomUtil.addClass(app.SidePane._mobileFullScreenCloser, 'displayNone'); // Hide back button
 			Wu.DomUtil.removeClass(app._mapPane, "map-blur"); // remove map blurring
 			Wu.DomUtil.removeClass(Wu.app._active, 'show'); // Hide current active fullpane
-			
 			app.SidePane.fullscreen = false;
-
 		}
-
 	},
+
 
 	initContent : function () {
 		
@@ -60,16 +73,15 @@ Wu.SidePane = Wu.Class.extend({
 		// menuslider
 		app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
 		app._menuSliderArrow = Wu.DomUtil.createId('div', 'menuslider-arrow', Wu.app._menuSlider);	// refactor app
-
-		
 	},
+
 	
 	render : function () {
 		var pane = this.options.panes;
 
 		// render sidepanes
 		if (pane.clients) 	this.Clients 	  = new Wu.SidePane.Clients();
-		if (pane.mapOptions) 	this.Map 	  = new Wu.SidePane.Map();		// Options
+		if (pane.options) 	this.Options 	  = new Wu.SidePane.Options();		// Options
 		if (pane.documents) 	this.Documents 	  = new Wu.SidePane.Documents();
 		if (pane.dataLibrary) 	this.DataLibrary  = new Wu.SidePane.DataLibrary();
 		if (pane.mediaLibrary) 	this.MediaLibrary = new Wu.SidePane.MediaLibrary();
@@ -77,25 +89,21 @@ Wu.SidePane = Wu.Class.extend({
 		if (pane.share) 	this.Share 	  = new Wu.SidePane.Share();
 		if (pane.account) 	this.Account 	  = new Wu.SidePane.Account();
 
+		this.refreshMenu();
 	},
 
+
 	calculateHeight : function () {
-
-
-		var header = app.HeaderPane;
-		var height = header.getHeight();
-
-		// set minimum width
-		if (!height) height = 80;
 
 		// set height
 		this._minHeight = 0;
 	},
 
-	setHeight : function (height) {
 
+	setHeight : function (height) {
 		this._container.style.height = height + 'px';
 	},
+
 
 	collapse : function () {
 		
@@ -110,14 +118,13 @@ Wu.SidePane = Wu.Class.extend({
 
 		// deactivte submenus
 		this._deactivate();
-
 	},
+
 
 	// call _deactivate on all items
 	_deactivate : function () {
-
 		if (this.Clients) 	this.Clients._deactivate();
-		if (this.Map) 		this.Map._deactivate();
+		if (this.Options) 	this.Options._deactivate();
 		if (this.Documents) 	this.Documents._deactivate();
 		if (this.DataLibrary) 	this.DataLibrary._deactivate();
 		if (this.MediaLibrary) 	this.MediaLibrary._deactivate();
@@ -125,6 +132,7 @@ Wu.SidePane = Wu.Class.extend({
 		if (this.Share) 	this.Share._deactivate();
 		if (this.Account) 	this.Account._deactivate();
 	},
+
 
 	expand : function () {
 
@@ -135,33 +143,85 @@ Wu.SidePane = Wu.Class.extend({
 		this.openPane();
 	},
 
+
 	_setMenuHeight : function () {
-
-		var project = app.activeProject;
-
-		// Button height
-		if ( !Wu.app.mobile ) {
-			var bHeight = 70;
-		} else {
-			var bHeight = 50;
-		}
-
-		var panes = this._getPaneArray();
-		var defaultPanes = app.access.to.edit_user(project) ? 3 : 2;
-
-		if (panes != 0) {
-			var height = panes.length * bHeight;
-		} else {
-			var height = defaultPanes * bHeight;
-		}
-
+		var bheight = app.mobile ? 50 : 70;
+		var height = this.paneOpen ? this._panes.length * bheight : 0;
 		app._editorMenuPane.style.height = parseInt(height) + 'px';
 	},
 
-	_getPaneArray : function (project) {
-		var project = project || app.activeProject;
+	setProject : function (project) {
+		// update content
+		if (this.Home) 		this.Home.updateContent(project);
+		if (this.Options)	this.Options.updateContent(project);
+		if (this.Documents) 	this.Documents.updateContent(project);
+		if (this.DataLibrary) 	this.DataLibrary.updateContent(project);
+	},
 
-		if (!project) return ['Clients', 'Users', 'Account'];
+
+	// display the relevant panes
+	refresh : function (panes) {
+		this.refreshMenu();
+	},
+	
+
+	refreshMenu : function () {
+		
+		// set correct state
+		this._updatePanes();
+
+		// render update
+		this._renderPanes();
+	},
+
+
+	_renderPanes : function () {
+
+		// get currently active panes
+		var active = _.filter(this._allPanes, function (pane) {
+			var p = this[pane];
+			return p && p._enabled;
+		}, this);
+
+		// return if same 	
+		if (_.isEqual(active, this._panes)) return this._setMenuHeight();
+
+		// disable all
+		_.each(this._allPanes, function (pane) {
+			if (this[pane]) this[pane].disable();
+		}, this);
+
+		// enable panes
+		_.each(this._panes, function (pane) {
+			if (this[pane]) this[pane].enable();
+		}, this);
+
+		this._setMenuHeight();
+	},
+
+	_defaultPanes : function () {
+
+		// if no active project,
+		var panes = ['Clients'];
+
+		// add users if admin
+		if (app.access.to.edit_project(false, app.Account)) panes.push('Users');
+		
+		// add logout
+		panes.push('Account');
+		
+		// set, return
+		this._panes = panes;
+		return this._panes;
+	},
+
+
+	// set this._panes to current state
+	_updatePanes : function () {
+		var project = app.activeProject;
+
+		// if no project, return defaults only
+		if (!project) return this._defaultPanes();
 
 		var panes = [],
 		    pane = this.options.panes,
@@ -170,9 +230,8 @@ Wu.SidePane = Wu.Class.extend({
 		    canEdit = app.access.to.edit_project(project, user),
 		    canManage = app.access.to.edit_user(project, user);
 
-
 		if (pane.clients) 					panes.push('Clients');
-		if (pane.mapOptions 	&& canEdit) 			panes.push('Map'); 
+		if (pane.options 	&& canEdit) 			panes.push('Options'); 
 		if (pane.documents   	&& settings.documentsPane) 	panes.push('Documents');
 		if (pane.dataLibrary 	&& settings.dataLibrary) 	panes.push('DataLibrary');
 		if (pane.MediaLibrary 	&& settings.mediaLibrary) 	panes.push('MediaLibrary');
@@ -180,119 +239,27 @@ Wu.SidePane = Wu.Class.extend({
 		if (pane.share 		&& settings.socialSharing) 	panes.push('Share');
 		if (pane.account) 					panes.push('Account');
 
-		return panes;
+		// set, return
+		this._panes = panes;
+		return this._panes;
 	},
 
-	setProject : function (project) {
-		// update content
-		if (this.Home) 		this.Home.updateContent(project);
-		if (this.Map) 		this.Map.updateContent(project);
-		if (this.Documents) 	this.Documents.updateContent(project);
-		if (this.DataLibrary) 	this.DataLibrary.updateContent(project);
-	},
-
-	refreshProject : function (project) {
-
-
-		var editMode = project.editMode; // access determined at Wu.Project
-		
-		// default menus in sidepane
-		var panes = this._getPaneArray(project);
-
-		// set menu height
-		if (this.paneOpen) this._setMenuHeight();									
-
-		// remove Map pane if not editor
-		if (!editMode) _.pull(panes, 'Map');
-
-		if (!app.access.to.edit_user(project)) _.pull(panes, 'Users');
-
-		// refresh
-		this.refresh(panes);
-	},
-
-	refreshClient : function () {
-
-		// set panes 
-		var panes = ['Clients'];
-		if (app.Account.isManager()) panes.push('Users');
-		panes.push('Account'); // logout button
-
-		// refresh
-		this.refresh(panes);
-	},
-
-	// display the relevant panes
-	refresh : function (panes) {
-		
-
-		var panes = panes || this.panes;
-		this.panes = [];
-
-		// all panes
-		var all = ['Clients', 'Map', 'Documents', 'DataLibrary', 'Users', 'Share', 'Account'], // MediaLibrary
-		    sidepane = app.SidePane;
-
-		// panes to active
-		all.forEach(function (elem, i, arr) {
-			if (!sidepane[elem]) {
-				sidepane[elem] = new Wu.SidePane[elem];
-			}
-			sidepane[elem].enable();
-			this.panes.push(elem);	// stored for calculating the menu slider
-		}, this);
-
-		// panes to deactivate
-		var off = all.diff(panes);
-		off.forEach(function (elem, i, arr) {
-			var dis = sidepane[elem];
-			if (dis)  sidepane[elem].disable();
-			_.pull(this.panes, elem);
-		}, this);
-
-		if (this.paneOpen) setTimeout(this._setMenuHeight.bind(this), 100); // another ugly hack! todo: refactor to avoid these type errs
-			
-	},
 
 	_refresh : function () {
-		// var panes = Wu.extend([], this.panes);
-		var panes = this._getPaneArray();
-		this.refresh(panes);
+		this.refreshMenu();
 	},
 	
-
-	addPane : function (pane) {
-		var panes = this._addPane(pane);
-		this.refresh(panes);
-	},
-
-	_addPane : function (pane) {
-		var panes = Wu.extend([], this.panes);
-		panes.push(pane);
-		panes = _.unique(panes);
-		return panes;
-	},
-
-	removePane : function (pane) {
-		var panes = this._removePane(pane);
-		this.refresh(panes);
-	},
-
-	_removePane : function (pane) {
-		var panes = Wu.extend([], this.panes);
-		_.pull(panes, pane);
-		return panes;
-	},
 
 	// close sidepane
 	closePane : function () {
 
 		// return if already closed
 		if (!this.paneOpen) return;
+
 		this.paneOpen = false;
 
-		// Close drop down menu
-		Wu.app._editorMenuPane.style.height = '0px';
+		// slide close
+		this._setMenuHeight();
 
 		// Close menu container
 		Wu.DomUtil.addClass(app._editorContentPane, 'hide-menu');
@@ -300,7 +267,7 @@ Wu.SidePane = Wu.Class.extend({
 		// Make map clickable behind...
 		setTimeout(function(){
 			Wu.DomUtil.addClass(app._editorContentPane, 'displayNone');	
-		}, 300)
+		}, 50)
 
 		// refresh leaflet
 		this._refreshLeaflet();
@@ -309,20 +276,19 @@ Wu.SidePane = Wu.Class.extend({
 		Wu.DomUtil.removeClass(app.SidePane.Documents._content, 'show'); 	// refactorrr
 		Wu.DomUtil.removeClass(app.SidePane.DataLibrary._content, 'show');
 		Wu.DomUtil.removeClass(app.SidePane.Users._content, 'show');
-
 	},
 
-	_closePane : function () {				// refactor: move to SidePane.Item ... 
-		// noop
-	},	
 
 	// open sidepane
 	openPane : function () {
 
-
 		// return if already open
 		if (this.paneOpen) return;
+
 		this.paneOpen = true;
+
+		// slide open
+		this._setMenuHeight();
 
 		// open
 		Wu.DomUtil.addClass(app._active, 'show');
@@ -331,33 +297,32 @@ Wu.SidePane = Wu.Class.extend({
 		// Have to set a micro timeout, so that it doesn't mess with the displayNone class above
 		setTimeout(function() {
 			Wu.DomUtil.removeClass(app._editorContentPane, 'hide-menu');
-		}, 10)
+		}, 50)
 
 		// refresh leaflet
 		this._refreshLeaflet();
 
-		if ( Wu.app.mobile ) this.openOnMobile();
-		
+		if (app.mobile) this.openOnMobile();
 	},
+
 
 	// By Jørgen ~ Do not open full screen panes
 	openOnMobile : function () {
-
-		if ( app._activeMenuItem == 'documents' || app._activeMenuItem == 'dataLibrary' || app._activeMenuItem == 'users') {
+		if (app._activeMenuItem == 'documents' || app._activeMenuItem == 'dataLibrary' || app._activeMenuItem == 'users') {
 			app.SidePane.Clients.activate();	
 		}
 	},
 
+	
 	widenContainer : function () {
 		this._container.style.width = '100%';
 	},
 
+	
 	_refreshLeaflet : function () {
 		setTimeout(function() {
 			var map = Wu.app._map;
 			if (map) map.reframe();
 		}, 300); // time with css
 	},
-
-	
 });

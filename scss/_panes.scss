@@ -2768,46 +2768,73 @@ td.tdcont.createdDate {
 
 
 /*
-┌─┐┬─┐┬─┐┌─┐┬─┐  ┌─┐┌─┐┌┐┌┌─┐
+┌─┐┬─┐┬─┐┌─┐┬─┐  ┌─┐┌─┐┌┐┌┌─┐ 	// rename to feedback pane, see knut.css
 ├┤ ├┬┘├┬┘│ │├┬┘  ├─┘├─┤│││├┤ 
 └─┘┴└─┴└─└─┘┴└─  ┴  ┴ ┴┘└┘└─┘
 */
 
 .error-pane {
 	position: absolute;
-	top: 6px;
-	left: 104px;
-	width: 100%;
-	height: 77px;
+	bottom: 0;
+	left: 0;
+	width: auto;
 	z-index: 999999999;
-	padding-right: 109px;
+	margin: 10px;
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-	}
+	max-width: 500px;
+	max-height: 400px;
+
+
+}
 
 .error-pane-content {
-	background: #C80000;
+	background: rgba(255, 0, 0, 0.81);
 	width: 100%;
 	height: 100%;
 	opacity: 0.9;
-	cursor: pointer;
-	}
+	cursor: default;
+	border-radius: 3px;
+	margin-right: 50px;
+	max-height: inherit;
+  	overflow: hidden;
+
+  	/*-webkit-box-shadow: 2px 5px 44px -10px rgba(0,0,0,1);
+	-moz-box-shadow: 2px 5px 44px -10px rgba(0,0,0,1);
+	box-shadow: 2px 5px 44px -10px rgba(0,0,0,1);*/
+}
 
 .error-pane-title {
 	color: white;
 	padding-left: 10px;
-	font-weight: 900;
+	font-weight: 400;
 	font-size: 200%;
-	}
+}
 
 .error-pane-description {
 	color: white;
 	padding-left: 10px;
-	font-weight: 900;
+	font-weight: 400;
 	font-size: 120%;
-	}
+	margin: 5px;
+}
 
-
+.error-pane-x {
+	top: 5px;
+	right: 4px;
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	color: white;
+	font-weight: bold;
+	cursor: pointer;
+	text-align: center;
+	border-radius: 10px;
+}
+.error-pane-x:hover {
+	background: white;
+	color: rgba(255, 0, 0, 0.81);
+}
 
 
 

@@ -41,28 +41,95 @@ var api = module.parent.exports;
 // exports
 module.exports = api.error = { 
 
-
 	unauthorized : function (req, res) {
+		console.log('api.error.unauthorized'.red);
+		
 		var message = "Don't be cheeky! All your IP are belong to us.";
 		res.end(JSON.stringify({ 
 			error : message 
 		}));
+
+		api.error.log('unauthorized');
 	},
 
 	missingInformation : function (req, res) {
+		console.log('api.error.missingInformation'.red);
+		
 		var message = 'Missing information. Stay with the program!';
 		res.end(JSON.stringify({ 
 			error : message 
 		}));
+		
+		api.error.log('missingInformation');
 	},
 
 	general : function (req, res, err) {
+		console.log('api.error.general'.red, err);
+
 		res.end(JSON.stringify({
-			error : err
+			error : api.error.pretty(err)
 		}));
+		
+		api.error.log(err);
+	},
+
+	pretty : function (err) {
+		if (!err) return err;
+
+		// return message if available		
+		if (err.message) return err.message;
+
+		// return ugly
+		return err;
+	},
+
+	log : function (err) {
+		if (!err) return;
+
+		// print
+		if (err.stack) console.log('stack:'.red, err.stack);
+		if (err.message) console.log('message'.red, err.message);
+		
+
+		if (_.isObject(err)) {
+			for (item in err) {
+				console.log('err items: ', err[item]);
+			}
+		}
+
+		// todo: slack, ga.js, log, etc.
 	},
 	
+	clientLog : function (req, res) {
+		var options = req.body,
+		    message = options.message,
+		    file = options.file,
+		    line = options.line,
+		    stack = options.stack,
+		    username = options.username,
+		    project = options.project,
+		    domain = api.config.portalServer.uri.split('//').reverse()[0],
+		    fileLine = options.file.split('/').reverse()[0] + ':' + options.line;
+
+		var find = api.config.portalServer.uri;
+		var re = new RegExp(find, 'g');
+		var cleanStack = stack.replace(re, '');
+
+		var text = '*Error*: ' + domain + ' `' + fileLine + '` ```' + cleanStack + '```';
+
+		api.slack._send({
+			text : text,
+			channel : '#error-log',
+			icon : 'http://systemapic.com/wp-content/uploads/systemapic-color-logo-circle-error.png'
+		});
+
+		res.end(); // no feedback
+	},
+
+
 
 
 
 }
+
+

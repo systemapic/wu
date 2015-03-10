@@ -50,22 +50,22 @@ module.exports = api.file = {
 		var pslug 	= req.body.pslug;
 
 		// return if nothing
-		if (!files || !puuids || !pslug) return res.end('nothing!');
+		if (!files || !puuids || !pslug) return api.error.missingInformation(req, res);
 
 		// create main folder
 		var uuidFolder 	= uuid.v4();
-		// var basedir 	= TEMPFOLDER + uuidFolder;
 		var basedir 	= api.config.path.temp + uuidFolder;
 		var maindir 	= basedir + '/' + pslug;
 		
 		fs.mkdirs(maindir, function (err) {		// refactor
+			if (err) console.log('ERR 9'.red, err);
 			
-			// return on error
-			if (err) return console.error(err);
+			if (err) return api.error.general(req, res, err);
 			
 			// for each file
 			var dbl = [], i = 1;
 			async.each(files, function (file, callback) {
+				if (!file || !file.name) return callback('No such file.');
 
 				// check for no double folder names			
 				var filename = file.name;
@@ -74,17 +74,20 @@ module.exports = api.file = {
 
 				// set paths
 				var dest = maindir + '/' + filename;
-				// var src = FILEFOLDER + file.uuid ; // folder
 				var src = api.config.path.file + file.uuid ; // folder
 
 				// copy
-				fs.copy(src, dest, function(err){ callback(err) });	
+				// fs.copy(src, dest, function(err) { callback(err) });	
+				fs.copy(src, dest, callback);	
 
 			}, 
 
 			// final callback
 			function (err) {	// todo: err handling
-				
+				if (err) console.log('ERR 10'.red, err);
+
+				if (err) return api.error.general(req, res, err);
+
 				// execute cmd line zipping 
 				var zipfile = basedir + '/' + pslug + '_download.zip';
 				var cmd = 'zip -r ' + zipfile + ' *'; 
@@ -92,7 +95,9 @@ module.exports = api.file = {
 				
 				// run command
 				exec(cmd, { cwd : maindir }, function (err, stdout, stdin) {
-					if (err) return res.end(err); // if err
+					if (err) console.log('ERR 11'.red, err);
+
+					if (err) return api.error.general(req, res, err); // if err
 
 					// send zip uuid
 					res.end(uuidFolder);
@@ -107,8 +112,6 @@ module.exports = api.file = {
 		var fileUuid = req.query.file,
 		    account = req.user,
 		    ops = [];
-
-
 
 		if (!fileUuid) return api.error.missingInformation(req, res);
 		
@@ -140,10 +143,11 @@ module.exports = api.file = {
 		});
 
 		async.waterfall(ops, function (err, path) {
+			if (err) console.log('ERR 12'.red, err);
+
 			if (err) return api.error.general(req, res, err);
 			res.download(path);
 		});
-
 	},
 
 
@@ -154,18 +158,17 @@ module.exports = api.file = {
 		    folder = api.config.path.temp + file,
 		    found,
 		    ops = [];
-
-
 	
 		// todo: this is fucked. not even dealing with a file object here, just paths.. 
 		// 	not solid! FIX!
-
 		
 		// find zip file
 		dive(folder, 
 
 			// each file callback
 			function(err, file) {
+				if (err) console.log('ERR 13'.red, err);
+
 				if (err || !file) return api.error.general(req, res, 'File not found.');
 
 				if (file.slice(-3) == 'zip') {
@@ -176,7 +179,9 @@ module.exports = api.file = {
 			}, 
 
 			// callback
-			function () { 
+			function (err) { 
+				if (err) console.log('ERR 14'.red, err);
+
 				if (!found) return api.error.general(req, res, 'File not found.');
 			}	
 		);
@@ -185,7 +190,6 @@ module.exports = api.file = {
 
 	// handle file download
 	download : function (req, res) {
-
 		var file = req.query.file,
 		    type = req.query.type || 'file';
 	
@@ -216,11 +220,8 @@ module.exports = api.file = {
 		console.log('uuids: ', uuids);
 
 
-
 		// validate
-		if (!_fids || !puuid || !userid) return res.end('missing!');
-
-		var ops = [];
+		if (!_fids || !puuid || !userid) return api.error.missingInformation(req, res);
 
 		// find layer _ids for removing in project
 		ops.push(function (callback) {
@@ -247,9 +248,7 @@ module.exports = api.file = {
 			.findOne({uuid : puuid})
 			// .populate('layers')
 			.exec(function (err, project) {
-				if (err) console.log('find err: ', err);
-
-				console.log('found project: ', project.name);
+				if (err || !project) return callback(err);
 
 				// pull files
 				_fids.forEach(function (f) {
@@ -265,8 +264,6 @@ module.exports = api.file = {
 				project.markModified('layers');
 
 				project.save(function (err) {
-					if (err) console.error('save err: ', err);
-					console.log('file removed from project');
 					return callback(err);
 				});
 			});
@@ -278,18 +275,13 @@ module.exports = api.file = {
 	
 		// run queries
 		async.series(ops, function(err) {
+			if (err) console.log('ERR 15'.red, err);
+			if (err) return api.error.general(req, res, err);		
 
-			if (err) {
-				console.log('asyn err: ', err);
-				return res.end('{ error : 0 }');
-			}		
-
-			console.log('delete done...?');
 			res.end(JSON.stringify({
 				error : err
 			}));
 		});
-
 	},
 
 
@@ -299,6 +291,7 @@ module.exports = api.file = {
 		    account = req.user,
 		    ops = [];
 		
+		if (!fileUuid) return api.error.missingInformation(req, res);
 
 		ops.push(function (callback) {
 			File
@@ -322,7 +315,10 @@ module.exports = api.file = {
 		});
 
 		async.waterfall(ops, function (err, file) {
-			if (err) return api.error.general(req, res, err);
+			if (err) console.log('file update err: '.red + err);
+			if (err) console.log('ERR 16'.red, err);
+			if (err || !file) return api.error.general(req, res, err);
+
 			res.end(JSON.stringify(file));
 		});
 
@@ -383,14 +379,14 @@ module.exports = api.file = {
 	// #########################################
 	// handleZip : function (inn, fileUuid, callback) {
 	handleZip : function (options, callback) {
-		console.log('FILER:  handleZip!!! ', options);
+		var inn = options.inn,
+		    fileUuid = options.fileUuid,
+		    out = api.config.path.file + fileUuid + options.out;
 
-		var inn = options.inn;
-		var fileUuid = options.fileUuid;
-		// var out = FILEFOLDER + fileUuid + options.out;
-		var out = api.config.path.file + fileUuid + options.out;
 
 		fs.ensureDir(out, function (err) {
+			if (err) console.log('handlezip 903 err: '.red + err);
+			if (err) return callback(err);
 
 			// cmd
 			var cmd = 'unzip -o -d "' + out + '" "' + inn + '" -x "*DS_Store*" "*__MACOSX*"'; 	// to folder .shp
@@ -398,9 +394,16 @@ module.exports = api.file = {
 
 			// unzip
 			exec(cmd, function (err, stdout, stdin) {
+				if (err) console.log('handleziup 00 err: '.red + err);
+				if (err) return callback(err);
+
 				// remove unnecessary files - important!
 				fs.unlink(inn, function (err) {
+					if (err) console.log('handle zip unlink  err: '.red + err);
+					if (err) return callback(err);
+
 					fs.remove(out + '/__MACOSX', function (err) {
+						if (err) console.log('handle zip remove : '.red + err);
 						callback(err);
 					});
 				});
@@ -412,24 +415,22 @@ module.exports = api.file = {
 	// ###  FILER: untar                     ###
 	// #########################################
 	handleTar : function (inn, fileUuid, callback) {
-		console.log('FILER: Handling tar');
-	
-		// var out = FILEFOLDER + fileUuid;
 		var out = api.config.path.file + fileUuid;
 
 		fs.ensureDir(out, function (err) {
+			if (err) return callback(err);
 
 			var cmd = 'tar xzf "' + inn + '" -C "' + out + '"';
 			var exec = require('child_process').exec;
 			
 			// unzip
 			exec(cmd, function (err, stdout, stdin) {
-				console.log('unzip done: ', err, stdout, stdin);
+				if (err) return callback(err);
 
 				// remove zipfile - important!
 				fs.unlink(inn, function (err) {
-					console.log('deleted tar file', err);
-				
+					if (err) return callback(err);
+
 					// remove __MACOSX
 					fs.remove(out + '/__MACOSX', function (err) {
 						// return
@@ -444,13 +445,14 @@ module.exports = api.file = {
 	// ###  FILER: image                     ###
 	// #########################################
 	handleImage : function (path, name, fileUuid, callback) {	
-		console.log('FILER: Handling image');
-		
+		if (!path || !name || !fileUuid) return callback('Missing information.9');
+
 		// set path
 		var out = api.config.path.file + fileUuid + '/' + name;
-
+	
 		// move to folder
 		fs.move(path, out, function (err) {
+			if (err) return callback(err);
 
 			// handle
 			api.pixels.handleImage(out, function (err, db) {
@@ -465,16 +467,14 @@ module.exports = api.file = {
 	// ###  FILER: documents                 ###
 	// #########################################
 	handleDocument : function (path, name, fileUuid, callback) {	
-		console.log('FILER: Handling doc');
+		if (!path || !name || !fileUuid) return callback('Missing information.10');
 
-		// set path	
 		var out = api.config.path.file + fileUuid + '/' + name;
 
 		// move to folder
 		fs.move(path, out, function (err) {
 			callback(null);
 		});
-
 	},
 
 
@@ -482,32 +482,60 @@ module.exports = api.file = {
 	// #########################################
 	// ###  FILER: geo/topo/json             ###
 	// #########################################
-	handleJson : function (inn, name, type, fileUuid, callback) {
-		console.log('FILER: Handling json');
+	handleJson : function (inn, name, type, fileUuid, done) {
+		if (!inn || !name || !fileUuid) return done('Missing information.11');
 	
 		// set path
 		var out = api.config.path.file + fileUuid + '/' + name;
 
-		// move to folder
-		fs.move(inn, out, function (err) {
+		console.log('--------------------'.red);
+		console.log('--------------------'.red);
+		console.log('--------------------'.red);
+		console.log('inn: ', inn);
+		console.log('out: ', out);
+		console.log('name: ', name);
+		console.log('type: ', type);
+		console.log('fileUuid: ', fileUuid);
+		console.log('---------------------'.red);
 
-			if (type == 'geojson') {
-				// process geo
-				return api.geo.handleGeoJSON(out, fileUuid, function (err, db) {
 
-					// populate db 
-					db.data = {
-						geojson : name
-					}
-					db.title = name;
+		var ops = {};
 
-					callback(err, db);
+		// move if not already in right place
+		if (inn != out) {
+			ops.move = function (callback) {
+				fs.move(inn, out, callback);
+			};
+		}
 
-				});	
-			}
+		ops.geo = function (callback) {
 
-			// catch err
-			callback(err);
+			// process geo
+			if (type != 'geojson') return callback('Not a valid .geojson file.');
+
+
+			api.geo.handleGeoJSON(out, fileUuid, function (err, db) {
+				if (err) console.log('ERR 51'.red, err);
+				if (err || !db) return callback(err || 'No db.');
+
+				// populate db 
+				db.data = {
+					geojson : name
+				}
+				db.title = name;
+
+				callback(err, db);
+
+			});	
+			
+
+		};
+
+
+		async.series(ops, function (err, results) {
+			if (err) console.log('ERR 60'.red, err);
+
+			done(err, results.geo);
 		});
 
 	},
@@ -518,14 +546,21 @@ module.exports = api.file = {
 	// #########################################
 	handleShapefile : function (folder, name, fileUuid, callback) {	// already moved to right place, by unzip
 		api.geo.handleShapefile(folder, name, fileUuid, function (err, db) {
+			if (err) console.log('ahndle shape ERRR 909: '.red + err);
+			if (err) console.log(err);
 			if (err) {
 				// delete shapefile
 				var path = folder + '/' + name;
-				fs.unlink(path, function (err) {
-					console.log('unlinked?', err);
+				fs.unlink(path, function (er) {
+					console.log('------------'.yellow, 'unlinked: ', path)
+					if (er) console.log('handle shape unlink err: '.red + er);
+					console.log('unlinked?', er);
+					callback(err);
 				});
+			} else {
+				console.log('============='.red, 'no err?');
+				callback(null, db);
 			}
-			callback(err, db);
 		});
 	},
 
@@ -547,6 +582,7 @@ module.exports = api.file = {
 		.limit(1)	// safeguard
 		.exec(function(err, record) {
 			console.log('found: ', record);
+			if (err) console.log('get geo exec err: '.red + err);
 			return api.file.sendGeoJsonFile(req, res, record[0]);
 		});
 	},
@@ -571,6 +607,8 @@ module.exports = api.file = {
 
 		// read file and ship it
 		fs.readJson(path, function (err, data) {
+			if (err) console.log('send geo json err: '.red + err);
+			if (err) console.log('ERR 17'.red, err);
 			if (err || !data) return api.error.general(req, res, err || 'No file.');
 
 			// set header
@@ -598,6 +636,9 @@ module.exports = api.file = {
 
 		// final callback
 		function (err) {
+			if (err) console.log('___send geo json  e err: '.red + err);
+			if (err) console.log('ERR 18'.red, err);
+			if (err || !geofile) return api.error.general(req, res, err);
 
 			// set filesize
 			var string = JSON.stringify(geofile);
@@ -608,7 +649,7 @@ module.exports = api.file = {
 			});
 			
 			// return geojson string
-			res.end(JSON.stringify(geofile));
+			res.end(string);
 		});
 		
 	},
