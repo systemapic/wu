@@ -31,7 +31,7 @@ L.Control.Layermenu = L.Control.extend({
 	},
 
 
-	initLayout : function () {		
+	initLayout : function () {	
 
 		// Create the header    
 		this._layerMenuHeader = Wu.DomUtil.createId('div', 'layer-menu-header');

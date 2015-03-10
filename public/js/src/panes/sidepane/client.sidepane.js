@@ -544,7 +544,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._container.style.height = this.maxHeight + 'px';          
 		this._isOpen = true;
 
-		Wu.DomUtil.removeClass(this._removeClientButton, 'displayNone');
+		if (this._removeClientButton) Wu.DomUtil.removeClass(this._removeClientButton, 'displayNone');
 
 		// close others
 		var clients = app.SidePane.Clients;
@@ -558,7 +558,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._container.style.height = this.minHeight + 'px';    
 		this._isOpen = false;
 
-		Wu.DomUtil.addClass(this._removeClientButton, 'displayNone');
+		if (this._removeClientButton) Wu.DomUtil.addClass(this._removeClientButton, 'displayNone');
 
 		this.resetOpenProjectInfo();
 	},

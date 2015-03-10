@@ -48,6 +48,14 @@ module.exports = function(app, passport) {
 		api.portal.getPortal(req, res);
 	});
 
+	
+	// =====================================
+	// ERROR LOGGING =======================
+	// =====================================
+	app.post('/api/error/log', isLoggedIn, function (req, res) {
+		api.error.clientLog(req, res);
+	});
+
 
 	// =====================================
 	// CREATE NEW PROJECT  =================

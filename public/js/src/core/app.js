@@ -17,6 +17,9 @@ Wu.App = Wu.Class.extend({
 		Wu.app = this;
 		window.app = this;
 
+		// error handling
+		this._initErrorHandling();
+
 		// merge options
 		Wu.setOptions(this, options);
 
@@ -39,6 +42,21 @@ Wu.App = Wu.Class.extend({
 
 	},
 
+	_initErrorHandling : function () {
+		window.onerror = function (message, file, line, d, e) {
+			var project = app.activeProject ? app.activeProject.getTitle() : 'None';
+			var username = app.Account ? app.Account.getName() : 'No name';
+			var options = JSON.stringify({
+				message : message,
+				file : file,
+				line : line,
+				user : username,
+				project : project
+			});
+
+			Wu.save('/api/error/log', options);
+		}
+	},
 
 	detectMobile : function() {
 		

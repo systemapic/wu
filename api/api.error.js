@@ -100,6 +100,27 @@ module.exports = api.error = {
 		// todo: slack, ga.js, log, etc.
 	},
 
+	clientLog : function (req, res) {
+		var options = req.body,
+		    message = options.message,
+		    file = options.file,
+		    line = options.line,
+		    username = options.username,
+		    project = options.project,
+		    domain = api.config.portalServer.uri.split('//').reverse()[0],
+		    fileLine = options.file.split('/').reverse()[0] + ':' + options.line;
+
+		var text = '*Error*: ' + domain + ' `' + fileLine + '` ```' + message + '``` ';
+
+		api.slack._send({
+			text : text,
+			channel : '#error-log',
+			icon : 'http://systemapic.com/wp-content/uploads/systemapic-color-logo-circle-error.png'
+		});
+
+		res.end(); // no feedback
+	},
+
 
 
 
