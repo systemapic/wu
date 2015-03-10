@@ -99,18 +99,23 @@ module.exports = api.error = {
 
 		// todo: slack, ga.js, log, etc.
 	},
-
+	
 	clientLog : function (req, res) {
 		var options = req.body,
 		    message = options.message,
 		    file = options.file,
 		    line = options.line,
+		    stack = options.stack,
 		    username = options.username,
 		    project = options.project,
 		    domain = api.config.portalServer.uri.split('//').reverse()[0],
 		    fileLine = options.file.split('/').reverse()[0] + ':' + options.line;
 
-		var text = '*Error*: ' + domain + ' `' + fileLine + '` ```' + message + '``` ';
+		var find = api.config.portalServer.uri;
+		var re = new RegExp(find, 'g');
+		var cleanStack = stack.replace(re, '');
+
+		var text = '*Error*: ' + domain + ' `' + fileLine + '` ```' + cleanStack + '```';
 
 		api.slack._send({
 			text : text,
@@ -120,6 +125,7 @@ module.exports = api.error = {
 
 		res.end(); // no feedback
 	},
+
 
 
 

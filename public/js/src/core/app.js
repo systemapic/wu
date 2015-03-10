@@ -43,20 +43,25 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_initErrorHandling : function () {
-		window.onerror = function (message, file, line, d, e) {
+		window.onerror = function (message, file, line, char, ref) {
+			
+			var stack = ref.stack;
 			var project = app.activeProject ? app.activeProject.getTitle() : 'None';
 			var username = app.Account ? app.Account.getName() : 'No name';
+			
 			var options = JSON.stringify({
 				message : message,
 				file : file,
 				line : line,
 				user : username,
+				stack : stack,
 				project : project
 			});
 
 			Wu.save('/api/error/log', options);
 		}
 	},
+
 
 	detectMobile : function() {
 		
