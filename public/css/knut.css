@@ -481,3 +481,25 @@ aka feedback pane
 
 
 
+
+
+
+
+/*fixing legends*/
+
+.legend-feature {
+	border : 0px solid white;
+}
+.legend-image1, .legend-image2 {
+  position: relative;
+  top: -16px;
+  left: -40px;
+  }
+
+.legend-entry-image {
+	border : 0px solid white;
+}
+
+
+
+

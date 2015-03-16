@@ -234,10 +234,11 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 
 	// enable edit mode on layermenu itself
 	enableEdit : function () {
-
-		if ( !app.MapPane.layerMenu._open ) app.MapPane.layerMenu.toggleLayerPane();		
-
 		var layerMenu = Wu.app.MapPane.layerMenu;
+		if (!layerMenu) return;
+
+		if (!layerMenu._open) layerMenu.toggleLayerPane();		
+
 		if (layerMenu) layerMenu.enableEdit();
 	},
 

@@ -176,7 +176,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.logodz.options.params.project = this.project.getUuid();
 
 		// set callback on successful upload
-		this.logodz.on('success', this.editedLogo, this);
+		this.logodz.on('success', this.editedLogo.bind(this), this);
 
 		// set image frame with editable clas
 		Wu.DomUtil.addClass(this.logo, 'editable');
@@ -188,7 +188,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		console.log('remLog DXZ');
 
 		if (this.logodz) this.logodz.disable();
-		this.logodz.off('success', this.editedLogo, this);
+		this.logodz.off('success', this.editedLogo.bind(this), this);
 		this.logodz = null;
 		delete this.logodz;
 
@@ -241,9 +241,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	},
 
-
-
 	makeNewThumbnail : function () {
+		this.project = this.project || app.activeProject;
 
 		// Set state to manually updated to prevet overriding
 		this.project.setThumbCreated(true);
@@ -254,9 +253,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	},
 
-	
-
 	editedLogo : function (err, path) {
+		this.project = this.project || app.activeProject;
 
 		// Set state to manually updated to prevet overriding
 		this.project.setThumbCreated(true);

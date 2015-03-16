@@ -117,6 +117,7 @@ Wu.Dropzone = Wu.Class.extend({
 				// acceptedFiles : '.zip,.gz,.png,.jpg,.jpeg,.geojson,.json,.topojson,.kml,.docx,.pdf,.doc,.txt',
 				// maxFiles : 10,
 				// parallelUploads : 10,
+				maxFilesize : 2000,
 				parallelUploads : 1,
 				clickable : this._clickable || false,
 				accept : function (file, done) {
@@ -237,6 +238,7 @@ Wu.Dropzone = Wu.Class.extend({
 		this.dz.on('uploadprogress', function (file, progress) {
 			// set progress
 			that.progress.setProgress(progress);
+			console.log('progress:', progress);
 		});                                                                                                                                                                                                               
 
 		// this.dz.on('successmultiple', function (dz, json, xml) {

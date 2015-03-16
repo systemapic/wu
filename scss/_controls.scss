@@ -423,7 +423,7 @@
 	left: auto;
 	text-transform: uppercase;
 	text-align: center;
-	height: 24px;
+	height: 28px;
 	line-height: 2.2;
 	font-weight: $obese;
 	margin-top: 0px;
@@ -926,7 +926,7 @@
 	}
 
 /* legends scroll right */
-#legends-scroll-right {
+.legends-scroll-right {
 	width: 20px;
 	height: 13px;
 	position: absolute;
@@ -1000,7 +1000,8 @@
 	position: relative;
 	margin-bottom: 3px;
 	margin-top: 3px;	
-	width: 135px;
+	/*width: 135px;*/
+	width: 200px;
 	}
 
 .legend-feature {

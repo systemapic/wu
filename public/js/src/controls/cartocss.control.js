@@ -473,6 +473,8 @@ L.Control.CartoCSS = L.Control.extend({
 
 		// Get title from tooltip
 		var tooltipMeta = this._layer.getTooltip();
+		
+		console.log('tooltipMeta', tooltipMeta);
 
 		// Clear old
 		this._legendsWrapper.innerHTML = '';
@@ -486,7 +488,10 @@ L.Control.CartoCSS = L.Control.extend({
 		// Title
 		this._legendsTitle = Wu.DomUtil.create('input', 'legends-title', this._legentTitleWrapper);
 		this._legendsTitle.setAttribute('placeholder', 'Legend title');
-		this._legendsTitle.innerHTML = tooltipMeta.title || '';
+		this._legendsTitle.setAttribute('disabled', 'disabled');
+		this._legendsTitle.value = tooltipMeta.title || '';
+
+		console.log('tooltiupMeta: ', tooltipMeta);
 
 		// Select all switch
 		var switchWrapper 	= Wu.DomUtil.create('div', 'cartoCSS-tooltip-switch-all-wrapper', this._legentTitleWrapper)
@@ -658,12 +663,17 @@ L.Control.CartoCSS = L.Control.extend({
 		
 		// generate legends on server from active fields
 		this._layer.createLegends(function (ctx, json) {	// callback
-			var legends = JSON.parse(json);
+			var legends = Wu.parse(json);
 
 			if (legends && legends.err) {
 				console.error('legends err', legends);
 				return this.handleError(legends.err);
 			}
+
+			if (!legends) {
+				console.error('no error', json);
+				return this.handleError(legends);
+			} 
 
 			// sort some things: #layer on top
 			var layer = _.remove(legends, function (l) {
@@ -880,8 +890,11 @@ L.Control.CartoCSS = L.Control.extend({
 
 	_saveTooltipMeta : function () {
 
+		var headerTitle = Wu.DomUtil.get('cartocss-tooltip-custom-header').value;
+		console.log('headerTitle', headerTitle);
+
 		var saved = {
-			title : '',
+			title : headerTitle,
 			fields : []
 		};
 
@@ -891,11 +904,10 @@ L.Control.CartoCSS = L.Control.extend({
 
 			var child = childs[i];
 
-			// get title
-			if (i == 0) {
-				saved.title = child.value;
-				continue;
-			}
+			// skip first
+			if (i == 0) continue;
+
+			console.log('child: ', child);
 
 			var key = child.childNodes[0].getAttribute('placeholder');
 			var title = child.childNodes[0].value;
@@ -914,7 +926,7 @@ L.Control.CartoCSS = L.Control.extend({
 		this._layer.setTooltip(saved);
 
 		// update legends tab title
-		this._legendsTitle.innerHTML = saved.title;
+		this._legendsTitle.value = saved.title;
 		
 	},
 

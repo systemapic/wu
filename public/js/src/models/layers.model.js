@@ -670,7 +670,7 @@ Wu.MapboxLayer = Wu.Layer.extend({
 		// create Leaflet.mapbox tileLayer
 		this.layer = L.mapbox.tileLayer(this.store.data.mapbox, {
 			accessToken : this.store.accessToken,
-			reuseTiles : true,
+			// reuseTiles : true,
 			// tileSize : 512,
 			// unloadInvisibleTiles : true,
 			// updateWhenIdle : true,

@@ -103,8 +103,10 @@ L.Control.Legends = L.Control.extend({
 		var inspectControl = app.MapPane.inspectControl;
 		var layermenuControl = app.MapPane.layerMenu;
 
+		legendsMaxWidth -= 20;
+
 		// Is there a layer inspector, and is the pane open?
-		if (inspectControl && layermenuControl._open ) legendsMaxWidth -= 300;
+		if (inspectControl && layermenuControl._open ) legendsMaxWidth -= 280;
 
 		// Set max width of legends container
 		this._container.style.maxWidth = legendsMaxWidth + 'px';
@@ -170,6 +172,8 @@ L.Control.Legends = L.Control.extend({
 		this._legendsInner.style.width = this._legendsWidth + 'px';
 		this._legendsInner.style.height = this._legendsHeight + 'px';
 
+		this.calculateHeight()
+
 		setTimeout(function() {
 			this._legendsOpener.style.opacity = '1';
 			this._legendsInner.style.width = '150px';
@@ -180,10 +184,10 @@ L.Control.Legends = L.Control.extend({
 
 		setTimeout(function() {
 			this._legendsCollapser.style.opacity = '0'; 
-			this._openWidth = 0;
-			this._openHeight = 0;
-			this._legendsWidth = 0;
-			this._legendsHeight = 0;
+			// this._openWidth = 0;
+			// this._openHeight = 0;
+			// this._legendsWidth = 0;
+			// this._legendsHeight = 0;
 		}.bind(this), 500);
 
 		this._setClosed();
@@ -195,6 +199,8 @@ L.Control.Legends = L.Control.extend({
 
 		// Hide the little arrow button         
 		if (!app.mobile) this._legendsOpener.style.opacity = '0';
+
+		// opopopopopopopopopop
 
 		// Set the width of the Legends
 		this._legendsInner.style.width = this.sliderWidth + 'px';
@@ -366,8 +372,8 @@ L.Control.Legends = L.Control.extend({
 	    	var div = Wu.DomUtil.create('div', 'legends-item', this._legendsInnerSlider);
 
 	    	// Set the width of the legends container
-		var containerWidth = Math.round(legends.length/4) * 150;
-		if (containerWidth < 150) containerWidth = 150;
+		var containerWidth = Math.round(legends.length/4) * 220;
+		if (containerWidth < 220) containerWidth = 220;
 		div.style.width = containerWidth + 'px';
 
 		// Set the width of the legends slider
@@ -402,6 +408,8 @@ L.Control.Legends = L.Control.extend({
 
 		// create legends
 		legends.forEach(function (legend) {
+
+			console.log('legend: ', legend);
 
 			// skip disabled legends
 			if (!legend.on) return;
@@ -447,6 +455,7 @@ L.Control.Legends = L.Control.extend({
 	},
 
 	_setContentHeight : function () {
+
 		var clientsPane = app.SidePane.Clients;
 		var optionsPane = app.SidePane.Map;
 

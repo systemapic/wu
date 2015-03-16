@@ -101,6 +101,7 @@ L.Control.Layermenu = L.Control.extend({
 		Wu.DomUtil.addClass(this._container, 'displayNone');
 	},
 
+
 	// Runs on window resize. Gets called up in app.js
 	resizeEvent : function (dimensions) {
 		
@@ -112,11 +113,18 @@ L.Control.Layermenu = L.Control.extend({
 
 	},
 
+
 	setMaxHeight : function (layersMaxHeight) {
+
 
 		// Make space for inspect control, if it's there, yo
 		var inspectControl = app.MapPane.inspectControl;
-		if ( inspectControl ) layersMaxHeight -= 120;
+		
+		if ( inspectControl ) {
+
+			var inspectorHeight = inspectControl._container.offsetHeight;
+			layersMaxHeight -= inspectorHeight - 5;
+		}
 
 		// Set max height of scroller container
 		this._layermenuOuter.style.maxHeight = layersMaxHeight + 'px';
@@ -167,6 +175,10 @@ L.Control.Layermenu = L.Control.extend({
 		app._map._controlCorners.topright.style.right = '140px';
 
 
+		// Adjust legends width
+		app.MapPane.legendsControl.checkWidth();
+
+
 		// Google Analytics event tracking
 		app.Analytics.ga(['Controls', 'Layers: close']);
 	
@@ -176,6 +188,7 @@ L.Control.Layermenu = L.Control.extend({
 	openLayerPane : function () {
 
 		this._open = true;
+
 
 		// Open Wrapper
 		app._map._controlCorners.bottomright.style.width = '290px';
@@ -199,6 +212,10 @@ L.Control.Layermenu = L.Control.extend({
 			if (!app.MapPane.descriptionControl._isClosed) app.MapPane.descriptionControl.mobileClosePane();
 
 		}
+
+		// Adjust legends width
+		app.MapPane.legendsControl.checkWidth();
+
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Controls', 'Layers: open']);
@@ -744,6 +761,10 @@ L.Control.Layermenu = L.Control.extend({
 		layerItem.on = true;
 
 
+		// Make room for Layer inspector
+		var dimensions = app._getDimensions();
+		this.resizeEvent(dimensions);
+
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 
@@ -754,6 +775,10 @@ L.Control.Layermenu = L.Control.extend({
 
 		var layer = layermenuItem.layer;
 		if (!layer) return;
+
+		// Make room for Layer inspector
+		var dimensions = app._getDimensions();
+		this.resizeEvent(dimensions);		
 
 		this._disableLayer(layer);
 	},
