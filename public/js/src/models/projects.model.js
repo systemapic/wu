@@ -778,23 +778,25 @@ Wu.Project = Wu.Class.extend({
 		this._setUrl();
 	},
 
-	
 	setBounds : function (bounds) {
 		this.store.bounds = bounds;
 		this._update('bounds');
 	},
 
 	setBoundsSW : function (bounds) {
+		this.store.bounds = this.store.bounds || {}
 		this.store.bounds.southWest = bounds;
 		this._update('bounds');		
 	},
 
 	setBoundsNE : function (bounds) {
+		this.store.bounds = this.store.bounds || {}
 		this.store.bounds.northEast = bounds;
 		this._update('bounds');
 	},
 
 	setBoundsZoomMin : function (zoomMin) {
+		this.store.bounds = this.store.bounds || {}
 		this.store.bounds.zoomMin = zoomMin;
 		this._update('bounds');
 	},
