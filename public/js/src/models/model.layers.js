@@ -3,9 +3,7 @@ Wu.Layer = Wu.Class.extend({
 	type : 'layer',
 
 	options : {
-
 		hoverTooltip : true,	// hover instead of click
-
 	},
 
 	initialize : function (layer) {
@@ -18,12 +16,10 @@ Wu.Layer = Wu.Class.extend({
 
 		// create leaflet layers
 		this.initLayer();
-		// console.log('init layer: ', this.getTitle());
 
+		// add hooks
 		this.addHooks();
 
-		// get zIndex control
-		this._zx = app.MapPane.getZIndexControls();
 	},
 
 	addHooks : function () {
@@ -42,23 +38,12 @@ Wu.Layer = Wu.Class.extend({
 		Wu.DomEvent[on](this.layer, 'loading', this._onLayerLoading, this);
 
 		Wu.Mixin.Events[on]('projectSelected', this._unload, this);
-
 	},
 
 	
 	_unload : function (e) {
-		// console.log('layer unload: ', this.getTitle(), e);
-		
-		// delete lal
+		// delete 
 		this.removeHooks();
-		// this.layer = null;
-		// delete this.layer;
-		// _.each(this, function (t) {
-			// this[t] = null;
-			// delete this[t];
-		// }, this);
-		// delete this;
-		// console.log(this);
 	},
 
 	_onLayerLoaded : function () {
@@ -163,13 +148,17 @@ Wu.Layer = Wu.Class.extend({
 
 	_addToZIndex : function (type) {
 		if (type == 'baselayer') this._isBase = true;
-		var zx = this._zx;
+		var zx = this._zx || this._getZX();
 		this._isBase ? zx.b.add(this) : zx.l.add(this); // either base or layermenu
 	},
 
 	_removeFromZIndex : function () {
-		var zx = this._zx;
+		var zx = this._zx || this._getZX();
 		this._isBase ? zx.b.remove(this) : zx.l.remove(this);
+	},
+
+	_getZX : function () {
+		return app.MapPane.getZIndexControls();
 	},
 
 	remove : function (map) {
