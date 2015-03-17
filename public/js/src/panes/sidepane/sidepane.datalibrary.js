@@ -544,7 +544,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		app.feedback.setMessage({
 			title : 'Files deleted',
-			description : this._getPrettyFileNames(files)
+			description : this._getPrettyFileNames(files)			
 		});
 
 	},
@@ -626,6 +626,15 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		} else {
 			dropzone.disable();
 		}
+
+
+		this.createFeedbackID();
+	},
+
+	createFeedbackID : function () {
+
+		this.__id = Wu.Util.createRandom(5);
+
 	},
 
 	
@@ -636,14 +645,18 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		app.feedback.setError({
 			title : 'Upload error',
 			description : err,
+			id : this.__id			
 		});
 
 	},
 
 	// process file
 	uploaded : function (result) {
+		
 		console.log('uploaded!!!', result);
 		
+	
+
 		// handle errors
 		if (result.error) this.handleError(result.error);
 		
@@ -659,10 +672,14 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			// set icon if image
 			var icon = (file.data && file.data.image) ? this._getImagePath(file.uuid, 100, 100) : null;
 
+		
+			console.log('id', this.__id);
+
 			app.feedback.setSuccess({
 				title : 'Upload success!',
 				description : 'Added <strong>' + file.name + '</strong> to the Data Library.',
-				icon : icon
+				icon : icon,
+				id : this.__id
 			});
 
 		}, this);
@@ -675,7 +692,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 			app.feedback.setAction({
 				title : 'Layer created',
-				description : 'Added <strong>' + layer.title + '</strong> to available layers.'
+				description : 'Added <strong>' + layer.title + '</strong> to available layers.',
+				id : this.__id
 			});
 
 

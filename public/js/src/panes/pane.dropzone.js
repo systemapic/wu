@@ -1,4 +1,4 @@
-Wu.Dropzone = Wu.Class.extend({
+Wu.Dropzone = Wu.Pane.extend({
 	// dropzone for files to data library
 	// drop anywhere, anytime
 
@@ -6,11 +6,7 @@ Wu.Dropzone = Wu.Class.extend({
 		metaDelay : 3000 // ms
 	},
 
-	initialize : function () {
-		this.initLayout();
-	},
-
-	initLayout : function () {
+	_initContainer : function () {
 
 		// create divs
 		this._container = Wu.DomUtil.create('div', 'dropzone-pane', app._appPane);
@@ -28,12 +24,21 @@ Wu.Dropzone = Wu.Class.extend({
 		this.hideMeta();
 	},
 
+	_editEnabled : function () {
+		this.disable();
+	},
+	_editDisabled : function () {
+		this.enable();
+	},
+
 	show : function () {
-		Wu.DomUtil.removeClass(this._container, 'displayNone');
+		// Wu.DomUtil.removeClass(this._container, 'displayNone');
+		this._container.style.display = 'block';
 	},
 
 	hide : function () {
-		Wu.DomUtil.addClass(this._container, 'displayNone');
+		// Wu.DomUtil.addClass(this._container, 'displayNone');
+		this._container.style.display = 'none';
 	},
 
 	showMeta : function () {
@@ -187,7 +192,11 @@ Wu.Dropzone = Wu.Class.extend({
 	},
 
 	refresh : function () {
+
 		var that = this;
+
+		// var id = Wu.Util.createRandom(5);
+		// console.log('id', id);
 
 		// refresh project
 		this.project = app.activeProject;
@@ -213,7 +222,7 @@ Wu.Dropzone = Wu.Class.extend({
 			// show meta screen
 			// that.showMeta();
 
-			that._showMetaFeedback(file);
+			// that._showMetaFeedback(file);
 
 			// show progressbar
 			that.progress.setProgress(0);
