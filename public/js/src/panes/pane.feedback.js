@@ -10,16 +10,19 @@ Wu.FeedbackPane = Wu.Class.extend({
 
 		// concurrent messages stored here
 		this._messages = {};
+
+		// Used to know the order (which message is oldest)
+		this._messagesArray = [];
 	},
 
 	initContainer : function () {
 		this._container = Wu.DomUtil.create('div', 'feedback-pane', app._appPane);
+		this._innerWrapper = Wu.DomUtil.create('div', 'feedback-pane-inner-wrapper', this._container);
 	},
 
 	set : function (options) {
 		this.add(options);
 	},
-
 	
 	setMessage : function (options) {
 		this.add(options, 1); 	// neutral message
@@ -39,19 +42,73 @@ Wu.FeedbackPane = Wu.Class.extend({
 
 	add : function (message, severity) {
 
+		// Create random number
 		var id = Wu.Util.createRandom(5);
 
+		// gets passed from sidepane.dataLibrary.js
+		if ( message.id ) id = message.id;
+
 		var options = {
-			container : this._container,
+			container 	: this._container,
+			innerWrapper 	: this._innerWrapper,   // Used to see if inner wrapper overflow container
 			id : id,
 			severity : severity || 3 // error default
+		}		
+
+		var pane = this._messages[id];
+		
+		if ( pane ) {
+			
+			this.update(message, severity);
+
+		} else {
+
+			// create and save in stack
+			this._messages[id] = new Wu.FeedbackPane.Message(Wu.extend(options, message));
+
+			// Store message boxes in array
+			this._messagesArray.push(this._messages[id]);
 		}
 
-		// create and save in stack
-		this._messages[id] = new Wu.FeedbackPane.Message(Wu.extend(options, message));
+		// If messages overflow its container: remove the oldest element message
+		this.checkOverflow();
+
+	},
+
+	// Check if message boxes overflow container, and remove the oldest message if it does
+	checkOverflow : function() {
+
+		var containerMaxHeight  = 700;
+		var innerHeight 	= this._innerWrapper.offsetHeight;
+		var diff 		= containerMaxHeight - 100 - innerHeight;
+		
+		if ( diff < 0 ) {
+		
+			var remId = this._messagesArray[0].options.id;
+			this.remove(remId);
+			this._messagesArray.splice(0, 1);
+		
+		}
+
+	},
+
+	// Update message box, if it exists before
+	update : function (message, severity) {
+
+		var title 	   = message.title;
+		var description    = message.description;
+		var id 		   = message.id;
+		var newTitle 	   = Wu.DomUtil.create('div', 'feedback-pane-title2', 	    this._messages[id]._content, title);
+		var newDescription = Wu.DomUtil.create('div', 'feedback-pane-description2', this._messages[id]._content, description);		
+
+		// Update severity
+		this._messages[id].options.severity = severity;
+		this._messages[id].setSeverity(severity);
+
 	},
 
 	remove : function (id) {
+
 		// delete container and object
 		var pane = this._messages[id];
 		if (!pane) return;
@@ -97,17 +154,19 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 	initLayout : function () {
 
 		// create divs
-		this._content = Wu.DomUtil.create('div', 'feedback-pane-content', this.options.container);
+		// this._innerWrapper = Wu.DomUtil.create('div', 'feedback-pane-inner-wrapper', this.options.container);			
 
-		this._title = Wu.DomUtil.create('div', 'feedback-pane-title', this._content);
-		this._icon = Wu.DomUtil.create('div', 'feedback-pane-icon', this._content);
-		this._iconImg = Wu.DomUtil.create('img', 'feedback-pane-icon-img', this._icon);
-		this._description = Wu.DomUtil.create('div', 'feedback-pane-description', this._content);
+		// this._content = Wu.DomUtil.create('div', 'feedback-pane-content', this.options.container);
+		this._content 		= Wu.DomUtil.create('div', 'feedback-pane-content', 	this.options.innerWrapper);
+		this._title 		= Wu.DomUtil.create('div', 'feedback-pane-title', 	this._content);
+		this._icon 		= Wu.DomUtil.create('div', 'feedback-pane-icon', 	this._content);
+		this._iconImg 		= Wu.DomUtil.create('img', 'feedback-pane-icon-img', 	this._icon);
+		this._description 	= Wu.DomUtil.create('div', 'feedback-pane-description', this._content);
 		
 		// set transition
 		this._content.style.opacity = 0;
 		this._content.style.webkitTransition = 'opacity ' + this.options.transitionDelay + 's';
-		this._content.style.transition = 'opacity ' + this.options.transitionDelay + 's';
+		this._content.style.transition 	     = 'opacity ' + this.options.transitionDelay + 's';
 
 		// x
 		this._x = Wu.DomUtil.create('div', 'feedback-pane-x', this._content, 'X');
@@ -177,10 +236,25 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 	setSeverity : function (s) {
 		var s = this.options.severity;
 		if (s) this.setStyle(this.options.severityStyle[s]);
+		
 	},
 
 	setStyle : function (style) {
-		Wu.DomUtil.addClass(this._content, style);
+
+		var _style    = [];
+		    _style[0] = this.options.severityStyle[1];
+		    _style[1] = this.options.severityStyle[2];
+		    _style[2] = this.options.severityStyle[3];
+		    _style[3] = this.options.severityStyle[4];
+
+		// Remove previous styles, and set the new one
+		_style.forEach(function(s) {
+
+			if ( s == style ) Wu.DomUtil.addClass(this._content, style);
+			else 		  Wu.DomUtil.removeClass(this._content, s);
+
+		}, this);
+
 	},
 
 	setBackground : function (color) {
