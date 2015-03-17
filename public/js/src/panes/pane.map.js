@@ -1,19 +1,29 @@
-Wu.MapPane = Wu.Class.extend({
+Wu.MapPane = Wu.Pane.extend({
 
-	initialize : function () {
+	// initialize : function () {
 		
-		// init container
-		this._initContainer();
+	// 	// init container
+	// 	this._initContainer();
 
-		// active layers
-		this._activeLayers = [];
+	// 	// active layers
+	// 	this._activeLayers = [];
 
+	// 	// connect zindex control
+	// 	this._baselayerZIndex = new Wu.ZIndexControl.Baselayers();
+	// 	this._layermenuZIndex = new Wu.ZIndexControl.Layermenu();
+
+	// 	return this; 
+	// },      
+
+
+	_initialize : function () {
 		// connect zindex control
 		this._baselayerZIndex = new Wu.ZIndexControl.Baselayers();
 		this._layermenuZIndex = new Wu.ZIndexControl.Layermenu();
 
-		return this; 
-	},      
+		// active layers
+		this._activeLayers = [];
+	},
 
 	_initContainer : function () {
 		
@@ -23,6 +33,30 @@ Wu.MapPane = Wu.Class.extend({
 		// add help pseudo
 		Wu.DomUtil.addClass(this._container, 'click-to-start');
 	},
+
+	_refresh : function () {
+		console.log('pane.map.js _refresh');
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	// fired on window resize
 	resizeEvent : function (d) {
@@ -453,6 +487,7 @@ Wu.MapPane = Wu.Class.extend({
 	       
 		// remove and delete control
 		this._map.removeControl(this.legendsControl);
+		this.legendsControl = null;
 		delete this.legendsControl;
 	},
 
@@ -471,6 +506,7 @@ Wu.MapPane = Wu.Class.extend({
 	       	
 		// remove and delete control
 		this._map.removeControl(this.mousepositionControl);
+		this.mousepositionControl = null;
 		delete this.mousepositionControl;
 	},
 
@@ -520,6 +556,7 @@ Wu.MapPane = Wu.Class.extend({
 	       	
 		// remove and delete control
 		this._map.removeControl(this.geolocationControl);
+		this.geolocationControl = null;
 		delete this.geolocationControl;
 		
 	},
@@ -535,6 +572,7 @@ Wu.MapPane = Wu.Class.extend({
 		if (!this._scale) return;
 
 		this._map.removeControl(this._scale);
+		this._scale = null;
 		delete this._scale;
 	},
 
@@ -559,6 +597,7 @@ Wu.MapPane = Wu.Class.extend({
 	       
 		// remove and delete control
 		this._map.removeControl(this.descriptionControl);
+		this.descriptionControl = null;
 		delete this.descriptionControl;
 	},
 
@@ -576,6 +615,15 @@ Wu.MapPane = Wu.Class.extend({
 		// update control with project
 		this.inspectControl.update();
 
+	},
+
+	disableInspect : function () {
+		if (!this.inspectControl) return;
+	       
+		// remove and delete control
+		this._map.removeControl(this.inspectControl);
+		this.inspectControl = null;
+		delete this.inspectControl;
 	},
 
 	enableCartocss : function () {
@@ -602,16 +650,11 @@ Wu.MapPane = Wu.Class.extend({
 		if (!this.cartoCss) return;
 
 		this._map.removeControl(this.cartoCss);
+		this.cartoCss = null;
 		delete this.cartoCss;
 	},
 
-	disableInspect : function () {
-		if (!this.inspectControl) return;
-	       
-		// remove and delete control
-		this._map.removeControl(this.inspectControl);
-		delete this.inspectControl;
-	},
+	
 
 	enableLayermenu : function () {      
 		if (this.layerMenu) return;
@@ -635,6 +678,7 @@ Wu.MapPane = Wu.Class.extend({
 	       
 		// remove and delete control
 		this._map.removeControl(this.layerMenu);
+		this.layerMenu = null;
 		delete this.layerMenu;
 	},
 
@@ -658,6 +702,7 @@ Wu.MapPane = Wu.Class.extend({
 		if (!this.baselayerToggle) return
 
 		this._map.removeControl(this.baselayerToggle);
+		this.baselayerToggle = null;
 		delete this.baselayerToggle;
 	},
 	
@@ -866,8 +911,6 @@ Wu.MapPane = Wu.Class.extend({
 		setTimeout(function () {
 			popup.openOn(map);		// todo: still some minor bugs,
 		}, 100); // hack			// this hack perhaps due to double opening
-
-		
 	},
 
 	_createPopup : function () {
