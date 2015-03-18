@@ -5,8 +5,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	type : 'users',
 	title : 'Users',
 
-	initContent : function () {
-
+	// initContent : function () {
+	_initContent : function () {
 		// create new fullscreen page, and set as default content
 		this._content = Wu.DomUtil.create('div', 'fullpage-users', Wu.app._appPane);
 		
@@ -95,6 +95,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// add tooltip
 		app.Tooltip.add(this._menu, '(Editors only) List of all users. Here you can create and delete users, as well as administer user access to projects.');
+
+		// add hooks
+		this.addHooks();
 
 	},
 

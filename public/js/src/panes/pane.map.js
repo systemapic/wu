@@ -1,21 +1,7 @@
 Wu.MapPane = Wu.Pane.extend({
 
-	// initialize : function () {
-		
-	// 	// init container
-	// 	this._initContainer();
-
-	// 	// active layers
-	// 	this._activeLayers = [];
-
-	// 	// connect zindex control
-	// 	this._baselayerZIndex = new Wu.ZIndexControl.Baselayers();
-	// 	this._layermenuZIndex = new Wu.ZIndexControl.Layermenu();
-
-	// 	return this; 
-	// },      
-
-
+	_ : 'mappane',
+	
 	_initialize : function () {
 		// connect zindex control
 		this._baselayerZIndex = new Wu.ZIndexControl.Baselayers();
@@ -32,18 +18,66 @@ Wu.MapPane = Wu.Pane.extend({
 	
 		// add help pseudo
 		Wu.DomUtil.addClass(this._container, 'click-to-start');
+
+		// init map
+		this._initLeaflet();
+
+		// adjust padding, etc.
+		this._adjustLayout();
 	},
 
+	// refresh view
 	_refresh : function () {
 		console.log('pane.map.js _refresh');
+
+		// remove old
+		this._flush();
+
+		// set base layers
+		this.setBaseLayers();
+
+		// set bounds
+		this.setMaxBounds();
+
+		// set position
+		this.setPosition();
+	},
+
+
+	_flush : function () {
+
+		// remove layers
+		this._flushLayers();
+
+	},
+
+
+	_flushLayers : function () {
+		var map = app._map;
+		map.eachLayer(function (layer) {
+			map.removeLayer(layer);
+		});
+	},
+
+
+	_initLeaflet : function () {
+
+		// create new map
+		this._map = app._map = L.map('map', {
+			worldCopyJump : true,
+			attributionControl : false,
+			maxZoom : 18
+		});
+
+		// add editable layer
+		// this.addEditableLayer(this._map);
 	},
 
 
 
-
-
-
-
+	_adjustLayout : function () {
+		// this.setHeaderPadding();
+	},
 
 
 
@@ -76,11 +110,11 @@ Wu.MapPane = Wu.Pane.extend({
 		}, 300); // time with css
 	},
 	
-	setProject : function (project) {
-		this.project = project;
-		this.reset();
-		this.update(project);
-	},
+	// setProject : function (project) {
+	// 	this._project = project;
+	// 	this.reset();
+	// 	this.update(project);
+	// },
 
 	getZIndexControls : function () {
 		var z = {
@@ -92,25 +126,19 @@ Wu.MapPane = Wu.Pane.extend({
 
 
 	clearBaseLayers : function () {
-		var map = this._map;
-
 		if (!this.baseLayers) return;
 		
 		this.baseLayers.forEach(function (base) {
-			map.removeLayer(base.layer);
+			app._map.removeLayer(base.layer);
 		});
 
 		this.baseLayers = {};
 	},
 
 	setBaseLayers : function () { 
-		var map = this._map;
 
-		// clear
-		this.clearBaseLayers();
-
-		// set baseLayers stored in project
-		var baseLayers = this.project.getBaselayers();
+		// get baseLayers stored in project
+		var baseLayers = this._project.getBaselayers();
 
 		// return if empty
 		if (!baseLayers) return;
@@ -121,17 +149,10 @@ Wu.MapPane = Wu.Pane.extend({
 		}, this);
 	},
 
-
 	addBaseLayer : function (baseLayer) {
-		
 		// Wu.Layer
-		var layer = this.project.layers[baseLayer.uuid];
-		if (!layer) return;
-		
-		layer.add('baselayer');
-		layer.setOpacity(baseLayer.opacity);
-			
-
+		var layer = this._project.layers[baseLayer.uuid];
+		if (layer) layer.add('baselayer');
 	},
 
 	removeBaseLayer : function (layer) {
@@ -143,43 +164,43 @@ Wu.MapPane = Wu.Pane.extend({
 		this._container.style.width = parseInt(window.innerWidth) - width + 'px';
 	},
 
-	_update : function (project) {
-		this.update(project);
-	},
+	// _update : function (project) {
+	// 	this.update(project);
+	// },
 
-	update : function (project) {
+	// update : function (project) {
 		
-		this.project = project;
+	// 	this._project = project;
 
-		// clear active layers
-		this.clearActiveLayers();
+	// 	// clear active layers
+	// 	this.clearActiveLayers();
 
-		// get editor privs
-		// this._isEditor = app.Account.canUpdateProject(app.activeProject.getUuid());
-		this._isEditor = app.access.to.edit_project(project);
+	// 	// get editor privs
+	// 	// this._isEditor = app.Account.canUpdateProject(app.activeProject.getUuid());
+	// 	this._isEditor = app.access.to.edit_project(project);
 
-		// set base layers
-		this.setBaseLayers();
+	// 	// set base layers
+	// 	this.setBaseLayers();
 
-		// set bounds
-		this.setMaxBounds();
+	// 	// set bounds
+	// 	this.setMaxBounds();
 
-		// set position
-		this.setPosition();
+	// 	// set position
+	// 	this.setPosition();
 
-		// set header padding
-		this.setHeaderPadding();
+	// 	// set header padding
+	// 	this.setHeaderPadding();
 
-		// set controls css logic
-		setTimeout(this.updateControlCss.bind(this), 100); // timeout hack bug
+	// 	// set controls css logic
+	// 	setTimeout(this.updateControlCss.bind(this), 100); // timeout hack bug
 		
-	},
+	// },
 
 	setHeaderPadding : function () {
 		// set padding
 		var map = this._map;
 		var control = map._controlContainer;
-		control.style.paddingTop = this.project.getHeaderHeight() + 'px';
+		control.style.paddingTop = this._project.getHeaderHeight() + 'px';
 	},
 
 
@@ -187,7 +208,7 @@ Wu.MapPane = Wu.Pane.extend({
 		var map = this._map;
 		
 		// get position
-		var pos = position || this.project.getLatLngZoom();
+		var pos = position || this._project.getLatLngZoom();
 		var lat = pos.lat;
 		var lng = pos.lng;
 		var zoom = pos.zoom;
@@ -246,7 +267,7 @@ Wu.MapPane = Wu.Pane.extend({
 
 	setMaxBounds : function () {
 		var map = app._map;
-		var bounds = this.project.getBounds();
+		var bounds = this._project.getBounds();
 
 		if (!bounds) return;
 
@@ -265,27 +286,27 @@ Wu.MapPane = Wu.Pane.extend({
 		this.reset();
 	},
 
-	createNewMap : function () {
+	// createNewMap : function () {
 
-		var options = {
-			worldCopyJump : true,
-			attributionControl : false,
-			maxZoom : 18
-		}
+	// 	var options = {
+	// 		worldCopyJump : true,
+	// 		attributionControl : false,
+	// 		maxZoom : 18
+	// 	}
 
-		// get project pos
-		var pos = this.project.getLatLngZoom(),
-		    lat = pos.lat,
-		    lng = pos.lng,
-		    zoom = pos.zoom;
+	// 	// get project pos
+	// 	var pos = this._project.getLatLngZoom(),
+	// 	    lat = pos.lat,
+	// 	    lng = pos.lng,
+	// 	    zoom = pos.zoom;
 
-		// create new map
-		this._map = app._map = L.map('map', options).setView([lat, lng], zoom); 
+	// 	// create new map
+	// 	this._map = app._map = L.map('map', options).setView([lat, lng], zoom); 
 
-		// add editable layer
-		this.addEditableLayer(this._map);
+	// 	// add editable layer
+	// 	this.addEditableLayer(this._map);
 
-	},
+	// },
 
 
 	addEditableLayer : function (map) {
@@ -327,7 +348,7 @@ Wu.MapPane = Wu.Pane.extend({
 	updateControlCss : function () {
 
 		// get controls
-		var controls = this.project.getControls(),
+		var controls = this._project.getControls(),
 		    corners = app._map._controlCorners,
 		    topleft = corners.topleft,
 		    bottomright = corners.bottomright,
@@ -388,6 +409,18 @@ Wu.MapPane = Wu.Pane.extend({
 
 	resetControls : function () {
 
+		this._drawControl 		= null;
+		this._drawControlLayer 		= null;
+		this._scale 			= null;
+		this.vectorStyle 		= null;
+		this.layerMenu 			= null;
+		this.legendsControl 		= null;
+		this.descriptionControl 	= null;
+		this.inspectControl 		= null;
+		this.mousepositionControl 	= null;
+		this.baselayerToggle 		= null;
+		this.geolocationControl 	= null;
+
 		// remove old controls
 		delete this._drawControl;
 		delete this._drawControlLayer;
@@ -403,6 +436,7 @@ Wu.MapPane = Wu.Pane.extend({
 
 		// remove carto
 		if (this.cartoCss) this.cartoCss.destroy();
+		this.cartoCss = null;
 		delete this.cartoCss;
 	},
 
@@ -630,7 +664,7 @@ Wu.MapPane = Wu.Pane.extend({
 		if (this.cartoCss) return;
 
 		// dont allow for non-editors
-		if (!this._isEditor) return;
+		if (!app.access.to.edit_project(this._project)) return;
 
 		// create control
 		this.cartoCss = L.control.cartoCss({

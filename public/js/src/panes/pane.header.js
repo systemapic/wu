@@ -5,7 +5,7 @@ Wu.HeaderPane = Wu.Pane.extend({
 	_initContainer : function () {
 
 		// create divs
-		this._container     = app._headerPane = Wu.DomUtil.create('div', 'displayNone', app._mapContainer);
+		this._container     = app._headerPane = Wu.DomUtil.create('div', '', app._mapContainer);
 		this._container.id  = 'header';
 
 		// wrapper for header
@@ -15,19 +15,17 @@ Wu.HeaderPane = Wu.Pane.extend({
 		this._title 	    = Wu.DomUtil.create('div', 'header-title', this._titleWrap);
 		this._subtitle 	    = Wu.DomUtil.create('div', 'header-subtitle', this._titleWrap);
 
-		// hack
-		// this._title.whichTitle    = 'title';
-		// this._subtitle.whichTitle = 'subtitle';
-
 		// tooltips
 		this._addTooltips();
 
 		// add hooks
 		this.addHooks();
+
+		// hide by default
+		this._hide();
 	},
 
-	// run on projectSelected event (by Wu.Pane)
-	// this._project is now updated
+	// refresh view (ie. on projectSelected)
 	_refresh : function () {
 
 		// refresh fields
@@ -35,22 +33,8 @@ Wu.HeaderPane = Wu.Pane.extend({
 		this.setTitle();
 		this.setSubtitle();
 
-		// show
+		// make sure is visible
 		this._show();
-	},
-
-	_show : function () {
-		this._container.style.display = 'block';
-	},
-
-	_hide : function () {
-		this._container.style.display = 'none';
-	},
-
-
-
-	getContainer : function () {
-		return this._container;
 	},
 
 	addHooks : function () {
@@ -61,6 +45,38 @@ Wu.HeaderPane = Wu.Pane.extend({
 
 	_addTooltips : function () {
 		app.Tooltip.add(this._logo, 'Click to upload a new logo');
+	},
+
+	_show : function () {
+		this._container.style.display = 'block';
+	},
+
+	_hide : function () {
+		this._container.style.display = 'none';
+	},
+
+	setLogo : function (logo) {
+		this._logo.src = logo || this._project.getHeaderLogo() ? this._project.getHeaderLogo() :  '/css/images/defaultProjectLogo.png';
+	},
+
+	setTitle : function (title) {
+		this._title.innerHTML = title || this._project.getHeaderTitle();
+	},
+
+	setSubtitle : function (subtitle) {
+		this._subtitle.innerHTML = subtitle || this._project.getHeaderSubtitle();
+	},
+
+	
+
+
+
+
+
+
+
+	getContainer : function () {
+		return this._container;
 	},
 
 	addedLogo : function (path) {
@@ -75,17 +91,7 @@ Wu.HeaderPane = Wu.Pane.extend({
 		this.setLogo();
 	},
 
-	setLogo : function (logo) {
-		this._logo.src = logo || this._project.getHeaderLogo() ? this._project.getHeaderLogo() :  '/css/images/defaultProjectLogo.png';
-	},
-
-	setTitle : function (title) {
-		this._title.innerHTML = title || this._project.getHeaderTitle();
-	},
-
-	setSubtitle : function (subtitle) {
-		this._subtitle.innerHTML = subtitle || this._project.getHeaderSubtitle();
-	},
+	
 
 
 

@@ -5,8 +5,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	title : 'Data <br> Library',
 
 
-	initContent : function () {
-
+	// initContent : function () {
+	_initContent : function () {
 		// create new fullscreen page, and set as default content
 		this._content = Wu.DomUtil.create('div', 'data-library ct1', Wu.app._appPane);
 		
@@ -116,6 +116,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// add tooltip
 		app.Tooltip.add(this._menu, 'The data library contains all files uploaded to the project.');
+
+		// add hooks
+		this.addHooks();
 	},
 
 

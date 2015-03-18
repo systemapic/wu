@@ -196,7 +196,11 @@ module.exports = function(grunt) {
 					// Extend Leaflet
 					'public/js/src/ext/extendLeaflet.js',
 
+					// controller
+					'public/js/src/core/controller.js',
+					
 					// Sidepane 
+					'public/js/src/panes/pane.js',
 					'public/js/src/panes/sidepane/sidepane.js',
 					'public/js/src/panes/sidepane/sidepane.item.js',
 					'public/js/src/panes/sidepane/sidepane.clients.js',
@@ -221,7 +225,6 @@ module.exports = function(grunt) {
 					'public/js/src/panes/sidepane/option.settings.js',
 
 					// Other Panes 
-					'public/js/src/panes/pane.js',
 					'public/js/src/panes/pane.header.js',
 					'public/js/src/panes/pane.progress.js',
 					'public/js/src/panes/pane.map.js',

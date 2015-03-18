@@ -158,7 +158,7 @@ Wu.Project = Wu.Class.extend({
 		this._refresh();
 	
 		// refresh mappane
-		this.refreshMappane();
+		// this.refreshMappane();
 
 		// refresh headerpane
 		// this.refreshHeaderpane();
@@ -702,7 +702,9 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getControls : function () {
-		return this.store.controls;
+		var controls = this.store.controls;
+		delete controls.vectorstyle; // tmp hack, todo: remove from errywhere
+		return controls;
 	},
 
 	getSettings : function () {

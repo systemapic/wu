@@ -5,10 +5,13 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	title : 'Share',
 
 
-	initContent : function () {
-
+	// initContent : function () {
+	_initContent : function () {
 		// create layout
 		this.initLayout();
+
+		// add hooks
+		this.addHooks();
 	},
 
 
