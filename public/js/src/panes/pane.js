@@ -1,4 +1,5 @@
 Wu.Pane = Wu.Class.extend({
+
 	initialize : function (options) {
 
 		// set options
@@ -14,10 +15,6 @@ Wu.Pane = Wu.Class.extend({
 		this._listen();
 	},      
 
-	_initialize : function () {
-		// dummy
-	},
-
 	_listen : function () {
 		Wu.Mixin.Events.on('projectSelected', this._projectSelected, this);
 		Wu.Mixin.Events.on('editEnabled',     this._editEnabled, this);
@@ -30,16 +27,19 @@ Wu.Pane = Wu.Class.extend({
 		var projectUuid = e.detail.projectUuid;
 
 		// set project
-		this._project = app.Projects[projectUuid];
+		this._project = app.activeProject = app.Projects[projectUuid];
 
 		// refresh pane
 		this._refresh();
 	},
 
-	_editEnabled : function () {},
-	_editDisabled : function () {},
-	_layerEnabled : function () {},
-	_layerDisabled : function () {},
-	_updateView : function () {},
-	_refresh : function () {},
+	// dummies
+	_initialize 	: function () {},
+	_editEnabled 	: function () {},
+	_editDisabled 	: function () {},
+	_layerEnabled 	: function () {},
+	_layerDisabled 	: function () {},
+	_updateView 	: function () {},
+	_refresh 	: function () {},
+
 });

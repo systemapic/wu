@@ -382,5 +382,13 @@ body {
 }
 
 
+.leaflet-control-search .search-tooltip { 
+	max-width: 500px;
+	text-align: left;
+}
+
+.leaflet-control-search .search-tooltip { 
+	overflow: hidden;
+}
 
 

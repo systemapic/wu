@@ -20,6 +20,13 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		this.panes.controlBaselayertoggle      	= Wu.DomUtil.get('map-controls-baselayertoggle').parentNode.parentNode;
 		this.panes.controlCartocss 		= Wu.DomUtil.get('map-controls-cartocss').parentNode.parentNode;
 
+		// add tooltips
+		this._addTooltips();
+	},
+
+
+	_addTooltips : function () {
+
 		// add tooltip
 		var h4 = this._container.getElementsByTagName('h4')[0]; // refactor 
 		app.Tooltip.add(h4, 'Enables the control options that goes on top of the map.');
@@ -36,9 +43,6 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		app.Tooltip.add(this.panes.controlMouseposition, 'Shows the geolocation of mouse pointer.');
 		app.Tooltip.add(this.panes.controlBaselayertoggle, 'Enables toggelig base layers on and off.');
 		app.Tooltip.add(this.panes.controlCartocss, 'Enables the CartoCSS editor, the tooltip styler, and auto generated layer legends.');
-
-
-
 	},
 
 	addHooks : function () {
@@ -59,7 +63,6 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		Wu.DomEvent.on( this.panes.controlBaselayertoggle, 'mousedown click', this.toggleControl, this);
 		Wu.DomEvent.on( this.panes.controlCartocss, 	   'mousedown click', this.toggleControl, this);
 
-
 	},
 
 	removeHooks : function () {
@@ -67,8 +70,10 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 	},
 
 	calculateHeight : function () {
+		var project = app.activeProject,
+		    controls = project.getControls(),
+		    x = _.size(controls);
 
-		var x = _.size(this.controls);
 		this.maxHeight = x * 30 + 30;
 		this.minHeight = 0;
 	},
@@ -123,7 +128,7 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 
 
 	disableControl : function (type) {
-		
+
 		// get vars
 		var target = Wu.DomUtil.get('map-controls-' + type); // checkbox
 		var parent = Wu.DomUtil.get('map-controls-title-' + type).parentNode; // div that gets .active 
@@ -147,36 +152,8 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 	},
 
 	update : function () {
-
 		// call update on prototype
 		Wu.SidePane.Options.Item.prototype.update.call(this)
-
-		this.controls = this.project.getControls();
-
-		// tmp hack to remove vectorstyle
-		delete this.controls.vectorstyle;		// todo: remove
-
-		// toggle each control
-		for (c in this.controls) {
-			var on = this.controls[c];
-			var enable = 'enable' + c.camelize();
-			var disable = 'disable' + c.camelize();
-			
-			// toggle
-			if (on) {	
-				// enable control on map
-				Wu.app.MapPane[enable]();
-
-				// enable control in menu
-				this.enableControl(c);
-			} else {	
-				// disable control on map
-				Wu.app.MapPane[disable]();
-				
-				// disable control in menu
-				this.disableControl(c);
-			}
-		}
 	},
 
 });

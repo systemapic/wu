@@ -1,6 +1,6 @@
-Wu.SidePane = Wu.Class.extend({
-	_ : 'sidepane', 
+Wu.SidePane = Wu.Pane.extend({
 
+	_ : 'sidepane', 
 
 	_allPanes : [
 		'Clients', 
@@ -12,23 +12,15 @@ Wu.SidePane = Wu.Class.extend({
 		'Account'
 	],
 
-
-	initialize : function (options) {
+	_initialize : function (options) {
 		this.options = options || app.options;
 
 		// panes
 		this._panes = [];
 
-		// render
-		this.initContainer();
-		this.initContent();
-		this.render();     
-		
-		return this;   
 	},
-
 	
-	initContainer: function () {
+	_initContainer: function () {
 
 		// create container
 		var className = 'q-editor-container';
@@ -40,7 +32,32 @@ Wu.SidePane = Wu.Class.extend({
 
 		// Mobile option ~ Back button when entering documents/datalibrary/users fullscreen
 		if (app.mobile) this._initMobileContainer();
+
+		// menu pane
+		var className = 'q-editor-menu';
+		Wu.app._editorMenuPane = Wu.DomUtil.create('menu', className, this._container); 
+
+		// content pane
+		var className = 'q-editor-content hide-menu displayNone';
+		app._editorContentPane = Wu.DomUtil.create('content', className, this._container); 
+
+		// menuslider
+		app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
+		app._menuSliderArrow = Wu.DomUtil.createId('div', 'menuslider-arrow', Wu.app._menuSlider);	// refactor app
+
+		// init content
+		// this.initContent();
+		this.render();    
 	},
+
+
+
+	_refresh : function () {
+		console.log('sidepane _refresh!!');
+		this.refreshMenu();
+	},
+
+
 
 
 	_initMobileContainer : function () {
@@ -60,20 +77,20 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 
-	initContent : function () {
+	// initContent : function () {
 		
-		// menu pane
-		var className = 'q-editor-menu';
-		Wu.app._editorMenuPane = Wu.DomUtil.create('menu', className, this._container); 
+	// 	// menu pane
+	// 	var className = 'q-editor-menu';
+	// 	Wu.app._editorMenuPane = Wu.DomUtil.create('menu', className, this._container); 
 
-		// content pane
-		var className = 'q-editor-content hide-menu displayNone';
-		app._editorContentPane = Wu.DomUtil.create('content', className, this._container); 
+	// 	// content pane
+	// 	var className = 'q-editor-content hide-menu displayNone';
+	// 	app._editorContentPane = Wu.DomUtil.create('content', className, this._container); 
 
-		// menuslider
-		app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
-		app._menuSliderArrow = Wu.DomUtil.createId('div', 'menuslider-arrow', Wu.app._menuSlider);	// refactor app
-	},
+	// 	// menuslider
+	// 	app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
+	// 	app._menuSliderArrow = Wu.DomUtil.createId('div', 'menuslider-arrow', Wu.app._menuSlider);	// refactor app
+	// },
 
 	
 	render : function () {
@@ -159,10 +176,10 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 
-	// display the relevant panes
-	refresh : function (panes) {
-		this.refreshMenu();
-	},
+	// // display the relevant panes
+	// refresh : function (panes) {
+	// 	this.refreshMenu();
+	// },
 	
 
 	refreshMenu : function () {
@@ -245,9 +262,9 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 
-	_refresh : function () {
-		this.refreshMenu();
-	},
+	// _refresh : function () {
+	// 	this.refreshMenu();
+	// },
 	
 
 	// close sidepane

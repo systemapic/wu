@@ -4,14 +4,16 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	type : 'clients',
 	title : 'Projects',
 
-	initialize : function () {
-		Wu.SidePane.Item.prototype.initialize.call(this)
+	// _initialize : function () {
+	// 	// Wu.SidePane.Item.prototype.initialize.call(this)
 
-		// active by default
-		this.activate();      
-	},
+	// 	// active by default
+	// 	this.activate();      
+	// },
 
-	initContent : function () {
+	_initContent : function () {
+
+		console.log('CLIENT _initContent', this);
 
 		this.clients = [];
 
@@ -37,6 +39,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		// add tooltip
 		app.Tooltip.add(this._menu, 'Here is a list of clients and projects you have access to.');
 
+		this.activate();
 
 	},
 
@@ -68,6 +71,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	_deactivate : function () {
+		console.log('_deactivate', this);
 		this.clients.forEach(function (client) {
 			client.close();
 		}, this);

@@ -339,6 +339,7 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 		// refresh cartoCssControl
 		var cartoCss = app.MapPane.cartoCss;
+		console.log('refresh controls!!!!!!!!!!!!!!!____________', cartoCss);
 		if (cartoCss) cartoCss.update()
 
 	},

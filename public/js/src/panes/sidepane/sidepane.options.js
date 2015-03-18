@@ -4,7 +4,7 @@ Wu.SidePane.Options = Wu.SidePane.Item.extend({
 	type : 'mapoptions',
 	title : 'Options',
 
-	initContent : function () {
+	_initContent : function () {
 
 		// longhand 
 		this.app = Wu.app;
@@ -35,7 +35,7 @@ Wu.SidePane.Options = Wu.SidePane.Item.extend({
 	},
 
 
-	buildHTML : function () {
+	buildHTML : function () { 	// todo: refactor into each option
 
 		this._HTML = {};
 
@@ -255,6 +255,7 @@ Wu.SidePane.Options = Wu.SidePane.Item.extend({
 		// update map settings
 		for (s in this.settings) {
 			var setting = this.settings[s];
+			console.log('setting ====> ', setting);
 			setting.update();
 		}
 
