@@ -37,7 +37,7 @@ Wu.Layer = Wu.Class.extend({
 		Wu.DomEvent[on](this.layer, 'load', this._onLayerLoaded, this);
 		Wu.DomEvent[on](this.layer, 'loading', this._onLayerLoading, this);
 
-		Wu.Mixin.Events[on]('projectSelected', this._unload, this);
+		// Wu.Mixin.Events[on]('projectSelected', this._unload, this);
 	},
 
 	

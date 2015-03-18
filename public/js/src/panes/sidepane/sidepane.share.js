@@ -92,23 +92,18 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 			// create image container
 			this._createImageView();
 
-			console.log('mmm');
 			// get snapshot from server
 			Wu.send('/api/util/snapshot', hash, function (a, b) {
-				console.log('cb!!');
 				this.createdImage(a, b);
 			}.bind(this), this);
-			console.log('mmm');
 
 		}.bind(this));
 
 		// set progress bar for a 5sec run
-		app.ProgressBar.timedProgress(2000);
-
+		app.ProgressBar.timedProgress(5000);
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Side Pane', 'Share: create image']);
-
 		
 	},
 
