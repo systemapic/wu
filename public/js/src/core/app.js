@@ -305,40 +305,25 @@ Wu.App = Wu.Class.extend({
 			return false;
 		}
 
-		// fire select project
-		Wu.Mixin.Events.fire('projectSelected', {detail : {
-			projectUuid : project.getUuid()
-		}});
-
 		// set project
-		// this._setProject(project);
-
-		// check for hash
-		// if (hash && hash.length == 6) {
-			// console.log('we got a hash!: ', hash);	
-			// return this._initHash(project, hash);
-		// }
+		this._setProject(project);
 
 		return true;
-		
 	},
 
 	_setProject : function (project) {
 		
 		// select project
-		project.select();
+		Wu.Mixin.Events.fire('projectSelected', {detail : {
+			projectUuid : project.getUuid()
+		}});
 
-		// refresh sidepane
-		// app.SidePane.refreshProject(project);
-
-		// remove help pseudo
-		Wu.DomUtil.removeClass(app._mapPane, 'click-to-start');
 	},
 
 	_initHotlink : function () {
 		
 		// parse error prone content of hotlink..
-		try { this.hotlink = JSON.parse(window.hotlink); } 
+		try { this.hotlink = Wu.parse(window.hotlink); } 
 		catch (e) { this.hotlink = false; };
 
 		// return if no hotlink
@@ -350,13 +335,10 @@ Wu.App = Wu.Class.extend({
 		// return if not found
 		if (!project) return false;
 
-		console.log('hotlink!?', this.hotlink);
-		
 		// set project
 		this._setProject(project);
 
 		return true;
-		
 	},
 
 
@@ -408,7 +390,6 @@ Wu.App = Wu.Class.extend({
 		Wu.post('/api/project/hash/get', JSON.stringify(json), callback, this);
 	},
 
-
 	_renderHash : function (context, json) {
 
 		// parse
@@ -454,7 +435,6 @@ Wu.App = Wu.Class.extend({
 			}
 			
 		}, this);
-
 	},
 
 	// save a hash
@@ -467,7 +447,6 @@ Wu.App = Wu.Class.extend({
 		});
 
 		console.log('setHash layers:', layers);
-
 
 		// get project;
 		var project = project || this.activeProject;
@@ -508,7 +487,9 @@ Wu.App = Wu.Class.extend({
 		if (!project) return false;
 
 		// set project
-		this._setProject(project);
+		Wu.Mixin.Events.fire('projectSelected', {detail : {
+			projectUuid : project.getUuid()
+		}});
 
 		// remove startpane
 		if (this.StartPane) this.StartPane.deactivate();
@@ -537,30 +518,30 @@ Wu.App = Wu.Class.extend({
 	},
 	
 	phantomReady : function () {
-		// return true;
+
+		var hashLayers = _.size(this._phantomHash.layers),
+		    baseLayers = _.size(app.activeProject.getBaselayers()),
+		    numLayers = hashLayers + baseLayers;
+
 		// check if ready for screenshot
-		// if (!this._loaded || !this._loading) return false;
+		if (!this._loaded || !this._loading) return false;
 
-		console.log(this._loaded.length, this._loading.length);
-
-
-		var hashLayers = _.size(this._phantomHash.layers);
-		var baseLayers = _.size(app.activeProject.getBaselayers());
-
-		var numLayers = hashLayers + baseLayers;
+		// Wu.send('/api/debug/phantom', {
+		// 	loaded : this._loaded.length,
+		// 	loading : this._loading.length,
+		// 	num : numLayers
+		// });
 
 		if (numLayers == 0) return true;
 
 		if (this._loaded.length == 0 ) return false; 
 
 		// if all layers loaded
-		if (this._loaded.length == this._loading.length) return true;
-		
+		if (this._loaded.length == numLayers) return true;
+
 		// not yet
 		return false;
-
 	},
-
 
 	// phantomjs: loaded layers
 	_loaded : [],

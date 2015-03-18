@@ -445,6 +445,15 @@ module.exports = function(app, passport) {
 	// 	api.debug.createRole(req, res);
 	// });
 
+	// =====================================
+	// DEBUG: PHANTOMJS FEEDBACK ===========
+	// ===================================== 
+	app.post('/api/debug/phantom', isLoggedIn, function (req, res) {
+		console.log('/api/debug/phantom');
+		console.log(req.body);
+		res.end();
+	});
+
 
 	// =====================================
 	// LOGIN ===============================
