@@ -22,6 +22,9 @@ Wu.MapPane = Wu.Pane.extend({
 		// init map
 		this._initLeaflet();
 
+		// events
+		// this._registerEvents();
+
 		// adjust padding, etc.
 		this._adjustLayout();
 	},
@@ -49,14 +52,17 @@ Wu.MapPane = Wu.Pane.extend({
 		// remove layers
 		this._flushLayers();
 
+		// remove controls
+		// this.resetControls();
 	},
 
 
 	_flushLayers : function () {
 		var map = app._map;
-		map.eachLayer(function (layer) {
+		map.eachLayer(function (layer) { 	// thsi sis bullshit! remove controls completely, end of story!!
 			map.removeLayer(layer);
 		});
+		// app.activeProject.getLayers().forEach(function (l) { l.remove() });
 	},
 
 
@@ -81,10 +87,28 @@ Wu.MapPane = Wu.Pane.extend({
 
 
 
+	_registerEvents : function () {
+
+		// app._map.on('moveend', this._onMove, this);
+		// app._map.on('zoomend', this._onZoom, this);
+	},
 
 
+	_onMove : function () {
+		console.log('moveend');
+		var project = this._project || app.activeProject;
+		Wu.Mixin.Events.fire('projectChanged', {detail : {
+			projectUuid : project.getUuid()
+		}});
+	},
 
-
+	_onZoom : function () {
+		console.log('zoom');
+		var project = this._project || app.activeProject;
+		Wu.Mixin.Events.fire('projectChanged', {detail : {
+			projectUuid : project.getUuid()
+		}});
+	},
 
 
 
@@ -409,6 +433,10 @@ Wu.MapPane = Wu.Pane.extend({
 
 	resetControls : function () {
 
+		// remove carto
+		if (this.cartoCss) this.cartoCss.destroy();
+
+		this.cartoCss 			= null;
 		this._drawControl 		= null;
 		this._drawControlLayer 		= null;
 		this._scale 			= null;
@@ -433,11 +461,8 @@ Wu.MapPane = Wu.Pane.extend({
 		delete this.mousepositionControl;
 		delete this.baselayerToggle;
 		delete this.geolocationControl;
-
-		// remove carto
-		if (this.cartoCss) this.cartoCss.destroy();
-		this.cartoCss = null;
 		delete this.cartoCss;
+
 	},
 
 	refreshControls : function () {
@@ -687,8 +712,6 @@ Wu.MapPane = Wu.Pane.extend({
 		this.cartoCss = null;
 		delete this.cartoCss;
 	},
-
-	
 
 	enableLayermenu : function () {      
 		if (this.layerMenu) return;

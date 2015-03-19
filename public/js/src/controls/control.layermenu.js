@@ -499,8 +499,6 @@ L.Control.Layermenu = L.Control.extend({
 			return false;
 		},
 
-		
-
 	},
 
 	_isFolder : function (item) {
@@ -525,7 +523,6 @@ L.Control.Layermenu = L.Control.extend({
 			Wu.DomUtil.removeClass(layer.el, 'invalidLayermenuitem');
 		}
 	},
-
 
 	// check logic
 	checkLogic : function () {
@@ -692,7 +689,6 @@ L.Control.Layermenu = L.Control.extend({
 		}
 	},
 
-
 	closeAll : function () {
 		this.updateLogic();
 		for (l in this._logic) {
@@ -733,7 +729,6 @@ L.Control.Layermenu = L.Control.extend({
 			// Google Analytics event tracking
 			app.Analytics.ga(['Controls', 'Layer show: ' + _layerName ]);
 		}    
-
 	},
 
 	_enableLayer : function (layerUuid) {
@@ -746,11 +741,14 @@ L.Control.Layermenu = L.Control.extend({
 		// mark active
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 		layerItem.on = true;
-
 	},
-		
-	enableLayer : function (layerItem) {
 
+	_enableLayerByUuid : function (layerUuid) {
+		var item = this._getLayermenuItem(layerUuid);
+		if (item) this.enableLayer(item);
+	},
+
+	enableLayer : function (layerItem) {
 		var layer = layerItem.layer;
 
 		// folder click
@@ -760,19 +758,16 @@ L.Control.Layermenu = L.Control.extend({
 		layer.add();
 		layerItem.on = true;
 
-
 		// Make room for Layer inspector
 		var dimensions = app._getDimensions();
 		this.resizeEvent(dimensions);
 
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
-
 	},
 
 	// disable by layermenuItem
 	disableLayer : function (layermenuItem) {
-
 		var layer = layermenuItem.layer;
 		if (!layer) return;
 
@@ -800,6 +795,14 @@ L.Control.Layermenu = L.Control.extend({
 	_getLayermenuItem : function (layerUuid) {
 		var layermenuItem = _.find(this.layers, function (l) { return l.item.layer == layerUuid; });
 		return layermenuItem;
+	},
+
+	_getActiveLayers : function () {
+		var active = _.filter(this.layers, function (layer) {
+			console.log('XX layer: ', layer);
+			return layer.on;
+		});
+		return active;
 	},
 
 	// layer deleted from project, remove layermenuitem
@@ -903,7 +906,6 @@ L.Control.Layermenu = L.Control.extend({
 		var wrap 	= Wu.DomUtil.create('div', className);
 		var uuid 	= item.uuid;
 		
-
 		// For some reason, HTML must come as string. 
 		var _iH = 	'<div class="layer-item-up">></div>' +
 			  	'<div class="layer-item-down"><</div>' +
@@ -1031,8 +1033,6 @@ L.Control.Layermenu = L.Control.extend({
 
 	},
 
-
-
 	_editFolderTitle : function (uuid) {
 		if (!this.editMode || this.currentlyEditing) return;
 
@@ -1147,9 +1147,11 @@ L.Control.Layermenu = L.Control.extend({
 	update : function (project) {
 
 		// get vars
-		this.project  = project || Wu.app.activeProject;
+		this.project  = project || app.activeProject;
 		this.layers   = {};
-		
+
+		console.error('lm update', this.project.getName());
+			
 		// create layermenu
 		this._fill();
 
@@ -1159,13 +1161,12 @@ L.Control.Layermenu = L.Control.extend({
 		// prevent map scrollzoom
 		var map = app._map;
 		Wu.DomEvent.on(this._container, 'mouseenter', function () {
-		   map.scrollWheelZoom.disable();
+			map.scrollWheelZoom.disable();
 		}, this);
 
 		Wu.DomEvent.on(this._container, 'mouseleave', function () {
-		    map.scrollWheelZoom.enable();
+			map.scrollWheelZoom.enable();
 		}, this);
-
 
 		// Check window height
 		var layersMaxHeight = window.innerHeight - 135;

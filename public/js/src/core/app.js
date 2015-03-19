@@ -437,7 +437,7 @@ Wu.App = Wu.Class.extend({
 		}, this);
 	},
 
-	// save a hash
+	// save a hash // todo: move to controller
 	setHash : function (callback, project) {
 
 		// get active layers
@@ -483,7 +483,7 @@ Wu.App = Wu.Class.extend({
 		// get project
 		var project = app.Projects[projectUuid];
 		
-		// return if no such project
+		// return if n§o such project
 		if (!project) return false;
 
 		// set project
