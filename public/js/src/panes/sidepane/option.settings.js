@@ -16,6 +16,8 @@ Wu.SidePane.Options.Settings = Wu.SidePane.Options.Item.extend({
 		darkTheme 	: true,
 		tooltips 	: true,
 		mapboxGL	: false,
+		saveState 	: true,
+
 
 	},
 
@@ -28,8 +30,6 @@ Wu.SidePane.Options.Settings = Wu.SidePane.Options.Item.extend({
 
 		// add tooltip
 		app.Tooltip.add(h4, 'Enable additional map settings.');
-
-
 	},
 
 	addHooks : function () {
@@ -148,6 +148,15 @@ Wu.SidePane.Options.Settings = Wu.SidePane.Options.Item.extend({
 
 			// add tooltip
 			app.Tooltip.add(mapboxGL, 'Render map with GL');
+
+		}
+		if (this.options.saveState) {
+			
+			var saveState = this._contentItem('saveState', 'Auto-save View');
+			wrapper.appendChild(saveState);
+
+			// add tooltip
+			app.Tooltip.add(saveState, 'Automatically save the current map state');
 
 		}
 

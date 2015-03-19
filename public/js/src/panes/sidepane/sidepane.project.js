@@ -313,7 +313,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.Mixin.Events.fire('projectSelected', { detail : {
 			projectUuid : projectUuid
 		}});    
-	
 
 		// remove startpane if active
 		app.StartPane.deactivate();

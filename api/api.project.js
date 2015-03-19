@@ -257,7 +257,8 @@ module.exports = api.project = {
 			'connectedAccounts',
 			'settings',
 			'categories',
-			'thumbCreated'
+			'thumbCreated',
+			'state'
 		];
 
  		// enqueue queries for valid fields
@@ -365,7 +366,8 @@ module.exports = api.project = {
 		var projectUuid = req.body.projectUuid,
 		    position 	= req.body.hash.position,
 		    layers 	= req.body.hash.layers,
-		    id 		= req.body.hash.id;
+		    id 		= req.body.hash.id,
+		    saveState   = req.body.saveState;
 
 		// create new hash
 		var hash 	= new Hash();
@@ -382,8 +384,28 @@ module.exports = api.project = {
 				error: err,
 				hash : doc
 			}));
+
+			if (saveState) api.project._saveState({
+				projectUuid : projectUuid,
+				hashId : id
+			});
 		});
 	},	
+
+	_saveState : function (options) {
+		var projectUuid = options.projectUuid,
+		    hashId = options.hashId;
+
+		Project
+		.findOne({uuid : projectUuid})
+		.exec(function (err, project) {
+			project.state = hashId;
+			project.save(function (err, doc) {
+				console.log('saved state!');
+			});
+		});
+
+	},
 
 
 	getAll : function (options, done) {

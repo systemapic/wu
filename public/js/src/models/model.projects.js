@@ -164,7 +164,7 @@ Wu.Project = Wu.Class.extend({
 		// this.refreshHeaderpane();
 	
 		// refresh sidepane
-		this.refreshSidepane();
+		this.refreshSidepane(); 	// todo!!!
 
 		// set active project in sidepane
 		if (this._menuItem) this._menuItem._markActive();
@@ -179,20 +179,20 @@ Wu.Project = Wu.Class.extend({
 		this.addLayer(layer);
 	},
 
-	refreshSidepane : function () {
-		// update sidepane
-		if (Wu.Util.isObject(Wu.app.SidePane)) Wu.app.SidePane.setProject(this);
-	},
+	// refreshSidepane : function () {
+	// 	// update sidepane
+	// 	if (Wu.Util.isObject(Wu.app.SidePane)) Wu.app.SidePane.setProject(this);
+	// },
 
 	// refreshHeaderpane : function () {
 		// update headerpane
 		// if (Wu.Util.isObject(Wu.app.HeaderPane)) Wu.app.HeaderPane.setProject(this);
 	// },
 
-	refreshMappane : function () {
-		// update mappane                
-		if (Wu.Util.isObject(Wu.app.MapPane)) Wu.app.MapPane.setProject(this);
-	},
+	// refreshMappane : function () {
+	// 	// update mappane                
+	// 	if (Wu.Util.isObject(Wu.app.MapPane)) Wu.app.MapPane.setProject(this);
+	// },
 
 	_reset : function () {
 		// this.removeHooks();
@@ -323,6 +323,10 @@ Wu.Project = Wu.Class.extend({
 
 		// set status
 		app.setSaveStatus();
+
+		Wu.Mixin.Events.fire('projectChanged', { detail : {
+			projectUuid : this.getUuid()
+		}});
 	},
 
 	_saveNew : function (opts) {
@@ -576,6 +580,10 @@ Wu.Project = Wu.Class.extend({
 		var bounds = this.store.bounds;
 		if (_.isEmpty(bounds)) return false;
 		return bounds;
+	},
+
+	getState : function () {
+		return this.store.state;
 	},
 
 	getLatLngZoom : function () {
@@ -1009,6 +1017,13 @@ Wu.Project = Wu.Class.extend({
 
 	},
 	disableMapboxGL : function () {
+
+	},
+
+	enableSaveState : function () {
+
+	},
+	disableSaveState : function () {
 
 	},
 

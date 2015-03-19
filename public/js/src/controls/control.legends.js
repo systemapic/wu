@@ -409,7 +409,7 @@ L.Control.Legends = L.Control.extend({
 		// create legends
 		legends.forEach(function (legend) {
 
-			console.log('legend: ', legend);
+			console.error('legend: ', legend);
 
 			// skip disabled legends
 			if (!legend.on) return;
