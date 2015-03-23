@@ -13,8 +13,6 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	_initContent : function () {
 
-		console.log('CLIENT _initContent', this);
-
 		this.clients = [];
 
 		// clients container
@@ -71,7 +69,6 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	_deactivate : function () {
-		console.log('_deactivate', this);
 		this.clients.forEach(function (client) {
 			client.close();
 		}, this);
@@ -107,8 +104,6 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	newClient : function () {
-
-		console.log('newClient!', this._creatingNewClient);
 
 		if ( this._creatingNewClient ) return;
 
@@ -266,13 +261,10 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	_created : function(client, json) {       // this is the http callback    
 
-		console.log('new client, callback: ', client, json);
-
 		var sidepaneClients = Wu.app.SidePane.Clients;
 		var options = JSON.parse(json);
 	       
 		if (options.error) {
-			console.log('error creating client.', options.error);
 			// remove old box
 			sidepaneClients._cancel();
 			return;

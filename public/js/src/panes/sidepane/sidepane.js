@@ -50,21 +50,14 @@ Wu.SidePane = Wu.Pane.extend({
 		this.render();    
 	},
 
-
-
 	_refresh : function () {
-		console.log('sidepane _refresh!!');
 		this.refreshMenu();
 	},
-
-
-
 
 	_initMobileContainer : function () {
 		this._mobileFullScreenCloser = Wu.DomUtil.create('div', 'q-editor-fullscreen-mobile-close displayNone', this._container);
 		Wu.DomEvent.on(this._mobileFullScreenCloser, 'mousedown', this.closeMobileFullscreen, this);
 	},
-
 
 	closeMobileFullscreen : function () {
 		if (app.SidePane.fullscreen) {
@@ -76,23 +69,6 @@ Wu.SidePane = Wu.Pane.extend({
 		}
 	},
 
-
-	// initContent : function () {
-		
-	// 	// menu pane
-	// 	var className = 'q-editor-menu';
-	// 	Wu.app._editorMenuPane = Wu.DomUtil.create('menu', className, this._container); 
-
-	// 	// content pane
-	// 	var className = 'q-editor-content hide-menu displayNone';
-	// 	app._editorContentPane = Wu.DomUtil.create('content', className, this._container); 
-
-	// 	// menuslider
-	// 	app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
-	// 	app._menuSliderArrow = Wu.DomUtil.createId('div', 'menuslider-arrow', Wu.app._menuSlider);	// refactor app
-	// },
-
-	
 	render : function () {
 		var pane = this.options.panes;
 
@@ -109,7 +85,6 @@ Wu.SidePane = Wu.Pane.extend({
 		this.refreshMenu();
 	},
 
-
 	calculateHeight : function () {
 
 		// set height
@@ -120,7 +95,6 @@ Wu.SidePane = Wu.Pane.extend({
 	setHeight : function (height) {
 		this._container.style.height = height + 'px';
 	},
-
 
 	collapse : function () {
 		
@@ -175,13 +149,6 @@ Wu.SidePane = Wu.Pane.extend({
 		if (this.DataLibrary) 	this.DataLibrary.updateContent(project);
 	},
 
-
-	// // display the relevant panes
-	// refresh : function (panes) {
-	// 	this.refreshMenu();
-	// },
-	
-
 	refreshMenu : function () {
 		
 		// set correct state
@@ -190,7 +157,6 @@ Wu.SidePane = Wu.Pane.extend({
 		// render update
 		this._renderPanes();
 	},
-
 
 	_renderPanes : function () {
 

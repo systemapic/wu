@@ -78,7 +78,6 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		this.minHeight = 0;
 	},
 
-
 	toggleControl : function (e) {
 		
 		// prevent default checkbox behaviour
@@ -99,31 +98,41 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		var disable = 'disable' + item.camelize();
 		var mapPane = app.MapPane;
 
+		var control = app.MapPane.getControls()[item];
+
+
+		this.project.store.controls[item] = on;	// todo
+		this.project._update('controls');
+
 		// toggle
 		if (on) {
+		
+			control._on();
+
 			// enable control on map
-			mapPane[enable]();
+			// mapPane[enable]();
 
 			// enable control in menu
 			this.enableControl(item);
 		} else {
+
+			control._off(); // todo: remove if
+			
 			// disable control on map
-			mapPane[disable]();
+			// mapPane[disable]();
 			
 			// disable control in menu
 			this.disableControl(item);
 		}
 
 		// save changes to project
-		this.project.store.controls[item] = on;	// todo
-		this.project._update('controls');
+		
 
 		// update controls css
 		mapPane.updateControlCss();
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Side Pane', 'Options > Controls toggle: ' + item]);
-
 	},
 
 
@@ -151,13 +160,22 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		target.checked = true;
 	},
 
+	// mark switched on or off
+	_refreshControls : function () {
+		var project = app.activeProject,
+		    controls = project.getControls();
+
+		_.each(controls, function (value, key) {
+			value ? this.enableControl(key) : this.disableControl(key);
+		}, this);
+	},
+
 	update : function () {
 		// call update on prototype
 		Wu.SidePane.Options.Item.prototype.update.call(this)
+
+		// mark active controls
+		this._refreshControls();
 	},
 
 });
-
-
-
-

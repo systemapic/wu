@@ -41,5 +41,6 @@ Wu.Pane = Wu.Class.extend({
 	_layerDisabled 	: function () {},
 	_updateView 	: function () {},
 	_refresh 	: function () {},
+	_initContainer : function () {},
 
 });

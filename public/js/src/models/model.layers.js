@@ -111,14 +111,14 @@ Wu.Layer = Wu.Class.extend({
 	_addToLegends : function () {
 
 		// add legends if active
-		var legendsControl = app.MapPane.legendsControl;
+		var legendsControl = app.MapPane.getControls().legends;
 		legendsControl && legendsControl.addLegend(this);
 	},
 
 	_addToInspect : function () {
 
 		// add to inspectControl if available
-		var inspectControl = app.MapPane.inspectControl;		
+		var inspectControl = app.MapPane.getControls().inspect;		
 		if (inspectControl) inspectControl.addLayer(this);
 
 	},
@@ -126,13 +126,12 @@ Wu.Layer = Wu.Class.extend({
 	_addToDescription : function () {
 
 		// add to descriptionControl if available
-		var descriptionControl = app.MapPane.descriptionControl;
+		var descriptionControl = app.MapPane.getControls().description;
 		if (!descriptionControl) return;
 
 		descriptionControl.setLayer(this);
 
 		// hide if empty and not editor
-		// var isEditor = app.Account.isSuperadmin() || app.Account.canUpdateProject(app.activeProject.getUuid());
 		var isEditor = app.access.to.edit_project(app.activeProject);
 		if (this.store.description || isEditor) { // todo: what if only editor 
 			descriptionControl.show();
@@ -164,8 +163,6 @@ Wu.Layer = Wu.Class.extend({
 	remove : function (map) {
 		var map = map || app._map;
 
-		console.log('REMMMVMVMVMVMVM');
-		
 		// leaflet fn
 		map.removeLayer(this.layer);
 
@@ -179,15 +176,15 @@ Wu.Layer = Wu.Class.extend({
 		this._removeFromZIndex();
 
 		// remove from inspectControl if available
-		var inspectControl = app.MapPane.inspectControl;			// refactor to events
+		var inspectControl = app.MapPane.getControls().inspect;			// refactor to events
 		if (inspectControl) inspectControl.removeLayer(this);
 
 		// remove from legendsControl if available
-		var legendsControl = app.MapPane.legendsControl;
+		var legendsControl = app.MapPane.getControls().legends;
 		if (legendsControl) legendsControl.removeLegend(this);
 
 		// remove from descriptionControl if avaialbe
-		var descriptionControl = app.MapPane.descriptionControl;
+		var descriptionControl = app.MapPane.getControls().description;
 		if (descriptionControl) {
 			descriptionControl.removeLayer(this);
 			descriptionControl._container.style.display = 'none'; // (j)		// refactor to descriptionControl
@@ -228,6 +225,10 @@ Wu.Layer = Wu.Class.extend({
 		this.save('title');
 	},
 
+	getDescription : function () {
+		return this.store.description;
+	},
+
 	getUuid : function () {
 		return this.store.uuid;
 	},
@@ -259,8 +260,6 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	getCartoCSS : function (cartoid, callback) {
-
-		console.log('getCartoCSS', cartoid);
 
 		var json = {
 			cartoid : cartoid
@@ -484,7 +483,6 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
 		    tileServer 	= app.options.servers.tiles.uri,
 		    subdomains  = app.options.servers.tiles.subdomains,
-		    // token 	= app.accessToken,
 		    token 	= '?token=' + app.Account.getToken(),
 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
@@ -547,7 +545,6 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 
-
 	update : function () {
 		var map = app._map;
 
@@ -593,7 +590,6 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		    cartoid 	= this.store.data.cartoid || 'cartoid',
 		    gridServer 	= app.options.servers.osm.uri,
 		    subdomains  = app.options.servers.osm.subdomains,
-		    // token 	= app.accessToken,
 		    token 	= '?token=' + app.Account.getToken(),
 		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
 		
@@ -658,19 +654,18 @@ Wu.MapboxLayer = Wu.Layer.extend({
 	
 	initLayer : function () {
 
-		// create Leaflet.mapbox tileLayer
-		this.layer = L.mapbox.tileLayer(this.store.data.mapbox, {
+		var url = 'https://{s}.tiles.mapbox.com/v4/{mapboxUri}/{z}/{x}/{y}.png?access_token={accessToken}';
+
+		this.layer = L.tileLayer(url, {
 			accessToken : this.store.accessToken,
-			// reuseTiles : true,
-			// tileSize : 512,
-			// unloadInvisibleTiles : true,
-			// updateWhenIdle : true,
+			mapboxUri : this.store.data.mapbox,
+			reuseTiles : true,
+			unloadInvisibleTiles : true,
+			updateWhenIdle : true,
 		});
 
-		// create gridLayer if available
-		if ('grids' in this.store) this.gridLayer = L.mapbox.gridLayer(this.store.data.mapbox);
+		// todo: add gridlayer to mapbox.. but why..?
 
-		// mark as loaded
 		this.loaded = true;
 	},
 });

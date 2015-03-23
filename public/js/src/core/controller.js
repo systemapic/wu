@@ -32,7 +32,7 @@ Wu.Controller = Wu.Class.extend({
 		this._project = app.activeProject = app.Projects[projectUuid];
 
 		// refresh map controls
-		this.refreshControls(); // perhaps refactor later, events in each control..
+		// this.refreshControls(); // perhaps refactor later, events in each control..
 
 		// set url
 		this._setUrl();
@@ -140,38 +140,37 @@ Wu.Controller = Wu.Class.extend({
 		Wu.Util.setAddressBar(url);
 	},
 
-	refreshControls : function () {
-		var controlsPane = app.SidePane.Options.settings.controls,
-		    project = this._project,
-		    controls = project.getControls(),
-		    pane = app.MapPane;
+	// refreshControls : function () {
+	// 	var controlsPane = app.SidePane.Options.settings.controls,
+	// 	    project = this._project,
+	// 	    controls = project.getControls(),
+	// 	    pane = app.MapPane;
 
-		    console.error('refreshControls!!! :)');
+	// 	    // console.error('refreshControls!!! :)');
 
-		// toggle each control
-		for (c in controls) {
-			var on = controls[c],
-			    enable = 'enable' + c.camelize(),
-			    disable = 'disable' + c.camelize();
+	// 	// toggle each control
+	// 	for (c in controls) {
+	// 		var on = controls[c],
+	// 		    enable = 'enable' + c.camelize(),
+	// 		    disable = 'disable' + c.camelize();
 			
-			pane[disable](); 	// todo: wtf !! is !! going on!?
-			console.log('on?', on, c, pane);
+	// 		pane[disable](); 	// todo: wtf !! is !! going on!?
 
-			// toggle
-			if (on) {	
-				// enable control on map
-				pane[enable]();
+	// 		// toggle
+	// 		if (on) {	
+	// 			// enable control on map
+	// 			pane[enable]();
 
-				// enable control in controls options menu
-				if (controlsPane) controlsPane.enableControl(c);
-			} else {	
-				// disable control on map
-				pane[disable]();
+	// 			// enable control in controls options menu
+	// 			if (controlsPane) controlsPane.enableControl(c);
+	// 		} else {	
+	// 			// disable control on map
+	// 			pane[disable]();
 				
-				// disable control in controls options menu
-				if (controlsPane) controlsPane.disableControl(c);
-			}
-		}
-	},
+	// 			// disable control in controls options menu
+	// 			if (controlsPane) controlsPane.disableControl(c);
+	// 		}
+	// 	}
+	// },
 
 });

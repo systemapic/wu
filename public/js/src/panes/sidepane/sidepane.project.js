@@ -304,18 +304,16 @@ Wu.SidePane.Project = Wu.Class.extend({
 		if (this._project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho not active.. fix!
 
 		// Google Analytics
-		var projectUuid = this._project.getUuid();
-		app.Analytics.setGaProject(projectUuid);	
+		// var projectUuid = this._project.getUuid(); // refactor: catch with events
+		// app.Analytics.setGaProject(projectUuid);	
 
 		// select project
 		// this._project.select();	
 		console.log('firing projectSelected');
 		Wu.Mixin.Events.fire('projectSelected', { detail : {
-			projectUuid : projectUuid
+			projectUuid : this._project.getUuid()
 		}});    
 
-		// remove startpane if active
-		app.StartPane.deactivate();
 	},
 
 	// add class to mark project active in sidepane

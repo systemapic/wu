@@ -144,32 +144,34 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		if (this.editMode) this.maxHeight += 100;
 	},
 
-	enableLayermenu : function () {
-		var layerMenu = app.MapPane.enableLayermenu();
-		app.SidePane.Options.settings.controls.enableControl('layermenu');
+	// enableLayermenu : function () {
+	// 	var layerMenu = app.MapPane.enableLayermenu();
+	// 	app.SidePane.Options.settings.controls.enableControl('layermenu');
 		
-		// save changes to project
-		this.project.store.controls.layermenu = true;
-		this.project._update('controls');
+	// 	// save changes to project
+	// 	this.project.store.controls.layermenu = true;
+	// 	this.project._update('controls');
 		
-		return layerMenu;
-	},
+	// 	return layerMenu;
+	// },
 
 	toggle : function (layer) {
 		
 		// console.log('toggle --> ', layer);
 
 		// ensure layerMenu is active
-		this.layerMenu = Wu.app.MapPane.layerMenu;
+		// this.layerMenu = Wu.app.MapPane.layerMenu;
 		// this.layerMenu = this.layerMenu || Wu.app.MapPane.layerMenu;
-		if (!this.layerMenu) this.layerMenu = this.enableLayermenu();
-		this.layerMenu.enableEdit();
+		// if (!this.layerMenu) this.layerMenu = this.enableLayermenu();
+		// this.layerMenu.enableEdit();
 		
+		var layerMenu = app.MapPane.getControls().layermenu;
+
 		if (layer.active) {
 			
 			// remove from layermenu
 			var uuid = layer.layer.store.uuid;
-			this.layerMenu._remove(uuid);
+			layerMenu._remove(uuid);
 
 			// set off
 			this.off(layer);
@@ -177,7 +179,7 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		} else {
 
 			// add to layermenu
-			this.layerMenu.add(layer.layer);
+			layerMenu.add(layer.layer);
 
 			// set on
 			this.on(layer);

@@ -18,8 +18,6 @@ Wu.SidePane.Item = Wu.Pane.extend({
 
 	_initContainer : function () {
 
-		console.log('init contianer sidepane.item!!', this._, this._wu);
-		
 		// menu
 		var className = 'q-editor-menu-item ' + this.type;
 		this._menu = Wu.DomUtil.create('div', className, Wu.app._editorMenuPane);
@@ -337,8 +335,6 @@ Wu.SidePane.Item = Wu.Pane.extend({
 
 
 	disable : function () {
-
-		console.log('disable!!', this);
 
 		// disable click
 		Wu.DomEvent.off(this._menu, 'mousedown', this._clickActivate, this); 

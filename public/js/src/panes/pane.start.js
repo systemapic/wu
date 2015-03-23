@@ -1,21 +1,18 @@
-Wu.StartPane = Wu.Class.extend({
+Wu.StartPane = Wu.Pane.extend({
 
-	initialize : function (options) {
-		
-		// set options
-		Wu.setOptions(this, options);
+	dimensions : {
+		screenW 	: 	0,
+		screenH 	: 	0,
+		boxW 		: 	350,
+		boxH 		: 	233,
+		sizeMode 	: 	'',
+		projectNo 	: 	0
+	},
 
+	projectContainers : [],
 
-		this.dimensions = {
-			screenW 	: 	0,
-			screenH 	: 	0,
-			boxW 		: 	350,
-			boxH 		: 	233,
-			sizeMode 	: 	'',
-			projectNo 	: 	0
-		}
-
-		this.projectContainers	= [];
+	_projectSelected : function (e) {
+		this.deactivate();
 	},
 
 	activate : function () {
