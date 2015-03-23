@@ -164,7 +164,7 @@ Wu.Project = Wu.Class.extend({
 		// this.refreshHeaderpane();
 	
 		// refresh sidepane
-		this.refreshSidepane(); 	// todo!!!
+		// this.refreshSidepane(); 	// todo!!!
 
 		// set active project in sidepane
 		if (this._menuItem) this._menuItem._markActive();

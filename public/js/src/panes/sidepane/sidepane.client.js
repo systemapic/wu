@@ -320,8 +320,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.open();
 
 		// select
-		sidepaneProject.project._menuItem.select();
+		// sidepaneProject.project._menuItem.select();
 
+		
 		// set status and unlock + button
 		app.setStatus('Done!');
 		this._unlockNewProjectButton();
@@ -334,6 +335,12 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// mark project div in sidepane as active
 		this._markActive(project);
+
+		// select
+		Wu.Mixin.Events.fire('projectSelected', { detail : {
+			projectUuid : project.getUuid()
+		}});
+
 	},
 
 
