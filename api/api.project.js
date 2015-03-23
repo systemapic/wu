@@ -86,6 +86,16 @@ module.exports = api.project = {
 			}, callback);
 		});
 
+		// get updated project
+		ops.push(function (project, callback) {
+			Project
+			.findOne({uuid : project.uuid})
+			.exec(function (err, updatedProject) {
+				if (err) return callback(err);
+				callback(null, updatedProject);
+			});
+		});
+
 		// run ops
 		async.waterfall(ops, function (err, project) {
 			if (err) return api.error.general(req, res, err);

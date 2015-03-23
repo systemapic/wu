@@ -70,14 +70,16 @@ L.Control.Cartocss = Wu.Control.extend({
 		// remove old content
 		this._flush();
 
-		// add new content
-		this._initContent();
-
 		// show
 		this._show();
+
+		// mark content not loaded
+		this._initedContent = false;
 	},
 
 	_initContent : function () {
+		if (this._initedContent) return;
+
 		// get all active, geojson layers
 		this._layers = this._project.getStylableLayers();
 
@@ -89,11 +91,13 @@ L.Control.Cartocss = Wu.Control.extend({
 
 		// refresh codemirror
 		this._codeMirror.refresh();
+
+		// mark content loaded
+		this._initedContent = true;
 	},
 
 	_on : function () {
 		this._refresh();
-		this._addAlreadyActive();
 	},
 
 	_off : function () {
@@ -106,9 +110,6 @@ L.Control.Cartocss = Wu.Control.extend({
 	_hide : function () {
 		this._container.style.display = 'none';
 		this.close();
-	},
-
-	_addAlreadyActive : function () {
 	},
 
 	initLayout : function () {
@@ -142,14 +143,18 @@ L.Control.Cartocss = Wu.Control.extend({
 		// append to leaflet-control-container
 		app._map.getContainer().appendChild(this._editorContainer);
 
+		// add tooltips
+		this._addTooltips();
+		
+	},
+
+	_addTooltips : function () {
 		// add tooltip
 		app.Tooltip.add(this._styleHeaderWrapper, 'Shows a list of active layers for this project.', { extends : 'systyle', tipJoint : 'top left'});
 		app.Tooltip.add(this._zoomVal, 'Shows current zoom level.', { extends : 'systyle', tipJoint : 'top left'});
 		app.Tooltip.add(this._tabStyling, 'Style selected layer. Takes CartoCSS code.', { extends : 'systyle', tipJoint : 'top left'});
 		app.Tooltip.add(this._tabTooltip, 'Customize tooltip to appear when clicking on different shapes in layer.', { extends : 'systyle', tipJoint : 'top left'});
 		app.Tooltip.add(this._tabLegends, 'Decide which legends you want to show for selected layer.', { extends : 'systyle', tipJoint : 'top left'});
-				
-
 	},
 
 	_setHooks : function (onoff) {
@@ -190,11 +195,9 @@ L.Control.Cartocss = Wu.Control.extend({
 		}, this)
 		
 	},
-
 	_addHooks : function () {
 		this._setHooks('on');
 	},
-
 	_removeHooks : function () {
 		this._setHooks('off');
 	},
@@ -213,7 +216,6 @@ L.Control.Cartocss = Wu.Control.extend({
 
 		// track mouse position
 		Wu.DomEvent.on(this._ghost, 'mousemove', this.resizeEditor, this);
-
 	},
 
 	removeResizeHooks : function () {
@@ -227,9 +229,7 @@ L.Control.Cartocss = Wu.Control.extend({
 	},
 
 	resizeEditor : function (e) {
-
 		// set new width
-		// var mouse = {x: 0};		
 		var mousex = e.clientX || e.pageX || 0,
 		    offleft = this._editorContainer.offsetLeft,
 		    offwidth =  this._editorContainer.offsetWidth,
@@ -1042,7 +1042,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		Wu.DomUtil.addClass(this._toolbarButton, 'open');
 
 		// update
-		// this._update();
+		this._initContent();
 
 		// add open class
 		Wu.DomUtil.addClass(this._editorContainer, 'open');
