@@ -23,7 +23,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // app.MapPane.mousepositionControl
 
-L.Control.MousePosition = L.Control.extend({
+L.Control.Mouseposition = Wu.Control.extend({
+
+        type : 'mouseposition',
+
         options: {
                 position: 'topright',
                 separator: ' : ',
@@ -35,6 +38,43 @@ L.Control.MousePosition = L.Control.extend({
                 prefix: "",
                 zoomLevel : true
         },
+
+        _on : function () {
+                this._show();
+        },
+        _off : function () {
+                this._hide();
+        },
+        _show : function () {
+                this._container.style.display = 'block';
+        },
+        _hide : function () {
+                this._container.style.display = 'none';
+        },
+
+        _addTo : function () {
+                this.addTo(app._map);
+                this._added = true;
+        },
+
+        _refresh : function () {
+                // should be active
+                if (!this._added) this._addTo();
+
+                // get control active setting from project
+                var active = this._project.getControls()[this.type];
+                
+                // if not active in project, hide
+                if (!active) return this._hide();
+
+                // remove old content
+                this._flush();
+        },
+
+        _flush : function () {
+
+        },
+
 
         onAdd: function (map) {
                 this._map = map;

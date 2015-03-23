@@ -1,6 +1,22 @@
 Wu.MapPane = Wu.Pane.extend({
 
 	_ : 'mappane',
+
+	options : {
+		controls : [
+			'inspect',
+			'layermenu',
+			'description',
+			'zoom',
+			'draw',
+			'legends',
+			'measure',
+			'geolocation',
+			'mouseposition',
+			'baselayertoggle',
+			'cartocss'
+		]
+	},
 	
 	_initialize : function () {
 		// connect zindex control
@@ -22,8 +38,11 @@ Wu.MapPane = Wu.Pane.extend({
 		// init map
 		this._initLeaflet();
 
+		// init controls
+		this._initControls();
+
 		// events
-		// this._registerEvents();
+		this._registerEvents();
 
 		// adjust padding, etc.
 		this._adjustLayout();
@@ -31,7 +50,6 @@ Wu.MapPane = Wu.Pane.extend({
 
 	// refresh view
 	_refresh : function () {
-		console.log('pane.map.js _refresh');
 
 		// remove old
 		this._flush();
@@ -51,6 +69,8 @@ Wu.MapPane = Wu.Pane.extend({
 
 		// remove layers
 		this._flushLayers();
+
+		this._activeLayers = [];
 
 		// remove controls
 		// this.resetControls();
@@ -72,7 +92,11 @@ Wu.MapPane = Wu.Pane.extend({
 		this._map = app._map = L.map('map', {
 			worldCopyJump : true,
 			attributionControl : false,
-			maxZoom : 18
+			maxZoom : 18,
+			// zoomAnimation : false
+			zoomControl : false,
+			inertia : false,
+			zoomAnimationThreshold : 2
 		});
 
 		// add editable layer
@@ -80,6 +104,23 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 
+	_initControls : function () {
+
+		this._controls = {};
+		var controls = this.options.controls;
+
+		_.each(controls, function (control) {
+
+			this._controls[control] = new L.Control[control.camelize()];
+
+		}, this);
+
+
+	},
+
+	getControls : function () {
+		return this._controls;
+	},
 
 	_adjustLayout : function () {
 		// this.setHeaderPadding();
@@ -89,13 +130,12 @@ Wu.MapPane = Wu.Pane.extend({
 
 	_registerEvents : function () {
 
-		// app._map.on('moveend', this._onMove, this);
-		// app._map.on('zoomend', this._onZoom, this);
+		app._map.on('moveend', this._onMove, this);
+		app._map.on('zoomend', this._onZoom, this);
 	},
 
 
 	_onMove : function () {
-		console.log('moveend');
 		var project = this._project || app.activeProject;
 		Wu.Mixin.Events.fire('projectChanged', {detail : {
 			projectUuid : project.getUuid()
@@ -103,7 +143,6 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 	_onZoom : function () {
-		console.log('zoom');
 		var project = this._project || app.activeProject;
 		Wu.Mixin.Events.fire('projectChanged', {detail : {
 			projectUuid : project.getUuid()
@@ -306,9 +345,9 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 	
 
-	_reset : function () {
-		this.reset();
-	},
+	// _reset : function () {
+	// 	this.reset();
+	// },
 
 	// createNewMap : function () {
 
@@ -339,40 +378,41 @@ Wu.MapPane = Wu.Pane.extend({
 		map.addLayer(this.editableLayers);
 	},
 
-	reset : function () {
+	// reset : function () {
 
-		// flush current map
-		var map = this._map;
-		if (map) {
+	// 	// flush current map
+	// 	var map = this._map;
+	// 	if (map) {
 			
-			// remove each layer
-			map.eachLayer(function(layer) {
-				map.removeLayer(layer);
-			});
+	// 		// remove each layer
+	// 		map.eachLayer(function(layer) {
+	// 			map.removeLayer(layer);
+	// 		});
 
-			// remove map
-			map.remove();
+	// 		// remove map
+	// 		map.remove();
 
-		}
+	// 	}
 
-		// create new map
-		this.createNewMap();
+	// 	// create new map
+	// 	this.createNewMap();
 
-		// width hack
-		this._updateWidth();
+	// 	// width hack
+	// 	this._updateWidth();
 
-		// remove controls
-		this.resetControls();
+	// 	// remove controls
+	// 	this.resetControls();
 
-		// remove hanging zoom
-		this.disableZoom();             // weird ta
+	// 	// remove hanging zoom
+	// 	this.disableZoom();             // weird ta
 
-	},
+	// },
 
 	updateControlCss : function () {
 
 		// get controls
 		var controls = this._project.getControls(),
+		    legendsControl = controls.legends,
 		    corners = app._map._controlCorners,
 		    topleft = corners.topleft,
 		    bottomright = corners.bottomright,
@@ -394,13 +434,13 @@ Wu.MapPane = Wu.Pane.extend({
 		if (controls.legends) {
 			
 			// get container
-			var legendsContainer = this.legendsControl._legendsContainer;
+			var legendsContainer = controls.legends._legendsContainer;
 
 			// Check for Layer Menu Control
 			if (controls.layermenu) {
-				Wu.DomUtil.removeClass(legendsContainer, 'legends-padding-right');
+				if (legendsContainer) Wu.DomUtil.removeClass(legendsContainer, 'legends-padding-right');
 			} else {
-				Wu.DomUtil.addClass(legendsContainer, 'legends-padding-right');
+				if (legendsContainer) Wu.DomUtil.addClass(legendsContainer, 'legends-padding-right');
 			}
 
 			// Check for Description Control
@@ -623,7 +663,7 @@ Wu.MapPane = Wu.Pane.extend({
 	enableMeasure : function () {
 		if (this._scale) return;
 
-		this._scale = L.control.scale({'position' : 'topright'});
+		this._scale = L.control.measure({'position' : 'topright'});
 		this._scale.addTo(this._map);
 	},
 
@@ -873,12 +913,8 @@ Wu.MapPane = Wu.Pane.extend({
 		Wu.DomEvent.on(container,   'mousedown mouseup click', L.DomEvent.stopPropagation, this);
 
 
-		// var that = this;
-
 		// add circle support
 		map.on('draw:created', function(e) {
-
-			// console.log('draw:created!', e);
 
 			// add circle support
 			e.layer.layerType = e.layerType;            

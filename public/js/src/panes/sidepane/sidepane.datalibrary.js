@@ -142,7 +142,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		Wu.DomEvent[on](this._search, 'keyup', this.searchList, this);
 
 		// 
-		console.log('set project un load');
 		Wu.Mixin.Events[on]('projectSelected', this._onProjectSelected, this);
 	},
 
@@ -154,7 +153,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var project = e.details;
 
 		this.removeHooks();
-		console.log('_unload datalib');
 
 		this._reset();
 	},
@@ -530,8 +528,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	deleteFiles : function (files) {
 
-		console.log('delete files: ', files);
-
 		// set status
 		app.setStatus('Deleting');
 		
@@ -564,8 +560,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	// list.js plugin
 	initList : function () { 
 
-		// console.error('init list!');
-		
 		// add dummy entry
 		var _tr = Wu.DomUtil.createId('tr', 'dummy-table-entry', this._table);
 
@@ -642,7 +636,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	
 	handleError : function (err) {
-		console.log('handleError: ', err);
 
 		// set error
 		app.feedback.setError({
@@ -656,9 +649,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	// process file
 	uploaded : function (result) {
 		
-		console.log('uploaded!!!', result);
-		
-	
 
 		// handle errors
 		if (result.error) this.handleError(result.error);
@@ -674,9 +664,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 			// set icon if image
 			var icon = (file.data && file.data.image) ? this._getImagePath(file.uuid, 100, 100) : null;
-
-		
-			console.log('id', this.__id);
 
 			app.feedback.setSuccess({
 				title : 'Upload success!',
@@ -747,7 +734,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._removeFile(file);
 
 		// clone file object
-		// console.log('fuie', file);
 		var tmp = Wu.extend({}, file.getStore()); 
 
 		var tmpData = {
@@ -990,7 +976,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	categoryKeydown : function (e) {
-		console.log('categoryKeydown!', e.keyCode);
 
 		// on enter
 		if (e.keyCode == 13) {
@@ -1018,7 +1003,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// on esc
 		if (e.keyCode == 27) {
-			console.log('esc!');
 			
 			// close, do nothing
 			this.closeCategories();

@@ -55,7 +55,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	_refresh : function () {
-		console.log('docuemtns refresh!!');
 
 		// use active project
 		this._project = app.activeProject;
@@ -68,9 +67,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// editMode: hide/show (+) button
 		var editMode = app.access.to.edit_project(this._project);
-		console.log('setting +');
 		if (editMode) {
-			console.log('aight!');
 			this._showPlus();
 		} else {
 			this._hidePlus();
@@ -197,10 +194,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	
 		// if editMode
 		// if (this._project.editMode) {
-		console.log('checking access docuemtns: ', this._project);
 		
 		if (app.access.to.edit_project(this._project)) {
-			console.log('has access!!');
 
 			// add shift key hook
 			this.enableShift();
@@ -345,8 +340,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	newFolder : function () {
-
-		console.log('create new folder!');
 
 		var folder = {
 			'title'   : 'Title',

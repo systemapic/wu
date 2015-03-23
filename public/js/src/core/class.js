@@ -400,8 +400,6 @@ Wu.Util = {
 		    		
 				var valid = Wu.verify(http.responseText);
 
-				console.log('got callback?', callback, valid);
-
 				if (http.status == 200 && valid) { // ok
 					if (callback) callback(null, http.responseText); 
 				} else { 

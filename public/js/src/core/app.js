@@ -27,8 +27,8 @@ Wu.App = Wu.Class.extend({
 		this._initAnalytics();
 
 		// set options
-		L.mapbox.config.FORCE_HTTPS = true;
-		L.mapbox.accessToken = this.options.providers.mapbox[0].accessToken; // todo: move to relevant place
+		// L.mapbox.config.FORCE_HTTPS = true;
+		// L.mapbox.accessToken = this.options.providers.mapbox[0].accessToken; // todo: move to relevant place
 
 		// set page title
 		document.title = this.options.portalTitle;

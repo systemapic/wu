@@ -255,7 +255,6 @@ Wu.SidePane.Options = Wu.SidePane.Item.extend({
 		// update map settings
 		for (s in this.settings) {
 			var setting = this.settings[s];
-			console.log('setting ====> ', setting);
 			setting.update();
 		}
 

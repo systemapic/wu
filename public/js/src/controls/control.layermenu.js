@@ -1,6 +1,7 @@
 // app.MapPane.layerMenu
+L.Control.Layermenu = Wu.Control.extend({
 
-L.Control.Layermenu = L.Control.extend({
+	type : 'layermenu',
 
 	options: {
 		position : 'bottomright' 
@@ -30,6 +31,47 @@ L.Control.Layermenu = L.Control.extend({
 
 	},
 
+	_addTo : function () {
+		this.addTo(app._map);
+		this._addHooks();
+		this._added = true;
+	},
+
+
+	_flush : function () {
+		this.layers = {};
+		this._content.innerHTML = '';
+	},
+
+	_refresh : function () {
+
+		// should be active
+		if (!this._added) this._addTo();
+
+		// get control active setting from project
+		var active = this._project.getControls()[this.type];
+		
+		// if not active in project, hide
+		if (!active) return this._hide();
+
+		// remove old content
+		this._flush();
+
+		// add new content
+		this._initContent();
+
+		// show
+		this._show();
+	},
+
+	_on : function () {
+		this._refresh();
+		this._addAlreadyActive();
+	},
+
+	_off : function () {
+		this._hide();
+	},
 
 	initLayout : function () {	
 
@@ -57,9 +99,10 @@ L.Control.Layermenu = L.Control.extend({
 		app._map._controlCorners.bottomright.appendChild(this._openLayers);
 
 		// Pick up Elements dealing with the Legends
-		if (app.MapPane.legendsControl) {
-			this._legendsContainer = app.MapPane.legendsControl._legendsContainer;
-			this._legendsCollapser = app.MapPane.legendsControl._legendsCollapser;
+		var legends = app.MapPane.getControls().legends;
+		if (legends) {
+			this._legendsContainer = legends._legendsContainer;
+			this._legendsCollapser = legends._legendsCollapser;
 		}
 
 		Wu.DomEvent.on(this._bhattan1,   'click', this.closeLayerPane, this);
@@ -73,8 +116,9 @@ L.Control.Layermenu = L.Control.extend({
 		Wu.DomEvent.on(this._innerContainer, 'mouseenter', this.cancelEditClose, this);
 		Wu.DomEvent.on(this._innerContainer, 'mouseleave', this.timedEditClose, this);
 
-		// add extra padding		
-		if (!app.MapPane.inspectControl) {
+		// add extra padding	
+		var inspect = app.MapPane.getControls().inspect;	
+		if (!inspect) {
 			var corner = app._map._controlCorners.bottomright;
 			corner.style.paddingBottom = 6 + 'px';
 		}
@@ -91,6 +135,78 @@ L.Control.Layermenu = L.Control.extend({
 		    	Wu.DomUtil.create('div', 'layers-mobile-arrow', this._innerContainer);
 		}
 
+	},
+
+	_addHooks : function () {
+		Wu.DomEvent.on(this._container, 'mouseenter', function () {
+			app._map.scrollWheelZoom.disable();
+		}, this);
+
+		Wu.DomEvent.on(this._container, 'mouseleave', function () {
+			app._map.scrollWheelZoom.enable();
+		}, this);
+	},
+
+	_initContent : function () {
+		this._fill();
+	},
+
+	_fill : function () {
+
+		// Get parent wrapper
+		this._parentWrapper = this._container.parentNode;
+
+		// return if empty layermenu
+		if (!this._project.store.layermenu || this._project.store.layermenu.length == 0 ) {
+
+			// Hide parent wrapper if empty
+			Wu.DomUtil.addClass(this._parentWrapper, 'displayNone');
+
+			return;
+		}
+
+		// Show parent wrapper if not empty
+		Wu.DomUtil.removeClass(this._parentWrapper, 'displayNone');
+
+		// iterate layermenu array and fill in to layermenu
+		this._project.store.layermenu.forEach(function (item) {
+
+			// get wu layer
+			var layer = _.find(this._project.layers, function (l) { return l.store.uuid == item.layer; });
+
+			var layerItem = {
+				item : item,
+				layer : layer
+			}
+
+			// add to layermenu
+			this._add(layerItem);
+
+		}, this);
+	},
+
+	_addAlreadyActive : function () {
+		
+		var active = app.MapPane.getActiveLayers();
+		var enabled = _.filter(this.layers, function (item) {
+			var uuid = item.layer.getUuid();
+			var ison = _.find(active, function (a) {
+				return a.getUuid() == uuid;
+			})
+			return ison;
+		});
+
+		enabled.forEach(function (e) {
+			this._enableLayer(e.layer.getUuid());
+		}, this);	
+	},
+
+	_show : function () {
+		this._container.style.display = 'block';
+	},
+
+	_hide : function () {
+		this._container.style.display = 'none';
 	},
 
 	show : function () {
@@ -115,10 +231,10 @@ L.Control.Layermenu = L.Control.extend({
 
 
 	setMaxHeight : function (layersMaxHeight) {
-
+		var layersMaxHeight = layersMaxHeight || window.innerHeight - 135;
 
 		// Make space for inspect control, if it's there, yo
-		var inspectControl = app.MapPane.inspectControl;
+		var inspectControl = app.MapPane.getControls().inspect;
 		
 		if ( inspectControl ) {
 
@@ -167,7 +283,8 @@ L.Control.Layermenu = L.Control.extend({
 		Wu.DomUtil.removeClass(this._openLayers, 'ol-collapsed');
 		
 		// Slide the LEGENDS
-		if (app.MapPane.inspectControl && this._legendsContainer) {
+		var inspect = app.MapPane.getControls().inspect;
+		if (inspect && this._legendsContainer) {
 			Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
 		}	
 		
@@ -176,7 +293,7 @@ L.Control.Layermenu = L.Control.extend({
 
 
 		// Adjust legends width
-		app.MapPane.legendsControl.checkWidth();
+		app.MapPane.getControls().legends.checkWidth();
 
 
 		// Google Analytics event tracking
@@ -197,7 +314,11 @@ L.Control.Layermenu = L.Control.extend({
 		Wu.DomUtil.addClass(this._openLayers, 'ol-collapsed');
 		
 		// Slide the LEGENDS
-		if ( app.MapPane.inspectControl ) {
+		var inspect = app.MapPane.getControls().inspect;
+		var legends = app.MapPane.getControls().legends;
+		var description = app.MapPane.getControls().description;
+		
+		if (inspect) {
 			if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
 		}
 		
@@ -206,15 +327,13 @@ L.Control.Layermenu = L.Control.extend({
 		
 		// If we're on mobile
 		if (app.mobile) {
-
 			// Check if legends is open ~ close it when opening layer menu
-			if (app.MapPane.legendsControl._isOpen) app.MapPane.legendsControl.MobileCloseLegends();
-			if (!app.MapPane.descriptionControl._isClosed) app.MapPane.descriptionControl.mobileClosePane();
-
+			if (legends._isOpen) legends.MobileCloseLegends();
+			if (!description._isClosed) description.mobileClosePane();
 		}
 
 		// Adjust legends width
-		app.MapPane.legendsControl.checkWidth();
+		legends.checkWidth();
 
 
 		// Google Analytics event tracking
@@ -264,7 +383,7 @@ L.Control.Layermenu = L.Control.extend({
 	disableEdit : function () {
 		if (!this.editMode) return;
 
-		if (!this.project.store.layermenu || this.project.store.layermenu.length == 0 ) {
+		if (!this._project.store.layermenu || this._project.store.layermenu.length == 0 ) {
 			// Hide parent wrapper if empty
 			Wu.DomUtil.addClass(this._parentWrapper, 'displayNone');
 		}		
@@ -429,10 +548,10 @@ L.Control.Layermenu = L.Control.extend({
 			var nodeList = Array.prototype.slice.call(this._content.childNodes);
 			
 			var newIndex = nodeList.indexOf(el);
-			var oldIndex = _.findIndex(this.project.store.layermenu, {uuid : uuid});
+			var oldIndex = _.findIndex(this._project.store.layermenu, {uuid : uuid});
 			
 			// move in layermenu array
-			this.project.store.layermenu.move(oldIndex, newIndex);
+			this._project.store.layermenu.move(oldIndex, newIndex);
 
 			// save
 			this.save();
@@ -531,7 +650,7 @@ L.Control.Layermenu = L.Control.extend({
 		this.clearInvalid();
 
 		// vars
-		var array = this.project.store.layermenu;
+		var array = this._project.store.layermenu;
 		var invalid = [];
 
 		// iterate each layermenuitem
@@ -581,7 +700,7 @@ L.Control.Layermenu = L.Control.extend({
 	updateLogic : function () {
 
 		// get vars
-		var array = this.project.store.layermenu;
+		var array = this._project.store.layermenu;
 		this._logic = this._logic || {};
 
 		// create logic from array
@@ -799,7 +918,6 @@ L.Control.Layermenu = L.Control.extend({
 
 	_getActiveLayers : function () {
 		var active = _.filter(this.layers, function (layer) {
-			console.log('XX layer: ', layer);
 			return layer.on;
 		});
 		return active;
@@ -839,7 +957,7 @@ L.Control.Layermenu = L.Control.extend({
 		delete this.layers[uuid];
 
 		// remove from layermenu
-		_.remove(this.project.store.layermenu, function (item) { return item.uuid == uuid; });
+		_.remove(this._project.store.layermenu, function (item) { return item.uuid == uuid; });
 
 		// save
 		this.save();
@@ -890,7 +1008,7 @@ L.Control.Layermenu = L.Control.extend({
 		this._add(layerItem);
 
 		// save
-		this.project.store.layermenu.push(item);
+		this._project.store.layermenu.push(item);
 		this.save();
 
 	},
@@ -966,41 +1084,6 @@ L.Control.Layermenu = L.Control.extend({
 		return this.layers;
 	},
 	
-	_fill : function () {
-
-		// Get parent wrapper
-		this._parentWrapper = this._container.parentNode;
-
-		// return if empty layermenu
-		if (!this.project.store.layermenu || this.project.store.layermenu.length == 0 ) {
-
-			// Hide parent wrapper if empty
-			Wu.DomUtil.addClass(this._parentWrapper, 'displayNone');
-
-			return;
-
-		}
-
-		// Show parent wrapper if not empty
-		Wu.DomUtil.removeClass(this._parentWrapper, 'displayNone');
-
-		// iterate layermenu array and fill in to layermenu
-		this.project.store.layermenu.forEach(function (item) {
-
-			// get wu layer
-			var layer = _.find(this.project.layers, function (l) { return l.store.uuid == item.layer; });
-
-			var layerItem = {
-				item : item,
-				layer : layer
-			}
-
-			// add to layermenu
-			this._add(layerItem);
-
-		}, this);
-	},
-
 
 	addMenuFolder : function () {
 		this.addFolder();		// todo: remove
@@ -1028,7 +1111,7 @@ L.Control.Layermenu = L.Control.extend({
 		this._add(layerItem);
 
 		// save to server
-		this.project.store.layermenu.push(folder);
+		this._project.store.layermenu.push(folder);
 		this.save();
 
 	},
@@ -1060,8 +1143,8 @@ L.Control.Layermenu = L.Control.extend({
 			folder.innerHTML = newTitle;
 			
 			// save
-			var i = _.findIndex(this.project.store.layermenu, {'uuid' : uuid});
-			this.project.store.layermenu[i].caption = newTitle;
+			var i = _.findIndex(this._project.store.layermenu, {'uuid' : uuid});
+			this._project.store.layermenu[i].caption = newTitle;
 			this.save();
 
 			// boolean
@@ -1084,12 +1167,12 @@ L.Control.Layermenu = L.Control.extend({
 		var wrap = this.layers[uuid].el;
 
 		// get current x pos
-		var i   = _.findIndex(this.project.store.layermenu, {'uuid' : uuid});
-		var pos = parseInt(this.project.store.layermenu[i].pos);
+		var i   = _.findIndex(this._project.store.layermenu, {'uuid' : uuid});
+		var pos = parseInt(this._project.store.layermenu[i].pos);
 
 		// set new pos
 		var newpos = pos + 1;
-		this.project.store.layermenu[i].pos = newpos;
+		this._project.store.layermenu[i].pos = newpos;
 
 		// add class
 		Wu.DomUtil.addClass(wrap, 'level-' + newpos);
@@ -1105,12 +1188,12 @@ L.Control.Layermenu = L.Control.extend({
 		var wrap = this.layers[uuid].el;
 
 		// get current x pos
-		var i   = _.findIndex(this.project.store.layermenu, {'uuid' : uuid});
-		var pos = parseInt(this.project.store.layermenu[i].pos);
+		var i   = _.findIndex(this._project.store.layermenu, {'uuid' : uuid});
+		var pos = parseInt(this._project.store.layermenu[i].pos);
 
 		// set new pos
 		var newpos = pos - 1;
-		this.project.store.layermenu[i].pos = newpos;
+		this._project.store.layermenu[i].pos = newpos;
 
 		// add class
 		Wu.DomUtil.addClass(wrap, 'level-' + newpos);
@@ -1139,42 +1222,12 @@ L.Control.Layermenu = L.Control.extend({
 
 		// save on timeout
 		this.saveTimer = setTimeout(function () {
-			that.project._update('layermenu');
+			that._project._update('layermenu');
 		}, 1000);       // don't save more than every goddamed second
 
 	},
 
-	update : function (project) {
 
-		// get vars
-		this.project  = project || app.activeProject;
-		this.layers   = {};
-
-		console.error('lm update', this.project.getName());
-			
-		// create layermenu
-		this._fill();
-
-		// close by default
-		this.closeAll();
-
-		// prevent map scrollzoom
-		var map = app._map;
-		Wu.DomEvent.on(this._container, 'mouseenter', function () {
-			map.scrollWheelZoom.disable();
-		}, this);
-
-		Wu.DomEvent.on(this._container, 'mouseleave', function () {
-			map.scrollWheelZoom.enable();
-		}, this);
-
-		// Check window height
-		var layersMaxHeight = window.innerHeight - 135;
-
-		// Set max height of Layers selector container
-		this.setMaxHeight(layersMaxHeight);
-	
-	}
 });
 
 L.control.layermenu = function (options) {
