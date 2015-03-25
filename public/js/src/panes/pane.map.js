@@ -70,6 +70,7 @@ Wu.MapPane = Wu.Pane.extend({
 		// remove layers
 		this._flushLayers();
 
+		this._activeLayers = null;
 		this._activeLayers = [];
 
 		// remove controls
@@ -79,10 +80,13 @@ Wu.MapPane = Wu.Pane.extend({
 
 	_flushLayers : function () {
 		var map = app._map;
-		map.eachLayer(function (layer) { 	// thsi sis bullshit! remove controls completely, end of story!!
-			map.removeLayer(layer);
-		});
-		// app.activeProject.getLayers().forEach(function (l) { l.remove() });
+		
+		var activeLayers = _.clone(this._activeLayers);
+
+		activeLayers.forEach(function (layer) {
+			map.removeLayer(layer.layer);
+			layer._flush();
+		}, this);
 	},
 
 

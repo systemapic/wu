@@ -7,6 +7,7 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	onAdd : function (map) {
+		console.log('description onAdd');
 		var className = 'leaflet-control-description',
 		    container = L.DomUtil.create('div', className),
 		    options   = this.options;
@@ -20,7 +21,9 @@ L.Control.Description = Wu.Control.extend({
 		return container; // turns into this._container on return
 	},
 
-	_initContainer : function () {                
+	_initContainer : function () {          
+
+		console.log('description _initContainer');      
 		
 		// hide by default
 		this._container.style.display = "none";
@@ -45,6 +48,7 @@ L.Control.Description = Wu.Control.extend({
 		this.addTo(app._map);
 		this._initContainer();
 		this._addHooks();
+		this._added = true;
 	},
 
 	_flush : function () {

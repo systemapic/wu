@@ -72,7 +72,6 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 	},
 
 	_refresh : function () {
-		// should be active
 		if (!this._added) this._addTo();
 
 		// get control active setting from project
@@ -96,6 +95,7 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 			this._list = null;
 		}
 
+		this._layers = null;
 		this._layers = {};
 
 	},

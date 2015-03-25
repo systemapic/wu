@@ -210,6 +210,8 @@ Wu.App = Wu.Class.extend({
 
 	_resizeEvents : function (e) {
 
+		console.log('resize??!');
+		return;
 		// todo: rewrite to emit resize event!
 
 		// get window dimensions
@@ -222,11 +224,11 @@ Wu.App = Wu.Class.extend({
 		if (app.MapPane) app.MapPane.resizeEvent(dimensions);
 
 		// legends control resize
-		var legendsControl = app.MapPane.legendsControl;
+		var legendsControl = app.MapPane.getControls().legends;
 		if (legendsControl) legendsControl.resizeEvent(dimensions);
 
 		// layermenu control resize
-		var layermenuControl = app.MapPane.layerMenu;
+		var layermenuControl = app.MapPane.getControls().layermenu;
 		if (layermenuControl) layermenuControl.resizeEvent(dimensions);
 	},
 

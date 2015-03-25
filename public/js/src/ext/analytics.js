@@ -74,7 +74,6 @@ Wu.Analytics = Wu.Class.extend({
 	},
 
 	setGaUser : function () {
-
 		if (!app.Account) return;
 
 		// USER
@@ -96,7 +95,6 @@ Wu.Analytics = Wu.Class.extend({
 		// ga('set', 'dimension13', userIP);
 
 		this._userSet = true;
-
 	},
 
 
@@ -131,14 +129,11 @@ Wu.Analytics = Wu.Class.extend({
 
 		// Send "select project" event to GA
 		this.ga(['Select project', projectName])
-
-
 	},
 
 
 	ga : function (trackArray) {
-
-		if ( !this._userSet) this.setGaUser();
+		if (!this._userSet) this.setGaUser();
 
 		var gaSendObject = {
 			'hitType' : 'event'
@@ -164,6 +159,10 @@ Wu.Analytics = Wu.Class.extend({
 
 		// Try send track object to google analytics
 		ga('send', gaSendObject);
+		
+		// mem leak?
+		gaSendObject = null;
+		trackArray = null;
 	},
 
 	// Use to log errors

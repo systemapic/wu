@@ -36,7 +36,8 @@ Wu.Tooltip = Wu.Class.extend({
 	},
 
 	add : function (div, content, options) {
-
+		return;
+		
 		// merge options
 		var opts = _.extend(_.clone(this.options), options);
 
