@@ -447,7 +447,7 @@ Wu.Project = Wu.Class.extend({
 		_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.getUuid(); });
 
 		// remove from layermenu
-		var layerMenu = app.MapPane.layerMenu;
+		var layerMenu = app.MapPane.getControls().layermenu;
 		if (layerMenu) layerMenu.onDelete(layer);
 
 		// remove from map
@@ -806,7 +806,7 @@ Wu.Project = Wu.Class.extend({
 	removeFiles : function (files) {
 
 		var list = app.SidePane.DataLibrary.list,
-		    layerMenu = app.MapPane.layerMenu,
+		    layerMenu = app.MapPane.getControls().layermenu,
 		    _fids = [],
 		    uuids = [],
 		    that = this;
