@@ -100,7 +100,7 @@ Wu.MapPane = Wu.Pane.extend({
 			// zoomAnimation : false
 			zoomControl : false,
 			inertia : false,
-			zoomAnimationThreshold : 2
+			// zoomAnimationThreshold : 2
 		});
 
 		// add editable layer

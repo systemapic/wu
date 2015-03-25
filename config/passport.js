@@ -10,15 +10,17 @@ var LocalStrategy = require('passport-local').Strategy;
 // load up the user model
 var User = require('../models/user');
 
-
-// redis, crypto
+// crypto
 var crypto = require('crypto');
-var redis = require('redis');
+
+// config
 var config = require('../config/config');
 
 // api
 var api = require('../api/api');
 
+// redis
+var redis = require('redis');
 var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host)
 r.auth(config.tokenRedis.auth);
 r.on('error', function (err) {
@@ -88,14 +90,8 @@ module.exports = function(passport) {
 					if (err) console.error(err);
 					return done(null, newUser);
 				});
-
-
-
-
 			});    
-
 		});
-
 	}));
 
 	// =========================================================================
@@ -112,9 +108,6 @@ module.exports = function(passport) {
 	},
 	function(req, email, password, done) { // callback with email and password from our form
 	  
-
-		// console.log('LOGIN ATTEMPT!', email, password);
-
 		// find a user whose email is the same as the forms email
 		// we are checking to see if the user trying to login already exists
 		User.findOne({ 'local.email' :  email }, function(err, user) {

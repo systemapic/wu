@@ -14,10 +14,6 @@ Wu.Layer = Wu.Class.extend({
 		// data not loaded
 		this.loaded = false;
 
-		// create leaflet layers
-		// this.initLayer();
-
-		
 	},
 
 	addHooks : function () {
@@ -34,8 +30,6 @@ Wu.Layer = Wu.Class.extend({
 		// all visible tiles loaded event (for phantomJS)
 		Wu.DomEvent[on](this.layer, 'load', this._onLayerLoaded, this);
 		Wu.DomEvent[on](this.layer, 'loading', this._onLayerLoading, this);
-
-		// Wu.Mixin.Events[on]('projectSelected', this._unload, this);
 	},
 
 	
@@ -55,15 +49,17 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	initLayer : function () {
+
 		// create Leaflet layer, load data if necessary
 		this._inited = true;
+		
 		// add hooks
 		this.addHooks();
-
 	},
 
 	add : function (type) {
 		if (type == 'baselayer') this._isBase = true;
+		
 		this.addTo();
 	},
 
@@ -79,21 +75,20 @@ Wu.Layer = Wu.Class.extend({
 
 	_addTo : function (type) {
 		if (!this._inited) this.initLayer();
+
 		var map = app._map;
 
 		// leaflet fn
-		// this.layer.addTo(map);
 		map.addLayer(this.layer);
-
-		// add to active layers
-		app.MapPane.addActiveLayer(this);	// includes baselayers
 
 		// add gridLayer if available
 		if (this.gridLayer) map.addLayer(this.gridLayer);
 
+		// add to active layers
+		app.MapPane.addActiveLayer(this);	// includes baselayers
+
 		// update zindex
 		this._addToZIndex(type);
-
 	},
 
 	addToControls : function () {
@@ -513,10 +508,6 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			cartoid : cartoid,
 			subdomains : subdomains,
 			maxRequests : 0,
-			// reuseTiles : true,
-			// unloadInvisibleTiles : false,
-			// updateWhenIdle : true,
-			
 		});
 	},
 
@@ -679,9 +670,6 @@ Wu.MapboxLayer = Wu.Layer.extend({
 		this.layer = L.tileLayer(url, {
 			accessToken : this.store.accessToken,
 			mapboxUri : this.store.data.mapbox,
-			// reuseTiles : true,
-			// unloadInvisibleTiles : true,
-			updateWhenIdle : true,
 		});
 
 		// todo: add gridlayer to mapbox.. but why..?

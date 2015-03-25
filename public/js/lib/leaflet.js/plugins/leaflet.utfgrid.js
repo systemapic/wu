@@ -1,7 +1,4 @@
-// nq = []; // num of reqs
-
 L.Util.ajax = function (url, cb) {
-	// console.log('ajax: ', url);
 	// the following is from JavaScript: The Definitive Guide
 	// and https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest/Using_XMLHttpRequest_in_IE6
 	if (window.XMLHttpRequest === undefined) {
@@ -30,8 +27,6 @@ L.Util.ajax = function (url, cb) {
 		}
 	};
 	request.send();
-	// nq.push(request);
-	// return request;
 };
 
 L.UtfGrid = L.Class.extend({
@@ -322,6 +317,7 @@ L.UtfGrid = L.Class.extend({
 		this._queue_request(key, function () {
 			
 			return L.Util.ajax(url, function (data) {
+				self._cache = self._cache || {};
 				self._cache[key] = data;
 				self._finish_request(key);
 			});
@@ -421,20 +417,16 @@ L.UtfGrid = L.Class.extend({
 	},
 
 	_flush : function () {
-		console.log('girdlayer fluyshhh');
 		this._flushCache();
-		// this.onRemove();
 	},
 
 	_flushCache : function () {
-		console.log('flush cache');
 		for (key in this._cache) {
 			this._cache[key] = null;
 			delete this._cache[key];
 		}
 		this._cache = null;
 		delete this._cache;
-		// this._cache = {};
 	},
 });
 

@@ -210,42 +210,13 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	_hideControls : function () {
-
-		// layermenu
-		var lm = app.MapPane.layerMenu;
-		if (lm) lm.hide();
-
-		// inspect
-		var ic = app.MapPane.inspectControl;
-		if (ic) ic.hide();
-
-		// legends
-		var lc = app.MapPane.legendsControl;
-		if (lc) lc.hide();
-
-		// description
-		var dc = app.MapPane.descriptionControl;
-		if (dc) dc.hide();
+		app.Controller.hideControls();
 	},
 
 	_showControls : function () {
-		// layermenu
-		var lm = app.MapPane.layerMenu;
-		if (lm) lm.show();
-
-		// inspect
-		var ic = app.MapPane.inspectControl;
-		if (ic) ic.show();
-
-		// legends
-		var lc = app.MapPane.legendsControl;
-		if (lc) lc.show();
-
-		// description
-		var dc = app.MapPane.descriptionControl;
-		if (dc) dc.show();
+		app.Controller.showControls();
 	},
-
+	
 	_deactivate : function () {
 
 		// remove shift key edit hook

@@ -140,6 +140,45 @@ Wu.Controller = Wu.Class.extend({
 		Wu.Util.setAddressBar(url);
 	},
 
+
+	hideControls : function () {
+		
+		// layermenu
+		var lm = app.MapPane.getControls().layermenu;
+		if (lm) lm.hide();
+
+		// inspect
+		var ic = app.MapPane.getControls().inspect;
+		if (ic) ic.hide();
+
+		// legends
+		var lc = app.MapPane.getControls().legends;
+		if (lc) lc.hide();
+
+		// description
+		var dc = app.MapPane.getControls().description;
+		if (dc) dc.hide();
+	},
+
+	showControls : function () {
+		// layermenu
+		var lm = app.MapPane.getControls().layermenu;
+		if (lm) lm.show();
+
+		// inspect
+		var ic = app.MapPane.getControls().inspect;
+		if (ic) ic.show();
+
+		// legends
+		var lc = app.MapPane.getControls().legends;
+		if (lc) lc.show();
+
+		// description
+		var dc = app.MapPane.getControls().description;
+		if (dc) dc.show();
+	},
+	
+
 	// refreshControls : function () {
 	// 	var controlsPane = app.SidePane.Options.settings.controls,
 	// 	    project = this._project,

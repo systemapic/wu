@@ -297,7 +297,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._createNewProject(project);
 
 		// GA – Register new project ID (This project has no title yet, so it's useless to save title)
-		ga('set', 'dimension8', store.uuid);	
+		// ga('set', 'dimension8', store.uuid);	
 
 	},
 
