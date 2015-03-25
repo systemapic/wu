@@ -665,6 +665,8 @@ L.Control.CartoCSS = L.Control.extend({
 		this._layer.createLegends(function (ctx, json) {	// callback
 			var legends = Wu.parse(json);
 
+			console.log('_updateLegends legend:', legends);
+
 			if (legends && legends.err) {
 				console.error('legends err', legends);
 				return this.handleError(legends.err);

@@ -1,5 +1,3 @@
-// Subelements under Clients/Client
-// app.SidePane.Clients.clients[x].projects
 Wu.SidePane.Project = Wu.Class.extend({
 
 	initialize : function (options) {
