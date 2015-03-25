@@ -179,27 +179,40 @@ Wu.StartPane = Wu.Class.extend({
 		newProject._projectContainer = Wu.DomUtil.create('div', 'start-panne-recent-projects', this._projectList);
 		newProject._projectThumb = Wu.DomUtil.create('img', '', newProject._projectContainer);
 
+
 		// Load image in memory before we paste it (to see image orientation)
 		var img = new Image();
-		var ssrc = project.getLogo();
+
+		// Serve project logo or a random predefined thumb image
+		var ssrc = project.getLogo() || app.options.servers.portal + 'css/images/default-thumbs/default-thumb-' + Math.floor(Math.random() * 10) + '.jpg';
 		img.src = ssrc;
+
+
+
+		var boxW    = this.dimensions.boxW;
+		var boxH    = this.dimensions.boxH;
 
 		img.onload = function() {
 
-			if ( img.width >= img.height ) {
-			
+
+			var wProp = img.width / boxW;
+			var hProp = img.height / boxH;
+
+			if ( hProp <= wProp ) {
+
 				// landscape
 				newProject._projectThumb.style.height = '100%';
 				newProject._projectThumb.style.width = 'auto';
-			
+
 			} else {
 				
-				// landscape
+				// portrait
 				newProject._projectThumb.style.height = 'auto';
 				newProject._projectThumb.style.width = '100%';
+			
 			}
 
-			newProject._projectThumb.src = project.getLogo();
+			newProject._projectThumb.src = ssrc;
 		}
 
 		newProject._projectTitle = Wu.DomUtil.create('div', 'start-project-name', newProject._projectContainer);

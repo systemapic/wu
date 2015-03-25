@@ -129,7 +129,8 @@ Wu.SidePane.Manage = Wu.Class.extend({
 
 		
 		// role explanation
-		var infoDiv = Wu.DomUtil.create('div', 'manage-access-info', wrapper);
+		var infoDivOuter = Wu.DomUtil.create('div', 'manage-access-info-outer', wrapper);	
+		var infoDiv = Wu.DomUtil.create('div', 'manage-access-info', infoDivOuter);
 		var role = currentRole ? currentRole.getSlug() : 'noRole';
 		var infoText = app.language.tooltips.roles[role];
 		infoDiv.innerHTML = infoText;
