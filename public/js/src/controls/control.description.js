@@ -1,37 +1,26 @@
-// app.MapPane.descriptionControl
-
-L.Control.Description = L.Control.extend({
+L.Control.Description = Wu.Control.extend({
 	
+	type : 'description',
+
 	options: {
-		// position : 'topleft' 
-		position : 'bottomright' 
+		position : 'topleft' 
 	},
 
 	onAdd : function (map) {
-
 		var className = 'leaflet-control-description',
 		    container = L.DomUtil.create('div', className),
 		    options   = this.options;
 
-
-		// #description-toggle-button
 		this._button = Wu.DomUtil.create('div', 'dropdown-button description-toggle-button', container)
-
-		// // #description-control-inner-content
 		this._content = Wu.DomUtil.create('div', 'description-control-inner-content', container)
-
-		// //  #collapse-description
 		this._collapser = Wu.DomUtil.create('div', 'menucollapser collapse-description', this._content, 'Info');
-
-		// // #description-control-inner-content-box
 		this._outer = Wu.DomUtil.create('div', 'description-control-inner-content-box', this._content)
 
 		return container; // turns into this._container on return
-
 	},
 
-	initContainer : function () {                
-		
+	_initContainer : function () {          
+
 		// hide by default
 		this._container.style.display = "none";
 
@@ -42,32 +31,101 @@ L.Control.Description = L.Control.extend({
 		app.Tooltip.add(this._container, 'Shows layer information', { extends : 'systyle', tipJoint : 'left' });
 			       
 		// If mobile: start closed info/description pane
-		if ( Wu.app.mobile ) {
+		if (app.mobile) {
 			this._content.style.left = Wu.app.nativeResolution[1] + 'px';
 			this._isClosed = true;
 
 			// Mobile arrow	
 		    	Wu.DomUtil.create('div', 'description-mobile-arrow', this._content);
 		}
+
 	},      
 
-	setDescription : function (layer) {
+	_addTo : function () {
 
+		this.addTo(app._map);
+		this._initContainer();
+		this._addHooks();
+		this._added = true;
+	},
+
+	_flush : function () {
+		this.layers = {};
+		this._inner.innerHTML = '';
+	},
+
+	_refresh : function () {
+
+		// should be active
+		if (!this._added) this._addTo();
+
+		// get control active setting from project
+		var active = this._project.getControls()[this.type];
+
+		// if not active in project, hide
+		if (!active) return this._hide();
+
+		// remove old content
+		this._flush();
+
+		// add edit hooks
+		this._addEditHooks();
+
+		// show
+		this._show();
+
+		// hide if empty
+		this._hideIfEmpty();
+	},
+
+	_addEditHooks : function () {
+
+		// turn off
+		Wu.DomEvent.off(this._outer, 'dblclick', this.toggleEdit, this);
+
+		// turn on if editor
+		var isEditor = app.access.to.edit_project(this._project);
+		if (isEditor) {
+			Wu.DomEvent.on(this._outer, 'dblclick', this.toggleEdit, this);
+		}
+	},
+
+	_on : function () {
+		this._show();
+	},
+
+	_off : function () {
+		this._hide();
+	},
+
+	setDescription : function (layer) {
 		this._inner.innerHTML = layer.store.description;
 	},
 
-	show : function () {
+	_isActive : function () {
+		if (!this._project) return false;
+		return this._project.getControls()[this.type];
+	},
+
+	_show : function () {
 		this._container.style.display = 'block'; 
 	},
 
-	hide : function () {
+	_hide : function () {
 		this._container.style.display = 'none'; 
 	},
 
-	// clear content
-	clear : function () {
-		this.activeLayer = false;
-		this._inner.innerHTML = '';
+	show : function () {
+		if (!this._container) return;
+		this._isActive() ? this._show() : this._hide();
+	},
+
+	hide : function () {
+		this._hide();
+	},
+
+	_hideIfEmpty : function () {
+		if (!this.activeLayer) this._hide();
 	},
 
 	setActiveLayer : function (layer) {
@@ -75,76 +133,36 @@ L.Control.Description = L.Control.extend({
 	},
 
 	setLayer : function (layer) {
+
 		this.activeLayer = layer;
 		this.setDescription(layer);
 
-		if ( !layer.store.description && !this.editMode) {
+		this._show();
+
+		var isEditor = app.access.to.edit_project(this._project);
+		if (!layer.getDescription() && !isEditor) {
 			this.closePane();
 			this.clear();
 		} 
-
 	},
 
 	removeLayer : function (layer) {
-		if (this.activeLayer == layer) this.clear();
+		if (this.activeLayer == layer) {
+			this._flush();
+		}
 	},
 
-	update : function (project) {
-
-		// get vars
-		this.project = project || Wu.app.activeProject;
-
-		// set editMode
-		this.editMode = this.project.editMode;
-		this.editing = false;
-		this.activeLayer = false;
-
-		// refresh container        
-		this.initContainer();
-
-		// add hooks
-		this.addHooks();
-
-		// clear
-		this.clear();
-
-	},  
-
-	addHooks : function () {
+	_addHooks : function () {
 		
 		// collapsers
-		// Wu.DomEvent.on(this._button, 'click', this.closePane, this);
 		Wu.DomEvent.on(this._button, 'click', this.toggleCloser, this);
-
-		// edit mode
-		if (this.editMode) Wu.DomEvent.on(this._outer, 'dblclick', this.toggleEdit, this);
-
+		
 		// prevent map double clicks
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent.on(this._button,    'mousedown mouseup click dblclick',  Wu.DomEvent.stopPropagation, this);
-
-
-	},
-	
-	removeHooks : function () {
-
-		// collapsers
-		Wu.DomEvent.off(this._button, 'click', this.closePane, this);
-
-		// edit mode
-		if (this.editMode) Wu.DomEvent.off(this._inner, 'dblclick', this.toggleEdit, this);
-
-		// prevent map double clicks
-		Wu.DomEvent.off(this._container, 'dblclick', Wu.DomEvent.stop, this);
-		Wu.DomEvent.off(this._container, 'dblclick', Wu.DomEvent.stop, this);
-		Wu.DomEvent.off(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
-		Wu.DomEvent.off(this._button,    'mousedown mouseup click dblclick',  Wu.DomEvent.stopPropagation, this);
-
 	},
 
 	toggleEdit : function () {
-
-		console.log('toggleEdit', this.editing);
 
 		// return if already editing
 		if (this.editing) return;
@@ -154,13 +172,9 @@ L.Control.Description = L.Control.extend({
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Controls', 'Description: edit content']);
-
 	},
 	
 	editOn : function () {
-
-		console.log('editOn', this.activeLayer);
-
 		if (!this.activeLayer) return;
 
 		this.editing = true;
@@ -178,9 +192,7 @@ L.Control.Description = L.Control.extend({
 		Wu.DomEvent.on(this._inner, 'keydown', this.keyDown, this);
 
 		// prevent map scrollzoom
-		var map = app._map;
-		map.scrollWheelZoom.disable();
-		
+		app._map.scrollWheelZoom.disable();
 	},	
 
 	keyDown : function (e) {
@@ -205,8 +217,7 @@ L.Control.Description = L.Control.extend({
 		this._inner.setAttribute('contenteditable', "false");
 
 		// prevent map scrollzoom
-		var map = app._map;
-		map.scrollWheelZoom.enable();
+		app._map.scrollWheelZoom.enable();
 
 		// save text
 		if (this.activeLayer) {
@@ -217,7 +228,6 @@ L.Control.Description = L.Control.extend({
 			// set status
 			app.setSaveStatus();
 		}
-
 	},
 
 	textChange : function (editing) {
@@ -236,9 +246,9 @@ L.Control.Description = L.Control.extend({
 		var nodes = this._inner;
 
 		// get sources
-		var files = this.project.getFiles();
-		var sources = this.project.getGrandeFiles();
-		var images = this.project.getGrandeImages();
+		var files = this._project.getFiles();
+		var sources = this._project.getGrandeFiles();
+		var images = this._project.getGrandeImages();
 
 		// set grande options
 		var options = {
@@ -276,7 +286,7 @@ L.Control.Description = L.Control.extend({
 	toggleCloser : function () {
 
 		// Close pane if we're on a desktop / pad
-		if ( !Wu.app.mobile ) {
+		if (!app.mobile) {
 			this.closePane();
 		
 		// Slide pane if we're on a mobile phone
@@ -284,11 +294,8 @@ L.Control.Description = L.Control.extend({
 			this._isClosed ? this.mobileOpenPane() : this.mobileClosePane();
 		}
 
-
 		// Google Analytics event tracking
 		app.Analytics.ga(['Controls', 'Description toggle']);
-
-
 	},
 
 	mobileOpenPane : function () {
@@ -300,15 +307,13 @@ L.Control.Description = L.Control.extend({
 		this._isClosed = false;
 
 		// Close other panes if they are open
-		if ( app.MapPane.legendsControl._isOpen ) app.MapPane.legendsControl.MobileCloseLegends();
-		if ( app.MapPane.layerMenu._open ) app.MapPane.layerMenu.closeLayerPane();
-
-
+		var legends = app.MapPane.getControls().legends;
+		var layermenu = app.MapPane.getControls().layermenu;
+		if (legends._isOpen) legends.MobileCloseLegends();
+		if (layermenu._open) layermenu.closeLayerPane();
 	},
 
-
 	mobileClosePane : function () {
-
 		Wu.DomUtil.removeClass(this._button, 'active-description');
 
 		// Slide out (only works in portrait format... in landscape it has to be [0] )
@@ -327,7 +332,6 @@ L.Control.Description = L.Control.extend({
 	}
 	
 });
-
 
 L.control.description = function (options) {
 	return new L.Control.Description(options);

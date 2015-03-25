@@ -330,16 +330,16 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 	_refreshControls : function () {
 
 		// refresh baselayerToggleControl
-		var baselayerToggle = app.MapPane.baselayerToggle;
-		if (baselayerToggle) baselayerToggle.update();
+		var baselayerToggle = app.MapPane.getControls().baselayertoggle;
+		if (baselayerToggle) baselayerToggle._refresh();
 
 		// mark occupied layers in layermenu
 		var layermenuSetting = app.SidePane.Options.settings.layermenu;
 		layermenuSetting.markOccupied();
 
 		// refresh cartoCssControl
-		var cartoCss = app.MapPane.cartoCss;
-		if (cartoCss) cartoCss.update()
+		var cartoCss = app.MapPane.getControls().cartocss;
+		if (cartoCss) cartoCss._refresh();
 
 	},
 

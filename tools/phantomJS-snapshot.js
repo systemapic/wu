@@ -16,6 +16,8 @@ var serverUrl   = args.serverUrl;
 var serverData  = args.serverData;
 var outfile 	= path;
 
+console.log('args: ', args);
+
 // connect
 var page = require('webpage').create(),
 	server = serverUrl,
@@ -62,11 +64,15 @@ page.open(server, 'post', data, function (status, why) {
 	// callback
 	function () {
 		
-		console.log('loaded!!');
+		console.log('loaded!!1');
 
-		page.viewportSize = { width : 1620, height: 1080 };
-		page.render(outfile);
-		phantom.exit();
+		setTimeout(function () {
+			page.viewportSize = { width : 1620, height: 1080 };
+			page.render(outfile);
+			phantom.exit();
+		}, 1000);
+
+		
 
 	});
 });

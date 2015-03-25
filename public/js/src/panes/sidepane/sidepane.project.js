@@ -6,13 +6,10 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.setOptions(this, options);
 
 		// set project
-		this.project = options.project;
-
-		// set edit mode
-		this.project.setEditMode();
+		this._project = options.project;
 
 		// set this as sidepane item
-		this.project.setSidepane(this);
+		this._project.setSidepane(this);
 
 		// set parent
 		this._parent = this.options.caller; // client div container
@@ -51,8 +48,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this._container);
 
 		// Project stats header
-		this.projectStatsHeader = Wu.DomUtil.create('div', 'project-stats', this.usersInnerWrapper);
-		this.projectStatsHeader.innerHTML = 'Project status:'
+		this._projectStatsHeader = Wu.DomUtil.create('div', 'project-stats', this.usersInnerWrapper);
+		this._projectStatsHeader.innerHTML = 'Project status:'
 
 		// create createdBy
 		this.createdBy = Wu.DomUtil.create('div', 'project-createdby', this.usersInnerWrapper);
@@ -66,8 +63,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.usersInnerWrapper);
 
 		// add delete button
-		// var canDelete = app.Account.canDeleteProject(this.project.store.uuid);
-		var canDelete = app.access.to.delete_project(this.project);
+		// var canDelete = app.Account.canDeleteProject(this._project.store.uuid);
+		var canDelete = app.access.to.delete_project(this._project);
 
 		if (canDelete || this.options.editMode) {
 			this.makeThumb = Wu.DomUtil.create('div', 'new-project-thumb', this.usersInnerWrapper, 'Generate thumbnail');
@@ -79,12 +76,11 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// add hooks
 		this.addHooks();
-
 	},
 
 	hookThumb : function () {
 		// This project ID
-		this.project._sidePaneLogoContainer = this.logo;
+		this._project._sidePaneLogoContainer = this.logo;
 	},
 
 	expandUsers : function () {
@@ -97,17 +93,17 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	update : function (project) {
 
-		this.project 			= project || this.project;
-		this.name.innerHTML 		= this.project.store.name;
-		this.description.innerHTML 	= this.project.store.description;
+		this._project 			= project || this._project;
+		this.name.innerHTML 		= this._project.store.name;
+		this.description.innerHTML 	= this._project.store.description;
 
-		var logoPath = this.project.store.logo ? this.project.store.logo :  '/css/images/defaultProjectLogo.png';
+		var logoPath = this._project.store.logo ? this._project.store.logo :  '/css/images/defaultProjectLogo.png';
 		this.logo.src = logoPath;
 
-		this.createdBy.innerHTML 	= '<div class="project-info-left">Created by:</div><div class="project-info-right">' + this.project.store.createdByName + "</div>";
-		this.lastUpdated.innerHTML 	= '<div class="project-info-left">Last updated:</div><div class="project-info-right">' + Wu.Util.prettyDate(this.project.store.lastUpdated) + "</div>";
-		this.createdDate.innerHTML 	= '<div class="project-info-left">Created time:</div><div class="project-info-right">' + Wu.Util.prettyDate(this.project.store.created) + "</div>";
-		this.usersInner.innerHTML       = '<div class="project-users-header">Project users:</div>' + this.project.getUsersHTML();
+		this.createdBy.innerHTML 	= '<div class="project-info-left">Created by:</div><div class="project-info-right">' + this._project.store.createdByName + "</div>";
+		this.lastUpdated.innerHTML 	= '<div class="project-info-left">Last updated:</div><div class="project-info-right">' + Wu.Util.prettyDate(this._project.store.lastUpdated) + "</div>";
+		this.createdDate.innerHTML 	= '<div class="project-info-left">Created time:</div><div class="project-info-right">' + Wu.Util.prettyDate(this._project.store.created) + "</div>";
+		this.usersInner.innerHTML       = '<div class="project-users-header">Project users:</div>' + this._project.getUsersHTML();
 	},
 
 	_setHooks : function (on) {
@@ -122,7 +118,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// edit hooks
 		// editing hooks
-		if (app.access.to.edit_project(this.project)) {
+		if (app.access.to.edit_project(this._project)) {
 			Wu.DomEvent[on](this.name, 	 'dblclick', this.edit, this);
 			Wu.DomEvent[on](this.description, 'dblclick', this.editDescription, this);
 			Wu.DomEvent[on](this.makeThumb, 'click', this.makeNewThumbnail, this );
@@ -130,10 +126,10 @@ Wu.SidePane.Project = Wu.Class.extend({
 		}
 
 		// add dz to logo
-		if (app.access.to.upload_file(this.project)) this._setDZ(on);
+		if (app.access.to.upload_file(this._project)) this._setDZ(on);
 
 		// add kill hook
-		if (app.access.to.delete_project(this.project)) {
+		if (app.access.to.delete_project(this._project)) {
 			Wu.DomEvent[on](this.kill, 'click', this.deleteProject, this);
 			
 		}
@@ -170,8 +166,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 		});
 		
 		// set client uuid param for server
-		this.logodz.options.params.projectUuid = this.project.getUuid();
-		this.logodz.options.params.project = this.project.getUuid();
+		this.logodz.options.params.projectUuid = this._project.getUuid();
+		this.logodz.options.params.project = this._project.getUuid();
 
 		// set callback on successful upload
 		this.logodz.on('success', this.editedLogo.bind(this), this);
@@ -202,7 +198,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var parentHeight = this._parent._container.offsetHeight;
 		var projectInfoHeight = this.usersInnerWrapper.offsetHeight;		
 
-		if ( !this.project._menuItem._isOpen ) {
+		if ( !this._project._menuItem._isOpen ) {
 
 			// Add open state to button
 			Wu.DomUtil.addClass(this.users, 'active-project-user-button');
@@ -214,7 +210,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 			this._parent._container.style.height = parentHeight + projectInfoHeight + 'px';
 
 			// Set open state
-			this.project._menuItem._isOpen = true;
+			this._project._menuItem._isOpen = true;
 
 		} else {
 
@@ -228,7 +224,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 			this._parent._container.style.height = parentHeight - projectInfoHeight + 'px';
 
 			// Set open state			
-			this.project._menuItem._isOpen = false;
+			this._project._menuItem._isOpen = false;
 
 		}
 
@@ -240,11 +236,11 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	makeNewThumbnail : function () {
-		this.project = this.project || app.activeProject;
+		this._project = this._project || app.activeProject;
 
 		// Set state to manually updated to prevet overriding
-		this.project.setThumbCreated(true);
-		this.project.createProjectThumb();
+		this._project.setThumbCreated(true);
+		this._project.createProjectThumb();
 
 		// Google Analytics event trackign
 		app.Analytics.ga(['Side Pane', 'Clients: make new thumbnail']);
@@ -252,19 +248,19 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	editedLogo : function (err, path) {
-		this.project = this.project || app.activeProject;
+		this._project = this._project || app.activeProject;
 
 		// Set state to manually updated to prevet overriding
-		this.project.setThumbCreated(true);
+		this._project.setThumbCreated(true);
 
 		// set path
 		var fullpath = '/images/' + path;
 		
 		// set new image and save
-		this.project.setLogo(fullpath);
+		this._project.setLogo(fullpath);
 
 		// update image 
-		this.logo.src = this.project.getLogo();
+		this.logo.src = this._project.getLogo();
 
 		// update header
 		app.HeaderPane.addedLogo(path);
@@ -305,17 +301,19 @@ Wu.SidePane.Project = Wu.Class.extend({
 	select : function (e) {
 
 		// dont select if already active
-		if (this.project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho not active.. fix!
+		if (this._project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho not active.. fix!
 
 		// Google Analytics
-		var _prodID = this.project.getUuid();
-		app.Analytics.setGaProject(_prodID);	
+		// var projectUuid = this._project.getUuid(); // refactor: catch with events
+		// app.Analytics.setGaProject(projectUuid);	
 
 		// select project
-		this.project.select();		
+		// this._project.select();	
+		console.log('firing projectSelected');
+		Wu.Mixin.Events.fire('projectSelected', { detail : {
+			projectUuid : this._project.getUuid()
+		}});    
 
-		// remove startpane if active
-		app.StartPane.deactivate();
 	},
 
 	// add class to mark project active in sidepane
@@ -378,13 +376,13 @@ Wu.SidePane.Project = Wu.Class.extend({
 		div.innerHTML = value;
 
 		// if name, change slug also
-		this.project.setSlug(value);
+		this._project.setSlug(value);
 
 		// save latest
-		this.project.setName(value);
+		this._project.setName(value);
 
 		// save header also
-		this.project.setHeaderTitle(value);
+		this._project.setHeaderTitle(value);
 
 		// update header view
 		app.HeaderPane.setTitle(value);
@@ -430,10 +428,10 @@ Wu.SidePane.Project = Wu.Class.extend({
 		div.innerHTML = value;
 
 		// save project description
-		this.project.setDescription(value);
+		this._project.setDescription(value);
 
 		// save header subtitle also
-		this.project.setHeaderSubtitle(value);
+		this._project.setHeaderSubtitle(value);
 
 		// update header view
 		app.HeaderPane.setSubtitle(value);
@@ -479,8 +477,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		var json = JSON.stringify({
 			value : value,
-			project : this.project.getUuid(),
-			client : this.project.getClient().getUuid()
+			project : this._project.getUuid(),
+			client : this._project.getClient().getUuid()
 		});
 
 		// post
@@ -492,10 +490,10 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// prevent project select
 		Wu.DomEvent.stop(e);
 
-		var answer = confirm('Are you sure you want to delete project ' + this.project.store.name + '?');
+		var answer = confirm('Are you sure you want to delete project ' + this._project.store.name + '?');
 		if (!answer) return;
 
-		var second = confirm('Are you REALLY sure you want to delete project ' + this.project.store.name + '? You cannot UNDO this action!');
+		var second = confirm('Are you REALLY sure you want to delete project ' + this._project.store.name + '? You cannot UNDO this action!');
 		if (!second) return; 
 
 		// twice confirmed, delete
@@ -512,23 +510,23 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.removeHooks();
 	
 		// remove from client 
-		this._parent.removeProject(this.project);
+		this._parent.removeProject(this._project);
 		
 		// remove from DOM
 		Wu.DomUtil.remove(this._container);
 
-		// if project is active, unload
-		if (this.project == app.activeProject) {
+		// // if project is active, unload
+		// if (this._project.getUuid() == app.activeProject) {
 
-			// unload
-			this.project.unload();
-		
-		}
+		// 	// unload
+		// 	this._project.unload();
+		// }
 
 		// delete
-		this.project._delete();
-		delete this;
-	}
+		this._project._delete();
+		this._project = null;
+
+	},
 
 
 });

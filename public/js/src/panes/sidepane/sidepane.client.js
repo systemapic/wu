@@ -243,7 +243,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 			folders : []
 
 		}
-	
 
 		// create new project with options, and save
 		var project = new Wu.Project(store);
@@ -258,7 +257,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// Google Analytics event trackign
 		app.Analytics.ga(['Side Pane', 'Clients: new project']);
-		
 	},
 
 	_markActive : function (newProject) {
@@ -275,11 +273,14 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},	
 
 	_projectCreated : function (project, json) {
+
+		console.log('PPPPPPPPPPP', project, json);
+
 		var result = Wu.parse(json),
 		    error  = result.error,
 		    store  = result.project;
 
-		console.log('Created project:', project);
+		console.log('Created project:', project, result);
 
 		// return error
 		if (error) return app.feedback.setError({
@@ -297,12 +298,14 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._createNewProject(project);
 
 		// GA – Register new project ID (This project has no title yet, so it's useless to save title)
-		ga('set', 'dimension8', store.uuid);	
+		// ga('set', 'dimension8', store.uuid);	// move to analtyics.js
 
 	},
 
 	// add project in sidepane
 	_createNewProject : function (project) {
+
+		console.log('sidepane.client._createNewProject project: ', project);
 
 		// add project to client array
 		this.projects.push(project);
@@ -320,7 +323,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.open();
 
 		// select
-		sidepaneProject.project._menuItem.select();
+		// sidepaneProject.project._menuItem.select();
+		console.log('sidepaneProject', sidepaneProject);
+		sidepaneProject.select();
+		sidepaneProject.update();
 
 		// set status and unlock + button
 		app.setStatus('Done!');
@@ -334,15 +340,26 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// mark project div in sidepane as active
 		this._markActive(project);
+
+		// select
+		Wu.Mixin.Events.fire('projectSelected', { detail : {
+			projectUuid : project.getUuid()
+		}});
+
 	},
 
 
 	_addDefaults : function () {
-		// add default baselayer
-		if (!app.SidePane) return;
-		if (!app.SidePane.Options) return; 	// refactor
-		if (!app.SidePane.Options.settings) return;
-		if (!app.SidePane.Options.settings.baselayer) return;
+		
+
+		// // add default baselayer
+		// if (!app.SidePane) return;
+		// if (!app.SidePane.Options) return; 	// refactor
+		// if (!app.SidePane.Options.settings) return;
+		// if (!app.SidePane.Options.settings.baselayer) return;
+		console.log('AKSDNADSK');
+		console.log(app.SidePane.Options.settings.baselayer._layers);
+		app.SidePane.Options.update();
 		app.SidePane.Options.settings.baselayer.setDefaultLayer();
 	},
 

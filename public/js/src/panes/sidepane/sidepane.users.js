@@ -5,8 +5,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	type : 'users',
 	title : 'Users',
 
-	initContent : function () {
-
+	// initContent : function () {
+	_initContent : function () {
 		// create new fullscreen page, and set as default content
 		this._content = Wu.DomUtil.create('div', 'fullpage-users', Wu.app._appPane);
 		
@@ -96,6 +96,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// add tooltip
 		app.Tooltip.add(this._menu, '(Editors only) List of all users. Here you can create and delete users, as well as administer user access to projects.');
 
+		// add hooks
+		this.addHooks();
+
 	},
 
 	addHooks : function () {
@@ -155,44 +158,14 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	},
 
 	_hideControls : function () {
-
-		// layermenu
-		var lm = app.MapPane.layerMenu;
-		if (lm) lm.hide();
-
-		// inspect
-		var ic = app.MapPane.inspectControl;
-		if (ic) ic.hide();
-
-		// legends
-		var lc = app.MapPane.legendsControl;
-		if (lc) lc.hide();
-
-		// description
-		var dc = app.MapPane.descriptionControl;
-		if (dc) dc.hide();
+		app.Controller.hideControls();
 	},
 
 	_showControls : function () {
-		// layermenu
-		var lm = app.MapPane.layerMenu;
-		if (lm) lm.show();
-
-		// inspect
-		var ic = app.MapPane.inspectControl;
-		if (ic) ic.show();
-
-		// legends
-		var lc = app.MapPane.legendsControl;
-		if (lc) lc.show();
-
-		// description
-		var dc = app.MapPane.descriptionControl;
-		if (dc) dc.show();
+		app.Controller.showControls();
 	},
 
 	searchList : function (e) {
-
 		if (e.keyCode == 27) { // esc
 			this.list.search(); // show all
 			this._search.value = '';

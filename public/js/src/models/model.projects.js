@@ -6,23 +6,30 @@ Wu.Project = Wu.Class.extend({
 		this.store = {};
 		Wu.extend(this.store, store);
 
-		// set editMode
-		this.setEditMode();
-
 		// ready save object
 		this.lastSaved = {};
 
 		// attach client
 		this._client = Wu.app.Clients[this.store.client];
 
-		// init roles
-		this.initRoles();
+		// init roles, files, layers
+		this._initObjects();
+	},
 
+	_initObjects : function () {
+		this.initRoles();
+		this.initFiles();
+		this.initLayers();
 	},
 
 	initRoles : function () {
+
+		// get roles
 		var roles = this.store.roles;
 		this._roles = {};
+		if (!roles) return;
+
+		// create
 		_.each(roles, function (role) {
 			this._roles[role.uuid] = new Wu.Role({
 				role : role,
@@ -33,26 +40,28 @@ Wu.Project = Wu.Class.extend({
 
 	initFiles : function () {
 
+		// get files
 		var files = this.getFiles();
-
-		// files object
 		this.files = {};
+		if (!files) return;
 
+		// create
 		files.forEach(function (file) {
 			this.files[file.uuid] = new Wu.Files(file);
 		}, this);
-
 	},
 
 	initLayers : function () {
 
-		// return if no layers
-		if (!this.store.layers) return;
-
+		// get layers
+		var layers = this.store.layers;
 		this.layers = {};
+		if (!layers) return;
 
-		// add layers to project
-		this.addLayers(this.store.layers);
+		// create
+		layers.forEach(function (layer) {
+			this.layers[layer.uuid] = new Wu.createLayer(layer);
+		}, this);
 	},
 
 	addLayers : function (layers) { // array of layers
@@ -62,10 +71,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	addLayer : function (layer) {
-		// creates a Wu.Layer object (could be Wu.MapboxLayer, Wu.RasterLayer, etc.)
-		// this.store.layers.push(layer); /// TODO: WEIRD to add to array here, it's run in line 41?????
 		this.layers[layer.uuid] = new Wu.createLayer(layer);
-
 		return this.layers[layer.uuid];
 	},
 
@@ -146,26 +152,11 @@ Wu.Project = Wu.Class.extend({
 		this.select();
 	},
 
-	setEditMode : function () {
-		// set editMode
-		this.editMode = false;
-		this.editMode = app.access.to.edit_project(this);
-	},
-
 	refresh : function () {
 
 		// refresh project
 		this._refresh();
 	
-		// refresh mappane
-		this.refreshMappane();
-
-		// refresh headerpane
-		this.refreshHeaderpane();
-	
-		// refresh sidepane
-		this.refreshSidepane();
-
 		// set active project in sidepane
 		if (this._menuItem) this._menuItem._markActive();
 
@@ -179,46 +170,24 @@ Wu.Project = Wu.Class.extend({
 		this.addLayer(layer);
 	},
 
-	refreshSidepane : function () {
-		// update sidepane
-		if (Wu.Util.isObject(Wu.app.SidePane)) Wu.app.SidePane.setProject(this);
-	},
-
-	refreshHeaderpane : function () {
-		// update headerpane
-		if (Wu.Util.isObject(Wu.app.HeaderPane)) Wu.app.HeaderPane.setProject(this);
-	},
-
-	refreshMappane : function () {
-		// update mappane                
-		if (Wu.Util.isObject(Wu.app.MapPane)) Wu.app.MapPane.setProject(this);
-	},
-
 
 	_reset : function () {
 		// this.removeHooks();
-
-
-
 	},
-
 
 	_refresh : function () {
 
 		// flush
 		this._reset();
 
-		// set editMode
-		this.setEditMode();
-
 		// init files
-		this.initFiles();
+		// this.initFiles();
 
   		// create layers 
-		this.initLayers();
+		// this.initLayers();
 
 		// init roles
-		this.initRoles();
+		// this.initRoles();
 
 		// update url
 		this._setUrl();
@@ -235,10 +204,6 @@ Wu.Project = Wu.Class.extend({
 
 	select : function () {
 
-		console.log('tooltip size', _.size(this.tips));
-
-		Wu.Mixin.Events.fire('projectSelected', {detail : this});
-
 		// hide headerpane
  		if (app._headerPane) Wu.DomUtil.removeClass(app._headerPane, 'displayNone');
 
@@ -250,7 +215,6 @@ Wu.Project = Wu.Class.extend({
 
 		// refresh project
 		this.refresh();
-
 	},
 
 	_setUrl : function () {
@@ -263,7 +227,8 @@ Wu.Project = Wu.Class.extend({
 
 	setNewStore : function (store) {
 		this.store = store;
-		this.select();
+		this._initObjects();
+		// this.select();
 	},
 
 	setStore : function (store) {
@@ -323,8 +288,6 @@ Wu.Project = Wu.Class.extend({
 	_save : function (string) {
 		// save to server                                       	// TODO: pgp
 		Wu.send('/api/project/update', string, this._saved.bind(this));                         // TODO: save only if actual changes! saving too much already
-	
-		
 	},
 
 	// callback for save
@@ -338,6 +301,10 @@ Wu.Project = Wu.Class.extend({
 
 		// set status
 		app.setSaveStatus();
+
+		Wu.Mixin.Events.fire('projectChanged', { detail : {
+			projectUuid : this.getUuid()
+		}});
 	},
 
 	_saveNew : function (opts) {
@@ -355,9 +322,12 @@ Wu.Project = Wu.Class.extend({
  		Wu.Util.postcb('/api/project/new', json, callback.bind(opts.context), this);
 	},
 
-	unload : function () {
-		app.MapPane.reset();
-		app.HeaderPane.reset();
+
+	_unload : function () {
+
+		// load random project
+		app.MapPane._flush();
+		app.HeaderPane._flush();
 		this.selected = false;
 	},
 
@@ -389,10 +359,24 @@ Wu.Project = Wu.Class.extend({
 		delete app.Projects[project.getUuid()];
 
 		// set no active project if was active
-		if (app.activeProject == this) {
-			app.SidePane.refresh(['Projects', 'Users', 'Account']);
+		if (app.activeProject.getUuid() == project.getUuid()) {
+
+			// null activeproject
 			app.activeProject = null;
-			delete app.activeProject;
+
+			// refresh sidepane
+			app.SidePane.refreshMenu();
+
+			// unload project
+			project._unload();
+			
+			// fire no project
+			Wu.Mixin.Events.fire('projectSelected', { detail : {
+				projectUuid : false
+			}});
+
+			// show start pane
+			app.Controller.showStartPane();
 		}
 
 		project = null;
@@ -402,8 +386,7 @@ Wu.Project = Wu.Class.extend({
 		app.setStatus('Deleted!');
 
 		// Save new project name to GA
-		ga('set', 'dimension9', deletedProjectName);
-
+		// ga('set', 'dimension9', deletedProjectName);
 	},
 
 	saveColorTheme : function () {
@@ -421,7 +404,6 @@ Wu.Project = Wu.Class.extend({
 
 		// inject
 		Wu.Util.setColorTheme();
-
 	},
 
 	removeMapboxAccount : function (account) {
@@ -595,6 +577,10 @@ Wu.Project = Wu.Class.extend({
 		return bounds;
 	},
 
+	getState : function () {
+		return this.store.state;
+	},
+
 	getLatLngZoom : function () {
 		var position = {
 			lat  : this.store.position.lat,
@@ -719,7 +705,9 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getControls : function () {
-		return this.store.controls;
+		var controls = this.store.controls;
+		delete controls.vectorstyle; // tmp hack, todo: remove from errywhere
+		return controls;
 	},
 
 	getSettings : function () {
@@ -768,6 +756,7 @@ Wu.Project = Wu.Class.extend({
 
 	setSlug : function (name) {
 		var slug = name.replace(/\s+/g, '').toLowerCase();
+		slug = slug.replace(/\W/g, '')
 		slug = Wu.Util.stripAccents(slug);
 		this.store.slug = slug;
 		
@@ -1024,6 +1013,13 @@ Wu.Project = Wu.Class.extend({
 
 	},
 	disableMapboxGL : function () {
+
+	},
+
+	enableSaveState : function () {
+
+	},
+	disableSaveState : function () {
 
 	},
 

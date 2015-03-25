@@ -16,8 +16,6 @@ var projectSchema = mongoose.Schema({
 	keywords 	: [{ type: String, default: '' }],
 	categories 	: [String],
 
-	// property => group => role => capabilities + members
-	// accessGroup     : { type: mongoose.Schema.Types.ObjectId, ref: 'Group' },
 	roles     : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
 
 			// image
@@ -138,13 +136,17 @@ var projectSchema = mongoose.Schema({
 		socialSharing 	: { type: Boolean, default: true },
 		documentsPane 	: { type: Boolean, default: true },
 		dataLibrary 	: { type: Boolean, default: true },
+		saveState	: { type: Boolean, default: false },
 		autoHelp 	: { type: Boolean, default: false },
 		autoAbout 	: { type: Boolean, default: false },
 		darkTheme 	: { type: Boolean, default: false },
 		tooltips 	: { type: Boolean, default: false },
 		mediaLibrary 	: { type: Boolean, default: false },
 		mapboxGL	: { type: Boolean, default: false },
-	}
+	},
+
+	// 
+	state : String,
 	
 });
 

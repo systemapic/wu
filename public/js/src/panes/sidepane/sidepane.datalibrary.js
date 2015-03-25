@@ -5,8 +5,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	title : 'Data <br> Library',
 
 
-	initContent : function () {
-
+	// initContent : function () {
+	_initContent : function () {
 		// create new fullscreen page, and set as default content
 		this._content = Wu.DomUtil.create('div', 'data-library ct1', Wu.app._appPane);
 		
@@ -116,6 +116,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// add tooltip
 		app.Tooltip.add(this._menu, 'The data library contains all files uploaded to the project.');
+
+		// add hooks
+		this.addHooks();
 	},
 
 
@@ -139,7 +142,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		Wu.DomEvent[on](this._search, 'keyup', this.searchList, this);
 
 		// 
-		console.log('set project un load');
 		Wu.Mixin.Events[on]('projectSelected', this._onProjectSelected, this);
 	},
 
@@ -151,7 +153,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var project = e.details;
 
 		this.removeHooks();
-		console.log('_unload datalib');
 
 		this._reset();
 	},
@@ -256,40 +257,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_hideControls : function () {
-
-		// layermenu
-		var lm = app.MapPane.layerMenu;
-		if (lm) lm.hide();
-
-		// inspect
-		var ic = app.MapPane.inspectControl;
-		if (ic) ic.hide();
-
-		// legends
-		var lc = app.MapPane.legendsControl;
-		if (lc) lc.hide();
-
-		// description
-		var dc = app.MapPane.descriptionControl;
-		if (dc) dc.hide();
+		app.Controller.hideControls();
 	},
 
 	_showControls : function () {
-		// layermenu
-		var lm = app.MapPane.layerMenu;
-		if (lm) lm.show();
-
-		// inspect
-		var ic = app.MapPane.inspectControl;
-		if (ic) ic.show();
-
-		// legends
-		var lc = app.MapPane.legendsControl;
-		if (lc) lc.show();
-
-		// description
-		var dc = app.MapPane.descriptionControl;
-		if (dc) dc.show();
+		app.Controller.showControls();
 	},
 
 	initDownloadTable : function () {
@@ -527,8 +499,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	deleteFiles : function (files) {
 
-		console.log('delete files: ', files);
-
 		// set status
 		app.setStatus('Deleting');
 		
@@ -561,8 +531,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	// list.js plugin
 	initList : function () { 
 
-		// console.error('init list!');
-		
 		// add dummy entry
 		var _tr = Wu.DomUtil.createId('tr', 'dummy-table-entry', this._table);
 
@@ -639,7 +607,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	
 	handleError : function (err) {
-		console.log('handleError: ', err);
 
 		// set error
 		app.feedback.setError({
@@ -653,9 +620,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	// process file
 	uploaded : function (result) {
 		
-		console.log('uploaded!!!', result);
-		
-	
 
 		// handle errors
 		if (result.error) this.handleError(result.error);
@@ -671,9 +635,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 			// set icon if image
 			var icon = (file.data && file.data.image) ? this._getImagePath(file.uuid, 100, 100) : null;
-
-		
-			console.log('id', this.__id);
 
 			app.feedback.setSuccess({
 				title : 'Upload success!',
@@ -744,7 +705,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._removeFile(file);
 
 		// clone file object
-		// console.log('fuie', file);
 		var tmp = Wu.extend({}, file.getStore()); 
 
 		var tmpData = {
@@ -987,7 +947,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	categoryKeydown : function (e) {
-		console.log('categoryKeydown!', e.keyCode);
 
 		// on enter
 		if (e.keyCode == 13) {
@@ -1015,7 +974,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// on esc
 		if (e.keyCode == 27) {
-			console.log('esc!');
 			
 			// close, do nothing
 			this.closeCategories();

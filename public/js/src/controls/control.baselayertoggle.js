@@ -4,8 +4,9 @@
  */
 
 // app.MapPane.baselayerToggle
+L.Control.Baselayertoggle = Wu.Control.extend({
 
-L.Control.BaselayerToggle = L.Control.extend({
+	type : 'baselayertoggle',
 
 	options: {
 		collapsed: true,
@@ -14,10 +15,24 @@ L.Control.BaselayerToggle = L.Control.extend({
 	},
 
 	onAdd: function () {
+		// create div
+		var className = 'leaflet-control-baselayertoggle';
+		var container = this._container = L.DomUtil.create('div', className);
 
-		this._initLayout();
-		this.update();
-		return this._container;
+		// add tooltip
+		app.Tooltip.add(container, 'Toggle between baselayers', { extends : 'systyle', offset : [23, 0]});
+
+		return container;
+	},
+
+	_addHooks : function () {
+		// add events
+		Wu.DomEvent.on(this._container, 'mousedown', this.toggle, this);
+		Wu.DomEvent.on(this._container, 'dblclick', Wu.DomEvent.stop, this);
+		Wu.DomEvent.on(this._container, 'mouseleave', this.mouseOut, this);
+
+		// add stops
+		Wu.DomEvent.on(this._container, 'mousedown dblclick mouseup click', Wu.DomEvent.stopPropagation, this);
 	},
 
 	addTo: function (map) {
@@ -36,28 +51,74 @@ L.Control.BaselayerToggle = L.Control.extend({
 		return this;
 	},
 
+	_on : function () {
+		this._show();
+	},
+	_off : function () {
+		this._hide();
+	},
+	_show : function () {
+		this._container.style.display = 'block';
+	},
+	_hide : function () {
+		this._container.style.display = 'none';
+	},
 
-	
-	_initLayout: function () {
+	_addTo : function () {
+		this.addTo(app._map);
+		this._addHooks();
+		this._added = true;
+	},
 
-		// create div
-		var className = 'leaflet-control-baselayertoggle';
-		var container = this._container = L.DomUtil.create('div', className);
+	_refresh : function () {
+		if (!this._added) this._addTo();
 
-		// add tooltip
-		app.Tooltip.add(container, 'Toggle between baselayers', { extends : 'systyle', offset : [23, 0]});
+		// get control active setting from project
+		var active = this._project.getControls()[this.type];
+		
+		// if not active in project, hide
+		if (!active) return this._hide();
 
-		// add events
-		Wu.DomEvent.on(container, 'mousedown', this.toggle, this);
-		Wu.DomEvent.on(container, 'dblclick', Wu.DomEvent.stop, this);
-		Wu.DomEvent.on(container, 'mouseleave', this.mouseOut, this);
+		// remove old content
+		this._flush();
 
-		// add stops
-		Wu.DomEvent.on(container, 'mousedown dblclick mouseup click', Wu.DomEvent.stopPropagation, this);
+		// init content
+		this._initContent();
 
 	},
 
+	_flush : function () {
+		// empty old
+		if (this._list) {
+			Wu.DomUtil.remove(this._list);
+			this._list = null;
+		}
 
+		this._layers = null;
+		this._layers = {};
+
+	},
+
+	_initContent : function () {
+		
+		// create wrapper
+		this._list = L.DomUtil.create('div', 'baselayertoggle-list', this._container);
+		Wu.DomEvent.on(this._list, 'dblclick', Wu.DomEvent.stop, this);
+
+		// build menu
+		var baseLayers = this._project.getBaselayers() || [];
+
+		baseLayers.forEach(function (b) {
+			console.log('bbb: ', b);
+			var baseLayer = {
+				layer : this._project.getLayer(b.uuid),
+				baseLayer : b
+			}
+			this.addLayer(baseLayer);
+		}, this);
+
+	},
+	
 	mouseOut : function () {
 
 		if ( this._isOpen ) { this.collapse() }
@@ -66,35 +127,35 @@ L.Control.BaselayerToggle = L.Control.extend({
 	},
 
 	
-	update: function () {
-		if (!this._container) return; 
+	// update: function () {
+	// 	if (!this._container) return; 
 
-		// set project
-		this.project = this.project || app.activeProject;
+	// 	// set project
+	// 	this._project = this._project || app.activeProject;
 
-		// empty old
-		if (this._list) Wu.DomUtil.remove(this._list);
+	// 	// empty old
+	// 	if (this._list) Wu.DomUtil.remove(this._list);
 
-		this._layers = {};
+	// 	this._layers = {};
 
-		// create wrapper
-		this._list = L.DomUtil.create('div', 'baselayertoggle-list', this._container);
-		Wu.DomEvent.on(this._list, 'dblclick', Wu.DomEvent.stop, this);
+	// 	// create wrapper
+	// 	this._list = L.DomUtil.create('div', 'baselayertoggle-list', this._container);
+	// 	Wu.DomEvent.on(this._list, 'dblclick', Wu.DomEvent.stop, this);
 
-		// build menu
-		var baseLayers = this.project.getBaselayers();
-		if (!baseLayers) return;
+	// 	// build menu
+	// 	var baseLayers = this._project.getBaselayers();
+	// 	if (!baseLayers) return;
 
-		baseLayers.forEach(function (b) {
-			var baseLayer = {
-				layer : this.project.getLayer(b.uuid),
-				baseLayer : b
-			}
-			this.addLayer(baseLayer);
-		}, this);
+	// 	baseLayers.forEach(function (b) {
+	// 		var baseLayer = {
+	// 			layer : this._project.getLayer(b.uuid),
+	// 			baseLayer : b
+	// 		}
+	// 		this.addLayer(baseLayer);
+	// 	}, this);
 
-		return this;
-	},
+	// 	return this;
+	// },
 
 	addLayer : function (baseLayer) {
 		if (!baseLayer.layer) return console.error('BUG: fixme!');
@@ -139,9 +200,7 @@ L.Control.BaselayerToggle = L.Control.extend({
 		}
 
 		// Google Analytics event tracking
-		var _layerTitle = layer.getTitle();
-		app.Analytics.ga(['Controls', 'Baselayer toggle: ' + _layerTitle]);
-
+		app.Analytics.ga(['Controls', 'Baselayer toggle: ' + layer.getTitle()]);
 
 	},
 
@@ -151,7 +210,6 @@ L.Control.BaselayerToggle = L.Control.extend({
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Controls', 'Baselayer toggle click']);
-
 	},
 
 	collapse : function () {
@@ -164,9 +222,8 @@ L.Control.BaselayerToggle = L.Control.extend({
 		Wu.DomUtil.addClass(this._container, 'open');
 	},
 
-
 });
 
 L.control.baselayerToggle = function (options) {
-	return new L.Control.BaselayerToggle(options);
+	return new L.Control.Baselayertoggle(options);
 };

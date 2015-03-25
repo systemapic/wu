@@ -148,10 +148,10 @@ module.exports = function(grunt) {
 					
 					// leaflet + mapbox
 					'public/js/lib/leaflet.js/leaflet-0.7.3-src.js',
-					'public/js/lib/mapbox.js/mapbox.standalone.uncompressed.js',
-					'public/js/lib/leaflet.js/plugins/leaflet.geojson.draw.js',
-					'public/js/lib/leaflet.js/plugins/leaflet.draw-src.js',
-					'public/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.js',
+					// 'public/js/lib/mapbox.js/mapbox.standalone.uncompressed.js',
+					// 'public/js/lib/leaflet.js/plugins/leaflet.geojson.draw.js',
+					// 'public/js/lib/leaflet.js/plugins/leaflet.draw-src.js',
+					// 'public/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.js',
 					'public/js/lib/leaflet.js/plugins/leaflet.utfgrid.js',
 
 					// tools
@@ -193,10 +193,13 @@ module.exports = function(grunt) {
 					// Class 
 					'public/js/src/core/class.js',
 
-					// Extend Leaflet
-					'public/js/src/ext/extendLeaflet.js',
+				
 
+					// controller
+					'public/js/src/core/controller.js',
+					
 					// Sidepane 
+					'public/js/src/panes/pane.js',
 					'public/js/src/panes/sidepane/sidepane.js',
 					'public/js/src/panes/sidepane/sidepane.item.js',
 					'public/js/src/panes/sidepane/sidepane.clients.js',
@@ -221,7 +224,6 @@ module.exports = function(grunt) {
 					'public/js/src/panes/sidepane/option.settings.js',
 
 					// Other Panes 
-					'public/js/src/panes/pane.js',
 					'public/js/src/panes/pane.header.js',
 					'public/js/src/panes/pane.progress.js',
 					'public/js/src/panes/pane.map.js',
@@ -231,17 +233,25 @@ module.exports = function(grunt) {
 					'public/js/src/panes/pane.dropzone.js',
 
 					// Controls 
+					'public/js/src/controls/control.js',
+					'public/js/src/controls/control.zoom.js',
+					'public/js/src/controls/control.geojson.draw.js',
+					'public/js/src/controls/control.draw.js',
 					'public/js/src/controls/control.zindex.js',
+					'public/js/src/controls/control.measure.js',
+					'public/js/src/controls/control.geolocation.js',
 					'public/js/src/controls/control.layermenu.js',
 					'public/js/src/controls/control.inspect.js',
 					'public/js/src/controls/control.description.js',
 					'public/js/src/controls/control.legends.js',
 					'public/js/src/controls/control.mouseposition.js',
 					'public/js/src/controls/control.baselayertoggle.js',
-					'public/js/src/controls/control.style.js',
 					'public/js/src/controls/control.cartocss.js',
+
 					'public/js/src/controls/control.tooltip.js',
+					'public/js/src/controls/control.style.js',
 					'public/js/src/controls/control.spinningmap.js',
+
 					// Models 
 					'public/js/src/models/model.projects.js',
 					'public/js/src/models/model.clients.js',
@@ -260,6 +270,9 @@ module.exports = function(grunt) {
 					'public/js/src/config/config.js',
 					'public/js/src/lang/language.english.js',
 
+					// Extend Leaflet
+					'public/js/src/ext/extendLeaflet.js',
+					
 					// App 
 					'public/js/src/core/app.js'
 				],

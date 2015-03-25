@@ -69,7 +69,7 @@ Wu.Client = Wu.Class.extend({
 		console.log('client saved', err, json);
 
 		var result = Wu.parse(json);
-		console.log('result: ', result);
+
 		if (result.error) return app.feedback.setError({
 			title : 'Client not updated', 
 			description : result.error
@@ -93,11 +93,8 @@ Wu.Client = Wu.Class.extend({
 			keywords 	: this.keywords
 		}
 
-		console.log('options', options);
-		
 		var json   = JSON.stringify(options);
 		var editor = Wu.app.SidePane.Clients;
-
 
 		Wu.Util.postcb('/api/client/new', json, editor._created, this);
 

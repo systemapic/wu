@@ -59,6 +59,14 @@ module.exports = api.client = {
 		});
 
 		ops.push(function (options, callback) {
+			// check unique name
+			api.client._checkUnique({
+				user : options.user,
+				store : store
+			}, callback);
+		});
+
+		ops.push(function (options, callback) {
 			// create client
 			api.client._create({
 				user : options.user,
@@ -72,9 +80,23 @@ module.exports = api.client = {
 			// saved ok
 			res.end(JSON.stringify(client));
 		});
-
 	},
 
+	_checkUnique : function (options, callback) {
+
+		Clientel
+		.findOne({slug : options.store.name.toLowerCase()})
+		.exec(function (err, result) {
+
+			// if err
+			var message = 'Client name already exists. Please choose another name.';
+			if (err) return callback(message);
+			if (result) return callback(message);
+			
+			// all good
+			callback(null, options);
+		});
+	},
 
 	_create : function (options, callback) {
 		var user = options.user,
@@ -94,7 +116,6 @@ module.exports = api.client = {
 
 		// save 
 		client.save(callback);
-
 	},
 
 

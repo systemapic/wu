@@ -1,23 +1,18 @@
-// app.StartPane
+Wu.StartPane = Wu.Pane.extend({
 
-Wu.StartPane = Wu.Class.extend({
+	dimensions : {
+		screenW 	: 	0,
+		screenH 	: 	0,
+		boxW 		: 	350,
+		boxH 		: 	233,
+		sizeMode 	: 	'',
+		projectNo 	: 	0
+	},
 
-	initialize : function (options) {
-		
-		// set options
-		Wu.setOptions(this, options);
+	projectContainers : [],
 
-
-		this.dimensions = {
-			screenW 	: 	0,
-			screenH 	: 	0,
-			boxW 		: 	350,
-			boxH 		: 	233,
-			sizeMode 	: 	'',
-			projectNo 	: 	0
-		}
-
-		this.projectContainers	= [];
+	_projectSelected : function (e) {
+		this.deactivate();
 	},
 
 	activate : function () {
@@ -27,9 +22,6 @@ Wu.StartPane = Wu.Class.extend({
 		// create container
 		this.initContainer();
 
-		// init spinner
-		// this.initSpinner();
-
 		// add events
 		this.addHooks();
 
@@ -38,7 +30,6 @@ Wu.StartPane = Wu.Class.extend({
 
 		// Show the header pane.
 		Wu.DomUtil.removeClass(Wu.app.HeaderPane._container, 'displayNone');
-
 
 	},	
 
@@ -118,6 +109,8 @@ Wu.StartPane = Wu.Class.extend({
 
 
 	refreshProjects : function () {
+
+		console.log('refreshProjects');
 
 		// clear old
 		this._projectList.innerHTML = '';
@@ -244,21 +237,23 @@ Wu.StartPane = Wu.Class.extend({
 
 	selectProject : function(project) {
 
-		// Google Analytics
-		app.Analytics.setGaProject(project.getUuid());
-
 		// select project
-		project.select();
+		// project.select();
 
 		// refresh sidepane
 		app.SidePane.refreshMenu();
+
+
+		console.log('firing projectSelected');
+		Wu.Mixin.Events.fire('projectSelected', { detail : {
+			projectUuid : project.getUuid()
+		}});  
 
 		// Hide the Start Pane
 		this.deactivate();
 
 		// Google Analytics event trackign
-		var projectID = project.getUuid();
-		app.Analytics.setGaProject(projectID);
+		app.Analytics.setGaProject(project.getUuid());
 
 	},
 

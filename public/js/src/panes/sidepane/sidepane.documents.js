@@ -1,12 +1,13 @@
 // DocumentsPane
 Wu.SidePane.Documents = Wu.SidePane.Item.extend({
-	
+	_ : 'sidepane.documents',
+
 	type : 'documents',
 	title : 'Docs',
 
 
-	initContent : function () {
-
+	// initContent : function () {
+	_initContent : function () {
 		// create new fullscreen page, and set as default content
 		this._content = Wu.DomUtil.create('div', 'fullpage-documents', Wu.app._appPane);
 		
@@ -32,13 +33,59 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// add tooltip
 		app.Tooltip.add(this._menu, 'This is the projects document section.');
+
+		// add hooks
+		this.addHooks();
 		
+	},
+
+
+
+
+	_flush : function () {
+
+		// reset text pane
+		this._textarea.innerHTML = '';
+
+		// reset left pane
+		this._folderpane.innerHTML = '';
+
+		// reset object
+		this.folders = {};
+	},
+
+	_refresh : function () {
+
+		// use active project
+		this._project = app.activeProject;
+
+		// flush
+		this._flush();
+
+		// set folders
+		this.createFolders();
+
+		// editMode: hide/show (+) button
+		var editMode = app.access.to.edit_project(this._project);
+		if (editMode) {
+			this._showPlus();
+		} else {
+			this._hidePlus();
+		}
+	},
+
+	_showPlus : function () {
+		this._newfolder.style.display = 'block';	
+	},
+
+	_hidePlus : function () {
+		this._newfolder.style.display = 'none';
 	},
 
 	initFolders : function () {
 
 		this.folders = {};
-		var folders = this.project.store.folders;
+		var folders = this._project.store.folders;
 
 		// init local folder object
 		folders.forEach(function (folder, i, arr) {
@@ -60,7 +107,8 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.addGrande();
 		
 		// show (+)
-		Wu.DomUtil.removeClass(this._newfolder, 'displayNone');
+		// Wu.DomUtil.removeClass(this._newfolder, 'displayNone');
+		this._showPlus();
 
 	},
 
@@ -69,9 +117,9 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		var nodes = this._textarea;
 
 		// get sources
-		var files   = this.project.getFiles();
-		var sources = this.project.getGrandeFiles(files);
-		var images  = this.project.getGrandeImages(files);
+		var files   = this._project.getFiles();
+		var sources = this._project.getGrandeFiles(files);
+		var images  = this._project.getGrandeImages(files);
 
 		// set grande options
 		var options = {
@@ -108,6 +156,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	removeGrande : function () {
 		if (!this.grande) return;
 		this.grande.destroy();
+		this.grande = null;
 		delete this.grande;
 	},
 	
@@ -125,27 +174,28 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.removeGrande();
 
 		// hide (+)
-		Wu.DomUtil.addClass(this._newfolder, 'displayNone');
+		// Wu.DomUtil.addClass(this._newfolder, 'displayNone');
+		this._hidePlus();
 
 	},
 
-	_activate : function (e) {                
+	_activate : function (e) {         
+		this._project = app.activeProject;       
 
 		// set top
 		this.adjustTop();
 
-		// turn off header resizing and icon
-		// Wu.app.HeaderPane.disableResize();
-
 		// select first title (create fake e object)
-		var folders = this.project.store.folders;
+		var folders = this._project.store.folders;
 		if (folders.length > 0) {
 			var uuid = folders[0].uuid;
 			this.selectFolder(uuid);
 		};
 	
 		// if editMode
-		if (this.project.editMode) {
+		// if (this._project.editMode) {
+		
+		if (app.access.to.edit_project(this._project)) {
 
 			// add shift key hook
 			this.enableShift();
@@ -160,46 +210,14 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	},
 
 	_hideControls : function () {
-
-		// layermenu
-		var lm = app.MapPane.layerMenu;
-		if (lm) lm.hide();
-
-		// inspect
-		var ic = app.MapPane.inspectControl;
-		if (ic) ic.hide();
-
-		// legends
-		var lc = app.MapPane.legendsControl;
-		if (lc) lc.hide();
-
-		// description
-		var dc = app.MapPane.descriptionControl;
-		if (dc) dc.hide();
+		app.Controller.hideControls();
 	},
 
 	_showControls : function () {
-		// layermenu
-		var lm = app.MapPane.layerMenu;
-		if (lm) lm.show();
-
-		// inspect
-		var ic = app.MapPane.inspectControl;
-		if (ic) ic.show();
-
-		// legends
-		var lc = app.MapPane.legendsControl;
-		if (lc) lc.show();
-
-		// description
-		var dc = app.MapPane.descriptionControl;
-		if (dc) dc.show();
+		app.Controller.showControls();
 	},
-
+	
 	_deactivate : function () {
-
-		// turn off header resizing
-		// Wu.app.HeaderPane.enableResize();
 
 		// remove shift key edit hook
 		this.disableShift();
@@ -245,7 +263,6 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 			btn.style.visibility = 'hidden';
 		}
 	},
-
 	
 	adjustTop : function () {
 		// debug, for innfelt header
@@ -260,35 +277,37 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._leftpane.style.top = '-' + project.store.header.height + 'px';
 	},
 
-       
+	// update : function () {
+
+	// 	// use active project
+	// 	this._project = app.activeProject;
+
+	// 	// flush
+	// 	this.reset();
+
+	// 	// set folders
+	// 	this.createFolders();
+
+	// 	// editMode: hide/show (+) button
+	// 	if (this._project.editMode) {
+	// 		Wu.DomUtil.removeClass(this._newfolder, 'displayNone');
+	// 	} else {
+	// 		Wu.DomUtil.addClass(this._newfolder, 'displayNone');
+	// 	}
+
+	// },
+
+	// updateContent : function () {  
+
+	// 	// reset text pane
+	// 	this._textarea.innerHTML = '';
+
+	// 	// update         
+	// 	this.update();
+	// },
 
 	update : function () {
 
-		// use active project
-		this.project = app.activeProject;
-
-		// flush
-		this.reset();
-
-		// set folders
-		this.createFolders();
-
-		// editMode: hide/show (+) button
-		if (this.project.editMode) {
-			Wu.DomUtil.removeClass(this._newfolder, 'displayNone');
-		} else {
-			Wu.DomUtil.addClass(this._newfolder, 'displayNone');
-		}
-
-	},
-
-	updateContent : function () {  
-
-		// reset text pane
-		this._textarea.innerHTML = '';
-
-		// update         
-		this.update();
 	},
 
 	newFolder : function () {
@@ -300,11 +319,11 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		}
 
 		// update 
-		this.project.store.folders.push(folder);
+		this._project.store.folders.push(folder);
 
 		// refresh
-		this.update();
-
+		// this.update();
+		this._refresh();
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Side Pane', 'Documents: New folder']);
@@ -314,7 +333,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	createFolders : function () {
 
 		// set folders
-		var folders = this.project.store.folders;
+		var folders = this._project.store.folders;
 
 		// return if no folders
 		if (!folders) return;
@@ -324,19 +343,19 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 		// create each folder headline
 		folders.forEach(function (elem, i, arr) {
-
 			this._createFolder(elem);
-
 		}, this);
 	       
 	},
 
 	_createFolder : function (elem) {
+		var editMode = app.access.to.edit_project(this._project);
+
 		// if editMode
-		if (this.project.editMode) {
+		if (editMode) {
+
 			// delete button
 			var btn = Wu.DomUtil.create('div', 'documents-folder-delete', this._folderpane, 'x');
-			// btn.innerHTML = 'x';
 			Wu.DomEvent.on(btn, 'click', function (e) { this.deleteFolder(elem.uuid); }, this);
 			this._deleteButtons[elem.uuid] = btn;
 		}
@@ -347,13 +366,14 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		folder.el.innerHTML = folder.title;
 	       
 		// set hooks
-		Wu.DomEvent.on( folder.el,  'mousedown', function (e) {
+		Wu.DomEvent.on(folder.el,  'mousedown', function (e) {
 			this.selectFolder(folder.uuid);
 		}, this );     // select folder
 		
 		// if editMode
-		if (this.project.editMode) {
-			Wu.DomEvent.on( folder.el,  'dblclick', function (e) {
+		if (editMode) {
+
+			Wu.DomEvent.on(folder.el,  'dblclick', function (e) {
 				this._renameFolder(e, folder.uuid);
 			}, this );      // rename folder
 		}
@@ -496,15 +516,15 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		var folders = this.folders;
 		
 		// convert to array
-		this.project.store.folders = [];
+		this._project.store.folders = [];
 		for (f in folders) {
 			var fo = Wu.extend({}, folders[f]);     // clone 
 			delete fo.el;                           // delete .el on clone only
-			this.project.store.folders.push(fo);    // push to storage
+			this._project.store.folders.push(fo);    // push to storage
 		}
 
 		// save project to server
-		this.project._update('folders');
+		this._project._update('folders');
 
 		// set status
 		app.setSaveStatus();
