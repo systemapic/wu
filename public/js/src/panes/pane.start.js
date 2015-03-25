@@ -110,6 +110,8 @@ Wu.StartPane = Wu.Pane.extend({
 
 	refreshProjects : function () {
 
+		console.log('refreshProjects');
+
 		// clear old
 		this._projectList.innerHTML = '';
 

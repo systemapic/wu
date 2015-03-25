@@ -25,6 +25,10 @@ Wu.Control = L.Control.extend({
 	_projectSelected : function (e) {
 		var projectUuid = e.detail.projectUuid;
 
+		if (!projectUuid) {
+			this._project = null;
+			return this._off();
+		}
 		// set project
 		this._project = app.activeProject = app.Projects[projectUuid];
 

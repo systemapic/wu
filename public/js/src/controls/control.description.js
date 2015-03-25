@@ -7,11 +7,9 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	onAdd : function (map) {
-		console.log('description onAdd');
 		var className = 'leaflet-control-description',
 		    container = L.DomUtil.create('div', className),
 		    options   = this.options;
-
 
 		this._button = Wu.DomUtil.create('div', 'dropdown-button description-toggle-button', container)
 		this._content = Wu.DomUtil.create('div', 'description-control-inner-content', container)
@@ -23,8 +21,6 @@ L.Control.Description = Wu.Control.extend({
 
 	_initContainer : function () {          
 
-		console.log('description _initContainer');      
-		
 		// hide by default
 		this._container.style.display = "none";
 
@@ -42,9 +38,11 @@ L.Control.Description = Wu.Control.extend({
 			// Mobile arrow	
 		    	Wu.DomUtil.create('div', 'description-mobile-arrow', this._content);
 		}
+
 	},      
 
 	_addTo : function () {
+
 		this.addTo(app._map);
 		this._initContainer();
 		this._addHooks();
@@ -93,7 +91,7 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_on : function () {
-		this._refresh();
+		this._show();
 	},
 
 	_off : function () {
@@ -102,6 +100,11 @@ L.Control.Description = Wu.Control.extend({
 
 	setDescription : function (layer) {
 		this._inner.innerHTML = layer.store.description;
+	},
+
+	_isActive : function () {
+		if (!this._project) return false;
+		return this._project.getControls()[this.type];
 	},
 
 	_show : function () {
@@ -113,11 +116,12 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	show : function () {
-		this._container.style.display = 'block'; 
+		if (!this._container) return;
+		this._isActive() ? this._show() : this._hide();
 	},
 
 	hide : function () {
-		this._container.style.display = 'none'; 
+		this._hide();
 	},
 
 	_hideIfEmpty : function () {
@@ -136,7 +140,7 @@ L.Control.Description = Wu.Control.extend({
 		this._show();
 
 		var isEditor = app.access.to.edit_project(this._project);
-		if ( !layer.getDescription() && !isEditor) {
+		if (!layer.getDescription() && !isEditor) {
 			this.closePane();
 			this.clear();
 		} 
@@ -145,7 +149,6 @@ L.Control.Description = Wu.Control.extend({
 	removeLayer : function (layer) {
 		if (this.activeLayer == layer) {
 			this._flush();
-				
 		}
 	},
 
@@ -190,7 +193,6 @@ L.Control.Description = Wu.Control.extend({
 
 		// prevent map scrollzoom
 		app._map.scrollWheelZoom.disable();
-		
 	},	
 
 	keyDown : function (e) {

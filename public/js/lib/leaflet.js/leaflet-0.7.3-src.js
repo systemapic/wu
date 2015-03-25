@@ -6852,13 +6852,13 @@ L.Map.Drag = L.Handler.extend({
 	},
 
 	removeHooks: function () {
-
+		var map = this._map;
+		
 		// remove events
 		if (map.options.worldCopyJump) {
 			this._draggable.off('predrag', this._onPreDrag, this);
 			map.off('viewreset', this._onViewReset, this);
 		}
-
 
 		this._draggable.disable();
 	},

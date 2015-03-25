@@ -91,6 +91,11 @@ L.Control.Inspect = Wu.Control.extend({
 		this._hide();
 	},
 
+	_isActive : function () {
+		if (!this._project) return false;
+		return this._project.getControls()[this.type];
+	},
+
 	_show : function () {
 		this._container.style.display = 'block';
 	},
@@ -100,11 +105,12 @@ L.Control.Inspect = Wu.Control.extend({
 	},
 
 	show : function () {
-		Wu.DomUtil.removeClass(this._container, 'displayNone');
+		if (!this._container) return;
+		this._isActive() ? this._show() : this._hide();
 	},
 
 	hide : function () {
-		Wu.DomUtil.addClass(this._container, 'displayNone');
+		this._hide();
 	},
 
 	_initContent : function () {

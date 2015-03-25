@@ -91,6 +91,8 @@ module.exports = api.project = {
 			Project
 			.findOne({uuid : project.uuid})
 			.exec(function (err, updatedProject) {
+				console.log('updatedProject:'.yellow, updatedProject);
+
 				if (err) return callback(err);
 				callback(null, updatedProject);
 			});
@@ -122,13 +124,17 @@ module.exports = api.project = {
 		
 		if (!store || !user) return done('Missing information.8');
 
+
+		var projectName = 'Project ' + api.utils.getRandomName();
+		var projectSlug = api.utils.createNameSlug(projectName);
+
 		// create model
 		var project 		= new Project();
 		project.uuid 		= 'project-' + uuid.v4();
 		project.createdBy 	= user.uuid;
 		project.createdByName   = user.firstName + ' ' + user.lastName;
-		project.slug 		= slug;
-		project.name 		= store.name;
+		project.slug 		= projectSlug;
+		project.name 		= projectName;
 		project.description 	= store.description;
 		project.keywords 	= store.keywords;
 		project.client 		= store.client;
@@ -346,6 +352,8 @@ module.exports = api.project = {
 		.populate('layers')
 		.populate('roles')
 		.exec(function (err, project) {
+			console.log('##########'.cyan);
+			console.log('returning project: '.cyan, project);
 			res.end(JSON.stringify({
 				error : err,
 				project: project

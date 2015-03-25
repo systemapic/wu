@@ -157,15 +157,6 @@ Wu.Project = Wu.Class.extend({
 		// refresh project
 		this._refresh();
 	
-		// refresh mappane
-		// this.refreshMappane();
-
-		// refresh headerpane
-		// this.refreshHeaderpane();
-	
-		// refresh sidepane
-		// this.refreshSidepane(); 	// todo!!!
-
 		// set active project in sidepane
 		if (this._menuItem) this._menuItem._markActive();
 
@@ -179,20 +170,6 @@ Wu.Project = Wu.Class.extend({
 		this.addLayer(layer);
 	},
 
-	// refreshSidepane : function () {
-	// 	// update sidepane
-	// 	if (Wu.Util.isObject(Wu.app.SidePane)) Wu.app.SidePane.setProject(this);
-	// },
-
-	// refreshHeaderpane : function () {
-		// update headerpane
-		// if (Wu.Util.isObject(Wu.app.HeaderPane)) Wu.app.HeaderPane.setProject(this);
-	// },
-
-	// refreshMappane : function () {
-	// 	// update mappane                
-	// 	if (Wu.Util.isObject(Wu.app.MapPane)) Wu.app.MapPane.setProject(this);
-	// },
 
 	_reset : function () {
 		// this.removeHooks();
@@ -250,7 +227,8 @@ Wu.Project = Wu.Class.extend({
 
 	setNewStore : function (store) {
 		this.store = store;
-		this.select();
+		this._initObjects();
+		// this.select();
 	},
 
 	setStore : function (store) {
@@ -344,9 +322,12 @@ Wu.Project = Wu.Class.extend({
  		Wu.Util.postcb('/api/project/new', json, callback.bind(opts.context), this);
 	},
 
-	unload : function () {
-		app.MapPane.reset();
-		app.HeaderPane.reset();
+
+	_unload : function () {
+
+		// load random project
+		app.MapPane._flush();
+		app.HeaderPane._flush();
 		this.selected = false;
 	},
 
@@ -378,10 +359,24 @@ Wu.Project = Wu.Class.extend({
 		delete app.Projects[project.getUuid()];
 
 		// set no active project if was active
-		if (app.activeProject == this) {
-			app.SidePane.refresh(['Projects', 'Users', 'Account']);
+		if (app.activeProject.getUuid() == project.getUuid()) {
+
+			// null activeproject
 			app.activeProject = null;
-			delete app.activeProject;
+
+			// refresh sidepane
+			app.SidePane.refreshMenu();
+
+			// unload project
+			project._unload();
+			
+			// fire no project
+			Wu.Mixin.Events.fire('projectSelected', { detail : {
+				projectUuid : false
+			}});
+
+			// show start pane
+			app.Controller.showStartPane();
 		}
 
 		project = null;
@@ -391,7 +386,7 @@ Wu.Project = Wu.Class.extend({
 		app.setStatus('Deleted!');
 
 		// Save new project name to GA
-		ga('set', 'dimension9', deletedProjectName);
+		// ga('set', 'dimension9', deletedProjectName);
 	},
 
 	saveColorTheme : function () {
@@ -761,6 +756,7 @@ Wu.Project = Wu.Class.extend({
 
 	setSlug : function (name) {
 		var slug = name.replace(/\s+/g, '').toLowerCase();
+		slug = slug.replace(/\W/g, '')
 		slug = Wu.Util.stripAccents(slug);
 		this.store.slug = slug;
 		
