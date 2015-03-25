@@ -117,11 +117,11 @@ module.exports = api.error = {
 
 		var text = '*Error*: ' + domain + ' `' + fileLine + '` ```' + cleanStack + '```';
 
-		api.slack._send({
-			text : text,
-			channel : '#error-log',
-			icon : 'http://systemapic.com/wp-content/uploads/systemapic-color-logo-circle-error.png'
-		});
+		// api.slack._send({
+		// 	text : text,
+		// 	channel : '#error-log',
+		// 	icon : 'http://systemapic.com/wp-content/uploads/systemapic-color-logo-circle-error.png'
+		// });
 
 		res.end(); // no feedback
 	},

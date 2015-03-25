@@ -3,6 +3,7 @@ config/config.js
 public/js/src/config/config.js
 public/js/src/config/login.config.js
 log/*
+tests/*
 dist/tmp/*
 views/tmp/*
 views/*.serve.*

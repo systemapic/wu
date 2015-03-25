@@ -1978,7 +1978,7 @@ button.image-attachment {
 	}
 		
 .checkbox {
-	width: 20px;
+	width: 25px;
 	padding: 0;
 	top: 0px;
 	position: relative;
@@ -2903,6 +2903,7 @@ td.tdcont.createdDate {
 /* Client logo */
 .manage-access-client-logo {
 	width: auto;
+	max-width: 105px;
 	height: 100%;
 	position: absolute;
 	left: 0px;
@@ -2971,17 +2972,20 @@ td.tdcont.createdDate {
 	left: 90px;
 	font-size: 18px;
 	font-weight: 900;
-	top: 10px;
+	max-width: 350px;
+	top: 12px;
 	}
 
 /* Client each project description */
 .manage-access-project-item-description {
 	position: absolute;
 	left: 90px;
-	top: 38px;
-	font-size: 14px;
-	width: 200px;
+	top: 40px;
+	font-size: 13px;
+	/*width: 200px;*/
+	max-width: 350px;
 	height: 40px;
+	line-height: 1.1;
 	}
 
 /* Client each project role wrapper */

@@ -14,9 +14,9 @@ var isPdf 	= args.pdf;
 var isThumb     = args.thumb;
 var serverUrl   = args.serverUrl;
 var serverData  = args.serverData;
+var outfile 	= path;
 
-// set file path
-var outfile = path;
+console.log('args: ', args);
 
 // connect
 var page = require('webpage').create(),
@@ -64,11 +64,15 @@ page.open(server, 'post', data, function (status, why) {
 	// callback
 	function () {
 		
-		console.log('loaded!!');
+		console.log('loaded!!1');
 
-		page.viewportSize = { width : 1620, height: 1080 };
-		page.render(outfile);
-		phantom.exit();
+		setTimeout(function () {
+			page.viewportSize = { width : 1620, height: 1080 };
+			page.render(outfile);
+			phantom.exit();
+		}, 1000);
+
+		
 
 	});
 });
@@ -87,7 +91,10 @@ function waitFor(testFx, onReady, timeOutMillis) {
 				if(!condition) {
 					// If condition still not fulfilled (timeout but condition is 'false')
 					console.log("'waitFor()' timeout");
-					phantom.exit(1);
+					page.viewportSize = { width : 1620, height: 1080 };
+					page.render(outfile);
+					phantom.exit();
+					// phantom.exit(1);
 				} else {
 					// Condition fulfilled (timeout and/or condition is 'true')
 					console.log("'waitFor()' finished in " + (new Date().getTime() - start) + "ms.");

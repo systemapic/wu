@@ -359,7 +359,8 @@ input[type=checkbox] + label.check {
 ╚══════╝╚══════╝╚═╝        ╚═╝   
 */	
 
-.legends-inner-slider-sliding {
+.legends-inner-slider-sliding,
+.legends-inner-slider {
 	-webkit-transition: left 500ms ease;
 	-moz-transition: left 500ms ease;
 	transition: left 500ms ease;
@@ -447,6 +448,13 @@ input[type=checkbox] + label.check {
 	-moz-transition: padding 250ms ease;
 	-o-transition: padding 250ms ease;
 	transition: padding 250ms ease;
+	}
+
+.leaflet-control-legends {
+	-webkit-transition: max-width 250ms ease;	
+	-moz-transition: max-width 250ms ease;	
+	-o-transition: max-width 250ms ease;	
+	transition: max-width 250ms ease;
 	}
 
 

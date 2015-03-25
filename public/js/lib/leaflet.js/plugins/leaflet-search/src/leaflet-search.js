@@ -701,10 +701,13 @@ L.Control.Search = L.Control.extend({
 	
 	_handleAutoresize: function() {	//autoresize this._input
 	    //TODO refact _handleAutoresize now is not accurate
-	    if (this._input.style.maxWidth != this._map._container.offsetWidth) //If maxWidth isn't the same as when first set, reset to current Map width
-	        this._input.style.maxWidth = L.DomUtil.getStyle(this._map._container, 'width');
+	    var map = this._map || app._map;
+	    if (!map || !map._container) return;
+	    
+	    if (this._input.style.maxWidth != map._container.offsetWidth) //If maxWidth isn't the same as when first set, reset to current Map width
+	        this._input.style.maxWidth = L.DomUtil.getStyle(map._container, 'width');
 
-		if(this.options.autoResize && (this._container.offsetWidth + 45 < this._map._container.offsetWidth))
+		if(this.options.autoResize && (this._container.offsetWidth + 45 < map._container.offsetWidth))
 			this._input.size = this._input.value.length<this._inputMinSize ? this._inputMinSize : this._input.value.length;
 	},
 
@@ -782,6 +785,7 @@ L.Control.Search = L.Control.extend({
 
 	_getRecord : function (key) {
 		var record = _.filter(this._recordsCache, function (r) {
+			if (!r) return false;
 			return r.address == key;
 		});
 

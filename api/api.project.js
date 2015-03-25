@@ -86,6 +86,18 @@ module.exports = api.project = {
 			}, callback);
 		});
 
+		// get updated project
+		ops.push(function (project, callback) {
+			Project
+			.findOne({uuid : project.uuid})
+			.exec(function (err, updatedProject) {
+				console.log('updatedProject:'.yellow, updatedProject);
+
+				if (err) return callback(err);
+				callback(null, updatedProject);
+			});
+		});
+
 		// run ops
 		async.waterfall(ops, function (err, project) {
 			if (err) return api.error.general(req, res, err);
@@ -112,13 +124,17 @@ module.exports = api.project = {
 		
 		if (!store || !user) return done('Missing information.8');
 
+
+		var projectName = 'Project ' + api.utils.getRandomName();
+		var projectSlug = api.utils.createNameSlug(projectName);
+
 		// create model
 		var project 		= new Project();
 		project.uuid 		= 'project-' + uuid.v4();
 		project.createdBy 	= user.uuid;
 		project.createdByName   = user.firstName + ' ' + user.lastName;
-		project.slug 		= slug;
-		project.name 		= store.name;
+		project.slug 		= projectSlug;
+		project.name 		= projectName;
 		project.description 	= store.description;
 		project.keywords 	= store.keywords;
 		project.client 		= store.client;
@@ -257,7 +273,8 @@ module.exports = api.project = {
 			'connectedAccounts',
 			'settings',
 			'categories',
-			'thumbCreated'
+			'thumbCreated',
+			'state'
 		];
 
  		// enqueue queries for valid fields
@@ -335,6 +352,8 @@ module.exports = api.project = {
 		.populate('layers')
 		.populate('roles')
 		.exec(function (err, project) {
+			console.log('##########'.cyan);
+			console.log('returning project: '.cyan, project);
 			res.end(JSON.stringify({
 				error : err,
 				project: project
@@ -365,7 +384,8 @@ module.exports = api.project = {
 		var projectUuid = req.body.projectUuid,
 		    position 	= req.body.hash.position,
 		    layers 	= req.body.hash.layers,
-		    id 		= req.body.hash.id;
+		    id 		= req.body.hash.id,
+		    saveState   = req.body.saveState;
 
 		// create new hash
 		var hash 	= new Hash();
@@ -382,8 +402,28 @@ module.exports = api.project = {
 				error: err,
 				hash : doc
 			}));
+
+			if (saveState) api.project._saveState({
+				projectUuid : projectUuid,
+				hashId : id
+			});
 		});
 	},	
+
+	_saveState : function (options) {
+		var projectUuid = options.projectUuid,
+		    hashId = options.hashId;
+
+		Project
+		.findOne({uuid : projectUuid})
+		.exec(function (err, project) {
+			project.state = hashId;
+			project.save(function (err, doc) {
+				console.log('saved state!');
+			});
+		});
+
+	},
 
 
 	getAll : function (options, done) {

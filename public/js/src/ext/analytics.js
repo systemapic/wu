@@ -50,95 +50,111 @@ Wu.Analytics = Wu.Class.extend({
 	},
 
 	initGoogle : function () {
+		if (this._inited) return;
 
 		var gaID = Wu.app.options.ga.id;
 
-		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		// (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		// (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		// m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		// })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-		// Force SSL		
-		ga('set', 'forceSSL', true);	
+		// // Force SSL		
+		// ga('set', 'forceSSL', true);	
 
-		// Create Object
-		ga('create', gaID, 'auto');
+		// // Create Object
+		// ga('create', gaID, 'auto');
 
-		// Send pageview to google
-		ga('send', 'pageview');
+		// // Send pageview to google
+		// ga('send', 'pageview');
 
-		// Software Version ~ Custion dimsension
-		var dimension3Value = Wu.version;
-		ga('set', 'dimension3', dimension3Value);
+		// // Software Version ~ Custion dimsension
+		// var dimension3Value = Wu.version;
+		// ga('set', 'dimension3', dimension3Value);
+
+		this._inited = true;
 		
 	},
 
-	setGaUser : function () {
+	// send to server
+	set : function (options) {
+		
+		// send to server. JSON.stringify not needed for options object.
+		Wu.send('/api/analytics/set', options, function (err, result) {
+			console.log('analytics set: ', err, result);
+		});
 
+	},
+
+	get : function (options) {
+
+		// send to server. JSON.stringify not needed for options object.
+		Wu.send('/api/analytics/get', options, function (err, result) {
+			console.log('analytics get: ', err, result);
+		});
+	},
+
+
+
+	setGaUser : function () {
 		if (!app.Account) return;
 
-		// USER
-		var userId = app.Account.getUuid();
-		if (!userId) return;
+		// // USER
+		// var userId = app.Account.getUuid();
+		// if (!userId) return;
 
-		ga('set', 'userId', userId);		
+		// ga('set', 'userId', userId);		
 
-		// Username ~ Custom dimension
-		var dimension2Value = app.Account.getFullName();
-		ga('set', 'dimension2', dimension2Value);
+		// // Username ~ Custom dimension
+		// var dimension2Value = app.Account.getFullName();
+		// ga('set', 'dimension2', dimension2Value);
 
-		// UserID ~ Custom dimension
-		var dimension5Value = userId;
-		ga('set', 'dimension5', dimension5Value);
+		// // UserID ~ Custom dimension
+		// var dimension5Value = userId;
+		// ga('set', 'dimension5', dimension5Value);
 
 		// TODO
 		// UserIP ~ Custom dimension 
 		// ga('set', 'dimension13', userIP);
 
 		this._userSet = true;
-
 	},
 
 
 	setGaProject : function (uuid) {
+		var projectSlug 	= app.Projects[uuid].getSlug(),
+		    projectClient 	= app.Projects[uuid].getClient(),
+		    clientSlug 		= projectClient.getSlug(),
+		    clientID 		= app.Projects[uuid].getClientUuid(),
+		    projectName 	= app.Projects[uuid].getName(),
+		    clientName		= projectClient.getName(),
+		    url = '/' + clientSlug + '/' + projectSlug;
 
-		var projectSlug 	= app.Projects[uuid].getSlug();
-		var projectClient 	= app.Projects[uuid].getClient();
-		var clientSlug 		= projectClient.getSlug();
-		var clientID 		= app.Projects[uuid].getClientUuid();
-		var projectName 	= app.Projects[uuid].getName();
-		var clientName		= projectClient.getName();
+		// // Send pageview to GA		
+		// ga('send', {
+		//   'hitType': 'pageview',
+		//   'page': url
+		// });
 
-		var url = '/' + clientSlug + '/' + projectSlug
+		// // Project ID ~ Custom dimension
+		// ga('set', 'dimension1', uuid);
 
-		// Send pageview to GA		
-		ga('send', {
-		  'hitType': 'pageview',
-		  'page': url
-		});
+		// // Client ID ~ Custom dimension
+		// ga('set', 'dimension4', clientID);
 
-		// Project ID ~ Custom dimension
-		ga('set', 'dimension1', uuid);
+		// // Project Name ~ Custom dimension
+		// ga('set', 'dimension6', projectName);
 
-		// Client ID ~ Custom dimension
-		ga('set', 'dimension4', clientID);
+		// // Client Name ~ Custom dimension
+		// ga('set', 'dimension7', clientName);
 
-		// Project Name ~ Custom dimension
-		ga('set', 'dimension6', projectName);
-
-		// Client Name ~ Custom dimension
-		ga('set', 'dimension7', clientName);
-
-		// Send "select project" event to GA
-		this.ga(['Select project', projectName])
-
-
+		// // Send "select project" event to GA
+		// this.ga(['Select project', projectName])
 	},
 
 
 	ga : function (trackArray) {
-
-		if ( !this._userSet) this.setGaUser();
+		if (!this._userSet) this.setGaUser();
 
 		var gaSendObject = {
 			'hitType' : 'event'
@@ -163,16 +179,20 @@ Wu.Analytics = Wu.Class.extend({
 		// console.log('gaSendObject', gaSendObject);
 
 		// Try send track object to google analytics
-		ga('send', gaSendObject);
+		// ga('send', gaSendObject);
+		
+		// mem leak?
+		gaSendObject = null;
+		trackArray = null;
 	},
 
 	// Use to log errors
 	logGaError : function (errorName, isFatal) {
 
-		ga('send', 'exception', {
-			'exDescription': errorName,
-			'exFatal': isFatal
-		});
+		// ga('send', 'exception', {
+		// 	'exDescription': errorName,
+		// 	'exFatal': isFatal
+		// });
 
 	}
 
