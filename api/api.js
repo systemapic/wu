@@ -8,8 +8,6 @@ var redisStore = require('redis').createClient(config.temptokenRedis.port, confi
 redisStore.auth(config.temptokenRedis.auth);
 redisStore.on('error', function (err) { console.error('redis err: ', err); });
 
-
-
 // api
 var api = {
 	config : config,
@@ -27,6 +25,7 @@ module.exports.email 	= require('./api.email');
 module.exports.error 	= require('./api.error');
 module.exports.slack 	= require('./api.slack');
 module.exports.debug 	= require('./api.debug');
+module.exports.utils 	= require('./api.utils');
 module.exports.upload 	= require('./api.upload');
 module.exports.legend 	= require('./api.legend');
 module.exports.pixels 	= require('./api.pixels');
@@ -35,3 +34,4 @@ module.exports.access 	= require('./api.access');
 module.exports.client 	= require('./api.client');
 module.exports.project 	= require('./api.project');
 module.exports.provider = require('./api.provider');
+module.exports.analytics = require('./api.analytics');

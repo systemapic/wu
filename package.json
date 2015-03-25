@@ -61,6 +61,7 @@
     "superagent": "^0.20.0",
     "togeojson": "^0.8.0",
     "topojson": "^1.6.8",
+    "universal-analytics": "^0.3.6",
     "unzip": "^0.1.9",
     "utf8": "^2.0.0",
     "wrench": "^1.5.8",

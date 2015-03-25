@@ -273,14 +273,14 @@ module.exports = api.upload = {
 
 				// fuck doing zip within zip!!
 				if (extension == 'zip') {
-					var message = 'The file ' + options.name + ' was rejected. Please upload only <br>one set of files within a zipped archive.';
+					var message = 'The file ' + options.name + ' was rejected. Please upload only one set of files within a zipped archive.';
 					done(message);
 					return false;
 				}
 				
 				// handle folder
 				if (options.type == 'folder') {
-					done("Upload rejected. Please don't include <br>folders inside zipped archives.");
+					done("Upload rejected. Please don't include folders inside zipped archives.");
 					return false;
 				}
 				

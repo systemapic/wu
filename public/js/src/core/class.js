@@ -400,8 +400,6 @@ Wu.Util = {
 		    		
 				var valid = Wu.verify(http.responseText);
 
-				console.log('got callback?', callback, valid);
-
 				if (http.status == 200 && valid) { // ok
 					if (callback) callback(null, http.responseText); 
 				} else { 
@@ -1941,21 +1939,21 @@ String.prototype.camelize = function () {
     });
 }
 
-JSON.parseAsync = function(data, callback) {
-	var worker, json
-	if (window.Worker) {
-		worker = new Worker( 'json.worker.js' );
-		worker.addEventListener( 'message', function (e) {
-			json = e.data;
-			callback( json );
-		}, false);
-		worker.postMessage( data );
-		return;
-	} else {
-		json = JSON.parse( data );
-		callback( json );
-	}
-};
+// JSON.parseAsync = function(data, callback) {
+// 	var worker, json
+// 	if (window.Worker) {
+// 		worker = new Worker( 'json.worker.js' );
+// 		worker.addEventListener( 'message', function (e) {
+// 			json = e.data;
+// 			callback( json );
+// 		}, false);
+// 		worker.postMessage( data );
+// 		return;
+// 	} else {
+// 		json = JSON.parse( data );
+// 		callback( json );
+// 	}
+// };
 
 // bind fn for phantomJS
 Function.prototype.bind = Function.prototype.bind || function (thisp) {

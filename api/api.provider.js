@@ -44,7 +44,10 @@ module.exports = api.provider = {
 	mapbox : {
 
 		setDefault : function (options, done) {	
-			if (!options) return sodone('No options provided.');
+
+			console.log('api.mapbox.setDefault', options);
+
+			if (!options) return done('No options provided.');
 
 			var project = options.project,
 			    username = api.config.defaultMapboxAccount.username,
@@ -84,6 +87,8 @@ module.exports = api.provider = {
 			ops.push(function (options, callback) {
 				var project = options.project;
 
+				console.log('saving : '.red, project);
+
 				// save project
 				project.markModified('layers');
 				project.markModified('connectedAccounts');
@@ -92,6 +97,8 @@ module.exports = api.provider = {
 
 			// do async and go to callback
 			async.waterfall(ops, function (err, result) {
+				console.log('mapbox async done: ', err, result);
+
 				if (err) return done(err);
 				done(null, result);
 			});
@@ -101,6 +108,9 @@ module.exports = api.provider = {
 
 		// mapbox helper fn
 		addLayersToProject : function (options, callback) {
+
+			console.log('addLayaersToPRojec	', options);
+
 			if (!options) return callback('No options.');
 
 			var project = options.project,
@@ -112,7 +122,8 @@ module.exports = api.provider = {
 
 			// add new layers
 			layers.forEach(function (add) {
-				project.layers.addToSet(add._id); // mongodB Layer object
+				console.log('adding layer: ', add);
+				options.project.layers.addToSet(add._id); // mongodB Layer object
 			});
 
 			// add account
@@ -120,7 +131,7 @@ module.exports = api.provider = {
 				username : username,
 				accessToken : accessToken
 			}
-			project.connectedAccounts.mapbox.push(account);
+			options.project.connectedAccounts.mapbox.push(account);
 
 			// return to async ops
 			callback(null, options);		
