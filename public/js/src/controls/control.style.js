@@ -44,11 +44,12 @@ Wu.Style = Wu.Class.extend({
 	},
 
 	setDarkThemeCartoCSS : function () {
-		if (!app.MapPane.cartoCss) return;
+		var cartoCss = app.MapPane.getControls().cartocss;
+		if (!cartoCss) return;
 
 		// Set code mirror to darktheme
 		var cartoCSStheme = Wu.DomUtil.get('cartoCSStheme');
-		app.MapPane.cartoCss._codeMirror.setOption("theme", "mbo");
+		cartoCss._codeMirror.setOption("theme", "mbo");
 		cartoCSStheme.setAttribute('href', app.options.servers.portal + 'js/lib/codemirror/mode/cartocss/codemirror.carto.darktheme.css');
 	
 	},

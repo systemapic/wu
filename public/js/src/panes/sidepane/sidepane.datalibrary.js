@@ -664,7 +664,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.project.refreshSidepane();
 
 		// refresh cartoCssControl
-		var ccss = app.MapPane.cartoCss;
+		var ccss = app.MapPane.getControls().cartocss;
 		if (ccss) ccss.update();
 
 		// refresh
@@ -1127,7 +1127,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.refreshHooks();
 
 		// refresh cartoCssControl
-		var cartoCss = app.MapPane.cartoCss;
+		var cartoCss = app.MapPane.getControls().cartocss;
 		if (cartoCss) cartoCss.update();
 	},
 
