@@ -15,7 +15,6 @@ Wu.SidePane.Item = Wu.Pane.extend({
 	// 	this.disable();
 	// },
 
-
 	_initContainer : function () {
 
 		// menu
@@ -135,7 +134,7 @@ Wu.SidePane.Item = Wu.Pane.extend({
 
 	
 	activate : function (e) {
-
+		console.log('activetae!!!!!!!!');
 
 		// set active menu
 		var prev = Wu.app._activeMenu || false;

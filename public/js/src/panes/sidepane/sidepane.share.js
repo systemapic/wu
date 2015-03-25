@@ -308,8 +308,12 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	},
 
 	_activate : function () {
+
 		// widen container from 350px to 100%
 		app.SidePane.widenContainer();
+
+		// hide controls
+		this._hideControls();
 
 	},
 
@@ -317,6 +321,17 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 		// reset expands
 		this._resetExpands();
+
+		// show controls
+		this._showControls();
+	},
+
+	_hideControls : function () {
+		app.Controller.hideControls();
+	},
+
+	_showControls : function () {
+		app.Controller.showControls();
 	},
 
 	enableSocial : function () {
