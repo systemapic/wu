@@ -733,6 +733,8 @@ L.Control.Cartocss = Wu.Control.extend({
 		this._layer.createLegends(function (ctx, json) {	// callback
 			var legends = Wu.parse(json);
 
+			console.log('_updateLegends legend:', legends);
+
 			if (legends && legends.err) {
 				return this.handleError(legends.err);
 			}

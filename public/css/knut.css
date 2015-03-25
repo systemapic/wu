@@ -279,12 +279,30 @@ body {
 
 
 /*manage access info box*/
-.manage-access-info {
+.manage-access-info-outer {
 	left: 618px;
 	position: absolute;
-	top: 10px;
-}
+	top: 0;
+	height: 100%;
+	padding-right: 15px;
+	display: table;
+	max-width: 257px;
+	line-height: 1.3;
+	}
 
+.manage-access-info {
+	display: table-cell;
+	vertical-align: middle;
+	}
+
+@media screen and (max-width: 1090px) {
+ 
+	.manage-access-info-outer { 
+
+		display: none;
+	}
+
+}
 
 
 /*LIGHTER DESIGN EXPERIMENT #1*/
