@@ -359,6 +359,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// if (!app.SidePane.Options.settings.baselayer) return;
 		console.log('AKSDNADSK');
 		console.log(app.SidePane.Options.settings.baselayer._layers);
+
+		if (!app.SidePane.Options) return;
+		
 		app.SidePane.Options.update();
 		app.SidePane.Options.settings.baselayer.setDefaultLayer();
 	},
