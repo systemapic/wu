@@ -27,17 +27,16 @@ Wu.Dropzone = Wu.Pane.extend({
 	_editEnabled : function () {
 		this.disable();
 	},
+
 	_editDisabled : function () {
 		this.enable();
 	},
 
 	show : function () {
-		// Wu.DomUtil.removeClass(this._container, 'displayNone');
 		this._container.style.display = 'block';
 	},
 
 	hide : function () {
-		// Wu.DomUtil.addClass(this._container, 'displayNone');
 		this._container.style.display = 'none';
 	},
 
@@ -105,7 +104,7 @@ Wu.Dropzone = Wu.Pane.extend({
 
 
 	initDropzone : function (options) {
-		
+
 		// get callback
 		this._uploadedCallback = options.uploadedCallback;
 
@@ -127,12 +126,13 @@ Wu.Dropzone = Wu.Pane.extend({
 				clickable : this._clickable || false,
 				accept : function (file, done) {
 
-					var ext = file.name.split('.').reverse()[0];
-					var acceptedFiles = ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt'];
-					var accepted = _.contains(acceptedFiles, ext);
-					var errorTitle = 'Upload not allowed';
-					var errorMessage ='The file <strong>' + file.name + '</strong> is not an accepted filetype.';
+					var ext = file.name.split('.').reverse()[0],
+					    acceptedFiles = ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt'],
+					    accepted = _.contains(acceptedFiles, ext),
+					    errorTitle = 'Upload not allowed',
+					    errorMessage ='The file <strong>' + file.name + '</strong> is not an accepted filetype.';
 
+					// feedback
 					if (!accepted) app.feedback.setError({ 
 						title : errorTitle, 
 						description : errorMessage
@@ -148,23 +148,20 @@ Wu.Dropzone = Wu.Pane.extend({
 	},
 
 	addDropzoneEvents : function () {
-
 		// add fullscreen bridge to dropzone
 		Wu.DomEvent.on(document.body, 'dragenter', this.dropping, this);
 		Wu.DomEvent.on(document.body, 'dragleave', this.undropping, this);
 		Wu.DomEvent.on(document.body, 'dragover', this.dragover, this);
-		Wu.DomEvent.on(document.body, 'drop', this.dropped, this);
+		Wu.DomEvent.on(this._container, 'drop', this.dropped, this);
 	},
 
 
 	removeDropzoneEvents : function () {
-
 		// remove fullscreen bridge to dropzone
 		Wu.DomEvent.off(document.body, 'dragenter', this.dropping, this);
 		Wu.DomEvent.off(document.body, 'dragleave', this.undropping, this);
 		Wu.DomEvent.off(document.body, 'dragover', this.dragover, this);
-		Wu.DomEvent.off(document.body, 'drop', this.dropped, this);
-
+		Wu.DomEvent.off(this._container, 'drop', this.dropped, this);
 	},
 
 	disable : function () {
@@ -192,11 +189,13 @@ Wu.Dropzone = Wu.Pane.extend({
 	},
 
 	refresh : function () {
+		this._refresh();
+	},
 
-		var that = this;
-
-		// var id = Wu.Util.createRandom(5);
-		// console.log('id', id);
+	_refresh : function () {
+		if (!app.access.to.upload_file(this._project)) {
+			return this.disable();
+		}
 
 		// refresh project
 		this.project = app.activeProject;
@@ -210,52 +209,46 @@ Wu.Dropzone = Wu.Pane.extend({
 
 		// set dz events
 		this.dz.on('drop', function (e) { 
-			that.hide();
-		});
+
+			this.hide();
+
+		}.bind(this));
 
 		this.dz.on('dragenter', function (e) { 
-		
 		});
 
 		this.dz.on('addedfile', function (file) { 
 
-			// show meta screen
-			// that.showMeta();
-
-			// that._showMetaFeedback(file);
-
 			// show progressbar
-			that.progress.setProgress(0);
-
-			// show meta
-			// that.addMeta(file);
+			this.progress.setProgress(0);
 
 			// set status
 			app.setStatus('Uploading');
-		});
+
+		}.bind(this));
 
 
 		this.dz.on('complete', function (file) {
 		
 			// clean up
-			that.dz.removeFile(file);
+			this.dz.removeFile(file);
 
 			// hide meta
-			that.fadeMeta();
-		});
+			this.fadeMeta();
+
+		}.bind(this));
 
 		this.dz.on('uploadprogress', function (file, progress) {
 			// set progress
-			that.progress.setProgress(progress);
+			this.progress.setProgress(progress);
 			console.log('progress:', progress);
-		});                                                                                                                                                                                                               
+		}.bind(this));                                                                                                                                                                                                               
 
 		// this.dz.on('successmultiple', function (dz, json, xml) {
 		this.dz.on('success', function (dz, json, xml) {
-			console.log('dz, json, xml', dz, json, xml);
 
 			// clear fullpane
-			that.progress.hideProgress();
+			this.progress.hideProgress();
 
 			// set status
 			app.setStatus('Done!', 2000);
@@ -264,15 +257,15 @@ Wu.Dropzone = Wu.Pane.extend({
 			var resp = Wu.parse(json);
 
 			// callback
-			if (resp) that._uploadedCallback(resp);
+			if (resp) this._uploadedCallback(resp);
 			
-		});
+		}.bind(this));
 	
 	},
 
 	dropping : function (e) {
 		e.preventDefault();
-	    
+
 		// show .fullscreen-drop
 		this.show(e);
 	},

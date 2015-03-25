@@ -47,7 +47,6 @@ Wu.Controller = Wu.Class.extend({
 		var projectUuid = e.detail.projectUuid;
 		var project = app.Projects[projectUuid];
 		var saveState = project.getSettings().saveState;
-		console.log('project changed!', project.getName());
 
 		// // save map state
 		// if (saveState) this._saveState({
@@ -62,7 +61,6 @@ Wu.Controller = Wu.Class.extend({
 		
 		if (!saveState || !state) return;
 
-		console.log('got state!', state);
 
 		var json = {
 			projectUuid : this._project.getUuid(),
@@ -73,7 +71,6 @@ Wu.Controller = Wu.Class.extend({
 		Wu.post('/api/project/hash/get', JSON.stringify(json), function (ctx, reply) {
 
 			var result = Wu.parse(reply);
-			console.log('=> ', result);
 
 			var hash = result.hash;
 
@@ -93,7 +90,6 @@ Wu.Controller = Wu.Class.extend({
 
 	// todo!
 	_saveState : function (options) {
-		console.log('_saveState');
 
 		var project = options.project || app.activeProject;
 
@@ -135,7 +131,6 @@ Wu.Controller = Wu.Class.extend({
 
 
 	hideControls : function () {
-		console.log('c.hideControls');
 
 		// layermenu
 		var lm = app.MapPane.getControls().layermenu;
@@ -155,8 +150,6 @@ Wu.Controller = Wu.Class.extend({
 	},
 
 	showControls : function () {
-
-		console.log('c.showControls');
 
 		// layermenu
 		var lm = app.MapPane.getControls().layermenu;
@@ -178,7 +171,6 @@ Wu.Controller = Wu.Class.extend({
 
 	showStartPane : function () {
 
-		console.log('showStartPAne!!');
 		// called from project._unload(), ie. when deleting active project
 
 		// flush mappane, headerpane, controls
@@ -192,7 +184,6 @@ Wu.Controller = Wu.Class.extend({
 
 		for (c in controls) {
 			var control = controls[c];
-			console.log('control: ', c, control);
 			control._off();
 		}
 

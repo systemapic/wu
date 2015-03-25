@@ -163,7 +163,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	removeLogoDZ : function () {
 		// disable edit on logo
-		console.log('remLog DXZ');
 
 		if (this.logodz) this.logodz.disable();
 		this.logodz.off('success', this.editedLogo.bind(this), this);
@@ -293,7 +292,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// select project
 		// this._project.select();	
-		console.log('firing projectSelected');
 		Wu.Mixin.Events.fire('projectSelected', { detail : {
 			projectUuid : this._project.getUuid()
 		}});    

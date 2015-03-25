@@ -168,7 +168,7 @@ Wu.SidePane = Wu.Pane.extend({
 		}, this);
 
 		// return if same 	
-		// if (_.isEqual(active, this._panes)) return this._setMenuHeight();
+		if (_.isEqual(active, this._panes)) return this._setMenuHeight();
 
 		// disable all
 		_.each(this._allPanes, function (pane) {

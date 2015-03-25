@@ -5,7 +5,6 @@ Wu.SidePane.Item = Wu.Pane.extend({
 
 	_initialize : function () {
 		Wu.setOptions(this, Wu.app.options);
-		// this.render();
 	},
 
 	_initContainer : function () {
@@ -58,7 +57,6 @@ Wu.SidePane.Item = Wu.Pane.extend({
 	// if clicking on already active tab, toggle it
 	_reclick : function () {
 
-		// var __map = Wu.DomUtil.get("map"); // (j)
 		var _menusliderArrow = Wu.DomUtil.get("menuslider-arrow"); // (j)
 
 		// if open
@@ -71,7 +69,6 @@ Wu.SidePane.Item = Wu.Pane.extend({
 			Wu.app.SidePane.closePane();
 
 			// Remove blur on map... (j)
-			// Wu.DomUtil.removeClass(__map, "map-blur")
 			Wu.DomUtil.removeClass(app._mapPane, "map-blur")
 			
 
@@ -102,10 +99,10 @@ Wu.SidePane.Item = Wu.Pane.extend({
 	_clickActivate : function (e) {
 
 		// To open fullscreen tabs that's been closed
-		if (Wu.app.mobile) this.mobileReActivate();
+		if (app.mobile) this.mobileReActivate();
 
 		// open pane if not closed
-		if (!Wu.app.SidePane.paneOpen) Wu.app.SidePane.openPane();
+		if (!app.SidePane.paneOpen) Wu.app.SidePane.openPane();
 
 		// continue tab activation
 		this.activate();
@@ -185,7 +182,6 @@ Wu.SidePane.Item = Wu.Pane.extend({
 
 	// do swipe of sidepane when selecting menu item, by jorgen
 	swiper : function (prev) {
-
 		
 		// Button height
 		var bHeight = app.mobile ? 50 : 70;
@@ -215,7 +211,6 @@ Wu.SidePane.Item = Wu.Pane.extend({
 		var _menusliderArrow = Wu.DomUtil.get("menuslider-arrow"); // (j)
 		_menusliderArrow.style.width = '9px'; // (j)
 
-
 		// check which 
 		// if (_.contains(classy, 'clients')) {
 		if ( app._activeMenuItem == 'clients' ) {	
@@ -240,8 +235,7 @@ Wu.SidePane.Item = Wu.Pane.extend({
 			Wu.DomUtil.addClass(__map, "map-blur")
 
 			// Mobile option
-			if ( Wu.app.mobile ) this.mobileFullScreenAdjustment();
-
+			if (app.mobile) this.mobileFullScreenAdjustment();
 		}
 	    
 		// if (_.contains(classy, 'dataLibrary')) {
@@ -252,8 +246,7 @@ Wu.SidePane.Item = Wu.Pane.extend({
 			Wu.DomUtil.addClass(__map, "map-blur");
 
 			// Mobile option
-			if ( Wu.app.mobile ) this.mobileFullScreenAdjustment();
-
+			if (app.mobile) this.mobileFullScreenAdjustment();
 		}
 	    
 
@@ -265,8 +258,7 @@ Wu.SidePane.Item = Wu.Pane.extend({
 			Wu.DomUtil.addClass(__map, "map-blur")
 
 			// Mobile option
-			if ( Wu.app.mobile ) this.mobileFullScreenAdjustment();
-
+			if (app.mobile) this.mobileFullScreenAdjustment();
 		}
 
 
@@ -278,8 +270,7 @@ Wu.SidePane.Item = Wu.Pane.extend({
 			Wu.DomUtil.addClass(__map, "map-blur")
 
 			// Mobile option
-			if ( Wu.app.mobile ) this.mobileFullScreenAdjustment();
-
+			if (app.mobile) this.mobileFullScreenAdjustment();
 		}
 				
 
@@ -287,7 +278,7 @@ Wu.SidePane.Item = Wu.Pane.extend({
 		if ( app._activeMenuItem == 'share' ) {
 			var n = app.SidePane._panes.indexOf('Share');
 			menuslider.style.top = h * n + 'px';
-			Wu.app.SidePane._container.style.width = '100%';
+			app.SidePane._container.style.width = '100%';
 			Wu.DomUtil.removeClass(__map, "map-blur")
 		}
 				
@@ -309,11 +300,10 @@ Wu.SidePane.Item = Wu.Pane.extend({
 		}
 		    
 		// Hide the Deactivated Pane
-		if (Wu.app._active) Wu.DomUtil.removeClass(swypefrom, 'show');
+		if (app._active) Wu.DomUtil.removeClass(swypefrom, 'show');
 			
 		// Swipe this IN
 		Wu.DomUtil.addClass(swypeto, 'show');	
-			
 	},
 
 	updateContent : function (project) {
@@ -324,7 +314,6 @@ Wu.SidePane.Item = Wu.Pane.extend({
 		Wu.DomEvent.on(elem, event, fn, uuid);
 	},
 
-
 	disable : function () {
 
 		// disable click
@@ -334,7 +323,6 @@ Wu.SidePane.Item = Wu.Pane.extend({
 		Wu.DomUtil.addClass(this._menu, 'disabled');
 
 		this._enabled = false;
-
 	},
 
 	enable : function () {
@@ -362,15 +350,9 @@ Wu.SidePane.Item = Wu.Pane.extend({
 
 	// active for Projects tab (ie. Clients)
 	calculateHeight : function () {
-
 		var screenHeight   = window.innerHeight,
 		    legendsControl = app.MapPane.getControls().legends,
 		    height         = -107 + screenHeight;
-
-		// if ( Wu.app.mobile ) {
-		// 	this.maxHeight = Wu.app.nativeResolution[0] - 87;
-		// 	return;
-		// }
 
 		if (!legendsControl) {
 			this.maxHeight = height - 6;
@@ -378,7 +360,6 @@ Wu.SidePane.Item = Wu.Pane.extend({
 		}
 		
 		var legendsHeight = parseInt(legendsControl._legendsHeight);
-
 
 		if (legendsControl._isOpen) {
 			height -= legendsHeight;
