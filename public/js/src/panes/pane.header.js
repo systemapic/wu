@@ -67,14 +67,6 @@ Wu.HeaderPane = Wu.Pane.extend({
 		this._subtitle.innerHTML = subtitle || this._project.getHeaderSubtitle();
 	},
 
-	
-
-
-
-
-
-
-
 	getContainer : function () {
 		return this._container;
 	},
@@ -91,86 +83,10 @@ Wu.HeaderPane = Wu.Pane.extend({
 		this.setLogo();
 	},
 
-	
+	_flush : function () {
+		this.setTitle(' ');
+		this.setSubtitle(' ');
+		this.setLogo('/css/images/defaultProjectLogo.png');
+	},
 
-
-
-
-
-
-
-
-	// initialize : function () {
-		
-	// 	// set options
-	// 	this.options = {};
-	// 	this.options.editMode = false;
-		
-	// 	// init container
-	// 	this._initContainer();
-		
-	// 	// return
-	// 	return this; 
-	// },      
-
-	// getHeight : function () {
-	// 	return this._headerHeight;
-	// },
-
-	
-	// _setLeft : function (left) {
-	// 	this._container.style.left = left + 'px';
-	// },
-
-	// _update : function (project) {
-	// 	this.update(project);
-	// },
-
-	// update : function (project) {
-
-	// 	this._project = project;
-	       
-	//         // show header
-	// 	// this._container.style.display = 'block';
-
-	// 	var headerLogoPath = project.getHeaderLogo() ? project.getHeaderLogo() :  '/css/images/defaultProjectLogo.png';
-	// 	this._logo.src = headerLogoPath;
-
-	// 	// update values
-	// 	this._title.innerHTML 	 = project.getHeaderTitle();
-	// 	this._subtitle.innerHTML = project.getHeaderSubtitle();
-	// },
-
-	
-	// reset : function () {
-		
-	// 	// Keep header, but remove it's content from DOM
-	// 	Wu.app.HeaderPane._title.innerHTML = '';
-	// 	Wu.app.HeaderPane._subtitle.innerHTML = '';
-	// 	Wu.app.HeaderPane._logo.src = '';
-	// },
-
-
-	// save : function () {
-
-	// 	// set current values to project
-	// 	this._project.store.header.height 	= this._headerHeight;
-	// 	this._project.store.header.title 	= this._title.innerHTML;
-	// 	this._project.store.header.subtitle 	= this._subtitle.innerHTML;
-	// 	var img = this._logo.src.slice(4).slice(0,-1);
-	// 	this._project.store.header.logo 		= img;     	
-
-	// 	// save to db
-	// 	this._save();
-	// },
-
-	// _save : function () {
-	// 	// save project to db
-	// 	this._project._update('header');
-	// },
-
-	// setProject : function (project) {
-	// 	// update header with project
-	// 	this._update(project);
-	// }
 });

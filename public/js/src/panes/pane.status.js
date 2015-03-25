@@ -46,12 +46,10 @@ Wu.StatusPane = Wu.Class.extend({
 
 
 	tab : function (e) {
-
 		if (e.keyCode == 9) this.toggle();
 	},
 
 	toggle : function () {
-
 		this.isOpen ? this.close() : this.open();
 	
 		// div cleanups to do when hitting home
@@ -59,7 +57,6 @@ Wu.StatusPane = Wu.Class.extend({
 
 		// Google Analytics event trackign
 		app.Analytics.ga(['Status Pane', 'toggle']);
-
 	},
 
 	cleaningJobs: function () {
@@ -76,9 +73,11 @@ Wu.StatusPane = Wu.Class.extend({
 	open : function (e) {
 
 		this.isOpen = true;
+		
+		// expand sidepane
 		if (app.SidePane) app.SidePane.expand();
-		this.refresh();
 
+		// check 
 		this.checkMapBlur();
 		this.setContentHeights();
 
@@ -86,45 +85,17 @@ Wu.StatusPane = Wu.Class.extend({
 		app._activeMenu._activate();
 
 		// Hide button section and Layer info when the Home dropdown menu opens (j)
-		if (app._map) app._map._controlCorners.topleft.style.opacity = 0;
+		this._hideTopleftControlCorner();
 
-		app.MapPane.descriptionControl;
-
-		// close layermenu edit if open  				// refactor all these events.. centralize
-		var layermenu = app.MapPane.layerMenu;
-		if (layermenu) layermenu.disableEdit();
-
+		// close layermenu edit if open  
+		var layermenuControl = app.MapPane.getControls().layermenu;
+		if (layermenuControl) layermenuControl.disableEdit();
 
 		// Face out startpane if it's open
-		if ( app.StartPane.isOpen ) app.StartPane._banner.style.opacity = '0.1';
-
+		if (app.StartPane.isOpen) this._fadeOutStartpane();
 
 		// Mobile option
-		if (Wu.app.mobile) {
-
-			// Check if there is a map pane there...
-			if ( app.MapPane ) {
-			
-				// Close the Layer Menu control
-				if ( app.MapPane.layerMenu ) {
-					app.MapPane.layerMenu.closeLayerPane();
-					app.MapPane.layerMenu._openLayers.style.opacity = 0;
-				}
-
-				// Close the Legends control
-				if ( app.MapPane.legendsControl ) {
-					if ( app.MapPane.legendsControl._isOpen ) app.MapPane.legendsControl.MobileCloseLegends();
-					app.MapPane.legendsControl._legendsOpener.style.opacity = 0;
-				}
-
-				// Close the description control
-				if ( app.MapPane.descriptionControl ) {
-					if ( !app.MapPane.descriptionControl._isClosed ) app.MapPane.descriptionControl.mobileClosePane();
-				}
-			}
-		}
-
-
+		if (app.mobile) this._openMobile();
 
 	},
 
@@ -135,53 +106,99 @@ Wu.StatusPane = Wu.Class.extend({
 
 		// collapse sidepane
 		if (app.SidePane) app.SidePane.collapse();
-		
-		// refresh
-		this.refresh();
 
-
-		var mp = app.MapPane,
-		    descriptionControl = mp.descriptionControl;
+		var descriptionControl = app.MapPane.getControls().description;
 
 		// removes the blur on map if it's set by one of the fullpanes
 		Wu.DomUtil.removeClass(app.MapPane._container, "map-blur");
 
 		// Show button section and Layer info when the Home dropdown menu opens (j)
+		this._showTopleftControlCorner();
+
+		// Face out startpane if it's open
+		if (app.StartPane.isOpen) this._fadeInStartpane();
+
+		// Mobile option : activate default sidepane on close to avoid opening in fullscreen
+		if (app.mobile) this._closeMobile();
+
+
+		// // Only open the description box if there is anything inside of it
+		// if (descriptionControl && descriptionControl.activeLayer) {
+		// 	if (descriptionControl.activeLayer.store.description == '' || !descriptionControl.activeLayer.store.description ) {
+		// 		descriptionControl.hide();
+		// 	}
+		// } 
+		
+
+	},
+
+	_hideTopleftControlCorner : function () {
+		if (app._map) app._map._controlCorners.topleft.style.opacity = 0;
+	},
+
+	_showTopleftControlCorner : function () {
 		if (app._map) {
 			var topleft = app._map._controlCorners.topleft;
 		    	topleft.style.opacity = 1;
 			topleft.style.display = 'block';
 		}
+	},
 
-		// Face out startpane if it's open
-		if ( app.StartPane.isOpen ) app.StartPane._banner.style.opacity = '1';
+	_fadeOutStartpane : function () {
+		app.StartPane._banner.style.opacity = '0.1';
+	},
 
-		// Mobile option : activate default sidepane on close to avoid opening in fullscreen
-		if (app.mobile) {
-			if (mp) {
-				
-				if (mp.layerMenu) 		mp.layerMenu._openLayers.style.opacity = 1;
-				if (mp.legendsControl)		mp.legendsControl._legendsOpener.style.opacity = 1;
-				if (mp.descriptionControl) 	mp.descriptionControl._button.style.opacity = 1;
-				
-				// Make sure we reset if we're in fullscreen mode (media library, users, etc)
-				if (app.SidePane.fullscreen) app.SidePane.Clients.activate();	
-			}
+	_fadeInStartpane : function () {
+		app.StartPane._banner.style.opacity = '1';
+	},
 
-			// Show the controllers (has been hidden when a new project is refreshed in projects.js > refresh() )
-			app._map._controlContainer.style.opacity = 1;
+	_openMobile : function () {
+		if (!app.MapPane) return;
+		
+		var layermenuControl = app.MapPane.getControls().layermenu,
+		    descriptionControl = app.MapPane.getControls().description,
+		    legendsControl = app.MapPane.getControls().legends;
+
+		// Close the Layer Menu control
+		if (layermenuControl) {
+			layermenuControl.closeLayerPane();
+			layermenuControl._openLayers.style.opacity = 0;
 		}
 
+		// Close the Legends control
+		if (legendsControl) {
+			if ( legendsControl._isOpen ) legendsControl.MobileCloseLegends();
+			legendsControl._legendsOpener.style.opacity = 0;
+		}
 
-		// Only open the description box if there is anything inside of it
-		if (descriptionControl && descriptionControl.activeLayer) {
-			if (descriptionControl.activeLayer.store.description == '' || !descriptionControl.activeLayer.store.description ) {
-				descriptionControl.hide();
-			}
-		} 
-		
-
+		// Close the description control
+		if (descriptionControl) {
+			if (!descriptionControl._isClosed) descriptionControl.mobileClosePane();
+		}
 	},
+
+	_closeMobile : function () {
+		
+		// Show the controllers (has been hidden when a new project is refreshed in projects.js > refresh() )
+		app._map._controlContainer.style.opacity = 1;
+
+		if (!app.MapPane) return;
+
+		var layermenuControl = app.MapPane.getControls().layermenu,
+		    legendsControl = app.MapPane.getControls().legends,
+		    descriptionControl =  app.MapPane.getControls().description;
+
+		if (layermenuControl) 	layermenuControl._openLayers.style.opacity = 1;
+		if (legendsControl)	legendsControl._legendsOpener.style.opacity = 1;
+		if (descriptionControl) descriptionControl._button.style.opacity = 1;
+		
+		// Make sure we reset if we're in fullscreen mode (media library, users, etc)
+		if (app.SidePane.fullscreen) app.SidePane.Clients.activate();	
+	
+	},
+
+
+	
 
 	setContentHeights : function () {
 
@@ -217,20 +234,20 @@ Wu.StatusPane = Wu.Class.extend({
 		this._container.style.height = parseInt(height) + 'px';
 	},
 
-	refresh : function () {
+	// refresh : function () {
+	// 	if (!this.project) return;
 
-		if (!this.project) return;
-		// set height to project headerHeight
-		var headerHeight = this.project.getHeaderHeight();
-		this.setHeight(headerHeight);
-	},
+	// 	// set height to project headerHeight
+	// 	var headerHeight = this.project.getHeaderHeight();
+	// 	this.setHeight(headerHeight);
+	// },
 
 	updateContent : function (project) {
 
 		this.project = project;
 
 		// refresh height
-		this.refresh();
+		// this.refresh();
 
 		// collapse errything to just logo
 		this.close();

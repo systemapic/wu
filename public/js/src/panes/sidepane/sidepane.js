@@ -183,7 +183,7 @@ Wu.SidePane = Wu.Pane.extend({
 	},
 
 	_defaultPanes : function () {
-
+		console.log('_defaultPanes');
 		// if no active project,
 		var panes = ['Clients'];
 
@@ -202,6 +202,8 @@ Wu.SidePane = Wu.Pane.extend({
 	// set this._panes to current state
 	_updatePanes : function () {
 		var project = app.activeProject;
+
+		console.log('_updatePanes', project);
 
 		// if no project, return defaults only
 		if (!project) return this._defaultPanes();

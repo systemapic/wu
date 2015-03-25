@@ -163,7 +163,7 @@ Wu.Layer = Wu.Class.extend({
 		var map = map || app._map;
 
 		// leaflet fn
-		map.removeLayer(this.layer);
+		if (map.hasLayer(this.layer)) map.removeLayer(this.layer);
 
 		// remove from active layers
 		app.MapPane.removeActiveLayer(this);	
@@ -171,7 +171,7 @@ Wu.Layer = Wu.Class.extend({
 		// remove gridLayer if available
 		if (this.gridLayer) {
 			this.gridLayer._flush();
-			map.removeLayer(this.gridLayer); 
+			if (map.hasLayer(this.gridLayer)) map.removeLayer(this.gridLayer); 
 		}
 
 		// remove from zIndex

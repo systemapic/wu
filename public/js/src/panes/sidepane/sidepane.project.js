@@ -515,18 +515,18 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// remove from DOM
 		Wu.DomUtil.remove(this._container);
 
-		// if project is active, unload
-		if (this._project == app.activeProject) {
+		// // if project is active, unload
+		// if (this._project.getUuid() == app.activeProject) {
 
-			// unload
-			this._project.unload();
-		
-		}
+		// 	// unload
+		// 	this._project.unload();
+		// }
 
 		// delete
 		this._project._delete();
-		delete this;
-	}
+		this._project = null;
+
+	},
 
 
 });

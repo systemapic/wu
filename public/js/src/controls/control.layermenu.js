@@ -48,11 +48,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		// should be active
 		if (!this._added) this._addTo();
 
-		// get control active setting from project
-		var active = this._project.getControls()[this.type];
-		
 		// if not active in project, hide
-		if (!active) return this._hide();
+		if (!this._isActive()) return this._hide();
 
 		// remove old content
 		this._flush();
@@ -64,7 +61,13 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._show();
 	},
 
+	_isActive : function () {
+		if (!this._project) return false;
+		return this._project.getControls()[this.type];
+	},
+
 	_on : function () {
+		console.log('layermenuControl on!@');
 		this._refresh();
 		this._addAlreadyActive();
 	},
@@ -210,11 +213,14 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	show : function () {
-		Wu.DomUtil.removeClass(this._container, 'displayNone');
+		if (!this._container) return;
+		
+		// if (this._isActive()) this._show();
+		this._isActive() ? this._show() : this._hide();
 	},
 
 	hide : function () {
-		Wu.DomUtil.addClass(this._container, 'displayNone');
+		this._hide();
 	},
 
 
@@ -226,7 +232,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Set max height of Layers selector container
 		this.setMaxHeight(layersMaxHeight);
-
 	},
 
 
@@ -236,7 +241,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		// Make space for inspect control, if it's there, yo
 		var inspectControl = app.MapPane.getControls().inspect;
 		
-		if ( inspectControl ) {
+		if (inspectControl) {
 
 			var inspectorHeight = inspectControl._container.offsetHeight;
 			layersMaxHeight -= inspectorHeight - 5;
@@ -353,7 +358,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.editMode = true;
 
 		// turn off dragging etc. on map
-		Wu.app.MapPane.disableInteraction(true);
+		app.MapPane.disableInteraction(true);
 
 		// turn off dropzone dragging
 		if (app.Dropzone) app.Dropzone.disable();

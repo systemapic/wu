@@ -167,7 +167,12 @@ L.Control.Legends = Wu.Control.extend({
 		// Set max width of legends
 		this.setMaxWidth(legendsMaxWidth)
 
-	},	
+	},
+
+	_isActive : function () {
+		if (!this._project) return false;
+		return this._project.getControls()[this.type];
+	},
 
 	_show : function () {
 		this._container.style.display = 'block';
@@ -178,13 +183,11 @@ L.Control.Legends = Wu.Control.extend({
 	},
 
 	show : function () {
-
-		Wu.DomUtil.removeClass(this._container, 'displayNone');
+		if (this._isActive()) this._show();
 	},
 
 	hide : function () {
-
-		Wu.DomUtil.addClass(this._container, 'displayNone');
+		this._hide();
 	},
 
 	// Runs on window resize (from app.js)

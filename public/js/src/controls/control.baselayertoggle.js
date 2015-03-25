@@ -4,7 +4,6 @@
  */
 
 // app.MapPane.baselayerToggle
-
 L.Control.Baselayertoggle = Wu.Control.extend({
 
 	type : 'baselayertoggle',
@@ -110,6 +109,7 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 		var baseLayers = this._project.getBaselayers() || [];
 
 		baseLayers.forEach(function (b) {
+			console.log('bbb: ', b);
 			var baseLayer = {
 				layer : this._project.getLayer(b.uuid),
 				baseLayer : b

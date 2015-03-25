@@ -26,6 +26,8 @@ Wu.Pane = Wu.Class.extend({
 	_projectSelected : function (e) {
 		var projectUuid = e.detail.projectUuid;
 
+		if (!projectUuid) return;
+
 		// set project
 		this._project = app.activeProject = app.Projects[projectUuid];
 

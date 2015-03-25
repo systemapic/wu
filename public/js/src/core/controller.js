@@ -28,6 +28,8 @@ Wu.Controller = Wu.Class.extend({
 	_projectSelected : function (e) {
 		var projectUuid = e.detail.projectUuid;
 
+		if (!projectUuid) return Wu.Util.setAddressBar('');
+
 		// set project
 		this._project = app.activeProject = app.Projects[projectUuid];
 
@@ -89,29 +91,20 @@ Wu.Controller = Wu.Class.extend({
 
 	},
 
-
+	// todo!
 	_saveState : function (options) {
 		console.log('_saveState');
 
 		var project = options.project || app.activeProject;
 
-		// get active layers
-		// var active = app.MapPane.layerMenu._getActiveLayers();
-		// var layers = _.map(active, function (l) {
-		// 	return l.item.layer;	// layer uuid
-		// });
-
 		var layers = app.MapPane.getZIndexControls().l._index;
 
-		console.log('LOOOLL', layers);
 
 		var layerUuids = [];
 		_.each(layers, function (l) {
-			console.log('LLLL ', l);
 			layerUuids.push(l.store.uuid);
 		});
 
-		console.log('saveState hash layers:', layerUuids);
 
 		// hash object
 		var json = {
@@ -142,7 +135,8 @@ Wu.Controller = Wu.Class.extend({
 
 
 	hideControls : function () {
-		
+		console.log('c.hideControls');
+
 		// layermenu
 		var lm = app.MapPane.getControls().layermenu;
 		if (lm) lm.hide();
@@ -161,6 +155,9 @@ Wu.Controller = Wu.Class.extend({
 	},
 
 	showControls : function () {
+
+		console.log('c.showControls');
+
 		// layermenu
 		var lm = app.MapPane.getControls().layermenu;
 		if (lm) lm.show();
@@ -177,39 +174,32 @@ Wu.Controller = Wu.Class.extend({
 		var dc = app.MapPane.getControls().description;
 		if (dc) dc.show();
 	},
-	
 
-	// refreshControls : function () {
-	// 	var controlsPane = app.SidePane.Options.settings.controls,
-	// 	    project = this._project,
-	// 	    controls = project.getControls(),
-	// 	    pane = app.MapPane;
 
-	// 	    // console.error('refreshControls!!! :)');
+	showStartPane : function () {
 
-	// 	// toggle each control
-	// 	for (c in controls) {
-	// 		var on = controls[c],
-	// 		    enable = 'enable' + c.camelize(),
-	// 		    disable = 'disable' + c.camelize();
-			
-	// 		pane[disable](); 	// todo: wtf !! is !! going on!?
+		console.log('showStartPAne!!');
+		// called from project._unload(), ie. when deleting active project
 
-	// 		// toggle
-	// 		if (on) {	
-	// 			// enable control on map
-	// 			pane[enable]();
+		// flush mappane, headerpane, controls
+		// show startpane
 
-	// 			// enable control in controls options menu
-	// 			if (controlsPane) controlsPane.enableControl(c);
-	// 		} else {	
-	// 			// disable control on map
-	// 			pane[disable]();
-				
-	// 			// disable control in controls options menu
-	// 			if (controlsPane) controlsPane.disableControl(c);
-	// 		}
-	// 	}
-	// },
+		app.MapPane._flush();
+		app.HeaderPane._flush();
+		app.HeaderPane._hide();
+
+		var controls = app.MapPane.getControls();
+
+		for (c in controls) {
+			var control = controls[c];
+			console.log('control: ', c, control);
+			control._off();
+		}
+
+		app.StatusPane.close()
+		app.StartPane.activate();
+
+	},
+
 
 });
