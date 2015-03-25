@@ -372,7 +372,7 @@ Wu.SidePane.Item = Wu.Pane.extend({
 	calculateHeight : function () {
 
 		var screenHeight   = window.innerHeight,
-		    legendsControl = app.MapPane.legendsControl,
+		    legendsControl = app.MapPane.getControls().legends,
 		    height         = -107 + screenHeight;
 
 		// if ( Wu.app.mobile ) {

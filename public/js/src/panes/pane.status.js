@@ -62,11 +62,11 @@ Wu.StatusPane = Wu.Class.extend({
 	cleaningJobs: function () {
 
 		// make sure layermenu edit is disabled
-		var layerMenu = Wu.app.MapPane.layerMenu;
+		var layerMenu = Wu.app.MapPane.getControls().layermenu;
 		if (layerMenu) layerMenu.disableEdit();
 
 		// close all open options
-		app.SidePane.Options.closeAll();
+		if (app.SidePane.Options) app.SidePane.Options.closeAll();
 	},
 
 	// open sidepane menu
