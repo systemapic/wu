@@ -119,9 +119,14 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// add hooks
 		this.addHooks();
+
+
 	},
 
 	_setHooks : function (on) {
+		if (this._hooks == on) return;
+		this._hooks = on;
+
 
 		// delete button
 		if (app.access.to.delete_project(this.project)) {
@@ -162,7 +167,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	// hooks added automatically on page load
 	addHooks : function () {
-		
 		this._setHooks('on');
 
 		if (app.access.to.delete_project(this.project)) {
@@ -508,8 +512,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		app.setStatus('Deleted!');
 
 		// refresh sidepane
-		this.project.refreshSidepane();
-
+		// this.project.refreshSidepane();
+		// app.SidePane.refreshMenu();
 
 		app.feedback.setMessage({
 			title : 'Files deleted',
@@ -737,7 +741,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		c[1].setAttribute('for', 'checkbox-' + tmp.uuid);      // label
 
 		// add hooks for editing file, if edit access
-		if (this.project.editMode) this._addFileEditHooks(tmp.uuid);
+		if (app.access.to.edit_project(this._project)) this._addFileEditHooks(tmp.uuid);
 
 		// add
 		this._domFiles[file.uuid] = {
@@ -764,7 +768,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_addFileEditHooks : function (uuid) {
-		// console.log('add file hooks', uuid);
 		this._setFileEditHooks('off', uuid);
 		this._setFileEditHooks('on', uuid);
 	},
@@ -1150,8 +1153,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 
 	refreshTable : function () {
-
-		// this._resetList();
 
 		// return if empty filelist
 		if (!this.project.files) { return; }

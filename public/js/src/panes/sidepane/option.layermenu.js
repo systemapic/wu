@@ -15,15 +15,12 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		this._outer  = Wu.DomUtil.create('div', 'map-layermenu-outer', this._inner);
 
 		// add tooltip
-		var h4 = Wu.DomUtil.get('h4-layer');
+		var h4 = Wu.DomUtil.get('h4-layer'); // refactor
 		app.Tooltip.add(h4, 'Sets layers that will appear in the layer menu. Selected base layers will be excluded from the Layer Menu list, and vice versa, to avoid duplicates.' );
 	},
 
 	update : function () {
 		Wu.SidePane.Options.Item.prototype.update.call(this)	// call update on prototype
-
-		// get layermenu object
-		// this.layerMenu = app.MapPane.getControls().layermenu; // todo: remove probably
 
 		// options
 		this.editMode = false;
@@ -80,7 +77,7 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		}, this);
 
 		// add toggle hook
-		Wu.DomEvent.on( container, 'mousedown', function (e) { 
+		Wu.DomEvent.on(container, 'mousedown', function (e) { 
 
 			// prevent other click events
 			Wu.DomEvent.stop(e);
@@ -91,12 +88,12 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		}, this );
 
 		// add edit hook
-		Wu.DomEvent.on (button, 'mousedown', function (e) {
+		Wu.DomEvent.on(button, 'mousedown', function (e) {
 			
 			// prevent other click events
 			Wu.DomEvent.stop(e);
 
-			return;// console.log('edit layer!');
+			return;
 
 			// toggle editMode
 			this.toggleEdit(layermenuLayer);
@@ -106,7 +103,6 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 
 	getLayerByUuid : function (layerUuid) {
 		var layer = _.find(this._layers, function (l) {
-			// console.log('l: ', l);
 			return l.layer.store.uuid == layerUuid;	
 		});
 
@@ -132,17 +128,6 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		// add 100 if in editMode
 		if (this.editMode) this.maxHeight += 100;
 	},
-
-	// enableLayermenu : function () {
-	// 	var layerMenu = app.MapPane.enableLayermenu();
-	// 	app.SidePane.Options.settings.controls.enableControl('layermenu');
-		
-	// 	// save changes to project
-	// 	this.project.store.controls.layermenu = true;
-	// 	this.project._update('controls');
-		
-	// 	return layerMenu;
-	// },
 
 	toggle : function (layer) {
 		var layerMenu = app.MapPane.getControls().layermenu;
@@ -209,21 +194,13 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 	// post-close
 	_close : function () {
 		this.disableEdit();
-		return;
-		// clearTimeout(this.closeEditTimer);
-		// var that = this;
-		// this.closeEditTimer = setTimeout(function() {
-		// 	that.disableEdit();
-		// }, 3000);
 	},
 
 	// enable edit mode on layermenu itself
 	enableEdit : function () {
 		var layerMenu = app.MapPane.getControls().layermenu;
 		if (!layerMenu) return;
-
 		if (!layerMenu._open) layerMenu.toggleLayerPane();		
-
 		if (layerMenu) layerMenu.enableEdit();
 	},
 

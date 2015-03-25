@@ -59,6 +59,9 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// show
 		this._show();
+
+		// close by default
+		this.closeAll();
 	},
 
 	_isActive : function () {
@@ -185,13 +188,15 @@ L.Control.Layermenu = Wu.Control.extend({
 			this._add(layerItem);
 
 		}, this);
+
+		// refresh sorting
+		// this.refreshSortable();
 	},
 
 	_addAlreadyActive : function () {
 		
 		var active = app.MapPane.getActiveLayers();
 		var enabled = _.filter(this.layers, function (item) {
-			console.log('item: ', item);
 			if (!item.layer) return false;
 			var uuid = item.layer.getUuid();
 			var ison = _.find(active, function (a) {
@@ -391,6 +396,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	disableEdit : function () {
 		if (!this.editMode) return;
 
+
 		if (!this._project.store.layermenu || this._project.store.layermenu.length == 0 ) {
 			// Hide parent wrapper if empty
 			Wu.DomUtil.addClass(this._parentWrapper, 'displayNone');
@@ -463,6 +469,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	initSortable : function () {
+		if (!app.access.to.edit_project(this._project)) return;
 		this._sortingEnabled = true;
 	
 		// iterate over all layers
@@ -470,23 +477,30 @@ L.Control.Layermenu = Wu.Control.extend({
 		for (var i = 0; i < items.length; i++) {
 			var el = items[i];
 			
-			// set attrs
-			// el.setAttribute('draggable', 'true');
-			
 			// set dragstart event
 			Wu.DomEvent.on(el, 'dragstart', this.drag.start, this);
 		};
 
 		// set hooks
-		// var bin = Wu.DomUtil.get('layer-menu-inner-content');
 		var bin = this._content;
-		if (bin) {
-			Wu.DomEvent.on(bin, 'dragover',  this.drag.over,  this);
-			Wu.DomEvent.on(bin, 'dragleave', this.drag.leave, this);
-			Wu.DomEvent.on(bin, 'drop', 	 this.drag.drop,  this);
-		} 
+		if (!bin) return;
+		Wu.DomEvent.on(bin, 'dragover',  this.drag.over,  this);
+		Wu.DomEvent.on(bin, 'dragleave', this.drag.leave, this);
+		Wu.DomEvent.on(bin, 'drop', 	 this.drag.drop,  this);
 
 	},
+
+	resetSortable : function () {
+		this._sortingEnabled = false;
+
+		// remove hooks
+		var bin = this._content;
+		if (!bin) return;
+		Wu.DomEvent.off(bin, 'dragover',  this.drag.over,  this);
+		Wu.DomEvent.off(bin, 'dragleave', this.drag.leave, this);
+		Wu.DomEvent.off(bin, 'drop', 	  this.drag.drop,  this);
+	},
+
 
 	enableDraggable : function () {
 
@@ -512,22 +526,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		};		
 	},
 
-	resetSortable : function () {
-		this._sortingEnabled = false;
-
-		// remove hooks
-		// var bin = Wu.DomUtil.get('layer-menu-inner-content');
-		var bin = this._content;
-		if (!bin) return;
-		
-		Wu.DomEvent.off(bin, 'dragover',  this.drag.over,  this);
-		Wu.DomEvent.off(bin, 'dragleave', this.drag.leave, this);
-		Wu.DomEvent.off(bin, 'drop', 	  this.drag.drop,  this);
-
-
 	
-	},
-
 	// dragging of layers to layermenu
 	drag : {
 
@@ -823,8 +822,10 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.updateLogic();
 		for (l in this._logic) {
 			var item = this.layers[l];
-			this._logic[l].isOpen = true;
-			this.enforceLogic(item);
+			if (item) {
+				this._logic[l].isOpen = true;
+				this.enforceLogic(item);
+			}
 		}
 	},
 
@@ -832,8 +833,10 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.updateLogic();
 		for (l in this._logic) {
 			var item = this.layers[l];
-			this._logic[l].isOpen = false;
-			this.enforceLogic(item);
+			if (item) {
+				this._logic[l].isOpen = false;
+				this.enforceLogic(item);
+			}
 		}
 	},
 
@@ -1019,7 +1022,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._add(layerItem);
 
 		// save
-		this._project.store.layermenu.push(item);
+		this._project.store.layermenu.push(item); // refactor
 		this.save();
 
 	},
@@ -1082,8 +1085,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomEvent.on(wrap, 'mousedown', function (e) { this.toggleLayer(layerItem); }, this);
 		Wu.DomEvent.on(this._innerContainer, 'dblclick', Wu.DomEvent.stop, this);
 
-		// refresh sorting
-		this.refreshSortable();
+		
 
 		// add to local store
 		this.layers[item.uuid] = layerItem;

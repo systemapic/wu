@@ -110,8 +110,6 @@ Wu.StartPane = Wu.Pane.extend({
 
 	refreshProjects : function () {
 
-		console.log('refreshProjects');
-
 		// clear old
 		this._projectList.innerHTML = '';
 
@@ -243,8 +241,6 @@ Wu.StartPane = Wu.Pane.extend({
 		// refresh sidepane
 		app.SidePane.refreshMenu();
 
-
-		console.log('firing projectSelected');
 		Wu.Mixin.Events.fire('projectSelected', { detail : {
 			projectUuid : project.getUuid()
 		}});  

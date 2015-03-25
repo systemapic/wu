@@ -1,8 +1,3 @@
-/*
- * L.Control.Layers is a control to allow users to switch between different layers on the map.
- * https://raw.githubusercontent.com/Leaflet/Leaflet/master/src/control/Control.Layers.js
- */
-
 // app.MapPane.baselayerToggle
 L.Control.Baselayertoggle = Wu.Control.extend({
 
@@ -109,7 +104,6 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 		var baseLayers = this._project.getBaselayers() || [];
 
 		baseLayers.forEach(function (b) {
-			console.log('bbb: ', b);
 			var baseLayer = {
 				layer : this._project.getLayer(b.uuid),
 				baseLayer : b
@@ -125,37 +119,6 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 		else { return };
 
 	},
-
-	
-	// update: function () {
-	// 	if (!this._container) return; 
-
-	// 	// set project
-	// 	this._project = this._project || app.activeProject;
-
-	// 	// empty old
-	// 	if (this._list) Wu.DomUtil.remove(this._list);
-
-	// 	this._layers = {};
-
-	// 	// create wrapper
-	// 	this._list = L.DomUtil.create('div', 'baselayertoggle-list', this._container);
-	// 	Wu.DomEvent.on(this._list, 'dblclick', Wu.DomEvent.stop, this);
-
-	// 	// build menu
-	// 	var baseLayers = this._project.getBaselayers();
-	// 	if (!baseLayers) return;
-
-	// 	baseLayers.forEach(function (b) {
-	// 		var baseLayer = {
-	// 			layer : this._project.getLayer(b.uuid),
-	// 			baseLayer : b
-	// 		}
-	// 		this.addLayer(baseLayer);
-	// 	}, this);
-
-	// 	return this;
-	// },
 
 	addLayer : function (baseLayer) {
 		if (!baseLayer.layer) return console.error('BUG: fixme!');
