@@ -51,7 +51,11 @@ L.Control.Description = Wu.Control.extend({
 
 	_flush : function () {
 		this.layers = {};
-		this._inner.innerHTML = '';
+		this._clear();
+	},
+
+	_clear : function () {
+		this._setDescription('');
 	},
 
 	_refresh : function () {
@@ -99,7 +103,11 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	setDescription : function (layer) {
-		this._inner.innerHTML = layer.store.description;
+		this._setDescription(layer.store.description);
+	},
+
+	_setDescription : function (text) {
+		this._inner.innerHTML = text;
 	},
 
 	_isActive : function () {
@@ -121,6 +129,7 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	hide : function () {
+		if (!this._container) return;
 		this._hide();
 	},
 
@@ -133,7 +142,6 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	setLayer : function (layer) {
-
 		this.activeLayer = layer;
 		this.setDescription(layer);
 
@@ -142,7 +150,7 @@ L.Control.Description = Wu.Control.extend({
 		var isEditor = app.access.to.edit_project(this._project);
 		if (!layer.getDescription() && !isEditor) {
 			this.closePane();
-			this.clear();
+			// this.clear();
 		} 
 	},
 

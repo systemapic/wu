@@ -61,11 +61,8 @@ L.Control.Cartocss = Wu.Control.extend({
 		// should be active
 		if (!this._added) this._addTo();
 
-		// get control active setting from project
-		var active = this._project.getControls()[this.type];
-		
 		// if not active in project, hide
-		if (!active) return this._hide();
+		if (!this._isActive()) return this._hide();
 
 		// remove old content
 		this._flush();
@@ -96,6 +93,16 @@ L.Control.Cartocss = Wu.Control.extend({
 		this._initedContent = true;
 	},
 
+	_isActive : function () {
+		if (!this._project) return false;
+
+		// check edit access
+		if (!app.access.to.edit_project(this._project)) return false;
+
+		// return if active
+		return this._project.getControls()[this.type];
+	},
+
 	_on : function () {
 		this._refresh();
 	},
@@ -113,7 +120,6 @@ L.Control.Cartocss = Wu.Control.extend({
 	},
 
 	initLayout : function () {
-
 
 		// create divs
 		this._editorContainer 		= Wu.DomUtil.create('div', 'cartocss-control-container'); // editor container

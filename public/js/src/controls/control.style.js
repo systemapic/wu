@@ -1,14 +1,10 @@
-// controls global styles
-// full color themeing to come
 // app.Style
-
 Wu.Style = Wu.Class.extend({
 
 	initialize : function () {
 		
 		// get style tag
 		this._styletag = Wu.DomUtil.get("styletag");
-
 	},
 
 	setDarkTheme : function () {	
@@ -21,7 +17,6 @@ Wu.Style = Wu.Class.extend({
 
 		// Set codemirror cartoCSS to dark theme
 		this.setDarkThemeCartoCSS();
-
 	},
 
 	setLightTheme : function () {
@@ -34,13 +29,13 @@ Wu.Style = Wu.Class.extend({
 	},
 
 	setLightThemeCartoCSS : function () {
-		if (!app.MapPane.cartoCss) return;
+		var cartoCss = app.MapPane.getControls().cartocss;
+		if (!cartoCss) return;
 		
 		// Set code mirror to light theme
 		var cartoCSStheme = Wu.DomUtil.get('cartoCSStheme');
-		app.MapPane.cartoCss._codeMirror.setOption("theme", "default");
+		cartoCss._codeMirror.setOption("theme", "default");
 		cartoCSStheme.setAttribute('href', app.options.servers.portal + 'js/lib/codemirror/mode/cartocss/codemirror.carto.css');
-
 	},
 
 	setDarkThemeCartoCSS : function () {
@@ -51,7 +46,6 @@ Wu.Style = Wu.Class.extend({
 		var cartoCSStheme = Wu.DomUtil.get('cartoCSStheme');
 		cartoCss._codeMirror.setOption("theme", "mbo");
 		cartoCSStheme.setAttribute('href', app.options.servers.portal + 'js/lib/codemirror/mode/cartocss/codemirror.carto.darktheme.css');
-	
 	},
 
 
@@ -68,7 +62,6 @@ Wu.Style = Wu.Class.extend({
 		phantom.rel = 'stylesheet';
 		phantom.href = app.options.servers.portal + 'css/phantomJS.css';
 		this._styletag.appendChild(phantom);
-
 	},
 
 	phantomJSthumb : function () {
@@ -78,10 +71,7 @@ Wu.Style = Wu.Class.extend({
 		phantom.rel = 'stylesheet';
 		phantom.href = app.options.servers.portal + 'css/phantomJSthumb.css';
 		this._styletag.appendChild(phantom);
-
 	},
-
-
 
 });
 

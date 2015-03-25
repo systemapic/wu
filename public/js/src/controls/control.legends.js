@@ -183,10 +183,14 @@ L.Control.Legends = Wu.Control.extend({
 	},
 
 	show : function () {
+		if (!this._container) return;
+
 		if (this._isActive()) this._show();
 	},
 
 	hide : function () {
+		if (!this._container) return;
+		
 		this._hide();
 	},
 

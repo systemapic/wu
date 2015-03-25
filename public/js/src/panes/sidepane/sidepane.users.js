@@ -418,11 +418,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		context.refreshTable();
 
 		// GA – New User ID
-		ga('set', 'dimension10', store.uuid);
+		// ga('set', 'dimension10', store.uuid);
 
 		// GA – New User Name
-		var newUserName = user.getFullName();
-		ga('set', 'dimension11', newUserName);
+		// var newUserName = user.getFullName();
+		// ga('set', 'dimension11', newUserName);
 
 	},
 
@@ -462,8 +462,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		user.deleteUser(this, 'deletedUser');
 
 		// GA – Deleted Username
-		var _delUsrName = user.getFullName();
-		ga('set', 'dimension12', _delUsrName);	 	// todo	
+		// var _delUsrName = user.getFullName();
+		// ga('set', 'dimension12', _delUsrName);	 	// todo	
 		
 	},
 

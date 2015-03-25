@@ -29,7 +29,7 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 
 	update : function () {
 		// set active project
-		this.project = Wu.app.activeProject;
+		this.project = app.activeProject;
 
 	},
 

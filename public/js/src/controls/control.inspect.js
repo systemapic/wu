@@ -110,6 +110,8 @@ L.Control.Inspect = Wu.Control.extend({
 	},
 
 	hide : function () {
+		if (!this._container) return;
+
 		this._hide();
 	},
 

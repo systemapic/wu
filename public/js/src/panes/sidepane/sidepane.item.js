@@ -8,13 +8,6 @@ Wu.SidePane.Item = Wu.Pane.extend({
 		// this.render();
 	},
 
-	// render : function () {
-	// 	// this.initContainer();  // will be lower-most function first, if available (ie. 'this' is context from where fn was run)
-	// 	this.initContent();
-	// 	this.addHooks();
-	// 	this.disable();
-	// },
-
 	_initContainer : function () {
 
 		// menu
@@ -134,7 +127,6 @@ Wu.SidePane.Item = Wu.Pane.extend({
 
 	
 	activate : function (e) {
-		console.log('activetae!!!!!!!!');
 
 		// set active menu
 		var prev = Wu.app._activeMenu || false;

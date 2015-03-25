@@ -28,10 +28,8 @@ Wu.SidePane.Options = Wu.SidePane.Item.extend({
 		this.settings.connect   = new Wu.SidePane.Options.Connect(this._settingsContainer);  // refactor container, ich.template
 		this.settings.settings  = new Wu.SidePane.Options.Settings(this._settingsContainer);  // refactor container, ich.template
 
-
 		// add tooltip
 		app.Tooltip.add(this._menu, '(Editors only) In this section you will find all the options for setting up a map.');
-
 	},
 
 
@@ -263,13 +261,11 @@ Wu.SidePane.Options = Wu.SidePane.Item.extend({
 	},
 
 	closeAll : function () {
-		// console.log('closeAll');
 
 		// close all options folders
 		var options = app.SidePane.Options.settings;
 		for (o in options) {
 			var option = options[o];
-			// console.log('option: ', option);
 			if (option._isOpen) option.close();
 		}
 

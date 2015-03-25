@@ -67,7 +67,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	_on : function () {
-		console.log('layermenuControl on!@');
 		this._refresh();
 		this._addAlreadyActive();
 	},
@@ -192,6 +191,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		
 		var active = app.MapPane.getActiveLayers();
 		var enabled = _.filter(this.layers, function (item) {
+			console.log('item: ', item);
+			if (!item.layer) return false;
 			var uuid = item.layer.getUuid();
 			var ison = _.find(active, function (a) {
 				return a.getUuid() == uuid;
@@ -220,6 +221,8 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	hide : function () {
+		if (!this._container) return;
+
 		this._hide();
 	},
 
@@ -882,7 +885,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		if (!layer) return this.toggleFolder(layerItem); 
 			
 		// add layer to map
-		console.log('layermenu enblaelay', layer);
 		layer.add();
 		layerItem.on = true;
 

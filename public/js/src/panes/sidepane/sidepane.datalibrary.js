@@ -121,7 +121,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.addHooks();
 	},
 
-
 	_setHooks : function (on) {
 
 		// delete button
@@ -661,11 +660,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		}, this);
 
 		// refresh sidepane
-		this.project.refreshSidepane();
+		app.SidePane.refreshMenu();
 
 		// refresh cartoCssControl
 		var ccss = app.MapPane.getControls().cartocss;
-		if (ccss) ccss.update();
+		if (ccss) ccss._refresh();
 
 		// refresh
 		this.reset();
@@ -1129,6 +1128,19 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// refresh cartoCssControl
 		var cartoCss = app.MapPane.getControls().cartocss;
 		if (cartoCss) cartoCss._refresh();
+
+		// hide stuff for non-editors
+		this._checkEditMode();
+	},
+
+	_checkEditMode : function () {
+		var canUpload = app.access.to.upload_file(this.project),
+		    canDelete = app.access.to.delete_file(this.project),
+		    canDownload = app.access.to.download_file(this.project);
+
+		this._uploader.style.display = canUpload ? 'inline-block' : 'none';
+		this._deleter.style.display = canDelete ? 'inline-block' : 'none';
+		this._downloader.style.display = canDownload ? 'inline-block' : 'none';
 	},
 
 	refreshHooks : function () {
