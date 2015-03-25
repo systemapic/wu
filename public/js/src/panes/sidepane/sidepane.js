@@ -1,6 +1,6 @@
-Wu.SidePane = Wu.Class.extend({
-	_ : 'sidepane', 
+Wu.SidePane = Wu.Pane.extend({
 
+	_ : 'sidepane', 
 
 	_allPanes : [
 		'Clients', 
@@ -12,23 +12,15 @@ Wu.SidePane = Wu.Class.extend({
 		'Account'
 	],
 
-
-	initialize : function (options) {
+	_initialize : function (options) {
 		this.options = options || app.options;
 
 		// panes
 		this._panes = [];
 
-		// render
-		this.initContainer();
-		this.initContent();
-		this.render();     
-		
-		return this;   
 	},
-
 	
-	initContainer: function () {
+	_initContainer: function () {
 
 		// create container
 		var className = 'q-editor-container';
@@ -40,28 +32,7 @@ Wu.SidePane = Wu.Class.extend({
 
 		// Mobile option ~ Back button when entering documents/datalibrary/users fullscreen
 		if (app.mobile) this._initMobileContainer();
-	},
 
-
-	_initMobileContainer : function () {
-		this._mobileFullScreenCloser = Wu.DomUtil.create('div', 'q-editor-fullscreen-mobile-close displayNone', this._container);
-		Wu.DomEvent.on(this._mobileFullScreenCloser, 'mousedown', this.closeMobileFullscreen, this);
-	},
-
-
-	closeMobileFullscreen : function () {
-		if (app.SidePane.fullscreen) {
-			Wu.app._editorMenuPane.style.opacity = 1; // .q-editor-content
-			Wu.DomUtil.addClass(app.SidePane._mobileFullScreenCloser, 'displayNone'); // Hide back button
-			Wu.DomUtil.removeClass(app._mapPane, "map-blur"); // remove map blurring
-			Wu.DomUtil.removeClass(Wu.app._active, 'show'); // Hide current active fullpane
-			app.SidePane.fullscreen = false;
-		}
-	},
-
-
-	initContent : function () {
-		
 		// menu pane
 		var className = 'q-editor-menu';
 		Wu.app._editorMenuPane = Wu.DomUtil.create('menu', className, this._container); 
@@ -73,9 +44,31 @@ Wu.SidePane = Wu.Class.extend({
 		// menuslider
 		app._menuSlider = Wu.DomUtil.createId('div', 'menuslider', Wu.app._editorMenuPane);
 		app._menuSliderArrow = Wu.DomUtil.createId('div', 'menuslider-arrow', Wu.app._menuSlider);	// refactor app
+
+		// init content
+		// this.initContent();
+		this.render();    
 	},
 
-	
+	_refresh : function () {
+		this.refreshMenu();
+	},
+
+	_initMobileContainer : function () {
+		this._mobileFullScreenCloser = Wu.DomUtil.create('div', 'q-editor-fullscreen-mobile-close displayNone', this._container);
+		Wu.DomEvent.on(this._mobileFullScreenCloser, 'mousedown', this.closeMobileFullscreen, this);
+	},
+
+	closeMobileFullscreen : function () {
+		if (app.SidePane.fullscreen) {
+			Wu.app._editorMenuPane.style.opacity = 1; // .q-editor-content
+			Wu.DomUtil.addClass(app.SidePane._mobileFullScreenCloser, 'displayNone'); // Hide back button
+			Wu.DomUtil.removeClass(app._mapPane, "map-blur"); // remove map blurring
+			Wu.DomUtil.removeClass(Wu.app._active, 'show'); // Hide current active fullpane
+			app.SidePane.fullscreen = false;
+		}
+	},
+
 	render : function () {
 		var pane = this.options.panes;
 
@@ -92,7 +85,6 @@ Wu.SidePane = Wu.Class.extend({
 		this.refreshMenu();
 	},
 
-
 	calculateHeight : function () {
 
 		// set height
@@ -103,7 +95,6 @@ Wu.SidePane = Wu.Class.extend({
 	setHeight : function (height) {
 		this._container.style.height = height + 'px';
 	},
-
 
 	collapse : function () {
 		
@@ -158,13 +149,6 @@ Wu.SidePane = Wu.Class.extend({
 		if (this.DataLibrary) 	this.DataLibrary.updateContent(project);
 	},
 
-
-	// display the relevant panes
-	refresh : function (panes) {
-		this.refreshMenu();
-	},
-	
-
 	refreshMenu : function () {
 		
 		// set correct state
@@ -173,7 +157,6 @@ Wu.SidePane = Wu.Class.extend({
 		// render update
 		this._renderPanes();
 	},
-
 
 	_renderPanes : function () {
 
@@ -200,7 +183,7 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 	_defaultPanes : function () {
-
+		console.log('_defaultPanes');
 		// if no active project,
 		var panes = ['Clients'];
 
@@ -219,6 +202,8 @@ Wu.SidePane = Wu.Class.extend({
 	// set this._panes to current state
 	_updatePanes : function () {
 		var project = app.activeProject;
+
+		console.log('_updatePanes', project);
 
 		// if no project, return defaults only
 		if (!project) return this._defaultPanes();
@@ -245,9 +230,9 @@ Wu.SidePane = Wu.Class.extend({
 	},
 
 
-	_refresh : function () {
-		this.refreshMenu();
-	},
+	// _refresh : function () {
+	// 	this.refreshMenu();
+	// },
 	
 
 	// close sidepane

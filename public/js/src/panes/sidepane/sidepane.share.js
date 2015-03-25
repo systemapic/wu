@@ -5,10 +5,13 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	title : 'Share',
 
 
-	initContent : function () {
-
+	// initContent : function () {
+	_initContent : function () {
 		// create layout
 		this.initLayout();
+
+		// add hooks
+		this.addHooks();
 	},
 
 
@@ -89,23 +92,18 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 			// create image container
 			this._createImageView();
 
-			console.log('mmm');
 			// get snapshot from server
 			Wu.send('/api/util/snapshot', hash, function (a, b) {
-				console.log('cb!!');
 				this.createdImage(a, b);
 			}.bind(this), this);
-			console.log('mmm');
 
 		}.bind(this));
 
 		// set progress bar for a 5sec run
-		app.ProgressBar.timedProgress(2000);
-
+		app.ProgressBar.timedProgress(5000);
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Side Pane', 'Share: create image']);
-
 		
 	},
 
@@ -310,8 +308,12 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	},
 
 	_activate : function () {
+
 		// widen container from 350px to 100%
 		app.SidePane.widenContainer();
+
+		// hide controls
+		this._hideControls();
 
 	},
 
@@ -319,6 +321,17 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 
 		// reset expands
 		this._resetExpands();
+
+		// show controls
+		this._showControls();
+	},
+
+	_hideControls : function () {
+		app.Controller.hideControls();
+	},
+
+	_showControls : function () {
+		app.Controller.showControls();
 	},
 
 	enableSocial : function () {

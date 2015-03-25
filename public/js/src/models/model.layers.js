@@ -3,9 +3,7 @@ Wu.Layer = Wu.Class.extend({
 	type : 'layer',
 
 	options : {
-
 		hoverTooltip : true,	// hover instead of click
-
 	},
 
 	initialize : function (layer) {
@@ -16,14 +14,6 @@ Wu.Layer = Wu.Class.extend({
 		// data not loaded
 		this.loaded = false;
 
-		// create leaflet layers
-		this.initLayer();
-		// console.log('init layer: ', this.getTitle());
-
-		this.addHooks();
-
-		// get zIndex control
-		this._zx = app.MapPane.getZIndexControls();
 	},
 
 	addHooks : function () {
@@ -40,25 +30,12 @@ Wu.Layer = Wu.Class.extend({
 		// all visible tiles loaded event (for phantomJS)
 		Wu.DomEvent[on](this.layer, 'load', this._onLayerLoaded, this);
 		Wu.DomEvent[on](this.layer, 'loading', this._onLayerLoading, this);
-
-		Wu.Mixin.Events[on]('projectSelected', this._unload, this);
-
 	},
 
 	
 	_unload : function (e) {
-		// console.log('layer unload: ', this.getTitle(), e);
-		
-		// delete lal
+		// delete 
 		this.removeHooks();
-		// this.layer = null;
-		// delete this.layer;
-		// _.each(this, function (t) {
-			// this[t] = null;
-			// delete this[t];
-		// }, this);
-		// delete this;
-		// console.log(this);
 	},
 
 	_onLayerLoaded : function () {
@@ -72,39 +49,46 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	initLayer : function () {
+
 		// create Leaflet layer, load data if necessary
+		this._inited = true;
+		
+		// add hooks
+		this.addHooks();
 	},
 
 	add : function (type) {
 		if (type == 'baselayer') this._isBase = true;
+		
 		this.addTo();
 	},
 
 	addTo : function () {
-		
+		if (!this._inited) this.initLayer();
+
 		// add to map
 		this._addTo();
 		
 		// add to controls
 		this.addToControls();
-
 	},
 
 	_addTo : function (type) {
+		if (!this._inited) this.initLayer();
+
 		var map = app._map;
 
 		// leaflet fn
-		this.layer.addTo(map);
-
-		// add to active layers
-		app.MapPane.addActiveLayer(this);	// includes baselayers
+		map.addLayer(this.layer);
 
 		// add gridLayer if available
 		if (this.gridLayer) map.addLayer(this.gridLayer);
 
+		// add to active layers
+		app.MapPane.addActiveLayer(this);	// includes baselayers
+
 		// update zindex
 		this._addToZIndex(type);
-
 	},
 
 	addToControls : function () {
@@ -119,21 +103,21 @@ Wu.Layer = Wu.Class.extend({
 	_addToLayermenu : function () {
 
 		// activate in layermenu
-		var layerMenu = app.MapPane.layerMenu;
+		var layerMenu = app.MapPane.getControls().layermenu;
 		layerMenu && layerMenu._enableLayer(this.getUuid());
 	},
 
 	_addToLegends : function () {
 
 		// add legends if active
-		var legendsControl = app.MapPane.legendsControl;
+		var legendsControl = app.MapPane.getControls().legends;
 		legendsControl && legendsControl.addLegend(this);
 	},
 
 	_addToInspect : function () {
 
 		// add to inspectControl if available
-		var inspectControl = app.MapPane.inspectControl;		
+		var inspectControl = app.MapPane.getControls().inspect;		
 		if (inspectControl) inspectControl.addLayer(this);
 
 	},
@@ -141,13 +125,12 @@ Wu.Layer = Wu.Class.extend({
 	_addToDescription : function () {
 
 		// add to descriptionControl if available
-		var descriptionControl = app.MapPane.descriptionControl;
+		var descriptionControl = app.MapPane.getControls().description;
 		if (!descriptionControl) return;
 
 		descriptionControl.setLayer(this);
 
 		// hide if empty and not editor
-		// var isEditor = app.Account.isSuperadmin() || app.Account.canUpdateProject(app.activeProject.getUuid());
 		var isEditor = app.access.to.edit_project(app.activeProject);
 		if (this.store.description || isEditor) { // todo: what if only editor 
 			descriptionControl.show();
@@ -163,40 +146,47 @@ Wu.Layer = Wu.Class.extend({
 
 	_addToZIndex : function (type) {
 		if (type == 'baselayer') this._isBase = true;
-		var zx = this._zx;
+		var zx = this._zx || this._getZX();
 		this._isBase ? zx.b.add(this) : zx.l.add(this); // either base or layermenu
 	},
 
 	_removeFromZIndex : function () {
-		var zx = this._zx;
+		var zx = this._zx || this._getZX();
 		this._isBase ? zx.b.remove(this) : zx.l.remove(this);
+	},
+
+	_getZX : function () {
+		return app.MapPane.getZIndexControls();
 	},
 
 	remove : function (map) {
 		var map = map || app._map;
 
 		// leaflet fn
-		map.removeLayer(this.layer);
+		if (map.hasLayer(this.layer)) map.removeLayer(this.layer);
 
 		// remove from active layers
 		app.MapPane.removeActiveLayer(this);	
 
 		// remove gridLayer if available
-		if (this.gridLayer) map.removeLayer(this.gridLayer); 
+		if (this.gridLayer) {
+			this.gridLayer._flush();
+			if (map.hasLayer(this.gridLayer)) map.removeLayer(this.gridLayer); 
+		}
 
 		// remove from zIndex
 		this._removeFromZIndex();
 
 		// remove from inspectControl if available
-		var inspectControl = app.MapPane.inspectControl;			// refactor to events
+		var inspectControl = app.MapPane.getControls().inspect;			// refactor to events
 		if (inspectControl) inspectControl.removeLayer(this);
 
 		// remove from legendsControl if available
-		var legendsControl = app.MapPane.legendsControl;
+		var legendsControl = app.MapPane.getControls().legends;
 		if (legendsControl) legendsControl.removeLegend(this);
 
 		// remove from descriptionControl if avaialbe
-		var descriptionControl = app.MapPane.descriptionControl;
+		var descriptionControl = app.MapPane.getControls().description;
 		if (descriptionControl) {
 			descriptionControl.removeLayer(this);
 			descriptionControl._container.style.display = 'none'; // (j)		// refactor to descriptionControl
@@ -237,6 +227,10 @@ Wu.Layer = Wu.Class.extend({
 		this.save('title');
 	},
 
+	getDescription : function () {
+		return this.store.description;
+	},
+
 	getUuid : function () {
 		return this.store.uuid;
 	},
@@ -268,8 +262,6 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	getCartoCSS : function (cartoid, callback) {
-
-		console.log('getCartoCSS', cartoid);
 
 		var json = {
 			cartoid : cartoid
@@ -452,6 +444,17 @@ Wu.Layer = Wu.Class.extend({
 
 	},
 
+	_flush : function () {
+
+		this.remove();
+		app.MapPane._clearPopup();
+		this._removeGridEvents();
+		this.layer = null;
+		this.gridLayer = null;
+		this._inited = false;
+
+	},
+
 });
 
 
@@ -467,13 +470,16 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 	initLayer : function () {
 		this.update();
+		this.addHooks();
+
+		this._inited = true;
 	},
 
 	update : function () {
 		var map = app._map;
 
 		// remove
-		if (this.layer) this.remove();
+		if (this.layer) this._flush();
 
 		this._fileUuid = this.store.file;
 		this._defaultCartoid = 'cartoid';
@@ -493,7 +499,6 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
 		    tileServer 	= app.options.servers.tiles.uri,
 		    subdomains  = app.options.servers.tiles.subdomains,
-		    // token 	= app.accessToken,
 		    token 	= '?token=' + app.Account.getToken(),
 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
@@ -503,10 +508,6 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			cartoid : cartoid,
 			subdomains : subdomains,
 			maxRequests : 0,
-			// reuseTiles : true,
-			// unloadInvisibleTiles : false,
-			// updateWhenIdle : true,
-			
 		});
 	},
 
@@ -556,12 +557,11 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 
-
 	update : function () {
 		var map = app._map;
 
 		// remove
-		if (this.layer) this.remove();
+		if (this.layer) this._flush();
 
 		// id of data 
 		this._fileUuid = 'osm';
@@ -582,7 +582,6 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
 		    tileServer 	= app.options.servers.osm.uri,
 		    subdomains  = app.options.servers.osm.subdomains,
-		    // token 	= app.accessToken,
 		    token 	= '?token=' + app.Account.getToken(),
 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
@@ -602,7 +601,6 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		    cartoid 	= this.store.data.cartoid || 'cartoid',
 		    gridServer 	= app.options.servers.osm.uri,
 		    subdomains  = app.options.servers.osm.subdomains,
-		    // token 	= app.accessToken,
 		    token 	= '?token=' + app.Account.getToken(),
 		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
 		
@@ -667,20 +665,18 @@ Wu.MapboxLayer = Wu.Layer.extend({
 	
 	initLayer : function () {
 
-		// create Leaflet.mapbox tileLayer
-		this.layer = L.mapbox.tileLayer(this.store.data.mapbox, {
+		var url = 'https://{s}.tiles.mapbox.com/v4/{mapboxUri}/{z}/{x}/{y}.png?access_token={accessToken}';
+
+		this.layer = L.tileLayer(url, {
 			accessToken : this.store.accessToken,
-			// reuseTiles : true,
-			// tileSize : 512,
-			// unloadInvisibleTiles : true,
-			// updateWhenIdle : true,
+			mapboxUri : this.store.data.mapbox,
 		});
 
-		// create gridLayer if available
-		if ('grids' in this.store) this.gridLayer = L.mapbox.gridLayer(this.store.data.mapbox);
-
-		// mark as loaded
+		// todo: add gridlayer to mapbox.. but why..?
+		// add hooks
+		this.addHooks();
 		this.loaded = true;
+		this._inited = true;
 	},
 });
 

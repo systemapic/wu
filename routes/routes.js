@@ -58,6 +58,21 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
+	// ANALYTICS ===================
+	// =====================================
+	app.post('/api/analytics/set', isLoggedIn, function (req,res) {
+		api.analytics.set(req, res);
+	});
+
+	// =====================================
+	// ANALYTICS ===================
+	// =====================================
+	app.post('/api/analytics/get', isLoggedIn, function (req,res) {
+		api.analytics.get(req, res);
+	});
+
+
+	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
 	app.post('/api/project/new', isLoggedIn, function (req,res) {
@@ -444,6 +459,15 @@ module.exports = function(app, passport) {
 	// app.post('/api/debug/createRole', isLoggedIn, function (req, res) {
 	// 	api.debug.createRole(req, res);
 	// });
+
+	// =====================================
+	// DEBUG: PHANTOMJS FEEDBACK ===========
+	// ===================================== 
+	app.post('/api/debug/phantom', isLoggedIn, function (req, res) {
+		console.log('/api/debug/phantom');
+		console.log(req.body);
+		res.end();
+	});
 
 
 	// =====================================

@@ -4,14 +4,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	type : 'clients',
 	title : 'Projects',
 
-	initialize : function () {
-		Wu.SidePane.Item.prototype.initialize.call(this)
 
-		// active by default
-		this.activate();      
-	},
-
-	initContent : function () {
+	_initContent : function () {
 
 		this.clients = [];
 
@@ -37,6 +31,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		// add tooltip
 		app.Tooltip.add(this._menu, 'Here is a list of clients and projects you have access to.');
 
+		this.activate();
 
 	},
 
@@ -90,7 +85,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	remove : function () {
 		var client = this;
 		var text = 'Are you sure you want to DELETE the client ' + client.name + '?';
-		var text2 = 'Are you REALLY sure you want to DELETE the client ' + client.name + '? This CANNOT be undone!';
+		var text2 = 'Are you REALLY sure you want to DELETE the client ' + client.name + '? This CAN NOT be undone!';
 		if (confirm(text)) {
 			if (confirm(text2)) {
 				client._delete();  
@@ -103,8 +98,6 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	newClient : function () {
-
-		console.log('newClient!', this._creatingNewClient);
 
 		if ( this._creatingNewClient ) return;
 
@@ -157,7 +150,6 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		this._newClient._cancelButton		= 	Wu.DomUtil.create('div', 'smap-button-white small cancel-new-client', this._newClient._innerWrapper, 'Cancel');
 
 
-
 		// move new button to last
 		Wu.DomUtil.remove(this._newClientButton);
 		this._clientsContainer.appendChild(this._newClientButton);
@@ -177,10 +169,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		var name = this._newClient._NameInput;
 		this._addHook(name, 'keyup', this._checkSlug, this);
 
-
 		// Google Analytics event trackign
 		app.Analytics.ga(['Side Pane', 'Clients: New client']);
-
 
 	},
 
@@ -219,22 +209,22 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	_disableConfirm : function () {
-		// var target = Wu.DomUtil.get('editor-client-confirm-button');           // TODO: real block of button
 		var target = this._newClient._confirmButton;
 		target.style.backgroundColor = 'red';
 		console.log('Client name is not unique.')
+
+		this._clientUnique = false;
 	},
 
 	_enableConfirm : function () {
-		// var target = Wu.DomUtil.get('editor-client-confirm-button');
 		var target = this._newClient._confirmButton;
 		target.style.backgroundColor = '';
-		// console.log('Client name OK.');
+
+		this._clientUnique = true;
 	},
 
 	_cancel : function () {
 		// remove edit box
-		// var old = Wu.DomUtil.get('editor-clients-container-new').parentNode;
 		var old = this._newClient._wrapper;
 
 		Wu.DomUtil.remove(old);
@@ -244,6 +234,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 	},
 
 	_confirm : function () {
+		if (!this._clientUnique) return;
 
 		// get client vars
 		var clientName = this._newClient._NameInput.value;
@@ -262,15 +253,18 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 
 	_created : function(client, json) {       // this is the http callback    
 
-		console.log('new client, callback: ', client, json);
-
 		var sidepaneClients = Wu.app.SidePane.Clients;
 		var options = JSON.parse(json);
 	       
+		console.log('options: ', options);
+
 		if (options.error) {
-			console.log('error creating client.', options.error);
 			// remove old box
 			sidepaneClients._cancel();
+			app.feedback.setError({
+				title : 'Client not created.', 
+				description : options.error
+			});
 			return;
 		} 
 

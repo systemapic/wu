@@ -1,23 +1,22 @@
-Wu.SidePane.Item = Wu.Class.extend({
+Wu.SidePane.Item = Wu.Pane.extend({
         _wu : 'sidepane.item', 
 	
 	type : 'item',
 
-	initialize : function () {
+	_initialize : function () {
 		Wu.setOptions(this, Wu.app.options);
-		this.render();
+		// this.render();
 	},
 
-	render : function () {
-		this.initContainer();  // will be lower-most function first, if available (ie. 'this' is context from where fn was run)
-		this.initContent();
-		this.addHooks();
-		this.disable();
-	},
+	// render : function () {
+	// 	// this.initContainer();  // will be lower-most function first, if available (ie. 'this' is context from where fn was run)
+	// 	this.initContent();
+	// 	this.addHooks();
+	// 	this.disable();
+	// },
 
+	_initContainer : function () {
 
-	initContainer : function () {
-		
 		// menu
 		var className = 'q-editor-menu-item ' + this.type;
 		this._menu = Wu.DomUtil.create('div', className, Wu.app._editorMenuPane);
@@ -33,9 +32,18 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 		// wrapper 
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._scrollWrapper);
+
+		// init item specific content
+		this._initContent();
+
+		// add hooks
+		this.addHooks();
+
+		// default
+		this.disable();
 	},
 
-	initContent : function () {
+	_initContent : function () {
 
 	},
 
@@ -126,7 +134,7 @@ Wu.SidePane.Item = Wu.Class.extend({
 
 	
 	activate : function (e) {
-
+		console.log('activetae!!!!!!!!');
 
 		// set active menu
 		var prev = Wu.app._activeMenu || false;

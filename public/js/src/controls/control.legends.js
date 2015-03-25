@@ -1,6 +1,6 @@
-// app.MapPane.legendsControl
+L.Control.Legends = Wu.Control.extend({
 
-L.Control.Legends = L.Control.extend({
+	type : 'legends',
 	
 	options: {
 		position : 'bottomleft' 
@@ -10,7 +10,6 @@ L.Control.Legends = L.Control.extend({
 
 	// automatically run when legends is added to map 
 	onAdd : function (map) {
-
 		var className = 'leaflet-control-legends',
 		    container = L.DomUtil.create('div', className),
 		    options = this.options;
@@ -39,7 +38,9 @@ L.Control.Legends = L.Control.extend({
 
 		// #legends-inner-slider
 		this._legendsInnerSlider = Wu.DomUtil.create('div', 'legends-inner-slider', this._legendsInner);
-			
+
+		// add tooltip
+		app.Tooltip.add(this._legendsInner, 'Shows legends of active layers', { extends : 'systyle', tipJoint : 'top right'});
 
 		return container;
 
@@ -66,6 +67,98 @@ L.Control.Legends = L.Control.extend({
 	
 	},
 
+	_addTo : function () {
+		this.addTo(app._map);
+		this.addHooks();
+		this._initContent();
+		this._added = true;
+	},
+
+
+	_flush : function () {
+		this._legendsInnerSlider.innerHTML = '';
+	},
+
+	_refresh : function () {
+
+		// should be active
+		if (!this._added) this._addTo();
+
+		// get control active setting from project
+		var active = this._project.getControls()[this.type];
+		
+		// if not active in project, hide
+		if (!active) return this._hide();
+
+		// remove old content
+		this._flush();
+
+		// add new content
+		// this._initContent();
+
+		// add already active layers
+		// this.refreshLegends();
+
+		// show
+		this._show();
+	},
+
+	_on : function () {
+		this._refresh();
+		this._addAlreadyActive();
+	},
+	_off : function () {
+		this._hide();
+	},
+
+	_addAlreadyActive : function () {
+		this.refreshLegends();
+	},
+
+	// _initContent : function () {
+
+	// },
+
+	// // is called when changing/selecting project
+	// update : function (project) {
+	       
+	// 	// project is ready only here, so init relevant vars
+	// 	// update is called from enableLayermenu toggle in MapPane
+
+	// 	// get vars
+	// 	this.project = project || Wu.app._activeProject;
+	// 	this._content = this._legendsContainer;
+
+	// 	// init divs
+	// 	this.initContainer();		
+
+	// 	this.calculateHeight();
+
+	// },
+
+	_initContent : function () {
+	
+		
+
+		this.legends = {};
+		this._layers = [];
+
+		// ADDED BY JØLLE
+		this.legendsCounter = []; 
+		this.sliderWidth = 0;
+		this.sliderOffset = 0;
+
+		// If mobile: start with closed legends pane
+		if (app.mobile) {
+			this._content.style.left = Wu.app.nativeResolution[1] + 'px';
+			this._setClosed();
+
+			// Mobile arrow	
+		    	Wu.DomUtil.create('div', 'legends-mobile-arrow', this._content);
+		}
+	},
+
+
 	checkWidth : function() {
 
 		// Check window width
@@ -74,16 +167,27 @@ L.Control.Legends = L.Control.extend({
 		// Set max width of legends
 		this.setMaxWidth(legendsMaxWidth)
 
-	},	
+	},
+
+	_isActive : function () {
+		if (!this._project) return false;
+		return this._project.getControls()[this.type];
+	},
+
+	_show : function () {
+		this._container.style.display = 'block';
+	},
+
+	_hide : function () {
+		this._container.style.display = 'none';
+	},
 
 	show : function () {
-
-		Wu.DomUtil.removeClass(this._container, 'displayNone');
+		if (this._isActive()) this._show();
 	},
 
 	hide : function () {
-
-		Wu.DomUtil.addClass(this._container, 'displayNone');
+		this._hide();
 	},
 
 	// Runs on window resize (from app.js)
@@ -100,8 +204,8 @@ L.Control.Legends = L.Control.extend({
 	setMaxWidth : function (legendsMaxWidth) {
 
 		// Check if the layer meny and end layer inspectors are there
-		var inspectControl = app.MapPane.inspectControl;
-		var layermenuControl = app.MapPane.layerMenu;
+		var inspectControl = app.MapPane.getControls().inspect;
+		var layermenuControl = app.MapPane.getControls().layermenu;
 
 		legendsMaxWidth -= 20;
 
@@ -130,8 +234,6 @@ L.Control.Legends = L.Control.extend({
 		this._legendsScrollRight.style.display = 'none';
 	},
 
-
-
 	// Needed for Mobile phones
 	toggleOpen : function(e) {
 
@@ -157,14 +259,15 @@ L.Control.Legends = L.Control.extend({
 	mobileOpenLegends : function(e) {
 
 		// Close layer menu if it's open
-		if (app.MapPane.layerMenu._open) app.MapPane.layerMenu.closeLayerPane();
-		if (!app.MapPane.descriptionControl._isClosed) app.MapPane.descriptionControl.mobileClosePane();
+		var descriptionControl = app.MapPane.getControls().description;
+		var layermenuControl = app.MapPane.getControls().layermenu;
+		if (layermenuControl._open) layermenuControl.closeLayerPane();
+		if (!descriptionControl._isClosed) descriptionControl.mobileClosePane();
 
 		Wu.DomUtil.addClass(this._legendsOpener, 'legends-open');
 		this._content.style.left = '0px';
 		this._setOpen();
 	},
-
 
 	closeLegends : function () {
 
@@ -184,16 +287,11 @@ L.Control.Legends = L.Control.extend({
 
 		setTimeout(function() {
 			this._legendsCollapser.style.opacity = '0'; 
-			// this._openWidth = 0;
-			// this._openHeight = 0;
-			// this._legendsWidth = 0;
-			// this._legendsHeight = 0;
 		}.bind(this), 500);
 
 		this._setClosed();
 
 	},
-
 
 	openLegends : function (e) {
 
@@ -220,51 +318,6 @@ L.Control.Legends = L.Control.extend({
 
 	},
 
-	// is called when changing/selecting project
-	update : function (project) {
-	       
-		// project is ready only here, so init relevant vars
-		// update is called from enableLayermenu toggle in MapPane
-
-		// get vars
-		this.project = project || Wu.app._activeProject;
-		this._content = this._legendsContainer;
-
-		// init divs
-		this.initContainer();		
-
-		this.calculateHeight();
-
-	},
-
-	initContainer : function () {
-	
-		// add hooks
-		this.addHooks();
-
-		this.legends = {};
-		this._layers = [];
-
-		// ADDED BY JØLLE
-		this.legendsCounter = []; 
-		this.sliderWidth = 0;
-		this.sliderOffset = 0;
-
-		// add tooltip
-		app.Tooltip.add(this._legendsInner, 'Shows legends of active layers', { extends : 'systyle', tipJoint : 'top right'});
-
-		// If mobile: start with closed legends pane
-		if (app.mobile) {
-			this._content.style.left = Wu.app.nativeResolution[1] + 'px';
-			this._setClosed();
-
-			// Mobile arrow	
-		    	Wu.DomUtil.create('div', 'legends-mobile-arrow', this._content);
-		}
-	},
-
-
-
 	// add legend from outside
 	addLegend : function (layer) {
 
@@ -275,7 +328,6 @@ L.Control.Legends = L.Control.extend({
 		this.refreshLegends();
 
 	},
-
 
 	removeLegend : function (layer) {
 
@@ -304,7 +356,10 @@ L.Control.Legends = L.Control.extend({
 
 	refreshLegends : function (layers) {
 
+		this.legends = null;
+		this.legends = {};
 
+		this.legendsCounter = null;
 		this.legendsCounter = [];
 		this.sliderWidth = 0;
 
@@ -355,7 +410,6 @@ L.Control.Legends = L.Control.extend({
 		return lm;
 	},
 
-
 	_addLegend : function (layer) {
 		var uuid = layer.store.uuid;
 		var legends = layer.getActiveLegends();
@@ -404,18 +458,16 @@ L.Control.Legends = L.Control.extend({
 
 		// create legends divs
 		var b = Wu.DomUtil.create('div', 'legend-header', div, headerTitle); // header
-		this._legendsList = Wu.DomUtil.create('div', 'legend-list', div);
+		var legendsList = Wu.DomUtil.create('div', 'legend-list', div);
 
 		// create legends
 		legends.forEach(function (legend) {
-
-			console.log('legend: ', legend);
 
 			// skip disabled legends
 			if (!legend.on) return;
 
 			// create legend divs
-			var d = Wu.DomUtil.create('div', 'legend-each', this._legendsList);
+			var d = Wu.DomUtil.create('div', 'legend-each', legendsList);
 			var e = Wu.DomUtil.create('div', 'legend-feature', d);
 			var f = Wu.DomUtil.create('img', 'legend-image1', e);
 			var g = Wu.DomUtil.create('img', 'legend-image2', e);
@@ -428,15 +480,11 @@ L.Control.Legends = L.Control.extend({
 
 
 		// mark open if not on Mobile
-		if ( !Wu.app.mobile ) this._setOpen();
+		if (!app.mobile) this._setOpen();
 
 		// see if we need the horizontal scrollers or not
 		this.checkWidth();
 		this.calculateHeight();
-
-		
-
-
 	},
 
 	_setOpen : function () {
@@ -464,16 +512,10 @@ L.Control.Legends = L.Control.extend({
 	},
 
 	_getLegendHeader : function (layer) {
-
 		var tip = layer.getTooltip();
-
 		if (!tip) return '';
-
 		return tip.title;
-
-
 	},
-
 
 	_adjustLegendSlider : function (legend) {
 
@@ -520,10 +562,9 @@ L.Control.Legends = L.Control.extend({
 
 			// Prevent double click
 			this.scrolling = true;
-			var that = this;
 			setTimeout(function () {
-				that.scrolling = false;
-			}, 500);
+				this.scrolling = false;
+			}.bind(this), 500);
 		}
 	},
 

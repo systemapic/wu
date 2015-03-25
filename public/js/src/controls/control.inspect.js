@@ -1,14 +1,13 @@
-// app.MapPane.inspectControl
-
-L.Control.Inspect = L.Control.extend({
+L.Control.Inspect = Wu.Control.extend({
 	
+	type : 'inspect',
+
 	options: {
 		position : 'bottomright',
 		draggable : true
 	},
 
 	onAdd : function (map) {
-
 		var className = 'leaflet-control-inspect ct14',
 		    container = L.DomUtil.create('div', className),
 		    options   = this.options;
@@ -22,13 +21,18 @@ L.Control.Inspect = L.Control.extend({
 		// add tooltip
 		app.Tooltip.add(container, 'Shows a list of active layers', { extends : 'systyle', tipJoint : 'top left'});
 
+		// get zindexControl
+		this._zx = app.MapPane.getZIndexControls().l; // layermenu zindex control 
+
+
+		this._added = true;
+
 		// content is not ready yet, cause not added to map! 
 		return container; 
 
 	},
 
 	addTo: function (map) {
-
 		this._map = map;
 
 		var container = this._container = this.onAdd(map),
@@ -45,39 +49,105 @@ L.Control.Inspect = L.Control.extend({
 		return this;
 	},
 
+	
+	_flush : function () {
+
+		this._list.innerHTML = '';
+		// console.errr();
+
+		this._layers = [];     
+
+	},
+
+	_refresh : function () {
+
+		// should be active
+		if (!this._added) this.addTo(app._map);
+
+		// get control active setting from project
+		var active = this._project.getControls()[this.type];
+		
+		// if not active in project, hide
+		if (!active) return this._hide();
+
+		// remove old content
+		this._flush();
+
+		// show
+		this._show();
+	},
+
+	// turned on and off by sidepane/options/controls toggle
+	_on : function () {
+
+		// refresh
+		this._refresh();
+
+		// add new content
+		this._initContent();
+
+	},
+	_off : function () {
+		this._hide();
+	},
+
+	_isActive : function () {
+		if (!this._project) return false;
+		return this._project.getControls()[this.type];
+	},
+
+	_show : function () {
+		this._container.style.display = 'block';
+	},
+
+	_hide : function () {
+		this._container.style.display = 'none';
+	},
+
 	show : function () {
-		Wu.DomUtil.removeClass(this._container, 'displayNone');
+		if (!this._container) return;
+		this._isActive() ? this._show() : this._hide();
 	},
 
 	hide : function () {
-		Wu.DomUtil.addClass(this._container, 'displayNone');
+		this._hide();
 	},
 
-	update : function (project) {
-		// on project refresh + added control
-
-		// get vars
-		this.project  = project || app.activeProject;
-		// this._content = Wu.DomUtil.get('inspect-control-inner-content'); 
-		// this._list    = Wu.DomUtil.get('inspector-list');
-
-		// reset layers
-		this.layers = [];           
-
-		// prevent scroll
-		this.disableScrollzoom();
-
-		// get zindexControl
-		this._zx = app.MapPane.getZIndexControls().l; // layermenu zindex control 
-
-	        // add active layers
+	_initContent : function () {
+		// add active layers
 	        this._addAlreadyActiveLayers();
 
+	        // disable scroll 
+	        this.disableScrollzoom();
 	},
+
+	// update : function (project) {
+	// 	// on project refresh + added control
+	// 	this._flush();
+
+	// 	// get vars
+	// 	this._project  = project || app.activeProject;
+	// 	// this._content = Wu.DomUtil.get('inspect-control-inner-content'); 
+	// 	// this._list    = Wu.DomUtil.get('inspector-list');
+
+	// 	// reset layers
+	// 	this._layers = [];           
+
+	// 	// prevent scroll
+	// 	this.disableScrollzoom();
+
+	// 	// get zindexControl
+	// 	this._zx = app.MapPane.getZIndexControls().l; // layermenu zindex control 
+
+	//         // add active layers
+	//         this._addAlreadyActiveLayers();
+
+	// },
 
 	_addAlreadyActiveLayers : function () {
 
 		var active = app.MapPane.getActiveLayers();
+
 		active.forEach(function (layer) {
 			// add layermenu layers
 			if (!layer._isBase) this.addLayer(layer);
@@ -93,7 +163,6 @@ L.Control.Inspect = L.Control.extend({
                 var map = app._map;
                 Wu.DomEvent.on(this._container, 'mouseenter', function () { map.scrollWheelZoom.disable(); }, this);
                 Wu.DomEvent.on(this._container, 'mouseleave', function () { map.scrollWheelZoom.enable();  }, this); 
- 		
 	},
 
 	resetScrollzoom : function () {
@@ -121,11 +190,12 @@ L.Control.Inspect = L.Control.extend({
 		var eye 	= Wu.DomUtil.create('div', 'inspect-eye', wrapper);
 		var kill 	= Wu.DomUtil.create('div', 'inspect-kill', wrapper);
 
-		// add tooltip
-		app.Tooltip.add(arrowsWrap, 'Arrange layer order', { extends : 'systyle', tipJoint : 'right', group : 'inspect-control'});
-		app.Tooltip.add(fly, 'Zoom to layer extent', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
-		app.Tooltip.add(eye, 'Isolate layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
-		app.Tooltip.add(kill, 'Disable layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
+		// // add tooltip 
+		// todo: this is MEMORY LEAK! must remove tooltip when removing this wrapper
+		// app.Tooltip.add(arrowsWrap, 'Arrange layer order', { extends : 'systyle', tipJoint : 'right', group : 'inspect-control'});
+		// app.Tooltip.add(fly, 'Zoom to layer extent', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
+		// app.Tooltip.add(eye, 'Isolate layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
+		// app.Tooltip.add(kill, 'Disable layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
 
 		// add to list
 		this._list.insertBefore(wrapper, this._list.firstChild);
@@ -144,7 +214,7 @@ L.Control.Inspect = L.Control.extend({
 		}
 
 		// add object to front of array
-		this.layers.unshift(entry);
+		this._layers.unshift(entry);
 
 		// add stops
 		Wu.DomEvent.on(upArrow,   'dblclick click', function (e) { Wu.DomEvent.stop(e); this.moveUp(entry);   	 }, this);
@@ -252,8 +322,7 @@ L.Control.Inspect = L.Control.extend({
 		this._md = 0;
 
 		// Google Analytics event tracking
-		var _layerName = layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);
 
 	},
 
@@ -276,51 +345,47 @@ L.Control.Inspect = L.Control.extend({
 		this._md = 0;
 
 		// Google Analytics event tracking
-		var _layerName = layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);
 
 	},
 
 
 	// remove by layer
 	removeLayer : function (layer) {
+		if (!this._layers || !layer) return;
 
 		// find entry in array
-		var entry = _.find(this.layers, function (l) { return l.uuid == layer.store.uuid; })
+		var entry = _.find(this._layers, function (l) { return l.uuid == layer.store.uuid; })
 
 		// remove
 		this._removeLayer(entry);
 
 		// Hide Layer inspector if it's empty
-		if ( this.layers.length == 0 ) this._content.style.display = 'none';
+		if (this._layers.length == 0) this._content.style.display = 'none';
 
 
 		// Google Analytics event tracking
-		var _layerName = layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Remove layer > ' + _layerName]);
+		app.Analytics.ga(['Controls', 'Inspect layers: Remove layer > ' + layer.getTitle()]);
 		
 
 	},
 
 	// remove by entry
 	_removeLayer : function (entry) {
-
-		if (!entry) return;
+		if (!this._layers || !entry) return;
 
 		// remove from DOM
 		Wu.DomUtil.remove(entry.wrapper);
 
 		// remove from array
-		_.remove(this.layers, function (l) { return l.uuid == entry.uuid; });
+		_.remove(this._layers, function (l) { return l.uuid == entry.uuid; });
 
 		// Hise Layer inspector if it's empty
-		if ( this.layers.length == 0 ) this._content.style.display = 'none';
-
+		if ( this._layers.length == 0 ) this._content.style.display = 'none';
 
 	},
 
 	moveUp : function (entry) {
-
 		var d = entry,
 		    div = d.wrapper,
 		    prev = div.previousSibling,
@@ -334,15 +399,11 @@ L.Control.Inspect = L.Control.extend({
 		// move up in zindex
 		this._zx.up(layer);
 
-
 		// Google Analytics event tracking
-		var _layerName = layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);		
-
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);		
 	},
 
 	moveDown : function (entry) {
-
 		var d = entry,
 		    div = d.wrapper,
 		    next = div.nextSibling,
@@ -357,9 +418,7 @@ L.Control.Inspect = L.Control.extend({
 		this._zx.down(layer);
 
 		// Google Analytics event tracking
-		var _layerName = layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);		
-		
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);		
 	},
 
 	
@@ -380,8 +439,7 @@ L.Control.Inspect = L.Control.extend({
 		map.fitBounds(bounds);
 
 		// Google Analytics event tracking
-		var _layerName = layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Fly to bounds for > ' + _layerName]);
+		app.Analytics.ga(['Controls', 'Inspect layers: Fly to bounds for > ' + layer.getTitle()]);
 
 	},
 
@@ -406,14 +464,12 @@ L.Control.Inspect = L.Control.extend({
 		}
 
 		// Google Analytics event tracking
-		var _layerName = entry.layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Toggle isolate > ' + _layerName]);	
+		app.Analytics.ga(['Controls', 'Inspect layers: Toggle isolate > ' + entry.layer.getTitle()]);	
 
 	},
 
 	_noneAreIsolated : function () {
-		
-		var any = _.filter(this.layers, function (entry) { return entry.isolated == true; });
+		var any = _.filter(this._layers, function (entry) { return entry.isolated == true; });
 		if (!any.length) return true;
 		return false;
 	},
@@ -422,14 +478,14 @@ L.Control.Inspect = L.Control.extend({
 
 		// check if all is isolated.false .. if so, dont hide but show all.
 		if (this._noneAreIsolated()) {
-			this.layers.forEach(function (n) {
+			this._layers.forEach(function (n) {
 				n.layer.show();
 			}, this);
 			return;
 		}
 
 		// else, isolate relevant layers
-		this.layers.forEach(function (n) {
+		this._layers.forEach(function (n) {
 			if (!n.isolated) {
 				n.layer.hide();
 			} else {
@@ -445,19 +501,19 @@ L.Control.Inspect = L.Control.extend({
 		this._removeLayer(entry);
 
 		// set inactive in layermenuControl
-		var layermenuControl = app.MapPane.layerMenu;
+		var layermenuControl = app.MapPane.getControls().layermenu;
 		if (layermenuControl) layermenuControl._disableLayer(entry.layer);
 
 		// remove from legendsControl if available
-		var legendsControl = app.MapPane.legendsControl;
+		var legendsControl = app.MapPane.getControls().legends;
 		if (legendsControl) legendsControl.removeLegend(entry.layer);
 
 		// remove from descriptionControl if avaialbe
-		var descriptionControl = app.MapPane.descriptionControl;
+		var descriptionControl = app.MapPane.getControls().description;
 		if (descriptionControl) descriptionControl.removeLayer(entry.layer);	
 
 		// Hise Layer inspector if it's empty
-		if (!this.layers.length) this._content.style.display = 'none';
+		if (!this._layers.length) this._content.style.display = 'none';
 
 	},
 
@@ -465,7 +521,7 @@ L.Control.Inspect = L.Control.extend({
 	select : function (entry) {
 
 		// set text in descriptionControl
-		var descriptionControl = app.MapPane.descriptionControl;
+		var descriptionControl = app.MapPane.getControls().description;
 		if (descriptionControl) descriptionControl.setLayer(entry.layer);
 
 		// set currently active entry
@@ -474,10 +530,6 @@ L.Control.Inspect = L.Control.extend({
 	},
 
 	getListPosition : function () {
-		console.log('getPosition');
-		console.log('index: ', this._zx.getIndex());
-		console.log('list: ', this._list);
-
 
 	},
 

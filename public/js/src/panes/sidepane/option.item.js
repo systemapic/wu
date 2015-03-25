@@ -1,4 +1,4 @@
-Wu.SidePane.Options.Item = Wu.SidePane.Options.extend({
+Wu.SidePane.Options.Item = Wu.Class.extend({
 	_ : 'sidepane.options.item',
 
 	type : 'options.item',

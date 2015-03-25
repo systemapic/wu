@@ -29,7 +29,7 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		Wu.SidePane.Options.Item.prototype.update.call(this)	// call update on prototype
 
 		// get layermenu object
-		this.layerMenu = Wu.app.MapPane.layerMenu;
+		this.layerMenu = app.MapPane.getControls().layermenu; // todo: remove probably
 
 		// options
 		this.editMode = false;
@@ -144,32 +144,39 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		if (this.editMode) this.maxHeight += 100;
 	},
 
-	enableLayermenu : function () {
-		var layerMenu = app.MapPane.enableLayermenu();
-		app.SidePane.Options.settings.controls.enableControl('layermenu');
+	// enableLayermenu : function () {
+	// 	var layerMenu = app.MapPane.enableLayermenu();
+	// 	app.SidePane.Options.settings.controls.enableControl('layermenu');
 		
-		// save changes to project
-		this.project.store.controls.layermenu = true;
-		this.project._update('controls');
+	// 	// save changes to project
+	// 	this.project.store.controls.layermenu = true;
+	// 	this.project._update('controls');
 		
-		return layerMenu;
-	},
+	// 	return layerMenu;
+	// },
 
 	toggle : function (layer) {
 		
 		// console.log('toggle --> ', layer);
 
 		// ensure layerMenu is active
-		this.layerMenu = Wu.app.MapPane.layerMenu;
+		// this.layerMenu = Wu.app.MapPane.layerMenu;
 		// this.layerMenu = this.layerMenu || Wu.app.MapPane.layerMenu;
-		if (!this.layerMenu) this.layerMenu = this.enableLayermenu();
-		this.layerMenu.enableEdit();
+		// if (!this.layerMenu) this.layerMenu = this.enableLayermenu();
+		// this.layerMenu.enableEdit();
+
+
 		
+		var layerMenu = app.MapPane.getControls().layermenu;
+
+		if (app.access.to.edit_project(this.project)) layerMenu.enableEdit();
+
+
 		if (layer.active) {
 			
 			// remove from layermenu
 			var uuid = layer.layer.store.uuid;
-			this.layerMenu._remove(uuid);
+			layerMenu._remove(uuid);
 
 			// set off
 			this.off(layer);
@@ -177,7 +184,7 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		} else {
 
 			// add to layermenu
-			this.layerMenu.add(layer.layer);
+			layerMenu.add(layer.layer);
 
 			// set on
 			this.on(layer);
@@ -188,8 +195,8 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		baselayerSetting.markOccupied()
 
 		// refresh cartoCssControl
-		var cartoCss = app.MapPane.cartoCss;
-		if (cartoCss) cartoCss.update()
+		var cartoCss = app.MapPane.getControls().cartocss;
+		if (cartoCss) cartoCss._refresh();
 	},
 
 	toggleEdit : function (layer) {
@@ -234,7 +241,7 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 
 	// enable edit mode on layermenu itself
 	enableEdit : function () {
-		var layerMenu = Wu.app.MapPane.layerMenu;
+		var layerMenu = app.MapPane.getControls().layermenu;
 		if (!layerMenu) return;
 
 		if (!layerMenu._open) layerMenu.toggleLayerPane();		
@@ -243,7 +250,7 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 	},
 
 	disableEdit : function () {
-		var layerMenu = Wu.app.MapPane.layerMenu;
+		var layerMenu = app.MapPane.getControls().layermenu;
 		if (layerMenu) layerMenu.disableEdit();
 	},
 
