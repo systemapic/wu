@@ -11,25 +11,19 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 
 		// create title and wrapper (and delete old content)
 		this._container.innerHTML = '<h4 id="h4-layer">Layer Menu</h4>';
-
-
 		this._inner  = Wu.DomUtil.create('div', 'map-layermenu-inner', this._container);
 		this._outer  = Wu.DomUtil.create('div', 'map-layermenu-outer', this._inner);
-		// var status   = 'Enable layer menu in Controls below.';
-		// this._status = Wu.DomUtil.create('div', 'layermenu-status', this._outer, status);
 
 		// add tooltip
 		var h4 = Wu.DomUtil.get('h4-layer');
-		// app.Tooltip.add(this._container, 'Sets layers that will appear in the layer menu. Selected base layers will be excluded from the Layer Menu list, and vice versa, to avoid duplicates.' );
 		app.Tooltip.add(h4, 'Sets layers that will appear in the layer menu. Selected base layers will be excluded from the Layer Menu list, and vice versa, to avoid duplicates.' );
-
 	},
 
 	update : function () {
 		Wu.SidePane.Options.Item.prototype.update.call(this)	// call update on prototype
 
 		// get layermenu object
-		this.layerMenu = app.MapPane.getControls().layermenu; // todo: remove probably
+		// this.layerMenu = app.MapPane.getControls().layermenu; // todo: remove probably
 
 		// options
 		this.editMode = false;
@@ -42,7 +36,6 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 
 		// mark deactivated layers
 		this.markOccupied();
-		
 	},
 
 	// add layers to layermenu list in sidepane
@@ -109,9 +102,6 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 			this.toggleEdit(layermenuLayer);
 
 		}, this);
-
-		
-
 	},
 
 	getLayerByUuid : function (layerUuid) {
@@ -131,7 +121,6 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		}
 
 		return false;
-		
 	},
 
 	calculateHeight : function () {
@@ -156,21 +145,10 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 	// },
 
 	toggle : function (layer) {
-		
-		// console.log('toggle --> ', layer);
-
-		// ensure layerMenu is active
-		// this.layerMenu = Wu.app.MapPane.layerMenu;
-		// this.layerMenu = this.layerMenu || Wu.app.MapPane.layerMenu;
-		// if (!this.layerMenu) this.layerMenu = this.enableLayermenu();
-		// this.layerMenu.enableEdit();
-
-
-		
 		var layerMenu = app.MapPane.getControls().layermenu;
 
+		// enable edit if editor
 		if (app.access.to.edit_project(this.project)) layerMenu.enableEdit();
-
 
 		if (layer.active) {
 			

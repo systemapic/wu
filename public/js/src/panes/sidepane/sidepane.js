@@ -142,6 +142,7 @@ Wu.SidePane = Wu.Pane.extend({
 	},
 
 	setProject : function (project) {
+		console.error('setProject FIXME!');
 		// update content
 		if (this.Home) 		this.Home.updateContent(project);
 		if (this.Options)	this.Options.updateContent(project);
@@ -167,7 +168,7 @@ Wu.SidePane = Wu.Pane.extend({
 		}, this);
 
 		// return if same 	
-		if (_.isEqual(active, this._panes)) return this._setMenuHeight();
+		// if (_.isEqual(active, this._panes)) return this._setMenuHeight();
 
 		// disable all
 		_.each(this._allPanes, function (pane) {
@@ -183,7 +184,7 @@ Wu.SidePane = Wu.Pane.extend({
 	},
 
 	_defaultPanes : function () {
-		console.log('_defaultPanes');
+
 		// if no active project,
 		var panes = ['Clients'];
 
@@ -202,8 +203,6 @@ Wu.SidePane = Wu.Pane.extend({
 	// set this._panes to current state
 	_updatePanes : function () {
 		var project = app.activeProject;
-
-		console.log('_updatePanes', project);
 
 		// if no project, return defaults only
 		if (!project) return this._defaultPanes();

@@ -31,43 +31,27 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// create title
 		this.name = Wu.DomUtil.create('div', 'project-title', this._container);
 		this.name.type = 'name';
-
-		// create description
 		this.description = Wu.DomUtil.create('div', 'project-description', this._container);
 		this.description.type = 'description';
-
-		// create logo
 		this.logoContainer = Wu.DomUtil.create('div', 'project-logo-container', this._container)
 		this.logo = Wu.DomUtil.create('img', 'project-logo', this.logoContainer);
 		this.logo.type = 'logo';
-
-		// Project info box (with little "i")
 		this.users = Wu.DomUtil.create('div', 'project-users-wrap', this._container);
-
-		// this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this.users);
 		this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this._container);
-
-		// Project stats header
 		this._projectStatsHeader = Wu.DomUtil.create('div', 'project-stats', this.usersInnerWrapper);
 		this._projectStatsHeader.innerHTML = 'Project status:'
-
-		// create createdBy
 		this.createdBy = Wu.DomUtil.create('div', 'project-createdby', this.usersInnerWrapper);
-
-		// create createdDate
 		this.createdDate = Wu.DomUtil.create('div', 'project-createddate', this.usersInnerWrapper);
-
-		// create lastModified
 		this.lastUpdated = Wu.DomUtil.create('div', 'project-lastupdated', this.usersInnerWrapper);
-
 		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.usersInnerWrapper);
 
-		// add delete button
-		// var canDelete = app.Account.canDeleteProject(this._project.store.uuid);
-		var canDelete = app.access.to.delete_project(this._project);
-
-		if (canDelete || this.options.editMode) {
+		// add thumbnail generator button
+		if (app.access.to.edit_project(this._project)) {
 			this.makeThumb = Wu.DomUtil.create('div', 'new-project-thumb', this.usersInnerWrapper, 'Generate thumbnail');
+		}
+
+		// add delete button
+		if (app.access.to.delete_project(this._project)) {
 			this.kill = Wu.DomUtil.create('div', 'project-delete', this.usersInnerWrapper, 'Delete project');			
 		}
 
@@ -121,7 +105,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		if (app.access.to.edit_project(this._project)) {
 			Wu.DomEvent[on](this.name, 	 'dblclick', this.edit, this);
 			Wu.DomEvent[on](this.description, 'dblclick', this.editDescription, this);
-			Wu.DomEvent[on](this.makeThumb, 'click', this.makeNewThumbnail, this );
+			Wu.DomEvent[on](this.makeThumb, 'click', this.makeNewThumbnail, this);
 			Wu.DomEvent[on](this.makeThumb, 'mousedown click', Wu.DomEvent.stopPropagation, this );
 		}
 
