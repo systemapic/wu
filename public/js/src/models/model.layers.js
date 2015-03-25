@@ -686,6 +686,66 @@ Wu.CartodbLayer = Wu.Layer.extend({
 });
 
 
+
+// systemapic layers
+Wu.RasterLayer = Wu.Layer.extend({
+
+	initLayer : function () {
+		this.update();
+
+	},
+
+	update : function () {
+		var map = app._map;
+
+		// remove
+		// if (this.layer) this.remove();
+
+		// this._fileUuid = this.store.file;
+		// this._defaultCartoid = 'cartoid';
+
+		console.log('this uuid: ', this.store.uuid);
+		console.log('this store: ', this.store);
+
+		// prepare raster
+		this._prepareRaster();
+
+		// prepare utfgrid
+		// this._prepareGrid();
+		
+	},
+
+	_prepareRaster : function () {
+		
+		// set ids
+		// var fileUuid 	= this._fileUuid,	// file id of geojson
+		    // cartoid 	= this.store.data.cartoid || this._defaultCartoid,
+		    // tileServer 	= app.options.servers.tiles.uri,
+		    // subdomains  = app.options.servers.tiles.subdomains,
+		    // token 	= app.accessToken,
+		    // token 	= '?token=' + app.Account.getToken(),
+		    // url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
+
+		var url = 'http://maptiles1.finncdn.no/tileService/1.0.3/norortho/{z}/{x}/{y}.png';
+
+		// add vector tile raster layer
+		this.layer = L.tileLayer(url, {
+			// fileUuid: this._fileUuid,
+			// cartoid : cartoid,
+			// subdomains : subdomains,
+			maxRequests : 0,
+			// reuseTiles : true,
+			// unloadInvisibleTiles : false,
+			// updateWhenIdle : true,
+			
+		});
+	},
+
+
+
+});
+
+
 // shorthand for creating all kinds of layers
 Wu.createLayer = function (layer) {
 
