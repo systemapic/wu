@@ -446,15 +446,16 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	disableSortable : function () {
-		this.resetSortable();
+		if (this._sortingEnabled) this.resetSortable();
 	},
 
 	refreshSortable : function () {
-		this.resetSortable();  
+		if (this._sortingEnabled) this.resetSortable();  
 		this.initSortable();
 	},
 
 	initSortable : function () {
+		this._sortingEnabled = true;
 	
 		// iterate over all layers
 		var items = document.getElementsByClassName('layer-menu-item-wrap');
@@ -476,7 +477,6 @@ L.Control.Layermenu = Wu.Control.extend({
 			Wu.DomEvent.on(bin, 'dragleave', this.drag.leave, this);
 			Wu.DomEvent.on(bin, 'drop', 	 this.drag.drop,  this);
 		} 
-
 
 	},
 
@@ -505,6 +505,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	resetSortable : function () {
+		this._sortingEnabled = false;
 
 		// remove hooks
 		// var bin = Wu.DomUtil.get('layer-menu-inner-content');
@@ -514,6 +515,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomEvent.off(bin, 'dragover',  this.drag.over,  this);
 		Wu.DomEvent.off(bin, 'dragleave', this.drag.leave, this);
 		Wu.DomEvent.off(bin, 'drop', 	  this.drag.drop,  this);
+
+
 	
 	},
 
@@ -874,6 +877,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		if (!layer) return this.toggleFolder(layerItem); 
 			
 		// add layer to map
+		console.log('layermenu enblaelay', layer);
 		layer.add();
 		layerItem.on = true;
 

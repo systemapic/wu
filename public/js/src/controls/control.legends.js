@@ -10,7 +10,6 @@ L.Control.Legends = Wu.Control.extend({
 
 	// automatically run when legends is added to map 
 	onAdd : function (map) {
-
 		var className = 'leaflet-control-legends',
 		    container = L.DomUtil.create('div', className),
 		    options = this.options;
@@ -285,10 +284,6 @@ L.Control.Legends = Wu.Control.extend({
 
 		setTimeout(function() {
 			this._legendsCollapser.style.opacity = '0'; 
-			// this._openWidth = 0;
-			// this._openHeight = 0;
-			// this._legendsWidth = 0;
-			// this._legendsHeight = 0;
 		}.bind(this), 500);
 
 		this._setClosed();
@@ -358,6 +353,10 @@ L.Control.Legends = Wu.Control.extend({
 
 	refreshLegends : function (layers) {
 
+		this.legends = null;
+		this.legends = {};
+
+		this.legendsCounter = null;
 		this.legendsCounter = [];
 		this.sliderWidth = 0;
 
@@ -456,7 +455,7 @@ L.Control.Legends = Wu.Control.extend({
 
 		// create legends divs
 		var b = Wu.DomUtil.create('div', 'legend-header', div, headerTitle); // header
-		this._legendsList = Wu.DomUtil.create('div', 'legend-list', div);
+		var legendsList = Wu.DomUtil.create('div', 'legend-list', div);
 
 		// create legends
 		legends.forEach(function (legend) {
@@ -465,7 +464,7 @@ L.Control.Legends = Wu.Control.extend({
 			if (!legend.on) return;
 
 			// create legend divs
-			var d = Wu.DomUtil.create('div', 'legend-each', this._legendsList);
+			var d = Wu.DomUtil.create('div', 'legend-each', legendsList);
 			var e = Wu.DomUtil.create('div', 'legend-feature', d);
 			var f = Wu.DomUtil.create('img', 'legend-image1', e);
 			var g = Wu.DomUtil.create('img', 'legend-image2', e);
@@ -478,15 +477,11 @@ L.Control.Legends = Wu.Control.extend({
 
 
 		// mark open if not on Mobile
-		if ( !Wu.app.mobile ) this._setOpen();
+		if (!app.mobile) this._setOpen();
 
 		// see if we need the horizontal scrollers or not
 		this.checkWidth();
 		this.calculateHeight();
-
-		
-
-
 	},
 
 	_setOpen : function () {
@@ -514,14 +509,9 @@ L.Control.Legends = Wu.Control.extend({
 	},
 
 	_getLegendHeader : function (layer) {
-
 		var tip = layer.getTooltip();
-
 		if (!tip) return '';
-
 		return tip.title;
-
-
 	},
 
 	_adjustLegendSlider : function (legend) {
@@ -569,10 +559,9 @@ L.Control.Legends = Wu.Control.extend({
 
 			// Prevent double click
 			this.scrolling = true;
-			var that = this;
 			setTimeout(function () {
-				that.scrolling = false;
-			}, 500);
+				this.scrolling = false;
+			}.bind(this), 500);
 		}
 	},
 

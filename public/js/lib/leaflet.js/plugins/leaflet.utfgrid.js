@@ -1,4 +1,4 @@
-nq = []; // num of reqs
+// nq = []; // num of reqs
 
 L.Util.ajax = function (url, cb) {
 	// console.log('ajax: ', url);
@@ -30,8 +30,8 @@ L.Util.ajax = function (url, cb) {
 		}
 	};
 	request.send();
-	nq.push(request);
-	return request;
+	// nq.push(request);
+	// return request;
 };
 
 L.UtfGrid = L.Class.extend({
@@ -105,11 +105,13 @@ L.UtfGrid = L.Class.extend({
 
 	onRemove: function () {
 		var map = this._map;
+
 		map.off('click', this._click, this);
 		map.off('mousedown', this._mousedown, this);
 		map.off('mouseup', this._mouseup, this);
 		map.off('mousemove', this._move, this);
 		map.off('moveend', this._update, this);
+		
 		if (this.options.pointerCursor) {
 			this._container.style.cursor = '';
 		}
@@ -123,7 +125,7 @@ L.UtfGrid = L.Class.extend({
 				this._abort_request(req_key);
 			}
 		}
-		this._cache = {};
+		this._flushCache();
 		this._update();
 	},
 
@@ -176,6 +178,8 @@ L.UtfGrid = L.Class.extend({
 		x = (x + max) % max;
 		y = (y + max) % max;
 
+		this._cache = this._cache || {};
+
 		var data = this._cache[map.getZoom() + '_' + x + '_' + y];
 		if (!data || !data.grid) {
 			return { latlng: e.latlng, data: null };
@@ -224,7 +228,8 @@ L.UtfGrid = L.Class.extend({
 				var xw = (x + max) % max, yw = (y + max) % max;
 				var key = zoom + '_' + xw + '_' + yw;
 				visible_tiles.push(key);
-
+				
+				this._cache = this._cache || {};
 				if (!this._cache.hasOwnProperty(key)) {
 					this._cache[key] = null;
 
@@ -262,9 +267,12 @@ L.UtfGrid = L.Class.extend({
 		var script = document.createElement('script');
 		script.setAttribute("type", "text/javascript");
 		script.setAttribute("src", url);
+		
+		this._cache = this._cache || {};
 
 		window[wk][functionName] = function (data) {
 			self._cache[key] = data;
+			window[wk][functionName] = null;
 			delete window[wk][functionName];
 			head.removeChild(script);
 			self._finish_request(key);
@@ -306,11 +314,12 @@ L.UtfGrid = L.Class.extend({
 		}, this.options));
 
 		var key = zoom + '_' + x + '_' + y;
+		this._cache = this._cache || {};
 		var self = this;
+		
 
 
 		this._queue_request(key, function () {
-
 			
 			return L.Util.ajax(url, function (data) {
 				self._cache[key] = data;
@@ -350,6 +359,7 @@ L.UtfGrid = L.Class.extend({
 			if (this._requests[key].timeout) {
 				window.clearTimeout(this._requests[key].timeout);
 			}
+			this._requests[key] = null;
 			delete this._requests[key];
 		}
 		
@@ -358,6 +368,7 @@ L.UtfGrid = L.Class.extend({
 	},
 
 	_abort_request: function(key){
+		this._cache = this._cache || {};
 
 		// Abort the request if possible
 		if (this._requests[key] && this._requests[key].handler){
@@ -367,6 +378,7 @@ L.UtfGrid = L.Class.extend({
 		}
 		// Ensure we don't keep a false copy of the data in the cache
 		if (this._cache[key] === null){
+			this._cache[key] = null;
 			delete this._cache[key];
 		}
 		// And remove the request
@@ -406,7 +418,24 @@ L.UtfGrid = L.Class.extend({
 			c--;
 		}
 		return c - 32;
-	}
+	},
+
+	_flush : function () {
+		console.log('girdlayer fluyshhh');
+		this._flushCache();
+		// this.onRemove();
+	},
+
+	_flushCache : function () {
+		console.log('flush cache');
+		for (key in this._cache) {
+			this._cache[key] = null;
+			delete this._cache[key];
+		}
+		this._cache = null;
+		delete this._cache;
+		// this._cache = {};
+	},
 });
 
 L.utfGrid = function (url, options) {

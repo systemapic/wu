@@ -15,11 +15,9 @@ Wu.Layer = Wu.Class.extend({
 		this.loaded = false;
 
 		// create leaflet layers
-		this.initLayer();
+		// this.initLayer();
 
-		// add hooks
-		this.addHooks();
-
+		
 	},
 
 	addHooks : function () {
@@ -58,6 +56,10 @@ Wu.Layer = Wu.Class.extend({
 
 	initLayer : function () {
 		// create Leaflet layer, load data if necessary
+		this._inited = true;
+		// add hooks
+		this.addHooks();
+
 	},
 
 	add : function (type) {
@@ -66,20 +68,22 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	addTo : function () {
-		
+		if (!this._inited) this.initLayer();
+
 		// add to map
 		this._addTo();
 		
 		// add to controls
 		this.addToControls();
-
 	},
 
 	_addTo : function (type) {
+		if (!this._inited) this.initLayer();
 		var map = app._map;
 
 		// leaflet fn
-		this.layer.addTo(map);
+		// this.layer.addTo(map);
+		map.addLayer(this.layer);
 
 		// add to active layers
 		app.MapPane.addActiveLayer(this);	// includes baselayers
@@ -104,7 +108,7 @@ Wu.Layer = Wu.Class.extend({
 	_addToLayermenu : function () {
 
 		// activate in layermenu
-		var layerMenu = app.MapPane.layerMenu;
+		var layerMenu = app.MapPane.getControls().layermenu;
 		layerMenu && layerMenu._enableLayer(this.getUuid());
 	},
 
@@ -170,7 +174,10 @@ Wu.Layer = Wu.Class.extend({
 		app.MapPane.removeActiveLayer(this);	
 
 		// remove gridLayer if available
-		if (this.gridLayer) map.removeLayer(this.gridLayer); 
+		if (this.gridLayer) {
+			this.gridLayer._flush();
+			map.removeLayer(this.gridLayer); 
+		}
 
 		// remove from zIndex
 		this._removeFromZIndex();
@@ -442,6 +449,17 @@ Wu.Layer = Wu.Class.extend({
 
 	},
 
+	_flush : function () {
+
+		this.remove();
+		app.MapPane._clearPopup();
+		this._removeGridEvents();
+		this.layer = null;
+		this.gridLayer = null;
+		this._inited = false;
+
+	},
+
 });
 
 
@@ -457,13 +475,16 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 
 	initLayer : function () {
 		this.update();
+		this.addHooks();
+
+		this._inited = true;
 	},
 
 	update : function () {
 		var map = app._map;
 
 		// remove
-		if (this.layer) this.remove();
+		if (this.layer) this._flush();
 
 		this._fileUuid = this.store.file;
 		this._defaultCartoid = 'cartoid';
@@ -549,7 +570,7 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		var map = app._map;
 
 		// remove
-		if (this.layer) this.remove();
+		if (this.layer) this._flush();
 
 		// id of data 
 		this._fileUuid = 'osm';
@@ -570,7 +591,6 @@ Wu.OSMLayer = Wu.CartoCSSLayer.extend({
 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
 		    tileServer 	= app.options.servers.osm.uri,
 		    subdomains  = app.options.servers.osm.subdomains,
-		    // token 	= app.accessToken,
 		    token 	= '?token=' + app.Account.getToken(),
 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
@@ -659,14 +679,16 @@ Wu.MapboxLayer = Wu.Layer.extend({
 		this.layer = L.tileLayer(url, {
 			accessToken : this.store.accessToken,
 			mapboxUri : this.store.data.mapbox,
-			reuseTiles : true,
-			unloadInvisibleTiles : true,
+			// reuseTiles : true,
+			// unloadInvisibleTiles : true,
 			updateWhenIdle : true,
 		});
 
 		// todo: add gridlayer to mapbox.. but why..?
-
+		// add hooks
+		this.addHooks();
 		this.loaded = true;
+		this._inited = true;
 	},
 });
 

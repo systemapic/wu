@@ -184,11 +184,12 @@ L.Control.Inspect = Wu.Control.extend({
 		var eye 	= Wu.DomUtil.create('div', 'inspect-eye', wrapper);
 		var kill 	= Wu.DomUtil.create('div', 'inspect-kill', wrapper);
 
-		// add tooltip
-		app.Tooltip.add(arrowsWrap, 'Arrange layer order', { extends : 'systyle', tipJoint : 'right', group : 'inspect-control'});
-		app.Tooltip.add(fly, 'Zoom to layer extent', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
-		app.Tooltip.add(eye, 'Isolate layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
-		app.Tooltip.add(kill, 'Disable layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
+		// // add tooltip 
+		// todo: this is MEMORY LEAK! must remove tooltip when removing this wrapper
+		// app.Tooltip.add(arrowsWrap, 'Arrange layer order', { extends : 'systyle', tipJoint : 'right', group : 'inspect-control'});
+		// app.Tooltip.add(fly, 'Zoom to layer extent', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
+		// app.Tooltip.add(eye, 'Isolate layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
+		// app.Tooltip.add(kill, 'Disable layer', { extends : 'systyle', tipJoint : 'bottom left', group : 'inspect-control'});
 
 		// add to list
 		this._list.insertBefore(wrapper, this._list.firstChild);
@@ -315,8 +316,7 @@ L.Control.Inspect = Wu.Control.extend({
 		this._md = 0;
 
 		// Google Analytics event tracking
-		var _layerName = layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);
 
 	},
 
@@ -339,14 +339,14 @@ L.Control.Inspect = Wu.Control.extend({
 		this._md = 0;
 
 		// Google Analytics event tracking
-		var _layerName = layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);
 
 	},
 
 
 	// remove by layer
 	removeLayer : function (layer) {
+		if (!this._layers || !layer) return;
 
 		// find entry in array
 		var entry = _.find(this._layers, function (l) { return l.uuid == layer.store.uuid; })
@@ -355,20 +355,18 @@ L.Control.Inspect = Wu.Control.extend({
 		this._removeLayer(entry);
 
 		// Hide Layer inspector if it's empty
-		if ( this._layers.length == 0 ) this._content.style.display = 'none';
+		if (this._layers.length == 0) this._content.style.display = 'none';
 
 
 		// Google Analytics event tracking
-		var _layerName = layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Remove layer > ' + _layerName]);
+		app.Analytics.ga(['Controls', 'Inspect layers: Remove layer > ' + layer.getTitle()]);
 		
 
 	},
 
 	// remove by entry
 	_removeLayer : function (entry) {
-
-		if (!entry) return;
+		if (!this._layers || !entry) return;
 
 		// remove from DOM
 		Wu.DomUtil.remove(entry.wrapper);
@@ -379,11 +377,9 @@ L.Control.Inspect = Wu.Control.extend({
 		// Hise Layer inspector if it's empty
 		if ( this._layers.length == 0 ) this._content.style.display = 'none';
 
-
 	},
 
 	moveUp : function (entry) {
-
 		var d = entry,
 		    div = d.wrapper,
 		    prev = div.previousSibling,
@@ -397,15 +393,11 @@ L.Control.Inspect = Wu.Control.extend({
 		// move up in zindex
 		this._zx.up(layer);
 
-
 		// Google Analytics event tracking
-		var _layerName = layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);		
-
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);		
 	},
 
 	moveDown : function (entry) {
-
 		var d = entry,
 		    div = d.wrapper,
 		    next = div.nextSibling,
@@ -420,9 +412,7 @@ L.Control.Inspect = Wu.Control.extend({
 		this._zx.down(layer);
 
 		// Google Analytics event tracking
-		var _layerName = layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + _layerName]);		
-		
+		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);		
 	},
 
 	
@@ -443,8 +433,7 @@ L.Control.Inspect = Wu.Control.extend({
 		map.fitBounds(bounds);
 
 		// Google Analytics event tracking
-		var _layerName = layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Fly to bounds for > ' + _layerName]);
+		app.Analytics.ga(['Controls', 'Inspect layers: Fly to bounds for > ' + layer.getTitle()]);
 
 	},
 
@@ -469,13 +458,11 @@ L.Control.Inspect = Wu.Control.extend({
 		}
 
 		// Google Analytics event tracking
-		var _layerName = entry.layer.store.title;
-		app.Analytics.ga(['Controls', 'Inspect layers: Toggle isolate > ' + _layerName]);	
+		app.Analytics.ga(['Controls', 'Inspect layers: Toggle isolate > ' + entry.layer.getTitle()]);	
 
 	},
 
 	_noneAreIsolated : function () {
-		
 		var any = _.filter(this._layers, function (entry) { return entry.isolated == true; });
 		if (!any.length) return true;
 		return false;

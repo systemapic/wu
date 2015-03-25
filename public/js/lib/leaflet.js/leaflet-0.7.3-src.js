@@ -611,7 +611,10 @@ L.Point = function (/*Number*/ x, /*Number*/ y, /*Boolean*/ round) {
 L.Point.prototype = {
 
 	clone: function () {
-		return new L.Point(this.x, this.y);
+		var x = _.clone(this.x);
+		var y = _.clone(this.y);
+		return new L.Point(x, y);
+		// return new L.Point(this.x, this.y);
 	},
 
 	// non-destructive, returns a new point
@@ -1483,7 +1486,8 @@ L.CRS = {
 
 	getSize: function (zoom) {
 		var s = this.scale(zoom);
-		return L.point(s, s);
+		var point = L.point(s, s);
+		return point;
 	}
 };
 
@@ -2865,7 +2869,6 @@ L.TileLayer = L.Class.extend({
 	},
 
 	_getZoomForUrl: function () {
-
 		var options = this.options,
 		    zoom = this._map.getZoom();
 
@@ -2875,9 +2878,11 @@ L.TileLayer = L.Class.extend({
 
 		zoom += options.zoomOffset;
 
-		return options.maxNativeZoom ? Math.min(zoom, options.maxNativeZoom) : zoom;
+		var zurl = options.maxNativeZoom ? Math.min(zoom, options.maxNativeZoom) : zoom;
+		return zurl;
 	},
 
+	// no mem leak
 	_getTilePos: function (tilePoint) {
 		var origin = this._map.getPixelOrigin(),
 		    tileSize = this._getTileSize();
@@ -2899,7 +2904,8 @@ L.TileLayer = L.Class.extend({
 	_getWrapTileNum: function () {
 		var crs = this._map.options.crs,
 		    size = crs.getSize(this._map.getZoom());
-		return size.divideBy(this._getTileSize())._floor();
+		var num = size.divideBy(this._getTileSize())._floor();
+		return num;
 	},
 
 	_adjustTilePoint: function (tilePoint) {
@@ -2920,7 +2926,8 @@ L.TileLayer = L.Class.extend({
 
 	_getSubdomain: function (tilePoint) {
 		var index = Math.abs(tilePoint.x + tilePoint.y) % this.options.subdomains.length;
-		return this.options.subdomains[index];
+		var subdomain = this.options.subdomains[index];
+		return subdomain;
 	},
 
 	_getTile: function () {
@@ -2929,7 +2936,8 @@ L.TileLayer = L.Class.extend({
 			this._resetTile(tile);
 			return tile;
 		}
-		return this._createTile();
+		var tile = this._createTile();
+		return tile;
 	},
 
 	// Override if data stored on a tile needs to be cleaned up before reuse
@@ -6844,6 +6852,14 @@ L.Map.Drag = L.Handler.extend({
 	},
 
 	removeHooks: function () {
+
+		// remove events
+		if (map.options.worldCopyJump) {
+			this._draggable.off('predrag', this._onPreDrag, this);
+			map.off('viewreset', this._onViewReset, this);
+		}
+
+
 		this._draggable.disable();
 	},
 
