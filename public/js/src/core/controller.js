@@ -83,7 +83,7 @@ Wu.Controller = Wu.Class.extend({
 			// set layermenu layers
 			var layers = hash.layers;
 			_.each(layers, function (layerUuid) {
-				app.MapPane.layerMenu._enableLayerByUuid(layerUuid);
+				app.MapPane.getControls().layermenu._enableLayerByUuid(layerUuid);
 			});
 
 
