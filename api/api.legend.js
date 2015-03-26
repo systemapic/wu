@@ -76,7 +76,7 @@ module.exports = api.legend = {
 		console.log('ap.legend.generate'.cyan);
 		console.log('fiuleUuid: ', fileUuid);
 		console.log('cartoid: ', cartoid);
-		console.log('layerUuid:', layerUuid);
+		// console.log('layerUuid:', layerUuid);
 
 		// get layer features/values
 		ops.push(function (callback) {
@@ -134,7 +134,6 @@ module.exports = api.legend = {
 								value 	  : options.value,
 								id 	  : options.id,
 								fileUuid  : fileUuid,
-								// layerUuid : layerUuid,
 								cartoid   : cartoid,
 								on 	  : true
 							}
@@ -173,26 +172,29 @@ module.exports = api.legend = {
 		mapnik.register_default_fonts();
 		mapnik.register_default_input_plugins();
 
-		var map = new mapnik.Map(100, 50);
+		var map = new mapnik.Map(20, 20);
 
 		try {
 			map.load(stylepath, function (err, map) {
 				if (err) return callback(err);
 
 				map.zoomAll(); // todo: zoom?
-				var im = new mapnik.Image(100, 50);
-				
-				map.render(im, function (err, im) {
-					if (err) console.log('map.render err'.red, err);
+				var im = new mapnik.Image(20, 20);
 
-					if (err) return callback(err);
+				map.render(im, function (err, im) {
+					if (err) {
+						console.log('map.render err'.red, err);
+						return callback(err);
+					}
 
 					im.encode('png', function(err, buffer) {
-						if (err) console.log('im.encode err'.red, err);
-
-						if (err) return callback(err);
+						if (err) {
+							console.log('im.encode err'.red, err);
+							return callback(err);
+						}
 
 						var outpath = api.config.path.legends + lid + '.png';
+						console.log('output: '.yellow, outpath);
 						
 						fs.writeFile(outpath, buffer, function (err) {
 							if (err) console.log('legend._create writefile err:'.red, err);

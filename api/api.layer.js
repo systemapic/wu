@@ -438,27 +438,65 @@ module.exports = api.layer = {
 		var properties = {};
 		properties[featureKey] = featureValue;
 
+		// var geojson = {
+		// 	"type" : "FeatureCollection",
+		// 	"features" : [
+		// 		{
+		// 		"type" : "Feature",
+		// 		"properties" : properties,
+		// 		"geometry": {
+		// 			"type": "Polygon",
+		// 			"coordinates": [
+		// 				[
+		// 				[
+		// 			              -180,
+		// 			              0
+		// 			            ],
+		// 			            [
+		// 			              -180,
+		// 			              90
+		// 			            ],
+		// 			            [
+		// 			              0,
+		// 			              90
+		// 			            ],
+		// 			            [
+		// 			              0,
+		// 			              0
+					             
+		// 			            ],
+		// 			            [
+		// 			              -180,
+		// 			              0
+		// 			            ]
+		// 				]
+		// 				]
+		// 			}
+		// 		}
+		// 	]
+		// }
+
 		var geojson = {
 			"type" : "FeatureCollection",
 			"features" : [
 				{
 				"type" : "Feature",
-				"properties" : properties,
+         			 "properties" : properties,
 				"geometry": {
 					"type": "Polygon",
 					"coordinates": [
 						[
 						[
-					              -180,
+					              -45,
 					              0
 					            ],
 					            [
-					              -180,
-					              90
+					              -45,
+					              45
 					            ],
 					            [
 					              0,
-					              90
+					              45
 					            ],
 					            [
 					              0,
@@ -466,7 +504,7 @@ module.exports = api.layer = {
 					             
 					            ],
 					            [
-					              -180,
+					              -45,
 					              0
 					            ]
 						]
