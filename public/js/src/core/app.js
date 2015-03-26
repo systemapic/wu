@@ -14,8 +14,7 @@ Wu.App = Wu.Class.extend({
 	initialize : function (options) {
 
 		// set global this
-		Wu.app = this;
-		window.app = this;
+		Wu.app = window.app = this;
 
 		// error handling
 		this._initErrorHandling();
@@ -25,10 +24,6 @@ Wu.App = Wu.Class.extend({
 
 		// Init analytics
 		this._initAnalytics();
-
-		// set options
-		// L.mapbox.config.FORCE_HTTPS = true;
-		// L.mapbox.accessToken = this.options.providers.mapbox[0].accessToken; // todo: move to relevant place
 
 		// set page title
 		document.title = this.options.portalTitle;
@@ -292,6 +287,8 @@ Wu.App = Wu.Class.extend({
 		    search  = window.location.search.split('?'),
 		    params  = Wu.Util.parseUrl();
 
+		console.log('_initLocation', hash, params);
+
 		// done if no location
 		if (!client || !project) return false;
 
@@ -307,6 +304,11 @@ Wu.App = Wu.Class.extend({
 		// set project
 		this._setProject(project);
 
+		// init hash
+		if (hash) {
+			console.log('got hash!', hash, project);
+			this._initHash(hash, project);
+		}
 		return true;
 	},
 
@@ -369,7 +371,7 @@ Wu.App = Wu.Class.extend({
 		app.StatusPane.setSaveStatus(delay);
 	},
 
-	_initHash : function (project, hash) {
+	_initHash : function (hash, project) {
 
 		// get hash values from server,
 		this.getHash(hash, project, this._renderHash);
@@ -379,6 +381,8 @@ Wu.App = Wu.Class.extend({
 
 	// get saved hash
 	getHash : function (id, project, callback) {
+
+		console.log('getHash!! =:', id, project);
 
 		var json = {
 			projectUuid : project.getUuid(),
@@ -394,6 +398,7 @@ Wu.App = Wu.Class.extend({
 		// parse
 		var result = JSON.parse(json); 
 
+		console.log('_renderHash', result);
 
 		// handle errors
 		if (result.error) console.log('error?', result.error);
@@ -423,7 +428,7 @@ Wu.App = Wu.Class.extend({
 				layer.add('baselayer'); 
 			} else {
 				// ass as layermenu
-				var lm = app.MapPane.layerMenu;
+				var lm = app.MapPane.getControls().layermenu;
 				if (lm) {
 					var lmi = lm._getLayermenuItem(layerUuid);
 					lm.enableLayer(lmi);
@@ -437,13 +442,20 @@ Wu.App = Wu.Class.extend({
 	setHash : function (callback, project) {
 
 		// get active layers
-		var active = app.MapPane.getActiveLayermenuLayers();
+		// var active = app.MapPane.getActiveLayermenuLayers();
+		// console.log('setHash: active', active);
+		// var layers = _.map(active, function (l) {
+		// 	return l.item.layer;	// layer uuid
+		// });	
+		var active = app.MapPane.getControls().layermenu._getActiveLayers();
 		var layers = _.map(active, function (l) {
-			return l.item.layer;	// layer uuid
-		});
+			return l.item.layer;
+		})
+
+		console.log('layers: ', layers);
 
 		// get project;
-		var project = project || this.activeProject;
+		var project = project || app.activeProject;
 
 		// hash object
 		var json = {

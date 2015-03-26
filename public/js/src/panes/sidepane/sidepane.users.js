@@ -307,8 +307,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var email = JSON.parse(data);
 		var div   = context._inputUser._email;
 		
+		var valid = context._validateEmail(div.value);
 		// mark valid
-		if (email.unique) {
+		if (email.unique && valid) {
 			Wu.DomUtil.addClass(div, 'valid');
 			Wu.DomUtil.removeClass(div, 'invalid');
 			context._inputUser.validEmail = true;
@@ -323,8 +324,10 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		var email1 = this._inputUser._email;
 		var email2 = this._inputUser._email2;
 
+		var valid = this._validateEmail(email1.value);
+
 		// mark valid
-		if (email1.value == email2.value) {
+		if (email1.value == email2.value && valid) {
 			Wu.DomUtil.addClass(email2, 'valid');
 			Wu.DomUtil.removeClass(email2, 'invalid');
 			this._inputUser.validEmail2 = true;
@@ -333,6 +336,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 			Wu.DomUtil.removeClass(email2, 'valid');
 			this._inputUser.validEmail2 = false;
 		}
+	},
+
+	_validateEmail : function (email) {
+		 var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    		return re.test(email);
 	},
 
 	cancelInput : function (e) {

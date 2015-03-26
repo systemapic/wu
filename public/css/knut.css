@@ -379,9 +379,29 @@ body {
 
 
 
+/*email*/
+.backpane-input.valid {
+  background-color: #4FDA4F !important;
+}
 
+.backpane-input.invalid {
+  background-color: #F03A3A !important;
+}
 
-
+.backpane-input::-webkit-input-placeholder { /* WebKit browsers */
+    color:    white;
+}
+.backpane-input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   color:    white;
+   opacity:  1;
+}
+.backpane-input::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color:    white;
+   opacity:  1;
+}
+.backpane-input:-ms-input-placeholder { /* Internet Explorer 10+ */
+   color:    white;
+}
 
 
 /*fixing legends*/
