@@ -390,10 +390,20 @@ body {
 	border : 0px solid white;
 }
 .legend-image1, .legend-image2 {
-  position: relative;
-  top: -16px;
-  left: -40px;
-  }
+	position: relative;
+	top: 0px;
+	left: 0px;
+}
+
+.legend-feature-name {
+	display: inline-block;
+	vertical-align: top;
+	position: relative;
+	left: 25px;
+	line-height: 1.2;
+	word-break: break-word;
+	max-width: 170px;
+}
 
 .legend-entry-image {
 	border : 0px solid white;
