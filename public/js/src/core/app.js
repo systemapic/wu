@@ -198,7 +198,7 @@ Wu.App = Wu.Class.extend({
 	_initEvents : function () {
 
 		// set event fire
-		this.fire = new Wu.Events();
+		// this.fire = new Wu.Events();
 
 		Wu.DomEvent.on(window, 'resize', this._resizeEvents, this);
 	},
@@ -255,15 +255,12 @@ Wu.App = Wu.Class.extend({
 		this.Access = new Wu.Access(this.options.json.access);
 	},
 
-	_isDev : function (user) {
-		if (user.uuid.slice(0,-13) == 'user-b76a8d27-6db6-46e0-8fc3') return true; // phantomJS user
-		if (user.uuid.slice(0,-13) == 'user-9fed4b5f-ad48-479a-88c3') return true; // phantomJS user
-		if (user.uuid.slice(0,-13) == 'user-e6e5d7d9-3b4c-403b-ad80') return true; // phantomJS user
-		return false;
-	},
-
-	
-
+	// _isDev : function (user) {
+	// 	if (user.uuid.slice(0,-13) == 'user-b76a8d27-6db6-46e0-8fc3') return true; // phantomJS user
+	// 	if (user.uuid.slice(0,-13) == 'user-9fed4b5f-ad48-479a-88c3') return true; // phantomJS user
+	// 	if (user.uuid.slice(0,-13) == 'user-e6e5d7d9-3b4c-403b-ad80') return true; // phantomJS user
+	// 	return false;
+	// },
 
 	_lonelyProject : function () {
 		// check if only one project, 
@@ -279,7 +276,6 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_initLocation : function () {
-
 		var path    = window.location.pathname,
 		    client  = path.split('/')[1],
 		    project = path.split('/')[2],
@@ -324,8 +320,11 @@ Wu.App = Wu.Class.extend({
 	_initHotlink : function () {
 		
 		// parse error prone content of hotlink..
-		try { this.hotlink = Wu.parse(window.hotlink); } 
-		catch (e) { this.hotlink = false; };
+		// try { this.hotlink = Wu.parse(window.hotlink); } 
+		// catch (e) { this.hotlink = false;
+
+		// parse error prone content of hotlink..
+		Wu.parse(window.hotlink);
 
 		// return if no hotlink
 		if (!this.hotlink) return false;
@@ -375,22 +374,18 @@ Wu.App = Wu.Class.extend({
 
 		// get hash values from server,
 		this.getHash(hash, project, this._renderHash);
-
 		return true;
 	},
 
 	// get saved hash
 	getHash : function (id, project, callback) {
-
 		console.log('getHash!! =:', id, project);
 
-		var json = {
+		// get a saved setup - which layers are active, position, 
+		Wu.post('/api/project/hash/get', JSON.stringify({
 			projectUuid : project.getUuid(),
 			id : id
-		}
-
-		// get a saved setup - which layers are active, position, 
-		Wu.post('/api/project/hash/get', JSON.stringify(json), callback, this);
+		}), callback, this);
 	},
 
 	_renderHash : function (context, json) {
@@ -442,33 +437,23 @@ Wu.App = Wu.Class.extend({
 	setHash : function (callback, project) {
 
 		// get active layers
-		// var active = app.MapPane.getActiveLayermenuLayers();
-		// console.log('setHash: active', active);
-		// var layers = _.map(active, function (l) {
-		// 	return l.item.layer;	// layer uuid
-		// });	
 		var active = app.MapPane.getControls().layermenu._getActiveLayers();
 		var layers = _.map(active, function (l) {
 			return l.item.layer;
 		})
 
-		console.log('layers: ', layers);
-
 		// get project;
 		var project = project || app.activeProject;
 
-		// hash object
-		var json = {
+		// save hash to server
+		Wu.post('/api/project/hash/set', JSON.stringify({
 			projectUuid : project.getUuid(),
 			hash : {
 				id 	 : Wu.Util.createRandom(6),
 				position : app.MapPane.getPosition(),
 				layers 	 : layers 			// layermenuItem uuids, todo: order as z-index
 			}
-		}
-
-		// save hash to server
-		Wu.post('/api/project/hash/set', JSON.stringify(json), callback, this);
+		}), callback, this);
 
 		// return
 		return json.hash;
@@ -476,7 +461,6 @@ Wu.App = Wu.Class.extend({
 	},
 
 	phantomJS : function (args) {
-
 		var projectUuid = args.projectUuid,
 	   	    hash    	= args.hash,
 	   	    isThumb     = args.thumb;
@@ -484,6 +468,7 @@ Wu.App = Wu.Class.extend({
 	   	// return if no project
 	   	if (!projectUuid) return false;
 
+	   	// set hash for phantom
 	   	this._phantomHash = hash;
 
 		// get project
@@ -607,14 +592,12 @@ Wu.App = Wu.Class.extend({
 
 		// add map click event
 		if (app._map) app._map.on('mousedown', function (e) {
-
 			var lat = e.latlng.lat,
 			    lng = e.latlng.lng,
 			    zoom = app._map.getZoom();
 
 			var tile = this._getTileURL(lat, lng, zoom);
 			console.log('tile:', tile);
-
 		}, this);
 
 		// extend 
@@ -623,7 +606,6 @@ Wu.App = Wu.Class.extend({
 				return this * Math.PI / 180;
 			}
 		}
-
 	},
 
 	// for debug
@@ -632,7 +614,5 @@ Wu.App = Wu.Class.extend({
 		var ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat.toRad()) + 1 / Math.cos(lat.toRad())) / Math.PI) / 2 * (1<<zoom) ));
 		return "" + zoom + "/" + xtile + "/" + ytile;
 	},
-
-	
 
 });

@@ -3,15 +3,17 @@ var loginConfig = {
 	autoStart : true,
 	accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q',
 	layer : 'systemapic.kcjonn12',
-	logo : 'css/images/systemapic-login-logo.png',
+	// logo : 'css/images/systemapic-login-logo.png',
+	logo : 'css/images/ruppellsgriffon_logo.png',
 	wrapper : false,
 	speed : 1000,
 	position : {
-		// lat : -33.83214, // sydney
-		// lng : 151.22299,
-		lat : 59.942,
-		lng : 10.716,
-		zoom : [4, 14]
+		lat : -33.83214, // sydney
+		lng : 151.22299,
+		zoom : [4, 18],
+		// lat : 59.942,
+		// lng : 10.716,
+		// zoom : [4, 14]
 	},
 	circle : {
 		radius : 120, 

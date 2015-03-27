@@ -136,5 +136,5 @@ L.Popup.include({
 
 });
 
-
-
+// prevent minifed bug
+L.Icon.Default.imagePath = '/css/images';
