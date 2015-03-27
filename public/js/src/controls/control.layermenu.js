@@ -467,14 +467,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		if (!app.access.to.edit_project(this._project)) return;
 		this._sortingEnabled = true;
 
-		console.log('inits');
-	
 		// iterate over all layers
 		var items = document.getElementsByClassName('layer-menu-item-wrap');
 		for (var i = 0; i < items.length; i++) {
 			var el = items[i];
-			console.log('inits i ', el, i);
-			
+
 			// set dragstart event
 			Wu.DomEvent.on(el, 'dragstart', this.drag.start, this);
 		};
@@ -535,7 +532,6 @@ L.Control.Layermenu = Wu.Control.extend({
 			Wu.DomUtil.addClass(el, 'dragged-ghost');
 
 			var uuid = el.id;
-			console.log('start');
 			this.drag.currentDragElement = el;
 			this.drag.currentDragUuid = uuid;
 			this.drag.startDragLevel = this.layers[uuid].item.pos;
