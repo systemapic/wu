@@ -1,4 +1,4 @@
-// app.MapPane.layerMenu
+ // app.MapPane.layerMenu
 L.Control.Layermenu = Wu.Control.extend({
 
 	type : 'layermenu',
@@ -194,7 +194,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	_addAlreadyActive : function () {
-		
 		var active = app.MapPane.getActiveLayers();
 		var enabled = _.filter(this.layers, function (item) {
 			if (!item.layer) return false;
@@ -257,7 +256,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Set max height of scroller container
 		this._layermenuOuter.style.maxHeight = layersMaxHeight + 'px';
-
 	},	
 
 	cancelEditClose : function () {
@@ -311,14 +309,12 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Controls', 'Layers: close']);
-	
 	},
 
 	// (j)
 	openLayerPane : function () {
 
 		this._open = true;
-
 
 		// Open Wrapper
 		app._map._controlCorners.bottomright.style.width = '290px';
@@ -331,8 +327,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		var legends = app.MapPane.getControls().legends;
 		var description = app.MapPane.getControls().description;
 		
-		if (inspect) {
-			if ( this._legendsContainer ) Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
+		if (inspect && this._legendsContainer) {
+			Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
 		}
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
@@ -347,7 +343,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Adjust legends width
 		legends.checkWidth();
-
 
 		// Google Analytics event tracking
 		app.Analytics.ga(['Controls', 'Layers: open']);
@@ -471,11 +466,14 @@ L.Control.Layermenu = Wu.Control.extend({
 	initSortable : function () {
 		if (!app.access.to.edit_project(this._project)) return;
 		this._sortingEnabled = true;
+
+		console.log('inits');
 	
 		// iterate over all layers
 		var items = document.getElementsByClassName('layer-menu-item-wrap');
 		for (var i = 0; i < items.length; i++) {
 			var el = items[i];
+			console.log('inits i ', el, i);
 			
 			// set dragstart event
 			Wu.DomEvent.on(el, 'dragstart', this.drag.start, this);
@@ -537,6 +535,7 @@ L.Control.Layermenu = Wu.Control.extend({
 			Wu.DomUtil.addClass(el, 'dragged-ghost');
 
 			var uuid = el.id;
+			console.log('start');
 			this.drag.currentDragElement = el;
 			this.drag.currentDragUuid = uuid;
 			this.drag.startDragLevel = this.layers[uuid].item.pos;
@@ -1074,6 +1073,10 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomEvent.on(up,   'mousedown', Wu.DomEvent.stop, this);
 		Wu.DomEvent.on(down, 'mousedown', Wu.DomEvent.stop, this);
 		Wu.DomEvent.on(del,  'mousedown', Wu.DomEvent.stop, this);
+
+		// drag
+		// set dragstart event
+		Wu.DomEvent.on(wrap, 'dragstart', this.drag.start, this);
 
 		// Stop Propagation
 		Wu.DomEvent.on(this._container, 'touchstart mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
