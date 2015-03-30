@@ -213,11 +213,11 @@ module.exports = api.file = {
 		    ops = [],
 		    _lids = [];
 
-		console.log('API: deleteFiles');
-		console.log('_fids: ', _fids);
-		console.log('puuid: ', puuid);
-		console.log('userid: ', userid);
-		console.log('uuids: ', uuids);
+		// console.log('API: deleteFiles');
+		// console.log('_fids: ', _fids);
+		// console.log('puuid: ', puuid);
+		// console.log('userid: ', userid);
+		// console.log('uuids: ', uuids);
 
 
 		// validate
@@ -488,44 +488,29 @@ module.exports = api.file = {
 		// set path
 		var out = api.config.path.file + fileUuid + '/' + name;
 
-		console.log('--------------------'.red);
-		console.log('--------------------'.red);
-		console.log('--------------------'.red);
-		console.log('inn: ', inn);
-		console.log('out: ', out);
-		console.log('name: ', name);
-		console.log('type: ', type);
-		console.log('fileUuid: ', fileUuid);
-		console.log('---------------------'.red);
+		// console.log('--------------------'.red);
+		// console.log('--------------------'.red);
+		// console.log('--------------------'.red);
+		// console.log('inn: ', inn);
+		// console.log('out: ', out);
+		// console.log('name: ', name);
+		// console.log('type: ', type);
+		// console.log('fileUuid: ', fileUuid);
+		// console.log('---------------------'.red);
 
 
 		var ops = {};
 
 		// move if not already in right place
 		if (inn != out) {
-			console.log('gonna move!'.yellow);
 			ops.move = function (callback) {
 
-
-				// fs.readFile(inn, function (err, data1) {
-				// 	console.log('read file => '.yellow, data1.length);
-				
-					fs.move(inn, out, function (err) {
-						console.log('moved ', inn, ' to ', out);
+				fs.move(inn, out, function (err) {
 
 
-						// fs.readFile(out, function (err, data2) {
-						// 	console.log('read file out => '.yellow, data2.length);
+						callback(err);
 					
-							callback(err);
-						// });
-
-						
-					});
-
-				// });
-
-
+				});
 				
 			};
 		}
@@ -574,13 +559,10 @@ module.exports = api.file = {
 				// delete shapefile
 				var path = folder + '/' + name;
 				fs.unlink(path, function (er) {
-					console.log('------------'.yellow, 'unlinked: ', path)
 					if (er) console.log('handle shape unlink err: '.red + er);
-					console.log('unlinked?', er);
 					callback(err);
 				});
 			} else {
-				console.log('============='.red, 'no err?');
 				callback(null, db);
 			}
 		});
@@ -603,7 +585,6 @@ module.exports = api.file = {
 		.or([{'access.users' : user}, {'access.projects' : projectUuid}])	// either of these
 		.limit(1)	// safeguard
 		.exec(function(err, record) {
-			console.log('found: ', record);
 			if (err) console.log('get geo exec err: '.red + err);
 			return api.file.sendGeoJsonFile(req, res, record[0]);
 		});

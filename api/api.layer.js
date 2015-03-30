@@ -150,7 +150,6 @@ module.exports = api.layer = {
 
 	// update layer
 	update : function (req, res) {
-		console.log('updateLayer');
 
 		var layerUuid 	= req.body.layer || false;
 		var user 	= req.user;
@@ -211,10 +210,10 @@ module.exports = api.layer = {
 		    ops = [],
 		    _lids = [];
 
-		console.log('API: deleteLayers');
-		console.log('puuid: ', projectUuid);
-		console.log('userid: ', userid);
-		console.log('uuids: ', layerUuids);
+		// console.log('API: deleteLayers');
+		// console.log('puuid: ', projectUuid);
+		// console.log('userid: ', userid);
+		// console.log('uuids: ', layerUuids);
 
 		// validate
 		if (!projectUuid || !userid) return api.error.missingInformation(req, res);
@@ -345,8 +344,8 @@ module.exports = api.layer = {
 
 	// set carto css
 	setCartoCSS : function (req, res) {
-		console.log('setCartoCSS');
-		console.log('body: ', req.body);
+		// console.log('setCartoCSS');
+		// console.log('body: ', req.body);
 
 		// get params
 		var fileUuid 	= req.body.fileUuid;
@@ -364,8 +363,8 @@ module.exports = api.layer = {
 		var host = isOSM ? api.config.vileosm.uri : api.config.vile.uri;
 
 
-		console.log('setCartoCSS HOST: ', host);
-		console.log('vars: ', layerUuid, fileUuid, cartoid, csspath, css);
+		// console.log('setCartoCSS HOST: ', host);
+		// console.log('vars: ', layerUuid, fileUuid, cartoid, csspath, css);
 
 		// save css to file by cartoId 
 		fs.writeFile(csspath, css, {encoding : 'utf8'}, function (err) {
@@ -581,7 +580,7 @@ module.exports = api.layer = {
 	},
 
 	_getLayerFeaturesValuesOSM : function (fileUuid, cartoid, callback) {
-		console.log('_getLayerFeaturesValuesOSM');
+		// console.log('_getLayerFeaturesValuesOSM');
 		callback('debug');
 	},
 
@@ -615,7 +614,7 @@ module.exports = api.layer = {
 						var renderer = new carto.Renderer();
 						var info = renderer.getRules(css);
 
-						console.log('-====> info', info);
+						// console.log('-====> info', info);
 
 						var string = JSON.stringify(info);
 
@@ -722,7 +721,7 @@ module.exports = api.layer = {
 
 
 	createModel : function (options, callback) {
-		console.log('api.layer.createModel'.yellow, options);
+		// console.log('api.layer.createModel'.yellow, options);
 
 		var layer 		= new Layer();
 		layer.uuid 		= options.uuid;

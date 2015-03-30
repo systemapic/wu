@@ -44,34 +44,50 @@ module.exports = api.socket = {
 
 	_processing : {},
 
-
 	send : function (options) {
 
-		
-
 	},
 
+	sendError : function (userId, err) {
+
+		var sock = api.socket._getSocket(userId);
+
+		// send to user
+		sock && sock.emit('errorMessage', {
+			error : err
+		});
+	},
 
 	uploadDone : function (options) {
+		console.log('uploadDone'.yellow);
 
-		var userId = options.user._id;
+		var userId = api.socket._getUserId(options);
+		var sock = api.socket._getSocket(userId);
 
-		var session = _.findKey(api.app.io.handshaken, function (s) {
-			return s.session.passport.user == userId;
-		});
-
-
-		console.log('found session?'.yellow, session);
-
-		var sock = api.app.io.sockets.sockets[session];
-		
-		console.log('sock: '.magenta, sock);
-		
 		// send to user
-		sock.emit('uploadDone', options.result);
-
+		sock && sock.emit('uploadDone', options.result);
 	},
 
+	_getUserId : function (options) {
+		if (!options || !options.user) return false;
+		return options.user._id;
+	},
+
+	_getSocket : function (userId) {
+		var session = api.socket._getSession(userId);
+		if (!session) return console.log('ERR 125: no session'.red);;
+		var sock = api.app.io.sockets.sockets[session];
+		if (!sock) return console.log('ERR 120: no sock'.red);
+		return sock;
+	},
+
+	_getSession : function (userId) {
+		var session = _.findKey(api.app.io.handshaken, function (s) {
+			if (!s || !s.session || !s.session.passport) return false;
+			return s.session.passport.user == userId;
+		});
+		return session;
+	},
 
 	setProcessing : function (process) {
 		this._processing[process.fileUuid] = process;
@@ -82,59 +98,25 @@ module.exports = api.socket = {
 		return this._processing[id];
 	},
 
-
 	processingDone : function (options) {
+		console.log('processingDone'.yellow);
 
-		var userId = options.user._id;
+		var userId = api.socket._getUserId(options);
+		var sock = api.socket._getSocket(userId);
 
-		var session = _.findKey(api.app.io.handshaken, function (s) {
-			return s.session.passport.user == userId;
-		});
-
-
-		console.log('found session?'.yellow, session);
-
-		var sock = api.app.io.sockets.sockets[session];
-		
-		console.log('sock: '.magenta, sock);
-		
 		// send to user
-		sock.emit('processingDone', options.result);
-
+		sock && sock.emit('processingDone', options.result);
 	},
 
-
 	grindDone : function (req, res) {
-		console.log('gridDone'.cyan);
-		console.log('gridDone'.cyan);
-		console.log('gridDone'.cyan);
-		console.log('gridDone'.cyan);
-
-		console.log('req: ', req);
-		console.log('gridDone'.cyan);
-		console.log('gridDone'.cyan);
-		console.log('gridDone'.cyan);
-		console.log('gridDone'.cyan);
-
-		res.end();
-
-
-		var fileUuid = req.body.fileUuid;
-
-		var process = api.socket.getProcessing(fileUuid);
-
-		var timeDiff = new Date().getTime() - process._timestamp;
-
-		var userId = process.userId;
-
-		var session = _.findKey(api.app.io.handshaken, function (s) {
-			return s.session.passport.user == userId;
-		});
-
-		var sock = api.app.io.sockets.sockets[session];
+		console.log('grindDone'.yellow);
 		
-		console.log('sock: '.magenta, sock);
-		
+		var fileUuid = req.body.fileUuid,
+		    process = api.socket.getProcessing(fileUuid),
+		    timeDiff = new Date().getTime() - process._timestamp,
+		    userId = process.userId,
+		    sock = api.socket._getSocket(userId);
+
 		// send to user
 		sock.emit('processingDone', {
 			processingDone : fileUuid,
@@ -142,8 +124,9 @@ module.exports = api.socket = {
 			size : process.size
 		});
 
+		// end connection
+		res.end();
 	},
-
 
 }
 

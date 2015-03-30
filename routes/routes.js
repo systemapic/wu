@@ -87,16 +87,16 @@ module.exports = function(app, passport) {
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
-	app.post('/api/chunked/upload', isLoggedIn, function (req, res) {
-		console.log('XXX POST /api/chunked/upload'.yellow, req.body);
-		// api.upload.chunkedUpload(req, res);
-	});
+	// app.post('/api/chunked/upload', isLoggedIn, function (req, res) {
+	// 	console.log('XXX POST /api/chunked/upload'.yellow, req.body);
+	// 	// api.upload.chunkedUpload(req, res);
+	// });
 
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
 	app.get('/api/chunked/upload', isLoggedIn, function (req, res) {
-		console.log('GET /api/chunked/upload'.yellow, req.body);
+		// console.log('GET /api/chunked/upload'.yellow, req.body);
 		api.upload.chunkedCheck(req, res);
 	});
 
@@ -104,7 +104,7 @@ module.exports = function(app, passport) {
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
 	app.get('/download/:identifier', isLoggedIn, function (req, res) {
-		console.log('GET /api/chunked/ident'.yellow, req.body);
+		// console.log('GET /api/chunked/ident'.yellow, req.body);
 		api.upload.chunkedIdent(req, res);
 	});
 
@@ -112,7 +112,7 @@ module.exports = function(app, passport) {
 	// UPLOAD DATA LIBRARY FILES ===========
 	// =====================================
 	app.post('/api/upload', isLoggedIn, function (req, res) {
-		console.log('POST /api/chunked/upload'.yellow, req.body);
+		// console.log('POST /api/chunked/upload'.yellow, req.body);
 		api.upload.chunkedUpload(req, res);
 	});
 
