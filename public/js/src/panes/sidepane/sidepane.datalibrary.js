@@ -208,8 +208,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			target : '/api/upload',
 			// chunkSize : 1*1024*128,
 			// chunkSize : 1*1024*512,
-			chunkSize : 1*1024*1024,
+			// chunkSize : 1*1024*1024,
+			chunkSize : 1*1024*2048,
 			// chunkSize : 1*1024*4096,
+			// chunkSize : 1*1024*8192,
 			simultaneousUploads : 5,
 			testChunks : false,
 			throttleProgressCallbacks : 1,
@@ -252,11 +254,14 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			var message = 'Uploaded ' + size.toFixed(2) + ' MB in ' + totalTime.toFixed(2) + ' seconds, at ' + bytesPerSecond.toFixed(2) + ' MB/s.';
 			console.log(message)
 
+
+			// console.error('id: ', this.__id);
+
 			app.feedback.setSuccess({
 				title : 'Upload success!',
 				description : message,
 				// icon : icon,
-				id : this.__id
+				id : Wu.Util.createRandom(5)
 			});
 
 			console.error('TODO: refresh layer if activated before processing is done.')
@@ -697,12 +702,12 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		}
 
 
-		this.createFeedbackID();
+		// this.createFeedbackID();
 	},
 
-	createFeedbackID : function () {
-		this.__id = Wu.Util.createRandom(5);
-	},
+	// createFeedbackID : function () {
+	// 	this.__id = Wu.Util.createRandom(5);
+	// },
 
 	
 	handleError : function (err) {
@@ -711,7 +716,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		app.feedback.setError({
 			title : 'Upload error',
 			description : err,
-			id : this.__id			
+			id : Wu.Util.createRandom(5)	
 		});
 
 	},
@@ -756,7 +761,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			app.feedback.setAction({
 				title : 'Layer created',
 				description : 'Added <strong>' + layer.title + '</strong> to available layers.',
-				id : this.__id
+				id : Wu.Util.createRandom(5)
 			});
 
 

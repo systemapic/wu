@@ -76,22 +76,23 @@ module.exports = api.error = {
 	generalSocket : function (user, err) {
 
 		var userId = user._id;
+		api.socket.sendError(userId, err);
 
-		var session = _.findKey(api.app.io.handshaken, function (s) {
-			return s.session.passport.user == userId;
-		});
+		// var session = _.findKey(api.app.io.handshaken, function (s) {
+		// 	if (!s || !s.session || !s.session.passport) return false;
+		// 	return s.session.passport.user == userId;
+		// });
 
+		// if (!session) return console.log('ERR 101: no session'.red);
 
-		console.log('found session?'.yellow, session);
+		// var sock = api.app.io.sockets.sockets[session];
 
-		var sock = api.app.io.sockets.sockets[session];
+		// if (!sock) return console.log('ERR 101: no sock'.red);
 		
-		console.log('sock: '.magenta, sock);
-		
-		// send to user
-		sock.emit('errorMessage', {
-			error : err
-		});
+		// // send to user
+		// sock.emit('errorMessage', {
+		// 	error : err
+		// });
 
 	},
 

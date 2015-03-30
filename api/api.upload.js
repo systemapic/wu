@@ -46,10 +46,14 @@ module.exports = api.upload = {
 
 		// console.log('res: '.red, res);
 
+		var resumableChunkNumber = req.body.resumableChunkNumber,
+		    resumableTotalChunks = req.body.resumableTotalChunks;
+
+
+		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks.');
+
 		// resumable		
 		r.post(req, function(status, filename, original_filename, identifier){
-			console.log('=>POST', status, original_filename, identifier);
-			
 			var options = req.body,
 			    fileUuid = options.fileUuid,
 			    projectUuid = options.projectUuid,
@@ -57,15 +61,11 @@ module.exports = api.upload = {
 			    outputPath = '/data/tmp/' + fileName,
 			    stream = fs.createWriteStream(outputPath);
 
-			console.log('outputPath: '.yellow, outputPath);
-			console.log('options->'.yellow, options);
-
 			// return status
 			res.status(status).send({});
 
 			// check if all done
 			if (status == 'done' && options.resumableChunkNumber == options.resumableTotalChunks) {
-				console.log('========= upload done!'.cyan);
 
 				// import uploaded file
 				api.upload._chunkedUploadDone({
@@ -121,7 +121,7 @@ module.exports = api.upload = {
 
 
 		ops.push(function (stats, callback) {
-			console.log('Upload done!'.yellow);
+			// console.log('Upload done!'.yellow);
 
 			var file = {
 				path : options.outputPath,
@@ -131,7 +131,7 @@ module.exports = api.upload = {
 
 			// import file
 			api.upload.importFile(file, options, function (err, pack) {
-				console.log('import done', err);
+				// console.log('import done', err);
 				callback(null, pack);
 			});
 
@@ -141,9 +141,17 @@ module.exports = api.upload = {
 
 
 		async.waterfall(ops, function (err, result) {
+
+			// console.log('waterfall done!'.red);
+			// console.log('waterfall done!'.red);
+			// console.log('waterfall done!'.red);
+			// console.log('options: ', options);
+			// console.log('result: ', result);
+
 			api.socket.uploadDone({
 				result : result,
 				user : options.user,
+				loka : 'loka'
 			});
 		});
 		
@@ -152,21 +160,21 @@ module.exports = api.upload = {
 
 	chunkedCheck : function (req, res) {
 		r.get(req, function(status, filename, original_filename, identifier){
-			console.log('GET', status);
+			// console.log('GET', status);
 			res.send((status == 'found' ? 200 : 404), status);
 		});
 	},
 
 	chunkedIdent : function (req, res) {
-		console.log('chunkedIdent'.yellow, req.params.identifier);
+		// console.log('chunkedIdent'.yellow, req.params.identifier);
 		r.write(req.params.identifier, res);
 	},
 
 	// entry point
 	importFile : function (incomingFile, options, done) {
 		// todo: check for upload access!;
-		console.log('API.upload.upload() IMORTFILE!'.cyan);
-		console.log('___________________'.cyan);
+		// console.log('API.upload.upload() IMORTFILE!'.cyan);
+		// console.log('___________________'.cyan);
 
 		// // process from-encoded upload
 		// var form = new formidable.IncomingForm({
@@ -195,9 +203,9 @@ module.exports = api.upload = {
 				if (err) console.log('ERR 18'.red, err);
 				if (err || !results) return callback(err || 'There were no valid files in the upload.');
 
-				console.log('_________ results ______________');
-				console.log('results: ', results);
-				console.log('__________ results end _________');				
+				// console.log('_________ results ______________');
+				// console.log('results: ', results);
+				// console.log('__________ results end _________');				
 							
 				callback(null, results);
 			});
@@ -267,7 +275,7 @@ module.exports = api.upload = {
 			// 	user : options.user,
 			// });
 
-			console.log('going done!');
+			// console.log('going done!');
 
 			done(null, pack);
 
@@ -374,7 +382,7 @@ module.exports = api.upload = {
 		    size = options.size;
 
 
-		console.log('_sendToProcessing'.yellow, layers);
+		// console.log('_sendToProcessing'.yellow, layers);
 
 
 		// can be several layers in each upload
@@ -409,7 +417,7 @@ module.exports = api.upload = {
 			// tar -cf - -C /var/www/vile/tests/rasters/advanced/ RapidEye_Boulder_CO.zip   | pigz | ssh px "pigz -d | tar xf - -C /home/"
 			var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh px "pigz -d | tar xf - -C ' + remoteFolder + '"';
 
-			console.log('dry cmd: ', cmd);
+			// console.log('dry cmd: ', cmd);
 
 			var host = api.config.grind.host;
 
@@ -430,7 +438,7 @@ module.exports = api.upload = {
 
 				// callback
 				function (err, response, body) {
-					console.log('requrest callback: ', err, body);
+					// console.log('requrest callback: ', err, body);
 
 
 					api.socket.setProcessing({
@@ -511,7 +519,7 @@ module.exports = api.upload = {
 
 		// if (!fileArray) return done('No files6.');
 
-		console.log('UPLOAD: Sorting form files');
+		// console.log('UPLOAD: Sorting form files');
 
 		// quick sort
 		var ops = [];
@@ -534,8 +542,8 @@ module.exports = api.upload = {
 				currentFolder : null
 			}
 
-			console.log('##############'.cyan);
-			console.log('options: ', options);
+			// console.log('##############'.cyan);
+			// console.log('options: ', options);
 
 			// add async ops
 			ops = api.upload._sortOps(ops, options);
