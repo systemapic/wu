@@ -503,8 +503,30 @@ module.exports = api.file = {
 
 		// move if not already in right place
 		if (inn != out) {
+			console.log('gonna move!'.yellow);
 			ops.move = function (callback) {
-				fs.move(inn, out, callback);
+
+
+				// fs.readFile(inn, function (err, data1) {
+				// 	console.log('read file => '.yellow, data1.length);
+				
+					fs.move(inn, out, function (err) {
+						console.log('moved ', inn, ' to ', out);
+
+
+						// fs.readFile(out, function (err, data2) {
+						// 	console.log('read file out => '.yellow, data2.length);
+					
+							callback(err);
+						// });
+
+						
+					});
+
+				// });
+
+
+				
 			};
 		}
 
@@ -680,6 +702,8 @@ module.exports = api.file = {
 		Project
 		.findOne({'uuid' : projectUuid })
 		.exec(function (err, project) {
+			if (err) return callback && callback(err);
+			if (!project) return callback && callback('No project');
 			project.files.push(file_id);			
 			project.markModified('files');
 			project.save(function (err) {
@@ -693,7 +717,7 @@ module.exports = api.file = {
 		    path = api.config.path.image + file;
 		
 		// send
-		res.sendFile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
+		res.sendfile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
 	},
 
 

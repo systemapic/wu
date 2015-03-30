@@ -57,19 +57,28 @@ module.exports = api.geo = {
 	handleGeoJSON : function (path, fileUuid, callback) {
 		if (!path || !fileUuid) return callback('Missing information.15');
 
+
 		api.geo.copyToVileFolder(path, fileUuid, function (err) {
 			if (err) return callback('copyvile hg err: ' + err);
 
 			try {
-				mapnikOmnivore.digest(path, function (err, metadata) {
-	        			if (err || !metadata) return callback('No metadata. gj' + err);
 
-		        		var db = {
-			        		metadata : JSON.stringify(metadata)
-			        	}
+				console.log('omni path: '.yellow, path);
 
-			        	// return
-			        	callback(null, db);
+				fs.readFile(path, function (err, data) {
+					console.log('data length: '.yellow, data.length);
+
+					mapnikOmnivore.digest(path, function (err, metadata) {
+		        			if (err || !metadata) return callback('No metadata. gj' + err);
+		        			
+			        		var db = {
+				        		metadata : JSON.stringify(metadata)
+				        	}
+
+				        	// return
+				        	callback(null, db);
+			        	});
+
 		        	});
 			
 			} catch (e) {
