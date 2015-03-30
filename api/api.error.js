@@ -73,6 +73,28 @@ module.exports = api.error = {
 		api.error.log(err);
 	},
 
+	generalSocket : function (user, err) {
+
+		var userId = user._id;
+
+		var session = _.findKey(api.app.io.handshaken, function (s) {
+			return s.session.passport.user == userId;
+		});
+
+
+		console.log('found session?'.yellow, session);
+
+		var sock = api.app.io.sockets.sockets[session];
+		
+		console.log('sock: '.magenta, sock);
+		
+		// send to user
+		sock.emit('errorMessage', {
+			error : err
+		});
+
+	},
+
 	pretty : function (err) {
 		if (!err) return err;
 

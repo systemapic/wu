@@ -1,4 +1,4 @@
-Wu.version = '0.5.1-dev';
+Wu.version = '0.6.1-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -15,6 +15,8 @@ Wu.App = Wu.Class.extend({
 
 		// set global this
 		Wu.app = window.app = this;
+
+		app.Socket = new Wu.Socket();
 
 		// error handling
 		this._initErrorHandling();
@@ -455,8 +457,8 @@ Wu.App = Wu.Class.extend({
 			}
 		}), callback, this);
 
-		// return
-		return json.hash;
+		// // return
+		// return json.hash;
 
 	},
 

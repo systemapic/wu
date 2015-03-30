@@ -34,102 +34,419 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
+var r = require('resumable-js/node-resumable')('/data/tmp/');
+
 // api
 var api = module.parent.exports;
 
 // exports
 module.exports = api.upload = { 
 
+	chunkedUpload : function (req, res) {
 
+		// console.log('res: '.red, res);
 
-	// entry point
-	file : function (req, res) {
-		// todo: check for upload access!;
-		console.log('API.upload.upload()'.cyan);
-		console.log('___________________'.cyan);
+		// resumable		
+		r.post(req, function(status, filename, original_filename, identifier){
+			console.log('=>POST', status, original_filename, identifier);
+			
+			var options = req.body,
+			    fileUuid = options.fileUuid,
+			    projectUuid = options.projectUuid,
+			    fileName = fileUuid + '-' + options.resumableFilename
+			    outputPath = '/data/tmp/' + fileName,
+			    stream = fs.createWriteStream(outputPath);
 
-		// process from-encoded upload
-		var form = new formidable.IncomingForm({
-			hash : 'sha1',
-			multiples : true,
-			keepExtensions : true,
+			console.log('outputPath: '.yellow, outputPath);
+			console.log('options->'.yellow, options);
+
+			// return status
+			res.status(status).send({});
+
+			// check if all done
+			if (status == 'done' && options.resumableChunkNumber == options.resumableTotalChunks) {
+				console.log('========= upload done!'.cyan);
+
+				// import uploaded file
+				api.upload._chunkedUploadDone({
+					user : req.user,
+					outputPath : outputPath,
+					fileName : options.resumableFilename,
+					projectUuid : projectUuid,
+					fileUuid : fileUuid,
+					resumableTotalChunks : options.resumableTotalChunks,
+					resumableIdentifier : options.resumableIdentifier
+				});
+
+			}
 		});
 
-		form.parse(req, function(err, fields, files) {	
-			if (err) console.log('ERR 1'.red, err);
-			if (err || !files || !fields || !files.file) return api.error.general(req, res, err || 'No files4.');
+	},
+
+	_chunkedUploadDone : function (options) {
+
+		var resumableTotalChunks = options.resumableTotalChunks,
+		    outputPath = options.outputPath,
+		    resumableIdentifier = options.resumableIdentifier,
+		    tmpFolder = '/data/tmp/',
+		    ops = [];
 
 
-			console.log('files! => '.yellow, files);
- 			
-			
+		ops.push(function (callback) {
 
-			var fileArray = [files.file];
+			// merge files
+			var cmd = 'cat ';
 
-			var ops = [];
+			_.times(resumableTotalChunks, function (i) {
+				var num = i + 1;
+				cmd += tmpFolder + 'resumable-' + resumableIdentifier + '.' + num + ' ';
+			})
 
-			// sort files
-			ops.push(function (callback) {
+			cmd += ' > ' + outputPath;
 
-				// quick sort
-				api.upload.sortFormFiles(fileArray, function (err, results) {
-					if (err) console.log('ERR 18'.red, err);
+			var exec = require('child_process').exec;
+			exec(cmd, function (err, stdout, stdin) {
+				if (err) console.log('err'.red, err);
+				// callback(null);
 
-					if (err || !results) return callback(err || 'There were no valid files in the upload.');
-
-					console.log('_________ results ______________');
-					console.log('results: ', results);
-					console.log('__________ results end _________');				
-								
-					callback(null, results);
-				});
-			});
-
-			// register files in mongo and to project
-			ops.push(function (entriesArray, callback) {
-				if (!entriesArray) return callback('Nothing to do.');
-
-				var options = {
-					entriesArray : entriesArray,
-					userUuid : req.user.uuid,
-					userFullName :  req.user.firstName + ' ' + req.user.lastName,
-					projectUuid : fields.project
-				}
-
-				// register files in mongo and to project
-				api.upload._registerFiles(options, function (err, results) {
-					if (err) console.log('ERR 17'.red, err);
-					callback(err, results);
-				});
-				
+				fs.stat(outputPath, callback);
 			});
 			
 
-			async.waterfall(ops, function (err, results) {
-				if (err) console.log('ERR 2'.red, err);
-				if (err || !results || !results.length) return api.error.general(req, res, err || 'There were no valid files in the upload.');
+		});
 
-				// organize in sidepane.dataLibrary format
-				var files = [],
-				    layers = [];
+		// ops.push(function (callback) {
+		// 	fs.stat(outputPath, callback);
+		// });
 
-				results && results.forEach(function (r) {
-					r.file && files.push(r.file);
-					r.layer && layers.push(r.layer);
-				});
 
-				var pack = {
-					files  : files,
-					layers :layers,
-					error : err
-				}
+		ops.push(function (stats, callback) {
+			console.log('Upload done!'.yellow);
 
-				// all done
-				res.end(JSON.stringify(pack));
+			var file = {
+				path : options.outputPath,
+				size : stats.size,
+				name : options.fileName,
+			}
+
+			// import file
+			api.upload.importFile(file, options, function (err, pack) {
+				console.log('import done', err);
+				callback(null, pack);
 			});
+
+			
+
+		});
+
+
+		async.waterfall(ops, function (err, result) {
+			api.socket.uploadDone({
+				result : result,
+				user : options.user,
+			});
+		});
+		
+		
+	},
+
+	chunkedCheck : function (req, res) {
+		r.get(req, function(status, filename, original_filename, identifier){
+			console.log('GET', status);
+			res.send((status == 'found' ? 200 : 404), status);
 		});
 	},
 
+	chunkedIdent : function (req, res) {
+		console.log('chunkedIdent'.yellow, req.params.identifier);
+		r.write(req.params.identifier, res);
+	},
+
+	// entry point
+	importFile : function (incomingFile, options, done) {
+		// todo: check for upload access!;
+		console.log('API.upload.upload() IMORTFILE!'.cyan);
+		console.log('___________________'.cyan);
+
+		// // process from-encoded upload
+		// var form = new formidable.IncomingForm({
+		// 	hash : 'sha1',
+		// 	multiples : true,
+		// 	keepExtensions : true,
+		// });
+
+		// form.parse(req, function(err, fields, files) {	
+		// 	if (err) console.log('ERR 1'.red, err);
+		// 	if (err || !files || !fields || !files.file) return api.error.general(req, res, err || 'No files4.');
+
+		var user = options.user,
+		    projectUuid = options.projectUuid;
+
+
+		var fileArray = [incomingFile];
+
+		var ops = [];
+
+		// sort files
+		ops.push(function (callback) {
+
+			// quick sort
+			api.upload.sortFormFiles(fileArray, function (err, results) {
+				if (err) console.log('ERR 18'.red, err);
+				if (err || !results) return callback(err || 'There were no valid files in the upload.');
+
+				console.log('_________ results ______________');
+				console.log('results: ', results);
+				console.log('__________ results end _________');				
+							
+				callback(null, results);
+			});
+		});
+
+		// register files in mongo and to project
+		ops.push(function (entriesArray, callback) {
+			if (!entriesArray) return callback('Nothing to do.');
+
+			var options = {
+				entriesArray : entriesArray,
+				userUuid : user.uuid,
+				userFullName :  user.firstName + ' ' + user.lastName,
+				projectUuid : projectUuid
+			}
+
+			// register files in mongo and to project
+			api.upload._registerFiles(options, function (err, results) {
+				if (err) console.log('ERR 17'.red, err);
+				callback(err, results);
+			});
+			
+		});
+		
+
+		async.waterfall(ops, function (err, results) {
+			if (err) console.log('ERR 2'.red, err);
+			if (err || !results || !results.length) return api.error.generalSocket(user, err || 'There were no valid files in the upload.');
+
+			// organize in sidepane.dataLibrary format
+			var files = [],
+			    layers = [];
+
+			results && results.forEach(function (r) {
+				r.file && files.push(r.file);
+				r.layer && layers.push(r.layer);
+			});
+
+			var pack = {
+				files : files,
+				layers : layers,
+				error : err
+			}
+
+			var options = {
+				pack : pack,
+				user : user,
+				size : incomingFile.size
+			}
+
+			api.upload._sendToProcessing(options, function (err, result) { // todo: do per file
+
+				// api.socket.setProcessing({
+				// 	result : result,
+				// 	err : err,
+				// 	user : options.user,
+				// 	id : fileUuid
+				// });
+
+			});
+
+			// all done
+			// res.end(JSON.stringify(pack));
+			// send upload done notification
+			// api.socket.uploadDone({
+			// 	result : pack,
+			// 	user : options.user,
+			// });
+
+			console.log('going done!');
+
+			done(null, pack);
+
+			
+		});
+		// });
+	},
+
+	// // entry point
+	// file : function (req, res) {
+	// 	// todo: check for upload access!;
+	// 	console.log('API.upload.upload()'.cyan);
+	// 	console.log('___________________'.cyan);
+
+	// 	// process from-encoded upload
+	// 	var form = new formidable.IncomingForm({
+	// 		hash : 'sha1',
+	// 		multiples : true,
+	// 		keepExtensions : true,
+	// 	});
+
+	// 	form.parse(req, function(err, fields, files) {	
+	// 		if (err) console.log('ERR 1'.red, err);
+	// 		if (err || !files || !fields || !files.file) return api.error.general(req, res, err || 'No files4.');
+
+
+	// 		console.log('files! => '.yellow, files);
+ 			
+			
+
+	// 		var fileArray = [files.file];
+
+	// 		var ops = [];
+
+	// 		// sort files
+	// 		ops.push(function (callback) {
+
+	// 			// quick sort
+	// 			api.upload.sortFormFiles(fileArray, function (err, results) {
+	// 				if (err) console.log('ERR 18'.red, err);
+
+	// 				if (err || !results) return callback(err || 'There were no valid files in the upload.');
+
+	// 				console.log('_________ results ______________');
+	// 				console.log('results: ', results);
+	// 				console.log('__________ results end _________');				
+								
+	// 				callback(null, results);
+	// 			});
+	// 		});
+
+	// 		// register files in mongo and to project
+	// 		ops.push(function (entriesArray, callback) {
+	// 			if (!entriesArray) return callback('Nothing to do.');
+
+	// 			var options = {
+	// 				entriesArray : entriesArray,
+	// 				userUuid : req.user.uuid,
+	// 				userFullName :  req.user.firstName + ' ' + req.user.lastName,
+	// 				projectUuid : fields.project
+	// 			}
+
+	// 			// register files in mongo and to project
+	// 			api.upload._registerFiles(options, function (err, results) {
+	// 				if (err) console.log('ERR 17'.red, err);
+	// 				callback(err, results);
+	// 			});
+				
+	// 		});
+			
+
+	// 		async.waterfall(ops, function (err, results) {
+	// 			if (err) console.log('ERR 2'.red, err);
+	// 			if (err || !results || !results.length) return api.error.general(req, res, err || 'There were no valid files in the upload.');
+
+	// 			// organize in sidepane.dataLibrary format
+	// 			var files = [],
+	// 			    layers = [];
+
+	// 			results && results.forEach(function (r) {
+	// 				r.file && files.push(r.file);
+	// 				r.layer && layers.push(r.layer);
+	// 			});
+
+	// 			var pack = {
+	// 				files  : files,
+	// 				layers :layers,
+	// 				error : err
+	// 			}
+
+	// 			api.upload._sendToProcessing(layers);
+
+	// 			// all done
+	// 			res.end(JSON.stringify(pack));
+	// 		});
+	// 	});
+	// },
+
+
+	_sendToProcessing : function (options, callback) {
+		var pack = options.pack,
+		    user = options.user,
+		    layers = pack.layers,
+		    size = options.size;
+
+
+		console.log('_sendToProcessing'.yellow, layers);
+
+
+		// can be several layers in each upload
+		layers.forEach(function (layer) {
+
+			// var path = api.config.path.geojson + fileUuid + '.geojson';
+
+			// console.log('path'.magenta, path); // /data/geojson/file-73a16a51-050e-492d-bd9b-0fa52f7bcd0a.geojson
+
+			// var remotePath = '/data/grind/' + fileUuid + '/';
+
+			// var arr = [
+			// 	'tar cjf - -C',
+			// 	api.config.path.geojson,
+			// 	fileUuid + '.geojson',
+			// 	'| ssh px "tar xjfC -',
+			// 	'/data/grind/geojson/"'
+			// ]
+
+			// var cmd = arr.join(' ');
+
+			// copy folder
+			// tar -cf - -C /var/www/vile/tests/rasters/advanced/ testfolder/ | pigz | ssh px "pigz -d | tar xf - -C /home/"
+
+			// tar -cf - RapidEye_Boulder_CO.zip  | pigz | ssh px "pigz -d | tar xf - -C /home/"
+			
+			var fileUuid = layer.file;
+			var localFile = fileUuid + '.geojson';
+			var localFolder = api.config.path.geojson;
+			var remoteFolder = '/data/grind/geojson/';
+
+			// tar -cf - -C /var/www/vile/tests/rasters/advanced/ RapidEye_Boulder_CO.zip   | pigz | ssh px "pigz -d | tar xf - -C /home/"
+			var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh px "pigz -d | tar xf - -C ' + remoteFolder + '"';
+
+			console.log('dry cmd: ', cmd);
+
+			var host = api.config.grind.host;
+
+			exec(cmd, function (err, stdout, stdin) {
+				if (err) console.log('err'.red, err);
+
+				// file sent
+				// notify px of transfer to start grind
+
+				// send to tileserver storage
+				request({
+					method : 'POST',
+					uri : host + 'grind/job',
+					json : {
+						fileUuid : fileUuid
+					}
+				}, 
+
+				// callback
+				function (err, response, body) {
+					console.log('requrest callback: ', err, body);
+
+
+					api.socket.setProcessing({
+						userId : user._id,
+						fileUuid : fileUuid,
+						pack : pack,
+						size : size
+					});
+
+					callback(null, 'All done!');
+
+				});
+			});
+		});
+
+	},
 
 
 	_registerFiles : function (options, done) {
@@ -271,7 +588,7 @@ module.exports = api.upload = {
 					currentFolder : currentFolder
 				}
 
-				// fuck doing zip within zip!!
+				// dont do zip within zip!!
 				if (extension == 'zip') {
 					var message = 'The file ' + options.name + ' was rejected. Please upload only one set of files within a zipped archive.';
 					done(message);
