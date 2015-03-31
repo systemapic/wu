@@ -193,6 +193,8 @@ Wu.Dropzone = Wu.Pane.extend({
 	},
 
 	_refresh : function () {
+		if (!this.dz) return console.error('TODO: remove', this);
+
 		if (!app.access.to.upload_file(this._project)) {
 			return this.disable();
 		}

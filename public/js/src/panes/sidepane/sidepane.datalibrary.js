@@ -17,6 +17,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// Upload button
 		this._uploader = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload');
 
+		// chunk upload
+		// this._uploaderChunk = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload Chunked');
+
 		// Search field
 		this._search = Wu.DomUtil.create('input', 'search', this._controlInner);
 		this._search.id = 'datalibrary-search';
@@ -47,7 +50,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// #datalibrary-table-container
 		this._tableContainer = Wu.DomUtil.create('div', 'datalibrary-table-container', this._dataLibraryContainer);
 
-	      
 		// create fullscreen dropzone
 		this.fulldrop = Wu.DomUtil.create('div', 'fullscreen-drop', this._content);
 
@@ -109,7 +111,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.initList();
 
 		// init dropzone
-		this.initDZ();
+		// this.initDZ();
 
 		// init download table
 		this.initDownloadTable();
@@ -117,9 +119,15 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// add tooltip
 		app.Tooltip.add(this._menu, 'The data library contains all files uploaded to the project.');
 
+
+		// add fullscreen drop 
+		this._resumableDrop = Wu.DomUtil.create('div', 'resumable-drop', app._appPane);
+
 		// add hooks
 		this.addHooks();
 
+		// 
+		Wu.Mixin.Events.on('projectSelected', this._onProjectSelected, this);
 
 	},
 
@@ -129,12 +137,12 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 
 		// delete button
-		if (app.access.to.delete_project(this.project)) {
+		if (app.access.to.delete_project(this._project)) {
 			Wu.DomEvent[on](this._deleter, 'mousedown', this.deleteConfirm, this);
 		}
 
 		// download 
-		if (app.access.to.download_file(this.project)) {
+		if (app.access.to.download_file(this._project)) {
 			// download button
 			Wu.DomEvent[on](this._downloader, 'mousedown', this.downloadFiles, this);
 		}
@@ -144,13 +152,14 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// search button
 		Wu.DomEvent[on](this._search, 'keyup', this.searchList, this);
-
-		// 
-		Wu.Mixin.Events[on]('projectSelected', this._onProjectSelected, this);
+		
 	},
 
 	_onProjectSelected : function (e) {
 		this._unload(e);
+
+		// refresh uploader
+		this._refreshResumable();
 	},
 
 	_unload : function (e) {
@@ -169,61 +178,214 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	addHooks : function () {
 		this._setHooks('on');
 
-		if (app.access.to.delete_project(this.project)) {
+		if (app.access.to.delete_project(this._project)) {
 			Wu.DomUtil.removeClass(this._deleter, 'displayNone');
 		};
 
-		if (app.access.to.upload_file(this.project)) {
+		if (app.access.to.upload_file(this._project)) {
 			Wu.DomUtil.removeClass(this._uploader, 'displayNone');
-			app.Dropzone.enable();
+			// app.Dropzone.enable();
 		}
 
-		if (app.access.to.download_file(this.project)) {
+		if (app.access.to.download_file(this._project)) {
 			Wu.DomUtil.removeClass(this._downloader, 'displayNone');
 		}
+	},
+
+	_refreshResumable : function () {
+		if (this.r) console.log('this.r: ', this.r);
+
+		// remove old
+		if (this.r) this._removeResumable();
+
+		// add new
+		if (app.access.to.upload_file(this._project)) this._addResumable();
+	},
+
+	_removeResumable : function () {
+		var r = this.r;
+		// r.unAssignBrowse(this._uploader);
+		r.unAssignDrop(this._resumableDrop);
+		r.cancel();
+		this.r = null;
+		delete this.r;
+
+		// remove drop events
+		Wu.DomEvent.off(window.document, 'dragenter', this._dragEnter, this);
+		Wu.DomEvent.off(this._resumableDrop, 'dragleave', this._dragLeave, this);
+	},
+
+	_addResumable : function () {
+	
+		var r = this.r = new Resumable({
+			target : '/api/upload',
+			chunkSize : 1*1024*2048,
+			simultaneousUploads : 5,
+			generateUniqueIdentifier : function (file) {
+				return file.size + '-' + file.lastModified + '-' + file.name;
+			},
+			testChunks : false, // resumable chunks
+			throttleProgressCallbacks : 1,
+			query : {
+				fileUuid : Wu.Util.guid('r'),
+				projectUuid : app.activeProject.getUuid()
+			},
+
+			// max files to be uploaded at once
+			maxFiles : 1,
+			maxFilesErrorCallback : function (files, errorCount) {
+
+				// feedback message
+				app.feedback.setError({
+					title : 'Sorry, you can\'t do that!',
+					description : 'Please only upload one file at a time.',
+				});
+
+				// hide drop
+				app.SidePane.DataLibrary._hideDrop();
+			},
+
+			// accepted filetypes
+			fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt'],
+			fileTypeErrorCallback : function (file, errorCount) {
+
+				// feedback message
+				app.feedback.setError({
+					title : 'Sorry, you can\'t do that!',
+					description : 'The file <strong>' + file.name + '</strong> is not an accepted filetype.',
+				});
+
+				// hide drop
+				app.SidePane.DataLibrary._hideDrop();
+
+			},
+		});
+
+		// assign to DOM
+		r.assignDrop(this._resumableDrop);
+		r.assignBrowse(this._uploader);
+
+		r.on('fileAdded', function(file){
+			console.log('r.fileAdded', file);
+		
+			r._startTime = new Date().getTime();
+			r.upload();
+
+			var size = Wu.Util.bytesToSize(file.size),
+			    fileName = file.fileName,
+			    message = 'Uploading ' + fileName + ' (' + size + ')';
+			
+			// set feedback
+			app.feedback.setMessage({
+				title : 'Upload started',
+				description : message,
+				id : file.uniqueIdentifier
+			});
+
+			// remove fulldrop
+			this._dragLeave();
+
+		}.bind(this));
+
+		r.on('complete', function(){
+			console.log('r.complete');
+		});
+
+		r.on('pause', function(){
+			console.log('r.pause');
+		});
+		
+		r.on('fileSuccess', function(file, message){
+			console.log('r.fileSuccess', file, message);
+
+			var endTime = new Date().getTime(),
+			    startTime = r._startTime,
+			    totalTime = (endTime - startTime) / 1000,
+			    size = file.size / 1000 / 1000,
+			    bytesPerSecond = size / totalTime,
+			    message = 'Uploaded ' + size.toFixed(2) + ' MB in ' + totalTime.toFixed(2) + ' seconds, at ' + bytesPerSecond.toFixed(2) + ' MB/s.',
+			    estimatedProcessingTime = (size * 0.5).toFixed(0) + ' seconds';
+			
+			message +=' <br><br>Estimated pre-processing time is ' + estimatedProcessingTime;
+
+			// set feedback
+			app.feedback.setMessage({
+				title : 'Upload success!',
+				description : message,
+				id : file.uniqueIdentifier
+			});
+
+			console.error('TODO: refresh layer if activated before processing is done.')
+
+			console.log('done????!?! isComplete() ? ', file.isComplete());
+
+			// refresh for new upload
+			this._refreshResumable();
+
+			app.ProgressBar.hideProgress();
+
+
+		}.bind(this));
+
+		r.on('fileError', function(file, message){
+			console.log('r.fileError');
+		});
+
+		r.on('fileProgress', function(file){
+			var progress = file.progress() * 100;
+			app.ProgressBar.setProgress(progress);
+		});
+
+		r.on('cancel', function(){
+			console.log('r.cancel');
+		});
+
+		r.on('uploadStart', function(){
+			console.log('r.uploadStart');
+		});
+
+		// add drop events
+		Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
+		Wu.DomEvent.on(this._resumableDrop, 'dragleave', this._dragLeave, this);
+
+	},
+
+	_dragEnter : function (e) {
+		console.log('_dragEnter');
+		if (!app.activeProject) return;
+		this._showDrop();
+	},
+
+	_dragLeave : function (e) {
+		console.log('_dragLeave');
+		this._hideDrop();
+	},
+
+	_hideDrop : function () {
+		this._resumableDrop.style.display = 'none';
+	},
+
+	_showDrop : function () {
+		this._resumableDrop.style.display = 'block';
 	},
 
 	removeHooks : function () {
 		
 		this._setHooks('off');
 		
-		if (app.access.to.delete_project(this.project)) {
+		if (app.access.to.delete_project(this._project)) {
 			Wu.DomUtil.addClass(this._deleter, 'displayNone');
 		};
 
-		if (app.access.to.upload_file(this.project)) {
+		if (app.access.to.upload_file(this._project)) {
 			Wu.DomUtil.addClass(this._uploader, 'displayNone');
-			app.Dropzone.disable();
+			// app.Dropzone.disable();
 		}
 
-		if (app.access.to.download_file(this.project)) {
+		if (app.access.to.download_file(this._project)) {
 			Wu.DomUtil.addClass(this._downloader, 'displayNone');
 		}
 	},
-
-	// // hooks added automatically on page load
-	// removeHooks : function () {
-	       
-	// 	// delete button
-	// 	Wu.DomEvent.off(this._deleter, 'mousedown', this.deleteConfirm, this);
-	// 	Wu.DomUtil.addClass(this._deleter, 'displayNone');
-
-	// 	// upload button 
-	// 	Wu.DomUtil.addClass(this._uploader, 'displayNone');
-	// 	app.Dropzone.disable();
-
-	// 	// download 
-	// 	Wu.DomEvent.off(this._downloader, 'mousedown', this.downloadFiles, this);
-	// 	Wu.DomUtil.addClass(this._downloader, 'displayNone');
-
-	// 	// check all button
-	// 	Wu.DomEvent.off(this._checkallLabel, 'mousedown', this.checkAll, this);
-
-	// 	// search button
-	// 	Wu.DomEvent.off(this._search, 'keyup', this.searchList, this);
-	       
-	// },
-
 
 	searchList : function (e) {
 		if (e.keyCode == 27) { // esc
@@ -307,7 +469,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				if (ch.checked) ch.checked = false;
 			}, this);
 
-
 		} else {
 			// check all visible
 			var visible = this.list.visibleItems;
@@ -335,11 +496,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		var json = {
 			'files' : this._downloadFileList, // [fuuids],
-			'puuid' : this.project.store.uuid,
-			'pslug' : this.project.store.slug
+			'puuid' : this._project.store.uuid,
+			'pslug' : this._project.store.slug
 		}
 
-		
 		var json = JSON.stringify(json);
 
 		// post         path          json      callback           this
@@ -473,7 +633,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// get selected files
 		var checks = [];
-		this.project.store.files.forEach(function(file, i, arr) {
+		this._project.store.files.forEach(function(file, i, arr) {
 			var checkbox = Wu.DomUtil.get('checkbox-' + file.uuid);
 			if (checkbox) { var checked = checkbox.checked; }
 			if (checked) { checks.push(file); }
@@ -506,15 +666,12 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		app.setStatus('Deleting');
 		
 		// remove files n layers from project
-		this.project.removeFiles(files);
+		this._project.removeFiles(files);
 
 		// set status
 		app.setStatus('Deleted!');
 
-		// refresh sidepane
-		// this.project.refreshSidepane();
-		// app.SidePane.refreshMenu();
-
+		// set feedback
 		app.feedback.setMessage({
 			title : 'Files deleted',
 			description : this._getPrettyFileNames(files)			
@@ -575,39 +732,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.list.clear();
 	},
 
-	// is only fired once ever
-	initDZ : function () {
-		if (!app.Dropzone) return;
-
-		// create dropzone
-		app.Dropzone.initDropzone({
-			uploadedCallback : this.uploaded.bind(this),
-			clickable : this._uploader
-		});
-                    
-	},
-
-	refreshDZ : function () {
-
-		var dropzone = app.Dropzone;
-
-		if (app.access.to.upload_file(this.project)) {
-			// refresh dropzone
-			dropzone.refresh();
-		} else {
-			dropzone.disable();
-		}
-
-
-		this.createFeedbackID();
-	},
-
-	createFeedbackID : function () {
-
-		this.__id = Wu.Util.createRandom(5);
-
-	},
-
 	
 	handleError : function (err) {
 
@@ -615,15 +739,15 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		app.feedback.setError({
 			title : 'Upload error',
 			description : err,
-			id : this.__id			
+			id : Wu.Util.createRandom(5)	
 		});
-
 	},
 
 	// process file
 	uploaded : function (result) {
-		
 
+		console.log('uploaded!', result);
+		
 		// handle errors
 		if (result.error) this.handleError(result.error);
 		
@@ -634,32 +758,25 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		result.files && result.files.forEach(function (file, i, arr) {
 			
 			// add to project locally (already added on server)
-			this.project.setFile(file);
-
-			// set icon if image
-			var icon = (file.data && file.data.image) ? this._getImagePath(file.uuid, 100, 100) : null;
-
-			app.feedback.setSuccess({
-				title : 'Upload success!',
-				description : 'Added <strong>' + file.name + '</strong> to the Data Library.',
-				icon : icon,
-				id : this.__id
-			});
-
+			this._project.setFile(file);
 		}, this);
 
 		// add layers
 		result.layers && result.layers.forEach(function (layer, i) {
-			this.project.addLayer(layer);
+			console.log('__________adding lyaer: ', layer);
+			this._project.addLayer(layer);
 
 			// todo: set layer icon
-
-			app.feedback.setAction({
+			app.feedback.setMessage({
 				title : 'Layer created',
 				description : 'Added <strong>' + layer.title + '</strong> to available layers.',
-				id : this.__id
+				id : result.uniqueIdentifier
 			});
 
+			// add automatically to layermenu
+			// if (app.access.to.edit_project(this.project)) {
+			// 	app.SidePane.Options.settings.layermenu._enableLayerFromOutside(layer.uuid);
+			// }
 
 		}, this);
 
@@ -820,13 +937,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var fileUuid = this._injectedUuid = e.target.parentNode.id;
 
 		// get file object
-		var file = this.project.getFile(fileUuid);
+		var file = this._project.getFile(fileUuid);
 
 		// create wrapper
 		var wrapper = this._injected = Wu.DomUtil.create('div', 'datalibrary-category-wrapper');
 
 		// add line per category
-		var categories = this.project.getCategories();
+		var categories = this._project.getCategories();
 
 		// for each category
 		categories.forEach(function (c) {
@@ -911,10 +1028,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	removeCategory : function (category) {
 
 		// remove from project
-		this.project.removeCategory(category);
+		this._project.removeCategory(category);
 	
 		// remove from all files
-		var files = this.project.getFileObjects();
+		var files = this._project.getFileObjects();
 		for (f in files) {
 			var file = files[f];
 			if (file.getCategory().toLowerCase() == category.toLowerCase()) {
@@ -942,7 +1059,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	injectCategoryBlur : function () {
 
 		// update file in project
-		this.project.store.files.forEach(function(file, i, arr) {
+		this._project.store.files.forEach(function(file, i, arr) {
 			// iterate and find hit
 			// if (file.uuid == fuuid) file[key] = value;
 		}, this);
@@ -957,11 +1074,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			var value = this._injectedNewline.value;
 
 			// create new category
-			this.project.addCategory(value);
+			this._project.addCategory(value);
 
 			// get file
 			var fileUuid = this._injectedUuid;
-			var file = this.project.getFile(fileUuid);
+			var file = this._project.getFile(fileUuid);
 
 			// set category
 			file.setCategory(value);
@@ -1020,7 +1137,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		}, this);
 
 		// update file in project
-		var file = this.project.getFile(this._injectedUuid);
+		var file = this._project.getFile(this._injectedUuid);
 		file.setKeywords(split);
 	},
 
@@ -1064,7 +1181,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var value = e.target.value || e.target.innerHTML;
 
 		// update file in project
-		this.project.store.files.forEach(function(file, i, arr) {
+		this._project.store.files.forEach(function(file, i, arr) {
 			// iterate and find hit
 			if (file.uuid == fuuid) file[key] = value;
 		}, this);
@@ -1081,14 +1198,14 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	updateLayerName : function (fileUuid, value) {
 		// find and update layer
-		var layer = this.project.getLayerFromFile(fileUuid);
+		var layer = this._project.getLayerFromFile(fileUuid);
 		if (layer) layer.setTitle(value);
 	},
 
 	_save : function (fuuid, key) {
 
 		// save the file
-		this.project.store.files.forEach(function(file, i, arr) {
+		this._project.store.files.forEach(function(file, i, arr) {
 		     
 			// iterate and find hit
 			if (file.uuid == fuuid) {	// refactor to file object?
@@ -1114,13 +1231,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	update : function () {
 
 		// use active project
-		this.project = Wu.app.activeProject;
+		this._project = Wu.app.activeProject;
 
 		// flush
 		this.reset();
 
 		// refresh dropzone
-		this.refreshDZ();
+		// this.refreshDZ();
 
 		// refresh table entries
 		this.refreshTable();
@@ -1137,9 +1254,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_checkEditMode : function () {
-		var canUpload = app.access.to.upload_file(this.project),
-		    canDelete = app.access.to.delete_file(this.project),
-		    canDownload = app.access.to.download_file(this.project);
+		var canUpload = app.access.to.upload_file(this._project),
+		    canDelete = app.access.to.delete_file(this._project),
+		    canDownload = app.access.to.download_file(this._project);
 
 		this._uploader.style.display = canUpload ? 'inline-block' : 'none';
 		this._deleter.style.display = canDelete ? 'inline-block' : 'none';
@@ -1155,11 +1272,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	refreshTable : function () {
 
 		// return if empty filelist
-		if (!this.project.files) { return; }
+		if (!this._project.files) { return; }
 
 		// enter files into table
-		for (f in this.project.files) {
-			var file = this.project.files[f];
+		for (f in this._project.files) {
+			var file = this._project.files[f];
 			this.addFile(file);
 		};
 

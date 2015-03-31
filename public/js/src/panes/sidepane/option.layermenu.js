@@ -129,6 +129,17 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		if (this.editMode) this.maxHeight += 100;
 	},
 
+	// _enableLayerFromOutside : function (layerUuid) {
+	// 	console.log('_enableLayerFromOutside', layerUuid, this, this._layers);
+
+	// 	var layermenuLayer = this._layers[layerUuid];
+	// 	if (!layermenuLayer) return console.error('no such layer.', layerUuid);
+
+	// 	var layerMenu = app.MapPane.getControls().layermenu;
+	// 	layerMenu.add(layermenuLayer.layer);
+	// 	this.on(layermenuLayer);
+	// },
+
 	toggle : function (layer) {
 		var layerMenu = app.MapPane.getControls().layermenu;
 
