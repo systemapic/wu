@@ -74,26 +74,9 @@ module.exports = api.error = {
 	},
 
 	generalSocket : function (user, err) {
+		api.socket.sendError(user._id, err);
 
-		var userId = user._id;
-		api.socket.sendError(userId, err);
-
-		// var session = _.findKey(api.app.io.handshaken, function (s) {
-		// 	if (!s || !s.session || !s.session.passport) return false;
-		// 	return s.session.passport.user == userId;
-		// });
-
-		// if (!session) return console.log('ERR 101: no session'.red);
-
-		// var sock = api.app.io.sockets.sockets[session];
-
-		// if (!sock) return console.log('ERR 101: no sock'.red);
-		
-		// // send to user
-		// sock.emit('errorMessage', {
-		// 	error : err
-		// });
-
+		api.error.log(err);
 	},
 
 	pretty : function (err) {
@@ -113,12 +96,18 @@ module.exports = api.error = {
 		if (err.stack) console.log('stack:'.red, err.stack);
 		if (err.message) console.log('message'.red, err.message);
 		
+		if (err) console.log('err: '.red, err);
 
-		if (_.isObject(err)) {
-			for (item in err) {
-				console.log('err items: ', err[item]);
-			}
-		}
+		// var text = '*Server error*: ' + err.message || 'Some error:' + ' ```' + err.stack || err + '```';
+
+		var text = '*Server error*: ```' + err + '```';
+
+		// send error to slack
+		api.slack._send({
+			text : text,
+			channel : api.config.slack.errorChannel,
+			icon : 'http://systemapic.com/wp-content/uploads/systemapic-color-logo-circle-error.png'
+		});
 
 		// todo: slack, ga.js, log, etc.
 	},
@@ -132,21 +121,20 @@ module.exports = api.error = {
 		    username = options.username,
 		    project = options.project,
 		    domain = api.config.portalServer.uri.split('//').reverse()[0],
-		    fileLine = options.file.split('/').reverse()[0] + ':' + options.line;
+		    fileLine = options.file.split('/').reverse()[0] + ':' + options.line,
+		    find = api.config.portalServer.uri,
+		    re = new RegExp(find, 'g'),
+		    cleanStack = stack.replace(re, ''),
+		    text = '*Error*: ' + domain + ' `' + fileLine + '` ```' + cleanStack + '```';
 
-		var find = api.config.portalServer.uri;
-		var re = new RegExp(find, 'g');
-		var cleanStack = stack.replace(re, '');
-
-		var text = '*Error*: ' + domain + ' `' + fileLine + '` ```' + cleanStack + '```';
-
+		// send error to slack
 		api.slack._send({
 			text : text,
-			channel : '#error-log',
+			channel : api.config.slack.errorChannel,
 			icon : 'http://systemapic.com/wp-content/uploads/systemapic-color-logo-circle-error.png'
 		});
 
-		res.end(); // no feedback
+		res && res.end(); // no feedback
 	},
 
 

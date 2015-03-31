@@ -587,7 +587,7 @@ Wu.App = Wu.Class.extend({
 		this.debug = true;
 
 		// set style
-		Wu.setStyle('img', {
+		app.Style.setStyle('img.leaflet-tile', {
 			'border-top': '1px solid rgba(255, 0, 0, 0.65)',
 			'border-left': '1px solid rgba(255, 0, 0, 0.65)'
 		});
@@ -596,10 +596,11 @@ Wu.App = Wu.Class.extend({
 		if (app._map) app._map.on('mousedown', function (e) {
 			var lat = e.latlng.lat,
 			    lng = e.latlng.lng,
-			    zoom = app._map.getZoom();
+			    zoom = app._map.getZoom(),
+			    tile = this._getTileURL(lat, lng, zoom);
 
-			var tile = this._getTileURL(lat, lng, zoom);
 			console.log('tile:', tile);
+			
 		}, this);
 
 		// extend 

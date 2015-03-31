@@ -157,7 +157,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	_onProjectSelected : function (e) {
 		this._unload(e);
 
-		console.log('refreshshsh!!');
+		// refresh uploader
 		this._refreshResumable();
 	},
 
@@ -183,11 +183,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		if (app.access.to.upload_file(this._project)) {
 			Wu.DomUtil.removeClass(this._uploader, 'displayNone');
-
 			Wu.DomUtil.removeClass(this._uploaderChunk, 'displayNone');
 			// app.Dropzone.enable();
-
-			
 		}
 
 		if (app.access.to.download_file(this._project)) {
@@ -221,18 +218,28 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			}
 		});
 
-		this.r = r;
+		// console.error(r);
 
-		// console.log('this.r: __', this.r);
-		// r.assignBrowse(this._uploaderChunk);
+		this.r = r;
 
 		r.assignDrop(window.document);
 
 		r.on('fileAdded', function(file){
 			console.log('r.fileAdded', file);
+		
 			r._startTime = new Date().getTime();
-			
 			r.upload();
+
+			var size = Wu.Util.bytesToSize(file.size),
+			    fileName = file.fileName,
+			    message = 'Uploading ' + fileName + ' (' + size + ')';
+			
+			// set feedback
+			app.feedback.setMessage({
+				title : 'Upload started',
+				description : message,
+				id : file.uniqueIdentifier
+			});
 		});
 
 		r.on('complete', function(){
@@ -243,37 +250,40 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			console.log('r.pause');
 		});
 		
-		r.on('fileSuccess', function(file,message){
+		r.on('fileSuccess', function(file, message){
 			console.log('r.fileSuccess', file, message);
 
-			var endTime = new Date().getTime();
-			var startTime = r._startTime;
-			var totalTime = (endTime - startTime) / 1000;
-			var size = file.size / 1000 / 1000
-			var bytesPerSecond = size / totalTime;
-			var message = 'Uploaded ' + size.toFixed(2) + ' MB in ' + totalTime.toFixed(2) + ' seconds, at ' + bytesPerSecond.toFixed(2) + ' MB/s.';
-			console.log(message)
+			var endTime = new Date().getTime(),
+			    startTime = r._startTime,
+			    totalTime = (endTime - startTime) / 1000,
+			    size = file.size / 1000 / 1000,
+			    bytesPerSecond = size / totalTime,
+			    message = 'Uploaded ' + size.toFixed(2) + ' MB in ' + totalTime.toFixed(2) + ' seconds, at ' + bytesPerSecond.toFixed(2) + ' MB/s.',
+			    estimatedProcessingTime = (size * 0.5).toFixed(0) + ' seconds';
+			message +=' <br><br>Estimated pre-processing time is ' + estimatedProcessingTime;
 
-
-			// console.error('id: ', this.__id);
-
-			app.feedback.setSuccess({
+			// set feedback
+			app.feedback.setMessage({
 				title : 'Upload success!',
 				description : message,
-				// icon : icon,
-				id : Wu.Util.createRandom(5)
+				id : file.uniqueIdentifier
 			});
 
 			console.error('TODO: refresh layer if activated before processing is done.')
 
-		});
+			// clear for next upload
+			this.r.cancel();
+
+			app.ProgressBar.hideProgress();
+		}.bind(this));
 
 		r.on('fileError', function(file, message){
 			console.log('r.fileError');
 		});
 
 		r.on('fileProgress', function(file){
-			console.log('r.fileProgress', file);
+			var progress = file.progress() * 100;
+			app.ProgressBar.setProgress(progress);
 		});
 
 		r.on('cancel', function(){
@@ -303,30 +313,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			Wu.DomUtil.addClass(this._downloader, 'displayNone');
 		}
 	},
-
-	// // hooks added automatically on page load
-	// removeHooks : function () {
-	       
-	// 	// delete button
-	// 	Wu.DomEvent.off(this._deleter, 'mousedown', this.deleteConfirm, this);
-	// 	Wu.DomUtil.addClass(this._deleter, 'displayNone');
-
-	// 	// upload button 
-	// 	Wu.DomUtil.addClass(this._uploader, 'displayNone');
-	// 	app.Dropzone.disable();
-
-	// 	// download 
-	// 	Wu.DomEvent.off(this._downloader, 'mousedown', this.downloadFiles, this);
-	// 	Wu.DomUtil.addClass(this._downloader, 'displayNone');
-
-	// 	// check all button
-	// 	Wu.DomEvent.off(this._checkallLabel, 'mousedown', this.checkAll, this);
-
-	// 	// search button
-	// 	Wu.DomEvent.off(this._search, 'keyup', this.searchList, this);
-	       
-	// },
-
 
 	searchList : function (e) {
 		if (e.keyCode == 27) { // esc
@@ -614,10 +600,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// set status
 		app.setStatus('Deleted!');
 
-		// refresh sidepane
-		// this._project.refreshSidepane();
-		// app.SidePane.refreshMenu();
-
+		// set feedback
 		app.feedback.setMessage({
 			title : 'Files deleted',
 			description : this._getPrettyFileNames(files)			
@@ -701,13 +684,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			dropzone.disable();
 		}
 
-
-		// this.createFeedbackID();
 	},
-
-	// createFeedbackID : function () {
-	// 	this.__id = Wu.Util.createRandom(5);
-	// },
 
 	
 	handleError : function (err) {
@@ -718,14 +695,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			description : err,
 			id : Wu.Util.createRandom(5)	
 		});
-
 	},
 
 	// process file
 	uploaded : function (result) {
-		
-		console.log('this.', this);
 
+		console.log('uploaded!', result);
+		
 		// handle errors
 		if (result.error) this.handleError(result.error);
 		
@@ -735,33 +711,19 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// add files to library
 		result.files && result.files.forEach(function (file, i, arr) {
 			
-			console.log('this._project', this._project);
-
 			// add to project locally (already added on server)
 			this._project.setFile(file);
-
-			// set icon if image
-			var icon = (file.data && file.data.image) ? this._getImagePath(file.uuid, 100, 100) : null;
-
-			// app.feedback.setSuccess({
-			// 	title : 'Upload success!',
-			// 	description : 'Added <strong>' + file.name + '</strong> to the Data Library.',
-			// 	icon : icon,
-			// 	id : this.__id
-			// });
-
 		}, this);
 
 		// add layers
 		result.layers && result.layers.forEach(function (layer, i) {
 			this._project.addLayer(layer);
 
-
 			// todo: set layer icon
-			app.feedback.setAction({
+			app.feedback.setMessage({
 				title : 'Layer created',
 				description : 'Added <strong>' + layer.title + '</strong> to available layers.',
-				id : Wu.Util.createRandom(5)
+				id : result.uniqueIdentifier
 			});
 
 

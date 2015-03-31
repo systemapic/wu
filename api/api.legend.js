@@ -73,22 +73,14 @@ module.exports = api.legend = {
 		// if (!fileUuid || !cartoid || !layerUuid) return done('Missing information.4');
 		if (!fileUuid || !cartoid) return done('Missing information.4');
 
-		console.log('ap.legend.generate'.cyan);
-		console.log('fiuleUuid: ', fileUuid);
-		console.log('cartoid: ', cartoid);
-		// console.log('layerUuid:', layerUuid);
-
 		// get layer features/values
 		ops.push(function (callback) {
 			api.layer._getLayerFeaturesValues(fileUuid, cartoid, function (err, result) {
 				if (err) console.log('_getLayerFeaturesValues err'.red, err);
-
 				if (err) return callback(err);
-				
 				callback(null, result);
 			});
 		});
-
 
 		// for each rule found
 		ops.push(function (result, callback) {
@@ -98,7 +90,6 @@ module.exports = api.legend = {
 
 			async.each(jah, function (rule, cb) {
 				if (!rule) console.log('no role'.red);
-
 				if (!rule) return cb('No rule.');
 
 				var options = {
@@ -110,7 +101,6 @@ module.exports = api.legend = {
 
 				api.layer._createStylesheet(options, function (err, result) {
 					if (err || !result) console.log('_createStylesheet err'.red, err, result);
-
 					if (err || !result) return cb(err || 'No stylesheet.');
 
 					api.legend._create(result, function (err, path) {
