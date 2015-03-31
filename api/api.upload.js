@@ -166,7 +166,7 @@ module.exports = api.upload = {
 	chunkedCheck : function (req, res) {
 		r.get(req, function(status, filename, original_filename, identifier){
 			// console.log('GET', status);
-			res.send((status == 'found' ? 200 : 404), status);
+			res.send((status == 'found' ? 200 : 201), status);
 		});
 	},
 

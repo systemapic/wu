@@ -95,7 +95,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
-	app.get('/api/chunked/upload', isLoggedIn, function (req, res) {
+	app.get('/api/upload', isLoggedIn, function (req, res) {
 		// console.log('GET /api/chunked/upload'.yellow, req.body);
 		api.upload.chunkedCheck(req, res);
 	});

@@ -158,7 +158,7 @@ Wu.App = Wu.Class.extend({
 		});
 
 		// render dropzone pane
-		this.Dropzone = new Wu.Dropzone();
+		// this.Dropzone = new Wu.Dropzone();
 
 		// render side pane 
 		this.SidePane = new Wu.SidePane();	// todo: add settings more locally? Wu.SidePane({options})

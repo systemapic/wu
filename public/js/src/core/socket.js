@@ -58,6 +58,11 @@ Wu.Socket = Wu.Class.extend({
 		});
 		socket.on('errorMessage', function (data) {
 			console.log('errorMessage!', data);
+
+			app.feedback.setError({
+				title : 'Error:',
+				description : data.error,
+			});
 		});
 		// // Listen for get-feelings event.
 		// socket.on('get-feelings', function () {
