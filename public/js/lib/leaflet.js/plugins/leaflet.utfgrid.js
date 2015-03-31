@@ -83,7 +83,7 @@ L.UtfGrid = L.Class.extend({
 		this._map = map;
 		this._container = this._map._container;
 
-		this._update();
+		// this._update();
 
 		var zoom = this._map.getZoom();
 
@@ -95,7 +95,7 @@ L.UtfGrid = L.Class.extend({
 		map.on('mousedown', this._mousedown, this);
 		map.on('mouseup', this._mouseup, this);
 		map.on('mousemove', this._move, this);
-		map.on('moveend', this._update, this);
+		// map.on('moveend', this._update, this);
 	},
 
 	onRemove: function () {
@@ -105,7 +105,7 @@ L.UtfGrid = L.Class.extend({
 		map.off('mousedown', this._mousedown, this);
 		map.off('mouseup', this._mouseup, this);
 		map.off('mousemove', this._move, this);
-		map.off('moveend', this._update, this);
+		// map.off('moveend', this._update, this);
 		
 		if (this.options.pointerCursor) {
 			this._container.style.cursor = '';
@@ -113,6 +113,7 @@ L.UtfGrid = L.Class.extend({
 	},
 
 	redraw: function () {
+		console.error('utf redraw')
 		// Clear cache to force all tiles to reload
 		this._request_queue = [];
 		for (var req_key in this._requests){
@@ -198,6 +199,8 @@ L.UtfGrid = L.Class.extend({
 	//Load up all required json grid files
 	//TODO: Load from center etc
 	_update: function () {
+
+		console.error('utf update');
 
 		var bounds = this._map.getPixelBounds(),
 		    zoom = this._map.getZoom(),
