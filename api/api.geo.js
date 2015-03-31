@@ -105,12 +105,14 @@ module.exports = api.geo = {
 
 		var cmd = 'digest ' + path;
 
+		console.log('cmd: ', cmd);
+
 		var exec = require('child_process').exec;
 
 		exec(cmd, function (err, stdout, stdin) {
 			console.log('err, stdout, stdin', err, stdout, stdin);
 			var metadata = stdout.replace(/(\r\n|\n|\r)/gm,"");
-			callback(null, metadata);
+			callback(err, metadata);
 		});
 
 	},

@@ -109,19 +109,26 @@ module.exports = api.socket = {
 	},
 
 	grindDone : function (req, res) {
-		console.log('grindDone'.yellow);
+		console.log('grindDone'.yellow, req.body);
 		
 		var fileUuid = req.body.fileUuid,
 		    process = api.socket.getProcessing(fileUuid),
 		    timeDiff = new Date().getTime() - process._timestamp,
 		    userId = process.userId,
-		    sock = api.socket._getSocket(userId);
+		    sock = api.socket._getSocket(userId),
+		    error = req.body.error,
+		    uniqueIdentifier = req.body.uniqueIdentifier;
+
+
+		console.log('grindDone: err?'.yellow, error);
 
 		// send to user
 		sock.emit('processingDone', {
 			processingDone : fileUuid,
 			elapsed : timeDiff,
-			size : process.size
+			error : error,
+			size : process.size,
+			uniqueIdentifier : uniqueIdentifier
 		});
 
 		// end connection

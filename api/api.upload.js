@@ -43,33 +43,38 @@ var api = module.parent.exports;
 module.exports = api.upload = { 
 
 	chunkedUpload : function (req, res) {
-
-		// console.log('res: '.red, res);
-
-		var resumableChunkNumber = req.body.resumableChunkNumber,
-		    resumableTotalChunks = req.body.resumableTotalChunks;
+	    	var options = req.body,
+		    fileUuid = options.fileUuid,
+		    projectUuid = options.projectUuid,
+		    fileName = fileUuid + '-' + options.resumableFilename,
+		    outputPath = '/data/tmp/' + fileName,
+		    stream = fs.createWriteStream(outputPath),
+		    resumableChunkNumber = req.body.resumableChunkNumber,
+	    	    resumableTotalChunks = req.body.resumableTotalChunks;
 
 
 		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks.');
-
+		console.log(options);
 		// resumable		
 		r.post(req, function(status, filename, original_filename, identifier){
-			var options = req.body,
-			    fileUuid = options.fileUuid,
-			    projectUuid = options.projectUuid,
-			    fileName = fileUuid + '-' + options.resumableFilename
-			    outputPath = '/data/tmp/' + fileName,
-			    stream = fs.createWriteStream(outputPath);
 
 			// return status
 			res.status(status).send({});
 
+			// register chunk done in redis
+			if (status == 'done' || status == 'partly_done') api.redis.incr('done-chunks-' + fileUuid);
+
 			// check if all done
-			if (status == 'done' && options.resumableChunkNumber == options.resumableTotalChunks) {
+			api.redis.get('done-chunks-' + fileUuid, function (err, count) {
+				console.log('redis chunk count'.yellow, err, count);
+
+				// return if not all done				
+				if (count != options.resumableTotalChunks) return;
 
 				// import uploaded file
 				api.upload._chunkedUploadDone({
 					user : req.user,
+					uniqueIdentifier : options.resumableIdentifier,
 					outputPath : outputPath,
 					fileName : options.resumableFilename,
 					projectUuid : projectUuid,
@@ -77,15 +82,14 @@ module.exports = api.upload = {
 					resumableTotalChunks : options.resumableTotalChunks,
 					resumableIdentifier : options.resumableIdentifier
 				});
-
-			}
+			});
 		});
-
 	},
 
 	_chunkedUploadDone : function (options) {
 
 		var resumableTotalChunks = options.resumableTotalChunks,
+		    uniqueIdentifier = options.uniqueIdentifier,
 		    outputPath = options.outputPath,
 		    resumableIdentifier = options.resumableIdentifier,
 		    tmpFolder = '/data/tmp/',
@@ -127,6 +131,7 @@ module.exports = api.upload = {
 				path : options.outputPath,
 				size : stats.size,
 				name : options.fileName,
+				uniqueIdentifier : uniqueIdentifier
 			}
 
 			// import file
@@ -247,16 +252,18 @@ module.exports = api.upload = {
 			var pack = {
 				files : files,
 				layers : layers,
-				error : err
+				error : err,
+				uniqueIdentifier : options.uniqueIdentifier
 			}
 
-			var options = {
+			var opts = {
 				pack : pack,
 				user : user,
-				size : incomingFile.size
+				size : incomingFile.size,
+				uniqueIdentifier : options.uniqueIdentifier
 			}
 
-			api.upload._sendToProcessing(options, function (err, result) { // todo: do per file
+			api.upload._sendToProcessing(opts, function (err, result) { // todo: do per file
 
 				// api.socket.setProcessing({
 				// 	result : result,
@@ -382,7 +389,7 @@ module.exports = api.upload = {
 		    size = options.size;
 
 
-		// console.log('_sendToProcessing'.yellow, layers);
+		console.log('_sendToProcessing'.yellow, options);
 
 
 		// can be several layers in each upload
@@ -413,6 +420,7 @@ module.exports = api.upload = {
 			var localFile = fileUuid + '.geojson';
 			var localFolder = api.config.path.geojson;
 			var remoteFolder = '/data/grind/geojson/';
+			var uniqueIdentifier = options.uniqueIdentifier;
 
 			// tar -cf - -C /var/www/vile/tests/rasters/advanced/ RapidEye_Boulder_CO.zip   | pigz | ssh px "pigz -d | tar xf - -C /home/"
 			var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh px "pigz -d | tar xf - -C ' + remoteFolder + '"';
@@ -420,6 +428,13 @@ module.exports = api.upload = {
 			// console.log('dry cmd: ', cmd);
 
 			var host = api.config.grind.host;
+
+			var sendOptions = {
+				fileUuid : fileUuid,
+				uniqueIdentifier : uniqueIdentifier
+			}
+
+			console.log('sendOptions'.yellow, sendOptions);
 
 			exec(cmd, function (err, stdout, stdin) {
 				if (err) console.log('err'.red, err);
@@ -431,9 +446,7 @@ module.exports = api.upload = {
 				request({
 					method : 'POST',
 					uri : host + 'grind/job',
-					json : {
-						fileUuid : fileUuid
-					}
+					json : sendOptions
 				}, 
 
 				// callback
@@ -444,6 +457,7 @@ module.exports = api.upload = {
 					api.socket.setProcessing({
 						userId : user._id,
 						fileUuid : fileUuid,
+						uniqueIdentifier : uniqueIdentifier,
 						pack : pack,
 						size : size
 					});

@@ -73,8 +73,28 @@ Wu.Style = Wu.Class.extend({
 		this._styletag.appendChild(phantom);
 	},
 
+	setStyle : function (tag, rules) {
+
+		// set rules 
+		jss.set(tag, rules);
+
+		// eg: 
+		// jss.set('img', {
+		// 	'border-top': '1px solid red',
+		// 	'border-left': '1px solid red'
+		// });
+		// https://github.com/Box9/jss
+	},
+
+	getStyle : function (tag) {
+		return jss.getAll(tag);
+	},
+
+
 });
 
+Wu.setStyle = Wu.Style.setStyle;
+Wu.getStyle = Wu.Style.getStyle;
 
 // keep for handy shortcuts
 function darktheme () {
