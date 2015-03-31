@@ -54,7 +54,7 @@ module.exports = api.upload = {
 
 
 		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks.');
-		console.log(options);
+
 		// resumable		
 		r.post(req, function(status, filename, original_filename, identifier){
 
@@ -119,13 +119,7 @@ module.exports = api.upload = {
 
 		});
 
-		// ops.push(function (callback) {
-		// 	fs.stat(outputPath, callback);
-		// });
-
-
 		ops.push(function (stats, callback) {
-			// console.log('Upload done!'.yellow);
 
 			var file = {
 				path : options.outputPath,
@@ -136,7 +130,6 @@ module.exports = api.upload = {
 
 			// import file
 			api.upload.importFile(file, options, function (err, pack) {
-				// console.log('import done', err);
 				callback(null, pack);
 			});
 
@@ -146,12 +139,6 @@ module.exports = api.upload = {
 
 
 		async.waterfall(ops, function (err, result) {
-
-			// console.log('waterfall done!'.red);
-			// console.log('waterfall done!'.red);
-			// console.log('waterfall done!'.red);
-			// console.log('options: ', options);
-			// console.log('result: ', result);
 
 			api.socket.uploadDone({
 				result : result,
@@ -165,13 +152,11 @@ module.exports = api.upload = {
 
 	chunkedCheck : function (req, res) {
 		r.get(req, function(status, filename, original_filename, identifier){
-			// console.log('GET', status);
 			res.send((status == 'found' ? 200 : 201), status);
 		});
 	},
 
 	chunkedIdent : function (req, res) {
-		// console.log('chunkedIdent'.yellow, req.params.identifier);
 		r.write(req.params.identifier, res);
 	},
 
@@ -208,10 +193,6 @@ module.exports = api.upload = {
 				if (err) console.log('ERR 18'.red, err);
 				if (err || !results) return callback(err || 'There were no valid files in the upload.');
 
-				// console.log('_________ results ______________');
-				// console.log('results: ', results);
-				// console.log('__________ results end _________');				
-							
 				callback(null, results);
 			});
 		});
@@ -431,7 +412,8 @@ module.exports = api.upload = {
 
 			var sendOptions = {
 				fileUuid : fileUuid,
-				uniqueIdentifier : uniqueIdentifier
+				uniqueIdentifier : uniqueIdentifier,
+				host : 'sx'
 			}
 
 			console.log('sendOptions'.yellow, sendOptions);
