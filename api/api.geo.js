@@ -76,8 +76,10 @@ module.exports = api.geo = {
 
 					// console.log('typeof metadata', typeof(metadata));
 
-		        			if (err || !metadata) return callback('No metadata. gj' + err);
+						if (err) return callback(err);
+		        			if (!metadata) return callback('No metadata!');
 		        			
+
 			        		var db = {
 				        		// metadata : JSON.stringify(metadata)
 				        		metadata : metadata
@@ -101,7 +103,9 @@ module.exports = api.geo = {
 
 	_readMetaData : function (path, callback) {
 
-		// console.log('_readMetaData'.yellow, path);
+		// debug
+		return api.geo._readMetaDataNode(path, callback);
+
 
 		var cmd = 'digest ' + path;
 
@@ -111,9 +115,28 @@ module.exports = api.geo = {
 
 		exec(cmd, function (err, stdout, stdin) {
 			console.log('err, stdout, stdin', err, stdout, stdin);
+			console.log('digest done.'.yellow);
+			console.log('err::'.yellow, err);
+			console.log('stdout::'.yellow, stdout);
+			console.log('stdin::'.yellow, stdin);
 			var metadata = stdout.replace(/(\r\n|\n|\r)/gm,"");
 			callback(err, metadata);
 		});
+
+	},
+
+	_readMetaDataNode : function (path, callback) {
+
+		mapnikOmnivore.digest(path, function(err, metadata) {
+			if (err) {
+				console.log('digest.err!'.red, err);
+				return callback(err);
+			}
+			// console.log(JSON.stringify(metadata, null, 2));
+			return callback(null, JSON.stringify(metadata, null, 2));
+
+		});
+
 
 	},
 
@@ -187,7 +210,8 @@ module.exports = api.geo = {
 					try {
 						// read meta from file
 				        	mapnikOmnivore.digest(path, function (err, metadata) {
-				        		if (err || !metadata) return callback('No metadata: ' + err);
+				        		if (err) return callback(err);
+				        		if (!metadata) return callback('No metadata!');
 
 				        		console.log('got meta?', err, metadata);
 				        		db.metadata = JSON.stringify(metadata);
@@ -314,11 +338,15 @@ module.exports = api.geo = {
 			var exists = fs.existsSync(proj); 				// todo: async!
 
 			// read projection file if exists
+			console.log('reading projection.'.yellow, proj);
 			var projection = exists ? fs.readFileSync(proj) : false; 	// todo: async!
-			
+			console.log('projection: '.cyan, projection.toString());
 			// set projection if any
-			var proj4 = projection ? srs.parse(projection).proj4 : false;
-
+			try {
+				var proj4 = projection ? srs.parse(projection).proj4 : false;
+			} catch (e) {
+				return callback(e);
+			}
 			// create ogr object
 			var myfile = ogr2ogr(inFile);
 
