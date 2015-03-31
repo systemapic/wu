@@ -1,4 +1,4 @@
-Wu.version = '0.5.1-dev';
+Wu.version = '0.6.1-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -15,6 +15,8 @@ Wu.App = Wu.Class.extend({
 
 		// set global this
 		Wu.app = window.app = this;
+
+		app.Socket = new Wu.Socket();
 
 		// error handling
 		this._initErrorHandling();
@@ -156,7 +158,7 @@ Wu.App = Wu.Class.extend({
 		});
 
 		// render dropzone pane
-		this.Dropzone = new Wu.Dropzone();
+		// this.Dropzone = new Wu.Dropzone();
 
 		// render side pane 
 		this.SidePane = new Wu.SidePane();	// todo: add settings more locally? Wu.SidePane({options})
@@ -455,8 +457,8 @@ Wu.App = Wu.Class.extend({
 			}
 		}), callback, this);
 
-		// return
-		return json.hash;
+		// // return
+		// return json.hash;
 
 	},
 
@@ -585,7 +587,7 @@ Wu.App = Wu.Class.extend({
 		this.debug = true;
 
 		// set style
-		Wu.setStyle('img', {
+		app.Style.setStyle('img.leaflet-tile', {
 			'border-top': '1px solid rgba(255, 0, 0, 0.65)',
 			'border-left': '1px solid rgba(255, 0, 0, 0.65)'
 		});
@@ -594,10 +596,11 @@ Wu.App = Wu.Class.extend({
 		if (app._map) app._map.on('mousedown', function (e) {
 			var lat = e.latlng.lat,
 			    lng = e.latlng.lng,
-			    zoom = app._map.getZoom();
+			    zoom = app._map.getZoom(),
+			    tile = this._getTileURL(lat, lng, zoom);
 
-			var tile = this._getTileURL(lat, lng, zoom);
 			console.log('tile:', tile);
+			
 		}, this);
 
 		// extend 

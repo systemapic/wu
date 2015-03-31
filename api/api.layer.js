@@ -49,24 +49,15 @@ module.exports = api.layer = {
 		// lol?
 		return res.end(JSON.stringify({error : 'Unsupported.'}))
 
+		// var layerType = req.body.layerType;
 
-		var layerType = req.body.layerType;
+		// if (layerType == 'geojson') return api.layer.createLayerFromGeoJSON(req, res);
 
-		if (layerType == 'geojson') return api.layer.createLayerFromGeoJSON(req, res);
-
-		res.end(JSON.stringify({
-			layer : 'yo!'
-		}));
-
-
+		// res.end(JSON.stringify({
+		// 	layer : 'yo!'
+		// }));
 
 	},
-
-	// _create : function (options, callback) {
-
-		
-
-	// },
 
 	// create OSM layer
 	createOSM : function (req, res) {
@@ -150,7 +141,6 @@ module.exports = api.layer = {
 
 	// update layer
 	update : function (req, res) {
-		console.log('updateLayer');
 
 		var layerUuid 	= req.body.layer || false;
 		var user 	= req.user;
@@ -210,11 +200,6 @@ module.exports = api.layer = {
 		    layerUuids = req.body.layerUuids,
 		    ops = [],
 		    _lids = [];
-
-		console.log('API: deleteLayers');
-		console.log('puuid: ', projectUuid);
-		console.log('userid: ', userid);
-		console.log('uuids: ', layerUuids);
 
 		// validate
 		if (!projectUuid || !userid) return api.error.missingInformation(req, res);
@@ -345,32 +330,19 @@ module.exports = api.layer = {
 
 	// set carto css
 	setCartoCSS : function (req, res) {
-		console.log('setCartoCSS');
-		console.log('body: ', req.body);
 
 		// get params
-		var fileUuid 	= req.body.fileUuid;
-		var css 	= req.body.css;
-		var cartoid 	= req.body.cartoid;
-		var layerUuid 	= req.body.layerUuid;
-
-		// set path
-		// var csspath = CARTOCSSFOLDER + cartoid + '.mss';
-		var csspath = api.config.path.cartocss + cartoid + '.mss';
-
-		var isOSM = (fileUuid == 'osm');
-
-		// var host = isOSM ? VILEOSMHOST : VILEHOST;
-		var host = isOSM ? api.config.vileosm.uri : api.config.vile.uri;
-
-
-		console.log('setCartoCSS HOST: ', host);
-		console.log('vars: ', layerUuid, fileUuid, cartoid, csspath, css);
+		var fileUuid 	= req.body.fileUuid,
+		    css 	= req.body.css,
+		    cartoid 	= req.body.cartoid,
+		    layerUuid 	= req.body.layerUuid,
+		    csspath = api.config.path.cartocss + cartoid + '.mss',
+		    isOSM = (fileUuid == 'osm'),
+		    host = isOSM ? api.config.vileosm.uri : api.config.vile.uri;
 
 		// save css to file by cartoId 
 		fs.writeFile(csspath, css, {encoding : 'utf8'}, function (err) {
 			if (err) return api.error.general(req, res);
-
 
 			// send to tileserver storage
 			request({
@@ -410,6 +382,7 @@ module.exports = api.layer = {
 
 						layer.data.cartoid = cartoid;
 						layer.markModified('data');
+						
 						layer.save(function (err, doc) {
 							if (err || !doc) return api.error.general(req, res, err || 'No layer.');
 
@@ -430,51 +403,14 @@ module.exports = api.layer = {
 
 
 	_createStylesheet : function (options, callback) {
-		var featureKey = options.key;
-		var featureValue = options.value;
-		var css = options.css;
-		var lid = options.id;
+		var featureKey = options.key,
+		    featureValue = options.value,
+		    css = options.css,
+		    lid = options.id,
+		    properties = {};
 
-		var properties = {};
+		// set key/value
 		properties[featureKey] = featureValue;
-
-		// var geojson = {
-		// 	"type" : "FeatureCollection",
-		// 	"features" : [
-		// 		{
-		// 		"type" : "Feature",
-		// 		"properties" : properties,
-		// 		"geometry": {
-		// 			"type": "Polygon",
-		// 			"coordinates": [
-		// 				[
-		// 				[
-		// 			              -180,
-		// 			              0
-		// 			            ],
-		// 			            [
-		// 			              -180,
-		// 			              90
-		// 			            ],
-		// 			            [
-		// 			              0,
-		// 			              90
-		// 			            ],
-		// 			            [
-		// 			              0,
-		// 			              0
-					             
-		// 			            ],
-		// 			            [
-		// 			              -180,
-		// 			              0
-		// 			            ]
-		// 				]
-		// 				]
-		// 			}
-		// 		}
-		// 	]
-		// }
 
 		var geojson = {
 			"type" : "FeatureCollection",
@@ -541,8 +477,6 @@ module.exports = api.layer = {
 
 			try {
 				var cr = new carto.Renderer({});
-			
-				// get xml
 				var xml = cr.render(options);
 				var stylepath = api.config.path.legends + 'stylesheet-' + lid + '.xml';
 
@@ -557,9 +491,7 @@ module.exports = api.layer = {
 					callback(null, result);
 				});
 
-			} catch (e) {
-				callback(e);
-			}
+			} catch (e) { callback(e); }
 
 		});
 
@@ -573,19 +505,20 @@ module.exports = api.layer = {
 	_getLayerFeaturesValues : function (fileUuid, cartoid, callback) {
 		if (!fileUuid || !cartoid) return callback('Missing information.1');
 
-		if (fileUuid == 'osm') {
-			api.layer._getLayerFeaturesValuesOSM(fileUuid, cartoid, callback);
-		} else {
-			api.layer._getLayerFeaturesValuesGeoJSON(fileUuid, cartoid, callback);
-		}
+		api.layer._getLayerFeaturesValuesGeoJSON(fileUuid, cartoid, callback);
+
+		// if (fileUuid == 'osm') {
+		// 	api.layer._getLayerFeaturesValuesOSM(fileUuid, cartoid, callback);
+		// } else {
+		// 	api.layer._getLayerFeaturesValuesGeoJSON(fileUuid, cartoid, callback);
+		// }
 	},
 
 	_getLayerFeaturesValuesOSM : function (fileUuid, cartoid, callback) {
-		console.log('_getLayerFeaturesValuesOSM');
 		callback('debug');
 	},
 
-	_getLayerFeaturesValuesGeoJSON : function (fileUuid, cartoid, callback) {
+	_getLayerFeaturesValuesGeoJSON : function (fileUuid, cartoid, callback) {       // todo: optimize!
 		if (!fileUuid || !cartoid) return callback('Missing information.2');
 
 		File
@@ -593,75 +526,56 @@ module.exports = api.layer = {
 		.exec(function (err, file) {
 			if (err || !file) return callback(err || 'No file.');
 
-
-			// read geojson file
-			var path = api.config.path.file + file.uuid + '/' + file.data.geojson;
+			// read css from file
+			var cartopath = api.config.path.cartocss + cartoid + '.mss';
 			
-			fs.readJson(path, function (err, data) {
-				if (err || !data) return callback(err || 'No data.');
+			fs.readFile(cartopath, 'utf8', function (err, buffer) {
+				if (err || !buffer) return callback(err || 'No data.');
 
-				// read css from file
-				var cartopath = api.config.path.cartocss + cartoid + '.mss';
-				
-				fs.readFile(cartopath, 'utf8', function (err, buffer) {
-					if (err || !buffer) return callback(err || 'No data.');
+				try {
 
-					// css as string
-					var css = buffer.toString();
+					// get rules from carto (forked! see explain below...)
+					var css = buffer.toString(),
+					    renderer = new carto.Renderer(),
+					    info = renderer.getRules(css),
+					    string = JSON.stringify(info),
+					    jah = [],
+					    rules1 = info.rules;//[0].rules;
 
-					try {
-
-						// get rules from carto (forked! see explain below...)
-						var renderer = new carto.Renderer();
-						var info = renderer.getRules(css);
-
-						console.log('-====> info', info);
-
-						var string = JSON.stringify(info);
-
-						// add rules to jah
-						var jah = [];
-						var rules1 = info.rules;//[0].rules;
-
-						rules1.forEach(function (rule1) {
-
-							var rules2 = rule1.rules;
-
-
-							if (!rules2) return;				// todo? forEach on rule1?
-							rules2.forEach(function (rrules) {
-								if (!rrules.selectors) return;
-
-								rrules.selectors.forEach(function (s) {
-									var rule = s.filters.filters;
-									for (var r in rule) {
-										var jahrule = rule[r];
-										jah.push({
-											key : jahrule.key.value,
-											value : jahrule.val.value
-										});
-									}
-								});
+					// iterate
+					rules1.forEach(function (rule1) {
+						var rules2 = rule1.rules;
+						if (!rules2) return;				// todo? forEach on rule1?
+						rules2.forEach(function (rrules) {
+							if (!rrules.selectors) return;
+							rrules.selectors.forEach(function (s) {
+								var rule = s.filters.filters;
+								for (var r in rule) {
+									var jahrule = rule[r];
+									jah.push({
+										key : jahrule.key.value,
+										value : jahrule.val.value
+									});
+								}
 							});
 						});
+					});
 
-						// add #layer
-						jah.push({
-							key : 'layer',
-							value : file.name
-						});
+					// add #layer
+					jah.push({
+						key : 'layer',
+						value : file.name
+					});
 
-						var result = {
-							rules : jah,
-							css : css
-						}
-
-						callback(null, result);
-
-					} catch (e) {
-						callback(e);
+					var result = {
+						rules : jah,
+						css : css
 					}
-				});
+
+					return callback(null, result);
+
+				// catch errros
+				} catch (e) { callback(e); }
 			});
 		});
 	},
@@ -722,7 +636,7 @@ module.exports = api.layer = {
 
 
 	createModel : function (options, callback) {
-		console.log('api.layer.createModel'.yellow, options);
+		// console.log('api.layer.createModel'.yellow, options);
 
 		var layer 		= new Layer();
 		layer.uuid 		= options.uuid;

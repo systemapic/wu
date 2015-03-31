@@ -509,6 +509,17 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			subdomains : subdomains,
 			maxRequests : 0,
 		});
+
+		Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
+	},
+
+	_updateGrid : function (l) {
+
+		// refresh of gridlayer is attached to layer. this because vector tiles are not made in vile.js, 
+		// and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
+		// - also, removed listeners in L.UtfGrid (onAdd)
+		// 
+		if (this.gridLayer) this.gridLayer._update();
 	},
 
 	_prepareGrid : function () {
@@ -526,8 +537,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		this.gridLayer = new L.UtfGrid(url, {
 			useJsonP: false,
 			subdomains: subdomains,
-			maxRequests : 20,
-			requestTimeout : 20000,
+			maxRequests : 0,
+			requestTimeout : 10000,
 			fileUuid : fileUuid
 		});
 

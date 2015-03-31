@@ -57,19 +57,39 @@ module.exports = api.geo = {
 	handleGeoJSON : function (path, fileUuid, callback) {
 		if (!path || !fileUuid) return callback('Missing information.15');
 
+
 		api.geo.copyToVileFolder(path, fileUuid, function (err) {
 			if (err) return callback('copyvile hg err: ' + err);
 
 			try {
-				mapnikOmnivore.digest(path, function (err, metadata) {
-	        			if (err || !metadata) return callback('No metadata. gj' + err);
 
-		        		var db = {
-			        		metadata : JSON.stringify(metadata)
-			        	}
+				// console.log('omni path: '.yellow, path);
 
-			        	// return
-			        	callback(null, db);
+				fs.readFile(path, function (err, data) {
+					// console.log('data length: '.yellow, data.length);
+
+					console.time('omnivore');
+					// mapnikOmnivore.digest(path, function (err, metadata) {
+					api.geo._readMetaData(path, function (err, metadata) {
+
+					console.timeEnd('omnivore');
+
+					// console.log('typeof metadata', typeof(metadata));
+
+						if (err) return callback(err);
+		        			if (!metadata) return callback('No metadata!');
+		        			
+
+			        		var db = {
+				        		// metadata : JSON.stringify(metadata)
+				        		metadata : metadata
+				        	}
+
+				        	// return
+				        	callback(null, db);
+					})
+			        	// });
+
 		        	});
 			
 			} catch (e) {
@@ -81,10 +101,49 @@ module.exports = api.geo = {
         	
 	},
 
+	_readMetaData : function (path, callback) {
+
+		// debug
+		return api.geo._readMetaDataNode(path, callback);
+
+
+		var cmd = 'digest ' + path;
+
+		console.log('cmd: ', cmd);
+
+		var exec = require('child_process').exec;
+
+		exec(cmd, function (err, stdout, stdin) {
+			console.log('err, stdout, stdin', err, stdout, stdin);
+			console.log('digest done.'.yellow);
+			console.log('err::'.yellow, err);
+			console.log('stdout::'.yellow, stdout);
+			console.log('stdin::'.yellow, stdin);
+			var metadata = stdout.replace(/(\r\n|\n|\r)/gm,"");
+			callback(err, metadata);
+		});
+
+	},
+
+	_readMetaDataNode : function (path, callback) {
+
+		mapnikOmnivore.digest(path, function(err, metadata) {
+			if (err) {
+				console.log('digest.err!'.red, err);
+				return callback(err);
+			}
+			// console.log(JSON.stringify(metadata, null, 2));
+			return callback(null, JSON.stringify(metadata, null, 2));
+
+		});
+
+
+	},
+
 
 	handleTopoJSON : function (path, fileUuid, callback) { 			// TODO!
 		// convert to geojson
-		console.log('TODO:::: handleTopoJSON', path, fileUuid);
+		// console.log('TODO:::: handleTopoJSON', path, fileUuid);
 
 		callback('Topojson unsupported.');
 	},
@@ -93,7 +152,7 @@ module.exports = api.geo = {
 
 
 	handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
-		console.log('handleShapefile...');
+		// console.log('handleShapefile...');
 
 		if (!folder || !name || !fileUuid) return callback('Missing info.');
 
@@ -106,7 +165,7 @@ module.exports = api.geo = {
 			// async ops
 			var ops = [];
 
-			console.log('_______#_#_#_#_#__'.cyan, 'READISHIT!!');
+			// console.log('_______#_#_#_#_#__'.cyan, 'READISHIT!!');
 
 			// check if valid shapefile(s)
 			ops.push(function (done) {
@@ -151,7 +210,8 @@ module.exports = api.geo = {
 					try {
 						// read meta from file
 				        	mapnikOmnivore.digest(path, function (err, metadata) {
-				        		if (err || !metadata) return callback('No metadata: ' + err);
+				        		if (err) return callback(err);
+				        		if (!metadata) return callback('No metadata!');
 
 				        		console.log('got meta?', err, metadata);
 				        		db.metadata = JSON.stringify(metadata);
@@ -210,7 +270,7 @@ module.exports = api.geo = {
 
 		possible.forEach(function (ex) {
 
-			console.log('foreach possigle'.magenta, ex);
+			// console.log('foreach possigle'.magenta, ex);
 
 			var p = options.folder + '/' + options.base + ex;
 			var f = options.outfolder + '/' + options.base + ex;
@@ -218,7 +278,6 @@ module.exports = api.geo = {
 			ops.push(function (callback) {
 
 				if (fs.existsSync(p)) {
-					console.log('existsssss'.red);
 					fs.move(p, f, callback);
 				} else {
 					callback();
@@ -238,7 +297,7 @@ module.exports = api.geo = {
 
 	convertshp : function (shapes, folder, callback) {
 		
-		console.log('########### CONVERT SHAPE'.cyan);
+		// console.log('########### CONVERT SHAPE'.cyan);
 
 		// get the .shp file
 		var shps = api.geo.getTheShape(shapes);
@@ -265,12 +324,12 @@ module.exports = api.geo = {
 		}
 						// callback
 		api.geo.moveShapefiles(options, function (err) {
-			console.log('made it here!!'.cyan)
+			// console.log('made it here!!'.cyan)
 			if (err) console.log('geomove err: '.red + err);
 
 			if (err) return callback(err);
 
-			console.log('made it here 22!!'.cyan)
+			// console.log('made it here 22!!'.cyan)
 
 			// make sure folder exists
 			fs.ensureDirSync(outfolder);					// todo: async!
@@ -279,11 +338,15 @@ module.exports = api.geo = {
 			var exists = fs.existsSync(proj); 				// todo: async!
 
 			// read projection file if exists
+			console.log('reading projection.'.yellow, proj);
 			var projection = exists ? fs.readFileSync(proj) : false; 	// todo: async!
-			
+			console.log('projection: '.cyan, projection.toString());
 			// set projection if any
-			var proj4 = projection ? srs.parse(projection).proj4 : false;
-
+			try {
+				var proj4 = projection ? srs.parse(projection).proj4 : false;
+			} catch (e) {
+				return callback(e);
+			}
 			// create ogr object
 			var myfile = ogr2ogr(inFile);
 
@@ -326,7 +389,10 @@ module.exports = api.geo = {
 		fs.ensureDirSync(outfolder); // todo: async!
 
 		// ogr2ogr shapefile to geojson
-		var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"';		
+		var cmd = 'ogr2ogr -f geoJSON "' + outFile + '" "' + inFile + '"';
+
+		// console.log('ogr2ogr cmd: '.red, cmd);
+
 		var exec = require('child_process').exec;
 
 		exec(cmd, function (err, stdout, stdin) {

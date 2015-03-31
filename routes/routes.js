@@ -32,11 +32,15 @@ var api = require('../api/api');
 // function exports
 module.exports = function(app, passport) {
 
+	api.app = app;
 
 	// ================================
 	// HOME PAGE (with login links) ===
 	// ================================
 	app.get('/', function(req, res) {
+
+		console.log('/ sessioon: '.yellow, req.session);
+
 		api.portal.getBase(req, res);
 	});
 
@@ -70,6 +74,52 @@ module.exports = function(app, passport) {
 	app.post('/api/analytics/get', isLoggedIn, function (req,res) {
 		api.analytics.get(req, res);
 	});
+
+	// =====================================
+	// GET NOTIFIED OF DONE GRINDS =========
+	// =====================================
+	app.post('/grind/done', function (req, res) {
+		api.socket.grindDone(req, res);
+	});
+
+
+
+	// =====================================
+	// RESUMABLE.js UPLOADS ================
+	// =====================================
+	// app.post('/api/chunked/upload', isLoggedIn, function (req, res) {
+	// 	console.log('XXX POST /api/chunked/upload'.yellow, req.body);
+	// 	// api.upload.chunkedUpload(req, res);
+	// });
+
+	// =====================================
+	// RESUMABLE.js UPLOADS ================
+	// =====================================
+	app.get('/api/upload', isLoggedIn, function (req, res) {
+		// console.log('GET /api/chunked/upload'.yellow, req.body);
+		api.upload.chunkedCheck(req, res);
+	});
+
+	// =====================================
+	// RESUMABLE.js UPLOADS ================
+	// =====================================
+	app.get('/download/:identifier', isLoggedIn, function (req, res) {
+		// console.log('GET /api/chunked/ident'.yellow, req.body);
+		api.upload.chunkedIdent(req, res);
+	});
+
+	// =====================================
+	// UPLOAD DATA LIBRARY FILES ===========
+	// =====================================
+	app.post('/api/upload', isLoggedIn, function (req, res) {
+		// console.log('POST /api/chunked/upload'.yellow, req.body);
+		api.upload.chunkedUpload(req, res);
+	});
+
+
+
+
+	
 
 
 	// =====================================
@@ -208,12 +258,12 @@ module.exports = function(app, passport) {
 	});
 
 
-	// =====================================
-	// UPLOAD DATA LIBRARY FILES ===========
-	// =====================================
-	app.post('/api/upload', isLoggedIn, function (req, res) {
-		api.upload.file(req, res);
-	});
+	// // =====================================
+	// // UPLOAD DATA LIBRARY FILES ===========
+	// // =====================================
+	// app.post('/api/upload', isLoggedIn, function (req, res) {
+	// 	api.upload.file(req, res);
+	// });
 
 	
 	// =====================================

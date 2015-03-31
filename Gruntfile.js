@@ -141,6 +141,9 @@ module.exports = function(grunt) {
 					// d3
 					'public/js/lib/d3.js/d3.js',
 
+					// socket.io
+					'/js/lib/socket.io/socket.io.js',
+
 					// dependencies 
 					'public/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js',
 					'public/js/lib/lodash/lodash.min.js',
@@ -159,6 +162,9 @@ module.exports = function(grunt) {
 					'public/js/lib/grande.js/js/grande.class.js',
 					'public/js/lib/grande.js/js/grande.js',
 					'public/js/lib/grande.js/js/grande.attachments.js',
+
+					// resumable
+					'public/js/lib/resumable.js/resumable.js',
 
 					// codemirror
 					'public/js/lib/codemirror/mode/cartocss/cartoref.js',
@@ -188,7 +194,8 @@ module.exports = function(grunt) {
 					// Class 
 					'public/js/src/core/class.js',
 
-				
+					// socket.io
+					'public/js/src/core/socket.js',
 
 					// controller
 					'public/js/src/core/controller.js',

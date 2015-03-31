@@ -177,4 +177,45 @@ module.exports = api.portal = {
 		console.time('getPortal');
 	},
 
+
+
+	grindDone : function (req, res) {
+
+		// close connection
+		res.end('Thanks!');
+
+
+		var options = req.body,
+		    fileUuid = options.fileUuid;
+
+
+		// send ping to client
+
+
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

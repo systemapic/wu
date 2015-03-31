@@ -213,11 +213,11 @@ module.exports = api.file = {
 		    ops = [],
 		    _lids = [];
 
-		console.log('API: deleteFiles');
-		console.log('_fids: ', _fids);
-		console.log('puuid: ', puuid);
-		console.log('userid: ', userid);
-		console.log('uuids: ', uuids);
+		// console.log('API: deleteFiles');
+		// console.log('_fids: ', _fids);
+		// console.log('puuid: ', puuid);
+		// console.log('userid: ', userid);
+		// console.log('uuids: ', uuids);
 
 
 		// validate
@@ -488,15 +488,15 @@ module.exports = api.file = {
 		// set path
 		var out = api.config.path.file + fileUuid + '/' + name;
 
-		console.log('--------------------'.red);
-		console.log('--------------------'.red);
-		console.log('--------------------'.red);
-		console.log('inn: ', inn);
-		console.log('out: ', out);
-		console.log('name: ', name);
-		console.log('type: ', type);
-		console.log('fileUuid: ', fileUuid);
-		console.log('---------------------'.red);
+		// console.log('--------------------'.red);
+		// console.log('--------------------'.red);
+		// console.log('--------------------'.red);
+		// console.log('inn: ', inn);
+		// console.log('out: ', out);
+		// console.log('name: ', name);
+		// console.log('type: ', type);
+		// console.log('fileUuid: ', fileUuid);
+		// console.log('---------------------'.red);
 
 
 		var ops = {};
@@ -504,7 +504,14 @@ module.exports = api.file = {
 		// move if not already in right place
 		if (inn != out) {
 			ops.move = function (callback) {
-				fs.move(inn, out, callback);
+
+				fs.move(inn, out, function (err) {
+
+
+						callback(err);
+					
+				});
+				
 			};
 		}
 
@@ -552,13 +559,10 @@ module.exports = api.file = {
 				// delete shapefile
 				var path = folder + '/' + name;
 				fs.unlink(path, function (er) {
-					console.log('------------'.yellow, 'unlinked: ', path)
 					if (er) console.log('handle shape unlink err: '.red + er);
-					console.log('unlinked?', er);
 					callback(err);
 				});
 			} else {
-				console.log('============='.red, 'no err?');
 				callback(null, db);
 			}
 		});
@@ -581,7 +585,6 @@ module.exports = api.file = {
 		.or([{'access.users' : user}, {'access.projects' : projectUuid}])	// either of these
 		.limit(1)	// safeguard
 		.exec(function(err, record) {
-			console.log('found: ', record);
 			if (err) console.log('get geo exec err: '.red + err);
 			return api.file.sendGeoJsonFile(req, res, record[0]);
 		});
@@ -680,6 +683,8 @@ module.exports = api.file = {
 		Project
 		.findOne({'uuid' : projectUuid })
 		.exec(function (err, project) {
+			if (err) return callback && callback(err);
+			if (!project) return callback && callback('No project');
 			project.files.push(file_id);			
 			project.markModified('files');
 			project.save(function (err) {
@@ -693,7 +698,7 @@ module.exports = api.file = {
 		    path = api.config.path.image + file;
 		
 		// send
-		res.sendFile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
+		res.sendfile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
 	},
 
 
