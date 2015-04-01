@@ -500,6 +500,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			'pslug' : this._project.store.slug
 		}
 
+
+		console.log('json', json);
+
 		var json = JSON.stringify(json);
 
 		// post         path          json      callback           this
