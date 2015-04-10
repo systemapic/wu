@@ -1,0 +1,65 @@
+--- /var/www/systemapic.js/tools/gdal2tiles/gdal2tiles.py	2015-03-27 12:03:11.000000000 -0700
++++ gdal2tiles.py	2015-03-30 12:10:33.622259925 -0700
+@@ -2276,8 +2281,60 @@
+ # =============================================================================
+ # =============================================================================
+ 
++def worker_metadata(argv):
++    gdal2tiles = GDAL2Tiles( argv[1:] )
++    gdal2tiles.open_input()
++    gdal2tiles.generate_metadata()
++    
++def worker_base_tiles(argv, cpu):
++    gdal2tiles = GDAL2Tiles( argv[1:] )
++    gdal2tiles.open_input()
++    gdal2tiles.generate_base_tiles(cpu)
++
++def worker_overview_tiles(argv, cpu, tz):
++    gdal2tiles = GDAL2Tiles( argv[1:] )
++    gdal2tiles.open_input()
++    gdal2tiles.generate_overview_tiles(cpu, tz)
++
+ if __name__=='__main__':
+     argv = gdal.GeneralCmdLineProcessor( sys.argv )
+     if argv:
+-        gdal2tiles = GDAL2Tiles( argv[1:] )
+-        gdal2tiles.process()
++        gdal2tiles = GDAL2Tiles( argv[1:] ) # handle command line options
++        gdal2tiles.open_input() # set tminz, tmaxz
++        
++        p = multiprocessing.Process(target=worker_metadata, args=[argv])
++        p.start()
++        p.join()
++        
++        pool = multiprocessing.Pool()
++        processed_tiles = 0
++        print("Generating Base Tiles:")
++        for cpu in range(gdal2tiles.options.processes):
++            pool.apply_async(worker_base_tiles, [argv, cpu])
++        pool.close()
++        while len(multiprocessing.active_children()) != 0:
++            try:
++                total = queue.get(timeout=1)
++                processed_tiles += 1
++                gdal.TermProgress_nocb(processed_tiles / float(total))
++                sys.stdout.flush()
++            except:
++                pass
++        pool.join()
++
++        processed_tiles = 0
++        print("Generating Overview Tiles:")
++        for tz in range(gdal2tiles.tmaxz-1, gdal2tiles.tminz-1, -1):
++            pool = multiprocessing.Pool()
++            for cpu in range(gdal2tiles.options.processes):
++                pool.apply_async(worker_overview_tiles, [argv, cpu, tz])
++            pool.close()
++            while len(multiprocessing.active_children()) != 0:
++                try:
++                    total = queue.get(timeout=1)
++                    processed_tiles += 1
++                    gdal.TermProgress_nocb(processed_tiles / float(total))
++                    sys.stdout.flush()
++                except:
++                    pass
++            pool.join()

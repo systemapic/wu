@@ -76,7 +76,7 @@ module.exports = api.error = {
 	generalSocket : function (user, err) {
 		
 		// send to socket
-		api.socket.sendError(user._id, err.message);
+		api.socket.sendError(user._id, err.message || err);
 
 		// log
 		api.error.log(err);
@@ -99,17 +99,15 @@ module.exports = api.error = {
 
 		var text = '*Server error*: ';
 
+		// slack formatting
 		if (err.message) text += ' `' + api.error._trim(err.message) + '` ';
 		if (err.stack) text += ' ``` ' + err.stack + ' ``` ';
-
 		if (!err.message && !err.stack) text += ' ```' + err + '```';
 
 		// print
 		if (err.stack) console.log('stack:'.red, err.stack);
 		if (err.message) console.log('message'.red, err.message);
 		if (err) console.log('err: '.red, err);
-
-		// var text = '*Server error*: ```' + err + '```';
 
 		// send error to slack
 		api.slack._send({
