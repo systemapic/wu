@@ -437,6 +437,8 @@ module.exports = api.upload = {
 			var extension 	= filetype[0];
 			var type 	= filetype[1];
 
+			console.log('filteyp'.yellow, filetype);
+
 			var options = {
 				path : file.path,
 				fileUuid : fileUuid,
@@ -778,6 +780,37 @@ module.exports = api.upload = {
 
 		}
 
+		if (ext == 'jp2') {
+			console.log('#$$$$$$$$$$$$$ 2 jp2'.red);
+			console.log('#$$$$$$$$$$$$$ 2 jp2'.red);
+			console.log('#$$$$$$$$$$$$$ 2 jp2'.red);
+
+
+			ops.push(function (callback) {
+
+				api.geo.handleRaster(options, function (err, db) {
+					if (err) {
+						console.log('ERR 98:'.red, err);
+						return callback(err);
+					}
+
+					// populate db entry
+					db = db || {};
+					db.name = options.name;
+					db.file = options.fileUuid;
+					db.type = 'Layer';
+					db.files = [options.name];
+					db.data = {};
+					db.data.raster = options.name;
+
+
+					callback(null, db);
+				});
+
+			});
+
+		}
+
 
 		if (ext == 'geojson') {
 			ops.push(function (callback) {
@@ -933,6 +966,7 @@ module.exports = api.upload = {
 	},
 
 	getFileType : function (name) {
+		console.log('name'.yellow, name);
 		if (!name) return ['unknown', 'unknown'];
 
 		// check if folder
@@ -958,6 +992,7 @@ module.exports = api.upload = {
 		// raster
 		if (name.slice(-4) == '.tif') 	  return ['tif',  'raster/tif'];
 		if (name.slice(-5) == '.tiff') 	  return ['tif',  'raster/tif'];
+		if (name.slice(-4) == '.jp2') 	  return ['jp2',  'raster/jp2'];
 	
 		// docs
 		if (name.slice(-4) == '.pdf') 	  return ['pdf',  'application/pdf'];

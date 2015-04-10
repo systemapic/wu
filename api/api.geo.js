@@ -58,67 +58,31 @@ module.exports = api.geo = {
 	handleGeoJSON : function (path, fileUuid, callback) {
 		if (!path || !fileUuid) return callback('Missing information.15');
 
-
 		api.geo.copyToVileFolder(path, fileUuid, function (err) {
 			if (err) return callback('copyvile hg err: ' + err);
 
 			try {
 
-				// console.log('omni path: '.yellow, path);
-
 				fs.readFile(path, function (err, data) {
-					// console.log('data length: '.yellow, data.length);
 
-					console.time('omnivore');
 					// mapnikOmnivore.digest(path, function (err, metadata) {
 					api.geo._readMetaData(path, function (err, metadata) {
-
-					console.timeEnd('omnivore');
-
-					// console.log('typeof metadata', typeof(metadata));
-
 						if (err) return callback(err);
 		        			if (!metadata) return callback('No metadata!');
 		        			
-
-			        		var db = {
-				        		// metadata : JSON.stringify(metadata)
-				        		metadata : metadata
-				        	}
+			        		var db = { metadata : metadata }
 
 				        	// return
 				        	callback(null, db);
 					})
-			        	// });
-
 		        	});
 			
-			} catch (e) {
-				callback('omni crash gj: ' + e);
-			}
-
+			} catch (e) { callback('omni crash gj: ' + e); }
 		});
-
-        	
 	},
 
 	_readMetaData : function (path, callback) {
-
-		// debug
 		return api.geo._readMetaDataNode(path, callback);
-
-
-		var cmd = 'digest ' + path;
-
-		console.log('cmd: ', cmd);
-
-		var exec = require('child_process').exec;
-
-		exec(cmd, function (err, stdout, stdin) {
-			var metadata = stdout.replace(/(\r\n|\n|\r)/gm,"");
-			callback(err, metadata);
-		});
-
 	},
 
 	_readMetaDataNode : function (path, callback) {
@@ -130,26 +94,15 @@ module.exports = api.geo = {
 			}
 			// console.log(JSON.stringify(metadata, null, 2));
 			return callback(null, JSON.stringify(metadata, null, 2));
-
 		});
-
-
 	},
 
-
 	handleTopoJSON : function (path, fileUuid, callback) { 			// TODO!
-		// convert to geojson
-		// console.log('TODO:::: handleTopoJSON', path, fileUuid);
-
 		callback('Topojson unsupported.');
 	},
 
 
-
-
 	handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
-		// console.log('handleShapefile...');
-
 		if (!folder || !name || !fileUuid) return callback('Missing info.');
 
 		fs.readdir(folder, function (err, files) {
@@ -169,15 +122,14 @@ module.exports = api.geo = {
 			// convert shapefile to geo/topojson
 			ops.push(function (done) {
 				api.geo.convertshp(files, folder, done);
-				console.log('lol1');
 			});
 
 			// run async jobs
 			async.series(ops, function (err, results) {
-				console.log('lol2');
-
-				if (err) console.log('MOFO!!'.red, err);
-				if (err) return callback(err);
+				if (err) {
+					console.log('MOFO!!'.red, err);
+					return callback(err);
+				}
 
 				var key = results[1];
 				if (!key) return callback('No key.');
@@ -199,33 +151,25 @@ module.exports = api.geo = {
 					file : fileUuid
 				}
 
-				console.log('lol3');
-
 				api.geo.copyToVileFolder(path, fileUuid, function (err) {
-					console.log('lol4');
-					if (err) console.log('ADSDALSKMDSALDSAMDSAL'.red);
-
 					if (err) return callback('copytToVile err: ' + err);
 
 					try {
 						// read meta from file
 				        	mapnikOmnivore.digest(path, function (err, metadata) {
-							console.log('lol5', path);
-							if (err) console.log('kenny'.yellow, err);
-
-				        		if (err) return callback(err);
+				        		if (err) {
+				        			console.log('ERR 400', err);
+				        			return callback(err);
+				        		}
 				        		if (!metadata) return callback('No metadata!');
 
-				        		console.log('got meta?', err, metadata);
 				        		db.metadata = JSON.stringify(metadata);
 					        	
 					        	// return
 					        	callback(null, db);
 				        	});
 
-				        } catch (e) {
-				        	callback('meta fail: ' + e);
-				        }
+				        } catch (e) { callback('meta fail: ' + e); }
 		        	});
 			});
 		});
@@ -266,28 +210,14 @@ module.exports = api.geo = {
 
 	moveShapefiles : function (options, done) {
 		var ops = [];
-
-		// move relevant shapefiles to a fresh folder
-		// ie. all files with same name as part of possible shapefile extension types
 		var possible = ['.shp', '.shx', '.dbf', '.prj', '.sbn', '.sbx', '.fbn', '.fbx', '.ain', '.aih', '.ixs', '.mxs', '.atx', '.shp.xml', '.cpg'];
-
 		possible.forEach(function (ex) {
-
-			// console.log('foreach possigle'.magenta, ex);
-
 			var p = options.folder + '/' + options.base + ex;
 			var f = options.outfolder + '/' + options.base + ex;
 			
 			ops.push(function (callback) {
-
-				if (fs.existsSync(p)) {
-					fs.move(p, f, callback);
-				} else {
-					callback();
-				}
+				fs.existsSync(p) ? fs.move(p, f, callback) : callback();
 			});
-			
-
 		});
 
 		async.parallel(ops, function (err) {
@@ -295,12 +225,9 @@ module.exports = api.geo = {
 			done(err);
 		});
 
-
 	},
 
 	convertshp : function (shapes, folder, callback) {
-		
-		console.log('########### CONVERT SHAPE'.cyan);
 
 		// get the .shp file
 		var shps = api.geo.getTheShape(shapes);
@@ -327,12 +254,10 @@ module.exports = api.geo = {
 		}
 						// callback
 		api.geo.moveShapefiles(options, function (err) {
-			console.log('made it 333 here!!'.cyan)
-			if (err) console.log('geomove err: '.red + err);
-
-			if (err) return callback(err);
-
-			console.log('made it here 22!!'.cyan)
+			if (err) {
+				console.log('geomove err: '.red + err);
+				return callback(err);
+			}
 
 			// make sure folder exists
 			fs.ensureDirSync(outfolder);					// todo: async!
@@ -346,7 +271,6 @@ module.exports = api.geo = {
 
 			// use ogr2ogr
 			api.geo._ogr2ogrFallback(folder, outfolder, toFile, outFile, inFile, fileUuid, proj4, callback);
-		
 		});
 	},
 
@@ -386,13 +310,10 @@ module.exports = api.geo = {
 
 	handleRaster : function (options, done) {
 
-		console.log('handleRaster'.yellow, options);
-
 		var fileUuid = options.fileUuid,
 		    inFile = options.path,
 		    outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
 		    ops = [];
-
 
 		// validation
 		ops.push(function (callback) {
@@ -490,15 +411,12 @@ module.exports = api.geo = {
 
 		// reproject if necessary
 		ops.push(function (meta, callback) {
-			console.log('GOT META META'.red, meta);
 
 			var proj4 = meta.projection;
 			var ourProj4 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ';
 			var source = gdal.SpatialReference.fromProj4(proj4);
 			var target = gdal.SpatialReference.fromProj4(ourProj4);
 			var isSame = source.isSame(target);
-
-			console.log('isSame?'.yellow, isSame);
 
 			// same, no reprojection necessary
 			if (isSame) return callback(null, meta);
@@ -515,9 +433,6 @@ module.exports = api.geo = {
 				callback(null, meta);
 			});
 
-			
-
-			// callback(null, meta);
 		});
 
 
