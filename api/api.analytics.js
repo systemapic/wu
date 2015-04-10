@@ -52,10 +52,7 @@ module.exports = api.analytics = {
 
 		if (!options) return api.error.missingInformation(req, res);
 
-
-
 		// node module: https://www.npmjs.com/package/universal-analytics
-
 
 		// return to client
 		res.end(JSON.stringify({
@@ -71,8 +68,6 @@ module.exports = api.analytics = {
 		// called from routes.js:64, /api/analytics/get
 
 		if (!options) return api.error.missingInformation(req, res);
-
-
 
 		// return to client
 		res.end(JSON.stringify({

@@ -636,16 +636,18 @@ module.exports = api.layer = {
 
 
 	createModel : function (options, callback) {
-		// console.log('api.layer.createModel'.yellow, options);
+		console.log('api.layer.createModel'.yellow, options);
 
 		var layer 		= new Layer();
 		layer.uuid 		= options.uuid;
 		layer.title 		= options.title;
 		layer.description 	= options.description || '';
-		layer.data.geojson 	= options.data.geojson;
 		layer.legend 		= options.legend || '';
 		layer.file 		= options.file;
 		layer.metadata 		= options.metadata;
+
+		if (options.data.geojson) layer.data.geojson = options.data.geojson;
+		if (options.data.raster)  layer.data.raster  = options.data.raster;
 
 		layer.save(function (err, doc) {
 			callback && callback(err, doc);
