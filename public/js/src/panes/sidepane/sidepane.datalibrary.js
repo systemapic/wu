@@ -177,23 +177,18 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	// hooks added automatically on page load
 	addHooks : function () {
 		this._setHooks('on');
-
-		if (app.access.to.delete_project(this._project)) {
-			Wu.DomUtil.removeClass(this._deleter, 'displayNone');
-		};
-
-		if (app.access.to.upload_file(this._project)) {
-			Wu.DomUtil.removeClass(this._uploader, 'displayNone');
-			// app.Dropzone.enable();
-		}
-
-		if (app.access.to.download_file(this._project)) {
-			Wu.DomUtil.removeClass(this._downloader, 'displayNone');
-		}
+		
+		var canDelete = app.access.to.delete_project(this._project),
+		    canUpload = app.access.to.upload_file(this._project),
+		    canDownload = app.access.to.download_file(this._project);
+		
+		if (canDelete)   Wu.DomUtil.removeClass(this._deleter, 'displayNone');
+		if (canUpload)   Wu.DomUtil.removeClass(this._uploader, 'displayNone');
+		if (canDownload) Wu.DomUtil.removeClass(this._downloader, 'displayNone');
+		
 	},
 
 	_refreshResumable : function () {
-		if (this.r) console.log('this.r: ', this.r);
 
 		// remove old
 		if (this.r) this._removeResumable();
@@ -203,8 +198,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_removeResumable : function () {
+
 		var r = this.r;
-		// r.unAssignBrowse(this._uploader);
 		r.unAssignDrop(this._resumableDrop);
 		r.cancel();
 		this.r = null;
@@ -216,7 +211,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_addResumable : function () {
-	
+		if (!app.activeProject) return;
+
 		var r = this.r = new Resumable({
 			target : '/api/upload',
 			chunkSize : 1*1024*2048,
@@ -246,7 +242,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			},
 
 			// accepted filetypes
-			fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt'],
+			fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif'],
 			fileTypeErrorCallback : function (file, errorCount) {
 
 				// feedback message
@@ -266,8 +262,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		r.assignBrowse(this._uploader);
 
 		r.on('fileAdded', function(file){
-			console.log('r.fileAdded', file);
-		
 			r._startTime = new Date().getTime();
 			r.upload();
 
@@ -306,7 +300,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			    message = 'Uploaded ' + size.toFixed(2) + ' MB in ' + totalTime.toFixed(2) + ' seconds, at ' + bytesPerSecond.toFixed(2) + ' MB/s.',
 			    estimatedProcessingTime = (size * 0.5).toFixed(0) + ' seconds';
 			
-			message +=' <br><br>Estimated pre-processing time is ' + estimatedProcessingTime;
+			message +=' <br><br>Pre-processing will take approx. ' + estimatedProcessingTime;
 
 			// set feedback
 			app.feedback.setMessage({
@@ -314,10 +308,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				description : message,
 				id : file.uniqueIdentifier
 			});
-
-			console.error('TODO: refresh layer if activated before processing is done.')
-
-			console.log('done????!?! isComplete() ? ', file.isComplete());
 
 			// refresh for new upload
 			this._refreshResumable();
@@ -372,19 +362,15 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	removeHooks : function () {
 		
 		this._setHooks('off');
+
+		var canDelete = app.access.to.delete_project(this._project),
+		    canUpload = app.access.to.upload_file(this._project),
+		    canDownload = app.access.to.download_file(this._project);
 		
-		if (app.access.to.delete_project(this._project)) {
-			Wu.DomUtil.addClass(this._deleter, 'displayNone');
-		};
-
-		if (app.access.to.upload_file(this._project)) {
-			Wu.DomUtil.addClass(this._uploader, 'displayNone');
-			// app.Dropzone.disable();
-		}
-
-		if (app.access.to.download_file(this._project)) {
-			Wu.DomUtil.addClass(this._downloader, 'displayNone');
-		}
+		if (canDelete) Wu.DomUtil.addClass(this._deleter, 'displayNone');
+		if (canUpload) Wu.DomUtil.addClass(this._uploader, 'displayNone');
+		if (canDownload) Wu.DomUtil.addClass(this._downloader, 'displayNone');
+		
 	},
 
 	searchList : function (e) {
@@ -500,8 +486,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			'pslug' : this._project.store.slug
 		}
 
-
-		console.log('json', json);
 
 		var json = JSON.stringify(json);
 

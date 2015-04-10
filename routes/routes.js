@@ -38,9 +38,6 @@ module.exports = function(app, passport) {
 	// HOME PAGE (with login links) ===
 	// ================================
 	app.get('/', function(req, res) {
-
-		console.log('/ sessioon: '.yellow, req.session);
-
 		api.portal.getBase(req, res);
 	});
 
@@ -96,7 +93,6 @@ module.exports = function(app, passport) {
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
 	app.get('/api/upload', isLoggedIn, function (req, res) {
-		// console.log('GET /api/chunked/upload'.yellow, req.body);
 		api.upload.chunkedCheck(req, res);
 	});
 
@@ -104,7 +100,6 @@ module.exports = function(app, passport) {
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
 	app.get('/download/:identifier', isLoggedIn, function (req, res) {
-		// console.log('GET /api/chunked/ident'.yellow, req.body);
 		api.upload.chunkedIdent(req, res);
 	});
 
@@ -112,7 +107,6 @@ module.exports = function(app, passport) {
 	// UPLOAD DATA LIBRARY FILES ===========
 	// =====================================
 	app.post('/api/upload', isLoggedIn, function (req, res) {
-		// console.log('POST /api/chunked/upload'.yellow, req.body);
 		api.upload.chunkedUpload(req, res);
 	});
 
@@ -514,8 +508,6 @@ module.exports = function(app, passport) {
 	// DEBUG: PHANTOMJS FEEDBACK ===========
 	// ===================================== 
 	app.post('/api/debug/phantom', isLoggedIn, function (req, res) {
-		console.log('/api/debug/phantom');
-		console.log(req.body);
 		res.end();
 	});
 
