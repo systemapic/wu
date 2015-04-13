@@ -52,7 +52,6 @@ module.exports = api.upload = {
 		    resumableChunkNumber = req.body.resumableChunkNumber,
 	    	    resumableTotalChunks = req.body.resumableTotalChunks;
 
-
 		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks.');
 
 		// resumable		
@@ -788,7 +787,7 @@ module.exports = api.upload = {
 
 			ops.push(function (callback) {
 
-				api.geo.handleRaster(options, function (err, db) {
+				api.geo.handleJPEG2000(options, function (err, db) {
 					if (err) {
 						console.log('ERR 98:'.red, err);
 						return callback(err);

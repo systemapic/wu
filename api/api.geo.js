@@ -308,12 +308,41 @@ module.exports = api.geo = {
 	},
 
 
+	handleJPEG2000 : function (options, done) {
+
+		var fileUuid = options.fileUuid,
+		    inFile = options.path,
+		    outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
+		    outFile = options.path + '.tif',
+		    ops = [];
+
+		// convert to geotiff, then api.geo.handleRaster
+		var cmd = '/var/www/deps/kakadu/kdu_expand -i "' + inFile + '" -o "' + outFile + '" -num_threads 6'; 
+
+		console.log('cmd', cmd);
+
+		var exec = require('child_process').exec;
+		exec(cmd, function (err, stdout, stdin) {
+			if (err) return done(err);
+			console.log('kakadu done'.yellow, err, stdout);
+
+			options.path = outFile;
+			
+			// handle raster normally
+			api.geo.handleRaster(options, done);
+		});
+
+
+	},
+
 	handleRaster : function (options, done) {
 
 		var fileUuid = options.fileUuid,
 		    inFile = options.path,
 		    outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
 		    ops = [];
+
+
 
 		// validation
 		ops.push(function (callback) {
@@ -438,7 +467,7 @@ module.exports = api.geo = {
 
 		ops.push(function (meta, callback) {
 
-			var cmd = api.config.path.tools + 'gdal2tiles.py -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
+			var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=6 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
 			console.log('cmd: ', cmd);
 
 			var exec = require('child_process').exec;
