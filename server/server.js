@@ -12,6 +12,7 @@ var morgan   = require('morgan');
 var session  = require('express-session');
 var configDB = require('../config/database.js');
 var port     = 3001;
+var host     = 'localhost';
 var prodMode = process.argv[2] == 'production';
 var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
@@ -75,7 +76,7 @@ require('../routes/socket.routes.js')(app, passport);
 
 
 // launch 
-var server = app.listen(port, 'localhost');
+var server = app.listen(port, host);
 
 
-console.log('The magic happens on port ' + port);
+console.log('The magic happens @ ', port, host);
