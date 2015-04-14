@@ -1,7 +1,7 @@
 // API: api.js
 
 // config
-var config = require('../config/config.js');
+var config = require('../config/server-config.js');
 
 // redis store for temp passwords
 var redisStore = require('redis').createClient(config.temptokenRedis.port, config.temptokenRedis.host);
