@@ -12,7 +12,7 @@ var morgan   = require('morgan');
 var session  = require('express-session');
 var configDB = require('../config/database.js');
 var port     = 3001;
-var host     = 'localhost';
+var host     = 'nginx';
 var prodMode = process.argv[2] == 'production';
 var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
