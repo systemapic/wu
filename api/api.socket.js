@@ -34,7 +34,6 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
-var r = require('resumable-js/node-resumable')('/data/tmp/');
 
 // api
 var api = module.parent.exports;
