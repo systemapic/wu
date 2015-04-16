@@ -164,7 +164,7 @@ module.exports = function(grunt) {
 					'public/js/lib/grande.js/js/grande.attachments.js',
 
 					// resumable
-					'public/js/lib/resumable.js/resumable.js',
+					'public/js/lib/resumable/resumable.js',
 
 					// codemirror
 					'public/js/lib/codemirror/mode/cartocss/cartoref.js',
