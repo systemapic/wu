@@ -75,4 +75,4 @@ require('../routes/socket.routes.js')(app, passport);
 var server = app.listen(port);
 
 
-console.log('The magic happens @ ', port, host);
+console.log('The magic happens @ ', port);
