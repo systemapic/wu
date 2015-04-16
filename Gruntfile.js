@@ -269,7 +269,7 @@ module.exports = function(grunt) {
 					'public/js/src/ext/analytics.js',
 
 					// Config file
-					'public/js/src/config/config.js',
+					'public/js/src/config/client-config.js',
 					'public/js/src/lang/language.english.js',
 
 					// Extend Leaflet
@@ -346,7 +346,7 @@ module.exports = function(grunt) {
 				src : [
 					'public/js/lib/mapbox.js/mapbox.2.1.4.js',
 					'public/js/src/controls/control.spinningmap.js',
-					'public/js/src/config/login.config.js',
+					'public/js/src/config/login-config.js',
 					'public/js/src/core/login.js',
 				],
 
