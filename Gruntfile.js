@@ -159,9 +159,9 @@ module.exports = function(grunt) {
 					'public/js/lib/sortable.js/Sortable.js',
 
 					// grande
-					'public/js/lib/grande.js/js/grande.class.js',
-					'public/js/lib/grande.js/js/grande.js',
-					'public/js/lib/grande.js/js/grande.attachments.js',
+					'public/js/lib/grande/js/grande.class.js',
+					'public/js/lib/grande/js/grande.js',
+					'public/js/lib/grande/js/grande.attachments.js',
 
 					// resumable
 					'public/js/lib/resumable/resumable.js',
@@ -289,8 +289,8 @@ module.exports = function(grunt) {
 				src : [  
 
 					'public/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.css',
-					'public/js/lib/grande.js/css/menu.css',                    
-					'public/js/lib/grande.js/css/editor.css',
+					'public/js/lib/grande/css/menu.css',                    
+					'public/js/lib/grande/css/editor.css',
 					'public/css/bootstrap.min.css',
 					'public/css/font-awesome.min.css',
 					'public/css/mapbox.css',        
