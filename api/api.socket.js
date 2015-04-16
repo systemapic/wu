@@ -34,7 +34,6 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
-
 // api
 var api = module.parent.exports;
 
