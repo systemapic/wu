@@ -1,6 +1,5 @@
 // server.js
 var express  = require('express.io');
-// var app      = require('express.io')();
 var mongoose = require('mongoose');
 var passport = require('passport');
 var flash    = require('connect-flash');
@@ -11,15 +10,12 @@ var cors     = require('cors');
 var morgan   = require('morgan');
 var session  = require('express-session');
 var configDB = require('../config/database.js');
-var port     = 3001;
-var host     = 'localhost';
 var prodMode = process.argv[2] == 'production';
 var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser'); 
+var port = 3001;
 
-
-// app.http().io()
 
 
 app = express().http().io()
@@ -76,7 +72,7 @@ require('../routes/socket.routes.js')(app, passport);
 
 
 // launch 
-var server = app.listen(port, host);
+var server = app.listen(port);
 
 
 console.log('The magic happens @ ', port, host);
