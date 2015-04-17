@@ -2,27 +2,34 @@
 module.exports = {
 
   	kueRedis : {
-		port : 6380,
-		host : '78.46.107.15',
+		port : 6379,
+		host : 'redis-kue',
 		auth : 'crlAxeVBbmaxBY5GVTaxohjsgEUcrT5IdJyHi8J1fdGG8KqXdfw3RP0qyoGlLltoVjFjzZCcKHvBVQHpTUQ26W8ql6xurdm0hLIY'
 	},
 
 	tokenRedis : {
 		// px
 		port : 6379,
-		host : '5.9.117.212',
-		auth : '0eUPIrjZnm302Fxqkb75heJWU61PpY66YDLIyYI0mlgRi5fqU2U56bLBtcJjYWG9uYusWK17Mi7OTkAb46VWtgy7UD844YJBmFdC'
+		host : 'redis-token',
+		auth : '9p7bRrd7Zo9oFbxVJIhI09pBq6KiOBvU4C76SmzCkqKlEPLHVR02TN2I40lmT9WjxFiFuBOpC2BGwTnzKyYTkMAQ21toWguG7SZE'
 	},
-
 
 	temptokenRedis : {
 		port : 6379,
-		host : '5.9.117.212',
-		auth : '0eUPIrjZnm302Fxqkb75heJWU61PpY66YDLIyYI0mlgRi5fqU2U56bLBtcJjYWG9uYusWK17Mi7OTkAb46VWtgy7UD844YJBmFdC'
+		host : 'redis-token',
+		auth : '9p7bRrd7Zo9oFbxVJIhI09pBq6KiOBvU4C76SmzCkqKlEPLHVR02TN2I40lmT9WjxFiFuBOpC2BGwTnzKyYTkMAQ21toWguG7SZE'
 	},
 
 	vile : {
-		uri : 'http://localhost:3003/'
+		uri : 'http://localhost:3003/',
+		link : 'vile',
+		port : '3003'
+	},
+
+	vileGrind : {
+		uri : 'http://5.9.117.212:3069/',
+		link : 'vileGrind',
+		port : '3069'
 	},
 
 	vileosm : {
