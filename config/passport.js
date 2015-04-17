@@ -10,8 +10,8 @@ var api = require('../api/api'); // api
 var redis = require('redis'); 
 var config = api.config;
 
-// redis
-var r = redis.createClient(6379, 'redis-token');
+// token redis
+var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host);
 r.auth(config.tokenRedis.auth);
 r.on('error', console.error);
 
@@ -120,9 +120,6 @@ module.exports = function(passport) {
 			});
 		});
 	}));
-
-
-	
 
 	
 
