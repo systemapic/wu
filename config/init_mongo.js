@@ -8,6 +8,8 @@ var colors 	 = require('colors');
 var crypto       = require('crypto');
 var uuid 	 = require('node-uuid');
 var mongoose 	 = require('mongoose');
+var _ 		 = require('lodash-node');
+
 
 // database schemas
 var Project 	 = require('../models/project');
