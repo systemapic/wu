@@ -6,7 +6,7 @@ var config = require('../config/server-config.js');
 // redis store for temp passwords
 var redisStore = require('redis').createClient(config.temptokenRedis.port, config.temptokenRedis.host);
 redisStore.auth(config.temptokenRedis.auth);
-redisStore.on('error', function (err) { console.error('redis err: ', err); });
+redisStore.on('error', console.error);
 
 // api
 var api = {
