@@ -28,7 +28,7 @@ if (prodMode) {
 app = express().http().io()
 
 // connect to our database
-var sessionStore = mongoose.connect(config.mongod.url); 
+var sessionStore = mongoose.connect(config.mongo.url); 
 
 // pass passport for configuration
 require('../config/passport')(passport); 

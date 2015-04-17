@@ -3,7 +3,7 @@ module.exports = {
 
 	port : 3001,
 
-	mongod : {
+	mongo : {
 		'url' : 'mongodb://mongo/systemapic'
 	},
 
