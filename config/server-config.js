@@ -1,6 +1,12 @@
 // CONFIG FILE FOR SYSTEMAPIC DEV PORTAL @ TX
 module.exports = {
 
+	port : 3001,
+
+	mongod : {
+		'url' : 'mongodb://mongo/systemapic'
+	},
+
   	kueRedis : {
 		port : 6379,
 		host : 'redis-kue',
@@ -8,7 +14,6 @@ module.exports = {
 	},
 
 	tokenRedis : {
-		// px
 		port : 6379,
 		host : 'redis-token',
 		auth : '9p7bRrd7Zo9oFbxVJIhI09pBq6KiOBvU4C76SmzCkqKlEPLHVR02TN2I40lmT9WjxFiFuBOpC2BGwTnzKyYTkMAQ21toWguG7SZE'
@@ -19,6 +24,27 @@ module.exports = {
 		host : 'redis-token',
 		auth : '9p7bRrd7Zo9oFbxVJIhI09pBq6KiOBvU4C76SmzCkqKlEPLHVR02TN2I40lmT9WjxFiFuBOpC2BGwTnzKyYTkMAQ21toWguG7SZE'
 	},
+
+	slack : {
+		webhook : 'https://hooks.slack.com/services/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',
+		token 	: 'xoxb-3868763863-SGufYHEt7crFub8BoWpNNsHy',
+		channel : '#systemapic-bot',
+		errorChannel : '#dev-error-log',
+		botname : 'systemapic-bot',
+		icon 	: 'http://systemapic.com/wp-content/uploads/systemapic-color-logo-circle.png',
+		baseurl : 'https://dev.systemapic.com/',
+	},
+
+
+
+
+
+
+
+	
+
+
+
 
 	vile : {
 		uri : 'http://localhost:3003/',
@@ -81,14 +107,6 @@ module.exports = {
 		},
 	},
 	
-	slack : {
-		webhook : 'https://hooks.slack.com/services/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',
-		token 	: 'xoxb-3868763863-SGufYHEt7crFub8BoWpNNsHy',
-		channel : '#systemapic-bot',
-		errorChannel : '#dev-error-log',
-		botname : 'systemapic-bot',
-		icon 	: 'http://systemapic.com/wp-content/uploads/systemapic-color-logo-circle.png',
-		baseurl : 'https://dev.systemapic.com/',
-	},
+	
 
 }
