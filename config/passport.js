@@ -6,13 +6,12 @@ var colors = require('colors');
 var LocalStrategy = require('passport-local').Strategy; // load all the things we need
 var User = require('../models/user'); // load up the user model
 var crypto = require('crypto'); // crypto
-// var config = require('../config/config'); // config
 var api = require('../api/api'); // api
 var redis = require('redis'); 
 var config = api.config;
 
 // redis
-var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host)
+var r = redis.createClient(6379, 'redis-token');
 r.auth(config.tokenRedis.auth);
 r.on('error', console.error);
 
