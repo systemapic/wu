@@ -9,7 +9,7 @@ var crypto       = require('crypto');
 var uuid 	 = require('node-uuid');
 var mongoose 	 = require('mongoose');
 var _ 		 = require('lodash-node');
-
+var fs 		 = require('fs');
 
 // database schemas
 var Project 	 = require('../models/project');
@@ -36,9 +36,78 @@ var global = {
 logo_screen();
 create_models();
 
+
+function flush_models(done) {
+	var ops = [];
+
+	// delete all users
+	ops.push(function (callback) {
+		User.remove({}, function (err) {
+			console.log('flushed all users!!!');
+			callback();
+		})
+	})
+	ops.push(function (callback) {
+		Project.remove({}, function (err) {
+			console.log('flushed all users!!!');
+			callback();
+		})
+	})
+	ops.push(function (callback) {
+		Clientel.remove({}, function (err) {
+			console.log('flushed all users!!!');
+			callback();
+		})
+
+	})
+	ops.push(function (callback) {
+		File.remove({}, function (err) {
+			console.log('flushed all users!!!');
+			callback();
+		})
+
+	})
+	ops.push(function (callback) {
+		Layer.remove({}, function (err) {
+			console.log('flushed all users!!!');
+			callback();
+		})
+
+	})
+	ops.push(function (callback) {
+		Role.remove({}, function (err) {
+			console.log('flushed all users!!!');
+			callback();
+		})
+
+	})
+	ops.push(function (callback) {
+		Hash.remove({}, function (err) {
+			console.log('flushed all users!!!');
+			callback();
+		})
+
+	})
+	ops.push(function (callback) {
+		Group.remove({}, function (err) {
+			console.log('flushed all users!!!');
+			callback();
+		})
+
+	})
+
+	async.series(ops, function (err, res){
+		console.log('all flushed!');
+		done();
+	});
+}
+
 function create_models() {
 
 	var ops = [];
+
+	// flush mongo
+	ops.push(flush_models);
 
 	// create user
 	ops.push(function (callback) {
@@ -57,6 +126,8 @@ function create_models() {
 
 			var msg = 'Log in with email '.yellow + user.local.email + ' and password: '.yellow + password;
 			console.log(msg);
+
+			console.log(user);
 
 			callback(null, user);
 		});
@@ -83,7 +154,7 @@ function create_models() {
 				var msg = 'Add this Super Admin Role uuid to config.js: '.yellow + role.uuid;
 				console.log(msg);
 
-				callback(err);
+				callback(err, role.uuid);
 			});
 		});
 
@@ -91,7 +162,7 @@ function create_models() {
 	});
 
 	// create portal admin role
-	ops.push(function (callback) {
+	ops.push(function (superAdminRole, callback) {
 
 		var role = new Role();
 		role.uuid = 'role-' + uuid.v4();
@@ -110,15 +181,39 @@ function create_models() {
 
 				console.log('Add this Portal Admin Role uuid to config.js: '.yellow + role.uuid);
 
-				callback(err);
+				var admins = {
+					duper : superAdminRole,
+					portal : role.uuid
+				}
+
+				callback(err, admins);
 			});
 		});
 
 	});
 
 
-	async.waterfall(ops, function (err, result) {
-		done('Big success');
+	async.waterfall(ops, function (err, admins) {
+		console.log('all done!');
+
+
+		var configFile = require('./server-config.js');
+
+		// console.log('foncif', configFile, typeof(configFile));
+
+		configFile.portal.roles.superAdmin = admins.duper;
+		configFile.portal.roles.portalAdmin = admins.portal;
+
+		var text = JSON.stringify(configFile, null, '\t');
+		var output = 'module.exports = ' + text;
+
+		console.log('output', output);
+
+		fs.writeFile('./server-config.js', output, function (err) {
+			console.log('wrote config', err);
+
+		});
+
 	});
 
 
