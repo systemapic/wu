@@ -33,7 +33,7 @@ app = express().http().io()
 var sessionStore = mongoose.connect(config.mongo.url); 
 
 // pass passport for configuration
-require('../config/passport')(passport); 
+require('./passport')(passport); 
 
 // set up our express application
 app.use(morgan('dev')); 
