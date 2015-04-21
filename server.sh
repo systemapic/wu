@@ -1,9 +1,7 @@
 #!/bin/bash
 
-
 if [ "$1" == "prod" ];then
 	PRODUCTIONMODE=true
-	
 else 
 	PRODUCTIONMODE=false	
 fi;
