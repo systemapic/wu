@@ -5,17 +5,17 @@ module.exports = {
 	},
 	"kueRedis": {
 		"port": 6379,
-		"host": "redis-kue",
+		"host": "rkue",
 		"auth": "crlAxeVBbmaxBY5GVTaxohjsgEUcrT5IdJyHi8J1fdGG8KqXdfw3RP0qyoGlLltoVjFjzZCcKHvBVQHpTUQ26W8ql6xurdm0hLIY"
 	},
 	"tokenRedis": {
 		"port": 6379,
-		"host": "redis-token",
+		"host": "rtoken",
 		"auth": "9p7bRrd7Zo9oFbxVJIhI09pBq6KiOBvU4C76SmzCkqKlEPLHVR02TN2I40lmT9WjxFiFuBOpC2BGwTnzKyYTkMAQ21toWguG7SZE"
 	},
 	"temptokenRedis": {
 		"port": 6379,
-		"host": "redis-token",
+		"host": "rtoken",
 		"auth": "9p7bRrd7Zo9oFbxVJIhI09pBq6KiOBvU4C76SmzCkqKlEPLHVR02TN2I40lmT9WjxFiFuBOpC2BGwTnzKyYTkMAQ21toWguG7SZE"
 	},
 	"slack": {
@@ -28,20 +28,26 @@ module.exports = {
 		"baseurl": "https://dev.systemapic.com/"
 	},
 	"vile": {
-		"uri": "http://localhost:3003/",
+		"uri": "http://vile:3003/",
 		"link": "vile",
 		"port": "3003"
 	},
-	"vileGrind": {
-		"uri": "http://5.9.117.212:3069/",
-		"link": "vileGrind",
-		"port": "3069"
+	"vile_grind" : {
+		"remote_ssh" : "px_vile_grind",
+		"remote_url" : "http://5.9.117.212:3004/",
+		"sender_ssh" : "tx_data_store", // from PX back to TX
+		"sender_url" : "https://dev.systemapic.com/"
 	},
+	// "vileGrind": {
+	// 	"uri": "http://5.9.117.212:3069/",
+	// 	"link": "vileGrind",
+	// 	"port": "3069"
+	// },
 	"vileosm": {
 		"uri": ""
 	},
 	"grind": {
-		"host": "http://5.9.117.212:3069/",
+		"host": "http://5.9.117.212:3004/",
 		"ssh": "tx"
 	},
 	"portalServer": {
@@ -76,8 +82,8 @@ module.exports = {
 	},
 	"portal": {
 		"roles": {
-			"superAdmin": "role-c263222d-f50d-41bb-83c1-a641da303b1e",
-			"portalAdmin": "role-b716a9e3-9e5c-462a-9ee9-30100ce6077e"
+			"superAdmin": "role-94e0a932-6395-482a-8a74-f8319fa6eac2",
+			"portalAdmin": "role-d00898ce-4efb-40a5-b6f7-8aa9a8a18eb1"
 		}
 	}
 }
