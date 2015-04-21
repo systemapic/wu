@@ -20,6 +20,6 @@ else
 	echo 'Debug mode'
 	grunt dev 
 	echo 'Running!'
-	nodemon --watch ../api --watch server.js --watch ../routes server.js
+	nodemon --watch ../api --watch ../config --watch server.js --watch ../routes server.js
 fi
 cd ..

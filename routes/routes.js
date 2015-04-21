@@ -497,6 +497,26 @@ module.exports = function(app, passport) {
 	});
 
 
+	// =====================================
+	// SERVER CLIENT CONFIG ================
+	// ===================================== 
+	app.get('/clientConfig.js', isLoggedIn, function (req, res) {
+		var configString = 'var systemapicConfigOptions = ' + JSON.stringify(api.clientConfig);
+		res.setHeader("content-type", "application/javascript");
+		res.end(configString);
+	});
+
+	// =====================================
+	// SERVER LOGIN CONFIG =================
+	// ===================================== 
+	app.get('/loginConfig.js', function (req, res) {
+		var configString = 'var loginConfig = ' + JSON.stringify(api.loginConfig);
+		res.setHeader("content-type", "application/javascript");
+		res.end(configString);
+	});
+
+
+
 	// // =====================================
 	// // DEBUG: CREATE ROLE ==================
 	// // ===================================== 
