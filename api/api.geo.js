@@ -309,6 +309,7 @@ module.exports = api.geo = {
 
 
 	handleJPEG2000 : function (options, done) {
+		return api.geo.handleRaster(options, done);
 
 		var fileUuid = options.fileUuid,
 		    inFile = options.path,
@@ -343,6 +344,7 @@ module.exports = api.geo = {
 		    ops = [];
 
 
+		console.log('GDAL VERSION'.red, gdal.version);
 
 		// validation
 		ops.push(function (callback) {
@@ -464,16 +466,16 @@ module.exports = api.geo = {
 
 		});
 
-
 		ops.push(function (meta, callback) {
 
-			var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=6 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
+			var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=1 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
 			console.log('cmd: ', cmd);
 
 			var exec = require('child_process').exec;
-			exec(cmd, function (err, stdout, stdin) {
+			exec(cmd, { maxBuffer: 2000 * 1024 }, function (err, stdout, stdin) {
+				console.log('ppgdal2tiles:'.green, stdout);
 				if (err) {
-					console.log('ogre fb err: '.red + err);
+					console.log('gdal2tiles err: '.red + err);
 					return callback(err);
 				}
 

@@ -1,3 +1,4 @@
+
 //API: api.upload.js
 // database schemas
 var Project 	= require('../models/project');
@@ -34,7 +35,8 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
-var r = require('resumable')('/data/tmp/');
+// resumable.js
+var r = require('../tools/resumable-node')('/data/tmp/');
 
 // api
 var api = module.parent.exports;
@@ -52,7 +54,7 @@ module.exports = api.upload = {
 		    resumableChunkNumber = req.body.resumableChunkNumber,
 	    	    resumableTotalChunks = req.body.resumableTotalChunks;
 
-		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks.');
+		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks to ', outputPath);
 
 		// resumable		
 		r.post(req, function(status, filename, original_filename, identifier){
@@ -65,7 +67,7 @@ module.exports = api.upload = {
 
 			// check if all done
 			api.redis.get('done-chunks-' + fileUuid, function (err, count) {
-				console.log('redis chunk count'.yellow, err, count);
+				console.log('Chunk #'.yellow, count, err);
 
 				// return if not all done				
 				if (count != options.resumableTotalChunks) return;
@@ -86,14 +88,12 @@ module.exports = api.upload = {
 	},
 
 	_chunkedUploadDone : function (options) {
-
 		var resumableTotalChunks = options.resumableTotalChunks,
 		    uniqueIdentifier = options.uniqueIdentifier,
 		    outputPath = options.outputPath,
 		    resumableIdentifier = options.resumableIdentifier,
 		    tmpFolder = '/data/tmp/',
 		    ops = [];
-
 
 		ops.push(function (callback) {
 
@@ -110,15 +110,12 @@ module.exports = api.upload = {
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
 				if (err) console.log('err'.red, err);
-
 				fs.stat(outputPath, callback);
 			});
-			
 
 		});
 
 		ops.push(function (stats, callback) {
-
 			var file = {
 				path : options.outputPath,
 				size : stats.size,
@@ -130,9 +127,6 @@ module.exports = api.upload = {
 			api.upload.importFile(file, options, function (err, pack) {
 				callback(null, pack);
 			});
-
-			
-
 		});
 
 
@@ -160,28 +154,11 @@ module.exports = api.upload = {
 
 	// entry point
 	importFile : function (incomingFile, options, done) {
-		// todo: check for upload access!;
-		// console.log('API.upload.upload() IMORTFILE!'.cyan);
-		// console.log('___________________'.cyan);
-
-		// // process from-encoded upload
-		// var form = new formidable.IncomingForm({
-		// 	hash : 'sha1',
-		// 	multiples : true,
-		// 	keepExtensions : true,
-		// });
-
-		// form.parse(req, function(err, fields, files) {	
-		// 	if (err) console.log('ERR 1'.red, err);
-		// 	if (err || !files || !fields || !files.file) return api.error.general(req, res, err || 'No files4.');
-
+		
 		var user = options.user,
-		    projectUuid = options.projectUuid;
-
-
-		var fileArray = [incomingFile];
-
-		var ops = [];
+		    projectUuid = options.projectUuid,
+		    fileArray = [incomingFile],
+		    ops = [];
 
 		// sort files
 		ops.push(function (callback) {
@@ -211,7 +188,6 @@ module.exports = api.upload = {
 				if (err) console.log('ERR 17'.red, err);
 				callback(err, results);
 			});
-			
 		});
 		
 
@@ -242,9 +218,6 @@ module.exports = api.upload = {
 				uniqueIdentifier : options.uniqueIdentifier
 			}
 
-			console.log('______________'.yellow);
-			console.log('layers:'.yellow, layers);
-
 
 			// only process geojson
 			var isGeojson = _.find(layers, function (l) {
@@ -252,7 +225,6 @@ module.exports = api.upload = {
 				return l.data.geojson;
 			});
 
-			console.log('isGeojson??'.red, isGeojson);
 			if (isGeojson) api.upload._sendToProcessing(opts, function (err, result) { // todo: do per file
 
 				// api.socket.setProcessing({
@@ -291,60 +263,42 @@ module.exports = api.upload = {
 
 		console.log('_sendToProcessing'.yellow, options);
 
-
 		// can be several layers in each upload
 		layers.forEach(function (layer) {
 
-			// var path = api.config.path.geojson + fileUuid + '.geojson';
-
-			// console.log('path'.magenta, path); // /data/geojson/file-73a16a51-050e-492d-bd9b-0fa52f7bcd0a.geojson
-
-			// var remotePath = '/data/grind/' + fileUuid + '/';
-
-			// var arr = [
-			// 	'tar cjf - -C',
-			// 	api.config.path.geojson,
-			// 	fileUuid + '.geojson',
-			// 	'| ssh px "tar xjfC -',
-			// 	'/data/grind/geojson/"'
-			// ]
-
-			// var cmd = arr.join(' ');
-
-			// copy folder
-			// tar -cf - -C /var/www/vile/tests/rasters/advanced/ testfolder/ | pigz | ssh px "pigz -d | tar xf - -C /home/"
-
-			// tar -cf - RapidEye_Boulder_CO.zip  | pigz | ssh px "pigz -d | tar xf - -C /home/"
-			
-			var fileUuid = layer.file;
-			var localFile = fileUuid + '.geojson';
-			var localFolder = api.config.path.geojson;
-			var remoteFolder = '/data/grind/geojson/';
-			var uniqueIdentifier = options.uniqueIdentifier;
+			var fileUuid = layer.file,
+			    localFile = fileUuid + '.geojson',
+			    localFolder = api.config.path.geojson,
+			    remoteFolder = '/data/grind/geojson/',
+			    uniqueIdentifier = options.uniqueIdentifier,
+			    remoteSSH = 'px_vile_grind';
 
 			// tar -cf - -C /var/www/vile/tests/rasters/advanced/ RapidEye_Boulder_CO.zip   | pigz | ssh px "pigz -d | tar xf - -C /home/"
-			var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh px "pigz -d | tar xf - -C ' + remoteFolder + '"';
+			var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + '"';
+			console.log('ssh cmd'.cyan, cmd);
 
-			var host = api.config.grind.host;
+			var remoteUrl = api.config.vile_grind.remote_url;
 
 			var sendOptions = {
 				fileUuid : fileUuid,
 				uniqueIdentifier : uniqueIdentifier,
-				host : api.config.grind.ssh
+				sender_ssh : api.config.vile_grind.sender_ssh,
+				sender_url : api.config.vile_grind.sender_url,
+				api_hook : 'grind/done'
 			}
 
-			console.log('sendOptions'.yellow, sendOptions);
-
+			// send file over ssh
 			exec(cmd, function (err, stdout, stdin) {
 				if (err) console.log('err'.red, err);
+				console.log('########## SSH #############'.red);
+				console.log(err, stdout, stdin);
 
-				// file sent
-				// notify px of transfer to start grind
-
-				// send to tileserver storage
+				console.log('sendOptions'.yellow, sendOptions);
+	
+				// ping tileserver storage to notify of file transfer
 				request({
 					method : 'POST',
-					uri : host + 'grind/job',
+					uri : remoteUrl + 'grind/job',
 					json : sendOptions
 				}, 
 
@@ -363,7 +317,6 @@ module.exports = api.upload = {
 				});
 			});
 		});
-
 	},
 
 
@@ -557,9 +510,9 @@ module.exports = api.upload = {
 				}
 
 				if (extension == 'tif') {
-					console.log('#$$$$$$$$$$$$$ tif'.red);
-					console.log('#$$$$$$$$$$$$$ tif'.red);
-					console.log('#$$$$$$$$$$$$$ tif'.red);
+					console.log('#$$$$$$$ TODO $$$$$$ tif'.red);
+					console.log('#$$$$$$$ TODO $$$$$$ tif'.red);
+					console.log('#$$$$$$$ TODO $$$$$$ tif'.red);
 
 				}
 				
@@ -584,7 +537,6 @@ module.exports = api.upload = {
 						});
 					});
 				}
-
 
 
 				if (extension == 'doc' || extension == 'pdf' || extension == 'docx' || extension == 'txt') {
@@ -748,10 +700,6 @@ module.exports = api.upload = {
 		}
 
 		if (ext == 'tif') {
-			console.log('#$$$$$$$$$$$$$ 2 tif'.red);
-			console.log('#$$$$$$$$$$$$$ 2 tif'.red);
-			console.log('#$$$$$$$$$$$$$ 2 tif'.red);
-
 
 			ops.push(function (callback) {
 
@@ -770,7 +718,6 @@ module.exports = api.upload = {
 					db.data = {};
 					db.data.raster = options.name;
 
-
 					callback(null, db);
 				});
 
@@ -780,10 +727,6 @@ module.exports = api.upload = {
 		}
 
 		if (ext == 'jp2') {
-			console.log('#$$$$$$$$$$$$$ 2 jp2'.red);
-			console.log('#$$$$$$$$$$$$$ 2 jp2'.red);
-			console.log('#$$$$$$$$$$$$$ 2 jp2'.red);
-
 
 			ops.push(function (callback) {
 
@@ -801,7 +744,6 @@ module.exports = api.upload = {
 					db.files = [options.name];
 					db.data = {};
 					db.data.raster = options.name;
-
 
 					callback(null, db);
 				});
