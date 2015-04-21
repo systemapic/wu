@@ -750,7 +750,7 @@ Wu.RasterLayer = Wu.Layer.extend({
 			cartoid : cartoid,
 			subdomains : subdomains,
 			maxRequests : 0,
-			// tms : true
+			tms : true
 		});
 
 	},
