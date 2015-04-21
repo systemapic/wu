@@ -467,8 +467,8 @@ module.exports = api.geo = {
 		});
 
 		ops.push(function (meta, callback) {
-
-			var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=1 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
+			var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
+			// var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=1 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
 			console.log('cmd: ', cmd);
 
 			var exec = require('child_process').exec;
