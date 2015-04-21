@@ -15,7 +15,7 @@ var prodMode = process.argv[2] == 'production';
 var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser'); 
-var config = require('../config/server-config.js');
+var config = require('../config/server-config.js').serverConfig;
 var port = config.port;
 
 // mute console in production mode
