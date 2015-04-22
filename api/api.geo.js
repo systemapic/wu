@@ -87,14 +87,20 @@ module.exports = api.geo = {
 
 	_readMetaDataNode : function (path, callback) {
 
+		try {
+
 		mapnikOmnivore.digest(path, function(err, metadata) {
 			if (err) {
-				console.log('digest.err!'.red, err);
+				console.log('digest.err!'.red, err, path);
 				return callback(err);
 			}
-			// console.log(JSON.stringify(metadata, null, 2));
 			return callback(null, JSON.stringify(metadata, null, 2));
 		});
+
+		} catch (e) {
+			console.log('omni crash'.red, e, path);
+			return callback(e);
+		}
 	},
 
 	handleTopoJSON : function (path, fileUuid, callback) { 			// TODO!
