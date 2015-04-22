@@ -88,6 +88,11 @@ Wu.Files = Wu.Class.extend({
 		this.save('keywords');
 	},
 
+	setTag : function () {
+		// this.store.keywords.push(newTag); 
+		this.save('keywords');
+	},
+
 	setFormat : function (format) {
 		this.store.format = format;
 		this.save('format');
