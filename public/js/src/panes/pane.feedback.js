@@ -46,7 +46,7 @@ Wu.FeedbackPane = Wu.Class.extend({
 		var id = Wu.Util.createRandom(5);
 
 		// gets passed from sidepane.dataLibrary.js
-		if ( message.id ) id = message.id;
+		if (message.id) id = message.id;
 
 		var options = {
 			container 	: this._container,
@@ -57,7 +57,7 @@ Wu.FeedbackPane = Wu.Class.extend({
 
 		var pane = this._messages[id];
 		
-		if ( pane ) {
+		if (pane) {
 			
 			this.update(message, severity);
 
@@ -72,22 +72,18 @@ Wu.FeedbackPane = Wu.Class.extend({
 
 		// If messages overflow its container: remove the oldest element message
 		this.checkOverflow();
-
 	},
 
 	// Check if message boxes overflow container, and remove the oldest message if it does
 	checkOverflow : function() {
-
 		var containerMaxHeight  = 700;
 		var innerHeight 	= this._innerWrapper.offsetHeight;
 		var diff 		= containerMaxHeight - 100 - innerHeight;
 		
-		if ( diff < 0 ) {
-		
+		if (diff < 0) {
 			var remId = this._messagesArray[0].options.id;
 			this.remove(remId);
 			this._messagesArray.splice(0, 1);
-		
 		}
 
 	},
@@ -126,7 +122,7 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 	options : {
 
 		clearTimer : true,
-		clearDelay : 10000,
+		clearDelay : 15000,
 		transitionDelay : 0.5, 
 		severityStyle : {
 			1 : 'message',
@@ -262,6 +258,7 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 	},
 
 	hide : function () {
+
 		this._content.style.opacity = 0;
 		setTimeout(function () {
 			app.feedback.remove(this.options.id);

@@ -63,8 +63,6 @@ module.exports = api.slack = {
 			unfurl_links 	: true,
 			link_names 	: 1,
 			attachments 	: attachments,
-		}, function (err, ok) {
-			console.log('sent slack!!!!!', err, ok);
 		});
 	},
 
@@ -126,8 +124,8 @@ module.exports = api.slack = {
 
 	loggedIn : function (options) {
 		var user = options.user,
-		    fullName = user.firstName + ' ' + user.lastName;	
-		var text = fullName + ' logged in to project.ruppellsgriffon.com.'
+		    fullName = user.firstName + ' ' + user.lastName,
+		    text = fullName + ' logged in to ' + api.config.slack.baseurl;
 
 		// send
 		api.slack._send({ text : text });

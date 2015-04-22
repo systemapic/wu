@@ -3,7 +3,7 @@ Wu.Layer = Wu.Class.extend({
 	type : 'layer',
 
 	options : {
-		hoverTooltip : true,	// hover instead of click
+		hoverTooltip : true,	// hover instead of click  todo..
 	},
 
 	initialize : function (layer) {
@@ -460,9 +460,9 @@ Wu.Layer = Wu.Class.extend({
 
 
 
-Wu.RasterLayer = Wu.Layer.extend({
-	type : 'rasterLayer',
-});
+// Wu.RasterLayer = Wu.Layer.extend({
+// 	type : 'rasterLayer',
+// });
 
 
 // systemapic layers
@@ -509,6 +509,17 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 			subdomains : subdomains,
 			maxRequests : 0,
 		});
+
+		Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
+	},
+
+	_updateGrid : function (l) {
+
+		// refresh of gridlayer is attached to layer. this because vector tiles are not made in vile.js, 
+		// and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
+		// - also, removed listeners in L.UtfGrid (onAdd)
+		// 
+		if (this.gridLayer) this.gridLayer._update();
 	},
 
 	_prepareGrid : function () {
@@ -526,8 +537,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 		this.gridLayer = new L.UtfGrid(url, {
 			useJsonP: false,
 			subdomains: subdomains,
-			maxRequests : 20,
-			requestTimeout : 20000,
+			maxRequests : 0,
+			requestTimeout : 10000,
 			fileUuid : fileUuid
 		});
 
@@ -690,9 +701,19 @@ Wu.CartodbLayer = Wu.Layer.extend({
 // systemapic layers
 Wu.RasterLayer = Wu.Layer.extend({
 
+	initialize : function (layer) {
+
+		// set source
+		this.store = layer; // db object
+		
+		// data not loaded
+		this.loaded = false;
+
+	},
+
+
 	initLayer : function () {
 		this.update();
-
 	},
 
 	update : function () {
@@ -701,11 +722,8 @@ Wu.RasterLayer = Wu.Layer.extend({
 		// remove
 		// if (this.layer) this.remove();
 
-		// this._fileUuid = this.store.file;
-		// this._defaultCartoid = 'cartoid';
-
-		console.log('this uuid: ', this.store.uuid);
-		console.log('this store: ', this.store);
+		this._fileUuid = this.store.file;
+		this._defaultCartoid = 'raster';
 
 		// prepare raster
 		this._prepareRaster();
@@ -715,39 +733,34 @@ Wu.RasterLayer = Wu.Layer.extend({
 		
 	},
 
-	_prepareRaster : function () {
-		
-		// set ids
-		// var fileUuid 	= this._fileUuid,	// file id of geojson
-		    // cartoid 	= this.store.data.cartoid || this._defaultCartoid,
-		    // tileServer 	= app.options.servers.tiles.uri,
-		    // subdomains  = app.options.servers.tiles.subdomains,
-		    // token 	= app.accessToken,
-		    // token 	= '?token=' + app.Account.getToken(),
-		    // url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
-		var url = 'http://maptiles1.finncdn.no/tileService/1.0.3/norortho/{z}/{x}/{y}.png';
+	_prepareRaster : function () {
+
+		// set ids
+		var fileUuid 	= this._fileUuid,	// file id of geojson
+		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
+		    tileServer 	= app.options.servers.tiles.uri,
+		    subdomains  = app.options.servers.tiles.subdomains,
+		    token 	= '?token=' + app.Account.getToken(),
+		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
-			// fileUuid: this._fileUuid,
-			// cartoid : cartoid,
-			// subdomains : subdomains,
+			fileUuid: fileUuid,
+			cartoid : cartoid,
+			subdomains : subdomains,
 			maxRequests : 0,
-			// reuseTiles : true,
-			// unloadInvisibleTiles : false,
-			// updateWhenIdle : true,
-			
+			tms : true
 		});
+
 	},
-
-
 
 });
 
 
 // shorthand for creating all kinds of layers
 Wu.createLayer = function (layer) {
+	if (!layer.data) return console.error(layer);
 
 	// mapbox
 	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
@@ -760,6 +773,9 @@ Wu.createLayer = function (layer) {
 
 	// topojson
 	if (layer.data.topojson) return new Wu.TopojsonLayer(layer);
+
+	// raster
+	if (layer.data.raster) return new Wu.RasterLayer(layer);
 }
 
 

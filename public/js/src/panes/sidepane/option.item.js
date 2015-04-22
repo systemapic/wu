@@ -34,7 +34,7 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 	},
 
 	addHooks : function () {
-		Wu.DomEvent.on( this._container, 'mousedown', this._GAtoggleOpen, this);
+		Wu.DomEvent.on(this._container, 'mousedown', this._GAtoggleOpen, this);
 	},
 
 	removeHooks : function () {
@@ -117,7 +117,7 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 	// sort layers by provider
 	sortLayers : function (layers) {
 		// possible keys in layer.store.data. must add more here later if other sources
-		var keys = ['geojson', 'mapbox', 'osm'];
+		var keys = ['geojson', 'mapbox', 'osm', 'raster'];
 		var results = [];
 		keys.forEach(function (key) {
 			var sort = {
@@ -140,6 +140,7 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 	addProvider : function (provider) {
 		var title = '';
 		if (provider == 'geojson') title = 'Data Library';
+		if (provider == 'raster') title = 'Data Library';
 		if (provider == 'mapbox') title = 'Mapbox';
 		if (provider == 'osm') title = 'Open Street Map';
 		var header = Wu.DomUtil.create('div', 'item-list-header', this._outer, title)

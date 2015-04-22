@@ -26,7 +26,8 @@ var layerSchema = mongoose.Schema({
 		topojson	: String,			// file uuid ... // simply request, check auth, serve file.
 		
 		cartoid   	: String,
-		
+		raster 		: String,
+
 		rastertile 	: String,			// server raster path: raster/hubble2/hubble
 		vectortile 	: String,			// server vector tile: vector/bigassvector/bigvector
 		mapbox 		: String,			// mapbox id: rawger.geography-class
@@ -37,14 +38,7 @@ var layerSchema = mongoose.Schema({
 	metadata : String, // json string with loads of meta
 	tooltip : String,  // json string with cartocss tooltips
 	legends : String,  // json string with cartocss legends
-
-	// geojson styling
-	// style : [{											// todo: remove!
-	// 	__sid : String,	// systemapic id added to geojson features
-	// 	style : String  // json of css style object
-	// }],
-
-	file : String 	// file uuid that layer is connected to, if any
+	file : String 	   // file uuid that layer is connected to, if any
 
 });
 

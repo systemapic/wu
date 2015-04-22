@@ -284,8 +284,6 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 	setDefaultLayer : function () {
 		var baseLayer = _.sample(this._layers, 1)[0];
-		console.log('setDefaultLayer', this._layers);
-		console.log('baseLayer', baseLayer);
 		if (!baseLayer) return;
 		this.on(baseLayer);
 		this.enableLayer(baseLayer);
