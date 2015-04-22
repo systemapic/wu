@@ -81,7 +81,7 @@ Wu.SidePane.Options.Position = Wu.SidePane.Options.Item.extend({
 		this.update();
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Options > Position: set position']);
+		app.Analytics.setGaEvent(['Side Pane', 'Options > Position: set position']);
 	},
 
 

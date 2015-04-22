@@ -163,7 +163,7 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 		}
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Baselayer toggle: ' + layer.getTitle()]);
+		app.Analytics.setGaEvent(['Controls', 'Baselayer toggle: ' + layer.getTitle()]);
 
 	},
 
@@ -172,7 +172,7 @@ L.Control.Baselayertoggle = Wu.Control.extend({
 		this._isOpen ? this.collapse() : this.expand();
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Baselayer toggle click']);
+		app.Analytics.setGaEvent(['Controls', 'Baselayer toggle click']);
 	},
 
 	collapse : function () {

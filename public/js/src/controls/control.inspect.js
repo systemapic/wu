@@ -324,7 +324,7 @@ L.Control.Inspect = Wu.Control.extend({
 		this._md = 0;
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);
+		app.Analytics.setGaEvent(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);
 
 	},
 
@@ -347,7 +347,7 @@ L.Control.Inspect = Wu.Control.extend({
 		this._md = 0;
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);
+		app.Analytics.setGaEvent(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);
 
 	},
 
@@ -367,7 +367,7 @@ L.Control.Inspect = Wu.Control.extend({
 
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Inspect layers: Remove layer > ' + layer.getTitle()]);
+		// app.Analytics.setGaEvent(['Controls', 'Inspect layers: Remove layer > ' + layer.getTitle()]);
 		
 
 	},
@@ -402,7 +402,7 @@ L.Control.Inspect = Wu.Control.extend({
 		this._zx.up(layer);
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);		
+		app.Analytics.setGaEvent(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);		
 	},
 
 	moveDown : function (entry) {
@@ -420,7 +420,7 @@ L.Control.Inspect = Wu.Control.extend({
 		this._zx.down(layer);
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);		
+		app.Analytics.setGaEvent(['Controls', 'Inspect layers: Z-index change for > ' + layer.getTitle()]);		
 	},
 
 	
@@ -441,7 +441,7 @@ L.Control.Inspect = Wu.Control.extend({
 		map.fitBounds(bounds);
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Inspect layers: Fly to bounds for > ' + layer.getTitle()]);
+		app.Analytics.setGaEvent(['Controls', 'Inspect layers: Fly to bounds for > ' + layer.getTitle()]);
 
 	},
 
@@ -466,7 +466,7 @@ L.Control.Inspect = Wu.Control.extend({
 		}
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Inspect layers: Toggle isolate > ' + entry.layer.getTitle()]);	
+		app.Analytics.setGaEvent(['Controls', 'Inspect layers: Toggle isolate > ' + entry.layer.getTitle()]);	
 
 	},
 

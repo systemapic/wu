@@ -183,7 +183,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.confirmDeleteClient();
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: delete client']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: delete client']);
 
 	},
 
@@ -256,7 +256,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		project._saveNew(options);
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: new project']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: new project']);
 	},
 
 	_markActive : function (newProject) {
@@ -417,7 +417,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		Wu.DomEvent.on( target,  'keydown', this.editKeyed,  this );           // save title
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: edit client name']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: edit client name']);
 
 
 	},
@@ -469,7 +469,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		Wu.DomEvent.on( target,  'keydown', this.editKeyed,   	    this );     // save title
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: edit client description']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: edit client description']);
 
 	},
 

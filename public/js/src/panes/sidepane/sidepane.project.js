@@ -97,7 +97,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomEvent[on](this._container, 'mousedown',  Wu.DomEvent.stopPropagation, this);	// to prevent closing of project pane
 	
 		// Toggle project info box
-		Wu.DomEvent[on](this.users, 'mousedown', this.toggleProjectInfo, this);
+		Wu.DomEvent[on](this.users, 'mousedown', this._GAtoggleProjectInfo, this);
 		Wu.DomEvent[on](this.users, 'click mousedown', Wu.DomEvent.stopPropagation, this);
 
 		// edit hooks
@@ -173,6 +173,15 @@ Wu.SidePane.Project = Wu.Class.extend({
 		Wu.DomUtil.removeClass(this.logo, 'editable');
 	},
 
+	_GAtoggleProjectInfo : function () {
+
+		// Google Analytics event trackign
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: toggle project info']);
+
+		// Fire function
+		this.toggleProjectInfo();
+
+	},
 
 
 	toggleProjectInfo : function () {
@@ -211,12 +220,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		}
 
-		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: toggle project info']);
-
-
-
 	},
+
 
 	makeNewThumbnail : function () {
 		this._project = this._project || app.activeProject;
@@ -226,7 +231,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this._project.createProjectThumb();
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: make new thumbnail']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: make new thumbnail']);
 
 	},
 
@@ -286,12 +291,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// dont select if already active
 		if (this._project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho not active.. fix!
 
-		// Google Analytics
-		// var projectUuid = this._project.getUuid(); // refactor: catch with events
-		// app.Analytics.setGaProject(projectUuid);	
-
-		// select project
-		// this._project.select();	
 		Wu.Mixin.Events.fire('projectSelected', { detail : {
 			projectUuid : this._project.getUuid()
 		}});    
@@ -342,7 +341,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: edit project title']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: edit project title']);
 	},
 
 	_editNameBlur : function (e) {
@@ -397,7 +396,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: edit project description']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: edit project description']);
 	},
 
 	_editDescriptionBlur : function (e) {
@@ -482,7 +481,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.confirmDelete();
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: delete project']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: delete project']);
 
 	},
 
