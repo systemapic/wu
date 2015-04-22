@@ -249,7 +249,7 @@ Wu.StartPane = Wu.Pane.extend({
 		this.deactivate();
 
 		// Google Analytics event trackign
-		app.Analytics.setGaProject(project.getUuid());
+		app.Analytics.setGaPageview(project.getUuid());
 
 	},
 

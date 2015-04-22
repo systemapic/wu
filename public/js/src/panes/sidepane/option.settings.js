@@ -24,7 +24,7 @@ Wu.SidePane.Options.Settings = Wu.SidePane.Options.Item.extend({
 	initLayout : function (container) {
 
 		// container, header, outer
-		this._container	= Wu.DomUtil.create('div', 'editor-inner-wrapper editor-map-item-wrap ct12 ct17 ct23', container);
+		this._container	= Wu.DomUtil.create('div', 'editor-inner-wrapper editor-map-item-wrap', container);
 		var h4 		= Wu.DomUtil.create('h4', '', this._container, 'Settings');
 		this._outer 	= Wu.DomUtil.create('div', 'settings-outer', this._container);
 
@@ -198,7 +198,7 @@ Wu.SidePane.Options.Settings = Wu.SidePane.Options.Item.extend({
 			this._settings[setting] ? input.setAttribute('checked', 'checked') : input.removeAttribute('checked');
 
 			// Google Analytics event tracking
-			app.Analytics.ga(['Side Pane', 'Options > Settings: ' + setting]);
+			app.Analytics.setGaEvent(['Side Pane', 'Options > Settings: ' + setting]);
 			
 		}, this);
 		 

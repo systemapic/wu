@@ -90,7 +90,7 @@ Wu.SidePane.Options.Connect = Wu.SidePane.Options.Item.extend({
 		}.bind(this));
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Options > Connected Src: add osm layer']);
+		app.Analytics.setGaEvent(['Side Pane', 'Options > Connected Src: add osm layer']);
 
 	},
 
@@ -117,7 +117,7 @@ Wu.SidePane.Options.Connect = Wu.SidePane.Options.Item.extend({
 		this._importMapbox(username, accessToken, this.importedMapbox);
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Options > Connected Src: import mapbox']);
+		app.Analytics.setGaEvent(['Side Pane', 'Options > Connected Src: import mapbox']);
 
 
 	},

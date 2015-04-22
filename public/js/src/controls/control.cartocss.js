@@ -169,10 +169,10 @@ L.Control.Cartocss = Wu.Control.extend({
 		Wu.DomEvent[onoff](this._updateButton, 'click', this.renderStyling, this);
 
 		// toolbar button click
-		Wu.DomEvent[onoff](this._toolbarButton, 'click', this.toggle, this);
+		Wu.DomEvent[onoff](this._toolbarButton, 'click', this._GAtoggle, this);
 
 		// remove control
-		Wu.DomEvent[onoff](this._xButton, 'click', this.toggle, this);
+		Wu.DomEvent[onoff](this._xButton, 'click', this._GAtoggle, this);
 
 		// Layer drop down
 		Wu.DomEvent[onoff](this._styleHeaderLayerName, 'click', this.toggleLayerDropDown, this);
@@ -398,7 +398,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		if (!layer) return;
 
 		// Google Analytics event tracking
-		if (layer) app.Analytics.ga(['Controls', 'CartoCSS select layer: ' + layer.getTitle()]);
+		if (layer) app.Analytics.setGaEvent(['Controls', 'CartoCSS select layer: ' + layer.getTitle()]);
 
 		// close dropdown
 		this.closeLayerDropDown();
@@ -412,7 +412,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		this.setSelected(layer);
 		
 		// Google Analytics event tracking
-		if (layer) app.Analytics.ga(['Controls', 'CartoCSS select layer: ' + layer.getTitle()]);
+		if (layer) app.Analytics.setGaEvent(['Controls', 'CartoCSS select layer: ' + layer.getTitle()]);
 	},
 
 	
@@ -433,7 +433,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		Wu.DomUtil.addClass(this._tabLegends, 'cartocss-active-tab');
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'CartoCSS toggle legends']);
+		app.Analytics.setGaEvent(['Controls', 'CartoCSS toggle legends']);
 
 		this.initLegends();
 	},
@@ -456,7 +456,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		Wu.DomUtil.removeClass(this._tabLegends, 'cartocss-active-tab');
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'CartoCSS toggle styles']);
+		app.Analytics.setGaEvent(['Controls', 'CartoCSS toggle styles']);
 
 		this.initStyling(this._layer);
 
@@ -479,7 +479,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		Wu.DomUtil.removeClass(this._tabLegends, 'cartocss-active-tab');
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'CartoCSS toggle tooltip']);	
+		app.Analytics.setGaEvent(['Controls', 'CartoCSS toggle tooltip']);	
 
 		this.initTooltip();	
 	},
@@ -1028,13 +1028,18 @@ L.Control.Cartocss = Wu.Control.extend({
 	},
 	
 	
+	_GAtoggle : function () {
+
+		// Google Analytics event tracking
+		app.Analytics.setGaEvent(['Controls', 'CartoCSS toggle']);		
+
+		// Fire function
+		this.toggle();
+	},
 
 	toggle : function () {
 		
 		this._open ? this.close() : this.open();
-
-		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'CartoCSS toggle']);
 
 	},
 
@@ -1098,7 +1103,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		this._layer.setCartoCSS(json, this.renderedStyling.bind(this));
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'CartoCSS render layer: ' + this._layer.getTitle()]);
+		app.Analytics.setGaEvent(['Controls', 'CartoCSS render layer: ' + this._layer.getTitle()]);
 
 	},
 

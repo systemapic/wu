@@ -1492,6 +1492,7 @@ Wu.DomEvent = {
     },
 
     _on: function (obj, type, fn, context) {
+
 	var id = type + Wu.stamp(fn) + (context ? '_' + Wu.stamp(context) : '');
 
 	if (obj[eventsKey] && obj[eventsKey][id]) { return this; }

@@ -108,7 +108,7 @@ Wu.SidePane.Item = Wu.Pane.extend({
 		this.activate();
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Select: ' + this.type]);
+		app.Analytics.setGaEvent(['Side Pane', 'Select: ' + this.type]);
 	},
 
 	mobileReActivate : function () {
