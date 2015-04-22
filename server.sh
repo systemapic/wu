@@ -1,9 +1,7 @@
 #!/bin/bash
 
-
 if [ "$1" == "prod" ];then
 	PRODUCTIONMODE=true
-	
 else 
 	PRODUCTIONMODE=false	
 fi;
@@ -20,7 +18,6 @@ else
 	echo 'Debug mode'
 	grunt dev 
 	echo 'Running!'
-	nodemon server.js
-
+	nodemon --watch ../api --watch ../config --watch server.js --watch ../routes server.js
 fi
 cd ..

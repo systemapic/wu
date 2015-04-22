@@ -32,6 +32,7 @@ var api = require('../api/api');
 // function exports
 module.exports = function(app, passport) {
 
+	api.app = app;
 
 	// ================================
 	// HOME PAGE (with login links) ===
@@ -70,6 +71,49 @@ module.exports = function(app, passport) {
 	app.post('/api/analytics/get', isLoggedIn, function (req,res) {
 		api.analytics.get(req, res);
 	});
+
+	// =====================================
+	// GET NOTIFIED OF DONE GRINDS =========
+	// =====================================
+	app.post('/grind/done', function (req, res) {
+		api.socket.grindDone(req, res);
+	});
+
+
+
+	// =====================================
+	// RESUMABLE.js UPLOADS ================
+	// =====================================
+	// app.post('/api/chunked/upload', isLoggedIn, function (req, res) {
+	// 	console.log('XXX POST /api/chunked/upload'.yellow, req.body);
+	// 	// api.upload.chunkedUpload(req, res);
+	// });
+
+	// =====================================
+	// RESUMABLE.js UPLOADS ================
+	// =====================================
+	app.get('/api/upload', isLoggedIn, function (req, res) {
+		api.upload.chunkedCheck(req, res);
+	});
+
+	// =====================================
+	// RESUMABLE.js UPLOADS ================
+	// =====================================
+	app.get('/download/:identifier', isLoggedIn, function (req, res) {
+		api.upload.chunkedIdent(req, res);
+	});
+
+	// =====================================
+	// UPLOAD DATA LIBRARY FILES ===========
+	// =====================================
+	app.post('/api/upload', isLoggedIn, function (req, res) {
+		api.upload.chunkedUpload(req, res);
+	});
+
+
+
+
+	
 
 
 	// =====================================
@@ -208,12 +252,12 @@ module.exports = function(app, passport) {
 	});
 
 
-	// =====================================
-	// UPLOAD DATA LIBRARY FILES ===========
-	// =====================================
-	app.post('/api/upload', isLoggedIn, function (req, res) {
-		api.upload.file(req, res);
-	});
+	// // =====================================
+	// // UPLOAD DATA LIBRARY FILES ===========
+	// // =====================================
+	// app.post('/api/upload', isLoggedIn, function (req, res) {
+	// 	api.upload.file(req, res);
+	// });
 
 	
 	// =====================================
@@ -453,6 +497,26 @@ module.exports = function(app, passport) {
 	});
 
 
+	// =====================================
+	// SERVER CLIENT CONFIG ================
+	// ===================================== 
+	app.get('/clientConfig.js', isLoggedIn, function (req, res) {
+		var configString = 'var systemapicConfigOptions = ' + JSON.stringify(api.clientConfig);
+		res.setHeader("content-type", "application/javascript");
+		res.end(configString);
+	});
+
+	// =====================================
+	// SERVER LOGIN CONFIG =================
+	// ===================================== 
+	app.get('/loginConfig.js', function (req, res) {
+		var configString = 'var loginConfig = ' + JSON.stringify(api.loginConfig);
+		res.setHeader("content-type", "application/javascript");
+		res.end(configString);
+	});
+
+
+
 	// // =====================================
 	// // DEBUG: CREATE ROLE ==================
 	// // ===================================== 
@@ -464,8 +528,6 @@ module.exports = function(app, passport) {
 	// DEBUG: PHANTOMJS FEEDBACK ===========
 	// ===================================== 
 	app.post('/api/debug/phantom', isLoggedIn, function (req, res) {
-		console.log('/api/debug/phantom');
-		console.log(req.body);
 		res.end();
 	});
 

@@ -4,19 +4,23 @@ var systemapicConfigOptions = {
 
 	portalName : 'systemapic',	// plugged in
 	portalLogo : false,		// not plugged in.. using sprites atm..
-	portalTitle : '[dev] Systemapic Secure Portal',
-	
+	portalTitle : 'Systemapic Secure Portal', // MX
+
 	// sidepane
 	panes : {
 		// plugged in and working! :)
 		clients 	: true,
-		mapOptions 	: true,
+		options 	: true,
 		documents 	: true,               	
 		dataLibrary 	: true,               	
 		users 		: true,
 		share 		: true,
 		mediaLibrary    : false,
 		account 	: true
+	},
+
+	logos : {
+		projectDefault : '/css/images/grinders/BG-grinder-small-grayDark-on-white.gif',
 	},	
 	
 	// default settings (overridden by project settings)
@@ -36,31 +40,31 @@ var systemapicConfigOptions = {
 				zoom : 5
 			}
 		}
-	},
+	},	
 
 	providers : {
 		// default accounts, added to all new (and old?) projects
 		mapbox : [{	
-			username : 'MAPBOX-USER-NAME',
-			accessToken : 'MAPBOX-ACCESS-TOKEN'
+			username : 'systemapic',
+			accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q'
 		}]
 	},
 
 	servers : {
 
-		// portal SX
-		portal   : 'https://dev.systemapic.com/',	// api
+		// portal MX
+		portal   : 'https://maps.systemapic.com/',	// api
 
-		// tiles SX
+		// tiles MX
 		tiles : {
 			uri : 'https://{s}.systemapic.com/r/',
-			subdomains : 'efgh' // sx
+			subdomains : 'ijkl' // mx
 		},
 
-		// utfgrid SX
+		// utfgrid MX
 		utfgrid : {
 			uri : 'https://{s}.systemapic.com/u/',
-			subdomains : 'efgh' // sx
+			subdomains : 'ijkl' // mx
 		},
 
 		// osm PX
@@ -69,15 +73,12 @@ var systemapicConfigOptions = {
 			uri : 'https://{s}.systemapic.com/r/',
 			subdomains : 'mnop' // px
 		}
+
+
 	},
 
-	silentUsers : [
-		// redacted
-		'user-9fed4b5f', // only part of uuid
-	],
-
-
 	ga : {
-		id : 'GOOGLE-ANALYTICS-ID'
+		id : 'UA-57572003-2'
 	}
+	
 }
