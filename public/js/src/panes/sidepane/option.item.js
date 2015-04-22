@@ -34,7 +34,7 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 	},
 
 	addHooks : function () {
-		Wu.DomEvent.on(this._container, 'mousedown', this.toggleOpen, this);
+		Wu.DomEvent.on(this._container, 'mousedown', this._GAtoggleOpen, this);
 	},
 
 	removeHooks : function () {
@@ -59,13 +59,18 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 		}, 200);	
 	},
 
-	toggleOpen : function () {
-		this._isOpen ? this.close() : this.open();
+	_GAtoggleOpen : function () {
 
 		// Google Analytics event trackign
 		var _name = this._container.childNodes[0].innerHTML;
-		app.Analytics.ga(['Side Pane', 'Options select: ' + _name]);
+		app.Analytics.setGaEvent(['Side Pane', 'Options select: ' + _name]);
 
+		this.toggleOpen();
+
+	},
+
+	toggleOpen : function () {
+		this._isOpen ? this.close() : this.open();
 	},
 
 	open : function () {

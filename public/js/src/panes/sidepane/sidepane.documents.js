@@ -326,7 +326,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this._refresh();
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Documents: New folder']);
+		app.Analytics.setGaEvent(['Side Pane', 'Documents: New folder']);
 
 	},
 
@@ -389,7 +389,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		}
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Documents: Delete folder']);
+		app.Analytics.setGaEvent(['Side Pane', 'Documents: Delete folder']);
 
 	},
 

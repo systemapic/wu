@@ -38,7 +38,7 @@ Wu.StatusPane = Wu.Class.extend({
 	addHooks : function () {
 
 		// open sidepane menu on mousedown
-		Wu.DomEvent.on(this._container, 'mousedown', this.toggle, this);
+		Wu.DomEvent.on(this._container, 'mousedown', this._GAtoggle, this);
 
 		// global TAB key toggle
 		// Wu.DomEvent.on(document, 'keydown', this.tab, this);	// todo: fix tabbing in inputs
@@ -49,14 +49,20 @@ Wu.StatusPane = Wu.Class.extend({
 		if (e.keyCode == 9) this.toggle();
 	},
 
+
+	_GAtoggle : function () {
+
+		// Google Analytics event trackign
+		app.Analytics.setGaEvent(['Status Pane', 'toggle']);
+
+		this.toggle();
+	},
+
 	toggle : function () {
 		this.isOpen ? this.close() : this.open();
 	
 		// div cleanups to do when hitting home
 		this.cleaningJobs();
-
-		// Google Analytics event trackign
-		app.Analytics.ga(['Status Pane', 'toggle']);
 	},
 
 	cleaningJobs: function () {
@@ -211,12 +217,15 @@ Wu.StatusPane = Wu.Class.extend({
 
 	checkMapBlur : function () {
 
-		if ( 	app._activeMenuItem == 'documents' || 
-			app._activeMenuItem == 'dataLibrary' || 
-			app._activeMenuItem == 'users' ) 
-		{
-			Wu.DomUtil.addClass(app.MapPane._container, "map-blur");
-		}
+		var blur = false;
+
+		if ( app._activeMenuItem == 'users'       && app.SidePane.Users.fullsize ) 	 blur = true;
+		if ( app._activeMenuItem == 'dataLibrary' && app.SidePane.DataLibrary.fullsize ) blur = true;
+		if ( app._activeMenuItem == 'documents' )					 blur = true;
+
+		if ( blur ) Wu.DomUtil.addClass(app.MapPane._container, "map-blur");	
+		
+
 
 	},
 
