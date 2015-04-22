@@ -261,6 +261,7 @@ module.exports = function(grunt) {
 					'public/js/src/models/model.layers.js',
 					'public/js/src/models/model.files.js',
 					'public/js/src/models/model.roles.js',
+					'public/js/src/models/model.D3List.js',
 
 					// Access
 					'public/js/src/core/access.js',

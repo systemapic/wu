@@ -815,7 +815,7 @@ Wu.Project = Wu.Class.extend({
 		files.forEach(function(file, i, arr) {
 
 			// remove from list
-			list.remove('uuid', file.uuid);
+			// list.remove('uuid', file.uuid);
 		
 			// remove from local project
 			_.remove(this.store.files, function (item) { return item.uuid == file.uuid; });

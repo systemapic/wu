@@ -30,11 +30,12 @@ Wu.SidePane.Manage = Wu.Class.extend({
 		var m = Wu.DomUtil.create('div', 'manage-access-title', t, titleText);
 		var s = Wu.DomUtil.create('div', 'manange-access-subtitle', t, subText);
 
+		// buttons
+		this._doneButton = Wu.DomUtil.create('div', 'manage-access-button-done', t);
+
+
 		// clients/projects wrapper
 		this._content = Wu.DomUtil.create('div', 'manage-access-content-wrapper', this._container);
-
-		// buttons
-		this._doneButton = Wu.DomUtil.create('div', 'manage-access-button-done', this._container);
 
 		// hide sidepane
 		this._sidepane._hide();
@@ -315,7 +316,7 @@ Wu.SidePane.Manage = Wu.Class.extend({
 		this._sidepane._show();
 		
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Users: Close manage access']);
+		app.Analytics.setGaEvent(['Side Pane', 'Users: Close manage access']);
 
 		// delete this?
 		delete this;

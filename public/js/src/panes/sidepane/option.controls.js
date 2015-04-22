@@ -51,17 +51,17 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		Wu.SidePane.Options.Item.prototype.addHooks.call(this)
 
 		// add events
-		Wu.DomEvent.on( this.panes.controlZoom,            'mousedown click', this.toggleControl, this);
-		Wu.DomEvent.on( this.panes.controlDraw,            'mousedown click', this.toggleControl, this);
-		Wu.DomEvent.on( this.panes.controlInspect,         'mousedown click', this.toggleControl, this);
-		Wu.DomEvent.on( this.panes.controlDescription,     'mousedown click', this.toggleControl, this);
-		Wu.DomEvent.on( this.panes.controlLayermenu,       'mousedown click', this.toggleControl, this);
-		Wu.DomEvent.on( this.panes.controlLegends,         'mousedown click', this.toggleControl, this);
-		Wu.DomEvent.on( this.panes.controlMeasure,         'mousedown click', this.toggleControl, this);
-		Wu.DomEvent.on( this.panes.controlGeolocation,     'mousedown click', this.toggleControl, this);
-		Wu.DomEvent.on( this.panes.controlMouseposition,   'mousedown click', this.toggleControl, this);
-		Wu.DomEvent.on( this.panes.controlBaselayertoggle, 'mousedown click', this.toggleControl, this);
-		Wu.DomEvent.on( this.panes.controlCartocss, 	   'mousedown click', this.toggleControl, this);
+		Wu.DomEvent.on( this.panes.controlZoom,            'mousedown', this._GAtoggleControl, this);
+		Wu.DomEvent.on( this.panes.controlDraw,            'mousedown', this._GAtoggleControl, this);
+		Wu.DomEvent.on( this.panes.controlInspect,         'mousedown', this._GAtoggleControl, this);
+		Wu.DomEvent.on( this.panes.controlDescription,     'mousedown', this._GAtoggleControl, this);
+		Wu.DomEvent.on( this.panes.controlLayermenu,       'mousedown', this._GAtoggleControl, this);
+		Wu.DomEvent.on( this.panes.controlLegends,         'mousedown', this._GAtoggleControl, this);
+		Wu.DomEvent.on( this.panes.controlMeasure,         'mousedown', this._GAtoggleControl, this);
+		Wu.DomEvent.on( this.panes.controlGeolocation,     'mousedown', this._GAtoggleControl, this);
+		Wu.DomEvent.on( this.panes.controlMouseposition,   'mousedown', this._GAtoggleControl, this);
+		Wu.DomEvent.on( this.panes.controlBaselayertoggle, 'mousedown', this._GAtoggleControl, this);
+		Wu.DomEvent.on( this.panes.controlCartocss, 	   'mousedown', this._GAtoggleControl, this);
 
 	},
 
@@ -78,7 +78,21 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		this.minHeight = 0;
 	},
 
+	_GAtoggleControl : function (e) {
+
+
+		// get type (zoom, draw, etc.)
+		var item = e.target.getAttribute('which');
+
+		// Google Analytics event tracking
+		app.Analytics.setGaEvent(['Side Pane', 'Options > Controls toggle: ' + item]);
+
+		// Fire function
+		this.toggleControl(e);
+	},
+
 	toggleControl : function (e) {
+
 		
 		// prevent default checkbox behaviour
 		if (e.type == 'click') return Wu.DomEvent.stop(e);
@@ -131,8 +145,6 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		// update controls css
 		mapPane.updateControlCss();
 
-		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Options > Controls toggle: ' + item]);
 	},
 
 

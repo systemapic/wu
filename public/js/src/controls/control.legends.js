@@ -49,7 +49,7 @@ L.Control.Legends = Wu.Control.extend({
 	addHooks : function () {
 
 		Wu.DomEvent.on(this._legendsCollapser, 'click', this.closeLegends, this);
-		Wu.DomEvent.on(this._legendsOpener, 'click', this.toggleOpen, this);
+		Wu.DomEvent.on(this._legendsOpener, 'click', this._GAtoggleOpen, this);
 
 		// prevent map scrollzoom (OOOBS! BLOCKS ALL SCROLLING)
 		Wu.DomEvent.on(this._container, 'mousewheel', Wu.DomEvent.stop, this);
@@ -238,6 +238,14 @@ L.Control.Legends = Wu.Control.extend({
 		this._legendsScrollRight.style.display = 'none';
 	},
 
+	_GAtoggleOpen : function (e) {
+
+		// Google Analytics event tracking
+		app.Analytics.setGaEvent(['Controls', 'Legends: toggle open']);
+
+		this.toggleOpen(e);
+	},
+
 	// Needed for Mobile phones
 	toggleOpen : function(e) {
 
@@ -249,8 +257,6 @@ L.Control.Legends = Wu.Control.extend({
 			this._isOpen ? this.mobileCloseLegends() : this.mobileOpenLegends();
 		}
 
-		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Legends: toggle open']);
 
 	},
 
