@@ -252,7 +252,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			},
 
 			// accepted filetypes
-			fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif', 'jp2'],
+			fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif', 'jp2', 'ecw'],
 			fileTypeErrorCallback : function (file, errorCount) {
 
 				// feedback message
