@@ -46,7 +46,6 @@ Wu.SidePane = Wu.Pane.extend({
 		app._menuSliderArrow = Wu.DomUtil.createId('div', 'menuslider-arrow', Wu.app._menuSlider);	// refactor app
 
 		// init content
-		// this.initContent();
 		this.render();    
 	},
 
@@ -141,14 +140,14 @@ Wu.SidePane = Wu.Pane.extend({
 		app._editorMenuPane.style.height = parseInt(height) + 'px';
 	},
 
-	setProject : function (project) {
-		console.error('setProject FIXME!');
-		// update content
-		if (this.Home) 		this.Home.updateContent(project);
-		if (this.Options)	this.Options.updateContent(project);
-		if (this.Documents) 	this.Documents.updateContent(project);
-		if (this.DataLibrary) 	this.DataLibrary.updateContent(project);
-	},
+	// setProject : function (project) {
+	// 	console.error('setProject FIXME!');
+	// 	// update content
+	// 	if (this.Home) 		this.Home.updateContent(project);
+	// 	if (this.Options)	this.Options.updateContent(project);
+	// 	if (this.Documents) 	this.Documents.updateContent(project);
+	// 	if (this.DataLibrary) 	this.DataLibrary.updateContent(project);
+	// },
 
 	refreshMenu : function () {
 		
@@ -296,13 +295,11 @@ Wu.SidePane = Wu.Pane.extend({
 			app.SidePane.Clients.activate();	
 		}
 	},
-
 	
 	widenContainer : function () {
 		this._container.style.width = '100%';
 	},
 
-	
 	_refreshLeaflet : function () {
 		setTimeout(function() {
 			var map = Wu.app._map;

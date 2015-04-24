@@ -267,7 +267,7 @@ Wu.SidePane.Manage = Wu.Class.extend({
 		// add member 
 		if (role) role.addMember(user, function (err, projectStore) {
 			if (err) return app.feedback.setError({
-				title : 'Access denied', 
+				title : 'Access denied',
 				description : err
 			});
 			

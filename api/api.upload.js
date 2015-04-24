@@ -56,6 +56,8 @@ module.exports = api.upload = {
 
 		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks to ', outputPath);
 
+		console.log('## RESUMABLE ##'.green, req.body);
+
 		// resumable		
 		r.post(req, function(status, filename, original_filename, identifier){
 
@@ -95,15 +97,16 @@ module.exports = api.upload = {
 		    tmpFolder = '/data/tmp/',
 		    ops = [];
 
+		// merge files
 		ops.push(function (callback) {
 
-			// merge files
+			
 			var cmd = 'cat ';
 
 			_.times(resumableTotalChunks, function (i) {
 				var num = i + 1;
 				cmd += tmpFolder + 'resumable-' + resumableIdentifier + '.' + num + ' ';
-			})
+			});
 
 			cmd += ' > ' + outputPath;
 
@@ -115,6 +118,7 @@ module.exports = api.upload = {
 
 		});
 
+		// import file
 		ops.push(function (stats, callback) {
 			var file = {
 				path : options.outputPath,
@@ -123,12 +127,10 @@ module.exports = api.upload = {
 				uniqueIdentifier : uniqueIdentifier
 			}
 
-			// import file
 			api.upload.importFile(file, options, function (err, pack) {
 				callback(null, pack);
 			});
 		});
-
 
 		async.waterfall(ops, function (err, result) {
 
@@ -803,56 +805,79 @@ module.exports = api.upload = {
 
 
 	projectLogo : function (req, res) {
+	    	var options = req.body,
+		    imageUuid = options.imageUuid,
+		    tmpFolder = '/data/tmp/',
+		    resumableIdentifier = options.resumableIdentifier;
 
-		// process from-encoded upload
-		var form = new formidable.IncomingForm({
-			hash : 'sha1',
-			multiples : true,
-			keepExtensions : true,
+		// resumable		
+		r.post(req, function(status, filename, original_filename, identifier){
+
+			// register chunk done in redis
+			if (status == 'done') {
+
+				var from = tmpFolder + 'resumable-' + resumableIdentifier + '.' + 1,
+				    file = imageUuid,
+				    to = api.config.path.image + file;
+
+				// rename and move to image folder
+				fs.copy(from, to, function (err) {
+					if (err) return api.error.general(req, res, err);
+					res.end(file);	// file will be saved by client
+				});
+			}
 		});
-
-		form.parse(req, function(err, fields, files) {	
-			if (err) console.log('ERR 3'.red, err);
-			if (err || !files || !files.file) return api.error.general(req, res, err || 'No files1.');
-
-			var from = files.file.path,
-			    file = 'image-' + uuid.v4(),
-			    to = api.config.path.image + file;
-			
-			// rename and move to image folder
-			fs.rename(from, to, function (err) {
-				if (err) console.log('ERR 4'.red, err);
-				if (err) return api.error.general(req, res, err);
-				res.end(file);	// file will be saved by client
-			});		
-	 	});
 	},
 
 
 	clientLogo : function (req, res) {
-		
-		// process from-encoded upload
-		var form = new formidable.IncomingForm({
-			hash : 'sha1',
-			multiples : true,
-			keepExtensions : true,
+	    	var options = req.body,
+		    imageUuid = options.imageUuid,
+		    tmpFolder = '/data/tmp/',
+		    resumableIdentifier = options.resumableIdentifier;
+
+		// resumable		
+		r.post(req, function(status, filename, original_filename, identifier){
+
+			// register chunk done in redis
+			if (status == 'done') {
+
+				var from = tmpFolder + 'resumable-' + resumableIdentifier + '.' + 1,
+				    file = imageUuid,
+				    to = api.config.path.image + file;
+
+				// rename and move to image folder
+				fs.copy(from, to, function (err) {
+					if (err) return api.error.general(req, res, err);
+					res.end(file);	// file will be saved by client
+				});
+			}
 		});
-		form.parse(req, function(err, fields, files) {	
-			if (err) console.log('ERR 5'.red, err);
-			if (err || !files || !files.file) return api.error.general(req, res, err || 'No files2.');
-			
-			var from = files.file.path,
-			    file = 'image-' + uuid.v4(),
-			    to = api.config.path.image + file;
-			
-			// rename and move to image folder
-			fs.rename(from, to, function (err) {
-				if (err) console.log('ERR 6'.red, err);
-				if (err) return api.error.general(req, res, err);
-				res.end(file);	// file will be saved by client
-			});		
-	 	});
 	},
+	// clientLogo : function (req, res) {
+		
+	// 	// process from-encoded upload
+	// 	var form = new formidable.IncomingForm({
+	// 		hash : 'sha1',
+	// 		multiples : true,
+	// 		keepExtensions : true,
+	// 	});
+	// 	form.parse(req, function(err, fields, files) {	
+	// 		if (err) console.log('ERR 5'.red, err);
+	// 		if (err || !files || !files.file) return api.error.general(req, res, err || 'No files2.');
+			
+	// 		var from = files.file.path,
+	// 		    file = 'image-' + uuid.v4(),
+	// 		    to = api.config.path.image + file;
+			
+	// 		// rename and move to image folder
+	// 		fs.rename(from, to, function (err) {
+	// 			if (err) console.log('ERR 6'.red, err);
+	// 			if (err) return api.error.general(req, res, err);
+	// 			res.end(file);	// file will be saved by client
+	// 		});		
+	//  	});
+	// },
 
 
 	image : function (req, res) {
