@@ -60,13 +60,18 @@ module.exports = api.pixels = {
 			id : req.body.hash.id,
 		}
 
+		// "email=info@systemapic.com&password=ee6f143f4bbfce8107b192708f574af2"
+		var phantomLogin = 'email=' + api.config.phantomJS.user + '&password=' + api.config.phantomJS.auth;
+
+		console.log('phantomLogin'.red, phantomLogin);
+
 		var args = {
 			projectUuid : projectUuid,
 			hash : hash,
 			path : path,
 			pdf : true,
 			serverUrl : api.config.portalServer.uri + 'login',
-			serverData : api.config.phantomJS.data
+			serverData : phantomLogin
 		}
 
 
@@ -179,6 +184,7 @@ module.exports = api.pixels = {
 			id : req.body.hash.id
 		}
 
+		var phantomLogin = 'email=' + api.config.phantomJS.user + '&password=' + api.config.phantomJS.auth;
 
 
 		var args = {
@@ -188,7 +194,7 @@ module.exports = api.pixels = {
 			pdf : false,
 			thumb : true,
 			serverUrl : api.config.portalServer.uri + 'login',
-			serverData : api.config.phantomJS.data
+			serverData : phantomLogin
 		}
 
 		var snappath = api.config.path.tools + 'phantomJS-snapshot.js';
@@ -283,13 +289,16 @@ module.exports = api.pixels = {
 			id : req.body.hash.id
 		}
 
+		var phantomLogin = 'email=' + api.config.phantomJS.user + '&password=' + api.config.phantomJS.auth;
+
+
 		var args = {
 			projectUuid : projectUuid,
 			hash : hash,
 			path : path,
 			pdf : false,
 			serverUrl : api.config.portalServer.uri + 'login',
-			serverData : api.config.phantomJS.data
+			serverData : phantomLogin
 		}
 
 

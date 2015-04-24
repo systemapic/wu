@@ -1,6 +1,6 @@
 npm-debug.log
 node_modules/*
-config/config.js
+config/server-config.js
 public/js/src/config/client-config.js
 public/js/src/config/login-config.js
 log/*

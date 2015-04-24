@@ -214,11 +214,8 @@ Wu.SidePane.Options = Wu.SidePane.Item.extend({
 		HTML.controls._mousePosSwitchInput = Wu.DomUtil.makeit({type : 'input', cname : 'cmn-toggle cmn-toggle-round-flat', id : 'map-controls-mouseposition', appendto : HTML.controls._mousePosSwitch, attr : [['type', 'checkbox'], ['checked', 'checked']]});
 		HTML.controls._mousePosSwitchLabel = Wu.DomUtil.makeit({type : 'label', appendto : HTML.controls._mousePosSwitch, attr : [['for', 'map-controls-mouseposition']]});
 
-		
-
 	},
 
-	
 	addHooks : function () {
 		
 	},
@@ -229,7 +226,7 @@ Wu.SidePane.Options = Wu.SidePane.Item.extend({
 
 	// run when sidepane deactivated
 	_deactivate : function () {
-
+		this.closeAll();
 	},
 
 	updateContent : function () {

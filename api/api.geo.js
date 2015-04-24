@@ -87,14 +87,20 @@ module.exports = api.geo = {
 
 	_readMetaDataNode : function (path, callback) {
 
+		try {
+
 		mapnikOmnivore.digest(path, function(err, metadata) {
 			if (err) {
-				console.log('digest.err!'.red, err);
+				console.log('digest.err!'.red, err, path);
 				return callback(err);
 			}
-			// console.log(JSON.stringify(metadata, null, 2));
 			return callback(null, JSON.stringify(metadata, null, 2));
 		});
+
+		} catch (e) {
+			console.log('omni crash'.red, e, path);
+			return callback(e);
+		}
 	},
 
 	handleTopoJSON : function (path, fileUuid, callback) { 			// TODO!
@@ -311,27 +317,27 @@ module.exports = api.geo = {
 	handleJPEG2000 : function (options, done) {
 		return api.geo.handleRaster(options, done);
 
-		var fileUuid = options.fileUuid,
-		    inFile = options.path,
-		    outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
-		    outFile = options.path + '.tif',
-		    ops = [];
+		// var fileUuid = options.fileUuid,
+		//     inFile = options.path,
+		//     outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
+		//     outFile = options.path + '.tif',
+		//     ops = [];
 
-		// convert to geotiff, then api.geo.handleRaster
-		var cmd = '/var/www/deps/kakadu/kdu_expand -i "' + inFile + '" -o "' + outFile + '" -num_threads 6'; 
+		// // convert to geotiff, then api.geo.handleRaster
+		// var cmd = '/var/www/deps/kakadu/kdu_expand -i "' + inFile + '" -o "' + outFile + '" -num_threads 6'; 
 
-		console.log('cmd', cmd);
+		// console.log('cmd', cmd);
 
-		var exec = require('child_process').exec;
-		exec(cmd, function (err, stdout, stdin) {
-			if (err) return done(err);
-			console.log('kakadu done'.yellow, err, stdout);
+		// var exec = require('child_process').exec;
+		// exec(cmd, function (err, stdout, stdin) {
+		// 	if (err) return done(err);
+		// 	console.log('kakadu done'.yellow, err, stdout);
 
-			options.path = outFile;
+		// 	options.path = outFile;
 			
-			// handle raster normally
-			api.geo.handleRaster(options, done);
-		});
+		// 	// handle raster normally
+		// 	api.geo.handleRaster(options, done);
+		// });
 
 
 	},
@@ -345,11 +351,17 @@ module.exports = api.geo = {
 
 
 		console.log('GDAL VERSION'.red, gdal.version);
+		console.log('GDAL DRIVERS'.red, gdal.drivers.getNames());
+		console.log('options.'.green, options);
 
 		// validation
 		ops.push(function (callback) {
 
 			var dataset = gdal.open(inFile);
+
+			if (!dataset) return callback('Invalid dataset.');
+			if (!dataset.srs) return callback('Invalid projection.');
+			if (!dataset.srs.validate) return callback('Invalid projection.');
 
 			// check if valid projection
 			var invalid = dataset.srs.validate();
@@ -453,7 +465,7 @@ module.exports = api.geo = {
 			if (isSame) return callback(null, meta);
 
 			var outFile = inFile + '.reprojected';
-			var cmd = 'gdalwarp -srcnodata 0 -dstnodata 0 -t_srs "' + ourProj4 + '" ' + inFile + ' ' + outFile;
+			var cmd = 'gdalwarp -srcnodata 0 -dstnodata 0 -t_srs "' + ourProj4 + '" "' + inFile + '" "' + outFile + '"';
 			console.log('gdalwarp cmd: ', cmd);
 
 			var exec = require('child_process').exec;
