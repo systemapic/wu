@@ -351,12 +351,17 @@ module.exports = api.geo = {
 
 
 		console.log('GDAL VERSION'.red, gdal.version);
+		console.log('GDAL DRIVERS'.red, gdal.drivers.getNames());
 		console.log('options.'.green, options);
 
 		// validation
 		ops.push(function (callback) {
 
 			var dataset = gdal.open(inFile);
+
+			if (!dataset) return callback('Invalid dataset.');
+			if (!dataset.srs) return callback('Invalid projection.');
+			if (!dataset.srs.validate) return callback('Invalid projection.');
 
 			// check if valid projection
 			var invalid = dataset.srs.validate();
@@ -460,7 +465,7 @@ module.exports = api.geo = {
 			if (isSame) return callback(null, meta);
 
 			var outFile = inFile + '.reprojected';
-			var cmd = 'gdalwarp -srcnodata 0 -dstnodata 0 -t_srs "' + ourProj4 + '" ' + inFile + ' ' + outFile;
+			var cmd = 'gdalwarp -srcnodata 0 -dstnodata 0 -t_srs "' + ourProj4 + '" "' + inFile + '" "' + outFile + '"';
 			console.log('gdalwarp cmd: ', cmd);
 
 			var exec = require('child_process').exec;

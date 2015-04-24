@@ -41,6 +41,8 @@ var r = require('../tools/resumable-node')('/data/tmp/');
 // api
 var api = module.parent.exports;
 
+
+
 // exports
 module.exports = api.upload = { 
 
@@ -100,15 +102,15 @@ module.exports = api.upload = {
 
 		// merge files
 		ops.push(function (callback) {
-			
+
 			var cmd = 'cat ';
 
 			_.times(resumableTotalChunks, function (i) {
 				var num = i + 1;
-				cmd += tmpFolder + 'resumable-' + resumableIdentifier + '.' + num + ' ';
+				cmd += '"' + tmpFolder + 'resumable-' + resumableIdentifier + '.' + num + '" ';
 			});
 
-			cmd += ' > ' + outputPath;
+			cmd += ' > "' + outputPath + '"';
 
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
@@ -132,19 +134,6 @@ module.exports = api.upload = {
 			});
 		});
 
-		// clean up 
-		ops.push(function (pack, callback) {
-
-			// clean up, remove chunks
-			var removePath = '/data/tmp/resumable-' + uniqueIdentifier + '.*';
-			fs.remove(removePath, console.log);
-
-			// clean up redis count
-			api.redis.del('done-chunks-' + uniqueIdentifier);
-
-			// done
-			callback(null, pack);
-		});
 
 		async.waterfall(ops, function (err, result) {
 
@@ -154,6 +143,14 @@ module.exports = api.upload = {
 				user : options.user,
 				loka : 'loka'
 			});
+
+			// clean up, remove chunks
+			var removePath = '/data/tmp/resumable-' + uniqueIdentifier + '.*';
+			fs.remove(removePath, console.log);
+
+			// clean up redis count
+			api.redis.del('done-chunks-' + uniqueIdentifier);
+
 		});
 		
 	},
@@ -243,7 +240,6 @@ module.exports = api.upload = {
 				uniqueIdentifier : options.uniqueIdentifier
 			}
 
-
 			// only process geojson
 			var isGeojson = _.find(layers, function (l) {
 				console.log('l: ', l);
@@ -252,30 +248,14 @@ module.exports = api.upload = {
 
 			if (isGeojson) api.upload._sendToProcessing(opts, function (err, result) { // todo: do per file
 
-				// api.socket.setProcessing({
-				// 	result : result,
-				// 	err : err,
-				// 	user : options.user,
-				// 	id : fileUuid
-				// });
+				// done processing
 
 			});
-
-			// all done
-			// res.end(JSON.stringify(pack));
-			// send upload done notification
-			// api.socket.uploadDone({
-			// 	result : pack,
-			// 	user : options.user,
-			// });
-
-			// console.log('going done!');
 
 			done(null, pack);
 
 			
 		});
-		// });
 	},
 
 	
@@ -533,10 +513,31 @@ module.exports = api.upload = {
 					});
 				}
 
-				if (extension == 'tif') {
-					console.log('#$$$$$$$ TODO $$$$$$ tif'.red);
-					console.log('#$$$$$$$ TODO $$$$$$ tif'.red);
-					console.log('#$$$$$$$ TODO $$$$$$ tif'.red);
+			
+				if (extension == 'tif' || extension == 'ecw' || extension == 'jp2') {
+
+					ops1.push(function (callback) {
+
+						api.geo.handleRaster(options, function (err, db) {
+							if (err) {
+								console.log('ERR 98:'.red, err);
+								return callback(err);
+							}
+
+							// populate db entry
+							db = db || {};
+							db.name = options.name;
+							db.file = options.fileUuid;
+							db.type = 'Layer';
+							db.files = [options.name];
+							db.data = {};
+							db.data.raster = options.name;
+
+							callback(null, db);
+						});
+
+
+					});
 
 				}
 				
@@ -723,7 +724,7 @@ module.exports = api.upload = {
 			});
 		}
 
-		if (ext == 'tif') {
+		if (ext == 'tif' || ext == 'ecw' || ext == 'jp2') {
 
 			ops.push(function (callback) {
 
@@ -750,58 +751,58 @@ module.exports = api.upload = {
 
 		}
 
-		if (ext == 'ecw') {
+		// if (ext == 'ecw') {
 
-			ops.push(function (callback) {
+		// 	ops.push(function (callback) {
 
-				api.geo.handleRaster(options, function (err, db) {
-					if (err) {
-						console.log('ERR 98:'.red, err);
-						return callback(err);
-					}
+		// 		api.geo.handleRaster(options, function (err, db) {
+		// 			if (err) {
+		// 				console.log('ERR 98:'.red, err);
+		// 				return callback(err);
+		// 			}
 
-					// populate db entry
-					db = db || {};
-					db.name = options.name;
-					db.file = options.fileUuid;
-					db.type = 'Layer';
-					db.files = [options.name];
-					db.data = {};
-					db.data.raster = options.name;
+		// 			// populate db entry
+		// 			db = db || {};
+		// 			db.name = options.name;
+		// 			db.file = options.fileUuid;
+		// 			db.type = 'Layer';
+		// 			db.files = [options.name];
+		// 			db.data = {};
+		// 			db.data.raster = options.name;
 
-					callback(null, db);
-				});
+		// 			callback(null, db);
+		// 		});
 
 
-			});
+		// 	});
 
-		}
+		// }
 
-		if (ext == 'jp2') {
+		// if (ext == 'jp2') {
 
-			ops.push(function (callback) {
+		// 	ops.push(function (callback) {
 
-				api.geo.handleJPEG2000(options, function (err, db) {
-					if (err) {
-						console.log('ERR 98:'.red, err);
-						return callback(err);
-					}
+		// 		api.geo.handleRaster(options, function (err, db) {
+		// 			if (err) {
+		// 				console.log('ERR 98:'.red, err);
+		// 				return callback(err);
+		// 			}
 
-					// populate db entry
-					db = db || {};
-					db.name = options.name;
-					db.file = options.fileUuid;
-					db.type = 'Layer';
-					db.files = [options.name];
-					db.data = {};
-					db.data.raster = options.name;
+		// 			// populate db entry
+		// 			db = db || {};
+		// 			db.name = options.name;
+		// 			db.file = options.fileUuid;
+		// 			db.type = 'Layer';
+		// 			db.files = [options.name];
+		// 			db.data = {};
+		// 			db.data.raster = options.name;
 
-					callback(null, db);
-				});
+		// 			callback(null, db);
+		// 		});
 
-			});
+		// 	});
 
-		}
+		// }
 
 
 		if (ext == 'geojson') {
@@ -1009,6 +1010,7 @@ module.exports = api.upload = {
 		if (name.slice(-5) == '.tiff') 	  return ['tif',  'raster/tif'];
 		if (name.slice(-4) == '.jp2') 	  return ['jp2',  'raster/jp2'];
 		if (name.slice(-4) == '.ecw') 	  return ['ecw',  'raster/ecw'];
+		if (name.slice(-7) == '.sqlite')  return ['sqlite',  'raster/sqlite'];
 	
 		// docs
 		if (name.slice(-4) == '.pdf') 	  return ['pdf',  'application/pdf'];
