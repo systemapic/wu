@@ -3,7 +3,6 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 	type : 'baseLayers',
 
-
 	getPanes : function () {
 		// map baselayer
 		this._container = Wu.DomUtil.get('editor-map-baselayer-wrap');
@@ -37,13 +36,14 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 		// mark unavailable layers
 		this.markOccupied();
-	},
 
+		// close
+		this.close();
+	},
 
 	removeHooks : function () {
 		// todo!!!
 	},
-
 
 	addLayer : function (layer) {
 

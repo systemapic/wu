@@ -883,6 +883,7 @@
 				}, false);
 			});
 		};
+
 		$.assignDrop = function(domNodes){
 			if(typeof(domNodes.length)=='undefined') domNodes = [domNodes];
 

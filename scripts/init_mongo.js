@@ -22,7 +22,7 @@ var Role 	 = require('../models/role');
 var Group 	 = require('../models/group');
 
 // config
-var config  = require('../config/server-config.js');
+var config  = require('../config/server-config.js').serverConfig;
 
 // connect to our database
 mongoose.connect(config.mongo.url); 
@@ -122,21 +122,27 @@ function create_models() {
 		user.lastName 		= global.lastName;
 		user.createdBy		= userUuid;
 
+		var options = {
+			user : user,
+			auth : password
+		}
+
 		user.save(function (err, user) {
 
 			var msg = 'Log in with email '.yellow + user.local.email + ' and password: '.yellow + password;
 			console.log(msg);
 
-			console.log(user);
+			// console.log(user);
 
-			callback(null, user);
+			callback(null, options);
 		});
 
 		
 	});
 
 	// create super admin role
-	ops.push(function (user, callback) {
+	ops.push(function (options, callback) {
+		var user = options.user;
 
 		var role = new Role();
 		role.uuid = 'role-' + uuid.v4();
@@ -154,7 +160,9 @@ function create_models() {
 				var msg = 'Add this Super Admin Role uuid to config.js: '.yellow + role.uuid;
 				console.log(msg);
 
-				callback(err, role.uuid);
+				options.superAdminRole = role.uuid;
+
+				callback(err, options);
 			});
 		});
 
@@ -162,7 +170,8 @@ function create_models() {
 	});
 
 	// create portal admin role
-	ops.push(function (superAdminRole, callback) {
+	ops.push(function (options, callback) {
+		var superAdminRole = options.superAdminRole;
 
 		var role = new Role();
 		role.uuid = 'role-' + uuid.v4();
@@ -181,36 +190,41 @@ function create_models() {
 
 				console.log('Add this Portal Admin Role uuid to config.js: '.yellow + role.uuid);
 
-				var admins = {
+				options.admins = {
 					duper : superAdminRole,
 					portal : role.uuid
 				}
 
-				callback(err, admins);
+				callback(err, options);
 			});
 		});
 
 	});
 
 
-	async.waterfall(ops, function (err, admins) {
+	async.waterfall(ops, function (err, options) {
 		console.log('all done!');
 
+		var admins = options.admins;
 
-		var configFile = require('./server-config.js');
+		var configFile = require('../config/server-config.js');
 
 		// console.log('foncif', configFile, typeof(configFile));
 
-		configFile.portal.roles.superAdmin = admins.duper;
-		configFile.portal.roles.portalAdmin = admins.portal;
+		configFile.serverConfig.portal.roles.superAdmin = admins.duper;
+		configFile.serverConfig.portal.roles.portalAdmin = admins.portal;
+
+		configFile.serverConfig.phantomJS.user = options.user.local.email;
+		configFile.serverConfig.phantomJS.auth = options.auth;	
 
 		var text = JSON.stringify(configFile, null, '\t');
 		var output = 'module.exports = ' + text;
 
-		console.log('output', output);
+		// console.log('output', output);
 
-		fs.writeFile('./server-config.js', output, function (err) {
+		fs.writeFile('../config/server-config.js', output, function (err) {
 			console.log('wrote config', err);
+			process.exit(0);
 
 		});
 

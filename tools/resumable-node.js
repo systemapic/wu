@@ -93,65 +93,51 @@ module.exports = resumable = function(temporaryFolder){
   //'non_resumable_request', null, null, null
   $.post = function(req, callback){
 
-    console.log('post!');
-
     var fields = req.body;
     var files = req.files;
-
     var chunkNumber = fields['resumableChunkNumber'];
     var chunkSize = fields['resumableChunkSize'];
     var totalSize = fields['resumableTotalSize'];
     var identifier = cleanIdentifier(fields['resumableIdentifier']);
     var filename = fields['resumableFilename'];
-
-
 		var original_filename = fields['resumableIdentifier'];
 
-    console.log('_______________'.red);
-    console.log(chunkNumber);
-    console.log(chunkSize);
-    console.log(totalSize);
-    console.log(identifier);
-    console.log(filename);
-    console.log(original_filename);
-    console.log('_______!_______'.red);
+    // console.log('_______________'.red);
+    // console.log(chunkNumber);
+    // console.log(chunkSize);
+    // console.log(totalSize);
+    // console.log(identifier);
+    // console.log(filename);
+    // console.log(original_filename);
+    // console.log('_______!_______'.red);
 
     if(!files[$.fileParameterName] || !files[$.fileParameterName].size) {
       callback('invalid_resumable_request', null, null, null);
       return;
     }
 
-    console.log('2');
     var validation = validateRequest(chunkNumber, chunkSize, totalSize, identifier, files[$.fileParameterName].size);
     if(validation=='valid') {
-      console.log('3 valid');
 
       var chunkFilename = getChunkFilename(chunkNumber, identifier);
 
-      console.log('chunkFilename', chunkFilename);
-
       // Save the chunk (TODO: OVERWRITE)
       fs.rename(files[$.fileParameterName].path, chunkFilename, function(err){
-        console.log('renamed!', err);
 
         // Do we have all the chunks?
         var currentTestChunk = 1;
         var numberOfChunks = Math.max(Math.floor(totalSize/(chunkSize*1.0)), 1);
         var testChunkExists = function(){
-              console.log('testChunkExists');
               fs.exists(getChunkFilename(currentTestChunk, identifier), function(exists){
-                console.log('exist', exists);
                 if(exists){
                   currentTestChunk++;
                   if(currentTestChunk>numberOfChunks) {
-                    console.log('>>>>', currentTestChunk);
                     callback('done', filename, original_filename, identifier);
                   } else {
                     // Recursion
                     testChunkExists();
                   }
                 } else {
-                  console.log('partly done');
                   callback('partly_done', filename, original_filename, identifier);
                 }
               });
@@ -159,8 +145,6 @@ module.exports = resumable = function(temporaryFolder){
         testChunkExists();
       });
     } else {
-          console.log('3 invalid');
-
           callback(validation, filename, original_filename, identifier);
     }
   }
@@ -220,7 +204,6 @@ module.exports = resumable = function(temporaryFolder){
           fs.exists(chunkFilename, function(exists) {
               if (exists) {
 
-                  console.log('exist removing ', chunkFilename);
                   fs.unlink(chunkFilename, function(err) {
                       if (options.onError) opentions.onError(err);
                   });

@@ -437,9 +437,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	},
 	
 
-	// fittekuk fittekuk
 	refreshTable : function (options) {
-
 
 		var _options = {};
 
@@ -462,6 +460,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		if ( options.tableSize ) {
 			_options.tableSize = options.tableSize;
 		}		
+
+		console.log('refreshTable ', _options);
 
 		this._userList.updateTable(_options);
 
