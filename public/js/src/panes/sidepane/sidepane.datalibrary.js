@@ -230,7 +230,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			generateUniqueIdentifier : function (file) {
 				return file.size + '-' + file.lastModified + '-' + file.name;
 			},
-			testChunks : false, // resumable chunks
+			testChunks : true, // resumable chunks
 			throttleProgressCallbacks : 1,
 			query : {
 				fileUuid : Wu.Util.guid('r'),

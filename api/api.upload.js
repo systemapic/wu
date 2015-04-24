@@ -51,12 +51,13 @@ module.exports = api.upload = {
 		    fileName = fileUuid + '-' + options.resumableFilename,
 		    outputPath = '/data/tmp/' + fileName,
 		    stream = fs.createWriteStream(outputPath),
-		    resumableChunkNumber = req.body.resumableChunkNumber,
-	    	    resumableTotalChunks = req.body.resumableTotalChunks;
+		    resumableChunkNumber = options.resumableChunkNumber,
+		    resumableIdentifier = options.resumableIdentifier,
+	    	    resumableTotalChunks = options.resumableTotalChunks;
 
 		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks to ', outputPath);
 
-		console.log('## RESUMABLE ##'.green, req.body);
+		console.log('## RESUMABLE ##'.green, options);
 
 		// resumable		
 		r.post(req, function(status, filename, original_filename, identifier){
@@ -65,10 +66,10 @@ module.exports = api.upload = {
 			res.status(status).send({});
 
 			// register chunk done in redis
-			if (status == 'done' || status == 'partly_done') api.redis.incr('done-chunks-' + fileUuid);
+			if (status == 'done' || status == 'partly_done') api.redis.incr('done-chunks-' + resumableIdentifier);
 
 			// check if all done
-			api.redis.get('done-chunks-' + fileUuid, function (err, count) {
+			api.redis.get('done-chunks-' + resumableIdentifier, function (err, count) {
 				console.log('Chunk #'.yellow, count, err);
 
 				// return if not all done				
@@ -99,7 +100,6 @@ module.exports = api.upload = {
 
 		// merge files
 		ops.push(function (callback) {
-
 			
 			var cmd = 'cat ';
 
@@ -132,8 +132,23 @@ module.exports = api.upload = {
 			});
 		});
 
+		// clean up 
+		ops.push(function (pack, callback) {
+
+			// clean up, remove chunks
+			var removePath = '/data/tmp/resumable-' + uniqueIdentifier + '.*';
+			fs.remove(removePath, console.log);
+
+			// clean up redis count
+			api.redis.del('done-chunks-' + uniqueIdentifier);
+
+			// done
+			callback(null, pack);
+		});
+
 		async.waterfall(ops, function (err, result) {
 
+			// ping client
 			api.socket.uploadDone({
 				result : result,
 				user : options.user,
@@ -141,7 +156,16 @@ module.exports = api.upload = {
 			});
 		});
 		
-		
+	},
+
+	// debug: delete all done-chunks
+	_deleteDoneChunks : function () {
+		api.redis.keys('done-chunk*', function(err, rows) {
+			rows.forEach(function (row) {
+				api.redis.del(row);
+				console.log('deleted row'.red, row);
+			});
+		});
 	},
 
 	chunkedCheck : function (req, res) {
@@ -156,7 +180,6 @@ module.exports = api.upload = {
 
 	// entry point
 	importFile : function (incomingFile, options, done) {
-		
 		var user = options.user,
 		    projectUuid = options.projectUuid,
 		    fileArray = [incomingFile],
@@ -267,7 +290,6 @@ module.exports = api.upload = {
 
 		// can be several layers in each upload
 		layers.forEach(function (layer) {
-
 			var fileUuid = layer.file,
 			    localFile = fileUuid + '.geojson',
 			    localFolder = api.config.path.geojson,
