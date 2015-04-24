@@ -750,6 +750,33 @@ module.exports = api.upload = {
 
 		}
 
+		if (ext == 'ecw') {
+
+			ops.push(function (callback) {
+
+				api.geo.handleRaster(options, function (err, db) {
+					if (err) {
+						console.log('ERR 98:'.red, err);
+						return callback(err);
+					}
+
+					// populate db entry
+					db = db || {};
+					db.name = options.name;
+					db.file = options.fileUuid;
+					db.type = 'Layer';
+					db.files = [options.name];
+					db.data = {};
+					db.data.raster = options.name;
+
+					callback(null, db);
+				});
+
+
+			});
+
+		}
+
 		if (ext == 'jp2') {
 
 			ops.push(function (callback) {
@@ -981,6 +1008,7 @@ module.exports = api.upload = {
 		if (name.slice(-4) == '.tif') 	  return ['tif',  'raster/tif'];
 		if (name.slice(-5) == '.tiff') 	  return ['tif',  'raster/tif'];
 		if (name.slice(-4) == '.jp2') 	  return ['jp2',  'raster/jp2'];
+		if (name.slice(-4) == '.ecw') 	  return ['ecw',  'raster/ecw'];
 	
 		// docs
 		if (name.slice(-4) == '.pdf') 	  return ['pdf',  'application/pdf'];
