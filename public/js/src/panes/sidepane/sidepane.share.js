@@ -103,7 +103,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		app.ProgressBar.timedProgress(5000);
 
 		// Google Analytics event tracking
-		app.Analytics.sidepane.share.js(['Side Pane', 'Share: create image']);
+		// app.Analytics.sidepane.share.js(['Side Pane', 'Share: create image']);
 		
 	},
 
@@ -179,7 +179,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 	downloadButtonClick : function  () {
 
 		// Google Analytics event tracking
-		app.Analytics.sidepane.share.js(['Side Pane', 'Share: download image']);
+		// app.Analytics.sidepane.share.js(['Side Pane', 'Share: download image']);
 
 		
 	},
@@ -196,7 +196,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		}.bind(this));
 
 		// Google Analytics event tracking
-		app.Analytics.sidepane.share.js(['Side Pane', 'Share: create link']);
+		// app.Analytics.sidepane.share.js(['Side Pane', 'Share: create link']);
 		
 	},
 
@@ -259,7 +259,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		context._createPrintView(path);
 
 		// Google Analytics event tracking
-		app.Analytics.sidepane.share.js(['Side Pane', 'Share: create print']);
+		// app.Analytics.sidepane.share.js(['Side Pane', 'Share: create print']);
 	},
 
 	_createPrintView : function (path) {

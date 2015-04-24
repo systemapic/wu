@@ -5,7 +5,6 @@ Wu.List = Wu.Class.extend({
 
 	initialize : function (options) {
 
-
 		// searchField has not been implemented yet
 		this.searchField = options.searchfield;
 	
@@ -15,26 +14,23 @@ Wu.List = Wu.Class.extend({
 		// Get list options
 		this.listOptions = this.getListOptions();
 
-		if ( this.listOptions.button ) {
+		if (this.listOptions.button) {
 			
 			// Select all button
 			this.selectAllButton = Wu.DomUtil.create('div', 'item-select-button select-all-button', this.D3container[0][0]);
-
 		}
 
-		// this.createFolderButton = Wu.DomUtil.create('div', 'create-folder-button', this.D3container[0][0], 'New folder')
-
+		// set hooks
 		this.setHooks('on');
-
-	
 	},
 
 	setHooks : function (on) {
 		
 		Wu.DomEvent[on](this.searchField, 'keyup', this.searchList, this);
-		if ( this.listOptions.button )  Wu.DomEvent[on](this.selectAllButton, 'mousedown', this.selectAllClick, this);
-
-		// Wu.DomEvent[on](this.createFolderButton, 'mousedown', this.createFolder, this);
+		
+		if (this.listOptions.button)  {
+			Wu.DomEvent[on](this.selectAllButton, 'mousedown', this.selectAllClick, this);
+		}
 
 	},
 
@@ -171,7 +167,7 @@ Wu.List = Wu.Class.extend({
 
 
 		// DELETING FILES
-		if ( options.remove ) 	that.removeItems(options.remove);
+		if ( options.remove ) that.removeItems(options.remove);
 
 		// UPLOADED FILES
 		if ( options.add ) that.addItems(options.add);
@@ -1628,7 +1624,7 @@ Wu.DataLibraryList = Wu.List.extend({
 
 	addItems : function (items) {
 
-		if ( this.sortData ) {
+		if ( this.sortedData ) {
 			var that = this;
 
 			items.forEach(function (item) {
@@ -3393,6 +3389,10 @@ Wu.UserList = Wu.List.extend({
 		var projects = user.getProjects();
 		var numProjects = projects ? projects.length : 0;
 		var projectsText = numProjects == 1 ? ' project' : ' projects';
+
+
+		console.log('projects', projects);
+
 
 		return divProjectsOpen + numProjects + projectsText + divProjectsClose;
 

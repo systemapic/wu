@@ -34,7 +34,7 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 	},
 
 	addHooks : function () {
-		Wu.DomEvent.on(this._container, 'mousedown', this._GAtoggleOpen, this);
+		Wu.DomEvent.on(this._container, 'mousedown', this.toggleOpen, this);
 	},
 
 	removeHooks : function () {
@@ -59,18 +59,13 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 		}, 200);	
 	},
 
-	_GAtoggleOpen : function () {
-
-		// Google Analytics event trackign
-		var _name = this._container.childNodes[0].innerHTML;
-		app.Analytics.setGaEvent(['Side Pane', 'Options select: ' + _name]);
-
-		this.toggleOpen();
-
-	},
-
 	toggleOpen : function () {
-		this._isOpen ? this.close() : this.open();
+		if (this._isOpen) {
+			this.close();
+		} else {
+			this.open();
+			app.Analytics.setGaEvent(['Side Pane', 'Options select: ' + this.type]);
+		}
 	},
 
 	open : function () {
@@ -117,7 +112,8 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 	// sort layers by provider
 	sortLayers : function (layers) {
 		// possible keys in layer.store.data. must add more here later if other sources
-		var keys = ['geojson', 'mapbox', 'osm', 'raster'];
+		// var keys = ['geojson', 'mapbox', 'osm', 'raster'];
+		var keys = ['geojson', 'mapbox', 'raster'];
 		var results = [];
 		keys.forEach(function (key) {
 			var sort = {
@@ -140,9 +136,10 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 	addProvider : function (provider) {
 		var title = '';
 		if (provider == 'geojson') title = 'Data Library';
-		if (provider == 'raster') title = 'Data Library';
+		if (provider == 'raster') title = 'Rasters';
 		if (provider == 'mapbox') title = 'Mapbox';
-		if (provider == 'osm') title = 'Open Street Map';
+		// if (provider == 'osm') title = 'Open Street Map';
+		if (provider == 'osm') return;
 		var header = Wu.DomUtil.create('div', 'item-list-header', this._outer, title)
 	},
 
@@ -152,7 +149,6 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 
 		// return if no layers
 	       	if (_.isEmpty(this.project.layers)) return;
-	       	
 
 	       	var sortedLayers = this.sortLayers(this.project.layers);
 

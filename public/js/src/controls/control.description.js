@@ -293,7 +293,7 @@ L.Control.Description = Wu.Control.extend({
 	_GAtoggleCloser : function () {
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Description toggle']);
+		app.Analytics.setGaEvent(['Controls', 'Description toggle']);
 
 		// Fire function
 		this.toggleCloser();
