@@ -30,6 +30,7 @@ var fileSchema = mongoose.Schema({
 
 		shapefiles : [String],        // can be several files 	// todo: remove? no need - all geo is geo/topojson
 		geojson    : String,		// geojson-adlskmdsalkdsmad-saslkdmasldksa.geojson
+		raster	   : String,
 		topojson   : String,
 		document   : String,		// also not needed??
 		other      : [String],		// also not needed??

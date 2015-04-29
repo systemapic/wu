@@ -554,7 +554,6 @@ module.exports = api.file = {
 	handleShapefile : function (folder, name, fileUuid, callback) {	// already moved to right place, by unzip
 		api.geo.handleShapefile(folder, name, fileUuid, function (err, db) {
 			if (err) console.log('ahndle shape ERRR 909: '.red + err);
-			if (err) console.log(err);
 			if (err) {
 				// delete shapefile
 				var path = folder + '/' + name;

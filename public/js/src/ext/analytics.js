@@ -15,9 +15,6 @@
 // http://developers.google.com/apis-explorer/?hl=en_US#p/analytics/v3/analytics.data.ga.get 
 // (unique ID for maps.systemapic.com => 98026334)
 
-
-
-
 // Må ingorere IP adressen til phantom på i GA... 
 // http://web-design-weekly.com/snippets/exclude-ip-address-from-google-analytics/
 
@@ -26,15 +23,15 @@
 // * CUSTOM DIMENSIONS OVERVIEW * //
 // ****************************** //
 
-// dimension1 = Project ID (Hit)
-// dimension2 = Username (Session)
-// dimension3 = Software version (Session)
-// dimension4 = Client ID (Hit)
-// dimension5 = User ID (Session)
-// dimension6 = Project Name (Hit)
-// dimension7 = Client Name (Hit)
-// dimension8 = New Project ID (Hit)
-// dimension9 = Deleted Project (Name)
+// dimension1  = Project ID (Hit)
+// dimension2  = Username (Session)
+// dimension3  = Software version (Session)
+// dimension4  = Client ID (Hit)
+// dimension5  = User ID (Session)
+// dimension6  = Project Name (Hit)
+// dimension7  = Client Name (Hit)
+// dimension8  = New Project ID (Hit)
+// dimension9  = Deleted Project (Name)
 // dimension10 = New User (ID)
 // dimension11 = New User (Name)
 // dimension12 = Delted User (Name)
@@ -46,42 +43,31 @@ Wu.Analytics = Wu.Class.extend({
 
 	initialize : function () {
 
-		this.initGoogle();
+		// this.initGoogle();
+		this._listen();
 	},
 
-	initGoogle : function () {
-		if (this._inited) return;
 
-		var gaID = Wu.app.options.ga.id;
+	_listen : function () {
 
-		// (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-		// (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-		// m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		// })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		Wu.Mixin.Events.on('projectSelected', this._projectSelected, this);
 
-		// // Force SSL		
-		// ga('set', 'forceSSL', true);	
-
-		// // Create Object
-		// ga('create', gaID, 'auto');
-
-		// // Send pageview to google
-		// ga('send', 'pageview');
-
-		// // Software Version ~ Custion dimsension
-		// var dimension3Value = Wu.version;
-		// ga('set', 'dimension3', dimension3Value);
-
-		this._inited = true;
-		
 	},
+
+	_projectSelected : function (e) {
+		var uuid = e.detail.projectUuid;
+
+		this.setGaPageview(uuid);
+	},	
 
 	// send to server
 	set : function (options) {
 		
 		// send to server. JSON.stringify not needed for options object.
 		Wu.send('/api/analytics/set', options, function (err, result) {
-			console.log('analytics set: ', err, result);
+
+			if ( err ) console.log('GA error:', err, JSON.parse(result));			
+
 		});
 
 	},
@@ -90,109 +76,163 @@ Wu.Analytics = Wu.Class.extend({
 
 		// send to server. JSON.stringify not needed for options object.
 		Wu.send('/api/analytics/get', options, function (err, result) {
-			console.log('analytics get: ', err, result);
+			console.log('analytics get: ', err, JSON.parse(result));
 		});
 	},
 
 
 
-	setGaUser : function () {
-		if (!app.Account) return;
+	// pageview
+	setGaPageview : function (uuid) {
+		if (app._isPhantom) return;
 
-		// // USER
-		// var userId = app.Account.getUuid();
-		// if (!userId) return;
+		// Set active project:
+		// If we have a UUID, use it
+		// if not, use current active project
+		var activeProject = uuid ? app.Projects[uuid] : app.activeProject;
 
-		// ga('set', 'userId', userId);		
+		// If uuid has been passed, used it
+		// if not, find active project uuid
+		var _uuid = uuid ? uuid : app.activeProject.getUuid();
 
-		// // Username ~ Custom dimension
-		// var dimension2Value = app.Account.getFullName();
-		// ga('set', 'dimension2', dimension2Value);
+		// Get parameters to pass to Google Analytics
+		var projectSlug 	= activeProject.getSlug();
+		var projectClient 	= activeProject.getClient();
+		var clientSlug 		= projectClient.getSlug();
+		var clientID 		= activeProject.getClientUuid();
+		var projectName 	= activeProject.getName();
+		var clientName		= projectClient.getName();
+	    	var projectName 	= activeProject.getName();
+		var hostname 		= app.options.servers.portal;
+		var projectSlug 	= activeProject.getSlug();
+		var pageUrl 		= '/' + clientSlug + '/' + projectSlug;
 
-		// // UserID ~ Custom dimension
-		// var dimension5Value = userId;
-		// ga('set', 'dimension5', dimension5Value);
+		// USER
+		var userID		= app.Account.getUuid();
 
-		// TODO
-		// UserIP ~ Custom dimension 
-		// ga('set', 'dimension13', userIP);
+		// Get user full name	
+		var dimension2Value	= app.Account.getFullName();
 
-		this._userSet = true;
+		// Get Systemapic version
+		var version 		= Wu.version;
+
+		// Pageview OPTIONS for Google Analytics
+		var gaPageview = {
+
+			hostname    : hostname,
+			page 	    : pageUrl,
+			title 	    : projectName,
+			dimension1  : _uuid, 		// Project ID
+			dimension4  : clientID,		// Client ID
+			dimension6  : projectName,	// Project name
+			dimension7  : clientName,	// Client name
+			dimension2  : dimension2Value,	// User full name
+			version     : version		// Systemapic version
+
+		}
+
+		// Contains tracking id and client id (for user)
+		var userHeader = this.gaHeader()		
+
+		var trackThis = {
+			
+			userHeader  : userHeader,
+			gaEvent     : false,
+			gaPageview  : gaPageview
+
+		}
+
+		// SEND TO SERVER
+		// SEND TO SERVER
+		// SEND TO SERVER
+
+		this.set(JSON.stringify(trackThis));
+
+
+		// Clean up
+		trackThis = null;
+		gaPageview = null;
+		userHeader = null;
+
+
 	},
 
-
-	setGaProject : function (uuid) {
-		var projectSlug 	= app.Projects[uuid].getSlug(),
-		    projectClient 	= app.Projects[uuid].getClient(),
-		    clientSlug 		= projectClient.getSlug(),
-		    clientID 		= app.Projects[uuid].getClientUuid(),
-		    projectName 	= app.Projects[uuid].getName(),
-		    clientName		= projectClient.getName(),
-		    url = '/' + clientSlug + '/' + projectSlug;
-
-		// // Send pageview to GA		
-		// ga('send', {
-		//   'hitType': 'pageview',
-		//   'page': url
-		// });
-
-		// // Project ID ~ Custom dimension
-		// ga('set', 'dimension1', uuid);
-
-		// // Client ID ~ Custom dimension
-		// ga('set', 'dimension4', clientID);
-
-		// // Project Name ~ Custom dimension
-		// ga('set', 'dimension6', projectName);
-
-		// // Client Name ~ Custom dimension
-		// ga('set', 'dimension7', clientName);
-
-		// // Send "select project" event to GA
-		// this.ga(['Select project', projectName])
-	},
+	// event
+	setGaEvent : function (trackArray) {
 
 
-	ga : function (trackArray) {
-		if (!this._userSet) this.setGaUser();
+		var gaEvent = {}		
 
-		var gaSendObject = {
-			'hitType' : 'event'
-		};
+		// GET EVENT PARAMETERS
+		// GET EVENT PARAMETERS
+		// GET EVENT PARAMETERS
 
 		// CATEGORY ( STRING – REQUIRED )
-		// Typically the object that was interacted with (e.g. button)
-		if ( trackArray[0] ) gaSendObject.eventCategory = trackArray[0];
+		if ( trackArray[0] ) gaEvent.eventCategory = trackArray[0];
 
 		// ACTION ( STRING – REQUIRED )
-		// The type of interaction (e.g. click)
-		if ( trackArray[1] ) gaSendObject.eventAction = trackArray[1];
+		if ( trackArray[1] ) gaEvent.eventAction = trackArray[1];
 
 		// LABEL ( STRING – OPTIONAL )
-		// Useful for categorizing events (e.g. nav buttons)
-		if ( trackArray[2] ) gaSendObject.eventLabel = trackArray[2];
+		if ( trackArray[2] ) gaEvent.eventLabel = trackArray[2];
 
 		// VALUE ( NUMBER – OPTIONAL )
-		// Values must be non-negative. Useful to pass counts (e.g. 4 times)
-		if ( trackArray[3] ) gaSendObject.eventValue = trackArray[3];		
+		if ( trackArray[3] ) gaEvent.eventValue = trackArray[3];		
 
-		// console.log('gaSendObject', gaSendObject);
+		// CURRENT PROJECT PATH
+		if ( app.activeProject ) {
+			var clientSlug  = app.activeProject._client.getSlug();
+			var projectSlug = app.activeProject.getSlug()
+			var pageUrl 	= '/' + clientSlug + '/' + projectSlug;
+			gaEvent.path = pageUrl;
+		} else {
+			gaEvent.path = '/';
+		}
 
-		// Try send track object to google analytics
-		// ga('send', gaSendObject);
+		// GET UNIVERSAL HEADER FOR USER
+		var userHeader = this.gaHeader()		
+
+		var trackThis = {
+			
+			userHeader  : userHeader,
+			gaEvent     : gaEvent,
+			gaPageview  : false
+
+		}
+
+		// SEND TO SERVER
+		// SEND TO SERVER
+		// SEND TO SERVER
+
+		this.set(JSON.stringify(trackThis));
 		
 		// mem leak?
 		gaSendObject = null;
 		trackArray = null;
+		userHeader = null;
+		trackThis = null;
 	},
 
-	// Use to log errors
-	logGaError : function (errorName, isFatal) {
 
-		// ga('send', 'exception', {
-		// 	'exDescription': errorName,
-		// 	'exFatal': isFatal
-		// });
+	// UNIVERSAL FOR ALL GA PUT REQUESTS
+	gaHeader : function() {
+
+		if (!app.Account) return;
+
+		// USER
+		var userID = app.Account.getUuid();
+		if (!userID) return;		
+
+		// Header for GA
+		var userHeader = {
+
+			trackingID : Wu.app.options.ga.id,
+			clientID   : userID,			// This might have to be session specific
+
+		};
+
+
+		return userHeader;
 
 	}
 

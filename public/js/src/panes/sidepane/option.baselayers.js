@@ -3,7 +3,6 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 	type : 'baseLayers',
 
-
 	getPanes : function () {
 		// map baselayer
 		this._container = Wu.DomUtil.get('editor-map-baselayer-wrap');
@@ -37,13 +36,14 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 		// mark unavailable layers
 		this.markOccupied();
-	},
 
+		// close
+		this.close();
+	},
 
 	removeHooks : function () {
 		// todo!!!
 	},
-
 
 	addLayer : function (layer) {
 
@@ -284,8 +284,6 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 	setDefaultLayer : function () {
 		var baseLayer = _.sample(this._layers, 1)[0];
-		console.log('setDefaultLayer', this._layers);
-		console.log('baseLayer', baseLayer);
 		if (!baseLayer) return;
 		this.on(baseLayer);
 		this.enableLayer(baseLayer);

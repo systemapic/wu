@@ -34,8 +34,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.description = Wu.DomUtil.create('div', 'project-description', this._container);
 		this.description.type = 'description';
 		this.logoContainer = Wu.DomUtil.create('div', 'project-logo-container', this._container)
-		this.logo = Wu.DomUtil.create('img', 'project-logo', this.logoContainer);
-		this.logo.type = 'logo';
 		this.users = Wu.DomUtil.create('div', 'project-users-wrap', this._container);
 		this.usersInnerWrapper = Wu.DomUtil.create('div', 'project-users-inner-wrapper', this._container);
 		this._projectStatsHeader = Wu.DomUtil.create('div', 'project-stats', this.usersInnerWrapper);
@@ -44,6 +42,9 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.createdDate = Wu.DomUtil.create('div', 'project-createddate', this.usersInnerWrapper);
 		this.lastUpdated = Wu.DomUtil.create('div', 'project-lastupdated', this.usersInnerWrapper);
 		this.usersInner = Wu.DomUtil.create('div', 'project-users', this.usersInnerWrapper);
+
+		// create logo
+		this._createLogo();
 
 		// add thumbnail generator button
 		if (app.access.to.edit_project(this._project)) {
@@ -60,6 +61,20 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		// add hooks
 		this.addHooks();
+	},
+
+	_createLogo : function () {
+		if (this.logo) {
+			// remove old
+			Wu.DomUtil.remove(this.logo);
+			this.logo = null;
+			delete this.logo;
+		}
+		this.logo = this._resumableBrowse = Wu.DomUtil.create('img', 'project-logo', this.logoContainer);
+		this.logo.type = 'logo';
+
+		Wu.DomEvent.on(this.logo, 'click', Wu.DomEvent.stopPropagation, this);
+
 	},
 
 	hookThumb : function () {
@@ -129,50 +144,118 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this._setHooks('off');
 	},
 
-
 	_setDZ : function (on) {
 		if (on == 'on') {
-			this.addLogoDZ();
+			this._refreshResumable();
 		} else {
-			this.removeLogoDZ();
+			this._removeResumable();
 		}
 	},
 
-
 	// edit hook for client logo
-	addLogoDZ : function () {
+	// addLogoDZ : function () {
+	_addResumable : function () {
+		console.log('_addResumable', this._project.getName());
 
-		// create dz
-		this.logodz = new Dropzone(this.logo, {
-				url : '/api/project/uploadlogo',
-				createImageThumbnails : false,
-				autoDiscover : false
+		var projectUuid = this._project.getUuid();
+
+		// create resumable object
+		var r = this.r = new Resumable({
+			target : '/api/project/uploadlogo',
+			chunkSize : 11*1024*1024, // 11MB
+			simultaneousUploads : 1,
+			testChunks : false, // turn off resume on small upload
+			query : {
+				imageUuid : Wu.Util.guid('image'),
+				projectUuid : projectUuid
+			},
+
+			// max file size (less than one chunk means only one chunk)
+			maxFileSize : 10*1024*1024, // 10MB
+			maxFileSizeErrorCallback : function (file, errorCount) {
+				
+				// feedback message
+				app.feedback.setError({
+					title : 'Image file is too large.',
+					description : 'Please use an image file smaller than 10MB.',
+				});
+			},
+
+			// max files to be uploaded at once
+			maxFiles : 1,
+
+			// accepted filetypes
+			fileType : ['png', 'jpg', 'jpeg', 'gif'],
+			fileTypeErrorCallback : function (file, errorCount) {
+
+				// feedback message
+				app.feedback.setError({
+					title : 'Not an accepted image format',
+					description : 'Please only use PNG, JPG or GIF image formats.',
+				});
+
+			},
 		});
-		
-		// set client uuid param for server
-		this.logodz.options.params.projectUuid = this._project.getUuid();
-		this.logodz.options.params.project = this._project.getUuid();
 
-		// set callback on successful upload
-		this.logodz.on('success', this.editedLogo.bind(this), this);
+		// assign upload button to DOM
+		r.assignBrowse(this._resumableBrowse);
 
-		// set image frame with editable clas
+		// start upload on add
+		r.on('fileAdded', r.upload);
+
+		// callback on success
+		r.on('fileSuccess', this.editedLogo.bind(this));
+
+		// editable cursor on image
 		Wu.DomUtil.addClass(this.logo, 'editable');
 
 	},
 
-	removeLogoDZ : function () {
-		// disable edit on logo
+	_refreshResumable : function () {
+		console.log('_refreshResumable');
 
-		if (this.logodz) this.logodz.disable();
-		this.logodz.off('success', this.editedLogo.bind(this), this);
-		this.logodz = null;
-		delete this.logodz;
+		// remove old
+		if (this.r) this._removeResumable();
 
-		// set image frame without editable clas
-		Wu.DomUtil.removeClass(this.logo, 'editable');
+		// add new
+		if (app.access.to.edit_project(this._project)) this._addResumable();
 	},
 
+	_removeResumable : function () {
+		console.log('_removeResumable');
+
+		var r = this.r;
+		r.cancel();
+		this.r = null;
+		delete this.r;
+
+		// refresh logo to kill listeners
+		this._createLogo();
+
+		console.log('this.r', this.r);
+	},
+
+	// removeLogoDZ : function () {
+	// 	// disable edit on logo
+
+	// 	if (this.logodz) this.logodz.disable();
+	// 	this.logodz.off('success', this.editedLogo.bind(this), this);
+	// 	this.logodz = null;
+	// 	delete this.logodz;
+
+	// 	// set image frame without editable clas
+	// 	Wu.DomUtil.removeClass(this.logo, 'editable');
+	// },
+
+	// _GAtoggleProjectInfo : function () {
+
+	// 	// Google Analytics event trackign
+	// 	app.Analytics.setGaEvent(['Side Pane', 'Clients: toggle project info']);
+
+	// 	// Fire function
+	// 	this.toggleProjectInfo();
+
+	// },
 
 
 	toggleProjectInfo : function () {
@@ -211,12 +294,10 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 		}
 
-		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: toggle project info']);
-
-
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: toggle project info']);
 
 	},
+
 
 	makeNewThumbnail : function () {
 		this._project = this._project || app.activeProject;
@@ -226,12 +307,15 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this._project.createProjectThumb();
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: make new thumbnail']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: make new thumbnail']);
 
 	},
 
-	editedLogo : function (err, path) {
+	editedLogo : function (resumable, path) {
 		this._project = this._project || app.activeProject;
+
+		// refresh resumable
+		this._refreshResumable();
 
 		// Set state to manually updated to prevet overriding
 		this._project.setThumbCreated(true);
@@ -286,12 +370,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// dont select if already active
 		if (this._project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho not active.. fix!
 
-		// Google Analytics
-		// var projectUuid = this._project.getUuid(); // refactor: catch with events
-		// app.Analytics.setGaProject(projectUuid);	
-
-		// select project
-		// this._project.select();	
 		Wu.Mixin.Events.fire('projectSelected', { detail : {
 			projectUuid : this._project.getUuid()
 		}});    
@@ -342,7 +420,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: edit project title']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: edit project title']);
 	},
 
 	_editNameBlur : function (e) {
@@ -397,7 +475,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: edit project description']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: edit project description']);
 	},
 
 	_editDescriptionBlur : function (e) {
@@ -482,7 +560,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.confirmDelete();
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: delete project']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: delete project']);
 
 	},
 

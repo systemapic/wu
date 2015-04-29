@@ -170,7 +170,7 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		this._addHook(name, 'keyup', this._checkSlug, this);
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: New client']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: New client']);
 
 	},
 

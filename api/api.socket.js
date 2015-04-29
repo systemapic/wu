@@ -34,8 +34,6 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
-var r = require('resumable-js/node-resumable')('/data/tmp/');
-
 // api
 var api = module.parent.exports;
 
@@ -49,7 +47,6 @@ module.exports = api.socket = {
 	},
 
 	sendError : function (userId, err) {
-
 		var sock = api.socket._getSocket(userId);
 
 		// send to user
@@ -90,6 +87,7 @@ module.exports = api.socket = {
 	},
 
 	setProcessing : function (process) {
+		console.log('setProcessing'.green, process);
 		this._processing[process.fileUuid] = process;
 		this._processing[process.fileUuid]._timestamp = new Date().getTime();
 	},
@@ -119,11 +117,10 @@ module.exports = api.socket = {
 		    error = req.body.error,
 		    uniqueIdentifier = req.body.uniqueIdentifier;
 
-
 		console.log('grindDone: err?'.yellow, error);
 
 		// send to user
-		sock.emit('processingDone', {
+		sock && sock.emit('processingDone', {
 			processingDone : fileUuid,
 			elapsed : timeDiff,
 			error : error,
@@ -136,14 +133,3 @@ module.exports = api.socket = {
 	},
 
 }
-
-
-
-
-
-
-
-
-
-
-

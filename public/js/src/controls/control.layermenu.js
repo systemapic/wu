@@ -110,8 +110,8 @@ L.Control.Layermenu = Wu.Control.extend({
 			this._legendsCollapser = legends._legendsCollapser;
 		}
 
-		Wu.DomEvent.on(this._bhattan1,   'click', this.closeLayerPane, this);
-		Wu.DomEvent.on(this._openLayers, 'click', this.toggleLayerPane, this);     
+		Wu.DomEvent.on(this._bhattan1,   'click', this._GAcloseLayerPane, this);
+		Wu.DomEvent.on(this._openLayers, 'click', this._GAtoggleLayerPane, this);     
 
 		// Stop Propagation
 		Wu.DomEvent.on(this._openLayers, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
@@ -280,8 +280,27 @@ L.Control.Layermenu = Wu.Control.extend({
 		}, 3000);
 	},
 
+	_GAtoggleLayerPane : function () {
+
+		// Google Analytics event tracking
+		app.Analytics.setGaEvent(['Controls', 'Layers: toggle open/close']);		
+
+		// Fire toggle function
+		this.toggleLayerPane();
+
+	},
+
 	toggleLayerPane : function () {
 		this._open ? this.closeLayerPane() : this.openLayerPane();
+	},
+
+	_GAcloseLayerPane : function () {
+
+		// Google Analytics event tracking
+		app.Analytics.setGaEvent(['Controls', 'Layers: close']);
+
+		// Fire close layer pane function
+		this.closeLayerPane();
 	},
 
 	// (j)
@@ -307,8 +326,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		app.MapPane.getControls().legends.checkWidth();
 
 
-		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Layers: close']);
+
 	},
 
 	// (j)
@@ -344,8 +362,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		// Adjust legends width
 		legends.checkWidth();
 
-		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Layers: open']);
+
 
 	},
 
@@ -851,11 +868,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		if (item.on) {
 			this.disableLayer(item);
 			// Google Analytics event tracking
-			app.Analytics.ga(['Controls', 'Layer hide: ' + _layerName ]);
+			app.Analytics.setGaEvent(['Controls', 'Layer hide: ' + _layerName ]);
 		} else {
 			this.enableLayer(item);
 			// Google Analytics event tracking
-			app.Analytics.ga(['Controls', 'Layer show: ' + _layerName ]);
+			app.Analytics.setGaEvent(['Controls', 'Layer show: ' + _layerName ]);
 		}    
 	},
 

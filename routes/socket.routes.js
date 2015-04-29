@@ -32,16 +32,10 @@ var api = require('../api/api');
 // function exports
 module.exports = function(app, passport) {
 
-
 	app.io.route('ready', function (req) {
-		console.log('------------'.yellow);
-		console.log('rea5dy!'.yellow);
-		// console.log('req: '.yellow, req);
-		// console.log('session:'.cyan, req.session);
-
+		console.log('socket ready'.red);
 		if (!isLoggedIn(req)) return;
 
-		// req.io.emit('get-feelings');
 		req.session.name = req.data
 		req.session.save(function() {
 			req.io.emit('get-feelings')
@@ -50,7 +44,7 @@ module.exports = function(app, passport) {
 
 	// Send back the session data.
 	app.io.route('send-feelings', function(req) {
-		console.log('io.route send-feelings!'.rainbow);
+		console.log('socket feels something'.red);
 		req.session.feelings = req.data
 		req.session.save(function() {
 			req.io.emit('session', req.session)
@@ -59,22 +53,9 @@ module.exports = function(app, passport) {
 
 	// helper function : if is logged in
 	function isLoggedIn(req, res, next) {
-		// console.log('req: ', req);
-		console.log('coookies!!'.yellow, req.session);
 		if (req.session.passport) return true;
-		console.log('#$$$$$$$$$$$$ not logged in!'.red);
 		return false;
 	}
 
 
-
-
-
 };
-
-
-
-
-
-
-
