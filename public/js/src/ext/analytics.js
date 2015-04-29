@@ -84,15 +84,16 @@ Wu.Analytics = Wu.Class.extend({
 
 	// pageview
 	setGaPageview : function (uuid) {
+		if (app._isPhantom) return;
 
 		// Set active project:
 		// If we have a UUID, use it
 		// if not, use current active project
-		var activeProject 	= uuid ? app.Projects[uuid] : app.activeProject;
+		var activeProject = uuid ? app.Projects[uuid] : app.activeProject;
 
 		// If uuid has been passed, used it
 		// if not, find active project uuid
-		var _uuid = uuid ? uuid : vapp.activeProject.getUuid();
+		var _uuid = uuid ? uuid : app.activeProject.getUuid();
 
 		// Get parameters to pass to Google Analytics
 		var projectSlug 	= activeProject.getSlug();

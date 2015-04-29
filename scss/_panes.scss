@@ -2736,8 +2736,10 @@ td.tdcont.createdDate {
 	transform: rotate(45deg);
 	}
 
-
-
+.users-expand-collapse:hover:before,
+.datalibrary-expand-collapse:hover:before {
+	background: rgba(0,0,0,0.5);
+	}
 
 
 /* SHARE */
@@ -3464,7 +3466,7 @@ td.tdcont.createdDate {
 	position: absolute;
 	float: right;
 	color: rgb(51, 51, 51);	
-	font-size: 12px;	
+	font-size: 13px;	
 	padding: 10px;
 	overflow: visible;
 	display: block;
@@ -3785,9 +3787,17 @@ td.tdcont.createdDate {
 	padding: 10px;
 	}
 
+
+
 .file-other-meta-wrapper {
 	padding-bottom: 0;
 	}
+
+
+.minimal .file-other-meta-wrapper {
+	display: none !important;
+	}
+
 
 .file-description-inner-wrapper {
 	background: transparent;

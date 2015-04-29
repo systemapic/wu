@@ -527,6 +527,7 @@ module.exports = function(grunt) {
 			'preprocess:login',
 			'htmlmin'
 
+
 	])});
 
 	grunt.registerTask('dev',  function () { grunt.task.run([ 
@@ -538,8 +539,7 @@ module.exports = function(grunt) {
 			'env:dev', 
 			'preprocess:dev',
 			'login',
-			'preprocess:login',
-
+			'preprocess:login'
 	])});	
 
 	grunt.registerTask('default', ['waiter']);

@@ -322,10 +322,6 @@ Wu.App = Wu.Class.extend({
 	_initHotlink : function () {
 		
 		// parse error prone content of hotlink..
-		// try { this.hotlink = Wu.parse(window.hotlink); } 
-		// catch (e) { this.hotlink = false;
-
-		// parse error prone content of hotlink..
 		Wu.parse(window.hotlink);
 
 		// return if no hotlink
@@ -462,6 +458,7 @@ Wu.App = Wu.Class.extend({
 
 	},
 
+
 	phantomJS : function (args) {
 		var projectUuid = args.projectUuid,
 	   	    hash    	= args.hash,
@@ -473,6 +470,8 @@ Wu.App = Wu.Class.extend({
 	   	// set hash for phantom
 	   	this._phantomHash = hash;
 
+	   	// if (!app.Projects) return;
+
 		// get project
 		var project = app.Projects[projectUuid];
 		
@@ -480,16 +479,13 @@ Wu.App = Wu.Class.extend({
 		if (!project) return false;
 
 		// set project
-		Wu.Mixin.Events.fire('projectSelected', {detail : {
-			projectUuid : project.getUuid()
+		Wu.Mixin.Events.fire('projectSelected', { detail : {
+			projectUuid : projectUuid
 		}});
 
-		// remove startpane
-		if (this.StartPane) this.StartPane.deactivate();
+		// app.activeProject = project;
 
-		// add phantomJS stylesheet		
-		isThumb ? app.Style.phantomJSthumb() : app.Style.phantomJS();
-
+		
 		// check for hash
 		if (hash) {
 
@@ -503,14 +499,27 @@ Wu.App = Wu.Class.extend({
 		}
 
 		// acticate legends for baselayers
-		app.MapPane.legendsControl.refreshAllLegends()
+		// app.MapPane.legendsControl.refreshAllLegends();
+		app.MapPane._controls.legends.refreshAllLegends();
+
+		// remove startpane
+		if (this.StartPane) this.StartPane.deactivate();
+
+		// add phantomJS stylesheet		
+		isThumb ? app.Style.phantomJSthumb() : app.Style.phantomJS();
+
 
 		// avoid Loading! etc in status
 		app.setStatus('systemapic'); // too early
 
 	},
 	
+	_setPhantomArgs : function (args) {
+		this._phantomArgs = args;
+	},
+	
 	phantomReady : function () {
+		if (!app.activeProject) return false;
 
 		var hashLayers = _.size(this._phantomHash.layers),
 		    baseLayers = _.size(app.activeProject.getBaselayers()),
