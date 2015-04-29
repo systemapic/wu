@@ -39,6 +39,8 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
+console.log('lauyer');
+
 // exports
 module.exports = api.layer = { 
 
@@ -331,6 +333,8 @@ module.exports = api.layer = {
 	// set carto css
 	setCartoCSS : function (req, res) {
 
+		console.log('setCartoCSS!'.yellow);
+
 		// get params
 		var fileUuid 	= req.body.fileUuid,
 		    css 	= req.body.css,
@@ -340,8 +344,13 @@ module.exports = api.layer = {
 		    isOSM = (fileUuid == 'osm'),
 		    host = isOSM ? api.config.vileosm.uri : api.config.vile.uri;
 
+		var host = api.config.vile.uri;
+
+		console.log('host: ', host);
+
 		// save css to file by cartoId 
 		fs.writeFile(csspath, css, {encoding : 'utf8'}, function (err) {
+			console.log('write err?', err);
 			if (err) return api.error.general(req, res);
 
 			// send to tileserver storage
@@ -357,6 +366,7 @@ module.exports = api.layer = {
 
 			// callback
 			function (err, response, body) {
+				console.log('err', err);
 
 				// custom error handling
 				if (err) {
@@ -521,26 +531,59 @@ module.exports = api.layer = {
 	_getLayerFeaturesValuesGeoJSON : function (fileUuid, cartoid, callback) {       // todo: optimize!
 		if (!fileUuid || !cartoid) return callback('Missing information.2');
 
+		console.log('## _getLayerFeaturesValues'.green);
+
 		File
 		.findOne({uuid : fileUuid})
 		.exec(function (err, file) {
+
+			console.log('## .findOne'.green, err, file);
+
 			if (err || !file) return callback(err || 'No file.');
 
 			// read css from file
 			var cartopath = api.config.path.cartocss + cartoid + '.mss';
 			
+			console.log('## cartopath'.green, cartopath);
+
 			fs.readFile(cartopath, 'utf8', function (err, buffer) {
 				if (err || !buffer) return callback(err || 'No data.');
+
+				console.log('## readfile ok!'.green);
+
+
+
+				try {
+					var output = new carto.Renderer({
+						filename: cartopath,
+						local_data_dir: fspath.dirname(cartopath),
+					}).renderMSS(buffer);
+				} catch(err) {
+					console.log('err11'.red, err);
+					if (Array.isArray(err)) {
+						err.forEach(function(e) {
+							carto.writeError(e, options);
+						});
+					} else { console.error('err22'.red, err); }
+				}
+				console.log('op: ', output);
+
+				// fs.writeFileSync('/home/cartocss.output', output);
+
 
 				try {
 
 					// get rules from carto (forked! see explain below...)
-					var css = buffer.toString(),
-					    renderer = new carto.Renderer(),
-					    info = renderer.getRules(css),
-					    string = JSON.stringify(info),
-					    jah = [],
-					    rules1 = info.rules;//[0].rules;
+					var css = buffer.toString();
+					var renderer = new carto.Renderer();
+					var info = renderer.getRules(css);
+					var string = JSON.stringify(info);
+					var jah = [];
+					var rules1 = info.rules;//[0].rules;
+
+					// console.log('## css:'.green, css);
+					// console.log('## info:'.green, info);
+					// console.log('## rules1:'.green, rules1);
 
 					// iterate
 					rules1.forEach(function (rule1) {
@@ -560,6 +603,8 @@ module.exports = api.layer = {
 							});
 						});
 					});
+
+					console.log('## CRACK!'.green);
 
 					// add #layer
 					jah.push({
@@ -625,8 +670,6 @@ module.exports = api.layer = {
 				}
 			}
 
-			// if (env.benchmark) console.warn('Inheritance time: ' + ((new Date() - inheritTime)) + 'ms');
-
 			return result;
 		} catch (e) {
 			return [];
@@ -636,16 +679,18 @@ module.exports = api.layer = {
 
 
 	createModel : function (options, callback) {
-		// console.log('api.layer.createModel'.yellow, options);
+		console.log('api.layer.createModel'.yellow, options);
 
 		var layer 		= new Layer();
 		layer.uuid 		= options.uuid;
 		layer.title 		= options.title;
 		layer.description 	= options.description || '';
-		layer.data.geojson 	= options.data.geojson;
 		layer.legend 		= options.legend || '';
 		layer.file 		= options.file;
 		layer.metadata 		= options.metadata;
+
+		if (options.data.geojson) layer.data.geojson = options.data.geojson;
+		if (options.data.raster)  layer.data.raster  = options.data.raster;
 
 		layer.save(function (err, doc) {
 			callback && callback(err, doc);
@@ -670,16 +715,22 @@ module.exports = api.layer = {
 
 // systemapic hack
 carto.Renderer.prototype.getRules = function render(data) {
+	console.log('++++ YO!!'.green);
     var env = _(this.env).defaults({
         benchmark: true,
         validation_data: false,
         effects: []
     });
 
-    if (!carto.tree.Reference.setVersion(this.options.mapnik_version)) {
-        throw new Error("Could not set mapnik version to " + this.options.mapnik_version);
-    }
+    // console.log('env', this.env);
+
+    // if (!carto.tree.Reference.setVersion(this.options.mapnik_version)) {
+    //     throw new Error("Could not set mapnik version to " + this.options.mapnik_version);
+    // }
+	console.log('++++ YO!! 2 '.green, data);
+
     var parser = (carto.Parser(env)).parse(data);
+	console.log('++++ YO!! 3'.green);
     return parser;
 }
 

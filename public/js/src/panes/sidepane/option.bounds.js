@@ -104,7 +104,7 @@ Wu.SidePane.Options.Bounds = Wu.SidePane.Options.Item.extend({
 
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Options > Bounds: set bounds']);
+		app.Analytics.setGaEvent(['Side Pane', 'Options > Bounds: set bounds']);
 
 	},
 
@@ -121,7 +121,7 @@ Wu.SidePane.Options.Bounds = Wu.SidePane.Options.Item.extend({
 		this.update();
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Options > Bounds: set min zoom']);
+		app.Analytics.setGaEvent(['Side Pane', 'Options > Bounds: set min zoom']);
 
 	},
 
@@ -138,7 +138,7 @@ Wu.SidePane.Options.Bounds = Wu.SidePane.Options.Item.extend({
 		this.update();
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Options > Bounds: set max zoom']);
+		app.Analytics.setGaEvent(['Side Pane', 'Options > Bounds: set max zoom']);
 
 	},
 
@@ -208,7 +208,7 @@ Wu.SidePane.Options.Bounds = Wu.SidePane.Options.Item.extend({
 		map.setMaxBounds(false);
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Options > Bounds: clear bounds']);
+		app.Analytics.setGaEvent(['Side Pane', 'Options > Bounds: clear bounds']);
 
 	},
 
@@ -240,7 +240,7 @@ Wu.SidePane.Options.Bounds = Wu.SidePane.Options.Item.extend({
 		map.setMaxBounds(bounds);
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Options > Bounds: set SW bounds']);
+		app.Analytics.setGaEvent(['Side Pane', 'Options > Bounds: set SW bounds']);
 
 
 	},
@@ -265,7 +265,7 @@ Wu.SidePane.Options.Bounds = Wu.SidePane.Options.Item.extend({
 		this.update();
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Options > Bounds: set NE bounds']);
+		app.Analytics.setGaEvent(['Side Pane', 'Options > Bounds: set NE bounds']);
 
 	},
 

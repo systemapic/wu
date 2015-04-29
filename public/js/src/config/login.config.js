@@ -1,12 +1,13 @@
 var loginConfig = {
+	// gl : true,
 	autoStart : true,
-	accessToken : 'MAPBOX-ACCESS-TOKEN',
-	layer : 'MAPBOX-LAYER-ID',
-	logo : 'RELATIVE-PATH-FOR-PNG',
+	accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q',
+	layer : 'systemapic.kcjonn12',
+	logo : 'css/images/systemapic-login-logo.png',
 	wrapper : false,
 	speed : 1000,
 	position : {
-		lat : 59.942, 	// oslo
+		lat : 59.942, // oslo
 		lng : 10.716,
 		zoom : [4, 14]
 	},
@@ -20,8 +21,7 @@ var loginConfig = {
 		}
 	},
 
-
 	ga : {
-		id : 'GOOGLE-ANALYTICS-ID'
+		id : 'UA-57572003-2'
 	}
 }

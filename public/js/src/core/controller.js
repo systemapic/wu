@@ -41,6 +41,7 @@ Wu.Controller = Wu.Class.extend({
 
 		// set state if any
 		// this._loadState();
+
 	},
 
 	_projectChanged : function (e) {

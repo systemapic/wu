@@ -9,10 +9,20 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	_initContent : function () {
 		// create new fullscreen page, and set as default content
 		this._content = Wu.DomUtil.create('div', 'fullpage-users', Wu.app._appPane);
+		this._innerContent = Wu.DomUtil.create('div', 'users-inner', this._content);
 		
+		this.fullsize = true;
+		this._expandCollapse = Wu.DomUtil.create('div', 'users-expand-collapse', this._innerContent);
+
 		// Users Control
-		this._usersControls = Wu.DomUtil.create('div', 'users-controls', this._content);
+		this._usersControls = Wu.DomUtil.create('div', 'users-controls', this._innerContent);
 		this._usersControlsInner = Wu.DomUtil.create('div', 'users-controls-inner', this._usersControls);
+
+		// Search users
+		this._search = Wu.DomUtil.create('input', 'users-search search', this._usersControlsInner);
+		this._search.setAttribute("type", "text");
+		this._search.setAttribute("placeholder", "Search users");
+
 
 		// Add user button
 		this._addUser = Wu.DomUtil.create('div', 'users-add-user smap-button-gray users', this._usersControlsInner, 'Create user');
@@ -20,13 +30,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// Delete user button
 		this._deleteUser = Wu.DomUtil.create('div', 'users-delete-user smap-button-gray users', this._usersControlsInner, 'Delete user');
 
-		// Search users
-		this._search = Wu.DomUtil.createId('input', 'users-search search', this._usersControlsInner);
-		this._search.setAttribute("type", "text");
-		this._search.setAttribute("placeholder", "Search users");
 
 		// create container (overwrite default) and insert template
-		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._content);
+		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._innerContent);
 
 		// #userlist
 		this._userList = Wu.DomUtil.create('div', 'userlist', this._container);
@@ -41,57 +47,12 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// #userslist
 		this._uList = Wu.DomUtil.createId('div', 'userslist', this._tableContainer);
 
-		// #users-table
-		var table = Wu.DomUtil.create('table', 'users-table', this._uList)
-		var thead = Wu.DomUtil.create('thead', '', table);
-		var tr = Wu.DomUtil.create('tr', '', thead);
-		
-		var th1 = Wu.DomUtil.create('th', 'fivep', tr);
-		th1.setAttribute('data-sort', 'checkbox');
-
-		// #users-squaredThree-checkbox-all
-		var th1_CBcontainer = Wu.DomUtil.create('div', 'squaredThree users-squaredThree-checkbox-all', th1);
-
-		// #users-checkbox-all
-		this._checkall = Wu.DomUtil.create('input', 'users-checkbox-all', th1_CBcontainer);
-		this._checkall.setAttribute('type', 'checkbox');
-		this._checkall.setAttribute('name', 'check');
-		this._checkall.setAttribute('value', 'None');
-		
-		// #label-users-checkbox-all
-		this._checkallLabel = Wu.DomUtil.create('label', 'label-users-checkbox-all', th1);
-		this._checkallLabel.setAttribute('for', 'users-checkbox-all');
-
-		var th2 = Wu.DomUtil.create('th', 'sort name thirtyp', tr, 'Name');
-		th2.setAttribute('data-sort', 'name');
-		th2.setAttribute('data-insensitive', 'true');
-
-		var th3 = Wu.DomUtil.create('th', 'sort company', tr, 'Company');
-		th3.setAttribute('data-sort', 'company');
-		th3.setAttribute('data-insensitive', 'true');
-
-		var th4 = Wu.DomUtil.create('th', 'sort position', tr, 'Position');
-		th4.setAttribute('data-sort', 'position');
-		th4.setAttribute('data-insensitive', 'true');
-
-		var th5 = Wu.DomUtil.create('th', 'sort phone', tr, 'Phone');
-		th5.setAttribute('data-sort', 'phone');
-		th5.setAttribute('data-insensitive', 'true');
-
-		var th6 = Wu.DomUtil.create('th', 'sort email', tr, 'Email');
-		th6.setAttribute('data-sort', 'email');
-		th6.setAttribute('data-insensitive', 'true');
-
-		var th7 = Wu.DomUtil.create('th', 'sort projects', tr, 'Access');
-		th7.setAttribute('data-sort', 'projects');
-		th7.setAttribute('data-insensitive', 'true');	
-
-		// #users-insertrows
-		this._table = Wu.DomUtil.createId('tbody', 'users-insertrows', table)
-		this._table.className = 'list';
 
 		// init table
-		this.initList();
+		var tableOptions      		= { container : this._uList, searchfield : this._search };
+		this._userList 			= new Wu.UserList(tableOptions);		
+
+
 
 		// add tooltip
 		app.Tooltip.add(this._menu, '(Editors only) List of all users. Here you can create and delete users, as well as administer user access to projects.');
@@ -103,8 +64,45 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	addHooks : function () {
 		// search
-		Wu.DomEvent.on(this._search, 'keyup', this.searchList, this);
+
+		Wu.DomEvent.on(this._expandCollapse, 'mousedown', this.toggleSize, this);
+
 	},
+
+	toggleSize : function () {
+
+		// Go small
+		if ( this.fullsize ) 	this.setSmallSize();
+
+		// Go large
+		else 			this.setFullSize();
+
+	},
+
+	setFullSize : function () {
+
+			Wu.DomUtil.removeClass(this._content, 'minimal');
+			Wu.DomUtil.removeClass(this._expandCollapse, 'expand');
+
+			Wu.DomUtil.addClass(app._map._container, 'map-blur');
+
+			this.fullsize = true;	
+
+			this.refreshTable({tableSize : 'full'});	
+
+	},
+
+	setSmallSize : function () {
+
+			Wu.DomUtil.addClass(this._content, 'minimal');
+			Wu.DomUtil.addClass(this._expandCollapse, 'expand');
+			Wu.DomUtil.removeClass(app._map._container, 'map-blur');
+
+			this.fullsize = false;
+
+			this.refreshTable({tableSize : 'small'});
+
+	},	
 
 	addEditHooks : function () {
 		
@@ -113,9 +111,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// delete button
 		Wu.DomEvent.on(this._deleteUser, 'mousedown', this.deleteUser, this);
-
-		// check all button
-		Wu.DomEvent.on(this._checkallLabel, 'mousedown', this.checkAll, this);
 
 		// show edit buttons
 		Wu.DomUtil.removeClass(this._addUser, 'displayNone');
@@ -130,9 +125,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// delete button
 		Wu.DomEvent.off(this._deleteUser, 'mousedown', this.deleteUser, this);
-
-		// check all button
-		Wu.DomEvent.off(this._checkallLabel, 'mousedown', this.checkAll, this);
 
 		// hide edit buttons
 		Wu.DomUtil.addClass(this._addUser, 'displayNone');
@@ -177,61 +169,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this.list.search(value);
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Users: Search users', value]);
-	},
-
-	// list.js plugin
-	initList : function () { 
-
-		// add dummy entry
-		var _tr = Wu.DomUtil.createId('tr', 'dummy-table-entry');
-
-		this._table.appendChild(_tr);
-
-		var _td1 = Wu.DomUtil.create('td', 'checkbox', _tr);
-		var _cBox = Wu.DomUtil.create('div', 'squaredThree', _td1);
-		var _cBoxInput = Wu.DomUtil.create('input', '', _cBox);
-		_cBoxInput.setAttribute('type', 'checkbox');
-		_cBoxInput.setAttribute('value', 'None');
-		_cBoxInput.setAttribute('name', 'check');
-		var _cBoxLabel = Wu.DomUtil.create('label', '', _cBox);
-		
-		var _td2 = Wu.DomUtil.create('td', 'name', _tr);
-
-		var _td3 = Wu.DomUtil.create('td', 'tdcont company', _tr);
-		_td3.setAttribute('key', 'company');
-		_td3.setAttribute('id', 'company-');
-		_td3.setAttribute('uuid', '');
-
-		var _td4 = Wu.DomUtil.create('td', 'tdcont position', _tr);
-		_td4.setAttribute('key', 'position');	
-		_td4.setAttribute('id', 'position-');
-		_td4.setAttribute('uuid', '');		
-
-		var _td5 = Wu.DomUtil.create('td', 'tdcont phone', _tr);
-		_td5.setAttribute('key', 'phone');
-		_td5.setAttribute('id', 'phone-');
-		_td5.setAttribute('uuid', '');		
-
-		var _td6 = Wu.DomUtil.create('td', 'tdcont email', _tr);
-		_td6.setAttribute('key', 'email');		
-		_td6.setAttribute('id', 'email-');
-		_td6.setAttribute('uuid', '');		
-
-		var _td7 = Wu.DomUtil.create('td', 'tdcont access', _tr);
-		_td7.setAttribute('key', 'access');	
-		_td7.setAttribute('id', 'access-');
-		_td7.setAttribute('uuid', '');		
-
-		var _td8 = Wu.DomUtil.create('td', 'tdcont uuid', _tr);
-		_td8.style.display = 'none';		
-
-		// init list.js
-		var options = { valueNames : ['name', 'company', 'position', 'phone', 'email', 'access'] };
-		this.list = new List('userslist', options);
-
-		// remove dummy
-		this.list.clear();
+		app.Analytics.setGaEvent(['Side Pane', 'Users: Search users', value]);
 	},
 
 	updateContent : function () {
@@ -240,11 +178,14 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	update : function () {
 
+		// Remove map-blur if small size 
+		if ( !this.fullsize ) Wu.DomUtil.removeClass(app._map._container, 'map-blur');		
+
 		// flush
 		this.reset();
 
 		// refresh table entries
-		this.refreshTable();
+		this.refreshTable({reset: true});
 
 		// add edit hooks
 		this.addEditHooks();
@@ -255,16 +196,17 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	inputUser : function () {
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Users: Create new user']);
+		app.Analytics.setGaEvent(['Side Pane', 'Users: Create new user']);
 
 		// Hide the Create user etc.
 		Wu.DomUtil.addClass(this._content, 'hide-top', this);
 
+		// pølse
 		this._inputUser  = {};
 		var titleText    = 'Create new user';
 		var subtitleText = 'Enter details for the new user:';
 		var messageText  = 'Password is auto-generated. The user will receive login details on email.';
-		var container    = this._inputUser._container = Wu.DomUtil.create('div',   'backpane-container', this._content);
+		var container    = this._inputUser._container = Wu.DomUtil.create('div',   'backpane-container', this._innerContent);
 		var wrapper      = this._inputUser._wrapper   = Wu.DomUtil.create('div',   'backpane-wrapper',   container);
 		var title        = this._inputUser._title     = Wu.DomUtil.create('div',   'backpane-title',     wrapper, titleText);
 		var subtitle     = this._inputUser._subtitle  = Wu.DomUtil.create('div',   'backpane-subtitle',  wrapper, subtitleText);		
@@ -351,7 +293,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		Wu.DomUtil.removeClass(this._content, 'hide-top', this);
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Users: Cancel create new user']);
+		app.Analytics.setGaEvent(['Side Pane', 'Users: Cancel create new user']);
 	},
 
 	_setMissingField : function (field) {
@@ -396,7 +338,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		Wu.DomUtil.removeClass(this._content, 'hide-top', this);
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Users: Confirm new user', firstName + ' ' + lastName]);
+		app.Analytics.setGaEvent(['Side Pane', 'Users: Confirm new user', firstName + ' ' + lastName]);
 
 	},
 
@@ -423,14 +365,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// update table
 		context.reset();
-		context.refreshTable();
 
-		// GA – New User ID
-		// ga('set', 'dimension10', store.uuid);
-
-		// GA – New User Name
-		// var newUserName = user.getFullName();
-		// ga('set', 'dimension11', newUserName);
+		context.refreshTable({add : store});
 
 	},
 
@@ -449,6 +385,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// delete each selected user
 		_.each(checked, function (user) {
+
+			console.log('user', user);
 			// confirm delete
 			var name = user.getFirstName() + ' ' + user.getLastName();
 			if (confirm('Are you sure you want to delete user ' + name + '?')) {
@@ -458,7 +396,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 			}
 
 			// Google Analytics event tracking
-			app.Analytics.ga(['Side Pane', 'Users: Delete user', name]);
+			app.Analytics.setGaEvent(['Side Pane', 'Users: Delete user', name]);
 
 		}, this);
 		
@@ -466,19 +404,15 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	confirmDelete : function (user) {
 
-		// delete user      cb
+		// delete user         cb
 		user.deleteUser(this, 'deletedUser');
-
-		// GA – Deleted Username
-		// var _delUsrName = user.getFullName();
-		// ga('set', 'dimension12', _delUsrName);	 	// todo	
 		
 	},
 
 	deletedUser : function (context) {
 		// refresh
 		context.reset();
-		context.refreshTable();
+		context.refreshTable({remove : 'TODO: find user ID'});
 	},
 	
 	checkAll : function () {
@@ -487,21 +421,9 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	getSelected : function () {
 
-		console.log('getSelected:', this.users);
+		var selected = this._userList.getSelected();
+		return selected;
 
-		// get selected files
-		var checks = [];
-		// for (u in this.users) {
-		_.each(this.users, function (user) {
-			console.log('user: ', user);
-			var checkbox = Wu.DomUtil.get('users-checkbox-' + user.getUuid());
-			if (checkbox) var checked = checkbox.checked; 
-			if (checked) checks.push(user); 
-		});
-
-		console.log('cheks:', checks);
-			
-		return checks;
 	},
 
 	_filteredUsers : function () {
@@ -514,115 +436,44 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		});
 	},
 	
-	refreshTable : function () {
-		this.users = this._filteredUsers();
 
-		_.each(this.users, function (user) {
-			this.addTableItem(user);
-		}, this);			
+	refreshTable : function (options) {
 
-		// sort list by name by default
-		this.list.sort('name', {order : 'asc'});
+		var _options = {};
+
+		    _options.context  = this._userList;
+		    _options.listData = app.Users;
+
+		if ( options.reset ) {
+			_options.reset    = true;
+			_options.canEdit  = this._canEdit();			
+		}
+
+		if ( options.remove ) {
+			_options.remove      = options.remove;
+		}		
+
+		if ( options.add ) {
+			_options.add 	= options.add;
+		}
+		
+		if ( options.tableSize ) {
+			_options.tableSize = options.tableSize;
+		}		
+
+		console.log('refreshTable ', _options);
+
+		this._userList.updateTable(_options);
+
 	},
 	
 	reset : function () {
-		// clear table
-		this.list.clear();
 	},
 
-	// add user entry to table
-	addTableItem : function (user) {
+	_canEdit : function () {
 
-		// prepare template values
-		var template = {};   
-
-		var tmpData = {
-			firstName     : user.getFirstName() || 'First name',
-			lastName      : user.getLastName()  || 'Last name',
-			lastNameUuid  : 'lastName-'  + user.getUuid(),
-			firstNameUuid : 'firstName-' + user.getUuid()			
-		}
-
-		// These must for some obscure reason be as strings...
-		var tmpLastNameString = '<input value="' + tmpData.lastName + '" id="' + tmpData.lastNameUuid + '" class="dln" readonly="readonly">';
-		var tmpFirstNameString = '<input value="' + tmpData.firstName + '" id="' + tmpData.firstNameUuid + '" class="dln smallerText" readonly="readonly">';
-
-		template.name 	  = tmpLastNameString + tmpFirstNameString;
-		template.email    = user.getEmail();
-		template.position = user.getPosition();
-		template.company  = user.getCompany();
-		template.mobile   = user.getMobile();
-		template.phone    = user.getPhone();
-		template.access   = this.getAccessTemplate(user);
-			       
-		// add users to list.js, and add to DOM
-		var ret = this.list.add(template);
-
-		// hack: manually add id's for event triggering                 TODO refactor, ich.
-		// for whole table
-		var nodes = ret[0].elm.children;
-		for (var i = 0; i < nodes.length; i++) {
-			var node = nodes[i];
-
-			// main checkbox, label
-			if (i == 0) {
-				node.children[0].children[0].id = 'users-checkbox-' + user.getUuid();
-				node.children[0].children[1].setAttribute('for', 'users-checkbox-' + user.getUuid());
-			}
-
-			// other divs
-			if (!node.id == '') {
-				node.id = node.id + user.getUuid();
-				node.setAttribute('uuid', user.getUuid());
-			}
-		};
-	
-		// add edit hooks
-		this.setEditHooks(user.getUuid());
-	},
-
-
-	// # of projects box in user entry
-	getAccessTemplate : function (user) {
-
-		var divProjectsOpen = '<div class="user-projects-button">';
-		var divProjectsClose = '</div>';
-
-		// get no of projets etc for user
-		var projects = user.getProjects();
-		var numProjects = projects ? projects.length : 0;
-		var projectsText = numProjects == 1 ? ' project' : ' projects';
-
-		return divProjectsOpen + numProjects + projectsText + divProjectsClose;
-	},
-
-	setEditHooks : function (uuid, onoff) {
-		var onoff = onoff || 'on';
-
-		// get <input>'s
-		var lastName    = Wu.DomUtil.get('lastName-' + uuid);
-		var firstName   = Wu.DomUtil.get('firstName-' + uuid);
-		var company     = Wu.DomUtil.get('company-' + uuid);
-		var position    = Wu.DomUtil.get('position-' + uuid);
-		var phone       = Wu.DomUtil.get('phone-' + uuid);
-		var email       = Wu.DomUtil.get('email-' + uuid);
-		var access      = Wu.DomUtil.get('access-' + uuid);
-
-		// set click hooks on title and description
-		Wu.DomEvent
-			[onoff]( lastName,       'mousedown mouseup click',     this.stop,      this ) 
-			[onoff]( lastName,       'dblclick',                    this.rename,    this )     
-			[onoff]( firstName,      'mousedown mouseup click',     this.stop,      this ) 
-			[onoff]( firstName,      'dblclick',                    this.rename,    this )     
-			[onoff]( company,        'mousedown mouseup click',     this.stop,      this ) 
-			[onoff]( company,        'dblclick',                    this._rename,   this )     
-			[onoff]( position,       'mousedown mouseup click',     this.stop,      this ) 
-			[onoff]( position,       'dblclick',                    this._rename,   this )     
-			[onoff]( phone,          'mousedown mouseup click',     this.stop,      this ) 
-			[onoff]( phone,          'dblclick',                    this._rename,   this )     
-			[onoff]( email,          'mousedown mouseup click',     this.stop,      this ) 
-			// [onoff]( email,          'dblclick',                    this._rename,   this )     
-			[onoff]( access,         'click',                    function () { this.editAccess(uuid); }, this )     
+		// TODO
+		return true;
 	},
 
 	// on click on # of projects box
@@ -635,13 +486,13 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 			caller : this
 		});
 
-		this._manage.addTo(this._content);
+		this._manage.addTo(this._innerContent);
 
 		// hide top bar
 		Wu.DomUtil.addClass(this._content, 'hide-top', this);
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Users: Edit access', user.getName() + ' (' + user.getUuid() + ' )']);
+		app.Analytics.setGaEvent(['Side Pane', 'Users: Edit access', user.getName() + ' (' + user.getUuid() + ' )']);
 	},
 
 	_hide : function () {
@@ -658,142 +509,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	stop : function (e) {
 		e.preventDefault();
 		e.stopPropagation();
-	},
-
-	rename : function (e) {
-
-		// enable editing on input box
-		e.target.removeAttribute('readonly'); 
-		e.target.focus();
-		e.target.selectionStart = e.target.selectionEnd;
-
-		// set key
-		e.target.fieldKey = e.target.id.split('-')[0];
-
-		// save on blur or enter
-		Wu.DomEvent.on( e.target, 'blur',    this.editBlur, this );
-		Wu.DomEvent.on( e.target, 'keydown', this.editKey,  this );
-
-
-		// Google Analytics event tracking
-		app.Analytics.ga(['Side Pane', 'Users: Edit ' + e.target.fieldKey]);
-	},
-
-	editKey : function (e) {
-		// blur on enter
-		if (event.which == 13 || event.keyCode == 13) e.target.blur();
-	},
-
-	editBlur : function (e) {
-
-		// get key
-		var key = e.target.fieldKey;
-
-		// set back to readonly
-		e.target.setAttribute('readonly', 'readonly');                                                                                                                                                                                         
-		
-		// get user uuid
-		var userUuid = e.target.id.replace(key + '-', '');
-
-		// get new title
-		var value = e.target.value || e.target.innerHTML;
-
-		// save to server
-		this.save(key, value, userUuid);
-	},
-
-	// rename a div, ie. inject <input>
-	_rename : function (e) {
-
-		// To make sure that no other fields are being edited
-		if ( this._isFocus )  this._forceStopBlur(this._previousTarget);
-
-		var div   = e.target;
-		var value = e.target.innerHTML;
-		var key   = e.target.getAttribute('key');
-		var uuid  = e.target.getAttribute('uuid');
-
-		var inputData = { 
-			value : value, 
-			key   : key , 
-			uuid  : uuid 
-		};
-
-		// clear namespace
-		div.innerHTML = '';
-
-		var input = Wu.DomUtil.create('input', 'inject-input', div);
-		input.setAttribute('key', inputData.key);
-		input.setAttribute('value', inputData.value);
-		input.setAttribute('uuid', inputData.uuid);
-
-		var target = div.firstChild;
-
-		// Store previous target, in case it's still in focus when we enter edit mode.
-		this._previousTarget = target;
-
-		// enable editing on input box
-		target.focus();
-
-		target.selectionStart = target.selectionEnd;
-
-		// We're in focus mode – in case it doesn't snap out of it.
-		this._isFocus = true;
-
-		// save on blur or enter
-		Wu.DomEvent.on( target,  'blur', this._editBlur, this );       // save folder title
-		Wu.DomEvent.on( target,  'keydown', this._editKey, this );     // save folder title
-
-
-	},
-
-	_editKey : function (e) {
-
-		// blur on enter
-		if (event.which == 13 || event.keyCode == 13) e.target.blur();
-	},
-
-	// Like _editBlur below, but if we go from editing one field to another one, the first one doesn't snap out of editing mode
-	// this function will take care of that.
-	_forceStopBlur : function (el) {
-
-		// Snap out of focus mode
-		this._isFocus = false;
-
-		// get value
-		var value = el.value;
-		var key   = el.getAttribute('key');
-		var user  = el.getAttribute('uuid');
-
-		// revert to <div>
-		var div = el.parentNode;
-
-		//refresh list
-		this.list.update();
-
-		// save to server
-		this.save(key, value, user);		
-	},
-
-	_editBlur : function (e) {
-
-		// Snap out of focus mode
-		this._isFocus = false;
-
-		// get value
-		var value = e.target.value;
-		var key   = e.target.getAttribute('key');
-		var user  = e.target.getAttribute('uuid');
-
-		// revert to <div>
-		var div = e.target.parentNode;
-		div.innerHTML = value;
-
-		//refresh list
-		this.list.update();
-
-		// save to server
-		this.save(key, value, user);
 	},
 
 	save : function (key, value, userUuid) {

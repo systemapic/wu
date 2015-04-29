@@ -108,7 +108,7 @@ Wu.SidePane.Item = Wu.Pane.extend({
 		this.activate();
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Select: ' + this.type]);
+		app.Analytics.setGaEvent(['Side Pane', 'Select: ' + this.type]);
 	},
 
 	mobileReActivate : function () {
@@ -126,11 +126,11 @@ Wu.SidePane.Item = Wu.Pane.extend({
 	activate : function (e) {
 
 		// set active menu
-		var prev = Wu.app._activeMenu || false;
-		Wu.app._activeMenu = this;
+		var prev = app._activeMenu || false;
+		app._activeMenu = this;
 		    
 		// active content                        
-		Wu.app._active = this._content;  
+		app._active = this._content;  
 		app._activeMenuItem = this.type;
 
 		// check vertical swipe action    (j)

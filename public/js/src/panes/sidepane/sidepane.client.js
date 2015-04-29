@@ -33,11 +33,22 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// create logo
 		this.logoContainer = Wu.DomUtil.create('div', 'client-logo-container', this._container);
-		this.logo = Wu.DomUtil.create('img', 'client-logo', this.logoContainer);
+		this._createLogo();
 
 		// create projects container
 		this._projectsContainer = Wu.DomUtil.create('div', 'projects-container', this._container);
+	},
 
+	_createLogo : function () {
+		if (this.logo) {
+			Wu.DomUtil.remove(this.logo);
+			this.logo = null;
+			delete this.logo;
+		}
+
+		this.logo = this._resumableBrowse = Wu.DomUtil.create('img', 'client-logo', this.logoContainer);
+
+		Wu.DomEvent.on(this.logo, 'mousedown', Wu.DomEvent.stopPropagation, this);
 	},
 
 
@@ -183,7 +194,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.confirmDeleteClient();
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: delete client']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: delete client']);
 
 	},
 
@@ -256,7 +267,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		project._saveNew(options);
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: new project']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: new project']);
 	},
 
 	_markActive : function (newProject) {
@@ -297,9 +308,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// create project in sidepane
 		this._createNewProject(project);
 
-		// GA – Register new project ID (This project has no title yet, so it's useless to save title)
-		// ga('set', 'dimension8', store.uuid);	// move to analtyics.js
-
 	},
 
 	// add project in sidepane
@@ -323,8 +331,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.open();
 
 		// select
-		// sidepaneProject.project._menuItem.select();
-		console.log('sidepaneProject', sidepaneProject);
 		sidepaneProject.select();
 		sidepaneProject.update();
 
@@ -350,16 +356,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 
 	_addDefaults : function () {
-		
-
-		// // add default baselayer
-		// if (!app.SidePane) return;
-		// if (!app.SidePane.Options) return; 	// refactor
-		// if (!app.SidePane.Options.settings) return;
-		// if (!app.SidePane.Options.settings.baselayer) return;
-		console.log('AKSDNADSK');
-		console.log(app.SidePane.Options.settings.baselayer._layers);
-
 		if (!app.SidePane.Options) return;
 		
 		app.SidePane.Options.update();
@@ -367,18 +363,18 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	addHooks : function () {
-		Wu.DomEvent.on( this._container, 'mousedown', this.toggle, this);
+		Wu.DomEvent.on(this._container, 'mousedown', this.toggle, this);
 	},
 
 	removeHooks : function () {
-		Wu.DomEvent.off( this._container, 'mousedown', this.toggle, this);
+		Wu.DomEvent.off(this._container, 'mousedown', this.toggle, this);
 	},
 
 	addEditHooks : function () {
 		if (app.access.to.edit_client()) {
 			Wu.DomEvent.on(this.title, 'dblclick', this.editName, this);
 			Wu.DomEvent.on(this.description, 'dblclick', this.editDescription, this);
-			this.addLogoDZ();
+			this._addResumable();
 		}
 	},
 
@@ -386,7 +382,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		if (app.access.to.edit_client()) {
 			Wu.DomEvent.off(this.title, 'dblclick', this.editName, this);
 			Wu.DomEvent.off(this.description, 'dblclick', this.editDescription, this);
-			this.removeLogoDZ();
+			this._removeResumable();
 		}
 	},
 
@@ -417,7 +413,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		Wu.DomEvent.on( target,  'keydown', this.editKeyed,  this );           // save title
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: edit client name']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: edit client name']);
 
 
 	},
@@ -469,7 +465,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		Wu.DomEvent.on( target,  'keydown', this.editKeyed,   	    this );     // save title
 
 		// Google Analytics event trackign
-		app.Analytics.ga(['Side Pane', 'Clients: edit client description']);
+		app.Analytics.setGaEvent(['Side Pane', 'Clients: edit client description']);
 
 	},
 
@@ -493,41 +489,124 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	},
 
-	
 	// edit hook for client logo
-	addLogoDZ : function () {
+	_addResumable : function () {
+		console.log('_addResumable', this.client.getName());
 
-		// create dz
-		this.logodz = new Dropzone(this.logo, {
-				url : '/api/client/uploadlogo',
-				createImageThumbnails : false,
-				autoDiscover : false
+		var clientUuid = this.client.getUuid();
+
+		// create resumable object
+		var r = this.r = new Resumable({
+			target : '/api/client/uploadlogo',
+			chunkSize : 11*1024*1024, // 11MB
+			simultaneousUploads : 1,
+			testChunks : false, // turn off resume on small upload
+			query : {
+				imageUuid : Wu.Util.guid('image'),
+				clientUuid : clientUuid
+			},
+
+			// max file size (less than one chunk means only one chunk)
+			maxFileSize : 10*1024*1024, // 10MB
+			maxFileSizeErrorCallback : function (file, errorCount) {
+				
+				// feedback message
+				app.feedback.setError({
+					title : 'Image file is too large.',
+					description : 'Please use an image file smaller than 10MB.',
+				});
+			},
+
+			// max files to be uploaded at once
+			maxFiles : 1,
+
+			// accepted filetypes
+			fileType : ['png', 'jpg', 'jpeg', 'gif'],
+			fileTypeErrorCallback : function (file, errorCount) {
+
+				// feedback message
+				app.feedback.setError({
+					title : 'Not an accepted image format',
+					description : 'Please only use PNG, JPG or GIF image formats.',
+				});
+
+			},
 		});
-		
-		// set client uuid param for server
-		this.logodz.options.params.clientUuid = this.client.getUuid();
-		this.logodz.options.params.client = this.client.getUuid();
-		
-		// set callback on successful upload
-		this.logodz.on('success', function (err, path) {
-			this.editedLogo(path);
-		}.bind(this));
 
-		// set image frame with editable clas
+		// assign upload button to DOM
+		r.assignBrowse(this._resumableBrowse);
+
+		// start upload on add
+		r.on('fileAdded', r.upload);
+
+		// callback on success
+		r.on('fileSuccess', this.editedLogo.bind(this));
+
+		// editable cursor on image
 		Wu.DomUtil.addClass(this.logo, 'editable');
+
 	},
 
-	removeLogoDZ : function () {
-		// disable edit on logo
-		if (this.logodz) this.logodz.disable();
-		delete this.logodz;
+	_refreshResumable : function () {
+		console.log('_refreshResumable');
 
-		// set image frame without editable clas
-		Wu.DomUtil.removeClass(this.logo, 'editable');
+		// remove old
+		if (this.r) this._removeResumable();
+
+		// add new
+		if (app.access.to.edit_project(this._project)) this._addResumable();
 	},
 
+	_removeResumable : function () {
+		console.log('_removeResumable');
 
-	editedLogo : function (path) {
+		var r = this.r;
+		r.cancel();
+		this.r = null;
+		delete this.r;
+
+		// refresh logo to kill listeners
+		this._createLogo();
+	},
+	
+	// // edit hook for client logo
+	// addLogoDZ : function () {
+
+	// 	// create dz
+	// 	this.logodz = new Dropzone(this.logo, {
+	// 			url : '/api/client/uploadlogo',
+	// 			createImageThumbnails : false,
+	// 			autoDiscover : false
+	// 	});
+		
+	// 	// set client uuid param for server
+	// 	this.logodz.options.params.clientUuid = this.client.getUuid();
+	// 	this.logodz.options.params.client = this.client.getUuid();
+		
+	// 	// set callback on successful upload
+	// 	this.logodz.on('success', function (err, path) {
+	// 		this.editedLogo(path);
+	// 	}.bind(this));
+
+	// 	// set image frame with editable clas
+	// 	Wu.DomUtil.addClass(this.logo, 'editable');
+	// },
+
+	// removeLogoDZ : function () {
+	// 	// disable edit on logo
+	// 	if (this.logodz) this.logodz.disable();
+	// 	delete this.logodz;
+
+	// 	// set image frame without editable clas
+	// 	Wu.DomUtil.removeClass(this.logo, 'editable');
+	// },
+
+
+	editedLogo : function (resubmable, path) {
+
+		console.log('editedLogo', resubmable, path);
+
+		this._refreshResumable();
 		
 		// set path
 		var fullpath = '/images/' + path;
@@ -537,7 +616,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 		// update image in header
 		this.logo.src = fullpath;
-
 	},
 
 	pendingOpen : function () {

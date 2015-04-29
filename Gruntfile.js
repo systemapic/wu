@@ -159,12 +159,12 @@ module.exports = function(grunt) {
 					'public/js/lib/sortable.js/Sortable.js',
 
 					// grande
-					'public/js/lib/grande.js/js/grande.class.js',
-					'public/js/lib/grande.js/js/grande.js',
-					'public/js/lib/grande.js/js/grande.attachments.js',
+					'public/js/lib/grande/js/grande.class.js',
+					'public/js/lib/grande/js/grande.js',
+					'public/js/lib/grande/js/grande.attachments.js',
 
 					// resumable
-					'public/js/lib/resumable.js/resumable.js',
+					'public/js/lib/resumable/resumable.js',
 
 					// codemirror
 					'public/js/lib/codemirror/mode/cartocss/cartoref.js',
@@ -261,6 +261,7 @@ module.exports = function(grunt) {
 					'public/js/src/models/model.layers.js',
 					'public/js/src/models/model.files.js',
 					'public/js/src/models/model.roles.js',
+					'public/js/src/models/model.D3List.js',
 
 					// Access
 					'public/js/src/core/access.js',
@@ -269,7 +270,7 @@ module.exports = function(grunt) {
 					'public/js/src/ext/analytics.js',
 
 					// Config file
-					'public/js/src/config/config.js',
+					'public/js/src/config/client-config.js',
 					'public/js/src/lang/language.english.js',
 
 					// Extend Leaflet
@@ -289,8 +290,8 @@ module.exports = function(grunt) {
 				src : [  
 
 					'public/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.css',
-					'public/js/lib/grande.js/css/menu.css',                    
-					'public/js/lib/grande.js/css/editor.css',
+					'public/js/lib/grande/css/menu.css',                    
+					'public/js/lib/grande/css/editor.css',
 					'public/css/bootstrap.min.css',
 					'public/css/font-awesome.min.css',
 					'public/css/mapbox.css',        
@@ -346,7 +347,7 @@ module.exports = function(grunt) {
 				src : [
 					'public/js/lib/mapbox.js/mapbox.2.1.4.js',
 					'public/js/src/controls/control.spinningmap.js',
-					'public/js/src/config/login.config.js',
+					'public/js/src/config/login-config.js',
 					'public/js/src/core/login.js',
 				],
 
@@ -526,6 +527,7 @@ module.exports = function(grunt) {
 			'preprocess:login',
 			'htmlmin'
 
+
 	])});
 
 	grunt.registerTask('dev',  function () { grunt.task.run([ 
@@ -537,8 +539,7 @@ module.exports = function(grunt) {
 			'env:dev', 
 			'preprocess:dev',
 			'login',
-			'preprocess:login',
-
+			'preprocess:login'
 	])});	
 
 	grunt.registerTask('default', ['waiter']);

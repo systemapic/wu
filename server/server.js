@@ -1,6 +1,7 @@
+
+
 // server.js
 var express  = require('express.io');
-// var app      = require('express.io')();
 var mongoose = require('mongoose');
 var passport = require('passport');
 var flash    = require('connect-flash');
@@ -10,18 +11,14 @@ var favicon  = require('serve-favicon');
 var cors     = require('cors');
 var morgan   = require('morgan');
 var session  = require('express-session');
-var configDB = require('../config/database.js');
-var port     = 3001;
 var prodMode = process.argv[2] == 'production';
 var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser'); 
-
-
-// app.http().io()
-
-
-app = express().http().io()
+// var config = require('../config/server-config.js').serverConfig;
+var api = require('../api/api');
+var config = api.config;
+var port = config.port;
 
 // mute console in production mode
 if (prodMode) {
@@ -31,11 +28,14 @@ if (prodMode) {
 	console.timeEnd = nullFn;
 }
 
+// socket enabled server
+app = express().http().io()
+
 // connect to our database
-var sessionStore = mongoose.connect(configDB.url); 
+var sessionStore = mongoose.connect(config.mongo.url); 
 
 // pass passport for configuration
-require('../config/passport')(passport); 
+require('./passport')(passport); 
 
 // set up our express application
 app.use(morgan('dev')); 
@@ -47,13 +47,12 @@ app.use(multipart()); // for resumable.js uploads
 
 // required for passport
 app.use(express.session({
-	secret: 'dslfksmdfldskfnlxxsadknvvlovn908209309fmsfmdslkm', 
+	secret: 'dslfksmdfldskfnlxxsadknvvlovn908209309fmsfmdslkm',  // random
         saveUninitialized: true,
         resave: true,
 }));
 
-
-
+// enable passport
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
@@ -73,9 +72,11 @@ require('../routes/routes.js')(app, passport);
 // load our socket api
 require('../routes/socket.routes.js')(app, passport);
 
-
 // launch 
-var server = app.listen(port, 'localhost');
+var server = app.listen(port);
 
+// brag
+console.log('The magic happens @ ', port);
 
-console.log('The magic happens on port ' + port);
+// debug cleanup
+api.upload._deleteDoneChunks();

@@ -163,7 +163,7 @@ L.Control.Description = Wu.Control.extend({
 	_addHooks : function () {
 		
 		// collapsers
-		Wu.DomEvent.on(this._button, 'click', this.toggleCloser, this);
+		Wu.DomEvent.on(this._button, 'click', this._GAtoggleCloser, this);
 		
 		// prevent map double clicks
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
@@ -179,7 +179,7 @@ L.Control.Description = Wu.Control.extend({
 		this.editOn();
 
 		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Description: edit content']);
+		app.Analytics.setGaEvent(['Controls', 'Description: edit content']);
 	},
 	
 	editOn : function () {
@@ -290,6 +290,16 @@ L.Control.Description = Wu.Control.extend({
 
 	},
 
+	_GAtoggleCloser : function () {
+
+		// Google Analytics event tracking
+		app.Analytics.setGaEvent(['Controls', 'Description toggle']);
+
+		// Fire function
+		this.toggleCloser();
+
+	},
+
 	// For Mobile Phones
 	toggleCloser : function () {
 
@@ -302,8 +312,6 @@ L.Control.Description = Wu.Control.extend({
 			this._isClosed ? this.mobileOpenPane() : this.mobileClosePane();
 		}
 
-		// Google Analytics event tracking
-		app.Analytics.ga(['Controls', 'Description toggle']);
 	},
 
 	mobileOpenPane : function () {

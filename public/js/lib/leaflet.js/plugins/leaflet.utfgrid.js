@@ -199,9 +199,6 @@ L.UtfGrid = L.Class.extend({
 	//Load up all required json grid files
 	//TODO: Load from center etc
 	_update: function () {
-
-		// console.error('utf update');
-
 		var bounds = this._map.getPixelBounds(),
 		    zoom = this._map.getZoom(),
 		    tileSize = this.options.tileSize;

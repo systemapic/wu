@@ -29,52 +29,11 @@
 
 .status-progress-bar {
 	z-index: 10010;
-}
+	}
+
 .dropzone-meta {
 	z-index: 10002 !important;
 	}
-
-
-
-.layer-menu-item-wrap {
-	/*background-color: #cfd0d2;*/
-	/*color: #333 !important;*/
-	}
-
-.layer-active {
-	/*background-color: #959ba4 !important;*/
-	/*color: #333 !important;*/
-	}	
-
-
-
-
-
-
-
-
-
-
-
-/* Each layer wrap: Universal => on every layer menu item */
-/*.layer-menu-item-wrap {
-	background-color: #cfd0d2 !important;
-	color: #333 !important;
-	}
-
-.layer-active {
-	background-color: #959ba4 !important; 
-	color: #000 !important;
-	}
-
-.menufolder {
-	background-color: #3c4759 !important; 
-	color: white !important;
-	}*/
-
-
-
-
 
 
 /*
@@ -103,12 +62,10 @@ aka feedback pane
 	height: 100%;
 	opacity: 0.9;
 	cursor: default;
-	/*border-radius: 3px;*/
 	border-radius: 2px;
 	margin-right: 50px;
 	max-height: inherit;
   	overflow: hidden;
-  	/*margin-top: 3px;*/
   	margin-top: 2px;
   	position: relative;
 	padding: 10px 15px 10px 15px;	
@@ -119,8 +76,6 @@ aka feedback pane
 	color: white;
 	padding-left: 0;
 	font-weight: 900;
-	/*font-size: 22px;*/
-	/*font-size: 19px;*/
 	font-size: 17px;
 	margin-bottom: 2px;
 	}
@@ -128,20 +83,15 @@ aka feedback pane
 .feedback-pane-title2 {
 	margin-top: 10px;
 	padding-top: 6px;
-	/*padding-bottom: 2px;*/
-	/*font-size: 19px;*/
 	border-top: 1px dashed rgba(255,255,255,0.3);
 	}
 
 .feedback-pane-description,
 .feedback-pane-description2 {
 	color: white;
-	/*font-weight: 400;*/
 	font-weight: 500;
 	padding: 0px;
 	margin: 0px;
-	/*font-size: 15px;*/
-	/*font-size: 14px;*/
 	font-size: 13px;
 	}
 
@@ -172,8 +122,6 @@ aka feedback pane
 	}
 
 .feedback-pane-content.error {
-	/*background-color: rgba(157, 38, 38, 0.81);*/
-	/*background-color: rgba(111, 2, 2, 0.81)*/
 	background-color: rgba(132, 14, 14, 0.81);
 	}
 
@@ -203,14 +151,44 @@ aka feedback pane
 	border-radius: 3px;
 	}
 
-.download-dialog-link {
-	height: 100%;
-  	width: 100%;
-  	position: absolute;
-  	left: 0;
-  	top: 0;
-	}
 
-.smap-button-gray  {
-	margin-left: 5px;
-	}
+/***************************************************************************/
+
+.description-textarea-outer-wrapper {
+  overflow: hidden;
+}
+
+.file-description-inner-wrapper {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	width: 120%;
+	padding-right: 20%;
+}
+
+
+.minimal .file-description-outer-wrapper {
+	  width: 100%;
+}
+
+.minimal .list-attribute-wrapper {
+	height: 33px;
+}
+
+.minimal .open-list-info {
+	  height: 206px;
+ 		top: 34px;
+}
+
+.minimal .file-list-wrapper {
+	height: 151px;
+}
+
+.manage-access-container {
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+@media screen and (max-width: 780px)
+.file-copright-wrapper {
+  width: 252px;
+}

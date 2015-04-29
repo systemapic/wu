@@ -1,3 +1,4 @@
+
 //API: api.upload.js
 // database schemas
 var Project 	= require('../models/project');
@@ -34,10 +35,13 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
-var r = require('resumable-js/node-resumable')('/data/tmp/');
+// resumable.js
+var r = require('../tools/resumable-node')('/data/tmp/');
 
 // api
 var api = module.parent.exports;
+
+
 
 // exports
 module.exports = api.upload = { 
@@ -49,11 +53,13 @@ module.exports = api.upload = {
 		    fileName = fileUuid + '-' + options.resumableFilename,
 		    outputPath = '/data/tmp/' + fileName,
 		    stream = fs.createWriteStream(outputPath),
-		    resumableChunkNumber = req.body.resumableChunkNumber,
-	    	    resumableTotalChunks = req.body.resumableTotalChunks;
+		    resumableChunkNumber = options.resumableChunkNumber,
+		    resumableIdentifier = options.resumableIdentifier,
+	    	    resumableTotalChunks = options.resumableTotalChunks;
 
+		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks to ', outputPath);
 
-		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks.');
+		console.log('## RESUMABLE ##'.green, options);
 
 		// resumable		
 		r.post(req, function(status, filename, original_filename, identifier){
@@ -62,11 +68,11 @@ module.exports = api.upload = {
 			res.status(status).send({});
 
 			// register chunk done in redis
-			if (status == 'done' || status == 'partly_done') api.redis.incr('done-chunks-' + fileUuid);
+			if (status == 'done' || status == 'partly_done') api.redis.incr('done-chunks-' + resumableIdentifier);
 
 			// check if all done
-			api.redis.get('done-chunks-' + fileUuid, function (err, count) {
-				console.log('redis chunk count'.yellow, err, count);
+			api.redis.get('done-chunks-' + resumableIdentifier, function (err, count) {
+				console.log('Chunk #'.yellow, count, err);
 
 				// return if not all done				
 				if (count != options.resumableTotalChunks) return;
@@ -87,7 +93,6 @@ module.exports = api.upload = {
 	},
 
 	_chunkedUploadDone : function (options) {
-
 		var resumableTotalChunks = options.resumableTotalChunks,
 		    uniqueIdentifier = options.uniqueIdentifier,
 		    outputPath = options.outputPath,
@@ -95,32 +100,28 @@ module.exports = api.upload = {
 		    tmpFolder = '/data/tmp/',
 		    ops = [];
 
-
+		// merge files
 		ops.push(function (callback) {
 
-			// merge files
 			var cmd = 'cat ';
 
 			_.times(resumableTotalChunks, function (i) {
 				var num = i + 1;
-				cmd += tmpFolder + 'resumable-' + resumableIdentifier + '.' + num + ' ';
-			})
+				cmd += '"' + tmpFolder + 'resumable-' + resumableIdentifier + '.' + num + '" ';
+			});
 
-			cmd += ' > ' + outputPath;
+			cmd += ' > "' + outputPath + '"';
 
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
 				if (err) console.log('err'.red, err);
-				// callback(null);
-
 				fs.stat(outputPath, callback);
 			});
-			
 
 		});
 
+		// import file
 		ops.push(function (stats, callback) {
-
 			var file = {
 				path : options.outputPath,
 				size : stats.size,
@@ -128,26 +129,40 @@ module.exports = api.upload = {
 				uniqueIdentifier : uniqueIdentifier
 			}
 
-			// import file
 			api.upload.importFile(file, options, function (err, pack) {
 				callback(null, pack);
 			});
-
-			
-
 		});
 
 
 		async.waterfall(ops, function (err, result) {
 
+			// ping client
 			api.socket.uploadDone({
 				result : result,
 				user : options.user,
 				loka : 'loka'
 			});
+
+			// clean up, remove chunks
+			var removePath = '/data/tmp/resumable-' + uniqueIdentifier + '.*';
+			fs.remove(removePath, console.log);
+
+			// clean up redis count
+			api.redis.del('done-chunks-' + uniqueIdentifier);
+
 		});
 		
-		
+	},
+
+	// debug: delete all done-chunks
+	_deleteDoneChunks : function () {
+		api.redis.keys('done-chunk*', function(err, rows) {
+			rows.forEach(function (row) {
+				api.redis.del(row);
+				console.log('deleted row'.red, row);
+			});
+		});
 	},
 
 	chunkedCheck : function (req, res) {
@@ -162,28 +177,10 @@ module.exports = api.upload = {
 
 	// entry point
 	importFile : function (incomingFile, options, done) {
-		// todo: check for upload access!;
-		// console.log('API.upload.upload() IMORTFILE!'.cyan);
-		// console.log('___________________'.cyan);
-
-		// // process from-encoded upload
-		// var form = new formidable.IncomingForm({
-		// 	hash : 'sha1',
-		// 	multiples : true,
-		// 	keepExtensions : true,
-		// });
-
-		// form.parse(req, function(err, fields, files) {	
-		// 	if (err) console.log('ERR 1'.red, err);
-		// 	if (err || !files || !fields || !files.file) return api.error.general(req, res, err || 'No files4.');
-
 		var user = options.user,
-		    projectUuid = options.projectUuid;
-
-
-		var fileArray = [incomingFile];
-
-		var ops = [];
+		    projectUuid = options.projectUuid,
+		    fileArray = [incomingFile],
+		    ops = [];
 
 		// sort files
 		ops.push(function (callback) {
@@ -213,7 +210,6 @@ module.exports = api.upload = {
 				if (err) console.log('ERR 17'.red, err);
 				callback(err, results);
 			});
-			
 		});
 		
 
@@ -244,125 +240,25 @@ module.exports = api.upload = {
 				uniqueIdentifier : options.uniqueIdentifier
 			}
 
-			api.upload._sendToProcessing(opts, function (err, result) { // todo: do per file
-
-				// api.socket.setProcessing({
-				// 	result : result,
-				// 	err : err,
-				// 	user : options.user,
-				// 	id : fileUuid
-				// });
-
+			// only process geojson
+			var isGeojson = _.find(layers, function (l) {
+				console.log('l: ', l);
+				return l.data.geojson;
 			});
 
-			// all done
-			// res.end(JSON.stringify(pack));
-			// send upload done notification
-			// api.socket.uploadDone({
-			// 	result : pack,
-			// 	user : options.user,
-			// });
+			if (isGeojson) api.upload._sendToProcessing(opts, function (err, result) { // todo: do per file
 
-			// console.log('going done!');
+				// done processing
+
+			});
 
 			done(null, pack);
 
 			
 		});
-		// });
 	},
 
-	// // entry point
-	// file : function (req, res) {
-	// 	// todo: check for upload access!;
-	// 	console.log('API.upload.upload()'.cyan);
-	// 	console.log('___________________'.cyan);
-
-	// 	// process from-encoded upload
-	// 	var form = new formidable.IncomingForm({
-	// 		hash : 'sha1',
-	// 		multiples : true,
-	// 		keepExtensions : true,
-	// 	});
-
-	// 	form.parse(req, function(err, fields, files) {	
-	// 		if (err) console.log('ERR 1'.red, err);
-	// 		if (err || !files || !fields || !files.file) return api.error.general(req, res, err || 'No files4.');
-
-
-	// 		console.log('files! => '.yellow, files);
- 			
-			
-
-	// 		var fileArray = [files.file];
-
-	// 		var ops = [];
-
-	// 		// sort files
-	// 		ops.push(function (callback) {
-
-	// 			// quick sort
-	// 			api.upload.sortFormFiles(fileArray, function (err, results) {
-	// 				if (err) console.log('ERR 18'.red, err);
-
-	// 				if (err || !results) return callback(err || 'There were no valid files in the upload.');
-
-	// 				console.log('_________ results ______________');
-	// 				console.log('results: ', results);
-	// 				console.log('__________ results end _________');				
-								
-	// 				callback(null, results);
-	// 			});
-	// 		});
-
-	// 		// register files in mongo and to project
-	// 		ops.push(function (entriesArray, callback) {
-	// 			if (!entriesArray) return callback('Nothing to do.');
-
-	// 			var options = {
-	// 				entriesArray : entriesArray,
-	// 				userUuid : req.user.uuid,
-	// 				userFullName :  req.user.firstName + ' ' + req.user.lastName,
-	// 				projectUuid : fields.project
-	// 			}
-
-	// 			// register files in mongo and to project
-	// 			api.upload._registerFiles(options, function (err, results) {
-	// 				if (err) console.log('ERR 17'.red, err);
-	// 				callback(err, results);
-	// 			});
-				
-	// 		});
-			
-
-	// 		async.waterfall(ops, function (err, results) {
-	// 			if (err) console.log('ERR 2'.red, err);
-	// 			if (err || !results || !results.length) return api.error.general(req, res, err || 'There were no valid files in the upload.');
-
-	// 			// organize in sidepane.dataLibrary format
-	// 			var files = [],
-	// 			    layers = [];
-
-	// 			results && results.forEach(function (r) {
-	// 				r.file && files.push(r.file);
-	// 				r.layer && layers.push(r.layer);
-	// 			});
-
-	// 			var pack = {
-	// 				files  : files,
-	// 				layers :layers,
-	// 				error : err
-	// 			}
-
-	// 			api.upload._sendToProcessing(layers);
-
-	// 			// all done
-	// 			res.end(JSON.stringify(pack));
-	// 		});
-	// 	});
-	// },
-
-
+	
 	_sendToProcessing : function (options, callback) {
 		var pack = options.pack,
 		    user = options.user,
@@ -372,69 +268,46 @@ module.exports = api.upload = {
 
 		console.log('_sendToProcessing'.yellow, options);
 
-
 		// can be several layers in each upload
 		layers.forEach(function (layer) {
-
-			// var path = api.config.path.geojson + fileUuid + '.geojson';
-
-			// console.log('path'.magenta, path); // /data/geojson/file-73a16a51-050e-492d-bd9b-0fa52f7bcd0a.geojson
-
-			// var remotePath = '/data/grind/' + fileUuid + '/';
-
-			// var arr = [
-			// 	'tar cjf - -C',
-			// 	api.config.path.geojson,
-			// 	fileUuid + '.geojson',
-			// 	'| ssh px "tar xjfC -',
-			// 	'/data/grind/geojson/"'
-			// ]
-
-			// var cmd = arr.join(' ');
-
-			// copy folder
-			// tar -cf - -C /var/www/vile/tests/rasters/advanced/ testfolder/ | pigz | ssh px "pigz -d | tar xf - -C /home/"
-
-			// tar -cf - RapidEye_Boulder_CO.zip  | pigz | ssh px "pigz -d | tar xf - -C /home/"
-			
-			var fileUuid = layer.file;
-			var localFile = fileUuid + '.geojson';
-			var localFolder = api.config.path.geojson;
-			var remoteFolder = '/data/grind/geojson/';
-			var uniqueIdentifier = options.uniqueIdentifier;
+			var fileUuid = layer.file,
+			    localFile = fileUuid + '.geojson',
+			    localFolder = api.config.path.geojson,
+			    remoteFolder = '/data/grind/geojson/',
+			    uniqueIdentifier = options.uniqueIdentifier,
+			    remoteSSH = 'px_vile_grind';
 
 			// tar -cf - -C /var/www/vile/tests/rasters/advanced/ RapidEye_Boulder_CO.zip   | pigz | ssh px "pigz -d | tar xf - -C /home/"
-			var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh px "pigz -d | tar xf - -C ' + remoteFolder + '"';
+			var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + '"';
+			console.log('ssh cmd'.cyan, cmd);
 
-			// console.log('dry cmd: ', cmd);
-
-			var host = api.config.grind.host;
+			var remoteUrl = api.config.vile_grind.remote_url;
 
 			var sendOptions = {
 				fileUuid : fileUuid,
 				uniqueIdentifier : uniqueIdentifier,
-				host : 'sx'
+				sender_ssh : api.config.vile_grind.sender_ssh,
+				sender_url : api.config.vile_grind.sender_url,
+				api_hook : 'grind/done'
 			}
 
-			console.log('sendOptions'.yellow, sendOptions);
-
+			// send file over ssh
 			exec(cmd, function (err, stdout, stdin) {
 				if (err) console.log('err'.red, err);
+				console.log('########## SSH #############'.red);
+				console.log(err, stdout, stdin);
 
-				// file sent
-				// notify px of transfer to start grind
-
-				// send to tileserver storage
+				console.log('sendOptions'.yellow, sendOptions);
+	
+				// ping tileserver storage to notify of file transfer
 				request({
 					method : 'POST',
-					uri : host + 'grind/job',
+					uri : remoteUrl + 'grind/job',
 					json : sendOptions
 				}, 
 
 				// callback
 				function (err, response, body) {
-					// console.log('requrest callback: ', err, body);
-
 
 					api.socket.setProcessing({
 						userId : user._id,
@@ -445,11 +318,9 @@ module.exports = api.upload = {
 					});
 
 					callback(null, 'All done!');
-
 				});
 			});
 		});
-
 	},
 
 
@@ -508,14 +379,7 @@ module.exports = api.upload = {
 	},
 
 
-
-
-
 	sortFormFiles : function (fileArray, done) {
-
-		// if (!fileArray) return done('No files6.');
-
-		// console.log('UPLOAD: Sorting form files');
 
 		// quick sort
 		var ops = [];
@@ -529,6 +393,8 @@ module.exports = api.upload = {
 			var extension 	= filetype[0];
 			var type 	= filetype[1];
 
+			console.log('filteyp'.yellow, filetype);
+
 			var options = {
 				path : file.path,
 				fileUuid : fileUuid,
@@ -538,12 +404,8 @@ module.exports = api.upload = {
 				currentFolder : null
 			}
 
-			// console.log('##############'.cyan);
-			// console.log('options: ', options);
-
 			// add async ops
 			ops = api.upload._sortOps(ops, options);
-		
 		});
 
 		async.series(ops, function (err, dbs) {
@@ -607,7 +469,7 @@ module.exports = api.upload = {
 				
 				// handle shapefiles
 				if (extension == 'shp') {
-				// if (options.type == 'shapefile') {					// gotchas: already in file-uuid folder, cause unzip
+							// gotchas: already in file-uuid folder, cause unzip
 
 					ops1.push(function (callback) {
 
@@ -651,7 +513,33 @@ module.exports = api.upload = {
 					});
 				}
 
+			
+				if (extension == 'tif' || extension == 'ecw' || extension == 'jp2') {
 
+					ops1.push(function (callback) {
+
+						api.geo.handleRaster(options, function (err, db) {
+							if (err) {
+								console.log('ERR 98:'.red, err);
+								return callback(err);
+							}
+
+							// populate db entry
+							db = db || {};
+							db.name = options.name;
+							db.file = options.fileUuid;
+							db.type = 'Layer';
+							db.files = [options.name];
+							db.data = {};
+							db.data.raster = options.name;
+
+							callback(null, db);
+						});
+
+
+					});
+
+				}
 				
 				if (extension == 'geojson') {
 
@@ -674,7 +562,6 @@ module.exports = api.upload = {
 						});
 					});
 				}
-
 
 
 				if (extension == 'doc' || extension == 'pdf' || extension == 'docx' || extension == 'txt') {
@@ -837,6 +724,86 @@ module.exports = api.upload = {
 			});
 		}
 
+		if (ext == 'tif' || ext == 'ecw' || ext == 'jp2') {
+
+			ops.push(function (callback) {
+
+				api.geo.handleRaster(options, function (err, db) {
+					if (err) {
+						console.log('ERR 98:'.red, err);
+						return callback(err);
+					}
+
+					// populate db entry
+					db = db || {};
+					db.name = options.name;
+					db.file = options.fileUuid;
+					db.type = 'Layer';
+					db.files = [options.name];
+					db.data = {};
+					db.data.raster = options.name;
+
+					callback(null, db);
+				});
+
+
+			});
+
+		}
+
+		// if (ext == 'ecw') {
+
+		// 	ops.push(function (callback) {
+
+		// 		api.geo.handleRaster(options, function (err, db) {
+		// 			if (err) {
+		// 				console.log('ERR 98:'.red, err);
+		// 				return callback(err);
+		// 			}
+
+		// 			// populate db entry
+		// 			db = db || {};
+		// 			db.name = options.name;
+		// 			db.file = options.fileUuid;
+		// 			db.type = 'Layer';
+		// 			db.files = [options.name];
+		// 			db.data = {};
+		// 			db.data.raster = options.name;
+
+		// 			callback(null, db);
+		// 		});
+
+
+		// 	});
+
+		// }
+
+		// if (ext == 'jp2') {
+
+		// 	ops.push(function (callback) {
+
+		// 		api.geo.handleRaster(options, function (err, db) {
+		// 			if (err) {
+		// 				console.log('ERR 98:'.red, err);
+		// 				return callback(err);
+		// 			}
+
+		// 			// populate db entry
+		// 			db = db || {};
+		// 			db.name = options.name;
+		// 			db.file = options.fileUuid;
+		// 			db.type = 'Layer';
+		// 			db.files = [options.name];
+		// 			db.data = {};
+		// 			db.data.raster = options.name;
+
+		// 			callback(null, db);
+		// 		});
+
+		// 	});
+
+		// }
+
 
 		if (ext == 'geojson') {
 			ops.push(function (callback) {
@@ -888,56 +855,79 @@ module.exports = api.upload = {
 
 
 	projectLogo : function (req, res) {
+	    	var options = req.body,
+		    imageUuid = options.imageUuid,
+		    tmpFolder = '/data/tmp/',
+		    resumableIdentifier = options.resumableIdentifier;
 
-		// process from-encoded upload
-		var form = new formidable.IncomingForm({
-			hash : 'sha1',
-			multiples : true,
-			keepExtensions : true,
+		// resumable		
+		r.post(req, function(status, filename, original_filename, identifier){
+
+			// register chunk done in redis
+			if (status == 'done') {
+
+				var from = tmpFolder + 'resumable-' + resumableIdentifier + '.' + 1,
+				    file = imageUuid,
+				    to = api.config.path.image + file;
+
+				// rename and move to image folder
+				fs.copy(from, to, function (err) {
+					if (err) return api.error.general(req, res, err);
+					res.end(file);	// file will be saved by client
+				});
+			}
 		});
-
-		form.parse(req, function(err, fields, files) {	
-			if (err) console.log('ERR 3'.red, err);
-			if (err || !files || !files.file) return api.error.general(req, res, err || 'No files1.');
-
-			var from = files.file.path,
-			    file = 'image-' + uuid.v4(),
-			    to = api.config.path.image + file;
-			
-			// rename and move to image folder
-			fs.rename(from, to, function (err) {
-				if (err) console.log('ERR 4'.red, err);
-				if (err) return api.error.general(req, res, err);
-				res.end(file);	// file will be saved by client
-			});		
-	 	});
 	},
 
 
 	clientLogo : function (req, res) {
-		
-		// process from-encoded upload
-		var form = new formidable.IncomingForm({
-			hash : 'sha1',
-			multiples : true,
-			keepExtensions : true,
+	    	var options = req.body,
+		    imageUuid = options.imageUuid,
+		    tmpFolder = '/data/tmp/',
+		    resumableIdentifier = options.resumableIdentifier;
+
+		// resumable		
+		r.post(req, function(status, filename, original_filename, identifier){
+
+			// register chunk done in redis
+			if (status == 'done') {
+
+				var from = tmpFolder + 'resumable-' + resumableIdentifier + '.' + 1,
+				    file = imageUuid,
+				    to = api.config.path.image + file;
+
+				// rename and move to image folder
+				fs.copy(from, to, function (err) {
+					if (err) return api.error.general(req, res, err);
+					res.end(file);	// file will be saved by client
+				});
+			}
 		});
-		form.parse(req, function(err, fields, files) {	
-			if (err) console.log('ERR 5'.red, err);
-			if (err || !files || !files.file) return api.error.general(req, res, err || 'No files2.');
-			
-			var from = files.file.path,
-			    file = 'image-' + uuid.v4(),
-			    to = api.config.path.image + file;
-			
-			// rename and move to image folder
-			fs.rename(from, to, function (err) {
-				if (err) console.log('ERR 6'.red, err);
-				if (err) return api.error.general(req, res, err);
-				res.end(file);	// file will be saved by client
-			});		
-	 	});
 	},
+	// clientLogo : function (req, res) {
+		
+	// 	// process from-encoded upload
+	// 	var form = new formidable.IncomingForm({
+	// 		hash : 'sha1',
+	// 		multiples : true,
+	// 		keepExtensions : true,
+	// 	});
+	// 	form.parse(req, function(err, fields, files) {	
+	// 		if (err) console.log('ERR 5'.red, err);
+	// 		if (err || !files || !files.file) return api.error.general(req, res, err || 'No files2.');
+			
+	// 		var from = files.file.path,
+	// 		    file = 'image-' + uuid.v4(),
+	// 		    to = api.config.path.image + file;
+			
+	// 		// rename and move to image folder
+	// 		fs.rename(from, to, function (err) {
+	// 			if (err) console.log('ERR 6'.red, err);
+	// 			if (err) return api.error.general(req, res, err);
+	// 			res.end(file);	// file will be saved by client
+	// 		});		
+	//  	});
+	// },
 
 
 	image : function (req, res) {
@@ -992,6 +982,7 @@ module.exports = api.upload = {
 	},
 
 	getFileType : function (name) {
+		console.log('name'.yellow, name);
 		if (!name) return ['unknown', 'unknown'];
 
 		// check if folder
@@ -1013,6 +1004,13 @@ module.exports = api.upload = {
 		if (name.slice(-5) == '.jpeg') 	  return ['jpg',  'image/jpeg'];
 		if (name.slice(-4) == '.jpg') 	  return ['jpg',  'image/jpeg'];
 		if (name.slice(-4) == '.png') 	  return ['png',  'image/png'];
+		
+		// raster
+		if (name.slice(-4) == '.tif') 	  return ['tif',  'raster/tif'];
+		if (name.slice(-5) == '.tiff') 	  return ['tif',  'raster/tif'];
+		if (name.slice(-4) == '.jp2') 	  return ['jp2',  'raster/jp2'];
+		if (name.slice(-4) == '.ecw') 	  return ['ecw',  'raster/ecw'];
+		if (name.slice(-7) == '.sqlite')  return ['sqlite',  'raster/sqlite'];
 	
 		// docs
 		if (name.slice(-4) == '.pdf') 	  return ['pdf',  'application/pdf'];

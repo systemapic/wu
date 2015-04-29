@@ -429,7 +429,7 @@
 	margin-top: 0px;
 	border-bottom: none;
 	box-shadow: none;
-	background: rgba(255, 255, 255, .97);	
+	background: rgba(255, 255, 255, 0.9);	
 	}	
 	
 
@@ -1160,7 +1160,7 @@
 
 /* Description inner wrapper */
 .description-control-inner-content-box {
-	background: rgba(255, 255, 255, 0.97);
+	background: rgba(255, 255, 255, 0.9);
 	width: 320px;
 	height: 100%;
 	font-size: 100%;
@@ -1310,7 +1310,7 @@
 /* The Layer List container */
 #layer-menu-inner-content {
 	height: 100%;
-	background: rgba(255, 255, 255, 0.97);
+	background: rgba(255, 255, 255, 0.9);
 	padding: 4px;
 	position: relative;
 	padding-bottom: 5px;
@@ -1622,12 +1622,16 @@
 
 /* Inner wrapper */
 .inspect-control-inner-content {
-	background: rgba(255, 255, 255, 0.97);
+	background: rgba(255, 255, 255, 0.9);
 	padding-bottom: 1px;
 	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
 	display: none;
 	overflow: hidden;
-	}		
+	}	
+
+.inspect-control-inner-content .menucollapser {
+	background: none !important;
+	}
 	
 /* header */
 .inspector-header {
