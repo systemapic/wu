@@ -200,7 +200,7 @@ L.UtfGrid = L.Class.extend({
 	//TODO: Load from center etc
 	_update: function () {
 
-		console.error('utf update');
+		// console.error('utf update');
 
 		var bounds = this._map.getPixelBounds(),
 		    zoom = this._map.getZoom(),
