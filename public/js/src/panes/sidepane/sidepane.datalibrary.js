@@ -134,7 +134,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		if ( this.fullsize ) 	this.setSmallSize();
 
 		// Go large
-		else 			this.setFullSize();
+		else 					this.setFullSize();
 
 	},
 
