@@ -2194,9 +2194,30 @@ Wu.DataLibraryList = Wu.List.extend({
 		// DESCRIPTION TEXTAREA
 		// DESCRIPTION TEXTAREA
 
+
+		// BIND
+		var descriptionTextAreaWrapper =
+			descriptionOuterWrapper
+			.selectAll('.description-textarea-outer-wrapper')
+			.data(function(d) { return [d] });
+
+		// ENTER
+		descriptionTextAreaWrapper
+			.enter()
+			.append('div')
+			.classed('description-textarea-outer-wrapper', true);
+
+		// EXIT
+		descriptionTextAreaWrapper
+			.exit()
+			.remove();
+
+
+
+
 		// BIND
 		var descriptionTextArea =
-			descriptionOuterWrapper
+			descriptionTextAreaWrapper
 			.selectAll('.file-description-inner-wrapper')
 			.data(function(d) { return [d] });
 

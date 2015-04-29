@@ -16,7 +16,7 @@ var serverUrl   = args.serverUrl;
 var serverData  = args.serverData;
 var outfile 	= path;
 
-console.log('args: ', args);
+console.log('a2rgs: ', args);
 
 // connect
 var page = require('webpage').create(),
@@ -35,16 +35,13 @@ page.open(server, 'post', data, function (status, why) {
 	console.log('PHTANTOM SUCCESS!!');
 
 
-	// interact with page
-	page.evaluate(function(args) {
+	// // // interact with page
+	// page.evaluate(function(args) {
 		
-		console.log('doing app.phantomJS(args)');
-		console.log('args: ', args);
+	// 	// init for phantomJS
+	// 	if (app) app._setPhantomArgs(args);
 
-		// init for phantomJS
-		if (app) app.phantomJS(args);
-
-	}, args);
+	// }, args);
 
 
 
@@ -53,12 +50,18 @@ page.open(server, 'post', data, function (status, why) {
 
 	
 	waitFor(function () {
+		console.log('checking...', JSON.stringify(args));
 
 		// Check in the page if a specific element is now visible
-		return page.evaluate(function() {
+		return page.evaluate(function(args) {
+
 			if (!app) return false;
+			if (!app.Projects) return false;
+
+			if (!app._isPhantom) app.phantomJS(args);
+
 			return app.phantomReady();
-		});
+		}, args);
 	}, 
 
 	// callback
