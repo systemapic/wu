@@ -28,7 +28,7 @@
     "express.io": "^1.1.13",
     "formidable": "^1.0.17",
     "fs-extra": "^0.18.1",
-    "gdal": "^0.4.3",
+    // "gdal": "^0.4.3",
     "geojson-validation": "^0.1.5",
     "gm": "^1.17.0",
     "grunt-contrib-htmlmin": "^0.4.0",
