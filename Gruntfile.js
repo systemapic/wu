@@ -347,7 +347,7 @@ module.exports = function(grunt) {
 				src : [
 					'public/js/lib/mapbox.js/mapbox.2.1.4.js',
 					'public/js/src/controls/control.spinningmap.js',
-					'public/js/src/config/login-config.js',
+					// 'public/js/src/config/login-config.js',
 					'public/js/src/core/login.js',
 				],
 
