@@ -11,13 +11,13 @@ cd server
 if $PRODUCTIONMODE; then
 	echo 'Production mode'
 	grunt prod 
-	echo 'Running!'
-	forever server.js production >> ../log/server.log
+	echo 'Running in production mode...'
+	forever server.js production
 	
 else
 	echo 'Debug mode'
 	grunt dev 
-	echo 'Running!'
+	echo 'Running in development mode...'
 	nodemon --watch ../api --watch ../config --watch server.js --watch ../routes server.js
 fi
 cd ..
