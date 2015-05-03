@@ -580,7 +580,7 @@ module.exports = function(app, passport) {
 	// FORGOT PASSWORD =====================
 	// =====================================
 	app.post('/forgot', function (req, res) {
-		api.auth.forgotPassword(res, req);
+		api.auth.forgotPassword(req, res);
 	});
 
 
