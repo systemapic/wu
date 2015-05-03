@@ -187,7 +187,7 @@ Wu.Project = Wu.Class.extend({
 		// this.initLayers();
 
 		// init roles
-		// this.initRoles();
+		this.initRoles();
 
 		// update url
 		this._setUrl();
