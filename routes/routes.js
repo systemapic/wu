@@ -477,12 +477,12 @@ module.exports = function(app, passport) {
 	});
 
 
-	// // =====================================
-	// // RESET PASSWORD ======================
-	// // =====================================
-	// app.post('/reset', function (req, res) {
-	// 	api.auth.requestPasswordReset(req, res);
-	// });
+	// =====================================
+	// RESET PASSWORD ======================
+	// =====================================
+	app.post('/reset', function (req, res) {
+		api.auth.requestPasswordReset(req, res);
+	});
 
 
 	// // =====================================
@@ -502,8 +502,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CREATE PASSWORD =====================
 	// ===================================== 
-	app.post('/reset', function (req, res) {
-		console.log('create pas!');
+	app.post('/reset/password', function (req, res) {
+		console.log('reset pas!');
 		api.auth.createPassword(req, res);
 	});
 

@@ -59,11 +59,11 @@ module.exports = api.auth = {
 		res.render('../../views/forgot.ejs', {message : ''});
 	},
 
-	servePasswordPage : function (req, res) {
-		// todo: check token
+	// servePasswordPage : function (req, res) {
+	// 	// todo: check token
 
-		res.render('../../views/pass.ejs', {message : ''});
-	},
+	// 	res.render('../../views/pass.ejs', {message : ''});
+	// },
 
 	createPassword : function (req, res) {
 
@@ -110,38 +110,36 @@ module.exports = api.auth = {
 			} else {
 				res.end('Please check your email for password reset link..');
 			}
-			// finish
-			// res.render('../../views/login.serve.ejs', { message: 'Please check your email for further instructions.' });
 		});
 	},
 
 
-	confirmPasswordReset : function (req, res) {
-		var email = req.query.email,
-	 	    token = req.query.token;
+	// confirmPasswordReset : function (req, res) {
+	// 	var email = req.query.email,
+	//  	    token = req.query.token;
 
-		User
-		.findOne({'local.email' : email})
-		.exec(function (err, user) {
-			if (err || !user) api.error.general(req, res, err || 'No such user. Maybe. ;)');
+	// 	User
+	// 	.findOne({'local.email' : email})
+	// 	.exec(function (err, user) {
+	// 		if (err || !user) api.error.general(req, res, err || 'No such user. Maybe. ;)');
 
-			// check token
-			api.auth.checkPasswordResetToken(user, token, function (valid) {
+	// 		// check token
+	// 		api.auth.checkPasswordResetToken(user, token, function (valid) {
 
-				// reset if valid token
-				if (valid) {
-					api.auth.resetPassword(user);
-					var message = 'Please check your email for new login details.';
-				} else {
-					var message = 'Password reset token is expired.';
-				}
+	// 			// reset if valid token
+	// 			if (valid) {
+	// 				api.auth.resetPassword(user);
+	// 				var message = 'Please check your email for new login details.';
+	// 			} else {
+	// 				var message = 'Password reset token is expired.';
+	// 			}
 
-				// finish
-				// res.render('../../views/login.serve.ejs', { message : message });
-				res.render('../../views/pass.ejs', { message : message });
-			});
-		});
-	},
+	// 			// finish
+	// 			// res.render('../../views/login.serve.ejs', { message : message });
+	// 			res.render('../../views/pass.ejs', { message : message });
+	// 		});
+	// 	});
+	// },
 
 	setPassword : function (user, password, callback) {
 		user.local.password = user.generateHash(password);
@@ -152,17 +150,17 @@ module.exports = api.auth = {
 
 
 
-	resetPassword : function (user) {
-		var password = crypto.randomBytes(16).toString('hex');
-		user.local.password = user.generateHash(password);
-		user.markModified('local');
+	// resetPassword : function (user) {
+	// 	var password = crypto.randomBytes(16).toString('hex');
+	// 	user.local.password = user.generateHash(password);
+	// 	user.markModified('local');
 	
-		// save the user
-		user.save(function(err, doc) { 
-			// send email with login details to user
-			api.email.sendWelcomeEmail(user, password);
-		});
-	},
+	// 	// save the user
+	// 	user.save(function(err, doc) { 
+	// 		// send email with login details to user
+	// 		api.email.sendWelcomeEmail(user, password);
+	// 	});
+	// },
 
 
 	setPasswordResetToken : function (user) {
@@ -174,16 +172,16 @@ module.exports = api.auth = {
 		return token;
 	},
 
-	checkPasswordToken : function (token, callback) {
-		api.redis.get(token, callback);
-	},
+	// checkPasswordToken : function (token, callback) {
+	// 	api.redis.get(token, callback);
+	// },
 	
-	checkPasswordResetToken : function (user, token, callback) {
-		var key = 'resetToken-' + user.uuid;
-		api.redis.get(key, function (err, actualToken) {
-			callback(!err && actualToken && actualToken == token)
-		});
-	},
+	// checkPasswordResetToken : function (user, token, callback) {
+	// 	var key = 'resetToken-' + user.uuid;
+	// 	api.redis.get(key, function (err, actualToken) {
+	// 		callback(!err && actualToken && actualToken == token)
+	// 	});
+	// },
 
 
 

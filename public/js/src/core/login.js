@@ -69,16 +69,18 @@ function addhooks() {
 	// create password
 	var createButton = document.getElementById('create-button');
 	createButton.onclick = submitNewPassword;
+
+	// 
 }
 
-function submitNewPassword () {
-
+function submitNewPassword () {	
 	console.log('submitNewPassword');
+	if (!passwordValid || !passwordSame) return console.log('too weak');
 
 	var pass1 = document.getElementById('password-input').value;
 	var pass2 = document.getElementById('password-repeat').value;
 
-	if (pass1 != pass2) return console.log('no match');
+	if (pass1 != pass2) return console.log('not same');
 
 	var options = {
 		token : getToken(),
@@ -86,7 +88,7 @@ function submitNewPassword () {
 	}
 
 	// send to server
-	sendRequest('/reset', options, function (err, body){
+	sendRequest('/reset/password', options, function (err, body){
 		console.log('/reset', err, body);
 		var result = JSON.parse(body);
 		if (result.err) return console.error(result.err);
@@ -267,4 +269,74 @@ function debugSetPassword () {
 	http.send(JSON.stringify({debug : true}));
 }
 
+
+zxcvbn_load_hook = function () {
+	console.log('zxcvbn loaded');
+
+	var p = document.getElementById('password-input');
+	var r = document.getElementById('password-repeat');
+	var s = document.getElementById('password-strength');
+	p.onkeyup = function () {
+		var password = p.value;
+		var score = zxcvbn(password);
+		console.log(score);
+		s.innerHTML = prettyStrength(score.score);
+
+		score.score == 4 ? markStrong() : markWeak();
+		checkButton();
+	}
+
+	r.onkeyup = function () {
+		p.value == r.value ? markSame() : markNotSame();
+		checkButton();
+	}
+}
+
+function checkButton() {
+	var createButton = document.getElementById('create-button');
+	if (passwordSame && passwordValid) {
+		createButton.disabled = false;		
+	} else {
+		createButton.disabled = true;		
+	}
+}
+
+function markSame() {
+	passwordSame = true;
+	var pro = document.getElementById('password-repeat-ok');
+	pro.innerHTML = '√';
+	pro.style.color = 'green';
+}
+
+function markNotSame() {
+	passwordSame = false;
+	var pro = document.getElementById('password-repeat-ok');
+	pro.innerHTML = 'X';
+	pro.style.color = 'red';
+}
+
+var passwordValid;
+var passwordSame;
+function markWeak() {
+	passwordValid = false;
+	var pio = document.getElementById('password-input-ok');
+	pio.innerHTML = 'X';
+	pio.style.color = 'red';
+}	
+
+function markStrong() {
+	passwordValid = true;
+	var pio = document.getElementById('password-input-ok');
+	pio.innerHTML = '√';
+	pio.style.color = 'green';
+}
+
+
+function prettyStrength (s) {
+	if (s==0) return 'Password strength: <div class="red">Very Weak</div></div>';
+	if (s==1) return 'Password strength: <div class="red">Very Weak</div></div>';
+	if (s==2) return 'Password strength: <div class="red">Weak</div></div>';
+	if (s==3) return 'Password strength: <div class="blue">Medium</div></div>';
+	if (s==4) return 'Password strength: <div class="green">Strong</div></div>';
+}
 
