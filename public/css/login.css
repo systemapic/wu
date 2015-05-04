@@ -448,3 +448,6 @@ body {
 #password-strength {
 	color: white;
 }
+.red { color: red;}
+.blue { color: blue;}
+.green {color: rgb(76, 236, 76);}
