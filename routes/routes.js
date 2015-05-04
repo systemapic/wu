@@ -109,10 +109,6 @@ module.exports = function(app, passport) {
 	app.post('/api/upload', isLoggedIn, function (req, res) {
 		api.upload.chunkedUpload(req, res);
 	});
-
-
-
-
 	
 
 
@@ -496,6 +492,29 @@ module.exports = function(app, passport) {
 		api.auth.confirmPasswordReset(req, res);
 	});
 
+	// =====================================
+	// SERVE CREATE PASSWORD PAGE ==========
+	// ===================================== 
+	app.get('/createPassword', function (req, res) {
+		api.auth.servePasswordPage(req, res);
+	});
+
+	// =====================================
+	// CREATE PASSWORD =====================
+	// ===================================== 
+	app.post('/createPassword', function (req, res) {
+		console.log('create pas!');
+		api.auth.createPassword(req, res);
+	});
+
+	// =====================================
+	// ZXCVBN DICTIONARY =================
+	// ===================================== 
+	app.get('/zxcvbn.js', function (req, res) {
+		fs.readFile('../public/js/lib/zxcvbn/zxcvbn.js', function (err, data) {
+			res.send(data);
+		});
+	});
 
 	// =====================================
 	// SERVER CLIENT CONFIG ================

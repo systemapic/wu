@@ -1,0 +1,71 @@
+<!-- views/profile.ejs -->
+<!doctype html>
+<html>
+<head>
+	<title>Systemapic Authentication</title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+	<style>
+		body 		{ padding-top:80px; word-wrap:break-word; }
+		.red { color: red;}
+		.blue { color: blue;}
+		.green {color: green;}
+	</style>
+
+	<script src='js/lib/zxcvbn/zxcvbn-async.js'></script>
+
+
+	
+</head>
+<body>
+<div class="container">
+
+	
+	<div class="page-header text-center">
+		<h1><span class="fa fa-anchor"></span>Create your password</h1>
+
+		<form action="/createPassword" method="post" id="hitme">
+		<div class="form-group"><input id="password-input" type="text" class="form-control" name="password" placeholder="Enter a strong password..."></div>
+		<div id="password-strength">Password strength:</div>
+		<div class="form-group"><input type="text" class="form-control" name="password" placeholder="Repeat..."></div>
+		<button type="submit" id="login-button" class="btn btn-default" name="create">Create</button>
+		</form>
+
+		
+
+
+	</div>
+
+
+</div>
+
+<script>
+zxcvbn_load_hook = function () {
+	console.log('zxcvbn loaded');
+
+	var p = document.getElementById('password-input');
+	var s = document.getElementById('password-strength');
+	p.onkeydown = function () {
+		console.log(p);
+		var password = p.value;
+		console.log('pass:', password);
+		var score = zxcvbn(password);
+
+		s.innerHTML = 'Password strength: ' + prettyStrength(score.score);
+		console.log(score);
+	}
+
+}
+
+
+function prettyStrength (s) {
+	if (s==0) return '<div class="red">Weak</div>';
+	if (s==1) return '<div class="red">Weak</div>';
+	if (s==2) return '<div class="red">Weak</div>';
+	if (s==3) return '<div class="blue">Medium</div>';
+	if (s==4) return '<div class="green">Strong</div>';
+}
+
+</script>
+</body>
+</html>

@@ -46,6 +46,20 @@ module.exports = api.auth = {
 		res.render('../../views/forgot.ejs', {message : ''});
 	},
 
+	createPasswordPage : function (req, res) {
+		// todo: check token
+
+		res.render('../../views/pass.ejs', {message : ''});
+	},
+
+	createPassword : function (req, res) {
+
+		api.auth.setPassword(req.user, req.body.password);
+
+		console.log('createPassword', req.body);
+		res.end();
+	},
+
 
 	requestPasswordReset : function (req, res) {
 		// get email
@@ -82,12 +96,20 @@ module.exports = api.auth = {
 					api.auth.resetPassword(user);
 					var message = 'Please check your email for new login details.';
 				} else {
-					var message = 'Authorization failed. Please try again.';
+					var message = 'Password reset token is expired.';
 				}
 
 				// finish
-				res.render('../../views/login.serve.ejs', { message : message });
+				// res.render('../../views/login.serve.ejs', { message : message });
+				res.render('../../views/pass.ejs', { message : message });
 			});
+		});
+	},
+
+	setPassword : function (user, password) {
+		user.local.password = user.generateHash(password);
+		user.markModified('local');
+		user.save(function(err, doc) { 
 		});
 	},
 
@@ -121,5 +143,7 @@ module.exports = api.auth = {
 			callback(!err && actualToken && actualToken == token)
 		});
 	},
+
+
 
 }
