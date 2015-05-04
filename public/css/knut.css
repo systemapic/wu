@@ -462,3 +462,19 @@ body {
 	width: 100%;
 }
 
+
+
+
+/*small fixes*/
+
+.manage-access-roles-wrapper {
+	right: 10px;
+}
+.manage-access-current-role {
+	padding: 10px;
+}
+
+
+
+
+

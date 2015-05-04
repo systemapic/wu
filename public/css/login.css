@@ -420,3 +420,34 @@ body {
 		min-width: 445px;	
 	}
 }
+
+
+#forgot-link {
+	font-weight: 400;
+	color: white;
+	position: relative;
+	vertical-align: bottom;
+	top: 17px;
+	left: 65px;
+	font-size: 14px;
+	text-decoration: underline;
+	cursor: pointer;
+}
+#forgot-link:hover {
+	font-weight: 500;
+}
+#login-inner-wrapper {
+	display: none;
+}
+#login-forgot-wrapper {
+	display: none;
+}
+#login-password-wrapper {
+	display: none;
+}
+#password-strength {
+	color: white;
+}
+.red { color: red;}
+.blue { color: blue;}
+.green {color: rgb(76, 236, 76);}

@@ -109,10 +109,6 @@ module.exports = function(app, passport) {
 	app.post('/api/upload', isLoggedIn, function (req, res) {
 		api.upload.chunkedUpload(req, res);
 	});
-
-
-
-
 	
 
 
@@ -489,13 +485,36 @@ module.exports = function(app, passport) {
 	});
 
 
+	// // =====================================
+	// // RESET PASSWORD ======================
+	// // ===================================== 
+	// app.get('/reset', function (req, res) {
+	// 	api.auth.confirmPasswordReset(req, res);
+	// });
+
+	// // =====================================
+	// // SERVE CREATE PASSWORD PAGE ==========
+	// // ===================================== 
+	// app.get('/createPassword', function (req, res) {
+	// 	api.auth.servePasswordPage(req, res);
+	// });
+
 	// =====================================
-	// RESET PASSWORD ======================
+	// CREATE PASSWORD =====================
 	// ===================================== 
-	app.get('/reset', function (req, res) {
-		api.auth.confirmPasswordReset(req, res);
+	app.post('/reset/password', function (req, res) {
+		console.log('reset pas!');
+		api.auth.createPassword(req, res);
 	});
 
+	// =====================================
+	// ZXCVBN DICTIONARY =================
+	// ===================================== 
+	app.get('/zxcvbn.js', function (req, res) {
+		fs.readFile('../public/js/lib/zxcvbn/zxcvbn.js', function (err, data) {
+			res.send(data);
+		});
+	});
 
 	// =====================================
 	// SERVER CLIENT CONFIG ================
@@ -575,12 +594,36 @@ module.exports = function(app, passport) {
 		failureFlash : true // allow flash messages
 	}));
 
-	
+	// app.post('/loginCheck', passport.authenticate('local-login-direct', function (err, user, req) {
+	// 	if (err || !req.res) return; // todo: hanging request 
+		
+	// 	// return status
+	// 	user ? req.res.end(user.lastName) : req.res.end(null);
+	// }));
+
+	app.get('/loginCheck', function(req, res, next) {
+		passport.authenticate('local-login-direct', function(err, user, info) {
+			if (err || !user) return res.end(null);
+
+			req.logIn(user, function(err) {
+				if (err) return res.end(null);
+				return res.redirect('/');
+			});
+		
+		})(req, res, next);
+	});
+
+
+	// app.post('/debugSetPassword', function (req, res) {
+	// 	api.auth.debugSetPassword(req, res);
+	// });
+
+
 	// =====================================
 	// FORGOT PASSWORD =====================
 	// =====================================
 	app.post('/forgot', function (req, res) {
-		api.auth.forgotPassword(res, req);
+		api.auth.forgotPassword(req, res);
 	});
 
 
