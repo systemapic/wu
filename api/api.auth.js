@@ -41,12 +41,25 @@ var api = module.parent.exports;
 // exports
 module.exports = api.auth = { 
 
+	// // REMOVE!! TODO!! REMOVE!!
+	// debugSetPassword : function (req, res) {
+	// 	User
+	// 	.findOne({'local.email' : 'info@systemapic.com'})
+	// 	.exec(function (err, user) {
+
+	// 		var password = 'mEJa2EchAbAbAkayaf';
+
+	// 		api.auth.setPassword(user, password);
+
+	// 		res.end('ok');
+	// 	});
+	// },
 
 	forgotPassword : function (req, res) {
 		res.render('../../views/forgot.ejs', {message : ''});
 	},
 
-	createPasswordPage : function (req, res) {
+	servePasswordPage : function (req, res) {
 		// todo: check token
 
 		res.render('../../views/pass.ejs', {message : ''});
@@ -54,10 +67,31 @@ module.exports = api.auth = {
 
 	createPassword : function (req, res) {
 
-		api.auth.setPassword(req.user, req.body.password);
-
 		console.log('createPassword', req.body);
-		res.end();
+
+		// check token
+		var token = req.body.token;
+		var password = req.body.password;
+
+		api.redis.get(token, function (err, userUuid) {
+			if (err || !userUuid) return res.end(JSON.stringify({
+				err : err || 'Invalid token'
+			}));
+
+			User
+			.findOne({uuid : userUuid})
+			.exec(function (err, user) {
+				api.auth.setPassword(user, password, function (err, doc) {
+					res.end(JSON.stringify({
+						err : null,
+						email : user.local.email
+					}));
+
+					// delete temp token
+					api.redis.del(token);
+				});
+			})
+		});
 	},
 
 
@@ -70,11 +104,14 @@ module.exports = api.auth = {
 		.exec(function (err, user) {
 
 			// send password reset email
-			if (!err && user) api.email.sendPasswordResetEmail(user);
-
+			if (!err && user) {
+				api.email.sendPasswordResetEmail(user);
+				res.end('Please check your email for password reset link.');
+			} else {
+				res.end('Please check your email for password reset link..');
+			}
 			// finish
-			res.render('../../views/login.serve.ejs', { message: 'Please check your email for further instructions.' });
-			res.end();
+			// res.render('../../views/login.serve.ejs', { message: 'Please check your email for further instructions.' });
 		});
 	},
 
@@ -106,12 +143,13 @@ module.exports = api.auth = {
 		});
 	},
 
-	setPassword : function (user, password) {
+	setPassword : function (user, password, callback) {
 		user.local.password = user.generateHash(password);
 		user.markModified('local');
-		user.save(function(err, doc) { 
-		});
+		user.save(callback);
 	},
+
+
 
 
 	resetPassword : function (user) {
@@ -128,15 +166,18 @@ module.exports = api.auth = {
 
 
 	setPasswordResetToken : function (user) {
-		var token = crypto.randomBytes(16).toString('hex'),
-		    key = 'resetToken-' + user.uuid;
+		var token = crypto.randomBytes(20).toString('hex'),
+		    key = user.uuid;
 
-		api.redis.set(key, token);  // set temp token
-		api.redis.expire(key, 600); // expire in ten mins
+		api.redis.set(token, key);  // set temp token
+		api.redis.expire(token, 600); // expire in ten mins
 		return token;
 	},
 
-
+	checkPasswordToken : function (token, callback) {
+		api.redis.get(token, callback);
+	},
+	
 	checkPasswordResetToken : function (user, token, callback) {
 		var key = 'resetToken-' + user.uuid;
 		api.redis.get(key, function (err, actualToken) {

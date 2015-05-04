@@ -1,15 +1,270 @@
-var spinner;
-// var s = spinner;
-function spin () {
+var feedbackTimer;
 
+function initScripts() {
+	spin();
+	checkmobile();
+	addhooks();
+
+	// if token, password time
+	checkToken() ? showCreatePassword() : showLogin();
+}
+
+function checkToken() {
+	var token = getToken();
+	return token && token.length > 38;
+}
+
+function getToken() {
+	var token = window.location.search.split('=')[1];
+	console.log('token: ', token);
+	return token;
+}
+
+function spin() {
+
+	// spinning map + logo
 	var content = L.DomUtil.get('spinning-content');
 	var container = L.DomUtil.get('spinning-map');
-
-	// config
 	var config = loginConfig;
 	config.content = content;
 	config.container = container;
-
-	// create spinner
-	spinner = new L.SpinningMap(loginConfig);
+	var spinner = new L.SpinningMap(config);
 }
+
+function checkmobile() {
+
+	// mobile css
+	if (L.Browser.mobile) {
+		var styletag = document.getElementById('styletag');
+		var styleURL = '<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/mobilestyle-login.css">';
+		styletag.innerHTML = styleURL;
+	}
+}
+
+
+function addhooks() {
+
+	// forgot password link
+	var forgotLink = document.getElementById('forgot-link');
+	forgotLink.onclick = function () {
+		console.log('forgot!');
+		showForgotPassword();
+	}	
+
+	// request reset
+	var requestButton = document.getElementById('request-button');
+	requestButton.onclick = function () {
+		var forgotInput = document.getElementById('forgot-email');
+		var email = forgotInput.value;
+
+		requestReset({
+			email : email
+		}, function (err, body) {
+			console.log('err, body', err, body);
+			showLogin();
+			setFeedback(body);
+		});
+	}
+
+	// create password
+	var createButton = document.getElementById('create-button');
+	createButton.onclick = submitNewPassword;
+}
+
+function submitNewPassword () {
+
+	console.log('submitNewPassword');
+
+	var pass1 = document.getElementById('password-input').value;
+	var pass2 = document.getElementById('password-repeat').value;
+
+	if (pass1 != pass2) return console.log('no match');
+
+	var options = {
+		token : getToken(),
+		password : pass1,
+	}
+
+	// send to server
+	sendRequest('/reset', options, function (err, body){
+		console.log('/reset', err, body);
+		var result = JSON.parse(body);
+		if (result.err) return console.error(result.err);
+
+		var form = document.getElementById('login-form');
+		var e = document.getElementById('input-email');
+		var p = document.getElementById('input-pass');
+
+		// auto login after success
+		e.value = result.email;
+		p.value = pass1;
+		form.submit();
+	});
+
+}
+
+function sendRequest(entryPoint, options, callback) {
+	var http = new XMLHttpRequest(),
+	    url = window.location.origin + entryPoint;
+	http.open("POST", url, true);
+	http.setRequestHeader('Content-type', 'application/json');
+	http.onreadystatechange = function() {
+		if (http.readyState == 4 && http.status == 200) {
+			callback && callback(null, http.responseText); 
+		}
+	}
+	http.send(JSON.stringify(options));
+}
+
+function requestReset (options, callback) {
+
+	var http = new XMLHttpRequest(),
+	    url = window.location.origin + '/reset';
+
+	http.open("POST", url, true);
+
+	//Send the proper header information along with the request
+	http.setRequestHeader('Content-type', 'application/json');
+
+	http.onreadystatechange = function() {
+		if (http.readyState == 4 && http.status == 200) {
+
+			// callback
+			callback && callback(null, http.responseText); 
+		}
+	}
+
+	http.send(JSON.stringify(options));
+}
+
+function hideAll() {
+	hideLogin();
+	hideForgotPassword();
+	hideCreatePassword();
+}
+
+function hideForgotPassword() {
+	var forgotDiv = document.getElementById('login-forgot-wrapper');
+	forgotDiv.style.display = 'none';
+}
+
+function showForgotPassword() {
+	hideAll();
+	var forgotDiv = document.getElementById('login-forgot-wrapper');
+	forgotDiv.style.display = 'block';
+}
+
+function hideLogin() {
+	var loginWrap = document.getElementById('login-inner-wrapper');
+	loginWrap.style.display = 'none';
+}
+
+function showLogin() {
+	hideAll();
+	var loginWrap = document.getElementById('login-inner-wrapper');
+	loginWrap.style.display = 'block';
+}
+
+function hideCreatePassword() {
+	var p = document.getElementById('login-password-wrapper');
+	p.style.display = 'none';
+}
+
+function showCreatePassword() {
+	var p = document.getElementById('login-password-wrapper');
+	p.style.display = 'block';
+}
+
+function missingInfo () {
+	setFeedback('Please provide both email and password.')
+}
+
+function setFeedback (msg) {
+	var msgBox = document.getElementById('feedback-message');
+	msgBox.innerHTML = msg;
+	feedbackTimer = setTimeout(clearFeedback, 10000);
+}
+
+function clearFeedback () {
+	var msgBox = document.getElementById('feedback-message');
+	msgBox.innerHTML = '';
+	feedbackTimer && clearTimeout(feedbackTimer);
+}
+
+function loginClick () {
+	clearFeedback();
+
+	var inputPass = document.getElementById('input-pass');
+	var inputEmail = document.getElementById('input-email');
+	var password = inputPass.value;
+	var email = inputEmail.value;
+
+	if (!password || !email) return missingInfo();
+
+	var options = {
+		password : password,
+		email : email
+	}
+
+	sendLoginCheck(options, function (err, authenticated) {
+		console.log('/loginCheck ok?', err, authenticated);
+
+		if (authenticated) {
+			console.log('hello ', authenticated.name);
+			setFeedback('Authenticated!', authenticated.name);
+
+			// var form = document.getElementById('login-form');
+			// form.action = '/login';
+			// form.submit();
+
+		} else {
+			console.log('not auth!');
+			setFeedback('Not authenticated!');
+		}
+
+	});
+}
+
+function sendLoginCheck (options, callback) {
+
+	var http = new XMLHttpRequest(),
+	    url = window.location.origin + '/loginCheck';
+
+	http.open("POST", url, true);
+
+	//Send the proper header information along with the request
+	http.setRequestHeader('Content-type', 'application/json');
+
+	http.onreadystatechange = function() {
+		if (http.readyState == 4 && http.status == 200) {
+
+			// callback
+			callback && callback(null, http.responseText); 
+		}
+	}
+
+	http.send(JSON.stringify(options));
+}
+
+function debugSetPassword () {
+
+	var http = new XMLHttpRequest(),
+	    url = window.location.origin + '/debugSetPassword';
+
+	http.open("POST", url, true);
+
+	//Send the proper header information along with the request
+	http.setRequestHeader('Content-type', 'application/json');
+
+	http.onreadystatechange = function() {
+		if (http.readyState == 4 && http.status == 200) {
+
+			// callback
+			callback && callback(null, http.responseText); 
+		}
+	}
+
+	http.send(JSON.stringify({debug : true}));
+}
+
+
