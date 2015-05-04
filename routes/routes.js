@@ -477,32 +477,32 @@ module.exports = function(app, passport) {
 	});
 
 
-	// =====================================
-	// RESET PASSWORD ======================
-	// =====================================
-	app.post('/reset', function (req, res) {
-		api.auth.requestPasswordReset(req, res);
-	});
+	// // =====================================
+	// // RESET PASSWORD ======================
+	// // =====================================
+	// app.post('/reset', function (req, res) {
+	// 	api.auth.requestPasswordReset(req, res);
+	// });
 
 
-	// =====================================
-	// RESET PASSWORD ======================
-	// ===================================== 
-	app.get('/reset', function (req, res) {
-		api.auth.confirmPasswordReset(req, res);
-	});
+	// // =====================================
+	// // RESET PASSWORD ======================
+	// // ===================================== 
+	// app.get('/reset', function (req, res) {
+	// 	api.auth.confirmPasswordReset(req, res);
+	// });
 
-	// =====================================
-	// SERVE CREATE PASSWORD PAGE ==========
-	// ===================================== 
-	app.get('/createPassword', function (req, res) {
-		api.auth.servePasswordPage(req, res);
-	});
+	// // =====================================
+	// // SERVE CREATE PASSWORD PAGE ==========
+	// // ===================================== 
+	// app.get('/createPassword', function (req, res) {
+	// 	api.auth.servePasswordPage(req, res);
+	// });
 
 	// =====================================
 	// CREATE PASSWORD =====================
 	// ===================================== 
-	app.post('/createPassword', function (req, res) {
+	app.post('/reset', function (req, res) {
 		console.log('create pas!');
 		api.auth.createPassword(req, res);
 	});
@@ -594,7 +594,31 @@ module.exports = function(app, passport) {
 		failureFlash : true // allow flash messages
 	}));
 
-	
+	// app.post('/loginCheck', passport.authenticate('local-login-direct', function (err, user, req) {
+	// 	if (err || !req.res) return; // todo: hanging request 
+		
+	// 	// return status
+	// 	user ? req.res.end(user.lastName) : req.res.end(null);
+	// }));
+
+	app.get('/loginCheck', function(req, res, next) {
+		passport.authenticate('local-login-direct', function(err, user, info) {
+			if (err || !user) return res.end(null);
+
+			req.logIn(user, function(err) {
+				if (err) return res.end(null);
+				return res.redirect('/');
+			});
+		
+		})(req, res, next);
+	});
+
+
+	// app.post('/debugSetPassword', function (req, res) {
+	// 	api.auth.debugSetPassword(req, res);
+	// });
+
+
 	// =====================================
 	// FORGOT PASSWORD =====================
 	// =====================================

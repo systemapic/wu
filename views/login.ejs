@@ -5,8 +5,6 @@
 <title>Systemapic Authentication</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-
-
 		<!-- @if NODE_ENV == 'DEVELOPMENT' -->
 
 			<!-- stylesheet -->
@@ -35,13 +33,12 @@
 
 
 <style>
+
 </style>
 </head>
 <body>
 
 	<div id="styletag"></div>
-
-
 
 	<div id="spinning-map"></div>
 	<div id="spinning-content">
@@ -57,31 +54,45 @@
 						<div class="alert alert-danger"><%= message %></div>
 					<% } %>
 
-					<form action="/login" method="post" id="hitme">
-						<div class="form-group"><input type="text" class="form-control" name="email" placeholder="Enter email..."></div>
-						<div class="form-group"><input type="password" class="form-control" name="password" placeholder="Enter password..."></div>
+					<div class="alert alert-danger" id="feedback-message"></div>
+
+					<form action="/login" method="post" id="login-form">
+						<div class="form-group"><input id="input-email" type="text" class="form-control" name="email" placeholder="Enter email..."></div>
+						<div class="form-group"><input id="input-pass" type="password" class="form-control" name="password" placeholder="Enter password..."></div>
 						<button type="submit" id="login-button" class="btn btn-default" name="login">Login</button>
-						<button type="submit" id="forgot-password" onclick="javascript: form.action='/forgot';">Forgot password?</button>
+						<!-- <button type="submit" id="forgot-password" onclick="javascript: form.action='/forgot';">Forgot password?</button> -->
+						<!-- <button id="login-button" class="btn btn-default" name="login">Login</button> -->
+						<!-- <button id="forgot-password" onclick="javascript: form.action='/forgot';">Forgot password?</button> -->
+
+						<div id="forgot-link">Forgot password?</div>
 					</form>
 				</div>
+
+
+				<div id="login-forgot-wrapper">
+					<h1 style="font-size: 25px;"><span class="secure-login-symbol"></span> Reset password</h1>
+					<input id="forgot-email" type="text" class="form-control" name="email" placeholder="Please enter your email...">
+					<button type="submit" id="request-button" class="btn btn-default" name="login">Confirm</button>
+				</div>	
+
+				<div id="login-password-wrapper" class="page-header text-center">
+					<h1><span class="fa fa-anchor"></span>Create your password</h1>
+
+					<div class="form-group"><input id="password-input" type="text" class="form-control" name="password" placeholder="Enter a strong password..."></div>
+					<div class="form-group"><input id="password-repeat" type="text" class="form-control" name="password" placeholder="Enter password again..."></div>
+					<div id="password-strength">Password strength:</div>
+					<button type="submit" id="create-button" class="btn btn-default" name="create">Create</button>
+
+				</div>
 			</div>
+
+
 		</div>
 	</div>
 
-	<script> spin(); 
-
-		if (L.Browser.mobile) {
-			var styletag = document.getElementById('styletag');
-			var styleURL = '<link rel="stylesheet" href="https://projects.ruppellsgriffon.com/css/mobilestyle-login.css">';
-			styletag.innerHTML = styleURL;
-		}
-
-
-
-
+	<script>
+		initScripts();
 	</script>
-
-
 
 
 	<script type="text/javascript">

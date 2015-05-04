@@ -80,7 +80,8 @@ module.exports = api.email = {
 		var name    = user.firstName + ' ' + user.lastName;
 		var email   = user.local.email;
 		var token   = api.auth.setPasswordResetToken(user);
-		var link    = api.config.portalServer.uri + 'reset?email=' + email + '&token=' + token;
+		// var link    = api.config.portalServer.uri + 'reset?email=' + email + '&token=' + token;
+		var link = api.config.portalServer.uri + 'login?token=' + token;
 
 		console.log('link: ', link);
 
