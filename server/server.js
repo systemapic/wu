@@ -62,6 +62,7 @@ app.use(favicon(__dirname + '/../dist/css/favicon.ico'));
 app.use(compress());
 app.use(cors());
 
+
 // static files
 var staticPath = prodMode ? '../dist' : '../public';
 app.use(express.static(path.join(__dirname, staticPath)));
@@ -71,6 +72,11 @@ require('../routes/routes.js')(app, passport);
 
 // load our socket api
 require('../routes/socket.routes.js')(app, passport);
+
+// catch route errors
+app.use(function(err, req, res, next){ 
+	err.status === 400 ? res.render('../../views/index.ejs') : next(err);
+});
 
 // launch 
 var server = app.listen(port);
