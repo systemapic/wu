@@ -3414,8 +3414,9 @@ Wu.UserList = Wu.List.extend({
 
 		console.log('projects', projects);
 
+		var html = divProjectsOpen + numProjects + projectsText + divProjectsClose;
 
-		return divProjectsOpen + numProjects + projectsText + divProjectsClose;
+		return html;
 
 
 	},

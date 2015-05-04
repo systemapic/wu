@@ -2,28 +2,32 @@
 <!doctype html>
 <html>
 <head>
-<title>Systemapic Authentication</title>
-<link href='dist/css.login.min.css' rel='stylesheet' />
-<!-- <script src="dist/combined/login.min.js"></script> -->
+	<title>Systemapic Authentication</title>
+	
+	<!-- stylesheet -->
+	<link href='css/mapbox.css' rel='stylesheet' />
+	<link href='css/login.css' rel='stylesheet' />
 
-<script src='js/lib/mapbox.js/mapbox.2.1.4.js'></script>
-<script src='js/lib/mapbox-gl.js/mapbox-gl.js'></script>
-<script src='js/src/controls/spinningMap.js'></script>
-<script src='js/src/core/login.js'></script>
+	<!-- javascript -->
+	<script src='js/lib/mapbox.js/mapbox.2.1.4.js'></script>
+	<script src='js/src/controls/control.spinningmap.js'></script>
+	<script src='/loginConfig.js'></script>			
+	<script src='js/src/core/login.js'></script>
+	
+	<style>
+	.form-control {
+		font-size: 100%;
+	}
+	</style>
 
-<style>
-.form-control {
-	font-size: 100%;
-}
-</style>
 </head>
 <body>
 	<div id="spinning-map"></div>
 	<div id="spinning-content">
 		<div class="col-sm-6 col-sm-offset-3">
-			<div id="powered-by">Powered by<a href="http://systemapic.com">Systemapic.com ©</a></div>
+			<div id="powered-by">Powered by<a href="http://systemapic.com" target="_blank">Systemapic.com ©</a></div>
 			<div id="login-logo"></div>
-			<h1 style="font-size: 25px;"><span class="secure-login-symbol"></span> Reset your password</h1>
+			<h1 style="font-size: 25px;"><span class="secure-login-symbol"></span>Request a password reset.</h1>
 
 			<% if (message.length > 0) { %>
 				<div class="alert alert-danger"><%= message %></div>

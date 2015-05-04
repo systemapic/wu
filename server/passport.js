@@ -124,6 +124,44 @@ module.exports = function(passport) {
 		});
 	}));
 
+	// new login flow
+	passport.use('local-login-direct', new LocalStrategy({
+		// by default, local strategy uses username and password, we will override with email
+		usernameField : 'email',
+		passwordField : 'password',
+		passReqToCallback : true // allows us to pass back the entire request to the callback
+	},
+	function(req, email, password, done) { // callback with email and password from our form
+	  
+		// find a user whose email is the same as the forms email
+		// we are checking to see if the user trying to login already exists
+		User.findOne({ 'local.email' :  email }, function(err, user) {
+
+			console.log('found user: ', user, password);
+
+			// if there are any errors, return the error before anything else
+			if (err) return done(err, false);
+
+			// if no user is found, return the message
+			if (!user) return done(null, false);
+
+			// if the user is found but the password is wrong
+			if (!user.validPassword(password)) return done(null, false); // create the loginMessage and save it to session as flashdata
+
+			// set token, save to user
+			user.token = setRedisToken(user);
+			user.save(function (err) {
+				if (err) console.error(err);
+
+				// slack
+				api.slack.loggedIn({user : user});
+
+				// all is well, return successful user
+				return done(null, user);
+			});
+		});
+	}));
+
 	
 
 	// tiles access token
