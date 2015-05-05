@@ -11,7 +11,7 @@ var favicon  = require('serve-favicon');
 var cors     = require('cors');
 var morgan   = require('morgan');
 var session  = require('express-session');
-var prodMode = process.argv[2] == 'production';
+var prodMode = process.argv[2] == 'prod';
 var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser'); 
