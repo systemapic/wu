@@ -2669,33 +2669,39 @@ td.tdcont.createdDate {
 
 .fullpage-users.minimal .users-inner,
 .data-library.minimal .data-library-inner {
-	min-height: 430px;
-	/*max-height: 650px;*/
-	max-height: 530px;
+	/*min-height: 430px;*/
+	/*max-height: 530px;*/
+
+	height: 530px;
+
 	overflow: hidden;
-	}
-
-/* Sausage control */
-/*.data-library.minimal .data-library-inner {
-	max-height: 530px;
-	}*/
-
-.fullpage-users.minimal {
-	min-height: 430px;
-	max-height: 650px;
-	padding-bottom: 3px;
-	overflow: hidden;	
 	}
 
 .fullpage-users.minimal,
 .data-library.minimal {
-	/*max-width: 690px;*/
-	max-width: 600px;
+	/*min-height: 430px;*/
+	/*max-height: 530px;*/
+
+	height: 530px;
+	padding-bottom: 3px;
+	overflow: hidden;	
+	}	
+
+.fullpage-users.minimal,
+.data-library.minimal {
+	max-width: 495px;
+	padding-right: 5px;
 	}
 
-.data-library.minimal {
-	padding-right: 112px;
-	}
+.data-library.minimal .fullscreen-drop {
+	display: none;
+	}	
+
+
+
+
+
+
 
 /* EXPAND/COLLAPSE BUTTON */
 /* EXPAND/COLLAPSE BUTTON */
@@ -3096,6 +3102,7 @@ td.tdcont.createdDate {
 
 .minimal .manage-access-title {
 	font-size: 20px;
+	line-height: 1;
 	}	
 
 /* User subtitle */
@@ -3266,15 +3273,18 @@ td.tdcont.createdDate {
 	z-index: 999999999;
 	/*padding: 12px 25px;*/
 
-	position: relative;
+	/*position: relative;*/
+	position: absolute;
 	width: 68px;
 	height: 28px;
 	padding: 0;
 	line-height: 2.3;
 	float: right;
 	font-size: 12px;
-	top: -5px;
-	right: -4px;	
+	/*top: -5px;*/
+	/*right: -4px;	*/
+	right: 7px;
+  	bottom: 10px;
 	}
 
 .manage-access-button-done:before {
