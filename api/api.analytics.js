@@ -39,9 +39,6 @@ var ua 		= require('universal-analytics');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
-var ua = require('universal-analytics');
-
-
 // api
 var api = module.parent.exports;
 
@@ -49,7 +46,9 @@ var api = module.parent.exports;
 module.exports = api.analytics = { 
 
 	set : function (req, res) {
+		console.time('ga set');
 		var options = req.body;
+		console.log('ga set options'.red, options);
 		// called from routes.js:64, /api/analytics/set
 
 		if (!options) return api.error.missingInformation(req, res);
@@ -87,20 +86,18 @@ module.exports = api.analytics = {
 		var clientID   = userHeader.clientID;   // The same as user id
 
 		// Create GA user instance
+		console.time('gaInstance');
 		var visitor = ua(trackingID, clientID, {
+		
 
 			// This is because we're not using
 			// GOOGLE's preferred format
 			strictCidFormat: false
 
-
 		});
-
-
-
+		console.timeEnd('gaInstance');
 
 		// TRACKING PAGEVIEWS
-
 		if ( gaPageview ) {
 
 			// OPTIONS
@@ -187,6 +184,9 @@ module.exports = api.analytics = {
 			});
 
 		}
+
+		console.timeEnd('ga set');
+
 
 	},
 
