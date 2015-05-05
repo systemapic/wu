@@ -8,6 +8,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	onAdd : function (map) {
+
 		var className = 'leaflet-control-layermenu',
 		    container = this._innerContainer = L.DomUtil.create('div', className),
 		    options   = this.options;
@@ -45,6 +46,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	_refresh : function () {
 
+
 		// should be active
 		if (!this._added) this._addTo();
 
@@ -62,6 +64,10 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// close by default
 		this.closeAll();
+
+		// Set max height
+		var dimensions = app._getDimensions();
+		this.resizeEvent(dimensions);		
 	},
 
 	_isActive : function () {
@@ -243,6 +249,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 
 	setMaxHeight : function (layersMaxHeight) {
+
 		var layersMaxHeight = layersMaxHeight || window.innerHeight - 135;
 
 		// Make space for inspect control, if it's there, yo
@@ -251,6 +258,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		if (inspectControl) {
 
 			var inspectorHeight = inspectControl._container.offsetHeight;
+
 			layersMaxHeight -= inspectorHeight - 5;
 		}
 
@@ -292,6 +300,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	toggleLayerPane : function () {
 		this._open ? this.closeLayerPane() : this.openLayerPane();
+
 	},
 
 	_GAcloseLayerPane : function () {
@@ -401,6 +410,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		// open all items in layermenu
 		this.openAll();
 
+		// Set max height
+		var dimensions = app._getDimensions();
+		    dimensions.height -= 45;
+		this.resizeEvent(dimensions);			
+
 	},
 
 
@@ -437,6 +451,11 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// remove new drag'n drop folder
 		this._removeMenuFolder();
+
+
+		// Set max height
+		var dimensions = app._getDimensions();
+		this.resizeEvent(dimensions);		
 		
 	},
 	
@@ -914,13 +933,13 @@ L.Control.Layermenu = Wu.Control.extend({
 	// disable by layermenuItem
 	disableLayer : function (layermenuItem) {
 		var layer = layermenuItem.layer;
-		if (!layer) return;
+		if (!layer) return;	
+
+		this._disableLayer(layer);
 
 		// Make room for Layer inspector
 		var dimensions = app._getDimensions();
 		this.resizeEvent(dimensions);		
-
-		this._disableLayer(layer);
 	},
 
 	// disable by layer

@@ -489,7 +489,10 @@ module.exports = api.geo = {
 				console.log('ppgdal2tiles:'.green, stdout);
 				if (err) {
 					console.log('gdal2tiles err: '.red + err);
-					return callback(err);
+					
+					api.error.log(err);
+					var errMsg = 'There was an error generating tiles for this raster image. Please check #error-log for more information.'
+					return callback(errMsg);
 				}
 
 				// return as db entry

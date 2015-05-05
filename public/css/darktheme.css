@@ -9,11 +9,11 @@
 
 
 .map-blur {
-	opacity: 1;
+	/*opacity: 1;*/
 	}
 
 .map-blur:after {
-	background: rgba(255,255,255,0.5);	
+	/*background: rgba(255,255,255,0.5);	*/
 	}
 
 
