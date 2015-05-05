@@ -13,7 +13,7 @@ if $PRODUCTIONMODE; then
 	grunt prod 
 	echo 'Running in production mode...'
 	# forever server.js prod
-	nodemon server.js
+	nodemon server.js prod
 	
 else
 	echo 'Debug mode'
