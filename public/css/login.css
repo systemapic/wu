@@ -275,6 +275,8 @@
 	padding-left: 520px;
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;	
+
+	padding-right: 30px;
 	}
 
 /* Login title */
@@ -292,8 +294,11 @@
 	width: 220px;
 	}
 
-#form-group {
+#form-group,
+.form-group {
 	width: 100%
+	box-sizing: border-box;
+  	padding-right: 10px;
 	}
 
 .form-control {
@@ -303,7 +308,8 @@
 	border: none;
 	}
 
-#login-button {
+#login-button,
+#request-button {
 	background: white;
 	border: none;
 	padding: 3px 10px 4px 10px;
@@ -315,7 +321,8 @@
 	cursor: pointer;
 	}
 
-#login-button:hover {
+#login-button:hover,
+#request-button:hover {
 	background: #DADADA;
 	}
 
@@ -428,26 +435,35 @@ body {
 	position: relative;
 	vertical-align: bottom;
 	top: 17px;
-	left: 65px;
+	/*left: 65px;*/
+	left: 0px;
 	font-size: 14px;
 	text-decoration: underline;
 	cursor: pointer;
-}
+	}
+
 #forgot-link:hover {
-	font-weight: 500;
-}
+	/*font-weight: 500;*/
+	}
+
 #login-inner-wrapper {
 	display: none;
-}
+	}
+
 #login-forgot-wrapper {
 	display: none;
-}
+	padding-right: 10px;
+  	box-sizing: border-box;
+	}
+
 #login-password-wrapper {
 	display: none;
-}
+	}
+
 #password-strength {
 	color: white;
-}
-.red { color: red;}
-.blue { color: blue;}
-.green {color: rgb(76, 236, 76);}
+	}
+
+.red 	{color: red;}
+.blue 	{color: blue;}
+.green 	{color: rgb(76, 236, 76);}
