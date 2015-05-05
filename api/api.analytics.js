@@ -132,8 +132,9 @@ module.exports = api.analytics = {
 
 			}
 
-
+			console.time('pageview');
 			visitor.pageview(pageviewParams, function (err) {
+			console.timeEnd('pageview');
 
 				// return to client
 				res.end(JSON.stringify({
@@ -173,7 +174,9 @@ module.exports = api.analytics = {
 
 
 			// visitor.event(eventParams).send();
+			console.time('pageevent');
 			visitor.event(eventParams, function (err) {
+			console.timeEnd('pageevent');
 				
 				// return to client
 				res.end(JSON.stringify({
