@@ -1,24 +1,23 @@
 #!/bin/bash
 
 if [ "$1" == "prod" ];then
-	PRODUCTIONMODE=true
+	PRODMODE=true
 else 
-	PRODUCTIONMODE=false	
+	PRODMODE=false	
 fi;
 
 cd server
 
-if $PRODUCTIONMODE; then
+if $PRODMODE; then
 	echo 'Production mode'
 	grunt prod 
 	echo 'Running in production mode...'
-	# forever server.js prod
-	nodemon server.js prod
-	
+	forever server.js prod
 else
 	echo 'Debug mode'
 	grunt dev 
 	echo 'Running in development mode...'
 	nodemon --watch ../api --watch ../config --watch server.js --watch ../routes server.js
 fi
+
 cd ..
