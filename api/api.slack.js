@@ -26,7 +26,7 @@ var exec 	= require('child_process').exec;
 var dive 	= require('dive');
 var async 	= require('async');
 var carto 	= require('carto');
-var nodeSlack 	= require('node-slack');
+var nodeSlack 	= require('../tools/slack');
 var crypto      = require('crypto');
 var fspath 	= require('path');
 var mapnik 	= require('mapnik');
@@ -53,6 +53,9 @@ module.exports = api.slack = {
 		    attachments = options.attachments,
 		    icon = options.icon,
 		    channel = options.channel;
+
+
+		console.log('slack send'.red, options);
 
 		// send to slack
 		slack.send({

@@ -3094,6 +3094,10 @@ td.tdcont.createdDate {
 	text-align: center;
 	}
 
+.minimal .manage-access-title {
+	font-size: 20px;
+	}	
+
 /* User subtitle */
 .manange-access-subtitle {
 	text-align: center;
@@ -3228,6 +3232,7 @@ td.tdcont.createdDate {
 .manage-access-current-role {
 	/*font-size: 120%;*/
 	/*border: 1px solid blue;*/
+	max-width: 200px;
 	}
 
 
@@ -3743,7 +3748,7 @@ td.tdcont.createdDate {
 	font-size: 12px;
 	color: #666;
 	line-height: 1.2;
-	height: 130px;
+	height: 134px;
 	overflow: hidden;	
 	border-left: 1px dashed rgba(255,255,255,0.5);
 	padding-left: 10px;
@@ -3775,6 +3780,7 @@ td.tdcont.createdDate {
 .file-description-outer-wrapper,
 .file-other-meta-wrapper {
 	width: 50%;
+	width: 100%;
 	height: 100%;
 	border-left: 1px dashed rgba(255,255,255,0.5);
 	position: relative;
@@ -3782,6 +3788,11 @@ td.tdcont.createdDate {
 	display: inline-block;
 	vertical-align: top;
 	}
+
+.file-description-outer-wrapper	{
+	height: 129px;
+	border-left: none !important;
+}
 
 .file-description-outer-wrapper {
 	padding: 10px;
@@ -3795,13 +3806,14 @@ td.tdcont.createdDate {
 
 
 .minimal .file-other-meta-wrapper {
-	display: none !important;
+	/*display: none !important;*/
 	}
 
 
 .file-description-inner-wrapper {
 	background: transparent;
-	height: 151px;
+	/*height: 151px;*/
+	height: 95px;
 	padding: 0;
 	font-size: 12px;
 	overflow: scroll;
@@ -3923,6 +3935,6 @@ td.tdcont.createdDate {
 	}	
 
 	.file-copright-wrapper {
-		width: 221px;
+		width: 250px;
 	}	
 }	
