@@ -21,12 +21,12 @@ var config = api.config;
 var port = config.port;
 
 // mute console in production mode
-if (prodMode) {
-	var nullFn = function () {};
-	console.log = nullFn;
-	console.time = nullFn;
-	console.timeEnd = nullFn;
-}
+// if (prodMode) {
+// 	var nullFn = function () {};
+// 	console.log = nullFn;
+// 	console.time = nullFn;
+// 	console.timeEnd = nullFn;
+// }
 
 // socket enabled server
 app = express().http().io()
