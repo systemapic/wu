@@ -14,8 +14,9 @@ if $PRODMODE; then
 	echo 'Running in production mode...'
 	forever server.js prod
 else
-	echo 'Debug mode'
+	echo 'Development mode'
 	grunt dev 
+	grunt watch &
 	echo 'Running in development mode...'
 	nodemon --watch ../api --watch ../config --watch server.js --watch ../routes server.js
 fi

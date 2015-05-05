@@ -41,8 +41,9 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 	// add layers to layermenu list in sidepane
 	addLayer : function (layer) {
 
+
 		// create and append div
-		var container = Wu.DomUtil.create('div', 'item-list select-elem ct0', this._outer);
+		var container = Wu.DomUtil.create('div', 'item-list select-elem', this._outer);
 
 		// create and set title
 		var text = Wu.DomUtil.create('div', 'item-list-inner-text', container);
@@ -123,6 +124,8 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 	},
 
 	calculateHeight : function () {
+
+
 		var min = _.size(this.project.getBaselayers());
 		var padding = this.numberOfProviders * 35;
 		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
@@ -133,6 +136,7 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 	},
 
 	toggle : function (layer) {
+
 		var layerMenu = app.MapPane.getControls().layermenu;
 
 		// enable edit if editor

@@ -475,8 +475,11 @@ module.exports = api.upload = {
 
 						// process shapefile (convert, store, vectorize, etc.)
 						api.file.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
-							if (err) console.log('ERR 29'.red, err);
-							if (err) return callback(err);
+							if (err) {
+								console.log('ERR 29'.red, err);
+								api.error.log(err);
+								return callback('Unable to handle shapefile format properly. Please see #error-log for details.')
+							}
 
 							// populate db entry
 							db = db || {};
@@ -497,8 +500,11 @@ module.exports = api.upload = {
 
 						// puts file in folder
 						api.file.handleImage(options.path, options.name, options.fileUuid, function (err, db) {
-							if (err) console.log('ERR 30'.red, err);
-							if (err) return callback(err);
+							if (err) {
+								console.log('ERR 30'.red, err);
+								api.error.log(err);
+								return callback('Unable to handle image format properly. Please see #error-log for details.')
+							}
 
 							// populate db entry
 							db = db || {};
@@ -520,8 +526,9 @@ module.exports = api.upload = {
 
 						api.geo.handleRaster(options, function (err, db) {
 							if (err) {
-								console.log('ERR 98:'.red, err);
-								return callback(err);
+								console.log('ERR 944'.red, err);
+								api.error.log(err);
+								return callback('Unable to handle raster format properly. Please see #error-log for details.')
 							}
 
 							// populate db entry
@@ -547,8 +554,11 @@ module.exports = api.upload = {
 
 						// processes geojson, puts file in folder
 						api.file.handleJson(options.path, options.name, options.extension, options.fileUuid, function (err, db) {
-							if (err) console.log('ERR 31'.red, err);
-							if (err) return callback(err);
+							if (err) {
+								console.log('ERR 301'.red, err);
+								api.error.log(err);
+								return callback('Unable to handle geojson format properly. Please see #error-log for details.')
+							}
 							
 							// populate db entry
 							db = db || {};
@@ -570,8 +580,11 @@ module.exports = api.upload = {
 
 						// puts file in folder
 						api.file.handleDocument(options.path, options.name, options.fileUuid, function (err, db) {
-							if (err) console.log('ERR 32'.red, err);
-							if (err) return callback(err);
+							if (err) {
+								console.log('ERR 32'.red, err);
+								api.error.log(err);
+								return callback('Unable to handle document format properly. Please see #error-log for details.')
+							}
 
 							// populate db entry
 							db = db || {};
@@ -614,8 +627,11 @@ module.exports = api.upload = {
 				}
 
 				api.upload.sortZipFolder(opt, function (err, dbs) {	// gets [db]
-					if (err) console.log('ERR 34'.red, err);
-					if (err) return callback(err);
+					if (err) {
+						console.log('ERR 30'.red, err);
+						api.error.log(err);
+						return callback('Unable to handle zip format properly. Please see #error-log for details.')
+					}
 					callback(null, dbs);
 				});
 			});

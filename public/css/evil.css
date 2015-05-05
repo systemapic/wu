@@ -1,16 +1,16 @@
 .map-blur {
-	opacity: 1;
+	/*opacity: 1;*/
 	}
 
 .map-blur:after {
-	content: '';
+/*	content: '';
 	position: absolute;
 	width: 100%;
 	height: 100%;
 	left: 0;
 	top: 0;
 	background: rgba(0,0,0,0.7);	
-	z-index: 9999;
+	z-index: 9999;*/
 	}
 
 .home-container,
@@ -155,33 +155,37 @@ aka feedback pane
 /***************************************************************************/
 
 .description-textarea-outer-wrapper {
-  overflow: hidden;
-}
+	overflow: hidden;
+	}
 
 .file-description-inner-wrapper {
 	overflow-y: scroll;
 	overflow-x: hidden;
 	width: 120%;
 	padding-right: 20%;
-}
-
+	}
 
 .minimal .file-description-outer-wrapper {
-	  width: 100%;
-}
+	width: 100%;
+	height: 145px;
+	}
+
+.minimal .file-description-inner-wrapper {
+	height: 110px;
+	}
 
 .minimal .list-attribute-wrapper {
 	height: 33px;
-}
+	}
 
 .minimal .open-list-info {
-	  height: 206px;
- 		top: 34px;
-}
+	height: 206px;
+ 	top: 34px;
+	}
 
 .minimal .file-list-wrapper {
 	height: 151px;
-}
+	}
 
 .manage-access-container {
 	overflow-y: scroll;
