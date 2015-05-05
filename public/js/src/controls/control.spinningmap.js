@@ -182,7 +182,7 @@ L.SpinningMap = L.Class.extend({
 
 	addHooks : function () {
 		var map = this._map;
-		map.on('resize', this._onResize.bind(this));
+		// map.on('resize', this._onResize.bind(this));
 	},
 
 	removeHooks : function () {

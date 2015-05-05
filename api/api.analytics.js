@@ -26,7 +26,7 @@ var exec 	= require('child_process').exec;
 var dive 	= require('dive');
 var async 	= require('async');
 var carto 	= require('carto');
-var nodeSlack 	= require('node-slack');
+var nodeSlack 	= require('../tools/slack');
 var crypto      = require('crypto');
 var fspath 	= require('path');
 var mapnik 	= require('mapnik');
@@ -132,8 +132,9 @@ module.exports = api.analytics = {
 
 			}
 
-
+			console.time('pageview');
 			visitor.pageview(pageviewParams, function (err) {
+			console.timeEnd('pageview');
 
 				// return to client
 				res.end(JSON.stringify({
@@ -173,7 +174,9 @@ module.exports = api.analytics = {
 
 
 			// visitor.event(eventParams).send();
+			console.time('pageevent');
 			visitor.event(eventParams, function (err) {
+			console.timeEnd('pageevent');
 				
 				// return to client
 				res.end(JSON.stringify({

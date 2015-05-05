@@ -754,13 +754,13 @@ class GDAL2Tiles(object):
         if self.in_ds.RasterCount == 0:
             self.error( "Input file '%s' has no raster band" % self.input )
             
-        if self.in_ds.GetRasterBand(1).GetRasterColorTable():
-            # TODO: Process directly paletted dataset by generating VRT in memory
-            self.error( "Please convert this file to RGB/RGBA and run gdal2tiles on the result.",
-            """From paletted file you can create RGBA file (temp.vrt) by:
-                gdal_translate -of vrt -expand rgba %s temp.vrt
-                then run:
-                gdal2tiles temp.vrt""" % self.input )
+        # if self.in_ds.GetRasterBand(1).GetRasterColorTable():
+        #     # TODO: Process directly paletted dataset by generating VRT in memory
+        #     self.error( "Please convert this file to RGB/RGBA and run gdal2tiles on the result.",
+        #     """From paletted file you can create RGBA file (temp.vrt) by:
+        #         gdal_translate -of vrt -expand rgba %s temp.vrt
+        #         then run:
+        #         gdal2tiles temp.vrt""" % self.input )
 
         # Get NODATA value
         self.in_nodata = []

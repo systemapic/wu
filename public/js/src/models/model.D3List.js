@@ -1935,14 +1935,19 @@ Wu.DataLibraryList = Wu.List.extend({
 		var otherMetaWrapper = this.listMetaOther(info);
 
 		// Statistics
-		this.listMetaOtherStats(otherMetaWrapper);
+		// this.listMetaOtherStats(otherMetaWrapper);
+
+		// // Other meta: Uploaded by
+		// this.listMetaOtherUploadedBy(otherMetaWrapper);
+
+
+		// Description
+		// this.listMetaDescription(info);		
+		this.listMetaDescription(otherMetaWrapper);
 
 		// Other meta: Uploaded by
 		this.listMetaOtherUploadedBy(otherMetaWrapper);
 
-
-		// Description
-		this.listMetaDescription(info);		
 
 
 	},

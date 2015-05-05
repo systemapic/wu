@@ -2669,33 +2669,39 @@ td.tdcont.createdDate {
 
 .fullpage-users.minimal .users-inner,
 .data-library.minimal .data-library-inner {
-	min-height: 430px;
-	/*max-height: 650px;*/
-	max-height: 530px;
+	/*min-height: 430px;*/
+	/*max-height: 530px;*/
+
+	height: 530px;
+
 	overflow: hidden;
-	}
-
-/* Sausage control */
-/*.data-library.minimal .data-library-inner {
-	max-height: 530px;
-	}*/
-
-.fullpage-users.minimal {
-	min-height: 430px;
-	max-height: 650px;
-	padding-bottom: 3px;
-	overflow: hidden;	
 	}
 
 .fullpage-users.minimal,
 .data-library.minimal {
-	/*max-width: 690px;*/
-	max-width: 600px;
+	/*min-height: 430px;*/
+	/*max-height: 530px;*/
+
+	height: 530px;
+	padding-bottom: 3px;
+	overflow: hidden;	
+	}	
+
+.fullpage-users.minimal,
+.data-library.minimal {
+	max-width: 495px;
+	padding-right: 5px;
 	}
 
-.data-library.minimal {
-	padding-right: 112px;
-	}
+.data-library.minimal .fullscreen-drop {
+	display: none;
+	}	
+
+
+
+
+
+
 
 /* EXPAND/COLLAPSE BUTTON */
 /* EXPAND/COLLAPSE BUTTON */
@@ -3094,6 +3100,11 @@ td.tdcont.createdDate {
 	text-align: center;
 	}
 
+.minimal .manage-access-title {
+	font-size: 20px;
+	line-height: 1;
+	}	
+
 /* User subtitle */
 .manange-access-subtitle {
 	text-align: center;
@@ -3228,6 +3239,7 @@ td.tdcont.createdDate {
 .manage-access-current-role {
 	/*font-size: 120%;*/
 	/*border: 1px solid blue;*/
+	max-width: 200px;
 	}
 
 
@@ -3261,15 +3273,18 @@ td.tdcont.createdDate {
 	z-index: 999999999;
 	/*padding: 12px 25px;*/
 
-	position: relative;
+	/*position: relative;*/
+	position: absolute;
 	width: 68px;
 	height: 28px;
 	padding: 0;
 	line-height: 2.3;
 	float: right;
 	font-size: 12px;
-	top: -5px;
-	right: -4px;	
+	/*top: -5px;*/
+	/*right: -4px;	*/
+	right: 7px;
+  	bottom: 10px;
 	}
 
 .manage-access-button-done:before {
@@ -3743,7 +3758,7 @@ td.tdcont.createdDate {
 	font-size: 12px;
 	color: #666;
 	line-height: 1.2;
-	height: 130px;
+	height: 134px;
 	overflow: hidden;	
 	border-left: 1px dashed rgba(255,255,255,0.5);
 	padding-left: 10px;
@@ -3775,6 +3790,7 @@ td.tdcont.createdDate {
 .file-description-outer-wrapper,
 .file-other-meta-wrapper {
 	width: 50%;
+	width: 100%;
 	height: 100%;
 	border-left: 1px dashed rgba(255,255,255,0.5);
 	position: relative;
@@ -3782,6 +3798,11 @@ td.tdcont.createdDate {
 	display: inline-block;
 	vertical-align: top;
 	}
+
+.file-description-outer-wrapper	{
+	height: 129px;
+	border-left: none !important;
+}
 
 .file-description-outer-wrapper {
 	padding: 10px;
@@ -3795,13 +3816,14 @@ td.tdcont.createdDate {
 
 
 .minimal .file-other-meta-wrapper {
-	display: none !important;
+	/*display: none !important;*/
 	}
 
 
 .file-description-inner-wrapper {
 	background: transparent;
-	height: 151px;
+	/*height: 151px;*/
+	height: 95px;
 	padding: 0;
 	font-size: 12px;
 	overflow: scroll;
@@ -3923,6 +3945,6 @@ td.tdcont.createdDate {
 	}	
 
 	.file-copright-wrapper {
-		width: 221px;
+		width: 250px;
 	}	
 }	
