@@ -338,6 +338,7 @@ module.exports = api.file = {
 			'status',
 			'category',
 			'version',
+			'copyright',
 		];
 
  		// enqueue queries for valid fields
