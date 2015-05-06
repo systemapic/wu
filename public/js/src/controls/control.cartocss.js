@@ -246,39 +246,6 @@ L.Control.Cartocss = Wu.Control.extend({
 		if ( w >= 300 ) this._editorContainer.style.width = w + 'px';
 	},
 
-	// // update: fired from outside, on project.select() etc.
-	// update : function () {
-
-	// 	// mark as update needed
-	// 	this._updated = false;
-	// },
-
-	// _update : function () {
-
-	// 	if (this._updated) return;
-
-	// 	// set active project
-	// 	this._project = app.activeProject;
-
-	// 	// get all active, geojson layers
-	// 	this._layers = this._project.getStylableLayers();
-
-	// 	// fill active layers box
-	// 	this._fillLayers();
-
-	// 	// select a layer
-	// 	this.setLastUpdatedLayer();
-
-	// 	// mark updated
-	// 	this._updated = true;
-
-	// 	// refresh codemirror
-	// 	this._codeMirror.refresh();
-
-	// },
-
-
-	
 	initCodeMirror : function () {
 		
 		this._codeMirror = CodeMirror.fromTextArea(this._inputArea, {
@@ -300,10 +267,34 @@ L.Control.Cartocss = Wu.Control.extend({
 		var fields = this._layer.getMetaFields(); // return false if no fields found
 		
 		// create string
-		var string =	'// CartoCSS reference guide:\n// https://bit.ly/1z5OvXT\n\n\n';
-		string += 	'// #layer is always the layer identifier \n';
+		var string =	'// CartoCSS reference guide:\n// https://bit.ly/1z5OvXT\n\n';
+		string += 	'// Cheat Sheet:\n';
+		string += 	'// ------------\n';
+		string += 	'//  Polygons:\n';
+		string += 	'//    polygon-fill: red;\n';
+		string += 	'//    polygon-opacity: 0.5;\n';
+		string += 	'// \n';
+		string += 	'//  Lines:\n';
+		string += 	'//    line-color: blue;\n';
+		string += 	'//    line-width: 2;\n';
+		string += 	'//    line-opacity: 0.9;\n';
+		string += 	'// \n';
+		string += 	'//  Text:\n';
+		string += 	'//    text-name: [field_name];\n';
+		string += 	'//    text-size: 12;\n';
+		string += 	'// \n';
+		string += 	'//  Filters:\n';
+		string += 	'//    [zoom>=12] {\n';
+		string += 	'//        // CSS for zoom 12 and higher\n';
+		string += 	'//    }\n';
+		string += 	'//    [field_name="Field Name"] {\n';
+		string += 	'//        // CSS for this field only\n';
+		string += 	'//    }\n';
+
+		string += 	'\n\n// #layer is always the layer identifier \n';
 		string += 	'#layer {\n\n';
-		string += 	'// Available fields in layer:\n\n';
+		string += 	'    // Available fields in layer:\n';
+		string += 	'	// --------------------------\n'
 
 		// add each field to string
 		for (key in fields) {

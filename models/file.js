@@ -17,6 +17,7 @@ var fileSchema = mongoose.Schema({
 	absfolder       :  String,
 	name            :  String,
 	description     :  String,
+	copyright 	:  String,
 	keywords        : [String],
 	category        :  String,
 	version         :  Number,        

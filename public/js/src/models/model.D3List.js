@@ -1695,16 +1695,27 @@ Wu.DataLibraryList = Wu.List.extend({
 
 		Wu.save('/api/file/update', string); 
 
-		// hack: update layer name if exists
-		if (key == 'name') this._updateLayername(id, value);
+		// hack: update layer also if exists
+		if (key == 'name') this._updateLayerName(id, value);
+		if (key == 'description') this._updateLayerDescription(id, value);
+		if (key == 'copyright') this._updateLayerCopyright(id, value);
 	},
 
-	_updateLayername : function (fileUuid, title) {
+	_updateLayerName : function (fileUuid, title) {
 		var layer = this._findLayerByFile(fileUuid)
 		if (!layer) return;
 		layer.setTitle(title);
 	},
-
+	_updateLayerDescription : function (fileUuid, description) {
+		var layer = this._findLayerByFile(fileUuid)
+		if (!layer) return;
+		layer.setDescription(description);
+	},
+	_updateLayerCopyright : function (fileUuid, copyright) {
+		var layer = this._findLayerByFile(fileUuid)
+		if (!layer) return;
+		layer.setCopyright(copyright);
+	},
 	_findLayerByFile : function (fileUuid) {
 		for (p in app.Projects) {
 			var project = app.Projects[p];
