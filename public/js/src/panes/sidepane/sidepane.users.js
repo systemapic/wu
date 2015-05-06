@@ -23,13 +23,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this._search.setAttribute("type", "text");
 		this._search.setAttribute("placeholder", "Search users");
 
-
 		// Add user button
 		this._addUser = Wu.DomUtil.create('div', 'users-add-user smap-button-gray users', this._usersControlsInner, 'Create user');
 
 		// Delete user button
 		this._deleteUser = Wu.DomUtil.create('div', 'users-delete-user smap-button-gray users', this._usersControlsInner, 'Delete user');
-
 
 		// create container (overwrite default) and insert template
 		this._container = Wu.DomUtil.create('div', 'editor-wrapper', this._innerContent);
@@ -43,65 +41,44 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// #users-table-container
 		this._tableContainer = Wu.DomUtil.create('div', 'users-table-container', this._userList);
 
-
 		// #userslist
 		this._uList = Wu.DomUtil.createId('div', 'userslist', this._tableContainer);
-
 
 		// init table
 		var tableOptions      		= { container : this._uList, searchfield : this._search };
 		this._userList 			= new Wu.UserList(tableOptions);		
-
-
 
 		// add tooltip
 		app.Tooltip.add(this._menu, '(Editors only) List of all users. Here you can create and delete users, as well as administer user access to projects.');
 
 		// add hooks
 		this.addHooks();
-
 	},
 
 	addHooks : function () {
-		// search
-
 		Wu.DomEvent.on(this._expandCollapse, 'mousedown', this.toggleSize, this);
-
 	},
 
 	toggleSize : function () {
 
-		// Go small
-		if ( this.fullsize ) 	this.setSmallSize();
-
-		// Go large
-		else 			this.setFullSize();
-
+		// go small or large
+		this.fullsize ? this.setSmallSize() : this.setFullSize();
 	},
 
 	setFullSize : function () {
-
-			Wu.DomUtil.removeClass(this._content, 'minimal');
-			Wu.DomUtil.removeClass(this._expandCollapse, 'expand');
-
-			Wu.DomUtil.addClass(app._map._container, 'map-blur');
-
-			this.fullsize = true;	
-
-			this.refreshTable({tableSize : 'full'});	
-
+		Wu.DomUtil.removeClass(this._content, 'minimal');
+		Wu.DomUtil.removeClass(this._expandCollapse, 'expand');
+		Wu.DomUtil.addClass(app._map._container, 'map-blur');
+		this.fullsize = true;	
+		this.refreshTable({tableSize : 'full'});	
 	},
 
 	setSmallSize : function () {
-
-			Wu.DomUtil.addClass(this._content, 'minimal');
-			Wu.DomUtil.addClass(this._expandCollapse, 'expand');
-			Wu.DomUtil.removeClass(app._map._container, 'map-blur');
-
-			this.fullsize = false;
-
-			this.refreshTable({tableSize : 'small'});
-
+		Wu.DomUtil.addClass(this._content, 'minimal');
+		Wu.DomUtil.addClass(this._expandCollapse, 'expand');
+		Wu.DomUtil.removeClass(app._map._container, 'map-blur');
+		this.fullsize = false;
+		this.refreshTable({tableSize : 'small'});
 	},	
 
 	addEditHooks : function () {
@@ -130,7 +107,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		Wu.DomUtil.addClass(this._addUser, 'displayNone');
 		Wu.DomUtil.addClass(this._deleteUser, 'displayNone');
 		Wu.DomUtil.addClass(this._addUser, 'displayNone');
-	      
 	},
 
 	// fired when different sidepane selected, for clean-up
@@ -178,6 +154,8 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	update : function () {
 
+		console.error('users update');
+
 		// Remove map-blur if small size 
 		if ( !this.fullsize ) Wu.DomUtil.removeClass(app._map._container, 'map-blur');		
 
@@ -189,7 +167,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		// add edit hooks
 		this.addEditHooks();
-
 	},
 	
 	// input fullscreen for new user details
@@ -439,31 +416,31 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	refreshTable : function (options) {
 
-		var _options = {};
+		var opts = {};
 
-		    _options.context  = this._userList;
-		    _options.listData = app.Users;
+		opts.context = this._userList;
+		opts.listData = app.Users;
 
-		if ( options.reset ) {
-			_options.reset    = true;
-			_options.canEdit  = this._canEdit();			
+		if (options.reset) {
+			opts.reset = true;
+			opts.canEdit = this._canEdit();			
 		}
 
-		if ( options.remove ) {
-			_options.remove      = options.remove;
+		if (options.remove) {
+			opts.remove = options.remove;
 		}		
 
-		if ( options.add ) {
-			_options.add 	= options.add;
+		if (options.add) {
+			opts.add = options.add;
 		}
 		
-		if ( options.tableSize ) {
-			_options.tableSize = options.tableSize;
-		}		
+		if (options.tableSize) {
+			opts.tableSize = options.tableSize;
+		}
 
-		console.log('refreshTable ', _options);
+		console.log('refreshTable ', opts);
 
-		this._userList.updateTable(_options);
+		this._userList.updateTable(opts);
 
 	},
 	
@@ -472,7 +449,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	_canEdit : function () {
 
-		// TODO
+		// TODO -- WTF??
 		return true;
 	},
 

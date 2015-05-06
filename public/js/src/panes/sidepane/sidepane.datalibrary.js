@@ -339,8 +339,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	},
 
-
-
 	_activate : function () {
 
 		// add hooks
@@ -366,7 +364,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	_showControls : function () {
 		app.Controller.showControls();
 	},
-
 
 	_dragEnter : function (e) {		
 		console.log('_dragEnter');		
@@ -475,7 +472,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	// TODO
 	_checkEditMode : function () {
-
 		var canUpload = app.access.to.upload_file(this.project),
 		    canDelete = app.access.to.delete_file(this.project),
 		    canDownload = app.access.to.download_file(this.project);
@@ -723,14 +719,17 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// add layers
 		result.layers && result.layers.forEach(function (layer, i) {
-			console.log('__________adding lyaer: ', layer);
 			this._project.addLayer(layer);
+
+			// custom title for rasters
+			var title = layer.data.raster ? 'Processing done!' : 'Layer created';
 
 			// todo: set layer icon
 			app.feedback.setMessage({
-				title : 'Layer created',
+				title : title,
 				description : 'Added <strong>' + layer.title + '</strong> to available layers.',
-				id : result.uniqueIdentifier
+				id : result.uniqueIdentifier,
+				severity : layer.data.raster ? 2 : 3
 			});
 
 		}, this);
