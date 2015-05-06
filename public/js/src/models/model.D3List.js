@@ -1700,24 +1700,19 @@ Wu.DataLibraryList = Wu.List.extend({
 	},
 
 	_updateLayername : function (fileUuid, title) {
-
 		var layer = this._findLayerByFile(fileUuid)
 		if (!layer) return;
-
-		console.error('fliund layer', layer);
-
 		layer.setTitle(title);
 	},
 
 	_findLayerByFile : function (fileUuid) {
-		var matchedLayer;
 		for (p in app.Projects) {
 			var project = app.Projects[p];
 			for (l in project.layers) {
 				var layer = project.layers[l];
 				if (layer.store.file == fileUuid) {
 					return layer;
-				}				
+				};		
 			};
 		};
 		return false;
