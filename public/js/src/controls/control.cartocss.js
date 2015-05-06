@@ -80,6 +80,8 @@ L.Control.Cartocss = Wu.Control.extend({
 		// get all active, geojson layers
 		this._layers = this._project.getStylableLayers();
 
+		console.log('stylable layers: ', this._layers);
+
 		// fill active layers box
 		this._fillLayers();
 

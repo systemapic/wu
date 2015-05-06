@@ -547,15 +547,17 @@ Wu.List = Wu.Class.extend({
 
 		// create update object
 		var saveJSON = {};
-		var namesapce = options.what;
+		var namespace = options.what;
 
-		saveJSON[namesapce] = newName;
+		saveJSON[namespace] = newName;
 		saveJSON.uuid 	    = options.uuid;
 
 		// popopopopopopo
-		saveJSON.key   	    = namesapce;
+		saveJSON.key   	    = namespace;
 		saveJSON.value 	    = newName;
 		saveJSON.id    	    = options.uuid;
+
+		console.log('SAVEJSON', saveJSON);
 
 		// Save changes
 		that.save(saveJSON);
@@ -1682,11 +1684,9 @@ Wu.DataLibraryList = Wu.List.extend({
 	// Save
 	save : function (saveJSON) {
 
-
 		var key     = saveJSON.key;
 		var value   = saveJSON.value;
 		var id      = saveJSON.id;
-
 		var _sJson  = {};
 		_sJson[key] = value;
 		_sJson.uuid = id;
@@ -1695,8 +1695,33 @@ Wu.DataLibraryList = Wu.List.extend({
 
 		Wu.save('/api/file/update', string); 
 
+		// hack: update layer name if exists
+		if (key == 'name') this._updateLayername(id, value);
 	},
 
+	_updateLayername : function (fileUuid, title) {
+
+		var layer = this._findLayerByFile(fileUuid)
+		if (!layer) return;
+
+		console.error('fliund layer', layer);
+
+		layer.setTitle(title);
+	},
+
+	_findLayerByFile : function (fileUuid) {
+		var matchedLayer;
+		for (p in app.Projects) {
+			var project = app.Projects[p];
+			for (l in project.layers) {
+				var layer = project.layers[l];
+				if (layer.store.file == fileUuid) {
+					return layer;
+				}				
+			};
+		};
+		return false;
+	},
 
 	// OPTIONS FOR THE LIST
 	getListOptions : function () {
