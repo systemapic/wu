@@ -139,29 +139,19 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	setFullSize : function () {
-
 			Wu.DomUtil.removeClass(this._content, 'minimal');
 			Wu.DomUtil.removeClass(this._expandCollapse, 'expand');
-
 			Wu.DomUtil.addClass(app._map._container, 'map-blur');
-
 			this.fullsize = true;	
-
 			this.refreshTable({tableSize : 'full'});	
-
 	},
 
 	setSmallSize : function () {
-
 			Wu.DomUtil.addClass(this._content, 'minimal');
 			Wu.DomUtil.addClass(this._expandCollapse, 'expand');
 			Wu.DomUtil.removeClass(app._map._container, 'map-blur');
-
 			this.fullsize = false;
-
 			this.refreshTable({tableSize : 'small'});
-
-
 	},
 
 	_onProjectSelected : function (e) {
@@ -263,7 +253,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 				// hide drop
 				app.SidePane.DataLibrary._hideDrop();
-
 			},
 		});
 
