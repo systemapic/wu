@@ -475,6 +475,74 @@ body {
 }
 
 
+/*redesign side*/
+.header-title-wrap {
+	width: auto;
+}
+.leaflet-bottom.leaflet-right {
+	padding-top: 5px;
+}
+.leaflet-control-layermenu.leaflet-control {
+	top: 0px;
+}
+.leaflet-top.leaflet-right {
+	position: fixed;
+	bottom: 5px;
+	right: 5px;
+	top: initial;
+}
+.leaflet-control-scale.leaflet-control {
+	float: left;
+	bottom: -2px;
+}
+.leaflet-bottom.leaflet-right {
+	padding-bottom: 28px;
+	margin-top: 5px;
+}
+.leaflet-right .leaflet-control { 
+	position: relative;
+	margin-bottom: 10px !important;
 
+}
+.leaflet-control-layermenu.leaflet-control {
+	/*must be set manually*/
+	height: 300px; 
+}
+.leaflet-control-description {
+	left: 0px;
+}
 
+/*legends*/
+.legends-inner {
+	background: none;
+	box-shadow: none;
+}
+.legends-collapser {
+	display: none;
+}
+.legend-list {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	background-color: rgba(255, 255, 255, 0.44);
+	border-radius: 1px;
+}
 
+.legends-item {
+	vertical-align: bottom;
+	padding: 0 5px 0 5px;
+}
+
+.legend-feature:before {
+	content: '';
+	width: 21px;
+	height: 20px;
+	position: absolute;
+	background: white;
+	top: 2px;
+	left: 2px;
+}
+.legend-feature {
+	border: 0px solid white;
+	padding-left: 2px;
+	padding-top: 2px;
+}
