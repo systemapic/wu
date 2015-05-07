@@ -3,7 +3,7 @@ L.Control.Description = Wu.Control.extend({
 	type : 'description',
 
 	options: {
-		position : 'topleft' 
+		position : 'bottomright' 
 	},
 
 	onAdd : function (map) {
