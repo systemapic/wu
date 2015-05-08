@@ -35,7 +35,9 @@ Wu.SidePane.Manage = Wu.Class.extend({
 
 
 		// clients/projects wrapper
-		this._content = Wu.DomUtil.create('div', 'manage-access-content-wrapper', this._container);
+		this._outerContent = Wu.DomUtil.create('div', 'manage-access-content-wrapper-outer', this._container);
+		this._content 	   = Wu.DomUtil.create('div', 'manage-access-content-wrapper', this._outerContent);
+
 
 		// hide sidepane
 		this._sidepane._hide();
@@ -143,7 +145,7 @@ Wu.SidePane.Manage = Wu.Class.extend({
 			Wu.DomEvent.on(div_currentRole, 'click', function () {
 
 				// show hide
-				Wu.DomUtil.addClass(div_currentRole, 'displayNone');
+				// Wu.DomUtil.addClass(div_currentRole, 'displayNone');
 
 				// Put current project wrapper on top (z-index: 999999);
 				Wu.DomUtil.addClass(wrapper, 'z999999');
@@ -169,14 +171,15 @@ Wu.SidePane.Manage = Wu.Class.extend({
 
 	
 
-	_insertAvailableRoles : function (options) {
+	_insertAvailableRoles : function (options) {		
+
 		var project = options.project,
 		    wrapper = options.wrapper,
 		    user = options.user,
 		    addTo = options.addTo,
 		    currentRoleDiv = options.currentRoleDiv,
 		    infoDiv = options.infoDiv;
-
+	
 
 		var availableRoles = app.access.get.availableRoles({
 			user : user,
@@ -184,15 +187,17 @@ Wu.SidePane.Manage = Wu.Class.extend({
 			noAdmins : true
 		});
 
+
+		var _map = Wu.DomUtil.get('map');
 		// create dropdown for available roles
-		var dropdown = Wu.DomUtil.create('div', 'manage-access-dropdown', addTo);
+		var dropdown = Wu.DomUtil.create('div', 'manage-access-dropdown', _map);
 
 		// click outside dropdown ghost
 		var ghost = Wu.DomUtil.create('div', 'manage-access-ghost', addTo);
 		Wu.DomEvent.on(ghost, 'click', function (e) {
 			Wu.DomUtil.remove(dropdown);
 			Wu.DomUtil.remove(ghost);
-			Wu.DomUtil.removeClass(currentRoleDiv, 'displayNone');
+			// Wu.DomUtil.removeClass(currentRoleDiv, 'displayNone');
 			Wu.DomUtil.removeClass(wrapper, 'z999999');
 		}, this);
 
@@ -224,8 +229,31 @@ Wu.SidePane.Manage = Wu.Class.extend({
 			}, this);
 
 		}, this);
+
+
+		// Set position
+		var bcr = addTo.getBoundingClientRect()
+		var _top = bcr.top;
+		var _left = bcr.left;	
+		var y = this.getScreenXY()[0];
+		if ( y-_top <= 480 ) _top -= dropdown.offsetHeight - bcr.height;
+		dropdown.setAttribute('style', 'left: ' + _left + 'px; top: ' + _top + 'px');
+
+
 	},
 
+	getScreenXY : function () {
+
+		var w = window,
+		    d = document,
+		    e = d.documentElement,
+		    g = d.getElementsByTagName('body')[0],
+		    x = w.innerWidth || e.clientWidth || g.clientWidth,
+		    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+
+		return[x,y];
+
+	},
 
 	_selectRole : function (options) {
 
@@ -236,7 +264,7 @@ Wu.SidePane.Manage = Wu.Class.extend({
 		Wu.DomUtil.remove(options.ghost);
 
 		// show current role
-		Wu.DomUtil.removeClass(options.currentRoleDiv, 'displayNone');
+		// Wu.DomUtil.removeClass(options.currentRoleDiv, 'displayNone');
 		
 		// Remove project wrapper z-index
 		Wu.DomUtil.removeClass(options.wrapper, 'z999999');

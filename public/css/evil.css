@@ -196,3 +196,166 @@ aka feedback pane
 .file-copright-wrapper {
   width: 252px;
 }
+
+
+
+
+/*
+██╗    ███████╗██╗   ██╗ ██████╗██╗  ██╗    ████████╗██╗  ██╗███████╗    ██╗    ██╗ ██████╗ ██████╗ ██╗     ██████╗ 
+██║    ██╔════╝██║   ██║██╔════╝██║ ██╔╝    ╚══██╔══╝██║  ██║██╔════╝    ██║    ██║██╔═══██╗██╔══██╗██║     ██╔══██╗
+██║    █████╗  ██║   ██║██║     █████╔╝        ██║   ███████║█████╗      ██║ █╗ ██║██║   ██║██████╔╝██║     ██║  ██║
+██║    ██╔══╝  ██║   ██║██║     ██╔═██╗        ██║   ██╔══██║██╔══╝      ██║███╗██║██║   ██║██╔══██╗██║     ██║  ██║
+██║    ██║     ╚██████╔╝╚██████╗██║  ██╗       ██║   ██║  ██║███████╗    ╚███╔███╔╝╚██████╔╝██║  ██║███████╗██████╔╝
+╚═╝    ╚═╝      ╚═════╝  ╚═════╝╚═╝  ╚═╝       ╚═╝   ╚═╝  ╚═╝╚══════╝     ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═════╝ 
+*/
+
+.manage-access-container {
+	overflow: hidden;
+	}
+
+.manage-access-roles-wrapper {
+	left: 350px;
+	}
+
+.manage-access-info-outer {
+	left: 570px !important;
+	}	
+
+.fullpage-users,
+.data-library {
+	min-width: 900px;
+	max-width: 900px;
+	width: 900px;
+	padding-right: 5px;
+	}
+
+.fullpage-users.minimal, 
+.data-library.minimal {
+	max-width: 495px;
+	width: 495px;
+	min-width: 495px;	
+	}
+
+.fullpage-users.minimal {
+	max-width: 497px;
+	width: 497px;
+	min-width: 497px;
+	}
+
+.data-library.minimal .data-library-inner .editor-wrapper {
+	width: 520px;
+	padding-right: 30px;	
+	}
+
+.minimal .manage-access-title-wrapper {
+	height: 100px;
+	}
+
+.manage-access-content-wrapper-outer {
+	overflow: scroll;
+	height: 100%;
+	width: 920px;
+	padding-right: 30px;	
+	}	
+
+.manage-access-content-wrapper {
+	}
+
+.fullpage-users.minimal, 
+.data-library.minimal {
+	max-width: 495px;	
+	}
+
+.minimal .manage-access-content-wrapper-outer {
+	padding-right: 20px;
+	box-sizing: border-box;
+	width: 515px;	
+	}
+
+.manage-access-title {
+	text-align: left;
+	}
+
+.manange-access-subtitle {
+	text-align: left;
+	}
+
+.canEdit .list-attribute-category, 
+.canEdit .list-title, 
+.canEdit .list-description, 
+.canEdit .list-attribute-company, 
+.canEdit .list-attribute-position, 
+.canEdit .list-attribute-phone {
+	line-height: 1.2;
+	}
+
+.minimal .list-attribute-wrapper {
+	height: 48px;
+	}
+
+.data-library-inner {
+	overflow: hidden;
+	}
+
+.fullpage-documents {
+	width: 890px;
+	padding-right: 0;	
+	}
+
+.draw-expander {
+	height: 142px;
+	}
+
+.documents-container-leftpane {
+	width: 200px;
+	}
+
+.documents-container-rightpane {
+	left: 200px;
+	padding-right: 270px;
+	}		
+
+#open-layers {
+	top: 5px;
+	}	
+
+.cartocss-control-container.open {
+	top: 5px;
+	padding-bottom: 10px;
+	}
+
+.leaflet-right .leaflet-control {
+	margin-bottom: 6px !important;
+	}
+
+.leaflet-control-description {
+	top: -6px !important;
+	}
+
+.legends-item {
+	border: none;
+	}
+
+.legend-list {
+	padding: 3px;
+	}
+
+/*.legend-header {
+	font-size: 13px;
+	top: 5px;
+	left: 0px;	
+	}*/
+
+#header {
+	width: auto;
+	padding: 0;
+	}
+
+.fullscreen-drop {
+	display: none;
+}
+
+.manage-access-dropdown {
+	position: fixed;
+	z-index: 999999999999999;
+}

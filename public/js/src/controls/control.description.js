@@ -3,7 +3,7 @@ L.Control.Description = Wu.Control.extend({
 	type : 'description',
 
 	options: {
-		position : 'topleft' 
+		position : 'bottomright' 
 	},
 
 	onAdd : function (map) {
@@ -11,7 +11,7 @@ L.Control.Description = Wu.Control.extend({
 		    container = L.DomUtil.create('div', className),
 		    options   = this.options;
 
-		this._button = Wu.DomUtil.create('div', 'dropdown-button description-toggle-button', container)
+		// this._button = Wu.DomUtil.create('div', 'dropdown-button description-toggle-button', container)
 		this._content = Wu.DomUtil.create('div', 'description-control-inner-content', container)
 		this._collapser = Wu.DomUtil.create('div', 'menucollapser collapse-description', this._content, 'Info');
 		this._outer = Wu.DomUtil.create('div', 'description-control-inner-content-box', this._content)
@@ -163,11 +163,11 @@ L.Control.Description = Wu.Control.extend({
 	_addHooks : function () {
 		
 		// collapsers
-		Wu.DomEvent.on(this._button, 'click', this._GAtoggleCloser, this);
+		// Wu.DomEvent.on(this._button, 'click', this._GAtoggleCloser, this);
 		
 		// prevent map double clicks
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
-		Wu.DomEvent.on(this._button,    'mousedown mouseup click dblclick',  Wu.DomEvent.stopPropagation, this);
+		// Wu.DomEvent.on(this._button,    'mousedown mouseup click dblclick',  Wu.DomEvent.stopPropagation, this);
 	},
 
 	toggleEdit : function () {
@@ -230,7 +230,7 @@ L.Control.Description = Wu.Control.extend({
 		// save text
 		if (this.activeLayer) {
 			var text = this._inner.innerHTML;			
-			this.activeLayer.store.description = text;
+			this.activeLayer.setDescription(text);
 			this.activeLayer.save('description');
 
 			// set status
@@ -297,7 +297,6 @@ L.Control.Description = Wu.Control.extend({
 
 		// Fire function
 		this.toggleCloser();
-
 	},
 
 	// For Mobile Phones
@@ -311,12 +310,11 @@ L.Control.Description = Wu.Control.extend({
 		} else {
 			this._isClosed ? this.mobileOpenPane() : this.mobileClosePane();
 		}
-
 	},
 
 	mobileOpenPane : function () {
 
-		Wu.DomUtil.addClass(this._button, 'active-description');
+		// Wu.DomUtil.addClass(this._button, 'active-description');
 
 		// Slide In
 		this._content.style.left = '0px';
@@ -330,7 +328,7 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	mobileClosePane : function () {
-		Wu.DomUtil.removeClass(this._button, 'active-description');
+		// Wu.DomUtil.removeClass(this._button, 'active-description');
 
 		// Slide out (only works in portrait format... in landscape it has to be [0] )
 		this._content.style.left = Wu.app.nativeResolution[1] + 'px';

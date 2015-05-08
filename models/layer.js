@@ -11,6 +11,7 @@ var layerSchema = mongoose.Schema({
 
 	title 		: String,
 	description 	: String, 	// html
+	copyright 	: String,
 	legend 		: String,	// html
 	maxZoom		: String,
 	minZoom		: String,	// which zoom levels layer is active for, todo later..

@@ -187,6 +187,7 @@ Wu.List = Wu.Class.extend({
 
 	refreshTable : function (context) {
 
+
 		var that = context ? context : this;
 
 		if ( that.sortedData ) {
@@ -547,15 +548,17 @@ Wu.List = Wu.Class.extend({
 
 		// create update object
 		var saveJSON = {};
-		var namesapce = options.what;
+		var namespace = options.what;
 
-		saveJSON[namesapce] = newName;
+		saveJSON[namespace] = newName;
 		saveJSON.uuid 	    = options.uuid;
 
 		// popopopopopopo
-		saveJSON.key   	    = namesapce;
+		saveJSON.key   	    = namespace;
 		saveJSON.value 	    = newName;
 		saveJSON.id    	    = options.uuid;
+
+		console.log('SAVEJSON', saveJSON);
 
 		// Save changes
 		that.save(saveJSON);
@@ -670,9 +673,7 @@ Wu.List = Wu.Class.extend({
 	// INIT
 
 	_D3list : function (DATA) {
-
-			
-		if ( !Wu.app.activeProject ) return;
+	
 
 		// Context
 		var that = this;
@@ -1249,7 +1250,6 @@ Wu.List = Wu.Class.extend({
 
 				if ( proceed ) {
 				
-					// console.log('proceed', proceed, att);
 					that.listAttribute(i, DATA);
 
 				}
@@ -1682,11 +1682,9 @@ Wu.DataLibraryList = Wu.List.extend({
 	// Save
 	save : function (saveJSON) {
 
-
 		var key     = saveJSON.key;
 		var value   = saveJSON.value;
 		var id      = saveJSON.id;
-
 		var _sJson  = {};
 		_sJson[key] = value;
 		_sJson.uuid = id;
@@ -1695,8 +1693,39 @@ Wu.DataLibraryList = Wu.List.extend({
 
 		Wu.save('/api/file/update', string); 
 
+		// hack: update layer also if exists
+		if (key == 'name') this._updateLayerName(id, value);
+		if (key == 'description') this._updateLayerDescription(id, value);
+		if (key == 'copyright') this._updateLayerCopyright(id, value);
 	},
 
+	_updateLayerName : function (fileUuid, title) {
+		var layer = this._findLayerByFile(fileUuid)
+		if (!layer) return;
+		layer.setTitle(title);
+	},
+	_updateLayerDescription : function (fileUuid, description) {
+		var layer = this._findLayerByFile(fileUuid)
+		if (!layer) return;
+		layer.setDescription(description);
+	},
+	_updateLayerCopyright : function (fileUuid, copyright) {
+		var layer = this._findLayerByFile(fileUuid)
+		if (!layer) return;
+		layer.setCopyright(copyright);
+	},
+	_findLayerByFile : function (fileUuid) {
+		for (p in app.Projects) {
+			var project = app.Projects[p];
+			for (l in project.layers) {
+				var layer = project.layers[l];
+				if (layer.store.file == fileUuid) {
+					return layer;
+				};		
+			};
+		};
+		return false;
+	},
 
 	// OPTIONS FOR THE LIST
 	getListOptions : function () {
@@ -2432,6 +2461,15 @@ Wu.DataLibraryList = Wu.List.extend({
 			.append('input')
 			.attr('type', 'text')
 			.attr('placeholder', 'Click to add copyright information')
+			.on('blur', function(d) {
+
+				// Fittepølse
+				// popopoppopopopoppopoopopo
+				console.log('fuck you!', this.value)
+				console.log('d', d);
+				// layer.setDescription/Title/Copyright
+
+			})
 			.classed('file-copright-line', true);
 
 		// EXIT
@@ -3415,9 +3453,6 @@ Wu.UserList = Wu.List.extend({
 		var projects = user.getProjects();
 		var numProjects = projects ? projects.length : 0;
 		var projectsText = numProjects == 1 ? ' project' : ' projects';
-
-
-		console.log('projects', projects);
 
 		var html = divProjectsOpen + numProjects + projectsText + divProjectsClose;
 

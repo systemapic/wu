@@ -161,6 +161,13 @@ module.exports = api.layer = {
 				layer.save();
 			};
 
+			// update description
+			if (req.body.hasOwnProperty('copyright')) {
+				var copyright = req.body.copyright;
+				layer.copyright = copyright;
+				layer.save();
+			};
+
 			// update title
 			if (req.body.hasOwnProperty('title')) {
 				var title = req.body.title;

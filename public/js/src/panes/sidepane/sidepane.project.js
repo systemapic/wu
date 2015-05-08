@@ -96,13 +96,21 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.name.innerHTML 		= this._project.store.name;
 		this.description.innerHTML 	= this._project.store.description;
 
-		var logoPath = this._project.store.logo ? this._project.store.logo :  '/css/images/defaultProjectLogo.png';
-		this.logo.src = logoPath;
+		// var logoPath = this._project.store.logo ? this._project.store.logo :  '/css/images/defaultProjectLogo.png';
+		this.logo.src = this._getPixelLogo();
 
 		this.createdBy.innerHTML 	= '<div class="project-info-left">Created by:</div><div class="project-info-right">' + this._project.store.createdByName + "</div>";
 		this.lastUpdated.innerHTML 	= '<div class="project-info-left">Last updated:</div><div class="project-info-right">' + Wu.Util.prettyDate(this._project.store.lastUpdated) + "</div>";
 		this.createdDate.innerHTML 	= '<div class="project-info-left">Created time:</div><div class="project-info-right">' + Wu.Util.prettyDate(this._project.store.created) + "</div>";
 		this.usersInner.innerHTML       = '<div class="project-users-header">Project users:</div>' + this._project.getUsersHTML();
+	},
+
+	_getPixelLogo : function () {
+		var logo = this._project.getLogo();
+		if (!logo) return '/css/images/defaultProjectLogo.png';
+		var base = logo.split('/')[2];
+		var url = '/pixels/image/' + base + '?width=90&height=60&format=png'
+		return url;
 	},
 
 	_setHooks : function (on) {
@@ -155,7 +163,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 	// edit hook for client logo
 	// addLogoDZ : function () {
 	_addResumable : function () {
-		console.log('_addResumable', this._project.getName());
 
 		var projectUuid = this._project.getUuid();
 
@@ -212,7 +219,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	_refreshResumable : function () {
-		console.log('_refreshResumable');
 
 		// remove old
 		if (this.r) this._removeResumable();
@@ -222,7 +228,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	_removeResumable : function () {
-		console.log('_removeResumable');
 
 		var r = this.r;
 		r.cancel();
@@ -232,7 +237,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// refresh logo to kill listeners
 		this._createLogo();
 
-		console.log('this.r', this.r);
 	},
 
 	// removeLogoDZ : function () {

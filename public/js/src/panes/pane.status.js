@@ -113,8 +113,6 @@ Wu.StatusPane = Wu.Class.extend({
 		// collapse sidepane
 		if (app.SidePane) app.SidePane.collapse();
 
-		var descriptionControl = app.MapPane.getControls().description;
-
 		// removes the blur on map if it's set by one of the fullpanes
 		Wu.DomUtil.removeClass(app.MapPane._container, "map-blur");
 
@@ -127,14 +125,26 @@ Wu.StatusPane = Wu.Class.extend({
 		// Mobile option : activate default sidepane on close to avoid opening in fullscreen
 		if (app.mobile) this._closeMobile();
 
+		this._hideDescription();
+	},
 
-		// // Only open the description box if there is anything inside of it
-		// if (descriptionControl && descriptionControl.activeLayer) {
-		// 	if (descriptionControl.activeLayer.store.description == '' || !descriptionControl.activeLayer.store.description ) {
-		// 		descriptionControl.hide();
-		// 	}
-		// } 
+	_hideDescription : function () {
+		// Only open the description box if there is anything inside of it
+		var dc = app.MapPane.getControls().description;
+		if (!dc) return;
+
+		// if no active layers selected in layermenu
+		var active = app.MapPane._controls.layermenu._getActiveLayers();
+		if (!active.length) return dc.hide();
 		
+		// if no active layers
+		if (!dc.activeLayer) return dc.hide();
+		
+		var d = dc.activeLayer.getDescription();
+		var canEdit = app.access.to.edit_project();
+
+		// if active layers, but empty and not editor
+		if (!d && !canEdit) return dc.hide();
 
 	},
 

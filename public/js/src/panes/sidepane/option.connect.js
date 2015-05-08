@@ -56,7 +56,7 @@ Wu.SidePane.Options.Connect = Wu.SidePane.Options.Item.extend({
 
 	calculateHeight : function () {
 		var num = this.project.getMapboxAccounts().length;
-		this.maxHeight = 150 + num * 30;
+		this.maxHeight = 180 + num * 30;
 		this.minHeight = 0;
 	},
 
@@ -94,11 +94,12 @@ Wu.SidePane.Options.Connect = Wu.SidePane.Options.Item.extend({
 
 	},
 
-	_updateLayerOptions : function () {
+	_updateOptions : function () {
 
 		// update contents in Options/Baselayers + Layermenu
 		app.SidePane.Options.settings.baselayer.update();
 		app.SidePane.Options.settings.layermenu.update();
+		this.update();
 	},
 
 	// on click when adding new mapbox account
@@ -135,11 +136,15 @@ Wu.SidePane.Options.Connect = Wu.SidePane.Options.Item.extend({
 	},
 
 	importedMapbox : function (that, json) {
+
+		console.log('json', json);
 		
 		// project store
 		var result = JSON.parse(json);
 		var error = result.error;
 		var store = result.project;
+
+		console.log('importedMabox', store);
 
 		if (error) return app.feedback.setError({
 			title : 'Error importing Mapbox',
@@ -149,6 +154,12 @@ Wu.SidePane.Options.Connect = Wu.SidePane.Options.Item.extend({
 
 		// update project
 		that.project.setStore(store);
+
+		// update Options
+		that._updateOptions();
+
+		that.calculateHeight();
+		that._outer.style.height = that.maxHeight + 50 + 'px';   
 
 	},
 

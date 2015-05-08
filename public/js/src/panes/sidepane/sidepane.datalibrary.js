@@ -139,29 +139,19 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	setFullSize : function () {
-
 			Wu.DomUtil.removeClass(this._content, 'minimal');
 			Wu.DomUtil.removeClass(this._expandCollapse, 'expand');
-
 			Wu.DomUtil.addClass(app._map._container, 'map-blur');
-
 			this.fullsize = true;	
-
 			this.refreshTable({tableSize : 'full'});	
-
 	},
 
 	setSmallSize : function () {
-
 			Wu.DomUtil.addClass(this._content, 'minimal');
 			Wu.DomUtil.addClass(this._expandCollapse, 'expand');
 			Wu.DomUtil.removeClass(app._map._container, 'map-blur');
-
 			this.fullsize = false;
-
 			this.refreshTable({tableSize : 'small'});
-
-
 	},
 
 	_onProjectSelected : function (e) {
@@ -215,9 +205,19 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.r = null;
 		delete this.r;
 
+		// remove hooks
+		this._disableResumable();
+	},
+
+	_disableResumable : function () {
 		// remove drop events
 		Wu.DomEvent.off(window.document, 'dragenter', this._dragEnter, this);
 		Wu.DomEvent.off(this._resumableDrop, 'dragleave', this._dragLeave, this);
+	},
+
+	_enableResumable : function () {
+		Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
+		Wu.DomEvent.on(this._resumableDrop, 'dragleave', this._dragLeave, this);
 	},
 
 	_addResumable : function () {
@@ -263,7 +263,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 				// hide drop
 				app.SidePane.DataLibrary._hideDrop();
-
 			},
 		});
 
@@ -344,13 +343,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			console.log('r.uploadStart');
 		});
 
+
 		// add drop events
-		Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
-		Wu.DomEvent.on(this._resumableDrop, 'dragleave', this._dragLeave, this);
+		this._enableResumable();
 
 	},
-
-
 
 	_activate : function () {
 
@@ -377,7 +374,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	_showControls : function () {
 		app.Controller.showControls();
 	},
-
 
 	_dragEnter : function (e) {		
 		console.log('_dragEnter');		
@@ -486,7 +482,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	// TODO
 	_checkEditMode : function () {
-
 		var canUpload = app.access.to.upload_file(this.project),
 		    canDelete = app.access.to.delete_file(this.project),
 		    canDownload = app.access.to.download_file(this.project);
@@ -734,14 +729,17 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// add layers
 		result.layers && result.layers.forEach(function (layer, i) {
-			console.log('__________adding lyaer: ', layer);
 			this._project.addLayer(layer);
+
+			// custom title for rasters
+			var title = layer.data.raster ? 'Processing done!' : 'Layer created';
 
 			// todo: set layer icon
 			app.feedback.setMessage({
-				title : 'Layer created',
+				title : title,
 				description : 'Added <strong>' + layer.title + '</strong> to available layers.',
-				id : result.uniqueIdentifier
+				id : result.uniqueIdentifier,
+				severity : layer.data.raster ? 2 : 3
 			});
 
 		}, this);
