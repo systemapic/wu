@@ -732,14 +732,15 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			this._project.addLayer(layer);
 
 			// custom title for rasters
-			var title = layer.data.raster ? 'Processing done!' : 'Layer created';
+			var title = layer.data.raster ? 'Layer created' : 'Processing done!';
+			var sev = layer.data.raster ? 2 : 1;
 
 			// todo: set layer icon
 			app.feedback.setMessage({
 				title : title,
 				description : 'Added <strong>' + layer.title + '</strong> to available layers.',
 				id : result.uniqueIdentifier,
-				severity : layer.data.raster ? 2 : 3
+				severity : sev
 			});
 
 		}, this);
