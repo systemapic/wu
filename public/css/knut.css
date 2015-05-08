@@ -423,6 +423,8 @@ body {
 	line-height: 1.2;
 	word-break: break-word;
 	max-width: 170px;
+	font-size: 14px;
+    	font-weight: 500;
 }
 
 .legend-entry-image {
@@ -511,8 +513,9 @@ body {
 
 }
 .leaflet-control-layermenu.leaflet-control {
-	/*must be set manually*/
-	height: 300px; 
+	-webkit-transition: height 250ms ease;
+	-moz-transition: height 250ms ease;
+	transition: height 250ms ease;
 }
 .leaflet-control-description {
 	left: 0px;
@@ -553,6 +556,19 @@ body {
 	padding-top: 2px;
 }
 
+.legend-header {
+	font-size: 18px;
+	top: 5px;
+	left: 0px;
+	color: black;
+	-webkit-text-fill-color: white;
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: black;
+	font-weight: 900;
+}
+
 .dragged-ghost {
 	cursor: -webkit-grabbing !important;
 }
+
+
