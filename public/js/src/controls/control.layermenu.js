@@ -267,15 +267,30 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		console.error('setMax');
 
-
+		// set new height for relative wrapper
 		this._setHeight();
 	},	
 
 	_setHeight : function () {
-		var innerHeight = app.MapPane._controls.layermenu._layermenuOuter.offsetHeight;
-		var sumHeight = innerHeight + 30 + 'px';
-		this._innerContainer.style.height = sumHeight;
-		console.log('_setHeight', sumHeight);
+		// var innerHeight = app.MapPane._controls.layermenu._layermenuOuter.offsetHeight;
+		// var sumHeight = innerHeight + 30 + 'px';
+		// this._innerContainer.style.height = sumHeight;
+		// console.log('_setHeight', sumHeight);
+
+		// count open items
+		var numOpen = this._getOpenItems();
+		var height = numOpen * 30 + 50 + 'px';
+		this._innerContainer.style.height = height;
+
+	},
+
+	_getOpenItems : function () {
+		var childNodes = this._content.childNodes;
+		var open = _.filter(childNodes, function (c) {
+			var closed = _.contains(c.classList, 'layeritem-closed');
+			return !closed;
+		});
+		return open.length;
 	},
 
 	cancelEditClose : function () {
