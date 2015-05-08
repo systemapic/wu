@@ -4,8 +4,8 @@ Wu.MapPane = Wu.Pane.extend({
 
 	options : {
 		controls : [
-			'inspect',
 			'description',
+			'inspect',
 			'layermenu',
 			'zoom',
 			'draw',

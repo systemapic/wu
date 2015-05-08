@@ -41,7 +41,11 @@ L.Control.Inspect = Wu.Control.extend({
 
 		// add class and append to control corner
 		L.DomUtil.addClass(container, 'leaflet-control');
-		corner.appendChild(container);
+		if (pos.indexOf('bottom') !== -1) {
+			corner.insertBefore(container, corner.firstChild);
+		} else {
+			corner.appendChild(container);
+		}
 
 		// stop
 		Wu.DomEvent.on(container, 'mousedown click dblclick', Wu.DomEvent.stop, this);
