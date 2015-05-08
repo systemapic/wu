@@ -41,6 +41,13 @@ module.exports = api.pixels = {
 
 
 
+	// function removeChars(validChars, inputString) {
+	// 	var regex = new RegExp('[^' + validChars + ']', 'g');
+	// 	return inputString.replace(regex, '');
+	// }
+
+	// var newString = removeChars('01234567890%-', "The result is -2,003% of the total");
+
 	// #########################################
 	// ###  API: Create PDF Snapshot         ###
 	// #########################################
@@ -48,7 +55,21 @@ module.exports = api.pixels = {
 		if (!req.body || !req.body.hash) return api.error.missingInformation(req, res);
 
 		var projectUuid = req.body.hash.project;
-		var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.png';
+		// var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.png';
+		// var filename = req.body.hash.slug + 
+
+		console.log('req.body.hash', req.body.hash);
+
+		var validChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMONPQRSTUVQXYZ0123456789';
+		var regex = new RegExp('[^' + validChars + ']', 'g');
+		var slug = req.body.hash.slug.replace(regex, '');
+		// var slug = req.body.hash.slug.trim().replace(' ', '_').
+		var today = new Date();
+		var dd = today.getDate();
+		var mm = today.getMonth()+1; //January is 0!
+		var yyyy = today.getFullYear();
+		var prettyDate = dd + '.' + dd + '.' + yyyy;
+		var filename = 'Systemapic - Project ' + slug + ' - ' + prettyDate + '.png';
 		var fileUuid = 'file-' + uuid.v4();
 		var folder = api.config.path.file + fileUuid;
 		var path = folder + '/' + filename;
@@ -726,6 +747,8 @@ module.exports = api.pixels = {
 		var path    	= option.file; 						// original file
 		var newFile 	= 'image-' + uuid.v4();					// unique filename
 		var newPath 	= api.config.path.image + newFile;				// modified file
+		var format 	= option.format || 'jpeg';
+
 
 		// wtf
 		gm.prototype.checkSize = function (action) {
@@ -740,7 +763,7 @@ module.exports = api.pixels = {
 			.autoOrient()
 			.crop(cropW, cropH, cropX, cropY)				// x, y is offset from top left corner
 			.noProfile()							// todo: strip of all exif?
-			.setFormat('JPEG')						// todo: watermark systemapic? or client?
+			.setFormat(format.toUpperCase())						// todo: watermark systemapic? or client?
 			.quality(quality)
 			.write(newPath, function (err) {
 				if (err) return callback(err);
@@ -863,6 +886,7 @@ module.exports = api.pixels = {
 		var cropY      = req.query.cropy;
 		var cropW      = req.query.cropw;
 		var cropH      = req.query.croph;
+		var format     = req.query.format;
 	
 		var imagePath = '/data/images/' + imageId;
 
@@ -870,6 +894,7 @@ module.exports = api.pixels = {
 			height: height,
 			width : width,
 			file : imagePath,
+			format : format,
 			crop : {
 				x : cropX,
 				y : cropY,

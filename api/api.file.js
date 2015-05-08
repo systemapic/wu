@@ -131,6 +131,7 @@ module.exports = api.file = {
 		ops.push(function (options, callback) {
 			var record = options.file,
 			    name = record.name.replace(/\s+/g, ''),
+			    // name = ''
 			    out = api.config.path.temp + name + '_' + record.type + '.zip',
 			    cwd = api.config.path.file + fileUuid,
 			    command = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store',
@@ -338,6 +339,7 @@ module.exports = api.file = {
 			'status',
 			'category',
 			'version',
+			'copyright',
 		];
 
  		// enqueue queries for valid fields

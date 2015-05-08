@@ -231,6 +231,20 @@ Wu.Layer = Wu.Class.extend({
 		return this.store.description;
 	},
 
+	setDescription : function (description) {
+		this.store.description = description;
+		this.save('description');
+	},
+
+	getCopyright : function () {
+		return this.store.copyright;
+	},
+
+	setCopyright : function (copyright) {
+		this.store.copyright = copyright;
+		this.save('copyright');
+	},
+
 	getUuid : function () {
 		return this.store.uuid;
 	},

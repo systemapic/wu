@@ -78,12 +78,21 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.title.innerHTML = this.client.getName();
 		this.description.innerHTML = this.client.getDescription();
 		
-		this.logo.src = this.client.getLogo() ? this.client.getLogo() : '/css/images/defaultProjectLogo.png';
+		// this.logo.src = this.client.getLogo() ? this.client.getLogo() : '/css/images/defaultProjectLogo.png';
+		this.logo.src = this._getPixelLogo();
 
 		Wu.DomUtil.thumbAdjust(this.logo, 70);
 		
 		// insert client's projects
 		this.insertProjects();
+	},
+
+	_getPixelLogo : function () {
+		var logo = this.client.getLogo();
+		if (!logo) return '/css/images/defaultProjectLogo.png';
+		var base = logo.split('/')[2];
+		var url = '/pixels/image/' + base + '?width=75&height=75&format=png'
+		return url;
 	},
 
 	insertProjects : function (projects) {
@@ -179,7 +188,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 				sidepaneProject.confirmDelete();
 			}, this);
 
-			console.log('All projects deleted!');
 		}
 
 		// confirm
@@ -285,13 +293,11 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	_projectCreated : function (project, json) {
 
-		console.log('PPPPPPPPPPP', project, json);
 
 		var result = Wu.parse(json),
 		    error  = result.error,
 		    store  = result.project;
 
-		console.log('Created project:', project, result);
 
 		// return error
 		if (error) return app.feedback.setError({
@@ -313,7 +319,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 	// add project in sidepane
 	_createNewProject : function (project) {
 
-		console.log('sidepane.client._createNewProject project: ', project);
 
 		// add project to client array
 		this.projects.push(project);
@@ -491,7 +496,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	// edit hook for client logo
 	_addResumable : function () {
-		console.log('_addResumable', this.client.getName());
 
 		var clientUuid = this.client.getUuid();
 
@@ -548,7 +552,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	_refreshResumable : function () {
-		console.log('_refreshResumable');
 
 		// remove old
 		if (this.r) this._removeResumable();
@@ -558,7 +561,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	_removeResumable : function () {
-		console.log('_removeResumable');
 
 		var r = this.r;
 		r.cancel();
@@ -604,7 +606,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	editedLogo : function (resubmable, path) {
 
-		console.log('editedLogo', resubmable, path);
 
 		this._refreshResumable();
 		

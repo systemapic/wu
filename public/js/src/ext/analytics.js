@@ -63,14 +63,9 @@ Wu.Analytics = Wu.Class.extend({
 	// send to server
 	set : function (options) {
 		
-		console.time('analytics.set')
 		// send to server. JSON.stringify not needed for options object.
 		Wu.send('/api/analytics/set', options, function (err, result) {
-		console.timeEnd('analytics.set')
-			console.log('analytics set', err, result);
-
 			if ( err ) console.log('GA error:', err, Wu.parse(result));			
-
 		});
 
 	},
@@ -79,7 +74,6 @@ Wu.Analytics = Wu.Class.extend({
 
 		// send to server. JSON.stringify not needed for options object.
 		Wu.send('/api/analytics/get', options, function (err, result) {
-			console.log('analytics get: ', err, JSON.parse(result));
 		});
 	},
 

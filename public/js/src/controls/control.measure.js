@@ -29,10 +29,16 @@ L.Control.Measure = Wu.Control.extend({
 		map.off(this.options.updateWhenIdle ? 'moveend' : 'move', this._update, this);
 	},
 
-
 	_addTo : function () {
 		this.addTo(app._map);
 		this._added = true;
+		this._addStops();
+	},
+
+	_addStops : function () {
+		L.DomEvent.on(this._container, 'dblclick',  Wu.DomEvent.stop, this);
+		L.DomEvent.on(this._container, 'mousedown', Wu.DomEvent.stop, this);
+		L.DomEvent.on(this._container, 'mouseup',   Wu.DomEvent.stop, this);
 	},
 
 	_refresh : function () {
@@ -55,7 +61,6 @@ L.Control.Measure = Wu.Control.extend({
 		this._container.style.display = 'none';
 	},
 
-
 	_on : function () {
 		this._show();
 	},
@@ -63,9 +68,6 @@ L.Control.Measure = Wu.Control.extend({
 	_off : function () {
 		this._hide();
 	},
-
-
-
 
 	_addScales: function (options, className, container) {
 		if (options.metric) {

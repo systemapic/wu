@@ -41,7 +41,11 @@ L.Control.Inspect = Wu.Control.extend({
 
 		// add class and append to control corner
 		L.DomUtil.addClass(container, 'leaflet-control');
-		corner.appendChild(container);
+		if (pos.indexOf('bottom') !== -1) {
+			corner.insertBefore(container, corner.firstChild);
+		} else {
+			corner.appendChild(container);
+		}
 
 		// stop
 		Wu.DomEvent.on(container, 'mousedown click dblclick', Wu.DomEvent.stop, this);
@@ -75,6 +79,9 @@ L.Control.Inspect = Wu.Control.extend({
 
 		// show
 		this._show();
+
+		// enable scroll
+		this.disableScrollzoom();
 	},
 
 	// turned on and off by sidepane/options/controls toggle
@@ -163,8 +170,12 @@ L.Control.Inspect = Wu.Control.extend({
 
 		// prevent map scrollzoom
                 var map = app._map;
-                Wu.DomEvent.on(this._container, 'mouseenter', function () { map.scrollWheelZoom.disable(); }, this);
-                Wu.DomEvent.on(this._container, 'mouseleave', function () { map.scrollWheelZoom.enable();  }, this); 
+                Wu.DomEvent.on(this._container, 'mouseenter', function () { 
+                	map.scrollWheelZoom.disable(); 
+                }, this);
+                Wu.DomEvent.on(this._container, 'mouseleave', function () { 
+                	map.scrollWheelZoom.enable();  
+                }, this); 
 	},
 
 	resetScrollzoom : function () {

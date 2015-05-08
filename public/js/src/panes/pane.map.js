@@ -4,9 +4,9 @@ Wu.MapPane = Wu.Pane.extend({
 
 	options : {
 		controls : [
+			'description',
 			'inspect',
 			'layermenu',
-			'description',
 			'zoom',
 			'draw',
 			'legends',
@@ -111,7 +111,6 @@ Wu.MapPane = Wu.Pane.extend({
 		this._controls = {};
 		var controls = this.options.controls;
 		_.each(controls, function (control) {
-
 			this._controls[control] = new L.Control[control.camelize()];
 
 		}, this);

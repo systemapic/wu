@@ -264,7 +264,26 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Set max height of scroller container
 		this._layermenuOuter.style.maxHeight = layersMaxHeight + 'px';
+
+		// set new height for relative wrapper
+		this._setHeight();
 	},	
+
+	_setHeight : function () {
+		// count open items
+		var numOpen = this._getOpenItems();
+		var height = numOpen * 30 + 50 + 'px';
+		this._innerContainer.style.height = height;
+	},
+
+	_getOpenItems : function () {
+		var childNodes = this._content.childNodes;
+		var open = _.filter(childNodes, function (c) {
+			var closed = _.contains(c.classList, 'layeritem-closed');
+			return !closed;
+		});
+		return open.length;
+	},
 
 	cancelEditClose : function () {
 		if (!this.editMode) return;
@@ -328,7 +347,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		}	
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		app._map._controlCorners.topright.style.right = '140px';
+		// app._map._controlCorners.topright.style.right = '140px';
 
 
 		// Adjust legends width
@@ -359,7 +378,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		}
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		app._map._controlCorners.topright.style.right = '295px';                
+		// app._map._controlCorners.topright.style.right = '295px';                
 		
 		// If we're on mobile
 		if (app.mobile) {
@@ -390,7 +409,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		app.MapPane.disableInteraction(true);
 
 		// turn off dropzone dragging
-		if (app.Dropzone) app.Dropzone.disable();
+		// if (app.Dropzone) app.Dropzone.disable();
+		app.SidePane.DataLibrary._disableResumable();
 
 		// Set attribute draggable to true on all divs
 		this.enableDraggable();
@@ -435,7 +455,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.app.MapPane.enableInteraction(true);
 
 		// turn off dropzone dragging
-		if (app.Dropzone) app.Dropzone.enable();
+		// if (app.Dropzone) app.Dropzone.enable();
+		app.SidePane.DataLibrary._enableResumable();
 
 		// Set attribute draggable to true on all divs
 		this.disableDraggable();		
@@ -847,6 +868,8 @@ L.Control.Layermenu = Wu.Control.extend({
 			// mark open
 			this._logic[uuid].isOpen = true;
 		}
+
+		this._setHeight();
 	},
 
 	closeAll : function () {
@@ -875,6 +898,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	toggleFolder : function (layerItem) {
 		this.updateLogic();	
 		this.enforceLogic(layerItem);
+
 	},
 
 	toggleLayer : function (item) {
