@@ -260,7 +260,7 @@ module.exports = api.provider = {
 			});
 
 			async.waterfall(ops, function (err, project) {
-				if (err) api.error.general(req, res, err);
+				if (err) return api.error.general(req, res, err);
 
 				// return project
 				api.project._returnProject(req, res, project);
