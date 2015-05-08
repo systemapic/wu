@@ -187,6 +187,7 @@ Wu.List = Wu.Class.extend({
 
 	refreshTable : function (context) {
 
+
 		var that = context ? context : this;
 
 		if ( that.sortedData ) {
@@ -672,9 +673,7 @@ Wu.List = Wu.Class.extend({
 	// INIT
 
 	_D3list : function (DATA) {
-
-			
-		if ( !Wu.app.activeProject ) return;
+	
 
 		// Context
 		var that = this;
@@ -1251,7 +1250,6 @@ Wu.List = Wu.Class.extend({
 
 				if ( proceed ) {
 				
-					// console.log('proceed', proceed, att);
 					that.listAttribute(i, DATA);
 
 				}
@@ -2463,6 +2461,15 @@ Wu.DataLibraryList = Wu.List.extend({
 			.append('input')
 			.attr('type', 'text')
 			.attr('placeholder', 'Click to add copyright information')
+			.on('blur', function(d) {
+
+				// Fittepølse
+				// popopoppopopopoppopoopopo
+				console.log('fuck you!', this.value)
+				console.log('d', d);
+				// layer.setDescription/Title/Copyright
+
+			})
 			.classed('file-copright-line', true);
 
 		// EXIT
@@ -3446,9 +3453,6 @@ Wu.UserList = Wu.List.extend({
 		var projects = user.getProjects();
 		var numProjects = projects ? projects.length : 0;
 		var projectsText = numProjects == 1 ? ' project' : ' projects';
-
-
-		console.log('projects', projects);
 
 		var html = divProjectsOpen + numProjects + projectsText + divProjectsClose;
 

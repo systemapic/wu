@@ -264,7 +264,19 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Set max height of scroller container
 		this._layermenuOuter.style.maxHeight = layersMaxHeight + 'px';
+
+		console.error('setMax');
+
+
+		this._setHeight();
 	},	
+
+	_setHeight : function () {
+		var innerHeight = app.MapPane._controls.layermenu._layermenuOuter.offsetHeight;
+		var sumHeight = innerHeight + 30 + 'px';
+		this._innerContainer.style.height = sumHeight;
+		console.log('_setHeight', sumHeight);
+	},
 
 	cancelEditClose : function () {
 		if (!this.editMode) return;
@@ -328,7 +340,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		}	
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		app._map._controlCorners.topright.style.right = '140px';
+		// app._map._controlCorners.topright.style.right = '140px';
 
 
 		// Adjust legends width
@@ -359,7 +371,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		}
 		
 		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		app._map._controlCorners.topright.style.right = '295px';                
+		// app._map._controlCorners.topright.style.right = '295px';                
 		
 		// If we're on mobile
 		if (app.mobile) {
@@ -847,6 +859,8 @@ L.Control.Layermenu = Wu.Control.extend({
 			// mark open
 			this._logic[uuid].isOpen = true;
 		}
+
+		this._setHeight();
 	},
 
 	closeAll : function () {
@@ -875,6 +889,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	toggleFolder : function (layerItem) {
 		this.updateLogic();	
 		this.enforceLogic(layerItem);
+
 	},
 
 	toggleLayer : function (item) {

@@ -478,26 +478,32 @@ body {
 /*redesign side*/
 .header-title-wrap {
 	width: auto;
-}
+	min-width: 250px;
+	}
+
 .leaflet-bottom.leaflet-right {
 	padding-top: 5px;
-}
+	}
+
 .leaflet-control-layermenu.leaflet-control {
 	top: 0px;
-}
+	}
+
 .leaflet-top.leaflet-right {
 	position: fixed;
 	bottom: 5px;
 	right: 5px;
 	top: initial;
-}
+	}
+
 .leaflet-control-scale.leaflet-control {
 	float: left;
 	bottom: -2px;
 }
 .leaflet-bottom.leaflet-right {
 	padding-bottom: 28px;
-	margin-top: 5px;
+	/*margin-top: 5px;*/
+	margin-top: 0px;
 }
 .leaflet-right .leaflet-control { 
 	position: relative;

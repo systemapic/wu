@@ -154,8 +154,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 	update : function () {
 
-		console.error('users update');
-
 		// Remove map-blur if small size 
 		if ( !this.fullsize ) Wu.DomUtil.removeClass(app._map._container, 'map-blur');		
 
@@ -437,8 +435,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		if (options.tableSize) {
 			opts.tableSize = options.tableSize;
 		}
-
-		console.log('refreshTable ', opts);
 
 		this._userList.updateTable(opts);
 
