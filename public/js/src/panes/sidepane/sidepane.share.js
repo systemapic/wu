@@ -236,8 +236,12 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		var that = this;	// callback
 		app.setHash(function (ctx, hash) {
 
+			var h = JSON.parse(hash);
+			h.hash.slug = app.activeProject.getName();
+			var json = JSON.stringify(h); 
+			console.log('sendign json', json);
 			// get snapshot from server
-			Wu.post('/api/util/pdfsnapshot', hash, that.createdPrint, that);
+			Wu.post('/api/util/pdfsnapshot', json, that.createdPrint, that);
 			console.log('setn req');
 
 		});
