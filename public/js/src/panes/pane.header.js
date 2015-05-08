@@ -56,7 +56,16 @@ Wu.HeaderPane = Wu.Pane.extend({
 	},
 
 	setLogo : function (logo) {
-		this._logo.src = logo || this._project.getHeaderLogo() ? this._project.getHeaderLogo() :  '/css/images/defaultProjectLogo.png';
+		this._logo.src = this._getPixelLogo(logo);
+		// this._logo.src = logo || this._project.getHeaderLogo() ? this._project.getHeaderLogo() :  '/css/images/defaultProjectLogo.png';
+		
+	},
+
+	_getPixelLogo : function (logo) {
+		var logo = logo || this._project.getHeaderLogo();
+		var base = logo.split('/')[2];
+		var url = '/pixels/image/' + base + '?width=105&height=70'
+		return url;
 	},
 
 	setTitle : function (title) {

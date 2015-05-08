@@ -78,12 +78,21 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.title.innerHTML = this.client.getName();
 		this.description.innerHTML = this.client.getDescription();
 		
-		this.logo.src = this.client.getLogo() ? this.client.getLogo() : '/css/images/defaultProjectLogo.png';
+		// this.logo.src = this.client.getLogo() ? this.client.getLogo() : '/css/images/defaultProjectLogo.png';
+		this.logo.src = this._getPixelLogo();
 
 		Wu.DomUtil.thumbAdjust(this.logo, 70);
 		
 		// insert client's projects
 		this.insertProjects();
+	},
+
+	_getPixelLogo : function () {
+		var logo = this.client.getLogo();
+		if (!logo) return '/css/images/defaultProjectLogo.png';
+		var base = logo.split('/')[2];
+		var url = '/pixels/image/' + base + '?width=75&height=75&format=png'
+		return url;
 	},
 
 	insertProjects : function (projects) {
