@@ -205,9 +205,19 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.r = null;
 		delete this.r;
 
+		// remove hooks
+		this._disableResumable();
+	},
+
+	_disableResumable : function () {
 		// remove drop events
 		Wu.DomEvent.off(window.document, 'dragenter', this._dragEnter, this);
 		Wu.DomEvent.off(this._resumableDrop, 'dragleave', this._dragLeave, this);
+	},
+
+	_enableResumable : function () {
+		Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
+		Wu.DomEvent.on(this._resumableDrop, 'dragleave', this._dragLeave, this);
 	},
 
 	_addResumable : function () {
@@ -333,9 +343,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			console.log('r.uploadStart');
 		});
 
+
 		// add drop events
-		Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
-		Wu.DomEvent.on(this._resumableDrop, 'dragleave', this._dragLeave, this);
+		this._enableResumable();
 
 	},
 

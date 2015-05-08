@@ -552,3 +552,7 @@ body {
 	padding-left: 2px;
 	padding-top: 2px;
 }
+
+.dragged-ghost {
+	cursor: -webkit-grabbing !important;
+}

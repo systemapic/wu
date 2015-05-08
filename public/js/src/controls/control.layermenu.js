@@ -402,7 +402,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		app.MapPane.disableInteraction(true);
 
 		// turn off dropzone dragging
-		if (app.Dropzone) app.Dropzone.disable();
+		// if (app.Dropzone) app.Dropzone.disable();
+		app.SidePane.DataLibrary._disableResumable();
 
 		// Set attribute draggable to true on all divs
 		this.enableDraggable();
@@ -447,7 +448,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.app.MapPane.enableInteraction(true);
 
 		// turn off dropzone dragging
-		if (app.Dropzone) app.Dropzone.enable();
+		// if (app.Dropzone) app.Dropzone.enable();
+		app.SidePane.DataLibrary._enableResumable();
 
 		// Set attribute draggable to true on all divs
 		this.disableDraggable();		
