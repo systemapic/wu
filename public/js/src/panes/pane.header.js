@@ -63,6 +63,7 @@ Wu.HeaderPane = Wu.Pane.extend({
 
 	_getPixelLogo : function (logo) {
 		var logo = logo || this._project.getHeaderLogo();
+		if (!logo) return '/css/images/defaultProjectLogo.png';
 		var base = logo.split('/')[2];
 		var url = '/pixels/image/' + base + '?width=105&height=70'
 		return url;

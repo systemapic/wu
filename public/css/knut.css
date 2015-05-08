@@ -571,4 +571,8 @@ body {
 	cursor: -webkit-grabbing !important;
 }
 
+.legends-control-inner-content {
+	cursor: default;
+}
+
 

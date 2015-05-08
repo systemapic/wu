@@ -163,7 +163,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 	// edit hook for client logo
 	// addLogoDZ : function () {
 	_addResumable : function () {
-		console.log('_addResumable', this._project.getName());
 
 		var projectUuid = this._project.getUuid();
 
@@ -220,7 +219,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	_refreshResumable : function () {
-		console.log('_refreshResumable');
 
 		// remove old
 		if (this.r) this._removeResumable();
@@ -230,7 +228,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	_removeResumable : function () {
-		console.log('_removeResumable');
 
 		var r = this.r;
 		r.cancel();
@@ -240,7 +237,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		// refresh logo to kill listeners
 		this._createLogo();
 
-		console.log('this.r', this.r);
 	},
 
 	// removeLogoDZ : function () {

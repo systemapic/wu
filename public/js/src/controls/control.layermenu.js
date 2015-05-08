@@ -265,23 +265,15 @@ L.Control.Layermenu = Wu.Control.extend({
 		// Set max height of scroller container
 		this._layermenuOuter.style.maxHeight = layersMaxHeight + 'px';
 
-		console.error('setMax');
-
 		// set new height for relative wrapper
 		this._setHeight();
 	},	
 
 	_setHeight : function () {
-		// var innerHeight = app.MapPane._controls.layermenu._layermenuOuter.offsetHeight;
-		// var sumHeight = innerHeight + 30 + 'px';
-		// this._innerContainer.style.height = sumHeight;
-		// console.log('_setHeight', sumHeight);
-
 		// count open items
 		var numOpen = this._getOpenItems();
 		var height = numOpen * 30 + 50 + 'px';
 		this._innerContainer.style.height = height;
-
 	},
 
 	_getOpenItems : function () {
