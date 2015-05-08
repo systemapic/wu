@@ -588,3 +588,6 @@ body {
 	cursor:    -moz-grabbing !important;
 }
 
+.edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content {
+     padding-bottom: 5px; 
+}

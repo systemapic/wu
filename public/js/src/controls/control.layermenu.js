@@ -269,10 +269,13 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._setHeight();
 	},	
 
-	_setHeight : function () {
+	_setHeight : function (extra) {
 		// count open items
 		var numOpen = this._getOpenItems();
-		var height = numOpen * 30 + 50 + 'px';
+		console.log('num', numOpen, extra);
+		if (this.editMode && !extra) extra = 50;
+		var extra = extra ? extra + 50 : 50;
+		var height = numOpen * 30 + extra + 'px';
 		this._innerContainer.style.height = height;
 	},
 
@@ -433,7 +436,9 @@ L.Control.Layermenu = Wu.Control.extend({
 		// Set max height
 		var dimensions = app._getDimensions();
 		    dimensions.height -= 45;
-		this.resizeEvent(dimensions);			
+		this.resizeEvent(dimensions);	
+
+		this._setHeight(50);		
 
 	},
 
@@ -476,7 +481,9 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Set max height
 		var dimensions = app._getDimensions();
-		this.resizeEvent(dimensions);		
+		this.resizeEvent(dimensions);	
+
+		this._setHeight();	
 		
 	},
 	
@@ -1037,6 +1044,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		if (baseLayer) baseLayer.markOccupied();
 		if (layerMenu) layerMenu.markOccupied();
 
+		this._setHeight();
+
 	},
 
 	removeLayermenuItem : function () {
@@ -1186,6 +1195,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._project.store.layermenu.push(folder);
 		this.save();
 
+		this._setHeight();
+
 	},
 
 	_editFolderTitle : function (uuid) {
@@ -1279,6 +1290,8 @@ L.Control.Layermenu = Wu.Control.extend({
 	deleteMenuFolder : function (uuid) {
 		// remove
 		this.remove(uuid); // layerMenuItem-32132-123123-adsdsa-sda
+
+		this._setHeight();
 	},
 
 
