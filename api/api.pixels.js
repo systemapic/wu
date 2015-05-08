@@ -747,6 +747,8 @@ module.exports = api.pixels = {
 		var path    	= option.file; 						// original file
 		var newFile 	= 'image-' + uuid.v4();					// unique filename
 		var newPath 	= api.config.path.image + newFile;				// modified file
+		var format 	= option.format || 'jpeg';
+
 
 		// wtf
 		gm.prototype.checkSize = function (action) {
@@ -761,7 +763,7 @@ module.exports = api.pixels = {
 			.autoOrient()
 			.crop(cropW, cropH, cropX, cropY)				// x, y is offset from top left corner
 			.noProfile()							// todo: strip of all exif?
-			.setFormat('JPEG')						// todo: watermark systemapic? or client?
+			.setFormat(format.toUpperCase())						// todo: watermark systemapic? or client?
 			.quality(quality)
 			.write(newPath, function (err) {
 				if (err) return callback(err);
@@ -884,6 +886,7 @@ module.exports = api.pixels = {
 		var cropY      = req.query.cropy;
 		var cropW      = req.query.cropw;
 		var cropH      = req.query.croph;
+		var format     = req.query.format;
 	
 		var imagePath = '/data/images/' + imageId;
 
@@ -891,6 +894,7 @@ module.exports = api.pixels = {
 			height: height,
 			width : width,
 			file : imagePath,
+			format : format,
 			crop : {
 				x : cropX,
 				y : cropY,
