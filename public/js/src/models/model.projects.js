@@ -175,6 +175,32 @@ Wu.Project = Wu.Class.extend({
 		// this.removeHooks();
 	},
 
+	_hardRefresh : function () {
+		// flush
+		this._reset();
+
+		// init files
+		this.initFiles();
+
+  		// create layers 
+		this.initLayers();
+
+		// init roles
+		this.initRoles();
+
+		// update url
+		this._setUrl();
+
+		// set settings
+		this.refreshSettings();
+		
+		// update color theme
+		this.setColorTheme();
+
+		// update project in sidepane
+		if (this._menuItem) this._menuItem.update();
+	},
+
 	_refresh : function () {
 
 		// flush
@@ -233,7 +259,7 @@ Wu.Project = Wu.Class.extend({
 
 	setStore : function (store) {
 		this.store = store;
-		this.refresh();
+		this._hardRefresh();
 	},
 
 	setRolesStore : function (roles) {
