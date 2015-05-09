@@ -779,14 +779,17 @@ Wu.MapPane = Wu.Pane.extend({
 						color: '#FFF',
 						fillOpacity: 0.3,
 						fillColor: '#FFF'
-					}
+					},
+					showArea : true
+					
 				},
 				polyline: { 
 					shapeOptions: {
 						fill: false,
 						color: '#FFF'
 
-					}
+					},
+					showArea : true
 				}       
 			}
 		};
