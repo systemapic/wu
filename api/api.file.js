@@ -144,6 +144,7 @@ module.exports = api.file = {
 			
 			// run command
 			console.log('cmd: ', command);
+			console.log('cwd: ', cwd);
 			
 			exec(command, {cwd : cwd}, function (err, stdout, stdin) {
 				callback(err, out);
