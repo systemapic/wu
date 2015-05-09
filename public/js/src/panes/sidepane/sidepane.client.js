@@ -525,7 +525,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 			maxFiles : 1,
 
 			// accepted filetypes
-			fileType : ['png', 'jpg', 'jpeg', 'gif'],
+			// fileType : ['png', 'jpg', 'jpeg', 'gif'],
+			fileType : ['png', 'jpg', 'jpeg', 'gif', 'PNG', 'JPG', 'JPEG', 'GIF'],
 			fileTypeErrorCallback : function (file, errorCount) {
 
 				// feedback message
@@ -616,7 +617,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.client.setLogo(fullpath);
 
 		// update image in header
-		this.logo.src = fullpath;
+		// this.logo.src = fullpath;
+		// this._getPixelLogo();
+		this.logo.src= this._getPixelLogo();
 	},
 
 	pendingOpen : function () {
