@@ -192,7 +192,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 			maxFiles : 1,
 
 			// accepted filetypes
-			fileType : ['png', 'jpg', 'jpeg', 'gif'],
+			fileType : ['png', 'jpg', 'jpeg', 'gif', 'PNG', 'JPG', 'JPEG', 'GIF'],
 			fileTypeErrorCallback : function (file, errorCount) {
 
 				// feedback message

@@ -575,4 +575,19 @@ body {
 	cursor: default;
 }
 
+.inspect-layer:hover {
+	box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
+}
+.inspect-layer {
+	box-shadow: none;
+	border: 1px solid rgba(128, 128, 128, 0.17);
+}
+.inspect-layer.dragging {
+	background: #92f0e5 !important;
+	cursor: -webkit-grabbing !important;
+	cursor:    -moz-grabbing !important;
+}
 
+.edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content {
+     padding-bottom: 5px; 
+}

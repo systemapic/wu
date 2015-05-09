@@ -354,6 +354,14 @@ module.exports = api.geo = {
 		console.log('GDAL DRIVERS'.red, gdal.drivers.getNames());
 		console.log('options.'.green, options);
 
+		async.parallel([function (callback) {
+			var out = api.config.path.file + fileUuid + '/' + options.name;
+			var inn = inFile;
+			console.log('inn, out', inn, out);
+
+			fs.copy(inn, out, callback)
+		}], console.log)
+
 		// validation
 		ops.push(function (callback) {
 

@@ -8,13 +8,13 @@ Wu.MapPane = Wu.Pane.extend({
 			'inspect',
 			'layermenu',
 			'zoom',
-			'draw',
 			'legends',
 			'measure',
 			'geolocation',
 			'mouseposition',
 			'baselayertoggle',
-			'cartocss'
+			'cartocss',
+			'draw',
 		]
 	},
 	
@@ -145,11 +145,6 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 
-
-
-
-
-
 	// fired on window resize
 	resizeEvent : function (d) {
 		this._updateWidth(d);
@@ -168,12 +163,6 @@ Wu.MapPane = Wu.Pane.extend({
 		}, 300); // time with css
 	},
 	
-	// setProject : function (project) {
-	// 	this._project = project;
-	// 	this.reset();
-	// 	this.update(project);
-	// },
-
 	getZIndexControls : function () {
 		var z = {
 			b : this._baselayerZIndex, // base
@@ -221,38 +210,6 @@ Wu.MapPane = Wu.Pane.extend({
 		this._container.style.left = width + 'px';
 		this._container.style.width = parseInt(window.innerWidth) - width + 'px';
 	},
-
-	// _update : function (project) {
-	// 	this.update(project);
-	// },
-
-	// update : function (project) {
-		
-	// 	this._project = project;
-
-	// 	// clear active layers
-	// 	this.clearActiveLayers();
-
-	// 	// get editor privs
-	// 	// this._isEditor = app.Account.canUpdateProject(app.activeProject.getUuid());
-	// 	this._isEditor = app.access.to.edit_project(project);
-
-	// 	// set base layers
-	// 	this.setBaseLayers();
-
-	// 	// set bounds
-	// 	this.setMaxBounds();
-
-	// 	// set position
-	// 	this.setPosition();
-
-	// 	// set header padding
-	// 	this.setHeaderPadding();
-
-	// 	// set controls css logic
-	// 	setTimeout(this.updateControlCss.bind(this), 100); // timeout hack bug
-		
-	// },
 
 	setHeaderPadding : function () {
 		// set padding
@@ -822,14 +779,17 @@ Wu.MapPane = Wu.Pane.extend({
 						color: '#FFF',
 						fillOpacity: 0.3,
 						fillColor: '#FFF'
-					}
+					},
+					showArea : true
+					
 				},
 				polyline: { 
 					shapeOptions: {
 						fill: false,
 						color: '#FFF'
 
-					}
+					},
+					showArea : true
 				}       
 			}
 		};
@@ -868,16 +828,12 @@ Wu.MapPane = Wu.Pane.extend({
 		var layers = this.editableLayers._layers;
 		for (l in layers) {
 			for (m in layers[l]._layers) {
-
 				if (m == id) return layers[l];
-
 				var deep = layers[l]._layers[m];
 				for (n in deep) {
 					var shit = deep[n];
 					if (n == id) return deep;
-
 					for (o in shit) {
-						var cunt = shit[o];
 						if (o == id) return shit;
 					}
 				}

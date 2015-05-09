@@ -1,4 +1,3 @@
-
 //API: api.upload.js
 // database schemas
 var Project 	= require('../models/project');
@@ -41,8 +40,6 @@ var r = require('../tools/resumable-node')('/data/tmp/');
 // api
 var api = module.parent.exports;
 
-
-
 // exports
 module.exports = api.upload = { 
 
@@ -58,7 +55,6 @@ module.exports = api.upload = {
 	    	    resumableTotalChunks = options.resumableTotalChunks;
 
 		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks to ', outputPath);
-
 		console.log('## RESUMABLE ##'.green, options);
 
 		// resumable		
@@ -510,7 +506,7 @@ module.exports = api.upload = {
 							db = db || {};
 							db.name = options.name;
 							db.file = options.fileUuid;
-							db.type = options.type;
+							db.type = 'image';
 							db.files = [options.name];
 
 							// return db
@@ -731,7 +727,7 @@ module.exports = api.upload = {
 					db = db || {};
 					db.name = options.name;
 					db.file = options.fileUuid;
-					db.type = options.type;
+					db.type = 'image';
 					db.files = [options.name];
 
 					// return db
