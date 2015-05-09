@@ -677,6 +677,7 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 			subtext = this._getMeasurementString();
 		}
 
+		console.log('a2', this._getMeasurementString());
 		return {
 			text: text,
 			subtext: subtext
@@ -705,7 +706,11 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 			latLngs = this._poly.getLatLngs();
 
 			this._area = L.GeometryUtil.geodesicArea(latLngs);
+			console.log(this._area);
 		}
+		latLngs = this._poly.getLatLngs();
+		this._area = L.GeometryUtil.geodesicArea(latLngs);
+			console.log(this._area);
 
 		L.Draw.Polyline.prototype._vertexChanged.call(this, latlng, added);
 	},
