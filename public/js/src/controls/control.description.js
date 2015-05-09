@@ -258,6 +258,9 @@ L.Control.Description = Wu.Control.extend({
 		var sources = this._project.getGrandeFiles();
 		var images = this._project.getGrandeImages();
 
+		console.log('sources', sources);
+		console.log('images: ', images);
+
 		// set grande options
 		var options = {
 			plugins : {

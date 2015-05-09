@@ -907,6 +907,7 @@ Wu.Project = Wu.Class.extend({
 
 	// format images for Grande plugin
 	_formatGrandeImages : function (files) {
+		console.log('))files', files);
 		var sources = [];
 		files.forEach(function (file) {
 			if (file.type == 'image') {

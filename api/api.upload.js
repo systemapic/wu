@@ -506,7 +506,7 @@ module.exports = api.upload = {
 							db = db || {};
 							db.name = options.name;
 							db.file = options.fileUuid;
-							db.type = options.type;
+							db.type = 'image';
 							db.files = [options.name];
 
 							// return db
@@ -727,7 +727,7 @@ module.exports = api.upload = {
 					db = db || {};
 					db.name = options.name;
 					db.file = options.fileUuid;
-					db.type = options.type;
+					db.type = 'image';
 					db.files = [options.name];
 
 					// return db
