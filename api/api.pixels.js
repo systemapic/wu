@@ -430,6 +430,7 @@ module.exports = api.pixels = {
 			entry.data.image.dimensions  = dimensions;
 			entry.dataSize        	     = dataSize;
 			entry.data.image.file        = file;
+			entry.type 		     = 'image';
 			
 			if (exif) {
 				entry.data.image.created     = api.pixels.getExif.created(exif);
