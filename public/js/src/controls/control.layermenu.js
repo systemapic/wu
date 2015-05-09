@@ -272,7 +272,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	_setHeight : function (extra) {
 		// count open items
 		var numOpen = this._getOpenItems();
-		console.log('num', numOpen, extra);
 		if (this.editMode && !extra) extra = 50;
 		var extra = extra ? extra + 50 : 50;
 		var height = numOpen * 30 + extra + 'px';
@@ -1088,6 +1087,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		// save
 		this._project.store.layermenu.push(item); // refactor
 		this.save();
+
+		this._setHeight();
 
 	},
 

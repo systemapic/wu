@@ -152,8 +152,6 @@ Wu.User = Wu.Class.extend({
 		var allProjects = app.Projects,
 		    projects = [];
 
-		console.error('getProjects', allProjects);
-
 		// return all if admin
 		if (app.access.is.admin(this)) return _.values(allProjects);
 
