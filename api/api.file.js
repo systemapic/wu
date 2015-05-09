@@ -115,6 +115,8 @@ module.exports = api.file = {
 
 		if (!fileUuid) return api.error.missingInformation(req, res);
 		
+		console.log('downloadFile'.green, fileUuid);
+
 		ops.push(function (callback) {
 			File
 			.findOne({uuid : fileUuid})
@@ -129,6 +131,9 @@ module.exports = api.file = {
 		});
 
 		ops.push(function (options, callback) {
+			
+			console.log('downloadFile.'.yellow, options);
+			
 			var record = options.file,
 			    name = record.name.replace(/\s+/g, ''),
 			    // name = ''
@@ -138,6 +143,9 @@ module.exports = api.file = {
 			    exec = require('child_process').exec;				
 			
 			// run command
+			console.log('cmd: ', command);
+			console.log('cwd: ', cwd);
+			
 			exec(command, {cwd : cwd}, function (err, stdout, stdin) {
 				callback(err, out);
 			});
@@ -193,6 +201,8 @@ module.exports = api.file = {
 	download : function (req, res) {
 		var file = req.query.file,
 		    type = req.query.type || 'file';
+
+		console.log('download'.green, file, type);
 	
 		if (!file) return api.error.missingInformation(req, res);
 		

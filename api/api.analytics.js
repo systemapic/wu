@@ -46,10 +46,7 @@ var api = module.parent.exports;
 module.exports = api.analytics = { 
 
 	set : function (req, res) {
-		console.time('ga set');
 		var options = req.body;
-		console.log('ga set options'.red, options);
-		// called from routes.js:64, /api/analytics/set
 
 		if (!options) return api.error.missingInformation(req, res);
 
@@ -86,7 +83,6 @@ module.exports = api.analytics = {
 		var clientID   = userHeader.clientID;   // The same as user id
 
 		// Create GA user instance
-		console.time('gaInstance');
 		var visitor = ua(trackingID, clientID, {
 		
 
@@ -95,7 +91,6 @@ module.exports = api.analytics = {
 			strictCidFormat: false
 
 		});
-		console.timeEnd('gaInstance');
 
 		// TRACKING PAGEVIEWS
 		if ( gaPageview ) {
@@ -132,9 +127,7 @@ module.exports = api.analytics = {
 
 			}
 
-			console.time('pageview');
 			visitor.pageview(pageviewParams, function (err) {
-			console.timeEnd('pageview');
 
 				// return to client
 				res.end(JSON.stringify({
@@ -174,9 +167,7 @@ module.exports = api.analytics = {
 
 
 			// visitor.event(eventParams).send();
-			console.time('pageevent');
 			visitor.event(eventParams, function (err) {
-			console.timeEnd('pageevent');
 				
 				// return to client
 				res.end(JSON.stringify({
@@ -188,7 +179,6 @@ module.exports = api.analytics = {
 
 		}
 
-		console.timeEnd('ga set');
 
 
 	},

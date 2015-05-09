@@ -609,9 +609,9 @@ label.info {
 
 .dragging {
 	background: #92f0e5 !important;
-	cursor: pointer;
-	cursor: -webkit-grab !important;
-	cursor:    -moz-grab !important;
+	/*cursor: pointer;*/
+	cursor: -webkit-grabbing !important;
+	cursor:    -moz-grabbing !important;
 	}
 
 
