@@ -31,7 +31,7 @@ var userLastname = process.argv[4];
 var userUuid = 'user-' + uuid.v4();
 
 if (!userEmail || !userFirstname || !userLastname) {
-	console.log('Usage: node create_superadmin.js EMAIL FIRST_NAME LAST_NAME'.yellow);
+	console.log('Usage: node create_admin.js EMAIL FIRST_NAME LAST_NAME'.yellow);
 	process.exit(1);
 }
 
@@ -41,13 +41,14 @@ var ops = [];
 ops.push(function (callback) {
 
 	// create user
-	var password 		= crypto.randomBytes(16).toString('hex');
+	// var password 		= crypto.randomBytes(16).toString('hex');
+	var password 		= 'new_admin_user'
 	var user            	= new User();
 	user.uuid 		= userUuid;
 	user.local.email    	= userEmail;	
 	user.local.password 	= user.generateHash(password);
-	user.firstName 		= 'Superadmin';
-	user.lastName 		= '';
+	user.firstName 		= userFirstname;
+	user.lastName 		= userLastname;
 	user.createdBy		= userUuid;
 	user.save(callback);
 
@@ -61,6 +62,7 @@ ops.push(function (callback) {
 	Role
 	.findOne({uuid : portalAdminRole})
 	.exec(function (err, role) {
+
 		role.members.push(userUuid);
 		role.save(callback);
 	});
