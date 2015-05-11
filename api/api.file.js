@@ -404,6 +404,8 @@ module.exports = api.file = {
 			var cmd = 'unzip -o -d "' + out + '" "' + inn + '" -x "*DS_Store*" "*__MACOSX*"'; 	// to folder .shp
 			var exec = require('child_process').exec;
 
+			console.log('zip cmd:'.red, cmd);
+
 			// unzip
 			exec(cmd, function (err, stdout, stdin) {
 				if (err) console.log('handleziup 00 err: '.red + err);
