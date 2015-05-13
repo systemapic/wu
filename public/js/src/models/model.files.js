@@ -74,7 +74,28 @@ Wu.Files = Wu.Class.extend({
 		return this.store.description;
 	},
 
+	getLayer : function () {
+		var fileUuid = this.getUuid();
+		console.log('fiel', fileUuid);
+		var project = _.find(app.Projects, function (p) {
+			return p.files[fileUuid];
+		});
+		console.log('PRO', project);
+		var layer = _.find(project.layers, function (l) {
+			return l.getFileUuid() == fileUuid;
+		});
+		console.log('layer: ', layer);
+		return layer;
+	},
 
+	getCopyright : function () {
+		return this.store.copyright;
+	},
+
+	setCopyright : function (copyright) {
+		this.store.copyright = copyright;
+		this.save('copyright');
+	},
 
 
 	// setters
@@ -116,6 +137,7 @@ Wu.Files = Wu.Class.extend({
 	},
 
 	setDescription : function (description) {
+		console.log('saving description1!!!!!');
 		this.store.description = description;
 		this.save('description');
 	},
@@ -140,7 +162,9 @@ Wu.Files = Wu.Class.extend({
 	// save json to server
 	_save : function (string) {
 		// TODO: save only if actual changes! saving too much already
-		Wu.save('/api/file/update', string); // save to server                            
+		Wu.save('/api/file/update', string); // save to server   
+
+		console.log('SAVING FILE!!');                         
 		app.setSaveStatus();// set status
 	},
 

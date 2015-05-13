@@ -301,7 +301,9 @@ module.exports = api.file = {
 		var fileUuid = req.body.uuid,
 		    account = req.user,
 		    ops = [];
-		
+
+
+
 		if (!fileUuid) return api.error.missingInformation(req, res);
 
 		ops.push(function (callback) {
@@ -341,6 +343,8 @@ module.exports = api.file = {
 		    options = job.options,
 		    queries = {};
 
+		console.log('update file'.green, options);
+		
 		// valid fields
 		var valid = [
 			'name', 

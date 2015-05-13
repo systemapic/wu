@@ -340,12 +340,6 @@ aka feedback pane
 	padding: 3px;
 	}
 
-/*.legend-header {
-	font-size: 13px;
-	top: 5px;
-	left: 0px;	
-	}*/
-
 #header {
 	width: auto;
 	padding: 0;
@@ -359,3 +353,22 @@ aka feedback pane
 	position: fixed;
 	z-index: 999999999999999;
 }
+
+
+
+.file-description-outer-wrapper {
+	overflow: hidden;
+	}
+
+.description-textarea-outer-wrapper {
+	height: 94px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	width: 537px;
+	padding-right: 30px;
+	}
+
+.minimal .description-textarea-outer-wrapper {
+	height: 108px;
+	width: 218px;
+	}

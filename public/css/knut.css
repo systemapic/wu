@@ -591,3 +591,9 @@ body {
 .edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content {
      padding-bottom: 5px; 
 }
+
+.description-copyright {
+	color: gray;
+  font-style: italic;
+  font-size: 90%;
+}
