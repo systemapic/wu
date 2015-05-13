@@ -314,33 +314,11 @@ module.exports = api.geo = {
 	},
 
 
-	handleJPEG2000 : function (options, done) {
-		return api.geo.handleRaster(options, done);
-
-		// var fileUuid = options.fileUuid,
-		//     inFile = options.path,
-		//     outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
-		//     outFile = options.path + '.tif',
-		//     ops = [];
-
-		// // convert to geotiff, then api.geo.handleRaster
-		// var cmd = '/var/www/deps/kakadu/kdu_expand -i "' + inFile + '" -o "' + outFile + '" -num_threads 6'; 
-
-		// console.log('cmd', cmd);
-
-		// var exec = require('child_process').exec;
-		// exec(cmd, function (err, stdout, stdin) {
-		// 	if (err) return done(err);
-		// 	console.log('kakadu done'.yellow, err, stdout);
-
-		// 	options.path = outFile;
-			
-		// 	// handle raster normally
-		// 	api.geo.handleRaster(options, done);
-		// });
+	// handleJPEG2000 : function (options, done) {
+	// 	return api.geo.handleRaster(options, done);
 
 
-	},
+	// },
 
 	handleRaster : function (options, done) {
 

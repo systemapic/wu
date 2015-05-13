@@ -253,6 +253,14 @@ Wu.Layer = Wu.Class.extend({
 		return this.store.file;
 	},
 
+	getFile : function () {
+		var fileUuid = this.getFileUuid();
+		var file = _.find(app.Projects, function (p) {
+			return p.files[fileUuid];
+		});
+		return file.files[fileUuid];
+	},
+
 	getProjectUuid : function () {
 		return app.activeProject.store.uuid;
 	},
