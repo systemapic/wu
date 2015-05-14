@@ -694,7 +694,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// set feedback
 		app.feedback.setMessage({
 			title : 'Files deleted',
-			description : this._getPrettyFileNames(files)			
+			description : this._getPrettyFileNames(files),
+			clearDelay : 5000
+
 		});
 
 	},
@@ -705,7 +707,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			names.push(file.name);
 		});
 
-		return names.join(', ');
+		return names.join('<br>');
 	},
 
 

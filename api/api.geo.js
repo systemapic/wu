@@ -55,6 +55,22 @@ module.exports = api.geo = {
 		});
 	},
 
+	copyToVileRasterFolder : function (path, fileUuid, callback) {
+		if (!path || !fileUuid) return callback('Missing information.14');
+
+		var dest = api.config.path.file + fileUuid;
+		console.log('copyToVileRasterFolder!!! 1', dest, path);
+
+		// do nothing if already there
+		if (path == dest) return callback(null);
+
+		console.log('copyToVileRasterFolder!!! 2');
+		fs.copy(path, dest, function(err) {
+			if (err) console.log('copy err!'.red, err);
+			callback(null);
+		});
+	},
+
 	handleGeoJSON : function (path, fileUuid, callback) {
 		if (!path || !fileUuid) return callback('Missing information.15');
 
@@ -314,12 +330,6 @@ module.exports = api.geo = {
 	},
 
 
-	// handleJPEG2000 : function (options, done) {
-	// 	return api.geo.handleRaster(options, done);
-
-
-	// },
-
 	handleRaster : function (options, done) {
 
 		var fileUuid = options.fileUuid,
@@ -328,23 +338,17 @@ module.exports = api.geo = {
 		    ops = [];
 
 
-		console.log('GDAL VERSION'.red, gdal.version);
-		console.log('GDAL DRIVERS'.red, gdal.drivers.getNames());
+		// console.log('GDAL VERSION'.red, gdal.version);
+		// console.log('GDAL DRIVERS'.red, gdal.drivers.getNames());
 		console.log('options.'.green, options);
 
-		// async.parallel([function (callback) {
-		// 	var out = api.config.path.file + fileUuid + '/' + options.name;
-		// 	var inn = inFile;
-		// 	console.log('inn, out', inn, out);
-
-		// 	fs.copy(inn, out, callback)
-		// }], console.log)
 
 		ops.push(function (callback) {
 			var out = api.config.path.file + fileUuid + '/' + options.name;
 			var inn = inFile;
 			console.log('COPYYY inn, out', inn, out);
 
+			// dont copy if already there
 			if (inn == out) return callback(null);
 
 			fs.copy(inn, out, function (err) {
@@ -478,20 +482,54 @@ module.exports = api.geo = {
 
 		ops.push(function (meta, callback) {
 			
-			var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
-			// var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=1 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
-			console.log('cmd: ', cmd);
+			// var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
+			// // var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=1 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
+			// console.log('cmd: ', cmd);
 
-			var exec = require('child_process').exec;
-			exec(cmd, { maxBuffer: 2000 * 1024 }, function (err, stdout, stdin) {
-				console.log('ppgdal2tiles:'.green, stdout);
-				if (err) {
-					console.log('gdal2tiles err: '.red + err);
+			// var exec = require('child_process').exec;
+			// exec(cmd, { maxBuffer: 2000 * 1024 }, function (err, stdout, stdin) {
+			// 	console.log('ppgdal2tiles:'.green, stdout);
+			// 	if (err) {
+			// 		console.log('gdal2tiles err: '.red + err);
 					
-					api.error.log(err);
-					var errMsg = 'There was an error generating tiles for this raster image. Please check #error-log for more information.'
-					return callback(errMsg);
-				}
+			// 		api.error.log(err);
+			// 		var errMsg = 'There was an error generating tiles for this raster image. Please check #error-log for more information.'
+			// 		return callback(errMsg);
+			// 	}
+
+			// 	// return as db entry
+			// 	var db = {
+			// 		data : {
+			// 			raster : options.name
+			// 		},
+			// 		title : options.name,
+			// 		file : fileUuid,
+			// 		metadata : JSON.stringify(meta)
+			// 	}
+
+			// 	console.log('db created'.yellow, db);
+			// 	callback(null, db);
+			// });
+
+				// var key = results[1];
+				// if (!key) return callback('No key.');
+
+				// var path = key.path;
+				// var name = key.name;
+				// var fileUuid = key.fileUuid;
+
+				// // add geojson file to list
+				// shapefiles.push(name);
+
+				// return as db entry
+				// var db = {
+				// 	files : shapefiles,
+				// 	data : {
+				// 		geojson : name
+				// 	},
+				// 	title : name,
+				// 	file : fileUuid
+				// }
 
 				// return as db entry
 				var db = {
@@ -502,14 +540,213 @@ module.exports = api.geo = {
 					file : fileUuid,
 					metadata : JSON.stringify(meta)
 				}
+				api.geo.copyToVileRasterFolder(options.path, fileUuid, function (err) {
+					if (err) return callback('copytToVile err: ' + err);
 
-				console.log('db created'.yellow, db);
-				callback(null, db);
-			});
+					callback(null, db);
+				});
 		});
 
 		async.waterfall(ops, done);
 	},
+
+
+	// handleJPEG2000 : function (options, done) {
+	// 	return api.geo.handleRaster(options, done);
+
+
+	// },
+
+	// handleRaster : function (options, done) {
+
+	// 	var fileUuid = options.fileUuid,
+	// 	    inFile = options.path,
+	// 	    outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
+	// 	    ops = [];
+
+
+	// 	// console.log('GDAL VERSION'.red, gdal.version);
+	// 	// console.log('GDAL DRIVERS'.red, gdal.drivers.getNames());
+	// 	console.log('options.'.green, options);
+
+	// 	// async.parallel([function (callback) {
+	// 	// 	var out = api.config.path.file + fileUuid + '/' + options.name;
+	// 	// 	var inn = inFile;
+	// 	// 	console.log('inn, out', inn, out);
+
+	// 	// 	fs.copy(inn, out, callback)
+	// 	// }], console.log)
+
+	// 	ops.push(function (callback) {
+	// 		var out = api.config.path.file + fileUuid + '/' + options.name;
+	// 		var inn = inFile;
+	// 		console.log('COPYYY inn, out', inn, out);
+
+	// 		if (inn == out) return callback(null);
+
+	// 		fs.copy(inn, out, function (err) {
+	// 			callback(err);
+	// 		});
+	// 	})
+
+	// 	// validation
+	// 	ops.push(function (callback) {
+
+	// 		var dataset = gdal.open(inFile);
+
+	// 		if (!dataset) return callback('Invalid dataset.');
+	// 		if (!dataset.srs) return callback('Invalid projection.');
+	// 		if (!dataset.srs.validate) return callback('Invalid projection.');
+
+	// 		// check if valid projection
+	// 		var invalid = dataset.srs.validate();
+
+	// 		// valid
+	// 		if (!invalid) return callback(null, dataset);
+			
+	// 		// invalid
+	// 		var msg = 'Invalid projection: ' + dataset.srs.toWKT();
+	// 		console.log('msg: ', msg);
+	// 		callback(msg); // err
+	// 	});
+
+
+	// 	// get file size
+	// 	ops.push(function (dataset, callback) {
+	// 		fs.stat(options.path, function (err, stats) {
+	// 			options.fileSize = stats.size;
+	// 			callback(null, dataset);
+	// 		});
+	// 	});
+
+
+	// 	// get meta 
+	// 	ops.push(function (dataset, callback) {
+			
+	// 		// get projection
+	// 		var s_srs = dataset.srs ? dataset.srs.toProj4() : 'null';
+
+	// 		// get extent
+	// 		var extent = api.geo._getRasterExtent(dataset);
+
+	// 		var meta = {
+	// 			projection : s_srs,
+	// 			geotransform : dataset.geoTransform,
+	// 			bands : dataset.bands.count(),
+	// 			extent : extent.extent,
+	// 			center : extent.center,
+	// 			minzoom : 0,
+	// 			maxzoom : 18,
+	// 			filetype : options.extension,
+	// 			filesize : options.fileSize, // bytes
+	// 			filename : options.name,
+	// 			size : {
+	// 				x : dataset.rasterSize.x,
+	// 				y : dataset.rasterSize.y
+	// 			},
+	// 		}
+
+	// 		// "{
+	// 		//   "filesize": 184509,
+	// 		//   "projection": "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs",
+	// 		//   "filename": "sydney",
+	// 		//   "center": [
+	// 		//     150.441711504,
+	// 		//     -33.52856723049999
+	// 		//   ],
+	// 		//   "extent": [
+	// 		//     149.39475100800001, 	// left
+	// 		//     -34.30833595899998, 	// bottom
+	// 		//     151.488672, 		// right 
+	// 		//     -32.748798502		// top
+	// 		//   ],
+	// 		//   "json": {
+	// 		//     "vector_layers": [
+	// 		//       {
+	// 		//         "id": "subunitsExMS",
+	// 		//         "description": "",
+	// 		//         "minzoom": 0,
+	// 		//         "maxzoom": 22,
+	// 		//         "fields": {
+	// 		//           "id": "String",
+	// 		//           "name": "String"
+	// 		//         }
+	// 		//       }
+	// 		//     ]
+	// 		//   },
+	// 		//   "minzoom": 0,
+	// 		//   "maxzoom": 12,
+	// 		//   "layers": [
+	// 		//     "subunitsExMS"
+	// 		//   ],
+	// 		//   "dstype": "ogr",
+	// 		//   "filetype": ".geojson"
+	// 		// }"
+			
+	// 		callback(null, meta);
+	// 	});
+
+
+	// 	// reproject if necessary
+	// 	ops.push(function (meta, callback) {
+
+	// 		var proj4 = meta.projection;
+	// 		var ourProj4 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ';
+	// 		var source = gdal.SpatialReference.fromProj4(proj4);
+	// 		var target = gdal.SpatialReference.fromProj4(ourProj4);
+	// 		var isSame = source.isSame(target);
+
+	// 		// same, no reprojection necessary
+	// 		if (isSame) return callback(null, meta);
+
+	// 		var outFile = inFile + '.reprojected';
+	// 		var cmd = 'gdalwarp -srcnodata 0 -dstnodata 0 -t_srs "' + ourProj4 + '" "' + inFile + '" "' + outFile + '"';
+	// 		console.log('gdalwarp cmd: ', cmd);
+
+	// 		var exec = require('child_process').exec;
+	// 		exec(cmd, function (err, stdout, stdin) {
+	// 			if (err) return callback(err);
+
+	// 			options.path = outFile;
+	// 			callback(null, meta);
+	// 		});
+
+	// 	});
+
+	// 	ops.push(function (meta, callback) {
+			
+	// 		var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
+	// 		// var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=1 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
+	// 		console.log('cmd: ', cmd);
+
+	// 		var exec = require('child_process').exec;
+	// 		exec(cmd, { maxBuffer: 2000 * 1024 }, function (err, stdout, stdin) {
+	// 			console.log('ppgdal2tiles:'.green, stdout);
+	// 			if (err) {
+	// 				console.log('gdal2tiles err: '.red + err);
+					
+	// 				api.error.log(err);
+	// 				var errMsg = 'There was an error generating tiles for this raster image. Please check #error-log for more information.'
+	// 				return callback(errMsg);
+	// 			}
+
+	// 			// return as db entry
+	// 			var db = {
+	// 				data : {
+	// 					raster : options.name
+	// 				},
+	// 				title : options.name,
+	// 				file : fileUuid,
+	// 				metadata : JSON.stringify(meta)
+	// 			}
+
+	// 			console.log('db created'.yellow, db);
+	// 			callback(null, db);
+	// 		});
+	// 	});
+
+	// 	async.waterfall(ops, done);
+	// },
 
 
 	_getRasterExtent : function (dataset) {
