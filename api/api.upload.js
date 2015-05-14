@@ -111,6 +111,8 @@ module.exports = api.upload = {
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
 				if (err) console.log('err'.red, err);
+
+				console.log('catted file: '.green, outputPath);
 				fs.stat(outputPath, callback);
 			});
 
@@ -177,6 +179,8 @@ module.exports = api.upload = {
 		    projectUuid = options.projectUuid,
 		    fileArray = [incomingFile],
 		    ops = [];
+
+		console.log('implortFile'.green, incomingFile, options);
 
 		// sort files
 		ops.push(function (callback) {
@@ -377,6 +381,8 @@ module.exports = api.upload = {
 
 	sortFormFiles : function (fileArray, done) {
 
+
+
 		// quick sort
 		var ops = [];
 		fileArray.forEach(function (file) {
@@ -428,6 +434,9 @@ module.exports = api.upload = {
 		}
 
 		var ops1 = [];
+
+		console.log('SORTZIPFOLDER!!'.green, options);
+		console.log('currentfolder: '.green, currentFolder);
 
 		// read files in folder
 		fs.readdir(currentFolder, function (err, files) {
@@ -611,6 +620,8 @@ module.exports = api.upload = {
 
 		var ext = options.extension;
 
+		console.log('_soprOp'.green, ops, options);
+
 		// handle folder
 		if (options.type == 'folder') {
 
@@ -645,6 +656,8 @@ module.exports = api.upload = {
 					fileUuid : options.fileUuid,
 					out : ''
 				}
+
+				console.log('zip!'.green);
 
 				// unzips files to folder
 				api.file.handleZip(opt, function (err) {
