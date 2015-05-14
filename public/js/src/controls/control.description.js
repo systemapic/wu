@@ -26,7 +26,7 @@ L.Control.Description = Wu.Control.extend({
 
 		// create scroller 
 		this._inner = Wu.DomUtil.create('div', 'description-scroller', this._outer);
-		this._copyright = Wu.DomUtil.create('div', 'description-copyright', this._outer, 'Copyright:');
+		this._copyright = Wu.DomUtil.create('div', 'description-copyright', this._outer, '');
 		
 		// add tooltip
 		app.Tooltip.add(this._container, 'Shows layer information', { extends : 'systyle', tipJoint : 'left' });
@@ -105,14 +105,19 @@ L.Control.Description = Wu.Control.extend({
 
 	setCopyright : function (layer) {
 		var file = layer.getFile();
-		var text = file.getCopyright();
-		this._copyright.innerHTML = 'Copyright: ' + text;
+
+		if (file) {
+			var text = file.getCopyright();
+			var copy = text ? 'Copyright: ' + text : '';
+			this._copyright.innerHTML = copy;
+		} else {
+			this._copyright.innerHTML = '';
+		}
 	},
 
 	setDescription : function (layer) {
 		this._setDescription(layer.store.description);
 		this.setCopyright(layer);
-
 	},
 
 	_setDescription : function (text) {
