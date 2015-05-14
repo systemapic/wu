@@ -25,6 +25,9 @@ Wu.Socket = Wu.Class.extend({
 		socket.on('hola', function(data){
 			console.log('hola!', data);
 		});
+		socket.on('tilesCreated', function(data){
+			console.log('tilesCreated:', data);
+		});
 		socket.on('uploadDone', function (data) {
 			console.log('uploadDone!', data);
 

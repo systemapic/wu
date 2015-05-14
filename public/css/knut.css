@@ -591,3 +591,16 @@ body {
 .edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content {
      padding-bottom: 5px; 
 }
+
+.description-copyright {
+	color: gray;
+  font-style: italic;
+  font-size: 90%;
+}
+
+.list-line {
+	-webkit-transition: height 250ms ease;
+	-moz-transition: height 250ms ease;
+	transition: height 250ms ease;
+	/*overflow: hidden;*/
+}

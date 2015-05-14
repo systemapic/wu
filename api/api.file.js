@@ -301,7 +301,9 @@ module.exports = api.file = {
 		var fileUuid = req.body.uuid,
 		    account = req.user,
 		    ops = [];
-		
+
+
+
 		if (!fileUuid) return api.error.missingInformation(req, res);
 
 		ops.push(function (callback) {
@@ -341,6 +343,8 @@ module.exports = api.file = {
 		    options = job.options,
 		    queries = {};
 
+		console.log('update file'.green, options);
+		
 		// valid fields
 		var valid = [
 			'name', 
@@ -404,23 +408,33 @@ module.exports = api.file = {
 			var cmd = 'unzip -o -d "' + out + '" "' + inn + '" -x "*DS_Store*" "*__MACOSX*"'; 	// to folder .shp
 			var exec = require('child_process').exec;
 
-			console.log('zip cmd:'.red, cmd);
+			console.log('zip cmd:'.green, cmd);
+
+			console.log('cmd in, out: '.green, inn, out);
 
 			// unzip
 			exec(cmd, function (err, stdout, stdin) {
 				if (err) console.log('handleziup 00 err: '.red + err);
 				if (err) return callback(err);
 
-				// remove unnecessary files - important!
-				fs.unlink(inn, function (err) {
-					if (err) console.log('handle zip unlink  err: '.red + err);
-					if (err) return callback(err);
+				console.log('zippppppped!!'.green);
+				console.log('zippppppped!!'.green);
+				console.log('zippppppped!!'.green, err, stdout, stdin);
 
-					fs.remove(out + '/__MACOSX', function (err) {
-						if (err) console.log('handle zip remove : '.red + err);
-						callback(err);
-					});
-				});
+				// consl.og('crahs!');
+				// remove unnecessary files - important!
+				console.log('unlkn king inn'.red, inn);
+				// fs.unlink(inn, function (err) {
+					// if (err) console.log('handle zip unlink  err: '.red + err);
+					// if (err) return callback(err);
+
+					console.log('removing out! __MAXOSX'.red, out);
+					callback(err);
+					// fs.remove(out + '/__MACOSX', function (err) {
+					// 	if (err) console.log('handle zip remove : '.red + err);
+					// 	callback(err);
+					// });
+				// });
 			});
 		});
 	},
@@ -712,6 +726,24 @@ module.exports = api.file = {
 		
 		// send
 		res.sendfile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
+	},
+
+	
+	tileCount : function (req, res) {
+		var fileUuid = req.body.fileUuid;
+		
+		var path = '/data/raster_tiles/' + fileUuid;
+		var cmd = 'find raster/ -type f | wc -l';
+
+		var exec = require('child_process').exec;				
+					
+		// run command
+		exec(cmd, { cwd : path }, function (err, stdout, stdin) {
+			if (err) console.log('ERR 11'.red, err);
+
+			var count = stdout;
+			res.end(count);
+		});
 	},
 
 

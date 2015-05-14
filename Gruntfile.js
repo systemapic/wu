@@ -32,7 +32,7 @@ module.exports = function(grunt) {
 			},
 
 			css : {
-				files:[  'scss/*' ],
+				files:[  'scss/*', 'public/css/**/*.css' ],
 				tasks:[  'sass', 'cssmin' ]
 			},
 

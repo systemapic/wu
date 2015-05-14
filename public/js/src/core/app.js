@@ -1,4 +1,4 @@
-Wu.version = '0.6.1-dev';
+Wu.version = '0.6.2-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -12,6 +12,8 @@ Wu.App = Wu.Class.extend({
 	_ready : false,
 
 	initialize : function (options) {
+
+		console.log('Systemapic version', Wu.version);
 
 		// set global this
 		Wu.app = window.app = this;
