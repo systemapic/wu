@@ -882,7 +882,9 @@ Wu.List = Wu.Class.extend({
 			// })
 			.attr('style', function(d) {
 				var isOpen = that.checkOpenFileInfo(d.fileUuid, that);
-				if ( isOpen ) return 'height: 240px;';
+				if ( isOpen ) {
+					return 'height: 240px; overflow: hidden;';
+				}
 			});
 					
 			
