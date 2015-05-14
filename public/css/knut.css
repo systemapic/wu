@@ -602,5 +602,5 @@ body {
 	-webkit-transition: height 250ms ease;
 	-moz-transition: height 250ms ease;
 	transition: height 250ms ease;
-	overflow: hidden;
+	/*overflow: hidden;*/
 }
