@@ -26,6 +26,7 @@ L.Control.Description = Wu.Control.extend({
 
 		// create scroller 
 		this._inner = Wu.DomUtil.create('div', 'description-scroller', this._outer);
+		this._copyright = Wu.DomUtil.create('div', 'description-copyright', this._outer, '');
 		
 		// add tooltip
 		app.Tooltip.add(this._container, 'Shows layer information', { extends : 'systyle', tipJoint : 'left' });
@@ -102,8 +103,21 @@ L.Control.Description = Wu.Control.extend({
 		this._hide();
 	},
 
+	setCopyright : function (layer) {
+		var file = layer.getFile();
+
+		if (file) {
+			var text = file.getCopyright();
+			var copy = text ? 'Copyright: ' + text : '';
+			this._copyright.innerHTML = copy;
+		} else {
+			this._copyright.innerHTML = '';
+		}
+	},
+
 	setDescription : function (layer) {
 		this._setDescription(layer.store.description);
+		this.setCopyright(layer);
 	},
 
 	_setDescription : function (text) {
@@ -233,6 +247,10 @@ L.Control.Description = Wu.Control.extend({
 			this.activeLayer.setDescription(text);
 			this.activeLayer.save('description');
 
+			// save text to file
+			var file = this.activeLayer.getFile();
+			file.setDescription(text);
+
 			// set status
 			app.setSaveStatus();
 		}
@@ -257,9 +275,6 @@ L.Control.Description = Wu.Control.extend({
 		var files = this._project.getFiles();
 		var sources = this._project.getGrandeFiles();
 		var images = this._project.getGrandeImages();
-
-		console.log('sources', sources);
-		console.log('images: ', images);
 
 		// set grande options
 		var options = {

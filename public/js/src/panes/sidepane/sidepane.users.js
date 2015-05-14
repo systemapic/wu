@@ -315,6 +315,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		// Google Analytics event tracking
 		app.Analytics.setGaEvent(['Side Pane', 'Users: Confirm new user', firstName + ' ' + lastName]);
 
+
 	},
 
 	// send new user request to server
@@ -343,6 +344,11 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 
 		context.refreshTable({add : store});
 
+		// feedback
+		app.FeedbackPane.setSuccess({
+			title : 'User created',
+			description : 'The user <strong>' + user.getFullName() + '</strong> has been created. The user will receive an email with login details.'
+		});
 	},
 
 	deleteUser : function () {		

@@ -882,7 +882,9 @@ Wu.List = Wu.Class.extend({
 			// })
 			.attr('style', function(d) {
 				var isOpen = that.checkOpenFileInfo(d.fileUuid, that);
-				if ( isOpen ) return 'height: 240px;';
+				if ( isOpen ) {
+					return 'height: 240px; overflow: hidden;';
+				}
 			});
 					
 			
@@ -1210,7 +1212,7 @@ Wu.List = Wu.Class.extend({
 
 			info
 				.on('click', function(d) {
-					that.toggleFileInfo(d, that);
+					that.toggleFileInfo(d, that, info);
 				})
 
 
@@ -1354,15 +1356,27 @@ Wu.List = Wu.Class.extend({
 		listAttribute
 			.html(function (d) { 
 
+
+
+
 				// If we have special rules for HTML ...
 				if ( listOptions.attributes[i].html ) {
 					var returnData = listOptions.attributes[i].html(d, that);
-					return [returnData];
+					
+					if ( returnData ) {
+						return [returnData.camelize()]
+					} else {
+						return [];
+					}
 
 				// if not, return attribute field.
 				} else {
-					return d.file.store[attribute] 
-				}				
+					if ( d.file.store[attribute] ) {
+						return d.file.store[attribute].camelize();
+					} else {
+						return []; 
+					}				
+				}
 
 			});
 
@@ -1575,7 +1589,8 @@ Wu.List = Wu.Class.extend({
 	},
 
 
-	toggleFileInfo : function (d, that) {
+	toggleFileInfo : function (d, that, info) {
+		console.log('toggle', d, that, info);
 
 		if ( !that.showFileInfo ) that.showFileInfo = [];
 
@@ -2086,9 +2101,16 @@ Wu.DataLibraryList = Wu.List.extend({
 			.enter()
 			.append('img')
 			.classed('file-thumb-img', true)
-			// .html('Thumb:');
 			.attr('src', function(d) {
-				// return thumbnail
+
+				var store = d.file.store;
+				
+				if (store.type == 'image') {
+					var imageFile   = store.data.image.file;
+					var url = '/pixels/image/' + imageFile + '?width=130&height=95'
+					return url;
+				}
+
 			});
 
 		// EXIT
@@ -2175,6 +2197,8 @@ Wu.DataLibraryList = Wu.List.extend({
 
 	// Description
 	listMetaDescription : function (wrapper) {
+
+		var that = this;
 
 		// DESCRIPTION OUTER WRAPPER
 		// DESCRIPTION OUTER WRAPPER
@@ -2264,14 +2288,45 @@ Wu.DataLibraryList = Wu.List.extend({
 		// UPDATE
 		descriptionTextArea
 			.html(function(d) {
+
 				var description = d.file.store.description;
+				
+				if ( description ) {
+					var hasHTML = description.search('</');
+					if ( hasHTML >= 1 ) {
+						this.outerHTML = description;
+						return [];
+						
+					}
+				}
+				
 				return description;
 			})
+			.on('focus', function(d) {
+				d.context = this;
+				Wu.DomEvent.on(this, 'keydown', _.throttle(that.throttleSaveDescription.bind(d), 1000)); 
+			});
 
 		// EXIT
 		descriptionTextArea
 			.exit()
 			.remove();
+
+	},
+
+	
+
+	throttleSaveDescription : function () {
+
+		var text = this.context.value;
+		var file = this.file;
+
+		file.setDescription(text)
+
+		var layer = file.getLayer();
+		
+		layer && layer.setDescription(text);
+
 
 	},
 
@@ -2393,6 +2448,7 @@ Wu.DataLibraryList = Wu.List.extend({
 	// Other meta: Uploaded by
 	listMetaOtherCopyright : function (wrapper) {
 
+		var that = this;
 
 		// COPYRIGHT WRAPPER
 		// COPYRIGHT WRAPPER
@@ -2461,24 +2517,81 @@ Wu.DataLibraryList = Wu.List.extend({
 			.append('input')
 			.attr('type', 'text')
 			.attr('placeholder', 'Click to add copyright information')
-			.on('blur', function(d) {
-
-				// Fittepølse
-				// popopoppopopopoppopoopopo
-				console.log('fuck you!', this.value)
-				console.log('d', d);
-				// layer.setDescription/Title/Copyright
-
-			})
 			.classed('file-copright-line', true);
+
+		copyrightLine
+			.attr('value', function(d) {
+
+				var file = d.file;
+				var copyright = file.getCopyright();
+
+				if ( copyright ) 	{ return copyright; }
+				else 			{ return []; }
+			})
+			.on('focus', function(d) {
+				d.context = this;
+				Wu.DomEvent.on(this, 'keydown', _.throttle(that.throttleSaveCopyright.bind(d), 1000)); 
+			});	
+
+
+			// .on('f', function(d) {
+
+			// 	// Fittepølse
+			// 	// popopoppopopopoppopoopopo
+			// 	console.log('fuck you!', this.value)
+			// 	console.log('d', d.file);
+			// 	// layer.setDescription/Title/Copyright
+
+			// })
 
 		// EXIT
 		copyrightLine
 			.exit()
 			.remove();
 
+	},
+
+	throttleSaveCopyright : function () {
+
+		console.log('throttleSaveCopyright', this);
+
+		var text = this.context.value;
+		var file = this.file;
+
+		console.log('text', text);
+		console.log('file', file);
+
+		file.setCopyright(text)
+
+		// var layer = file.getLayer();
+		
+		// layer && layer.setDescription(text);
 
 	},
+
+
+	// .html(function(d) {
+
+	// 	var description = d.file.store.description;
+		
+	// 	if ( description ) {
+	// 		var hasHTML = description.search('</');
+	// 		if ( hasHTML >= 1 ) {
+	// 			this.outerHTML = description;
+	// 			return [];
+				
+	// 		}
+	// 	}
+		
+	// 	return description;
+	// })
+	// .on('focus', function(d) {
+	// 	d.context = this;
+	// 	Wu.DomEvent.on(this, 'keydown', _.throttle(that.throttleSave.bind(d), 1000)); 
+	// });	
+
+
+
 
 	// Other meta: Uploaded by
 	listMetaOtherStats : function (wrapper) {
