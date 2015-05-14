@@ -241,12 +241,17 @@ module.exports = api.upload = {
 			}
 
 			// only process geojson
-			var isGeojson = _.find(layers, function (l) {
-				console.log('l: ', l);
+			opts.isGeojson = _.find(layers, function (l) {
 				return l.data.geojson;
 			});
 
-			if (isGeojson) api.upload._sendToProcessing(opts, function (err, result) { // todo: do per file
+			// only process geojson
+			opts.isRaster = _.find(layers, function (l) {
+				return l.data.raster;
+			});
+
+
+			if (opts.isGeojson || opts.isRaster) api.file._sendToProcessing(opts, function (err, result) { // todo: do per file
 
 				// done processing
 
@@ -259,70 +264,7 @@ module.exports = api.upload = {
 	},
 
 	
-	_sendToProcessing : function (options, callback) {
-		var pack = options.pack,
-		    user = options.user,
-		    layers = pack.layers,
-		    size = options.size;
-
-
-		console.log('_sendToProcessing'.yellow, options);
-
-		// can be several layers in each upload
-		layers.forEach(function (layer) {
-			var fileUuid = layer.file,
-			    localFile = fileUuid + '.geojson',
-			    localFolder = api.config.path.geojson,
-			    remoteFolder = '/data/grind/geojson/',
-			    uniqueIdentifier = options.uniqueIdentifier,
-			    remoteSSH = 'px_vile_grind';
-
-			// tar -cf - -C /var/www/vile/tests/rasters/advanced/ RapidEye_Boulder_CO.zip   | pigz | ssh px "pigz -d | tar xf - -C /home/"
-			var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + '"';
-			console.log('ssh cmd'.cyan, cmd);
-
-			var remoteUrl = api.config.vile_grind.remote_url;
-
-			var sendOptions = {
-				fileUuid : fileUuid,
-				uniqueIdentifier : uniqueIdentifier,
-				sender_ssh : api.config.vile_grind.sender_ssh,
-				sender_url : api.config.vile_grind.sender_url,
-				api_hook : 'grind/done'
-			}
-
-			// send file over ssh
-			exec(cmd, function (err, stdout, stdin) {
-				if (err) console.log('err'.red, err);
-				console.log('########## SSH #############'.red);
-				console.log(err, stdout, stdin);
-
-				console.log('sendOptions'.yellow, sendOptions);
 	
-				// ping tileserver storage to notify of file transfer
-				request({
-					method : 'POST',
-					uri : remoteUrl + 'grind/job',
-					json : sendOptions
-				}, 
-
-				// callback
-				function (err, response, body) {
-
-					api.socket.setProcessing({
-						userId : user._id,
-						fileUuid : fileUuid,
-						uniqueIdentifier : uniqueIdentifier,
-						pack : pack,
-						size : size
-					});
-
-					callback(null, 'All done!');
-				});
-			});
-		});
-	},
-
 
 	_registerFiles : function (options, done) {
 		var entriesArray = options.entriesArray,
