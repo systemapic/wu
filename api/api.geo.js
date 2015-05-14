@@ -332,13 +332,25 @@ module.exports = api.geo = {
 		console.log('GDAL DRIVERS'.red, gdal.drivers.getNames());
 		console.log('options.'.green, options);
 
-		async.parallel([function (callback) {
+		// async.parallel([function (callback) {
+		// 	var out = api.config.path.file + fileUuid + '/' + options.name;
+		// 	var inn = inFile;
+		// 	console.log('inn, out', inn, out);
+
+		// 	fs.copy(inn, out, callback)
+		// }], console.log)
+
+		ops.push(function (callback) {
 			var out = api.config.path.file + fileUuid + '/' + options.name;
 			var inn = inFile;
-			console.log('inn, out', inn, out);
+			console.log('COPYYY inn, out', inn, out);
 
-			fs.copy(inn, out, callback)
-		}], console.log)
+			if (inn == out) return callback(null);
+
+			fs.copy(inn, out, function (err) {
+				callback(err);
+			});
+		})
 
 		// validation
 		ops.push(function (callback) {

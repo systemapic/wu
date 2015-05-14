@@ -408,23 +408,33 @@ module.exports = api.file = {
 			var cmd = 'unzip -o -d "' + out + '" "' + inn + '" -x "*DS_Store*" "*__MACOSX*"'; 	// to folder .shp
 			var exec = require('child_process').exec;
 
-			console.log('zip cmd:'.red, cmd);
+			console.log('zip cmd:'.green, cmd);
+
+			console.log('cmd in, out: '.green, inn, out);
 
 			// unzip
 			exec(cmd, function (err, stdout, stdin) {
 				if (err) console.log('handleziup 00 err: '.red + err);
 				if (err) return callback(err);
 
-				// remove unnecessary files - important!
-				fs.unlink(inn, function (err) {
-					if (err) console.log('handle zip unlink  err: '.red + err);
-					if (err) return callback(err);
+				console.log('zippppppped!!'.green);
+				console.log('zippppppped!!'.green);
+				console.log('zippppppped!!'.green, err, stdout, stdin);
 
-					fs.remove(out + '/__MACOSX', function (err) {
-						if (err) console.log('handle zip remove : '.red + err);
-						callback(err);
-					});
-				});
+				// consl.og('crahs!');
+				// remove unnecessary files - important!
+				console.log('unlkn king inn'.red, inn);
+				// fs.unlink(inn, function (err) {
+					// if (err) console.log('handle zip unlink  err: '.red + err);
+					// if (err) return callback(err);
+
+					console.log('removing out! __MAXOSX'.red, out);
+					callback(err);
+					// fs.remove(out + '/__MACOSX', function (err) {
+					// 	if (err) console.log('handle zip remove : '.red + err);
+					// 	callback(err);
+					// });
+				// });
 			});
 		});
 	},
