@@ -79,6 +79,13 @@ module.exports = function(app, passport) {
 		api.socket.grindDone(req, res);
 	});
 
+	// =====================================
+	// GET NOTIFIED OF DONE GRINDS =========
+	// =====================================
+	app.post('/grind/raster/done', function (req, res) {
+		api.socket.grindRasterDone(req, res);
+	});
+
 
 
 	// =====================================

@@ -650,39 +650,39 @@ module.exports = api.file = {
 	},
 
 
-	// todo: possibly old, to be removed?
-	// send geojson helper 
-	_sendGeoJsonFile : function (req, res, record) {
+	// // todo: possibly old, to be removed?
+	// // send geojson helper 
+	// _sendGeoJsonFile : function (req, res, record) {
 
-		var geofile = [];
+	// 	var geofile = [];
 
-		// for each file
-		async.each(record.files, function (file, callback) {
-			fs.readFile(file, function (err, data) {
-				if (data) geofile.push(JSON.parse(data));	// added error handling
-				callback(err);
-			})		
-		}, 
+	// 	// for each file
+	// 	async.each(record.files, function (file, callback) {
+	// 		fs.readFile(file, function (err, data) {
+	// 			if (data) geofile.push(JSON.parse(data));	// added error handling
+	// 			callback(err);
+	// 		})		
+	// 	}, 
 
-		// final callback
-		function (err) {
-			if (err) console.log('___send geo json  e err: '.red + err);
-			if (err) console.log('ERR 18'.red, err);
-			if (err || !geofile) return api.error.general(req, res, err);
+	// 	// final callback
+	// 	function (err) {
+	// 		if (err) console.log('___send geo json  e err: '.red + err);
+	// 		if (err) console.log('ERR 18'.red, err);
+	// 		if (err || !geofile) return api.error.general(req, res, err);
 
-			// set filesize
-			var string = JSON.stringify(geofile);
-			var length = string.length.toString();
-			res.set({
-				'Content-Type': 'text/json',
-				'Content-Length': length
-			});
+	// 		// set filesize
+	// 		var string = JSON.stringify(geofile);
+	// 		var length = string.length.toString();
+	// 		res.set({
+	// 			'Content-Type': 'text/json',
+	// 			'Content-Length': length
+	// 		});
 			
-			// return geojson string
-			res.end(string);
-		});
+	// 		// return geojson string
+	// 		res.end(string);
+	// 	});
 		
-	},
+	// },
 
 
 	createModel : function (options, callback) {
@@ -746,6 +746,161 @@ module.exports = api.file = {
 		});
 	},
 
+	_sendToProcessing : function (options, done) {
+		var pack = options.pack,
+		    user = options.user,
+		    layers = pack.layers,
+		    size = options.size,
+		    ops = [];
+
+
+		console.log('_sendToProcessing'.yellow, options);
+
+		// can be several layers in each upload
+		layers.forEach(function (layer) {
+			ops.push(function (callback) {
+				if (options.isRaster) api.file._sendToProcessingRaster(layer, options, callback)
+				if (options.isGeojson) api.file._sendToProcessingGeojson(layer, options, callback)
+			});
+			
+		});
+
+		async.series(ops, function (err, results) {
+			done && done(null, 'All DONE');
+		});
+	},
+
+	_sendToProcessingRaster : function (layer, options, done) {
+
+		console.log('PRIOCESSING RASTER!!!!')
+		console.log('PRIOCESSING RASTER!!!!')
+		console.log('PRIOCESSING RASTER!!!!')
+		console.log('PRIOCESSING RASTER!!!!', layer, options);
+
+		var pack = options.pack,
+		    user = options.user,
+		    layers = pack.layers,
+		    size = options.size,
+		    ops = [];
+
+		var fileUuid = layer.file,
+		    localFile = layer.data.raster,
+		    localFolder = api.config.path.file + fileUuid + '/',
+		    remoteFolder = '/data/grind/raster/',
+		    uniqueIdentifier = options.uniqueIdentifier,
+		    remoteSSH = 'px_vile_grind';
+
+		// tar -cf - -C /var/www/vile/tests/rasters/advanced/ RapidEye_Boulder_CO.zip   | pigz | ssh px "pigz -d | tar xf - -C /home/"
+		var cmd = 'tar -cf - -C "' + localFolder + '" "' + localFile + '" | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + ' | ln -s ' + remoteFolder + localFile + ' ' + remoteFolder + fileUuid + '"';
+
+		cmd += ' | ln -s ' + localFile + ' ' + fileUuid;
+		console.log('ssh cmd'.cyan, cmd);
+
+		var remoteUrl = api.config.vile_grind.remote_url;
+
+		var sendOptions = {
+			fileUuid : fileUuid,
+			uniqueIdentifier : uniqueIdentifier,
+			sender_ssh : api.config.vile_grind.sender_ssh,
+			sender_url : api.config.vile_grind.sender_url,
+			api_hook : 'grind/raster/done'
+		}
+
+		// send file over ssh
+		exec(cmd, function (err, stdout, stdin) {
+			if (err) console.log('err'.red, err);
+			console.log('########## SSH #############'.red);
+			console.log(err, stdout, stdin);
+
+			console.log('sendOptions'.yellow, sendOptions);
+
+			// ping tileserver storage to notify of file transfer
+			request({
+				method : 'POST',
+				uri : remoteUrl + 'grind/raster/job',
+				json : sendOptions
+			}, 
+
+			// callback
+			function (err, response, body) {
+
+				console.log('+++++++++++++++++ setprocessing api.file.js', fileUuid);
+				api.socket.setProcessing({
+					userId : user._id,
+					fileUuid : fileUuid,
+					uniqueIdentifier : uniqueIdentifier,
+					pack : pack,
+					size : size
+				});
+
+				done(null, 'All done!');
+			});
+		});
+
+
+
+	},
+
+	_sendToProcessingGeojson : function (layer, options, done) {
+
+		var pack = options.pack,
+		    user = options.user,
+		    layers = pack.layers,
+		    size = options.size,
+		    ops = [];
+
+		var fileUuid = layer.file,
+		    localFile = fileUuid + '.geojson',
+		    localFolder = api.config.path.geojson,
+		    remoteFolder = '/data/grind/geojson/',
+		    uniqueIdentifier = options.uniqueIdentifier,
+		    remoteSSH = 'px_vile_grind';
+
+		// tar -cf - -C /var/www/vile/tests/rasters/advanced/ RapidEye_Boulder_CO.zip   | pigz | ssh px "pigz -d | tar xf - -C /home/"
+		var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + '"';
+		console.log('ssh cmd'.cyan, cmd);
+
+		var remoteUrl = api.config.vile_grind.remote_url;
+
+		var sendOptions = {
+			fileUuid : fileUuid,
+			uniqueIdentifier : uniqueIdentifier,
+			sender_ssh : api.config.vile_grind.sender_ssh,
+			sender_url : api.config.vile_grind.sender_url,
+			api_hook : 'grind/done'
+		}
+
+		// send file over ssh
+		exec(cmd, function (err, stdout, stdin) {
+			if (err) console.log('err'.red, err);
+			console.log('########## SSH #############'.red);
+			console.log(err, stdout, stdin);
+
+			console.log('sendOptions'.yellow, sendOptions);
+
+			// ping tileserver storage to notify of file transfer
+			request({
+				method : 'POST',
+				uri : remoteUrl + 'grind/job',
+				json : sendOptions
+			}, 
+
+			// callback
+			function (err, response, body) {
+
+				api.socket.setProcessing({
+					userId : user._id,
+					fileUuid : fileUuid,
+					uniqueIdentifier : uniqueIdentifier,
+					pack : pack,
+					size : size
+				});
+
+				done(null, 'All done!');
+			});
+		});
+
+	},
 
 
 }
