@@ -718,6 +718,24 @@ module.exports = api.file = {
 		res.sendfile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
 	},
 
+	
+	tileCount : function (req, res) {
+		var fileUuid = req.body.fileUuid;
+		
+		var path = '/data/raster_tiles/' + fileUuid;
+		var cmd = 'find raster/ -type f | wc -l';
+
+		var exec = require('child_process').exec;				
+					
+		// run command
+		exec(cmd, { cwd : path }, function (err, stdout, stdin) {
+			if (err) console.log('ERR 11'.red, err);
+
+			var count = stdout;
+			res.end(count);
+		});
+	},
+
 
 
 }

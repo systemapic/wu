@@ -1210,7 +1210,7 @@ Wu.List = Wu.Class.extend({
 
 			info
 				.on('click', function(d) {
-					that.toggleFileInfo(d, that);
+					that.toggleFileInfo(d, that, info);
 				})
 
 
@@ -1587,7 +1587,8 @@ Wu.List = Wu.Class.extend({
 	},
 
 
-	toggleFileInfo : function (d, that) {
+	toggleFileInfo : function (d, that, info) {
+		console.log('toggle', d, that, info);
 
 		if ( !that.showFileInfo ) that.showFileInfo = [];
 
@@ -2100,10 +2101,10 @@ Wu.DataLibraryList = Wu.List.extend({
 			.classed('file-thumb-img', true)
 			.attr('src', function(d) {
 
-				var type 	= d.file.store.type;
-				var imageFile   = d.file.store.data.image.file;
-
-				if ( type == 'image' ) {
+				var store = d.file.store;
+				
+				if (store.type == 'image') {
+					var imageFile   = store.data.image.file;
 					var url = '/pixels/image/' + imageFile + '?width=130&height=95'
 					return url;
 				}

@@ -349,8 +349,6 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 			title : 'User created',
 			description : 'The user <strong>' + user.getFullName() + '</strong> has been created. The user will receive an email with login details.'
 		});
-
-
 	},
 
 	deleteUser : function () {		
