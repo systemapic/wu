@@ -77,7 +77,6 @@ module.exports = api.file = {
 				var src = api.config.path.file + file.uuid ; // folder
 
 				// copy
-				// fs.copy(src, dest, function(err) { callback(err) });	
 				fs.copy(src, dest, callback);	
 
 			}, 
@@ -85,7 +84,6 @@ module.exports = api.file = {
 			// final callback
 			function (err) {	// todo: err handling
 				if (err) console.log('ERR 10'.red, err);
-
 				if (err) return api.error.general(req, res, err);
 
 				// execute cmd line zipping 
@@ -131,20 +129,12 @@ module.exports = api.file = {
 		});
 
 		ops.push(function (options, callback) {
-			
-			console.log('downloadFile.'.yellow, options);
-			
 			var record = options.file,
 			    name = record.name.replace(/\s+/g, ''),
-			    // name = ''
 			    out = api.config.path.temp + name + '_' + record.type + '.zip',
 			    cwd = api.config.path.file + fileUuid,
 			    command = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store',
 			    exec = require('child_process').exec;				
-			
-			// run command
-			console.log('cmd: ', command);
-			console.log('cwd: ', cwd);
 			
 			exec(command, {cwd : cwd}, function (err, stdout, stdin) {
 				callback(err, out);
@@ -201,8 +191,6 @@ module.exports = api.file = {
 	download : function (req, res) {
 		var file = req.query.file,
 		    type = req.query.type || 'file';
-
-		console.log('download'.green, file, type);
 	
 		if (!file) return api.error.missingInformation(req, res);
 		
@@ -211,7 +199,6 @@ module.exports = api.file = {
 			
 		// normal file
 		return api.file.downloadFile(req, res);
-		
 	},
 
 
@@ -224,13 +211,6 @@ module.exports = api.file = {
 		    ops = [],
 		    _lids = [];
 
-		// console.log('API: deleteFiles');
-		// console.log('_fids: ', _fids);
-		// console.log('puuid: ', puuid);
-		// console.log('userid: ', userid);
-		// console.log('uuids: ', uuids);
-
-
 		// validate
 		if (!_fids || !puuid || !userid) return api.error.missingInformation(req, res);
 
@@ -238,18 +218,13 @@ module.exports = api.file = {
 		ops.push(function (callback) {
 
 			Layer.find({file : {$in : uuids}}, function (err, layers) {
-
 				layers.forEach(function (layer) {
 					_lids.push(layer._id);
 				});
-
 				
 				// todo: delete?
-
 				return callback(err);
-		
 			});
-
 		});
 
 		// delete file from project
@@ -281,9 +256,6 @@ module.exports = api.file = {
 		});
 
 		
-
-
-	
 		// run queries
 		async.series(ops, function(err) {
 			if (err) console.log('ERR 15'.red, err);
@@ -302,8 +274,6 @@ module.exports = api.file = {
 		    account = req.user,
 		    ops = [];
 
-
-
 		if (!fileUuid) return api.error.missingInformation(req, res);
 
 		ops.push(function (callback) {
@@ -311,7 +281,6 @@ module.exports = api.file = {
 			.findOne({uuid : fileUuid})
 			.exec(callback);
 		});
-
 
 		ops.push(function (file, callback) {
 			api.access.to.edit_file({
@@ -399,7 +368,6 @@ module.exports = api.file = {
 		    fileUuid = options.fileUuid,
 		    out = api.config.path.file + fileUuid + options.out;
 
-
 		fs.ensureDir(out, function (err) {
 			if (err) console.log('handlezip 903 err: '.red + err);
 			if (err) return callback(err);
@@ -408,34 +376,32 @@ module.exports = api.file = {
 			var cmd = 'unzip -o -d "' + out + '" "' + inn + '" -x "*DS_Store*" "*__MACOSX*"'; 	// to folder .shp
 			var exec = require('child_process').exec;
 
-			console.log('zip cmd:'.green, cmd);
+			exec(cmd, callback);
 
-			console.log('cmd in, out: '.green, inn, out);
+			// // unzip
+			// exec(cmd, function (err, stdout, stdin) {
+			// 	if (err) console.log('handleziup 00 err: '.red + err);
+			// 	if (err) return callback(err);
 
-			// unzip
-			exec(cmd, function (err, stdout, stdin) {
-				if (err) console.log('handleziup 00 err: '.red + err);
-				if (err) return callback(err);
+			// 	console.log('zippppppped!!'.green);
+			// 	console.log('zippppppped!!'.green);
+			// 	console.log('zippppppped!!'.green, err, stdout, stdin);
 
-				console.log('zippppppped!!'.green);
-				console.log('zippppppped!!'.green);
-				console.log('zippppppped!!'.green, err, stdout, stdin);
+			// 	// consl.og('crahs!');
+			// 	// remove unnecessary files - important!
+			// 	console.log('unlkn king inn'.red, inn);
+			// 	// fs.unlink(inn, function (err) {
+			// 		// if (err) console.log('handle zip unlink  err: '.red + err);
+			// 		// if (err) return callback(err);
 
-				// consl.og('crahs!');
-				// remove unnecessary files - important!
-				console.log('unlkn king inn'.red, inn);
-				// fs.unlink(inn, function (err) {
-					// if (err) console.log('handle zip unlink  err: '.red + err);
-					// if (err) return callback(err);
-
-					console.log('removing out! __MAXOSX'.red, out);
-					callback(err);
-					// fs.remove(out + '/__MACOSX', function (err) {
-					// 	if (err) console.log('handle zip remove : '.red + err);
-					// 	callback(err);
-					// });
-				// });
-			});
+			// 		console.log('removing out! __MAXOSX'.red, out);
+			// 		callback(err);
+			// 		// fs.remove(out + '/__MACOSX', function (err) {
+			// 		// 	if (err) console.log('handle zip remove : '.red + err);
+			// 		// 	callback(err);
+			// 		// });
+			// 	// });
+			// });
 		});
 	},
 
@@ -490,7 +456,6 @@ module.exports = api.file = {
 	},
 
 
-
 	// #########################################
 	// ###  FILER: documents                 ###
 	// #########################################
@@ -499,12 +464,13 @@ module.exports = api.file = {
 
 		var out = api.config.path.file + fileUuid + '/' + name;
 
-		// move to folder
-		fs.move(path, out, function (err) {
-			callback(null);
-		});
-	},
+		console.log('path, out', path, out);
 
+		if (path == out) return callback(null);
+
+		// move to folder
+		fs.move(path, out, callback);
+	},
 
 
 	// #########################################
@@ -515,39 +481,18 @@ module.exports = api.file = {
 	
 		// set path
 		var out = api.config.path.file + fileUuid + '/' + name;
-
-		// console.log('--------------------'.red);
-		// console.log('--------------------'.red);
-		// console.log('--------------------'.red);
-		// console.log('inn: ', inn);
-		// console.log('out: ', out);
-		// console.log('name: ', name);
-		// console.log('type: ', type);
-		// console.log('fileUuid: ', fileUuid);
-		// console.log('---------------------'.red);
-
-
 		var ops = {};
 
 		// move if not already in right place
 		if (inn != out) {
 			ops.move = function (callback) {
-
-				fs.move(inn, out, function (err) {
-
-
-						callback(err);
-					
-				});
-				
+				fs.move(inn, out, callback);
 			};
 		}
 
+		// process geo
 		ops.geo = function (callback) {
-
-			// process geo
 			if (type != 'geojson') return callback('Not a valid .geojson file.');
-
 
 			api.geo.handleGeoJSON(out, fileUuid, function (err, db) {
 				if (err) console.log('ERR 51'.red, err);
@@ -560,16 +505,11 @@ module.exports = api.file = {
 				db.title = name;
 
 				callback(err, db);
-
 			});	
-			
-
 		};
-
 
 		async.series(ops, function (err, results) {
 			if (err) console.log('ERR 60'.red, err);
-
 			done(err, results.geo);
 		});
 
@@ -637,7 +577,6 @@ module.exports = api.file = {
 
 		// read file and ship it
 		fs.readJson(path, function (err, data) {
-			if (err) console.log('send geo json err: '.red + err);
 			if (err) console.log('ERR 17'.red, err);
 			if (err || !data) return api.error.general(req, res, err || 'No file.');
 
@@ -648,42 +587,6 @@ module.exports = api.file = {
 			res.end(JSON.stringify(data));
 		});
 	},
-
-
-	// // todo: possibly old, to be removed?
-	// // send geojson helper 
-	// _sendGeoJsonFile : function (req, res, record) {
-
-	// 	var geofile = [];
-
-	// 	// for each file
-	// 	async.each(record.files, function (file, callback) {
-	// 		fs.readFile(file, function (err, data) {
-	// 			if (data) geofile.push(JSON.parse(data));	// added error handling
-	// 			callback(err);
-	// 		})		
-	// 	}, 
-
-	// 	// final callback
-	// 	function (err) {
-	// 		if (err) console.log('___send geo json  e err: '.red + err);
-	// 		if (err) console.log('ERR 18'.red, err);
-	// 		if (err || !geofile) return api.error.general(req, res, err);
-
-	// 		// set filesize
-	// 		var string = JSON.stringify(geofile);
-	// 		var length = string.length.toString();
-	// 		res.set({
-	// 			'Content-Type': 'text/json',
-	// 			'Content-Length': length
-	// 		});
-			
-	// 		// return geojson string
-	// 		res.end(string);
-	// 	});
-		
-	// },
-
 
 	createModel : function (options, callback) {
 
@@ -700,9 +603,7 @@ module.exports = api.file = {
 		file.dataSize 		= options.dataSize;
 		file.data 		= options.data;
 
-		file.save(function (err, doc) {
-			callback(err, doc);
-		});
+		file.save(callback);
 	},
 
 	// save file to project (file, layer, project id's)
@@ -730,12 +631,10 @@ module.exports = api.file = {
 
 	
 	tileCount : function (req, res) {
-		var fileUuid = req.body.fileUuid;
-		
-		var path = '/data/raster_tiles/' + fileUuid;
-		var cmd = 'find raster/ -type f | wc -l';
-
-		var exec = require('child_process').exec;				
+		var fileUuid = req.body.fileUuid,
+		    path = '/data/raster_tiles/' + fileUuid,
+		    cmd = 'find raster/ -type f | wc -l',
+		    exec = require('child_process').exec;				
 					
 		// run command
 		exec(cmd, { cwd : path }, function (err, stdout, stdin) {
@@ -753,14 +652,12 @@ module.exports = api.file = {
 		    size = options.size,
 		    ops = [];
 
-
-		console.log('_sendToProcessing'.yellow, options);
-
 		// can be several layers in each upload
 		layers.forEach(function (layer) {
 			ops.push(function (callback) {
-				if (options.isRaster) api.file._sendToProcessingRaster(layer, options, callback)
-				if (options.isGeojson) api.file._sendToProcessingGeojson(layer, options, callback)
+				if (options.isRaster)  api.file._sendToProcessingRaster(layer, options, callback);
+				if (options.isGeojson) api.file._sendToProcessingGeojson(layer, options, callback);
+				if (!options.isRaster && !options.isGeojson) callback();
 			});
 			
 		});
@@ -771,96 +668,83 @@ module.exports = api.file = {
 	},
 
 	_sendToProcessingRaster : function (layer, options, done) {
-
-		console.log('PRIOCESSING RASTER!!!!')
-		console.log('PRIOCESSING RASTER!!!!')
-		console.log('PRIOCESSING RASTER!!!!')
-		console.log('PRIOCESSING RASTER!!!!', layer, options);
-
 		var pack = options.pack,
 		    user = options.user,
 		    layers = pack.layers,
 		    size = options.size,
-		    ops = [];
-
-		var fileUuid = layer.file,
+		    ops = [],
+		    fileUuid = layer.file,
 		    localFile = layer.data.raster,
 		    localFolder = api.config.path.file + fileUuid + '/',
-		    remoteFolder = '/data/grind/raster/',
+		    remoteFolder = '/data/grind/raster/' + fileUuid + '/',
 		    uniqueIdentifier = options.uniqueIdentifier,
-		    remoteSSH = 'px_vile_grind';
-
-		// tar -cf - -C /var/www/vile/tests/rasters/advanced/ RapidEye_Boulder_CO.zip   | pigz | ssh px "pigz -d | tar xf - -C /home/"
-		var cmd = 'tar -cf - -C "' + localFolder + '" "' + localFile + '" | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + ' | ln -s ' + remoteFolder + localFile + ' ' + remoteFolder + fileUuid + '"';
-
-		cmd += ' | ln -s ' + localFile + ' ' + fileUuid;
-		console.log('ssh cmd'.cyan, cmd);
-
-		var remoteUrl = api.config.vile_grind.remote_url;
-
+		    remoteSSH = 'px_vile_grind',
+		    remoteUrl = api.config.vile_grind.remote_url;
+		
 		var sendOptions = {
 			fileUuid : fileUuid,
+			filename : layer.data.raster,
 			uniqueIdentifier : uniqueIdentifier,
 			sender_ssh : api.config.vile_grind.sender_ssh,
 			sender_url : api.config.vile_grind.sender_url,
-			api_hook : 'grind/raster/done'
+			api_hook : 'grind/raster/done',
 		}
 
+		// create dir on remote
+		ops.push(function (callback) {
+			var cmd2 = 'ssh ' + remoteSSH + ' "mkdir ' + remoteFolder + '"';
+			exec(cmd2, callback);
+		});
+
 		// send file over ssh
-		exec(cmd, function (err, stdout, stdin) {
-			if (err) console.log('err'.red, err);
-			console.log('########## SSH #############'.red);
-			console.log(err, stdout, stdin);
+		ops.push(function (callback) {
+			var cmd = 'tar -cf - -C "' + localFolder + '" "' + localFile + '" | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + '/"';
+			exec(cmd, callback);
+		});
 
-			console.log('sendOptions'.yellow, sendOptions);
-
-			// ping tileserver storage to notify of file transfer
+		// notify remote of file
+		ops.push(function (callback) {
 			request({
 				method : 'POST',
 				uri : remoteUrl + 'grind/raster/job',
 				json : sendOptions
-			}, 
-
-			// callback
-			function (err, response, body) {
-
-				console.log('+++++++++++++++++ setprocessing api.file.js', fileUuid);
-				api.socket.setProcessing({
-					userId : user._id,
-					fileUuid : fileUuid,
-					uniqueIdentifier : uniqueIdentifier,
-					pack : pack,
-					size : size
-				});
-
-				done(null, 'All done!');
-			});
+			}, callback); 
 		});
 
+		// run ops
+		async.series(ops, function (err, results) {
+			if (err) return done(err);
 
+			// register socket
+			api.socket.setProcessing({
+				userId : user._id,
+				fileUuid : fileUuid,
+				uniqueIdentifier : uniqueIdentifier,
+				pack : pack,
+				size : size
+			});
+
+			// callback
+			done(null, 'All done!');
+		})
 
 	},
 
 	_sendToProcessingGeojson : function (layer, options, done) {
-
 		var pack = options.pack,
 		    user = options.user,
 		    layers = pack.layers,
 		    size = options.size,
-		    ops = [];
-
-		var fileUuid = layer.file,
+		    ops = [],
+		    fileUuid = layer.file,
 		    localFile = fileUuid + '.geojson',
 		    localFolder = api.config.path.geojson,
 		    remoteFolder = '/data/grind/geojson/',
 		    uniqueIdentifier = options.uniqueIdentifier,
-		    remoteSSH = 'px_vile_grind';
+		    remoteSSH = 'px_vile_grind',
+		    remoteUrl = api.config.vile_grind.remote_url;
 
-		// tar -cf - -C /var/www/vile/tests/rasters/advanced/ RapidEye_Boulder_CO.zip   | pigz | ssh px "pigz -d | tar xf - -C /home/"
 		var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + '"';
-		console.log('ssh cmd'.cyan, cmd);
-
-		var remoteUrl = api.config.vile_grind.remote_url;
 
 		var sendOptions = {
 			fileUuid : fileUuid,
@@ -873,10 +757,6 @@ module.exports = api.file = {
 		// send file over ssh
 		exec(cmd, function (err, stdout, stdin) {
 			if (err) console.log('err'.red, err);
-			console.log('########## SSH #############'.red);
-			console.log(err, stdout, stdin);
-
-			console.log('sendOptions'.yellow, sendOptions);
 
 			// ping tileserver storage to notify of file transfer
 			request({
