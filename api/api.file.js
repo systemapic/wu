@@ -464,8 +464,7 @@ module.exports = api.file = {
 
 		var out = api.config.path.file + fileUuid + '/' + name;
 
-		console.log('path, out', path, out);
-
+		// do nothing if already there
 		if (path == out) return callback(null);
 
 		// move to folder
