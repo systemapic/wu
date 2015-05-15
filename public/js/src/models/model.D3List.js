@@ -858,6 +858,8 @@ Wu.List = Wu.Class.extend({
 			.data(DATA);
 
 
+
+
 		// EACH FILE WRAPPER
 		// EACH FILE WRAPPER
 		// EACH FILE WRAPPER		
@@ -868,18 +870,23 @@ Wu.List = Wu.Class.extend({
 			.enter()
 			.append('div');
 		
+
+		console.log('this.D3container', this.D3container);
+		console.log('wrapper', wrapper);
+
 		// UPDATE
 		wrapper
-			.attr('class', function(d) {
+			.attr('class', function(d) {				
 				var cName = 'list-line';
 				var isSelected = that.checkSelected(d.fileUuid);
 				if ( isSelected ) cName += ' selected';
+
+				if ( d.file.isProcessing ) {
+					cName += ' processing';
+				}
+
 				return cName;
 			})
-			// .attr('draggable', function(d) {
-			// 	var isSelected = that.checkSelected(d.fileUuid);
-			// 	return isSelected;
-			// })
 			.attr('style', function(d) {
 				var isOpen = that.checkOpenFileInfo(d.fileUuid, that);
 				if ( isOpen ) {
@@ -1158,8 +1165,6 @@ Wu.List = Wu.Class.extend({
 		// UPDATE
 		// If there is a function on this field
 
-		// udihelvete
-
 		if ( this.listOptions.titleSpace.description.killOnSmall && this.tableSize == 'small' ) {
 				
 			fileDescription
@@ -1240,35 +1245,13 @@ Wu.List = Wu.Class.extend({
 		listOptions.attributes.forEach(function (att, i) {
 
 			if ( att.niceName != 'Name' ) {
-
 				// Filter out fields that should only appear for editors
-
 				var proceed = true;
-
-				if ( att.restrict    && !that.canEdit ) 	    proceed = false;
-				// if ( att.killOnSmall && that.tableSize == 'small' ) proceed = false;
-
-				
-
+				if ( att.restrict    && !that.canEdit ) proceed = false;
 				if ( proceed ) {
-				
 					that.listAttribute(i, DATA);
-
+					that.listProcessing(i, DATA);
 				}
-
-				// 	if (  ) that.listAttribute(i, DATA);
-				// } else {
-				// 	that.listAttribute(i, DATA);
-				// }
-
-				// if ( att.restrict ) {
-				// 	if ( that.canEdit ) that.listAttribute(i, DATA);
-				// } else {
-				// 	that.listAttribute(i, DATA);
-				// }
-
-
-				// if ( att.killOnSmall && that.tableSize != 'small' )
 
 			}
 
@@ -1276,6 +1259,128 @@ Wu.List = Wu.Class.extend({
 	
 	},
 
+
+	listProcessing : function (i, DATA) {
+
+		var listOptions = this.listOptions;
+		var that        = this;
+		var attribute   = listOptions.attributes[i].name;
+		var fn 	        = listOptions.attributes[i].fn;
+		var ev 	        = listOptions.attributes[i].ev;
+		var style       = this.getAttributeStyle(i);
+		var kill 	= listOptions.attributes[i].killOnSmall;
+
+		// WRAPPER
+		// WRAPPER
+		// WRAPPER
+
+		// BIND
+		var process = 
+			listOptions.wrapper
+			.selectAll('.list-process')
+			.data(function(d) { 
+
+				if ( d.file.isProcessing ) {
+					console.log('this is fucking processing, you whore!!!', d.file.store.name)
+					return [d];
+
+				} else {
+
+					return [];
+
+				}
+			});
+
+		// ENTER
+		process
+			.enter()
+			.append('div')
+			.classed('list-process', true);
+
+
+		// EXIT
+		process
+			.exit()
+			.remove();
+
+
+		// Process bar
+
+		// BIND
+		var processBar = 
+			process
+			.selectAll('.list-process-bar')
+			.data(function(d) { return [d] });
+
+		// ENTER
+		processBar
+			.enter()
+			.append('div')
+			.classed('list-process-bar', true);
+
+		// EXIT
+		processBar
+			.exit()
+			.remove();
+
+
+
+		// Process bar inner
+
+		// BIND
+		var processBarInner = 
+			processBar
+			.selectAll('.list-process-bar-inner')
+			.data(function(d) { return [d] });
+
+		// ENTER
+		processBarInner
+			.enter()
+			.append('div')
+			.classed('list-process-bar-inner', true);
+
+		// UPDATE
+		processBarInner
+			.attr('style', function(d) {
+				return 'width:' + d.file.isProcessing.percent + '%'; 
+			})
+
+		// EXIT
+		processBarInner
+			.exit()
+			.remove();
+
+
+
+
+
+		// Process NO
+
+		// BIND
+		var processNO = 
+			process
+			.selectAll('.list-process-no')
+			.data(function(d) { return [d] });
+
+		// ENTER
+		processNO
+			.enter()
+			.append('div')
+			.classed('list-process-no', true);
+
+		// UPDATE
+		processNO
+			.html(function(d) {
+				return d.file.isProcessing.tiles;
+			})
+
+		// EXIT
+		processNO
+			.exit()
+			.remove();			
+
+
+	},
 
 	// Each attribute
 
@@ -1299,8 +1404,18 @@ Wu.List = Wu.Class.extend({
 			listOptions.wrapper
 			.selectAll('.list-attribute-wrapper-' + attribute)
 			.data(function(d) { 
-				if ( kill && that.tableSize == 'small' ) return []
-				else 	    				 return [d];
+
+				if ( d.file.isProcessing ) {
+					return [];
+				} else if ( kill && that.tableSize == 'small' ) {
+					
+					return [];
+
+				} else {
+
+					return [d];
+
+				}
 			});
 
 		// ENTER
@@ -1386,6 +1501,109 @@ Wu.List = Wu.Class.extend({
 			.remove();
 
 	},
+
+
+	updateProcessig : function (context, data) {
+
+
+		// BIND
+		var process = 
+			context
+			.selectAll('.list-process')
+			.data(function(d) { 
+				return [d] 
+			});
+
+		// ENTER
+		process
+			.enter()
+			.append('div')
+			.classed('list-process', true);
+
+
+		// EXIT
+		process
+			.exit()
+			.remove();
+
+
+
+		// Process bar
+
+		// BIND
+		var processBar = 
+			process
+			.selectAll('.list-process-bar')
+			.data(function(d) { return [d] });
+
+		// ENTER
+		processBar
+			.enter()
+			.append('div')
+			.classed('list-process-bar', true);
+
+		// EXIT
+		processBar
+			.exit()
+			.remove();
+
+
+
+		// Process bar inner
+
+		// BIND
+		var processBarInner = 
+			processBar
+			.selectAll('.list-process-bar-inner')
+			.data(function(d) { return [d] });
+
+		// ENTER
+		processBarInner
+			.enter()
+			.append('div')
+			.classed('list-process-bar-inner', true);
+
+		// UPDATE
+		processBarInner
+			.attr('style', function(d) {
+				return 'width:' + d.file.isProcessing.percent + '%'; 
+			})
+
+		// EXIT
+		processBarInner
+			.exit()
+			.remove();
+
+
+
+		// Process NO
+
+		// BIND
+		var processNO = 
+			process
+			.selectAll('.list-process-no')
+			.data(function(d) { return [d] });
+
+		// ENTER
+		processNO
+			.enter()
+			.append('div')
+			.classed('list-process-no', true);
+
+		// UPDATE
+		processNO
+			.html(function(d) {
+				return d.file.isProcessing.tiles;
+			})
+
+		// EXIT
+		processNO
+			.exit()
+			.remove();		
+
+	},
+
+
 
 
 	// ┬  ┬┌─┐┌┬┐  ┌─┐┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌┌─┐
