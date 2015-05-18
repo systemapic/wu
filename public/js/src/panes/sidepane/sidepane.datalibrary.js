@@ -794,6 +794,22 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		e.preventDefault();
 		e.stopPropagation();
 
+	},
+
+	processFile : function (fileID, percent, tiles) {
+
+		var file = app.activeProject.files[fileID];
+		file.isProcessing = {};
+		file.isProcessing.tiles = tiles;
+		file.isProcessing.percent = percent;
+		this._dataLibraryList.refreshTable();
+
+	},
+
+	processFileDone : function (fileID) {
+		var file = app.activeProject.files[fileID];
+		file.isProcessing = null;
+		this._dataLibraryList.refreshTable();
 	}
 
 });

@@ -372,3 +372,130 @@ aka feedback pane
 	height: 108px;
 	width: 218px;
 	}
+
+
+
+
+.list-process {
+	top: 0;
+	right: 0;
+	height: 50px;
+	border-left: 1px dashed rgba(255, 255, 255, 0.5);
+	text-align: center;
+	overflow: hidden;
+	width: 45%;
+	position: absolute;
+	float: right;
+	color: #333333;
+	font-size: 13px;
+	padding: 10px;
+	overflow: visible;
+	display: block;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;	
+	}
+
+
+.list-title {
+	height: 18px;
+	}
+
+.processing .list-title,
+.processing .list-description {
+	color: rgba(0,0,0,0.3);
+	}	
+
+.processing .item-select-button {
+	display: none;
+	}
+
+.processing .list-item-info {
+	display: none;
+	}
+
+
+
+
+
+
+
+
+
+.list-process-bar {
+	width: 290px;
+	height: 20px;
+	background: rgba(0,0,0,0.2);
+	border-radius: 27px;
+	top: 12px;
+	left: 0px;
+	padding: 4px;
+	position: relative;
+	}
+
+.list-process-bar:before {
+	content: 'Processing';
+	top: -18px;
+	position: absolute;
+	left: 0;
+	font-size: 12px;
+	}		
+
+.list-process-bar-inner {
+	background: white;
+	border-radius: 20px;
+	padding: 6px;
+	width: 0;
+	position: relative;
+	}
+
+.list-process-no {
+	position: absolute;
+	top: 22px;
+	right: 14px;
+	background: #a00000;
+	height: 20px;
+	border-radius: 20px;
+	padding-left: 9px;
+	padding-right: 8px;
+	min-width: 57px;
+	color: white;
+	font-weight: 900;
+	}
+
+.list-process-no:before {
+	content: 'Tiles';
+	color: black;
+	font-weight: 400;
+	top: -18px;
+	position: absolute;
+	left: 0;
+	font-size: 12px;	
+	}	
+
+.minimal .list-process-bar {
+	top: -3px;
+	left: 0px;
+  	width: 110px;	
+	}	
+
+.minimal .list-process-bar:before {
+	display: none;
+	}	
+
+.minimal .list-process-no {
+	top: 7px;
+	}
+
+.minimal .list-process-no:before {
+	display: none;
+	}
+
+.minimal .list-title-wrapper {
+	/*max-width: 287px;*/
+	}	
+
+
+
+.minimal .processing .list-title-wrapper {
+	padding: 6px 122px 4px 48px;
+	}	
