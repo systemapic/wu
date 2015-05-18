@@ -395,18 +395,23 @@ aka feedback pane
 	box-sizing: border-box;	
 	}
 
+
+.list-title {
+	height: 18px;
+	}
+
 .processing .list-title,
 .processing .list-description {
 	color: rgba(0,0,0,0.3);
-}	
+	}	
 
 .processing .item-select-button {
 	display: none;
-}
+	}
 
 .processing .list-item-info {
 	display: none;
-}
+	}
 
 
 
@@ -486,5 +491,11 @@ aka feedback pane
 	}
 
 .minimal .list-title-wrapper {
-	max-width: 287px;
+	/*max-width: 287px;*/
+	}	
+
+
+
+.minimal .processing .list-title-wrapper {
+	padding: 6px 122px 4px 48px;
 	}	

@@ -723,8 +723,23 @@ module.exports = api.file = {
 				size : size
 			});
 
+	
+			// api.file._startProcessingProgress({
+			// 	fileUuid : fileUuid
+			// });			
+
 			// callback
-			done(null, 'All done!');
+			done && done(null, 'All done!');
+		})
+
+	},
+
+	_startProcessingProgress : function () {
+
+		// send processing progress by socket
+		api.socket.pushProcessingProgress({
+			userId : user._id,
+			fileUuid : fileUuid
 		})
 
 	},

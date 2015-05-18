@@ -65,14 +65,14 @@ module.exports = api.socket = {
 		socket && socket.emit('uploadDone', options.result);
 	},
 
-	tilesCreated : function (options) {
-		console.log('tiles created'.green, options);
+	processingProgress : function (options) {
+		console.log('processingProgress'.green, options);
 
 		// get socket
 		var socket = api.socket.getSocket(options);
 
 		// send to user
-		socket && socket.emit('tilesCreated', options.result);
+		socket && socket.emit('processingProgress', options.result);
 	},
 
 	processingDone : function (options) {

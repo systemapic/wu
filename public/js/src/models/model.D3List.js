@@ -36,7 +36,6 @@ Wu.List = Wu.Class.extend({
 
 	createFolder : function() {
 
-		console.log('create new folder...');
 		// console.log('this.listData', this.listData);
 
 		// var newFolder = {
@@ -558,7 +557,6 @@ Wu.List = Wu.Class.extend({
 		saveJSON.value 	    = newName;
 		saveJSON.id    	    = options.uuid;
 
-		console.log('SAVEJSON', saveJSON);
 
 		// Save changes
 		that.save(saveJSON);
@@ -870,9 +868,6 @@ Wu.List = Wu.Class.extend({
 			.enter()
 			.append('div');
 		
-
-		console.log('this.D3container', this.D3container);
-		console.log('wrapper', wrapper);
 
 		// UPDATE
 		wrapper
@@ -1242,16 +1237,19 @@ Wu.List = Wu.Class.extend({
 		var listOptions = this.listOptions;
 		var that = this;
 
+		// Init processing, if there is such a thing...
+		that.listProcessing(DATA);
+
+		// Init attributes (gets stropped if there is processing happening...)
 		listOptions.attributes.forEach(function (att, i) {
 
 			if ( att.niceName != 'Name' ) {
 				// Filter out fields that should only appear for editors
 				var proceed = true;
 				if ( att.restrict    && !that.canEdit ) proceed = false;
-				if ( proceed ) {
-					that.listAttribute(i, DATA);
-					that.listProcessing(i, DATA);
-				}
+				if ( proceed ) that.listAttribute(i, DATA);
+					// that.listProcessing(i, DATA);
+				
 
 			}
 
@@ -1264,11 +1262,7 @@ Wu.List = Wu.Class.extend({
 
 		var listOptions = this.listOptions;
 		var that        = this;
-		var attribute   = listOptions.attributes[i].name;
-		var fn 	        = listOptions.attributes[i].fn;
-		var ev 	        = listOptions.attributes[i].ev;
-		var style       = this.getAttributeStyle(i);
-		var kill 	= listOptions.attributes[i].killOnSmall;
+		
 
 		// WRAPPER
 		// WRAPPER
@@ -1281,13 +1275,9 @@ Wu.List = Wu.Class.extend({
 			.data(function(d) { 
 
 				if ( d.file.isProcessing ) {
-					console.log('this is fucking processing, you whore!!!', d.file.store.name)
 					return [d];
-
 				} else {
-
 					return [];
-
 				}
 			});
 
@@ -1342,7 +1332,12 @@ Wu.List = Wu.Class.extend({
 		// UPDATE
 		processBarInner
 			.attr('style', function(d) {
-				return 'width:' + d.file.isProcessing.percent + '%'; 
+
+				var percent = d.file.isProcessing.percent;
+				if ( d.file.isProcessing.percent > 100 ) {
+					percent = 100;
+				}
+				return 'width:' + percent + '%'; 
 			})
 
 		// EXIT
@@ -1383,7 +1378,6 @@ Wu.List = Wu.Class.extend({
 	},
 
 	// Each attribute
-
 	listAttribute : function (i, DATA) {
 
 		var listOptions = this.listOptions;
@@ -1407,14 +1401,11 @@ Wu.List = Wu.Class.extend({
 
 				if ( d.file.isProcessing ) {
 					return [];
+
 				} else if ( kill && that.tableSize == 'small' ) {
-					
 					return [];
-
 				} else {
-
 					return [d];
-
 				}
 			});
 
@@ -1808,7 +1799,6 @@ Wu.List = Wu.Class.extend({
 
 
 	toggleFileInfo : function (d, that, info) {
-		console.log('toggle', d, that, info);
 
 		if ( !that.showFileInfo ) that.showFileInfo = [];
 
@@ -2771,13 +2761,8 @@ Wu.DataLibraryList = Wu.List.extend({
 
 	throttleSaveCopyright : function () {
 
-		console.log('throttleSaveCopyright', this);
-
 		var text = this.context.value;
 		var file = this.file;
-
-		console.log('text', text);
-		console.log('file', file);
 
 		file.setCopyright(text)
 
