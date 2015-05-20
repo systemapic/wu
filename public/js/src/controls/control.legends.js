@@ -473,6 +473,8 @@ L.Control.Legends = Wu.Control.extend({
 		// create legends
 		legends.forEach(function (legend) {
 
+			console.log('LEGEND', legend);
+
 			// skip disabled legends
 			if (!legend.on) return;
 
