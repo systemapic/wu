@@ -79,7 +79,7 @@ L.Control.Legends = Wu.Control.extend({
 		this._legendsInnerSlider.innerHTML = '';
 	},
 
-	_refresh : function () {
+	_refresh : function (hide) {
 
 		// should be active
 		if (!this._added) this._addTo();
@@ -100,7 +100,7 @@ L.Control.Legends = Wu.Control.extend({
 		// this.refreshLegends();
 
 		// show
-		this._show();
+		!hide && this._show();
 	},
 
 	_on : function () {
