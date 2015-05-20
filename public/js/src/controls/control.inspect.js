@@ -63,7 +63,7 @@ L.Control.Inspect = Wu.Control.extend({
 
 	},
 
-	_refresh : function () {
+	_refresh : function (hide) {
 
 		// should be active
 		if (!this._added) this.addTo(app._map);
@@ -78,7 +78,7 @@ L.Control.Inspect = Wu.Control.extend({
 		this._flush();
 
 		// show
-		this._show();
+		!hide && this._show();
 
 		// enable scroll
 		this.disableScrollzoom();

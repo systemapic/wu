@@ -19,7 +19,7 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		app.Tooltip.add(h4, 'Sets layers that will appear in the layer menu. Selected base layers will be excluded from the Layer Menu list, and vice versa, to avoid duplicates.' );
 	},
 
-	update : function () {
+	update : function (show) {
 		Wu.SidePane.Options.Item.prototype.update.call(this)	// call update on prototype
 
 		// options
@@ -35,23 +35,51 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 		this.markOccupied();
 
 		// close
-		this.close();
+		show ? this.open() : this.close();
 	},
+
+	fillLayers : function () {
+
+		this._layers = {};
+
+		// return if no layers
+	       	if (_.isEmpty(this.project.layers)) return;
+
+	       	var sortedLayers = this.sortLayers(this.project.layers);
+
+	       	sortedLayers.forEach(function (provider) {
+
+	       		this.addProvider(provider.key);
+
+	       		provider.layers.forEach(function (layer) {
+	       			this.addLayer(layer);
+	       		}, this);
+
+	       	}, this);
+
+	       	// calculate height for wrapper
+	       	this.calculateHeight();
+
+	},
+
 
 	// add layers to layermenu list in sidepane
 	addLayer : function (layer) {
 
-
+		var file = layer.getFile();
+		// var title = file ? file.getName() : layer.store.title;
+		var title = layer.store.title;
+		
 		// create and append div
 		var container = Wu.DomUtil.create('div', 'item-list select-elem', this._outer);
 
 		// create and set title
 		var text = Wu.DomUtil.create('div', 'item-list-inner-text', container);
-		text.innerHTML = layer.store.title;
+		text.innerHTML = title;
 
 		// set height if short title - hacky..
-		if (layer.store.title) { // err if no title
-			if (layer.store.title.length < 32) text.style.maxHeight = '12px';
+		if (title) { // err if no title
+			if (title.length < 32) text.style.maxHeight = '12px';
 		}
 
 		// append edit button

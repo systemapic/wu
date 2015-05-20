@@ -113,7 +113,6 @@ L.UtfGrid = L.Class.extend({
 	},
 
 	redraw: function () {
-		console.error('utf redraw')
 		// Clear cache to force all tiles to reload
 		this._request_queue = [];
 		for (var req_key in this._requests){
@@ -199,8 +198,6 @@ L.UtfGrid = L.Class.extend({
 	//Load up all required json grid files
 	//TODO: Load from center etc
 	_update: function () {
-
-		console.log('utf update');
 
 		var bounds = this._map.getPixelBounds(),
 		    zoom = this._map.getZoom(),

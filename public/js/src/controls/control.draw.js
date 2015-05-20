@@ -7,7 +7,6 @@ L.Control.Draw = Wu.Control.extend({
 	type : 'draw',
 
 	_flush : function () {
-		console.log('flush draw');
 	},
 
 	_addTo : function () {

@@ -2044,6 +2044,17 @@ Wu.DataLibraryList = Wu.List.extend({
 	_updateLayerName : function (fileUuid, title) {
 		var layer = this._findLayerByFile(fileUuid)
 		if (!layer) return;
+		
+		// update layermenu
+		var lm = app.MapPane._controls.layermenu;
+		lm && lm._refresh(true);
+
+		var insp = app.MapPane._controls.inspect;
+		insp && insp._refresh(true);
+
+		var leg = app.MapPane._controls.legends;
+		leg && leg._refresh(true);
+
 		layer.setTitle(title);
 	},
 	_updateLayerDescription : function (fileUuid, description) {
