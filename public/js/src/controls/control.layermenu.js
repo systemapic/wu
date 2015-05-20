@@ -44,7 +44,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._content.innerHTML = '';
 	},
 
-	_refresh : function () {
+	_refresh : function (hide) {
 
 
 		// should be active
@@ -60,7 +60,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._initContent();
 
 		// show
-		this._show();
+		!hide && this._show();
 
 		// close by default
 		this.closeAll();
@@ -1065,6 +1065,8 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	// add from sidepane
 	add : function (layer) {
+
+
 		
 		// create db item
 		var item = {
@@ -1097,6 +1099,9 @@ L.Control.Layermenu = Wu.Control.extend({
 		var item  = layerItem.item;
 		var layer = layerItem.layer;
 
+		var file = layer ? layer.getFile() : false;
+		var caption = file ? file.store.name : item.caption;
+
 		// create div
 		var className   = 'layer-menu-item-wrap';
 		if (!layer) className += ' menufolder';
@@ -1108,7 +1113,7 @@ L.Control.Layermenu = Wu.Control.extend({
 			  	'<div class="layer-item-down"><</div>' +
 				'<div class="layer-item-delete">x</div>' +
 				'<div type="layerItem" class="layer-menu-item">' +
-				item.caption +
+				caption +
 				'</div>';
 
 		wrap.innerHTML 	= _iH;
@@ -1230,6 +1235,17 @@ L.Control.Layermenu = Wu.Control.extend({
 			var i = _.findIndex(this._project.store.layermenu, {'uuid' : uuid});
 			this._project.store.layermenu[i].caption = newTitle;
 			this.save();
+
+			var layerUuid = this._project.store.layermenu[i].layer;
+			var layer = this._project.getLayer(layerUuid);
+			var file = layer ? layer.getFile() : false;
+
+			// update file and layer models
+			file && file.setName(newTitle);
+			layer && layer.setTitle(newTitle);
+
+			// update layermenu
+			app.SidePane.Options.settings.layermenu.update(true)
 
 			// boolean
 			this.currentlyEditing = false;

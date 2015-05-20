@@ -76,15 +76,12 @@ Wu.Files = Wu.Class.extend({
 
 	getLayer : function () {
 		var fileUuid = this.getUuid();
-		console.log('fiel', fileUuid);
 		var project = _.find(app.Projects, function (p) {
 			return p.files[fileUuid];
 		});
-		console.log('PRO', project);
 		var layer = _.find(project.layers, function (l) {
 			return l.getFileUuid() == fileUuid;
 		});
-		console.log('layer: ', layer);
 		return layer;
 	},
 
