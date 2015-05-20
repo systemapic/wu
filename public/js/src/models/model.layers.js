@@ -724,31 +724,31 @@ Wu.CartodbLayer = Wu.Layer.extend({
 
 });
 
-Wu.GeoJSONLayer = Wu.Layer.extend({
+// Wu.GeoJSONLayer = Wu.Layer.extend({
 
-	type : 'geojsonlayer',
+// 	type : 'geojsonlayer',
 
-	initialize : function (geojson) {
+// 	initialize : function (geojson) {
 
-		this.store = {}; // db model
-		this.geojson = geojson;
+// 		this.store = {}; // db model
+// 		this.geojson = geojson;
 
-		this.loaded = false;
-	},
+// 		this.loaded = false;
+// 	},
 	
-	initLayer : function () {
+// 	initLayer : function () {
 
-		// var url = 'https://{s}.tiles.mapbox.com/v4/{mapboxUri}/{z}/{x}/{y}.png?access_token={accessToken}';
+// 		// var url = 'https://{s}.tiles.mapbox.com/v4/{mapboxUri}/{z}/{x}/{y}.png?access_token={accessToken}';
 
-		this.layer = L.geoJson(this.geojson);
+// 		this.layer = L.geoJson(this.geojson);
 
-		// todo: add gridlayer to mapbox.. but why..?
-		// add hooks
-		// this.addHooks();
-		this.loaded = true;
-		this._inited = true;
-	},
-});
+// 		// todo: add gridlayer to mapbox.. but why..?
+// 		// add hooks
+// 		// this.addHooks();
+// 		this.loaded = true;
+// 		this._inited = true;
+// 	},
+// });
 
 
 
