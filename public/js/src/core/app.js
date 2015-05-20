@@ -1,4 +1,4 @@
-Wu.version = '0.6.2-dev';
+Wu.version = '0.6.4-dev';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -13,7 +13,7 @@ Wu.App = Wu.Class.extend({
 
 	initialize : function (options) {
 
-		console.log('Systemapic version', Wu.version);
+		console.log('Systemapic v.' + Wu.version);
 
 		// set global this
 		Wu.app = window.app = this;
@@ -287,8 +287,6 @@ Wu.App = Wu.Class.extend({
 		    search  = window.location.search.split('?'),
 		    params  = Wu.Util.parseUrl();
 
-		console.log('_initLocation', hash, params);
-
 		// done if no location
 		if (!client || !project) return false;
 
@@ -379,7 +377,6 @@ Wu.App = Wu.Class.extend({
 
 	// get saved hash
 	getHash : function (id, project, callback) {
-		console.log('getHash!! =:', id, project);
 
 		// get a saved setup - which layers are active, position, 
 		Wu.post('/api/project/hash/get', JSON.stringify({
@@ -392,8 +389,6 @@ Wu.App = Wu.Class.extend({
 
 		// parse
 		var result = JSON.parse(json); 
-
-		console.log('_renderHash', result);
 
 		// handle errors
 		if (result.error) console.log('error?', result.error);

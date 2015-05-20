@@ -101,8 +101,6 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		// get type (zoom, draw, etc.)
 		var item = e.target.getAttribute('which');
 
-		console.log('which: ', item);
-
 		// get checkbox
 		var target = Wu.DomUtil.get('map-controls-' + item);
 
@@ -149,8 +147,6 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 
 	disableControl : function (type) {
 
-		console.log('DISABLED', type);
-	
 		// get vars
 		var target = Wu.DomUtil.get('map-controls-' + type); // checkbox
 		var parent = Wu.DomUtil.get('map-controls-title-' + type).parentNode; // div that gets .active 
@@ -163,8 +159,6 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 
 	enableControl : function (type) {
 
-		console.error('ENABLED', type);
-		
 		// get vars
 		var target = Wu.DomUtil.get('map-controls-' + type); // checkbox
 		var parent = Wu.DomUtil.get('map-controls-title-' + type).parentNode; // div that gets .active 
