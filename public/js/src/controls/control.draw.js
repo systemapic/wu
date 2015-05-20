@@ -11,7 +11,6 @@ L.Control.Draw = Wu.Control.extend({
 	},
 
 	_addTo : function () {
-		console.log('__addto');
 
 		// add to map
 		this.addTo(app._map);
@@ -27,7 +26,6 @@ L.Control.Draw = Wu.Control.extend({
 
 	_refresh : function () {
 
-		console.log('_refresh draw');
 
 		// should be active
 		if (!this._added) this._addTo(app._map);
@@ -51,7 +49,6 @@ L.Control.Draw = Wu.Control.extend({
 	},
 
 	_projectSelected : function (e) {
-		console.log('P SELECT!!');
 		var projectUuid = e.detail.projectUuid;
 
 		if (!projectUuid) {
@@ -67,8 +64,6 @@ L.Control.Draw = Wu.Control.extend({
 
 	// turned on and off by sidepane/options/controls toggle
 	_on : function () {
-
-		console.log('on draw');
 
 		// refresh
 		this._refresh();
@@ -87,12 +82,10 @@ L.Control.Draw = Wu.Control.extend({
 	},
 
 	_show : function () {
-		console.log('__show');
 		this._container.style.display = 'block';
 	},
 
 	_hide : function () {
-		console.log('__hide');
 		this._container.style.display = 'none';
 	},
 
@@ -108,11 +101,9 @@ L.Control.Draw = Wu.Control.extend({
 	},
 
 	_initContent : function () {
-		console.log('INITNC ONTENT');
 	},
 
 	refresh : function () {
-		console.log('refresh!', this);
 		this.addTo(app._map);
 	},
 
@@ -204,13 +195,13 @@ L.Control.Draw = Wu.Control.extend({
 		polygonDraw.options.exitModeAfterCreate(false);
 
 		polygonDraw.on('mode', function modeReceived(eventData) {
-                   	console.log('mode', eventData);
+                   	// console.log('mode', eventData);
 
                 });
 
 		polygonDraw.on('markers', function getMarkers(eventData) {
-		    	var latLngs = eventData.latLngs;
-		    	console.log('markers', eventData);
+		    	// var latLngs = eventData.latLngs;
+		    	// console.log('markers', eventData);
 		    	// ...
 		});
 
@@ -238,14 +229,14 @@ L.Control.Draw = Wu.Control.extend({
 	},
 
 	_savePolygon : function () {
-		console.log('save');
+		// console.log('save');
 
 		// set VIEW mode
 		this._disablePolygon();
 	
 		// get geojson
 		var geojson = this._polygonDraw.getGeoJSON();
-		console.log('GeoJSON:', geojson);
+		// console.log('GeoJSON:', geojson);
 
 		// clear
 		this._polygonDraw._clearPolygons();
@@ -254,7 +245,7 @@ L.Control.Draw = Wu.Control.extend({
 		// add to layermenu, project, data library, sidepanes
 		// 
 		var geojsonLayer = new Wu.GeoJSONLayer(geojson);
-		console.log('gg', geojsonLayer);
+		// console.log('gg', geojsonLayer);
 
 		// add to map
 		geojsonLayer._addTo();
@@ -262,7 +253,7 @@ L.Control.Draw = Wu.Control.extend({
 	},
 
 	_cancelPolygon : function () {
-		console.log('cacnel');
+		// console.log('cacnel');
 	},
 	_undoPolygon : function () {
 		console.log('undo');
