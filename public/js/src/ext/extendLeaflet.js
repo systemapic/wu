@@ -8,60 +8,60 @@ L.Map.include({
 	}
 });
 
-// add wrapper for draw controls
-L.Control.Draw.include({
+// // add wrapper for draw controls
+// L.Control.Draw.include({
 
-	// custom onAdd
-	onAdd: function (map) {
-		var container = L.DomUtil.create('div', 'leaflet-draw'),
-			addedTopClass = false,
-			topClassName = 'leaflet-draw-toolbar-top',
-			toolbarContainer;
+// 	// custom onAdd
+// 	onAdd: function (map) {
+// 		var container = L.DomUtil.create('div', 'leaflet-draw'),
+// 			addedTopClass = false,
+// 			topClassName = 'leaflet-draw-toolbar-top',
+// 			toolbarContainer;
 
-		// create wrappers
-		var sectionButton = L.DomUtil.create('div', 'leaflet-draw-section-button', container);
-		var sectionWrapper = L.DomUtil.create('div', 'leaflet-draw-section-wrapper', container);
-		this._wrapper = sectionWrapper;	// shorthand for adding more stuff to this wrapper
+// 		// create wrappers
+// 		var sectionButton = L.DomUtil.create('div', 'leaflet-draw-section-button', container);
+// 		var sectionWrapper = L.DomUtil.create('div', 'leaflet-draw-section-wrapper', container);
+// 		this._wrapper = sectionWrapper;	// shorthand for adding more stuff to this wrapper
 
-		// add tooltip
-		app.Tooltip.add(sectionButton, 'Draw on the map');
+// 		// add tooltip
+// 		app.Tooltip.add(sectionButton, 'Draw on the map');
 
-		// add hook to button
-		L.DomEvent.on(sectionButton, 'mousedown', function (e) {
-			L.DomEvent.stop(e);
-			if (L.DomUtil.hasClass(sectionWrapper, 'draw-expander')) {
-				L.DomUtil.removeClass(sectionWrapper, 'draw-expander') 
-				L.DomUtil.removeClass(sectionButton, 'open-drawer');
-			} else {
-				L.DomUtil.addClass(sectionWrapper, 'draw-expander');
-				L.DomUtil.addClass(sectionButton, 'open-drawer');
-			}
-		}, this);
-		L.DomEvent.on(sectionButton, 'dblclick', L.DomEvent.stop, this);
+// 		// add hook to button
+// 		L.DomEvent.on(sectionButton, 'mousedown', function (e) {
+// 			L.DomEvent.stop(e);
+// 			if (L.DomUtil.hasClass(sectionWrapper, 'draw-expander')) {
+// 				L.DomUtil.removeClass(sectionWrapper, 'draw-expander') 
+// 				L.DomUtil.removeClass(sectionButton, 'open-drawer');
+// 			} else {
+// 				L.DomUtil.addClass(sectionWrapper, 'draw-expander');
+// 				L.DomUtil.addClass(sectionButton, 'open-drawer');
+// 			}
+// 		}, this);
+// 		L.DomEvent.on(sectionButton, 'dblclick', L.DomEvent.stop, this);
 
-		for (var toolbarId in this._toolbars) {
-			if (this._toolbars.hasOwnProperty(toolbarId)) {
-				toolbarContainer = this._toolbars[toolbarId].addToolbar(map);
+// 		for (var toolbarId in this._toolbars) {
+// 			if (this._toolbars.hasOwnProperty(toolbarId)) {
+// 				toolbarContainer = this._toolbars[toolbarId].addToolbar(map);
 
-				if (toolbarContainer) {
-					// Add class to the first toolbar to remove the margin
-					if (!addedTopClass) {
-						if (!L.DomUtil.hasClass(toolbarContainer, topClassName)) {
-							L.DomUtil.addClass(toolbarContainer.childNodes[0], topClassName);
-						}
-						addedTopClass = true;
-					}
+// 				if (toolbarContainer) {
+// 					// Add class to the first toolbar to remove the margin
+// 					if (!addedTopClass) {
+// 						if (!L.DomUtil.hasClass(toolbarContainer, topClassName)) {
+// 							L.DomUtil.addClass(toolbarContainer.childNodes[0], topClassName);
+// 						}
+// 						addedTopClass = true;
+// 					}
 
-					// add to sectionWrapper instead of container
-					sectionWrapper.appendChild(toolbarContainer);
-				}
-			}
-		}
+// 					// add to sectionWrapper instead of container
+// 					sectionWrapper.appendChild(toolbarContainer);
+// 				}
+// 			}
+// 		}
 
-		return container;
-	},
+// 		return container;
+// 	},
 
-});
+// });
 
 
 

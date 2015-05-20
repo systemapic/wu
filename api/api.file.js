@@ -499,7 +499,8 @@ module.exports = api.file = {
 
 				// populate db 
 				db.data = {
-					geojson : name
+					geojson : name,
+					cartoid : 'default'
 				}
 				db.title = name;
 
