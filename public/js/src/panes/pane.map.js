@@ -72,7 +72,6 @@ Wu.MapPane = Wu.Pane.extend({
 
 		this._activeLayers = null;
 		this._activeLayers = [];
-
 	},
 
 
@@ -98,6 +97,7 @@ Wu.MapPane = Wu.Pane.extend({
 			// zoomAnimation : false
 			zoomControl : false,
 			inertia : false,
+			// loadingControl : true,
 			// zoomAnimationThreshold : 2
 		});
 
@@ -107,12 +107,10 @@ Wu.MapPane = Wu.Pane.extend({
 
 
 	_initControls : function () {
-
-		this._controls = {};
 		var controls = this.options.controls;
+		this._controls = {};
 		_.each(controls, function (control) {
 			this._controls[control] = new L.Control[control.camelize()];
-
 		}, this);
 	},
 
@@ -717,111 +715,140 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 
-	enableDraw : function () {
-		if (this._drawControl) return;
+	// enableDraw : function () {
+	// 	console.log('enableBraw', this._drawControl);
+	// 	if (this._drawControl) return;
 		
-		// add draw control
-		this.addDrawControl();
-	},
+	// 	// add draw control
+	// 	this.addDrawControl();
+	// },
 
-	disableDraw : function () {
-		if (!this._drawControl || this._drawControl === 'undefined') return;
+	// disableDraw : function () {
+	// 	console.log('disableBraw', this._drawControl);
+	// 	if (!this._drawControl || this._drawControl === 'undefined') return;
 
-		// disable draw control
-		this.removeDrawControl();
-	},
+	// 	// disable draw control
+	// 	this.removeDrawControl();
+	// },
 
-	removeDrawControl : function () {
-		if (!this._drawControl || this._drawControl === 'undefined') return;
+	// removeDrawControl : function () {
+	// 	if (!this._drawControl || this._drawControl === 'undefined') return;
 
-		// remove draw control
-		this._map.removeControl(this._drawControl);
+	// 	// remove draw control
+	// 	this._map.removeControl(this._drawControl);
 
-		// this._map.removeLayer(this.editableLayers);	//todo
-		this._drawControl = false;
+	// 	// this._map.removeLayer(this.editableLayers);	//todo
+	// 	this._drawControl = false;
 
-		// remove vector styling
-		this.disableVectorstyle();
-	},
+	// 	// remove vector styling
+	// 	this.disableVectorstyle();
+	// },
 
-	addDrawControl : function () {
-		var that = this,
-		    map = this._map,
-		    editableLayers = this.editableLayers;
+	// addDrawControl : function () {
+	// 	var that = this,
+	// 	    map = this._map,
+	// 	    editableLayers = this.editableLayers;
 
-		// Leaflet.Draw options
-		options = {
-			position: 'topleft',
-			// edit: {
-			// 	// editable layers
-			// 	featureGroup: editableLayers
-			// },
-			draw: {
-				circle: {
-					shapeOptions: {
-						fill: true,
-						color: '#FFF',
-						fillOpacity: 0.3,
-						// fillColor: '#FFF'
-					}
-				},
-				rectangle: { 
-					shapeOptions: {
-						fill: true,
-						color: '#FFF',
-						fillOpacity: 0.3,
-						fillColor: '#FFF'
-					}
-				},
-				polygon: { 
-					shapeOptions: {
-						fill: true,
-						color: '#FFF',
-						fillOpacity: 0.3,
-						fillColor: '#FFF'
-					},
-					showArea : true
+	// 	var options = {
+	// 		draw : {
+
+	// 		},
+
+	// 		edit : {
+
+	// 		}
+	// 	}
+
+	// 	console.log('add draw control!');
+
+	// 	// add drawControl
+	// 	var drawControl = this._drawControl = new L.Control.Draw(options);
+
+	// 	console.log('drawControl--->', drawControl)
+
+	// 	// add to map
+	// 	map.addControl(drawControl);
+
+	// 	// close popups on hover, stop clickthrough
+	// 	Wu.DomEvent.on(drawControl, 'mousemove', L.DomEvent.stop, this);
+	// 	Wu.DomEvent.on(drawControl, 'mouseover', map.closePopup, this);
+	// 	Wu.DomEvent.on(container,   'mousedown mouseup click', L.DomEvent.stopPropagation, this);
+
+
+
+	// 	// // Leaflet.Draw options
+	// 	// options = {
+	// 	// 	position: 'topleft',
+	// 	// 	// edit: {
+	// 	// 	// 	// editable layers
+	// 	// 	// 	featureGroup: editableLayers
+	// 	// 	// },
+	// 	// 	draw: {
+	// 	// 		circle: {
+	// 	// 			shapeOptions: {
+	// 	// 				fill: true,
+	// 	// 				color: '#FFF',
+	// 	// 				fillOpacity: 0.3,
+	// 	// 				// fillColor: '#FFF'
+	// 	// 			}
+	// 	// 		},
+	// 	// 		rectangle: { 
+	// 	// 			shapeOptions: {
+	// 	// 				fill: true,
+	// 	// 				color: '#FFF',
+	// 	// 				fillOpacity: 0.3,
+	// 	// 				fillColor: '#FFF'
+	// 	// 			}
+	// 	// 		},
+	// 	// 		polygon: { 
+	// 	// 			shapeOptions: {
+	// 	// 				fill: true,
+	// 	// 				color: '#FFF',
+	// 	// 				fillOpacity: 0.3,
+	// 	// 				fillColor: '#FFF'
+	// 	// 			},
+	// 	// 			showArea : true
 					
-				},
-				polyline: { 
-					shapeOptions: {
-						fill: false,
-						color: '#FFF'
+	// 	// 		},
+	// 	// 		polyline: { 
+	// 	// 			shapeOptions: {
+	// 	// 				fill: false,
+	// 	// 				color: '#FFF'
 
-					},
-					showArea : true
-				}       
-			}
-		};
+	// 	// 			},
+	// 	// 			showArea : true
+	// 	// 		}       
+	// 	// 	}
+	// 	// };
 
-		// add drawControl
-		var drawControl = this._drawControl = new L.Control.Draw(options);
+	// 	// // add drawControl
+	// 	// var drawControl = this._drawControl = new L.Control.Draw(options);
 
-		// add to map
-		map.addControl(drawControl);
+	// 	// // add to map
+	// 	// map.addControl(drawControl);
 
-		// add class
-		var container = drawControl._container;
-		L.DomUtil.addClass(container, 'elizaveta');	// todo: className
+	// 	// // add class
+	// 	// var container = drawControl._container;
+	// 	// L.DomUtil.addClass(container, 'elizaveta');	// todo: className
 
-		// close popups on hover, stop clickthrough
-		Wu.DomEvent.on(drawControl, 'mousemove', L.DomEvent.stop, this);
-		Wu.DomEvent.on(drawControl, 'mouseover', map.closePopup, this);
-		Wu.DomEvent.on(container,   'mousedown mouseup click', L.DomEvent.stopPropagation, this);
+	// 	// // close popups on hover, stop clickthrough
+	// 	// Wu.DomEvent.on(drawControl, 'mousemove', L.DomEvent.stop, this);
+	// 	// Wu.DomEvent.on(drawControl, 'mouseover', map.closePopup, this);
+	// 	// Wu.DomEvent.on(container,   'mousedown mouseup click', L.DomEvent.stopPropagation, this);
 
 
-		// add circle support
-		map.on('draw:created', function(e) {
+	// 	// // add circle support
+	// 	// map.on('draw:created', function(e) {
 
-			// add circle support
-			e.layer.layerType = e.layerType;            
+	// 	// 	// add circle support
+	// 	// 	e.layer.layerType = e.layerType;            
 
-			// add to map
-			app._map.addLayer(e.layer);
+	// 	// 	// add to map
+	// 	// 	app._map.addLayer(e.layer);
 
-		});
+	// 	// });
 
-	},
+	// },
 
 	getEditableLayerParent : function (id) {
 		// return id from _leaflet_id

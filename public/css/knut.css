@@ -604,3 +604,210 @@ body {
 	transition: height 250ms ease;
 	/*overflow: hidden;*/
 }
+
+
+.leaflet-popup {
+	transition: opacity none;
+	-webkit-transition: opacity none;
+}
+
+
+
+
+.leaflet-draw-button {
+	width: 26px;
+	height: 26px !important;
+	top: 0;
+	left: 0;
+	background: white;
+	position: absolute;
+}
+
+.leaflet-draw-button.polygon {
+	background: white;
+}
+
+.leaflet-draw-button.polyline {
+	background: white;
+	/*top: 30px;*/
+}
+.leaflet-draw-button-wrapper {
+	position: absolute;
+	height: 30px;
+}
+.leaflet-draw-button-wrapper.polygon {
+	top: 0px;
+}
+.leaflet-draw-button-wrapper.polyline {
+	top: 30px;
+}
+.leaflet-draw-button.polygon.active {
+	background: red;
+}
+
+.leaflet-draw-button:first-child {
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+}
+.leaflet-draw-button:last-child {
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+}
+
+
+
+.leaflet-draw-button-save {
+	position: absolute;
+	left: 30px;
+	border: 1px solid green;
+	background-color: blue;
+}
+
+.leaflet-draw-button-cancel {
+	position: absolute;
+	left: 90px;
+	border: 1px solid green;
+	background-color: blue;
+}
+
+.leaflet-draw-button-undo {
+	position: absolute;
+	left: 60px;
+	border: 1px solid green;
+	background-color: blue;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+#map.mode-edit div.polygon-elbow {
+    opacity: 1;
+    pointer-events: all;
+}
+
+#map.mode-create {
+    cursor: crosshair;
+}
+
+svg.tracer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#map div.polygon-elbow {
+    -webkit-transition: opacity .25s;
+    box-shadow: 0 0 0 2px white, 0 0 10px rgba(0, 0, 0, .35);
+    border: 5px solid #D7217E;
+    border-radius: 10px;
+    transition: opacity 0.25s;
+    cursor: move;
+    opacity: 0;
+    pointer-events: none;
+    box-sizing: border-box;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+
+/*
+#map {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50%;
+    overflow: visible;
+    height: 100%;
+}
+*/
+#map section.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    box-shadow: inset -100px 0 100px -100px rgba(0, 0, 0, .25);
+    width: 100%;
+    height: 100%;
+    z-index: 2001;
+}
+
+#map.mode-create {
+    cursor: crosshair !important;
+}
+
+#map g path {
+    transition: all 0.25s;
+    stroke-width: 4px;
+    stroke-opacity: 1;
+    stroke: #D7217E;
+    position: absolute;
+    z-index: 1001;
+    fill: #D7217E;
+    fill-opacity: .75;
+    -webkit-filter: none;
+}
+
+#map.mode-delete path {
+    cursor: no-drop !important;
+}
+
+#map.mode-delete path:hover {
+    fill: #4d4d4d !important;
+}
+
+#map div.polygon-elbow {
+    -webkit-transition: opacity .25s;
+    box-shadow: 0 0 0 2px white, 0 0 10px rgba(0, 0, 0, .35);
+    border: 5px solid #D7217E;
+    border-radius: 10px;
+    transition: opacity 0.25s;
+    cursor: move;
+    opacity: 0;
+    pointer-events: none;
+    box-sizing: border-box;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+#map div.polygon-elbow.non-polygon {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    border: 5px solid darkgray;
+}
+
+#map.mode-edit div.polygon-elbow {
+    opacity: 1;
+    pointer-events: all;
+}
+
+#map svg.tracer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2001;
+    pointer-events: none;
+}
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+
+
+
+
+
+

@@ -33,7 +33,7 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 
 		// Add tooltip for each option
 		app.Tooltip.add(this.panes.controlZoom, 'Enables zooming on the map. Puts [+] and [-] buttons on the map.');
-		app.Tooltip.add(this.panes.controlDraw, 'Enables drawing on the map.');
+		app.Tooltip.add(this.panes.controlDraw, 'Enables drawing of shapes on the map.');
 		app.Tooltip.add(this.panes.controlInspect, 'The layer inspector enables users to change the order or selected layers, to isolate layers, and to zoom to layer bounds.');
 		app.Tooltip.add(this.panes.controlDescription, 'Enables layer description boxes.');
 		app.Tooltip.add(this.panes.controlLayermenu, 'Enables the layer menu.');
@@ -80,7 +80,6 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 
 	_GAtoggleControl : function (e) {
 
-
 		// get type (zoom, draw, etc.)
 		var item = e.target.getAttribute('which');
 
@@ -93,7 +92,6 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 
 	toggleControl : function (e) {
 
-		
 		// prevent default checkbox behaviour
 		if (e.type == 'click') return Wu.DomEvent.stop(e);
 	
@@ -102,6 +100,8 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 
 		// get type (zoom, draw, etc.)
 		var item = e.target.getAttribute('which');
+
+		console.log('which: ', item);
 
 		// get checkbox
 		var target = Wu.DomUtil.get('map-controls-' + item);
@@ -113,7 +113,6 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		var mapPane = app.MapPane;
 
 		var control = app.MapPane.getControls()[item];
-
 
 		this.project.store.controls[item] = on;	// todo
 		this.project._update('controls');
@@ -150,6 +149,8 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 
 	disableControl : function (type) {
 
+		console.log('DISABLED', type);
+	
 		// get vars
 		var target = Wu.DomUtil.get('map-controls-' + type); // checkbox
 		var parent = Wu.DomUtil.get('map-controls-title-' + type).parentNode; // div that gets .active 
@@ -161,6 +162,8 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 	},
 
 	enableControl : function (type) {
+
+		console.error('ENABLED', type);
 		
 		// get vars
 		var target = Wu.DomUtil.get('map-controls-' + type); // checkbox

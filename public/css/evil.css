@@ -499,3 +499,86 @@ aka feedback pane
 .minimal .processing .list-title-wrapper {
 	padding: 6px 122px 4px 48px;
 	}	
+
+
+
+.list-process-grind {
+  background-image: url(/css/images/grinders/BG-grinder-small-grayDark-on-white.gif) !important;
+  height: 100%;
+  width: 100%;
+  padding: 1px;
+  background-position: 500px -4px;
+  background-repeat: no-repeat;
+  opacity: 1;
+  position: absolute;
+  right: 0;
+  background-color: white;
+  z-index: -2;
+}
+ .minimal .list-process-grind {
+  background-image: url(/css/images/grinders/BG-grinder-small-grayDark-on-white.gif) !important;
+  height: 42px;
+  width: 100%;
+  padding: 1px;
+  background-position: 382px -4px;
+  background-repeat: no-repeat;
+  opacity: 1;
+  position: absolute;
+  right: 0;
+  background-color: white;
+  z-index: -2;
+  background-size: auto 100%;
+}
+
+
+
+
+.grande-sources-source {
+	padding-bottom: 6px;
+}
+
+.grande-sources-source-title {
+	  left: 38px;
+   position: relative;
+  display: inline-block;
+}
+
+.grande-sources-source-icon {
+	position: absolute;
+}
+
+.grande-sources-container {
+  position: absolute;
+  width: 300px;
+  top: 37px;
+  left: -24px;
+  background: black;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #262625;
+  box-shadow: 0 0 2px #262625;
+  overflow: scroll;
+  max-height: 300px;
+}
+
+.grande-sources-source-thumb {
+  position: relative;
+  height: 39px;
+  right: 4px;
+  top: 3px;
+  width: auto;
+  max-width: 70px;
+  display: inline-block;
+  float: right;
+}
+
+.documents-container-textarea p img {
+  display: block;
+  position: relative;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.description-editing {
+  background-color: transparent !important;	
+}
