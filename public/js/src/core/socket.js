@@ -13,7 +13,7 @@ Wu.Socket = Wu.Class.extend({
 		var socket = this._socket;
 
 		socket.on('connect', function(){
-			console.log('connect!');
+			console.log('Securely connected to socket.');
 			socket.emit('ready', 'ko')
 		});
 		socket.on('event', function(data){

@@ -816,7 +816,6 @@ Wu.RasterLayer = Wu.Layer.extend({
 Wu.createLayer = function (layer) {
 	if (!layer.data) return console.error(layer);
 
-	console.log(layer.data);
 	// mapbox
 	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
 
