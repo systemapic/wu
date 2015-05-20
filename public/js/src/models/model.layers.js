@@ -724,6 +724,32 @@ Wu.CartodbLayer = Wu.Layer.extend({
 
 });
 
+Wu.GeoJSONLayer = Wu.Layer.extend({
+
+	type : 'geojsonlayer',
+
+	initialize : function (geojson) {
+
+		this.store = {}; // db model
+		this.geojson = geojson;
+
+		this.loaded = false;
+	},
+	
+	initLayer : function () {
+
+		// var url = 'https://{s}.tiles.mapbox.com/v4/{mapboxUri}/{z}/{x}/{y}.png?access_token={accessToken}';
+
+		this.layer = L.geoJson(this.geojson);
+
+		// todo: add gridlayer to mapbox.. but why..?
+		// add hooks
+		// this.addHooks();
+		this.loaded = true;
+		this._inited = true;
+	},
+});
+
 
 
 // systemapic layers
@@ -790,6 +816,7 @@ Wu.RasterLayer = Wu.Layer.extend({
 Wu.createLayer = function (layer) {
 	if (!layer.data) return console.error(layer);
 
+	console.log(layer.data);
 	// mapbox
 	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
 

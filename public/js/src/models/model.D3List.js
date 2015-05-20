@@ -1257,7 +1257,6 @@ Wu.List = Wu.Class.extend({
 	
 	},
 
-
 	listProcessing : function (i, DATA) {
 
 		var listOptions = this.listOptions;
@@ -1271,7 +1270,7 @@ Wu.List = Wu.Class.extend({
 		// BIND
 		var process = 
 			listOptions.wrapper
-			.selectAll('.list-process')
+			.selectAll('.list-process-grind')
 			.data(function(d) { 
 
 				if ( d.file.isProcessing ) {
@@ -1285,7 +1284,7 @@ Wu.List = Wu.Class.extend({
 		process
 			.enter()
 			.append('div')
-			.classed('list-process', true);
+			.classed('list-process-grind', true);
 
 
 		// EXIT
@@ -1294,88 +1293,208 @@ Wu.List = Wu.Class.extend({
 			.remove();
 
 
-		// Process bar
+		// // Process bar
 
-		// BIND
-		var processBar = 
-			process
-			.selectAll('.list-process-bar')
-			.data(function(d) { return [d] });
+		// // BIND
+		// var processBar = 
+		// 	process
+		// 	.selectAll('.list-process-bar')
+		// 	.data(function(d) { return [d] });
 
-		// ENTER
-		processBar
-			.enter()
-			.append('div')
-			.classed('list-process-bar', true);
+		// // ENTER
+		// processBar
+		// 	.enter()
+		// 	.append('div')
+		// 	.classed('list-process-bar', true);
 
-		// EXIT
-		processBar
-			.exit()
-			.remove();
-
-
-
-		// Process bar inner
-
-		// BIND
-		var processBarInner = 
-			processBar
-			.selectAll('.list-process-bar-inner')
-			.data(function(d) { return [d] });
-
-		// ENTER
-		processBarInner
-			.enter()
-			.append('div')
-			.classed('list-process-bar-inner', true);
-
-		// UPDATE
-		processBarInner
-			.attr('style', function(d) {
-
-				var percent = d.file.isProcessing.percent;
-				if ( d.file.isProcessing.percent > 100 ) {
-					percent = 100;
-				}
-				return 'width:' + percent + '%'; 
-			})
-
-		// EXIT
-		processBarInner
-			.exit()
-			.remove();
+		// // EXIT
+		// processBar
+		// 	.exit()
+		// 	.remove();
 
 
 
+		// // Process bar inner
+
+		// // BIND
+		// var processBarInner = 
+		// 	processBar
+		// 	.selectAll('.list-process-bar-inner')
+		// 	.data(function(d) { return [d] });
+
+		// // ENTER
+		// processBarInner
+		// 	.enter()
+		// 	.append('div')
+		// 	.classed('list-process-bar-inner', true);
+
+		// // UPDATE
+		// processBarInner
+		// 	.attr('style', function(d) {
+
+		// 		var percent = d.file.isProcessing.percent;
+		// 		if ( d.file.isProcessing.percent > 100 ) {
+		// 			percent = 100;
+		// 		}
+		// 		return 'width:' + percent + '%'; 
+		// 	})
+
+		// // EXIT
+		// processBarInner
+		// 	.exit()
+		// 	.remove();
 
 
-		// Process NO
 
-		// BIND
-		var processNO = 
-			process
-			.selectAll('.list-process-no')
-			.data(function(d) { return [d] });
 
-		// ENTER
-		processNO
-			.enter()
-			.append('div')
-			.classed('list-process-no', true);
 
-		// UPDATE
-		processNO
-			.html(function(d) {
-				return d.file.isProcessing.tiles;
-			})
+		// // Process NO
 
-		// EXIT
-		processNO
-			.exit()
-			.remove();			
+		// // BIND
+		// var processNO = 
+		// 	process
+		// 	.selectAll('.list-process-no')
+		// 	.data(function(d) { return [d] });
+
+		// // ENTER
+		// processNO
+		// 	.enter()
+		// 	.append('div')
+		// 	.classed('list-process-no', true);
+
+		// // UPDATE
+		// processNO
+		// 	.html(function(d) {
+		// 		return d.file.isProcessing.tiles;
+		// 	})
+
+		// // EXIT
+		// processNO
+		// 	.exit()
+		// 	.remove();			
 
 
 	},
+
+
+	// listProcessing : function (i, DATA) {
+
+	// 	var listOptions = this.listOptions;
+	// 	var that        = this;
+		
+
+	// 	// WRAPPER
+	// 	// WRAPPER
+	// 	// WRAPPER
+
+	// 	// BIND
+	// 	var process = 
+	// 		listOptions.wrapper
+	// 		.selectAll('.list-process')
+	// 		.data(function(d) { 
+
+	// 			if ( d.file.isProcessing ) {
+	// 				return [d];
+	// 			} else {
+	// 				return [];
+	// 			}
+	// 		});
+
+	// 	// ENTER
+	// 	process
+	// 		.enter()
+	// 		.append('div')
+	// 		.classed('list-process', true);
+
+
+	// 	// EXIT
+	// 	process
+	// 		.exit()
+	// 		.remove();
+
+
+	// 	// Process bar
+
+	// 	// BIND
+	// 	var processBar = 
+	// 		process
+	// 		.selectAll('.list-process-bar')
+	// 		.data(function(d) { return [d] });
+
+	// 	// ENTER
+	// 	processBar
+	// 		.enter()
+	// 		.append('div')
+	// 		.classed('list-process-bar', true);
+
+	// 	// EXIT
+	// 	processBar
+	// 		.exit()
+	// 		.remove();
+
+
+
+	// 	// Process bar inner
+
+	// 	// BIND
+	// 	var processBarInner = 
+	// 		processBar
+	// 		.selectAll('.list-process-bar-inner')
+	// 		.data(function(d) { return [d] });
+
+	// 	// ENTER
+	// 	processBarInner
+	// 		.enter()
+	// 		.append('div')
+	// 		.classed('list-process-bar-inner', true);
+
+	// 	// UPDATE
+	// 	processBarInner
+	// 		.attr('style', function(d) {
+
+	// 			var percent = d.file.isProcessing.percent;
+	// 			if ( d.file.isProcessing.percent > 100 ) {
+	// 				percent = 100;
+	// 			}
+	// 			return 'width:' + percent + '%'; 
+	// 		})
+
+	// 	// EXIT
+	// 	processBarInner
+	// 		.exit()
+	// 		.remove();
+
+
+
+
+
+	// 	// Process NO
+
+	// 	// BIND
+	// 	var processNO = 
+	// 		process
+	// 		.selectAll('.list-process-no')
+	// 		.data(function(d) { return [d] });
+
+	// 	// ENTER
+	// 	processNO
+	// 		.enter()
+	// 		.append('div')
+	// 		.classed('list-process-no', true);
+
+	// 	// UPDATE
+	// 	processNO
+	// 		.html(function(d) {
+	// 			return d.file.isProcessing.tiles;
+	// 		})
+
+	// 	// EXIT
+	// 	processNO
+	// 		.exit()
+	// 		.remove();			
+
+
+	// },
 
 	// Each attribute
 	listAttribute : function (i, DATA) {

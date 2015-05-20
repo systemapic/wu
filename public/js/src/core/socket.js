@@ -33,6 +33,10 @@ Wu.Socket = Wu.Class.extend({
 
 			// set uploaded
 			app.SidePane.DataLibrary.uploaded(data);
+
+			// set processing started on file
+			var fileUuid = data.files[0].uuid;
+			app.SidePane.DataLibrary.processFile(fileUuid, 0, 1);
 		});
 		socket.on('processingDone', function (data) {
 			console.log('processingDone!', data);
@@ -41,7 +45,8 @@ Wu.Socket = Wu.Class.extend({
 			    elapsed = data.elapsed,
 			    bytesPerSec = Wu.Util.bytesToSize(data.size / elapsed / 1000) + '/s',
 			    description = 'Processing of ' + size + ' took ' + elapsed / 1000 + ' seconds',
-			    uniqueIdentifier = data.uniqueIdentifier;
+			    uniqueIdentifier = data.uniqueIdentifier,
+			    fileUuid = data.processingDone;
 
 			if (data.error) {
 				app.feedback.setError({
@@ -55,6 +60,8 @@ Wu.Socket = Wu.Class.extend({
 					description : description,
 					id : uniqueIdentifier
 				});
+
+				app.SidePane.DataLibrary.processFileDone(fileUuid, 100, 1);
 			}
 
 			
