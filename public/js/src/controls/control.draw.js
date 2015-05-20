@@ -11,6 +11,7 @@ L.Control.Draw = Wu.Control.extend({
 	},
 
 	_addTo : function () {
+		// return;
 
 		// add to map
 		this.addTo(app._map);
@@ -32,6 +33,7 @@ L.Control.Draw = Wu.Control.extend({
 
 
 		// debug: turn whole thing off! 
+		this._flush();
 		return this._hide();
 
 		// get control active setting from project
@@ -119,11 +121,11 @@ L.Control.Draw = Wu.Control.extend({
 			toolbarContainer;
 
 		// create buttons
-		container.appendChild(this._createPolygonButtons());
-		container.appendChild(this._createPolylineButtons());
+		// container.appendChild(this._createPolygonButtons());
+		// container.appendChild(this._createPolylineButtons());
 
 		// create draw controls
-		this._polygonDraw = this._createPolygonDraw().addTo(map);
+		// this._polygonDraw = this._createPolygonDraw();//.addTo(map);
 		// this._polylineDraw = this._createPolylineDraw().addTo(map);
 		
 		// add tooltip
@@ -211,6 +213,7 @@ L.Control.Draw = Wu.Control.extend({
 	},
 
 	_addHooks : function () {
+		return;
 
 		// polyline buttons
 		L.DomEvent.on(this._polylineButton, 'click', this._togglePolyline, this);

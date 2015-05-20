@@ -197,11 +197,6 @@
             this.hull    = new L.FreeDraw.Hull();
             this.element = options.element || null;
 
-            // Merge user options
-            for (var o in options) {
-                this.options[o] = options[o];
-            }
-
             this.setMode(options.mode || this.mode);
             this.options.setPathClipperPadding(100);
 
@@ -286,6 +281,7 @@
 
         },
 
+     
         /**
          * @method onAdd
          * @param map {L.Map}
@@ -615,6 +611,18 @@
             return uniqueValues;
 
         },
+
+        /**
+         * @method getGeoJSON
+         * @param polygon {L.Polygon}
+         * @param event {Object}
+         * @return {L.GeoJSON{}}
+         */
+        getGeoJSON : function getGeoJSON() {
+            var polygons = this.getPolygons(true);
+            return L.FreeDraw.Utilities.getGeoJSON(polygons);
+        },
+
 
         /**
          * @method handlePolygonClick
@@ -2278,6 +2286,26 @@
 
             return groups;
 
+        },
+
+        getGeoJSON : function getGeoJSON(latLngGroups) {
+
+            if (latLngGroups.length === 1) {
+                return latLngGroups[0].toGeoJSON();
+            }
+
+            var features = []; 
+
+            latLngGroups.forEach(function (f) {
+                features.push(f.toGeoJSON());
+            });
+
+            var geojson = {
+                "type": "FeatureCollection",
+                "features": features
+            }
+
+            return geojson;
         }
 
 

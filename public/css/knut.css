@@ -744,7 +744,7 @@ svg.tracer {
     cursor: crosshair !important;
 }
 
-#map g path {
+/*#map g path {
     transition: all 0.25s;
     stroke-width: 4px;
     stroke-opacity: 1;
@@ -755,7 +755,7 @@ svg.tracer {
     fill-opacity: .75;
     -webkit-filter: none;
 }
-
+*/
 #map.mode-delete path {
     cursor: no-drop !important;
 }
