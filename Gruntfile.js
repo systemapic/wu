@@ -148,10 +148,15 @@ module.exports = function(grunt) {
 					'public/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js',
 					'public/js/lib/lodash/lodash.min.js',
 					'public/js/lib/async/async.js',
+					'public/js/lib/Leaflet.Freedraw/deps/jsclipper.js',
+					'public/js/lib/Leaflet.Freedraw/deps/concavehull.js',
+					'public/js/lib/Leaflet.Freedraw/deps/graham_scan.min.js',
+					'public/js/lib/Leaflet.Freedraw/deps/hammer.js',
 					
 					// leaflet + mapbox
 					'public/js/lib/leaflet.js/leaflet-0.7.3-src.js',
 					'public/js/lib/leaflet.js/plugins/leaflet.utfgrid.js',
+					'public/js/lib/Leaflet.Freedraw/dist/leaflet.freedraw-src.js',
 
 					// tools
 					'public/js/lib/dropzone.js/dropzone.min.js',
