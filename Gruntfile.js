@@ -150,7 +150,7 @@ module.exports = function(grunt) {
 					'public/js/lib/async/async.js',
 					'public/js/lib/leaflet.freedraw.js/jsclipper.js',
 					'public/js/lib/leaflet.freedraw.js/concavehull.js',
-					'public/js/lib/leaflet.freedraw.js/graham_scan.min.js',
+					'public/js/lib/leaflet.freedraw.js/graham_scan.js',
 					'public/js/lib/leaflet.freedraw.js/hammer.js',
 					
 					// leaflet + mapbox
