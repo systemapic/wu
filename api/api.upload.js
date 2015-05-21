@@ -128,6 +128,7 @@ module.exports = api.upload = {
 			}
 
 			api.upload.importFile(file, options, function (err, pack) {
+				console.log('imported file!', pack);
 				callback(null, pack);
 			});
 		});

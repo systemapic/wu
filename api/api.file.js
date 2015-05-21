@@ -250,7 +250,8 @@ module.exports = api.file = {
 				project.markModified('layers');
 
 				project.save(function (err) {
-					return callback(err);
+					if (err) console.log('delete file save err 445', err);
+					callback(null);
 				});
 			});
 		});
