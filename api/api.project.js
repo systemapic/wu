@@ -306,7 +306,7 @@ module.exports = api.project = {
 			project.markModified(field);
 			project.save(function (err, doc) {
 				console.log('saved?!'.red, err);
-				callback(err, doc);
+				callback(null, doc);
 			});
 		};
 		return queries;
