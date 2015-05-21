@@ -364,6 +364,7 @@ Wu.Layer = Wu.Class.extend({
 
 	setLegendsTitle : function (title) {
 		var legends = Wu.parse(this.store.legends);
+		if (!legends[0]) return;
 		legends[0].value = title;
 		this.setLegends(legends);
 	},
