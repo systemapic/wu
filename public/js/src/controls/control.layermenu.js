@@ -1244,8 +1244,8 @@ L.Control.Layermenu = Wu.Control.extend({
 			file && file.setName(newTitle);
 			layer && layer.setTitle(newTitle);
 
-			// update layermenu
-			app.SidePane.Options.settings.layermenu.update(true)
+			// update controls
+			this._updateControls();
 
 			// boolean
 			this.currentlyEditing = false;
@@ -1257,6 +1257,23 @@ L.Control.Layermenu = Wu.Control.extend({
 			if (event.which == 13 || event.keyCode == 13) input.blur(); // enter
 			if (event.which == 27 || event.keyCode == 27) input.blur(); // esc
 		}, this);
+
+	},
+
+	_updateControls : function () {
+		
+		// update layermenu
+		var lm = app.MapPane._controls.layermenu;
+		lm && lm._refresh(true);
+
+		var insp = app.MapPane._controls.inspect;
+		insp && insp._refresh(true);
+
+		var leg = app.MapPane._controls.legends;
+		leg && leg._refresh(true);
+
+		// update layermenu
+		app.SidePane.Options.settings.layermenu.update(true)
 
 	},
 

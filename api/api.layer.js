@@ -419,218 +419,8 @@ module.exports = api.layer = {
 	},
 
 
-	_createStylesheet : function (options, callback) {
-		var featureKey = options.key,
-		    featureValue = options.value,
-		    css = options.css,
-		    lid = options.id,
-		    properties = {};
+	
 
-		// set key/value
-		properties[featureKey] = featureValue;
-
-		var geojson = {
-			"type" : "FeatureCollection",
-			"features" : [
-				{
-				"type" : "Feature",
-         			 "properties" : properties,
-				"geometry": {
-					"type": "Polygon",
-					"coordinates": [
-						[
-						[
-					              -45,
-					              0
-					            ],
-					            [
-					              -45,
-					              45
-					            ],
-					            [
-					              0,
-					              45
-					            ],
-					            [
-					              0,
-					              0
-					             
-					            ],
-					            [
-					              -45,
-					              0
-					            ]
-						]
-						]
-					}
-				}
-			]
-		}
-
-
-		// write geojson template to disk
-		var toFile = api.config.path.legends + 'template-' + lid + '.geojson'; 
-
-		fs.outputFile(toFile, JSON.stringify(geojson), function (err) {
-			if (err) return callback(err);
-
-			var options = {
-				"srs": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over",
-
-				"Stylesheet": [{
-					"id" : 'layer',
-					"data" : css
-				}],
-
-				"Layer": [{
-					"id" : "layer",	
-					"name" : "layer",
-					"Datasource" : {
-						"file" : toFile,
-						"type" : "geojson"
-					}
-				}]
-			}
-
-			try {
-				var cr = new carto.Renderer({});
-				var xml = cr.render(options);
-				var stylepath = api.config.path.legends + 'stylesheet-' + lid + '.xml';
-
-				fs.outputFile(stylepath, xml, function (err) {
-					if (err) return callback(err);
-
-					var result = {
-						stylepath : stylepath,
-						lid : lid
-					}
-
-					callback(null, result);
-				});
-
-			} catch (e) { callback(e); }
-
-		});
-
-	},
-
-
-	// #########################################
-	// ###  API: Get Layer Feature Values    ###
-	// #########################################	
-	// get features from geojson that are active in cartoid.mss (ie. only active/visible layers)
-	_getLayerFeaturesValues : function (fileUuid, cartoid, callback) {
-		if (!fileUuid || !cartoid) return callback('Missing information.1');
-
-		api.layer._getLayerFeaturesValuesGeoJSON(fileUuid, cartoid, callback);
-
-		// if (fileUuid == 'osm') {
-		// 	api.layer._getLayerFeaturesValuesOSM(fileUuid, cartoid, callback);
-		// } else {
-		// 	api.layer._getLayerFeaturesValuesGeoJSON(fileUuid, cartoid, callback);
-		// }
-	},
-
-	_getLayerFeaturesValuesOSM : function (fileUuid, cartoid, callback) {
-		callback('debug');
-	},
-
-	_getLayerFeaturesValuesGeoJSON : function (fileUuid, cartoid, callback) {       // todo: optimize!
-		if (!fileUuid || !cartoid) return callback('Missing information.2');
-
-		console.log('## _getLayerFeaturesValues'.green);
-
-		File
-		.findOne({uuid : fileUuid})
-		.exec(function (err, file) {
-
-			console.log('## .findOne'.green, err, file);
-
-			if (err || !file) return callback(err || 'No file.');
-
-			// read css from file
-			var cartopath = api.config.path.cartocss + cartoid + '.mss';
-			
-			console.log('## cartopath'.green, cartopath);
-
-			fs.readFile(cartopath, 'utf8', function (err, buffer) {
-				if (err || !buffer) return callback(err || 'No data.');
-
-				console.log('## readfile ok!'.green);
-
-
-
-				try {
-					var output = new carto.Renderer({
-						filename: cartopath,
-						local_data_dir: fspath.dirname(cartopath),
-					}).renderMSS(buffer);
-				} catch(err) {
-					console.log('err11'.red, err);
-					if (Array.isArray(err)) {
-						err.forEach(function(e) {
-							carto.writeError(e, options);
-						});
-					} else { console.error('err22'.red, err); }
-				}
-				console.log('op: ', output);
-
-				// fs.writeFileSync('/home/cartocss.output', output);
-
-
-				try {
-
-					// get rules from carto (forked! see explain below...)
-					var css = buffer.toString();
-					var renderer = new carto.Renderer();
-					var info = renderer.getRules(css);
-					var string = JSON.stringify(info);
-					var jah = [];
-					var rules1 = info.rules;//[0].rules;
-
-					// console.log('## css:'.green, css);
-					// console.log('## info:'.green, info);
-					// console.log('## rules1:'.green, rules1);
-
-					// iterate
-					rules1.forEach(function (rule1) {
-						var rules2 = rule1.rules;
-						if (!rules2) return;				// todo? forEach on rule1?
-						rules2.forEach(function (rrules) {
-							if (!rrules.selectors) return;
-							rrules.selectors.forEach(function (s) {
-								var rule = s.filters.filters;
-								for (var r in rule) {
-									var jahrule = rule[r];
-									jah.push({
-										key : jahrule.key.value,
-										value : jahrule.val.value
-									});
-								}
-							});
-						});
-					});
-
-					console.log('## CRACK!'.green);
-
-					// add #layer
-					jah.push({
-						key : 'layer',
-						value : file.name
-					});
-
-					var result = {
-						rules : jah,
-						css : css
-					}
-
-					return callback(null, result);
-
-				// catch errros
-				} catch (e) { callback(e); }
-			});
-		});
-	},
 
 	
 
@@ -722,22 +512,16 @@ module.exports = api.layer = {
 
 // systemapic hack
 carto.Renderer.prototype.getRules = function render(data) {
-	console.log('++++ YO!!'.green);
-    var env = _(this.env).defaults({
-        benchmark: true,
-        validation_data: false,
-        effects: []
-    });
+	var env = _(this.env).defaults({
+		benchmark: true,
+		validation_data: false,
+		effects: []
+	});
 
-    // console.log('env', this.env);
+	carto.tree.Reference.setVersion(this.options.mapnik_version);
 
-    // if (!carto.tree.Reference.setVersion(this.options.mapnik_version)) {
-    //     throw new Error("Could not set mapnik version to " + this.options.mapnik_version);
-    // }
-	console.log('++++ YO!! 2 '.green, data);
+	var parser = (carto.Parser(env)).parse(data);
 
-    var parser = (carto.Parser(env)).parse(data);
-	console.log('++++ YO!! 3'.green);
-    return parser;
+	return parser;
 }
 
