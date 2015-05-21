@@ -218,8 +218,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	_addResumable : function () {
 		if (!app.activeProject) return;
 
-		console.error('CREATE RESUAMBLE!!');
-
 		var r = this.r = new Resumable({
 			target : '/api/upload',
 			chunkSize : 1*1024*1024,
