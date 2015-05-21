@@ -473,8 +473,6 @@ L.Control.Legends = Wu.Control.extend({
 		// create legends
 		legends.forEach(function (legend) {
 
-			console.log('LEGEND', legend);
-
 			// skip disabled legends
 			if (!legend.on) return;
 
@@ -483,7 +481,8 @@ L.Control.Legends = Wu.Control.extend({
 			var e = Wu.DomUtil.create('div', 'legend-feature', d);
 			var f = Wu.DomUtil.create('img', 'legend-image1', e);
 			var g = Wu.DomUtil.create('img', 'legend-image2', e);
-			var h = Wu.DomUtil.create('div', 'legend-feature-name', d, legend.value);
+			var title = legend.key == 'layer' ? legend.value : legend.key.toLowerCase().camelize() + ': ' + legend.value;
+			var h = Wu.DomUtil.create('div', 'legend-feature-name', d, title);
 
 			f.src = legend.base64;
 			g.src = legend.base64;
