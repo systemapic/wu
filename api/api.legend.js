@@ -75,9 +75,10 @@ module.exports = api.legend = {
 
 		// get layer features/values
 		ops.push(function (callback) {
-			api.layer._getLayerFeaturesValues(fileUuid, cartoid, function (err, result) {
+			api.legend._getLayerFeaturesValues(fileUuid, cartoid, function (err, result) {
 				if (err) console.log('_getLayerFeaturesValues err'.red, err);
 				if (err) return callback(err);
+
 				callback(null, result);
 			});
 		});
@@ -99,9 +100,11 @@ module.exports = api.legend = {
 					id : 'legend-' + uuid.v4()
 				}
 
-				api.layer._createStylesheet(options, function (err, result) {
+				
+				api.legend._createStylesheet(options, function (err, result) {
 					if (err || !result) console.log('_createStylesheet err'.red, err, result);
 					if (err || !result) return cb(err || 'No stylesheet.');
+
 
 					api.legend._create(result, function (err, path) {
 						if (err || !path) console.log('api.legend._create err'.red, err, path);
@@ -152,55 +155,255 @@ module.exports = api.legend = {
 
 	},
 
+	
+	_createStylesheet : function (options, callback) {
+		var featureKey = options.key,
+		    featureValue = options.value,
+		    css = options.css,
+		    lid = options.id,
+		    properties = {};
+
+		// set key/value
+		properties[featureKey] = featureValue;
+
+		var geojson = {
+			"type" : "FeatureCollection",
+			"features" : [
+				{
+				"type" : "Feature",
+         			 "properties" : properties,
+         			// "properties" : {"layer" : "layer"},
+				"geometry": {
+					"type": "Polygon",
+					"coordinates": [
+						[
+						[
+					              -45,
+					              0
+					            ],
+					            [
+					              -45,
+					              45
+					            ],
+					            [
+					              0,
+					              45
+					            ],
+					            [
+					              0,
+					              0
+					             
+					            ],
+					            [
+					              -45,
+					              0
+					            ]
+						]
+						]
+					}
+				}
+			]
+		}
+
+
+		// write geojson template to disk
+		var toFile = api.config.path.legends + 'template-' + lid + '.geojson'; 
+
+		fs.outputFile(toFile, JSON.stringify(geojson), function (err) {
+			if (err) return callback(err);
+
+			var options = {
+				"srs": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over",
+
+				"Stylesheet": [{
+					"id" : 'layer',
+					"data" : css
+				}],
+
+				"Layer": [{
+					"id" : "layer",	
+					"name" : "layer",
+					"Datasource" : {
+						"file" : toFile,
+						"type" : "geojson"
+					}
+				}]
+			}
+
+			try {
+				var cr = new carto.Renderer({});
+				var xml = cr.render(options);
+				var stylepath = api.config.path.legends + 'stylesheet-' + lid + '.xml';
+
+				fs.outputFile(stylepath, xml, function (err) {
+					if (err) return callback(err);
+
+					var result = {
+						stylepath : stylepath,
+						lid : lid
+					}
+
+					callback(null, result);
+				});
+
+			} catch (e) { callback(e); }
+
+		});
+
+	},
+
+
 
 	_create : function (options, callback) {
 
 		var stylepath = options.stylepath;
 		var lid = options.lid;
+		var outpath = api.config.path.legends + lid + '.png';
 
-		// register fonts and datasource plugins
-		mapnik.register_default_fonts();
-		mapnik.register_default_input_plugins();
+		var inxml = stylepath;
+		var outpng = outpath;
 
-		var map = new mapnik.Map(20, 20);
+		// ridicilous hack
+		var exec = require('child_process').exec;
+		var cmd = 'node ../tools/create_png.js ' + inxml + ' ' + outpng;
+		exec(cmd, function (err, stdin, stdout) {
+			callback(null, outpng);
+		});
 
-		try {
-			map.load(stylepath, function (err, map) {
-				if (err) return callback(err);
 
-				map.zoomAll(); // todo: zoom?
-				var im = new mapnik.Image(20, 20);
+		// doesnt work!
+		//
+		// var map = new mapnik.Map(20, 20);
+		// map.load(stylepath, function(err, map) {
+		//     if (err) throw err;
+		//     map.zoomAll();
+		//     var im = new mapnik.Image(20, 20);
+		//     map.render(im, function(err, im) {
+		//       if (err) throw err;
+		//       im.encode('png', function(err, buffer) {
+		//           if (err) throw err;
+		//           fs.writeFile(outpath, buffer, function(err) {
+		//               if (err) throw err;
+		//               console.log('saved map image to22', outpath);
+		//               callback(null, outpath);
+		//           });
+		//       });
+		//     });
+		// });
 
-				map.render(im, function (err, im) {
-					if (err) {
-						console.log('map.render err'.red, err);
-						return callback(err);
-					}
+	},
 
-					im.encode('png', function(err, buffer) {
-						if (err) {
-							console.log('im.encode err'.red, err);
-							return callback(err);
-						}
 
-						var outpath = api.config.path.legends + lid + '.png';
-						console.log('output: '.yellow, outpath);
-						
-						fs.writeFile(outpath, buffer, function (err) {
-							if (err) console.log('legend._create writefile err:'.red, err);
+	// #########################################
+	// ###  API: Get Layer Feature Values    ###
+	// #########################################	
+	// get features from geojson that are active in cartoid.mss (ie. only active/visible layers)
+	_getLayerFeaturesValues : function (fileUuid, cartoid, callback) {
+		if (!fileUuid || !cartoid) return callback('Missing information.1');
 
-							if (err) return callback(err);
-							
-							callback(null, outpath);
+		api.legend._getLayerFeaturesValuesGeoJSON(fileUuid, cartoid, callback);
+
+		// if (fileUuid == 'osm') {
+		// 	api.layer._getLayerFeaturesValuesOSM(fileUuid, cartoid, callback);
+		// } else {
+		// 	api.layer._getLayerFeaturesValuesGeoJSON(fileUuid, cartoid, callback);
+		// }
+	},
+
+	_getLayerFeaturesValuesOSM : function (fileUuid, cartoid, callback) {
+		callback('debug');
+	},
+
+	_getLayerFeaturesValuesGeoJSON : function (fileUuid, cartoid, callback) {       // todo: optimize!
+		if (!fileUuid || !cartoid) return callback('Missing information.2');
+
+
+		File
+		.findOne({uuid : fileUuid})
+		.exec(function (err, file) {
+
+
+			if (err || !file) return callback(err || 'No file.');
+
+			// read css from file
+			var cartopath = api.config.path.cartocss + cartoid + '.mss';
+			
+
+			fs.readFile(cartopath, 'utf8', function (err, buffer) {
+				if (err || !buffer) return callback(err || 'No data.');
+
+
+
+
+				try {
+					var output = new carto.Renderer({
+						filename: cartopath,
+						local_data_dir: fspath.dirname(cartopath),
+					}).renderMSS(buffer);
+				} catch(err) {
+					console.log('err11'.red, err);
+					if (Array.isArray(err)) {
+						err.forEach(function(e) {
+							carto.writeError(e, options);
+						});
+					} else { console.error('err22'.red, err); }
+				}
+				console.log('op: ', output);
+
+				// fs.writeFileSync('/home/cartocss.output', output);
+
+
+				try {
+
+					// get rules from carto (forked! see explain below...)
+					var css = buffer.toString();
+					var renderer = new carto.Renderer();
+					var info = renderer.getRules(css);
+					var string = JSON.stringify(info);
+					var jah = [];
+					var rules1 = info.rules;//[0].rules;
+
+					// console.log('## css:'.green, css);
+					// console.log('## info:'.green, info);
+					// console.log('## rules1:'.green, rules1);
+
+					// iterate
+					rules1.forEach(function (rule1) {
+						var rules2 = rule1.rules;
+						if (!rules2) return;				// todo? forEach on rule1?
+						rules2.forEach(function (rrules) {
+							if (!rrules.selectors) return;
+							rrules.selectors.forEach(function (s) {
+								var rule = s.filters.filters;
+								for (var r in rule) {
+									var jahrule = rule[r];
+									jah.push({
+										key : jahrule.key.value,
+										value : jahrule.val.value
+									});
+								}
+							});
 						});
 					});
-				});
-			});
 
-		} catch (e) { 
-			console.log('legend._create try catch'.red, e);
-			callback(e);
-		}
+					// add #layer
+					jah.push({
+						key : 'layer',
+						value : file.name
+					});
+
+					var result = {
+						rules : jah,
+						css : css
+					}
+
+					return callback(null, result);
+
+				// catch errros
+				} catch (e) { callback(e); }
+			});
+		});
 	},
+
 
 }

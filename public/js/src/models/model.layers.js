@@ -225,6 +225,8 @@ Wu.Layer = Wu.Class.extend({
 	setTitle : function (title) {
 		this.store.title = title;
 		this.save('title');
+
+		this.setLegendsTitle(title);
 	},
 
 	getDescription : function () {
@@ -358,6 +360,12 @@ Wu.Layer = Wu.Class.extend({
 		if (!legends) return;
 		this.store.legends = JSON.stringify(legends);
 		this.save('legends');
+	},
+
+	setLegendsTitle : function (title) {
+		var legends = Wu.parse(this.store.legends);
+		legends[0].value = title;
+		this.setLegends(legends);
 	},
 
 	createLegends : function (callback) {
