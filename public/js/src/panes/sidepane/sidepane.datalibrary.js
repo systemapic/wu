@@ -129,13 +129,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	toggleSize : function () {
-
-		// Go small
-		if ( this.fullsize ) 	this.setSmallSize();
-
-		// Go large
-		else 					this.setFullSize();
-
+		this.fullsize ? this.setSmallSize() : this.setFullSize();
 	},
 
 	setFullSize : function () {
@@ -155,7 +149,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_onProjectSelected : function (e) {
-
 		this._unload(e);
 
 		// refresh uploader
@@ -199,6 +192,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	_removeResumable : function () {
 
+		console.error('_removeResumable');
+
 		var r = this.r;
 		r.unAssignDrop(this._resumableDrop);
 		r.cancel();
@@ -223,9 +218,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	_addResumable : function () {
 		if (!app.activeProject) return;
 
+		console.error('CREATE RESUAMBLE!!');
+
 		var r = this.r = new Resumable({
 			target : '/api/upload',
-			chunkSize : 1*1024*2048,
+			chunkSize : 1*1024*1024,
 			simultaneousUploads : 5,
 			generateUniqueIdentifier : function (file) {
 				return file.size + '-' + file.lastModified + '-' + file.name;
@@ -238,13 +235,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			},
 
 			// max files to be uploaded at once
-			maxFiles : 1,
+			maxFiles : 5,
 			maxFilesErrorCallback : function (files, errorCount) {
 
 				// feedback message
 				app.feedback.setError({
 					title : 'Sorry, you can\'t do that!',
-					description : 'Please only upload one file at a time.',
+					description : 'Please only upload five files at a time.',
 				});
 
 				// hide drop
@@ -319,7 +316,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			});
 
 			// refresh for new upload
-			this._refreshResumable();
+			// this._refreshResumable();
 
 			app.ProgressBar.hideProgress();
 
@@ -717,11 +714,15 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		console.log('uploaded!', result);
 		
 		// handle errors
-		if (result.error) this.handleError(result.error);
-		
+		if (result.error) {
+			console.error('error', result.error);
+			this.handleError(result.error);
+		}
 		// return if nothing
-		if (!result.files) return;
-
+		if (!result.files) {
+			console.error('no files?');
+			return;
+		}
 		// add files to library
 		result.files && result.files.forEach(function (file, i, arr) {
 			
