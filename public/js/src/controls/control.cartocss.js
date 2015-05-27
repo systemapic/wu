@@ -746,7 +746,8 @@ L.Control.Cartocss = Wu.Control.extend({
 			var layer = _.remove(legends, function (l) {
 				return l.key == 'layer';
 			});
-			legends.unshift(layer[0]);
+			
+			legends.unshift && legends.unshift(layer[0]);
 
 			// include old legends settings
 			legends = this._mergePreviousLegendsSettings(legends, this._layer.getLegends());

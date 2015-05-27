@@ -59,7 +59,7 @@ module.exports = api.geo = {
 		if (!path || !fileUuid) return callback('Missing information.14');
 
 		var dest = api.config.path.file + fileUuid;
-		console.log('copyToVileRasterFolder!!! 1', dest, path);
+		console.log('copyToVileRasterFolder!!! 1, from , to', path, dest);
 
 		// do nothing if already there
 		if (path == dest) return callback(null);
@@ -462,6 +462,13 @@ module.exports = api.geo = {
 			var source = gdal.SpatialReference.fromProj4(proj4);
 			var target = gdal.SpatialReference.fromProj4(ourProj4);
 			var isSame = source.isSame(target);
+
+			console.log('priojection: ', proj4);
+			console.log('spurce:', source);
+			console.log('target: ', target);
+
+			// debug
+			return callback(null, meta);
 
 			// same, no reprojection necessary
 			if (isSame) return callback(null, meta);
