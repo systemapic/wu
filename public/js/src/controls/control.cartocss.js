@@ -771,7 +771,8 @@ L.Control.Cartocss = Wu.Control.extend({
 
 
 	_mergePreviousLegendsSettings : function (newLegends, oldLegends) {
-
+		if (!newLegends) return;
+		
 		// keep .on setting
 		newLegends.forEach(function (newlegend, i){
 			var oldlegend = _.find(oldLegends, function (o) {
