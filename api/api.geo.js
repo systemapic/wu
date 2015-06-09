@@ -308,10 +308,7 @@ module.exports = api.geo = {
 
 		if (proj4) cmd += ' -s_srs "' + proj4 + '" -t_srs "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"';
 
-		console.log('ogr2ogr cmd: '.red, cmd);
-
 		var exec = require('child_process').exec;
-
 		exec(cmd, function (err, stdout, stdin) {
 			console.log('did cmn'.yellow);
 			

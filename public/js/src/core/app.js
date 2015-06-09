@@ -13,6 +13,8 @@ Wu.App = Wu.Class.extend({
 
 	initialize : function (options) {
 
+		console.log('magda -> ', options);
+
 		console.log('Systemapic v.' + Wu.version);
 
 		// set global this
@@ -79,6 +81,8 @@ Wu.App = Wu.Class.extend({
 		// set vars
 		this.options.json = portalStore;
 
+		console.log(portalStore);
+
 		// accesss
 		this._initAccess();
 
@@ -115,6 +119,10 @@ Wu.App = Wu.Class.extend({
 
 		// main user account
 		this.Account = new Wu.User(this.options.json.account);
+
+		console.log('this.account -> ', this.Account);
+
+		console.error('this', this);
 		
 		// create user objects
 		this.Users = {};
