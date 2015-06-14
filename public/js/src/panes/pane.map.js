@@ -873,7 +873,8 @@ Wu.MapPane = Wu.Pane.extend({
 	_addPopupContent : function (e) {
 
 		// if d3tooltip setting on, get d3 instead of normal text
-		var d3tooltip = true; // this is the toggle, TODO: connect setting!
+		var d3tooltip = false; // this is the toggle, TODO: connect setting!
+		
 		var content = d3tooltip ? this._createPopupContentD3(e) : this._createPopupContent(e);
 		var buffer = '<hr>';
 
