@@ -317,9 +317,6 @@ Wu.Access = Wu.Class.extend({
 		
 		upload_file 		: function (project, user) { 
 			var user = user || app.Account;
-			console.log('access.to.upload_file', project, user);
-			console.log('admin?', app.access.as.admin(user, 'upload_file'));
-			console.log('cap?', app.access.has.project_capability(user, project, 'upload_file'));
 			if (app.access.as.admin(user, 'upload_file')) return true;
 			if (app.access.has.project_capability(user, project, 'upload_file')) return true;
 			return false;
