@@ -169,13 +169,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	addHooks : function () {
 		this._setHooks('on');
 
-		console.log('THISPROJECT', this._project);
 		var project = this._project || app.activeProject;
 		var canDelete = app.access.to.delete_project(project),
 		    canUpload = app.access.to.upload_file(project),
 		    canDownload = app.access.to.download_file(project);
 		
-		console.error('canUpload:', canUpload);
 		if (canDelete)   Wu.DomUtil.removeClass(this._deleter, 'displayNone');
 		if (canUpload)   Wu.DomUtil.removeClass(this._uploader, 'displayNone');
 		if (canDownload) Wu.DomUtil.removeClass(this._downloader, 'displayNone');
