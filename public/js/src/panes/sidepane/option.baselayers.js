@@ -374,11 +374,13 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 	activate : function (layerUuid) {
 		var layer = this._layers[layerUuid];
+		if (!layer) return;
 		Wu.DomUtil.removeClass(layer.container, 'deactivated');
 	},
 
 	deactivate : function (layerUuid) {
 		var layer = this._layers[layerUuid];
+		if (!layer) return;
 		Wu.DomUtil.addClass(layer.container, 'deactivated');
 	}
 });
