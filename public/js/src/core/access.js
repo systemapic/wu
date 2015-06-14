@@ -199,12 +199,17 @@ Wu.Access = Wu.Class.extend({
 			    roles = project.getRoles(),
 			    permission = false;
 
+			console.log('has pro cap', user, project, capability);
 
 			_.each(roles, function (role) {
+				console.log('role: ', role);
+				console.log('role.hasMember(user)', role.hasMember(user));
 				if (role.hasMember(user)) {
+					console.log('role.hasCapability(capability)', role.hasCapability(capability));
 					if (role.hasCapability(capability)) permission = true;
 				}
 			});
+			console.log('permission: ', permission);
 			return permission;
 		},
 
@@ -312,6 +317,9 @@ Wu.Access = Wu.Class.extend({
 		
 		upload_file 		: function (project, user) { 
 			var user = user || app.Account;
+			console.log('access.to.upload_file', project, user);
+			console.log('admin?', app.access.as.admin(user, 'upload_file'));
+			console.log('cap?', app.access.has.project_capability(user, project, 'upload_file'));
 			if (app.access.as.admin(user, 'upload_file')) return true;
 			if (app.access.has.project_capability(user, project, 'upload_file')) return true;
 			return false;

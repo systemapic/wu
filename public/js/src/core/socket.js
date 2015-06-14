@@ -34,9 +34,11 @@ Wu.Socket = Wu.Class.extend({
 			// set uploaded
 			app.SidePane.DataLibrary.uploaded(data);
 
-			// set processing started on file
-			var fileUuid = data.files[0].uuid;
-			app.SidePane.DataLibrary.processFile(fileUuid, 0, 1);
+			if (data.layers.length) {
+				// set processing started on file
+				var fileUuid = data.files[0].uuid;
+				app.SidePane.DataLibrary.processFile(fileUuid, 0, 1);
+			}
 		});
 		socket.on('processingDone', function (data) {
 			console.log('processingDone!', data);
