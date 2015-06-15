@@ -55,7 +55,8 @@ Wu.SidePane.Options.Connect = Wu.SidePane.Options.Item.extend({
 	},	
 
 	calculateHeight : function () {
-		var num = this.project.getMapboxAccounts().length;
+		var project = this.project || app.activeProject;
+		var num = project.getMapboxAccounts().length;
 		this.maxHeight = 180 + num * 30;
 		this.minHeight = 0;
 	},
@@ -80,9 +81,10 @@ Wu.SidePane.Options.Connect = Wu.SidePane.Options.Item.extend({
 	},
 
 	addOSMLayer : function () {
+		var project = this.project || app.activeProject;
 
 		// create layer
-		this.project.createOSMLayer(function (err, layer) {
+		project.createOSMLayer(function (err, layer) {
 
 			// add to baselayer, layermenu
 			this._updateLayerOptions();

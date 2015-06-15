@@ -199,17 +199,12 @@ Wu.Access = Wu.Class.extend({
 			    roles = project.getRoles(),
 			    permission = false;
 
-			console.log('has pro cap', user, project, capability);
 
 			_.each(roles, function (role) {
-				console.log('role: ', role);
-				console.log('role.hasMember(user)', role.hasMember(user));
 				if (role.hasMember(user)) {
-					console.log('role.hasCapability(capability)', role.hasCapability(capability));
 					if (role.hasCapability(capability)) permission = true;
 				}
 			});
-			console.log('permission: ', permission);
 			return permission;
 		},
 

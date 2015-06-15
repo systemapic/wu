@@ -14,7 +14,7 @@ Wu.HeaderPane = Wu.Pane.extend({
 		this._titleWrap     = Wu.DomUtil.create('div', 'header-title-wrap', this._container);
 		this._title 	    = Wu.DomUtil.create('div', 'header-title', this._titleWrap);
 		this._subtitle 	    = Wu.DomUtil.create('div', 'header-subtitle', this._titleWrap);
-
+		this._role 			= Wu.DomUtil.create('div', 'header-role', this._titleWrap);
 		// tooltips
 		this._addTooltips();
 
@@ -28,19 +28,11 @@ Wu.HeaderPane = Wu.Pane.extend({
 	// refresh view (ie. on projectSelected)
 	_refresh : function () {
 
-		console.log('this._project', this._project);
-		var project = this._project || app.activeProject;
-
-		var roles = project.getRoles();
-
-		console.log('roles', roles);
-
-		
-
 		// refresh fields
 		this.setLogo();
 		this.setTitle();
 		this.setSubtitle();
+		this.setRole();
 
 		// make sure is visible
 		this._show();
@@ -84,6 +76,32 @@ Wu.HeaderPane = Wu.Pane.extend({
 
 	setSubtitle : function (subtitle) {
 		this._subtitle.innerHTML = subtitle || this._project.getHeaderSubtitle();
+	},
+
+	setRole : function () {
+		var myrole = this._getRole();
+		this._role.innerHTML = myrole;
+	},
+
+	_getRole : function () {
+		// superadmins
+		if (app.Access.is.superAdmin()) return 'Superadmin';
+		if (app.Access.is.admin()) return 'Admin';
+
+		// erryone else
+		var project = this._project || app.activeProject;
+		var roles = project.getRoles();
+		var myrole = '';
+		for (r in roles) {
+			var role = roles[r];
+			role.store.members.forEach(function (m) {
+				if (m == app.Account.getUuid()) {
+					myrole = role;
+				}
+			})
+		}
+		if (myrole) return myrole.getName();
+		return 'No role.'
 	},
 
 	getContainer : function () {

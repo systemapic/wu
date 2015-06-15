@@ -83,6 +83,9 @@ Wu.Analytics = Wu.Class.extend({
 	setGaPageview : function (uuid) {
 		if (app._isPhantom) return;
 
+		// return if no project (ie. after delete)
+		if (!app.activeProject) return;
+
 		// Set active project:
 		// If we have a UUID, use it
 		// if not, use current active project
