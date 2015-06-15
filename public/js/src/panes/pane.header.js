@@ -14,7 +14,8 @@ Wu.HeaderPane = Wu.Pane.extend({
 		this._titleWrap     = Wu.DomUtil.create('div', 'header-title-wrap', this._container);
 		this._title 	    = Wu.DomUtil.create('div', 'header-title', this._titleWrap);
 		this._subtitle 	    = Wu.DomUtil.create('div', 'header-subtitle', this._titleWrap);
-		this._role 			= Wu.DomUtil.create('div', 'header-role', this._titleWrap);
+		this._role 	    = Wu.DomUtil.create('div', 'header-role', this._titleWrap);
+	
 		// tooltips
 		this._addTooltips();
 
@@ -26,7 +27,7 @@ Wu.HeaderPane = Wu.Pane.extend({
 	},
 
 	// refresh view (ie. on projectSelected)
-	_refresh : function () {
+	_refresh : function (project) {
 
 		// refresh fields
 		this.setLogo();
@@ -71,6 +72,7 @@ Wu.HeaderPane = Wu.Pane.extend({
 	},
 
 	setTitle : function (title) {
+		console.log('setTile', this._project);
 		this._title.innerHTML = title || this._project.getHeaderTitle();
 	},
 
