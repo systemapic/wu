@@ -308,6 +308,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// add to global store
 		app.Projects[store.uuid] = project;
 
+		console.log('store', store);
 		// update project store
 		project.setNewStore(store);
 
