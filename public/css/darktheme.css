@@ -58,7 +58,7 @@ h3, h4 {
 	color: rgba(255, 255, 255, 0.95);
 	}
 
-.header-subtitle {
+.header-subtitle, .header-role {
 	color: white;
 	font-weight: 400;
 	}
@@ -683,4 +683,19 @@ blockquote {
 
 #editor-client-item-new	h5 {
 	color: white;
+}
+
+.list-attribute-type, .list-attribute-created{
+	line-height: 1.2;
+}
+
+.d3-list-header-item{
+	cursor: pointer;
+	padding-top: 5px;
+	position: absolute;
+	top: 0;
+	height: 100%;
+	/*border-left: 1px dashed rgba(255, 255, 255, 0.5);*/
+	text-align: center;
+	overflow: hidden; 
 }
