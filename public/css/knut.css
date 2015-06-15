@@ -805,8 +805,18 @@ svg.tracer {
     margin: 0;
 }
 
+.list-attribute-wrapper{
+	cursor: pointer;
+	cursor: hand;
+}
 
+.list-attribute-wrapper-access:hover{
+	background: rgba(0, 0, 0, 0.1);
+}
 
+.documents-container-rightpane{
+	border-left: 2.5px solid rgba(128, 128, 128, 0.17);;
+}
 
 
 

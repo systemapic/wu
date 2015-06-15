@@ -28,6 +28,15 @@ Wu.HeaderPane = Wu.Pane.extend({
 	// refresh view (ie. on projectSelected)
 	_refresh : function () {
 
+		console.log('this._project', this._project);
+		var project = this._project || app.activeProject;
+
+		var roles = project.getRoles();
+
+		console.log('roles', roles);
+
+		
+
 		// refresh fields
 		this.setLogo();
 		this.setTitle();
