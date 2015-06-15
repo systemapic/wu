@@ -545,15 +545,15 @@ input.cmn-toggle-round-flat:checked + label:after {
 	}
 
 .leaflet-control-search .search-button {
-	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon_inverted.png') no-repeat 2px -22px !important;
+	background: url('../css/search-icon-inverted.png') no-repeat 2px -22px !important;
 	}
 
 .leaflet-control-search .search-button:hover {
-	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon_inverted.png') no-repeat 2px 2px !important;
+	background: url('../css/search-icon-inverted.png') no-repeat 2px 2px !important;
 	}
 
 .leaflet-control-search.search-load .search-input {
-	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/loader_inverted.gif') no-repeat center right #fff;
+	background: url('../css/search-icon-inverted.png') no-repeat center right #fff;
 	}
 
 .leaflet-container.dark .map-tooltip .close, 
