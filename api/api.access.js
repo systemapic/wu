@@ -1098,6 +1098,11 @@ module.exports = api.access = {
 			var account = options.user, 
 			    user = options.subject;
 
+
+			console.log('edit_user ::::', options);
+			// ok if self
+			if (account.uuid == user.uuid) return done(null, options);
+
 			// if not createdBy self, pass to edit_other_user
 			if (!api.access.is.createdBy(user, account)) return api.access.to.edit_other_user(options, done);
 
