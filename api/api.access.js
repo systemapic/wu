@@ -871,6 +871,7 @@ module.exports = api.access = {
 			    roles = project.roles,
 			    access = false;
 			
+			console.log('..............has', options, capability);
 			if (roles) roles.forEach(function (role) {
 				// if user in role
 				if (_.contains(role.members, user.getUuid())) {
@@ -948,7 +949,8 @@ module.exports = api.access = {
 
 			async.series(ops, function (err, is) {
 				if (!err && is.admin || is.capable) return done(null, options);
-				done('No access.');
+				done(api.access.textTemplates.no_access);
+				// done("You can't do that!");
 			});
 		},
 
@@ -1196,4 +1198,8 @@ module.exports = api.access = {
 			api.access.to._check(options, 'delegate_to_user', done);
 		},
 	},
+
+	textTemplates : {
+		no_access : "You don't have permission to do that.",
+	}
 }
