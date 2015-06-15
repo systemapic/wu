@@ -818,6 +818,25 @@ svg.tracer {
 	border-left: 2.5px solid rgba(128, 128, 128, 0.17);;
 }
 
+.header-role{
+	border: 0px;
+ 	background: transparent;
+	display: block;
+	font-style: inherit;
+	color: #666;
+	font-size: 16px;
+	float: right;
+	height: 16px;
+	word-wrap: break-word;
+	position: relative;
+	/*left: inherit;*/
+	top: 0;
+	line-height: 15px;
+	overflow: hidden;
+	max-height: 31px;
+	
+}
+
 
 
 

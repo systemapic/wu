@@ -384,16 +384,11 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	deleteFolder : function (uuid) {
 		if (confirm('Are you sure you want to delete folder ' + this.folders[uuid].title + '?')) {
-			console.log('tnis.folders', this.folders);
 			var el = this.folders[uuid].el;
-			console.log('el', el);
 			Wu.DomUtil.remove(el.previousSibling);
 			Wu.DomUtil.remove(el);
 			delete this.folders[uuid];
-
 			this.save();
-		
-
 		}
 
 		// hide delete buttons

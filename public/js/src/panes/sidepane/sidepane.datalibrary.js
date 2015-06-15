@@ -189,7 +189,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// add new
 		var project = this._project || app.activeProject;
-		console.error('this.P_oroj', project);
 		if (app.access.to.upload_file(project)) this._addResumable();
 	},
 
