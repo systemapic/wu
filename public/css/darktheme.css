@@ -700,6 +700,17 @@ blockquote {
 	overflow: hidden; 
 }
 
+#userslist .d3-list-header-item{
+	cursor: pointer;
+	padding-top: 5px;
+	position: absolute;
+	top: 0;
+	height: 100%;
+	/*border-left: 1px dashed rgba(255, 255, 255, 0.5);*/
+	text-align: center;
+	overflow: hidden; 
+}
+
 .list-attribute{
 	color: #999;
 }
