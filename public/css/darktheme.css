@@ -122,6 +122,8 @@ h3, h4 {
 	}
 
 .project-users-inner-wrapper {
+	padding-top: 25px;
+	padding-bottom: 15px;
 	background-color: #333;
 	color: #FAFAFA;
 	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
@@ -713,4 +715,21 @@ blockquote {
 
 .list-attribute{
 	color: #999;
+}
+
+.project-item{
+	/*needs to be fixed*/
+}
+
+.fullpage-users, .manage-access-container{
+	background-color: rgba(33, 33, 33, 0.9) !important;
+}
+
+.manage-access-title-wrapper, .manage-access-client-title{
+	color: white;
+	background-color: rgba(33, 33, 33, 0.9) !important;
+}
+
+.manage-access-info-outer .manage-access-info{
+	color: white;
 }
