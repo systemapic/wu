@@ -442,7 +442,7 @@ module.exports = api.upload = {
 
 
 				// handle images
-				if (extension == 'jpg' || extension == 'png' || extension == 'jpeg') {
+				if (extension == 'jpg' || extension == 'tiff' || extension == 'png' || extension == 'jpeg') {
 
 					ops1.push(function (callback) {
 

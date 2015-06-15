@@ -249,7 +249,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			},
 
 			// accepted filetypes
-			fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif', 'jp2', 'ecw'],
+			fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif', 'tiff', 'jp2', 'ecw'],
 			fileTypeErrorCallback : function (file, errorCount) {
 
 				var description = 'The file <strong>' + file.name + '</strong> is not an accepted filetype.';
