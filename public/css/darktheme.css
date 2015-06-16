@@ -730,6 +730,14 @@ blockquote {
 	background-color: rgba(33, 33, 33, 0.9) !important;
 }
 
-.manage-access-info-outer .manage-access-info{
-	color: white;
+.manage-access-info{
+	color: rgba(255, 255, 255, 0.95);
+}
+
+.manage-acesss-roles-wrapper{
+
+}
+
+.manage-access-current-role{
+
 }
