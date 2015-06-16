@@ -1541,8 +1541,8 @@ Wu.List = Wu.Class.extend({
 			.attr('style', style);
 
 
-		if ( fn && event ) {
-
+		// if ( fn && event ) {
+		if (fn) {
 			// UPDATE
 			listAttributeWrapper 
 				.on(ev, function (d) {
@@ -3137,8 +3137,11 @@ Wu.DataLibraryList = Wu.List.extend({
 		var files = app.SidePane.DataLibrary.project.getFileObjects();
 		for (f in files) {
 			var file = files[f];
-			if (file.getCategory().toLowerCase() == category.toLowerCase()) {
-				file.setCategory('<span class="grayed">no category</span>'); // set blank
+			var fc = file.getCategory();
+			if (fc) {
+				if (fc.toLowerCase() == category.toLowerCase()) {
+					file.setCategory('<span class="grayed">no category</span>'); // set blank
+				}
 			}
 		}
 

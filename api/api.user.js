@@ -67,7 +67,6 @@ module.exports = api.user = {
 			.exec(callback);
 		});
 
-
 		// check access
 		ops.push(function (project, callback) {
 			api.access.to.create_user({
@@ -152,7 +151,6 @@ module.exports = api.user = {
 				callback(null, user, project);
 			});
 		});
-
 
 		ops.push(function (user, project, callback)  {
 			api.access.to.edit_user({

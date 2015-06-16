@@ -384,8 +384,17 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	deleteFolder : function (uuid) {
 		if (confirm('Are you sure you want to delete folder ' + this.folders[uuid].title + '?')) {
+			var el = this.folders[uuid].el;
+			Wu.DomUtil.remove(el.previousSibling);
+			Wu.DomUtil.remove(el);
 			delete this.folders[uuid];
 			this.save();
+		}
+
+		// hide delete buttons
+		for (b in this._deleteButtons) {
+			var btn = this._deleteButtons[b];
+			btn.style.visibility = 'hidden';
 		}
 
 		// Google Analytics event tracking

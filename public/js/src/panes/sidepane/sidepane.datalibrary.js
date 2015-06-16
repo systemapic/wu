@@ -168,10 +168,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	// hooks added automatically on page load
 	addHooks : function () {
 		this._setHooks('on');
-		
-		var canDelete = app.access.to.delete_project(this._project),
-		    canUpload = app.access.to.upload_file(this._project),
-		    canDownload = app.access.to.download_file(this._project);
+
+		var project = this._project || app.activeProject;
+		var canDelete = app.access.to.delete_project(project),
+		    canUpload = app.access.to.upload_file(project),
+		    canDownload = app.access.to.download_file(project);
 		
 		if (canDelete)   Wu.DomUtil.removeClass(this._deleter, 'displayNone');
 		if (canUpload)   Wu.DomUtil.removeClass(this._uploader, 'displayNone');
@@ -187,7 +188,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._addUploaderButton();
 
 		// add new
-		if (app.access.to.upload_file(this._project)) this._addResumable();
+		var project = this._project || app.activeProject;
+		if (app.access.to.upload_file(project)) this._addResumable();
 	},
 
 	_removeResumable : function () {
@@ -247,13 +249,23 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			},
 
 			// accepted filetypes
-			fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif', 'jp2', 'ecw'],
+			fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif', 'tiff', 'jp2', 'ecw'],
 			fileTypeErrorCallback : function (file, errorCount) {
+
+				var description = 'The file <strong>' + file.name + '</strong> is not an accepted filetype.';
+
+				var filetype = file.name.split('.').reverse()[0];
+
+				if (filetype == 'shp') {
+					var description = 'Please zip shapefiles before uploading. Mandatory files are .shp, .shx, .dbf.';
+				}
+
+				console.log('fileTypeErrorCallback', file, errorCount);
 
 				// feedback message
 				app.feedback.setError({
 					title : 'Sorry, you can\'t do that!',
-					description : 'The file <strong>' + file.name + '</strong> is not an accepted filetype.',
+					description : description
 				});
 
 				// hide drop
@@ -302,16 +314,29 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			    size = file.size / 1000 / 1000,
 			    bytesPerSecond = size / totalTime,
 			    message = 'Uploaded ' + size.toFixed(2) + ' MB in ' + totalTime.toFixed(2) + ' seconds, at ' + bytesPerSecond.toFixed(2) + ' MB/s.',
-			    estimatedProcessingTime = (size * 0.5).toFixed(0) + ' seconds';
+			    estimatedProcessingTime = (size * 0.5).toFixed(0) + ' seconds',
+			    ext = file.fileName.split('.').reverse()[0];
+
+
+
+			var regularFile = (ext == 'pdf' || ext == 'txt' || ext == 'doc' || ext == 'docx' || ext == 'jpeg');
 			
 			message +=' <br><br>Pre-processing will take approx. ' + estimatedProcessingTime;
 
 			// set feedback
-			app.feedback.setMessage({
-				title : 'Upload success!',
-				description : message,
-				id : file.uniqueIdentifier
-			});
+			if (regularFile) {
+				app.feedback.setSuccess({
+					title : 'Upload done',
+					description : file.fileName + ' was uploaded successfully.',
+					id : file.uniqueIdentifier,
+				});
+			} else {
+				app.feedback.setMessage({
+					title : 'Upload success!',
+					description : message,
+					id : file.uniqueIdentifier
+				});
+			}
 
 			// refresh for new upload
 			// this._refreshResumable();
@@ -746,6 +771,12 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		}, this);
 
+		// if not layer, no processing
+		if (!result.layers) {
+			var fileUuid = result.files[0].uuid;
+			app.SidePane.DataLibrary.processFileDone(fileUuid, 100, 1);
+		}
+
 		// refresh Sidepane Options
 		app.SidePane.Options.settings.layermenu.update();
 		app.SidePane.Options.settings.baselayer.update();
@@ -760,10 +791,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// refresh
 		this.reset();
 
-		var uploadedFiles = result.files;
-
+		// add files
 		this.refreshTable({
-			add: uploadedFiles
+			add: result.files
 		});
 
 	},

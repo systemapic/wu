@@ -294,7 +294,7 @@ body {
 	display: table-cell;
 	vertical-align: middle;
 	}
-
+/*
 @media screen and (max-width: 1090px) {
  
 	.manage-access-info-outer { 
@@ -302,7 +302,7 @@ body {
 		display: none;
 	}
 
-}
+}*/
 
 
 /*LIGHTER DESIGN EXPERIMENT #1*/
@@ -805,8 +805,35 @@ svg.tracer {
     margin: 0;
 }
 
+.list-attribute-wrapper{
+	cursor: pointer;
+	cursor: hand;
+}
 
+.list-attribute-wrapper-access:hover{
+	background: rgba(0, 0, 0, 0.1);
+}
 
+.documents-container-rightpane{
+	border-left: 2.5px solid rgba(128, 128, 128, 0.17);;
+}
+
+.header-role{
+	border: 0px;
+ 	background: transparent;
+	display: block;
+	font-style: italic;
+	color: #666;
+	font-size: 16px;
+	float: right;
+	height: 16px;
+	word-wrap: break-word;
+	position: relative;
+	top: 0;
+	line-height: 15px;
+	overflow: hidden;
+	max-height: 31px;
+}
 
 
 

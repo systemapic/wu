@@ -59,7 +59,7 @@ module.exports = api.geo = {
 		if (!path || !fileUuid) return callback('Missing information.14');
 
 		var dest = api.config.path.file + fileUuid;
-		console.log('copyToVileRasterFolder!!! 1', dest, path);
+		console.log('copyToVileRasterFolder!!! 1, from , to', path, dest);
 
 		// do nothing if already there
 		if (path == dest) return callback(null);
@@ -308,10 +308,7 @@ module.exports = api.geo = {
 
 		if (proj4) cmd += ' -s_srs "' + proj4 + '" -t_srs "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"';
 
-		console.log('ogr2ogr cmd: '.red, cmd);
-
 		var exec = require('child_process').exec;
-
 		exec(cmd, function (err, stdout, stdin) {
 			console.log('did cmn'.yellow);
 			
@@ -462,6 +459,13 @@ module.exports = api.geo = {
 			var source = gdal.SpatialReference.fromProj4(proj4);
 			var target = gdal.SpatialReference.fromProj4(ourProj4);
 			var isSame = source.isSame(target);
+
+			console.log('priojection: ', proj4);
+			console.log('spurce:', source);
+			console.log('target: ', target);
+
+			// debug
+			return callback(null, meta);
 
 			// same, no reprojection necessary
 			if (isSame) return callback(null, meta);

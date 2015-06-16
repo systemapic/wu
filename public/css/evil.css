@@ -582,3 +582,22 @@ aka feedback pane
 .description-editing {
   background-color: transparent !important;	
 }
+
+
+
+
+/*D3 SVG*/
+.axis line,
+.axis path {
+    fill: none;
+    stroke: rgba(255,255,255,0.2);
+    shape-rendering: crispEdges;
+    stroke-width: 1;
+}
+
+.axis text {
+	fill: rgba(255,255,255,0.5);
+	font-size: 10px; 
+	font-family: helvetica neue;
+}	
+	

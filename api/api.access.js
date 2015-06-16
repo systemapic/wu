@@ -871,6 +871,7 @@ module.exports = api.access = {
 			    roles = project.roles,
 			    access = false;
 			
+			console.log('..............has', options, capability);
 			if (roles) roles.forEach(function (role) {
 				// if user in role
 				if (_.contains(role.members, user.getUuid())) {
@@ -894,6 +895,8 @@ module.exports = api.access = {
 			var role = _.find(project.roles, function (r) {
 				return _.contains(r.members, user.getUuid());
 			});
+
+			console.log('ROLEROLEROLE:', role);
 
 			// return if no role
 			if (!role || !role.capabilities) return done(null, false);
@@ -932,6 +935,8 @@ module.exports = api.access = {
 			    project = options.project,
 			    ops = {};
 
+			console.log('_check +++++++++++++', options, capability);
+
 			ops.admin = function (callback) {
 				// if is admin
 				api.access.is.admin(options, callback);
@@ -947,8 +952,10 @@ module.exports = api.access = {
 			};
 
 			async.series(ops, function (err, is) {
+				console.log('__err, is', err, is);
 				if (!err && is.admin || is.capable) return done(null, options);
-				done('No access.');
+				done(api.access.textTemplates.no_access);
+				// done("You can't do that!");
 			});
 		},
 
@@ -1061,7 +1068,14 @@ module.exports = api.access = {
 		},
 
 		edit_file : function (options, done) {
-			api.access.to._check(options, 'edit_file', done); 			// todo: if not createdBy self, pass to _other_
+			Project
+			.findOne({files : options.file._id})
+			.populate('roles')
+			.exec(function (err, project) {
+				if (err || !project) return done('No access.');
+				options.project = project;
+				api.access.to._check(options, 'edit_file', done); 			// todo: if not createdBy self, pass to _other_
+			});
 		},
 
 		edit_other_file : function (options, done) {
@@ -1083,6 +1097,11 @@ module.exports = api.access = {
 		edit_user : function (options, done) { 
 			var account = options.user, 
 			    user = options.subject;
+
+
+			console.log('edit_user ::::', options);
+			// ok if self
+			if (account.uuid == user.uuid) return done(null, options);
 
 			// if not createdBy self, pass to edit_other_user
 			if (!api.access.is.createdBy(user, account)) return api.access.to.edit_other_user(options, done);
@@ -1196,4 +1215,8 @@ module.exports = api.access = {
 			api.access.to._check(options, 'delegate_to_user', done);
 		},
 	},
+
+	textTemplates : {
+		no_access : "You don't have permission to do that.",
+	}
 }
