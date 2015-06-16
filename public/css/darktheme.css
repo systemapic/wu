@@ -58,7 +58,7 @@ h3, h4 {
 	color: rgba(255, 255, 255, 0.95);
 	}
 
-.header-subtitle {
+.header-subtitle, .header-role {
 	color: white;
 	font-weight: 400;
 	}
@@ -122,6 +122,8 @@ h3, h4 {
 	}
 
 .project-users-inner-wrapper {
+	padding-top: 25px;
+	padding-bottom: 15px;
 	background-color: #333;
 	color: #FAFAFA;
 	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
@@ -148,7 +150,7 @@ h3, h4 {
 	}
 
 .datalibrary-container {
-	background-color: rgba(0, 0, 0, 0.5) !important;
+	/*background-color: rgba(0, 0, 0, 0.5) !important;*/
 	color: #DADADA;
 	line-height: 0.45;
 	}
@@ -545,15 +547,15 @@ input.cmn-toggle-round-flat:checked + label:after {
 	}
 
 .leaflet-control-search .search-button {
-	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon_inverted.png') no-repeat 2px -22px !important;
+	background: url('../css/search-icon-inverted.png') no-repeat 2px -22px !important;
 	}
 
 .leaflet-control-search .search-button:hover {
-	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/search-icon_inverted.png') no-repeat 2px 2px !important;
+	background: url('../css/search-icon-inverted.png') no-repeat 2px 2px !important;
 	}
 
 .leaflet-control-search.search-load .search-input {
-	background: url('../js/src/leaflet.js/plugins/leaflet-search/images/loader_inverted.gif') no-repeat center right #fff;
+	background: url('../css/search-icon-inverted.png') no-repeat center right #fff;
 	}
 
 .leaflet-container.dark .map-tooltip .close, 
@@ -683,4 +685,59 @@ blockquote {
 
 #editor-client-item-new	h5 {
 	color: white;
+}
+
+.list-attribute-type, .list-attribute-created{
+	line-height: 1.2;
+}
+
+.d3-list-header-item{
+	cursor: pointer;
+	padding-top: 10px;
+	position: absolute;
+	top: 0;
+	height: 100%;
+	/*border-left: 1px dashed rgba(255, 255, 255, 0.5);*/
+	text-align: center;
+	overflow: hidden; 
+}
+
+#userslist .d3-list-header-item{
+	cursor: pointer;
+	padding-top: 5px;
+	position: absolute;
+	top: 0;
+	height: 100%;
+	/*border-left: 1px dashed rgba(255, 255, 255, 0.5);*/
+	text-align: center;
+	overflow: hidden; 
+}
+
+.list-attribute{
+	color: #999;
+}
+
+.project-item{
+	/*needs to be fixed*/
+}
+
+.fullpage-users, .manage-access-container{
+	background-color: rgba(33, 33, 33, 0.9) !important;
+}
+
+.manage-access-title-wrapper, .manage-access-client-title{
+	color: white;
+	background-color: rgba(33, 33, 33, 0.9) !important;
+}
+
+.manage-access-info{
+	color: rgba(255, 255, 255, 0.95);
+}
+
+.manage-acesss-roles-wrapper{
+
+}
+
+.manage-access-current-role{
+
 }

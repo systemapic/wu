@@ -115,7 +115,7 @@ Wu.App = Wu.Class.extend({
 
 		// main user account
 		this.Account = new Wu.User(this.options.json.account);
-		
+
 		// create user objects
 		this.Users = {};
 		this.options.json.users.forEach(function(user, i, arr) {

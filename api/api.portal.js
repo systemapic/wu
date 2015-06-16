@@ -184,34 +184,11 @@ module.exports = api.portal = {
 		// close connection
 		res.end('Thanks!');
 
-
 		var options = req.body,
 		    fileUuid = options.fileUuid;
 
-
 		// send ping to client
-
-
 	},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

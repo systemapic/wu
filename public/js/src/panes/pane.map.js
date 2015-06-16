@@ -872,8 +872,11 @@ Wu.MapPane = Wu.Pane.extend({
 
 	_addPopupContent : function (e) {
 
-		var content = this._createPopupContent(e),
-		    buffer = '<hr>';
+		// if d3tooltip setting on, get d3 instead of normal text
+		var d3tooltip = false; // this is the toggle, TODO: connect setting!
+		
+		var content = d3tooltip ? this._createPopupContentD3(e) : this._createPopupContent(e);
+		var buffer = '<hr>';
 
 		// clear old popup
 		this._popup = null;
@@ -949,13 +952,283 @@ Wu.MapPane = Wu.Pane.extend({
 		map.on('popupclose',  this._clearPopup, this);
 	},
 
+
+	_createPopupContentD3 : function (e) {
+
+		console.log('opipupcontent', e);
+
+		// check for stored tooltip
+		var data = e.data,
+		    layer = e.layer,
+		    meta = layer.getTooltip(),
+		    string = '',
+		    d3array = [];
+
+		// already stored tooltip (edited, etc.)
+		if (meta) {
+
+			// add meta to tooltip
+			for (var m in meta.fields) {
+				var field = meta.fields[m];
+
+				// only add active tooltips
+				if (field.on) {
+
+					// get key/value
+					var caption = field.title || field.key;
+					var value = data[field.key];
+
+					var d3obj = [];
+					d3obj[0] = field.key;
+					d3obj[1] = parseFloat(value);
+
+					d3array.push(d3obj);
+				}
+			}
+
+		// first time use of meta.. (or something)
+		} else {
+
+			for (var key in data) {
+				var value = data[key];
+
+				var d3obj = [];
+				d3obj[0] = key
+				d3obj[1] = parseFloat(value);
+
+				d3array.push(d3obj);
+			}
+
+		}
+
+
+		// must return finsihed html, so make somthing of d3array here..
+		// ... 
+		var html = this._createD3chart(d3array);
+		return html;
+
+	},
+
+	_createD3chart : function (d3array) {
+
+		var that = this;
+
+		// Standards
+		var boxX = 5;
+		var boxY = 15;
+		var boxWidth = 345;
+		var boxHeight = 150;
+		var bpadding = 0;
+		var xInterval = (boxWidth - 8) / d3array.length+1;
+
+
+		// Function to draw line
+		var lineFunction = d3.svg.line()
+			.x(function(d) { return d.x })
+			.y(function(d) { return d.y })
+			.interpolate('linear');
+
+		// Get max and min values from array
+		var mmax = d3array.sort(function(a,b){return b[1]-a[1];})[0][1];
+		var mmin = d3array.sort(function(a,b){return a[1]-b[1];})[0][1];		
+
+		// Set range/scale
+		var graphScale = d3.scale.linear()
+			.domain([mmin, mmax])
+			.range([(boxHeight),0]);
+
+
+		
+
+
+		// Holds all the points
+		var lineData = []; 
+
+		// Make x/y coordinates
+		d3array.forEach(function(d3arr, i) { 
+			var _x = boxX + (xInterval*i) + bpadding/2;
+			var _y = boxY + graphScale(d3arr[1]);
+			var point = { "x": _x,   "y": _y }; 
+			lineData.push(point);   
+		});
+
+
+
+		// CONTAINERS
+		var d3Container  = Wu.DomUtil.create('div');
+
+ 		var svgContainer = d3.select(d3Container).append("svg")
+                                     .attr("width", boxWidth + 50)
+                                     .attr("height", boxHeight + 85);
+
+
+
+
+		// Vertical helper lines
+		// Vertical helper lines
+		// Vertical helper lines			
+
+		// Vertical helper lines
+		var verticalHelpersGrop = svgContainer.append('g');
+		var verticalHelpers = verticalHelpersGrop.selectAll('line')
+			.data(lineData)
+			.enter()
+				.append('line')
+				.attr('x1', function(d) { return d.x })
+				.attr('y1', boxY)
+				.attr('x2', function(d) { return d.x })
+				.attr('y2', boxHeight + boxY)
+				.attr('stroke', 'rgba(255,255,255,0.2)')
+				.attr('stroke-width', 0.5);
+
+
+
+
+		
+		// LINE LINE LINE
+		// LINE LINE LINE
+		// LINE LINE LINE
+
+
+
+		// Graph Box
+		var GraphBox = svgContainer
+			.append("rect")
+			.attr("x", boxX)
+			.attr("y", boxY)
+			.attr('rx', 0)
+			.attr("width", boxWidth)
+			.attr("height", boxHeight)
+			.attr('stroke', 'rgba(255,255,255,0.7)')
+			.attr('stroke-width', 1)	
+			.attr("fill", "transparent");
+
+		// Line Container
+		var GraphBoxG = svgContainer.append('g');
+
+		// Create Line
+		var graphLine = GraphBoxG
+			.append('path')
+			.attr('d', lineFunction(lineData))			
+			.attr('stroke', 'white')
+			.attr('stroke-width', 1)
+			.attr('fill', 'none');
+
+
+
+		// TEXT TEXT TEXT
+		// TEXT TEXT TEXT
+		// TEXT TEXT TEXT				
+
+		// Texts
+		var graphCircles = svgContainer.append('g');
+		var eachCircle = graphCircles.selectAll('text')
+			.data(lineData)
+			.enter()
+				.append('text')
+				.attr('font-family', 'helvetica')
+				.attr('font-size', 11)				
+				.attr('x', function(d) { return d.x })
+				.attr('y', function(d) { 
+					return boxHeight + boxY + 6;
+				})
+				.attr('transform', function (d, i) {
+					var xx = d.x - 5;
+					var yy = boxHeight + boxY + 5;
+					var trans = 'rotate(75 ' + xx + ' ' + yy + ')';
+					return trans;
+				})			
+				.attr('fill', 'white')
+				.text(function(d, i) {
+
+					var ddate = d3array[i][0].substring(0,4);
+					    ddate += '.';
+					    ddate += d3array[i][0].substring(4,6);
+					    ddate += '.';
+					    ddate += d3array[i][0].substring(6,8);					    
+					return ddate;
+				});
+
+
+
+		// TEXT ON TOP WHEN HOVERING
+		// TEXT ON TOP WHEN HOVERING
+		// TEXT ON TOP WHEN HOVERING			
+
+		// Texts
+		var topText = svgContainer
+				.append('text')
+				.attr('font-family', 'helvetica')
+				.attr('font-size', 11)
+				.attr('fill', 'white')
+				.attr('x', boxX)
+				.attr('y', boxY - 5)
+				.text(function(d) { return 'YEAR.MONTH.DAY = VALUE'; });
+
+
+		// RIGHT AXIS 
+		// RIGHT AXIS 
+		// RIGHT AXIS 				
+
+		// Axis -- RIGHT
+		var graphAxisScale = d3.svg.axis()
+			.scale(graphScale)
+			.orient("right")
+			.ticks(10)
+			.tickSize(-boxWidth, -boxWidth, -boxWidth);
+
+		var graphAxis = GraphBoxG
+			.append('g')
+			.attr('transform', function() { return 'translate(' + (boxWidth+boxX) + ',' + boxY + ')'; })
+			.attr("class", "axis")
+			.call(graphAxisScale);
+
+
+
+
+		// DOTS DOTS DOTS
+		// DOTS DOTS DOTS
+		// DOTS DOTS DOTS				
+
+		// Circles
+		var dottRadius = 3;
+
+		var graphCircles = svgContainer.append('g');
+		var eachCircle = graphCircles.selectAll('circle')
+			.data(lineData)
+			.enter()
+				.append('circle')
+				.attr('cx', function(d) { return d.x })
+				.attr('cy', function(d) { return d.y })
+				.attr('r', dottRadius)
+				.attr('fill', 'white')
+				.attr('style', 'cursor: pointer;')
+				.on('mouseover', function(d) {
+					console.log('hovering!', d);
+				});
+
+
+
+
+		var returnThis = new XMLSerializer().serializeToString(d3Container);
+		return returnThis;
+
+
+	},
+
+	
+
 	_createPopupContent : function (e) {
+
+		console.log('opipupcontent', e);
 
 		// check for stored tooltip
 		var data = e.data,
 		    layer = e.layer,
 		    meta = layer.getTooltip(),
 		    string = '';
+
+		var d3array = [];
 
 		if (meta) {
 			if (meta.title) string += '<div class="tooltip-title-small">' + meta.title + '</div>';
@@ -971,6 +1244,11 @@ Wu.MapPane = Wu.Pane.extend({
 
 					// add to string
 					string += caption + ': ' + value + '<br>';
+
+					// // add to d3 array
+					// var d3obj = {};
+					// d3obj[caption] = value;
+					// d3array.push(d3obj);
 				}
 			}
 			return string;

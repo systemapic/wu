@@ -112,8 +112,10 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 
 		var control = app.MapPane.getControls()[item];
 
-		this.project.store.controls[item] = on;	// todo
-		this.project._update('controls');
+
+		var project = this.project || app.activeProject; // todo: this.project vs. this._project
+		project.store.controls[item] = on;	// todo
+		project._update('controls');
 
 		// toggle
 		if (on) {

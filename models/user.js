@@ -50,10 +50,8 @@ var userSchema = mongoose.Schema({
 // methods ======================
 // generating a hash
 userSchema.methods.generateHash = function(password) {
-    console.log('----------hashing passowrd ---------------');
     console.log('password: ', password);
     var hashed = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-    console.log('hashed: ', hashed);
     return hashed;
 };
 

@@ -135,6 +135,8 @@ module.exports = api.project = {
 		project.slug 		= projectSlug;
 		project.name 		= projectName;
 		project.description 	= store.description;
+		project.header.title    = projectName;
+		project.header.subtitle = 'Project description';
 		project.keywords 	= store.keywords;
 		project.client 		= store.client;
 		project.position 	= store.position;

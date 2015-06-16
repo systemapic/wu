@@ -70,6 +70,9 @@ module.exports = api.error = {
 			error : api.error.pretty(err)
 		}));
 		
+		// send to socket
+		api.socket.sendError(req.user._id, err.message || err);
+
 		api.error.log(err);
 	},
 

@@ -246,9 +246,11 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 
 	markOccupied : function () {
 
+		var project = this.project || app.activeProject;
+
 		// get active baselayers
-		var baseLayers = this.project.getBaselayers();
-		var all = this.project.getLayers();
+		var baseLayers = project.getBaselayers();
+		var all = project.getLayers();
 
 		all.forEach(function (a) {
 			this.activate(a.store.uuid);
