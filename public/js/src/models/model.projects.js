@@ -702,8 +702,14 @@ Wu.Project = Wu.Class.extend({
 
 
 	getHeaderLogo : function () {
+		if(Wu.app.Style.getCurrentTheme() === 'darkTheme'){
+			var defaultProjectLogo = '/css/images/defaultProjectLogoLight.png';
+		}
+		else if(Wu.app.Style.getCurrentTheme() === 'lightTheme'){
+			var defaultProjectLogo = '/css/images/defaultProjectLogo.png';
+		}
 		var logo = this.store.header.logo;
-		if (!logo) logo = '/css/images/defaultProjectLogo.png';
+		if (!logo) logo = defaultProjectLogo;
 		return logo;
 	},
 

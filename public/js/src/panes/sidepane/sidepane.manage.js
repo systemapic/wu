@@ -49,15 +49,20 @@ Wu.SidePane.Manage = Wu.Class.extend({
 	},
 
 	insertClients : function () {
-
+		
 		_.each(app.Clients, function (client) {
-
+			if(Wu.app.Style.getCurrentTheme() === 'darkTheme'){
+				var defaultProjectLogo = '/css/images/defaultProjectLogoLight.png';
+			}
+			else if(Wu.app.Style.getCurrentTheme() === 'lightTheme'){
+				var defaultProjectLogo = '/css/images/defaultProjectLogo.png';
+			}
 			// wrapper
 			var clientWrapper = Wu.DomUtil.create('div', 'manage-access-client-wrapper', this._content);
 
 			// client meta
 			var clientMeta = Wu.DomUtil.create('div', 'manage-access-client-meta-wrap', clientWrapper);
-			var logo = client.getLogo() || '/css/images/defaultProjectLogo.png';
+			var logo = client.getLogo() || defaultProjectLogo;
 			var clientLogo = Wu.DomUtil.create('img', 'manage-access-client-logo', clientMeta, logo);
 			var clientTitle = Wu.DomUtil.create('div', 'manage-access-client-title', clientMeta, client.getTitle());
 			var clientDescription = Wu.DomUtil.create('div', 'manage-access-client-description', clientMeta, client.getDescription());
@@ -89,12 +94,20 @@ Wu.SidePane.Manage = Wu.Class.extend({
 		}, this);
 	},
 
-
 	_insertProject : function (options) {
+
+		if(Wu.app.Style.getCurrentTheme() === 'darkTheme'){
+			var defaultProjectLogo = '/css/images/defaultProjectLogoLight.png';
+		}
+		else if(Wu.app.Style.getCurrentTheme() === 'lightTheme'){
+			var defaultProjectLogo = '/css/images/defaultProjectLogo.png';
+		}
+
 		var project = options.project,
-		    projectsWrapper = options.projectsWrapper,
-		    logo = project.getLogo() || '/css/images/defaultProjectLogo.png';
-		   
+		    projectsWrapper = options.projectsWrapper
+
+		    logo = project.getLogo() || defaultProjectLogo;
+
 		// wrapper
 		var projectWrapper = Wu.DomUtil.create('div', 'manage-access-project-item', projectsWrapper);
 
