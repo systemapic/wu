@@ -46,7 +46,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 			delete this.logo;
 		}
 
-		this.logo = this._resumableBrowse = Wu.DomUtil.create('img', 'client-logo', this.logoContainer);
+		this.logo = this._resumableBrowse = Wu.DomUtil.create('div', 'project-logo', this.logoContainer);
 
 		Wu.DomEvent.on(this.logo, 'mousedown', Wu.DomEvent.stopPropagation, this);
 	},
@@ -79,7 +79,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.description.innerHTML = this.client.getDescription();
 		
 		// this.logo.src = this.client.getLogo() ? this.client.getLogo() : '/css/images/defaultProjectLogo.png';
-		this.logo.src = this._getPixelLogo();
+		if (this._getPixelLogo()) this.logo.style.backgroundImage = 'url(' + this._getPixelLogo()+ ')';
 
 		Wu.DomUtil.thumbAdjust(this.logo, 70);
 		
@@ -88,8 +88,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	_getPixelLogo : function () {
+
 		var logo = this.client.getLogo();
-		if (!logo) return '/css/images/defaultProjectLogo.png';
+		if (!logo) return false;
 		var base = logo.split('/')[2];
 		var url = '/pixels/image/' + base + '?width=75&height=75&format=png'
 		return url;
@@ -620,7 +621,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// update image in header
 		// this.logo.src = fullpath;
 		// this._getPixelLogo();
-		this.logo.src= this._getPixelLogo();
+		this.logo.style.backgroundImage = 'url(' + this._getPixelLogo()+ ')';
 	},
 
 	pendingOpen : function () {

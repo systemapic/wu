@@ -25,7 +25,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	initLayout : function () {
 
-		// create container
+		// create containerthi
 		this._container = Wu.DomUtil.create('div', 'project-item');
 
 		// create title
@@ -70,7 +70,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 			this.logo = null;
 			delete this.logo;
 		}
-		this.logo = this._resumableBrowse = Wu.DomUtil.create('img', 'project-logo', this.logoContainer);
+		this.logo = this._resumableBrowse = Wu.DomUtil.create('div', 'project-logo', this.logoContainer);
 		this.logo.type = 'logo';
 
 		Wu.DomEvent.on(this.logo, 'click', Wu.DomEvent.stopPropagation, this);
@@ -97,7 +97,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this.description.innerHTML 	= this._project.store.description;
 
 		// var logoPath = this._project.store.logo ? this._project.store.logo :  '/css/images/defaultProjectLogo.png';
-		this.logo.src = this._getPixelLogo();
+		if (this._getPixelLogo()) this.logo.style.backgroundImage = 'url(' + this._getPixelLogo() + ')';
 
 		this.createdBy.innerHTML 	= '<div class="project-info-left">Created by:</div><div class="project-info-right">' + this._project.store.createdByName + "</div>";
 		this.lastUpdated.innerHTML 	= '<div class="project-info-left">Last updated:</div><div class="project-info-right">' + Wu.Util.prettyDate(this._project.store.lastUpdated) + "</div>";
@@ -106,10 +106,11 @@ Wu.SidePane.Project = Wu.Class.extend({
 	},
 
 	_getPixelLogo : function () {
+
 		var logo = this._project.getLogo();
-		if (!logo) return '/css/images/defaultProjectLogo.png';
+		if (!logo) return false;
 		var base = logo.split('/')[2];
-		var url = '/pixels/image/' + base + '?width=90&height=60&format=png'
+		var url = '/pixels/image/' + base + '?width=90&height=60&format=png';
 		return url;
 	},
 
@@ -331,7 +332,10 @@ Wu.SidePane.Project = Wu.Class.extend({
 		this._project.setLogo(fullpath);
 
 		// update image 
-		this.logo.src = this._project.getLogo();
+
+		//this.logo.style.backgroundImage = 'url(' + this._project.getLogo() + ')';
+		this.logo.style.backgroundImage = 'url(' + this._getPixelLogo() + ')';
+		//this.logo.src = this._project.getLogo();
 
 		// update header
 		app.HeaderPane.addedLogo(path);
