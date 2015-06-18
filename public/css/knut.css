@@ -815,7 +815,7 @@ svg.tracer {
 }
 
 .documents-container-rightpane{
-	border-left: 2.5px solid rgba(128, 128, 128, 0.17);;
+	border-left: 2.5px solid rgba(128, 128, 128, 0.17);
 }
 
 .header-role{
@@ -838,3 +838,8 @@ svg.tracer {
 
 
 
+.project-logo, .client-logo{
+	background-image: url(images/defaultProjectLogo.png);
+	background-position: center;
+  	background-repeat: no-repeat;
+}

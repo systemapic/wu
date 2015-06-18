@@ -118,7 +118,7 @@ h3, h4 {
 	}
 
 .project-users-inner-wrapper:before {
-	background-color: #333;
+	background-color:  rgba(0, 0, 0, 0.25);
 	}
 
 .project-users-inner-wrapper {
@@ -126,7 +126,7 @@ h3, h4 {
 	padding-bottom: 15px;
 	background-color: #333;
 	color: #FAFAFA;
-	box-shadow: 0 0 5px 0 rgba(0,0,0,0.3);
+	box-shadow: 0 0 5px 0 rgba(0,0,0,0);
 	}
 
 .project-info-left,
@@ -682,12 +682,12 @@ blockquote {
 
 
 
-
 #editor-client-item-new	h5 {
 	color: white;
 }
 
-.list-attribute-type, .list-attribute-created{
+.list-attribute-type, 
+.list-attribute-created{
 	line-height: 1.2;
 }
 
@@ -708,7 +708,6 @@ blockquote {
 	position: absolute;
 	top: 0;
 	height: 100%;
-	/*border-left: 1px dashed rgba(255, 255, 255, 0.5);*/
 	text-align: center;
 	overflow: hidden; 
 }
@@ -717,27 +716,103 @@ blockquote {
 	color: #999;
 }
 
-.project-item{
-	/*needs to be fixed*/
+.fullpage-users, 
+.manage-access-container{
+	background-color: rgba(33, 33, 33, 0.9);
 }
 
-.fullpage-users, .manage-access-container{
-	background-color: rgba(33, 33, 33, 0.9) !important;
-}
-
-.manage-access-title-wrapper, .manage-access-client-title{
+.manage-access-title-wrapper{
 	color: white;
-	background-color: rgba(33, 33, 33, 0.9) !important;
+	background-color: rgba(33, 33, 33, 0.9);
 }
 
-.manage-access-info{
+.manage-access-info, 
+.manage-access-client-title, 
+.manage-access-project-item-title, 
+.manage-access-project-item-description{
 	color: rgba(255, 255, 255, 0.95);
-}
-
-.manage-acesss-roles-wrapper{
+	max-width: 257px;
 
 }
 
-.manage-access-current-role{
+.inspect-control-inner-content{
+	background-color: rgba(33, 33, 33, 0.9);
+}
 
+.manage-access-project-item:nth-child(odd) {
+	background-color: rgba(100, 100, 100, 0.65); 
+}
+
+.manage-access-project-item:nth-child(even) {
+	background-color: rgba(120, 120, 120, 0.65);
+  }
+
+.users-expand-collapse:before, 
+.datalibrary-expand-collapse:before {
+  background: rgba(120, 120, 120, 0.65);
+}
+
+.fullpage-users.show{
+
+    padding-bottom: 0px;
+    height: 900px;
+
+}
+
+.fullpage-users {
+	min-width: 900px;
+	max-width: 900px;
+	width: 900px;
+	padding-right: 0px;
+}
+
+.download-dialog-inner{
+	background: rgba(33, 33, 33, 0.9);
+}
+
+/* redefined */
+.datalibrary-controls, 
+.users-controls{
+	color: rgba(128, 128, 128, 0.17)
+}
+
+.users-inner, 
+.data-library-inner {
+    background: rgba(33, 33, 33, 0.9) none repeat scroll 0% 0%;
+}
+
+.project-users-inner-wrapper {
+	background: rgba(0, 0, 0, 0);
+ }
+
+.q-editor-content-item{
+	padding-right: 6px;
+}
+
+.new-project-thumb{
+	color: #333;
+}
+
+.project-logo, 
+.client-logo{
+	background-image: url(images/defaultProjectLogoLight.png);
+	background-position: center;
+  	background-repeat: no-repeat;
+}
+
+.file-uploaded-by, 
+.each-file-in-list, 
+.file-copright-line, 
+.file-uploaded-by, 
+.file-description-inner-wrapper {
+  color: white;
+}
+
+.file-description-inner-wrapper,
+.file-copright-line{
+	line-height: 1.4em;
+}
+
+.file-copright-title{
+	padding-top: 5px;
 }
