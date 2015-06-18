@@ -1,6 +1,8 @@
 // app.Style
 Wu.Style = Wu.Class.extend({
 
+	currentTheme : 'lightTheme',
+
 	initialize : function () {
 		
 		// get style tag
@@ -17,6 +19,7 @@ Wu.Style = Wu.Class.extend({
 
 		// Set codemirror cartoCSS to dark theme
 		this.setDarkThemeCartoCSS();
+		this.currentTheme = 'darkTheme';
 	},
 
 	setLightTheme : function () {
@@ -26,6 +29,7 @@ Wu.Style = Wu.Class.extend({
 
 		// Set codemirror cartoCSS to light theme
 		this.setLightThemeCartoCSS();
+		this.currentTheme = 'lightTheme';
 	},
 
 	setLightThemeCartoCSS : function () {
@@ -48,6 +52,9 @@ Wu.Style = Wu.Class.extend({
 		cartoCSStheme.setAttribute('href', app.options.servers.portal + 'js/lib/codemirror/mode/cartocss/codemirror.carto.darktheme.css');
 	},
 
+	getCurrentTheme : function () {
+		return this.currentTheme;
+	},
 
 	// todo: will overwrite darktheme??
 	initSVGpatterns : function () {
