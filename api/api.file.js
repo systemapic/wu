@@ -113,7 +113,7 @@ module.exports = api.file = {
 
 		if (!fileUuid) return api.error.missingInformation(req, res);
 		
-		console.log('downloadFile'.green, fileUuid);
+		// console.log('downloadFile'.green, fileUuid);
 
 		ops.push(function (callback) {
 			File
@@ -313,7 +313,7 @@ module.exports = api.file = {
 		    options = job.options,
 		    queries = {};
 
-		console.log('update file'.green, options);
+		// console.log('update file'.green, options);
 		
 		// valid fields
 		var valid = [
@@ -591,6 +591,8 @@ module.exports = api.file = {
 
 	createModel : function (options, callback) {
 
+		console.log('api.file.createModel'.red);
+
 		var file 		= new File();
 		file.uuid 		= options.uuid;
 		file.createdBy 		= options.createdBy;
@@ -604,20 +606,37 @@ module.exports = api.file = {
 		file.dataSize 		= options.dataSize;
 		file.data 		= options.data;
 
-		file.save(callback);
+
+		file.save(function (err, doc) {
+			// console.log('file model created:', err, doc);
+			if (err) console.log(err);
+			callback(null, doc);
+		});
 	},
 
 	// save file to project (file, layer, project id's)
 	addToProject : function (file_id, projectUuid, callback) {
+
+		console.log('===> ADD FILE TO PROJECT', file_id);
+
 		Project
 		.findOne({'uuid' : projectUuid })
 		.exec(function (err, project) {
+			console.log('');
+			console.log('');
+			console.log('');
+			console.log('err? -> found pro:', err, project);
+			console.log('file_id: ', file_id);
+
 			if (err) return callback && callback(err);
 			if (!project) return callback && callback('No project');
+
 			project.files.push(file_id);			
 			project.markModified('files');
 			project.save(function (err) {
-				callback && callback(err, done);
+				console.log('saved project', err);
+				console.log('modified project: ', project);
+				callback && callback(err);
 			});
 		});
 	},

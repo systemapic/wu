@@ -59,12 +59,12 @@ module.exports = api.geo = {
 		if (!path || !fileUuid) return callback('Missing information.14');
 
 		var dest = api.config.path.file + fileUuid;
-		console.log('copyToVileRasterFolder!!! 1, from , to', path, dest);
+		// console.log('copyToVileRasterFolder!!! 1, from , to', path, dest);
 
 		// do nothing if already there
 		if (path == dest) return callback(null);
 
-		console.log('copyToVileRasterFolder!!! 2');
+		// console.log('copyToVileRasterFolder!!! 2');
 		fs.copy(path, dest, function(err) {
 			if (err) console.log('copy err!'.red, err);
 			callback(null);
@@ -149,7 +149,7 @@ module.exports = api.geo = {
 			// run async jobs
 			async.series(ops, function (err, results) {
 				if (err) {
-					console.log('MOFO!!'.red, err);
+					// console.log('MOFO!!'.red, err);
 					return callback(err);
 				}
 
@@ -310,7 +310,7 @@ module.exports = api.geo = {
 
 		var exec = require('child_process').exec;
 		exec(cmd, function (err, stdout, stdin) {
-			console.log('did cmn'.yellow);
+			// console.log('did cmn'.yellow);
 			
 			if (err) console.log('ogre fb err: '.red + err);
 			if (err) return callback(err);
@@ -337,13 +337,13 @@ module.exports = api.geo = {
 
 		// console.log('GDAL VERSION'.red, gdal.version);
 		// console.log('GDAL DRIVERS'.red, gdal.drivers.getNames());
-		console.log('options.'.green, options);
+		// console.log('options.'.green, options);
 
 
 		ops.push(function (callback) {
 			var out = api.config.path.file + fileUuid + '/' + options.name;
 			var inn = inFile;
-			console.log('COPYYY inn, out', inn, out);
+			// console.log('COPYYY inn, out', inn, out);
 
 			// dont copy if already there
 			if (inn == out) return callback(null);
@@ -370,7 +370,7 @@ module.exports = api.geo = {
 			
 			// invalid
 			var msg = 'Invalid projection: ' + dataset.srs.toWKT();
-			console.log('msg: ', msg);
+			// console.log('msg: ', msg);
 			callback(msg); // err
 		});
 
@@ -460,9 +460,9 @@ module.exports = api.geo = {
 			var target = gdal.SpatialReference.fromProj4(ourProj4);
 			var isSame = source.isSame(target);
 
-			console.log('priojection: ', proj4);
-			console.log('spurce:', source);
-			console.log('target: ', target);
+			// console.log('priojection: ', proj4);
+			// console.log('spurce:', source);
+			// console.log('target: ', target);
 
 			// debug
 			return callback(null, meta);
@@ -472,7 +472,7 @@ module.exports = api.geo = {
 
 			var outFile = inFile + '.reprojected';
 			var cmd = 'gdalwarp -srcnodata 0 -dstnodata 0 -t_srs "' + ourProj4 + '" "' + inFile + '" "' + outFile + '"';
-			console.log('gdalwarp cmd: ', cmd);
+			// console.log('gdalwarp cmd: ', cmd);
 
 			var exec = require('child_process').exec;
 			exec(cmd, function (err, stdout, stdin) {
@@ -802,7 +802,7 @@ module.exports = api.geo = {
 			]
 		}
 		
-		console.log('metadataExtent', metadataExtent);
+		// console.log('metadataExtent', metadataExtent);
 
 		return metadataExtent;
 	},
