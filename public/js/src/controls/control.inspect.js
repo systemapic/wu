@@ -189,7 +189,7 @@ L.Control.Inspect = Wu.Control.extend({
 
 	// currently called from layers.js:63 .. refactor.. dont chain, do modules, event emitters
 	addLayer : function (layer) {
-
+		
 		// Make sure that the layer inspector is visible
 		this._content.style.display = 'block';
 

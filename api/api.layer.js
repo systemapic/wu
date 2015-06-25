@@ -39,7 +39,7 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
-console.log('lauyer');
+// console.log('lauyer');
 
 // exports
 module.exports = api.layer = { 
@@ -340,7 +340,7 @@ module.exports = api.layer = {
 	// set carto css
 	setCartoCSS : function (req, res) {
 
-		console.log('setCartoCSS!'.yellow);
+		// console.log('setCartoCSS!'.yellow);
 
 		// get params
 		var fileUuid 	= req.body.fileUuid,
@@ -353,11 +353,11 @@ module.exports = api.layer = {
 
 		var host = api.config.vile.uri;
 
-		console.log('host: ', host);
+		// console.log('host: ', host);
 
 		// save css to file by cartoId 
 		fs.writeFile(csspath, css, {encoding : 'utf8'}, function (err) {
-			console.log('write err?', err);
+			// console.log('write err?', err);
 			if (err) return api.error.general(req, res);
 
 			// send to tileserver storage
@@ -373,7 +373,7 @@ module.exports = api.layer = {
 
 			// callback
 			function (err, response, body) {
-				console.log('err', err);
+				// console.log('err', err);
 
 				// custom error handling
 				if (err) {
@@ -476,7 +476,8 @@ module.exports = api.layer = {
 
 
 	createModel : function (options, callback) {
-		console.log('api.layer.createModel'.yellow, options);
+
+		console.log('api.layer.createModel'.red);
 
 		var layer 		= new Layer();
 		layer.uuid 		= options.uuid;
@@ -490,12 +491,16 @@ module.exports = api.layer = {
 		if (options.data.raster)  layer.data.raster  = options.data.raster;
 
 		layer.save(function (err, doc) {
+			// console.log('layer model created:', err, doc);
 			callback && callback(err, doc);
 		});
 	},
 
 	// save file to project (file, layer, project id's)
 	addToProject : function (layer_id, projectUuid, callback) {
+
+		console.log('===> ADD LAYER TO PROJECT', layer_id);
+
 		Project
 		.findOne({'uuid' : projectUuid })
 		.exec(function (err, project) {

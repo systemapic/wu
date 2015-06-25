@@ -306,7 +306,6 @@ module.exports = api.user = {
 		.exec(done);
 	},
 
-
 	_getAllFiltered : function (options, done) {
 		if (!options) return done('No options.');
 

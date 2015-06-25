@@ -68,11 +68,11 @@ Wu.App = Wu.Class.extend({
 		Wu.post('api/portal', data, this.initServerResponse, this, this.options.servers.portal);
 	},
 
-	initServerResponse : function (that, response) {
-		var resp = Wu.parse(response);
+	initServerResponse : function (that, responseString) {
+		var responseObject = Wu.parse(responseString);
 
 		// revv it up
-		that.initApp(resp);
+		that.initApp(responseObject);
 	},
 
 	initApp : function (portalStore) {

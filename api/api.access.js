@@ -871,7 +871,7 @@ module.exports = api.access = {
 			    roles = project.roles,
 			    access = false;
 			
-			console.log('..............has', options, capability);
+			// console.log('..............has', options, capability);
 			if (roles) roles.forEach(function (role) {
 				// if user in role
 				if (_.contains(role.members, user.getUuid())) {
@@ -896,7 +896,7 @@ module.exports = api.access = {
 				return _.contains(r.members, user.getUuid());
 			});
 
-			console.log('ROLEROLEROLE:', role);
+			// console.log('ROLEROLEROLE:', role);
 
 			// return if no role
 			if (!role || !role.capabilities) return done(null, false);
@@ -935,7 +935,7 @@ module.exports = api.access = {
 			    project = options.project,
 			    ops = {};
 
-			console.log('_check +++++++++++++', options, capability);
+			// console.log('_check +++++++++++++', options, capability);
 
 			ops.admin = function (callback) {
 				// if is admin
@@ -952,7 +952,7 @@ module.exports = api.access = {
 			};
 
 			async.series(ops, function (err, is) {
-				console.log('__err, is', err, is);
+				// console.log('__err, is', err, is);
 				if (!err && is.admin || is.capable) return done(null, options);
 				done(api.access.textTemplates.no_access);
 				// done("You can't do that!");
@@ -1099,7 +1099,7 @@ module.exports = api.access = {
 			    user = options.subject;
 
 
-			console.log('edit_user ::::', options);
+			// console.log('edit_user ::::', options);
 			// ok if self
 			if (account.uuid == user.uuid) return done(null, options);
 

@@ -7,10 +7,23 @@ Wu.Style = Wu.Class.extend({
 		
 		// get style tag
 		this._styletag = Wu.DomUtil.get("styletag");
+
+		Wu.Mixin.Events.on('projectSelected', this._projectSelected, this);
+	},
+
+	_projectSelected : function (e) {
+		var projectUuid = e.detail.projectUuid;
+		this._project = app.Projects[projectUuid];
+		if (!this._project) return;
+
+		setTimeout(function () {
+			this._project.getSettings()['darkTheme'] ? this.setDarkTheme() : this.setLightTheme();
+		}.bind(this), 1000)
+		
 	},
 
 	setDarkTheme : function () {	
-	
+
 		// append darktheme stylesheet
 		var darktheme = document.createElement("link");
 		darktheme.rel = 'stylesheet';
@@ -23,7 +36,7 @@ Wu.Style = Wu.Class.extend({
 	},
 
 	setLightTheme : function () {
-
+		
 		// remove darktheme stylesheet
 		this._styletag.innerHTML = '';
 
