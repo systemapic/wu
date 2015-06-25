@@ -103,7 +103,7 @@ span.cm-carto-filter             { color:#66475B; }
 .dark .CodeMirror pre { background: transparent;}
 .dark .CodeMirror .CodeMirror-cursor { border-color:#ccc; }
 .dark .CodeMirror-selected,
-.dark .CodeMirror-focused .CodeMirror-selected { background:#303030; }
+.dark .CodeMirror-focused .CodeMirror-selected { background:#1F1F1F; }
 
 .dark .CodeMirror pre                  { color:#ccc; }
 .dark span.cm-keyword,
