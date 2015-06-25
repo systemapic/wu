@@ -152,6 +152,7 @@ module.exports = api.portal = {
 				res.end(zipped);
 			});
 
+
 		});
 	},
 
@@ -163,18 +164,8 @@ module.exports = api.portal = {
 		console.log('  Email: ' + req.user.local.email);
 		console.log('  IP:    ' + req.headers['x-real-ip']);
 		console.log('_______________________________________________________________________'.yellow);
+		console.log('_______________________________________________________________________'.yellow);
 		console.log('');
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('');
-		console.time('getPortal');
 	},
 
 

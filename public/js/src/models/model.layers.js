@@ -58,8 +58,11 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	add : function (type) {
-		if (type == 'baselayer') this._isBase = true;
+
+		// mark as base or layermenu layer
+		this._isBase = type == 'baselayer';
 		
+		// add
 		this.addTo();
 	},
 
@@ -92,6 +95,7 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	addToControls : function () {
+
 		if (this._isBase) return;
 
 		this._addToLegends();
@@ -256,7 +260,6 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	getAttribution : function () {
-		console.log('ATTR', this);
 		return this.store.attribution;
 	},
 

@@ -1,6 +1,4 @@
 // Move all pop-ups to model.D3List.js
-
-
 Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	_ : 'sidepane.datalibrary', 
 	
@@ -148,7 +146,18 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			this.refreshTable({tableSize : 'small'});
 	},
 
+	_projectSelected : function (e) {
+		var projectUuid = e.detail.projectUuid;
+		if (!projectUuid) return;
+
+		// set project
+		this._project = app.activeProject = app.Projects[projectUuid];
+
+		this._onProjectSelected(e);
+	},
+
 	_onProjectSelected : function (e) {
+
 		this._unload(e);
 
 		// refresh uploader
@@ -156,7 +165,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_unload : function (e) {
-
 		var project = e.details;
 		this.removeHooks();
 		this._reset();
@@ -194,8 +202,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	_removeResumable : function () {
 
-		console.error('_removeResumable');
-
 		var r = this.r;
 		r.unAssignDrop(this._resumableDrop);
 		r.cancel();
@@ -220,6 +226,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	_addResumable : function () {
 		if (!app.activeProject) return;
 
+		var projectUuid = app.activeProject.getUuid();
+
 		var r = this.r = new Resumable({
 			target : '/api/upload',
 			chunkSize : 1*1024*1024,
@@ -231,7 +239,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			throttleProgressCallbacks : 1,
 			query : {
 				fileUuid : Wu.Util.guid('r'),
-				projectUuid : app.activeProject.getUuid()
+				projectUuid : projectUuid
 			},
 
 			// max files to be uploaded at once
@@ -260,7 +268,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 					var description = 'Please zip shapefiles before uploading. Mandatory files are .shp, .shx, .dbf.';
 				}
 
-				console.log('fileTypeErrorCallback', file, errorCount);
 
 				// feedback message
 				app.feedback.setError({

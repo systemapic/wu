@@ -836,10 +836,37 @@ svg.tracer {
 }
 
 
-
-
 .project-logo, .client-logo{
 	background-image: url(images/defaultProjectLogo.png);
 	background-position: center;
   	background-repeat: no-repeat;
 }
+
+.legends-item{
+	margin-top: 0px;
+}
+
+.gutter-syntax-error{
+	background-color: #E9C385;
+	z-index:1;
+
+}
+
+.cartocss-error-pane {
+	background: #E9C385;
+}
+
+.active-error {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-y: scroll;
+  width: 97.2%;
+  height: 29px;
+} 
+
+.CodeMirror{
+	border-bottom: 2px solid #ddd;
+	border-left: 2px solid #ddd;
+}
+

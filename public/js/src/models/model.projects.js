@@ -385,7 +385,7 @@ Wu.Project = Wu.Class.extend({
 		delete app.Projects[project.getUuid()];
 
 		// set no active project if was active
-		if (app.activeProject.getUuid() == project.getUuid()) {
+		if (app.activeProject && app.activeProject.getUuid() == project.getUuid()) {
 
 			// null activeproject
 			app.activeProject = null;

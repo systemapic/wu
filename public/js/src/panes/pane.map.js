@@ -25,7 +25,9 @@ Wu.MapPane = Wu.Pane.extend({
 
 		// active layers
 		this._activeLayers = [];
+
 	},
+
 
 	_initContainer : function () {
 		

@@ -183,7 +183,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._project.store.layermenu.forEach(function (item) {
 
 			// get wu layer
-			var layer = _.find(this._project.layers, function (l) { return l.store.uuid == item.layer; });
+			var layer = this._project.layers[item.layer];
 
 			var layerItem = {
 				item : item,
@@ -958,6 +958,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
+
 	},
 
 	// disable by layermenuItem
@@ -1094,7 +1095,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	},
 
-	_add : function (layerItem) {		
+	_add : function (layerItem) {	
 
 		var item  = layerItem.item;
 		var layer = layerItem.layer;
