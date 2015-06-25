@@ -163,12 +163,18 @@ module.exports = api.auth = {
 	// },
 
 
-	setPasswordResetToken : function (user) {
+	setNewLoginToken : function (user) {
+
+		return this.setPasswordResetToken(user, true);
+	},
+
+
+	setPasswordResetToken : function (user, dontexpire) {
 		var token = crypto.randomBytes(20).toString('hex'),
 		    key = user.uuid;
 
 		api.redis.set(token, key);  // set temp token
-		api.redis.expire(token, 600); // expire in ten mins
+		if (!dontexpire) api.redis.expire(token, 600); // expire in ten mins
 		return token;
 	},
 

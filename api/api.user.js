@@ -86,7 +86,7 @@ module.exports = api.user = {
 		// send email
 		ops.push(function (user, password, callback) {
 			console.log('got password: '.yellow, password);
-			// api.email.sendWelcomeEmail(user, password);  // refactor plain pass
+			api.email.sendWelcomeEmail(user, password);  // refactor plain pass
 			callback(null, user);
 		});
 
