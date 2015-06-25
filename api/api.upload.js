@@ -55,7 +55,7 @@ module.exports = api.upload = {
 	    	    resumableTotalChunks = options.resumableTotalChunks;
 
 		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks to ', outputPath);
-		console.log('## RESUMABLE ##'.green, options);
+		// console.log('## RESUMABLE ##'.green, options);
 
 		// resumable		
 		r.post(req, function(status, filename, original_filename, identifier){
@@ -68,11 +68,13 @@ module.exports = api.upload = {
 
 			// check if all done
 			api.redis.get('done-chunks-' + resumableIdentifier, function (err, count) {
-				console.log('Chunk #'.yellow, count, err);
+				// console.log('Chunk #'.yellow, count, err);
 
 				// return if not all done				
-				if (count != options.resumableTotalChunks) return;
-
+				if (count != options.resumableTotalChunks) {
+					console.log('COUNT != CHUNKS');
+					return;
+				} 
 				// import uploaded file
 				api.upload._chunkedUploadDone({
 					user : req.user,
@@ -96,7 +98,7 @@ module.exports = api.upload = {
 		    tmpFolder = '/data/tmp/',
 		    ops = [];
 
-		// merge files
+		// merge chunks
 		ops.push(function (callback) {
 
 			var cmd = 'cat ';
@@ -112,7 +114,7 @@ module.exports = api.upload = {
 			exec(cmd, function (err, stdout, stdin) {
 				if (err) console.log('err'.red, err);
 
-				console.log('catted file: '.green, outputPath);
+				// console.log('catted file: '.green, outputPath);
 				fs.stat(outputPath, callback);
 			});
 
@@ -127,10 +129,7 @@ module.exports = api.upload = {
 				uniqueIdentifier : uniqueIdentifier
 			}
 
-			api.upload.importFile(file, options, function (err, pack) {
-				console.log('imported file!', pack);
-				callback(null, pack);
-			});
+			api.upload.importFile(file, options, callback);
 		});
 
 
@@ -159,7 +158,7 @@ module.exports = api.upload = {
 		api.redis.keys('done-chunk*', function(err, rows) {
 			rows.forEach(function (row) {
 				api.redis.del(row);
-				console.log('deleted row'.red, row);
+				// console.log('deleted row'.red, row);
 			});
 		});
 	},
@@ -181,7 +180,7 @@ module.exports = api.upload = {
 		    fileArray = [incomingFile],
 		    ops = [];
 
-		console.log('implortFile'.green, incomingFile, options);
+		// console.log('implortFile'.green, incomingFile, options);
 
 		// sort files
 		ops.push(function (callback) {
@@ -255,18 +254,14 @@ module.exports = api.upload = {
 			if (opts.isGeojson || opts.isRaster) api.file._sendToProcessing(opts, function (err, result) { // todo: do per file
 
 				// done processing
-
 			});
 
 			done(null, pack);
 
-			
 		});
 	},
 
 	
-	
-
 	_registerFiles : function (options, done) {
 		var entriesArray = options.entriesArray,
 		    userFullName = options.userFullName,
@@ -277,6 +272,8 @@ module.exports = api.upload = {
 
 
 		entries.forEach(function (entry) {
+
+			console.log('>>> entries for each >>>'.red, entry.file);
 
 			// set meta
 			entry.uuid = entry.file; 
@@ -310,8 +307,11 @@ module.exports = api.upload = {
 			if (err) console.log('ERR 19'.red, err);
 			if (err || !docs || !_.isArray(docs)) return done(err || 'No docs.');
 
+			// console.log('DOCDOCDOC', docs);
+
 			// add files/layers to project
 			_.each(docs, function (doc) {
+
 				if (doc.file) api.file.addToProject(doc.file._id, projectUuid);
 				if (doc.layer) api.layer.addToProject(doc.layer._id, projectUuid);
 			});
@@ -324,8 +324,6 @@ module.exports = api.upload = {
 
 	sortFormFiles : function (fileArray, done) {
 
-
-
 		// quick sort
 		var ops = [];
 		fileArray.forEach(function (file) {
@@ -337,8 +335,6 @@ module.exports = api.upload = {
 			var filetype 	= api.upload.getFileType(file.path);
 			var extension 	= filetype[0];
 			var type 	= filetype[1];
-
-			console.log('filteyp'.yellow, filetype);
 
 			var options = {
 				path : file.path,
@@ -378,8 +374,8 @@ module.exports = api.upload = {
 
 		var ops1 = [];
 
-		console.log('SORTZIPFOLDER!!'.green, options);
-		console.log('currentfolder: '.green, currentFolder);
+		// console.log('SORTZIPFOLDER!!'.green, options);
+		// console.log('currentfolder: '.green, currentFolder);
 
 		// read files in folder
 		fs.readdir(currentFolder, function (err, files) {
@@ -563,7 +559,7 @@ module.exports = api.upload = {
 
 		var ext = options.extension;
 
-		console.log('_soprOp'.green, ops, options);
+		// console.log('_soprOp'.green, ops, options);
 
 		// handle folder
 		if (options.type == 'folder') {
@@ -600,7 +596,7 @@ module.exports = api.upload = {
 					out : ''
 				}
 
-				console.log('zip!'.green);
+				// console.log('zip!'.green);
 
 				// unzips files to folder
 				api.file.handleZip(opt, function (err) {
@@ -950,7 +946,7 @@ module.exports = api.upload = {
 	},
 
 	getFileType : function (name) {
-		console.log('name'.yellow, name);
+		// console.log('name'.yellow, name);
 		if (!name) return ['unknown', 'unknown'];
 
 		// check if folder

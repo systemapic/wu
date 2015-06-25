@@ -56,6 +56,8 @@ Wu.Tooltip = Wu.Class.extend({
 		return;
 		// console.error('tooltip on!'); // todo optimize: too many event registered?
 
+		// console.log('on tips!', this.tips);
+
 		// create tooltip
 		this.tips.forEach(function (t) {
 
@@ -63,6 +65,7 @@ Wu.Tooltip = Wu.Class.extend({
 			if (!t.inited)  {
 
 				// create tip
+				if (!t.div || !t.content) return; 
 				var tip = new Opentip(t.div, t.content, t.options);
 
 				// mark inited (for events)
@@ -97,8 +100,6 @@ Wu.Tooltip = Wu.Class.extend({
 
 		// register events
 		this.on();
-
-
 	},
 
 	// turn off in settings
@@ -106,7 +107,6 @@ Wu.Tooltip = Wu.Class.extend({
 
 		// deregister events
 		this.off();
-
 	},
 
 });

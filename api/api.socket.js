@@ -56,7 +56,7 @@ module.exports = api.socket = {
 	},
 
 	uploadDone : function (options) {
-		console.log('uploadDone'.yellow);
+		// console.log('uploadDone'.yellow);
 
 		// get socket
 		var socket = api.socket.getSocket(options);
@@ -66,7 +66,8 @@ module.exports = api.socket = {
 	},
 
 	processingProgress : function (options) {
-		console.log('processingProgress'.green, options);
+		console.log('SOCKET: processingProgress');
+		// console.log('processingProgress'.green, options);
 
 		// get socket
 		var socket = api.socket.getSocket(options);
@@ -76,7 +77,8 @@ module.exports = api.socket = {
 	},
 
 	processingDone : function (options) {
-		console.log('processingDone'.yellow);
+		// console.log('processingDone'.yellow);
+		console.log('SOCKET: processingDone');
 
 		var userId = api.socket._getUserId(options);
 		var sock = api.socket._getSocket(userId);
@@ -86,7 +88,8 @@ module.exports = api.socket = {
 	},
 
 	grindRasterDone : function (req, res) {
-		console.log('grindRasterDone', req.body);
+		// console.log('grindRasterDone', req.body);
+		console.log('SOCKET: grindRasterDone');
 
 		var fileUuid = req.body.fileUuid,
 		    process = api.socket._getProcessing(fileUuid),
@@ -96,7 +99,7 @@ module.exports = api.socket = {
 		    error = req.body.error,
 		    uniqueIdentifier = req.body.uniqueIdentifier;
 
-		console.log('grindDone: err?'.yellow, error);
+		// console.log('grindDone: err?'.yellow, error);
 
 		// send to user
 		sock && sock.emit('processingDone', {
@@ -121,7 +124,8 @@ module.exports = api.socket = {
 		    error = req.body.error,
 		    uniqueIdentifier = req.body.uniqueIdentifier;
 
-		console.log('grindDone: err?'.yellow, error);
+		// console.log('grindDone: err?'.yellow, error);
+		console.log('SOCKET: grindDone');
 
 		// send to user
 		sock && sock.emit('processingDone', {
@@ -168,22 +172,26 @@ module.exports = api.socket = {
 	},
 
 	setProcessing : function (process) {
-		console.log('setProce2sing'.green, process);
-		console.log('============== SETPROCESSING ==============');
-		console.log('============== SETPROCESSING ==============');
-		console.log('============== SETPROCESSING ==============');
-		console.log('============== fileUuid: ' + process.fileUuid + ' ==============');
+		// console.log('setProce2sing'.green, process);
+		// console.log('============== SETPROCESSING ==============');
+		// console.log('============== SETPROCESSING ==============');
+		// console.log('============== SETPROCESSING ==============');
+		// console.log('============== fileUuid: ' + process.fileUuid + ' ==============');
+
+		console.log('SOCKET: setProcessing');
 
 		this._processing[process.fileUuid] = process;
 		this._processing[process.fileUuid]._timestamp = new Date().getTime();
 	},
 
 	_getProcessing : function (id) {
-		console.log('GET processing'.green, process);
-		console.log('============== GETPROCESSING ==============');
-		console.log('============== GETPROCESSING ==============');
-		console.log('============== GETPROCESSING ==============');
-		console.log('============== id: ' + id + ' ==============');
+		// console.log('GET processing'.green, process);
+		// console.log('============== GETPROCESSING ==============');
+		// console.log('============== GETPROCESSING ==============');
+		// console.log('============== GETPROCESSING ==============');
+		// console.log('============== id: ' + id + ' ==============');
+
+		console.log('SOCKET: getProcessing');
 
 		return this._processing[id];
 	},
