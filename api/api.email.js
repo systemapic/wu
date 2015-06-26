@@ -56,9 +56,7 @@ module.exports = api.email = {
 		options.from = options.from || api.config.nodemailer.from;
 
 		// overwrite to // debug
-		// options.to = 'knutole@noerd.biz';
-
-
+		options.to = 'knutole@noerd.biz';
 
 		// send email
 		transporter.sendMail(options);
@@ -86,9 +84,7 @@ module.exports = api.email = {
 		var link = api.config.portalServer.uri + 'login?token=' + token;
 		var to      = email;
 		var subject = 'Please confirm your request for a password reset';
-		var body    = '<div style="background-color: #f8f8f8; padding: 0; margin: 0; font-family: helvetica neue, helvetica, \'Open Sans\'; position: relative; top: 0; left: 0;width: 100%; height: 100%; padding-top: 100px;"><div style="width: 500px; margin: auto; background-color: white; border-radius: 20px; padding: 20px; color: #3f4652; position: relative; margin-bottom: 25px;"><div style="text-align: center;background: white;width: 140px;min-height: 140px;border-radius: 100px;position: relative;top: 0;margin: auto;"><img style="position: relative; top: 10px;" src="http://systemapic.com/logo/Just_Circle/120x120/grayDark-systemapic-logo-circle-120x120.png"></div><h1 style="font-weight: 500;font-size: 36px;text-align: center;margin: 0;">Hello ' + name + '</h1><div style="border-top: 1px dashed #3f4652;margin-top: 40px;margin-bottom: 40px;opacity: 0.15;"></div><h4 style="font-size: 17px;padding: 0;margin: 5px;margin-bottom: 20px;line-height: 1.4;">You have requested a password reset.</h4><h5 style="font-size: 14px; padding: 0; margin: 5px;"><br><a href="' + link + '">Reset your password by clicking this link.</a></h5><div style="border-top: 1px dashed #3f4652;margin-top: 40px;margin-bottom: 30px;opacity: 0.15;"></div><div style="font-size: 13px;line-height: 1.3;font-style: italic;padding-bottom: 20px;opacity: 0.5;">The link is valid for ten minutes. If you think you have received this email in error, no further action is required.<br></div></div><div style="left: 0;font-size: 12px;font-style: italic;width: 100%;text-align: center; margin-bottom: 100px; padding-bottom: 100px;"><a style="text-decoration: none; color: #3f4652;" href="mailto:info@systemapic.com">info@systemapic.com</a> ~ <a style="text-decoration: none; color:#3f4652;" href="http:/systemapic.com">Systemapic.com</a> &copy;</div></div>';		
-
-		console.log('sending email tp:', to);
+		var body    = '<div style="background-color: #f8f8f8; padding: 0; margin: 0; font-family: helvetica neue, helvetica, \'Open Sans\'; position: relative; top: 0; left: 0;width: 100%; height: 100%; padding-top: 100px;"><div style="width: 500px; margin: auto; background-color: white; border-radius: 20px; padding: 20px; color: #3f4652; position: relative; margin-bottom: 25px;"><div style="text-align: center;background: white;width: 140px;min-height: 140px;border-radius: 100px;position: relative;top: 0;margin: auto;"><img style="position: relative; top: 10px;" src="http://systemapic.com/logo/Just_Circle/120x120/grayDark-systemapic-logo-circle-120x120.png" /></div><h1 style="font-weight: 500;font-size: 36px;text-align: center;margin: 0;">Hello ' + name + '</h1><div style="border-top: 1px dashed #3f4652;margin-top: 40px;margin-bottom: 40px;opacity: 0.15;"></div><h4 style="font-size: 17px;padding: 0;margin: 5px;margin-bottom: 20px;line-height: 1.4;">You have requested a password reset.</h4><h5 style="font-size: 14px; padding: 0; margin: 5px;"><br><a href="' + link + '">Reset your password by clicking this link.</a></h5><div style="border-top: 1px dashed #3f4652;margin-top: 40px;margin-bottom: 30px;opacity: 0.15;"></div><div style="font-size: 13px;line-height: 1.3;font-style: italic;padding-bottom: 20px;opacity: 0.5;">The link is valid for ten minutes. If you think you have received this email in error, no further action is required.<br></div></div><div style="left: 0;font-size: 12px;font-style: italic;width: 100%;text-align: center; margin-bottom: 100px; padding-bottom: 100px;"><a style="text-decoration: none; color: #3f4652;" href="mailto:info@systemapic.com">info@systemapic.com</a> ~ <a style="text-decoration: none; color:#3f4652;" href="http:/systemapic.com">Systemapic.com</a> &copy;</div></div>';		
 
 		// send email
 		api.email._send({
@@ -113,7 +109,7 @@ module.exports = api.email = {
 		// email body
 		var body = '<div style="background-color: #f8f8f8; padding: 0; margin: 0; font-family: helvetica neue, helvetica, \'Open Sans\'; position: relative; top: 0; left: 0;width: 100%; height: 100%; padding-top: 100px;">';
 		body    += '<div style="width: 500px; margin: auto; background-color: white; border-radius: 20px; padding: 20px; color: #3f4652; position: relative; margin-bottom: 25px;">';
-		body 	+= '<div style="text-align: center;background: white;width: 140px;min-height: 140px;border-radius: 100px;position: relative;top: 0;margin: auto;"><img style="position: relative; top: 10px;" src="http://systemapic.com/logo/Just_Circle/120x120/grayDark-systemapic-logo-circle-120x120.png"></div>';
+		body 	+= '<div style="text-align: center;background: white;width: 140px;min-height: 140px;border-radius: 100px;position: relative;top: 0;margin: auto;"><img style="position: relative; top: 10px;" src="http://systemapic.com/logo/Just_Circle/120x120/grayDark-systemapic-logo-circle-120x120.png" /></div>';
 		body 	+= '<h1 style="font-weight: 500;font-size: 36px;text-align: center;margin: 0;">Hi ' + name + '!</h1><div style="border-top: 1px dashed #3f4652;margin-top: 40px;margin-bottom: 40px;opacity: 0.15;"></div>';
 		body 	+= '<h1 style="font-weight: 500;font-size: 23px;text-align: center;margin: 10px;">Welcome to Systemapic.com</h1>'; 
 		body 	+= '<h4 style="font-size: 17px;padding: 0;margin: 5px;margin-bottom: 20px;line-height: 1.4;">';
