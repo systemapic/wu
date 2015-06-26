@@ -992,6 +992,15 @@ Wu.Project = Wu.Class.extend({
 		app.Tooltip.deactivate();
 	},
 
+
+	enableD3popup : function () {
+		console.log('enable d3popup');
+	},
+	disableD3popup : function () {
+		console.log('disable d3popup');
+	},
+
+
 	enableScreenshot : function () {
 		app.SidePane.Share.enableScreenshot();
 	},
