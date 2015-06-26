@@ -88,6 +88,7 @@ L.SpinningMap = L.Class.extend({
 		var img = 'url("' + this.options.logo + '")';
 		this._logo.style.backgroundImage = img;
 		
+		
 	},
 
 	initContent : function () {

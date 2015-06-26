@@ -496,6 +496,8 @@ Wu.List = Wu.Class.extend({
 	// CREATE INPUT FIELD
 	_D3input : function (options, blurFunction) {
 
+		console.log('i think its easy to make million$');
+
 		// Create input box
 		var input 	    = Wu.DomUtil.create('input');
 		    input.type 	    = 'text';
@@ -529,6 +531,8 @@ Wu.List = Wu.Class.extend({
 
 	// INPUT FIELD ON BLUR
 	updateAndRefresh : function (input, options) {
+
+		console.log('refresh!');
 
 		// New Name
 		var newName  = input.value;
@@ -2047,10 +2051,10 @@ Wu.DataLibraryList = Wu.List.extend({
 		
 		// update layermenu
 		var lm = app.MapPane._controls.layermenu;
-		lm && lm._refresh(true);
+		lm && lm._refreshContent(true);
 
 		var insp = app.MapPane._controls.inspect;
-		insp && insp._refresh(true);
+		insp && insp._refreshContent(true);
 
 		var leg = app.MapPane._controls.legends;
 		leg && leg._refresh(true);

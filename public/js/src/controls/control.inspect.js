@@ -84,6 +84,12 @@ L.Control.Inspect = Wu.Control.extend({
 		this.disableScrollzoom();
 	},
 
+	// refresh but keep active layers
+	_refreshContent : function (hide) {
+		this._refresh(hide);
+		this._addAlreadyActiveLayers();
+	},
+
 	// turned on and off by sidepane/options/controls toggle
 	_on : function () {
 

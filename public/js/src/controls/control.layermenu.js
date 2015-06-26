@@ -46,6 +46,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	_refresh : function (hide) {
 
+		console.log('REFRRHRHHRHRHRHRHRHRHRH', this);
 
 		// should be active
 		if (!this._added) this._addTo();
@@ -68,6 +69,12 @@ L.Control.Layermenu = Wu.Control.extend({
 		// Set max height
 		var dimensions = app._getDimensions();
 		this.resizeEvent(dimensions);		
+	},
+
+	// refresh for names etc, but keep active layers
+	_refreshContent : function (hide) {
+		this._refresh(hide);
+		this._addAlreadyActive();
 	},
 
 	_isActive : function () {
