@@ -409,16 +409,16 @@ body {
 		z-index: 0;
 	}
 
-	.col-sm-6.col-sm-offset-3 h1 {
+	.col-sm-6.col-sm-offset-3 h1, #pw-header {
 		z-index: 999999;
 		font-size: 18px;
 
 	}
-	#hitme {
+/*	#hitme {
 		z-index: 999999;
 		position: absolute;
 		width: 375px;
-	}
+	}*/
 
 	.col-sm-6.col-sm-offset-3 {
 		padding-left: 30px;
