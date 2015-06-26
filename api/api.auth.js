@@ -113,6 +113,25 @@ module.exports = api.auth = {
 		});
 	},
 
+	checkResetToken : function (req, res) {
+
+		// check token
+		var token = req.body.token;
+
+		api.redis.get(token, function (err, userUuid) {
+			console.log('err, userUuid', err, userUuid);
+
+			// var response = (err || !userUuid) ? 'Invalid token' : 'Valid token'
+
+			var response = {
+				valid : userUuid ? true : false
+			}
+
+			return res.end(JSON.stringify(response));
+		});
+
+
+	},
 
 	// confirmPasswordReset : function (req, res) {
 	// 	var email = req.query.email,

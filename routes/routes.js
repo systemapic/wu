@@ -483,6 +483,12 @@ module.exports = function(app, passport) {
 		api.access.setNoRole(req, res);
 	});
 
+	// =====================================
+	// CHECK RESET PASSWORD TOKEN ==========
+	// =====================================
+	app.post('/reset/checktoken', function (req, res) {
+		api.auth.checkResetToken(req, res);
+	});
 
 	// =====================================
 	// RESET PASSWORD ======================

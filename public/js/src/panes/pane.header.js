@@ -64,17 +64,14 @@ Wu.HeaderPane = Wu.Pane.extend({
 	},
 
 	_getPixelLogo : function (logo) {
-		console.log('logo??', logo);
 		var logo = logo || this._project.getHeaderLogo();
 
-		console.log('logo2??', logo);
 		if (!logo || logo == '/css/images/defaultProjectLogoLight.png') return '/css/images/defaultProjectLogoLight.png';
 		if (!logo || logo == '/css/images/defaultProjectLogo.png') return '/css/images/defaultProjectLogo.png';
 
 		var base = logo.split('/')[2];
 		var url = '/pixels/image/' + base + '?width=105&height=70'
 		
-		console.log('urrlrlr', url);
 		return url;
 	},
 

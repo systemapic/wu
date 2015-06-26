@@ -9,12 +9,12 @@ redisStore.auth(config.serverConfig.temptokenRedis.auth);
 redisStore.on('error', console.error);
 
 // api
-var api = {
-	config : config.serverConfig,
-	clientConfig : config.clientConfig,
-	loginConfig : config.loginConfig,
-	redis  : redisStore,
-}
+var api = {};
+api.version 		= '1.0-beta';
+api.config 		= config.serverConfig;
+api.clientConfig 	= config.clientConfig;
+api.loginConfig 	= config.loginConfig;
+api.redis 		= redisStore;
 
 // exports
 module.exports 		= api;
