@@ -212,7 +212,7 @@ module.exports = api.project = {
 		    projectUuid = req.body.uuid,
 		    ops = [];
 
-		console.log('Updating project.'.yellow);
+		console.log('Updating project.'.yellow, req.body);
 		// console.log('body: ', req.body);
 
 		// return on missing

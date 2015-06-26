@@ -143,6 +143,7 @@ var projectSchema = mongoose.Schema({
 		tooltips 	: { type: Boolean, default: false },
 		mediaLibrary 	: { type: Boolean, default: false },
 		mapboxGL	: { type: Boolean, default: false },
+		d3popup		: { type: Boolean, default: false },
 	},
 
 	// 

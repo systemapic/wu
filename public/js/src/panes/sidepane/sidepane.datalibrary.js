@@ -131,19 +131,19 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	setFullSize : function () {
-			Wu.DomUtil.removeClass(this._content, 'minimal');
-			Wu.DomUtil.removeClass(this._expandCollapse, 'expand');
-			Wu.DomUtil.addClass(app._map._container, 'map-blur');
-			this.fullsize = true;	
-			this.refreshTable({tableSize : 'full'});	
+		Wu.DomUtil.removeClass(this._content, 'minimal');
+		Wu.DomUtil.removeClass(this._expandCollapse, 'expand');
+		Wu.DomUtil.addClass(app._map._container, 'map-blur');
+		this.fullsize = true;	
+		this.refreshTable({tableSize : 'full'});	
 	},
 
 	setSmallSize : function () {
-			Wu.DomUtil.addClass(this._content, 'minimal');
-			Wu.DomUtil.addClass(this._expandCollapse, 'expand');
-			Wu.DomUtil.removeClass(app._map._container, 'map-blur');
-			this.fullsize = false;
-			this.refreshTable({tableSize : 'small'});
+		Wu.DomUtil.addClass(this._content, 'minimal');
+		Wu.DomUtil.addClass(this._expandCollapse, 'expand');
+		Wu.DomUtil.removeClass(app._map._container, 'map-blur');
+		this.fullsize = false;
+		this.refreshTable({tableSize : 'small'});
 	},
 
 	_projectSelected : function (e) {
@@ -216,11 +216,14 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// remove drop events
 		Wu.DomEvent.off(window.document, 'dragenter', this._dragEnter, this);
 		Wu.DomEvent.off(this._resumableDrop, 'dragleave', this._dragLeave, this);
+		Wu.DomEvent.off(this._resumableDrop, 'drop', this._dragLeave, this);
 	},
 
 	_enableResumable : function () {
+		// add drag/drop events
 		Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
 		Wu.DomEvent.on(this._resumableDrop, 'dragleave', this._dragLeave, this);
+		Wu.DomEvent.on(this._resumableDrop, 'drop', this._dragLeave, this);
 	},
 
 	_addResumable : function () {
@@ -233,9 +236,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			chunkSize : 1*1024*1024,
 			simultaneousUploads : 5,
 			generateUniqueIdentifier : function (file) {
-				return file.size + '-' + file.lastModified + '-' + file.name;
+				var idr = file.size + '-' + file.lastModified + '-' + file.name;
+				return idr;
 			},
-			testChunks : true, // resumable chunks
+			testChunks : true, // resumable chunks // todo: server side redis count not stable
 			throttleProgressCallbacks : 1,
 			query : {
 				fileUuid : Wu.Util.guid('r'),
@@ -248,7 +252,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 				// feedback message
 				app.feedback.setError({
-					title : 'Sorry, you can\'t do that!',
+					title : "Sorry, you can't do that!",
 					description : 'Please only upload five files at a time.',
 				});
 
@@ -260,16 +264,14 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif', 'tiff', 'jp2', 'ecw'],
 			fileTypeErrorCallback : function (file, errorCount) {
 
+				// set feedback
 				var description = 'The file <strong>' + file.name + '</strong> is not an accepted filetype.';
-
 				var filetype = file.name.split('.').reverse()[0];
+				
+				// custom shapefile feedback
+				if (filetype == 'shp') description = 'Please zip shapefiles before uploading. Mandatory files are .shp, .shx, .dbf.';
 
-				if (filetype == 'shp') {
-					var description = 'Please zip shapefiles before uploading. Mandatory files are .shp, .shx, .dbf.';
-				}
-
-
-				// feedback message
+				// show feedback message
 				app.feedback.setError({
 					title : 'Sorry, you can\'t do that!',
 					description : description
@@ -305,15 +307,14 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		}.bind(this));
 
 		r.on('complete', function(){
-			console.log('r.complete');
+			// console.log('r.complete');
 		});
 
 		r.on('pause', function(){
-			console.log('r.pause');
+			// console.log('r.pause');
 		});
 		
 		r.on('fileSuccess', function(file, message){
-			console.log('r.fileSuccess', file, message);
 
 			var endTime = new Date().getTime(),
 			    startTime = r._startTime,
@@ -323,8 +324,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			    message = 'Uploaded ' + size.toFixed(2) + ' MB in ' + totalTime.toFixed(2) + ' seconds, at ' + bytesPerSecond.toFixed(2) + ' MB/s.',
 			    estimatedProcessingTime = (size * 0.5).toFixed(0) + ' seconds',
 			    ext = file.fileName.split('.').reverse()[0];
-
-
 
 			var regularFile = (ext == 'pdf' || ext == 'txt' || ext == 'doc' || ext == 'docx' || ext == 'jpeg');
 			
@@ -345,16 +344,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				});
 			}
 
-			// refresh for new upload
-			// this._refreshResumable();
-
+			// hide progess bar
 			app.ProgressBar.hideProgress();
-
 
 		}.bind(this));
 
 		r.on('fileError', function(file, message){
-			console.log('r.fileError');
+			console.log('r.fileError', file, message);
 		});
 
 		r.on('fileProgress', function(file){
@@ -363,13 +359,12 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		});
 
 		r.on('cancel', function(){
-			console.log('r.cancel');
+			// console.log('r.cancel');
 		});
 
 		r.on('uploadStart', function(){
-			console.log('r.uploadStart');
+			// console.log('r.uploadStart');
 		});
-
 
 		// add drop events
 		this._enableResumable();
@@ -457,11 +452,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 
 	createFeedbackID : function () {
-
 		this.__id = Wu.Util.createRandom(5);
-
 	},
-
 	
 	handleError : function (err) {
 
@@ -471,7 +463,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			description : err,
 			id : this.__id			
 		});
-
 	},
 
 
