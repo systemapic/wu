@@ -250,7 +250,7 @@
 	}
 
 #login-logo {
-	/*background-image: url(https://maps.systemapic.com/css/images/griffon_logo_drop.png);*/
+	/*background-image: url(https://dev.systemapic.com/css/images/login-logo.png);*/
 	background-repeat: no-repeat;
 	width: 429px;
 	height: 291px;
@@ -432,6 +432,28 @@ body {
 	}
 }
 
+@media screen and (max-width: 600px){
+
+		#login-logo{
+			z-index: 0;
+			transform: scale(0.7, 0.7);
+			-ms-transform: scale(0.7, 0.7);
+			-webkit-transform: scale(0.7, 0.7);
+			background-position: center top;
+			top:-50px;
+	}
+}
+
+@media screen and (max-width: 400px){
+
+		#login-logo{
+			z-index: 0;
+			transform: scale(0.9, 0.9);
+			-ms-transform: scale(0.9, 0.9);
+			-webkit-transform: scale(0.9, 0.9);
+			/*background-position: left top;*/
+	}
+}
 
 #forgot-link {
 	font-weight: 400;
