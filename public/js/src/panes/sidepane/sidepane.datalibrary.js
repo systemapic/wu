@@ -246,19 +246,19 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				projectUuid : projectUuid
 			},
 
-			// max files to be uploaded at once
-			maxFiles : 5,
-			maxFilesErrorCallback : function (files, errorCount) {
+			// // max files to be uploaded at once
+			// maxFiles : 5,
+			// maxFilesErrorCallback : function (files, errorCount) {
 
-				// feedback message
-				app.feedback.setError({
-					title : "Sorry, you can't do that!",
-					description : 'Please only upload five files at a time.',
-				});
+			// 	// feedback message
+			// 	app.feedback.setError({
+			// 		title : "Sorry, you can't do that!",
+			// 		description : 'Please only upload five files at a time.',
+			// 	});
 
-				// hide drop
-				app.SidePane.DataLibrary._hideDrop();
-			},
+			// 	// hide drop
+			// 	app.SidePane.DataLibrary._hideDrop();
+			// },
 
 			// accepted filetypes
 			fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif', 'tiff', 'jp2', 'ecw'],
