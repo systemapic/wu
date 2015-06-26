@@ -409,12 +409,12 @@ body {
 		z-index: 0;
 	}
 
-	.col-sm-6.col-sm-offset-3 h1, #pw-header {
+	.col-sm-6.col-sm-offset-3 h{
 		z-index: 999999;
 		font-size: 18px;
 
 	}
-/*	#hitme {
+	/*	#hitme {
 		z-index: 999999;
 		position: absolute;
 		width: 375px;
@@ -469,7 +469,7 @@ body {
 #login-forgot-wrapper {
 	display: none;
 	padding-right: 10px;
-  	box-sizing: border-box;
+  	/*box-sizing: border-box;*/
 	}
 
 #login-password-wrapper {
