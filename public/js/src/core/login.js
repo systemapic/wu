@@ -16,8 +16,35 @@ function checkToken() {
 
 function getToken() {
 	var token = window.location.search.split('=')[1];
-	console.log('token: ', token);
 	return token;
+}
+
+window.onload = function () {
+	console.log('window.onload');
+
+	if (!checkToken()) return;
+
+	var options = {
+		token : getToken()
+	}
+
+	sendRequest('/reset/checktoken', options, function (err, body){
+		console.log('checked token', err, body);
+
+		var response = JSON.parse(body);
+		if (!response.valid) {
+			console.error('invalid token');
+			
+			showForgotPassword();
+
+			var feedbackDiv = document.getElementById('forgot-feedback');
+			feedbackDiv.innerHTML = 'Your token has expired. Please request a new one above.';
+			feedbackDiv.style.color = 'red';
+			feedbackDiv.style.fontSize = '18px';
+			feedbackDiv.style.paddingTop = '10px';
+		} 
+	});
+
 }
 
 function spin() {
@@ -47,7 +74,6 @@ function addhooks() {
 	// forgot password link
 	var forgotLink = document.getElementById('forgot-link');
 	forgotLink.onclick = function () {
-		console.log('forgot!');
 		showForgotPassword();
 	}	
 
@@ -104,6 +130,7 @@ function submitNewPassword () {
 	});
 
 }
+
 
 function sendRequest(entryPoint, options, callback) {
 	var http = new XMLHttpRequest(),
@@ -271,25 +298,27 @@ function debugSetPassword () {
 
 
 zxcvbn_load_hook = function () {
-	console.log('zxcvbn loaded');
 
 	var p = document.getElementById('password-input');
 	var r = document.getElementById('password-repeat');
+	p.onkeyup = keyedup;
+	r.onkeyup = keyedup;
+}
+
+function keyedup() {
+	var p = document.getElementById('password-input');
+	var r = document.getElementById('password-repeat');
 	var s = document.getElementById('password-strength');
-	p.onkeyup = function () {
-		var password = p.value;
-		var score = zxcvbn(password);
-		console.log(score);
-		s.innerHTML = prettyStrength(score.score);
 
-		score.score == 4 ? markStrong() : markWeak();
-		checkButton();
-	}
+	var password = p.value;
+	var score = zxcvbn(password);
+	console.log(score);
+	s.innerHTML = prettyStrength(score.score);
 
-	r.onkeyup = function () {
-		p.value == r.value ? markSame() : markNotSame();
-		checkButton();
-	}
+	score.score == 4 ? markStrong() : markWeak();
+	checkButton();
+	p.value == r.value ? markSame() : markNotSame();
+	checkButton();
 }
 
 function checkButton() {

@@ -250,7 +250,7 @@
 	}
 
 #login-logo {
-	/*background-image: url(https://maps.systemapic.com/css/images/griffon_logo_drop.png);*/
+	/*background-image: url(https://dev.systemapic.com/css/images/login-logo.png);*/
 	background-repeat: no-repeat;
 	width: 429px;
 	height: 291px;
@@ -409,16 +409,16 @@ body {
 		z-index: 0;
 	}
 
-	.col-sm-6.col-sm-offset-3 h1 {
+	.col-sm-6.col-sm-offset-3 h1, #pw-header {
 		z-index: 999999;
 		font-size: 18px;
 
 	}
-	#hitme {
+/*	#hitme {
 		z-index: 999999;
 		position: absolute;
 		width: 375px;
-	}
+	}*/
 
 	.col-sm-6.col-sm-offset-3 {
 		padding-left: 30px;
@@ -430,6 +430,18 @@ body {
 		width: 445px;
 		min-width: 445px;	
 	}
+}
+
+
+@media screen and (max-width: 600px){
+
+		#login-logo{
+			z-index: 0;
+			transform: scale(0.7, 0.7);
+			-ms-transform: scale(0.7, 0.7);
+			-webkit-transform: scale(0.7, 0.7);
+			background-position: center top;
+		}
 }
 
 
@@ -468,9 +480,9 @@ body {
 	color: white;
 	}
 
-.red 	{color: red;}
-.blue 	{color: blue;}
-.green 	{color: rgb(76, 236, 76);}
+.red 	{color: red; display:inline;}
+.blue 	{color: blue; display:inline;}
+.green 	{color: rgb(76, 236, 76); display:inline;}
 
 #password-input-ok, #password-repeat-ok{
 	margin-left: 10px;
