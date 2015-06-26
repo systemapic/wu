@@ -700,6 +700,8 @@ module.exports = api.file = {
 		    uniqueIdentifier = options.uniqueIdentifier,
 		    remoteSSH = 'px_vile_grind',
 		    remoteUrl = api.config.vile_grind.remote_url;
+
+		var remoteUrl = 'http://grind:3004/';
 		
 		var sendOptions = {
 			fileUuid : fileUuid,
@@ -710,17 +712,17 @@ module.exports = api.file = {
 			api_hook : 'grind/raster/done',
 		}
 
-		// create dir on remote
-		ops.push(function (callback) {
-			var cmd2 = 'ssh ' + remoteSSH + ' "mkdir ' + remoteFolder + '"';
-			exec(cmd2, callback);
-		});
+		// // create dir on remote
+		// ops.push(function (callback) {
+		// 	var cmd2 = 'ssh ' + remoteSSH + ' "mkdir ' + remoteFolder + '"';
+		// 	exec(cmd2, callback);
+		// });
 
-		// send file over ssh
-		ops.push(function (callback) {
-			var cmd = 'tar -cf - -C "' + localFolder + '" "' + localFile + '" | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + '/"';
-			exec(cmd, callback);
-		});
+		// // send file over ssh
+		// ops.push(function (callback) {
+		// 	var cmd = 'tar -cf - -C "' + localFolder + '" "' + localFile + '" | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + '/"';
+		// 	exec(cmd, callback);
+		// });
 
 		// notify remote of file
 		ops.push(function (callback) {
@@ -779,6 +781,8 @@ module.exports = api.file = {
 		    remoteSSH = 'px_vile_grind',
 		    remoteUrl = api.config.vile_grind.remote_url;
 
+		// debug
+
 		var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + '"';
 
 		var sendOptions = {
@@ -790,8 +794,13 @@ module.exports = api.file = {
 		}
 
 		// send file over ssh
-		exec(cmd, function (err, stdout, stdin) {
-			if (err) console.log('err'.red, err);
+		// exec(cmd, function (err, stdout, stdin) {
+			// if (err) console.log('err'.red, err);
+
+			var remoteUrl = 'http://grind:3004/';
+
+			console.log('--------->>>>>remoteUrl: ', remoteUrl);
+			console.log('localFolder / localFile', localFolder, localFile);
 
 			// ping tileserver storage to notify of file transfer
 			request({
@@ -803,6 +812,8 @@ module.exports = api.file = {
 			// callback
 			function (err, response, body) {
 
+				console.log('request done', err, body);
+
 				api.socket.setProcessing({
 					userId : user._id,
 					fileUuid : fileUuid,
@@ -813,9 +824,62 @@ module.exports = api.file = {
 
 				done(null, 'All done!');
 			});
-		});
+		// });
 
 	},
+
+
+	// _sendToProcessingGeojson : function (layer, options, done) {
+	// 	var pack = options.pack,
+	// 	    user = options.user,
+	// 	    layers = pack.layers,
+	// 	    size = options.size,
+	// 	    ops = [],
+	// 	    fileUuid = layer.file,
+	// 	    localFile = fileUuid + '.geojson',
+	// 	    localFolder = api.config.path.geojson,
+	// 	    remoteFolder = '/data/grind/geojson/',
+	// 	    uniqueIdentifier = options.uniqueIdentifier,
+	// 	    remoteSSH = 'px_vile_grind',
+	// 	    remoteUrl = api.config.vile_grind.remote_url;
+
+	// 	var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + '"';
+
+	// 	var sendOptions = {
+	// 		fileUuid : fileUuid,
+	// 		uniqueIdentifier : uniqueIdentifier,
+	// 		sender_ssh : api.config.vile_grind.sender_ssh,
+	// 		sender_url : api.config.vile_grind.sender_url,
+	// 		api_hook : 'grind/done'
+	// 	}
+
+	// 	// send file over ssh
+	// 	exec(cmd, function (err, stdout, stdin) {
+	// 		if (err) console.log('err'.red, err);
+
+	// 		// ping tileserver storage to notify of file transfer
+	// 		request({
+	// 			method : 'POST',
+	// 			uri : remoteUrl + 'grind/job',
+	// 			json : sendOptions
+	// 		}, 
+
+	// 		// callback
+	// 		function (err, response, body) {
+
+	// 			api.socket.setProcessing({
+	// 				userId : user._id,
+	// 				fileUuid : fileUuid,
+	// 				uniqueIdentifier : uniqueIdentifier,
+	// 				pack : pack,
+	// 				size : size
+	// 			});
+
+	// 			done(null, 'All done!');
+	// 		});
+	// 	});
+
+	// },
 
 
 }

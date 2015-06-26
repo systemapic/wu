@@ -13,9 +13,6 @@ Wu.Client = Wu.Class.extend({
 
 	setEditMode : function () {
 		// set editMode
-		// this.editMode = false;
-		// if (app.Account.canUpdateClient(this.uuid)) this.editMode = true;
-		// if (app.access.to.edit_client(this.getUuid())) this.editMode = true;
 		this.editMode = app.access.to.edit_client(this.getUuid())
 	},
 
@@ -136,8 +133,6 @@ Wu.Client = Wu.Class.extend({
 	},
 
 	getPixelLogo : function (options) {
-
-			
 
 	},
 

@@ -75,7 +75,8 @@ module.exports = api.email = {
 
 	sendPasswordResetEmail : function (user) {
 		if (!user) return;
-
+		//api.user.js
+		// var inviter = req.user.firstName + req.user.lastName;
 		// todo: SSL
 		var name    = user.firstName + ' ' + user.lastName;
 		var email   = user.local.email;

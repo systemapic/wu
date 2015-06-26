@@ -378,19 +378,19 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	addEditHooks : function () {
-		if (app.access.to.edit_client()) {
-			Wu.DomEvent.on(this.title, 'dblclick', this.editName, this);
-			Wu.DomEvent.on(this.description, 'dblclick', this.editDescription, this);
-			this._addResumable();
-		}
+		if (!app.access.to.edit_client()) return;
+
+		Wu.DomEvent.on(this.title, 'dblclick', this.editName, this);
+		Wu.DomEvent.on(this.description, 'dblclick', this.editDescription, this);
+		this._addResumable();
 	},
 
 	removeEditHooks : function () {
-		if (app.access.to.edit_client()) {
-			Wu.DomEvent.off(this.title, 'dblclick', this.editName, this);
-			Wu.DomEvent.off(this.description, 'dblclick', this.editDescription, this);
-			this._removeResumable();
-		}
+		if (!app.access.to.edit_client()) return;
+
+		Wu.DomEvent.off(this.title, 'dblclick', this.editName, this);
+		Wu.DomEvent.off(this.description, 'dblclick', this.editDescription, this);
+		this._removeResumable();
 	},
 
 
@@ -407,6 +407,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var input = Wu.DomUtil.create('input', 'client-edit editable');
 		input.value = value;
 
+		this._clientNameInput = input;
+
 		div.innerHTML = ''; 
 		div.appendChild(input);
 
@@ -418,6 +420,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// save on blur or enter
 		Wu.DomEvent.on( target,  'blur',    this.editedName, this );     	// save title
 		Wu.DomEvent.on( target,  'keydown', this.editKeyed,  this );           // save title
+		Wu.DomEvent.on( target,  'keyup', this._checkUnique,  this );           // save title
 
 		// Google Analytics event trackign
 		app.Analytics.setGaEvent(['Side Pane', 'Clients: edit client name']);
@@ -425,7 +428,33 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	},
 
+	_markNotUnique : function () {
+		Wu.DomUtil.addClass(this._clientNameInput, 'notunique');
+		this._validName = false;
+	},
+
+	_markUnique : function () {
+		Wu.DomUtil.removeClass(this._clientNameInput, 'notunique');
+		this._validName = true;
+	},
+
+	_checkUnique : function (e) {
+		var name = this._clientNameInput.value;
+		var json = JSON.stringify({
+			value : name,
+			client : this.client.getUuid()
+		});
+
+		// post
+		Wu.post('/api/client/unique', json, function (ctx, response) {
+			var resp = Wu.parse(response);
+			resp.unique ? this._markUnique() : this._markNotUnique();
+		}.bind(this), this);
+	},
+
 	editedName : function (e) {
+
+		if (!this._validName) return;
 	
 		// revert to <div>
 		var target = e.target;
@@ -446,6 +475,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 	},
 
 	editKeyed : function (e) {
+		if (!this._validName) return;
+		
 		// blur on enter
 		if (event.which == 13 || event.keyCode == 13) e.target.blur();
 	},
