@@ -17,8 +17,7 @@ Wu.SidePane.Options.Settings = Wu.SidePane.Options.Item.extend({
 		tooltips 	: true,
 		mapboxGL	: false,
 		saveState 	: true,
-
-
+		d3popup 	: true,
 	},
 
 	initLayout : function (container) {
@@ -159,6 +158,18 @@ Wu.SidePane.Options.Settings = Wu.SidePane.Options.Item.extend({
 			app.Tooltip.add(saveState, 'Automatically save the current map state');
 
 		}
+
+		if (this.options.d3popup) {
+			console.log('d3popup');
+			
+			var d3popup = this._contentItem('d3popup', 'Custom popup');
+			wrapper.appendChild(d3popup);
+
+			// add tooltip
+			app.Tooltip.add(d3popup, 'Enable customized D3 popup (experimental)');
+
+		}
+
 
 		return wrapper;
 	},

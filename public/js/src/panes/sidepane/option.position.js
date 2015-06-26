@@ -13,6 +13,11 @@ Wu.SidePane.Options.Position = Wu.SidePane.Options.Item.extend({
 		this.panes.initPosZoomValue    	= Wu.DomUtil.get('editor-map-initpos-zoom-value');
 		this.toggled 	               	= false;
 
+		// disable input boxes
+		this.panes.initPosLatValue.setAttribute('disabled', 'disabled');
+		this.panes.initPosLngValue.setAttribute('disabled', 'disabled');
+		this.panes.initPosZoomValue.setAttribute('disabled', 'disabled');
+
 		// add tooltip
 		var h4 = this._container.getElementsByTagName('h4')[0];
 		app.Tooltip.add(h4, 'Sets the starting position of the map.');
@@ -30,10 +35,10 @@ Wu.SidePane.Options.Position = Wu.SidePane.Options.Item.extend({
 		Wu.DomEvent.on( this.panes.initPos,  'mouseup',        	this.buttonUp,    this );
 		Wu.DomEvent.on( this.panes.initPos,  'mouseleave',     	this.buttonUp,    this );
 
-		Wu.DomEvent.on( this.panes.initPos         , 'mousedown', Wu.DomEvent.stopPropagation, this );
-		Wu.DomEvent.on( this.panes.initPosLatValue , 'mousedown', Wu.DomEvent.stopPropagation, this );
-		Wu.DomEvent.on( this.panes.initPosLngValue , 'mousedown', Wu.DomEvent.stopPropagation, this );
-		Wu.DomEvent.on( this.panes.initPosZoomValue, 'mousedown', Wu.DomEvent.stopPropagation, this );
+		Wu.DomEvent.on( this.panes.initPos         , 'mousedown click', Wu.DomEvent.stop, this );
+		Wu.DomEvent.on( this.panes.initPosLatValue , 'mousedown click', Wu.DomEvent.stop, this );
+		Wu.DomEvent.on( this.panes.initPosLngValue , 'mousedown click', Wu.DomEvent.stop, this );
+		Wu.DomEvent.on( this.panes.initPosZoomValue, 'mousedown click', Wu.DomEvent.stop, this );
 
 	},
 

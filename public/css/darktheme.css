@@ -255,14 +255,14 @@ tr:nth-child(even) {
 #open-layers,
 .home-container,
 .home-container {
-	background-color: rgba(33, 33, 33, 0.9) !important;
+	background-color: rgba(35, 35, 35, 0.9) !important;
 	}
 
-.fullpage-documents .editor-wrapper,
+/*.fullpage-documents .editor-wrapper,
 .data-library .editor-wrapper,
 .fullpage-users .editor-wrapper {
 	background: rgba(33,33,33,0.9)
-	}		
+	}		*/
 
 .leaflet-control-inspect,
 .inspector-header,
@@ -824,4 +824,28 @@ blockquote {
 
 .connect-title{
 	color: #DADADA;
+}
+
+.d3-list-header{
+	background: rgba(0, 0, 0, 0.8);
+}
+
+.fullpage-users.show,.data-library.show{
+	opacity:0.96;
+}
+
+.list-line:nth-child(odd) {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.list-line:nth-child(even) {
+  background: rgba(225, 225, 225, 0.03);
+}
+
+.item-select-button{
+	background: rgba(255, 255, 255, 0.3);
+}
+
+.list-description {
+  color: #8F8F8F;
 }

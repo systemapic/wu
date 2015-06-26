@@ -122,7 +122,7 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 	options : {
 
 		clearTimer : true,
-		clearDelay : 15000,
+		clearDelay : 10000,
 		transitionDelay : 0.5, 
 		severityStyle : {
 			1 : 'message',

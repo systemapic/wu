@@ -811,7 +811,7 @@ svg.tracer {
 }
 
 .list-attribute-wrapper-access:hover{
-	background: rgba(0, 0, 0, 0.1);
+	background: rgba(0, 0, 0, 0.2);
 }
 
 .documents-container-rightpane{
@@ -869,4 +869,22 @@ svg.tracer {
 	border-bottom: 2px solid #ddd;
 	border-left: 2px solid #ddd;
 }
+
+
+
+#map-initpos-inner {
+	cursor: default !important;
+}
+
+#editor-map-initpos-lat-value, #editor-map-initpos-lng-value, #editor-map-initpos-zoom-value {
+	cursor: default;
+}
+
+
+.notunique {
+	color: red;
+}
+
+
+
 

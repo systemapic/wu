@@ -891,6 +891,10 @@ module.exports = api.pixels = {
 	
 		var imagePath = '/data/images/' + imageId;
 
+		console.log('imageId: ', imageId);
+
+		if (imageId == 'images') return res.end();
+
 		var options = {
 			height: height,
 			width : width,
