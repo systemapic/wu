@@ -46,8 +46,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	_refresh : function (hide) {
 
-		console.log('REFRRHRHHRHRHRHRHRHRHRH', this);
-
 		// should be active
 		if (!this._added) this._addTo();
 
@@ -328,7 +326,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	toggleLayerPane : function () {
 		this._open ? this.closeLayerPane() : this.openLayerPane();
-
 	},
 
 	_GAcloseLayerPane : function () {
@@ -355,15 +352,8 @@ L.Control.Layermenu = Wu.Control.extend({
 			Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
 		}	
 		
-		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		// app._map._controlCorners.topright.style.right = '140px';
-
-
 		// Adjust legends width
 		app.MapPane.getControls().legends.checkWidth();
-
-
-
 	},
 
 	// (j)
@@ -386,9 +376,6 @@ L.Control.Layermenu = Wu.Control.extend({
 			Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
 		}
 		
-		// Measure, plus Long & Lat (.leaflet-top.leaflet-right)                
-		// app._map._controlCorners.topright.style.right = '295px';                
-		
 		// If we're on mobile
 		if (app.mobile) {
 			// Check if legends is open ~ close it when opening layer menu
@@ -398,8 +385,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Adjust legends width
 		legends.checkWidth();
-
-
 
 	},
 
@@ -483,7 +468,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// remove new drag'n drop folder
 		this._removeMenuFolder();
-
 
 		// Set max height
 		var dimensions = app._getDimensions();
