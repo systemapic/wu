@@ -436,14 +436,47 @@ body {
 @media screen and (max-width: 600px){
 
 		#login-logo{
-			z-index: 0;
+			z-index: 1;
 			transform: scale(0.7, 0.7);
 			-ms-transform: scale(0.7, 0.7);
 			-webkit-transform: scale(0.7, 0.7);
 			background-position: center top;
 		}
+
+		#input-email, #input-pass, #forgot-link, #forgot-email{
+			position: relative;
+			z-index: 2;
+		}
 }
 
+@media only screen (max-width : 1024px)  { 
+
+		#login-logo{
+			transform: scale(0.8, 0.8);
+			-ms-transform: scale(0.8, 0.8);
+			-webkit-transform: scale(0.8, 0.8);
+			background-position: center top;
+		}
+
+		#input-email, #input-pass, #forgot-link, #forgot-email{
+			position: relative;
+			z-index: 2;
+		}
+}
+
+/*iPad in landscape*/
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) and (-webkit-min-device-pixel-ratio: 2) {
+	#login-forgot-wrapper{
+		padding-top: 200px;
+	}
+}
+
+/*Nexus 7 landscape*/
+@media only screen and (min-device-width : 600px) and (max-device-width : 966px) and (orientation: landscape) {
+    #login-forgot-wrapper{
+		padding-top: 25px;
+	}
+}
 
 #forgot-link {
 	font-weight: 400;
