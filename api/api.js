@@ -10,7 +10,7 @@ redisStore.on('error', console.error);
 
 // api
 var api = {};
-api.version 		= '1.0-beta';
+api.version 		= '1.0.3';
 api.config 		= config.serverConfig;
 api.clientConfig 	= config.clientConfig;
 api.loginConfig 	= config.loginConfig;
