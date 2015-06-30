@@ -22,7 +22,11 @@ function getToken() {
 window.onload = function () {
 	console.log('window.onload');
 
-	if (!checkToken()) return;
+	if (!checkToken()){
+		document.getElementById('input-email').focus();
+		document.getElementById('forgot-email').focus();
+		return;
+	} 
 
 	var options = {
 		token : getToken()
