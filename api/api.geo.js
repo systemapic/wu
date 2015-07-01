@@ -124,6 +124,20 @@ module.exports = api.geo = {
 	},
 
 
+	import2postgis : function (files, callback) {
+
+
+		
+		// var returnObject = {
+		// 	path : outFile, 
+		// 	name : toFile, 
+		// 	fileUuid : fileUuid
+		// }
+
+		callback(null, returnObject);
+	},
+
+	// new way: postgis!
 	handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
 		if (!folder || !name || !fileUuid) return callback('Missing info.');
 
@@ -141,15 +155,20 @@ module.exports = api.geo = {
 				api.geo.validateshp(files, done);
 			});
 
-			// convert shapefile to geo/topojson
+			// import into postgis
 			ops.push(function (done) {
-				api.geo.convertshp(files, folder, done);
+				api.geo.import2postgis(files, done);
 			});
+
+			// // convert shapefile to geo/topojson
+			// ops.push(function (done) {
+			// 	api.geo.convertshp(files, folder, done);
+			// });
 
 			// run async jobs
 			async.series(ops, function (err, results) {
 				if (err) {
-					// console.log('MOFO!!'.red, err);
+					console.log('MOFO!!'.red, err);
 					return callback(err);
 				}
 
@@ -173,29 +192,109 @@ module.exports = api.geo = {
 					file : fileUuid
 				}
 
-				api.geo.copyToVileFolder(path, fileUuid, function (err) {
-					if (err) return callback('copytToVile err: ' + err);
+				// todo: meta from postgis
 
-					try {
-						// read meta from file
-				        	mapnikOmnivore.digest(path, function (err, metadata) {
-				        		if (err) {
-				        			console.log('ERR 400', err);
-				        			return callback(err);
-				        		}
-				        		if (!metadata) return callback('No metadata!');
+				// return
+				callback(null, db);
 
-				        		db.metadata = JSON.stringify(metadata);
+				// api.geo.copyToVileFolder(path, fileUuid, function (err) {
+				// 	if (err) return callback('copytToVile err: ' + err);
+
+				// 	try {
+				// 		// read meta from file
+				//         	mapnikOmnivore.digest(path, function (err, metadata) {
+				//         		if (err) {
+				//         			console.log('ERR 400', err);
+				//         			return callback(err);
+				//         		}
+				//         		if (!metadata) return callback('No metadata!');
+
+				//         		db.metadata = JSON.stringify(metadata);
 					        	
-					        	// return
-					        	callback(null, db);
-				        	});
+				// 	        	// return
+				// 	        	callback(null, db);
+				//         	});
 
-				        } catch (e) { callback('meta fail: ' + e); }
-		        	});
+				//         } catch (e) { callback('meta fail: ' + e); }
+		  //       	});
 			});
 		});
 	},
+
+
+	// old way, with files
+	// handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
+	// 	if (!folder || !name || !fileUuid) return callback('Missing info.');
+
+	// 	fs.readdir(folder, function (err, files) {
+	// 		if (err || !files) return callback('Some files were rejected. Please upload <br>only one shapefile per zip.');
+
+	// 		// clone array
+	// 		var shapefiles = files.slice();
+
+	// 		// async ops
+	// 		var ops = [];
+
+	// 		// check if valid shapefile(s)
+	// 		ops.push(function (done) {
+	// 			api.geo.validateshp(files, done);
+	// 		});
+
+	// 		// convert shapefile to geo/topojson
+	// 		ops.push(function (done) {
+	// 			api.geo.convertshp(files, folder, done);
+	// 		});
+
+	// 		// run async jobs
+	// 		async.series(ops, function (err, results) {
+	// 			if (err) {
+	// 				// console.log('MOFO!!'.red, err);
+	// 				return callback(err);
+	// 			}
+
+	// 			var key = results[1];
+	// 			if (!key) return callback('No key.');
+
+	// 			var path = key.path;
+	// 			var name = key.name;
+	// 			var fileUuid = key.fileUuid;
+
+	// 			// add geojson file to list
+	// 			shapefiles.push(name);
+
+	// 			// return as db entry
+	// 			var db = {
+	// 				files : shapefiles,
+	// 				data : {
+	// 					geojson : name
+	// 				},
+	// 				title : name,
+	// 				file : fileUuid
+	// 			}
+
+	// 			api.geo.copyToVileFolder(path, fileUuid, function (err) {
+	// 				if (err) return callback('copytToVile err: ' + err);
+
+	// 				try {
+	// 					// read meta from file
+	// 			        	mapnikOmnivore.digest(path, function (err, metadata) {
+	// 			        		if (err) {
+	// 			        			console.log('ERR 400', err);
+	// 			        			return callback(err);
+	// 			        		}
+	// 			        		if (!metadata) return callback('No metadata!');
+
+	// 			        		db.metadata = JSON.stringify(metadata);
+					        	
+	// 				        	// return
+	// 				        	callback(null, db);
+	// 			        	});
+
+	// 			        } catch (e) { callback('meta fail: ' + e); }
+	// 	        	});
+	// 		});
+	// 	});
+	// },
 
 
 
