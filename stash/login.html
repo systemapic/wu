@@ -83,8 +83,28 @@
 
 <body style="margin: 0; padding: 0;">
 
+<!-- JSON-LD Script for google mail actions-->
+<script type="application/ld+json">
+   {
+      "@context":       "http://schema.org",
+      "@type":          "EmailMessage",
+      "description":    "Welcome to Systemapic, view your account now!",
+      "potentialAction": {
+        "@type": "ViewAction",
+        "target":   "https://dev.systemapic.com/login",
+        "name": "View your account"
+      },
+    "publisher": 
+    {
+       "@type": "Organization",
+       "name": "Systemapic",
+       "url": "https://systemapic.com"
+    }
+  }
+</script>
+
 <!-- HEADER -->
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">
     <tr>
         <td bgcolor="#313640" >
             <div align="center" style="padding: 0px 10px 0px 10px;">
@@ -158,7 +178,7 @@
 </table>
 
 <!-- FOOTER -->
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">
     <tr bgcolor="#EBEAE8">
         <td align="center">
             <table width="500" border="0" cellspacing="0" cellpadding="10" align="center" class="responsive-table">
