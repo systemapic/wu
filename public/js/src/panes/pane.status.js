@@ -103,6 +103,33 @@ Wu.StatusPane = Wu.Class.extend({
 		// Mobile option
 		if (app.mobile) this._openMobile();
 
+		// events for auto-closing of sidepane. clicking on map/header pane collapses the sidepane
+		this._addAutoCloseEvents();
+
+	},
+
+	_addAutoCloseEvents : function () {
+
+		//console.log('_addAutoCloseEvents');
+
+		var mapPaneDiv = app.MapPane._container; // mapPaneDiv = Wu.DomUtil.get('map'); or document.getElementById('map');
+		Wu.DomEvent.on(mapPaneDiv, 'click', this.close, this);
+
+		var headerPaneDiv = app.HeaderPane._container;
+		Wu.DomEvent.on(headerPaneDiv, 'click', this.close, this);
+
+	},
+
+	_removeAutoCloseEvents : function () {
+
+		//console.log('_removeAutoCloseEvents');
+
+		var mapPaneDiv = app.MapPane._container; // mapPaneDiv = Wu.DomUtil.get('map'); or document.getElementById('map');
+		Wu.DomEvent.off(mapPaneDiv, 'click', this.close, this);
+
+		var headerPaneDiv = app.HeaderPane._container;
+		Wu.DomEvent.off(headerPaneDiv, 'click', this.close, this);
+
 	},
 
 	// close sidepane menu
@@ -126,6 +153,9 @@ Wu.StatusPane = Wu.Class.extend({
 		if (app.mobile) this._closeMobile();
 
 		this._hideDescription();
+
+		// unregister auto-close events
+		this._removeAutoCloseEvents();
 	},
 
 	_hideDescription : function () {
