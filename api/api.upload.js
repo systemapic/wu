@@ -122,6 +122,7 @@ module.exports = api.upload = {
 
 		// import file
 		ops.push(function (stats, callback) {
+			
 			var file = {
 				path : options.outputPath,
 				size : stats.size,
