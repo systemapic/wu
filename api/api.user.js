@@ -250,7 +250,16 @@ module.exports = api.user = {
 		ops.push(function (options, callback) {
 			if (!options || !options.subject) return callback('Missing information.7');
 
+			var deletedUser = options.subject;
+			console.log('deletedUser: ', deletedUser);
+			var token = deletedUser.token; // ?
+
+			console.log('tokenL ', token);
+
+			api.redis.del(token); // works?
+
 			options.subject.remove(callback);
+
 		});
 
 		async.waterfall(ops, function (err, user) {
