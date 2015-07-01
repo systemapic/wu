@@ -69,6 +69,34 @@ Wu.SidePane.Options.Bounds = Wu.SidePane.Options.Item.extend({
 		// todo!!!
 	},
 
+
+	open : function () {
+		this.calculateHeight();
+		this._outer.style.height = this.maxHeight + 20 + 'px';       
+		this._open(); // local fns   
+		this._isOpen = true;
+
+		if (app._pendingClose && app._pendingClose != this) {
+			app._pendingClose.close();
+		}
+		app._pendingClose = this;
+		//when bounds is open the sidepane should not collapse by clicking on map/headerpane
+		app.StatusPane._removeAutoCloseEvents();
+	},
+
+
+	close : function () {   				// perhaps todo: now it's closing every pane, cause addHooks been run 6 times.
+		// console.log('close ', this.type);		// set this to app._pendingclose here for just one close... 
+		this.calculateHeight();
+		this._outer.style.height = this.minHeight + 'px';        
+		this._close();
+		this._isOpen = false;
+		app._pendingClose = false;
+		if (app._timerOpen) clearTimeout(app._timerOpen);
+		app.StatusPane._addAutoCloseEvents();
+	},
+
+	
 	setBounds : function (e) {
 		
 		// get actual Project object
