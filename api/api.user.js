@@ -250,14 +250,12 @@ module.exports = api.user = {
 		ops.push(function (options, callback) {
 			if (!options || !options.subject) return callback('Missing information.7');
 
+			//deleting token 
 			var deletedUser = options.subject;
-			console.log('deletedUser: ', deletedUser);
-			var token = deletedUser.token; // ?
+			var token = deletedUser.token; 
+			api.redis.del(token); 
 
-			console.log('tokenL ', token);
-
-			api.redis.del(token); // works?
-
+			//removing the whole user
 			options.subject.remove(callback);
 
 		});
