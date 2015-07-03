@@ -183,8 +183,8 @@ Wu.SidePane.Clients = Wu.SidePane.Item.extend({
 		var that = this;
 		this._timer = setTimeout(function() {
 			// var name = Wu.DomUtil.get('editor-client-name-new'),
-			var name = this._newClient._NameInput,
-			    slug = Wu.Util.trimAll(name.value).toLowerCase(),
+			var name = this._newClient._NameInput.value,
+			    slug = Wu.Util.trimAll(name).toLowerCase(),
 			    json = JSON.stringify({ 'slug' : slug}),
 			    path = '/api/client/unique';
 
