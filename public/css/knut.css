@@ -267,6 +267,10 @@ body {
 .menufolder {
 	background-color: #3C4759 !important; 
 	color: white !important;
+ 	background-image: url(images/folder_img.png);
+ 	background-size: 25px;
+	background-position: 5% 50%;;
+  	background-repeat: no-repeat;
 	}
 
 
