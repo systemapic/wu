@@ -255,7 +255,9 @@ module.exports = api.client = {
 	// check if slug is unique
 	checkUniqueSlug : function (req, res) {
 		var slug = req.body.value;
-		if (slug.toLowerCase) slug = slug.toLowerCase();
+		if (slug && slug.toLowerCase) {
+			slug = slug.toLowerCase();
+		}
 		console.log('slug', slug);
 		
 		Clientel
