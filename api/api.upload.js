@@ -1,4 +1,5 @@
 //API: api.upload.js
+
 // database schemas
 var Project 	= require('../models/project');
 var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
@@ -252,10 +253,10 @@ module.exports = api.upload = {
 			});
 
 
-			if (opts.isGeojson || opts.isRaster) api.file._sendToProcessing(opts, function (err, result) { // todo: do per file
+			// if (opts.isGeojson || opts.isRaster) api.file._sendToProcessing(opts, function (err, result) { // todo: do per file
 
-				// done processing
-			});
+			// 	// done processing
+			// });
 
 			done(null, pack);
 
@@ -437,6 +438,33 @@ module.exports = api.upload = {
 					});
 				}
 
+				if (extension == 'geojson') {
+
+					ops1.push(function (callback) {
+
+						// processes geojson, puts file in folder
+						api.file.handleJson(options.path, options.name, options.extension, options.fileUuid, function (err, db) {
+							if (err) {
+								console.log('ERR 301'.red, err);
+								api.error.log(err);
+								return callback('Unable to handle geojson format properly. Please see #error-log for details.')
+							}
+							
+							// populate db entry
+							db = db || {};
+							db.name = options.name;
+							db.file = options.fileUuid;
+							db.type = 'Layer';
+							db.files = [options.name];
+
+							// return db
+							callback(null, db);
+						});
+					});
+				}
+
+
+
 
 				// handle images
 				if (extension == 'jpg' || extension == 'tiff' || extension == 'png' || extension == 'jpeg') {
@@ -493,32 +521,7 @@ module.exports = api.upload = {
 
 				}
 				
-				if (extension == 'geojson') {
-
-					ops1.push(function (callback) {
-
-						// processes geojson, puts file in folder
-						api.file.handleJson(options.path, options.name, options.extension, options.fileUuid, function (err, db) {
-							if (err) {
-								console.log('ERR 301'.red, err);
-								api.error.log(err);
-								return callback('Unable to handle geojson format properly. Please see #error-log for details.')
-							}
-							
-							// populate db entry
-							db = db || {};
-							db.name = options.name;
-							db.file = options.fileUuid;
-							db.type = 'Layer';
-							db.files = [options.name];
-
-							// return db
-							callback(null, db);
-						});
-					});
-				}
-
-
+				
 				if (extension == 'doc' || extension == 'pdf' || extension == 'docx' || extension == 'txt') {
 
 					ops1.push(function (callback) {
