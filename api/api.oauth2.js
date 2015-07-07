@@ -67,8 +67,7 @@ var oauth2server = oauth2orize.createServer();
 module.exports = api.oauth2 = { 
 
 	calculateExpirationDate : function () {
-		console.log('caluculateExpirationDate');
-		return new Date(new Date().getTime() + (this.expiresIn * 1000));
+		return new Date(new Date().getTime() + (api.config.token.expiresIn * 1000));
 	},
 
 	util : {
@@ -252,7 +251,38 @@ module.exports = api.oauth2 = {
 
 }
 
+/**
+ * Exchange the refresh token for an access token.
+ *
+ * The callback accepts the `client`, which is exchanging the client's id from the token
+ * request for verification.  If this value is validated, the application issues an access
+ * token on behalf of the client who authorized the code
+ */
+oauth2server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, done) {
 
+  console.log('oauth2.js > refresh token!'.red);
+
+  api.oauth2.store.refreshTokens.find(refreshToken, function (err, authCode) {
+    if (err) {
+      return done(err);
+    }
+    if (!authCode) {
+      return done(null, false);
+    }
+    if (client.id !== authCode.clientID) {
+      return done(null, false);
+    }
+    var token = api.oauth2.util.uid(api.config.token.accessTokenLength);
+    api.oauth2.store.accessTokens.save(token, api.oauth2.calculateExpirationDate(), authCode.userID, authCode.clientID, authCode.scope, function (err) {
+      if (err) {
+        return done(err);
+      }
+      return done(null, token, null, {expires_in: api.config.token.expiresIn});
+    });
+  });
+}));
+
+// bearer token
 oauth2server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, done) {
 	//Validate the user
 
@@ -270,9 +300,7 @@ oauth2server.exchange(oauth2orize.exchange.password(function (client, username, 
 		var token = api.oauth2.util.uid(api.config.token.accessTokenLength);
 
 		// save access_token
-		api.oauth2.store.accessTokens.save(token, function () {
-			return new Date(new Date().getTime() + (api.config.token.expiresIn * 1000));
-		}, user.id, client.id, scope, function (err) {
+		api.oauth2.store.accessTokens.save(token, api.oauth2.calculateExpirationDate(), user.id, client.id, scope, function (err) {
 			if (err) return done(err);
 			
 			var refreshToken = null;
