@@ -261,33 +261,32 @@ oauth2server.exchange(oauth2orize.exchange.password(function (client, username, 
 		
 		if (!user) return done(null, false);
 		
-
-		// if (password !== user.password) {
+		// check password against stored hash
 		if (!user.validPassword(password)) {
 			return done(null, false);
 		}
-		
+
+		// create access_token
 		var token = api.oauth2.util.uid(api.config.token.accessTokenLength);
 
+		// save access_token
 		api.oauth2.store.accessTokens.save(token, function () {
-			return new Date(new Date().getTime() + (3600 * 1000));
+			return new Date(new Date().getTime() + (api.config.token.expiresIn * 1000));
 		}, user.id, client.id, scope, function (err) {
-			if (err) {
-				return done(err);
-			}
+			if (err) return done(err);
+			
 			var refreshToken = null;
 			//I mimic openid connect's offline scope to determine if we send
 			//a refresh token or not
 			if (scope && scope.indexOf("offline_access") === 0) {
 				refreshToken = api.oauth2.util.uid(api.config.token.refreshTokenLength);
 				api.oauth2.store.refreshTokens.save(refreshToken, user.id, client.id, scope, function (err) {
-					if (err) {
-						return done(err);
-					}
+					if (err) return done(err);
+					
 					return done(null, token, refreshToken, {expires_in: api.config.token.expiresIn});
 				});
 			} else {
-				return done(null, token, refreshToken, {expires_in: config.token.expiresIn});
+				return done(null, token, refreshToken, {expires_in: api.config.token.expiresIn});
 			}
 		});
 	});
