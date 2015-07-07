@@ -629,17 +629,17 @@ module.exports = function(app, passport) {
 	// 	user ? req.res.end(user.lastName) : req.res.end(null);
 	// }));
 
-	app.get('/loginCheck', function(req, res, next) {
-		passport.authenticate('local-login-direct', function(err, user, info) {
-			if (err || !user) return res.end(null);
+	// app.get('/loginCheck', function(req, res, next) {
+	// 	passport.authenticate('local-login-direct', function(err, user, info) {
+	// 		if (err || !user) return res.end(null);
 
-			req.logIn(user, function(err) {
-				if (err) return res.end(null);
-				return res.redirect('/');
-			});
+	// 		req.logIn(user, function(err) {
+	// 			if (err) return res.end(null);
+	// 			return res.redirect('/');
+	// 		});
 		
-		})(req, res, next);
-	});
+	// 	})(req, res, next);
+	// });
 
 
 	// app.post('/debugSetPassword', function (req, res) {

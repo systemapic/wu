@@ -346,7 +346,7 @@ Wu.Util = {
 		http.setRequestHeader("Content-type", "application/json");
 
 		// set access_token on header
-		http.setRequestHeader("Authorization", "Bearer " + )
+		http.setRequestHeader("Authorization", "Bearer " + 'lkasmdlasdkmldaskm')
 
 		http.onreadystatechange = function() {
 			if(http.readyState == 4 && http.status == 200) {
