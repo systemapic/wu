@@ -53,8 +53,7 @@ module.exports = function(app, passport) {
 	// ================================
 	// this works!
 	app.get('/api/userinfo', passport.authenticate('bearer', {session: false}), function(req, res) {
-		console.log('valid!');
-		res.json({user_id: req.user.id, name: req.user.firstName, scope: req.authInfo.scope});
+		res.json({user : req.user, user_id: req.user.id, name: req.user.firstName, scope: req.authInfo.scope});
 	});
 
 

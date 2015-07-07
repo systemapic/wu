@@ -337,7 +337,6 @@ Wu.Util = {
 	post : function (path, json) {
 		var that = this,
 		    http = new XMLHttpRequest(),
-		    // url = window.location.origin;
 		    url = Wu.Util._getServerUrl(); 
 		url += path;
 		
@@ -345,6 +344,9 @@ Wu.Util = {
 
 		//Send the proper header information along with the request
 		http.setRequestHeader("Content-type", "application/json");
+
+		// set access_token on header
+		http.setRequestHeader("Authorization", "Bearer " + )
 
 		http.onreadystatechange = function() {
 			if(http.readyState == 4 && http.status == 200) {
