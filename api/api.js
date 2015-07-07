@@ -8,6 +8,10 @@ var redisStore = require('redis').createClient(config.serverConfig.temptokenRedi
 redisStore.auth(config.serverConfig.temptokenRedis.auth);
 redisStore.on('error', console.error);
 
+// // oauth2 server
+// var oauth2orize = require('oauth2orize');
+// var oauth2server = oauth2orize.createServer();
+
 // api
 var api = {};
 api.version 		= '1.0.3';
@@ -15,6 +19,7 @@ api.config 		= config.serverConfig;
 api.clientConfig 	= config.clientConfig;
 api.loginConfig 	= config.loginConfig;
 api.redis 		= redisStore;
+// api.oauth2server 	= oauth2server;
 
 // exports
 module.exports 		= api;
@@ -22,6 +27,7 @@ module.exports.geo 	= require('./api.geo');
 module.exports.file 	= require('./api.file');
 module.exports.auth 	= require('./api.auth');
 module.exports.user 	= require('./api.user');
+module.exports.oauth2   = require('./api.oauth2');
 module.exports.layer 	= require('./api.layer');
 module.exports.email 	= require('./api.email');
 module.exports.error 	= require('./api.error');

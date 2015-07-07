@@ -42,6 +42,22 @@ module.exports = function(app, passport) {
 	});
 
 
+	// ================================
+	// OAUTH2: Get Token ==============
+	// ================================
+	app.post('/oauth/token', api.oauth2.getToken);
+
+
+	// ================================
+	// OAUTH2: Get Token ==============
+	// ================================
+	// this works!
+	app.get('/api/userinfo', passport.authenticate('bearer', {session: false}), function(req, res) {
+		console.log('valid!');
+		res.json({user_id: req.user.id, name: req.user.firstName, scope: req.authInfo.scope});
+	});
+
+
 	// =====================================
 	// GET WHOLE SETUP FOR PORTAL ==========
 	// =====================================
