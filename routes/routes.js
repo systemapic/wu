@@ -59,7 +59,6 @@ module.exports = function(app, passport) {
 		res.json({user : req.user, user_id: req.user.id, name: req.user.firstName, scope: req.authInfo.scope});
 	});
 
-	
 
 	// =====================================
 	// GET WHOLE SETUP FOR PORTAL ==========
@@ -106,33 +105,24 @@ module.exports = function(app, passport) {
 	});
 
 
-
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
-	// app.post('/api/chunked/upload', isLoggedIn, function (req, res) {
-	// 	console.log('XXX POST /api/chunked/upload'.yellow, req.body);
-	// 	// api.upload.chunkedUpload(req, res);
-	// });
-
-	// =====================================
-	// RESUMABLE.js UPLOADS ================
-	// =====================================
-	app.get('/api/upload', isLoggedIn, function (req, res) {
+	app.get('/api/upload', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.chunkedCheck(req, res);
 	});
 
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
-	app.get('/download/:identifier', isLoggedIn, function (req, res) {
+	app.get('/download/:identifier', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.chunkedIdent(req, res);
 	});
 
 	// =====================================
 	// UPLOAD DATA LIBRARY FILES ===========
 	// =====================================
-	app.post('/api/upload', isLoggedIn, function (req, res) {
+	app.post('/api/upload', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.chunkedUpload(req, res);
 	});
 	
@@ -201,6 +191,7 @@ module.exports = function(app, passport) {
 		api.upload.image(req, res);
 	});
 
+	// todo: access_tokens for all images.. lots of code to update client side tho..
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
@@ -274,14 +265,6 @@ module.exports = function(app, passport) {
 	});
 
 
-	// // =====================================
-	// // UPLOAD DATA LIBRARY FILES ===========
-	// // =====================================
-	// app.post('/api/upload', isLoggedIn, function (req, res) {
-	// 	api.upload.file(req, res);
-	// });
-
-	
 	// =====================================
 	// GET MAPBOX ACCOUNT ==================
 	// =====================================
@@ -334,7 +317,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// GET FILE DOWNLOAD ===================
 	// =====================================
-	app.get('/api/file/download', isLoggedIn, function (req, res) {
+	app.get('/api/file/download', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.file.download(req, res);
 	});
 
@@ -517,20 +500,6 @@ module.exports = function(app, passport) {
 	});
 
 
-	// // =====================================
-	// // RESET PASSWORD ======================
-	// // ===================================== 
-	// app.get('/reset', function (req, res) {
-	// 	api.auth.confirmPasswordReset(req, res);
-	// });
-
-	// // =====================================
-	// // SERVE CREATE PASSWORD PAGE ==========
-	// // ===================================== 
-	// app.get('/createPassword', function (req, res) {
-	// 	api.auth.servePasswordPage(req, res);
-	// });
-
 	// =====================================
 	// CREATE PASSWORD =====================
 	// ===================================== 
@@ -566,14 +535,6 @@ module.exports = function(app, passport) {
 		res.end(configString);
 	});
 
-
-
-	// // =====================================
-	// // DEBUG: CREATE ROLE ==================
-	// // ===================================== 
-	// app.post('/api/debug/createRole', isLoggedIn, function (req, res) {
-	// 	api.debug.createRole(req, res);
-	// });
 
 	// =====================================
 	// DEBUG: PHANTOMJS FEEDBACK ===========
@@ -625,30 +586,6 @@ module.exports = function(app, passport) {
 		failureRedirect : '/login', // redirect back to the signup page if there is an error
 		failureFlash : true // allow flash messages
 	}));
-
-	// app.post('/loginCheck', passport.authenticate('local-login-direct', function (err, user, req) {
-	// 	if (err || !req.res) return; // todo: hanging request 
-		
-	// 	// return status
-	// 	user ? req.res.end(user.lastName) : req.res.end(null);
-	// }));
-
-	// app.get('/loginCheck', function(req, res, next) {
-	// 	passport.authenticate('local-login-direct', function(err, user, info) {
-	// 		if (err || !user) return res.end(null);
-
-	// 		req.logIn(user, function(err) {
-	// 			if (err) return res.end(null);
-	// 			return res.redirect('/');
-	// 		});
-		
-	// 	})(req, res, next);
-	// });
-
-
-	// app.post('/debugSetPassword', function (req, res) {
-	// 	api.auth.debugSetPassword(req, res);
-	// });
 
 
 	// =====================================

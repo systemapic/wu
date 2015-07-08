@@ -42,10 +42,6 @@ module.exports = api.socket = {
 
 	_processing : {},
 
-	// send : function (options) {
-
-	// },
-
 	sendError : function (userId, err) {
 		var sock = api.socket._getSocket(userId);
 
@@ -56,7 +52,6 @@ module.exports = api.socket = {
 	},
 
 	uploadDone : function (options) {
-		// console.log('uploadDone'.yellow);
 
 		// get socket
 		var socket = api.socket.getSocket(options);
@@ -141,9 +136,6 @@ module.exports = api.socket = {
 	},
 
 
-
-
-
 	getSocket : function (options) {
 		var userId = api.socket._getUserId(options);
 		var sock = api.socket._getSocket(userId);
@@ -172,27 +164,11 @@ module.exports = api.socket = {
 	},
 
 	setProcessing : function (process) {
-		// console.log('setProce2sing'.green, process);
-		// console.log('============== SETPROCESSING ==============');
-		// console.log('============== SETPROCESSING ==============');
-		// console.log('============== SETPROCESSING ==============');
-		// console.log('============== fileUuid: ' + process.fileUuid + ' ==============');
-
-		console.log('SOCKET: setProcessing');
-
 		this._processing[process.fileUuid] = process;
 		this._processing[process.fileUuid]._timestamp = new Date().getTime();
 	},
 
 	_getProcessing : function (id) {
-		// console.log('GET processing'.green, process);
-		// console.log('============== GETPROCESSING ==============');
-		// console.log('============== GETPROCESSING ==============');
-		// console.log('============== GETPROCESSING ==============');
-		// console.log('============== id: ' + id + ' ==============');
-
-		console.log('SOCKET: getProcessing');
-
 		return this._processing[id];
 	},
 
