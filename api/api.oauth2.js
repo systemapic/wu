@@ -286,6 +286,8 @@ oauth2server.exchange(oauth2orize.exchange.refreshToken(function (client, refres
 oauth2server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, done) {
 	//Validate the user
 
+	console.log('exchange passwrod!!!!', client, username, password); // this is run on /oauth/token POST
+
 	api.oauth2.store.users.findByUsername(username, function (err, user) {
 		if (err) return done(err);
 		

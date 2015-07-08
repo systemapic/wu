@@ -57,6 +57,7 @@ module.exports = api.portal = {
 			req.session.hotlink = hotlink;
 			res.render('../../views/app.serve.ejs', {
 				hotlink : hotlink || {},
+				access_token : req.session.access_token || {}
 			});
 		} else {
 			// redirect to login with hotlink embedded
@@ -87,9 +88,31 @@ module.exports = api.portal = {
 		// return if not logged in 			
 		if (!req.isAuthenticated()) return res.render('../../views/index.ejs'); 
 		
+		// create access token TODO: hacky, rewrite errything
+		var authCode = {
+			scope : '*',
+			userID : req.user._id,
+			clientID : 1,
+			expires_in : api.oauth2.calculateExpirationDate()
+		}
+		var token = api.oauth2.util.uid(api.config.token.accessTokenLength);
+		api.oauth2.store.accessTokens.save(token, authCode.expires_in, authCode.userID, authCode.clientID, authCode.scope, console.log);
+
+		var access_token = {
+			access_token : token,
+			expires_in : authCode.expires_in,
+			scope : authCode.scope
+		}
+
+		console.log('access_token'.red, access_token);
+		console.log('hotlink: ', req.session.hotlink);
+
+		req.session.access_token = access_token;
+
 		// render app html				
 		res.render('../../views/app.serve.ejs', {
-			hotlink : req.session.hotlink
+			hotlink : req.session.hotlink,
+			access_token : access_token
 		});
 
 		// reset hotlink
@@ -146,6 +169,20 @@ module.exports = api.portal = {
 			// add user account
 			result.account = account;
 
+			console.log('req.body', req.body);
+
+			var gzip = true;
+			if (req.body.gzip === false) {
+				gzip = false;
+			}
+
+
+			// var dontZip = JSON.parse(req.body).dontZip;
+
+			// console.log('dontZip? ', dontZip, req.body);
+			
+			// if (dontZip) return res.json(result);
+			if (!gzip) return res.json(result);
 			// return result gzipped
 			res.writeHead(200, {'Content-Type': 'application/json', 'Content-Encoding': 'gzip'});
 			zlib.gzip(JSON.stringify(result), function (err, zipped) {

@@ -18,6 +18,12 @@ Wu.App = Wu.Class.extend({
 		// set global this
 		Wu.app = window.app = this;
 
+		// set access token
+		app.access_token = window.access_token.access_token;
+
+		// debug
+		this.debugAccessToken();
+
 		app.Socket = new Wu.Socket();
 
 		// error handling
@@ -37,6 +43,17 @@ Wu.App = Wu.Class.extend({
 
 		// Detect mobile devices
 		this.detectMobile();
+	},
+
+	debugAccessToken : function () {
+
+		var access_token = app.access_token;
+		console.log('debugAccessToken: access_token: ', access_token);
+
+		Wu.send('/api/userinfo', {}, function (err, body) {
+			console.log('err, body', err, body);
+		})
+
 	},
 
 	_initErrorHandling : function () {
@@ -79,7 +96,7 @@ Wu.App = Wu.Class.extend({
 		// set vars
 		this.options.json = portalStore;
 
-		// accesss
+		// access
 		this._initAccess();
 
 		// init global events
