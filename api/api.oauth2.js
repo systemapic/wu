@@ -39,7 +39,7 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
-
+// oauth2 libs
 var oauth2orize = require('oauth2orize');
 var passport = require('passport');
 var login = require('connect-ensure-login');
@@ -60,7 +60,6 @@ var clients = [
 ];
 
 // oauth2 server
-var oauth2orize = require('oauth2orize');
 var oauth2server = oauth2orize.createServer();
 
 // exports
@@ -260,34 +259,30 @@ module.exports = api.oauth2 = {
  */
 oauth2server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, done) {
 
-  console.log('oauth2.js > refresh token!'.red);
+	console.log('oauth2.js > refresh token!'.red);
 
-  api.oauth2.store.refreshTokens.find(refreshToken, function (err, authCode) {
-    if (err) {
-      return done(err);
-    }
-    if (!authCode) {
-      return done(null, false);
-    }
-    if (client.id !== authCode.clientID) {
-      return done(null, false);
-    }
-    var token = api.oauth2.util.uid(api.config.token.accessTokenLength);
-    api.oauth2.store.accessTokens.save(token, api.oauth2.calculateExpirationDate(), authCode.userID, authCode.clientID, authCode.scope, function (err) {
-      if (err) {
-        return done(err);
-      }
-      return done(null, token, null, {expires_in: api.config.token.expiresIn});
-    });
-  });
+	api.oauth2.store.refreshTokens.find(refreshToken, function (err, authCode) {
+		if (err) return done(err);
+		
+		if (!authCode) return done(null, false);
+		
+		if (client.id !== authCode.clientID) return done(null, false);
+		
+		// create token
+		var token = api.oauth2.util.uid(api.config.token.accessTokenLength);
+		api.oauth2.store.accessTokens.save(token, api.oauth2.calculateExpirationDate(), authCode.userID, authCode.clientID, authCode.scope, function (err) {
+			if (err) return done(err);
+			return done(null, token, null, {expires_in: api.config.token.expiresIn});
+		});
+	});
 }));
 
 // bearer token
 oauth2server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, done) {
-	//Validate the user
 
 	console.log('exchange passwrod!!!!', client, username, password); // this is run on /oauth/token POST
 
+	//Validate the user
 	api.oauth2.store.users.findByUsername(username, function (err, user) {
 		if (err) return done(err);
 		
