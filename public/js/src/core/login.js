@@ -1,26 +1,20 @@
 var feedbackTimer;
 
-function initScripts() {
-	spin();
-	checkmobile();
-	addhooks();
-
-	// if token, password time
-	checkToken() ? showCreatePassword() : showLogin();
-}
-
-function checkToken() {
-	var token = getToken();
-	return token && token.length > 38;
-}
-
-function getToken() {
-	var token = window.location.search.split('=')[1];
-	return token;
-}
-
 window.onload = function () {
 	console.log('window.onload');
+
+	  // We need to access the form element
+	  var form = document.getElementById("login-form");
+
+	  // // to takeover its submit event.
+	  // form.addEventListener("submit", function (event) {
+	  //   event.preventDefault();
+
+	  //   console.log('login form submit click!');
+
+	  //   // sendData();
+	  //   getAccessToken();
+	  // });
 
 	if (!checkToken()){
 		document.getElementById('input-email').focus();
@@ -50,6 +44,109 @@ window.onload = function () {
 	});
 
 }
+
+function initScripts() {
+	spin();
+	checkmobile();
+	addhooks();
+
+	// if token, password time
+	checkToken() ? showCreatePassword() : showLogin();
+}
+
+function checkToken() {
+	var token = getToken();
+	return token && token.length > 38;
+}
+
+function getToken() {
+	var token = window.location.search.split('=')[1];
+	return token;
+}
+
+function getAccessToken() {
+
+	var username = document.getElementById('input-email').value;
+	var password = document.getElementById('input-pass').value
+
+	console.log('getAccessToken u/p; ', username, password);
+
+	var options = {
+		grant_type : 'password',
+		username : username,
+		password : password,
+		scope : 'offline_access'
+	}
+
+	sendAccessTokenRequest('/oauth/token', options, function (err, body) {
+		console.log('access token return, err, body', err, body);
+
+		if (err) return console.log(err);
+
+		var result = JSON.parse(body);
+
+		if (result.error) return console.log(result);
+
+		var access_token = result.access_token;
+		console.log('Access token: ', access_token);
+		window.access_token = access_token;
+
+		if (window.access_token) {
+			// make GET request with access token
+
+			// setTimeout(getPortal, 1000);
+
+			var url = 'https://dev.systemapic.com/?access_token=' + window.access_token;
+
+			console.log('url: ', url);
+			setTimeout(function () {
+				window.location.href = url;
+			}, 1000);
+		}
+
+	});	
+}
+
+
+function getPortal() {
+	console.log('getPortal');
+
+	var url = window.location.origin + '/portal';
+	var http = new XMLHttpRequest();
+	http.open( "GET", url, false );
+	http.setRequestHeader('Authorization', 'Bearer ' + window.access_token); 
+	http.send( null );
+	return http.responseText;
+
+	// var http = new XMLHttpRequest(),
+	//     url = window.location.origin + '/portal';
+	// http.open("GET", url, true);
+	// http.setRequestHeader('Content-type', 'application/json');
+	// http.setRequestHeader('Authorization', 'Bearer ' + window.access_token); 
+	// http.onreadystatechange = function() {
+	// 	if (http.readyState == 4) {
+	// 		callback && callback(null, http.responseText); 
+	// 	} 
+	// }
+	// http.send(JSON.stringify(options));
+
+}
+
+function sendAccessTokenRequest(entryPoint, options, callback) {
+	var http = new XMLHttpRequest(),
+	    url = window.location.origin + entryPoint;
+	http.open("POST", url, true);
+	http.setRequestHeader('Content-type', 'application/json');
+	http.setRequestHeader('Authorization', 'Basic YWJjMTIzOnNzaC1zZWNyZXQ=');
+	http.onreadystatechange = function() {
+		if (http.readyState == 4) {
+			callback && callback(null, http.responseText); 
+		} 
+	}
+	http.send(JSON.stringify(options));
+}
+
+
 
 function spin() {
 

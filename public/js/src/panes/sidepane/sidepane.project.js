@@ -175,7 +175,8 @@ Wu.SidePane.Project = Wu.Class.extend({
 			testChunks : false, // turn off resume on small upload
 			query : {
 				imageUuid : Wu.Util.guid('image'),
-				projectUuid : projectUuid
+				projectUuid : projectUuid,
+				access_token : app.access_token
 			},
 
 			// max file size (less than one chunk means only one chunk)
