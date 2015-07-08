@@ -20,6 +20,7 @@ Wu.App = Wu.Class.extend({
 
 		// set access token
 		app.access_token = window.access_token.access_token;
+		app.refresh_token = window.access_token.refresh_token;
 
 		// debug
 		this.debugAccessToken();

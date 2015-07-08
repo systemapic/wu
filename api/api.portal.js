@@ -98,10 +98,14 @@ module.exports = api.portal = {
 		var token = api.oauth2.util.uid(api.config.token.accessTokenLength);
 		api.oauth2.store.accessTokens.save(token, authCode.expires_in, authCode.userID, authCode.clientID, authCode.scope, console.log);
 
+		var refresh_token = api.oauth2.util.uid(api.config.token.accessTokenLength);
+		api.oauth2.store.accessTokens.save(refresh_token, authCode.expires_in, authCode.userID, authCode.clientID, authCode.scope, console.log);
+
 		var access_token = {
 			access_token : token,
 			expires_in : authCode.expires_in,
-			scope : authCode.scope
+			scope : authCode.scope,
+			refresh_token : refresh_token
 		}
 
 		console.log('access_token'.red, access_token);
