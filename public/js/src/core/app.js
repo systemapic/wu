@@ -19,11 +19,8 @@ Wu.App = Wu.Class.extend({
 		Wu.app = window.app = this;
 
 		// set access token
-		app.access_token = window.access_token.access_token;
-		app.refresh_token = window.access_token.refresh_token;
-
-		// debug
-		this.debugAccessToken();
+		
+		this.setAccessTokens();
 
 		app.Socket = new Wu.Socket();
 
@@ -46,9 +43,11 @@ Wu.App = Wu.Class.extend({
 		this.detectMobile();
 	},
 
-	debugAccessToken : function () {
+	setAccessTokens : function () {
 
-		var access_token = app.access_token;
+		app.access_token = window.access_token;
+
+		var access_token = app.access_token.access_token;
 		console.log('debugAccessToken: access_token: ', access_token);
 
 		Wu.send('/api/userinfo', {}, function (err, body) {
