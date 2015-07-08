@@ -346,8 +346,8 @@ Wu.Util = {
 		http.setRequestHeader("Content-type", "application/json");
 
 		// set access_token on header
-		http.setRequestHeader("Authorization", "Bearer " + app.access_token);
-		
+		http.setRequestHeader("Authorization", "Bearer " + app.access_token.access_token);
+
 		http.onreadystatechange = function() {
 			if(http.readyState == 4 && http.status == 200) {
 				var valid = Wu.verify(http.responseText);
@@ -370,7 +370,7 @@ Wu.Util = {
 		http.setRequestHeader('Content-type', 'application/json');
 
 		// set access_token on header
-		http.setRequestHeader("Authorization", "Bearer " + app.access_token);
+		http.setRequestHeader("Authorization", "Bearer " + app.access_token.access_token);
 
 		http.onreadystatechange = function() {
 			if(http.readyState == 4 && http.status == 200) {
@@ -399,7 +399,7 @@ Wu.Util = {
 		http.setRequestHeader('Content-type', 'application/json');
 
 		// set access_token on header
-		http.setRequestHeader("Authorization", "Bearer " + app.access_token);
+		http.setRequestHeader("Authorization", "Bearer " + app.access_token.access_token);
 
 		http.onreadystatechange = function() {
 			if (http.readyState == 4) {
