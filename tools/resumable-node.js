@@ -3,9 +3,9 @@ var fs = require('fs'), path = require('path'), util = require('util'), Stream =
 process.env.TMPDIR = '/data/tmp';
 
 module.exports = resumable = function(temporaryFolder){
-  console.log('temporaryFolder', temporaryFolder);
-  console.log(fs.readdirSync(temporaryFolder));
-  console.log(fs.accessSync(temporaryFolder));
+  // console.log('temporaryFolder', temporaryFolder);
+  // console.log(fs.readdirSync(temporaryFolder));
+  // console.log(fs.accessSync(temporaryFolder));
   
   var $ = this;
   $.temporaryFolder = temporaryFolder;
