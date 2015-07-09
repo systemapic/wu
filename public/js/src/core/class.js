@@ -337,7 +337,6 @@ Wu.Util = {
 	post : function (path, json) {
 		var that = this,
 		    http = new XMLHttpRequest(),
-		    // url = window.location.origin;
 		    url = Wu.Util._getServerUrl(); 
 		url += path;
 		
@@ -345,6 +344,9 @@ Wu.Util = {
 
 		//Send the proper header information along with the request
 		http.setRequestHeader("Content-type", "application/json");
+
+		// set access_token on header
+		http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
 
 		http.onreadystatechange = function() {
 			if(http.readyState == 4 && http.status == 200) {
@@ -367,6 +369,9 @@ Wu.Util = {
 		//Send the proper header information along with the request
 		http.setRequestHeader('Content-type', 'application/json');
 
+		// set access_token on header
+		http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
+
 		http.onreadystatechange = function() {
 			if(http.readyState == 4 && http.status == 200) {
 
@@ -382,10 +387,7 @@ Wu.Util = {
 	},
 
 
-	_getServerUrl : function () {
-		return app.options.servers.portal.slice(0,-1);
-	},
-
+	
 	// post with callback and error handling (do callback.bind(this) for context)
 	send : function (path, json, callback) {
 		var that = this;
@@ -395,6 +397,10 @@ Wu.Util = {
 
 		http.open("POST", url, true);
 		http.setRequestHeader('Content-type', 'application/json');
+
+		// set access_token on header
+		http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
+
 		http.onreadystatechange = function() {
 			if (http.readyState == 4) {
 		    		
@@ -415,6 +421,9 @@ Wu.Util = {
 		http.send(json);
 	},
 
+	_getServerUrl : function () {
+		return app.options.servers.portal.slice(0,-1);
+	},
 
 	// get with callback
 	_getJSON : function (url, callback) {

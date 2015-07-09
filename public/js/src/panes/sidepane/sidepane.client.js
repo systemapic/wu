@@ -540,7 +540,8 @@ Wu.SidePane.Client = Wu.Class.extend({
 			testChunks : false, // turn off resume on small upload
 			query : {
 				imageUuid : Wu.Util.guid('image'),
-				clientUuid : clientUuid
+				clientUuid : clientUuid,
+				access_token : app.tokens.access_token
 			},
 
 			// max file size (less than one chunk means only one chunk)
