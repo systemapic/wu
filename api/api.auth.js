@@ -70,7 +70,7 @@ module.exports = api.auth = {
 					}));
 
 					// delete temp token
-					api.redis.del(token);
+					if (token) api.redis.del(token);
 				});
 			});
 		});
