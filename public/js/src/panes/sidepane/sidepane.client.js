@@ -441,7 +441,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 	_checkUnique : function (e) {
 		var name = this._clientNameInput.value;
 		var json = JSON.stringify({
-			value : name,
+			slug : name,
 			client : this.client.getUuid()
 		});
 
