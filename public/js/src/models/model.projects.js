@@ -264,7 +264,7 @@ Wu.Project = Wu.Class.extend({
 
 	setRolesStore : function (roles) {
 		this.store.roles = roles;
-		this._refresh();
+		this.initRoles();
 	},
 
 	setMapboxAccount : function (store) {
