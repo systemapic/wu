@@ -3904,10 +3904,12 @@ Wu.UserList = Wu.List.extend({
 
 		// get no of projets etc for user
 		var projects = user.getProjects();
-		var numProjects = projects ? projects.length : 0;
-		var projectsText = numProjects == 1 ? ' project' : ' projects';
+		var n = projects ? projects.length : 0;
+		var projectsText = n == 1 ? n + ' project' : n + ' projects';
+		if (n == 0) projectsText = 'Click to give access!';
 
-		var html = divProjectsOpen + numProjects + projectsText + divProjectsClose;
+		// set html
+		var html = divProjectsOpen + projectsText + divProjectsClose;
 
 		return html;
 
