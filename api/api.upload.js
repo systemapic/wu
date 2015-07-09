@@ -159,7 +159,7 @@ module.exports = api.upload = {
 	_deleteDoneChunks : function () {
 		api.redis.keys('done-chunk*', function(err, rows) {
 			rows.forEach(function (row) {
-				api.redis.del(row);
+				if (row) api.redis.del(row);
 				// console.log('deleted row'.red, row);
 			});
 		});
