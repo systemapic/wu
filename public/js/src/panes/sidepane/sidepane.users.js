@@ -297,7 +297,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 			email     : email,
 			company   : companyName,
 			position  : position,
-			phone     : phoneNo
+			phone     : phoneNo,
 		}
 
 		// create user
@@ -322,7 +322,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	createUser : function (data) {
 		if (!data) return;
 
-		// managers only have create_user access on project, so include project
+		// managers only have create_user access on project, so include project // todo: what if no project selected?
 		if (app.activeProject) data.project = app.activeProject.getUuid();
 
 		// get new user from server
@@ -334,6 +334,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	createdUser : function (context, json) {
 
 		var store = JSON.parse(json);
+		console.log(store);
 		if (store.error) return console.error(store.error);
 
 		var user = new Wu.User(store);

@@ -98,10 +98,43 @@ Wu.StartPane = Wu.Pane.extend({
 		this._banner 			= Wu.DomUtil.create('div', 'startpane-banner', this._bannerContainer);
 
 		this._recentProjectsContainer 	= Wu.DomUtil.create('div', 'startpane-recent-projects-container', this._banner);
+		
+		if ( this._getLatestProjects().length > 1 ){
+			//1 and not 0 since hidden/default project is counted in
 
-		this._recentProjectsHeader 	= Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Recent projects:');
-		this._projectList 		= Wu.DomUtil.create('div', 'startpane-project-list', this._recentProjectsContainer);
+			//there are some projects for this user
+			//console.log("has: " + this._getLatestProjects().length + " projects");
+			this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Recent projects:');
 
+		} else {
+
+			//there are no projects for this user
+			
+			if (app.access.to.create_project()) {
+				//the user has access to create projects
+				this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Get started:');
+				this._hasAccessMessage = Wu.DomUtil.create('p', 'startpane-has-access',this._recentProjectsContainer,'Hello ' +app.Account.getFirstName()+'.<br/>You have no projects yet. Choose one of your clients and click the respective button below to start a project.');
+				
+				for (c in app.Clients) {
+					var client = app.Clients[c];
+					
+					var logo = client.getLogo();
+					var name = client.getName();
+					
+					// same as app.SidePane.Clients.clients[i].client.name 
+					this._clientDiv = Wu.DomUtil.create('p', 'startpane-has-client', this._recentProjectsContainer,name + '<br/>');
+					//this._clientDiv = Wu.DomUtil.create(...etc)
+				}
+
+			} else {
+				//the user has no access to create projects
+				this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'No current projects.');
+				this._hasNoAccessMessage = Wu.DomUtil.create('p', 'startpane-has-no-access',this._recentProjectsContainer,'Hello ' +app.Account.getFirstName()+',<br/>You are currently not participating in any projects, and you are not allowed to create a project. <br/>Please wait for an invitation.');
+				
+			}
+		}	
+
+		this._projectList = Wu.DomUtil.create('div', 'startpane-project-list', this._recentProjectsContainer);
 		// return 
 		return wrapper;
 		
@@ -138,13 +171,15 @@ Wu.StartPane = Wu.Pane.extend({
 
 		// run sizer
 		this.positionSpinner(dims);
+
+		this.addHooks();
 	},
 
 	_getLatestProjects : function () {
 
 		// Get all projects
-		var projectsUnsorted = app.Projects;	
-
+		var projectsUnsorted = app.Projects;
+		
 		// Sort them by last updated
 		var projects = _.sortBy(projectsUnsorted, function(p) {
 			return p.getLastUpdated();
@@ -164,12 +199,12 @@ Wu.StartPane = Wu.Pane.extend({
 
 		if (!client) return;
 
+
 		var newProject = {};
 
 		// create container
 		newProject._projectContainer = Wu.DomUtil.create('div', 'start-panne-recent-projects', this._projectList);
 		newProject._projectThumb = Wu.DomUtil.create('img', '', newProject._projectContainer);
-
 
 		// Load image in memory before we paste it (to see image orientation)
 		var img = new Image();
@@ -223,17 +258,35 @@ Wu.StartPane = Wu.Pane.extend({
 		if (project.getName().length < 22) Wu.DomUtil.addClass(newProject._projectTitle, 'short-name');
 		
 		// select project hook
-		Wu.DomEvent.on(newProject._projectContainer, 'mousedown', function() { this.selectProject(project); }, this);
+		Wu.DomEvent.on(newProject._projectContainer, 'click', function() { this.selectProject(project); }, this);
 
 	},
 
 	addHooks : function () {
+
+	},
+	removeHooks : function () {
+
 	},
 
-	removeHooks : function () {
+	enableHooks : function () {
+		console.log('addhooks')
+		this._hooksDisabled = false;
+	},
+
+	disableHooks : function () {
+		console.log('remohooks');
+		this._hooksDisabled = true;
 	},
 
 	selectProject : function(project) {
+
+		console.log('select!');
+
+		// a hack to disable hook temporarily
+		if (this._hooksDisabled) return;
+
+		console.log('..selecting');
 
 		// select project
 		// project.select();
