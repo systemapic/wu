@@ -135,10 +135,10 @@ module.exports = api.email = {
 			body    +=  '<td>';
 			body    +=  '<table width="100%" border="0" cellspacing="0" cellpadding="10" align = "center">';
 			body    +=  '<tr>';
-			body    +=  '<td align="center" style="font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; padding: 15px 0px 0px 0px; text-align:center"><span style="font-size: 24px;">Hello ' + name + '</span></td>';
+			body    +=  '<td align="center" style="font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; padding: 15px 0px 0px 0px; text-align:center"><span style="font-size: 24px;">Dear ' + name + '</span></td>';
 			body    +=  '</tr>';
 			body    +=  '<tr>';
-			body    +=  '<td align="center" style="font-size: 16px; padding: 25px 0px 0px 0px;  line-height: 25px; font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; text-align: center;">You have requested a password reset. <br/> Click the button below to receive a new password.</td>';
+			body    +=  '<td align="center" style="font-size: 16px; padding: 25px 0px 0px 0px;  line-height: 25px; font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; text-align: center;">You have requested a password reset. <br/> Click the button below to create your new password.</td>';
 			body    +=  '</tr>';
 			body    +=  '</table>';
 			body    +=  '</td>';
@@ -156,7 +156,7 @@ module.exports = api.email = {
 			body    +=  '</tr>';
 			body    +=  '<tr>';
 			body    +=  '<td align="center" style="padding: 0px 0px 25px 0px; font-size: 14px; line-height: 20px; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #313640;"><span style="font-style: italic;">';
-			body    +=  'The link is valid for ten minutes. <br/> If you think you have received this email in error, no further action is required.';
+			body    +=  'The link is valid for ten minutes. <br/> If you think you have received this email in error, <br/>no further action is required.';
 			body    +=  '</span>';
 		    body    +=  '</td>';
 			body    +=  '</tr>';
@@ -259,7 +259,7 @@ module.exports = api.email = {
 			body += '<td>';
 			body += '<table width="100%" border="0" cellspacing="0" cellpadding="10">';
 			body += '<tr>';
-			body += '<td align="center" style="font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; padding: 15px 0px 0px 0px; text-align:center"><span style="font-size: 24px;">Hello ' + name + '</span></td>';
+			body += '<td align="center" style="font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; padding: 15px 0px 0px 0px; text-align:center"><span style="font-size: 24px;">Dear ' + name + '</span></td>';
 			body += '</tr>';
 			body += '<tr>';
 			body += '<td align="center" style="font-size: 16px; padding: 25px 0px 0px 0px;  line-height: 25px; font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; text-align: center;">Welcome to Systemapic.com<br/>You have been invited by ' + fullname + '.<br/> Click the button below to log in and create your own password.</td>';
@@ -280,7 +280,7 @@ module.exports = api.email = {
 			body += '</tr>';
 			body += '<tr>';
 			body += '<td align="center" style="padding: 0px 0px 25px 0px; font-size: 14px; line-height: 20px; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #313640;"><span style="font-style: italic;">';
-			body += 'If you think you have received this email in error, no further action is required.';
+			body += 'If you think you have received this email in error, <br>no further action is required.';
 			body += '</span>';
 			body += '</td>';
 			body += '</tr>';

@@ -123,6 +123,7 @@ Wu.Controller = Wu.Class.extend({
 
 	_setUrl : function () {
 		var client = this._project.getClient();
+		if (client === undefined)	return;
 		var url = '/';
 		url += client.slug;
 		url += '/';
