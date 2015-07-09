@@ -45,9 +45,7 @@
 		<!-- @endif -->
 		<script type="text/javascript">(function(){
 			window.hotlink = '<%- JSON.stringify(hotlink) %>';
-			window.access_token = JSON.parse('<%- JSON.stringify(access_token) %>');
-			// window.access_token = JSON.parse(window.access_token);
-
+			window.tokens = JSON.parse('<%- JSON.stringify(access_token) %>');
 			}());
 		</script>
 

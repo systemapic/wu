@@ -64,48 +64,48 @@ function getToken() {
 	return token;
 }
 
-function getAccessToken() {
+// function getAccessToken() {
 
-	var username = document.getElementById('input-email').value;
-	var password = document.getElementById('input-pass').value
+// 	var username = document.getElementById('input-email').value;
+// 	var password = document.getElementById('input-pass').value
 
-	console.log('getAccessToken u/p; ', username, password);
+// 	console.log('getAccessToken u/p; ', username, password);
 
-	var options = {
-		grant_type : 'password',
-		username : username,
-		password : password,
-		scope : 'offline_access'
-	}
+// 	var options = {
+// 		grant_type : 'password',
+// 		username : username,
+// 		password : password,
+// 		scope : 'offline_access'
+// 	}
 
-	sendAccessTokenRequest('/oauth/token', options, function (err, body) {
-		console.log('access token return, err, body', err, body);
+// 	sendAccessTokenRequest('/oauth/token', options, function (err, body) {
+// 		console.log('access token return, err, body', err, body);
 
-		if (err) return console.log(err);
+// 		if (err) return console.log(err);
 
-		var result = JSON.parse(body);
+// 		var result = JSON.parse(body);
 
-		if (result.error) return console.log(result);
+// 		if (result.error) return console.log(result);
 
-		var access_token = result.access_token;
-		console.log('Access token: ', access_token);
-		window.access_token = access_token;
+// 		var access_token = result.access_token;
+// 		console.log('Access token: ', access_token);
+// 		window.access_token = access_token;
 
-		if (window.access_token) {
-			// make GET request with access token
+// 		if (window.access_token) {
+// 			// make GET request with access token
 
-			// setTimeout(getPortal, 1000);
+// 			// setTimeout(getPortal, 1000);
 
-			var url = 'https://dev.systemapic.com/?access_token=' + window.access_token;
+// 			var url = 'https://dev.systemapic.com/?access_token=' + window.access_token;
 
-			console.log('url: ', url);
-			setTimeout(function () {
-				window.location.href = url;
-			}, 1000);
-		}
+// 			console.log('url: ', url);
+// 			setTimeout(function () {
+// 				window.location.href = url;
+// 			}, 1000);
+// 		}
 
-	});	
-}
+// 	});	
+// }
 
 
 function getPortal() {

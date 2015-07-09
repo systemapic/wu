@@ -940,7 +940,7 @@ Wu.Project = Wu.Class.extend({
 			var prefix    = (file.type == 'image') ? '/images/' 					: '/api/file/download/?file=';
 			var url = prefix + file.uuid;// + suffix
 
-			url += '&access_token=' + app.access_token.access_token;
+			url += '&access_token=' + app.tokens.access_token;
 
 			console.log('url: -====>> ', url);
 			var source = {
