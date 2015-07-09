@@ -942,7 +942,6 @@ Wu.Project = Wu.Class.extend({
 
 			url += '&access_token=' + app.tokens.access_token;
 
-			console.log('url: -====>> ', url);
 			var source = {
 			    	title 	: file.name, 	// title
 			    	thumbnail : thumbnail,  // optional. url to image
