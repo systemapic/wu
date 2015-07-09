@@ -104,7 +104,7 @@ Wu.StartPane = Wu.Pane.extend({
 
 			//there are some projects for this user
 			//console.log("has: " + this._getLatestProjects().length + " projects");
-			this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Recent projects:');
+			this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Latest projects:');
 
 		} else {
 

@@ -153,6 +153,20 @@ module.exports = api.project = {
 	},
 
 
+	_getProjectByUuid : function (projectUuid, done) {
+		Projects
+		.find({uuid : projectUuid})
+		.populate('files')
+		.populate('roles')
+		.populate('layers')
+		.exec(done);
+	},
+
+	_getProjectsByUserUuid : function (userUuid, done) {
+
+
+	},
+
 	// #########################################
 	// ###  API: Delete Project              ###
 	// #########################################
@@ -444,17 +458,47 @@ module.exports = api.project = {
 			if (err || !isAdmin) return api.project._getAllFiltered(options, done);
 			
 			// is admin, get all
-			api.project._getAll(options, done);
+			api.project._getAll(done);
 		});
 	},
 
-	_getAll : function (options, done) {
+	_getAll : function (done) {
 		Project
 		.find()
 		.populate('files')
 		.populate('roles')
 		.populate('layers')
 		.exec(done);
+	},
+
+
+	_getProjectByUserUuidAndCapability : function (userUuid, capability, done) {
+		// get all roles with user as read_project
+		var cap_filter = 'capabilities.' + capability,
+		    roleIds = [];
+
+		Role
+		.find({ members : userUuid })
+		.where(cap_filter, true)
+		.exec(function (err, roles) {
+			if (err) return done(err);
+
+			// push role id's to array
+			roles.forEach(function (role) { roleIds.push(role._id); });
+
+			Project
+			.findOne({roles : { $in : roleIds }})
+			.populate('files')
+			.populate('roles')
+			.populate('layers')
+			.exec(function (err, project) {
+				if (err) return done(err);
+				if (!project) return done('No project found.');
+				
+				// success
+				done(null, project);
+			});
+		});
 	},
 
 

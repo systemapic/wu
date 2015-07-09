@@ -43,15 +43,17 @@ var api = module.parent.exports;
 module.exports = api.user = { 
 
 
+
 	// create user
 	create : function (req, res) {
-		if (!req.body || !req.body.project) return api.error.missingInformation(req, res);
+		if (!req.body) return api.error.missingInformation(req, res);
 
 		// user not added to any roles on creation
 		// blank user with no access - must be given project access, etc.
 
 		var account = req.user,
 		    projectUuid = req.body.project,
+		    userUuid = req.user.uuid,
 		    options = req.body;
 		    ops = [];
 
@@ -61,10 +63,12 @@ module.exports = api.user = {
 		console.log('create user', account, projectUuid, options);
 
 		ops.push(function (callback) {
-			Project
-			.findOne({uuid : projectUuid})
-			.populate('roles')
-			.exec(callback);
+			if (projectUuid) {
+				api.project._getProjectByUuid(projectUuid, callback);
+			} else {
+				api.project._getProjectByUserUuidAndCapability(userUuid, 'create_user', callback);
+
+			}
 		});
 
 		// check access
@@ -303,6 +307,37 @@ module.exports = api.user = {
 			
 			// is admin, get all
 			api.user._getAll(options, done);
+		});
+	},
+
+
+	_getUserByUuid : function (userUuid, done) {
+		User
+		.find({uuid : userUuid})
+		.exec(done);
+	},
+
+	_getUserProjects : function (userUuid, done) {
+
+		// get user
+		api.user._getUserByUuid(userUuid, function (err, user) {
+			if (err) return done(err);
+
+			var userProjects = [];
+
+			// get all projects
+			api.project._getAll(function (err, projects) {	
+				if (err) return done(err);
+
+				// filter projects that has roles with user as member
+				projects.forEach(function (project) {
+					project.roles.forEach(function (role) {
+						if (role.members.indexOf(userUuid) >= 0) userProjects.push(project);
+					});			
+				});
+
+				done(null, userProjects);
+			});
 		});
 	},
 
