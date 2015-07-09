@@ -181,6 +181,7 @@ Wu.Analytics = Wu.Class.extend({
 
 		// CURRENT PROJECT PATH
 		if ( app.activeProject ) {
+			if (app.activeProject._client === undefined || app.activeProject === undefined ) return;
 			var clientSlug  = app.activeProject._client.getSlug();
 			var projectSlug = app.activeProject.getSlug()
 			var pageUrl 	= '/' + clientSlug + '/' + projectSlug;

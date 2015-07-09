@@ -288,11 +288,29 @@ Wu.App = Wu.Class.extend({
 	// },
 
 	_lonelyProject : function () {
-		// check if only one project, 
-		// if so, open it
+		//default case: hidden/ghost project (belongs to no client). Preferable to stick to the Start Pane
 		if (_.size(app.Projects) == 1) {
 			for (p in app.Projects) {
-				var project = app.Projects[p];
+				var project = app.Projects[p]; 
+				//if project is hidden/ghost it has no client
+			    if(project.getClient() === undefined){
+					return false;
+				}
+				this._setProject(project);
+				return true;
+			}
+		}
+		//single project plus hidden/ghost project
+		//check if single (owned) project. Redirect to it instead of sticking on the Start pane
+		if (_.size(app.Projects) == 2) {
+			for (p in app.Projects) {
+	
+				var project = app.Projects[p]; 
+				//if project is hidden/ghost it has no client
+				if(project.getClient() === undefined){
+					continue;
+				}
+				
 				this._setProject(project);
 				return true;
 			}
