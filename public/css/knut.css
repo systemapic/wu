@@ -889,6 +889,34 @@ svg.tracer {
 	color: red;
 }
 
+.startpane-header-title {
+  color: #fff;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+  font-size: 26px;
+  margin: 0;
+  margin-bottom: 15px;
+  text-align: left;
+  padding-left: 5px;
+}
 
+.startpane-has-access, .startpane-has-no-access {
+  color: #fff;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+  font-size: 16px;
+  margin: 0;
+  margin-bottom: 15px;
+  text-align: left;
+  padding-left: 5px; 
+}
+
+.startpane-has-client {
+  color: #fff;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
+  font-size: 20px;
+  margin: 0;
+  margin-bottom: 15px;
+  text-align: left;
+  padding-left: 5px; 
+}
 
 
