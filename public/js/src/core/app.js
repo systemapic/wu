@@ -13,15 +13,16 @@ Wu.App = Wu.Class.extend({
 
 	initialize : function (options) {
 
+		// print version
 		console.log('Systemapic v.' + Wu.version);
 
 		// set global this
 		Wu.app = window.app = this;
 
 		// set access token
-		
 		this.setAccessTokens();
 
+		// init socket
 		app.Socket = new Wu.Socket();
 
 		// error handling
@@ -45,14 +46,17 @@ Wu.App = Wu.Class.extend({
 
 	setAccessTokens : function () {
 
-		app.access_token = window.access_token;
+		app.tokens = window.tokens;
 
-		var access_token = app.access_token.access_token;
-		console.log('debugAccessToken: access_token: ', access_token);
+		var access_token = app.tokens.access_token;
 
+		// print debug
+		console.log('Debug: access_token: ', access_token);
+
+		// test access token
 		Wu.send('/api/userinfo', {}, function (err, body) {
 			console.log('err, body', err, body);
-		})
+		});
 
 	},
 

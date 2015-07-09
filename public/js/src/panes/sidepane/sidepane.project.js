@@ -176,7 +176,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 			query : {
 				imageUuid : Wu.Util.guid('image'),
 				projectUuid : projectUuid,
-				access_token : app.access_token.access_token
+				access_token : app.tokens.access_token
 			},
 
 			// max file size (less than one chunk means only one chunk)

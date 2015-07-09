@@ -244,7 +244,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			query : {
 				fileUuid : Wu.Util.guid('r'),
 				projectUuid : projectUuid,
-				access_token : app.access_token.access_token
+				access_token : app.tokens.access_token
 			},
 
 			// // max files to be uploaded at once

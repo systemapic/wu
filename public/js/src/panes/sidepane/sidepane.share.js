@@ -126,7 +126,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		path += '&height=' + height;
 
 		// set access token
-		path += '&access_token=' + app.access_token.access_token;
+		path += '&access_token=' + app.tokens.access_token;
 
 		// set url
 		var url = 'url("';
@@ -141,7 +141,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		raw += '?raw=true'; // add raw to path
 
 		// set access token
-		raw += '&access_token=' + app.access_token.access_token;
+		raw += '&access_token=' + app.tokens.access_token;
 		this._downloadButton.href = raw;
 
 

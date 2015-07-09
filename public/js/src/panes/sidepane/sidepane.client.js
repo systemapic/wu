@@ -541,7 +541,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 			query : {
 				imageUuid : Wu.Util.guid('image'),
 				clientUuid : clientUuid,
-				access_token : app.access_token.access_token
+				access_token : app.tokens.access_token
 			},
 
 			// max file size (less than one chunk means only one chunk)
