@@ -13,11 +13,16 @@ Wu.App = Wu.Class.extend({
 
 	initialize : function (options) {
 
+		// print version
 		console.log('Systemapic v.' + Wu.version);
 
 		// set global this
 		Wu.app = window.app = this;
 
+		// set access token
+		this.setAccessTokens();
+
+		// init socket
 		app.Socket = new Wu.Socket();
 
 		// error handling
@@ -37,6 +42,22 @@ Wu.App = Wu.Class.extend({
 
 		// Detect mobile devices
 		this.detectMobile();
+	},
+
+	setAccessTokens : function () {
+
+		app.tokens = window.tokens;
+
+		var access_token = app.tokens.access_token;
+
+		// print debug
+		console.log('Debug: access_token: ', access_token);
+
+		// test access token
+		Wu.send('/api/userinfo', {}, function (err, body) {
+			console.log('err, body', err, body);
+		});
+
 	},
 
 	_initErrorHandling : function () {
@@ -79,7 +100,7 @@ Wu.App = Wu.Class.extend({
 		// set vars
 		this.options.json = portalStore;
 
-		// accesss
+		// access
 		this._initAccess();
 
 		// init global events

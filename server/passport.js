@@ -4,6 +4,9 @@
 var uuid = require('node-uuid');
 var colors = require('colors');
 var LocalStrategy = require('passport-local').Strategy; // load all the things we need
+var BearerStrategy = require('passport-http-bearer').Strategy;
+var BasicStrategy = require('passport-http').BasicStrategy;
+
 var User = require('../models/user'); // load up the user model
 var crypto = require('crypto'); // crypto
 var api = require('../api/api'); // api
@@ -95,6 +98,7 @@ module.exports = function(passport) {
 	},
 	function(req, email, password, done) { // callback with email and password from our form
 	  
+
 		// find a user whose email is the same as the forms email
 		// we are checking to see if the user trying to login already exists
 		User.findOne({ 'local.email' :  email }, function(err, user) {
@@ -124,44 +128,81 @@ module.exports = function(passport) {
 		});
 	}));
 
-	// new login flow
-	passport.use('local-login-direct', new LocalStrategy({
-		// by default, local strategy uses username and password, we will override with email
-		usernameField : 'email',
-		passwordField : 'password',
-		passReqToCallback : true // allows us to pass back the entire request to the callback
-	},
-	function(req, email, password, done) { // callback with email and password from our form
-	  
-		// find a user whose email is the same as the forms email
-		// we are checking to see if the user trying to login already exists
-		User.findOne({ 'local.email' :  email }, function(err, user) {
+	
 
-			console.log('found user: ', user, password);
+	// =========================================================================
+	// BEARER ACCESS TOKEN =====================================================
+	// =========================================================================
+	// calls made to API endpoints with an access_token
+	//
+	passport.use(new BearerStrategy(
+		function (accessToken, done) {
 
-			// if there are any errors, return the error before anything else
-			if (err) return done(err, false);
+			console.log('passport.js:193 BearerStrategy > accessToken'.yellow, accessToken); // is used when calling API endpoint with access_token
 
-			// if no user is found, return the message
-			if (!user) return done(null, false);
-
-			// if the user is found but the password is wrong
-			if (!user.validPassword(password)) return done(null, false); // create the loginMessage and save it to session as flashdata
-
-			// set token, save to user
-			user.token = setRedisToken(user);
-			user.save(function (err) {
-				if (err) console.error(err);
-
-				// slack
-				api.slack.loggedIn({user : user});
-
-				// all is well, return successful user
-				return done(null, user);
+			api.oauth2.store.accessTokens.find(accessToken, function (err, token) {
+				if (err) return done(err);
+				
+				if (!token) return done(null, false);
+				
+				if (new Date() > token.expirationDate) {
+					api.oauth2.store.accessTokens.delete(accessToken, function (err) {
+						return done(err);
+					});
+			
+				} else {
+					if (token.userID !== null) {
+						api.oauth2.store.users.find(token.userID, function (err, user) {
+							if (err) return done(err);
+							
+							if (!user) return done(null, false);
+							
+				
+							// to keep this example simple, restricted scopes are not implemented,
+							// and this is just for illustrative purposes
+							var info = {scope: '*'};
+							return done(null, user, info);
+						});
+					} else {
+						//The request came from a client only since userID is null
+						//therefore the client is passed back instead of a user
+						api.oauth2.store.clients.find(token.clientID, function (err, client) {
+							if (err) return done(err);
+							
+							if (!client) return done(null, false);
+							
+						
+							// to keep this example simple, restricted scopes are not implemented,
+							// and this is just for illustrative purposes
+							var info = {scope: '*'};
+							return done(null, client, info);
+						});
+					}
+				}
 			});
-		});
-	}));
+		}
+	));
 
+
+	passport.use(new BasicStrategy(
+		function (username, password, done) {
+
+			console.log('auth.js:53 BasicStrategy'.yellow, username, password);
+
+			api.oauth2.store.clients.findByClientId(username, function (err, client) {
+				if (err) return done(err);
+				
+				if (!client) return done(null, false);
+				
+				if (client.clientSecret != password) {
+					return done(null, false);
+				}
+
+				console.log('found client!', client.clientId);
+				return done(null, client);
+			});
+		}
+	));
 	
 
 	// tiles access token

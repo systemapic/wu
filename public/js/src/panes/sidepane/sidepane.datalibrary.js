@@ -243,7 +243,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			throttleProgressCallbacks : 1,
 			query : {
 				fileUuid : Wu.Util.guid('r'),
-				projectUuid : projectUuid
+				projectUuid : projectUuid,
+				access_token : app.tokens.access_token
 			},
 
 			// // max files to be uploaded at once

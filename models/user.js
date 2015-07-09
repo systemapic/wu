@@ -22,6 +22,8 @@ var userSchema = mongoose.Schema({
         // tile server auth token
         token       : String,
 
+        access_token : String,
+
         local : {
                 email        : String,      // login name
                 password     : String,
