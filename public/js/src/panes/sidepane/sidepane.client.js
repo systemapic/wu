@@ -78,7 +78,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this.title.innerHTML = this.client.getName();
 		this.description.innerHTML = this.client.getDescription();
 		
-		// this.logo.src = this.client.getLogo() ? this.client.getLogo() : '/css/images/defaultProjectLogo.png';
 		if (this._getPixelLogo()) this.logo.style.backgroundImage = 'url(' + this._getPixelLogo()+ ')';
 
 		Wu.DomUtil.thumbAdjust(this.logo, 70);
@@ -399,6 +398,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// return if already editing
 		if (this.editing) return;
 		this.editing = true;
+		this._validName = true;
 		
 		// inject <input>
 		var div = this.title;
@@ -440,6 +440,10 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	_checkUnique : function (e) {
 		var name = this._clientNameInput.value;
+
+		// return ok if same name
+		if (name == this.client.getName()) return this._markUnique();
+
 		var json = JSON.stringify({
 			slug : name,
 			client : this.client.getUuid()
@@ -454,7 +458,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 
 	editedName : function (e) {
 
-		if (!this._validName) return;
+		if (!this._validName) return console.log('invalid name');
 	
 		// revert to <div>
 		var target = e.target;
@@ -489,8 +493,6 @@ Wu.SidePane.Client = Wu.Class.extend({
 		// inject <input>
 		var div = this.description;
 		var value = div.innerHTML;
-		// div.innerHTML = ich.injectClientEditInput({ value : value }); 
-		// todo: insert input
 		div.innerHTML = '<input value="'+ value +'" class="client-edit editable ct15 ct16">';
 
 		// focus
