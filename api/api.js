@@ -1,25 +1,20 @@
-// API: api.js
+// api.js
 
 // config
 var config = require('../config/server-config.js');
 
 // redis store for temp passwords
 var redisStore = require('redis').createClient(config.serverConfig.temptokenRedis.port, config.serverConfig.temptokenRedis.host);
-redisStore.auth(config.serverConfig.temptokenRedis.auth);
 redisStore.on('error', console.error);
-
-// // oauth2 server
-// var oauth2orize = require('oauth2orize');
-// var oauth2server = oauth2orize.createServer();
+redisStore.auth(config.serverConfig.temptokenRedis.auth);
 
 // api
 var api = {};
-api.version 		= '1.0.4';
+api.version 		= require('fs').readFileSync('../public/js/src/core/app.js').toString().split("'")[1];
 api.config 		= config.serverConfig;
 api.clientConfig 	= config.clientConfig;
 api.loginConfig 	= config.loginConfig;
 api.redis 		= redisStore;
-// api.oauth2server 	= oauth2server;
 
 // exports
 module.exports 		= api;
@@ -44,3 +39,6 @@ module.exports.socket 	= require('./api.socket');
 module.exports.project 	= require('./api.project');
 module.exports.provider = require('./api.provider');
 module.exports.analytics = require('./api.analytics');
+
+// print version
+console.log('\nSystemapic API version: ', api.version, '\n');

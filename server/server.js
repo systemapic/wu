@@ -15,7 +15,7 @@ var prodMode = process.argv[2] == 'prod';
 var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser'); 
-// var config = require('../config/server-config.js').serverConfig;
+
 var api = require('../api/api');
 var config = api.config;
 var port = config.port;
@@ -34,6 +34,8 @@ app = express().http().io()
 // connect to our database
 var sessionStore = mongoose.connect(config.mongo.url); 
 
+// var RedisStore = require('connect-redis')(express.session);
+
 // pass passport for configuration
 require('./passport')(passport); 
 
@@ -50,6 +52,13 @@ app.use(express.session({
 	secret: 'dslfksmdfldskfnlxxsadknvvlovn908209309fmsfmdslkm',  // random
         saveUninitialized: true,
         resave: true,
+ //        store: new RedisStore({
+	// 	host : 'rtoken',
+	// 	port : 6379,
+	// 	db : 2,
+	// 	ttl : 3600,
+	// 	pass : '9p7bRrd7Zo9oFbxVJIhI09pBq6KiOBvU4C76SmzCkqKlEPLHVR02TN2I40lmT9WjxFiFuBOpC2BGwTnzKyYTkMAQ21toWguG7SZE'
+	// }),
 }));
 
 // enable passport
