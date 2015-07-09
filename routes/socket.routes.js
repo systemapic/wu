@@ -33,8 +33,8 @@ var api = require('../api/api');
 module.exports = function(app, passport) {
 
 	app.io.route('ready', function (req) {
-		console.log('socket ready'.red);
-		if (!isLoggedIn(req)) return;
+
+		// if (!isLoggedIn(req)) return;
 
 		req.session.name = req.data
 		req.session.save(function() {

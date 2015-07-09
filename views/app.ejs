@@ -43,7 +43,11 @@
 			<link rel="stylesheet" href="/css/css.portal.min.css">
 	
 		<!-- @endif -->
-		<script type="text/javascript">(function(){window.hotlink = '<%- JSON.stringify(hotlink) %>';}());</script>
+		<script type="text/javascript">(function(){
+			window.hotlink = '<%- JSON.stringify(hotlink) %>';
+			window.tokens = JSON.parse('<%- JSON.stringify(access_token) %>');
+			}());
+		</script>
 
 
 	</head>
