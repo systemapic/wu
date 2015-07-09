@@ -258,13 +258,10 @@ module.exports = api.client = {
 		if (slug && slug.toLowerCase) {
 			slug = slug.toLowerCase();
 		}
-		console.log('slug', slug);
-		
+
 		Clientel
 		.find({slug : slug})
 		.exec(function(err, result) { 
-			console.log('err, result', err, result);
-		
 			if (result.length == 0) return res.end('{"unique" : true }'); 	// unique
 			return res.end('{"unique" : false }');				// not unique
 		});
