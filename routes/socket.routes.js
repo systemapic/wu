@@ -34,21 +34,21 @@ module.exports = function(app, passport) {
 
 	app.io.route('ready', function (req) {
 
-		// if (!isLoggedIn(req)) return;
+		if (!isLoggedIn(req)) return;
 
-		req.session.name = req.data
-		req.session.save(function() {
-			req.io.emit('get-feelings')
-		});
+		// req.session.name = req.data
+		// req.session.save(function() {
+		// 	req.io.emit('get-feelings')
+		// });
 	});
 
 	// Send back the session data.
 	app.io.route('send-feelings', function(req) {
-		console.log('socket feels something'.red);
-		req.session.feelings = req.data
-		req.session.save(function() {
-			req.io.emit('session', req.session)
-		});
+		// console.log('socket feels something'.red);
+		// req.session.feelings = req.data
+		// req.session.save(function() {
+		// 	req.io.emit('session', req.session)
+		// });
 	});
 
 	// helper function : if is logged in
