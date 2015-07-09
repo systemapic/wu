@@ -524,6 +524,8 @@ module.exports = api.access = {
 		// return on missing info
 		if (!projectUuid || !userUuid || !roleUuid) return api.error.missingInformation(req, res);
 
+		console.log('projreoroor', projectUuid);
+
 		// get role 
 		ops.push(function (callback) {
 			api.access.getRole({
