@@ -118,6 +118,17 @@ Wu.StatusPane = Wu.Class.extend({
 		var headerPaneDiv = app.HeaderPane._container;
 		Wu.DomEvent.on(headerPaneDiv, 'click', this.close, this);
 
+		//implementing collapsing pane capability in the start screen - recent projects pane
+		// var atStartPane = document.getElementsByClassName('startpane-canvas-container')[0];
+		var atStartPane = app.StartPane._container;
+		if (atStartPane !== undefined ){
+			//necessary check for the state that follows after having chosen a project
+			Wu.DomEvent.on(atStartPane, 'click', this.close, this);
+
+			// disable "select project" event in startpane
+			app.StartPane.disableHooks();
+		}
+
 	},
 
 	_removeAutoCloseEvents : function () {
@@ -130,10 +141,25 @@ Wu.StatusPane = Wu.Class.extend({
 		var headerPaneDiv = app.HeaderPane._container;
 		Wu.DomEvent.off(headerPaneDiv, 'click', this.close, this);
 
+		//implementing collapsing pane capability in the start screen - recent projects pane
+	    	// var atStartPane = document.getElementsByClassName('startpane-canvas-container')[0];
+		var atStartPane = app.StartPane._container;
+	    	if (atStartPane !== undefined ){
+	    		//necessary check for the state that follows after having chosen a project
+			Wu.DomEvent.off(atStartPane, 'click', this.close, this);
+
+			// enable "select project" event in startpane
+			app.StartPane.enableHooks();
+
+		}
+
 	},
 
 	// close sidepane menu
 	close : function (e) {
+		
+		// trying to stop event from propagating
+		if (e) Wu.DomEvent.stop(e);
 
 		this.isOpen = false;
 
