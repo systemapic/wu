@@ -45,6 +45,7 @@
     "mongoose": "^4.0.1",
     "mongoose-times": "^0.1.0",
     "morgan": "^1.5.2",
+    "node-dir": "^0.1.8",
     "node-gyp": "^1.0.3",
     "node-sass": "^2.1.1",
     "node-upload-progress": "0.0.1",
