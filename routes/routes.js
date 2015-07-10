@@ -120,12 +120,21 @@ module.exports = function(app, passport) {
 	});
 
 	// =====================================
-	// UPLOAD DATA LIBRARY FILES ===========
+	// UPLOAD DATA LIBRARY FILES =========== // renamed route to /chunked
 	// =====================================
-	app.post('/api/upload', passport.authenticate('bearer', {session: false}), function (req, res) {
+	app.post('/api/data/upload/chunked', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.chunkedUpload(req, res);
 	});
 	
+
+	// new api for uploading files (postgis enabled)
+	// =====================================
+	// UPLOAD FILES - NEW API ===========
+	// =====================================
+	app.post('/api/data/upload', passport.authenticate('bearer', {session: false}), function (req, res) {
+		api.upload.chunkedUpload(req, res);
+	});
+
 
 
 	// =====================================

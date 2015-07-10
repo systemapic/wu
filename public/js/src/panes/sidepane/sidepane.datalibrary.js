@@ -232,7 +232,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var projectUuid = app.activeProject.getUuid();
 
 		var r = this.r = new Resumable({
-			target : '/api/upload',
+			target : '/api/data/upload/chunked',
 			chunkSize : 1*1024*1024,
 			simultaneousUploads : 5,
 			generateUniqueIdentifier : function (file) {
