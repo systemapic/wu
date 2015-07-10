@@ -849,3 +849,8 @@ blockquote {
 .list-description {
   color: #8F8F8F;
 }
+
+/* #172 */
+.client-title input, .client-description input, .project-title input, .project-description input, .project-edit-textarea{
+	color: white;
+}
