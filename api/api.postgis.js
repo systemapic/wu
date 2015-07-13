@@ -37,11 +37,33 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // resumable.js
 var r = require('../tools/resumable-node')('/data/tmp/');
 
+// postgres
+var pg = require('node-postgres');
+
+
 // api
 var api = module.parent.exports;
 
 // exports
 module.exports = api.postgis = { 
+
+	
+
+	createDatabase : function (options, done) {
+		var userUuid = options.userUuid;
+
+	},
+
+	createTable : function (options, done) {
+		var userUuid = options.userUuid;
+
+	},
+
+	importData : function (options, done) {
+
+
+	}
+
 
 
 }

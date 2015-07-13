@@ -1,5 +1,3 @@
-
-
 // server.js
 var express  = require('express.io');
 var mongoose = require('mongoose');
