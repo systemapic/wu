@@ -114,16 +114,25 @@ Wu.StartPane = Wu.Pane.extend({
 				//the user has access to create projects
 				this._recentProjectsHeader = Wu.DomUtil.create('h1', 'startpane-header-title', this._recentProjectsContainer, 'Get started:');
 				this._hasAccessMessage = Wu.DomUtil.create('p', 'startpane-has-access',this._recentProjectsContainer,'Hello ' +app.Account.getFirstName()+'.<br/>You have no projects yet. Choose one of your clients and click the respective button below to start a project.');
-				
+				this._clientsContainer = Wu.DomUtil.create('div', 'startpane-client-container',this._recentProjectsContainer);
+
 				for (c in app.Clients) {
 					var client = app.Clients[c];
 					
-					var logo = client.getLogo();
+					var logo = this._getPixelLogo(client.getLogo()) || '/css/images/grayLight-systemapic-logo-circle-240x240.png'; //assign a default logo if none
 					var name = client.getName();
+
+
+					this._singleClientContainer = Wu.DomUtil.create('div', 'startpane-single-client-container',this._clientsContainer);
 					
-					// same as app.SidePane.Clients.clients[i].client.name 
-					this._clientDiv = Wu.DomUtil.create('p', 'startpane-has-client', this._recentProjectsContainer,name + '<br/>');
-					//this._clientDiv = Wu.DomUtil.create(...etc)
+					this._logoContainer = Wu.DomUtil.create('div', 'startpane-client-logo', this._singleClientContainer, '<img src='+logo+'>');
+					//adding the client name 
+					this._clientDiv = Wu.DomUtil.create('div', 'startpane-client-name', this._singleClientContainer, '<p>' +name + '</p>');
+					this._createProjectLink = Wu.DomUtil.create('div', 'startpane-new-project', this._singleClientContainer, '<p>Create new project.</p>');
+					Wu.DomEvent.on(this._createProjectLink, 'mousedown', function() { this.createProjectFromClient(client); }, this);
+
+					// add tooltip
+					app.Tooltip.add(this._logoContainer, 'Click to create new project.');
 				}
 
 			} else {
@@ -477,6 +486,98 @@ Wu.StartPane = Wu.Pane.extend({
 			// Set padding
 			this._wrapper.style.paddingTop = padding + 'px';
 
+	},
+
+	//creates a new default project for a client that has none
+	createProjectFromClient : function (client) {
+		var position = app.options.defaults.project.position;
+		var store = {
+			name : 'Project title',
+			description : 'Project description',
+			createdByName : app.Account.getName(),
+			keywords : '',
+			client : client.getUuid(),
+			position : position || {},
+			bounds : {
+				northEast : {
+					lat : 0,
+					lng : 0
+				},
+				southWest : {
+					lat : 0,
+					lng : 0
+				},
+				minZoom : 1,
+				maxZoom : 22
+			},
+			header : {
+				height : 50
+			},
+			folders : []
+		}
+		// create new project with options, and save
+		var project = new Wu.Project(store);
+		project.editMode = true;
+
+		var sidepaneClient = this._getSidepaneClient(client);
+
+		var options = {
+			store : store,
+			callback : sidepaneClient._projectCreated,
+			context : sidepaneClient
+		}
+
+		project._saveNew(options);
+
+		// Google Analytics event tracking
+		app.Analytics.setGaEvent(['Start Pane', 'Clients: new project']);	
+		this.deactivate();
+	},
+
+	_projectCreated : function (project, json) {
+
+		var result = Wu.parse(json),
+		    error  = result.error,
+		    store  = result.project;
+
+		// return error
+		if (error) return app.feedback.setError({
+			title : 'There was an error creating new project!', 
+			description : error
+		});
+			
+		// add to global store
+		app.Projects[store.uuid] = project;
+
+		console.log('store', store);
+		// update project store
+		project.setNewStore(store);
+
+		// create project in sidepane
+		this._createNewProject(project);
+
+	},
+
+	//helper function
+	_getSidepaneClient : function (client){
+		var array = app.SidePane.Clients.clients;
+		var client = _.find(array,function(a){ 
+			return a.client.getUuid() == client.getUuid(); 
+			});
+		return client;
+	},
+
+	_getPixelLogo : function (logo) {
+		if (!logo) return false;
+		var base;
+		//if(logo.search('/css/images') !== -1){
+		//	base = logo.split('/').reverse()[0];
+		//} else{
+			base = logo.split('/')[2];
+		//}
+		console.log(base);
+		var url = '/pixels/image/' + base + '?width=250&height=250&format=png';
+		return url;
 	}
 });
 
