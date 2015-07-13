@@ -100,15 +100,15 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			delete this._uploader;
 		}
 
-		if (this._uploaderSimple) {
-			Wu.DomUtil.remove(this._uploaderSimple);
-			this._uploaderSimple = null;
-			delete this._uploaderSimple;
-		}
+		// if (this._uploaderSimple) {
+		// 	Wu.DomUtil.remove(this._uploaderSimple);
+		// 	this._uploaderSimple = null;
+		// 	delete this._uploaderSimple;
+		// }
 
 		// Upload button
 		this._uploader = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Import data...');
-		this._uploaderSimple = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload image/document');
+		// this._uploaderSimple = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload image/document');
 	},
 
 	_setHooks : function (on) {
@@ -192,7 +192,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		
 		if (canDelete)   Wu.DomUtil.removeClass(this._deleter, 'displayNone');
 		if (canUpload)   Wu.DomUtil.removeClass(this._uploader, 'displayNone');
-		if (canUpload)   Wu.DomUtil.removeClass(this._uploaderSimple, 'displayNone');
+		// if (canUpload)   Wu.DomUtil.removeClass(this._uploaderSimple, 'displayNone');
 		if (canDownload) Wu.DomUtil.removeClass(this._downloader, 'displayNone');
 		
 	},
@@ -223,16 +223,16 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	_disableResumable : function () {
 		// remove drop events
-		// Wu.DomEvent.off(window.document, 'dragenter', this._dragEnter, this);
-		// Wu.DomEvent.off(this._resumableDrop, 'dragleave', this._dragLeave, this);
-		// Wu.DomEvent.off(this._resumableDrop, 'drop', this._dragLeave, this);
+		Wu.DomEvent.off(window.document, 'dragenter', this._dragEnter, this);
+		Wu.DomEvent.off(this._resumableDrop, 'dragleave', this._dragLeave, this);
+		Wu.DomEvent.off(this._resumableDrop, 'drop', this._dragLeave, this);
 	},
 
 	_enableResumable : function () {
 		// add drag/drop events
-		// Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
-		// Wu.DomEvent.on(this._resumableDrop, 'dragleave', this._dragLeave, this);
-		// Wu.DomEvent.on(this._resumableDrop, 'drop', this._dragLeave, this);
+		Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
+		Wu.DomEvent.on(this._resumableDrop, 'dragleave', this._dragLeave, this);
+		Wu.DomEvent.on(this._resumableDrop, 'drop', this._dragLeave, this);
 	},
 
 	_addResumable : function () {
@@ -280,7 +280,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		});
 
 		// assign to DOM
-		// r.assignDrop(this._resumableDrop);
+		r.assignDrop(this._resumableDrop);
 		r.assignBrowse(this._uploader);
 
 		r.on('fileAdded', function(file){
