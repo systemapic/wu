@@ -99,8 +99,16 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			this._uploader = null;
 			delete this._uploader;
 		}
+
+		if (this._uploaderSimple) {
+			Wu.DomUtil.remove(this._uploaderSimple);
+			this._uploaderSimple = null;
+			delete this._uploaderSimple;
+		}
+
 		// Upload button
-		this._uploader = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload');
+		this._uploader = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Import data...');
+		this._uploaderSimple = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload image/document');
 	},
 
 	_setHooks : function (on) {
@@ -184,6 +192,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		
 		if (canDelete)   Wu.DomUtil.removeClass(this._deleter, 'displayNone');
 		if (canUpload)   Wu.DomUtil.removeClass(this._uploader, 'displayNone');
+		if (canUpload)   Wu.DomUtil.removeClass(this._uploaderSimple, 'displayNone');
 		if (canDownload) Wu.DomUtil.removeClass(this._downloader, 'displayNone');
 		
 	},
@@ -214,16 +223,16 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	_disableResumable : function () {
 		// remove drop events
-		Wu.DomEvent.off(window.document, 'dragenter', this._dragEnter, this);
-		Wu.DomEvent.off(this._resumableDrop, 'dragleave', this._dragLeave, this);
-		Wu.DomEvent.off(this._resumableDrop, 'drop', this._dragLeave, this);
+		// Wu.DomEvent.off(window.document, 'dragenter', this._dragEnter, this);
+		// Wu.DomEvent.off(this._resumableDrop, 'dragleave', this._dragLeave, this);
+		// Wu.DomEvent.off(this._resumableDrop, 'drop', this._dragLeave, this);
 	},
 
 	_enableResumable : function () {
 		// add drag/drop events
-		Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
-		Wu.DomEvent.on(this._resumableDrop, 'dragleave', this._dragLeave, this);
-		Wu.DomEvent.on(this._resumableDrop, 'drop', this._dragLeave, this);
+		// Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
+		// Wu.DomEvent.on(this._resumableDrop, 'dragleave', this._dragLeave, this);
+		// Wu.DomEvent.on(this._resumableDrop, 'drop', this._dragLeave, this);
 	},
 
 	_addResumable : function () {
@@ -239,7 +248,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				var idr = file.size + '-' + file.lastModified + '-' + file.name;
 				return idr;
 			},
-			testChunks : true, // resumable chunks // todo: server side redis count not stable
+			testChunks : false, // resumable chunks // todo: server side redis count not stable
 			throttleProgressCallbacks : 1,
 			query : {
 				fileUuid : Wu.Util.guid('r'),
@@ -247,26 +256,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				access_token : app.tokens.access_token
 			},
 
-			// // max files to be uploaded at once
-			// maxFiles : 5,
-			// maxFilesErrorCallback : function (files, errorCount) {
-
-			// 	// feedback message
-			// 	app.feedback.setError({
-			// 		title : "Sorry, you can't do that!",
-			// 		description : 'Please only upload five files at a time.',
-			// 	});
-
-			// 	// hide drop
-			// 	app.SidePane.DataLibrary._hideDrop();
-			// },
-
 			// accepted filetypes
-			fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif', 'tiff', 'jp2', 'ecw'],
+			// fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif', 'tiff', 'jp2', 'ecw'],
+			fileType : ['zip', 'gz', 'geojson', 'tif', 'tiff', 'jp2', 'ecw'],
 			fileTypeErrorCallback : function (file, errorCount) {
 
 				// set feedback
-				var description = 'The file <strong>' + file.name + '</strong> is not an accepted filetype.';
+				var description = 'The file <strong>' + file.name + '</strong> is not a geodata file. To upload normal images or documents, use the "Upload image/document button".';
 				var filetype = file.name.split('.').reverse()[0];
 				
 				// custom shapefile feedback
@@ -284,7 +280,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		});
 
 		// assign to DOM
-		r.assignDrop(this._resumableDrop);
+		// r.assignDrop(this._resumableDrop);
 		r.assignBrowse(this._uploader);
 
 		r.on('fileAdded', function(file){
@@ -326,24 +322,25 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			    estimatedProcessingTime = (size * 0.5).toFixed(0) + ' seconds',
 			    ext = file.fileName.split('.').reverse()[0];
 
-			var regularFile = (ext == 'pdf' || ext == 'txt' || ext == 'doc' || ext == 'docx' || ext == 'jpeg');
+			// var regularFile = (ext == 'pdf' || ext == 'txt' || ext == 'doc' || ext == 'docx' || ext == 'jpeg');
 			
 			message +=' <br><br>Pre-processing will take approx. ' + estimatedProcessingTime;
 
 			// set feedback
-			if (regularFile) {
-				app.feedback.setSuccess({
-					title : 'Upload done',
-					description : file.fileName + ' was uploaded successfully.',
-					id : file.uniqueIdentifier,
-				});
-			} else {
-				app.feedback.setMessage({
-					title : 'Upload success!',
-					description : message,
-					id : file.uniqueIdentifier
-				});
-			}
+			app.feedback.setMessage({
+				title : 'Upload success!',
+				description : message,
+				id : file.uniqueIdentifier
+			});
+			// if (regularFile) {
+			// 	app.feedback.setSuccess({
+			// 		title : 'Upload done',
+			// 		description : file.fileName + ' was uploaded successfully.',
+			// 		id : file.uniqueIdentifier,
+			// 	});
+			// } else {
+				
+			// }
 
 			// hide progess bar
 			app.ProgressBar.hideProgress();

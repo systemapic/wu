@@ -35,6 +35,8 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
+var ZipInfo = require('infozip');
+
 // resumable.js
 var r = require('../tools/resumable-node')('/data/tmp/');
 
@@ -43,6 +45,90 @@ var api = module.parent.exports;
 
 // exports
 module.exports = api.upload = { 
+
+
+	// import : function (req, res) {
+
+	// 	// curl --form "userUuid=loka" \
+	// 	//	--form "meta=feta" \
+	// 	// 	--form "data=@/home/_testing/veryold/africa/africa.zip" \
+	// 	//	--header "Authorization: Bearer [access_token]" \
+	// 	//	https://dev.systemapic.com/api/data/import
+
+	// 	console.log('api.upload.import, req.body: ', req.body); // { userUuid: 'loka', meta: 'feta' }
+
+	// 	// console.log('files: ', req.files);
+
+
+	// 	// console.log('file: ', file);
+
+	// 	// return 
+	// 	res.end(JSON.stringify({
+	// 		success : true,
+	// 		errors : null,
+	// 		uploadUuid : options.uploadUuid
+	// 	}));
+	// },
+
+
+
+	// organizeImport : function (options) {
+
+	// 	console.log('organizeImport: ', options);
+
+	// 	// this is only data import, so check for geodata
+
+
+	// 	var temporaryPath = req.files.data.path;
+
+	// 	var zip = new ZipInfo(temporaryPath);
+
+
+	// 	var options = {
+	// 		userUuid : req.body.userUuid,
+	// 		temporaryPath : req.files.data.path,
+	// 		uploadUuid : 'upload-' + uuid.v4(),
+	// 	}
+
+	// 	zip.read(function (err, entries) {
+
+	// 		console.log('zip err?', err);
+			
+	// 		// console.log('entries: ', entries);
+	// 		// { entries:
+	// 		//  [ { name: 'Africa.shx',
+	// 		//      size: 6196,
+	// 		//      crc: 'ef984e26',
+	// 		//      isDirectory: false },
+	// 		//    { name: 'Africa.dbf',
+	// 		//      size: 33657,
+	// 		//      crc: 'eb51a0b3',
+	// 		//      isDirectory: false },
+	// 		//    { name: 'Africa.shp',
+	// 		//      size: 3333196,
+	// 		//      crc: '67842891',
+	// 		//      isDirectory: false } ],
+	// 		// size: 0 }
+
+	// 		options.entries = entries.entries;
+
+	// 		// organize
+	// 		api.upload.organizeImport(options);
+
+	// 	});
+
+
+	// },
+
+
+
+
+
+
+
+
+
+
 
 	chunkedUpload : function (req, res) {
 	    	var options = req.body,
@@ -85,7 +171,8 @@ module.exports = api.upload = {
 					projectUuid : projectUuid,
 					fileUuid : fileUuid,
 					resumableTotalChunks : options.resumableTotalChunks,
-					resumableIdentifier : options.resumableIdentifier
+					resumableIdentifier : options.resumableIdentifier,
+					req : req
 				});
 			});
 		});
@@ -96,6 +183,7 @@ module.exports = api.upload = {
 		    uniqueIdentifier = options.uniqueIdentifier,
 		    outputPath = options.outputPath,
 		    resumableIdentifier = options.resumableIdentifier,
+		    user = options.user,
 		    tmpFolder = '/data/tmp/',
 		    ops = [];
 
@@ -188,7 +276,7 @@ module.exports = api.upload = {
 		ops.push(function (callback) {
 
 			// quick sort
-			api.upload.sortFormFiles(fileArray, function (err, results) {
+			api.upload.sortFormFiles(fileArray, options, function (err, results) {
 				if (err) console.log('ERR 18'.red, err);
 				if (err || !results) return callback(err || 'There were no valid files in the upload.');
 
@@ -324,7 +412,7 @@ module.exports = api.upload = {
 	},
 
 
-	sortFormFiles : function (fileArray, done) {
+	sortFormFiles : function (fileArray, opts, done) {
 
 		// quick sort
 		var ops = [];
@@ -344,7 +432,8 @@ module.exports = api.upload = {
 				name : file.name,
 				type : file.type,
 				extension : extension,
-				currentFolder : null
+				currentFolder : null,
+				user : opts.user
 			}
 
 			// add async ops
@@ -653,7 +742,11 @@ module.exports = api.upload = {
 			ops.push(function (callback) {
 
 				// process shapefile (convert, store, vectorize, etc.)
-				api.file.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
+				// api.file.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
+				api.postgis.importShapefile(options, function (err, db) {
+
+				// })
+				// api.file.handleShapefile(options, function (err, db) {
 					if (err) console.log('ERR 40'.red, err);
 					if (err) console.log('### SORTOPS HANDLESHAPEFILE ERR'.red, err);
 					if (err) return callback(err);

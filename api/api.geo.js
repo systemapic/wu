@@ -127,180 +127,101 @@ module.exports = api.geo = {
 
 	import2postgis : function (options, callback) {
 
-
-		var files = options.files;
-		var folder = options.folder;
-		var clientName = options.clientName;
-
-		console.log('import2postgis(), files: ', files, folder);
-
-		// get the .shp file
-		var shps = api.geo.getTheShape(files);
-		
-		if (!shps) console.error('ERR: 401 -> No shapefile?????');
-		// return err if no .shp found
-		// if (!shps) return callback('No shapefile?');
-
-		// vars
-		var shp = shps[0];
-		var base = shp.slice(0,-4);
-
-		var fileUuid = clientName + '_' + uuid.v4();
-		// var toFile = shp + '.geojson';
-		// var outfolder = api.config.path.file + fileUuid;
-		// var outFile = outfolder + '/' + toFile;
-		// var inFile = outfolder + '/' + shp;
-		// var zipFile = outfolder + '/' + base + '.zip';
-		// var proj = outfolder + '/' + base + '.prj';
-
-		console.log('shp: ', shp);
-		console.log('base: ', base);
-		console.log('fileUuid: ', fileUuid);
+		return api.postgis.importData(options, callback);
 		
 		
-		var shapefile_path = '"' + folder + '/' + shp + '"';
-
-		// configs
-		var pg_username = 'docker';
-		var pg_password = 'docker';
-		// var pg_host = '172.17.8.151';
-		var pg_host = 'postgis';
-		var pg_db = 'systemapic';
-
-		// paths
-		// var shapefile_folder = '"/docks/postgis/data/';
-		// var shapefile_file = 'cetin3/cetin3_SBAS_6x5_22d-sbas-direct_UTM38N.shp"';
-		// var shapefile_path = shapefile_folder + shapefile_file;
-		
-		// fileUuid of data
-		// var fileUuid = 'file-' + uuid.v4();
-
-
-		// var cmd = 'shp2pgsql -I egypt/EGY-level_1.shp file-322323-232332 | PGPASSWORD=docker psql -h 172.17.8.151 --username=docker systemapic'
-		var cmd = [
-			'shp2pgsql',
-			'-I',
-			shapefile_path,
-			fileUuid,
-			'|',
-			'PGPASSWORD=' + pg_password,
-			'psql',
-			'-h 172.17.8.151',
-			'--username=' + pg_username,
-			'systemapic'
-		]
-
-		var command = cmd.join(' ');
-		console.log('command: ', command);
-
-		console.time('import');
-		exec(command, {maxBuffer: 1024 * 50000}, function (err, stdin, stdout) {
-			console.log('cmd done', stdout, stdin, err);
-			console.timeEnd('import');
-
-			console.log('shp2psql err: ', err);
-
-			var returnObject = {
-				path : 'postgis_debug_path', 
-				name : 'postgis_debug_name', 
-				fileUuid : fileUuid
-			}
-
-			callback(err, returnObject);
-		});
-
 		
 	},
 
-	// new way: postgis!
-	handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
-		if (!folder || !name || !fileUuid) return callback('Missing info.');
+	// // new way: postgis!
+	// handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
+	// 	if (!folder || !name || !fileUuid) return callback('Missing info.');
 
-		fs.readdir(folder, function (err, files) {
-			if (err || !files) return callback('Some files were rejected. Please upload <br>only one shapefile per zip.');
+	// 	fs.readdir(folder, function (err, files) {
+	// 		if (err || !files) return callback('Some files were rejected. Please upload <br>only one shapefile per zip.');
 
-			// clone array
-			var shapefiles = files.slice();
+	// 		// clone array
+	// 		var shapefiles = files.slice();
 
-			// async ops
-			var ops = [];
+	// 		// async ops
+	// 		var ops = [];
 
-			// check if valid shapefile(s)
-			ops.push(function (done) {
-				api.geo.validateshp(files, done);
-			});
+	// 		// check if valid shapefile(s)
+	// 		ops.push(function (done) {
+	// 			api.geo.validateshp(files, done);
+	// 		});
 
-			// import into postgis
-			ops.push(function (done) {
+	// 		// import into postgis
+	// 		ops.push(function (done) {
 
-				var options = {
-					files : files, 
-					folder : folder,
-					clientName : 'clientName'
-				}
-				api.geo.import2postgis(options, done);
-			});
+	// 			var options = {
+	// 				files : files, 
+	// 				folder : folder,
+	// 				clientName : 'clientName'
+	// 			}
+	// 			api.geo.import2postgis(options, done);
+	// 		});
 
-			// // convert shapefile to geo/topojson
-			// ops.push(function (done) {
-			// 	api.geo.convertshp(files, folder, done);
-			// });
+	// 		// // convert shapefile to geo/topojson
+	// 		// ops.push(function (done) {
+	// 		// 	api.geo.convertshp(files, folder, done);
+	// 		// });
 
-			// run async jobs
-			async.series(ops, function (err, results) {
-				if (err) {
-					console.log('MOFO!!'.red, err);
-					return callback(err);
-				}
+	// 		// run async jobs
+	// 		async.series(ops, function (err, results) {
+	// 			if (err) {
+	// 				console.log('MOFO!!'.red, err);
+	// 				return callback(err);
+	// 			}
 
-				var key = results[1];
-				if (!key) return callback('No key.');
+	// 			var key = results[1];
+	// 			if (!key) return callback('No key.');
 
-				var path = key.path;
-				var name = key.name;
-				var fileUuid = key.fileUuid;
+	// 			var path = key.path;
+	// 			var name = key.name;
+	// 			var fileUuid = key.fileUuid;
 
-				// add geojson file to list
-				shapefiles.push(name);
+	// 			// add geojson file to list
+	// 			shapefiles.push(name);
 
-				// return as db entry
-				var db = {
-					files : shapefiles,
-					data : {
-						geojson : name
-					},
-					title : name,
-					file : fileUuid
-				}
+	// 			// return as db entry
+	// 			var db = {
+	// 				files : shapefiles,
+	// 				data : {
+	// 					geojson : name
+	// 				},
+	// 				title : name,
+	// 				file : fileUuid
+	// 			}
 
-				// todo: meta from postgis
+	// 			// todo: meta from postgis
 
-				// return
-				callback(null, db);
+	// 			// return
+	// 			callback(null, db);
 
-				// api.geo.copyToVileFolder(path, fileUuid, function (err) {
-				// 	if (err) return callback('copytToVile err: ' + err);
+	// 			// api.geo.copyToVileFolder(path, fileUuid, function (err) {
+	// 			// 	if (err) return callback('copytToVile err: ' + err);
 
-				// 	try {
-				// 		// read meta from file
-				//         	mapnikOmnivore.digest(path, function (err, metadata) {
-				//         		if (err) {
-				//         			console.log('ERR 400', err);
-				//         			return callback(err);
-				//         		}
-				//         		if (!metadata) return callback('No metadata!');
+	// 			// 	try {
+	// 			// 		// read meta from file
+	// 			//         	mapnikOmnivore.digest(path, function (err, metadata) {
+	// 			//         		if (err) {
+	// 			//         			console.log('ERR 400', err);
+	// 			//         			return callback(err);
+	// 			//         		}
+	// 			//         		if (!metadata) return callback('No metadata!');
 
-				//         		db.metadata = JSON.stringify(metadata);
+	// 			//         		db.metadata = JSON.stringify(metadata);
 					        	
-				// 	        	// return
-				// 	        	callback(null, db);
-				//         	});
+	// 			// 	        	// return
+	// 			// 	        	callback(null, db);
+	// 			//         	});
 
-				//         } catch (e) { callback('meta fail: ' + e); }
-		  //       	});
-			});
-		});
-	},
+	// 			//         } catch (e) { callback('meta fail: ' + e); }
+	// 	  //       	});
+	// 		});
+	// 	});
+	// },
 
 
 	// old way, with files
@@ -387,7 +308,7 @@ module.exports = api.geo = {
 		files.forEach(function (f) {
 			var ext = f.slice(-4);
 			_.pull(mandatory, ext);
-		})
+		});
 
 		// if not all accounted for, return error
 		if (mandatory.length > 0) {

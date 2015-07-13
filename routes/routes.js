@@ -144,6 +144,54 @@ module.exports = function(app, passport) {
 	});
 
 
+
+
+
+
+
+
+
+
+
+
+	// =====================================
+	// POSTGIS API  ========================
+	// =====================================
+
+
+
+	// app.post('/api/data/createDatabase', passport.authenticate('bearer', {session: false}), function (req,res) {
+	// 	api.postgis.createDatabase(req.body, function (err, result) {
+	// 		if (err) console.log('/api/data/createDatabase', err);
+	// 		res.end(JSON.stringify(result));
+	// 	});
+	// });
+
+
+
+	// =====================================
+	// IMPORT DATA to POSTGIS ==============
+	// =====================================
+	app.post('/api/data/import', passport.authenticate('bearer', {session: false}), function (req, res) {
+		api.upload.import(req, res);
+	
+	});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	// =====================================
 	// DELETE PROJECT   ====================
 	// =====================================
