@@ -15,6 +15,7 @@ var _ 		= require('lodash-node');
 var fs 		= require('fs-extra');
 var gm 		= require('gm');
 var kue 	= require('kue');
+var dir 	= require('node-dir');
 var fss 	= require("q-io/fs");
 var zlib 	= require('zlib');
 var uuid 	= require('node-uuid');
@@ -65,24 +66,40 @@ module.exports = api.upload = {
 	import : function (req, res) {
 		console.log('api.upload.import, req.body: ', req.body); // { userUuid: 'loka', meta: 'feta' }
 
+
+
 		// return object
 		var result = {
-			uploadID : api.utils.getRandomChars(8), // create upload id
-			user : req.user,
-			options : req.body,
-			files : req.files
+			upload_id : api.utils.getRandomChars(16), // create upload id
+			uploaded_by : req.user.uuid,
+			filename : req.files.data.originalFilename,
+			timestamp : Date.now()
 		}
 
-		// return id of upload
+		// todo: save upload id to redis for processing feedback
+
+		// return id of upload to client
 		res.end(JSON.stringify(result));
 
 		// process upload
-		// api.upload.organizeImport(result);
+		api.upload.prepareImport({
+			upload_id : result.upload_id,
+			files : req.files,
+			options : req.body,
+			user : req.user,
+			timestamp : result.timestamp
+		}, function (err, options) {
+		
+			// organize import
+			api.upload.organizeImport(options);
+		});
+
+		
 	},
 
 
 	/**
-	 * Organize upload
+	 * Prepare upload before organizing (unzip, etc.)
 	 *
 	 * @private
 	 *
@@ -90,10 +107,9 @@ module.exports = api.upload = {
 	 * @param {object} options - Options object containing uploadID, user, req.body, req.files
 	 * @returns null
 	 */
-	organizeImport : function (options) {
+	prepareImport : function (options, done) {
 
-		
-		// file can at this point be either: 
+		// file can at this point be either: (always a single file)
 		// 	zip
 		// 	tar.gz
 		// 	geojson
@@ -101,63 +117,225 @@ module.exports = api.upload = {
 		// 	ecw
 		// 	jp2
 
+		// ACTIONS
+		// --------
 		// if zip/gz file, unzip
-
 		// if geojson, handle as geojson // ogr2ogr
-
 		// if tif/f, handle as tiff 	// 
 		// if ecw, handle as ecw	// } raster2psql
 		// if jp2, handle as jp2	//
 
 		// when done: will have a file or list of files in a temp folder
+		//
+		// end result: 
+		// {
+		// 	upload_id : result.upload_id,
+		// 	files : [list of files with full path],
+		// 	options : req.body,
+		// 	user : req.user
+		// }
 
 
 		console.log('organizeImport: ', options);
 
-		var temporaryPath = options.files.data.path;
+		// get files object
+		var files = options.files;
 
+		// get path
+		var temporaryPath = files.data.path;
 
-		var extension = temporaryPath.split('.').reverse()[0];
+		// get file extension
+		var ext = temporaryPath.split('.').reverse()[0].trim();
 
-
-		var zip = new ZipInfo(temporaryPath);
-
-
-		var options = {
-			userUuid : options.user.uuid,
-			temporaryPath : req.files.data.path,
-			uploadUuid : 'upload-' + uuid.v4(),
-		}
-
-		zip.read(function (err, entries) {
-
-			console.log('zip err?', err);
+		console.log('extension is: ', ext);
 			
-			// console.log('entries: ', entries);
-			// { entries:
-			//  [ { name: 'Africa.shx',
-			//      size: 6196,
-			//      crc: 'ef984e26',
-			//      isDirectory: false },
-			//    { name: 'Africa.dbf',
-			//      size: 33657,
-			//      crc: 'eb51a0b3',
-			//      isDirectory: false },
-			//    { name: 'Africa.shp',
-			//      size: 3333196,
-			//      crc: '67842891',
-			//      isDirectory: false } ],
-			// size: 0 }
+		// set original filename + size
+		options.size = files.data.size;
+		options.originalFilename = files.data.originalFilename;
 
-			options.entries = entries.entries;
 
-			// organize
-			api.upload.organizeImport(options);
+		// organize files so output is equal no matter what ;)
+		var ops = [];
 
+		if (ext == 'zip') ops.push(function (callback) {
+			api.upload.unzip(options, function (err, files) {
+				options.files = files;
+				callback(null);
+			});
 		});
 
+		if (ext == 'gz') ops.push(function (callback) {
+			api.upload.untar(options, function (err, files) {
+				options.files = files;
+				callback(null);
+			});
+		});
+
+		if (ext == 'geojson') ops.push(function (callback) {
+			options.files = [temporaryPath];
+			callback(null);
+		});
+
+		if (ext == 'tif') ops.push(function (callback) {
+			options.files = [temporaryPath];
+			callback(null);
+		});
+
+		if (ext == 'tiff') ops.push(function (callback) {
+			options.files = [temporaryPath];
+			callback(null);
+		});
+
+		if (ext == 'ecw') ops.push(function (callback) {
+			options.files = [temporaryPath];
+			callback(null);
+		});
+
+		if (ext == 'jp2') ops.push(function (callback) {
+			options.files = [temporaryPath];
+			callback(null);
+		});
+
+		async.series(ops, function (err) {
+			if (err) console.log('api.upload.prepareImport err 3', err);
+			done(null, options);
+		});
 
 	},
+
+
+	organizeImport : function (options) {
+
+		console.log('organizeImport', options);
+		// { 
+		// 	upload_id: '3woibxuawttep14i',
+		// 	files: [ 
+		// 		'/data/tmp/3woibxuawttep14i/sydney.geojson' 
+		// 	],
+		// 	options: { 
+		// 		userUuid: 'loka', 
+		// 		meta: 'feta' 
+		// 	},
+		// 	user: { 
+		// 		_id: 55a395d6b20fee8956807ae6,
+		// 		lastUpdated: Mon Jul 13 2015 12:59:00 GMT+0000 (UTC),
+		// 		created: Mon Jul 13 2015 10:41:26 GMT+0000 (UTC),
+		// 		createdBy: 'user-f6dfd21b-2e72-44ff-b433-c574bd80e328',
+		// 		phone: 'k',
+		// 		position: 'k',
+		// 		company: 'k',
+		// 		lastName: 'k',
+		// 		firstName: 'lk',
+		// 		uuid: 'user-fcf9bd89-dea9-4abe-9219-d18a35c85ac5',
+		// 		__v: 0,
+		// 		token: 'token-d18a35c85ac5.7c74b712fa2533beccebf288',
+		// 		google: {},
+		// 		twitter: {},
+		// 		facebook: {},
+		// 		local: { 
+		// 			password: '$2a$08$N02tEu4qGsYr/sztGHTLEeQ0r4jMU3Nbi9UbKpcWmA7IABo8B4.0e',
+		// 			email: 'foudroyant4@gmail.com' 
+		// 		} 
+		// 	},
+		// 	timestamp: 1436815452458,
+		// 	size: 53520,
+		// 	originalFilename: 'road.tar.gz' 
+		// }
+
+		// figure out if shapefile, geojson, or raster, then process accordingly
+
+
+		var geotype = api.upload.getGeotype(options);
+
+		if (!geotype) console.log('api.upload.organizeImport err 4: invalid geotype!', geotype, options);
+
+		if (geotype == 'shapefile') 	return api.postgis.importShapefile(options);
+		if (geotype == 'geojson') 	return api.postgis.importGeojson(options);
+		if (geotype == 'raster') 	return api.postgis.importRaster(options);
+
+		console.log('invalid geotyp...???');
+	},
+
+
+	getGeotype : function (options) {
+		var files = options.files;
+
+		if (files.length == 1) {
+			var file = files[0];
+			var ext = file.split('.').reverse()[0];
+			if (ext == 'geojson') return 'geojson';
+			if (ext == 'ecw') return 'raster';
+			if (ext == 'jp2') return 'raster';
+			if (ext == 'tif') return 'raster';
+			if (ext == 'tiff') return 'raster';
+		}
+
+		var type = false;
+		files.forEach(function (file) {
+			var ext = file.split('.').reverse()[0];
+			if (ext == 'shp') type = 'shapefile';
+		});
+
+		return type;
+	},
+
+
+
+
+
+
+
+	untar : function (options, done) {
+		var tarfile = options.files.data.path,
+		    extractPath = '/data/tmp/' + options.upload_id,
+		    exec = require('child_process').exec,
+		    cmd = 'tar xzf "' + tarfile + '" -C "' + extractPath + '"';
+			
+		// create upload_id temp dir
+		fs.ensureDir(extractPath, function (err) {
+			
+			// untar
+			exec(cmd, function (err, stdout, stdin) {
+				if (err) console.log('api.upload.untar err 2', err);
+				
+				// get list of filepaths
+				dir.files(extractPath, done);
+			});
+		});
+	},
+
+
+	// returns array of filepaths
+	unzip : function (options, done) {
+		var temporaryPath = options.files.data.path,
+		    zip = new ZipInfo(temporaryPath),
+		    extractPath = '/data/tmp/' + options.upload_id;
+		
+		// unzip
+		zip.extractTo(extractPath, ['*'], {junkPaths : true}, function (err) {
+			if (err) console.log('api.upload.unzip err 1', err);
+
+			// get list of filepaths
+			dir.files(extractPath, done);
+		});
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

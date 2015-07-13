@@ -41,10 +41,14 @@ var api = module.parent.exports;
 // exports
 module.exports = api.utils = { 
 
-	getRandomChars : function (digits) {
-		var random = Math.random().toString(36).slice((digits) * -1);
-		console.log('random: ', random);
-		return random;
+	getRandomChars : function (len, charSet) {
+		charSet = charSet || 'abcdefghijklmnopqrstuvwxyz';
+		var randomString = '';
+		for (var i = 0; i < len; i++) {
+			var randomPoz = Math.floor(Math.random() * charSet.length);
+			randomString += charSet.substring(randomPoz,randomPoz+1);
+		}
+		return randomString;
 	},
 
 	createNameSlug : function (name) {
@@ -52,7 +56,6 @@ module.exports = api.utils = {
 		slug =api.utils.stripAccents(slug);
 		return slug;
 	},
-
 
 	getRandomName : function () {
 		return _.sample(api.utils.randomNames);
@@ -539,7 +542,6 @@ module.exports = api.utils = {
 		var mapping = function (c) {
 			return map[c] || c; 
 		};
-
 		
 		return str.replace(nonWord, mapping);
 	},
