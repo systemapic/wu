@@ -127,14 +127,7 @@ module.exports = function(app, passport) {
 	});
 	
 
-	// new api for uploading files (postgis enabled)
-	// =====================================
-	// UPLOAD FILES - NEW API ===========
-	// =====================================
-	app.post('/api/data/upload', passport.authenticate('bearer', {session: false}), function (req, res) {
-		api.upload.chunkedUpload(req, res);
-	});
-
+	
 
 	// =====================================
 	// CREATE NEW PROJECT  =================
@@ -167,6 +160,14 @@ module.exports = function(app, passport) {
 	// 	});
 	// });
 
+
+	// // new api for uploading files (postgis enabled)
+	// // =====================================
+	// // UPLOAD FILES - NEW API ===========
+	// // =====================================
+	// app.post('/api/data/upload', passport.authenticate('bearer', {session: false}), function (req, res) {
+	// 	api.upload.chunkedUpload(req, res);
+	// });
 
 
 	// =====================================

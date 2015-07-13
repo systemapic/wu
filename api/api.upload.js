@@ -46,79 +46,118 @@ var api = module.parent.exports;
 // exports
 module.exports = api.upload = { 
 
+	/**
+	 * Import data to PostGIS
+	 *
+	 * @function api.upload.import
+	 * @param {object} req - Express Request object
+	 * @param {object} res - Express Request object
+	 * @returns {object} Success, errors and ID of upload
+	 *
+	 * @example
+	 * // example curl usage for this endpoint ('/api/data/import')
+	 * curl --form "userUuid=loka" \
+	 *      --form "meta=feta" \
+	 *      --form "data=@/home/_testing/veryold/africa/africa.zip" \
+	 *      --header "Authorization: Bearer [insert_access_token]" \
+	 *      https://dev.systemapic.com/api/data/import
+	 */
+	import : function (req, res) {
+		console.log('api.upload.import, req.body: ', req.body); // { userUuid: 'loka', meta: 'feta' }
 
-	// import : function (req, res) {
+		// return object
+		var result = {
+			uploadID : api.utils.getRandomChars(8), // create upload id
+			user : req.user,
+			options : req.body,
+			files : req.files
+		}
 
-	// 	// curl --form "userUuid=loka" \
-	// 	//	--form "meta=feta" \
-	// 	// 	--form "data=@/home/_testing/veryold/africa/africa.zip" \
-	// 	//	--header "Authorization: Bearer [access_token]" \
-	// 	//	https://dev.systemapic.com/api/data/import
+		// return id of upload
+		res.end(JSON.stringify(result));
 
-	// 	console.log('api.upload.import, req.body: ', req.body); // { userUuid: 'loka', meta: 'feta' }
-
-	// 	// console.log('files: ', req.files);
-
-
-	// 	// console.log('file: ', file);
-
-	// 	// return 
-	// 	res.end(JSON.stringify({
-	// 		success : true,
-	// 		errors : null,
-	// 		uploadUuid : options.uploadUuid
-	// 	}));
-	// },
-
-
-
-	// organizeImport : function (options) {
-
-	// 	console.log('organizeImport: ', options);
-
-	// 	// this is only data import, so check for geodata
-
-
-	// 	var temporaryPath = req.files.data.path;
-
-	// 	var zip = new ZipInfo(temporaryPath);
+		// process upload
+		// api.upload.organizeImport(result);
+	},
 
 
-	// 	var options = {
-	// 		userUuid : req.body.userUuid,
-	// 		temporaryPath : req.files.data.path,
-	// 		uploadUuid : 'upload-' + uuid.v4(),
-	// 	}
+	/**
+	 * Organize upload
+	 *
+	 * @private
+	 *
+	 * @function api.upload.organizeImport
+	 * @param {object} options - Options object containing uploadID, user, req.body, req.files
+	 * @returns null
+	 */
+	organizeImport : function (options) {
 
-	// 	zip.read(function (err, entries) {
+		
+		// file can at this point be either: 
+		// 	zip
+		// 	tar.gz
+		// 	geojson
+		// 	tif/f
+		// 	ecw
+		// 	jp2
 
-	// 		console.log('zip err?', err);
+		// if zip/gz file, unzip
+
+		// if geojson, handle as geojson // ogr2ogr
+
+		// if tif/f, handle as tiff 	// 
+		// if ecw, handle as ecw	// } raster2psql
+		// if jp2, handle as jp2	//
+
+		// when done: will have a file or list of files in a temp folder
+
+
+		console.log('organizeImport: ', options);
+
+		var temporaryPath = options.files.data.path;
+
+
+		var extension = temporaryPath.split('.').reverse()[0];
+
+
+		var zip = new ZipInfo(temporaryPath);
+
+
+		var options = {
+			userUuid : options.user.uuid,
+			temporaryPath : req.files.data.path,
+			uploadUuid : 'upload-' + uuid.v4(),
+		}
+
+		zip.read(function (err, entries) {
+
+			console.log('zip err?', err);
 			
-	// 		// console.log('entries: ', entries);
-	// 		// { entries:
-	// 		//  [ { name: 'Africa.shx',
-	// 		//      size: 6196,
-	// 		//      crc: 'ef984e26',
-	// 		//      isDirectory: false },
-	// 		//    { name: 'Africa.dbf',
-	// 		//      size: 33657,
-	// 		//      crc: 'eb51a0b3',
-	// 		//      isDirectory: false },
-	// 		//    { name: 'Africa.shp',
-	// 		//      size: 3333196,
-	// 		//      crc: '67842891',
-	// 		//      isDirectory: false } ],
-	// 		// size: 0 }
+			// console.log('entries: ', entries);
+			// { entries:
+			//  [ { name: 'Africa.shx',
+			//      size: 6196,
+			//      crc: 'ef984e26',
+			//      isDirectory: false },
+			//    { name: 'Africa.dbf',
+			//      size: 33657,
+			//      crc: 'eb51a0b3',
+			//      isDirectory: false },
+			//    { name: 'Africa.shp',
+			//      size: 3333196,
+			//      crc: '67842891',
+			//      isDirectory: false } ],
+			// size: 0 }
 
-	// 		options.entries = entries.entries;
+			options.entries = entries.entries;
 
-	// 		// organize
-	// 		api.upload.organizeImport(options);
+			// organize
+			api.upload.organizeImport(options);
 
-	// 	});
+		});
 
 
-	// },
+	},
 
 
 
@@ -171,8 +210,7 @@ module.exports = api.upload = {
 					projectUuid : projectUuid,
 					fileUuid : fileUuid,
 					resumableTotalChunks : options.resumableTotalChunks,
-					resumableIdentifier : options.resumableIdentifier,
-					req : req
+					resumableIdentifier : options.resumableIdentifier
 				});
 			});
 		});
@@ -212,14 +250,15 @@ module.exports = api.upload = {
 		// import file
 		ops.push(function (stats, callback) {
 			
-			var file = {
+			var fileOptions = {
 				path : options.outputPath,
 				size : stats.size,
 				name : options.fileName,
 				uniqueIdentifier : uniqueIdentifier
 			}
 
-			api.upload.importFile(file, options, callback);
+			// import file
+			api.upload.importFile(fileOptions, options, callback);
 		});
 
 
