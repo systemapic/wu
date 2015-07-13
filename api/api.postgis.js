@@ -48,7 +48,13 @@ var api = module.parent.exports;
 module.exports = api.postgis = { 
 
 
+	// todo tuesday: shapefile ok, continue with geojson, raster.
+
+
 	initUser : function (options, done) {
+		console.log('api.postgis.initUser --> IS THIS BEING RUN?!??!?!?!?')
+		return;
+
 		var user = options.account,
 		    options = options.options;
 
@@ -56,7 +62,6 @@ module.exports = api.postgis = {
 			user : user
 		}, function (err, result) {
 			if (err) return done(err);
-
 			done(null, user);
 		});
 
@@ -65,13 +70,12 @@ module.exports = api.postgis = {
 	
 	createDatabase : function (options, done) {
 
-		console.log('options: ', options);
+		console.log('createDatabase options: ', options);
 
 		var user = options.user,
 		    userUuid = options.user.uuid,
 		    pg_db = api.utils.getRandomChars(10);
 
-		var connectionString = 'postgres://docker:docker@postgis/systemapic';
 
 		var CREATE_DB_SCRIPT_PATH = '/var/www/wu/scripts/postgis/create_database.sh'; // todo: put in config
 
@@ -79,6 +83,7 @@ module.exports = api.postgis = {
 		exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
 			console.log('err? ', err, stdout, stdin);
 
+			// save pg_db name to user
 			User
 			.findOne({uuid : userUuid})
 			.exec(function (err, usr) {
@@ -105,12 +110,11 @@ module.exports = api.postgis = {
 
 			console.log('pgdb: ', pgdb);
 
+			// if already exists, return
 			if (pgdb) return done(null, pgdb);
 
 			// doesn't exist, must create
 			api.postgis.createDatabase(options, function (err, result) {
-				console.log('created db!!!', err, result);
-
 				if (err) return done(err);
 
 				// all good
@@ -131,19 +135,7 @@ module.exports = api.postgis = {
 
 		console.log('importShapefile', options);
 
-		var files = options.files,
-		    clientName = options.clientName,
-		    shape = api.geo.getTheShape(files)[0],
-		    fileUuid = 'file-' + uuid.v4();
-
-
-		// configs
-		var pg_username = 'docker';
-		var pg_password = 'docker';
-		var pg_host = 'postgis';
-		// var pg_db = 'systemapic';
-
-
+		
 		var ops = [];
 
 		ops.push(function (callback) {
@@ -154,31 +146,10 @@ module.exports = api.postgis = {
 
 		ops.push(function (pg_db, callback) {
 
-			// var cmd = 'shp2pgsql -I egypt/EGY-level_1.shp file-322323-232332 | PGPASSWORD=docker psql -h 172.17.8.151 --username=docker systemapic'
-			var cmd = [
-				'shp2pgsql',
-				'-I',
-				shape,
-				fileUuid,
-				'|',
-				'PGPASSWORD=' + pg_password,
-				'psql',
-				'-h',
-				pg_host,
-				'--username=' + pg_username,
-				pg_db
-			]
+			options.pg_db = pg_db;
 
-			var command = cmd.join(' ');
-			console.log('command: ', command);
-
-			// import to postgis
-			console.time('import took');
-			exec(command, {maxBuffer: 1024 * 50000}, function (err) {
-				console.timeEnd('import took');
-
-				callback(err, 'seems ok?');
-			});
+			// import to db
+			api.postgis._importShapefile(options, callback);
 		});
 
 
@@ -189,6 +160,46 @@ module.exports = api.postgis = {
 		});
 
 			
+	},
+
+	_importShapefile : function (options, done) {
+
+		var files = options.files,
+		    clientName = options.clientName,
+		    shape = api.geo.getTheShape(files)[0],
+		    fileUuid = 'file-' + uuid.v4(),
+		    pg_db = options.pg_db;
+
+		// config // todo: put in config
+		var pg_host = 'postgis';
+		var pg_password = 'docker';
+		var pg_username = 'docker';
+
+		// var cmd = 'shp2pgsql -I egypt/EGY-level_1.shp file-322323-232332 | PGPASSWORD=docker psql -h 172.17.8.151 --username=docker systemapic'
+		var cmd = [
+			'shp2pgsql',
+			'-I',
+			shape,
+			fileUuid,
+			'|',
+			'PGPASSWORD=' + pg_password,
+			'psql',
+			'-h',
+			pg_host,
+			'--username=' + pg_username,
+			pg_db
+		]
+
+		var command = cmd.join(' ');
+		console.log('command: ', command);
+
+		// import to postgis
+		console.time('import took');
+		exec(command, {maxBuffer: 1024 * 50000}, function (err) {
+			console.timeEnd('import took');
+
+			done(err, 'seems ok?');
+		});
 	},
 
 	// // new way: postgis!
