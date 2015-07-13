@@ -94,6 +94,8 @@ module.exports = api.user = {
 			callback(null, user);
 		});
 
+		
+
 		// run ops
 		async.waterfall(ops, function (err, user) {
 			if (err) return api.error.general(req, res, err);

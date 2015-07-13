@@ -29,6 +29,7 @@ var fileSchema = mongoose.Schema({
 
 	data : {
 
+		postgis    : String, 	// postgis data
 		shapefiles : [String],        // can be several files 	// todo: remove? no need - all geo is geo/topojson
 		geojson    : String,		// geojson-adlskmdsalkdsmad-saslkdmasldksa.geojson
 		raster	   : String,
@@ -64,8 +65,6 @@ var fileSchema = mongoose.Schema({
 				}
 			}]
 		}
-		
-
 	},
 
 

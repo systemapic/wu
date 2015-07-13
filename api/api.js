@@ -38,6 +38,7 @@ module.exports.portal 	= require('./api.portal');
 module.exports.access 	= require('./api.access');
 module.exports.client 	= require('./api.client');
 module.exports.socket 	= require('./api.socket');
+module.exports.postgis  = require('./api.postgis');
 module.exports.project 	= require('./api.project');
 module.exports.provider = require('./api.provider');
 module.exports.analytics = require('./api.analytics');

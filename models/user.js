@@ -24,6 +24,8 @@ var userSchema = mongoose.Schema({
 
         access_token : String,
 
+        postgis_database : String,
+
         local : {
                 email        : String,      // login name
                 password     : String,

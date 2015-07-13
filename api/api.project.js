@@ -154,7 +154,7 @@ module.exports = api.project = {
 
 
 	_getProjectByUuid : function (projectUuid, done) {
-		Projects
+		Project
 		.find({uuid : projectUuid})
 		.populate('files')
 		.populate('roles')

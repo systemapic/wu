@@ -41,6 +41,11 @@ var api = module.parent.exports;
 // exports
 module.exports = api.utils = { 
 
+	getRandomChars : function (digits) {
+		var random = Math.random().toString(36).slice((digits) * -1);
+		console.log('random: ', random);
+		return random;
+	},
 
 	createNameSlug : function (name) {
 		var slug = name.replace(/\s+/g, '').toLowerCase();
