@@ -51,6 +51,10 @@ module.exports = api.utils = {
 		return randomString;
 	},
 
+	getRandom : function (len, charSet) {
+		return api.utils.getRandomChars(len, charSet);
+	},
+
 	createNameSlug : function (name) {
 		var slug = name.replace(/\s+/g, '').toLowerCase();
 		slug =api.utils.stripAccents(slug);

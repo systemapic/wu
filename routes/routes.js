@@ -179,7 +179,10 @@ module.exports = function(app, passport) {
 	});
 
 
-
+	app.get('/api/data/uploadStatus', passport.authenticate('bearer', {session: false}), function (req, res) {
+		console.log('status!!!!');
+		api.upload.getUploadStatus(req, res);
+	});
 
 
 
