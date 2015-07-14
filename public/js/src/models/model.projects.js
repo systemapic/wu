@@ -313,7 +313,8 @@ Wu.Project = Wu.Class.extend({
 
 	_save : function (string) {
 		// save to server                                       	// TODO: pgp
-		Wu.send('/api/project/update', string, this._saved.bind(this));                         // TODO: save only if actual changes! saving too much already
+		Wu.send('/api/project/update', string, this._saved.bind(this));  
+		                       // TODO: save only if actual changes! saving too much already
 	},
 
 	// callback for save
@@ -1099,11 +1100,13 @@ Wu.Project = Wu.Class.extend({
 		context.setLogo(path); 		// trigger server-save
 		context.setHeaderLogo(path); 	// triggers server-save
 
-		context._menuItem.logo.src = path;
+		context._menuItem.logo.style.backgroundImage = 'url(' + context._getPixelLogo(path) + ')';
+		context.setTempLogo(); 
 
 		// Set logo in header pane
-		if (context == app.activeProject) app.HeaderPane.addedLogo(image); // triggers this.setHeaderLogo -- triggers save
-
+		if (context == app.activeProject) {
+			app.HeaderPane.addedLogo(image); // triggers this.setHeaderLogo -- triggers save
+		}
 	},
 
 	setThumbCreated : function (bool) {
@@ -1117,6 +1120,12 @@ Wu.Project = Wu.Class.extend({
 
 	setTempLogo : function () {
 		this._sidePaneLogoContainer.src = app.options.logos.projectDefault;
-	}	
+	},
+
+	_getPixelLogo : function (logo) {
+		var base = logo.split('/')[2];
+		var url = '/pixels/image/' + base + '?width=90&height=60&format=png';
+		return url;
+	}
 
 });
