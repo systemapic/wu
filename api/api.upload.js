@@ -81,6 +81,8 @@ module.exports = api.upload = {
 			import_took_ms : null,
 			data_type : null,
 			original_format : null,
+			table_name : null, 
+			database_name : null
 		}
 
 		// return id of upload to client
@@ -131,11 +133,54 @@ module.exports = api.upload = {
 				processing_success : true,
 				status : 'Done', 
 				expire : 3600 * 24
+			}, function (err) {
+
+				console.log('api.upload.import DONE!', results);
+
+				// create a file object 
+				api.upload._createFileModel(uploadStatus.upload_id, function (err, fileModel) {
+					console.log('api.upload.import > created filemode', err, fileModel);
+
+				});
+			
 			});
 
-			console.log('api.upload.import DONE!', results);
+			
 		});	
 		
+	},
+
+	_createFileModel : function (upload_id, done) {
+		console.log('############################ createFileModel (api.upload) ###################');
+		console.log('############################ createFileModel (api.upload) ###################');
+		console.log('############################ createFileModel (api.upload) ###################');
+
+		var upload_id_key = 'uploadStatus:' + upload_id;
+		api.redis.get(upload_id_key, function (err, uploadStatus) {
+			var u = JSON.parse(uploadStatus);
+			console.log('REDISREDISREID _______________________ err, u', err, u);
+
+			var fileModel = {
+				uuid : 'file-' + uuid.v4(),
+				createdBy : u.user_id,
+				name : u.filename,
+				type : 'postgis',
+				dataSize : u.size,
+				data : {
+					postgis : {
+						database_name : u.database_name,
+						table_name : u.table_name,
+						data_type : u.data_type,
+						original_format : u.original_format
+					}
+				}
+			}
+
+			api.file._createModel(fileModel, function (err, file) {
+				done(err, file);
+			});	
+
+		});
 	},
 
 	updateStatus : function (upload_id, status, callback, expire) {
