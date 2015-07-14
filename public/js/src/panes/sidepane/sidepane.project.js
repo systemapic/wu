@@ -111,7 +111,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var logo = this._project.getLogo();
 		if (!logo) return false;
 		var base = logo.split('/')[2];
-		var url = '/pixels/image/' + base + '?width=90&height=60&format=png';
+		var url = '/pixels/image/' + base + '?width=90&height=60&format=png' + '&access_token=' + app.tokens.access_token;
 		return url;
 	},
 

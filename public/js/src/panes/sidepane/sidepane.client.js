@@ -91,7 +91,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var logo = this.client.getLogo();
 		if (!logo) return false;
 		var base = logo.split('/')[2];
-		var url = '/pixels/image/' + base + '?width=75&height=75&format=png';
+		var url = '/pixels/image/' + base + '?width=75&height=75&format=png'+'&access_token=' + app.tokens.access_token;;
 		return url;
 	},
 
@@ -646,7 +646,7 @@ Wu.SidePane.Client = Wu.Class.extend({
 		this._refreshResumable();
 		
 		// set path
-		var fullpath = '/images/' + path;
+		var fullpath = '/images/' + path ;
 		
 		// set new image and save
 		this.client.setLogo(fullpath);

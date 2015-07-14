@@ -62,7 +62,7 @@ Wu.SidePane.Manage = Wu.Class.extend({
 
 			// client meta
 			var clientMeta = Wu.DomUtil.create('div', 'manage-access-client-meta-wrap', clientWrapper);
-			var logo = client.getLogo() || defaultProjectLogo;
+			var logo = (client.getLogo() || defaultProjectLogo)  + '?access_token=' + app.tokens.access_token;;
 			var clientLogo = Wu.DomUtil.create('img', 'manage-access-client-logo', clientMeta, logo);
 			var clientTitle = Wu.DomUtil.create('div', 'manage-access-client-title', clientMeta, client.getTitle());
 			var clientDescription = Wu.DomUtil.create('div', 'manage-access-client-description', clientMeta, client.getDescription());
@@ -106,7 +106,7 @@ Wu.SidePane.Manage = Wu.Class.extend({
 		var project = options.project,
 		    projectsWrapper = options.projectsWrapper
 
-		    logo = project.getLogo() || defaultProjectLogo;
+		    logo = (project.getLogo() || defaultProjectLogo)  + '?access_token=' + app.tokens.access_token;
 
 		// wrapper
 		var projectWrapper = Wu.DomUtil.create('div', 'manage-access-project-item', projectsWrapper);
