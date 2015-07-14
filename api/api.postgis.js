@@ -122,7 +122,7 @@ module.exports = api.postgis = {
 			// if no geotype, something's wrong
 			if (!geotype) return callback('api.upload.organizeImport err 4: invalid geotype!');
 
-			// send to appropriate api.postgis.import_
+			// send to appropriate api.postgis.import
 			if (geotype == 'shapefile') 	return api.postgis.importShapefile(options, callback);
 			if (geotype == 'geojson') 	return api.postgis.importGeojson(options, callback);
 			if (geotype == 'raster') 	return api.postgis.importRaster(options, callback);

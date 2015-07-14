@@ -616,22 +616,39 @@ module.exports = api.file = {
 
 	// new: postgis file model
 	_createModel : function (fileModel, callback) {
-		console.log('api.file._createModel', fileModel);
-
 		var file = new File();
-
 		for (f in fileModel) {
 			file[f] = fileModel[f];
 			file.markModified(f);
-
-			console.log('f: ', f);
-			console.log('fileModel[f]', fileModel[f]);
 		}
+		file.save(callback);
+	},
 
-		file.save(function (err, doc) {
-			console.log('file saved: ', err, doc);
-			callback(err, doc);
+	getFile : function (req, res) {
+
+		console.log('req.query', req.query);
+		
+		var fileUuid = req.query.fileUuid,
+		    ops = [];
+
+		// check for missing info
+		if (!fileUuid) return api.error.missingInformation(req, res);
+
+		// todo: check permission to access file
+		
+		// get file
+		File
+		.findOne({uuid : fileUuid})
+		.exec(function (err, file) {
+			if (err) return api.error.general(req, res, err);
+
+			res.end(JSON.stringify(file));
 		});
+
+	},
+
+	_getFile : function (fileUuid, callback) {
+
 	},
 
 	// save file to project (file, layer, project id's)
