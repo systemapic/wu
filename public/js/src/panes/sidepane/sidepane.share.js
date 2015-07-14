@@ -263,7 +263,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		var pdf = result.pdf;
 
 		// set path for zip file
-		var path = '/api/file/download?file=' + pdf + '&type=file';
+		var path = '/api/file/download?file=' + pdf + '&type=file'+ '&access_token=' + app.tokens.access_token;
 		
 		// create print view
 		context._createPrintView(path);

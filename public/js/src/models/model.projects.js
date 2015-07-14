@@ -717,7 +717,7 @@ Wu.Project = Wu.Class.extend({
 	getHeaderLogoBg : function () {
 		var logo = this.store.header.logo;
 		if (!logo) logo = this.store.logo;
-		var url = "url('" + logo + "')";
+		var url = "url('" + logo  + "')";
 		return url;
 	},
 
@@ -941,7 +941,7 @@ Wu.Project = Wu.Class.extend({
 			var prefix    = (file.type == 'image') ? '/images/' 					: '/api/file/download/?file=';
 			var url = prefix + file.uuid;// + suffix
 
-			url += '&access_token=' + app.tokens.access_token;
+			//url += '?access_token=' + app.tokens.access_token;
 
 			var source = {
 			    	title 	: file.name, 	// title
@@ -1092,7 +1092,7 @@ Wu.Project = Wu.Class.extend({
 
 		// parse results
 		var result = JSON.parse(json),
-		    image = result.cropped,
+		    image = result.cropped ,
 		    fileUuid = result.fileUuid,
 		    path = '/images/' + image;
 
@@ -1124,7 +1124,7 @@ Wu.Project = Wu.Class.extend({
 
 	_getPixelLogo : function (logo) {
 		var base = logo.split('/')[2];
-		var url = '/pixels/image/' + base + '?width=90&height=60&format=png';
+		var url = '/pixels/image/' + base + '?width=90&height=60&format=png' + '&access_token=' + app.tokens.access_token; ;
 		return url;
 	}
 
