@@ -64,8 +64,8 @@ module.exports = api.upload = {
 	 *      https://dev.systemapic.com/api/data/import
 	 */
 	import : function (req, res) {
-		console.log('api.upload.import, req.body: ', req.body); // { userUuid: 'loka', meta: 'feta' }
 
+		// set upload status
 		var uploadStatus = {
 			upload_id : api.utils.getRandomChars(16), // create upload id
 			user_id : req.user.uuid,
@@ -83,7 +83,6 @@ module.exports = api.upload = {
 		// return id of upload to client
 		res.end(JSON.stringify(uploadStatus));
 		
-
 		var ops = [];
 
 		// save upload status
@@ -112,14 +111,11 @@ module.exports = api.upload = {
 
 				// organize import
 				api.upload.organizeImport(opts, callback);
-
 			});
-
 		});
 
 		// run ops
 		async.series(ops, function (err, results) {
-
 			// if err, set upload status, return
 			if (err) return api.upload.updateStatus(uploadStatus.upload_id, { // todo: more specific error reporting
 				error_code : 1, 
@@ -128,7 +124,13 @@ module.exports = api.upload = {
 			});
 
 			// set upload status, expire in one day
-			api.upload.updateStatus(uploadStatus.upload_id, {status : 'Done', expire : 3600 * 24});
+			api.upload.updateStatus(uploadStatus.upload_id, {
+				processing_success : true,
+				status : 'Done', 
+				expire : 3600 * 24
+			});
+
+			console.log('api.upload.import DONE!', results);
 		});	
 		
 	},
@@ -144,9 +146,7 @@ module.exports = api.upload = {
 			// add keys
 			var uploadStatus = JSON.parse(uploadStatusJSON);
 			for (s in status) {
-
-				// set status (except ttl)
-				if (s != 'expire') uploadStatus[s] = status[s];
+				if (s != 'expire') uploadStatus[s] = status[s]; // set status (except ttl)
 			};
 
 			// save upload status
@@ -195,19 +195,18 @@ module.exports = api.upload = {
 		options.size = files.data.size;
 		options.originalFilename = files.data.originalFilename;
 
-		// organize files so output is equal no matter what ;)
-
+		// organize files so output is equal no matter what :)
 		if (ext == 'zip') ops.push(function (callback) {
 			api.upload.unzip(options, function (err, files) {
 				options.files = files;
-				callback(null);
+				callback(err);
 			});
 		});
 
 		if (ext == 'gz') ops.push(function (callback) {
 			api.upload.untar(options, function (err, files) {
 				options.files = files;
-				callback(null);
+				callback(err);
 			});
 		});
 
@@ -236,62 +235,21 @@ module.exports = api.upload = {
 			callback(null);
 		});
 
+		// run ops
 		async.series(ops, function (err) {
 			if (err) console.log('api.upload.prepareImport err 3', err);
-			done(null, options);
+			done(err, options);
 		});
 
 	},
 
 
-	organizeImport : function (options, done) {
-
-		console.log('organizeImport', options);
-
-		// files should be ready here, and as array in options.files. 
-		//
-		//
-		// { 
-		// 	upload_id: '3woibxuawttep14i',
-		// 	files: [ 
-		// 		'/data/tmp/3woibxuawttep14i/sydney.geojson' 
-		// 	],
-		// 	options: { 
-		// 		userUuid: 'loka', 
-		// 		meta: 'feta' 
-		// 	},
-		// 	user: { 
-		// 		_id: 55a395d6b20fee8956807ae6,
-		// 		lastUpdated: Mon Jul 13 2015 12:59:00 GMT+0000 (UTC),
-		// 		created: Mon Jul 13 2015 10:41:26 GMT+0000 (UTC),
-		// 		createdBy: 'user-f6dfd21b-2e72-44ff-b433-c574bd80e328',
-		// 		phone: 'k',
-		// 		position: 'k',
-		// 		company: 'k',
-		// 		lastName: 'k',
-		// 		firstName: 'lk',
-		// 		uuid: 'user-fcf9bd89-dea9-4abe-9219-d18a35c85ac5',
-		// 		__v: 0,
-		// 		token: 'token-d18a35c85ac5.7c74b712fa2533beccebf288',
-		// 		google: {},
-		// 		twitter: {},
-		// 		facebook: {},
-		// 		local: { 
-		// 			password: '$2a$08$N02tEu4qGsYr/sztGHTLEeQ0r4jMU3Nbi9UbKpcWmA7IABo8B4.0e',
-		// 			email: 'foudroyant4@gmail.com' 
-		// 		} 
-		// 	},
-		// 	timestamp: 1436815452458,
-		// 	size: 53520,
-		// 	originalFilename: 'road.tar.gz' 
-		// }
+	organizeImport : function (options, done) { 	// todo: remove perhaps
 
 		// import to postgis
 		api.postgis.import(options, done);
 	},
 
-
-	
 
 	untar : function (options, done) {
 		var tarfile = options.files.data.path,
@@ -301,10 +259,11 @@ module.exports = api.upload = {
 			
 		// create upload_id temp dir
 		fs.ensureDir(extractPath, function (err) {
-			
+			if (err) return done(err);
+
 			// untar
 			exec(cmd, function (err, stdout, stdin) {
-				if (err) console.log('api.upload.untar err 2', err);
+				if (err) return done(err);
 				
 				// get list of filepaths
 				dir.files(extractPath, done);
@@ -321,7 +280,7 @@ module.exports = api.upload = {
 		
 		// unzip
 		zip.extractTo(extractPath, ['*'], {junkPaths : true}, function (err) {
-			if (err) console.log('api.upload.unzip err 1', err);
+			if (err) return done(err);
 
 			// get list of filepaths
 			dir.files(extractPath, done);
