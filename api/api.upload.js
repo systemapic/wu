@@ -121,6 +121,7 @@ module.exports = api.upload = {
 
 		// run ops
 		async.series(ops, function (err, results) {
+			
 			// if err, set upload status, return
 			if (err) return api.upload.updateStatus(uploadStatus.upload_id, { // todo: more specific error reporting
 				error_code : 1, 
@@ -128,37 +129,31 @@ module.exports = api.upload = {
 				status : 'Failed'
 			});
 
-			// set upload status, expire in one day
-			api.upload.updateStatus(uploadStatus.upload_id, {
-				processing_success : true,
-				status : 'Done', 
-				expire : 3600 * 24
-			}, function (err) {
+			// create file model 
+			api.upload._createFileModel(uploadStatus.upload_id, function (err, fileModel) {
+				console.log('api.upload.import > created filemode', err, fileModel);
 
-				console.log('api.upload.import DONE!', results);
+				// set upload status, expire in one day
+				api.upload.updateStatus(uploadStatus.upload_id, {
+					processing_success : true,
+					status : 'Done', 
+					expire : 3600 * 24,
+					fileUuid : fileModel.uuid
+				}, function (err) {
 
-				// create a file object 
-				api.upload._createFileModel(uploadStatus.upload_id, function (err, fileModel) {
-					console.log('api.upload.import > created filemode', err, fileModel);
-
+					console.log('api.upload.import DONE!', results);
+					
 				});
-			
 			});
-
-			
 		});	
-		
 	},
 
 	_createFileModel : function (upload_id, done) {
-		console.log('############################ createFileModel (api.upload) ###################');
-		console.log('############################ createFileModel (api.upload) ###################');
-		console.log('############################ createFileModel (api.upload) ###################');
 
+		// get info from uploadStatus // todo: too much of a shortcut?
 		var upload_id_key = 'uploadStatus:' + upload_id;
 		api.redis.get(upload_id_key, function (err, uploadStatus) {
 			var u = JSON.parse(uploadStatus);
-			console.log('REDISREDISREID _______________________ err, u', err, u);
 
 			var fileModel = {
 				uuid : 'file-' + uuid.v4(),
@@ -168,18 +163,16 @@ module.exports = api.upload = {
 				dataSize : u.size,
 				data : {
 					postgis : {
-						database_name : u.database_name,
-						table_name : u.table_name,
-						data_type : u.data_type,
+						database_name 	: u.database_name,
+						table_name 	: u.table_name,
+						data_type 	: u.data_type,
 						original_format : u.original_format
 					}
 				}
 			}
 
-			api.file._createModel(fileModel, function (err, file) {
-				done(err, file);
-			});	
-
+			// create file model
+			api.file._createModel(fileModel, done);	
 		});
 	},
 

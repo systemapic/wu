@@ -178,13 +178,20 @@ module.exports = function(app, passport) {
 	
 	});
 
-
+	// =====================================
+	// GET UPLOAD STATUS ===================
+	// =====================================
 	app.get('/api/data/uploadStatus', passport.authenticate('bearer', {session: false}), function (req, res) {
 		console.log('status!!!!');
 		api.upload.getUploadStatus(req, res);
 	});
 
-
+	// =====================================
+	// GET FILE MODEL FROM FILEUUID ========
+	// =====================================
+	app.get('/api/data/file', passport.authenticate('bearer', {session: false}), function (req, res) {
+		api.file.getFile(req, res);
+	});
 
 
 
