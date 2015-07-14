@@ -231,7 +231,9 @@ module.exports = api.postgis = {
 			// set upload status
 			api.upload.updateStatus(options.upload_id, {
 				data_type : 'raster',
-				import_took_ms : endTime - startTime
+				import_took_ms : endTime - startTime,
+				table_name : fileUuid,
+				database_name : pg_db
 			}, function () {
 				// return
 				done(err, 'Raster imported successfully.');
@@ -268,7 +270,9 @@ module.exports = api.postgis = {
 				// set import time to status
 				api.upload.updateStatus(options.upload_id, {
 					data_type : 'vector',
-					import_took_ms : endTime - startTime
+					import_took_ms : endTime - startTime,
+					table_name : fileUuid,
+					database_name : pg_db
 				}, function () {
 					callback(err, 'Shapefile imported successfully.');
 				});
