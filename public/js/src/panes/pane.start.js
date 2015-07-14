@@ -119,7 +119,7 @@ Wu.StartPane = Wu.Pane.extend({
 				for (c in app.Clients) {
 					var client = app.Clients[c];
 					
-					var logo = this._getPixelLogo(client.getLogo()) || '/css/images/grayLight-systemapic-logo-circle-240x240.png'; //assign a default logo if none
+					var logo = this._getPixelLogo(client.getLogo()) || ('/css/images/grayLight-systemapic-logo-circle-240x240.png'+'?access_token=' + app.tokens.access_token); //assign a default logo if none
 					var name = client.getName();
 
 
@@ -219,8 +219,8 @@ Wu.StartPane = Wu.Pane.extend({
 		var img = new Image();
 
 		// Serve project logo or a random predefined thumb image
-		var ssrc = project.getLogo() || app.options.servers.portal + 'css/images/default-thumbs/default-thumb-' + Math.floor(Math.random() * 10) + '.jpg';
-		img.src = ssrc;
+		var ssrc = (project.getLogo() || app.options.servers.portal + 'css/images/default-thumbs/default-thumb-' + Math.floor(Math.random() * 10) + '.jpg') + '?access_token=' + app.tokens.access_token;
+		img.src = ssrc ;
 
 
 
@@ -247,7 +247,7 @@ Wu.StartPane = Wu.Pane.extend({
 			
 			}
 
-			newProject._projectThumb.src = ssrc;
+			newProject._projectThumb.src = ssrc; 
 		}
 
 		newProject._projectTitle = Wu.DomUtil.create('div', 'start-project-name', newProject._projectContainer);
@@ -258,7 +258,7 @@ Wu.StartPane = Wu.Pane.extend({
 
 		if (client.getLogo()) {
 			newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
-			newProject._clientLogo.src = client.getLogo();
+			newProject._clientLogo.src = client.getLogo() + '?access_token=' + app.tokens.access_token;
 		}
 
 		this.projectContainers.push(newProject);
@@ -569,7 +569,7 @@ Wu.StartPane = Wu.Pane.extend({
 		if (!logo) return false;
 		var base;
 		base = logo.split('/')[2];
-		var url = '/pixels/image/' + base + '?width=250&height=250&format=png';
+		var url = '/pixels/image/' + base + '?width=250&height=250&format=png'+'&access_token=' + app.tokens.access_token;;
 		return url;
 	}
 });
