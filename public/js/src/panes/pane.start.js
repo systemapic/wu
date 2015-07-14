@@ -279,12 +279,10 @@ Wu.StartPane = Wu.Pane.extend({
 	},
 
 	enableHooks : function () {
-		console.log('addhooks')
 		this._hooksDisabled = false;
 	},
 
 	disableHooks : function () {
-		console.log('remohooks');
 		this._hooksDisabled = true;
 	},
 
@@ -570,12 +568,7 @@ Wu.StartPane = Wu.Pane.extend({
 	_getPixelLogo : function (logo) {
 		if (!logo) return false;
 		var base;
-		//if(logo.search('/css/images') !== -1){
-		//	base = logo.split('/').reverse()[0];
-		//} else{
-			base = logo.split('/')[2];
-		//}
-		console.log(base);
+		base = logo.split('/')[2];
 		var url = '/pixels/image/' + base + '?width=250&height=250&format=png';
 		return url;
 	}

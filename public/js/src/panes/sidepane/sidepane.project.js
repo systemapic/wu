@@ -25,7 +25,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	initLayout : function () {
 
-		// create containerthi
+		// create container
 		this._container = Wu.DomUtil.create('div', 'project-item');
 
 		// create title
@@ -65,6 +65,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	_createLogo : function () {
 		if (this.logo) {
+			console.log(this.logo);
 			// remove old
 			Wu.DomUtil.remove(this.logo);
 			this.logo = null;

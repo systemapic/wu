@@ -160,7 +160,6 @@ Wu.SidePane.Options.Settings = Wu.SidePane.Options.Item.extend({
 		}
 
 		if (this.options.d3popup) {
-			console.log('d3popup');
 			
 			var d3popup = this._contentItem('d3popup', 'Custom popup');
 			wrapper.appendChild(d3popup);
