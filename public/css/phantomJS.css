@@ -7,10 +7,15 @@
 .leaflet-top.leaflet-right,
 .leaflet-top.leaflet-left,
 #legends-collapser,
-#start-pane {
+#start-pane,
+.header-role,
+.leaflet-control-container,
+.q-editor-container,
+.cartocss-control-container {
 	display: none !important;
 	}
 
 #header {
 	width: auto !important;
 	}
+

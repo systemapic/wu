@@ -66,35 +66,79 @@ module.exports = api.upload = {
 	import : function (req, res) {
 		console.log('api.upload.import, req.body: ', req.body); // { userUuid: 'loka', meta: 'feta' }
 
-
-
-		// return object
-		var result = {
+		var uploadStatus = {
 			upload_id : api.utils.getRandomChars(16), // create upload id
-			uploaded_by : req.user.uuid,
+			user_id : req.user.uuid,
 			filename : req.files.data.originalFilename,
-			timestamp : Date.now()
+			timestamp : Date.now(),
+			status : 'Processing',
+			size : req.files.data.size,
+			upload_success : true,
+			error_code : null,
+			error_text : null
 		}
 
-		// todo: save upload id to redis for processing feedback
+		var ops = [];
 
-		// return id of upload to client
-		res.end(JSON.stringify(result));
+		ops.push(function (callback) {
 
-		// process upload
-		api.upload.prepareImport({
-			upload_id : result.upload_id,
-			files : req.files,
-			options : req.body,
-			user : req.user,
-			timestamp : result.timestamp
-		}, function (err, options) {
-		
-			// organize import
-			api.upload.organizeImport(options);
+			// save upload id to redis
+			var key = 'uploadStatus:' + uploadStatus.upload_id;
+			api.redis.set(key, JSON.stringify(uploadStatus), callback);
 		});
 
+
+		ops.push(function (callback) {
+
+			// return id of upload to client
+			res.end(JSON.stringify(uploadStatus));
+
+			callback(null);
+		});
+
+
+		ops.push(function (callback) {
+
+			// import options
+			var options = {
+				upload_id : uploadStatus.upload_id,
+				files : req.files,
+				options : req.body,
+				user : req.user,
+				timestamp : uploadStatus.timestamp
+			}
+
+			// process upload
+			api.upload.prepareImport(options, function (err, opts) {
+			
+				// organize import
+				api.upload.organizeImport(opts, callback);
+
+			});
+
+		});
+
+
+		async.series(ops, function (err, results) {
+
+			console.log('api.upload.import done, ', err, results);
+
+		});	
 		
+		
+	},
+
+
+	getUploadStatus : function (req, res) {
+		var upload_id = req.query.upload_id,
+		    upload_id_key = 'uploadStatus:' + upload_id;
+
+		api.redis.get(upload_id_key, function (err, uploadStatus) {
+			if (err) return api.error.general(req, res, err);
+
+			// return upload status
+			res.end(uploadStatus);
+		});
 	},
 
 
@@ -204,9 +248,13 @@ module.exports = api.upload = {
 	},
 
 
-	organizeImport : function (options) {
+	organizeImport : function (options, done) {
 
 		console.log('organizeImport', options);
+
+		// files should be ready here, and as array in options.files. 
+		//
+		//
 		// { 
 		// 	upload_id: '3woibxuawttep14i',
 		// 	files: [ 
@@ -242,48 +290,12 @@ module.exports = api.upload = {
 		// 	originalFilename: 'road.tar.gz' 
 		// }
 
-		// figure out if shapefile, geojson, or raster, then process accordingly
-
-
-		var geotype = api.upload.getGeotype(options);
-
-		if (!geotype) console.log('api.upload.organizeImport err 4: invalid geotype!', geotype, options);
-
-		if (geotype == 'shapefile') 	return api.postgis.importShapefile(options);
-		if (geotype == 'geojson') 	return api.postgis.importGeojson(options);
-		if (geotype == 'raster') 	return api.postgis.importRaster(options);
-
-		console.log('invalid geotyp...???');
+		// import to postgis
+		api.postgis.import(options, done);
 	},
 
 
-	getGeotype : function (options) {
-		var files = options.files;
-
-		if (files.length == 1) {
-			var file = files[0];
-			var ext = file.split('.').reverse()[0];
-			if (ext == 'geojson') return 'geojson';
-			if (ext == 'ecw') return 'raster';
-			if (ext == 'jp2') return 'raster';
-			if (ext == 'tif') return 'raster';
-			if (ext == 'tiff') return 'raster';
-		}
-
-		var type = false;
-		files.forEach(function (file) {
-			var ext = file.split('.').reverse()[0];
-			if (ext == 'shp') type = 'shapefile';
-		});
-
-		return type;
-	},
-
-
-
-
-
-
+	
 
 	untar : function (options, done) {
 		var tarfile = options.files.data.path,

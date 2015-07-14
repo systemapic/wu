@@ -1,4 +1,4 @@
-//API: api.upload.js
+// API: api.upload.js
 // database schemas
 var Project 	= require('../models/project');
 var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
@@ -47,41 +47,27 @@ var api = module.parent.exports;
 // exports
 module.exports = api.postgis = { 
 
-
-	// todo tuesday: shapefile ok, continue with geojson, raster.
-
-
-	initUser : function (options, done) {
-		console.log('api.postgis.initUser --> IS THIS BEING RUN?!??!?!?!?')
-		return;
-
-		var user = options.account,
-		    options = options.options;
-
-		api.postgis.createDatabase({
-			user : user
-		}, function (err, result) {
-			if (err) return done(err);
-			done(null, user);
-		});
-
-	},
-
 	
 	createDatabase : function (options, done) {
-
 		console.log('createDatabase options: ', options);
 
 		var user = options.user,
 		    userUuid = options.user.uuid,
-		    pg_db = api.utils.getRandomChars(10);
+		    userName = '"' + options.user.firstName + ' ' + options.user.lastName + '"',
+		    pg_db = api.utils.getRandomChars(10),
+		    CREATE_DB_SCRIPT_PATH = '../scripts/postgis/create_database.sh'; // todo: put in config
+		
+		// create database script
+		var command = [
+			CREATE_DB_SCRIPT_PATH, 	// script
+			pg_db, 			// database name
+			userName,		// username
+			userUuid		// userUuid
+		].join(' ');
 
-
-		var CREATE_DB_SCRIPT_PATH = '/var/www/wu/scripts/postgis/create_database.sh'; // todo: put in config
-
-		var cmd = CREATE_DB_SCRIPT_PATH + ' ' + pg_db;
-		exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
-			console.log('err? ', err, stdout, stdin);
+		// create database in postgis
+		exec(command, {maxBuffer: 1024 * 50000}, function (err) {
+			if (err) return done(err);
 
 			// save pg_db name to user
 			User
@@ -89,13 +75,11 @@ module.exports = api.postgis = {
 			.exec(function (err, usr) {
 				usr.postgis_database = pg_db;
 				usr.save(function (err) {
-					console.log('saved pg_db', err, pg_db);
-					done(null, pg_db);
+					options.user = usr; // add updated user
+					done(null, options);
 				});
 			});
 		});
-
-			
 	},
 
 	ensureDatabaseExists : function (options, done) {
@@ -106,210 +90,217 @@ module.exports = api.postgis = {
 		.exec(function (err, user) {
 			if (err) return done(err);
 
-			var pgdb = user.postgis_database;
-
-			console.log('pgdb: ', pgdb);
-
 			// if already exists, return
-			if (pgdb) return done(null, pgdb);
+			if (user.postgis_database) return done(null, options);
 
 			// doesn't exist, must create
-			api.postgis.createDatabase(options, function (err, result) {
+			api.postgis.createDatabase(options, function (err, opts) {
 				if (err) return done(err);
 
 				// all good
-				done(null, result.dbName);
+				done(null, opts);
 			});
 		});
 	},
 
+
+	import : function (options, done) {
+
+		var ops = [];
+
+		// ensure database exists
+		ops.push(function (callback) {
+			api.postgis.ensureDatabaseExists(options, callback);
+		});
+
+		// import according to type
+		ops.push(function (options, callback) {
+
+			// get which type of data
+			var geotype = api.postgis._getGeotype(options);
+
+			// if no geotype, something's wrong
+			if (!geotype) return callback('api.upload.organizeImport err 4: invalid geotype!');
+
+			// send to appropriate api.postgis.import_
+			if (geotype == 'shapefile') 	return api.postgis.importShapefile(options, callback);
+			if (geotype == 'geojson') 	return api.postgis.importGeojson(options, callback);
+			if (geotype == 'raster') 	return api.postgis.importRaster(options, callback);
+
+			// not type caught, err
+			callback('Not a valid geotype. Must be Shapefile, GeoJSON or Raster.');
+
+		});
+
+
+		async.waterfall(ops, function (err, results) {
+			console.log('api.postgis.import done', err, results);
+
+			done && done(err, results);
+		});
+
+	},
+
+
 	importGeojson : function (options, done) {
+		console.log('importGeosjon', options);
+
+		// need to convert to ESRI shapefile (ouch!) first..
+		var geojsonPath = options.files[0],
+		    geojsonBasename = api.postgis._getBasefile(geojsonPath),
+		    shapefileFolder = '/data/tmp/' + api.utils.getRandom(5) + '/',
+		    shapefileBasename = geojsonBasename + '.shp',
+		    shapefilePath = shapefileFolder + shapefileBasename,
+		    ops = [];
+
+		// create dir
+		ops.push(function (callback) {
+			fs.ensureDir(shapefileFolder, callback);
+		});
+
+		// convert to shape
+		ops.push(function (callback) {
+			var cmd = [
+				'ogr2ogr',
+				'-f',
+				'"ESRI Shapefile"',
+				shapefilePath,
+				geojsonPath
+			].join(' ');
+
+			exec(cmd, callback);
+		});
+
+
+		ops.push(function (callback) {
+
+			// get content of dir
+			fs.readdir(shapefileFolder, function (err, files) {
+				if (err) return callback(err);
+				
+				// add path to files, and add to options
+				options.files = [];
+				files.forEach(function (file) {
+					options.files.push(shapefileFolder + file);
+				});
+
+				callback(null);
+			});
+		});
+
+
+		ops.push(function (callback) {
+
+			// do shapefile import
+			api.postgis.importShapefile(options, callback);
+
+		});
+
+		// run ops
+		async.series(ops, done);
+
 
 	},
 	
 	importRaster : function (options, done) {
 
+		var clientName 	= options.clientName,
+		    raster 	= options.files[0],
+		    fileUuid 	= 'raster_' + api.utils.getRandom(10),
+		    pg_db 	= options.user.postgis_database;
+
+		var IMPORT_RASTER_SCRIPT_PATH = '../scripts/postgis/import_raster.sh'; // todo: put in config
+		
+		// create database script
+		var cmd = [
+			IMPORT_RASTER_SCRIPT_PATH, 	// script
+			raster,
+			fileUuid,
+			pg_db
+		].join(' ');
+
+		console.log('importRaster cmd: ', cmd);
+
+		// import to postgis
+		console.time('import took');
+		exec(cmd, {maxBuffer: 1024 * 50000}, function (err) {
+			console.timeEnd('import took');
+
+			done(err, 'Raster imported successfully.');
+		});
+
 	},
 
 	importShapefile : function (options, done) {
 
-		console.log('importShapefile', options);
+		var files 	= options.files,
+		    shape 	= api.geo.getTheShape(files)[0],
+		    fileUuid 	= 'shape_' + api.utils.getRandom(10),
+		    pg_db 	= options.user.postgis_database;
 
+		var IMPORT_SHAPEFILE_SCRIPT_PATH = '../scripts/postgis/import_shapefile.sh'; // todo: put in config
 		
-		var ops = [];
-
-		ops.push(function (callback) {
-
-			// ensure database exists
-			api.postgis.ensureDatabaseExists(options, callback);
-		});
-
-		ops.push(function (pg_db, callback) {
-
-			options.pg_db = pg_db;
-
-			// import to db
-			api.postgis._importShapefile(options, callback);
-		});
-
-
-		async.waterfall(ops, function (err, result) {
-			console.log('importSHapefile done, err, res', err, result);
-
-			done && done(err, result);
-		});
-
-			
-	},
-
-	_importShapefile : function (options, done) {
-
-		var files = options.files,
-		    clientName = options.clientName,
-		    shape = api.geo.getTheShape(files)[0],
-		    fileUuid = 'file-' + uuid.v4(),
-		    pg_db = options.pg_db;
-
-		// config // todo: put in config
-		var pg_host = 'postgis';
-		var pg_password = 'docker';
-		var pg_username = 'docker';
-
-		// var cmd = 'shp2pgsql -I egypt/EGY-level_1.shp file-322323-232332 | PGPASSWORD=docker psql -h 172.17.8.151 --username=docker systemapic'
+		// create database script
 		var cmd = [
-			'shp2pgsql',
-			'-I',
+			IMPORT_SHAPEFILE_SCRIPT_PATH, 	// script
 			shape,
 			fileUuid,
-			'|',
-			'PGPASSWORD=' + pg_password,
-			'psql',
-			'-h',
-			pg_host,
-			'--username=' + pg_username,
 			pg_db
-		]
+		].join(' ');
 
-		var command = cmd.join(' ');
-		console.log('command: ', command);
+		console.log('importShapefile cmd: ', cmd);
 
 		// import to postgis
 		console.time('import took');
-		exec(command, {maxBuffer: 1024 * 50000}, function (err) {
+		exec(cmd, {maxBuffer: 1024 * 50000}, function (err) {
 			console.timeEnd('import took');
 
-			done(err, 'seems ok?');
+			done(err, 'Shapefile imported successfully.');
 		});
 	},
 
-	// // new way: postgis!
-	// importShapefile : function (options, done) {  // folder = folder with shapefiles inside
-	// 	var folder = options.folder,
-	// 	    name = options.name,
-	// 	    fileUuid = options.fileUuid,
-	// 	    ops = [];
-
-	// 	if (!folder || !name || !fileUuid) return callback('Missing info.');
 
 
-	// 	// get file list
-	// 	ops.push(function(callback) {
-	// 		fs.readdir(folder, function (err, files) {
-	// 			if (err || !files) return callback('Some files were rejected. Please upload <br>only one shapefile per zip.')
 
-	// 			callback(null, files);
-	// 		});
-	// 	});
+	_getGeotype : function (options) {
+		var files = options.files,
+		    type = false;
 
-	// 	// validate shapefile 
-	// 	ops.push(function (files, callback) {
-	// 		api.geo.validateshp(files, callback);
-	// 	});
+		// only one file
+		if (files.length == 1) {
+			var ext = files[0].split('.').reverse()[0];
+			if (ext == 'geojson') return 'geojson';
+			if (ext == 'ecw') return 'raster';
+			if (ext == 'jp2') return 'raster';
+			if (ext == 'tif') return 'raster';
+			if (ext == 'tiff') return 'raster';
+		}
 
-	// 	// import to postgis
-	// 	ops.push(function (callback) {
-	// 		var options = {
-	// 			files : files, 
-	// 			folder : folder,
-	// 			clientName : 'clientName'
-	// 		}
+		// several files
+		files.forEach(function (file) {
+			var ext = file.split('.').reverse()[0];
+			if (ext == 'shp') type = 'shapefile';
+		});
 
-	// 		// import
-	// 		api.postgis._importShapefile(options, callback);
-	// 	});
+		return type;
+	},
 
 
-	// 	// register etc
-	// 	ops.push(function (callback) {
+	_getShapefile : function (shapes) {
+		var shapefile;
+		for (s in shapes) {
+			if (shapes[s] && shapes[s].slice(-4) == '.shp') {
+				var shapefile = shapes[s];
+			}
+		}
+		return shapefile;
+	},
 
-	// 	});
+	_getBasefile : function (file) {
+		var filename = file.split('/').reverse()[0];
+		return filename;
+	},
 
-
-	// 	fs.readdir(folder, function (err, files) {
-	// 		if (err || !files) return callback('Some files were rejected. Please upload <br>only one shapefile per zip.');
-
-	// 		// clone array
-	// 		var shapefiles = files.slice();
-
-	// 		// async ops
-	// 		var ops = [];
-
-	// 		// check if valid shapefile(s)
-	// 		ops.push(function (done) {
-	// 			api.geo.validateshp(files, done);
-	// 		});
-
-	// 		// import into postgis
-	// 		ops.push(function (done) {
-
-	// 			var options = {
-	// 				files : files, 
-	// 				folder : folder,
-	// 				clientName : 'clientName'
-	// 			}
-	// 			api.geo.import2postgis(options, done);
-	// 		});
-
-	// 		// // convert shapefile to geo/topojson
-	// 		// ops.push(function (done) {
-	// 		// 	api.geo.convertshp(files, folder, done);
-	// 		// });
-
-	// 		// run async jobs
-	// 		async.series(ops, function (err, results) {
-	// 			if (err) {
-	// 				console.log('MOFO!!'.red, err);
-	// 				return callback(err);
-	// 			}
-
-	// 			var key = results[1];
-	// 			if (!key) return callback('No key.');
-
-	// 			var path = key.path;
-	// 			var name = key.name;
-	// 			var fileUuid = key.fileUuid;
-
-	// 			// add geojson file to list
-	// 			shapefiles.push(name);
-
-	// 			// return as db entry
-	// 			var db = {
-	// 				files : shapefiles,
-	// 				data : {
-	// 					geojson : name
-	// 				},
-	// 				title : name,
-	// 				file : fileUuid
-	// 			}
-
-	// 			// todo: meta from postgis
-
-	// 			// return
-	// 			callback(null, db);
-
-	// 		});
-	// 	});
-	// },
 
 
 
