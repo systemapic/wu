@@ -40,7 +40,6 @@ var r = require('../tools/resumable-node')('/data/tmp/');
 // postgres
 var pg = require('pg');
 
-
 // api
 var api = module.parent.exports;
 
@@ -397,9 +396,9 @@ module.exports = api.postgis = {
 
 	_getRasterType : function (file) {
 		var extension = api.postgis._getExtension(file);
-		if (extension == 'ecw') return 'ERDAS Compressed Wavelets (ECW)';
-		if (extension == 'tif' || extension == 'tiff') return 'GeoTIFF';
-		if (extension == 'jp2') return 'JPEG-2000';
+		if (extension == 'ecw') 			return 'ERDAS Compressed Wavelets (ECW)';
+		if (extension == 'tif' || extension == 'tiff') 	return 'GeoTIFF';
+		if (extension == 'jp2') 			return 'JPEG-2000';
 
 		return 'Unknown';
 	},
