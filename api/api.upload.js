@@ -74,10 +74,13 @@ module.exports = api.upload = {
 			status : 'Processing',
 			size : req.files.data.size,
 			upload_success : true,
+			processing_success : null,
 			error_code : null,
 			error_text : null,
 			rows_count : null,
-			import_took_ms : null
+			import_took_ms : null,
+			data_type : null,
+			original_format : null,
 		}
 
 		// return id of upload to client
@@ -109,8 +112,8 @@ module.exports = api.upload = {
 			api.upload.prepareImport(options, function (err, opts) {
 				if (err) return callback(err);
 
-				// organize import
-				api.upload.organizeImport(opts, callback);
+				// postgis import
+				api.postgis.import(opts, callback);
 			});
 		});
 
