@@ -49,8 +49,6 @@ module.exports = api.postgis = {
 
 	
 	createDatabase : function (options, done) {
-		console.log('createDatabase options: ', options);
-
 		var user = options.user,
 		    userUuid = options.user.uuid,
 		    userName = '"' + options.user.firstName + ' ' + options.user.lastName + '"',
@@ -81,6 +79,7 @@ module.exports = api.postgis = {
 			});
 		});
 	},
+
 
 	ensureDatabaseExists : function (options, done) {
 		var userUuid = options.user.uuid;
@@ -132,10 +131,7 @@ module.exports = api.postgis = {
 
 		});
 
-
 		async.waterfall(ops, function (err, results) {
-			console.log('api.postgis.import done', err, results);
-
 			done && done(err, results);
 		});
 
@@ -177,7 +173,7 @@ module.exports = api.postgis = {
 			// get content of dir
 			fs.readdir(shapefileFolder, function (err, files) {
 				if (err) return callback(err);
-				
+
 				// add path to files, and add to options
 				options.files = [];
 				files.forEach(function (file) {
@@ -198,12 +194,10 @@ module.exports = api.postgis = {
 
 		// run ops
 		async.series(ops, done);
-
-
 	},
+
 	
 	importRaster : function (options, done) {
-
 		var clientName 	= options.clientName,
 		    raster 	= options.files[0],
 		    fileUuid 	= 'raster_' + api.utils.getRandom(10),
@@ -219,24 +213,39 @@ module.exports = api.postgis = {
 			pg_db
 		].join(' ');
 
-		console.log('importRaster cmd: ', cmd);
-
 		// import to postgis
-		console.time('import took');
+		var startTime = new Date().getTime();
 		exec(cmd, {maxBuffer: 1024 * 50000}, function (err) {
-			console.timeEnd('import took');
+			var endTime = new Date().getTime();
 
-			done(err, 'Raster imported successfully.');
+			// set err on upload status
+			if (err) return api.upload.updateStatus(options.upload_id, {
+				error_code : 2,
+				error_text : err
+			}, function () {
+				// return
+				done(err);
+			});
+
+
+			// set upload status
+			api.upload.updateStatus(options.upload_id, {
+				data_type : 'raster',
+				import_took_ms : endTime - startTime
+			}, function () {
+				// return
+				done(err, 'Raster imported successfully.');
+			});
 		});
 
 	},
 
 	importShapefile : function (options, done) {
-
 		var files 	= options.files,
 		    shape 	= api.geo.getTheShape(files)[0],
 		    fileUuid 	= 'shape_' + api.utils.getRandom(10),
-		    pg_db 	= options.user.postgis_database;
+		    pg_db 	= options.user.postgis_database,
+		    ops 	= [];
 
 		var IMPORT_SHAPEFILE_SCRIPT_PATH = '../scripts/postgis/import_shapefile.sh'; // todo: put in config
 		
@@ -248,18 +257,79 @@ module.exports = api.postgis = {
 			pg_db
 		].join(' ');
 
-		console.log('importShapefile cmd: ', cmd);
 
-		// import to postgis
-		console.time('import took');
-		exec(cmd, {maxBuffer: 1024 * 50000}, function (err) {
-			console.timeEnd('import took');
+		ops.push(function (callback) {
 
-			done(err, 'Shapefile imported successfully.');
+			// import to postgis
+			var startTime = new Date().getTime();
+			exec(cmd, {maxBuffer: 1024 * 50000}, function (err) {
+				var endTime = new Date().getTime();
+
+				// set import time to status
+				api.upload.updateStatus(options.upload_id, {
+					data_type : 'vector',
+					import_took_ms : endTime - startTime
+				}, function () {
+					callback(err, 'Shapefile imported successfully.');
+				});
+
+				
+			});
 		});
+
+		// count rows for upload status
+		ops.push(function (callback) {
+			
+			api.postgis.query({
+				postgis_db : pg_db,
+				query : 'SELECT count(*) from ' + fileUuid
+			}, function (err, result) {
+				if (err) return callback(null);
+				
+				// set upload status
+				api.upload.updateStatus(options.upload_id, {
+					rows_count : result.rows[0].count
+				}, function () {
+					callback(null);
+				});
+			});
+		});
+
+		// run ops
+		async.series(ops, done);
+
 	},
 
 
+	query : function (options, callback) {
+		var postgis_db = options.postgis_db,
+		    variables = options.variables,
+		    query = options.query;
+
+		// count rows and add to uploadStatus
+		var conString = 'postgres://docker:docker@postgis/' + postgis_db; // todo: put in config
+		pg.connect(conString, function(err, client, pgcb) {
+			if (err) {
+				console.log('api.postgis.query err, pg.connect', err);
+				return callback(null);
+			}
+			
+			// do query
+			client.query(query, variables, function(err, result) {
+				// clean up after pg
+				pgcb();
+				client.end();
+
+				if (err) {
+					console.log('api.postgis.query err, client.query', err);
+					return callback(err); 
+				}
+				
+				// return result
+				callback(null, result);
+			});
+		});
+	},
 
 
 	_getGeotype : function (options) {
@@ -296,12 +366,11 @@ module.exports = api.postgis = {
 		return shapefile;
 	},
 
+
 	_getBasefile : function (file) {
 		var filename = file.split('/').reverse()[0];
 		return filename;
 	},
-
-
 
 
 }
