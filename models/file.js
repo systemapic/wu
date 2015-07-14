@@ -29,8 +29,15 @@ var fileSchema = mongoose.Schema({
 
 	data : {
 
-		postgis    : String, 	// postgis data
-		shapefiles : [String],        // can be several files 	// todo: remove? no need - all geo is geo/topojson
+		postgis    : { 				// postgis data
+			database_name : String,
+			table_name : String,
+			data_type : String, // raster or vector
+		}, 				
+		
+
+
+		shapefiles : [String],        	// can be several files 	// todo: remove? no need - all geo is geo/topojson
 		geojson    : String,		// geojson-adlskmdsalkdsmad-saslkdmasldksa.geojson
 		raster	   : String,
 		topojson   : String,

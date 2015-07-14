@@ -115,6 +115,8 @@ module.exports = api.postgis = {
 		// import according to type
 		ops.push(function (options, callback) {
 
+			console.log('import', options);
+
 			// get which type of data
 			var geotype = api.postgis._getGeotype(options);
 
@@ -188,7 +190,16 @@ module.exports = api.postgis = {
 		ops.push(function (callback) {
 
 			// do shapefile import
-			api.postgis.importShapefile(options, callback);
+			api.postgis.importShapefile(options, function (err, results) {
+
+				// set upload status
+				api.upload.updateStatus(options.upload_id, {
+					original_format : 'GeoJSON',
+				}, function () {
+					// return
+					callback(err, results);
+				});
+			});
 
 		});
 
@@ -201,8 +212,10 @@ module.exports = api.postgis = {
 		var clientName 	= options.clientName,
 		    raster 	= options.files[0],
 		    fileUuid 	= 'raster_' + api.utils.getRandom(10),
-		    pg_db 	= options.user.postgis_database;
+		    pg_db 	= options.user.postgis_database,
+		    original_format = api.postgis._getRasterType(raster);
 
+		console.log('############ original_f', original_format);
 		var IMPORT_RASTER_SCRIPT_PATH = '../scripts/postgis/import_raster.sh'; // todo: put in config
 		
 		// create database script
@@ -231,6 +244,7 @@ module.exports = api.postgis = {
 			// set upload status
 			api.upload.updateStatus(options.upload_id, {
 				data_type : 'raster',
+				original_format : original_format,
 				import_took_ms : endTime - startTime,
 				table_name : fileUuid,
 				database_name : pg_db
@@ -359,6 +373,11 @@ module.exports = api.postgis = {
 		return type;
 	},
 
+	_getExtension : function (file) {
+		var ext = file.split('.').reverse()[0];
+		return ext;
+	},
+
 
 	_getShapefile : function (shapes) {
 		var shapefile;
@@ -376,5 +395,13 @@ module.exports = api.postgis = {
 		return filename;
 	},
 
+	_getRasterType : function (file) {
+		var extension = api.postgis._getExtension(file);
+		if (extension == 'ecw') return 'ERDAS Compressed Wavelets (ECW)';
+		if (extension == 'tif' || extension == 'tiff') return 'GeoTIFF';
+		if (extension == 'jp2') return 'JPEG-2000';
+
+		return 'Unknown';
+	},
 
 }
