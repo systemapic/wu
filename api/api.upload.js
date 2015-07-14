@@ -75,11 +75,18 @@ module.exports = api.upload = {
 			size : req.files.data.size,
 			upload_success : true,
 			error_code : null,
-			error_text : null
+			error_text : null,
+			rows_count : null,
+			import_took_ms : null
 		}
+
+		// return id of upload to client
+		res.end(JSON.stringify(uploadStatus));
+		
 
 		var ops = [];
 
+		// save upload status
 		ops.push(function (callback) {
 
 			// save upload id to redis
@@ -87,16 +94,7 @@ module.exports = api.upload = {
 			api.redis.set(key, JSON.stringify(uploadStatus), callback);
 		});
 
-
-		ops.push(function (callback) {
-
-			// return id of upload to client
-			res.end(JSON.stringify(uploadStatus));
-
-			callback(null);
-		});
-
-
+		// import data
 		ops.push(function (callback) {
 
 			// import options
@@ -110,7 +108,8 @@ module.exports = api.upload = {
 
 			// process upload
 			api.upload.prepareImport(options, function (err, opts) {
-			
+				if (err) return callback(err);
+
 				// organize import
 				api.upload.organizeImport(opts, callback);
 
@@ -118,14 +117,48 @@ module.exports = api.upload = {
 
 		});
 
-
+		// run ops
 		async.series(ops, function (err, results) {
 
-			console.log('api.upload.import done, ', err, results);
+			// if err, set upload status, return
+			if (err) return api.upload.updateStatus(uploadStatus.upload_id, { // todo: more specific error reporting
+				error_code : 1, 
+				error_text : err,
+				status : 'Failed'
+			});
 
+			// set upload status, expire in one day
+			api.upload.updateStatus(uploadStatus.upload_id, {status : 'Done', expire : 3600 * 24});
 		});	
 		
+	},
+
+	updateStatus : function (upload_id, status, callback, expire) {
 		
+		var upload_id_key = 'uploadStatus:' + upload_id;
+
+		// update upload status, one key at a time if necessary
+		api.redis.get(upload_id_key, function (err, uploadStatusJSON) {
+			if (err) return callback && callback(err);
+
+			// add keys
+			var uploadStatus = JSON.parse(uploadStatusJSON);
+			for (s in status) {
+
+				// set status (except ttl)
+				if (s != 'expire') uploadStatus[s] = status[s];
+			};
+
+			// save upload status
+			api.redis.set(upload_id_key, JSON.stringify(uploadStatus), function (err) {
+
+				// expire if set
+				if (status.expire) api.redis.expire(upload_id_key, status.expire);
+				
+				// return
+				callback && callback(err);
+			});
+		});
 	},
 
 
@@ -137,7 +170,7 @@ module.exports = api.upload = {
 			if (err) return api.error.general(req, res, err);
 
 			// return upload status
-			res.end(uploadStatus);
+			res.end(uploadStatus || JSON.stringify({ error : 'Upload ID not found or expired.'}));
 		});
 	},
 
@@ -153,53 +186,16 @@ module.exports = api.upload = {
 	 */
 	prepareImport : function (options, done) {
 
-		// file can at this point be either: (always a single file)
-		// 	zip
-		// 	tar.gz
-		// 	geojson
-		// 	tif/f
-		// 	ecw
-		// 	jp2
+		var files = options.files, // get files object
+		    temporaryPath = files.data.path, // get path
+		    ext = temporaryPath.split('.').reverse()[0].trim(), // get file extension
+		    ops = [];
 
-		// ACTIONS
-		// --------
-		// if zip/gz file, unzip
-		// if geojson, handle as geojson // ogr2ogr
-		// if tif/f, handle as tiff 	// 
-		// if ecw, handle as ecw	// } raster2psql
-		// if jp2, handle as jp2	//
-
-		// when done: will have a file or list of files in a temp folder
-		//
-		// end result: 
-		// {
-		// 	upload_id : result.upload_id,
-		// 	files : [list of files with full path],
-		// 	options : req.body,
-		// 	user : req.user
-		// }
-
-
-		console.log('organizeImport: ', options);
-
-		// get files object
-		var files = options.files;
-
-		// get path
-		var temporaryPath = files.data.path;
-
-		// get file extension
-		var ext = temporaryPath.split('.').reverse()[0].trim();
-
-		console.log('extension is: ', ext);
-			
 		// set original filename + size
 		options.size = files.data.size;
 		options.originalFilename = files.data.originalFilename;
 
-
 		// organize files so output is equal no matter what ;)
-		var ops = [];
 
 		if (ext == 'zip') ops.push(function (callback) {
 			api.upload.unzip(options, function (err, files) {
