@@ -58,6 +58,8 @@ L.Control.Cartocss = Wu.Control.extend({
 
 	_refresh : function () {
 
+		console.error('cartocss._refresh');
+
 		// should be active
 		if (!this._added) this._addTo();
 
