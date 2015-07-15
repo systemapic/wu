@@ -1,12 +1,12 @@
 #!/bin/bash
 
 
-if [ "$1" == "" ]; then
-	echo "Must provide upload_id as first argument,"
-	echo "eg. get_upload_status.sh ijotqnslmnnjjiac"
-	echo ""
-	exit 1 # missing args
-fi
+# if [ "$1" == "" ]; then
+# 	echo "Must provide upload_id as first argument,"
+# 	echo "eg. get_upload_status.sh ijotqnslmnnjjiac"
+# 	echo ""
+# 	exit 1 # missing args
+# fi
 
 # access token
 USERNAME=foudroyant4@gmail.com
@@ -15,7 +15,7 @@ ACCESSTOKEN=$(curl --header "Authorization: Basic YWJjMTIzOnNzaC1zZWNyZXQ=" --da
 
 # api endpoint 
 UPLOAD_ID=$1
-ENDPOINT=/api/import/status
+ENDPOINT=/api/data/export/test
 API="https://dev.systemapic.com$ENDPOINT?upload_id=$UPLOAD_ID&access_token=$ACCESSTOKEN"
 
 curl -s -X GET $API | python -mjson.tool

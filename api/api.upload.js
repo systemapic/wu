@@ -74,16 +74,18 @@ module.exports = api.upload = {
 			status : 'Processing',
 			size : req.files.data.size,
 			upload_success : true,
-			processing_success : null,
 			error_code : null,
 			error_text : null,
-			rows_count : null,
-			import_took_ms : null,
-			data_type : null,
-			original_format : null,
-			table_name : null, 
-			database_name : null
+			// processing_success : null,
+			// rows_count : null,
+			// import_took_ms : null,
+			// data_type : null,
+			// original_format : null,
+			// table_name : null, 
+			// database_name : null,
+			// fileUuid : null
 		}
+
 
 		// return id of upload to client
 		res.end(JSON.stringify(uploadStatus));

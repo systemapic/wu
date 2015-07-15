@@ -47,6 +47,10 @@ module.exports = function(app, passport) {
 	// ================================
 	app.post('/oauth/token', api.oauth2.getToken);
 
+	app.get('/api/token/check', passport.authenticate('bearer', {session: false}), function (req, res) {
+		res.end('OK');
+	});
+
 
 	// ================================
 	// OAUTH2: Debug token ============
@@ -119,12 +123,13 @@ module.exports = function(app, passport) {
 		api.upload.chunkedIdent(req, res);
 	});
 
-	// =====================================
-	// UPLOAD DATA LIBRARY FILES =========== // renamed route to /chunked
-	// =====================================
-	app.post('/api/data/upload/chunked', passport.authenticate('bearer', {session: false}), function (req, res) {
-		api.upload.chunkedUpload(req, res);
-	});
+	// todo: this route is now DEAD
+	// // =====================================
+	// // UPLOAD DATA LIBRARY FILES =========== // renamed route to /chunked
+	// // =====================================
+	// app.post('/api/data/upload/chunked', passport.authenticate('bearer', {session: false}), function (req, res) {
+	// 	api.upload.chunkedUpload(req, res);
+	// });
 	
 
 	
@@ -173,7 +178,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// IMPORT DATA to POSTGIS ==============
 	// =====================================
-	app.post('/api/data/import', passport.authenticate('bearer', {session: false}), function (req, res) {
+	app.post('/api/import', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.import(req, res);
 	
 	});
@@ -181,19 +186,25 @@ module.exports = function(app, passport) {
 	// =====================================
 	// GET UPLOAD STATUS ===================
 	// =====================================
-	app.get('/api/data/uploadStatus', passport.authenticate('bearer', {session: false}), function (req, res) {
-		console.log('status!!!!');
+	app.get('/api/import/status', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.getUploadStatus(req, res);
 	});
 
-	// =====================================
-	// GET FILE MODEL FROM FILEUUID ========
-	// =====================================
-	app.get('/api/data/file', passport.authenticate('bearer', {session: false}), function (req, res) {
-		api.file.getFile(req, res);
-	});
+	// // =====================================
+	// // GET FILE MODEL FROM FILEUUID ========
+	// // =====================================
+	// app.get('/api/data/file', passport.authenticate('bearer', {session: false}), function (req, res) {
+	// 	api.file.getFile(req, res);
+	// });
 
 
+
+	// // =====================================
+	// // GET FILE MODEL FROM FILEUUID ========
+	// // =====================================
+	// app.get('/api/data/export/', passport.authenticate('bearer', {session: false}), function (req, res) {
+	// 	api.file.getFile(req, res);
+	// });
 
 
 
