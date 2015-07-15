@@ -52,8 +52,10 @@ L.Control.Cartocss = Wu.Control.extend({
 
 	_flush : function () {
 		this.layers = {};
+		this._layers = [];
 		this.clearCodeMirror();
 		this._styleHeaderLayerName.innerHTML = '';
+		console.error();
 	},
 
 	_refresh : function () {
@@ -66,9 +68,12 @@ L.Control.Cartocss = Wu.Control.extend({
 
 		// remove old content
 		this._flush();
+		this._initEmpty();
 
 		// show
 		this._show();
+
+		if(this._open) this.open();
 
 		// mark content not loaded
 		this._initedContent = false;
@@ -80,8 +85,6 @@ L.Control.Cartocss = Wu.Control.extend({
 		// get all active, geojson layers
 		this._layers = this._project.getStylableLayers();
 
-		console.log('stylable layers: ', this._layers);
-
 		// fill active layers box
 		this._fillLayers();
 
@@ -90,9 +93,22 @@ L.Control.Cartocss = Wu.Control.extend({
 
 		// refresh codemirror
 		this._codeMirror.refresh();
+		this._initEmpty();
 
 		// mark content loaded
 		this._initedContent = true;
+	},
+
+	_initEmpty : function (){
+		//if there are no active layers
+		if(!this._layers|| !this._layers.length ){
+
+			this._styleHeaderLayerName.innerHTML = 'No available layers';
+			//explanatory text on cartocss editor
+			this._codeMirror.setValue('There are no layers to be edited. Upload or activate some before editing.');
+		}
+			
+		return;
 	},
 
 	_isActive : function () {
@@ -107,6 +123,7 @@ L.Control.Cartocss = Wu.Control.extend({
 
 	_on : function () {
 		this._refresh();
+		this._initEmpty();
 	},
 
 	_off : function () {
@@ -1051,6 +1068,7 @@ L.Control.Cartocss = Wu.Control.extend({
 
 		// update
 		this._initContent();
+
 
 		// add open class
 		Wu.DomUtil.addClass(this._editorContainer, 'open');
