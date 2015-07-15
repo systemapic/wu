@@ -959,6 +959,7 @@ svg.tracer {
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
 
 }
+
 .startpane-client-logo img{
   position: absolute;
   display: block;
@@ -966,4 +967,17 @@ svg.tracer {
   width: auto;
   max-width: 300px;
   max-height: 250px;
+}
+
+.share-image-download-button:visited, .share-image-download-button:link{
+	text-decoration: none !important;
+	color:white;
+}
+
+.fullpage-users.show.hide-top.minimal .manage-access-project-item-description{
+	width: 190px;
+}
+
+.fullpage-users.show.hide-top .manage-access-project-item-description{
+	width: 260px;
 }
