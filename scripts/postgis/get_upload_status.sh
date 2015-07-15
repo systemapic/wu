@@ -15,6 +15,7 @@ ACCESSTOKEN=$(curl --header "Authorization: Basic YWJjMTIzOnNzaC1zZWNyZXQ=" --da
 
 # api endpoint 
 UPLOAD_ID=$1
-ENDPOINT="https://dev.systemapic.com/api/data/uploadStatus?upload_id=$UPLOAD_ID&access_token=$ACCESSTOKEN"
+ENDPOINT=/api/import/status
+API="https://dev.systemapic.com$ENDPOINT?upload_id=$UPLOAD_ID&access_token=$ACCESSTOKEN"
 
-curl -s -X GET $ENDPOINT | python -mjson.tool
+curl -s -X GET $API | python -mjson.tool
