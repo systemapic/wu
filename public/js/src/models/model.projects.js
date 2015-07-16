@@ -313,7 +313,8 @@ Wu.Project = Wu.Class.extend({
 
 	_save : function (string) {
 		// save to server                                       	// TODO: pgp
-		Wu.send('/api/project/update', string, this._saved.bind(this));                         // TODO: save only if actual changes! saving too much already
+		Wu.send('/api/project/update', string, this._saved.bind(this));  
+		                       // TODO: save only if actual changes! saving too much already
 	},
 
 	// callback for save
@@ -716,7 +717,7 @@ Wu.Project = Wu.Class.extend({
 	getHeaderLogoBg : function () {
 		var logo = this.store.header.logo;
 		if (!logo) logo = this.store.logo;
-		var url = "url('" + logo + "')";
+		var url = "url('" + logo  + "')";
 		return url;
 	},
 
@@ -916,8 +917,8 @@ Wu.Project = Wu.Class.extend({
 		var sources = [];
 		files.forEach(function (file) {
 			if (file.type == 'image') {
-				var thumbnail 	= '/pixels/' + file.uuid + '?width=75&height=50';
-				var url 	= '/pixels/' + file.uuid + '?width=200&height=200';
+				var thumbnail 	= '/pixels/' + file.uuid + '?width=75&height=50' + '&access_token=' + app.tokens.access_token;
+				var url 	= '/pixels/' + file.uuid + '?width=200&height=200' + '&access_token=' + app.tokens.access_token;
 				var source = {
 				    	title 	: file.name, 	// title
 				    	thumbnail : thumbnail,  // optional. url to image
@@ -936,11 +937,11 @@ Wu.Project = Wu.Class.extend({
 		var sources = [];
 		files.forEach(function (file) {
 
-			var thumbnail = (file.type == 'image') ? '/pixels/' + file.uuid + '?width=50&height=50' : '';
+			var thumbnail = (file.type == 'image') ? '/pixels/' + file.uuid + '?width=50&height=50' + '&access_token=' + app.tokens.access_token : '';
 			var prefix    = (file.type == 'image') ? '/images/' 					: '/api/file/download/?file=';
-			var url = prefix + file.uuid;// + suffix
+			var url = prefix + file.uuid + '&access_token=' + app.tokens.access_token;// + suffix
 
-			url += '&access_token=' + app.tokens.access_token;
+			//url += '?access_token=' + app.tokens.access_token;
 
 			var source = {
 			    	title 	: file.name, 	// title
@@ -1091,7 +1092,7 @@ Wu.Project = Wu.Class.extend({
 
 		// parse results
 		var result = JSON.parse(json),
-		    image = result.cropped,
+		    image = result.cropped ,
 		    fileUuid = result.fileUuid,
 		    path = '/images/' + image;
 
@@ -1099,11 +1100,13 @@ Wu.Project = Wu.Class.extend({
 		context.setLogo(path); 		// trigger server-save
 		context.setHeaderLogo(path); 	// triggers server-save
 
-		context._menuItem.logo.src = path;
+		context._menuItem.logo.style.backgroundImage = 'url(' + context._getPixelLogo(path) + ')';
+		context.setTempLogo(); 
 
 		// Set logo in header pane
-		if (context == app.activeProject) app.HeaderPane.addedLogo(image); // triggers this.setHeaderLogo -- triggers save
-
+		if (context == app.activeProject) {
+			app.HeaderPane.addedLogo(image); // triggers this.setHeaderLogo -- triggers save
+		}
 	},
 
 	setThumbCreated : function (bool) {
@@ -1117,6 +1120,12 @@ Wu.Project = Wu.Class.extend({
 
 	setTempLogo : function () {
 		this._sidePaneLogoContainer.src = app.options.logos.projectDefault;
-	}	
+	},
 
-});
+	_getPixelLogo : function (logo) {
+		var base = logo.split('/')[2];
+		var url = '/pixels/image/' + base + '?width=90&height=60&format=png' + '&access_token=' + app.tokens.access_token;
+		return url;
+	}
+
+})

@@ -298,7 +298,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
-	app.get('/images/*', isLoggedIn, function (req,res) {
+	app.get('/images/*', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.file.sendImage(req, res);
 	});
 
@@ -306,7 +306,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
-	app.get('/pixels/fit/*', isLoggedIn, function (req,res) {
+	app.get('/pixels/fit/*',passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.pixels.serveFitPixelPerfection(req, res);
 	});
 
@@ -314,7 +314,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
-	app.get('/pixels/image/*', isLoggedIn, function (req,res) {
+	app.get('/pixels/image/*', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.pixels.serveImagePixelPerfection(req, res);
 	});
 
@@ -322,7 +322,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
-	app.get('/pixels/*', isLoggedIn, function (req,res) {
+	app.get('/pixels/*', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.pixels.servePixelPerfection(req, res);
 	});
 
