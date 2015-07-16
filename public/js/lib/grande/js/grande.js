@@ -707,7 +707,6 @@ G.Rande = G.Class.extend({
 		var range = window.getSelection().getRangeAt(0);
 		range.collapse(true);
 		range.insertNode(image);
-		console.log('aye');
 
 	},
 
