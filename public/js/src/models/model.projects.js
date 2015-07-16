@@ -917,8 +917,8 @@ Wu.Project = Wu.Class.extend({
 		var sources = [];
 		files.forEach(function (file) {
 			if (file.type == 'image') {
-				var thumbnail 	= '/pixels/' + file.uuid + '?width=75&height=50';
-				var url 	= '/pixels/' + file.uuid + '?width=200&height=200';
+				var thumbnail 	= '/pixels/' + file.uuid + '?width=75&height=50' + '&access_token=' + app.tokens.access_token;
+				var url 	= '/pixels/' + file.uuid + '?width=200&height=200' + '&access_token=' + app.tokens.access_token;
 				var source = {
 				    	title 	: file.name, 	// title
 				    	thumbnail : thumbnail,  // optional. url to image
@@ -937,9 +937,9 @@ Wu.Project = Wu.Class.extend({
 		var sources = [];
 		files.forEach(function (file) {
 
-			var thumbnail = (file.type == 'image') ? '/pixels/' + file.uuid + '?width=50&height=50' : '';
+			var thumbnail = (file.type == 'image') ? '/pixels/' + file.uuid + '?width=50&height=50' + '&access_token=' + app.tokens.access_token : '';
 			var prefix    = (file.type == 'image') ? '/images/' 					: '/api/file/download/?file=';
-			var url = prefix + file.uuid;// + suffix
+			var url = prefix + file.uuid + '&access_token=' + app.tokens.access_token;// + suffix
 
 			//url += '?access_token=' + app.tokens.access_token;
 
@@ -1124,8 +1124,8 @@ Wu.Project = Wu.Class.extend({
 
 	_getPixelLogo : function (logo) {
 		var base = logo.split('/')[2];
-		var url = '/pixels/image/' + base + '?width=90&height=60&format=png' + '&access_token=' + app.tokens.access_token; ;
+		var url = '/pixels/image/' + base + '?width=90&height=60&format=png' + '&access_token=' + app.tokens.access_token;
 		return url;
 	}
 
-});
+})

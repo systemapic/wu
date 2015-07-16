@@ -620,7 +620,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		
 
 		// set path for zip file
-		var path = '/api/file/download?file=' + response + '&type=zip';
+		var path = '/api/file/download?file=' + response + '&type=zip' + '&access_token=' + app.tokens.access_token;
 		
 		// create download dialog
 		that.updateDownloadDialog(path);
