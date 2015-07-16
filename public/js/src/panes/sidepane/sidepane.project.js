@@ -25,7 +25,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	initLayout : function () {
 
-		// create containerthi
+		// create container
 		this._container = Wu.DomUtil.create('div', 'project-item');
 
 		// create title
@@ -65,6 +65,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 
 	_createLogo : function () {
 		if (this.logo) {
+			console.log(this.logo);
 			// remove old
 			Wu.DomUtil.remove(this.logo);
 			this.logo = null;
@@ -110,7 +111,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var logo = this._project.getLogo();
 		if (!logo) return false;
 		var base = logo.split('/')[2];
-		var url = '/pixels/image/' + base + '?width=90&height=60&format=png';
+		var url = '/pixels/image/' + base + '?width=90&height=60&format=png' + '&access_token=' + app.tokens.access_token;
 		return url;
 	},
 

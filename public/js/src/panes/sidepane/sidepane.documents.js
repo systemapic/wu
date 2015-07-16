@@ -348,8 +348,40 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 	       
 	},
 
+	_hackAccessTokens : function (elem) {
+		// content is the html string that needs search/replace of all "access_token=adsadsdas" strings
+		
+		var	badToken, //an element might have various bad tokens. Iterate and find them all.
+			occurrances = this._getIndicesOf("&amp;access_token=",elem.content), //array of indices where the bad tokens appear inside the element. 
+			regex;
+	
+		for (var i=0, len = occurrances.length; i < len; i++) {
+
+			badToken  = elem.content.substring(occurrances[i]+18,occurrances[i]+256+18); //256: access token length, 18:&amp;access_token= length
+			elem.content = elem.content.replace(badToken, app.tokens.access_token); //replace bad token in the element
+		}
+
+		return elem;
+	},
+
+	//returns an array of indices where a substring appears inside a string.
+	//searchStr: substring, str: the whole string
+	_getIndicesOf : function(searchStr, str) {
+    	var startIndex = 0, searchStrLen = searchStr.length;
+    	var index, indices = [];
+    	
+   		while ((index = str.indexOf(searchStr, startIndex)) > -1) {
+        	indices.push(index);
+        	startIndex = index + searchStrLen;
+    	}	
+    	return indices;
+	},
+
+
 	_createFolder : function (elem) {
 		var editMode = app.access.to.edit_project(this._project);
+
+		var elem = this._hackAccessTokens(elem);
 
 		// if editMode
 		if (editMode) {

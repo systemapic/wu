@@ -1596,7 +1596,8 @@ button.image-attachment {
 	height: 30px;
 	}
 
-.grande-sources-source-icon.image {
+.grande-sources-source-icon.image,
+.grande-sources-source-icon.Image {
 	background-image: url(images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -187px -75px;
@@ -1604,7 +1605,8 @@ button.image-attachment {
 	width: 26px !important;	
 	}
 
-.grande-sources-source-icon.layer {
+.grande-sources-source-icon.layer,
+.grande-sources-source-icon.Layer {
 	background-image: url(images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -144px -75px;

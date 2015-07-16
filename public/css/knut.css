@@ -26,9 +26,6 @@
 }
 
 
-
-
-
 /*layermenu logic check*/
 .invalidLayermenuitem .layer-menu-item {
 	background: red;
@@ -269,7 +266,7 @@ body {
 	color: white !important;
  	background-image: url(images/folder_img.png);
  	background-size: 25px;
-	background-position: 2% 50%;;
+	background-position: 2% 50%;
   	background-repeat: no-repeat;
 	}
 
@@ -889,34 +886,98 @@ svg.tracer {
 	color: red;
 }
 
-.startpane-header-title {
+.startpane-header-title{
   color: #fff;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
   font-size: 26px;
-  margin: 0;
   margin-bottom: 15px;
   text-align: left;
-  padding-left: 5px;
+  padding-left: 0px;
 }
 
 .startpane-has-access, .startpane-has-no-access {
   color: #fff;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
-  font-size: 16px;
+  font-size: 18px;
   margin: 0;
   margin-bottom: 15px;
   text-align: left;
-  padding-left: 5px; 
 }
 
-.startpane-has-client {
-  color: #fff;
+.startpane-client-container{
+	position : absolute;
+}
+
+.startpane-single-client-container{
+	position : relative;
+	display: inline-flex;
+	margin-right: 10px;
+}
+
+.startpane-new-project {
+  font-size: 15px;
+  font-weight: 600;
+  overflow: hidden;
+  position: absolute;
+  bottom: 4px;
+  text-align: center;
+  color: #FFF;
+  background: rgba(0, 0, 0, 0.4);
+  right: 4px;
+  line-height: 1.3;
+  padding: 8px 8px 0px 8px;
+  max-width: 282px;
+  cursor: pointer;
+  cursor: hand;
+}
+
+.startpane-client-name {
+  position: absolute;
+  bottom: 44px;
+  background: rgba(0, 0, 0, 0.4);
+  right: 4px;
+  padding: 8px 8px 0px 8px;
+  font-size: 14px;
+  color: white;
+  max-width: 282px;
+}
+
+.startpane-client-logo{
+  width: 250px;
+  height: 250px;
+  background-color: white;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
-  font-size: 20px;
-  margin: 0;
-  margin-bottom: 15px;
-  text-align: left;
-  padding-left: 5px; 
+  text-align: center;
+  line-height: 1.6;
+  font-weight: 900;
+  font-size: 15px;
+  position: relative;
+  display: inline-block;
+  margin: 2px;
+  overflow: hidden;
+  opacity: 0.9;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+
 }
 
+.startpane-client-logo img{
+  position: absolute;
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: 300px;
+  max-height: 250px;
+}
 
+.share-image-download-button:visited, .share-image-download-button:link{
+	text-decoration: none !important;
+	color:white;
+}
+
+.fullpage-users.show.hide-top.minimal .manage-access-project-item-description{
+	width: 190px;
+}
+
+.fullpage-users.show.hide-top .manage-access-project-item-description{
+	width: 260px;
+}

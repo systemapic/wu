@@ -66,11 +66,11 @@ Wu.HeaderPane = Wu.Pane.extend({
 	_getPixelLogo : function (logo) {
 		var logo = logo || this._project.getHeaderLogo();
 
-		if (!logo || logo == '/css/images/defaultProjectLogoLight.png') return '/css/images/defaultProjectLogoLight.png';
-		if (!logo || logo == '/css/images/defaultProjectLogo.png') return '/css/images/defaultProjectLogo.png';
+		if (!logo || logo == '/css/images/defaultProjectLogoLight.png') return '/css/images/defaultProjectLogoLight.png' + '?access_token=' + app.tokens.access_token;
+		if (!logo || logo == '/css/images/defaultProjectLogo.png') return '/css/images/defaultProjectLogo.png' + '?access_token=' + app.tokens.access_token;
 
 		var base = logo.split('/')[2];
-		var url = '/pixels/image/' + base + '?width=105&height=70'
+		var url = '/pixels/image/' + base + '?width=105&height=70' + '&access_token=' + app.tokens.access_token;
 		
 		return url;
 	},
