@@ -350,23 +350,20 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 
 	_hackAccessTokens : function (elem) {
 		// content is the html string that needs search/replace of all "access_token=adsadsdas" strings
-
+		
 		var	badToken, //an element might have various bad tokens. Iterate and find them all.
 			occurrances = this._getIndicesOf("&amp;access_token=",elem.content), //array of indices where the bad tokens appear inside the element. 
 			regex;
 	
 		for (var i=0, len = occurrances.length; i < len; i++) {
 
-			badToken  = elem.content.substring(occurrances[i]+18,occurrances[i]+256+18);
-			regex = new RegExp(badToken, "g");
-
-			if (regex != '/(?:)/g') //strict inequality did not work at some point
-				//replace bad token in the element
-				elem.content.replace(regex, app.tokens.access_token);
-			
+			badToken  = elem.content.substring(occurrances[i]+18,occurrances[i]+256+18); //256: access token length, 18:&amp;access_token= length
+			//regex = new RegExp(badToken, "g");
+			//if (regex != '/(?:)/g') //strict inequality did not work at some point
+			//elem.content = elem.content.replace(regex.toString().substring(1,regex.toString().length-2), app.tokens.access_token); //replace bad token in the element
+			elem.content = elem.content.replace(badToken, app.tokens.access_token); //replace bad token in the element
 		}
 
-		//console.log(">>",elem.content);
 		return elem;
 	},
 
