@@ -123,7 +123,7 @@ module.exports = function(app, passport) {
 		api.upload.chunkedIdent(req, res);
 	});
 
-	// todo: this route is now DEAD
+	// todo: this route is now DEAD; still alive in wu.js
 	// // =====================================
 	// // UPLOAD DATA LIBRARY FILES =========== // renamed route to /chunked
 	// // =====================================
@@ -146,33 +146,48 @@ module.exports = function(app, passport) {
 
 
 
+	// #####################################
+	// =====================================
+	// BRIDGE API ==========================
+	// =====================================
+	// brigde to mongoose for pile.js
+	// #####################################
+
+
+	app.get('/api/file/get', passport.authenticate('bearer', {session: false}), function (req, res) {
+		console.log('/api/bridge/getFile', req);
+		api.file.getFile(req, res);
+	});
 
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// #####################################
 	// =====================================
 	// POSTGIS API  ========================
 	// =====================================
+	// #####################################
 
-
-
-	// app.post('/api/data/createDatabase', passport.authenticate('bearer', {session: false}), function (req,res) {
-	// 	api.postgis.createDatabase(req.body, function (err, result) {
-	// 		if (err) console.log('/api/data/createDatabase', err);
-	// 		res.end(JSON.stringify(result));
-	// 	});
-	// });
-
-
-	// // new api for uploading files (postgis enabled)
-	// // =====================================
-	// // UPLOAD FILES - NEW API ===========
-	// // =====================================
-	// app.post('/api/data/upload', passport.authenticate('bearer', {session: false}), function (req, res) {
-	// 	api.upload.chunkedUpload(req, res);
-	// });
 
 
 	// =====================================
@@ -180,7 +195,6 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/import', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.import(req, res);
-	
 	});
 
 	// =====================================
@@ -197,14 +211,24 @@ module.exports = function(app, passport) {
 	// 	api.file.getFile(req, res);
 	// });
 
-
-
 	// // =====================================
 	// // GET FILE MODEL FROM FILEUUID ========
 	// // =====================================
 	// app.get('/api/data/export/', passport.authenticate('bearer', {session: false}), function (req, res) {
 	// 	api.file.getFile(req, res);
 	// });
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -686,6 +710,14 @@ module.exports = function(app, passport) {
 	function isLoggedIn(req, res, next) {
 		if (req.isAuthenticated()) return next();
 		res.redirect('/');
+	}
+
+	function internalAccess(req, res, next) {
+		var token = req.query.token || req.body.token;
+		if (token == 'thisissecret') return next();
+		res.end(JSON.stringify({
+			error : 'No access.'
+		}))
 	}
 
 	
