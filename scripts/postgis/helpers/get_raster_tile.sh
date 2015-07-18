@@ -31,7 +31,9 @@ LAYERUUID=$1
 Z=$2
 X=$3
 Y=$4
-ENDPOINT=/api/db/raster
-API="https://dev.systemapic.com$ENDPOINT?layerUuid=$LAYERUUID&z=$Z&x=$X&y=$Y&access_token=$ACCESSTOKEN"
+ENDPOINT=/tiles
+API="https://e.systemapic.com$ENDPOINT/$LAYERUUID/$Z/$X/$Y.png?access_token=$ACCESSTOKEN"
+
+echo $API
 
 curl -s -X GET $API | python -mjson.tool

@@ -1,0 +1,14 @@
+{
+  "cartocss_version": "2.0.1",
+  "cartocss": "#layer {}",
+  "sql": "SELECT * FROM table",
+  "file_id": "file_suhrcucstpmtxqgtpyyc",
+  "srid": "",
+  "raster_band": "",
+  "geom_type": "geometry",
+  "geom_column": "geom",
+  "access_token": "i9gok7pk8500p43awdTlxOy5Di20pr516d8NE2OSVRqkGu0UMWBauOcLYjUDSpIAnRDLl0yoYf4Q7qkYvAEoPQc6kLPsRxZV1zOnJ6Aj0Mkby5VJRTqwRo8brVv0JyTtlqWd0DKltrkbud0nqRH4jicLEjcQBrnTdAdf3NEOcSX5nfEAFj7Tvv3MM67bVGNC0z9eADqSr68ZOgMEQXG0nCRfStqSIr2R8MDftCG0K43NNG2aORXwCyjZ4hwAhrv2",
+  "attributes": "",
+  "interactivity": "",
+  "affected_tables": ""
+}

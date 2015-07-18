@@ -16,6 +16,7 @@ ACCESSTOKEN=$(curl --header "Authorization: Basic YWJjMTIzOnNzaC1zZWNyZXQ=" --da
 # api endpoint 
 UPLOAD_ID=$1
 ENDPOINT=/api/db/getLayer
+ENDPOINT=/tiles
 API="https://dev.systemapic.com$ENDPOINT?layerUuid=$1&access_token=$ACCESSTOKEN"
 
 curl -s -X GET $API | python -mjson.tool
