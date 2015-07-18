@@ -67,7 +67,9 @@ module.exports = api.upload = {
 
 		// set upload status
 		var uploadStatus = {
-			upload_id : api.utils.getRandomChars(16), // create upload id
+			// fileUuid : api.utils.getRandomChars(20), // create upload id
+			// fileUuid : uuid.v4(), // this will be file id also
+			file_id : 'file_' + api.utils.getRandomChars(20),
 			user_id : req.user.uuid,
 			filename : req.files.data.originalFilename,
 			timestamp : Date.now(),
@@ -96,7 +98,7 @@ module.exports = api.upload = {
 		ops.push(function (callback) {
 
 			// save upload id to redis
-			var key = 'uploadStatus:' + uploadStatus.upload_id;
+			var key = 'uploadStatus:' + uploadStatus.file_id;
 			api.redis.set(key, JSON.stringify(uploadStatus), callback);
 		});
 
@@ -105,7 +107,7 @@ module.exports = api.upload = {
 
 			// import options
 			var options = {
-				upload_id : uploadStatus.upload_id,
+				file_id : uploadStatus.file_id,
 				files : req.files,
 				options : req.body,
 				user : req.user,
@@ -125,22 +127,22 @@ module.exports = api.upload = {
 		async.series(ops, function (err, results) {
 			
 			// if err, set upload status, return
-			if (err) return api.upload.updateStatus(uploadStatus.upload_id, { // todo: more specific error reporting
+			if (err) return api.upload.updateStatus(uploadStatus.file_id, { // todo: more specific error reporting
 				error_code : 1, 
 				error_text : err,
 				status : 'Failed'
 			});
 
 			// create file model 
-			api.upload._createFileModel(uploadStatus.upload_id, function (err, fileModel) {
+			api.upload._createFileModel(uploadStatus.file_id, function (err, fileModel) {
 				console.log('api.upload.import > created filemode', err, fileModel);
 
 				// set upload status, expire in one day
-				api.upload.updateStatus(uploadStatus.upload_id, {
+				api.upload.updateStatus(uploadStatus.file_id, {
 					processing_success : true,
 					status : 'Done', 
 					expire : 3600 * 24,
-					fileUuid : fileModel.uuid
+					file_id : fileModel.uuid
 				}, function (err) {
 
 					console.log('api.upload.import DONE!', results);
@@ -150,15 +152,15 @@ module.exports = api.upload = {
 		});	
 	},
 
-	_createFileModel : function (upload_id, done) {
+	_createFileModel : function (file_id, done) {
 
 		// get info from uploadStatus // todo: too much of a shortcut?
-		var upload_id_key = 'uploadStatus:' + upload_id;
-		api.redis.get(upload_id_key, function (err, uploadStatus) {
+		var file_id_key = 'uploadStatus:' + file_id;
+		api.redis.get(file_id_key, function (err, uploadStatus) {
 			var u = JSON.parse(uploadStatus);
 
 			var fileModel = {
-				uuid : 'file-' + uuid.v4(),
+				uuid : file_id,
 				createdBy : u.user_id,
 				name : u.filename,
 				type : 'postgis',
@@ -178,12 +180,12 @@ module.exports = api.upload = {
 		});
 	},
 
-	updateStatus : function (upload_id, status, callback, expire) {
+	updateStatus : function (file_id, status, callback, expire) {
 		
-		var upload_id_key = 'uploadStatus:' + upload_id;
+		var file_id_key = 'uploadStatus:' + file_id;
 
 		// update upload status, one key at a time if necessary
-		api.redis.get(upload_id_key, function (err, uploadStatusJSON) {
+		api.redis.get(file_id_key, function (err, uploadStatusJSON) {
 			if (err) return callback && callback(err);
 
 			// add keys
@@ -193,10 +195,10 @@ module.exports = api.upload = {
 			};
 
 			// save upload status
-			api.redis.set(upload_id_key, JSON.stringify(uploadStatus), function (err) {
+			api.redis.set(file_id_key, JSON.stringify(uploadStatus), function (err) {
 
 				// expire if set
-				if (status.expire) api.redis.expire(upload_id_key, status.expire);
+				if (status.expire) api.redis.expire(file_id_key, status.expire);
 				
 				// return
 				callback && callback(err);
@@ -206,10 +208,12 @@ module.exports = api.upload = {
 
 
 	getUploadStatus : function (req, res) {
-		var upload_id = req.query.upload_id,
-		    upload_id_key = 'uploadStatus:' + upload_id;
+		var file_id = req.query.file_id,
+		    file_id_key = 'uploadStatus:' + file_id;
 
-		api.redis.get(upload_id_key, function (err, uploadStatus) {
+		console.log('file_id', file_id);
+
+		api.redis.get(file_id_key, function (err, uploadStatus) {
 			if (err) return api.error.general(req, res, err);
 
 			// return upload status
@@ -296,11 +300,11 @@ module.exports = api.upload = {
 
 	untar : function (options, done) {
 		var tarfile = options.files.data.path,
-		    extractPath = '/data/tmp/' + options.upload_id,
+		    extractPath = '/data/tmp/' + options.file_id,
 		    exec = require('child_process').exec,
 		    cmd = 'tar xzf "' + tarfile + '" -C "' + extractPath + '"';
 			
-		// create upload_id temp dir
+		// create file_id temp dir
 		fs.ensureDir(extractPath, function (err) {
 			if (err) return done(err);
 
@@ -319,7 +323,7 @@ module.exports = api.upload = {
 	unzip : function (options, done) {
 		var temporaryPath = options.files.data.path,
 		    zip = new ZipInfo(temporaryPath),
-		    extractPath = '/data/tmp/' + options.upload_id;
+		    extractPath = '/data/tmp/' + options.file_id;
 		
 		// unzip
 		zip.extractTo(extractPath, ['*'], {junkPaths : true}, function (err) {

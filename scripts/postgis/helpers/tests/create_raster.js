@@ -57,6 +57,7 @@ var postgis_settings = {
 	// 'table' 	: 'shape_ubpdiiswel',
 	// 'table' 	: '(select * from shape_ubpdiiswel where vel < -50) as sub',
 	'table' 	: '(select * from shape_ubpdiiswel where ST_Intersects(geom, !bbox!)) as sub',
+	// 'table' 	: ''
 	'user' 		: 'docker',
 	'password' 	: 'docker',
 	'host' 		: 'postgis',
@@ -82,7 +83,7 @@ layer.datasource = postgis;
 layer.styles = [params.style];
 
 map.bufferSize = 64;
-map.load(path.join(__dirname, params.style + '.xml'), {strict: true}, function(err,map) {
+map.load(path.join(__dirname, params.style + '.xml'), { strict: true }, function(err,map) {
 	if (err) throw err;
 	map.add_layer(layer);
 

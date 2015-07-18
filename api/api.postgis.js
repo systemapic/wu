@@ -193,7 +193,7 @@ module.exports = api.postgis = {
 			api.postgis.importShapefile(options, function (err, results) {
 
 				// set upload status
-				api.upload.updateStatus(options.upload_id, {
+				api.upload.updateStatus(options.file_id, {
 					original_format : 'GeoJSON',
 				}, function () {
 					// return
@@ -211,18 +211,18 @@ module.exports = api.postgis = {
 	importRaster : function (options, done) {
 		var clientName 	= options.clientName,
 		    raster 	= options.files[0],
-		    fileUuid 	= 'raster_' + api.utils.getRandom(10),
+		    // file_id 	= 'raster_' + api.utils.getRandom(10),
+		    file_id 	= options.file_id,
 		    pg_db 	= options.user.postgis_database,
 		    original_format = api.postgis._getRasterType(raster);
 
-		console.log('############ original_f', original_format);
 		var IMPORT_RASTER_SCRIPT_PATH = '../scripts/postgis/import_raster.sh'; // todo: put in config
 		
 		// create database script
 		var cmd = [
 			IMPORT_RASTER_SCRIPT_PATH, 	// script
 			raster,
-			fileUuid,
+			file_id,
 			pg_db
 		].join(' ');
 
@@ -232,7 +232,7 @@ module.exports = api.postgis = {
 			var endTime = new Date().getTime();
 
 			// set err on upload status
-			if (err) return api.upload.updateStatus(options.upload_id, {
+			if (err) return api.upload.updateStatus(options.file_id, {
 				error_code : 2,
 				error_text : err
 			}, function () {
@@ -242,11 +242,11 @@ module.exports = api.postgis = {
 
 
 			// set upload status
-			api.upload.updateStatus(options.upload_id, {
+			api.upload.updateStatus(options.file_id, {
 				data_type : 'raster',
 				original_format : original_format,
 				import_took_ms : endTime - startTime,
-				table_name : fileUuid,
+				table_name : file_id,
 				database_name : pg_db
 			}, function () {
 				// return
@@ -260,7 +260,8 @@ module.exports = api.postgis = {
 		var files 	= options.files,
 		    shape 	= api.geo.getTheShape(files)[0],
 		    prjfile 	= api.geo.getTheProjection(files)[0],
-		    fileUuid 	= 'shape_' + api.utils.getRandom(10),
+		    // file_id 	= 'shape_' + api.utils.getRandom(10),
+		    file_id 	= options.file_id,
 		    pg_db 	= options.user.postgis_database,
 		    ops 	= [];
 
@@ -290,13 +291,13 @@ module.exports = api.postgis = {
 
 		ops.push(function (srid, callback) {
 
-			var srid_converted = srid.srid + ':3857'; 
+			var srid_converted = srid.srid + ':3857';  // convert on import. todo: create the_geom + the_geom_webmercator columns after import instead
 
 			// create database script
 			var cmd = [
 				IMPORT_SHAPEFILE_SCRIPT_PATH, 	// script
 				shape,
-				fileUuid,
+				file_id,
 				pg_db,
 				srid_converted
 			].join(' ');
@@ -306,16 +307,16 @@ module.exports = api.postgis = {
 			// import to postgis
 			var startTime = new Date().getTime();
 			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
-				console.log('stdout', err, stdout, stdin);
+				console.log('stdout', err, stdin);
 				if (err) console.log('import_shapefile_script err: ', err);
 
 				var endTime = new Date().getTime();
 
 				// set import time to status
-				api.upload.updateStatus(options.upload_id, {
+				api.upload.updateStatus(options.file_id, { 	// todo: set err if err
 					data_type : 'vector',
 					import_took_ms : endTime - startTime,
-					table_name : fileUuid,
+					table_name : file_id,
 					database_name : pg_db
 				}, function () {
 					callback(err, 'Shapefile imported successfully.');
@@ -330,12 +331,12 @@ module.exports = api.postgis = {
 			
 			api.postgis.query({
 				postgis_db : pg_db,
-				query : 'SELECT count(*) from ' + fileUuid
+				query : 'SELECT count(*) from "' + file_id + '"'
 			}, function (err, result) {
-				if (err) return callback(null);
+				if (err) return callback(err);
 				
 				// set upload status
-				api.upload.updateStatus(options.upload_id, {
+				api.upload.updateStatus(options.file_id, {
 					rows_count : result.rows[0].count
 				}, function () {
 					callback(null);
@@ -357,10 +358,8 @@ module.exports = api.postgis = {
 		// count rows and add to uploadStatus
 		var conString = 'postgres://docker:docker@postgis/' + postgis_db; // todo: put in config
 		pg.connect(conString, function(err, client, pgcb) {
-			if (err) {
-				console.log('api.postgis.query err, pg.connect', err);
-				return callback(null);
-			}
+			if (err) return callback(err);
+			
 			
 			// do query
 			client.query(query, variables, function(err, result) {
@@ -368,10 +367,8 @@ module.exports = api.postgis = {
 				pgcb();
 				client.end();
 
-				if (err) {
-					console.log('api.postgis.query err, client.query', err);
-					return callback(err); 
-				}
+				if (err) return callback(err); 
+				
 				
 				// return result
 				callback(null, result);
