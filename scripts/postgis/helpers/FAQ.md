@@ -29,7 +29,7 @@ db: zzjihbcpqm
 table: shape_qbbdijgmex
 epsg: 32638
 
-
+Query records in a bounding box: http://docs.cartodb.com/tips-and-tricks.html#query-records-in-a-bounding-box
 
 
 

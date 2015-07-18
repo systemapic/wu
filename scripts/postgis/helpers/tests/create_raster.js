@@ -24,15 +24,15 @@ mapnik.register_default_input_plugins();
 
 console.time('CREATE RASTER');
 
-var database_name = 'zzjihbcpqm';
+// var database_name = 'zzjihbcpqm';
 
 // cetin3, EPSG:32638
-var table_name = 'shape_qbbdijgmex';
+// var table_name = 'shape_qbbdijgmex';
 
 // cadastral, srid: 4326
-var table_name = 'shape_dszhjnseex';
+// var table_name = 'shape_dszhjnseex';
 
-14/10124/6322
+// 14/10124/6322
 var params = {
 	// z : 13, // cadastral
 	// x : 7533,
@@ -55,7 +55,8 @@ var postgis_settings = {
 	// 'table' 	: '(select * from shape_ozpnkswisx where area_m2 > 1000) as sub', // works!
 	// 'table' 	: '(select * from shape_ozpnkswisx where area_m2 > 1000) as sub', // works!
 	// 'table' 	: 'shape_ubpdiiswel',
-	'table' 	: '(select * from shape_ubpdiiswel where vel < -50) as sub',
+	// 'table' 	: '(select * from shape_ubpdiiswel where vel < -50) as sub',
+	'table' 	: '(select * from shape_ubpdiiswel where ST_Intersects(geom, !bbox!)) as sub',
 	'user' 		: 'docker',
 	'password' 	: 'docker',
 	'host' 		: 'postgis',
@@ -81,7 +82,7 @@ layer.datasource = postgis;
 layer.styles = [params.style];
 
 map.bufferSize = 64;
-map.load(path.join(__dirname, 'points.xml'), {strict: true}, function(err,map) {
+map.load(path.join(__dirname, params.style + '.xml'), {strict: true}, function(err,map) {
 	if (err) throw err;
 	map.add_layer(layer);
 
