@@ -12,10 +12,14 @@ if [ "$3" == "" ]; then
 	exit 1 # missing args
 fi
 
+if [ "$4" == "" ]; then
+	exit 1 # missing args
+fi
+
 # env vars
 PGPASSWORD=docker
 PGUSERNAME=docker
 PGHOST=postgis
 
 # import shapefile
-shp2pgsql -I $1 $2 | PGPASSWORD=$PGPASSWORD psql --host=$PGHOST --username=$PGUSERNAME $3
+shp2pgsql -s $4 -I $1 $2 | PGPASSWORD=$PGPASSWORD psql --host=$PGHOST --username=$PGUSERNAME $3

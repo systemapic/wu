@@ -15,6 +15,7 @@ var fs 		= require('fs-extra');
 var gm 		= require('gm');
 var kue 	= require('kue');
 var fss 	= require("q-io/fs");
+var srs 	= require('srs');
 var zlib 	= require('zlib');
 var uuid 	= require('node-uuid');
 var util 	= require('util');
@@ -258,26 +259,56 @@ module.exports = api.postgis = {
 	importShapefile : function (options, done) {
 		var files 	= options.files,
 		    shape 	= api.geo.getTheShape(files)[0],
+		    prjfile 	= api.geo.getTheProjection(files)[0],
 		    fileUuid 	= 'shape_' + api.utils.getRandom(10),
 		    pg_db 	= options.user.postgis_database,
 		    ops 	= [];
 
 		var IMPORT_SHAPEFILE_SCRIPT_PATH = '../scripts/postgis/import_shapefile.sh'; // todo: put in config
 		
-		// create database script
-		var cmd = [
-			IMPORT_SHAPEFILE_SCRIPT_PATH, 	// script
-			shape,
-			fileUuid,
-			pg_db
-		].join(' ');
+
+		console.log('prjfile: ', prjfile);
 
 
 		ops.push(function (callback) {
 
+			if (prjfile) {
+				fs.readFile(prjfile, function (err, prj4) {
+					console.time('srid');
+					var srid = srs.parse(prj4);
+					console.timeEnd('srid');
+					console.log('srid: ', srid);
+					callback(err, srid);
+				});
+			} else {
+				// no prj file
+				callback(null, false);
+			}
+		});
+
+
+
+		ops.push(function (srid, callback) {
+
+			var srid_converted = srid.srid + ':3857'; 
+
+			// create database script
+			var cmd = [
+				IMPORT_SHAPEFILE_SCRIPT_PATH, 	// script
+				shape,
+				fileUuid,
+				pg_db,
+				srid_converted
+			].join(' ');
+
+			console.log('cmd: ', cmd);
+
 			// import to postgis
 			var startTime = new Date().getTime();
-			exec(cmd, {maxBuffer: 1024 * 50000}, function (err) {
+			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+				console.log('stdout', err, stdout, stdin);
+				if (err) console.log('import_shapefile_script err: ', err);
+
 				var endTime = new Date().getTime();
 
 				// set import time to status
@@ -295,7 +326,7 @@ module.exports = api.postgis = {
 		});
 
 		// count rows for upload status
-		ops.push(function (callback) {
+		ops.push(function (success, callback) {
 			
 			api.postgis.query({
 				postgis_db : pg_db,
@@ -313,7 +344,7 @@ module.exports = api.postgis = {
 		});
 
 		// run ops
-		async.series(ops, done);
+		async.waterfall(ops, done);
 
 	},
 
