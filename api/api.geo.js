@@ -331,6 +331,17 @@ module.exports = api.geo = {
 		return shps;
 	},
 
+	getTheProjection : function (shapes) {
+		// get .prj file
+		var shps = [];
+		for (s in shapes) {
+			if (shapes[s] && shapes[s].slice(-4) == '.prj') {
+				shps.push(shapes[s]);
+			}
+		}
+		return shps;
+	},
+
 	moveShapefiles : function (options, done) {
 		var ops = [];
 		var possible = ['.shp', '.shx', '.dbf', '.prj', '.sbn', '.sbx', '.fbn', '.fbx', '.ain', '.aih', '.ixs', '.mxs', '.atx', '.shp.xml', '.cpg'];

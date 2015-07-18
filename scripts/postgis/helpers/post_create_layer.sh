@@ -3,7 +3,12 @@
 
 if [ "$1" == "" ]; then
 	echo "Must provide fileUuid as first argument,"
-	echo "eg. get_file_object.sh file-b8219271-8caf-4da5-b1d3-47575fac1df1"
+	echo ""
+	exit 1 # missing args
+fi
+
+if [ "$1" == "" ]; then
+	echo "Must provide table as second argument,"
 	echo ""
 	exit 1 # missing args
 fi
@@ -18,7 +23,7 @@ FILEUUID=$1
 ENDPOINT=/api/db/createLayer
 API="https://dev.systemapic.com$ENDPOINT"
 SQL="SELECT count(*) FROM table"
-JSON='{"fileUuid" : "'$1'", "sql" : "SELECT count(*) FROM table", "cartocss" : "#layer {}", "access_token" : "'$ACCESSTOKEN'"}'
+JSON='{"fileUuid" : "'$1'", "table" : "'$2'", "sql" : "SELECT count(*) FROM table", "cartocss" : "#layer {}", "access_token" : "'$ACCESSTOKEN'"}'
 
 echo $JSON
 # curl -s -X GET $API | python -mjson.tool
