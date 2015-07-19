@@ -1,14 +1,14 @@
 {
-  "srid": "",
-  "raster_band": "",
-  "geom_type": "geometry",
   "geom_column": "geom",
-  "access_token": "du04teAO2M1AU78GuGuR3xeE6QaZFFzO7x7WgYvPHHhAW6WuqokQDzGy18oYOGhS0Fx8Q9bdTHJjEZIs5HmKDsgs5VoyuSQmfNZDl8QEkPLTX3Am7S7N2Z7G2T6a7HR0MJ8lfxmfdeYpeAJdNtvezKajxaN720Cwpx0MmVQSi59uxn5okZrDyEWkzY2yHcQ0Msdd5Ie2qSj8RhdS1romjGWtwtgGApw7L54dr4PqHfALWbKPd6hZUK5wGF2MSfNB",
-  "attributes": "",
-  "interactivity": "",
+  "geom_type": "geometry",
+  "raster_band": "",
+  "srid": "",
   "affected_tables": "",
-  "file_id": "file_dnrupsgoihxxhpzquzlh",
-  "sql": "SELECT * FROM file_dnrupsgoihxxhpzquzlh",
-  "cartocss": "#layer { polygon-fill: red; polygon-opacity: 0.5; }",
-  "cartocss_version": "2.0.1"
+  "interactivity": "",
+  "attributes": "",
+  "access_token": "1Q45CYWIMYahrv3YRBPJ0KA4QwyFRYvizTgLetRuw0ANtUJZ3LMEW49zipLeUONNUnC27NKpzcdgj2kAsEF5Kr7q5ImoFqkK9ELKhmF3N4cW9isqkLNiLa3lejMmR6jKWdvbYHlk41lq1DIp7l9zOkzjgfPoLeia9ApLqFODCG02CbDEEcRDPEue9CdDjcqu9uMH2czSlluhAeeeW9TiqCT23jQBT81I7C4K90nmb8ASWyCaWY6cmsQ3VfClj94x",
+  "cartocss_version": "2.0.1",
+  "cartocss": "#layer {  marker-allow-overlap: true; [vel < -40] { marker-fill: yellow} [vel > -40] { marker-fill: red} }",
+  "sql": "(SELECT * FROM file_ifesiymozbhiogqcfopi) as sub",
+  "file_id": "file_ifesiymozbhiogqcfopi"
 }

@@ -164,6 +164,8 @@ L.Control.Cartocss = Wu.Control.extend({
 		this._tooltipWrapper		= Wu.DomUtil.create('div', 'cartocss-tooltip-wrapper', this._tooltipOuterWrapper);
 		this._formWrapper 		= Wu.DomUtil.create('form', 'cartocss-form-wrapper', this._wrapper); // For CodeMirror: create form wrapper
 		this._inputArea 		= Wu.DomUtil.create('textarea', 'cartocss-input', this._formWrapper); // For CodeMirror: create text area
+		this._sqlPane 			= Wu.DomUtil.create('textarea', 'cartocss-sql', this._wrapper);
+		this._sqlPane.setAttribute('placeholder', 'Insert SQL statement.');
 		this._errorPane 		= Wu.DomUtil.create('div', 'cartocss-error-pane', this._wrapper); // error feedback pane
 		this._updateButton 		= Wu.DomUtil.create('div', 'cartocss-update-button', this._wrapper, 'Update'); // create update button
 

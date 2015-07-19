@@ -28,7 +28,7 @@ jq '.access_token="'$ACCESSTOKEN'"' layer.json > tmp.json
 jq '.file_id="'$FILEID'"' tmp.json > tmp2.json
 
 # add SQL to layer.json
-jq '.sql="(SELECT * FROM '$FILEID' WHERE roadtype = street) as sub"' tmp2.json > layer.json
+jq '.sql="(SELECT * FROM '$FILEID') as sub"' tmp2.json > layer.json
 
 # remove tmp.json
 rm tmp.json
