@@ -32,8 +32,12 @@ Z=$2
 X=$3
 Y=$4
 ENDPOINT=/tiles
-API="https://e.systemapic.com$ENDPOINT/$LAYERUUID/$Z/$X/$Y.png?access_token=$ACCESSTOKEN"
+TYPE=png
+API="https://e.systemapic.com$ENDPOINT/$LAYERUUID/$Z/$X/$Y.$TYPE?access_token=$ACCESSTOKEN"
 
 echo $API
 
-curl -s -X GET $API | python -mjson.tool
+curl -s -X GET $API > raster_2.$TYPE
+if [ "$TYPE" == "png" ]; then
+	rsub raster_2.$TYPE
+fi
