@@ -26,4 +26,4 @@ FILE=/home/trashtest/cadastral.zip
 
 
 # curl the endpoint
-curl -s --form "userUuid=loka" --form "meta=feta" --form "data=@$FILE" --header "Authorization: Bearer $ACCESSTOKEN" $API #| python -mjson.tool
+curl -s --form "userUuid=loka" --form "meta=feta" --form "data=@$FILE" --header "Authorization: Bearer $ACCESSTOKEN" $API | python -mjson.tool

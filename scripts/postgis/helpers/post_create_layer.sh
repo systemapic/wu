@@ -20,9 +20,18 @@ API="https://dev.systemapic.com$ENDPOINT"
 # vars
 FILEID=$1
 
-# add file_id, access_token to layer.json
-jq '.access_token="'$ACCESSTOKEN'"' layer.json > layer2.json
-jq '.file_id="'$FILEID'"' layer2.json > layer.json
-rm layer2.json
+set -f
+# add access_token to layer.json
+jq '.access_token="'$ACCESSTOKEN'"' layer.json > tmp.json
+
+# add file_id to layer.json
+jq '.file_id="'$FILEID'"' tmp.json > tmp2.json
+
+# add SQL to layer.json
+jq '.sql="SELECT * FROM '$FILEID'"' tmp2.json > layer.json
+
+# remove tmp.json
+rm tmp.json
+rm tmp2.json
 
 curl -s -H "Content-Type: application/json" -X POST -d @layer.json $API | python -mjson.tool
