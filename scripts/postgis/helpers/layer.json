@@ -1,14 +1,14 @@
 {
-  "affected_tables": "",
-  "interactivity": "",
-  "attributes": "",
-  "access_token": "i9gok7pk8500p43awdTlxOy5Di20pr516d8NE2OSVRqkGu0UMWBauOcLYjUDSpIAnRDLl0yoYf4Q7qkYvAEoPQc6kLPsRxZV1zOnJ6Aj0Mkby5VJRTqwRo8brVv0JyTtlqWd0DKltrkbud0nqRH4jicLEjcQBrnTdAdf3NEOcSX5nfEAFj7Tvv3MM67bVGNC0z9eADqSr68ZOgMEQXG0nCRfStqSIr2R8MDftCG0K43NNG2aORXwCyjZ4hwAhrv2",
-  "cartocss_version": "2.0.1",
-  "cartocss": "#layer {}",
-  "sql": "SELECT * FROM table",
-  "file_id": "file_suhrcucstpmtxqgtpyyc",
   "srid": "",
   "raster_band": "",
   "geom_type": "geometry",
-  "geom_column": "geom"
+  "geom_column": "geom",
+  "access_token": "du04teAO2M1AU78GuGuR3xeE6QaZFFzO7x7WgYvPHHhAW6WuqokQDzGy18oYOGhS0Fx8Q9bdTHJjEZIs5HmKDsgs5VoyuSQmfNZDl8QEkPLTX3Am7S7N2Z7G2T6a7HR0MJ8lfxmfdeYpeAJdNtvezKajxaN720Cwpx0MmVQSi59uxn5okZrDyEWkzY2yHcQ0Msdd5Ie2qSj8RhdS1romjGWtwtgGApw7L54dr4PqHfALWbKPd6hZUK5wGF2MSfNB",
+  "attributes": "",
+  "interactivity": "",
+  "affected_tables": "",
+  "file_id": "file_dnrupsgoihxxhpzquzlh",
+  "sql": "SELECT * FROM file_dnrupsgoihxxhpzquzlh",
+  "cartocss": "#layer { polygon-fill: red; polygon-opacity: 0.5; }",
+  "cartocss_version": "2.0.1"
 }
