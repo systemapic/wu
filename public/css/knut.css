@@ -981,3 +981,18 @@ svg.tracer {
 .fullpage-users.show.hide-top .manage-access-project-item-description{
 	width: 260px;
 }
+
+
+.cartocss-sql {
+	height: 100px;
+	width: 100%;
+	padding: 10px;
+	border: rgb(205, 205, 205) 1px solid;
+	resize: none;
+	font-family: Courier;
+	font-size: 14px;
+}
+
+.cartocss-sql:focus {
+	border: rgb(205, 205, 205) 1px solid !important;
+}
