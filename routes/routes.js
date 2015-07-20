@@ -155,7 +155,6 @@ module.exports = function(app, passport) {
 
 
 	app.get('/api/file/get', passport.authenticate('bearer', {session: false}), function (req, res) {
-		console.log('/api/bridge/getFile', req);
 		api.file.getFile(req, res);
 	});
 

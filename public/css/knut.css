@@ -996,3 +996,11 @@ svg.tracer {
 .cartocss-sql:focus {
 	border: rgb(205, 205, 205) 1px solid !important;
 }
+
+
+
+/*progress bar processing*/
+.status-progress-bar.processing {
+	background: red;
+
+}

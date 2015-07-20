@@ -296,7 +296,7 @@ module.exports = api.postgis = {
 			// create database script
 			var cmd = [
 				IMPORT_SHAPEFILE_SCRIPT_PATH, 	// script
-				shape,
+				'"' + shape + '"',
 				file_id,
 				pg_db,
 				srid_converted
