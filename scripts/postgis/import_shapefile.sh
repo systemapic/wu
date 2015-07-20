@@ -26,4 +26,4 @@ ENCODING="-W 'LATIN1"
 ENCODING=""
 
 # import shapefile
-shp2pgsql -s $4 $ENCODING -I $1 $2 | PGPASSWORD=$PGPASSWORD psql --host=$PGHOST --username=$PGUSERNAME $3
+shp2pgsql -s $4 $ENCODING -I "$1" $2 | PGPASSWORD=$PGPASSWORD psql --host=$PGHOST --username=$PGUSERNAME $3

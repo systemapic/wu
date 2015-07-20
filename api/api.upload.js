@@ -65,6 +65,10 @@ module.exports = api.upload = {
 	 */
 	import : function (req, res) {
 
+		console.log('req: ', req);
+
+		if (!req.files || !req.files.data) return api.error.missingInformation(res, 'No file.');
+
 		// set upload status
 		var uploadStatus = {
 			// fileUuid : api.utils.getRandomChars(20), // create upload id
@@ -123,6 +127,35 @@ module.exports = api.upload = {
 			});
 		});
 
+		// create file model
+		ops.push(function (callback) {
+			api.upload._createFileModel(uploadStatus.file_id, function (err, file) {
+				if (err) return callback(err);
+				console.log('_createFileModel', file);
+
+				// add to project if available
+				if (req.body.projectUuid) {
+					var projectUuid = req.body.projectUuid;
+					return api.file.addToProject(file._id, projectUuid, callback);
+				}
+
+				callback(null, file);
+			});
+		});
+
+		
+		// set upload status
+		ops.push(function (callback) {
+
+			// set upload status, expire in one day
+			api.upload.updateStatus(uploadStatus.file_id, {
+				processing_success : true,
+				status : 'Done', 
+				expire : 3600 * 24,
+				file_id : uploadStatus.file_id
+			}, callback);
+		});
+
 		// run ops
 		async.series(ops, function (err, results) {
 			
@@ -133,22 +166,22 @@ module.exports = api.upload = {
 				status : 'Failed'
 			});
 
-			// create file model 
-			api.upload._createFileModel(uploadStatus.file_id, function (err, fileModel) {
-				console.log('api.upload.import > created filemode', err, fileModel);
+			// // create file model 
+			// api.upload._createFileModel(uploadStatus.file_id, function (err, fileModel) {
+			// 	console.log('api.upload.import > created filemode', err, fileModel);
 
-				// set upload status, expire in one day
-				api.upload.updateStatus(uploadStatus.file_id, {
-					processing_success : true,
-					status : 'Done', 
-					expire : 3600 * 24,
-					file_id : fileModel.uuid
-				}, function (err) {
+			// 	// set upload status, expire in one day
+			// 	api.upload.updateStatus(uploadStatus.file_id, {
+			// 		processing_success : true,
+			// 		status : 'Done', 
+			// 		expire : 3600 * 24,
+			// 		file_id : fileModel.uuid
+			// 	}, function (err) {
 
-					console.log('api.upload.import DONE!', results);
+			// 		console.log('api.upload.import DONE!', results);
 					
-				});
-			});
+			// 	});
+			// });
 		});	
 	},
 
@@ -386,7 +419,6 @@ module.exports = api.upload = {
 
 			// check if all done
 			api.redis.get('done-chunks-' + resumableIdentifier, function (err, count) {
-				// console.log('Chunk #'.yellow, count, err);
 
 				// return if not all done				
 				if (count != options.resumableTotalChunks) {
