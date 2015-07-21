@@ -114,12 +114,25 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._uploader.setAttribute('type', 'file');
 		this._uploader.id = 'fileinput';
 
+		this._uploaderId = Wu.Util.createRandom(7);
+		var that = this;
 		var uploadFn = this.uploadFile;
 		this._uploader.addEventListener('change', function () {
 			console.log('THIS', this);
 			var file = this.files[0];
 			console.log('file::: ', file);
 			uploadFn(file);
+
+			var size = parseInt(file.size / 1000 / 1000) + 'MB';
+			var name = file.name;
+			var description = name + ', ' + size;
+			console.log('uploadIRD uipload', that._uploaderId);
+			app.feedback.setMessage({
+				title : 'Uploading data',
+				description : description,
+				id : that._uploaderId
+			});
+
 		}, false);
 	},
 
@@ -158,17 +171,17 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 			console.log('estimatedTime', estimatedTime);
 
+			console.log('uploadIRDD proces', app.SidePane.DataLibrary._uploaderId);
+
 			app.feedback.setMessage({
-				title : 'Processing data',
-				description : 'Estimated time: ' + parseInt(estimatedTime/1000) + ' seconds',
-				clearDelay : estimatedTime
+				title : 'Processing data!',
+				description : 'File will be added to the Data Library as soon as it\'s finished. Estimated time approx. ' + parseInt(estimatedTime/1000) + ' seconds.',
+				clearDelay : estimatedTime,
+				id : app.SidePane.DataLibrary._uploaderId
 			});
 
 			// reset progress
 			app.ProgressBar.hideProgress();
-
-			// set processing progress
-			// app.ProgressBar.timedProgress(estimatedTime/1000);
 
 			// get file and add to client
 			app.SidePane.DataLibrary._getFile(uploadStatus, app.SidePane.DataLibrary._addFile);
@@ -232,7 +245,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	_createDefaultLayer : function (file) {
 
-		var file_id = file.uuid;
+		var file_id = file.uuid,
+		    project = this._project;
 
 		var layerJSON = {
 			"geom_column": "geom",
@@ -244,10 +258,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			"attributes": "",
 			"access_token": app.tokens.access_token,
 			"cartocss_version": "2.0.1",
-			"cartocss": "#layer {  polygon-fill: red; marker-fill: yellow; }",
+			"cartocss": "#layer {  polygon-fill: red; marker-fill: #001980; marker-allow-overlap: true; marker-clip: false; marker-comp-op: screen;}",
 			"sql": "(SELECT * FROM " + file_id + ") as sub",
 			"file_id": file_id,
-			"include_model" : true
+			"return_model" : true,
+			"projectUuid" : this._project.getUuid()
 		}
 
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
@@ -255,6 +270,19 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			var layer = Wu.parse(layerJSON);
 
 			console.log('layer: ', layer);
+
+			// refresh Sidepane Options
+			project.addLayer(layer.layerModel);
+			app.SidePane.Options.settings.layermenu.update();
+			app.SidePane.Options.settings.baselayer.update();
+
+			// refresh sidepane
+			app.SidePane.refreshMenu();
+
+			// refresh cartoCssControl
+			var ccss = app.MapPane.getControls().cartocss;
+			ccss && ccss._refresh();
+
 
 		});
 

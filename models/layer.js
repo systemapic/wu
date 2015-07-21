@@ -42,14 +42,18 @@ var layerSchema = mongoose.Schema({
 			cartocss : String,
 			cartocss_version : String,
 			geom_column : String,
+			file_id : String,
+			database_name : String,
+			table_name : String,
+			data_type : String,
 			geom_type : String,
 			raster_band : Number,
-			affected_tables : [String],
-			interactivity : [String],
-			attributes : {
-				id : String,
-				columns : [String]
-			}
+			// affected_tables : [String],
+			// interactivity : [String],
+			// attributes : {
+				// id : String,
+				// columns : [String]
+			// }
 
 		}
 

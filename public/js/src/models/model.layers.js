@@ -306,8 +306,13 @@ Wu.Layer = Wu.Class.extend({
 
 	getMeta : function () {
 		var metajson = this.store.metadata;
-		if (metajson) return JSON.parse(metajson);
-		return false;
+		if (!metajson) return false;
+
+		var meta = Wu.parse(metajson);
+		console.log('meta:', meta, this);
+		return meta;
+		// if (metajson) return JSON.parse(metajson);
+		// return false;
 	},
 
 	getMetaFields : function () {
@@ -496,6 +501,76 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 });
+
+
+
+Wu.PostGISLayer = Wu.Layer.extend({
+
+	initLayer : function () {
+		this.update();
+		this.addHooks();
+
+		this._inited = true;
+	},
+
+	update : function () {
+		var map = app._map;
+
+		// remove
+		if (this.layer) this._flush();
+
+		this._fileUuid = this.store.file;
+		this._defaultCartoid = 'cartoid';
+
+		// prepare raster
+		this._prepareRaster();
+
+	},
+
+	_getLayerUuid : function () {
+		return this.store.uuid;
+	},
+
+	_prepareRaster : function () {
+
+		console.log('PostGIS layer, preapreRaster', this);
+		
+		// set ids
+		var fileUuid 	= this._fileUuid,	// file id of geojson
+		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
+		    tileServer 	= app.options.servers.tiles.uri,
+		    subdomains  = app.options.servers.tiles.subdomains,
+		    access_token = '?access_token=' + app.tokens.access_token;
+		    // url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
+
+		var layerUuid = this._getLayerUuid();
+		var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.png' + access_token;
+
+		// add vector tile raster layer
+		this.layer = L.tileLayer(url, {
+			layerUuid: this._getLayerUuid(),
+			subdomains : subdomains,
+			maxRequests : 0,
+		});
+
+		// Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
+	},
+
+
+	updateStyle : function () {
+		// set new options and redraw
+		if (this.layer) this.layer.setOptions({
+			cartoid : this.getCartoid(),
+		});
+	},
+
+
+});
+
+
+
+
+
 
 
 
@@ -828,6 +903,12 @@ Wu.RasterLayer = Wu.Layer.extend({
 Wu.createLayer = function (layer) {
 	if (!layer.data) return console.error(layer);
 
+	console.log('__________ layer.data', layer.data);
+
+	// postgis
+	if (layer.data.postgis && layer.data.postgis.file_id) {
+		return new Wu.PostGISLayer(layer);
+	}
 	// mapbox
 	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
 

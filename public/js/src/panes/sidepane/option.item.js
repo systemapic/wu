@@ -111,9 +111,10 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 
 	// sort layers by provider
 	sortLayers : function (layers) {
+		console.log('sortLayers, layers:', layers);
 		// possible keys in layer.store.data. must add more here later if other sources
 		// var keys = ['geojson', 'mapbox', 'osm', 'raster'];
-		var keys = ['geojson', 'mapbox', 'raster'];
+		var keys = ['geojson', 'mapbox', 'raster', 'postgis'];
 		var results = [];
 		keys.forEach(function (key) {
 			var sort = {
@@ -122,6 +123,7 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 			}
 			for (l in layers) {
 				var layer = layers[l];
+				console.log('-> layer: ', layer);
 				if (layer.store.data.hasOwnProperty(key)) {
 					sort.layers.push(layer)
 				}
@@ -129,14 +131,15 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 			results.push(sort);
 		}, this);
 
+		console.log('SROOTED', results);
 		this.numberOfProviders = results.length;
 		return results;
 	},
 
 	addProvider : function (provider) {
 		var title = '';
-		if (provider == 'geojson') title = 'Data Library';
-		if (provider == 'raster') title = 'Rasters';
+		if (provider == 'postgis') title = 'Data Library';
+		// if (provider == 'raster') title = 'Rasters';
 		if (provider == 'mapbox') title = 'Mapbox';
 		// if (provider == 'osm') title = 'Open Street Map';
 		if (provider == 'osm') return;

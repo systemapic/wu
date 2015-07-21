@@ -45,6 +45,8 @@ Wu.FeedbackPane = Wu.Class.extend({
 		// Create random number
 		var id = Wu.Util.createRandom(5);
 
+		console.log('adding: ', message, message.id);
+
 		// gets passed from sidepane.dataLibrary.js
 		if (message.id) id = message.id;
 
@@ -90,6 +92,9 @@ Wu.FeedbackPane = Wu.Class.extend({
 
 	// Update message box, if it exists before
 	update : function (message, severity) {
+
+		console.log('UPDATING EXTISTIN, ', message);
+		console.log('this._mass', this._messages);
 
 		var title 	   = message.title;
 		var description    = message.description;
