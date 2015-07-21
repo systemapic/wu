@@ -16,6 +16,14 @@ Wu.Layer = Wu.Class.extend({
 
 	},
 
+	setStore : function (store) {
+		var added = this._added;
+		this._flush();
+		this.store = store;
+		this.loaded = false;
+		if (added) this.addTo();
+	},
+
 	addHooks : function () {
 		this._setHooks('on');
 	},
@@ -60,7 +68,7 @@ Wu.Layer = Wu.Class.extend({
 	add : function (type) {
 
 		// mark as base or layermenu layer
-		this._isBase = type == 'baselayer';
+		this._isBase = (type == 'baselayer');
 		
 		// add
 		this.addTo();
@@ -92,6 +100,9 @@ Wu.Layer = Wu.Class.extend({
 
 		// update zindex
 		this._addToZIndex(type);
+
+		this._added = true;
+
 	},
 
 	addToControls : function () {
@@ -195,6 +206,8 @@ Wu.Layer = Wu.Class.extend({
 			descriptionControl.removeLayer(this);
 			descriptionControl._container.style.display = 'none'; // (j)		// refactor to descriptionControl
 		}
+
+		this._added = false;
 	},
 
 	getActiveLayers : function () {

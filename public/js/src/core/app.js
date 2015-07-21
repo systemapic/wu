@@ -55,6 +55,7 @@ Wu.App = Wu.Class.extend({
 
 		// test access token
 		Wu.send('/api/userinfo', {}, function (err, body) {
+			if (body == 401) console.error('LOGGED OUT!');
 			console.log('err, body', err, body);
 		});
 

@@ -844,7 +844,7 @@ L.Control.Cartocss = Wu.Control.extend({
 			// create tooltip entry
 			this._createTooltipEntry(field.key, field.title, field.on);
 
-			if ( field.on) onCounter++;
+			if (field.on) onCounter++;
 
 		}, this);
 
@@ -1101,26 +1101,110 @@ L.Control.Cartocss = Wu.Control.extend({
 		// get css string
 		var css = this._codeMirror.getValue();
 
+
 		// return if empty
 		if (!css) return;
-		
-		// set vars
-		var fileUuid = this._layer.getFileUuid();
-		var cartoid = Wu.Util.createRandom(7);
 
-		// send to server
-		var json = {							// todo: verify valid css
-			css : css,
-			fileUuid : fileUuid,
-			cartoid : cartoid,
-			layerUuid : this._layer.getUuid()
+		// get sql
+		var sql = this._sqlPane.value;
+		
+		// // set vars
+		// var fileUuid = this._layer.getFileUuid();
+		// var cartoid = Wu.Util.createRandom(7);
+
+		// // send to server
+		// var json = {							// todo: verify valid css
+		// 	css : css,
+		// 	fileUuid : fileUuid,
+		// 	cartoid : cartoid,
+		// 	layerUuid : this._layer.getUuid()
+		// }
+
+		// // save to server
+		// this._layer.setCartoCSS(json, this.renderedStyling.bind(this));
+
+		// // Google Analytics event tracking
+		// app.Analytics.setGaEvent(['Controls', 'CartoCSS render layer: ' + this._layer.getTitle()]);
+
+
+		// request new layer
+		var layerOptions = {
+			css : css, 
+			sql : sql,
+			layer : this._layer
 		}
 
-		// save to server
-		this._layer.setCartoCSS(json, this.renderedStyling.bind(this));
+		this._createLayer(layerOptions);
 
-		// Google Analytics event tracking
-		app.Analytics.setGaEvent(['Controls', 'CartoCSS render layer: ' + this._layer.getTitle()]);
+	},
+
+	_createLayer : function (options, done) {
+
+		var css = options.css,
+		    sql = options.sql,
+		    layer = options.layer,
+		    file_id = layer.getFileUuid(),
+		    project = this._project;
+
+
+		console.log('############# createlayer');
+		console.log('layer: ', layer);
+
+		// var file_id = file.uuid,
+		    // project = this._project;
+
+		// replace table with file_id in sql
+		sql.replace('table', file_id);
+
+		var layerJSON = {
+			"geom_column": "the_geom_3857",
+			"geom_type": "geometry",
+			"raster_band": "",
+			"srid": "",
+			"affected_tables": "",
+			"interactivity": "",
+			"attributes": "",
+			"access_token": app.tokens.access_token,
+			"cartocss_version": "2.0.1",
+			// "cartocss": "#layer {  polygon-fill: red; marker-fill: #001980; marker-allow-overlap: true; marker-clip: false; marker-comp-op: screen;}",
+			"cartocss" : css,
+			"sql": sql || "(SELECT * FROM " + file_id + ") as sub",
+			"file_id": file_id,
+			"return_model" : true,
+			"projectUuid" : project.getUuid()
+		}
+
+		console.log('layerJSON', layerJSON);
+
+		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
+			console.log('NEW err, newLayerJSON', err, newLayerJSON);
+			
+			// remove old layer
+			// layer.remove();
+
+			// new layer
+			var newLayer = Wu.parse(newLayerJSON);
+
+			var layerStore = newLayer.layerModel;
+
+			console.log('newLayer: ', newLayer);
+
+			layer.setStore(layerStore);
+
+			// // refresh Sidepane Options
+			// project.addLayer(newLayer.layerModel);
+			// app.SidePane.Options.settings.layermenu.update();
+			// app.SidePane.Options.settings.baselayer.update();
+
+			// // refresh sidepane
+			// app.SidePane.refreshMenu();
+
+			// // refresh cartoCssControl
+			// var ccss = app.MapPane.getControls().cartocss;
+			// ccss && ccss._refresh();
+
+
+		});
 
 	},
 
