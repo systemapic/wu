@@ -628,7 +628,7 @@ module.exports = api.file = {
 
 		console.log('req.query', req.query);
 		
-		var fileUuid = req.query.fileUuid,
+		var fileUuid = req.query.fileUuid || req.query.file_id,
 		    ops = [];
 
 		// check for missing info

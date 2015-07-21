@@ -326,8 +326,40 @@ module.exports = api.postgis = {
 			});
 		});
 
-		// count rows for upload status
+		// create 3857 and 4326 geometries
 		ops.push(function (success, callback) {
+			api.postgis._primeTableWithGeometries({
+				file_id : file_id,
+				postgis_db : pg_db,
+			}, callback);
+		});
+
+		// get metadata
+		ops.push(function (callback) {
+
+			api.postgis._getMetadata({
+				file_id : file_id,
+				postgis_db : pg_db
+			}, function (err, metadata) {
+				if (err) return callback(err);
+
+				console.log('GOT METADATA', metadata);
+
+				var metadataJSON = JSON.stringify(metadata);
+				
+				// set upload status
+				api.upload.updateStatus(options.file_id, {
+					metadata : metadataJSON
+				}, function () {
+					callback(null);
+				});
+			})
+
+		});
+
+		
+		// count rows for upload status
+		ops.push(function (callback) {
 			
 			api.postgis.query({
 				postgis_db : pg_db,
@@ -349,6 +381,201 @@ module.exports = api.postgis = {
 
 	},
 
+	_getMetadata : function (options, done) {
+		var file_id = options.file_id, 
+		    postgis_db = options.postgis_db,
+		    ops = [],
+		    metadata = {};
+
+		// get extent
+		ops.push(function (callback) {
+
+			var query = 'SELECT ST_Extent(the_geom_4326) FROM ' + file_id
+
+			api.postgis.query({
+				postgis_db : postgis_db,
+				query : query
+			}, function (err, results) {
+				if (err) return callback(err);
+				console.log('METAEXX results', results);
+
+				var box = results.rows[0].st_extent;
+
+				var m = box.split('(')[1];
+				console.log('mP: ',m);
+
+				var m2 = m.split(')')[0];
+
+				var c1 = m2.split(' ')[0];
+				var c2 = m2.split(' ')[1].split(',')[0];
+				var c3 = m2.split(',')[1].split(' ')[0];
+				var c4 = m2.split(' ')[2];
+
+				console.log('c1', c1);
+				console.log('c2', c2);
+				console.log('c3', c3);
+				console.log('c4', c4);
+
+				
+				metadata.extent = [c1, c2, c3, c4];
+				callback(null);
+			});	
+		});
+
+		// ops.push(function (callback) {
+
+		// 	callback();
+
+		// });
+
+		async.series(ops, function (err, results) {
+			done(err, metadata);
+		});
+	},
+
+	_primeTableWithGeometries : function (options, done) {
+
+		var file_id = options.file_id,
+		    postgis_db = options.postgis_db,
+		    ops = [];
+
+		// get geometry type
+		ops.push(function (callback) {
+			api.postgis.query({
+				postgis_db : postgis_db,
+				query : 'SELECT ST_GeometryType(geom) from "' + file_id + '" limit 1'
+			}, function (err, results) {
+				if (err) return callback(err);
+
+				console.log('err, results 22', err, results);
+
+				var geometry_type = results.rows[0].st_geometrytype.split('ST_')[1];
+				console.log('geometries_t', geometry_type);
+				callback(null, geometry_type);
+			})
+		});
+
+		// create geometry 3857
+		ops.push(function (geometry_type, callback) {
+
+			var column = ' the_geom_3857';
+			var geometry = ' geometry(' + geometry_type + ', 3857)';
+			var query = 'ALTER TABLE ' + file_id + ' ADD COLUMN' + column + geometry;
+
+			console.log('query geom', query);
+
+			api.postgis.query({
+				postgis_db : postgis_db,
+				query : query
+			}, function (err, results) {
+				console.log('Q2', err, results);
+				if (err) return callback(err);
+
+				callback(null, geometry_type);
+			});
+		});
+
+		// create geometry 4326
+		ops.push(function (geometry_type, callback) {
+
+			var column = ' the_geom_4326';
+			var geometry = ' geometry(' + geometry_type + ', 4326)';
+			var query = 'ALTER TABLE ' + file_id + ' ADD COLUMN' + column + geometry;
+
+			console.log('query geom', query);
+
+			api.postgis.query({
+				postgis_db : postgis_db,
+				query : query
+			}, function (err, results) {
+				console.log('Q2', err, results);
+				if (err) return callback(err);
+
+				callback(err, geometry_type);
+			});
+		});
+
+
+		// populate geometry
+		ops.push(function (geometry_type, callback) {
+
+			var query = 'ALTER TABLE ' + file_id + ' ALTER COLUMN the_geom_3857 TYPE Geometry(' + geometry_type + ', 3857) USING ST_Transform(geom, 3857)'
+
+   			api.postgis.query({
+				postgis_db : postgis_db,
+				query : query
+			}, function (err, results) {
+				console.log('Q99', err, results);
+				if (err) return callback(err);
+
+				callback(err, geometry_type);
+			});
+		});
+
+		// populate geometry
+		ops.push(function (geometry_type, callback) {
+
+			var query = 'ALTER TABLE ' + file_id + ' ALTER COLUMN the_geom_4326 TYPE Geometry(' + geometry_type + ', 4326) USING ST_Transform(geom, 4326)'
+
+   			api.postgis.query({
+				postgis_db : postgis_db,
+				query : query
+			}, function (err, results) {
+				console.log('Q99-2', err, results);
+				if (err) return callback(err);
+
+				callback(err);
+			});
+		});
+
+
+		// create index for 3857
+		ops.push(function (callback) {
+
+			var idx = file_id + '_the_geom_4326_idx';
+			var query = 'CREATE INDEX ' + idx + ' ON ' + file_id + ' USING GIST(the_geom_4326)'
+
+			console.log('query: ', query);
+			
+			api.postgis.query({
+				postgis_db : postgis_db,
+				query : query
+			}, function (err, results) {
+				console.log('Q2', err, results);
+				if (err) return callback(err);
+
+				callback(null);
+			});
+		});
+
+		// create index for 4326
+		ops.push(function (callback) {
+
+			var idx = file_id + '_the_geom_3857_idx';
+			var query = 'CREATE INDEX ' + idx + ' ON ' + file_id + ' USING GIST(the_geom_3857)'
+
+			console.log('query: ', query);
+
+			api.postgis.query({
+				postgis_db : postgis_db,
+				query : query
+			}, function (err, results) {
+				console.log('Q2', err, results);
+				if (err) return callback(err);
+
+				callback(null, 'ok');
+			});
+		});
+
+
+		async.waterfall(ops, function (err, results) {
+			done(err);
+		});
+
+
+
+	},
+
 
 	query : function (options, callback) {
 		var postgis_db = options.postgis_db,
@@ -365,7 +592,7 @@ module.exports = api.postgis = {
 			client.query(query, variables, function(err, result) {
 				// clean up after pg
 				pgcb();
-				client.end();
+				// client.end();
 
 				if (err) return callback(err); 
 				
