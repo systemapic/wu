@@ -544,6 +544,11 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		return this.store.uuid;
 	},
 
+	getCartoCSS : function (cartoid, callback) {
+		return this.store.data.postgis.cartocss;
+	},
+
+
 	_prepareRaster : function () {
 
 		console.log('PostGIS layer, preapreRaster', this);

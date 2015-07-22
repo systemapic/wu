@@ -922,7 +922,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		var layerItem = _.find(this.layers, function (l) {
 			return l.item.layer == layerUuid;
 		});
-	
+		
+		if (!layerItem) return console.error('no layer');
 		// mark active
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 		layerItem.on = true;

@@ -509,19 +509,24 @@ L.Control.Cartocss = Wu.Control.extend({
 		this._styleHeaderLayerName.innerHTML = layer.store.title.camelize();
 
 		// check for existing css
-		this._cartoid = this._layer.getCartoid();
+		// this._cartoid = this._layer.getCartoid();
 
 		// if no style stored on layer yet, set default message	
-		if (!this._cartoid) return this._initStylingDefault();	
+		// if (!this._cartoid) return this._initStylingDefault();	
 
 		this.clearCodeMirror();			
 
 		// else get css from server
-		this._layer.getCartoCSS(this._cartoid, function (ctx, css) {
-			// set css
-			this.updateCodeMirror(css);
+		var css = this._layer.getCartoCSS();
+		
+		console.log('CSSCSCSSCS', css);
 
-		}.bind(this));
+		this.updateCodeMirror(css);
+		// this._layer.getCartoCSS(this._cartoid, function (ctx, css) {
+			// set css
+			// this.updateCodeMirror(css);
+
+		// }.bind(this));
 	},
 	
 	initLegends : function () {
@@ -1138,23 +1143,35 @@ L.Control.Cartocss = Wu.Control.extend({
 
 	},
 
+	_createSQL : function (file_id, sql) {
+		console.log('sql??', sql);
+		if (sql) {
+			// replace table with file_id in sql
+			sql.replace('table', file_id);
+
+			// wrap
+			sql = '(' + sql + ') as sub';
+
+		} else {
+			// default
+			sql = "(SELECT * FROM " + file_id + ") as sub";
+		}
+		return sql;
+	},
+
 	_createLayer : function (options, done) {
 
 		var css = options.css,
-		    sql = options.sql,
 		    layer = options.layer,
 		    file_id = layer.getFileUuid(),
+		    sql = options.sql,
+		    sql = this._createSQL(file_id, sql),
 		    project = this._project;
 
 
 		console.log('############# createlayer');
 		console.log('layer: ', layer);
 
-		// var file_id = file.uuid,
-		    // project = this._project;
-
-		// replace table with file_id in sql
-		sql.replace('table', file_id);
 
 		var layerJSON = {
 			"geom_column": "the_geom_3857",
@@ -1168,7 +1185,7 @@ L.Control.Cartocss = Wu.Control.extend({
 			"cartocss_version": "2.0.1",
 			// "cartocss": "#layer {  polygon-fill: red; marker-fill: #001980; marker-allow-overlap: true; marker-clip: false; marker-comp-op: screen;}",
 			"cartocss" : css,
-			"sql": sql || "(SELECT * FROM " + file_id + ") as sub",
+			"sql": sql,
 			"file_id": file_id,
 			"return_model" : true,
 			"projectUuid" : project.getUuid()
