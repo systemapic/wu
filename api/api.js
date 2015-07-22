@@ -3,6 +3,8 @@
 // config
 var config = require('../config/server-config.js');
 
+console.log('config: ', config);
+
 // redis store for temp passwords
 var redisStore = require('redis').createClient(config.serverConfig.temptokenRedis.port, config.serverConfig.temptokenRedis.host);
 redisStore.on('error', function (err) {
@@ -45,4 +47,4 @@ module.exports.provider = require('./api.provider');
 module.exports.analytics = require('./api.analytics');
 
 // print version
-console.log('\nSystemapic API version: ', api.version, '\n');
+console.log('\nSystemapic API version is ', api.version, '\n');
