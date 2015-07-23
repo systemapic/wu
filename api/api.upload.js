@@ -64,15 +64,10 @@ module.exports = api.upload = {
 	 *      https://dev.systemapic.com/api/data/import
 	 */
 	import : function (req, res) {
-
-		console.log('req: ', req);
-
 		if (!req.files || !req.files.data) return api.error.missingInformation(res, 'No file.');
 
 		// set upload status
 		var uploadStatus = {
-			// fileUuid : api.utils.getRandomChars(20), // create upload id
-			// fileUuid : uuid.v4(), // this will be file id also
 			file_id : 'file_' + api.utils.getRandomChars(20),
 			user_id : req.user.uuid,
 			filename : req.files.data.originalFilename,
@@ -89,11 +84,10 @@ module.exports = api.upload = {
 			// original_format : null,
 			// table_name : null, 
 			// database_name : null,
-			// fileUuid : null
 		}
 
 
-		// return id of upload to client
+		// return upload status to client
 		res.end(JSON.stringify(uploadStatus));
 		
 		var ops = [];
@@ -131,15 +125,14 @@ module.exports = api.upload = {
 		ops.push(function (callback) {
 			api.upload._createFileModel(uploadStatus.file_id, function (err, file) {
 				if (err) return callback(err);
-				console.log('_createFileModel', file);
-
+				
 				// add to project if available
-				if (req.body.projectUuid) {
-					var projectUuid = req.body.projectUuid;
-					return api.file.addToProject(file._id, projectUuid, callback);
-				}
+				if (!req.body.projectUuid) return callback(null);	
 
-				callback(null, file);
+				// add to project
+				var projectUuid = req.body.projectUuid;
+				api.file.addToProject(file._id, projectUuid, callback);
+				
 			});
 		});
 
@@ -166,22 +159,7 @@ module.exports = api.upload = {
 				status : 'Failed'
 			});
 
-			// // create file model 
-			// api.upload._createFileModel(uploadStatus.file_id, function (err, fileModel) {
-			// 	console.log('api.upload.import > created filemode', err, fileModel);
-
-			// 	// set upload status, expire in one day
-			// 	api.upload.updateStatus(uploadStatus.file_id, {
-			// 		processing_success : true,
-			// 		status : 'Done', 
-			// 		expire : 3600 * 24,
-			// 		file_id : fileModel.uuid
-			// 	}, function (err) {
-
-			// 		console.log('api.upload.import DONE!', results);
-					
-			// 	});
-			// });
+			
 		});	
 	},
 

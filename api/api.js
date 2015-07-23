@@ -3,8 +3,6 @@
 // config
 var config = require('../config/server-config.js');
 
-console.log('config: ', config);
-
 // redis store for temp passwords
 var redisStore = require('redis').createClient(config.serverConfig.temptokenRedis.port, config.serverConfig.temptokenRedis.host);
 redisStore.on('error', function (err) {

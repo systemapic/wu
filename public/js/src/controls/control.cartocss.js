@@ -60,8 +60,6 @@ L.Control.Cartocss = Wu.Control.extend({
 
 	_refresh : function () {
 
-		console.error('cartocss._refresh');
-
 		// should be active
 		if (!this._added) this._addTo();
 
@@ -308,7 +306,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		string += 	'//    [zoom>=12] {\n';
 		string += 	'//        // CSS for zoom 12 and higher\n';
 		string += 	'//    }\n';
-		string += 	'//    [field_name="Field Name"] {\n';
+		string += 	'//    [field_name=Field Name] {\n';
 		string += 	'//        // CSS for this field only\n';
 		string += 	'//    }\n';
 
@@ -519,8 +517,6 @@ L.Control.Cartocss = Wu.Control.extend({
 		// else get css from server
 		var css = this._layer.getCartoCSS();
 		
-		console.log('CSSCSCSSCS', css);
-
 		this.updateCodeMirror(css);
 		// this._layer.getCartoCSS(this._cartoid, function (ctx, css) {
 			// set css
@@ -1112,26 +1108,7 @@ L.Control.Cartocss = Wu.Control.extend({
 
 		// get sql
 		var sql = this._sqlPane.value;
-		
-		// // set vars
-		// var fileUuid = this._layer.getFileUuid();
-		// var cartoid = Wu.Util.createRandom(7);
-
-		// // send to server
-		// var json = {							// todo: verify valid css
-		// 	css : css,
-		// 	fileUuid : fileUuid,
-		// 	cartoid : cartoid,
-		// 	layerUuid : this._layer.getUuid()
-		// }
-
-		// // save to server
-		// this._layer.setCartoCSS(json, this.renderedStyling.bind(this));
-
-		// // Google Analytics event tracking
-		// app.Analytics.setGaEvent(['Controls', 'CartoCSS render layer: ' + this._layer.getTitle()]);
-
-
+	
 		// request new layer
 		var layerOptions = {
 			css : css, 
@@ -1139,14 +1116,14 @@ L.Control.Cartocss = Wu.Control.extend({
 			layer : this._layer
 		}
 
-		this._createLayer(layerOptions);
+		this._updateLayer(layerOptions);
 
 	},
 
 	_createSQL : function (file_id, sql) {
-		console.log('sql??', sql);
+
 		if (sql) {
-			// replace table with file_id in sql
+			// replace 'table' with file_id in sql
 			sql.replace('table', file_id);
 
 			// wrap
@@ -1154,12 +1131,12 @@ L.Control.Cartocss = Wu.Control.extend({
 
 		} else {
 			// default
-			sql = "(SELECT * FROM " + file_id + ") as sub";
+			sql = '(SELECT * FROM  ' + file_id + ') as sub';
 		}
 		return sql;
 	},
 
-	_createLayer : function (options, done) {
+	_updateLayer : function (options, done) {
 
 		var css = options.css,
 		    layer = options.layer,
@@ -1169,58 +1146,39 @@ L.Control.Cartocss = Wu.Control.extend({
 		    project = this._project;
 
 
-		console.log('############# createlayer');
-		console.log('layer: ', layer);
+		var layerOptions = layer.store.data.postgis;
 
+		layerOptions.sql = sql;
+		layerOptions.css = css;
+		layerOptions.file_id = file_id;		
 
 		var layerJSON = {
-			"geom_column": "the_geom_3857",
-			"geom_type": "geometry",
-			"raster_band": "",
-			"srid": "",
-			"affected_tables": "",
-			"interactivity": "",
-			"attributes": "",
-			"access_token": app.tokens.access_token,
-			"cartocss_version": "2.0.1",
-			// "cartocss": "#layer {  polygon-fill: red; marker-fill: #001980; marker-allow-overlap: true; marker-clip: false; marker-comp-op: screen;}",
-			"cartocss" : css,
-			"sql": sql,
-			"file_id": file_id,
-			"return_model" : true,
-			"projectUuid" : project.getUuid()
+			geom_column: 'the_geom_3857',
+			geom_type: 'geometry',
+			raster_band: '',
+			srid: '',
+			affected_tables: '',
+			interactivity: '',
+			attributes: '',
+			access_token: app.tokens.access_token,
+			cartocss_version: '2.0.1',
+			cartocss : css,
+			sql: sql,
+			file_id: file_id,
+			return_model : true,
+			layerUuid : layer.getUuid()
 		}
 
-		console.log('layerJSON', layerJSON);
-
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
-			console.log('NEW err, newLayerJSON', err, newLayerJSON);
-			
-			// remove old layer
-			// layer.remove();
 
 			// new layer
-			var newLayer = Wu.parse(newLayerJSON);
+			var newLayerStyle = Wu.parse(newLayerJSON);
 
-			var layerStore = newLayer.layerModel;
+			layer.setStyle(newLayerStyle.options);
 
-			console.log('newLayer: ', newLayer);
+			layer.update({enable : true});
 
-			layer.setStore(layerStore);
-
-			// // refresh Sidepane Options
-			// project.addLayer(newLayer.layerModel);
-			// app.SidePane.Options.settings.layermenu.update();
-			// app.SidePane.Options.settings.baselayer.update();
-
-			// // refresh sidepane
-			// app.SidePane.refreshMenu();
-
-			// // refresh cartoCssControl
-			// var ccss = app.MapPane.getControls().cartocss;
-			// ccss && ccss._refresh();
-
-
+			done && done();
 		});
 
 	},

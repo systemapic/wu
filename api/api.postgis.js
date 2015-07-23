@@ -133,9 +133,122 @@ module.exports = api.postgis = {
 
 		});
 
-		async.waterfall(ops, function (err, results) {
-			done && done(err, results);
+		async.waterfall(ops, done);
+
+	},
+
+
+	importShapefile : function (options, done) {
+		var files 	= options.files,
+		    shape 	= api.geo.getTheShape(files)[0],
+		    prjfile 	= api.geo.getTheProjection(files)[0],
+		    file_id 	= options.file_id,
+		    pg_db 	= options.user.postgis_database,
+		    ops 	= [];
+
+		// todo: put in config
+		var IMPORT_SHAPEFILE_SCRIPT_PATH = '../scripts/postgis/import_shapefile.sh'; 
+		
+
+		console.log('prjfile: ', prjfile);
+
+		// read projection
+		ops.push(function (callback) {
+
+			if (prjfile) {
+				fs.readFile(prjfile, function (err, prj4) {
+					var srid = srs.parse(prj4);
+					callback(err, srid);
+				});
+			} else {
+				// no prj file
+				callback(null, false);
+			}
 		});
+
+
+		// import with bash script
+		ops.push(function (srid, callback) {
+
+			var srid_converted = srid.srid + ':3857';  // convert on import. todo: create the_geom + the_geom_webmercator columns after import instead
+
+			// create database script
+			var cmd = [
+				IMPORT_SHAPEFILE_SCRIPT_PATH, 	// script
+				'"' + shape + '"',
+				file_id,
+				pg_db,
+				srid_converted
+			].join(' ');
+
+			console.log('cmd: ', cmd);
+
+			// import to postgis
+			var startTime = new Date().getTime();
+			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+				console.log('stdout', err, stdin);
+				if (err) console.log('import_shapefile_script err: ', err);
+
+				var endTime = new Date().getTime();
+
+				// set import time to status
+				api.upload.updateStatus(options.file_id, { 	// todo: set err if err
+					data_type : 'vector',
+					import_took_ms : endTime - startTime,
+					table_name : file_id,
+					database_name : pg_db
+				}, function () {
+					callback(err, 'Shapefile imported successfully.');
+				});
+			});
+		});
+
+		// prime geometries in new table
+		ops.push(function (success, callback) {
+			api.postgis._primeTableWithGeometries({
+				file_id : file_id,
+				postgis_db : pg_db,
+			}, callback);
+		});
+
+		// get metadata
+		ops.push(function (callback) {
+
+			api.postgis._getMetadata({
+				file_id : file_id,
+				postgis_db : pg_db
+			}, function (err, metadata) {
+				if (err) return callback(err);
+
+				var metadataJSON = JSON.stringify(metadata);
+				
+				// set upload status
+				api.upload.updateStatus(options.file_id, {
+					metadata : metadataJSON
+				}, callback);
+			})
+
+		});
+
+		
+		// count rows for upload status
+		ops.push(function (callback) {
+			
+			api.postgis.query({
+				postgis_db : pg_db,
+				query : 'SELECT count(*) from "' + file_id + '"'
+			}, function (err, result) {
+				if (err) return callback(err);
+				
+				// set upload status
+				api.upload.updateStatus(options.file_id, {
+					rows_count : result.rows[0].count
+				}, callback);
+			});
+		});
+
+		// run ops
+		async.waterfall(ops, done);
 
 	},
 
@@ -220,7 +333,7 @@ module.exports = api.postgis = {
 		
 		// create database script
 		var cmd = [
-			IMPORT_RASTER_SCRIPT_PATH, 	// script
+			IMPORT_RASTER_SCRIPT_PATH,
 			raster,
 			file_id,
 			pg_db
@@ -256,130 +369,6 @@ module.exports = api.postgis = {
 
 	},
 
-	importShapefile : function (options, done) {
-		var files 	= options.files,
-		    shape 	= api.geo.getTheShape(files)[0],
-		    prjfile 	= api.geo.getTheProjection(files)[0],
-		    // file_id 	= 'shape_' + api.utils.getRandom(10),
-		    file_id 	= options.file_id,
-		    pg_db 	= options.user.postgis_database,
-		    ops 	= [];
-
-		var IMPORT_SHAPEFILE_SCRIPT_PATH = '../scripts/postgis/import_shapefile.sh'; // todo: put in config
-		
-
-		console.log('prjfile: ', prjfile);
-
-
-		ops.push(function (callback) {
-
-			if (prjfile) {
-				fs.readFile(prjfile, function (err, prj4) {
-					console.time('srid');
-					var srid = srs.parse(prj4);
-					console.timeEnd('srid');
-					console.log('srid: ', srid);
-					callback(err, srid);
-				});
-			} else {
-				// no prj file
-				callback(null, false);
-			}
-		});
-
-
-
-		ops.push(function (srid, callback) {
-
-			var srid_converted = srid.srid + ':3857';  // convert on import. todo: create the_geom + the_geom_webmercator columns after import instead
-
-			// create database script
-			var cmd = [
-				IMPORT_SHAPEFILE_SCRIPT_PATH, 	// script
-				'"' + shape + '"',
-				file_id,
-				pg_db,
-				srid_converted
-			].join(' ');
-
-			console.log('cmd: ', cmd);
-
-			// import to postgis
-			var startTime = new Date().getTime();
-			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
-				console.log('stdout', err, stdin);
-				if (err) console.log('import_shapefile_script err: ', err);
-
-				var endTime = new Date().getTime();
-
-				// set import time to status
-				api.upload.updateStatus(options.file_id, { 	// todo: set err if err
-					data_type : 'vector',
-					import_took_ms : endTime - startTime,
-					table_name : file_id,
-					database_name : pg_db
-				}, function () {
-					callback(err, 'Shapefile imported successfully.');
-				});
-
-				
-			});
-		});
-
-		// create 3857 and 4326 geometries
-		ops.push(function (success, callback) {
-			api.postgis._primeTableWithGeometries({
-				file_id : file_id,
-				postgis_db : pg_db,
-			}, callback);
-		});
-
-		// get metadata
-		ops.push(function (callback) {
-
-			api.postgis._getMetadata({
-				file_id : file_id,
-				postgis_db : pg_db
-			}, function (err, metadata) {
-				if (err) return callback(err);
-
-				console.log('GOT METADATA', metadata);
-
-				var metadataJSON = JSON.stringify(metadata);
-				
-				// set upload status
-				api.upload.updateStatus(options.file_id, {
-					metadata : metadataJSON
-				}, function () {
-					callback(null);
-				});
-			})
-
-		});
-
-		
-		// count rows for upload status
-		ops.push(function (callback) {
-			
-			api.postgis.query({
-				postgis_db : pg_db,
-				query : 'SELECT count(*) from "' + file_id + '"'
-			}, function (err, result) {
-				if (err) return callback(err);
-				
-				// set upload status
-				api.upload.updateStatus(options.file_id, {
-					rows_count : result.rows[0].count
-				}, function () {
-					callback(null);
-				});
-			});
-		});
-
-		// run ops
-		async.waterfall(ops, done);
-
-	},
 
 	_getMetadata : function (options, done) {
 		var file_id = options.file_id, 
@@ -399,34 +388,24 @@ module.exports = api.postgis = {
 				if (err) return callback(err);
 				console.log('METAEXX results', results);
 
+				// old skool
 				var box = results.rows[0].st_extent;
-
 				var m = box.split('(')[1];
-				console.log('mP: ',m);
-
 				var m2 = m.split(')')[0];
-
 				var c1 = m2.split(' ')[0];
 				var c2 = m2.split(' ')[1].split(',')[0];
 				var c3 = m2.split(',')[1].split(' ')[0];
 				var c4 = m2.split(' ')[2];
 
-				console.log('c1', c1);
-				console.log('c2', c2);
-				console.log('c3', c3);
-				console.log('c4', c4);
-
-				
+				// set
 				metadata.extent = [c1, c2, c3, c4];
+				
+
 				callback(null);
 			});	
 		});
 
-		// ops.push(function (callback) {
-
-		// 	callback();
-
-		// });
+		// todo: get fields for cartocss pro-tips
 
 		async.series(ops, function (err, results) {
 			done(err, metadata);
@@ -446,51 +425,37 @@ module.exports = api.postgis = {
 				query : 'SELECT ST_GeometryType(geom) from "' + file_id + '" limit 1'
 			}, function (err, results) {
 				if (err) return callback(err);
-
-				console.log('err, results 22', err, results);
-
 				var geometry_type = results.rows[0].st_geometrytype.split('ST_')[1];
-				console.log('geometries_t', geometry_type);
 				callback(null, geometry_type);
 			})
 		});
 
 		// create geometry 3857
 		ops.push(function (geometry_type, callback) {
-
 			var column = ' the_geom_3857';
 			var geometry = ' geometry(' + geometry_type + ', 3857)';
 			var query = 'ALTER TABLE ' + file_id + ' ADD COLUMN' + column + geometry;
-
-			console.log('query geom', query);
 
 			api.postgis.query({
 				postgis_db : postgis_db,
 				query : query
 			}, function (err, results) {
-				console.log('Q2', err, results);
 				if (err) return callback(err);
-
 				callback(null, geometry_type);
 			});
 		});
 
 		// create geometry 4326
 		ops.push(function (geometry_type, callback) {
-
 			var column = ' the_geom_4326';
 			var geometry = ' geometry(' + geometry_type + ', 4326)';
 			var query = 'ALTER TABLE ' + file_id + ' ADD COLUMN' + column + geometry;
-
-			console.log('query geom', query);
 
 			api.postgis.query({
 				postgis_db : postgis_db,
 				query : query
 			}, function (err, results) {
-				console.log('Q2', err, results);
 				if (err) return callback(err);
-
 				callback(err, geometry_type);
 			});
 		});
@@ -498,32 +463,26 @@ module.exports = api.postgis = {
 
 		// populate geometry
 		ops.push(function (geometry_type, callback) {
-
 			var query = 'ALTER TABLE ' + file_id + ' ALTER COLUMN the_geom_3857 TYPE Geometry(' + geometry_type + ', 3857) USING ST_Transform(geom, 3857)'
 
    			api.postgis.query({
 				postgis_db : postgis_db,
 				query : query
 			}, function (err, results) {
-				console.log('Q99', err, results);
 				if (err) return callback(err);
-
 				callback(err, geometry_type);
 			});
 		});
 
 		// populate geometry
 		ops.push(function (geometry_type, callback) {
-
 			var query = 'ALTER TABLE ' + file_id + ' ALTER COLUMN the_geom_4326 TYPE Geometry(' + geometry_type + ', 4326) USING ST_Transform(geom, 4326)'
 
    			api.postgis.query({
 				postgis_db : postgis_db,
 				query : query
 			}, function (err, results) {
-				console.log('Q99-2', err, results);
 				if (err) return callback(err);
-
 				callback(err);
 			});
 		});
@@ -531,38 +490,28 @@ module.exports = api.postgis = {
 
 		// create index for 3857
 		ops.push(function (callback) {
-
 			var idx = file_id + '_the_geom_4326_idx';
 			var query = 'CREATE INDEX ' + idx + ' ON ' + file_id + ' USING GIST(the_geom_4326)'
 
-			console.log('query: ', query);
-			
 			api.postgis.query({
 				postgis_db : postgis_db,
 				query : query
 			}, function (err, results) {
-				console.log('Q2', err, results);
 				if (err) return callback(err);
-
 				callback(null);
 			});
 		});
 
 		// create index for 4326
 		ops.push(function (callback) {
-
 			var idx = file_id + '_the_geom_3857_idx';
 			var query = 'CREATE INDEX ' + idx + ' ON ' + file_id + ' USING GIST(the_geom_3857)'
-
-			console.log('query: ', query);
 
 			api.postgis.query({
 				postgis_db : postgis_db,
 				query : query
 			}, function (err, results) {
-				console.log('Q2', err, results);
 				if (err) return callback(err);
-
 				callback(null, 'ok');
 			});
 		});
@@ -587,7 +536,6 @@ module.exports = api.postgis = {
 		pg.connect(conString, function(err, client, pgcb) {
 			if (err) return callback(err);
 			
-			
 			// do query
 			client.query(query, variables, function(err, result) {
 				// clean up after pg
@@ -595,7 +543,6 @@ module.exports = api.postgis = {
 				// client.end();
 
 				if (err) return callback(err); 
-				
 				
 				// return result
 				callback(null, result);
