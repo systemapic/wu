@@ -95,7 +95,7 @@ Wu.MapPane = Wu.Pane.extend({
 		this._map = app._map = L.map('map', {
 			worldCopyJump : true,
 			attributionControl : false,
-			maxZoom : 18,
+			//maxZoom : 18,
 			// zoomAnimation : false
 			zoomControl : false,
 			inertia : false,

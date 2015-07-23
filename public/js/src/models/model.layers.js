@@ -16,13 +16,13 @@ Wu.Layer = Wu.Class.extend({
 
 	},
 
-	setStore : function (store) {
-		var added = this._added;
-		this._flush();
-		this.store = store;
-		this.loaded = false;
-		if (added) this.addTo();
-	},
+	// setStore : function (store) {
+	// 	var added = this._added;
+	// 	this._flush();
+	// 	this.store = store;
+	// 	this.loaded = false;
+	// 	if (added) this.addTo();
+	// },
 
 	addHooks : function () {
 		this._setHooks('on');
@@ -298,6 +298,13 @@ Wu.Layer = Wu.Class.extend({
 		if (this.store.data) return this.store.data.cartoid;
 	},
 
+	// set postgis styling 
+	setLayerStyle : function (options, callback) {
+
+		
+
+	},
+
 	setCartoCSS : function (json, callback) {
 
 		// send to server
@@ -322,10 +329,7 @@ Wu.Layer = Wu.Class.extend({
 		if (!metajson) return false;
 
 		var meta = Wu.parse(metajson);
-		console.log('meta:', meta, this);
 		return meta;
-		// if (metajson) return JSON.parse(metajson);
-		// return false;
 	},
 
 	getMetaFields : function () {
@@ -388,6 +392,11 @@ Wu.Layer = Wu.Class.extend({
 		if (!legends[0]) return;
 		legends[0].value = title;
 		this.setLegends(legends);
+	},
+
+	setStyle : function (postgis) {
+		this.store.data.postgis = postgis;
+		this.save('data');
 	},
 
 	createLegends : function (callback) {
@@ -526,22 +535,23 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		this._inited = true;
 	},
 
-	update : function () {
+	update : function (options) {
 		var map = app._map;
 
 		// remove
 		if (this.layer) this._flush();
 
-		this._fileUuid = this.store.file;
-		this._defaultCartoid = 'cartoid';
-
 		// prepare raster
 		this._prepareRaster();
 
+		// enable
+		if (options && options.enable) {
+			map.addLayer(this.layer);
+		}
 	},
 
 	_getLayerUuid : function () {
-		return this.store.uuid;
+		return this.store.data.postgis.layer_id;
 	},
 
 	getCartoCSS : function (cartoid, callback) {
@@ -551,8 +561,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 	_prepareRaster : function () {
 
-		console.log('PostGIS layer, preapreRaster', this);
-		
 		// set ids
 		var fileUuid 	= this._fileUuid,	// file id of geojson
 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
@@ -920,8 +928,6 @@ Wu.RasterLayer = Wu.Layer.extend({
 // shorthand for creating all kinds of layers
 Wu.createLayer = function (layer) {
 	if (!layer.data) return console.error(layer);
-
-	console.log('__________ layer.data', layer.data);
 
 	// postgis
 	if (layer.data.postgis && layer.data.postgis.file_id) {

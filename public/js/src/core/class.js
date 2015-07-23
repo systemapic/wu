@@ -364,6 +364,7 @@ Wu.Util = {
 		
 		url += path;
 
+
 		http.open("POST", url, true);
 
 		//Send the proper header information along with the request

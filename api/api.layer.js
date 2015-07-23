@@ -48,9 +48,12 @@ module.exports = api.layer = {
 	// create layer
 	create : function (req, res) {
 
-		var options = req.body.options;
+
+		var options = req.body;
+		console.log('CREATE 0---- layer', options);
 
 		api.layer.createModel(options, function (err, doc) {
+			console.log('created Mode err? ', err, doc);
 			if (err) return api.error.general(res, err);
 
 			res.json(doc);
@@ -201,6 +204,14 @@ module.exports = api.layer = {
 			if (req.body.hasOwnProperty('zIndex')) {
 				var zIndex = req.body.zIndex;
 				layer.zIndex = zIndex;
+				layer.save();
+			}
+
+			// update data
+			if (req.body.hasOwnProperty('data')) {
+				var data = req.body.data;
+				layer.data = data;
+				layer.markModified('data');
 				layer.save();
 			}
 
@@ -488,7 +499,7 @@ module.exports = api.layer = {
 		console.log('api.layer.createModel'.red, options);
 
 		var layer 		= new Layer();
-		layer.uuid 		= options.uuid;
+		layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),
 		layer.title 		= options.title;
 		layer.description 	= options.description || '';
 		layer.legend 		= options.legend || '';

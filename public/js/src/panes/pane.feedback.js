@@ -45,7 +45,7 @@ Wu.FeedbackPane = Wu.Class.extend({
 		// Create random number
 		var id = Wu.Util.createRandom(5);
 
-		console.log('adding: ', message, message.id);
+		console.error('adding: ', message, message.id);
 
 		// gets passed from sidepane.dataLibrary.js
 		if (message.id) id = message.id;

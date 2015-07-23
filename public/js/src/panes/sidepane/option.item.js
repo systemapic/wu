@@ -111,7 +111,7 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 
 	// sort layers by provider
 	sortLayers : function (layers) {
-		console.log('sortLayers, layers:', layers);
+		// console.log('sortLayers, layers:', layers);
 		// possible keys in layer.store.data. must add more here later if other sources
 		// var keys = ['geojson', 'mapbox', 'osm', 'raster'];
 		var keys = ['geojson', 'mapbox', 'raster', 'postgis'];
@@ -123,7 +123,7 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 			}
 			for (l in layers) {
 				var layer = layers[l];
-				console.log('-> layer: ', layer);
+				// console.log('-> layer: ', layer);
 				if (layer.store.data.hasOwnProperty(key)) {
 					sort.layers.push(layer)
 				}
@@ -131,7 +131,7 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 			results.push(sort);
 		}, this);
 
-		console.log('SROOTED', results);
+		// console.log('SROOTED', results);
 		this.numberOfProviders = results.length;
 		return results;
 	},

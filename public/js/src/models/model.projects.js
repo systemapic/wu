@@ -71,9 +71,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	addLayer : function (layer) {
-		console.log('addLayer: ', layer);
 		this.layers[layer.uuid] = new Wu.createLayer(layer);
-		console.log('this.layers.s.s.', this.layers[layer.uuid]);
 		return this.layers[layer.uuid];
 	},
 

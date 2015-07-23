@@ -467,6 +467,7 @@ module.exports = function(app, passport) {
 	// CREATE NEW LAYER ====================
 	// =====================================
 	app.post('/api/layers/new', passport.authenticate('bearer', {session: false}), function (req, res) {
+		console.log('/api/layers/new');
 		api.layer.create(req, res);
 	});
 
