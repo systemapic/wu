@@ -1092,7 +1092,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		var item  = layerItem.item;
 		var layer = layerItem.layer;
 
-		var file = layer ? layer.getFile() : false;
+		var file = layer && layer.getFile ? layer.getFile() : false;
 		var caption = file ? file.store.name : item.caption;
 
 		// create div

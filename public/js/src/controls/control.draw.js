@@ -33,7 +33,7 @@ L.Control.Draw = Wu.Control.extend({
 
 		// debug: turn whole thing off! 
 		this._flush();
-		return this._hide();
+		// return this._hide();
 
 		// get control active setting from project
 		var active = this._project.getControls()[this.type];
@@ -120,12 +120,12 @@ L.Control.Draw = Wu.Control.extend({
 			toolbarContainer;
 
 		// create buttons
-		// container.appendChild(this._createPolygonButtons());
-		// container.appendChild(this._createPolylineButtons());
+		container.appendChild(this._createPolygonButtons());
+		container.appendChild(this._createPolylineButtons());
 
 		// create draw controls
 		// this._polygonDraw = this._createPolygonDraw();//.addTo(map);
-		// this._polylineDraw = this._createPolylineDraw().addTo(map);
+		this._polylineDraw = this._createPolylineDraw();//.addTo(map);
 		
 		// add tooltip
 		app.Tooltip.add(this._polygonButton, 'Draw polygons on the map');
@@ -154,65 +154,65 @@ L.Control.Draw = Wu.Control.extend({
 
 	_createPolylineDraw : function () {
 		
-		// // create draw tools
-		// var polylineDraw = new L.FreeDraw({ // new feature group
-		// 	smoothFactor : 2,
-		// 	simplifyPolygons : false
-		// });
+		// create draw tools
+		var polylineDraw = new L.FreeDraw({ // new feature group
+			smoothFactor : 2,
+			simplifyPolygons : false
+		});
 
-		// polylineDraw.options.exitModeAfterCreate(false);
+		polylineDraw.options.exitModeAfterCreate(false);
 
-		// polylineDraw.on('mode', function modeReceived(eventData) {
-  //                  console.log('mode', eventData);
+		polylineDraw.on('mode', function modeReceived(eventData) {
+                   console.log('mode', eventData);
 
-  //               });
+                });
 
-		// polylineDraw.on('markers', function getMarkers(eventData) {
-		//     var latLngs = eventData.latLngs;
-		//     console.log('markers', eventData);
-		//     // ...
-		// });
+		polylineDraw.on('markers', function getMarkers(eventData) {
+		    var latLngs = eventData.latLngs;
+		    console.log('markers', eventData);
+		    // ...
+		});
 
-		// app.__pl = polylineDraw;
+		app.__pl = polylineDraw;
 
-		// return polylineDraw;
+		return polylineDraw;
 
 	},
 
 	_createPolygonDraw : function () {
 		
-		// create draw tools
-		var polygonDraw = new L.FreeDraw({
-			smoothFactor : 0,
-			simplifyPolygons : false,
-			// attemptMerge : false,
-			hullAlgorithm : false,
-			// multiplePolygons : false
-			boundariesAfterEdit : true,
-			createExitMode : false
+		// // create draw tools
+		// var polygonDraw = new L.FreeDraw({
+		// 	smoothFactor : 0,
+		// 	simplifyPolygons : false,
+		// 	// attemptMerge : false,
+		// 	hullAlgorithm : false,
+		// 	// multiplePolygons : false
+		// 	boundariesAfterEdit : true,
+		// 	createExitMode : false
 
-		});
+		// });
 
-		polygonDraw.options.exitModeAfterCreate(false);
+		// polygonDraw.options.exitModeAfterCreate(false);
 
-		polygonDraw.on('mode', function modeReceived(eventData) {
-                   	// console.log('mode', eventData);
+		// polygonDraw.on('mode', function modeReceived(eventData) {
+  //                  	// console.log('mode', eventData);
 
-                });
+  //               });
 
-		polygonDraw.on('markers', function getMarkers(eventData) {
-		    	// var latLngs = eventData.latLngs;
-		    	// console.log('markers', eventData);
-		    	// ...
-		});
+		// polygonDraw.on('markers', function getMarkers(eventData) {
+		//     	// var latLngs = eventData.latLngs;
+		//     	// console.log('markers', eventData);
+		//     	// ...
+		// });
 
-		app.__pb = polygonDraw;
+		// app.__pb = polygonDraw;
 
-		return polygonDraw;
+		// return polygonDraw;
 	},
 
 	_addHooks : function () {
-		return;
+		//return;
 
 		// polyline buttons
 		L.DomEvent.on(this._polylineButton, 'click', this._togglePolyline, this);
