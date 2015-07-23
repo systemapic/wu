@@ -166,6 +166,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		this._sqlPane.setAttribute('placeholder', 'Insert SQL statement.');
 		this._errorPane 		= Wu.DomUtil.create('div', 'cartocss-error-pane', this._wrapper); // error feedback pane
 		this._updateButton 		= Wu.DomUtil.create('div', 'cartocss-update-button', this._wrapper, 'Update'); // create update button
+		this._refreshButton 		= Wu.DomUtil.create('div', 'cartocss-refresh-button', this._wrapper); // create update button
 
 		// append to leaflet-control-container
 		app._map.getContainer().appendChild(this._editorContainer);
@@ -210,6 +211,9 @@ L.Control.Cartocss = Wu.Control.extend({
 		// Resize container
 		Wu.DomEvent[onoff](this._resizeHandle, 'mousedown', this.resize, this);
 
+		// refresh button
+		Wu.DomEvent[onoff](this._refreshButton, 'mousedown', this._refreshLayer, this);
+
 		// stops
 		Wu.DomEvent[onoff](this._editorContainer, 	'mousewheel mousedown dblclick click', 		Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent[onoff](this._toolbarButton, 	'dblclick', 					Wu.DomEvent.stopPropagation, this);
@@ -227,6 +231,11 @@ L.Control.Cartocss = Wu.Control.extend({
 	},
 	_removeHooks : function () {
 		this._setHooks('off');
+	},
+
+	_refreshLayer : function () {
+		console.log('redraw', this);
+		this._layer.layer.redraw();
 	},
 
 	resize : function () {
