@@ -1004,3 +1004,32 @@ svg.tracer {
 	background: red;
 
 }
+
+/*refresh layer button*/
+.cartocss-refresh-button {
+    width: 30px;
+    height: 30px;
+    bottom: 0px;
+    border-radius: 2px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.9;
+    font-size: 15px;
+    font-weight: 500;
+    margin: auto;
+    position: absolute;
+    background-image: url('images/refresh.png');
+    left: 10px;
+    bottom: 23px;
+    background-size: 30px;
+    background-repeat: no-repeat;
+}
+
+.cartocss-refresh-button:hover {
+    background-color: rgba(224, 223, 223, 0.81);
+    border-radius: 5px;
+}
+
+
+
+
