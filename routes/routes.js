@@ -448,6 +448,14 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
+	// ADD/LINK FILE TO NEW PROJECT ========
+	// =====================================
+	app.post('/api/file/addtoproject', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.file.addFileToProject(req, res);
+	});
+
+
+	// =====================================
 	// DELETE LAYER(S) =====================
 	// =====================================
 	app.post('/api/layers/delete', passport.authenticate('bearer', {session: false}), function (req,res) {
