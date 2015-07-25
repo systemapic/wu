@@ -59,8 +59,11 @@ Wu.Project = Wu.Class.extend({
 		if (!layers) return;
 
 		// create
+		console.log('initLayers');
 		layers.forEach(function (layer) {
-			this.layers[layer.uuid] = new Wu.createLayer(layer);
+			console.log('init>', layer);
+			var wuLayer =  new Wu.createLayer(layer);
+			if (wuLayer) this.layers[layer.uuid] = wuLayer;
 		}, this);
 	},
 
@@ -71,8 +74,10 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	addLayer : function (layer) {
-		this.layers[layer.uuid] = new Wu.createLayer(layer);
-		return this.layers[layer.uuid];
+		console.log('addLayer: ', layer);
+		var l = new Wu.createLayer(layer);
+		if (l) this.layers[layer.uuid] = l;
+		return l || false;
 	},
 
 	addBaseLayer : function (layer) {
@@ -564,6 +569,7 @@ Wu.Project = Wu.Class.extend({
 
 			if (l) {
 				console.log('l.store', l.store);
+				if (!l.store) return false;
 				if (l.store.data.hasOwnProperty('geojson')) return true;
 				if (l.store.data.hasOwnProperty('osm')) return true;
 				if (l.store.data.hasOwnProperty('postgis')) return true;

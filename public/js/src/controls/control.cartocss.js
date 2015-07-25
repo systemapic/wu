@@ -236,6 +236,7 @@ L.Control.Cartocss = Wu.Control.extend({
 	_refreshLayer : function () {
 		console.log('redraw', this);
 		this._layer.layer.redraw();
+		this._layer.gridLayer.redraw();
 	},
 
 	resize : function () {
