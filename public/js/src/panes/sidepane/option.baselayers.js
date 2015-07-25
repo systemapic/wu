@@ -362,11 +362,14 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 		// activate layers
 		layers.forEach(function (a) {
-			this.activate(a.store.uuid);
+			if (a.store) this.activate(a.store.uuid);
 		}, this);
 
 		layermenuLayers.forEach(function (bl) {
-			var layer = _.find(layers, function (l) { return l.store.uuid == bl.layer; });
+			var layer = _.find(layers, function (l) { 
+				if (!l.store) return false;
+				return l.store.uuid == bl.layer; 
+			});
 			if (layer) this.deactivate(layer.store.uuid);
 		}, this);
 

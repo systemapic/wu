@@ -123,9 +123,12 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 			}
 			for (l in layers) {
 				var layer = layers[l];
-				// console.log('-> layer: ', layer);
-				if (layer.store.data.hasOwnProperty(key)) {
-					sort.layers.push(layer)
+
+				if (layer) {
+
+					if (layer.store && layer.store.data.hasOwnProperty(key)) {
+						sort.layers.push(layer)
+					}
 				}
 			}
 			results.push(sort);

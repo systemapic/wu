@@ -900,6 +900,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	toggleLayer : function (item) {
 		if (this.editMode) return;
+		console.log('time: ', item);
 
 		var layer = item.layer;
 		var _layerName = layer ? layer.getTitle() : 'Folder';

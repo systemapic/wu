@@ -39,7 +39,6 @@ Wu.Layer = Wu.Class.extend({
 		Wu.DomEvent[on](this.layer, 'load', this._onLayerLoaded, this);
 		Wu.DomEvent[on](this.layer, 'loading', this._onLayerLoading, this);
 	},
-
 	
 	_unload : function (e) {
 		// delete 
@@ -460,6 +459,7 @@ Wu.Layer = Wu.Class.extend({
 
 	_setGridEvents : function (on) {
 		var grid = this.gridLayer;
+		console.log('grid?', grid, on);
 		if (!grid || !on) return;
 		grid[on]('mousedown', this._gridOnMousedown, this);
 		grid[on]('mouseup', this._gridOnMouseup, this);
@@ -544,6 +544,9 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		// prepare raster
 		this._prepareRaster();
 
+		// prepare utfgrid
+		this._prepareGrid();
+
 		// enable
 		if (options && options.enable) {
 			map.addLayer(this.layer);
@@ -551,6 +554,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 	},
 
 	_getLayerUuid : function () {
+		console.log('this', this);
 		return this.store.data.postgis.layer_id;
 	},
 
@@ -579,11 +583,49 @@ Wu.PostGISLayer = Wu.Layer.extend({
 			maxRequests : 0,
 		});
 
-		// Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
+		Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
+	},
+
+	_updateGrid : function (l) {
+
+		console.log('_updateGrid', l);
+
+		// refresh of gridlayer is attached to layer. this because vector tiles are not made in vile.js, 
+		// and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
+		// - also, removed listeners in L.UtfGrid (onAdd)
+		// 
+		if (this.gridLayer) this.gridLayer._update();
+	},
+
+	_prepareGrid : function () {
+
+		// set ids
+		var subdomains  = app.options.servers.tiles.subdomains,
+		    access_token = '?access_token=' + app.tokens.access_token;
+		
+		var layerUuid = this._getLayerUuid();
+		var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.grid' + access_token;
+
+		// create gridlayer
+		this.gridLayer = new L.UtfGrid(url, {
+			useJsonP: false,
+			subdomains: subdomains,
+			maxRequests : 0,
+			requestTimeout : 10000,
+			layerUuid : layerUuid
+		});
+
+		// debug
+		// this.gridLayer = false;
+
+		// add grid events
+		this._addGridEvents();
+
 	},
 
 
 	updateStyle : function () {
+		return console.error('updateStyle, remove');
 		// set new options and redraw
 		if (this.layer) this.layer.setOptions({
 			cartoid : this.getCartoid(),
@@ -655,6 +697,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	},
 
 	_updateGrid : function (l) {
+
+
 
 		// refresh of gridlayer is attached to layer. this because vector tiles are not made in vile.js, 
 		// and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
@@ -927,8 +971,10 @@ Wu.RasterLayer = Wu.Layer.extend({
 
 // shorthand for creating all kinds of layers
 Wu.createLayer = function (layer) {
-	if (!layer.data) return console.error(layer);
-
+	if (!layer.data) {
+		console.error('no layer - weird:', layer);
+		return false;
+	}
 	// postgis
 	if (layer.data.postgis && layer.data.postgis.file_id) {
 		return new Wu.PostGISLayer(layer);
