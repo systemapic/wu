@@ -3,14 +3,22 @@
     src: url(phantomfont/Open_Sans/OpenSans-Light.ttf);
 	}
 
-.leaflet-bottom.leaflet-right,
-.leaflet-top.leaflet-right,
-.leaflet-top.leaflet-left,
-#legends-collapser,
-#start-pane {
-	display: none !important;
-	}
+/*Screenshot for share/image, remove all controls except legends, measure/scale*/
 
-#header {
+.home-container,
+.leaflet-top.leaflet-left,
+.leaflet-control-layermenu.leaflet-control,
+#legends-collapser,
+#start-pane, #header {
+	display: none !important;
+}
+
+/*#header {
 	width: auto !important;
-	}
+	}*/
+
+.cartocss-toolbar-button{
+	display: none !important;
+	opacity: 0 !important;
+}
+
