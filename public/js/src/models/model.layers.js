@@ -583,6 +583,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 			maxRequests : 0,
 		});
 
+		// load grid after all pngs.. (dont remember why..)
 		Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
 	},
 
