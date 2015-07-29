@@ -149,7 +149,7 @@ L.UtfGrid = L.Class.extend({
 			if (on.data) {
 				this.fire('mouseover', on);
 				if (this.options.pointerCursor) {
-					this._container.style.cursor = 'pointer';
+					this._container.style.cursor = 'crosshair';
 				}
 			}
 
@@ -199,8 +199,10 @@ L.UtfGrid = L.Class.extend({
 	//TODO: Load from center etc
 	_update: function () {
 
-		var bounds = this._map.getPixelBounds(),
-		    zoom = this._map.getZoom(),
+		var map = this._map || app._map; // systemapic hack
+
+		var bounds = map.getPixelBounds(),
+		    zoom = map.getZoom(),
 		    tileSize = this.options.tileSize;
 
 		if (zoom > this.options.maxZoom || zoom < this.options.minZoom) {
@@ -213,7 +215,7 @@ L.UtfGrid = L.Class.extend({
 			seTilePoint = new L.Point(
 				Math.floor(bounds.max.x / tileSize),
 				Math.floor(bounds.max.y / tileSize)),
-				max = this._map.options.crs.scale(zoom) / tileSize;
+				max = map.options.crs.scale(zoom) / tileSize;
 
 		//Load all required ones
 		var visible_tiles = [];

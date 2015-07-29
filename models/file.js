@@ -60,18 +60,18 @@ var fileSchema = mongoose.Schema({
 				dir : Number
 			},
 			orientation : Number,
-			// crunched : [{
-			// 	file : String, 
-			// 	width : Number,
-			// 	height : Number,
-			// 	quality : Number,
-			// 	crop : {
-			// 		w : Number,
-			// 		h : Number,
-			// 		x : Number,
-			// 		y : Number
-			// 	}
-			// }]
+			crunched : [{
+				file : String, 
+				width : Number,
+				height : Number,
+				quality : Number,
+				crop : {
+					w : Number,
+					h : Number,
+					x : Number,
+					y : Number
+				}
+			}]
 		}
 	},
 
