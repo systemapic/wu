@@ -1,21 +1,14 @@
 @font-face {
     font-family: 'Helvetica neue';
     src: url(phantomfont/Open_Sans/OpenSans-Light.ttf);
-	}
+}
 
-/*Screenshot for share/image, remove all controls except legends, measure/scale*/
-
-.home-container,
 .leaflet-top.leaflet-left,
 .leaflet-control-layermenu.leaflet-control,
 #legends-collapser,
-#start-pane, #header {
+#start-pane{
 	display: none !important;
 }
-
-/*#header {
-	width: auto !important;
-	}*/
 
 .cartocss-toolbar-button{
 	display: none !important;
