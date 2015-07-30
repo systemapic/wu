@@ -42,8 +42,10 @@ Wu.App = Wu.Class.extend({
 
 		// Detect mobile devices
 		this.detectMobile();
+
 	},
 
+	
 	setAccessTokens : function () {
 
 		app.tokens = window.tokens;
