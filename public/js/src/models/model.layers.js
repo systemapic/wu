@@ -14,15 +14,9 @@ Wu.Layer = Wu.Class.extend({
 		// data not loaded
 		this.loaded = false;
 
-	},
+		console.error('create layer', layer);
 
-	// setStore : function (store) {
-	// 	var added = this._added;
-	// 	this._flush();
-	// 	this.store = store;
-	// 	this.loaded = false;
-	// 	if (added) this.addTo();
-	// },
+	},
 
 	addHooks : function () {
 		this._setHooks('on');
@@ -544,10 +538,13 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		// prepare raster
 		this._prepareRaster();
 
+		console.log('PostGIS layer update()');
+
 		// prepare utfgrid
-		this._prepareGrid();
+		// this._prepareGrid();
 
 		// enable
+		if (options) console.log('OPTIONS ==> ', options);
 		if (options && options.enable) {
 			map.addLayer(this.layer);
 		}
@@ -567,14 +564,16 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 		// set ids
 		var fileUuid 	= this._fileUuid,	// file id of geojson
-		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
-		    tileServer 	= app.options.servers.tiles.uri,
+		    // cartoid 	= this.store.data.cartoid || this._defaultCartoid,
+		    // tileServer 	= app.options.servers.tiles.uri,
 		    subdomains  = app.options.servers.tiles.subdomains,
 		    access_token = '?access_token=' + app.tokens.access_token;
 		    // url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		var layerUuid = this._getLayerUuid();
 		var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.png' + access_token;
+
+		console.log('url', url);
 
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
@@ -583,8 +582,27 @@ Wu.PostGISLayer = Wu.Layer.extend({
 			maxRequests : 0,
 		});
 
+		console.log('loaded layer: ', this.layer);
+
 		// load grid after all pngs.. (dont remember why..)
-		Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
+		// Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
+
+	},
+
+	_invalidateTiles : function () {
+		console.log('invalidateTIles');
+
+		var options = {
+			layerUuid : this._getLayerUuid(),
+			access_token : app.tokens.access_token, 
+			zoom : app._map.getZoom()
+		}
+
+		console.log('invalidate options', options);
+
+		Wu.send('/api/db/invalidate', options, function (a, b) {
+			console.log('invalidate sent', a, b);
+		}, this);
 	},
 
 	_updateGrid : function (l) {
@@ -595,7 +613,10 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		// and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
 		// - also, removed listeners in L.UtfGrid (onAdd)
 		// 
-		if (this.gridLayer) this.gridLayer._update();
+		if (this.gridLayer) {
+			console.log('this.gridLayer._update()');
+			this.gridLayer._update();
+		}
 	},
 
 	_prepareGrid : function () {

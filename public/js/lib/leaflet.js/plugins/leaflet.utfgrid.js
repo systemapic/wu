@@ -95,7 +95,7 @@ L.UtfGrid = L.Class.extend({
 		map.on('mousedown', this._mousedown, this);
 		map.on('mouseup', this._mouseup, this);
 		map.on('mousemove', this._move, this);
-		// map.on('moveend', this._update, this);
+		map.on('moveend', this._update, this);
 	},
 
 	onRemove: function () {
@@ -105,7 +105,7 @@ L.UtfGrid = L.Class.extend({
 		map.off('mousedown', this._mousedown, this);
 		map.off('mouseup', this._mouseup, this);
 		map.off('mousemove', this._move, this);
-		// map.off('moveend', this._update, this);
+		map.off('moveend', this._update, this);
 		
 		if (this.options.pointerCursor) {
 			this._container.style.cursor = '';
