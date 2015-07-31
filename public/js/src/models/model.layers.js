@@ -541,7 +541,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		console.log('PostGIS layer update()');
 
 		// prepare utfgrid
-		// this._prepareGrid();
+		this._prepareGrid();
 
 		// enable
 		if (options) console.log('OPTIONS ==> ', options);
@@ -591,18 +591,19 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 	_invalidateTiles : function () {
 		console.log('invalidateTIles');
+		return;
 
-		var options = {
-			layerUuid : this._getLayerUuid(),
-			access_token : app.tokens.access_token, 
-			zoom : app._map.getZoom()
-		}
+		// var options = {
+		// 	layerUuid : this._getLayerUuid(),
+		// 	access_token : app.tokens.access_token, 
+		// 	zoom : app._map.getZoom()
+		// }
 
-		console.log('invalidate options', options);
+		// console.log('invalidate options', options);
 
-		Wu.send('/api/db/invalidate', options, function (a, b) {
-			console.log('invalidate sent', a, b);
-		}, this);
+		// Wu.send('/api/db/invalidate', options, function (a, b) {
+		// 	console.log('invalidate sent', a, b);
+		// }, this);
 	},
 
 	_updateGrid : function (l) {
