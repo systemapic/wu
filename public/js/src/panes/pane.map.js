@@ -92,7 +92,7 @@ Wu.MapPane = Wu.Pane.extend({
 	_initLeaflet : function () {
 
 		// create new map
-		this._map = app._map = L.map('map', {
+		var map = this._map = app._map = L.map('map', {
 			worldCopyJump : true,
 			attributionControl : false,
 			//maxZoom : 18,
@@ -103,8 +103,52 @@ Wu.MapPane = Wu.Pane.extend({
 			// zoomAnimationThreshold : 2
 		});
 
+
+		// global map events
+		map.on('zoomstart', function (e) {
+			console.log('zoomztart', e);
+
+			map.eachLayer(function (layer) {
+				if (!layer.options) return;
+
+				var layerUuid = layer.options.layerUuid;
+
+				if (!layerUuid) return;
+
+				// get wu layer
+				var l = app.activeProject.getPostGISLayer(layerUuid);
+			
+				console.log('Laighto-san', l);
+
+				if (!l) return  
+				
+
+				console.log('got layer1--1-1');
+				l._invalidateTiles();
+				
+				
+			});
+
+			// send invalidate to pile
+			this._invalidateTiles();
+		}, this)
+
+
+
+
+
+
 		// add editable layer
 		// this.addEditableLayer(this._map);
+	},
+
+	_invalidateTiles : function () {
+
+		var options = {
+			access_token : app.tokens.access_token, // unique identifier
+
+		}
+
 	},
 
 

@@ -559,7 +559,18 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getLayer : function (uuid) {
+		console.log('getLaer', uuid, this.layers);
 		return this.layers[uuid];
+	},
+
+	getPostGISLayer : function (layer_id) {
+		return _.find(this.layers, function (layer) {
+			console.log('_.find', layer);
+			if (!layer.store) return;
+			if (!layer.store.data) return;
+			if (!layer.store.data.postgis) return;
+			return layer.store.data.postgis.layer_id == layer_id;
+		});
 	},
 
 	getStylableLayers : function () {
