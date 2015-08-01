@@ -464,6 +464,31 @@ Wu.Layer = Wu.Class.extend({
 		this._setGridEvents('off');
 	},
 
+	_fetchData : function (e, callback) {
+		console.log('fetchData', e);
+
+		var keys = Object.keys(e.data);
+		var column = keys[0];
+		var row = e.data[column];
+		var layer_id = e.layer.store.data.postgis.layer_id;
+
+		var options = {
+			column : column,
+			row : row,
+			layer_id : layer_id,
+
+			access_token : app.tokens.access_token
+		}
+
+		Wu.send('/api/db/fetch', options, callback, this);
+	},
+
+	_fetchedData : function (ctx, resp) {
+		console.log('_fetchedData', ctx, resp);
+	},
+
+
+
 	_gridOnMousedown : function(e) {
 		if (!e.data) return;
 
@@ -471,13 +496,21 @@ Wu.Layer = Wu.Class.extend({
 		e.layer = this;
 
 		// add to pending
-		app.MapPane._addPopupContent(e);
+		// app.MapPane._addPopupContent(e);
 
-		var event = e.e.originalEvent;
-		this._event = {
-			x : event.x,
-			y : event.y
-		}
+		// fetch data
+		this._fetchData(e, function (ctx, json) {
+			var data = JSON.parse(json);
+			e.data = data;
+			var event = e.e.originalEvent;
+			this._event = {
+				x : event.x,
+				y : event.y
+			}
+			app.MapPane._addPopupContent(e);
+		});
+
+		
 
 	},
 
