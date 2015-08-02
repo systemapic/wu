@@ -774,6 +774,7 @@
 
             if (this.options.simplifyPolygon) {
 
+
                 latLngs = function simplifyPolygons() {
 
                     var points   = ClipperLib.Clipper.CleanPolygon(this.latLngsToClipperPoints(latLngs), 1.1),
@@ -845,6 +846,8 @@
                 this.notifyBoundaries();
                 this.memory.save(this.getPolygons(true));
             }
+
+           
 
             return polygon;
 
@@ -1585,6 +1588,11 @@
                 this.setMapPermissions('enable');
 
             }
+
+            // fire 
+            this.fire('polygon', {
+                polygon : polygon
+            })
 
         }
 

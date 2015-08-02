@@ -200,6 +200,13 @@ Wu.App = Wu.Class.extend({
 		// render eror pane
 		this.FeedbackPane = new Wu.FeedbackPane();
 
+		// init tools
+		this.Tools = {};
+		this.Tools.FreeDraw = new Wu.Tool.FreeDraw({
+			map : this.MapPane._map
+		});
+	
+
 	},
 
 	// init default view on page-load

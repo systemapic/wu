@@ -138,7 +138,7 @@ module.exports = api.error = {
 		    fileLine = options.file.split('/').reverse()[0] + ':' + options.line,
 		    find = api.config.portalServer.uri,
 		    re = new RegExp(find, 'g'),
-		    cleanStack = stack.replace(re, ''),
+		    cleanStack = stack ? stack.replace(re, '') : '',
 		    text = '*Error*: ' + domain + ' `' + fileLine + '` ```' + cleanStack + '```';
 
 		// send error to slack
