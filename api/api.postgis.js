@@ -84,10 +84,14 @@ module.exports = api.postgis = {
 	ensureDatabaseExists : function (options, done) {
 		var userUuid = options.user.uuid;
 
+		console.log('ensureDB');
+
 		User
 		.findOne({uuid : userUuid})
 		.exec(function (err, user) {
 			if (err) return done(err);
+
+			console.log('useR: ', user);
 
 			// if already exists, return
 			if (user.postgis_database) return done(null, options);
