@@ -422,6 +422,12 @@ Wu.Util = {
 		http.send(json);
 	},
 
+
+
+
+
+	
+
 	_getServerUrl : function () {
 		return app.options.servers.portal.slice(0,-1);
 	},

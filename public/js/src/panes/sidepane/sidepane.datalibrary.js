@@ -184,7 +184,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			app.ProgressBar.hideProgress();
 
 			// get file and add to client
-			app.SidePane.DataLibrary._getFile(uploadStatus, app.SidePane.DataLibrary._addFile);
+			app.SidePane.DataLibrary._getFile(uploadStatus, app.SidePane.DataLibrary._gotFile);
 
 		},
 
@@ -225,19 +225,19 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		xhr.send(null);
 	},
 
-	_addFile : function (file) {
+	_gotFile : function (file) {
 		// console.log('_addFile: ', file);
 
 		// add file to lib
-		var lib = app.SidePane.DataLibrary;
-		lib._project.setFile(file);
-		lib.reset();
-		lib.refreshTable({
+		var dlib = app.SidePane.DataLibrary;
+		dlib._project.setFile(file);
+		dlib.reset();
+		dlib.refreshTable({
 			add: [file]
 		});
 
 		// create default layer
-		lib._createDefaultLayer(file);
+		dlib._createDefaultLayer(file);
 
 		// reset progress
 		app.ProgressBar.hideProgress();
@@ -267,6 +267,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// create postgis layer
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
+			console.log('api/db/createLayer', err, layerJSON);
 			var layer = Wu.parse(layerJSON);
 
 			var options = {
