@@ -14,8 +14,6 @@ Wu.Layer = Wu.Class.extend({
 		// data not loaded
 		this.loaded = false;
 
-		console.error('create layer', layer);
-
 	},
 
 	addHooks : function () {
@@ -453,7 +451,6 @@ Wu.Layer = Wu.Class.extend({
 
 	_setGridEvents : function (on) {
 		var grid = this.gridLayer;
-		console.log('grid?', grid, on);
 		if (!grid || !on) return;
 		grid[on]('mousedown', this._gridOnMousedown, this);
 		grid[on]('mouseup', this._gridOnMouseup, this);
@@ -465,7 +462,6 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	_fetchData : function (e, callback) {
-		console.log('fetchData', e);
 
 		var keys = Object.keys(e.data);
 		var column = keys[0];
@@ -483,11 +479,7 @@ Wu.Layer = Wu.Class.extend({
 		Wu.send('/api/db/fetch', options, callback, this);
 	},
 
-	_fetchedData : function (ctx, resp) {
-		console.log('_fetchedData', ctx, resp);
-	},
-
-
+	
 
 	_gridOnMousedown : function(e) {
 		if (!e.data) return;
@@ -572,8 +564,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		// prepare raster
 		this._prepareRaster();
 
-		console.log('PostGIS layer update()');
-
 		// prepare utfgrid
 		this._prepareGrid();
 
@@ -585,7 +575,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 	},
 
 	_getLayerUuid : function () {
-		console.log('this', this);
 		return this.store.data.postgis.layer_id;
 	},
 
@@ -607,16 +596,12 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		var layerUuid = this._getLayerUuid();
 		var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.png' + access_token;
 
-		console.log('url', url);
-
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			layerUuid: this._getLayerUuid(),
 			subdomains : subdomains,
 			maxRequests : 0,
 		});
-
-		console.log('loaded layer: ', this.layer);
 
 		// load grid after all pngs.. (dont remember why..)
 		// Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
@@ -642,14 +627,11 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 	_updateGrid : function (l) {
 
-		console.log('_updateGrid', l);
-
 		// refresh of gridlayer is attached to layer. this because vector tiles are not made in vile.js, 
 		// and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
 		// - also, removed listeners in L.UtfGrid (onAdd)
 		// 
 		if (this.gridLayer) {
-			console.log('this.gridLayer._update()');
 			this.gridLayer._update();
 		}
 	},
