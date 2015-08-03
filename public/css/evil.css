@@ -599,14 +599,14 @@ aka feedback pane
 	fill: rgba(255,255,255,0.5);
 	font-size: 10px; 
 	font-family: helvetica neue;
-}	
+	}
 	
-
-
+.leaflet-popup-content-wrapper {
+  	background: rgba(0, 0, 0, 0.8);	
+	}
 
 .c3-xgrid, .c3-ygrid {
 	stroke-dasharray: 2 2 !important;
-	/*opacity: 0.2 !important;*/
 	stroke: rgba(255,255,255,0.2) !important;
 	}
 
@@ -617,11 +617,17 @@ aka feedback pane
 .c3 path, .c3 line {
 	fill: none;
 	stroke: #fff;
-}	
+	}	
 
 .c3-chart-line {
 	opacity: 1 !important;
-}
+	}
+
+g.c3-event-rects.c3-event-rects-multiple rect{
+	stroke-width: 0.5;
+	stroke: white;
+	}
+
 
 
 
