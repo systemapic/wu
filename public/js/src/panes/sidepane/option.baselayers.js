@@ -265,8 +265,8 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 		}
 
 		var project = app.activeProject;
-		var thumbCreated = project.getThumbCreated(); 			// refactor
-		if (!thumbCreated) project.createProjectThumb();		
+		// var thumbCreated = project.getThumbCreated(); 			// refactor
+		// if (!thumbCreated) project.createProjectThumb();		
 
 	},
 
