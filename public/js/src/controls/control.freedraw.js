@@ -94,9 +94,14 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 			// fetch data
 			this._fetchData({
 				geojson : geojson
-			}, function (a, b) {
+			}, function (err, results) {
 
-				console.log('fetched??!', a, b);
+				var resultObject = Wu.parse(results);
+
+				console.log('fetched results: ', resultObject);
+				console.log('all points: ', resultObject.all);
+				console.log('average: ', resultObject.average);
+
 			});
 
 		}.bind(this));
@@ -114,7 +119,7 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 	},
 
 	_fetchData : function (options, callback) {
-		console.log('fetchData', geojson);
+		console.log('fetchData', options);
 
 		// var keys = Object.keys(e.data);
 		// var column = keys[0];
