@@ -501,6 +501,7 @@ Wu.Layer = Wu.Class.extend({
 		// fetch data
 		this._fetchData(e, function (ctx, json) {
 			var data = JSON.parse(json);
+			console.log('fetched data: ', data);
 			e.data = data;
 			var event = e.e.originalEvent;
 			this._event = {
