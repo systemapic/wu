@@ -487,11 +487,9 @@ Wu.Layer = Wu.Class.extend({
 		// pass layer
 		e.layer = this;
 
-		// add to pending
-		// app.MapPane._addPopupContent(e);
-
 		// fetch data
 		this._fetchData(e, function (ctx, json) {
+			
 			var data = JSON.parse(json);
 			console.log('fetched data: ', data);
 			e.data = data;
@@ -568,7 +566,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		this._prepareGrid();
 
 		// enable
-		if (options) console.log('OPTIONS ==> ', options);
 		if (options && options.enable) {
 			map.addLayer(this.layer);
 		}
@@ -664,7 +661,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 
 	updateStyle : function () {
-		return console.error('updateStyle, remove');
+		return console.error('updateStyle, todo: remove');
 		// set new options and redraw
 		if (this.layer) this.layer.setOptions({
 			cartoid : this.getCartoid(),
