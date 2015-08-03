@@ -105,7 +105,7 @@ L.Popup.include({
 		console.log('upd8!');
 
 		// var _extraWidth = 46;
-		var _extraWidth = 146;
+		var _extraWidth = 216;
 
 
 		var container = this._contentNode,

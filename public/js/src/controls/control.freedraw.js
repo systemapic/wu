@@ -93,7 +93,9 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 
 			// fetch data
 			this._fetchData({
+
 				geojson : geojson
+
 			}, function (err, results) {
 
 				var resultObject = Wu.parse(results);
@@ -101,6 +103,9 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 				console.log('fetched results: ', resultObject);
 				console.log('all points: ', resultObject.all);
 				console.log('average: ', resultObject.average);
+
+				app.MapPane._addPopupContentDraw(resultObject);
+
 
 			});
 

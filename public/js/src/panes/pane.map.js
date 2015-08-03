@@ -933,7 +933,8 @@ Wu.MapPane = Wu.Pane.extend({
 		// var content = d3popup ? this._createPopupContentD3(e) : this._createPopupContent(e);
 		var content = d3popup ? this._createPopupContentC3(e) : this._createPopupContent(e);
 
-		var buffer = '<hr>';
+		// var buffer = '<hr>';
+		var buffer = '';
 
 		// clear old popup
 		this._popup = null;
@@ -1012,6 +1013,13 @@ Wu.MapPane = Wu.Pane.extend({
 
 
 
+
+
+
+
+
+
+
 	_createPopupContentC3 : function (e) {
 
 
@@ -1021,8 +1029,11 @@ Wu.MapPane = Wu.Pane.extend({
 		    meta = layer.getTooltip(),
 		    string = '',		    
 		    d3array = {	
+		    		
 		    		x 	: ['test_x'], 
 		    		y 	: ['test_y'], 
+		    		
+
 		    		ticks 	: []
 		    	};
 
@@ -1066,11 +1077,56 @@ Wu.MapPane = Wu.Pane.extend({
 
 		// Create frickin chart...
 		var _HTML = this.initC3Chart(d3array);
-		return _HTML;
+		
+		var _header = this.initC3Header();
+
+		return _header + _HTML;
 
 
 	},
 
+
+
+
+
+
+	_addPopupContentDraw : function (data) {
+
+
+		var all = data.all;
+		var avg = data.average;
+
+		var d3array = {	
+		    	x 	: ['test_x'], 
+		    	y 	: ['test_y'], 
+		    	ticks 	: []
+		};		
+
+		for (var key in avg) {
+
+			var value   = parseFloat(avg[key]);				
+			var dateStr = key;
+
+			this.c3StackArray(dateStr, value, d3array);
+
+		}
+
+		// Create frickin chart...
+		var _HTML = this.initC3Chart(d3array);
+
+		this._popupContent += 'hello!';
+
+	},
+
+
+
+
+
+
+
+	// CHART HELPER – BUILD ARRAY
+	// CHART HELPER – BUILD ARRAY
+	// CHART HELPER – BUILD ARRAY		
 
 	c3StackArray : function (dateStr, value, d3array) {
 
@@ -1097,15 +1153,33 @@ Wu.MapPane = Wu.Pane.extend({
 
 		}
 		
-
 	},
 
+
+	// CREATE CHART
+	// CREATE CHART
+	// CREATE CHART
+
+
+	initC3Header : function () {
+
+		return '<div id="c3-header">C3 HEADER OF GRAPH!!!</div><br>';
+
+	},
 
 	initC3Chart : function (data) {
 
 		var x = data.x;
 		var y = data.y;
+
 		var t = data.ticks;
+
+
+
+		_columns = [x, y];
+
+
+
 
 		var _C3Container = Wu.DomUtil.createId('div', 'c3-container');	
 
@@ -1115,12 +1189,16 @@ Wu.MapPane = Wu.Pane.extend({
 		        
 
 			size: {
-				height: 240,
-				width: 480
+				height: 300,
+				width: 540
 			},
 
-			grid: { x: { show: true },
-				y: { show: true }
+			point : {
+				r: 3.5
+			},
+
+			grid: { y: { show: true },
+				x: { show: true }
 			},
 
 			legend: {
@@ -1133,12 +1211,11 @@ Wu.MapPane = Wu.Pane.extend({
 		                        'test_y': x[0]
 		                },
 
-		                columns: [ 
-		                        x,
-		                        y 
-		                        ],
+		                columns: _columns,
 
-		                type: 'scatter'
+		                // type: 'scatter',
+		                type: 'spline'
+
 
 		        },
 
@@ -1162,31 +1239,24 @@ Wu.MapPane = Wu.Pane.extend({
 
 
 
-		// console.log('initC3Chart');
-		// console.log('data', data);
-		// console.log('_C3Container', _C3Container);
-
-		// console.log('x', x);
-		// console.log('y', y);
-		// console.log('t', t);
-
-
-		console.log('');
-		console.log('');
-		console.log('_C3Container', _C3Container);
-
 		var _chartObject2HTML = new XMLSerializer().serializeToString(_C3Container);
-		return _chartObject2HTML;		
-		
-		console.log('');
-		console.log('');
-
-
-
-
+		return _chartObject2HTML;
 
 	},
-	
+
+
+
+
+
+	// ****************************************************************************************************************
+	// ****************************************************************************************************************
+	// ****************************************************************************************************************		
+
+
+
+	// "Normal" pop-up
+	// "Normal" pop-up
+	// "Normal" pop-up		
 
 	_createPopupContent : function (e) {
 
@@ -1236,7 +1306,6 @@ Wu.MapPane = Wu.Pane.extend({
 			return string;
 		}
 	},
-
 
 
 
