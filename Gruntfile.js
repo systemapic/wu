@@ -141,6 +141,9 @@ module.exports = function(grunt) {
 					// d3
 					'public/js/lib/d3.js/d3.js',
 
+					// c3
+					'public/js/lib/d3/c3.js',
+
 					// socket.io
 					'/js/lib/socket.io/socket.io.js',
 
@@ -309,7 +312,8 @@ module.exports = function(grunt) {
 					'public/js/lib/codemirror/mode/cartocss/codemirror.carto.css',
 					'public/js/lib/codemirror/mode/cartocss/codemirror.fetta.css',
 					'public/js/lib/codemirror/theme/mbo.css',
-					'public/css/opentip.css'
+					'public/css/opentip.css',
+					'public/js/lib/c3/c3.css'
 				],
 				
 				dest : 'dist/tmp/css.dependencies.css'

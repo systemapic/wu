@@ -101,6 +101,13 @@ L.Popup.include({
 
 	_updateLayout: function () {
 
+
+		console.log('upd8!');
+
+		// var _extraWidth = 46;
+		var _extraWidth = 146;
+
+
 		var container = this._contentNode,
 		    style = container.style;
 
@@ -113,7 +120,8 @@ L.Popup.include({
 		width = Math.min(width, this.options.maxWidth);
 		width = Math.max(width, this.options.minWidth);
 
-		style.width = (width + 46) + 'px';
+		style.width = (width + _extraWidth) + 'px';
+
 		style.whiteSpace = '';
 
 		style.height = '';
@@ -131,7 +139,7 @@ L.Popup.include({
 
 		this._containerWidth = this._container.offsetWidth;
 
-		parent_container.style.width = (width + 46) + 'px';
+		parent_container.style.width = (width + _extraWidth) + 'px';
 	}
 
 });
