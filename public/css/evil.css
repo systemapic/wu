@@ -601,3 +601,28 @@ aka feedback pane
 	font-family: helvetica neue;
 }	
 	
+
+
+
+.c3-xgrid, .c3-ygrid {
+	stroke-dasharray: 2 2 !important;
+	/*opacity: 0.2 !important;*/
+	stroke: rgba(255,255,255,0.2) !important;
+	}
+
+.c3 text { 
+	fill: white;
+	}	
+
+.c3 path, .c3 line {
+	fill: none;
+	stroke: #fff;
+}	
+
+.c3-chart-line {
+	opacity: 1 !important;
+}
+
+
+
+
