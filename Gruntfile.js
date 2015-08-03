@@ -185,7 +185,8 @@ module.exports = function(grunt) {
 
 					// extra
 					'public/js/lib/opentip/opentip-native.js',
-					'public/js/lib/jss.js/jss.js'			
+					'public/js/lib/jss.js/jss.js',	
+					'public/js/lib/keymaster/keymaster.js'		
 
 				],
 				
@@ -258,6 +259,7 @@ module.exports = function(grunt) {
 					'public/js/src/controls/control.tooltip.js',
 					'public/js/src/controls/control.style.js',
 					'public/js/src/controls/control.spinningmap.js',
+					'public/js/src/controls/control.freedraw.js',
 
 					// Models 
 					'public/js/src/models/model.projects.js',
