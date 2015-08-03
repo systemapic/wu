@@ -59,9 +59,7 @@ Wu.Project = Wu.Class.extend({
 		if (!layers) return;
 
 		// create
-		console.log('initLayers');
 		layers.forEach(function (layer) {
-			console.log('init>', layer);
 			var wuLayer =  new Wu.createLayer(layer);
 			if (wuLayer) this.layers[layer.uuid] = wuLayer;
 		}, this);
@@ -74,7 +72,6 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	addLayer : function (layer) {
-		console.log('addLayer: ', layer);
 		var l = new Wu.createLayer(layer);
 		if (l) this.layers[layer.uuid] = l;
 		return l || false;
