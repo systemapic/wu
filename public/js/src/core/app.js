@@ -117,8 +117,14 @@ Wu.App = Wu.Class.extend({
 		// create app container
 		this._initContainer();
 
+		// init chrome
+		this._initChrome();
+
 		// create panes
 		this._initPanes();
+
+		// init tools
+		this._initTools();
 
 		// init pane view
 		this._initView();
@@ -161,6 +167,17 @@ Wu.App = Wu.Class.extend({
 		}, this);
 	},
 
+	_initChrome : function () {
+		this.Chrome = {};
+
+		// top chrome
+		this.Chrome.Top = new Wu.Chrome.Top();
+
+		// right chrome
+		this.Chrome.Right = new Wu.Chrome.Right();
+
+	},
+
 	_initPanes : function () {
 
 		// render tooltip
@@ -200,13 +217,17 @@ Wu.App = Wu.Class.extend({
 		// render eror pane
 		this.FeedbackPane = new Wu.FeedbackPane();
 
+		
+	},
+
+	_initTools : function () {
+
 		// init tools
 		this.Tools = {};
 		this.Tools.FreeDraw = new Wu.Tool.FreeDraw({
 			map : this.MapPane._map
 		});
 	
-
 	},
 
 	// init default view on page-load
