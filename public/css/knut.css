@@ -493,7 +493,7 @@ body {
 	}
 
 .leaflet-top.leaflet-right {
-	position: fixed;
+	/*position: fixed;*/
 	bottom: 5px;
 	right: 5px;
 	top: initial;

@@ -1,0 +1,41 @@
+.chrome{
+} 
+.chrome-container {
+} 
+
+.chrome-top {
+    background: white;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 40px;
+    width: 150px;
+}
+
+.chrome-button.cartoeditor {
+    position: relative;
+    background: red;
+    width: 30px;
+    height: 30px;
+}
+
+.chrome-right {
+    background: yellow;
+    position: absolute;
+    right: 0;
+    top: 40px;
+    height: 100%;
+    width:0;
+}
+
+
+/*ADJUSTMENTS TO EXISITNG ELEMENTS*/
+.leaflet-control-layermenu.leaflet-control {
+	top: 42px;
+}
+#open-layers {
+	display: none;
+}
+#bhattan1 {
+	display: none;
+}
