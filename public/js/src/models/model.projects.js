@@ -538,6 +538,22 @@ Wu.Project = Wu.Class.extend({
 		return _.toArray(this.layers);
 	},
 
+	getPostGISLayers : function () {
+		return _.filter(this.layers, function (l) {
+			if (!l) return false;
+			if (!l.store.data) return false;
+			return l.store.data.postgis;
+		});
+	},
+
+	// debug
+	getDeadLayers : function () {
+		return _.filter(this.layers, function (l) {
+			if (!l) return true;
+			return l.store.data == null;
+		});
+	},
+
 	getActiveLayers : function () {
 
 		// get all layers in project
