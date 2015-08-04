@@ -586,8 +586,12 @@ aka feedback pane
 
 
 
+
+
+
 /*D3 SVG*/
-.axis line,
+
+/*.axis line,
 .axis path {
     fill: none;
     stroke: rgba(255,255,255,0.2);
@@ -600,7 +604,38 @@ aka feedback pane
 	font-size: 10px; 
 	font-family: helvetica neue;
 	}
-	
+	*/
+
+
+#c3-header-metacontainer {
+	margin-right: 0;
+	margin-left: 0;
+	margin-bottom: 20px;
+	}
+
+.c3-header-metapair {
+	display: inline-block;
+	vertical-align: top;
+	text-align: center;
+	font-size: 11px;
+	font-weight: 900;
+	background: rgba(255,255,255,0.1);
+	margin: 1px;
+	border: 1px solid rgba(255,255,255,0.4);
+	}
+
+.c3-header-metakey {
+	padding: 0px 3px 1px 3px;
+	background: rgba(255,255,255,0.4);
+	color: black;
+	}
+
+.c3-header-metaval {
+ 	padding: 0px 3px 1px 3px;
+ 	}
+
+
+
 .leaflet-popup-content-wrapper {
   	background: rgba(0, 0, 0, 0.8);	
 	}
@@ -612,11 +647,12 @@ aka feedback pane
 
 .c3 text { 
 	fill: white;
+  	font-size: 12px;	
 	}	
 
 .c3 path, .c3 line {
+	stroke: white;
 	fill: none;
-	stroke: #fff;
 	}	
 
 .c3-chart-line {
@@ -630,5 +666,9 @@ g.c3-event-rects.c3-event-rects-multiple rect{
 
 
 
+.c3-target-avgX {
+	stroke-width: 2px;
+	stroke: white;
+}
 
 
