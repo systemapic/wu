@@ -105,6 +105,8 @@ L.Popup.include({
 		console.log('upd8!');
 
 		// var _extraWidth = 46;
+
+		// Additional adjustment for FRANO		
 		var _extraWidth = 216;
 
 
@@ -129,6 +131,11 @@ L.Popup.include({
 		var height = container.offsetHeight,
 		    maxHeight = this.options.maxHeight,
 		    scrolledClass = 'leaflet-popup-scrolled';
+
+
+		// Additional adjustment for FRANO
+		maxHeight += 65;
+
 
 		if (maxHeight && height > maxHeight) {
 			style.height = maxHeight + 'px';
