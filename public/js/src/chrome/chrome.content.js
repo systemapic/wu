@@ -63,29 +63,29 @@ Wu.Chrome.Content.StyleEditor = Wu.Chrome.Content.extend({
 
 		// content, tabs
 		this._content = Wu.DomUtil.create('div', 'chrome chrome-content styleditor content', this._container);
-		this._tabsContainer = Wu.DomUtil.create('div', 'chrome chrome-content styleditor tabs', this._content);
-		this._tabsContent = Wu.DomUtil.create('div', 'chrome chrome-content styleditor tabs', this._content);
+		this._tabsContainer = Wu.DomUtil.create('div', 'chrome chrome-content styleditor tabs-container', this._content);
+		this._tabsContent = Wu.DomUtil.create('div', 'chrome chrome-content styleditor tabs-content', this._content);
 
 		// tabs
 		this._tabs = {};
-		this._tabs.auto = Wu.DomUtil.create('div', 'chrome chrome-content styleditor tab fullauto', this._tabsContainer);
-		this._tabs.carto = Wu.DomUtil.create('div', 'chrome chrome-content styleditor tab cartocss', this._tabsContainer);
-		this._tabs.sql = Wu.DomUtil.create('div', 'chrome chrome-content styleditor tab sql', this._tabsContainer);
+		this._tabs.presets = Wu.DomUtil.create('div', 'chrome chrome-content styleditor tab fullauto', this._tabsContainer, 'Presets');
+		this._tabs.carto = Wu.DomUtil.create('div', 'chrome chrome-content styleditor tab cartocss', this._tabsContainer, 'CartoCSS');
+		this._tabs.sql = Wu.DomUtil.create('div', 'chrome chrome-content styleditor tab sql', this._tabsContainer, 'SQL');
 		
 		// tab content
 		this._tabContent = {};
-		this._tabContent.auto = this._createAuto();
+		this._tabContent.presets = this._createPresets();
 		this._tabContent.carto = this._createCarto();
 		this._tabContent.sql = this._createSql();
 
 		// default open
-		this._openAuto();
+		this._openPresets();
 	},
 
 	addEvents : function () {
 
 		// click events on tabs
-		Wu.DomEvent.on(this._tabs.auto, 'click', this._openAuto, this);
+		Wu.DomEvent.on(this._tabs.presets, 'click', this._openPresets, this);
 		Wu.DomEvent.on(this._tabs.carto,'click', this._openCarto, this);
 		Wu.DomEvent.on(this._tabs.sql,  'click', this._openSql, this);
 	},
@@ -98,21 +98,461 @@ Wu.Chrome.Content.StyleEditor = Wu.Chrome.Content.extend({
 		}
 	},
 
-	_createAuto : function () {
-		var container = Wu.DomUtil.create('div', 'chrome chrome-content styleeditor tab-content fullauto', this._tabsContent, 'tab auto');
-			
 
 
-		return container;
+	_defaultPresets : {
+
+		// sar data
+		sar : {
+
+			markers : {
+
+				opacity : {
+					column : 'coherence',
+					range : [0, 1] 		// last number = opacity: 1
+				},
+
+				size : {
+					column : 'vel',
+					range : [0, -100]
+				},
+
+				color : {
+					column : 'vel',
+					scale : []
+				}
+			},
+
+		}
 	},
 
+	_scales : {
+
+	},
+
+
+	_createPresets : function () {
+
+
+		var presets = {};
+
+		presets._container = Wu.DomUtil.create('div', 'chrome chrome-content styleeditor tab-content presets', this._tabsContent, 'tab auto');
+
+		presets._content = Wu.DomUtil.create('div', 'presets-wrapper', presets._container)
+
+		// presets:
+		presets._presets = {};
+
+
+
+		// 1. default
+		presets._presets.default = {};
+		presets._presets.default._container = Wu.DomUtil.create('div', 'presets-container default', presets._content);
+		var image = Wu.DomUtil.create('div', 'presets-container-image default', presets._presets.default._container);
+		var title = Wu.DomUtil.create('div', 'presets-container-title default', presets._presets.default._container, 'default');
+
+		// event
+		Wu.DomEvent.on(presets._presets.default._container, 'click', function () {
+			console.log('def click');
+		}, this);
+
+
+
+
+		// 2. cloropleth
+		presets._presets.cloropleth = {};
+		presets._presets.cloropleth._container = Wu.DomUtil.create('div', 'presets-container cloropleth', presets._content);
+		var image = Wu.DomUtil.create('div', 'presets-container-image cloropleth', presets._presets.cloropleth._container);
+		var title = Wu.DomUtil.create('div', 'presets-container-title cloropleth', presets._presets.cloropleth._container, 'CLOROPLETH');
+
+		// event
+		Wu.DomEvent.on(presets._presets.cloropleth._container, 'click', function () {
+			console.log('cloro click');
+		}, this);
+
+
+
+
+
+		this._selectors = [];
+
+		// default values
+		var selector_1 = {
+			column : 'vel', // ie. for color
+			color : 'red-to-green',
+
+			marker_width : 'vel',
+			marker_zoom_scale : true,
+			opacity : 'coherence'
+		};
+
+		this._selectors.push(selector_1);
+
+
+		var dummyColumns = [
+			{
+				text : 'coherence', 
+			},
+			{
+				text : 'vel', 
+			},
+			{
+				text : 'height', 
+			},
+			{
+				text : 'north', 
+			},
+		];
+
+
+		// selectors
+		var selectors_wrapper = Wu.DomUtil.create('div', 'selectors-wrapper', presets._container);
+
+		// column selector
+		var column_selector = Wu.DomUtil.create('div', 'styleeditor selector-wrapper column', selectors_wrapper);
+		var column_text = Wu.DomUtil.create('div', 'styleeditor selector-text column', column_selector, 'Column');
+		var dropdown = Wu.DomUtil.create('select', 'styleeditor dropdown', column_selector);
+		
+		dummyColumns.forEach(function (d) {
+			var op = new Option();
+			op.value = d.text;
+			op.text = d.text;
+			dropdown.options.add(op);  
+		});
+
+		// todo: select default value
+
+
+		Wu.DomEvent.on(dropdown, 'change', function (s) { // todo: this leaks!
+			console.log('select!', s);
+			var i = s.target.options.selectedIndex;
+			console.log('s.valu', i); 
+			var value = s.target.options[s.target.selectedIndex].value;
+			console.log('value: ', value); // ok
+
+			selector_1.column = value;
+
+			this._renderPreset();
+
+		}, this);
+
+
+		var dummyColors = [
+			{
+				text : 'red-to-green',
+			},
+			{
+				text : 'green-to-blue',
+			}
+		]
+
+
+		// color ramp selector
+		// column selector
+		var color_selector = Wu.DomUtil.create('div', 'styleeditor selector-wrapper color', selectors_wrapper);
+		var color_text = Wu.DomUtil.create('div', 'styleeditor selector-text color', color_selector, 'Color ramp');
+		var dropdown2 = Wu.DomUtil.create('select', 'styleeditor dropdown', color_selector);
+		
+		dummyColors.forEach(function (d) {
+			var op = new Option();
+			op.value = d.text;
+			op.text = d.text;
+			dropdown2.options.add(op);  
+		});
+
+		Wu.DomEvent.on(dropdown2, 'change', function (s) { // todo: this leaks!
+			console.log('selectcolor!', s);
+			var i = s.target.options.selectedIndex;
+			console.log('s.valu c', i); 
+			var value = s.target.options[s.target.selectedIndex].value;
+			console.log('value c: ', value); // ok
+
+			selector_1.color = value;
+
+			this._renderPreset();
+		}, this);
+		  
+
+
+		var dummyMarkerwidth = [
+			1, 2, 3, 4, 5, 6, 7, 'vel', 'coherence', 'height'
+		]
+
+
+
+		// marker width selector
+		var mwidth_selector = Wu.DomUtil.create('div', 'styleeditor selector-wrapper marker-width', selectors_wrapper);
+		var color_text = Wu.DomUtil.create('div', 'styleeditor selector-text marker-width', mwidth_selector, 'Marker width');
+		var dropdown3 = Wu.DomUtil.create('select', 'styleeditor dropdown', mwidth_selector);
+		
+		dummyMarkerwidth.forEach(function (d) {
+			var op = new Option();
+			op.value = d;
+			op.text = d;
+			dropdown3.options.add(op);  
+		});
+
+		Wu.DomEvent.on(dropdown3, 'change', function (s) { // todo: this leaks!
+			console.log('selectcolor!', s);
+			var i = s.target.options.selectedIndex;
+			console.log('s.valu c', i); 
+			var value = s.target.options[s.target.selectedIndex].value;
+			console.log('value c: ', value); // ok
+
+			selector_1.marker_width = value;
+
+			this._renderPreset();
+		}, this);
+
+
+
+
+
+
+
+
+		// marker width zoom scale checkbox
+		var mscale_selector = Wu.DomUtil.create('div', 'styleeditor selector-wrapper marker-width', selectors_wrapper);
+		var color_text = Wu.DomUtil.create('div', 'styleeditor selector-text marker-width', mscale_selector, 'Scale marker width to zoom?');
+
+		// scale marker width to zoom
+		var checkbox = document.createElement('input');
+		checkbox.type = "checkbox";
+		checkbox.name = "checkbox-marker-width-scale";
+		checkbox.value = "checkbox-marker-width-scale";
+		checkbox.id = "checkbox-marker-width-scale";
+
+		mscale_selector.appendChild(checkbox);
+
+		Wu.DomEvent.on(checkbox, 'click', function () {
+			var value = checkbox.checked;
+			console.log('checkbox clicked!', value); // true/false
+
+			selector_1.marker_zoom_scale = value;
+
+			this._renderPreset();
+
+		}, this);
+
+
+
+
+
+
+
+
+
+
+
+		// opacity selector
+		var opacity_selector = Wu.DomUtil.create('div', 'styleeditor selector-wrapper marker-width', selectors_wrapper);
+		var color_text = Wu.DomUtil.create('div', 'styleeditor selector-text marker-width', opacity_selector, 'Marker opacity');
+		var dropdown4 = Wu.DomUtil.create('select', 'styleeditor dropdown', opacity_selector);
+		
+		dummyMarkerwidth.forEach(function (d) {
+			var op = new Option();
+			op.value = d;
+			op.text = d;
+			dropdown4.options.add(op);  
+		});
+
+		Wu.DomEvent.on(dropdown4, 'change', function (s) { // todo: this leaks!
+			console.log('selectcolor!', s);
+			var i = s.target.options.selectedIndex;
+			console.log('s.valu c', i); 
+			var value = s.target.options[s.target.selectedIndex].value;
+			console.log('value c: ', value); // ok
+
+			selector_1.opacity = value;
+
+			this._renderPreset();
+		}, this);
+
+
+
+		// // create dropdown
+		// var dropdown = this._createDropdown({
+		// 	clickFn : function (entry) {
+		// 		console.log('you cliked -> entry', entry);
+		// 	},
+
+		// 	title : 'Column',
+
+		// 	entries : [
+		// 		{
+		// 			text : 'Entry1',
+		// 		},
+		// 		{
+		// 			text : 'Entry2',
+		// 		},
+		// 		{
+		// 			text : 'Entry3',
+		// 		},
+		// 		{
+		// 			text : 'Entry4',
+		// 		}
+		// 	],
+
+		// 	appendTo : selectors_wrapper
+		// });
+
+
+
+
+
+
+
+		// abilities:
+		//
+		// 	set opacity by [vel] (ie. [column])	
+		// 	set color scale by [column]
+		// 	set marker size by [column]
+
+		// 	vars needed (markers):
+		//	@width_value -> base value, will be multiplied by zoom level factor 
+
+
+		// @width_value : 1;
+
+		// [zoom<13] {
+		//     marker-width: @width_value * 0.5;
+		// }
+		// [zoom=13] {
+		//   marker-width: @width_value * 1;
+		// }
+		// [zoom=14] {
+		//   marker-width: @width_value * 2;
+		// }
+		// [zoom=15] {
+		//     marker-width: @width_value * 4;
+		// }
+		// [zoom=16] {
+		//     marker-width: @width_value * 8;
+		// }
+		// [zoom=17] {
+		//     marker-width: @width_value * 12;
+		// }
+		// [zoom=18] {
+		//     marker-width: @width_value * 20;
+		// }
+		// [zoom>18] {
+		//     marker-width: @width_value * 24;
+		// }
+		// 
+
+
+		// scale - for å lage steps
+		// // #################################################
+		// // scale calcs per [var]
+		// // todo: insert max, min from meta
+		// // --
+		// // scale by velocity
+		// @scale_column_vel : [vel];
+		// @scale_max_vel : -50; // height_max
+		// @scale_min_vel : -200;  // height_min
+
+		// // calc steps velocity, n steps
+		// @delta_vel   : (@scale_max_vel - @scale_min_vel)/10;
+		// @step_1_vel  : @scale_min_vel;
+		// @step_2_vel  : @scale_min_vel + @delta_vel;
+		// @step_3_vel  : @scale_min_vel + (@delta_vel * 2);
+		// @step_4_vel  : @scale_min_vel + (@delta_vel * 3);
+		// @step_5_vel  : @scale_min_vel + (@delta_vel * 4);
+		// @step_6_vel  : @scale_min_vel + (@delta_vel * 5);
+		// @step_7_vel  : @scale_min_vel + (@delta_vel * 6);
+		// @step_8_vel  : @scale_min_vel + (@delta_vel * 7);
+		// @step_9_vel  : @scale_min_vel + (@delta_vel * 8);
+		// @step_10_vel : @scale_min_vel + (@delta_vel * 9);
+		// // ####################################################
+
+
+
+
+		// // color scale
+		// @color_1_vel :  #2f00ff;
+		// @color_2_vel :  #003dff;
+		// @color_3_vel :  #009eff;
+		// @color_4_vel :  #00ffdf;
+		// @color_5_vel :  #00ffa9;
+		// @color_6_vel :  #a5ff00;
+		// @color_7_vel :  #ffd700;
+		// @color_8_vel :  #ff8100;
+		// @color_9_vel :  #ff3600;
+		// @color_10_vel :  #ff0000;
+
+
+
+
+
+
+		// // ####################################   må ligge i Layer {}
+		//   // SCALE TEMPLATE, per [var]
+		//   // ..
+		//   // color
+		//   [@scale_column_vel < @step_2_vel] {
+		//       marker-fill: @color_1_vel;
+		//   }
+
+		//   [@scale_column_vel > @step_2_vel][@scale_column_vel < @step_3_vel] {
+		//       marker-fill: @color_2_vel;
+		//   }
+
+		//    [@scale_column_vel > @step_3_vel][@scale_column_vel < @step_4_vel] {
+		//       marker-fill: @color_3_vel;
+		//   }
+
+		//    [@scale_column_vel > @step_4_vel][@scale_column_vel < @step_5_vel] {
+		//       marker-fill: @color_4_vel;
+		//   }
+
+		//    [@scale_column_vel > @step_5_vel][@scale_column_vel < @step_6_vel] {
+		//       marker-fill: @color_5_vel;
+		//   }
+
+		//    [@scale_column_vel > @step_6_vel][@scale_column_vel < @step_7_vel] {
+		//       marker-fill: @color_6_vel
+		//   }
+
+		//    [@scale_column_vel > @step_7_vel][@scale_column_vel < @step_8_vel] {
+		//       marker-fill: @color_7_vel;
+		//   }
+
+		//    [@scale_column_vel > @step_8_vel][@scale_column_vel < @step_9_vel] {
+		//       marker-fill: @color_8_vel;
+		//   }
+
+		//    [@scale_column_vel > @step_9_vel][@scale_column_vel < @step_10_vel] {
+		//       marker-fill: @color_9_vel;
+		//   }
+
+		//    [@scale_column_vel > @step_10_vel] {
+		//       marker-fill: @color_10_vel;
+		//   }
+		//   // ############################################################
+
+
+		return presets;
+	},
+
+
+	_renderPreset : function () {
+
+		console.log('_rendeRPRes', this._selectors);
+
+	},
+
+
+
 	_createCarto : function () {
-		var container = Wu.DomUtil.create('div', 'chrome chrome-content styleeditor tab-content cartocss', this._tabsContent, 'tab carto');
+
+		var carto = {}
+
+		carto._container = Wu.DomUtil.create('div', 'chrome chrome-content styleeditor tab-content cartocss', this._tabsContent, 'tab carto');
 	
-		var inputArea = Wu.DomUtil.create('input', 'chrome chrome-content styleditor cartoss inputarea', container);
+		carto._input = Wu.DomUtil.create('input', 'chrome chrome-content styleditor cartoss inputarea', carto._container);
 
 		// create codemirror (overkill?)
-		this._codeMirror = CodeMirror.fromTextArea(inputArea, {
+		carto._codeMirror = CodeMirror.fromTextArea(carto._input, {
     			lineNumbers: true,    			
     			matchBrackets: true,
     			lineWrapping: true,
@@ -125,33 +565,40 @@ Wu.Chrome.Content.StyleEditor = Wu.Chrome.Content.extend({
   		});
 
 		// debug
-  		this._codeMirror.setValue('asdlkmasdl');
+  		carto._codeMirror.setValue('asdlkmasdl');
 
 
+  		// debug button
+  		var button = Wu.DomUtil.create('div', 'debug-button', carto._container, 'Render style');
+  		button.onclick = function () {
+  			console.log('render sytle!');
+  		}
 
-		return container;
+		return carto;
 	},
 
 	_createSql : function () {
-		var container = Wu.DomUtil.create('div', 'chrome chrome-content styleeditor tab-content sql', this._tabsContent, 'tab sql');
+
+		var sql = {}
+		sql._container = Wu.DomUtil.create('div', 'chrome chrome-content styleeditor tab-content sql', this._tabsContent, 'tab sql');
 		
-		this._sqlInput = Wu.DomUtil.create('textarea', 'chrome chrome-content styleeditor tab-content sql-input', container);
-		this._sqlInput.placeholder = 'Insert your SQL statement (using table as magic keyword)';
+		sql._input = Wu.DomUtil.create('textarea', 'chrome chrome-content styleeditor tab-content sql-input', sql._container);
+		sql._input.placeholder = 'Insert your SQL statement (using table as magic keyword)';
 
 
-		return container;
+		return sql;
 	},
 
-	_openAuto : function () {
+	_openPresets : function () {
 		
 		// reset
 		this._closeAllTabs();
 
 		// open this
-		Wu.DomUtil.addClass(this._tabs.auto, 'open');
+		Wu.DomUtil.addClass(this._tabs.presets, 'open');
 
 		// add content
-		this._tabContent.auto.style.display = 'block';
+		this._tabContent.presets._container.style.display = 'block';
 
 		// add subtitle
 		this._subtitle.innerHTML = 'One-click magick'
@@ -166,7 +613,7 @@ Wu.Chrome.Content.StyleEditor = Wu.Chrome.Content.extend({
 		Wu.DomUtil.addClass(this._tabs.carto, 'open');
 
 		// add content
-		this._tabContent.carto.style.display = 'block';
+		this._tabContent.carto._container.style.display = 'block';
 
 		// add subtitle
 		this._subtitle.innerHTML = 'Manually edit CartoCSS'
@@ -181,7 +628,7 @@ Wu.Chrome.Content.StyleEditor = Wu.Chrome.Content.extend({
 		Wu.DomUtil.addClass(this._tabs.sql, 'open');
 
 		// show content
-		this._tabContent.sql.style.display = 'block';
+		this._tabContent.sql._container.style.display = 'block';
 
 		// add subtitle
 		this._subtitle.innerHTML = 'Query your data with SQL'
@@ -195,7 +642,7 @@ Wu.Chrome.Content.StyleEditor = Wu.Chrome.Content.extend({
 
 		// hide all content
 		for (var t in this._tabContent) {
-			this._tabContent[t].style.display = 'none';
+			this._tabContent[t]._container.style.display = 'none';
 		}
 	},
 
