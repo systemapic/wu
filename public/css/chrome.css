@@ -1,22 +1,28 @@
+
 .chrome{
 } 
 .chrome-container {
+    
 } 
-
+/*for light-theme: styling top container to be consistent with the rest og the interface*/
 .chrome-top {
-    background: white;
+    background: rgba(255, 255, 255, 0.93);
     position: absolute;
     right: 0;
     top: 0;
-    height: 40px;
+    height: 30px;
     width: 150px;
 }
 
 .chrome-button.cartoeditor {
+    background-image: url(images/expand-right-8x.png);
+    background-repeat: no-repeat;
+    background-size: 30px 30px;
     position: relative;
-    background: red;
     width: 30px;
     height: 30px;
+    float: right;
+    margin-right: 5px;
 }
 
 .chrome-right {
@@ -31,11 +37,11 @@
 
 /*ADJUSTMENTS TO EXISITNG ELEMENTS*/
 .leaflet-control-layermenu.leaflet-control {
-	top: 42px;
+    top: 42px;
 }
 #open-layers {
-	display: none;
+    display: none;
 }
 #bhattan1 {
-	display: none;
+    display: none;
 }

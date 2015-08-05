@@ -21,7 +21,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._buttons = Wu.DomUtil.create('div', 'chrome-buttons', this._container);
 
 		// create button for carto editor
-		this._cartoeditorBtn = Wu.DomUtil.create('div', 'chrome-button cartoeditor', this._buttons, 'style');
+		// this._cartoeditorBtn = Wu.DomUtil.create('div', 'chrome-button cartoeditor', this._buttons, 'style');
+		this._cartoeditorBtn = Wu.DomUtil.create('div', 'chrome-button cartoeditor', this._buttons);
 
 		// add more buttons here at will
 		// ...
