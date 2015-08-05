@@ -4,6 +4,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 	options : {
 		defaultWidth : 400,
+		
 	},
 
 	_initialize : function () {
@@ -21,8 +22,10 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		// create the container (just a div to hold errythign)
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-right', app._appPane);
 
-		// create a container to hold the editor
-		this._cartoEditorContainer = Wu.DomUtil.create('div', 'chrome-content cartoeditor', this._container);
+		// create the style editor
+		this._styleEditor = new Wu.Chrome.Content.StyleEditor({
+			appendTo : this._container
+		});
 
 		// create other containers for other type content
 		// ...

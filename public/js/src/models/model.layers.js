@@ -94,6 +94,11 @@ Wu.Layer = Wu.Class.extend({
 
 		this._added = true;
 
+		// fire event
+		Wu.Mixin.Events.fire('layerEnabled', { detail : {
+			layer : this
+		}}); 
+
 	},
 
 	addToControls : function () {
