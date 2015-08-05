@@ -93,9 +93,11 @@ Wu.Chrome.Content.StyleEditor = Wu.Chrome.Content.extend({
 	_layerEnabled 	 : function (layer) {
 		console.log('alyer enabled!', layer);
 
-		if (this._layer) {
-			this._layer = layer;
-		}
+		// if (this._layer) {
+		// 	this._layer = layer;
+		// }
+
+		this._layer = layer;
 	},
 
 

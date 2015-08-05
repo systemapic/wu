@@ -383,7 +383,7 @@ module.exports = api.postgis = {
 		// get extent
 		ops.push(function (callback) {
 
-			var query = 'SELECT ST_Extent(the_geom_4326) FROM ' + file_id
+			var query = 'SELECT ST_Extent(the_geom_4326) FROM ' + file_id;
 
 			api.postgis.query({
 				postgis_db : postgis_db,
@@ -407,6 +407,109 @@ module.exports = api.postgis = {
 
 				callback(null);
 			});	
+		});
+
+		// get min/max of all fields
+		ops.push(function (callback) {
+
+
+			// var query = 'SELECT ST_Extent(the_geom_4326) FROM ' + file_id
+
+			var query = 'SELECT * FROM ' + file_id + ' LIMIT 1';
+
+			api.postgis.query({
+				postgis_db : postgis_db,
+				query : query
+			}, function (err, results) {
+				console.log('get all columns');
+				console.log('err, results', err, results);
+
+				var rows = results.rows[0];
+
+				var columns = [];
+
+				for (var r in rows) {
+					if (r != 'geom' && r != 'the_geom_3857' && r != 'the_geom_4326') {
+						columns.push(r);
+					}
+				}
+
+				console.log('COLUMNS -==> ', columns);
+
+				// metadata.columns = columns;
+
+				// callback();
+
+				var min_max_values = {};
+				var jobs = [];
+
+				columns.forEach(function (column) {
+
+					min_max_values[column] = {
+						min : 0,
+						max : 0
+					};
+
+					jobs.push(function (done) {
+						
+						// get max values
+
+						// do sql query on postgis
+						var MAX_SCRIPT = '../scripts/postgis/get_max_of_column.sh'; 
+
+						// st_extent script 
+						var command = [
+							MAX_SCRIPT, 	// script
+							postgis_db, 	// database name
+							file_id,	// table name
+							column
+						].join(' ');
+
+
+						// create database in postgis
+						exec(command, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+							if (err) return done(null);
+
+							var json = stdout.split('\n')[2];
+
+							console.log('json', json);
+
+							var data = JSON.parse(json);
+							
+							console.log('minmax data: ', data);
+
+							min_max_values[column] = data;
+
+							// callback
+							done(null, data);
+						});
+
+
+					});	
+
+
+
+				});
+
+
+				async.parallel(jobs, function (err, values) {
+					console.log('DONEDONEDONE! min_max_values', min_max_values);
+
+					metadata.columns = min_max_values;
+
+					callback(null);
+				});
+
+
+				
+
+			
+
+
+			});
+
+			
+
 		});
 
 		// todo: get fields for cartocss pro-tips
