@@ -391,6 +391,9 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	setStyle : function (postgis) {
+		console.log('set style -> postgis: ', postgis);
+		if (!postgis) return console.error('no styloe to set!');
+		
 		this.store.data.postgis = postgis;
 		this.save('data');
 	},
@@ -665,13 +668,13 @@ Wu.PostGISLayer = Wu.Layer.extend({
 	},
 
 
-	updateStyle : function () {
-		return console.error('updateStyle, todo: remove');
-		// set new options and redraw
-		if (this.layer) this.layer.setOptions({
-			cartoid : this.getCartoid(),
-		});
-	},
+	// updateStyle : function () {
+	// 	return console.error('updateStyle, todo: remove');
+	// 	// set new options and redraw
+	// 	if (this.layer) this.layer.setOptions({
+	// 		cartoid : this.getCartoid(),
+	// 	});
+	// },
 
 
 });

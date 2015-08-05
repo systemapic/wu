@@ -48,7 +48,7 @@
     font-size: 16px;
     padding: 5px;
 }
-.chrome.chrome-content.styleditor.tabs {
+.chrome.chrome-content.styleditor.tabs-container {
     height: 30px;
     width: 100%;
     background: #AAFFAA;
@@ -76,11 +76,38 @@
 }
 
 
+.presets-container {
+    width: 100px;
+    height: 100px;
+    border-radius: 4px;
+    border: 1px solid black;
+    position: relative;
+    margin: 10px;
+    float: right;
+}
 
+.presets-container-title {
+    bottom: 0;
+    position: absolute;
+}
 
+.presets-wrapper {
+    height: 150px;
+}
 
+.styleeditor.selector-text {
+    width: 60%;
+    float: left;
+}
 
+.dropdown.wrapper {
+    float: left;
+    width: 40%;
+}
 
+#checkbox-marker-width-scale {
+    display: block;
+}
 
 
 /*ADJUSTMENTS TO EXISITNG ELEMENTS*/

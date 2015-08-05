@@ -1184,6 +1184,13 @@ L.Control.Cartocss = Wu.Control.extend({
 			// new layer
 			var newLayerStyle = Wu.parse(newLayerJSON);
 
+			console.log('newLayerJSON', newLayerStyle);
+
+			if (newLayerStyle.error) {
+				done();
+				return console.error(newLayerStyle.error);
+			}
+
 			layer.setStyle(newLayerStyle.options);
 
 			layer.update({enable : true});
