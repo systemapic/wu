@@ -952,6 +952,9 @@ L.Control.Layermenu = Wu.Control.extend({
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 
+		console.log('flying!', layerItem);
+		this.flyTo(layer);
+
 	},
 
 	// disable by layermenuItem
@@ -978,6 +981,25 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// remove active class
 		Wu.DomUtil.removeClass(layermenuItem.el, 'layer-active');
+	},
+
+	flyTo : function (layer) {
+		if (!layer) return;
+
+		var extent = layer.getMeta().extent;
+		if (!extent) return;
+
+		var southWest = L.latLng(extent[1], extent[0]),
+		    northEast = L.latLng(extent[3], extent[2]),
+		    bounds = L.latLngBounds(southWest, northEast);
+
+		// fly
+		var map = app._map;
+		map.fitBounds(bounds);
+
+		// Google Analytics event tracking
+		// app.Analytics.setGaEvent(['Controls', 'Inspect layers: Fly to bounds for > ' + layer.getTitle()]);
+
 	},
 
 	_getLayermenuItem : function (layerUuid) {
