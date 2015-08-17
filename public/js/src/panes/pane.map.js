@@ -932,6 +932,8 @@ Wu.MapPane = Wu.Pane.extend({
 		// clear old popup
 		this._popup = null;
 
+		console.log('pop 2');
+
 		// return if no content
 		if (!content) return;
 		
@@ -945,6 +947,8 @@ Wu.MapPane = Wu.Pane.extend({
 
 		// append content
 		this._popupContent += content;
+
+		this.openPopup(e);
 
 	},
 
@@ -1422,6 +1426,7 @@ Wu.MapPane = Wu.Pane.extend({
 		var d3array = [];
 
 		if (meta) {
+			console.log('got meta 1');
 			if (meta.title) string += '<div class="tooltip-title-small">' + meta.title + '</div>';
 
 			// add meta to tooltip
@@ -1445,7 +1450,7 @@ Wu.MapPane = Wu.Pane.extend({
 			return string;
 
 		} else {
-
+			console.log('no meta 2');
 			// create content
 			var string = '';
 			for (var key in data) {
