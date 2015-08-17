@@ -469,76 +469,9 @@ Wu.Layer = Wu.Class.extend({
 		this._setGridEvents('off');
 	},
 
-	_fetchData : function (e, callback) {
-
-		var keys = Object.keys(e.data);
-		var column = keys[0];
-		var row = e.data[column];
-		var layer_id = e.layer.store.data.postgis.layer_id;
-
-		var options = {
-			column : column,
-			row : row,
-			layer_id : layer_id,
-
-			access_token : app.tokens.access_token
-		}
-
-		Wu.send('/api/db/fetch', options, callback, this);
-	},
-
 	
 
-	_gridOnMousedown : function(e) {
-		if (!e.data) return;
-
-		// pass layer
-		e.layer = this;
-
-		// fetch data
-		this._fetchData(e, function (ctx, json) {
-			
-			var data = JSON.parse(json);
-			console.log('fetched data: ', data);
-			e.data = data;
-			var event = e.e.originalEvent;
-			this._event = {
-				x : event.x,
-				y : event.y
-			}
-			app.MapPane._addPopupContent(e);
-		});
-
-		
-
-	},
-
-	_gridOnMouseup : function (e) {
-		if (!e.data) return;
-
-		// pass layer
-		e.layer = this;
-
-		var event = e.e.originalEvent;
-
-		if (this._event === undefined || this._event.x == event.x) {
-			// open popup 
-			app.MapPane.openPopup(e);
-		} else {
-			// clear old
-			app.MapPane._clearPopup();
-		}
-
-	},
-
-	_gridOnClick : function (e) {
-		// clear old
-		app.MapPane._clearPopup();
-
-	},
-
 	_flush : function () {
-
 		this.remove();
 		app.MapPane._clearPopup();
 		this._removeGridEvents();
@@ -676,6 +609,77 @@ Wu.PostGISLayer = Wu.Layer.extend({
 	// 	});
 	// },
 
+
+	_fetchData : function (e, callback) {
+
+		var keys = Object.keys(e.data);
+		var column = keys[0];
+		var row = e.data[column];
+		var layer_id = e.layer.store.data.postgis.layer_id;
+
+		var options = {
+			column : column,
+			row : row,
+			layer_id : layer_id,
+			access_token : app.tokens.access_token
+		}
+
+		Wu.send('/api/db/fetch', options, callback, this);
+	},
+
+	
+
+	_gridOnMousedown : function(e) {
+		if (!e.data) return;
+
+		// pass layer
+		e.layer = this;
+
+		// fetch data
+		this._fetchData(e, function (ctx, json) {
+			
+			var data = JSON.parse(json);
+			console.log('fetched data: ', data);
+			e.data = data;
+			var event = e.e.originalEvent;
+			this._event = {
+				x : event.x,
+				y : event.y
+			}
+			app.MapPane._addPopupContent(e);
+		});
+
+		
+
+	},
+
+	_gridOnMouseup : function (e) {
+		if (!e.data) return;
+
+		// pass layer
+		e.layer = this;
+
+		var event = e.e.originalEvent;
+
+		
+
+		if (this._event === undefined || this._event.x == event.x) {
+			// open popup 
+			// app.MapPane.openPopup(e);
+
+			// console.log('pop 7 open');
+		} else {
+			// clear old
+			app.MapPane._clearPopup();
+		}
+
+	},
+
+	_gridOnClick : function (e) {
+		// clear old
+		// app.MapPane._clearPopup();
+
+	},
 
 });
 
