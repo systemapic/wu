@@ -97,6 +97,7 @@ L.Control.Cartocss = Wu.Control.extend({
 
 		// mark content loaded
 		this._initedContent = true;
+
 	},
 
 	_initEmpty : function (){

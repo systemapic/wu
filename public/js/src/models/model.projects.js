@@ -120,8 +120,6 @@ Wu.Project = Wu.Class.extend({
 		return title;
 	},
 
-	
-
 	createLayerFromGeoJSON : function (geojson) {
 
 		// set options
@@ -277,7 +275,6 @@ Wu.Project = Wu.Class.extend({
 		this._refresh();
 		this.refreshSidepane();
 	},
-
 
 	_update : function (field) {
 

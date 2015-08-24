@@ -163,12 +163,6 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 		return layer_id;
 	},
 
-
-
-		// todo monday: create route, do query, etc.
-
-
-
 });
 
 
