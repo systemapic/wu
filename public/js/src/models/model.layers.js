@@ -301,6 +301,15 @@ Wu.Layer = Wu.Class.extend({
 
 	},
 
+	// set json representation of style in editor (for easy conversion)
+	setEditorStyle : function (options, callback) {
+
+	},
+
+	getEditorStyle : function () {
+		return false;
+	},
+
 	setCartoCSS : function (json, callback) {
 
 		// send to server
