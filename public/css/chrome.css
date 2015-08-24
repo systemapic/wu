@@ -350,6 +350,9 @@
     color: black;
 }
 
+.chrome-content.settings-button.active-tab {
+    background: red;
+}
 
 
 /* EDITED BY JØRGEN */
