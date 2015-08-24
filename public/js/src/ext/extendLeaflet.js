@@ -207,6 +207,15 @@ L.Popup = L.Class.extend({
 
 	_updateLayout: function () {
 
+
+		console.log('upd8!');
+
+		// var _extraWidth = 46;
+
+		// Additional adjustment for FRANO		
+		var _extraWidth = 216;
+
+
 		var container = this._contentNode,
 		    style = container.style;
 
@@ -219,7 +228,8 @@ L.Popup = L.Class.extend({
 		width = Math.min(width, this.options.maxWidth);
 		width = Math.max(width, this.options.minWidth);
 
-		style.width = (width + 46) + 'px';
+		style.width = (width + _extraWidth) + 'px';
+
 		style.whiteSpace = '';
 
 		style.height = '';
@@ -227,6 +237,11 @@ L.Popup = L.Class.extend({
 		var height = container.offsetHeight,
 		    maxHeight = this.options.maxHeight,
 		    scrolledClass = 'leaflet-popup-scrolled';
+
+
+		// Additional adjustment for FRANO
+		maxHeight += 65;
+
 
 		if (maxHeight && height > maxHeight) {
 			style.height = maxHeight + 'px';

@@ -220,7 +220,9 @@ module.exports = function(app, passport) {
 
 
 
-
+	app.get('/api/joinbeta', function (req, res) {
+		api.portal.joinBeta(req, res);
+	});
 
 
 
