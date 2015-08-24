@@ -12,15 +12,44 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 	},
 
-	show : function () {
+	_addEvents : function () {
 
+		var trigger = this.options.trigger;
+		if (trigger) {
+			Wu.DomEvent.on(trigger, 'click', this.show, this);
+		}
+	},
+
+	show : function () {
+		if (!this._inited) this._initLayout();
+
+		// hide others
+		this.hideAll();
+
+		// show this
+		this._container.style.display = 'block';
+
+		// mark button
+		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
 	},
 
 	hide : function () {
+		this._container.style.display = 'none';
+		Wu.DomUtil.removeClass(this.options.trigger, 'active-tab');
 
 	},
 
+	hideAll : function () {
+		if (!this.options || !this.options.parent) return console.log('hideAll not possible');
 
+		var tabs = this.options.parent.getTabs();
+
+		for (var t in tabs) {
+			var tab = tabs[t];
+			tab.hide();
+		}
+
+	},
 
 
 
@@ -34,22 +63,22 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 				enabled : true,
 				text : 'Style Editor'
 			},
-			cartocss : {
-				enabled : true,
-				text : 'CartoCSS'
-			},
 			layers : {
 				enabled : true,
 				text : 'Layers'
+			},
+			tooltip : {
+				enabled : true,
+				text : 'Tooltip'
+			},
+			cartocss : {
+				enabled : true,
+				text : 'CartoCSS'
 			},
 			sql : {
 				enabled : true,
 				text : 'SQL'
 			},
-			tooltip : {
-				enabled : true,
-				text : 'Tooltip'
-			}
 		}
 	},
 
@@ -77,9 +106,12 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 		// title
 		this._title = Wu.DomUtil.create('div', 'chrome chrome-content settings-title', this._container, 'Settings');
 
-		// tab options
+		// tabs
 		this._initTabs();
+	},
 
+	getTabs : function () {
+		return this._tabs;
 	},
 
 	_initTabs : function () {
@@ -111,7 +143,8 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 					this._tabs[tab] = new Wu.Chrome.Content[tab]({
 						options : this._options,
 						trigger : trigger,
-						appendTo : this._tabsWrapper
+						appendTo : this._tabsWrapper,
+						parent : this
 					});
 				}
 			}
@@ -125,7 +158,7 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 	},
 
 	hide : function () {
-
+		console.log('hiding tab!');
 	},
 
 });
@@ -144,7 +177,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		// this._initLayout();
 
 		// add events
-		this.addEvents();
+		this._addEvents();
 	},
 
 
@@ -169,7 +202,6 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	},
 
 	_initLayout : function () {
-		console.log('init ADSADSDAS');
 		if (!this._project) return;
   
 		// active layer
@@ -223,27 +255,86 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		// get current style, return false if none
 		var currentStyle = layer.getEditorStyle();
 
+		console.log('currentStyle: ', currentStyle);
 		
 	},
 
 
-	addEvents : function () {
 
-		var trigger = this.options.trigger;
-		if (trigger) {
-			Wu.DomEvent.on(trigger, 'click', this.open, this);
-		}
+
+
+});
+
+
+Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
+
+	_initialize : function () {
+
+		console.log('chrome.content layers');
+
+		// init container
+		this._initContainer();
+
+		// init layout
+		this._initLayout();
+
+		// add events
+		this._addEvents();
+	},
+
+	_initContainer : function () {
+
+		// create container
+		this._container = Wu.DomUtil.create('div', 'chrome chrome-content layers', this.options.appendTo);
+
+	},
+
+	_initLayout : function () {
+
+	},
+
+	
+
+	open : function () {
+		console.log('open!', this);
+	}
+
+});
+
+
+
+
+
+Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
+
+	_initialize : function () {
+
+		console.log('chrome.content carto');
+
+		// init container
+		this._initContainer();
+
+		// init layout
+		this._initLayout();
+
+		// add events
+		this._addEvents();
+	},
+
+	_initContainer : function () {
+
+		// create container
+		this._container = Wu.DomUtil.create('div', 'chrome chrome-content cartocss', this.options.appendTo);
+
+	},
+
+	_initLayout : function () {
+
 	},
 
 	open : function () {
 		console.log('open!', this);
-
-		if (!this._inited) this._initLayout();
-	},
-
-	close : function () {
-
-	},
+	}
 
 });
 
@@ -261,7 +352,7 @@ Wu.Chrome.Content.Sql = Wu.Chrome.Content.extend({
 		this._initLayout();
 
 		// add events
-		this.addEvents();
+		this._addEvents();
 	},
 
 	_initContainer : function () {
@@ -275,13 +366,6 @@ Wu.Chrome.Content.Sql = Wu.Chrome.Content.extend({
 
 	},
 
-	addEvents : function () {
-
-		var trigger = this.options.trigger;
-		if (trigger) {
-			Wu.DomEvent.on(trigger, 'click', this.open, this);
-		}
-	},
 
 	open : function () {
 		console.log('open!', this);
@@ -290,46 +374,6 @@ Wu.Chrome.Content.Sql = Wu.Chrome.Content.extend({
 });
 
 
-Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
-
-	_initialize : function () {
-
-		console.log('chrome.content carto');
-
-		// init container
-		this._initContainer();
-
-		// init layout
-		this._initLayout();
-
-		// add events
-		this.addEvents();
-	},
-
-	_initContainer : function () {
-
-		// create container
-		this._container = Wu.DomUtil.create('div', 'chrome chrome-content cartocss', this.options.appendTo);
-
-	},
-
-	_initLayout : function () {
-
-	},
-
-	addEvents : function () {
-
-		var trigger = this.options.trigger;
-		if (trigger) {
-			Wu.DomEvent.on(trigger, 'click', this.open, this);
-		}
-	},
-
-	open : function () {
-		console.log('open!', this);
-	}
-
-});
 
 Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 
@@ -344,7 +388,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		this._initLayout();
 
 		// add events
-		this.addEvents();
+		this._addEvents();
 	},
 
 	_initContainer : function () {
@@ -358,57 +402,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 
 	},
 
-	addEvents : function () {
-
-		var trigger = this.options.trigger;
-		if (trigger) {
-			Wu.DomEvent.on(trigger, 'click', this.open, this);
-		}
-	},
-
-	open : function () {
-		console.log('open!', this);
-	}
-
-});
-
-
-
-Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
-
-	_initialize : function () {
-
-		console.log('chrome.content layers');
-
-		// init container
-		this._initContainer();
-
-		// init layout
-		this._initLayout();
-
-		// add events
-		this.addEvents();
-	},
-
-	_initContainer : function () {
-
-		// create container
-		this._container = Wu.DomUtil.create('div', 'chrome chrome-content layers', this.options.appendTo);
-
-	},
-
-	_initLayout : function () {
-
-	},
-
-	addEvents : function () {
-
-		var trigger = this.options.trigger;
-		if (trigger) {
-			Wu.DomEvent.on(trigger, 'click', this.open, this);
-		}
-	},
-
+	
 	open : function () {
 		console.log('open!', this);
 	}
