@@ -3,7 +3,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	_ : 'rightchrome', 
 
 	options : {
-		defaultWidth : 400,
+		defaultWidth : 350,
 		
 	},
 

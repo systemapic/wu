@@ -202,20 +202,15 @@ input[type=checkbox] + label.check {
 	}*/
 
 .q-editor-container {
-	-webkit-transition: height 250ms ease, width 250ms ease;
+/*	-webkit-transition: height 250ms ease, width 250ms ease;
 	-moz-transition: height 250ms ease, width 250ms ease;
 	transition: height 250ms ease, width 250ms ease;	
-	}	
+*/	}	
 
 .q-editor-content-item {
-
-	-webkit-transition: opacity 250ms ease;
+/*	-webkit-transition: opacity 250ms ease;
 	-moz-transition: opacity 250ms ease;
 	transition: opacity 250ms ease;
-
-/*	-webkit-transition: height 250ms ease, width 250ms ease, padding 250ms ease;
-	-moz-transition: height 250ms ease, width 250ms ease, padding 250ms ease;
-	transition: height 250ms ease, width 250ms ease, padding 250ms ease;
 */	}
 
 #header {
@@ -315,7 +310,7 @@ input[type=checkbox] + label.check {
 #editor-map-initpos-coordinates,
 #editor-map-bounds-coordinates,
 .settings-outer,
-.q-editor-menu,
+/*.q-editor-menu,*/
 .project-item {
 	-webkit-transition: height 250ms ease;
 	-moz-transition: height 250ms ease;

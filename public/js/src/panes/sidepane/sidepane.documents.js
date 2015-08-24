@@ -205,7 +205,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		}
 
 		// hide other controls
-		this._hideControls();
+		// this._hideControls();
 
 	},
 
@@ -226,7 +226,7 @@ Wu.SidePane.Documents = Wu.SidePane.Item.extend({
 		this.removeEditHooks();
 
 		// show controls
-		this._showControls();
+		// this._showControls();
 	},
 
 
