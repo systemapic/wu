@@ -92,10 +92,10 @@ Wu.MapPane = Wu.Pane.extend({
 	_initLeaflet : function () {
 
 		// create new map
-		this._map = app._map = L.map('map', {
+		var map = this._map = app._map = L.map('map', {
 			worldCopyJump : true,
 			attributionControl : false,
-			maxZoom : 18,
+			//maxZoom : 18,
 			// zoomAnimation : false
 			zoomControl : false,
 			inertia : false,
@@ -103,8 +103,52 @@ Wu.MapPane = Wu.Pane.extend({
 			// zoomAnimationThreshold : 2
 		});
 
+
+		// global map events
+		map.on('zoomstart', function (e) {
+			console.log('zoomztart', e);
+
+			map.eachLayer(function (layer) {
+				if (!layer.options) return;
+
+				var layerUuid = layer.options.layerUuid;
+
+				if (!layerUuid) return;
+
+				// get wu layer
+				var l = app.activeProject.getPostGISLayer(layerUuid);
+			
+				console.log('Laighto-san', l);
+
+				if (!l) return  
+				
+
+				console.log('got layer1--1-1');
+				l._invalidateTiles();
+				
+				
+			});
+
+			// send invalidate to pile
+			this._invalidateTiles();
+		}, this)
+
+
+
+
+
+
 		// add editable layer
 		// this.addEditableLayer(this._map);
+	},
+
+	_invalidateTiles : function () {
+
+		var options = {
+			access_token : app.tokens.access_token, // unique identifier
+
+		}
+
 	},
 
 
@@ -875,12 +919,14 @@ Wu.MapPane = Wu.Pane.extend({
 	_addPopupContent : function (e) {
 
 		// if d3tooltip setting on, get d3 instead of normal text
-		var d3tooltip = false; // this is the toggle, TODO: connect setting!
+		// var d3tooltip = true; // this is the toggle, TODO: connect setting!
 		
 		var d3popup = this._project.getSettings()['d3popup'];
+		var d3popup = false;
 		console.log('current d3 setting', d3popup);
 
 		var content = d3popup ? this._createPopupContentD3(e) : this._createPopupContent(e);
+
 		var buffer = '<hr>';
 
 		// clear old popup
@@ -900,7 +946,10 @@ Wu.MapPane = Wu.Pane.extend({
 		// append content
 		this._popupContent += content;
 
+		this.openPopup(e);
+
 	},
+
 
 	_clearPopup : function () {
 		this._popupContent = '';
@@ -1221,11 +1270,148 @@ Wu.MapPane = Wu.Pane.extend({
 
 	},
 
+
+
+
+
+	// _createPopupContentChart : function (e) {
+
+	// 	// create canvas
+	// 	var canvas = document.createElement('canvas');
+	// 	canvas.id     = "chart-canvas";
+	// 	canvas.width  = 1224;
+	// 	canvas.height = 768;
+	// 	canvas.style.zIndex   = 8;
+	// 	canvas.style.position = "absolute";
+	// 	canvas.style.border   = "1px solid";
+
+
+	// 	var ctx = canvas.getContext('2d');
+
+	// 	var data = e.data;
+		
+
+	// 	var options = {
+
+	// 	    ///Boolean - Whether grid lines are shown across the chart
+	// 	    scaleShowGridLines : true,
+
+	// 	    //String - Colour of the grid lines
+	// 	    scaleGridLineColor : "rgba(0,0,0,.05)",
+
+	// 	    //Number - Width of the grid lines
+	// 	    scaleGridLineWidth : 1,
+
+	// 	    //Boolean - Whether to show horizontal lines (except X axis)
+	// 	    scaleShowHorizontalLines: true,
+
+	// 	    //Boolean - Whether to show vertical lines (except Y axis)
+	// 	    scaleShowVerticalLines: true,
+
+	// 	    //Boolean - Whether the line is curved between points
+	// 	    bezierCurve : true,
+
+	// 	    //Number - Tension of the bezier curve between points
+	// 	    bezierCurveTension : 0.4,
+
+	// 	    //Boolean - Whether to show a dot for each point
+	// 	    pointDot : true,
+
+	// 	    //Number - Radius of each point dot in pixels
+	// 	    pointDotRadius : 4,
+
+	// 	    //Number - Pixel width of point dot stroke
+	// 	    pointDotStrokeWidth : 1,
+
+	// 	    //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+	// 	    pointHitDetectionRadius : 20,
+
+	// 	    //Boolean - Whether to show a stroke for datasets
+	// 	    datasetStroke : true,
+
+	// 	    //Number - Pixel width of dataset stroke
+	// 	    datasetStrokeWidth : 2,
+
+	// 	    //Boolean - Whether to fill the dataset with a colour
+	// 	    datasetFill : true,
+
+	// 	    //String - A legend template
+	// 	    legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
+
+	// 	};
+
+
+	// 	var labels = [],
+	// 	    dataArray = [];
+
+	// 	for (var d in data) {
+	// 		labels.push(d);
+	// 		dataArray.push(data[d])
+	// 	}
+
+
+	// 	var chartData = {
+	// 	    labels:labels,
+	// 	    datasets: [
+	// 	        {
+	// 	            label: "My First dataset",
+	// 	            fillColor: "rgba(220,220,220,0.2)",
+	// 	            strokeColor: "rgba(220,220,220,1)",
+	// 	            pointColor: "rgba(220,220,220,1)",
+	// 	            pointStrokeColor: "#fff",
+	// 	            pointHighlightFill: "#fff",
+	// 	            pointHighlightStroke: "rgba(220,220,220,1)",
+	// 	            data: dataArray
+	// 	        },
+	// 	        {
+	// 	            label: "My Second dataset",
+	// 	            fillColor: "rgba(151,187,205,0.2)",
+	// 	            strokeColor: "rgba(151,187,205,1)",
+	// 	            pointColor: "rgba(151,187,205,1)",
+	// 	            pointStrokeColor: "#fff",
+	// 	            pointHighlightFill: "#fff",
+	// 	            pointHighlightStroke: "rgba(151,187,205,1)",
+	// 	            data: [28, 48, 40, 19, 86, 27, 90]
+	// 	        }
+	// 	    ]
+	// 	};
+
+	// 	var content = new Chart(ctx).Line(data, options);
+
+	// 	console.log('content: ', content);
+
+	// 	// // if d3tooltip setting on, get d3 instead of normal text
+	// 	// var d3tooltip = false; // this is the toggle, TODO: connect setting!
+		
+	// 	// var d3popup = this._project.getSettings()['d3popup'];
+	// 	// console.log('current d3 setting', d3popup);
+
+	// 	// var content = d3popup ? this._createPopupContentD3(e) : this._createPopupContent(e);
+	// 	// var buffer = '<hr>';
+
+	// 	// clear old popup
+	// 	this._popup = null;
+
+	// 	// return if no content
+	// 	if (!content) return;
+		
+	// 	if (!this._popupContent) {
+	// 		// create empty
+	// 		this._popupContent = '';
+	// 	} else {
+	// 		// append buffer
+	// 		this._popupContent += buffer;
+	// 	}
+
+	// 	// append content
+	// 	this._popupContent += content;
+
+	// },
+
+
 	
 
 	_createPopupContent : function (e) {
-
-		console.log('opipupcontent', e);
 
 		// check for stored tooltip
 		var data = e.data,
@@ -1259,7 +1445,6 @@ Wu.MapPane = Wu.Pane.extend({
 			return string;
 
 		} else {
-
 			// create content
 			var string = '';
 			for (var key in data) {
@@ -1271,6 +1456,12 @@ Wu.MapPane = Wu.Pane.extend({
 			return string;
 		}
 	},
+
+
+
+
+
+
 	
 });
 

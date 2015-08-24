@@ -94,6 +94,20 @@ Wu.Files = Wu.Class.extend({
 		this.save('copyright');
 	},
 
+	_addToProject : function (projectUuid) {
+
+		var options = {
+			projectUuid : projectUuid, 
+			fileUuid : this.getUuid()
+		}
+
+		Wu.Util.postcb('/api/file/addtoproject', JSON.stringify(options), function (err, body) {
+
+			console.log('_addToProject err, body', err, body);
+
+		});
+	},
+
 
 	// setters
 	setName : function (name) {

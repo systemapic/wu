@@ -52,12 +52,14 @@ module.exports = api.access = {
 				edit_other_client 	: true, 	
 				delete_client 		: true, 	
 				delete_other_client 	: true,  
+				
 				create_project 		: true, 	
 				read_project 		: true, 	
 				edit_project 		: true, 	
 				edit_other_project 	: true, 	
 				delete_project 		: true, 	
 				delete_other_project 	: true,
+				
 				upload_file 		: true, 	
 				download_file 		: true, 	
 				edit_file 		: true, 	
@@ -67,6 +69,7 @@ module.exports = api.access = {
 				delete_other_version 	: true,
 				delete_file 		: true, 	
 				delete_other_file 	: true, 	
+				
 				create_user 		: true, 
 				read_user 		: true,
 				read_other_user		: true,	
@@ -74,6 +77,7 @@ module.exports = api.access = {
 				edit_other_user 	: true, 	
 				delete_user 		: true, 	
 				delete_other_user 	: true, 	
+				
 				share_project 		: true, 	
 				read_analytics 		: true, 	
 				manage_analytics	: true, 	
@@ -1028,6 +1032,10 @@ module.exports = api.access = {
 		
 		read_project : function (options, done) { 
 			api.access.to._check(options, 'read_project', done);
+		},
+
+		read_file : function (options, done) {
+			// access to read file if ... // todo! not added to list of caps either. 
 		},
 		
 		upload_file : function (options, done) { 

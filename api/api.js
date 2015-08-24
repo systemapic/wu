@@ -37,10 +37,12 @@ module.exports.pixels 	= require('./api.pixels');
 module.exports.portal 	= require('./api.portal');
 module.exports.access 	= require('./api.access');
 module.exports.client 	= require('./api.client');
+module.exports.bridge 	= require('./api.bridge');
 module.exports.socket 	= require('./api.socket');
+module.exports.postgis  = require('./api.postgis');
 module.exports.project 	= require('./api.project');
 module.exports.provider = require('./api.provider');
 module.exports.analytics = require('./api.analytics');
 
 // print version
-console.log('\nSystemapic API version: ', api.version, '\n');
+console.log('\nSystemapic API version is ', api.version, '\n');

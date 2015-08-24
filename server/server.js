@@ -1,5 +1,3 @@
-
-
 // server.js
 var express  = require('express.io');
 var mongoose = require('mongoose');
@@ -52,7 +50,7 @@ app.use(express.session({
 	secret: 'dslfksmdfldskfnlxxsadknvvlovn908209309fmsfmdslkm',  // random
         saveUninitialized: true,
         resave: true,
- //        store: new RedisStore({
+        // store: new RedisStore({	// todo: more permanent access_tokens
 	// 	host : 'rtoken',
 	// 	port : 6379,
 	// 	db : 2,

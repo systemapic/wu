@@ -104,6 +104,73 @@ module.exports = api.file = {
 		});
 	},
 
+	addFileToProject : function (req, res) {
+		var options = req.body,
+		    fileUuid = options.fileUuid,
+		    projectUuid = options.projectUuid,
+		    ops = [],
+		    thefile,
+		    theproject,
+		    thelayers = [];
+
+
+		ops.push(function (callback) {
+
+			File
+			.findOne({uuid : fileUuid})
+			.exec(function (err, file) {
+				thefile = file;
+				callback(err);
+			});
+
+		});
+
+		// get all layers connected to file
+		ops.push(function (callback) {
+			
+			Layer
+			.find({file : thefile.uuid})
+			.exec(function (err, layers) {
+				thelayers = layers;
+				callback(err);
+			});
+
+		});
+
+		// get and save project
+		ops.push(function (callback) {
+			Project
+			.findOne({uuid : projectUuid})
+			.exec(function (err, project) {
+				theproject = project;
+				callback(err);
+			});
+		});
+		ops.push(function (callback) {
+			theproject.files.push(thefile._id);
+			thelayers.forEach(function (layer) {
+				theproject.layers.push(layer._id);
+			});
+			theproject.markModified('files');
+			theproject.markModified('layers');
+			theproject.save(function (err, project) {
+				theproject = project;
+				callback(err);
+			});
+
+		});
+
+		async.series(ops, function (err, results) {
+			if (err) return api.error.general(res, err);
+			res.json(theproject);
+		});
+
+		
+
+
+
+	},
+
 
 	// handle file downloads
 	downloadFile : function (req, res) {
@@ -612,6 +679,43 @@ module.exports = api.file = {
 			if (err) console.log(err);
 			callback(null, doc);
 		});
+	},
+
+	// new: postgis file model
+	_createModel : function (fileModel, callback) {
+		var file = new File();
+		for (f in fileModel) {
+			file[f] = fileModel[f];
+			file.markModified(f);
+		}
+		file.save(callback);
+	},
+
+	getFile : function (req, res) {
+
+		console.log('req.query', req.query);
+		
+		var fileUuid = req.query.fileUuid || req.query.file_id,
+		    ops = [];
+
+		// check for missing info
+		if (!fileUuid) return api.error.missingInformation(req, res);
+
+		// todo: check permission to access file
+		
+		// get file
+		File
+		.findOne({uuid : fileUuid})
+		.exec(function (err, file) {
+			if (err) return api.error.general(req, res, err);
+
+			res.end(JSON.stringify(file));
+		});
+
+	},
+
+	_getFile : function (fileUuid, callback) {
+
 	},
 
 	// save file to project (file, layer, project id's)

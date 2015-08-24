@@ -44,7 +44,7 @@ module.exports = api.email = {
 
 	_send : function (options) {
 
-		console.log('_send email'.green, options);
+		// console.log('_send email'.green, options);
 
 		// hook up to gmail
 		var transporter = nodemailer.createTransport(api.config.nodemailer);
@@ -69,7 +69,7 @@ module.exports = api.email = {
 		// 	html    : body
 		// }
 
-		console.log('Sent email!'.yellow, options);
+		console.log('Sent email!'.yellow);
 	},
 
 

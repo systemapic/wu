@@ -39,31 +39,38 @@ Wu.ProgressPane = Wu.Class.extend({
 		bar.style.opacity = 0;
 		this._current = 0;
 		bar.style.width = 0;
+		bar.style.backgroundColor = 'white';
+
+		if (this._progressTimer) clearTimeout(this._progressTimer)
 	},
 	
 	// do a timed progress
 	timedProgress : function (ms) {
 		var that = this,
 		    duration = ms || 5000, // five seconds default
-		    steps = 10,	 	   // five steps default
+		    steps = 100,	 	   // five steps default
 		    p = 0;		   // start percentage
 		
 		// calculate delay
-		var delay = parseInt(duration) / steps;
+		var delay = parseInt(parseInt(duration) / steps);
 
 		// start progress
-		this._timedProgress(p, delay, steps);	
+		that._timedProgress(p, delay, steps);
 
+		// change color
+		app._progressBar.style.backgroundColor = 'red';
 	},
 
 	_timedProgress : function (percent, delay, steps) {
 		var that = this;
 
+		console.log('timedprogress', percent, delay, steps);
+
 		// set progress to percent after delay
 		percent = percent + (100/steps);
-		this.setProgress(percent);
+		that.setProgress(percent);
 		
-		setTimeout(function () {
+		that._progressTimer = setTimeout(function () {
 
 			// play it again sam
 			if (percent < 100) return that._timedProgress(percent, delay, steps);
