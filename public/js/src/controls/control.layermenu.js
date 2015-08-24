@@ -15,7 +15,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// add html
 		this._layermenuOuter 	= Wu.DomUtil.create('div', 'scroller-frame');
-		var _scrollUp 		= Wu.DomUtil.create('div', 'scroll-up', this._layermenuOuter);
+		// var _scrollUp 		= Wu.DomUtil.create('div', 'scroll-up', this._layermenuOuter);
 		var _innerScroller 	= Wu.DomUtil.create('div', 'inner-scroller', this._layermenuOuter);
 		this._content 		= Wu.DomUtil.createId('div', 'layer-menu-inner-content', _innerScroller);
 
@@ -93,18 +93,18 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Create the header    
 		this._layerMenuHeader = Wu.DomUtil.createId('div', 'layer-menu-header');
-		Wu.DomUtil.addClass(this._layerMenuHeader, 'menucollapser');
+		// Wu.DomUtil.addClass(this._layerMenuHeader, 'menucollapser');
 		
 		// title
-		this._layerMenuHeaderTitle = Wu.DomUtil.create('div', 'layer-menu-header-title', this._layerMenuHeader, 'Layers');
+		// this._layerMenuHeaderTitle = Wu.DomUtil.create('div', 'layer-menu-header-title', this._layerMenuHeader, 'Layers');
 
 		// Create the collapse button
-		this._bhattan1 = Wu.DomUtil.createId('div', 'bhattan1');
-		Wu.DomUtil.addClass(this._bhattan1, 'dropdown-button rotate270');
-		this._layerMenuHeader.appendChild(this._bhattan1);
+		// this._bhattan1 = Wu.DomUtil.createId('div', 'bhattan1');
+		// Wu.DomUtil.addClass(this._bhattan1, 'dropdown-button rotate270');
+		// this._layerMenuHeader.appendChild(this._bhattan1);
 
 		// Insert Header at the top
-		this._innerContainer.insertBefore(this._layerMenuHeader, this._innerContainer.getElementsByTagName('div')[0]);
+		// this._innerContainer.insertBefore(this._layerMenuHeader, this._innerContainer.getElementsByTagName('div')[0]);
 
 		// Create the 'uncollapse' button ... will put in DOM l8r
 		this._openLayers = Wu.DomUtil.createId('div', 'open-layers');
@@ -121,12 +121,12 @@ L.Control.Layermenu = Wu.Control.extend({
 			this._legendsCollapser = legends._legendsCollapser;
 		}
 
-		Wu.DomEvent.on(this._bhattan1,   'click', this._GAcloseLayerPane, this);
-		Wu.DomEvent.on(this._openLayers, 'click', this._GAtoggleLayerPane, this);     
+		// Wu.DomEvent.on(this._bhattan1,   'click', this._GAcloseLayerPane, this);
+		// Wu.DomEvent.on(this._openLayers, 'click', this._GAtoggleLayerPane, this);     
 
 		// Stop Propagation
-		Wu.DomEvent.on(this._openLayers, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
-		Wu.DomEvent.on(this._bhattan1, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		// Wu.DomEvent.on(this._openLayers, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		// Wu.DomEvent.on(this._bhattan1, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 
 		// auto-close event
 		Wu.DomEvent.on(this._innerContainer, 'mouseenter', this.cancelEditClose, this);
@@ -140,8 +140,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		}
 
 		// add tooltip
-		app.Tooltip.add(this._layerMenuHeaderTitle, 'The layer menu lets you choose what layers you want to be on top of the map', { extends : 'systyle', tipJoint : 'right' });
-		app.Tooltip.add(this._bhattan1, 'Minimize the layer menu', { extends : 'systyle', tipJoint : 'left' });		
+		// app.Tooltip.add(this._layerMenuHeaderTitle, 'The layer menu lets you choose what layers you want to be on top of the map', { extends : 'systyle', tipJoint : 'right' });
+		// app.Tooltip.add(this._bhattan1, 'Minimize the layer menu', { extends : 'systyle', tipJoint : 'left' });		
 
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
@@ -413,7 +413,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.enableSortable();
 
 		// set title
-		this._layerMenuHeaderTitle.innerHTML = 'Edit Layer Menu';  
+		// this._layerMenuHeaderTitle.innerHTML = 'Edit Layer Menu';  
 
 		// add edit style
 		Wu.DomUtil.addClass(this._innerContainer, 'edit-mode');
@@ -461,7 +461,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.disableSortable();
 
 		// set title
-		this._layerMenuHeaderTitle.innerHTML = 'Layers';  
+		// this._layerMenuHeaderTitle.innerHTML = 'Layers';  
 
 		// remove edit style
 		Wu.DomUtil.removeClass(this._innerContainer, 'edit-mode');
@@ -486,7 +486,7 @@ L.Control.Layermenu = Wu.Control.extend({
 			// create if not exists
 			this._menuFolder = Wu.DomUtil.create('div', 'smap-button-white middle-item ct12 ct18', this._innerContainer, 'Add folder');
 
-			// insert
+			// insert 		todo: not very nice...
 			this._layerMenuHeader.parentNode.insertBefore(this._menuFolder, this._layerMenuHeader.nextSibling);
 
 			// add action
