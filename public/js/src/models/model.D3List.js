@@ -2072,10 +2072,14 @@ Wu.DataLibraryList = Wu.List.extend({
 		layer.setCopyright(copyright);
 	},
 	_findLayerByFile : function (fileUuid) {
+		console.log('_findLayerByFile: ', fileUuid);
 		for (p in app.Projects) {
 			var project = app.Projects[p];
 			for (l in project.layers) {
-				var layer = project.layers[l];
+				console.log('l?,', l);
+				var layer = project.layers[l]; 	// todo: this is a string (layer-2323232), so this can't work!
+				if (!layer) return false;
+				if (!layer.store) return false;
 				if (layer.store.file == fileUuid) {
 					return layer;
 				};		

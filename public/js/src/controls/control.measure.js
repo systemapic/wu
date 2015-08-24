@@ -33,6 +33,7 @@ L.Control.Measure = Wu.Control.extend({
 		this.addTo(app._map);
 		this._added = true;
 		this._addStops();
+
 	},
 
 	_addStops : function () {

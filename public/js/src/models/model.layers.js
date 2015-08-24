@@ -31,7 +31,6 @@ Wu.Layer = Wu.Class.extend({
 		Wu.DomEvent[on](this.layer, 'load', this._onLayerLoaded, this);
 		Wu.DomEvent[on](this.layer, 'loading', this._onLayerLoading, this);
 	},
-
 	
 	_unload : function (e) {
 		// delete 
@@ -60,7 +59,7 @@ Wu.Layer = Wu.Class.extend({
 	add : function (type) {
 
 		// mark as base or layermenu layer
-		this._isBase = type == 'baselayer';
+		this._isBase = (type == 'baselayer');
 		
 		// add
 		this.addTo();
@@ -92,6 +91,14 @@ Wu.Layer = Wu.Class.extend({
 
 		// update zindex
 		this._addToZIndex(type);
+
+		this._added = true;
+
+		// fire event
+		Wu.Mixin.Events.fire('layerEnabled', { detail : {
+			layer : this
+		}}); 
+
 	},
 
 	addToControls : function () {
@@ -195,6 +202,8 @@ Wu.Layer = Wu.Class.extend({
 			descriptionControl.removeLayer(this);
 			descriptionControl._container.style.display = 'none'; // (j)		// refactor to descriptionControl
 		}
+
+		this._added = false;
 	},
 
 	getActiveLayers : function () {
@@ -285,6 +294,13 @@ Wu.Layer = Wu.Class.extend({
 		if (this.store.data) return this.store.data.cartoid;
 	},
 
+	// set postgis styling 
+	setLayerStyle : function (options, callback) {
+
+		
+
+	},
+
 	setCartoCSS : function (json, callback) {
 
 		// send to server
@@ -306,8 +322,10 @@ Wu.Layer = Wu.Class.extend({
 
 	getMeta : function () {
 		var metajson = this.store.metadata;
-		if (metajson) return JSON.parse(metajson);
-		return false;
+		if (!metajson) return false;
+
+		var meta = Wu.parse(metajson);
+		return meta;
 	},
 
 	getMetaFields : function () {
@@ -370,6 +388,14 @@ Wu.Layer = Wu.Class.extend({
 		if (!legends[0]) return;
 		legends[0].value = title;
 		this.setLegends(legends);
+	},
+
+	setStyle : function (postgis) {
+		console.log('set style -> postgis: ', postgis);
+		if (!postgis) return console.error('no styloe to set!');
+		
+		this.store.data.postgis = postgis;
+		this.save('data');
 	},
 
 	createLegends : function (callback) {
@@ -443,20 +469,187 @@ Wu.Layer = Wu.Class.extend({
 		this._setGridEvents('off');
 	},
 
+	
+
+	_flush : function () {
+		this.remove();
+		app.MapPane._clearPopup();
+		this._removeGridEvents();
+		this.layer = null;
+		this.gridLayer = null;
+		this._inited = false;
+
+	},
+
+});
+
+
+
+Wu.PostGISLayer = Wu.Layer.extend({
+
+	initLayer : function () {
+		this.update();
+		this.addHooks();
+
+		this._inited = true;
+	},
+
+	update : function (options) {
+		var map = app._map;
+
+		// remove
+		if (this.layer) this._flush();
+
+		// prepare raster
+		this._prepareRaster();
+
+		// prepare utfgrid
+		this._prepareGrid();
+
+		// enable
+		if (options && options.enable) {
+			map.addLayer(this.layer);
+		}
+	},
+
+	_getLayerUuid : function () {
+		return this.store.data.postgis.layer_id;
+	},
+
+	getCartoCSS : function (cartoid, callback) {
+		return this.store.data.postgis.cartocss;
+	},
+
+
+	_prepareRaster : function () {
+
+		// set ids
+		var fileUuid 	= this._fileUuid,	// file id of geojson
+		    // cartoid 	= this.store.data.cartoid || this._defaultCartoid,
+		    // tileServer 	= app.options.servers.tiles.uri,
+		    subdomains  = app.options.servers.tiles.subdomains,
+		    access_token = '?access_token=' + app.tokens.access_token;
+		    // url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
+
+		var layerUuid = this._getLayerUuid();
+		var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.png' + access_token;
+
+		// add vector tile raster layer
+		this.layer = L.tileLayer(url, {
+			layerUuid: this._getLayerUuid(),
+			subdomains : subdomains,
+			maxRequests : 0,
+		});
+
+		// load grid after all pngs.. (dont remember why..)
+		// Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
+
+	},
+
+	_invalidateTiles : function () {
+		console.log('invalidateTIles');
+		return;
+
+		// var options = {
+		// 	layerUuid : this._getLayerUuid(),
+		// 	access_token : app.tokens.access_token, 
+		// 	zoom : app._map.getZoom()
+		// }
+
+		// console.log('invalidate options', options);
+
+		// Wu.send('/api/db/invalidate', options, function (a, b) {
+		// 	console.log('invalidate sent', a, b);
+		// }, this);
+	},
+
+	_updateGrid : function (l) {
+
+		// refresh of gridlayer is attached to layer. this because vector tiles are not made in vile.js, 
+		// and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
+		// - also, removed listeners in L.UtfGrid (onAdd)
+		// 
+		if (this.gridLayer) {
+			this.gridLayer._update();
+		}
+	},
+
+	_prepareGrid : function () {
+
+		// set ids
+		var subdomains  = app.options.servers.tiles.subdomains,
+		    access_token = '?access_token=' + app.tokens.access_token;
+		
+		var layerUuid = this._getLayerUuid();
+		var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.grid' + access_token;
+
+		// create gridlayer
+		this.gridLayer = new L.UtfGrid(url, {
+			useJsonP: false,
+			subdomains: subdomains,
+			maxRequests : 0,
+			requestTimeout : 10000,
+			layerUuid : layerUuid
+		});
+
+		// debug
+		// this.gridLayer = false;
+
+		// add grid events
+		this._addGridEvents();
+
+	},
+
+
+	// updateStyle : function () {
+	// 	return console.error('updateStyle, todo: remove');
+	// 	// set new options and redraw
+	// 	if (this.layer) this.layer.setOptions({
+	// 		cartoid : this.getCartoid(),
+	// 	});
+	// },
+
+
+	_fetchData : function (e, callback) {
+
+		var keys = Object.keys(e.data);
+		var column = keys[0];
+		var row = e.data[column];
+		var layer_id = e.layer.store.data.postgis.layer_id;
+
+		var options = {
+			column : column,
+			row : row,
+			layer_id : layer_id,
+			access_token : app.tokens.access_token
+		}
+
+		Wu.send('/api/db/fetch', options, callback, this);
+	},
+
+	
+
 	_gridOnMousedown : function(e) {
 		if (!e.data) return;
 
 		// pass layer
 		e.layer = this;
 
-		// add to pending
-		app.MapPane._addPopupContent(e);
+		// fetch data
+		this._fetchData(e, function (ctx, json) {
+			
+			var data = JSON.parse(json);
+			console.log('fetched data: ', data);
+			e.data = data;
+			var event = e.e.originalEvent;
+			this._event = {
+				x : event.x,
+				y : event.y
+			}
+			app.MapPane._addPopupContent(e);
+		});
 
-		var event = e.e.originalEvent;
-		this._event = {
-			x : event.x,
-			y : event.y
-		}
+		
 
 	},
 
@@ -468,9 +661,13 @@ Wu.Layer = Wu.Class.extend({
 
 		var event = e.e.originalEvent;
 
+		
+
 		if (this._event === undefined || this._event.x == event.x) {
 			// open popup 
-			app.MapPane.openPopup(e);
+			// app.MapPane.openPopup(e);
+
+			// console.log('pop 7 open');
 		} else {
 			// clear old
 			app.MapPane._clearPopup();
@@ -480,22 +677,16 @@ Wu.Layer = Wu.Class.extend({
 
 	_gridOnClick : function (e) {
 		// clear old
-		app.MapPane._clearPopup();
-
-	},
-
-	_flush : function () {
-
-		this.remove();
-		app.MapPane._clearPopup();
-		this._removeGridEvents();
-		this.layer = null;
-		this.gridLayer = null;
-		this._inited = false;
+		// app.MapPane._clearPopup();
 
 	},
 
 });
+
+
+
+
+
 
 
 
@@ -554,6 +745,8 @@ Wu.CartoCSSLayer = Wu.Layer.extend({
 	},
 
 	_updateGrid : function (l) {
+
+
 
 		// refresh of gridlayer is attached to layer. this because vector tiles are not made in vile.js, 
 		// and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
@@ -826,8 +1019,14 @@ Wu.RasterLayer = Wu.Layer.extend({
 
 // shorthand for creating all kinds of layers
 Wu.createLayer = function (layer) {
-	if (!layer.data) return console.error(layer);
-
+	if (!layer.data) {
+		console.error('no layer - weird:', layer);
+		return false;
+	}
+	// postgis
+	if (layer.data.postgis && layer.data.postgis.file_id) {
+		return new Wu.PostGISLayer(layer);
+	}
 	// mapbox
 	if (layer.data.mapbox) return new Wu.MapboxLayer(layer);
 

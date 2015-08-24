@@ -900,6 +900,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	toggleLayer : function (item) {
 		if (this.editMode) return;
+		console.log('time: ', item);
 
 		var layer = item.layer;
 		var _layerName = layer ? layer.getTitle() : 'Folder';
@@ -922,7 +923,9 @@ L.Control.Layermenu = Wu.Control.extend({
 		var layerItem = _.find(this.layers, function (l) {
 			return l.item.layer == layerUuid;
 		});
-	
+		
+		if (!layerItem) return console.error('no layer');
+		
 		// mark active
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 		layerItem.on = true;
@@ -950,6 +953,9 @@ L.Control.Layermenu = Wu.Control.extend({
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 
+		console.log('flying!', layerItem);
+		this.flyTo(layer);
+
 	},
 
 	// disable by layermenuItem
@@ -976,6 +982,25 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// remove active class
 		Wu.DomUtil.removeClass(layermenuItem.el, 'layer-active');
+	},
+
+	flyTo : function (layer) {
+		if (!layer) return;
+
+		var extent = layer.getMeta().extent;
+		if (!extent) return;
+
+		var southWest = L.latLng(extent[1], extent[0]),
+		    northEast = L.latLng(extent[3], extent[2]),
+		    bounds = L.latLngBounds(southWest, northEast);
+
+		// fly
+		var map = app._map;
+		map.fitBounds(bounds);
+
+		// Google Analytics event tracking
+		// app.Analytics.setGaEvent(['Controls', 'Inspect layers: Fly to bounds for > ' + layer.getTitle()]);
+
 	},
 
 	_getLayermenuItem : function (layerUuid) {
@@ -1091,7 +1116,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		var item  = layerItem.item;
 		var layer = layerItem.layer;
 
-		var file = layer ? layer.getFile() : false;
+		var file = layer && layer.getFile ? layer.getFile() : false;
 		var caption = file ? file.store.name : item.caption;
 
 		// create div
@@ -1335,6 +1360,48 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.saveTimer = setTimeout(function () {
 			that._project._update('layermenu');
 		}, 1000);       // don't save more than every goddamed second
+
+	},
+
+	_projectSelected : function (e) {
+
+		console.log('layermenu project selectged');
+
+		var projectUuid = e.detail.projectUuid;
+
+		if (!projectUuid) {
+			this._project = null;
+			return this._off();
+		}
+		// set project
+		this._project = app.activeProject = app.Projects[projectUuid];
+
+		// refresh pane
+		this._refresh();
+
+		// select first layer by default
+		this._selectDefaultLayer();
+
+	},
+
+	_selectDefaultLayer : function () {
+		console.log('select!!', this);
+		var layerItem;
+
+		// get first layer
+		_.forEach(this.layers, function (l) {
+			console.log('L', l);
+			layerItem = l;
+			return false;
+		}.bind(this));
+
+		if (!layerItem) return; // no layers in layermenu
+		
+		console.log('first layeR: ', layerItem);
+
+		// this.enableLayer(layerItem);
+
+
 
 	},
 

@@ -493,7 +493,7 @@ body {
 	}
 
 .leaflet-top.leaflet-right {
-	position: fixed;
+	/*position: fixed;*/
 	bottom: 5px;
 	right: 5px;
 	top: initial;
@@ -981,4 +981,82 @@ svg.tracer {
 .fullpage-users.show.hide-top .manage-access-project-item-description{
 	width: 260px;
 }
+
+
+
+.cartocss-sql {
+	height: 100px;
+	width: 100%;
+	padding: 10px;
+	border: rgb(205, 205, 205) 1px solid;
+	resize: none;
+	font-family: Courier;
+	font-size: 14px;
+}
+
+.cartocss-sql:focus {
+	border: rgb(205, 205, 205) 1px solid !important;
+}
+
+
+
+/*progress bar processing*/
+.status-progress-bar.processing {
+	background: red;
+
+}
+
+/*refresh layer button*/
+.cartocss-refresh-button {
+    width: 30px;
+    height: 30px;
+    bottom: 0px;
+    border-radius: 2px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.9;
+    font-size: 15px;
+    font-weight: 500;
+    margin: auto;
+    position: absolute;
+    background-image: url('images/refresh.png');
+    left: 10px;
+    bottom: 23px;
+    background-size: 30px;
+    background-repeat: no-repeat;
+}
+
+.cartocss-refresh-button:hover {
+    background-color: rgba(224, 223, 223, 0.81);
+    border-radius: 5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

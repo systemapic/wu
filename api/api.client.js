@@ -254,18 +254,14 @@ module.exports = api.client = {
 
 	// check if slug is unique
 	checkUniqueSlug : function (req, res) {
-		var slug = req.body.slug; 
-		console.log('req.body: '+ req.body);
-		console.log();
-		console.log(req.body);
-		if (slug.toLowerCase) slug = slug.toLowerCase();
-		console.log('slug', slug);
-		
+		var slug = req.body.value;
+		if (slug && slug.toLowerCase) {
+			slug = slug.toLowerCase();
+		}
+
 		Clientel
 		.find({slug : slug})
 		.exec(function(err, result) { 
-			console.log('err, result', err, result);
-		
 			if (result.length == 0) return res.end('{"unique" : true }'); 	// unique
 			return res.end('{"unique" : false }');				// not unique
 		});

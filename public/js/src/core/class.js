@@ -364,6 +364,7 @@ Wu.Util = {
 		
 		url += path;
 
+
 		http.open("POST", url, true);
 
 		//Send the proper header information along with the request
@@ -420,6 +421,12 @@ Wu.Util = {
 		// send string
 		http.send(json);
 	},
+
+
+
+
+
+	
 
 	_getServerUrl : function () {
 		return app.options.servers.portal.slice(0,-1);

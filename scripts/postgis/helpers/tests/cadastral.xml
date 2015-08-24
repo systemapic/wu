@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Map>
+
+<Map background-color="#FFF">
+
+<Style name="cadastral">
+  <Rule>
+    <PolygonSymbolizer fill="darkred" fill-opacity=".5" />
+  </Rule>
+</Style>
+
+<Layer name="cadastral" status="on">
+  <StyleName>cadastral</StyleName>
+  <Datasource>
+    <Parameter name="table">new_table_cadastral</Parameter>
+    <Parameter name="geometry_field">wkb_geometry</Parameter>
+    <Parameter name="type">postgis</Parameter>
+    <Parameter name="user">docker</Parameter>
+    <Parameter name="password">docker</Parameter>
+    <Parameter name="dbname">zzjihbcpqm</Parameter>
+    <Parameter name="srid">4326</Parameter>
+  </Datasource>
+</Layer>
+</Map>

@@ -34,7 +34,33 @@ var layerSchema = mongoose.Schema({
 		mapbox 		: String,			// mapbox id: rawger.geography-class
 		cartodb 	: String,			// cartodb id: 
 		osm 		: String,			// osm id?
+	
+
+		postgis : {
+
+			sql : String,
+			cartocss : String,
+			cartocss_version : String,
+			geom_column : String,
+			file_id : String,
+			database_name : String,
+			table_name : String,
+			data_type : String,
+			geom_type : String,
+			raster_band : Number,
+			layer_id : String,
+			metadata : String,
+			// affected_tables : [String],
+			// interactivity : [String],
+			// attributes : {
+				// id : String,
+				// columns : [String]
+			// }
+
+		}
+
 	}, 
+
 
 	metadata : String, // json string with loads of meta
 	tooltip : String,  // json string with cartocss tooltips

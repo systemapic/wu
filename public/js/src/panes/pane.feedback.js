@@ -137,8 +137,6 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 		// set options
 		Wu.setOptions(this, options);
 
-		console.log('this.options, ', this.options);
-		
 		// init layout
 		this.initLayout();
 

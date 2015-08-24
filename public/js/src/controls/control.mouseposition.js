@@ -55,6 +55,7 @@ L.Control.Mouseposition = Wu.Control.extend({
         _addTo : function () {
                 this.addTo(app._map);
                 this._added = true;
+
         },
 
         _refresh : function () {

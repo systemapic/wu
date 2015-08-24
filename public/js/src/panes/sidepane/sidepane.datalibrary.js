@@ -99,9 +99,363 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			this._uploader = null;
 			delete this._uploader;
 		}
+
+		// if (this._uploaderSimple) {
+		// 	Wu.DomUtil.remove(this._uploaderSimple);
+		// 	this._uploaderSimple = null;
+		// 	delete this._uploaderSimple;
+		// }
+
 		// Upload button
-		this._uploader = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload');
+		// this._uploader = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Import data...');
+		// this._uploaderSimple = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload image/document');
+
+		this._uploader = Wu.DomUtil.create('input', 'smap-button-gray', this._controlInner, 'Import data...');
+		this._uploader.setAttribute('type', 'file');
+		this._uploader.id = 'fileinput';
+
+		this._uploaderId = Wu.Util.createRandom(7);
+		var that = this;
+		var uploadFn = this.uploadFile;
+		this._uploader.addEventListener('change', function () {
+			console.log('THIS', this);
+			var file = this.files[0];
+			console.log('file::: ', file);
+			uploadFn(file);
+
+			var size = parseInt(file.size / 1000 / 1000) + 'MB';
+			var name = file.name;
+			var description = name + ', ' + size;
+			console.log('uploadIRD uipload', that._uploaderId);
+			app.feedback.setMessage({
+				title : 'Uploading data',
+				description : description,
+				id : that._uploaderId
+			});
+
+		}, false);
 	},
+
+	_uploadProgress : function (a, b, c) {
+
+		var loaded = a.loaded;
+		var total = a.total;
+		var progress = (loaded/total) * 100;
+		console.log('uploadProgress', progress);
+		app.ProgressBar.setProgress(progress);
+	},
+
+	_upload : {
+
+		progress : function (data) {
+			// console.log('progress: ', data);
+			var loaded = data.loaded;
+			var total = data.total;
+			var progress = (loaded/total) * 100;
+			app.ProgressBar.setProgress(progress);
+
+			// estimate upload time for large files
+			if (total > 10000000) {
+				// console.log('big file!')
+				// app.ProgressBar.timedProgress()
+				
+			}
+		},
+
+		load : function (data) {
+			var uploadStatus = Wu.parse(data.target.response);
+			console.log('uploadStatus:', uploadStatus);
+
+			var size = uploadStatus.size;
+			var estimatedTime = (size * 1.5)/1000; // ms		// 420 sec for 250MB => 2 sec/MB
+
+			// console.log('estimatedTime', estimatedTime);
+
+			// console.log('uploadIRDD proces', app.SidePane.DataLibrary._uploaderId);
+
+			app.feedback.setMessage({
+				title : 'Processing data!',
+				description : 'File will be added to the Data Library as soon as it\'s finished. Estimated time approx. ' + parseInt(estimatedTime/1000) + ' seconds.',
+				clearDelay : estimatedTime,
+				id : app.SidePane.DataLibrary._uploaderId
+			});
+
+			// reset progress
+			app.ProgressBar.hideProgress();
+
+			// get file and add to client
+			app.SidePane.DataLibrary._getFile(uploadStatus, app.SidePane.DataLibrary._gotFile);
+
+		},
+
+		error : function (data) {
+			console.log('ERROR!', data);
+
+		},
+
+		abort : function (data) {
+			console.log('ABORT!', data);
+
+		},
+
+	},
+
+	_getFile : function (uploadStatus, callback) {
+		var xhr = new XMLHttpRequest();
+		var fd = new FormData();
+		var url = app.options.servers.portal + 'api/file/get';
+		url += '?fileUuid=' + uploadStatus.file_id;
+		url += '&access_token=' + app.tokens.access_token;
+
+		xhr.open("GET", url, true);
+		xhr.onreadystatechange = function() {
+			if(xhr.readyState == 4 && xhr.status == 200) {
+				var file = Wu.parse(xhr.responseText);
+				// console.log('FILE', file);
+
+				// return file
+				if (file) return callback(file);
+				
+				// loop until file is ready
+				setTimeout(function () {
+					app.SidePane.DataLibrary._getFile(uploadStatus, callback);
+				}, 1000);
+			}
+		}
+		xhr.send(null);
+	},
+
+	_gotFile : function (file) {
+		// console.log('_addFile: ', file);
+
+		// add file to lib
+		var dlib = app.SidePane.DataLibrary;
+		dlib._project.setFile(file);
+		dlib.reset();
+		dlib.refreshTable({
+			add: [file]
+		});
+
+		// create default layer
+		dlib._createDefaultLayer(file);
+
+		// reset progress
+		app.ProgressBar.hideProgress();
+	},
+
+	_createDefaultLayer : function (file) {
+
+		var file_id = file.uuid,
+		    project = this._project;
+
+		var layerJSON = {
+			"geom_column": "the_geom_3857",
+			"geom_type": "geometry",
+			"raster_band": "",
+			"srid": "",
+			"affected_tables": "",
+			"interactivity": "",
+			"attributes": "",
+			"access_token": app.tokens.access_token,
+			"cartocss_version": "2.0.1",
+			"cartocss": "#layer {  \n polygon-fill: red; \n marker-fill: #001980; \n marker-allow-overlap: true; \n marker-clip: false; \n marker-comp-op: screen;}",
+			"sql": "(SELECT * FROM " + file_id + ") as sub",
+			"file_id": file_id,
+			"return_model" : true,
+			"projectUuid" : this._project.getUuid()
+		}
+
+		// create postgis layer
+		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
+			console.log('api/db/createLayer', err, layerJSON);
+			var layer = Wu.parse(layerJSON);
+
+			var options = {
+				projectUuid : this._project.getUuid(), // pass to automatically attach to project
+				data : {
+					postgis : layer.options
+				},
+				metadata : layer.options.metadata,
+				title : file.name,
+				description : file.description,
+				file : file.uuid
+			}
+
+			// create new layer model
+			this._createLayerModel(options, function (err, layerModel) {
+
+				// refresh Sidepane Options
+				project.addLayer(layerModel);
+				app.SidePane.Options.settings.layermenu.update();
+				app.SidePane.Options.settings.baselayer.update();
+
+				// refresh sidepane
+				app.SidePane.refreshMenu();
+
+				// refresh cartoCssControl
+				var ccss = app.MapPane.getControls().cartocss;
+				ccss && ccss._refresh();	
+			})
+			
+		}.bind(this));
+
+	},
+
+	_createLayerModel : function (options, done) {
+
+		Wu.Util.postcb('/api/layers/new', JSON.stringify(options), function (err, body) {
+
+			var layerModel = Wu.parse(body);
+
+			done(null, layerModel);
+
+		}.bind(this));
+	},
+
+	uploadFile : function (file){
+		var url = app.options.servers.portal + 'api/import';
+		var xhr = new XMLHttpRequest();
+		var fd = new FormData();
+		xhr.open("POST", url, true);
+
+		// event handlers
+		var uploadProgress = app.SidePane.DataLibrary._upload.progress;
+		var uploadComplete = app.SidePane.DataLibrary._upload.load;
+		var uploadError = app.SidePane.DataLibrary._upload.error;
+		var uploadAbort = app.SidePane.DataLibrary._upload.abort;
+		
+		// set access_token on header
+		xhr.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
+
+		// events
+		xhr.upload.addEventListener("progress", uploadProgress, false);
+		xhr.addEventListener('load', uploadComplete, false);
+		xhr.addEventListener('error', uploadError, false);
+		xhr.addEventListener('abort', uploadAbort, false);
+		
+		// file
+		fd.append("data", file);
+
+		// project
+		fd.append('projectUuid', app.activeProject.getUuid());
+
+		// send
+		xhr.send(fd);
+	},
+
+
+	// process file
+	uploaded : function (result) {
+
+		
+		// handle errors
+		if (result.error) {
+			console.error('error', result.error);
+			this.handleError(result.error);
+		}
+		// return if nothing
+		if (!result.files) {
+			console.error('no files?');
+			return;
+		}
+		// add files to library
+		result.files && result.files.forEach(function (file, i, arr) {
+			
+			// add to project locally (already added on server)
+			this._project.setFile(file);
+		}, this);
+
+		// add layers
+		result.layers && result.layers.forEach(function (layer, i) {
+			this._project.addLayer(layer);
+
+			// custom title for rasters
+			var title = layer.data.raster ? 'Layer created' : 'Processing done!';
+			var sev = layer.data.raster ? 2 : 1;
+
+			// todo: set layer icon
+			app.feedback.setMessage({
+				title : title,
+				description : 'Added <strong>' + layer.title + '</strong> to available layers.',
+				id : result.uniqueIdentifier,
+				severity : sev
+			});
+
+		}, this);
+
+		// if not layer, no processing
+		if (!result.layers) {
+			var fileUuid = result.files[0].uuid;
+			app.SidePane.DataLibrary.processFileDone(fileUuid, 100, 1);
+		}
+
+		// refresh Sidepane Options
+		app.SidePane.Options.settings.layermenu.update();
+		app.SidePane.Options.settings.baselayer.update();
+
+		// refresh sidepane
+		app.SidePane.refreshMenu();
+
+		// refresh cartoCssControl
+		var ccss = app.MapPane.getControls().cartocss;
+		if (ccss) ccss._refresh();
+
+		// refresh
+		this.reset();
+
+		// add files
+		this.refreshTable({
+			add: result.files
+		});
+
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	_setHooks : function (on) {
 		if (this._hooks == on) return;
@@ -184,6 +538,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		
 		if (canDelete)   Wu.DomUtil.removeClass(this._deleter, 'displayNone');
 		if (canUpload)   Wu.DomUtil.removeClass(this._uploader, 'displayNone');
+		// if (canUpload)   Wu.DomUtil.removeClass(this._uploaderSimple, 'displayNone');
 		if (canDownload) Wu.DomUtil.removeClass(this._downloader, 'displayNone');
 		
 	},
@@ -228,18 +583,19 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	_addResumable : function () {
 		if (!app.activeProject) return;
+		return;
 
 		var projectUuid = app.activeProject.getUuid();
 
 		var r = this.r = new Resumable({
-			target : '/api/upload',
+			target : '/api/data/upload/chunked',
 			chunkSize : 1*1024*1024,
 			simultaneousUploads : 5,
 			generateUniqueIdentifier : function (file) {
 				var idr = file.size + '-' + file.lastModified + '-' + file.name;
 				return idr;
 			},
-			testChunks : true, // resumable chunks // todo: server side redis count not stable
+			testChunks : false, // resumable chunks // todo: server side redis count not stable
 			throttleProgressCallbacks : 1,
 			query : {
 				fileUuid : Wu.Util.guid('r'),
@@ -247,26 +603,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				access_token : app.tokens.access_token
 			},
 
-			// // max files to be uploaded at once
-			// maxFiles : 5,
-			// maxFilesErrorCallback : function (files, errorCount) {
-
-			// 	// feedback message
-			// 	app.feedback.setError({
-			// 		title : "Sorry, you can't do that!",
-			// 		description : 'Please only upload five files at a time.',
-			// 	});
-
-			// 	// hide drop
-			// 	app.SidePane.DataLibrary._hideDrop();
-			// },
-
 			// accepted filetypes
-			fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif', 'tiff', 'jp2', 'ecw'],
+			// fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif', 'tiff', 'jp2', 'ecw'],
+			fileType : ['zip', 'gz', 'geojson', 'tif', 'tiff', 'jp2', 'ecw'],
 			fileTypeErrorCallback : function (file, errorCount) {
 
 				// set feedback
-				var description = 'The file <strong>' + file.name + '</strong> is not an accepted filetype.';
+				var description = 'The file <strong>' + file.name + '</strong> is not a geodata file. To upload normal images or documents, use the "Upload image/document button".';
 				var filetype = file.name.split('.').reverse()[0];
 				
 				// custom shapefile feedback
@@ -326,24 +669,25 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			    estimatedProcessingTime = (size * 0.5).toFixed(0) + ' seconds',
 			    ext = file.fileName.split('.').reverse()[0];
 
-			var regularFile = (ext == 'pdf' || ext == 'txt' || ext == 'doc' || ext == 'docx' || ext == 'jpeg');
+			// var regularFile = (ext == 'pdf' || ext == 'txt' || ext == 'doc' || ext == 'docx' || ext == 'jpeg');
 			
 			message +=' <br><br>Pre-processing will take approx. ' + estimatedProcessingTime;
 
 			// set feedback
-			if (regularFile) {
-				app.feedback.setSuccess({
-					title : 'Upload done',
-					description : file.fileName + ' was uploaded successfully.',
-					id : file.uniqueIdentifier,
-				});
-			} else {
-				app.feedback.setMessage({
-					title : 'Upload success!',
-					description : message,
-					id : file.uniqueIdentifier
-				});
-			}
+			app.feedback.setMessage({
+				title : 'Upload success!',
+				description : message,
+				id : file.uniqueIdentifier
+			});
+			// if (regularFile) {
+			// 	app.feedback.setSuccess({
+			// 		title : 'Upload done',
+			// 		description : file.fileName + ' was uploaded successfully.',
+			// 		id : file.uniqueIdentifier,
+			// 	});
+			// } else {
+				
+			// }
 
 			// hide progess bar
 			app.ProgressBar.hideProgress();
@@ -351,7 +695,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		}.bind(this));
 
 		r.on('fileError', function(file, message){
-			console.log('r.fileError', file, message);
+			// console.log('r.fileError', file, message);
 		});
 
 		r.on('fileProgress', function(file){

@@ -138,7 +138,7 @@ L.Control.Legends = Wu.Control.extend({
 
 	_initContent : function () {
 	
-		
+		console.error('_initContent legends');
 
 		this.legends = {};
 		this._layers = [];
@@ -156,6 +156,7 @@ L.Control.Legends = Wu.Control.extend({
 			// Mobile arrow	
 		    	Wu.DomUtil.create('div', 'legends-mobile-arrow', this._content);
 		}
+
 	},
 
 

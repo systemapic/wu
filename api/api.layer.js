@@ -48,8 +48,19 @@ module.exports = api.layer = {
 	// create layer
 	create : function (req, res) {
 
+
+		var options = req.body;
+		console.log('CREATE 0---- layer', options);
+
+		api.layer.createModel(options, function (err, doc) {
+			console.log('created Mode err? ', err, doc);
+			if (err) return api.error.general(res, err);
+
+			res.json(doc);
+		});
+
 		// lol?
-		return res.end(JSON.stringify({error : 'Unsupported.'}))
+		// return res.end(JSON.stringify({error : 'Unsupported.'}))
 
 		// var layerType = req.body.layerType;
 
@@ -193,6 +204,14 @@ module.exports = api.layer = {
 			if (req.body.hasOwnProperty('zIndex')) {
 				var zIndex = req.body.zIndex;
 				layer.zIndex = zIndex;
+				layer.save();
+			}
+
+			// update data
+			if (req.body.hasOwnProperty('data')) {
+				var data = req.body.data;
+				layer.data = data;
+				layer.markModified('data');
 				layer.save();
 			}
 
@@ -477,22 +496,30 @@ module.exports = api.layer = {
 
 	createModel : function (options, callback) {
 
-		console.log('api.layer.createModel'.red);
+		console.log('api.layer.createModel'.red, options);
 
 		var layer 		= new Layer();
-		layer.uuid 		= options.uuid;
+		layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),
 		layer.title 		= options.title;
 		layer.description 	= options.description || '';
 		layer.legend 		= options.legend || '';
 		layer.file 		= options.file;
 		layer.metadata 		= options.metadata;
+		layer.data 		= options.data;
+		// if (options.data.geojson) layer.data.geojson = options.data.geojson;
+		// if (options.data.raster)  layer.data.raster  = options.data.raster;
+		// if (options.data.postgis) layer.data.postgis = options.data.postgis;
 
-		if (options.data.geojson) layer.data.geojson = options.data.geojson;
-		if (options.data.raster)  layer.data.raster  = options.data.raster;
+		layer.save(function (err, savedLayer) {
+			if (err) return callback(err);
 
-		layer.save(function (err, doc) {
-			// console.log('layer model created:', err, doc);
-			callback && callback(err, doc);
+			if (options.projectUuid) {
+				return api.layer.addToProject(layer._id, options.projectUuid, function (err) {
+					callback && callback(err, savedLayer);
+				});
+			}
+			
+			callback && callback(err, savedLayer);
 		});
 	},
 
