@@ -1,21 +1,17 @@
 @font-face {
     font-family: 'Helvetica neue';
     src: url(phantomfont/Open_Sans/OpenSans-Light.ttf);
-	}
+}
 
-.leaflet-bottom.leaflet-right,
-.leaflet-top.leaflet-right,
 .leaflet-top.leaflet-left,
+.leaflet-control-layermenu.leaflet-control,
 #legends-collapser,
-#start-pane,
-.header-role,
-.leaflet-control-container,
-.q-editor-container,
-.cartocss-control-container {
-	display: none !important;
-	}
+#start-pane{
 
-#header {
-	width: auto !important;
-	}
+}
+
+.cartocss-toolbar-button{
+	display: none !important;
+	opacity: 0 !important;
+}
 
