@@ -574,7 +574,6 @@ Wu.App = Wu.Class.extend({
 		// add phantomJS stylesheet		
 		isThumb ? app.Style.phantomJSthumb() : app.Style.phantomJS();
 
-
 		// avoid Loading! etc in status
 		app.setStatus('systemapic'); // too early
 

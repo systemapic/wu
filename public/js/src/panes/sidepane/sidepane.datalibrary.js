@@ -722,7 +722,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.addHooks();
 
 		// hide other controls
-		this._hideControls();
+		// this._hideControls();
 	},
 	
 	_deactivate : function () {
@@ -731,7 +731,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this.removeHooks();
 
 		// show controls
-		this._showControls();
+		// this._showControls();
 	},
 
 	_hideControls : function () {

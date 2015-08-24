@@ -248,9 +248,9 @@ Wu.SidePane = Wu.Pane.extend({
 		Wu.DomUtil.addClass(app._editorContentPane, 'hide-menu');
 
 		// Make map clickable behind...
-		setTimeout(function(){
-			Wu.DomUtil.addClass(app._editorContentPane, 'displayNone');	
-		}, 50)
+		// setTimeout(function(){
+		Wu.DomUtil.addClass(app._editorContentPane, 'displayNone');	
+		// }, 50)
 
 		// refresh leaflet
 		this._refreshLeaflet();
@@ -278,9 +278,9 @@ Wu.SidePane = Wu.Pane.extend({
 		Wu.DomUtil.removeClass(app._editorContentPane, 'displayNone');
 
 		// Have to set a micro timeout, so that it doesn't mess with the displayNone class above
-		setTimeout(function() {
-			Wu.DomUtil.removeClass(app._editorContentPane, 'hide-menu');
-		}, 50)
+		// setTimeout(function() {
+		Wu.DomUtil.removeClass(app._editorContentPane, 'hide-menu');
+		// }, 50)
 
 		// refresh leaflet
 		this._refreshLeaflet();
