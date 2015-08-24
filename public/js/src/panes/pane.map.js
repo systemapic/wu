@@ -796,6 +796,9 @@ Wu.MapPane = Wu.Pane.extend({
 
 		// append content
 		this._popupContent += content;
+
+		this.openPopup(e);
+
 	},
 
 	_clearPopup : function () {
@@ -1266,8 +1269,6 @@ Wu.MapPane = Wu.Pane.extend({
 
 	_createPopupContent : function (e) {
 
-		console.log('opipupcontent', e);
-
 		// check for stored tooltip
 		var data = e.data,
 		    layer = e.layer,
@@ -1300,7 +1301,6 @@ Wu.MapPane = Wu.Pane.extend({
 			return string;
 
 		} else {
-
 			// create content
 			var string = '';
 			for (var key in data) {

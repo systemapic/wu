@@ -97,6 +97,7 @@ L.Control.Cartocss = Wu.Control.extend({
 
 		// mark content loaded
 		this._initedContent = true;
+
 	},
 
 	_initEmpty : function (){
@@ -1183,6 +1184,13 @@ L.Control.Cartocss = Wu.Control.extend({
 
 			// new layer
 			var newLayerStyle = Wu.parse(newLayerJSON);
+
+			console.log('newLayerJSON', newLayerStyle);
+
+			if (newLayerStyle.error) {
+				done();
+				return console.error(newLayerStyle.error);
+			}
 
 			layer.setStyle(newLayerStyle.options);
 

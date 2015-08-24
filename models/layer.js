@@ -49,6 +49,7 @@ var layerSchema = mongoose.Schema({
 			geom_type : String,
 			raster_band : Number,
 			layer_id : String,
+			metadata : String,
 			// affected_tables : [String],
 			// interactivity : [String],
 			// attributes : {
