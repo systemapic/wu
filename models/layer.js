@@ -65,8 +65,8 @@ var layerSchema = mongoose.Schema({
 	metadata : String, // json string with loads of meta
 	tooltip : String,  // json string with cartocss tooltips
 	legends : String,  // json string with cartocss legends
-	file : String 	   // file uuid that layer is connected to, if any
-
+	file : String,	   // file uuid that layer is connected to, if any
+	style : String,
 });
 
 
