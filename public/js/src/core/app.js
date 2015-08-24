@@ -53,7 +53,7 @@ Wu.App = Wu.Class.extend({
 		var access_token = app.tokens.access_token;
 
 		// print debug
-		console.log('Debug: access_token: ', access_token);
+		// console.log('Debug: access_token: ', access_token);
 
 		// test access token
 		Wu.send('/api/userinfo', {}, function (err, body) {
@@ -117,8 +117,14 @@ Wu.App = Wu.Class.extend({
 		// create app container
 		this._initContainer();
 
+		// init chrome
+		this._initChrome();
+
 		// create panes
 		this._initPanes();
+
+		// init tools
+		this._initTools();
 
 		// init pane view
 		this._initView();
@@ -161,6 +167,17 @@ Wu.App = Wu.Class.extend({
 		}, this);
 	},
 
+	_initChrome : function () {
+		this.Chrome = {};
+
+		// top chrome
+		this.Chrome.Top = new Wu.Chrome.Top();
+
+		// right chrome
+		this.Chrome.Right = new Wu.Chrome.Right();
+
+	},
+
 	_initPanes : function () {
 
 		// render tooltip
@@ -185,9 +202,6 @@ Wu.App = Wu.Class.extend({
 			projects : this.Projects
 		});
 
-		// render dropzone pane
-		// this.Dropzone = new Wu.Dropzone();
-
 		// render side pane 
 		this.SidePane = new Wu.SidePane();	// todo: add settings more locally? Wu.SidePane({options})
 
@@ -200,13 +214,17 @@ Wu.App = Wu.Class.extend({
 		// render eror pane
 		this.FeedbackPane = new Wu.FeedbackPane();
 
+		
+	},
+
+	_initTools : function () {
+
 		// init tools
 		this.Tools = {};
 		this.Tools.FreeDraw = new Wu.Tool.FreeDraw({
 			map : this.MapPane._map
 		});
 	
-
 	},
 
 	// init default view on page-load

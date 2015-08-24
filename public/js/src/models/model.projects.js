@@ -59,9 +59,7 @@ Wu.Project = Wu.Class.extend({
 		if (!layers) return;
 
 		// create
-		console.log('initLayers');
 		layers.forEach(function (layer) {
-			console.log('init>', layer);
 			var wuLayer =  new Wu.createLayer(layer);
 			if (wuLayer) this.layers[layer.uuid] = wuLayer;
 		}, this);
@@ -74,7 +72,6 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	addLayer : function (layer) {
-		console.log('addLayer: ', layer);
 		var l = new Wu.createLayer(layer);
 		if (l) this.layers[layer.uuid] = l;
 		return l || false;
@@ -122,8 +119,6 @@ Wu.Project = Wu.Class.extend({
 
 		return title;
 	},
-
-	
 
 	createLayerFromGeoJSON : function (geojson) {
 
@@ -280,7 +275,6 @@ Wu.Project = Wu.Class.extend({
 		this._refresh();
 		this.refreshSidepane();
 	},
-
 
 	_update : function (field) {
 
@@ -539,6 +533,22 @@ Wu.Project = Wu.Class.extend({
 
 	getLayers : function () {
 		return _.toArray(this.layers);
+	},
+
+	getPostGISLayers : function () {
+		return _.filter(this.layers, function (l) {
+			if (!l) return false;
+			if (!l.store.data) return false;
+			return l.store.data.postgis;
+		});
+	},
+
+	// debug
+	getDeadLayers : function () {
+		return _.filter(this.layers, function (l) {
+			if (!l) return true;
+			return l.store.data == null;
+		});
 	},
 
 	getActiveLayers : function () {

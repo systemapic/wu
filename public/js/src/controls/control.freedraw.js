@@ -21,7 +21,7 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 
 		// set options
 		this._freeDraw.options.setHullAlgorithm(false);
-		// this._freeDraw.options.setSmoothFactor(1);
+		this._freeDraw.options.setSmoothFactor(0);
 
 		// set shortcut key
 		this._shortkeys();
@@ -83,6 +83,13 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 
 		console.log('ADDEVENTS!@!!!');
 
+		// map click
+		this._map.on('mousedown', function (e) {
+			console.log('map mousedown', e);
+		}, this);
+
+
+		// freedraw events
 		this._freeDraw.on('polygon', function (layer) { 			// todo: refactor! 
 			console.log('added layer', layer);
 
@@ -131,10 +138,14 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 		// var row = e.data[column];
 		// var layer_id = e.layer.store.data.postgis.layer_id;
 
+		var layer_id = this._getActiveLayerID();
+
+		if (!layer_id) return console.error('no active layer_id to fetch data from??');
+
 		var options = {
 			access_token : app.tokens.access_token,
 			geojson : options.geojson,
-			layer_id : this._layer.store.data.postgis.layer_id
+			layer_id : layer_id
 
 		}
 
@@ -143,11 +154,19 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 		Wu.send('/api/db/fetchArea', options, callback, this);
 	},
 
+	_getActiveLayerID : function () {
 
+		console.log('_getActiveLayerID');
+		console.log('zinde', app.MapPane._layermenuZIndex);
 
-		// todo monday: create route, do query, etc.
+		var layer = app.MapPane._layermenuZIndex._index[0];
 
+		if (!layer || !layer.store || !layer.store.data || !layer.store.data.postgis) return false;
 
+		var layer_id = layer.store.data.postgis.layer_id;
+
+		return layer_id;
+	},
 
 });
 

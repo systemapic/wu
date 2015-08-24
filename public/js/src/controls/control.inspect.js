@@ -50,6 +50,7 @@ L.Control.Inspect = Wu.Control.extend({
 		// stop
 		Wu.DomEvent.on(container, 'mousedown click dblclick', Wu.DomEvent.stop, this);
 
+		
 		return this;
 	},
 
@@ -195,6 +196,7 @@ L.Control.Inspect = Wu.Control.extend({
 
 	// currently called from layers.js:63 .. refactor.. dont chain, do modules, event emitters
 	addLayer : function (layer) {
+		if (!this._layers) return; // bc fn called even if inspect is disabled
 		
 		// Make sure that the layer inspector is visible
 		this._content.style.display = 'block';

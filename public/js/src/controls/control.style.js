@@ -9,6 +9,7 @@ Wu.Style = Wu.Class.extend({
 		this._styletag = Wu.DomUtil.get("styletag");
 
 		Wu.Mixin.Events.on('projectSelected', this._projectSelected, this);
+
 	},
 
 	_projectSelected : function (e) {

@@ -14,8 +14,6 @@ Wu.Layer = Wu.Class.extend({
 		// data not loaded
 		this.loaded = false;
 
-		console.error('create layer', layer);
-
 	},
 
 	addHooks : function () {
@@ -95,6 +93,11 @@ Wu.Layer = Wu.Class.extend({
 		this._addToZIndex(type);
 
 		this._added = true;
+
+		// fire event
+		Wu.Mixin.Events.fire('layerEnabled', { detail : {
+			layer : this
+		}}); 
 
 	},
 
@@ -388,6 +391,9 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	setStyle : function (postgis) {
+		console.log('set style -> postgis: ', postgis);
+		if (!postgis) return console.error('no styloe to set!');
+		
 		this.store.data.postgis = postgis;
 		this.save('data');
 	},
@@ -453,7 +459,6 @@ Wu.Layer = Wu.Class.extend({
 
 	_setGridEvents : function (on) {
 		var grid = this.gridLayer;
-		console.log('grid?', grid, on);
 		if (!grid || !on) return;
 		grid[on]('mousedown', this._gridOnMousedown, this);
 		grid[on]('mouseup', this._gridOnMouseup, this);
@@ -464,83 +469,9 @@ Wu.Layer = Wu.Class.extend({
 		this._setGridEvents('off');
 	},
 
-	_fetchData : function (e, callback) {
-		console.log('fetchData', e);
-
-		var keys = Object.keys(e.data);
-		var column = keys[0];
-		var row = e.data[column];
-		var layer_id = e.layer.store.data.postgis.layer_id;
-
-		var options = {
-			column : column,
-			row : row,
-			layer_id : layer_id,
-
-			access_token : app.tokens.access_token
-		}
-
-		Wu.send('/api/db/fetch', options, callback, this);
-	},
-
-	_fetchedData : function (ctx, resp) {
-		console.log('_fetchedData', ctx, resp);
-	},
-
-
-
-	_gridOnMousedown : function(e) {
-		if (!e.data) return;
-
-		// pass layer
-		e.layer = this;
-
-		// add to pending
-		// app.MapPane._addPopupContent(e);
-
-		// fetch data
-		this._fetchData(e, function (ctx, json) {
-			var data = JSON.parse(json);
-			console.log('fetched data: ', data);
-			e.data = data;
-			var event = e.e.originalEvent;
-			this._event = {
-				x : event.x,
-				y : event.y
-			}
-			app.MapPane._addPopupContent(e);
-		});
-
-		
-
-	},
-
-	_gridOnMouseup : function (e) {
-		if (!e.data) return;
-
-		// pass layer
-		e.layer = this;
-
-		var event = e.e.originalEvent;
-
-		if (this._event === undefined || this._event.x == event.x) {
-			// open popup 
-			app.MapPane.openPopup(e);
-		} else {
-			// clear old
-			app.MapPane._clearPopup();
-		}
-
-	},
-
-	_gridOnClick : function (e) {
-		// clear old
-		app.MapPane._clearPopup();
-
-	},
+	
 
 	_flush : function () {
-
 		this.remove();
 		app.MapPane._clearPopup();
 		this._removeGridEvents();
@@ -572,20 +503,16 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		// prepare raster
 		this._prepareRaster();
 
-		console.log('PostGIS layer update()');
-
 		// prepare utfgrid
 		this._prepareGrid();
 
 		// enable
-		if (options) console.log('OPTIONS ==> ', options);
 		if (options && options.enable) {
 			map.addLayer(this.layer);
 		}
 	},
 
 	_getLayerUuid : function () {
-		console.log('this', this);
 		return this.store.data.postgis.layer_id;
 	},
 
@@ -607,16 +534,12 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		var layerUuid = this._getLayerUuid();
 		var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.png' + access_token;
 
-		console.log('url', url);
-
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			layerUuid: this._getLayerUuid(),
 			subdomains : subdomains,
 			maxRequests : 0,
 		});
-
-		console.log('loaded layer: ', this.layer);
 
 		// load grid after all pngs.. (dont remember why..)
 		// Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
@@ -642,14 +565,11 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 	_updateGrid : function (l) {
 
-		console.log('_updateGrid', l);
-
 		// refresh of gridlayer is attached to layer. this because vector tiles are not made in vile.js, 
 		// and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
 		// - also, removed listeners in L.UtfGrid (onAdd)
 		// 
 		if (this.gridLayer) {
-			console.log('this.gridLayer._update()');
 			this.gridLayer._update();
 		}
 	},
@@ -681,14 +601,85 @@ Wu.PostGISLayer = Wu.Layer.extend({
 	},
 
 
-	updateStyle : function () {
-		return console.error('updateStyle, remove');
-		// set new options and redraw
-		if (this.layer) this.layer.setOptions({
-			cartoid : this.getCartoid(),
-		});
+	// updateStyle : function () {
+	// 	return console.error('updateStyle, todo: remove');
+	// 	// set new options and redraw
+	// 	if (this.layer) this.layer.setOptions({
+	// 		cartoid : this.getCartoid(),
+	// 	});
+	// },
+
+
+	_fetchData : function (e, callback) {
+
+		var keys = Object.keys(e.data);
+		var column = keys[0];
+		var row = e.data[column];
+		var layer_id = e.layer.store.data.postgis.layer_id;
+
+		var options = {
+			column : column,
+			row : row,
+			layer_id : layer_id,
+			access_token : app.tokens.access_token
+		}
+
+		Wu.send('/api/db/fetch', options, callback, this);
 	},
 
+	
+
+	_gridOnMousedown : function(e) {
+		if (!e.data) return;
+
+		// pass layer
+		e.layer = this;
+
+		// fetch data
+		this._fetchData(e, function (ctx, json) {
+			
+			var data = JSON.parse(json);
+			console.log('fetched data: ', data);
+			e.data = data;
+			var event = e.e.originalEvent;
+			this._event = {
+				x : event.x,
+				y : event.y
+			}
+			app.MapPane._addPopupContent(e);
+		});
+
+		
+
+	},
+
+	_gridOnMouseup : function (e) {
+		if (!e.data) return;
+
+		// pass layer
+		e.layer = this;
+
+		var event = e.e.originalEvent;
+
+		
+
+		if (this._event === undefined || this._event.x == event.x) {
+			// open popup 
+			// app.MapPane.openPopup(e);
+
+			// console.log('pop 7 open');
+		} else {
+			// clear old
+			app.MapPane._clearPopup();
+		}
+
+	},
+
+	_gridOnClick : function (e) {
+		// clear old
+		// app.MapPane._clearPopup();
+
+	},
 
 });
 

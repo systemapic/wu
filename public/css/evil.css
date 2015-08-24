@@ -326,10 +326,11 @@ aka feedback pane
 
 .leaflet-right .leaflet-control {
 	margin-bottom: 6px !important;
+	top: 34px;
 	}
 
 .leaflet-control-description {
-	top: -6px !important;
+	/*top: -6px !important;*/
 	}
 
 .legends-item {

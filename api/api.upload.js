@@ -225,6 +225,7 @@ module.exports = api.upload = {
 		console.log('file_id', file_id);
 
 		api.redis.get(file_id_key, function (err, uploadStatus) {
+			console.log('err, uploadStatus', err, uploadStatus);
 			if (err) return api.error.general(req, res, err);
 
 			// return upload status
