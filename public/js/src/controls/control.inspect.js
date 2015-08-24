@@ -50,6 +50,7 @@ L.Control.Inspect = Wu.Control.extend({
 		// stop
 		Wu.DomEvent.on(container, 'mousedown click dblclick', Wu.DomEvent.stop, this);
 
+		
 		return this;
 	},
 

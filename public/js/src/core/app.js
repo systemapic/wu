@@ -53,7 +53,7 @@ Wu.App = Wu.Class.extend({
 		var access_token = app.tokens.access_token;
 
 		// print debug
-		console.log('Debug: access_token: ', access_token);
+		// console.log('Debug: access_token: ', access_token);
 
 		// test access token
 		Wu.send('/api/userinfo', {}, function (err, body) {
@@ -201,9 +201,6 @@ Wu.App = Wu.Class.extend({
 		this.StartPane = new Wu.StartPane({
 			projects : this.Projects
 		});
-
-		// render dropzone pane
-		// this.Dropzone = new Wu.Dropzone();
 
 		// render side pane 
 		this.SidePane = new Wu.SidePane();	// todo: add settings more locally? Wu.SidePane({options})
