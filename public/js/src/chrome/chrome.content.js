@@ -455,6 +455,7 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		this._cartoEditor.addKeyMap(this._keymap);
 		this._SQLEditor.addKeyMap(this._keymap);
 
+		
 		keymaster('⌘+r, ctrl+r', function(){
 			this._refreshLayer();
 			return false;
