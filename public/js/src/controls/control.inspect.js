@@ -533,7 +533,7 @@ L.Control.Inspect = Wu.Control.extend({
 		var descriptionControl = app.MapPane.getControls().description;
 		if (descriptionControl) descriptionControl.removeLayer(entry.layer);	
 
-		// Hise Layer inspector if it's empty
+		// Hide Layer inspector if it's empty
 		if (!this._layers.length) this._content.style.display = 'none';
 
 	},

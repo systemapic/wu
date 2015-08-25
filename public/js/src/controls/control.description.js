@@ -7,6 +7,7 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	onAdd : function (map) {
+
 		var className = 'leaflet-control-description',
 		    container = L.DomUtil.create('div', className),
 		    options   = this.options;
@@ -56,7 +57,10 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_clear : function () {
+		// console.log('%chide', 'background: green; color: white;');
 		this._setDescription('');
+		this.isOpen = false;
+		this.toggleScale();
 	},
 
 	_refresh : function () {
@@ -100,6 +104,7 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_off : function () {
+
 		this._hide();
 	},
 
@@ -130,24 +135,31 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_show : function () {
-		this._container.style.display = 'block'; 
+		this._container.style.display = 'block';
+		this.isOpen = true;
 	},
 
-	_hide : function () {
+	_hide : function () {	
+
 		this._container.style.display = 'none'; 
+		this.isOpen = false;
 	},
 
 	show : function () {
 		if (!this._container) return;
 		this._isActive() ? this._show() : this._hide();
+		// console.log('%cshow', 'background: green; color: white;');
+		this.toggleScale();
 	},
 
 	hide : function () {
+		
 		if (!this._container) return;
 		this._hide();
 	},
 
-	_hideIfEmpty : function () {
+	_hideIfEmpty : function () {		
+
 		if (!this.activeLayer) this._hide();
 	},
 
@@ -312,6 +324,7 @@ L.Control.Description = Wu.Control.extend({
 
 		// Google Analytics event tracking
 		app.Analytics.setGaEvent(['Controls', 'Description toggle']);
+		
 
 		// Fire function
 		this.toggleCloser();
@@ -354,13 +367,20 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	closePane : function () {
+
 		this._container.style.display = "none";
 		this._isClosed = true;
 	},
 	
 	openPane : function () {
+
 		this._container.style.display = "block";
 		this._isClosed = false;			
+	},
+
+	toggleScale : function () {
+
+		app.MapPane.getControls().measure.__toggle();
 	}
 	
 });
