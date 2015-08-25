@@ -32,7 +32,7 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 	_shortkeys : function () {
 
 		// set keyboard shortcut
-		key('d', this.toggle.bind(this));
+		keymaster('d', this.toggle.bind(this));
 
 	},
 

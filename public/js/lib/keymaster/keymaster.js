@@ -294,3 +294,5 @@
   if(typeof module !== 'undefined') module.exports = assignKey;
 
 })(this);
+
+var keymaster = key.noConflict();
