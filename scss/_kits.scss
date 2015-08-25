@@ -221,11 +221,11 @@ input[type=checkbox] + label.check {
 	}
 
 .leaflet-top.leaflet-right {
-	-webkit-transition: bottom 250ms ease, right 250ms ease;
+/*	-webkit-transition: bottom 250ms ease, right 250ms ease;
 	-moz-transition: bottom 250ms ease, right 250ms ease;	
 	-o-transition: bottom 250ms ease, right 250ms ease;	
 	transition: bottom 250ms ease, right 250ms ease;	
-	}
+*/	}
 
 .uncollapse-killer {
 	-webkit-transition: width 250ms ease, height 250ms ease, left 250ms ease, margin 250ms ease;

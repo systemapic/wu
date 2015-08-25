@@ -406,6 +406,138 @@
 .q-editor-content-item {
     background: white;
     box-shadow: none;
+    }
+
+.leaflet-control-layermenu.closed {
+    display: none !important;
+    }
+
+.edit-mode .scroller-frame {
+    padding-top: 33px;
+    }
+
+.fullpage-users, 
+.data-library,
+.fullpage-documents {
+    top: 36px;
+    }
+
+.users-inner, 
+.data-library-inner,
+.fullpage-documents .editor-wrapper {
+    box-shadow: none;
+    background: white;    
+    }
+
+.fullpage-documents {
+    box-shadow: none;
+    width: 895px;
+    }
+
+.documents-container-rightpane {
+    border-left: 1px solid #EAEAEA;
+    }
+
+.leaflet-bottom.leaflet-right {
+    z-index: 100;
+    }
+
+.leaflet-top.leaflet-right {
+    bottom: 38px !important;
+    }
+
+.measure-padding-right {
+    right: 285px;
+    }    
+
+.layer-menu-item-wrap {
+    background-color: #cccccc !important;
+    color: #454545;
+    font-weight: 500;
+    }
+
+.layer-active {
+    background-color: #78a09c !important;
+    color: white !important;
+    font-weight: 900;
+    }
+
+.menufolder {
+    font-weight: 900;
+    background-color: #3C4759 !important;
+}    
+
+.layer-menu-item {
+    text-indent: 7px;
+    text-align: left;
 }
+
+.menufolder .layer-menu-item {
+    text-indent: 32px;
+}
+
+.menufolder {
+  background-image: none;
+}
+
+.menufolder:before {
+    content: '';
+    background-image: url(images/systemapic-sprite.png);
+    background-position: -61px -45px;
+    background-repeat: no-repeat;
+    background-size: auto;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+
+.layer-active .layer-menu-flyto {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    width: 21px;
+    background-image: url(images/evil_sprite.png);
+    background-repeat: no-repeat;
+    background-position: -283px -42px;
+    display: none;
+    opacity: 0.7;
+    }
+
+.layer-active:hover .layer-menu-flyto { 
+    display: block;
+    }
+
+.layer-menu-flyto:hover {
+    opacity: 1;
+    }    
+
+
+
+/* OVERRIDE KNUT */
+
+.chrome-right {
+    border-top: 1px solid #999;
+    }
+
+.chrome-right:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -2px;
+    width: 2px;
+    height: 100%;
+    background: black;
+    opacity: 0.2;
+    }
+
+.status-progress-bar {
+    background-color: red;
+    box-shadow: none;
+    height: 2px;
+    }
+
 
 

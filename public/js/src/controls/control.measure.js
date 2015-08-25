@@ -56,6 +56,25 @@ L.Control.Measure = Wu.Control.extend({
 
 	_show : function () {
 		this._container.style.display = 'block';
+
+		this.__toggle();
+	},
+
+	__toggle : function () {
+
+
+		console.log('SHOW THE MOTHER FUCKING MEASURE!!!');
+
+		var description = app.MapPane.getControls().description;
+
+		console.log('description.isOpen', description.isOpen);
+
+		if ( description.isOpen ) {
+			Wu.DomUtil.addClass(this._container, 'measure-padding-right')
+		} else {
+			Wu.DomUtil.removeClass(this._container, 'measure-padding-right')
+		}
+
 	},
 
 	_hide : function () {
