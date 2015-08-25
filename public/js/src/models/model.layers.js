@@ -101,6 +101,34 @@ Wu.Layer = Wu.Class.extend({
 
 	},
 
+	_addThin: function () {
+		if (!this._inited) this.initLayer();
+
+		// only add to map temporarily
+		app._map.addLayer(this.layer);
+
+	},
+
+	_removeThin : function () {
+		if (!this._inited) this.initLayer();
+		app._map.removeLayer(this.layer);
+	},
+
+	flyTo : function () {
+
+		var extent = this.getMeta().extent;
+		if (!extent) return;
+
+		var southWest = L.latLng(extent[1], extent[0]),
+		    northEast = L.latLng(extent[3], extent[2]),
+		    bounds = L.latLngBounds(southWest, northEast);
+
+		// fly
+		var map = app._map;
+		map.fitBounds(bounds);
+	},
+
+
 	addToControls : function () {
 
 		if (this._isBase) return;
@@ -232,6 +260,9 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	getTitle : function () {
+		// override, get file title instead (if exists)
+		var file = this.getFile();
+		if (file) return file.getName();
 		return this.store.title;
 	},
 
@@ -555,6 +586,14 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 	getCartoCSS : function (cartoid, callback) {
 		return this.store.data.postgis.cartocss;
+	},
+
+	getSQL : function () {
+		return this.store.data.postgis.sql;
+	},
+
+	getPostGISData : function () {
+		return this.store.data.postgis;
 	},
 
 

@@ -866,13 +866,6 @@ svg.tracer {
   height: 29px;
 } 
 
-.CodeMirror{
-	border-bottom: 2px solid #ddd;
-	border-left: 2px solid #ddd;
-}
-
-
-
 #map-initpos-inner {
 	cursor: default !important;
 }

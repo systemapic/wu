@@ -14,7 +14,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		this.initContainer();
 
 		// add hooks
-		this.addHooks();
+		this._addEvents();
 	},
 
 	initContainer : function () {
@@ -27,18 +27,30 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 			appendTo : this._container
 		});
 
-		// // create the style editor
-		// this._styleEditor = new Wu.Chrome.Content.StyleEditor({
-		// 	appendTo : this._container
-		// });
-
-		// create other containers for other type content
-		// ...
-
 	},
 
-	addHooks : function () {
+	_addEvents : function () {
 		// todo
+		Wu.DomEvent.on(window, 'resize', this._windowResize, this);
+	},
+
+	_removeEvents : function () {
+		Wu.DomEvent.off(window, 'resize', this._windowResize, this);
+	},
+
+	_windowResize : function () {
+		console.log('window resize!');
+	},
+
+	getDimensions : function () {
+
+		var dims = {
+			width : this.options.defaultWidth,
+			height : this._container.offsetHeight
+		}
+
+		return dims;
+
 	},
 
 
@@ -50,6 +62,9 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 		// move map
 		this.moveMap('open');
+
+		// fire event?
+		this._settingsSelector.opened();
 	},
 
 	close : function () {
@@ -60,6 +75,10 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 		// move map
 		this.moveMap('close');
+
+		// fire event?
+		this._settingsSelector.closed();
+
 	},
 
 	// helper fn, todo: refactor

@@ -262,10 +262,9 @@
 
 .chrome-content.settingsSelector { 
     position: absolute;
-    border-bottom: 1px solid gray;
     padding-bottom: 20px;
     width: 100%;
-    height: 100px;
+    height: 80px;
 }
 
 
@@ -286,6 +285,7 @@
     color: white;
     cursor: pointer;
     margin-top: 4px;
+    font-size: 15px;
 }
 .chrome-content.settings-button:hover {
     background: #218DE8;
@@ -300,8 +300,7 @@
 
 .chrome-content.settings-tabs-wrapper {
     position: absolute;
-    top: 100px;
-    margin: 20px;
+    top: 120px;
 }
 .chrome-content.active-layer.title {
     font-size: 20px;
@@ -352,6 +351,10 @@
 
 .chrome-content.settings-button.active-tab {
     background: red;
+}
+
+.chrome.chrome-content.styler {
+    margin-top: 5px;
 }
 
 
@@ -538,6 +541,65 @@
     box-shadow: none;
     height: 2px;
     }
+
+
+
+
+
+
+/*codemirror editor*/
+
+.CodeMirror {
+    background: white;
+    font-size: 12px;
+}
+.span.cm-carto-valid-identifier {
+    color: #353535;
+}
+
+.chrome.chrome-content.cartocss.refresh-button {
+    width: 200px;
+    height: 35px;
+    background: #FF5E5E;
+    border-radius: 3px;
+    text-align: center;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto;
+    padding: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+.chrome.chrome-content.cartocss.refresh-button:hover {
+    background: red;
+}
+
+.chrome.chrome-content.cartocss.title {
+    font-size: 15px;
+    margin: 5px;
+    margin-top: 20px;
+    margin-left: 20px;
+    opacity: 0;
+    transition: opacity 0.5s linear;
+}
+
+.chrome.chrome-content.styler-content.active-layer.wrapper {
+    margin: 20px;
+    margin-top: 4px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -185,6 +185,7 @@ module.exports = function(grunt) {
 					'public/js/lib/codemirror/mode/cartocss/codemirror.palette.js',
 					'public/js/lib/codemirror/mode/cartocss/sexagesimal.js',
 					'public/js/lib/codemirror/mode/cartocss/spectrum.js',
+					'public/js/lib/codemirror/mode/sql/sql.js',
 
 					// extra
 					'public/js/lib/opentip/opentip-native.js',

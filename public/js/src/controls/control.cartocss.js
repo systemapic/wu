@@ -327,7 +327,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		string += 	'	// --------------------------\n'
 
 		// add each field to string
-		for (key in fields) {
+		for (var key in fields) {
 			var type = fields[key];
 			string += '    // [' + key + '=' + type + '] {}\n';
 		}
@@ -905,7 +905,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		this._toolTipSwitches = [];
 
 		// for each field
-		for (key in fields) {
+		for (var key in fields) {
 			var value = fields[key];
 
 			// create tooltip entry

@@ -34,9 +34,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// User name button container
 		this._usrNameContainer = Wu.DomUtil.create('div', 'username-container', this._buttons);
 
-		// USERNAME
-		// USERNAME
-
 		// Username
 		this._usrName = Wu.DomUtil.create('div', 'top-username', this._usrNameContainer);
 
@@ -46,26 +43,18 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Logout
 		this._usrLogout = Wu.DomUtil.create('div', 'top-logout', this._usrNameContainer, 'log out');
 
-		// BUTTONS
-		// BUTTONS
-
 		// Layers button
 		this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton', this._buttons);
 		
 		// Settings button
-		this._cartoeditorBtn = Wu.DomUtil.create('div', 'chrome-button cartoeditor', this._buttons);
+		this._settingsButton = Wu.DomUtil.create('div', 'chrome-button cartoeditor', this._buttons);
 
 	},
-
-
-	// HOOKS
-	// HOOKS
-	// HOOKS
 
 	_setHooks : function (onoff) {
 
 		// click event on carto editor button
-		Wu.DomEvent[onoff](this._cartoeditorBtn, 'click', this._toggleCartoEditor, this);
+		Wu.DomEvent[onoff](this._settingsButton, 'click', this._toggleSettingsPane, this);
 
 		// Toggle layer menu
 		Wu.DomEvent[onoff](this._layersBtn, 'click', this._toggleLayermenu, this);
@@ -86,11 +75,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._setHooks('off');
 	},
 
-
-	// SELECT PROJECT
-	// SELECT PROJECT
-	// SELECT PROJECT
-
 	_projectSelected : function (e) {
 
 		console.log('%c_projectSelected', 'background: red; color: white');
@@ -105,10 +89,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// refresh pane
 		this._refresh();
 	},
-
-	// REFRESH
-	// REFRESH
-	// REFRESH
 
 	_refresh : function () {
 
@@ -145,7 +125,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_setProjectTitle : function () {
 
 		// TODO: Bedre måte å finne client name på?
-		this._clientName = app.Chrome.Top._project.getClient().name;
+		this._clientName = this._project.getClient().getName();
 		this._projectTitle = this._project.getHeaderTitle();
 
 		this._projectTitleContainer.innerHTML = this._clientName.toLowerCase() + '&nbsp;:&nbsp;' + this._projectTitle.toLowerCase();
@@ -167,10 +147,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	},
 
 
-	// TOGGLE LEFT PANE
-	// TOGGLE LEFT PANE
-	// TOGGLE LEFT PANE
-
 	_toggleLeftPane : function () {
 
 		this._leftPaneisOpen ? this.closeLeftPane() : this.openLeftPane();
@@ -179,14 +155,11 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	openLeftPane : function () {
 
-		// xoxoxox
-
 		// app.Chrome.Left.isOpen = true;
 		this._leftPaneisOpen = true;
 
 		// Set active state of button
 		Wu.DomUtil.addClass(this._menuBtn, 'active');
-
 
 		// expand sidepane
 		if (app.SidePane) app.SidePane.expand();
@@ -196,7 +169,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// trigger activation on active menu item
 		app._activeMenu._activate();
-
 
 	},
 
@@ -224,18 +196,10 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		if (optionsPane) optionsPane.setContentHeight();
 	},
 
-	
-
-
-
-	// TOGGLE LAYER MENU
-	// TOGGLE LAYER MENU
-	// TOGGLE LAYER MENU
 
 	_toggleLayermenu : function () {
 
 		this._layerMenuOpen ? this._closeLayerMenu() : this._openLayerMenu();
-
 	},
 
 	_openLayerMenu : function () {
@@ -271,42 +235,34 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		}
 	},
 
-	// CARTO EDITOR
-	// CARTO EDITOR
-	// CARTO EDITOR
-
-	_toggleCartoEditor : function () {
+	_toggleSettingsPane : function () {
 		// if this is true ?         then do this        :        if not, this
-		this._cartoEditorOpen ? this._closeCartoEditor() : this._openCartoEditor();
+		this._settingsPaneOpen ? this._closeRightChrome() : this._openRightChrome();
 	},
 
-	_openCartoEditor : function () {
+	_openRightChrome : function () {
 
 		// use a variable to mark editor as open
-		this._cartoEditorOpen = true;
+		this._settingsPaneOpen = true;
 
 		// Add "active" class from button
-		Wu.DomUtil.addClass(this._cartoeditorBtn, 'active');
+		Wu.DomUtil.addClass(this._settingsButton, 'active');
 
 		// trigger fn in right chrome to open it
 		app.Chrome.Right.open();
 	},
 
-	_closeCartoEditor : function () {		
+	_closeRightChrome : function () {		
 
 		// mark not open
-		this._cartoEditorOpen = false;
+		this._settingsPaneOpen = false;
 
 		// Remove "active" class from button
-		Wu.DomUtil.removeClass(this._cartoeditorBtn, 'active');
+		Wu.DomUtil.removeClass(this._settingsButton, 'active');
 
 		// close right chrome
 		app.Chrome.Right.close();
 	},
-
-
-
-
 
 
 });
