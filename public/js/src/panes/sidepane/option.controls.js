@@ -117,6 +117,7 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		project.store.controls[item] = on;	// todo
 		project._update('controls');
 
+
 		// toggle
 		if (on) {
 		
@@ -127,6 +128,7 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 
 			// enable control in menu
 			this.enableControl(item);
+
 		} else {
 
 			control._off(); // todo: remove if

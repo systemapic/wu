@@ -382,14 +382,14 @@ Wu.MapPane = Wu.Pane.extend({
 
 		}
 
-		// scale control
-		if (controls.measure) {
-			if (controls.layermenu) {
-				topright.style.right = '295px';
-			} else {
-				topright.style.right = '6px';
-			}
-		}
+		// // scale control
+		// if (controls.measure) {
+		// 	if (controls.layermenu) {
+		// 		topright.style.right = '295px';
+		// 	} else {
+		// 		topright.style.right = '6px';
+		// 	}
+		// }
 
 
 		// todo?

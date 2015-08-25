@@ -3,6 +3,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_ : 'topchrome', 
 
 	_initialize : function (options) {
+
 		console.log('top chrome init', this);
 
 		// init container
@@ -22,6 +23,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// Portal Logo
 		this._portalLogo = Wu.DomUtil.create('div', 'chrome-portal-logo', this._container);
+		this._portalLogoImg = Wu.DomUtil.create('img', '', this._portalLogo);
 
 		// Project title
 		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title', this._container);
@@ -49,8 +51,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// Layers button
 		this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton', this._buttons);
-		this._layerBtnArrow = Wu.DomUtil.create('div', 'chrome-layer-button-arrow', this._layersBtn);
-
+		
 		// Settings button
 		this._cartoeditorBtn = Wu.DomUtil.create('div', 'chrome-button cartoeditor', this._buttons);
 
@@ -66,10 +67,14 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// click event on carto editor button
 		Wu.DomEvent[onoff](this._cartoeditorBtn, 'click', this._toggleCartoEditor, this);
 
-		// add more click events here if adding more buttons
+		// Toggle layer menu
 		Wu.DomEvent[onoff](this._layersBtn, 'click', this._toggleLayermenu, this);
 
+		// Toggle left pane
 		Wu.DomEvent[onoff](this._menuBtn, 'click', this._toggleLeftPane, this);
+
+		// Log out button
+		Wu.DomEvent[onoff](this._usrLogout, 'click', this._logOut, this);
 
 	},
 
@@ -110,13 +115,40 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._setProjectTitle();
 		this._setUsername();
 		this._setPortalLogo();
+		this._showHideLayerButton();
+
+		// The layer menu
+		this.__layerMenu = app.MapPane.getControls().layermenu;
+		
+		
+		// TODO: fikse dette...
+		setTimeout(function() {
+
+			// Set active state to Layer menu button if it's open
+			if ( this.__layerMenu._open ) this._openLayerMenu();
+
+		}.bind(this), 10);
+
+	},
+
+	_showHideLayerButton : function () {
+
+		// If there are no layers, hide button
+		if (!this._project.store.layermenu || this._project.store.layermenu.length == 0 ) {
+			Wu.DomUtil.addClass(this._layersBtn, 'displayNone');
+		} else {
+			Wu.DomUtil.removeClass(this._layersBtn, 'displayNone');
+		}
 
 	},
 
 	_setProjectTitle : function () {
 
+		// TODO: Bedre måte å finne client name på?
+		this._clientName = app.Chrome.Top._project.getClient().name;
 		this._projectTitle = this._project.getHeaderTitle();
-		this._projectTitleContainer.innerHTML = this._projectTitle;		
+
+		this._projectTitleContainer.innerHTML = this._clientName.toLowerCase() + '&nbsp;:&nbsp;' + this._projectTitle.toLowerCase();
 	},
 
 	_setUsername : function () {
@@ -128,8 +160,9 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_setPortalLogo : function () {
 
-		this._portalLogoImg = Wu.DomUtil.create('img', '', this._portalLogo);
 		this._portalLogoImg.src = 'https://dev2.systemapic.com/css/images/globesar-web-logo.png';
+		// this._portalLogoImg = Wu.DomUtil.create('img', '', this._portalLogo);
+		// this._portalLogoImg.src = 'https://dev2.systemapic.com/css/images/globesar-web-logo.png';
 		
 	},
 
@@ -166,7 +199,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 
 	},
-
 
 
 	closeLeftPane : function () {
@@ -214,8 +246,9 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Add "active" class from button
 		Wu.DomUtil.addClass(this._layersBtn, 'active');
 
+		
 		// TODO: Open Layer Menu
-
+		this.__layerMenu.openLayerPane();
 	},
 
 	_closeLayerMenu : function () {
@@ -227,8 +260,16 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		Wu.DomUtil.removeClass(this._layersBtn, 'active');
 
 		// TODO: Close Layer Menu
+		this.__layerMenu.closeLayerPane();
+
+
 	},	
 
+	_logOut : function () {
+		if (confirm('Are you sure you want to log out?')) {
+			window.location.href = app.options.servers.portal + 'logout';
+		}
+	},
 
 	// CARTO EDITOR
 	// CARTO EDITOR
