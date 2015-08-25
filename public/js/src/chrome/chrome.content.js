@@ -36,19 +36,28 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 	hide : function () {
 		this._container.style.display = 'none';
 		Wu.DomUtil.removeClass(this.options.trigger, 'active-tab');
-
 	},
 
 	hideAll : function () {
 		if (!this.options || !this.options.parent) return console.log('hideAll not possible');
 
 		var tabs = this.options.parent.getTabs();
-
 		for (var t in tabs) {
 			var tab = tabs[t];
 			tab.hide();
 		}
 
+	},
+
+	_projectSelected : function (e) {
+		var p = e.detail.projectUuid;
+		if (!p) return;
+
+		// set project
+		this._project = app.activeProject = app.Projects[p];
+
+		// refresh pane
+		// this._refresh();
 	},
 
 
@@ -180,25 +189,10 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		this._addEvents();
 	},
 
-
 	_initContainer : function () {
-
-		console.log('iniit styhle editor layout');
 
 		// create container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content styler', this.options.appendTo);
-
-	},
-
-	_projectSelected : function (e) {
-		var p = e.detail.projectUuid;
-		if (!p) return;
-
-		// set project
-		this._project = app.activeProject = app.Projects[p];
-
-		// refresh pane
-		// this._refresh();
 	},
 
 	_initLayout : function () {
@@ -208,7 +202,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		this._initLayout_activeLayers();
 
 		// field
-
+		// this._initLayout_fields();
 
 		// mark as inited
 		this._inited = true;
@@ -225,9 +219,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		// get layers
 		var layers = this._project.getPostGISLayers();
 
-		console.log('loyyasysysy', layers);
-
-		// create select
+		// create dropdown
 		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', this._container);
 		var select = Wu.DomUtil.create('select', 'active-layer-select', selectWrap);
 
@@ -250,13 +242,25 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 		var layer = this._project.getLayer(layerUuid);
 
-		console.log('lyaer: ', layer);
+		// get current style, returns default if none
+		var style = layer.getEditorStyle();
 
-		// get current style, return false if none
-		var currentStyle = layer.getEditorStyle();
+		console.log('currentStyle: ', style);
 
-		console.log('currentStyle: ', currentStyle);
-		
+		// init style json
+		this._initStyle(style);
+	},
+
+	_initStyle : function (style) {
+		console.log('currentstyle: ', style);
+
+	},
+
+
+	_createField : function (json) {
+
+
+
 	},
 
 

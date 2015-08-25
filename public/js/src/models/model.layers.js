@@ -307,7 +307,35 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	getEditorStyle : function () {
-		return false;
+
+		return this.getDefaultEditorStyle();
+
+		// return meta;
+	},
+
+	getDefaultEditorStyle : function () {
+		var meta = this.getMeta();
+
+		console.log('meta: ', meta);
+
+		var columns = meta.columns;
+		var field;
+
+		for (var c in columns) {
+			field = c;
+		}
+
+		
+		var style = {
+			field : field,
+			colors : ['red', 'white', 'blue'],
+			marker : {
+				width : field,
+				opacity : 1,
+			}
+		}
+
+		return style;
 	},
 
 	setCartoCSS : function (json, callback) {
