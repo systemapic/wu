@@ -9,7 +9,7 @@ Wu.SidePane = Wu.Pane.extend({
 		'DataLibrary', 
 		'Users', 
 		'Share', 
-		'Account'
+		// 'Account'
 	],
 
 	_initialize : function (options) {
@@ -79,7 +79,7 @@ Wu.SidePane = Wu.Pane.extend({
 		if (pane.mediaLibrary) 	this.MediaLibrary = new Wu.SidePane.MediaLibrary();
 		if (pane.users) 	this.Users 	  = new Wu.SidePane.Users();
 		if (pane.share) 	this.Share 	  = new Wu.SidePane.Share();
-		if (pane.account) 	this.Account 	  = new Wu.SidePane.Account();
+		// if (pane.account) 	this.Account 	  = new Wu.SidePane.Account();
 
 		this.refreshMenu();
 	},
@@ -120,7 +120,7 @@ Wu.SidePane = Wu.Pane.extend({
 		if (this.MediaLibrary) 	this.MediaLibrary._deactivate();
 		if (this.Users) 	this.Users._deactivate();
 		if (this.Share) 	this.Share._deactivate();
-		if (this.Account) 	this.Account._deactivate();
+		// if (this.Account) 	this.Account._deactivate();
 	},
 
 
@@ -220,7 +220,7 @@ Wu.SidePane = Wu.Pane.extend({
 		if (pane.MediaLibrary 	&& settings.mediaLibrary) 	panes.push('MediaLibrary');
 		if (pane.users 		&& canManage) 			panes.push('Users');
 		if (pane.share 		&& settings.socialSharing) 	panes.push('Share');
-		if (pane.account) 					panes.push('Account');
+		// if (pane.account) 					panes.push('Account');
 
 		// set, return
 		this._panes = panes;

@@ -66,7 +66,8 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Set max height
 		var dimensions = app._getDimensions();
-		this.resizeEvent(dimensions);		
+		this.resizeEvent(dimensions);
+
 	},
 
 	// refresh for names etc, but keep active layers
@@ -176,10 +177,10 @@ L.Control.Layermenu = Wu.Control.extend({
 		if (!this._project.store.layermenu || this._project.store.layermenu.length == 0 ) {
 
 			// Hide parent wrapper if empty
-			Wu.DomUtil.addClass(this._parentWrapper, 'displayNone');
+			Wu.DomUtil.addClass(this._parentWrapper, 'displayNone');			
 
 			return;
-		}
+		}		
 
 		// Show parent wrapper if not empty
 		Wu.DomUtil.removeClass(this._parentWrapper, 'displayNone');
@@ -191,7 +192,7 @@ L.Control.Layermenu = Wu.Control.extend({
 			var layer = this._project.layers[item.layer];
 
 			var layerItem = {
-				item : item,
+				item  : item,
 				layer : layer
 			}
 
@@ -342,49 +343,56 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		this._open = false;
 
+		Wu.DomUtil.addClass(this._innerContainer, 'closed');
+		
+
 		// Collapse Wrapper
-		app._map._controlCorners.bottomright.style.width = '0px';
-		Wu.DomUtil.removeClass(this._openLayers, 'ol-collapsed');
+		// app._map._controlCorners.bottomright.style.width = '0px';
+
+		// Wu.DomUtil.removeClass(this._openLayers, 'ol-collapsed');
 		
 		// Slide the LEGENDS
-		var inspect = app.MapPane.getControls().inspect;
-		if (inspect && this._legendsContainer) {
-			Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
-		}	
+		// var inspect = app.MapPane.getControls().inspect;
+		// if (inspect && this._legendsContainer) {
+		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
+		// }	
 		
 		// Adjust legends width
-		app.MapPane.getControls().legends.checkWidth();
+		// app.MapPane.getControls().legends.checkWidth();
 	},
 
-	// (j)
+	// (j) xoxox 
 	openLayerPane : function () {
 
 		this._open = true;
 
+		// console.log('openLayerPane', this.container);
+		Wu.DomUtil.removeClass(this._innerContainer, 'closed');
+
 		// Open Wrapper
-		app._map._controlCorners.bottomright.style.width = '290px';
+		// app._map._controlCorners.bottomright.style.width = '290px';
 
 		// Close the closer :P
-		Wu.DomUtil.addClass(this._openLayers, 'ol-collapsed');
+		// Wu.DomUtil.addClass(this._openLayers, 'ol-collapsed');
 		
-		// Slide the LEGENDS
-		var inspect = app.MapPane.getControls().inspect;
-		var legends = app.MapPane.getControls().legends;
-		var description = app.MapPane.getControls().description;
+		// // Slide the LEGENDS
+		// var inspect = app.MapPane.getControls().inspect;
+		// var legends = app.MapPane.getControls().legends;
+		// var description = app.MapPane.getControls().description;
 		
-		if (inspect && this._legendsContainer) {
-			Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
-		}
+		// if (inspect && this._legendsContainer) {
+		// 	Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
+		// }
 		
-		// If we're on mobile
-		if (app.mobile) {
-			// Check if legends is open ~ close it when opening layer menu
-			if (legends._isOpen) legends.MobileCloseLegends();
-			if (!description._isClosed) description.mobileClosePane();
-		}
+		// // If we're on mobile
+		// if (app.mobile) {
+		// 	// Check if legends is open ~ close it when opening layer menu
+		// 	if (legends._isOpen) legends.MobileCloseLegends();
+		// 	if (!description._isClosed) description.mobileClosePane();
+		// }
 
-		// Adjust legends width
-		legends.checkWidth();
+		// // Adjust legends width
+		// legends.checkWidth();
 
 	},
 
@@ -484,11 +492,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		if (!this._menuFolder) {
 
 			// create if not exists
-			this._menuFolder = Wu.DomUtil.create('div', 'smap-button-white middle-item ct12 ct18', this._innerContainer, 'Add folder');
-
-			// insert 		todo: not very nice...
-			this._layerMenuHeader.parentNode.insertBefore(this._menuFolder, this._layerMenuHeader.nextSibling);
-
+			this._menuFolder = Wu.DomUtil.create('div', 'smap-button-white middle-item', this._innerContainer, 'Add folder');
+			
 			// add action
 			Wu.DomEvent.on(this._menuFolder, 'click', this.addMenuFolder, this);
 
@@ -497,11 +502,16 @@ L.Control.Layermenu = Wu.Control.extend({
 			Wu.DomUtil.removeClass(this._menuFolder, 'displayNone');
 		}
 
+
+		// Wu.DomUtil.addClass(this._innerContainer, 'editing-menufolder')
+
 	},
 
 	_removeMenuFolder : function () {
 		if (!this._menuFolder) return;
 		Wu.DomUtil.addClass(this._menuFolder, 'displayNone');
+
+		// Wu.DomUtil.removeClass(this._innerContainer, 'editing-menufolder')
 	},
 
 	enableSortable : function () {
@@ -960,6 +970,8 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	// disable by layermenuItem
 	disableLayer : function (layermenuItem) {
+
+
 		var layer = layermenuItem.layer;
 		if (!layer) return;	
 
@@ -1120,18 +1132,19 @@ L.Control.Layermenu = Wu.Control.extend({
 		var caption = file ? file.store.name : item.caption;
 
 		// create div
+		// var className   = 'layer-menu-item-wrap';
 		var className   = 'layer-menu-item-wrap';
 		if (!layer) className += ' menufolder';
 		var wrap 	= Wu.DomUtil.create('div', className);
 		var uuid 	= item.uuid;
-		
+				
+
 		// For some reason, HTML must come as string. 
 		var _iH = 	'<div class="layer-item-up">></div>' +
 			  	'<div class="layer-item-down"><</div>' +
 				'<div class="layer-item-delete">x</div>' +
-				'<div type="layerItem" class="layer-menu-item">' +
-				caption +
-				'</div>';
+				'<div class="layer-menu-flyto"></div>' +
+				'<div type="layerItem" class="layer-menu-item">' + caption + '</div>';
 
 		wrap.innerHTML 	= _iH;
 
@@ -1342,6 +1355,9 @@ L.Control.Layermenu = Wu.Control.extend({
 		// remove
 		this.remove(uuid); // layerMenuItem-32132-123123-adsdsa-sda
 
+		// Hides layer button if there are no layers to show
+		app.Chrome.Top._showHideLayerButton();
+
 		this._setHeight();
 	},
 
@@ -1411,3 +1427,6 @@ L.Control.Layermenu = Wu.Control.extend({
 L.control.layermenu = function (options) {
 	return new L.Control.Layermenu(options);
 };
+
+
+

@@ -188,6 +188,10 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 			this.on(layer);
 		}
 
+
+		// Hides layer button if there are no layers to show
+		app.Chrome.Top._showHideLayerButton();	
+
 		// mark occupied layers in layermenu
 		var baselayerSetting = app.SidePane.Options.settings.baselayer;
 		baselayerSetting.markOccupied()
