@@ -1143,7 +1143,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		var _iH = 	'<div class="layer-item-up">></div>' +
 			  	'<div class="layer-item-down"><</div>' +
 				'<div class="layer-item-delete">x</div>' +
-				'<div class="layer-menu-flyto"></div>' +
+				// '<div class="layer-menu-flyto"></div>' +
 				'<div type="layerItem" class="layer-menu-item">' + caption + '</div>';
 
 		wrap.innerHTML 	= _iH;

@@ -1,3 +1,4 @@
+// app.MapPane._controls.description
 L.Control.Description = Wu.Control.extend({
 	
 	type : 'description',
@@ -13,9 +14,9 @@ L.Control.Description = Wu.Control.extend({
 		    options   = this.options;
 
 		// this._button = Wu.DomUtil.create('div', 'dropdown-button description-toggle-button', container)
-		this._content = Wu.DomUtil.create('div', 'description-control-inner-content', container)
-		this._collapser = Wu.DomUtil.create('div', 'menucollapser collapse-description', this._content, 'Info');
-		this._outer = Wu.DomUtil.create('div', 'description-control-inner-content-box', this._content)
+		this._content = Wu.DomUtil.create('div', 'description-control-content', container)
+		// this._collapser = Wu.DomUtil.create('div', 'menucollapser collapse-description', this._content, 'Info');
+		this._outer = Wu.DomUtil.create('div', 'description-control-content-box', this._content)
 
 		return container; // turns into this._container on return
 	},
@@ -26,7 +27,24 @@ L.Control.Description = Wu.Control.extend({
 		this._container.style.display = "none";
 
 		// create scroller 
-		this._inner = Wu.DomUtil.create('div', 'description-scroller', this._outer);
+		this._inner = Wu.DomUtil.create('div', 'description-control-inner', this._outer);
+
+		// HEADER
+		this._header = Wu.DomUtil.create('div', 'description-control-header-section', this._inner);
+
+		this._title = Wu.DomUtil.create('div', 'description-control-header-title', this._header);
+		this._toggle = Wu.DomUtil.create('div', 'description-control-header-toggle', this._header);
+
+		// DESCRIPTION
+		this._description = Wu.DomUtil.create('div', 'description-control-description', this._inner);
+
+		// META CONTAINER
+		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._inner);
+
+		// LEGEND CONTAINER
+		this._legendContainer = Wu.DomUtil.create('div', 'description-control-legend-container', this._inner);
+
+		// COPYRIGHT
 		this._copyright = Wu.DomUtil.create('div', 'description-copyright', this._outer, '');
 		
 		// add tooltip
@@ -41,7 +59,166 @@ L.Control.Description = Wu.Control.extend({
 		    	Wu.DomUtil.create('div', 'description-mobile-arrow', this._content);
 		}
 
-	},      
+	},
+
+
+
+	// SET THINGS
+	// SET THINGS
+	// SET THINGS	
+
+	setTitle : function (title) {
+		this._title.innerHTML = title;
+	},
+
+
+	setDescription : function (layer) {
+
+		// this._setDescription(layer.store.description);
+		// this.setCopyright(layer);
+
+		// TODO.. remove
+		this.initFakeLegend();
+
+	},
+
+
+	_setDescription : function (text) {
+		
+		// if ( text != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
+		// else 		  Wu.DomUtil.addClass(this._description, 'displayNone');
+		
+		this._description.innerHTML = text;
+	},
+
+
+	setMeta : function (meta) {
+
+		// Clear container
+		this._metaContainer.innerHTML = '';
+
+		
+		var key;
+		for ( key in meta ) {
+
+			var _key = key;
+			var _val = meta[key]
+
+			// Make new content	
+			var metaLine = Wu.DomUtil.create('div', 'legends-meta-line', this._metaContainer);
+			var metaKey = Wu.DomUtil.create('div', 'legends-meta-key', metaLine, _key)
+			var metaVal = Wu.DomUtil.create('div', 'legend-meta-valye', metaLine, _val)
+
+		}
+
+
+
+	},
+
+	setLegend : function (HTML) {
+		
+		// this._legendContainer.innerHTML = gradientHTML;
+
+		this._legendContainer.innerHTML = HTML;
+	
+	},
+
+	gradientLegend : function (options) {
+
+
+
+
+		// Set color stops
+		var colorStops = options.colorStops;
+
+		// Set styling
+		var gradientStyle = 'background: -webkit-linear-gradient(left, ' + colorStops.join() + ');';
+		    gradientStyle += 'background: -o-linear-gradient(right, '    + colorStops.join() + ');';
+		    gradientStyle += 'background: -moz-linear-gradient(right, '  + colorStops.join() + ');';
+		    gradientStyle += 'background: linear-gradient(to right, '    + colorStops.join() + ');';
+  
+
+			// Container
+		var	_legendHTML = '<div class="info-legend-container">';
+
+			// Legend Frame
+			_legendHTML += '<div class="info-legend-frame">';
+
+			_legendHTML += '<div class="info-legend-val info-legend-min-val">' + options.minVal + '</div>';
+			_legendHTML += '<div class="info-legend-val info-legend-med-val">' + options.medVal + '</div>';
+			_legendHTML += '<div class="info-legend-val info-legend-max-val">' + options.maxVal + '</div>';
+
+			// Gradient
+			_legendHTML += '<div class="info-legend-gradient-container" style="' + gradientStyle + '"></div>';
+
+		    	_legendHTML += '</div>';
+
+			if ( options.bline ) {
+				_legendHTML += '<div class="info-legend-gradient-bottomline"">' + options.bline + '</div>';
+			}
+
+		    	_legendHTML += '</div>';
+
+		return _legendHTML;
+
+	},
+
+	setCopyright : function (layer) {
+		var file = layer.getFile();
+
+		if (file) {
+			var text = file.getCopyright();
+			var copy = text ? 'Copyright: ' + text : '';
+			this._copyright.innerHTML = copy;
+		} else {
+			this._copyright.innerHTML = '';
+		}
+	},
+
+
+	// TOGGLE
+	// TOGGLE	
+	// TOGGLE	
+
+	toggle : function () {
+
+		if ( !this.isCollapsed ) this.isCollapsed = false;
+		this.isCollapsed ? this.toggleOpen() : this.toggleClose();
+
+	},
+
+	toggleOpen : function () {
+
+		this.isCollapsed = false;
+
+		Wu.DomUtil.removeClass(this._legendContainer, 'minimized');
+		Wu.DomUtil.removeClass(this._header, 'minimized');		
+
+		Wu.DomUtil.removeClass(this._description, 'displayNone');
+		Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
+		Wu.DomUtil.removeClass(this._toggle, 'legend-toggle-open');
+
+		Wu.DomUtil.removeClass(this._title, 'minimized');
+	},
+
+	toggleClose : function () {
+
+		this.isCollapsed = true;
+
+		Wu.DomUtil.addClass(this._legendContainer, 'minimized');
+		Wu.DomUtil.addClass(this._header, 'minimized');
+
+		Wu.DomUtil.addClass(this._description, 'displayNone');
+		Wu.DomUtil.addClass(this._metaContainer, 'displayNone');		
+		Wu.DomUtil.addClass(this._toggle, 'legend-toggle-open');
+
+		Wu.DomUtil.addClass(this._title, 'minimized');
+
+	},
+
+	//////////////////////////////////////////////////////////
+
+
 
 	_addTo : function () {
 
@@ -57,9 +234,9 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_clear : function () {
-		// console.log('%chide', 'background: green; color: white;');
+		
 		this._setDescription('');
-		this.isOpen = false;
+		this.isOpen = true;
 		this.toggleScale();
 	},
 
@@ -78,7 +255,7 @@ L.Control.Description = Wu.Control.extend({
 		this._flush();
 
 		// add edit hooks
-		this._addEditHooks();
+		// this._addEditHooks();
 
 		// show
 		this._show();
@@ -108,26 +285,7 @@ L.Control.Description = Wu.Control.extend({
 		this._hide();
 	},
 
-	setCopyright : function (layer) {
-		var file = layer.getFile();
 
-		if (file) {
-			var text = file.getCopyright();
-			var copy = text ? 'Copyright: ' + text : '';
-			this._copyright.innerHTML = copy;
-		} else {
-			this._copyright.innerHTML = '';
-		}
-	},
-
-	setDescription : function (layer) {
-		this._setDescription(layer.store.description);
-		this.setCopyright(layer);
-	},
-
-	_setDescription : function (text) {
-		this._inner.innerHTML = text;
-	},
 
 	_isActive : function () {
 		if (!this._project) return false;
@@ -148,7 +306,6 @@ L.Control.Description = Wu.Control.extend({
 	show : function () {
 		if (!this._container) return;
 		this._isActive() ? this._show() : this._hide();
-		// console.log('%cshow', 'background: green; color: white;');
 		this.toggleScale();
 	},
 
@@ -190,10 +347,13 @@ L.Control.Description = Wu.Control.extend({
 		
 		// collapsers
 		// Wu.DomEvent.on(this._button, 'click', this._GAtoggleCloser, this);
-		
+		Wu.DomEvent.on(this._toggle, 'click', this.toggle, this);	
+	
 		// prevent map double clicks
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 		// Wu.DomEvent.on(this._button,    'mousedown mouseup click dblclick',  Wu.DomEvent.stopPropagation, this);
+
+
 	},
 
 	toggleEdit : function () {
@@ -381,7 +541,52 @@ L.Control.Description = Wu.Control.extend({
 	toggleScale : function () {
 
 		app.MapPane.getControls().measure.__toggle();
+	},
+
+
+
+	initFakeLegend : function () {
+
+		
+		// SET TITLE
+		this.setTitle('Layer name');
+
+		// SET DESCRIPTION
+		var description = 'Some information about the data set can be written here, such as name of satellite, etc.'
+		this._setDescription(description);
+
+
+		// SET META
+		var _meta = {			
+			'Deliverable code' 	: 'I14J1S',
+			'Delivery code' 	: 'GA0003',
+			'Delivery date' 	: '2013/04/09',
+			'Sat [band]' 		: 'Envisat [C]',
+			'Geometry' 		: 'D',
+			'Category' 		: 'SqueeSAR',
+			'Start time' 		: '2003/01/11',
+			'End time' 		: '2010/09/21'		
+			}
+
+		this.setMeta(_meta);
+
+			
+		// SET LEGEND
+
+		var gradientOptions = {
+			colorStops : ['red', 'green', 'blue', 'hotpink'],
+			minVal : -20,
+			medVal : 0,
+			maxVal : 20,
+			bline : 'vel[mm/yr]'
+			}
+
+		var gradientHTML = this.gradientLegend(gradientOptions);
+
+		this.setLegend(gradientHTML);
+
 	}
+
 	
 });
 
