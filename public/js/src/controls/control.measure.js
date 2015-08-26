@@ -62,12 +62,7 @@ L.Control.Measure = Wu.Control.extend({
 
 	__toggle : function () {
 
-
-		console.log('SHOW THE MOTHER FUCKING MEASURE!!!');
-
 		var description = app.MapPane.getControls().description;
-
-		console.log('description.isOpen', description.isOpen);
 
 		if ( description.isOpen ) {
 			Wu.DomUtil.addClass(this._container, 'measure-padding-right')
