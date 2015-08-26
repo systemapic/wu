@@ -218,11 +218,12 @@ module.exports = api.upload = {
 	},
 
 
+	// gets queried from pile.js
 	getUploadStatus : function (req, res) {
 		var file_id = req.query.file_id,
 		    file_id_key = 'uploadStatus:' + file_id;
 
-		console.log('file_id', file_id);
+		console.log('file_id_key', file_id_key);
 
 		api.redis.get(file_id_key, function (err, uploadStatus) {
 			console.log('err, uploadStatus', err, uploadStatus);
