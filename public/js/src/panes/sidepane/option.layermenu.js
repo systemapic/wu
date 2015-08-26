@@ -68,7 +68,7 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 
 		var file = layer.getFile();
 		// var title = file ? file.getName() : layer.store.title;
-		var title = layer.store.title;
+		var title = layer.getTitle();
 		
 		// create and append div
 		var container = Wu.DomUtil.create('div', 'item-list select-elem', this._outer);
