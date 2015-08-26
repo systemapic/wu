@@ -608,7 +608,7 @@ aka feedback pane
 	*/
 
 
-#c3-header-metacontainer {
+/*#c3-header-metacontainer {
 	margin-right: 0;
 	margin-left: 0;
 	margin-bottom: 20px;
@@ -671,5 +671,5 @@ g.c3-event-rects.c3-event-rects-multiple rect{
 	stroke-width: 2px;
 	stroke: white;
 }
-
+*/
 

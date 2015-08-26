@@ -1132,7 +1132,7 @@
 	}	
 	
 /* Leaflet description Header wrapper */
-.description-control-inner-content {
+.description-control-content {
 	height: 100%;
 	overflow: hidden;
 	box-shadow: 0 0 5px rgba(0,0,0,0.5);
@@ -1159,7 +1159,7 @@
 	}
 
 /* Description inner wrapper */
-.description-control-inner-content-box {
+.description-control-content-box {
 	background: rgba(255, 255, 255, 0.9);
 	width: 320px;
 	height: 100%;
@@ -1174,21 +1174,21 @@
 	max-height: 500px; // OBS! Event listener for this
 	}
 
-.description-control-inner-content-box a {
+.description-control-content-box a {
 	font-weight: 900;
 	}	
 
-.description-control-inner-content-box h1 {	
+.description-control-content-box h1 {	
 	font-size: 25px;
 	margin: 10px 0px 10px 0px;
 	}
 
-.description-control-inner-content-box h2 {	
+.description-control-content-box h2 {	
 	font-size: 16px;
 	margin: 15px 0px 5px 0px;
 	}
 
-.description-control-inner-content-box hr {
+.description-control-content-box hr {
 	border-top: 1px solid black;
 	}
 
