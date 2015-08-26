@@ -207,13 +207,10 @@ L.Popup = L.Class.extend({
 
 	_updateLayout: function () {
 
-
-		console.log('upd8!');
-
 		// var _extraWidth = 46;
-
 		// Additional adjustment for FRANO		
-		var _extraWidth = 216;
+		// var _extraWidth = 170;
+		var _extraWidth = 70;
 
 
 		var container = this._contentNode,
@@ -228,10 +225,10 @@ L.Popup = L.Class.extend({
 		width = Math.min(width, this.options.maxWidth);
 		width = Math.max(width, this.options.minWidth);
 
-		style.width = (width + _extraWidth) + 'px';
-
+		var newWidth = (width + _extraWidth) + 'px';
+		
+		style.width = newWidth;
 		style.whiteSpace = '';
-
 		style.height = '';
 
 		var height = container.offsetHeight,
@@ -240,7 +237,7 @@ L.Popup = L.Class.extend({
 
 
 		// Additional adjustment for FRANO
-		maxHeight += 65;
+		maxHeight += 165;
 
 
 		if (maxHeight && height > maxHeight) {
@@ -252,7 +249,7 @@ L.Popup = L.Class.extend({
 
 		this._containerWidth = this._container.offsetWidth;
 
-		parent_container.style.width = (width + 46) + 'px';
+		parent_container.style.width = newWidth;
 	},
 
 	_updatePosition: function () {
@@ -267,7 +264,10 @@ L.Popup = L.Class.extend({
 		}
 
 		this._containerBottom = -offset.y - (animated ? 0 : pos.y);
-		this._containerLeft = -Math.round(this._containerWidth / 2) + offset.x + (animated ? 0 : pos.x);
+
+		var jorgosXadjustment = - 20;
+
+		this._containerLeft = -Math.round(this._containerWidth / 2) + offset.x + (animated ? 0 : pos.x) + jorgosXadjustment;
 
 		// bottom position the popup in case the height of the popup changes (images loading etc)
 		this._container.style.bottom = this._containerBottom + 'px';

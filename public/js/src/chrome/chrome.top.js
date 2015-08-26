@@ -49,7 +49,23 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Settings button
 		this._settingsButton = Wu.DomUtil.create('div', 'chrome-button cartoeditor', this._buttons);
 
+		this.initDefault();
+
 	},
+
+
+	initDefault : function () {
+
+		this._setUsername();
+		this._setPortalLogo();
+
+	},
+
+
+
+	// HOOKS
+	// HOOKS
+	// HOOKS
 
 	_setHooks : function (onoff) {
 
@@ -93,8 +109,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_refresh : function () {
 
 		this._setProjectTitle();
-		this._setUsername();
-		this._setPortalLogo();
+		// this._setUsername();
+		// this._setPortalLogo();
 		this._showHideLayerButton();
 
 		// The layer menu
