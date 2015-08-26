@@ -213,7 +213,9 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 	},
 
 	opened : function () {
-		console.log('i was opened!');
+		console.log('i was opened!', this._tabs);
+		this._tabs['Styler'].show();
+
 	},
 
 	closed : function () {
@@ -432,7 +434,28 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
     			gutters: ['CodeMirror-linenumbers', 'errors']
   		});
 
-	
+		app.debug = app.debug || {};
+  		app.debug.ca = this._cartoEditor;
+		
+	},
+
+	_createSqlEditor : function () {
+
+
+		// editor
+		this._SQLEditor = CodeMirror.fromTextArea(this._codewrap, {
+    			lineNumbers: true,    			
+    			mode: {
+    				name : 'text/x-sql',
+    			},
+    			matchBrackets: true,
+    			lineWrapping: false,
+    			paletteHints : true,
+    			gutters: ['CodeMirror-linenumbers', 'errors']
+  		});
+
+		app.debug = app.debug || {};
+  		app.debug.sql = this._SQLEditor;
 	},
 
 	_setKeymap : function () {
@@ -471,24 +494,11 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 	_removeKeymaps : function () {
 		this._cartoEditor.removeKeyMap(this._keymap);
 		this._SQLEditor.removeKeyMap(this._keymap);
-		if (keymaster.unbind) key.unbind('⌘+s, ctrl+s');
-		if (keymaster.unbind) key.unbind('⌘+r, ctrl+r');
+		if (keymaster.unbind) keymaster.unbind('⌘+s, ctrl+s');
+		if (keymaster.unbind) keymaster.unbind('⌘+r, ctrl+r');
 	},
 
-	_createSqlEditor : function () {
-
-		// editor
-		this._SQLEditor = CodeMirror.fromTextArea(this._codewrap, {
-    			lineNumbers: true,    			
-    			mode: {
-    				name : 'text/x-sql',
-    			},
-    			matchBrackets: true,
-    			lineWrapping: false,
-    			paletteHints : true,
-    			gutters: ['CodeMirror-linenumbers', 'errors']
-  		});
-	},
+	
 
 	_updateDimensions : function () {
 		if (!this._cartoEditor) return;
@@ -703,6 +713,10 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 
 		// show
 		this._showEditors();
+
+		// refresh codemirror (cause buggy)
+		this._SQLEditor.refresh();
+		this._cartoEditor.refresh();
 	},
 
 	_refreshCartoCSS : function () {
