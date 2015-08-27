@@ -630,19 +630,44 @@
     margin: 20px;
     margin-top: 5px;
 }
+
+
+
 /* TOOLTIP TOOLTIP TOOLTIP TOOLTIP */
 /* TOOLTIP TOOLTIP TOOLTIP TOOLTIP */
 /* TOOLTIP TOOLTIP TOOLTIP TOOLTIP */
 
 /* Container */
 .leaflet-popup-content-wrapper {
-    background: rgba(255,255,255,0.92);
+    /*background: rgba(255,255,255,0.92);*/
+    background: white;
     border-radius: 0;
     color: black;
     }
 
+.leaflet-popup-tip-container {
+    position: relative;
+    top: 0px;
+    height: 27px;
+    visibility: hidden;
+    }
+
+/*.leaflet-popup-tip-container:before {
+    content: '';
+    border: 2px solid red;
+    position: absolute;
+    bottom: 0px;
+    width: 22px;
+    height: 22px;
+    left: 9px;
+    border-radius: 10px;
+    }*/
+
 .leaflet-popup-tip {
-    background: rgba(255,255,255,0.92);
+    /*background: rgba(255,255,255,0.92);*/
+    background: white;
+    left: -1px;
+    position: relative;    
     }
 
 .leaflet-popup-content,
@@ -651,6 +676,11 @@
     padding: 0 !important;
     }
 
+
+.c3 svg {
+    position: relative;
+    left: -7px;
+}
 
 /* HEADER */
 .c3-header-wrapper {
@@ -663,13 +693,15 @@
     background: white;
     padding: 15px;
     padding-top: 10px;
+    padding-bottom: 8px;
     }
 
 .c3-header-layer-name {
     font-size: 18px;
     font-weight: 900;
     display: inline-block;
-    vertical-align: top;    
+    vertical-align: top; 
+    text-transform: uppercase;   
     }
 
 .c3-point-count {
@@ -679,9 +711,9 @@
     position: relative;
     top: -3px;
     margin-bottom: -1px;
-    display: inline-block;
-    vertical-align: bottom;
-    text-indent: 8px;
+    /*display: inline-block;*/
+    /*vertical-align: bottom;*/
+    /*text-indent: 8px;*/
     }
 
 .c3-header-metapair {
@@ -690,16 +722,16 @@
     font-size: 11px;
     font-weight: 900;
     /*width: 24%;*/
-    width: 32%;
+    width: 33%;
     text-align: left;
     margin: 0;
     border-bottom: 1px solid #DADADA !important;
     padding-bottom: 2px !important;
     }
 
-.metapair-0,
 .metapair-1,
-.metapair-2 {
+.metapair-2,
+.metapair-3 {
     border-top: 1px solid #DADADA !important;
     }
 
@@ -737,8 +769,9 @@
 /* C3 C3 C3 C3 C3 C3 C3 C3 C3 C3 C3 C3 */
 
 #c3-container {
-    border-top: 1px solid #999;
-    padding-top: 10px;
+    /*border-top: 1px solid #999;*/
+    /*padding-top: 10px;*/
+    max-height: 238px !important;
     }
 
 #c3-header-metacontainer {
@@ -1020,4 +1053,29 @@ g.c3-event-rects.c3-event-rects-multiple rect {
     }
 
 
+
+/*freedraw*/
+section.map.mode-create {
+    cursor: pointer;
+}
+
+section.map.mode-edit div.polygon-elbow {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.leaflet-container.leaflet-clickable, .leaflet-container.map-clickable, .leaflet-marker-icon, .leaflet-overlay-pane path.tracer.leaflet-clickable {
+    cursor: pointer;
+    fill-opacity: 0.7;
+    fill: #FF4646;
+    stroke: red;
+    stroke-opacity: 0.8;
+    stroke-width: 1px;
+    transition: fill-opacity 0.15s;
+}
+
+.leaflet-container.leaflet-clickable, .leaflet-container.map-clickable, .leaflet-marker-icon, .leaflet-overlay-pane path.tracer.leaflet-clickable:hover {
+    fill-opacity: 0.3;
+}
+}
 

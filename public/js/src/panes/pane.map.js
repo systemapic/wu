@@ -90,7 +90,7 @@ Wu.MapPane = Wu.Pane.extend({
 		var map = this._map = app._map = L.map('map', {
 			worldCopyJump : true,
 			attributionControl : false,
-			maxZoom : 20,
+			maxZoom : 18,
 			minZoom : 0,
 			// zoomAnimation : false
 			zoomControl : false,
@@ -780,17 +780,10 @@ Wu.MapPane = Wu.Pane.extend({
 		var d3popup = this._project.getSettings()['d3popup'];
 		var d3popup = true;
 
-		// var content = d3popup ? this._createPopupContentD3(e) : this._createPopupContent(e);
-
-		// console.log('_addPopupContent', e, multiPopUp);
-
-		// xoxoxox
 		if ( multiPopUp ) var content = this.multiPopUp(multiPopUp);
 		else 		  var content = d3popup ? this._createPopupContentC3(e) : this._createPopupContent(e);
 
-		// console.log('content', content);
 
-		// var buffer = '<hr>';
 		var buffer = '';
 
 		// clear old popup
@@ -808,25 +801,30 @@ Wu.MapPane = Wu.Pane.extend({
 		}
 
 		// append content
-		this._popupContent += content;
+		this._popupContent = content;
 
-		this.openPopup(e);
+		this.openPopup(e, multiPopUp);
 
 	},
 
 	_clearPopup : function () {
 		this._popupContent = '';
 		this._popup = null;
+
+		this.popUpMarkerCircle && app._map.removeLayer(this.popUpMarkerCircle);
+		
 	},
 	
-	openPopup : function (e) {
+	openPopup : function (e, multiPopUp) {
 		if (this._popup) return;
 
 		var popup   = this._createPopup(),
 		    content = this._popupContent,
-		    map     = app._map,
-		    latlng  = e.latlng;
+		    map     = app._map;
 
+
+		var latlng = multiPopUp ? multiPopUp.center : e.latlng;
+		
 		// return if no content
 		if (!content) return this._clearPopup();
 		
@@ -839,10 +837,27 @@ Wu.MapPane = Wu.Pane.extend({
 		// set content
 		popup.setContent(content);
 		popup.setLatLng(latlng);
+
+		
 		
 		setTimeout(function () {
+
 			popup.openOn(map);		// todo: still some minor bugs,
-		}, 100); // hack			// this hack perhaps due to double opening
+
+			if ( multiPopUp ) return;
+
+			// If single sampling, create a little circle...
+			var latlng = L.latLng(e.data.lat, e.data.lon);
+			var styling = { radius: 10,
+					fillColor: "#f03",
+					color: "red",
+					fillOpacity: 0.5
+			}
+			this.popUpMarkerCircle = L.circleMarker(latlng, styling).addTo(map);
+
+
+		}.bind(this), 100); // hack			// this hack perhaps due to double opening
+
 	},
 
 	_createPopup : function () {
@@ -872,11 +887,11 @@ Wu.MapPane = Wu.Pane.extend({
 
 
 
-	// *********************************************
-	// * POP-UP POP-UP POP-UP POP-UP POP-UP POP-UP *
-	// * POP-UP POP-UP POP-UP POP-UP POP-UP POP-UP *
-	// * POP-UP POP-UP POP-UP POP-UP POP-UP POP-UP *
-	// *********************************************	
+	// ***************************************************************
+	// * C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP *
+	// * C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP *
+	// * C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP *
+	// ***************************************************************
 
 
 	_createPopupContentC3 : function (e) {
@@ -887,10 +902,326 @@ Wu.MapPane = Wu.Pane.extend({
 
 	
 	_addPopupContentDraw : function (data) {
-	
 		this._addPopupContent(false, data)		
-	
 	},
+
+
+
+	// SINGLE POP-UP
+	// SINGLE POP-UP
+	// SINGLE POP-UP		
+
+	singlePopUp : function (e) {
+
+		var _meta = e.layer.getTooltip();
+
+		var c3Obj = {
+
+
+			data : e.data,
+			layer : e.layer,
+			layerName : e.layer.store.title,
+			meta : _meta,
+			d3array : {
+		    		meta 	: [],
+		    		xName 	: 'field_x', 
+		    		yName 	: 'field_y',
+		    		x 	: [],
+		    		y 	: [],
+		    		ticks 	: []
+			},
+			multiPopUp : false
+
+		}
+
+
+		var _c3Obj = this.stackC3meta(c3Obj);
+
+		// Create HTML
+		var _header = this.initC3Header(_c3Obj);
+		var _HTML   = this.initC3Chart(_c3Obj);
+
+		return _header + _HTML;			
+
+	},
+
+
+	// MULTI POP-UP
+	// MULTI POP-UP
+	// MULTI POP-UP		
+
+	multiPopUp : function (_data) {	
+
+		var _average = _data.average;
+		var _center = _data.center;
+		var _layer = this._getWuLayerFromPostGISLayer(_data.layer_id);
+		var _layerName = _layer.store.title;
+		var _meta = _layer.getTooltip();
+		var _totalPoints = _data.total_points;
+
+		// Show square meters if less than 1000
+		if ( _data.area < 1000 ) {
+
+			var area = Math.round(_data.area);
+			var _areaSQ = area + 'm' + '<sup>2</sup>';
+
+		// Show square KM if more than 1000 (0.01 km2)
+		} else {
+
+			var area = _data.area / 1000000;
+			var areaRounded = Math.floor(area * 1000) / 1000;
+			var _areaSQ = areaRounded + 'km' + '<sup>2</sup>';
+
+		}		
+
+		
+		var c3Obj = {
+
+			data 		: _average,
+			layer 		: _layer,
+			layerName 	: _layerName,
+			meta 		: _meta,
+			d3array 	: {
+				    		meta 	: [],
+				    		xName 	: 'field_x', 
+				    		yName 	: 'field_y',
+				    		x 	: [],
+				    		y 	: [],
+				    		ticks 	: []
+			},
+			multiPopUp : {
+					center 		: _center,
+					totalPoints 	: _totalPoints,
+					areaSQ 		: _areaSQ
+			}
+
+		}
+
+
+		// var _data = this.stackC3meta(c3Obj);
+		var _c3Obj = this.stackC3meta(c3Obj);
+
+		// Create HTML
+		var _header = this.initC3Header(_c3Obj);
+		var _HTML   = this.initC3Chart(_c3Obj);		
+
+		return _header + _HTML;
+
+	},	
+
+
+	// HEADER
+	// HEADER
+	// HEADER
+
+	// RETURNS HTML WITH HEADER – RUNS NO FUNCTION
+	initC3Header : function (c3Obj) {
+
+		var headerMeta = c3Obj.d3array.meta;
+		var layerName = c3Obj.layerName;
+
+		var areaSQ = c3Obj.multiPopUp.areaSQ;
+		var pointCount = c3Obj.multiPopUp.totalPoints;
+
+
+
+		var metaStr = '<div id="c3-header-metacontainer">';
+
+		metaStr += '<div class="c3-header-wrapper">';
+		metaStr += '<div class="c3-header-layer-name">' + layerName + '</div>';
+		
+		// If we're sampling more than one point
+		if ( c3Obj.multiPopUp ) {
+		
+			var plural = pointCount + ' points over ' + areaSQ;
+			metaStr += '<div class="c3-point-count">sampling&nbsp;' + plural + '</div>';
+		
+		}
+
+		metaStr += '</div>';
+
+		var c = 0;
+		headerMeta.forEach(function(meta, i) {
+
+			// ************************************************************
+			//      	     HARDCODE : TODO => REMOVE
+			// ************************************************************
+			// This is just temporary... but select these fields for viewing
+
+			// if (       meta[0] != 'lat' 
+			// 	&& meta[0] != 'lon' 
+			// 	&& meta[0] != 'height' 
+			// 	&& meta[0] != 'coherence' 
+			// 	&& meta[0] != 'mvel'
+			// 	&& meta[0] != 'dtotal' 
+			// 	&& meta[0] != 'd12mnd' 
+			// 	&& meta[0] != 'd3mnd' 
+			// 	&& meta[0] != 'd1mnd' 
+			// 	) { return }
+
+			// ************************************************************
+
+			if ( !meta[1] ) return;
+
+			c++;
+
+			metaStr += '<div class="' + 'c3-header-metapair metapair-' + c + '">';
+			metaStr += '<div class="c3-header-metakey">' + meta[0] + ':</div>';
+			metaStr += '<div class="c3-header-metaval">' + meta[1] + '</div>';
+			metaStr += '</div>';
+
+		});
+
+		metaStr += '</div>';
+
+		return metaStr;
+
+	},
+
+
+	// CHART
+	// CHART
+	// CHART
+
+	// RETURNS HTML WITH CHART – RUNS NO FUNCTION
+	// Pretty much OK => just need to fix "moment" time
+	initC3Chart : function (c3Obj) {
+
+		var data = c3Obj.d3array;
+
+		// Ticks
+		var t = data.ticks;
+
+		// X's and Why's
+		var x = data.x;
+		var y = data.y;
+
+		// Get first TICK date and the first X date
+		var firstTickDate = t[0];
+		var firstXDate = x[0];
+
+		// If the first X date is more recent than the first TICK date,
+		// remove the first tick date.
+		if ( firstXDate > firstTickDate ) t.splice(0,1);	
+		
+		// Get min and max Y
+		var minY = Math.min.apply(null, y);
+		var maxY = Math.max.apply(null, y);
+
+		// Get range
+		var range;
+		if ( minY < 0 ) {
+			var convertedMinY = Math.abs(minY);
+			if ( convertedMinY > maxY ) 	range = convertedMinY;
+			else 				range = maxY;
+		} else {
+			range = Math.floor(maxY * 100) / 100;
+		}
+
+		console.log('%cRANGE', 'background: green; color: white;');
+		console.log('RANGE', range)
+
+		// Column name
+		var xName = data.xName;
+		var yName = data.yName;
+
+		// Add column name to X and Y (required by C3)
+		x.unshift(xName);
+		y.unshift(yName);
+
+		// Colums
+		_columns = [x, y];
+
+		// Create container
+		var _C3Container = Wu.DomUtil.createId('div', 'c3-container');	
+
+
+		// CHART SETTINGS
+		var chart = c3.generate({
+		        
+		        bindto: _C3Container,
+		        
+			size: {
+				// height: 300,
+				// width: 540
+				// height: 270,
+				height: 250,
+				width: 460
+			},
+
+			point : {
+				r: 3.5
+			},
+
+			grid: { y: { show: true },
+				x: { show: true }
+			},
+
+			legend: {
+				show: false
+			},		
+
+		        data: {
+
+		                xs: {
+		                        'field_y': 'field_x'
+		                },
+
+		                columns: _columns,
+
+		                colors : {
+		                	field_y: '#0000FF'
+		                },
+
+		                type: 'scatter'
+
+
+		        },
+
+		        axis: {
+		                x: {
+		                        type: 'timeseries',
+		                        localtime: false,
+		                        tick: {
+		                        	format: function (x) { 
+		                        		
+							var year = x.getFullYear().toString().substr(2,2);
+							var month = x.getMonth();
+
+							// moment(x)
+
+		                        		return month + '.' + year;
+
+		                        	},
+		                                // format: '%Y - %m',
+		                                values: t,
+		                                // rotate: 90,
+		                                rotate: 75,
+		                                multiline: false                                        
+		                        }
+		                },
+
+		                y: {
+		                	max : range,
+		                	min : -range,
+					tick: {
+						format: function (d) { return Math.floor(d * 100)/100 }
+					}
+		                },
+
+		        },
+
+			color: {
+				pattern: ['#000000']
+			}		        
+		});
+
+		// NAAAASTY... 
+		var _chartObject2HTML = new XMLSerializer().serializeToString(_C3Container);
+		return _chartObject2HTML;
+
+	},
+
 
 	// CHART HELPER – BUILD ARRAY (Only for single now, but should make universal)
 	// CHART HELPER – BUILD ARRAY (Only for single now, but should make universal)
@@ -949,146 +1280,12 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 
+	stackC3meta : function (c3Obj) {
 
 
-
-
-
-
-
-
-
-
-	// CHART
-	initC3Chart : function (data) {
-
-		// Ticks
-		var t = data.ticks;
-
-		// X's and Why's
-		var x = data.x;
-		var y = data.y;
-
-		// Get first TICK date and the first X date
-		var firstTickDate = t[0];
-		var firstXDate = x[0];
-
-		// If the first X date is more recent than the first TICK date,
-		// remove the first tick date.
-		if ( firstXDate > firstTickDate ) t.splice(0,1);	
-		
-		// Get min and max Y
-		var minY = Math.min.apply(null, y);
-		var maxY = Math.max.apply(null, y);
-
-		// Get range
-		var range;
-		if ( minY < 0 ) {
-			var convertedMinY = Math.abs(minY);
-			if ( convertedMinY > maxY ) 	range = convertedMinY;
-			else 				range = maxY;
-		} else {
-			range = maxY;
-		}
-
-		// Column name
-		var xName = data.xName;
-		var yName = data.yName;
-
-		// Add column name to X and Y (required by C3)
-		x.unshift(xName);
-		y.unshift(yName);
-
-		// Colums
-		_columns = [x, y];
-
-		// Create container
-		var _C3Container = Wu.DomUtil.createId('div', 'c3-container');	
-
-		// CHART SETTINGS
-		var chart = c3.generate({
-		        
-		        bindto: _C3Container,
-		        
-			size: {
-				// height: 300,
-				// width: 540
-				height: 270,
-				width: 440
-			},
-
-			point : {
-				r: 3.5
-			},
-
-			grid: { y: { show: true },
-				x: { show: true }
-			},
-
-			legend: {
-				show: false
-			},		
-
-		        data: {
-
-		                xs: {
-		                        'field_y': 'field_x'
-		                },
-
-		                columns: _columns,
-
-		                colors : {
-		                	field_y: '#0000FF'
-		                },
-
-		                type: 'scatter'
-
-
-		        },
-
-		        axis: {
-		                x: {
-		                        type: 'timeseries',
-		                        localtime: false,
-		                        tick: {
-		                        	format: function (x) { 
-		                        		
-							var year = x.getFullYear().toString().substr(2,2);
-							var month = x.getMonth();
-
-							// moment(x)
-
-		                        		return month + '.' + year;
-
-		                        	},
-		                                // format: '%Y - %m',
-		                                values: t,
-		                                // rotate: 90,
-		                                rotate: 75,
-		                                multiline: false                                        
-		                        }
-		                },
-
-		                y: {
-		                	max : range,
-		                	min : -range
-		                }
-		        },
-
-			color: {
-				pattern: ['#000000']
-			}		        
-		});
-
-		// NAAAASTY... 
-		var _chartObject2HTML = new XMLSerializer().serializeToString(_C3Container);
-		return _chartObject2HTML;
-
-	},
-
-
-
-	organizeC3data : function (data, meta, d3array, layerName, areaKM, pointCount) {
+		var data = c3Obj.data;
+		var meta = c3Obj.meta;		
+		var d3array = c3Obj.d3array;
 
 
 		// already stored tooltip (edited, etc.)
@@ -1103,7 +1300,8 @@ Wu.MapPane = Wu.Pane.extend({
 				if (field.on) {
 
 					// get key/value
-					var _val = parseFloat(data[field.key]);
+					// var _val = parseFloat(data[field.key]);
+					var _val = parseFloat(data[field.key]).toString().substring(0,10);
 					var _key = field.title || field.key;
 
 					this.c3StackArray(_key, _val, d3array);	
@@ -1117,7 +1315,8 @@ Wu.MapPane = Wu.Pane.extend({
 
 			for (var key in data) {
 
-				var _val = parseFloat(data[key]);				
+				// var _val = parseFloat(data[key]);
+				var _val = parseFloat(data[key]).toString().substring(0,10);
 				var _key = key;
 
 				this.c3StackArray(_key, _val, d3array);
@@ -1125,138 +1324,17 @@ Wu.MapPane = Wu.Pane.extend({
 			}
 		}
 
-		// Create frickin chart...
-		var _header = this.initC3Header(d3array.meta, layerName, areaKM, pointCount);		
-		var _HTML = this.initC3Chart(d3array);
 
-		return _header + _HTML;		
-
-	},
-
-
-	// HEADER
-	// HEADER
-	// HEADER
-
-	initC3Header : function (headerMeta, layerName, areaKM, pointCount) {
-
-		var metaStr = '<div id="c3-header-metacontainer">';
-
-		metaStr += '<div class="c3-header-wrapper">';
-		metaStr += '<div class="c3-header-layer-name">' + layerName + '</div>';
-		
-		// If we're sampling more than one point
-		if ( pointcount && areaKM ) {
-		
-			var plural = pointcount + ' points over ' + areaKM;
-			metaStr += '<div class="c3-point-count">(sampling&nbsp;' + plural + ')</div>';
-		
-		}
-
-		metaStr += '</div>';
-
-		headerMeta.forEach(function(meta, i) {
-
-			if ( !meta[1] ) return;
-			metaStr += '<div class="' + 'c3-header-metapair metapair-' + i + '">';
-			metaStr += '<div class="c3-header-metakey">' + meta[0] + ':</div>';
-			metaStr += '<div class="c3-header-metaval">' + meta[1] + '</div>';
-			metaStr += '</div>';
-
-		});
-
-		metaStr += '</div>';
-
-		return metaStr;
-
-	},
-
-
-
-	// ***************************************
-	// * SINGLE DATA SINGLE DATA SINGLE DATA *
-	// * SINGLE DATA SINGLE DATA SINGLE DATA *
-	// * SINGLE DATA SINGLE DATA SINGLE DATA *
-	// ***************************************
-
-
-	singlePopUp : function (e) {
-
-		// Check for stored tooltip
-		var data = e.data,
-		    layer = e.layer,
-		    layerName = e.layer.store.title,
-		    meta = layer.getTooltip(),
-		    // string = '',		    
-		    d3array = {	
-		    		
-		    		meta 	: [],
-		    		xName 	: 'field_x', 
-		    		yName 	: 'field_y',
-		    		x 	: [],
-		    		y 	: [],
-		    		ticks 	: []
-		    	};
-
-
-
-		var _data = this.organizeC3data(data, meta, d3array, layerName);
-
-		return _data;
-
-	},
-
-
-	multiPopUp : function (data) {	
-
-	 	console.log('%cSay whoooot?', 'background: red; color: white;');
-		console.log('data: ', data);		
-
-		var average = data.average;
-		var area = data.area / 1000;
-		var areaRounded = Math.round(area * 100) / 100;
-		var areaKM = areaRounded + ' km' + '<sup>2</sup>';
-
-		// get wu layer from postgis layer id
-		var layer = this._getWuLayerFromPostGISLayer(data.layer_id);
-
-		console.log('got wu layer: ', layer);
-
-		var layerName = layer.title;
-
-		var totalPoints = data.total_points;
-
-
-		console.log('average', average);
-		console.log('areaRounded', areaRounded);
-		console.log('totalPoints', totalPoints);
-		console.log('areaKM', areaKM);
-		console.log('layerName', layerName);
-
-
-		var _data = average,
-		    // layer = e.layer,
-		    meta = layer.getTooltip(),
-		    // string = '',		    
-		    d3array = {	
-		    		
-		    		meta 	: [],
-		    		xName 	: 'field_x', 
-		    		yName 	: 'field_y',
-		    		x 	: [],
-		    		y 	: [],
-		    		ticks 	: []
-		    	};
-
-		var _data = this.organizeC3data(data, meta, d3array, layerName, areaKM, totalPoints);
-
-
-		return _data;
-
-
-		
+		return c3Obj;
 	
 	},
+
+
+
+
+
+
+
 
 
 
