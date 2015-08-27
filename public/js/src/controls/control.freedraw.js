@@ -96,6 +96,8 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 			console.log('FREEDRAW A B ', layer, b, c);
 
 			var geojson = layer.polygon.toGeoJSON();
+			var center = layer.polygon.getBounds().getCenter();
+
 
 			console.log('geo: ', geojson);
 
@@ -113,7 +115,7 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 				console.log('all points: ', resultObject.all);
 				console.log('average: ', resultObject.average);
 
-				app.MapPane._addPopupContentDraw(resultObject);
+				app.MapPane._addPopupContentDraw(resultObject, center);
 
 
 			});

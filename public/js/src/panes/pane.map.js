@@ -102,7 +102,7 @@ Wu.MapPane = Wu.Pane.extend({
 		this._attributionControl = L.control.attribution({position : 'bottomleft', prefix : false});
 		map.addControl(this._attributionControl);
 
-		this._attributionControl.addAttribution('<a href="http://systemapic.com">WEB GIS by Systemapic.com</a>');
+		this._attributionControl.addAttribution('<a href="http://systemapic.com">Powered by Systemapic.com</a>');
 		this._attributionControl.removeAttribution('Leaflet');
 
 
@@ -885,11 +885,11 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 
-	// xoxoxox
+	
 	_addPopupContentDraw : function (data) {
-
-		this._addPopupContent(false, data)
-		// this.multiPopUp(data);
+	
+		this._addPopupContent(false, data)		
+	
 	},
 
 	// CHART HELPER – BUILD ARRAY (Only for single now, but should make universal)
@@ -1088,7 +1088,7 @@ Wu.MapPane = Wu.Pane.extend({
 
 
 
-	organizeC3data : function (data, meta, d3array) {
+	organizeC3data : function (data, meta, d3array, layerName, areaKM, pointCount) {
 
 
 		// already stored tooltip (edited, etc.)
@@ -1123,13 +1123,11 @@ Wu.MapPane = Wu.Pane.extend({
 				this.c3StackArray(_key, _val, d3array);
 
 			}
-
 		}
 
 		// Create frickin chart...
+		var _header = this.initC3Header(d3array.meta, layerName, areaKM, pointCount);		
 		var _HTML = this.initC3Chart(d3array);
-		var _header = this.initC3Header(d3array.meta);
-
 
 		return _header + _HTML;		
 
@@ -1140,20 +1138,21 @@ Wu.MapPane = Wu.Pane.extend({
 	// HEADER
 	// HEADER
 
-	initC3Header : function (headerMeta, multipoint) {
+	initC3Header : function (headerMeta, layerName, areaKM, pointCount) {
 
 		var metaStr = '<div id="c3-header-metacontainer">';
 
-		// TODO
-		var layername = "LAYER NAME";
-		var pointCount = 1;
-		
-		var plural;
-		pointCount > 1 ? plural = 's' : plural = '';
-
 		metaStr += '<div class="c3-header-wrapper">';
-		metaStr += '<div class="c3-header-layer-name">' + layername + '</div>';
-		metaStr += '<div class="c3-point-count">(sampling&nbsp;' + pointCount + '&nbsp;point' + plural + ')</div>';
+		metaStr += '<div class="c3-header-layer-name">' + layerName + '</div>';
+		
+		// If we're sampling more than one point
+		if ( pointcount && areaKM ) {
+		
+			var plural = pointcount + ' points over ' + areaKM;
+			metaStr += '<div class="c3-point-count">(sampling&nbsp;' + plural + ')</div>';
+		
+		}
+
 		metaStr += '</div>';
 
 		headerMeta.forEach(function(meta, i) {
@@ -1186,6 +1185,7 @@ Wu.MapPane = Wu.Pane.extend({
 		// Check for stored tooltip
 		var data = e.data,
 		    layer = e.layer,
+		    layerName = e.layer.store.title,
 		    meta = layer.getTooltip(),
 		    // string = '',		    
 		    d3array = {	
@@ -1198,9 +1198,9 @@ Wu.MapPane = Wu.Pane.extend({
 		    		ticks 	: []
 		    	};
 
-		console.log('layer', layer);
 
-		var _data = this.organizeC3data(data, meta, d3array);
+
+		var _data = this.organizeC3data(data, meta, d3array, layerName);
 
 		return _data;
 
@@ -1208,6 +1208,9 @@ Wu.MapPane = Wu.Pane.extend({
 
 
 	multiPopUp : function (data) {	
+
+	 	console.log('%cSay whoooot?', 'background: red; color: white;');
+		console.log('data: ', data);		
 
 		var average = data.average;
 		var area = data.area / 1000;
@@ -1217,17 +1220,18 @@ Wu.MapPane = Wu.Pane.extend({
 		// get wu layer from postgis layer id
 		var layer = this._getWuLayerFromPostGISLayer(data.layer_id);
 
+		console.log('got wu layer: ', layer);
+
+		var layerName = layer.title;
+
 		var totalPoints = data.total_points;
 
-
-	 	console.log('%cSay whoooot?', 'background: red; color: white;');
-		console.log('data: ', data);
-		console.log('got wu layer: ', layer);	
 
 		console.log('average', average);
 		console.log('areaRounded', areaRounded);
 		console.log('totalPoints', totalPoints);
 		console.log('areaKM', areaKM);
+		console.log('layerName', layerName);
 
 
 		var _data = average,
@@ -1244,7 +1248,7 @@ Wu.MapPane = Wu.Pane.extend({
 		    		ticks 	: []
 		    	};
 
-		var _data = this.organizeC3data(data, meta, d3array);
+		var _data = this.organizeC3data(data, meta, d3array, layerName, areaKM, totalPoints);
 
 
 		return _data;
@@ -1342,5 +1346,3 @@ Wu.MapPane = Wu.Pane.extend({
 
 	
 });
-
-
