@@ -265,61 +265,72 @@
 
 
 .chrome-content.settingsSelector { 
-    position: absolute;
+    position: relative;
     padding-bottom: 20px;
     width: 100%;
-    height: 80px;
-}
+    border-bottom: 1px dashed #ccc;
+    }
 
 
 .chrome-content.settings-button-wrapper {
     margin-left: 20px;
-}
+    }
 
 
 .chrome-content.settings-button {
-    background: #918DE8;
+    background: #ccc;
     width: auto;
-    float: left;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
     padding: 2px;
     padding-left: 5px;
     padding-right: 5px;
     margin-right: 4px;
     font-weight: 500;
-    color: white;
+    color: black;
     cursor: pointer;
     margin-top: 4px;
     font-size: 15px;
-}
+    }
+
 .chrome-content.settings-button:hover {
-    background: #218DE8;
-}
+    background: #bbb;
+    }
 
 .chrome-content.settings-title {
-    font-size: 20px;
+    font-size: 18px;
     margin: 5px;
     margin-left: 20px;
-}
-
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 0;
+    margin-top: 8px;
+    }
 
 .chrome-content.settings-tabs-wrapper {
     position: absolute;
     top: 120px;
-}
+    }
+
 .chrome-content.active-layer.title {
-    font-size: 20px;
-}
+    font-size: 15px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    }
+
 .chrome-content.active-layer.select-wrap {
     padding: 0;
     margin: 0;
     border: 1px solid #ccc;
+    min-width: 312px;
     max-width: 360px;
     border-radius: 3px;
     overflow: hidden;
     background-color: #fff;
     position: relative;
     z-index: 100;
-}
+    }
 
 .chrome-content.active-layer.select-wrap:before {
     content: '';
@@ -332,7 +343,7 @@
     z-index: 101;
     background: #fff url("images/arrowdown.gif") no-repeat;
     pointer-events: none;
-}
+    }
 
 .chrome-content.active-layer.select-wrap select {
     padding: 5px 8px;
@@ -344,22 +355,28 @@
     -webkit-appearance: none;
        -moz-appearance: none;
             appearance: none;
-}
+    }
 
 .chrome-content.active-layer.select-wrap select:focus {
     outline: none;
-}
+    }
+
 .active-layer-option {
     color: black;
-}
+    }
 
 .chrome-content.settings-button.active-tab {
-    background: red;
-}
+    background: #78a09c;
+    color: white;
+    }
+
+.chrome-content.settings-button.active-tab:hover {
+    background: #6C8E8B;
+    }
 
 .chrome.chrome-content.styler {
     margin-top: 5px;
-}
+    }
 
 
 /* EDITED BY JØRGEN */
@@ -589,7 +606,7 @@
 
 .chrome.chrome-content.styler-content.active-layer.wrapper {
     margin: 20px;
-    margin-top: 4px;
+    margin-top: 5px;
 }
 /* TOOLTIP TOOLTIP TOOLTIP TOOLTIP */
 /* TOOLTIP TOOLTIP TOOLTIP TOOLTIP */
