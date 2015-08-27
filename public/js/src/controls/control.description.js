@@ -78,7 +78,7 @@ L.Control.Description = Wu.Control.extend({
 		// this.setCopyright(layer);
 
 		// TODO.. remove
-		this.initFakeLegend();
+		this.initFakeLegend(layer);
 
 	},
 
@@ -545,11 +545,13 @@ L.Control.Description = Wu.Control.extend({
 
 
 
-	initFakeLegend : function () {
+	initFakeLegend : function (layer) {
 
 		
+		var title = layer.getTitle();
+
 		// SET TITLE
-		this.setTitle('Layer name');
+		this.setTitle(title);
 
 		// SET DESCRIPTION
 		var description = 'Some information about the data set can be written here, such as name of satellite, etc.'
@@ -574,7 +576,16 @@ L.Control.Description = Wu.Control.extend({
 		// SET LEGEND
 
 		var gradientOptions = {
-			colorStops : ['red', 'green', 'blue', 'hotpink'],
+			colorStops : ['#2f00ff',
+					'#003dff',
+					'#009eff',
+					'#00ffdf',
+					'#00ffa9',
+					'#a5ff00',
+					'#ffd700',
+					'#ff8100',
+					'#ff3600',
+					'#ff0000'],
 			minVal : -20,
 			medVal : 0,
 			maxVal : 20,

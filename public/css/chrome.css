@@ -466,12 +466,34 @@
     }
 
 .leaflet-top.leaflet-right {
-    bottom: 38px !important;
+    bottom: 4px !important;
+    right: 260px;
     }
 
 .measure-padding-right {
-    right: 251px;
+    /*right: 251px;*/
     }    
+
+.leaflet-control-scale {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 0 !important;
+    margin: 0 !important;
+    top: 0 !important;
+    bottom: auto;
+    float: none;
+    }    
+
+.leaflet-control-mouseposition {
+    margin: 0 !important;
+    margin-bottom: 0 !important;
+    position: relative;
+    vertical-align: top;
+    top: 0 !important;
+    bottom: auto;
+    float: none;    
+    }
 
 .layer-menu-item-wrap {
     background-color: #cccccc !important;
@@ -634,6 +656,7 @@
 .c3-header-wrapper {
     position: relative;
     margin-bottom: 7px;
+    max-width: 400px;
     }
 
 #c3-header-metacontainer {

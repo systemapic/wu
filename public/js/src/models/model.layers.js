@@ -1033,7 +1033,7 @@ Wu.NorkartLayer = Wu.Layer.extend({
 		tile_url : 'https://www.webatlas.no/maptiles/tiles/{type}/wa_grid/{z}/{x}/{y}.jpeg',
 		current_mapstyle : 1, // aerial
 		customer_id : 'systemapic',
-		minZoom : 15,
+		minZoom : 13,
 		maxZoom : 20
 	},
 
@@ -1070,8 +1070,6 @@ Wu.NorkartLayer = Wu.Layer.extend({
 			tms : false,
 			maxZoom : this.options.maxZoom,
 			minZoom : this.options.minZoom,
-			reuseTiles : false,
-			unloadInvisibleTiles : true
 		});
 
 		// add clear background cache event (hack for hanging tiles)
@@ -1097,10 +1095,10 @@ Wu.NorkartLayer = Wu.Layer.extend({
 		// clear cache if at zoom break-point
 		var zoom = app._map.getZoom(); // after
 		if (zoom == this.options.minZoom - 1) {
-			this.layer._clearBgBuffer();
+			this.layer && this.layer._clearBgBuffer();
 		}
 		if (zoom == this.options.maxZoom + 1) {
-			this.layer._clearBgBuffer();
+			this.layer && this.layer._clearBgBuffer();
 		}
 	},
 

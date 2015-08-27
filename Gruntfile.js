@@ -190,7 +190,8 @@ module.exports = function(grunt) {
 					// extra
 					'public/js/lib/opentip/opentip-native.js',
 					'public/js/lib/jss.js/jss.js',	
-					'public/js/lib/keymaster/keymaster.js'		
+					'public/js/lib/keymaster/keymaster.js',	
+					'public/js/lib/moment.js/moment.min.js'		
 
 				],
 				
