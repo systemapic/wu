@@ -16,12 +16,15 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 		this._map = options.map;
 
 		this._freeDraw = L.freeDraw({
-			mode : L.FreeDraw.MODES.CREATE,
+			mode : L.FreeDraw.MODES.CREATE  | L.FreeDraw.MODES.EDIT | L.FreeDraw.MODES.APPEND
+
 		});
 
 		// set options
 		this._freeDraw.options.setHullAlgorithm(false);
 		this._freeDraw.options.setSmoothFactor(0);
+		// this._freeDraw.options.disableStopPropagation();
+		this._freeDraw.handlePolygonClick = this._polygonClick.bind(this);
 
 		// set shortcut key
 		this._shortkeys();
@@ -80,63 +83,62 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 
 
 	_addEvents : function () {
+		this._freeDraw.on('polygon', this._createdPolygon, this);
 
-		console.log('ADDEVENTS!@!!!');
+		this._freeDraw.on('markers', function getMarkers(eventData) {
+			var latLngs = eventData.latLngs;
+			// ...
+			console.log('freedraw markers', latLngs);
+		});
+	},
+	_removeEvents : function () {
+		this._freeDraw.off('polygon', this._createdPolygon, this);
+	},
 
-		// map click
-		this._map.on('mousedown', function (e) {
-			console.log('map mousedown', e);
-		}, this);
+	_createdPolygon : function (layer) {
+		console.log('added layer 2442', layer);
 
+		app.MapPane._creatingPolygon = true;
 
-		// freedraw events
-		this._freeDraw.on('polygon', function (layer, b, c) { 			// todo: refactor! 
-			console.log('added layer', layer);
+		var geojson = layer.polygon.toGeoJSON();
 
-			var geojson = layer.polygon.toGeoJSON();
-			var center = layer.polygon.getBounds().getCenter();
+		// fetch data
+		this._fetchData({
+			geojson : geojson,
+			layer : layer
+		}, function (err, results) {
+			var resultObject = Wu.parse(results);
 
-			console.log('geo: ', geojson);
+			console.log('fetched results: ', resultObject);
 
-			// fetch data
-			this._fetchData({
+			// add center
+			resultObject.center = layer.polygon.getBounds().getCenter();
 
-				geojson : geojson
+			// add to popup
+			app.MapPane._addPopupContentDraw(resultObject);
 
-			}, function (err, results) {
+			app.MapPane._creatingPolygon = false;
 
-				var resultObject = Wu.parse(results);
-
-				console.log('fetched results: ', resultObject);
-				console.log('all points: ', resultObject.all);
-				console.log('average: ', resultObject.average);
-
-				app.MapPane._addPopupContentDraw(resultObject, center);
-
-
-			});
+			this._latestFetch = resultObject;
 
 		}.bind(this));
 
-
 	},
 
-	_removeEvents : function () {
+	
 
+	_polygonClick : function (polygon, event) {
+		console.log('_polygonClick', polygon, event, this);
 
-		this._freeDraw.off('polygon', function (layer) {
-			console.log('added layer', layer);
-		})
-
+		var e = event.originalEvent;
+		Wu.DomEvent.stop(e);
+		
+		// add to popup
+		app.MapPane._addPopupContentDraw(this._latestFetch);
 	},
 
 	_fetchData : function (options, callback) {
 		console.log('fetchData', options);
-
-		// var keys = Object.keys(e.data);
-		// var column = keys[0];
-		// var row = e.data[column];
-		// var layer_id = e.layer.store.data.postgis.layer_id;
 
 		var layer_id = this._getActiveLayerID();
 
@@ -146,7 +148,6 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 			access_token : app.tokens.access_token,
 			geojson : options.geojson,
 			layer_id : layer_id
-
 		}
 
 		console.log('options!', options);
@@ -155,10 +156,6 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 	},
 
 	_getActiveLayerID : function () {
-
-		console.log('_getActiveLayerID');
-		console.log('zinde', app.MapPane._layermenuZIndex);
-
 		var layer = app.MapPane._layermenuZIndex._index[0];
 
 		if (!layer || !layer.store || !layer.store.data || !layer.store.data.postgis) return false;

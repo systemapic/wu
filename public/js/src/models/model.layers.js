@@ -706,25 +706,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 	
 
 	_gridOnMousedown : function(e) {
-		if (!e.data) return;
-
-		// pass layer
-		e.layer = this;
-
-		// fetch data
-		this._fetchData(e, function (ctx, json) {
-			
-			var data = JSON.parse(json);
-			console.log('fetched data: ', data);
-			e.data = data;
-			var event = e.e.originalEvent;
-			this._event = {
-				x : event.x,
-				y : event.y
-			}
-			app.MapPane._addPopupContent(e);
-		});
-
+		
 		
 
 	},
@@ -752,8 +734,26 @@ Wu.PostGISLayer = Wu.Layer.extend({
 	},
 
 	_gridOnClick : function (e) {
-		// clear old
-		// app.MapPane._clearPopup();
+		if (!e.data) return;
+		if (app.MapPane._creatingPolygon) return;
+
+		// pass layer
+		e.layer = this;
+
+		// fetch data
+		this._fetchData(e, function (ctx, json) {
+			
+			var data = JSON.parse(json);
+			console.log('fetched data: ', data);
+			e.data = data;
+			var event = e.e.originalEvent;
+			this._event = {
+				x : event.x,
+				y : event.y
+			}
+			app.MapPane._addPopupContent(e);
+		});
+
 
 	},
 

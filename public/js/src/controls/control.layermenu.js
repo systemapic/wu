@@ -277,11 +277,11 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	_setHeight : function (extra) {
 		// count open items
-		var numOpen = this._getOpenItems();
-		if (this.editMode && !extra) extra = 50;
-		var extra = extra ? extra + 50 : 50;
-		var height = numOpen * 30 + extra + 'px';
-		this._innerContainer.style.height = height;
+		// var numOpen = this._getOpenItems();
+		// if (this.editMode && !extra) extra = 50;
+		// var extra = extra ? extra + 50 : 50;
+		// var height = numOpen * 30 + extra + 'px';
+		// this._innerContainer.style.height = height;
 	},
 
 	_getOpenItems : function () {

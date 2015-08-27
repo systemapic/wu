@@ -35,6 +35,8 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
+var geojsonArea = require('geojson-area');
+
 // resumable.js
 var r = require('../tools/resumable-node')('/data/tmp/');
 
@@ -390,8 +392,7 @@ module.exports = api.postgis = {
 				query : query
 			}, function (err, results) {
 				if (err) return callback(err);
-				console.log('METAEXX results', results);
-
+										// todo: get extent as geojson polygon
 				// old skool
 				var box = results.rows[0].st_extent;
 				var m = box.split('(')[1];
@@ -404,7 +405,6 @@ module.exports = api.postgis = {
 				// set
 				metadata.extent = [c1, c2, c3, c4];
 				
-
 				callback(null);
 			});	
 		});
@@ -499,22 +499,94 @@ module.exports = api.postgis = {
 
 					callback(null);
 				});
-
-
-				
-
-			
-
-
 			});
+		});
 
-			
+		// get total area
+		ops.push(function (callback) {
+
+			// meta:
+			// 1. row count (ie. how many points)
+			// 2. file size
+			// 3. total area of file
+
+			var GET_EXTENT_SCRIPT_PATH = '../scripts/postgis/get_st_extent_as_geojson.sh';
+
+			// st_extent script 
+			var command = [
+				GET_EXTENT_SCRIPT_PATH, 	// script
+				postgis_db, 	// database name
+				file_id,	// table name
+			].join(' ');
+
+
+			// create database in postgis
+			exec(command, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+				console.log('err, stdout, stdin', err, stdout, stdin);
+
+				var json = stdout.split('\n')[2];
+				var geojson = JSON.parse(json);
+				var area = geojsonArea.geometry(geojson);
+
+				metadata.extent_geojson = geojson;
+
+				metadata.total_area = area; // square meters
+
+				// callback
+				callback(null);
+			});
 
 		});
 
+		// get number of rows
+		ops.push(function (callback) {
+
+			var query = 'SELECT count(*) FROM ' + file_id;
+
+			api.postgis.query({
+				postgis_db : postgis_db,
+				query : query
+			}, function (err, results) {
+				if (err) return callback();
+
+				var json = results.rows[0];
+				metadata.row_count = json.count;
+
+				callback();
+			});
+		});
+
+
+		// get size of table in bytes
+		ops.push(function (callback) {
+
+			// var query = 'SELECT count(*) FROM ' + file_id;
+			var query = "SELECT pg_size_pretty(pg_table_size('" + file_id + "'));"
+			
+			console.log('size quer: ', query);
+
+			api.postgis.query({
+				postgis_db : postgis_db,
+				query : query
+			}, function (err, results) {
+				console.log('ERR, RESULTS SIZE', err, results);
+				if (err) return callback();
+
+				var json = results.rows[0];
+
+				console.log('json_SIZEE: ', json);
+				metadata.size_bytes = json.pg_size_pretty;
+
+				callback();
+			});
+		});
+
+
 		// todo: get fields for cartocss pro-tips
 
+
 		async.series(ops, function (err, results) {
+			console.log('ALL META DONE-=>>>', metadata);
 			done(err, metadata);
 		});
 	},
