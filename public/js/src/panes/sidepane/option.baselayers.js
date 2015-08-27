@@ -45,6 +45,32 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 		// todo!!!
 	},
 
+	fillLayers : function () {
+
+		this._layers = {};
+
+		// return if no layers
+	       	if (_.isEmpty(this.project.layers)) return;
+
+	       	var sortedLayers = this.sortLayers(this.project.layers);
+
+	       	sortedLayers.forEach(function (provider) {
+
+	       		console.log('prioveder:', provider);
+
+	       		this.addProvider(provider.key);
+
+	       		provider.layers.forEach(function (layer) {
+	       			this.addLayer(layer);
+	       		}, this);
+
+	       	}, this);
+
+	       	// calculate height for wrapper
+	       	this.calculateHeight();
+
+	},
+
 	addLayer : function (layer) {
 
 		// create and append div
