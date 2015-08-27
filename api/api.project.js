@@ -85,6 +85,13 @@ module.exports = api.project = {
 			}, callback);
 		});
 
+		// add norkart layers
+		ops.push(function (project, callback) {
+			api.provider.norkart.setDefault({
+				project : project
+			}, callback);
+		});
+
 		// get updated project
 		ops.push(function (project, callback) {
 			Project

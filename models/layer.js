@@ -34,7 +34,7 @@ var layerSchema = mongoose.Schema({
 		mapbox 		: String,			// mapbox id: rawger.geography-class
 		cartodb 	: String,			// cartodb id: 
 		osm 		: String,			// osm id?
-	
+		norkart     : String,
 
 		postgis : {
 

@@ -41,6 +41,40 @@ var api = module.parent.exports;
 // exports
 module.exports = api.provider = { 
 
+	norkart : {
+
+		setDefault : function (options, done) {
+
+			var project = options.project;
+
+			// create simple norkart layer
+			var layer 		= new Layer();
+			layer.uuid 		= 'layer-' + uuid.v4(); // unique uuid
+			layer.title 		= 'Norkart Aerial'
+			layer.description 	= '';
+			layer.legend		= '';
+			layer.maxZoom 		= 0;
+			layer.minZoom 		= 0;
+			layer.bounds 		= '';
+			layer.tms		= false;
+			layer.data.norkart 	= 'webatlas-orto-newup'; // aerial. hybrid=webatlas-standard-hybrid
+			layer.attribution 	= 'Norkart'; 	// html
+
+			// save
+			layer.save(function (err, saved_layer) {
+				project.layers.addToSet(saved_layer._id)
+
+				// save project
+				project.markModified('layers');
+				project.save(function (err, p) {
+					done(err, project);
+				});
+			});
+
+		},
+
+	},
+
 	mapbox : {
 
 		setDefault : function (options, done) {	
