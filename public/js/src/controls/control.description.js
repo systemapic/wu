@@ -550,6 +550,12 @@ L.Control.Description = Wu.Control.extend({
 		
 		var title = layer.getTitle();
 
+		console.error('legend -> ', layer);
+
+		var meta = layer.getMeta();
+
+		console.log('meta: ', meta);
+
 		// SET TITLE
 		this.setTitle(title);
 
@@ -576,16 +582,7 @@ L.Control.Description = Wu.Control.extend({
 		// SET LEGEND
 
 		var gradientOptions = {
-			colorStops : ['#2f00ff',
-					'#003dff',
-					'#009eff',
-					'#00ffdf',
-					'#00ffa9',
-					'#a5ff00',
-					'#ffd700',
-					'#ff8100',
-					'#ff3600',
-					'#ff0000'],
+			colorStops : ["#ff0000", "#ff3600", "#ff8100", "#ffd700", "#a5ff00", "#00ffa9", "#00ffdf", "#009eff", "#003dff", "#2f00ff"],
 			minVal : -20,
 			medVal : 0,
 			maxVal : 20,
