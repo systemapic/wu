@@ -324,8 +324,11 @@ module.exports = api.geo = {
 		// get .shp file
 		var shps = [];
 		for (s in shapes) {
-			if (shapes[s] && shapes[s].slice(-4) == '.shp') {
-				shps.push(shapes[s]);
+			var shape_part = shapes[s];
+			if (shape_part && shape_part.slice(-4) == '.shp') {
+				if (!shape_part.slice(0,1) != '.') {
+					shps.push(shape_part);
+				}
 			}
 		}
 		return shps;
@@ -335,8 +338,12 @@ module.exports = api.geo = {
 		// get .prj file
 		var shps = [];
 		for (s in shapes) {
-			if (shapes[s] && shapes[s].slice(-4) == '.prj') {
-				shps.push(shapes[s]);
+
+			var shape_part = shapes[s];
+			if (shape_part && shape_part.slice(-4) == '.prj') {
+				if (!shape_part.slice(0,1) != '.') {
+					shps.push(shape_part);
+				}
 			}
 		}
 		return shps;

@@ -90,8 +90,10 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 
 
 		// freedraw events
-		this._freeDraw.on('polygon', function (layer) { 			// todo: refactor! 
+		this._freeDraw.on('polygon', function (layer, b, c) { 			// todo: refactor! 
 			console.log('added layer', layer);
+
+			console.log('FREEDRAW A B ', layer, b, c);
 
 			var geojson = layer.polygon.toGeoJSON();
 

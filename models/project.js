@@ -122,13 +122,13 @@ var projectSchema = mongoose.Schema({
 		description 	: { type: Boolean, default: true  },
 		draw 		: { type: Boolean, default: false },
 		layermenu 	: { type: Boolean, default: true  },
-		legends 	: { type: Boolean, default: true  },
-		inspect 	: { type: Boolean, default: true  },
+		legends 	: { type: Boolean, default: false  },
+		inspect 	: { type: Boolean, default: false  },
 		geolocation 	: { type: Boolean, default: false },
 		vectorstyle 	: { type: Boolean, default: false },
 		mouseposition 	: { type: Boolean, default: false },
 		baselayertoggle : { type: Boolean, default: false },
-		cartocss 	: { type: Boolean, default: true  }
+		cartocss 	: { type: Boolean, default: false  }
 	},
 
 	settings : {
