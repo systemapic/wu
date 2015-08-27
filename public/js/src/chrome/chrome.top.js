@@ -44,10 +44,10 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._usrLogout = Wu.DomUtil.create('div', 'top-logout', this._usrNameContainer, 'log out');
 
 		// Layers button
-		this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton', this._buttons);
+		this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton displayNone', this._buttons);
 		
 		// Settings button
-		this._settingsButton = Wu.DomUtil.create('div', 'chrome-button cartoeditor', this._buttons);
+		this._settingsButton = Wu.DomUtil.create('div', 'chrome-button cartoeditor displayNone', this._buttons);
 
 		this.initDefault();
 
@@ -108,6 +108,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_refresh : function () {
 
+		console.log('%cREFRESH!', 'background: green; color: white;');
+
 		this._setProjectTitle();
 		// this._setUsername();
 		// this._setPortalLogo();
@@ -116,14 +118,37 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// The layer menu
 		this.__layerMenu = app.MapPane.getControls().layermenu;
 		
-		
+		// Show settings button if user has access to it...
+		if ( this.hasSettingsAccess() ) Wu.DomUtil.removeClass(this._settingsButton, 'displayNone');
+
 		// TODO: fikse dette...
 		setTimeout(function() {
 
 			// Set active state to Layer menu button if it's open
 			if ( this.__layerMenu._open ) this._openLayerMenu();
 
-		}.bind(this), 10);
+		}.bind(this), 50);
+
+	},
+
+	// TODO: Knut har sikkert en fiffig funksjon for dett, men...
+	hasSettingsAccess : function () {
+
+		var uuid = app.Account.store.uuid;
+		var portalRoleMembers = app.Access.store.portalRole.members;
+		var superRoleMembers = app.Access.store.superRole.members;
+
+		var hasSettingsAccess = false;
+
+		for ( var i = 0; i < portalRoleMembers.length; i++ ) {
+			if ( portalRoleMembers[i] == uuid ) hasSettingsAccess = true;
+		}
+
+		for ( var i = 0; i < superRoleMembers.length; i++ ) {
+			if ( superRoleMembers[i] == uuid ) hasSettingsAccess = true;
+		}
+
+		return hasSettingsAccess;
 
 	},
 
