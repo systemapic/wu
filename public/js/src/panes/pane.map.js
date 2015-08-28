@@ -1157,6 +1157,10 @@ Wu.MapPane = Wu.Pane.extend({
 
 		headerMeta.forEach(function(meta, i) {
 
+			if ( meta[0] == 'geom' || meta[0] == 'the_geom_3857' || meta[0] == 'geom4326' ) return;
+
+			console.log('meta[0]', meta[0]);
+
 			if ( !meta[1] ) return;
 			metaStr += '<div class="' + 'c3-header-metapair metapair-' + i + '">';
 			metaStr += '<div class="c3-header-metakey">' + meta[0] + ':</div>';
