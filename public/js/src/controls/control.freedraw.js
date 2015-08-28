@@ -102,6 +102,8 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 
 		var geojson = layer.polygon.toGeoJSON();
 
+		// this._startWaitingFlash(layer.polygon);
+
 		// fetch data
 		this._fetchData({
 			geojson : geojson,
@@ -121,6 +123,8 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 
 			this._latestFetch = resultObject;
 
+			// this._stopWaitingFlash(layer.polygon);
+
 		}.bind(this));
 
 	},
@@ -132,7 +136,7 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 
 		var e = event.originalEvent;
 		Wu.DomEvent.stop(e);
-		
+
 		// add to popup
 		app.MapPane._addPopupContentDraw(this._latestFetch);
 	},
@@ -154,6 +158,38 @@ Wu.Tool.FreeDraw = Wu.Tool.extend({
 
 		Wu.send('/api/db/fetchArea', options, callback, this);
 	},
+	
+	// _startWaitingFlash : function (polygon) {
+
+	// 	this._flashCounter = 0;
+
+	// 	this._flashTimer = setInterval(function () {
+	// 		console.log('FLASHFLASH!!', polygon);
+			
+	// 		if (this._flashCounter == 0) {
+	// 			console.log('0');
+	// 			// polygon._container.style.opacity = 0;
+	// 			polygon.setStyle({
+	// 				fillColor : 'blue'
+	// 			})
+	// 			polygon.redraw();
+	// 			this._flashCounter = 1;
+	// 		} else {
+	// 			console.log('1');
+	// 			polygon.setStyle({
+	// 				fillColor : 'yellow'
+	// 			})
+	// 			this._flashCounter = 0;
+	// 		}
+
+	// 	}.bind(this), 300);
+
+	// },
+
+	// _stopWaitingFlash : function (polygon) {
+	// 	console.log('STOPO FLASHFLASH!!', polygon);
+	// 	clearInterval(this._flashTimer);
+	// },
 
 	_getActiveLayerID : function () {
 		var layer = app.MapPane._layermenuZIndex._index[0];
