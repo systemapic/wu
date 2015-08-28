@@ -33,7 +33,7 @@ L.Control.Description = Wu.Control.extend({
 		this._toggle = Wu.DomUtil.create('div', 'description-control-header-toggle', this._header);
 
 		// description
-		this._description = Wu.DomUtil.create('div', 'description-control-description', this._inner);
+		this._description = Wu.DomUtil.create('div', 'description-control-description displayNone', this._inner);
 
 		// meta
 		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._inner);
@@ -76,7 +76,11 @@ L.Control.Description = Wu.Control.extend({
 
 
 	_setDescription : function (text) {
+
+		console.log('%c_setDescription', 'background:red; color: white;')
+		console.log('text', text);
 		
+		if ( !text && text != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
 		this._description.innerHTML = text;
 	},
 

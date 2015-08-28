@@ -860,6 +860,10 @@ g.c3-event-rects.c3-event-rects-multiple rect {
     top: -4px;
     }
 
+.description-control-header-section {
+    padding-bottom: 10px;
+    }
+
 .description-control-header-section.minimized:before {
     content: '';
     position: absolute;
@@ -875,7 +879,7 @@ g.c3-event-rects.c3-event-rects-multiple rect {
     border-bottom: 1px solid #999;
     padding-top: 4px;
     padding-bottom: 4px;
-    margin-top: 10px;
+    margin-top: 0px;
     margin-bottom: 15px;
     line-height: 1.3;
     }    
