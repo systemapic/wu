@@ -102,10 +102,13 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	_addThin: function () {
+		console.log('_addTHIN!');
 		if (!this._inited) this.initLayer();
 
+		console.log('adding!', this.layer);
 		// only add to map temporarily
 		app._map.addLayer(this.layer);
+		this.layer.bringToFront();
 
 	},
 
@@ -577,6 +580,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		// enable
 		if (options && options.enable) {
 			map.addLayer(this.layer);
+			this.layer.bringToFront();
 		}
 	},
 

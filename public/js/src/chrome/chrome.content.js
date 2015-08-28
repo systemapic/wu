@@ -415,16 +415,11 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 	},
 
 	_flush : function () {
-		// this._container.innerHTML = '';
-		// this._cleanup();
-
 		this._removeKeymaps();
 		this._removeEvents();
 		this._cartoEditor = null;
 		this._SQLEditor = null;
 		this._container.innerHTML = '';
-
-
 	},
 
 
@@ -434,8 +429,8 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		// hide
 		// unbind keys
 		if (this._select) this._select.selectedIndex = 0;
-		this._cartoEditor.setValue('');
-		this._SQLEditor.setValue('');
+		this._cartoEditor && this._cartoEditor.setValue('');
+		this._SQLEditor && this._SQLEditor.setValue('');
 		this._hideEditors();
 		this._removeKeymaps();
 		this._removeEvents();
@@ -479,9 +474,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
     			gutters: ['CodeMirror-linenumbers', 'errors']
   		});
 
-		// app.debug = app.debug || {};
-  		// app.debug.ca = this._cartoEditor;
-		
 	},
 
 	_createSqlEditor : function () {
@@ -499,8 +491,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
     			gutters: ['CodeMirror-linenumbers', 'errors']
   		});
 
-		// app.debug = app.debug || {};
-  		// app.debug.sql = this._SQLEditor;
 	},
 
 	_setKeymap : function () {
@@ -713,6 +703,8 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 	},
 
 	_tempaddLayer : function () {
+
+		console.log('tempaddinglayer!!');
 
 		// remember
 		this._temps = this._temps || [];

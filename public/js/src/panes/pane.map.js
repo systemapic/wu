@@ -777,6 +777,9 @@ Wu.MapPane = Wu.Pane.extend({
 	_addPopupContent : function (e, multiPopUp) {
 
 		
+		var options = {};
+		this._chart = new Wu.Control.Chart(options);
+		
 		var d3popup = this._project.getSettings()['d3popup'];
 		var d3popup = true;
 
@@ -804,6 +807,7 @@ Wu.MapPane = Wu.Pane.extend({
 		this._popupContent = content;
 
 		this.openPopup(e, multiPopUp);
+
 
 	},
 
@@ -1071,6 +1075,11 @@ Wu.MapPane = Wu.Pane.extend({
 
 			// ************************************************************
 
+
+
+			if ( meta[0] == 'geom' || meta[0] == 'the_geom_3857' || meta[0] == 'the_geom_4326' ) { return }
+
+
 			if ( !meta[1] ) return;
 
 			c++;
@@ -1145,6 +1154,7 @@ Wu.MapPane = Wu.Pane.extend({
 		// Create container
 		var _C3Container = Wu.DomUtil.createId('div', 'c3-container');	
 
+		
 
 		// CHART SETTINGS
 		var chart = c3.generate({
@@ -1185,13 +1195,13 @@ Wu.MapPane = Wu.Pane.extend({
 
 		                type: 'scatter',
 
-		                onmouseover : function () {
-		                	console.log('onmouseover');
-		                },
+		                // onmouseover : function () {
+		                // 	console.log('onmouseover');
+		                // },
 
-		                onclick : function () {
-		                	console.log('data click');
-		                }
+		                // onclick : function () {
+		                // 	console.log('data click');
+		                // }
 
 
 		        },
