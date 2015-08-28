@@ -90,7 +90,7 @@ Wu.MapPane = Wu.Pane.extend({
 		var map = this._map = app._map = L.map('map', {
 			worldCopyJump : true,
 			attributionControl : false,
-			maxZoom : 18,
+			maxZoom : 19,
 			minZoom : 0,
 			// zoomAnimation : false
 			zoomControl : false,
@@ -337,7 +337,7 @@ Wu.MapPane = Wu.Pane.extend({
     		// set maxBoudns
 		map.setMaxBounds(maxBounds);
 		map.options.minZoom = bounds.minZoom;
-		map.options.maxZoom = bounds.maxZoom;
+		map.options.maxZoom = bounds.maxZoom > 19 ? 19 : bounds.maxZoom;
 	},
 	
 	addEditableLayer : function (map) {
@@ -840,23 +840,33 @@ Wu.MapPane = Wu.Pane.extend({
 
 		
 		
-		setTimeout(function () {
 
-			popup.openOn(map);		// todo: still some minor bugs,
+		popup.openOn(map);		// todo: still some minor bugs,
 
-			if ( multiPopUp ) return;
+		if ( multiPopUp ) return;
 
-			// If single sampling, create a little circle...
-			var latlng = L.latLng(e.data.lat, e.data.lon);
-			var styling = { radius: 10,
-					fillColor: "#f03",
-					color: "red",
-					fillOpacity: 0.5
-			}
-			this.popUpMarkerCircle = L.circleMarker(latlng, styling).addTo(map);
+		// different latlng data formats
+		// 1. lat/lng in column (akervatn) 	// todo: make pluggable, or create lat/lng in table on import
+		// 2. north/east as 3857 (turkey)
 
+		// If single sampling, create a little circle...
+		
+		// 1. lat/lng ing column
+		var latlng = L.latLng(e.data.lat, e.data.lon);	 // todo: remove this??
 
-		}.bind(this), 100); // hack			// this hack perhaps due to double opening
+		// 2 north/east as 3857
+		if (!latlng) {
+			var latlng = L.Projection.Mercator.unproject({x:e.data.north, y:e.data.east}); // wrong conversion, wrong epsg?
+		}
+
+		var styling = { 
+			radius: 10,
+			fillColor: "#f03",
+			color: "red",
+			fillOpacity: 0.5
+		}
+
+		this.popUpMarkerCircle = L.circleMarker(latlng, styling).addTo(map);
 
 	},
 
@@ -1150,7 +1160,7 @@ Wu.MapPane = Wu.Pane.extend({
 			},
 
 			point : {
-				r: 3.5
+				r: 3.5,
 			},
 
 			grid: { y: { show: true },
@@ -1173,7 +1183,15 @@ Wu.MapPane = Wu.Pane.extend({
 		                	field_y: '#0000FF'
 		                },
 
-		                type: 'scatter'
+		                type: 'scatter',
+
+		                onmouseover : function () {
+		                	console.log('onmouseover');
+		                },
+
+		                onclick : function () {
+		                	console.log('data click');
+		                }
 
 
 		        },
