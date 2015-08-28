@@ -13,9 +13,7 @@ L.Control.Description = Wu.Control.extend({
 		    container = L.DomUtil.create('div', className),
 		    options   = this.options;
 
-		// this._button = Wu.DomUtil.create('div', 'dropdown-button description-toggle-button', container)
 		this._content = Wu.DomUtil.create('div', 'description-control-content', container)
-		// this._collapser = Wu.DomUtil.create('div', 'menucollapser collapse-description', this._content, 'Info');
 		this._outer = Wu.DomUtil.create('div', 'description-control-content-box', this._content)
 
 		return container; // turns into this._container on return
@@ -29,22 +27,21 @@ L.Control.Description = Wu.Control.extend({
 		// create scroller 
 		this._inner = Wu.DomUtil.create('div', 'description-control-inner', this._outer);
 
-		// HEADER
+		// header
 		this._header = Wu.DomUtil.create('div', 'description-control-header-section', this._inner);
-
 		this._title = Wu.DomUtil.create('div', 'description-control-header-title', this._header);
 		this._toggle = Wu.DomUtil.create('div', 'description-control-header-toggle', this._header);
 
-		// DESCRIPTION
-		this._description = Wu.DomUtil.create('div', 'description-control-description', this._inner);
+		// description
+		this._description = Wu.DomUtil.create('div', 'description-control-description displayNone', this._inner);
 
-		// META CONTAINER
+		// meta
 		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._inner);
 
-		// LEGEND CONTAINER
+		// legend
 		this._legendContainer = Wu.DomUtil.create('div', 'description-control-legend-container', this._inner);
 
-		// COPYRIGHT
+		// copyright
 		this._copyright = Wu.DomUtil.create('div', 'description-copyright', this._outer, '');
 		
 		// add tooltip
@@ -61,11 +58,6 @@ L.Control.Description = Wu.Control.extend({
 
 	},
 
-
-
-	// SET THINGS
-	// SET THINGS
-	// SET THINGS	
 
 	setTitle : function (title) {
 		this._title.innerHTML = title;
@@ -84,10 +76,11 @@ L.Control.Description = Wu.Control.extend({
 
 
 	_setDescription : function (text) {
+
+		console.log('%c_setDescription', 'background:red; color: white;')
+		console.log('text', text);
 		
-		// if ( text != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
-		// else 		  Wu.DomUtil.addClass(this._description, 'displayNone');
-		
+		if ( !text && text != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
 		this._description.innerHTML = text;
 	},
 
@@ -97,70 +90,55 @@ L.Control.Description = Wu.Control.extend({
 		// Clear container
 		this._metaContainer.innerHTML = '';
 
-		
-		var key;
-		for ( key in meta ) {
+		for (var key in meta) {
 
-			var _key = key;
-			var _val = meta[key]
+			var val = meta[key]
 
 			// Make new content	
 			var metaLine = Wu.DomUtil.create('div', 'legends-meta-line', this._metaContainer);
-			var metaKey = Wu.DomUtil.create('div', 'legends-meta-key', metaLine, _key)
-			var metaVal = Wu.DomUtil.create('div', 'legend-meta-valye', metaLine, _val)
-
+			var metaKey = Wu.DomUtil.create('div', 'legends-meta-key', metaLine, key)
+			var metaVal = Wu.DomUtil.create('div', 'legend-meta-valye', metaLine, val)
 		}
-
-
-
 	},
 
 	setLegend : function (HTML) {
-		
-		// this._legendContainer.innerHTML = gradientHTML;
 
 		this._legendContainer.innerHTML = HTML;
-	
 	},
 
 	gradientLegend : function (options) {
-
-
-
 
 		// Set color stops
 		var colorStops = options.colorStops;
 
 		// Set styling
 		var gradientStyle = 'background: -webkit-linear-gradient(left, ' + colorStops.join() + ');';
-		    gradientStyle += 'background: -o-linear-gradient(right, '    + colorStops.join() + ');';
-		    gradientStyle += 'background: -moz-linear-gradient(right, '  + colorStops.join() + ');';
-		    gradientStyle += 'background: linear-gradient(to right, '    + colorStops.join() + ');';
+		gradientStyle    += 'background: -o-linear-gradient(right, '    + colorStops.join() + ');';
+		gradientStyle    += 'background: -moz-linear-gradient(right, '  + colorStops.join() + ');';
+		gradientStyle    += 'background: linear-gradient(to right, '    + colorStops.join() + ');';
   
 
-			// Container
-		var	_legendHTML = '<div class="info-legend-container">';
+		// Container
+		var _legendHTML = '<div class="info-legend-container">';
 
-			// Legend Frame
-			_legendHTML += '<div class="info-legend-frame">';
+		// Legend Frame
+		_legendHTML += '<div class="info-legend-frame">';
 
-			_legendHTML += '<div class="info-legend-val info-legend-min-val">' + options.minVal + '</div>';
-			_legendHTML += '<div class="info-legend-val info-legend-med-val">' + options.medVal + '</div>';
-			_legendHTML += '<div class="info-legend-val info-legend-max-val">' + options.maxVal + '</div>';
+		_legendHTML += '<div class="info-legend-val info-legend-min-val">' + options.minVal + '</div>';
+		_legendHTML += '<div class="info-legend-val info-legend-med-val">' + options.medVal + '</div>';
+		_legendHTML += '<div class="info-legend-val info-legend-max-val">' + options.maxVal + '</div>';
 
-			// Gradient
-			_legendHTML += '<div class="info-legend-gradient-container" style="' + gradientStyle + '"></div>';
+		// Gradient
+		_legendHTML += '<div class="info-legend-gradient-container" style="' + gradientStyle + '"></div>';
+		_legendHTML += '</div>';
 
-		    	_legendHTML += '</div>';
+		if (options.bline) {
+			_legendHTML += '<div class="info-legend-gradient-bottomline"">' + options.bline + '</div>';
+		}
 
-			if ( options.bline ) {
-				_legendHTML += '<div class="info-legend-gradient-bottomline"">' + options.bline + '</div>';
-			}
-
-		    	_legendHTML += '</div>';
+		_legendHTML += '</div>';
 
 		return _legendHTML;
-
 	},
 
 	setCopyright : function (layer) {
@@ -175,16 +153,9 @@ L.Control.Description = Wu.Control.extend({
 		}
 	},
 
-
-	// TOGGLE
-	// TOGGLE	
-	// TOGGLE	
-
 	toggle : function () {
-
 		if ( !this.isCollapsed ) this.isCollapsed = false;
 		this.isCollapsed ? this.toggleOpen() : this.toggleClose();
-
 	},
 
 	toggleOpen : function () {
@@ -215,10 +186,6 @@ L.Control.Description = Wu.Control.extend({
 		Wu.DomUtil.addClass(this._title, 'minimized');
 
 	},
-
-	//////////////////////////////////////////////////////////
-
-
 
 	_addTo : function () {
 
@@ -285,8 +252,6 @@ L.Control.Description = Wu.Control.extend({
 		this._hide();
 	},
 
-
-
 	_isActive : function () {
 		if (!this._project) return false;
 		return this._project.getControls()[this.type];
@@ -298,7 +263,6 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_hide : function () {	
-
 		this._container.style.display = 'none'; 
 		this.isOpen = false;
 	},
@@ -310,13 +274,11 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	hide : function () {
-		
 		if (!this._container) return;
 		this._hide();
 	},
 
 	_hideIfEmpty : function () {		
-
 		if (!this.activeLayer) this._hide();
 	},
 
@@ -346,13 +308,11 @@ L.Control.Description = Wu.Control.extend({
 	_addHooks : function () {
 		
 		// collapsers
-		// Wu.DomEvent.on(this._button, 'click', this._GAtoggleCloser, this);
 		Wu.DomEvent.on(this._toggle, 'click', this.toggle, this);	
 	
 		// prevent map double clicks
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 		// Wu.DomEvent.on(this._button,    'mousedown mouseup click dblclick',  Wu.DomEvent.stopPropagation, this);
-
 
 	},
 
@@ -505,8 +465,6 @@ L.Control.Description = Wu.Control.extend({
 
 	mobileOpenPane : function () {
 
-		// Wu.DomUtil.addClass(this._button, 'active-description');
-
 		// Slide In
 		this._content.style.left = '0px';
 		this._isClosed = false;
@@ -519,7 +477,6 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	mobileClosePane : function () {
-		// Wu.DomUtil.removeClass(this._button, 'active-description');
 
 		// Slide out (only works in portrait format... in landscape it has to be [0] )
 		this._content.style.left = Wu.app.nativeResolution[1] + 'px';
@@ -527,73 +484,103 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	closePane : function () {
-
 		this._container.style.display = "none";
 		this._isClosed = true;
 	},
 	
 	openPane : function () {
-
 		this._container.style.display = "block";
 		this._isClosed = false;			
 	},
 
 	toggleScale : function () {
-
 		app.MapPane.getControls().measure.__toggle();
 	},
 
 
+	_parseStartEndDate : function (meta) {
+
+		// get all columns with dates
+		var columns = meta.columns;
+
+		var times = [];
+
+		for (var c in columns) {
+			if (c.length == 8) { // because d12mnd is valid moment.js date (??)
+				var m = moment(c, "YYYYMMDD");
+				var unix = m.format('x');
+				if (m.isValid()) {
+					var u = parseInt(unix);
+					if (u > 0) { // remove errs
+						times.push(u);
+					}
+				}
+			}
+		};
+
+		function sortNumber(a,b) {
+			return a - b;
+		}
+
+		times.sort(sortNumber);
+
+		var first = times[0];
+		var last = times[times.length-1];
+		var m_first = moment(first).format('MMM Do YYYY');
+		var m_last = moment(last).format('MMM Do YYYY');
+
+		var startend = {
+			start : m_first,
+			end : m_last
+		}
+
+		return startend;
+	},
 
 	initFakeLegend : function (layer) {
 
-		
-		var title = layer.getTitle();
+		var meta = layer.getMeta();
+		console.log('meta: ', meta, layer);
 
-		// SET TITLE
+		// set title
+		var title = layer.getTitle();
 		this.setTitle(title);
 
-		// SET DESCRIPTION
-		var description = 'Some information about the data set can be written here, such as name of satellite, etc.'
+		// set description
+		var description = layer.getDescription();
 		this._setDescription(description);
 
+		// create description meta
+		var area = Math.floor(meta.total_area / 1000000 * 100) / 100;
+		var num_points = meta.row_count;
+		var num_columns = _.size(meta.columns);
+		var size_bytes = meta.size_bytes;
+		var startend = this._parseStartEndDate(meta);
 
-		// SET META
-		var _meta = {			
-			'Deliverable code' 	: 'I14J1S',
-			'Delivery code' 	: 'GA0003',
-			'Delivery date' 	: '2013/04/09',
-			'Sat [band]' 		: 'Envisat [C]',
-			'Geometry' 		: 'D',
-			'Category' 		: 'SqueeSAR',
-			'Start time' 		: '2003/01/11',
-			'End time' 		: '2010/09/21'		
-			}
+		var description_meta = {
+			'Number of points' : num_points,
+			'Covered area (km<sup>2</sup>)' : area,
+			'Columns' : num_columns,
+			'Data size' : size_bytes,
+			'Start date' : startend.start,
+			'End date' : startend.end
+		}
 
-		this.setMeta(_meta);
-
+		// set description meta
+		this.setMeta(description_meta);
 			
-		// SET LEGEND
-
+		// create legend
 		var gradientOptions = {
-			colorStops : ['#2f00ff',
-					'#003dff',
-					'#009eff',
-					'#00ffdf',
-					'#00ffa9',
-					'#a5ff00',
-					'#ffd700',
-					'#ff8100',
-					'#ff3600',
-					'#ff0000'],
+			colorStops : ["#ff0000", "#ff3600", "#ff8100", "#ffd700", "#a5ff00", "#00ffa9", "#00ffdf", "#009eff", "#003dff", "#2f00ff"],
 			minVal : -20,
 			medVal : 0,
 			maxVal : 20,
 			bline : 'vel[mm/yr]'
-			}
+		}
 
 		var gradientHTML = this.gradientLegend(gradientOptions);
 
+		// set legend
 		this.setLegend(gradientHTML);
 
 	}

@@ -39,6 +39,7 @@ var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var pg = require('pg');
 var exec = require('child_process').exec;
+
 // api
 var api = module.parent.exports;
 
@@ -341,7 +342,14 @@ module.exports = api.geo = {
 
 			var shape_part = shapes[s];
 			if (shape_part && shape_part.slice(-4) == '.prj') {
-				if (!shape_part.slice(0,1) != '.') {
+
+				console.log('shape_part: ', shape_part);
+
+				var basename = nodepath.basename(shape_part);
+
+				console.log('basnemae: ', basename);
+
+				if (!basename.slice(0,1) != '.') {
 					shps.push(shape_part);
 				}
 			}

@@ -102,10 +102,13 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	_addThin: function () {
+		console.log('_addTHIN!');
 		if (!this._inited) this.initLayer();
 
+		console.log('adding!', this.layer);
 		// only add to map temporarily
 		app._map.addLayer(this.layer);
+		this.layer.bringToFront();
 
 	},
 
@@ -577,6 +580,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		// enable
 		if (options && options.enable) {
 			map.addLayer(this.layer);
+			this.layer.bringToFront();
 		}
 	},
 
@@ -601,11 +605,8 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 		// set ids
 		var fileUuid 	= this._fileUuid,	// file id of geojson
-		    // cartoid 	= this.store.data.cartoid || this._defaultCartoid,
-		    // tileServer 	= app.options.servers.tiles.uri,
 		    subdomains  = app.options.servers.tiles.subdomains,
 		    access_token = '?access_token=' + app.tokens.access_token;
-		    // url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		var layerUuid = this._getLayerUuid();
 		var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.png' + access_token;
@@ -615,6 +616,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 			layerUuid: this._getLayerUuid(),
 			subdomains : subdomains,
 			maxRequests : 0,
+			maxZoom : 19
 		});
 
 		// load grid after all pngs.. (dont remember why..)
@@ -665,7 +667,8 @@ Wu.PostGISLayer = Wu.Layer.extend({
 			subdomains: subdomains,
 			maxRequests : 0,
 			requestTimeout : 10000,
-			layerUuid : layerUuid
+			layerUuid : layerUuid,
+			maxZoom : 19
 		});
 
 		// debug
@@ -706,25 +709,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 	
 
 	_gridOnMousedown : function(e) {
-		if (!e.data) return;
-
-		// pass layer
-		e.layer = this;
-
-		// fetch data
-		this._fetchData(e, function (ctx, json) {
-			
-			var data = JSON.parse(json);
-			console.log('fetched data: ', data);
-			e.data = data;
-			var event = e.e.originalEvent;
-			this._event = {
-				x : event.x,
-				y : event.y
-			}
-			app.MapPane._addPopupContent(e);
-		});
-
+		
 		
 
 	},
@@ -752,8 +737,26 @@ Wu.PostGISLayer = Wu.Layer.extend({
 	},
 
 	_gridOnClick : function (e) {
-		// clear old
-		// app.MapPane._clearPopup();
+		if (!e.data) return;
+		if (app.MapPane._creatingPolygon) return;
+
+		// pass layer
+		e.layer = this;
+
+		// fetch data
+		this._fetchData(e, function (ctx, json) {
+			
+			var data = JSON.parse(json);
+			console.log('fetched data: ', data);
+			e.data = data;
+			var event = e.e.originalEvent;
+			this._event = {
+				x : event.x,
+				y : event.y
+			}
+			app.MapPane._addPopupContent(e);
+		});
+
 
 	},
 

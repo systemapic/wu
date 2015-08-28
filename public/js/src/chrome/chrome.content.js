@@ -65,7 +65,12 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		this._project = app.activeProject = app.Projects[p];
 
 		// refresh pane
-		// this._refresh();
+		this._refresh();
+	},
+
+
+	_refresh : function () {
+
 	},
 
 	_initLayout_activeLayers : function () {
@@ -258,6 +263,17 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		this._inited = true;
 	},
 
+	_refresh : function () {
+
+		this._flush();
+		this._initLayout();
+	},
+
+	_flush : function () {
+		this._container.innerHTML = '';
+	},
+
+
 	
 	// event run when layer selected 
 	_selectedActiveLayer : function (e) {
@@ -318,7 +334,16 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 
 	},
 
-	
+	_refresh : function () {
+
+		this._flush();
+		this._initLayout();
+	},
+
+	_flush : function () {
+		this._container.innerHTML = '';
+	},
+
 
 	open : function () {
 		console.log('open!', this);
@@ -383,14 +408,29 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 
 	},
 
+	_refresh : function () {
+
+		this._flush();
+		this._initLayout();
+	},
+
+	_flush : function () {
+		this._removeKeymaps();
+		this._removeEvents();
+		this._cartoEditor = null;
+		this._SQLEditor = null;
+		this._container.innerHTML = '';
+	},
+
+
 	_cleanup : function () {
 		// select nothing from dropdown
 		// clear carto, sql
 		// hide
 		// unbind keys
 		if (this._select) this._select.selectedIndex = 0;
-		this._cartoEditor.setValue('');
-		this._SQLEditor.setValue('');
+		this._cartoEditor && this._cartoEditor.setValue('');
+		this._SQLEditor && this._SQLEditor.setValue('');
 		this._hideEditors();
 		this._removeKeymaps();
 		this._removeEvents();
@@ -434,9 +474,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
     			gutters: ['CodeMirror-linenumbers', 'errors']
   		});
 
-		app.debug = app.debug || {};
-  		app.debug.ca = this._cartoEditor;
-		
 	},
 
 	_createSqlEditor : function () {
@@ -454,8 +491,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
     			gutters: ['CodeMirror-linenumbers', 'errors']
   		});
 
-		app.debug = app.debug || {};
-  		app.debug.sql = this._SQLEditor;
 	},
 
 	_setKeymap : function () {
@@ -492,8 +527,8 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 	},
 
 	_removeKeymaps : function () {
-		this._cartoEditor.removeKeyMap(this._keymap);
-		this._SQLEditor.removeKeyMap(this._keymap);
+		this._cartoEditor && this._cartoEditor.removeKeyMap(this._keymap);
+		this._SQLEditor && this._SQLEditor.removeKeyMap(this._keymap);
 		if (keymaster.unbind) keymaster.unbind('⌘+s, ctrl+s');
 		if (keymaster.unbind) keymaster.unbind('⌘+r, ctrl+r');
 	},
@@ -669,6 +704,8 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 
 	_tempaddLayer : function () {
 
+		console.log('tempaddinglayer!!');
+
 		// remember
 		this._temps = this._temps || [];
 
@@ -754,12 +791,10 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 			return clean_sql;
 		}
 
-		console.log('suspicious sql?', sql);
 		return sql;
 	},
 
 	_showEditors : function () {
-		console.log('show!');
 		this._SQLEditor.getWrapperElement().style.opacity = 1;
 		this._cartoEditor.getWrapperElement().style.opacity = 1;
 		this._sqltitle.style.opacity = 1;
@@ -768,7 +803,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 	},
 
 	_hideEditors : function () {
-		console.log('hide!');
 		this._SQLEditor.getWrapperElement().style.opacity = 0;
 		this._cartoEditor.getWrapperElement().style.opacity = 0;
 		this._sqltitle.style.opacity = 0;
