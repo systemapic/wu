@@ -575,7 +575,6 @@ Wu.Project = Wu.Class.extend({
 
 	getPostGISLayer : function (layer_id) {
 		return _.find(this.layers, function (layer) {
-			console.log('_.find', layer);
 			if (!layer.store) return;
 			if (!layer.store.data) return;
 			if (!layer.store.data.postgis) return;
@@ -589,7 +588,6 @@ Wu.Project = Wu.Class.extend({
 		var cartoLayers = _.filter(all, function (l) {
 
 			if (l) {
-				console.log('l.store', l.store);
 				if (!l.store) return false;
 				if (l.store.data.hasOwnProperty('geojson')) return true;
 				if (l.store.data.hasOwnProperty('osm')) return true;

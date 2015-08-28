@@ -9,6 +9,38 @@ L.Map.include({
 });
 
 
+L.Polygon.include({
+
+	getCenter: function () {
+		var i, j, p1, p2, f, area, x, y, center,
+		    points = this._rings[0],
+		    len = points.length;
+
+		if (!len) { return null; }
+
+		// polygon centroid algorithm; only uses the first ring if there are multiple
+
+		area = x = y = 0;
+
+		for (i = 0, j = len - 1; i < len; j = i++) {
+			p1 = points[i];
+			p2 = points[j];
+
+			f = p1.y * p2.x - p2.y * p1.x;
+			x += (p1.x + p2.x) * f;
+			y += (p1.y + p2.y) * f;
+			area += f * 3;
+		}
+
+		if (area === 0) {
+			// Polygon is so small that all points are on same pixel.
+			center = points[0];
+		} else {
+			center = [x / area, y / area];
+		}
+		return this._map.layerPointToLatLng(center);
+	},
+})
 
 L.Popup = L.Class.extend({
 	includes: L.Mixin.Events,
@@ -29,6 +61,9 @@ L.Popup = L.Class.extend({
 	},
 
 	initialize: function (options, source) {
+
+
+
 		L.setOptions(this, options);
 
 		this._source = source;
@@ -37,6 +72,7 @@ L.Popup = L.Class.extend({
 	},
 
 	onAdd: function (map) {
+
 		this._map = map;
 
 		if (!this._container) {
@@ -117,6 +153,7 @@ L.Popup = L.Class.extend({
 	},
 
 	setContent: function (content) {
+
 		this._content = content;
 		this.update();
 		return this;
@@ -170,7 +207,7 @@ L.Popup = L.Class.extend({
 
 		if (this.options.closeButton) {
 			closeButton = this._closeButton =
-			        L.DomUtil.create('a', prefix + '-close-button', container);
+			L.DomUtil.create('a', prefix + '-close-button', container);
 			closeButton.href = '#close';
 			closeButton.innerHTML = '&#215;';
 			L.DomEvent.disableClickPropagation(closeButton);
@@ -179,7 +216,7 @@ L.Popup = L.Class.extend({
 		}
 
 		var wrapper = this._wrapper =
-		        L.DomUtil.create('div', prefix + '-content-wrapper', container);
+		L.DomUtil.create('div', prefix + '-content-wrapper', container);
 		L.DomEvent.disableClickPropagation(wrapper);
 
 		this._contentNode = L.DomUtil.create('div', prefix + '-content', wrapper);
@@ -263,9 +300,12 @@ L.Popup = L.Class.extend({
 			L.DomUtil.setPosition(this._container, pos);
 		}
 
-		this._containerBottom = -offset.y - (animated ? 0 : pos.y);
 
-		var jorgosXadjustment = - 20;
+		var jorgosYadjustment = - 11;
+
+		this._containerBottom = - offset.y - (animated ? 0 : pos.y) + jorgosYadjustment;
+
+		var jorgosXadjustment = - 18;
 
 		this._containerLeft = -Math.round(this._containerWidth / 2) + offset.x + (animated ? 0 : pos.x) + jorgosXadjustment;
 
