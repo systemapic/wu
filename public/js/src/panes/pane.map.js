@@ -778,7 +778,7 @@ Wu.MapPane = Wu.Pane.extend({
 
 		
 		var options = {};
-		this._chart = new Wu.Control.Chart(options);
+		// this._chart = new Wu.Control.Chart(options);
 		
 		var d3popup = this._project.getSettings()['d3popup'];
 		var d3popup = true;

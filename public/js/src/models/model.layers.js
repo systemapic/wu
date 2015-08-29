@@ -1034,9 +1034,14 @@ Wu.NorkartLayer = Wu.Layer.extend({
 		// norkart options
 		log_url : 'https://www.webatlas.no/weblog/Log2.aspx?',
 		tile_url : 'https://www.webatlas.no/maptiles/tiles/{type}/wa_grid/{z}/{x}/{y}.jpeg',
-		current_mapstyle : 1, // aerial
+		current_mapstyle : 1, // aerial,
+		tilesets: {
+	                vector: "webatlas-standard-vektor",
+	                aerial: "webatlas-orto-newup",
+	                hybrid: "webatlas-standard-hybrid"
+	            },
 		customer_id : 'systemapic',
-		minZoom : 13,
+		minZoom : 0,
 		maxZoom : 20
 	},
 
@@ -1063,7 +1068,8 @@ Wu.NorkartLayer = Wu.Layer.extend({
 	_prepareRaster : function () {
 
 		// norkart
-		var type = this.store.data.norkart;
+		// var type = this.store.data.norkart;
+		var type = this.options.tilesets.aerial;
 		var url = this.options.tile_url;
 
 		// add vector tile raster layer

@@ -963,8 +963,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 
-		console.log('flying!', layerItem);
-		this.flyTo(layer);
+		// console.log('flying!', layerItem);
+		// this.flyTo(layer);
 
 	},
 
@@ -1143,7 +1143,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		var _iH = 	'<div class="layer-item-up">></div>' +
 			  	'<div class="layer-item-down"><</div>' +
 				'<div class="layer-item-delete">x</div>' +
-				// '<div class="layer-menu-flyto"></div>' +
+				'<div id="layer-flyto-' + layer.getUuid() + '" class="layer-menu-flyto"></div>' +
 				'<div type="layerItem" class="layer-menu-item">' + caption + '</div>';
 
 		wrap.innerHTML 	= _iH;
@@ -1152,11 +1152,14 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomUtil.addClass(wrap, 'level-' + item.pos);
 
 		// mark as draggable if we're in editing mode
-		if ( this.editMode ) { wrap.setAttribute('draggable', true) }
-		else { wrap.setAttribute('draggable', false); }
+		if (this.editMode) { 
+			wrap.setAttribute('draggable', true) 
+		} else { 
+			wrap.setAttribute('draggable', false); 
+		}
 
-	
-		this._content.appendChild(wrap); 	// append to layermenu
+		// append to layermenu
+		this._content.appendChild(wrap); 	
 
 		// get elems
 		var up    = wrap.children[0];
@@ -1189,10 +1192,19 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomEvent.on(wrap, 'mousedown', function (e) { this.toggleLayer(layerItem); }, this);
 		Wu.DomEvent.on(this._innerContainer, 'dblclick', Wu.DomEvent.stop, this);
 
-		
+		// trigger on flyto
+		var flyto = Wu.DomUtil.get('layer-flyto-' + layer.getUuid());
+		Wu.DomEvent.on(flyto, 'mousedown', function (e) {
+			console.log('flytotototoot');
+
+			Wu.DomEvent.stop(e);
+			this.flyTo(layer);
+		}, this);
 
 		// add to local store
 		this.layers[item.uuid] = layerItem;
+
+
 
 	},
 
