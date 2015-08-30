@@ -100,43 +100,12 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			delete this._uploader;
 		}
 
-		// if (this._uploaderSimple) {
-		// 	Wu.DomUtil.remove(this._uploaderSimple);
-		// 	this._uploaderSimple = null;
-		// 	delete this._uploaderSimple;
-		// }
-
-		// Upload button
-		// this._uploader = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Import data...');
-		// this._uploaderSimple = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload image/document');
-
-		this._uploader = Wu.DomUtil.create('input', 'smap-button-gray', this._controlInner, 'Import data...');
-		this._uploader.setAttribute('type', 'file');
-		this._uploader.id = 'fileinput';
-
-		this._uploaderId = Wu.Util.createRandom(7);
-		var that = this;
-		var uploadFn = this.uploadFile;
-		this._uploader.addEventListener('change', function () {
-			console.log('THIS', this);
-			var file = this.files[0];
-			console.log('file::: ', file);
-			uploadFn(file);
-
-			var size = parseInt(file.size / 1000 / 1000) + 'MB';
-			var name = file.name;
-			var description = name + ', ' + size;
-			console.log('uploadIRD uipload', that._uploaderId);
-			app.feedback.setMessage({
-				title : 'Uploading data',
-				description : description,
-				id : that._uploaderId
-			});
-
-		}, false);
+		this._uploader = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload');
 	},
 
-	_uploadProgress : function (a, b, c) {
+	_uploadProgress : function (a) {
+
+		console.log('uploadProgress', a);
 
 		var loaded = a.loaded;
 		var total = a.total;
@@ -145,66 +114,36 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		app.ProgressBar.setProgress(progress);
 	},
 
-	_upload : {
 
-		progress : function (data) {
-			// console.log('progress: ', data);
-			var loaded = data.loaded;
-			var total = data.total;
-			var progress = (loaded/total) * 100;
-			app.ProgressBar.setProgress(progress);
+	_checkPendingFiles : function () {
+		if (!this._project) return;
 
-			// estimate upload time for large files
-			if (total > 10000000) {
-				// console.log('big file!')
-				// app.ProgressBar.timedProgress()
-				
-			}
-		},
+		console.log('_checkPendingFiles', this._project.getName());
 
-		load : function (data) {
-			var uploadStatus = Wu.parse(data.target.response);
-			console.log('uploadStatus:', uploadStatus);
+		var pending = this._project.getPendingFiles();
+		if (pending.length == 0) return console.log('no pending files...');
 
-			var size = uploadStatus.size;
-			var estimatedTime = (size * 1.5)/1000; // ms		// 420 sec for 250MB => 2 sec/MB
-
-			// console.log('estimatedTime', estimatedTime);
-
-			// console.log('uploadIRDD proces', app.SidePane.DataLibrary._uploaderId);
-
-			app.feedback.setMessage({
-				title : 'Processing data!',
-				description : 'File will be added to the Data Library as soon as it\'s finished. Estimated time approx. ' + parseInt(estimatedTime/1000) + ' seconds.',
-				clearDelay : estimatedTime,
-				id : app.SidePane.DataLibrary._uploaderId
-			});
-
-			// reset progress
-			app.ProgressBar.hideProgress();
-
-			// get file and add to client
-			app.SidePane.DataLibrary._getFile(uploadStatus, app.SidePane.DataLibrary._gotFile);
-
-		},
-
-		error : function (data) {
-			console.log('ERROR!', data);
-
-		},
-
-		abort : function (data) {
-			console.log('ABORT!', data);
-
-		},
+		// continue checking status of pending files
+		this._getFiles();
 
 	},
 
-	_getFile : function (uploadStatus, callback) {
+	// check processing files
+	_getFiles : function () {
+
+		var files = this._project.getPendingFiles();
+
+		var file_id = files[0];
+
+		this._getFile(file_id, this._gotFile.bind(this));
+
+	},
+
+	_getFile : function (file_id, callback) {
 		var xhr = new XMLHttpRequest();
 		var fd = new FormData();
 		var url = app.options.servers.portal + 'api/file/get';
-		url += '?fileUuid=' + uploadStatus.file_id;
+		url += '?fileUuid=' + file_id;
 		url += '&access_token=' + app.tokens.access_token;
 
 		xhr.open("GET", url, true);
@@ -218,7 +157,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				
 				// loop until file is ready
 				setTimeout(function () {
-					app.SidePane.DataLibrary._getFile(uploadStatus, callback);
+					app.SidePane.DataLibrary._getFile(file_id, callback); // loop
 				}, 1000);
 			}
 		}
@@ -226,7 +165,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_gotFile : function (file) {
-		// console.log('_addFile: ', file);
+		console.log('_gotFile: ', file);
+
+		// remove pending
+		this._project.removePendingFile(file.uuid);
 
 		// add file to lib
 		var dlib = app.SidePane.DataLibrary;
@@ -241,6 +183,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// reset progress
 		app.ProgressBar.hideProgress();
+
+
 	},
 
 	_createDefaultLayer : function (file) {
@@ -294,7 +238,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 				// refresh cartoCssControl
 				var ccss = app.MapPane.getControls().cartocss;
-				ccss && ccss._refresh();	
+				ccss && ccss._refresh();
+
+				// todo: set layer icon
+				app.feedback.setMessage({
+					title : 'Done processing!',
+					description : 'Added <strong>' + layerModel.title + '</strong> to available layers.',
+				});	
 			})
 			
 		}.bind(this));
@@ -312,36 +262,36 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		}.bind(this));
 	},
 
-	uploadFile : function (file){
-		var url = app.options.servers.portal + 'api/import';
-		var xhr = new XMLHttpRequest();
-		var fd = new FormData();
-		xhr.open("POST", url, true);
+	// uploadFile : function (file){
+	// 	var url = app.options.servers.portal + 'api/import';
+	// 	var xhr = new XMLHttpRequest();
+	// 	var fd = new FormData();
+	// 	xhr.open("POST", url, true);
 
-		// event handlers
-		var uploadProgress = app.SidePane.DataLibrary._upload.progress;
-		var uploadComplete = app.SidePane.DataLibrary._upload.load;
-		var uploadError = app.SidePane.DataLibrary._upload.error;
-		var uploadAbort = app.SidePane.DataLibrary._upload.abort;
+	// 	// event handlers
+	// 	var uploadProgress = app.SidePane.DataLibrary._upload.progress;
+	// 	var uploadComplete = app.SidePane.DataLibrary._upload.load;
+	// 	var uploadError = app.SidePane.DataLibrary._upload.error;
+	// 	var uploadAbort = app.SidePane.DataLibrary._upload.abort;
 		
-		// set access_token on header
-		xhr.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
+	// 	// set access_token on header
+	// 	xhr.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
 
-		// events
-		xhr.upload.addEventListener("progress", uploadProgress, false);
-		xhr.addEventListener('load', uploadComplete, false);
-		xhr.addEventListener('error', uploadError, false);
-		xhr.addEventListener('abort', uploadAbort, false);
+	// 	// events
+	// 	xhr.upload.addEventListener("progress", uploadProgress, false);
+	// 	xhr.addEventListener('load', uploadComplete, false);
+	// 	xhr.addEventListener('error', uploadError, false);
+	// 	xhr.addEventListener('abort', uploadAbort, false);
 		
-		// file
-		fd.append("data", file);
+	// 	// file
+	// 	fd.append("data", file);
 
-		// project
-		fd.append('projectUuid', app.activeProject.getUuid());
+	// 	// project
+	// 	fd.append('projectUuid', app.activeProject.getUuid());
 
-		// send
-		xhr.send(fd);
-	},
+	// 	// send
+	// 	xhr.send(fd);
+	// },
 
 
 	// process file
@@ -516,6 +466,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// refresh uploader
 		this._refreshResumable();
+
+		console.log('PRO SELECT', this._project);
+
+		// check pending
+		this._checkPendingFiles();
 	},
 
 	_unload : function (e) {
@@ -544,6 +499,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_refreshResumable : function () {
+
+		console.log('_refreshResumable');
 
 		// remove old
 		if (this.r) this._removeResumable();
@@ -583,24 +540,26 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	_addResumable : function () {
 		if (!app.activeProject) return;
-		return;
 
 		var projectUuid = app.activeProject.getUuid();
 
+		var file_id = 'file_' + Wu.Util.getRandomChars(20);
+
 		var r = this.r = new Resumable({
 			target : '/api/data/upload/chunked',
-			chunkSize : 1*1024*1024,
+			chunkSize : 2*1024*1024,
 			simultaneousUploads : 5,
 			generateUniqueIdentifier : function (file) {
-				var idr = file.size + '-' + file.lastModified + '-' + file.name;
+				var idr = file.size + '-' + file.lastModified + '-' + app.Account.getUuid() + '-'  + file.name;
 				return idr;
 			},
-			testChunks : false, // resumable chunks // todo: server side redis count not stable
+			testChunks : true, // resumable chunks // todo: server side redis count not stable
 			throttleProgressCallbacks : 1,
 			query : {
 				fileUuid : Wu.Util.guid('r'),
 				projectUuid : projectUuid,
-				access_token : app.tokens.access_token
+				access_token : app.tokens.access_token,
+				file_id : file_id
 			},
 
 			// accepted filetypes
@@ -631,6 +590,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		r.assignBrowse(this._uploader);
 
 		r.on('fileAdded', function(file){
+			console.log('fileAdded: ', file);
+
 			r._startTime = new Date().getTime();
 			r.upload();
 
@@ -650,28 +611,27 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		}.bind(this));
 
-		r.on('complete', function(){
-			// console.log('r.complete');
+		r.on('complete', function(data){
+			console.log('r.complete', data);
 		});
 
 		r.on('pause', function(){
-			// console.log('r.pause');
+			console.log('r.pause');
 		});
 		
 		r.on('fileSuccess', function(file, message){
+			console.log('r.success', file, message);
 
-			var endTime = new Date().getTime(),
-			    startTime = r._startTime,
-			    totalTime = (endTime - startTime) / 1000,
-			    size = file.size / 1000 / 1000,
-			    bytesPerSecond = size / totalTime,
-			    message = 'Uploaded ' + size.toFixed(2) + ' MB in ' + totalTime.toFixed(2) + ' seconds, at ' + bytesPerSecond.toFixed(2) + ' MB/s.',
-			    estimatedProcessingTime = (size * 0.5).toFixed(0) + ' seconds',
-			    ext = file.fileName.split('.').reverse()[0];
+			var endTime 	= new Date().getTime(),
+			    startTime 	= r._startTime,
+			    totalTime 	= (endTime - startTime) / 1000,
+			    size 	= file.size / 1000 / 1000,
+			    bytesps  	= size / totalTime,
+			    message 	= 'Uploaded ' + size.toFixed(2) + ' MB in ' + totalTime.toFixed(2) + ' seconds, at ' + bytesps.toFixed(2) + ' MB/s.',
+			    procTime 	= (size * 0.5).toFixed(0) + ' seconds',
+			    ext 	= file.fileName.split('.').reverse()[0];
 
-			// var regularFile = (ext == 'pdf' || ext == 'txt' || ext == 'doc' || ext == 'docx' || ext == 'jpeg');
-			
-			message +=' <br><br>Pre-processing will take approx. ' + estimatedProcessingTime;
+			message +=' <br><br>Pre-processing will take approx. ' + procTime;
 
 			// set feedback
 			app.feedback.setMessage({
@@ -679,18 +639,13 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				description : message,
 				id : file.uniqueIdentifier
 			});
-			// if (regularFile) {
-			// 	app.feedback.setSuccess({
-			// 		title : 'Upload done',
-			// 		description : file.fileName + ' was uploaded successfully.',
-			// 		id : file.uniqueIdentifier,
-			// 	});
-			// } else {
-				
-			// }
 
 			// hide progess bar
 			app.ProgressBar.hideProgress();
+
+			
+			// add pending processing
+			this._addPendingFile(file_id);
 
 		}.bind(this));
 
@@ -701,18 +656,28 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		r.on('fileProgress', function(file){
 			var progress = file.progress() * 100;
 			app.ProgressBar.setProgress(progress);
+			console.log('progress: ', progress);
 		});
 
 		r.on('cancel', function(){
-			// console.log('r.cancel');
+			console.log('r.cancel');
 		});
 
 		r.on('uploadStart', function(){
-			// console.log('r.uploadStart');
+			console.log('r.uploadStart');
 		});
 
 		// add drop events
 		this._enableResumable();
+
+	},
+
+	_addPendingFile : function (file_id) {
+
+		this._project.setPendingFile(file_id);
+
+		// get file and add to client
+		this._getFiles();
 
 	},
 
@@ -820,6 +785,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	update : function () {
 
+		console.log('UPDATE DATALIB!!!', this._project);
+
 		// Remove map-blur if small size 
 		if ( !this.fullsize ) Wu.DomUtil.removeClass(app._map._container, 'map-blur');
 		
@@ -841,6 +808,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// hide stuff for non-editors
 		this._checkEditMode();
+
 	},
 
 	// TODO
@@ -882,30 +850,27 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		var _options = {};
 
-		    _options.context  = this._dataLibraryList;
-		    _options.listData = this._project.files;
+		_options.context  = this._dataLibraryList;
+		_options.listData = this._project.files;
 
-		if ( options.reset ) {
-			_options.reset    = true;
-			_options.canEdit  = this._canEdit();		
+		if (options.reset) {
+			_options.reset = true;
+			_options.canEdit = this._canEdit();		
 		}
 
-		if ( options.remove ) {
-			_options.remove      = options.remove;
+		if (options.remove) {
+			_options.remove = options.remove;
 		}		
 
-		if ( options.add ) {
+		if (options.add) {
 			_options.add = options.add;
 		}
 		
-		if ( options.tableSize ) {
+		if (options.tableSize) {
 			_options.tableSize = options.tableSize;
-
 		}
 
 		this._dataLibraryList.updateTable(_options);
-
-			
 	},
 
 
@@ -1074,72 +1039,72 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 
-	// process file
-	uploaded : function (result) {
+	// // process file
+	// uploaded : function (result) {
 
-		console.log('uploaded!', result);
+	// 	console.log('uploaded!', result);
 		
-		// handle errors
-		if (result.error) {
-			console.error('error', result.error);
-			this.handleError(result.error);
-		}
-		// return if nothing
-		if (!result.files) {
-			console.error('no files?');
-			return;
-		}
-		// add files to library
-		result.files && result.files.forEach(function (file, i, arr) {
+	// 	// handle errors
+	// 	if (result.error) {
+	// 		console.error('error', result.error);
+	// 		this.handleError(result.error);
+	// 	}
+	// 	// return if nothing
+	// 	if (!result.files) {
+	// 		console.error('no files?');
+	// 		return;
+	// 	}
+	// 	// add files to library
+	// 	result.files && result.files.forEach(function (file, i, arr) {
 			
-			// add to project locally (already added on server)
-			this._project.setFile(file);
-		}, this);
+	// 		// add to project locally (already added on server)
+	// 		this._project.setFile(file);
+	// 	}, this);
 
-		// add layers
-		result.layers && result.layers.forEach(function (layer, i) {
-			this._project.addLayer(layer);
+	// 	// add layers
+	// 	result.layers && result.layers.forEach(function (layer, i) {
+	// 		this._project.addLayer(layer);
 
-			// custom title for rasters
-			var title = layer.data.raster ? 'Layer created' : 'Processing done!';
-			var sev = layer.data.raster ? 2 : 1;
+	// 		// custom title for rasters
+	// 		var title = layer.data.raster ? 'Layer created' : 'Processing done!';
+	// 		var sev = layer.data.raster ? 2 : 1;
 
-			// todo: set layer icon
-			app.feedback.setMessage({
-				title : title,
-				description : 'Added <strong>' + layer.title + '</strong> to available layers.',
-				id : result.uniqueIdentifier,
-				severity : sev
-			});
+	// 		// todo: set layer icon
+	// 		app.feedback.setMessage({
+	// 			title : title,
+	// 			description : 'Added <strong>' + layer.title + '</strong> to available layers.',
+	// 			id : result.uniqueIdentifier,
+	// 			severity : sev
+	// 		});
 
-		}, this);
+	// 	}, this);
 
-		// if not layer, no processing
-		if (!result.layers) {
-			var fileUuid = result.files[0].uuid;
-			app.SidePane.DataLibrary.processFileDone(fileUuid, 100, 1);
-		}
+	// 	// if not layer, no processing
+	// 	if (!result.layers) {
+	// 		var fileUuid = result.files[0].uuid;
+	// 		app.SidePane.DataLibrary.processFileDone(fileUuid, 100, 1);
+	// 	}
 
-		// refresh Sidepane Options
-		app.SidePane.Options.settings.layermenu.update();
-		app.SidePane.Options.settings.baselayer.update();
+	// 	// refresh Sidepane Options
+	// 	app.SidePane.Options.settings.layermenu.update();
+	// 	app.SidePane.Options.settings.baselayer.update();
 
-		// refresh sidepane
-		app.SidePane.refreshMenu();
+	// 	// refresh sidepane
+	// 	app.SidePane.refreshMenu();
 
-		// refresh cartoCssControl
-		var ccss = app.MapPane.getControls().cartocss;
-		if (ccss) ccss._refresh();
+	// 	// refresh cartoCssControl
+	// 	var ccss = app.MapPane.getControls().cartocss;
+	// 	if (ccss) ccss._refresh();
 
-		// refresh
-		this.reset();
+	// 	// refresh
+	// 	this.reset();
 
-		// add files
-		this.refreshTable({
-			add: result.files
-		});
+	// 	// add files
+	// 	this.refreshTable({
+	// 		add: result.files
+	// 	});
 
-	},
+	// },
 
 	_getImagePath : function (fileUuid, width, height, backgroundImage) {
 		var path = app.options.servers.portal;

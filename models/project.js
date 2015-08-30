@@ -148,6 +148,8 @@ var projectSchema = mongoose.Schema({
 
 	// 
 	state : String,
+
+	pending : [String],
 	
 });
 
