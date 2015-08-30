@@ -515,6 +515,7 @@
 .layer-menu-item {
     text-indent: 7px;
     text-align: left;
+    width: 90%;
     }
 
 .menufolder .layer-menu-item {
@@ -583,6 +584,7 @@
     background-color: red;
     box-shadow: none;
     height: 2px;
+    z-index: 1000000000000; 
     }
 
 

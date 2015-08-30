@@ -112,7 +112,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
-	app.get('/api/upload', passport.authenticate('bearer', {session: false}), function (req, res) {
+	app.get('/api/data/upload/chunked', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.chunkedCheck(req, res);
 	});
 
@@ -124,12 +124,12 @@ module.exports = function(app, passport) {
 	});
 
 	// todo: this route is now DEAD; still alive in wu.js
-	// // =====================================
-	// // UPLOAD DATA LIBRARY FILES =========== // renamed route to /chunked
-	// // =====================================
-	// app.post('/api/data/upload/chunked', passport.authenticate('bearer', {session: false}), function (req, res) {
-	// 	api.upload.chunkedUpload(req, res);
-	// });
+	// =====================================
+	// UPLOAD DATA LIBRARY FILES =========== // renamed route to /chunked
+	// =====================================
+	app.post('/api/data/upload/chunked', passport.authenticate('bearer', {session: false}), function (req, res) {
+		api.upload.chunkedUpload(req, res);
+	});
 	
 
 	

@@ -296,7 +296,8 @@ module.exports = api.project = {
 			'settings',
 			'categories',
 			'thumbCreated',
-			'state'
+			'state',
+			'pending'
 		];
 
  		// enqueue queries for valid fields

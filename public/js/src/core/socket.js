@@ -32,39 +32,39 @@ Wu.Socket = Wu.Class.extend({
 			console.log('uploadDone!', data);
 
 			// set uploaded
-			app.SidePane.DataLibrary.uploaded(data);
+			// app.SidePane.DataLibrary.uploaded(data);
 
-			if (data.layers.length) {
-				// set processing started on file
-				var fileUuid = data.files[0].uuid;
-				app.SidePane.DataLibrary.processFile(fileUuid, 0, 1);
-			}
+			// if (data.layers.length) {
+			// 	// set processing started on file
+			// 	var fileUuid = data.files[0].uuid;
+			// 	app.SidePane.DataLibrary.processFile(fileUuid, 0, 1);
+			// }
 		});
 		socket.on('processingDone', function (data) {
 			console.log('processingDone!', data);
 
-			var size = Wu.Util.bytesToSize(data.size),
-			    elapsed = data.elapsed,
-			    bytesPerSec = Wu.Util.bytesToSize(data.size / elapsed / 1000) + '/s',
-			    description = 'Processing of ' + size + ' took ' + elapsed / 1000 + ' seconds',
-			    uniqueIdentifier = data.uniqueIdentifier,
-			    fileUuid = data.processingDone;
+			// var size = Wu.Util.bytesToSize(data.size),
+			//     elapsed = data.elapsed,
+			//     bytesPerSec = Wu.Util.bytesToSize(data.size / elapsed / 1000) + '/s',
+			//     description = 'Processing of ' + size + ' took ' + elapsed / 1000 + ' seconds',
+			//     uniqueIdentifier = data.uniqueIdentifier,
+			//     fileUuid = data.processingDone;
 
-			if (data.error) {
-				app.feedback.setError({
-					title : 'Processing error!',
-					description : data.error,
-					id : uniqueIdentifier
-				});
-			} else {
-				app.feedback.setSuccess({
-					title : 'Processing done!',
-					description : description,
-					id : uniqueIdentifier
-				});
+			// if (data.error) {
+			// 	app.feedback.setError({
+			// 		title : 'Processing error!',
+			// 		description : data.error,
+			// 		id : uniqueIdentifier
+			// 	});
+			// } else {
+			// 	app.feedback.setSuccess({
+			// 		title : 'Processing done!',
+			// 		description : description,
+			// 		id : uniqueIdentifier
+			// 	});
 
-				app.SidePane.DataLibrary.processFileDone(fileUuid, 100, 1);
-			}
+			// 	app.SidePane.DataLibrary.processFileDone(fileUuid, 100, 1);
+			// }
 
 			
 		});

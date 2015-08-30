@@ -176,7 +176,7 @@ module.exports = api.postgis = {
 		// import with bash script
 		ops.push(function (srid, callback) {
 
-			var srid_converted = srid.srid + ':3857';  // convert on import. todo: create the_geom + the_geom_webmercator columns after import instead
+			var srid_converted = srid.srid;// + ':3857';  // convert on import. todo: create the_geom + the_geom_webmercator columns after import instead
 
 			// create database script
 			var cmd = [

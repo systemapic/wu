@@ -514,15 +514,15 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		this._SQLEditor.addKeyMap(this._keymap);
 
 		
-		keymaster('⌘+r, ctrl+r', function(){
-			this._refreshLayer();
-			return false;
-		}.bind(this));
+		// keymaster('⌘+r, ctrl+r', function(){
+		// 	this._refreshLayer();
+		// 	return false;
+		// }.bind(this));
 
-		keymaster('⌘+s, ctrl+s', function(){
-			this._updateStyle();
-			return false;
-		}.bind(this));
+		// keymaster('⌘+s, ctrl+s', function(){
+		// 	this._updateStyle();
+		// 	return false;
+		// }.bind(this));
 
 	},
 
