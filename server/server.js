@@ -38,7 +38,7 @@ var sessionStore = mongoose.connect(config.mongo.url);
 require('./passport')(passport); 
 
 // set up our express application
-// app.use(morgan('tiny')); 
+app.use(morgan('dev')); 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({limit: '2000mb', extended : true}));
 app.use(bodyParser.json({limit:'2000mb'}));
