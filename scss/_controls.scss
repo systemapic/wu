@@ -1181,9 +1181,35 @@
 	float: none !important;	
 	margin-bottom: 19px;
 	left: 33px;
-	top: 0px;
-	position: absolute;	
+	/*top: 0px;*/
+	/*position: absolute;	*/
+
+	top: auto !important;
+	bottom: 0 !important;
+	position: absolute !important;	
 	}	
+
+.description-control-content {
+	bottom: 0;
+	top: auto;
+	}
+
+.leaflet-control-description.leaflet-control {
+	display: block;
+	top: auto;
+	bottom: 0;
+	position: absolute;
+	}
+
+.description-control-inner-content {
+	box-shadow: none;
+	}
+
+.description-control-inner-content-box,
+.menucollapser {
+	background: white;
+	}
+
 	
 /* Leaflet description Header wrapper */
 .description-control-content {
