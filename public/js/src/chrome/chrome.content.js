@@ -88,6 +88,8 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		// get layers
 		var layers = this._project.getPostGISLayers();
 
+		console.log('got pg layerS: ', layers);
+
 		// placeholder
 		var option = Wu.DomUtil.create('option', '', select);
 		option.innerHTML = 'Select a layer to style...';
@@ -228,6 +230,14 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 
 		for (var t in this._tabs) {
 			this._tabs[t].closed();
+		}
+	},
+
+	_refreshAll : function () {
+
+		for (var t in this._tabs) {
+			console.log('refreshhhh', t);
+			this._tabs[t]._refresh();
 		}
 	},
 

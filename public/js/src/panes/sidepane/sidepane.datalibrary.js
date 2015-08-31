@@ -240,6 +240,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 				var ccss = app.MapPane.getControls().cartocss;
 				ccss && ccss._refresh();
 
+				// refresh chrome content
+				app.Chrome.Right._settingsSelector._refreshAll();
+
 				// todo: set layer icon
 				app.feedback.setMessage({
 					title : 'Done processing!',
