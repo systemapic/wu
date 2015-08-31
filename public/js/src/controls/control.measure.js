@@ -57,20 +57,20 @@ L.Control.Measure = Wu.Control.extend({
 	_show : function () {
 		this._container.style.display = 'block';
 
-		this.__toggle();
+		// this.__toggle();
 	},
 
-	__toggle : function () {
+	// __toggle : function (openDescription) {
 
-		var description = app.MapPane.getControls().description;
+	// 	var description = app.MapPane.getControls().description;
 
-		if ( description.isOpen ) {
-			Wu.DomUtil.addClass(this._container, 'measure-padding-right')
-		} else {
-			Wu.DomUtil.removeClass(this._container, 'measure-padding-right')
-		}
+	// 	if ( description.isOpen ) {
+	// 		Wu.DomUtil.addClass(this._container, 'measure-padding-right')
+	// 	} else {
+	// 		Wu.DomUtil.removeClass(this._container, 'measure-padding-right')
+	// 	}
 
-	},
+	// },
 
 	_hide : function () {
 		this._container.style.display = 'none';

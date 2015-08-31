@@ -41,7 +41,87 @@ var api = module.parent.exports;
 // exports
 module.exports = api.provider = { 
 
+
+	google : {
+
+		setDefault : function (options, done) {
+
+			var project = options.project;
+
+			// create simple google layer
+			var layer 		= new Layer();
+			layer.uuid 		= 'layer-' + uuid.v4(); // unique uuid
+			layer.title 		= 'Google Aerial'
+			layer.description 	= '';
+			layer.legend		= '';
+			layer.maxZoom 		= 0;
+			layer.minZoom 		= 0;
+			layer.bounds 		= '';
+			layer.tms		= false;
+			layer.data.google 	= 'SATELLITE'; // aerial. hybrid=webatlas-standard-hybrid
+			layer.attribution 	= 'Google'; 	// html
+
+			// save
+			layer.save(function (err, saved_layer) {
+				project.layers.addToSet(saved_layer._id)
+
+				console.log('saved_lauer', saved_layer);
+
+				// save project
+				project.markModified('layers');
+				project.save(function (err, p) {
+					done(err, project);
+				});
+			});
+
+		},
+
+	},
+
+
 	norkart : {
+
+		setDefaults : function (options, done) {
+
+			// create both hybrid and aerial
+
+			var ops = [];
+
+			// aerial
+			ops.push(function (callback) {
+
+				options.tileType = 'aerial';
+				options.title = 'Norkart Aerial';
+
+				api.provider.norkart.setDefault(options, callback);
+
+			});
+
+			// hybrid
+			ops.push(function (project, callback) {
+
+				options.project = project;
+				options.title = 'Norkart Hybrid';
+				options.tileType = 'hybrid';
+
+				api.provider.norkart.setDefault(options, callback);
+
+			})
+
+			// vector
+			ops.push(function (project, callback) {
+
+				options.project = project;
+				options.title = 'Norkart Vector';
+				options.tileType = 'vector';
+
+				api.provider.norkart.setDefault(options, callback);	
+			});
+
+			// run ops
+			async.waterfall(ops, done);
+
+		},
 
 		setDefault : function (options, done) {
 
@@ -50,14 +130,15 @@ module.exports = api.provider = {
 			// create simple norkart layer
 			var layer 		= new Layer();
 			layer.uuid 		= 'layer-' + uuid.v4(); // unique uuid
-			layer.title 		= 'Norkart Aerial'
+			layer.title 		= options.title || 'Norkart Aerial';
 			layer.description 	= '';
 			layer.legend		= '';
 			layer.maxZoom 		= 0;
 			layer.minZoom 		= 0;
 			layer.bounds 		= '';
 			layer.tms		= false;
-			layer.data.norkart 	= 'webatlas-orto-newup'; // aerial. hybrid=webatlas-standard-hybrid
+			layer.data.norkart 	= options.tileType || 'aerial';
+			layer.tileType 		= options.tileType || 'aerial';
 			layer.attribution 	= 'Norkart'; 	// html
 
 			// save

@@ -716,7 +716,7 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		this._layer._addThin();
 
 		// fly to
-		this._layer.flyTo();
+		// this._layer.flyTo();
 
 		// remember
 		this._temps.push(this._layer);
