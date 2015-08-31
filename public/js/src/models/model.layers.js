@@ -611,6 +611,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		var layerUuid = this._getLayerUuid();
 		var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.png' + access_token;
 
+
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			layerUuid: this._getLayerUuid(),
@@ -769,219 +770,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 
 
-
-// Wu.RasterLayer = Wu.Layer.extend({
-// 	type : 'rasterLayer',
-// });
-
-
-// systemapic layers
-Wu.CartoCSSLayer = Wu.Layer.extend({
-
-	initLayer : function () {
-		this.update();
-		this.addHooks();
-
-		this._inited = true;
-	},
-
-	update : function () {
-		var map = app._map;
-
-		// remove
-		if (this.layer) this._flush();
-
-		this._fileUuid = this.store.file;
-		this._defaultCartoid = 'cartoid';
-
-		// prepare raster
-		this._prepareRaster();
-
-		// prepare utfgrid
-		this._prepareGrid();
-		
-	},
-
-	_prepareRaster : function () {
-		
-		// set ids
-		var fileUuid 	= this._fileUuid,	// file id of geojson
-		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
-		    tileServer 	= app.options.servers.tiles.uri,
-		    subdomains  = app.options.servers.tiles.subdomains,
-		    token 	= '?token=' + app.Account.getToken(),
-		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
-
-		// add vector tile raster layer
-		this.layer = L.tileLayer(url, {
-			fileUuid: this._fileUuid,
-			cartoid : cartoid,
-			subdomains : subdomains,
-			maxRequests : 0,
-		});
-
-		Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
-	},
-
-	_updateGrid : function (l) {
-
-
-
-		// refresh of gridlayer is attached to layer. this because vector tiles are not made in vile.js, 
-		// and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
-		// - also, removed listeners in L.UtfGrid (onAdd)
-		// 
-		if (this.gridLayer) this.gridLayer._update();
-	},
-
-	_prepareGrid : function () {
-
-		// set ids
-		var fileUuid 	= this._fileUuid,	// file id of geojson
-		    cartoid 	= this.store.data.cartoid || 'cartoid',
-		    gridServer 	= app.options.servers.utfgrid.uri,
-		    subdomains  = app.options.servers.utfgrid.subdomains,
-		    // token 	= app.accessToken,
-		    token 	= '?token=' + app.Account.getToken(),
-		    url 	= gridServer + '{fileUuid}/{z}/{x}/{y}.grid.json' + token;
-		
-		// create gridlayer
-		this.gridLayer = new L.UtfGrid(url, {
-			useJsonP: false,
-			subdomains: subdomains,
-			maxRequests : 0,
-			requestTimeout : 10000,
-			fileUuid : fileUuid
-		});
-
-		// debug
-		// this.gridLayer = false;
-
-		// add grid events
-		this._addGridEvents();
-
-	},
-
-	updateStyle : function () {
-		// set new options and redraw
-		if (this.layer) this.layer.setOptions({
-			cartoid : this.getCartoid(),
-		});
-	},
-
-	_typeLayer : function () {
-
-	},
-
-});
-
-
-
-
-Wu.OSMLayer = Wu.CartoCSSLayer.extend({
-
-	update : function () {
-		var map = app._map;
-
-		// remove
-		if (this.layer) this._flush();
-
-		// id of data 
-		this._fileUuid = 'osm';
-		this._defaultCartoid = 'cartoidosm';
-
-		// prepare raster
-		this._prepareRaster();
-
-		// prepare utfgrid
-		this._prepareGrid();
-		
-	},
-
-	_prepareRaster : function () {
-		
-		// set ids
-		var fileUuid 	= this._fileUuid,	// file id of geojson
-		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
-		    tileServer 	= app.options.servers.osm.uri,
-		    subdomains  = app.options.servers.osm.subdomains,
-		    token 	= '?token=' + app.Account.getToken(),
-		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
-
-		// add vector tile raster layer
-		this.layer = L.tileLayer(url, {
-			fileUuid: this._fileUuid,
-			cartoid : cartoid,
-			subdomains : subdomains,
-			maxRequests : 0,
-		});
-	},
-
-	_prepareGrid : function () {
-
-		// set ids
-		var fileUuid 	= this._fileUuid,	// file id of geojson
-		    cartoid 	= this.store.data.cartoid || 'cartoid',
-		    gridServer 	= app.options.servers.osm.uri,
-		    subdomains  = app.options.servers.osm.subdomains,
-		    token 	= '?token=' + app.Account.getToken(),
-		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
-		
-		// create gridlayer
-		// this.gridLayer = new L.UtfGrid(url, {
-		// 	useJsonP: false,
-		// 	subdomains: subdomains,
-		// 	// subdomains: 'ijk',
-		// 	// subdomains: 'ghi',
-		// 	maxRequests : 10,
-		// 	requestTimeout : 20000
-		// });
-
-		// debug
-		this.gridLayer = false;
-
-		// add grid events
-		this._addGridEvents();
-
-	},
-
-	getFileUuid : function () {
-		return 'osm';
-	},
-
-	setCartoCSS : function (json, callback) {
-
-		// send to server
-		Wu.post('/api/layers/cartocss/set', JSON.stringify(json), callback, this);
-	
-		// set locally on layer
-		this.setCartoid(json.cartoid);
-	},
-
-	getCartoCSS : function (cartoid, callback) {
-
-		var json = {
-			cartoid : cartoid
-		}
-
-		// get cartocss from server
-		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
-	},
-
-	updateStyle : function () {
-
-		// set new options and redraw
-		if (this.layer) this.layer.setOptions({
-			cartoid : this.getCartoid(),
-		});
-
-	},
-
-
-
-});
-
-
 Wu.MapboxLayer = Wu.Layer.extend({
 
 	type : 'mapboxLayer',
@@ -1004,45 +792,14 @@ Wu.MapboxLayer = Wu.Layer.extend({
 });
 
 
-Wu.CartodbLayer = Wu.Layer.extend({
 
-});
+Wu.GoogleLayer = Wu.Layer.extend({
 
-
-
-Wu.NorkartLayer = Wu.Layer.extend({
-
-	// 1. add customer id
-	// 2. do logs
-	// 3. attribution based on location
-
-
-
-	// LOG
-	// ---
-	// log-url: http://www.webatlas.no/weblog/Log2.aspx?WMS-REQUEST=BBOX=10.434350967407228,60.337823495982036,10.518379211425783,60.378405609690134&MAPSTYLE=0&CUSTOMER=systemapic
-
-
-
-	// ATTRIBUTION
-	// -----------
-	// add attribution to layer.options (ie. leaflet layer)
-	// change attribution on mapmove, use _getCopyrightText
-
+	type : 'googleLayer',
 
 	options : {
-		// norkart options
-		log_url : 'https://www.webatlas.no/weblog/Log2.aspx?',
-		tile_url : 'https://www.webatlas.no/maptiles/tiles/{type}/wa_grid/{z}/{x}/{y}.jpeg',
-		current_mapstyle : 1, // aerial,
-		tilesets: {
-	                vector: "webatlas-standard-vektor",
-	                aerial: "webatlas-orto-newup",
-	                hybrid: "webatlas-standard-hybrid"
-	            },
-		customer_id : 'systemapic',
 		minZoom : 0,
-		maxZoom : 20
+		maxZoom : 20,
 	},
 
 	initialize : function (layer) {
@@ -1065,16 +822,24 @@ Wu.NorkartLayer = Wu.Layer.extend({
 		this._prepareRaster();
 	},
 
+	getTileType : function () {
+		return this.store.tileType || 'aerial';
+	},
+
 	_prepareRaster : function () {
 
 		// norkart
-		// var type = this.store.data.norkart;
-		var type = this.options.tilesets.aerial;
-		var url = this.options.tile_url;
+		var type = this.getTileType();
+		// var format = this.options.tileformats[type];
+		var access_token = '?access_token=' + app.tokens.access_token;
+		var url = 'https://{s}.systemapic.com/proxy/google/{type}/{z}/{x}/{y}.png' + access_token;
+		var subdomains  = app.options.servers.proxy.subdomains;
 
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			type : type,
+			// format : format,
+			subdomains : subdomains,
 			maxRequests : 0,
 			tms : false,
 			maxZoom : this.options.maxZoom,
@@ -1083,15 +848,88 @@ Wu.NorkartLayer = Wu.Layer.extend({
 
 		// add clear background cache event (hack for hanging tiles)
 		// see: https://github.com/Leaflet/Leaflet/issues/1905
-		if (!this._eventsAdded) {
-			this._addEvents();
-		}
+		// if (!this._eventsAdded) this._addEvents();
 
 		// add move event (for norkart logging)
-		if (!this._logEvent) {
-			
-			this._logEvent = true;
-		}
+		// if (!this._logEvent) this._logEvent = true;
+	},
+
+});
+
+
+Wu.NorkartLayer = Wu.Layer.extend({
+
+	type : 'norkartLayer',
+
+	// ATTRIBUTION // TODO!
+	// -----------
+	// add attribution to layer.options (ie. leaflet layer)
+	// change attribution on mapmove, use _getCopyrightText
+
+	options : {
+		// norkart options
+		log_url : 'https://www.webatlas.no/weblog/Log2.aspx?',
+		current_mapstyle : 1, // aerial,
+	        tileformats : {
+	        	vector: "png",
+	                aerial: "jpeg",
+	                hybrid: "jpeg"
+	        },
+		customer_id : 'systemapic',
+		minZoom : 0,
+		maxZoom : 20,
+	},
+
+	initialize : function (layer) {
+
+		// set source
+		this.store = layer; // db object
+		
+		// data not loaded
+		this.loaded = false;
+	},
+
+	initLayer : function () {
+		this.update();
+	},
+
+	update : function () {
+		var map = app._map;
+
+		// prepare raster
+		this._prepareRaster();
+	},
+
+	getTileType : function () {
+		return this.store.tileType || 'aerial';
+	},
+
+	_prepareRaster : function () {
+
+		// norkart
+		var type = this.getTileType();
+		var format = this.options.tileformats[type];
+		var access_token = '?access_token=' + app.tokens.access_token;
+		var url = 'https://{s}.systemapic.com/proxy/norkart/{type}/{z}/{x}/{y}.{format}' + access_token;
+		var subdomains  = app.options.servers.proxy.subdomains;
+
+		// add vector tile raster layer
+		this.layer = L.tileLayer(url, {
+			type : type,
+			format : format,
+			subdomains : subdomains,
+			maxRequests : 0,
+			tms : false,
+			maxZoom : this.options.maxZoom,
+			minZoom : this.options.minZoom,
+		});
+
+		// add clear background cache event (hack for hanging tiles)
+		// see: https://github.com/Leaflet/Leaflet/issues/1905
+		if (!this._eventsAdded) this._addEvents();
+
+		// add move event (for norkart logging)
+		if (!this._logEvent) this._logEvent = true;
 	},
 
 	_addEvents : function () {
@@ -1245,11 +1083,16 @@ Wu.RasterLayer = Wu.Layer.extend({
 });
 
 
+Wu.CartodbLayer = Wu.Layer.extend({});
+
+Wu.ErrorLayer = Wu.Layer.extend({})
+
+
 // shorthand for creating all kinds of layers
 Wu.createLayer = function (layer) {
 	if (!layer.data) {
 		console.error('no layer - weird:', layer);
-		return false;
+		return new Wu.ErrorLayer();
 	}
 	// postgis
 	if (layer.data.postgis && layer.data.postgis.file_id) {
@@ -1273,13 +1116,32 @@ Wu.createLayer = function (layer) {
 	// raster
 	if (layer.data.norkart) return new Wu.NorkartLayer(layer);
 
-	return false;
+	// raster
+	if (layer.data.google) return new Wu.GoogleLayer(layer);
+
+	return new Wu.ErrorLayer();
 }
 
 
 
 
 
+
+
+// update options and redraw
+L.TileLayer.include({
+	setOptions : function (options) {
+		L.setOptions(this, options);
+		this.redraw();
+	}
+});
+
+L.UtfGrid.include({
+	setOptions : function (options) {
+		L.setOptions(this, options);
+		this.redraw();
+	}
+});
 
 
 
@@ -1323,227 +1185,219 @@ Wu.createLayer = function (layer) {
 
 
 
-/*
- * Google layer using Google Maps API
- */
-
-/* global google: true */
-
-L.Google = L.Class.extend({
-	includes: L.Mixin.Events,
-
-	options: {
-		minZoom: 0,
-		maxZoom: 18,
-		tileSize: 256,
-		subdomains: 'abc',
-		errorTileUrl: '',
-		attribution: '',
-		opacity: 1,
-		continuousWorld: false,
-		noWrap: false,
-		mapOptions: {
-			backgroundColor: '#dddddd'
-		}
-	},
-
-	// Possible types: SATELLITE, ROADMAP, HYBRID, TERRAIN
-	initialize: function(type, options) {
-		L.Util.setOptions(this, options);
-
-		this._ready = google.maps.Map !== undefined;
-		if (!this._ready) L.Google.asyncWait.push(this);
-
-		this._type = type || 'SATELLITE';
-	},
-
-	onAdd: function(map, insertAtTheBottom) {
-		this._map = map;
-		this._insertAtTheBottom = insertAtTheBottom;
-
-		// create a container div for tiles
-		this._initContainer();
-		this._initMapObject();
-
-		// set up events
-		map.on('viewreset', this._resetCallback, this);
-
-		this._limitedUpdate = L.Util.limitExecByInterval(this._update, 150, this);
-		map.on('move', this._update, this);
-
-		map.on('zoomanim', this._handleZoomAnim, this);
-
-		//20px instead of 1em to avoid a slight overlap with google's attribution
-		map._controlCorners.bottomright.style.marginBottom = '20px';
-
-		this._reset();
-		this._update();
-	},
-
-	onRemove: function(map) {
-		map._container.removeChild(this._container);
-
-		map.off('viewreset', this._resetCallback, this);
-
-		map.off('move', this._update, this);
-
-		map.off('zoomanim', this._handleZoomAnim, this);
-
-		map._controlCorners.bottomright.style.marginBottom = '0em';
-	},
-
-	getAttribution: function() {
-		return this.options.attribution;
-	},
-
-	setOpacity: function(opacity) {
-		this.options.opacity = opacity;
-		if (opacity < 1) {
-			L.DomUtil.setOpacity(this._container, opacity);
-		}
-	},
-
-	setElementSize: function(e, size) {
-		e.style.width = size.x + 'px';
-		e.style.height = size.y + 'px';
-	},
-
-	_initContainer: function() {
-		var tilePane = this._map._container,
-			first = tilePane.firstChild;
-
-		if (!this._container) {
-			this._container = L.DomUtil.create('div', 'leaflet-google-layer leaflet-top leaflet-left');
-			this._container.id = '_GMapContainer_' + L.Util.stamp(this);
-			this._container.style.zIndex = 'auto';
-		}
-
-		tilePane.insertBefore(this._container, first);
-
-		this.setOpacity(this.options.opacity);
-		this.setElementSize(this._container, this._map.getSize());
-	},
-
-	_initMapObject: function() {
-		if (!this._ready) return;
-		this._google_center = new google.maps.LatLng(0, 0);
-		var map = new google.maps.Map(this._container, {
-			center: this._google_center,
-			zoom: 0,
-			tilt: 0,
-			mapTypeId: google.maps.MapTypeId[this._type],
-			disableDefaultUI: true,
-			keyboardShortcuts: false,
-			draggable: false,
-			disableDoubleClickZoom: true,
-			scrollwheel: false,
-			streetViewControl: false,
-			styles: this.options.mapOptions.styles,
-			backgroundColor: this.options.mapOptions.backgroundColor
-		});
-
-		var _this = this;
-		this._reposition = google.maps.event.addListenerOnce(map, 'center_changed',
-			function() { _this.onReposition(); });
-		this._google = map;
-
-		google.maps.event.addListenerOnce(map, 'idle',
-			function() { _this._checkZoomLevels(); });
-		google.maps.event.addListenerOnce(map, 'tilesloaded',
-			function() { _this.fire('load'); });
-		//Reporting that map-object was initialized.
-		this.fire('MapObjectInitialized', { mapObject: map });
-	},
-
-	_checkZoomLevels: function() {
-		//setting the zoom level on the Google map may result in a different zoom level than the one requested
-		//(it won't go beyond the level for which they have data).
-		// verify and make sure the zoom levels on both Leaflet and Google maps are consistent
-		if (this._google.getZoom() !== this._map.getZoom()) {
-			//zoom levels are out of sync. Set the leaflet zoom level to match the google one
-			this._map.setZoom( this._google.getZoom() );
-		}
-	},
-
-	_resetCallback: function(e) {
-		this._reset(e.hard);
-	},
-
-	_reset: function(clearOldContainer) {
-		this._initContainer();
-	},
-
-	_update: function(e) {
-		if (!this._google) return;
-		this._resize();
-
-		var center = this._map.getCenter();
-		var _center = new google.maps.LatLng(center.lat, center.lng);
-
-		this._google.setCenter(_center);
-		this._google.setZoom(Math.round(this._map.getZoom()));
-
-		this._checkZoomLevels();
-	},
-
-	_resize: function() {
-		var size = this._map.getSize();
-		if (this._container.style.width === size.x &&
-				this._container.style.height === size.y)
-			return;
-		this.setElementSize(this._container, size);
-		this.onReposition();
-	},
 
 
-	_handleZoomAnim: function (e) {
-		var center = e.center;
-		var _center = new google.maps.LatLng(center.lat, center.lng);
 
-		this._google.setCenter(_center);
-		this._google.setZoom(Math.round(e.zoom));
-	},
+// Wu.RasterLayer = Wu.Layer.extend({
+// 	type : 'rasterLayer',
+// });
 
 
-	onReposition: function() {
-		if (!this._google) return;
-		google.maps.event.trigger(this._google, 'resize');
-	}
-});
+// // systemapic layers
+// Wu.CartoCSSLayer = Wu.Layer.extend({
 
-L.Google.asyncWait = [];
-L.Google.asyncInitialize = function() {
-	var i;
-	for (i = 0; i < L.Google.asyncWait.length; i++) {
-		var o = L.Google.asyncWait[i];
-		o._ready = true;
-		if (o._container) {
-			o._initMapObject();
-			o._update();
-		}
-	}
-	L.Google.asyncWait = [];
-};
+// 	initLayer : function () {
+// 		this.update();
+// 		this.addHooks();
+
+// 		this._inited = true;
+// 	},
+
+// 	update : function () {
+// 		var map = app._map;
+
+// 		// remove
+// 		if (this.layer) this._flush();
+
+// 		this._fileUuid = this.store.file;
+// 		this._defaultCartoid = 'cartoid';
+
+// 		// prepare raster
+// 		this._prepareRaster();
+
+// 		// prepare utfgrid
+// 		this._prepareGrid();
+		
+// 	},
+
+// 	_prepareRaster : function () {
+		
+// 		// set ids
+// 		var fileUuid 	= this._fileUuid,	// file id of geojson
+// 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
+// 		    tileServer 	= app.options.servers.tiles.uri,
+// 		    subdomains  = app.options.servers.tiles.subdomains,
+// 		    token 	= '?token=' + app.Account.getToken(),
+// 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
+
+// 		// add vector tile raster layer
+// 		this.layer = L.tileLayer(url, {
+// 			fileUuid: this._fileUuid,
+// 			cartoid : cartoid,
+// 			subdomains : subdomains,
+// 			maxRequests : 0,
+// 		});
+
+// 		Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
+// 	},
+
+// 	_updateGrid : function (l) {
+
+
+
+// 		// refresh of gridlayer is attached to layer. this because vector tiles are not made in vile.js, 
+// 		// and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
+// 		// - also, removed listeners in L.UtfGrid (onAdd)
+// 		// 
+// 		if (this.gridLayer) this.gridLayer._update();
+// 	},
+
+// 	_prepareGrid : function () {
+
+// 		// set ids
+// 		var fileUuid 	= this._fileUuid,	// file id of geojson
+// 		    cartoid 	= this.store.data.cartoid || 'cartoid',
+// 		    gridServer 	= app.options.servers.utfgrid.uri,
+// 		    subdomains  = app.options.servers.utfgrid.subdomains,
+// 		    // token 	= app.accessToken,
+// 		    token 	= '?token=' + app.Account.getToken(),
+// 		    url 	= gridServer + '{fileUuid}/{z}/{x}/{y}.grid.json' + token;
+		
+// 		// create gridlayer
+// 		this.gridLayer = new L.UtfGrid(url, {
+// 			useJsonP: false,
+// 			subdomains: subdomains,
+// 			maxRequests : 0,
+// 			requestTimeout : 10000,
+// 			fileUuid : fileUuid
+// 		});
+
+// 		// debug
+// 		// this.gridLayer = false;
+
+// 		// add grid events
+// 		this._addGridEvents();
+
+// 	},
+
+// 	updateStyle : function () {
+// 		// set new options and redraw
+// 		if (this.layer) this.layer.setOptions({
+// 			cartoid : this.getCartoid(),
+// 		});
+// 	},
+
+// 	_typeLayer : function () {
+
+// 	},
+
+// });
 
 
 
 
+// Wu.OSMLayer = Wu.CartoCSSLayer.extend({
+
+// 	update : function () {
+// 		var map = app._map;
+
+// 		// remove
+// 		if (this.layer) this._flush();
+
+// 		// id of data 
+// 		this._fileUuid = 'osm';
+// 		this._defaultCartoid = 'cartoidosm';
+
+// 		// prepare raster
+// 		this._prepareRaster();
+
+// 		// prepare utfgrid
+// 		this._prepareGrid();
+		
+// 	},
+
+// 	_prepareRaster : function () {
+		
+// 		// set ids
+// 		var fileUuid 	= this._fileUuid,	// file id of geojson
+// 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
+// 		    tileServer 	= app.options.servers.osm.uri,
+// 		    subdomains  = app.options.servers.osm.subdomains,
+// 		    token 	= '?token=' + app.Account.getToken(),
+// 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
+
+// 		// add vector tile raster layer
+// 		this.layer = L.tileLayer(url, {
+// 			fileUuid: this._fileUuid,
+// 			cartoid : cartoid,
+// 			subdomains : subdomains,
+// 			maxRequests : 0,
+// 		});
+// 	},
+
+// 	_prepareGrid : function () {
+
+// 		// set ids
+// 		var fileUuid 	= this._fileUuid,	// file id of geojson
+// 		    cartoid 	= this.store.data.cartoid || 'cartoid',
+// 		    gridServer 	= app.options.servers.osm.uri,
+// 		    subdomains  = app.options.servers.osm.subdomains,
+// 		    token 	= '?token=' + app.Account.getToken(),
+// 		    url 	= gridServer + fileUuid + '/{z}/{x}/{y}.grid.json' + token;
+		
+// 		// create gridlayer
+// 		// this.gridLayer = new L.UtfGrid(url, {
+// 		// 	useJsonP: false,
+// 		// 	subdomains: subdomains,
+// 		// 	// subdomains: 'ijk',
+// 		// 	// subdomains: 'ghi',
+// 		// 	maxRequests : 10,
+// 		// 	requestTimeout : 20000
+// 		// });
+
+// 		// debug
+// 		this.gridLayer = false;
+
+// 		// add grid events
+// 		this._addGridEvents();
+
+// 	},
+
+// 	getFileUuid : function () {
+// 		return 'osm';
+// 	},
+
+// 	setCartoCSS : function (json, callback) {
+
+// 		// send to server
+// 		Wu.post('/api/layers/cartocss/set', JSON.stringify(json), callback, this);
+	
+// 		// set locally on layer
+// 		this.setCartoid(json.cartoid);
+// 	},
+
+// 	getCartoCSS : function (cartoid, callback) {
+
+// 		var json = {
+// 			cartoid : cartoid
+// 		}
+
+// 		// get cartocss from server
+// 		Wu.post('/api/layers/cartocss/get', JSON.stringify(json), callback, this);
+// 	},
+
+// 	updateStyle : function () {
+
+// 		// set new options and redraw
+// 		if (this.layer) this.layer.setOptions({
+// 			cartoid : this.getCartoid(),
+// 		});
+
+// 	},
 
 
 
+// });
 
 
-// update options and redraw
-L.TileLayer.include({
-	setOptions : function (options) {
-		L.setOptions(this, options);
-		this.redraw();
-	}
-});
 
-L.UtfGrid.include({
-	setOptions : function (options) {
-		L.setOptions(this, options);
-		this.redraw();
-	}
-});

@@ -34,7 +34,8 @@ var layerSchema = mongoose.Schema({
 		mapbox 		: String,			// mapbox id: rawger.geography-class
 		cartodb 	: String,			// cartodb id: 
 		osm 		: String,			// osm id?
-		norkart     : String,
+		norkart     	: String,
+		google 		: String,
 
 		postgis : {
 
@@ -50,13 +51,6 @@ var layerSchema = mongoose.Schema({
 			raster_band : Number,
 			layer_id : String,
 			metadata : String,
-			// affected_tables : [String],
-			// interactivity : [String],
-			// attributes : {
-				// id : String,
-				// columns : [String]
-			// }
-
 		}
 
 	}, 
@@ -67,6 +61,7 @@ var layerSchema = mongoose.Schema({
 	legends : String,  // json string with cartocss legends
 	file : String,	   // file uuid that layer is connected to, if any
 	style : String,
+	tileType : String, // tiletype, eg. 'aerial', 'hybrid'
 });
 
 

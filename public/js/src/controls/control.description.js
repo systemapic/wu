@@ -76,9 +76,6 @@ L.Control.Description = Wu.Control.extend({
 
 
 	_setDescription : function (text) {
-
-		console.log('%c_setDescription', 'background:red; color: white;')
-		console.log('text', text);
 		
 		if ( !text && text != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
 		this._description.innerHTML = text;
@@ -160,12 +157,17 @@ L.Control.Description = Wu.Control.extend({
 
 	toggleOpen : function () {
 
+
+		// xoxoxo
+
 		this.isCollapsed = false;
 
 		Wu.DomUtil.removeClass(this._legendContainer, 'minimized');
 		Wu.DomUtil.removeClass(this._header, 'minimized');		
 
-		Wu.DomUtil.removeClass(this._description, 'displayNone');
+		var description = this._description.innerHTML;
+		if ( description && description != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
+		
 		Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
 		Wu.DomUtil.removeClass(this._toggle, 'legend-toggle-open');
 
@@ -173,6 +175,7 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	toggleClose : function () {
+
 
 		this.isCollapsed = true;
 
@@ -204,7 +207,7 @@ L.Control.Description = Wu.Control.extend({
 		
 		this._setDescription('');
 		this.isOpen = true;
-		this.toggleScale();
+		this.toggleScale(false);
 	},
 
 	_refresh : function () {
@@ -270,7 +273,7 @@ L.Control.Description = Wu.Control.extend({
 	show : function () {
 		if (!this._container) return;
 		this._isActive() ? this._show() : this._hide();
-		this.toggleScale();
+		this.toggleScale(true);
 	},
 
 	hide : function () {
@@ -493,8 +496,15 @@ L.Control.Description = Wu.Control.extend({
 		this._isClosed = false;			
 	},
 
-	toggleScale : function () {
-		app.MapPane.getControls().measure.__toggle();
+	toggleScale : function (openDescription) {
+
+
+		if ( openDescription ) {
+			Wu.DomUtil.addClass(app._map._controlCorners.topright, 'toggle-scale');
+		} else {
+			Wu.DomUtil.removeClass(app._map._controlCorners.topright, 'toggle-scale');
+		}
+
 	},
 
 

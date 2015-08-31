@@ -114,7 +114,7 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 		// console.log('sortLayers, layers:', layers);
 		// possible keys in layer.store.data. must add more here later if other sources
 		// var keys = ['geojson', 'mapbox', 'osm', 'raster'];
-		var keys = ['geojson', 'mapbox', 'raster', 'postgis', 'norkart'];
+		var keys = ['geojson', 'mapbox', 'raster', 'postgis', 'norkart', 'google'];
 		var results = [];
 		keys.forEach(function (key) {
 			var sort = {
