@@ -1230,8 +1230,10 @@ Wu.MapPane = Wu.Pane.extend({
 		                },
 
 		                y: {
-		                	max : range,
-		                	min : -range,
+		                	// max : range,
+		                	// min : -range,
+		                	max : 50,
+		                	min : -50,
 					tick: {
 						format: function (d) { return Math.floor(d * 100)/100 }
 					}
