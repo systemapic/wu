@@ -1601,7 +1601,8 @@
 	color: #454545;
 	font-weight: 500;
 
-	height: 27px;
+	/*height: 27px;*/
+
 	font-size: 13px;
 	background-color: #EEEEEE !important;	
 	}
@@ -1611,10 +1612,10 @@
 	/*background-color: #3b596a !important;*/
 	font-weight: 900;
 	background-color: #3C4759 !important;	
-	background-image: none;
+	background-image: none !important;
 	}
 
-.menufolder:before {
+/*.menufolder:before {
 	content: '';
 	background-image: url(images/systemapic-sprite.png);
 	background-position: -61px -45px;
@@ -1625,15 +1626,21 @@
 	position: absolute;
 	top: 0;
 	left: 0;	
-	}
+	}*/
+
 
 .menufolder .layer-menu-item {
-	text-indent: 32px;
-	}	
+/*	background-image: url(images/evil_sprite.png);
+	background-position: -61px -45px;
+	background-repeat: no-repeat;
+	background-size: auto;*/
+	}
+
+
 
 .layer-active {
 	/*background-color: #c07c0c !important;	*/
-	background-color: #78a09c !important;
+	/*background-color: #78a09c !important;*/
 	/*color: white !important;*/
 	/*font-weight: 900;	*/
 
@@ -1661,7 +1668,7 @@
 	width: 21px;
 	background-image: url(images/evil_sprite.png);
 	background-repeat: no-repeat;
-	background-position: -283px -42px;
+	background-position: -281px -44px;
 	display: none;
 	opacity: 0.7;
 	}
@@ -1700,10 +1707,10 @@
 	/*text-align: left;*/
 	/*width: 90%;	*/
 
-	text-indent: 7px;
+	/*text-indent: 7px;*/
 	text-align: left;
 	width: 90%;
-	padding-left: 14px; 	
+	padding-left: 20px; 	
 	}	
 
 
@@ -1832,9 +1839,12 @@
 
 
 /* Show Left/Right/Delete buttons on layers when editing the Layer menu */
-.edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content .layer-menu-item-wrap:hover > .layer-item-up,
-.edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content .layer-menu-item-wrap:hover > .layer-item-down,
-.edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content .layer-menu-item-wrap:hover > .layer-item-delete {
+/*.edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content .layer-menu-item-wrap:hover > .layer-item-up,*/
+/*.edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content .layer-menu-item-wrap:hover > .layer-item-down,*/
+/*.edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content .layer-menu-item-wrap:hover > .layer-item-delete,*/
+
+
+.edit-mode .scroller-frame .inner-scroller #layer-menu-inner-content .layer-menu-item-wrap:hover > .layer-item-movers-wrap {
 	display: block;
 	}
 
@@ -1848,6 +1858,12 @@
 
 
 /* up/down/delete buttons on layermenu items */
+.layer-item-movers-wrap {
+	width: 100%;
+	height: 100%;
+	position: absolute;	
+	display: none;
+	}
 
 .layer-item-delete,
 .layer-item-down,
@@ -1860,36 +1876,33 @@
 
 .layer-item-up {
 	width: 18px;
-	background-color: rgba(255,255,255,0.8);
+	background-color: rgba(255, 255, 255, 0.8);
 	position: absolute;
-	left: 21px;
+	left: 20px;
 	padding: 0px 0px 0px 2px;
 	font-size: 160%;
-	display: none;
 	color: transparent;
 	background-image: url(images/evil_sprite.png);
 	background-repeat: no-repeat;
-	top: 2px;
-	height: 26px;
-	/*background-position: 7px -73px; */
-	background-position: 7px -75px;
+	top: 1px;
+	background-position: 7px -74px;
+	height: 24px;
+	margin: auto;
 	}
 
 .layer-item-down {
 	width: 18px;
-	background-color: rgba(255,255,255,0.8);
+	background-color: rgba(255, 255, 255, 0.8);
 	position: absolute;
-	left: 2px;
+	left: 1px;
 	padding: 0px 0px 0px 2px;
 	font-size: 160%;
 	color: transparent;
 	background-image: url(images/evil_sprite.png);
 	background-repeat: no-repeat;
-	top: 2px;
-	height: 26px;
-	/*background-position: -28px -73px;*/
-	background-position: -28px -75px;
-	display: none;
+	top: 1px;
+	height: 24px;
+	background-position: -28px -74px;
 	}
 
 .layer-item-up:hover,
@@ -1898,24 +1911,20 @@
 	}	
 
 .layer-item-delete {
-	/*width: 18px;*/
-	background: rgba(255, 255, 255, 1);
+	background: white;
 	position: absolute;
-	right: 2px;
+	right: 1px;
 	padding: 0px 0px 0px 2px;
 	font-size: 160%;
-	display: none;
 	color: transparent;
 	background-image: url(images/evil_sprite.png);
 	background-repeat: no-repeat;
-	top: 2px;
-	border-radius: 1px;
+	top: 1px;
+	border-radius: 0px;
 	opacity: 0.8;
-	height: 26px;
-	/*background-position: 1px -39px;*/
-
-	background-position: 2px -41px;
-	width: 21px;	
+	height: 24px;
+	background-position: 2px -40px;
+	width: 20px;
 	}
 
 .layer-item-delete:hover {
