@@ -575,6 +575,7 @@ module.exports = api.postgis = {
 				var json = results.rows[0];
 
 				console.log('json_SIZEE: ', json);
+				
 				metadata.size_bytes = json.pg_size_pretty;
 
 				callback();
@@ -586,7 +587,6 @@ module.exports = api.postgis = {
 
 
 		async.series(ops, function (err, results) {
-			console.log('ALL META DONE-=>>>', metadata);
 			done(err, metadata);
 		});
 	},
