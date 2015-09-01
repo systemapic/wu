@@ -96,17 +96,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._layerMenuHeader = Wu.DomUtil.createId('div', 'layer-menu-header');
 		// Wu.DomUtil.addClass(this._layerMenuHeader, 'menucollapser');
 		
-		// title
-		// this._layerMenuHeaderTitle = Wu.DomUtil.create('div', 'layer-menu-header-title', this._layerMenuHeader, 'Layers');
-
-		// Create the collapse button
-		// this._bhattan1 = Wu.DomUtil.createId('div', 'bhattan1');
-		// Wu.DomUtil.addClass(this._bhattan1, 'dropdown-button rotate270');
-		// this._layerMenuHeader.appendChild(this._bhattan1);
-
-		// Insert Header at the top
-		// this._innerContainer.insertBefore(this._layerMenuHeader, this._innerContainer.getElementsByTagName('div')[0]);
-
 		// Create the 'uncollapse' button ... will put in DOM l8r
 		this._openLayers = Wu.DomUtil.createId('div', 'open-layers');
 		this._openLayers.innerHTML = 'Layers';
@@ -122,27 +111,12 @@ L.Control.Layermenu = Wu.Control.extend({
 			this._legendsCollapser = legends._legendsCollapser;
 		}
 
-		// Wu.DomEvent.on(this._bhattan1,   'click', this._GAcloseLayerPane, this);
-		// Wu.DomEvent.on(this._openLayers, 'click', this._GAtoggleLayerPane, this);     
-
-		// Stop Propagation
-		// Wu.DomEvent.on(this._openLayers, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
-		// Wu.DomEvent.on(this._bhattan1, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
-
-		// auto-close event
-		// Wu.DomEvent.on(this._innerContainer, 'mouseenter', this.cancelEditClose, this);
-		// Wu.DomEvent.on(this._innerContainer, 'mouseleave', this.timedEditClose, this);
-
 		// add extra padding	
 		var inspect = app.MapPane.getControls().inspect;	
 		if (!inspect) {
 			var corner = app._map._controlCorners.bottomright;
 			corner.style.paddingBottom = 6 + 'px';
 		}
-
-		// add tooltip
-		// app.Tooltip.add(this._layerMenuHeaderTitle, 'The layer menu lets you choose what layers you want to be on top of the map', { extends : 'systyle', tipJoint : 'right' });
-		// app.Tooltip.add(this._bhattan1, 'Minimize the layer menu', { extends : 'systyle', tipJoint : 'left' });		
 
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
@@ -201,8 +175,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		}, this);
 
-		// refresh sorting
-		// this.refreshSortable();
 	},
 
 	_addAlreadyActive : function () {
@@ -338,62 +310,18 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.closeLayerPane();
 	},
 
-	// (j)
 	closeLayerPane : function () {
 
 		this._open = false;
 
 		Wu.DomUtil.addClass(this._innerContainer, 'closed');
-		
-
-		// Collapse Wrapper
-		// app._map._controlCorners.bottomright.style.width = '0px';
-
-		// Wu.DomUtil.removeClass(this._openLayers, 'ol-collapsed');
-		
-		// Slide the LEGENDS
-		// var inspect = app.MapPane.getControls().inspect;
-		// if (inspect && this._legendsContainer) {
-		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
-		// }	
-		
-		// Adjust legends width
-		// app.MapPane.getControls().legends.checkWidth();
 	},
 
-	// (j) xoxox 
 	openLayerPane : function () {
 
 		this._open = true;
 
-		// console.log('openLayerPane', this.container);
 		Wu.DomUtil.removeClass(this._innerContainer, 'closed');
-
-		// Open Wrapper
-		// app._map._controlCorners.bottomright.style.width = '290px';
-
-		// Close the closer :P
-		// Wu.DomUtil.addClass(this._openLayers, 'ol-collapsed');
-		
-		// // Slide the LEGENDS
-		// var inspect = app.MapPane.getControls().inspect;
-		// var legends = app.MapPane.getControls().legends;
-		// var description = app.MapPane.getControls().description;
-		
-		// if (inspect && this._legendsContainer) {
-		// 	Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
-		// }
-		
-		// // If we're on mobile
-		// if (app.mobile) {
-		// 	// Check if legends is open ~ close it when opening layer menu
-		// 	if (legends._isOpen) legends.MobileCloseLegends();
-		// 	if (!description._isClosed) description.mobileClosePane();
-		// }
-
-		// // Adjust legends width
-		// legends.checkWidth();
-
 	},
 
 
@@ -957,9 +885,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 
-		// console.log('flying!', layerItem);
-		// this.flyTo(layer);
-
 	},
 
 	// disable by layermenuItem
@@ -1003,9 +928,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		// fly
 		var map = app._map;
 		map.fitBounds(bounds);
-
-		// Google Analytics event tracking
-		// app.Analytics.setGaEvent(['Controls', 'Inspect layers: Fly to bounds for > ' + layer.getTitle()]);
 
 	},
 
@@ -1087,8 +1009,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	// add from sidepane
 	add : function (layer) {
-
-
 		
 		// create db item
 		var item = {
@@ -1203,7 +1123,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// add to local store
 		this.layers[item.uuid] = layerItem;
-
 	},
 
 
@@ -1252,8 +1171,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		var layerItem = this.layers[uuid];
 		var folder = layerItem.el.children[3];
-
-		console.log('luaeRImte, folder', layerItem, folder);
 
 		// inject <input>
 		var title = folder.innerHTML;
@@ -1322,8 +1239,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	upFolder : function (uuid) {
 
-		console.log('%cupFolder', 'background: green; color: white;')
-
 		// get element
 		var wrap = this.layers[uuid].el;
 
@@ -1358,7 +1273,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		// dont allow below 0
 		if (newpos < 0) newpos = 0;
 
-		console.log('d newpos: ', newpos);
 		this._project.store.layermenu[i].pos = newpos;
 
 		// add class
@@ -1400,8 +1314,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	_projectSelected : function (e) {
 
-		console.log('layermenu project selectged');
-
 		var projectUuid = e.detail.projectUuid;
 
 		if (!projectUuid) {
@@ -1420,7 +1332,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	_selectDefaultLayer : function () {
-		console.log('select!!', this);
 		var layerItem;
 
 		// get first layer
@@ -1431,12 +1342,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		}.bind(this));
 
 		if (!layerItem) return; // no layers in layermenu
-		
-		console.log('first layeR: ', layerItem);
-
-		// this.enableLayer(layerItem);
-
-
 
 	},
 
