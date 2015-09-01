@@ -582,10 +582,10 @@ L.Control.Description = Wu.Control.extend({
 		// create legend
 		var gradientOptions = {
 			colorStops : ["#ff0000", "#ff3600", "#ff8100", "#ffd700", "#a5ff00", "#00ffa9", "#00ffdf", "#009eff", "#003dff", "#2f00ff"],
-			minVal : -20,
+			minVal : -5,
 			medVal : 0,
-			maxVal : 20,
-			bline : 'vel[mm/yr]'
+			maxVal : 5,
+			bline : 'Velocity (mm pr. year)'
 		}
 
 		var gradientHTML = this.gradientLegend(gradientOptions);
