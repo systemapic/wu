@@ -49,30 +49,34 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Settings button
 		this._settingsButton = Wu.DomUtil.create('div', 'chrome-button cartoeditor displayNone', this._buttons);
 
-		// Init CPU clock
-		this.initCPUclock(this._buttons);
-
-
 		this.initDefault();
 
 	},
 
-	initCPUclock : function (wrapper) {
 
-		console.log('%cinitCPUclock', 'background: red; color: white;');
+	initDefault : function () {
 
+		this._setUsername();
+		this._setPortalLogo();
+
+		// Init CPU clock
+		this.initCPUclock(this._buttons);
+
+
+	},
+
+
+	initCPUclock : function (wrapper) {	
+
+		// Check if superadmin
 		var isSuperAdmin = app.Access.is.superAdmin();
 		if ( !isSuperAdmin ) return;
-
-		console.log('isSuperAdmin', isSuperAdmin);
 
 		var CPUwrapper = Wu.DomUtil.create('div', 'cpu-wrapper', wrapper);
 
 		this._CPUbars = [];
 
 		for ( i = 0; i<10; i++ ) {
-
-			console.log('i', i);
 			this._CPUbars[i] = Wu.DomUtil.create('div', 'cpu-bar', CPUwrapper);
 		}
 
@@ -93,19 +97,14 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		for ( i = 0; i<10; i++ ) {
 			
+			// Get the right div
 			var no = 9 - i;
 
+			// Set the right classes
 			if ( i >= p ) 	Wu.DomUtil.removeClass(this._CPUbars[no], 'cpu-on');
 			else		Wu.DomUtil.addClass(this._CPUbars[no], 'cpu-on');
 		}
 
-
-	},
-
-	initDefault : function () {
-
-		this._setUsername();
-		this._setPortalLogo();
 
 	},
 

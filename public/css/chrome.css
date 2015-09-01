@@ -78,3 +78,9 @@ section.map.mode-edit div.polygon-elbow {
 .leaflet-container.leaflet-clickable, .leaflet-container.map-clickable, .leaflet-marker-icon, .leaflet-overlay-pane path.tracer.leaflet-clickable:hover {
     fill-opacity: 0.3;
 }
+
+
+/*layermenu folder dbclick*/
+.layer-item-movers-wrap {
+    /*pointer-events: none;*/
+}
