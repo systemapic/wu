@@ -1133,39 +1133,41 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// create div
 		// var className   = 'layer-menu-item-wrap';
-		var className   = 'layer-menu-item-wrap';
+		var 	    className  = 'layer-menu-item-wrap';
 		if (!layer) className += ' menufolder';
-		var wrap 	= Wu.DomUtil.create('div', className);
+			    className += ' level-' + item.pos;
+
+		var wrap 	= Wu.DomUtil.create('div', className, this._content);
 		var uuid 	= item.uuid;
-				
-
-		// For some reason, HTML must come as string. 
-		var _iH = 	'<div class="layer-item-up">></div>' +
-			  	'<div class="layer-item-down"><</div>' +
-				'<div class="layer-item-delete">x</div>' +
-				'<div id="layer-flyto-' + layer.getUuid() + '" class="layer-menu-flyto"></div>' +
-				'<div type="layerItem" class="layer-menu-item">' + caption + '</div>';
-
-		wrap.innerHTML 	= _iH;
-
-		wrap.id 	= uuid;
-		Wu.DomUtil.addClass(wrap, 'level-' + item.pos);
+		    wrap.id 	= uuid;
 
 		// mark as draggable if we're in editing mode
 		if (this.editMode) { 
 			wrap.setAttribute('draggable', true) 
 		} else { 
 			wrap.setAttribute('draggable', false); 
+		}		    
+
+
+		var layerItemMoversWrap = Wu.DomUtil.create('div', 'layer-item-movers-wrap', wrap);
+		var up = Wu.DomUtil.create('div', 'layer-item-up', layerItemMoversWrap);
+		var down = Wu.DomUtil.create('div', 'layer-item-down', layerItemMoversWrap);
+		var del = Wu.DomUtil.create('div', 'layer-item-delete', layerItemMoversWrap);
+
+		if ( layer ) {
+			var layerItemFlyTo = Wu.DomUtil.createId('div', 'layer-flyto-' + layer.getUuid(), wrap);
+		    	layerItemFlyTo.className = 'layer-menu-flyto';
 		}
 
-		// append to layermenu
-		this._content.appendChild(wrap); 	
+		var inner = Wu.DomUtil.create('div', 'layer-menu-item', wrap);
+		    inner.setAttribute('type', 'layerItem');
+		    inner.innerHTML = caption;
 
-		// get elems
-		var up    = wrap.children[0];
-		var down  = wrap.children[1];
-		var del   = wrap.children[2];
-		var inner = wrap.children[3];
+
+
+
+		// append to layermenu
+		// this._content.appendChild(wrap); 	
 
 		// add hooks
 		Wu.DomEvent.on(up,   'click', function (e) { this.upFolder(uuid); 	  }, this);
@@ -1321,6 +1323,8 @@ L.Control.Layermenu = Wu.Control.extend({
 
 
 	upFolder : function (uuid) {
+
+		console.log('%cupFolder', 'background: green; color: white;')
 
 		// get element
 		var wrap = this.layers[uuid].el;

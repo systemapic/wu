@@ -7,14 +7,35 @@ Wu.Socket = Wu.Class.extend({
 
 		// add listeners
 		this._listen();
+
+		// add loops
+		this._addLoops();
+	},
+
+	_addLoops : function () {
+
+		setInterval(function () {
+			this._getServerStats();
+		}.bind(this), 2000);
+
+	},
+
+	_getServerStats : function () {
+		var socket = this._socket;
+		socket.emit('get_server_stats');
 	},
 
 	_listen : function () {
 		var socket = this._socket;
 
+		socket.on('server_stats', function (data) {
+			var stats = data.server_stats;
+			app.Chrome.Top.updateCPUclock(stats.cpu_usage);
+		})
+
 		socket.on('connect', function(){
 			console.log('Securely connected to socket.');
-			// socket.emit('ready', 'koko')
+			socket.emit('ready', 'koko')
 		});
 		socket.on('event', function(data){
 			console.log('event data: ', data);
@@ -27,6 +48,9 @@ Wu.Socket = Wu.Class.extend({
 		});
 		socket.on('processingProgress', function(data){
 			console.log('processingProgress:', data);
+		});
+		socket.on('stats', function(data){
+			console.log('stats:', data);
 		});
 		socket.on('uploadDone', function (data) {
 			console.log('uploadDone!', data);

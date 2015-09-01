@@ -50,13 +50,6 @@ app.use(express.session({
 	secret: 'dslfksmdfldskfnlxxsadknvvlovn908209309fmsfmdslkm',  // random
         saveUninitialized: true,
         resave: true,
-        // store: new RedisStore({	// todo: more permanent access_tokens
-	// 	host : 'rtoken',
-	// 	port : 6379,
-	// 	db : 2,
-	// 	ttl : 3600,
-	// 	pass : '9p7bRrd7Zo9oFbxVJIhI09pBq6KiOBvU4C76SmzCkqKlEPLHVR02TN2I40lmT9WjxFiFuBOpC2BGwTnzKyYTkMAQ21toWguG7SZE'
-	// }),
 }));
 
 // enable passport
@@ -68,7 +61,6 @@ app.use(favicon(__dirname + '/../dist/css/favicon.ico'));
 // enable compression
 app.use(compress());
 app.use(cors());
-
 
 // static files
 var staticPath = prodMode ? '../dist' : '../public';
