@@ -100,7 +100,6 @@ module.exports = api.upload = {
 		// save upload id to redis
 		var key = 'uploadStatus:' + uploadStatus.file_id;
 		api.redis.set(key, JSON.stringify(uploadStatus), function (err) {
-			console.log('set redis');
 
 			// return upload status to client
 			res.end(JSON.stringify(uploadStatus));
@@ -114,7 +113,6 @@ module.exports = api.upload = {
 		}
 
 		api.upload._import(options, function (err, results) {
-			console.log('api.upload._import done > err, results', err, results);
 		});
 
 
@@ -143,28 +141,11 @@ module.exports = api.upload = {
 	    	    file_id 		 = options.file_id,
 	    	    access_token 	 = options.access_token;
 
-		console.log('at 1', access_token);
-
-		console.log('#####################################');
-		console.log('### current file_id --> ', file_id);
-		console.log('#####################################');
-
-
-
 		// resumable		
 		r.post(req, function(status, filename, original_filename, identifier){
 
 			// set redis count id
 			var redis_id = resumableIdentifier + file_id;
-
-			console.log('ooooooooooooooooooooooooooooooooooooooooooooooooooooooooo');
-			console.log('ooo Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks to ', outputPath);
-			console.log('ooo Id: ', resumableIdentifier); // size + last mod + name
-			console.log('ooo file_id: ', file_id);
-			console.log('ooo FILENAME: ', filename, original_filename);
-			console.log('ooo redis_id: ', redis_id);
-		    	console.log('ooooooooooooooooooooooooooooooooooooooooooooooooooooooooo');
-			
 
 			// if success
 			if (status == 'done' || status == 'partly_done') {
@@ -189,16 +170,8 @@ module.exports = api.upload = {
 				console.log('total chunks:', options.resumableTotalChunks);
 
 				if (count != options.resumableTotalChunks) {
-					console.log('done chunks < total chunks');
 					return;
 				} 
-
-		    		console.log('ooooooooooooooooooooooooooooooooooooooooooooooooooooooooo');
-				console.log('ooo ALL CHUNKS DONE!! --- moving forward with import! ');
-		    		console.log('ooooooooooooooooooooooooooooooooooooooooooooooooooooooooo');
-
-
-		    		console.log('at 5: ', access_token);
 
 				// import uploaded file
 				api.upload._chunkedUploadDone({
@@ -233,8 +206,6 @@ module.exports = api.upload = {
 		    ops 		= [],
 		    redis_id 		= redis_id,
 		    access_token 	= options.access_token;
-
-		console.log('at 2', access_token);
 
 
 		// merge chunks
@@ -290,8 +261,6 @@ module.exports = api.upload = {
 		
 		ops.push(function (uploadStatus, callback) {
 
-			console.log('at 3', access_token);
-			
 			var options = {
 				files : {
 					data : {
@@ -309,11 +278,6 @@ module.exports = api.upload = {
 			// import file
 			api.upload._import(options, function (err, results) {
 
-				console.log('ooooooooooooooooooooooooooooooooooooooooooooooooooooooooo');
-				console.log('ooo api.upload._import done > err, results', err, results);
-				console.log('ooo 	       _import done! 	 		');
-				console.log('ooooooooooooooooooooooooooooooooooooooooooooooooooooopooo');
-
 				// done
 				callback(err);
 			});
@@ -325,28 +289,17 @@ module.exports = api.upload = {
 		async.waterfall(ops, function (err, result) {
 			if (err) console.log('oooooooo err!  chunked upload done err!!', err);
 			
-
-			console.log('ooooooooooooooooooooooooooooooooooooooooooooooooooooooooo');
-			console.log('ooooo 	       chunked upload done 		oooooo');
-			console.log('ooooooooooooooooooooooooooooooooooooooooooooooooooooopooo');
-
 			// clean up, remove chunks
-			console.log('removing done chunks in /data/tmp/');
 			var removePath = '/data/tmp/resumable-' + uniqueIdentifier + '.*';
 			fs.remove(removePath, console.log);
 
 			// clean up redis count
-			console.log('removing done chunks in redis', redis_id);
 			api.redis.del('done-chunks-' + redis_id, function (err) {
 				if (err) console.log('rem done chunks err!', err);
 			});
 		});
 		
 	},
-
-
-
-
 
 
 	_import : function (options, done) {
@@ -359,11 +312,7 @@ module.exports = api.upload = {
 		    file_id = uploadStatus.file_id,
 		    project_id = body.projectUuid;
 
-
-		console.log('at 43', access_token);
-
 		var ops = [];
-
 
 		// import data
 		ops.push(function (callback) {
@@ -408,14 +357,12 @@ module.exports = api.upload = {
 			api.upload.updateStatus(file_id, {
 				processing_success : true,
 				status : 'Done', 
-				// file_id : file_id
 			}, callback);
 		});
 
 
 		// create default layer (layer model + pile layer)
 		ops.push(function (callback) {
-
 
 			var layerOptions = {
 				"geom_column": "the_geom_3857",
@@ -434,9 +381,8 @@ module.exports = api.upload = {
 				"projectUuid" : project_id
 			}
 
-
+			// create pile layer
 			api.layer.createPileLayer(layerOptions, function (err, pileLayer) {
-				console.log('CREATED PILE LAYER 2 ', err, pileLayer);
 
 				// set upload status
 				api.upload.updateStatus(file_id, {
@@ -459,8 +405,6 @@ module.exports = api.upload = {
 
 					api.layer.createModel(options, function (err, doc) {
 
-						console.log('created model111', err, doc);
-
 						// set upload status
 						api.upload.updateStatus(file_id, {
 							default_layer_model : doc.uuid,
@@ -479,13 +423,11 @@ module.exports = api.upload = {
 			
 			// if err, set upload status, return
 			if (err) {
-				console.log('lakdsmadlskmdsalkdasm ERR');
 				return api.upload.updateStatus(file_id, { // todo: more specific error reporting
 					error_code : 1, 
 					error_text : err,
 					status : 'Failed'
 				}, function (err) {
-					console.log('some errororororo');
 				});
 			}
 
@@ -494,11 +436,6 @@ module.exports = api.upload = {
 				file_id : file_id,
 				user_id : user._id
 			});
-
-			console.log('ooooooooooooooooooooooooooooooooooooooooooooooooooooooooo');
-			console.log('ooooo 	       _import done (1)  		oooooo');
-			console.log('ooooooooooooooooooooooooooooooooooooooooooooooooooooopooo');
-			console.log('uploadStatus: ', uploadStatus);
 
 			// all done
 			done(err);
@@ -510,11 +447,7 @@ module.exports = api.upload = {
 
 
 	_notifyProcessingDone : function (options) {
-
-		console.log('_notifyProcessingDone', options);
-
 		api.socket.processingDone(options)
-
 	},
 
 
@@ -523,8 +456,6 @@ module.exports = api.upload = {
 	// after upload, calling this to get results
 	getUpload : function (req, res) {
 
-		console.log('req.query', req.query);
-		
 		var file_id = req.query.fileUuid || req.query.file_id,
 		    ops = [];
 
@@ -535,14 +466,11 @@ module.exports = api.upload = {
 		var key = 'uploadStatus:' + file_id;
 		api.redis.get(key, function (err, uploadStatus) {
 
-			console.log('api.upload.getUpload: uploadStatus', uploadStatus);
-
 			var status = JSON.parse(uploadStatus);
 
 			if (!status) return api.error.genera(req, res, 'no such upload status id');
 
 			var layer_id = status.default_layer_model;
-
 			
 			var ops = {};
 
@@ -553,32 +481,24 @@ module.exports = api.upload = {
 				.exec(function (err, file) {
 					if (err) return api.error.general(req, res, err);
 
-					console.log('classic man', err, file);
 					callback(null, file);
-
-					// res.end(JSON.stringify(file));
 				});
 
 			}
 
 			ops.layer = function (callback) {
 
-				console.log('trying to find layer: ', layer_id);
 
 				Layer
 				.findOne({uuid : layer_id})
 				.exec(function (err, layer) {
 					if (err) return api.error.general(req, res, err);
 
-					console.log('classic man22', err, layer);
 					callback(null, layer);
-
-					// res.end(JSON.stringify(file));
 				});
 			}
 
 			ops.project = function (callback) {
-
 				callback(null, status.added_to_project);
 			}
 
@@ -586,18 +506,9 @@ module.exports = api.upload = {
 				res.end(JSON.stringify(result));
 			});
 
-
-
 		});
-
-
-
 		
 	},
-
-
-
-
 
 
 	_createFileModel : function (file_id, done) {
@@ -630,9 +541,6 @@ module.exports = api.upload = {
 
 	updateStatus : function (file_id, status, callback) {
 		
-
-		console.log('saving upload status', file_id, status);
-
 		var file_id_key = 'uploadStatus:' + file_id;
 		api.redis.get(file_id_key, function (err, uploadStatusJSON) {
 			if (err) return callback && callback(err);
@@ -646,12 +554,6 @@ module.exports = api.upload = {
 			// save upload status
 			api.redis.set(file_id_key, JSON.stringify(uploadStatus), function (err) {
 
-				// expire if set
-				// if (status.expire) api.redis.expire(file_id_key, status.expire);
-				
-
-				console.log('mofo callback -> ', file_id, status, callback);
-
 				// return
 				callback && callback(err);
 			});
@@ -664,10 +566,7 @@ module.exports = api.upload = {
 		var file_id = req.query.file_id,
 		    file_id_key = 'uploadStatus:' + file_id;
 
-		console.log('file_id_key', file_id_key);
-
 		api.redis.get(file_id_key, function (err, uploadStatus) {
-			console.log('err, uploadStatus', err, uploadStatus);
 			if (err) return api.error.general(req, res, err);
 
 			// return upload status
@@ -819,14 +718,12 @@ module.exports = api.upload = {
 		api.redis.keys('done-chunk*', function(err, rows) {
 			rows.forEach(function (row) {
 				if (row) api.redis.del(row);
-				// console.log('deleted row'.red, row);
 			});
 		});
 	},
 
 	chunkedCheck : function (req, res) {
 		r.get(req, function(status, filename, original_filename, identifier){
-			console.log('chunkCHck', status, filename, original_filename, identifier);
 			res.send((status == 'found' ? 200 : 201), status);
 		});
 	},
@@ -841,8 +738,6 @@ module.exports = api.upload = {
 		    projectUuid = options.projectUuid,
 		    fileArray = [incomingFile],
 		    ops = [];
-
-		// console.log('implortFile'.green, incomingFile, options);
 
 		// sort files
 		ops.push(function (callback) {
@@ -934,8 +829,6 @@ module.exports = api.upload = {
 
 
 		entries.forEach(function (entry) {
-
-			console.log('>>> entries for each >>>'.red, entry.file);
 
 			// set meta
 			entry.uuid = entry.file; 
