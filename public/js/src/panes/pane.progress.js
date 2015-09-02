@@ -27,10 +27,11 @@ Wu.ProgressPane = Wu.Class.extend({
 
 	setProgress : function (percent) {
 		if (percent < this._current + 2) return;
-
+		
 		var bar = this._progressBar;
 		bar.style.opacity = 1;
 		bar.style.width = percent + '%';
+		bar.style.backgroundColor = 'red';
 		this._current = percent;
 	},
 
@@ -63,8 +64,6 @@ Wu.ProgressPane = Wu.Class.extend({
 
 	_timedProgress : function (percent, delay, steps) {
 		var that = this;
-
-		console.log('timedprogress', percent, delay, steps);
 
 		// set progress to percent after delay
 		percent = percent + (100/steps);

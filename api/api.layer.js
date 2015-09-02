@@ -39,8 +39,6 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
-// console.log('lauyer');
-
 // exports
 module.exports = api.layer = { 
 
@@ -50,10 +48,8 @@ module.exports = api.layer = {
 
 
 		var options = req.body;
-		console.log('CREATE 0---- layer', options);
 
 		api.layer.createModel(options, function (err, doc) {
-			console.log('created Mode err? ', err, doc);
 			if (err) return api.error.general(res, err);
 
 			res.json(doc);
@@ -101,10 +97,6 @@ module.exports = api.layer = {
 
 		// callback
 		function (err, response, body) {
-			// console.log('err', err);
-
-			console.log('callback from pile!! ->> err, body', err, body);
-
 			callback(err, body);
 
 		});
@@ -373,8 +365,6 @@ module.exports = api.layer = {
 	// set carto css
 	setCartoCSS : function (req, res) {
 
-		// console.log('setCartoCSS!'.yellow);
-
 		// get params
 		var fileUuid 	= req.body.fileUuid,
 		    css 	= req.body.css,
@@ -386,11 +376,8 @@ module.exports = api.layer = {
 
 		var host = api.config.vile.uri;
 
-		// console.log('host: ', host);
-
 		// save css to file by cartoId 
 		fs.writeFile(csspath, css, {encoding : 'utf8'}, function (err) {
-			// console.log('write err?', err);
 			if (err) return api.error.general(req, res);
 
 			// send to tileserver storage
@@ -406,7 +393,6 @@ module.exports = api.layer = {
 
 			// callback
 			function (err, response, body) {
-				// console.log('err', err);
 
 				// custom error handling
 				if (err) {
@@ -510,8 +496,6 @@ module.exports = api.layer = {
 
 	createModel : function (options, callback) {
 
-		console.log('api.layer.createModel'.red, options);
-
 		var layer 		= new Layer();
 		layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),
 		layer.title 		= options.title;
@@ -536,8 +520,6 @@ module.exports = api.layer = {
 
 	// save file to project (file, layer, project id's)
 	addToProject : function (layer_id, projectUuid, callback) {
-
-		console.log('===> ADD LAYER TO PROJECT', layer_id);
 
 		Project
 		.findOne({'uuid' : projectUuid })
