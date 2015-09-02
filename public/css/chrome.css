@@ -84,3 +84,133 @@ section.map.mode-edit div.polygon-elbow {
 .layer-item-movers-wrap {
     /*pointer-events: none;*/
 }
+
+
+
+
+
+/* TOOLTIP FIELDS */
+/* TOOLTIP FIELDS */
+/* TOOLTIP FIELDS */
+
+.chrome-tooltip-field-wrapper {
+    padding: 0px 30px 200px 30px;
+    }
+
+.chrome-tooltip-metafield-line {
+    border-top: 1px solid #999;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 14px;    
+    }
+
+.chrome-tooltip-metafield-line:last-child {
+    border-bottom: 1px solid #999;    
+    }
+
+input.chrome-tooltip-field-input {
+    border: none;
+    }
+
+.chrome-switch-container {
+    width: 29px;
+    height: 16px;
+    background-color: white;
+    border-radius: 20px;
+    top: 2px;
+    float: left;
+    margin-right: 10px;    
+    position: relative;
+    box-shadow: 0 0 1px 0 rgba(0,0,0,0.5) inset;
+    cursor: pointer;
+    overflow: visible;
+    -webkit-transition: background-color 100ms;
+    -moz-transition: background-color 100ms;
+    -ms-transition: background-color 100ms;
+    -o-transition: background-color 100ms;
+    transition: background-color 100ms;
+    }
+
+.right-switch {
+    float: right;
+    margin-left: 10px;
+    margin-right: 0;
+    }    
+
+.chrome-switch-container:before {
+    content: '';
+    position: absolute;
+    background-color: white;
+    left: 0;
+    width: 15px;
+    height: 15px;
+    border-radius: 20px;
+    box-shadow: 0 0 1px 0 rgba(0,0,0,0.1) inset, 1px 1px 2px 0 rgba(0,0,0,0.3);
+    -webkit-transition: left 100ms;
+    -moz-transition: left 100ms;
+    -ms-transition: left 100ms;
+    -o-transition: left 100ms;
+    transition: left 100ms;
+    }    
+
+.chrome-switch-container.switch-on {
+    background-color: #71c4a8;
+    }
+
+.chrome-switch-container.switch-on:before {
+    left: 15px;
+    }
+
+.chrome-content-header {
+    font-weight: 900;
+    font-size: 14px;
+    margin-bottom: 5px;    
+    }
+
+.chrome-content-header-gray {
+    font-style: italic;
+    color: #999;
+    font-weight: 500;    
+    }
+
+.chrome-content-section-wrapper {
+    margin-bottom: 20px;
+    }
+
+
+
+
+.chrome-content.settings-tabs-wrapper {
+    position: absolute;
+    top: 112px;
+    padding-top: 8px;
+    max-height: 100%;
+    overflow: scroll;
+    }
+
+
+.chrome-content-tooltip-title-field,
+.chrome-content-tooltip-title-field:focus {
+    width: 100%;
+    border: 1px solid #ccc !important;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    }
+
+
+.chrome-tooltip-field-mini-input,
+.chrome-tooltip-field-mini-input:focus {
+    width: 28px;
+    height: 17px;
+    position: relative;
+    float: right;
+    border: 1px solid #ccc !important;
+    top: 1px;
+    text-align: center;
+    line-height: 1.2;
+    font-size: 12px;
+    }
+
+
+    

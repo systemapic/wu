@@ -191,7 +191,29 @@ module.exports = function(grunt) {
 					'public/js/lib/opentip/opentip-native.js',
 					'public/js/lib/jss.js/jss.js',	
 					'public/js/lib/keymaster/keymaster.js',	
-					'public/js/lib/moment.js/moment.min.js'		
+					'public/js/lib/moment.js/moment.min.js',
+
+					'public/js/src/chrome/chrome.js',
+					'public/js/src/chrome/chrome.top.js',
+					'public/js/src/chrome/chrome.bottom.js',
+					'public/js/src/chrome/chrome.left.js',
+					'public/js/src/chrome/chrome.right.js',
+					'public/js/src/chrome/chrome.center.js',
+
+					// chrome
+					// 'public/js/src/chrome/chrome.js',
+					// 'public/js/src/chrome/chrome.top.js',
+					// 'public/js/src/chrome/chrome.bottom.js',
+					// 'public/js/src/chrome/chrome.left.js',
+					// 'public/js/src/chrome/chrome.right.js',
+
+					// 'public/js/src/chrome/right_content/chrome.right.content.js',
+					// 'public/js/src/chrome/right_content/chrome.right.content.cartocss.js',
+					// 'public/js/src/chrome/right_content/chrome.right.content.layers.js',
+					// 'public/js/src/chrome/right_content/chrome.right.content.styler.js',
+					// 'public/js/src/chrome/right_content/chrome.right.content.tooltip.js',
+
+
 
 				],
 				
