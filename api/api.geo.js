@@ -327,7 +327,14 @@ module.exports = api.geo = {
 		for (s in shapes) {
 			var shape_part = shapes[s];
 			if (shape_part && shape_part.slice(-4) == '.shp') {
-				if (!shape_part.slice(0,1) != '.') {
+
+				console.log('shape_part: ', shape_part);
+
+				var basename = nodepath.basename(shape_part);
+
+				console.log('basnemae: ', basename);
+
+				if (basename.slice(0,1) != '.') {
 					shps.push(shape_part);
 				}
 			}
@@ -349,7 +356,7 @@ module.exports = api.geo = {
 
 				console.log('basnemae: ', basename);
 
-				if (!basename.slice(0,1) != '.') {
+				if (basename.slice(0,1) != '.') {
 					shps.push(shape_part);
 				}
 			}

@@ -176,7 +176,7 @@ module.exports = api.postgis = {
 		// import with bash script
 		ops.push(function (srid, callback) {
 
-			var srid_converted = srid.srid + ':3857';  // convert on import. todo: create the_geom + the_geom_webmercator columns after import instead
+			var srid_converted = srid.srid;// + ':3857';  // convert on import. todo: create the_geom + the_geom_webmercator columns after import instead
 
 			// create database script
 			var cmd = [
@@ -575,6 +575,7 @@ module.exports = api.postgis = {
 				var json = results.rows[0];
 
 				console.log('json_SIZEE: ', json);
+				
 				metadata.size_bytes = json.pg_size_pretty;
 
 				callback();
@@ -586,7 +587,6 @@ module.exports = api.postgis = {
 
 
 		async.series(ops, function (err, results) {
-			console.log('ALL META DONE-=>>>', metadata);
 			done(err, metadata);
 		});
 	},

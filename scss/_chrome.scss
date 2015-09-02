@@ -1,0 +1,398 @@
+/* CHROME CHROME CHROME CHROME CHROME CHROME CHROME CHROME */
+/* CHROME CHROME CHROME CHROME CHROME CHROME CHROME CHROME */
+/* CHROME CHROME CHROME CHROME CHROME CHROME CHROME CHROME */
+
+
+/* TOP TOP TOP */
+/* TOP TOP TOP */
+/* TOP TOP TOP */
+
+.chrome-top {
+    background: white;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 35px;
+    width: 100%;
+    z-index: 9999999999;
+    }
+
+/* TOP: Menu button */
+.chrome-menu-button {
+    position: absolute;
+    width: 42px;
+    height: 35px;
+    border-right: 1px dashed #A6A6A6;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+    z-index: 200;
+    }
+
+.chrome-menu-button:before {
+    content: '';
+    background-image: url(images/systemapic-sprite.png);
+    background-repeat: no-repeat;
+    background-position: 1px -43px;
+    position: absolute;
+    width: 42px;
+    height: 35px;
+    top: 0;
+    left: 0;
+    opacity: 0.5;
+    }
+
+.chrome-menu-button.active:before,
+.chrome-menu-button:hover:before {
+    opacity: 1;
+    }
+
+/* TOP: Logo */
+.chrome-portal-logo {
+    position: relative;
+    left: 50px;
+    top: 4px;    
+    }
+
+.chrome-top:before {
+    content: '';
+    background: black;
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    top: 35px;
+    z-index: 0;
+    opacity: 0.2;
+    }
+
+/* TOP: Project title */
+.chrome-project-title {
+    width: 100%;
+    position: absolute;
+    top: 7px;
+    left: 0;
+    text-align: center;
+    font-size: 14px;
+    color: #999;
+    }
+
+/* TOP: username */
+.username-container {
+    font-size: 14px;
+    color: #999;
+    top: 7px;
+    right: 11px;
+    }
+
+.username-container,
+.username-container .top-username,
+.username-container .top-logout,
+.username-container .top-divider {
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    }
+
+.username-container .top-username,
+.username-container .top-logout {
+    cursor: pointer;
+    }
+
+.username-container .top-username:hover,
+.username-container .top-logout:hover {
+    color: #333;
+    }
+
+/* TOP RIGHT BUTTONS */
+.chrome-buttons {
+    position: absolute;
+    width: 100%;
+    height: 35px;
+    text-align: right;
+    top: 0;
+    z-index: 100;
+    }
+
+.chrome-button {
+    background-image: url(images/systemapic-sprite.png);
+    background-repeat: no-repeat;    
+    position: relative;
+    width: 30px;
+    height: 35px;
+    display: inline-block;
+    vertical-align: top;    
+    margin-right: 5px;
+    opacity: 0.5;
+    cursor: pointer;
+    }
+
+.chrome-button.active,
+.chrome-button:hover {
+    opacity: 1;
+    }
+
+.chrome-button.cartoeditor {
+    background-position: -6px -3px;
+    }
+
+.chrome-button.layerbutton {
+    background-position: -44px -2px;
+    }
+
+.chrome-layer-button-arrow {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: 35px;
+    right: 8px;
+    background: white;
+    display: none;
+    -ms-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    }
+
+.chrome-button.layerbutton.active .chrome-layer-button-arrow {
+    /*display: block;*/
+    }    
+
+
+/* RIGHT RIGHT RIGHT */
+/* RIGHT RIGHT RIGHT */
+/* RIGHT RIGHT RIGHT */
+
+.chrome-right {
+    background: white;
+    position: absolute;
+    right: 0;
+    top: 35px;
+    height: 100%;
+    width: 0;
+    z-index: 99999999999;
+    }
+
+.chrome.chrome-content.styleditor.header {
+    width: 100%;
+    height: 80px;
+    background: #F76F6F;
+    }
+
+.chrome.chrome-content.styleditor.title {
+    font-size: 28px;
+    padding: 5px;
+    }
+
+.chrome.chrome-content.styleditor.subtitle {
+    font-size: 16px;
+    padding: 5px;
+    }
+
+.chrome.chrome-content.styleditor.tabs-container {
+    height: 30px;
+    width: 100%;
+    background: #AAFFAA;
+    border-top: 1px solid grey;
+    }
+
+.chrome.chrome-content.styleditor.tab {
+    width: 30%;
+    height: 100%;
+    position: relative;
+    background: red;
+    float: left;
+    }
+
+.chrome.chrome-content.styleditor.tab.fullauto {
+    background: blue;
+    }
+
+.chrome.chrome-content.styleditor.tab.sql {
+    background: cyan;
+    }
+
+.chrome.chrome-content.styleditor.tab.open {
+    width: 40%;
+    }
+
+.chrome-content.settingsSelector { 
+    position: relative;
+    padding-bottom: 20px;
+    width: 100%;
+    border-bottom: 1px dashed #ccc;
+    }
+
+.chrome-content.settings-button-wrapper {
+    margin-left: 20px;
+    }
+
+.chrome-content.settings-button {
+    background: #ccc;
+    width: auto;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    padding: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-right: 4px;
+    font-weight: 500;
+    color: black;
+    cursor: pointer;
+    margin-top: 4px;
+    font-size: 15px;
+    }
+
+.chrome-content.settings-button:hover {
+    background: #bbb;
+    }
+
+.chrome-content.settings-title {
+    font-size: 18px;
+    margin: 5px;
+    margin-left: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 0;
+    margin-top: 8px;
+    }
+
+.chrome-content.settings-tabs-wrapper {
+    position: absolute;
+    top: 120px;
+    }
+
+.chrome-content.active-layer.title {
+    font-size: 15px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    }
+
+.chrome-content.active-layer.select-wrap {
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    min-width: 312px;
+    max-width: 360px;
+    border-radius: 3px;
+    overflow: hidden;
+    background-color: #fff;
+    position: relative;
+    z-index: 100;
+    }
+
+.chrome-content.active-layer.select-wrap:before {
+    content: '';
+    background: white;
+    position: absolute;
+    right: 0;
+    width: 20px;
+    top: 4px;
+    height: 20px;
+    z-index: 101;
+    background: #fff url("images/arrowdown.gif") no-repeat;
+    pointer-events: none;
+    }
+
+.chrome-content.active-layer.select-wrap select {
+    padding: 5px 8px;
+    width: 130%;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    background-image: none;
+    -webkit-appearance: none;
+       -moz-appearance: none;
+            appearance: none;
+    }
+
+.chrome-content.active-layer.select-wrap select:focus {
+    outline: none;
+    }
+
+.chrome-content.settings-button.active-tab {
+    background: #78a09c;
+    color: white;
+    }
+
+.chrome-content.settings-button.active-tab:hover {
+    background: #6C8E8B;
+    }
+
+.chrome.chrome-content.styler {
+    margin-top: 5px;
+    }
+
+.chrome-right {
+    border-top: 1px solid #999;
+    }
+
+.chrome-right:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -2px;
+    width: 2px;
+    height: 100%;
+    background: black;
+    opacity: 0.2;
+    }
+
+.chrome.chrome-content.cartocss.refresh-button {
+    width: 200px;
+    height: 35px;
+    background: #FF5E5E;
+    border-radius: 3px;
+    text-align: center;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto;
+    padding: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+    }
+
+.chrome.chrome-content.cartocss.refresh-button:hover {
+    background: red;
+    }
+
+.chrome.chrome-content.cartocss.title {
+    font-size: 15px;
+    margin: 5px;
+    margin-top: 20px;
+    margin-left: 20px;
+    opacity: 0;
+    transition: opacity 0.5s linear;
+    }
+
+.chrome.chrome-content.styler-content.active-layer.wrapper {
+    margin: 20px;
+    margin-top: 5px;
+    }
+
+
+/* CODE MIRROR */
+
+.CodeMirror { 
+        height: 100%;
+        border: 1px solid #ddd;
+        visibility: visible !important;
+        position: relative !important;
+        top: 0 !important;
+        -webkit-transition: opacity 0.5s linear;
+        -moz-transition: opacity 0.5s linear;
+        -ms-transition: opacity 0.5s linear;
+        -o-transition: opacity 0.5s linear;
+        transition: opacity 0.5s linear;
+        opacity: 0;
+        background: white;
+        font-size: 12px;    
+        }
+
+.CodeMirror pre { 
+        padding-left: 7px; 
+        line-height: 1.25; 
+        }
+
+.span.cm-carto-valid-identifier {
+    color: #353535;
+    }

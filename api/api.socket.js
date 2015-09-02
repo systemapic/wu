@@ -42,6 +42,19 @@ module.exports = api.socket = {
 
 	_processing : {},
 
+
+	getServerStats : function (req) {
+
+		// get stats from redis
+		api.redis.lrange('server_stats', 0, 0, function (err, range) {
+			var stats = api.utils.parse(range);
+			req.io.socket.emit('server_stats', {
+				server_stats : stats
+			});
+		});
+
+	},
+
 	sendError : function (userId, err) {
 		var sock = api.socket._getSocket(userId);
 

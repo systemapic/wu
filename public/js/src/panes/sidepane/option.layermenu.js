@@ -155,8 +155,8 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 
 
 		var min = _.size(this.project.getBaselayers());
-		var padding = this.numberOfProviders * 35;
-		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
+		var padding = this.numberOfProviders * 30;
+		this.maxHeight = (_.size(this.project.layers) - min) * 30 + padding;
 		this.minHeight = 0;
 
 		// add 100 if in editMode

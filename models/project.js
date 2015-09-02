@@ -120,15 +120,15 @@ var projectSchema = mongoose.Schema({
 		zoom 		: { type: Boolean, default: true  },
 		measure 	: { type: Boolean, default: true  },
 		description 	: { type: Boolean, default: true  },
-		draw 		: { type: Boolean, default: false },
+		mouseposition 	: { type: Boolean, default: true  },
 		layermenu 	: { type: Boolean, default: true  },
-		legends 	: { type: Boolean, default: false  },
-		inspect 	: { type: Boolean, default: false  },
+		draw 		: { type: Boolean, default: false },
+		legends 	: { type: Boolean, default: false },
+		inspect 	: { type: Boolean, default: false },
 		geolocation 	: { type: Boolean, default: false },
 		vectorstyle 	: { type: Boolean, default: false },
-		mouseposition 	: { type: Boolean, default: false },
 		baselayertoggle : { type: Boolean, default: false },
-		cartocss 	: { type: Boolean, default: false  }
+		cartocss 	: { type: Boolean, default: false }
 	},
 
 	settings : {
@@ -148,6 +148,8 @@ var projectSchema = mongoose.Schema({
 
 	// 
 	state : String,
+
+	pending : [String],
 	
 });
 
