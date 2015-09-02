@@ -56,8 +56,6 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 	       	sortedLayers.forEach(function (provider) {
 
-	       		console.log('prioveder:', provider);
-
 	       		this.addProvider(provider.key);
 
 	       		provider.layers.forEach(function (layer) {

@@ -1,19 +1,11 @@
 // Move all pop-ups to model.D3List.js
 Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
-	_ : 'sidepane.datalibrary', 
 	
+	_ : 'sidepane.datalibrary', 
 	type : 'dataLibrary',
 	title : 'Data <br> Library',
+	
 	sortDirection : {},
-
-
-	//  ██████╗ ███████╗███╗   ██╗███████╗██████╗  █████╗ ██╗     
-	// ██╔════╝ ██╔════╝████╗  ██║██╔════╝██╔══██╗██╔══██╗██║     
-	// ██║  ███╗█████╗  ██╔██╗ ██║█████╗  ██████╔╝███████║██║     
-	// ██║   ██║██╔══╝  ██║╚██╗██║██╔══╝  ██╔══██╗██╔══██║██║     
-	// ╚██████╔╝███████╗██║ ╚████║███████╗██║  ██║██║  ██║███████╗
-	//  ╚═════╝ ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
-	                                                           
 
 	_initContent : function () {
 
@@ -78,12 +70,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var tableOptions      		= { container : this._table, searchfield : this._search };
 		this._dataLibraryList 		= new Wu.DataLibraryList(tableOptions);
 
-		// init dropzone
-		// this.initDZ();
-
 		// add tooltip
-		app.Tooltip.add(this._menu, 'The data library contains all files uploaded to the project.');
-
+		// app.Tooltip.add(this._menu, 'The data library contains all files uploaded to the project.');
 
 		// add fullscreen drop 
 		this._resumableDrop = Wu.DomUtil.create('div', 'resumable-drop', app._appPane);
@@ -103,88 +91,150 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._uploader = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload');
 	},
 
-	_uploadProgress : function (a) {
-
-		console.log('uploadProgress', a);
-
-		var loaded = a.loaded;
-		var total = a.total;
-		var progress = (loaded/total) * 100;
-		console.log('uploadProgress', progress);
-		app.ProgressBar.setProgress(progress);
-	},
+	// _uploadProgress : function (a) {
+	// 	var loaded = a.loaded;
+	// 	var total = a.total;
+	// 	var progress = (loaded/total) * 100;
+	// 	console.error('uploadProgress', progress);
+	// 	app.ProgressBar.setProgress(progress);
+	// },
 
 
-	_checkPendingFiles : function () {
-		if (!this._project) return;
+	// _checkPendingFiles : function () {
+	// 	if (!this._project) return;
 
-		console.log('_checkPendingFiles', this._project.getName());
+	// 	console.log('_checkPendingFiles', this._project.getName());
 
-		var pending = this._project.getPendingFiles();
-		if (pending.length == 0) return console.log('no pending files...');
+	// 	var pending = this._project.getPendingFiles();
+	// 	if (pending.length == 0) return console.log('no pending files...');
 
-		// continue checking status of pending files
-		this._getFiles();
+	// 	// continue checking status of pending files
+	// 	this._getFiles();
 
-	},
+	// },
 
-	// check processing files
-	_getFiles : function () {
+	// // check processing files
+	// _getFiles : function () {
 
-		var files = this._project.getPendingFiles();
+	// 	var files = this._project.getPendingFiles();
 
-		var file_id = files[0];
+	// 	var file_id = files[0];
 
-		this._getFile(file_id, this._gotFile.bind(this));
+	// 	this._getFile(file_id, this._gotFile.bind(this));
+
+	// },
+
+	_socketNotificationOfDoneFile : function (file_id) {
+
+		var that = app.SidePane.DataLibrary;
+		that._getFile(file_id, that._gotFile.bind(that));
 
 	},
 
 	_getFile : function (file_id, callback) {
 		var xhr = new XMLHttpRequest();
 		var fd = new FormData();
-		var url = app.options.servers.portal + 'api/file/get';
+		var url = app.options.servers.portal + 'api/upload/get';
 		url += '?fileUuid=' + file_id;
 		url += '&access_token=' + app.tokens.access_token;
 
 		xhr.open("GET", url, true);
 		xhr.onreadystatechange = function() {
 			if(xhr.readyState == 4 && xhr.status == 200) {
-				var file = Wu.parse(xhr.responseText);
-				// console.log('FILE', file);
+				var fileObject = Wu.parse(xhr.responseText);
+
+				console.log('git sum: ', fileObject);
 
 				// return file
-				if (file) return callback(file);
+				if (fileObject && fileObject.file && fileObject.layer) return callback(fileObject);
 				
-				// loop until file is ready
-				setTimeout(function () {
-					app.SidePane.DataLibrary._getFile(file_id, callback); // loop
-				}, 1000);
+				// // loop until file is ready
+				// setTimeout(function () {
+				// 	app.SidePane.DataLibrary._getFile(file_id, callback); // loop
+				// }, 5000);
 			}
 		}
 		xhr.send(null);
 	},
 
-	_gotFile : function (file) {
-		console.log('_gotFile: ', file);
+	_gotFile : function (fileObject) {
+		console.log('_gotFile: ', fileObject);
+
+		var file = fileObject.file;
+		var layer = fileObject.layer;
+		var projectUuid = fileObject.project;
+
+		var project = app.Projects[projectUuid];
+		console.log('project: ', project, projectUuid);
+		if (!project) return console.error('no project to add file to');
 
 		// remove pending
-		this._project.removePendingFile(file.uuid);
+		project.removePendingFile(file.uuid);
 
-		// add file to lib
-		var dlib = app.SidePane.DataLibrary;
-		dlib._project.setFile(file);
-		dlib.reset();
-		dlib.refreshTable({
-			add: [file]
-		});
+		// add file/layer to project locally
+		project.setFile(file);
+		project.addLayer(layer);
+
+		// if project is active
+		if (project.getUuid() == app.activeProject.getUuid()) {
+			// active project
+			
+			console.log('THIS PROJECT');
+			this._addFile();
+
+			this._addLayer();
+		} else {
+			// some other project
+
+			console.log('OTHER PROJECT');
+
+		}
+
+		// feedback message
+		app.feedback.setMessage({
+			title : 'Done processing!',
+			description : 'Added <strong>' + layer.title + '</strong> to available layers in project ' + project.getTitle() + '.'
+		});	
+
+		// // add file to lib
+		// this._addFile(file);
+		
+		// // add layer 
+		// this._addLayer(layer);
+
 
 		// create default layer
-		dlib._createDefaultLayer(file);
+		// this._createDefaultLayer(file);
 
 		// reset progress
 		app.ProgressBar.hideProgress();
 
 
+	},
+
+	_addFile : function (file) {
+		this.reset();
+		this.refreshTable({
+			add: [file]
+		});
+	},
+
+	_addLayer : function () {
+
+		app.SidePane.Options.settings.layermenu.update();
+		app.SidePane.Options.settings.baselayer.update();
+
+		// refresh sidepane
+		app.SidePane.refreshMenu();
+
+		// refresh cartoCssControl
+		var ccss = app.MapPane.getControls().cartocss;
+		ccss && ccss._refresh();
+
+		// refresh chrome content
+		app.Chrome.Right._settingsSelector._refreshAll();
+
+		
 	},
 
 	_createDefaultLayer : function (file) {
@@ -211,8 +261,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// create postgis layer
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
-			console.log('api/db/createLayer', err, layerJSON);
 			var layer = Wu.parse(layerJSON);
+			console.log('api/db/createLayer', err, layer);
 
 			var options = {
 				projectUuid : this._project.getUuid(), // pass to automatically attach to project
@@ -265,40 +315,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		}.bind(this));
 	},
 
-	// uploadFile : function (file){
-	// 	var url = app.options.servers.portal + 'api/import';
-	// 	var xhr = new XMLHttpRequest();
-	// 	var fd = new FormData();
-	// 	xhr.open("POST", url, true);
-
-	// 	// event handlers
-	// 	var uploadProgress = app.SidePane.DataLibrary._upload.progress;
-	// 	var uploadComplete = app.SidePane.DataLibrary._upload.load;
-	// 	var uploadError = app.SidePane.DataLibrary._upload.error;
-	// 	var uploadAbort = app.SidePane.DataLibrary._upload.abort;
-		
-	// 	// set access_token on header
-	// 	xhr.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
-
-	// 	// events
-	// 	xhr.upload.addEventListener("progress", uploadProgress, false);
-	// 	xhr.addEventListener('load', uploadComplete, false);
-	// 	xhr.addEventListener('error', uploadError, false);
-	// 	xhr.addEventListener('abort', uploadAbort, false);
-		
-	// 	// file
-	// 	fd.append("data", file);
-
-	// 	// project
-	// 	fd.append('projectUuid', app.activeProject.getUuid());
-
-	// 	// send
-	// 	xhr.send(fd);
-	// },
-
-
 	// process file
 	uploaded : function (result) {
+
+		console.log('### UPLOADED!!!!!! ###');
+		console.log('uploaded(result)');
 
 		
 		// handle errors
@@ -473,7 +494,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		console.log('PRO SELECT', this._project);
 
 		// check pending
-		this._checkPendingFiles();
+		// this._checkPendingFiles();
 	},
 
 	_unload : function (e) {
@@ -540,29 +561,35 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		Wu.DomEvent.on(this._resumableDrop, 'dragleave', this._dragLeave, this);
 		Wu.DomEvent.on(this._resumableDrop, 'drop', this._dragLeave, this);
 	},
+	
 
+	// todo: move into own class (with refresh, etc)
 	_addResumable : function () {
 		if (!app.activeProject) return;
 
-		var projectUuid = app.activeProject.getUuid();
-
-		var file_id = 'file_' + Wu.Util.getRandomChars(20);
-
+		// create resumable
 		var r = this.r = new Resumable({
 			target : '/api/data/upload/chunked',
 			chunkSize : 2*1024*1024,
 			simultaneousUploads : 5,
 			generateUniqueIdentifier : function (file) {
-				var idr = file.size + '-' + file.lastModified + '-' + app.Account.getUuid() + '-'  + file.name;
+				var idr = file.size + '-' + file.lastModified + '-' + app.Account.getUuid() + '-'  + file.name + '-' + Wu.Util.getRandomChars(5);
 				return idr;
 			},
-			testChunks : true, // resumable chunks // todo: server side redis count not stable
-			throttleProgressCallbacks : 1,
+			testChunks : true, // resumable chunks 
 			query : {
 				fileUuid : Wu.Util.guid('r'),
-				projectUuid : projectUuid,
+				projectUuid : app.activeProject.getUuid(),
 				access_token : app.tokens.access_token,
-				file_id : file_id
+				file_id : 'file_' + Wu.Util.getRandomChars(18) + 'ko'
+			},
+
+			// max one upload at a time
+			maxFiles : 1,
+			maxFilesErrorCallback : function () {
+				app.feedback.setError({
+					title : 'Please only upload one file at a time.',
+				});	
 			},
 
 			// accepted filetypes
@@ -571,11 +598,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			fileTypeErrorCallback : function (file, errorCount) {
 
 				// set feedback
-				var description = 'The file <strong>' + file.name + '</strong> is not a geodata file. To upload normal images or documents, use the "Upload image/document button".';
+				var description = 'The file <strong>' + file.name + '</strong> is not a geodata file. We only allow geodata at this time.';
 				var filetype = file.name.split('.').reverse()[0];
 				
 				// custom shapefile feedback
-				if (filetype == 'shp') description = 'Please zip shapefiles before uploading. Mandatory files are .shp, .shx, .dbf.';
+				if (filetype == 'shp') description = 'Please zip shapefiles before uploading. Mandatory files are .shp, .shx, .dbf, .prj.';
 
 				// show feedback message
 				app.feedback.setError({
@@ -625,6 +652,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		r.on('fileSuccess', function(file, message){
 			console.log('r.success', file, message);
 
+			// get file_id
+			var m = Wu.parse(message);
+			var file_id = m.file_id;
+
 			var endTime 	= new Date().getTime(),
 			    startTime 	= r._startTime,
 			    totalTime 	= (endTime - startTime) / 1000,
@@ -637,7 +668,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 			message +=' <br><br>Pre-processing will take approx. ' + procTime;
 
 			// set feedback
-			app.feedback.setMessage({
+			app.feedback.setSuccess({
 				title : 'Upload success!',
 				description : message,
 				id : file.uniqueIdentifier
@@ -648,7 +679,10 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 			
 			// add pending processing
-			this._addPendingFile(file_id);
+			// this._addPendingFile(file_id);
+
+			// refresh resumable for next download
+			this._refreshResumable();
 
 		}.bind(this));
 
@@ -659,7 +693,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		r.on('fileProgress', function(file){
 			var progress = file.progress() * 100;
 			app.ProgressBar.setProgress(progress);
-			console.log('progress: ', progress);
 		});
 
 		r.on('cancel', function(){

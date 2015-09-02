@@ -314,6 +314,18 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	},
 
 
+	show : function () {
+		if (!this._inited) this._initLayout();
+
+		// hide others
+		this.hideAll();
+
+		// show this
+		this._container.style.display = 'block';
+
+		// mark button
+		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+	},
 
 
 
@@ -353,7 +365,19 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 	_flush : function () {
 		this._container.innerHTML = '';
 	},
+	
+	show : function () {
+		if (!this._inited) this._initLayout();
 
+		// hide others
+		this.hideAll();
+
+		// show this
+		this._container.style.display = 'block';
+
+		// mark button
+		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+	},
 
 	open : function () {
 		console.log('open!', this);
@@ -820,6 +844,19 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		this._refreshButton.style.opacity = 0;
 	},
 
+	show : function () {
+		if (!this._inited) this._initLayout();
+
+		// hide others
+		this.hideAll();
+
+		// show this
+		this._container.style.display = 'block';
+
+		// mark button
+		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+	},
+
 
 });
 
@@ -854,7 +891,21 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 	
 	open : function () {
 		console.log('open!', this);
-	}
+	},
+
+	show : function () {
+		if (!this._inited) this._initLayout();
+
+		// hide others
+		this.hideAll();
+
+		// show this
+		this._container.style.display = 'block';
+
+		// mark button
+		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+	},
+
 
 });
 
