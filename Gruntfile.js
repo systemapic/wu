@@ -266,6 +266,8 @@ module.exports = function(grunt) {
 					'public/js/src/controls/control.spinningmap.js',
 					'public/js/src/controls/control.freedraw.js',
 
+					'public/js/src/controls/control.chart.js',					
+
 					// Models 
 					'public/js/src/models/model.projects.js',
 					'public/js/src/models/model.clients.js',
