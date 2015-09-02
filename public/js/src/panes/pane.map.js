@@ -776,6 +776,11 @@ Wu.MapPane = Wu.Pane.extend({
 
 	_addPopupContent : function (e, multiPopUp) {
 
+
+		console.log('%c****************', 'backgroun: blue; color: white;');
+		console.log('%c_addPopupContent', 'backgroun: red; color: white;');
+		console.log('%c****************', 'backgroun: blue; color: white;');
+
 		
 		var options = {};
 		this._chart = new Wu.Control.Chart(options);
@@ -909,6 +914,7 @@ Wu.MapPane = Wu.Pane.extend({
 
 
 	_createPopupContentC3 : function (e) {
+
 		var _retHTML = this.singlePopUp(e);
 		return _retHTML;
 	},
@@ -1105,6 +1111,8 @@ Wu.MapPane = Wu.Pane.extend({
 	// RETURNS HTML WITH CHART – RUNS NO FUNCTION
 	// Pretty much OK => just need to fix "moment" time
 	initC3Chart : function (c3Obj) {
+
+
 
 		var data = c3Obj.d3array;
 
