@@ -154,8 +154,8 @@ module.exports = function(app, passport) {
 	// #####################################
 
 
-	app.get('/api/file/get', passport.authenticate('bearer', {session: false}), function (req, res) {
-		api.file.getFile(req, res);
+	app.get('/api/upload/get', passport.authenticate('bearer', {session: false}), function (req, res) {
+		api.upload.getUpload(req, res);
 	});
 
 

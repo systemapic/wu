@@ -219,7 +219,7 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 	},
 
 	setDescription : function () {
-		this._description.innerHTML = this.options.description;
+		this._description.innerHTML = this.options.description || '';
 	},
 
 	setIcon : function () {

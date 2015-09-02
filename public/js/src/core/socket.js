@@ -65,7 +65,10 @@ Wu.Socket = Wu.Class.extend({
 			// }
 		});
 		socket.on('processingDone', function (data) {
-			console.log('processingDone!', data);
+			console.log('processingDone!!!', data);
+
+			var file_id = data.file_id;
+			app.SidePane.DataLibrary._socketNotificationOfDoneFile(file_id)
 
 			// var size = Wu.Util.bytesToSize(data.size),
 			//     elapsed = data.elapsed,

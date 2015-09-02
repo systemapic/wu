@@ -198,7 +198,7 @@ module.exports = api.postgis = {
 				var endTime = new Date().getTime();
 
 				// set import time to status
-				api.upload.updateStatus(options.file_id, { 	// todo: set err if err
+				api.upload.updateStatus(file_id, { 	// todo: set err if err
 					data_type : 'vector',
 					import_took_ms : endTime - startTime,
 					table_name : file_id,
@@ -229,7 +229,7 @@ module.exports = api.postgis = {
 				var metadataJSON = JSON.stringify(metadata);
 				
 				// set upload status
-				api.upload.updateStatus(options.file_id, {
+				api.upload.updateStatus(file_id, {
 					metadata : metadataJSON
 				}, callback);
 			})
@@ -247,7 +247,7 @@ module.exports = api.postgis = {
 				if (err) return callback(err);
 				
 				// set upload status
-				api.upload.updateStatus(options.file_id, {
+				api.upload.updateStatus(file_id, {
 					rows_count : result.rows[0].count
 				}, callback);
 			});
@@ -312,7 +312,7 @@ module.exports = api.postgis = {
 			api.postgis.importShapefile(options, function (err, results) {
 
 				// set upload status
-				api.upload.updateStatus(options.file_id, {
+				api.upload.updateStatus(file_id, {
 					original_format : 'GeoJSON',
 				}, function () {
 					// return
@@ -351,7 +351,7 @@ module.exports = api.postgis = {
 			var endTime = new Date().getTime();
 
 			// set err on upload status
-			if (err) return api.upload.updateStatus(options.file_id, {
+			if (err) return api.upload.updateStatus(file_id, {
 				error_code : 2,
 				error_text : err
 			}, function () {
@@ -361,7 +361,7 @@ module.exports = api.postgis = {
 
 
 			// set upload status
-			api.upload.updateStatus(options.file_id, {
+			api.upload.updateStatus(file_id, {
 				data_type : 'raster',
 				original_format : original_format,
 				import_took_ms : endTime - startTime,

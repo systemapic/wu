@@ -88,11 +88,16 @@ module.exports = api.socket = {
 		// console.log('processingDone'.yellow);
 		console.log('SOCKET: processingDone');
 
-		var userId = api.socket._getUserId(options);
-		var sock = api.socket._getSocket(userId);
+		var file_id = options.file_id,
+		    user_id = options.user_id;
+
+		// var userId = api.socket._getUserId(options);
+		var sock = api.socket._getSocket(user_id);
 
 		// send to user
-		sock && sock.emit('processingDone', options.result);
+		sock && sock.emit('processingDone', {
+			file_id : file_id
+		});
 	},
 
 	grindRasterDone : function (req, res) {

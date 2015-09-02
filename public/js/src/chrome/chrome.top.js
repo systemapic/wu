@@ -228,7 +228,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_setPortalLogo : function () {
 
-		this._portalLogoImg.src = 'https://dev2.systemapic.com/css/images/globesar-web-logo.png';
+		this._portalLogoImg.src = app.options.servers.portal + 'css/images/globesar-web-logo.png';
 		// this._portalLogoImg = Wu.DomUtil.create('img', '', this._portalLogo);
 		// this._portalLogoImg.src = 'https://dev2.systemapic.com/css/images/globesar-web-logo.png';
 		

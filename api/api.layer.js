@@ -59,18 +59,8 @@ module.exports = api.layer = {
 			res.json(doc);
 		});
 
-		// lol?
-		// return res.end(JSON.stringify({error : 'Unsupported.'}))
-
-		// var layerType = req.body.layerType;
-
-		// if (layerType == 'geojson') return api.layer.createLayerFromGeoJSON(req, res);
-
-		// res.end(JSON.stringify({
-		// 	layer : 'yo!'
-		// }));
-
 	},
+
 
 	// create OSM layer
 	createOSM : function (req, res) {
@@ -95,6 +85,30 @@ module.exports = api.layer = {
 			// add to project
 			doc && api.layer.addToProject(doc._id, projectUuid);
 		});
+	},
+
+
+	createPileLayer : function (options, callback) {
+
+		var host = api.config.portalServer.uri;
+
+		// send to tileserver storage
+		request({
+			method : 'POST',
+			uri : host + 'api/db/createLayer',
+			json : options
+		}, 
+
+		// callback
+		function (err, response, body) {
+			// console.log('err', err);
+
+			console.log('callback from pile!! ->> err, body', err, body);
+
+			callback(err, body);
+
+		});
+
 	},
 
 
@@ -506,9 +520,6 @@ module.exports = api.layer = {
 		layer.file 		= options.file;
 		layer.metadata 		= options.metadata;
 		layer.data 		= options.data;
-		// if (options.data.geojson) layer.data.geojson = options.data.geojson;
-		// if (options.data.raster)  layer.data.raster  = options.data.raster;
-		// if (options.data.postgis) layer.data.postgis = options.data.postgis;
 
 		layer.save(function (err, savedLayer) {
 			if (err) return callback(err);

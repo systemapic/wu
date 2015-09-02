@@ -691,28 +691,28 @@ module.exports = api.file = {
 		file.save(callback);
 	},
 
-	getFile : function (req, res) {
+	// getFile : function (req, res) {
 
-		console.log('req.query', req.query);
+	// 	console.log('req.query', req.query);
 		
-		var fileUuid = req.query.fileUuid || req.query.file_id,
-		    ops = [];
+	// 	var fileUuid = req.query.fileUuid || req.query.file_id,
+	// 	    ops = [];
 
-		// check for missing info
-		if (!fileUuid) return api.error.missingInformation(req, res);
+	// 	// check for missing info
+	// 	if (!fileUuid) return api.error.missingInformation(req, res);
 
-		// todo: check permission to access file
+	// 	// todo: check permission to access file
 		
-		// get file
-		File
-		.findOne({uuid : fileUuid})
-		.exec(function (err, file) {
-			if (err) return api.error.general(req, res, err);
+	// 	// get file
+	// 	File
+	// 	.findOne({uuid : fileUuid})
+	// 	.exec(function (err, file) {
+	// 		if (err) return api.error.general(req, res, err);
 
-			res.end(JSON.stringify(file));
-		});
+	// 		res.end(JSON.stringify(file));
+	// 	});
 
-	},
+	// },
 
 	_getFile : function (fileUuid, callback) {
 
