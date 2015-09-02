@@ -231,11 +231,11 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._portalLogoImg.src = app.options.servers.portal + 'css/images/globesar-web-logo.png';
 		// this._portalLogoImg = Wu.DomUtil.create('img', '', this._portalLogo);
 		// this._portalLogoImg.src = 'https://dev2.systemapic.com/css/images/globesar-web-logo.png';
-		
 	},
 
 
-	_toggleLeftPane : function () {
+	_toggleLeftPane : function (e) {
+		Wu.DomEvent.stop(e);
 
 		this._leftPaneisOpen ? this.closeLeftPane() : this.openLeftPane();
 
@@ -258,6 +258,9 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// trigger activation on active menu item
 		app._activeMenu._activate();
 
+		// auto-close triggers
+		this._addAutoCloseTriggers();
+
 	},
 
 
@@ -273,6 +276,28 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// collapse sidepane
 		if (app.SidePane) app.SidePane.collapse();
 
+		// auto-close triggers
+		this._removeAutoCloseTriggers();
+
+	},
+
+	// close menu when clicking on map, header, etc.
+	_addAutoCloseTriggers : function () {
+
+		// map pane
+		Wu.DomEvent.on(app.MapPane._container, 'click', this.closeLeftPane, this);
+		
+		// chrome top
+		Wu.DomEvent.on(this._container, 'click', this.closeLeftPane, this);
+	},
+
+	_removeAutoCloseTriggers : function () {
+
+		// map pane
+		Wu.DomEvent.off(app.MapPane._container, 'click', this.closeLeftPane, this);
+		
+		// chrome top
+		Wu.DomEvent.on(this._container, 'click', this.closeLeftPane, this);
 	},
 
 	setContentHeights : function () {
