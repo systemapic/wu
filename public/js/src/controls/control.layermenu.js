@@ -62,7 +62,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		!hide && this._show();
 
 		// close by default
-		this.closeAll();
+		if (!this.editMode) this.closeAll();
 
 		// Set max height
 		var dimensions = app._getDimensions();
@@ -96,17 +96,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._layerMenuHeader = Wu.DomUtil.createId('div', 'layer-menu-header');
 		// Wu.DomUtil.addClass(this._layerMenuHeader, 'menucollapser');
 		
-		// title
-		// this._layerMenuHeaderTitle = Wu.DomUtil.create('div', 'layer-menu-header-title', this._layerMenuHeader, 'Layers');
-
-		// Create the collapse button
-		// this._bhattan1 = Wu.DomUtil.createId('div', 'bhattan1');
-		// Wu.DomUtil.addClass(this._bhattan1, 'dropdown-button rotate270');
-		// this._layerMenuHeader.appendChild(this._bhattan1);
-
-		// Insert Header at the top
-		// this._innerContainer.insertBefore(this._layerMenuHeader, this._innerContainer.getElementsByTagName('div')[0]);
-
 		// Create the 'uncollapse' button ... will put in DOM l8r
 		this._openLayers = Wu.DomUtil.createId('div', 'open-layers');
 		this._openLayers.innerHTML = 'Layers';
@@ -122,27 +111,12 @@ L.Control.Layermenu = Wu.Control.extend({
 			this._legendsCollapser = legends._legendsCollapser;
 		}
 
-		// Wu.DomEvent.on(this._bhattan1,   'click', this._GAcloseLayerPane, this);
-		// Wu.DomEvent.on(this._openLayers, 'click', this._GAtoggleLayerPane, this);     
-
-		// Stop Propagation
-		// Wu.DomEvent.on(this._openLayers, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
-		// Wu.DomEvent.on(this._bhattan1, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
-
-		// auto-close event
-		Wu.DomEvent.on(this._innerContainer, 'mouseenter', this.cancelEditClose, this);
-		Wu.DomEvent.on(this._innerContainer, 'mouseleave', this.timedEditClose, this);
-
 		// add extra padding	
 		var inspect = app.MapPane.getControls().inspect;	
 		if (!inspect) {
 			var corner = app._map._controlCorners.bottomright;
 			corner.style.paddingBottom = 6 + 'px';
 		}
-
-		// add tooltip
-		// app.Tooltip.add(this._layerMenuHeaderTitle, 'The layer menu lets you choose what layers you want to be on top of the map', { extends : 'systyle', tipJoint : 'right' });
-		// app.Tooltip.add(this._bhattan1, 'Minimize the layer menu', { extends : 'systyle', tipJoint : 'left' });		
 
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
@@ -201,8 +175,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		}, this);
 
-		// refresh sorting
-		// this.refreshSortable();
 	},
 
 	_addAlreadyActive : function () {
@@ -338,62 +310,18 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.closeLayerPane();
 	},
 
-	// (j)
 	closeLayerPane : function () {
 
 		this._open = false;
 
 		Wu.DomUtil.addClass(this._innerContainer, 'closed');
-		
-
-		// Collapse Wrapper
-		// app._map._controlCorners.bottomright.style.width = '0px';
-
-		// Wu.DomUtil.removeClass(this._openLayers, 'ol-collapsed');
-		
-		// Slide the LEGENDS
-		// var inspect = app.MapPane.getControls().inspect;
-		// if (inspect && this._legendsContainer) {
-		// 	Wu.DomUtil.removeClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
-		// }	
-		
-		// Adjust legends width
-		// app.MapPane.getControls().legends.checkWidth();
 	},
 
-	// (j) xoxox 
 	openLayerPane : function () {
 
 		this._open = true;
 
-		// console.log('openLayerPane', this.container);
 		Wu.DomUtil.removeClass(this._innerContainer, 'closed');
-
-		// Open Wrapper
-		// app._map._controlCorners.bottomright.style.width = '290px';
-
-		// Close the closer :P
-		// Wu.DomUtil.addClass(this._openLayers, 'ol-collapsed');
-		
-		// // Slide the LEGENDS
-		// var inspect = app.MapPane.getControls().inspect;
-		// var legends = app.MapPane.getControls().legends;
-		// var description = app.MapPane.getControls().description;
-		
-		// if (inspect && this._legendsContainer) {
-		// 	Wu.DomUtil.addClass(this._legendsContainer, 'legends-padding-right'); // rem (j)
-		// }
-		
-		// // If we're on mobile
-		// if (app.mobile) {
-		// 	// Check if legends is open ~ close it when opening layer menu
-		// 	if (legends._isOpen) legends.MobileCloseLegends();
-		// 	if (!description._isClosed) description.mobileClosePane();
-		// }
-
-		// // Adjust legends width
-		// legends.checkWidth();
-
 	},
 
 
@@ -502,16 +430,11 @@ L.Control.Layermenu = Wu.Control.extend({
 			Wu.DomUtil.removeClass(this._menuFolder, 'displayNone');
 		}
 
-
-		// Wu.DomUtil.addClass(this._innerContainer, 'editing-menufolder')
-
 	},
 
 	_removeMenuFolder : function () {
 		if (!this._menuFolder) return;
 		Wu.DomUtil.addClass(this._menuFolder, 'displayNone');
-
-		// Wu.DomUtil.removeClass(this._innerContainer, 'editing-menufolder')
 	},
 
 	enableSortable : function () {
@@ -910,7 +833,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	toggleLayer : function (item) {
 		if (this.editMode) return;
-		console.log('time: ', item);
 
 		var layer = item.layer;
 		var _layerName = layer ? layer.getTitle() : 'Folder';
@@ -963,9 +885,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 
-		console.log('flying!', layerItem);
-		this.flyTo(layer);
-
 	},
 
 	// disable by layermenuItem
@@ -1009,9 +928,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		// fly
 		var map = app._map;
 		map.fitBounds(bounds);
-
-		// Google Analytics event tracking
-		// app.Analytics.setGaEvent(['Controls', 'Inspect layers: Fly to bounds for > ' + layer.getTitle()]);
 
 	},
 
@@ -1084,7 +1000,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	},
 
-
 	// remove initiated from sidepane
 	_remove : function (uuid) {
 		// find layermenuItem uuid
@@ -1094,8 +1009,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	// add from sidepane
 	add : function (layer) {
-
-
 		
 		// create db item
 		var item = {
@@ -1132,43 +1045,53 @@ L.Control.Layermenu = Wu.Control.extend({
 		var caption = file ? file.store.name : item.caption;
 
 		// create div
-		// var className   = 'layer-menu-item-wrap';
-		var className   = 'layer-menu-item-wrap';
+		var className  = 'layer-menu-item-wrap';
+
+		// add if folder
 		if (!layer) className += ' menufolder';
-		var wrap 	= Wu.DomUtil.create('div', className);
-		var uuid 	= item.uuid;
-				
+		
+		// more classes
+		className += ' level-' + item.pos;
 
-		// For some reason, HTML must come as string. 
-		var _iH = 	'<div class="layer-item-up">></div>' +
-			  	'<div class="layer-item-down"><</div>' +
-				'<div class="layer-item-delete">x</div>' +
-				// '<div class="layer-menu-flyto"></div>' +
-				'<div type="layerItem" class="layer-menu-item">' + caption + '</div>';
-
-		wrap.innerHTML 	= _iH;
-
-		wrap.id 	= uuid;
-		Wu.DomUtil.addClass(wrap, 'level-' + item.pos);
+		// add wrap
+		var uuid = item.uuid;
+		var wrap = Wu.DomUtil.create('div', className, this._content);
+		wrap.id = uuid;
 
 		// mark as draggable if we're in editing mode
-		if ( this.editMode ) { wrap.setAttribute('draggable', true) }
-		else { wrap.setAttribute('draggable', false); }
+		if (this.editMode) { 
+			wrap.setAttribute('draggable', true) 
+		} else { 
+			wrap.setAttribute('draggable', false); 
+		}		    
 
-	
-		this._content.appendChild(wrap); 	// append to layermenu
 
-		// get elems
-		var up    = wrap.children[0];
-		var down  = wrap.children[1];
-		var del   = wrap.children[2];
-		var inner = wrap.children[3];
+		// var layerItemMoversWrap = Wu.DomUtil.create('div', 'layer-item-movers-wrap', wrap);
+		var up = Wu.DomUtil.create('div', 'layer-item-up', wrap);
+		var down = Wu.DomUtil.create('div', 'layer-item-down', wrap);
+		var del = Wu.DomUtil.create('div', 'layer-item-delete', wrap);
+
+		if (layer) {
+			var layerItemFlyTo = Wu.DomUtil.createId('div', 'layer-flyto-' + layer.getUuid(), wrap);
+		    	layerItemFlyTo.className = 'layer-menu-flyto';
+		}
+
+		var inner = Wu.DomUtil.create('div', 'layer-menu-item', wrap);
+		inner.setAttribute('type', 'layerItem');
+		inner.innerHTML = caption;
+
+
+		// append to layermenu
+		// this._content.appendChild(wrap); 	
 
 		// add hooks
 		Wu.DomEvent.on(up,   'click', function (e) { this.upFolder(uuid); 	  }, this);
 		Wu.DomEvent.on(down, 'click', function (e) { this.downFolder(uuid); 	  }, this);
 		Wu.DomEvent.on(del,  'click', function (e) { this.deleteMenuFolder(uuid); }, this);
-		Wu.DomEvent.on(inner, 'dblclick', function (e) { this._editFolderTitle(uuid); },this);
+		
+		if (!layer) { // folder
+			Wu.DomEvent.on(inner, 'dblclick', function (e) { this._editFolderTitle(uuid); },this);
+		}
 
 		// prevent layer activation
 		Wu.DomEvent.on(up,   'mousedown', Wu.DomEvent.stop, this);
@@ -1189,11 +1112,17 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomEvent.on(wrap, 'mousedown', function (e) { this.toggleLayer(layerItem); }, this);
 		Wu.DomEvent.on(this._innerContainer, 'dblclick', Wu.DomEvent.stop, this);
 
-		
+		// trigger on flyto on layer
+		if (layer) {
+			var flyto = Wu.DomUtil.get('layer-flyto-' + layer.getUuid());
+			Wu.DomEvent.on(flyto, 'mousedown', function (e) {
+				Wu.DomEvent.stop(e);
+				this.flyTo(layer);
+			}, this);
+		}
 
 		// add to local store
 		this.layers[item.uuid] = layerItem;
-
 	},
 
 
@@ -1340,6 +1269,10 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// set new pos
 		var newpos = pos - 1;
+
+		// dont allow below 0
+		if (newpos < 0) newpos = 0;
+
 		this._project.store.layermenu[i].pos = newpos;
 
 		// add class
@@ -1381,8 +1314,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	_projectSelected : function (e) {
 
-		console.log('layermenu project selectged');
-
 		var projectUuid = e.detail.projectUuid;
 
 		if (!projectUuid) {
@@ -1401,7 +1332,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	_selectDefaultLayer : function () {
-		console.log('select!!', this);
 		var layerItem;
 
 		// get first layer
@@ -1412,12 +1342,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		}.bind(this));
 
 		if (!layerItem) return; // no layers in layermenu
-		
-		console.log('first layeR: ', layerItem);
-
-		// this.enableLayer(layerItem);
-
-
 
 	},
 

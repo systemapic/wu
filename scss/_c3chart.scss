@@ -1,0 +1,134 @@
+/* C3 C3 C3 C3 C3 C3 C3 C3 C3 C3 C3 C3 */
+/* C3 C3 C3 C3 C3 C3 C3 C3 C3 C3 C3 C3 */
+/* C3 C3 C3 C3 C3 C3 C3 C3 C3 C3 C3 C3 */
+
+
+.c3 svg {
+    position: relative;
+    left: -7px;
+    }
+    
+/* HEADER */
+.c3-header-wrapper {
+    position: relative;
+    margin-bottom: 7px;
+    max-width: 400px;
+    }
+
+#c3-header-metacontainer {
+    background: white;
+    padding: 15px;
+    padding-top: 10px;
+    padding-bottom: 8px;
+    }
+
+.c3-header-layer-name {
+    font-size: 18px;
+    font-weight: 900;
+    display: inline-block;
+    vertical-align: top; 
+    text-transform: uppercase;   
+    }
+
+.c3-point-count {
+    font-size: 15px;
+    font-style: italic;
+    color: #999;
+    position: relative;
+    top: -3px;
+    margin-bottom: -1px;
+    }
+
+.c3-header-metapair {
+    display: inline-block;
+    vertical-align: top;
+    font-size: 11px;
+    font-weight: 900;
+    width: 33%;
+    text-align: left;
+    margin: 0;
+    border-bottom: 1px solid #DADADA !important;
+    padding-bottom: 2px !important;
+    }
+
+.metapair-1,
+.metapair-2,
+.metapair-3 {
+    border-top: 1px solid #DADADA !important;
+    }
+
+.c3-header-metapair,
+.c3-header-metakey {
+    background: none;
+    border: none;
+    padding: 0;
+    }
+
+.c3-header-metakey,
+.c3-header-metaval {
+    background: none;
+    border: none;
+    text-align: left;
+    display: inline-block;
+    vertical-align: top;
+    }
+
+.c3-header-metakey {
+    color: #999;
+    }
+
+.c3-header-metaval {
+    padding: 0px 0px 0px 5px;
+    }
+
+#c3-container {
+    max-height: 238px !important;
+    }
+
+#c3-header-metacontainer {
+    margin-right: 0;
+    margin-left: 0;
+    margin-bottom: 0px;
+    }
+
+.c3-header-metapair {
+    }
+
+.c3-xgrid, .c3-ygrid {
+    stroke-dasharray: 2 2 !important;
+    stroke: rgba(255,255,255,0.2) !important;
+    }
+
+.c3 text { 
+    fill: black;
+    font-size: 12px;    
+    }   
+
+.c3 path, .c3 line {
+    stroke: black;
+    fill: none;
+    }   
+
+.c3 line {
+    stroke: #DADADA !important;
+    }
+
+.c3-chart-line {
+    opacity: 1 !important;
+    }
+
+g.c3-event-rects.c3-event-rects-multiple rect {
+    stroke-width: 0.5;
+    stroke: black;
+    }
+
+.c3-target-avgX {
+    stroke-width: 2px;
+    stroke: black;
+    }
+
+.c3-zoom-rect {
+    fill: white;
+    fill-opacity: 1;
+    opacity: 1 !important; 
+    }

@@ -40,6 +40,9 @@ module.exports = function(app, passport) {
 		// req.session.save(function() {
 		// 	req.io.emit('get-feelings')
 		// });
+
+		// send cpu monitor
+		// api.socket._sendStatisticsContinuously(req);
 	});
 
 	// Send back the session data.
@@ -49,6 +52,13 @@ module.exports = function(app, passport) {
 		// req.session.save(function() {
 		// 	req.io.emit('session', req.session)
 		// });
+	});
+
+	// get stats
+	app.io.route('get_server_stats', function (req) {
+		if (!isLoggedIn(req)) return;
+		
+		api.socket.getServerStats(req);
 	});
 
 	// helper function : if is logged in

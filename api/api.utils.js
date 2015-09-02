@@ -38,8 +38,53 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
+
+function constantLoopFunctions () {
+	setInterval(function () {
+
+		// get stats on server
+		api.utils.updateStatistics();
+	
+	}, 1000);
+};
+
+constantLoopFunctions();
+
+
 // exports
 module.exports = api.utils = { 
+
+	parse : function (string) {
+		try {
+			var object = JSON.parse(string);	
+		} catch (e) {
+			var object = false;
+		}
+		return object;
+	},
+
+	updateStatistics : function () {
+
+		// get stats
+		STATS_SCRIPT_PATH = '../scripts/get_cpu_stats.sh'; // todo: put in config
+		
+		// create database in postgis
+		exec(STATS_SCRIPT_PATH, {maxBuffer: 1024 * 50000}, function (err, stdin, stdout) {
+			if (err) return;
+			var cpu_usage = -1;
+			try {
+				var stdin_split = stdin.split('\n');
+				var cpu_usage = parseFloat(stdin_split[1].split('   ')[2]);
+
+			} catch (e) {}
+			
+			// save stats to redis
+			api.redis.lpush('server_stats', JSON.stringify({
+				time : _.now(),
+				cpu_usage : cpu_usage
+			}));
+		});
+	},
 
 	getRandomChars : function (len, charSet) {
 		charSet = charSet || 'abcdefghijklmnopqrstuvwxyz';

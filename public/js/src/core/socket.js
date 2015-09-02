@@ -7,14 +7,35 @@ Wu.Socket = Wu.Class.extend({
 
 		// add listeners
 		this._listen();
+
+		// add loops
+		this._addLoops();
+	},
+
+	_addLoops : function () {
+
+		setInterval(function () {
+			this._getServerStats();
+		}.bind(this), 2000);
+
+	},
+
+	_getServerStats : function () {
+		var socket = this._socket;
+		socket.emit('get_server_stats');
 	},
 
 	_listen : function () {
 		var socket = this._socket;
 
+		socket.on('server_stats', function (data) {
+			var stats = data.server_stats;
+			app.Chrome.Top.updateCPUclock(stats.cpu_usage);
+		})
+
 		socket.on('connect', function(){
 			console.log('Securely connected to socket.');
-			// socket.emit('ready', 'koko')
+			socket.emit('ready', 'koko')
 		});
 		socket.on('event', function(data){
 			console.log('event data: ', data);
@@ -28,53 +49,56 @@ Wu.Socket = Wu.Class.extend({
 		socket.on('processingProgress', function(data){
 			console.log('processingProgress:', data);
 		});
+		socket.on('stats', function(data){
+			console.log('stats:', data);
+		});
 		socket.on('uploadDone', function (data) {
 			console.log('uploadDone!', data);
 
 			// set uploaded
-			app.SidePane.DataLibrary.uploaded(data);
+			// app.SidePane.DataLibrary.uploaded(data);
 
-			if (data.layers.length) {
-				// set processing started on file
-				var fileUuid = data.files[0].uuid;
-				app.SidePane.DataLibrary.processFile(fileUuid, 0, 1);
-			}
+			// if (data.layers.length) {
+			// 	// set processing started on file
+			// 	var fileUuid = data.files[0].uuid;
+			// 	app.SidePane.DataLibrary.processFile(fileUuid, 0, 1);
+			// }
 		});
 		socket.on('processingDone', function (data) {
 			console.log('processingDone!', data);
 
-			var size = Wu.Util.bytesToSize(data.size),
-			    elapsed = data.elapsed,
-			    bytesPerSec = Wu.Util.bytesToSize(data.size / elapsed / 1000) + '/s',
-			    description = 'Processing of ' + size + ' took ' + elapsed / 1000 + ' seconds',
-			    uniqueIdentifier = data.uniqueIdentifier,
-			    fileUuid = data.processingDone;
+			// var size = Wu.Util.bytesToSize(data.size),
+			//     elapsed = data.elapsed,
+			//     bytesPerSec = Wu.Util.bytesToSize(data.size / elapsed / 1000) + '/s',
+			//     description = 'Processing of ' + size + ' took ' + elapsed / 1000 + ' seconds',
+			//     uniqueIdentifier = data.uniqueIdentifier,
+			//     fileUuid = data.processingDone;
 
-			if (data.error) {
-				app.feedback.setError({
-					title : 'Processing error!',
-					description : data.error,
-					id : uniqueIdentifier
-				});
-			} else {
-				app.feedback.setSuccess({
-					title : 'Processing done!',
-					description : description,
-					id : uniqueIdentifier
-				});
+			// if (data.error) {
+			// 	app.feedback.setError({
+			// 		title : 'Processing error!',
+			// 		description : data.error,
+			// 		id : uniqueIdentifier
+			// 	});
+			// } else {
+			// 	app.feedback.setSuccess({
+			// 		title : 'Processing done!',
+			// 		description : description,
+			// 		id : uniqueIdentifier
+			// 	});
 
-				app.SidePane.DataLibrary.processFileDone(fileUuid, 100, 1);
-			}
+			// 	app.SidePane.DataLibrary.processFileDone(fileUuid, 100, 1);
+			// }
 
 			
 		});
 		socket.on('errorMessage', function (data) {
 			console.log('errorMessage!', data);
 
-			app.feedback.setError({
-				title : 'Error:',
-				description : data.error,
-			});
+			// app.feedback.setError({
+			// 	title : 'Error:',
+			// 	description : data.error,
+			// });
 		});
 		// // Listen for get-feelings event.
 		// socket.on('get-feelings', function () {

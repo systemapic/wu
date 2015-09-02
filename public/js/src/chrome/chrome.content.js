@@ -88,6 +88,8 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		// get layers
 		var layers = this._project.getPostGISLayers();
 
+		console.log('got pg layerS: ', layers);
+
 		// placeholder
 		var option = Wu.DomUtil.create('option', '', select);
 		option.innerHTML = 'Select a layer to style...';
@@ -228,6 +230,14 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 
 		for (var t in this._tabs) {
 			this._tabs[t].closed();
+		}
+	},
+
+	_refreshAll : function () {
+
+		for (var t in this._tabs) {
+			console.log('refreshhhh', t);
+			this._tabs[t]._refresh();
 		}
 	},
 
@@ -514,15 +524,15 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		this._SQLEditor.addKeyMap(this._keymap);
 
 		
-		keymaster('⌘+r, ctrl+r', function(){
-			this._refreshLayer();
-			return false;
-		}.bind(this));
+		// keymaster('⌘+r, ctrl+r', function(){
+		// 	this._refreshLayer();
+		// 	return false;
+		// }.bind(this));
 
-		keymaster('⌘+s, ctrl+s', function(){
-			this._updateStyle();
-			return false;
-		}.bind(this));
+		// keymaster('⌘+s, ctrl+s', function(){
+		// 	this._updateStyle();
+		// 	return false;
+		// }.bind(this));
 
 	},
 
@@ -716,7 +726,7 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		this._layer._addThin();
 
 		// fly to
-		this._layer.flyTo();
+		// this._layer.flyTo();
 
 		// remember
 		this._temps.push(this._layer);

@@ -59,6 +59,53 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._setUsername();
 		this._setPortalLogo();
 
+		// Init CPU clock
+		this.initCPUclock(this._buttons);
+
+
+	},
+
+
+	initCPUclock : function (wrapper) {	
+
+		// Check if superadmin
+		var isSuperAdmin = app.Access.is.superAdmin();
+		if ( !isSuperAdmin ) return;
+
+		var CPUwrapper = Wu.DomUtil.create('div', 'cpu-wrapper', wrapper);
+
+		this._CPUbars = [];
+
+		for ( i = 0; i<10; i++ ) {
+			this._CPUbars[i] = Wu.DomUtil.create('div', 'cpu-bar', CPUwrapper);
+		}
+
+	},
+
+
+	updateCPUclock : function (percent) {
+
+		// Return if not super admin...
+		var isSuperAdmin = app.Access.is.superAdmin();
+		if ( !isSuperAdmin ) return;		
+
+		// Get value as numbers
+		var pp = parseInt(percent);
+
+		// Get clean value of number
+		var p = Math.round(pp / 10);
+
+		for ( i = 0; i<10; i++ ) {
+			
+			// Get the right div
+			var no = 9 - i;
+
+			// Set the right classes
+			if ( i >= p ) 	Wu.DomUtil.removeClass(this._CPUbars[no], 'cpu-on');
+			else		Wu.DomUtil.addClass(this._CPUbars[no], 'cpu-on');
+		}
+
+
 	},
 
 

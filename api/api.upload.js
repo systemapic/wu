@@ -47,6 +47,11 @@ var api = module.parent.exports;
 // exports
 module.exports = api.upload = { 
 
+
+
+
+
+
 	/**
 	 * Import data to PostGIS
 	 *
@@ -66,14 +71,17 @@ module.exports = api.upload = {
 	import : function (req, res) {
 		if (!req.files || !req.files.data) return api.error.missingInformation(res, 'No file.');
 
+		var files = req.files;
+		var user = req.user;
+
 		// set upload status
 		var uploadStatus = {
 			file_id : 'file_' + api.utils.getRandomChars(20),
-			user_id : req.user.uuid,
-			filename : req.files.data.originalFilename,
+			user_id : user.uuid,
+			filename : files.data.originalFilename,
 			timestamp : Date.now(),
 			status : 'Processing',
-			size : req.files.data.size,
+			size : files.data.size,
 			upload_success : true,
 			error_code : null,
 			error_text : null,
@@ -86,19 +94,39 @@ module.exports = api.upload = {
 			// database_name : null,
 		}
 
+		// save upload id to redis
+		var key = 'uploadStatus:' + uploadStatus.file_id;
+		api.redis.set(key, JSON.stringify(uploadStatus), function (err) {
+			console.log('set redis');
 
-		// return upload status to client
-		res.end(JSON.stringify(uploadStatus));
-		
+			// return upload status to client
+			res.end(JSON.stringify(uploadStatus));
+		});
+
+		var options = {
+			files : req.files,
+			user : req.user,
+			uploadStatus : uploadStatus,
+			body : req.body
+		}
+
+		api.upload._import(options, function (err, results) {
+			console.log('api.upload._import done > err, results', err, results);
+		});
+
+
+	},
+
+
+	_import : function (options, done) {
+
+		var files = options.files,
+		    user = options.user,
+		    uploadStatus = options.uploadStatus,
+		    body = options.body;
+
 		var ops = [];
 
-		// save upload status
-		ops.push(function (callback) {
-
-			// save upload id to redis
-			var key = 'uploadStatus:' + uploadStatus.file_id;
-			api.redis.set(key, JSON.stringify(uploadStatus), callback);
-		});
 
 		// import data
 		ops.push(function (callback) {
@@ -106,9 +134,9 @@ module.exports = api.upload = {
 			// import options
 			var options = {
 				file_id : uploadStatus.file_id,
-				files : req.files,
-				options : req.body,
-				user : req.user,
+				files : files,
+				options : body,
+				user : user,
 				timestamp : uploadStatus.timestamp
 			}
 
@@ -127,16 +155,16 @@ module.exports = api.upload = {
 				if (err) return callback(err);
 				
 				// add to project if available
-				if (!req.body.projectUuid) return callback(null);	
+				if (!body.projectUuid) return callback(null);	
 
 				// add to project
-				var projectUuid = req.body.projectUuid;
+				var projectUuid = body.projectUuid;
 				api.file.addToProject(file._id, projectUuid, callback);
 				
 			});
 		});
 
-		
+
 		// set upload status
 		ops.push(function (callback) {
 
@@ -144,7 +172,7 @@ module.exports = api.upload = {
 			api.upload.updateStatus(uploadStatus.file_id, {
 				processing_success : true,
 				status : 'Done', 
-				expire : 3600 * 24,
+				// expire : 3600 * 24,
 				file_id : uploadStatus.file_id
 			}, callback);
 		});
@@ -159,9 +187,232 @@ module.exports = api.upload = {
 				status : 'Failed'
 			});
 
-			
+
+			// all done
+			done(err);
 		});	
 	},
+
+
+	chunkedUpload : function (req, res) {
+	    	var options 		 = req.body,
+		    fileUuid 		 = options.fileUuid,
+		    projectUuid 	 = options.projectUuid,
+		    fileName 		 = fileUuid + '-' + options.resumableFilename,
+		    outputPath 		 = '/data/tmp/' + fileName,
+		    stream 		 = fs.createWriteStream(outputPath),
+		    resumableChunkNumber = options.resumableChunkNumber,
+		    resumableIdentifier  = options.resumableIdentifier,
+	    	    resumableTotalChunks = options.resumableTotalChunks,
+	    	    file_id 		 = options.file_id;
+
+		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks to ', outputPath);
+		console.log('## RESUMABLE ##'.green, resumableIdentifier); // size + last mod + name
+
+		console.log('file_id: ', file_id);
+		// resumable		
+		r.post(req, function(status, filename, original_filename, identifier){
+
+			console.log('FILENAME: ', filename, original_filename);
+
+			// if success
+			if (status == 'done' || status == 'partly_done') {
+				
+				// return status
+				res.status(200).send({});
+
+				// register chunk done in redis
+				api.redis.incr('done-chunks-' + resumableIdentifier);
+			} else {
+				console.log('done 308');
+				// return status
+				res.status(308).send({});
+
+			}
+
+			// check if all done
+			api.redis.get('done-chunks-' + resumableIdentifier, function (err, count) {
+
+				// return if not all done
+				console.log('count == total count', count, options.resumableTotalChunks);				
+				if (count != options.resumableTotalChunks) {
+					console.log('COUNT != CHUNKS');
+					return;
+				} 
+
+				console.log('ALL DONE!!');
+
+				// import uploaded file
+				api.upload._chunkedUploadDone({
+					user : req.user,
+					uniqueIdentifier : options.resumableIdentifier,
+					outputPath : outputPath,
+					body : req.body,
+					fileName : options.resumableFilename,
+					original_filename : filename,
+					projectUuid : projectUuid,
+					fileUuid : fileUuid,
+					resumableTotalChunks : options.resumableTotalChunks,
+					resumableIdentifier : options.resumableIdentifier,
+					file_id : file_id
+				});
+			});
+		});
+	},
+
+	_chunkedUploadDone : function (options) {
+		var resumableTotalChunks = options.resumableTotalChunks,
+		    uniqueIdentifier = options.uniqueIdentifier,
+		    outputPath = options.outputPath,
+		    original_filename = options.original_filename,
+		    resumableIdentifier = options.resumableIdentifier,
+		    user = options.user,
+		    file_id = options.file_id,
+		    tmpFolder = '/data/tmp/',
+		    body = options.body,
+		    ops = [];
+
+		console.log('file_id: ', file_id);
+
+		// merge chunks
+		ops.push(function (callback) {
+
+			var cmd = 'cat ';
+
+			_.times(resumableTotalChunks, function (i) {
+				var num = i + 1;
+				cmd += '"' + tmpFolder + 'resumable-' + resumableIdentifier + '.' + num + '" ';
+			});
+
+			cmd += ' > "' + outputPath + '"';
+			
+			console.log('cmd: ', cmd);
+
+			var exec = require('child_process').exec;
+			exec(cmd, function (err, stdout, stdin) {
+				if (err) console.log('err'.red, err);
+
+				console.log('catted file: '.green, outputPath);
+				fs.stat(outputPath, callback);
+			});
+
+		});
+
+		// import file
+		ops.push(function (stats, callback) {
+			
+			// var fileOptions = {
+			// 	path : options.outputPath,
+			// 	size : stats.size,
+			// 	name : options.fileName,
+			// 	uniqueIdentifier : uniqueIdentifier
+			// }
+
+			// // import file
+			// api.upload.importFile(fileOptions, options, callback);
+
+		
+			// set upload status
+			var uploadStatus = {
+				file_id : file_id,
+				user_id : user.uuid,
+				filename : original_filename,
+				timestamp : Date.now(),
+				status : 'Processing',
+				size : stats.size,
+				upload_success : true,
+				error_code : null,
+				error_text : null,
+				// processing_success : null,
+				// rows_count : null,
+				// import_took_ms : null,
+				// data_type : null,
+				// original_format : null,
+				// table_name : null, 
+				// database_name : null,
+			}
+
+
+
+			// save upload id to redis
+			var key = 'uploadStatus:' + uploadStatus.file_id;
+			api.redis.set(key, JSON.stringify(uploadStatus), function (err) {
+				console.log('set redis');
+
+				// return upload status to client
+			});
+
+			var files = {
+				data : {
+					path : outputPath,
+					size : stats.size,
+					originalFilename : original_filename
+				}
+			}
+
+			var options = {
+				files : files,
+				user : user,
+				uploadStatus : uploadStatus,
+				body : body
+			}
+
+
+			// import file
+			api.upload._import(options, function (err, results) {
+				console.log('api.upload._import done > err, results', err, results);
+
+				// done
+				callback(err);
+			});
+
+
+		});
+
+
+		async.waterfall(ops, function (err, result) {
+
+			// ping client
+			console.log('sending socket to client: ', result);
+			api.socket.uploadDone({
+				result : result,
+				user : options.user,
+				loka : 'loka'
+			});
+
+			// clean up, remove chunks
+			var removePath = '/data/tmp/resumable-' + uniqueIdentifier + '.*';
+			fs.remove(removePath, console.log);
+
+			// clean up redis count
+			console.log('removing done chunks!', uniqueIdentifier);
+			api.redis.del('done-chunks-' + uniqueIdentifier);
+
+		});
+		
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	_createFileModel : function (file_id, done) {
 
@@ -209,7 +460,7 @@ module.exports = api.upload = {
 			api.redis.set(file_id_key, JSON.stringify(uploadStatus), function (err) {
 
 				// expire if set
-				if (status.expire) api.redis.expire(file_id_key, status.expire);
+				// if (status.expire) api.redis.expire(file_id_key, status.expire);
 				
 				// return
 				callback && callback(err);
@@ -373,119 +624,6 @@ module.exports = api.upload = {
 
 
 
-
-	chunkedUpload : function (req, res) {
-	    	var options = req.body,
-		    fileUuid = options.fileUuid,
-		    projectUuid = options.projectUuid,
-		    fileName = fileUuid + '-' + options.resumableFilename,
-		    outputPath = '/data/tmp/' + fileName,
-		    stream = fs.createWriteStream(outputPath),
-		    resumableChunkNumber = options.resumableChunkNumber,
-		    resumableIdentifier = options.resumableIdentifier,
-	    	    resumableTotalChunks = options.resumableTotalChunks;
-
-		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks to ', outputPath);
-		// console.log('## RESUMABLE ##'.green, options);
-
-		// resumable		
-		r.post(req, function(status, filename, original_filename, identifier){
-
-			// return status
-			res.status(status).send({});
-
-			// register chunk done in redis
-			if (status == 'done' || status == 'partly_done') api.redis.incr('done-chunks-' + resumableIdentifier);
-
-			// check if all done
-			api.redis.get('done-chunks-' + resumableIdentifier, function (err, count) {
-
-				// return if not all done				
-				if (count != options.resumableTotalChunks) {
-					console.log('COUNT != CHUNKS');
-					return;
-				} 
-				// import uploaded file
-				api.upload._chunkedUploadDone({
-					user : req.user,
-					uniqueIdentifier : options.resumableIdentifier,
-					outputPath : outputPath,
-					fileName : options.resumableFilename,
-					projectUuid : projectUuid,
-					fileUuid : fileUuid,
-					resumableTotalChunks : options.resumableTotalChunks,
-					resumableIdentifier : options.resumableIdentifier
-				});
-			});
-		});
-	},
-
-	_chunkedUploadDone : function (options) {
-		var resumableTotalChunks = options.resumableTotalChunks,
-		    uniqueIdentifier = options.uniqueIdentifier,
-		    outputPath = options.outputPath,
-		    resumableIdentifier = options.resumableIdentifier,
-		    user = options.user,
-		    tmpFolder = '/data/tmp/',
-		    ops = [];
-
-		// merge chunks
-		ops.push(function (callback) {
-
-			var cmd = 'cat ';
-
-			_.times(resumableTotalChunks, function (i) {
-				var num = i + 1;
-				cmd += '"' + tmpFolder + 'resumable-' + resumableIdentifier + '.' + num + '" ';
-			});
-
-			cmd += ' > "' + outputPath + '"';
-
-			var exec = require('child_process').exec;
-			exec(cmd, function (err, stdout, stdin) {
-				if (err) console.log('err'.red, err);
-
-				// console.log('catted file: '.green, outputPath);
-				fs.stat(outputPath, callback);
-			});
-
-		});
-
-		// import file
-		ops.push(function (stats, callback) {
-			
-			var fileOptions = {
-				path : options.outputPath,
-				size : stats.size,
-				name : options.fileName,
-				uniqueIdentifier : uniqueIdentifier
-			}
-
-			// import file
-			api.upload.importFile(fileOptions, options, callback);
-		});
-
-
-		async.waterfall(ops, function (err, result) {
-
-			// ping client
-			api.socket.uploadDone({
-				result : result,
-				user : options.user,
-				loka : 'loka'
-			});
-
-			// clean up, remove chunks
-			var removePath = '/data/tmp/resumable-' + uniqueIdentifier + '.*';
-			fs.remove(removePath, console.log);
-
-			// clean up redis count
-			api.redis.del('done-chunks-' + uniqueIdentifier);
-
-		});
-		
-	},
-
 	// debug: delete all done-chunks
 	_deleteDoneChunks : function () {
 		api.redis.keys('done-chunk*', function(err, rows) {
@@ -498,6 +636,7 @@ module.exports = api.upload = {
 
 	chunkedCheck : function (req, res) {
 		r.get(req, function(status, filename, original_filename, identifier){
+			console.log('chunkCHck', status, filename, original_filename, identifier);
 			res.send((status == 'found' ? 200 : 201), status);
 		});
 	},

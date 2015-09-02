@@ -87,7 +87,14 @@ module.exports = api.project = {
 
 		// add norkart layers
 		ops.push(function (project, callback) {
-			api.provider.norkart.setDefault({
+			api.provider.norkart.setDefaults({
+				project : project
+			}, callback);
+		});
+
+		// add google layers
+		ops.push(function (project, callback) {
+			api.provider.google.setDefault({
 				project : project
 			}, callback);
 		});
@@ -296,7 +303,8 @@ module.exports = api.project = {
 			'settings',
 			'categories',
 			'thumbCreated',
-			'state'
+			'state',
+			'pending'
 		];
 
  		// enqueue queries for valid fields

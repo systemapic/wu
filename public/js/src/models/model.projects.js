@@ -14,7 +14,9 @@ Wu.Project = Wu.Class.extend({
 
 		// init roles, files, layers
 		this._initObjects();
+
 	},
+
 
 	_initObjects : function () {
 		this.initRoles();
@@ -772,6 +774,28 @@ Wu.Project = Wu.Class.extend({
 
 	getSettings : function () {
 		return this.store.settings;
+	},
+
+	clearPendingFiles : function () {
+		this.store.pending = [];
+		this._update('pending');
+	},
+
+	setPendingFile : function (file_id) {
+		this.store.pending.push(file_id);
+		this._update('pending');
+	},
+
+	getPendingFiles : function () {
+		return this.store.pending;
+	},
+
+	removePendingFile : function (file_id) {
+		var remd = _.remove(this.store.pending, function (p) {
+			return p == file_id;
+		});
+		console.log('removed???', this.store.pending, remd);
+		this._update('pending');
 	},
 
 	setSettings : function (settings) {
