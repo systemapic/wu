@@ -1156,7 +1156,7 @@ aka feedback pane
 
 .feedback-pane-title,
 .feedback-pane-title2 {
-	color: white;
+	/*color: white;*/
 	padding-left: 0;
 	font-weight: 900;
 	font-size: 17px;
@@ -1171,7 +1171,7 @@ aka feedback pane
 
 .feedback-pane-description,
 .feedback-pane-description2 {
-	color: white;
+	/*color: white;*/
 	font-weight: 500;
 	padding: 0px;
 	margin: 0px;
@@ -1201,11 +1201,12 @@ aka feedback pane
 	}
 
 .feedback-pane-content.message {
-	background-color: rgba(77, 87, 102, 0.81);
+	background-color: rgba(255, 255, 255, 0.81);
 	}
 
 .feedback-pane-content.error {
-	background-color: rgba(132, 14, 14, 0.81);
+	background: rgba(255, 0, 0, 0.81);
+	color: rgba(255, 255, 255, 0.94);
 	}
 
 .feedback-pane-content.success {

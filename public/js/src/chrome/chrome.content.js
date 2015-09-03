@@ -88,8 +88,6 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		// get layers
 		var layers = this._project.getPostGISLayers();
 
-		console.log('got pg layerS: ', layers);
-
 		// placeholder
 		var option = Wu.DomUtil.create('option', '', select);
 		option.innerHTML = 'Select a layer to style...';
@@ -188,13 +186,10 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 		// create tabs
 		for ( var o in this.options.tabs) {
 			if (this.options.tabs[o].enabled) {
-				console.log('o: ', o);
 
 				var text = this.options.tabs[o].text;
 
 				var tab = o.camelize();
-
-				console.log('tab: ', tab);
 
 				// create tab contents
 				if (Wu.Chrome.Content[tab]) {
@@ -213,7 +208,6 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 			}
 		}
 
-		console.log('this._tabs: ', this._tabs);
 	},
 
 	show : function () {
@@ -240,8 +234,9 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 
 	_refreshAll : function () {
 
-		for ( var t in this._tabs) {
+		for (var t in this._tabs) {
 			console.log('refreshhhh', t);
+
 			this._tabs[t]._refresh();
 		}
 	},
@@ -257,8 +252,6 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 	_initialize : function () {
-
-		console.log('chrome.content styleeditor');
 
 		// init container
 		this._initContainer();
@@ -299,21 +292,17 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	_selectedActiveLayer : function (e) {
 
 		var layerUuid = e.target.value;
-		console.log('selected layer: ', layerUuid);
 
 		var layer = this._project.getLayer(layerUuid);
 
 		// get current style, returns default if none
 		var style = layer.getEditorStyle();
 
-		console.log('currentStyle: ', style);
-
 		// init style json
 		this._initStyle(style);
 	},
 
 	_initStyle : function (style) {
-		console.log('currentstyle: ', style);
 
 	},
 
@@ -352,7 +341,6 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 
 	_initialize : function () {
 
-		console.log('chrome.content layers');
 
 		// init container
 		this._initContainer();
@@ -385,6 +373,7 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 	show : function () {
 		if (!this._inited) this._initLayout();
 
+
 		// hide others
 		this.hideAll();
 
@@ -394,8 +383,6 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 		// mark button
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
 	},
-
-
 
 	open : function () {
 		console.log('open!', this);
@@ -413,7 +400,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 
 	_initialize : function () {
 
-		console.log('chrome.content carto');
 
 		// init container
 		this._initContainer();
@@ -625,7 +611,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 
 	_updateStyle : function () {
 
-		console.log('uypdateSTYLE!');
 
 	},
 
@@ -758,8 +743,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 
 	_tempaddLayer : function () {
 
-		console.log('tempaddinglayer!!');
-
 		// remember
 		this._temps = this._temps || [];
 
@@ -891,7 +874,6 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 
 	_initialize : function () {
 
-		console.log('chrome.content styleeditor');
 
 		// init container
 		this._initContainer();
@@ -1367,11 +1349,27 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 
 				metaFields[f].title = title;
 				metaFields[f].on = on;
-
-
 				return;
 			}
 		}
+	},
+
+	
+	open : function () {
+		console.log('open!', this);
+	},
+
+	show : function () {
+		if (!this._inited) this._initLayout();
+
+		// hide others
+		this.hideAll();
+
+		// show this
+		this._container.style.display = 'block';
+
+		// mark button
+		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
 	},
 
 	// Validate date format

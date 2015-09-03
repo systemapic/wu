@@ -39,8 +39,6 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
-// console.log('lauyer');
-
 // exports
 module.exports = api.layer = { 
 
@@ -50,27 +48,15 @@ module.exports = api.layer = {
 
 
 		var options = req.body;
-		console.log('CREATE 0---- layer', options);
 
 		api.layer.createModel(options, function (err, doc) {
-			console.log('created Mode err? ', err, doc);
 			if (err) return api.error.general(res, err);
 
 			res.json(doc);
 		});
 
-		// lol?
-		// return res.end(JSON.stringify({error : 'Unsupported.'}))
-
-		// var layerType = req.body.layerType;
-
-		// if (layerType == 'geojson') return api.layer.createLayerFromGeoJSON(req, res);
-
-		// res.end(JSON.stringify({
-		// 	layer : 'yo!'
-		// }));
-
 	},
+
 
 	// create OSM layer
 	createOSM : function (req, res) {
@@ -95,6 +81,26 @@ module.exports = api.layer = {
 			// add to project
 			doc && api.layer.addToProject(doc._id, projectUuid);
 		});
+	},
+
+
+	createPileLayer : function (options, callback) {
+
+		var host = api.config.portalServer.uri;
+
+		// send to tileserver storage
+		request({
+			method : 'POST',
+			uri : host + 'api/db/createLayer',
+			json : options
+		}, 
+
+		// callback
+		function (err, response, body) {
+			callback(err, body);
+
+		});
+
 	},
 
 
@@ -359,8 +365,6 @@ module.exports = api.layer = {
 	// set carto css
 	setCartoCSS : function (req, res) {
 
-		// console.log('setCartoCSS!'.yellow);
-
 		// get params
 		var fileUuid 	= req.body.fileUuid,
 		    css 	= req.body.css,
@@ -372,11 +376,8 @@ module.exports = api.layer = {
 
 		var host = api.config.vile.uri;
 
-		// console.log('host: ', host);
-
 		// save css to file by cartoId 
 		fs.writeFile(csspath, css, {encoding : 'utf8'}, function (err) {
-			// console.log('write err?', err);
 			if (err) return api.error.general(req, res);
 
 			// send to tileserver storage
@@ -392,7 +393,6 @@ module.exports = api.layer = {
 
 			// callback
 			function (err, response, body) {
-				// console.log('err', err);
 
 				// custom error handling
 				if (err) {
@@ -496,8 +496,6 @@ module.exports = api.layer = {
 
 	createModel : function (options, callback) {
 
-		console.log('api.layer.createModel'.red, options);
-
 		var layer 		= new Layer();
 		layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),
 		layer.title 		= options.title;
@@ -506,9 +504,6 @@ module.exports = api.layer = {
 		layer.file 		= options.file;
 		layer.metadata 		= options.metadata;
 		layer.data 		= options.data;
-		// if (options.data.geojson) layer.data.geojson = options.data.geojson;
-		// if (options.data.raster)  layer.data.raster  = options.data.raster;
-		// if (options.data.postgis) layer.data.postgis = options.data.postgis;
 
 		layer.save(function (err, savedLayer) {
 			if (err) return callback(err);
@@ -525,8 +520,6 @@ module.exports = api.layer = {
 
 	// save file to project (file, layer, project id's)
 	addToProject : function (layer_id, projectUuid, callback) {
-
-		console.log('===> ADD LAYER TO PROJECT', layer_id);
 
 		Project
 		.findOne({'uuid' : projectUuid })

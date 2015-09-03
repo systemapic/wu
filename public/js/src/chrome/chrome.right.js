@@ -8,7 +8,6 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	_initialize : function () {
-		console.log('rightchrome init', this);
 
 		// init container
 		this.initContainer();
@@ -39,7 +38,6 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	_windowResize : function () {
-		console.log('window resize!');
 	},
 
 	getDimensions : function () {
@@ -55,7 +53,6 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 
 	open : function () {
-		console.log('open right chrome');
 		
 		// set width of right pane
 		this._container.style.width = this.options.defaultWidth + 'px';
@@ -68,7 +65,6 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	close : function () {
-		console.log('close right chrome');
 
 		// set width of right pane
 		this._container.style.width = '0';
