@@ -205,15 +205,28 @@ L.Popup = L.Class.extend({
 			container = this._container = L.DomUtil.create('div', containerClass),
 			closeButton;
 
+
 		if (this.options.closeButton) {
 			closeButton = this._closeButton =
 			L.DomUtil.create('a', prefix + '-close-button', container);
 			closeButton.href = '#close';
 			closeButton.innerHTML = '&#215;';
 			L.DomEvent.disableClickPropagation(closeButton);
-
 			L.DomEvent.on(closeButton, 'mouseup', this._onCloseButtonClick, this);
 		}
+
+
+
+		// this._container.setAttribute('draggable', true);
+
+		// MOVE BUTTON
+		// this._moveButton = Wu.DomUtil.create('div', prefix + '-move-button', container);
+
+		// L.DomEvent.disableClickPropagation(this._moveButton);
+		// L.DomEvent.disableScrollPropagation(this._moveButton);
+
+		// Wu.DomEvent.on(this._moveButton, 'mousedown', this.enableDraggableTooltip, this);
+
 
 		var wrapper = this._wrapper =
 		L.DomUtil.create('div', prefix + '-content-wrapper', container);
@@ -226,13 +239,19 @@ L.Popup = L.Class.extend({
 
 		this._tipContainer = L.DomUtil.create('div', prefix + '-tip-container', container);
 		this._tip = L.DomUtil.create('div', prefix + '-tip', this._tipContainer);
+
+
+		// this.enableDraggableTooltip();
+
 	},
 
 	_updateContent: function () {
 		if (!this._content) { return; }
 
 		if (typeof this._content === 'string') {
-			this._contentNode.innerHTML = this._content;
+			// this._contentNode.innerHTML = this._content;
+			this._contentNode.appendChild(this._content);
+
 		} else {
 			while (this._contentNode.hasChildNodes()) {
 				this._contentNode.removeChild(this._contentNode.firstChild);
@@ -364,7 +383,65 @@ L.Popup = L.Class.extend({
 	_onCloseButtonClick: function (e) {
 		this._close();
 		L.DomEvent.stop(e);
-	}
+	},
+
+
+
+	// enableDraggableTooltip : function () {
+
+	// 	this.dragPos = [];
+	// 	this._container.style.position = 'fixed';
+	// 	Wu.DomEvent.on(window, 'mousemove', this.isDragging, this);
+
+	// 	console.log('%c start dragging', 'background: blue; color: white');
+
+	// },
+
+	// isDragging : function (e) {		
+
+	// 	var x = e.clientX;
+	// 	var y = e.clientY;
+
+	// 	var diffX = x - this.dragPos[0];
+	// 	var diffY = y - this.dragPos[1];
+
+	// 	this.dragPos = [x, y];
+
+	// 	var bouding = this._container.getBoundingClientRect();
+
+	// 	var boxX = bouding.left;
+	// 	var boxY = bouding.top;
+
+	// 	// this._container.style.top = boxY + 'px';
+	// 	// this._container.style.left = boxX + 'px';
+	// 	// this._container.style.bottom = '';
+	// 	// this._container.style.right = '';
+
+
+
+
+	// 	var newX = boxX + diffX;
+	// 	var newY = boxY + diffY;		
+
+	// 	this._container.style.top = newY + 'px';
+	// 	this._container.style.left = newX + 'px';
+	// 	this._container.style.bottom = '';
+	// 	this._container.style.right = '';
+
+
+	// 	Wu.DomEvent.on(window, 'mouseup', this.stopDragging, this);
+	// },
+
+	// stopDragging : function (e) {
+
+	// 	console.log('stop dragging')
+
+	// 	console.log('this._container', this._container);
+
+	// 	Wu.DomEvent.off(window, 'mousemove', this.isDragging, this);
+
+	// },
+
 });
 
 // L.Popup.include({

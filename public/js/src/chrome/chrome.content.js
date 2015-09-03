@@ -889,7 +889,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 
 
-
 	_initialize : function () {
 
 		console.log('chrome.content styleeditor');
@@ -905,7 +904,6 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 
 		// create container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content styler', this.options.appendTo);
-		
 	},
 
 	_initLayout : function () {
@@ -930,7 +928,22 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		this._container.innerHTML = '';
 	},
 
-	// event run when layer selected 
+	// Runs on init
+	show : function () {
+		
+		if (!this._inited) this._initLayout();
+
+		// hide others
+		this.hideAll();
+
+		// show this
+		this._container.style.display = 'block';
+
+		// mark button
+		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+	},
+
+	// Event run when layer selected 
 	_selectedActiveLayer : function (e) {
 
 		var layerUuid = e.target.value;
@@ -957,6 +970,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		this.initFields();
 	},
 
+	// Title
 	initTitle : function () {
 
 
@@ -979,9 +993,11 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		Wu.DomEvent.on(titleInput, 'blur', this.saveTitle, this);
 	},
 
+	// Description
 	initDescription : function () {
 	},
 
+	// Tooltip meta
 	createTooltipMeta : function (layerMeta) {
 
 		// Get columns
@@ -998,8 +1014,6 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 
 			return this.cleanColumns(columns);
 		}
-
-		// return columns;
 	},
 
 	// Create clean columns (without time series)
@@ -1064,13 +1078,14 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		return [metaData, timeSeriesCount];
 	},
 
+	// Init meta fields and time series
 	initFields : function () {
 
-		// this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-tooltip-field-wrapper', this._container);
 		this.fieldListFromObject('Fields')
 		if ( this.tooltipMeta.timeSeries ) this.initTimeSeries();
 	},
 
+	// Creates section with meta field lines
 	fieldListFromObject : function (title, timeSeries) {
 
 
@@ -1102,6 +1117,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		}
 	},
 
+	// Cretes section with time series
 	initTimeSeries : function () {
 
 		var timeSeries = this.tooltipMeta.timeSeries;
@@ -1161,8 +1177,9 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 
 		// Create list of time series fields
 		this.fieldListFromObject('Time Series Fields', true);
-	},
+	},	
 
+	// Creates one meta field line, with input, switch, etc
 	_createMetaFieldLine : function (options) {
 
 		// _key, wrapper, input, right
@@ -1174,8 +1191,6 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		var isOn = options.isOn;
 		var title = options.title;
 		var miniInput = options.miniInput;
-
-		console.log('options', options);
 
 		var fieldWrapper = Wu.DomUtil.create('div', 'chrome-tooltip-metafield-line', wrapper);
 		
@@ -1232,6 +1247,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		}
 	},
 
+	// Toggle switch
 	toggleSwitch : function (e) {
 
 		var on = e.target.getAttribute('state');
@@ -1253,14 +1269,16 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		}	
 
 		this._saveTooltipMeta(key, '', isOn)
-	},
+	},	
 
+	// Save title
 	saveTitle : function (e) {
 
 		this.tooltipMeta.title = e.target.value;
 		this._layer.setTooltip(this.tooltipMeta);
 	},
 
+	// Save input fields in meta field lines
 	saveFromBlur : function (e) {
 		
 		var key   = e.target.id.substring(12, e.target.id.length);
@@ -1274,15 +1292,16 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		this._saveTooltipMeta(key, value, on);
 	},
 
+	// Saves tiny input to right
 	saveMiniBur : function (e) {
 
 		var key   = e.target.id.substring(17, e.target.id.length)
 		var value = e.target.value;
 
 		this._saveTooltipMeta(key, false, value);
-
 	},
 
+	// Saves switches, etc
 	_saveTooltipMeta : function (_key, title, on) {
 
 		var titleField = Wu.DomUtil.get('field_input_' + _key);
@@ -1317,6 +1336,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		this._layer.setTooltip(this.tooltipMeta);
 	},
 
+	// Save helpers – goes through the JSON object to find a key match in the time series
 	updateTimeSeriesMeta : function (_key, title, on) {
 
 		var timeSeries = this.tooltipMeta.timeSeries;
@@ -1334,9 +1354,9 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		}
 
 		return hit;
-
 	},
 
+	// Save helper – goes through the JSON object to find a key match in the meta fields
 	updateMeta : function (_key, title, on) {
 
 		var metaFields = this.tooltipMeta.metaFields;
@@ -1352,8 +1372,9 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 				return;
 			}
 		}
-	},	
+	},
 
+	// Validate date format
 	checkDateFormat : function (_key) {
 
 		if ( _key.length != 8 ) return false;		
@@ -1361,22 +1382,6 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		if ( _m == 'Invalid date' ) return false;
 		return true;
 	},
-
-	show : function () {
-		
-		if (!this._inited) this._initLayout();
-
-		// hide others
-		this.hideAll();
-
-		// show this
-		this._container.style.display = 'block';
-
-		// mark button
-		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
-	},
-
-
 
 });
 
