@@ -91,7 +91,9 @@ module.exports = api.socket = {
 
 		// send to user
 		sock && sock.emit('processingDone', {
-			file_id : file_id
+			file_id : file_id,
+			import_took_ms : options.import_took_ms
+
 		});
 	},
 

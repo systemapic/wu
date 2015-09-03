@@ -70,9 +70,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		var tableOptions = { container : this._table, searchfield : this._search };
 		this._dataLibraryList = new Wu.DataLibraryList(tableOptions);
 
-		// add tooltip
-		// app.Tooltip.add(this._menu, 'The data library contains all files uploaded to the project.');
-
 		// add fullscreen drop 
 		this._resumableDrop = Wu.DomUtil.create('div', 'resumable-drop', app._appPane);
 
@@ -83,17 +80,23 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 	_addUploaderButton : function () {
 		if (this._uploader) {
+
+			// only way to remove listeners on resumable upload button is to destroy completely
 			Wu.DomUtil.remove(this._uploader);
 			this._uploader = null;
 			delete this._uploader;
 		}
 
+		// create upload button
 		this._uploader = Wu.DomUtil.create('div', 'smap-button-gray', this._controlInner, 'Upload');
 	},
 
 
-	_socketNotificationOfDoneFile : function (file_id) {
+	_socketNotificationOfDoneFile : function (file_id, import_time_ms) {
 		var that = app.SidePane.DataLibrary;
+
+		this._importTimes = this._importTimes || {};
+		this._importTimes[file_id] = import_time_ms;
 
 		// get file objects
 		that._getFile(file_id, that._gotFile.bind(that));
@@ -120,7 +123,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_gotFile : function (fileObject) {
-		console.log('_gotFile: ', fileObject);
 
 		var file = fileObject.file;
 		var layer = fileObject.layer;
@@ -138,9 +140,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		project.addLayer(layer);
 
 		// feedback message
+		var import_took_pretty = (parseInt(this._importTimes[file.uuid] / 1000)) + ' seconds';
+		var description = 'Import took ' + import_took_pretty;
 		app.feedback.setMessage({
-			title : 'Done processing!',
-			description : 'Added <strong>' + layer.title + '</strong> to available layers in project ' + project.getTitle() + '.'
+			title : 'Import successful',
+			description : description
 		});	
 
 		// reset progress
@@ -156,6 +160,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		} 
 	},
 
+	// add file to project locally
 	_addFile : function (file) {
 		this.reset();
 		this.refreshTable({
@@ -163,6 +168,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		});
 	},
 
+	// add layer to project locally
 	_addLayer : function () {
 
 		// refresh sidepane layers
@@ -178,157 +184,9 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// refresh chrome content
 		app.Chrome.Right._settingsSelector._refreshAll();
-		
 	},
 
-	// _createDefaultLayer : function (file) {
-
-	// 	var file_id = file.uuid,
-	// 	    project = this._project;
-
-	// 	var layerJSON = {
-	// 		"geom_column": "the_geom_3857",
-	// 		"geom_type": "geometry",
-	// 		"raster_band": "",
-	// 		"srid": "",
-	// 		"affected_tables": "",
-	// 		"interactivity": "",
-	// 		"attributes": "",
-	// 		"access_token": app.tokens.access_token,
-	// 		"cartocss_version": "2.0.1",
-	// 		"cartocss": "#layer {  \n polygon-fill: red; \n marker-fill: #001980; \n marker-allow-overlap: true; \n marker-clip: false; \n marker-comp-op: screen;}",
-	// 		"sql": "(SELECT * FROM " + file_id + ") as sub",
-	// 		"file_id": file_id,
-	// 		"return_model" : true,
-	// 		"projectUuid" : this._project.getUuid()
-	// 	}
-
-	// 	// create postgis layer
-	// 	Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
-	// 		var layer = Wu.parse(layerJSON);
-	// 		console.log('api/db/createLayer', err, layer);
-
-	// 		var options = {
-	// 			projectUuid : this._project.getUuid(), // pass to automatically attach to project
-	// 			data : {
-	// 				postgis : layer.options
-	// 			},
-	// 			metadata : layer.options.metadata,
-	// 			title : file.name,
-	// 			description : file.description,
-	// 			file : file.uuid
-	// 		}
-
-	// 		// create new layer model
-	// 		this._createLayerModel(options, function (err, layerModel) {
-
-	// 			// refresh Sidepane Options
-	// 			project.addLayer(layerModel);
-	// 			app.SidePane.Options.settings.layermenu.update();
-	// 			app.SidePane.Options.settings.baselayer.update();
-
-	// 			// refresh sidepane
-	// 			app.SidePane.refreshMenu();
-
-	// 			// refresh cartoCssControl
-	// 			var ccss = app.MapPane.getControls().cartocss;
-	// 			ccss && ccss._refresh();
-
-	// 			// refresh chrome content
-	// 			app.Chrome.Right._settingsSelector._refreshAll();
-
-	// 			// todo: set layer icon
-	// 			app.feedback.setMessage({
-	// 				title : 'Done processing!',
-	// 				description : 'Added <strong>' + layerModel.title + '</strong> to available layers.',
-	// 			});	
-	// 		})
-			
-	// 	}.bind(this));
-
-	// },
-
-	// _createLayerModel : function (options, done) {
-
-	// 	Wu.Util.postcb('/api/layers/new', JSON.stringify(options), function (err, body) {
-
-	// 		var layerModel = Wu.parse(body);
-
-	// 		done(null, layerModel);
-
-	// 	}.bind(this));
-	// },
-
-	// // process file
-	// uploaded : function (result) {
-
-	// 	console.log('### UPLOADED!!!!!! ###');
-	// 	console.log('uploaded(result)');
-
-		
-	// 	// handle errors
-	// 	if (result.error) {
-	// 		console.error('error', result.error);
-	// 		this.handleError(result.error);
-	// 	}
-	// 	// return if nothing
-	// 	if (!result.files) {
-	// 		console.error('no files?');
-	// 		return;
-	// 	}
-	// 	// add files to library
-	// 	result.files && result.files.forEach(function (file, i, arr) {
-			
-	// 		// add to project locally (already added on server)
-	// 		this._project.setFile(file);
-	// 	}, this);
-
-	// 	// add layers
-	// 	result.layers && result.layers.forEach(function (layer, i) {
-	// 		this._project.addLayer(layer);
-
-	// 		// custom title for rasters
-	// 		var title = layer.data.raster ? 'Layer created' : 'Processing done!';
-	// 		var sev = layer.data.raster ? 2 : 1;
-
-	// 		// todo: set layer icon
-	// 		app.feedback.setMessage({
-	// 			title : title,
-	// 			description : 'Added <strong>' + layer.title + '</strong> to available layers.',
-	// 			id : result.uniqueIdentifier,
-	// 			severity : sev
-	// 		});
-
-	// 	}, this);
-
-	// 	// if not layer, no processing
-	// 	if (!result.layers) {
-	// 		var fileUuid = result.files[0].uuid;
-	// 		app.SidePane.DataLibrary.processFileDone(fileUuid, 100, 1);
-	// 	}
-
-	// 	// refresh Sidepane Options
-	// 	app.SidePane.Options.settings.layermenu.update();
-	// 	app.SidePane.Options.settings.baselayer.update();
-
-	// 	// refresh sidepane
-	// 	app.SidePane.refreshMenu();
-
-	// 	// refresh cartoCssControl
-	// 	var ccss = app.MapPane.getControls().cartocss;
-	// 	if (ccss) ccss._refresh();
-
-	// 	// refresh
-	// 	this.reset();
-
-	// 	// add files
-	// 	this.refreshTable({
-	// 		add: result.files
-	// 	});
-
-	// },
-
-
+	
 
 	_setHooks : function (on) {
 		if (this._hooks == on) return;
@@ -342,7 +200,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// download 
 		if (app.access.to.download_file(this._project)) {
 			// download button
-			Wu.DomEvent[on](this._downloader, 'mousedown', this.downloadFiles, this);
+			// Wu.DomEvent[on](this._downloader, 'mousedown', this.downloadFiles, this);
 		}
 
 		// project selected event
@@ -419,191 +277,72 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	_refreshResumable : function () {
 
 		// remove old
-		if (this.r) this._removeResumable();
+		this._removeResumables();
 
 		// add button
 		this._addUploaderButton();
 
-		// add new
+		// check upload access
 		var project = this._project || app.activeProject;
-		if (app.access.to.upload_file(project)) this._addResumable();
+		if (!app.access.to.upload_file(project)) return;
+			
+		// add new
+		this._addResumable();
 	},
 
-	_removeResumable : function () {
+	_removeResumables : function () {
+		for (var rs in this._resumables) {
+			var r = this._resumables[rs];
 
-		var r = this.r;
-		r.unAssignDrop(this._resumableDrop);
-		r.cancel();
-		this.r = null;
-		delete this.r;
+			// destroy errything (unless active)
+			r.destroy(); 
+		}
+	},
 
-		// remove hooks
-		this._disableResumable();
+	_removeResumable : function (r_id) {
+		this._resumables[r_id] = null;
+		delete this._resumables[r_id];
+	},
+
+	// helper fn
+	_eachResumable : function (fn) {
+		for (var rs in this._resumables) {
+			fn(this._resumables[rs]);
+		}
 	},
 
 	_disableResumable : function () {
-		// remove drop events
-		Wu.DomEvent.off(window.document, 'dragenter', this._dragEnter, this);
-		Wu.DomEvent.off(this._resumableDrop, 'dragleave', this._dragLeave, this);
-		Wu.DomEvent.off(this._resumableDrop, 'drop', this._dragLeave, this);
+		// disable dragging
+
+		// for each resumable
+		this._eachResumable(function (r) {
+			r.disable();
+		});
 	},
 
 	_enableResumable : function () {
-		// add drag/drop events
-		Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
-		Wu.DomEvent.on(this._resumableDrop, 'dragleave', this._dragLeave, this);
-		Wu.DomEvent.on(this._resumableDrop, 'drop', this._dragLeave, this);
+		// enable dragging
+		// for each resumable
+		this._eachResumable(function (r) {
+			r.enable();
+		});
 	},
 	
+	_resumables : {},
 
 	// todo: move into own class (with refresh, etc)
 	_addResumable : function () {
 		if (!app.activeProject) return;
 
 		// create resumable
-		var r = this.r = new Resumable({
-			target : '/api/data/upload/chunked',
-			chunkSize : 2*1024*1024,
-			simultaneousUploads : 5,
-			generateUniqueIdentifier : function (file) {
-				var idr = file.size + '-' + file.lastModified + '-' + app.Account.getUuid() + '-'  + file.name + '-' + Wu.Util.getRandomChars(5);
-				return idr;
-			},
-			testChunks : true, // resumable chunks 
-			query : {
-				fileUuid : Wu.Util.guid('r'),
-				projectUuid : app.activeProject.getUuid(),
-				access_token : app.tokens.access_token,
-				file_id : 'file_' + Wu.Util.getRandomChars(18) + 'ko'
-			},
-
-			// max one upload at a time
-			maxFiles : 1,
-			maxFilesErrorCallback : function () {
-				app.feedback.setError({
-					title : 'Please only upload one file at a time.',
-				});	
-			},
-
-			// accepted filetypes
-			// fileType : ['zip', 'gz', 'png', 'jpg', 'jpeg', 'geojson', 'doc', 'docx', 'pdf', 'txt', 'tif', 'tiff', 'jp2', 'ecw'],
-			fileType : ['zip', 'gz', 'geojson', 'tif', 'tiff', 'jp2', 'ecw'],
-			fileTypeErrorCallback : function (file, errorCount) {
-
-				// set feedback
-				var description = 'The file <strong>' + file.name + '</strong> is not a geodata file. We only allow geodata at this time.';
-				var filetype = file.name.split('.').reverse()[0];
-				
-				// custom shapefile feedback
-				if (filetype == 'shp') description = 'Please zip shapefiles before uploading. Mandatory files are .shp, .shx, .dbf, .prj.';
-
-				// show feedback message
-				app.feedback.setError({
-					title : 'Sorry, you can\'t do that!',
-					description : description
-				});
-
-				// hide drop
-				app.SidePane.DataLibrary._hideDrop();
-			},
+		var r = new Wu.Resumable({
+			drop : this._resumableDrop,
+			browse : this._uploader,
+			context : this
 		});
 
-		// assign to DOM
-		r.assignDrop(this._resumableDrop);
-		r.assignBrowse(this._uploader);
-
-		r.on('fileAdded', function(file){
-			console.log('fileAdded: ', file);
-
-			r._startTime = new Date().getTime();
-			r.upload();
-
-			var size = Wu.Util.bytesToSize(file.size),
-			    fileName = file.fileName,
-			    message = 'Uploading ' + fileName + ' (' + size + ')';
-			
-			// set feedback
-			app.feedback.setMessage({
-				title : 'Upload started',
-				description : message,
-				id : file.uniqueIdentifier
-			});
-
-			// remove fulldrop
-			this._dragLeave();
-
-		}.bind(this));
-
-		r.on('complete', function(data){
-			console.log('r.complete', data);
-		});
-
-		r.on('pause', function(){
-			console.log('r.pause');
-		});
-		
-		r.on('fileSuccess', function(file, message){
-			console.log('r.success', file, message);
-
-			// get file_id
-			var m = Wu.parse(message);
-			var file_id = m.file_id;
-
-			var endTime 	= new Date().getTime(),
-			    startTime 	= r._startTime,
-			    totalTime 	= (endTime - startTime) / 1000,
-			    size 	= file.size / 1000 / 1000,
-			    bytesps  	= size / totalTime,
-			    message 	= 'Uploaded ' + size.toFixed(2) + ' MB in ' + totalTime.toFixed(2) + ' seconds, at ' + bytesps.toFixed(2) + ' MB/s.',
-			    procTime 	= (size * 0.5).toFixed(0) + ' seconds',
-			    ext 	= file.fileName.split('.').reverse()[0];
-
-			message +=' <br><br>Pre-processing will take approx. ' + procTime;
-
-			// set feedback
-			app.feedback.setSuccess({
-				title : 'Upload success!',
-				description : message,
-				id : file.uniqueIdentifier
-			});
-
-			// refresh resumable for next download
-			this._refreshResumable();
-
-			// hide progess bar
-			app.ProgressBar.hideProgress();
-
-
-		}.bind(this));
-
-		r.on('fileError', function(file, message){
-			// console.log('r.fileError', file, message);
-		});
-
-		r.on('fileProgress', function(file){
-			var progress = file.progress() * 100;
-			app.ProgressBar.setProgress(progress);
-		});
-
-		r.on('cancel', function(){
-			console.log('r.cancel');
-		});
-
-		r.on('uploadStart', function(){
-			console.log('r.uploadStart');
-		});
-
-		// add drop events
-		this._enableResumable();
-
-	},
-
-	_addPendingFile : function (file_id) {
-
-		this._project.setPendingFile(file_id);
-
-		// get file and add to client
-		this._getFiles();
+		// add to memory
+		this._resumables[r.get_id()] = r;
 
 	},
 
@@ -628,13 +367,11 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	},
 
 	_dragEnter : function (e) {		
-		console.log('_dragEnter');		
 		if (!app.activeProject) return;		
 		this._showDrop();		
 	},		
 		
 	_dragLeave : function (e) {		
-		console.log('_dragLeave');		
 		this._hideDrop();		
 	},		
 		

@@ -4,8 +4,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_initialize : function (options) {
 
-		console.log('top chrome init', this);
-
 		// init container
 		this.initContainer();
 
@@ -140,8 +138,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_projectSelected : function (e) {
 
-		console.log('%c_projectSelected', 'background: red; color: white');
-
 		var projectUuid = e.detail.projectUuid;
 
 		if (!projectUuid) return;
@@ -155,11 +151,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_refresh : function () {
 
-		console.log('%cREFRESH!', 'background: green; color: white;');
-
 		this._setProjectTitle();
-		// this._setUsername();
-		// this._setPortalLogo();
 		this._showHideLayerButton();
 
 		// The layer menu
