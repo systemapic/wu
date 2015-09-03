@@ -29,7 +29,7 @@ Wu.FeedbackPane = Wu.Class.extend({
 	},
 
 	setSuccess : function (options) {
-		this.add(options, 2);	// success message
+		this.add(options, 1);	// success message
 	},
 	
 	setError : function (options) {
@@ -219,7 +219,7 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 	},
 
 	setDescription : function () {
-		this._description.innerHTML = this.options.description;
+		this._description.innerHTML = this.options.description || '';
 	},
 
 	setIcon : function () {

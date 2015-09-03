@@ -110,48 +110,48 @@ Wu.StatusPane = Wu.Class.extend({
 
 	_addAutoCloseEvents : function () {
 
-		// //console.log('_addAutoCloseEvents');
+		console.log('_addAutoCloseEvents');
 
-		// var mapPaneDiv = app.MapPane._container; // mapPaneDiv = Wu.DomUtil.get('map'); or document.getElementById('map');
-		// Wu.DomEvent.on(mapPaneDiv, 'click', this.close, this);
+		var mapPaneDiv = app.MapPane._container; // mapPaneDiv = Wu.DomUtil.get('map'); or document.getElementById('map');
+		Wu.DomEvent.on(mapPaneDiv, 'click', this.close, this);
 
 		// var headerPaneDiv = app.HeaderPane._container;
 		// Wu.DomEvent.on(headerPaneDiv, 'click', this.close, this);
 
-		// //implementing collapsing pane capability in the start screen - recent projects pane
-		// // var atStartPane = document.getElementsByClassName('startpane-canvas-container')[0];
-		// var atStartPane = app.StartPane._container;
-		// if (atStartPane !== undefined ){
-		// 	//necessary check for the state that follows after having chosen a project
-		// 	Wu.DomEvent.on(atStartPane, 'click', this.close, this);
+		//implementing collapsing pane capability in the start screen - recent projects pane
+		// var atStartPane = document.getElementsByClassName('startpane-canvas-container')[0];
+		var atStartPane = app.StartPane._container;
+		if (atStartPane !== undefined ){
+			//necessary check for the state that follows after having chosen a project
+			Wu.DomEvent.on(atStartPane, 'click', this.close, this);
 
-		// 	// disable "select project" event in startpane
-		// 	app.StartPane.disableHooks();
-		// }
+			// disable "select project" event in startpane
+			app.StartPane.disableHooks();
+		}
 
 	},
 
 	_removeAutoCloseEvents : function () {
 
-		// //console.log('_removeAutoCloseEvents');
+		//console.log('_removeAutoCloseEvents');
 
-		// var mapPaneDiv = app.MapPane._container; // mapPaneDiv = Wu.DomUtil.get('map'); or document.getElementById('map');
-		// Wu.DomEvent.off(mapPaneDiv, 'click', this.close, this);
+		var mapPaneDiv = app.MapPane._container; // mapPaneDiv = Wu.DomUtil.get('map'); or document.getElementById('map');
+		Wu.DomEvent.off(mapPaneDiv, 'click', this.close, this);
 
 		// var headerPaneDiv = app.HeaderPane._container;
 		// Wu.DomEvent.off(headerPaneDiv, 'click', this.close, this);
 
-		// //implementing collapsing pane capability in the start screen - recent projects pane
-	 //    	// var atStartPane = document.getElementsByClassName('startpane-canvas-container')[0];
-		// var atStartPane = app.StartPane._container;
-	 //    	if (atStartPane !== undefined ){
-	 //    		//necessary check for the state that follows after having chosen a project
-		// 	Wu.DomEvent.off(atStartPane, 'click', this.close, this);
+		//implementing collapsing pane capability in the start screen - recent projects pane
+	    	// var atStartPane = document.getElementsByClassName('startpane-canvas-container')[0];
+		var atStartPane = app.StartPane._container;
+	    	if (atStartPane !== undefined ){
+	    		//necessary check for the state that follows after having chosen a project
+			Wu.DomEvent.off(atStartPane, 'click', this.close, this);
 
-		// 	// enable "select project" event in startpane
-		// 	app.StartPane.enableHooks();
+			// enable "select project" event in startpane
+			app.StartPane.enableHooks();
 
-		// }
+		}
 
 	},
 

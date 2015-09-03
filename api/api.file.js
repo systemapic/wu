@@ -691,28 +691,28 @@ module.exports = api.file = {
 		file.save(callback);
 	},
 
-	getFile : function (req, res) {
+	// getFile : function (req, res) {
 
-		console.log('req.query', req.query);
+	// 	console.log('req.query', req.query);
 		
-		var fileUuid = req.query.fileUuid || req.query.file_id,
-		    ops = [];
+	// 	var fileUuid = req.query.fileUuid || req.query.file_id,
+	// 	    ops = [];
 
-		// check for missing info
-		if (!fileUuid) return api.error.missingInformation(req, res);
+	// 	// check for missing info
+	// 	if (!fileUuid) return api.error.missingInformation(req, res);
 
-		// todo: check permission to access file
+	// 	// todo: check permission to access file
 		
-		// get file
-		File
-		.findOne({uuid : fileUuid})
-		.exec(function (err, file) {
-			if (err) return api.error.general(req, res, err);
+	// 	// get file
+	// 	File
+	// 	.findOne({uuid : fileUuid})
+	// 	.exec(function (err, file) {
+	// 		if (err) return api.error.general(req, res, err);
 
-			res.end(JSON.stringify(file));
-		});
+	// 		res.end(JSON.stringify(file));
+	// 	});
 
-	},
+	// },
 
 	_getFile : function (fileUuid, callback) {
 
@@ -721,25 +721,15 @@ module.exports = api.file = {
 	// save file to project (file, layer, project id's)
 	addToProject : function (file_id, projectUuid, callback) {
 
-		console.log('===> ADD FILE TO PROJECT', file_id);
-
 		Project
 		.findOne({'uuid' : projectUuid })
 		.exec(function (err, project) {
-			console.log('');
-			console.log('');
-			console.log('');
-			console.log('err? -> found pro:', err, project);
-			console.log('file_id: ', file_id);
-
 			if (err) return callback && callback(err);
 			if (!project) return callback && callback('No project');
 
 			project.files.push(file_id);			
 			project.markModified('files');
 			project.save(function (err) {
-				console.log('saved project', err);
-				console.log('modified project: ', project);
 				callback && callback(err);
 			});
 		});

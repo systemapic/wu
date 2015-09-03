@@ -74,8 +74,6 @@ module.exports = api.socket = {
 	},
 
 	processingProgress : function (options) {
-		console.log('SOCKET: processingProgress');
-		// console.log('processingProgress'.green, options);
 
 		// get socket
 		var socket = api.socket.getSocket(options);
@@ -85,19 +83,21 @@ module.exports = api.socket = {
 	},
 
 	processingDone : function (options) {
-		// console.log('processingDone'.yellow);
-		console.log('SOCKET: processingDone');
 
-		var userId = api.socket._getUserId(options);
-		var sock = api.socket._getSocket(userId);
+		var file_id = options.file_id,
+		    user_id = options.user_id;
+
+		var sock = api.socket._getSocket(user_id);
 
 		// send to user
-		sock && sock.emit('processingDone', options.result);
+		sock && sock.emit('processingDone', {
+			file_id : file_id,
+			import_took_ms : options.import_took_ms
+
+		});
 	},
 
 	grindRasterDone : function (req, res) {
-		// console.log('grindRasterDone', req.body);
-		console.log('SOCKET: grindRasterDone');
 
 		var fileUuid = req.body.fileUuid,
 		    process = api.socket._getProcessing(fileUuid),
@@ -106,8 +106,6 @@ module.exports = api.socket = {
 		    sock = api.socket._getSocket(userId),
 		    error = req.body.error,
 		    uniqueIdentifier = req.body.uniqueIdentifier;
-
-		// console.log('grindDone: err?'.yellow, error);
 
 		// send to user
 		sock && sock.emit('processingDone', {
@@ -131,9 +129,6 @@ module.exports = api.socket = {
 		    sock = api.socket._getSocket(userId),
 		    error = req.body.error,
 		    uniqueIdentifier = req.body.uniqueIdentifier;
-
-		// console.log('grindDone: err?'.yellow, error);
-		console.log('SOCKET: grindDone');
 
 		// send to user
 		sock && sock.emit('processingDone', {

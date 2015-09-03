@@ -115,31 +115,9 @@ L.Control.Legends = Wu.Control.extend({
 		this.refreshLegends();
 	},
 
-	// _initContent : function () {
-
-	// },
-
-	// // is called when changing/selecting project
-	// update : function (project) {
-	       
-	// 	// project is ready only here, so init relevant vars
-	// 	// update is called from enableLayermenu toggle in MapPane
-
-	// 	// get vars
-	// 	this.project = project || Wu.app._activeProject;
-	// 	this._content = this._legendsContainer;
-
-	// 	// init divs
-	// 	this.initContainer();		
-
-	// 	this.calculateHeight();
-
-	// },
 
 	_initContent : function () {
 	
-		console.error('_initContent legends');
-
 		this.legends = {};
 		this._layers = [];
 

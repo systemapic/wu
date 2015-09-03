@@ -86,14 +86,10 @@ module.exports = api.postgis = {
 	ensureDatabaseExists : function (options, done) {
 		var userUuid = options.user.uuid;
 
-		console.log('ensureDB');
-
 		User
 		.findOne({uuid : userUuid})
 		.exec(function (err, user) {
 			if (err) return done(err);
-
-			console.log('useR: ', user);
 
 			// if already exists, return
 			if (user.postgis_database) return done(null, options);
@@ -121,8 +117,6 @@ module.exports = api.postgis = {
 		// import according to type
 		ops.push(function (options, callback) {
 
-			console.log('import', options);
-
 			// get which type of data
 			var geotype = api.postgis._getGeotype(options);
 
@@ -136,7 +130,6 @@ module.exports = api.postgis = {
 
 			// not type caught, err
 			callback('Not a valid geotype. Must be Shapefile, GeoJSON or Raster.');
-
 		});
 
 		async.waterfall(ops, done);
@@ -152,12 +145,13 @@ module.exports = api.postgis = {
 		    pg_db 	= options.user.postgis_database,
 		    ops 	= [];
 
+
+
+		if (!prjfile) return done('Please provide a projection file.');
+
 		// todo: put in config
 		var IMPORT_SHAPEFILE_SCRIPT_PATH = '../scripts/postgis/import_shapefile.sh'; 
 		
-
-		console.log('prjfile: ', prjfile);
-
 		// read projection
 		ops.push(function (callback) {
 
@@ -187,18 +181,17 @@ module.exports = api.postgis = {
 				srid_converted
 			].join(' ');
 
-			console.log('cmd: ', cmd);
-
 			// import to postgis
 			var startTime = new Date().getTime();
 			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
-				console.log('stdout', err, stdin);
 				if (err) console.log('import_shapefile_script err: ', err);
+				console.log('stdin, ', stdin);
+				console.log('stdout', stdout);
 
 				var endTime = new Date().getTime();
 
 				// set import time to status
-				api.upload.updateStatus(options.file_id, { 	// todo: set err if err
+				api.upload.updateStatus(file_id, { 	// todo: set err if err
 					data_type : 'vector',
 					import_took_ms : endTime - startTime,
 					table_name : file_id,
@@ -229,7 +222,7 @@ module.exports = api.postgis = {
 				var metadataJSON = JSON.stringify(metadata);
 				
 				// set upload status
-				api.upload.updateStatus(options.file_id, {
+				api.upload.updateStatus(file_id, {
 					metadata : metadataJSON
 				}, callback);
 			})
@@ -247,7 +240,7 @@ module.exports = api.postgis = {
 				if (err) return callback(err);
 				
 				// set upload status
-				api.upload.updateStatus(options.file_id, {
+				api.upload.updateStatus(file_id, {
 					rows_count : result.rows[0].count
 				}, callback);
 			});
@@ -260,7 +253,6 @@ module.exports = api.postgis = {
 
 
 	importGeojson : function (options, done) {
-		console.log('importGeosjon', options);
 
 		// need to convert to ESRI shapefile (ouch!) first..
 		var geojsonPath = options.files[0],
@@ -312,7 +304,7 @@ module.exports = api.postgis = {
 			api.postgis.importShapefile(options, function (err, results) {
 
 				// set upload status
-				api.upload.updateStatus(options.file_id, {
+				api.upload.updateStatus(file_id, {
 					original_format : 'GeoJSON',
 				}, function () {
 					// return
@@ -351,7 +343,7 @@ module.exports = api.postgis = {
 			var endTime = new Date().getTime();
 
 			// set err on upload status
-			if (err) return api.upload.updateStatus(options.file_id, {
+			if (err) return api.upload.updateStatus(file_id, {
 				error_code : 2,
 				error_text : err
 			}, function () {
@@ -361,7 +353,7 @@ module.exports = api.postgis = {
 
 
 			// set upload status
-			api.upload.updateStatus(options.file_id, {
+			api.upload.updateStatus(file_id, {
 				data_type : 'raster',
 				original_format : original_format,
 				import_took_ms : endTime - startTime,
@@ -421,8 +413,6 @@ module.exports = api.postgis = {
 				postgis_db : postgis_db,
 				query : query
 			}, function (err, results) {
-				console.log('get all columns');
-				console.log('err, results', err, results);
 
 				var rows = results.rows[0];
 
@@ -434,11 +424,6 @@ module.exports = api.postgis = {
 					}
 				}
 
-				console.log('COLUMNS -==> ', columns);
-
-				// metadata.columns = columns;
-
-				// callback();
 
 				var min_max_values = {};
 				var jobs = [];
@@ -472,12 +457,8 @@ module.exports = api.postgis = {
 
 							var json = stdout.split('\n')[2];
 
-							console.log('json', json);
-
 							var data = JSON.parse(json);
 							
-							console.log('minmax data: ', data);
-
 							min_max_values[column] = data;
 
 							// callback
@@ -493,8 +474,6 @@ module.exports = api.postgis = {
 
 
 				async.parallel(jobs, function (err, values) {
-					console.log('DONEDONEDONE! min_max_values', min_max_values);
-
 					metadata.columns = min_max_values;
 
 					callback(null);
@@ -522,7 +501,6 @@ module.exports = api.postgis = {
 
 			// create database in postgis
 			exec(command, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
-				console.log('err, stdout, stdin', err, stdout, stdin);
 
 				var json = stdout.split('\n')[2];
 				var geojson = JSON.parse(json);
@@ -563,18 +541,13 @@ module.exports = api.postgis = {
 			// var query = 'SELECT count(*) FROM ' + file_id;
 			var query = "SELECT pg_size_pretty(pg_table_size('" + file_id + "'));"
 			
-			console.log('size quer: ', query);
-
 			api.postgis.query({
 				postgis_db : postgis_db,
 				query : query
 			}, function (err, results) {
-				console.log('ERR, RESULTS SIZE', err, results);
 				if (err) return callback();
 
 				var json = results.rows[0];
-
-				console.log('json_SIZEE: ', json);
 				
 				metadata.size_bytes = json.pg_size_pretty;
 

@@ -55,63 +55,27 @@ Wu.Socket = Wu.Class.extend({
 		socket.on('uploadDone', function (data) {
 			console.log('uploadDone!', data);
 
-			// set uploaded
-			// app.SidePane.DataLibrary.uploaded(data);
-
-			// if (data.layers.length) {
-			// 	// set processing started on file
-			// 	var fileUuid = data.files[0].uuid;
-			// 	app.SidePane.DataLibrary.processFile(fileUuid, 0, 1);
-			// }
 		});
 		socket.on('processingDone', function (data) {
-			console.log('processingDone!', data);
+			console.log('processingDone!!!', data);
 
-			// var size = Wu.Util.bytesToSize(data.size),
-			//     elapsed = data.elapsed,
-			//     bytesPerSec = Wu.Util.bytesToSize(data.size / elapsed / 1000) + '/s',
-			//     description = 'Processing of ' + size + ' took ' + elapsed / 1000 + ' seconds',
-			//     uniqueIdentifier = data.uniqueIdentifier,
-			//     fileUuid = data.processingDone;
-
-			// if (data.error) {
-			// 	app.feedback.setError({
-			// 		title : 'Processing error!',
-			// 		description : data.error,
-			// 		id : uniqueIdentifier
-			// 	});
-			// } else {
-			// 	app.feedback.setSuccess({
-			// 		title : 'Processing done!',
-			// 		description : description,
-			// 		id : uniqueIdentifier
-			// 	});
-
-			// 	app.SidePane.DataLibrary.processFileDone(fileUuid, 100, 1);
-			// }
-
+			// notify data lib
+			var file_id = data.file_id;
+			var import_took_ms = data.import_took_ms;
+			app.SidePane.DataLibrary._socketNotificationOfDoneFile(file_id, import_took_ms);
 			
 		});
 		socket.on('errorMessage', function (data) {
 			console.log('errorMessage!', data);
 
-			// app.feedback.setError({
-			// 	title : 'Error:',
-			// 	description : data.error,
-			// });
+			var content = data.error;
+
+			app.FeedbackPane.setError({
+				title : content.title,
+				description : content.description
+			})
 		});
-		// // Listen for get-feelings event.
-		// socket.on('get-feelings', function () {
-		// 	socket.emit('send-feelings', 'good');
-		// });
-		// // Listen for session event.
-		// socket.on('session', function(data) {
-		// 	message = 'Hey ' + data.name + '!\n\n' 
-		// 	message += 'Server says you feel '+ data.feelings + '\n'
-		// 	message += 'I know these things because sessions work!\n\n'
-		// 	message += 'Also, you joined ' + data.loginDate + '\n'
-		// 	console.log('session');
-		// });
+		
 
 	},
 

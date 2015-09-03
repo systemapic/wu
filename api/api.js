@@ -37,7 +37,6 @@ module.exports.pixels 	= require('./api.pixels');
 module.exports.portal 	= require('./api.portal');
 module.exports.access 	= require('./api.access');
 module.exports.client 	= require('./api.client');
-module.exports.bridge 	= require('./api.bridge');
 module.exports.socket 	= require('./api.socket');
 module.exports.postgis  = require('./api.postgis');
 module.exports.project 	= require('./api.project');

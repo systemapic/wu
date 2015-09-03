@@ -478,6 +478,10 @@ body {
 	}
 }
 
+#create-button.disabled {
+	display: none;
+}
+
 #forgot-link {
 	font-weight: 400;
 	color: white;
@@ -510,8 +514,11 @@ body {
 	}
 
 #password-strength {
-	color: white;
-	}
+	color: rgba(255, 255, 255, 0.78);
+	font-size: 12px;
+	width: 160px;
+	padding: 4px;
+}
 
 .red 	{color: red; display:inline;}
 .blue 	{color: blue; display:inline;}
