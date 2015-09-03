@@ -1336,7 +1336,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// get first layer
 		_.forEach(this.layers, function (l) {
-			console.log('L', l);
 			layerItem = l;
 			return false;
 		}.bind(this));

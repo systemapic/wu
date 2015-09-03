@@ -1,0 +1,16 @@
+.smap-button-gray.blurred {
+	color: gray;
+	background: gainsboro;
+}
+.smap-button-gray.blurred:active{
+	color: gray;
+	background: gainsboro;
+}
+
+.leaflet-control-attribution {
+	background: rgba(255,255,255, 0.7) !important;
+}
+.feedback-pane {
+	margin-bottom: 26px !important;
+	margin-left: 6px !important;
+}
