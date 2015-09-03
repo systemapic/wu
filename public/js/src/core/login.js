@@ -1,24 +1,14 @@
 var feedbackTimer;
 
-window.onload = function () {
-	console.log('window.onload');
 
-	  // We need to access the form element
-	  var form = document.getElementById("login-form");
 
-	  // // to takeover its submit event.
-	  // form.addEventListener("submit", function (event) {
-	  //   event.preventDefault();
-
-	  //   console.log('login form submit click!');
-
-	  //   // sendData();
-	  //   getAccessToken();
-	  // });
-
+check_token();
+function check_token() {
 	if (!checkToken()){
-		document.getElementById('input-email').focus();
-		document.getElementById('forgot-email').focus();
+		var ie = document.getElementById('input-email');
+		var fe = document.getElementById('forgot-email');
+		if (ie) ie.focus();
+		if (fe) fe.focus();
 		return;
 	} 
 
@@ -42,7 +32,26 @@ window.onload = function () {
 			feedbackDiv.style.paddingTop = '10px';
 		} 
 	});
+}
 
+window.onload = function () {
+	// console.log('window.onload');
+
+	// We need to access the form element
+	// var form = document.getElementById("login-form");
+
+
+	
+
+	// var p = document.getElementById('password-input');
+	// var r = document.getElementById('password-repeat');
+	// p.onkeyup = keyedup;
+	// r.onkeyup = keyedup;
+
+}
+
+function login_key_up() {
+	console.log('KEYOU')
 }
 
 function initScripts() {
@@ -64,50 +73,6 @@ function getToken() {
 	return token;
 }
 
-// function getAccessToken() {
-
-// 	var username = document.getElementById('input-email').value;
-// 	var password = document.getElementById('input-pass').value
-
-// 	console.log('getAccessToken u/p; ', username, password);
-
-// 	var options = {
-// 		grant_type : 'password',
-// 		username : username,
-// 		password : password,
-// 		scope : 'offline_access'
-// 	}
-
-// 	sendAccessTokenRequest('/oauth/token', options, function (err, body) {
-// 		console.log('access token return, err, body', err, body);
-
-// 		if (err) return console.log(err);
-
-// 		var result = JSON.parse(body);
-
-// 		if (result.error) return console.log(result);
-
-// 		var access_token = result.access_token;
-// 		console.log('Access token: ', access_token);
-// 		window.access_token = access_token;
-
-// 		if (window.access_token) {
-// 			// make GET request with access token
-
-// 			// setTimeout(getPortal, 1000);
-
-// 			var url = 'https://dev.systemapic.com/?access_token=' + window.access_token;
-
-// 			console.log('url: ', url);
-// 			setTimeout(function () {
-// 				window.location.href = url;
-// 			}, 1000);
-// 		}
-
-// 	});	
-// }
-
-
 function getPortal() {
 	console.log('getPortal');
 
@@ -117,18 +82,6 @@ function getPortal() {
 	http.setRequestHeader('Authorization', 'Bearer ' + window.access_token); 
 	http.send( null );
 	return http.responseText;
-
-	// var http = new XMLHttpRequest(),
-	//     url = window.location.origin + '/portal';
-	// http.open("GET", url, true);
-	// http.setRequestHeader('Content-type', 'application/json');
-	// http.setRequestHeader('Authorization', 'Bearer ' + window.access_token); 
-	// http.onreadystatechange = function() {
-	// 	if (http.readyState == 4) {
-	// 		callback && callback(null, http.responseText); 
-	// 	} 
-	// }
-	// http.send(JSON.stringify(options));
 
 }
 
@@ -197,12 +150,10 @@ function addhooks() {
 	var createButton = document.getElementById('create-button');
 	createButton.onclick = submitNewPassword;
 
-	// 
 }
 
 function submitNewPassword () {	
-	console.log('submitNewPassword');
-	if (!passwordValid || !passwordSame) return console.log('too weak');
+	if (!passwordSame) return console.log('too weak');
 
 	var pass1 = document.getElementById('password-input').value;
 	var pass2 = document.getElementById('password-repeat').value;
@@ -216,7 +167,6 @@ function submitNewPassword () {
 
 	// send to server
 	sendRequest('/reset/password', options, function (err, body){
-		console.log('/reset', err, body);
 		var result = JSON.parse(body);
 		if (result.err) return console.error(result.err);
 
@@ -343,10 +293,6 @@ function loginClick () {
 			console.log('hello ', authenticated.name);
 			setFeedback('Authenticated!', authenticated.name);
 
-			// var form = document.getElementById('login-form');
-			// form.action = '/login';
-			// form.submit();
-
 		} else {
 			console.log('not auth!');
 			setFeedback('Not authenticated!');
@@ -400,10 +346,26 @@ function debugSetPassword () {
 
 zxcvbn_load_hook = function () {
 
+	// var p = document.getElementById('password-input');
+	// var r = document.getElementById('password-repeat');
+	// p.onkeyup = keyedup;
+	// r.onkeyup = keyedup;
+}
+
+function pw_key_up() {
+	console.log('pw_key_up');
+
 	var p = document.getElementById('password-input');
 	var r = document.getElementById('password-repeat');
-	p.onkeyup = keyedup;
-	r.onkeyup = keyedup;
+	var s = document.getElementById('password-strength');
+
+	if (p.value == r.value && p.value != '') {
+		markSame();
+	} else {
+		markNotSame();
+	}
+
+	checkButton();
 }
 
 function keyedup() {
@@ -411,38 +373,42 @@ function keyedup() {
 	var r = document.getElementById('password-repeat');
 	var s = document.getElementById('password-strength');
 
+
 	var password = p.value;
 	var score = zxcvbn(password);
 	console.log(score);
-	s.innerHTML = prettyStrength(score.score);
+	s.innerHTML = 'Time to brute-force password: ' + score.crack_time_display; 
 
-	score.score == 4 ? markStrong() : markWeak();
-	checkButton();
-	p.value == r.value ? markSame() : markNotSame();
-	checkButton();
+	// score.score >= 3 ? markStrong() : markWeak();
+	// checkButton();
+	// p.value == r.value ? markSame() : markNotSame();
+	// checkButton();
 }
 
 function checkButton() {
 	var createButton = document.getElementById('create-button');
-	if (passwordSame && passwordValid) {
-		createButton.disabled = false;		
+	if (passwordSame) {
+		createButton.disabled = false;	
+		createButton.style.display = 'block';	
 	} else {
 		createButton.disabled = true;		
+		createButton.style.display = 'none';	
 	}
 }
 
 function markSame() {
 	passwordSame = true;
-	var pro = document.getElementById('password-repeat-ok');
-	pro.innerHTML = '√';
-	pro.style.color = 'green';
+	// var pro = document.getElementById('password-repeat-ok');
+	// pro.innerHTML = '√';
+	// pro.style.color = 'green';
+
 }
 
 function markNotSame() {
 	passwordSame = false;
-	var pro = document.getElementById('password-repeat-ok');
-	pro.innerHTML = 'X';
-	pro.style.color = 'red';
+	// var pro = document.getElementById('password-repeat-ok');
+	// pro.innerHTML = 'X';
+	// pro.style.color = 'red';
 }
 
 var passwordValid;
