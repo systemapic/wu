@@ -342,6 +342,8 @@ module.exports = api.upload = {
 		async.waterfall(ops, function (err, result) {
 			if (err) console.log('oooooooo err!  chunked upload done err!!', err);
 			
+			console.log('ALWAYS ARRAIVING HEREHEHERHRHEH');
+
 			// clean up, remove chunks
 			var removePath = '/data/tmp/resumable-' + uniqueIdentifier + '.*';
 			fs.remove(removePath, console.log);
@@ -479,7 +481,9 @@ module.exports = api.upload = {
 			
 			// if err, set upload status, return
 			if (err) {
-				return api.upload.updateStatus(file_id, { // todo: more specific error reporting
+
+				// update upload status
+				api.upload.updateStatus(file_id, { // todo: more specific error reporting
 					error_code : 1, 
 					error_text : err,
 					status : 'Failed'
@@ -491,6 +495,9 @@ module.exports = api.upload = {
 						description : err
 					});
 				});
+
+				// return err
+				return done(err);
 			}
 
 

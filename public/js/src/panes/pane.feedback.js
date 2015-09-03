@@ -29,7 +29,7 @@ Wu.FeedbackPane = Wu.Class.extend({
 	},
 
 	setSuccess : function (options) {
-		this.add(options, 2);	// success message
+		this.add(options, 1);	// success message
 	},
 	
 	setError : function (options) {

@@ -130,7 +130,6 @@ module.exports = api.postgis = {
 
 			// not type caught, err
 			callback('Not a valid geotype. Must be Shapefile, GeoJSON or Raster.');
-
 		});
 
 		async.waterfall(ops, done);

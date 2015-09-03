@@ -76,6 +76,8 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		// add hooks
 		this.addHooks();
 
+
+
 	},
 
 	_addUploaderButton : function () {
@@ -218,7 +220,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	setFullSize : function () {
 		Wu.DomUtil.removeClass(this._content, 'minimal');
 		Wu.DomUtil.removeClass(this._expandCollapse, 'expand');
-		Wu.DomUtil.addClass(app._map._container, 'map-blur');
 		this.fullsize = true;	
 		this.refreshTable({tableSize : 'full'});	
 	},
@@ -226,7 +227,6 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	setSmallSize : function () {
 		Wu.DomUtil.addClass(this._content, 'minimal');
 		Wu.DomUtil.addClass(this._expandCollapse, 'expand');
-		Wu.DomUtil.removeClass(app._map._container, 'map-blur');
 		this.fullsize = false;
 		this.refreshTable({tableSize : 'small'});
 	},
@@ -249,6 +249,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 
 		// refresh uploader
 		this._refreshResumable();
+
 	},
 
 	_unload : function (e) {
