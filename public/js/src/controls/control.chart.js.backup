@@ -176,19 +176,16 @@ Wu.Control.Chart = Wu.Class.extend({
 	// Create single point C3 pop-up content
 	singlePopUp : function (e) {
 
-
-
-
 		// With time series
 		if ( this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == 'on' ) {
-			var content = this.singleC3PopUp(e);
+			var _HTML = this.singleC3PopUp(e);
 		
 		// Without time series
 		} else {
-			var content = this._createPopupContent(e);
+			var _HTML = this._createPopupContent(e);
 		}
 
-		return content;
+		return _HTML;
 
 	},
 
@@ -207,8 +204,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		    		yName 	: 'field_y',
 		    		x 	: [],
 		    		y 	: [],
-		    		ticks 	: [],
-		    		tmpTicks : []
+		    		ticks 	: []
 			},
 			multiPopUp : false
 
@@ -226,12 +222,9 @@ Wu.Control.Chart = Wu.Class.extend({
 		}
 
 		// Create HTML
-		var _header = this.createHeader(headerOptions);
+		var _HTML = this.headerHTML(headerOptions);
 
-		var content = Wu.DomUtil.create('div', 'popup-inner-content');
-		content.appendChild(_header);
-
-		return content;		
+		return _HTML;		
 	},	
 
 
@@ -248,8 +241,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		    		yName 	: 'field_y',
 		    		x 	: [],
 		    		y 	: [],
-		    		ticks 	: [],
-		    		tmpTicks : []
+		    		ticks 	: []
 			},
 		}
 
@@ -263,38 +255,23 @@ Wu.Control.Chart = Wu.Class.extend({
 			multiPopUp 	: false
 		}
 
-
-		var content = Wu.DomUtil.create('div', 'popup-inner-content');
-
 		// Create header HTML
-		var _header = this.createHeader(headerOptions);
-		content.appendChild(_header);
+		var _HTML = this.headerHTML(headerOptions);
 
 		// Create graph HTML
-		if ( this.popupSettings && this.popupSettings.timeSeries.enable != 'off') {
-			
-			var _chart = this.C3Chart(_c3Obj);
-			content.appendChild(_chart);
-		
-		}
+		if ( this.popupSettings && this.popupSettings.timeSeries.enable != 'off') _HTML += this.C3ChartHTML(_c3Obj);
 
-		return content;			
+		return _HTML;			
 	},
 
 	// Create multi point C3 pop-up content
 	multiPointPopUp : function (_data) {	
-
-
-		console.log('%c multiPointPopUp', 'background: blue; color: white;');
-		console.log('_data', _data);
 		
 		var _average = _data.average;
 		var _center = _data.center;
 		var _layer = this._getWuLayerFromPostGISLayer(_data.layer_id);
 		var _layerName = _layer.store.title;
 		var _totalPoints = _data.total_points;
-
-		console.log('_totalPoints', _totalPoints);
 
 		// Show square meters if less than 1000
 		if ( _data.area < 1000 ) {
@@ -322,8 +299,7 @@ Wu.Control.Chart = Wu.Class.extend({
 				    		yName 	: 'field_y',
 				    		x 	: [],
 				    		y 	: [],
-				    		ticks 	: [],
-				    		tmpTicks : []
+				    		ticks 	: []
 			},
 			multiPopUp : {
 					center 		: _center,
@@ -342,18 +318,11 @@ Wu.Control.Chart = Wu.Class.extend({
 			multiPopUp 	: true
 		}
 
+		// Create HTML
+		var _header = this.headerHTML(headerOptions);
+		var _HTML   = this.C3ChartHTML(_c3Obj);		
 
-		var content = Wu.DomUtil.create('div', 'popup-inner-content');
-
-		// Create header
-		var _header = this.createHeader(headerOptions);
-		content.appendChild(_header);
-
-		// Create chart
-		var _chart = this.C3Chart(_c3Obj);
-		content.appendChild(_chart);
-
-		return content;
+		return _header + _HTML;
 	},		
 
 
@@ -363,36 +332,39 @@ Wu.Control.Chart = Wu.Class.extend({
 	// PRODUCE HTML		
 
 	// Header
-	createHeader : function (options) {
+	headerHTML : function (options) {
 
 		var headerMeta = options.headerMeta;
 		var layerName  = options.layerName;
 		var areaSQ     = options.areaSQ;
-		var pointCount = options.pointCount;
+		var pointCount = options.totalPoints;
 		var multiPopUp = options.multiPopUp;
 
-		// If custom title
 		if ( this.popupSettings.title && this.popupSettings.title != '' ) {
 			layerName = this.popupSettings.title
 		}
 
-		// Container
-		var container = Wu.DomUtil.createId('div', 'c3-header-metacontainer');
+		var metaStr = '<div id="c3-header-metacontainer" ';
 
-		// If not time series, make small pop-up
+		// Add class for small pop-up
 		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == 'off' ) {
-			container.className = 'small-pop-up';
+			metaStr += ' class="small-pop-up"';
 		}
+		metaStr += '">';
 
-		// Header
-		var headerWrapper = Wu.DomUtil.create('div', 'c3-header-wrapper', container);
-		var headerName = Wu.DomUtil.create('div', 'c3-header-layer-name', headerWrapper, layerName)
 
+		metaStr += '<div class="c3-header-wrapper">';
+		metaStr += '<div class="c3-header-layer-name">' + layerName + '</div>';
+		
+		// If we're sampling more than one point
 		if ( multiPopUp ) {
-			var plural = 'sampling ' + pointCount + ' points over ' + areaSQ;
-			var _pointCount = Wu.DomUtil.create('div', 'c3-point-count', headerWrapper, plural);
+		
+			var plural = pointCount + ' points over ' + areaSQ;
+			metaStr += '<div class="c3-point-count">sampling&nbsp;' + plural + '</div>';
+		
 		}
 
+		metaStr += '</div>';
 
 		var c = 0;
 		headerMeta.forEach(function(meta, i) {
@@ -420,25 +392,20 @@ Wu.Control.Chart = Wu.Class.extend({
 
 			c++;
 
-			var roundedVal = 100;
-
-			if ( roundedVal ) {
-				var NewVal = Math.floor(parseFloat(_val) * roundedVal) / roundedVal;
-				_val = NewVal;
-			}
-
-			var metaPair = Wu.DomUtil.create('div', 'c3-header-metapair metapair-' + c, container);
-			var metaKey = Wu.DomUtil.create('div', 'c3-header-metakey', metaPair, title);
-			var metaVal = Wu.DomUtil.create('div', 'c3-header-metaval', metaPair, _val);
+			metaStr += '<div class="' + 'c3-header-metapair metapair-' + c + '">';
+			metaStr += '<div class="c3-header-metakey">' + title + ':</div>';
+			metaStr += '<div class="c3-header-metaval">' + _val + '</div>';
+			metaStr += '</div>';
 
 		}.bind(this));
 
-		return container;
+		metaStr += '</div>';
 
+		return metaStr;
 	},
 
 	// Chart
-	C3Chart : function (c3Obj) {
+	C3ChartHTML : function (c3Obj) {
 		
 		var data = c3Obj.d3array;
 
@@ -498,6 +465,14 @@ Wu.Control.Chart = Wu.Class.extend({
 		// Create container
 		var _C3Container = Wu.DomUtil.createId('div', 'c3-container');	
 
+
+		// xoxoxoxoxo
+		// L.DomEvent.disableClickPropagation(_C3Container);
+		// L.DomEvent.disableScrollPropagation(_C3Container);
+
+		// Wu.DomEvent.on(_C3Container, 'click', this.clickChart, this)
+
+
 		// CHART SETTINGS
 		var chart = c3.generate({
 		        
@@ -531,14 +506,19 @@ Wu.Control.Chart = Wu.Class.extend({
 		                colors : {
 		                	field_y: '#0000FF'
 		                },
-		                type: 'scatter',
+
+		                // type: 'line',
+		                type: 'scatter'
+		                // type : 'spline'
+		                // These are not so good..
+		                // type: 'bar', 
+		                // type : 'area'
+		                // type : 'area-spline'
+		                
 
 		        },
 
 		        axis: {
-
-
-
 		                x: {
 		                        type: 'timeseries',
 		                        localtime: false,
@@ -556,30 +536,17 @@ Wu.Control.Chart = Wu.Class.extend({
 						format: function (d) { return Math.floor(d * 100)/100 }
 					}
 		                },
-	                
 
 		        },
-
-			tooltip: {
-				format: {
-					title: function (d) { 
-
-						// var isDate = this.validateDateFormat(_key);
-
-						var nnDate = moment(d).format("DD.MM.YYYY");
-						// xoxoxox
-						return nnDate;
-					},
-			
-				}
-			},	        
 
 			color: {
 				pattern: ['#000000']
 			}		        
 		});
 
-		return _C3Container;
+		// NAAAASTY... 
+		var _chartObject2HTML = new XMLSerializer().serializeToString(_C3Container);
+		return _chartObject2HTML;
 	},
 
 
@@ -642,15 +609,21 @@ Wu.Control.Chart = Wu.Class.extend({
 	// TODO: fix this sheeet
 	C3dataObjBuilder : function (_key, _val, d3array) {
 
-		var isDate = this._validateDateFormat(_key);
+		var isDate = this.validateDateFormat(_key);
 
 		// CREATE DATE SERIES
 		// CREATE DATE SERIES
 		if ( isDate ) {
 
-			// var nnDate = new Date(_date);
+			// // Create Legible Date Value        
+			var yy = _key.substring(0, 4);
+			var mm = _key.substring(4, 6);
+			var dd = _key.substring(6, 10);
+			var _date = yy + '-' + mm + '-' + dd;
 
-			var nnDate = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YY-MM-DD");			
+			var nnDate = new Date(_date);
+
+			// var nnDate = moment(_key, "YYYYMMDD").format("YYYY MM DD");
 
 			// DATE
 			d3array.x.push(nnDate);
@@ -658,30 +631,25 @@ Wu.Control.Chart = Wu.Class.extend({
 			// VALUE
 			d3array.y.push(_val);
 
+			// TICKS				
+			// var chartTick   = yy + '-' + mm + '-00';
+			// var chartTick = new Date(yy + '-' + mm);;
 
-			// var momentChartTick = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY");
-			var momentTmpTick = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format('YYYY');
-			
-			var __momentTick = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD HH:mm");
-			var momentTick = new Date(__momentTick);
+			var chartTick = new Date(yy);;
 
-			console.log('%c momentTmpTick', 'background: blue; color: white;');
-			console.log(momentTmpTick);
-
+			// var chartTick = moment(_key, "YYYYMMDD");
 			var newTick = true;
 
-
 			// Calculate the ticks
-			d3array.tmpTicks.forEach(function(ct) { 
+			d3array.ticks.forEach(function(ct) { 
 
-				if ( ct == momentTmpTick ) newTick = false; 
+				// Avoid duplicates... (must set toUTCString as _date is CEST time format, while chartTick is CET)
+				// if ( ct.toUTCString() == chartTick.toUTCString() ) newTick = false; 
+				if ( ct == chartTick ) newTick = false; 
 
 			})
 
-			if ( newTick ) {
-				d3array.tmpTicks.push(momentTmpTick);
-				d3array.ticks.push(momentTick);
-			}
+			if ( newTick ) d3array.ticks.push(chartTick);
 
 		// CREATE META FIELDS
 		// CREATE META FIELDS
@@ -708,16 +676,11 @@ Wu.Control.Chart = Wu.Class.extend({
 		return layerUuid;		
 	},	
 
-	_validateDateFormat : function (_key) {
+	validateDateFormat : function (_key) {
 
-		// Default fields that for some reason gets read as time formats...
-		if ( _key == 'the_geom_3857' || _key == 'the_geom_4326' ) return false;
-
-		// If it's Frano's time series format
-		var _m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("DD-MM-YYYY");
+		if ( _key.length != 8 ) return false;	
+		var _m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("MMM Do YY");		
 		if ( _m == 'Invalid date' ) return false;
-
-
 		return true;
 
 	},					

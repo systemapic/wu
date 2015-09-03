@@ -51,10 +51,23 @@
     padding-bottom: 2px !important;
     }
 
+
 .metapair-1,
 .metapair-2,
 .metapair-3 {
     border-top: 1px solid #DADADA !important;
+    }
+
+
+.small-pop-up .c3-header-metapair {
+    display: block;
+    width: 100%;
+    }
+
+.small-pop-up .metapair-1,
+.small-pop-up .metapair-2,
+.small-pop-up .metapair-3 {
+    border-top: none !important;
     }
 
 .c3-header-metapair,
@@ -132,3 +145,43 @@ g.c3-event-rects.c3-event-rects-multiple rect {
     fill-opacity: 1;
     opacity: 1 !important; 
     }
+
+.c3-tooltip-container {
+    width: 150px;
+    }
+
+.c3-tooltip-name--field-y .name {
+    display: none;
+    }
+
+.c3-tooltip td.value {
+    text-align: center;
+    font-weight: 900;
+    padding: 2px 0px 2px 0px;
+    font-size: 12px;
+    }
+
+.c3-tooltip th {
+    font-size: 11px;
+    padding: 2px 5px;
+    text-align: left;
+    background: white;
+    font-weight: 600;
+    width: 20px;
+    background-color: #666;
+    color: white;
+    }
+
+
+
+.leaflet-popup-move-button {
+    background-color: rgba(255, 0, 0, 0.4);
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    height: 39px;
+    cursor: pointer;
+    z-index: 99999999999;
+    pointer-events: all;
+    }    
