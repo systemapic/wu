@@ -57,8 +57,6 @@ module.exports = api.slack = {
 
 		console.log('slack send'.red, options);
 
-		return console.log('slack off debug');
-		
 		// send to slack
 		slack.send({
 			text 		: text,
@@ -91,7 +89,6 @@ module.exports = api.slack = {
 
 			// send
 			api.slack._send({text : text});
-			
 		});
 	},
 
@@ -134,7 +131,6 @@ module.exports = api.slack = {
 
 		// send
 		api.slack._send({ text : text });
-
 	},
 
 };
