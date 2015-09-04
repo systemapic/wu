@@ -65,7 +65,6 @@ L.Control.Draw = Wu.Control.extend({
 	},
 
 	_clearAll : function () {
-		console.log('clear all layers');
 
 		var r = this._toolbars.edit._modes.remove.handler;
 		var e = this._toolbars.edit._modes.edit.handler;
@@ -111,8 +110,6 @@ L.Control.Draw = Wu.Control.extend({
 		}, function (err, results) {
 			var resultObject = Wu.parse(results);
 
-			console.log('fetched results: ', resultObject);
-
 			// add center
 			resultObject.center = layer.getBounds().getCenter();
 
@@ -143,7 +140,6 @@ L.Control.Draw = Wu.Control.extend({
 
 
 	_drawEdited : function (e) {
-		console.log('edited', e);
 
 		var layer = this._getEditedLayer(e);
 
@@ -176,13 +172,10 @@ L.Control.Draw = Wu.Control.extend({
 		app.MapPane._drawing = false;
 	},
 	_drawDeleted : function (e) {
-		console.log('drawdeleted', e);
-		console.log('this._toolbars', this._toolbars);
 	},
 
 	// fetch data from postgis
 	_fetchData : function (options, callback) {
-		console.log('fetchData', options);
 
 		var layer_id = this._getActiveLayerID();
 
@@ -200,8 +193,6 @@ L.Control.Draw = Wu.Control.extend({
 			geojson : options.geojson,
 			layer_id : layer_id
 		}
-
-		console.log('options!', options);
 
 		Wu.send('/api/db/fetchArea', options, callback, this);
 	},
@@ -346,10 +337,6 @@ L.Control.Draw = Wu.Control.extend({
 			// Listen for when toolbar is enabled
 			this._toolbars[L.DrawToolbar.TYPE].on('enable', this._toolbarEnabled, this);
 
-			console.log('this._toolbars', this._toolbars);
-
-			// // enable draw programatically
-			// this._toolbars.draw._modes.polygon.handler.enable()
 		}
 
 		if (L.EditToolbar && this.options.edit) {
