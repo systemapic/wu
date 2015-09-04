@@ -71,8 +71,10 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 	addLayer : function (layer) {
 
+		console.log('addLayer', layer.getTitle());
+
 		// create and append div
-		var container = Wu.DomUtil.create('div', 'item-list select-elem ct0 baselayer', this._outer);
+		var container = Wu.DomUtil.create('div', 'item-list select-elem baselayer', this._outer);
 		var text = Wu.DomUtil.create('div', 'item-list-inner-text', container);
 		
 		// set title
@@ -315,6 +317,9 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 	enableLayer : function (baseLayer) {
 
+		console.log('enableLayer');
+		console.log('baseLayer', baseLayer);
+
 		// get layer
 		var layer = baseLayer.layer;
 
@@ -334,6 +339,9 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 	disableLayer : function (baseLayer) {
 		if (!baseLayer) return
+
+		console.log('enableLayer');
+		console.log('baseLayer', baseLayer);			
 
 		// get layer
 		var layer = baseLayer.layer;

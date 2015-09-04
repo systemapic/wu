@@ -959,15 +959,20 @@ L.Control.Layermenu = Wu.Control.extend({
 	// turn off a layer from options
 	remove : function (uuid) {				// todo: clean up layers vs layermenuitems, see _getLayermenuItem above
 		
+
+		console.log('%c control.layermenu.js => remove', 'background: blue; color: white');
+		console.log('uuid', uuid);
+
 		// get layermenuItem
 		var layermenuItem = this.layers[uuid];
+		console.log('layermenuItem', layermenuItem);
 
 		// remove from DOM
 		var elem = layermenuItem.el;
 		if (elem) elem.parentNode.removeChild(elem);
 
 		// set inactive in sidepane layermenu
-		if (layermenuItem.layer) app.SidePane.Options.settings.layermenu._off(layermenuItem.layer);
+		// if (layermenuItem.layer) app.SidePane.Options.settings.layermenu._off(layermenuItem.layer);
 
 		// remove layer from map
 		var layer = layermenuItem.layer;
@@ -983,12 +988,12 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.save();
 
 		// update Options pane
-		var baseLayer = app.SidePane.Options.settings.baselayer;
-		var layerMenu = app.SidePane.Options.settings.layermenu;
-		if (baseLayer) baseLayer.markOccupied();
-		if (layerMenu) layerMenu.markOccupied();
+		// var baseLayer = app.SidePane.Options.settings.baselayer;
+		// var layerMenu = app.SidePane.Options.settings.layermenu;
+		// if (baseLayer) baseLayer.markOccupied();
+		// if (layerMenu) layerMenu.markOccupied();
 
-		this._setHeight();
+		// this._setHeight();
 
 	},
 

@@ -3,6 +3,15 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 	_initialize : function () {
 
 		console.log('chrome.content');
+
+	},
+
+	// Hides the "add folder" in layer menu
+	_hideLayerEditor : function () {
+
+		var layerMenu = app.MapPane.getControls().layermenu;
+		if (layerMenu) layerMenu.disableEdit();
+
 	},
 
 
@@ -54,6 +63,9 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 			var tab = tabs[t];
 			tab.hide();
 		}
+
+		// Hides the "add folder" in layer menu
+		this._hideLayerEditor();
 
 	},
 
@@ -124,17 +136,16 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		    _wrapper 	= options.wrapper,
 		    _input 	= options.input,
 		    _right 	= options.rightPos,
-		    _switch 	= options.switch,
 		    _isOn 	= options.isOn,
 		    _title 	= options.title,
-		    _miniInput 	= options.miniInput,
-		    _setClear   = options.setClear;
-
+		    _type 	= options.type;
+		    
 		var fieldWrapper = Wu.DomUtil.create('div', 'chrome-metafield-line', _wrapper);
+		    fieldWrapper.id = 'field_wrapper_' + _key;
 		
 
 		// Create switch
-		if ( _switch ) {
+		if ( _type == 'switch' ) {
 	
 			// Create classname
 			var 		    _class = 'chrome-switch-container';
@@ -155,7 +166,7 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 		}
 
-		if ( _miniInput ) {
+		if ( _type == 'miniInput' ) {
 
 			var miniInput = Wu.DomUtil.createId('input', 'field_mini_input_' + _key, fieldWrapper);
 			    miniInput.className = 'chrome-field-mini-input';
@@ -167,18 +178,39 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 		}
 
-		if ( _setClear ) {
+
+
+		if ( _type == 'setClear' ) {
 
 			var setClear = Wu.DomUtil.create('div', 'setClear', fieldWrapper);
+			    setClear.setAttribute('key', _key);
 			    setClear.innerHTML = 'SET';
 
 			if ( _isOn ) {
 				Wu.DomUtil.addClass(setClear, 'setClear-on');
+				setClear.setAttribute('state', 'true');
 				setClear.innerHTML = 'CLEAR';
+			} else {
+				setClear.setAttribute('state', 'false');
 			}
 
+			Wu.DomEvent.on(setClear, 'click', this.toggleSetClear, this);
 
 		}
+
+
+		if ( _type == 'set' ) {
+
+			var setClear = Wu.DomUtil.create('div', 'chrome-set', fieldWrapper);
+			    setClear.setAttribute('key', _key);
+			    setClear.innerHTML = 'SET';
+
+			Wu.DomEvent.on(setClear, 'click', this.toggleSet, this);
+
+		}
+
+
+
 
 		// Create input field
 		if ( _input ) {
@@ -228,6 +260,44 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		this._saveToServer(key, '', isOn)
 	},
 
+	toggleSetClear : function (e) {
+
+		var elem  = e.target;
+		var id    = elem.id;
+		var key   = elem.getAttribute('key')
+		var state = elem.getAttribute('state')
+
+		if ( state == "true" )  var on = true;
+		else 			var on = false;
+
+		if ( on ) {
+		
+			Wu.DomUtil.removeClass(elem, 'setClear-on');
+			elem.setAttribute('state', 'false');
+			elem.innerHTML = 'SET';
+			var isOn = false;
+		
+		} else {
+
+			Wu.DomUtil.addClass(elem, 'setClear-on');
+			elem.setAttribute('state', 'true');
+			elem.innerHTML = 'CLEAR';
+			var isOn = true;
+		}
+
+		this.saveSetClear(key, isOn);
+	},
+
+	toggleSet : function (e) {
+
+		var elem  = e.target;
+		var id    = elem.id;
+		var key   = elem.getAttribute('key')
+
+		this.saveSet(key);
+
+	},
+
 	// Saver dummy
 	saveMiniBlur : function () {
 
@@ -258,6 +328,26 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		console.log('%c ***************************** ', 'background: red; color: white');
 	},
 
+
+	saveSetClear : function () {
+
+		console.log('%c ***************************** ', 'background: red; color: white');
+		console.log('%c Did you foget something?', 'color: blue');
+		console.log('%c Function "saveSetClear" fired from parent function...', 'color: blue');
+		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
+		console.log('%c ***************************** ', 'background: red; color: white');
+
+	},
+
+	saveSet : function () {
+
+		console.log('%c ***************************** ', 'background: red; color: white');
+		console.log('%c Did you foget something?', 'color: blue');
+		console.log('%c Function "saveSet" fired from parent function...', 'color: blue');
+		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
+		console.log('%c ***************************** ', 'background: red; color: white');
+
+	}
 
 });
 
@@ -414,7 +504,6 @@ Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
 
 		// create container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane mapsettings', this.options.appendTo);
-		
 	},
 
 	_initLayout : function () {
@@ -428,9 +517,45 @@ Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
 
 		// mark as inited
 		this._inited = true;		
-
 	},
 
+	// UNIVERSALS
+	// UNIVERSALS
+	// UNIVERSALS		
+
+	_refresh : function () {
+
+		this._flush();
+		this._initLayout();
+	},
+
+	_flush : function () {
+
+		this._container.innerHTML = '';
+	},
+	
+	show : function () {
+
+		if (!this._inited) this._initLayout();
+
+		// hide others
+		this.hideAll();
+
+		// show this
+		this._container.style.display = 'block';
+
+		// mark button
+		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+	},
+
+	open : function () {
+		console.log('open!', this);
+	},	
+
+
+	// CREATE STUFF
+	// CREATE STUFF
+	// CREATE STUFF		
 
 	// Creates section with meta field lines
 	initSettings : function (title) {
@@ -446,7 +571,7 @@ Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
 				name   : 'Zoom'
 			},
 			draw : {
-				enable : false,
+				enable : true,
 				name   : 'Draw'
 			},
 			description : {
@@ -504,10 +629,13 @@ Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
 					wrapper 	: sectionWrapper,
 					input 		: false,
 					title 		: title,
-					switch 		: true,
 					isOn 		: project.store.controls[key],
-					dropdown	: false,
-					rightPos	: false
+					rightPos	: false,
+					type 		: 'switch'
+					// switch 		: true,
+					
+					// dropdown	: false,
+					
 				}
 
 				this._createMetaFieldLine(lineOptions);
@@ -520,18 +648,17 @@ Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
 		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
 		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, title);
 
+		var isBoundsSet = this.isBoundsSet();
 
 		var lineOptions = {
 			key 		: 'bounds', 
 			wrapper 	: sectionWrapper,
 			input 		: false,
 			title 		: 'Bounds',			
-			isOn 		: true,
-
-			switch 		: false,
-			dropdown	: false,
-			setClear 	: true,
-			rightPos	: false
+			isOn 		: isBoundsSet,
+			rightPos	: false,
+			type 		: 'setClear',
+			
 		}
 
 		this._createMetaFieldLine(lineOptions);
@@ -541,19 +668,48 @@ Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
 			key 		: 'position', 
 			wrapper 	: sectionWrapper,
 			input 		: false,
-			title 		: 'position',			
+			title 		: 'Position',			
 			isOn 		: false,
-
-			switch 		: false,
-			dropdown	: false,
-			setClear 	: true,
-			rightPos	: false
+			rightPos	: false,
+			type 		: 'set',
 		}
 
 		this._createMetaFieldLine(lineOptions);
 
 	},
 
+
+	isBoundsSet : function () {
+
+		var bounds = app.activeProject.getBounds();
+
+		// If no bounds
+		if ( !bounds ) return false;
+
+		var maxZoom      = bounds.maxZoom;
+		var minZoom      = bounds.minZoom;
+		var northEastLat = bounds.northEast.lat;
+		var northEastLng = bounds.northEast.lng;
+		var southWestLat = bounds.southWest.lat;
+		var southWestLng = bounds.southWest.lng;
+
+		// If bounds sat to view everything (clear)
+		if ( maxZoom      == 20 &&
+		     minZoom      == 1 &&
+		     northEastLat == 90 &&
+		     northEastLng == 180 &&
+		     southWestLat == -90 &&
+		     southWestLng == -180
+		) return false;
+
+		// Bounds are set
+		return true;
+
+	},
+
+	// SAVERS 
+	// SAVERS
+	// SAVERS
 
 	_saveToServer : function (_key, title, on) {
 
@@ -577,40 +733,146 @@ Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
 	},
 
 
-	_refresh : function () {
+	saveSetClear : function (key, on) {
 
-		console.log('%c mapsettings: _refresh', 'background: red; color: white;');
+		// Set/Clear bounds
+		if ( key == 'bounds' ) on ? this.setBounds() : this.clearBounds();
 
-		this._flush();
-		this._initLayout();
 	},
 
-	_flush : function () {
+	saveSet : function (key) {
 
-		console.log('%c mapsettings: _flush', 'background: red; color: white;');
+		if ( key == 'position' ) this.setPosition();
 
-		this._container.innerHTML = '';
-	},
-	
-	show : function () {
-
-		console.log('%c mapsettings: show', 'background: red; color: white;');
-
-		if (!this._inited) this._initLayout();
-
-		// hide others
-		this.hideAll();
-
-		// show this
-		this._container.style.display = 'block';
-
-		// mark button
-		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
 	},
 
-	open : function () {
-		console.log('open!', this);
-	}
+
+	// SET POSITION
+	// SET POSITION
+	// SET POSITION		
+
+	setPosition : function () {
+
+		// get actual Project object
+		var project = app.activeProject;
+
+		// if no active project, do nothing
+		if (!project) return; 
+
+		// get center and zoom
+		var center = Wu.app._map.getCenter();
+		var zoom   = Wu.app._map.getZoom();
+
+		// set position 
+		var position = {
+			lat  : center.lat,
+			lng  : center.lng,
+			zoom : zoom
+		}
+
+		// save to project
+		project.setPosition(position);
+
+	},		
+
+
+
+	// SET/ CLEAR BOUNDS
+	// SET/ CLEAR BOUNDS
+	// SET/ CLEAR BOUNDS		
+
+	setBounds : function (e) {
+		
+		// get actual Project object
+		var project = app.activeProject;
+
+		// if no active project, do nothing
+		if (!project) return; 
+
+		// get map bounds and zoom
+		var bounds = Wu.app._map.getBounds();
+		var zoom   = Wu.app._map.getZoom();
+
+		// write directly to Project
+		project.setBounds({
+			northEast : {
+				lat : bounds._northEast.lat,
+				lng : bounds._northEast.lng
+			},
+
+			southWest : {
+				lat : bounds._southWest.lat,
+				lng : bounds._southWest.lng
+			},
+			minZoom : zoom,
+			maxZoom : 18
+		});
+		
+
+		// enforce new bounds
+		this.enforceBounds();
+	},
+
+	clearBounds : function () {
+		
+		// get actual Project object
+		var project = Wu.app.activeProject;
+		var map = Wu.app._map;
+
+		var _nullBounds = {
+			northEast : {
+				lat : '90',
+				lng : '180'
+			},
+
+			southWest : {
+				lat : '-90',
+				lng : '-180'
+			},
+			minZoom : '1',
+			maxZoom : '20'
+		}
+
+		// set bounds to project
+		project.setBounds(_nullBounds);
+
+		// enforce
+		this.enforceBounds();
+
+		// no bounds
+		map.setMaxBounds(false);
+	},		
+
+	enforceBounds : function () {
+		
+		var project = app.activeProject;
+		var map     = app._map;
+
+		// get values
+		var bounds = project.getBounds();
+
+		if (bounds) {
+			var southWest   = L.latLng(bounds.southWest.lat, bounds.southWest.lng);
+	   		var northEast 	= L.latLng(bounds.northEast.lat, bounds.northEast.lng);
+	    		var maxBounds 	= L.latLngBounds(southWest, northEast);
+			var minZoom 	= bounds.minZoom;
+			var maxZoom 	= bounds.maxZoom;
+
+	    		if (bounds == this._nullBounds) {
+	    			map.setMaxBounds(false);
+	    		} else {
+	    			map.setMaxBounds(maxBounds);
+	    		}
+			
+			// set zoom
+			map.options.minZoom = minZoom;
+			map.options.maxZoom = maxZoom;	
+		}
+		
+
+		map.invalidateSize();
+	},
+
 });
 
 
@@ -705,8 +967,12 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 
-	_initialize : function () {
 
+	// INITS
+	// INITS
+	// INITS		
+
+	_initialize : function () {
 
 		// init container
 		this._initContainer();
@@ -719,12 +985,33 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 
 		// create container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane layers', this.options.appendTo);
-
 	},
 
 	_initLayout : function () {
 
+		if (!this._project) return;
+
+		// Inner wrapper
+		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._container);
+
+		// Init layer/baselayer toggle
+		this.initLayerBaselayerToggle();
+
+		// Init Layers
+		this.initLayers();
+
+		// mark as inited
+		this._inited = true;
+
+		// This fires too late...
+		this._mode = 'layer';
+
 	},
+
+
+	// OTHER UNIVERSALS
+	// OTHER UNIVERSALS
+	// OTHER UNIVERSALS		
 
 	_refresh : function () {
 
@@ -737,8 +1024,8 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 	},
 	
 	show : function () {
-		if (!this._inited) this._initLayout();
 
+		if (!this._inited) this._initLayout();
 
 		// hide others
 		this.hideAll();
@@ -748,11 +1035,379 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 
 		// mark button
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+
+		// enable edit of layer menu...
+		var layerMenu = app.MapPane.getControls().layermenu;
+		if (app.access.to.edit_project(this._project)) layerMenu.enableEdit();
+
 	},
 
 	open : function () {
 		console.log('open!', this);
-	}
+	},
+
+
+	// closed : function () {
+	// 	console.log('i was closed!');
+	// },
+
+	// hide : function () {
+	// 	console.log('i was hidden!');
+	// },
+
+
+
+	// TOP BUTTONS (BASE LAYERS / LAYERS)
+	// TOP BUTTONS (BASE LAYERS / LAYERS)
+	// TOP BUTTONS (BASE LAYERS / LAYERS)		
+
+
+	initLayerBaselayerToggle : function () {
+
+		var wrapper = Wu.DomUtil.create('div',   'chrome-layer-baselayer-toggle', this._fieldsWrapper);
+		this.baselayerButton = Wu.DomUtil.create('div', 'chrome-layer-toggle-button chrome-baselayer', wrapper, 'BASE LAYERS');
+		this.layerButton = Wu.DomUtil.create('div',     'chrome-layer-toggle-button chrome-layer layer-toggle-active', wrapper, 'LAYERS');
+
+		Wu.DomEvent.on(this.layerButton,     'click', this.toggleToLayers, this);
+		Wu.DomEvent.on(this.baselayerButton, 'click', this.toggleToBaseLayers, this);
+	},
+
+	toggleToBaseLayers : function () {
+		Wu.DomUtil.addClass(this.baselayerButton, 'layer-toggle-active')
+		Wu.DomUtil.removeClass(this.layerButton, 'layer-toggle-active')
+		this._mode = 'baselayer';	
+		this.update();		
+	},
+
+	toggleToLayers : function () {
+		Wu.DomUtil.removeClass(this.baselayerButton, 'layer-toggle-active')
+		Wu.DomUtil.addClass(this.layerButton, 'layer-toggle-active')
+		this._mode = 'layer';
+		this.update();
+	},
+
+
+
+	// ROLL OUT LAYERS
+	// ROLL OUT LAYERS
+	// ROLL OUT LAYERS	
+
+	initLayers : function () {
+
+		this._layers = {};
+
+		// return if no layers
+	       	if (_.isEmpty(this._project.layers)) return;
+
+	       	this.sortedLayers = this.sortLayers(this._project.layers);
+
+	       	this.sortedLayers.forEach(function (provider) {
+
+	       		var providerTitle = this.providerTitle(provider.key);
+
+	       		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
+			var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, providerTitle);
+
+	       		provider.layers.forEach(function (layer) {
+
+	       			this.addLayer(layer, sectionWrapper);
+
+	       		}, this);
+
+	       	}, this);
+
+	       	this.update();
+	},
+
+	addLayer : function (layer, wrapper) {
+
+		// Get title 
+		var layerTitle = layer.getTitle();
+		var uuid       = layer.store.uuid;
+		var on 	       = false;
+		
+		// set active or not
+		this._project.store.baseLayers.forEach(function (b) {
+			if ( uuid == b.uuid ) { on = true; return; } 
+		}.bind(this));
+
+		var lineOptions = {
+			key 		: uuid,
+			wrapper 	: wrapper,
+			input 		: false,
+			title 		: layerTitle,
+			isOn 		: on,
+			rightPos	: false,
+			type 		: 'switch'
+		}
+
+		this._createMetaFieldLine(lineOptions);
+	},
+
+
+	providerTitle : function (provider) {
+
+		if (provider == 'postgis') var title = 'Data Library';
+		if (provider == 'mapbox')  var title = 'Mapbox';
+		if (provider == 'norkart') var title = 'Norkart';
+		if (provider == 'google')  var title = 'Google';
+		if (provider == 'osm')     return false;
+
+		// Return title
+		return title;
+	},
+
+	// sort layers by provider
+	sortLayers : function (layers) {
+
+		var keys = [ 'postgis', 'google', 'norkart', 'geojson', 'mapbox', 'raster'];
+		var results = [];
+	
+		keys.forEach(function (key) {
+			var sort = {
+				key : key,
+				layers : []
+			}
+			for (l in layers) {
+				var layer = layers[l];
+
+				if (layer) {
+
+					if (layer.store && layer.store.data.hasOwnProperty(key)) {
+						sort.layers.push(layer)
+					}
+				}
+			}
+			results.push(sort);
+		}, this);
+
+		// console.log('SROOTED', results);
+		this.numberOfProviders = results.length;
+		return results;
+	},
+
+
+
+
+
+
+	// UPDATE
+	// UPDATE
+	// UPDATE		
+
+	update : function () {
+
+		if ( !this._mode ) this._mode = 'layer';
+
+		if ( this._mode == 'baselayer' ) this.markBaseLayerOccupied();
+		if ( this._mode == 'layer' )     this.markLayerOccupied();
+		
+		this.updateSwitches();
+	},
+
+
+	// MARK BASE LAYERS AS OCCUPIED
+
+	markBaseLayerOccupied : function () {
+
+		// get layers and active baselayers
+		var layermenuLayers = this._project.getLayermenuLayers();
+		var layers = this._project.getLayers();
+
+		// activate layers
+		layers.forEach(function (a) {
+			if (a.store) this.activateLayer(a.store.uuid);
+		}, this);
+
+		layermenuLayers.forEach(function (bl) {
+			var layer = _.find(layers, function (l) { 
+				if (!l.store) return false;
+				return l.store.uuid == bl.layer; 
+			});
+			if (layer) this.deactivateLayer(layer.store.uuid);
+		}, this);
+	},
+
+	// MARK LAYERS AS OCCUPIED
+
+	markLayerOccupied : function () {
+
+
+		var project = this._project;
+
+		// get active baselayers
+		var baseLayers = project.getBaselayers();
+		var all = project.getLayers();
+
+		all.forEach(function (a) {
+			this.activateLayer(a.store.uuid);
+		}, this);
+
+		baseLayers.forEach(function (bl) {
+			this.deactivateLayer(bl.uuid);
+		}, this);
+
+	},
+
+	// SET LAYER AS NOT OCCUPIED
+
+	activateLayer : function (layerUuid) {
+
+		var _id = 'field_wrapper_' + layerUuid;
+		var elem = Wu.DomUtil.get(_id);
+
+		Wu.DomUtil.removeClass(elem, 'deactivated-layer');
+
+	},
+
+	// SET LAYER AS OCCUPIED
+
+	deactivateLayer : function (layerUuid) {
+
+		var _id = 'field_wrapper_' + layerUuid;
+		var elem = Wu.DomUtil.get(_id);
+
+		Wu.DomUtil.addClass(elem, 'deactivated-layer');
+
+	},
+
+
+	// UPDATE SWITCHES
+	// UPDATE SWITCHES
+	// UPDATE SWITCHES
+
+	updateSwitches : function () {
+
+	       	this.sortedLayers.forEach(function (provider) {
+	       		provider.layers.forEach(function (layer) {
+	       			this.updateSwitch(layer);
+	       		}, this);
+	       	}, this);		
+	},
+
+	updateSwitch : function (layer) {
+
+		// Get title 
+		var layerTitle = layer.getTitle();
+		var uuid       = layer.store.uuid;
+		var on 	       = false;
+		
+
+		if ( this._mode == 'baselayer' ) {
+			// Set active or not
+			this._project.store.baseLayers.forEach(function (b) {
+				if ( uuid == b.uuid ) { on = true; return; } 
+			}.bind(this));
+		}
+
+		if ( this._mode == 'layer' ) {
+			// set active or not
+			this._project.store.layermenu.forEach(function (b) {
+				if ( uuid == b.layer ) { on = true; return; }
+			}, this);
+		}
+
+		// Get switch
+		var _switch = Wu.DomUtil.get('field_switch_' + uuid);
+
+		if ( on ) {
+			Wu.DomUtil.addClass(_switch, 'switch-on');
+			_switch.setAttribute('state', 'true');
+		} else {
+			Wu.DomUtil.removeClass(_switch, 'switch-on');
+			_switch.setAttribute('state', 'false');			
+		}
+	},	
+
+	
+
+	// SAVE
+	// SAVE
+	// SAVE		
+
+	_saveToServer : function (key, title, on) {
+
+		if ( this._mode == 'baselayer' ) {
+			on ? this.enableBaseLayer(key) : this.disableBaseLayer(key);
+		} else {
+			on ? this.enableLayer(key) : this.disableLayer(key);
+		}
+	},
+
+
+	// ENABLE BASE LAYER (AND SAVE)
+
+	enableBaseLayer : function (uuid) {
+
+		var layer = this._project.layers[uuid];
+
+		// Update map	
+		if (layer) layer._addTo('baselayer');
+
+		// Save to server
+		this._project.addBaseLayer({
+			uuid : uuid,
+			zIndex : 1,
+			opacity : layer.getOpacity()
+		});
+
+		this.update();
+	},
+
+	// DISABLE BASE LAYER (AND SAVE)
+
+	disableBaseLayer : function (uuid) {		
+
+		var layer = this._project.layers[uuid];
+
+		// Update map
+		if (layer) layer.disable(); 
+
+		// Save to server
+		this._project.removeBaseLayer(layer);
+
+		this.update();	
+	},
+
+
+
+	// ENABLE LAYER (AND SAVE)
+	enableLayer : function (uuid) {
+
+		var layer = this._project.layers[uuid];
+
+		var layerMenu = app.MapPane.getControls().layermenu;
+		layerMenu.add(layer);
+
+	},
+
+	// DISABLE LAYER (AND SAVE)
+	disableLayer : function (uuid) {
+
+		console.log(uuid);
+
+		var layer = this._project.layers[uuid];
+		var _uuid = layer.store.uuid;
+
+		var layerMenu = app.MapPane.getControls().layermenu;
+		layerMenu._remove(_uuid);
+
+	},	
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
 });
 
 
@@ -1452,10 +2107,10 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 				wrapper 	: sectionWrapper,
 				input 		: true,
 				title 		: title,
-				switch 		: true,
 				isOn 		: isOn,
-				dropdown	: false,
-				rightPos	: false
+				rightPos	: false,
+				type 		: 'switch'
+				
 			}
 
 			this._createMetaFieldLine(options);
@@ -1480,13 +2135,12 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 			wrapper 	: sectionWrapper,
 			input 		: false,
 			title 		: 'Enable time series',
-			switch 		: true,
-			dropdown	: false,
-			rightPos	: true,
 			isOn 		: this.tooltipMeta.timeSeries.enable,
+			rightPos	: true,
+			type 		: 'switch'
+
 		}
 		var enableTimeSeries = this._createMetaFieldLine(options);
-		// timeSeries.enable = 'on';
 		
 		// Use min/max from styling switch
 		var options = {
@@ -1494,15 +2148,13 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 			wrapper 	: sectionWrapper,
 			input 		: false,
 			title 		: 'Range',
-			switch 		: false,
-			dropdown	: false,
-			rightPos	: true,			
-			miniInput	: true,
-			value 		: this.tooltipMeta.timeSeries.minmaxRange,
 			isOn 		: true,
+			rightPos	: true,
+			type 		: 'miniInput',
+			value 		: this.tooltipMeta.timeSeries.minmaxRange,
+			
 		}
 		var useMinMaxFromStyle = this._createMetaFieldLine(options)
-		// timeSeries.minmax = 'on';
 
 		// Use min/max from styling switch
 		var options = {
@@ -1510,14 +2162,15 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 			wrapper 	: sectionWrapper,
 			input 		: false,
 			title 		: 'Graph style',
-			switch 		: false,
-			dropdown	: ['scatter', 'line'],
-			rightPos	: true,
 			isOn 		: this.tooltipMeta.timeSeries.graphstyle,
+			rightPos	: true,
+			type 		: 'dropdown',
+			dropdown	: ['scatter', 'line'],
+			
+			
 		}
 
 		var graphType = this._createMetaFieldLine(options)
-		// timeSeries.graphstyle = 'scatter';
 
 
 		// Create list of time series fields
@@ -1652,7 +2305,6 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		if ( _m == 'Invalid date' ) return false;
 		return true;
 	},
-
 });
 
 
