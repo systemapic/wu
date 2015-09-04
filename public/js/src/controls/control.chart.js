@@ -1,4 +1,4 @@
-Wu.Control.Chart = Wu.Class.extend({
+Wu.Control.Chart = Wu.Control.extend({
 
 	initialize : function(options) {
 		
@@ -25,10 +25,8 @@ Wu.Control.Chart = Wu.Class.extend({
 			var content = this.singlePopUp(e);
 		}
 
-		console.log('this.popupSettings', this.popupSettings);
-
 		// clear old popup
-		this._popup = null;
+		// this._popup = null;
 
 		// return if no content
 		if (!content) return;
@@ -116,10 +114,27 @@ Wu.Control.Chart = Wu.Class.extend({
 		map.on('popupclose',  this._clearPopup, this);
 	},
 
-	_clearPopup : function () {
+	_refresh : function () {
+
+		if (this._popup) {
+			this._popup._remove();
+		} 
+
+		this._clearPopup(false);
+	},
+
+	_clearPopup : function (clearPolygons) {
+		
+		// clear polygon
+		if (clearPolygons) app.MapPane.getControls().draw._clearAll();
+
+		// nullify
 		this._popupContent = '';
 		this._popup = null;
+
+		// remove marker
 		this.popUpMarkerCircle && app._map.removeLayer(this.popUpMarkerCircle);
+
 	},
 	
 	// Create leaflet pop-up
@@ -137,7 +152,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		}
 
 		// create popup
-		var popup = Wu.popup({
+		var popup = this._popup = Wu.popup({
 			offset : [18, 0],
 			closeButton : true,
 			zoomAnimation : false,
@@ -183,7 +198,6 @@ Wu.Control.Chart = Wu.Class.extend({
 		    		tmpTicks : []
 			},
 			multiPopUp : false
-
 		}
 
 		var _c3Obj = this.createC3dataObj(c3Obj);
@@ -355,7 +369,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		var headerName = Wu.DomUtil.create('div', 'c3-header-layer-name', headerWrapper, layerName)
 
 		if ( multiPopUp ) {
-			var plural = 'sampling ' + pointCount + ' points over ' + areaSQ;
+			var plural = 'sampling ' + pointCount + ' points over approx. ' + areaSQ;
 			var _pointCount = Wu.DomUtil.create('div', 'c3-point-count', headerWrapper, plural);
 		}
 
@@ -449,8 +463,6 @@ Wu.Control.Chart = Wu.Class.extend({
 			}
 
 		}
-
-		console.log('RANGE ->', range);
 
 		this._range = range;
 
@@ -567,8 +579,7 @@ Wu.Control.Chart = Wu.Class.extend({
 	_addChartEvents : function (div) {
 
 		// mousewheel zoom on chart
-		Wu.DomEvent.on(div, 'mousewheel', _.throttle(this._onChartMousemove, 50), this);
-
+		Wu.DomEvent.on(div, 'mousewheel', _.throttle(this._onChartMousemove, 50), this); // prob leaking
 	},
 
 	_onChartMousemove : function (e) {
@@ -581,7 +592,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		if (e.wheelDeltaY == 0) return; // not IE compatible
 
 		// size of step
-		var d = this._range / 5;
+		var d = this._range / 8;
 
 		// zoom Y axis
 		if (delta > 0) { // moving up
@@ -637,7 +648,6 @@ Wu.Control.Chart = Wu.Class.extend({
 					var _key = field.title || field.key;
 
 					this.C3dataObjBuilder(_key, _val, d3array);
-					
 				}
 			}
 
@@ -650,10 +660,8 @@ Wu.Control.Chart = Wu.Class.extend({
 				var _key = key;
 
 				this.C3dataObjBuilder(_key, _val, d3array);
-
 			}
 		}
-
 
 		return c3Obj;
 	},
@@ -725,17 +733,31 @@ Wu.Control.Chart = Wu.Class.extend({
 		// Default fields that for some reason gets read as time formats...
 		if ( _key == 'the_geom_3857' || _key == 'the_geom_4326' ) return false;
 
-		// If it's other time format
-		var _m = moment(_key).format("YYYY-MM-DD");
-		if ( _m != 'Invalid date' ) return _m;
+		if (_key.length < 6) return false; // cant possibly be date
+
+		// if only letters, not a date
+		if (this._isOnlyLetters(_key)) return;
 
 		// If it's Frano's time series format
 		var _m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
 		if ( _m != 'Invalid date' ) return _m;
 
+		// If it's other time format
+		var _m = moment(_key).format("YYYY-MM-DD"); // buggy
+		if ( _m != 'Invalid date' ) return _m;
+
 		// If it's not a valid date...
 		return false;
-	},					
+	},	
+
+	_isOnlyLetters : function (string) {
+		var nums = [];
+		_.each(string, function (s) {
+			if (!isNaN(s)) nums.push(s);
+		})
+		if (nums.length) return false;
+		return true;
+	},			
 
 
 })

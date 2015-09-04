@@ -44,21 +44,45 @@ L.Control.Draw = Wu.Control.extend({
 
 		var map = app._map;
 
+		// draw events
 		map.on('draw:created', this._drawCreated.bind(this));
 		map.on('draw:edited', this._drawEdited.bind(this));
 		map.on('draw:deleted', this._drawDeleted.bind(this));
-		// map.on('draw:editstart', this._drawEditstart.bind(this));
-		// map.on('draw:editstop', this._drawEditstop.bind(this));
+		map.on('draw:editstart', this._drawEditstart.bind(this));
+		map.on('draw:editstop', this._drawEditstop.bind(this));
+		map.on('draw:drawstop', this._drawDrawstop.bind(this));
+		map.on('draw:drawstart', this._drawDrawstart.bind(this));
 
 		// // enable draw programatically
 		keymaster('d', this._toggleDraw.bind(this));
 		keymaster('e', this._toggleEdit.bind(this));
 		keymaster('c', this._clearAll.bind(this));
+
+		// button events
+		var removeButton = this._toolbars.edit._modes.remove.button;
+		Wu.DomEvent.on(removeButton, 'click', this._clearAll, this);
 		
 	},
 
 	_clearAll : function () {
 		console.log('clear all layers');
+
+		var r = this._toolbars.edit._modes.remove.handler;
+		var e = this._toolbars.edit._modes.edit.handler;
+		var layers = r._deletableLayers.getLayers();
+
+		layers.forEach(function (l) {
+			r._deletableLayers.removeLayer(l);
+			r.save();
+			r.disable();
+			e.disable();
+
+			app.MapPane._clearPopup();
+			
+		}, this);
+
+		if (!layers.length) app.MapPane._clearPopup();
+
 	},
 
 	_drawCreated : function (e) {
@@ -123,6 +147,8 @@ L.Control.Draw = Wu.Control.extend({
 
 		var layer = this._getEditedLayer(e);
 
+		if (!layer) return;
+		
 		// query for data
 		this._queryData(layer);
 
@@ -135,23 +161,39 @@ L.Control.Draw = Wu.Control.extend({
 		}
 
 	},
+
+	// events
 	_drawEditstart : function (e) {
-		console.log('editstart', e);
+		app.MapPane._drawing = true;
 	},
 	_drawEditstop : function (e) {
-		console.log('editstop', e);
+		app.MapPane._drawing = false;
+	},
+	_drawDrawstart : function (e) {
+		app.MapPane._drawing = true;
+	},
+	_drawDrawstop : function (e) {
+		app.MapPane._drawing = false;
 	},
 	_drawDeleted : function (e) {
-		console.log('editstop', e);
-		console.log('this.)_To', this._toolbars);
+		console.log('drawdeleted', e);
+		console.log('this._toolbars', this._toolbars);
 	},
 
+	// fetch data from postgis
 	_fetchData : function (options, callback) {
 		console.log('fetchData', options);
 
 		var layer_id = this._getActiveLayerID();
 
-		if (!layer_id) return console.error('no active layer_id to fetch data from??');
+		if (!layer_id) {
+			console.error('no active layer_id to fetch data from??');
+			app.FeedbackPane.setMessage({
+				title : 'No active layer to fetch data from.'
+			});
+
+			return;
+		} 
 
 		var options = {
 			access_token : app.tokens.access_token,

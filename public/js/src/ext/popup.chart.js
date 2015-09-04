@@ -1,5 +1,5 @@
 Wu.Popup = {};
-Wu.Popup.Chart = L.Class.extend({
+Wu.Popup.Chart = L.Control.extend({
 	includes: L.Mixin.Events,
 
 	options: {
@@ -88,13 +88,18 @@ Wu.Popup.Chart = L.Class.extend({
 
 		// add events
 		this._addEvents();
+
+		this._added = true;
 	},
 
 	_remove : function () {
-
+		if (!this._added) return;
+		
 		// remove
-		this._pane.removeChild(this._container);
-
+		try {
+			this._pane.removeChild(this._container);
+		} catch (e) {}; // lazy hack fml
+		
 		// remove events
 		this._removeEvents();
 	},
