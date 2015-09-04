@@ -6,7 +6,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		
 		// OTHER OPTIONS
 		var multiPopUp = options.multiPopUp;
-		var e = options.e;
+		var e 	       = options.e;
 
 		
 		if ( multiPopUp ) {
@@ -27,8 +27,6 @@ Wu.Control.Chart = Wu.Class.extend({
 			var content = this.singlePopUp(e);
 		}
 
-		console.log('this.popupSettings', this.popupSettings);
-
 		// clear old popup
 		this._popup = null;
 
@@ -43,6 +41,7 @@ Wu.Control.Chart = Wu.Class.extend({
 
 		// Open popup
 		this.openPopup(e, multiPopUp);
+
 	},
 
 
@@ -52,14 +51,14 @@ Wu.Control.Chart = Wu.Class.extend({
 
 	// Open pop-up
 	openPopup : function (e, multiPopUp) {
+
 		if (this._popup) return;
 
 		var popup   = this._createPopup(),
 		    content = this._popupContent,
-		    map     = app._map,
-		    project = this._project || app.activeProject;
+		    map     = app._map;
 
-		// set latlng
+
 		var latlng = multiPopUp ? multiPopUp.center : e.latlng;
 		
 		// return if no content
@@ -73,31 +72,22 @@ Wu.Control.Chart = Wu.Class.extend({
 
 		// set content
 		popup.setContent(content);
+		popup.setLatLng(latlng);
 
-		// open popup
-		popup.open();
+		popup.openOn(map);		// todo: still some minor bugs,
 
-		// show marker on popup, but not on multi cause polygon
-		if (!multiPopUp) {
+		if ( multiPopUp ) return;
 
-			// set latlng
-			var latlng = this._getMarkerPosition(latlng, e);
-			
-			// Add marker circle
-			this._addMarkerCircle(latlng);
+		// // 1. lat/lng ing column
+		// var latlng = L.latLng(e.data.lat, e.data.lon);	 // todo: remove this??
+
+		// // 2 north/east as 3857
+		if (!latlng) {
+			var latlng = L.Projection.Mercator.unproject({x:e.data.north, y:e.data.east}); // wrong conversion, wrong epsg?
 		}
 
-		
-	},
-
-	_getMarkerPosition : function (latlng, e) {
-
-		// try to calculate true position of point, instead of mouse pos. need to look in data. 
-		// this is kinda specific to globesar's data, but could be made pluggable.
-
-		// var latlng = L.Projection.Mercator.unproject({x:e.data.north, y:e.data.east}); // wrong conversion, wrong epsg?
-
-		return latlng;
+		// Add marker circle
+		this._addMarkerCircle(latlng);
 	},
 
 	// Add marker circle (not working)
@@ -113,6 +103,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		this.popUpMarkerCircle = L.circleMarker(latlng, styling).addTo(app._map);
 	},
 
+	// Close pop-up
 	_addPopupCloseEvent : function () {
 		if (this._popInit) return;
 		this._popInit = true;	// only run once
@@ -121,6 +112,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		map.on('popupclose',  this._clearPopup, this);
 	},
 
+	// Clear pop-up
 	_clearPopup : function () {
 		this._popupContent = '';
 		this._popup = null;
@@ -131,7 +123,7 @@ Wu.Control.Chart = Wu.Class.extend({
 	_createPopup : function () {
 
 		// Create smaller pop-up if there are no graphs to show
-		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == false ) {
+		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == 'off' ) {
 			var maxWidth = 150;
 			var minWidth = 150;
 
@@ -141,15 +133,15 @@ Wu.Control.Chart = Wu.Class.extend({
 			var minWidth = 200;			
 		}
 
+
 		// create popup
-		var popup = Wu.popup({
+		var popup = L.popup({
 			offset : [18, 0],
 			closeButton : true,
 			zoomAnimation : false,
 			maxWidth : maxWidth,
 			minWidth : minWidth,
 			maxHeight : 350,
-			appendTo : app._appPane // where to put popup
 		});
 
 		return popup;
@@ -157,16 +149,23 @@ Wu.Control.Chart = Wu.Class.extend({
 
 
 
+	// CREATE POP-UP CONTENT
+	// CREATE POP-UP CONTENT
+	// CREATE POP-UP CONTENT
+
+
 	// Create single point C3 pop-up content
 	singlePopUp : function (e) {
 
-		// check if timeseries
-		var timeSeries = (this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == 'on');
-
-		// create content, as timeseries or normal
-		var content = timeSeries ? this.singleC3PopUp(e) : this._createPopupContent(e);
-
+		// With time series
+		if ( this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == 'on' ) {
+			var content = this.singleC3PopUp(e);
 		
+		// Without time series
+		} else {
+			var content = this._createPopupContent(e);
+		}
+
 		return content;
 	},
 
@@ -193,6 +192,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		}
 
 		var _c3Obj = this.createC3dataObj(c3Obj);
+
 
 		var headerOptions = {
 			headerMeta 	: _c3Obj.d3array.meta,
@@ -248,7 +248,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		content.appendChild(_header);
 
 		// Create graph HTML
-		if ( this.popupSettings && this.popupSettings.timeSeries.enable != false) {
+		if ( this.popupSettings && this.popupSettings.timeSeries.enable != 'off') {
 			
 			var _chart = this.C3Chart(_c3Obj);
 			content.appendChild(_chart);
@@ -262,11 +262,16 @@ Wu.Control.Chart = Wu.Class.extend({
 	multiPointPopUp : function (_data) {	
 
 
+		console.log('%c multiPointPopUp', 'background: blue; color: white;');
+		console.log('_data', _data);
+		
 		var _average = _data.average;
 		var _center = _data.center;
 		var _layer = this._getWuLayerFromPostGISLayer(_data.layer_id);
 		var _layerName = _layer.store.title;
 		var _totalPoints = _data.total_points;
+
+		console.log('_totalPoints', _totalPoints);
 
 		// Show square meters if less than 1000
 		if ( _data.area < 1000 ) {
@@ -352,7 +357,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		var container = Wu.DomUtil.createId('div', 'c3-header-metacontainer');
 
 		// If not time series, make small pop-up
-		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == false ) {
+		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == 'off' ) {
 			container.className = 'small-pop-up';
 		}
 
@@ -381,7 +386,7 @@ Wu.Control.Chart = Wu.Class.extend({
 			if ( !_val ) return;
 
 			// Do not show field if it's been set to "off" in settings!
-			if ( setting.on == false ) return;
+			if ( setting.on == 'off' ) return;
 
 			// Use title from settings, if there is one
 			if (  setting.title && setting.title != '' ) {
@@ -471,6 +476,10 @@ Wu.Control.Chart = Wu.Class.extend({
 		var _C3Container = Wu.DomUtil.createId('div', 'c3-container');	
 
 
+
+		console.log('%c *************************', 'background: red; color: white');
+		console.log('t', t);
+
 		// CHART SETTINGS
 		var chart = c3.generate({
 		        
@@ -510,13 +519,19 @@ Wu.Control.Chart = Wu.Class.extend({
 
 		        axis: {
 
+
+
 		                x: {
 		                        type: 'timeseries',
 		                        localtime: false,
 		                        tick: {
-		                                format: '%Y',
+		                                // format: '%Y',
 		                                values: t,
-		                                multiline: false                                        
+		                                // values : function (d) {
+		                                // 	console.log('d', d);
+		                                // 	return d;
+		                                // },
+		                                // multiline: false                                        
 		                        }
 		                },
 
@@ -534,7 +549,11 @@ Wu.Control.Chart = Wu.Class.extend({
 			tooltip: {
 				format: {
 					title: function (d) { 
+
+						// var isDate = this.validateDateFormat(_key);
+
 						var nnDate = moment(d).format("DD.MM.YYYY");
+						// xoxoxox
 						return nnDate;
 					},
 			
@@ -599,7 +618,6 @@ Wu.Control.Chart = Wu.Class.extend({
 		return c3Obj;
 	},
 
-
 	// Split time series from other meta
 	// TODO: fix this sheeet
 	C3dataObjBuilder : function (_key, _val, d3array) {
@@ -610,8 +628,9 @@ Wu.Control.Chart = Wu.Class.extend({
 		// CREATE DATE SERIES
 		if ( isDate ) {
 
-			// Create Legible Date Value
-			var nnDate = new Date(isDate);
+			// var nnDate = new Date(_date);
+
+			var nnDate = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YY-MM-DD");			
 
 			// DATE
 			d3array.x.push(nnDate);
@@ -620,21 +639,30 @@ Wu.Control.Chart = Wu.Class.extend({
 			d3array.y.push(_val);
 
 
-			// Get only year
-			var year = moment(isDate).format("YYYY");
-			var chartTick = new Date(year);
+			// var momentChartTick = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY");
+			var momentTmpTick = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format('YYYY');
+			
+			// var __momentTick = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD HH:mm");
+			var __momentTick = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY");
+			var momentTick   = new Date(__momentTick);
+
+			console.log('%c !!! momentTick', 'background: blue; color: white;');
+			console.log(momentTick);
 
 			var newTick = true;
 
-			// Calculate the ticks
-			d3array.ticks.forEach(function(ct) { 
 
-				// Avoid duplicates... (must set toUTCString as _date is CEST time format, while chartTick is CET)
-				if ( ct == chartTick ) newTick = false; 
+			// Calculate the ticks
+			d3array.tmpTicks.forEach(function(ct) { 
+
+				if ( ct == momentTmpTick ) newTick = false; 
 
 			})
 
-			if ( newTick ) d3array.ticks.push(chartTick);
+			if ( newTick ) {
+				d3array.tmpTicks.push(momentTmpTick);
+				d3array.ticks.push(momentTick);
+			}
 
 		// CREATE META FIELDS
 		// CREATE META FIELDS
@@ -666,17 +694,17 @@ Wu.Control.Chart = Wu.Class.extend({
 		// Default fields that for some reason gets read as time formats...
 		if ( _key == 'the_geom_3857' || _key == 'the_geom_4326' ) return false;
 
-		// If it's other time format
-		var _m = moment(_key).format("YYYY-MM-DD");
-		if ( _m != 'Invalid date' ) return _m;
-
 		// If it's Frano's time series format
-		var _m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
-		if ( _m != 'Invalid date' ) return _m;
+		var _m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("DD-MM-YYYY");
+		if ( _m == 'Invalid date' ) return false;
 
-		// If it's not a valid date...
-		return false;
+
+		return true;
+
 	},					
+
+
+
 
 
 })
