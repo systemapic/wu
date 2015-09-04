@@ -798,6 +798,14 @@ Wu.Project = Wu.Class.extend({
 		this._update('pending');
 	},
 
+	setPopupPosition : function (pos) {
+		this._popupPosition = pos;
+	},
+
+	getPopupPosition : function () {
+		return this._popupPosition;
+	},
+
 	setSettings : function (settings) {
 		this.store.settings = settings;
 		this._update('settings');
