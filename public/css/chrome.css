@@ -227,23 +227,107 @@ input.chrome-field-input {
 
 
 
-.setClear {
-  background: #999;
-  position: relative;
-  float: left;
-  font-size: 11px;
+.setClear,
+.chrome-set {
+    background: #999;
+    position: relative;
+    float: left;
+    font-size: 11px;
+    font-weight: 900;
+    width: 50px;
+    text-align: center;
+    height: 17px;
+    line-height: 1.5;
+    margin-right: 8px;
+    border-radius: 3px;
+    top: 1px;
+    color: white;
+    cursor: pointer;
+    }
+
+.setClear:hover {
+    background: #888;
+}    
+
+.chrome-set,
+.setClear.setClear-on {
+    background: #78a09c;
+    }
+
+.chrome-set:hover,
+.setClear.setClear-on:hover {   
+    background: #668884;
+    }
+
+.chrome-set:active {
+    background: #526E6A;
+}    
+
+
+
+
+.chrome-layer-toggle-button {
+    width: 50%;
+    background: #cccccc;
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    padding: 7px 1px 7px 1px;
+    color: #333;
+    font-weight: 900;
+    font-size: 14px;
+    cursor: pointer;
+    }
+
+.chrome-layer-toggle-button:hover {
+    background: #bbbbbb;
+}    
+
+.chrome-layer-toggle-button.chrome-baselayer {
+    border-radius: 4px 0px 0px 4px;
+    }
+
+.chrome-layer-toggle-button.chrome-layer {
+    border-radius: 0px 4px 4px 0px;
+    border-left: 1px solid white;
+    }
+
+
+.layer-toggle-active {
+    background: #78a09c;
+    color: white;
+    }
+
+.layer-toggle-active:hover {
+    background: #6c8e8b;
+    }
+
+.chrome.chrome-content.chrome-pane.layers,
+.chrome.chrome-content.chrome-pane.mapsettings {
+    padding-top: 10px;
+    }
+
+
+
+.chrome-layer-baselayer-toggle {
+    margin-bottom: 25px;
+    }
+
+
+.deactivated-layer:before {
+  content: 'occupied layer';  
+  background: rgba(255,255,255,0.7);
+  z-index: 9999;
+  position: absolute;
+  width: 289px;
+  height: 20px;
+  text-align: right;
   font-weight: 900;
-  width: 50px;
-  text-align: center;
-  height: 17px;
-  line-height: 1.5;
-  margin-right: 8px;
-  border-radius: 3px;
-  top: 1px;
-  color: white;
-  cursor: pointer;
+  font-style: italic;
+  color: #C80000;
+  line-height: 1.3;
 }
 
-.setClear.setClear-on {
-  background: #78a09c;
-}
+
+
+
