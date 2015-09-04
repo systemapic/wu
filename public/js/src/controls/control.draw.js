@@ -19,7 +19,6 @@ L.Control.Draw = Wu.Control.extend({
 				}
 			}
 		},
-		edit: false
 	},
 
 	type : 'draw',
@@ -47,33 +46,35 @@ L.Control.Draw = Wu.Control.extend({
 
 		map.on('draw:created', this._drawCreated.bind(this));
 		map.on('draw:edited', this._drawEdited.bind(this));
+		map.on('draw:deleted', this._drawDeleted.bind(this));
 		// map.on('draw:editstart', this._drawEditstart.bind(this));
 		// map.on('draw:editstop', this._drawEditstop.bind(this));
 
 		// // enable draw programatically
 		keymaster('d', this._toggleDraw.bind(this));
 		keymaster('e', this._toggleEdit.bind(this));
+		keymaster('c', this._clearAll.bind(this));
 		
 	},
 
 	_drawCreated : function (e) {
-		console.log('drawcreated', e);
 		var type = e.layerType,
-		layer = e.layer;
+		    layer = e.layer;
 
-		if (type === 'marker') {
-			layer.bindPopup('A popup!');
-		}
-
-		console.log(this._layerContainer);
+		// add layer to map
 		this._layerContainer.addLayer(layer);
+
+		// query for data
+		this._queryData(layer);
+
+		// add layer events
+		this._addLayerEvents(layer);
+	},
+
+	_queryData : function (layer) {
 
 		// get data etc.
 		var geojson = layer.toGeoJSON();
-
-		console.log('geojson', geojson);
-
-		// this._startWaitingFlash(layer.polygon);
 
 		// fetch data
 		this._fetchData({
@@ -90,22 +91,55 @@ L.Control.Draw = Wu.Control.extend({
 			// add to popup
 			app.MapPane._addPopupContentDraw(resultObject);
 
+			// mark as not creating anymore
 			app.MapPane._creatingPolygon = false;
 
+			// memorize
 			this._latestFetch = resultObject;
 
-			// this._stopWaitingFlash(layer.polygon);
+		}.bind(this));
+		
+	},
+
+	_addLayerEvents : function (layer) {
+		
+		// on delete
+		layer.on('deleted', function (e) {
+			// shortcut that shizz
+			var removeHandler = this._toolbars.edit._modes.remove.handler;
+			removeHandler.save();
+			removeHandler.disable();
 
 		}.bind(this));
 	},
+
+
 	_drawEdited : function (e) {
 		console.log('edited', e);
+
+		var layer = this._getEditedLayer(e);
+
+		// query for data
+		this._queryData(layer);
+
+	},
+
+	_getEditedLayer : function (e) {
+		var layers = e.layers._layers;
+		for (var l in layers) {
+			return layers[l];
+		}
+
 	},
 	_drawEditstart : function (e) {
 		console.log('editstart', e);
 	},
 	_drawEditstop : function (e) {
 		console.log('editstop', e);
+	},
+	_drawDeleted : function (e) {
+		console.log('editstop', e);
+		console.log('this.)_To', this._toolbars);
 	},
 
 	_fetchData : function (options, callback) {
@@ -125,25 +159,19 @@ L.Control.Draw = Wu.Control.extend({
 
 		Wu.send('/api/db/fetchArea', options, callback, this);
 	},
+	
 	_getActiveLayerID : function () {
 		var layer = app.MapPane._layermenuZIndex._index[0];
-
 		if (!layer || !layer.store || !layer.store.data || !layer.store.data.postgis) return false;
-
 		var layer_id = layer.store.data.postgis.layer_id;
-
 		return layer_id;
 	},
 
 	_toggleDraw : function () {
-		console.log('D!');
-
-		console.log('this._toolbars', this._toolbars);
 		
 		if (this._drawEnabled) {
 			this._toolbars.draw._modes.polygon.handler.disable();
 			this._drawEnabled = false;
-
 		} else {
 			this._toolbars.draw._modes.polygon.handler.enable();
 			this._drawEnabled = true;
@@ -151,13 +179,10 @@ L.Control.Draw = Wu.Control.extend({
 	},
 
 	_toggleEdit : function () {
-		console.log('D!');
-		
 		if (this._editEnabled) {
 			this._toolbars.edit._modes.edit.handler.save();
 			this._toolbars.edit._modes.edit.handler.disable()
 			this._editEnabled = false;
-
 		} else {
 			this._toolbars.edit._modes.edit.handler.enable();
 			this._editEnabled = true;
@@ -201,8 +226,6 @@ L.Control.Draw = Wu.Control.extend({
 	// turned on and off by sidepane/options/controls toggle
 	_on : function () {
 
-		console.log('DRAW _on');
-
 		// refresh
 		this._refresh();
 
@@ -239,11 +262,6 @@ L.Control.Draw = Wu.Control.extend({
 	},
 
 	_initContent : function () {
-		this._layerContainer =  new L.FeatureGroup();
-		app._map.addLayer(this._layerContainer);
-
-		console.log('initContent!', this._layerContainer);
-
 	},
 
 	refresh : function () {
@@ -261,7 +279,6 @@ L.Control.Draw = Wu.Control.extend({
 
 		// create layer container
 		this._layerContainer = new L.FeatureGroup();
-		console.log('this._layerContainer', this._layerContainer);
 		app._map.addLayer(this._layerContainer);
 
 		// add edit options
