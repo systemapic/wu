@@ -557,9 +557,8 @@ Wu.Control.Chart = Wu.Class.extend({
 			}		        
 		});
 
-		// add events
+		// add zoom events
 		this._addChartEvents(_C3Container);
-
 
 		return _C3Container;
 	},
@@ -567,6 +566,7 @@ Wu.Control.Chart = Wu.Class.extend({
 
 	_addChartEvents : function (div) {
 
+		// mousewheel zoom on chart
 		Wu.DomEvent.on(div, 'mousewheel', _.throttle(this._onChartMousemove, 50), this);
 
 	},
@@ -580,26 +580,28 @@ Wu.Control.Chart = Wu.Class.extend({
 		// only Y scroll
 		if (e.wheelDeltaY == 0) return; // not IE compatible
 
+		// size of step
 		var d = this._range / 5;
 
 		// zoom Y axis
 		if (delta > 0) { // moving up
 
+			// set range
 			this._range = this._range += d;
 
-			// if (this._range < 0.1) this._range = 0.1;
-
-			this._chart.axis.max({
-				y : this._range,
-				y2 : this._range
-			});
+			// update axis
+			this._chart.axis.max(this._range);
 			this._chart.axis.min(-this._range);
 		
 		} else { // moving down
+			
+			// set range
 			this._range = this._range -= d;
 
+			// dont go under 1
 			if (this._range < 1) this._range = 1;
 
+			// update axis
 			this._chart.axis.max(this._range);
 			this._chart.axis.min(-this._range);
 		}
