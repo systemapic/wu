@@ -150,7 +150,6 @@ Wu.MapPane = Wu.Pane.extend({
 		var controls = this.options.controls;
 		this._controls = {};
 		_.each(controls, function (control) {
-			console.log('initcontrol', control, this._controls);
 			this._controls[control] = new L.Control[control.camelize()];
 		}, this);
 	},
@@ -835,7 +834,7 @@ Wu.MapPane = Wu.Pane.extend({
 
 	_clearPopup : function () {
 		if (this._chart) {
-			this._chart._clearPopup();
+			this._chart._refresh();
 		}
 	},
 

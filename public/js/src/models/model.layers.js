@@ -626,20 +626,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 	},
 
 	_invalidateTiles : function () {
-		console.log('invalidateTIles');
 		return;
-
-		// var options = {
-		// 	layerUuid : this._getLayerUuid(),
-		// 	access_token : app.tokens.access_token, 
-		// 	zoom : app._map.getZoom()
-		// }
-
-		// console.log('invalidate options', options);
-
-		// Wu.send('/api/db/invalidate', options, function (a, b) {
-		// 	console.log('invalidate sent', a, b);
-		// }, this);
 	},
 
 	_updateGrid : function (l) {
@@ -723,8 +710,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 		var event = e.e.originalEvent;
 
-		
-
 		if (this._event === undefined || this._event.x == event.x) {
 			// open popup 
 			// app.MapPane.openPopup(e);
@@ -739,7 +724,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 	_gridOnClick : function (e) {
 		if (!e.data) return;
-		if (app.MapPane._creatingPolygon) return;
+		if (app.MapPane._drawing) return;
 
 		// pass layer
 		e.layer = this;
@@ -755,6 +740,8 @@ Wu.PostGISLayer = Wu.Layer.extend({
 				x : event.x,
 				y : event.y
 			}
+
+			// open popup
 			app.MapPane._addPopupContent(e);
 		});
 

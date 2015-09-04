@@ -25,7 +25,7 @@ L.drawLocal = {
 			},
 			buttons: {
 				polyline: 'Draw a polyline',
-				polygon: 'Draw a polygon',
+				polygon: 'Draw a polygon to query data (or press d)',
 				rectangle: 'Draw a rectangle',
 				circle: 'Draw a circle',
 				marker: 'Draw a marker'
@@ -83,17 +83,17 @@ L.drawLocal = {
 				}
 			},
 			buttons: {
-				edit: 'Edit layers.',
+				edit: 'Edit polygon (or press e)',
 				editDisabled: 'No layers to edit.',
-				remove: 'Delete layers.',
+				remove: 'Clear polygon (or press c)',
 				removeDisabled: 'No layers to delete.'
 			}
 		},
 		handlers: {
 			edit: {
 				tooltip: {
-					text: 'Drag handles, or marker to edit feature.',
-					subtext: 'Click cancel to undo changes.'
+					text: 'Click cancel or press ESC to undo changes. <br>Click save or press e to confirm edit.',
+					subtext: 'Drag handles to edit feature.'
 				}
 			},
 			remove: {
