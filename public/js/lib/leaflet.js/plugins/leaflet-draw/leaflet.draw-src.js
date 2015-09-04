@@ -1789,8 +1789,9 @@ L.GeometryUtil = L.extend(L.GeometryUtil || {}, {
 		var areaStr;
 
 		if (isMetric) {
-			if (area >= 10000) {
-				areaStr = (area * 0.0001).toFixed(2) + ' ha';
+			if (area >= 1000000) {
+				// areaStr = (area * 0.0001).toFixed(2) + ' ha';
+				areaStr = (area * 0.000001).toFixed(2) + ' km&sup2;'; // km2
 			} else {
 				areaStr = area.toFixed(2) + ' m&sup2;';
 			}
@@ -1973,6 +1974,7 @@ L.Control.Draw = L.Control.extend({
 	},
 
 	initialize: function (options) {
+
 		if (L.version < '0.7') {
 			throw new Error('Leaflet.draw 0.2.3+ requires Leaflet 0.7.0+. Download latest from https://github.com/Leaflet/Leaflet/');
 		}
@@ -2002,6 +2004,8 @@ L.Control.Draw = L.Control.extend({
 			this._toolbars[L.EditToolbar.TYPE].on('enable', this._toolbarEnabled, this);
 		}
 	},
+
+	
 
 	onAdd: function (map) {
 		var container = L.DomUtil.create('div', 'leaflet-draw'),

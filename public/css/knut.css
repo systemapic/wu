@@ -58,3 +58,33 @@
 	opacity: 0.5;
 }
 
+
+.leaflet-draw-toolbar a.leaflet-draw-edit-edit:before {
+    content: '';
+    background-image: url(images/leaflet.draw.sprites.png);
+    background-repeat: no-repeat;
+    width: 26px;
+    height: 26px;
+    top: 0;
+    right: 0;
+    position: absolute;
+    opacity: 0.75;
+    background-position: -151px;
+}
+.leaflet-draw-toolbar a.leaflet-draw-edit-remove:before {
+    content: '';
+    background-image: url(images/leaflet.draw.sprites.png);
+    background-repeat: no-repeat;
+    width: 26px;
+    height: 26px;
+    top: 0;
+    right: 0;
+    position: absolute;
+    opacity: 0.75;
+    background-position: -182px;
+}
+
+.leaflet-draw-toolbar {
+    margin-top: 0px;
+    box-shadow: none !important;
+}

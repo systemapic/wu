@@ -219,11 +219,11 @@ Wu.App = Wu.Class.extend({
 
 	_initTools : function () {
 
-		// init tools
-		this.Tools = {};
-		this.Tools.FreeDraw = new Wu.Tool.FreeDraw({
-			map : this.MapPane._map
-		});
+		// // init tools
+		// this.Tools = {};
+		// this.Tools.FreeDraw = new Wu.Tool.FreeDraw({
+		// 	map : this.MapPane._map
+		// });
 	
 	},
 
