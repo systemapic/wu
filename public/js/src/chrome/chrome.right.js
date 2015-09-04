@@ -75,6 +75,11 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		// fire event?
 		this._settingsSelector.closed();
 
+		// Make sure the "add folder"/editing of layer menu is closed
+		var layerMenu = app.MapPane.getControls().layermenu;
+		if (layerMenu) layerMenu.disableEdit();
+
+
 	},
 
 	// helper fn, todo: refactor
