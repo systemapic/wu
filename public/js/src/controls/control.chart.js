@@ -1,7 +1,5 @@
 Wu.Control.Chart = Wu.Class.extend({
 
-
-	// INITIALIZE POP-UP
 	initialize : function(options) {
 		
 		// OTHER OPTIONS
@@ -46,10 +44,6 @@ Wu.Control.Chart = Wu.Class.extend({
 	},
 
 
-	// UNIVERSAL OPEN/CLOSE POP-UP FUNCTIONS
-	// UNIVERSAL OPEN/CLOSE POP-UP FUNCTIONS
-	// UNIVERSAL OPEN/CLOSE POP-UP FUNCTIONS
-
 	// Open pop-up
 	openPopup : function (e, multiPopUp) {
 		if (this._popup) return;
@@ -86,7 +80,6 @@ Wu.Control.Chart = Wu.Class.extend({
 			// Add marker circle
 			this._addMarkerCircle(latlng);
 		}
-
 		
 	},
 
@@ -105,9 +98,11 @@ Wu.Control.Chart = Wu.Class.extend({
 
 		var styling = { 
 			radius: 10,
-			fillColor: "#f03",
-			color: "red",
-			fillOpacity: 0.5
+			fillColor: "white",
+			color: "white",
+			weight: 15,
+			opacity : 1,
+			fillOpacity: 0.4
 		}
 
 		this.popUpMarkerCircle = L.circleMarker(latlng, styling).addTo(app._map);
@@ -166,7 +161,6 @@ Wu.Control.Chart = Wu.Class.extend({
 		// create content, as timeseries or normal
 		var content = timeSeries ? this.singleC3PopUp(e) : this._createPopupContent(e);
 
-		
 		return content;
 	},
 
@@ -456,6 +450,10 @@ Wu.Control.Chart = Wu.Class.extend({
 
 		}
 
+		console.log('RANGE ->', range);
+
+		this._range = range;
+
 		// Column name
 		var xName = data.xName;
 		var yName = data.yName;
@@ -472,8 +470,10 @@ Wu.Control.Chart = Wu.Class.extend({
 
 
 		// CHART SETTINGS
-		var chart = c3.generate({
+		var chart = this._chart = c3.generate({
 		        
+		        interaction : true,
+
 		        bindto: _C3Container,
 		        
 			size: {
@@ -493,10 +493,21 @@ Wu.Control.Chart = Wu.Class.extend({
 				show: false
 			},		
 
+			zoom : {
+				enabled : false,
+				onzoomstart : function () {
+
+				},
+				onzoom : function (d) {
+					
+				},
+				onzoomend : function () {
+				},
+			},
 		        data: {
 
 		                xs: {
-		                        'field_y': 'field_x'
+		                        field_y: 'field_x'
 		                },
 
 		                columns: _columns,
@@ -527,7 +538,6 @@ Wu.Control.Chart = Wu.Class.extend({
 						format: function (d) { return Math.floor(d * 100)/100 }
 					}
 		                },
-	                
 
 		        },
 
@@ -538,7 +548,8 @@ Wu.Control.Chart = Wu.Class.extend({
 						return nnDate;
 					},
 			
-				}
+				},
+				
 			},	        
 
 			color: {
@@ -546,7 +557,53 @@ Wu.Control.Chart = Wu.Class.extend({
 			}		        
 		});
 
+		// add events
+		this._addChartEvents(_C3Container);
+
+
 		return _C3Container;
+	},
+
+
+	_addChartEvents : function (div) {
+
+		Wu.DomEvent.on(div, 'mousewheel', _.throttle(this._onChartMousemove, 50), this);
+
+	},
+
+	_onChartMousemove : function (e) {
+
+		// cross-browser wheel delta
+		var e = window.event || e; // old IE support
+		var delta = Math.max(-1, Math.min(1, (e.wheelDeltaY || -e.detail)));
+
+		// only Y scroll
+		if (e.wheelDeltaY == 0) return; // not IE compatible
+
+		var d = this._range / 5;
+
+		// zoom Y axis
+		if (delta > 0) { // moving up
+
+			this._range = this._range += d;
+
+			// if (this._range < 0.1) this._range = 0.1;
+
+			this._chart.axis.max({
+				y : this._range,
+				y2 : this._range
+			});
+			this._chart.axis.min(-this._range);
+		
+		} else { // moving down
+			this._range = this._range -= d;
+
+			if (this._range < 1) this._range = 1;
+
+			this._chart.axis.max(this._range);
+			this._chart.axis.min(-this._range);
+		}
+
 	},
 
 

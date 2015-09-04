@@ -798,5 +798,11 @@ Wu.MapPane = Wu.Pane.extend({
 
 	},
 
+	_clearPopup : function () {
+		if (this._chart) {
+			this._chart._clearPopup();
+		}
+	},
+
 	
 });
