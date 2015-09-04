@@ -93,22 +93,22 @@ section.map.mode-edit div.polygon-elbow {
 /* TOOLTIP FIELDS */
 /* TOOLTIP FIELDS */
 
-.chrome-tooltip-field-wrapper {
+.chrome-field-wrapper {
     padding: 0px 30px 200px 30px;
     }
 
-.chrome-tooltip-metafield-line {
+.chrome-metafield-line {
     border-top: 1px solid #999;
     padding-top: 2px;
     padding-bottom: 2px;
     font-size: 14px;    
     }
 
-.chrome-tooltip-metafield-line:last-child {
+.chrome-metafield-line:last-child {
     border-bottom: 1px solid #999;    
     }
 
-input.chrome-tooltip-field-input {
+input.chrome-field-input {
     border: none;
     }
 
@@ -199,8 +199,8 @@ input.chrome-tooltip-field-input {
     }
 
 
-.chrome-tooltip-field-mini-input,
-.chrome-tooltip-field-mini-input:focus {
+.chrome-field-mini-input,
+.chrome-field-mini-input:focus {
     width: 28px;
     height: 17px;
     position: relative;
@@ -218,3 +218,32 @@ input.chrome-tooltip-field-input {
 #c3-container {
       max-height: 247px !important;
 }    
+
+
+
+.chrome.chrome-content.chrome-pane {
+    width: 352px;
+}
+
+
+
+.setClear {
+  background: #999;
+  position: relative;
+  float: left;
+  font-size: 11px;
+  font-weight: 900;
+  width: 50px;
+  text-align: center;
+  height: 17px;
+  line-height: 1.5;
+  margin-right: 8px;
+  border-radius: 3px;
+  top: 1px;
+  color: white;
+  cursor: pointer;
+}
+
+.setClear.setClear-on {
+  background: #78a09c;
+}

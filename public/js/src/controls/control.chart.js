@@ -27,6 +27,8 @@ Wu.Control.Chart = Wu.Class.extend({
 			var content = this.singlePopUp(e);
 		}
 
+		console.log('this.popupSettings', this.popupSettings);
+
 		// clear old popup
 		this._popup = null;
 
@@ -41,7 +43,6 @@ Wu.Control.Chart = Wu.Class.extend({
 
 		// Open popup
 		this.openPopup(e, multiPopUp);
-
 	},
 
 
@@ -130,7 +131,7 @@ Wu.Control.Chart = Wu.Class.extend({
 	_createPopup : function () {
 
 		// Create smaller pop-up if there are no graphs to show
-		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == 'off' ) {
+		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == false ) {
 			var maxWidth = 150;
 			var minWidth = 150;
 
@@ -164,6 +165,7 @@ Wu.Control.Chart = Wu.Class.extend({
 
 		// create content, as timeseries or normal
 		var content = timeSeries ? this.singleC3PopUp(e) : this._createPopupContent(e);
+
 		
 		return content;
 	},
@@ -246,7 +248,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		content.appendChild(_header);
 
 		// Create graph HTML
-		if ( this.popupSettings && this.popupSettings.timeSeries.enable != 'off') {
+		if ( this.popupSettings && this.popupSettings.timeSeries.enable != false) {
 			
 			var _chart = this.C3Chart(_c3Obj);
 			content.appendChild(_chart);
@@ -259,16 +261,12 @@ Wu.Control.Chart = Wu.Class.extend({
 	// Create multi point C3 pop-up content
 	multiPointPopUp : function (_data) {	
 
-		console.log('%c multiPointPopUp', 'background: blue; color: white;');
-		console.log('_data', _data);
-		
+
 		var _average = _data.average;
 		var _center = _data.center;
 		var _layer = this._getWuLayerFromPostGISLayer(_data.layer_id);
 		var _layerName = _layer.store.title;
 		var _totalPoints = _data.total_points;
-
-		console.log('_totalPoints', _totalPoints);
 
 		// Show square meters if less than 1000
 		if ( _data.area < 1000 ) {
@@ -354,7 +352,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		var container = Wu.DomUtil.createId('div', 'c3-header-metacontainer');
 
 		// If not time series, make small pop-up
-		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == 'off' ) {
+		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == false ) {
 			container.className = 'small-pop-up';
 		}
 
@@ -383,7 +381,7 @@ Wu.Control.Chart = Wu.Class.extend({
 			if ( !_val ) return;
 
 			// Do not show field if it's been set to "off" in settings!
-			if ( setting.on == 'off' ) return;
+			if ( setting.on == false ) return;
 
 			// Use title from settings, if there is one
 			if (  setting.title && setting.title != '' ) {
@@ -472,6 +470,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		// Create container
 		var _C3Container = Wu.DomUtil.createId('div', 'c3-container');	
 
+
 		// CHART SETTINGS
 		var chart = c3.generate({
 		        
@@ -511,8 +510,6 @@ Wu.Control.Chart = Wu.Class.extend({
 
 		        axis: {
 
-
-
 		                x: {
 		                        type: 'timeseries',
 		                        localtime: false,
@@ -537,11 +534,7 @@ Wu.Control.Chart = Wu.Class.extend({
 			tooltip: {
 				format: {
 					title: function (d) { 
-
-						// var isDate = this.validateDateFormat(_key);
-
 						var nnDate = moment(d).format("DD.MM.YYYY");
-						// xoxoxox
 						return nnDate;
 					},
 			
@@ -556,12 +549,6 @@ Wu.Control.Chart = Wu.Class.extend({
 		return _C3Container;
 	},
 
-
-	clickChart : function () {
-
-		console.log('%c clickChart', 'background: blue; color: white');
-
-	},
 
 
 	// DATA BUILDERS
@@ -612,6 +599,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		return c3Obj;
 	},
 
+
 	// Split time series from other meta
 	// TODO: fix this sheeet
 	C3dataObjBuilder : function (_key, _val, d3array) {
@@ -622,9 +610,8 @@ Wu.Control.Chart = Wu.Class.extend({
 		// CREATE DATE SERIES
 		if ( isDate ) {
 
-			// var nnDate = new Date(_date);
-
-			var nnDate = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YY-MM-DD");			
+			// Create Legible Date Value
+			var nnDate = new Date(isDate);
 
 			// DATE
 			d3array.x.push(nnDate);
@@ -633,29 +620,21 @@ Wu.Control.Chart = Wu.Class.extend({
 			d3array.y.push(_val);
 
 
-			// var momentChartTick = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY");
-			var momentTmpTick = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format('YYYY');
-			
-			var __momentTick = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD HH:mm");
-			var momentTick = new Date(__momentTick);
-
-			console.log('%c momentTmpTick', 'background: blue; color: white;');
-			console.log(momentTmpTick);
+			// Get only year
+			var year = moment(isDate).format("YYYY");
+			var chartTick = new Date(year);
 
 			var newTick = true;
 
-
 			// Calculate the ticks
-			d3array.tmpTicks.forEach(function(ct) { 
+			d3array.ticks.forEach(function(ct) { 
 
-				if ( ct == momentTmpTick ) newTick = false; 
+				// Avoid duplicates... (must set toUTCString as _date is CEST time format, while chartTick is CET)
+				if ( ct == chartTick ) newTick = false; 
 
 			})
 
-			if ( newTick ) {
-				d3array.tmpTicks.push(momentTmpTick);
-				d3array.ticks.push(momentTick);
-			}
+			if ( newTick ) d3array.ticks.push(chartTick);
 
 		// CREATE META FIELDS
 		// CREATE META FIELDS
@@ -687,17 +666,17 @@ Wu.Control.Chart = Wu.Class.extend({
 		// Default fields that for some reason gets read as time formats...
 		if ( _key == 'the_geom_3857' || _key == 'the_geom_4326' ) return false;
 
+		// If it's other time format
+		var _m = moment(_key).format("YYYY-MM-DD");
+		if ( _m != 'Invalid date' ) return _m;
+
 		// If it's Frano's time series format
-		var _m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("DD-MM-YYYY");
-		if ( _m == 'Invalid date' ) return false;
+		var _m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
+		if ( _m != 'Invalid date' ) return _m;
 
-
-		return true;
-
+		// If it's not a valid date...
+		return false;
 	},					
-
-
-
 
 
 })

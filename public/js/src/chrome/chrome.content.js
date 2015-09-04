@@ -115,6 +115,150 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 	},
 
 
+
+	// Creates one meta field line, with input, switch, etc
+	_createMetaFieldLine : function (options) {
+
+		// _key, wrapper, input, right
+		var _key 	= options.key,
+		    _wrapper 	= options.wrapper,
+		    _input 	= options.input,
+		    _right 	= options.rightPos,
+		    _switch 	= options.switch,
+		    _isOn 	= options.isOn,
+		    _title 	= options.title,
+		    _miniInput 	= options.miniInput,
+		    _setClear   = options.setClear;
+
+		var fieldWrapper = Wu.DomUtil.create('div', 'chrome-metafield-line', _wrapper);
+		
+
+		// Create switch
+		if ( _switch ) {
+	
+			// Create classname
+			var 		    _class = 'chrome-switch-container';
+			if ( _isOn ) 	    _class += ' switch-on';
+			if ( _right ) 	    _class += ' right-switch';
+
+			// Create button
+			var fieldSwitch = Wu.DomUtil.create('div', _class, fieldWrapper);
+			    fieldSwitch.setAttribute('key', _key);
+			    fieldSwitch.id = 'field_switch_' + _key;
+
+			// Set on/off state
+			if ( _isOn ) fieldSwitch.setAttribute('state', 'true');
+			else 	     fieldSwitch.setAttribute('state', 'false');
+
+			// Add hooks
+			Wu.DomEvent.on(fieldSwitch, 'click', this.toggleSwitch, this);		    
+
+		}
+
+		if ( _miniInput ) {
+
+			var miniInput = Wu.DomUtil.createId('input', 'field_mini_input_' + _key, fieldWrapper);
+			    miniInput.className = 'chrome-field-mini-input';
+			    miniInput.setAttribute('placeholder', 'auto');
+
+			    if ( options.value ) miniInput.value = options.value;
+
+			Wu.DomEvent.on(miniInput, 'blur', this.saveMiniBlur, this);
+
+		}
+
+		if ( _setClear ) {
+
+			var setClear = Wu.DomUtil.create('div', 'setClear', fieldWrapper);
+			    setClear.innerHTML = 'SET';
+
+			if ( _isOn ) {
+				Wu.DomUtil.addClass(setClear, 'setClear-on');
+				setClear.innerHTML = 'CLEAR';
+			}
+
+
+		}
+
+		// Create input field
+		if ( _input ) {
+
+			var fieldName = Wu.DomUtil.createId('input', 'field_input_' + _key, fieldWrapper);
+			    fieldName.className = 'chrome-field-input';
+			    fieldName.setAttribute('name', 'field_input_' + _key);
+			    fieldName.setAttribute('placeholder', _key);
+
+			    if ( _title ) fieldName.value = _title;
+
+			    Wu.DomEvent.on(fieldName, 'blur', this.saveFromBlur, this);
+		
+		// Create "normal" text line
+		} else {
+
+			var fieldName = Wu.DomUtil.create('div', 'chrome-field-line', fieldWrapper);
+			    fieldName.innerHTML = _title ? _title : _key;
+		}
+	},
+
+	// Toggle switch
+	toggleSwitch : function (e) {
+
+		var stateAttrib = e.target.getAttribute('state');
+		
+		if ( stateAttrib == 'true' ) var on = true;
+		else 			     var on = false;
+
+		var key = e.target.getAttribute('key');
+
+		if ( on ) {
+			
+			e.target.setAttribute('state', 'false');
+			Wu.DomUtil.removeClass(e.target, 'switch-on');
+
+			var isOn = false;
+
+		} else {
+
+			e.target.setAttribute('state', 'true');
+			Wu.DomUtil.addClass(e.target, 'switch-on');
+
+			var isOn = true;
+		}	
+
+		this._saveToServer(key, '', isOn)
+	},
+
+	// Saver dummy
+	saveMiniBlur : function () {
+
+		console.log('%c ***************************** ', 'background: red; color: white');
+		console.log('%c Did you foget something?', 'color: blue');
+		console.log('%c Function "saveMiniBlur" fired from parent function...', 'color: blue');
+		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
+		console.log('%c ***************************** ', 'background: red; color: white');
+	},
+
+	// Saver dummy
+	saveFromBlur : function () {
+
+		console.log('%c *****************************', 'background: red; color: white');
+		console.log('%c Did you foget something?', 'color: blue');
+		console.log('%c Function "saveFromBlur" fired from parent function...', 'color: blue');
+		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
+		console.log('%c ***************************** ', 'background: red; color: white');
+	},
+
+	// Saver dummy
+	_saveToServer : function () {
+
+		console.log('%c ***************************** ', 'background: red; color: white');
+		console.log('%c Did you foget something?', 'color: blue');
+		console.log('%c Function "_saveToServer" fired from parent function...', 'color: blue');
+		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
+		console.log('%c ***************************** ', 'background: red; color: white');
+	},
+
+
 });
 
 
@@ -142,6 +286,11 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 				enabled : true,
 				text : 'CartoCSS & SQL'
 			},
+
+			mapsettings : {
+				enabled : true,
+				text : 'Map Settings'
+			},			
 		}
 	},
 
@@ -170,6 +319,8 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 		// tabs
 		this._initTabs();
 	},
+
+
 
 	getTabs : function () {
 		return this._tabs;
@@ -244,6 +395,224 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 });
 
 
+// ┌┬┐┌─┐┌─┐  ┌─┐┌─┐┌┬┐┌┬┐┬┌┐┌┌─┐┌─┐
+// │││├─┤├─┘  └─┐├┤  │  │ │││││ ┬└─┐
+// ┴ ┴┴ ┴┴    └─┘└─┘ ┴  ┴ ┴┘└┘└─┘└─┘
+
+Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
+
+	_initialize : function () {
+
+		// init container
+		this._initContainer();
+
+		// add events
+		this._addEvents();
+	},
+
+	_initContainer : function () {
+
+		// create container
+		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane mapsettings', this.options.appendTo);
+		
+	},
+
+	_initLayout : function () {
+
+		if (!this._project) return;
+
+		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._container);
+		this.initSettings('Controls');
+
+		this.initBoundPos('Bounds & Position');
+
+		// mark as inited
+		this._inited = true;		
+
+	},
+
+
+	// Creates section with meta field lines
+	initSettings : function (title) {
+
+
+		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
+		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, title);
+
+		var options = {
+
+			zoom : {
+				enable : true,
+				name   : 'Zoom'
+			},
+			draw : {
+				enable : false,
+				name   : 'Draw'
+			},
+			description : {
+				enable : true,
+				name   : 'Description/legend'
+			},
+			measure : {
+				enable : true,
+				name   : 'Measure'		
+			},
+			mouseposition : {
+				enable : true,
+				name   : 'Mouse position'
+			},
+			geolocation : {
+				enable : true,
+				name   : 'Geo search'				
+			},
+
+			// Inactive
+			layermenu : {
+				enable : false,
+				name   : 'Layer menu'
+			},
+			legends : {
+				enable : false,
+				name   : 'Legend'
+			},
+			baselayertoggle : {
+				enable : false,
+				name   : 'Base layer toggle'
+			},
+			cartocss : {
+				enable : false,
+				name   : 'CartoCSS'
+			},
+
+		}
+
+
+		// Get control
+		var project = app.activeProject;
+
+
+		for ( var key in options ) {
+			
+			var enable  = options[key].enable;			
+
+			if ( enable ) {
+
+				var title = options[key].name;
+
+				var lineOptions = {
+					key 		: key, 
+					wrapper 	: sectionWrapper,
+					input 		: false,
+					title 		: title,
+					switch 		: true,
+					isOn 		: project.store.controls[key],
+					dropdown	: false,
+					rightPos	: false
+				}
+
+				this._createMetaFieldLine(lineOptions);
+			}
+		}
+	},
+
+	initBoundPos : function (title) {
+
+		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
+		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, title);
+
+
+		var lineOptions = {
+			key 		: 'bounds', 
+			wrapper 	: sectionWrapper,
+			input 		: false,
+			title 		: 'Bounds',			
+			isOn 		: true,
+
+			switch 		: false,
+			dropdown	: false,
+			setClear 	: true,
+			rightPos	: false
+		}
+
+		this._createMetaFieldLine(lineOptions);
+
+
+		var lineOptions = {
+			key 		: 'position', 
+			wrapper 	: sectionWrapper,
+			input 		: false,
+			title 		: 'position',			
+			isOn 		: false,
+
+			switch 		: false,
+			dropdown	: false,
+			setClear 	: true,
+			rightPos	: false
+		}
+
+		this._createMetaFieldLine(lineOptions);
+
+	},
+
+
+	_saveToServer : function (_key, title, on) {
+
+		var item = _key;
+
+		// Get control
+		var control = app.MapPane.getControls()[item];
+
+		// Save
+		var project = app.activeProject;
+		    project.store.controls[item] = on;
+		    project._update('controls');
+
+		// toggle on map
+		if (on) {
+			control._on();
+		} else {
+			control._off();
+		}
+
+	},
+
+
+	_refresh : function () {
+
+		console.log('%c mapsettings: _refresh', 'background: red; color: white;');
+
+		this._flush();
+		this._initLayout();
+	},
+
+	_flush : function () {
+
+		console.log('%c mapsettings: _flush', 'background: red; color: white;');
+
+		this._container.innerHTML = '';
+	},
+	
+	show : function () {
+
+		console.log('%c mapsettings: show', 'background: red; color: white;');
+
+		if (!this._inited) this._initLayout();
+
+		// hide others
+		this.hideAll();
+
+		// show this
+		this._container.style.display = 'block';
+
+		// mark button
+		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+	},
+
+	open : function () {
+		console.log('open!', this);
+	}
+});
+
 
 // ┌─┐┌┬┐┬ ┬┬  ┌─┐┬─┐
 // └─┐ │ └┬┘│  ├┤ ├┬┘
@@ -263,7 +632,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	_initContainer : function () {
 
 		// create container
-		this._container = Wu.DomUtil.create('div', 'chrome chrome-content styler', this.options.appendTo);
+		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane styler', this.options.appendTo);
 	},
 
 	_initLayout : function () {
@@ -327,9 +696,6 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		// mark button
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
 	},
-
-
-
 });
 
 
@@ -352,7 +718,7 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 	_initContainer : function () {
 
 		// create container
-		this._container = Wu.DomUtil.create('div', 'chrome chrome-content layers', this.options.appendTo);
+		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane layers', this.options.appendTo);
 
 	},
 
@@ -387,7 +753,6 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 	open : function () {
 		console.log('open!', this);
 	}
-
 });
 
 
@@ -411,7 +776,7 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 	_initContainer : function () {
 
 		// create container
-		this._container = Wu.DomUtil.create('div', 'chrome chrome-content cartocss', this.options.appendTo);
+		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane cartocss', this.options.appendTo);
 	},
 
 	_initLayout : function () {
@@ -859,8 +1224,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		// mark button
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
 	},
-
-
 });
 
 
@@ -885,7 +1248,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 	_initContainer : function () {
 
 		// create container
-		this._container = Wu.DomUtil.create('div', 'chrome chrome-content styler', this.options.appendTo);
+		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane styler', this.options.appendTo);
 	},
 
 	_initLayout : function () {
@@ -940,7 +1303,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		// If no tooltip meta stored, create from layer meta
 		if ( !this.tooltipMeta ) this.tooltipMeta = this.createTooltipMeta(layerMeta);
 
-		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-tooltip-field-wrapper', this._container);
+		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._container);
 
 		// Init title
 		this.initTitle();
@@ -1012,7 +1375,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 			
 			metaData.metaFields[f] = {
 					title : false,
-					on    : 'on'
+					on    : true
 			}
 		}
 
@@ -1041,7 +1404,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 				
 				metaData.timeSeries[_key] = {
 						title : false,
-						on    : 'on'
+						on    : true
 				}
 
 				timeSeriesCount ++;
@@ -1051,7 +1414,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 				
 				metaData.metaFields[_key] = {
 						title : false,
-						on    : 'on'
+						on    : true
 				};
 
 			}       
@@ -1160,98 +1523,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		// Create list of time series fields
 		this.fieldListFromObject('Time Series Fields', true);
 	},	
-
-	// Creates one meta field line, with input, switch, etc
-	_createMetaFieldLine : function (options) {
-
-		// _key, wrapper, input, right
-		var _key = options.key;
-		var wrapper = options.wrapper;
-		var input = options.input;
-		var right = options.rightPos;
-		var _switch = options.switch;
-		var isOn = options.isOn;
-		var title = options.title;
-		var miniInput = options.miniInput;
-
-		var fieldWrapper = Wu.DomUtil.create('div', 'chrome-tooltip-metafield-line', wrapper);
-		
-		// Create switch
-		if ( _switch ) {
 	
-			// Create classname
-			var 		    _class = 'chrome-switch-container';
-			if ( isOn == 'on' ) _class += ' switch-on';
-			if ( right ) 	    _class += ' right-switch';
-
-			// Create button
-			var fieldSwitch = Wu.DomUtil.create('div', _class, fieldWrapper);
-			    fieldSwitch.setAttribute('key', _key);
-			    fieldSwitch.id = 'field_switch_' + _key;
-
-			// Set on/off state
-			if ( isOn == 'on' ) fieldSwitch.setAttribute('state', 'on');			    
-
-			// Add hooks
-			Wu.DomEvent.on(fieldSwitch, 'click', this.toggleSwitch, this);		    
-
-		}
-
-		if ( miniInput ) {
-
-			var _miniInput = Wu.DomUtil.createId('input', 'field_mini_input_' + _key, fieldWrapper);
-			    _miniInput.className = 'chrome-tooltip-field-mini-input';
-			    _miniInput.setAttribute('placeholder', 'auto');
-
-			    if ( options.value ) _miniInput.value = options.value;
-
-			Wu.DomEvent.on(_miniInput, 'blur', this.saveMiniBur, this);
-
-		}
-
-		// Create input field
-		if ( input ) {
-
-			var fieldName = Wu.DomUtil.createId('input', 'field_input_' + _key, fieldWrapper);
-			    fieldName.className = 'chrome-tooltip-field-input';
-			    fieldName.setAttribute('name', 'field_input_' + _key);
-			    fieldName.setAttribute('placeholder', _key);
-
-			    if ( title ) fieldName.value = title;
-
-			    Wu.DomEvent.on(fieldName, 'blur', this.saveFromBlur, this);
-		
-		// Create "normal" text line
-		} else {
-
-			var fieldName = Wu.DomUtil.create('div', 'chrome-tooltip-field-line', fieldWrapper);
-			    fieldName.innerHTML = title ? title : _key;
-		}
-	},
-
-	// Toggle switch
-	toggleSwitch : function (e) {
-
-		var on = e.target.getAttribute('state');
-		var key = e.target.getAttribute('key');
-
-		if ( on == 'on') {
-			
-			e.target.setAttribute('state', 'off');
-			Wu.DomUtil.removeClass(e.target, 'switch-on');
-
-			var isOn = 'off';
-
-		} else {
-
-			e.target.setAttribute('state', 'on');
-			Wu.DomUtil.addClass(e.target, 'switch-on');
-
-			var isOn = 'on';
-		}	
-
-		this._saveTooltipMeta(key, '', isOn)
-	},	
 
 	// Save title
 	saveTitle : function (e) {
@@ -1269,22 +1541,22 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		var thisSwitch = Wu.DomUtil.get('field_switch_' + key);
 		var thisSwitchState = thisSwitch.getAttribute('state');
 
-		var on = thisSwitchState ? 'on' : 'off';
+		var on = thisSwitchState ? true : false;
 
-		this._saveTooltipMeta(key, value, on);
+		this._saveToServer(key, value, on);
 	},
 
 	// Saves tiny input to right
-	saveMiniBur : function (e) {
+	saveMiniBlur : function (e) {
 
 		var key   = e.target.id.substring(17, e.target.id.length)
 		var value = e.target.value;
 
-		this._saveTooltipMeta(key, false, value);
+		this._saveToServer(key, false, value);
 	},
 
 	// Saves switches, etc
-	_saveTooltipMeta : function (_key, title, on) {
+	_saveToServer : function (_key, title, on) {
 
 		var titleField = Wu.DomUtil.get('field_input_' + _key);
 		var title      = titleField ? titleField.value : false;

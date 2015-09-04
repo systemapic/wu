@@ -110,6 +110,10 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		var disable = 'disable' + item.camelize();
 		var mapPane = app.MapPane;
 
+		console.log('%c toggle control', 'background: red; color: white;')
+		console.log('item', item);
+		console.log('on', on);
+
 		var control = app.MapPane.getControls()[item];
 
 
