@@ -88,3 +88,11 @@
     margin-top: 0px;
     box-shadow: none !important;
 }
+
+
+.leaflet-draw-edit-edit.leaflet-disabled {
+	display:  none;
+}
+.leaflet-draw-edit-remove.leaflet-disabled {
+	display:  none;
+}
