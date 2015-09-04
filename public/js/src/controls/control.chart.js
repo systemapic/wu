@@ -6,7 +6,7 @@ Wu.Control.Chart = Wu.Class.extend({
 		
 		// OTHER OPTIONS
 		var multiPopUp = options.multiPopUp;
-		var e 	       = options.e;
+		var e = options.e;
 
 		
 		if ( multiPopUp ) {
@@ -51,14 +51,14 @@ Wu.Control.Chart = Wu.Class.extend({
 
 	// Open pop-up
 	openPopup : function (e, multiPopUp) {
-
 		if (this._popup) return;
 
 		var popup   = this._createPopup(),
 		    content = this._popupContent,
-		    map     = app._map;
+		    map     = app._map,
+		    project = this._project || app.activeProject;
 
-
+		// set latlng
 		var latlng = multiPopUp ? multiPopUp.center : e.latlng;
 		
 		// return if no content
@@ -72,22 +72,31 @@ Wu.Control.Chart = Wu.Class.extend({
 
 		// set content
 		popup.setContent(content);
-		popup.setLatLng(latlng);
 
-		popup.openOn(map);		// todo: still some minor bugs,
+		// open popup
+		popup.open();
 
-		if ( multiPopUp ) return;
+		// show marker on popup, but not on multi cause polygon
+		if (!multiPopUp) {
 
-		// // 1. lat/lng ing column
-		// var latlng = L.latLng(e.data.lat, e.data.lon);	 // todo: remove this??
-
-		// // 2 north/east as 3857
-		if (!latlng) {
-			var latlng = L.Projection.Mercator.unproject({x:e.data.north, y:e.data.east}); // wrong conversion, wrong epsg?
+			// set latlng
+			var latlng = this._getMarkerPosition(latlng, e);
+			
+			// Add marker circle
+			this._addMarkerCircle(latlng);
 		}
 
-		// Add marker circle
-		this._addMarkerCircle(latlng);
+		
+	},
+
+	_getMarkerPosition : function (latlng, e) {
+
+		// try to calculate true position of point, instead of mouse pos. need to look in data. 
+		// this is kinda specific to globesar's data, but could be made pluggable.
+
+		// var latlng = L.Projection.Mercator.unproject({x:e.data.north, y:e.data.east}); // wrong conversion, wrong epsg?
+
+		return latlng;
 	},
 
 	// Add marker circle (not working)
@@ -103,7 +112,6 @@ Wu.Control.Chart = Wu.Class.extend({
 		this.popUpMarkerCircle = L.circleMarker(latlng, styling).addTo(app._map);
 	},
 
-	// Close pop-up
 	_addPopupCloseEvent : function () {
 		if (this._popInit) return;
 		this._popInit = true;	// only run once
@@ -112,7 +120,6 @@ Wu.Control.Chart = Wu.Class.extend({
 		map.on('popupclose',  this._clearPopup, this);
 	},
 
-	// Clear pop-up
 	_clearPopup : function () {
 		this._popupContent = '';
 		this._popup = null;
@@ -133,15 +140,15 @@ Wu.Control.Chart = Wu.Class.extend({
 			var minWidth = 200;			
 		}
 
-
 		// create popup
-		var popup = L.popup({
+		var popup = Wu.popup({
 			offset : [18, 0],
 			closeButton : true,
 			zoomAnimation : false,
 			maxWidth : maxWidth,
 			minWidth : minWidth,
 			maxHeight : 350,
+			appendTo : app._appPane // where to put popup
 		});
 
 		return popup;
@@ -149,47 +156,16 @@ Wu.Control.Chart = Wu.Class.extend({
 
 
 
-
-
-
-
-	// CREATE POP-UP CONTENT
-	// CREATE POP-UP CONTENT
-	// CREATE POP-UP CONTENT
-
-	// // Create single point C3 pop-up content
-	// singlePopUp : function (e) {
-
-	// 	console.log('singlePopUp', this.popupSettings.timeSeries);
-
-	// 	if ( this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable = 'on' ) {
-	// 		var _HTML = this.singleC3PopUp(e);
-	// 	} else {
-	// 		var _HTML = this._createPopupContent(e);
-	// 	}
-
-	// 	return _HTML;
-		
-
-	// },	
-
 	// Create single point C3 pop-up content
 	singlePopUp : function (e) {
 
+		// check if timeseries
+		var timeSeries = (this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == 'on');
 
-
-
-		// With time series
-		if ( this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == 'on' ) {
-			var content = this.singleC3PopUp(e);
+		// create content, as timeseries or normal
+		var content = timeSeries ? this.singleC3PopUp(e) : this._createPopupContent(e);
 		
-		// Without time series
-		} else {
-			var content = this._createPopupContent(e);
-		}
-
 		return content;
-
 	},
 
 	// Create "normal" pop-up content without time series
@@ -215,7 +191,6 @@ Wu.Control.Chart = Wu.Class.extend({
 		}
 
 		var _c3Obj = this.createC3dataObj(c3Obj);
-
 
 		var headerOptions = {
 			headerMeta 	: _c3Obj.d3array.meta,
@@ -283,7 +258,6 @@ Wu.Control.Chart = Wu.Class.extend({
 
 	// Create multi point C3 pop-up content
 	multiPointPopUp : function (_data) {	
-
 
 		console.log('%c multiPointPopUp', 'background: blue; color: white;');
 		console.log('_data', _data);
