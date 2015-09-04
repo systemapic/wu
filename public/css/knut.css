@@ -96,3 +96,9 @@
 .leaflet-draw-edit-remove.leaflet-disabled {
 	display:  none;
 }
+.leaflet-draw.leaflet-control {
+	margin-top: 0px;
+}
+.leaflet-control-search.leaflet-control {
+	margin-top: 6px;
+}

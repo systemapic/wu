@@ -102,10 +102,8 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	_addThin: function () {
-		console.log('_addTHIN!');
 		if (!this._inited) this.initLayer();
 
-		console.log('adding!', this.layer);
 		// only add to map temporarily
 		app._map.addLayer(this.layer);
 		this.layer.bringToFront();
@@ -350,8 +348,6 @@ Wu.Layer = Wu.Class.extend({
 	getDefaultEditorStyle : function () {
 		var meta = this.getMeta();
 
-		console.log('meta: ', meta);
-
 		var columns = meta.columns;
 		var field;
 
@@ -462,7 +458,6 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	setStyle : function (postgis) {
-		console.log('set style -> postgis: ', postgis);
 		if (!postgis) return console.error('no styloe to set!');
 		
 		this.store.data.postgis = postgis;
