@@ -57,6 +57,10 @@ L.Control.Draw = Wu.Control.extend({
 		
 	},
 
+	_clearAll : function () {
+		console.log('clear all layers');
+	},
+
 	_drawCreated : function (e) {
 		var type = e.layerType,
 		    layer = e.layer;
