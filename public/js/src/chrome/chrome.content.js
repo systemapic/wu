@@ -1742,11 +1742,31 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 				headers += '@' + color.range + '_max: ' + minMax[1] + ';\n';
 				headers += '@' + color.range + ': [' + color.range + '];\n\n';
 
-				var no = 10;
-				color.value.forEach(function(c, i) {
-					no -= i;
-					style += '@color_' + no + ': ' + c + ';\n';
+				// COLORS
+				color.value.forEach(function(c, i) {	
+					headers += '@color_' + (color.value.length - i) + ': ' + c + ';\n';
 				})
+
+				headers += '\n';
+
+				// COLOR STEPS
+				headers += '@' + color.range + '_delta: (@' + color.range + '_max - @' + color.range + '_min)/' + color.value.length + ';\n'
+				color.value.forEach(function(c, i) {	
+					headers += '@step_' + (i+1) + ' + (@' + color.range + '_delta * ' + i + ');\n';
+				})				
+
+
+				// @delta   : (@field_max - @field_min)/10;
+				// @step_1  : @field_min;
+				// @step_2  : @field_min + @delta;
+				// @step_3  : @field_min + (@delta * 2);
+				// @step_4  : @field_min + (@delta * 3);
+				// @step_5  : @field_min + (@delta * 4);
+				// @step_6  : @field_min + (@delta * 5);
+				// @step_7  : @field_min + (@delta * 6);
+				// @step_8  : @field_min + (@delta * 7);
+				// @step_9  : @field_min + (@delta * 8);
+				// @step_10 : @field_min + (@delta * 9);				
 
 
 			
