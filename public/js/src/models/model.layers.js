@@ -102,10 +102,8 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	_addThin: function () {
-		console.log('_addTHIN!');
 		if (!this._inited) this.initLayer();
 
-		console.log('adding!', this.layer);
 		// only add to map temporarily
 		app._map.addLayer(this.layer);
 		this.layer.bringToFront();
@@ -350,8 +348,6 @@ Wu.Layer = Wu.Class.extend({
 	getDefaultEditorStyle : function () {
 		var meta = this.getMeta();
 
-		console.log('meta: ', meta);
-
 		var columns = meta.columns;
 		var field;
 
@@ -462,7 +458,6 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	setStyle : function (postgis) {
-		console.log('set style -> postgis: ', postgis);
 		if (!postgis) return console.error('no styloe to set!');
 		
 		this.store.data.postgis = postgis;
@@ -626,20 +621,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 	},
 
 	_invalidateTiles : function () {
-		console.log('invalidateTIles');
 		return;
-
-		// var options = {
-		// 	layerUuid : this._getLayerUuid(),
-		// 	access_token : app.tokens.access_token, 
-		// 	zoom : app._map.getZoom()
-		// }
-
-		// console.log('invalidate options', options);
-
-		// Wu.send('/api/db/invalidate', options, function (a, b) {
-		// 	console.log('invalidate sent', a, b);
-		// }, this);
 	},
 
 	_updateGrid : function (l) {
@@ -723,8 +705,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 		var event = e.e.originalEvent;
 
-		
-
 		if (this._event === undefined || this._event.x == event.x) {
 			// open popup 
 			// app.MapPane.openPopup(e);
@@ -739,7 +719,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 	_gridOnClick : function (e) {
 		if (!e.data) return;
-		if (app.MapPane._creatingPolygon) return;
+		if (app.MapPane._drawing) return;
 
 		// pass layer
 		e.layer = this;
@@ -755,6 +735,8 @@ Wu.PostGISLayer = Wu.Layer.extend({
 				x : event.x,
 				y : event.y
 			}
+
+			// open popup
 			app.MapPane._addPopupContent(e);
 		});
 

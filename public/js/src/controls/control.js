@@ -9,7 +9,7 @@ Wu.Control = L.Control.extend({
 		this._listen();
 
 		// local initialize
-		this._initialize();
+		this._initialize(options);
 
 	},      
 

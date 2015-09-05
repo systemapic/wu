@@ -48,7 +48,6 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		}
 
 		return dims;
-
 	},
 
 
@@ -78,7 +77,6 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		// Make sure the "add folder"/editing of layer menu is closed
 		var layerMenu = app.MapPane.getControls().layermenu;
 		if (layerMenu) layerMenu.disableEdit();
-
 
 	},
 

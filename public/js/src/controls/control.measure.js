@@ -60,18 +60,6 @@ L.Control.Measure = Wu.Control.extend({
 		// this.__toggle();
 	},
 
-	// __toggle : function (openDescription) {
-
-	// 	var description = app.MapPane.getControls().description;
-
-	// 	if ( description.isOpen ) {
-	// 		Wu.DomUtil.addClass(this._container, 'measure-padding-right')
-	// 	} else {
-	// 		Wu.DomUtil.removeClass(this._container, 'measure-padding-right')
-	// 	}
-
-	// },
-
 	_hide : function () {
 		this._container.style.display = 'none';
 	},
