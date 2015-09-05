@@ -185,8 +185,6 @@ module.exports = api.postgis = {
 			var startTime = new Date().getTime();
 			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
 				if (err) console.log('import_shapefile_script err: ', err);
-				console.log('stdin, ', stdin);
-				console.log('stdout', stdout);
 
 				var endTime = new Date().getTime();
 
