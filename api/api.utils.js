@@ -79,7 +79,7 @@ module.exports = api.utils = {
 			} catch (e) {}
 			
 			// save stats to redis
-			api.redis.lpush('server_stats', JSON.stringify({
+			api.redis.stats.lpush('server_stats', JSON.stringify({
 				time : _.now(),
 				cpu_usage : cpu_usage
 			}));

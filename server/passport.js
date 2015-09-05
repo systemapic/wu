@@ -14,9 +14,9 @@ var redis = require('redis');
 var config = api.config;
 
 // token redis
-var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host);
-r.auth(config.tokenRedis.auth);
-r.on('error', console.error);
+// var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host);
+// r.auth(config.tokenRedis.auth);
+// r.on('error', console.error);
 
 // expose this function to our app using module.exports
 module.exports = function(passport) {
@@ -226,7 +226,7 @@ module.exports = function(passport) {
 		var token = key + '.' + crypto.randomBytes(12).toString('hex');  // ASFSAlkdmflsdkfmdslk2lk  // random string
 
 		// async set
-		r.set(key, token);
+		api.redis.temp.set(key, token);
 		
 		// return token
 		return token;

@@ -44,7 +44,7 @@ module.exports = api.error = {
 	unauthorized : function (req, res) {
 		console.log('api.error.unauthorized'.red);
 		
-		var message = "Don't be cheeky! All your IP are belong to us.";
+		var message = "Don't be cheeky! All your IP's are belong to us.";
 		res.end(JSON.stringify({ 
 			error : message 
 		}));
