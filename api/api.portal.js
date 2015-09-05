@@ -130,7 +130,7 @@ module.exports = api.portal = {
 		var email = req.query.email;
 
 		// add to redis
-		api.redis.lpush('beta_access', email);
+		api.redis.stats.lpush('beta_access', email);
 
 		// send email
 		api.email.sendJoinBetaMail(email);
@@ -141,7 +141,7 @@ module.exports = api.portal = {
 	},
 
 	getBetaMembers : function () {
-		api.redis.lrange('beta_access', 0, -1, function (err, members) {
+		api.redis.stats.lrange('beta_access', 0, -1, function (err, members) {
 			if (err) console.log('err:', err);
 			console.log('beta access members: ', members);
 		});

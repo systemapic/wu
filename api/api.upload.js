@@ -99,7 +99,7 @@ module.exports = api.upload = {
 		
 		// save upload id to redis
 		var key = 'uploadStatus:' + uploadStatus.file_id;
-		api.redis.set(key, JSON.stringify(uploadStatus), function (err) {
+		api.redis.layers.set(key, JSON.stringify(uploadStatus), function (err) {
 
 			// return upload status to client
 			res.end(JSON.stringify(uploadStatus));
@@ -150,7 +150,7 @@ module.exports = api.upload = {
 
 	    		  // create unique file_id
 		    	var upload_file_id_key = 'upload_id:' + resumableIdentifier;
-		    	api.redis.get(upload_file_id_key, function (err, stored_file_id) {
+		    	api.redis.layers.get(upload_file_id_key, function (err, stored_file_id) {
 		    		console.log('redis get stored file_id', err, stored_file_id);
 		    		
 		    		// got id
@@ -162,7 +162,7 @@ module.exports = api.upload = {
 		    		// first chunk, create file_id
 		    		if (!stored_file_id) {
 		    			var stored_file_id =  'file_' + api.utils.getRandomChars(20);
-		    			return api.redis.set(upload_file_id_key, stored_file_id, function (err) {
+		    			return api.redis.layers.set(upload_file_id_key, stored_file_id, function (err) {
 		    				file_id = stored_file_id;
 		    				console.log('saved stored filei', err, stored_file_id)
 		    				callback(null);
@@ -189,7 +189,7 @@ module.exports = api.upload = {
 					res.status(200).send({file_id : file_id});
 
 					// register chunk done in redis
-					api.redis.incr('done-chunks-' + redis_id);
+					api.redis.temp.incr('done-chunks-' + redis_id);
 
 				} else {
 
@@ -198,7 +198,7 @@ module.exports = api.upload = {
 				}
 
 				// check if all done
-				api.redis.get('done-chunks-' + redis_id, function (err, count) {
+				api.redis.temp.get('done-chunks-' + redis_id, function (err, count) {
 
 					// return if not all done
 					console.log('done chunks:', count);
@@ -234,7 +234,7 @@ module.exports = api.upload = {
 		async.series(ops, function (err) {
 
 			var upload_file_id_key = 'upload_id:' + resumableIdentifier;
-		    	api.redis.del(upload_file_id_key, function (err) {
+		    	api.redis.temp.del(upload_file_id_key, function (err) {
 
 		    		console.log('deleted upload_file_id_key', err);
 		    	});
@@ -303,7 +303,7 @@ module.exports = api.upload = {
 
 			// save upload id to redis
 			var key = 'uploadStatus:' + uploadStatus.file_id;
-			api.redis.set(key, JSON.stringify(uploadStatus), function (err) {
+			api.redis.layers.set(key, JSON.stringify(uploadStatus), function (err) {
 				if (err) return callback(err);
 
 				callback(null, uploadStatus);
@@ -349,7 +349,7 @@ module.exports = api.upload = {
 			fs.remove(removePath, console.log);
 
 			// clean up redis count
-			api.redis.del('done-chunks-' + redis_id, function (err) {
+			api.redis.temp.del('done-chunks-' + redis_id, function (err) {
 				if (err) console.log('rem done chunks err!', err);
 			});
 
@@ -541,7 +541,7 @@ module.exports = api.upload = {
 
 
 		var key = 'uploadStatus:' + file_id;
-		api.redis.get(key, function (err, uploadStatus) {
+		api.redis.layers.get(key, function (err, uploadStatus) {
 
 			var status = JSON.parse(uploadStatus);
 
@@ -592,7 +592,7 @@ module.exports = api.upload = {
 
 		// get info from uploadStatus // todo: too much of a shortcut?
 		var file_id_key = 'uploadStatus:' + file_id;
-		api.redis.get(file_id_key, function (err, uploadStatus) {
+		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
 			var u = JSON.parse(uploadStatus);
 
 			var fileModel = {
@@ -619,7 +619,7 @@ module.exports = api.upload = {
 	updateStatus : function (file_id, status, callback) {
 		
 		var file_id_key = 'uploadStatus:' + file_id;
-		api.redis.get(file_id_key, function (err, uploadStatusJSON) {
+		api.redis.layers.get(file_id_key, function (err, uploadStatusJSON) {
 			if (err) return callback && callback(err);
 
 			// add keys
@@ -629,7 +629,7 @@ module.exports = api.upload = {
 			};
 
 			// save upload status
-			api.redis.set(file_id_key, JSON.stringify(uploadStatus), function (err) {
+			api.redis.layers.set(file_id_key, JSON.stringify(uploadStatus), function (err) {
 
 				// return
 				callback && callback(err);
@@ -643,7 +643,7 @@ module.exports = api.upload = {
 		var file_id = req.query.file_id,
 		    file_id_key = 'uploadStatus:' + file_id;
 
-		api.redis.get(file_id_key, function (err, uploadStatus) {
+		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
 			if (err) return api.error.general(req, res, err);
 
 			// return upload status
@@ -792,9 +792,9 @@ module.exports = api.upload = {
 
 	// debug: delete all done-chunks
 	_deleteDoneChunks : function () {
-		api.redis.keys('done-chunk*', function(err, rows) {
+		api.redis.temp.keys('done-chunk*', function(err, rows) {
 			rows.forEach(function (row) {
-				if (row) api.redis.del(row);
+				if (row) api.redis.temp.del(row);
 			});
 		});
 	},

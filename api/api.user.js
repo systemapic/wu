@@ -259,7 +259,7 @@ module.exports = api.user = {
 			//deleting token 
 			var deletedUser = options.subject;
 			var token = deletedUser.token; 
-			if (token) api.redis.del(token); 
+			if (token) api.redis.temp.del(token); 
 
 			//removing the whole user
 			options.subject.remove(callback);
