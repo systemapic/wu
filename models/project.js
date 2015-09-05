@@ -122,7 +122,7 @@ var projectSchema = mongoose.Schema({
 		description 	: { type: Boolean, default: true  },
 		mouseposition 	: { type: Boolean, default: true  },
 		layermenu 	: { type: Boolean, default: true  },
-		draw 		: { type: Boolean, default: false },
+		draw 		: { type: Boolean, default: true  },
 		legends 	: { type: Boolean, default: false },
 		inspect 	: { type: Boolean, default: false },
 		geolocation 	: { type: Boolean, default: false },

@@ -120,12 +120,9 @@ Wu.MapPane = Wu.Pane.extend({
 				// get wu layer
 				var l = app.activeProject.getPostGISLayer(layerUuid);
 		
-
 				if (!l) return  
 				
 				l._invalidateTiles();
-				
-				
 			});
 
 			// send invalidate to pile
@@ -483,275 +480,6 @@ Wu.MapPane = Wu.Pane.extend({
 		map.keyboard.enable();
 	},
 
-	disableZoom : function () {
-		this._map.touchZoom.disable();
-		this._map.doubleClickZoom.disable();
-		this._map.scrollWheelZoom.disable();
-		this._map.boxZoom.disable();
-		this._map.keyboard.disable();
-		document.getElementsByClassName('leaflet-control-zoom')[0].style.display = 'none';
-	}, 
-
-	enableZoom : function () {
-		this._map.touchZoom.enable();
-		this._map.doubleClickZoom.enable();
-		this._map.scrollWheelZoom.enable();
-		this._map.boxZoom.enable();
-		this._map.keyboard.enable();
-		document.getElementsByClassName('leaflet-control-zoom')[0].style.display = 'block';
-	},
-
-	enableLegends : function () {
-		if (this.legendsControl) return;
-
-		// create control
-		this.legendsControl = L.control.legends({
-			position : 'bottomleft'
-		});
-
-		// add to map
-		this.legendsControl.addTo(this._map);
-
-		// update control with project
-		this.legendsControl.update();
-	},
-
-	disableLegends : function () {
-		if (!this.legendsControl) return;
-	       
-		// remove and delete control
-		this._map.removeControl(this.legendsControl);
-		this.legendsControl = null;
-		delete this.legendsControl;
-	},
-
-	enableMouseposition : function () {
-		if (this.mousepositionControl) return;
-
-		// create control
-		this.mousepositionControl = L.control.mouseposition({ position : 'topright' });
-
-		// add to map
-		this.mousepositionControl.addTo(this._map);
-	},
-
-	disableMouseposition : function () {
-		if (!this.mousepositionControl) return;
-	       	
-		// remove and delete control
-		this._map.removeControl(this.mousepositionControl);
-		this.mousepositionControl = null;
-		delete this.mousepositionControl;
-	},
-
-	enableGeolocation : function () {
-		if (this.geolocationControl) return;
-
-		// create controls 
-		this.geolocationControl = new L.Control.Search({
-			url : 'https://nominatim.openstreetmap.org/search?format=json&q={s}',
-			jsonpParam : 'json_callback',
-			propertyName : 'display_name',
-			propertyLoc : ['lat','lon'],	
-			boundingBox : 'boundingbox',
-
-			// custom filter
-			filterJSON : function (json) {
-				var jsonret = [], i;
-				for (i in json) {
-					var item = json[i];
-					if (item.hasOwnProperty('type')) {
-						var adr = {
-							address : item.display_name,
-							boundingbox : item.boundingbox,
-							latlng : L.latLng(item.lat, item.lon),
-							type : item.type
-						}
-					}
-
-					// push
-					jsonret.push(adr);
-				}
-				
-				var all = _.unique(jsonret, function (j) {
-					if (j) return j.address;
-				});
-
-				return all;
-			}
-		});
-
-		// add to map
-		this.geolocationControl.addTo(this._map);
-	},
-
-	disableGeolocation : function () {
-		if (!this.geolocationControl) return;
-	       	
-		// remove and delete control
-		this._map.removeControl(this.geolocationControl);
-		this.geolocationControl = null;
-		delete this.geolocationControl;
-	},
-
-	enableMeasure : function () {
-		if (this._scale) return;
-
-		this._scale = L.control.measure({'position' : 'topright'});
-		this._scale.addTo(this._map);
-	},
-
-	disableMeasure : function () {
-		if (!this._scale) return;
-
-		this._map.removeControl(this._scale);
-		this._scale = null;
-		delete this._scale;
-	},
-
-	enableDescription : function () {
-		if (this.descriptionControl) return;
-
-		// create control
-		this.descriptionControl = L.control.description({
-			position : 'topleft'
-		});
-
-		// add to map
-		this.descriptionControl.addTo(this._map);
-
-		// update control with project
-		this.descriptionControl.update();
-	},
-
-	disableDescription : function () {
-		if (!this.descriptionControl) return;
-	       
-		// remove and delete control
-		this._map.removeControl(this.descriptionControl);
-		this.descriptionControl = null;
-		delete this.descriptionControl;
-	},
-
-	enableInspect : function () {
-		if (this.inspectControl) return;
-
-		// create control
-		this.inspectControl = L.control.inspect({
-			position : 'bottomright'
-		});
-
-		// add to map
-		this.inspectControl.addTo(this._map);
-
-		// update control with project
-		this.inspectControl.update();
-	},
-
-	disableInspect : function () {
-		if (!this.inspectControl) return;
-	       
-		// remove and delete control
-		this._map.removeControl(this.inspectControl);
-		this.inspectControl = null;
-		delete this.inspectControl;
-	},
-
-	enableCartocss : function () {
-		if (this.cartoCss) return;
-
-		// dont allow for non-editors
-		if (!app.access.to.edit_project(this._project)) return;
-
-		// create control
-		this.cartoCss = L.control.cartoCss({
-			position : 'topleft'
-		});
-
-		// add to map
-		this.cartoCss.addTo(this._map);
-
-		// update with latest
-		if (app.activeProject) this.cartoCss.update();
-
-		return this.cartoCss;
-	},
-
-	disableCartocss : function () {
-		if (!this.cartoCss) return;
-
-		this._map.removeControl(this.cartoCss);
-		this.cartoCss = null;
-		delete this.cartoCss;
-	},
-
-	enableLayermenu : function () {      
-		if (this.layerMenu) return;
-
-		// add control
-		this.layerMenu = L.control.layermenu({
-			position : 'bottomright'
-		});
-
-		// add to map
-		this.layerMenu.addTo(this._map);
-		
-		// update control (to fill layermenu from project)
-		this.layerMenu.update();
-
-		return this.layerMenu;
-	},
-
-	disableLayermenu : function () {
-		if (!this.layerMenu) return;
-	       
-		// remove and delete control
-		this._map.removeControl(this.layerMenu);
-		this.layerMenu = null;
-		delete this.layerMenu;
-	},
-
-	enableBaselayertoggle : function () {
-		if (this.baselayerToggle) return;
-
-		// create control
-		this.baselayerToggle = L.control.baselayerToggle();
-
-		// add to map
-		this.baselayerToggle.addTo(this._map);
-
-		// update
-		this.baselayerToggle.update();
-
-		return this.baselayerToggle;
-	},
-
-	disableBaselayertoggle : function () {
-		if (!this.baselayerToggle) return
-
-		this._map.removeControl(this.baselayerToggle);
-		this.baselayerToggle = null;
-		delete this.baselayerToggle;
-	},
-	
-	enableVectorstyle : function (container) {
-		// if (this.vectorStyle) return;
-		
-		// this.vectorStyle = L.control.styleEditor({ 
-		// 	position: "topleft", 
-		// 	container : container
-		// });
-		
-		// this._map.addControl(this.vectorStyle);
-	},
-
-	disableVectorstyle : function () {
-		// if (!this.vectorStyle) return;
-
-		// // remove vectorstyle control
-		// this._map.removeControl(this.vectorStyle);             // todo: doesnt clean up after itself!
-		// delete this.vectorStyle;   
-	},
 
 	getEditableLayerParent : function (id) {
 		// return id from _leaflet_id
@@ -773,14 +501,6 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 
-
-	// ***************************************************************
-	// * C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP *
-	// * C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP *
-	// * C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP C3 POP-UP *
-	// ***************************************************************
-
-
 	// Create pop-up from draw
 	_addPopupContentDraw : function (data) {
 		this._addPopupContent(false, data)		
@@ -788,14 +508,17 @@ Wu.MapPane = Wu.Pane.extend({
 
 	// Create pop-up
 	_addPopupContent : function (e, multiPopUp) {
-
 		var options = {
 			e 		: e,
 			multiPopUp 	: multiPopUp,
 		};
-
 		this._chart = new Wu.Control.Chart(options);
+	},
 
+	_clearPopup : function () {
+		if (this._chart) {
+			this._chart._refresh();
+		}
 	},
 
 	

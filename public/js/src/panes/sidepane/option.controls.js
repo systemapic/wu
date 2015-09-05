@@ -127,6 +127,8 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		
 			control._on();
 
+			console.log('mia control: ', control);
+
 			// enable control on map
 			// mapPane[enable]();
 

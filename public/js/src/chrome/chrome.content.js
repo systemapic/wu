@@ -59,7 +59,7 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		if (!this.options || !this.options.parent) return console.log('hideAll not possible');
 
 		var tabs = this.options.parent.getTabs();
-		for ( var t in tabs ) {
+		for (var t in tabs) {
 			var tab = tabs[t];
 			tab.hide();
 		}
@@ -85,13 +85,16 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 	},
 
-	_initLayout_activeLayers : function () {
+	_initLayout_activeLayers : function (title, subtitle) {
+
+		var title = title || 'Layer';
+		var subtitle = subtitle || 'Select a layer to style...';
 
 		// active layer wrapper
 		var wrap = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper', this._container);
 
 		// title
-		var title = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, 'Layer');
+		var title = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
 		
 		// create dropdown
 		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', wrap);
@@ -102,10 +105,9 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 		// placeholder
 		var option = Wu.DomUtil.create('option', '', select);
-		option.innerHTML = 'Select a layer to style...';
+		option.innerHTML = subtitle;
 		option.setAttribute('disabled', '');
 		option.setAttribute('selected', '');
-
 
 		// fill select options
 		layers.forEach(function (layer) {
@@ -131,89 +133,95 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 	// Creates one meta field line, with input, switch, etc
 	_createMetaFieldLine : function (options) {
 
-		// _key, wrapper, input, right
-		var _key 	= options.key,
-		    _wrapper 	= options.wrapper,
-		    _input 	= options.input,
-		    _right 	= options.rightPos,
-		    _isOn 	= options.isOn,
-		    _title 	= options.title,
-		    _type 	= options.type,
-		    _dropArray  = options.dropArray,
-		    _color 	= options.color,
-		    _val 	= options.value;
+		var key 	= options.key,
+		    wrapper 	= options.wrapper,
+		    input 	= options.input,
+		    right 	= options.rightPos,
+		    isOn 	= options.isOn,
+		    title 	= options.title,
+		    type 	= options.type,
+		    dropArray  = options.dropArray,
+		    color 	= options.color,
+		    val 	= options.value;
+
 		    
-		var fieldWrapper = Wu.DomUtil.create('div', 'chrome-metafield-line', _wrapper);
-		    fieldWrapper.id = 'field_wrapper_' + _key;
-		
+		var fieldWrapper = Wu.DomUtil.create('div', 'chrome-metafield-line', wrapper);
+		fieldWrapper.id = 'field_wrapper_' + key;
 
 		// Create switch
-		if ( _type == 'switch' ) {
+		if (type == 'switch') {
 	
 			// Create classname
-			var 		    _class = 'chrome-switch-container';
-			if ( _isOn ) 	    _class += ' switch-on';
-			if ( _right ) 	    _class += ' right-switch';
+			var divclass = 'chrome-switch-container';
+			if (isOn) divclass += ' switch-on';
+			if (right) divclass += ' right-switch';
 
 			// Create button
-			var fieldSwitch = Wu.DomUtil.create('div', _class, fieldWrapper);
-			    fieldSwitch.setAttribute('key', _key);
-			    fieldSwitch.id = 'field_switch_' + _key;
+			var fieldSwitch = Wu.DomUtil.create('div', divclass, fieldWrapper);
+			fieldSwitch.setAttribute('key', key);
+			fieldSwitch.id = 'field_switch_' + key;
 
 			// Set on/off state
-			if ( _isOn ) fieldSwitch.setAttribute('state', 'true');
-			else 	     fieldSwitch.setAttribute('state', 'false');
+			if (isOn) {
+				fieldSwitch.setAttribute('state', 'true');
+			} else {
+				fieldSwitch.setAttribute('state', 'false');
+			}	    
 
 			// Add hooks
 			Wu.DomEvent.on(fieldSwitch, 'click', this.toggleSwitch, this);		    
 
 		}
 
-		if ( _type == 'miniInput' ) {
+		if (type == 'miniInput') {
 
-			var miniInput = Wu.DomUtil.createId('input', 'field_mini_input_' + _key, fieldWrapper);
-			    miniInput.className = 'chrome-field-mini-input';
-			    miniInput.setAttribute('placeholder', 'auto');
+			// create
+			var miniInput = Wu.DomUtil.createId('input', 'field_mini_input_' + key, fieldWrapper);
+			miniInput.className = 'chrome-field-mini-input';
+			miniInput.setAttribute('placeholder', 'auto');
 
-			    if ( !_right ) Wu.DomUtil.addClass(miniInput, 'left-mini');
-			    if ( !_isOn  ) Wu.DomUtil.addClass(miniInput, 'left-mini-kill');			    
+			// set value
+			if (options.value) miniInput.value = val;
+			if ( !right ) Wu.DomUtil.addClass(miniInput, 'left-mini');
+			if ( !isOn  ) Wu.DomUtil.addClass(miniInput, 'left-mini-kill');			    
 
-			    if ( options.value ) miniInput.value = _val;
 
+			// set event
 			Wu.DomEvent.on(miniInput, 'blur', this.saveMiniBlur, this);
-
 		}
 
 
-		if ( _type == 'dualMiniInput' ) {
+		if ( type == 'dualMiniInput' ) {
 
-			var miniInputMin = Wu.DomUtil.createId('input', 'field_mini_input_max_' + _key, fieldWrapper);
-			    miniInputMin.className = 'chrome-field-mini-input mini-input-dual';
-			    miniInputMin.setAttribute('placeholder', 'auto');
+			var miniInputMin = Wu.DomUtil.createId('input', 'field_mini_input_max_' + key, fieldWrapper);
+			miniInputMin.className = 'chrome-field-mini-input mini-input-dual';
+			miniInputMin.setAttribute('placeholder', 'auto');
 
-			    if ( options.value ) miniInputMin.value = _val[1];
+			if ( options.value ) miniInputMin.value = val[1];
 
 			Wu.DomEvent.on(miniInputMin, 'blur', this.saveMiniBlur, this);
 
 
-			var miniInputMin = Wu.DomUtil.createId('input', 'field_mini_input_min_' + _key, fieldWrapper);
-			    miniInputMin.className = 'chrome-field-mini-input mini-input-dual';
-			    miniInputMin.setAttribute('placeholder', 'auto');
+			var miniInputMin = Wu.DomUtil.createId('input', 'field_mini_input_min_' + key, fieldWrapper);
+			miniInputMin.className = 'chrome-field-mini-input mini-input-dual';
+			miniInputMin.setAttribute('placeholder', 'auto');
 
-			    if ( options.value ) miniInputMin.value = _val[0];
+			if ( options.value ) miniInputMin.value = val[0];
 
 			Wu.DomEvent.on(miniInputMin, 'blur', this.saveMiniBlur, this);
 
 		}
 
 
-		if ( _type == 'setClear' ) {
+		if (type == 'setClear') {
 
+			// create
 			var setClear = Wu.DomUtil.create('div', 'setClear', fieldWrapper);
-			    setClear.setAttribute('key', _key);
-			    setClear.innerHTML = 'SET';
+			setClear.setAttribute('key', key);
+			setClear.innerHTML = 'SET';
 
-			if ( _isOn ) {
+			// if on, mark
+			if (isOn) {
 				Wu.DomUtil.addClass(setClear, 'setClear-on');
 				setClear.setAttribute('state', 'true');
 				setClear.innerHTML = 'CLEAR';
@@ -221,97 +229,98 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 				setClear.setAttribute('state', 'false');
 			}
 
+			// set event
 			Wu.DomEvent.on(setClear, 'click', this.toggleSetClear, this);
 
 		}
 
 
-		if ( _type == 'set' ) {
+		if (type == 'set') {
 
+			// create
 			var setClear = Wu.DomUtil.create('div', 'chrome-set', fieldWrapper);
-			    setClear.setAttribute('key', _key);
-			    setClear.innerHTML = 'SET';
+			setClear.setAttribute('key', key);
+			setClear.innerHTML = 'SET';
 
+			// set event
 			Wu.DomEvent.on(setClear, 'click', this.toggleSet, this);
-
 		}
 
-		if ( _type == 'color' ) {
+		if ( type == 'color' ) {
 
 			var color = Wu.DomUtil.create('div', 'chrome-color-ball', fieldWrapper);
-			    color.id = 'color_ball_' + _key;
-			    color.style.background = _val;
+			color.id = 'color_ball_' + key;
+			color.style.background = val;
 
-			if ( !_isOn ) Wu.DomUtil.addClass(color, 'disable-color-ball');
+			if ( !isOn ) Wu.DomUtil.addClass(color, 'disable-color-ball');
 
-			if ( !_right ) Wu.DomUtil.addClass(color, 'left-ball');
+			if ( !right ) Wu.DomUtil.addClass(color, 'left-ball');
 
 		}
 	
-		if ( _type == 'colorrange' ) {
+		if ( type == 'colorrange' ) {
 
 			// Set styling
-			var gradientStyle = 'background: -webkit-linear-gradient(left, ' + _val.join() + ');';
-			gradientStyle    += 'background: -o-linear-gradient(right, '     + _val.join() + ');';
-			gradientStyle    += 'background: -moz-linear-gradient(right, '   + _val.join() + ');';
-			gradientStyle    += 'background: linear-gradient(to right, '     + _val.join() + ');';
+			var gradientStyle = 'background: -webkit-linear-gradient(left, ' + val.join() + ');';
+			gradientStyle    += 'background: -o-linear-gradient(right, '     + val.join() + ');';
+			gradientStyle    += 'background: -moz-linear-gradient(right, '   + val.join() + ');';
+			gradientStyle    += 'background: linear-gradient(to right, '     + val.join() + ');';
 
 			var color = Wu.DomUtil.create('div', 'chrome-color-range', fieldWrapper);
-			    color.id = 'chrome-color-range_' + _key;
-			    color.setAttribute('style', gradientStyle);
+			color.id = 'chrome-color-range_' + key;
+			color.setAttribute('style', gradientStyle);
 
 		}
 
 
-		if ( _dropArray ) {
-			this._init_miniDropDown(_dropArray, fieldWrapper, _key, options.selectedField);
+		if ( dropArray ) {
+			this._init_miniDropDown(dropArray, fieldWrapper, key, options.selectedField);
 		}
 
 		// Create input field
-		if ( _input ) {
+		if (input) {
 
-			var fieldName = Wu.DomUtil.createId('input', 'field_input_' + _key, fieldWrapper);
-			    fieldName.className = 'chrome-field-input';
-			    fieldName.setAttribute('name', 'field_input_' + _key);
-			    fieldName.setAttribute('placeholder', _key);
+			// create
+			var fieldName = Wu.DomUtil.createId('input', 'field_input_' + key, fieldWrapper);
+			fieldName.className = 'chrome-field-input';
+			fieldName.setAttribute('name', 'field_input_' + key);
+			fieldName.setAttribute('placeholder', key);
 
-			    if ( _title ) fieldName.value = _title;
+			// set title 
+			if (title) fieldName.value = title;
 
-			    Wu.DomEvent.on(fieldName, 'blur', this.saveFromBlur, this);
+			// set event
+			Wu.DomEvent.on(fieldName, 'blur', this.saveFromBlur, this);
 		
-		// Create "normal" text line
+		
 		} else {
 
+			// Create "normal" text line
 			var fieldName = Wu.DomUtil.create('div', 'chrome-field-line', fieldWrapper);
-			    fieldName.innerHTML = _title ? _title : _key;
+			fieldName.innerHTML = title ? title : key;
 		}
 	},
 
 	// Toggle switch
 	toggleSwitch : function (e) {
 
+		// get state
 		var stateAttrib = e.target.getAttribute('state');
-		
-		if ( stateAttrib == 'true' ) var on = true;
-		else 			     var on = false;
-
+		var on = (stateAttrib == 'true');
 		var key = e.target.getAttribute('key');
 
-		if ( on ) {
-			
+		if (on) {
 			e.target.setAttribute('state', 'false');
 			Wu.DomUtil.removeClass(e.target, 'switch-on');
-
 			var isOn = false;
 
 		} else {
-
 			e.target.setAttribute('state', 'true');
 			Wu.DomUtil.addClass(e.target, 'switch-on');
-
 			var isOn = true;
 		}	
 
+		// save
 		this._saveToServer(key, '', isOn)
 	},
 
@@ -319,13 +328,11 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 		var elem  = e.target;
 		var id    = elem.id;
-		var key   = elem.getAttribute('key')
-		var state = elem.getAttribute('state')
+		var key   = elem.getAttribute('key');
+		var state = elem.getAttribute('state');
+		var on 	  = (state == 'true');
 
-		if ( state == "true" )  var on = true;
-		else 			var on = false;
-
-		if ( on ) {
+		if (on) {
 		
 			Wu.DomUtil.removeClass(elem, 'setClear-on');
 			elem.setAttribute('state', 'false');
@@ -350,7 +357,6 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		var key   = elem.getAttribute('key')
 
 		this.saveSet(key);
-
 	},
 
 
@@ -447,18 +453,18 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 	},
 
-	_validateDateFormat : function (_key) {
+	_validateDateFormat : function (key) {
 
 		// Default fields that for some reason gets read as time formats...
-		if ( _key == 'the_geom_3857' || _key == 'the_geom_4326' ) return false;
+		if ( key == 'the_geom_3857' || key == 'the_geom_4326' ) return false;
 
 		// If it's other time format
-		var _m = moment(_key).format("YYYY-MM-DD");
-		if ( _m != 'Invalid date' ) return _m;
+		var m = moment(key).format("YYYY-MM-DD");
+		if ( m != 'Invalid date' ) return m;
 
 		// If it's Frano's time series format
-		var _m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
-		if ( _m != 'Invalid date' ) return _m;
+		var m = moment(key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
+		if ( m != 'Invalid date' ) return m;
 
 		// If it's not a valid date...
 		return false;
@@ -507,7 +513,12 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 			mapsettings : {
 				enabled : true,
 				text : 'Map Settings'
-			},			
+			},	
+
+			filters : {
+				enabled : true,
+				text : 'Data Filters'
+			}		
 		}
 	},
 
@@ -538,7 +549,6 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 	},
 
 
-
 	getTabs : function () {
 		return this._tabs;
 	},
@@ -558,6 +568,8 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 				var text = this.options.tabs[o].text;
 
 				var tab = o.camelize();
+
+				console.log('tab: ', tab);
 
 				// create tab contents
 				if (Wu.Chrome.Content[tab]) {
@@ -587,24 +599,17 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 	},
 
 	opened : function () {
-		console.log('i was opened!', this._tabs);
 		this._tabs['Styler'].show();
-
 	},
 
 	closed : function () {
-		console.log('i was closed!');
-
 		for ( var t in this._tabs) {
 			this._tabs[t].closed();
 		}
 	},
 
 	_refreshAll : function () {
-
 		for (var t in this._tabs) {
-			console.log('refreshhhh', t);
-
 			this._tabs[t]._refresh();
 		}
 	},
@@ -758,9 +763,6 @@ Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
 					isOn 		: project.store.controls[key],
 					rightPos	: false,
 					type 		: 'switch'
-					// switch 		: true,
-					
-					// dropdown	: false,
 					
 				}
 
@@ -784,11 +786,9 @@ Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
 			isOn 		: isBoundsSet,
 			rightPos	: false,
 			type 		: 'setClear',
-			
 		}
 
 		this._createMetaFieldLine(lineOptions);
-
 
 		var lineOptions = {
 			key 		: 'position', 
@@ -837,9 +837,7 @@ Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
 	// SAVERS
 	// SAVERS
 
-	_saveToServer : function (_key, title, on) {
-
-		var item = _key;
+	_saveToServer : function (item, title, on) {
 
 		// Get control
 		var control = app.MapPane.getControls()[item];
@@ -945,7 +943,7 @@ Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
 		var project = Wu.app.activeProject;
 		var map = Wu.app._map;
 
-		var _nullBounds = {
+		var nullBounds = {
 			northEast : {
 				lat : '90',
 				lng : '180'
@@ -960,7 +958,7 @@ Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
 		}
 
 		// set bounds to project
-		project.setBounds(_nullBounds);
+		project.setBounds(nullBounds);
 
 		// enforce
 		this.enforceBounds();
@@ -1185,20 +1183,20 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	// INIT COLOR
 	initPointOptionColor : function (sectionWrapper) {
 
-		var _key = 'color';
+		var key = 'color';
 
 		// Create JSON obj if it's not already there
-		if ( !this.cartoJSON.point[_key] ) this.cartoJSON.point[_key] = {};
+		if ( !this.cartoJSON.point[key] ) this.cartoJSON.point[key] = {};
 
 		// Get stores states
-		var isOn   = this.cartoJSON.point[_key].range ? false : true;
-		var val    = this.cartoJSON.point[_key].staticVal ? this.cartoJSON.point[_key].staticVal : '#FF33FF';
-		var range  = this.cartoJSON.point[_key].range ? this.cartoJSON.point[_key].range : false;
-		var minMax = this.cartoJSON.point[_key].minMax ? this.cartoJSON.point[_key].minMax : false;
-		var customMinMax = this.cartoJSON.point[_key].customMinMax ? this.cartoJSON.point[_key].customMinMax : false;
+		var isOn   = this.cartoJSON.point[key].range ? false : true;
+		var val    = this.cartoJSON.point[key].staticVal ? this.cartoJSON.point[key].staticVal : '#FF33FF';
+		var range  = this.cartoJSON.point[key].range ? this.cartoJSON.point[key].range : false;
+		var minMax = this.cartoJSON.point[key].minMax ? this.cartoJSON.point[key].minMax : false;
+		var customMinMax = this.cartoJSON.point[key].customMinMax ? this.cartoJSON.point[key].customMinMax : false;
 
 		var lineOptions = {
-			key 		: _key, 
+			key 		: key, 
 			wrapper 	: sectionWrapper,
 			input 		: false,
 			title 		: '<b>Color</b>',
@@ -1212,11 +1210,10 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		this._createMetaFieldLine(lineOptions);
 
 		// SAVE JSON
-		this.cartoJSON.point[_key] = {
+		this.cartoJSON.point[key] = {
 			range 	     : range,
 			minMax 	     : minMax,
 			customMinMax : customMinMax,
-			// value 	    : lineOptions.value,
 			staticVal    : val,
 		};
 	},
@@ -1224,18 +1221,18 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	// INIT OPACITY
 	initPointOptionOpacity : function (sectionWrapper) {
 
-		var _key = 'opacity';
+		var key = 'opacity';
 
 		// Create JSON obj if it's not already there
-		if ( !this.cartoJSON.point[_key] ) this.cartoJSON.point[_key] = {};
+		if ( !this.cartoJSON.point[key] ) this.cartoJSON.point[key] = {};
 
 		// Get stores states
-		var isOn   = this.cartoJSON.point[_key].range ? false : true;
-		var val    = this.cartoJSON.point[_key].value ? this.cartoJSON.point[_key].value : 1;
-		var range  = this.cartoJSON.point[_key].range ? this.cartoJSON.point[_key].range : false;	
+		var isOn   = this.cartoJSON.point[key].range ? false : true;
+		var val    = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : 1;
+		var range  = this.cartoJSON.point[key].range ? this.cartoJSON.point[key].range : false;	
 
 		var lineOptions = {
-			key 		: _key,
+			key 		: key,
 			wrapper 	: sectionWrapper,
 			input 		: false,
 			title 		: '<b>Opacity</b>',
@@ -1249,7 +1246,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		this._createMetaFieldLine(lineOptions);
 
 		// SAVE JSON
-		this.cartoJSON.point[_key] = {
+		this.cartoJSON.point[key] = {
 			range 	    : range,
 			value 	    : val
 		};
@@ -1258,19 +1255,19 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	// INIT POINT SIZE
 	initPointOptionPointSize : function (sectionWrapper) {
 
-		var _key = 'pointsize';
+		var key = 'pointsize';
 
 		// Create JSON obj if it's not already there
-		if ( !this.cartoJSON.point[_key] ) this.cartoJSON.point[_key] = {};
+		if ( !this.cartoJSON.point[key] ) this.cartoJSON.point[key] = {};
 
 		// Get stores states
-		var isOn   = this.cartoJSON.point[_key].range ? false : true;
-		var val    = this.cartoJSON.point[_key].value ? this.cartoJSON.point[_key].value : 1.2;
-		var range  = this.cartoJSON.point[_key].range ? this.cartoJSON.point[_key].range : false;
-		var minMax = this.cartoJSON.point[_key].minMax ? this.cartoJSON.point[_key].minMax : false;				
+		var isOn   = this.cartoJSON.point[key].range ? false : true;
+		var val    = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : 1.2;
+		var range  = this.cartoJSON.point[key].range ? this.cartoJSON.point[key].range : false;
+		var minMax = this.cartoJSON.point[key].minMax ? this.cartoJSON.point[key].minMax : false;				
 
 		var lineOptions = {
-			key 		: _key, 
+			key 		: key, 
 			wrapper 	: sectionWrapper,
 			input 		: false,
 			title 		: '<b>Point size</b>',
@@ -1284,7 +1281,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		this._createMetaFieldLine(lineOptions);	
 
 		// SAVE JSON
-		this.cartoJSON.point[_key] = {
+		this.cartoJSON.point[key] = {
 			range 	    : range,
 			minMax 	    : minMax,			
 			value 	    : lineOptions.value
@@ -1441,9 +1438,9 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		var value = parseFloat(e.target.value);
 		var key   = e.target.id.slice(17, e.target.id.length);
 		
-		var _pre = key.substring(0,4);
+		var pre = key.substring(0,4);
 
-		if ( _pre == 'min_' || _pre == 'max_' ) {
+		if ( pre == 'min_' || pre == 'max_' ) {
 			key = key.slice(4, key.length);
 		}
 
@@ -1469,10 +1466,10 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 		// Save dynamic POINT SIZE values
 		if ( key == 'minmaxpointsize' ) {
-			if ( _pre == 'min_' ) {
+			if ( pre == 'min_' ) {
 				this.cartoJSON.point.pointsize.minMax[0] = value;
 			}
-			if ( _pre == 'max_' ) {
+			if ( pre == 'max_' ) {
 				this.cartoJSON.point.pointsize.minMax[1] = value;	
 			}	
 		}
@@ -1483,14 +1480,14 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		// COLOR RANGE
 
 		if ( key == 'minmaxcolorrange' ) {
-			if ( _pre == 'min_' ) {
+			if ( pre == 'min_' ) {
 				// SAVE MIN AND MAX VALUE
 				var maxField = Wu.DomUtil.get('field_mini_input_max_minmaxcolorrange');
 				var maxVal = maxField.value;
 				this.cartoJSON.point.color.customMinMax = [value, maxVal];
 			}
 
-			if ( _pre == 'max_' ) {
+			if ( pre == 'max_' ) {
 				// SAVE MIN AND MAX VALUE
 				var minField = Wu.DomUtil.get('field_mini_input_max_minmaxcolorrange');
 				var minVal = minField.value;
@@ -2077,7 +2074,7 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 	// sort layers by provider
 	sortLayers : function (layers) {
 
-		var keys = [ 'postgis', 'google', 'norkart', 'geojson', 'mapbox', 'raster'];
+		var keys = ['postgis', 'google', 'norkart', 'geojson', 'mapbox', 'raster'];
 		var results = [];
 	
 		keys.forEach(function (key) {
@@ -2085,7 +2082,7 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 				key : key,
 				layers : []
 			}
-			for (l in layers) {
+			for (var l in layers) {
 				var layer = layers[l];
 
 				if (layer) {
@@ -2170,8 +2167,8 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 
 	activateLayer : function (layerUuid) {
 
-		var _id = 'field_wrapper_' + layerUuid;
-		var elem = Wu.DomUtil.get(_id);
+		var id = 'field_wrapper_' + layerUuid;
+		var elem = Wu.DomUtil.get(id);
 
 		Wu.DomUtil.removeClass(elem, 'deactivated-layer');
 
@@ -2181,8 +2178,8 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 
 	deactivateLayer : function (layerUuid) {
 
-		var _id = 'field_wrapper_' + layerUuid;
-		var elem = Wu.DomUtil.get(_id);
+		var id = 'field_wrapper_' + layerUuid;
+		var elem = Wu.DomUtil.get(id);
 
 		Wu.DomUtil.addClass(elem, 'deactivated-layer');
 
@@ -2225,14 +2222,14 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 		}
 
 		// Get switch
-		var _switch = Wu.DomUtil.get('field_switch_' + uuid);
+		var s = Wu.DomUtil.get('field_switch_' + uuid);
 
 		if ( on ) {
-			Wu.DomUtil.addClass(_switch, 'switch-on');
-			_switch.setAttribute('state', 'true');
+			Wu.DomUtil.addClass(s, 'switch-on');
+			s.setAttribute('state', 'true');
 		} else {
-			Wu.DomUtil.removeClass(_switch, 'switch-on');
-			_switch.setAttribute('state', 'false');			
+			Wu.DomUtil.removeClass(s, 'switch-on');
+			s.setAttribute('state', 'false');			
 		}
 	},	
 
@@ -2610,22 +2607,23 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 			layerUuid : layer.getUuid()
 		}
 
+		// create layer on server
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
 
 			// new layer
 			var newLayerStyle = Wu.parse(newLayerJSON);
 
-			console.log('newLayerJSON', newLayerStyle);
-
+			// catch errors
 			if (newLayerStyle.error) {
 				done && done();
 				return console.error(newLayerStyle.error);
 			}
 
+			// set & update
 			layer.setStyle(newLayerStyle.options);
-
 			layer.update({enable : true});
 
+			// return
 			done && done();
 		});
 
@@ -2673,9 +2671,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 
 		// add
 		this._layer._addThin();
-
-		// fly to
-		// this._layer.flyTo();
 
 		// remember
 		this._temps.push(this._layer);
@@ -2875,6 +2870,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 	// Title
 	initTitle : function () {
 
+		// get title
 		var title = this.tooltipMeta.title;
 
 		// Wrapper
@@ -2883,14 +2879,14 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		// Header
 		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, 'Title');
 
-		var titleInput = Wu.DomUtil.create('input', 'chrome-content-tooltip-title-field', sectionWrapper)
-		    titleInput.id   = 'tooltip-title-input';
-		    titleInput.name = 'tooltip-title-input';
-		    
-		    titleInput.setAttribute('placeholder', this._layer.store.title);
+		var titleInput = Wu.DomUtil.create('input', 'chrome-content-tooltip-title-field', sectionWrapper);
+		titleInput.id = 'tooltip-title-input';
+		titleInput.name = 'tooltip-title-input';
+		titleInput.setAttribute('placeholder', this._layer.store.title);
 
-		    if ( title ) titleInput.value = title;
+		if (title) titleInput.value = title;
 
+		// set save event
 		Wu.DomEvent.on(titleInput, 'blur', this.saveTitle, this);
 	},
 
@@ -2907,12 +2903,9 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		// Returns object with timeseries separated from the other fields
 		var splitMetaData = this.buildTimeSeries(columns);
 
-		if ( splitMetaData[1] > 5 ) {
-		
+		if (splitMetaData[1] > 5) {
 			return splitMetaData[0];
-		
 		} else {
-
 			return this.cleanColumns(columns);
 		}
 	},
@@ -2927,8 +2920,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 			timeSeries : false
 		};
 
-		for ( var f in columns ) {
-			
+		for (var f in columns) {
 			metaData.metaFields[f] = {
 					title : false,
 					on    : true
@@ -2952,13 +2944,13 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 
 		for ( var f in columns ) {
 
-			var _key = f;
-			var isTime = this._validateDateFormat(_key);
+			// validate time
+			var isTime = this._validateDateFormat(f);
 
 			// Is time series
 			if ( isTime ) {
 				
-				metaData.timeSeries[_key] = {
+				metaData.timeSeries[f] = {
 						title : false,
 						on    : true
 				}
@@ -2968,7 +2960,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 			// Is not time series
 			} else {
 				
-				metaData.metaFields[_key] = {
+				metaData.metaFields[f] = {
 						title : false,
 						on    : true
 				};
@@ -2982,7 +2974,8 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 	// Init meta fields and time series
 	initFields : function () {
 
-		this.fieldListFromObject('Fields')
+		// 
+		this.fieldListFromObject('Fields');
 		if ( this.tooltipMeta.timeSeries ) this.initTimeSeries();
 	},
 
@@ -3110,20 +3103,19 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 	},
 
 	// Saves switches, etc
-	_saveToServer : function (_key, title, on) {
+	_saveToServer : function (key, title, on) {
 
-		var titleField = Wu.DomUtil.get('field_input_' + _key);
+		var titleField = Wu.DomUtil.get('field_input_' + key);
 		var title      = titleField ? titleField.value : false;
 
 		// If no title, set to false
-		if ( !titleField ) var title = false 
-		else 	           var title = titleField.value
-			
+		var title = titleField ? titleField.value : false;
 
-		if ( _key == 'enable' || _key == 'minmaxRange' || _key == 'graphstyle' ) {
+
+		if ( key == 'enable' || key == 'minmaxRange' || key == 'graphstyle' ) {
 			
 			// Update object
-			this.tooltipMeta.timeSeries[_key] = on;
+			this.tooltipMeta.timeSeries[key] = on;
 
 			// Save to server
 			this._layer.setTooltip(this.tooltipMeta);
@@ -3132,27 +3124,27 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		}
 
 		// Check if key is date	
-		var keyIsDate = this._validateDateFormat(_key);
+		var keyIsDate = this._validateDateFormat(key);
 		
 		// If key is date, try to update timeseries
-		if ( keyIsDate ) var timeUpdated = this.updateTimeSeriesMeta(_key, title, on);
+		if ( keyIsDate ) var timeUpdated = this.updateTimeSeriesMeta(key, title, on);
 		
 		// If key is not date, or could not be found in time series, go through metafields
-		if ( !timeUpdated || !keyIsDate ) this.updateMeta(_key, title, on);
+		if ( !timeUpdated || !keyIsDate ) this.updateMeta(key, title, on);
 	
 		// Save to server
 		this._layer.setTooltip(this.tooltipMeta);
 	},
 
 	// Save helpers – goes through the JSON object to find a key match in the time series
-	updateTimeSeriesMeta : function (_key, title, on) {
+	updateTimeSeriesMeta : function (key, title, on) {
 
 		var timeSeries = this.tooltipMeta.timeSeries;
 		var hit = false;
 
 		for ( var f in timeSeries ) {
 
-			if ( f == _key ) {
+			if ( f == key ) {
 
 				timeSeries[f].title = title;
 				timeSeries[f].on = on;			
@@ -3165,13 +3157,13 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 	},
 
 	// Save helper – goes through the JSON object to find a key match in the meta fields
-	updateMeta : function (_key, title, on) {
+	updateMeta : function (key, title, on) {
 
 		var metaFields = this.tooltipMeta.metaFields;
 
 		for ( var f in metaFields ) {
 
-			if ( f == _key ) {
+			if ( f == key ) {
 
 				metaFields[f].title = title;
 				metaFields[f].on = on;
@@ -3198,7 +3190,482 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
 	},
 
+	// // Validate date format
+	// checkDateFormat : function (key) {
+
+	// 	if ( key.length != 8 ) return false;		
+	// 	var m = moment(key, ["YYYYMMDD", moment.ISO_8601]).format("MMM Do YY");		
+	// 	if ( m == 'Invalid date' ) return false;
+	// 	return true;
+	// },
 });
 
+
+
+
+// sql filters
+Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
+
+	_initialize : function () {
+
+		// init container
+		this._initContainer();
+
+		// add events
+		this._addEvents();
+	},
+
+	_initContainer : function () {
+
+		// create container
+		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane filters', this.options.appendTo);
+	},
+
+	_initLayout : function () {
+
+		// active layer
+		this._initLayout_activeLayers('Datasets', 'Select a dataset to filter...');
+
+		// wrapper
+		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content filters code-wrapper', this._container);
+
+		// sql editor
+		// this._createSqlEditor();
+		
+		// carto editor
+		// this._createCartoEditor();
+
+		// add shortkeys
+		// this._setKeymap();
+
+		// create refresh button
+		// this._createRefresh();
+
+		// insert titles
+		// this._createTitles();
+
+		// hide by default
+		// this._hideEditors();
+
+		// set sizes
+		// this._updateDimensions();
+
+		// mark as inited
+		this._inited = true;
+
+	},
+
+	_refresh : function () {
+
+		this._flush();
+		this._initLayout();
+	},
+
+	_flush : function () {
+		// this._removeKeymaps();
+		// this._removeEvents();
+		// this._cartoEditor = null;
+		// this._SQLEditor = null;
+		this._container.innerHTML = '';
+	},
+
+
+	_cleanup : function () {
+		// select nothing from dropdown
+		// clear carto, sql
+		// hide
+		// unbind keys
+		if (this._select) this._select.selectedIndex = 0;
+		this._cartoEditor && this._cartoEditor.setValue('');
+		this._SQLEditor && this._SQLEditor.setValue('');
+		this._hideEditors();
+		this._removeKeymaps();
+		this._removeEvents();
+	},
+
+	_removeEvents : function () {
+
+		// Wu.DomEvent.off(window, 'resize', this._windowResize, this);
+
+	},
+
+
+
+	_createTitles : function () {
+		
+		// create
+		this._cartotitle = Wu.DomUtil.create('div', 'chrome chrome-content cartocss title');
+		this._cartotitle.innerHTML = 'CartoCSS';
+		this._sqltitle = Wu.DomUtil.create('div', 'chrome chrome-content cartocss title');
+		this._sqltitle.innerHTML = 'SQL';
+		
+		// insert
+		var c = this._cartoEditor.getWrapperElement();
+		c.parentElement.insertBefore(this._cartotitle, c);
+
+		// insert
+		var s = this._SQLEditor.getWrapperElement();
+		s.parentElement.insertBefore(this._sqltitle, s);
+	},
+
+	_createCartoEditor : function () {
+
+		// editor
+		this._cartoEditor = CodeMirror.fromTextArea(this._codewrap, {
+    			lineNumbers: true,    			
+    			mode: {
+    				name : 'carto',
+    				reference : window.cartoRef
+    			},
+    			matchBrackets: true,
+    			lineWrapping: false,
+    			paletteHints : true,
+    			gutters: ['CodeMirror-linenumbers', 'errors']
+  		});
+
+	},
+
+	_createSqlEditor : function () {
+
+
+		// editor
+		this._SQLEditor = CodeMirror.fromTextArea(this._codewrap, {
+    			lineNumbers: true,    			
+    			mode: {
+    				name : 'text/x-sql',
+    			},
+    			matchBrackets: true,
+    			lineWrapping: false,
+    			paletteHints : true,
+    			gutters: ['CodeMirror-linenumbers', 'errors']
+  		});
+
+	},
+
+	_setKeymap : function () {
+
+		this._keymap = {
+			"Cmd-S": function(cm){
+				this._updateStyle();
+			}.bind(this),
+			"Ctrl-S": function(cm){
+				this._updateStyle();
+			}.bind(this),
+			"Cmd-R": function(cm){
+				this._refreshLayer();
+			}.bind(this),
+			"Ctrl-R": function(cm){
+				this._refreshLayer();
+			}.bind(this)
+		}
+
+		this._cartoEditor.addKeyMap(this._keymap);
+		this._SQLEditor.addKeyMap(this._keymap);
+
+		
+		// keymaster('⌘+r, ctrl+r', function(){
+		// 	this._refreshLayer();
+		// 	return false;
+		// }.bind(this));
+
+		// keymaster('⌘+s, ctrl+s', function(){
+		// 	this._updateStyle();
+		// 	return false;
+		// }.bind(this));
+
+	},
+
+	_removeKeymaps : function () {
+		this._cartoEditor && this._cartoEditor.removeKeyMap(this._keymap);
+		this._SQLEditor && this._SQLEditor.removeKeyMap(this._keymap);
+		if (keymaster.unbind) keymaster.unbind('⌘+s, ctrl+s');
+		if (keymaster.unbind) keymaster.unbind('⌘+r, ctrl+r');
+	},
+
+	
+
+	_updateDimensions : function () {
+		if (!this._cartoEditor) return;
+
+		// get dimensions
+		var dims = app.Chrome.Right.getDimensions();
+
+		// set sizes
+		var carto = this._cartoEditor.getWrapperElement();
+		if (carto) {
+			carto.style.width = dims.width + 'px';
+			carto.style.height = (dims.height/3*2) - 150 + 'px';
+		}
+
+		// set sizes
+		var sql = this._SQLEditor.getWrapperElement();
+		if (sql) {
+			sql.style.width = dims.width + 'px';
+			sql.style.height = (dims.height/3*1) - 220 + 'px';
+		}
+	},
+
+	_windowResize : function () {
+		this._updateDimensions();
+		app._map.invalidateSize();
+	},
+
+	_createRefresh : function () {
+
+		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
+		this._refreshButton = Wu.DomUtil.create('div', 'chrome chrome-content cartocss refresh-button', this._container, text);
+
+		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
+	},
+
+	_updateStyle : function () {
+
+
+	},
+
+	_updateStyle : function () {
+
+		// return if no active layer
+		if (!this._layer) return console.error('no layer');
+
+		// get css string
+		var css = this._cartoEditor.getValue();
+
+		// return if empty
+		if (!css) return console.error('no css');
+
+		// get sql
+		var sql = this._SQLEditor.getValue();
+	
+		// request new layer
+		var layerOptions = {
+			css : css, 
+			sql : sql,
+			layer : this._layer
+		}
+
+		this._updateLayer(layerOptions);
+
+	},
+
+	_createSQL : function (file_id, sql) {
+
+		if (sql) {
+			// replace 'table' with file_id in sql
+			sql.replace('table', file_id);
+
+			// wrap
+			sql = '(' + sql + ') as sub';
+
+		} else {
+			// default
+			sql = '(SELECT * FROM  ' + file_id + ') as sub';
+		}
+		return sql;
+	},
+
+	_updateLayer : function (options, done) {
+
+		var css = options.css,
+		    layer = options.layer,
+		    file_id = layer.getFileUuid(),
+		    sql = options.sql,
+		    sql = this._createSQL(file_id, sql),
+		    project = this._project;
+
+
+		var layerOptions = layer.store.data.postgis;
+
+		layerOptions.sql = sql;
+		layerOptions.css = css;
+		layerOptions.file_id = file_id;		
+
+		var layerJSON = {
+			geom_column: 'the_geom_3857',
+			geom_type: 'geometry',
+			raster_band: '',
+			srid: '',
+			affected_tables: '',
+			interactivity: '',
+			attributes: '',
+			access_token: app.tokens.access_token,
+			cartocss_version: '2.0.1',
+			cartocss : css,
+			sql: sql,
+			file_id: file_id,
+			return_model : true,
+			layerUuid : layer.getUuid()
+		}
+
+		// create layer on server
+		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
+
+			// new layer
+			var newLayerStyle = Wu.parse(newLayerJSON);
+
+			// catch errors
+			if (newLayerStyle.error) {
+				done && done();
+				return console.error(newLayerStyle.error);
+			}
+
+			// set & update
+			layer.setStyle(newLayerStyle.options);
+			layer.update({enable : true});
+
+			// return
+			done && done();
+		});
+
+	},
+
+	_refreshLayer : function () {
+		console.log('_refreshLayer');
+	},
+
+	open : function () {
+		console.log('open!', this);
+	},
+
+	_selectedActiveLayer : function (e) {
+
+		// get layer
+		var layerUuid = e.target.value;
+		this._layer = this._project.getLayer(layerUuid);
+
+		// selecting layer in dropdown...
+		// .. problems:
+		// 1. what if layer is not in layer menu?
+		// 2. if not, should it be added?
+		// 3. what if user just clicks wrong layer?
+		// 4. should actually layers not in layermenu be available in dropdown? (they are now)
+		// 5. 
+		// ----------
+		// SOLUTION: temporarily add layers to map for editing, remove when done editing.
+
+
+		// refresh
+		this._refreshEditor();
+
+		// add layer temporarily to map
+		this._tempaddLayer();
+	},
+
+	_tempaddLayer : function () {
+
+		// remember
+		this._temps = this._temps || [];
+
+		// remove other styling layers
+		this._tempRemoveLayers();
+
+		// add
+		this._layer._addThin();
+
+		// remember
+		this._temps.push(this._layer);
+
+	},
+
+	_tempRemoveLayers : function () {
+		if (!this._temps) return;
+
+		// remove other layers added tempy for styling
+		this._temps.forEach(function (layer) {
+			layer._removeThin();
+		}, this);
+	},
+
+	opened : function () {
+
+	},
+
+	closed : function () {
+		// clean up
+		this._tempRemoveLayers();
+		this._cleanup();
+	},
+
+	_refreshEditor : function () {
+		
+		// fill editors
+		this._refreshCartoCSS();
+		this._refreshSQL();
+
+		// show
+		this._showEditors();
+
+		// refresh codemirror (cause buggy)
+		this._SQLEditor.refresh();
+		this._cartoEditor.refresh();
+	},
+
+	_refreshCartoCSS : function () {
+
+		// get
+		var css = this._layer.getCartoCSS();
+
+		// set
+		this._cartoEditor.setValue(css);
+	},
+
+	_refreshSQL : function () {
+
+		// get
+		var meta = this._layer.getPostGISData();
+		var rawsql = meta.sql;
+		var table = meta.table_name;
+		var sql = rawsql.replace(table, 'table').replace('  ', ' ');
+
+		// remove (etc) as sub
+		var sql = this._cleanSQL(sql);
+
+		// set
+		this._SQLEditor.setValue(sql);
+	
+	},
+
+	_cleanSQL : function (sql) {
+		var first = sql.substring(0,1);
+		var last = sql.slice(-8);
+
+		// if sql is of format (SELECT * FROM table) as sub
+		if (first == '(' && last == ') as sub') {
+			var clean_sql = sql.substr(1, sql.length -9);
+			return clean_sql;
+		}
+
+		return sql;
+	},
+
+	_showEditors : function () {
+		this._SQLEditor.getWrapperElement().style.opacity = 1;
+		this._cartoEditor.getWrapperElement().style.opacity = 1;
+		this._sqltitle.style.opacity = 1;
+		this._cartotitle.style.opacity = 1;
+		this._refreshButton.style.opacity = 1;
+	},
+
+	_hideEditors : function () {
+		this._SQLEditor.getWrapperElement().style.opacity = 0;
+		this._cartoEditor.getWrapperElement().style.opacity = 0;
+		this._sqltitle.style.opacity = 0;
+		this._cartotitle.style.opacity = 0;
+		this._refreshButton.style.opacity = 0;
+	},
+
+	show : function () {
+		if (!this._inited) this._initLayout();
+
+		// hide others
+		this.hideAll();
+
+		// show this
+		this._container.style.display = 'block';
+
+		// mark button
+		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+	},
+});
 
 
