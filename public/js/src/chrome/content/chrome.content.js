@@ -59,6 +59,14 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		this._hideLayerEditor();
 
 	},
+	
+	// Hides the "add folder" in layer menu
+	_hideLayerEditor : function () {
+
+		var layerMenu = app.MapPane.getControls().layermenu;
+		if (layerMenu) layerMenu.disableEdit();
+
+	},
 
 	_projectSelected : function (e) {
 		var p = e.detail.projectUuid;
