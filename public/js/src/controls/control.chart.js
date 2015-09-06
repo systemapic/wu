@@ -444,6 +444,8 @@ Wu.Control.Chart = Wu.Control.extend({
 		// Get range
 		var range;
 
+		console.log('c2Ob', c3Obj);
+
 		var settingsRange = c3Obj.popupSettings.timeSeries.minmaxRange;
 	
 		// Use range from settings

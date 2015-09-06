@@ -26,26 +26,7 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		// wrapper
 		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content filters code-wrapper', this._container);
 
-		// sql editor
-		// this._createSqlEditor();
-		
-		// carto editor
-		// this._createCartoEditor();
-
-		// add shortkeys
-		// this._setKeymap();
-
-		// create refresh button
-		// this._createRefresh();
-
-		// insert titles
-		// this._createTitles();
-
-		// hide by default
-		// this._hideEditors();
-
-		// set sizes
-		// this._updateDimensions();
+	
 
 		// mark as inited
 		this._inited = true;
@@ -59,25 +40,12 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 	},
 
 	_flush : function () {
-		// this._removeKeymaps();
-		// this._removeEvents();
-		// this._cartoEditor = null;
-		// this._SQLEditor = null;
-		this._container.innerHTML = '';
+		
 	},
 
 
 	_cleanup : function () {
-		// select nothing from dropdown
-		// clear carto, sql
-		// hide
-		// unbind keys
-		if (this._select) this._select.selectedIndex = 0;
-		this._cartoEditor && this._cartoEditor.setValue('');
-		this._SQLEditor && this._SQLEditor.setValue('');
-		this._hideEditors();
-		this._removeKeymaps();
-		this._removeEvents();
+		
 	},
 
 	_removeEvents : function () {
@@ -90,116 +58,14 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 	_createTitles : function () {
 		
-		// create
-		this._cartotitle = Wu.DomUtil.create('div', 'chrome chrome-content cartocss title');
-		this._cartotitle.innerHTML = 'CartoCSS';
-		this._sqltitle = Wu.DomUtil.create('div', 'chrome chrome-content cartocss title');
-		this._sqltitle.innerHTML = 'SQL';
-		
-		// insert
-		var c = this._cartoEditor.getWrapperElement();
-		c.parentElement.insertBefore(this._cartotitle, c);
-
-		// insert
-		var s = this._SQLEditor.getWrapperElement();
-		s.parentElement.insertBefore(this._sqltitle, s);
-	},
-
-	_createCartoEditor : function () {
-
-		// editor
-		this._cartoEditor = CodeMirror.fromTextArea(this._codewrap, {
-    			lineNumbers: true,    			
-    			mode: {
-    				name : 'carto',
-    				reference : window.cartoRef
-    			},
-    			matchBrackets: true,
-    			lineWrapping: false,
-    			paletteHints : true,
-    			gutters: ['CodeMirror-linenumbers', 'errors']
-  		});
-
-	},
-
-	_createSqlEditor : function () {
-
-
-		// editor
-		this._SQLEditor = CodeMirror.fromTextArea(this._codewrap, {
-    			lineNumbers: true,    			
-    			mode: {
-    				name : 'text/x-sql',
-    			},
-    			matchBrackets: true,
-    			lineWrapping: false,
-    			paletteHints : true,
-    			gutters: ['CodeMirror-linenumbers', 'errors']
-  		});
-
-	},
-
-	_setKeymap : function () {
-
-		this._keymap = {
-			"Cmd-S": function(cm){
-				this._updateStyle();
-			}.bind(this),
-			"Ctrl-S": function(cm){
-				this._updateStyle();
-			}.bind(this),
-			"Cmd-R": function(cm){
-				this._refreshLayer();
-			}.bind(this),
-			"Ctrl-R": function(cm){
-				this._refreshLayer();
-			}.bind(this)
-		}
-
-		this._cartoEditor.addKeyMap(this._keymap);
-		this._SQLEditor.addKeyMap(this._keymap);
-
-		
-		// keymaster('⌘+r, ctrl+r', function(){
-		// 	this._refreshLayer();
-		// 	return false;
-		// }.bind(this));
-
-		// keymaster('⌘+s, ctrl+s', function(){
-		// 	this._updateStyle();
-		// 	return false;
-		// }.bind(this));
-
-	},
-
-	_removeKeymaps : function () {
-		this._cartoEditor && this._cartoEditor.removeKeyMap(this._keymap);
-		this._SQLEditor && this._SQLEditor.removeKeyMap(this._keymap);
-		if (keymaster.unbind) keymaster.unbind('⌘+s, ctrl+s');
-		if (keymaster.unbind) keymaster.unbind('⌘+r, ctrl+r');
+	
 	},
 
 	
 
+
 	_updateDimensions : function () {
-		if (!this._cartoEditor) return;
-
-		// get dimensions
-		var dims = app.Chrome.Right.getDimensions();
-
-		// set sizes
-		var carto = this._cartoEditor.getWrapperElement();
-		if (carto) {
-			carto.style.width = dims.width + 'px';
-			carto.style.height = (dims.height/3*2) - 150 + 'px';
-		}
-
-		// set sizes
-		var sql = this._SQLEditor.getWrapperElement();
-		if (sql) {
-			sql.style.width = dims.width + 'px';
-			sql.style.height = (dims.height/3*1) - 220 + 'px';
-		}
+		
 	},
 
 	_windowResize : function () {
@@ -209,10 +75,7 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 	_createRefresh : function () {
 
-		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
-		this._refreshButton = Wu.DomUtil.create('div', 'chrome chrome-content cartocss refresh-button', this._container, text);
-
-		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
+		
 	},
 
 	_updateStyle : function () {
@@ -385,25 +248,25 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 	_refreshEditor : function () {
 		
-		// fill editors
-		this._refreshCartoCSS();
-		this._refreshSQL();
+		// // fill editors
+		// this._refreshCartoCSS();
+		// this._refreshSQL();
 
-		// show
-		this._showEditors();
+		// // show
+		// this._showEditors();
 
-		// refresh codemirror (cause buggy)
-		this._SQLEditor.refresh();
-		this._cartoEditor.refresh();
+		// // refresh codemirror (cause buggy)
+		// this._SQLEditor.refresh();
+		// this._cartoEditor.refresh();
 	},
 
 	_refreshCartoCSS : function () {
 
-		// get
-		var css = this._layer.getCartoCSS();
+		// // get
+		// var css = this._layer.getCartoCSS();
 
-		// set
-		this._cartoEditor.setValue(css);
+		// // set
+		// this._cartoEditor.setValue(css);
 	},
 
 	_refreshSQL : function () {
@@ -435,21 +298,6 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		return sql;
 	},
 
-	_showEditors : function () {
-		this._SQLEditor.getWrapperElement().style.opacity = 1;
-		this._cartoEditor.getWrapperElement().style.opacity = 1;
-		this._sqltitle.style.opacity = 1;
-		this._cartotitle.style.opacity = 1;
-		this._refreshButton.style.opacity = 1;
-	},
-
-	_hideEditors : function () {
-		this._SQLEditor.getWrapperElement().style.opacity = 0;
-		this._cartoEditor.getWrapperElement().style.opacity = 0;
-		this._sqltitle.style.opacity = 0;
-		this._cartotitle.style.opacity = 0;
-		this._refreshButton.style.opacity = 0;
-	},
 
 	show : function () {
 		if (!this._inited) this._initLayout();
