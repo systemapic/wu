@@ -21,8 +21,22 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		this._initLayout_activeLayers('Datasets', 'Select a dataset to filter...');
 
 		// wrapper
-		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content filters code-wrapper', this._container);
+		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._container);
 
+		// sql editor
+		this._createSqlEditor();
+
+		// create refresh button
+		this._createRefresh();
+
+		// insert titles
+		this._createTitles();
+
+		// hide by default
+		this._hideEditors();
+
+		// set sizes
+		this._updateDimensions();
 
 		// mark as inited
 		this._inited = true;
@@ -30,16 +44,12 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 	},
 
 	_refresh : function () {
-
 		this._flush();
 		this._initLayout();
 	},
 
 	_flush : function () {
-		// this._removeKeymaps();
-		// this._removeEvents();
-		// this._cartoEditor = null;
-		// this._SQLEditor = null;
+		this._SQLEditor = null;
 		this._container.innerHTML = '';
 	},
 
@@ -58,6 +68,13 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 	_createTitles : function () {
 		
+		// create
+		this._sqltitle = Wu.DomUtil.create('div', 'chrome chrome-content cartocss title');
+		this._sqltitle.innerHTML = 'SQL';
+		
+		// insert
+		var s = this._SQLEditor.getWrapperElement();
+		s.parentElement.insertBefore(this._sqltitle, s);
 
 	},
 
@@ -74,30 +91,59 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 
 	},
+	
+	_updateDimensions : function () {
+
+		if (!this._SQLEditor) return;
+
+		// get dimensions
+		var dims = app.Chrome.Right.getDimensions();
+		// set sizes
+		var sql = this._SQLEditor.getWrapperElement();
+		if (sql) {
+			sql.style.width = dims.width + 'px';
+			sql.style.height = (dims.height/3*1) - 220 + 'px';
+		}
+	},
+
+	_createRefresh : function () {
+
+		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
+		this._refreshButton = Wu.DomUtil.create('div', 'chrome chrome-content cartocss refresh-button', this._container, text);
+
+		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
+	},
+
 
 	_updateStyle : function () {
 
 		// return if no active layer
 		if (!this._layer) return console.error('no layer');
 
-		// get css string
-		var css = this._cartoEditor.getValue();
-
-		// return if empty
-		if (!css) return console.error('no css');
-
 		// get sql
-		var sql = this._SQLEditor.getValue();
+		var sql = this.getSQLValue();
+
+		// get css
+		var css = this.getCartocssValue();
 	
 		// request new layer
 		var layerOptions = {
-			css : css, 
 			sql : sql,
+			css : css,
 			layer : this._layer
 		}
 
 		this._updateLayer(layerOptions);
 
+	},
+
+	getCartocssValue : function () {
+		var css = this._layer.getCartoCSS();
+		return css;
+	},
+
+	getSQLValue : function () {
+		return this._SQLEditor.getValue();
 	},
 
 	_createSQL : function (file_id, sql) {
@@ -118,12 +164,14 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 	_updateLayer : function (options, done) {
 
-		var css = options.css,
-		    layer = options.layer,
-		    file_id = layer.getFileUuid(),
-		    sql = options.sql,
-		    sql = this._createSQL(file_id, sql),
-		    project = this._project;
+		console.log('_updateLayer, options, ', options);
+
+		var css 	= this.getCartocssValue(),
+		    layer 	= options.layer,
+		    file_id 	= layer.getFileUuid(),
+		    sql 	= options.sql,
+		    sql 	= this._createSQL(file_id, sql),
+		    project 	= this._project;
 
 
 		var layerOptions = layer.store.data.postgis;
@@ -179,7 +227,9 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		console.log('open!', this);
 	},
 
+
 	_selectedActiveLayer : function (e) {
+		console.log('selected active layer, filter', e);
 
 		// get layer
 		var layerUuid = e.target.value;
@@ -239,7 +289,15 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 	},
 
 	_refreshEditor : function () {
+		console.log('filter refresheditor');
 
+		this._refreshSQL();
+
+		// show
+		this._showEditors();
+
+		// refresh codemirror (cause buggy)
+		this._SQLEditor.refresh();
 	},
 
 	_refreshCartoCSS : function () {
@@ -287,6 +345,36 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 		// mark button
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+	},
+
+	_showEditors : function () {
+		this._SQLEditor.getWrapperElement().style.opacity = 1;
+		this._sqltitle.style.opacity = 1;
+		this._refreshButton.style.opacity = 1;
+	},
+
+	_hideEditors : function () {
+		this._SQLEditor.getWrapperElement().style.opacity = 0;
+		this._sqltitle.style.opacity = 0;
+		this._refreshButton.style.opacity = 0;
+	},
+
+
+	_createSqlEditor : function () {
+
+
+		// editor
+		this._SQLEditor = CodeMirror.fromTextArea(this._codewrap, {
+    			lineNumbers: true,    			
+    			mode: {
+    				name : 'text/x-sql',
+    			},
+    			matchBrackets: true,
+    			lineWrapping: false,
+    			paletteHints : true,
+    			gutters: ['CodeMirror-linenumbers', 'errors']
+  		});
+
 	},
 });
 
