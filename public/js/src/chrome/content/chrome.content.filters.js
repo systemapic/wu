@@ -1,6 +1,3 @@
-
-
-// sql filters
 Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 	_initialize : function () {
@@ -26,7 +23,6 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		// wrapper
 		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content filters code-wrapper', this._container);
 
-	
 
 		// mark as inited
 		this._inited = true;
@@ -40,12 +36,16 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 	},
 
 	_flush : function () {
-		
+		// this._removeKeymaps();
+		// this._removeEvents();
+		// this._cartoEditor = null;
+		// this._SQLEditor = null;
+		this._container.innerHTML = '';
 	},
 
 
 	_cleanup : function () {
-		
+
 	},
 
 	_removeEvents : function () {
@@ -58,14 +58,7 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 	_createTitles : function () {
 		
-	
-	},
 
-	
-
-
-	_updateDimensions : function () {
-		
 	},
 
 	_windowResize : function () {
@@ -75,7 +68,6 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 	_createRefresh : function () {
 
-		
 	},
 
 	_updateStyle : function () {
@@ -247,26 +239,11 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 	},
 
 	_refreshEditor : function () {
-		
-		// // fill editors
-		// this._refreshCartoCSS();
-		// this._refreshSQL();
 
-		// // show
-		// this._showEditors();
-
-		// // refresh codemirror (cause buggy)
-		// this._SQLEditor.refresh();
-		// this._cartoEditor.refresh();
 	},
 
 	_refreshCartoCSS : function () {
 
-		// // get
-		// var css = this._layer.getCartoCSS();
-
-		// // set
-		// this._cartoEditor.setValue(css);
 	},
 
 	_refreshSQL : function () {

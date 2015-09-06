@@ -60,12 +60,6 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 	},
 
-	// Hides the "add folder" in layer menu
-	_hideLayerEditor : function () {
-		var layerMenu = app.MapPane.getControls().layermenu;
-		if (layerMenu) layerMenu.disableEdit();
-	},
-
 	_projectSelected : function (e) {
 		var p = e.detail.projectUuid;
 		if (!p) return;
@@ -77,27 +71,23 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		this._refresh();
 	},
 
+
 	_refresh : function () {
 
 	},
 
-	opened : function () {
-
-	},
-
-	closed : function () {
-		console.log('i was also closed!', this);
-	},
-
 	_initLayout_activeLayers : function (title, subtitle) {
 
-		// get titles
 		var title = title || 'Layer';
 		var subtitle = subtitle || 'Select a layer to style...';
 
-		// create divs
+		// active layer wrapper
 		var wrap = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper', this._container);
+
+		// title
 		var title = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
+		
+		// create dropdown
 		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', wrap);
 		var select = this._select = Wu.DomUtil.create('select', 'active-layer-select', selectWrap);
 
@@ -119,9 +109,19 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 		// select event
 		Wu.DomEvent.on(select, 'change', this._selectedActiveLayer, this); // todo: mem leak?
+
+
 	},
 
-	
+	opened : function () {
+	},
+
+	closed : function () {
+		console.log('i was also closed!', this);
+	},
+
+
+
 	// Creates one meta field line, with input, switch, etc
 	_createMetaFieldLine : function (options) {
 
@@ -136,7 +136,6 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		    color 	= options.color,
 		    val 	= options.value;
 
-		
 		var fieldWrapper = Wu.DomUtil.create('div', 'chrome-metafield-line', wrapper);
 		fieldWrapper.id = 'field_wrapper_' + key;
 

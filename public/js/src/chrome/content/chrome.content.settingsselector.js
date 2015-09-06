@@ -123,4 +123,3 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 		}
 	},
 });
-
