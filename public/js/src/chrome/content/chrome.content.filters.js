@@ -23,6 +23,7 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		// wrapper
 		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._container);
 
+		
 		// sql editor
 		this._createSqlEditor();
 
@@ -245,6 +246,8 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		// ----------
 		// SOLUTION: temporarily add layers to map for editing, remove when done editing.
 
+		// filter chart
+		this._createFilterDropdown();
 
 		// refresh
 		this._refreshEditor();
@@ -362,7 +365,6 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 	_createSqlEditor : function () {
 
-
 		// editor
 		this._SQLEditor = CodeMirror.fromTextArea(this._codewrap, {
     			lineNumbers: true,    			
@@ -374,8 +376,201 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
     			paletteHints : true,
     			gutters: ['CodeMirror-linenumbers', 'errors']
   		});
+	},
+
+	_getColumns : function () {
+		if (!this._layer) return false;
+
+		var meta = Wu.parse(this._layer.getPostGISData().metadata);
+
+		console.log('_getColumns meta', meta);
+
+		var columns = meta.columns;
+
+		console.log('cols', columns);
+
+		return columns;
+	},
+
+	_createFilterDropdown : function () {
+
+		console.log('_createFilterDropdown', this._layer);
+
+		// get columns
+		
+
+		var title = 'Columns'
+		var subtitle = 'Select a column to filter by...';
+
+		// active layer wrapper
+		var wrap = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper', this._container);
+
+		// title
+		var title = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
+		
+		// create dropdown
+		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', wrap);
+		var select = this._select = Wu.DomUtil.create('select', 'active-layer-select', selectWrap);
+
+		// get layers
+		var columns = this._getColumns();
+
+		// placeholder
+		var option = Wu.DomUtil.create('option', '', select);
+		option.innerHTML = subtitle;
+		option.setAttribute('disabled', '');
+		option.setAttribute('selected', '');
+
+
+		console.log('columns: --> ', columns);
+
+
+		for (var c in columns) {
+			// var column = columns[c];
+			var option = Wu.DomUtil.create('option', 'active-layer-option', select);
+			option.value = c;
+			option.innerHTML = c;
+		}
+
+
+		// select event
+		Wu.DomEvent.on(select, 'change', this._selectedFilterColumn, this); // todo: mem leak?
+
 
 	},
+
+	_selectedFilterColumn : function (e) {
+
+		var column = e.target.value;
+
+		console.log('valuye: ', column);
+
+		this._createFilterChart(column);
+	},
+
+	_createFilterChart : function (column) {
+
+		console.log('_createFilterChart');
+
+		// create div
+		this._filterDiv = Wu.DomUtil.createId('div', 'chrome-content-filter-chart', this._container);
+
+		var chart = dc.barChart(this._filterDiv);
+
+		this._getHistogram(column, function (err, histogram) {
+
+			console.log('got histo', err, histogram);
+			// return;
+
+
+
+			// d3.json(histogram, function (err, data) {
+			// 	console.log('d3 err', err);
+			// 	console.log('data: ', data);
+
+			var data = histogram;
+
+			console.log('LENGTH', data.length);
+
+			var ndx             = crossfilter(data),
+			    runDimension    = ndx.dimension(function(d) {return +d.bucket;}), 			// x-axis
+			    speedSumGroup   = runDimension.group().reduceSum(function(d) {return d.freq;});	// y-axis
+
+			chart
+			.width(340)
+			.height(160)
+			.gap(1)
+			.x(d3.scale.linear().domain([0, data.length + 1]))
+			.brushOn(true) // drag filter
+
+			// .centerBar(true)
+			.renderLabel(true)
+			// .yAxisLabel("Y Axis")
+			.elasticX(true)
+			.elasticY(true)
+			.dimension(runDimension)
+			// .round(dc.round.floor)
+			.group(speedSumGroup)
+			// .renderTitle(true).title(function (d) {
+			// 	return 'test: ' + d.value;
+			// })
+			// .renderHorizontalGridLines(true)
+			// .label(function (d) {
+			// 	console.log(d);
+			// 	return 'test';
+			// })
+			.margins({top: 10, right: 30, bottom: 30, left: 80})
+			.filterPrinter(function (filters) {
+				var f = filters[0];
+				console.log('left: ', f[0]);	// prints min/max of bucket filter
+				console.log('right: ', f[1]);
+
+				console.error('TODO: get filter value from bucket; create SQL');
+				return f[0];
+			});
+
+			chart.render();
+
+			labels = chart.g().selectAll("rect.bar text");
+			console.log(labels);
+
+			// });
+
+
+		});
+
+
+	},
+
+	_getHistogram : function (column, done) {
+		if (!this._layer) return;
+
+		var postgisData = this._layer.getPostGISData();
+
+		console.log('postgisData', postgisData);
+
+		
+
+		var options = {
+			layer_id : postgisData.layer_id,
+			file_id : postgisData.file_id,
+			column : column,
+			access_token : app.tokens.access_token,
+			num_buckets : 50
+		}
+
+		console.log('options', options);
+
+		// return;
+
+		// get histogram 
+		Wu.post('/api/db/fetchHistogram', JSON.stringify(options), function (err, histogramJSON) {
+
+			console.log('fetchHistogram', err, histogramJSON);
+
+			// // new layer
+			// var newLayerStyle = Wu.parse(newLayerJSON);
+
+			var histogramData = Wu.parse(histogramJSON);
+
+			// console.log('histogramData', histogramData);
+
+			// // catch errors
+			// if (newLayerStyle.error) {
+			// 	done && done();
+			// 	return console.error(newLayerStyle.error);
+			// }
+
+			// // set & update
+			// layer.setStyle(newLayerStyle.options);
+			// layer.update({enable : true});
+
+			// return
+			done && done(null, histogramData);
+		});
+
+
+	}
 });
 
 
