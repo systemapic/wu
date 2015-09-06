@@ -143,6 +143,8 @@ module.exports = function(grunt) {
 
 					// c3
 					'public/js/lib/d3/c3.js',
+					'public/js/lib/dc.js/crossfilter.js',
+					'public/js/lib/dc.js/dc.js',
 
 					// socket.io
 					'/js/lib/socket.io/socket.io.js',
