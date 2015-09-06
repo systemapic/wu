@@ -427,6 +427,3 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 
 	},	
 });
-
-
-

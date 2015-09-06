@@ -478,15 +478,18 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			if ( pre == 'min_' ) {
 				// SAVE MIN AND MAX VALUE
 				var maxField = Wu.DomUtil.get('field_mini_input_max_minmaxcolorrange');
-				var maxVal = maxField.value;
+
+				var maxVal = parseInt(maxField.value);
 				this.cartoJSON.point.color.customMinMax = [value, maxVal];
 			}
 
 			if ( pre == 'max_' ) {
 				// SAVE MIN AND MAX VALUE
-				var minField = Wu.DomUtil.get('field_mini_input_max_minmaxcolorrange');
-				var minVal = minField.value;
-				this.cartoJSON.point.color.customMinMax[0] = minVal;
+
+				var minField = Wu.DomUtil.get('field_mini_input_min_minmaxcolorrange');
+				var minVal = parseInt(minField.value);
+				// this.cartoJSON.point.color.customMinMax[0] = minVal;
+				this.cartoJSON.point.color.customMinMax = [minVal, value];
 			}			
 		}
 	},	
@@ -710,7 +713,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		var cartoJSON = this.cartoJSON;
 
 		var headers = '';
-		var style   = '';
+		var style   = '#layer {\n\n';
 
 		if ( cartoJSON.point && cartoJSON.point.enabled == true ) {
 
@@ -718,55 +721,91 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			// COLOR
 			// COLOR
 
+// <<<<<<< HEAD
+// 			var color = cartoJSON.point.color;
+
+// 			if ( color.range ) {
+
+// 				// color range
+// 				color.customMinMax
+// 				color.minMax
+// 				color.range
+// 				color.value
+
+// 				var minMax = color.customMinMax ? color.customMinMax : color.minMax;
+
+// 				headers += '@' + color.range + '_min: ' + minMax[0] + ';\n'; 
+// 				headers += '@' + color.range + '_max: ' + minMax[1] + ';\n';
+// 				headers += '@' + color.range + ': [' + color.range + '];\n\n';
+
+// 				// COLORS
+// 				color.value.forEach(function(c, i) {	
+// 					headers += '@color_' + (color.value.length - i) + ': ' + c + ';\n';
+// 				})
+
+// 				headers += '\n';
+
+// 				// COLOR STEPS
+// 				headers += '@' + color.range + '_delta: (@' + color.range + '_max - @' + color.range + '_min)/' + color.value.length + ';\n'
+// 				color.value.forEach(function(c, i) {	
+// 					headers += '@step_' + (i+1) + ' + (@' + color.range + '_delta * ' + i + ');\n';
+// 				})				
+
+
+// 				// @delta   : (@field_max - @field_min)/10;
+// 				// @step_1  : @field_min;
+// 				// @step_2  : @field_min + @delta;
+// 				// @step_3  : @field_min + (@delta * 2);
+// 				// @step_4  : @field_min + (@delta * 3);
+// 				// @step_5  : @field_min + (@delta * 4);
+// 				// @step_6  : @field_min + (@delta * 5);
+// 				// @step_7  : @field_min + (@delta * 6);
+// 				// @step_8  : @field_min + (@delta * 7);
+// 				// @step_9  : @field_min + (@delta * 8);
+// 				// @step_10 : @field_min + (@delta * 9);				
+
+
+			
+// 			} else {
+			
+// 				// static color
+// 				color.staticVal
+// 			}
+
+// 			// OPACITY
+// 			// OPACITY
+// 			// OPACITY
+
+// 			var opacity = cartoJSON.point.opacity;
+
+// 			if ( opacity.range ) {
+
+// 				// opaciyt range
+// 				opacity.range
+
+
+			
+// 			} else {
+
+// 				// static opacity
+// 				opacity.value	
+// 			}
+
+// =======
+			var allowOverlap = 'true';
+			var markerClip  = 'false';
+			var compOp      = 'screen'
+
+			style += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
+			style += '\tmarker-clip: ' + markerClip + ';\n';
+			style += '\tmarker-comp-op: ' + compOp + ';\n\n';
+
+			
+
 			var color = cartoJSON.point.color;
 
-			if ( color.range ) {
-
-				// color range
-				color.customMinMax
-				color.minMax
-				color.range
-				color.value
-
-				var minMax = color.customMinMax ? color.customMinMax : color.minMax;
-
-				headers += '@' + color.range + '_min: ' + minMax[0] + ';\n'; 
-				headers += '@' + color.range + '_max: ' + minMax[1] + ';\n';
-				headers += '@' + color.range + ': [' + color.range + '];\n\n';
-
-				// COLORS
-				color.value.forEach(function(c, i) {	
-					headers += '@color_' + (color.value.length - i) + ': ' + c + ';\n';
-				})
-
-				headers += '\n';
-
-				// COLOR STEPS
-				headers += '@' + color.range + '_delta: (@' + color.range + '_max - @' + color.range + '_min)/' + color.value.length + ';\n'
-				color.value.forEach(function(c, i) {	
-					headers += '@step_' + (i+1) + ' + (@' + color.range + '_delta * ' + i + ');\n';
-				})				
 
 
-				// @delta   : (@field_max - @field_min)/10;
-				// @step_1  : @field_min;
-				// @step_2  : @field_min + @delta;
-				// @step_3  : @field_min + (@delta * 2);
-				// @step_4  : @field_min + (@delta * 3);
-				// @step_5  : @field_min + (@delta * 4);
-				// @step_6  : @field_min + (@delta * 5);
-				// @step_7  : @field_min + (@delta * 6);
-				// @step_8  : @field_min + (@delta * 7);
-				// @step_9  : @field_min + (@delta * 8);
-				// @step_10 : @field_min + (@delta * 9);				
-
-
-			
-			} else {
-			
-				// static color
-				color.staticVal
-			}
 
 			// OPACITY
 			// OPACITY
@@ -776,17 +815,123 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 			if ( opacity.range ) {
 
-				// opaciyt range
-				opacity.range
+				var max = Math.floor(this.columns[opacity.range].max * 10) / 10;
+				var min = Math.floor(this.columns[opacity.range].min * 10) / 10;				
 
+				var normalizedOffset = true;
+
+				// NORMALIZED OFFSET 
+				// i.e. if the lowest number is 30, and 
+			 	// highest is 100, 30 will return 0.3 and not 0
+				if ( normalizedOffset ) {
+					if ( min > 0 ) min = 0;
+				}
+
+				headers += '@opacity_field_max: ' + max + ';\n';
+				headers += '@opacity_field_min: ' + min + ';\n';
+				headers += '@opacity_field_range: [' + opacity.range + '];\n\n';
+
+				headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
 
 			
 			} else {
 
 				// static opacity
-				opacity.value	
+				headers += '@opacity_field: ' + opacity.value + ';\n';
 			}
 
+			style += '\tmarker-opacity: @opacity_field;\n\n'
+
+
+			// COLOR RANGE
+			// COLOR RANGE
+			// COLOR RANGE
+
+			if ( color.range ) {
+
+				var minMax = color.customMinMax ? color.customMinMax : color.minMax;
+
+
+				console.log('color', color);
+
+				// CREATE VARS
+				var fieldName = '@' + color.range;
+				var maxField  = fieldName + '_max';
+				var minField  = fieldName + '_min';
+				var deltaName = fieldName + '_delta';
+				
+
+				// DEFINE FIELD NAME + MIN/MAX
+				headers += fieldName + ': [' + color.range + '];\n';
+				headers += maxField  + ': '  + minMax[1] + ';\n'; 
+				headers += minField  + ': '  + minMax[0] + ';\n\n';
+				
+
+				// COLORS VALUES
+				color.value.forEach(function(c, i) {	
+					headers += fieldName + '_color_' + (color.value.length - i) + ': ' + c + ';\n';
+				})
+
+				headers += '\n';
+				
+				// COLOR STEPS (DELTA)
+				headers += fieldName + '_delta: (' + maxField + ' - ' + minField + ')/' + color.value.length + ';\n'
+				color.value.forEach(function(c, i) {	
+					headers += fieldName + '_step_' + (i+1) + ': (' + minField + ' + ' + fieldName + '_delta * ' + i + ');\n';
+				})
+
+				// @vel_step_1 + (@vel_delta * 0);
+
+				
+
+				// @step_2  : @field_min + @delta;
+
+				headers += '\n';
+
+
+
+
+				// STYLE STYLE STYLE
+				// STYLE STYLE STYLE
+				// STYLE STYLE STYLE
+
+
+				color.value.forEach(function(c,i) {
+
+					var no = i+1;
+
+					if ( no == 1 ) {
+
+						style += '\t[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + '] ';
+						style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
+
+					}
+
+					if ( no > 1 && no < color.value.length ) {
+
+						style += '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + ']';
+						style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
+						style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
+
+					}
+
+					if ( no == color.value.length ) {
+
+						style +=  '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + '] ';
+						style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n\n';
+					}
+				})
+				
+			
+			} else {
+			
+				// static color
+				style += '\tmarker-fill: ' + color.staticVal + ';\n\n';
+			}
+
+
+
+// >>>>>>> 004632af95e291d25a28fabe45cb51100ce8975a
 			
 			// POINT SIZE
 			// POINT SIZE
@@ -796,78 +941,49 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 			if ( pointsize.range ) {
 
-				// point size range
-				pointsize.minMax
-				pointsize.range
+				var max = Math.floor(this.columns[pointsize.range].max * 10) / 10;
+				var min = Math.floor(this.columns[pointsize.range].min * 10) / 10;
+			
+				headers += '@marker_size_max: ' + pointsize.minMax[1] + ';\n';
+				headers += '@marker_size_min: ' + pointsize.minMax[0] + ';\n';
+				headers += '@marker_size_range: [' + pointsize.range + '];\n';
+				headers += '@marker_size_range_maxVal: ' + max + ';\n';
+				headers += '@marker_size_range_minVal: ' + min + ';\n';
+				headers += '\n//TODO: Fix this!\n';
+				headers += '@marker_size_factor: (@marker_size_range / (@marker_size_range_maxVal - @marker_size_range_minVal)) * @marker_size_max;\n\n';
 
 			} else {
 
-				// static point size
-				pointsize.value
+
+				headers += '@marker_size_factor: ' + pointsize.value + ';\n';
 
 			}
+
+
+			headers += '[zoom=10] { marker-width: 0.3 * @marker_size_factor; }\n';
+			headers += '[zoom=11] { marker-width: 0.5 * @marker_size_factor; }\n';
+			headers += '[zoom=12] { marker-width: 1   * @marker_size_factor; }\n';
+			headers += '[zoom=13] { marker-width: 1   * @marker_size_factor; }\n';
+			headers += '[zoom=14] { marker-width: 2   * @marker_size_factor; }\n';
+			headers += '[zoom=15] { marker-width: 4   * @marker_size_factor; }\n';
+			headers += '[zoom=16] { marker-width: 6   * @marker_size_factor; }\n';
+			headers += '[zoom=17] { marker-width: 8   * @marker_size_factor; }\n';
+			headers += '[zoom=18] { marker-width: 12  * @marker_size_factor; }\n\n';
+
+
 		}
+
+		style += '}'
 
 		console.log('');
 		console.log('%c******* cartCSS headers *******', 'background: red; color: white;');
-		console.log('');
-		console.log(headers);
-		console.log('');
+		
+		var finalCarto = headers + style;
 
-		console.log('%c******* cartCSS style *******', 'background: red; color: white;');
-		console.log('');
-		console.log(style);
-		console.log('');
+		console.log(finalCarto);
+		
 
 	}
 
 
-	// createCartoJSON : function (fieldName) {
-
-	// 	var field = this.columns[fieldName];
-
-	// 	var max = field.max;
-	// 	var min = field.min;
-		
-	// 	if ( min > 0 ) min = 0;
-
-	// 	var color = {
-	// 		max : max,
-	// 		min : min,
-	// 		field : fieldName,
-	// 		dimension : key
-	// 	}
-
-	// 	this.toCarto(color);
-
-	// },
-
-
-	// toCarto : function (JSON) {
-
-	// 	var max = JSON.max;
-	// 	var min = JSON.min;
-	// 	var field = JSON.field;
-	// 	var dimension = JSON.dimension;
-
-	// 	var maxName   = '@' + field + '_max'
-	// 	var minName   = '@' + field + '_min';
-	// 	var fieldName = '@' + field;
-
-	// 	var univeralCarto  =  maxName + ': ' + max + ';';
-	// 	    univeralCarto +=  minName + ': ' + min + ';';
-	// 	    univeralCarto +=  fieldName + ': [' + field + '];';
-
-	// 	var cartoStr = dimension + ': ' + '((' + fieldName + ' - ' + minName + ') / (' + maxName + ' - ' + minName + '));';
-
-	// 	console.log('univeralCarto', univeralCarto);
-	// 	console.log('cartoStr', cartoStr);
-
-	// },
-
-
-
 });
-
-
-
