@@ -25,7 +25,7 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._container);
 
 		// sql editor
-		this._createSqlEditor();
+		// this._createSqlEditor();
 		
 		// carto editor
 		this._createCartoEditor();
@@ -60,7 +60,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		this._removeKeymaps();
 		this._removeEvents();
 		this._cartoEditor = null;
-		this._SQLEditor = null;
 		this._container.innerHTML = '';
 	},
 
@@ -72,7 +71,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		// unbind keys
 		if (this._select) this._select.selectedIndex = 0;
 		this._cartoEditor && this._cartoEditor.setValue('');
-		this._SQLEditor && this._SQLEditor.setValue('');
 		this._hideEditors();
 		this._removeKeymaps();
 		this._removeEvents();
@@ -89,16 +87,11 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		// create
 		this._cartotitle = Wu.DomUtil.create('div', 'chrome chrome-content cartocss title');
 		this._cartotitle.innerHTML = 'CartoCSS';
-		this._sqltitle = Wu.DomUtil.create('div', 'chrome chrome-content cartocss title');
-		this._sqltitle.innerHTML = 'SQL';
 		
 		// insert
 		var c = this._cartoEditor.getWrapperElement();
 		c.parentElement.insertBefore(this._cartotitle, c);
 
-		// insert
-		var s = this._SQLEditor.getWrapperElement();
-		s.parentElement.insertBefore(this._sqltitle, s);
 	},
 
 	_createCartoEditor : function () {
@@ -118,22 +111,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 
 	},
 
-	_createSqlEditor : function () {
-
-
-		// editor
-		this._SQLEditor = CodeMirror.fromTextArea(this._codewrap, {
-    			lineNumbers: true,    			
-    			mode: {
-    				name : 'text/x-sql',
-    			},
-    			matchBrackets: true,
-    			lineWrapping: false,
-    			paletteHints : true,
-    			gutters: ['CodeMirror-linenumbers', 'errors']
-  		});
-
-	},
 
 	_setKeymap : function () {
 
@@ -153,7 +130,7 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		}
 
 		this._cartoEditor.addKeyMap(this._keymap);
-		this._SQLEditor.addKeyMap(this._keymap);
+		// this._SQLEditor.addKeyMap(this._keymap);
 
 		
 		// keymaster('⌘+r, ctrl+r', function(){
@@ -170,7 +147,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 
 	_removeKeymaps : function () {
 		this._cartoEditor && this._cartoEditor.removeKeyMap(this._keymap);
-		this._SQLEditor && this._SQLEditor.removeKeyMap(this._keymap);
 		if (keymaster.unbind) keymaster.unbind('⌘+s, ctrl+s');
 		if (keymaster.unbind) keymaster.unbind('⌘+r, ctrl+r');
 	},
@@ -190,12 +166,7 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 			carto.style.height = (dims.height/3*2) - 150 + 'px';
 		}
 
-		// set sizes
-		var sql = this._SQLEditor.getWrapperElement();
-		if (sql) {
-			sql.style.width = dims.width + 'px';
-			sql.style.height = (dims.height/3*1) - 220 + 'px';
-		}
+		
 	},
 
 	_windowResize : function () {
@@ -211,10 +182,6 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
 	},
 
-	_updateStyle : function () {
-
-
-	},
 
 	_updateStyle : function () {
 
@@ -222,13 +189,13 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		if (!this._layer) return console.error('no layer');
 
 		// get css string
-		var css = this._cartoEditor.getValue();
+		var css = this.getCartocssValue();
 
 		// return if empty
 		if (!css) return console.error('no css');
 
 		// get sql
-		var sql = this._SQLEditor.getValue();
+		var sql = this.getSQLValue();
 	
 		// request new layer
 		var layerOptions = {
@@ -240,6 +207,15 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		this._updateLayer(layerOptions);
 
 	},
+
+	getCartocssValue : function () {
+		return this._cartoEditor.getValue();
+	},
+
+	getSQLValue : function () {
+		return this._layer.getSQL();
+	},
+
 
 	_createSQL : function (file_id, sql) {
 
@@ -262,14 +238,15 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		var css = options.css,
 		    layer = options.layer,
 		    file_id = layer.getFileUuid(),
-		    sql = options.sql,
-		    sql = this._createSQL(file_id, sql),
+		    // sql = options.sql,
+		    // sql = this._createSQL(file_id, sql),
+		    sql = this.getSQLValue(),
 		    project = this._project;
 
 
 		var layerOptions = layer.store.data.postgis;
 
-		layerOptions.sql = sql;
+		// layerOptions.sql = sql;
 		layerOptions.css = css;
 		layerOptions.file_id = file_id;		
 
@@ -383,13 +360,11 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		
 		// fill editors
 		this._refreshCartoCSS();
-		this._refreshSQL();
 
 		// show
 		this._showEditors();
 
 		// refresh codemirror (cause buggy)
-		this._SQLEditor.refresh();
 		this._cartoEditor.refresh();
 	},
 
@@ -402,47 +377,15 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		this._cartoEditor.setValue(css);
 	},
 
-	_refreshSQL : function () {
-
-		// get
-		var meta = this._layer.getPostGISData();
-		var rawsql = meta.sql;
-		var table = meta.table_name;
-		var sql = rawsql.replace(table, 'table').replace('  ', ' ');
-
-		// remove (etc) as sub
-		var sql = this._cleanSQL(sql);
-
-		// set
-		this._SQLEditor.setValue(sql);
-	
-	},
-
-	_cleanSQL : function (sql) {
-		var first = sql.substring(0,1);
-		var last = sql.slice(-8);
-
-		// if sql is of format (SELECT * FROM table) as sub
-		if (first == '(' && last == ') as sub') {
-			var clean_sql = sql.substr(1, sql.length -9);
-			return clean_sql;
-		}
-
-		return sql;
-	},
 
 	_showEditors : function () {
-		this._SQLEditor.getWrapperElement().style.opacity = 1;
 		this._cartoEditor.getWrapperElement().style.opacity = 1;
-		this._sqltitle.style.opacity = 1;
 		this._cartotitle.style.opacity = 1;
 		this._refreshButton.style.opacity = 1;
 	},
 
 	_hideEditors : function () {
-		this._SQLEditor.getWrapperElement().style.opacity = 0;
 		this._cartoEditor.getWrapperElement().style.opacity = 0;
-		this._sqltitle.style.opacity = 0;
 		this._cartotitle.style.opacity = 0;
 		this._refreshButton.style.opacity = 0;
 	},
