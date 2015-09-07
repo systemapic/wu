@@ -331,7 +331,8 @@ module.exports = function(grunt) {
 					'public/js/lib/codemirror/mode/cartocss/codemirror.fetta.css',
 					'public/js/lib/codemirror/theme/mbo.css',
 					'public/css/opentip.css',
-					'public/js/lib/c3/c3.css'
+					'public/js/lib/c3/c3.css',
+					'public/js/lib/dc.js/dc.css'
 				],
 				
 				dest : 'dist/tmp/css.dependencies.css'
