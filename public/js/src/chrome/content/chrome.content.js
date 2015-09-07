@@ -140,7 +140,7 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		    isOn 	= options.isOn,
 		    title 	= options.title,
 		    type 	= options.type,
-		    dropArray  = options.dropArray,
+		    dropArray   = options.dropArray,
 		    color 	= options.color,
 		    val 	= options.value;
 
@@ -179,35 +179,57 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 			miniInput.className = 'chrome-field-mini-input';
 			miniInput.setAttribute('placeholder', 'auto');
 
+			miniInput.setAttribute('tabindex', options.tabindex);
+			
+
 			// set value
 			if (options.value) miniInput.value = val;
+
+			// other options
 			if ( !right ) Wu.DomUtil.addClass(miniInput, 'left-mini');
 			if ( !isOn  ) Wu.DomUtil.addClass(miniInput, 'left-mini-kill');			    
 
-
 			// set event
 			Wu.DomEvent.on(miniInput, 'blur', this.saveMiniBlur, this);
+
+			// Force numeric
+			// TODO: Write this into class.js
+			miniInput.onkeypress = this.forceNumeric;
 		}
 
 
 		if ( type == 'dualMiniInput' ) {
 
-			var miniInputMin = Wu.DomUtil.createId('input', 'field_mini_input_max_' + key, fieldWrapper);
-			miniInputMin.className = 'chrome-field-mini-input mini-input-dual';
-			miniInputMin.setAttribute('placeholder', 'auto');
+			var miniInputMax = Wu.DomUtil.createId('input', 'field_mini_input_max_' + key, fieldWrapper);
+			miniInputMax.className = 'chrome-field-mini-input mini-input-dual';
+			miniInputMax.setAttribute('placeholder', 'auto');
 
-			if ( options.value ) miniInputMin.value = val[1];
+			miniInputMax.setAttribute('tabindex', options.tabindex[1]);
 
-			Wu.DomEvent.on(miniInputMin, 'blur', this.saveMiniBlur, this);
+			if ( options.minMax ) miniInputMax.setAttribute('placeholder', options.minMax[1]);
+			if ( options.value  ) miniInputMax.value = val[1];
+
+			Wu.DomEvent.on(miniInputMax, 'blur', this.saveMiniBlur, this);
+
+			// Force numeric
+			// TODO: Write this into class.js
+			miniInputMax.onkeypress = this.forceNumeric;
 
 
 			var miniInputMin = Wu.DomUtil.createId('input', 'field_mini_input_min_' + key, fieldWrapper);
 			miniInputMin.className = 'chrome-field-mini-input mini-input-dual';
 			miniInputMin.setAttribute('placeholder', 'auto');
 
-			if ( options.value ) miniInputMin.value = val[0];
+			miniInputMin.setAttribute('tabindex', options.tabindex[0]);
+
+			if ( options.minMax ) miniInputMin.setAttribute('placeholder', options.minMax[0]);
+			if ( options.value  ) miniInputMin.value = val[0];
 
 			Wu.DomEvent.on(miniInputMin, 'blur', this.saveMiniBlur, this);
+
+			// Force numeric
+			// TODO: Write this into class.js
+			miniInputMin.onkeypress = this.forceNumeric;		
 
 		}
 
@@ -252,9 +274,12 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 			color.style.background = val;
 
 			if ( !isOn ) Wu.DomUtil.addClass(color, 'disable-color-ball');
-
 			if ( !right ) Wu.DomUtil.addClass(color, 'left-ball');
 
+			
+			// var that = this;
+			this.initSpectrum(this, val, color, key)
+			
 		}
 	
 		if ( type == 'colorrange' ) {
@@ -265,10 +290,43 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 			gradientStyle    += 'background: -moz-linear-gradient(right, '   + val.join() + ');';
 			gradientStyle    += 'background: linear-gradient(to right, '     + val.join() + ');';
 
-			var color = Wu.DomUtil.create('div', 'chrome-color-range', fieldWrapper);
+			var colorRangeWrapper = Wu.DomUtil.create('div', 'chrome-color-range-wrapper', fieldWrapper)
+			    colorRangeWrapper.setAttribute('key', key);
+
+			var color = Wu.DomUtil.create('div', 'chrome-color-range', colorRangeWrapper);
 			color.id = 'chrome-color-range_' + key;
+			color.setAttribute('key', key);
 			color.setAttribute('style', gradientStyle);
 
+			var clickCatcher = Wu.DomUtil.create('div', 'click-catcher displayNone', fieldWrapper);
+			    clickCatcher.id = 'click-catcher-' + key;
+			    clickCatcher.setAttribute('key', key);
+
+			var colorSelectorWrapper = Wu.DomUtil.create('div', 'chrome-color-selector-wrapper displayNone', colorRangeWrapper);
+			    colorSelectorWrapper.id = 'chrome-color-selector-wrapper-' + key;
+
+			var colorBall_3 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-3', colorSelectorWrapper);
+			    colorBall_3.id = 'color-range-ball-3-' + key;
+			    colorBall_3.style.background = val[2];
+			    colorBall_3.setAttribute('hex', val[2]);
+			    
+			var colorBall_2 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-2', colorSelectorWrapper);
+			    colorBall_2.id = 'color-range-ball-2-' + key;
+			    colorBall_2.style.background = val[1];
+			    colorBall_2.setAttribute('hex', val[1]);
+
+			var colorBall_1 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-1', colorSelectorWrapper);
+			    colorBall_1.id = 'color-range-ball-1-' + key;
+			    colorBall_1.style.background = val[0];
+			    colorBall_1.setAttribute('hex', val[0]);			        			    			    
+
+			    this.initSpectrum(this, val[0], colorBall_1, key);
+			    this.initSpectrum(this, val[1], colorBall_2, key);
+			    this.initSpectrum(this, val[2], colorBall_3, key);
+
+			Wu.DomEvent.on(color, 'click', this.toggleColorRange, this);
+
+			Wu.DomEvent.on(clickCatcher, 'click', this.stopEditingColorRange, this);
 		}
 
 
@@ -298,6 +356,107 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 			var fieldName = Wu.DomUtil.create('div', 'chrome-field-line', fieldWrapper);
 			fieldName.innerHTML = title ? title : key;
 		}
+	},
+
+	initSpectrum : function (context, hex, wrapper, key) {
+
+
+		$(wrapper).spectrum({
+			color: hex,
+			preferredFormat: 'hex',
+			showInitial: true,
+			showAlpha: false,
+			chooseText: 'Choose',
+			cancelText: 'Cancel',
+			containerClassName: 'dark clip',
+			change: function(hex) {
+
+				var r = Math.round(hex._r).toString(16);
+				var g = Math.round(hex._g).toString(16);
+				var b = Math.round(hex._b).toString(16);
+
+				if ( r.length == 1 ) r += '0';
+				if ( g.length == 1 ) g += '0';
+				if ( b.length == 1 ) b += '0';
+
+				var hex = '#' + r + g + b;
+
+				wrapper.style.background = hex;
+
+				context.updateColor(hex, key, wrapper);
+			}
+		});
+
+
+	},
+
+	
+	toggleColorRange : function (e) {
+	        
+		var key = e.target.getAttribute('key');
+
+		var rangeSelector = Wu.DomUtil.get('chrome-color-selector-wrapper-' + key);
+		var clickCatcher = Wu.DomUtil.get('click-catcher-' + key);
+
+		Wu.DomUtil.removeClass(rangeSelector, 'displayNone');
+		Wu.DomUtil.removeClass(clickCatcher, 'displayNone');
+
+	},
+
+	stopEditingColorRange : function (e) {
+
+		var key = e.target.getAttribute('key');
+
+		var rangeSelector = Wu.DomUtil.get('chrome-color-selector-wrapper-' + key);
+		var clickCatcher = Wu.DomUtil.get('click-catcher-' + key);
+
+		Wu.DomUtil.addClass(rangeSelector, 'displayNone');
+		Wu.DomUtil.addClass(clickCatcher, 'displayNone');
+
+	},
+
+	// _closeColorRangeSelector : function () {
+
+	// 	var key = 'colorrange';
+
+	// 	var rangeSelector = Wu.DomUtil.get('chrome-color-selector-wrapper-' + key);
+	// 	var clickCatcher = Wu.DomUtil.get('click-catcher-' + key);
+
+	// 	Wu.DomUtil.addClass(rangeSelector, 'displayNone');
+	// 	Wu.DomUtil.addClass(clickCatcher, 'displayNone');		
+
+	// },
+
+	// Make sure hex decimals have two digits
+	padToTwo : function (numberString) {
+
+		if (numberString.length < 2) numberString = '0' + numberString;
+		return numberString;
+	},
+
+	// OMG code... haven't written it myself...
+	// But it interpolates values between hex values
+	hexAverage : function (twoHexes) {
+		return twoHexes.reduce(function (previousValue, currentValue) {
+			return currentValue
+			.replace(/^#/, '')
+			.match(/.{2}/g)
+			.map(function (value, index) {
+				return previousValue[index] + parseInt(value, 16);
+			});
+		}, [0, 0, 0])
+		.reduce(function (previousValue, currentValue) {
+			var newValue = this.padToTwo(Math.floor(currentValue / twoHexes.length).toString(16));
+			return previousValue + newValue;
+		}.bind(this), '#');
+	},
+
+
+	forceNumeric : function (e) {
+
+		// only allow '0-9' + '.' and '-'
+		return e.charCode >= 45 && e.charCode <= 57 && e.charCode != 47;
+
 	},
 
 	// Toggle switch

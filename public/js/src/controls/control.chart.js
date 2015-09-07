@@ -170,8 +170,12 @@ Wu.Control.Chart = Wu.Control.extend({
 	// Create single point C3 pop-up content
 	singlePopUp : function (e) {
 
+
+		console.log('%c single pop-up', 'background: red; color: white;');
+		console.log('this.popupSettings', this.popupSettings);
+
 		// check if timeseries
-		var timeSeries = (this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == 'on');
+		var timeSeries = (this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == true );
 
 		// create content, as timeseries or normal
 		var content = timeSeries ? this.singleC3PopUp(e) : this._createPopupContent(e);

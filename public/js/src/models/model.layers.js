@@ -430,6 +430,18 @@ Wu.Layer = Wu.Class.extend({
 		this.save('tooltip');
 	},
 
+	getStyling : function () {
+		var json = this.store.style;
+		if (!json) return false;
+		var styleJSON = JSON.parse(json);
+		return styleJSON;
+	},
+
+	setStyling : function (styleJSON) {
+		this.store.style = JSON.stringify(styleJSON);
+		this.save('style');
+	},
+
 	getLegends : function () {
 		var meta = this.store.legends
 		if (meta) return JSON.parse(meta);

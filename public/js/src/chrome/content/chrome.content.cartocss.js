@@ -267,6 +267,8 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 			layerUuid : layer.getUuid()
 		}
 
+		console.log('_upfateLayer', layerJSON);
+
 		// create layer on server
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
 

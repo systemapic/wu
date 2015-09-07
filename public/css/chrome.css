@@ -1,3 +1,14 @@
+/*input[type='number'] {
+    -moz-appearance:textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}*/
+
+
 /* ????? ????? ????? ????? ????? ????? ????? ????? */
 /* ????? ????? ????? ????? ????? ????? ????? ????? */
 /* ????? ????? ????? ????? ????? ????? ????? ????? */
@@ -234,7 +245,8 @@ input.chrome-field-input {
     transition: width 100ms, opacity 100ms, margin 100ms;
     }
 
-.left-mini-kill {
+.left-mini-kill,
+.left-mini-kill:focus {
     width: 0;
     opacity: 0;
     margin: 0;
@@ -427,7 +439,7 @@ input.chrome-field-input {
   border-radius: 14px;
   top: 1px;
   right: 10px;
-  box-shadow: 0 0 0 1px #ccc inset, 0 0 0 3px white inset;
+  box-shadow: 0 0 0 1px #666 inset, 0 0 0 3px white inset;
   cursor: pointer;
   margin-left: 2px;
 }
@@ -462,12 +474,94 @@ input.chrome-field-input {
 }
 
 
+
+.chrome-color-range-wrapper,
 .chrome-color-range {
-  height: 18px;
-  width: 140px;
-  float: right;
-  box-shadow: 0 0 0px 1px #ccc inset, 0 0 0px 2px white inset;
+    position: relative;
+    float: right;
+    box-shadow: 0 0 0px 1px #ccc inset, 0 0 0px 2px white inset;
+    cursor: pointer;
+    z-index: 1000;
+    }
+
+
+.chrome-color-range {
+    height: 18px;
+    width: 140px;
+    }
+
+.chrome-color-selector-wrapper {
+    background: transparent;
+    position: absolute;
+    top: -3px;
+    right: -5px;
+    z-index: 9999999;
+    width: 149px;
+    height: 24px;
+    padding-top: 2px;
+    }
+
+.color-range-ball {
+    margin: 0;
+    /*float: left;*/
+    right: 0;
+    /*margin-left: 12px;*/
+    }
+
+
+.rangeball-1 {
+    position: absolute;
+    left: 2px;
+    top: 3px;
+    }
+
+.rangeball-2 {
+    position: absolute;
+    left: 66px;
+    top: 3px;
+    }
+
+.rangeball-3 {
+    position: absolute;
+    right: 2px;
+    top: 3px;
+    }
+
+.click-catcher {
+  position: fixed;
+  width: 350px;
+  height: 100%;
+  top: 262px;
+  right: 0;
+  z-index: 999;
+    }
+
+
+
+
+.chrome.chrome-content.cartocss.refresh-button {
+    z-index: 9999999999;
+    position: absolute;
+    bottom: 0;
+    left: 77px;    
+    }
+
+
+
+.leflet-container.leaflet-popup {
+  max-width: 468px;
 }
 
 
+.c3-header-metapair {
+    height: 18px;
+}
 
+#c3-header-metacontainer {
+  line-height: 1.2;
+}
+
+.metapair-1, .metapair-2, .metapair-3 {
+    padding-top: 0px !important;
+    border-top: 0px !important;
+}
