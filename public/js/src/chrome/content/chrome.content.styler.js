@@ -21,22 +21,29 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 		// create container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane styler', this.options.appendTo);
+		
+
 	},
 
 	_initLayout : function () {
 		if (!this._project) return;
   		
 		// active layer
-		this._initLayout_activeLayers();
+		this.layerSelector = this._initLayout_activeLayers();
 
+		// Create field wrapper
 		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._container);
 
+		// Create refresh button at bottom
 		this._createRefresh();
 
 		// mark as inited
 		this._inited = true;
+
+
 	},
 
+	
 	_refresh : function () {
 
 		this._flush();
@@ -59,7 +66,22 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 		// mark button
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+
+		
+		// Enable settings from layer we're working with
+		var layerUuid = this._getActiveLayerUiid();
+		if ( layerUuid ) this._selectedActiveLayer(false, layerUuid);		
+
+		// Select layer we're working on
+		var options = this.layerSelector.childNodes;
+		for ( var k in options ) {
+			if ( options[k].value == layerUuid ) options[k].selected = true;
+		}
+
+
+
 	},
+
 
 	closed : function () {
 		// clean up
@@ -68,13 +90,16 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	},	
 	
 	// event run when layer selected 
-	_selectedActiveLayer : function (e) {
+	_selectedActiveLayer : function (e, uuid) {
 
 		this._fieldsWrapper.innerHTML = '';
 
-		this.layerUuid = e.target.value;
+		this.layerUuid = uuid ? uuid : e.target.value
 
 		this._layer = this._project.getLayer(this.layerUuid);
+
+		// Store uuid of layer we're working with
+		this._storeActiveLayerUiid(this.layerUuid);		
 
 		// get current style, returns default if none
 		var style = this._layer.getStyling();
@@ -90,15 +115,22 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		// init style json
 		this._initStyle();
 
-		// fitte	
+		// Add temp layer
 		this._tempaddLayer();
+
+		// Display bottom container
+		Wu.DomUtil.removeClass(this._bottomContainer, 'displayNone');
 	},
 
 
 	_createRefresh : function () {
 
+		// create fixed bottom container
+		this._bottomContainer = Wu.DomUtil.create('div', 'chrome-content-bottom-container displayNone', this._container);
+
+
 		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
-		this._refreshButton = Wu.DomUtil.create('div', 'chrome chrome-content cartocss refresh-button', this._container, text);
+		this._refreshButton = Wu.DomUtil.create('div', 'chrome chrome-content cartocss refresh-button', this._bottomContainer, text);
 
 		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
 		Wu.DomEvent.on(this._refreshButton, 'mouseover', this._closeColorRangeSelector, this);
@@ -856,6 +888,8 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	// ADD/REMOVE THIN LAYERS
 	// ADD/REMOVE THIN LAYERS
 
+	// xoxoxoxoxoxox
+
 	_tempaddLayer : function () {
 
 		// remember
@@ -1202,7 +1236,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			layer : this._layer
 		}
 
-		this._updateLayer(layerOptions);
+		this._updateLayer(layerOptions);;		
 
 	},
 
@@ -1239,7 +1273,6 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			return_model : true,
 			layerUuid : layer.getUuid()
 		}
-
 
 
 		// create layer on server

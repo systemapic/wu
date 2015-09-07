@@ -26,7 +26,7 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 	_initLayout : function () {
 
 		// active layer
-		this._initLayout_activeLayers('Datasets', 'Select a dataset to filter...');
+		this.layerSelector = this._initLayout_activeLayers('Datasets', 'Select a dataset to filter...');
 
 		// wrapper
 		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._container);
@@ -228,11 +228,17 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		console.log('open!', this);
 	},
 
-	_selectedActiveLayer : function (e) {
+
+	_selectedActiveLayer : function (e, uuid) {
 		console.log('selected active layer, filter', e);
 
+		var layerUuid = uuid ? uuid : e.target.value;
+		
+		// Store uuid of layer we're working with
+		this._storeActiveLayerUiid(layerUuid);
+
 		// get layer
-		var layerUuid = e.target.value;
+		// var layerUuid = e.target.value;
 		this._layer = this._project.getLayer(layerUuid);
 
 		// selecting layer in dropdown...
@@ -347,6 +353,17 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 		// mark button
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+
+		// Enable settings from layer we're working with
+		var layerUuid = this._getActiveLayerUiid();
+		if ( layerUuid ) this._selectedActiveLayer(false, layerUuid);		
+
+		// Select layer we're working on
+		var options = this.layerSelector.childNodes;
+		for ( var k in options ) {
+			if ( options[k].value == layerUuid ) options[k].selected = true;
+		}
+
 	},
 
 	_showEditors : function () {

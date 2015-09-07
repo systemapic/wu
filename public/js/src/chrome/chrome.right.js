@@ -4,6 +4,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 	options : {
 		defaultWidth : 350,
+		editingLayer : false
 		
 	},
 
@@ -77,6 +78,8 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		// Make sure the "add folder"/editing of layer menu is closed
 		var layerMenu = app.MapPane.getControls().layermenu;
 		if (layerMenu) layerMenu.disableEdit();
+
+
 
 	},
 

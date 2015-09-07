@@ -23,7 +23,7 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
   
 
 		// active layer
-		this._initLayout_activeLayers();
+		this.layerSelector = this._initLayout_activeLayers();
 
 		// mark as inited
 		this._inited = true;
@@ -52,12 +52,27 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 
 		// mark button
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+
+		// Enable settings from layer we're working with
+		var layerUuid = this._getActiveLayerUiid();
+		if ( layerUuid ) this._selectedActiveLayer(false, layerUuid);
+
+		// Select layer we're working on
+		var options = this.layerSelector.childNodes;
+		for ( var k in options ) {
+			if ( options[k].value == layerUuid ) options[k].selected = true;
+		}		
 	},
 
 	// Event run when layer selected 
-	_selectedActiveLayer : function (e) {
+	_selectedActiveLayer : function (e, uuid) {
 
-		var layerUuid = e.target.value;
+		var layerUuid = uuid ? uuid : e.target.value;
+		
+		// Store uuid of layer we're working with
+		this._storeActiveLayerUiid(layerUuid);
+
+		
 		this._layer = this._project.getLayer(layerUuid);
 
 		// Get stored tooltip meta
@@ -391,18 +406,18 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		console.log('open!', this);
 	},
 
-	show : function () {
-		if (!this._inited) this._initLayout();
+	// show : function () {
+	// 	if (!this._inited) this._initLayout();
 
-		// hide others
-		this.hideAll();
+	// 	// hide others
+	// 	this.hideAll();
 
-		// show this
-		this._container.style.display = 'block';
+	// 	// show this
+	// 	this._container.style.display = 'block';
 
-		// mark button
-		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
-	},
+	// 	// mark button
+	// 	Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+	// },
 
 	// // Validate date format
 	// checkDateFormat : function (key) {
