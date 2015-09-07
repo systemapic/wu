@@ -1,5 +1,13 @@
 Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
+	// still todo: 
+	// 1. multiple filters
+	// 2. clear filter is firing a bit too often
+	// 3. cancel previous processing jobs on pile when updating layer
+	// 4. auto-select dataset/columns
+	// 5. thin_add layer when opening dataset
+
+
 	_initialize : function () {
 
 		// init container
@@ -53,18 +61,13 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		this._container.innerHTML = '';
 	},
 
-
 	_cleanup : function () {
 
 	},
 
 	_removeEvents : function () {
 
-		// Wu.DomEvent.off(window, 'resize', this._windowResize, this);
-
 	},
-
-
 
 	_createTitles : function () {
 		
@@ -88,7 +91,6 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 	},
 
 	_updateStyle : function () {
-
 
 	},
 	
@@ -138,8 +140,7 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 	},
 
 	getCartocssValue : function () {
-		var css = this._layer.getCartoCSS();
-		return css;
+		return this._layer.getCartoCSS();
 	},
 
 	getSQLValue : function () {
@@ -174,12 +175,13 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		    project 	= this._project;
 
 
+		// layer options
 		var layerOptions = layer.store.data.postgis;
-
 		layerOptions.sql = sql;
 		layerOptions.css = css;
 		layerOptions.file_id = file_id;		
 
+		// layer json
 		var layerJSON = {
 			geom_column: 'the_geom_3857',
 			geom_type: 'geometry',
@@ -361,7 +363,6 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		this._refreshButton.style.opacity = 0;
 	},
 
-
 	_createSqlEditor : function () {
 
 		// editor
@@ -379,25 +380,19 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 	_getColumns : function () {
 		if (!this._layer) return false;
-
 		var meta = Wu.parse(this._layer.getPostGISData().metadata);
-
-		console.log('_getColumns meta', meta);
-
 		var columns = meta.columns;
-
-		console.log('cols', columns);
-
 		return columns;
 	},
 
 	_createFilterDropdown : function () {
 
-		console.log('_createFilterDropdown', this._layer);
+		// remove already existing dropdown
+		if (this._filterDropdown) {
+			Wu.DomUtil.remove(this._filterDropdown);
+		}
 
-		// get columns
-		
-
+		// set titles
 		var title = 'Columns'
 		var subtitle = 'Select a column to filter by...';
 
@@ -423,19 +418,16 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		option.setAttribute('disabled', '');
 		option.setAttribute('selected', '');
 
-
-		console.log('columns: --> ', columns);
-
-
+		// create options
 		for (var c in columns) {
 			var option = Wu.DomUtil.create('option', 'active-layer-option', select);
 			option.value = c;
 			option.innerHTML = c;
 		}
 
-
 		// select event
 		Wu.DomEvent.on(select, 'change', this._selectedFilterColumn, this); // todo: mem leak?
+
 	},
 
 	_selectedFilterColumn : function (e) {
@@ -446,19 +438,13 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 	},
 
 	_createFilterChart : function (column) {
-		console.log('_createFilterChart');
-
 		
 		// get histogram from server
 		this._getHistogram(column, function (err, histogram) {
 
-			console.log('histogram: ', histogram);
-
-			// remove old
-			if (this._filterDiv) {
-				Wu.DomUtil.remove(this._filterDiv);
-			}
-
+			// remove old div
+			if (this._filterDiv) Wu.DomUtil.remove(this._filterDiv);
+			
 			// return on err
 			if (err) return console.error('histogram err: ', err);
 
@@ -482,69 +468,45 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 			// chart settings
 			chart
 			.width(340)
-			.height(120)
+			.height(180)
 			.gap(1)
 			.x(d3.scale.linear().domain([0, histogram.length + 1]))
 			.brushOn(true) // drag filter
-
-			// .centerBar(true)
 			.renderLabel(true)
-			// .yAxisLabel("Y Axis")
-			// .elasticX(true)
-			// .elasticY(true)
 			.dimension(runDimension)
-			// .round(dc.round.floor)
 			.group(speedSumGroup)
-
-			// .title(true).title(function (d) {
-			// 	return 'test: ' + d.value;
-			// })
-			// .renderTitle(true)
-			// .renderHorizontalGridLines(false)
-			// .label(function (d) {
-			// 	console.log(d);
-			// 	return 'test';
-			// })
-			.margins({top: 10, right: 10, bottom: 20, left: 50})
-			
-			// chart.colors(["#a60000","#ff0000", "#ff4040","#ff7373","#67e667","#39e639","#00cc00"]);
-
-			// chart.colorAccessor(function(d){
-			// 	console.log('colorAccessor', d);
-			// 	return d.x;
-			// })
+			.margins({top: 10, right: 10, bottom: 20, left: 40})
 
 			// filter event (throttled)
 			chart.on('filtered', _.throttle(function (chart, filter) {
-				if (!filter) return;
+				console.log('on.filtered', filter);
+				if (!filter) return this._clearFilter();
 
 				// round buckets
 				var buckets = [Math.round(filter[0]), Math.round(filter[1])];
 
 				// apply sql filter, create new layer, etc.
 				this._applyFilter(column, buckets, histogram);
-				
-			}.bind(this), 500));
+
+			}.bind(this), 1000));
 
 			// prettier y-axis
 			chart.yAxis().tickFormat(function(v) {
-				console.log('tickFormat v', v);
-
 				if (v > 1000000) return Math.round(v/1000000) + 'M';
 				if (v > 1000) return Math.round(v/1000) + 'k';
 				return v;
 			});
 
-			var tickValues = this._getYAxisTicks(histogram);
-			chart.yAxis().tickValues(tickValues);
+			// set y axis tick values
+			var ytickValues = this._getYAxisTicks(histogram);
+			chart.yAxis().tickValues(ytickValues);
 
+			// set format of x axis ticks
 			chart.xAxis().tickFormat(function(v) {
 				if (v > histogram.length) v = histogram.length - 1;
-				var value = Math.round(histogram[v].range_min * 10) / 10;
+				var value = Math.round(histogram[v].range_min * 100) / 100;
 				return value;
 			});
-
-			// chart.xAxis().tickValues([0, 10, 20, 30]);
 
 			// render
 			chart.render();
@@ -559,56 +521,81 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		});
 
 		var max = m.freq;
-		console.log('max: ', max); // 66944
 
 		// five ticks
+		var num_ticks = 3;
 		var ticks = [];
-
-		for (var n = 1; n < 6; n++) {
-			console.log('n: ', n);
-			// var val = Math.round(max/5 * n);
-			var val = max/5 * n;
-
-			console.log('val: ', val);
-			
-			
+		for (var n = 1; n < num_ticks + 1; n++) {
+			var val = max/num_ticks * n;
 			ticks.push(val);
 		}
-
-		console.log('ticks: ', ticks);
-
 		return ticks;
+	},
+
+	_getXAxisTicks : function (histogram) {
+		// // var m = _.max(histogram, function (h) {
+		// // 	return h.freq;
+		// // });
+
+		// // var max = m.freq;
+
+		// // // five ticks
+		// // var ticks = [];
+		// // for (var n = 1; n < 6; n++) {
+		// // 	var val = max/5 * n;
+		// // 	ticks.push(val);
+		// // }
+
+		// var ticks = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
+
+		// return ticks;
+	},
+
+	_clearFilter : function () {
+		console.log('CLEAR FILTER');
+
+		// get sql values
+		var currentSQL = this._SQLEditor.getValue();
+		var freshSQL = 'SELECT * FROM table';
+
+		// return of no change
+		if (currentSQL == freshSQL) return;
+
+		// set sql
+		this._SQLEditor.setValue(freshSQL);
+
+		// update style
+		this._updateStyle();
+
 	},
 
 	_applyFilter : function (column, buckets, histogram) {
 
 		console.log('_applyFilter', column, buckets, histogram);
 
-		
-
-
+		// get bucket
 		var bottom_bucket = buckets[0];
 		var top_bucket = buckets[1];
 		if (histogram.length <= top_bucket) top_bucket = histogram.length-1;
 
-		// get min range
+		// get ranges
 		var bucket_min = histogram[bottom_bucket];
-		var range_min = bucket_min.range_min;
-		// var range_max = bucket.range_max;
-
+		var range_min = Math.round(bucket_min.range_min * 100)/100;
 		var bucket_max = histogram[top_bucket];
-		var range_max = bucket_max.range_max;
+		var range_max = Math.round(bucket_max.range_max * 100)/100;
 		
 		console.log('range_min, range_max', range_min, range_max);
 
+		// create SQL
 		var sql = 'SELECT * FROM table';
-
-		sql += ' where ' + column + ' > ' + range_min + ' and ' + column + ' < ' + range_max;
+		sql    += ' where ' + column + ' > ' + range_min + ' and ' + column + ' < ' + range_max;
 
 		console.log('SQL', sql);
 
+		// set sql
 		this._SQLEditor.setValue(sql);
 
+		// update style
 		this._updateStyle();
 
 	},
@@ -629,6 +616,7 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		// get histogram 
 		Wu.post('/api/db/fetchHistogram', JSON.stringify(options), function (err, histogramJSON) {
 
+			// parse
 			var histogramData = Wu.parse(histogramJSON);
 
 			// return
