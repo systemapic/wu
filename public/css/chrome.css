@@ -1,3 +1,4 @@
+
 /*input[type='number'] {
     -moz-appearance:textfield;
 }
@@ -54,27 +55,24 @@ input::-webkit-inner-spin-button {
     display: block;
     }
 
-
 /* TROR DENNE ER FRA KNUT SIN RIGHT PANE DROP DOWN */
 .active-layer-option {
     color: black;
     }
 
 
-
 /* freedraw  freedraw  freedraw  freedraw */
 /* freedraw  freedraw  freedraw  freedraw */
 /* freedraw  freedraw  freedraw  freedraw */
-
 
 section.map.mode-create {
     cursor: pointer;
-}
+    }
 
 section.map.mode-edit div.polygon-elbow {
     opacity: 1;
     pointer-events: all;
-}
+    }
 
 .leaflet-container.leaflet-clickable, .leaflet-container.map-clickable, .leaflet-marker-icon, .leaflet-overlay-pane path.tracer.leaflet-clickable {
     cursor: pointer;
@@ -84,17 +82,16 @@ section.map.mode-edit div.polygon-elbow {
     stroke-opacity: 0.8;
     stroke-width: 1px;
     transition: fill-opacity 0.15s;
-}
+    }
 
 .leaflet-container.leaflet-clickable, .leaflet-container.map-clickable, .leaflet-marker-icon, .leaflet-overlay-pane path.tracer.leaflet-clickable:hover {
     fill-opacity: 0.3;
-}
-
+    }
 
 /*layermenu folder dbclick*/
 .layer-item-movers-wrap {
     /*pointer-events: none;*/
-}
+    }
 
 
 
@@ -113,7 +110,6 @@ section.map.mode-edit div.polygon-elbow {
     padding-top: 2px;
     padding-bottom: 2px;
     font-size: 14px;
-
     }
 
 .chrome-metafield-line:last-child {
@@ -126,7 +122,7 @@ section.map.mode-edit div.polygon-elbow {
     border-top: 1px dashed #999;
     margin-top: 1px;   
     padding-bottom: 0; 
-}    
+    }    
 
 input.chrome-field-input {
     border: none;
@@ -208,7 +204,6 @@ input.chrome-field-input {
     overflow: scroll;
     }
 
-
 .chrome-content-tooltip-title-field,
 .chrome-content-tooltip-title-field:focus {
     width: 100%;
@@ -217,7 +212,6 @@ input.chrome-field-input {
     padding-left: 10px;
     padding-right: 10px;
     }
-
 
 .chrome-field-mini-input,
 .chrome-field-mini-input:focus {
@@ -234,7 +228,6 @@ input.chrome-field-input {
     margin-left: 2px;
     opacity: 1;
     }
-
 
 .left-mini,
 .left-mini:focus {
@@ -253,26 +246,18 @@ input.chrome-field-input {
     border: none !important;
     }
 
-
 .mini-input-dual,
 .mini-input-dual:focus {
     width: 69px;
     }    
 
-
-    
-
 #c3-container {
-      max-height: 247px !important;
-}    
-
-
+    max-height: 247px !important;
+    }
 
 .chrome.chrome-content.chrome-pane {
     width: 352px;
-}
-
-
+    }
 
 .setClear,
 .chrome-set {
@@ -294,7 +279,7 @@ input.chrome-field-input {
 
 .setClear:hover {
     background: #888;
-}    
+    }
 
 .chrome-set,
 .setClear.setClear-on {
@@ -308,7 +293,7 @@ input.chrome-field-input {
 
 .chrome-set:active {
     background: #526E6A;
-}    
+    }    
 
 
 
@@ -328,7 +313,7 @@ input.chrome-field-input {
 
 .chrome-layer-toggle-button:hover {
     background: #bbbbbb;
-}    
+    }    
 
 .chrome-layer-toggle-button.chrome-baselayer {
     border-radius: 4px 0px 0px 4px;
@@ -338,7 +323,6 @@ input.chrome-field-input {
     border-radius: 0px 4px 4px 0px;
     border-left: 1px solid white;
     }
-
 
 .layer-toggle-active {
     background: #78a09c;
@@ -354,33 +338,33 @@ input.chrome-field-input {
     padding-top: 10px;
     }
 
-
-
 .chrome-layer-baselayer-toggle {
     margin-bottom: 25px;
     }
 
-
 .deactivated-layer:before {
-  content: 'occupied layer';  
-  background: rgba(255,255,255,0.7);
-  z-index: 9999;
-  position: absolute;
-  width: 289px;
-  height: 20px;
-  text-align: right;
-  font-weight: 900;
-  font-style: italic;
-  color: #C80000;
-  line-height: 1.3;
-}
+    content: 'layer';
+    background: rgba(255,255,255,0.7);
+    z-index: 9999;
+    position: absolute;
+    width: 289px;
+    height: 20px;
+    text-align: right;
+    font-weight: 900;
+    font-style: italic;
+    color: #C80000;
+    line-height: 1.3;
+    }
+
+.editing-baselayers .deactivated-layer:before { 
+    content: 'base layer';
+    }
+
 
 
 .disable-mini-input {
-  opacity: 0.2;
-}
-
-
+    opacity: 0.2;
+    }
 
 
 
@@ -413,7 +397,6 @@ input.chrome-field-input {
     pointer-events: none;
     }
 
-
 .select-field-wrap select {
     padding: 1px 8px 0px 8px;
     width: 130%;
@@ -430,21 +413,18 @@ input.chrome-field-input {
     color: black;
     }
 
-
 .chrome-color-ball {
-  width: 18px;
-  height: 18px;
-  position: relative;
-  float: right;
-  border-radius: 14px;
-  top: 1px;
-  right: 10px;
-  box-shadow: 0 0 0 1px #666 inset, 0 0 0 3px white inset;
-  cursor: pointer;
-  margin-left: 2px;
-}
-
-
+    width: 18px;
+    height: 18px;
+    position: relative;
+    float: right;
+    border-radius: 14px;
+    top: 1px;
+    right: 10px;
+    box-shadow: 0 0 0 1px #666 inset, 0 0 0 3px white inset;
+    cursor: pointer;
+    margin-left: 2px;
+    }
 
 .left-ball {
     float: left;
@@ -458,7 +438,6 @@ input.chrome-field-input {
 
     }
 
-
 .disable-color-ball {
     width: 0;
     height: 0;
@@ -466,14 +445,11 @@ input.chrome-field-input {
     margin: 0;
     }
 
-
 .chrome-add-color {
-  float: right;
-  position: relative;
-  right: 4px;
-}
-
-
+    float: right;
+    position: relative;
+    right: 4px;
+    }
 
 .chrome-color-range-wrapper,
 .chrome-color-range {
@@ -483,7 +459,6 @@ input.chrome-field-input {
     cursor: pointer;
     z-index: 1000;
     }
-
 
 .chrome-color-range {
     height: 18px;
@@ -503,11 +478,8 @@ input.chrome-field-input {
 
 .color-range-ball {
     margin: 0;
-    /*float: left;*/
     right: 0;
-    /*margin-left: 12px;*/
     }
-
 
 .rangeball-1 {
     position: absolute;
@@ -528,23 +500,18 @@ input.chrome-field-input {
     }
 
 .click-catcher {
-  position: fixed;
-  width: 350px;
-  height: 100%;
-  top: 262px;
-  right: 0;
-  z-index: 999;
+    position: fixed;
+    width: 350px;
+    height: 100%;
+    top: 262px;
+    right: 0;
+    z-index: 999;
     }
 
 
 
 
-.chrome.chrome-content.cartocss.refresh-button {
-    z-index: 9999999999;
-    position: absolute;
-    bottom: 0;
-    left: 77px;    
-    }
+
 
 
 
@@ -565,3 +532,74 @@ input.chrome-field-input {
     padding-top: 0px !important;
     border-top: 0px !important;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.chrome-content.settings-tabs-wrapper {
+    position: absolute;
+    top: 112px;
+    padding-top: 8px;
+    min-height: 100%;
+    width: 100%;
+    overflow: scroll;
+    padding-bottom: 150px;
+    box-sizing: border-box;
+    }
+
+.chrome.chrome-content.chrome-pane {
+    width: 352px;
+    min-height: 100%;
+    position: absolute;
+    }
+
+.chrome-content-bottom-container {
+    position: absolute;
+    width: 100%;
+    bottom: 153px;
+    padding-bottom: 30px;
+    padding-top: 20px;
+    border-top: 1px dashed #ccc;
+    }
+
+.chrome.chrome-content.cartocss.refresh-button {
+    z-index: 9999999999;
+    }
+
+.chrome.chrome-content.styler {
+    margin-top: 0;
+    }
+
+
+
+.chrome-pane.layers .chrome-field-line {
+      padding-left: 39px;
+    }
+
+
+.chrome-content.settings-button-wrapper {
+    padding-right: 20px;
+}    
+
+.chrome-content.settings-button {
+    margin-top: 3px;
+    font-size: 13px;
+    margin-right: 3px;    
+    }
+
+

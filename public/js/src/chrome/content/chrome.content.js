@@ -119,6 +119,19 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		Wu.DomEvent.on(select, 'change', this._selectedActiveLayer, this); // todo: mem leak?
 
 
+		return select;
+
+	},
+
+
+	_storeActiveLayerUiid : function (uuid) {
+		app.Chrome.Right.options.editingLayer = uuid;
+	},
+
+	_getActiveLayerUiid : function () {
+		var uuid;
+		app.Chrome.Right.options.editingLayer ? uuid = app.Chrome.Right.options.editingLayer : uuid = false;
+		return uuid;
 	},
 
 	opened : function () {
