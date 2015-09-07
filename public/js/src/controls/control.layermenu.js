@@ -881,6 +881,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 
+		app.Chrome.Right.options.editingLayer = layer.getUuid();
+
 	},
 
 	// disable by layermenuItem
@@ -895,6 +897,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		// Make room for Layer inspector
 		var dimensions = app._getDimensions();
 		this.resizeEvent(dimensions);		
+
+		app.Chrome.Right.options.editingLayer = false;
 	},
 
 	// disable by layer

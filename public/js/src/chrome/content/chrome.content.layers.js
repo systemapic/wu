@@ -108,13 +108,19 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 	toggleToBaseLayers : function () {
 		Wu.DomUtil.addClass(this.baselayerButton, 'layer-toggle-active')
 		Wu.DomUtil.removeClass(this.layerButton, 'layer-toggle-active')
-		this._mode = 'baselayer';	
+
+		Wu.DomUtil.addClass(this._fieldsWrapper, 'editing-baselayers')
+
+		this._mode = 'baselayer';
 		this.update();		
 	},
 
 	toggleToLayers : function () {
 		Wu.DomUtil.removeClass(this.baselayerButton, 'layer-toggle-active')
 		Wu.DomUtil.addClass(this.layerButton, 'layer-toggle-active')
+
+		Wu.DomUtil.removeClass(this._fieldsWrapper, 'editing-baselayers')
+
 		this._mode = 'layer';
 		this.update();
 	},

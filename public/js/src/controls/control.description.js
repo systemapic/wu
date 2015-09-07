@@ -122,7 +122,7 @@ L.Control.Description = Wu.Control.extend({
 		_legendHTML += '<div class="info-legend-frame">';
 
 		_legendHTML += '<div class="info-legend-val info-legend-min-val">' + options.minVal + '</div>';
-		_legendHTML += '<div class="info-legend-val info-legend-med-val">' + options.medVal + '</div>';
+		// _legendHTML += '<div class="info-legend-val info-legend-med-val">' + options.medVal + '</div>';
 		_legendHTML += '<div class="info-legend-val info-legend-max-val">' + options.maxVal + '</div>';
 
 		// Gradient
@@ -550,7 +550,10 @@ L.Control.Description = Wu.Control.extend({
 	initFakeLegend : function (layer) {
 
 		var meta = layer.getMeta();
+
+		console.log('%c init legend = > ', 'background: red; color: white;');
 		console.log('meta: ', meta, layer);
+		console.log('%c *************** ', 'background: red; color: white;');
 
 		// set title
 		var title = layer.getTitle();
@@ -566,11 +569,13 @@ L.Control.Description = Wu.Control.extend({
 		var num_columns = _.size(meta.columns);
 		var size_bytes = meta.size_bytes;
 		var startend = this._parseStartEndDate(meta);
+		var style = JSON.parse(layer.store.style);
+
 
 		var description_meta = {
 			'Number of points' : num_points,
 			'Covered area (km<sup>2</sup>)' : area,
-			'Columns' : num_columns,
+			// 'Columns' : num_columns,
 			'Data size' : size_bytes,
 			'Start date' : startend.start,
 			'End date' : startend.end
@@ -578,20 +583,54 @@ L.Control.Description = Wu.Control.extend({
 
 		// set description meta
 		this.setMeta(description_meta);
-			
-		// create legend
-		var gradientOptions = {
-			colorStops : ["#ff0000", "#ff3600", "#ff8100", "#ffd700", "#a5ff00", "#00ffa9", "#00ffdf", "#009eff", "#003dff", "#2f00ff"],
-			minVal : -5,
-			medVal : 0,
-			maxVal : 5,
-			bline : 'Velocity (mm pr. year)'
+
+
+
+		var key = 'point';
+		
+
+		// COLOR RANGE
+		if ( style[key].color.range ) {
+
+			var colorStops = style[key].color.value;
+			var customMinMax = style[key].color.customMinMax;
+			var minMax = style[key].color.minMax
+
+			if ( customMinMax[0] != null || customMinMax[0] != NaN || customMinMax[0] != '' ) {
+				var min = customMinMax[0];
+			} else {
+				var min = minMax[0];
+			}
+
+			if ( customMinMax[1] != null || customMinMax[1] != NaN || customMinMax[1] != '' ) {
+				var max = customMinMax[1];
+			} else {
+				var max = minMax[1];
+			}
+
+
+			// create legend
+			var gradientOptions = {
+				colorStops : colorStops,
+				minVal : customMinMax[0],
+				// medVal : (customMinMax[0]+customMinMax[1]),
+				maxVal : customMinMax[1],
+				bline : 'Velocity (mm pr. year)'
+			}
+
+			var legendHTML = this.gradientLegend(gradientOptions);
+
+		} else {
+
+			var legendHTML = 'TODO: Create legend for static colors!';
+
 		}
 
-		var gradientHTML = this.gradientLegend(gradientOptions);
+			
+
 
 		// set legend
-		this.setLegend(gradientHTML);
+		this.setLegend(legendHTML);
 
 	}
 
