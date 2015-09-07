@@ -23,7 +23,6 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		// wrapper
 		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._container);
 
-		
 		// sql editor
 		this._createSqlEditor();
 
@@ -403,7 +402,10 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		var subtitle = 'Select a column to filter by...';
 
 		// active layer wrapper
-		var wrap = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper', this._container);
+		var wrap = this._filterDropdown = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper');
+
+		// insert on top of containe
+		this._container.insertBefore(wrap, this._container.children[1]);
 
 		// title
 		var title = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
@@ -426,7 +428,6 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 
 		for (var c in columns) {
-			// var column = columns[c];
 			var option = Wu.DomUtil.create('option', 'active-layer-option', select);
 			option.value = c;
 			option.innerHTML = c;
@@ -435,90 +436,180 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 		// select event
 		Wu.DomEvent.on(select, 'change', this._selectedFilterColumn, this); // todo: mem leak?
-
-
 	},
 
 	_selectedFilterColumn : function (e) {
 
 		var column = e.target.value;
 
-		console.log('valuye: ', column);
-
 		this._createFilterChart(column);
 	},
 
 	_createFilterChart : function (column) {
-
 		console.log('_createFilterChart');
 
-		// create div
-		this._filterDiv = Wu.DomUtil.createId('div', 'chrome-content-filter-chart', this._container);
-
-		var chart = dc.barChart(this._filterDiv);
-
+		
+		// get histogram from server
 		this._getHistogram(column, function (err, histogram) {
 
-			console.log('got histo', err, histogram);
-			// return;
+			console.log('histogram: ', histogram);
 
+			// remove old
+			if (this._filterDiv) {
+				Wu.DomUtil.remove(this._filterDiv);
+			}
 
+			// return on err
+			if (err) return console.error('histogram err: ', err);
 
-			// d3.json(histogram, function (err, data) {
-			// 	console.log('d3 err', err);
-			// 	console.log('data: ', data);
+			// create div
+			this._filterDiv = Wu.DomUtil.createId('div', 'chrome-content-filter-chart');
+			this._container.insertBefore(this._filterDiv, this._filterDropdown.nextSibling);
 
-			var data = histogram;
+			// return if no histogram
+			if (!histogram) {
+				// not valid data to create histogram from
+				this._filterDiv.innerHTML = 'No valid data to create histogram from.'
+				return;
+			}
 
-			console.log('LENGTH', data.length);
-
-			var ndx             = crossfilter(data),
+			// create chart
+			var chart = dc.barChart(this._filterDiv),
+		   	    ndx             = crossfilter(histogram),
 			    runDimension    = ndx.dimension(function(d) {return +d.bucket;}), 			// x-axis
 			    speedSumGroup   = runDimension.group().reduceSum(function(d) {return d.freq;});	// y-axis
 
+			// chart settings
 			chart
 			.width(340)
-			.height(160)
+			.height(120)
 			.gap(1)
-			.x(d3.scale.linear().domain([0, data.length + 1]))
+			.x(d3.scale.linear().domain([0, histogram.length + 1]))
 			.brushOn(true) // drag filter
 
 			// .centerBar(true)
 			.renderLabel(true)
 			// .yAxisLabel("Y Axis")
-			.elasticX(true)
-			.elasticY(true)
+			// .elasticX(true)
+			// .elasticY(true)
 			.dimension(runDimension)
 			// .round(dc.round.floor)
 			.group(speedSumGroup)
-			// .renderTitle(true).title(function (d) {
+
+			// .title(true).title(function (d) {
 			// 	return 'test: ' + d.value;
 			// })
-			// .renderHorizontalGridLines(true)
+			// .renderTitle(true)
+			// .renderHorizontalGridLines(false)
 			// .label(function (d) {
 			// 	console.log(d);
 			// 	return 'test';
 			// })
-			.margins({top: 10, right: 30, bottom: 30, left: 80})
-			.filterPrinter(function (filters) {
-				var f = filters[0];
-				console.log('left: ', f[0]);	// prints min/max of bucket filter
-				console.log('right: ', f[1]);
+			.margins({top: 10, right: 10, bottom: 20, left: 50})
+			
+			// chart.colors(["#a60000","#ff0000", "#ff4040","#ff7373","#67e667","#39e639","#00cc00"]);
 
-				console.error('TODO: get filter value from bucket; create SQL');
-				return f[0];
+			// chart.colorAccessor(function(d){
+			// 	console.log('colorAccessor', d);
+			// 	return d.x;
+			// })
+
+			// filter event (throttled)
+			chart.on('filtered', _.throttle(function (chart, filter) {
+				if (!filter) return;
+
+				// round buckets
+				var buckets = [Math.round(filter[0]), Math.round(filter[1])];
+
+				// apply sql filter, create new layer, etc.
+				this._applyFilter(column, buckets, histogram);
+				
+			}.bind(this), 500));
+
+			// prettier y-axis
+			chart.yAxis().tickFormat(function(v) {
+				console.log('tickFormat v', v);
+
+				if (v > 1000000) return Math.round(v/1000000) + 'M';
+				if (v > 1000) return Math.round(v/1000) + 'k';
+				return v;
 			});
 
+			var tickValues = this._getYAxisTicks(histogram);
+			chart.yAxis().tickValues(tickValues);
+
+			chart.xAxis().tickFormat(function(v) {
+				if (v > histogram.length) v = histogram.length - 1;
+				var value = Math.round(histogram[v].range_min * 10) / 10;
+				return value;
+			});
+
+			// chart.xAxis().tickValues([0, 10, 20, 30]);
+
+			// render
 			chart.render();
 
-			labels = chart.g().selectAll("rect.bar text");
-			console.log(labels);
+		}.bind(this));
 
-			// });
+	},
 
-
+	_getYAxisTicks : function (histogram) {
+		var m = _.max(histogram, function (h) {
+			return h.freq;
 		});
 
+		var max = m.freq;
+		console.log('max: ', max); // 66944
+
+		// five ticks
+		var ticks = [];
+
+		for (var n = 1; n < 6; n++) {
+			console.log('n: ', n);
+			// var val = Math.round(max/5 * n);
+			var val = max/5 * n;
+
+			console.log('val: ', val);
+			
+			
+			ticks.push(val);
+		}
+
+		console.log('ticks: ', ticks);
+
+		return ticks;
+	},
+
+	_applyFilter : function (column, buckets, histogram) {
+
+		console.log('_applyFilter', column, buckets, histogram);
+
+		
+
+
+		var bottom_bucket = buckets[0];
+		var top_bucket = buckets[1];
+		if (histogram.length <= top_bucket) top_bucket = histogram.length-1;
+
+		// get min range
+		var bucket_min = histogram[bottom_bucket];
+		var range_min = bucket_min.range_min;
+		// var range_max = bucket.range_max;
+
+		var bucket_max = histogram[top_bucket];
+		var range_max = bucket_max.range_max;
+		
+		console.log('range_min, range_max', range_min, range_max);
+
+		var sql = 'SELECT * FROM table';
+
+		sql += ' where ' + column + ' > ' + range_min + ' and ' + column + ' < ' + range_max;
+
+		console.log('SQL', sql);
+
+		this._SQLEditor.setValue(sql);
+
+		this._updateStyle();
 
 	},
 
@@ -526,10 +617,6 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		if (!this._layer) return;
 
 		var postgisData = this._layer.getPostGISData();
-
-		console.log('postgisData', postgisData);
-
-		
 
 		var options = {
 			layer_id : postgisData.layer_id,
@@ -539,37 +626,14 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 			num_buckets : 50
 		}
 
-		console.log('options', options);
-
-		// return;
-
 		// get histogram 
 		Wu.post('/api/db/fetchHistogram', JSON.stringify(options), function (err, histogramJSON) {
 
-			console.log('fetchHistogram', err, histogramJSON);
-
-			// // new layer
-			// var newLayerStyle = Wu.parse(newLayerJSON);
-
 			var histogramData = Wu.parse(histogramJSON);
-
-			// console.log('histogramData', histogramData);
-
-			// // catch errors
-			// if (newLayerStyle.error) {
-			// 	done && done();
-			// 	return console.error(newLayerStyle.error);
-			// }
-
-			// // set & update
-			// layer.setStyle(newLayerStyle.options);
-			// layer.update({enable : true});
 
 			// return
 			done && done(null, histogramData);
 		});
-
-
 	}
 });
 

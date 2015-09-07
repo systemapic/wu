@@ -90,7 +90,7 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		var subtitle = subtitle || 'Select a layer to style...';
 
 		// active layer wrapper
-		var wrap = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper', this._container);
+		var wrap = this._activeLayersWrap = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper', this._container);
 
 		// title
 		var title = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
