@@ -67,7 +67,7 @@ ops.push(function (callback) {
 });
 
 async.series(ops, function (err, result) {
-	console.log('all done, ', err, result);
+	// console.log('all done, ', err, result);
 	process.exit(0);
 });
 

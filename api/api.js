@@ -3,23 +3,18 @@
 // config
 var config = require('../config/server-config.js');
 
-// redis store for temp passwords
-var redisStore = require('redis').createClient(config.serverConfig.temptokenRedis.port, config.serverConfig.temptokenRedis.host);
-redisStore.on('error', function (err) {
-	console.log('Redis error: ', err);
-});
-redisStore.auth(config.serverConfig.temptokenRedis.auth);
 
 // api
 var api = {};
-api.version 		= require('fs').readFileSync('../public/js/src/core/app.js').toString().split("'")[1];
-api.config 		= config.serverConfig;
-api.clientConfig 	= config.clientConfig;
-api.loginConfig 	= config.loginConfig;
-api.redis 		= redisStore;
+api.version = require('fs').readFileSync('../public/js/src/core/app.js').toString().split("'")[1];
+api.config = config.serverConfig;
+api.clientConfig = config.clientConfig;
+api.loginConfig = config.loginConfig;
+
 
 // exports
 module.exports 		= api;
+module.exports.redis 	= require('./api.redis');
 module.exports.geo 	= require('./api.geo');
 module.exports.file 	= require('./api.file');
 module.exports.auth 	= require('./api.auth');
@@ -38,9 +33,10 @@ module.exports.portal 	= require('./api.portal');
 module.exports.access 	= require('./api.access');
 module.exports.client 	= require('./api.client');
 module.exports.socket 	= require('./api.socket');
+module.exports.postgis  = require('./api.postgis');
 module.exports.project 	= require('./api.project');
 module.exports.provider = require('./api.provider');
 module.exports.analytics = require('./api.analytics');
 
 // print version
-console.log('\nSystemapic API version: ', api.version, '\n');
+console.log('\nSystemapic API version is ', api.version, '\n');

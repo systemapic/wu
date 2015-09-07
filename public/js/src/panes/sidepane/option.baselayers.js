@@ -45,14 +45,40 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 		// todo!!!
 	},
 
+	fillLayers : function () {
+
+		this._layers = {};
+
+		// return if no layers
+	       	if (_.isEmpty(this.project.layers)) return;
+
+	       	var sortedLayers = this.sortLayers(this.project.layers);
+
+	       	sortedLayers.forEach(function (provider) {
+
+	       		this.addProvider(provider.key);
+
+	       		provider.layers.forEach(function (layer) {
+	       			this.addLayer(layer);
+	       		}, this);
+
+	       	}, this);
+
+	       	// calculate height for wrapper
+	       	this.calculateHeight();
+
+	},
+
 	addLayer : function (layer) {
 
+		console.log('addLayer', layer.getTitle());
+
 		// create and append div
-		var container = Wu.DomUtil.create('div', 'item-list select-elem ct0 baselayer', this._outer);
+		var container = Wu.DomUtil.create('div', 'item-list select-elem baselayer', this._outer);
 		var text = Wu.DomUtil.create('div', 'item-list-inner-text', container);
 		
 		// set title
-		text.innerHTML = layer.store.title;
+		text.innerHTML = layer.getTitle();
 
 		// set height if short title - hacky..
 		if (layer.store.title) { 
@@ -265,8 +291,8 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 		}
 
 		var project = app.activeProject;
-		var thumbCreated = project.getThumbCreated(); 			// refactor
-		if (!thumbCreated) project.createProjectThumb();		
+		// var thumbCreated = project.getThumbCreated(); 			// refactor
+		// if (!thumbCreated) project.createProjectThumb();		
 
 	},
 
@@ -291,6 +317,9 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 	enableLayer : function (baseLayer) {
 
+		console.log('enableLayer');
+		console.log('baseLayer', baseLayer);
+
 		// get layer
 		var layer = baseLayer.layer;
 
@@ -310,6 +339,9 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 	disableLayer : function (baseLayer) {
 		if (!baseLayer) return
+
+		console.log('enableLayer');
+		console.log('baseLayer', baseLayer);			
 
 		// get layer
 		var layer = baseLayer.layer;
@@ -345,8 +377,8 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 		// Runs only for base layer menu?
 		var min = _.size(this.project.getLayermenuLayers()),
-		    padding = this.numberOfProviders * 35;
-		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
+		    padding = this.numberOfProviders * 30;
+		this.maxHeight = (_.size(this.project.layers) - min) * 30 + padding;
 		this.minHeight = 0;
 
 		// add 100 if in editMode
@@ -362,11 +394,14 @@ Wu.SidePane.Options.BaseLayers = Wu.SidePane.Options.Item.extend({
 
 		// activate layers
 		layers.forEach(function (a) {
-			this.activate(a.store.uuid);
+			if (a.store) this.activate(a.store.uuid);
 		}, this);
 
 		layermenuLayers.forEach(function (bl) {
-			var layer = _.find(layers, function (l) { return l.store.uuid == bl.layer; });
+			var layer = _.find(layers, function (l) { 
+				if (!l.store) return false;
+				return l.store.uuid == bl.layer; 
+			});
 			if (layer) this.deactivate(layer.store.uuid);
 		}, this);
 

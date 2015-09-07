@@ -1,0 +1,567 @@
+/*input[type='number'] {
+    -moz-appearance:textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}*/
+
+
+/* ????? ????? ????? ????? ????? ????? ????? ????? */
+/* ????? ????? ????? ????? ????? ????? ????? ????? */
+/* ????? ????? ????? ????? ????? ????? ????? ????? */
+/* ????? ????? ????? ????? ????? ????? ????? ????? */
+
+
+/* ????? */
+.presets-container {
+    width: 100px;
+    height: 100px;
+    border-radius: 4px;
+    border: 1px solid black;
+    position: relative;
+    margin: 10px;
+    float: right;
+    }
+
+/* ????? */
+.presets-container-title {
+    bottom: 0;
+    position: absolute;
+    }
+
+/* ????? */
+.presets-wrapper {
+    height: 150px;
+    }
+
+/* ????? */
+.styleeditor.selector-text {
+    width: 60%;
+    float: left;
+    }
+
+/* ????? */
+.dropdown.wrapper {
+    float: left;
+    width: 40%;
+    }
+
+/* ????? */
+#checkbox-marker-width-scale {
+    display: block;
+    }
+
+
+/* TROR DENNE ER FRA KNUT SIN RIGHT PANE DROP DOWN */
+.active-layer-option {
+    color: black;
+    }
+
+
+
+/* freedraw  freedraw  freedraw  freedraw */
+/* freedraw  freedraw  freedraw  freedraw */
+/* freedraw  freedraw  freedraw  freedraw */
+
+
+section.map.mode-create {
+    cursor: pointer;
+}
+
+section.map.mode-edit div.polygon-elbow {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.leaflet-container.leaflet-clickable, .leaflet-container.map-clickable, .leaflet-marker-icon, .leaflet-overlay-pane path.tracer.leaflet-clickable {
+    cursor: pointer;
+    fill-opacity: 0.7;
+    fill: #FF4646;
+    stroke: red;
+    stroke-opacity: 0.8;
+    stroke-width: 1px;
+    transition: fill-opacity 0.15s;
+}
+
+.leaflet-container.leaflet-clickable, .leaflet-container.map-clickable, .leaflet-marker-icon, .leaflet-overlay-pane path.tracer.leaflet-clickable:hover {
+    fill-opacity: 0.3;
+}
+
+
+/*layermenu folder dbclick*/
+.layer-item-movers-wrap {
+    /*pointer-events: none;*/
+}
+
+
+
+
+
+/* TOOLTIP FIELDS */
+/* TOOLTIP FIELDS */
+/* TOOLTIP FIELDS */
+
+.chrome-field-wrapper {
+    padding: 0px 30px 200px 30px;
+    }
+
+.chrome-metafield-line {
+    border-top: 1px solid #999;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 14px;
+
+    }
+
+.chrome-metafield-line:last-child {
+    border-bottom: 1px solid #999;    
+    }
+
+.chrome-metafield-line .chrome-metafield-line {
+    border: none;
+    color: #999;
+    border-top: 1px dashed #999;
+    margin-top: 1px;   
+    padding-bottom: 0; 
+}    
+
+input.chrome-field-input {
+    border: none;
+    }
+
+.chrome-switch-container {
+    width: 29px;
+    height: 16px;
+    background-color: white;
+    border-radius: 20px;
+    top: 2px;
+    float: left;
+    margin-right: 10px;    
+    position: relative;
+    box-shadow: 0 0 1px 0 rgba(0,0,0,0.5) inset;
+    cursor: pointer;
+    overflow: visible;
+    -webkit-transition: background-color 100ms;
+    -moz-transition: background-color 100ms;
+    -ms-transition: background-color 100ms;
+    -o-transition: background-color 100ms;
+    transition: background-color 100ms;
+    }
+
+.right-switch {
+    float: right;
+    margin-left: 10px;
+    margin-right: 0;
+    }    
+
+.chrome-switch-container:before {
+    content: '';
+    position: absolute;
+    background-color: white;
+    left: 0;
+    width: 15px;
+    height: 15px;
+    border-radius: 20px;
+    box-shadow: 0 0 1px 0 rgba(0,0,0,0.1) inset, 1px 1px 2px 0 rgba(0,0,0,0.3);
+    -webkit-transition: left 100ms;
+    -moz-transition: left 100ms;
+    -ms-transition: left 100ms;
+    -o-transition: left 100ms;
+    transition: left 100ms;
+    }    
+
+.chrome-switch-container.switch-on {
+    background-color: #71c4a8;
+    }
+
+.chrome-switch-container.switch-on:before {
+    left: 15px;
+    }
+
+.chrome-content-header {
+    font-weight: 900;
+    font-size: 14px;
+    margin-bottom: 5px;    
+    }
+
+.chrome-content-header-gray {
+    font-style: italic;
+    color: #999;
+    font-weight: 500;    
+    }
+
+.chrome-content-section-wrapper {
+    margin-bottom: 20px;
+    }
+
+
+
+
+.chrome-content.settings-tabs-wrapper {
+    position: absolute;
+    top: 112px;
+    padding-top: 8px;
+    max-height: 100%;
+    overflow: scroll;
+    }
+
+
+.chrome-content-tooltip-title-field,
+.chrome-content-tooltip-title-field:focus {
+    width: 100%;
+    border: 1px solid #ccc !important;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    }
+
+
+.chrome-field-mini-input,
+.chrome-field-mini-input:focus {
+    width: 34px;
+    height: 18px;
+    position: relative;
+    float: right;
+    border: 1px solid #ccc !important;
+    top: 1px;
+    text-align: center;
+    line-height: 1.2;
+    font-size: 12px;
+    font-weight: 900;
+    margin-left: 2px;
+    opacity: 1;
+    }
+
+
+.left-mini,
+.left-mini:focus {
+    float: left;
+    margin-left: 0;
+    margin-right: 5px;
+    -webkit-transition: width 100ms, opacity 100ms, margin 100ms;
+    transition: width 100ms, opacity 100ms, margin 100ms;
+    }
+
+.left-mini-kill,
+.left-mini-kill:focus {
+    width: 0;
+    opacity: 0;
+    margin: 0;
+    border: none !important;
+    }
+
+
+.mini-input-dual,
+.mini-input-dual:focus {
+    width: 69px;
+    }    
+
+
+    
+
+#c3-container {
+      max-height: 247px !important;
+}    
+
+
+
+.chrome.chrome-content.chrome-pane {
+    width: 352px;
+}
+
+
+
+.setClear,
+.chrome-set {
+    background: #999;
+    position: relative;
+    float: left;
+    font-size: 11px;
+    font-weight: 900;
+    width: 50px;
+    text-align: center;
+    height: 17px;
+    line-height: 1.5;
+    margin-right: 8px;
+    border-radius: 3px;
+    top: 1px;
+    color: white;
+    cursor: pointer;
+    }
+
+.setClear:hover {
+    background: #888;
+}    
+
+.chrome-set,
+.setClear.setClear-on {
+    background: #78a09c;
+    }
+
+.chrome-set:hover,
+.setClear.setClear-on:hover {   
+    background: #668884;
+    }
+
+.chrome-set:active {
+    background: #526E6A;
+}    
+
+
+
+
+.chrome-layer-toggle-button {
+    width: 50%;
+    background: #cccccc;
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    padding: 7px 1px 7px 1px;
+    color: #333;
+    font-weight: 900;
+    font-size: 14px;
+    cursor: pointer;
+    }
+
+.chrome-layer-toggle-button:hover {
+    background: #bbbbbb;
+}    
+
+.chrome-layer-toggle-button.chrome-baselayer {
+    border-radius: 4px 0px 0px 4px;
+    }
+
+.chrome-layer-toggle-button.chrome-layer {
+    border-radius: 0px 4px 4px 0px;
+    border-left: 1px solid white;
+    }
+
+
+.layer-toggle-active {
+    background: #78a09c;
+    color: white;
+    }
+
+.layer-toggle-active:hover {
+    background: #6c8e8b;
+    }
+
+.chrome.chrome-content.chrome-pane.layers,
+.chrome.chrome-content.chrome-pane.mapsettings {
+    padding-top: 10px;
+    }
+
+
+
+.chrome-layer-baselayer-toggle {
+    margin-bottom: 25px;
+    }
+
+
+.deactivated-layer:before {
+  content: 'occupied layer';  
+  background: rgba(255,255,255,0.7);
+  z-index: 9999;
+  position: absolute;
+  width: 289px;
+  height: 20px;
+  text-align: right;
+  font-weight: 900;
+  font-style: italic;
+  color: #C80000;
+  line-height: 1.3;
+}
+
+
+.disable-mini-input {
+  opacity: 0.2;
+}
+
+
+
+
+
+
+
+.select-field-wrap {
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    width: 140px;
+    border-radius: 3px;
+    overflow: hidden;
+    background-color: #fff;
+    z-index: 100;
+    position: absolute;
+    right: 30px;
+    font-size: 12px;
+    }
+
+.select-field-wrap:before {
+    content: '';
+    background: white;
+    position: absolute;
+    right: -2px;
+    width: 20px;
+    top: -2px;
+    height: 20px;
+    z-index: 101;
+    background: #fff url("images/arrowdown.gif") no-repeat;
+    pointer-events: none;
+    }
+
+
+.select-field-wrap select {
+    padding: 1px 8px 0px 8px;
+    width: 130%;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    background-image: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;    
+    }
+
+.active-field-option {
+    color: black;
+    }
+
+
+.chrome-color-ball {
+  width: 18px;
+  height: 18px;
+  position: relative;
+  float: right;
+  border-radius: 14px;
+  top: 1px;
+  right: 10px;
+  box-shadow: 0 0 0 1px #666 inset, 0 0 0 3px white inset;
+  cursor: pointer;
+  margin-left: 2px;
+}
+
+
+
+.left-ball {
+    float: left;
+    margin-left: 8px;
+    right: 0;
+    margin-right: 12px;  
+    opacity: 1;
+
+    -webkit-transition: opacity 100ms, margin 100ms, width 100ms, height 100ms;
+    transition: opacity 100ms, margin 100ms, width 100ms, height 100ms;
+
+    }
+
+
+.disable-color-ball {
+    width: 0;
+    height: 0;
+    opacity: 0;
+    margin: 0;
+    }
+
+
+.chrome-add-color {
+  float: right;
+  position: relative;
+  right: 4px;
+}
+
+
+
+.chrome-color-range-wrapper,
+.chrome-color-range {
+    position: relative;
+    float: right;
+    box-shadow: 0 0 0px 1px #ccc inset, 0 0 0px 2px white inset;
+    cursor: pointer;
+    z-index: 1000;
+    }
+
+
+.chrome-color-range {
+    height: 18px;
+    width: 140px;
+    }
+
+.chrome-color-selector-wrapper {
+    background: transparent;
+    position: absolute;
+    top: -3px;
+    right: -5px;
+    z-index: 9999999;
+    width: 149px;
+    height: 24px;
+    padding-top: 2px;
+    }
+
+.color-range-ball {
+    margin: 0;
+    /*float: left;*/
+    right: 0;
+    /*margin-left: 12px;*/
+    }
+
+
+.rangeball-1 {
+    position: absolute;
+    left: 2px;
+    top: 3px;
+    }
+
+.rangeball-2 {
+    position: absolute;
+    left: 66px;
+    top: 3px;
+    }
+
+.rangeball-3 {
+    position: absolute;
+    right: 2px;
+    top: 3px;
+    }
+
+.click-catcher {
+  position: fixed;
+  width: 350px;
+  height: 100%;
+  top: 262px;
+  right: 0;
+  z-index: 999;
+    }
+
+
+
+
+.chrome.chrome-content.cartocss.refresh-button {
+    z-index: 9999999999;
+    position: absolute;
+    bottom: 0;
+    left: 77px;    
+    }
+
+
+
+.leflet-container.leaflet-popup {
+  max-width: 468px;
+}
+
+
+.c3-header-metapair {
+    height: 18px;
+}
+
+#c3-header-metacontainer {
+  line-height: 1.2;
+}
+
+.metapair-1, .metapair-2, .metapair-3 {
+    padding-top: 0px !important;
+    border-top: 0px !important;
+}

@@ -47,6 +47,10 @@ module.exports = function(app, passport) {
 	// ================================
 	app.post('/oauth/token', api.oauth2.getToken);
 
+	app.get('/api/token/check', passport.authenticate('bearer', {session: false}), function (req, res) {
+		res.end('OK');
+	});
+
 
 	// ================================
 	// OAUTH2: Debug token ============
@@ -108,7 +112,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
-	app.get('/api/upload', passport.authenticate('bearer', {session: false}), function (req, res) {
+	app.get('/api/data/upload/chunked', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.chunkedCheck(req, res);
 	});
 
@@ -119,14 +123,16 @@ module.exports = function(app, passport) {
 		api.upload.chunkedIdent(req, res);
 	});
 
+	// todo: this route is now DEAD; still alive in wu.js
 	// =====================================
-	// UPLOAD DATA LIBRARY FILES ===========
+	// UPLOAD DATA LIBRARY FILES =========== // renamed route to /chunked
 	// =====================================
-	app.post('/api/upload', passport.authenticate('bearer', {session: false}), function (req, res) {
+	app.post('/api/data/upload/chunked', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.chunkedUpload(req, res);
 	});
 	
 
+	
 
 	// =====================================
 	// CREATE NEW PROJECT  =================
@@ -134,6 +140,103 @@ module.exports = function(app, passport) {
 	app.post('/api/project/new', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.project.create(req, res);
 	});
+
+
+
+
+
+
+	// #####################################
+	// =====================================
+	// BRIDGE API ==========================
+	// =====================================
+	// brigde to mongoose for pile.js
+	// #####################################
+
+
+	app.get('/api/upload/get', passport.authenticate('bearer', {session: false}), function (req, res) {
+		api.upload.getUpload(req, res);
+	});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// #####################################
+	// =====================================
+	// POSTGIS API  ========================
+	// =====================================
+	// #####################################
+
+
+
+	// =====================================
+	// IMPORT DATA to POSTGIS ==============
+	// =====================================
+	app.post('/api/import', passport.authenticate('bearer', {session: false}), function (req, res) {
+		api.upload.import(req, res);
+	});
+
+	// =====================================
+	// GET UPLOAD STATUS ===================
+	// =====================================
+	app.get('/api/import/status', passport.authenticate('bearer', {session: false}), function (req, res) {
+		api.upload.getUploadStatus(req, res);
+	});
+
+	// // =====================================
+	// // GET FILE MODEL FROM FILEUUID ========
+	// // =====================================
+	// app.get('/api/data/file', passport.authenticate('bearer', {session: false}), function (req, res) {
+	// 	api.file.getFile(req, res);
+	// });
+
+	// // =====================================
+	// // GET FILE MODEL FROM FILEUUID ========
+	// // =====================================
+	// app.get('/api/data/export/', passport.authenticate('bearer', {session: false}), function (req, res) {
+	// 	api.file.getFile(req, res);
+	// });
+
+
+
+
+	app.get('/api/joinbeta', function (req, res) {
+		api.portal.joinBeta(req, res);
+	});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	// =====================================
@@ -347,6 +450,14 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
+	// ADD/LINK FILE TO NEW PROJECT ========
+	// =====================================
+	app.post('/api/file/addtoproject', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.file.addFileToProject(req, res);
+	});
+
+
+	// =====================================
 	// DELETE LAYER(S) =====================
 	// =====================================
 	app.post('/api/layers/delete', passport.authenticate('bearer', {session: false}), function (req,res) {
@@ -366,6 +477,7 @@ module.exports = function(app, passport) {
 	// CREATE NEW LAYER ====================
 	// =====================================
 	app.post('/api/layers/new', passport.authenticate('bearer', {session: false}), function (req, res) {
+		console.log('/api/layers/new');
 		api.layer.create(req, res);
 	});
 
@@ -608,6 +720,14 @@ module.exports = function(app, passport) {
 	function isLoggedIn(req, res, next) {
 		if (req.isAuthenticated()) return next();
 		res.redirect('/');
+	}
+
+	function internalAccess(req, res, next) {
+		var token = req.query.token || req.body.token;
+		if (token == 'thisissecret') return next();
+		res.end(JSON.stringify({
+			error : 'No access.'
+		}))
 	}
 
 	

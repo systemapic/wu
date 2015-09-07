@@ -14,7 +14,9 @@ Wu.Project = Wu.Class.extend({
 
 		// init roles, files, layers
 		this._initObjects();
+
 	},
+
 
 	_initObjects : function () {
 		this.initRoles();
@@ -60,7 +62,8 @@ Wu.Project = Wu.Class.extend({
 
 		// create
 		layers.forEach(function (layer) {
-			this.layers[layer.uuid] = new Wu.createLayer(layer);
+			var wuLayer =  new Wu.createLayer(layer);
+			if (wuLayer) this.layers[layer.uuid] = wuLayer;
 		}, this);
 	},
 
@@ -71,8 +74,9 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	addLayer : function (layer) {
-		this.layers[layer.uuid] = new Wu.createLayer(layer);
-		return this.layers[layer.uuid];
+		var l = new Wu.createLayer(layer);
+		if (l) this.layers[layer.uuid] = l;
+		return l || false;
 	},
 
 	addBaseLayer : function (layer) {
@@ -117,8 +121,6 @@ Wu.Project = Wu.Class.extend({
 
 		return title;
 	},
-
-	
 
 	createLayerFromGeoJSON : function (geojson) {
 
@@ -275,7 +277,6 @@ Wu.Project = Wu.Class.extend({
 		this._refresh();
 		this.refreshSidepane();
 	},
-
 
 	_update : function (field) {
 
@@ -536,6 +537,22 @@ Wu.Project = Wu.Class.extend({
 		return _.toArray(this.layers);
 	},
 
+	getPostGISLayers : function () {
+		return _.filter(this.layers, function (l) {
+			if (!l) return false;
+			if (!l.store.data) return false;
+			return l.store.data.postgis;
+		});
+	},
+
+	// debug
+	getDeadLayers : function () {
+		return _.filter(this.layers, function (l) {
+			if (!l) return true;
+			return l.store.data == null;
+		});
+	},
+
 	getActiveLayers : function () {
 
 		// get all layers in project
@@ -554,7 +571,17 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getLayer : function (uuid) {
+		console.log('getLaer', uuid, this.layers);
 		return this.layers[uuid];
+	},
+
+	getPostGISLayer : function (layer_id) {
+		return _.find(this.layers, function (layer) {
+			if (!layer.store) return;
+			if (!layer.store.data) return;
+			if (!layer.store.data.postgis) return;
+			return layer.store.data.postgis.layer_id == layer_id;
+		});
 	},
 
 	getStylableLayers : function () {
@@ -563,8 +590,10 @@ Wu.Project = Wu.Class.extend({
 		var cartoLayers = _.filter(all, function (l) {
 
 			if (l) {
+				if (!l.store) return false;
 				if (l.store.data.hasOwnProperty('geojson')) return true;
 				if (l.store.data.hasOwnProperty('osm')) return true;
+				if (l.store.data.hasOwnProperty('postgis')) return true;
 
 			} else {
 				return false;
@@ -745,6 +774,36 @@ Wu.Project = Wu.Class.extend({
 
 	getSettings : function () {
 		return this.store.settings;
+	},
+
+	clearPendingFiles : function () {
+		this.store.pending = [];
+		this._update('pending');
+	},
+
+	setPendingFile : function (file_id) {
+		this.store.pending.push(file_id);
+		this._update('pending');
+	},
+
+	getPendingFiles : function () {
+		return this.store.pending;
+	},
+
+	removePendingFile : function (file_id) {
+		var remd = _.remove(this.store.pending, function (p) {
+			return p == file_id;
+		});
+		console.log('removed???', this.store.pending, remd);
+		this._update('pending');
+	},
+
+	setPopupPosition : function (pos) {
+		this._popupPosition = pos;
+	},
+
+	getPopupPosition : function () {
+		return this._popupPosition;
 	},
 
 	setSettings : function (settings) {

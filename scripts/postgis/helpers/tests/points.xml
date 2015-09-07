@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Map minimum-version="2.0.0">
+    <Style name="points">
+        <Rule>
+            <MarkersSymbolizer width="2" opacity="0.8" allow-overlap="true" fill="yellow"/>
+        </Rule>
+    </Style>
+</Map>

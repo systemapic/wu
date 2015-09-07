@@ -68,7 +68,7 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 
 		var file = layer.getFile();
 		// var title = file ? file.getName() : layer.store.title;
-		var title = layer.store.title;
+		var title = layer.getTitle();
 		
 		// create and append div
 		var container = Wu.DomUtil.create('div', 'item-list select-elem', this._outer);
@@ -155,8 +155,8 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 
 
 		var min = _.size(this.project.getBaselayers());
-		var padding = this.numberOfProviders * 35;
-		this.maxHeight = (_.size(this.project.layers) - min) * 33 + padding;
+		var padding = this.numberOfProviders * 30;
+		this.maxHeight = (_.size(this.project.layers) - min) * 30 + padding;
 		this.minHeight = 0;
 
 		// add 100 if in editMode
@@ -187,6 +187,10 @@ Wu.SidePane.Options.LayerMenu = Wu.SidePane.Options.Item.extend({
 			// set on
 			this.on(layer);
 		}
+
+
+		// Hides layer button if there are no layers to show
+		app.Chrome.Top._showHideLayerButton();	
 
 		// mark occupied layers in layermenu
 		var baselayerSetting = app.SidePane.Options.settings.baselayer;

@@ -111,9 +111,7 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 
 	// sort layers by provider
 	sortLayers : function (layers) {
-		// possible keys in layer.store.data. must add more here later if other sources
-		// var keys = ['geojson', 'mapbox', 'osm', 'raster'];
-		var keys = ['geojson', 'mapbox', 'raster'];
+		var keys = [ 'postgis', 'google', 'norkart', 'geojson', 'mapbox', 'raster'];
 		var results = [];
 		keys.forEach(function (key) {
 			var sort = {
@@ -122,24 +120,33 @@ Wu.SidePane.Options.Item = Wu.Class.extend({
 			}
 			for (l in layers) {
 				var layer = layers[l];
-				if (layer.store.data.hasOwnProperty(key)) {
-					sort.layers.push(layer)
+
+				if (layer) {
+
+					if (layer.store && layer.store.data.hasOwnProperty(key)) {
+						sort.layers.push(layer)
+					}
 				}
 			}
 			results.push(sort);
 		}, this);
 
+		// console.log('SROOTED', results);
 		this.numberOfProviders = results.length;
 		return results;
 	},
 
 	addProvider : function (provider) {
 		var title = '';
-		if (provider == 'geojson') title = 'Data Library';
-		if (provider == 'raster') title = 'Rasters';
+		if (provider == 'postgis') title = 'Data Library';
+		// if (provider == 'raster') title = 'Rasters';
 		if (provider == 'mapbox') title = 'Mapbox';
+		if (provider == 'norkart') title = 'Norkart';
+		if (provider == 'google') title = 'Google';
 		// if (provider == 'osm') title = 'Open Street Map';
 		if (provider == 'osm') return;
+
+		// add item
 		var header = Wu.DomUtil.create('div', 'item-list-header', this._outer, title)
 	},
 

@@ -14,9 +14,9 @@ var redis = require('redis');
 var config = api.config;
 
 // token redis
-var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host);
-r.auth(config.tokenRedis.auth);
-r.on('error', console.error);
+// var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host);
+// r.auth(config.tokenRedis.auth);
+// r.on('error', console.error);
 
 // expose this function to our app using module.exports
 module.exports = function(passport) {
@@ -103,7 +103,7 @@ module.exports = function(passport) {
 		// we are checking to see if the user trying to login already exists
 		User.findOne({ 'local.email' :  email }, function(err, user) {
 
-			console.log('found user: ', user, password);
+			// console.log('found user: ', user, password);
 
 			// if there are any errors, return the error before anything else
 			if (err) return done(err);
@@ -138,7 +138,7 @@ module.exports = function(passport) {
 	passport.use(new BearerStrategy(
 		function (accessToken, done) {
 
-			console.log('passport.js:193 BearerStrategy > accessToken'.yellow, accessToken); // is used when calling API endpoint with access_token
+			// console.log('passport.js:193 BearerStrategy > accessToken'.yellow, accessToken); // is used when calling API endpoint with access_token
 
 			api.oauth2.store.accessTokens.find(accessToken, function (err, token) {
 				if (err) return done(err);
@@ -187,7 +187,7 @@ module.exports = function(passport) {
 	passport.use(new BasicStrategy(
 		function (username, password, done) {
 
-			console.log('auth.js:53 BasicStrategy'.yellow, username, password);
+			// console.log('auth.js:53 BasicStrategy'.yellow, username, password);
 
 			api.oauth2.store.clients.findByClientId(username, function (err, client) {
 				if (err) return done(err);
@@ -198,7 +198,7 @@ module.exports = function(passport) {
 					return done(null, false);
 				}
 
-				console.log('found client!', client.clientId);
+				// console.log('found client!', client.clientId);
 				return done(null, client);
 			});
 		}
@@ -226,7 +226,7 @@ module.exports = function(passport) {
 		var token = key + '.' + crypto.randomBytes(12).toString('hex');  // ASFSAlkdmflsdkfmdslk2lk  // random string
 
 		// async set
-		r.set(key, token);
+		api.redis.temp.set(key, token);
 		
 		// return token
 		return token;

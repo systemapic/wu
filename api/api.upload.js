@@ -1,4 +1,5 @@
 //API: api.upload.js
+
 // database schemas
 var Project 	= require('../models/project');
 var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
@@ -14,6 +15,7 @@ var _ 		= require('lodash-node');
 var fs 		= require('fs-extra');
 var gm 		= require('gm');
 var kue 	= require('kue');
+var dir 	= require('node-dir');
 var fss 	= require("q-io/fs");
 var zlib 	= require('zlib');
 var uuid 	= require('node-uuid');
@@ -34,6 +36,8 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
+var ZipInfo = require('infozip');
+
 // resumable.js
 var r = require('../tools/resumable-node')('/data/tmp/');
 
@@ -43,122 +47,754 @@ var api = module.parent.exports;
 // exports
 module.exports = api.upload = { 
 
-	chunkedUpload : function (req, res) {
-	    	var options = req.body,
-		    fileUuid = options.fileUuid,
-		    projectUuid = options.projectUuid,
-		    fileName = fileUuid + '-' + options.resumableFilename,
-		    outputPath = '/data/tmp/' + fileName,
-		    stream = fs.createWriteStream(outputPath),
-		    resumableChunkNumber = options.resumableChunkNumber,
-		    resumableIdentifier = options.resumableIdentifier,
-	    	    resumableTotalChunks = options.resumableTotalChunks;
 
-		console.log('Uploading', resumableChunkNumber, 'of', resumableTotalChunks, 'chunks to ', outputPath);
-		// console.log('## RESUMABLE ##'.green, options);
 
-		// resumable		
-		r.post(req, function(status, filename, original_filename, identifier){
 
-			// return status
-			res.status(status).send({});
 
-			// register chunk done in redis
-			if (status == 'done' || status == 'partly_done') api.redis.incr('done-chunks-' + resumableIdentifier);
 
-			// check if all done
-			api.redis.get('done-chunks-' + resumableIdentifier, function (err, count) {
-				// console.log('Chunk #'.yellow, count, err);
+	/**
+	 * Upload data to PostGIS with cUrl (API)
+	 *
+	 * @function api.upload.import
+	 * @param {object} req - Express Request object
+	 * @param {object} res - Express Request object
+	 * @returns {object} Success, errors and ID of upload
+	 *
+	 * @example
+	 * // example curl usage for this endpoint ('/api/data/import')
+	 * curl --form "userUuid=loka" \
+	 *      --form "meta=feta" \
+	 *      --form "data=@/home/_testing/veryold/africa/africa.zip" \
+	 *      --header "Authorization: Bearer [insert_access_token]" \
+	 *      https://dev.systemapic.com/api/data/import
+	 */
+	import : function (req, res) {
+		if (!req.files || !req.files.data) return api.error.missingInformation(res, 'No file.');
 
-				// return if not all done				
-				if (count != options.resumableTotalChunks) {
-					console.log('COUNT != CHUNKS');
-					return;
-				} 
-				// import uploaded file
-				api.upload._chunkedUploadDone({
-					user : req.user,
-					uniqueIdentifier : options.resumableIdentifier,
-					outputPath : outputPath,
-					fileName : options.resumableFilename,
-					projectUuid : projectUuid,
-					fileUuid : fileUuid,
-					resumableTotalChunks : options.resumableTotalChunks,
-					resumableIdentifier : options.resumableIdentifier
-				});
-			});
+		var files = req.files;
+		var user = req.user;
+
+		// set upload status
+		var uploadStatus = {
+			file_id : 'file_' + api.utils.getRandomChars(20),
+			user_id : user.uuid,
+			filename : files.data.originalFilename,
+			timestamp : Date.now(),
+			status : 'Processing',
+			size : files.data.size,
+			upload_success : true,
+			error_code : null,
+			error_text : null,
+			// processing_success : null,
+			// rows_count : null,
+			// import_took_ms : null,
+			// data_type : null,
+			// original_format : null,
+			// table_name : null, 
+			// database_name : null,
+
+			// default_layer : 'layer_adslkml2k3dm2lkmasd' // add default layer
+		}
+
+		
+		// save upload id to redis
+		var key = 'uploadStatus:' + uploadStatus.file_id;
+		api.redis.layers.set(key, JSON.stringify(uploadStatus), function (err) {
+
+			// return upload status to client
+			res.end(JSON.stringify(uploadStatus));
 		});
+
+		var options = {
+			files : req.files,
+			user : req.user,
+			uploadStatus : uploadStatus,
+			body : req.body
+		}
+
+		api.upload._import(options, function (err, results) {
+		});
+
+
 	},
 
-	_chunkedUploadDone : function (options) {
+
+	/**
+	 * Upload data to PostGIS with resumable.js  (client)
+	 *
+	 * @function api.upload.import
+	 * @param {object} req - Express Request object
+	 * @param {object} res - Express Request object
+	 * @returns {object} Success, errors and ID of upload
+	 *
+	 */
+	chunkedUpload : function (req, res) {
+	    	var options 		 = req.body,
+		    fileUuid 		 = options.fileUuid,
+		    projectUuid 	 = options.projectUuid,
+		    fileName 		 = fileUuid + '-' + options.resumableFilename,
+		    outputPath 		 = '/data/tmp/' + fileName,
+		    stream 		 = fs.createWriteStream(outputPath),
+		    resumableChunkNumber = options.resumableChunkNumber,
+		    resumableIdentifier  = options.resumableIdentifier,
+	    	    resumableTotalChunks = options.resumableTotalChunks,
+	    	    file_id 		 = null,
+	    	    access_token 	 = options.access_token;
+
+
+	    	var ops = [];
+
+	    	console.log('CHUNKED UPLOAD!');
+
+	    	ops.push(function (callback) {
+
+	    		  // create unique file_id
+		    	var upload_file_id_key = 'upload_id:' + resumableIdentifier;
+		    	api.redis.layers.get(upload_file_id_key, function (err, stored_file_id) {
+		    		console.log('redis get stored file_id', err, stored_file_id);
+		    		
+		    		// got id
+		    		if (stored_file_id) {
+		    			file_id = stored_file_id;
+		    			return callback(null);
+		    		}
+
+		    		// first chunk, create file_id
+		    		if (!stored_file_id) {
+		    			var stored_file_id =  'file_' + api.utils.getRandomChars(20);
+		    			return api.redis.layers.set(upload_file_id_key, stored_file_id, function (err) {
+		    				file_id = stored_file_id;
+		    				console.log('saved stored filei', err, stored_file_id)
+		    				callback(null);
+		    			});
+		    		};
+		    	})
+
+	    	})
+
+	  
+	    	ops.push(function (callback) {
+
+
+			// resumable		
+			r.post(req, function(status, filename, original_filename, identifier){
+
+				// set redis count id
+				var redis_id = resumableIdentifier + file_id;
+
+				// if success
+				if (status == 'done' || status == 'partly_done') {
+					
+					// return status
+					res.status(200).send({file_id : file_id});
+
+					// register chunk done in redis
+					api.redis.temp.incr('done-chunks-' + redis_id);
+
+				} else {
+
+					// return status
+					res.status(308).send({file_id : file_id});
+				}
+
+				// check if all done
+				api.redis.temp.get('done-chunks-' + redis_id, function (err, count) {
+
+					// return if not all done
+					console.log('done chunks:', count);
+					console.log('total chunks:', options.resumableTotalChunks);
+
+					if (count != options.resumableTotalChunks) {
+						return;
+					} 
+
+					// import uploaded file
+					api.upload._chunkedUploadDone({
+						user 			: req.user,
+						uniqueIdentifier 	: options.resumableIdentifier,
+						outputPath 		: outputPath,
+						body 			: req.body,
+						fileName 		: options.resumableFilename,
+						original_filename 	: filename,
+						projectUuid 		: projectUuid,
+						resumableTotalChunks 	: options.resumableTotalChunks,
+						resumableIdentifier 	: options.resumableIdentifier,
+						file_id 		: file_id,
+						redis_id 		: redis_id,
+						access_token 		: access_token
+					});
+
+					// release
+					callback();
+				});
+			});
+	    	});
+
+		
+		async.series(ops, function (err) {
+
+			var upload_file_id_key = 'upload_id:' + resumableIdentifier;
+		    	api.redis.temp.del(upload_file_id_key, function (err) {
+
+		    		console.log('deleted upload_file_id_key', err);
+		    	});
+
+		})
+
+		
+
+	},
+
+	_chunkedUploadDone : function (options, done) {
 		var resumableTotalChunks = options.resumableTotalChunks,
-		    uniqueIdentifier = options.uniqueIdentifier,
-		    outputPath = options.outputPath,
+		    uniqueIdentifier 	= options.uniqueIdentifier,
+		    outputPath 		= options.outputPath,
+		    original_filename 	= options.original_filename,
 		    resumableIdentifier = options.resumableIdentifier,
-		    tmpFolder = '/data/tmp/',
-		    ops = [];
+		    user 		= options.user,
+		    file_id 		= options.file_id,
+		    tmpFolder 		= '/data/tmp/',
+		    body 		= options.body,
+		    ops 		= [],
+		    redis_id 		= redis_id,
+		    access_token 	= options.access_token;
+
 
 		// merge chunks
 		ops.push(function (callback) {
-
 			var cmd = 'cat ';
-
 			_.times(resumableTotalChunks, function (i) {
 				var num = i + 1;
 				cmd += '"' + tmpFolder + 'resumable-' + resumableIdentifier + '.' + num + '" ';
 			});
-
 			cmd += ' > "' + outputPath + '"';
-
 			var exec = require('child_process').exec;
-			exec(cmd, function (err, stdout, stdin) {
-				if (err) console.log('err'.red, err);
-
-				// console.log('catted file: '.green, outputPath);
+			exec(cmd, function (err) {
+				if (err) return callback(err);
 				fs.stat(outputPath, callback);
 			});
-
 		});
 
-		// import file
+		// set uploadStatus
 		ops.push(function (stats, callback) {
-			var file = {
-				path : options.outputPath,
+			
+			// set upload status
+			var uploadStatus = {
+				file_id : file_id,
+				user_id : user.uuid,
+				filename : original_filename,
+				timestamp : Date.now(),
+				status : 'Processing',
 				size : stats.size,
-				name : options.fileName,
-				uniqueIdentifier : uniqueIdentifier
+				upload_success : true,
+				error_code : null,
+				error_text : null,
+				processing_success : null,
+				rows_count : null,
+				import_took_ms : null,
+				data_type : null,
+				original_format : null,
+				table_name : null, 
+				database_name : null,
+
+				default_layer : null,
+				default_layer_model : null,
 			}
 
-			api.upload.importFile(file, options, callback);
+			// save upload id to redis
+			var key = 'uploadStatus:' + uploadStatus.file_id;
+			api.redis.layers.set(key, JSON.stringify(uploadStatus), function (err) {
+				if (err) return callback(err);
+
+				callback(null, uploadStatus);
+			});
+		});
+
+		
+		ops.push(function (uploadStatus, callback) {
+
+			var options = {
+				files : {
+					data : {
+						path : outputPath,
+						size : uploadStatus.size,
+						originalFilename : original_filename
+					},
+				},
+				user : user,
+				uploadStatus : uploadStatus,
+				body : body,
+				access_token : access_token
+			}
+
+			// import file
+			api.upload._import(options, function (err, results) {
+
+				
+				// done
+				callback(err);
+			});
+
+
 		});
 
 
 		async.waterfall(ops, function (err, result) {
-
-			// ping client
-			api.socket.uploadDone({
-				result : result,
-				user : options.user,
-				loka : 'loka'
-			});
+			if (err) console.log('oooooooo err!  chunked upload done err!!', err);
+			
+			console.log('ALWAYS ARRAIVING HEREHEHERHRHEH');
 
 			// clean up, remove chunks
 			var removePath = '/data/tmp/resumable-' + uniqueIdentifier + '.*';
 			fs.remove(removePath, console.log);
 
 			// clean up redis count
-			api.redis.del('done-chunks-' + uniqueIdentifier);
+			api.redis.temp.del('done-chunks-' + redis_id, function (err) {
+				if (err) console.log('rem done chunks err!', err);
+			});
+
+			// all done
+			// done && done(null);
+		});
+		
+	},
+
+
+	_import : function (options, done) {
+
+		var files = options.files,
+		    user = options.user,
+		    uploadStatus = options.uploadStatus,
+		    body = options.body,
+		    access_token = options.access_token,
+		    file_id = uploadStatus.file_id,
+		    project_id = body.projectUuid,
+		    import_start_time = new Date().getTime();
+
+
+		var ops = [];
+
+		// import data
+		ops.push(function (callback) {
+
+			// import options
+			var options = {
+				file_id : file_id,
+				files : files,
+				options : body,
+				user : user,
+				timestamp : uploadStatus.timestamp
+			}
+
+			// process upload
+			api.upload.prepareImport(options, function (err, opts) {
+				if (err) return callback(err);
+
+				// postgis import
+				api.postgis.import(opts, callback);
+			});
+		});
+
+		// create file model
+		ops.push(function (callback) {
+			api.upload._createFileModel(file_id, function (err, file) {
+				if (err) return callback(err);
+				
+				// add to project if available
+				if (!body.projectUuid) return callback(null);	
+
+				// add to project
+				var projectUuid = body.projectUuid;
+				api.file.addToProject(file._id, projectUuid, callback);
+				
+			});
+		});
+
+		// set upload status
+		ops.push(function (callback) {
+
+			// set upload status, expire in one day
+			api.upload.updateStatus(file_id, {
+				processing_success : true,
+				status : 'Done', 
+			}, callback);
+		});
+
+
+		// create default layer (layer model + pile layer)
+		ops.push(function (callback) {
+
+			var layerOptions = {
+				"geom_column": "the_geom_3857",
+				"geom_type": "geometry",
+				"raster_band": "",
+				"srid": "",
+				"affected_tables": "",
+				"interactivity": "",
+				"attributes": "",
+				"access_token": access_token,
+				"cartocss_version": "2.0.1",
+				"cartocss": "#layer {  \n polygon-fill: red; \n marker-fill: #001980; \n marker-allow-overlap: true; \n marker-clip: false; \n marker-comp-op: screen;}",
+				"sql": "(SELECT * FROM " + file_id + ") as sub",
+				"file_id": file_id,
+				"return_model" : true,
+				"projectUuid" : project_id
+			}
+
+			// create pile layer
+			api.layer.createPileLayer(layerOptions, function (err, pileLayer) {
+
+				// set upload status
+				api.upload.updateStatus(file_id, {
+					default_layer : pileLayer.layerUuid,
+				}, function (err) {
+
+					// create wu.layer
+					var options = {
+						projectUuid : project_id, // pass to automatically attach to project
+						data : {
+							postgis : pileLayer.options
+						},
+						metadata : pileLayer.options.metadata,
+						title : 'temp title',
+						description : 'temp description',
+						file : file_id,
+					}
+
+					api.layer.createModel(options, function (err, doc) {
+
+						// set upload status
+						api.upload.updateStatus(file_id, {
+							default_layer_model : doc.uuid,
+							added_to_project : project_id
+						}, callback);
+					});
+				});
+
+			});
+
+		});
+
+
+		// run ops
+		async.series(ops, function (err, results) {
+			
+			// if err, set upload status, return
+			if (err) {
+
+				// update upload status
+				api.upload.updateStatus(file_id, { // todo: more specific error reporting
+					error_code : 1, 
+					error_text : err,
+					status : 'Failed'
+				}, function (err2) {
+
+					// send error message on socket
+					api.socket.sendError(user._id, {
+						title : 'Upload failed.',
+						description : err
+					});
+				});
+
+				// return err
+				return done(err);
+			}
+
+
+			// calc import time
+			var import_stop_time = new Date().getTime();
+			var import_took_ms = import_stop_time - import_start_time;
+
+			console.log('Import took', import_took_ms, 'ms');
+
+			// ping client
+			api.upload._notifyProcessingDone({
+				file_id : file_id,
+				user_id : user._id,
+				import_took_ms : import_took_ms
+			});
+
+			// all done
+			done(err);
+		});	
+	},
+
+
+
+
+
+	_notifyProcessingDone : function (options) {
+		api.socket.processingDone(options)
+	},
+
+
+
+
+	// after upload, calling this to get results
+	getUpload : function (req, res) {
+
+		var file_id = req.query.fileUuid || req.query.file_id,
+		    ops = [];
+
+		// check for missing info
+		if (!file_id) return api.error.missingInformation(req, res);
+
+
+		var key = 'uploadStatus:' + file_id;
+		api.redis.layers.get(key, function (err, uploadStatus) {
+
+			var status = JSON.parse(uploadStatus);
+
+			if (!status) return api.error.genera(req, res, 'no such upload status id');
+
+			var layer_id = status.default_layer_model;
+			
+			var ops = {};
+
+			ops.file = function (callback) {
+				// get file
+				File
+				.findOne({uuid : file_id})
+				.exec(function (err, file) {
+					if (err) return api.error.general(req, res, err);
+
+					callback(null, file);
+				});
+
+			}
+
+			ops.layer = function (callback) {
+
+
+				Layer
+				.findOne({uuid : layer_id})
+				.exec(function (err, layer) {
+					if (err) return api.error.general(req, res, err);
+
+					callback(null, layer);
+				});
+			}
+
+			ops.project = function (callback) {
+				callback(null, status.added_to_project);
+			}
+
+			async.parallel(ops, function (err, result) {
+				res.end(JSON.stringify(result));
+			});
 
 		});
 		
 	},
 
+
+	_createFileModel : function (file_id, done) {
+
+		// get info from uploadStatus // todo: too much of a shortcut?
+		var file_id_key = 'uploadStatus:' + file_id;
+		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
+			var u = JSON.parse(uploadStatus);
+
+			var fileModel = {
+				uuid : file_id,
+				createdBy : u.user_id,
+				name : u.filename,
+				type : 'postgis',
+				dataSize : u.size,
+				data : {
+					postgis : {
+						database_name 	: u.database_name,
+						table_name 	: u.table_name,
+						data_type 	: u.data_type,
+						original_format : u.original_format
+					}
+				}
+			}
+
+			// create file model
+			api.file._createModel(fileModel, done);	
+		});
+	},
+
+	updateStatus : function (file_id, status, callback) {
+		
+		var file_id_key = 'uploadStatus:' + file_id;
+		api.redis.layers.get(file_id_key, function (err, uploadStatusJSON) {
+			if (err) return callback && callback(err);
+
+			// add keys
+			var uploadStatus = JSON.parse(uploadStatusJSON);
+			for (s in status) {
+				if (s != 'expire') uploadStatus[s] = status[s]; // set status (except ttl)
+			};
+
+			// save upload status
+			api.redis.layers.set(file_id_key, JSON.stringify(uploadStatus), function (err) {
+
+				// return
+				callback && callback(err);
+			});
+		});
+	},
+
+
+	// gets queried from pile.js
+	getUploadStatus : function (req, res) {
+		var file_id = req.query.file_id,
+		    file_id_key = 'uploadStatus:' + file_id;
+
+		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
+			if (err) return api.error.general(req, res, err);
+
+			// return upload status
+			res.end(uploadStatus || JSON.stringify({ error : 'Upload ID not found or expired.'}));
+		});
+	},
+
+
+	/**
+	 * Prepare upload before organizing (unzip, etc.)
+	 *
+	 * @private
+	 *
+	 * @function api.upload.organizeImport
+	 * @param {object} options - Options object containing uploadID, user, req.body, req.files
+	 * @returns null
+	 */
+	prepareImport : function (options, done) {
+
+		var files = options.files, // get files object
+		    temporaryPath = files.data.path, // get path
+		    ext = temporaryPath.split('.').reverse()[0].trim(), // get file extension
+		    ops = [];
+
+		// set original filename + size
+		options.size = files.data.size;
+		options.originalFilename = files.data.originalFilename;
+
+		// organize files so output is equal no matter what :)
+		if (ext == 'zip') ops.push(function (callback) {
+			api.upload.unzip(options, function (err, files) {
+				options.files = files;
+				callback(err);
+			});
+		});
+
+		if (ext == 'gz') ops.push(function (callback) {
+			api.upload.untar(options, function (err, files) {
+				options.files = files;
+				callback(err);
+			});
+		});
+
+		if (ext == 'geojson') ops.push(function (callback) {
+			options.files = [temporaryPath];
+			callback(null);
+		});
+
+		if (ext == 'tif') ops.push(function (callback) {
+			options.files = [temporaryPath];
+			callback(null);
+		});
+
+		if (ext == 'tiff') ops.push(function (callback) {
+			options.files = [temporaryPath];
+			callback(null);
+		});
+
+		if (ext == 'ecw') ops.push(function (callback) {
+			options.files = [temporaryPath];
+			callback(null);
+		});
+
+		if (ext == 'jp2') ops.push(function (callback) {
+			options.files = [temporaryPath];
+			callback(null);
+		});
+
+		// run ops
+		async.series(ops, function (err) {
+			if (err) console.log('api.upload.prepareImport err 3', err);
+			done(err, options);
+		});
+
+	},
+
+
+	organizeImport : function (options, done) { 	// todo: remove perhaps
+
+		// import to postgis
+		api.postgis.import(options, done);
+	},
+
+
+	untar : function (options, done) {
+		var tarfile = options.files.data.path,
+		    extractPath = '/data/tmp/' + options.file_id,
+		    exec = require('child_process').exec,
+		    cmd = 'tar xzf "' + tarfile + '" -C "' + extractPath + '"';
+			
+		// create file_id temp dir
+		fs.ensureDir(extractPath, function (err) {
+			if (err) return done(err);
+
+			// untar
+			exec(cmd, function (err, stdout, stdin) {
+				if (err) return done(err);
+				
+				// get list of filepaths
+				dir.files(extractPath, done);
+			});
+		});
+	},
+
+
+	// returns array of filepaths
+	unzip : function (options, done) {
+		var temporaryPath = options.files.data.path,
+		    zip = new ZipInfo(temporaryPath),
+		    extractPath = '/data/tmp/' + options.file_id;
+		
+		// unzip
+		zip.extractTo(extractPath, ['*'], {junkPaths : true}, function (err) {
+			if (err) return done(err);
+
+			// get list of filepaths
+			dir.files(extractPath, done);
+		});
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	// debug: delete all done-chunks
 	_deleteDoneChunks : function () {
-		api.redis.keys('done-chunk*', function(err, rows) {
+		api.redis.temp.keys('done-chunk*', function(err, rows) {
 			rows.forEach(function (row) {
-				if (row) api.redis.del(row);
-				// console.log('deleted row'.red, row);
+				if (row) api.redis.temp.del(row);
 			});
 		});
 	},
@@ -180,13 +816,11 @@ module.exports = api.upload = {
 		    fileArray = [incomingFile],
 		    ops = [];
 
-		// console.log('implortFile'.green, incomingFile, options);
-
 		// sort files
 		ops.push(function (callback) {
 
 			// quick sort
-			api.upload.sortFormFiles(fileArray, function (err, results) {
+			api.upload.sortFormFiles(fileArray, options, function (err, results) {
 				if (err) console.log('ERR 18'.red, err);
 				if (err || !results) return callback(err || 'There were no valid files in the upload.');
 
@@ -251,10 +885,10 @@ module.exports = api.upload = {
 			});
 
 
-			if (opts.isGeojson || opts.isRaster) api.file._sendToProcessing(opts, function (err, result) { // todo: do per file
+			// if (opts.isGeojson || opts.isRaster) api.file._sendToProcessing(opts, function (err, result) { // todo: do per file
 
-				// done processing
-			});
+			// 	// done processing
+			// });
 
 			done(null, pack);
 
@@ -272,8 +906,6 @@ module.exports = api.upload = {
 
 
 		entries.forEach(function (entry) {
-
-			console.log('>>> entries for each >>>'.red, entry.file);
 
 			// set meta
 			entry.uuid = entry.file; 
@@ -322,7 +954,7 @@ module.exports = api.upload = {
 	},
 
 
-	sortFormFiles : function (fileArray, done) {
+	sortFormFiles : function (fileArray, opts, done) {
 
 		// quick sort
 		var ops = [];
@@ -342,7 +974,8 @@ module.exports = api.upload = {
 				name : file.name,
 				type : file.type,
 				extension : extension,
-				currentFolder : null
+				currentFolder : null,
+				user : opts.user
 			}
 
 			// add async ops
@@ -436,6 +1069,33 @@ module.exports = api.upload = {
 					});
 				}
 
+				if (extension == 'geojson') {
+
+					ops1.push(function (callback) {
+
+						// processes geojson, puts file in folder
+						api.file.handleJson(options.path, options.name, options.extension, options.fileUuid, function (err, db) {
+							if (err) {
+								console.log('ERR 301'.red, err);
+								api.error.log(err);
+								return callback('Unable to handle geojson format properly. Please see #error-log for details.')
+							}
+							
+							// populate db entry
+							db = db || {};
+							db.name = options.name;
+							db.file = options.fileUuid;
+							db.type = 'Layer';
+							db.files = [options.name];
+
+							// return db
+							callback(null, db);
+						});
+					});
+				}
+
+
+
 
 				// handle images
 				if (extension == 'jpg' || extension == 'tiff' || extension == 'png' || extension == 'jpeg') {
@@ -492,32 +1152,7 @@ module.exports = api.upload = {
 
 				}
 				
-				if (extension == 'geojson') {
-
-					ops1.push(function (callback) {
-
-						// processes geojson, puts file in folder
-						api.file.handleJson(options.path, options.name, options.extension, options.fileUuid, function (err, db) {
-							if (err) {
-								console.log('ERR 301'.red, err);
-								api.error.log(err);
-								return callback('Unable to handle geojson format properly. Please see #error-log for details.')
-							}
-							
-							// populate db entry
-							db = db || {};
-							db.name = options.name;
-							db.file = options.fileUuid;
-							db.type = 'Layer';
-							db.files = [options.name];
-
-							// return db
-							callback(null, db);
-						});
-					});
-				}
-
-
+				
 				if (extension == 'doc' || extension == 'pdf' || extension == 'docx' || extension == 'txt') {
 
 					ops1.push(function (callback) {
@@ -649,7 +1284,11 @@ module.exports = api.upload = {
 			ops.push(function (callback) {
 
 				// process shapefile (convert, store, vectorize, etc.)
-				api.file.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
+				// api.file.handleShapefile(options.currentFolder, options.name, options.fileUuid, function (err, db) {
+				api.postgis.importShapefile(options, function (err, db) {
+
+				// })
+				// api.file.handleShapefile(options, function (err, db) {
 					if (err) console.log('ERR 40'.red, err);
 					if (err) console.log('### SORTOPS HANDLESHAPEFILE ERR'.red, err);
 					if (err) return callback(err);
@@ -984,8 +1623,8 @@ module.exports = api.upload = {
 
 		// shapefile parts
 		if (name.slice('-4') == '.shp')   return ['shp', 'shapefile'];
-		var mandatory = ['.shp', '.shx', '.dbf'];
-		var optional = ['.prj', '.sbn', '.sbx', '.fbn', '.fbx', '.ain', '.aih', '.ixs', '.mxs', '.atx', '.shp.xml', '.cpg'];
+		var mandatory = ['.shp', '.shx', '.dbf', '.prj'];
+		var optional = ['.sbn', '.sbx', '.fbn', '.fbx', '.ain', '.aih', '.ixs', '.mxs', '.atx', '.shp.xml', '.cpg'];
 		if (mandatory.indexOf(name.slice(-4)) > -1) return ['shape', 'partialshape'];
 		if (optional.indexOf(name.slice(-4)) > -1)  return ['shape', 'partialshape'];
 
