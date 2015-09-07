@@ -37,6 +37,8 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var pg = require('pg');
+var exec = require('child_process').exec;
 
 // api
 var api = module.parent.exports;
@@ -124,78 +126,178 @@ module.exports = api.geo = {
 	},
 
 
-	handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
-		if (!folder || !name || !fileUuid) return callback('Missing info.');
+	import2postgis : function (options, callback) {
 
-		fs.readdir(folder, function (err, files) {
-			if (err || !files) return callback('Some files were rejected. Please upload <br>only one shapefile per zip.');
-
-			// clone array
-			var shapefiles = files.slice();
-
-			// async ops
-			var ops = [];
-
-			// check if valid shapefile(s)
-			ops.push(function (done) {
-				api.geo.validateshp(files, done);
-			});
-
-			// convert shapefile to geo/topojson
-			ops.push(function (done) {
-				api.geo.convertshp(files, folder, done);
-			});
-
-			// run async jobs
-			async.series(ops, function (err, results) {
-				if (err) {
-					// console.log('MOFO!!'.red, err);
-					return callback(err);
-				}
-
-				var key = results[1];
-				if (!key) return callback('No key.');
-
-				var path = key.path;
-				var name = key.name;
-				var fileUuid = key.fileUuid;
-
-				// add geojson file to list
-				shapefiles.push(name);
-
-				// return as db entry
-				var db = {
-					files : shapefiles,
-					data : {
-						geojson : name
-					},
-					title : name,
-					file : fileUuid
-				}
-
-				api.geo.copyToVileFolder(path, fileUuid, function (err) {
-					if (err) return callback('copytToVile err: ' + err);
-
-					try {
-						// read meta from file
-				        	mapnikOmnivore.digest(path, function (err, metadata) {
-				        		if (err) {
-				        			console.log('ERR 400', err);
-				        			return callback(err);
-				        		}
-				        		if (!metadata) return callback('No metadata!');
-
-				        		db.metadata = JSON.stringify(metadata);
-					        	
-					        	// return
-					        	callback(null, db);
-				        	});
-
-				        } catch (e) { callback('meta fail: ' + e); }
-		        	});
-			});
-		});
+		return api.postgis.importData(options, callback);
+		
+		
+		
 	},
+
+	// // new way: postgis!
+	// handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
+	// 	if (!folder || !name || !fileUuid) return callback('Missing info.');
+
+	// 	fs.readdir(folder, function (err, files) {
+	// 		if (err || !files) return callback('Some files were rejected. Please upload <br>only one shapefile per zip.');
+
+	// 		// clone array
+	// 		var shapefiles = files.slice();
+
+	// 		// async ops
+	// 		var ops = [];
+
+	// 		// check if valid shapefile(s)
+	// 		ops.push(function (done) {
+	// 			api.geo.validateshp(files, done);
+	// 		});
+
+	// 		// import into postgis
+	// 		ops.push(function (done) {
+
+	// 			var options = {
+	// 				files : files, 
+	// 				folder : folder,
+	// 				clientName : 'clientName'
+	// 			}
+	// 			api.geo.import2postgis(options, done);
+	// 		});
+
+	// 		// // convert shapefile to geo/topojson
+	// 		// ops.push(function (done) {
+	// 		// 	api.geo.convertshp(files, folder, done);
+	// 		// });
+
+	// 		// run async jobs
+	// 		async.series(ops, function (err, results) {
+	// 			if (err) {
+	// 				console.log('MOFO!!'.red, err);
+	// 				return callback(err);
+	// 			}
+
+	// 			var key = results[1];
+	// 			if (!key) return callback('No key.');
+
+	// 			var path = key.path;
+	// 			var name = key.name;
+	// 			var fileUuid = key.fileUuid;
+
+	// 			// add geojson file to list
+	// 			shapefiles.push(name);
+
+	// 			// return as db entry
+	// 			var db = {
+	// 				files : shapefiles,
+	// 				data : {
+	// 					geojson : name
+	// 				},
+	// 				title : name,
+	// 				file : fileUuid
+	// 			}
+
+	// 			// todo: meta from postgis
+
+	// 			// return
+	// 			callback(null, db);
+
+	// 			// api.geo.copyToVileFolder(path, fileUuid, function (err) {
+	// 			// 	if (err) return callback('copytToVile err: ' + err);
+
+	// 			// 	try {
+	// 			// 		// read meta from file
+	// 			//         	mapnikOmnivore.digest(path, function (err, metadata) {
+	// 			//         		if (err) {
+	// 			//         			console.log('ERR 400', err);
+	// 			//         			return callback(err);
+	// 			//         		}
+	// 			//         		if (!metadata) return callback('No metadata!');
+
+	// 			//         		db.metadata = JSON.stringify(metadata);
+					        	
+	// 			// 	        	// return
+	// 			// 	        	callback(null, db);
+	// 			//         	});
+
+	// 			//         } catch (e) { callback('meta fail: ' + e); }
+	// 	  //       	});
+	// 		});
+	// 	});
+	// },
+
+
+	// old way, with files
+	// handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
+	// 	if (!folder || !name || !fileUuid) return callback('Missing info.');
+
+	// 	fs.readdir(folder, function (err, files) {
+	// 		if (err || !files) return callback('Some files were rejected. Please upload <br>only one shapefile per zip.');
+
+	// 		// clone array
+	// 		var shapefiles = files.slice();
+
+	// 		// async ops
+	// 		var ops = [];
+
+	// 		// check if valid shapefile(s)
+	// 		ops.push(function (done) {
+	// 			api.geo.validateshp(files, done);
+	// 		});
+
+	// 		// convert shapefile to geo/topojson
+	// 		ops.push(function (done) {
+	// 			api.geo.convertshp(files, folder, done);
+	// 		});
+
+	// 		// run async jobs
+	// 		async.series(ops, function (err, results) {
+	// 			if (err) {
+	// 				// console.log('MOFO!!'.red, err);
+	// 				return callback(err);
+	// 			}
+
+	// 			var key = results[1];
+	// 			if (!key) return callback('No key.');
+
+	// 			var path = key.path;
+	// 			var name = key.name;
+	// 			var fileUuid = key.fileUuid;
+
+	// 			// add geojson file to list
+	// 			shapefiles.push(name);
+
+	// 			// return as db entry
+	// 			var db = {
+	// 				files : shapefiles,
+	// 				data : {
+	// 					geojson : name
+	// 				},
+	// 				title : name,
+	// 				file : fileUuid
+	// 			}
+
+	// 			api.geo.copyToVileFolder(path, fileUuid, function (err) {
+	// 				if (err) return callback('copytToVile err: ' + err);
+
+	// 				try {
+	// 					// read meta from file
+	// 			        	mapnikOmnivore.digest(path, function (err, metadata) {
+	// 			        		if (err) {
+	// 			        			console.log('ERR 400', err);
+	// 			        			return callback(err);
+	// 			        		}
+	// 			        		if (!metadata) return callback('No metadata!');
+
+	// 			        		db.metadata = JSON.stringify(metadata);
+					        	
+	// 				        	// return
+	// 				        	callback(null, db);
+	// 			        	});
+
+	// 			        } catch (e) { callback('meta fail: ' + e); }
+	// 	        	});
+	// 		});
+	// 	});
+	// },
 
 
 
@@ -207,7 +309,7 @@ module.exports = api.geo = {
 		files.forEach(function (f) {
 			var ext = f.slice(-4);
 			_.pull(mandatory, ext);
-		})
+		});
 
 		// if not all accounted for, return error
 		if (mandatory.length > 0) {
@@ -223,8 +325,40 @@ module.exports = api.geo = {
 		// get .shp file
 		var shps = [];
 		for (s in shapes) {
-			if (shapes[s] && shapes[s].slice(-4) == '.shp') {
-				shps.push(shapes[s]);
+			var shape_part = shapes[s];
+			if (shape_part && shape_part.slice(-4) == '.shp') {
+
+				console.log('shape_part: ', shape_part);
+
+				var basename = nodepath.basename(shape_part);
+
+				console.log('basnemae: ', basename);
+
+				if (basename.slice(0,1) != '.') {
+					shps.push(shape_part);
+				}
+			}
+		}
+		return shps;
+	},
+
+	getTheProjection : function (shapes) {
+		// get .prj file
+		var shps = [];
+		for (s in shapes) {
+
+			var shape_part = shapes[s];
+			if (shape_part && shape_part.slice(-4) == '.prj') {
+
+				console.log('shape_part: ', shape_part);
+
+				var basename = nodepath.basename(shape_part);
+
+				console.log('basnemae: ', basename);
+
+				if (basename.slice(0,1) != '.') {
+					shps.push(shape_part);
+				}
 			}
 		}
 		return shps;

@@ -39,8 +39,6 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
-// console.log('lauyer');
-
 // exports
 module.exports = api.layer = { 
 
@@ -48,18 +46,17 @@ module.exports = api.layer = {
 	// create layer
 	create : function (req, res) {
 
-		// lol?
-		return res.end(JSON.stringify({error : 'Unsupported.'}))
 
-		// var layerType = req.body.layerType;
+		var options = req.body;
 
-		// if (layerType == 'geojson') return api.layer.createLayerFromGeoJSON(req, res);
+		api.layer.createModel(options, function (err, doc) {
+			if (err) return api.error.general(res, err);
 
-		// res.end(JSON.stringify({
-		// 	layer : 'yo!'
-		// }));
+			res.json(doc);
+		});
 
 	},
+
 
 	// create OSM layer
 	createOSM : function (req, res) {
@@ -84,6 +81,26 @@ module.exports = api.layer = {
 			// add to project
 			doc && api.layer.addToProject(doc._id, projectUuid);
 		});
+	},
+
+
+	createPileLayer : function (options, callback) {
+
+		var host = api.config.portalServer.uri;
+
+		// send to tileserver storage
+		request({
+			method : 'POST',
+			uri : host + 'api/db/createLayer',
+			json : options
+		}, 
+
+		// callback
+		function (err, response, body) {
+			callback(err, body);
+
+		});
+
 	},
 
 
@@ -182,6 +199,14 @@ module.exports = api.layer = {
 				layer.save();
 			}
 
+			// update style
+			if (req.body.hasOwnProperty('style')) {
+				var style = req.body.style;
+				layer.style = style;
+				layer.save();
+			}
+
+
 			// update legends
 			if (req.body.hasOwnProperty('legends')) {
 				var legends = req.body.legends;
@@ -193,6 +218,14 @@ module.exports = api.layer = {
 			if (req.body.hasOwnProperty('zIndex')) {
 				var zIndex = req.body.zIndex;
 				layer.zIndex = zIndex;
+				layer.save();
+			}
+
+			// update data
+			if (req.body.hasOwnProperty('data')) {
+				var data = req.body.data;
+				layer.data = data;
+				layer.markModified('data');
 				layer.save();
 			}
 
@@ -340,8 +373,6 @@ module.exports = api.layer = {
 	// set carto css
 	setCartoCSS : function (req, res) {
 
-		// console.log('setCartoCSS!'.yellow);
-
 		// get params
 		var fileUuid 	= req.body.fileUuid,
 		    css 	= req.body.css,
@@ -353,11 +384,8 @@ module.exports = api.layer = {
 
 		var host = api.config.vile.uri;
 
-		// console.log('host: ', host);
-
 		// save css to file by cartoId 
 		fs.writeFile(csspath, css, {encoding : 'utf8'}, function (err) {
-			// console.log('write err?', err);
 			if (err) return api.error.general(req, res);
 
 			// send to tileserver storage
@@ -373,7 +401,6 @@ module.exports = api.layer = {
 
 			// callback
 			function (err, response, body) {
-				// console.log('err', err);
 
 				// custom error handling
 				if (err) {
@@ -477,29 +504,30 @@ module.exports = api.layer = {
 
 	createModel : function (options, callback) {
 
-		console.log('api.layer.createModel'.red);
-
 		var layer 		= new Layer();
-		layer.uuid 		= options.uuid;
+		layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),
 		layer.title 		= options.title;
 		layer.description 	= options.description || '';
 		layer.legend 		= options.legend || '';
 		layer.file 		= options.file;
 		layer.metadata 		= options.metadata;
+		layer.data 		= options.data;
 
-		if (options.data.geojson) layer.data.geojson = options.data.geojson;
-		if (options.data.raster)  layer.data.raster  = options.data.raster;
+		layer.save(function (err, savedLayer) {
+			if (err) return callback(err);
 
-		layer.save(function (err, doc) {
-			// console.log('layer model created:', err, doc);
-			callback && callback(err, doc);
+			if (options.projectUuid) {
+				return api.layer.addToProject(layer._id, options.projectUuid, function (err) {
+					callback && callback(err, savedLayer);
+				});
+			}
+			
+			callback && callback(err, savedLayer);
 		});
 	},
 
 	// save file to project (file, layer, project id's)
 	addToProject : function (layer_id, projectUuid, callback) {
-
-		console.log('===> ADD LAYER TO PROJECT', layer_id);
 
 		Project
 		.findOne({'uuid' : projectUuid })

@@ -89,7 +89,6 @@ module.exports = api.slack = {
 
 			// send
 			api.slack._send({text : text});
-			
 		});
 	},
 
@@ -132,7 +131,6 @@ module.exports = api.slack = {
 
 		// send
 		api.slack._send({ text : text });
-
 	},
 
 };

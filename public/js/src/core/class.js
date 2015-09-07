@@ -364,6 +364,7 @@ Wu.Util = {
 		
 		url += path;
 
+
 		http.open("POST", url, true);
 
 		//Send the proper header information along with the request
@@ -420,6 +421,12 @@ Wu.Util = {
 		// send string
 		http.send(json);
 	},
+
+
+
+
+
+	
 
 	_getServerUrl : function () {
 		return app.options.servers.portal.slice(0,-1);
@@ -480,6 +487,16 @@ Wu.Util = {
 
 	createRandom : function (digits) {
 		return Math.random().toString(36).slice((digits) * -1).toUpperCase()
+	},
+
+	getRandomChars : function (len, charSet) {
+		charSet = charSet || 'abcdefghijklmnopqrstuvwxyz';
+		var randomString = '';
+		for (var i = 0; i < len; i++) {
+			var randomPoz = Math.floor(Math.random() * charSet.length);
+			randomString += charSet.substring(randomPoz,randomPoz+1);
+		}
+		return randomString;
 	},
 
 	deselectText : function () {

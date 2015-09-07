@@ -85,12 +85,25 @@ module.exports = api.project = {
 			}, callback);
 		});
 
+		// add norkart layers
+		ops.push(function (project, callback) {
+			api.provider.norkart.setDefaults({
+				project : project
+			}, callback);
+		});
+
+		// add google layers
+		ops.push(function (project, callback) {
+			api.provider.google.setDefault({
+				project : project
+			}, callback);
+		});
+
 		// get updated project
 		ops.push(function (project, callback) {
 			Project
 			.findOne({uuid : project.uuid})
 			.exec(function (err, updatedProject) {
-				console.log('updatedProject:'.yellow, updatedProject);
 
 				if (err) return callback(err);
 				callback(null, updatedProject);
@@ -154,7 +167,7 @@ module.exports = api.project = {
 
 
 	_getProjectByUuid : function (projectUuid, done) {
-		Projects
+		Project
 		.find({uuid : projectUuid})
 		.populate('files')
 		.populate('roles')
@@ -227,7 +240,6 @@ module.exports = api.project = {
 		    ops = [];
 
 		console.log('Updating project.'.yellow, req.body);
-		// console.log('body: ', req.body);
 
 		// return on missing
 		if (!projectUuid) return api.error.missingInformation(req, res);
@@ -289,7 +301,8 @@ module.exports = api.project = {
 			'settings',
 			'categories',
 			'thumbCreated',
-			'state'
+			'state',
+			'pending'
 		];
 
  		// enqueue queries for valid fields
@@ -321,12 +334,12 @@ module.exports = api.project = {
 			project[field] = options[field];
 			project.markModified(field);
 			project.save(function (err, doc) {
-				console.log('saved?!'.red, err);
 				callback(null, doc);
 			});
 		};
 		return queries;
 	},
+
 
 
 	// #########################################
@@ -370,8 +383,6 @@ module.exports = api.project = {
 		.populate('layers')
 		.populate('roles')
 		.exec(function (err, project) {
-			console.log('##########'.cyan);
-			console.log('returning project: '.cyan, project);
 			res.end(JSON.stringify({
 				error : err,
 				project: project
@@ -437,7 +448,6 @@ module.exports = api.project = {
 		.exec(function (err, project) {
 			project.state = hashId;
 			project.save(function (err, doc) {
-				console.log('saved state!');
 			});
 		});
 

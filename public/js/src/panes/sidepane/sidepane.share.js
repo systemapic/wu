@@ -323,7 +323,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		app.SidePane.widenContainer();
 
 		// hide controls
-		this._hideControls();
+		// this._hideControls();
 
 	},
 
@@ -333,7 +333,7 @@ Wu.SidePane.Share = Wu.SidePane.Item.extend({
 		this._resetExpands();
 
 		// show controls
-		this._showControls();
+		// this._showControls();
 	},
 
 	_hideControls : function () {

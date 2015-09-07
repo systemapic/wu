@@ -61,6 +61,8 @@ L.UtfGrid = L.Class.extend({
 		this._url = url;
 		this._cache = {};
 
+		console.log('utf init!');
+
 
 		// Find a unique id in window we can use for our callbacks
 		// Required for jsonP
@@ -83,7 +85,7 @@ L.UtfGrid = L.Class.extend({
 		this._map = map;
 		this._container = this._map._container;
 
-		// this._update();
+		this._update();
 
 		var zoom = this._map.getZoom();
 
@@ -95,7 +97,7 @@ L.UtfGrid = L.Class.extend({
 		map.on('mousedown', this._mousedown, this);
 		map.on('mouseup', this._mouseup, this);
 		map.on('mousemove', this._move, this);
-		// map.on('moveend', this._update, this);
+		map.on('moveend', this._update, this);
 	},
 
 	onRemove: function () {
@@ -105,7 +107,7 @@ L.UtfGrid = L.Class.extend({
 		map.off('mousedown', this._mousedown, this);
 		map.off('mouseup', this._mouseup, this);
 		map.off('mousemove', this._move, this);
-		// map.off('moveend', this._update, this);
+		map.off('moveend', this._update, this);
 		
 		if (this.options.pointerCursor) {
 			this._container.style.cursor = '';
@@ -149,7 +151,7 @@ L.UtfGrid = L.Class.extend({
 			if (on.data) {
 				this.fire('mouseover', on);
 				if (this.options.pointerCursor) {
-					this._container.style.cursor = 'pointer';
+					this._container.style.cursor = 'crosshair';
 				}
 			}
 
@@ -199,8 +201,12 @@ L.UtfGrid = L.Class.extend({
 	//TODO: Load from center etc
 	_update: function () {
 
-		var bounds = this._map.getPixelBounds(),
-		    zoom = this._map.getZoom(),
+		console.log('update');
+
+		var map = this._map || app._map; // systemapic hack
+
+		var bounds = map.getPixelBounds(),
+		    zoom = map.getZoom(),
 		    tileSize = this.options.tileSize;
 
 		if (zoom > this.options.maxZoom || zoom < this.options.minZoom) {
@@ -213,7 +219,7 @@ L.UtfGrid = L.Class.extend({
 			seTilePoint = new L.Point(
 				Math.floor(bounds.max.x / tileSize),
 				Math.floor(bounds.max.y / tileSize)),
-				max = this._map.options.crs.scale(zoom) / tileSize;
+				max = map.options.crs.scale(zoom) / tileSize;
 
 		//Load all required ones
 		var visible_tiles = [];

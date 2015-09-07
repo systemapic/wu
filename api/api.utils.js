@@ -38,16 +38,73 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
+
+function constantLoopFunctions () {
+	setInterval(function () {
+
+		// get stats on server
+		api.utils.updateStatistics();
+	
+	}, 1000);
+};
+
+constantLoopFunctions();
+
+
 // exports
 module.exports = api.utils = { 
 
+	parse : function (string) {
+		try {
+			var object = JSON.parse(string);	
+		} catch (e) {
+			var object = false;
+		}
+		return object;
+	},
+
+	updateStatistics : function () {
+
+		// get stats
+		STATS_SCRIPT_PATH = '../scripts/get_cpu_stats.sh'; // todo: put in config
+		
+		// create database in postgis
+		exec(STATS_SCRIPT_PATH, {maxBuffer: 1024 * 50000}, function (err, stdin, stdout) {
+			if (err) return;
+			var cpu_usage = -1;
+			try {
+				var stdin_split = stdin.split('\n');
+				var cpu_usage = parseFloat(stdin_split[1].split('   ')[2]);
+
+			} catch (e) {}
+			
+			// save stats to redis
+			api.redis.stats.lpush('server_stats', JSON.stringify({
+				time : _.now(),
+				cpu_usage : cpu_usage
+			}));
+		});
+	},
+
+	getRandomChars : function (len, charSet) {
+		charSet = charSet || 'abcdefghijklmnopqrstuvwxyz';
+		var randomString = '';
+		for (var i = 0; i < len; i++) {
+			var randomPoz = Math.floor(Math.random() * charSet.length);
+			randomString += charSet.substring(randomPoz,randomPoz+1);
+		}
+		return randomString;
+	},
+
+	getRandom : function (len, charSet) {
+		return api.utils.getRandomChars(len, charSet);
+	},
 
 	createNameSlug : function (name) {
 		var slug = name.replace(/\s+/g, '').toLowerCase();
 		slug =api.utils.stripAccents(slug);
 		return slug;
 	},
-
 
 	getRandomName : function () {
 		return _.sample(api.utils.randomNames);
@@ -534,7 +591,6 @@ module.exports = api.utils = {
 		var mapping = function (c) {
 			return map[c] || c; 
 		};
-
 		
 		return str.replace(nonWord, mapping);
 	},

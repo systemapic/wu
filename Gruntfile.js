@@ -141,6 +141,11 @@ module.exports = function(grunt) {
 					// d3
 					'public/js/lib/d3.js/d3.js',
 
+					// c3
+					'public/js/lib/d3/c3.js',
+					'public/js/lib/dc.js/crossfilter.js',
+					'public/js/lib/dc.js/dc.js',
+
 					// socket.io
 					'/js/lib/socket.io/socket.io.js',
 
@@ -148,15 +153,11 @@ module.exports = function(grunt) {
 					'public/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js',
 					'public/js/lib/lodash/lodash.min.js',
 					'public/js/lib/async/async.js',
-					'public/js/lib/leaflet.freedraw.js/jsclipper.js',
-					'public/js/lib/leaflet.freedraw.js/concavehull.js',
-					'public/js/lib/leaflet.freedraw.js/graham_scan.js',
-					'public/js/lib/leaflet.freedraw.js/hammer.js',
 					
 					// leaflet + mapbox
 					'public/js/lib/leaflet.js/leaflet-0.7.3-src.js',
 					'public/js/lib/leaflet.js/plugins/leaflet.utfgrid.js',
-					'public/js/lib/leaflet.freedraw.js/leaflet.freedraw-src.js',
+					'public/js/lib/leaflet.js/plugins/leaflet-draw/leaflet.draw-src.js',
 
 					// tools
 					'public/js/lib/dropzone.js/dropzone.min.js',
@@ -182,10 +183,13 @@ module.exports = function(grunt) {
 					'public/js/lib/codemirror/mode/cartocss/codemirror.palette.js',
 					'public/js/lib/codemirror/mode/cartocss/sexagesimal.js',
 					'public/js/lib/codemirror/mode/cartocss/spectrum.js',
+					'public/js/lib/codemirror/mode/sql/sql.js',
 
 					// extra
 					'public/js/lib/opentip/opentip-native.js',
-					'public/js/lib/jss.js/jss.js'			
+					'public/js/lib/jss.js/jss.js',	
+					'public/js/lib/keymaster/keymaster.js',	
+					'public/js/lib/moment.js/moment.min.js',
 
 				],
 				
@@ -254,10 +258,27 @@ module.exports = function(grunt) {
 					'public/js/src/controls/control.mouseposition.js',
 					'public/js/src/controls/control.baselayertoggle.js',
 					'public/js/src/controls/control.cartocss.js',
-
 					'public/js/src/controls/control.tooltip.js',
 					'public/js/src/controls/control.style.js',
 					'public/js/src/controls/control.spinningmap.js',
+					'public/js/src/controls/control.freedraw.js',
+					'public/js/src/controls/control.chart.js',	
+
+					// chrome
+					'public/js/src/chrome/chrome.js',	
+					'public/js/src/chrome/chrome.bottom.js',	
+					'public/js/src/chrome/chrome.top.js',	
+					'public/js/src/chrome/chrome.left.js',	
+					'public/js/src/chrome/chrome.right.js',	
+					'public/js/src/chrome/chrome.center.js',	
+					'public/js/src/chrome/content/chrome.content.js',	
+					'public/js/src/chrome/content/chrome.settingsselector.js',	
+					'public/js/src/chrome/content/chrome.mapsettings.js',	
+					'public/js/src/chrome/content/chrome.layers.js',	
+					'public/js/src/chrome/content/chrome.cartocss.js',	
+					'public/js/src/chrome/content/chrome.styler.js',	
+					'public/js/src/chrome/content/chrome.tooltip.js',	
+					'public/js/src/chrome/content/chrome.filters.js',	
 
 					// Models 
 					'public/js/src/models/model.projects.js',
@@ -280,6 +301,8 @@ module.exports = function(grunt) {
 
 					// Extend Leaflet
 					'public/js/src/ext/extendLeaflet.js',
+					'public/js/src/ext/popup.chart.js',
+					'public/js/src/ext/resumable.js',
 					
 					// App 
 					'public/js/src/core/app.js'
@@ -307,7 +330,9 @@ module.exports = function(grunt) {
 					'public/js/lib/codemirror/mode/cartocss/codemirror.carto.css',
 					'public/js/lib/codemirror/mode/cartocss/codemirror.fetta.css',
 					'public/js/lib/codemirror/theme/mbo.css',
-					'public/css/opentip.css'
+					'public/css/opentip.css',
+					'public/js/lib/c3/c3.css',
+					'public/js/lib/dc.js/dc.css'
 				],
 				
 				dest : 'dist/tmp/css.dependencies.css'

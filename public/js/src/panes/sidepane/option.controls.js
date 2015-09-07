@@ -110,6 +110,10 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		var disable = 'disable' + item.camelize();
 		var mapPane = app.MapPane;
 
+		console.log('%c toggle control', 'background: red; color: white;')
+		console.log('item', item);
+		console.log('on', on);
+
 		var control = app.MapPane.getControls()[item];
 
 
@@ -117,16 +121,20 @@ Wu.SidePane.Options.Controls = Wu.SidePane.Options.Item.extend({
 		project.store.controls[item] = on;	// todo
 		project._update('controls');
 
+
 		// toggle
 		if (on) {
 		
 			control._on();
+
+			console.log('mia control: ', control);
 
 			// enable control on map
 			// mapPane[enable]();
 
 			// enable control in menu
 			this.enableControl(item);
+
 		} else {
 
 			control._off(); // todo: remove if

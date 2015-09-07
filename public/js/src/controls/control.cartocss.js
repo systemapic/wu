@@ -97,6 +97,7 @@ L.Control.Cartocss = Wu.Control.extend({
 
 		// mark content loaded
 		this._initedContent = true;
+
 	},
 
 	_initEmpty : function (){
@@ -162,8 +163,11 @@ L.Control.Cartocss = Wu.Control.extend({
 		this._tooltipWrapper		= Wu.DomUtil.create('div', 'cartocss-tooltip-wrapper', this._tooltipOuterWrapper);
 		this._formWrapper 		= Wu.DomUtil.create('form', 'cartocss-form-wrapper', this._wrapper); // For CodeMirror: create form wrapper
 		this._inputArea 		= Wu.DomUtil.create('textarea', 'cartocss-input', this._formWrapper); // For CodeMirror: create text area
+		this._sqlPane 			= Wu.DomUtil.create('textarea', 'cartocss-sql', this._wrapper);
+		this._sqlPane.setAttribute('placeholder', 'Insert SQL statement.');
 		this._errorPane 		= Wu.DomUtil.create('div', 'cartocss-error-pane', this._wrapper); // error feedback pane
 		this._updateButton 		= Wu.DomUtil.create('div', 'cartocss-update-button', this._wrapper, 'Update'); // create update button
+		this._refreshButton 		= Wu.DomUtil.create('div', 'cartocss-refresh-button', this._wrapper); // create update button
 
 		// append to leaflet-control-container
 		app._map.getContainer().appendChild(this._editorContainer);
@@ -208,6 +212,9 @@ L.Control.Cartocss = Wu.Control.extend({
 		// Resize container
 		Wu.DomEvent[onoff](this._resizeHandle, 'mousedown', this.resize, this);
 
+		// refresh button
+		Wu.DomEvent[onoff](this._refreshButton, 'mousedown', this._refreshLayer, this);
+
 		// stops
 		Wu.DomEvent[onoff](this._editorContainer, 	'mousewheel mousedown dblclick click', 		Wu.DomEvent.stopPropagation, this);
 		Wu.DomEvent[onoff](this._toolbarButton, 	'dblclick', 					Wu.DomEvent.stopPropagation, this);
@@ -225,6 +232,12 @@ L.Control.Cartocss = Wu.Control.extend({
 	},
 	_removeHooks : function () {
 		this._setHooks('off');
+	},
+
+	_refreshLayer : function () {
+		console.log('redraw', this);
+		this._layer.layer.redraw();
+		this._layer.gridLayer.redraw();
 	},
 
 	resize : function () {
@@ -304,7 +317,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		string += 	'//    [zoom>=12] {\n';
 		string += 	'//        // CSS for zoom 12 and higher\n';
 		string += 	'//    }\n';
-		string += 	'//    [field_name="Field Name"] {\n';
+		string += 	'//    [field_name=Field Name] {\n';
 		string += 	'//        // CSS for this field only\n';
 		string += 	'//    }\n';
 
@@ -314,7 +327,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		string += 	'	// --------------------------\n'
 
 		// add each field to string
-		for (key in fields) {
+		for (var key in fields) {
 			var type = fields[key];
 			string += '    // [' + key + '=' + type + '] {}\n';
 		}
@@ -505,19 +518,22 @@ L.Control.Cartocss = Wu.Control.extend({
 		this._styleHeaderLayerName.innerHTML = layer.store.title.camelize();
 
 		// check for existing css
-		this._cartoid = this._layer.getCartoid();
+		// this._cartoid = this._layer.getCartoid();
 
 		// if no style stored on layer yet, set default message	
-		if (!this._cartoid) return this._initStylingDefault();	
+		// if (!this._cartoid) return this._initStylingDefault();	
 
 		this.clearCodeMirror();			
 
 		// else get css from server
-		this._layer.getCartoCSS(this._cartoid, function (ctx, css) {
+		var css = this._layer.getCartoCSS();
+		
+		this.updateCodeMirror(css);
+		// this._layer.getCartoCSS(this._cartoid, function (ctx, css) {
 			// set css
-			this.updateCodeMirror(css);
+			// this.updateCodeMirror(css);
 
-		}.bind(this));
+		// }.bind(this));
 	},
 	
 	initLegends : function () {
@@ -840,7 +856,7 @@ L.Control.Cartocss = Wu.Control.extend({
 			// create tooltip entry
 			this._createTooltipEntry(field.key, field.title, field.on);
 
-			if ( field.on) onCounter++;
+			if (field.on) onCounter++;
 
 		}, this);
 
@@ -889,7 +905,7 @@ L.Control.Cartocss = Wu.Control.extend({
 		this._toolTipSwitches = [];
 
 		// for each field
-		for (key in fields) {
+		for (var key in fields) {
 			var value = fields[key];
 
 			// create tooltip entry
@@ -1097,26 +1113,91 @@ L.Control.Cartocss = Wu.Control.extend({
 		// get css string
 		var css = this._codeMirror.getValue();
 
+
 		// return if empty
 		if (!css) return;
-		
-		// set vars
-		var fileUuid = this._layer.getFileUuid();
-		var cartoid = Wu.Util.createRandom(7);
 
-		// send to server
-		var json = {							// todo: verify valid css
-			css : css,
-			fileUuid : fileUuid,
-			cartoid : cartoid,
-			layerUuid : this._layer.getUuid()
+		// get sql
+		var sql = this._sqlPane.value;
+	
+		// request new layer
+		var layerOptions = {
+			css : css, 
+			sql : sql,
+			layer : this._layer
 		}
 
-		// save to server
-		this._layer.setCartoCSS(json, this.renderedStyling.bind(this));
+		this._updateLayer(layerOptions);
 
-		// Google Analytics event tracking
-		app.Analytics.setGaEvent(['Controls', 'CartoCSS render layer: ' + this._layer.getTitle()]);
+	},
+
+	_createSQL : function (file_id, sql) {
+
+		if (sql) {
+			// replace 'table' with file_id in sql
+			sql.replace('table', file_id);
+
+			// wrap
+			sql = '(' + sql + ') as sub';
+
+		} else {
+			// default
+			sql = '(SELECT * FROM  ' + file_id + ') as sub';
+		}
+		return sql;
+	},
+
+	_updateLayer : function (options, done) {
+
+		var css = options.css,
+		    layer = options.layer,
+		    file_id = layer.getFileUuid(),
+		    sql = options.sql,
+		    sql = this._createSQL(file_id, sql),
+		    project = this._project;
+
+
+		var layerOptions = layer.store.data.postgis;
+
+		layerOptions.sql = sql;
+		layerOptions.css = css;
+		layerOptions.file_id = file_id;		
+
+		var layerJSON = {
+			geom_column: 'the_geom_3857',
+			geom_type: 'geometry',
+			raster_band: '',
+			srid: '',
+			affected_tables: '',
+			interactivity: '',
+			attributes: '',
+			access_token: app.tokens.access_token,
+			cartocss_version: '2.0.1',
+			cartocss : css,
+			sql: sql,
+			file_id: file_id,
+			return_model : true,
+			layerUuid : layer.getUuid()
+		}
+
+		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
+
+			// new layer
+			var newLayerStyle = Wu.parse(newLayerJSON);
+
+			console.log('newLayerJSON', newLayerStyle);
+
+			if (newLayerStyle.error) {
+				done();
+				return console.error(newLayerStyle.error);
+			}
+
+			layer.setStyle(newLayerStyle.options);
+
+			layer.update({enable : true});
+
+			done && done();
+		});
 
 	},
 

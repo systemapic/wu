@@ -259,8 +259,6 @@ module.exports = api.oauth2 = {
  */
 oauth2server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, done) {
 
-	console.log('oauth2.js > refresh token!'.red);
-
 	api.oauth2.store.refreshTokens.find(refreshToken, function (err, authCode) {
 		if (err) return done(err);
 		
@@ -279,8 +277,6 @@ oauth2server.exchange(oauth2orize.exchange.refreshToken(function (client, refres
 
 // bearer token
 oauth2server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, done) {
-
-	console.log('exchange passwrod!!!!', client, username, password); // this is run on /oauth/token POST
 
 	//Validate the user
 	api.oauth2.store.users.findByUsername(username, function (err, user) {

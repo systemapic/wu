@@ -62,6 +62,7 @@ module.exports = api.user = {
 
 		console.log('create user', account, projectUuid, options);
 
+		// permissions hack, need project to get a capability... todo: refactor whole permissions thing
 		ops.push(function (callback) {
 			if (projectUuid) {
 				api.project._getProjectByUuid(projectUuid, callback);
@@ -93,6 +94,7 @@ module.exports = api.user = {
 			api.email.sendWelcomeEmail(user, password, account);  // refactor plain pass
 			callback(null, user);
 		});
+
 
 		// run ops
 		async.waterfall(ops, function (err, user) {
@@ -257,7 +259,7 @@ module.exports = api.user = {
 			//deleting token 
 			var deletedUser = options.subject;
 			var token = deletedUser.token; 
-			if (token) api.redis.del(token); 
+			if (token) api.redis.temp.del(token); 
 
 			//removing the whole user
 			options.subject.remove(callback);

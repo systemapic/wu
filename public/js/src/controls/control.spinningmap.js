@@ -269,12 +269,12 @@ L.SpinningMap = L.Class.extend({
 
 	// start spinning
 	start : function () {
-		this._gl ? this._startGL() : this._start();
+		// this._gl ? this._startGL() : this._start();
 	},
 
 	// stop spinning
 	stop : function () {
-		this._gl ? this._stopGL() : this._stop();
+		// this._gl ? this._stopGL() : this._stop();
 	},
 
 	_start : function () {
