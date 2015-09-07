@@ -90,16 +90,13 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 	},
 
-	_updateStyle : function () {
-
-	},
-	
 	_updateDimensions : function () {
 
 		if (!this._SQLEditor) return;
 
 		// get dimensions
 		var dims = app.Chrome.Right.getDimensions();
+
 		// set sizes
 		var sql = this._SQLEditor.getWrapperElement();
 		if (sql) {
@@ -110,9 +107,11 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 	_createRefresh : function () {
 
+		// create div
 		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
 		this._refreshButton = Wu.DomUtil.create('div', 'chrome chrome-content cartocss refresh-button', this._container, text);
 
+		// set event
 		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
 	},
 
@@ -135,6 +134,7 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 			layer : this._layer
 		}
 
+		// update layer
 		this._updateLayer(layerOptions);
 
 	},
@@ -150,6 +150,7 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 	_createSQL : function (file_id, sql) {
 
 		if (sql) {
+
 			// replace 'table' with file_id in sql
 			sql.replace('table', file_id);
 
@@ -164,8 +165,6 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 	},
 
 	_updateLayer : function (options, done) {
-
-		console.log('_updateLayer, options, ', options);
 
 		var css 	= this.getCartocssValue(),
 		    layer 	= options.layer,
@@ -228,7 +227,6 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 	open : function () {
 		console.log('open!', this);
 	},
-
 
 	_selectedActiveLayer : function (e) {
 		console.log('selected active layer, filter', e);
@@ -378,11 +376,15 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
   		});
 	},
 
-	_getColumns : function () {
+	_getSortedColumns : function () {
 		if (!this._layer) return false;
-		var meta = Wu.parse(this._layer.getPostGISData().metadata);
-		var columns = meta.columns;
-		return columns;
+
+		var meta = Wu.parse(this._layer.getPostGISData().metadata),
+		    columns = meta.columns,
+		    keys = Object.keys(columns),
+		    keysSorted = keys.sort();
+
+		return keys.reverse();
 	},
 
 	_createFilterDropdown : function () {
@@ -399,18 +401,18 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		// active layer wrapper
 		var wrap = this._filterDropdown = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper');
 
-		// insert on top of containe
+		// insert on top of container
 		this._container.insertBefore(wrap, this._container.children[1]);
 
 		// title
-		var title = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
+		var titleDiv = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
 		
 		// create dropdown
 		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', wrap);
 		var select = this._select = Wu.DomUtil.create('select', 'active-layer-select', selectWrap);
 
 		// get layers
-		var columns = this._getColumns();
+		var columns = this._getSortedColumns();
 
 		// placeholder
 		var option = Wu.DomUtil.create('option', '', select);
@@ -418,22 +420,55 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		option.setAttribute('disabled', '');
 		option.setAttribute('selected', '');
 
-		// create options
-		for (var c in columns) {
+		// fill dropdown
+		columns.forEach(function (column) {
 			var option = Wu.DomUtil.create('option', 'active-layer-option', select);
-			option.value = c;
-			option.innerHTML = c;
-		}
+			option.value = column;
+			option.innerHTML = column;
+		});
 
 		// select event
 		Wu.DomEvent.on(select, 'change', this._selectedFilterColumn, this); // todo: mem leak?
 
+		// clear old filterdi
+		this._clearFilterDiv();
+
+		// auto-select option if filter active
+		this._autoSelectFilter();
+	},
+
+	_clearFilterDiv : function () {
+
+		if (this._filterDiv) this._filterDiv.innerHTML = '';
+
+	},
+
+	_autoSelectFilter : function () {
+		if (!this._layer) return;
+		
+		var filter = Wu.parse(this._layer.getFilter());
+
+		if (!filter.length) return; 
+
+		// column
+		var column = filter[0].column;
+
+		// create chart
+		this._createFilterChart(column);
+
+		// set index in dropdown
+		this._select.selectedIndex = this._getDropdownIndex(column);
+	},
+
+	_getDropdownIndex : function (column) {
+		for (var i = 0; i < this._select.length; i++) {
+			if (this._select.options[i].value == column) return i;
+		}
+		return 0;
 	},
 
 	_selectedFilterColumn : function (e) {
-
 		var column = e.target.value;
-
 		this._createFilterChart(column);
 	},
 
@@ -449,69 +484,136 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 			if (err) return console.error('histogram err: ', err);
 
 			// create div
-			this._filterDiv = Wu.DomUtil.createId('div', 'chrome-content-filter-chart');
+			var filterDiv = this._filterDiv = Wu.DomUtil.createId('div', 'chrome-content-filter-chart');
 			this._container.insertBefore(this._filterDiv, this._filterDropdown.nextSibling);
 
 			// return if no histogram
 			if (!histogram) {
+
 				// not valid data to create histogram from
 				this._filterDiv.innerHTML = 'No valid data to create histogram from.'
 				return;
 			}
 
-			// create chart
-			var chart = dc.barChart(this._filterDiv),
-		   	    ndx             = crossfilter(histogram),
-			    runDimension    = ndx.dimension(function(d) {return +d.bucket;}), 			// x-axis
-			    speedSumGroup   = runDimension.group().reduceSum(function(d) {return d.freq;});	// y-axis
-
-			// chart settings
-			chart
-			.width(340)
-			.height(180)
-			.gap(1)
-			.x(d3.scale.linear().domain([0, histogram.length + 1]))
-			.brushOn(true) // drag filter
-			.renderLabel(true)
-			.dimension(runDimension)
-			.group(speedSumGroup)
-			.margins({top: 10, right: 10, bottom: 20, left: 40})
-
-			// filter event (throttled)
-			chart.on('filtered', _.throttle(function (chart, filter) {
-				console.log('on.filtered', filter);
-				if (!filter) return this._clearFilter();
-
-				// round buckets
-				var buckets = [Math.round(filter[0]), Math.round(filter[1])];
-
-				// apply sql filter, create new layer, etc.
-				this._applyFilter(column, buckets, histogram);
-
-			}.bind(this), 1000));
-
-			// prettier y-axis
-			chart.yAxis().tickFormat(function(v) {
-				if (v > 1000000) return Math.round(v/1000000) + 'M';
-				if (v > 1000) return Math.round(v/1000) + 'k';
-				return v;
-			});
-
-			// set y axis tick values
-			var ytickValues = this._getYAxisTicks(histogram);
-			chart.yAxis().tickValues(ytickValues);
-
-			// set format of x axis ticks
-			chart.xAxis().tickFormat(function(v) {
-				if (v > histogram.length) v = histogram.length - 1;
-				var value = Math.round(histogram[v].range_min * 100) / 100;
-				return value;
+			// chart
+			var chart = this._createChart({
+				column : column, 
+				histogram : histogram,
+				appendTo : filterDiv,
 			});
 
 			// render
 			chart.render();
 
+			// check if filter already stored in layer
+			this._applyAlreadyStoredFilter(column);
+
 		}.bind(this));
+
+	},
+
+
+	_createChart : function (options) {
+
+		var appendTo = options.appendTo,
+		    histogram = options.histogram,
+		    column = options.column;
+
+		// create chart
+		var chart = this._chart = dc.barChart(this._filterDiv),
+	   	    ndx             = crossfilter(histogram),
+		    runDimension    = ndx.dimension(function(d) {return +d.bucket;}), 			// x-axis
+		    speedSumGroup   = runDimension.group().reduceSum(function(d) {return d.freq;});	// y-axis
+
+		// chart settings
+		chart
+		    .width(340)
+		    .height(180)
+		    .gap(1)
+		    .x(d3.scale.linear().domain([0, histogram.length + 1]))
+		    .brushOn(true) // drag filter
+		    .renderLabel(true)
+		    .dimension(runDimension)
+		    .group(speedSumGroup)
+		    .margins({top: 10, right: 10, bottom: 20, left: 40});
+
+		// filter event (throttled)
+		chart.on('filtered', function (chart, filter) {
+
+			// filter == null
+			if (!filter) return this._registerFilter(false);
+
+			// round buckets
+			var buckets = [Math.round(filter[0]), Math.round(filter[1])];
+
+			// apply sql filter, create new layer, etc.
+			this._registerFilter(column, buckets, histogram);
+
+		}.bind(this));
+
+		// prettier y-axis
+		chart.yAxis().tickFormat(function(v) {
+			if (v > 1000000) return Math.round(v/1000000) + 'M';
+			if (v > 1000) return Math.round(v/1000) + 'k';
+			return v;
+		});
+
+		// set y axis tick values
+		var ytickValues = this._getYAxisTicks(histogram);
+		chart.yAxis().tickValues(ytickValues);
+
+		// set format of x axis ticks
+		chart.xAxis().tickFormat(function(v) {
+			if (v > histogram.length) v = histogram.length - 1;
+			var value = Math.round(histogram[v].range_min * 100) / 100;
+			return value;
+		});
+
+		// set events
+		chart.renderlet(function (chart) {
+			// this._chart.select('.brush').on('mouseup', this._onBrushMouseup.bind(this));
+			this._chart.select('.brush').on('mousedown', this._onBrushMousedown.bind(this));
+		}.bind(this));
+
+
+		return chart;
+
+	},
+
+	_onBrushMousedown : function (e) {
+		// add full screen mouseup/mouseout catcher
+		this._brushCatcher = Wu.DomUtil.create('div', 'brush-catcher', app._appPane);
+		Wu.DomEvent.on(this._brushCatcher, 'mouseup', this._onBrushMouseup, this);
+		Wu.DomEvent.on(this._brushCatcher, 'mouseout', this._onBrushMouseup, this);
+	},
+
+	_onBrushMouseup : function (e) {
+
+		// remove catcher
+		Wu.DomEvent.off(this._brushCatcher, 'mouseup', this._onBrushMouseup, this);
+		Wu.DomEvent.off(this._brushCatcher, 'mouseout', this._onBrushMouseup, this);
+		Wu.DomUtil.remove(this._brushCatcher);
+
+		// timeout hack, due to d3 race conditions on brush events
+		setTimeout(this._applyFilter.bind(this), 500);
+	},
+
+	_applyAlreadyStoredFilter : function (column) {
+		var filter = this._layer.getFilter();
+		if (!filter) return;
+
+		var f = Wu.parse(filter);
+
+		// find column
+		var c = _.find(f, function (col) {
+			return col.column == column;
+		});
+
+		if (!c) return;
+
+		// filter, redraw
+		this._chart.filter([c.bucket_min, c.bucket_max]);
+		this._chart.redraw();
 
 	},
 
@@ -533,26 +635,11 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 	},
 
 	_getXAxisTicks : function (histogram) {
-		// // var m = _.max(histogram, function (h) {
-		// // 	return h.freq;
-		// // });
-
-		// // var max = m.freq;
-
-		// // // five ticks
-		// // var ticks = [];
-		// // for (var n = 1; n < 6; n++) {
-		// // 	var val = max/5 * n;
-		// // 	ticks.push(val);
-		// // }
-
-		// var ticks = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
-
-		// return ticks;
+		
 	},
 
+
 	_clearFilter : function () {
-		console.log('CLEAR FILTER');
 
 		// get sql values
 		var currentSQL = this._SQLEditor.getValue();
@@ -567,11 +654,29 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		// update style
 		this._updateStyle();
 
+		// save filter to layer
+		this._layer.setFilter(JSON.stringify([])); // will delete all column filters
+
+	},
+
+	_registerFilter : function (column, buckets, histogram) {
+
+		// no filter
+		if (!column) return this._filters = false;
+ 
+ 		this._filters = {};
+		this._filters.column = column;
+		this._filters.buckets = buckets;
+		this._filters.histogram = histogram;
 	},
 
 	_applyFilter : function (column, buckets, histogram) {
 
-		console.log('_applyFilter', column, buckets, histogram);
+		if (!this._filters) return this._clearFilter();
+
+		var column = this._filters.column;
+		var buckets = this._filters.buckets;
+		var histogram = this._filters.histogram;
 
 		// get bucket
 		var bottom_bucket = buckets[0];
@@ -584,11 +689,9 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 		var bucket_max = histogram[top_bucket];
 		var range_max = Math.round(bucket_max.range_max * 100)/100;
 		
-		console.log('range_min, range_max', range_min, range_max);
-
 		// create SQL
 		var sql = 'SELECT * FROM table';
-		sql    += ' where ' + column + ' > ' + range_min + ' and ' + column + ' < ' + range_max;
+		sql    += ' \nwhere ' + column + ' > ' + range_min + '\nand ' + column + ' < ' + range_max;
 
 		console.log('SQL', sql);
 
@@ -597,6 +700,13 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 
 		// update style
 		this._updateStyle();
+
+		// save filter to layer
+		this._layer.setFilter(JSON.stringify([{
+			column : column,
+			bucket_min : bottom_bucket,
+			bucket_max : top_bucket
+		}]));
 
 	},
 
@@ -622,6 +732,7 @@ Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
 			// return
 			done && done(null, histogramData);
 		});
+
 	}
 });
 

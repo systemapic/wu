@@ -324,7 +324,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomUtil.removeClass(this._innerContainer, 'closed');
 	},
 
-
 	// enter edit mode of layermenu
 	enableEdit : function () {
 		if (this.editMode) return;
@@ -347,9 +346,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		
 		// enable drag'n drop in layermenu
 		this.enableSortable();
-
-		// set title
-		// this._layerMenuHeaderTitle.innerHTML = 'Edit Layer Menu';  
 
 		// add edit style
 		Wu.DomUtil.addClass(this._innerContainer, 'edit-mode');

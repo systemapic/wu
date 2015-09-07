@@ -61,6 +61,7 @@ var layerSchema = mongoose.Schema({
 	legends : String,  // json string with cartocss legends
 	file : String,	   // file uuid that layer is connected to, if any
 	style : String,
+	filter : String,
 	tileType : String, // tiletype, eg. 'aerial', 'hybrid'
 });
 
