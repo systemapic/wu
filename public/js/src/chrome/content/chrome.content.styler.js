@@ -60,19 +60,38 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		// mark button
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
 	},
+
+	closed : function () {
+		// clean up
+		this._tempRemoveLayers();
+		// this._cleanup();
+	},	
 	
 	// event run when layer selected 
 	_selectedActiveLayer : function (e) {
 
+		this._fieldsWrapper.innerHTML = '';
+
 		this.layerUuid = e.target.value;
 
-		var layer = this._project.getLayer(this.layerUuid);
+		this._layer = this._project.getLayer(this.layerUuid);
 
 		// get current style, returns default if none
-		var style = layer.getEditorStyle();
+		var style = this._layer.getStyling();
+
+		this.tabindex = 1;
+
+		if ( style ) { 
+			this.cartoJSON = style;	
+		} else {
+			this.cartoJSON = {};
+		}
 
 		// init style json
-		this._initStyle(style);
+		this._initStyle();
+
+		// fitte	
+		this._tempaddLayer();
 	},
 
 
@@ -82,6 +101,19 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		this._refreshButton = Wu.DomUtil.create('div', 'chrome chrome-content cartocss refresh-button', this._container, text);
 
 		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
+		Wu.DomEvent.on(this._refreshButton, 'mouseover', this._closeColorRangeSelector, this);
+	},	
+
+	_closeColorRangeSelector : function () {
+
+		var key = 'colorrange';
+
+		var rangeSelector = Wu.DomUtil.get('chrome-color-selector-wrapper-' + key);
+		var clickCatcher = Wu.DomUtil.get('click-catcher-' + key);
+
+		if ( rangeSelector ) Wu.DomUtil.addClass(rangeSelector, 'displayNone');
+		if ( clickCatcher  ) Wu.DomUtil.addClass(clickCatcher, 'displayNone');		
+
 	},	
 
 
@@ -103,7 +135,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		// Get columns
 		this.columns = layerMeta.columns;
 
-		this.metaFields = ['NONE', '---------------'];
+		this.metaFields = ['static', '---------------'];
 
 		for ( var k in this.columns ) {
 
@@ -119,8 +151,8 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	// INIT CONTENT
 	// INIT CONTENT
 
-	_initStyle : function (style) {
-		
+	_initStyle : function () {
+
 		this.getLayerMeta();
 
 		this.initPoint();
@@ -135,6 +167,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 	initPoint : function () {
 
+
 		// Create JSON obj if it's not already there
 		if ( !this.cartoJSON.point ) this.cartoJSON.point = {};
 
@@ -146,7 +179,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 		// Create line
 		var lineOptions = {
-			key 		: 'point', 
+			key 		: 'point',
 			wrapper 	: this._pointSectionWrapper,
 			input 		: false,
 			title 		: '<b>Point</b>',
@@ -154,7 +187,11 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			rightPos	: false,
 			type 		: 'switch'
 		}
-		this._createMetaFieldLine(lineOptions);	
+		this._createMetaFieldLine(lineOptions);
+
+
+		this._saveToServer('point', '', isOn);
+
 	},
 
 
@@ -183,9 +220,14 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		// Create JSON obj if it's not already there
 		if ( !this.cartoJSON.point[key] ) this.cartoJSON.point[key] = {};
 
+		// xoxoxox 
+
+		var defaultRange = ['#ff0000', '#a5ff00', '#003dff'];
+
 		// Get stores states
 		var isOn   = this.cartoJSON.point[key].range ? false : true;
-		var val    = this.cartoJSON.point[key].staticVal ? this.cartoJSON.point[key].staticVal : '#FF33FF';
+		var staticVal = this.cartoJSON.point[key].staticVal ? this.cartoJSON.point[key].staticVal : '#FF33FF';
+		var val    = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : defaultRange;
 		var range  = this.cartoJSON.point[key].range ? this.cartoJSON.point[key].range : false;
 		var minMax = this.cartoJSON.point[key].minMax ? this.cartoJSON.point[key].minMax : false;
 		var customMinMax = this.cartoJSON.point[key].customMinMax ? this.cartoJSON.point[key].customMinMax : false;
@@ -198,7 +240,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			isOn 		: isOn,
 			rightPos	: false,
 			type 		: 'color',
-			value 		: val,
+			value 		: staticVal,
 			dropArray 	: this.metaFields,
 			selectedField   : range
 		}
@@ -209,7 +251,8 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			range 	     : range,
 			minMax 	     : minMax,
 			customMinMax : customMinMax,
-			staticVal    : val,
+			staticVal    : staticVal,
+			value 	     : val
 		};
 	},
 
@@ -236,7 +279,8 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			type 		: 'miniInput',
 			value 		: val,
 			dropArray 	: this.metaFields,
-			selectedField   : range
+			selectedField   : range,
+			tabindex 	: this.tabindex++
 		}
 		this._createMetaFieldLine(lineOptions);
 
@@ -271,7 +315,8 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			type 		: 'miniInput',
 			value 		: val,
 			dropArray 	: this.metaFields,
-			selectedField   : range
+			selectedField   : range,
+			tabindex 	: this.tabindex++
 		}
 		this._createMetaFieldLine(lineOptions);	
 
@@ -286,13 +331,13 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	// CLEAR POINT OPTIONS
 	clearPointOptions : function () {
 
-		var colorWrapper = Wu.DomUtil.get('field_wrapper_color');
-		var opacityWrapper = Wu.DomUtil.get('field_wrapper_opacity');
+		var colorWrapper     = Wu.DomUtil.get('field_wrapper_color');
+		var opacityWrapper   = Wu.DomUtil.get('field_wrapper_opacity');
 		var pointsizeWrapper = Wu.DomUtil.get('field_wrapper_pointsize');
 		
-		colorWrapper.remove();
-		opacityWrapper.remove();
-		pointsizeWrapper.remove();
+		if ( colorWrapper ) colorWrapper.remove();
+		if ( opacityWrapper ) opacityWrapper.remove();
+		if ( pointsizeWrapper ) pointsizeWrapper.remove();
 	},
 
 
@@ -312,9 +357,9 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 			var colorRange = options.colorRange;
 
-			if ( !colorRange ) 			return;
-			if ( colorRange == 'NONE' ) 		return;
-			if ( colorRange == '---------------' ) 	return;
+			if ( !colorRange ) return;
+			if ( colorRange == 'static' ) return;
+			if ( colorRange == '---------------' ) return;
 			
 			var fieldName = colorRange;
 
@@ -326,9 +371,9 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 			var pointSizeRange = options.pointSizeRange;
 
-			if ( !pointSizeRange ) 			return;
-			if ( pointSizeRange == 'NONE' ) 		return;
-			if ( pointSizeRange == '---------------' ) 	return;
+			if ( !pointSizeRange ) 	return;
+			if ( pointSizeRange == 'static' ) return;
+			if ( pointSizeRange == '---------------' ) return;
 			
 			var fieldName = pointSizeRange;
 
@@ -382,7 +427,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		// UNSELECTING FIELD
 
 		// Clean up if we UNSELECTED field
-		if ( fieldName == 'NONE' || fieldName == '---------------') {
+		if ( fieldName == 'static' || fieldName == '---------------') {
 			
 			// Make static inputs available
 			if ( key == 'opacity' || key == 'pointsize' ) {	
@@ -446,7 +491,23 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 		// Save static OPACITY value
 		if ( key == 'opacity' ) {
-			this.cartoJSON.point[key].value = value;	
+
+			// Get field 
+			var inputField = Wu.DomUtil.get('field_mini_input_opacity');
+
+
+			// If more than one, make it one
+			if ( value > 1  && value < 10  ) value = 1;
+			if ( value > 10 && value < 100 ) value = value/100;
+			if ( value > 100 ) 	         value = 1;
+			
+
+			// Set value in input
+			inputField.value = value;
+
+			// Store in json
+			this.cartoJSON.point[key].value = value;
+
 		}
 
 
@@ -456,15 +517,70 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 		// Save static POINT SIZE value
 		if ( key == 'pointsize' ) {
-			this.cartoJSON.point[key].value = value;	
+
+			// Get field 
+			var inputField = Wu.DomUtil.get('field_mini_input_pointsize');
+
+			// If less than 0.5, make it 0.5
+			if ( value < 0.5 ) value = 0.5;
+
+			// Set value in input
+			inputField.value = value;
+
+			// Stors in json
+			this.cartoJSON.point[key].value = value;
+
 		}	
 
 		// Save dynamic POINT SIZE values
 		if ( key == 'minmaxpointsize' ) {
+
+			var minField = Wu.DomUtil.get('field_mini_input_min_minmaxpointsize');
+			var maxField = Wu.DomUtil.get('field_mini_input_max_minmaxpointsize');
+
+			var defaultMin = 1;
+			var defaultMax = 10;
+
 			if ( pre == 'min_' ) {
+
+				// If not set, use default min
+				if ( isNaN(value) ) value = defaultMin;
+
+				// If less than zero, make it zero
+				if ( value < 0 ) value = 0;
+
+				// Get max value
+				var maxVal = parseFloat(maxField.value);
+
+				// Make sure min value is not higher than max value
+				value = this.validateNumber(value, maxVal, true);
+
+				// Set value in input
+				minField.value = value;
+
+				// Stor in json
 				this.cartoJSON.point.pointsize.minMax[0] = value;
+			
 			}
+
 			if ( pre == 'max_' ) {
+
+				// If not set, use default max
+				if ( isNaN(value) ) value = defaultMax;
+
+				// If less than 0.5, make it 0.5
+				if ( value < 0.5 ) value = 0.5;
+
+				// Get min value
+				var minVal = parseFloat(minField.value);
+
+				// Make sure max value is not less than min value
+				value = this.validateNumber(value, minVal, false);
+
+				// Set value in input
+				maxField.value = value;
+
+				// Store in json
 				this.cartoJSON.point.pointsize.minMax[1] = value;	
 			}	
 		}
@@ -475,27 +591,91 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		// COLOR RANGE
 
 		if ( key == 'minmaxcolorrange' ) {
-			if ( pre == 'min_' ) {
-				// SAVE MIN AND MAX VALUE
-				var maxField = Wu.DomUtil.get('field_mini_input_max_minmaxcolorrange');
 
-				var maxVal = parseInt(maxField.value);
+			var maxField = Wu.DomUtil.get('field_mini_input_max_minmaxcolorrange');
+			var minField = Wu.DomUtil.get('field_mini_input_min_minmaxcolorrange');			
+			
+			if ( pre == 'min_' ) {
+
+				// SAVE MIN AND MAX VALUE
+				var maxVal = parseFloat(maxField.value);
+
+				if ( isNaN(value)  ) value  = this.cartoJSON.point.color.minMax[0];
+				if ( isNaN(maxVal) ) maxVal = this.cartoJSON.point.color.minMax[1];
+
+				value = this.validateNumber(value, maxVal, true);
+
+				minField.value = value;
+
 				this.cartoJSON.point.color.customMinMax = [value, maxVal];
 			}
 
 			if ( pre == 'max_' ) {
-				// SAVE MIN AND MAX VALUE
 
-				var minField = Wu.DomUtil.get('field_mini_input_min_minmaxcolorrange');
-				var minVal = parseInt(minField.value);
-				// this.cartoJSON.point.color.customMinMax[0] = minVal;
+				// SAVE MIN AND MAX VALUE
+				
+				var minVal = parseFloat(minField.value);
+				
+				if ( isNaN(value) )  value = this.cartoJSON.point.color.minMax[1];
+				if ( isNaN(minVal) ) minVal = this.cartoJSON.point.color.minMax[0];
+
+				value = this.validateNumber(value, minVal, false);
+
+				maxField.value = value;
+
 				this.cartoJSON.point.color.customMinMax = [minVal, value];
 			}			
 		}
 	},	
 
+	updateColor : function (hex, key, wrapper) {
 
+		// fittepølse
+		if ( key == 'color' ) {
+			this.cartoJSON.point[key].staticVal = hex;
+		}
 
+		if ( key == 'colorrange' ) {
+			
+			var colorBall_1 = Wu.DomUtil.get('color-range-ball-1-' + key);
+			var colorBall_2 = Wu.DomUtil.get('color-range-ball-2-' + key);
+			var colorBall_3 = Wu.DomUtil.get('color-range-ball-3-' + key);
+
+			// Litt klønete koding her... 
+			// men bakgrunnsfarge blir alltid lest som RGB, 
+			// selv om man skriver den som HEX. Burde kanskje
+			// hatt en RGB2HEX istedet, men jeg gjorde det nå
+			// sånn her i første omgang. Det funker.
+
+			// Set HEX value on ball we've changed
+			wrapper.setAttribute('hex', hex);
+
+			// Get color values
+			var color1 = colorBall_1.getAttribute('hex');
+			var color2 = colorBall_2.getAttribute('hex');
+			var color3 = colorBall_3.getAttribute('hex');
+
+			// Build color array
+			var colors = [color1, color2, color3];
+
+			// Color range bar
+			var colorRangeBar = Wu.DomUtil.get('chrome-color-range_' + key);
+
+			// Set styling
+			var gradientStyle = 'background: -webkit-linear-gradient(left, ' + colors.join() + ');';
+			gradientStyle    += 'background: -o-linear-gradient(right, '     + colors.join() + ');';
+			gradientStyle    += 'background: -moz-linear-gradient(right, '   + colors.join() + ');';
+			gradientStyle    += 'background: linear-gradient(to right, '     + colors.join() + ');';			
+
+			colorRangeBar.setAttribute('style', gradientStyle);
+
+			// Store in JSON
+			this.cartoJSON.point.color.value = colors;
+
+		}
+
+		this._closeColorRangeSelector();
+	},
 
 
 	// ADD EXTRA FIELDS
@@ -515,6 +695,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	// ADD COLOR FIELDS
 	addColorFields : function (key, fieldName) {
 
+
 		if ( key == 'color' ) {
 
 			// Get wrapper
@@ -529,7 +710,9 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 			// Do not add if we've already added it!
 			var minMaxColorRange = Wu.DomUtil.get('field_wrapper_minmaxcolorrange');
+			
 			if ( minMaxColorRange ) {
+			
 				var max = Wu.DomUtil.get('field_mini_input_max_minmaxcolorrange');
 				var min = Wu.DomUtil.get('field_mini_input_min_minmaxcolorrange');
 				max.value = fieldMaxRange;
@@ -544,8 +727,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			// COLOR RANGE
 			// COLOR RANGE
 
-
-			var defaultRange = ['#ff0000', '#ff3600', '#ff8100', '#ffd700', '#a5ff00', '#00ffa9', '#00ffdf', '#009eff', '#003dff', '#2f00ff'];
+			var defaultRange = ['#ff0000', '#a5ff00', '#003dff'];
 
 			// Get stores states
 			var value  = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : defaultRange;
@@ -573,7 +755,12 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			// MIN/MAX
 
 			var value  = this.cartoJSON.point[key].customMinMax ? this.cartoJSON.point[key].customMinMax : [fieldMinRange, fieldMaxRange];
-			// var value  = [fieldMinRange, fieldMaxRange];
+
+			
+			// Use placeholder value if empty
+			if ( isNaN(value[0]) ) value[0] = fieldMinRange;
+			if ( isNaN(value[1]) ) value[1] = fieldMaxRange;
+
 
 			var lineOptions = {
 				key 		: 'minmaxcolorrange', 
@@ -584,13 +771,34 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 				rightPos	: true,
 				type 		: 'dualMiniInput',
 				value 		: value,
+				minMax 		: [fieldMinRange, fieldMaxRange],
+				tabindex 	: [this.tabindex++, this.tabindex++]
 			}
 			this._createMetaFieldLine(lineOptions);
 
 			// SAVE JSON
-			this.cartoJSON.point[key].minMax = value;
+			this.cartoJSON.point[key].customMinMax = value;
+			this.cartoJSON.point[key].minMax       = [fieldMinRange, fieldMaxRange];
+			
 
 		}
+	},
+
+	validateNumber : function (originNo, compareTo, isLess) {
+		
+
+		// If number is higher than number it's supposed to 
+		// be less than, replace with higher number
+		if ( originNo > compareTo && isLess ) originNo = compareTo;
+
+		// If number is lower than number it's supposed to 
+		// be more than, replace with lower number
+		if ( originNo < compareTo && !isLess ) originNo = compareTo;
+
+		// value = this.validateNumber(value, minVal, false);
+
+		return originNo;
+
 	},
 
 	// ADD POINT SIZE FIELDS
@@ -604,7 +812,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			var minMaxPointSize = Wu.DomUtil.get('field_wrapper_minmaxpointsize');
 			if ( minMaxPointSize ) return;
 
-			var minMax  = this.cartoJSON.point[key].minMax ? this.cartoJSON.point[key].minMax : [0,30];
+			var minMax  = this.cartoJSON.point[key].minMax ? this.cartoJSON.point[key].minMax : [1,10];
 
 			var lineOptions = {
 				key 		: 'minmaxpointsize', 
@@ -615,6 +823,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 				rightPos	: true,
 				type 		: 'dualMiniInput',
 				value 		: minMax,
+				tabindex 	: [this.tabindex++, this.tabindex++]
 			}
 			this._createMetaFieldLine(lineOptions);	
 					
@@ -630,21 +839,47 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 		if ( key == 'pointsize' ) {
 			var minMaxPointSize = Wu.DomUtil.get('field_wrapper_minmaxpointsize');
-			minMaxPointSize.remove();
+			if ( minMaxPointSize ) minMaxPointSize.remove();
 		}
 
 		if ( key == 'color' ) {
 			var minMaxColorRange = Wu.DomUtil.get('field_wrapper_minmaxcolorrange');
-			minMaxColorRange.remove();
+			if ( minMaxColorRange ) minMaxColorRange.remove();
 
 			var colorRange = Wu.DomUtil.get('field_wrapper_colorrange');
-			colorRange.remove();
+			if ( colorRange ) colorRange.remove();
 		}		
 	},
 
 
+	// ADD/REMOVE THIN LAYERS
+	// ADD/REMOVE THIN LAYERS
+	// ADD/REMOVE THIN LAYERS
 
+	_tempaddLayer : function () {
 
+		// remember
+		this._temps = this._temps || [];
+
+		// remove other styling layers
+		this._tempRemoveLayers();
+
+		// add
+		this._layer._addThin();
+
+		// remember
+		this._temps.push(this._layer);
+
+	},
+
+	_tempRemoveLayers : function () {
+		if (!this._temps) return;
+
+		// remove other layers added tempy for styling
+		this._temps.forEach(function (layer) {
+			layer._removeThin();
+		}, this);
+	},
 
 
 
@@ -708,282 +943,326 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 	_updateStyle : function () {
 
-		console.log('cartoJSON', this.cartoJSON);
-
 		var cartoJSON = this.cartoJSON;
 
 		var headers = '';
 		var style   = '#layer {\n\n';
 
+		var allowOverlap = 'true';
+		var markerClip  = 'false';
+		var compOp      = 'screen'
+
+		// CREATE DEFAULT STYLING
+		style += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
+		style += '\tmarker-clip: ' + markerClip + ';\n';
+		style += '\tmarker-comp-op: ' + compOp + ';\n\n';
+
+
+		// STYLE POINT
+		// STYLE POINT
+		// STYLE POINT
+
 		if ( cartoJSON.point && cartoJSON.point.enabled == true ) {
 
-			// COLOR
-			// COLOR
-			// COLOR
-
-// <<<<<<< HEAD
-// 			var color = cartoJSON.point.color;
-
-// 			if ( color.range ) {
-
-// 				// color range
-// 				color.customMinMax
-// 				color.minMax
-// 				color.range
-// 				color.value
-
-// 				var minMax = color.customMinMax ? color.customMinMax : color.minMax;
-
-// 				headers += '@' + color.range + '_min: ' + minMax[0] + ';\n'; 
-// 				headers += '@' + color.range + '_max: ' + minMax[1] + ';\n';
-// 				headers += '@' + color.range + ': [' + color.range + '];\n\n';
-
-// 				// COLORS
-// 				color.value.forEach(function(c, i) {	
-// 					headers += '@color_' + (color.value.length - i) + ': ' + c + ';\n';
-// 				})
-
-// 				headers += '\n';
-
-// 				// COLOR STEPS
-// 				headers += '@' + color.range + '_delta: (@' + color.range + '_max - @' + color.range + '_min)/' + color.value.length + ';\n'
-// 				color.value.forEach(function(c, i) {	
-// 					headers += '@step_' + (i+1) + ' + (@' + color.range + '_delta * ' + i + ');\n';
-// 				})				
-
-
-// 				// @delta   : (@field_max - @field_min)/10;
-// 				// @step_1  : @field_min;
-// 				// @step_2  : @field_min + @delta;
-// 				// @step_3  : @field_min + (@delta * 2);
-// 				// @step_4  : @field_min + (@delta * 3);
-// 				// @step_5  : @field_min + (@delta * 4);
-// 				// @step_6  : @field_min + (@delta * 5);
-// 				// @step_7  : @field_min + (@delta * 6);
-// 				// @step_8  : @field_min + (@delta * 7);
-// 				// @step_9  : @field_min + (@delta * 8);
-// 				// @step_10 : @field_min + (@delta * 9);				
-
-
-			
-// 			} else {
-			
-// 				// static color
-// 				color.staticVal
-// 			}
-
-// 			// OPACITY
-// 			// OPACITY
-// 			// OPACITY
-
-// 			var opacity = cartoJSON.point.opacity;
-
-// 			if ( opacity.range ) {
-
-// 				// opaciyt range
-// 				opacity.range
-
-
-			
-// 			} else {
-
-// 				// static opacity
-// 				opacity.value	
-// 			}
-
-// =======
-			var allowOverlap = 'true';
-			var markerClip  = 'false';
-			var compOp      = 'screen'
-
-			style += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
-			style += '\tmarker-clip: ' + markerClip + ';\n';
-			style += '\tmarker-comp-op: ' + compOp + ';\n\n';
-
-			
-
-			var color = cartoJSON.point.color;
-
-
-
-
 			// OPACITY
-			// OPACITY
-			// OPACITY
+			var pointOpacityCarto = this.buildCarto_pointOpacity(headers, style);
+			headers += pointOpacityCarto.headers;
+			style += pointOpacityCarto.style;
 
-			var opacity = cartoJSON.point.opacity;
+			// COLOR
+			var pointColorCarto = this.buildCarto_pointColor(headers, style);
+			headers += pointColorCarto.headers;
+			style += pointColorCarto.style;
 
-			if ( opacity.range ) {
+			// SIZE
+			var pointSizeCarto = this.buildCarto_pointSize(headers, style);
+			headers += pointSizeCarto.headers;
+			style += pointSizeCarto.style;			
 
-				var max = Math.floor(this.columns[opacity.range].max * 10) / 10;
-				var min = Math.floor(this.columns[opacity.range].min * 10) / 10;				
+		}
+			
+		style += '}'
 
-				var normalizedOffset = true;
+		var finalCarto = headers + style;
 
-				// NORMALIZED OFFSET 
-				// i.e. if the lowest number is 30, and 
-			 	// highest is 100, 30 will return 0.3 and not 0
-				if ( normalizedOffset ) {
-					if ( min > 0 ) min = 0;
+		this.saveCartoJSON(finalCarto);
+	},
+
+	buildCarto_pointOpacity : function () {
+
+		// OPACITY
+		// OPACITY
+		// OPACITY
+
+		var opacity = this.cartoJSON.point.opacity;
+
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}
+
+
+		if ( opacity.range ) {
+
+			var max = Math.floor(this.columns[opacity.range].max * 10) / 10;
+			var min = Math.floor(this.columns[opacity.range].min * 10) / 10;				
+
+			var normalizedOffset = true;
+
+			// NORMALIZED OFFSET 
+			// i.e. if the lowest number is 30, and 
+		 	// highest is 100, 30 will return 0.3 and not 0
+			if ( normalizedOffset ) {
+				if ( min > 0 ) min = 0;
+			}
+
+			cartObj.headers += '@opacity_field_max: ' + max + ';\n';
+			cartObj.headers += '@opacity_field_min: ' + min + ';\n';
+			cartObj.headers += '@opacity_field_range: [' + opacity.range + '];\n\n';
+
+			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
+
+		
+		} else {
+
+			// static opacity
+			cartObj.headers += '@opacity_field: ' + opacity.value + ';\n';
+		}
+
+		cartObj.style += '\tmarker-opacity: @opacity_field;\n\n';
+
+		return cartObj;
+	},
+
+	buildCarto_pointColor : function (headers, style) {
+
+		// COLOR RANGE
+		// COLOR RANGE
+		// COLOR RANGE
+
+		var color = this.cartoJSON.point.color;
+
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}		
+
+		if ( color.range ) {
+
+			var minMax = color.customMinMax ? color.customMinMax : color.minMax;
+
+			// Get color values
+			var c1 = color.value[0];
+			var c5 = color.value[1];
+			var c9 = color.value[2];
+
+			// Interpolate
+			var c3 = this.hexAverage([c1, c5]);
+			var c7 = this.hexAverage([c5, c9]);
+
+			// Interpolate
+			var c2 = this.hexAverage([c1, c3]);
+			var c4 = this.hexAverage([c3, c5]);
+			var c6 = this.hexAverage([c5, c7]);
+			var c8 = this.hexAverage([c7, c9]);
+
+
+			colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9];
+
+
+			// CREATE VARS
+			var fieldName = '@' + color.range;
+			var maxField  = fieldName + '_max';
+			var minField  = fieldName + '_min';
+			var deltaName = fieldName + '_delta';
+			
+
+			// DEFINE FIELD NAME + MIN/MAX
+			cartObj.headers += fieldName + ': [' + color.range + '];\n';
+			cartObj.headers += maxField  + ': '  + minMax[1] + ';\n'; 
+			cartObj.headers += minField  + ': '  + minMax[0] + ';\n\n';
+			
+
+			// COLORS VALUES
+			colorArray.forEach(function(c, i) {	
+				cartObj.headers += fieldName + '_color_' + (i+1) + ': ' + c + ';\n';
+			})
+
+			cartObj.headers += '\n';
+			
+			// COLOR STEPS (DELTA)
+			cartObj.headers += fieldName + '_delta: (' + maxField + ' - ' + minField + ')/' + colorArray.length + ';\n'
+			
+			colorArray.forEach(function(c, i) {	
+				cartObj.headers += fieldName + '_step_' + (i+1) + ': (' + minField + ' + ' + fieldName + '_delta * ' + i + ');\n';
+			})
+
+
+			cartObj.headers += '\n';
+
+
+
+			// STYLE STYLE STYLE
+			// STYLE STYLE STYLE
+			// STYLE STYLE STYLE
+
+
+			colorArray.forEach(function(c,i) {
+
+				var no = i+1;
+
+				if ( no == 1 ) {
+
+					cartObj.style += '\t[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + '] ';
+					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
+
 				}
 
-				headers += '@opacity_field_max: ' + max + ';\n';
-				headers += '@opacity_field_min: ' + min + ';\n';
-				headers += '@opacity_field_range: [' + opacity.range + '];\n\n';
+				if ( no > 1 && no < colorArray.length ) {
 
-				headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
+					cartObj.style += '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + ']';
+					cartObj.style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
+					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
 
+				}
+
+				if ( no == colorArray.length ) {
+
+					cartObj.style +=  '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + '] ';
+					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n\n';
+				}
+			})
 			
-			} else {
+		
+		} else {
+		
+			// static color
+			cartObj.style += '\tmarker-fill: ' + color.staticVal + ';\n\n';
+		}
 
-				// static opacity
-				headers += '@opacity_field: ' + opacity.value + ';\n';
-			}
+		return cartObj;
+	},
 
-			style += '\tmarker-opacity: @opacity_field;\n\n'
+	buildCarto_pointSize : function (headers, style) {
 
+		// POINT SIZE
+		// POINT SIZE
+		// POINT SIZE
 
-			// COLOR RANGE
-			// COLOR RANGE
-			// COLOR RANGE
+		var pointsize = this.cartoJSON.point.pointsize;
 
-			if ( color.range ) {
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}		
 
-				var minMax = color.customMinMax ? color.customMinMax : color.minMax;
+		if ( pointsize.range ) {
 
-
-				console.log('color', color);
-
-				// CREATE VARS
-				var fieldName = '@' + color.range;
-				var maxField  = fieldName + '_max';
-				var minField  = fieldName + '_min';
-				var deltaName = fieldName + '_delta';
-				
-
-				// DEFINE FIELD NAME + MIN/MAX
-				headers += fieldName + ': [' + color.range + '];\n';
-				headers += maxField  + ': '  + minMax[1] + ';\n'; 
-				headers += minField  + ': '  + minMax[0] + ';\n\n';
-				
-
-				// COLORS VALUES
-				color.value.forEach(function(c, i) {	
-					headers += fieldName + '_color_' + (color.value.length - i) + ': ' + c + ';\n';
-				})
-
-				headers += '\n';
-				
-				// COLOR STEPS (DELTA)
-				headers += fieldName + '_delta: (' + maxField + ' - ' + minField + ')/' + color.value.length + ';\n'
-				color.value.forEach(function(c, i) {	
-					headers += fieldName + '_step_' + (i+1) + ': (' + minField + ' + ' + fieldName + '_delta * ' + i + ');\n';
-				})
-
-				// @vel_step_1 + (@vel_delta * 0);
-
-				
-
-				// @step_2  : @field_min + @delta;
-
-				headers += '\n';
-
-
-
-
-				// STYLE STYLE STYLE
-				// STYLE STYLE STYLE
-				// STYLE STYLE STYLE
-
-
-				color.value.forEach(function(c,i) {
-
-					var no = i+1;
-
-					if ( no == 1 ) {
-
-						style += '\t[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + '] ';
-						style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
-
-					}
-
-					if ( no > 1 && no < color.value.length ) {
-
-						style += '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + ']';
-						style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
-						style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
-
-					}
-
-					if ( no == color.value.length ) {
-
-						style +=  '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + '] ';
-						style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n\n';
-					}
-				})
-				
+			var max = Math.floor(this.columns[pointsize.range].max * 10) / 10;
+			var min = Math.floor(this.columns[pointsize.range].min * 10) / 10;
+		
+			// cartObj.headers += '@marker_size_max: ' + pointsize.minMax[1] + ';\n';
+			cartObj.headers += '@marker_size_min: ' + pointsize.minMax[0] + ';\n';
+			cartObj.headers += '@marker_size_range: ' + (pointsize.minMax[1] - pointsize.minMax[0]) + ';\n';
+			cartObj.headers += '@marker_size_field: [' + pointsize.range + '];\n';
+			cartObj.headers += '@marker_size_field_maxVal: ' + max + ';\n';
+			cartObj.headers += '@marker_size_field_minVal: ' + min + ';\n';
+			cartObj.headers += '\n//TODO: Fix this!\n';
+			cartObj.headers += '@marker_size_factor: (@marker_size_field / (@marker_size_field_maxVal - @marker_size_field_minVal)) * (@marker_size_range + @marker_size_min);\n\n';
 			
-			} else {
-			
-				// static color
-				style += '\tmarker-fill: ' + color.staticVal + ';\n\n';
-			}
+		} else {
 
-
-
-// >>>>>>> 004632af95e291d25a28fabe45cb51100ce8975a
-			
-			// POINT SIZE
-			// POINT SIZE
-			// POINT SIZE
-
-			var pointsize = cartoJSON.point.pointsize;
-
-			if ( pointsize.range ) {
-
-				var max = Math.floor(this.columns[pointsize.range].max * 10) / 10;
-				var min = Math.floor(this.columns[pointsize.range].min * 10) / 10;
-			
-				headers += '@marker_size_max: ' + pointsize.minMax[1] + ';\n';
-				headers += '@marker_size_min: ' + pointsize.minMax[0] + ';\n';
-				headers += '@marker_size_range: [' + pointsize.range + '];\n';
-				headers += '@marker_size_range_maxVal: ' + max + ';\n';
-				headers += '@marker_size_range_minVal: ' + min + ';\n';
-				headers += '\n//TODO: Fix this!\n';
-				headers += '@marker_size_factor: (@marker_size_range / (@marker_size_range_maxVal - @marker_size_range_minVal)) * @marker_size_max;\n\n';
-
-			} else {
-
-
-				headers += '@marker_size_factor: ' + pointsize.value + ';\n';
-
-			}
-
-
-			headers += '[zoom=10] { marker-width: 0.3 * @marker_size_factor; }\n';
-			headers += '[zoom=11] { marker-width: 0.5 * @marker_size_factor; }\n';
-			headers += '[zoom=12] { marker-width: 1   * @marker_size_factor; }\n';
-			headers += '[zoom=13] { marker-width: 1   * @marker_size_factor; }\n';
-			headers += '[zoom=14] { marker-width: 2   * @marker_size_factor; }\n';
-			headers += '[zoom=15] { marker-width: 4   * @marker_size_factor; }\n';
-			headers += '[zoom=16] { marker-width: 6   * @marker_size_factor; }\n';
-			headers += '[zoom=17] { marker-width: 8   * @marker_size_factor; }\n';
-			headers += '[zoom=18] { marker-width: 12  * @marker_size_factor; }\n\n';
-
+			cartObj.headers += '@marker_size_factor: ' + pointsize.value + ';\n';
 
 		}
 
-		style += '}'
 
-		console.log('');
-		console.log('%c******* cartCSS headers *******', 'background: red; color: white;');
-		
-		var finalCarto = headers + style;
+		cartObj.headers += '[zoom=10] { marker-width: 0.3 * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=11] { marker-width: 0.5 * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=12] { marker-width: 1   * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=13] { marker-width: 1   * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=14] { marker-width: 2   * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=15] { marker-width: 4   * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=16] { marker-width: 6   * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=17] { marker-width: 8   * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=18] { marker-width: 12  * @marker_size_factor; }\n\n';
 
-		console.log(finalCarto);
-		
 
-	}
+		return cartObj;
+	},
+
+	saveCartoJSON : function (finalCarto) {
+
+		this._layer.setStyling(this.cartoJSON);
+
+		// request new layer
+		var layerOptions = {
+			css : finalCarto, 
+			sql : "(SELECT * FROM table) as sub",
+			layer : this._layer
+		}
+
+		this._updateLayer(layerOptions);
+
+	},
+
+
+	_updateLayer : function (options, done) {
+
+		var css = options.css,
+		    layer = options.layer,
+		    file_id = layer.getFileUuid(),
+		    sql = options.sql,
+		    // sql = this._createSQL(file_id, sql),
+		    project = this._project;
+
+
+		var layerOptions = layer.store.data.postgis;
+
+		layerOptions.sql = sql;
+		layerOptions.css = css;
+		layerOptions.file_id = file_id;		
+
+		var layerJSON = {
+			geom_column: 'the_geom_3857',
+			geom_type: 'geometry',
+			raster_band: '',
+			srid: '',
+			affected_tables: '',
+			interactivity: '',
+			attributes: '',
+			access_token: app.tokens.access_token,
+			cartocss_version: '2.0.1',
+			cartocss : css,
+			sql: sql,
+			file_id: file_id,
+			return_model : true,
+			layerUuid : layer.getUuid()
+		}
+
+
+
+		// create layer on server
+		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
+
+			// new layer
+			var newLayerStyle = Wu.parse(newLayerJSON);
+
+			// catch errors
+			if (newLayerStyle.error) {
+				done && done();
+				return console.error(newLayerStyle.error);
+			}
+
+			// set & update
+			layer.setStyle(newLayerStyle.options);
+			layer.update({enable : true});
+
+			// return
+			done && done();
+		});
+
+	},	
 
 
 });
