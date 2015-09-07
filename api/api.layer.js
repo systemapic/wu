@@ -199,6 +199,14 @@ module.exports = api.layer = {
 				layer.save();
 			}
 
+			// update style
+			if (req.body.hasOwnProperty('style')) {
+				var style = req.body.style;
+				layer.style = style;
+				layer.save();
+			}
+
+
 			// update legends
 			if (req.body.hasOwnProperty('legends')) {
 				var legends = req.body.legends;
