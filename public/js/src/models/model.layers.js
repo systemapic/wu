@@ -603,6 +603,16 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		return this.store.data.postgis.sql;
 	},
 
+	setFilter : function (filter) {
+		console.log('setFilter: ', filter);
+		this.store.filter = filter;
+		this.save('filter');
+	},
+
+	getFilter : function () {
+		return this.store.filter;
+	},
+
 	getPostGISData : function () {
 		return this.store.data.postgis;
 	},
@@ -618,7 +628,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		var layerUuid = this._getLayerUuid();
 		var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.png' + access_token;
 
-
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			layerUuid: this._getLayerUuid(),
@@ -626,9 +635,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 			maxRequests : 0,
 			maxZoom : 19
 		});
-
-		// load grid after all pngs.. (dont remember why..)
-		// Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
 
 	},
 

@@ -206,6 +206,14 @@ module.exports = api.layer = {
 				layer.save();
 			}
 
+			// update filter
+			if (req.body.hasOwnProperty('filter')) {
+				var filter = req.body.filter;
+				layer.filter = filter;
+
+				console.log('filteR: ', filter);
+				layer.save();
+			}
 
 			// update legends
 			if (req.body.hasOwnProperty('legends')) {

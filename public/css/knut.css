@@ -110,3 +110,11 @@
 #chrome-content-filter-chart {
 	font-size: 10px;
 }
+
+.brush-catcher {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	/*background: red;*/
+	z-index: 999999999999;
+}
