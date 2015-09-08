@@ -1,11 +1,9 @@
-Wu.List = Wu.Class.extend({
+Wu.DataList = Wu.Class.extend({
 	
 	canEdit : false,
 	folder  : 'Folder',
 
 	initialize : function (options) {
-
-		console.log('%c initialize ', 'background: red; color: white;');
 
 		// searchField has not been implemented yet
 		this.searchField = options.searchfield;
@@ -37,46 +35,6 @@ Wu.List = Wu.Class.extend({
 	},
 
 	createFolder : function() {
-
-		// console.log('this.listData', this.listData);
-
-		// var newFolder = {
-
-		// 	'fileUuid' : {
-
-		// 		store : {
-
-		// 			access : {
-		// 				clients : [],
-		// 				projects : [],
-		// 				users : []
-		// 			},
-		// 			category : '',
-		// 			created : '',
-		// 			createdBy : '',
-		// 			createdByName : '',
-		// 			data : {
-		// 				geojson : '',
-		// 				image : {
-		// 					crunched : []
-		// 				},
-		// 				other : [],
-		// 				shapefile : [],						
-		// 			},
-		// 			description : '',
-		// 			files : [],
-		// 			format : [],
-		// 			keywords : [],
-		// 			lastUpdated : '',
-		// 			name : '',
-		// 			type : '',
-		// 			uuid : ''
-
-		// 		}
-
-		// 	}
-
-		// }
 
 	},
 
@@ -140,9 +98,6 @@ Wu.List = Wu.Class.extend({
 
 	updateTable : function (options) {  
 
-
-		console.log('%c updateTable ', 'background: red; color: white;');
-
 		var that = options.context;
 
 		// RESET TABLE!
@@ -190,8 +145,6 @@ Wu.List = Wu.Class.extend({
 	// REFRESH LIST WITH DATA FILE LIST FROM DOM		
 
 	refreshTable : function (context) {
-
-		console.log('%c refreshTable ', 'background: red; color: white;');
 
 
 		var that = context ? context : this;
@@ -683,8 +636,6 @@ Wu.List = Wu.Class.extend({
 
 	_D3list : function (DATA) {
 	
-
-		console.log('%c _D3list ', 'background: red; color: white;');
 
 		// Context
 		var that = this;
@@ -1961,7 +1912,7 @@ Wu.List = Wu.Class.extend({
 // ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝    ╚══════╝╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   
 
 
-Wu.DataLibraryList = Wu.List.extend({
+Wu.DataLibraryList = Wu.DataList.extend({
 
 
 	// ┌─┐┌─┐┌┐┌┌─┐┬─┐┌─┐┬  
@@ -1971,8 +1922,6 @@ Wu.DataLibraryList = Wu.List.extend({
 
 	// Refresh table
 	refresh : function (DATA) {
-
-		console.log('%c refresh ', 'background: red; color: white;', data);
 		
 		if ( DATA ) this._D3list(DATA);
 
@@ -1980,8 +1929,6 @@ Wu.DataLibraryList = Wu.List.extend({
 
 
 	addItems : function (items) {
-
-		console.log('%c addItems ', 'background: red; color: white;', data);
 
 		if ( this.sortedData ) {
 			var that = this;
@@ -2006,8 +1953,6 @@ Wu.DataLibraryList = Wu.List.extend({
 	},
 
 	removeItems : function (items) {
-
-		console.log('%c removeItems ', 'background: red; color: white;', data);
 
 		// Remove from sorted data
 		if ( this.sortedData ) {
@@ -2043,8 +1988,6 @@ Wu.DataLibraryList = Wu.List.extend({
 	// Save
 	save : function (saveJSON) {
 
-		console.log('%c save ', 'background: red; color: white;', data);
-
 		var key     = saveJSON.key;
 		var value   = saveJSON.value;
 		var id      = saveJSON.id;
@@ -2063,9 +2006,6 @@ Wu.DataLibraryList = Wu.List.extend({
 	},
 
 	_updateLayerName : function (fileUuid, title) {
-
-		console.log('%c _updateLayerName ', 'background: red; color: white;', data);
-		
 		var layer = this._findLayerByFile(fileUuid)
 		if (!layer) return;
 		
@@ -3981,8 +3921,5 @@ Wu.UserList = Wu.List.extend({
 
 		// Return files
 		return checks;
-
 	},	
-
-
-})
+});
