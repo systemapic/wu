@@ -1691,6 +1691,7 @@ aka feedback pane
 	vertical-align: top;
 	padding: 3px;
 	padding-left: 5px;
+	float: right;
 	}
 
 .cpu-bar {
