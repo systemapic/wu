@@ -159,6 +159,12 @@ module.exports = api.portal = {
 		var account = req.user,
 		    a = {};
 
+		a.account = function (callback) {
+			api.user._getSingle({
+				user : account
+			}, callback);
+		}
+
 		// get projects
 		a.projects = function (callback) { 
 			api.project.getAll({
@@ -192,7 +198,7 @@ module.exports = api.portal = {
 			if (err || !result) return api.error.general(req, res, err || 'No result.');
 
 			// add user account
-			result.account = account;
+			// result.account = account;
 
 			console.log('req.body', req.body);
 

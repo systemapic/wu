@@ -19,6 +19,7 @@ Wu.Chrome = Wu.Class.extend({
 		Wu.Mixin.Events.on('editDisabled',    this._editDisabled, this);
 		Wu.Mixin.Events.on('layerEnabled',    this._layerEnabled, this);
 		Wu.Mixin.Events.on('layerDisabled',   this._layerDisabled, this);
+		Wu.Mixin.Events.on('fileImported',    this._onFileImported, this);
 	},
 
 	_projectSelected : function (e) {
@@ -34,6 +35,10 @@ Wu.Chrome = Wu.Class.extend({
 		this._refresh();
 	},
 
+	_onFileImported  : function (e) {
+		console.log('_onFileImported', e);
+	},
+
 	// dummies
 	// _projectSelected : function () {},
 	_initialize 	 : function () {},
@@ -43,6 +48,7 @@ Wu.Chrome = Wu.Class.extend({
 	_layerDisabled 	 : function () {},
 	_updateView 	 : function () {},
 	_refresh 	 : function () {},
+	// _onFileImported  : function () {},
 	_initContainer   : function () {},
 
 

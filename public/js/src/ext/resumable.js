@@ -1,16 +1,11 @@
 Wu.Resumable = Wu.Class.extend({
 
-
 	options : {
-
 		target : '/api/data/upload/chunked',
 		chunkSize : 2*1024*1024,
 		simultaneousUploads : 5,
-		// generateUniqueIdentifier : this._generateUniqueIdentifier,
 		testChunks : true, 
-		// query : this._generateQuery,
 		maxFiles : 1,
-		// maxFilesErrorCallback : this._maxFilesErrorCallback,
 		fileType : ['zip', 'gz', 'geojson', 'tif', 'tiff', 'jp2', 'ecw'],
 		fileTypeErrorCallback : this._fileTypeErrorCallback,
 	},
@@ -18,6 +13,7 @@ Wu.Resumable = Wu.Class.extend({
 
 	initialize : function (options) {
 		
+		// set options
 		Wu.setOptions(this, options);
 
 		// options fn's
@@ -26,55 +22,65 @@ Wu.Resumable = Wu.Class.extend({
 		this.options.maxFilesErrorCallback = this._maxFilesErrorCallback;
 
 		// create resumable
-		this.create();
+		this._create();
 
 		// generate unique id
-		this.set_id();
+		this._set_id();
 	},
 
-	create : function () {
+	_create : function () {
+
+		console.error('CREATE RESUM');
 
 		// create resumable instance
 		var r = this.r = new Resumable(this.options);
 
 		// assign drop, browse
-		this._assign();
+		// this._assign();
 
 		// add events
-		this._addEvents();
+		this._addResumableEvents();
 
 	},
 
 	destroy : function () {
-		if (!this.r) return;
+		// if (!this.r) return;
 
-		var r = this.r;
-		var r_id = this.get_id();
-		var ctx = this.options.context;
+		// var r = this.r;
+		// var r_id = this._get_id();
+		// var ctx = this.options.context;
 
-		// don't destroy if in use
-		if (r.isUploading()) return;
+		// // don't destroy if in use
+		// if (r.isUploading()) return;
 
-		// destroy
-		this._unassign();
+		// // destroy
+		// this._unassign();
 
-		// cancel (moot)
-		r.cancel();
+		// // cancel (moot)
+		// r.cancel();
 
-		// remove events
-		this._removeEvents();
+		// // remove events
+		// this._removeEvents();
 
-		// destroy
-		this.r = null;
-		delete this.r;
+		// // destroy
+		// this.r = null;
+		// delete this.r;
 
-		// delete
-		ctx._removeResumable(r_id);
+		// // delete
+		// ctx._removeResumable(r_id);
 	},
 
 	_assign : function () {
-		this.r.assignDrop(this.options.drop);
-		this.r.assignBrowse(this.options.browse);
+		if (this.options.drop)   this.r.assignDrop(this.options.drop);
+		if (this.options.browse) this.r.assignBrowse(this.options.browse);
+	},
+
+	assignDrop : function (div) {
+		this.r.assignDrop(div);
+	},
+
+	assignBrowse : function (div) {
+		this.r.assignBrowse(div);
 	},
 
 	_unassign : function () {
@@ -82,22 +88,23 @@ Wu.Resumable = Wu.Class.extend({
 	},
 
 	_disableUploadButton : function () {
-		if (!this.options.browse) return;
-		Wu.DomEvent.on(this.options.browse, 'click', Wu.DomEvent.stop, this);
-		Wu.DomUtil.addClass(this.options.browse, 'blurred');
+		// if (!this.options.browse) return;
+		// Wu.DomEvent.on(this.options.browse, 'click', Wu.DomEvent.stop, this);
+		// Wu.DomUtil.addClass(this.options.browse, 'blurred');
 	},
 	_enableUploadButton : function () {
-		if (!this.options.browse) return;
-		Wu.DomEvent.off(this.options.browse, 'click', Wu.DomEvent.stop, this);
-		Wu.DomUtil.removeClass(this.options.browse, 'blurred');
+		// if (!this.options.browse) return;
+		// Wu.DomEvent.off(this.options.browse, 'click', Wu.DomEvent.stop, this);
+		// Wu.DomUtil.removeClass(this.options.browse, 'blurred');
 	},
 
 	// success or aborted or failed
 	_uploadDone : function () {
-		this._enableUploadButton();
+		// this._enableUploadButton();
+		this.options.onUploadDone();
 	},
 
-	_addEvents : function () {
+	_addResumableEvents : function () {
 		var r = this.r;
 
 		// file added
@@ -113,12 +120,12 @@ Wu.Resumable = Wu.Class.extend({
 			this.feedbackUploadStarted(file);
 
 			// remove fulldrop
-			this._dragLeave();
+			// this._dragLeave();
 
 			// deny multiple uploads
 			// this.options.context._refreshResumable();
-			this.disable();
-			this._disableUploadButton();
+			// this.disable();
+			// this._disableUploadButton();
 
 		}.bind(this));
 
@@ -129,7 +136,7 @@ Wu.Resumable = Wu.Class.extend({
 			this.feedbackUploadSuccess(file, message);
 			
 			// refresh resumable for next download 	// todo: destroy!
-			this.options.context._refreshResumable();
+			// this.options.context._refreshResumable();
 
 			// hide progess bar
 			app.ProgressBar.hideProgress();
@@ -167,26 +174,26 @@ Wu.Resumable = Wu.Class.extend({
 		
 		}.bind(this));
 
-		this._enableDrop();
+		// this._enableDrop();
 
 	},
 
 	_removeEvents : function () {
-		this._disableDrop();
+		// this._disableDrop();
 	},
 
 	_enableDrop : function () {
-		var drop = this.options.drop;
-		Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
-		Wu.DomEvent.on(drop, 'dragleave', this._dragLeave, this);
-		Wu.DomEvent.on(drop, 'drop', this._dragLeave, this);
+		// var drop = this.options.drop;
+		// Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
+		// Wu.DomEvent.on(drop, 'dragleave', this._dragLeave, this);
+		// Wu.DomEvent.on(drop, 'drop', this._dragLeave, this);
 	},
 
 	_disableDrop : function () {
-		var drop = this.options.drop;
-		Wu.DomEvent.off(window.document, 'dragenter', this._dragEnter, this);
-		Wu.DomEvent.off(drop, 'dragleave', this._dragLeave, this);
-		Wu.DomEvent.off(drop, 'drop', this._dragLeave, this);
+		// var drop = this.options.drop;
+		// Wu.DomEvent.off(window.document, 'dragenter', this._dragEnter, this);
+		// Wu.DomEvent.off(drop, 'dragleave', this._dragLeave, this);
+		// Wu.DomEvent.off(drop, 'drop', this._dragLeave, this);
 	},
 
 	_dragLeave : function () {
@@ -198,14 +205,14 @@ Wu.Resumable = Wu.Class.extend({
 	},
 	
 	disable : function () {
-		this._tempDisabled = true;
-		this._disableDrop();
+		// this._tempDisabled = true;
+		// this._disableDrop();
 	},
 
 	enable : function () {
-		if (this._tempDisabled) {
-			this._enableDrop();
-		}
+		// if (this._tempDisabled) {
+		// 	this._enableDrop();
+		// }
 	},
 
 	// feedback upload started
@@ -240,23 +247,21 @@ Wu.Resumable = Wu.Class.extend({
 		    ext 	= file.fileName.split('.').reverse()[0];
 
 		// set message
-		// var message = 'Uploaded ' + size.toFixed(2) + ' MB in ' + totalTime.toFixed(2) + ' seconds (' + bytesps.toFixed(2) + ' MB/s).';
 		var message = 'Estimated processing time: ' + procTime;
 
 		// set feedback
 		app.feedback.setMessage({
 			title : 'Processing file',
 			description : message,
-			// id : file.uniqueIdentifier
 		});
 
 	},
 
 	// get/set id
-	set_id : function () {
+	_set_id : function () {
 		this._id = Wu.Util.getRandomChars(5);
 	},
-	get_id : function () {
+	_get_id : function () {
 		return this._id;
 	},
 
@@ -269,7 +274,7 @@ Wu.Resumable = Wu.Class.extend({
 	_generateQuery : function () {
 		var query = {
 			fileUuid : Wu.Util.guid('r'),
-			projectUuid : app.activeProject.getUuid(),
+			// projectUuid : app.activeProject.getUuid(),
 			access_token : app.tokens.access_token,
 		};
 		return query;
@@ -295,7 +300,7 @@ Wu.Resumable = Wu.Class.extend({
 		});
 
 		// hide drop
-		app.SidePane.DataLibrary._hideDrop();
+		// app.SidePane.DataLibrary._hideDrop();
 	},
 
 

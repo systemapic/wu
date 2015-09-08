@@ -4,13 +4,10 @@ var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
 var timestamps = require('mongoose-times');
 
-// property => group => role => capabilities + members
-
 // define the schema for our user model
 var userSchema = mongoose.Schema({
 
         uuid        : String,
-
         firstName   : String,
         lastName    : String,
         company     : String,
@@ -25,6 +22,8 @@ var userSchema = mongoose.Schema({
         access_token : String,
 
         postgis_database : String,
+
+        files : [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
 
         local : {
                 email        : String,      // login name
