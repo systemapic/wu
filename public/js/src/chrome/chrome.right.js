@@ -4,7 +4,11 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 	options : {
 		defaultWidth : 350,
-		editingLayer : false
+		editingLayer : false,
+		tabs : {
+			settings : true,
+			data : true
+		}
 		
 	},
 
@@ -22,23 +26,45 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		// create the container (just a div to hold errythign)
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-right', app._appPane);
 
-		// create settings selector
-		this._settingsSelector = new Wu.Chrome.Content.SettingsSelector({
-			appendTo : this._container
-		});
+		// holder for all tabs
+		this._tabs = {};
 
+		
+		// data tab
+		if (this.options.tabs.data) {
+
+			// create settings selector
+			this._tabs.data = new Wu.Chrome.Data({
+				appendTo : this._container,
+				chrome : this // ie. right chrome
+			});
+		}
+
+		// settings tab
+		if (this.options.tabs.settings) {
+
+			// create settings selector
+			this._tabs.settings = new Wu.Chrome.SettingsContent.SettingsSelector({
+				appendTo : this._container,
+				chrome : this
+			});
+		}
+
+
+	
 	},
 
 	_addEvents : function () {
 		// todo
-		Wu.DomEvent.on(window, 'resize', this._windowResize, this);
+		Wu.DomEvent.on(window, 'resize', this._onWindowResize, this);
 	},
 
 	_removeEvents : function () {
-		Wu.DomEvent.off(window, 'resize', this._windowResize, this);
+		Wu.DomEvent.off(window, 'resize', this._onWindowResize, this);
 	},
 
-	_windowResize : function () {
+	_onWindowResize : function () {
+
 	},
 
 	getDimensions : function () {
@@ -51,59 +77,91 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		return dims;
 	},
 
+	// helper fn
+	_forEachTab : function (fn) {
+		for (var t in this._tabs) {
+			var tab = this._tabs[t];
+			fn(tab);
+		}
+	},
 
-	open : function () {
+	open : function (tab) {
+		console.log('righcrome open!  this._isOpen => ', this._isOpen, this);
 		
+		// hide all tabs
+		this._forEachTab(function (tab) {
+			tab._hide();
+			tab.onClosed();
+		});
+
+		// show tab
+		tab._show();
+		tab.onOpened();
+
+
+		// if chrome already open
+		if (this._isOpen) return;
+
+		this._isOpen = true;
+
 		// set width of right pane
 		this._container.style.width = this.options.defaultWidth + 'px';
 		this._container.style.display = 'block';
 
 		// move map
-		this.moveMap('open');
-
-		// fire event?
-		this._settingsSelector.opened();
+		var map = app.MapPane._container;
+		var width = map.offsetWidth - this.options.defaultWidth;
+		map.style.width = width + 'px';
+		
 	},
 
-	close : function () {
+	close : function (tab) {
+		console.log('righcrome close!  this._isOpen => ', this._isOpen, this);
+		
+
+		// hide tab
+		tab._hide();
+		tab.onClosed();
+
+		if (!this._isOpen) return;
+
+		this._isOpen = false;
 
 		// set width of right pane
 		this._container.style.width = '0';
 		this._container.style.display = 'none';
 
-		// move map
-		if ( !app.Chrome.Data.isOpen ) this.moveMap('close');
+		// set map fullscreen
+		var map = app.MapPane._container;
+		map.style.width = '100%';
 
-		// fire event?
-		this._settingsSelector.closed();
+		
 
-		// Make sure the "add folder"/editing of layer menu is closed
-		var layerMenu = app.MapPane.getControls().layermenu;
-		if (layerMenu) layerMenu.disableEdit();
-
-
-
+		// // fire event on all tabs
+		// this._forEachTab(function (tab) {
+		// 	tab.onClosed(); // fire opened event
+		// });
 	},
 
-	// helper fn, todo: refactor
-	moveMap : function (direction) {
+	// // helper fn, todo: refactor
+	// moveMap : function (direction) {
 
-		// div = map container
-		var div = app.MapPane._container;
+	// 	// div = map container
+	// 	var div = app.MapPane._container;
 
-		// get current map width
-		var currentWidth = div.offsetWidth;
+	// 	// get current map width
+	// 	var currentWidth = div.offsetWidth;
 
-		// default: full width
-		var width = '100%';
+	// 	// default: full width
+	// 	var width = '100%';
 
-		// if open, set width to current minus width of right chrome
-		if (direction == 'open') width = currentWidth - this.options.defaultWidth + 'px';
+	// 	// if open, set width to current minus width of right chrome
+	// 	if (direction == 'open') width = currentWidth - this.options.defaultWidth + 'px';
 
-		// set width
-		div.style.width = width;
+	// 	// set width
+	// 	div.style.width = width;
 
-	},
+	// },
 
 
 });

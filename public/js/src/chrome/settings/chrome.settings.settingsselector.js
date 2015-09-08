@@ -1,4 +1,4 @@
-Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
+Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 	options : {
 		tabs : {
@@ -33,12 +33,25 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 		}
 	},
 
-	_initialize : function () {
+	_initialize : function (options) {
 
+		// set options
+		Wu.setOptions(this, options);
+
+		// init container
 		this._initContainer();
 
-		this.initLayout();
+		// init content
+		this._initContent();
+
+		// register a button in top chrome
+		this._registerButton();
+
+		// hide by default
+		this._hide();
+
 	},
+
 
 	_initContainer : function () {
 
@@ -46,11 +59,10 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content settingsSelector', this.options.appendTo);
 
 		// tabs wrapper
-		this._tabsWrapper = Wu.DomUtil.create('div', 'chrome chrome-content settings-tabs-wrapper', this.options.appendTo);
-
+		this._tabsWrapper = Wu.DomUtil.create('div', 'chrome chrome-content settings-tabs-wrapper', this._container);
 	},
 
-	initLayout : function () {
+	_initContent : function () {
 
 		// title
 		this._title = Wu.DomUtil.create('div', 'chrome chrome-content settings-title', this._container, 'Settings');
@@ -59,10 +71,22 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 		this._initTabs();
 	},
 
+	_registerButton : function () {
 
-	getTabs : function () {
-		return this._tabs;
+		// top
+		var top = app.Chrome.Top;
+
+		// add a button to top chrome
+		top._registerButton({
+			name : 'settingsSelector',
+			className : 'chrome-button settingsSelector',
+			trigger : this._togglePane,
+			context : this
+		});
+
 	},
+
+
 
 	_initTabs : function () {
 
@@ -83,13 +107,13 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 				console.log('tab: ', tab);
 
 				// create tab contents
-				if (Wu.Chrome.Content[tab]) {
+				if (Wu.Chrome.SettingsContent[tab]) {
 
 					// create tab button
 					var trigger = Wu.DomUtil.create('div', 'chrome chrome-content settings-button', this._buttonWrapper, text);
 
 					// create content
-					this._tabs[tab] = new Wu.Chrome.Content[tab]({
+					this._tabs[tab] = new Wu.Chrome.SettingsContent[tab]({
 						options : this._options,
 						trigger : trigger,
 						appendTo : this._tabsWrapper,
@@ -101,22 +125,52 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 
 	},
 
-	show : function () {
 
+	getTabs : function () {
+		return this._tabs;
 	},
 
-	hide : function () {
-		console.log('hiding tab!');
+
+	_togglePane : function () {
+
+		// right chrome
+		var chrome = this.options.chrome;
+
+		// open/close
+		this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
 	},
 
-	opened : function () {
+	_show : function () {
+		this._container.style.display = 'block';
+		this._isOpen = true;
+	},
+
+	_hide : function () {
+		this._container.style.display = 'none';
+		this._isOpen = false;
+	},
+
+	// onOpened : function () {
+	// 	this.opened();
+	// },
+
+	// onClosed : function () {
+	// 	this.closed(); 	// todo: remove shortcut
+	// },
+
+	onOpened : function () {
+		// default styler
 		this._tabs['Styler'].show();
 	},
 
-	closed : function () {
+	onClosed : function () {
 		for ( var t in this._tabs) {
 			this._tabs[t].closed();
 		}
+
+		// Make sure the "add folder"/editing of layer menu is closed
+		var layerMenu = app.MapPane.getControls().layermenu;	 // move to settings selector
+		if (layerMenu) layerMenu.disableEdit();
 	},
 
 	_refreshAll : function () {
