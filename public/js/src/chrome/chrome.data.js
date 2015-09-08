@@ -53,6 +53,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 		// set width of right pane
 		this._outerContainer.style.width = this.options.defaultWidth + 'px';
+		this._outerContainer.style.display = 'block';
 
 		// move map
 		this.moveMap('open');
@@ -62,6 +63,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// set width of right pane
 		this._outerContainer.style.width = '0';
+		this._outerContainer.style.display = 'none';
 
 		// move map
 		// this.moveMap('close');
