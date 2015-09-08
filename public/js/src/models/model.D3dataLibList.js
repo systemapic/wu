@@ -1,4 +1,4 @@
-Wu.List = Wu.Class.extend({
+Wu.DataList = Wu.Class.extend({
 	
 	canEdit : false,
 	folder  : 'Folder',
@@ -35,46 +35,6 @@ Wu.List = Wu.Class.extend({
 	},
 
 	createFolder : function() {
-
-		// console.log('this.listData', this.listData);
-
-		// var newFolder = {
-
-		// 	'fileUuid' : {
-
-		// 		store : {
-
-		// 			access : {
-		// 				clients : [],
-		// 				projects : [],
-		// 				users : []
-		// 			},
-		// 			category : '',
-		// 			created : '',
-		// 			createdBy : '',
-		// 			createdByName : '',
-		// 			data : {
-		// 				geojson : '',
-		// 				image : {
-		// 					crunched : []
-		// 				},
-		// 				other : [],
-		// 				shapefile : [],						
-		// 			},
-		// 			description : '',
-		// 			files : [],
-		// 			format : [],
-		// 			keywords : [],
-		// 			lastUpdated : '',
-		// 			name : '',
-		// 			type : '',
-		// 			uuid : ''
-
-		// 		}
-
-		// 	}
-
-		// }
 
 	},
 
@@ -1952,7 +1912,7 @@ Wu.List = Wu.Class.extend({
 // ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝    ╚══════╝╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   
 
 
-Wu.DataLibraryList = Wu.List.extend({
+Wu.DataLibraryList = Wu.DataList.extend({
 
 
 	// ┌─┐┌─┐┌┐┌┌─┐┬─┐┌─┐┬  
@@ -3961,8 +3921,5 @@ Wu.UserList = Wu.List.extend({
 
 		// Return files
 		return checks;
-
 	},	
-
-
-})
+});

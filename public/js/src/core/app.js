@@ -176,6 +176,9 @@ Wu.App = Wu.Class.extend({
 		// right chrome
 		this.Chrome.Right = new Wu.Chrome.Right();
 
+		// data chrome
+		this.Chrome.Data = new Wu.Chrome.Data();
+
 	},
 
 	_initPanes : function () {
