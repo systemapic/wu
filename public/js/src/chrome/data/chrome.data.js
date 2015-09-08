@@ -1,6 +1,6 @@
 Wu.Chrome.Data = Wu.Chrome.extend({
 
-	_ : 'datachrome', 
+	_ : 'data', 
 
 	options : {
 		defaultWidth : 350
