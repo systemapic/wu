@@ -58,6 +58,8 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		// create container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content settingsSelector', this.options.appendTo);
 
+		this._header = Wu.DomUtil.create('div', 'settingsSelector-header', this._container)
+
 		// tabs wrapper
 		this._tabsWrapper = Wu.DomUtil.create('div', 'chrome chrome-content settings-tabs-wrapper', this._container);
 	},
@@ -65,7 +67,7 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 	_initContent : function () {
 
 		// title
-		this._title = Wu.DomUtil.create('div', 'chrome chrome-content settings-title', this._container, 'Settings');
+		this._title = Wu.DomUtil.create('div', 'chrome chrome-content settings-title', this._header, 'Settings');
 
 		// tabs
 		this._initTabs();
@@ -94,7 +96,7 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		this._tabs = {};
 
 		// button wrapper
-		this._buttonWrapper = Wu.DomUtil.create('div', 'chrome chrome-content settings-button-wrapper', this._container);
+		this._buttonWrapper = Wu.DomUtil.create('div', 'chrome chrome-content settings-button-wrapper', this._header);
 		
 		// create tabs
 		for ( var o in this.options.tabs) {
