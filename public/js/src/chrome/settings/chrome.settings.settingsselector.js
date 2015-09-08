@@ -52,12 +52,26 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 	},
 
+	_refresh : function () {
+
+
+		// remove settings button if no access to edit project
+		if (app.Access.to.edit_project(app.activeProject.getUuid())) { 			// todo: check if working
+			Wu.DomUtil.removeClass(this._settingsButton, 'displayNone');
+		} else {
+			Wu.DomUtil.addClass(this._settingsButton, 'displayNone');
+		}
+
+
+	},
+
 
 	_initContainer : function () {
 
 		// create container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content settingsSelector', this.options.appendTo);
 
+		// header wrapper
 		this._header = Wu.DomUtil.create('div', 'settingsSelector-header', this._container)
 
 		// tabs wrapper
@@ -152,21 +166,15 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		this._isOpen = false;
 	},
 
-	// onOpened : function () {
-	// 	this.opened();
-	// },
-
-	// onClosed : function () {
-	// 	this.closed(); 	// todo: remove shortcut
-	// },
-
 	onOpened : function () {
+
 		// default styler
 		this._tabs['Styler'].show();
 	},
 
+	// clean up on close
 	onClosed : function () {
-		for ( var t in this._tabs) {
+		for (var t in this._tabs) {
 			this._tabs[t].closed();
 		}
 

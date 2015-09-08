@@ -104,6 +104,34 @@ module.exports = api.file = {
 		});
 	},
 
+	addNewFileToUser : function (options, done) {
+
+		console.log('addNewFileToUser', options);
+
+		var userUuid = options.user.uuid,
+		    file_id = options.file._id;
+
+
+		User
+		.findOne({uuid : userUuid})
+		.exec(function (err, user) {
+			console.log('find user??', err, user);
+			if (err) return done(err);
+
+			// add file
+			user.files.push(file_id);
+			user.markModified('files');
+			
+			// save
+			user.save(function (err, doc) {
+				console.log('|SAVED USER!??!?', err, doc);
+				done(err);
+			});
+		});
+
+
+	},
+
 	addFileToProject : function (req, res) {
 		var options = req.body,
 		    fileUuid = options.fileUuid,

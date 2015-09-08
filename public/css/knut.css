@@ -126,3 +126,17 @@
 .chrome-button.settingsSelector {
 	background-position: -6px -3px;
 }
+
+.debug-button {
+	    width: 200px;
+    height: 35px;
+    background: #FF5E5E;
+    border-radius: 3px;
+    text-align: center;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto;
+    padding: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+}

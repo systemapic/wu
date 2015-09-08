@@ -18,7 +18,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-top', app._appPane);
 
 		// Menu Button
-		this._menuBtn = Wu.DomUtil.create('div', 'chrome-menu-button', this._container);		
+		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button', this._container);		
 
 		// Portal Logo
 		this._portalLogo = Wu.DomUtil.create('div', 'chrome-portal-logo', this._container);
@@ -54,19 +54,22 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	},
 
+	// add button to top chrome
 	_registerButton : function (button) {
 
-		var className = button.className;
-		var trigger = button.trigger;
-		var name = button.name;
-		var ctx = button.context;
+		// button options
+		var className = button.className,
+		    trigger = button.trigger,
+		    name = button.name,
+		    ctx = button.context;
 
+		// buttons holder
 		this._buttons = this._buttons || {};
 
+		// create button
 		var button = this._buttons[name] = Wu.DomUtil.create('div', className, this._buttonWrapper);
 
-		console.log('button div: ', button);
-
+		// register event
 		Wu.DomEvent.on(button, 'click', trigger, ctx);
 	},
 
@@ -140,7 +143,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		Wu.DomEvent[onoff](this._layersBtn, 'click', this._toggleLayermenu, this);
 
 		// Toggle left pane
-		Wu.DomEvent[onoff](this._menuBtn, 'click', this._toggleLeftPane, this);
+		Wu.DomEvent[onoff](this._menuButton, 'click', this._toggleLeftPane, this);
 
 		// Log out button
 		Wu.DomEvent[onoff](this._userLogout, 'click', this._logOut, this);
@@ -176,8 +179,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// The layer menu
 		this.__layerMenu = app.MapPane.getControls().layermenu;
 		
-		// Show settings button if user has access to it...
-		// if ( this.hasSettingsAccess() ) Wu.DomUtil.removeClass(this._settingsButton, 'displayNone');
 
 		// TODO: fikse dette...
 		setTimeout(function() {
@@ -189,27 +190,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	},
 
-	// TODO: Knut har sikkert en fiffig funksjon for dett, men...
-	hasSettingsAccess : function () {
-
-		var uuid = app.Account.store.uuid;
-		var portalRoleMembers = app.Access.store.portalRole.members;
-		var superRoleMembers = app.Access.store.superRole.members;
-
-		var hasSettingsAccess = false;
-
-		for ( var i = 0; i < portalRoleMembers.length; i++ ) {
-			if ( portalRoleMembers[i] == uuid ) hasSettingsAccess = true;
-		}
-
-		for ( var i = 0; i < superRoleMembers.length; i++ ) {
-			if ( superRoleMembers[i] == uuid ) hasSettingsAccess = true;
-		}
-
-		return hasSettingsAccess;
-
-	},
-
+	
 	_showHideLayerButton : function () {
 
 		// If there are no layers, hide button
@@ -223,25 +204,23 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_setProjectTitle : function () {
 
-		// TODO: Bedre måte å finne client name på?
+		// get client & project names
 		this._clientName = this._project.getClient().getName();
 		this._projectTitle = this._project.getHeaderTitle();
 
+		// set project title
 		this._projectTitleContainer.innerHTML = this._clientName.toLowerCase() + '&nbsp;:&nbsp;' + this._projectTitle.toLowerCase();
 	},
 
 	_setUsername : function () {
-
 		var username = app.Account.getFullName();
 		this._userName.innerHTML = username.toLowerCase();
-
 	},
 
 	_setPortalLogo : function () {
 
-		this._portalLogoImg.src = app.options.servers.portal + 'css/images/globesar-web-logo.png';
-		// this._portalLogoImg = Wu.DomUtil.create('img', '', this._portalLogo);
-		// this._portalLogoImg.src = 'https://dev2.systemapic.com/css/images/globesar-web-logo.png';
+		// portal logo from config
+		this._portalLogoImg.src = app.options.servers.portal + app.options.logos.portalLogo;
 	},
 
 
@@ -249,7 +228,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		Wu.DomEvent.stop(e);
 
 		this._leftPaneisOpen ? this.closeLeftPane() : this.openLeftPane();
-
 	},
 
 	openLeftPane : function () {
@@ -258,7 +236,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._leftPaneisOpen = true;
 
 		// Set active state of button
-		Wu.DomUtil.addClass(this._menuBtn, 'active');
+		Wu.DomUtil.addClass(this._menuButton, 'active');
 
 		// expand sidepane
 		if (app.SidePane) app.SidePane.expand();
@@ -281,8 +259,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._leftPaneisOpen = false;
 
 		// Remove active state of button
-		Wu.DomUtil.removeClass(this._menuBtn, 'active');
-
+		Wu.DomUtil.removeClass(this._menuButton, 'active');
 
 		// collapse sidepane
 		if (app.SidePane) app.SidePane.collapse();
@@ -358,78 +335,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 			window.location.href = app.options.servers.portal + 'logout';
 		}
 	},
-
-
-	// _toggleDataLibPane : function () {
-	// 	// if this is true ?         then do this        :        if not, this
-	// 	app.Chrome.Data.isOpen ? this._closeDataLib() : this._openDataLib();
-	// },
-
-
-	// _openDataLib : function () {
-
-	// 	// use a variable to mark editor as open
-	// 	app.Chrome.Data.isOpen = true;
-
-	// 	// Add "active" class from button
-	// 	Wu.DomUtil.addClass(this._dataButton, 'active');
-
-	// 	// trigger fn in right chrome to open it
-	// 	app.Chrome.Data.open('Data');
-
-	// 	// Close settings
-	// 	if ( app.Chrome.Right.isOpen ) this._closeRightChrome();
-
-
-	// },
-
-
-	// _closeDataLib : function () {
-
-	// 	// mark not open
-	// 	app.Chrome.Data.isOpen = false;
-
-	// 	// Remove "active" class from button
-	// 	Wu.DomUtil.removeClass(this._dataButton, 'active');
-
-	// 	// close right chrome
-	// 	app.Chrome.Data.close();
-
-	// },
-
-
-
-	// _toggleSettingsPane : function () {
-	// 	// if this is true ?         then do this        :        if not, this
-	// 	app.Chrome.Right.isOpen ? this._closeRightChrome() : this._openRightChrome();
-	// },
-
-	// _openRightChrome : function () {
-
-	// 	// use a variable to mark editor as open
-	// 	app.Chrome.Right.isOpen = true;
-
-	// 	// Add "active" class from button
-	// 	Wu.DomUtil.addClass(this._settingsButton, 'active');
-
-	// 	// trigger fn in right chrome to open it
-	// 	app.Chrome.Right.open('Styler');
-
-	// 	// Close data library
-	// 	if ( app.Chrome.Right.isOpen ) this._closeDataLib();		
-	// },
-
-	// _closeRightChrome : function () {		
-
-	// 	// mark not open
-	// 	app.Chrome.Right.isOpen = false;
-
-	// 	// Remove "active" class from button
-	// 	Wu.DomUtil.removeClass(this._settingsButton, 'active');
-
-	// 	// close right chrome
-	// 	app.Chrome.Right.close();
-	// },
 
 
 });

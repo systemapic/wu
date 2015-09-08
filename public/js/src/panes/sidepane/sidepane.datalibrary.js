@@ -249,7 +249,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._unload(e);
 
 		// refresh uploader
-		this._refreshResumable();
+		// this._refreshResumable();
 
 	},
 
@@ -344,7 +344,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		});
 
 		// add to memory
-		this._resumables[r.get_id()] = r;
+		this._resumables[r._get_id()] = r;
 
 	},
 
