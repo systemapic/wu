@@ -1,11 +1,9 @@
-Wu.Chrome.Right = Wu.Chrome.extend({
+Wu.Chrome.Data = Wu.Chrome.extend({
 
-	_ : 'rightchrome', 
+	_ : 'datachrome', 
 
 	options : {
-		defaultWidth : 350,
-		editingLayer : false
-		
+		defaultWidth : 350
 	},
 
 	_initialize : function () {
@@ -15,17 +13,16 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 		// add hooks
 		this._addEvents();
+		
 	},
 
 	initContainer : function () {
 
 		// create the container (just a div to hold errythign)
-		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-right', app._appPane);
+		this._outerContainer = Wu.DomUtil.create('div', 'chrome chrome-container chrome-right chrome-data', app._appPane);
 
-		// create settings selector
-		this._settingsSelector = new Wu.Chrome.Content.SettingsSelector({
-			appendTo : this._container
-		});
+		this.initContent();
+
 
 	},
 
@@ -45,41 +42,30 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 		var dims = {
 			width : this.options.defaultWidth,
-			height : this._container.offsetHeight
+			height : this._outerContainer.offsetHeight
 		}
 
 		return dims;
 	},
 
 
-	open : function () {
+	open : function (tab) {
 		
 		// set width of right pane
-		this._container.style.width = this.options.defaultWidth + 'px';
+		this._outerContainer.style.width = this.options.defaultWidth + 'px';
 
 		// move map
 		this.moveMap('open');
-
-		// fire event?
-		this._settingsSelector.opened();
 	},
 
 	close : function () {
 
 		// set width of right pane
-		this._container.style.width = '0';
+		this._outerContainer.style.width = '0';
 
 		// move map
-		if ( !app.Chrome.Data.isOpen ) this.moveMap('close');
-
-		// fire event?
-		this._settingsSelector.closed();
-
-		// Make sure the "add folder"/editing of layer menu is closed
-		var layerMenu = app.MapPane.getControls().layermenu;
-		if (layerMenu) layerMenu.disableEdit();
-
-
+		// this.moveMap('close');
+		if ( !app.Chrome.Right.isOpen ) this.moveMap('close');
 
 	},
 
@@ -104,4 +90,17 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 
 
+
+	// HERE IT BEGINS!!!
+
+	initContent : function () {
+
+
+
+	},
+
+
 });
+
+
+

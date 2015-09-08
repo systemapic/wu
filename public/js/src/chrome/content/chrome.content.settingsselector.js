@@ -14,20 +14,22 @@ Wu.Chrome.Content.SettingsSelector = Wu.Chrome.Content.extend({
 				enabled : true,
 				text : 'Tooltip'
 			},
-			cartocss : {
+			
+			filters : {
 				enabled : true,
-				text : 'CartoCSS & SQL'
+				text : 'Data Filters'
 			},
-
+			
 			mapsettings : {
 				enabled : true,
 				text : 'Map Settings'
 			},	
 
-			filters : {
+			cartocss : {
 				enabled : true,
-				text : 'Data Filters'
-			}		
+				text : 'CartoCSS & SQL'
+			},
+		
 		}
 	},
 

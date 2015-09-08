@@ -13,6 +13,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	initContainer : function () {
 
+
 		// container to hold errything
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-top', app._appPane);
 
@@ -44,10 +45,15 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Layers button
 		this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton displayNone', this._buttons);
 		
+		// Datalib button
+		this._dataButton = Wu.DomUtil.create('div', 'chrome-button datalib', this._buttons);
+
 		// Settings button
 		this._settingsButton = Wu.DomUtil.create('div', 'chrome-button cartoeditor displayNone', this._buttons);
 
 		this.initDefault();
+
+
 
 	},
 
@@ -116,6 +122,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// click event on carto editor button
 		Wu.DomEvent[onoff](this._settingsButton, 'click', this._toggleSettingsPane, this);
+
+		Wu.DomEvent[onoff](this._dataButton, 'click', this._toggleDataLibPane, this);
 
 		// Toggle layer menu
 		Wu.DomEvent[onoff](this._layersBtn, 'click', this._toggleLayermenu, this);
@@ -340,27 +348,70 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		}
 	},
 
+
+	_toggleDataLibPane : function () {
+		// if this is true ?         then do this        :        if not, this
+		app.Chrome.Data.isOpen ? this._closeDataLib() : this._openDataLib();
+	},
+
+
+	_openDataLib : function () {
+
+		// use a variable to mark editor as open
+		app.Chrome.Data.isOpen = true;
+
+		// Add "active" class from button
+		Wu.DomUtil.addClass(this._dataButton, 'active');
+
+		// trigger fn in right chrome to open it
+		app.Chrome.Data.open('Data');
+
+		// Close settings
+		if ( app.Chrome.Right.isOpen ) this._closeRightChrome();
+
+
+	},
+
+
+	_closeDataLib : function () {
+
+		// mark not open
+		app.Chrome.Data.isOpen = false;
+
+		// Remove "active" class from button
+		Wu.DomUtil.removeClass(this._dataButton, 'active');
+
+		// close right chrome
+		app.Chrome.Data.close();
+
+	},
+
+
+
 	_toggleSettingsPane : function () {
 		// if this is true ?         then do this        :        if not, this
-		this._settingsPaneOpen ? this._closeRightChrome() : this._openRightChrome();
+		app.Chrome.Right.isOpen ? this._closeRightChrome() : this._openRightChrome();
 	},
 
 	_openRightChrome : function () {
 
 		// use a variable to mark editor as open
-		this._settingsPaneOpen = true;
+		app.Chrome.Right.isOpen = true;
 
 		// Add "active" class from button
 		Wu.DomUtil.addClass(this._settingsButton, 'active');
 
 		// trigger fn in right chrome to open it
-		app.Chrome.Right.open();
+		app.Chrome.Right.open('Styler');
+
+		// Close data library
+		if ( app.Chrome.Right.isOpen ) this._closeDataLib();		
 	},
 
 	_closeRightChrome : function () {		
 
 		// mark not open
-		this._settingsPaneOpen = false;
+		app.Chrome.Right.isOpen = false;
 
 		// Remove "active" class from button
 		Wu.DomUtil.removeClass(this._settingsButton, 'active');
