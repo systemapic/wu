@@ -1,6 +1,6 @@
 Wu.Chrome.Data = Wu.Chrome.extend({
 
-	_ : 'datachrome', 
+	_ : 'data', 
 
 	options : {
 		defaultWidth : 350
@@ -59,8 +59,22 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// HERE IT BEGINS!!!
 	_initContent : function () {
 
+		this._debugFn();
+
 		// add hooks
 		this._addEvents();
+	},
+
+	_debugFn : function () {
+
+		console.log('_debug');
+
+		// create button wrapper
+		var buttonWrapper = Wu.DomUtil.create('div', 'button-wrapper', this._container);
+
+		// get upload button
+		var button = app.Data.getUploadButton('debug-button', buttonWrapper);
+
 	},
 
 	_registerButton : function () {

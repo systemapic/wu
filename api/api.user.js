@@ -343,10 +343,19 @@ module.exports = api.user = {
 		});
 	},
 
+	_getSingle : function (options, done) {
+		var userUuid = options.user.uuid;
+
+		User
+		.findOne({uuid : userUuid})
+		.populate('files')
+		.exec(done);
+	},
 
 	_getAll : function (options, done) {
 		User
 		.find()
+		.populate('files')
 		.exec(done);
 	},
 
@@ -390,6 +399,7 @@ module.exports = api.user = {
 		ops.push(function (users, callback) {
 			User
 			.find()
+			.populate('files')
 			.or([
 				{ uuid : { $in : users }}, 		// roles
 				{ createdBy : user.getUuid()}, 	// createdBy self

@@ -381,10 +381,6 @@ Wu.SidePane.Project = Wu.Class.extend({
 		if (this._project == app.activeProject) return;         // todo: activeProject is set at beginning, even tho not active.. fix!
 
 		var uuid = this._project.getUuid();
-			
-		// Refresh datalibrary
-		// app.Chrome.Data.refresh(uuid);
-
 
 		Wu.Mixin.Events.fire('projectSelected', { detail : {
 			projectUuid : uuid
