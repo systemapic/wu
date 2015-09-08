@@ -732,3 +732,60 @@ input.chrome-field-input {
 .item-select-button:before {
   background-position: -61px -75px;    
 }*/
+
+
+
+
+
+
+
+
+
+
+.chrome-data-top {
+    border-bottom: 1px dashed #ccc;
+    position: absolute;
+    width: 100%;
+    height: 55px;
+    }
+
+.chrome-data-bottom {
+    border-top: 1px dashed #ccc;
+    position: absolute;
+    bottom: 35px;
+    width: 100%;
+    height: 105px;
+    }
+
+.chrome-data-inner {
+    padding: 70px 25px 139px 25px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    }
+
+.file-list-container {
+    margin-bottom: 30px;
+    }
+
+.data-list-line {
+    cursor: pointer;
+    }
+
+.file-list-container-title {
+    font-size: 16px;
+    margin-bottom: 9px;
+    }
+
+
+
+
+
+
+
+
+
+
+
+

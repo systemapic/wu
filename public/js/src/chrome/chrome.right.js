@@ -106,5 +106,4 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 
-
 });

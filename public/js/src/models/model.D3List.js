@@ -5,7 +5,6 @@ Wu.List = Wu.Class.extend({
 
 	initialize : function (options) {
 
-		console.log('%c initialize ', 'background: red; color: white;');
 
 		// searchField has not been implemented yet
 		this.searchField = options.searchfield;
@@ -141,7 +140,6 @@ Wu.List = Wu.Class.extend({
 	updateTable : function (options) {  
 
 
-		console.log('%c updateTable ', 'background: red; color: white;');
 
 		var that = options.context;
 
@@ -191,7 +189,6 @@ Wu.List = Wu.Class.extend({
 
 	refreshTable : function (context) {
 
-		console.log('%c refreshTable ', 'background: red; color: white;');
 
 
 		var that = context ? context : this;
@@ -503,8 +500,6 @@ Wu.List = Wu.Class.extend({
 	// CREATE INPUT FIELD
 	_D3input : function (options, blurFunction) {
 
-		console.log('i think its easy to make million$');
-
 		// Create input box
 		var input 	    = Wu.DomUtil.create('input');
 		    input.type 	    = 'text';
@@ -539,7 +534,6 @@ Wu.List = Wu.Class.extend({
 	// INPUT FIELD ON BLUR
 	updateAndRefresh : function (input, options) {
 
-		console.log('refresh!');
 
 		// New Name
 		var newName  = input.value;
@@ -684,7 +678,6 @@ Wu.List = Wu.Class.extend({
 	_D3list : function (DATA) {
 	
 
-		console.log('%c _D3list ', 'background: red; color: white;');
 
 		// Context
 		var that = this;
@@ -1972,16 +1965,12 @@ Wu.DataLibraryList = Wu.List.extend({
 	// Refresh table
 	refresh : function (DATA) {
 
-		console.log('%c refresh ', 'background: red; color: white;', data);
-		
 		if ( DATA ) this._D3list(DATA);
 
 	},
 
 
 	addItems : function (items) {
-
-		console.log('%c addItems ', 'background: red; color: white;', data);
 
 		if ( this.sortedData ) {
 			var that = this;
@@ -2006,8 +1995,6 @@ Wu.DataLibraryList = Wu.List.extend({
 	},
 
 	removeItems : function (items) {
-
-		console.log('%c removeItems ', 'background: red; color: white;', data);
 
 		// Remove from sorted data
 		if ( this.sortedData ) {
@@ -2043,8 +2030,6 @@ Wu.DataLibraryList = Wu.List.extend({
 	// Save
 	save : function (saveJSON) {
 
-		console.log('%c save ', 'background: red; color: white;', data);
-
 		var key     = saveJSON.key;
 		var value   = saveJSON.value;
 		var id      = saveJSON.id;
@@ -2064,8 +2049,6 @@ Wu.DataLibraryList = Wu.List.extend({
 
 	_updateLayerName : function (fileUuid, title) {
 
-		console.log('%c _updateLayerName ', 'background: red; color: white;', data);
-		
 		var layer = this._findLayerByFile(fileUuid)
 		if (!layer) return;
 		
