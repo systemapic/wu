@@ -383,7 +383,7 @@ Wu.SidePane.Project = Wu.Class.extend({
 		var uuid = this._project.getUuid();
 			
 		// Refresh datalibrary
-		app.Chrome.Data.refresh(uuid);
+		// app.Chrome.Data.refresh(uuid);
 
 
 		Wu.Mixin.Events.fire('projectSelected', { detail : {

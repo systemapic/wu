@@ -21,21 +21,21 @@ Wu.Chrome = Wu.Class.extend({
 		Wu.Mixin.Events.on('layerDisabled',   this._layerDisabled, this);
 	},
 
-	// _projectSelected : function (e) {
+	_projectSelected : function (e) {
 
-	// 	var projectUuid = e.detail.projectUuid;
+		var projectUuid = e.detail.projectUuid;
 
-	// 	if (!projectUuid) return;
+		if (!projectUuid) return;
 
-	// 	// set project
-	// 	this._project = app.activeProject = app.Projects[projectUuid];
+		// set project
+		this._project = app.activeProject = app.Projects[projectUuid];
 
-	// 	// refresh pane
-	// 	this._refresh();
-	// },
+		// refresh pane
+		this._refresh();
+	},
 
 	// dummies
-	_projectSelected : function () {},
+	// _projectSelected : function () {},
 	_initialize 	 : function () {},
 	_editEnabled 	 : function () {},
 	_editDisabled 	 : function () {},
