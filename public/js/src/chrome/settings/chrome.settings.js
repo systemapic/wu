@@ -1,4 +1,4 @@
-Wu.Chrome.Content = Wu.Chrome.extend({
+Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	_initialize : function () {
 
@@ -138,7 +138,6 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 	},
 
 	closed : function () {
-		console.log('i was also closed!', this);
 	},
 
 
@@ -522,22 +521,18 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 	},
 
 	toggleSet : function (e) {
-
 		var elem  = e.target;
 		var id    = elem.id;
 		var key   = elem.getAttribute('key')
-
 		this.saveSet(key);
 	},
-
-
 
 	_init_miniDropDown : function (array, wrap, _key, selected) {
 
 		// create dropdown
 		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-mini-dropdown active-field select-field-wrap', wrap);
 		var select = this._select = Wu.DomUtil.create('select', 'active-field-select', selectWrap);
-		    select.setAttribute('key', _key);
+		select.setAttribute('key', _key);
 
 		// get layers
 		var layers = this._project.getPostGISLayers();
@@ -547,7 +542,6 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		option.innerHTML = 'select field';
 		option.setAttribute('disabled', '');
 		option.setAttribute('selected', '');
-
 
 		// fill select options
 		array.forEach(function (field) {

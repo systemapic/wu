@@ -1,4 +1,4 @@
-Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
+Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 
 	_initialize : function () {

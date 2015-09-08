@@ -28,33 +28,46 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title', this._container);
 
 		// WRAPPER FOR BUTTONS			// todo: make pluggable
-		this._buttons = Wu.DomUtil.create('div', 'chrome-buttons', this._container);
+		this._buttonWrapper = Wu.DomUtil.create('div', 'chrome-buttons', this._container);
 
 		// User name button container
-		this._usrNameContainer = Wu.DomUtil.create('div', 'username-container', this._buttons);
+		this._userNameContainer = Wu.DomUtil.create('div', 'username-container', this._buttonWrapper);
 
 		// Username
-		this._usrName = Wu.DomUtil.create('div', 'top-username', this._usrNameContainer);
+		this._userName = Wu.DomUtil.create('div', 'top-username', this._userNameContainer);
 
 		// Divider
-		this._usrDivider = Wu.DomUtil.create('div', 'top-divider', this._usrNameContainer, '&nbsp;|&nbsp;');
+		this._userDivider = Wu.DomUtil.create('div', 'top-divider', this._userNameContainer, '&nbsp;|&nbsp;');
+
+
+
 
 		// Logout
-		this._usrLogout = Wu.DomUtil.create('div', 'top-logout', this._usrNameContainer, 'log out');
+		this._userLogout = Wu.DomUtil.create('div', 'top-logout', this._userNameContainer, 'log out');
 
 		// Layers button
-		this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton displayNone', this._buttons);
-		
-		// Datalib button
-		this._dataButton = Wu.DomUtil.create('div', 'chrome-button datalib', this._buttons);
+		this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton displayNone', this._buttonWrapper);
+	
 
-		// Settings button
-		this._settingsButton = Wu.DomUtil.create('div', 'chrome-button cartoeditor displayNone', this._buttons);
-
+		// set default
 		this.initDefault();
 
+	},
 
+	_registerButton : function (button) {
 
+		var className = button.className;
+		var trigger = button.trigger;
+		var name = button.name;
+		var ctx = button.context;
+
+		this._buttons = this._buttons || {};
+
+		var button = this._buttons[name] = Wu.DomUtil.create('div', className, this._buttonWrapper);
+
+		console.log('button div: ', button);
+
+		Wu.DomEvent.on(button, 'click', trigger, ctx);
 	},
 
 
@@ -64,9 +77,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._setPortalLogo();
 
 		// Init CPU clock
-		this.initCPUclock(this._buttons);
-
-
+		this.initCPUclock(this._buttonWrapper);
 	},
 
 
@@ -121,9 +132,9 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_setHooks : function (onoff) {
 
 		// click event on carto editor button
-		Wu.DomEvent[onoff](this._settingsButton, 'click', this._toggleSettingsPane, this);
+		// Wu.DomEvent[onoff](this._settingsButton, 'click', this._toggleSettingsPane, this);
 
-		Wu.DomEvent[onoff](this._dataButton, 'click', this._toggleDataLibPane, this);
+		// Wu.DomEvent[onoff](this._dataButton, 'click', this._toggleDataLibPane, this);
 
 		// Toggle layer menu
 		Wu.DomEvent[onoff](this._layersBtn, 'click', this._toggleLayermenu, this);
@@ -132,7 +143,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		Wu.DomEvent[onoff](this._menuBtn, 'click', this._toggleLeftPane, this);
 
 		// Log out button
-		Wu.DomEvent[onoff](this._usrLogout, 'click', this._logOut, this);
+		Wu.DomEvent[onoff](this._userLogout, 'click', this._logOut, this);
 
 	},
 
@@ -166,7 +177,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this.__layerMenu = app.MapPane.getControls().layermenu;
 		
 		// Show settings button if user has access to it...
-		if ( this.hasSettingsAccess() ) Wu.DomUtil.removeClass(this._settingsButton, 'displayNone');
+		// if ( this.hasSettingsAccess() ) Wu.DomUtil.removeClass(this._settingsButton, 'displayNone');
 
 		// TODO: fikse dette...
 		setTimeout(function() {
@@ -222,7 +233,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_setUsername : function () {
 
 		var username = app.Account.getFullName();
-		this._usrName.innerHTML = username.toLowerCase();
+		this._userName.innerHTML = username.toLowerCase();
 
 	},
 
@@ -349,76 +360,76 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	},
 
 
-	_toggleDataLibPane : function () {
-		// if this is true ?         then do this        :        if not, this
-		app.Chrome.Data.isOpen ? this._closeDataLib() : this._openDataLib();
-	},
+	// _toggleDataLibPane : function () {
+	// 	// if this is true ?         then do this        :        if not, this
+	// 	app.Chrome.Data.isOpen ? this._closeDataLib() : this._openDataLib();
+	// },
 
 
-	_openDataLib : function () {
+	// _openDataLib : function () {
 
-		// use a variable to mark editor as open
-		app.Chrome.Data.isOpen = true;
+	// 	// use a variable to mark editor as open
+	// 	app.Chrome.Data.isOpen = true;
 
-		// Add "active" class from button
-		Wu.DomUtil.addClass(this._dataButton, 'active');
+	// 	// Add "active" class from button
+	// 	Wu.DomUtil.addClass(this._dataButton, 'active');
 
-		// trigger fn in right chrome to open it
-		app.Chrome.Data.open('Data');
+	// 	// trigger fn in right chrome to open it
+	// 	app.Chrome.Data.open('Data');
 
-		// Close settings
-		if ( app.Chrome.Right.isOpen ) this._closeRightChrome();
-
-
-	},
+	// 	// Close settings
+	// 	if ( app.Chrome.Right.isOpen ) this._closeRightChrome();
 
 
-	_closeDataLib : function () {
-
-		// mark not open
-		app.Chrome.Data.isOpen = false;
-
-		// Remove "active" class from button
-		Wu.DomUtil.removeClass(this._dataButton, 'active');
-
-		// close right chrome
-		app.Chrome.Data.close();
-
-	},
+	// },
 
 
+	// _closeDataLib : function () {
 
-	_toggleSettingsPane : function () {
-		// if this is true ?         then do this        :        if not, this
-		app.Chrome.Right.isOpen ? this._closeRightChrome() : this._openRightChrome();
-	},
+	// 	// mark not open
+	// 	app.Chrome.Data.isOpen = false;
 
-	_openRightChrome : function () {
+	// 	// Remove "active" class from button
+	// 	Wu.DomUtil.removeClass(this._dataButton, 'active');
 
-		// use a variable to mark editor as open
-		app.Chrome.Right.isOpen = true;
+	// 	// close right chrome
+	// 	app.Chrome.Data.close();
 
-		// Add "active" class from button
-		Wu.DomUtil.addClass(this._settingsButton, 'active');
+	// },
 
-		// trigger fn in right chrome to open it
-		app.Chrome.Right.open('Styler');
 
-		// Close data library
-		if ( app.Chrome.Right.isOpen ) this._closeDataLib();		
-	},
 
-	_closeRightChrome : function () {		
+	// _toggleSettingsPane : function () {
+	// 	// if this is true ?         then do this        :        if not, this
+	// 	app.Chrome.Right.isOpen ? this._closeRightChrome() : this._openRightChrome();
+	// },
 
-		// mark not open
-		app.Chrome.Right.isOpen = false;
+	// _openRightChrome : function () {
 
-		// Remove "active" class from button
-		Wu.DomUtil.removeClass(this._settingsButton, 'active');
+	// 	// use a variable to mark editor as open
+	// 	app.Chrome.Right.isOpen = true;
 
-		// close right chrome
-		app.Chrome.Right.close();
-	},
+	// 	// Add "active" class from button
+	// 	Wu.DomUtil.addClass(this._settingsButton, 'active');
+
+	// 	// trigger fn in right chrome to open it
+	// 	app.Chrome.Right.open('Styler');
+
+	// 	// Close data library
+	// 	if ( app.Chrome.Right.isOpen ) this._closeDataLib();		
+	// },
+
+	// _closeRightChrome : function () {		
+
+	// 	// mark not open
+	// 	app.Chrome.Right.isOpen = false;
+
+	// 	// Remove "active" class from button
+	// 	Wu.DomUtil.removeClass(this._settingsButton, 'active');
+
+	// 	// close right chrome
+	// 	app.Chrome.Right.close();
+	// },
 
 
 });
