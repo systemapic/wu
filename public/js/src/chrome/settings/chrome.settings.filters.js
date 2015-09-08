@@ -1,4 +1,4 @@
-Wu.Chrome.Content.Filters = Wu.Chrome.Content.extend({
+Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	// still todo: 
 	// 1. multiple filters

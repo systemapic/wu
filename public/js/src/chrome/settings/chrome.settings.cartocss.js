@@ -1,4 +1,4 @@
-Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
+Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 
 	_initialize : function () {
 

@@ -1,4 +1,4 @@
-Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
+Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 
 	// INITS

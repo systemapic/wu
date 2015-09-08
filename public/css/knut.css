@@ -118,3 +118,11 @@
 	/*background: red;*/
 	z-index: 999999999999;
 }
+
+
+
+
+/*top chrome buttons*/
+.chrome-button.settingsSelector {
+	background-position: -6px -3px;
+}
