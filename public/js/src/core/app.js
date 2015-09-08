@@ -177,7 +177,7 @@ Wu.App = Wu.Class.extend({
 		this.Chrome.Right = new Wu.Chrome.Right();
 
 		// data chrome
-		this.Chrome.Data = new Wu.Chrome.Data();
+		// this.Chrome.Data = new Wu.Chrome.Data();
 
 	},
 

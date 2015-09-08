@@ -1,4 +1,4 @@
-Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
+Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	// UNIVERSALS
 	// UNIVERSALS	

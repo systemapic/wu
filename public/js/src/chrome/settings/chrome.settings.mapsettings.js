@@ -1,4 +1,4 @@
-Wu.Chrome.Content.Mapsettings = Wu.Chrome.Content.extend({
+Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 
 	_initialize : function () {
 
