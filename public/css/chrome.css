@@ -517,6 +517,7 @@ input.chrome-field-input {
 
 .leflet-container.leaflet-popup {
   max-width: 468px;
+  min-width: 175px;
 }
 
 
@@ -598,8 +599,136 @@ input.chrome-field-input {
 
 .chrome-content.settings-button {
     margin-top: 3px;
-    font-size: 13px;
+    font-size: 14px;
     margin-right: 3px;    
     }
 
 
+
+
+
+
+
+
+.chrome-pane.styler .chrome-field-line {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    }
+
+.chrome-pane.styler .chrome-field-mini-input, 
+.chrome-pane.styler .chrome-field-mini-input:focus {
+    height: 21px;
+    }
+
+.chrome-pane.styler .select-field-wrap {
+    margin-top: 1px;
+    }
+
+.chrome-pane.styler .select-field-wrap:before {
+    top: 0;
+    }
+
+.chrome-pane.styler .chrome-color-range {
+    height: 22px;
+    }
+
+.chrome-pane.styler .chrome-color-selector-wrapper {
+    top: -1px;
+    }
+
+.chrome-pane.styler .chrome-switch-container {
+    top: 4px;
+    }
+
+.chrome-pane.styler .select-field-wrap select {
+    padding: 2px 8px 2px 8px;
+    }
+
+/*.leflet-container.leaflet-popup*/
+
+
+
+
+
+
+
+.d3-list-header {
+      height: 22px;
+}
+
+.chrome-datalib {
+    position: absolute !important;
+    display: block  !important;
+    left: 0 !important;
+    top: 0 !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    min-height: 100% !important;
+    }
+
+.data-library.minimal .data-library-inner .editor-wrapper {
+      width: 383px;
+}    
+
+.fullpage-users.minimal .users-inner, .data-library.minimal .data-library-inner {
+      min-height: 100%;
+}
+
+.list-item-info {
+    display: none;
+}
+
+.list-attribute-wrapper-type.list-attribute-wrapper {
+    display: none;
+}
+
+.list-line {
+    background: transparent !important;
+}
+
+.data-library.minimal .list-line, .data-library.minimal .list-title-wrapper {
+      height: 25px;
+  border-bottom: 1px solid #ddd;
+  padding: 4px 1px 1px 24px;
+}
+
+.d3-list-header-item-Type {
+    display: none;
+}
+
+.item-select-button {
+    box-shadow: none !important;
+    top: 4px !important;
+    left: 3px !important;
+    width: 15px !important;
+    height: 16px !important;
+    }
+
+.d3-list-header-item-Name {
+    padding-left: 23px;
+    padding-top: 4px;
+}    
+
+.select-all-button {
+    left: 3px;    
+    float: left;
+    top: 3px !important;  
+}
+
+.search {
+  width: 141px;    
+}
+
+.datalib-bottom {
+  position: absolute;
+  width: 100%;
+  bottom: 35px;
+  padding-bottom: 30px;
+  padding-top: 20px;
+  border-top: 1px dashed #ccc;
+  text-align: center;    
+}
+
+.item-select-button:before {
+  background-position: -61px -75px;    
+}

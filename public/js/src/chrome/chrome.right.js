@@ -70,7 +70,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		this._container.style.width = '0';
 
 		// move map
-		this.moveMap('close');
+		if ( !app.Chrome.Data.isOpen ) this.moveMap('close');
 
 		// fire event?
 		this._settingsSelector.closed();
