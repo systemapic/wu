@@ -8,6 +8,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	sortDirection : {},
 
 	_initContent : function () {
+		
 
 		// create new fullscreen page, and set as default content
 		this._content = Wu.DomUtil.create('div', 'data-library', Wu.app._appPane);
