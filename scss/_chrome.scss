@@ -342,6 +342,7 @@
     opacity: 0.2;
     }
 
+.chrome-right-big-button,
 .chrome.chrome-content.cartocss.refresh-button {
     width: 200px;
     height: 35px;
@@ -356,6 +357,7 @@
     cursor: pointer;
     }
 
+.chrome-right-big-button:hover,
 .chrome.chrome-content.cartocss.refresh-button:hover {
     background: red;
     }

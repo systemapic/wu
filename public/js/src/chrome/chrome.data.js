@@ -136,7 +136,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 		this.fileProviders.projectFiles.data = this._project.getFiles();
-		this.fileProviders.myFiles.data = app.Account.getFiles();
+		// this.fileProviders.myFiles.data = app.Account.getFiles();
 
 		for ( var f in this.fileProviders ) {
 
@@ -458,5 +458,5 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	}
 
-
+fdfdsf
 });
