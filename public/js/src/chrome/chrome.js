@@ -20,6 +20,7 @@ Wu.Chrome = Wu.Class.extend({
 		Wu.Mixin.Events.on('layerEnabled',    this._layerEnabled, this);
 		Wu.Mixin.Events.on('layerDisabled',   this._layerDisabled, this);
 		Wu.Mixin.Events.on('fileImported',    this._onFileImported, this);
+		Wu.Mixin.Events.on('layerAdded',      this._onLayerAdded, this);
 	},
 
 	_projectSelected : function (e) {
@@ -46,6 +47,7 @@ Wu.Chrome = Wu.Class.extend({
 	_updateView 	 : function () {},
 	_refresh 	 : function () {},
 	_onFileImported  : function () {},
+	_onLayerAdded    : function () {},
 	_initContainer   : function () {},
 
 

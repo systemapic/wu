@@ -569,7 +569,7 @@ L.Control.Description = Wu.Control.extend({
 		var num_columns = _.size(meta.columns);
 		var size_bytes = meta.size_bytes;
 		var startend = this._parseStartEndDate(meta);
-		var style = JSON.parse(layer.store.style);
+		var style = Wu.parse(layer.store.style);
 
 
 		var description_meta = {
@@ -590,7 +590,7 @@ L.Control.Description = Wu.Control.extend({
 		
 
 		// COLOR RANGE
-		if ( style[key].color.range ) {
+		if ( style && style[key].color.range ) {
 
 			var colorStops = style[key].color.value;
 			var customMinMax = style[key].color.customMinMax;

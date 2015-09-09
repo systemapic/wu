@@ -551,8 +551,6 @@ Wu.Project = Wu.Class.extend({
 			if (layer.store && layer.store.data && layer.store.data.postgis) layers.push(layer);
 		}
 
-		console.log('PGPGPG', layers);
-
 		return layers;
 
 	},

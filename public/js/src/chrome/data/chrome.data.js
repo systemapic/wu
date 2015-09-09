@@ -22,6 +22,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	},
 
+	_onLayerAdded : function () {
+
+		console.error('_onLayerAdded');
+
+		this._refresh();
+	},
+
 	_initContainer : function () {
 
 		// create the container (just a div to hold errythign)
@@ -65,11 +72,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Upload button
 		this.uploadButton = app.Data.getUploadButton('chrome-right-big-button upload', this.bottomContainer);
 		this.uploadButton.innerHTML = 'Upload';
-
-
 	},
-
-	
 
 	// HERE IT BEGINS!!!
 	_initContent : function () {

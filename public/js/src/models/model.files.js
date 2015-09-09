@@ -192,6 +192,11 @@ Wu.Files = Wu.Class.extend({
 
 	_createLayer : function (project) {
 		console.log('file._createLayer', this.getName(), project);
+
+
+		this._createDefaultLayer(project);
+
+
 	},
 
 	_downloadFile : function () {
@@ -200,6 +205,82 @@ Wu.Files = Wu.Class.extend({
 
 
 
+	_createDefaultLayer : function (project) {
+
+		var file_id = this.getUuid();
+		var file = this;
+
+		var layerJSON = {
+			"geom_column": "the_geom_3857",
+			"geom_type": "geometry",
+			"raster_band": "",
+			"srid": "",
+			"affected_tables": "",
+			"interactivity": "",
+			"attributes": "",
+			"access_token": app.tokens.access_token,
+			"cartocss_version": "2.0.1",
+			"cartocss": "#layer {  \n polygon-fill: red; \n marker-fill: #001980; \n marker-allow-overlap: true; \n marker-clip: false; \n marker-comp-op: screen;}",
+			"sql": "(SELECT * FROM " + file_id + ") as sub",
+			"file_id": file_id,
+			"return_model" : true,
+			"projectUuid" : project.getUuid()
+		}
+
+		console.log('_createDefaultLayer', layerJSON);
+
+
+
+		// create postgis layer
+		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
+			console.log('api/db/createLayer', err, layerJSON);
+			var layer = Wu.parse(layerJSON);
+
+			var options = {
+				projectUuid : project.getUuid(), // pass to automatically attach to project
+				data : {
+					postgis : layer.options
+				},
+				metadata : layer.options.metadata,
+				title : file.getName() + ' Layer',
+				description : 'Default layer',
+				file : file.getUuid()
+			}
+
+			// create new layer model
+			this._createLayerModel(options, function (err, layerModel) {
+
+				// refresh Sidepane Options
+				project.addLayer(layerModel);
+
+
+				// todo: set layer icon
+				app.feedback.setMessage({
+					title : 'Done processing!',
+					description : 'Added <strong>' + layerModel.title + '</strong> to available layers.',
+				});	
+
+				// select project
+				Wu.Mixin.Events.fire('layerAdded', {detail : {
+					projectUuid : project.getUuid()
+				}});
+
+			})
+			
+		}.bind(this));
+
+	},
+
+	_createLayerModel : function (options, done) {
+
+		Wu.Util.postcb('/api/layers/new', JSON.stringify(options), function (err, body) {
+
+			var layerModel = Wu.parse(body);
+
+			done(null, layerModel);
+
+		}.bind(this));
+	},
 
 
 
