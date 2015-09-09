@@ -168,6 +168,8 @@ module.exports = api.layer = {
 		if (!layerUuid) return api.error.missingInformation(req, res);
 
 
+		console.log('up[date layer!', req.body);
+
 		Layer.findOne({'uuid' : layerUuid}, function (err, layer) {
 			if (err || !layer) return api.error.missingInformation(req, res);
 
@@ -187,6 +189,7 @@ module.exports = api.layer = {
 
 			// update title
 			if (req.body.hasOwnProperty('title')) {
+				console.log('TITLE!!');
 				var title = req.body.title;
 				layer.title = title;
 				layer.save();

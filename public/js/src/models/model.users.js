@@ -8,9 +8,6 @@ Wu.User = Wu.Class.extend({
 		this.initFiles();
 	},
 
-
-
-
 	initFiles : function () {
 
 		// get files

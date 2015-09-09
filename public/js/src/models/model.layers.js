@@ -261,13 +261,11 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	getTitle : function () {
-		// override, get file title instead (if exists)
-		var file = this.getFile();
-		if (file) return file.getName();
 		return this.store.title;
 	},
 
 	setTitle : function (title) {
+
 		this.store.title = title;
 		this.save('title');
 
