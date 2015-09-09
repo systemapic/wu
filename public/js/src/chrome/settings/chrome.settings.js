@@ -32,6 +32,10 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		this._refresh();
 	},
 
+	_onLayerEdited : function () {
+		this._refresh();
+	},
+
 	show : function () {
 		if (!this._inited) this._initLayout();
 

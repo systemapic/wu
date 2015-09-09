@@ -869,6 +869,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			console.log(d);
 			d.setTitle(newName);
 
+			// select project
+			Wu.Mixin.Events.fire('layerEdited', {detail : {
+				layer: d
+			}});
+
 		} else {
 			d.setName(newName);	
 		}

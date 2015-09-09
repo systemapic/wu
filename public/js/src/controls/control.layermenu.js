@@ -44,6 +44,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._content.innerHTML = '';
 	},
 
+	_onLayerEdited : function () {
+		console.log('lyaermneu _onLayerEdited');
+		this._refresh();
+	},
+
 	_refresh : function (hide) {
 
 		// should be active
@@ -51,6 +56,9 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// if not active in project, hide
 		if (!this._isActive()) return this._hide();
+
+
+		console.log("PASTTSTS");
 
 		// remove old content
 		this._flush();
@@ -169,6 +177,8 @@ L.Control.Layermenu = Wu.Control.extend({
 				item  : item,
 				layer : layer
 			}
+
+			console.log('LAYER SSDSDSDDS', layer);
 
 			// add to layermenu
 			this._add(layerItem);
@@ -1045,8 +1055,9 @@ L.Control.Layermenu = Wu.Control.extend({
 		var layer = layerItem.layer;
 
 		var file = layer && layer.getFile ? layer.getFile() : false;
-		var caption = file ? file.store.name : item.caption;
-
+		// var caption = file ? file.store.name : item.caption;
+		var caption = layer.getTitle();
+		
 		// create div
 		var className  = 'layer-menu-item-wrap';
 
