@@ -1,6 +1,6 @@
 Wu.Chrome.Data = Wu.Chrome.extend({
 
-	_ : 'datachrome', 
+	_ : 'data', 
 
 	options : {
 		defaultWidth : 350
@@ -90,7 +90,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var top = app.Chrome.Top;
 
 		// add a button to top chrome
-		top._registerButton({
+		this._dataButton = top._registerButton({
 			name : 'data',
 			className : 'chrome-button datalib',
 			trigger : this._togglePane,
@@ -111,11 +111,18 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_show : function () {
 		this._container.style.display = 'block';
 		this._isOpen = true;
+
+		// mark button active
+		Wu.DomUtil.addClass(this._dataButton, 'active');
 	},
 
 	_hide : function () {
 		this._container.style.display = 'none';
 		this._isOpen = false;
+
+		// mark button inactive
+		Wu.DomUtil.removeClass(this._dataButton, 'active');
+
 	},
 
 	onOpened : function () {

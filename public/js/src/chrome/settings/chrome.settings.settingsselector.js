@@ -1,5 +1,7 @@
 Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
+	_ : 'settingsSelector',
+
 	options : {
 
 		tabs : {
@@ -151,6 +153,8 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		// right chrome
 		var chrome = this.options.chrome;
 
+		console.log('TOGLGLE');
+
 		// open/close
 		this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
 	},
@@ -158,21 +162,30 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 	_show : function () {
 		this._container.style.display = 'block';
 		this._isOpen = true;
+
+		Wu.DomUtil.addClass(this._settingsButton, 'active');
 	},
 
 	_hide : function () {
 		this._container.style.display = 'none';
 		this._isOpen = false;
+
+		Wu.DomUtil.removeClass(this._settingsButton, 'active');
+
 	},
 
 	onOpened : function () {
 
 		// default styler
 		this._tabs['Styler'].show();
+
+		console.log('i was opened', this._);
+
 	},
 
 	// clean up on close
 	onClosed : function () {
+
 		for (var t in this._tabs) {
 			this._tabs[t].closed();
 		}
@@ -180,6 +193,23 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		// Make sure the "add folder"/editing of layer menu is closed
 		var layerMenu = app.MapPane.getControls().layermenu;	 // move to settings selector
 		if (layerMenu) layerMenu.disableEdit();
+
+		console.log('i was closed', this._);
+
+		this._addThinRemovedLayers();
+
+	},
+
+	_addThinRemovedLayers : function () {
+		var layerMenu = app.MapPane.getControls().layermenu;
+		if (!layerMenu) return;
+
+		var layers = layerMenu._getActiveLayers();
+		layers.forEach(function (l) {
+			console.log('L', l);
+			l.layer._addThin();
+		})
+
 	},
 
 	_refreshAll : function () {
