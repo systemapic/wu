@@ -86,7 +86,6 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	open : function (tab) {
-		console.log('righcrome open!  this._isOpen => ', this._isOpen, this);
 		
 		// hide all tabs
 		this._forEachTab(function (tab) {
@@ -116,8 +115,6 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	close : function (tab) {
-		console.log('righcrome close!  this._isOpen => ', this._isOpen, this);
-		
 
 		// hide tab
 		tab._hide();
@@ -136,32 +133,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		map.style.width = '100%';
 
 		
-
-		// // fire event on all tabs
-		// this._forEachTab(function (tab) {
-		// 	tab.onClosed(); // fire opened event
-		// });
 	},
 
-	// // helper fn, todo: refactor
-	// moveMap : function (direction) {
-
-	// 	// div = map container
-	// 	var div = app.MapPane._container;
-
-	// 	// get current map width
-	// 	var currentWidth = div.offsetWidth;
-
-	// 	// default: full width
-	// 	var width = '100%';
-
-	// 	// if open, set width to current minus width of right chrome
-	// 	if (direction == 'open') width = currentWidth - this.options.defaultWidth + 'px';
-
-	// 	// set width
-	// 	div.style.width = width;
-
-	// },
-
-
+	
 });

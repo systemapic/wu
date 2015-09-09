@@ -1954,1561 +1954,1561 @@ Wu.List = Wu.Class.extend({
 // ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝    ╚══════╝╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   
 
 
-Wu.DataLibraryList = Wu.List.extend({
+// Wu.DataLibraryList = Wu.List.extend({
 
 
-	// ┌─┐┌─┐┌┐┌┌─┐┬─┐┌─┐┬  
-	// │ ┬├┤ │││├┤ ├┬┘├─┤│  
-	// └─┘└─┘┘└┘└─┘┴└─┴ ┴┴─┘
+// 	// ┌─┐┌─┐┌┐┌┌─┐┬─┐┌─┐┬  
+// 	// │ ┬├┤ │││├┤ ├┬┘├─┤│  
+// 	// └─┘└─┘┘└┘└─┘┴└─┴ ┴┴─┘
 
 
-	// Refresh table
-	refresh : function (DATA) {
+// 	// Refresh table
+// 	refresh : function (DATA) {
 
-		if ( DATA ) this._D3list(DATA);
+// 		if ( DATA ) this._D3list(DATA);
 
-	},
+// 	},
 
 
-	addItems : function (items) {
+// 	addItems : function (items) {
 
-		if ( this.sortedData ) {
-			var that = this;
+// 		if ( this.sortedData ) {
+// 			var that = this;
 
-			items.forEach(function (item) {
+// 			items.forEach(function (item) {
 
-				var newItem = {
-					fileUuid : item.uuid,
-					file : {
-						store : item
-					}
-				}
+// 				var newItem = {
+// 					fileUuid : item.uuid,
+// 					file : {
+// 						store : item
+// 					}
+// 				}
 
-				that.sortedData.push(newItem);
+// 				that.sortedData.push(newItem);
 
-			})
+// 			})
 
-		}
+// 		}
 
-		this.refreshTable();
+// 		this.refreshTable();
 
-	},
+// 	},
 
-	removeItems : function (items) {
+// 	removeItems : function (items) {
 
-		// Remove from sorted data
-		if ( this.sortedData ) {
+// 		// Remove from sorted data
+// 		if ( this.sortedData ) {
 
-			var that = this;
+// 			var that = this;
 			
-			var delThese = []
+// 			var delThese = []
 
-			// Run through all sorted data
-			this.sortedData.forEach(function (sd, i) {
+// 			// Run through all sorted data
+// 			this.sortedData.forEach(function (sd, i) {
 
-				// Run through all items we're going to delete
-				items.forEach(function (item) {
+// 				// Run through all items we're going to delete
+// 				items.forEach(function (item) {
 
-					// If there is a match, push into delete items array
-					if ( item.uuid == sd.fileUuid ) delThese.push(sd);
+// 					// If there is a match, push into delete items array
+// 					if ( item.uuid == sd.fileUuid ) delThese.push(sd);
 
-				})
-			})
+// 				})
+// 			})
 
-			// Run through delete items array, and splice on idex
-			delThese.forEach(function (dt) {
-				var index = that.sortedData.indexOf(dt);
-				that.sortedData.splice(index, 1);
-			})
+// 			// Run through delete items array, and splice on idex
+// 			delThese.forEach(function (dt) {
+// 				var index = that.sortedData.indexOf(dt);
+// 				that.sortedData.splice(index, 1);
+// 			})
 
-		}
+// 		}
 
-		this.refreshTable();
+// 		this.refreshTable();
 
-	},
+// 	},
 
-	// Save
-	save : function (saveJSON) {
+// 	// Save
+// 	save : function (saveJSON) {
 
-		var key     = saveJSON.key;
-		var value   = saveJSON.value;
-		var id      = saveJSON.id;
-		var _sJson  = {};
-		_sJson[key] = value;
-		_sJson.uuid = id;
+// 		var key     = saveJSON.key;
+// 		var value   = saveJSON.value;
+// 		var id      = saveJSON.id;
+// 		var _sJson  = {};
+// 		_sJson[key] = value;
+// 		_sJson.uuid = id;
 
-		var string  = JSON.stringify(_sJson);
+// 		var string  = JSON.stringify(_sJson);
 
-		Wu.save('/api/file/update', string); 
+// 		Wu.save('/api/file/update', string); 
 
-		// hack: update layer also if exists
-		if (key == 'name') this._updateLayerName(id, value);
-		if (key == 'description') this._updateLayerDescription(id, value);
-		if (key == 'copyright') this._updateLayerCopyright(id, value);
-	},
+// 		// hack: update layer also if exists
+// 		if (key == 'name') this._updateLayerName(id, value);
+// 		if (key == 'description') this._updateLayerDescription(id, value);
+// 		if (key == 'copyright') this._updateLayerCopyright(id, value);
+// 	},
 
-	_updateLayerName : function (fileUuid, title) {
+// 	_updateLayerName : function (fileUuid, title) {
 
-		var layer = this._findLayerByFile(fileUuid)
-		if (!layer) return;
+// 		var layer = this._findLayerByFile(fileUuid)
+// 		if (!layer) return;
 		
-		// update layermenu
-		var lm = app.MapPane._controls.layermenu;
-		lm && lm._refreshContent(true);
+// 		// update layermenu
+// 		var lm = app.MapPane._controls.layermenu;
+// 		lm && lm._refreshContent(true);
 
-		var insp = app.MapPane._controls.inspect;
-		insp && insp._refreshContent(true);
+// 		var insp = app.MapPane._controls.inspect;
+// 		insp && insp._refreshContent(true);
 
-		var leg = app.MapPane._controls.legends;
-		leg && leg._refresh(true);
+// 		var leg = app.MapPane._controls.legends;
+// 		leg && leg._refresh(true);
 
-		layer.setTitle(title);
-	},
-	_updateLayerDescription : function (fileUuid, description) {
-		var layer = this._findLayerByFile(fileUuid)
-		if (!layer) return;
-		layer.setDescription(description);
-	},
-	_updateLayerCopyright : function (fileUuid, copyright) {
-		var layer = this._findLayerByFile(fileUuid)
-		if (!layer) return;
-		layer.setCopyright(copyright);
-	},
-	_findLayerByFile : function (fileUuid) {
-		console.log('_findLayerByFile: ', fileUuid);
-		for (p in app.Projects) {
-			var project = app.Projects[p];
-			for (l in project.layers) {
-				console.log('l?,', l);
-				var layer = project.layers[l]; 	// todo: this is a string (layer-2323232), so this can't work!
-				if (!layer) return false;
-				if (!layer.store) return false;
-				if (layer.store.file == fileUuid) {
-					return layer;
-				};		
-			};
-		};
-		return false;
-	},
+// 		layer.setTitle(title);
+// 	},
+// 	_updateLayerDescription : function (fileUuid, description) {
+// 		var layer = this._findLayerByFile(fileUuid)
+// 		if (!layer) return;
+// 		layer.setDescription(description);
+// 	},
+// 	_updateLayerCopyright : function (fileUuid, copyright) {
+// 		var layer = this._findLayerByFile(fileUuid)
+// 		if (!layer) return;
+// 		layer.setCopyright(copyright);
+// 	},
+// 	_findLayerByFile : function (fileUuid) {
+// 		console.log('_findLayerByFile: ', fileUuid);
+// 		for (p in app.Projects) {
+// 			var project = app.Projects[p];
+// 			for (l in project.layers) {
+// 				console.log('l?,', l);
+// 				var layer = project.layers[l]; 	// todo: this is a string (layer-2323232), so this can't work!
+// 				if (!layer) return false;
+// 				if (!layer.store) return false;
+// 				if (layer.store.file == fileUuid) {
+// 					return layer;
+// 				};		
+// 			};
+// 		};
+// 		return false;
+// 	},
 
-	// OPTIONS FOR THE LIST
-	getListOptions : function () {
+// 	// OPTIONS FOR THE LIST
+// 	getListOptions : function () {
 
 
-		var listOptions = {
+// 		var listOptions = {
 
-			fileInfo   : true, 
+// 			fileInfo   : true, 
 
-			button     : {
+// 			button     : {
 
-					// when selecting item
-					fn  : this.selectListItem,
+// 					// when selecting item
+// 					fn  : this.selectListItem,
 
-					// array with stored selections
-					arr : []
+// 					// array with stored selections
+// 					arr : []
 
-			},
+// 			},
 			
-			titleSpace : {
+// 			titleSpace : {
 
-				name 		: {
+// 				name 		: {
 
-					fn    	    : this.titleFunction,
-					ev    	    : 'dblclick',
-					field 	    : 'name'
-				},
+// 					fn    	    : this.titleFunction,
+// 					ev    	    : 'dblclick',
+// 					field 	    : 'name'
+// 				},
 
-				description 	: {
+// 				description 	: {
 
-					fn    	    : this.injectTagsPopUp,
-					ev    	    : 'dblclick',
-					html  	    : this.descriptionHTML,
-					field 	    : false,			// field if false because we use an HTML function to get field value
-					killOnSmall : true,			// kill when list is in "collapsed" mode					
-				}
+// 					fn    	    : this.injectTagsPopUp,
+// 					ev    	    : 'dblclick',
+// 					html  	    : this.descriptionHTML,
+// 					field 	    : false,			// field if false because we use an HTML function to get field value
+// 					killOnSmall : true,			// kill when list is in "collapsed" mode					
+// 				}
 
-			},
+// 			},
 
-			attributes : [
+// 			attributes : [
 
-					// This one is only used for the header
+// 					// This one is only used for the header
 
-					{ 	
-						name 	 : 'name',	
-						niceName : 'Name',
-						fn       : null,
-						ev       : null
-					},					
+// 					{ 	
+// 						name 	 : 'name',	
+// 						niceName : 'Name',
+// 						fn       : null,
+// 						ev       : null
+// 					},					
 
 					
-					// These ones are used for attributes
+// 					// These ones are used for attributes
 
-					// { 	
-					// 	name 	 : 'status',
-					// 	niceName : 'Status',
-					// 	fn       : null,
-					// 	ev       : null,
-					// 	restrict : true,
-					// 	width    : 10
-					// },
+// 					// { 	
+// 					// 	name 	 : 'status',
+// 					// 	niceName : 'Status',
+// 					// 	fn       : null,
+// 					// 	ev       : null,
+// 					// 	restrict : true,
+// 					// 	width    : 10
+// 					// },
 
-					{ 	
-						name 	    : 'created',		// name in field
-						niceName    : 'Date',			// view name
-						html        : this.dateHTML,		// html function
-						fn          : null,			// event function
-						ev          : null,			// event trigger (i.e. "mousedown")
-						killOnSmall : true,			// kill when list is in "collapsed" mode
-						restrict    : false,			// restrict to editors
-						width       : 15			// width in percent
+// 					{ 	
+// 						name 	    : 'created',		// name in field
+// 						niceName    : 'Date',			// view name
+// 						html        : this.dateHTML,		// html function
+// 						fn          : null,			// event function
+// 						ev          : null,			// event trigger (i.e. "mousedown")
+// 						killOnSmall : true,			// kill when list is in "collapsed" mode
+// 						restrict    : false,			// restrict to editors
+// 						width       : 15			// width in percent
 
-					},	
+// 					},	
 
-					{ 	
-						name 	    : 'category',
-						niceName    : 'Category',
-						fn          : this.injectCategoryPopUp,
-						ev          : 'dblclick',
-						html        : this.categoryHTML,
-						killOnSmall : true,
-						restrict    : false,						
-						width       : 15,
-						smallWidth  : 18						
-					},
+// 					{ 	
+// 						name 	    : 'category',
+// 						niceName    : 'Category',
+// 						fn          : this.injectCategoryPopUp,
+// 						ev          : 'dblclick',
+// 						html        : this.categoryHTML,
+// 						killOnSmall : true,
+// 						restrict    : false,						
+// 						width       : 15,
+// 						smallWidth  : 18						
+// 					},
 
-					{ 	
-						name 	    : 'type',
-						niceName    : 'Type',
-						fn          : null,
-						ev          : null,
-						killOnSmall : false,
-						restrict    : false,						
-						width       : 15,
-						smallWidth  : 18				
-					},
+// 					{ 	
+// 						name 	    : 'type',
+// 						niceName    : 'Type',
+// 						fn          : null,
+// 						ev          : null,
+// 						killOnSmall : false,
+// 						restrict    : false,						
+// 						width       : 15,
+// 						smallWidth  : 18				
+// 					},
 
-			],
+// 			],
 
-			// Fields we incorporate in searching
-			searchFields : [
+// 			// Fields we incorporate in searching
+// 			searchFields : [
 
-				'type',
-				'name',
-				'description',
-				'created',
-				'category',
-				'createdByName',
-				'keywords'
+// 				'type',
+// 				'name',
+// 				'description',
+// 				'created',
+// 				'category',
+// 				'createdByName',
+// 				'keywords'
 
-				]			
+// 				]			
 
-		}
+// 		}
 
-		return listOptions;
+// 		return listOptions;
 	
-	},
+// 	},
 
 
 
-	// ┌─┐┌─┐┌┬┐┬┌─┐┌┐┌  ┌─┐┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌┌─┐
-	// ├─┤│   │ ││ ││││  ├┤ │ │││││   │ ││ ││││└─┐
-	// ┴ ┴└─┘ ┴ ┴└─┘┘└┘  └  └─┘┘└┘└─┘ ┴ ┴└─┘┘└┘└─┘	
+// 	// ┌─┐┌─┐┌┬┐┬┌─┐┌┐┌  ┌─┐┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌┌─┐
+// 	// ├─┤│   │ ││ ││││  ├┤ │ │││││   │ ││ ││││└─┐
+// 	// ┴ ┴└─┘ ┴ ┴└─┘┘└┘  └  └─┘┘└┘└─┘ ┴ ┴└─┘┘└┘└─┘	
 
-	// Functions that gets triggered on events in table cells
+// 	// Functions that gets triggered on events in table cells
 
-	titleFunction : function (DATA, d, context, outerContext) {
+// 	titleFunction : function (DATA, d, context, outerContext) {
 
-		if ( !outerContext.canEdit ) return;
+// 		if ( !outerContext.canEdit ) return;
 
-		var options = {
+// 		var options = {
 
-			outerContext : outerContext,
-			context      : context,
-			what         : 'name',
-			allDATA      : DATA,
-			data 	     : d,
-			where        : d.file.store,
-			value        : d.file.store.name,
-			uuid         : d.fileUuid
+// 			outerContext : outerContext,
+// 			context      : context,
+// 			what         : 'name',
+// 			allDATA      : DATA,
+// 			data 	     : d,
+// 			where        : d.file.store,
+// 			value        : d.file.store.name,
+// 			uuid         : d.fileUuid
 
-		}
+// 		}
 
-		if ( this.sortedData ) options.allDATA = this.sortedData;
+// 		if ( this.sortedData ) options.allDATA = this.sortedData;
 
-		outerContext.editField(options);
+// 		outerContext.editField(options);
 
-	},
+// 	},
 
-	descriptionHTML : function (DATA) {
+// 	descriptionHTML : function (DATA) {
 
-		var keywords = DATA.file.store.keywords.join(', ');
-		if ( keywords.length >= 2 ) var res = 'Tags: ' + keywords;
-		else 			    var res = 'Add tags...';
-		return res;
+// 		var keywords = DATA.file.store.keywords.join(', ');
+// 		if ( keywords.length >= 2 ) var res = 'Tags: ' + keywords;
+// 		else 			    var res = 'Add tags...';
+// 		return res;
 
-	},
+// 	},
 
-	categoryHTML : function (DATA) {
+// 	categoryHTML : function (DATA) {
 
-		var category = DATA.file.store.category;
-		if ( !category || category == '' || category == ' ' ) return '<span class="grayed">no category</span>';
-		else return category;
+// 		var category = DATA.file.store.category;
+// 		if ( !category || category == '' || category == ' ' ) return '<span class="grayed">no category</span>';
+// 		else return category;
 
-	},	
+// 	},	
 	
 
-	// ┌─┐─┐ ┬┌┬┐┌─┐┬─┐┌┐┌┌─┐┬  
-	// ├┤ ┌┴┬┘ │ ├┤ ├┬┘│││├─┤│  
-	// └─┘┴ └─ ┴ └─┘┴└─┘└┘┴ ┴┴─┘	
+// 	// ┌─┐─┐ ┬┌┬┐┌─┐┬─┐┌┐┌┌─┐┬  
+// 	// ├┤ ┌┴┬┘ │ ├┤ ├┬┘│││├─┤│  
+// 	// └─┘┴ └─ ┴ └─┘┴└─┘└┘┴ ┴┴─┘	
 
-	// These functions gets called from sidepane.dataLibrary.js
+// 	// These functions gets called from sidepane.dataLibrary.js
 
-	// Returns selected list items
+// 	// Returns selected list items
 
-	getSelected : function () {
+// 	getSelected : function () {
 
-		// get selected files
-		var checks = [];
+// 		// get selected files
+// 		var checks = [];
 
-		var dataArray = this.data2array(this.listData);
+// 		var dataArray = this.data2array(this.listData);
 
-		var selectedListItems = this.listOptions.button.arr;
+// 		var selectedListItems = this.listOptions.button.arr;
 		
-		// Go throuhg all files on project
-		dataArray.forEach(function(file) {
+// 		// Go throuhg all files on project
+// 		dataArray.forEach(function(file) {
 
-			// Go through checked files
-			selectedListItems.forEach(function (selectedFile) {
+// 			// Go through checked files
+// 			selectedListItems.forEach(function (selectedFile) {
 
-				// Save if we have a match
-				if ( selectedFile == file.fileUuid ) checks.push(file.file.store);
+// 				// Save if we have a match
+// 				if ( selectedFile == file.fileUuid ) checks.push(file.file.store);
 
-			});
+// 			});
 
-		});
+// 		});
 
-		// Return files
-		return checks;
+// 		// Return files
+// 		return checks;
 
-	},	
+// 	},	
 
 
 
-	// ███████╗██╗██╗     ███████╗    ███╗   ███╗███████╗████████╗ █████╗ 
-	// ██╔════╝██║██║     ██╔════╝    ████╗ ████║██╔════╝╚══██╔══╝██╔══██╗
-	// █████╗  ██║██║     █████╗      ██╔████╔██║█████╗     ██║   ███████║
-	// ██╔══╝  ██║██║     ██╔══╝      ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║
-	// ██║     ██║███████╗███████╗    ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║
-	// ╚═╝     ╚═╝╚══════╝╚══════╝    ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝
+// 	// ███████╗██╗██╗     ███████╗    ███╗   ███╗███████╗████████╗ █████╗ 
+// 	// ██╔════╝██║██║     ██╔════╝    ████╗ ████║██╔════╝╚══██╔══╝██╔══██╗
+// 	// █████╗  ██║██║     █████╗      ██╔████╔██║█████╗     ██║   ███████║
+// 	// ██╔══╝  ██║██║     ██╔══╝      ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║
+// 	// ██║     ██║███████╗███████╗    ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║
+// 	// ╚═╝     ╚═╝╚══════╝╚══════╝    ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝
 	                                                                   
 
-	// ┌─┐┬┬  ┌─┐  ┬┌┐┌┌─┐┌─┐  ┌─┐┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌
-	// ├┤ ││  ├┤   ││││├┤ │ │  ├┤ │ │││││   │ ││ ││││
-	// └  ┴┴─┘└─┘  ┴┘└┘└  └─┘  └  └─┘┘└┘└─┘ ┴ ┴└─┘┘└┘
+// 	// ┌─┐┬┬  ┌─┐  ┬┌┐┌┌─┐┌─┐  ┌─┐┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌
+// 	// ├┤ ││  ├┤   ││││├┤ │ │  ├┤ │ │││││   │ ││ ││││
+// 	// └  ┴┴─┘└─┘  ┴┘└┘└  └─┘  └  └─┘┘└┘└─┘ ┴ ┴└─┘┘└┘
 
-	openItemInfo : function (DATA) {
+// 	openItemInfo : function (DATA) {
 
-		var wrapper = this.listOptions.wrapper;
+// 		var wrapper = this.listOptions.wrapper;
 
-		// Create the file info wrapper
-		var info = this.listMetaInfoWrapper(wrapper);
+// 		// Create the file info wrapper
+// 		var info = this.listMetaInfoWrapper(wrapper);
 
-		// Thumbnail
-		this.listMetaThumb(info);
+// 		// Thumbnail
+// 		this.listMetaThumb(info);
 
-		// File list
-		this.listMetaFileList(info);
+// 		// File list
+// 		this.listMetaFileList(info);
 
-		// Copyright
-		this.listMetaOtherCopyright(info);		
+// 		// Copyright
+// 		this.listMetaOtherCopyright(info);		
 
 
 		
-		// Other meta wrapper
-		var otherMetaWrapper = this.listMetaOther(info);
+// 		// Other meta wrapper
+// 		var otherMetaWrapper = this.listMetaOther(info);
 
-		// Statistics
-		// this.listMetaOtherStats(otherMetaWrapper);
+// 		// Statistics
+// 		// this.listMetaOtherStats(otherMetaWrapper);
 
-		// // Other meta: Uploaded by
-		// this.listMetaOtherUploadedBy(otherMetaWrapper);
-
-
-		// Description
-		// this.listMetaDescription(info);		
-		this.listMetaDescription(otherMetaWrapper);
-
-		// Other meta: Uploaded by
-		this.listMetaOtherUploadedBy(otherMetaWrapper);
+// 		// // Other meta: Uploaded by
+// 		// this.listMetaOtherUploadedBy(otherMetaWrapper);
 
 
+// 		// Description
+// 		// this.listMetaDescription(info);		
+// 		this.listMetaDescription(otherMetaWrapper);
 
-	},
-
-	// Create the file info wrapper
-	listMetaInfoWrapper : function (wrapper) {
-
-		var that = this;
-
-		// FILE INFO WRAPPER
-		// FILE INFO WRAPPER
-		// FILE INFO WRAPPER
-
-		// BIND
-		var info = 
-			wrapper
-			.selectAll('.open-list-info')
-			.data(function(d) { 
-				var isOpen = that.checkOpenFileInfo(d.fileUuid, that);
-				if ( isOpen ) 	return [d];
-				else 		return [];
-			});
-
-
-		// ENTER
-		info
-			.enter()
-			.append('div')
-			.classed('open-list-info', true);
-
-
-		// EXIT
-		info
-			.exit()
-			.remove();
-
-
-		return info;
-
-	},
-
-	// Thumbnail
-	listMetaThumb : function (wrapper) {
-
-
-		// THUMB WRAPPER
-		// THUMB WRAPPER
-		// THUMB WRAPPER
-
-		// BIND
-		var thumb =
-			wrapper
-			.selectAll('.file-thumb')
-			.data(function(d) { return [d] })
-
-		// ENTER
-		thumb
-			.enter()
-			.append('div')
-			.classed('file-thumb', true);
-
-		// EXIT
-		thumb
-			.exit()
-			.remove();
+// 		// Other meta: Uploaded by
+// 		this.listMetaOtherUploadedBy(otherMetaWrapper);
 
 
 
-		// THUMB TITLE
-		// THUMB TITLE
-		// THUMB TITLE
+// 	},
 
-		// BIND
-		var thumbTitle =
-			thumb
-			.selectAll('.file-thumb-title')
-			.data(function(d) { return [d] })
+// 	// Create the file info wrapper
+// 	listMetaInfoWrapper : function (wrapper) {
 
-		// ENTER
-		thumbTitle
-			.enter()
-			.append('div')
-			.classed('file-thumb-title', true)
-			.classed('list-meta-title', true)
-			.html('Thumb:');
+// 		var that = this;
 
-		// EXIT
-		thumbTitle
-			.exit()
-			.remove();	
+// 		// FILE INFO WRAPPER
+// 		// FILE INFO WRAPPER
+// 		// FILE INFO WRAPPER
+
+// 		// BIND
+// 		var info = 
+// 			wrapper
+// 			.selectAll('.open-list-info')
+// 			.data(function(d) { 
+// 				var isOpen = that.checkOpenFileInfo(d.fileUuid, that);
+// 				if ( isOpen ) 	return [d];
+// 				else 		return [];
+// 			});
 
 
+// 		// ENTER
+// 		info
+// 			.enter()
+// 			.append('div')
+// 			.classed('open-list-info', true);
 
-		// THUMB IMG
-		// THUMB IMG
-		// THUMB IMG
+
+// 		// EXIT
+// 		info
+// 			.exit()
+// 			.remove();
 
 
-		// BIND
-		var thumbImg =
-			thumb
-			.selectAll('.file-thumb-img')
-			.data(function(d) { return [d] })
+// 		return info;
 
-		// ENTER
-		thumbImg
-			.enter()
-			.append('img')
-			.classed('file-thumb-img', true)
-			.attr('src', function(d) {
+// 	},
 
-				var store = d.file.store;
+// 	// Thumbnail
+// 	listMetaThumb : function (wrapper) {
+
+
+// 		// THUMB WRAPPER
+// 		// THUMB WRAPPER
+// 		// THUMB WRAPPER
+
+// 		// BIND
+// 		var thumb =
+// 			wrapper
+// 			.selectAll('.file-thumb')
+// 			.data(function(d) { return [d] })
+
+// 		// ENTER
+// 		thumb
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-thumb', true);
+
+// 		// EXIT
+// 		thumb
+// 			.exit()
+// 			.remove();
+
+
+
+// 		// THUMB TITLE
+// 		// THUMB TITLE
+// 		// THUMB TITLE
+
+// 		// BIND
+// 		var thumbTitle =
+// 			thumb
+// 			.selectAll('.file-thumb-title')
+// 			.data(function(d) { return [d] })
+
+// 		// ENTER
+// 		thumbTitle
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-thumb-title', true)
+// 			.classed('list-meta-title', true)
+// 			.html('Thumb:');
+
+// 		// EXIT
+// 		thumbTitle
+// 			.exit()
+// 			.remove();	
+
+
+
+// 		// THUMB IMG
+// 		// THUMB IMG
+// 		// THUMB IMG
+
+
+// 		// BIND
+// 		var thumbImg =
+// 			thumb
+// 			.selectAll('.file-thumb-img')
+// 			.data(function(d) { return [d] })
+
+// 		// ENTER
+// 		thumbImg
+// 			.enter()
+// 			.append('img')
+// 			.classed('file-thumb-img', true)
+// 			.attr('src', function(d) {
+
+// 				var store = d.file.store;
 				
-				if (store.type == 'image') {
-					var imageFile   = store.data.image.file;
-					var url = '/pixels/image/' + imageFile + '?width=130&height=95'
-					return url;
-				}
+// 				if (store.type == 'image') {
+// 					var imageFile   = store.data.image.file;
+// 					var url = '/pixels/image/' + imageFile + '?width=130&height=95'
+// 					return url;
+// 				}
 
-			});
+// 			});
 
-		// EXIT
-		thumbImg
-			.exit()
-			.remove();	
+// 		// EXIT
+// 		thumbImg
+// 			.exit()
+// 			.remove();	
 
 				
-	},
+// 	},
 
-	// File list
-	listMetaFileList : function (wrapper) {
+// 	// File list
+// 	listMetaFileList : function (wrapper) {
 
-		// FILE LIST WRAPPER
-		// FILE LIST WRAPPER
-		// FILE LIST WRAPPER
+// 		// FILE LIST WRAPPER
+// 		// FILE LIST WRAPPER
+// 		// FILE LIST WRAPPER
 
-		// BIND
-		var fileListWrapper =
-			wrapper
-			.selectAll('.file-list-wrapper')
-			.data(function(d) { return [d.file.store.files] })
+// 		// BIND
+// 		var fileListWrapper =
+// 			wrapper
+// 			.selectAll('.file-list-wrapper')
+// 			.data(function(d) { return [d.file.store.files] })
 
-		// ENTER
-		fileListWrapper
-			.enter()
-			.append('div')
-			.classed('file-list-wrapper', true);
+// 		// ENTER
+// 		fileListWrapper
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-list-wrapper', true);
 
-		// EXIT
-		fileListWrapper
-			.exit()
-			.remove();
-
-
-		// FILE LIST HEADER
-		// FILE LIST HEADER
-
-		// BIND
-		var fileListHeader =
-			fileListWrapper
-			.selectAll('.file-list-header')
-			.data(function(d) { return [d] })
-
-		// ENTER
-		fileListHeader
-			.enter()
-			.append('div')
-			.classed('file-list-header', true)
-			.classed('list-meta-title', true)			
-			.html('Files:');
-
-		// EXIT
-		fileListHeader
-			.exit()
-			.remove();
+// 		// EXIT
+// 		fileListWrapper
+// 			.exit()
+// 			.remove();
 
 
-		// FILES IN FILE LIST
-		// FILES IN FILE LIST
+// 		// FILE LIST HEADER
+// 		// FILE LIST HEADER
 
-		// BIND
-		var eachFileInList =
-			fileListWrapper
-			.selectAll('.each-file-in-list')
-			.data(function(d) { return d })
+// 		// BIND
+// 		var fileListHeader =
+// 			fileListWrapper
+// 			.selectAll('.file-list-header')
+// 			.data(function(d) { return [d] })
 
-		// ENTER
-		eachFileInList
-			.enter()
-			.append('div')
-			.classed('each-file-in-list', true);
+// 		// ENTER
+// 		fileListHeader
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-list-header', true)
+// 			.classed('list-meta-title', true)			
+// 			.html('Files:');
 
-		// UPDATE
-		eachFileInList
-			.html(function(d) { return d })
-
-		// EXIT
-		eachFileInList
-			.exit()
-			.remove();
-
-	},
-
-	// Description
-	listMetaDescription : function (wrapper) {
-
-		var that = this;
-
-		// DESCRIPTION OUTER WRAPPER
-		// DESCRIPTION OUTER WRAPPER
-		// DESCRIPTION OUTER WRAPPER			
-
-		// BIND
-		var descriptionOuterWrapper =
-			wrapper
-			.selectAll('.file-description-outer-wrapper')
-			.data(function(d) { return [d] })
-
-		// ENTER
-		descriptionOuterWrapper
-			.enter()
-			.append('div')
-			.classed('file-description-outer-wrapper', true);
-
-		// EXIT
-		descriptionOuterWrapper
-			.exit()
-			.remove();
+// 		// EXIT
+// 		fileListHeader
+// 			.exit()
+// 			.remove();
 
 
+// 		// FILES IN FILE LIST
+// 		// FILES IN FILE LIST
 
-		// DESCRIPTION TITLE
-		// DESCRIPTION TITLE
-		// DESCRIPTION TITLE
+// 		// BIND
+// 		var eachFileInList =
+// 			fileListWrapper
+// 			.selectAll('.each-file-in-list')
+// 			.data(function(d) { return d })
 
-		// BIND
-		var descriptionTitle =
-			descriptionOuterWrapper
-			.selectAll('.file-description-title')
-			.data(function(d) { return [d] })
+// 		// ENTER
+// 		eachFileInList
+// 			.enter()
+// 			.append('div')
+// 			.classed('each-file-in-list', true);
 
-		// ENTER
-		descriptionTitle
-			.enter()
-			.append('div')
-			.classed('file-description-title', true)
-			.classed('list-meta-title', true)
-			.html('Description:');
+// 		// UPDATE
+// 		eachFileInList
+// 			.html(function(d) { return d })
 
-		// EXIT
-		descriptionTitle
-			.exit()
-			.remove();
+// 		// EXIT
+// 		eachFileInList
+// 			.exit()
+// 			.remove();
+
+// 	},
+
+// 	// Description
+// 	listMetaDescription : function (wrapper) {
+
+// 		var that = this;
+
+// 		// DESCRIPTION OUTER WRAPPER
+// 		// DESCRIPTION OUTER WRAPPER
+// 		// DESCRIPTION OUTER WRAPPER			
+
+// 		// BIND
+// 		var descriptionOuterWrapper =
+// 			wrapper
+// 			.selectAll('.file-description-outer-wrapper')
+// 			.data(function(d) { return [d] })
+
+// 		// ENTER
+// 		descriptionOuterWrapper
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-description-outer-wrapper', true);
+
+// 		// EXIT
+// 		descriptionOuterWrapper
+// 			.exit()
+// 			.remove();
 
 
 
-		// DESCRIPTION TEXTAREA
-		// DESCRIPTION TEXTAREA
-		// DESCRIPTION TEXTAREA
+// 		// DESCRIPTION TITLE
+// 		// DESCRIPTION TITLE
+// 		// DESCRIPTION TITLE
+
+// 		// BIND
+// 		var descriptionTitle =
+// 			descriptionOuterWrapper
+// 			.selectAll('.file-description-title')
+// 			.data(function(d) { return [d] })
+
+// 		// ENTER
+// 		descriptionTitle
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-description-title', true)
+// 			.classed('list-meta-title', true)
+// 			.html('Description:');
+
+// 		// EXIT
+// 		descriptionTitle
+// 			.exit()
+// 			.remove();
 
 
-		// BIND
-		var descriptionTextAreaWrapper =
-			descriptionOuterWrapper
-			.selectAll('.description-textarea-outer-wrapper')
-			.data(function(d) { return [d] });
 
-		// ENTER
-		descriptionTextAreaWrapper
-			.enter()
-			.append('div')
-			.classed('description-textarea-outer-wrapper', true);
-
-		// EXIT
-		descriptionTextAreaWrapper
-			.exit()
-			.remove();
+// 		// DESCRIPTION TEXTAREA
+// 		// DESCRIPTION TEXTAREA
+// 		// DESCRIPTION TEXTAREA
 
 
+// 		// BIND
+// 		var descriptionTextAreaWrapper =
+// 			descriptionOuterWrapper
+// 			.selectAll('.description-textarea-outer-wrapper')
+// 			.data(function(d) { return [d] });
+
+// 		// ENTER
+// 		descriptionTextAreaWrapper
+// 			.enter()
+// 			.append('div')
+// 			.classed('description-textarea-outer-wrapper', true);
+
+// 		// EXIT
+// 		descriptionTextAreaWrapper
+// 			.exit()
+// 			.remove();
 
 
-		// BIND
-		var descriptionTextArea =
-			descriptionTextAreaWrapper
-			.selectAll('.file-description-inner-wrapper')
-			.data(function(d) { return [d] });
 
-		// ENTER
-		descriptionTextArea
-			.enter()
-			.append('textarea')
-			.classed('file-description-inner-wrapper', true);
 
-		// UPDATE
-		descriptionTextArea
-			.html(function(d) {
+// 		// BIND
+// 		var descriptionTextArea =
+// 			descriptionTextAreaWrapper
+// 			.selectAll('.file-description-inner-wrapper')
+// 			.data(function(d) { return [d] });
 
-				var description = d.file.store.description;
+// 		// ENTER
+// 		descriptionTextArea
+// 			.enter()
+// 			.append('textarea')
+// 			.classed('file-description-inner-wrapper', true);
+
+// 		// UPDATE
+// 		descriptionTextArea
+// 			.html(function(d) {
+
+// 				var description = d.file.store.description;
 				
-				if ( description ) {
-					var hasHTML = description.search('</');
-					if ( hasHTML >= 1 ) {
-						this.outerHTML = description;
-						return [];
+// 				if ( description ) {
+// 					var hasHTML = description.search('</');
+// 					if ( hasHTML >= 1 ) {
+// 						this.outerHTML = description;
+// 						return [];
 						
-					}
-				}
+// 					}
+// 				}
 				
-				return description;
-			})
-			.on('focus', function(d) {
-				d.context = this;
-				Wu.DomEvent.on(this, 'keydown', _.throttle(that.throttleSaveDescription.bind(d), 1000)); 
-			});
+// 				return description;
+// 			})
+// 			.on('focus', function(d) {
+// 				d.context = this;
+// 				Wu.DomEvent.on(this, 'keydown', _.throttle(that.throttleSaveDescription.bind(d), 1000)); 
+// 			});
 
-		// EXIT
-		descriptionTextArea
-			.exit()
-			.remove();
+// 		// EXIT
+// 		descriptionTextArea
+// 			.exit()
+// 			.remove();
 
-	},
+// 	},
 
 	
 
-	throttleSaveDescription : function () {
+// 	throttleSaveDescription : function () {
 
-		var text = this.context.value;
-		var file = this.file;
+// 		var text = this.context.value;
+// 		var file = this.file;
 
-		file.setDescription(text)
+// 		file.setDescription(text)
 
-		var layer = file.getLayer();
+// 		var layer = file.getLayer();
 		
-		layer && layer.setDescription(text);
+// 		layer && layer.setDescription(text);
 
 
-	},
+// 	},
 
-	// Other meta wrapper
-	listMetaOther : function (wrapper) {
+// 	// Other meta wrapper
+// 	listMetaOther : function (wrapper) {
 
-		// OTHER META WRAPPER
-		// OTHER META WRAPPER
-		// OTHER META WRAPPER
+// 		// OTHER META WRAPPER
+// 		// OTHER META WRAPPER
+// 		// OTHER META WRAPPER
 
-		// BIND
-		var otherMetaWrapper =
-			wrapper
-			.selectAll('.file-other-meta-wrapper')
-			.data(function(d) { return [d] })
+// 		// BIND
+// 		var otherMetaWrapper =
+// 			wrapper
+// 			.selectAll('.file-other-meta-wrapper')
+// 			.data(function(d) { return [d] })
 
-		// ENTER
-		otherMetaWrapper
-			.enter()
-			.append('div')
-			.classed('file-other-meta-wrapper', true);
+// 		// ENTER
+// 		otherMetaWrapper
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-other-meta-wrapper', true);
 
-		// EXIT
-		otherMetaWrapper
-			.exit()
-			.remove();
+// 		// EXIT
+// 		otherMetaWrapper
+// 			.exit()
+// 			.remove();
 
-		return otherMetaWrapper;
+// 		return otherMetaWrapper;
 
-	},
+// 	},
 
-	// Other meta: Uploaded by
-	listMetaOtherUploadedBy : function (wrapper) {
-
-
-		// UPLOADED BY WRAPPER
-		// UPLOADED BY WRAPPER
-		// UPLOADED BY WRAPPER
-
-		// BIND
-		var uploadedByWrapper =
-			wrapper
-			.selectAll('.file-uploaded-by-wrapper')
-			.data(function(d) { return [d] })
-
-		// ENTER
-		uploadedByWrapper
-			.enter()
-			.append('div')
-			.classed('file-uploaded-by-wrapper', true)
-			.classed('list-meta-title', true);
-
-		// EXIT
-		uploadedByWrapper
-			.exit()
-			.remove();
+// 	// Other meta: Uploaded by
+// 	listMetaOtherUploadedBy : function (wrapper) {
 
 
+// 		// UPLOADED BY WRAPPER
+// 		// UPLOADED BY WRAPPER
+// 		// UPLOADED BY WRAPPER
 
-		// UPLOADED BY TITLE
-		// UPLOADED BY TITLE
-		// UPLOADED BY TITLE				
+// 		// BIND
+// 		var uploadedByWrapper =
+// 			wrapper
+// 			.selectAll('.file-uploaded-by-wrapper')
+// 			.data(function(d) { return [d] })
 
-		// BIND
-		var uploadedByTitle =
-			uploadedByWrapper
-			.selectAll('.file-uploaded-by-title')
-			.data(function(d) { return [d] })
+// 		// ENTER
+// 		uploadedByWrapper
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-uploaded-by-wrapper', true)
+// 			.classed('list-meta-title', true);
 
-		// ENTER
-		uploadedByTitle
-			.enter()
-			.append('div')
-			.classed('file-uploaded-by-title', true)
-			.classed('list-meta-title', true)
-			.html('Uploaded by:&nbsp;');
-
-		// EXIT
-		uploadedByTitle
-			.exit()
-			.remove();
+// 		// EXIT
+// 		uploadedByWrapper
+// 			.exit()
+// 			.remove();
 
 
-		// UPLOADED BY
-		// UPLOADED BY
-		// UPLOADED BY
 
-		// BIND
-		var uploadedBy =
-			uploadedByWrapper
-			.selectAll('.file-uploaded-by')
-			.data(function(d) { return [d] })
+// 		// UPLOADED BY TITLE
+// 		// UPLOADED BY TITLE
+// 		// UPLOADED BY TITLE				
 
-		// ENTER
-		uploadedBy
-			.enter()
-			.append('div')
-			.classed('file-uploaded-by', true)
-			.html('Uploaded by:');
+// 		// BIND
+// 		var uploadedByTitle =
+// 			uploadedByWrapper
+// 			.selectAll('.file-uploaded-by-title')
+// 			.data(function(d) { return [d] })
 
-		// UPDATE
-		uploadedBy
-			.html(function(d) {
+// 		// ENTER
+// 		uploadedByTitle
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-uploaded-by-title', true)
+// 			.classed('list-meta-title', true)
+// 			.html('Uploaded by:&nbsp;');
 
-				var userID = d.file.store.createdBy;
-				var fullname = app.Users[userID].getFullName()
+// 		// EXIT
+// 		uploadedByTitle
+// 			.exit()
+// 			.remove();
+
+
+// 		// UPLOADED BY
+// 		// UPLOADED BY
+// 		// UPLOADED BY
+
+// 		// BIND
+// 		var uploadedBy =
+// 			uploadedByWrapper
+// 			.selectAll('.file-uploaded-by')
+// 			.data(function(d) { return [d] })
+
+// 		// ENTER
+// 		uploadedBy
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-uploaded-by', true)
+// 			.html('Uploaded by:');
+
+// 		// UPDATE
+// 		uploadedBy
+// 			.html(function(d) {
+
+// 				var userID = d.file.store.createdBy;
+// 				var fullname = app.Users[userID].getFullName()
 				
-				return fullname; // d.file.store.createdByName;
-			})
+// 				return fullname; // d.file.store.createdByName;
+// 			})
 
-		// EXIT
-		uploadedBy
-			.exit()
-			.remove();
+// 		// EXIT
+// 		uploadedBy
+// 			.exit()
+// 			.remove();
 
-	},
-
-
-	// Other meta: Uploaded by
-	listMetaOtherCopyright : function (wrapper) {
-
-		var that = this;
-
-		// COPYRIGHT WRAPPER
-		// COPYRIGHT WRAPPER
-		// COPYRIGHT WRAPPER
-
-		// BIND
-		var copyrightWrapper =
-			wrapper
-			.selectAll('.file-copright-wrapper')
-			.data(function(d) { return [d] })
-
-		// ENTER
-		copyrightWrapper
-			.enter()
-			.append('div')
-			.classed('file-copright-wrapper', true)
-			.classed('list-meta-title', true);
-
-		// EXIT
-		copyrightWrapper
-			.exit()
-			.remove();
+// 	},
 
 
+// 	// Other meta: Uploaded by
+// 	listMetaOtherCopyright : function (wrapper) {
 
-		// COPYRIGHT TITLE
-		// COPYRIGHT TITLE
-		// COPYRIGHT TITLE
+// 		var that = this;
 
-		// BIND
-		var copyrightTitle =
-			copyrightWrapper
-			.selectAll('.file-copright-title')
-			.data(function(d) { return [d] })
+// 		// COPYRIGHT WRAPPER
+// 		// COPYRIGHT WRAPPER
+// 		// COPYRIGHT WRAPPER
 
-		// ENTER
-		copyrightTitle
-			.enter()
-			.append('div')
-			.classed('file-copright-title', true)
-			.classed('list-meta-title', true)
-			.html('Copyright:');
+// 		// BIND
+// 		var copyrightWrapper =
+// 			wrapper
+// 			.selectAll('.file-copright-wrapper')
+// 			.data(function(d) { return [d] })
 
-		// EXIT
-		copyrightTitle
-			.exit()
-			.remove();
+// 		// ENTER
+// 		copyrightWrapper
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-copright-wrapper', true)
+// 			.classed('list-meta-title', true);
+
+// 		// EXIT
+// 		copyrightWrapper
+// 			.exit()
+// 			.remove();
 
 
 
+// 		// COPYRIGHT TITLE
+// 		// COPYRIGHT TITLE
+// 		// COPYRIGHT TITLE
+
+// 		// BIND
+// 		var copyrightTitle =
+// 			copyrightWrapper
+// 			.selectAll('.file-copright-title')
+// 			.data(function(d) { return [d] })
+
+// 		// ENTER
+// 		copyrightTitle
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-copright-title', true)
+// 			.classed('list-meta-title', true)
+// 			.html('Copyright:');
+
+// 		// EXIT
+// 		copyrightTitle
+// 			.exit()
+// 			.remove();
 
 
-		// COPYRIGHT LINE
-		// COPYRIGHT LINE
-		// COPYRIGHT LINE
-
-		// BIND
-		var copyrightLine =
-			copyrightWrapper
-			.selectAll('.file-copright-line')
-			.data(function(d) { return [d] })
-
-		// ENTER
-		copyrightLine
-			.enter()
-			.append('input')
-			.attr('type', 'text')
-			.attr('placeholder', 'Click to add copyright information')
-			.classed('file-copright-line', true);
-
-		copyrightLine
-			.attr('value', function(d) {
-
-				var file = d.file;
-				var copyright = file.getCopyright();
-
-				if ( copyright ) 	{ return copyright; }
-				else 			{ return []; }
-			})
-			.on('focus', function(d) {
-				d.context = this;
-				Wu.DomEvent.on(this, 'keydown', _.throttle(that.throttleSaveCopyright.bind(d), 1000)); 
-			});	
 
 
-			// .on('f', function(d) {
 
-			// 	// Fittepølse
-			// 	// popopoppopopopoppopoopopo
-			// 	console.log('fuck you!', this.value)
-			// 	console.log('d', d.file);
-			// 	// layer.setDescription/Title/Copyright
+// 		// COPYRIGHT LINE
+// 		// COPYRIGHT LINE
+// 		// COPYRIGHT LINE
 
-			// })
+// 		// BIND
+// 		var copyrightLine =
+// 			copyrightWrapper
+// 			.selectAll('.file-copright-line')
+// 			.data(function(d) { return [d] })
 
-		// EXIT
-		copyrightLine
-			.exit()
-			.remove();
+// 		// ENTER
+// 		copyrightLine
+// 			.enter()
+// 			.append('input')
+// 			.attr('type', 'text')
+// 			.attr('placeholder', 'Click to add copyright information')
+// 			.classed('file-copright-line', true);
 
-	},
+// 		copyrightLine
+// 			.attr('value', function(d) {
 
-	throttleSaveCopyright : function () {
+// 				var file = d.file;
+// 				var copyright = file.getCopyright();
 
-		var text = this.context.value;
-		var file = this.file;
+// 				if ( copyright ) 	{ return copyright; }
+// 				else 			{ return []; }
+// 			})
+// 			.on('focus', function(d) {
+// 				d.context = this;
+// 				Wu.DomEvent.on(this, 'keydown', _.throttle(that.throttleSaveCopyright.bind(d), 1000)); 
+// 			});	
 
-		file.setCopyright(text)
 
-		// var layer = file.getLayer();
+// 			// .on('f', function(d) {
+
+// 			// 	// Fittepølse
+// 			// 	// popopoppopopopoppopoopopo
+// 			// 	console.log('fuck you!', this.value)
+// 			// 	console.log('d', d.file);
+// 			// 	// layer.setDescription/Title/Copyright
+
+// 			// })
+
+// 		// EXIT
+// 		copyrightLine
+// 			.exit()
+// 			.remove();
+
+// 	},
+
+// 	throttleSaveCopyright : function () {
+
+// 		var text = this.context.value;
+// 		var file = this.file;
+
+// 		file.setCopyright(text)
+
+// 		// var layer = file.getLayer();
 		
-		// layer && layer.setDescription(text);
+// 		// layer && layer.setDescription(text);
 
-	},
+// 	},
 
 
-	// .html(function(d) {
+// 	// .html(function(d) {
 
-	// 	var description = d.file.store.description;
+// 	// 	var description = d.file.store.description;
 		
-	// 	if ( description ) {
-	// 		var hasHTML = description.search('</');
-	// 		if ( hasHTML >= 1 ) {
-	// 			this.outerHTML = description;
-	// 			return [];
+// 	// 	if ( description ) {
+// 	// 		var hasHTML = description.search('</');
+// 	// 		if ( hasHTML >= 1 ) {
+// 	// 			this.outerHTML = description;
+// 	// 			return [];
 				
-	// 		}
-	// 	}
+// 	// 		}
+// 	// 	}
 		
-	// 	return description;
-	// })
-	// .on('focus', function(d) {
-	// 	d.context = this;
-	// 	Wu.DomEvent.on(this, 'keydown', _.throttle(that.throttleSave.bind(d), 1000)); 
-	// });	
+// 	// 	return description;
+// 	// })
+// 	// .on('focus', function(d) {
+// 	// 	d.context = this;
+// 	// 	Wu.DomEvent.on(this, 'keydown', _.throttle(that.throttleSave.bind(d), 1000)); 
+// 	// });	
 
 
 
 
-	// Other meta: Uploaded by
-	listMetaOtherStats : function (wrapper) {
+// 	// Other meta: Uploaded by
+// 	listMetaOtherStats : function (wrapper) {
 
 
-		// STATS WRAPPER
-		// STATS WRAPPER
-		// STATS WRAPPER
+// 		// STATS WRAPPER
+// 		// STATS WRAPPER
+// 		// STATS WRAPPER
 
-		// BIND
-		var statsWrapper =
-			wrapper
-			.selectAll('.file-stats-wrapper')
-			.data(function(d) { return [d] })
+// 		// BIND
+// 		var statsWrapper =
+// 			wrapper
+// 			.selectAll('.file-stats-wrapper')
+// 			.data(function(d) { return [d] })
 
-		// ENTER
-		statsWrapper
-			.enter()
-			.append('div')
-			.classed('file-stats-wrapper', true);
+// 		// ENTER
+// 		statsWrapper
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-stats-wrapper', true);
 
-		// EXIT
-		statsWrapper
-			.exit()
-			.remove();
-
-
-
-		// STATS TITLE
-		// STATS TITLE
-		// STATS TITLE
-
-		// BIND
-		var statsTitle =
-			statsWrapper
-			.selectAll('.file-stats-title')
-			.data(function(d) { return [d] })
-
-		// ENTER
-		statsTitle
-			.enter()
-			.append('div')
-			.classed('file-stats-title', true)
-			.classed('list-meta-title', true)
-			.html('Statistics:');
-
-		// EXIT
-		statsTitle
-			.exit()
-			.remove();
+// 		// EXIT
+// 		statsWrapper
+// 			.exit()
+// 			.remove();
 
 
 
-		// STATS DOWNLOADS
-		// STATS DOWNLOADS
-		// STATS DOWNLOADS
+// 		// STATS TITLE
+// 		// STATS TITLE
+// 		// STATS TITLE
 
-		// BIND
-		var statsDownloads =
-			statsWrapper
-			.selectAll('.file-stats-downloads')
-			.data(function(d) { return [d] })
+// 		// BIND
+// 		var statsTitle =
+// 			statsWrapper
+// 			.selectAll('.file-stats-title')
+// 			.data(function(d) { return [d] })
 
-		// ENTER
-		statsDownloads
-			.enter()
-			.append('div')
-			.classed('file-stats-downloads', true)
-			.classed('list-meta-title', true)
-			// .html('2 d<span class="killat780">own</span>l<span class="killat780">oa</span>ds / 15 <span class="killat780">map</span> views');
-			.html('Not available');
+// 		// ENTER
+// 		statsTitle
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-stats-title', true)
+// 			.classed('list-meta-title', true)
+// 			.html('Statistics:');
 
-		// EXIT
-		statsDownloads
-			.exit()
-			.remove();
-
+// 		// EXIT
+// 		statsTitle
+// 			.exit()
+// 			.remove();
 
 
-	},
+
+// 		// STATS DOWNLOADS
+// 		// STATS DOWNLOADS
+// 		// STATS DOWNLOADS
+
+// 		// BIND
+// 		var statsDownloads =
+// 			statsWrapper
+// 			.selectAll('.file-stats-downloads')
+// 			.data(function(d) { return [d] })
+
+// 		// ENTER
+// 		statsDownloads
+// 			.enter()
+// 			.append('div')
+// 			.classed('file-stats-downloads', true)
+// 			.classed('list-meta-title', true)
+// 			// .html('2 d<span class="killat780">own</span>l<span class="killat780">oa</span>ds / 15 <span class="killat780">map</span> views');
+// 			.html('Not available');
+
+// 		// EXIT
+// 		statsDownloads
+// 			.exit()
+// 			.remove();
 
 
-	// ██████╗  ██████╗ ██████╗     ██╗   ██╗██████╗ ███████╗
-	// ██╔══██╗██╔═══██╗██╔══██╗    ██║   ██║██╔══██╗██╔════╝
-	// ██████╔╝██║   ██║██████╔╝    ██║   ██║██████╔╝███████╗
-	// ██╔═══╝ ██║   ██║██╔═══╝     ██║   ██║██╔═══╝ ╚════██║
-	// ██║     ╚██████╔╝██║         ╚██████╔╝██║     ███████║
-	// ╚═╝      ╚═════╝ ╚═╝          ╚═════╝ ╚═╝     ╚══════╝
+
+// 	},
+
+
+// 	// ██████╗  ██████╗ ██████╗     ██╗   ██╗██████╗ ███████╗
+// 	// ██╔══██╗██╔═══██╗██╔══██╗    ██║   ██║██╔══██╗██╔════╝
+// 	// ██████╔╝██║   ██║██████╔╝    ██║   ██║██████╔╝███████╗
+// 	// ██╔═══╝ ██║   ██║██╔═══╝     ██║   ██║██╔═══╝ ╚════██║
+// 	// ██║     ╚██████╔╝██║         ╚██████╔╝██║     ███████║
+// 	// ╚═╝      ╚═════╝ ╚═╝          ╚═════╝ ╚═╝     ╚══════╝
 	                                                      
 
-	// ┌─┐┌─┐┌┬┐┌─┐┌─┐┌─┐┬─┐┬ ┬
-	// │  ├─┤ │ ├┤ │ ┬│ │├┬┘└┬┘
-	// └─┘┴ ┴ ┴ └─┘└─┘└─┘┴└─ ┴   
+// 	// ┌─┐┌─┐┌┬┐┌─┐┌─┐┌─┐┬─┐┬ ┬
+// 	// │  ├─┤ │ ├┤ │ ┬│ │├┬┘└┬┘
+// 	// └─┘┴ ┴ ┴ └─┘└─┘└─┘┴└─ ┴   
 
 
-	injectCategoryPopUp : function (allData, data, context, outerContext) {
+// 	injectCategoryPopUp : function (allData, data, context, outerContext) {
 
-		if ( !outerContext.canEdit ) return;
+// 		if ( !outerContext.canEdit ) return;
 
-		var dataLib = app.SidePane.DataLibrary;
+// 		var dataLib = app.SidePane.DataLibrary;
 
-		// close others
-		outerContext.closeCategories();		
+// 		// close others
+// 		outerContext.closeCategories();		
 
-		// reset search field
-		outerContext.resetSearch();		
+// 		// reset search field
+// 		outerContext.resetSearch();		
 
-		// get file uuid
-		var fileUuid = data.fileUuid;
+// 		// get file uuid
+// 		var fileUuid = data.fileUuid;
 
-		// Save UUID
-		outerContext._injectedUuid = fileUuid;
+// 		// Save UUID
+// 		outerContext._injectedUuid = fileUuid;
 
-		// get file object
-		var file = dataLib.project.getFile(fileUuid);
+// 		// get file object
+// 		var file = dataLib.project.getFile(fileUuid);
 
-		// create wrapper
-		var wrapper = outerContext._injectedCategory = Wu.DomUtil.create('div', 'list-popup-wrapper');
+// 		// create wrapper
+// 		var wrapper = outerContext._injectedCategory = Wu.DomUtil.create('div', 'list-popup-wrapper');
 
-		// get array of categories
-		var categories = dataLib.project.getCategories();
+// 		// get array of categories
+// 		var categories = dataLib.project.getCategories();
 
-		// for each category
-		categories.forEach(function (c) {
+// 		// for each category
+// 		categories.forEach(function (c) {
 
-			// create category line
-			outerContext.createCategoryLine(wrapper, c, file);
+// 			// create category line
+// 			outerContext.createCategoryLine(wrapper, c, file);
 
-		});
-
-
-		// add "new category" line
-		var newlinewrap = Wu.DomUtil.create('div', 'list-popup-new-wrap', wrapper);
-		var newline = outerContext._injectedNewline = Wu.DomUtil.create('input', 'list-popup-new', newlinewrap);
-		newline.setAttribute('placeholder', 'Add category...');
-
-		// set event on new category
-		Wu.DomEvent.on(newline, 'keydown', outerContext.categoryKeydown, outerContext);		
-		Wu.DomEvent.on(newline, 'mousedown', outerContext.stop, outerContext);		
-
-		// set position 
-		wrapper.style.position = 'absolute';
-		wrapper.style.left = -47 + 'px';
-		wrapper.style.top = 30 + 'px';
-
-		// add to wrapper
-		context.appendChild(wrapper);
-
-		// add outside click event
-		Wu.DomEvent.on(window, 'mousedown', outerContext._closeCategories, outerContext);
-
-		// Google Analytics event tracking
-		app.Analytics.setGaEvent(['Side Pane', 'Data library: inject category']);
-
-	},
-
-	createCategoryLine : function (wrapper, c, file) {
+// 		});
 
 
-		// create line item
-		var wrap = Wu.DomUtil.create('div', 'list-popup-line-wrap', wrapper);
-		var div  = Wu.DomUtil.create('div', 'list-popup-line', wrap, c.camelize());
-		var del  = Wu.DomUtil.create('div', 'list-popup-line-del', wrap, 'X');
+// 		// add "new category" line
+// 		var newlinewrap = Wu.DomUtil.create('div', 'list-popup-new-wrap', wrapper);
+// 		var newline = outerContext._injectedNewline = Wu.DomUtil.create('input', 'list-popup-new', newlinewrap);
+// 		newline.setAttribute('placeholder', 'Add category...');
 
-		// select category
-		Wu.DomEvent.on(div, 'mousedown', function (e) {
+// 		// set event on new category
+// 		Wu.DomEvent.on(newline, 'keydown', outerContext.categoryKeydown, outerContext);		
+// 		Wu.DomEvent.on(newline, 'mousedown', outerContext.stop, outerContext);		
+
+// 		// set position 
+// 		wrapper.style.position = 'absolute';
+// 		wrapper.style.left = -47 + 'px';
+// 		wrapper.style.top = 30 + 'px';
+
+// 		// add to wrapper
+// 		context.appendChild(wrapper);
+
+// 		// add outside click event
+// 		Wu.DomEvent.on(window, 'mousedown', outerContext._closeCategories, outerContext);
+
+// 		// Google Analytics event tracking
+// 		app.Analytics.setGaEvent(['Side Pane', 'Data library: inject category']);
+
+// 	},
+
+// 	createCategoryLine : function (wrapper, c, file) {
+
+
+// 		// create line item
+// 		var wrap = Wu.DomUtil.create('div', 'list-popup-line-wrap', wrapper);
+// 		var div  = Wu.DomUtil.create('div', 'list-popup-line', wrap, c.camelize());
+// 		var del  = Wu.DomUtil.create('div', 'list-popup-line-del', wrap, 'X');
+
+// 		// select category
+// 		Wu.DomEvent.on(div, 'mousedown', function (e) {
 			
-			// stop
-			Wu.DomEvent.stopPropagation(e);
+// 			// stop
+// 			Wu.DomEvent.stopPropagation(e);
 
-			// set vars
-			var value = c;
-			var key = 'category';
+// 			// set vars
+// 			var value = c;
+// 			var key = 'category';
 
-			// save to model
-			file.setCategory(value);
+// 			// save to model
+// 			file.setCategory(value);
 
-			// close
-			this.closeCategories();
+// 			// close
+// 			this.closeCategories();
 		
-			// refresh
-			this.refreshTable();
+// 			// refresh
+// 			this.refreshTable();
 
-		}, this);
+// 		}, this);
 
-		// delete category
-		Wu.DomEvent.on(del, 'mousedown', function (e) {
+// 		// delete category
+// 		Wu.DomEvent.on(del, 'mousedown', function (e) {
 
-			// stop
-			Wu.DomEvent.stopPropagation(e);
+// 			// stop
+// 			Wu.DomEvent.stopPropagation(e);
 
-			// remove category
-			var msg = 'Are you sure you want to delete category ' + c.camelize() + '? This will remove the category from all files.';
-			if (confirm(msg)) {
+// 			// remove category
+// 			var msg = 'Are you sure you want to delete category ' + c.camelize() + '? This will remove the category from all files.';
+// 			if (confirm(msg)) {
 
-				// remove category
-				this.removeCategory(c);
-			} 
+// 				// remove category
+// 				this.removeCategory(c);
+// 			} 
 
-		}, this);
+// 		}, this);
 
-	},
+// 	},
 
-	removeCategory : function (category) {
+// 	removeCategory : function (category) {
 
-		// remove from project
-		app.SidePane.DataLibrary.project.removeCategory(category);
+// 		// remove from project
+// 		app.SidePane.DataLibrary.project.removeCategory(category);
 	
-		// remove from all files
-		var files = app.SidePane.DataLibrary.project.getFileObjects();
-		for (f in files) {
-			var file = files[f];
-			var fc = file.getCategory();
-			if (fc) {
-				if (fc.toLowerCase() == category.toLowerCase()) {
-					file.setCategory('<span class="grayed">no category</span>'); // set blank
-				}
-			}
-		}
+// 		// remove from all files
+// 		var files = app.SidePane.DataLibrary.project.getFileObjects();
+// 		for (f in files) {
+// 			var file = files[f];
+// 			var fc = file.getCategory();
+// 			if (fc) {
+// 				if (fc.toLowerCase() == category.toLowerCase()) {
+// 					file.setCategory('<span class="grayed">no category</span>'); // set blank
+// 				}
+// 			}
+// 		}
 
-		// close
-		this.closeCategories();
+// 		// close
+// 		this.closeCategories();
 	
-		// refresh
-		this.refreshTable();
+// 		// refresh
+// 		this.refreshTable();
 
-	},
+// 	},
 
-	closeCategories : function () {
+// 	closeCategories : function () {
 
-		if (this._injectedCategory) Wu.DomUtil.remove(this._injectedCategory);
-		Wu.DomEvent.off(window, 'mousedown', this._closeCategories, this);
+// 		if (this._injectedCategory) Wu.DomUtil.remove(this._injectedCategory);
+// 		Wu.DomEvent.off(window, 'mousedown', this._closeCategories, this);
 
-	},
+// 	},
 
-	_closeCategories : function () {
+// 	_closeCategories : function () {
 
-		this.closeCategories();
+// 		this.closeCategories();
 	
-	},
+// 	},
 
-	categoryKeydown : function (e) {
+// 	categoryKeydown : function (e) {
 
-		// on enter
-		if (e.keyCode == 13) {
+// 		// on enter
+// 		if (e.keyCode == 13) {
 
-			// get value
-			var value = this._injectedNewline.value;
+// 			// get value
+// 			var value = this._injectedNewline.value;
 
-			// create new category
-			app.SidePane.DataLibrary.project.addCategory(value);
+// 			// create new category
+// 			app.SidePane.DataLibrary.project.addCategory(value);
 
-			// get file
-			var fileUuid = this._injectedUuid;
-			var file = app.SidePane.DataLibrary.project.getFile(fileUuid);
+// 			// get file
+// 			var fileUuid = this._injectedUuid;
+// 			var file = app.SidePane.DataLibrary.project.getFile(fileUuid);
 
-			// set category
-			file.setCategory(value);
+// 			// set category
+// 			file.setCategory(value);
 
-			// close
-			this.closeCategories();
+// 			// close
+// 			this.closeCategories();
 		
-			// refresh
-			// this.reset();
-			this.refreshTable();
-		}
+// 			// refresh
+// 			// this.reset();
+// 			this.refreshTable();
+// 		}
 
-		// on esc
-		if (e.keyCode == 27) {
+// 		// on esc
+// 		if (e.keyCode == 27) {
 			
-			// close, do nothing
-			this.closeCategories();
-		}
+// 			// close, do nothing
+// 			this.closeCategories();
+// 		}
 
-	},	
-
-
-	// ┌┬┐┌─┐┌─┐┌─┐
-	//  │ ├─┤│ ┬└─┐
-	//  ┴ ┴ ┴└─┘└─┘
-
-	injectTagsPopUp : function (allData, data, context, outerContext) {
-
-		if ( !outerContext.canEdit ) return;
-
-		var dataLib = app.SidePane.DataLibrary;
-
-		// Clean up
-		outerContext._closeTags();
-
-		// get file uuid
-		var fileUuid = data.fileUuid;
-
-		// Save UUID
-		outerContext._injectedUuid = fileUuid;
-
-		// get file object
-		var file = dataLib.project.getFile(fileUuid);
-
-		// create wrapper
-		outerContext._injected = {};
-
-		var wrapper      = outerContext._injected.outer = Wu.DomUtil.create('div', 'list-popup-wrapper'); // TODO: change classname
-		var innerWrapper = outerContext._injected.inner = Wu.DomUtil.create('div', 'list-popup-tag-wrapper-inner', wrapper); // TODO: change classname
-
-		// add line per category
-		var tags = data.file.store.keywords;
-
-		// Roll out the tags
-		outerContext.updateTagList(file);
+// 	},	
 
 
-		// add new category line
-		var newlinewrap = Wu.DomUtil.create('div', 'list-popup-new-wrap', wrapper);
-		var newline = outerContext._injectedNewline = Wu.DomUtil.create('input', 'list-popup-new', newlinewrap);
-		newline.setAttribute('placeholder', 'Add tag...');
+// 	// ┌┬┐┌─┐┌─┐┌─┐
+// 	//  │ ├─┤│ ┬└─┐
+// 	//  ┴ ┴ ┴└─┘└─┘
 
-		outerContext._ghostTag = Wu.DomUtil.create('div', 'list-ghost-tag', newlinewrap);
+// 	injectTagsPopUp : function (allData, data, context, outerContext) {
 
-		// set event on new category
-		Wu.DomEvent.on(newline, 'keydown',   outerContext.tagKeydown, outerContext);
-		Wu.DomEvent.on(newline, 'keyup',     outerContext.tagKeyup, outerContext);
-		Wu.DomEvent.on(newline, 'mousedown', outerContext.stop, outerContext);		
-		Wu.DomEvent.on(wrapper, 'mousedown', outerContext.stop, outerContext);
+// 		if ( !outerContext.canEdit ) return;
 
-		// set position 
-		wrapper.style.position = 'absolute';
-		wrapper.style.left = 0 + 'px';
-		wrapper.style.top = 30 + 'px';
+// 		var dataLib = app.SidePane.DataLibrary;
 
-		// add to wrapper
-		context.appendChild(wrapper);
+// 		// Clean up
+// 		outerContext._closeTags();
 
-		// add outside click event
-		Wu.DomEvent.on(window, 'mousedown', outerContext._closeTags, outerContext);
+// 		// get file uuid
+// 		var fileUuid = data.fileUuid;
 
+// 		// Save UUID
+// 		outerContext._injectedUuid = fileUuid;
 
-		outerContext.findAllTags();
+// 		// get file object
+// 		var file = dataLib.project.getFile(fileUuid);
 
-	},
+// 		// create wrapper
+// 		outerContext._injected = {};
 
-	updateTagList : function (file) {
+// 		var wrapper      = outerContext._injected.outer = Wu.DomUtil.create('div', 'list-popup-wrapper'); // TODO: change classname
+// 		var innerWrapper = outerContext._injected.inner = Wu.DomUtil.create('div', 'list-popup-tag-wrapper-inner', wrapper); // TODO: change classname
 
-		var that = this;
+// 		// add line per category
+// 		var tags = data.file.store.keywords;
 
-		// Wrapper...
-		var d3Wrapper = d3.select(this._injected.inner);
-
-		// Tags...
-		var store = file.store.keywords;
+// 		// Roll out the tags
+// 		outerContext.updateTagList(file);
 
 
-		// LINE WRAPPER
-		// LINE WRAPPER		
+// 		// add new category line
+// 		var newlinewrap = Wu.DomUtil.create('div', 'list-popup-new-wrap', wrapper);
+// 		var newline = outerContext._injectedNewline = Wu.DomUtil.create('input', 'list-popup-new', newlinewrap);
+// 		newline.setAttribute('placeholder', 'Add tag...');
 
-		// bind
-		var lineWrapper =
-			d3Wrapper
-			.selectAll('.list-popup-line-wrap')
-			.data(store, function(d) { 
-				return [d] 
-			});
+// 		outerContext._ghostTag = Wu.DomUtil.create('div', 'list-ghost-tag', newlinewrap);
+
+// 		// set event on new category
+// 		Wu.DomEvent.on(newline, 'keydown',   outerContext.tagKeydown, outerContext);
+// 		Wu.DomEvent.on(newline, 'keyup',     outerContext.tagKeyup, outerContext);
+// 		Wu.DomEvent.on(newline, 'mousedown', outerContext.stop, outerContext);		
+// 		Wu.DomEvent.on(wrapper, 'mousedown', outerContext.stop, outerContext);
+
+// 		// set position 
+// 		wrapper.style.position = 'absolute';
+// 		wrapper.style.left = 0 + 'px';
+// 		wrapper.style.top = 30 + 'px';
+
+// 		// add to wrapper
+// 		context.appendChild(wrapper);
+
+// 		// add outside click event
+// 		Wu.DomEvent.on(window, 'mousedown', outerContext._closeTags, outerContext);
+
+
+// 		outerContext.findAllTags();
+
+// 	},
+
+// 	updateTagList : function (file) {
+
+// 		var that = this;
+
+// 		// Wrapper...
+// 		var d3Wrapper = d3.select(this._injected.inner);
+
+// 		// Tags...
+// 		var store = file.store.keywords;
+
+
+// 		// LINE WRAPPER
+// 		// LINE WRAPPER		
+
+// 		// bind
+// 		var lineWrapper =
+// 			d3Wrapper
+// 			.selectAll('.list-popup-line-wrap')
+// 			.data(store, function(d) { 
+// 				return [d] 
+// 			});
 			
-		// enter
-		lineWrapper
-			.enter()
-			.append('div')
-			.classed('list-popup-line-wrap', true);
+// 		// enter
+// 		lineWrapper
+// 			.enter()
+// 			.append('div')
+// 			.classed('list-popup-line-wrap', true);
 
-		// exit
-		lineWrapper
-			.exit()
-			.remove();
-
-
-		// LINE
-		// LINE		
-
-		// bind
-		var line = 
-			lineWrapper
-			.selectAll('.list-popup-line')
-			.data(function(d) { return [d] })
-
-		// enter
-		line
-			.enter()
-			.append('div')
-			.classed('list-popup-line', true)
-
-		// update
-		line
-			.html(function(d) {
-				return d
-			})
-
-		// exit
-		line
-			.exit()
-			.remove();
+// 		// exit
+// 		lineWrapper
+// 			.exit()
+// 			.remove();
 
 
-		// DEL
-		// DEL
+// 		// LINE
+// 		// LINE		
 
-		// bind
-		var del = 
-			lineWrapper
-			.selectAll('.list-popup-line-del')
-			.data(function(d) { return [d] })
+// 		// bind
+// 		var line = 
+// 			lineWrapper
+// 			.selectAll('.list-popup-line')
+// 			.data(function(d) { return [d] })
 
-		// enter
-		del
-			.enter()
-			.append('div')
-			.classed('list-popup-line-del', true);
+// 		// enter
+// 		line
+// 			.enter()
+// 			.append('div')
+// 			.classed('list-popup-line', true)
 
-		// update
-		del
-			.on('mousedown', function (d) {
+// 		// update
+// 		line
+// 			.html(function(d) {
+// 				return d
+// 			})
 
-				var index = false;
+// 		// exit
+// 		line
+// 			.exit()
+// 			.remove();
 
-				// We add 1 to index to avoid 0, which is read as the same as "false"
-				store.forEach(function (st,i) {
-					if ( d == st ) index = i+1;
-				})
 
-				if ( index ) {
-					store.splice(index-1, 1);				
-				} else if ( store.length <= 1 ) {
-					file.store.keywords = [];
-				}
+// 		// DEL
+// 		// DEL
 
-				that.updateTagList(file);
-				that.refreshTable();
-				file.setTag();
+// 		// bind
+// 		var del = 
+// 			lineWrapper
+// 			.selectAll('.list-popup-line-del')
+// 			.data(function(d) { return [d] })
 
-			})
-			.html('X');
+// 		// enter
+// 		del
+// 			.enter()
+// 			.append('div')
+// 			.classed('list-popup-line-del', true);
 
-		// exit
-		del
-			.exit()
-			.remove();
+// 		// update
+// 		del
+// 			.on('mousedown', function (d) {
 
-	},
+// 				var index = false;
 
-	// Not sure if this is enough
-	_closeTags : function () {
+// 				// We add 1 to index to avoid 0, which is read as the same as "false"
+// 				store.forEach(function (st,i) {
+// 					if ( d == st ) index = i+1;
+// 				})
 
-		if ( this._injected ) {
-			Wu.DomUtil.remove(this._injected.outer);
-			Wu.DomUtil.remove(this._injected.inner);
-		}
+// 				if ( index ) {
+// 					store.splice(index-1, 1);				
+// 				} else if ( store.length <= 1 ) {
+// 					file.store.keywords = [];
+// 				}
 
-	},
+// 				that.updateTagList(file);
+// 				that.refreshTable();
+// 				file.setTag();
 
-	// Finds all tags on all files for auto completion
-	findAllTags : function () {
+// 			})
+// 			.html('X');
 
-		this._allTags = [];
-		var that = this;
+// 		// exit
+// 		del
+// 			.exit()
+// 			.remove();
 
-		for (f in this.listData) {
+// 	},
 
-			var keywords = this.listData[f].store.keywords;
+// 	// Not sure if this is enough
+// 	_closeTags : function () {
 
-			keywords.forEach(function (k) {
+// 		if ( this._injected ) {
+// 			Wu.DomUtil.remove(this._injected.outer);
+// 			Wu.DomUtil.remove(this._injected.inner);
+// 		}
 
-				var noMatch = true;
-				that._allTags.forEach(function (aT) {
-					if ( k == aT ) noMatch = false;
-				})
+// 	},
 
-				if ( noMatch ) that._allTags.push(k);
+// 	// Finds all tags on all files for auto completion
+// 	findAllTags : function () {
 
-			})
-		};
+// 		this._allTags = [];
+// 		var that = this;
 
-	},
+// 		for (f in this.listData) {
 
-	// When typing
-	tagKeydown : function (e) {
+// 			var keywords = this.listData[f].store.keywords;
 
-		// If we're using arrow right
-		if (e.which == 39  || e.keyCode == 39 ) {
-			if ( this._ghostValue ) e.target.value = this._ghostValue;
-		}
+// 			keywords.forEach(function (k) {
+
+// 				var noMatch = true;
+// 				that._allTags.forEach(function (aT) {
+// 					if ( k == aT ) noMatch = false;
+// 				})
+
+// 				if ( noMatch ) that._allTags.push(k);
+
+// 			})
+// 		};
+
+// 	},
+
+// 	// When typing
+// 	tagKeydown : function (e) {
+
+// 		// If we're using arrow right
+// 		if (e.which == 39  || e.keyCode == 39 ) {
+// 			if ( this._ghostValue ) e.target.value = this._ghostValue;
+// 		}
 		
-		// If there is an enter or a comma, save
-		if (e.which == 13  || e.keyCode == 13 || e.which == 188 || e.keyCode == 188 ) {
+// 		// If there is an enter or a comma, save
+// 		if (e.which == 13  || e.keyCode == 13 || e.which == 188 || e.keyCode == 188 ) {
 
-			var value = e.target.value;
+// 			var value = e.target.value;
 
-			if ( value.length <= 2 ) return;
+// 			if ( value.length <= 2 ) return;
 
-			// update file in project
-			var file    = app.SidePane.DataLibrary.project.getFile(this._injectedUuid);
-			var wrapper = this._injected.inner;
+// 			// update file in project
+// 			var file    = app.SidePane.DataLibrary.project.getFile(this._injectedUuid);
+// 			var wrapper = this._injected.inner;
 
-			// Add keyword to array
-			file.store.keywords.push(value);
+// 			// Add keyword to array
+// 			file.store.keywords.push(value);
 
-			// Refresh list
-			this.refreshTable();
+// 			// Refresh list
+// 			this.refreshTable();
 
-			// Create a new line
-			this.updateTagList(file);
+// 			// Create a new line
+// 			this.updateTagList(file);
 
-			// save to model
-			file.setTag();
+// 			// save to model
+// 			file.setTag();
 
-			// Clear input field
-			e.target.value = '';
+// 			// Clear input field
+// 			e.target.value = '';
 
-			this._ghostTag.innerHTML = '';
+// 			this._ghostTag.innerHTML = '';
 
-			return;
-		} 
+// 			return;
+// 		} 
 
-	},
+// 	},
 
-	tagKeyup : function (e) {
+// 	tagKeyup : function (e) {
 
-		// Clear input field on comma
-		if ( e.which == 188 || e.keyCode == 188 ) {
-			e.target.value = '';
-			this._ghostTag.innerHTML = '';
+// 		// Clear input field on comma
+// 		if ( e.which == 188 || e.keyCode == 188 ) {
+// 			e.target.value = '';
+// 			this._ghostTag.innerHTML = '';
 
-		} else {
+// 		} else {
 
-			// Auto completion
-			var value = e.target.value;
+// 			// Auto completion
+// 			var value = e.target.value;
 
-			// Clear ghost
-			if ( value.length <= 1 ) {
-				this.ghostTag('', 0);
-				return
-			}
+// 			// Clear ghost
+// 			if ( value.length <= 1 ) {
+// 				this.ghostTag('', 0);
+// 				return
+// 			}
 
-			var that = this;
+// 			var that = this;
 
-			// Set new ghost for auto completion
-			this._allTags.forEach(function (tag) {			
+// 			// Set new ghost for auto completion
+// 			this._allTags.forEach(function (tag) {			
 
-				var length = value.length;
-				var tagStr = tag.substring(0, length);
+// 				var length = value.length;
+// 				var tagStr = tag.substring(0, length);
 
-				if ( tagStr == value) that.ghostTag(tag, length);
+// 				if ( tagStr == value) that.ghostTag(tag, length);
 				
-			})
+// 			})
 
-		}
+// 		}
 
-	},	
+// 	},	
 
-	// For auto completion
-	ghostTag : function (tag, length) {
+// 	// For auto completion
+// 	ghostTag : function (tag, length) {
 
-		var first  = tag.substring(0, length);
-		var second = tag.substring(length, tag.length)
+// 		var first  = tag.substring(0, length);
+// 		var second = tag.substring(length, tag.length)
 
-		var ghost = '<span class="shy-ghost">' + first + '</span>' + second;
+// 		var ghost = '<span class="shy-ghost">' + first + '</span>' + second;
 
-		this._ghostTag.innerHTML = ghost;
-		this._ghostValue = tag;
+// 		this._ghostTag.innerHTML = ghost;
+// 		this._ghostValue = tag;
 
-	}
+// 	}
 
 
 
-})
+// })
 
 
 // ██╗   ██╗███████╗███████╗██████╗ ███████╗

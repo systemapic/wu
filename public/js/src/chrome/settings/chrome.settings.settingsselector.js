@@ -1,6 +1,7 @@
 Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 	options : {
+
 		tabs : {
 			styler : {
 				enabled : true,
@@ -29,8 +30,8 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 				enabled : true,
 				text : 'CartoCSS & SQL'
 			},
-		
 		}
+		
 	},
 
 	_initialize : function (options) {
@@ -49,11 +50,9 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 		// hide by default
 		this._hide();
-
 	},
 
 	_refresh : function () {
-
 
 		// remove settings button if no access to edit project
 		if (app.Access.to.edit_project(app.activeProject.getUuid())) { 			// todo: check if working
@@ -61,8 +60,6 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		} else {
 			Wu.DomUtil.addClass(this._settingsButton, 'displayNone');
 		}
-
-
 	},
 
 
@@ -93,13 +90,12 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		var top = app.Chrome.Top;
 
 		// add a button to top chrome
-		top._registerButton({
+		this._settingsButton = top._registerButton({
 			name : 'settingsSelector',
 			className : 'chrome-button settingsSelector',
 			trigger : this._togglePane,
 			context : this
 		});
-
 	},
 
 

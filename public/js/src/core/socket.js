@@ -62,7 +62,7 @@ Wu.Socket = Wu.Class.extend({
 			// notify data lib
 			var file_id = data.file_id;
 			var import_took_ms = data.import_took_ms;
-			// app.SidePane.DataLibrary._socketNotificationOfDoneFile(file_id, import_took_ms);
+
 			app.Data._onImportedFile(file_id, import_took_ms);
 			
 		});

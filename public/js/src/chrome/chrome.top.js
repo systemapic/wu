@@ -67,10 +67,12 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._buttons = this._buttons || {};
 
 		// create button
-		var button = this._buttons[name] = Wu.DomUtil.create('div', className, this._buttonWrapper);
+		var buttonDiv = this._buttons[name] = Wu.DomUtil.create('div', className, this._buttonWrapper);
 
 		// register event
-		Wu.DomEvent.on(button, 'click', trigger, ctx);
+		Wu.DomEvent.on(buttonDiv, 'click', trigger, ctx);
+
+		return buttonDiv;
 	},
 
 

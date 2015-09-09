@@ -139,11 +139,10 @@ Wu.Project = Wu.Class.extend({
 
 		// parse layer data
 		var parsed = JSON.parse(data);
+
+		console.error('TODO: created layer from GeoJSON, needs to be added to Data.');
 		
-		// callback
-		app.SidePane.DataLibrary.uploaded(parsed, {
-			autoAdd : true
-		});
+		
 	},
 
 	createLayer : function () {
@@ -897,8 +896,9 @@ Wu.Project = Wu.Class.extend({
 
 	removeFiles : function (files) {
 
-		var list = app.SidePane.DataLibrary.list,
-		    layerMenu = app.MapPane.getControls().layermenu,
+		console.error('remove files, needs to be rewritten with new Wu.Data');
+
+		var layerMenu = app.MapPane.getControls().layermenu,
 		    _fids = [],
 		    uuids = [],
 		    that = this;
