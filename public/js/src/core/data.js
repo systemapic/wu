@@ -137,5 +137,12 @@ Wu.Data = Wu.Class.extend({
 	},
 
 
+	disableUploader : function () {
+
+	},
+	enableUploader : function () {
+
+	},
+
 
 });

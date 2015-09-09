@@ -299,8 +299,6 @@ Wu.Resumable = Wu.Class.extend({
 			description : description
 		});
 
-		// hide drop
-		// app.SidePane.DataLibrary._hideDrop();
 	},
 
 
