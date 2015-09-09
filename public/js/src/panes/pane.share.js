@@ -20,14 +20,11 @@ Wu.Share = Wu.Pane.extend({
 		// create layout
 		this._initLayout();
 
+		// put button in top chrome
 		this._registerButton();
-
-		// add hooks
-		// this.addHooks();
 	},
 
 	_initLayout : function () {
-
 
 		// create dropdown
 		this._shareDropdown = Wu.DomUtil.create('div', 'share-dropdown displayNone', app._appPane);
@@ -40,32 +37,6 @@ Wu.Share = Wu.Pane.extend({
 		Wu.DomEvent.on(this._shareImageButton, 'click', this._shareImage, this);
 		Wu.DomEvent.on(this._sharePrintButton, 'click', this._sharePrint, this);
 		Wu.DomEvent.on(this._shareLinkButton,  'click', this._shareLink, this);
-
-		console.log('inited layout share', this._shareDropdown);
-
-		// // wrapper
-		// var wrap 	 = Wu.DomUtil.create('div', 'share-wrapper', this._content),
-		//     sstitle 	 = Wu.DomUtil.create('div', 'share-header', wrap, 'Publish');
-
-		// // image
-		// this.imageButton = Wu.DomUtil.create('div', 'share-wrap image', wrap);
-		// var ssbox	 = Wu.DomUtil.create('div', 'share-icon-box image', this.imageButton),
-		//     ssbutton 	 = Wu.DomUtil.create('div', 'share-title image', this.imageButton, 'Image'),
-		//     ssdesc 	 = Wu.DomUtil.create('div', 'share-subtitle image', this.imageButton, 'Create snapshot of map');
-
-		// // print
-		// this.printButton = Wu.DomUtil.create('div', 'share-wrap print', wrap);
-		// var pbox	 = Wu.DomUtil.create('div', 'share-icon-box print', this.printButton),
-		//     pbutton 	 = Wu.DomUtil.create('div', 'share-title print', this.printButton, 'PDF'),
-		//     pdesc 	 = Wu.DomUtil.create('div', 'share-subtitle print', this.printButton, 'Create printable map');
-
-		// // link
-		// this.linkButton  = Wu.DomUtil.create('div', 'share-wrap link', wrap);
-		// var lbox	 = Wu.DomUtil.create('div', 'share-icon-box link', this.linkButton),
-		//     lbutton 	 = Wu.DomUtil.create('div', 'share-title link', this.linkButton, 'Link'),
-		//     ldesc 	 = Wu.DomUtil.create('div', 'share-subtitle link', this.linkButton, 'Create share link');
-
-		
 	},
 
 	_registerButton : function () {
@@ -101,6 +72,10 @@ Wu.Share = Wu.Pane.extend({
 		Wu.DomUtil.addClass(this._shareDropdown, 'displayNone');
 		this._isOpen = false;
 
+		// remove links if open
+		if (this._shareLinkInput) Wu.DomUtil.remove(this._shareLinkInput);
+		if (this._sharePDFInput) Wu.DomUtil.remove(this._sharePDFInput);
+
 		// remove ghost
 		this._removeGhost();
 	},
@@ -113,19 +88,14 @@ Wu.Share = Wu.Pane.extend({
 	_removeGhost : function () {
 		Wu.DomEvent.off(this._ghost, 'click', this._close, this);
 		Wu.DomUtil.remove(this._ghost);
-
 	},
 
 	// on select project
 	_refresh : function () {
 		console.log('share refresh');
-
 	},
 
-
 	_shareImage : function () {
-
-		console.log('_shareIMage');
 
 		app.setHash(function (ctx, hash) {
 
@@ -145,38 +115,14 @@ Wu.Share = Wu.Pane.extend({
 		// parse results
 		var result = Wu.parse(file);
 		var image = result.image;
-
-		console.log('result: ', result);
-
-
-		// get dimensions of container
-		// var height = this._imageContainer.offsetHeight;
-		// var width = this._imageContainer.offsetWidth;
-
-		// set path
 		var path = app.options.servers.portal;
 		path += 'pixels/';
 		path += image;
-		var raw = path;
-		// path += '?width=' + width;
-		// path += '&height=' + height;
-
-		// set access token
+		path += '?raw=true'; // add raw to path
 		path += '&access_token=' + app.tokens.access_token;
 
-
-		console.log('path: ', path);
-		
-		// set download link
-		raw += '?raw=true'; // add raw to path
-
-		// set access token
-		raw += '&access_token=' + app.tokens.access_token;
-
-		console.log('raw: ', raw);
-
 		// open (note: some browsers will block pop-ups. todo: test browsers!)
-		window.open(raw, 'mywindow')
+		window.open(path, 'mywindow')
 
 		// close share dropdown
 		this._close();
@@ -184,9 +130,6 @@ Wu.Share = Wu.Pane.extend({
 	},
 
 	_shareLink : function () {
-
-		console.log('_shraeLink');
-
 
 		// create hash, callback
 		app.setHash(function (context, hash) {
@@ -199,21 +142,27 @@ Wu.Share = Wu.Pane.extend({
 	},
 
 	_createLinkView : function (result) {
-		console.log('_createLinkView', result);
 
 		var link = Wu.parse(result);
-
-		console.log('link: ', link);
-
 		var shareLink = window.location.href + '/' + link.hash.id;
 
-		console.log('shareLink: ', shareLink);
+		this._insertShareLink(shareLink);
 
-		function copyToClipboard(text) {
-		  window.prompt("Copy to clipboard: Ctrl+C, Enter", text);
-		}
+	},
 
-		copyToClipboard(shareLink);
+	_insertShareLink : function (url) {
+
+		if (this._shareLinkInput) Wu.DomUtil.remove(this._shareLinkInput);
+
+		// create input
+		this._shareLinkInput = Wu.DomUtil.create('input', 'share-input');
+		this._shareLinkInput.value = url;
+
+		// add to dom
+		this._shareDropdown.appendChild(this._shareLinkInput);
+
+		// select content of input
+		this._shareLinkInput.select();
 
 	},
 
@@ -225,7 +174,7 @@ Wu.Share = Wu.Pane.extend({
 			var h = JSON.parse(hash);
 			h.hash.slug = app.activeProject.getName();
 			var json = JSON.stringify(h); 
-			
+
 			// get snapshot from server
 			Wu.post('/api/util/pdfsnapshot', json, that._createdPrint, that);
 
@@ -241,18 +190,28 @@ Wu.Share = Wu.Pane.extend({
 		var result = JSON.parse(file);
 		var pdf = result.pdf;
 
-		console.log('result', result);
-		
 		// set path for zip file
-		var path = '/api/file/download?file=' + pdf + '&type=file'+ '&access_token=' + app.tokens.access_token;
+		var path = app.options.servers.portal + 'api/file/download?file=' + pdf + '&type=pdf'+ '&access_token=' + app.tokens.access_token;
 
-		console.log('path: ', path);
-		
-		// open (note: some browsers will block pop-ups. todo: test browsers!)
-		window.open(path, 'mywindow')
+		// insert open pdf link
+		context._insertPDFLink(path);
 
-		// close share dropdown
-		this._close();
 	},
+
+	_insertPDFLink : function (url) {
+
+		if (this._sharePDFInput) Wu.DomUtil.remove(this._sharePDFInput);
+
+		// create input
+		this._sharePDFInput = Wu.DomUtil.create('a', 'share-link-pdf');
+		this._sharePDFInput.href = url;
+		this._sharePDFInput.target = '_blank';
+		this._sharePDFInput.innerHTML = 'Open PDF';
+
+		// add to dom
+		this._shareDropdown.appendChild(this._sharePDFInput);
+
+	},
+
 
 });

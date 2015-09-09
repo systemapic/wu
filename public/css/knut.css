@@ -179,3 +179,34 @@
 .chrome-right {
 	z-index: 10000002;
 }
+
+.share-input {
+	/*position: absolute;*/
+	height: 30px;
+	width: 113px;
+	/*background: blue;*/
+	left: 0;
+	bottom: 9px;
+	border: none !important;
+}
+.share-input::selection {
+	background: #71c4a8;
+}
+
+.share-link-pdf {
+	position: absolute;
+	height: auto;
+	width: 100%;
+	left: 0;
+	bottom: 37px;
+	border: none !important;
+	background-color: white;
+	margin-left: 0;
+	color: #3F4652;
+	padding-left: 19px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+
+
