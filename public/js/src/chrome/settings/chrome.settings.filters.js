@@ -25,11 +25,16 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	_initLayout : function () {
 
+		// Scroller
+		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
+		this._midOuterScroller = Wu.DomUtil.create('div', 'chrome-middle-section-outer-scroller', this._midSection);
+		this._midInnerScroller = Wu.DomUtil.create('div', 'chrome-middle-section-inner-scroller', this._midOuterScroller);
+
 		// active layer
-		this.layerSelector = this._initLayout_activeLayers('Datasets', 'Select a dataset to filter...');
+		this.layerSelector = this._initLayout_activeLayers('Datasets', 'Select a dataset to filter...', this._midInnerScroller);
 
 		// wrapper
-		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._container);
+		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._midInnerScroller);
 
 		// sql editor
 		this._createSqlEditor();
@@ -38,7 +43,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		this._createRefresh();
 
 		// insert titles
-		this._createTitles();
+		this._createSQLwrapper();
 
 		// hide by default
 		this._hideEditors();
@@ -50,6 +55,28 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		this._inited = true;
 
 	},
+
+
+	_createRefresh : function () {
+
+
+		// create fixed bottom container
+		this._bottomContainer = Wu.DomUtil.create('div', 'chrome-content-bottom-container displayNone', this._container);
+
+
+		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
+		this._refreshButton = Wu.DomUtil.create('div', 'chrome-right-big-button', this._bottomContainer, text);
+
+		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
+
+		// // create div
+		// var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
+		// this._refreshButton = Wu.DomUtil.create('div', 'chrome-right-big-button', this._container, text);
+
+		// // set event
+		// Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
+	},
+
 
 	_refresh : function () {
 		this._flush();
@@ -69,8 +96,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-	_createTitles : function () {
-		
+	_createSQLwrapper : function () {
+
 		// create
 		this._sqltitle = Wu.DomUtil.create('div', 'chrome chrome-content cartocss title');
 		this._sqltitle.innerHTML = 'SQL';
@@ -86,9 +113,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		app._map.invalidateSize();
 	},
 
-	_createRefresh : function () {
-
-	},
 
 	_updateDimensions : function () {
 
@@ -105,15 +129,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		}
 	},
 
-	_createRefresh : function () {
-
-		// create div
-		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
-		this._refreshButton = Wu.DomUtil.create('div', 'chrome chrome-content cartocss refresh-button', this._container, text);
-
-		// set event
-		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
-	},
 
 
 	_updateStyle : function () {
@@ -259,6 +274,15 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		// add layer temporarily to map
 		this._tempaddLayer();
+
+
+		// Display bottom container
+		Wu.DomUtil.removeClass(this._bottomContainer, 'displayNone');
+
+		// Pad up scroller
+		Wu.DomUtil.addClass(this._midSection, 'middle-section-padding-bottom');
+
+
 	},
 
 	_tempaddLayer : function () {
@@ -419,7 +443,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		var wrap = this._filterDropdown = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper');
 
 		// insert on top of container
-		this._container.insertBefore(wrap, this._container.children[1]);
+		this._midInnerScroller.insertBefore(wrap, this._midInnerScroller.children[1]);
 
 		// title
 		var titleDiv = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
@@ -502,7 +526,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 			// create div
 			var filterDiv = this._filterDiv = Wu.DomUtil.createId('div', 'chrome-content-filter-chart');
-			this._container.insertBefore(this._filterDiv, this._filterDropdown.nextSibling);
+			this._midInnerScroller.insertBefore(this._filterDiv, this._filterDropdown.nextSibling);
 
 			// return if no histogram
 			if (!histogram) {

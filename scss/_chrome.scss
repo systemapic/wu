@@ -315,12 +315,12 @@
     }
 
 .chrome-content.settings-button.active-tab {
-    background: #78a09c;
+    background: #71C4A8;
     color: white;
     }
 
 .chrome-content.settings-button.active-tab:hover {
-    background: #6C8E8B;
+    background: #67B097;
     }
 
 .chrome.chrome-content.styler {
@@ -342,8 +342,7 @@
     opacity: 0.2;
     }
 
-.chrome-right-big-button,
-.chrome.chrome-content.cartocss.refresh-button {
+.chrome-right-big-button {
     width: 200px;
     height: 35px;
     background: #FF5E5E;
@@ -357,10 +356,17 @@
     cursor: pointer;
     }
 
-.chrome-right-big-button:hover,
-.chrome.chrome-content.cartocss.refresh-button:hover {
+.chrome-right-big-button:hover {
     background: red;
     }
+
+.chrome-right-big-button.upload {
+    background: #71C4A8;
+    }
+
+.chrome-right-big-button.upload:hover {
+    background: #67B097;
+    }    
 
 .chrome.chrome-content.cartocss.title {
     font-size: 15px;

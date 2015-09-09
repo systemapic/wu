@@ -21,18 +21,24 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// create container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane styler', this.options.appendTo);
-		
+
 
 	},
 
 	_initLayout : function () {
 		if (!this._project) return;
-  		
+
+		// Scroller
+		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
+		this._midOuterScroller = Wu.DomUtil.create('div', 'chrome-middle-section-outer-scroller', this._midSection);		
+		this._midInnerScroller = Wu.DomUtil.create('div', 'chrome-middle-section-inner-scroller', this._midOuterScroller);
+
+
 		// active layer
-		this.layerSelector = this._initLayout_activeLayers();
+		this.layerSelector = this._initLayout_activeLayers(false, false, this._midInnerScroller); // appending to this._midSection
 
 		// Create field wrapper
-		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._container);
+		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 
 		// Create refresh button at bottom
 		this._createRefresh();
@@ -42,6 +48,19 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 
 	},
+
+	_createRefresh : function () {
+
+		// create fixed bottom container
+		this._bottomContainer = Wu.DomUtil.create('div', 'chrome-content-bottom-container displayNone', this._container);
+
+
+		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
+		this._refreshButton = Wu.DomUtil.create('div', 'chrome-right-big-button', this._bottomContainer, text);
+
+		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
+		Wu.DomEvent.on(this._refreshButton, 'mouseover', this._closeColorRangeSelector, this);
+	},	
 
 	
 	_refresh : function () {
@@ -120,21 +139,14 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// Display bottom container
 		Wu.DomUtil.removeClass(this._bottomContainer, 'displayNone');
+
+		// Pad up scroller
+		Wu.DomUtil.addClass(this._midSection, 'middle-section-padding-bottom');
+		
 	},
 
 
-	_createRefresh : function () {
 
-		// create fixed bottom container
-		this._bottomContainer = Wu.DomUtil.create('div', 'chrome-content-bottom-container displayNone', this._container);
-
-
-		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
-		this._refreshButton = Wu.DomUtil.create('div', 'chrome-right-big-button', this._bottomContainer, text);
-
-		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
-		Wu.DomEvent.on(this._refreshButton, 'mouseover', this._closeColorRangeSelector, this);
-	},	
 
 	_closeColorRangeSelector : function () {
 

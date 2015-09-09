@@ -257,18 +257,26 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// LAYERS
 		// LAYERS
 
-		// Dummy for no layers
-		var noLayer = { store : { name : 'No layers added',  uuid : 'nolayers'} }
+		var D3container = this.projectLayersContainers.D3container;
+
+		// If project has no layers...
+		var layers = this._project.getPostGISLayers()
+		if ( layers.length == 0 ) {
+
+			var noDataText = ['<span style="font-style: italic; color: #ccc;">Click on files from the list below to add layers.</span>'];
+			this.createNoLayer(D3container, noDataText);
 
 		// Init layers data
-		var layers = this._project.getPostGISLayers()
-		if ( layers.length == 0 ) layers = noLayer;
-		this.projectLayers.data = layers;
+		} else {
+			this.projectLayers.data = layers;
 
-		var D3container = this.projectLayersContainers.D3container;
-		var data = this.projectLayers.data;
+			// Remove text for no layers...
+			this.createNoLayer(D3container, []);
 
-		this.initFileList(D3container, data, 'layers');		
+			this.initFileList(D3container, layers, 'layers');
+		}
+		
+
 
 
 		// FILES
@@ -291,6 +299,31 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	},
 
+
+	createNoLayer : function (D3container, data) {
+
+
+		// BIND
+		var dataListLine = 
+			D3container
+			.selectAll('.data-list-line')
+			.data(data);
+
+		// ENTER
+		dataListLine
+			.enter()
+			.append('div')
+			.classed('data-list-line', true)
+			.classed('chrome-metafield-line', true)
+			.html(function (d) { return d });
+
+
+		// EXIT
+		dataListLine
+			.exit()
+			.remove();
+
+	},
 
 
 	// ████████╗██╗  ██╗███████╗    ██╗      ██████╗  ██████╗ ██████╗ 
