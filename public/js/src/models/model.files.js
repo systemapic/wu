@@ -182,14 +182,21 @@ Wu.Files = Wu.Class.extend({
 
 
 	// todo: move all delete of files here
-	_delete : function () {
-
+	_deleteFile : function () {
+		console.log('file._deleteFile', this.getName());
 	},
 
+	_shareFile : function () {
+		console.log('file._shareFile', this.getName());
+	},
 
+	_createLayer : function (project) {
+		console.log('file._createLayer', this.getName(), project);
+	},
 
-
-
+	_downloadFile : function () {
+		console.log('file._downloadFile', this.getName());
+	},
 
 
 
