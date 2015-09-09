@@ -15,7 +15,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// add html
 		this._layermenuOuter 	= Wu.DomUtil.create('div', 'scroller-frame');
-		// var _scrollUp 		= Wu.DomUtil.create('div', 'scroll-up', this._layermenuOuter);
 		var _innerScroller 	= Wu.DomUtil.create('div', 'inner-scroller', this._layermenuOuter);
 		this._content 		= Wu.DomUtil.createId('div', 'layer-menu-inner-content', _innerScroller);
 
@@ -45,7 +44,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	_onLayerEdited : function () {
-		console.log('lyaermneu _onLayerEdited');
 		this._refresh();
 	},
 
@@ -112,19 +110,19 @@ L.Control.Layermenu = Wu.Control.extend({
 		// Append to DOM
 		app._map._controlCorners.bottomright.appendChild(this._openLayers);
 
-		// Pick up Elements dealing with the Legends
-		var legends = app.MapPane.getControls().legends;
-		if (legends) {
-			this._legendsContainer = legends._legendsContainer;
-			this._legendsCollapser = legends._legendsCollapser;
-		}
+		// // Pick up Elements dealing with the Legends
+		// var legends = app.MapPane.getControls().legends;
+		// if (legends) {
+		// 	this._legendsContainer = legends._legendsContainer;
+		// 	this._legendsCollapser = legends._legendsCollapser;
+		// }
 
-		// add extra padding	
-		var inspect = app.MapPane.getControls().inspect;	
-		if (!inspect) {
-			var corner = app._map._controlCorners.bottomright;
-			corner.style.paddingBottom = 6 + 'px';
-		}
+		// // add extra padding	
+		// var inspect = app.MapPane.getControls().inspect;	
+		// if (!inspect) {
+		// 	var corner = app._map._controlCorners.bottomright;
+		// 	corner.style.paddingBottom = 6 + 'px';
+		// }
 
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
@@ -177,8 +175,6 @@ L.Control.Layermenu = Wu.Control.extend({
 				item  : item,
 				layer : layer
 			}
-
-			console.log('LAYER SSDSDSDDS', layer);
 
 			// add to layermenu
 			this._add(layerItem);
@@ -258,12 +254,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},	
 
 	_setHeight : function (extra) {
-		// count open items
-		// var numOpen = this._getOpenItems();
-		// if (this.editMode && !extra) extra = 50;
-		// var extra = extra ? extra + 50 : 50;
-		// var height = numOpen * 30 + extra + 'px';
-		// this._innerContainer.style.height = height;
+		
 	},
 
 	_getOpenItems : function () {
@@ -345,7 +336,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.editMode = true;
 
 		// turn off dragging etc. on map
-		app.MapPane.disableInteraction(true);
+		// app.MapPane.disableInteraction(true);
 
 		// turn off dropzone dragging
 		app.Data.disableUploader();
@@ -389,7 +380,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.editMode = false;
 		
 		// re-enable dragging etc. on map
-		Wu.app.MapPane.enableInteraction(true);
+		// Wu.app.MapPane.enableInteraction(true);
 
 		// turn off dropzone dragging
 		app.Data.enableUploader();
@@ -1083,7 +1074,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		// var layerItemMoversWrap = Wu.DomUtil.create('div', 'layer-item-movers-wrap', wrap);
 		var up = Wu.DomUtil.create('div', 'layer-item-up', wrap);
 		var down = Wu.DomUtil.create('div', 'layer-item-down', wrap);
-		var del = Wu.DomUtil.create('div', 'layer-item-delete', wrap);
+		// var del = Wu.DomUtil.create('div', 'layer-item-delete', wrap);
 
 		if (layer) {
 			var layerItemFlyTo = Wu.DomUtil.createId('div', 'layer-flyto-' + layer.getUuid(), wrap);
@@ -1101,7 +1092,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		// add hooks
 		Wu.DomEvent.on(up,   'click', function (e) { this.upFolder(uuid); 	  }, this);
 		Wu.DomEvent.on(down, 'click', function (e) { this.downFolder(uuid); 	  }, this);
-		Wu.DomEvent.on(del,  'click', function (e) { this.deleteMenuFolder(uuid); }, this);
+		// Wu.DomEvent.on(del,  'click', function (e) { this.deleteMenuFolder(uuid); }, this);
 		
 		if (!layer) { // folder
 			Wu.DomEvent.on(inner, 'dblclick', function (e) { this._editFolderTitle(uuid); },this);
@@ -1110,7 +1101,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		// prevent layer activation
 		Wu.DomEvent.on(up,   'mousedown', Wu.DomEvent.stop, this);
 		Wu.DomEvent.on(down, 'mousedown', Wu.DomEvent.stop, this);
-		Wu.DomEvent.on(del,  'mousedown', Wu.DomEvent.stop, this);
+		// Wu.DomEvent.on(del,  'mousedown', Wu.DomEvent.stop, this);
 
 		// drag
 		// set dragstart event
