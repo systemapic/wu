@@ -23,7 +23,7 @@ Wu.Share = Wu.Pane.extend({
 		this._registerButton();
 
 		// add hooks
-		this.addHooks();
+		// this.addHooks();
 	},
 
 	_initLayout : function () {
@@ -33,9 +33,9 @@ Wu.Share = Wu.Pane.extend({
 		this._shareDropdown = Wu.DomUtil.create('div', 'share-dropdown displayNone', app._appPane);
 
 		// items
-		this._shareImageButton = Wu.DomUtil.create('div', 'share-item', this._shareDropdown);
-		this._sharePrintButton = Wu.DomUtil.create('div', 'share-item', this._shareDropdown);
-		this._shareLinkButton  = Wu.DomUtil.create('div', 'share-item', this._shareDropdown);
+		this._shareImageButton = Wu.DomUtil.create('div', 'share-item', this._shareDropdown, 'Share Image');
+		this._sharePrintButton = Wu.DomUtil.create('div', 'share-item', this._shareDropdown, 'Share PDF');
+		this._shareLinkButton  = Wu.DomUtil.create('div', 'share-item', this._shareDropdown, 'Share link');
 
 		Wu.DomEvent.on(this._shareImageButton, 'click', this._shareImage, this);
 		Wu.DomEvent.on(this._sharePrintButton, 'click', this._sharePrint, this);
@@ -83,24 +83,37 @@ Wu.Share = Wu.Pane.extend({
 			trigger : this._togglePane,
 			context : this
 		});
-
 	},
 
 	_togglePane : function () {
-		console.log('share toglgepane', this._isOpen);
+		this._isOpen ? this._close() : this._open();
+	},
 
+	_open : function () {
+		Wu.DomUtil.removeClass(this._shareDropdown, 'displayNone');
+		this._isOpen = true;
 
-		if (this._isOpen) {
-			this._isOpen = false;
+		// add fullscreen click-ghost
+		this._addGhost();
+	},
 
-			Wu.DomUtil.addClass(this._shareDropdown, 'displayNone');
+	_close : function () {
+		Wu.DomUtil.addClass(this._shareDropdown, 'displayNone');
+		this._isOpen = false;
 
-		} else {
+		// remove ghost
+		this._removeGhost();
+	},
 
-			Wu.DomUtil.removeClass(this._shareDropdown, 'displayNone');
+	_addGhost : function () {
+		this._ghost = Wu.DomUtil.create('div', 'share-ghost', app._appPane);
+		Wu.DomEvent.on(this._ghost, 'click', this._close, this);
+	},
 
-			this._isOpen = true;
-		}
+	_removeGhost : function () {
+		Wu.DomEvent.off(this._ghost, 'click', this._close, this);
+		Wu.DomUtil.remove(this._ghost);
+
 	},
 
 	// on select project
@@ -110,29 +123,11 @@ Wu.Share = Wu.Pane.extend({
 	},
 
 
-	// addHooks : function () {
-
-	// 	// clear hooks
-	// 	this.removeHooks();
-
-	// 	// add hooks
-	// 	Wu.DomEvent.on(this._imageButton, 'click', this._createImage, this);
-	// 	Wu.DomEvent.on(this._printButton, 'click', this._createPrint, this);
-	// 	Wu.DomEvent.on(this._linkButton, 'click', this._createLink, this);
-	// },
-
-	// removeHooks : function () {
-
-	// 	// remove hooks
-	// 	Wu.DomEvent.off(this._imageButton, 'click', this._createImage, this);
-	// 	Wu.DomEvent.off(this._printButton, 'click', this._createPrint, this);
-	// 	Wu.DomEvent.off(this._linkButton, 'click', this._createLink, this);
-	// },
-
 	_shareImage : function () {
 
-		app.setHash(function (ctx, hash) {
+		console.log('_shareIMage');
 
+		app.setHash(function (ctx, hash) {
 
 			// get snapshot from server
 			Wu.send('/api/util/snapshot', hash, function (a, b) {
@@ -143,7 +138,6 @@ Wu.Share = Wu.Pane.extend({
 
 		// set progress bar for a 5sec run
 		app.ProgressBar.timedProgress(5000);
-
 	},
 
 	_createdImage : function (context, file, c) {
@@ -152,39 +146,46 @@ Wu.Share = Wu.Pane.extend({
 		var result = Wu.parse(file);
 		var image = result.image;
 
+		console.log('result: ', result);
+
+
 		// get dimensions of container
-		var height = this._imageContainer.offsetHeight;
-		var width = this._imageContainer.offsetWidth;
+		// var height = this._imageContainer.offsetHeight;
+		// var width = this._imageContainer.offsetWidth;
 
 		// set path
 		var path = app.options.servers.portal;
 		path += 'pixels/';
 		path += image;
 		var raw = path;
-		path += '?width=' + width;
-		path += '&height=' + height;
+		// path += '?width=' + width;
+		// path += '&height=' + height;
 
 		// set access token
 		path += '&access_token=' + app.tokens.access_token;
 
-		// set url
-		var url = 'url("';
-		url += path;
-		url += '")';
 
-		// set image
-		this._imageContainer.style.backgroundImage = url;
+		console.log('path: ', path);
 		
 		// set download link
 		raw += '?raw=true'; // add raw to path
 
 		// set access token
 		raw += '&access_token=' + app.tokens.access_token;
-		this._downloadButton.href = raw;
+
+		console.log('raw: ', raw);
+
+		// open (note: some browsers will block pop-ups. todo: test browsers!)
+		window.open(raw, 'mywindow')
+
+		// close share dropdown
+		this._close();
 
 	},
 
 	_shareLink : function () {
+
+		console.log('_shraeLink');
 
 
 		// create hash, callback
@@ -195,14 +196,24 @@ Wu.Share = Wu.Pane.extend({
 
 		}.bind(this));
 
-		// Google Analytics event tracking
-		// app.Analytics.sidepane.share.js(['Side Pane', 'Share: create link']);
-		
 	},
 
 	_createLinkView : function (result) {
+		console.log('_createLinkView', result);
 
-		
+		var link = Wu.parse(result);
+
+		console.log('link: ', link);
+
+		var shareLink = window.location.href + '/' + link.hash.id;
+
+		console.log('shareLink: ', shareLink);
+
+		function copyToClipboard(text) {
+		  window.prompt("Copy to clipboard: Ctrl+C, Enter", text);
+		}
+
+		copyToClipboard(shareLink);
 
 	},
 
@@ -221,7 +232,7 @@ Wu.Share = Wu.Pane.extend({
 		});
 
 		// set progress bar for a 5sec run
-		app.ProgressBar.timedProgress(2000);
+		app.ProgressBar.timedProgress(5000);
 	},
 
 	_createdPrint : function (context, file) {
@@ -230,11 +241,18 @@ Wu.Share = Wu.Pane.extend({
 		var result = JSON.parse(file);
 		var pdf = result.pdf;
 
+		console.log('result', result);
+		
 		// set path for zip file
 		var path = '/api/file/download?file=' + pdf + '&type=file'+ '&access_token=' + app.tokens.access_token;
-		
-	
 
+		console.log('path: ', path);
+		
+		// open (note: some browsers will block pop-ups. todo: test browsers!)
+		window.open(path, 'mywindow')
+
+		// close share dropdown
+		this._close();
 	},
 
 });
