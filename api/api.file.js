@@ -372,6 +372,7 @@ module.exports = api.file = {
 
 		if (!fileUuid) return api.error.missingInformation(req, res);
 
+
 		ops.push(function (callback) {
 			File
 			.findOne({uuid : fileUuid})
