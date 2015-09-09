@@ -130,7 +130,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 
 		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
-		this._refreshButton = Wu.DomUtil.create('div', 'chrome chrome-content cartocss refresh-button', this._bottomContainer, text);
+		this._refreshButton = Wu.DomUtil.create('div', 'chrome-right-big-button', this._bottomContainer, text);
 
 		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
 		Wu.DomEvent.on(this._refreshButton, 'mouseover', this._closeColorRangeSelector, this);

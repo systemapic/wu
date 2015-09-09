@@ -537,11 +537,24 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getPostGISLayers : function () {
-		return _.filter(this.layers, function (l) {
-			if (!l) return false;
-			if (!l.store.data) return false;
-			return l.store.data.postgis;
-		});
+		// return _.filter(this.layers, function (l) {
+		// 	if (!l) return false;
+		// 	if (!l.store.data) return false;
+		// 	return l.store.data.postgis;
+		// });
+
+		var layers = [];
+
+		for (var l in this.layers) {
+			var layer = this.layers[l];
+
+			if (layer.store && layer.store.data && layer.store.data.postgis) layers.push(layer);
+		}
+
+		console.log('PGPGPG', layers);
+
+		return layers;
+
 	},
 
 	// debug

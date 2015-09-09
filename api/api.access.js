@@ -1078,7 +1078,10 @@ module.exports = api.access = {
 		},
 
 		edit_file : function (options, done) {
-			Project
+
+			console.log('access edit_file: ', options);
+
+			User
 			.findOne({files : options.file._id})
 			.populate('roles')
 			.exec(function (err, project) {
