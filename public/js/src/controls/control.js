@@ -15,6 +15,7 @@ Wu.Control = L.Control.extend({
 
 	_listen : function () {
 		Wu.Mixin.Events.on('projectSelected', this._projectSelected, this);
+		Wu.Mixin.Events.on('layerEdited', this._onLayerEdited, this);
 
 		// Wu.Mixin.Events.on('editEnabled',     this._editEnabled, this);
 		// Wu.Mixin.Events.on('editDisabled',    this._editDisabled, this);
@@ -38,6 +39,7 @@ Wu.Control = L.Control.extend({
 
 	// dummies
 	_initialize 	: function () {},
+	_onLayerEdited : function () {},
 	// _editEnabled 	: function () {},
 	// _editDisabled 	: function () {},
 	// _layerEnabled 	: function () {},
