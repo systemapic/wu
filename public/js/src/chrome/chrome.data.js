@@ -458,5 +458,4 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	}
 
-fdfdsf
 });

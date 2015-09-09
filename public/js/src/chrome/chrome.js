@@ -35,10 +35,7 @@ Wu.Chrome = Wu.Class.extend({
 		this._refresh();
 	},
 
-	_onFileImported  : function (e) {
-		console.log('_onFileImported', e);
-	},
-
+	
 	// dummies
 	// _projectSelected : function () {},
 	_initialize 	 : function () {},
@@ -48,7 +45,7 @@ Wu.Chrome = Wu.Class.extend({
 	_layerDisabled 	 : function () {},
 	_updateView 	 : function () {},
 	_refresh 	 : function () {},
-	// _onFileImported  : function () {},
+	_onFileImported  : function () {},
 	_initContainer   : function () {},
 
 

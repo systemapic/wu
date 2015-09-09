@@ -15,9 +15,6 @@ Wu.Data = Wu.Class.extend({
 
 		// create resumable
 		this._resumable = new Wu.Resumable({
-			// drop : this._resumableDrop,
-			// browse : this._uploader,
-			// context : this
 			onUploadDone : this._onUploadDone 
 		});
 
@@ -98,19 +95,18 @@ Wu.Data = Wu.Class.extend({
 
 	_gotFile : function (fileObject) {
 
-		var file = fileObject.file;
+		var fileStore = fileObject.file;
 		var layer = fileObject.layer;
-		var projectUuid = fileObject.project;
 		var user = app.Account;
 
-		console.log('GOT FILE!!!', fileObject);
+		console.log('GOT FILE!!!', fileStore);
 
 		// add locally
-		var f = user.setFile(file);
+		var file = user.setFile(fileStore);
 
 		// fire event (for data lib to pick up changes)
 		Wu.Mixin.Events.fire('fileImported', { detail : {
-			file : f
+			file : file
 		}});
 
 
