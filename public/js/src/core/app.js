@@ -215,6 +215,9 @@ Wu.App = Wu.Class.extend({
 		// render eror pane
 		this.FeedbackPane = new Wu.FeedbackPane();
 
+		// share pane
+		this.Share = new Wu.Share();
+
 		
 	},
 
