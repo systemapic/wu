@@ -28,6 +28,10 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	},
 
+	_onLayerAdded : function () {
+		this._refresh();
+	},
+
 	show : function () {
 		if (!this._inited) this._initLayout();
 
