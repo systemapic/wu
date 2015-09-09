@@ -28,7 +28,7 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 			cartocss : {
 				enabled : true,
-				text : 'CartoCSS & SQL'
+				text : 'CartoCSS'
 			},
 		}
 		
@@ -73,6 +73,9 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 		// tabs wrapper
 		this._tabsWrapper = Wu.DomUtil.create('div', 'chrome chrome-content settings-tabs-wrapper', this._container);
+
+
+
 	},
 
 	_initContent : function () {

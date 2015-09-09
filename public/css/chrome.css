@@ -283,16 +283,16 @@ input.chrome-field-input {
 
 .chrome-set,
 .setClear.setClear-on {
-    background: #78a09c;
+    background: #6AB69C;
     }
 
 .chrome-set:hover,
 .setClear.setClear-on:hover {   
-    background: #668884;
+    background: #67B097;
     }
 
 .chrome-set:active {
-    background: #526E6A;
+    background: #6AB69C;
     }    
 
 
@@ -324,13 +324,14 @@ input.chrome-field-input {
     border-left: 1px solid white;
     }
 
+
 .layer-toggle-active {
-    background: #78a09c;
+    background: #71C4A8;
     color: white;
     }
 
 .layer-toggle-active:hover {
-    background: #6c8e8b;
+    background: #67B097;
     }
 
 .chrome.chrome-content.chrome-pane.layers,
@@ -352,7 +353,7 @@ input.chrome-field-input {
     text-align: right;
     font-weight: 900;
     font-style: italic;
-    color: #C80000;
+    color: #71C4A8;
     line-height: 1.3;
     }
 
@@ -610,11 +611,14 @@ input.chrome-field-input {
 
 
 
-
 .chrome-pane.styler .chrome-field-line {
     padding-top: 2px;
     padding-bottom: 2px;
     }
+
+.chrome-pane.styler .chrome-switch-container {
+    top: 4px;
+}
 
 .chrome-pane.styler .chrome-field-mini-input, 
 .chrome-pane.styler .chrome-field-mini-input:focus {
@@ -637,9 +641,9 @@ input.chrome-field-input {
     top: -1px;
     }
 
-.chrome-pane.styler .chrome-switch-container {
+/*.chrome-pane.styler .chrome-switch-container {
     top: 4px;
-    }
+    }*/
 
 .chrome-pane.styler .select-field-wrap select {
     padding: 2px 8px 2px 8px;
@@ -873,4 +877,83 @@ input.chrome-field-input {
   padding-left: 5px;
   padding-right: 5px;
       
+}
+
+
+
+
+.chrome.chrome-content.chrome-pane.layers, .chrome.chrome-content.chrome-pane.mapsettings {
+    padding-top: 0;
+    }
+
+
+
+.chrome-middle-section {
+    padding-bottom: 141px;
+    padding-right: 0px;
+    position: absolute;
+    height: 100%;
+    width: 351px;
+    }
+
+.chrome-middle-section.middle-section-padding-bottom {
+    padding-bottom: 249px;
+    }
+
+
+.chrome-middle-section-outer-scroller {
+    position: relative;
+    width: 337px;
+    height: 100%;
+    overflow: hidden;
+    }
+
+.chrome-middle-section-inner-scroller {
+    position: relative;
+    width: 352px;
+    height: 100%;
+    overflow-y: scroll;
+    padding-right: 24px;
+    overflow-x: hidden;
+    padding-top: 10px;
+
+    }
+
+.chrome-layers-top-button-wrapper {
+    margin: auto;
+    top: 0;
+    position: relative;
+    background: white;
+    padding: 10px 20px 10px 20px;
+    height: 56px;
+    border-bottom: 1px dashed #ccc;
+    }
+
+.chrome-field-wrapper {
+    width: 352px;
+}
+
+.chrome-pane.cartocss {
+    padding-top: 10px;
+}
+
+
+.chrome-content.settings-tabs-wrapper {
+  position: absolute;
+  top: 108px;
+  padding-top: 0px;
+  min-height: 100%;
+  width: 100%;
+  padding-bottom: 150px;
+  box-sizing: border-box;
+  overflow: hidden;    
+}
+
+.chrome-content.active-layer.wrapper {
+    margin-top: 0 !important;
+}
+
+
+#chrome-content-filter-chart {
+    margin-bottom: 20px;
 }
