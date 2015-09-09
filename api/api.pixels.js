@@ -137,6 +137,7 @@ module.exports = api.pixels = {
 				callback(null);
 
 			} catch (e) {
+				console.log('pdf error', e);
 				callback(e);
 			}
 
@@ -145,6 +146,7 @@ module.exports = api.pixels = {
 		// get size
 		ops.push(function (callback) {
 			fs.stat(pdfpath, function (err, stats) {
+				console.log('stat pdfpath', pdfpath, err, stats);
 				if (err) return callback(err);
 
 				dataSize = stats.size;
