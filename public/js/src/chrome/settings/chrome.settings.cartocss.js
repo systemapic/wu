@@ -18,11 +18,14 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 
 	_initLayout : function () {
 
+		// Mid section
+		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
+
 		// active layer
-		this.layerSelector = this._initLayout_activeLayers();
+		this.layerSelector = this._initLayout_activeLayers(false, false, this._midSection);
 
 		// wrapper
-		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._container);
+		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._midSection);
 
 		// sql editor
 		// this._createSqlEditor();
@@ -163,7 +166,7 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		var carto = this._cartoEditor.getWrapperElement();
 		if (carto) {
 			carto.style.width = dims.width + 'px';
-			carto.style.height = (dims.height/3*2) - 150 + 'px';
+			carto.style.height = dims.height - 363 + 'px';
 		}
 
 		

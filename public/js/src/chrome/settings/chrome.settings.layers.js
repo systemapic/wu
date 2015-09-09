@@ -24,8 +24,15 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 		if (!this._project) return;
 
+		this._topButtonWrapper = Wu.DomUtil.create('div', 'chrome-layers-top-button-wrapper', this._container);
+
+		// Scroller
+		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
+		this._midOuterScroller = Wu.DomUtil.create('div', 'chrome-middle-section-outer-scroller', this._midSection);
+		this._midInnerScroller = Wu.DomUtil.create('div', 'chrome-middle-section-inner-scroller', this._midOuterScroller);
+
 		// Inner wrapper
-		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._container);
+		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 
 		// Init layer/baselayer toggle
 		this.initLayerBaselayerToggle();
@@ -80,15 +87,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	},
 
 
-	// closed : function () {
-	// 	console.log('i was closed!');
-	// },
-
-	// hide : function () {
-	// 	console.log('i was hidden!');
-	// },
-
-
 
 	// TOP BUTTONS (BASE LAYERS / LAYERS)
 	// TOP BUTTONS (BASE LAYERS / LAYERS)
@@ -97,7 +95,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 	initLayerBaselayerToggle : function () {
 
-		var wrapper = Wu.DomUtil.create('div',   'chrome-layer-baselayer-toggle', this._fieldsWrapper);
+		var wrapper = Wu.DomUtil.create('div',   'chrome-layer-baselayer-toggle', this._topButtonWrapper);
 		this.baselayerButton = Wu.DomUtil.create('div', 'chrome-layer-toggle-button chrome-baselayer', wrapper, 'BASE LAYERS');
 		this.layerButton = Wu.DomUtil.create('div',     'chrome-layer-toggle-button chrome-layer layer-toggle-active', wrapper, 'LAYERS');
 

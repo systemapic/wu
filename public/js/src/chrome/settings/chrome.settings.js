@@ -84,13 +84,13 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	},
 
-	_initLayout_activeLayers : function (title, subtitle) {
+	_initLayout_activeLayers : function (title, subtitle, container) {
 
 		var title = title || 'Layer';
 		var subtitle = subtitle || 'Select a layer to style...';
 
 		// active layer wrapper
-		var wrap = this._activeLayersWrap = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper', this._container);
+		var wrap = this._activeLayersWrap = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper', container);
 
 		// title
 		var title = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
@@ -347,7 +347,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		}
 
 		// Create input field
-		if (input) {
+		if ( input ) {
 
 			// create
 			var fieldName = Wu.DomUtil.createId('input', 'field_input_' + key, fieldWrapper);

@@ -19,7 +19,12 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 
 		if (!this._project) return;
 
-		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._container);
+		// Scroller
+		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
+		this._midOuterScroller = Wu.DomUtil.create('div', 'chrome-middle-section-outer-scroller', this._midSection);		
+		this._midInnerScroller = Wu.DomUtil.create('div', 'chrome-middle-section-inner-scroller', this._midOuterScroller);		
+
+		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 		this.initSettings('Controls');
 
 		this.initBoundPos('Bounds & Position');
