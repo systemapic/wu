@@ -8,6 +8,13 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	},
 
+	options : {
+		dropdown : {
+			staticText : 'Fixed value',
+			staticDivider : '-'
+		}
+	},
+
 	_initialize : function () {
 
 		// init container
@@ -179,7 +186,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Get columns
 		this.columns = layerMeta.columns;
 
-		this.metaFields = ['static', '---------------'];
+		this.metaFields = [this.options.dropdown.staticText, this.options.dropdown.staticDivider];
 
 		for ( var k in this.columns ) {
 
@@ -402,8 +409,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			var colorRange = options.colorRange;
 
 			if ( !colorRange ) return;
-			if ( colorRange == 'static' ) return;
-			if ( colorRange == '---------------' ) return;
+			if ( colorRange == this.options.dropdown.staticText ) return;
+			if ( colorRange == this.options.dropdown.staticDivider ) return;
 			
 			var fieldName = colorRange;
 
@@ -416,8 +423,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			var pointSizeRange = options.pointSizeRange;
 
 			if ( !pointSizeRange ) 	return;
-			if ( pointSizeRange == 'static' ) return;
-			if ( pointSizeRange == '---------------' ) return;
+			if ( pointSizeRange == this.options.dropdown.staticText ) return;
+			if ( pointSizeRange == this.options.dropdown.staticDivider ) return;
 			
 			var fieldName = pointSizeRange;
 
@@ -471,7 +478,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// UNSELECTING FIELD
 
 		// Clean up if we UNSELECTED field
-		if ( fieldName == 'static' || fieldName == '---------------') {
+		if ( fieldName == this.options.dropdown.staticText || fieldName == this.options.dropdown.staticDivider) {
 			
 			// Make static inputs available
 			if ( key == 'opacity' || key == 'pointsize' ) {	
@@ -925,6 +932,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._temps.forEach(function (layer) {
 			layer._removeThin();
 		}, this);
+
+		this._temps = [];
 	},
 
 
@@ -1286,6 +1295,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			layerUuid : layer.getUuid()
 		}
 
+		var that = this;
 
 		// create layer on server
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
@@ -1301,11 +1311,16 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 			// set & update
 			layer.setStyle(newLayerStyle.options);
-			layer.update({enable : true});
+			// layer.update({enable : true});
+			layer.update({}, function () {
+				console.log('CALLBACK');
+				that._tempaddLayer();
+			});
+			
 
 			// return
 			done && done();
-		});
+		}.bind(this));
 
 	},	
 

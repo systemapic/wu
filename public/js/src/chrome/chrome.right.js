@@ -9,7 +9,6 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 			settings : true,
 			data : true
 		}
-		
 	},
 
 	_initialize : function () {
@@ -29,7 +28,6 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		// holder for all tabs
 		this._tabs = {};
 
-		
 		// data tab
 		if (this.options.tabs.data) {
 
@@ -49,9 +47,6 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 				chrome : this
 			});
 		}
-
-
-	
 	},
 
 	_addEvents : function () {
@@ -68,12 +63,10 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	getDimensions : function () {
-
 		var dims = {
 			width : this.options.defaultWidth,
 			height : this._container.offsetHeight
 		}
-
 		return dims;
 	},
 
@@ -86,17 +79,18 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	open : function (tab) {
+
+		console.log('chrome right open => tab: ', tab._);
 		
 		// hide all tabs
 		this._forEachTab(function (tab) {
 			tab._hide();
-			tab.onClosed();
+			// tab.onClosed();
 		});
 
 		// show tab
 		tab._show();
 		tab.onOpened();
-
 
 		// if chrome already open
 		if (this._isOpen) return;
@@ -111,16 +105,19 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		var map = app.MapPane._container;
 		var width = map.offsetWidth - this.options.defaultWidth;
 		map.style.width = width + 'px';
-		
+
 	},
 
 	close : function (tab) {
-
+		console.log('chrome right close => tab: ', tab._);
+		
 		// hide tab
-		tab._hide();
-		tab.onClosed();
+		if (tab._hide) tab._hide();
+		if (tab.onClosed) tab.onClosed();
 
 		if (!this._isOpen) return;
+
+		console.log('2'); // on right chrome complete close (not switch)
 
 		this._isOpen = false;
 
@@ -132,8 +129,8 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		var map = app.MapPane._container;
 		map.style.width = '100%';
 
-		
 	},
+
 
 	
 });
