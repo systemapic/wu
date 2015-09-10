@@ -202,21 +202,21 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 		console.log('i was closed', this._);
 
-		this._addThinRemovedLayers();
+		// this._addThinRemovedLayers();
 
 	},
 
-	_addThinRemovedLayers : function () {
-		var layerMenu = app.MapPane.getControls().layermenu;
-		if (!layerMenu) return;
+	// _addThinRemovedLayers : function () {
+	// 	var layerMenu = app.MapPane.getControls().layermenu;
+	// 	if (!layerMenu) return;
 
-		var layers = layerMenu._getActiveLayers();
-		layers.forEach(function (l) {
-			console.log('L', l);
-			l.layer._addThin();
-		})
+	// 	var layers = layerMenu._getActiveLayers();
+	// 	layers.forEach(function (l) {
+	// 		console.log('L', l);
+	// 		l.layer._addThin();
+	// 	})
 
-	},
+	// },
 
 	_refreshAll : function () {
 		for (var t in this._tabs) {

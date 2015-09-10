@@ -225,9 +225,12 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 				return console.error(newLayerStyle.error);
 			}
 
-			// set & update
-			layer.setStyle(newLayerStyle.options);
-			layer.update({enable : true});
+			// // set & update
+			// layer.setStyle(newLayerStyle.options);
+			// layer.update({enable : true});
+
+			// update layer
+			layer.updateStyle(newLayerStyle);
 
 			// return
 			done && done();
@@ -284,20 +287,21 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 
 	},
-
+	
 	_tempaddLayer : function () {
 
 		// remember
 		this._temps = this._temps || [];
 
-		// remove other styling layers
-		this._tempRemoveLayers();
+		// if not already added to map
+		if (!this._layer._added) {
 
-		// add
-		this._layer._addThin();
+			// add
+			this._layer._addThin();
 
-		// remember
-		this._temps.push(this._layer);
+			// remember
+			this._temps.push(this._layer);
+		}
 
 	},
 
@@ -308,6 +312,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		this._temps.forEach(function (layer) {
 			layer._removeThin();
 		}, this);
+
+		this._temps = [];
 	},
 
 	opened : function () {
