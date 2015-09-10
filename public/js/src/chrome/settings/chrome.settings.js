@@ -186,7 +186,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 				fieldSwitch.setAttribute('state', 'true');
 			} else {
 				fieldSwitch.setAttribute('state', 'false');
-			}	    
+			}
 
 			// Add hooks
 			Wu.DomEvent.on(fieldSwitch, 'click', this.toggleSwitch, this);		    
@@ -350,6 +350,21 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 			Wu.DomEvent.on(clickCatcher, 'click', this.stopEditingColorRange, this);
 		}
 
+		if ( options.radio ) {
+
+			var radio = Wu.DomUtil.create('div', 'layer-radio', fieldWrapper);
+			radio.id = 'radio_' + key;
+
+			if ( options.radioOn ) {
+				Wu.DomUtil.addClass(radio, 'radio-on');
+				radio.setAttribute('state', 'true');
+			} else {
+				radio.setAttribute('state', 'false');
+			}
+
+			Wu.DomEvent.on(radio, 'click', this.toggleRadio, this);
+		}
+
 
 		if ( dropArray ) {
 			this._init_miniDropDown(dropArray, fieldWrapper, key, options.selectedField);
@@ -480,6 +495,12 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	},
 
+
+	// Toggle radio
+	toggleRadio : function (e) {
+
+	},
+
 	// Toggle switch
 	toggleSwitch : function (e) {
 
@@ -543,12 +564,14 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		var select = this._select = Wu.DomUtil.create('select', 'active-field-select', selectWrap);
 		select.setAttribute('key', _key);
 
+		if ( selected ) Wu.DomUtil.addClass(selectWrap, 'full-width');
+
 		// get layers
 		var layers = this._project.getPostGISLayers();
 
 		// placeholder
 		var option = Wu.DomUtil.create('option', '', select);
-		option.innerHTML = 'Select column to style by...';
+		option.innerHTML = 'Select column...';
 		option.setAttribute('disabled', '');
 		option.setAttribute('selected', '');
 

@@ -23,9 +23,19 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Portal Logo
 		this._portalLogo = Wu.DomUtil.create('div', 'chrome-portal-logo', this._container);
 		this._portalLogoImg = Wu.DomUtil.create('img', '', this._portalLogo);
+		this._portalLogoImg.src = '/css/images/systemapic-portal-logo.png';
+
+		// Project title container
+		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title-container', this._container);
+
+		// Client Logo
+		this._clientLogo = Wu.DomUtil.create('div', 'chrome-client-logo', this._projectTitleContainer);
+		this._clientLogoImg = Wu.DomUtil.create('img', '', this._clientLogo);		
 
 		// Project title
-		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title', this._container);
+		this._projectTitle = Wu.DomUtil.create('div', 'chrome-project-title', this._projectTitleContainer);
+
+
 
 		// WRAPPER FOR BUTTONS			// todo: make pluggable
 		this._buttonWrapper = Wu.DomUtil.create('div', 'chrome-buttons', this._container);
@@ -208,10 +218,11 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// get client & project names
 		this._clientName = this._project.getClient().getName();
-		this._projectTitle = this._project.getHeaderTitle();
+		this._projectTitleName = this._project.getHeaderTitle();
 
 		// set project title
-		this._projectTitleContainer.innerHTML = this._clientName.toLowerCase() + '&nbsp;:&nbsp;' + this._projectTitle.toLowerCase();
+		// this._projectTitleContainer.innerHTML = this._clientName.toLowerCase() + '&nbsp;:&nbsp;' + this._projectTitle.toLowerCase();
+		this._projectTitle.innerHTML = this._projectTitleName.toLowerCase();
 	},
 
 	_setUsername : function () {
@@ -222,7 +233,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_setPortalLogo : function () {
 
 		// portal logo from config
-		this._portalLogoImg.src = app.options.servers.portal + app.options.logos.portalLogo;
+		this._clientLogoImg.src = app.options.servers.portal + app.options.logos.portalLogo;
 	},
 
 

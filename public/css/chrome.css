@@ -110,6 +110,8 @@ section.map.mode-edit div.polygon-elbow {
     padding-top: 2px;
     padding-bottom: 2px;
     font-size: 14px;
+
+    position: relative;
     }
 
 .chrome-metafield-line:last-child {
@@ -344,7 +346,7 @@ input.chrome-field-input {
     }
 
 .deactivated-layer:before {
-    content: 'layer';
+    content: 'base layer';
     background: rgba(255,255,255,0.7);
     z-index: 9999;
     position: absolute;
@@ -358,7 +360,7 @@ input.chrome-field-input {
     }
 
 .editing-baselayers .deactivated-layer:before { 
-    content: 'base layer';
+    content: 'layer';
     }
 
 
@@ -381,7 +383,8 @@ input.chrome-field-input {
     background-color: #fff;
     z-index: 100;
     position: absolute;
-    right: 30px;
+    /*right: 30px;*/
+    right: 0px;
     font-size: 12px;
     }
 
@@ -514,12 +517,18 @@ input.chrome-field-input {
 
 
 
-
+.c3-header-layer-name {
+    margin-bottom: 5px;
+    }
 
 .leflet-container.leaflet-popup {
-  max-width: 468px;
-  min-width: 175px;
-}
+    max-width: 468px;
+    min-width: 200px;
+    }
+
+.leflet-container.leaflet-popup.tiny-pop-up {
+    max-width: 200px;
+    }
 
 
 .c3-header-metapair {
@@ -751,7 +760,7 @@ input.chrome-field-input {
     border-bottom: 1px dashed #ccc;
     position: absolute;
     width: 100%;
-    height: 55px;
+    height: 74px;
     }
 
 .chrome-data-bottom {
@@ -837,21 +846,37 @@ input.chrome-field-input {
     right: 3px;
     padding: 13px 20px 13px 19px;
     box-shadow: 0 0 2px 1px rgba(0,0,0,0.4);
-    z-index: 999999999999;
+    z-index: 400;
     top: 27px;
     width: 142px;
     cursor: default;
     }
 
 .file-popup-trigger {
-  background: transparent;
-  width: 100%;
-  height: 100%;
+    position: absolute;
+    top: 3px;
+    z-index: 300;
+    opacity: 1;
+    width: 18px;
+    height: 18px;
+    border-radius: 10px;
+    right: 1px;
+    box-shadow: 0 0 0 1px #666 inset;
+    background: white;
+    opacity: 0.5;
+    }
+
+.file-popup-trigger.active,
+.file-popup-trigger:hover {
+    opacity: 1;
+}    
+
+.file-popup-trigger:before {
+  content: '...';
   position: absolute;
-  top: 0;
-  opacity: 0;
-  z-index: 99999;
-}
+  top: -3px;
+  right: 3px;
+    }
 
 .file-action {
   font-size: 14px;
@@ -871,7 +896,7 @@ input.chrome-field-input {
   width: 100%;
   height: 100%;
   border: none;
-  z-index: 999999999999;
+  z-index: 200;
   resize: none;
   padding-top: 4px;
   padding-left: 5px;
@@ -916,7 +941,6 @@ input.chrome-field-input {
     padding-right: 24px;
     overflow-x: hidden;
     padding-top: 10px;
-
     }
 
 .chrome-layers-top-button-wrapper {
@@ -931,29 +955,225 @@ input.chrome-field-input {
 
 .chrome-field-wrapper {
     width: 352px;
-}
+    }
 
 .chrome-pane.cartocss {
     padding-top: 10px;
-}
-
+    }
 
 .chrome-content.settings-tabs-wrapper {
-  position: absolute;
-  top: 108px;
-  padding-top: 0px;
-  min-height: 100%;
-  width: 100%;
-  padding-bottom: 150px;
-  box-sizing: border-box;
-  overflow: hidden;    
-}
+    position: absolute;
+    top: 108px;
+    padding-top: 0px;
+    min-height: 100%;
+    width: 100%;
+    padding-bottom: 150px;
+    box-sizing: border-box;
+    overflow: hidden;
+    }
 
 .chrome-content.active-layer.wrapper {
     margin-top: 0 !important;
-}
-
+    }
 
 #chrome-content-filter-chart {
     margin-bottom: 20px;
+    }
+
+.leaflet-control-scale {
+    padding-right: 0;
+    margin-right: 0;
+    }
+
+
+.layer-radio {
+    width: 15px;
+    height: 15px;
+    position: absolute;
+    right: 0;
+    top: 4px;
+    box-shadow: 0 0 0 1px #ccc inset, 0 0 0 3px #FFFFFF inset;
+    z-index: 9999;
+    border-radius: 10px;
+    background: #eee;
+    cursor: pointer;
+    }
+
+.layer-radio:hover {
+    background: #ddd;
+}
+
+.radio-on {
+    background: #71C4A8;
+}
+
+.radio-on:hover {
+    background: #67B097;
+}
+
+
+.sql-bottom-container {
+    position: absolute;
+    width: 100%;
+    bottom: 143px;
+    padding-bottom: 0;
+    padding-top: 0;
+    border-top: 1px dashed #ccc;
+    opacity: 0;
+    transition: opacity 0.5s linear;
+    }
+
+.chrome.chrome-content.cartocss.title {
+    font-size: 15px;
+    margin: 5px 5px 5px 20px;
+    opacity: 1;
+    transition: opacity 0.5s linear;
+    }
+
+
+.share-dropdown {
+    top: 38px !important;
+}    
+
+
+
+
+
+.chrome-mini-dropdown {
+    width: 125px;
+}
+
+
+.chrome-mini-dropdown.full-width {
+    width: 162px;
+    right: 0;
+    }
+
+.select-field-wrap {
+      right: 37px;
+}
+
+.chrome-color-range {
+      width: 163px;
+}
+
+.mini-input-dual, .mini-input-dual:focus {
+      width: 80px;
+}
+
+.chrome-pane.styler .chrome-color-ball {
+    top: 5px;
+  right: 8px;
+}
+
+.chrome-pane.styler .chrome-field-line {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.chrome-pane.styler .select-field-wrap {
+      margin-top: 3px;
+}
+
+.chrome-pane.styler .chrome-field-mini-input, .chrome-pane.styler .chrome-field-mini-input:focus {
+    height: 22px;
+    top: 3px;
+}
+
+.chrome-pane.styler .chrome-switch-container {
+      top: 6px;
+      right: 4px;
+}
+
+.chrome-color-range-wrapper {
+    top: 2px;
+}
+
+
+.chrome-color-selector-wrapper {
+  background: transparent;
+  position: absolute;
+  right: -10px;
+  z-index: 9999999;
+  width: 178px;
+  height: 24px;
+  padding-top: 2px;
+  top: -3px !important;    
+}
+
+.rangeball-2 {
+      left: 78px;
+}
+
+
+.chrome-header-title {
+  font-size: 18px;
+  /*margin: 5px;*/
+  /*margin-left: 20px;*/
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 0;
+  /*margin-top: 8px;*/
+}
+
+.chrome-data-top {
+  border-bottom: 1px dashed #ccc;
+  position: absolute;
+  width: 100%;
+  height: 80px;
+  padding: 10px 20px 20px 20px;
+}
+
+.chrome-upload-button {
+  border-radius: 0;
+  text-align: center;
+  font-weight: 700;
+  color: white;
+  padding: 5px 0px 5px 0px;
+  cursor: pointer;
+  line-height: 1;
+  background: #71C4A8;
+  position: relative;
+  margin-top: 3px; 
+}
+
+
+.chrome-data-inner {
+      padding: 80px 25px 0px 25px;
+}
+
+
+
+
+
+
+
+
+.chrome-project-title-container {
+  position: absolute;
+  top: 4px;
+  width: 100%;
+  text-align: center;
+}    
+
+.chrome-project-title {
+  text-align: center;
+  font-size: 14px;
+  color: #999;
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  width: auto;
+  top: 3px;
+  left: 9px;
+}
+
+.chrome-client-logo {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;    
+}
+
+.chrome-portal-logo {
+    top: 3px;
 }

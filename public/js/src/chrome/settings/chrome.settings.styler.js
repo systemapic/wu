@@ -48,7 +48,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 
 		// Create refresh button at bottom
-		this._createRefresh();
+		// this._createRefresh();
 
 		// mark as inited
 		this._inited = true;
@@ -67,6 +67,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
 		Wu.DomEvent.on(this._refreshButton, 'mouseover', this._closeColorRangeSelector, this);
+
+		// Pad up scroller
+		Wu.DomUtil.addClass(this._midSection, 'middle-section-padding-bottom');		
 	},	
 
 	
@@ -132,6 +135,18 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// get current style, returns default if none
 		var style = this._layer.getStyling();
 
+
+		console.log('');
+		console.log('');
+		console.log('');
+
+		console.log('style', style);
+
+		console.log('');
+		console.log('');
+		console.log('');
+
+
 		this.tabindex = 1;
 
 		if ( style ) { 
@@ -149,8 +164,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Display bottom container
 		Wu.DomUtil.removeClass(this._bottomContainer, 'displayNone');
 
-		// Pad up scroller
-		Wu.DomUtil.addClass(this._midSection, 'middle-section-padding-bottom');
 		
 	},
 
@@ -237,7 +250,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			input 		: false,
 			title 		: '<b>Point</b>',
 			isOn 		: isOn,
-			rightPos	: false,
+			rightPos	: true,
 			type 		: 'switch'
 		}
 		this._createMetaFieldLine(lineOptions);
@@ -291,7 +304,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			input 		: false,
 			title 		: '<b>Color</b>',
 			isOn 		: isOn,
-			rightPos	: false,
+			rightPos	: true,
 			type 		: 'color',
 			value 		: staticVal,
 			dropArray 	: this.metaFields,
@@ -328,7 +341,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			input 		: false,
 			title 		: '<b>Opacity</b>',
 			isOn 		: isOn,
-			rightPos	: false,
+			rightPos	: true,
 			type 		: 'miniInput',
 			value 		: val,
 			dropArray 	: this.metaFields,
@@ -364,7 +377,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			input 		: false,
 			title 		: '<b>Point size</b>',
 			isOn 		: isOn,
-			rightPos	: false,
+			rightPos	: true,
 			type 		: 'miniInput',
 			value 		: val,
 			dropArray 	: this.metaFields,
@@ -467,6 +480,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 				this.clearPointOptions();				
 			}			
 		}
+
+		// UPDATE
+		this._updateStyle();
 	},
 
 	// ON SELECT MINI DROP DOWN
@@ -474,6 +490,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		var key = e.target.getAttribute('key');
 		var fieldName = e.target.value;
+
+		var wrapper = e.target.parentElement;
 
 		// UNSELECTING FIELD
 		// UNSELECTING FIELD
@@ -498,6 +516,11 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 			this.cartoJSON.point[key].range = false;
 
+			// UPDATE
+			this._updateStyle();
+
+			Wu.DomUtil.removeClass(wrapper, 'full-width');
+
 			return;		
 		} 			
 
@@ -505,6 +528,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// SELECTING FIELD
 		// SELECTING FIELD
 		// SELECTING FIELD				
+
+
+		Wu.DomUtil.addClass(wrapper, 'full-width');
 
 		// DISABLE mini input fields
 		if ( key == 'opacity' || key == 'pointsize' ) {
@@ -523,6 +549,11 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// Add fields
 		this.addExtraFields(key, fieldName);
+
+
+		// UPDATE
+		this._updateStyle();
+
 	},
 
 	// ON BLUR IN MINI FIELDS
@@ -679,6 +710,11 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 				this.cartoJSON.point.color.customMinMax = [minVal, value];
 			}			
 		}
+
+
+		// UPDATE
+		this._updateStyle();
+
 	},	
 
 	updateColor : function (hex, key, wrapper) {
@@ -728,6 +764,10 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		}
 
 		this._closeColorRangeSelector();
+
+		// UPDATE
+		this._updateStyle();
+
 	},
 
 
@@ -1108,23 +1148,75 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 			var minMax = color.customMinMax ? color.customMinMax : color.minMax;
 
+
+
 			// Get color values
 			var c1 = color.value[0];
-			var c5 = color.value[1];
-			var c9 = color.value[2];
+			var c17 = color.value[1];
+			var c33 = color.value[2];
+
+			// Interpolate
+			var c9 = this.hexAverage([c1, c17]);
+			var c25 = this.hexAverage([c17, c33]);
+
+
+			// Interpolate
+			var c5 = this.hexAverage([c1, c9]);
+			var c13 = this.hexAverage([c9, c17]);
+			var c21 = this.hexAverage([c17, c25]);
+			var c29 = this.hexAverage([c25, c33]);
 
 			// Interpolate
 			var c3 = this.hexAverage([c1, c5]);
 			var c7 = this.hexAverage([c5, c9]);
+			var c11 = this.hexAverage([c9, c13]);
+			var c15 = this.hexAverage([c13, c17]);
+			var c19 = this.hexAverage([c17, c21]);
+			var c23 = this.hexAverage([c21, c25]);
+			var c27 = this.hexAverage([c25, c29]);
+			var c31 = this.hexAverage([c29, c33]);
 
 			// Interpolate
 			var c2 = this.hexAverage([c1, c3]);
 			var c4 = this.hexAverage([c3, c5]);
 			var c6 = this.hexAverage([c5, c7]);
 			var c8 = this.hexAverage([c7, c9]);
+			var c10 = this.hexAverage([c9, c11]);
+			var c12 = this.hexAverage([c11, c13]);
+			var c14 = this.hexAverage([c13, c15]);
+			var c16 = this.hexAverage([c15, c17]);
+			var c18 = this.hexAverage([c17, c19]);
+			var c20 = this.hexAverage([c19, c21]);
+			var c22 = this.hexAverage([c21, c23]);
+			var c24 = this.hexAverage([c23, c25]);
+			var c26 = this.hexAverage([c25, c27]);
+			var c28 = this.hexAverage([c27, c29]);
+			var c30 = this.hexAverage([c29, c31]);
+			var c32 = this.hexAverage([c31, c33]);
+
+			var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33];
 
 
-			colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9];
+
+
+
+
+			// // Get color values
+			// var c1 = color.value[0];
+			// var c5 = color.value[1];
+			// var c9 = color.value[2];
+
+			// // Interpolate
+			// var c3 = this.hexAverage([c1, c5]);
+			// var c7 = this.hexAverage([c5, c9]);
+
+			// // Interpolate
+			// var c2 = this.hexAverage([c1, c3]);
+			// var c4 = this.hexAverage([c3, c5]);
+			// var c6 = this.hexAverage([c5, c7]);
+			// var c8 = this.hexAverage([c7, c9]);
+
+			// var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9];
 
 
 			// CREATE VARS

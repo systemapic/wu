@@ -175,7 +175,9 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 			title 		: layerTitle,
 			isOn 		: on,
 			rightPos	: false,
-			type 		: 'switch'
+			type 		: 'switch',
+			radio 		: true,
+			radioOn		: false
 		}
 
 		this._createMetaFieldLine(lineOptions);
@@ -234,12 +236,15 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 	update : function () {
 
+		console.log('%c update ', 'background: red; color: white;');
+
 		if ( !this._mode ) this._mode = 'layer';
 
 		if ( this._mode == 'baselayer' ) this.markBaseLayerOccupied();
 		if ( this._mode == 'layer' )     this.markLayerOccupied();
 		
 		this.updateSwitches();
+		this.updateRadios();
 	},
 
 
@@ -309,9 +314,130 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	},
 
 
+	// TOGGLE RADIOS
+	// TOGGLE RADIOS
+	// TOGGLE RADIOS	
+
+	// Toggle radio
+	toggleRadio : function (e) {
+
+		var elem = e.target;
+		this.radioOnOff(elem);
+
+	},
+
+	radioOnOff : function (elem) {
+		var state = elem.getAttribute('state');
+		state == 'true' ? this.radioOff(elem) : this.radioOn(elem);
+	},
+
+
+	radioOn : function (elem) {
+
+		var id = elem.id;
+		var uuid = id.slice(6, id.length);		
+
+		Wu.DomUtil.addClass(elem, 'radio-on');
+		elem.setAttribute('state', 'true');
+
+		console.log('%c saveStartLayer ', 'background: red; color: white;')
+		console.log('layer id => ', uuid);
+		console.log('');		
+
+	},
+
+	radioOff : function (elem) {
+
+		var id = elem.id;
+		var uuid = id.slice(6, id.length);
+
+		Wu.DomUtil.removeClass(elem, 'radio-on');
+		elem.setAttribute('state', 'false');
+
+		console.log('%c removeStartLayer ', 'background: red; color: white;')
+		console.log('layer id => ', uuid);
+		console.log('');
+
+	},
+
+
+
+	// UPDATE RADIOS
+	// UPDATE RADIOS
+	// UPDATE RADIOS	
+
+
+	updateRadios : function () {
+
+	       	this.sortedLayers.forEach(function (provider) {
+	       		provider.layers.forEach(function (layer) {
+	       			this.updateRadio(layer);
+	       		}, this);
+	       	}, this);		
+	},
+
+
+	updateRadio : function (layer) {
+
+		// Get title 
+		var layerTitle = layer.getTitle();
+		var uuid       = layer.store.uuid;
+		var layerActive = false;
+		
+
+		if ( this._mode == 'baselayer' ) {}
+
+		// Only show radio if layer is active...
+		if ( this._mode == 'layer' ) {
+			this._project.store.layermenu.forEach(function (b) {
+				if ( uuid == b.layer ) { layerActive = true; return; }
+			}, this);
+		}
+
+		// Get switch
+		var s = Wu.DomUtil.get('radio_' + uuid);
+
+		if ( layerActive ) {
+			Wu.DomUtil.removeClass(s, 'displayNone');
+		} else {
+			Wu.DomUtil.addClass(s, 'displayNone');		
+		}
+	},	
+
+
 	// UPDATE SWITCHES
 	// UPDATE SWITCHES
 	// UPDATE SWITCHES
+
+	// Toggle switch
+	toggleSwitch : function (e) {
+
+		// get state
+		var stateAttrib = e.target.getAttribute('state');
+		var on = (stateAttrib == 'true');
+		var key = e.target.getAttribute('key');
+
+		if ( on ) {
+			e.target.setAttribute('state', 'false');
+			Wu.DomUtil.removeClass(e.target, 'switch-on');
+			var isOn = false;		
+
+			// Turn off radio
+			var radioElem = Wu.DomUtil.get('radio_' + key);
+			this.radioOff(radioElem);
+			
+		} else {
+			e.target.setAttribute('state', 'true');
+			Wu.DomUtil.addClass(e.target, 'switch-on');
+			var isOn = true;
+		}	
+
+		// save
+		this._saveToServer(key, '', isOn)
+
+		// Update radios
+		this.updateRadios();
+	},	
 
 	updateSwitches : function () {
 
