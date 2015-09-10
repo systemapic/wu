@@ -48,7 +48,7 @@ Wu.Share = Wu.Pane.extend({
 		var top = app.Chrome.Top;
 
 		// add a button to top chrome
-		top._registerButton({
+		this._shareButton = top._registerButton({
 			name : 'share',
 			className : 'chrome-button share',
 			trigger : this._togglePane,
@@ -66,6 +66,9 @@ Wu.Share = Wu.Pane.extend({
 
 		// add fullscreen click-ghost
 		this._addGhost();
+
+		// mark button active
+		Wu.DomUtil.addClass(this._shareButton, 'active');
 	},
 
 	_close : function () {
@@ -78,6 +81,9 @@ Wu.Share = Wu.Pane.extend({
 
 		// remove ghost
 		this._removeGhost();
+
+		// mark button inactive
+		Wu.DomUtil.removeClass(this._shareButton, 'active');
 	},
 
 	_addGhost : function () {
@@ -196,6 +202,7 @@ Wu.Share = Wu.Pane.extend({
 		// insert open pdf link
 		context._insertPDFLink(path);
 
+		app.ProgressBar.hideProgress();
 	},
 
 	_insertPDFLink : function (url) {
