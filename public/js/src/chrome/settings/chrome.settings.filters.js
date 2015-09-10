@@ -256,18 +256,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		this._storeActiveLayerUiid(layerUuid);
 
 		// get layer
-		// var layerUuid = e.target.value;
 		this._layer = this._project.getLayer(layerUuid);
-
-		// selecting layer in dropdown...
-		// .. problems:
-		// 1. what if layer is not in layer menu?
-		// 2. if not, should it be added?
-		// 3. what if user just clicks wrong layer?
-		// 4. should actually layers not in layermenu be available in dropdown? (they are now)
-		// 5. 
-		// ----------
-		// SOLUTION: temporarily add layers to map for editing, remove when done editing.
 
 		// filter chart
 		this._createFilterDropdown();
@@ -278,14 +267,11 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		// add layer temporarily to map
 		this._tempaddLayer();
 
-
 		// Display bottom container
 		Wu.DomUtil.removeClass(this._bottomContainer, 'displayNone');
 
 		// Pad up scroller
 		Wu.DomUtil.addClass(this._midSection, 'middle-section-padding-bottom');
-
-
 	},
 	
 	_tempaddLayer : function () {
@@ -327,8 +313,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_refreshEditor : function () {
-		console.log('filter refresheditor');
 
+		// refresh sql
 		this._refreshSQL();
 
 		// show
@@ -485,9 +471,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_clearFilterDiv : function () {
-
 		if (this._filterDiv) this._filterDiv.innerHTML = '';
-
 	},
 
 	_autoSelectFilter : function () {
@@ -582,6 +566,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		    .renderLabel(true)
 		    .dimension(runDimension)
 		    .group(speedSumGroup)
+		    // .mouseZoomable(true)
 		    .margins({top: 10, right: 10, bottom: 20, left: 40});
 
 		// filter event (throttled)
@@ -618,7 +603,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		// set events
 		chart.renderlet(function (chart) {
-			// this._chart.select('.brush').on('mouseup', this._onBrushMouseup.bind(this));
 			this._chart.select('.brush').on('mousedown', this._onBrushMousedown.bind(this));
 		}.bind(this));
 

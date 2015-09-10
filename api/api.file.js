@@ -398,6 +398,209 @@ module.exports = api.file = {
 	},
 
 
+	deleteFile : function (req, res) {
+
+		console.log('deleteFile', req.body);
+		
+		// could be other type files later, but postgis only for now.
+
+		var options = req.body,
+		    database_name = options.database_name,
+		    table_name = options.table_name,
+		    fileUuid = table_name,
+		    data_type = options.data_type,
+		    user = req.user,
+		    ops = [];
+
+		if (!database_name || !table_name) return api.error.missingInformation(req, res);
+
+
+		// get file model
+		ops.push(function (callback) {
+			File
+			.findOne({uuid : fileUuid})
+			.exec(callback)
+		});
+
+		// check permissions
+		ops.push(function (file, callback) {
+			console.log('TODO! permission to delete file!')
+			callback(null, file);
+		});
+
+		// remove file from user
+		ops.push(function (file, callback) {
+
+			User
+			.findOne({uuid : user.uuid})
+			.exec(function (err, u) {
+				u.files.pull(file._id);
+				u.markModified('files');
+				u.save(function (err) {
+					callback(null);
+				});
+			});
+		});
+
+		// remove file model
+		ops.push(function (callback) {
+
+			File
+			.findOne({uuid : fileUuid})
+			.remove(function (err, rmf) {
+				console.log('removed file model', err, rmf);
+				callback(null);
+			});
+		});
+
+
+		// remove postgis data
+		ops.push(function (callback) {
+			api.postgis.deleteTable({
+				database_name : database_name,
+				table_name : table_name
+			}, function (err) {
+				callback(err);
+			});
+		});
+
+
+		// ops.push(function (callback) {
+
+
+
+
+		// })
+
+
+		// remove layers based on dataset
+		ops.push(function (callback) {
+
+			Layer
+			.find({'data.postgis.table_name' : table_name})
+			.exec(function (err, layers) {
+				if (err) return api.error.general(req, res, err);
+				
+
+
+				// todo: remove layers from projects
+				api.file.deleteLayersFromProjects({
+					layers : layers
+				}, function (err) {
+					console.log('deleted layers from projec!', err);
+
+
+					console.log('gonna dlete these layers!! ', layers);
+					
+
+					// delete layer models
+					async.each(layers, function (layer, done) {
+						console.log('deleting layer: ', layer);
+						layer.remove(done)
+					}, function (err) {
+						console.log('deleted all layers', err);
+						callback(err);
+					});
+
+
+				});
+
+
+
+			});
+
+		});
+
+
+		async.waterfall(ops, function (err, results) {
+			console.log('waterfall done', err, results);
+			res.json({
+				success : true,
+				error : err
+			});
+		});
+
+
+
+	},
+
+	deleteLayersFromProjects : function (options, done) {
+		var layers = options.layers;
+
+
+		Project
+		.findOne({uuid : "project-d574c970-4bcd-4d94-aaa5-9fab88069849"})
+		.exec(function (err, randomProject) {
+			console.log('randomProject', randomProject);
+		})
+
+
+
+		async.each(layers, function (layer, callback) {
+
+			var layer_id = layer._id;
+			console.log('layer-----id', layer_id);
+
+			// find project
+			Project
+			.findOne({layers : layer_id})
+			.exec(function (err, p) {
+				console.log('FOUND PROJECT WITH LAYER -> ', p);
+
+				if (!p) return callback();
+
+				p.layers.pull(layer_id);
+				p.markModified('layers');
+				p.save(function (err) {
+					console.log('removed layer from project', err);
+					callback(err);
+				});
+
+			})
+
+
+		}, function (err) {
+
+			console.log('removed all layers from all projects?', err);
+
+			done(err);
+
+		});
+
+	},
+
+
+	// get postgis layers on dataset
+	getLayers : function (req, res) {
+
+		console.log('getLayers', req.body);
+		
+		var options = req.body,
+		    database_name = options.database_name,
+		    table_name = options.table_name,
+		    fileUuid = table_name,
+		    data_type = options.data_type,
+		    user = req.user,
+		    ops = [];
+
+		if (!database_name || !table_name) return api.error.missingInformation(req, res);
+
+		// todo: permissons
+
+
+		Layer
+		.find({'data.postgis.table_name' : table_name})
+		.exec(function (err, layers) {
+			if (err) return api.error.general(req, res, err);
+			
+			console.log('found layers: ', layers);
+
+			res.json(layers);
+		});
+
+
+	},
+
 	// delete a file
 	deleteFiles : function (req, res) {
 		var _fids  = req.body._fids,
