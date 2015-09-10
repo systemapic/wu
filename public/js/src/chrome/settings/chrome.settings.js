@@ -567,63 +567,31 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	// Saver dummy
 	_selectedMiniDropDown : function () {
-
-		console.log('%c ***************************** ', 'background: red; color: white');
-		console.log('%c Did you foget something?', 'color: blue');
-		console.log('%c Function "_selectedMiniDropDown" fired from parent function...', 'color: blue');
-		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
-		console.log('%c ***************************** ', 'background: red; color: white');
+		console.log('%c Function "_selectedMiniDropDown" fired from parent function => nothing happens', 'background: red; color: white');
 	},
 
 	// Saver dummy
 	saveMiniBlur : function () {
-
-		console.log('%c ***************************** ', 'background: red; color: white');
-		console.log('%c Did you foget something?', 'color: blue');
-		console.log('%c Function "saveMiniBlur" fired from parent function...', 'color: blue');
-		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
-		console.log('%c ***************************** ', 'background: red; color: white');
+		console.log('%c Function "saveMiniBlur" fired from parent function => nothing happens', 'background: red; color: white');
 	},
 
 	// Saver dummy
 	saveFromBlur : function () {
-
-		console.log('%c *****************************', 'background: red; color: white');
-		console.log('%c Did you foget something?', 'color: blue');
-		console.log('%c Function "saveFromBlur" fired from parent function...', 'color: blue');
-		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
-		console.log('%c ***************************** ', 'background: red; color: white');
+		console.log('%c Function "saveFromBlur" fired from parent function => nothing happens', 'background: red; color: white');
 	},
 
 	// Saver dummy
 	_saveToServer : function () {
-
-		console.log('%c ***************************** ', 'background: red; color: white');
-		console.log('%c Did you foget something?', 'color: blue');
-		console.log('%c Function "_saveToServer" fired from parent function...', 'color: blue');
-		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
-		console.log('%c ***************************** ', 'background: red; color: white');
+		console.log('%c Function "_saveToServer" fired from parent function => nothing happens', 'background: red; color: white');
 	},
 
 
 	saveSetClear : function () {
-
-		console.log('%c ***************************** ', 'background: red; color: white');
-		console.log('%c Did you foget something?', 'color: blue');
-		console.log('%c Function "saveSetClear" fired from parent function...', 'color: blue');
-		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
-		console.log('%c ***************************** ', 'background: red; color: white');
-
+		console.log('%c Function "saveSetClear" fired from parent function => nothing happens', 'background: red; color: white');
 	},
 
 	saveSet : function () {
-
-		console.log('%c ***************************** ', 'background: red; color: white');
-		console.log('%c Did you foget something?', 'color: blue');
-		console.log('%c Function "saveSet" fired from parent function...', 'color: blue');
-		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
-		console.log('%c ***************************** ', 'background: red; color: white');
-
+		console.log('%c Function "saveSet" fired from parent function => nothing happens', 'background: red; color: white');
 	},
 
 	_validateDateFormat : function (key) {
