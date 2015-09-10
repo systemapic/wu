@@ -1047,8 +1047,8 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		var file = layer && layer.getFile ? layer.getFile() : false;
 		// var caption = file ? file.store.name : item.caption;
-		var caption = layer.getTitle();
-		
+		var caption = file ? layerlayer.getTitle() : item.caption;
+
 		// create div
 		var className  = 'layer-menu-item-wrap';
 
@@ -1175,7 +1175,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.currentlyEditing = true;
 
 		var layerItem = this.layers[uuid];
-		var folder = layerItem.el.children[3];
+		var folder = layerItem.el.children[2];
 
 		// inject <input>
 		var title = folder.innerHTML;

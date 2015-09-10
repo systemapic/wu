@@ -1,6 +1,6 @@
 Wu.Chrome.Data = Wu.Chrome.extend({
 
-	_ : 'datachrome', 
+	_ : 'data', 
 
 	options : {
 		defaultWidth : 350
@@ -99,18 +99,22 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	_show : function () {
 
+		// mark button active
 		Wu.DomUtil.addClass(this._topButton, 'active');
 
 		this._container.style.display = 'block';
 		this._isOpen = true;
+
 	},
 
 	_hide : function () {
 
+		// mark button inactive
 		Wu.DomUtil.removeClass(this._topButton, 'active');
 
 		this._container.style.display = 'none';
 		this._isOpen = false;
+
 	},
 
 	onOpened : function () {

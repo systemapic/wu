@@ -146,6 +146,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 	},
 
 	closed : function () {
+		
 	},
 
 
@@ -547,7 +548,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 		// placeholder
 		var option = Wu.DomUtil.create('option', '', select);
-		option.innerHTML = 'select field';
+		option.innerHTML = 'Select column to style by...';
 		option.setAttribute('disabled', '');
 		option.setAttribute('selected', '');
 

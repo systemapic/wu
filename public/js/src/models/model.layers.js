@@ -94,6 +94,8 @@ Wu.Layer = Wu.Class.extend({
 
 		this._added = true;
 
+		console.error('add tooo');
+
 		// fire event
 		Wu.Mixin.Events.fire('layerEnabled', { detail : {
 			layer : this
@@ -112,6 +114,7 @@ Wu.Layer = Wu.Class.extend({
 
 	_removeThin : function () {
 		if (!this._inited) this.initLayer();
+
 		app._map.removeLayer(this.layer);
 	},
 
@@ -201,6 +204,8 @@ Wu.Layer = Wu.Class.extend({
 
 	remove : function (map) {
 		var map = map || app._map;
+
+		console.error('remove!');
 
 		// leaflet fn
 		if (map.hasLayer(this.layer)) map.removeLayer(this.layer);
@@ -570,7 +575,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		this._inited = true;
 	},
 
-	update : function (options) {
+	update : function (options, callback) {
 		var map = app._map;
 
 		// remove
@@ -584,9 +589,15 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 		// enable
 		if (options && options.enable) {
+			
+			console.error('piad to see', this._added);
+
 			map.addLayer(this.layer);
 			this.layer.bringToFront();
+
 		}
+
+		callback && callback();
 	},
 
 	_getLayerUuid : function () {
