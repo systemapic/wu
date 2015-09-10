@@ -263,6 +263,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// If project has no layers...
 		var layers = this._project.getPostGISLayers()
 
+
 		this.projectLayers.data = layers;
 
 		// Remove text for no layers...

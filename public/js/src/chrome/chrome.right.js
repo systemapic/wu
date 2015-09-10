@@ -85,7 +85,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		// hide all tabs
 		this._forEachTab(function (tab) {
 			tab._hide();
-			// tab.onClosed();
+			tab.onClosed();
 		});
 
 		// show tab
