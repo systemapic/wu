@@ -441,12 +441,28 @@ module.exports = function(app, passport) {
 		api.file.update(req, res);
 	});
 
+	// =====================================
+	// GET LAYERS OF FILE ==================
+	// =====================================
+	app.post('/api/file/getLayers', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.file.getLayers(req, res);
+	});
+
+
+
+	// // =====================================
+	// // DELETE FILE(S) ===================
+	// // =====================================
+	// app.post('/api/file/delete', passport.authenticate('bearer', {session: false}), function (req,res) {
+	// 	api.file.deleteFiles(req, res);
+	// });
+
 
 	// =====================================
 	// DELETE FILE(S) ===================
 	// =====================================
 	app.post('/api/file/delete', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.file.deleteFiles(req, res);
+		api.file.deleteFile(req, res);
 	});
 
 

@@ -260,6 +260,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// If project has no layers...
 		var layers = this._project.getPostGISLayers()
+
 		if ( layers.length == 0 ) {
 
 			var noDataText = ['<span style="font-style: italic; color: #ccc;">Click on files from the list below to add layers.</span>'];
