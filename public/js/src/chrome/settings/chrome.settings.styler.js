@@ -149,11 +149,13 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		this.tabindex = 1;
 
-		if ( style ) { 
-			this.cartoJSON = style;	
-		} else {
-			this.cartoJSON = {};
-		}
+		// if ( style ) { 
+		// 	this.cartoJSON = style;	
+		// } else {
+		// 	this.cartoJSON = {};
+		// }
+
+		this.cartoJSON = style || {};
 
 		// init style json
 		this._initStyle();
@@ -945,28 +947,28 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	},
 
 
-	// ADD/REMOVE THIN LAYERS
-	// ADD/REMOVE THIN LAYERS
-	// ADD/REMOVE THIN LAYERS
-
-	// xoxoxoxoxoxox
-
+	// add layer temporarily for editing
 	_tempaddLayer : function () {
 
 		// remember
 		this._temps = this._temps || [];
 
-		// remove other styling layers
+		// remove others
 		this._tempRemoveLayers();
 
-		// add
-		this._layer._addThin();
+		// if not already added to map
+		if (!this._layer._added) {
 
-		// remember
-		this._temps.push(this._layer);
+			// add
+			this._layer._addThin();
+
+			// remember
+			this._temps.push(this._layer);
+		}
 
 	},
 
+	// remove temp added layers
 	_tempRemoveLayers : function () {
 		if (!this._temps) return;
 
@@ -1344,10 +1346,16 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		this._layer.setStyling(this.cartoJSON);
 
+		console.log('saveCartoJSON this._layuer', this._layer);
+
+		var sql = this._layer.getSQL();
+
+		console.log('sql:', sql);
+
 		// request new layer
 		var layerOptions = {
 			css : finalCarto, 
-			sql : "(SELECT * FROM table) as sub",
+			sql : sql,
 			layer : this._layer
 		}
 
@@ -1403,14 +1411,11 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 				return console.error(newLayerStyle.error);
 			}
 
-			// set & update
-			layer.setStyle(newLayerStyle.options);
-			// layer.update({enable : true});
-			layer.update({}, function () {
-				console.log('CALLBACK');
-				that._tempaddLayer();
-			});
-			
+
+			console.log('got new layer -> set newLayerStyle', newLayerStyle);
+
+			// update layer
+			layer.updateStyle(newLayerStyle);
 
 			// return
 			done && done();

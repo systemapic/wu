@@ -50,6 +50,18 @@ var api = module.parent.exports;
 module.exports = api.postgis = { 
 
 	
+
+	deleteTable : function (options, callback) {
+
+
+		console.log('postgis deleteTable', options);
+
+
+		callback(null);
+
+	},
+
+	
 	createDatabase : function (options, done) {
 		var user = options.user,
 		    userUuid = options.user.uuid,

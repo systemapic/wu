@@ -472,11 +472,8 @@ Wu.Layer = Wu.Class.extend({
 		this.setLegends(legends);
 	},
 
-	setStyle : function (postgis) {
-		if (!postgis) return console.error('no styloe to set!');
-		
-		this.store.data.postgis = postgis;
-		this.save('data');
+	setStyle : function () {
+
 	},
 
 	createLegends : function (callback) {
@@ -600,6 +597,25 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		callback && callback();
 	},
 
+	setStyle : function (postgis) {
+		if (!postgis) return console.error('no styloe to set!');
+		
+		this.store.data.postgis = postgis;
+		this.save('data');
+	},
+
+	// on change in style editor, etc.
+	updateStyle : function (style) {
+		var layerUuid = style.layerUuid,
+		    postgisOptions = style.options;
+
+		// save 
+		this.setStyle(postgisOptions);
+
+		// update layer option
+		this._refreshLayer(layerUuid);
+	},
+
 	_getLayerUuid : function () {
 		return this.store.data.postgis.layer_id;
 	},
@@ -613,7 +629,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 	},
 
 	setFilter : function (filter) {
-		console.log('setFilter: ', filter);
 		this.store.filter = filter;
 		this.save('filter');
 	},
@@ -624,6 +639,14 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 	getPostGISData : function () {
 		return this.store.data.postgis;
+	},
+
+	_refreshLayer : function (layerUuid) {
+		this.layer.setOptions({
+			layerUuid : layerUuid
+		});
+
+		this.layer.redraw();
 	},
 
 

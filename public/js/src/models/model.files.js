@@ -183,7 +183,62 @@ Wu.Files = Wu.Class.extend({
 
 	// todo: move all delete of files here
 	_deleteFile : function () {
-		console.log('file._deleteFile', this.getName());
+		console.log('file._deleteFile', this.getName(), this);
+
+
+
+		// check if dataset has layers
+		this._getLayers(function (err, layers) {
+			console.log('_getLayers', err, layers);
+
+			var num_layers = layers.length;
+			var pretty_layers = [];
+
+			layers.forEach(function (l, n, m) {
+				pretty_layers.push('- ' + l.title);
+			});
+
+			var has_layers_msg = 'There exists ' + num_layers + ' layers based on this dataset: \n' + pretty_layers.join('\n') + '\n\nDeleting dataset will delete all layers. Are you sure?';
+			var just_confirm = 'Do you really want to delete dataset ' + this.getName() + '?';
+			var message = num_layers ? has_layers_msg : just_confirm;
+			var confirmed = confirm(message);
+
+			if (!confirmed) return console.log('Nothing deleted.');
+			
+			// delete file
+			var postgisOptions = this.getPostGISData();
+			Wu.post('/api/file/delete', JSON.stringify(postgisOptions), function (err, response) {
+				console.log('deleted?', err, response);
+
+			});
+			
+
+
+
+		}.bind(this));
+
+
+		return;
+
+
+		
+
+
+	},
+
+	_getLayers : function (callback) {
+
+		// get layers connected to dataset
+		var postgisOptions = this.getPostGISData();
+		Wu.post('/api/file/getLayers', JSON.stringify(postgisOptions), function (err, response) {
+			var layers = Wu.parse(response);
+			callback(err, layers);
+		});
+	},
+
+	getPostGISData : function () {
+		if (!this.store.data) return false;
+		return this.store.data.postgis;
 	},
 
 	_shareFile : function () {
@@ -193,10 +248,7 @@ Wu.Files = Wu.Class.extend({
 	_createLayer : function (project) {
 		console.log('file._createLayer', this.getName(), project);
 
-
 		this._createDefaultLayer(project);
-
-
 	},
 
 	_downloadFile : function () {
@@ -227,10 +279,6 @@ Wu.Files = Wu.Class.extend({
 			"projectUuid" : project.getUuid()
 		}
 
-		console.log('_createDefaultLayer', layerJSON);
-
-
-
 		// create postgis layer
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
 			console.log('api/db/createLayer', err, layerJSON);
@@ -242,8 +290,8 @@ Wu.Files = Wu.Class.extend({
 					postgis : layer.options
 				},
 				metadata : layer.options.metadata,
-				title : file.getName() + ' Layer',
-				description : 'Default layer',
+				title : 'Layer from ' + file.getName(),
+				description : 'Description: Layer created from ' + file.getName(),
 				file : file.getUuid()
 			}
 
@@ -253,32 +301,26 @@ Wu.Files = Wu.Class.extend({
 				// refresh Sidepane Options
 				project.addLayer(layerModel);
 
-
 				// todo: set layer icon
 				app.feedback.setMessage({
-					title : 'Done processing!',
-					description : 'Added <strong>' + layerModel.title + '</strong> to available layers.',
+					title : 'Created layer from dataset',
+					description : 'Added <strong>' + layerModel.title + '</strong> to project.',
 				});	
 
 				// select project
 				Wu.Mixin.Events.fire('layerAdded', {detail : {
 					projectUuid : project.getUuid()
 				}});
-
-			})
+			});
 			
 		}.bind(this));
 
 	},
 
 	_createLayerModel : function (options, done) {
-
 		Wu.Util.postcb('/api/layers/new', JSON.stringify(options), function (err, body) {
-
 			var layerModel = Wu.parse(body);
-
 			done(null, layerModel);
-
 		}.bind(this));
 	},
 
