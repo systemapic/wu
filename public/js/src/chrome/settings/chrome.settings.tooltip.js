@@ -35,18 +35,21 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 	_refresh : function () {
 
-		this._flush();
+		// this._flush();
 		this._initLayout();
 	},
 
 	_flush : function () {
+
 		this._container.innerHTML = '';
 	},
 
 	// Runs on init
 	show : function () {
-		
+
 		if (!this._inited) this._initLayout();
+
+		this._midInnerScroller.innerHTML = '';
 
 		// hide others
 		this.hideAll();
@@ -207,7 +210,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	// Init meta fields and time series
 	initFields : function () {
 
-		// 
 		this.fieldListFromObject('Fields');
 		if ( this.tooltipMeta.timeSeries ) this.initTimeSeries();
 	},
@@ -410,25 +412,4 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		console.log('open!', this);
 	},
 
-	// show : function () {
-	// 	if (!this._inited) this._initLayout();
-
-	// 	// hide others
-	// 	this.hideAll();
-
-	// 	// show this
-	// 	this._container.style.display = 'block';
-
-	// 	// mark button
-	// 	Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
-	// },
-
-	// // Validate date format
-	// checkDateFormat : function (key) {
-
-	// 	if ( key.length != 8 ) return false;		
-	// 	var m = moment(key, ["YYYYMMDD", moment.ISO_8601]).format("MMM Do YY");		
-	// 	if ( m == 'Invalid date' ) return false;
-	// 	return true;
-	// },
 });

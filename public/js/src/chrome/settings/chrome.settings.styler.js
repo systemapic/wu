@@ -65,6 +65,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	
 	_refresh : function () {
 
+		console.log('%c _refresh styler', 'background: green; color: white;')
+
 		this._flush();
 		this._initLayout();
 	},

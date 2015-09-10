@@ -156,11 +156,17 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_show : function () {
+
+		Wu.DomUtil.addClass(this._settingsButton, 'active');
+
 		this._container.style.display = 'block';
 		this._isOpen = true;
 	},
 
 	_hide : function () {
+
+		Wu.DomUtil.removeClass(this._settingsButton, 'active');
+
 		this._container.style.display = 'none';
 		this._isOpen = false;
 	},
