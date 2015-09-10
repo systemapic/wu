@@ -202,6 +202,7 @@ Wu.Share = Wu.Pane.extend({
 		// insert open pdf link
 		context._insertPDFLink(path);
 
+		app.ProgressBar.hideProgress();
 	},
 
 	_insertPDFLink : function (url) {
