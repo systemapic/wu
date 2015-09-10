@@ -581,7 +581,6 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getLayer : function (uuid) {
-		console.log('getLaer', uuid, this.layers);
 		return this.layers[uuid];
 	},
 
@@ -804,7 +803,6 @@ Wu.Project = Wu.Class.extend({
 		var remd = _.remove(this.store.pending, function (p) {
 			return p == file_id;
 		});
-		console.log('removed???', this.store.pending, remd);
 		this._update('pending');
 	},
 
