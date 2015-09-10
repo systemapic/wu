@@ -21,6 +21,8 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 		if (!this._project) return;
   
+		console.log('%c _initLayout ', 'background: #FF33FF; color: white;');
+
   		// Scroller
 		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
 		this._midOuterScroller = Wu.DomUtil.create('div', 'chrome-middle-section-outer-scroller', this._midSection);
@@ -28,6 +30,9 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 		// active layer
 		this.layerSelector = this._initLayout_activeLayers(false, false, this._midInnerScroller);
+
+		// Fields wrapper
+		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 
 		// mark as inited
 		this._inited = true;
@@ -49,7 +54,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 		if (!this._inited) this._initLayout();
 
-		this._midInnerScroller.innerHTML = '';
+		this._fieldsWrapper.innerHTML = '';
 
 		// hide others
 		this.hideAll();
@@ -91,7 +96,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		// If no tooltip meta stored, create from layer meta
 		if ( !this.tooltipMeta ) this.tooltipMeta = this.createTooltipMeta(layerMeta);
 
-		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
+		// this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 
 		// Init title
 		this.initTitle();

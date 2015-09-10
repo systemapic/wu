@@ -52,12 +52,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	initTopContainer : function () {
 
-		// Bottom container
+		// Top container
 		this.topContainer = Wu.DomUtil.create('div', 'chrome-data-top', this._container);
 
+		this.topTitle = Wu.DomUtil.create('div', 'chrome-header-title', this.topContainer, 'Data Library')
+
 		// Upload button
-		this.uploadButton = app.Data.getUploadButton('chrome-right-big-button upload', this.topContainer);
-		this.uploadButton.innerHTML = 'Upload';
+		this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this.topContainer);
+		this.uploadButton.innerHTML = 'Upload files...';
 
 	},
 
@@ -260,20 +262,21 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// If project has no layers...
 		var layers = this._project.getPostGISLayers()
-		if ( layers.length == 0 ) {
 
+		this.projectLayers.data = layers;
+
+		// Remove text for no layers...
+		this.createNoLayer(D3container, []);
+		this.initFileList(D3container, layers, 'layers');		
+
+
+		// If no layers, make a dummy
+		if ( layers.length == 0 ) {
 			var noDataText = ['<span style="font-style: italic; color: #ccc;">Click on files from the list below to add layers.</span>'];
 			this.createNoLayer(D3container, noDataText);
 
-		// Init layers data
-		} else {
-			this.projectLayers.data = layers;
-
-			// Remove text for no layers...
-			this.createNoLayer(D3container, []);
-
-			this.initFileList(D3container, layers, 'layers');
-		}
+		} 
+		
 		
 
 
@@ -421,6 +424,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				if ( library == 'layers' ) return d.getTitle();
 				return d.getName();
 			}.bind(this))
+			.on('dblclick', function (d) {
+				this.activateInput(d, library);
+			}.bind(this));			
 
 
 		// Exit
@@ -434,6 +440,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 	},
+
+	
+	// ┌─┐┬┬  ┌─┐  ┬┌┐┌┌─┐┬ ┬┌┬┐
+	// ├┤ ││  ├┤   ││││├─┘│ │ │ 
+	// └  ┴┴─┘└─┘  ┴┘└┘┴  └─┘ ┴ 	
 
 	createInputField : function (parent, library) {
 
@@ -524,12 +535,15 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Update
 		popupTrigger
-			.on('click', function (d) {
-				this.singleClick(d, library);
+			.classed('active', function (d) {
+				var uuid = d.getUuid()
+				if ( uuid == this.showFileActionFor ) return true;
+				return false;
 			}.bind(this))
-			.on('dblclick', function (d) {
-				this.dblClick(d, library);
-			}.bind(this));			
+			.on('click', function (d) {
+				var uuid = d.getUuid();
+				this.click_showFileOptions(uuid)
+			}.bind(this))	
 
 
 		// Exit
@@ -750,22 +764,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 
-	singleClick : function (d, library) {
 
-		var e = window.event;
-
-    		if (this.timer) clearTimeout(this.timer);
-    		
-    		this.timer = setTimeout(function() {
-    			this.dataListClickEvents(d, library, e)
-    		}.bind(this), 250);
-
-	},
-
-
-	dblClick : function (d, library) {
-
-		clearTimeout(this.timer);
+	activateInput : function (d, library) {
 
 		this.editingName = d.getUuid();
 		this.showFileActionFor = false;
@@ -795,7 +795,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		}
 		
 		// Else just click
-		this.click_showFileOptions(this, uuid); 
+		// this.click_showFileOptions(this, uuid); 
 
 	},
 
@@ -897,10 +897,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	// Just click
 
-	click_showFileOptions : function (elem, uuid) {
+	click_showFileOptions : function (uuid) {
 
-		// Stop if we're editing name
-		if ( this.editingName ) return;
+		console.log('click_showFileOptions', uuid);
 
 		// Deselect
 		if ( this.showFileActionFor == uuid ) {

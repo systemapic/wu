@@ -33,14 +33,20 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		// active layer
 		this.layerSelector = this._initLayout_activeLayers('Datasets', 'Select a dataset to filter...', this._midInnerScroller);
 
-		// wrapper
-		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._midInnerScroller);
+
+		// create fixed bottom container
+		this._bottomContainer = Wu.DomUtil.create('div', 'sql-bottom-container', this._container);
+
+		this._sqltitle = Wu.DomUtil.create('div', 'chrome chrome-content cartocss title', this._bottomContainer, 'SQL');
+
+		// CodeMirror
+		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._bottomContainer);
 
 		// sql editor
 		this._createSqlEditor();
 
 		// create refresh button
-		this._createRefresh();
+		// this._createRefresh();
 
 		// insert titles
 		this._createSQLwrapper();
@@ -60,8 +66,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	_createRefresh : function () {
 
 
-		// create fixed bottom container
-		this._bottomContainer = Wu.DomUtil.create('div', 'chrome-content-bottom-container displayNone', this._container);
+		// // create fixed bottom container
+		// this._bottomContainer = Wu.DomUtil.create('div', 'chrome-content-bottom-container displayNone', this._container);
 
 
 		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
@@ -99,12 +105,12 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	_createSQLwrapper : function () {
 
 		// create
-		this._sqltitle = Wu.DomUtil.create('div', 'chrome chrome-content cartocss title');
-		this._sqltitle.innerHTML = 'SQL';
+		// this._sqltitle = Wu.DomUtil.create('div', 'chrome chrome-content cartocss title');
+		// this._sqltitle.innerHTML = 'SQL';
 		
 		// insert
-		var s = this._SQLEditor.getWrapperElement();
-		s.parentElement.insertBefore(this._sqltitle, s);
+		// var s = this._SQLEditor.getWrapperElement();
+		// s.parentElement.insertBefore(this._sqltitle, s);
 
 	},
 
@@ -125,7 +131,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		var sql = this._SQLEditor.getWrapperElement();
 		if (sql) {
 			sql.style.width = dims.width + 'px';
-			sql.style.height = (dims.height/3*1) - 220 + 'px';
+			// sql.style.height = (dims.height/3*1) - 220 + 'px';
+			sql.style.height = '72px';
 		}
 	},
 
@@ -277,7 +284,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 
 		// Display bottom container
-		Wu.DomUtil.removeClass(this._bottomContainer, 'displayNone');
+		this._bottomContainer.style.opacity = 1;
 
 		// Pad up scroller
 		Wu.DomUtil.addClass(this._midSection, 'middle-section-padding-bottom');
@@ -392,14 +399,14 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	_showEditors : function () {
 		this._SQLEditor.getWrapperElement().style.opacity = 1;
-		this._sqltitle.style.opacity = 1;
-		this._refreshButton.style.opacity = 1;
+		// this._sqltitle.style.opacity = 1;
+		// this._refreshButton.style.opacity = 1;
 	},
 
 	_hideEditors : function () {
 		this._SQLEditor.getWrapperElement().style.opacity = 0;
-		this._sqltitle.style.opacity = 0;
-		this._refreshButton.style.opacity = 0;
+		// this._sqltitle.style.opacity = 0;
+		// this._refreshButton.style.opacity = 0;
 	},
 
 	_createSqlEditor : function () {
@@ -415,6 +422,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
     			paletteHints : true,
     			gutters: ['CodeMirror-linenumbers', 'errors']
   		});
+
+
 	},
 
 	_getSortedColumns : function () {

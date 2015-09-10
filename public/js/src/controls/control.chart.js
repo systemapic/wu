@@ -142,14 +142,19 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Create smaller pop-up if there are no graphs to show
 		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == false ) {
-			var maxWidth = 150;
-			var minWidth = 150;
+			var maxWidth = 200;
+			var minWidth = 200;
 
 		// Create large pop-up for graph
 		} else {
 			var maxWidth = 400;
 			var minWidth = 200;			
 		}
+
+
+		console.log('%c _createPopup ', 'background: red; color: white;');
+		console.log('minWidth', minWidth);
+		console.log('maxWidth', maxWidth);
 
 		// create popup
 		var popup = this._popup = Wu.popup({
@@ -161,6 +166,13 @@ Wu.Control.Chart = Wu.Control.extend({
 			maxHeight : 350,
 			appendTo : app._appPane // where to put popup
 		});
+
+
+
+		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == false ) {
+			Wu.DomUtil.addClass(popup._container, 'tiny-pop-up')
+		}
+
 
 		return popup;
 	},
@@ -271,8 +283,7 @@ Wu.Control.Chart = Wu.Control.extend({
 	},
 
 	// Create multi point C3 pop-up content
-	multiPointPopUp : function (_data) {	
-
+	multiPointPopUp : function (_data) {			
 
 		var _average = _data.average;
 		var _center = _data.center;
@@ -333,9 +344,16 @@ Wu.Control.Chart = Wu.Control.extend({
 		var _header = this.createHeader(headerOptions);
 		content.appendChild(_header);
 
-		// Create chart
-		var _chart = this.C3Chart(_c3Obj);
-		content.appendChild(_chart);
+
+		if ( this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == true ) {
+
+			// Create chart
+			var _chart = this.C3Chart(_c3Obj);
+			content.appendChild(_chart);
+
+		}
+
+
 
 		return content;
 	},		
