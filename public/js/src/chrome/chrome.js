@@ -20,8 +20,10 @@ Wu.Chrome = Wu.Class.extend({
 		Wu.Mixin.Events.on('layerEnabled',    this._layerEnabled, this);
 		Wu.Mixin.Events.on('layerDisabled',   this._layerDisabled, this);
 		Wu.Mixin.Events.on('fileImported',    this._onFileImported, this);
+		Wu.Mixin.Events.on('fileDeleted',     this._onFileDeleted, this);
 		Wu.Mixin.Events.on('layerAdded',      this._onLayerAdded, this);
-		Wu.Mixin.Events.on('layerEdited',      this._onLayerEdited, this);
+		Wu.Mixin.Events.on('layerEdited',     this._onLayerEdited, this);
+		Wu.Mixin.Events.on('layerDeleted',    this._onLayerDeleted, this);
 	},
 
 	_projectSelected : function (e) {
@@ -41,6 +43,8 @@ Wu.Chrome = Wu.Class.extend({
 	// dummies
 	// _projectSelected : function () {},
 	_initialize 	 : function () {},
+	_initContainer   : function () {},
+
 	_editEnabled 	 : function () {},
 	_editDisabled 	 : function () {},
 	_layerEnabled 	 : function () {},
@@ -48,9 +52,10 @@ Wu.Chrome = Wu.Class.extend({
 	_updateView 	 : function () {},
 	_refresh 	 : function () {},
 	_onFileImported  : function () {},
+	_onFileDeleted   : function () {},
 	_onLayerAdded    : function () {},
-	_onLayerEdited    : function () {},
-	_initContainer   : function () {},
+	_onLayerEdited   : function () {},
+	_onLayerDeleted  : function () {},
 
 
 });
