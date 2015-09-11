@@ -559,6 +559,19 @@ Wu.Layer = Wu.Class.extend({
 
 	},
 
+	downloadLayer : function () {
+		console.log('download layer', this);
+	},
+	shareLayer : function () {
+		console.log('download layer', this);
+	},
+	deleteLayer : function () {
+		console.log('download layer', this);
+
+
+	},
+	
+
 });
 
 
@@ -792,6 +805,32 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 
 	},
+
+
+	downloadLayer : function () {
+		console.log('download layer postgis', this);
+	},
+	shareLayer : function () {
+		console.log('share layer postgis', this);
+	},
+	deleteLayer : function () {
+		console.log('delete layer postgis', this);
+
+		// confirm
+		var message = 'Are you sure you want to delete this layer? \n - ' + this.getTitle();
+		if (!confirm(message)) return console.log('No layer deleted.');
+
+		// get project
+		var layerUuid = this.getUuid();
+		var project = _.find(app.Projects, function (p) {
+			return p.layers[layerUuid];
+		})
+
+		// delete layer
+		project.deleteLayer(this);
+
+	},
+	
 
 });
 

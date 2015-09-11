@@ -245,65 +245,114 @@ module.exports = api.layer = {
 
 	},
 
-
 	deleteLayer : function (req, res) {
 
-		var projectUuid  = req.body.projectUuid,
-		    userid = req.user.uuid,
-		    layerUuids = req.body.layerUuids,
-		    ops = [],
-		    _lids = [];
 
-		// validate
-		if (!projectUuid || !userid) return api.error.missingInformation(req, res);
+		var options = req.body,
+		    layerUuid = options.layerUuid,
+		    projectUuid = options.projectUuid,
+		    ops = [];
 
-		// find layer _ids for removing in project
+
+		// delete layer model
+		// delete from project
+
 		ops.push(function (callback) {
-			Layer.find({uuid : {$in : layerUuids}}, function (err, layers) {
-				if (err || !layers) return callback(err || 'No layers.');
 
-				layers.forEach(function (layer) {
-					_lids.push(layer._id);
-				});
+			Layer
+			.findOne({uuid : layerUuid})
+			.remove(function (err, layer) {
+				console.log('removed layer: ', err, layer);
 
-				callback(err);
-			});
+				callback(err, layer._id);
+			})
+
 		});
 
+		ops.push(function (layer_id, callback) {
 
-
-		// delete layer from project
-		ops.push(function (callback) {
-			
 			Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
-				if (err || !project) return callback(err || 'No project.');
 
-				// pull layers
-				_lids.forEach(function (l) {
-					project.layers.pull(l)
-				})
-				
-				// project.markModified('files');
+				project.layers.pull(layer_id)
 				project.markModified('layers');
-				project.save(function (err) {
-					callback(err);
-				});
+				project.save(callback);
+			})
+		});
+
+		async.waterfall(ops, function (err, results) {
+			console.log('all done? ', err, results);
+			res.json({
+				success : true,
+				error : err
 			});
 		});
 
-	
-		// run queries
-		async.series(ops, function(err) {
-			if (err) return api.error.general(req, res, err);		
-
-			res.end(JSON.stringify({
-				error : err
-			}));
-		});
 
 	},
+
+
+
+
+	// deleteLayer : function (req, res) {
+
+	// 	var projectUuid  = req.body.projectUuid,
+	// 	    userid = req.user.uuid,
+	// 	    layerUuids = req.body.layerUuids,
+	// 	    ops = [],
+	// 	    _lids = [];
+
+	// 	// validate
+	// 	if (!projectUuid || !userid) return api.error.missingInformation(req, res);
+
+	// 	// find layer _ids for removing in project
+	// 	ops.push(function (callback) {
+	// 		Layer.find({uuid : {$in : layerUuids}}, function (err, layers) {
+	// 			if (err || !layers) return callback(err || 'No layers.');
+
+	// 			layers.forEach(function (layer) {
+	// 				_lids.push(layer._id);
+	// 			});
+
+	// 			callback(err);
+	// 		});
+	// 	});
+
+
+
+	// 	// delete layer from project
+	// 	ops.push(function (callback) {
+			
+	// 		Project
+	// 		.findOne({uuid : projectUuid})
+	// 		.exec(function (err, project) {
+	// 			if (err || !project) return callback(err || 'No project.');
+
+	// 			// pull layers
+	// 			_lids.forEach(function (l) {
+	// 				project.layers.pull(l)
+	// 			})
+				
+	// 			// project.markModified('files');
+	// 			project.markModified('layers');
+	// 			project.save(function (err) {
+	// 				callback(err);
+	// 			});
+	// 		});
+	// 	});
+
+	
+	// 	// run queries
+	// 	async.series(ops, function(err) {
+	// 		if (err) return api.error.general(req, res, err);		
+
+	// 		res.end(JSON.stringify({
+	// 			error : err
+	// 		}));
+	// 	});
+
+	// },
 
 
 	// reload layer meta
