@@ -1437,6 +1437,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_updateLayer : function (options, done) {
 
+		console.error('_udpateLayuer');
+
 		var css = options.css,
 		    layer = options.layer,
 		    file_id = layer.getFileUuid(),

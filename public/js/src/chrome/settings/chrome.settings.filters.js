@@ -718,7 +718,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		// filter, redraw
 		this._chart.filter([c.bucket_min, c.bucket_max]);
 		this._chart.redraw();
-
 	},
 
 	_getYAxisTicks : function (histogram) {
