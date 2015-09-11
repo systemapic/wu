@@ -602,7 +602,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 			this._updateChart(histogram, column);
 
 			// Reset filter
-			this._chart.filter([1,49]);
+			this._chart.filterAll();
 
 			// render
 			this._chart.redraw();
