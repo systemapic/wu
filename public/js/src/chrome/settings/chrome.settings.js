@@ -306,10 +306,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		if ( type == 'colorrange' ) {
 
 			// Set styling
-			var gradientStyle = 'background: -webkit-linear-gradient(left, ' + val.join() + ');';
-			gradientStyle    += 'background: -o-linear-gradient(right, '     + val.join() + ');';
-			gradientStyle    += 'background: -moz-linear-gradient(right, '   + val.join() + ');';
-			gradientStyle    += 'background: linear-gradient(to right, '     + val.join() + ');';
+			var gradientStyle = this._gradientStyle(val);
 
 			var colorRangeWrapper = Wu.DomUtil.create('div', 'chrome-color-range-wrapper', fieldWrapper)
 			    colorRangeWrapper.setAttribute('key', key);
@@ -326,17 +323,20 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 			var colorSelectorWrapper = Wu.DomUtil.create('div', 'chrome-color-selector-wrapper displayNone', colorRangeWrapper);
 			    colorSelectorWrapper.id = 'chrome-color-selector-wrapper-' + key;
 
-			var colorBall_3 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-3', colorSelectorWrapper);
+
+			var colorBallWrapper = Wu.DomUtil.create('div', 'chrome-color-ball-wrapper', colorSelectorWrapper)
+
+			var colorBall_3 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-3', colorBallWrapper);
 			    colorBall_3.id = 'color-range-ball-3-' + key;
 			    colorBall_3.style.background = val[2];
 			    colorBall_3.setAttribute('hex', val[2]);
 			    
-			var colorBall_2 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-2', colorSelectorWrapper);
+			var colorBall_2 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-2', colorBallWrapper);
 			    colorBall_2.id = 'color-range-ball-2-' + key;
 			    colorBall_2.style.background = val[1];
 			    colorBall_2.setAttribute('hex', val[1]);
 
-			var colorBall_1 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-1', colorSelectorWrapper);
+			var colorBall_1 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-1', colorBallWrapper);
 			    colorBall_1.id = 'color-range-ball-1-' + key;
 			    colorBall_1.style.background = val[0];
 			    colorBall_1.setAttribute('hex', val[0]);			        			    			    
@@ -345,8 +345,38 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 			    this.initSpectrum(this, val[1], colorBall_2, key);
 			    this.initSpectrum(this, val[2], colorBall_3, key);
 
-			Wu.DomEvent.on(color, 'click', this.toggleColorRange, this);
 
+			// Color range presets
+			// Color range presets
+			// Color range presets
+
+			var colorRangePresetWrapper = Wu.DomUtil.create('div', 'color-range-preset-wrapper', colorSelectorWrapper);
+
+			var colorRangesPresets = [
+				['#ff0000', '#00ff00', '#0000ff'],
+				['#ff007d', '#ffff00', '#007dff'],
+				['#ff7d00', '#ffff00', '#00ff7d'],
+				['#ff00ff', '#ffff00', '#00ffff'],
+				['#ffff00', '#ff00ff', '#00ffff'],
+				['#ff0000', '#00ff00'],
+				['#ff007d', '#ffff00'],
+				['#0000ff', '#ffff00'],
+				['#ff7d00', '#00ff00']
+			]
+
+			colorRangesPresets.forEach(function(preset, i) {
+
+				var gradientStyle = this._gradientStyle(preset);
+				var colorRangePreset = Wu.DomUtil.create('div', 'color-range-preset', colorRangePresetWrapper);
+				    colorRangePreset.id = 'color-range-preset-' + i;
+				    colorRangePreset.setAttribute('style', gradientStyle);
+				    colorRangePreset.setAttribute('hex', preset.join(','));
+
+				    Wu.DomEvent.on(colorRangePreset, 'click', this.selectColorPreset, this);
+
+			}.bind(this))
+
+			Wu.DomEvent.on(color, 'click', this.toggleColorRange, this);
 			Wu.DomEvent.on(clickCatcher, 'click', this.stopEditingColorRange, this);
 		}
 
@@ -394,6 +424,18 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		}
 	},
 
+
+	_gradientStyle : function (colorArray) {
+
+		var gradientStyle = 'background: -webkit-linear-gradient(left, ' + colorArray.join() + ');';
+		gradientStyle    += 'background: -o-linear-gradient(right, '     + colorArray.join() + ');';
+		gradientStyle    += 'background: -moz-linear-gradient(right, '   + colorArray.join() + ');';
+		gradientStyle    += 'background: linear-gradient(to right, '     + colorArray.join() + ');';
+
+		return gradientStyle;
+
+	},
+
 	initSpectrum : function (context, hex, wrapper, key) {
 
 
@@ -426,6 +468,11 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	},
 
+
+	selectColorPreset : function (e) {
+
+	},
+
 	
 	toggleColorRange : function (e) {
 	        
@@ -451,17 +498,6 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	},
 
-	// _closeColorRangeSelector : function () {
-
-	// 	var key = 'colorrange';
-
-	// 	var rangeSelector = Wu.DomUtil.get('chrome-color-selector-wrapper-' + key);
-	// 	var clickCatcher = Wu.DomUtil.get('click-catcher-' + key);
-
-	// 	Wu.DomUtil.addClass(rangeSelector, 'displayNone');
-	// 	Wu.DomUtil.addClass(clickCatcher, 'displayNone');		
-
-	// },
 
 	// Make sure hex decimals have two digits
 	padToTwo : function (numberString) {
