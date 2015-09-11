@@ -721,7 +721,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	updateColor : function (hex, key, wrapper) {
 
-		// fittepølse
+
 		if ( key == 'color' ) {
 			this.cartoJSON.point[key].staticVal = hex;
 		}
@@ -753,10 +753,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			var colorRangeBar = Wu.DomUtil.get('chrome-color-range_' + key);
 
 			// Set styling
-			var gradientStyle = 'background: -webkit-linear-gradient(left, ' + colors.join() + ');';
-			gradientStyle    += 'background: -o-linear-gradient(right, '     + colors.join() + ');';
-			gradientStyle    += 'background: -moz-linear-gradient(right, '   + colors.join() + ');';
-			gradientStyle    += 'background: linear-gradient(to right, '     + colors.join() + ');';			
+		
+			var gradientStyle = this._gradientStyle(colors);
 
 			colorRangeBar.setAttribute('style', gradientStyle);
 
@@ -771,6 +769,59 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._updateStyle();
 
 	},
+
+
+
+	// xoxoxoxox
+	selectColorPreset : function (e) {
+
+		var elem = e.target;
+		var hex = elem.getAttribute('hex');
+		var hexArray = hex.split(',');
+
+		// Make three values from two
+		if ( hexArray.length == 2 ) {
+			var c1 = hexArray[0];
+			var c3 = hexArray[1];
+			var c2 = this.hexAverage([c1, c3]);
+			hexArray = [c1, c2, c3];
+		}
+
+		// Color range bar
+		var colorRangeBar = Wu.DomUtil.get('chrome-color-range_colorrange');
+
+		// Set styling		
+		var gradientStyle = this._gradientStyle(hexArray);
+
+		// Set style on colorrange bar
+		colorRangeBar.setAttribute('style', gradientStyle);
+
+
+		// Update color balls
+		var colorBall_1 = Wu.DomUtil.get('color-range-ball-1-colorrange');
+		    colorBall_1.style.background = hexArray[0];
+		    colorBall_1.setAttribute('hex', hexArray[0]);
+
+		var colorBall_2 = Wu.DomUtil.get('color-range-ball-2-colorrange');
+		    colorBall_2.style.background = hexArray[1];
+		    colorBall_2.setAttribute('hex', hexArray[1]);
+
+		var colorBall_3 = Wu.DomUtil.get('color-range-ball-3-colorrange');
+		    colorBall_3.style.background = hexArray[2];
+		    colorBall_3.setAttribute('hex', hexArray[2]);
+
+
+
+		// Store in JSON
+		this.cartoJSON.point.color.value = hexArray;
+
+		this._closeColorRangeSelector();
+
+		// UPDATE
+		this._updateStyle();		
+
+	},
+
 
 
 	// ADD EXTRA FIELDS
@@ -979,8 +1030,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		this._temps = [];
 	},
-
-
 
 
 

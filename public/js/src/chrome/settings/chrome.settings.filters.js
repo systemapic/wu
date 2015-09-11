@@ -115,7 +115,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_windowResize : function () {
-		this._updateDimensions();
+		// this._updateDimensions();
 		app._map.invalidateSize();
 	},
 
@@ -264,6 +264,12 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		// get layer
 		this._layer = this._project.getLayer(layerUuid);
+
+		// Clear chart
+		if ( this._chart ) {
+			this._chart.innerHTML = '';
+			this._chart = false;
+		}
 
 		// filter chart
 		this._createFilterDropdown();
@@ -480,7 +486,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_clearFilterDiv : function () {
-		if (this._filterDiv) this._filterDiv.innerHTML = '';
+		if (this._filterDiv) this._filterDiv.innerHTML = '';		
 	},
 
 	_autoSelectFilter : function () {
@@ -509,64 +515,105 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	_selectedFilterColumn : function (e) {
 		var column = e.target.value;
-		this._createFilterChart(column);
+		this._createFilterChart(column);		
+	},
+
+	nullHistogram : function () {
+
+		var histogram = [];
+		for ( var i = 0; i<49; i++ ) {
+			var hist = {
+				bucket : i+1,
+				freq : 0,
+				range : false,
+				range_min : 0,
+				range_max : 0
+			}
+			histogram.push(hist);
+		}
+
+		return histogram;
+
 	},
 
 	_createFilterChart : function (column) {
-		
-		// get histogram from server
+
+		// Create chart
+		if ( !this._chart ) this._createHistogram(column);
+
+		// Update chart
+		this._updateHistogram(column);
+
+	},
+
+	_createHistogram : function (column) {
+
+		// create div
+		var filterDiv = this._filterDiv = Wu.DomUtil.createId('div', 'chrome-content-filter-chart');
+		this._midInnerScroller.insertBefore(this._filterDiv, this._filterDropdown.nextSibling);
+
+		// Create null historgram
+		histogram = this.nullHistogram();
+
+		// Create Chart
+		this._chart = dc.barChart(this._filterDiv);			
+
+		// Update Chart Data
+		this._updateChart(histogram, column);
+
+		// Render chart
+		this._chart.render();
+
+
+	},
+
+	_updateHistogram : function (column) {
+
 		this._getHistogram(column, function (err, histogram) {
 
-			// remove old div
-			if (this._filterDiv) Wu.DomUtil.remove(this._filterDiv);
-			
-			// return on err
+			console.log('%c UPDATE HISTOGRAM ', 'background: green; color: white;');
+
 			if (err) return console.error('histogram err: ', err);
 
-			// create div
-			var filterDiv = this._filterDiv = Wu.DomUtil.createId('div', 'chrome-content-filter-chart');
-			this._midInnerScroller.insertBefore(this._filterDiv, this._filterDropdown.nextSibling);
-
-			// return if no histogram
+			// Create null historgram
 			if (!histogram) {
-
-				// not valid data to create histogram from
-				this._filterDiv.innerHTML = 'No valid data to create histogram from.'
-				return;
+				histogram = this.nullHistogram();
+				Wu.DomUtil.addClass(this._filterDiv, 'null-histogram');
+			} else {
+				Wu.DomUtil.removeClass(this._filterDiv, 'null-histogram');
 			}
 
-			// chart
-			var chart = this._createChart({
-				column : column, 
-				histogram : histogram,
-				appendTo : filterDiv,
-			});
+			// Update chart
+			this._updateChart(histogram, column);
+
+			// Reset filter
+			this._chart.filter([1,49]);
 
 			// render
-			chart.render();
+			this._chart.redraw();
 
 			// check if filter already stored in layer
-			this._applyAlreadyStoredFilter(column);
+			this._applyAlreadyStoredFilter(column);			
 
-		}.bind(this));
+
+		}.bind(this))
 
 	},
 
 
-	_createChart : function (options) {
 
-		var appendTo = options.appendTo,
-		    histogram = options.histogram,
-		    column = options.column;
 
-		// create chart
-		var chart = this._chart = dc.barChart(this._filterDiv),
-	   	    ndx             = crossfilter(histogram),
-		    runDimension    = ndx.dimension(function(d) {return +d.bucket;}), 			// x-axis
-		    speedSumGroup   = runDimension.group().reduceSum(function(d) {return d.freq;});	// y-axis
+	_updateChart : function (histogram, column) {
+
+		console.log('%c _updateChart ', 'background: blue; color: white;');
+
+		var ndx         = crossfilter(histogram),
+		runDimension    = ndx.dimension(function(d) {return +d.bucket;}), 		// x-axis
+		speedSumGroup   = runDimension.group().reduceSum(function(d) {return d.freq;});	// y-axis
+
 
 		// chart settings
-		chart
+		this._chart
 		    .width(340)
 		    .height(180)
 		    .gap(1)
@@ -575,11 +622,12 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		    .renderLabel(true)
 		    .dimension(runDimension)
 		    .group(speedSumGroup)
-		    // .mouseZoomable(true)
+		    .elasticX(true)
+		    .elasticY(true)
 		    .margins({top: 10, right: 10, bottom: 20, left: 40});
 
 		// filter event (throttled)
-		chart.on('filtered', function (chart, filter) {
+		this._chart.on('filtered', function (chart, filter) {
 
 			// filter == null
 			if (!filter) return this._registerFilter(false);
@@ -592,31 +640,33 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		}.bind(this));
 
+
+		// set y axis tick values
+		var ytickValues = this._getYAxisTicks(histogram);
+		this._chart.yAxis().tickValues(ytickValues);
+
 		// prettier y-axis
-		chart.yAxis().tickFormat(function(v) {
+		this._chart.yAxis().tickFormat(function(v) {
+
 			if (v > 1000000) return Math.round(v/1000000) + 'M';
 			if (v > 1000) return Math.round(v/1000) + 'k';
 			return v;
 		});
 
-		// set y axis tick values
-		var ytickValues = this._getYAxisTicks(histogram);
-		chart.yAxis().tickValues(ytickValues);
 
 		// set format of x axis ticks
-		chart.xAxis().tickFormat(function(v) {
+		this._chart.xAxis().tickFormat(function(v) {
+
 			if (v > histogram.length) v = histogram.length - 1;
 			var value = Math.round(histogram[v].range_min * 100) / 100;
 			return value;
 		});
 
+
 		// set events
-		chart.renderlet(function (chart) {
+		this._chart.renderlet(function (chart) {
 			this._chart.select('.brush').on('mousedown', this._onBrushMousedown.bind(this));
 		}.bind(this));
-
-
-		return chart;
 
 	},
 

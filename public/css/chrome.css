@@ -1177,3 +1177,39 @@ input.chrome-field-input {
 .chrome-portal-logo {
     top: 3px;
 }
+
+
+
+
+.color-range-preset-wrapper {
+    padding: 5px;
+    background: white;
+    box-shadow: 0 0 3px 0 rgba(0,0,0,0.4);
+    top: 26px;
+    position: relative;
+    }
+
+.color-range-preset {
+    background: red;
+    padding: 10px;
+    margin-bottom: 1px;
+    }
+
+
+#chrome-content-filter-chart {
+    position: relative;
+    }
+
+.null-histogram:before {
+    content: 'No valid data to create histogram from...';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.8);
+    text-align: center;
+    font-size: 13px;
+    padding-top: 74px;
+    padding-left: 22px;
+    }
