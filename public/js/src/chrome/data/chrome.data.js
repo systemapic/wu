@@ -29,6 +29,15 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._refresh();
 	},
 
+	_onFileDeleted : function () {
+		console.log('_onFileDeleted!!!');
+		this._refresh();
+	},
+
+	_onLayerDeleted : function () {
+		this._refresh();
+	},
+
 	_initContainer : function () {
 
 		// create the container (just a div to hold errythign)

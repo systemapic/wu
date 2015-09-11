@@ -11,7 +11,7 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 			},
 			layers : {
 				enabled : true,
-				text : 'Layers'
+				text : 'Project Layers'
 			},
 			tooltip : {
 				enabled : true,

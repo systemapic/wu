@@ -210,22 +210,68 @@ Wu.Files = Wu.Class.extend({
 			Wu.post('/api/file/delete', JSON.stringify(postgisOptions), function (err, response) {
 				console.log('deleted?', err, response);
 
-			});
-			
+				var removedObjects = Wu.parse(response);
+
+				// clean up locally
+				this._fileDeleted(removedObjects);
 
 
+			}.bind(this));
 
 		}.bind(this));
 
 
-		return;
+	},
+
+	_fileDeleted : function (result) {
+		console.log('_fileDeleted', result);
+
+		// remove locally
+		// 1. remove file from user locally
+		// 2. remove layers from projects
+		// 	
+
+		// catch error
+		if (result.error || !result.success) return console.error(result.error || 'No success deleting!');
+
+		// update user locally
+		app.Account.removeFile(result.removed.file);
+
+		// update projects locally
+		this._removeLayersLocally(result.removed.layers);
+
+		// fire event
+		Wu.Mixin.Events.fire('fileDeleted', {detail : {
+			fileUuid : 'lol'
+		}});
+	},
 
 
-		
+	_removeLayersLocally : function (layers) {
 
+		layers.forEach(function (layer) {
+
+			// find project 
+			var project = _.find(app.Projects, function (p) {
+				return p.getLayer(layer.uuid);
+			});
+
+
+			// remove layer
+			project.removeLayer(layer);
+
+			console.log('FOUND project -> ', project);
+
+		});
+
+		// fire event
+		Wu.Mixin.Events.fire('layerDeleted', {detail : {
+			fileUuid : 'lol'
+		}});
 
 	},
 
+	
 	_getLayers : function (callback) {
 
 		// get layers connected to dataset
