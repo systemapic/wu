@@ -56,21 +56,21 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-	_createRefresh : function () {
+	// _createRefresh : function () {
 
-		// create fixed bottom container
-		this._bottomContainer = Wu.DomUtil.create('div', 'chrome-content-bottom-container displayNone', this._container);
+	// 	// create fixed bottom container
+	// 	this._bottomContainer = Wu.DomUtil.create('div', 'chrome-content-bottom-container displayNone', this._container);
 
 
-		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
-		this._refreshButton = Wu.DomUtil.create('div', 'chrome-right-big-button', this._bottomContainer, text);
+	// 	var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
+	// 	this._refreshButton = Wu.DomUtil.create('div', 'chrome-right-big-button', this._bottomContainer, text);
 
-		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
-		Wu.DomEvent.on(this._refreshButton, 'mouseover', this._closeColorRangeSelector, this);
+	// 	Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
+	// 	Wu.DomEvent.on(this._refreshButton, 'mouseover', this._closeColorRangeSelector, this);
 
-		// Pad up scroller
-		Wu.DomUtil.addClass(this._midSection, 'middle-section-padding-bottom');		
-	},	
+	// 	// Pad up scroller
+	// 	Wu.DomUtil.addClass(this._midSection, 'middle-section-padding-bottom');		
+	// },	
 
 	
 	_refresh : function () {
@@ -123,6 +123,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// event run when layer selected 
 	_selectedActiveLayer : function (e, uuid) {
 
+		console.log('%c _selectedActiveLayer ', 'background: red; color: white;');
+
 		this._fieldsWrapper.innerHTML = '';
 
 		this.layerUuid = uuid ? uuid : e.target.value
@@ -135,25 +137,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// get current style, returns default if none
 		var style = this._layer.getStyling();
 
-
-		console.log('');
-		console.log('');
-		console.log('');
-
-		console.log('style', style);
-
-		console.log('');
-		console.log('');
-		console.log('');
-
-
 		this.tabindex = 1;
-
-		// if ( style ) { 
-		// 	this.cartoJSON = style;	
-		// } else {
-		// 	this.cartoJSON = {};
-		// }
 
 		this.cartoJSON = style || {};
 
@@ -164,7 +148,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._tempaddLayer();
 
 		// Display bottom container
-		Wu.DomUtil.removeClass(this._bottomContainer, 'displayNone');
+		// Wu.DomUtil.removeClass(this._bottomContainer, 'displayNone');
 
 		
 	},
@@ -258,7 +242,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._createMetaFieldLine(lineOptions);
 
 
-		this._saveToServer('point', '', isOn);
+		// this._saveToServer('point', '', isOn);
+		this.initPointOffOn(isOn);
 
 	},
 
@@ -458,33 +443,40 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// On toggle switch button
 	_saveToServer : function (key, title, on) {
 
-		if ( key == 'point' ) {
-
-			if ( on ) {
-				this.cartoJSON[key].enabled = true;
-				this.initPointOptions(this._pointSectionWrapper);
-
-				var colorRange = this.cartoJSON[key].color.range ? this.cartoJSON[key].color.range : false;
-				var opacityRange = this.cartoJSON[key].opacity.range ? this.cartoJSON[key].color.opacity : false;
-				var pointSizeRange = this.cartoJSON[key].pointsize.range ? this.cartoJSON[key].pointsize.range : false;
-
-				var options = {
-					colorRange : colorRange,
-					opacityRange : opacityRange,
-					pointSizeRange : pointSizeRange,
-				}
-				
-				this.initOpenFields(options, 'color');
-				this.initOpenFields(options, 'pointsize');
-
-			} else {
-				this.cartoJSON[key].enabled = false;
-				this.clearPointOptions();				
-			}			
-		}
+		this.initPointOffOn(on);
 
 		// UPDATE
 		this._updateStyle();
+	},
+
+
+	initPointOffOn : function (on) {
+
+		var key = 'point';
+
+		if ( on ) {
+			this.cartoJSON[key].enabled = true;
+			this.initPointOptions(this._pointSectionWrapper);
+
+			var colorRange = this.cartoJSON[key].color.range ? this.cartoJSON[key].color.range : false;
+			var opacityRange = this.cartoJSON[key].opacity.range ? this.cartoJSON[key].color.opacity : false;
+			var pointSizeRange = this.cartoJSON[key].pointsize.range ? this.cartoJSON[key].pointsize.range : false;
+
+			var options = {
+				colorRange : colorRange,
+				opacityRange : opacityRange,
+				pointSizeRange : pointSizeRange,
+			}
+			
+			this.initOpenFields(options, 'color');
+			this.initOpenFields(options, 'pointsize');
+
+		} else {
+			this.cartoJSON[key].enabled = false;
+			this.clearPointOptions();				
+		}			
+	
+
 	},
 
 	// ON SELECT MINI DROP DOWN
@@ -591,6 +583,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			// Set value in input
 			inputField.value = value;
 
+			// Do not save if value is unchanged
+			if ( this.cartoJSON.point[key].value == value ) return;
+
 			// Store in json
 			this.cartoJSON.point[key].value = value;
 
@@ -612,6 +607,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 			// Set value in input
 			inputField.value = value;
+
+			// Do not save if value is unchanged
+			if ( this.cartoJSON.point[key].value == value ) return;
 
 			// Stors in json
 			this.cartoJSON.point[key].value = value;
@@ -641,6 +639,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 				// Make sure min value is not higher than max value
 				value = this.validateNumber(value, maxVal, true);
 
+				// Do not save if value is unchanged
+				if ( this.cartoJSON.point.pointsize.minMax[0] == value ) return;
+
 				// Set value in input
 				minField.value = value;
 
@@ -662,6 +663,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 				// Make sure max value is not less than min value
 				value = this.validateNumber(value, minVal, false);
+
+				// Do not save if value is unchanged
+				if ( this.cartoJSON.point.pointsize.minMax[1] == value ) return;
 
 				// Set value in input
 				maxField.value = value;
@@ -691,6 +695,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 				value = this.validateNumber(value, maxVal, true);
 
+				// Do not save if value is unchanged
+				if ( this.cartoJSON.point.color.customMinMax[0] == value ) return;
+
 				minField.value = value;
 
 				this.cartoJSON.point.color.customMinMax = [value, maxVal];
@@ -706,6 +713,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 				if ( isNaN(minVal) ) minVal = this.cartoJSON.point.color.minMax[0];
 
 				value = this.validateNumber(value, minVal, false);
+
+				// Do not save if value is unchanged
+				if ( this.cartoJSON.point.color.customMinMax[1] == value ) return;
 
 				maxField.value = value;
 
@@ -757,6 +767,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			var gradientStyle = this._gradientStyle(colors);
 
 			colorRangeBar.setAttribute('style', gradientStyle);
+
+			// Do not save if value is unchanged
+			if ( this.cartoJSON.point.color.value == value ) return;
 
 			// Store in JSON
 			this.cartoJSON.point.color.value = colors;
@@ -811,11 +824,18 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		    colorBall_3.setAttribute('hex', hexArray[2]);
 
 
+		this._closeColorRangeSelector();
+
+		// Do not save if value is unchanged
+		if ( this.cartoJSON.point.color.value[0] == hexArray[0] &&
+		     this.cartoJSON.point.color.value[1] == hexArray[1] && 
+		     this.cartoJSON.point.color.value[2] == hexArray[2] ) {
+
+			return;
+		}
 
 		// Store in JSON
-		this.cartoJSON.point.color.value = hexArray;
-
-		this._closeColorRangeSelector();
+		this.cartoJSON.point.color.value = hexArray;		
 
 		// UPDATE
 		this._updateStyle();		
@@ -1090,6 +1110,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// CARTO CARTO CARTO CARTO		
 
 	_updateStyle : function () {
+
+		console.log('%c _updateStyle ', 'background: #FF33FF; color: white;');
 
 		var cartoJSON = this.cartoJSON;
 

@@ -755,7 +755,7 @@ input.chrome-field-input {
 
 .mini-input-dual,
 .mini-input-dual:focus {
-    width: 69px;
+    width: 80px !important;
     }    
 
 
@@ -858,7 +858,7 @@ input.chrome-field-input {
 
 .chrome-mini-dropdown.full-width {
     width: 162px;
-    right: 0;
+    right: 0 !important;
     }    
 
 
@@ -1170,6 +1170,7 @@ input.chrome-field-input {
     }
 
 .chrome-pane.styler .select-field-wrap {
+    right: 37px;
     margin-top: 3px;
     }
 
@@ -1240,7 +1241,8 @@ input.chrome-field-input {
     }
 
 .chrome-pane.filters .chrome-middle-section.no-sql {
-    padding-bottom: 176px;
+    /*padding-bottom: 176px;*/
+    padding-bottom: 186px;
     }
 
 .chrome-content.sql-wrapper-outer {
@@ -1263,7 +1265,8 @@ input.chrome-field-input {
 .sql-bottom-container {
     position: absolute;
     width: 100%;
-    bottom: 32px;
+    /*bottom: 32px;*/
+    bottom: 42px;
     padding-bottom: 0;
     padding-top: 0;
     border-top: 1px dashed #ccc;
@@ -1289,7 +1292,7 @@ input.chrome-field-input {
     color: white;
     padding: 5px;
     position: absolute;
-    right: 3px;
+    right: 6px;
     top: 3px;
     font-weight: 900;
     line-height: 1;
