@@ -19,9 +19,9 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 	_initLayout : function () {
 
+
 		if (!this._project) return;
   
-		console.log('%c _initLayout ', 'background: #FF33FF; color: white;');
 
   		// Scroller
 		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
@@ -83,7 +83,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		
 		// Store uuid of layer we're working with
 		this._storeActiveLayerUiid(layerUuid);
-
 		
 		this._layer = this._project.getLayer(layerUuid);
 
@@ -97,6 +96,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		if ( !this.tooltipMeta ) this.tooltipMeta = this.createTooltipMeta(layerMeta);
 
 		// this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
+		this._fieldsWrapper.innerHTML = '';
 
 		// Init title
 		this.initTitle();

@@ -33,23 +33,18 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		// active layer
 		this.layerSelector = this._initLayout_activeLayers('Datasets', 'Select a dataset to filter...', this._midInnerScroller);
 
-
 		// create fixed bottom container
 		this._bottomContainer = Wu.DomUtil.create('div', 'sql-bottom-container', this._container);
 
-		this._sqltitle = Wu.DomUtil.create('div', 'chrome chrome-content cartocss title', this._bottomContainer, 'SQL');
+		this._sqltitle = Wu.DomUtil.create('div', 'chrome chrome-content sql title', this._bottomContainer, 'SQL');
+		this._sqlSave = Wu.DomUtil.create('div', 'sql-save', this._bottomContainer, 'Save');
 
 		// CodeMirror
-		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._bottomContainer);
+		this._codeWrapOuter = Wu.DomUtil.create('div', 'chrome-content sql-wrapper-outer', this._bottomContainer)
+		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._codeWrapOuter);
 
 		// sql editor
 		this._createSqlEditor();
-
-		// create refresh button
-		// this._createRefresh();
-
-		// insert titles
-		this._createSQLwrapper();
 
 		// hide by default
 		this._hideEditors();
@@ -59,6 +54,40 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		// mark as inited
 		this._inited = true;
+
+		// Init hooks
+		this.initHooks();
+
+	},
+
+	initHooks : function () {
+
+		Wu.DomEvent.on(this._sqlSave, 'click', this._updateStyle, this);
+		Wu.DomEvent.on(this._sqltitle, 'click', this.toggleSql, this);
+
+	},
+
+	toggleSql : function () {
+
+		if ( this.sqlOpen ) {
+
+			Wu.DomUtil.removeClass(this._codeWrapOuter, 'active');
+			Wu.DomUtil.removeClass(this._sqlSave, 'active');
+			Wu.DomUtil.removeClass(this._bottomContainer, 'active');
+
+			Wu.DomUtil.addClass(this._midSection, 'no-sql');
+
+			this.sqlOpen = false;
+		} else {
+			
+			Wu.DomUtil.addClass(this._codeWrapOuter, 'active');
+			Wu.DomUtil.addClass(this._sqlSave, 'active');
+			Wu.DomUtil.addClass(this._bottomContainer, 'active');
+
+			Wu.DomUtil.removeClass(this._midSection, 'no-sql');
+
+			this.sqlOpen = true;			
+		}
 
 	},
 
@@ -102,17 +131,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-	_createSQLwrapper : function () {
-
-		// create
-		// this._sqltitle = Wu.DomUtil.create('div', 'chrome chrome-content cartocss title');
-		// this._sqltitle.innerHTML = 'SQL';
-		
-		// insert
-		// var s = this._SQLEditor.getWrapperElement();
-		// s.parentElement.insertBefore(this._sqltitle, s);
-
-	},
 
 	_windowResize : function () {
 		// this._updateDimensions();
@@ -131,8 +149,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		var sql = this._SQLEditor.getWrapperElement();
 		if (sql) {
 			sql.style.width = dims.width + 'px';
-			// sql.style.height = (dims.height/3*1) - 220 + 'px';
-			sql.style.height = '72px';
+			sql.style.height = '1114px';
 		}
 	},
 
@@ -571,8 +588,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		this._getHistogram(column, function (err, histogram) {
 
-			console.log('%c UPDATE HISTOGRAM ', 'background: green; color: white;');
-
 			if (err) return console.error('histogram err: ', err);
 
 			// Create null historgram
@@ -605,12 +620,9 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	_updateChart : function (histogram, column) {
 
-		console.log('%c _updateChart ', 'background: blue; color: white;');
-
 		var ndx         = crossfilter(histogram),
 		runDimension    = ndx.dimension(function(d) {return +d.bucket;}), 		// x-axis
 		speedSumGroup   = runDimension.group().reduceSum(function(d) {return d.freq;});	// y-axis
-
 
 		// chart settings
 		this._chart
@@ -653,10 +665,12 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 			return v;
 		});
 
-
+		// set x axis tick spacing
+		var xtickValues = this._getXAxisTickSpacing(histogram);
+		this._chart.xAxis().tickValues(xtickValues);
+	
 		// set format of x axis ticks
 		this._chart.xAxis().tickFormat(function(v) {
-
 			if (v > histogram.length) v = histogram.length - 1;
 			var value = Math.round(histogram[v].range_min * 100) / 100;
 			return value;
@@ -724,8 +738,29 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		return ticks;
 	},
 
-	_getXAxisTicks : function (histogram) {
-		
+	_getXAxisTickSpacing : function (histogram) {
+
+		var maxLength = 0;
+
+		histogram.forEach(function(h) {
+
+			var maxNo = Math.round(h.range_max * 100) / 100;
+			var minNo = Math.round(h.range_min * 100) / 100;
+
+			var max = maxNo.toString().length;
+			var min = minNo.toString().length;
+
+			if ( maxLength < max ) maxLength = max;
+			if ( maxLength < min ) maxLength = min;
+
+		});
+
+
+		if ( maxLength > 7 ) return [10,20,30,40];
+		if ( maxLength > 5 && maxLength < 8 ) return [10,20,30,40];
+
+		return [5,10,15,20,25,30,35,40,45];
+
 	},
 
 
