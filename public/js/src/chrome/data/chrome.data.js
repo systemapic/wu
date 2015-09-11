@@ -613,9 +613,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	initFileActions : function (parent, library) {
 
 		// Disable actions for Layers
-		var isDisabled = false;
-		if ( library == 'layers' ) isDisabled = true;
-
+		var isDisabled = (library == 'layers'),
+		    that = this;
 	
 		var action = {
 
@@ -641,14 +640,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			},
 		}
 
-		var that = this;
-
 
 		for (var f in action) {
 
 			var name = action[f].name;
 			var className = 'file-action-' + f;
-
 
 			// Bind
 			var fileAction = 
@@ -667,9 +663,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				.html(name)
 				.on('click', function (d) {
 					var trigger = this.getAttribute('trigger')
-					var uuid = d.getUuid();
-					that.fileActionTriggered(trigger, d, that, library)
-				})
+					that.itemActionTriggered(trigger, d, that, library)
+				});
 
 			// Exit
 			fileAction
@@ -687,122 +682,85 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// ╚██████╗███████╗██║╚██████╗██║  ██╗    ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
 	//  ╚═════╝╚══════╝╚═╝ ╚═════╝╚═╝  ╚═╝    ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
 
-	// xoxoxo
-	fileActionTriggered : function (trigger, file, context, library) {
 
 
-		// LAYERS
-		// LAYERS
-		// LAYERS
-
-		if ( library == 'layers' ) {
-
-
-			var layerUuid = file.getUuid();
-			var project = context._project;
-
-			// set name
-			if ( trigger == 'changeName' ) {
-				context.editingName = layerUuid;
-				context._refresh();
-			}
-
-			// share
-			if ( trigger == 'share' ) {
-				console.log('%c todo: make share layer function', 'background: red; color: white');
-			}
-
-			// download
-			if ( trigger == 'download' ) {
-				console.log('%c todo: make download layer function', 'background: red; color: white');
-			}
-
-			// delete
-			if ( trigger == 'delete' ) {
-				console.log('%c todo: make delete layer function', 'background: red; color: white');
-			}
-
-			// Reset
-			this.showFileActionFor = false;
-			this.selectedFiles = [];
-			this._refresh();			
-
-			return;
-
-		}
-
-
-		// FILES
-		// FILES
-		// FILES
-
+	_fileActionTriggered : function (trigger, file, context, library) {
 		var fileUuid = file.getUuid();
 		var project = context._project;
 
 		// set name
-		if ( trigger == 'changeName' ) {
-			context.editingName = fileUuid;			
-		}
+		if (trigger == 'changeName') context.editingName = fileUuid;			
 
 		// create layer
-		if ( trigger == 'createLayer' ) {
-			file._createLayer(project);
-		}
+		if (trigger == 'createLayer') file._createLayer(project);
 
 		// share
-		if ( trigger == 'share' ) {
-			file._shareFile();	
-		}
+		if (trigger == 'share') file._shareFile();	
 
 		// download
-		if ( trigger == 'download' ) {
-			file._downloadFile();	
-		}
+		if (trigger == 'download') file._downloadFile();	
 
 		// delete
-		if ( trigger == 'delete' ) {
-			file._deleteFile();	
-		}
-
+		if (trigger == 'delete') file._deleteFile();	
+		
 		// Reset
 		this.showFileActionFor = false;
 		this.selectedFiles = [];
 		this._refresh();
+	},
+
+	_layerActionTriggered : function (trigger, layer, ctx, library) {
+
+		// rename
+		if (trigger == 'changeName') ctx.editingName = layer.getUuid();
+			
+		// share
+		if (trigger == 'share') layer.shareLayer();
+
+		// download
+		if (trigger == 'download') layer.downloadLayer();
+
+		// delete
+		if (trigger == 'delete') layer.deleteLayer();
 		
+		// refresh
+		this.showFileActionFor = false;
+		this.selectedFiles = [];
+		this._refresh();			
 
 	},
 
+	
 
 
+	// xoxoxo
+	itemActionTriggered : function (trigger, file, context, library) {
+
+		// pass to fn
+		if (library == 'layers') return this._layerActionTriggered(trigger, file, context, library);
+		if (library == 'myFiles') return this._fileActionTriggered(trigger, file, context, library);
+ 
+		return console.error('neither file nor layer??');
+	},
 
 	activateInput : function (d, library) {
-
 		this.editingName = d.getUuid();
 		this.showFileActionFor = false;
 		this.selectedFiles = [];
 		this._refresh();
-
 	},
-
-
 
 	dataListClickEvents : function (d, library, e) {
 
 		var uuid = d.getUuid();
 
-		if ( uuid == 'nolayers' ) return;
+		if (uuid == 'nolayers') return;
 
 		// If holding CMD down
-		if ( e.metaKey ) { 
-			this.click_toggleCMD(uuid);
-			return;
-		}
+		if (e.metaKey) return this.click_toggleCMD(uuid);
 		
 		// If holding shift down
-		if ( e.shiftKey ) { 
-			this.click_toggleSHIFT(uuid, library); 
-			return;
-		}
+		if (e.shiftKey) return this.click_toggleSHIFT(uuid, library); 
 		
 		// Else just click
 		// this.click_showFileOptions(this, uuid); 
@@ -909,8 +867,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	click_showFileOptions : function (uuid) {
 
-		console.log('click_showFileOptions', uuid);
-
 		// Deselect
 		if ( this.showFileActionFor == uuid ) {
 			this.showFileActionFor = false;
@@ -940,9 +896,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		})
 
 		// Stop if we're editing name
-		if ( e.target.name == this.editingName ) stop = true;
+		if (e.target.name == this.editingName) stop = true;
 
-		if ( stop ) return;
+		if (stop) return;
 
 		// Reset
 		this.showFileActionFor = false;
@@ -953,70 +909,29 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 
-
-
-
 	saveName : function (newName, d, library) {
 
-		if ( library == 'layers' ) {
+		// rename layer
+		if (library == 'layers') {
 
 			if ( !newName || newName == '' ) newName = d.getTitle();
 			d.setTitle(newName);
 
-			// select project
+			// fire layer edited
 			Wu.Mixin.Events.fire('layerEdited', {detail : {
 				layer: d
 			}});
 
+		// rename file
 		} else {
 
 			if ( !newName || newName == '' ) newName = d.getName();
 			d.setName(newName);	
 		}
 		
-
 		this.editingName = false;
 		this._refresh();
 	},
-
-
-	createLayer : function (newName, d) {
-
-		d.setName(newName);
-
-		this.editingName = false;
-
-		this._refresh();
-	},
-
-	shareFile : function (newName, d) {
-
-		d.setName(newName);
-
-		this.editingName = false;
-
-		this._refresh();
-	},
-
-
-	downloadFile : function (newName, d) {
-
-		d.setName(newName);
-
-		this.editingName = false;
-
-		this._refresh();
-	},
-
-
-	deleteFile : function (newName, d) {
-
-		// d.setName(newName);
-
-		this.editingName = false;
-
-		this._refresh();
-	}
 
 
 });

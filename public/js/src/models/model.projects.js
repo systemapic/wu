@@ -461,6 +461,34 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
+	deleteLayer : function (layer) {
+
+		var options = {
+			layerUuid : layer.getUuid(),
+			projectUuid : this.getUuid()
+		}
+
+		Wu.post('/api/layers/delete', JSON.stringify(options), function (err, response) {
+			if (err) return console.error('layer delete err:', err);
+
+			console.log('deleted form server?', err, response);
+
+			var result = Wu.parse(response);
+
+			if (result.error) return console.error('layer delete result.error:', result.error);
+
+			// remove locally, and from layermenu etc.
+			this._removeLayer(layer);
+
+			// fire event
+			Wu.Mixin.Events.fire('layerDeleted', { detail : {
+				layer : this
+			}}); 
+
+		}.bind(this));
+
+	},
+
 	removeLayer : function (layerStore) {
 		var layer = this.getLayer(layerStore.uuid);
 		this._removeLayer(layer);

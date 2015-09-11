@@ -51,14 +51,34 @@ module.exports = api.postgis = {
 
 	
 
-	deleteTable : function (options, callback) {
+	deleteTable : function (options, done) {
+			var database_name = options.database_name,
+		    table_name = options.table_name,
+		    DROP_TABLE_SCRIPT = '../scripts/postgis/drop_table.sh';
+
+		// missing information
+		if (!database_name || !table_name) return api.error.missingInformation(req, res);
+
+		// validation
+		if (!table_name.length == 25) return api.error.general(req, res, 'Invalid table name!' + table_name);
+
+		var command = [
+			DROP_TABLE_SCRIPT,
+			database_name,
+			table_name
+		].join(' ');
 
 
-		console.log('postgis deleteTable', options);
+		console.log('command: ', command);
 
+		// create database in postgis
+		exec(command, {maxBuffer: 1024 * 50000}, function (err) {
+			if (err) return done(err);
 
-		callback(null);
+			console.log('deleted from postgis! ', err);
+			done(null);
 
+		});
 	},
 
 	
