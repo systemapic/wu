@@ -393,6 +393,12 @@ module.exports = api.file = {
 		// check permissions
 		ops.push(function (file, callback) {
 			console.log('TODO! permission to delete file!')
+
+			// api.access.to.delete_file({
+			// 	file : file,
+			// 	user : account
+			// }, callback);
+
 			callback(null, file);
 		});
 
@@ -435,14 +441,8 @@ module.exports = api.file = {
 			api.postgis.deleteTable({
 				database_name : database_name,
 				table_name : table_name
-			}, function (err) {
-
-
-
-				callback(err);
-			});
+			}, callback);
 		});
-
 
 
 		// remove layers based on dataset
@@ -452,39 +452,22 @@ module.exports = api.file = {
 			.find({'data.postgis.table_name' : table_name})
 			.exec(function (err, layers) {
 				if (err) return api.error.general(req, res, err);
-				
 
 				// todo: remove layers from projects
 				api.file.deleteLayersFromProjects({
 					layers : layers
 				}, function (err) {
-					console.log('deleted layers from projec!', err);
-
-
-					console.log('gonna dlete these layers!! ', layers);
-					
 
 					// delete layer models
 					async.each(layers, function (layer, done) {
-						console.log('deleting layer: ', layer);
 						layer.remove(done)
 					}, function (err) {
-						console.log('deleted all layers', err);
-
 						removedObjects.layers = layers;
-
 						callback(err);
 					});
-
-
 				});
-
-
-
 			});
-
 		});
-
 
 		async.waterfall(ops, function (err, results) {
 			console.log('waterfall done', err, results);
@@ -494,7 +477,6 @@ module.exports = api.file = {
 				removed : removedObjects
 			});
 		});
-
 
 
 	},
