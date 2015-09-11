@@ -207,12 +207,6 @@ Wu.Project = Wu.Class.extend({
 		// flush
 		this._reset();
 
-		// init files
-		// this.initFiles();
-
-  		// create layers 
-		// this.initLayers();
-
 		// init roles
 		this.initRoles();
 
@@ -467,7 +461,14 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
+	removeLayer : function (layerStore) {
+		var layer = this.getLayer(layerStore.uuid);
+		this._removeLayer(layer);
+	},
+
 	_removeLayer : function (layer) {
+
+		console.log('REMOVELYAER ', layer);
 
 		// remove from layermenu & baselayer store
 		_.remove(this.store.layermenu, function (item) { return item.layer == layer.getUuid(); });

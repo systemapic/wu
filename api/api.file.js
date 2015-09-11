@@ -220,16 +220,7 @@ module.exports = api.file = {
 		ops.push(function (options, callback) {
 			var record = options.file,
 			    name = record.name.replace(/\s+/g, '');
-			//     out = api.config.path.temp + name + '_' + record.type + '.zip',
-			//     cwd = api.config.path.file + fileUuid,
-			//     command = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store',
-			//     exec = require('child_process').exec;				
 			
-			// exec(command, {cwd : cwd}, function (err, stdout, stdin) {
-			// 	callback(err, out);
-			// });
-
-			// get pdf file path
 
 			var folder = api.config.path.file + fileUuid;
 			console.log('get pdf: ', options);
@@ -249,23 +240,11 @@ module.exports = api.file = {
 					
 				});
 
-				console.log('FOUND PDF:', pdf);
-				console.log('record: ', record);
-				console.log('name: ', name);
-
 				var path = folder + '/' + pdf;
 
-				console.log('path---> ', path);
 
 				callback(null, path);
 
-				// var renamedPath = folder + '/' + 'snapshot.pdf';
-
-				// console.log('renamedPath', renamedPath);
-
-				// fs.rename(path, renamedPath, function (err) {
-				// 	callback(null, renamedPath);
-				// });
 			});
 
 			
@@ -276,24 +255,10 @@ module.exports = api.file = {
 			if (err) console.log('ERR 12'.red, err);
 			if (err) return api.error.general(req, res, err);
 
-			// res.setHeader('Content-Type', 'application/pdf');
-
-			// console.log('DOWNLOAD PATH -==>' , path);
-			// // res.type('application/pdf');
-			// res.download(path);
-
-			console.log('RES: ', res);
-
 			res.setHeader('Content-type', 'application/pdf');
-        		// res.download(path);
-
-			// // res.setHeader('Content-disposition', 'inline; filename=snapshot.pdf');
 
 			var filestream = fs.createReadStream(path);
 			filestream.pipe(res);
-
-			// res.end();
-
 
 		});
 		
@@ -415,6 +380,9 @@ module.exports = api.file = {
 		if (!database_name || !table_name) return api.error.missingInformation(req, res);
 
 
+		var removedObjects = {};
+
+
 		// get file model
 		ops.push(function (callback) {
 			File
@@ -437,6 +405,11 @@ module.exports = api.file = {
 				u.files.pull(file._id);
 				u.markModified('files');
 				u.save(function (err) {
+
+					removedObjects.user = {
+						file_id : file._id
+					}
+
 					callback(null);
 				});
 			});
@@ -449,6 +422,9 @@ module.exports = api.file = {
 			.findOne({uuid : fileUuid})
 			.remove(function (err, rmf) {
 				console.log('removed file model', err, rmf);
+				removedObjects.file = {
+					file_id : fileUuid
+				}
 				callback(null);
 			});
 		});
@@ -460,17 +436,13 @@ module.exports = api.file = {
 				database_name : database_name,
 				table_name : table_name
 			}, function (err) {
+
+
+
 				callback(err);
 			});
 		});
 
-
-		// ops.push(function (callback) {
-
-
-
-
-		// })
 
 
 		// remove layers based on dataset
@@ -481,7 +453,6 @@ module.exports = api.file = {
 			.exec(function (err, layers) {
 				if (err) return api.error.general(req, res, err);
 				
-
 
 				// todo: remove layers from projects
 				api.file.deleteLayersFromProjects({
@@ -499,6 +470,9 @@ module.exports = api.file = {
 						layer.remove(done)
 					}, function (err) {
 						console.log('deleted all layers', err);
+
+						removedObjects.layers = layers;
+
 						callback(err);
 					});
 
@@ -516,7 +490,8 @@ module.exports = api.file = {
 			console.log('waterfall done', err, results);
 			res.json({
 				success : true,
-				error : err
+				error : err,
+				removed : removedObjects
 			});
 		});
 
