@@ -76,7 +76,7 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 
 
 		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
-		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, title);
+		var header = Wu.DomUtil.create('div', 'chrome-content title', sectionWrapper, title);
 
 		var options = {
 
@@ -157,7 +157,7 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 	initBoundPos : function (title) {
 
 		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
-		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, title);
+		var header = Wu.DomUtil.create('div', 'chrome-content title', sectionWrapper, title);
 
 		var isBoundsSet = this.isBoundsSet();
 

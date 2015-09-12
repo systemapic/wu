@@ -171,7 +171,8 @@ Wu.Layer = Wu.Class.extend({
 		var descriptionControl = app.MapPane.getControls().description;
 		if (!descriptionControl) return;
 
-		descriptionControl.setLayer(this);
+		// xoxoxo
+		descriptionControl._addLayer(this);
 
 		// hide if empty and not editor
 		var isEditor = app.access.to.edit_project(app.activeProject);
@@ -202,6 +203,8 @@ Wu.Layer = Wu.Class.extend({
 		return app.MapPane.getZIndexControls();
 	},
 
+
+	// xoxoxox
 	remove : function (map) {
 		var map = map || app._map;
 
@@ -222,20 +225,9 @@ Wu.Layer = Wu.Class.extend({
 		// remove from zIndex
 		this._removeFromZIndex();
 
-		// remove from inspectControl if available
-		var inspectControl = app.MapPane.getControls().inspect;			// refactor to events
-		if (inspectControl) inspectControl.removeLayer(this);
-
-		// remove from legendsControl if available
-		var legendsControl = app.MapPane.getControls().legends;
-		if (legendsControl) legendsControl.removeLegend(this);
-
 		// remove from descriptionControl if avaialbe
 		var descriptionControl = app.MapPane.getControls().description;
-		if (descriptionControl) {
-			descriptionControl.removeLayer(this);
-			descriptionControl._container.style.display = 'none'; // (j)		// refactor to descriptionControl
-		}
+		if ( descriptionControl ) descriptionControl._removeLayer(this);
 
 		this._added = false;
 	},

@@ -1721,3 +1721,106 @@ aka feedback pane
 	}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.description-control-header-toggle {
+	right: 6px;
+	top: 9px;	
+	}
+
+
+
+.description-multiple-toggle-wrapper {
+	background: white;
+	width: 245px;	
+	position: relative;
+	}
+
+.each-multiple-description {
+	padding: 4px 15px 4px 25px;
+	border-bottom: 1px dashed #ccc;
+	font-size: 12px;
+	font-weight: 900;
+	cursor: pointer;
+	text-transform: uppercase;
+	position: relative;
+	}
+
+.each-multiple-description:hover {
+	color: black;
+	}
+
+
+.each-multiple-description.active {
+	color: black;
+	cursor: default;
+	}
+
+.each-multiple-description.active:after {
+	content: '';
+	background: #089688;
+	width: 10px;
+	height: 10px;
+	position: absolute;
+	border-radius: 12px;
+	left: 9px;
+	padding-right: 10px;
+	opacity: 100;
+	top: 8px;	
+	}	
+
+.description-control-description {
+	border-top: 0;
+	border-bottom: 1px solid #999;
+	padding-top: 5px;
+	padding-bottom: 4px;
+	margin-top: 0px;
+	margin-bottom: 14px;
+	line-height: 1.3;	
+	}	
+
+.description-control-header-section {
+	padding-bottom: 0;	
+}
+/*.description-control-header-section.minimized {*/
+/*	padding-bottom: 0;*/
+	/*}*/
+
+.description-control-content-box {
+	padding-top: 3px;
+	}
+
+.each-multiple-description.one-layer {
+	font-size: 15px;
+	cursor: default;
+	color: black;
+	padding-left: 15px;
+	}
