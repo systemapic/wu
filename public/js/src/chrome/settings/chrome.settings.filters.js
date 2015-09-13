@@ -1,12 +1,5 @@
 Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
-	// still todo: 
-	// 1. multiple filters
-	// 2. clear filter is firing a bit too often
-	// 3. cancel previous processing jobs on pile when updating layer
-	// 4. auto-select dataset/columns
-	// 5. thin_add layer when opening dataset
-
 
 	_initialize : function () {
 
@@ -521,6 +514,9 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		var filterDiv = this._filterDiv = Wu.DomUtil.createId('div', 'chrome-content-filter-chart');
 		this._midInnerScroller.insertBefore(this._filterDiv, this._filterDropdown.nextSibling);
 
+		// create filter label div
+		this._filterLabel = Wu.DomUtil.create('div', 'chrome-content-filter-label', this._filterDiv);
+
 		// Create null historgram
 		histogram = this.nullHistogram();
 
@@ -736,24 +732,34 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	},
 
+	_setFilterLabel : function (value) {
+		this._filterLabel.innerHTML = value;
+	},
+
 	_registerFilter : function (column, buckets, histogram) {
 
 		// no filter
-		if (!column) return this._filters = false;
- 
+		if (!column) {
+			// set label
+			this._setFilterLabel('No filter.');
+
+			// return 
+			return this._filters = false;
+ 		}
+
+ 		// filter
  		this._filters = {};
 		this._filters.column = column;
 		this._filters.buckets = buckets;
 		this._filters.histogram = histogram;
+
+		// set label
+		var b = this._calculateBuckets(column, buckets, histogram);
+		var label = 'Filtering '  + column.toUpperCase() + ' from ' + b.min + ' to ' + b.max + '.';
+		this._setFilterLabel(label);
 	},
 
-	_applyFilter : function (column, buckets, histogram) {
-
-		if (!this._filters) return this._clearFilter();
-
-		var column = this._filters.column;
-		var buckets = this._filters.buckets;
-		var histogram = this._filters.histogram;
+	_calculateBuckets : function (column, buckets, histogram) {
 
 		// get bucket
 		var bottom_bucket = buckets[0];
@@ -765,10 +771,32 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		var range_min = Math.round(bucket_min.range_min * 100)/100;
 		var bucket_max = histogram[top_bucket];
 		var range_max = Math.round(bucket_max.range_max * 100)/100;
+
+		var b = {
+			min : range_min,
+			max : range_max,
+			bottom : bottom_bucket, 
+			top : top_bucket
+		}
+
+		return b;
+	},
+
+	_applyFilter : function (column, buckets, histogram) {
+
+		if (!this._filters) return this._clearFilter();
+
+		var column = this._filters.column;
+		var buckets = this._filters.buckets;
+		var histogram = this._filters.histogram;
+
+		// calculate bucket values
+		var b = this._calculateBuckets(column, buckets, histogram);
 		
 		// create SQL
 		var sql = 'SELECT * FROM table';
-		sql    += ' \nwhere ' + column + ' > ' + range_min + '\nand ' + column + ' < ' + range_max;
+		// sql    += ' \nwhere ' + column + ' > ' + range_min + '\nand ' + column + ' < ' + range_max;
+		sql    += ' \nwhere ' + column + ' > ' + b.min + '\nand ' + column + ' < ' + b.max;
 
 		console.log('SQL', sql);
 
@@ -781,8 +809,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		// save filter to layer
 		this._layer.setFilter(JSON.stringify([{
 			column : column,
-			bucket_min : bottom_bucket,
-			bucket_max : top_bucket
+			bucket_min : b.bottom,
+			bucket_max : b.top
 		}]));
 
 	},

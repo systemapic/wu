@@ -216,3 +216,13 @@
 .file-action-share:hover {
 	color: gainsboro;
 }
+
+
+.chrome-content-filter-label {
+	height: 20px;
+	width: 100%;
+	position: absolute;
+	bottom: -24px;
+	margin-left: 39px;
+	font-size: 11px;
+}
