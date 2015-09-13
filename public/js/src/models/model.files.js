@@ -298,7 +298,40 @@ Wu.Files = Wu.Class.extend({
 	},
 
 	_downloadFile : function () {
+		this._downloadDataset();
+	}, 
+
+	_downloadDataset : function () {
+
 		console.log('file._downloadFile', this.getName());
+
+		var options = {
+			file_id : this.getUuid(),
+		}
+
+		Wu.post('/api/file/downloadDataset', JSON.stringify(options), this._downloadedDataset.bind(this));
+
+	},
+
+	_downloadedDataset : function (err, response) {
+
+		console.log('downloaded dataset', err, response);
+
+		// parse results
+		var filePath = response;
+		var path = app.options.servers.portal;
+		path += 'api/file/download/';
+		path += '?file=' + filePath;
+		// path += '?raw=true'; // add raw to path
+		path += '&type=shp';
+		path += '&access_token=' + app.tokens.access_token;
+
+		console.log('PATH: ', path);
+
+		// open (note: some browsers will block pop-ups. todo: test browsers!)
+		window.open(path, 'mywindow')
+
+
 	},
 
 

@@ -52,7 +52,7 @@ module.exports = api.postgis = {
 	
 
 	deleteTable : function (options, done) {
-			var database_name = options.database_name,
+		var database_name = options.database_name,
 		    table_name = options.table_name,
 		    DROP_TABLE_SCRIPT = '../scripts/postgis/drop_table.sh';
 
@@ -68,17 +68,179 @@ module.exports = api.postgis = {
 			table_name
 		].join(' ');
 
-
-		console.log('command: ', command);
-
 		// create database in postgis
 		exec(command, {maxBuffer: 1024 * 50000}, function (err) {
 			if (err) return done(err);
-
-			console.log('deleted from postgis! ', err);
 			done(null);
-
 		});
+	},
+
+
+	downloadDatasetFromLayer : function (req, res) {
+
+		var options = req.body,
+		    layerUuid = options.layer_id,
+		    format = options.format,
+		    ops = [];
+
+		ops.push(function (callback) {
+			Layer
+			.findOne({uuid : layerUuid})
+			.exec(callback);
+		});
+
+		ops.push(function (layer, callback) {
+
+			var options = {
+				database_name 	: layer.data.postgis.database_name,
+				table_name 	: layer.data.postgis.table_name,
+				data_type 	: layer.data.postgis.data_type,
+				query 		: api.postgis._cleanSQLQuery(layer.data.postgis.sql),
+				name 		: layer.title.replace(/ /g,'').replace('.zip', '')
+			}
+
+			// get dataset
+			api.postgis.downloadDataset(options, callback);
+		});
+
+		async.waterfall(ops, function (err, results) {
+			res.end(results);
+		});
+
+	},
+
+	_cleanSQLQuery : function (sql) {
+		var sql = sql;
+		var a = sql.replace('(', '');
+		var b = a.replace(') as sub', '');
+		var c = b.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var cleanSQL = '"' + c + '"';
+		return cleanSQL;
+	},
+
+
+	downloadDatasetFromFile: function (req, res) {
+		var options = req.body,
+		    fileUuid = options.file_id,
+		    format = options.format,
+		    ops = [];
+
+		ops.push(function (callback) {
+			File
+			.findOne({uuid : fileUuid})
+			.exec(callback);
+		});
+
+		ops.push(function (file, callback) {
+
+			var table_name = file.data.postgis.table_name;
+
+			var options = {
+				database_name 	: file.data.postgis.database_name,
+				table_name 	: file.data.postgis.table_name,
+				data_type 	: file.data.postgis.data_type,
+				query 		: '"SELECT * FROM ' + table_name + '"',
+				name 		: file.name.replace(/ /g,'').replace('.zip', ''),
+			}
+
+			// get dataset
+			api.postgis.downloadDataset(options, callback);
+		});
+
+		async.waterfall(ops, function (err, results) {
+			res.end(results);
+		});
+	},
+
+	downloadDataset : function (options, done) {
+		
+		var database_name = options.database_name,
+		    table_name = options.table_name,
+		    data_type = options.data_type,
+		    query = options.query,
+		    name = options.name,
+		    ops = [];
+
+
+		ops.push(function (callback) {
+
+			// where to put file
+			var filePath = database_name + '/' + table_name + '/' +  api.utils.getRandomChars(5) + '/',
+			    folder = api.config.path.temp + filePath,
+			    filename = name,
+			    output = folder + filename,
+			    returnOutput = filePath + filename,
+			    DOWNLOAD_TABLE_SCRIPT = '../scripts/postgis/download_table.sh';
+
+
+			// create folder
+			fs.ensureDir(folder, function (err) {
+
+				var command = [
+					DOWNLOAD_TABLE_SCRIPT,
+					database_name,
+					output,
+					query
+				].join(' ');
+
+				// create database in postgis
+				exec(command, {maxBuffer: 1024 * 50000}, function (err, stdout) {
+					if (err) return callback(err);
+
+					var options = {
+						zipfolder : folder,
+						zipfile : folder + filename,
+						returnOutput : returnOutput
+					}
+					
+					callback(null, options);
+
+				});
+			});
+		});
+
+
+		ops.push(function (options, callback) {
+
+			var zipfolder = options.zipfolder,
+			    zipfile = options.zipfile + '.tar.gz',
+			    returnOutput = options.returnOutput + '.tar.gz';
+
+			var cmd = [
+				'tar',
+				'cvf',
+				'-',
+				'-C',
+				'"' + zipfolder + '"',
+				'.',
+				'|',
+				'pigz',
+				'>',
+				zipfile
+			].join(' ');
+
+			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout) {
+				if (err) return callback(err);
+				callback(null, returnOutput);
+			});
+		});
+
+		async.waterfall(ops, function (err, zipfile) {
+			done(err, zipfile);
+		});
+
 	},
 
 	

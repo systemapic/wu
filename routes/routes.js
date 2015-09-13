@@ -426,12 +426,27 @@ module.exports = function(app, passport) {
 	});
 
 
+	// // =====================================
+	// // REQUEST FILE DOWNLOAD (zip'n send) ==
+	// // =====================================
+	// app.post('/api/file/download', passport.authenticate('bearer', {session: false}), function (req,res) {
+	// 	api.file.zipAndSend(req, res);
+	// });
+
 	// =====================================
-	// REQUEST FILE DOWNLOAD (zip'n send) ==
+	// DOWNLOAD DATASET ====================
 	// =====================================
-	app.post('/api/file/download', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.file.zipAndSend(req, res);
+	app.post('/api/file/downloadDataset', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.postgis.downloadDatasetFromFile(req, res);
 	});
+
+	// =====================================
+	// DOWNLOAD DATASET ====================
+	// =====================================
+	app.post('/api/layer/downloadDataset', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.postgis.downloadDatasetFromLayer(req, res);
+	});
+
 
 	
 	// =====================================

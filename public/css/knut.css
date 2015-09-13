@@ -209,3 +209,10 @@
 }
 
 
+/*temporary override*/
+.file-action-share {
+	color: gainsboro;
+}
+.file-action-share:hover {
+	color: gainsboro;
+}
