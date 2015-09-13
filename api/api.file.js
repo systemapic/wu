@@ -310,16 +310,12 @@ module.exports = api.file = {
 
 	downloadShape : function (req, res) {
 
+		// todo: permissions!
+
 		var file = req.query.file;
-
-
 		var filePath = api.config.path.temp + file;
-		console.log('downloadShape ->', file, filePath);
 
 		res.download(filePath);
-
-
-
 	},
 
 
