@@ -113,8 +113,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		}
 	},
 
-
-
 	_updateStyle : function () {
 
 		// return if no active layer
@@ -812,7 +810,24 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-	_getHistogram : function (column, done) {
+	_getHistogram : function (column, done, fresh) {
+
+		// debug switch
+		// var fresh = true;
+
+		// get fresh histogram from server, if requested
+		if (fresh) return this._getFreshHistogram(column, done);
+
+		// get stored histogram
+		var postgisData = this._layer.getPostGISData();
+		var file_id = postgisData.file_id;
+		var file = app.Account.getFile(file_id);
+		var histogram = file.getHistogram(column);
+		done(null, histogram);
+
+	},
+
+	_getFreshHistogram : function (column, done) {
 		if (!this._layer) return;
 
 		var postgisData = this._layer.getPostGISData();

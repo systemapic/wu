@@ -403,7 +403,25 @@ Wu.Files = Wu.Class.extend({
 		}.bind(this));
 	},
 
+	getMeta : function () {
+		if (!this.store.data.postgis) return false;
+		if (!this.store.data.postgis.metadata) return false;
+		var meta = Wu.parse(this.store.data.postgis.metadata);
+		return meta;
+	},
 
+	getHistograms : function () {
+		var meta = this.getMeta();
+		if (!meta) return false;
+		var histogram = meta.histogram;
+		return histogram;
+	},
+
+	getHistogram : function (column) {
+		var h = this.getHistograms();
+		if (!h) return false;
+		return h[column];
+	},
 
 
 
