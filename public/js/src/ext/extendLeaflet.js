@@ -1,5 +1,8 @@
 
 
+
+
+
 // smoother zooming, especially on apple mousepad
 L._lastScroll = new Date().getTime();
 L.Map.ScrollWheelZoom.prototype._onWheelScroll = function (e) {
@@ -32,7 +35,30 @@ L.Map.include({
 		if (!this._loaded) { return this; }
 		this._sizeChanged = true;
 		this.fire('moveend');
-	}
+	},
+
+	fitBounds: function (bounds, options) {
+
+		options = options || {};
+		bounds = bounds.getBounds ? bounds.getBounds() : L.latLngBounds(bounds);
+
+		var paddingTL = L.point(options.paddingTopLeft || options.padding || [0, 0]),
+		    paddingBR = L.point(options.paddingBottomRight || options.padding || [0, 0]),
+
+		    zoom = this.getBoundsZoom(bounds, false, paddingTL.add(paddingBR)),
+		    paddingOffset = paddingBR.subtract(paddingTL).divideBy(2),
+
+		    swPoint = this.project(bounds.getSouthWest(), zoom),
+		    nePoint = this.project(bounds.getNorthEast(), zoom),
+		    center = this.unproject(swPoint.add(nePoint).divideBy(2).add(paddingOffset), zoom);
+
+		zoom = options && options.maxZoom ? Math.min(options.maxZoom, zoom) : zoom;
+
+		// added minZoom option
+		zoom = options && options.minZoom ? Math.max(options.minZoom, zoom) : zoom;
+
+		return this.setView(center, zoom, options);
+	},
 });
 
 

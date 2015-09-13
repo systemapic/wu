@@ -66,7 +66,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
 
 		// Enable settings from layer we're working with
-		var layerUuid = this._getActiveLayerUiid();
+		var layerUuid = this._getActiveLayerUuid();
 		if ( layerUuid ) this._selectedActiveLayer(false, layerUuid);
 
 		// Select layer we're working on
@@ -82,7 +82,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		var layerUuid = uuid ? uuid : e.target.value;
 		
 		// Store uuid of layer we're working with
-		this._storeActiveLayerUiid(layerUuid);
+		this._storeActiveLayerUuid(layerUuid);
 		
 		this._layer = this._project.getLayer(layerUuid);
 

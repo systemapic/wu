@@ -277,7 +277,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		var layerUuid = uuid ? uuid : e.target.value;
 		
 		// Store uuid of layer we're working with
-		this._storeActiveLayerUiid(layerUuid);
+		this._storeActiveLayerUuid(layerUuid);
 
 		// get layer
 		this._layer = this._project.getLayer(layerUuid);
@@ -302,34 +302,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		// Pad up scroller
 		Wu.DomUtil.addClass(this._midSection, 'middle-section-padding-bottom');
-	},
-	
-	_tempaddLayer : function () {
-
-		// remember
-		this._temps = this._temps || [];
-
-		// if not already added to map
-		if (!this._layer._added) {
-
-			// add
-			this._layer._addThin();
-
-			// remember
-			this._temps.push(this._layer);
-		}
-
-	},
-
-	_tempRemoveLayers : function () {
-		if (!this._temps) return;
-
-		// remove other layers added tempy for styling
-		this._temps.forEach(function (layer) {
-			layer._removeThin();
-		}, this);
-
-		this._temps = [];
 	},
 
 	opened : function () {
@@ -401,7 +373,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
 
 		// Enable settings from layer we're working with
-		var layerUuid = this._getActiveLayerUiid();
+		var layerUuid = this._getActiveLayerUuid();
 		if ( layerUuid ) this._selectedActiveLayer(false, layerUuid);		
 
 		// Select layer we're working on

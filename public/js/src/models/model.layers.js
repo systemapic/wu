@@ -119,17 +119,24 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	flyTo : function () {
-
 		var extent = this.getMeta().extent;
 		if (!extent) return;
 
 		var southWest = L.latLng(extent[1], extent[0]),
 		    northEast = L.latLng(extent[3], extent[2]),
-		    bounds = L.latLngBounds(southWest, northEast);
+		    bounds = L.latLngBounds(southWest, northEast),
+		    map = app._map,
+		    row_count = parseInt(this.getMeta().row_count),
+		    flyOptions = {};
+
+		// if large file, don't zoom out
+		if (row_count > 500000) { 
+			var zoom = map.getZoom();
+			flyOptions.minZoom = zoom;
+		}
 
 		// fly
-		var map = app._map;
-		map.fitBounds(bounds);
+		map.fitBounds(bounds, flyOptions);
 	},
 
 

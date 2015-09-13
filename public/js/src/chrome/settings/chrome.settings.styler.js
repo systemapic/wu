@@ -100,7 +100,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		
 		// Enable settings from layer we're working with
-		var layerUuid = this._getActiveLayerUiid();
+		var layerUuid = this._getActiveLayerUuid();
 		if ( layerUuid ) this._selectedActiveLayer(false, layerUuid);		
 
 		// Select layer we're working on
@@ -132,7 +132,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._layer = this._project.getLayer(this.layerUuid);
 
 		// Store uuid of layer we're working with
-		this._storeActiveLayerUiid(this.layerUuid);		
+		this._storeActiveLayerUuid(this.layerUuid);		
 
 		// get current style, returns default if none
 		var style = this._layer.getStyling();
@@ -1018,38 +1018,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	},
 
 
-	// add layer temporarily for editing
-	_tempaddLayer : function () {
-
-		// remember
-		this._temps = this._temps || [];
-
-		// remove others
-		this._tempRemoveLayers();
-
-		// if not already added to map
-		if (!this._layer._added) {
-
-			// add
-			this._layer._addThin();
-
-			// remember
-			this._temps.push(this._layer);
-		}
-
-	},
-
-	// remove temp added layers
-	_tempRemoveLayers : function () {
-		if (!this._temps) return;
-
-		// remove other layers added tempy for styling
-		this._temps.forEach(function (layer) {
-			layer._removeThin();
-		}, this);
-
-		this._temps = [];
-	},
 
 
 
