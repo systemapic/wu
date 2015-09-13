@@ -1074,7 +1074,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		// var layerItemMoversWrap = Wu.DomUtil.create('div', 'layer-item-movers-wrap', wrap);
 		var up = Wu.DomUtil.create('div', 'layer-item-up', wrap);
 		var down = Wu.DomUtil.create('div', 'layer-item-down', wrap);
-		// var del = Wu.DomUtil.create('div', 'layer-item-delete', wrap);
+		
+		if (!layer) {
+			// create delete button only on folder
+			var del = Wu.DomUtil.create('div', 'layer-item-delete', wrap);
+		}
 
 		if (layer) {
 			var layerItemFlyTo = Wu.DomUtil.createId('div', 'layer-flyto-' + layer.getUuid(), wrap);
@@ -1092,16 +1096,16 @@ L.Control.Layermenu = Wu.Control.extend({
 		// add hooks
 		Wu.DomEvent.on(up,   'click', function (e) { this.upFolder(uuid); 	  }, this);
 		Wu.DomEvent.on(down, 'click', function (e) { this.downFolder(uuid); 	  }, this);
-		// Wu.DomEvent.on(del,  'click', function (e) { this.deleteMenuFolder(uuid); }, this);
 		
 		if (!layer) { // folder
 			Wu.DomEvent.on(inner, 'dblclick', function (e) { this._editFolderTitle(uuid); },this);
+			Wu.DomEvent.on(del,  'click', function (e) { this.deleteMenuFolder(uuid); }, this);
+			Wu.DomEvent.on(del,  'mousedown', Wu.DomEvent.stop, this);
 		}
 
 		// prevent layer activation
 		Wu.DomEvent.on(up,   'mousedown', Wu.DomEvent.stop, this);
 		Wu.DomEvent.on(down, 'mousedown', Wu.DomEvent.stop, this);
-		// Wu.DomEvent.on(del,  'mousedown', Wu.DomEvent.stop, this);
 
 		// drag
 		// set dragstart event
@@ -1175,7 +1179,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.currentlyEditing = true;
 
 		var layerItem = this.layers[uuid];
-		var folder = layerItem.el.children[2];
+		var folder = layerItem.el.children[3];
 
 		// inject <input>
 		var title = folder.innerHTML;
@@ -1235,9 +1239,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		var leg = app.MapPane._controls.legends;
 		leg && leg._refresh(true);
-
-		// update layermenu
-		app.SidePane.Options.settings.layermenu.update(true)
 
 	},
 
