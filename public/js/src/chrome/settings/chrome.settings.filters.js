@@ -95,21 +95,11 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	_createRefresh : function () {
 
 
-		// // create fixed bottom container
-		// this._bottomContainer = Wu.DomUtil.create('div', 'chrome-content-bottom-container displayNone', this._container);
-
-
 		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
 		this._refreshButton = Wu.DomUtil.create('div', 'chrome-right-big-button', this._bottomContainer, text);
 
 		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
 
-		// // create div
-		// var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
-		// this._refreshButton = Wu.DomUtil.create('div', 'chrome-right-big-button', this._container, text);
-
-		// // set event
-		// Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
 	},
 
 
@@ -249,10 +239,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 				return console.error(newLayerStyle.error);
 			}
 
-			// // set & update
-			// layer.setStyle(newLayerStyle.options);
-			// layer.update({enable : true});
-
 			// update layer
 			layer.updateStyle(newLayerStyle);
 
@@ -386,14 +372,10 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	_showEditors : function () {
 		this._SQLEditor.getWrapperElement().style.opacity = 1;
-		// this._sqltitle.style.opacity = 1;
-		// this._refreshButton.style.opacity = 1;
 	},
 
 	_hideEditors : function () {
 		this._SQLEditor.getWrapperElement().style.opacity = 0;
-		// this._sqltitle.style.opacity = 0;
-		// this._refreshButton.style.opacity = 0;
 	},
 
 	_createSqlEditor : function () {
@@ -409,8 +391,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
     			paletteHints : true,
     			gutters: ['CodeMirror-linenumbers', 'errors']
   		});
-
-
 	},
 
 	_getSortedColumns : function () {
@@ -704,7 +684,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		var ticks = [];
 		for (var n = 1; n < num_ticks + 1; n++) {
 			var val = max/num_ticks * n;
-			ticks.push(val);
+			var val_rounded = Math.round(val/100) * 100;
+			ticks.push(val_rounded);
 		}
 		return ticks;
 	},
