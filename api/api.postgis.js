@@ -412,7 +412,7 @@ module.exports = api.postgis = {
 				if (err) return callback(err);
 
 				var metadataJSON = JSON.stringify(metadata);
-				
+
 				// set upload status
 				api.upload.updateStatus(file_id, {
 					metadata : metadataJSON
@@ -597,8 +597,6 @@ module.exports = api.postgis = {
 		ops.push(function (callback) {
 
 
-			// var query = 'SELECT ST_Extent(the_geom_4326) FROM ' + file_id
-
 			var query = 'SELECT * FROM ' + file_id + ' LIMIT 1';
 
 			api.postgis.query({
@@ -607,18 +605,15 @@ module.exports = api.postgis = {
 			}, function (err, results) {
 
 				var rows = results.rows[0];
-
 				var columns = [];
+				var min_max_values = {};
+				var jobs = [];
 
 				for (var r in rows) {
 					if (r != 'geom' && r != 'the_geom_3857' && r != 'the_geom_4326') {
 						columns.push(r);
 					}
 				}
-
-
-				var min_max_values = {};
-				var jobs = [];
 
 				columns.forEach(function (column) {
 
@@ -648,7 +643,6 @@ module.exports = api.postgis = {
 							if (err) return done(null);
 
 							var json = stdout.split('\n')[2];
-
 							var data = JSON.parse(json);
 							
 							min_max_values[column] = data;
@@ -656,16 +650,12 @@ module.exports = api.postgis = {
 							// callback
 							done(null, data);
 						});
-
-
 					});	
-
-
-
 				});
 
 
 				async.parallel(jobs, function (err, values) {
+					min_max_values._columns = columns;
 					metadata.columns = min_max_values;
 
 					callback(null);
@@ -675,11 +665,6 @@ module.exports = api.postgis = {
 
 		// get total area
 		ops.push(function (callback) {
-
-			// meta:
-			// 1. row count (ie. how many points)
-			// 2. file size
-			// 3. total area of file
 
 			var GET_EXTENT_SCRIPT_PATH = '../scripts/postgis/get_st_extent_as_geojson.sh';
 
@@ -699,7 +684,6 @@ module.exports = api.postgis = {
 				var area = geojsonArea.geometry(geojson);
 
 				metadata.extent_geojson = geojson;
-
 				metadata.total_area = area; // square meters
 
 				// callback
@@ -730,7 +714,6 @@ module.exports = api.postgis = {
 		// get size of table in bytes
 		ops.push(function (callback) {
 
-			// var query = 'SELECT count(*) FROM ' + file_id;
 			var query = "SELECT pg_size_pretty(pg_table_size('" + file_id + "'));"
 			
 			api.postgis.query({
@@ -740,21 +723,97 @@ module.exports = api.postgis = {
 				if (err) return callback();
 
 				var json = results.rows[0];
-				
 				metadata.size_bytes = json.pg_size_pretty;
 
 				callback();
 			});
 		});
 
+		
+		// get histograms
+		ops.push(function (callback) {
 
-		// todo: get fields for cartocss pro-tips
+			var columns = metadata.columns._columns;
+			var histogram = {};
 
+			async.each(columns, function (column, cb) {
+
+				api.postgis.fetchHistogram({
+					database_name : postgis_db,
+					table_name : file_id, 
+					num_buckets : api.config.postgis.filters.num_buckets,
+					column : column
+				}, function (err, histo) {
+					if (err) console.log('hisgto err', err);
+
+					histogram[column] = histo;
+					cb(null);
+				});
+
+
+			}, function (err, results) {
+
+				// set histogram to meta
+				metadata.histogram = histogram;
+
+				callback();
+			})
+
+
+		});
 
 		async.series(ops, function (err, results) {
 			done(err, metadata);
 		});
 	},
+
+	fetchHistogram : function (options, done) {
+
+		var table_name = options.table_name,
+		    database_name = options.database_name,
+		    num_buckets = options.num_buckets || 50, // todo: move to config
+		    column = options.column,
+		    ops = [];
+
+
+		ops.push(function (callback) {
+
+			// do sql query on postgis
+			var GET_HISTOGRAM_SCRIPT = '../scripts/postgis/get_histogram.sh';
+
+			// st_extent script 
+			var command = [
+				GET_HISTOGRAM_SCRIPT, 	// script
+				database_name, 	// database name
+				table_name,
+				column,
+				num_buckets
+			].join(' ');
+
+
+			// do postgis script
+			exec(command, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+				if (err) return callback(err);
+
+				var arr = stdout.split('\n'),
+				    result = [];
+
+				arr.forEach(function (arrr) {
+					try {
+						var item = JSON.parse(arrr);
+						result.push(item);
+					} catch (e) {};
+				});
+
+				callback(null, result);
+
+			});
+		});
+
+		async.waterfall(ops, done);
+
+	},
+
 
 	_primeTableWithGeometries : function (options, done) {
 
@@ -864,8 +923,6 @@ module.exports = api.postgis = {
 		async.waterfall(ops, function (err, results) {
 			done(err);
 		});
-
-
 
 	},
 

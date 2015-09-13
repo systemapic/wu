@@ -37,13 +37,15 @@ if [ "$5" == "bar" ]; then
 	),
 	     histogram as (
 	   select width_bucket("'$3'", min, max, '$BUCKETS') as bucket,
-	          int4range(min("'$3'")::int, max("'$3'")::int, '"'"'[]'"'"') as range,
+	          int8range(min("'$3'")::int, max("'$3'")::int, '"'"'[]'"'"') as range,
+	          min("'$3'") as range_min,
+	          max("'$3'") as range_max,
 	          count(*) as freq
 	     from '$2', column_stats
 	 group by bucket
 	 order by bucket
 	)
-	select bucket, range, freq, repeat('"'"'*'"'"', (freq::float / max(freq) over() * 30)::int) as bar from histogram;'
+	select bucket, range, freq, range_min, range_max, repeat('"'"'*'"'"', (freq::float / max(freq) over() * 30)::int) as bar from histogram;'
 
 else 
 
@@ -55,11 +57,13 @@ else
 	     histogram as (
 	   select width_bucket("'$3'", min, max, '$BUCKETS') as bucket,
 	          int4range(min("'$3'")::int, max("'$3'")::int, '"'"'[]'"'"') as range,
+	          min("'$3'") as range_min,
+	          max("'$3'") as range_max,
 	          count(*) as freq
 	     from '$2', column_stats
 	 group by bucket
 	 order by bucket
 	)
-	select bucket, range, freq from histogram) t;'
+	select bucket, range, freq, range_min, range_max from histogram) t;'
 fi
 

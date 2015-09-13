@@ -751,30 +751,6 @@ module.exports = api.file = {
 
 			exec(cmd, callback);
 
-			// // unzip
-			// exec(cmd, function (err, stdout, stdin) {
-			// 	if (err) console.log('handleziup 00 err: '.red + err);
-			// 	if (err) return callback(err);
-
-			// 	console.log('zippppppped!!'.green);
-			// 	console.log('zippppppped!!'.green);
-			// 	console.log('zippppppped!!'.green, err, stdout, stdin);
-
-			// 	// consl.og('crahs!');
-			// 	// remove unnecessary files - important!
-			// 	console.log('unlkn king inn'.red, inn);
-			// 	// fs.unlink(inn, function (err) {
-			// 		// if (err) console.log('handle zip unlink  err: '.red + err);
-			// 		// if (err) return callback(err);
-
-			// 		console.log('removing out! __MAXOSX'.red, out);
-			// 		callback(err);
-			// 		// fs.remove(out + '/__MACOSX', function (err) {
-			// 		// 	if (err) console.log('handle zip remove : '.red + err);
-			// 		// 	callback(err);
-			// 		// });
-			// 	// });
-			// });
 		});
 	},
 
@@ -996,28 +972,6 @@ module.exports = api.file = {
 		file.save(callback);
 	},
 
-	// getFile : function (req, res) {
-
-	// 	console.log('req.query', req.query);
-		
-	// 	var fileUuid = req.query.fileUuid || req.query.file_id,
-	// 	    ops = [];
-
-	// 	// check for missing info
-	// 	if (!fileUuid) return api.error.missingInformation(req, res);
-
-	// 	// todo: check permission to access file
-		
-	// 	// get file
-	// 	File
-	// 	.findOne({uuid : fileUuid})
-	// 	.exec(function (err, file) {
-	// 		if (err) return api.error.general(req, res, err);
-
-	// 		res.end(JSON.stringify(file));
-	// 	});
-
-	// },
 
 	_getFile : function (fileUuid, callback) {
 
@@ -1111,17 +1065,6 @@ module.exports = api.file = {
 			api_hook : 'grind/raster/done',
 		}
 
-		// // create dir on remote
-		// ops.push(function (callback) {
-		// 	var cmd2 = 'ssh ' + remoteSSH + ' "mkdir ' + remoteFolder + '"';
-		// 	exec(cmd2, callback);
-		// });
-
-		// // send file over ssh
-		// ops.push(function (callback) {
-		// 	var cmd = 'tar -cf - -C "' + localFolder + '" "' + localFile + '" | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + '/"';
-		// 	exec(cmd, callback);
-		// });
 
 		// notify remote of file
 		ops.push(function (callback) {
@@ -1227,58 +1170,6 @@ module.exports = api.file = {
 
 	},
 
-
-	// _sendToProcessingGeojson : function (layer, options, done) {
-	// 	var pack = options.pack,
-	// 	    user = options.user,
-	// 	    layers = pack.layers,
-	// 	    size = options.size,
-	// 	    ops = [],
-	// 	    fileUuid = layer.file,
-	// 	    localFile = fileUuid + '.geojson',
-	// 	    localFolder = api.config.path.geojson,
-	// 	    remoteFolder = '/data/grind/geojson/',
-	// 	    uniqueIdentifier = options.uniqueIdentifier,
-	// 	    remoteSSH = 'px_vile_grind',
-	// 	    remoteUrl = api.config.vile_grind.remote_url;
-
-	// 	var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + '"';
-
-	// 	var sendOptions = {
-	// 		fileUuid : fileUuid,
-	// 		uniqueIdentifier : uniqueIdentifier,
-	// 		sender_ssh : api.config.vile_grind.sender_ssh,
-	// 		sender_url : api.config.vile_grind.sender_url,
-	// 		api_hook : 'grind/done'
-	// 	}
-
-	// 	// send file over ssh
-	// 	exec(cmd, function (err, stdout, stdin) {
-	// 		if (err) console.log('err'.red, err);
-
-	// 		// ping tileserver storage to notify of file transfer
-	// 		request({
-	// 			method : 'POST',
-	// 			uri : remoteUrl + 'grind/job',
-	// 			json : sendOptions
-	// 		}, 
-
-	// 		// callback
-	// 		function (err, response, body) {
-
-	// 			api.socket.setProcessing({
-	// 				userId : user._id,
-	// 				fileUuid : fileUuid,
-	// 				uniqueIdentifier : uniqueIdentifier,
-	// 				pack : pack,
-	// 				size : size
-	// 			});
-
-	// 			done(null, 'All done!');
-	// 		});
-	// 	});
-
-	// },
 
 
 }

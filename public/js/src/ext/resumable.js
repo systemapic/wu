@@ -35,39 +35,13 @@ Wu.Resumable = Wu.Class.extend({
 		// create resumable instance
 		var r = this.r = new Resumable(this.options);
 
-		// assign drop, browse
-		// this._assign();
-
 		// add events
 		this._addResumableEvents();
 
 	},
 
 	destroy : function () {
-		// if (!this.r) return;
-
-		// var r = this.r;
-		// var r_id = this._get_id();
-		// var ctx = this.options.context;
-
-		// // don't destroy if in use
-		// if (r.isUploading()) return;
-
-		// // destroy
-		// this._unassign();
-
-		// // cancel (moot)
-		// r.cancel();
-
-		// // remove events
-		// this._removeEvents();
-
-		// // destroy
-		// this.r = null;
-		// delete this.r;
-
-		// // delete
-		// ctx._removeResumable(r_id);
+		
 	},
 
 	_assign : function () {
@@ -88,19 +62,12 @@ Wu.Resumable = Wu.Class.extend({
 	},
 
 	_disableUploadButton : function () {
-		// if (!this.options.browse) return;
-		// Wu.DomEvent.on(this.options.browse, 'click', Wu.DomEvent.stop, this);
-		// Wu.DomUtil.addClass(this.options.browse, 'blurred');
 	},
 	_enableUploadButton : function () {
-		// if (!this.options.browse) return;
-		// Wu.DomEvent.off(this.options.browse, 'click', Wu.DomEvent.stop, this);
-		// Wu.DomUtil.removeClass(this.options.browse, 'blurred');
 	},
 
 	// success or aborted or failed
 	_uploadDone : function () {
-		// this._enableUploadButton();
 		this.options.onUploadDone();
 	},
 
@@ -119,14 +86,6 @@ Wu.Resumable = Wu.Class.extend({
 			// give feedback
 			this.feedbackUploadStarted(file);
 
-			// remove fulldrop
-			// this._dragLeave();
-
-			// deny multiple uploads
-			// this.options.context._refreshResumable();
-			// this.disable();
-			// this._disableUploadButton();
-
 		}.bind(this));
 
 		// file success
@@ -135,9 +94,6 @@ Wu.Resumable = Wu.Class.extend({
 			// give feedback
 			this.feedbackUploadSuccess(file, message);
 			
-			// refresh resumable for next download 	// todo: destroy!
-			// this.options.context._refreshResumable();
-
 			// hide progess bar
 			app.ProgressBar.hideProgress();
 
@@ -174,26 +130,15 @@ Wu.Resumable = Wu.Class.extend({
 		
 		}.bind(this));
 
-		// this._enableDrop();
-
 	},
 
 	_removeEvents : function () {
-		// this._disableDrop();
 	},
 
 	_enableDrop : function () {
-		// var drop = this.options.drop;
-		// Wu.DomEvent.on(window.document, 'dragenter', this._dragEnter, this);
-		// Wu.DomEvent.on(drop, 'dragleave', this._dragLeave, this);
-		// Wu.DomEvent.on(drop, 'drop', this._dragLeave, this);
 	},
 
 	_disableDrop : function () {
-		// var drop = this.options.drop;
-		// Wu.DomEvent.off(window.document, 'dragenter', this._dragEnter, this);
-		// Wu.DomEvent.off(drop, 'dragleave', this._dragLeave, this);
-		// Wu.DomEvent.off(drop, 'drop', this._dragLeave, this);
 	},
 
 	_dragLeave : function () {
@@ -205,14 +150,9 @@ Wu.Resumable = Wu.Class.extend({
 	},
 	
 	disable : function () {
-		// this._tempDisabled = true;
-		// this._disableDrop();
 	},
 
 	enable : function () {
-		// if (this._tempDisabled) {
-		// 	this._enableDrop();
-		// }
 	},
 
 	// feedback upload started
@@ -227,7 +167,6 @@ Wu.Resumable = Wu.Class.extend({
 		app.feedback.setMessage({
 			title : 'Uploading',
 			description : message,
-			// id : file.uniqueIdentifier
 		});
 	},
 

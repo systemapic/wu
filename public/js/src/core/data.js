@@ -2,16 +2,12 @@ Wu.Data = Wu.Class.extend({
 
 	initialize : function () {
 
-
-		console.log('Wu.Data._initalize()');
-
 		// init resumable
 		this._initResumable();
 
 	},
 
 	_initResumable : function () {
-		console.log('Wu.Data._initResumable');
 
 		// create resumable
 		this._resumable = new Wu.Resumable({
@@ -43,13 +39,10 @@ Wu.Data = Wu.Class.extend({
 	},
 
 	_onUploadButtonClick : function () {
-		console.log('_onUploadButtonClick');
 	},
 
 	// ping from socket
 	_onImportedFile : function (file_id, import_time_ms) {
-
-		console.log('_onImportedFile', file_id);
 
 		// print import time
 		app.Data._setFeedbackImportTime(import_time_ms);
@@ -59,7 +52,6 @@ Wu.Data = Wu.Class.extend({
 	},
 
 	_onUploadDone : function () {
-		console.log('_onUploadDone');
 	},
 
 	_setFeedbackImportTime : function (import_time_ms) {
@@ -84,8 +76,6 @@ Wu.Data = Wu.Class.extend({
 			if(xhr.readyState == 4 && xhr.status == 200) {
 				var fileObject = Wu.parse(xhr.responseText);
 
-				console.log('xhr _getFile: ', fileObject)
-
 				// return file
 				if (fileObject && fileObject.file) return callback(fileObject);
 			}
@@ -99,8 +89,6 @@ Wu.Data = Wu.Class.extend({
 		var layer = fileObject.layer;
 		var user = app.Account;
 
-		console.log('GOT FILE!!!', fileStore);
-
 		// add locally
 		var file = user.setFile(fileStore);
 
@@ -108,32 +96,6 @@ Wu.Data = Wu.Class.extend({
 		Wu.Mixin.Events.fire('fileImported', { detail : {
 			file : file
 		}});
-
-
-
-
-
-
-		// var project = app.Projects[projectUuid];
-
-		// // return if no project to add to
-		// if (!project) return console.error('no project to add file to');
-
-		// // add file/layer to project locally
-		// project.setFile(file);
-		// project.addLayer(layer);
-		
-		// // reset progress
-		// app.ProgressBar.hideProgress();
-
-		// // if project is active
-		// if (!app.activeProject) return;
-		
-		// if (project.getUuid() == app.activeProject.getUuid()) {
-		// 	// active project
-		// 	this._addFile();
-		// 	this._addLayer();
-		// } 
 	},
 
 
