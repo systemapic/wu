@@ -308,6 +308,22 @@ module.exports = api.file = {
 	},
 
 
+	downloadShape : function (req, res) {
+
+		var file = req.query.file;
+
+
+		var filePath = api.config.path.temp + file;
+		console.log('downloadShape ->', file, filePath);
+
+		res.download(filePath);
+
+
+
+	},
+
+
+
 	// download zip
 	downloadZip : function (req, res) {
 		var file = req.query.file,
@@ -357,6 +373,9 @@ module.exports = api.file = {
 		
 		// pdf
 		if (type == 'pdf') return api.file.downloadPDF(req, res);
+
+		// pdf
+		if (type == 'shp') return api.file.downloadShape(req, res);
 
 		// normal file
 		return api.file.downloadFile(req, res);

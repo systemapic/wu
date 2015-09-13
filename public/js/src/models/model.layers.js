@@ -552,7 +552,7 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	downloadLayer : function () {
-		console.log('download layer', this);
+
 	},
 	shareLayer : function () {
 		console.log('download layer', this);
@@ -800,8 +800,37 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 
 	downloadLayer : function () {
-		console.log('download layer postgis', this);
+		
+		console.log('layer._downloadFile', this.getTitle());
+
+		var options = {
+			layer_id : this.getUuid()
+		}
+
+		Wu.post('/api/layer/downloadDataset', JSON.stringify(options), this._downloadedDataset.bind(this));
+
 	},
+
+	_downloadedDataset : function (err, response) {
+
+		console.log('downloaded dataset', err, response);
+
+		// parse results
+		var filePath = response;
+		var path = app.options.servers.portal;
+		path += 'api/file/download/';
+		path += '?file=' + filePath;
+		// path += '?raw=true'; // add raw to path
+		path += '&type=shp';
+		path += '&access_token=' + app.tokens.access_token;
+
+		console.log('PATH: ', path);
+
+		// open (note: some browsers will block pop-ups. todo: test browsers!)
+		window.open(path, 'mywindow')
+
+	},
+
 	shareLayer : function () {
 		console.log('share layer postgis', this);
 	},
