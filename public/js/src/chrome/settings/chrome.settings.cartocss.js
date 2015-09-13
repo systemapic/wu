@@ -311,7 +311,7 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		var layerUuid = uuid ? uuid : e.target.value;
 		
 		// Store uuid of layer we're working with
-		this._storeActiveLayerUiid(layerUuid);
+		this._storeActiveLayerUuid(layerUuid);
 
 		// get layer
 		// var layerUuid = e.target.value;
@@ -339,30 +339,7 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		Wu.DomUtil.removeClass(this._bottomContainer, 'displayNone');		
 	},
 
-	_tempaddLayer : function () {
-
-		// remember
-		this._temps = this._temps || [];
-
-		// remove other styling layers
-		this._tempRemoveLayers();
-
-		// add
-		this._layer._addThin();
-
-		// remember
-		this._temps.push(this._layer);
-
-	},
-
-	_tempRemoveLayers : function () {
-		if (!this._temps) return;
-
-		// remove other layers added tempy for styling
-		this._temps.forEach(function (layer) {
-			layer._removeThin();
-		}, this);
-	},
+	
 
 	opened : function () {
 
@@ -421,7 +398,7 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
 
 		// Enable settings from layer we're working with
-		var layerUuid = this._getActiveLayerUiid();
+		var layerUuid = this._getActiveLayerUuid();
 		if ( layerUuid ) this._selectedActiveLayer(false, layerUuid);		
 
 		// Select layer we're working on

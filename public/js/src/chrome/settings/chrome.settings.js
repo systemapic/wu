@@ -132,11 +132,11 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 	},
 
 
-	_storeActiveLayerUiid : function (uuid) {
+	_storeActiveLayerUuid : function (uuid) {
 		app.Chrome.Right.options.editingLayer = uuid;
 	},
 
-	_getActiveLayerUiid : function () {
+	_getActiveLayerUuid : function () {
 		var uuid;
 		app.Chrome.Right.options.editingLayer ? uuid = app.Chrome.Right.options.editingLayer : uuid = false;
 		return uuid;
@@ -147,6 +147,43 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	closed : function () {
 		
+	},
+
+
+	// add layer temporarily for editing
+	_tempaddLayer : function () {
+
+		// remember
+		this._temps = this._temps || [];
+
+		// remove others
+		this._tempRemoveLayers();
+
+		// if not already added to map
+		if (!this._layer._added) {
+
+			// add
+			this._layer._addThin();
+
+			// remember
+			this._temps.push(this._layer);
+
+			// move into view
+			this._layer.flyTo();
+		}
+
+	},
+
+	// remove temp added layers
+	_tempRemoveLayers : function () {
+		if (!this._temps) return;
+
+		// remove other layers added tempy for styling
+		this._temps.forEach(function (layer) {
+			layer._removeThin();
+		}, this);
+
+		this._temps = [];
 	},
 
 

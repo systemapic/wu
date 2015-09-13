@@ -914,21 +914,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomUtil.removeClass(layermenuItem.el, 'layer-active');
 	},
 
-	flyTo : function (layer) {
-		if (!layer) return;
-
-		var extent = layer.getMeta().extent;
-		if (!extent) return;
-
-		var southWest = L.latLng(extent[1], extent[0]),
-		    northEast = L.latLng(extent[3], extent[2]),
-		    bounds = L.latLngBounds(southWest, northEast);
-
-		// fly
-		var map = app._map;
-		map.fitBounds(bounds);
-
-	},
 
 	_getLayermenuItem : function (layerUuid) {
 		var layermenuItem = _.find(this.layers, function (l) { return l.item.layer == layerUuid; });
@@ -1126,7 +1111,7 @@ L.Control.Layermenu = Wu.Control.extend({
 			var flyto = Wu.DomUtil.get('layer-flyto-' + layer.getUuid());
 			Wu.DomEvent.on(flyto, 'mousedown', function (e) {
 				Wu.DomEvent.stop(e);
-				this.flyTo(layer);
+				layer.flyTo();
 			}, this);
 		}
 
