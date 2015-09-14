@@ -130,7 +130,13 @@ Wu.MapPane = Wu.Pane.extend({
 		}, this)
 
 
+		map.on('load', function (e) {
+			console.log('map load!');
 
+			var lm = app.MapPane.getControls().layermenu;
+			console.log('lm: ', lm);
+			lm._enableDefaultLayers();
+		})
 
 
 

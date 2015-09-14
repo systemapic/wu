@@ -162,14 +162,12 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_updateLayer : function (options, done) {
-
 		var css 	= this.getCartocssValue(),
 		    layer 	= options.layer,
 		    file_id 	= layer.getFileUuid(),
 		    sql 	= options.sql,
 		    sql 	= this._createSQL(file_id, sql),
 		    project 	= this._project;
-
 
 		// layer options
 		var layerOptions = layer.store.data.postgis;
@@ -306,10 +304,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 			var clean_sql = sql.substr(1, sql.length -9);
 			return clean_sql;
 		}
-
 		return sql;
 	},
-
 
 	show : function () {
 		if (!this._inited) this._initLayout();
@@ -332,7 +328,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		for (var k in options) {
 			if (options[k].value == layerUuid) options[k].selected = true;
 		}
-
 	},
 
 	_showEditors : function () {
@@ -402,11 +397,18 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		option.setAttribute('disabled', '');
 		option.setAttribute('selected', '');
 
+		// mute columns
+		var mute_columns = [
+			'_columns'
+		]
+
 		// fill dropdown
 		columns.forEach(function (column) {
-			var option = Wu.DomUtil.create('option', 'active-layer-option', select);
-			option.value = column;
-			option.innerHTML = column;
+			if (mute_columns.indexOf(column) == -1) {
+				var option = Wu.DomUtil.create('option', 'active-layer-option', select);
+				option.value = column;
+				option.innerHTML = column;
+			}
 		});
 
 		// select event
@@ -469,7 +471,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	_createFilterChart : function (column) {
 
 		// Create chart
-		if ( !this._chart ) this._createHistogram(column);
+		if (!this._chart) this._createHistogram(column);
 
 		// Update chart
 		this._updateHistogram(column);
@@ -530,9 +532,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		var ndx = crossfilter(histogram),
 		    runDimension = ndx.dimension(function(d) {return +d.bucket;}), 			// x-axis
-		    speedSumGroup = runDimension.group().reduceSum(function(d) {return d.freq;});	// y-axis
-
-		var num_buckets = this.options.num_buckets;
+		    speedSumGroup = runDimension.group().reduceSum(function(d) {return d.freq;}),	// y-axis
+		    num_buckets = this.options.num_buckets;
 
 		// chart settings
 		this._chart
@@ -588,7 +589,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		this._chart.renderlet(function (chart) {
 			this._chart.select('.brush').on('mousedown', this._onBrushMousedown.bind(this));
 		}.bind(this));
-
 	},
 
 	_onBrushMousedown : function (e) {
@@ -704,7 +704,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		// save filter to layer
 		this._layer.setFilter(JSON.stringify([])); // will delete all column filters
-
 	},
 
 	_setFilterLabel : function (value) {
@@ -824,7 +823,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		var file = app.Account.getFile(file_id);
 		var histogram = file.getHistogram(column);
 		done(null, histogram);
-
 	},
 
 	_getFreshHistogram : function (column, done) {
@@ -851,5 +849,3 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		});
 	}
 });
-
-
