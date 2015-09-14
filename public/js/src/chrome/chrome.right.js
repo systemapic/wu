@@ -79,8 +79,6 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	open : function (tab) {
-
-		console.log('chrome right open => tab: ', tab._);
 		
 		// hide all tabs
 		this._forEachTab(function (tab) {
@@ -109,15 +107,12 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	close : function (tab) {
-		console.log('chrome right close => tab: ', tab._);
 		
 		// hide tab
 		if (tab._hide) tab._hide();
 		if (tab.onClosed) tab.onClosed();
 
 		if (!this._isOpen) return;
-
-		console.log('2'); // on right chrome complete close (not switch)
 
 		this._isOpen = false;
 

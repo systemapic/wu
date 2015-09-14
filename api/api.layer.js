@@ -572,6 +572,7 @@ module.exports = api.layer = {
 		layer.file 		= options.file;
 		layer.metadata 		= options.metadata;
 		layer.data 		= options.data;
+		layer.style 		= options.style;
 
 		layer.save(function (err, savedLayer) {
 			if (err) return callback(err);

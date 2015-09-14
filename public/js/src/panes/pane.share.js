@@ -42,9 +42,6 @@ Wu.Share = Wu.Pane.extend({
 	_registerButton : function () {
 
 		// register button in top chrome
-		console.log('share _registerButton');
-
-		// where
 		var top = app.Chrome.Top;
 
 		// add a button to top chrome
@@ -98,7 +95,6 @@ Wu.Share = Wu.Pane.extend({
 
 	// on select project
 	_refresh : function () {
-		console.log('share refresh');
 	},
 
 	_shareImage : function () {

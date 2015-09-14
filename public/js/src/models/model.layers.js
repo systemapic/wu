@@ -94,8 +94,6 @@ Wu.Layer = Wu.Class.extend({
 
 		this._added = true;
 
-		console.error('add tooo');
-
 		// fire event
 		Wu.Mixin.Events.fire('layerEnabled', { detail : {
 			layer : this
@@ -214,8 +212,6 @@ Wu.Layer = Wu.Class.extend({
 	// xoxoxox
 	remove : function (map) {
 		var map = map || app._map;
-
-		console.error('remove!');
 
 		// leaflet fn
 		if (map.hasLayer(this.layer)) map.removeLayer(this.layer);
@@ -562,12 +558,10 @@ Wu.Layer = Wu.Class.extend({
 
 	},
 	shareLayer : function () {
-		console.log('download layer', this);
+		console.log('share layer', this);
 	},
 	deleteLayer : function () {
-		console.log('download layer', this);
-
-
+		console.log('delete layer', this);
 	},
 	
 
@@ -598,9 +592,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 		// enable
 		if (options && options.enable) {
-			
-			console.error('piad to see', this._added);
-
 			map.addLayer(this.layer);
 			this.layer.bringToFront();
 
@@ -725,15 +716,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 	},
 
 
-	// updateStyle : function () {
-	// 	return console.error('updateStyle, todo: remove');
-	// 	// set new options and redraw
-	// 	if (this.layer) this.layer.setOptions({
-	// 		cartoid : this.getCartoid(),
-	// 	});
-	// },
-
-
 	_fetchData : function (e, callback) {
 
 		var keys = Object.keys(e.data);
@@ -768,10 +750,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		var event = e.e.originalEvent;
 
 		if (this._event === undefined || this._event.x == event.x) {
-			// open popup 
-			// app.MapPane.openPopup(e);
-
-			// console.log('pop 7 open');
+			
 		} else {
 			// clear old
 			app.MapPane._clearPopup();
@@ -790,7 +769,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		this._fetchData(e, function (ctx, json) {
 			
 			var data = JSON.parse(json);
-			console.log('fetched data: ', data);
 			e.data = data;
 			var event = e.e.originalEvent;
 			this._event = {
@@ -808,8 +786,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 	downloadLayer : function () {
 		
-		console.log('layer._downloadFile', this.getTitle());
-
 		var options = {
 			layer_id : this.getUuid()
 		}
@@ -820,8 +796,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 	_downloadedDataset : function (err, response) {
 
-		console.log('downloaded dataset', err, response);
-
 		// parse results
 		var filePath = response;
 		var path = app.options.servers.portal;
@@ -830,8 +804,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		// path += '?raw=true'; // add raw to path
 		path += '&type=shp';
 		path += '&access_token=' + app.tokens.access_token;
-
-		console.log('PATH: ', path);
 
 		// open (note: some browsers will block pop-ups. todo: test browsers!)
 		window.open(path, 'mywindow')
@@ -842,7 +814,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		console.log('share layer postgis', this);
 	},
 	deleteLayer : function () {
-		console.log('delete layer postgis', this);
 
 		// confirm
 		var message = 'Are you sure you want to delete this layer? \n - ' + this.getTitle();

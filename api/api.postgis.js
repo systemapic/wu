@@ -762,6 +762,43 @@ module.exports = api.postgis = {
 
 		});
 
+
+		// get geometry type
+		ops.push(function (callback) {
+
+			// do sql query on postgis
+			var GET_HISTOGRAM_SCRIPT = '../scripts/postgis/get_geometry_type.sh';
+
+			// st_extent script 
+			var command = [
+				GET_HISTOGRAM_SCRIPT, 	// script
+				postgis_db, 	// database name
+				file_id,	// table
+			].join(' ');
+
+
+			// do postgis script
+			exec(command, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+				if (err) return callback(err);
+
+				var arr = stdout.split('\n'),
+				    result = [];
+
+				arr.forEach(function (arrr) {
+					try {
+						var item = JSON.parse(arrr);
+						result.push(item);
+					} catch (e) {};
+				});
+
+				console.log('geometry type result: ', result);
+				metadata.geometry_type = result[0].st_geometrytype;
+
+				callback(null, result);
+
+			});
+		});
+
 		async.series(ops, function (err, results) {
 			done(err, metadata);
 		});

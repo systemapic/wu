@@ -43,7 +43,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._content.innerHTML = '';
 	},
 
-	_onLayerEdited : function () {
+	_onLayerEdited : function (e) {
+		var layer = e.detail.layer;
 		this._refresh();
 	},
 
@@ -80,7 +81,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		for (var l in this.layers) {
 			var layer = this.layers[l];
-			console.log('LLLLLLL', layer);
 
 			if (layer.item.enabled) {
 				this._enableDefaultLayer(layer);
@@ -858,7 +858,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 	
 	_enableDefaultLayer : function (layer) {
-		console.log('_enableDefaultLayer', layer);
 		this.enableLayer(layer);
 	},
 
@@ -869,8 +868,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	enableLayer : function (layerItem) {
 		var layer = layerItem.layer;
-
-		console.log('aluerITem', layerItem);
 
 		// folder click
 		if (!layer) return this.toggleFolder(layerItem); 
@@ -949,20 +946,12 @@ L.Control.Layermenu = Wu.Control.extend({
 	// turn off a layer from options
 	remove : function (uuid) {				// todo: clean up layers vs layermenuitems, see _getLayermenuItem above
 		
-
-		console.log('%c control.layermenu.js => remove', 'background: blue; color: white');
-		console.log('uuid', uuid);
-
 		// get layermenuItem
 		var layermenuItem = this.layers[uuid];
-		console.log('layermenuItem', layermenuItem);
 
 		// remove from DOM
 		var elem = layermenuItem.el;
 		if (elem) elem.parentNode.removeChild(elem);
-
-		// set inactive in sidepane layermenu
-		// if (layermenuItem.layer) app.SidePane.Options.settings.layermenu._off(layermenuItem.layer);
 
 		// remove layer from map
 		var layer = layermenuItem.layer;
@@ -976,14 +965,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// save
 		this.save();
-
-		// update Options pane
-		// var baseLayer = app.SidePane.Options.settings.baselayer;
-		// var layerMenu = app.SidePane.Options.settings.layermenu;
-		// if (baseLayer) baseLayer.markOccupied();
-		// if (layerMenu) layerMenu.markOccupied();
-
-		// this._setHeight();
 
 	},
 
@@ -1036,8 +1017,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		var item  = layerItem.item;
 		var layer = layerItem.layer;
 
-		var file = layer && layer.getFile ? layer.getFile() : false;
-		var caption = file ? layerlayer.getTitle() : item.caption;
+		var caption = layer && layer.getTitle ? layer.getTitle() : item.caption;
 
 		// create div
 		var className  = 'layer-menu-item-wrap';
@@ -1121,12 +1101,10 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.layers[item.uuid] = layerItem;
 	},
 
-
 	getLayers : function () {
 		return this.layers;
 	},
 	
-
 	addMenuFolder : function () {
 		this.addFolder();		// todo: remove
 	},

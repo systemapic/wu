@@ -47,36 +47,14 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Create field wrapper
 		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 
-		// Create refresh button at bottom
-		// this._createRefresh();
-
 		// mark as inited
 		this._inited = true;
 
 
 	},
 
-	// _createRefresh : function () {
-
-	// 	// create fixed bottom container
-	// 	this._bottomContainer = Wu.DomUtil.create('div', 'chrome-content-bottom-container displayNone', this._container);
-
-
-	// 	var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
-	// 	this._refreshButton = Wu.DomUtil.create('div', 'chrome-right-big-button', this._bottomContainer, text);
-
-	// 	Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
-	// 	Wu.DomEvent.on(this._refreshButton, 'mouseover', this._closeColorRangeSelector, this);
-
-	// 	// Pad up scroller
-	// 	Wu.DomUtil.addClass(this._midSection, 'middle-section-padding-bottom');		
-	// },	
-
 	
 	_refresh : function () {
-
-		console.log('%c _refresh styler', 'background: green; color: white;')
-
 		this._flush();
 		this._initLayout();
 	},
@@ -97,7 +75,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// mark button
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
-
 		
 		// Enable settings from layer we're working with
 		var layerUuid = this._getActiveLayerUuid();
@@ -108,22 +85,16 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		for ( var k in options ) {
 			if ( options[k].value == layerUuid ) options[k].selected = true;
 		}
-
-
-
 	},
 
 
 	closed : function () {
 		// clean up
 		this._tempRemoveLayers();
-		// this._cleanup();
 	},	
 	
 	// event run when layer selected 
 	_selectedActiveLayer : function (e, uuid) {
-
-		console.log('%c _selectedActiveLayer ', 'background: red; color: white;');
 
 		this._fieldsWrapper.innerHTML = '';
 

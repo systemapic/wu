@@ -131,17 +131,11 @@ Wu.MapPane = Wu.Pane.extend({
 
 
 		map.on('load', function (e) {
-			console.log('map load!');
 
 			var lm = app.MapPane.getControls().layermenu;
-			console.log('lm: ', lm);
 			lm._enableDefaultLayers();
-		})
+		});
 
-
-
-		// add editable layer
-		// this.addEditableLayer(this._map);
 	},
 
 	_invalidateTiles : function () {
