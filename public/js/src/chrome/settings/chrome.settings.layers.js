@@ -83,7 +83,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	},
 
 	open : function () {
-		console.log('open!', this);
 	},
 
 
@@ -236,8 +235,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	// UPDATE		
 	update : function () {
 
-		console.log('%c update ', 'background: red; color: white;');
-
 		if ( !this._mode ) this._mode = 'layer';
 		if ( this._mode == 'baselayer' ) this.markBaseLayerOccupied();
 		if ( this._mode == 'layer' )     this.markLayerOccupied();
@@ -316,10 +313,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		Wu.DomUtil.addClass(elem, 'radio-on');
 		elem.setAttribute('state', 'true');
 
-		console.log('%c saveStartLayer ', 'background: red; color: white;')
-		console.log('layer id => ', layer_id);
-		console.log('');	
-
 		// save state
 		var layerMenu = app.MapPane.getControls().layermenu;
 		layerMenu._setEnabledOnInit(layer_id, true);
@@ -333,10 +326,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 		Wu.DomUtil.removeClass(elem, 'radio-on');
 		elem.setAttribute('state', 'false');
-
-		console.log('%c removeStartLayer ', 'background: red; color: white;')
-		console.log('layer id => ', layer_id);
-		console.log('');
 
 		// save state
 		var layerMenu = app.MapPane.getControls().layermenu;
@@ -367,8 +356,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		var uuid       = layer.store.uuid;
 		var layerActive = false;
 		
-
-		// if (this._mode == 'baselayer') {}
 
 		// Only show radio if layer is active...
 		if (this._mode == 'layer') {

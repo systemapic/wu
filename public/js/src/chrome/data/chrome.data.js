@@ -23,14 +23,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	_onLayerAdded : function () {
-
-		console.error('_onLayerAdded');
-
 		this._refresh();
 	},
 
 	_onFileDeleted : function () {
-		console.log('_onFileDeleted!!!');
 		this._refresh();
 	},
 
@@ -44,22 +40,23 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content data', this.options.appendTo);
 
 		// Middle container
-		this.innerContainer = Wu.DomUtil.create('div', 'chrome-data-inner', this._container);
-		this.fileListsOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this.innerContainer);
-		this.fileListsContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this.fileListsOuterScroller);
+		this._innerContainer = Wu.DomUtil.create('div', 'chrome-data-inner', this._container);
+		this._fileListsOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
+		this._fileListsContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this._fileListsOuterScroller);
 
-		// Top Container 
-		this.initTopContainer();
+		// create top container
+		this._initTopContainer();
 
-		this.initContent();
+		// create file list
+		this._initFileLists();
 
-
-		Wu.DomEvent.on(this.innerContainer, 'click', this.closeFileOption, this);
+		// close event
+		Wu.DomEvent.on(this._innerContainer, 'click', this.closeFileOption, this);
 
 	},
 
 
-	initTopContainer : function () {
+	_initTopContainer : function () {
 
 		// Top container
 		this.topContainer = Wu.DomUtil.create('div', 'chrome-data-top', this._container);
@@ -69,7 +66,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Upload button
 		this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this.topContainer);
 		this.uploadButton.innerHTML = 'Upload files...';
-
 	},
 
 
@@ -84,9 +80,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_registerButton : function () {
 
 		// register button in top chrome
-		console.log('data _registerButton');
-
-		// where
 		var top = app.Chrome.Top;
 
 		// add a button to top chrome
@@ -129,24 +122,19 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	onOpened : function () {
-		console.log('i was opened!');
 	},
 
 	onClosed : function () {
-		console.log('i was closed!'); // for cleanup etc., if closed from somewhere else
+		// console.log('i was closed!'); // for cleanup etc., if closed from somewhere else
 	},
 
 	_addEvents : function () {
-		// todo
-		Wu.DomEvent.on(window, 'resize', this._onWindowResize, this);
 	},
 
 	_removeEvents : function () {
-		Wu.DomEvent.off(window, 'resize', this._onWindowResize, this);
 	},
 
 	_onWindowResize : function () {
-		console.log('_windowResize')
 	},
 
 	getDimensions : function () {
@@ -157,10 +145,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		return dims;
 	},
 
-
-
 	_onFileImported : function () {
-	
 		this._refresh();
 	},
 
@@ -184,7 +169,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// │││││ │   │  │ ││││ │ ├─┤││││├┤ ├┬┘└─┐
 	// ┴┘└┘┴ ┴   └─┘└─┘┘└┘ ┴ ┴ ┴┴┘└┘└─┘┴└─└─┘
 
-	initContent : function () {
+	// initContent : function () {
+	_initFileLists : function () {
 
 
 		// Holds each section (project files, my files, etc)
@@ -222,7 +208,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this.projectLayersContainers = {};
 
 		// Create wrapper
-		this.projectLayersContainers.wrapper = Wu.DomUtil.create('div', 'file-list-container', this.fileListsContainer);
+		this.projectLayersContainers.wrapper = Wu.DomUtil.create('div', 'file-list-container', this._fileListsContainer);
 		
 		// Title
 		this.projectLayersContainers.title = Wu.DomUtil.create('div', 'chrome-content-header file-list-container-title', this.projectLayersContainers.wrapper);
@@ -243,7 +229,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			this.fileListContainers[f] = {};
 
 			// Create wrapper
-			this.fileListContainers[f].wrapper = Wu.DomUtil.create('div', 'file-list-container', this.fileListsContainer);
+			this.fileListContainers[f].wrapper = Wu.DomUtil.create('div', 'file-list-container', this._fileListsContainer);
 			
 			// Title
 			this.fileListContainers[f].title = Wu.DomUtil.create('div', 'chrome-content-header file-list-container-title', this.fileListContainers[f].wrapper);
@@ -431,8 +417,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Update
 		nameContent
 			.html(function (d) { 
-				if ( library == 'layers' ) return d.getTitle();
-				return d.getName();
+				return d.getTitle();
 			}.bind(this))
 			.on('dblclick', function (d) {
 				this.activateInput(d, library);
@@ -905,8 +890,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this.selectedFiles = [];
 		this._refresh();
 	},
-
-
 
 
 	saveName : function (newName, d, library) {

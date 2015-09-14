@@ -30,8 +30,6 @@ Wu.Resumable = Wu.Class.extend({
 
 	_create : function () {
 
-		console.error('CREATE RESUM');
-
 		// create resumable instance
 		var r = this.r = new Resumable(this.options);
 

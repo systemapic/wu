@@ -30,7 +30,7 @@ Wu.Socket = Wu.Class.extend({
 
 		socket.on('server_stats', function (data) {
 			var stats = data.server_stats;
-			app.Chrome.Top.updateCPUclock(stats.cpu_usage);
+			if (app.Chrome) app.Chrome.Top.updateCPUclock(stats.cpu_usage);
 		})
 
 		socket.on('connect', function(){

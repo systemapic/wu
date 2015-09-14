@@ -17,6 +17,9 @@ Wu.Files = Wu.Class.extend({
 	getName : function () {
 		return this.store.name;
 	},
+	getTitle : function () {
+		return this.getName();
+	},
 
 	getType : function () {
 		return this.store.type;
@@ -103,8 +106,6 @@ Wu.Files = Wu.Class.extend({
 
 		Wu.Util.postcb('/api/file/addtoproject', JSON.stringify(options), function (err, body) {
 
-			console.log('_addToProject err, body', err, body);
-
 		});
 	},
 
@@ -131,8 +132,6 @@ Wu.Files = Wu.Class.extend({
 	},
 
 	setCategory : function (category) {
-		console.log('Wu.Files.setCategory: ', category);
-
 		this.store.category = category; // should be string
 		this.save('category');
 	},
@@ -148,7 +147,6 @@ Wu.Files = Wu.Class.extend({
 	},
 
 	setDescription : function (description) {
-		console.log('saving description1!!!!!');
 		this.store.description = description;
 		this.save('description');
 	},
@@ -175,7 +173,6 @@ Wu.Files = Wu.Class.extend({
 		// TODO: save only if actual changes! saving too much already
 		Wu.save('/api/file/update', string); // save to server   
 
-		console.log('SAVING FILE!!');                         
 		app.setSaveStatus();// set status
 	},
 
@@ -183,13 +180,9 @@ Wu.Files = Wu.Class.extend({
 
 	// todo: move all delete of files here
 	_deleteFile : function () {
-		console.log('file._deleteFile', this.getName(), this);
-
-
 
 		// check if dataset has layers
 		this._getLayers(function (err, layers) {
-			console.log('_getLayers', err, layers);
 
 			var num_layers = layers.length;
 			var pretty_layers = [];
@@ -224,12 +217,6 @@ Wu.Files = Wu.Class.extend({
 	},
 
 	_fileDeleted : function (result) {
-		console.log('_fileDeleted', result);
-
-		// remove locally
-		// 1. remove file from user locally
-		// 2. remove layers from projects
-		// 	
 
 		// catch error
 		if (result.error || !result.success) return console.error(result.error || 'No success deleting!');
@@ -259,8 +246,6 @@ Wu.Files = Wu.Class.extend({
 
 			// remove layer
 			project.removeLayer(layer);
-
-			console.log('FOUND project -> ', project);
 
 		});
 
@@ -292,8 +277,6 @@ Wu.Files = Wu.Class.extend({
 	},
 
 	_createLayer : function (project) {
-		console.log('file._createLayer', this.getName(), project);
-
 		this._createDefaultLayer(project);
 	},
 
@@ -302,8 +285,6 @@ Wu.Files = Wu.Class.extend({
 	}, 
 
 	_downloadDataset : function () {
-
-		console.log('file._downloadFile', this.getName());
 
 		var options = {
 			file_id : this.getUuid(),
@@ -315,8 +296,6 @@ Wu.Files = Wu.Class.extend({
 
 	_downloadedDataset : function (err, response) {
 
-		console.log('downloaded dataset', err, response);
-
 		// parse results
 		var filePath = response;
 		var path = app.options.servers.portal;
@@ -326,20 +305,87 @@ Wu.Files = Wu.Class.extend({
 		path += '&type=shp';
 		path += '&access_token=' + app.tokens.access_token;
 
-		console.log('PATH: ', path);
-
 		// open (note: some browsers will block pop-ups. todo: test browsers!)
 		window.open(path, 'mywindow')
 
-
 	},
 
+	getGeometryType : function () {
+		var meta = this.getMeta();
+		console.log('meta', meta);
+		return meta.geometry_type;
+	},
 
+	getDefaultStyling : function () {
+
+		// returns geom type from file meta
+		var geometry_type = this.getGeometryType();
+
+		var style = {
+			json : {}
+		};
+
+		if (geometry_type == 'ST_Point') { 
+			style.css = this._defaultStyling.css.point; // todo: remove
+			style.json.point = this._defaultStyling.json.point;
+		}
+		if (geometry_type == 'ST_Polygon') { 
+			style.css = this._defaultStyling.css.polygon;
+			style.json.polygon = this._defaultStyling.json.polygon;
+		}
+		if (geometry_type == 'ST_LineString') { 
+			style.css = this._defaultStyling.css.line;
+			style.json.line = this._defaultStyling.json.line;
+		}
+
+		return style;
+	},
+
+	// default cartocss styling
+	_defaultStyling : {
+		css : {
+			// todo: remove this css, create css from style json instead!
+			point : "@opacity_field: 0.5; @marker_size_factor: 1; [zoom=10] { marker-width: 0.3 * @marker_size_factor; } [zoom=11] { marker-width: 0.5 * @marker_size_factor; } [zoom=12] { marker-width: 1 * @marker_size_factor; } [zoom=13] { marker-width: 1 * @marker_size_factor; } [zoom=14] { marker-width: 2 * @marker_size_factor; } [zoom=15] { marker-width: 4 * @marker_size_factor; } [zoom=16] { marker-width: 6 * @marker_size_factor; } [zoom=17] { marker-width: 8 * @marker_size_factor; } [zoom=18] { marker-width: 12 * @marker_size_factor; } #layer { marker-allow-overlap: true; marker-clip: false; marker-comp-op: screen; marker-opacity: @opacity_field; marker-fill: #fcff33; }",
+			polygon : "#layer {  \n polygon-fill: red; \n marker-fill: blue; \n marker-allow-overlap: true; \n marker-clip: false; \n marker-comp-op: screen;}",
+			line : "#layer {  \n polygon-fill: red; \n marker-fill: yellow; \n marker-allow-overlap: true; \n marker-clip: false; \n marker-comp-op: screen;}",
+		}, 
+
+		// default styling
+		json : {
+			point : { 
+				enabled : true, 
+				color : { 
+					range : false, 
+					minMax : [-426.6,105.9], 
+					customMinMax : [-426.6,105.9], 
+					staticVal : "#fcff33",
+					value : [
+						"#ff0000",
+						"#a5ff00",
+						"#003dff"
+					]
+				},
+				opacity : { 
+					range : false,
+					value : 0.5
+				}, 
+				pointsize : { 
+					range :false,
+					minMax : false,
+					value : 1.
+				}
+			},
+			polygon : {},
+			line : {}
+		}
+	},
 
 	_createDefaultLayer : function (project) {
 
 		var file_id = this.getUuid();
 		var file = this;
+
+		var cartocss = file.getDefaultStyling().css; // bytt ut denne med cartocss laget fra json style over
 
 		var layerJSON = {
 			"geom_column": "the_geom_3857",
@@ -351,7 +397,7 @@ Wu.Files = Wu.Class.extend({
 			"attributes": "",
 			"access_token": app.tokens.access_token,
 			"cartocss_version": "2.0.1",
-			"cartocss": "#layer {  \n polygon-fill: red; \n marker-fill: #001980; \n marker-allow-overlap: true; \n marker-clip: false; \n marker-comp-op: screen;}",
+			"cartocss": cartocss, 	// save default cartocss style (will be active on first render)
 			"sql": "(SELECT * FROM " + file_id + ") as sub",
 			"file_id": file_id,
 			"return_model" : true,
@@ -360,7 +406,6 @@ Wu.Files = Wu.Class.extend({
 
 		// create postgis layer
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
-			console.log('api/db/createLayer', err, layerJSON);
 			var layer = Wu.parse(layerJSON);
 
 			var options = {
@@ -371,7 +416,8 @@ Wu.Files = Wu.Class.extend({
 				metadata : layer.options.metadata,
 				title : 'Layer from ' + file.getName(),
 				description : 'Description: Layer created from ' + file.getName(),
-				file : file.getUuid()
+				file : file.getUuid(),
+				style : JSON.stringify(file.getDefaultStyling().json) // save default json style
 			}
 
 			// create new layer model
