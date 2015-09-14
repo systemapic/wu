@@ -75,9 +75,6 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 		// tabs wrapper
 		this._tabsWrapper = Wu.DomUtil.create('div', 'chrome chrome-content settings-tabs-wrapper', this._container);
-
-
-
 	},
 
 	_initContent : function () {
@@ -103,8 +100,6 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		});
 	},
 
-
-
 	_initTabs : function () {
 
 		// tabs object
@@ -114,14 +109,11 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		this._buttonWrapper = Wu.DomUtil.create('div', 'chrome chrome-content settings-button-wrapper', this._header);
 		
 		// create tabs
-		for ( var o in this.options.tabs) {
+		for (var o in this.options.tabs) {
 			if (this.options.tabs[o].enabled) {
 
 				var text = this.options.tabs[o].text;
-
 				var tab = o.camelize();
-
-				console.log('tab: ', tab);
 
 				// create tab contents
 				if (Wu.Chrome.SettingsContent[tab]) {
@@ -139,21 +131,16 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 				}
 			}
 		}
-
 	},
-
 
 	getTabs : function () {
 		return this._tabs;
 	},
 
-
 	_togglePane : function () {
 
 		// right chrome
 		var chrome = this.options.chrome;
-
-		console.log('TOGLGLE');
 
 		// open/close
 		this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
@@ -177,16 +164,12 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		this._isOpen = false;
 
 		Wu.DomUtil.removeClass(this._settingsButton, 'active');
-
 	},
 
 	onOpened : function () {
 
 		// default styler
 		this._tabs['Styler'].show();
-
-		console.log('i was opened', this._);
-
 	},
 
 	// clean up on close
@@ -200,23 +183,7 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		var layerMenu = app.MapPane.getControls().layermenu;	 // move to settings selector
 		if (layerMenu) layerMenu.disableEdit();
 
-		console.log('i was closed', this._);
-
-		// this._addThinRemovedLayers();
-
 	},
-
-	// _addThinRemovedLayers : function () {
-	// 	var layerMenu = app.MapPane.getControls().layermenu;
-	// 	if (!layerMenu) return;
-
-	// 	var layers = layerMenu._getActiveLayers();
-	// 	layers.forEach(function (l) {
-	// 		console.log('L', l);
-	// 		l.layer._addThin();
-	// 	})
-
-	// },
 
 	_refreshAll : function () {
 		for (var t in this._tabs) {

@@ -144,8 +144,8 @@ Wu.Layer = Wu.Class.extend({
 
 		if (this._isBase) return;
 
-		this._addToLegends();
-		this._addToInspect();
+		// this._addToLegends();
+		// this._addToInspect();
 		this._addToDescription();
 		this._addToLayermenu();
 	},

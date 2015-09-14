@@ -55,9 +55,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		// if not active in project, hide
 		if (!this._isActive()) return this._hide();
 
-
-		console.log("PASTTSTS");
-
 		// remove old content
 		this._flush();
 
@@ -73,6 +70,22 @@ L.Control.Layermenu = Wu.Control.extend({
 		// Set max height
 		var dimensions = app._getDimensions();
 		this.resizeEvent(dimensions);
+
+		// enable layers that are active by default
+		// this._enableDefaultLayers();
+
+	},
+
+	_enableDefaultLayers : function () {
+
+		for (var l in this.layers) {
+			var layer = this.layers[l];
+			console.log('LLLLLLL', layer);
+
+			if (layer.item.enabled) {
+				this._enableDefaultLayer(layer);
+			}
+		}
 
 	},
 
@@ -109,20 +122,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Append to DOM
 		app._map._controlCorners.bottomright.appendChild(this._openLayers);
-
-		// // Pick up Elements dealing with the Legends
-		// var legends = app.MapPane.getControls().legends;
-		// if (legends) {
-		// 	this._legendsContainer = legends._legendsContainer;
-		// 	this._legendsCollapser = legends._legendsCollapser;
-		// }
-
-		// // add extra padding	
-		// var inspect = app.MapPane.getControls().inspect;	
-		// if (!inspect) {
-		// 	var corner = app._map._controlCorners.bottomright;
-		// 	corner.style.paddingBottom = 6 + 'px';
-		// }
 
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
@@ -836,11 +835,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		if (item.on) {
 			this.disableLayer(item);
 			// Google Analytics event tracking
-			app.Analytics.setGaEvent(['Controls', 'Layer hide: ' + _layerName ]);
+			// app.Analytics.setGaEvent(['Controls', 'Layer hide: ' + _layerName ]);
 		} else {
 			this.enableLayer(item);
 			// Google Analytics event tracking
-			app.Analytics.setGaEvent(['Controls', 'Layer show: ' + _layerName ]);
+			// app.Analytics.setGaEvent(['Controls', 'Layer show: ' + _layerName ]);
 		}    
 	},
 
@@ -857,6 +856,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 		layerItem.on = true;
 	},
+	
+	_enableDefaultLayer : function (layer) {
+		console.log('_enableDefaultLayer', layer);
+		this.enableLayer(layer);
+	},
 
 	_enableLayerByUuid : function (layerUuid) {
 		var item = this._getLayermenuItem(layerUuid);
@@ -865,6 +869,8 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	enableLayer : function (layerItem) {
 		var layer = layerItem.layer;
+
+		console.log('aluerITem', layerItem);
 
 		// folder click
 		if (!layer) return this.toggleFolder(layerItem); 
@@ -1031,7 +1037,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		var layer = layerItem.layer;
 
 		var file = layer && layer.getFile ? layer.getFile() : false;
-		// var caption = file ? file.store.name : item.caption;
 		var caption = file ? layerlayer.getTitle() : item.caption;
 
 		// create div
@@ -1074,9 +1079,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		inner.setAttribute('type', 'layerItem');
 		inner.innerHTML = caption;
 
-
-		// append to layermenu
-		// this._content.appendChild(wrap); 	
 
 		// add hooks
 		Wu.DomEvent.on(up,   'click', function (e) { this.upFolder(uuid); 	  }, this);
@@ -1335,12 +1337,26 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	},
 
+	_setEnabledOnInit : function (layer_id, onoff) {
+
+		var l = this._project.store.layermenu;
+		var i = -1;
+
+		l.forEach(function (item, n) {
+			if (item.layer == layer_id) i = n;
+		});
+
+		// err
+		if (i < 0) return console.error('couldnt save');
+
+		// save
+		this._project.store.layermenu[i].enabled = onoff;
+		this.save();
+	},
+
 
 });
 
 L.control.layermenu = function (options) {
 	return new L.Control.Layermenu(options);
 };
-
-
-

@@ -165,8 +165,18 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		
 		// set active or not
 		this._project.store.baseLayers.forEach(function (b) {
-			if ( uuid == b.uuid ) { on = true; return; } 
+			if ( uuid == b.uuid ) { 
+				on = true; 
+				return; 
+			} 
 		}.bind(this));
+
+
+		// get saved state of enabled-by-default
+		layermenuItem = _.find(this._project.store.layermenu, function (l) {
+			return l.layer == uuid;
+		});
+		var enabledByDefault = layermenuItem && layermenuItem.enabled;
 
 		var lineOptions = {
 			key 		: uuid,
@@ -177,7 +187,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 			rightPos	: false,
 			type 		: 'switch',
 			radio 		: true,
-			radioOn		: false
+			radioOn		: enabledByDefault
 		}
 
 		this._createMetaFieldLine(lineOptions);
@@ -209,9 +219,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 			}
 			for (var l in layers) {
 				var layer = layers[l];
-
 				if (layer) {
-
 					if (layer.store && layer.store.data.hasOwnProperty(key)) {
 						sort.layers.push(layer)
 					}
@@ -220,26 +228,17 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 			results.push(sort);
 		}, this);
 
-		// console.log('SROOTED', results);
 		this.numberOfProviders = results.length;
 		return results;
 	},
 
 
-
-
-
-
-	// UPDATE
-	// UPDATE
 	// UPDATE		
-
 	update : function () {
 
 		console.log('%c update ', 'background: red; color: white;');
 
 		if ( !this._mode ) this._mode = 'layer';
-
 		if ( this._mode == 'baselayer' ) this.markBaseLayerOccupied();
 		if ( this._mode == 'layer' )     this.markLayerOccupied();
 		
@@ -249,7 +248,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 
 	// MARK BASE LAYERS AS OCCUPIED
-
 	markBaseLayerOccupied : function () {
 
 		// get layers and active baselayers
@@ -271,9 +269,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	},
 
 	// MARK LAYERS AS OCCUPIED
-
 	markLayerOccupied : function () {
-
 
 		var project = this._project;
 
@@ -292,72 +288,59 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	},
 
 	// SET LAYER AS NOT OCCUPIED
-
 	activateLayer : function (layerUuid) {
-
 		var id = 'field_wrapper_' + layerUuid;
 		var elem = Wu.DomUtil.get(id);
-
 		Wu.DomUtil.removeClass(elem, 'deactivated-layer');
-
 	},
 
 	// SET LAYER AS OCCUPIED
-
 	deactivateLayer : function (layerUuid) {
-
 		var id = 'field_wrapper_' + layerUuid;
 		var elem = Wu.DomUtil.get(id);
-
 		Wu.DomUtil.addClass(elem, 'deactivated-layer');
-
 	},
-
-
-	// TOGGLE RADIOS
-	// TOGGLE RADIOS
-	// TOGGLE RADIOS	
 
 	// Toggle radio
 	toggleRadio : function (e) {
-
 		var elem = e.target;
-		this.radioOnOff(elem);
-
-	},
-
-	radioOnOff : function (elem) {
 		var state = elem.getAttribute('state');
 		state == 'true' ? this.radioOff(elem) : this.radioOn(elem);
 	},
 
-
 	radioOn : function (elem) {
 
 		var id = elem.id;
-		var uuid = id.slice(6, id.length);		
+		var layer_id = id.slice(6, id.length);		
 
 		Wu.DomUtil.addClass(elem, 'radio-on');
 		elem.setAttribute('state', 'true');
 
 		console.log('%c saveStartLayer ', 'background: red; color: white;')
-		console.log('layer id => ', uuid);
-		console.log('');		
+		console.log('layer id => ', layer_id);
+		console.log('');	
+
+		// save state
+		var layerMenu = app.MapPane.getControls().layermenu;
+		layerMenu._setEnabledOnInit(layer_id, true);
 
 	},
 
 	radioOff : function (elem) {
 
 		var id = elem.id;
-		var uuid = id.slice(6, id.length);
+		var layer_id = id.slice(6, id.length);
 
 		Wu.DomUtil.removeClass(elem, 'radio-on');
 		elem.setAttribute('state', 'false');
 
 		console.log('%c removeStartLayer ', 'background: red; color: white;')
-		console.log('layer id => ', uuid);
+		console.log('layer id => ', layer_id);
 		console.log('');
 
+		// save state
+		var layerMenu = app.MapPane.getControls().layermenu;
+		layerMenu._setEnabledOnInit(layer_id, false);
 	},
 
 
@@ -385,10 +368,10 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		var layerActive = false;
 		
 
-		if ( this._mode == 'baselayer' ) {}
+		// if (this._mode == 'baselayer') {}
 
 		// Only show radio if layer is active...
-		if ( this._mode == 'layer' ) {
+		if (this._mode == 'layer') {
 			this._project.store.layermenu.forEach(function (b) {
 				if ( uuid == b.layer ) { layerActive = true; return; }
 			}, this);
@@ -397,7 +380,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		// Get switch
 		var s = Wu.DomUtil.get('radio_' + uuid);
 
-		if ( layerActive ) {
+		if (layerActive) {
 			Wu.DomUtil.removeClass(s, 'displayNone');
 		} else {
 			Wu.DomUtil.addClass(s, 'displayNone');		
@@ -541,13 +524,10 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 		var layerMenu = app.MapPane.getControls().layermenu;
 		layerMenu.add(layer);
-
 	},
 
 	// DISABLE LAYER (AND SAVE)
 	disableLayer : function (uuid) {
-
-		console.log(uuid);
 
 		var layer = this._project.layers[uuid];
 		var _uuid = layer.store.uuid;
