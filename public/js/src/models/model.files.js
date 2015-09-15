@@ -322,22 +322,24 @@ Wu.Files = Wu.Class.extend({
 		var geometry_type = this._getGeometryType();
 
 		if (geometry_type == 'ST_Point') { 
-			return this._defaultStyling.point;
+			return this._defaultStyling;
 		}
-		if (geometry_type == 'ST_Polygon') { 
-			return this._defaultStyling.polygon;
-		}
-		if (geometry_type == 'ST_LineString') { 
-			return this._defaultStyling.line;
-		}
+		// if (geometry_type == 'ST_Polygon') { 
+		// 	return this._defaultStyling.polygon;
+		// }
+		// if (geometry_type == 'ST_LineString') { 
+		// 	return this._defaultStyling.line;
+		// }
 	},
 
 	_createDefaultCartocss : function (json) {
 
 		var styler = app.Tools.Styler;
-		var css = styler.json2cartocss(json);
+		// var css = styler.json2cartocss(json);
 
-		console.log('got this css ->', css);
+		// console.log('got this css ->', css);
+
+		var css = "#layer { polygon-fill: red; marker-fill: red; marker-allow-overlap: true; marker-clip: false; marker-comp-op: screen;}";
 
 		return css;
 
@@ -371,8 +373,8 @@ Wu.Files = Wu.Class.extend({
 				value : 1.
 			}
 		},
-		polygon : {},
-		line : {}
+		// polygon : {},
+		// line : {}
 	},
 
 	_createDefaultLayer : function (project) {
