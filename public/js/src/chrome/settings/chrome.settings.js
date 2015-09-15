@@ -362,22 +362,36 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 			var colorBall_3 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-3', colorBallWrapper);
 			    colorBall_3.id = 'color-range-ball-3-' + key;
-			    colorBall_3.style.background = val[2];
-			    colorBall_3.setAttribute('hex', val[2]);
+			    colorBall_3.style.background = val[4];
+			    colorBall_3.setAttribute('hex', val[4]);
 			    
 			var colorBall_2 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-2', colorBallWrapper);
 			    colorBall_2.id = 'color-range-ball-2-' + key;
-			    colorBall_2.style.background = val[1];
-			    colorBall_2.setAttribute('hex', val[1]);
+			    colorBall_2.style.background = val[2];
+			    colorBall_2.setAttribute('hex', val[2]);
 
 			var colorBall_1 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-1', colorBallWrapper);
 			    colorBall_1.id = 'color-range-ball-1-' + key;
 			    colorBall_1.style.background = val[0];
 			    colorBall_1.setAttribute('hex', val[0]);			        			    			    
 
+
+			    console.log('');
+			    console.log('');
+			    console.log('');
+			    console.log('');
+			    console.log('');
+			    console.log('val', val);
+			    console.log('');
+			    console.log('');
+			    console.log('');
+			    console.log('');
+			    console.log('');
+
+			    
 			    this.initSpectrum(this, val[0], colorBall_1, key);
-			    this.initSpectrum(this, val[1], colorBall_2, key);
-			    this.initSpectrum(this, val[2], colorBall_3, key);
+			    this.initSpectrum(this, val[2], colorBall_2, key);
+			    this.initSpectrum(this, val[4], colorBall_3, key);
 
 
 			// Color range presets
@@ -387,12 +401,12 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 			var colorRangePresetWrapper = Wu.DomUtil.create('div', 'color-range-preset-wrapper', colorSelectorWrapper);
 
 			var colorRangesPresets = [
-				['#ff0000', '#00ff00', '#0000ff'],
+				['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'],
+				['#0000ff', '#00ffff', '#00ff00', '#ffff00', '#ff0000'],
 				['#ff007d', '#ffff00', '#007dff'],
 				['#ff7d00', '#ffff00', '#00ff7d'],
 				['#ff00ff', '#ffff00', '#00ffff'],
 				['#ffff00', '#ff00ff', '#00ffff'],
-				['#ff0000', '#00ff00'],
 				['#ff007d', '#ffff00'],
 				['#0000ff', '#ffff00'],
 				['#ff7d00', '#00ff00']
