@@ -602,6 +602,14 @@ module.exports = function(app, passport) {
 		api.user.checkUniqueEmail(req, res);
 	});
 
+	// =====================================
+	// CHECK UNIQUE USER/EMAIL =============
+	// =====================================
+	app.post('/api/user/invite', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.user.invite(req, res);
+	});
+
+
 
 	// =====================================
 	// access: GET ROLE  ===============

@@ -43,6 +43,90 @@ var api = module.parent.exports;
 module.exports = api.user = { 
 
 
+	// invite users
+	invite : function (req, res) {
+		var options = req.body;
+
+		// invite users
+		api.user._invite(options, function (err, results) {
+			res.json(results);
+		});
+
+
+	},
+
+	_invite : function (options, callback) {
+
+		var access_type = options.access_type,
+		    invite_emails = options.emails,
+		    project_id = options.project_id;
+
+
+		console.log('INVITE ?USERS', options);
+
+
+		// 1. if exisitng user, add access and notify
+		// 2. if not existing, send create user link and store access in redis or whatever
+
+
+		// if not existing
+		// ---------------
+		// 
+		// - need to send link to user with token. 
+		// - token must be stored in redis and contain: email, project, type access, who invited, when invited 
+		// - possible to sign up with that email address only
+		// - when following link, taken to sign-up site: 
+		// 	1) enter details (name, organization, type profession?, etc.)
+		//	2) will create account on that email, give view/edit access to project.
+		// 	3) log user in immediately, activate project
+		// 	
+		// - should take invited user < 1 min to sign up.
+		//
+		// - new user has access to:
+		// 	1) view/edit project invited for
+		// 	2) NOT create new project ...
+		// 	3) NOT upload data 
+		// 	4) invite others for VIEW
+		// 	
+		// 	- should set certain limitations on others' servers. ie, if GLOBESAR has a server, others should perhaps not
+		//		be able to invite to it. perhaps invite to SYSTEMAPIC server instead?
+		// 	- actually, only GLOBESAR should be able to invite uploaders to his own portal.
+		// 	- need to syncronize servers soon! 
+
+
+
+		// PILOT FLOW:
+		// 1. frano can only invite VIEWERS
+		// 2. if he wants more admins, we'll add them for him.
+		// 3. anybody can invite VIEWERS to own projects ?
+		//
+		// 4. ALSO would be really cool: just send anyone a link, and they can login/register and get access to project.
+
+
+		var results = {
+
+		}
+
+		callback(null, options);
+
+	},
+
+
+
+	_inviteNewUser : function (options, callback) {
+
+
+
+	},
+
+	_inviteExistingUser : function (options, callback) {
+
+
+
+	},
+
+
+
 
 	// create user
 	create : function (req, res) {
