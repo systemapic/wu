@@ -292,6 +292,9 @@ Wu.Files = Wu.Class.extend({
 
 		Wu.post('/api/file/downloadDataset', JSON.stringify(options), this._downloadedDataset.bind(this));
 
+		// set progress
+		app.ProgressBar.timedProgress(2000);
+
 	},
 
 	_downloadedDataset : function (err, response) {
@@ -332,17 +335,10 @@ Wu.Files = Wu.Class.extend({
 		// }
 	},
 
-	_createDefaultCartocss : function (json) {
+	_createDefaultCartocss : function (json, callback) {
 
 		var styler = app.Tools.Styler;
-		// var css = styler.json2cartocss(json);
-
-		// console.log('got this css ->', css);
-
-		var css = "#layer { polygon-fill: red; marker-fill: red; marker-allow-overlap: true; marker-clip: false; marker-comp-op: screen;}";
-
-		return css;
-
+		styler.getCartoCSSFromJSON(json, callback);
 	},
 
 
@@ -354,8 +350,8 @@ Wu.Files = Wu.Class.extend({
 			enabled : true, 
 			color : { 
 				range : false, 
-				minMax : [-426.6,105.9], 
-				customMinMax : [-426.6,105.9], 
+				minMax : [-426.6, 105.9], 
+				customMinMax : [-426.6, 105.9], 
 				staticVal : "yellow",
 				value : [
 					"#ff0000",
@@ -382,12 +378,37 @@ Wu.Files = Wu.Class.extend({
 		var file_id = this.getUuid();
 		var file = this;
 
-		// var cartocss = this.getDefaultStyling().css; // bytt ut denne med cartocss laget fra json style over
-
+		// get default style
 		var defaultStyle = this._getDefaultStyling();
-		var defaultCartocss = this._createDefaultCartocss(defaultStyle);
+		
+		// create css from json (server side)
+		this._createDefaultCartocss(defaultStyle, function (ctx, defaultCartocss) {
 
-		console.log('default STYLE', defaultStyle, defaultCartocss);
+			var options = {
+				file : file,
+				defaultCartocss : defaultCartocss,
+				project : project,
+				defaultStyle : defaultStyle
+			}
+
+			// create layer on server
+			this._requestDefaultLayer(options)
+
+
+		}.bind(this));
+
+	
+
+	},
+
+	_requestDefaultLayer : function (options) {
+
+		var file = options.file,
+		    file_id = file.getUuid(),
+		    project = options.project,
+		    defaultCartocss = options.defaultCartocss,
+		    defaultStyle = options.defaultStyle;
+
 
 		var layerJSON = {
 			"geom_column": "the_geom_3857",

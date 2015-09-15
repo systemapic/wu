@@ -195,8 +195,12 @@ module.exports = api.postgis = {
 					query
 				].join(' ');
 
+				console.log('dump to shp cmd: ', command);
+
 				// create database in postgis
 				exec(command, {maxBuffer: 1024 * 50000}, function (err, stdout) {
+					console.log('err, stdout', err, stdout);
+
 					if (err) return callback(err);
 
 					var options = {
@@ -213,25 +217,31 @@ module.exports = api.postgis = {
 
 
 		ops.push(function (options, callback) {
-
 			var zipfolder = options.zipfolder,
-			    zipfile = options.zipfile + '.tar.gz',
+			    tarfile = options.zipfile + '.tar',
+			    zipfile = tarfile + '.gz',
 			    returnOutput = options.returnOutput + '.tar.gz';
 
 			var cmd = [
 				'tar',
 				'cvf',
-				'-',
+				// 'loka.tar',
+				tarfile,
 				'-C',
 				'"' + zipfolder + '"',
 				'.',
-				'|',
+				'&&',
 				'pigz',
-				'>',
-				zipfile
+				tarfile
+				// 'loka.tar'
+				// zipfile
 			].join(' ');
 
+			console.log('tar cmd: ', cmd);
+
 			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout) {
+				console.log('err, stdout', err, stdout);
+
 				if (err) return callback(err);
 				callback(null, returnOutput);
 			});

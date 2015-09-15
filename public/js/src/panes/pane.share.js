@@ -33,10 +33,12 @@ Wu.Share = Wu.Pane.extend({
 		this._shareImageButton = Wu.DomUtil.create('div', 'share-item', this._shareDropdown, 'Share Image');
 		this._sharePrintButton = Wu.DomUtil.create('div', 'share-item', this._shareDropdown, 'Share PDF');
 		this._shareLinkButton  = Wu.DomUtil.create('div', 'share-item', this._shareDropdown, 'Share link');
+		this._shareInviteButton  = Wu.DomUtil.create('div', 'share-item', this._shareDropdown, 'Invite users...');
 
-		Wu.DomEvent.on(this._shareImageButton, 'click', this._shareImage, this);
-		Wu.DomEvent.on(this._sharePrintButton, 'click', this._sharePrint, this);
-		Wu.DomEvent.on(this._shareLinkButton,  'click', this._shareLink, this);
+		Wu.DomEvent.on(this._shareImageButton,  'click', this._shareImage, this);
+		Wu.DomEvent.on(this._sharePrintButton,  'click', this._sharePrint, this);
+		Wu.DomEvent.on(this._shareLinkButton,   'click', this._shareLink, this);
+		Wu.DomEvent.on(this._shareInviteButton, 'click', this._shareInvite, this);
 	},
 
 	_registerButton : function () {
@@ -213,6 +215,47 @@ Wu.Share = Wu.Pane.extend({
 
 		// add to dom
 		this._shareDropdown.appendChild(this._sharePDFInput);
+
+	},
+
+
+	_shareInvite : function () {
+
+		console.log('share invite!');
+
+		Wu.DomUtil.addClass(this._shareDropdown, 'wide-share');
+
+		this._createInviteView();
+
+	},
+
+	_createInviteView : function () {
+
+		console.log('projects?', this._project, app.activeProject);
+
+		this._inviteInputsWrapper = Wu.DomUtil.create('div', 'share-invite-input-wrapper', this._shareDropdown);
+
+		// var title = 'Invite users to this view this project.';
+
+		// var titleDiv = Wu.DomUtil.create('div', 'share-invite-title', this._inviteInputsWrapper, title);
+
+
+
+		this._inviteInputs = [];
+
+		var num_inputs = 6;
+
+		for (var i = 1; i < num_inputs; i++) {
+
+			var input = Wu.DomUtil.create('input', 'share-invite-input', this._inviteInputsWrapper);
+			input.setAttribute('placeHolder', 'Enter email...');
+
+			this._inviteInputs.push(input);
+		}
+
+
+		// add submit button
+
 
 	},
 
