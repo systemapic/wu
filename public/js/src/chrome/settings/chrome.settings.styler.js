@@ -1046,8 +1046,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 
 
-
-
 	// CARTO CARTO CARTO CARTO
 	// CARTO CARTO CARTO CARTO
 	// CARTO CARTO CARTO CARTO		
