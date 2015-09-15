@@ -47,6 +47,415 @@ var api = module.parent.exports;
 module.exports = api.geo = { 
 
 
+
+	json2cartocss : function (req, res) {
+		var options = req.body;
+
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('options', options);
+		console.log('');
+		console.log('');
+		console.log('');
+
+		// convert json to cartocss
+		api.geo._json2cartocss(options, function (err, css) {
+
+			console.log('json2css done! ', err, css);
+
+			res.end(css);
+		});
+	},
+
+
+	_json2cartocss : function (options, callback) {
+
+		var styleJSON = options.styleJSON;
+
+		console.log('api.geo._json2cartocss -> styleJSON : ', styleJSON);
+
+
+		// json in, cartocss out
+
+		var headers = '';
+		var style   = '#layer {\n\n';
+
+		var allowOverlap = 'true';
+		var markerClip  = 'false';
+		var compOp      = 'screen'
+
+		// CREATE DEFAULT STYLING
+		style += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
+		style += '\tmarker-clip: ' + markerClip + ';\n';
+		style += '\tmarker-comp-op: ' + compOp + ';\n\n';
+
+
+		// STYLE POINT
+		// STYLE POINT
+		// STYLE POINT
+
+		if ( styleJSON.point && styleJSON.point.enabled == true ) {
+
+			console.log('INSIDE json2cartocss point');
+
+			// OPACITY
+			var pointOpacityCarto = this.buildCarto_pointOpacity(styleJSON, headers, style);
+			headers += pointOpacityCarto.headers;
+			style += pointOpacityCarto.style;
+
+			// COLOR
+			var pointColorCarto = this.buildCarto_pointColor(styleJSON, headers, style);
+			headers += pointColorCarto.headers;
+			style += pointColorCarto.style;
+
+			// SIZE
+			var pointSizeCarto = this.buildCarto_pointSize(styleJSON, headers, style);
+			headers += pointSizeCarto.headers;
+			style += pointSizeCarto.style;	
+
+		}
+			
+		style += '}'
+
+		var finalCarto = headers + style;
+
+		console.log('json2cartocss final', finalCarto);
+
+
+		// return cartocss
+		callback(null, finalCarto);
+
+	},
+
+
+
+
+	// OPACITY
+	// OPACITY
+	// OPACITY
+
+	buildCarto_pointOpacity : function (style) {
+
+		var opacity = style.point.opacity;
+
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}
+
+
+		if ( opacity.range ) {
+
+			var max = Math.floor(this.columns[opacity.range].max * 10) / 10;
+			var min = Math.floor(this.columns[opacity.range].min * 10) / 10;				
+
+			var normalizedOffset = true;
+
+			// NORMALIZED OFFSET 
+			// i.e. if the lowest number is 30, and 
+		 	// highest is 100, 30 will return 0.3 and not 0
+			if ( normalizedOffset ) {
+				if ( min > 0 ) min = 0;
+			}
+
+			cartObj.headers += '@opacity_field_max: ' + max + ';\n';
+			cartObj.headers += '@opacity_field_min: ' + min + ';\n';
+			cartObj.headers += '@opacity_field_range: [' + opacity.range + '];\n\n';
+			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
+
+		
+		} else {
+
+			// static opacity
+			cartObj.headers += '@opacity_field: ' + opacity.value + ';\n';
+		}
+
+		cartObj.style += '\tmarker-opacity: @opacity_field;\n\n';
+
+		return cartObj;
+	},
+
+
+	// COLOR RANGE
+	// COLOR RANGE
+	// COLOR RANGE
+
+	buildCarto_pointColor : function (style) {
+
+		var color = style.point.color;
+
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}		
+
+		if ( color.range ) {
+
+			var minMax = color.customMinMax ? color.customMinMax : color.minMax;
+
+
+			// Get color values
+			var c1 = color.value[0];
+			var c9 = color.value[1];
+			var c17 = color.value[2];
+			var c25 = color.value[3];
+			var c33 = color.value[4];
+
+			// Interpolate
+			// var c9 = this.hexAverage([c1, c17]);
+			// var c25 = this.hexAverage([c17, c33]);
+
+
+			// Interpolate
+			var c5 = this.hexAverage([c1, c9]);
+			var c13 = this.hexAverage([c9, c17]);
+			var c21 = this.hexAverage([c17, c25]);
+			var c29 = this.hexAverage([c25, c33]);
+
+			// Interpolate
+			var c3 = this.hexAverage([c1, c5]);
+			var c7 = this.hexAverage([c5, c9]);
+			var c11 = this.hexAverage([c9, c13]);
+			var c15 = this.hexAverage([c13, c17]);
+			var c19 = this.hexAverage([c17, c21]);
+			var c23 = this.hexAverage([c21, c25]);
+			var c27 = this.hexAverage([c25, c29]);
+			var c31 = this.hexAverage([c29, c33]);
+
+			// Interpolate
+			var c2 = this.hexAverage([c1, c3]);
+			var c4 = this.hexAverage([c3, c5]);
+			var c6 = this.hexAverage([c5, c7]);
+			var c8 = this.hexAverage([c7, c9]);
+			var c10 = this.hexAverage([c9, c11]);
+			var c12 = this.hexAverage([c11, c13]);
+			var c14 = this.hexAverage([c13, c15]);
+			var c16 = this.hexAverage([c15, c17]);
+			var c18 = this.hexAverage([c17, c19]);
+			var c20 = this.hexAverage([c19, c21]);
+			var c22 = this.hexAverage([c21, c23]);
+			var c24 = this.hexAverage([c23, c25]);
+			var c26 = this.hexAverage([c25, c27]);
+			var c28 = this.hexAverage([c27, c29]);
+			var c30 = this.hexAverage([c29, c31]);
+			var c32 = this.hexAverage([c31, c33]);
+
+			var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33];
+
+
+
+			// CREATE VARS
+			var fieldName = '@' + color.range;
+			var maxField  = fieldName + '_max';
+			var minField  = fieldName + '_min';
+			var deltaName = fieldName + '_delta';
+			
+
+			// DEFINE FIELD NAME + MIN/MAX
+			cartObj.headers += fieldName + ': [' + color.range + '];\n';
+			cartObj.headers += maxField  + ': '  + minMax[1] + ';\n'; 
+			cartObj.headers += minField  + ': '  + minMax[0] + ';\n\n';
+			
+
+			// COLORS VALUES
+			colorArray.forEach(function(c, i) {	
+				cartObj.headers += fieldName + '_color_' + (i+1) + ': ' + c + ';\n';
+			})
+
+			cartObj.headers += '\n';
+			
+			// COLOR STEPS (DELTA)
+			cartObj.headers += fieldName + '_delta: (' + maxField + ' - ' + minField + ')/' + colorArray.length + ';\n'
+			
+			colorArray.forEach(function(c, i) {	
+				cartObj.headers += fieldName + '_step_' + (i+1) + ': (' + minField + ' + ' + fieldName + '_delta * ' + i + ');\n';
+			})
+
+
+			cartObj.headers += '\n';
+
+
+
+			// STYLE STYLE STYLE
+			// STYLE STYLE STYLE
+			// STYLE STYLE STYLE
+
+
+			colorArray.forEach(function(c,i) {
+
+				var no = i+1;
+
+				if ( no == 1 ) {
+
+					cartObj.style += '\t[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + '] ';
+					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
+
+				}
+
+				if ( no > 1 && no < colorArray.length ) {
+
+					cartObj.style += '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + ']';
+					cartObj.style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
+					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
+
+				}
+
+				if ( no == colorArray.length ) {
+
+					cartObj.style +=  '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + '] ';
+					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n\n';
+				}
+			})
+			
+		
+		} else {
+		
+			// static color
+			cartObj.style += '\tmarker-fill: ' + color.staticVal + ';\n\n';
+		}
+
+		return cartObj;
+	},
+
+	
+	// POINT SIZE
+	// POINT SIZE
+	// POINT SIZE
+
+	buildCarto_pointSize : function (style) {
+
+		var pointsize = style.point.pointsize;
+
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}		
+
+		if ( pointsize.range ) {
+
+			var max = Math.floor(this.columns[pointsize.range].max * 10) / 10;
+			var min = Math.floor(this.columns[pointsize.range].min * 10) / 10;
+		
+			// cartObj.headers += '@marker_size_max: ' + pointsize.minMax[1] + ';\n';
+			cartObj.headers += '@marker_size_min: ' + pointsize.minMax[0] + ';\n';
+			cartObj.headers += '@marker_size_range: ' + (pointsize.minMax[1] - pointsize.minMax[0]) + ';\n';
+			cartObj.headers += '@marker_size_field: [' + pointsize.range + '];\n';
+			cartObj.headers += '@marker_size_field_maxVal: ' + max + ';\n';
+			cartObj.headers += '@marker_size_field_minVal: ' + min + ';\n';
+			cartObj.headers += '\n//TODO: Fix this!\n';
+			cartObj.headers += '@marker_size_factor: (@marker_size_field / (@marker_size_field_maxVal - @marker_size_field_minVal)) * (@marker_size_range + @marker_size_min);\n\n';
+			
+		} else {
+
+			cartObj.headers += '@marker_size_factor: ' + pointsize.value + ';\n';
+
+		}
+
+
+		cartObj.headers += '[zoom=10] { marker-width: 0.3 * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=11] { marker-width: 0.5 * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=12] { marker-width: 1   * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=13] { marker-width: 1   * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=14] { marker-width: 2   * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=15] { marker-width: 4   * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=16] { marker-width: 6   * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=17] { marker-width: 8   * @marker_size_factor; }\n';
+		cartObj.headers += '[zoom=18] { marker-width: 12  * @marker_size_factor; }\n\n';
+
+
+		return cartObj;
+	},
+
+
+	// Make sure hex decimals have two digits
+	padToTwo : function (numberString) {
+
+		if (numberString.length < 2) numberString = '0' + numberString;
+		return numberString;
+	},
+
+	// OMG code... haven't written it myself...
+	// But it interpolates values between hex values
+	hexAverage : function (twoHexes) {
+		return twoHexes.reduce(function (previousValue, currentValue) {
+			return currentValue
+			.replace(/^#/, '')
+			.match(/.{2}/g)
+			.map(function (value, index) {
+				return previousValue[index] + parseInt(value, 16);
+			});
+		}, [0, 0, 0])
+		.reduce(function (previousValue, currentValue) {
+			var newValue = this.padToTwo(Math.floor(currentValue / twoHexes.length).toString(16));
+			return previousValue + newValue;
+		}.bind(this), '#');
+	},
+
+
+
+	// *********************************************************************************
+	// *********************************************************************************
+	// *********************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	copyToVileFolder : function (path, fileUuid, callback) {
 		if (!path || !fileUuid) return callback('Missing information.14');
 
@@ -133,173 +542,6 @@ module.exports = api.geo = {
 		
 		
 	},
-
-	// // new way: postgis!
-	// handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
-	// 	if (!folder || !name || !fileUuid) return callback('Missing info.');
-
-	// 	fs.readdir(folder, function (err, files) {
-	// 		if (err || !files) return callback('Some files were rejected. Please upload <br>only one shapefile per zip.');
-
-	// 		// clone array
-	// 		var shapefiles = files.slice();
-
-	// 		// async ops
-	// 		var ops = [];
-
-	// 		// check if valid shapefile(s)
-	// 		ops.push(function (done) {
-	// 			api.geo.validateshp(files, done);
-	// 		});
-
-	// 		// import into postgis
-	// 		ops.push(function (done) {
-
-	// 			var options = {
-	// 				files : files, 
-	// 				folder : folder,
-	// 				clientName : 'clientName'
-	// 			}
-	// 			api.geo.import2postgis(options, done);
-	// 		});
-
-	// 		// // convert shapefile to geo/topojson
-	// 		// ops.push(function (done) {
-	// 		// 	api.geo.convertshp(files, folder, done);
-	// 		// });
-
-	// 		// run async jobs
-	// 		async.series(ops, function (err, results) {
-	// 			if (err) {
-	// 				console.log('MOFO!!'.red, err);
-	// 				return callback(err);
-	// 			}
-
-	// 			var key = results[1];
-	// 			if (!key) return callback('No key.');
-
-	// 			var path = key.path;
-	// 			var name = key.name;
-	// 			var fileUuid = key.fileUuid;
-
-	// 			// add geojson file to list
-	// 			shapefiles.push(name);
-
-	// 			// return as db entry
-	// 			var db = {
-	// 				files : shapefiles,
-	// 				data : {
-	// 					geojson : name
-	// 				},
-	// 				title : name,
-	// 				file : fileUuid
-	// 			}
-
-	// 			// todo: meta from postgis
-
-	// 			// return
-	// 			callback(null, db);
-
-	// 			// api.geo.copyToVileFolder(path, fileUuid, function (err) {
-	// 			// 	if (err) return callback('copytToVile err: ' + err);
-
-	// 			// 	try {
-	// 			// 		// read meta from file
-	// 			//         	mapnikOmnivore.digest(path, function (err, metadata) {
-	// 			//         		if (err) {
-	// 			//         			console.log('ERR 400', err);
-	// 			//         			return callback(err);
-	// 			//         		}
-	// 			//         		if (!metadata) return callback('No metadata!');
-
-	// 			//         		db.metadata = JSON.stringify(metadata);
-					        	
-	// 			// 	        	// return
-	// 			// 	        	callback(null, db);
-	// 			//         	});
-
-	// 			//         } catch (e) { callback('meta fail: ' + e); }
-	// 	  //       	});
-	// 		});
-	// 	});
-	// },
-
-
-	// old way, with files
-	// handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
-	// 	if (!folder || !name || !fileUuid) return callback('Missing info.');
-
-	// 	fs.readdir(folder, function (err, files) {
-	// 		if (err || !files) return callback('Some files were rejected. Please upload <br>only one shapefile per zip.');
-
-	// 		// clone array
-	// 		var shapefiles = files.slice();
-
-	// 		// async ops
-	// 		var ops = [];
-
-	// 		// check if valid shapefile(s)
-	// 		ops.push(function (done) {
-	// 			api.geo.validateshp(files, done);
-	// 		});
-
-	// 		// convert shapefile to geo/topojson
-	// 		ops.push(function (done) {
-	// 			api.geo.convertshp(files, folder, done);
-	// 		});
-
-	// 		// run async jobs
-	// 		async.series(ops, function (err, results) {
-	// 			if (err) {
-	// 				// console.log('MOFO!!'.red, err);
-	// 				return callback(err);
-	// 			}
-
-	// 			var key = results[1];
-	// 			if (!key) return callback('No key.');
-
-	// 			var path = key.path;
-	// 			var name = key.name;
-	// 			var fileUuid = key.fileUuid;
-
-	// 			// add geojson file to list
-	// 			shapefiles.push(name);
-
-	// 			// return as db entry
-	// 			var db = {
-	// 				files : shapefiles,
-	// 				data : {
-	// 					geojson : name
-	// 				},
-	// 				title : name,
-	// 				file : fileUuid
-	// 			}
-
-	// 			api.geo.copyToVileFolder(path, fileUuid, function (err) {
-	// 				if (err) return callback('copytToVile err: ' + err);
-
-	// 				try {
-	// 					// read meta from file
-	// 			        	mapnikOmnivore.digest(path, function (err, metadata) {
-	// 			        		if (err) {
-	// 			        			console.log('ERR 400', err);
-	// 			        			return callback(err);
-	// 			        		}
-	// 			        		if (!metadata) return callback('No metadata!');
-
-	// 			        		db.metadata = JSON.stringify(metadata);
-					        	
-	// 				        	// return
-	// 				        	callback(null, db);
-	// 			        	});
-
-	// 			        } catch (e) { callback('meta fail: ' + e); }
-	// 	        	});
-	// 		});
-	// 	});
-	// },
-
-
 
 	validateshp : function (files, callback) {
 
@@ -467,11 +709,6 @@ module.exports = api.geo = {
 		    inFile = options.path,
 		    outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
 		    ops = [];
-
-
-		// console.log('GDAL VERSION'.red, gdal.version);
-		// console.log('GDAL DRIVERS'.red, gdal.drivers.getNames());
-		// console.log('options.'.green, options);
 
 
 		ops.push(function (callback) {
