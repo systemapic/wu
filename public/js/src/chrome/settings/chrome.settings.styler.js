@@ -122,10 +122,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Add temp layer
 		this._tempaddLayer();
 
-		// Display bottom container
-		// Wu.DomUtil.removeClass(this._bottomContainer, 'displayNone');
-
-		
 	},
 
 
@@ -183,8 +179,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this.getLayerMeta();
 
 		this.initPoint();
-		// this.initPolygon();
-		// this.initLine();
 	},	
 
 
