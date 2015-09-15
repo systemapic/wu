@@ -22,6 +22,10 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// add events
 		this._addEvents();
+
+		// shortcut
+		app.Tools = app.Tools || {};
+		app.Tools.Styler = this;
 	},
 
 	_initContainer : function () {
@@ -1052,7 +1056,17 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		console.log('%c _updateStyle ', 'background: #FF33FF; color: white;');
 
-		var cartoJSON = this.cartoJSON;
+		var finalCarto = this.json2cartocss(this.cartoJSON);
+
+		this.saveCartoJSON(finalCarto);
+	},
+
+
+	json2cartocss : function (cartoJSON) {
+
+
+		console.log('json2cartocss', cartoJSON, typeof(cartoJSON));
+
 
 		var headers = '';
 		var style   = '#layer {\n\n';
@@ -1072,6 +1086,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// STYLE POINT
 
 		if ( cartoJSON.point && cartoJSON.point.enabled == true ) {
+
+			console.log('INSIDE json2cartocss point');
 
 			// OPACITY
 			var pointOpacityCarto = this.buildCarto_pointOpacity(headers, style);
@@ -1094,8 +1110,12 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		var finalCarto = headers + style;
 
-		this.saveCartoJSON(finalCarto);
+		console.log('json2cartocss final', finalCarto);
+
+		return finalCarto;
+
 	},
+
 
 	buildCarto_pointOpacity : function () {
 
@@ -1128,7 +1148,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			cartObj.headers += '@opacity_field_max: ' + max + ';\n';
 			cartObj.headers += '@opacity_field_min: ' + min + ';\n';
 			cartObj.headers += '@opacity_field_range: [' + opacity.range + '];\n\n';
-
 			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
 
 		
