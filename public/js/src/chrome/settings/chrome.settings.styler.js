@@ -1056,9 +1056,14 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_updateStyle : function () {
 
-		this.getCartoCSSFromJSON(this.cartoJSON, function (ctx, finalCarto) {
-			this.saveCartoJSON(finalCarto);
-		});
+
+		console.log('%c _updateStyle ', 'background: #FF33FF; color: white;')
+		console.log(this.cartoJSON);
+		console.log('%c _updateStyle ', '****************')
+
+		// this.getCartoCSSFromJSON(this.cartoJSON, function (ctx, finalCarto) {
+		// 	this.saveCartoJSON(finalCarto);
+		// });
 
 	},
 
