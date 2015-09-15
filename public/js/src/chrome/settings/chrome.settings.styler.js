@@ -744,7 +744,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			colorRangeBar.setAttribute('style', gradientStyle);
 
 			// Do not save if value is unchanged
-			if ( this.cartoJSON.point.color.value == value ) return;
+			// if ( this.cartoJSON.point.color.value == value ) return;
+			if ( this.cartoJSON.point.color.value == colors ) return;
 
 			// Store in JSON
 			this.cartoJSON.point.color.value = colors;
@@ -815,16 +816,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		console.log('');		
 
 
-		// // Get color values
-		// var c1 = color.value[0];
-		// var c17 = color.value[1];
-		// var c33 = color.value[2];
-
-		// // Interpolate
-		// var c9 = this.hexAverage([c1, c17]);
-		// var c25 = this.hexAverage([c17, c33]);
-
-
 
 		// Color range bar
 		var colorRangeBar = Wu.DomUtil.get('chrome-color-range_colorrange');
@@ -842,12 +833,12 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		    colorBall_1.setAttribute('hex', hexArray[0]);
 
 		var colorBall_2 = Wu.DomUtil.get('color-range-ball-2-colorrange');
-		    colorBall_2.style.background = hexArray[1];
-		    colorBall_2.setAttribute('hex', hexArray[1]);
+		    colorBall_2.style.background = hexArray[2];
+		    colorBall_2.setAttribute('hex', hexArray[2]);
 
 		var colorBall_3 = Wu.DomUtil.get('color-range-ball-3-colorrange');
-		    colorBall_3.style.background = hexArray[2];
-		    colorBall_3.setAttribute('hex', hexArray[2]);
+		    colorBall_3.style.background = hexArray[4];
+		    colorBall_3.setAttribute('hex', hexArray[4]);
 
 
 		this._closeColorRangeSelector();
@@ -1065,14 +1056,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_updateStyle : function () {
 
-		console.log('%c _updateStyle ', 'background: #FF33FF; color: white;');
-
 		this.getCartoCSSFromJSON(this.cartoJSON, function (ctx, finalCarto) {
-
-			console.log('got carto??', ctx, finalCarto); // string
-
 			this.saveCartoJSON(finalCarto);
-
 		});
 
 	},
