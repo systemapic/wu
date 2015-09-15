@@ -792,6 +792,9 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 		Wu.post('/api/layer/downloadDataset', JSON.stringify(options), this._downloadedDataset.bind(this));
 
+		// set progress
+		app.ProgressBar.timedProgress(2000);
+
 	},
 
 	_downloadedDataset : function (err, response) {
