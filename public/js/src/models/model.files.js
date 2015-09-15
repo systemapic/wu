@@ -310,74 +310,69 @@ Wu.Files = Wu.Class.extend({
 
 	},
 
-	getGeometryType : function () {
+	_getGeometryType : function () {
 		var meta = this.getMeta();
 		console.log('meta', meta);
 		return meta.geometry_type;
 	},
 
-	getDefaultStyling : function () {
+	_getDefaultStyling : function () {
 
 		// returns geom type from file meta
-		var geometry_type = this.getGeometryType();
-
-		var style = {
-			json : {}
-		};
+		var geometry_type = this._getGeometryType();
 
 		if (geometry_type == 'ST_Point') { 
-			style.css = this._defaultStyling.css.point; // todo: remove
-			style.json.point = this._defaultStyling.json.point;
+			return this._defaultStyling.point;
 		}
 		if (geometry_type == 'ST_Polygon') { 
-			style.css = this._defaultStyling.css.polygon;
-			style.json.polygon = this._defaultStyling.json.polygon;
+			return this._defaultStyling.polygon;
 		}
 		if (geometry_type == 'ST_LineString') { 
-			style.css = this._defaultStyling.css.line;
-			style.json.line = this._defaultStyling.json.line;
+			return this._defaultStyling.line;
 		}
-
-		return style;
 	},
+
+	_createDefaultCartocss : function (json) {
+
+		var styler = app.Tools.Styler;
+		var css = styler.json2cartocss(json);
+
+		console.log('got this css ->', css);
+
+		return css;
+
+	},
+
 
 	// default cartocss styling
 	_defaultStyling : {
-		css : {
-			// todo: remove this css, create css from style json instead!
-			point : "@opacity_field: 0.5; @marker_size_factor: 1; [zoom=10] { marker-width: 0.3 * @marker_size_factor; } [zoom=11] { marker-width: 0.5 * @marker_size_factor; } [zoom=12] { marker-width: 1 * @marker_size_factor; } [zoom=13] { marker-width: 1 * @marker_size_factor; } [zoom=14] { marker-width: 2 * @marker_size_factor; } [zoom=15] { marker-width: 4 * @marker_size_factor; } [zoom=16] { marker-width: 6 * @marker_size_factor; } [zoom=17] { marker-width: 8 * @marker_size_factor; } [zoom=18] { marker-width: 12 * @marker_size_factor; } #layer { marker-allow-overlap: true; marker-clip: false; marker-comp-op: screen; marker-opacity: @opacity_field; marker-fill: #fcff33; }",
-			polygon : "#layer {  \n polygon-fill: red; \n marker-fill: blue; \n marker-allow-overlap: true; \n marker-clip: false; \n marker-comp-op: screen;}",
-			line : "#layer {  \n polygon-fill: red; \n marker-fill: yellow; \n marker-allow-overlap: true; \n marker-clip: false; \n marker-comp-op: screen;}",
-		}, 
-
+		
 		// default styling
-		json : {
-			point : { 
-				enabled : true, 
-				color : { 
-					range : false, 
-					minMax : [-426.6,105.9], 
-					customMinMax : [-426.6,105.9], 
-					staticVal : "#fcff33",
-					value : [
-						"#ff0000",
-						"#a5ff00",
-						"#003dff"
-					]
-				},
-				opacity : { 
-					range : false,
-					value : 0.5
-				}, 
-				pointsize : { 
-					range :false,
-					minMax : false,
-					value : 1.
-				}
+		point : { 
+			enabled : true, 
+			color : { 
+				range : false, 
+				minMax : [-426.6,105.9], 
+				customMinMax : [-426.6,105.9], 
+				staticVal : "yellow",
+				value : [
+					"#ff0000",
+					"#a5ff00",
+					"#003dff"
+				]
 			},
-			polygon : {},
-			line : {}
-		}
+			opacity : { 
+				range : false,
+				value : 0.5
+			}, 
+			pointsize : { 
+				range :false,
+				minMax : false,
+				value : 1.
+			}
+		},
+		polygon : {},
+		line : {}
 	},
 
 	_createDefaultLayer : function (project) {
@@ -385,7 +380,12 @@ Wu.Files = Wu.Class.extend({
 		var file_id = this.getUuid();
 		var file = this;
 
-		var cartocss = file.getDefaultStyling().css; // bytt ut denne med cartocss laget fra json style over
+		// var cartocss = this.getDefaultStyling().css; // bytt ut denne med cartocss laget fra json style over
+
+		var defaultStyle = this._getDefaultStyling();
+		var defaultCartocss = this._createDefaultCartocss(defaultStyle);
+
+		console.log('default STYLE', defaultStyle, defaultCartocss);
 
 		var layerJSON = {
 			"geom_column": "the_geom_3857",
@@ -397,7 +397,7 @@ Wu.Files = Wu.Class.extend({
 			"attributes": "",
 			"access_token": app.tokens.access_token,
 			"cartocss_version": "2.0.1",
-			"cartocss": cartocss, 	// save default cartocss style (will be active on first render)
+			"cartocss": defaultCartocss, 	// save default cartocss style (will be active on first render)
 			"sql": "(SELECT * FROM " + file_id + ") as sub",
 			"file_id": file_id,
 			"return_model" : true,
@@ -417,7 +417,7 @@ Wu.Files = Wu.Class.extend({
 				title : 'Layer from ' + file.getName(),
 				description : 'Description: Layer created from ' + file.getName(),
 				file : file.getUuid(),
-				style : JSON.stringify(file.getDefaultStyling().json) // save default json style
+				style : JSON.stringify(defaultStyle) // save default json style
 			}
 
 			// create new layer model
