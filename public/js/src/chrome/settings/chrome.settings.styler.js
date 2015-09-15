@@ -1046,6 +1046,16 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 
 
+	getCartoCSSFromJSON : function (json, callback) {
+
+		var options = {
+
+			styleJSON : json
+		}
+
+		Wu.post('/api/geo/json2cartocss', JSON.stringify(options), callback.bind(this), this);
+
+	},
 
 
 	// CARTO CARTO CARTO CARTO
@@ -1056,9 +1066,14 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		console.log('%c _updateStyle ', 'background: #FF33FF; color: white;');
 
-		var finalCarto = this.json2cartocss(this.cartoJSON);
+		this.getCartoCSSFromJSON(this.cartoJSON, function (ctx, finalCarto) {
 
-		this.saveCartoJSON(finalCarto);
+			console.log('got carto??', ctx, finalCarto); // string
+
+
+			// this.saveCartoJSON(finalCarto);
+		});
+
 	},
 
 

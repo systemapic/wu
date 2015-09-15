@@ -47,6 +47,116 @@ var api = module.parent.exports;
 module.exports = api.geo = { 
 
 
+
+	json2cartocss : function (req, res) {
+		var options = req.body;
+
+		console.log('options', options);
+
+		// convert json to cartocss
+		api.geo._json2cartocss(options, function (err, css) {
+
+			console.log('json2css done! ', err, css);
+
+			res.end(css);
+		});
+	},
+
+
+	_json2cartocss : function (options, callback) {
+
+		var styleJSON = options.styleJSON;
+
+		console.log('api.geo._json2cartocss -> styleJSON : ', styleJSON);
+
+
+		// json in, cartocss out
+
+
+		// this is where the magic happens
+
+
+
+
+
+
+
+
+		// return cartocss
+		callback(null, cartocss);
+
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	copyToVileFolder : function (path, fileUuid, callback) {
 		if (!path || !fileUuid) return callback('Missing information.14');
 
@@ -133,173 +243,6 @@ module.exports = api.geo = {
 		
 		
 	},
-
-	// // new way: postgis!
-	// handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
-	// 	if (!folder || !name || !fileUuid) return callback('Missing info.');
-
-	// 	fs.readdir(folder, function (err, files) {
-	// 		if (err || !files) return callback('Some files were rejected. Please upload <br>only one shapefile per zip.');
-
-	// 		// clone array
-	// 		var shapefiles = files.slice();
-
-	// 		// async ops
-	// 		var ops = [];
-
-	// 		// check if valid shapefile(s)
-	// 		ops.push(function (done) {
-	// 			api.geo.validateshp(files, done);
-	// 		});
-
-	// 		// import into postgis
-	// 		ops.push(function (done) {
-
-	// 			var options = {
-	// 				files : files, 
-	// 				folder : folder,
-	// 				clientName : 'clientName'
-	// 			}
-	// 			api.geo.import2postgis(options, done);
-	// 		});
-
-	// 		// // convert shapefile to geo/topojson
-	// 		// ops.push(function (done) {
-	// 		// 	api.geo.convertshp(files, folder, done);
-	// 		// });
-
-	// 		// run async jobs
-	// 		async.series(ops, function (err, results) {
-	// 			if (err) {
-	// 				console.log('MOFO!!'.red, err);
-	// 				return callback(err);
-	// 			}
-
-	// 			var key = results[1];
-	// 			if (!key) return callback('No key.');
-
-	// 			var path = key.path;
-	// 			var name = key.name;
-	// 			var fileUuid = key.fileUuid;
-
-	// 			// add geojson file to list
-	// 			shapefiles.push(name);
-
-	// 			// return as db entry
-	// 			var db = {
-	// 				files : shapefiles,
-	// 				data : {
-	// 					geojson : name
-	// 				},
-	// 				title : name,
-	// 				file : fileUuid
-	// 			}
-
-	// 			// todo: meta from postgis
-
-	// 			// return
-	// 			callback(null, db);
-
-	// 			// api.geo.copyToVileFolder(path, fileUuid, function (err) {
-	// 			// 	if (err) return callback('copytToVile err: ' + err);
-
-	// 			// 	try {
-	// 			// 		// read meta from file
-	// 			//         	mapnikOmnivore.digest(path, function (err, metadata) {
-	// 			//         		if (err) {
-	// 			//         			console.log('ERR 400', err);
-	// 			//         			return callback(err);
-	// 			//         		}
-	// 			//         		if (!metadata) return callback('No metadata!');
-
-	// 			//         		db.metadata = JSON.stringify(metadata);
-					        	
-	// 			// 	        	// return
-	// 			// 	        	callback(null, db);
-	// 			//         	});
-
-	// 			//         } catch (e) { callback('meta fail: ' + e); }
-	// 	  //       	});
-	// 		});
-	// 	});
-	// },
-
-
-	// old way, with files
-	// handleShapefile : function (folder, name, fileUuid, callback) {  // folder = folder with shapefiles inside
-	// 	if (!folder || !name || !fileUuid) return callback('Missing info.');
-
-	// 	fs.readdir(folder, function (err, files) {
-	// 		if (err || !files) return callback('Some files were rejected. Please upload <br>only one shapefile per zip.');
-
-	// 		// clone array
-	// 		var shapefiles = files.slice();
-
-	// 		// async ops
-	// 		var ops = [];
-
-	// 		// check if valid shapefile(s)
-	// 		ops.push(function (done) {
-	// 			api.geo.validateshp(files, done);
-	// 		});
-
-	// 		// convert shapefile to geo/topojson
-	// 		ops.push(function (done) {
-	// 			api.geo.convertshp(files, folder, done);
-	// 		});
-
-	// 		// run async jobs
-	// 		async.series(ops, function (err, results) {
-	// 			if (err) {
-	// 				// console.log('MOFO!!'.red, err);
-	// 				return callback(err);
-	// 			}
-
-	// 			var key = results[1];
-	// 			if (!key) return callback('No key.');
-
-	// 			var path = key.path;
-	// 			var name = key.name;
-	// 			var fileUuid = key.fileUuid;
-
-	// 			// add geojson file to list
-	// 			shapefiles.push(name);
-
-	// 			// return as db entry
-	// 			var db = {
-	// 				files : shapefiles,
-	// 				data : {
-	// 					geojson : name
-	// 				},
-	// 				title : name,
-	// 				file : fileUuid
-	// 			}
-
-	// 			api.geo.copyToVileFolder(path, fileUuid, function (err) {
-	// 				if (err) return callback('copytToVile err: ' + err);
-
-	// 				try {
-	// 					// read meta from file
-	// 			        	mapnikOmnivore.digest(path, function (err, metadata) {
-	// 			        		if (err) {
-	// 			        			console.log('ERR 400', err);
-	// 			        			return callback(err);
-	// 			        		}
-	// 			        		if (!metadata) return callback('No metadata!');
-
-	// 			        		db.metadata = JSON.stringify(metadata);
-					        	
-	// 				        	// return
-	// 				        	callback(null, db);
-	// 			        	});
-
-	// 			        } catch (e) { callback('meta fail: ' + e); }
-	// 	        	});
-	// 		});
-	// 	});
-	// },
-
-
 
 	validateshp : function (files, callback) {
 
@@ -467,11 +410,6 @@ module.exports = api.geo = {
 		    inFile = options.path,
 		    outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
 		    ops = [];
-
-
-		// console.log('GDAL VERSION'.red, gdal.version);
-		// console.log('GDAL DRIVERS'.red, gdal.drivers.getNames());
-		// console.log('options.'.green, options);
 
 
 		ops.push(function (callback) {
