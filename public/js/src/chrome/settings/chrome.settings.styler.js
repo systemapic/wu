@@ -763,17 +763,68 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// xoxoxoxox
 	selectColorPreset : function (e) {
 
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('%c selectColorPreset ', 'background: red; color: white;');
+		console.log('');
+		console.log('');
+		console.log('');
+
 		var elem = e.target;
 		var hex = elem.getAttribute('hex');
 		var hexArray = hex.split(',');
 
+		console.log('hexArray.length', hexArray.length);
+		console.log('');
+		console.log('');
+
 		// Make three values from two
 		if ( hexArray.length == 2 ) {
 			var c1 = hexArray[0];
-			var c3 = hexArray[1];
+			var c5 = hexArray[1];
+			var c3 = this.hexAverage([c1, c5]);
+
 			var c2 = this.hexAverage([c1, c3]);
-			hexArray = [c1, c2, c3];
+			var c4 = this.hexAverage([c3, c5]);
+
+			hexArray = [c1, c2, c3, c4, c5];
 		}
+
+
+		// Make five from three
+		if ( hexArray.length == 3 ) {
+
+			var c1 = hexArray[0];
+			var c3 = hexArray[1];
+			var c5 = hexArray[2];
+
+			var c2 = this.hexAverage([c1, c3]);
+			var c4 = this.hexAverage([c3, c5]);
+
+			hexArray = [c1, c2, c3, c4, c5];
+
+		}
+
+
+
+		console.log('');
+		console.log('');
+		console.log('hexArray', hexArray);
+		console.log('');
+		console.log('');		
+
+
+		// // Get color values
+		// var c1 = color.value[0];
+		// var c17 = color.value[1];
+		// var c33 = color.value[2];
+
+		// // Interpolate
+		// var c9 = this.hexAverage([c1, c17]);
+		// var c25 = this.hexAverage([c17, c33]);
+
+
 
 		// Color range bar
 		var colorRangeBar = Wu.DomUtil.get('chrome-color-range_colorrange');
@@ -804,7 +855,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Do not save if value is unchanged
 		if ( this.cartoJSON.point.color.value[0] == hexArray[0] &&
 		     this.cartoJSON.point.color.value[1] == hexArray[1] && 
-		     this.cartoJSON.point.color.value[2] == hexArray[2] ) {
+		     this.cartoJSON.point.color.value[2] == hexArray[2] &&
+		     this.cartoJSON.point.color.value[3] == hexArray[3] &&
+		     this.cartoJSON.point.color.value[4] == hexArray[4] ) {
 
 			return;
 		}
@@ -994,58 +1047,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 
 
-
-
-
-
-	// initPolygon : function () {
-
-	// 	var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
-
-	// 	var lineOptions = {
-	// 		key 		: 'polygon', 
-	// 		wrapper 	: sectionWrapper,
-	// 		input 		: false,
-	// 		title 		: 'Polygon',
-	// 		isOn 		: false,
-	// 		rightPos	: false,
-	// 		type 		: 'switch'
-	// 	}
-
-	// 	this._createMetaFieldLine(lineOptions);
-
-
-	// },
-
-	// initLine : function () {
-
-	// 	var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
-
-	// 	var lineOptions = {
-	// 		key 		: 'line', 
-	// 		wrapper 	: sectionWrapper,
-	// 		input 		: false,
-	// 		title 		: 'Line',
-	// 		isOn 		: false,
-	// 		rightPos	: false,
-	// 		type 		: 'switch'
-	// 	}
-
-	// 	this._createMetaFieldLine(lineOptions);
-
-	// },
-
-
-
-	// _createField : function (json) {
-
-
-
-	// },
-
-
-
-
 	getCartoCSSFromJSON : function (json, callback) {
 
 		var options = {
@@ -1060,7 +1061,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	// CARTO CARTO CARTO CARTO
 	// CARTO CARTO CARTO CARTO
-	// CARTO CARTO CARTO CARTO		
+	// CARTO CARTO CARTO CARTO
 
 	_updateStyle : function () {
 
@@ -1070,321 +1071,12 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 			console.log('got carto??', ctx, finalCarto); // string
 
+			this.saveCartoJSON(finalCarto);
 
-			// this.saveCartoJSON(finalCarto);
 		});
 
 	},
 
-
-	json2cartocss : function (cartoJSON) {
-
-
-		console.log('json2cartocss', cartoJSON, typeof(cartoJSON));
-
-
-		var headers = '';
-		var style   = '#layer {\n\n';
-
-		var allowOverlap = 'true';
-		var markerClip  = 'false';
-		var compOp      = 'screen'
-
-		// CREATE DEFAULT STYLING
-		style += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
-		style += '\tmarker-clip: ' + markerClip + ';\n';
-		style += '\tmarker-comp-op: ' + compOp + ';\n\n';
-
-
-		// STYLE POINT
-		// STYLE POINT
-		// STYLE POINT
-
-		if ( cartoJSON.point && cartoJSON.point.enabled == true ) {
-
-			console.log('INSIDE json2cartocss point');
-
-			// OPACITY
-			var pointOpacityCarto = this.buildCarto_pointOpacity(headers, style);
-			headers += pointOpacityCarto.headers;
-			style += pointOpacityCarto.style;
-
-			// COLOR
-			var pointColorCarto = this.buildCarto_pointColor(headers, style);
-			headers += pointColorCarto.headers;
-			style += pointColorCarto.style;
-
-			// SIZE
-			var pointSizeCarto = this.buildCarto_pointSize(headers, style);
-			headers += pointSizeCarto.headers;
-			style += pointSizeCarto.style;			
-
-		}
-			
-		style += '}'
-
-		var finalCarto = headers + style;
-
-		console.log('json2cartocss final', finalCarto);
-
-		return finalCarto;
-
-	},
-
-
-	buildCarto_pointOpacity : function () {
-
-		// OPACITY
-		// OPACITY
-		// OPACITY
-
-		var opacity = this.cartoJSON.point.opacity;
-
-		var cartObj = {
-			headers : '',
-			style   : ''
-		}
-
-
-		if ( opacity.range ) {
-
-			var max = Math.floor(this.columns[opacity.range].max * 10) / 10;
-			var min = Math.floor(this.columns[opacity.range].min * 10) / 10;				
-
-			var normalizedOffset = true;
-
-			// NORMALIZED OFFSET 
-			// i.e. if the lowest number is 30, and 
-		 	// highest is 100, 30 will return 0.3 and not 0
-			if ( normalizedOffset ) {
-				if ( min > 0 ) min = 0;
-			}
-
-			cartObj.headers += '@opacity_field_max: ' + max + ';\n';
-			cartObj.headers += '@opacity_field_min: ' + min + ';\n';
-			cartObj.headers += '@opacity_field_range: [' + opacity.range + '];\n\n';
-			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
-
-		
-		} else {
-
-			// static opacity
-			cartObj.headers += '@opacity_field: ' + opacity.value + ';\n';
-		}
-
-		cartObj.style += '\tmarker-opacity: @opacity_field;\n\n';
-
-		return cartObj;
-	},
-
-	buildCarto_pointColor : function (headers, style) {
-
-		// COLOR RANGE
-		// COLOR RANGE
-		// COLOR RANGE
-
-		var color = this.cartoJSON.point.color;
-
-		var cartObj = {
-			headers : '',
-			style   : ''
-		}		
-
-		if ( color.range ) {
-
-			var minMax = color.customMinMax ? color.customMinMax : color.minMax;
-
-
-
-			// Get color values
-			var c1 = color.value[0];
-			var c17 = color.value[1];
-			var c33 = color.value[2];
-
-			// Interpolate
-			var c9 = this.hexAverage([c1, c17]);
-			var c25 = this.hexAverage([c17, c33]);
-
-
-			// Interpolate
-			var c5 = this.hexAverage([c1, c9]);
-			var c13 = this.hexAverage([c9, c17]);
-			var c21 = this.hexAverage([c17, c25]);
-			var c29 = this.hexAverage([c25, c33]);
-
-			// Interpolate
-			var c3 = this.hexAverage([c1, c5]);
-			var c7 = this.hexAverage([c5, c9]);
-			var c11 = this.hexAverage([c9, c13]);
-			var c15 = this.hexAverage([c13, c17]);
-			var c19 = this.hexAverage([c17, c21]);
-			var c23 = this.hexAverage([c21, c25]);
-			var c27 = this.hexAverage([c25, c29]);
-			var c31 = this.hexAverage([c29, c33]);
-
-			// Interpolate
-			var c2 = this.hexAverage([c1, c3]);
-			var c4 = this.hexAverage([c3, c5]);
-			var c6 = this.hexAverage([c5, c7]);
-			var c8 = this.hexAverage([c7, c9]);
-			var c10 = this.hexAverage([c9, c11]);
-			var c12 = this.hexAverage([c11, c13]);
-			var c14 = this.hexAverage([c13, c15]);
-			var c16 = this.hexAverage([c15, c17]);
-			var c18 = this.hexAverage([c17, c19]);
-			var c20 = this.hexAverage([c19, c21]);
-			var c22 = this.hexAverage([c21, c23]);
-			var c24 = this.hexAverage([c23, c25]);
-			var c26 = this.hexAverage([c25, c27]);
-			var c28 = this.hexAverage([c27, c29]);
-			var c30 = this.hexAverage([c29, c31]);
-			var c32 = this.hexAverage([c31, c33]);
-
-			var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33];
-
-
-
-
-
-
-			// // Get color values
-			// var c1 = color.value[0];
-			// var c5 = color.value[1];
-			// var c9 = color.value[2];
-
-			// // Interpolate
-			// var c3 = this.hexAverage([c1, c5]);
-			// var c7 = this.hexAverage([c5, c9]);
-
-			// // Interpolate
-			// var c2 = this.hexAverage([c1, c3]);
-			// var c4 = this.hexAverage([c3, c5]);
-			// var c6 = this.hexAverage([c5, c7]);
-			// var c8 = this.hexAverage([c7, c9]);
-
-			// var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9];
-
-
-			// CREATE VARS
-			var fieldName = '@' + color.range;
-			var maxField  = fieldName + '_max';
-			var minField  = fieldName + '_min';
-			var deltaName = fieldName + '_delta';
-			
-
-			// DEFINE FIELD NAME + MIN/MAX
-			cartObj.headers += fieldName + ': [' + color.range + '];\n';
-			cartObj.headers += maxField  + ': '  + minMax[1] + ';\n'; 
-			cartObj.headers += minField  + ': '  + minMax[0] + ';\n\n';
-			
-
-			// COLORS VALUES
-			colorArray.forEach(function(c, i) {	
-				cartObj.headers += fieldName + '_color_' + (i+1) + ': ' + c + ';\n';
-			})
-
-			cartObj.headers += '\n';
-			
-			// COLOR STEPS (DELTA)
-			cartObj.headers += fieldName + '_delta: (' + maxField + ' - ' + minField + ')/' + colorArray.length + ';\n'
-			
-			colorArray.forEach(function(c, i) {	
-				cartObj.headers += fieldName + '_step_' + (i+1) + ': (' + minField + ' + ' + fieldName + '_delta * ' + i + ');\n';
-			})
-
-
-			cartObj.headers += '\n';
-
-
-
-			// STYLE STYLE STYLE
-			// STYLE STYLE STYLE
-			// STYLE STYLE STYLE
-
-
-			colorArray.forEach(function(c,i) {
-
-				var no = i+1;
-
-				if ( no == 1 ) {
-
-					cartObj.style += '\t[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + '] ';
-					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
-
-				}
-
-				if ( no > 1 && no < colorArray.length ) {
-
-					cartObj.style += '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + ']';
-					cartObj.style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
-					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
-
-				}
-
-				if ( no == colorArray.length ) {
-
-					cartObj.style +=  '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + '] ';
-					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n\n';
-				}
-			})
-			
-		
-		} else {
-		
-			// static color
-			cartObj.style += '\tmarker-fill: ' + color.staticVal + ';\n\n';
-		}
-
-		return cartObj;
-	},
-
-	buildCarto_pointSize : function (headers, style) {
-
-		// POINT SIZE
-		// POINT SIZE
-		// POINT SIZE
-
-		var pointsize = this.cartoJSON.point.pointsize;
-
-		var cartObj = {
-			headers : '',
-			style   : ''
-		}		
-
-		if ( pointsize.range ) {
-
-			var max = Math.floor(this.columns[pointsize.range].max * 10) / 10;
-			var min = Math.floor(this.columns[pointsize.range].min * 10) / 10;
-		
-			// cartObj.headers += '@marker_size_max: ' + pointsize.minMax[1] + ';\n';
-			cartObj.headers += '@marker_size_min: ' + pointsize.minMax[0] + ';\n';
-			cartObj.headers += '@marker_size_range: ' + (pointsize.minMax[1] - pointsize.minMax[0]) + ';\n';
-			cartObj.headers += '@marker_size_field: [' + pointsize.range + '];\n';
-			cartObj.headers += '@marker_size_field_maxVal: ' + max + ';\n';
-			cartObj.headers += '@marker_size_field_minVal: ' + min + ';\n';
-			cartObj.headers += '\n//TODO: Fix this!\n';
-			cartObj.headers += '@marker_size_factor: (@marker_size_field / (@marker_size_field_maxVal - @marker_size_field_minVal)) * (@marker_size_range + @marker_size_min);\n\n';
-			
-		} else {
-
-			cartObj.headers += '@marker_size_factor: ' + pointsize.value + ';\n';
-
-		}
-
-
-		cartObj.headers += '[zoom=10] { marker-width: 0.3 * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=11] { marker-width: 0.5 * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=12] { marker-width: 1   * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=13] { marker-width: 1   * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=14] { marker-width: 2   * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=15] { marker-width: 4   * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=16] { marker-width: 6   * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=17] { marker-width: 8   * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=18] { marker-width: 12  * @marker_size_factor; }\n\n';
-
-
-		return cartObj;
-	},
 
 	saveCartoJSON : function (finalCarto) {
 
