@@ -233,7 +233,7 @@
 	min-height: 400px;
 	width: auto;
 	min-width: 500px;*/
-	height: 300px;
+	height: auto;
 	width: 300px;
 }	
 
@@ -253,14 +253,44 @@
 .share-invite-title {
 	font-size: 14px;
 	font-weight: 500;
-	border-top: 1px solid black;
-	margin: 10px;
+	margin-left: 0px;
+	position: relative;
+	float: left;
+	margin: 2px;
+}
+
+.share-invite-toggle {
+	font-size: 14px;
+	font-weight: 500;
 	padding-top: 10px;
 	margin-left: 0px;
+	position: relative;
+	float: left;
+	background-color: black;
+	color: white;
+	padding: 2px;
+	cursor: pointer;
+}
+.share-invite-toggle:hover {
+	color: black;
+	background: white;
+	border: 1px solid black;
 }
 
 
-
+.share-invite-submit {
+	height: auto;
+	width: 129px;
+	border: 1px solid red;
+	padding: 5px;
+	position: relative;
+	margin-left: 140px;
+	border-radius: 2px;
+}
+.share-invite-submit:hover {
+	background: green;
+	color: white;
+}
 
 
 
