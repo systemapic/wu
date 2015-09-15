@@ -292,6 +292,9 @@ Wu.Files = Wu.Class.extend({
 
 		Wu.post('/api/file/downloadDataset', JSON.stringify(options), this._downloadedDataset.bind(this));
 
+		// set progress
+		app.ProgressBar.timedProgress(2000);
+
 	},
 
 	_downloadedDataset : function (err, response) {
