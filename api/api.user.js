@@ -162,6 +162,9 @@ module.exports = api.user = {
 		    invite_token,
 		    ops = [];
 
+		// return if no token
+		if (!options.invite_token) return done(null);
+
 		// get token store from redis
 		ops.push(function (callback) {
 			var redis_key = 'invite:token:' + options.invite_token;

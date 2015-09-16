@@ -84,7 +84,9 @@ Wu.Layer = Wu.Class.extend({
 		map.addLayer(this.layer);
 
 		// add gridLayer if available
-		if (this.gridLayer) map.addLayer(this.gridLayer);
+		if (this.gridLayer) {
+			map.addLayer(this.gridLayer);
+		}
 
 		// add to active layers
 		app.MapPane.addActiveLayer(this);	// includes baselayers
@@ -683,12 +685,16 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		// and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
 		// - also, removed listeners in L.UtfGrid (onAdd)
 		// 
+
+		console.error('layer updateGrid', this.getTitle());
 		if (this.gridLayer) {
 			this.gridLayer._update();
 		}
 	},
 
 	_prepareGrid : function () {
+
+		console.error('prepare grid', this.getTitle());
 
 		// set ids
 		var subdomains  = app.options.servers.tiles.subdomains,
