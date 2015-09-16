@@ -54,7 +54,6 @@ module.exports = api.slack = {
 		    icon = options.icon,
 		    channel = options.channel;
 
-
 		console.log('slack send'.red, options);
 
 		var slack_options = {
@@ -80,33 +79,25 @@ module.exports = api.slack = {
 
 	registeredUser : function (options) {
 
-		console.log('api.slack.registeredUser', options);
-
-	
-		var time_diff = new Date().getTime() - options.timestamp;// minutes
-
-
-		console.log('time_fidd', time_diff);
-
+		// get time since invite
 		var age_of_link = api.utils.prettyDate(new Date(options.timestamp));
 
-		// var text = options.inviter_name + ' invited ' + options.user_name + ' to project: ' + options.project_name;
-
-		// var text = options.user_name;
-
-		var text = 'A new user registered to the portal! \n\n'
-
-		text += '`Name:` ' + options.user_name;
-		text += '\n`Email:` ' + options.user_email;
-		if (options.user_company) text += '\n`Company:` ' + options.user_company;
-		if (options.user_position) text += '\n`Position:` ' + options.user_position;
-
-		text += '\n`Invited by:` ' + options.inviter_name;
-		if (options.inviter_company) text += ' (' + options.inviter_company + ')';
-		text += '\n`Invited to project:` ' + options.project_name;
-		text += '\nInvite link was created ' + age_of_link;
-
-		console.log('slack text: ', text);
+		// text
+		var text 	 = 'A new user registered to ' + api.config.slack.baseurl +' \n\n';
+		text 		+= '`Name:` ' + options.user_name;
+		text 		+= '\n`Email:` ' + options.user_email;
+		if (options.user_company) {
+			text 	+= '\n`Company:` ' + options.user_company;
+		}
+		if (options.user_position) {
+			text 	+= '\n`Position:` ' + options.user_position;
+		}
+			text 	+= '\n`Invited by:` ' + options.inviter_name;
+		if (options.inviter_company) {
+			text 	+= ' (' + options.inviter_company + ')';
+		}
+		text 		+= '\n`Invited to project:` ' + options.project_name;
+		text 		+= '\n`Invite link was created:` ' + age_of_link;
 
 		// send
 		api.slack._send({
@@ -169,20 +160,15 @@ module.exports = api.slack = {
 		.exec(callback)
 	},
 
-
-
 	loggedIn : function (options) {
 		var user = options.user,
 		    fullName = user.firstName + ' ' + user.lastName,
 		    text = fullName + ' logged in to ' + api.config.slack.baseurl;
-
-		    console.log('slack logged in!');
 
 		// send
 		api.slack._send({ 
 			text : text,
 		});
 	},
-
 };
 
