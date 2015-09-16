@@ -53,6 +53,15 @@ module.exports = function(passport) {
 	},
 	function(req, email, password, done) {
 
+		console.log('req: ', req);
+
+		var options = req.body;
+
+		// var company = req.body.company;
+		// var position = req.body.position;
+		// var firstName = req.body.firstName;
+		// var lastName = req.body.lastName;
+
 		// asynchronous
 		// User.findOne wont fire unless data is sent back
 		process.nextTick(function() {
@@ -66,20 +75,33 @@ module.exports = function(passport) {
 				// check to see if there's already a user with that email
 				if (user) return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
 
-				// if there is no user with that email,
-				// create the user
-				var newUser            = new User();
+				console.log('register user!!', options);
 
-				// set the user's local credentials
-				newUser.local.email    = email;
-				newUser.local.password = newUser.generateHash(password);
-				newUser.uuid = 'user-' + uuid.v4();
+				// register user
+				api.user.register(options, function (err, newUser) {
+					console.log('created suer!', newUser);
 
-				// save the user
-				newUser.save(function(err) {
-					if (err) console.error(err);
 					return done(null, newUser);
-				});
+
+
+				})
+
+				// // if there is no user with that email,
+				// // create the user
+				// var newUser            	= new User();
+				// newUser.local.email    	= email;
+				// newUser.local.password 	= newUser.generateHash(password);
+				// newUser.uuid 		= 'user-' + uuid.v4();
+				// newUser.company 	= company;
+				// newUser.position 	= position;
+				// newUser.firstName 	= firstName;
+				// newUser.lastName 	= lastName;
+
+				// // save the user
+				// newUser.save(function(err) {
+				// 	if (err) console.error(err);
+				// 	return done(null, newUser);
+				// });
 			});    
 		});
 	}));

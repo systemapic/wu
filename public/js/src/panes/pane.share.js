@@ -265,62 +265,94 @@ Wu.Share = Wu.Pane.extend({
 
 	_createInviteView : function () {
 
-		console.log('projects?', this._project, app.activeProject);
 
-		if (this._inviteWrapper) Wu.DomUtil.remove(this._inviteWrapper);
+		this._getInviteLink(function (ctx, link) {
 
-		this._clearTitles();
+			console.log('got ivnite link: ', ctx, link);
 
-		// invite wrapper
-		this._inviteWrapper = Wu.DomUtil.create('div', 'share-invite-wrapper', this._shareDropdown);
 
-		// hide invite button
-		this._shareInviteButton.innerHTML = '';
+			console.log('projects?', this._project, app.activeProject);
 
-		// insert title
-		this._insertInviteTitle(this._inviteWrapper);
+			if (this._inviteWrapper) Wu.DomUtil.remove(this._inviteWrapper);
 
-		// inputs wrapper
-		this._inviteInputsWrapper = Wu.DomUtil.create('div', 'share-invite-input-wrapper', this._inviteWrapper);
+			this._clearTitles();
 
-		// hold invites
-		this._inviteInputs = [];
+			// invite wrapper
+			this._inviteWrapper = Wu.DomUtil.create('div', 'share-invite-wrapper', this._shareDropdown);
 
-		// first input
-		var input = Wu.DomUtil.create('input', 'share-invite-input', this._inviteInputsWrapper);
-		input.setAttribute('placeHolder', 'Enter email...');
-		this._inviteInputs.push(input);
+			// hide invite button
+			this._shareInviteButton.innerHTML = '';
 
-		// second (evented) input
-		this._createInviteInput();
+			// insert title
+			this._insertInviteTitle(this._inviteWrapper, link);
 
-		// add submit button
-		this._submitInvite = Wu.DomUtil.create('div', 'share-invite-submit', this._inviteWrapper, 'Send invitations...');
+			// // inputs wrapper
+			// this._inviteInputsWrapper = Wu.DomUtil.create('div', 'share-invite-input-wrapper', this._inviteWrapper);
 
-		// submit event
-		Wu.DomEvent.on(this._submitInvite, 'click', this._submittingInvite, this);
+			// // hold invites
+			// this._inviteInputs = [];
+
+			// // first input
+			// var input = Wu.DomUtil.create('input', 'share-invite-input', this._inviteInputsWrapper);
+			// input.setAttribute('placeHolder', 'Enter email...');
+			// this._inviteInputs.push(input);
+
+			// // second (evented) input
+			// this._createInviteInput();
+
+			// // add submit button
+			// this._submitInvite = Wu.DomUtil.create('div', 'share-invite-submit', this._inviteWrapper, 'Send invitations...');
+
+			// // submit event
+			// Wu.DomEvent.on(this._submitInvite, 'click', this._submittingInvite, this);
+
+
+		}.bind(this));
+
+
 
 	},
 
-	_insertInviteTitle : function (appendTo) {
+
+	_getInviteLink : function (callback) {
+
+		var options = {
+			project_id : this._project.getUuid(),
+			project_name : this._project.getTitle(),
+			access_type : 'view'
+		}
+
+		// get invite link
+		Wu.post('/api/invite/link', JSON.stringify(options), callback);
+
+
+	},
+
+	_insertInviteTitle : function (appendTo, link) {
 
 		// wrap
 		var titleWrap = Wu.DomUtil.create('div', 'share-invite-title-wrap', appendTo);
 
 		// create first part of title
 		var pre = Wu.DomUtil.create('div', 'share-invite-title', titleWrap);
-		pre.innerHTML = 'Invite users to view project: ' + this._project.getTitle();
+		pre.innerHTML = 'Invite users to view project:<br> ' + this._project.getTitle();
 
 		// // create toggle
 		// this._inviteTypeToggle = Wu.DomUtil.create('div', 'share-invite-toggle', titleWrap);
 		// this._inviteTypeToggle.innerHTML = 'view';
 
-		// // create last part of title
-		// var post = Wu.DomUtil.create('div', 'share-invite-title', titleWrap);
-		// post.innerHTML = ' project: ' + this._project.getTitle();
+		// create last part of title
+		var post = Wu.DomUtil.create('div', 'share-invite-title-post', titleWrap);	 
+		post.innerHTML = 'Invite users to view this project by sending them this link. If they are not already registed, they will be allowed to create an account.';
+		// post.innerHTML += ' The link will be valid for 48 hours.'
+		post.innerHTML += '<br><br>(Press Ctrl-C to copy to clipboard.)'
 
 		// event
 		// Wu.DomEvent.on(this._inviteTypeToggle, 'click', this._toggleInviteType, this);
+
+		var input = Wu.DomUtil.create('input', 'share-invite-input-link', titleWrap);
+		input.value = link;
+		input.select();
 
 	},
 
