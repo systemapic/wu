@@ -726,9 +726,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			// fittepølse 
 			var colors = this.convertToFiveColors([color1, color2, color3]);
 
-
-			console.error(colors);
-
 			// Color range bar
 			var colorRangeBar = Wu.DomUtil.get('chrome-color-range_' + key);
 
@@ -1055,11 +1052,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		this._layer.setStyling(this.cartoJSON);
 
-		console.log('saveCartoJSON this._layuer', this._layer);
-
 		var sql = this._layer.getSQL();
-
-		console.log('sql:', sql);
 
 		// request new layer
 		var layerOptions = {
@@ -1074,8 +1067,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 
 	_updateLayer : function (options, done) {
-
-		console.error('_udpateLayuer');
 
 		var css = options.css,
 		    layer = options.layer,
@@ -1122,8 +1113,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 				return console.error(newLayerStyle.error);
 			}
 
-
-			console.log('got new layer -> set newLayerStyle', newLayerStyle);
 
 			// update layer
 			layer.updateStyle(newLayerStyle);

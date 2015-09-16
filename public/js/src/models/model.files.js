@@ -315,7 +315,6 @@ Wu.Files = Wu.Class.extend({
 
 	_getGeometryType : function () {
 		var meta = this.getMeta();
-		console.log('meta', meta);
 		return meta.geometry_type;
 	},
 

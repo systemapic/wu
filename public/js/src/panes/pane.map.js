@@ -148,7 +148,6 @@ Wu.MapPane = Wu.Pane.extend({
 
 		// // on map load
 		map.on('projectSelected', function (e) {
-			console.error('map load');
 			// hack due to race conditions
 			setTimeout(function () { 
 				// enable layers that are marked as on by default
@@ -326,7 +325,6 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 	addActiveLayer : function (layer) {
-		console.error('addActiveLayer', layer);
 		this._activeLayers.push(layer);
 	},
 

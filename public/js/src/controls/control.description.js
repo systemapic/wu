@@ -438,10 +438,6 @@ L.Control.Description = Wu.Control.extend({
 
 
 	setDescriptionHTML : function (text) {
-
-		console.log('setDescriptionHTML');
-		console.log('this.isCollapsed', this.isCollapsed);
-
 		if ( !text || text != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
 		if ( this.isCollapsed ) Wu.DomUtil.addClass(this._description, 'displayNone');
 		this._description.innerHTML = text;

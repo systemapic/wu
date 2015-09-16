@@ -2,8 +2,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	initialize : function(options) {
 
-		console.log('%c pop-up => initialize', 'background: red; color: white;');
-
 		// OTHER OPTIONS
 		var multiPopUp = options.multiPopUp;
 		var e = options.e;
