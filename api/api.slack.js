@@ -54,19 +54,57 @@ module.exports = api.slack = {
 		    icon = options.icon,
 		    channel = options.channel;
 
-
 		console.log('slack send'.red, options);
 
-		// send to slack
-		slack.send({
+		var slack_options = {
 			text 		: text,
 			channel 	: channel || api.config.slack.channel,
 			username 	: api.config.slack.botname,
-			icon_url 	: icon || api.config.slack.icon,
+			icon_url 	: api.config.slack.icon,
 			unfurl_links 	: true,
 			link_names 	: 1,
 			attachments 	: attachments,
+		}
+
+		if (options.icon_emoji) {
+			slack_options.icon_emoji = options.icon_emoji;
+		}
+
+
+		// send to slack
+		slack.send(slack_options);
+	},
+
+
+
+	registeredUser : function (options) {
+
+		// get time since invite
+		var age_of_link = api.utils.prettyDate(new Date(options.timestamp));
+
+		// text
+		var text 	 = 'A new user registered to ' + api.config.slack.baseurl +' \n\n';
+		text 		+= '`Name:` ' + options.user_name;
+		text 		+= '\n`Email:` ' + options.user_email;
+		if (options.user_company) {
+			text 	+= '\n`Company:` ' + options.user_company;
+		}
+		if (options.user_position) {
+			text 	+= '\n`Position:` ' + options.user_position;
+		}
+			text 	+= '\n`Invited by:` ' + options.inviter_name;
+		if (options.inviter_company) {
+			text 	+= ' (' + options.inviter_company + ')';
+		}
+		text 		+= '\n`Invited to project:` ' + options.project_name;
+		text 		+= '\n`Invite link was created:` ' + age_of_link;
+
+		// send
+		api.slack._send({
+			text : text,
+			icon_emoji : ":sunglasses:"
 		});
+
 	},
 
 
@@ -122,16 +160,15 @@ module.exports = api.slack = {
 		.exec(callback)
 	},
 
-
-
 	loggedIn : function (options) {
 		var user = options.user,
 		    fullName = user.firstName + ' ' + user.lastName,
 		    text = fullName + ' logged in to ' + api.config.slack.baseurl;
 
 		// send
-		api.slack._send({ text : text });
+		api.slack._send({ 
+			text : text,
+		});
 	},
-
 };
 

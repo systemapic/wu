@@ -110,15 +110,113 @@ module.exports = api.user = {
 				role.members.addToSet(created_user.uuid);
 
 				// save
-				role.save(callback);
+				role.save(function (err) {
+					callback(err);
+				});
 			});
+		});
+
+		ops.push(function (callback) {
+
+
+			// send slack
+			api.slack.registeredUser({
+				user_name 	: created_user.firstName + ' ' + created_user.lastName,
+				user_company 	: created_user.company,
+				user_email 	: created_user.local.email,
+				user_position 	: created_user.position,
+				inviter_name 	: token_store.invited_by.firstName + ' ' + token_store.invited_by.lastName,
+				inviter_company : token_store.invited_by.company,
+				project_name 	: token_store.project.name,
+				timestamp 	: token_store.timestamp
+			});
+
+
+			// send email
+
+
+
+			callback(null);
+
+
+
+
 		});
 
 		// done
 		async.waterfall(ops, function (err, results) {
-			done && done(err, created_user);
+			if (err) return done(err);
+
+
+			// send email
+
+
+			done(null, created_user);
 		});
 	
+	},
+
+
+	_processInviteToken : function (options, done) {
+		var user = options.user,
+		    invite_token,
+		    ops = [];
+
+		// get token store from redis
+		ops.push(function (callback) {
+			var redis_key = 'invite:token:' + options.invite_token;
+			api.redis.tokens.get(redis_key, callback);
+		});
+
+		// find project for adding to roles
+		ops.push(function (inviteJSON, callback) {
+			
+			// parse
+			invite_token = JSON.parse(inviteJSON);
+
+			Project
+			.findOne({uuid : invite_token.project.id})
+			.populate('roles')
+			.exec(callback);
+
+		});
+
+		// add user to project roles
+		ops.push(function (project, callback) {
+
+			var a = invite_token.project.access_type;
+			
+			// default role
+			var role_slug = 'noRole';
+
+			// decide which role
+			if (a == 'view') role_slug = 'projectReader'; // todo: other access types
+
+			// find reader role
+			var access_role = _.find(project.roles, function (r) {
+				return r.slug == role_slug;
+			});
+
+			Role
+			.findOne({uuid : access_role.uuid})
+			.exec(function (err, role) {
+
+				// add user to reader role of project
+				role.members.addToSet(user.uuid);
+
+				// save
+				role.save(callback);
+			});
+		});
+
+		async.waterfall(ops, function (err, results) {
+			var project_json = {
+				name : invite_token.project.name,
+				id : invite_token.project.id
+			}
+			done(null, project_json);
+		});
+
 	},
 
 	// invite users
@@ -205,7 +303,6 @@ module.exports = api.user = {
 
 		// create token and save in redis with options
 		var token = api.utils.getRandomChars(20, 'abcdefghijklmnopqrstuvwxyz1234567890');
-		console.log('invite token: ', token);
 
 		var token_store = {
 			project : {
@@ -225,16 +322,10 @@ module.exports = api.user = {
 
 		console.log('token store', token_store);
 
-
+		// save token to redis
 		var redis_key = 'invite:token:' + token;
-		console.log('redis_key: ', redis_key);	
 		api.redis.tokens.set(redis_key, JSON.stringify(token_store), function (err) {
-
-			console.log('saved redis token', err);
-
-
 			var inviteLink = api.config.portalServer.uri + 'invite/' + token;
-
 			callback(null, inviteLink);
 		});
 	},
