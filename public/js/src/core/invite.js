@@ -38,8 +38,8 @@ Wu.Invite = Wu.Class.extend({
 		var headerTitleDiv = Wu.DomUtil.create('div', 'invite-header-title', wrapper, headerTitle);
 
 		// login instead of register if you have account
-		var portalUrl = window.location.origin + '/login';
-		var loginText = '(If you already have an account, please <a href="' + portalUrl + '">login</a> and try link again.)';
+		var link = window.location.origin + '/login?invite=' + this._invite.token;
+		var loginText = '(If you already have an account, please <a href="' + link + '">login</a> and try link again.)';
 		var loginTextDiv = Wu.DomUtil.create('div', 'invite-login-title', wrapper, loginText);
 
 		// add invite token to form
@@ -47,13 +47,5 @@ Wu.Invite = Wu.Class.extend({
 		input_token.value = this._invite.token;
 
 	},
-
-
-
-
-
-
-
-
 
 });

@@ -37,7 +37,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._added = true;
 	},
 
-
 	_flush : function () {
 		this.layers = {};
 		this._content.innerHTML = '';
@@ -79,11 +78,21 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	_enableDefaultLayers : function () {
 
-		for (var l in this.layers) {
-			var layer = this.layers[l];
+		console.log('enabledddddd');
 
-			if (layer.item.enabled) {
-				this._enableDefaultLayer(layer);
+		for (var l in this.layers) {
+			var layermenuItem = this.layers[l];
+
+			console.log('ASDASDASD ', layermenuItem.layer.store);
+
+			if (layermenuItem.item.enabled) {
+
+				console.log('ASDASDASD222 ', layermenuItem.layer);
+
+				// var actual_layer = this._project.getLayer(layermenuItem.layer.store.uuid);
+
+				// console.log('actuval_layer', actual_layer);
+				this._enableDefaultLayer(layermenuItem);
 			}
 		}
 
@@ -623,7 +632,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	clearInvalid : function () {
-		for (l in this.layers) {
+		for (var l in this.layers) {
 			var layer = this.layers[l];
 			Wu.DomUtil.removeClass(layer.el, 'invalidLayermenuitem');
 		}
@@ -798,7 +807,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	closeAll : function () {
 		this.updateLogic();
-		for (l in this._logic) {
+		for (var l in this._logic) {
 			var item = this.layers[l];
 			if (item) {
 				this._logic[l].isOpen = true;
@@ -809,7 +818,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	openAll : function () {
 		this.updateLogic();
-		for (l in this._logic) {
+		for (var l in this._logic) {
 			var item = this.layers[l];
 			if (item) {
 				this._logic[l].isOpen = false;
@@ -822,7 +831,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	toggleFolder : function (layerItem) {
 		this.updateLogic();	
 		this.enforceLogic(layerItem);
-
 	},
 
 	toggleLayer : function (item) {
@@ -834,12 +842,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		// toggle
 		if (item.on) {
 			this.disableLayer(item);
-			// Google Analytics event tracking
-			// app.Analytics.setGaEvent(['Controls', 'Layer hide: ' + _layerName ]);
 		} else {
 			this.enableLayer(item);
-			// Google Analytics event tracking
-			// app.Analytics.setGaEvent(['Controls', 'Layer show: ' + _layerName ]);
 		}    
 	},
 
@@ -858,6 +862,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 	
 	_enableDefaultLayer : function (layer) {
+		console.error('_enableDefaultLayer', layer);
 		this.enableLayer(layer);
 	},
 
@@ -1298,18 +1303,26 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._refresh();
 
 		// select first layer by default
-		this._selectDefaultLayer();
+		// this._selectDefaultLayer();
+
+		// this._enableDefaultLayers();
 
 	},
 
 	_selectDefaultLayer : function () {
 		var layerItem;
 
+		// console.error('PROJECT SELECTED');
+		// var lm = app.MapPane.getControls().layermenu;
+		// lm && lm._enableDefaultLayers();
+
 		// get first layer
 		_.forEach(this.layers, function (l) {
 			layerItem = l;
 			return false;
 		}.bind(this));
+
+		console.log('layerItem', layerItem);
 
 		if (!layerItem) return; // no layers in layermenu
 
