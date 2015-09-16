@@ -91,8 +91,6 @@ module.exports = function(passport) {
 		// we are checking to see if the user trying to login already exists
 		User.findOne({ 'local.email' :  email }, function(err, user) {
 
-			// console.log('found user: ', user, password);
-
 			// if there are any errors, return the error before anything else
 			if (err) return done(err);
 
