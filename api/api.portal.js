@@ -121,11 +121,7 @@ module.exports = api.portal = {
 					access_token : req.session.access_token || {}
 				});
 			}
-
-
-
-		})
-
+		});
 
 	},
 
@@ -194,6 +190,14 @@ module.exports = api.portal = {
 		});
 	},
 
+	_checkInvite : function (options) {
+		console.log('_checkInvite', options);
+		var invite_token = options.invite_token;
+		if (!invite_token) return false;
+		if (invite_token.length == 20) return true;
+		return false;
+	},
+
 	// #########################################
 	// ###  API: Get Portal                  ###
 	// #########################################
@@ -202,9 +206,25 @@ module.exports = api.portal = {
 
 		// print debug
 		api.portal.printDebug(req);
+		
+		// options
+		var options = req.body,
+		    account = req.user,
+		    a = {}, 
+		    invite = this._checkInvite(options);	 // check for invite token
 
-		var account = req.user,
-		    a = {};
+		// include invite access
+		if (invite) a.invite = function (callback) {
+
+			// process token
+			api.user._processInviteToken({
+				user : req.user,
+				invite_token : options.invite_token
+			}, function (err, project_json) {
+				callback(null, project_json);
+			});
+		}		
+		
 
 		a.account = function (callback) {
 			api.user._getSingle({
@@ -244,23 +264,14 @@ module.exports = api.portal = {
 		async.series(a, function (err, result) {
 			if (err || !result) return api.error.general(req, res, err || 'No result.');
 
-			// add user account
-			// result.account = account;
-
-			console.log('req.body', req.body);
-
 			var gzip = true;
 			if (req.body.gzip === false) {
 				gzip = false;
 			}
-
-
-			// var dontZip = JSON.parse(req.body).dontZip;
-
-			// console.log('dontZip? ', dontZip, req.body);
 			
 			// if (dontZip) return res.json(result);
 			if (!gzip) return res.json(result);
+			
 			// return result gzipped
 			res.writeHead(200, {'Content-Type': 'application/json', 'Content-Encoding': 'gzip'});
 			zlib.gzip(JSON.stringify(result), function (err, zipped) {

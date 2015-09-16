@@ -57,16 +57,63 @@ module.exports = api.slack = {
 
 		console.log('slack send'.red, options);
 
-		// send to slack
-		slack.send({
+		var slack_options = {
 			text 		: text,
 			channel 	: channel || api.config.slack.channel,
 			username 	: api.config.slack.botname,
-			icon_url 	: icon || api.config.slack.icon,
+			icon_url 	: api.config.slack.icon,
 			unfurl_links 	: true,
 			link_names 	: 1,
 			attachments 	: attachments,
+		}
+
+		if (options.icon_emoji) {
+			slack_options.icon_emoji = options.icon_emoji;
+		}
+
+
+		// send to slack
+		slack.send(slack_options);
+	},
+
+
+
+	registeredUser : function (options) {
+
+		console.log('api.slack.registeredUser', options);
+
+	
+		var time_diff = new Date().getTime() - options.timestamp;// minutes
+
+
+		console.log('time_fidd', time_diff);
+
+		var age_of_link = api.utils.prettyDate(new Date(options.timestamp));
+
+		// var text = options.inviter_name + ' invited ' + options.user_name + ' to project: ' + options.project_name;
+
+		// var text = options.user_name;
+
+		var text = 'A new user registered to the portal! \n\n'
+
+		text += '`Name:` ' + options.user_name;
+		text += '\n`Email:` ' + options.user_email;
+		if (options.user_company) text += '\n`Company:` ' + options.user_company;
+		if (options.user_position) text += '\n`Position:` ' + options.user_position;
+
+		text += '\n`Invited by:` ' + options.inviter_name;
+		if (options.inviter_company) text += ' (' + options.inviter_company + ')';
+		text += '\n`Invited to project:` ' + options.project_name;
+		text += '\nInvite link was created ' + age_of_link;
+
+		console.log('slack text: ', text);
+
+		// send
+		api.slack._send({
+			text : text,
+			icon_emoji : ":sunglasses:"
 		});
+
 	},
 
 
@@ -129,8 +176,12 @@ module.exports = api.slack = {
 		    fullName = user.firstName + ' ' + user.lastName,
 		    text = fullName + ' logged in to ' + api.config.slack.baseurl;
 
+		    console.log('slack logged in!');
+
 		// send
-		api.slack._send({ text : text });
+		api.slack._send({ 
+			text : text,
+		});
 	},
 
 };
