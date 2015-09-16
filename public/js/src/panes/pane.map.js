@@ -130,19 +130,21 @@ Wu.MapPane = Wu.Pane.extend({
 		}, this)
 
 
+		// // on map load
 		map.on('load', function (e) {
 
+			console.log('map load');
+
+			// enable layers that are marked as on by default
 			var lm = app.MapPane.getControls().layermenu;
-			lm._enableDefaultLayers();
+			lm && lm._enableDefaultLayers();
 		});
 
 	},
 
 	_invalidateTiles : function () {
-
 		var options = {
 			access_token : app.tokens.access_token, // unique identifier
-
 		}
 	},
 

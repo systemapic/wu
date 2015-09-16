@@ -1,23 +1,15 @@
 var feedbackTimer;
 
 
-// check_invite();
-// return;
 check_token();
 
-
-
 function check_invite() {
-	console.log('check invite!', window.location);
-
-
-
-	var invite = window.location;
-
-
+	var search = window.location.search;
+	if (!search) return;
+	var invite_token = search.split('?')[1].split('invite=')[1];
+	var input = document.getElementById('invite_input');
+	input.value = invite_token;
 }
-
-
 
 function check_token() {
 	if (!checkToken()){
@@ -33,11 +25,9 @@ function check_token() {
 	}
 
 	sendRequest('/reset/checktoken', options, function (err, body){
-		console.log('checked token', err, body);
 
 		var response = JSON.parse(body);
 		if (!response.valid) {
-			console.error('invalid token');
 			
 			showForgotPassword();
 
@@ -51,23 +41,10 @@ function check_token() {
 }
 
 window.onload = function () {
-	// console.log('window.onload');
-
-	// We need to access the form element
-	// var form = document.getElementById("login-form");
-
-
-	
-
-	// var p = document.getElementById('password-input');
-	// var r = document.getElementById('password-repeat');
-	// p.onkeyup = keyedup;
-	// r.onkeyup = keyedup;
-
+	check_invite();
 }
 
 function login_key_up() {
-	console.log('KEYOU')
 }
 
 function initScripts() {
@@ -85,15 +62,12 @@ function checkToken() {
 }
 
 function getToken() {
-	console.log('window.location', window.location);
 	var token = window.location.search.split('=')[1];
 	return token;
 }
 
 function getPortal() {
-	console.log('getPortal');
-
-	var url = window.location.origin + '/portal';
+	// var url = window.location.origin + '/portal';
 	var http = new XMLHttpRequest();
 	http.open( "GET", url, false );
 	http.setRequestHeader('Authorization', 'Bearer ' + window.access_token); 
@@ -116,8 +90,6 @@ function sendAccessTokenRequest(entryPoint, options, callback) {
 	http.send(JSON.stringify(options));
 }
 
-
-
 function spin() {
 
 	// spinning map + logo
@@ -138,7 +110,6 @@ function checkmobile() {
 		styletag.innerHTML = styleURL;
 	}
 }
-
 
 function addhooks() {
 
@@ -166,7 +137,6 @@ function addhooks() {
 	// create password
 	var createButton = document.getElementById('create-button');
 	createButton.onclick = submitNewPassword;
-
 }
 
 function submitNewPassword () {	
