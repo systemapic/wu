@@ -42,28 +42,23 @@ var api = module.parent.exports;
 // exports
 module.exports = api.user = { 
 
-
 	register : function (options, done) {
-
-
 		var ops = [],
 		    created_user,
 		    token_store;
 
-		    console.log('options,', options);
-
+		// get token store from redis
 		ops.push(function (callback) {
 			var token = options.invite_token;
 			var redis_key = 'invite:token:' + token;
 			api.redis.tokens.get(redis_key, callback);
 		});
 
-
+		// create new user
 		ops.push(function (tokenJSON, callback) {
 
+			// parse token_store
 			token_store = JSON.parse(tokenJSON);
-			var invitedBy = token_store.invited_by.uuid;
-			var project_id = token_store.project.id;
 
 			// create the user
 			var newUser            	= new User();
@@ -74,16 +69,16 @@ module.exports = api.user = {
 			newUser.position 	= options.position;
 			newUser.firstName 	= options.firstname;
 			newUser.lastName 	= options.lastname;
-			newUser.invitedBy 	= invitedBy;
+			newUser.invitedBy 	= token_store.invited_by.uuid;
 
 			// save the user
 			newUser.save(function(err) {
 				created_user = newUser;
-				callback(err, project_id);
+				callback(err, token_store.project.id);
 			});
 		});
 
-
+		// find project for adding to roles
 		ops.push(function (project_id, callback) {
 			Project
 			.findOne({uuid : project_id})
@@ -91,43 +86,40 @@ module.exports = api.user = {
 			.exec(callback);
 		});
 
-
+		// add user to project roles
 		ops.push(function (project, callback) {
 
 			var a = token_store.project.access_type;
+			
+			// default role
 			var role_slug = 'noRole';
 
-			if (a == 'view') role_slug = 'projectReader';
-			// if (a == 'edit') role_slug = 'projectEditor'; // etc.
-
-
+			// decide which role
+			if (a == 'view') role_slug = 'projectReader'; // todo: other access types
 
 			// find reader role
-			var readerRole = _.find(project.roles, function (r) {
-				return r.slug == 'projectReader';
+			var access_role = _.find(project.roles, function (r) {
+				return r.slug == role_slug;
 			});
 
 			Role
-			.findOne({uuid : readerRole.uuid})
+			.findOne({uuid : access_role.uuid})
 			.exec(function (err, role) {
 
 				// add user to reader role of project
 				role.members.addToSet(created_user.uuid);
 
 				// save
-				role.save(function (err, r) {
-					callback(err);
-				});
+				role.save(callback);
 			});
 		});
 
+		// done
 		async.waterfall(ops, function (err, results) {
-			done(err, created_user);
+			done && done(err, created_user);
 		});
 	
 	},
-
-
 
 	// invite users
 	invite : function (req, res) {
@@ -137,8 +129,6 @@ module.exports = api.user = {
 		api.user._invite(options, function (err, results) {
 			res.json(results);
 		});
-
-
 	},
 
 	_invite : function (options, callback) {
@@ -202,12 +192,8 @@ module.exports = api.user = {
 		options.user = req.user;
 
 		api.user._createInviteLink(options, function (err, inviteLink) {
-
 			res.end(inviteLink);
-
 		});
-
-
 	},
 
 	_createInviteLink : function (options, callback) {
