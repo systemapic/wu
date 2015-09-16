@@ -133,11 +133,13 @@ Wu.MapPane = Wu.Pane.extend({
 		// // on map load
 		map.on('load', function (e) {
 
-			console.log('map load');
-
-			// enable layers that are marked as on by default
-			var lm = app.MapPane.getControls().layermenu;
-			lm && lm._enableDefaultLayers();
+			// hack due to race conditions
+			setTimeout(function () { 
+				// enable layers that are marked as on by default
+				var lm = app.MapPane.getControls().layermenu;
+				lm && lm._enableDefaultLayers();
+			}, 10);
+			
 		});
 
 	},
