@@ -137,11 +137,14 @@ L.SpinningMap = L.Class.extend({
 		    zoom = this.options.position.zoom;
 
 		// create map
-		var map = this._map = L.mapbox.map(this._container);
+		var map = this._map = L.mapbox.map(this._container, {
+			attributionControl : true
+		});
 
 		// add layer
 		var layer = L.mapbox.tileLayer(this.options.layer, {
-			format : this.options.tileFormat
+			format : this.options.tileFormat,
+
 		}).addTo(map);
 
 		// set map options
@@ -159,7 +162,7 @@ L.SpinningMap = L.Class.extend({
 
 		// remove zoom and attribution
 		map.zoomControl.removeFrom(map);
-		map.attributionControl.removeFrom(map);
+		// map.attributionControl.removeFrom(map);
 
 	},
 

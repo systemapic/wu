@@ -529,3 +529,17 @@ body {
 	width: 25px;
 }
 
+
+.leaflet-control-attribution.leaflet-control {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    color: white !important;
+    background-color: rgba(0, 0, 0, 0.44);
+}
+.leaflet-control-container {
+	display: block;
+}
+.leaflet-container .leaflet-control-attribution a, .leaflet-container .map-info-container a {
+    color: rgba(255, 255, 255, 0.58);
+}
