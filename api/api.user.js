@@ -133,7 +133,10 @@ module.exports = api.user = {
 
 
 			// send email
-
+			api.email.sendInvitedEmail({
+				email : created_user.local.email,
+				name : created_user.firstName,
+			});
 
 
 			callback(null);
