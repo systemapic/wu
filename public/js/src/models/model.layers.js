@@ -686,15 +686,12 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		// - also, removed listeners in L.UtfGrid (onAdd)
 		// 
 
-		console.error('layer updateGrid', this.getTitle());
 		if (this.gridLayer) {
 			this.gridLayer._update();
 		}
 	},
 
 	_prepareGrid : function () {
-
-		console.error('prepare grid', this.getTitle());
 
 		// set ids
 		var subdomains  = app.options.servers.tiles.subdomains,

@@ -77,25 +77,12 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	_enableDefaultLayers : function () {
-
-		console.log('enabledddddd');
-
 		for (var l in this.layers) {
 			var layermenuItem = this.layers[l];
-
-			console.log('ASDASDASD ', layermenuItem.layer.store);
-
 			if (layermenuItem.item.enabled) {
-
-				console.log('ASDASDASD222 ', layermenuItem.layer);
-
-				// var actual_layer = this._project.getLayer(layermenuItem.layer.store.uuid);
-
-				// console.log('actuval_layer', actual_layer);
 				this._enableDefaultLayer(layermenuItem);
 			}
 		}
-
 	},
 
 	// refresh for names etc, but keep active layers
@@ -862,7 +849,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 	
 	_enableDefaultLayer : function (layer) {
-		console.error('_enableDefaultLayer', layer);
 		this.enableLayer(layer);
 	},
 
@@ -1288,46 +1274,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	},
 
-	_projectSelected : function (e) {
-
-		var projectUuid = e.detail.projectUuid;
-
-		if (!projectUuid) {
-			this._project = null;
-			return this._off();
-		}
-		// set project
-		this._project = app.activeProject = app.Projects[projectUuid];
-
-		// refresh pane
-		this._refresh();
-
-		// select first layer by default
-		// this._selectDefaultLayer();
-
-		// this._enableDefaultLayers();
-
-	},
-
-	_selectDefaultLayer : function () {
-		var layerItem;
-
-		// console.error('PROJECT SELECTED');
-		// var lm = app.MapPane.getControls().layermenu;
-		// lm && lm._enableDefaultLayers();
-
-		// get first layer
-		_.forEach(this.layers, function (l) {
-			layerItem = l;
-			return false;
-		}.bind(this));
-
-		console.log('layerItem', layerItem);
-
-		if (!layerItem) return; // no layers in layermenu
-
-	},
-
+	
 	_setEnabledOnInit : function (layer_id, onoff) {
 
 		var l = this._project.store.layermenu;
