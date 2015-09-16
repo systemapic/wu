@@ -75,22 +75,11 @@ module.exports = api.portal = {
 		res.render('../../views/login.serve.ejs', { message: req.flash('loginMessage') });
 	},
 
-	// signup : function (req, res) {
-		
-	// 	// debug
-	// 	return res.redirect('/login');
-
-	// 	// res.render('../../views/signup.ejs', { message: req.flash('signupMessage') });
-	// },
-
-
 	invite : function (req, res) {
 
 		// get client/project
 		var path = req.originalUrl.split('/');
 		var invite_token = path[2];
-
-
 
 		// get token from redis
 		var redis_key = 'invite:token:' + invite_token;
@@ -98,23 +87,19 @@ module.exports = api.portal = {
 
 			// if logged in
 			if (req.isAuthenticated()) {
-				// req.session.hotlink = hotlink;
 				res.render('../../views/app.serve.ejs', {
-					// hotlink : hotlink || {},
+					hotlink : {},
 					access_token : req.session.access_token || {}
 				});
 
-			// if not logged in, redirect to invite.ejs
+			// if not logged in
 			} else {
-				// req.session.invite_token = invite_token;
 				res.render('../../views/invite.ejs', {
-					// hotlink : hotlink || {},
 					invite : token_store,
 					access_token : req.session.access_token || {}
 				});
 			}
 		});
-
 	},
 
 
@@ -167,8 +152,10 @@ module.exports = api.portal = {
 		// send email
 		api.email.sendJoinBetaMail(email);
 
+		// debug print
 		api.portal.getBetaMembers();
 
+		// return
 		res.end();
 	},
 
@@ -278,15 +265,5 @@ module.exports = api.portal = {
 		console.log('');
 	},
 
-	grindDone : function (req, res) {
-
-		// close connection
-		res.end('Thanks!');
-
-		var options = req.body,
-		    fileUuid = options.fileUuid;
-
-		// send ping to client
-	},
 
 }
