@@ -295,21 +295,21 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		}
 		var useMinMaxFromStyle = this._createMetaFieldLine(options)
 
-		// Use min/max from styling switch
-		var options = {
-			key 		: 'graphstyle', 
-			wrapper 	: sectionWrapper,
-			input 		: false,
-			title 		: 'Graph style',
-			isOn 		: this.tooltipMeta.timeSeries.graphstyle,
-			rightPos	: true,
-			type 		: 'dropdown',
-			dropdown	: ['scatter', 'line'],
+		// // Use min/max from styling switch
+		// var options = {
+		// 	key 		: 'graphstyle', 
+		// 	wrapper 	: sectionWrapper,
+		// 	input 		: false,
+		// 	title 		: 'Graph style',
+		// 	isOn 		: this.tooltipMeta.timeSeries.graphstyle,
+		// 	rightPos	: true,
+		// 	type 		: 'dropdown',
+		// 	dropdown	: ['scatter', 'line'],
 			
 			
-		}
+		// }
 
-		var graphType = this._createMetaFieldLine(options)
+		// var graphType = this._createMetaFieldLine(options)
 
 
 		// Create list of time series fields

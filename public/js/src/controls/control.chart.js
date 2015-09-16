@@ -1,7 +1,9 @@
 Wu.Control.Chart = Wu.Control.extend({
 
 	initialize : function(options) {
-		
+
+		console.log('%c pop-up => initialize', 'background: red; color: white;');
+
 		// OTHER OPTIONS
 		var multiPopUp = options.multiPopUp;
 		var e = options.e;
@@ -26,7 +28,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		}
 
 		// clear old popup
-		// this._popup = null;
+		this._popup = null;
 
 		// return if no content
 		if (!content) return;
@@ -39,11 +41,13 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Open popup
 		this.openPopup(e, multiPopUp);
+
 	},
 
 
 	// Open pop-up
 	openPopup : function (e, multiPopUp) {
+
 		if (this._popup) return;
 
 		var popup   = this._createPopup(),
@@ -274,7 +278,7 @@ Wu.Control.Chart = Wu.Control.extend({
 	},
 
 	// Create multi point C3 pop-up content
-	multiPointPopUp : function (_data) {			
+	multiPointPopUp : function (_data) {
 
 		var _average = _data.average;
 		var _center = _data.center;

@@ -1804,7 +1804,8 @@ aka feedback pane
 	padding-bottom: 4px;
 	margin-top: 0px;
 	margin-bottom: 14px;
-	line-height: 1.3;	
+	line-height: 1.3;
+	display: none;
 	}	
 
 .description-control-header-section {
