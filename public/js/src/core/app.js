@@ -228,8 +228,6 @@ Wu.App = Wu.Class.extend({
 
 		// share pane
 		this.Share = new Wu.Share();
-
-		
 	},
 
 
@@ -255,8 +253,6 @@ Wu.App = Wu.Class.extend({
 	_initInvite : function () {
 		var project = this.options.json.invite;
 
-		console.log('ivnnite: ', project);
-
 		if (!project) return false;
 
 		// select project
@@ -268,7 +264,6 @@ Wu.App = Wu.Class.extend({
 			title : 'Project access granted',
 			description : 'You\'ve been given access to the project ' + project.name 
 		});
-
 	},
 
 	_initEvents : function () {

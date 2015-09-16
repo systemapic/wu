@@ -46,7 +46,6 @@ module.exports = function(app, passport) {
 	// OAUTH2: Get Token ==============
 	// ================================
 	app.post('/oauth/token', api.oauth2.getToken);
-
 	app.get('/api/token/check', passport.authenticate('bearer', {session: false}), function (req, res) {
 		res.end('OK');
 	});
@@ -132,8 +131,6 @@ module.exports = function(app, passport) {
 	});
 	
 
-	
-
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
@@ -142,51 +139,12 @@ module.exports = function(app, passport) {
 	});
 
 
-
-
-
-
-	// #####################################
 	// =====================================
-	// BRIDGE API ==========================
+	// GET UPLOAD ==========================
 	// =====================================
-	// brigde to mongoose for pile.js
-	// #####################################
-
-
 	app.get('/api/upload/get', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.getUpload(req, res);
 	});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	// #####################################
-	// =====================================
-	// POSTGIS API  ========================
-	// =====================================
-	// #####################################
-
 
 
 	// =====================================
@@ -203,40 +161,12 @@ module.exports = function(app, passport) {
 		api.upload.getUploadStatus(req, res);
 	});
 
-	// // =====================================
-	// // GET FILE MODEL FROM FILEUUID ========
-	// // =====================================
-	// app.get('/api/data/file', passport.authenticate('bearer', {session: false}), function (req, res) {
-	// 	api.file.getFile(req, res);
-	// });
-
-	// // =====================================
-	// // GET FILE MODEL FROM FILEUUID ========
-	// // =====================================
-	// app.get('/api/data/export/', passport.authenticate('bearer', {session: false}), function (req, res) {
-	// 	api.file.getFile(req, res);
-	// });
-
-
-
-
+	// =====================================
+	// JOIN BETA MAIL ======================
+	// =====================================
 	app.get('/api/joinbeta', function (req, res) {
 		api.portal.joinBeta(req, res);
 	});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 	// =====================================
@@ -433,15 +363,6 @@ module.exports = function(app, passport) {
 		api.geo.json2cartocss(req, res);
 	});
 
-
-
-	// // =====================================
-	// // REQUEST FILE DOWNLOAD (zip'n send) ==
-	// // =====================================
-	// app.post('/api/file/download', passport.authenticate('bearer', {session: false}), function (req,res) {
-	// 	api.file.zipAndSend(req, res);
-	// });
-
 	// =====================================
 	// DOWNLOAD DATASET ====================
 	// =====================================
@@ -455,7 +376,6 @@ module.exports = function(app, passport) {
 	app.post('/api/layer/downloadDataset', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.postgis.downloadDatasetFromLayer(req, res);
 	});
-
 
 	
 	// =====================================
@@ -471,15 +391,6 @@ module.exports = function(app, passport) {
 	app.post('/api/file/getLayers', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.file.getLayers(req, res);
 	});
-
-
-
-	// // =====================================
-	// // DELETE FILE(S) ===================
-	// // =====================================
-	// app.post('/api/file/delete', passport.authenticate('bearer', {session: false}), function (req,res) {
-	// 	api.file.deleteFiles(req, res);
-	// });
 
 
 	// =====================================
@@ -618,7 +529,6 @@ module.exports = function(app, passport) {
 	});
 
 
-
 	// =====================================
 	// access: GET ROLE  ===============
 	// =====================================
@@ -721,12 +631,12 @@ module.exports = function(app, passport) {
 	});
 
 
-	// =====================================
-	// SIGNUP ==============================
-	// =====================================
-	app.get('/signup', function(req, res) {
-		api.portal.signup(req, res);
-	});
+	// // =====================================
+	// // SIGNUP ==============================
+	// // =====================================
+	// app.get('/signup', function(req, res) {
+	// 	api.portal.signup(req, res);
+	// });
 
 
 	// =====================================

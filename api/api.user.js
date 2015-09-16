@@ -174,8 +174,6 @@ module.exports = api.user = {
 			// parse
 			invite_token = JSON.parse(inviteJSON);
 
-			console.log('invite_token', invite_token);
-
 			Project
 			.findOne({uuid : invite_token.project.id})
 			.populate('roles')
@@ -207,21 +205,15 @@ module.exports = api.user = {
 				role.members.addToSet(user.uuid);
 
 				// save
-				role.save(function (err) {
-					callback(err);
-				});
-
+				role.save(callback);
 			});
 		});
 
 		async.waterfall(ops, function (err, results) {
-			console.log('added to roles ---', err, results);
-
 			var project_json = {
 				name : invite_token.project.name,
 				id : invite_token.project.id
 			}
-
 			done(null, project_json);
 		});
 
@@ -311,7 +303,6 @@ module.exports = api.user = {
 
 		// create token and save in redis with options
 		var token = api.utils.getRandomChars(20, 'abcdefghijklmnopqrstuvwxyz1234567890');
-		console.log('invite token: ', token);
 
 		var token_store = {
 			project : {
@@ -331,16 +322,10 @@ module.exports = api.user = {
 
 		console.log('token store', token_store);
 
-
+		// save token to redis
 		var redis_key = 'invite:token:' + token;
-		console.log('redis_key: ', redis_key);	
 		api.redis.tokens.set(redis_key, JSON.stringify(token_store), function (err) {
-
-			console.log('saved redis token', err);
-
-
 			var inviteLink = api.config.portalServer.uri + 'invite/' + token;
-
 			callback(null, inviteLink);
 		});
 	},
