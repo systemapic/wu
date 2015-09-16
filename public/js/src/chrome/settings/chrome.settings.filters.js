@@ -530,6 +530,11 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	_updateChart : function (histogram, column) {
 
+		console.log('%c _updateChart ', 'background: #FF33FF; color: white;');
+		console.log('histogram.length => ', histogram.length);
+		console.log('column => ', column);
+
+
 		var ndx = crossfilter(histogram),
 		    runDimension = ndx.dimension(function(d) {return +d.bucket;}), 			// x-axis
 		    speedSumGroup = runDimension.group().reduceSum(function(d) {return d.freq;}),	// y-axis
@@ -552,7 +557,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		// filter event (throttled)
 		this._chart.on('filtered', function (chart, filter) {
 
-			// filter == null
 			if (!filter) return this._registerFilter(false);
 
 			// round buckets

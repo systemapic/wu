@@ -212,11 +212,11 @@
 /*temporary override*/
 .file-action-share {
 	color: gainsboro;
-}
+	}
+	
 .file-action-share:hover {
 	color: gainsboro;
-}
-
+	}
 
 .chrome-content-filter-label {
 	height: 20px;
@@ -225,106 +225,4 @@
 	bottom: -24px;
 	margin-left: 39px;
 	font-size: 11px;
-}
-
-
-.wide-share {
-	/*height: auto;
-	min-height: 400px;
-	width: auto;
-	min-width: 500px;*/
-	height: auto;
-	width: 300px;
-}	
-
-.share-invite-input {
-	position: relative;
-	float: none;
-	width: 100%;
-	margin: 3px;
-	border: 0;
-	margin-left: 20px;
-}
-
-.share-dropdown {
-	transition: all 200ms;
-}
-
-.share-invite-title {
-	font-size: 20px;
-	font-weight: 500;
-	margin-left: 0px;
-	position: relative;
-}
-
-.share-invite-toggle {
-	font-size: 14px;
-	font-weight: 500;
-	padding-top: 10px;
-	margin-left: 0px;
-	position: relative;
-	float: left;
-	background-color: black;
-	color: white;
-	padding: 2px;
-	cursor: pointer;
-}
-.share-invite-toggle:hover {
-	color: black;
-	background: white;
-	border: 1px solid black;
-}
-
-
-.share-invite-submit {
-	height: auto;
-	width: 129px;
-	border: 1px solid red;
-	padding: 5px;
-	position: relative;
-	margin-left: 140px;
-	border-radius: 2px;
-}
-.share-invite-submit:hover {
-	background: green;
-	color: white;
-}
-
-
-.share-invite-input-link {
-	width: 100%;
-	background: rgba(113, 196, 168, 1);
-	padding: 2px;
-	border: 0;
-}
-
-.share-invite-input-link::selection {
-	background: rgba(113, 196, 168, 1);
-	color: white;
-}
-.share-invite-title-post {
-	font-weight: 300;
-	position: relative;
-	padding: 4px;
-	padding-left: 0px;
-	margin-top: 5px;
-	margin-bottom: 5px;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	}
