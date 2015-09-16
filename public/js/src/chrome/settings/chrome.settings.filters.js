@@ -534,9 +534,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		console.log('histogram.length => ', histogram.length);
 		console.log('column => ', column);
 
-
 		var ndx = crossfilter(histogram),
-		    runDimension = ndx.dimension(function(d) {return +d.bucket;}), 			// x-axis
+		    runDimension = ndx.dimension(function(d) {return d.bucket;}), 			// x-axis
 		    speedSumGroup = runDimension.group().reduceSum(function(d) {return d.freq;}),	// y-axis
 		    num_buckets = this.options.num_buckets;
 
