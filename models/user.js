@@ -15,6 +15,7 @@ var userSchema = mongoose.Schema({
         phone       : String,
         mobile      : String,
         createdBy   : String,
+        invitedBy   : String,
 
         // tile server auth token
         token       : String,

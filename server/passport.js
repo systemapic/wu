@@ -66,20 +66,8 @@ module.exports = function(passport) {
 				// check to see if there's already a user with that email
 				if (user) return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
 
-				// if there is no user with that email,
-				// create the user
-				var newUser            = new User();
-
-				// set the user's local credentials
-				newUser.local.email    = email;
-				newUser.local.password = newUser.generateHash(password);
-				newUser.uuid = 'user-' + uuid.v4();
-
-				// save the user
-				newUser.save(function(err) {
-					if (err) console.error(err);
-					return done(null, newUser);
-				});
+				// register user
+				api.user.register(req.body, done);
 			});    
 		});
 	}));

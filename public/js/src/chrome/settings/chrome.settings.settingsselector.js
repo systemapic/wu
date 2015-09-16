@@ -57,7 +57,7 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 	_refresh : function () {
 
 		// remove settings button if no access to edit project
-		if (app.Access.to.edit_project(app.activeProject.getUuid())) { 			// todo: check if working
+		if (app.Access.to.edit_project(app.activeProject)) { 			// todo: check if working
 			Wu.DomUtil.removeClass(this._settingsButton, 'displayNone');
 		} else {
 			Wu.DomUtil.addClass(this._settingsButton, 'displayNone');

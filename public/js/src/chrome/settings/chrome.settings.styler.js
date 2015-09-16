@@ -1,9 +1,5 @@
 Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
-	// UNIVERSALS
-	// UNIVERSALS	
-	// UNIVERSALS
-
 	cartoJSON : {
 
 	},
@@ -32,8 +28,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// create container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane styler', this.options.appendTo);
-
-
 	},
 
 	_initLayout : function () {
@@ -44,7 +38,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._midOuterScroller = Wu.DomUtil.create('div', 'chrome-middle-section-outer-scroller', this._midSection);		
 		this._midInnerScroller = Wu.DomUtil.create('div', 'chrome-middle-section-inner-scroller', this._midOuterScroller);
 
-
 		// active layer
 		this.layerSelector = this._initLayout_activeLayers(false, false, this._midInnerScroller); // appending to this._midSection
 
@@ -53,8 +46,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// mark as inited
 		this._inited = true;
-
-
 	},
 
 	
@@ -91,7 +82,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		}
 	},
 
-
 	closed : function () {
 		// clean up
 		this._tempRemoveLayers();
@@ -105,6 +95,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this.layerUuid = uuid ? uuid : e.target.value
 
 		this._layer = this._project.getLayer(this.layerUuid);
+
+		if (!this._layer) return;
 
 		// Store uuid of layer we're working with
 		this._storeActiveLayerUuid(this.layerUuid);		
@@ -122,10 +114,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Add temp layer
 		this._tempaddLayer();
 
-		// Display bottom container
-		// Wu.DomUtil.removeClass(this._bottomContainer, 'displayNone');
-
-		
 	},
 
 
