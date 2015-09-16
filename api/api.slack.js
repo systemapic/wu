@@ -47,7 +47,6 @@ var slack = new nodeSlack(api.config.slack.webhook);
 // exports
 module.exports = api.slack = { 
 
-
 	_send : function (options) {
 		var text = options.text,
 		    attachments = options.attachments,
@@ -70,12 +69,9 @@ module.exports = api.slack = {
 			slack_options.icon_emoji = options.icon_emoji;
 		}
 
-
 		// send to slack
 		slack.send(slack_options);
 	},
-
-
 
 	registeredUser : function (options) {
 
@@ -83,30 +79,22 @@ module.exports = api.slack = {
 		var age_of_link = api.utils.prettyDate(new Date(options.timestamp));
 
 		// text
-		var text 	 = 'A new user registered to ' + api.config.slack.baseurl +' \n\n';
-		text 		+= '`Name:` ' + options.user_name;
-		text 		+= '\n`Email:` ' + options.user_email;
-		if (options.user_company) {
-			text 	+= '\n`Company:` ' + options.user_company;
-		}
-		if (options.user_position) {
-			text 	+= '\n`Position:` ' + options.user_position;
-		}
-			text 	+= '\n`Invited by:` ' + options.inviter_name;
-		if (options.inviter_company) {
-			text 	+= ' (' + options.inviter_company + ')';
-		}
-		text 		+= '\n`Invited to project:` ' + options.project_name;
-		text 		+= '\n`Invite link was created:` ' + age_of_link;
+		var text = 'A new user registered to ' + api.config.slack.baseurl +' \n\n';
+		text += '`Name:` ' + options.user_name;
+		text += '\n`Email:` ' + options.user_email;
+		if (options.user_company) text 	+= '\n`Company:` ' + options.user_company;
+		if (options.user_position) text += '\n`Position:` ' + options.user_position;
+		text += '\n`Invited by:` ' + options.inviter_name;
+		if (options.inviter_company) text += ' (' + options.inviter_company + ')';
+		text += '\n`Invited to project:` ' + options.project_name;
+		text += '\n`Invite link was created:` ' + age_of_link;
 
 		// send
 		api.slack._send({
 			text : text,
-			icon_emoji : ":sunglasses:"
+			// icon_emoji : ":sunglasses:"
 		});
-
 	},
-
 
 	createdProject : function (options) {
 		var project = options.project,
@@ -129,8 +117,6 @@ module.exports = api.slack = {
 			api.slack._send({text : text});
 		});
 	},
-
-	
 
 	deletedProject : function (options) {
 		var project = options.project,
@@ -171,4 +157,3 @@ module.exports = api.slack = {
 		});
 	},
 };
-

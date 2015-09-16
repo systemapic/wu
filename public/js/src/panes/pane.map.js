@@ -48,6 +48,22 @@ Wu.MapPane = Wu.Pane.extend({
 		this._adjustLayout();
 	},
 
+	_projectSelected : function (e) {
+
+		var projectUuid = e.detail.projectUuid;
+
+		if (!projectUuid) return;
+
+		// set project
+		this._project = app.activeProject = app.Projects[projectUuid];
+
+		// refresh pane
+		this._refresh();
+
+		// fire project selected on map load
+		app._map.fire('projectSelected')
+	},
+
 	// refresh view
 	_refresh : function () {
 
@@ -62,6 +78,7 @@ Wu.MapPane = Wu.Pane.extend({
 
 		// set position
 		this.setPosition();
+
 	},
 
 	_flush : function () {
@@ -77,9 +94,8 @@ Wu.MapPane = Wu.Pane.extend({
 		var map = app._map;
 		
 		var activeLayers = _.clone(this._activeLayers);
-
 		activeLayers.forEach(function (layer) {
-			map.removeLayer(layer.layer);
+			if (layer.layer) map.removeLayer(layer.layer);
 			layer._flush();
 		}, this);
 	},
@@ -131,8 +147,8 @@ Wu.MapPane = Wu.Pane.extend({
 
 
 		// // on map load
-		map.on('load', function (e) {
-
+		map.on('projectSelected', function (e) {
+			console.error('map load');
 			// hack due to race conditions
 			setTimeout(function () { 
 				// enable layers that are marked as on by default
@@ -310,7 +326,7 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 	addActiveLayer : function (layer) {
-
+		console.error('addActiveLayer', layer);
 		this._activeLayers.push(layer);
 	},
 

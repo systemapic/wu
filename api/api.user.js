@@ -239,8 +239,6 @@ module.exports = api.user = {
 		    project_id = options.project_id;
 
 
-		console.log('INVITE ?USERS', options);
-
 
 		// 1. if exisitng user, add access and notify
 		// 2. if not existing, send create user link and store access in redis or whatever
@@ -323,8 +321,6 @@ module.exports = api.user = {
 			timestamp : new Date().getTime(),
 		}
 
-		console.log('token store', token_store);
-
 		// save token to redis
 		var redis_key = 'invite:token:' + token;
 		api.redis.tokens.set(redis_key, JSON.stringify(token_store), function (err) {
@@ -365,8 +361,6 @@ module.exports = api.user = {
 
 		// return on missing info
 		if (!options.email) return api.error.missingInformation(req, res);
-
-		console.log('create user', account, projectUuid, options);
 
 		// permissions hack, need project to get a capability... todo: refactor whole permissions thing
 		ops.push(function (callback) {
