@@ -41,7 +41,6 @@ Wu.Share = Wu.Pane.extend({
 		// events
 		Wu.DomEvent.on(this._shareImageButton,  'click', this._shareImage, this);
 		Wu.DomEvent.on(this._sharePrintButton,  'click', this._sharePrint, this);
-		// Wu.DomEvent.on(this._shareLinkButton,   'click', this._shareLink, this);
 		Wu.DomEvent.on(this._shareInviteButton, 'click', this._shareInvite, this);
 	},
 
@@ -270,7 +269,6 @@ Wu.Share = Wu.Pane.extend({
 
 			console.log('got ivnite link: ', ctx, link);
 
-
 			console.log('projects?', this._project, app.activeProject);
 
 			if (this._inviteWrapper) Wu.DomUtil.remove(this._inviteWrapper);
@@ -278,34 +276,14 @@ Wu.Share = Wu.Pane.extend({
 			this._clearTitles();
 
 			// invite wrapper
-			this._inviteWrapper = Wu.DomUtil.create('div', 'share-invite-wrapper', this._shareDropdown);
+			this._inviteOuterWrapper = Wu.DomUtil.create('div', 'share-invite-wrapper opacitizer', this._shareDropdown);
+			this._inviteWrapper = Wu.DomUtil.create('div', 'share-invite-wrapper-inner', this._inviteOuterWrapper);
 
 			// hide invite button
 			this._shareInviteButton.innerHTML = '';
 
 			// insert title
 			this._insertInviteTitle(this._inviteWrapper, link);
-
-			// // inputs wrapper
-			// this._inviteInputsWrapper = Wu.DomUtil.create('div', 'share-invite-input-wrapper', this._inviteWrapper);
-
-			// // hold invites
-			// this._inviteInputs = [];
-
-			// // first input
-			// var input = Wu.DomUtil.create('input', 'share-invite-input', this._inviteInputsWrapper);
-			// input.setAttribute('placeHolder', 'Enter email...');
-			// this._inviteInputs.push(input);
-
-			// // second (evented) input
-			// this._createInviteInput();
-
-			// // add submit button
-			// this._submitInvite = Wu.DomUtil.create('div', 'share-invite-submit', this._inviteWrapper, 'Send invitations...');
-
-			// // submit event
-			// Wu.DomEvent.on(this._submitInvite, 'click', this._submittingInvite, this);
-
 
 		}.bind(this));
 
@@ -337,18 +315,12 @@ Wu.Share = Wu.Pane.extend({
 		var pre = Wu.DomUtil.create('div', 'share-invite-title', titleWrap);
 		pre.innerHTML = 'Invite users to view project:<br> ' + this._project.getTitle();
 
-		// // create toggle
-		// this._inviteTypeToggle = Wu.DomUtil.create('div', 'share-invite-toggle', titleWrap);
-		// this._inviteTypeToggle.innerHTML = 'view';
-
 		// create last part of title
 		var post = Wu.DomUtil.create('div', 'share-invite-title-post', titleWrap);	 
-		post.innerHTML = 'Invite users to view this project by sending them this link. If they are not already registed, they will be allowed to create an account.';
-		// post.innerHTML += ' The link will be valid for 48 hours.'
-		post.innerHTML += '<br><br>(Press Ctrl-C to copy to clipboard.)'
+		post.innerHTML = 'Invite users to view this project by sending them this link. If they are not already registed, they will be allowed to create an account.';		
 
-		// event
-		// Wu.DomEvent.on(this._inviteTypeToggle, 'click', this._toggleInviteType, this);
+		var copyKey = (navigator.platform == 'MacIntel') ? '⌘-C' : 'Ctrl-C';
+		post.innerHTML += '<br><br>(Press ' + copyKey + ' to copy to clipboard.)';
 
 		var input = Wu.DomUtil.create('input', 'share-invite-input-link', titleWrap);
 		input.value = link;

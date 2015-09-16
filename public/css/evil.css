@@ -1809,10 +1809,7 @@ aka feedback pane
 
 .description-control-header-section {
 	padding-bottom: 0;	
-}
-/*.description-control-header-section.minimized {*/
-/*	padding-bottom: 0;*/
-	/*}*/
+	}
 
 .description-control-content-box {
 	padding-top: 3px;
@@ -1824,3 +1821,123 @@ aka feedback pane
 	color: black;
 	padding-left: 15px;
 	}
+
+
+
+
+/* SHARE */
+/* SHARE */
+/* SHARE */
+
+.wide-share {	
+	height: 250px !important;
+	width: 300px !important;
+	}
+
+.share-invite-wrapper {
+	overflow: hidden;
+	/*opacity: 0;*/
+	
+	}
+
+/*.wide-share .share-invite-wrapper {
+	opacity: 1;	
+	}
+*/
+
+.wide-share .share-item {
+	display: none;
+	}	
+
+.share-invite-wrapper-inner {
+	width: 260px;
+	height: 220px;
+	}	
+
+.share-invite-input {
+	position: relative;
+	float: none;
+	width: 100%;
+	margin: 3px;
+	border: 0;
+	margin-left: 20px;
+	}
+
+.share-dropdown {
+	-webkit-transition: width 200ms ease, height 200ms ease;
+  	transition: width 200ms ease, height 200ms ease;
+  	width: 145px;
+  	height: 100px;
+	}
+	
+.share-invite-title {
+	margin-left: 0px;
+	position: relative;
+	font-size: 19px;
+	font-weight: 900 !important;
+	margin-bottom: 10px;
+	}
+
+.share-invite-toggle {
+	font-size: 14px;
+	font-weight: 500;
+	padding-top: 10px;
+	margin-left: 0px;
+	position: relative;
+	float: left;
+	background-color: black;
+	color: white;
+	padding: 2px;
+	cursor: pointer;
+	}
+
+.share-invite-toggle:hover {
+	color: black;
+	background: white;
+	border: 1px solid black;
+	}
+
+
+.share-invite-submit {
+	height: auto;
+	width: 129px;
+	border: 1px solid red;
+	padding: 5px;
+	position: relative;
+	margin-left: 140px;
+	border-radius: 2px;
+	}
+
+.share-invite-submit:hover {
+	background: green;
+	color: white;
+	}
+
+.share-invite-input-link {
+	width: 100%;
+	background: rgba(113, 196, 168, 1);
+	padding: 2px;
+	border: 0;
+	}
+
+.share-invite-input-link::selection {
+	background: rgba(113, 196, 168, 1);
+	color: white;
+	}
+
+.share-invite-title-post {
+	font-weight: 400;
+	font-size: 14px;
+	position: relative;
+	padding: 4px;
+	padding-left: 0px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	}	
+
+
+
+
+
+
+
