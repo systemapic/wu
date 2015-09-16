@@ -338,7 +338,6 @@ module.exports = api.email = {
 		subtitle += '<br><br>Contact us if you would like to join our beta and create your own projects. You can sign up for our beta on our <a href="http://systemapic.com" target="_blank">website</a>.';
 		subtitle += '<br><br>We hope you will enjoy your new way of sharing and collaborating on geodata. We wish you a great workday on <a href="' + login_link + '">Systemapic.com</a>! <br><br> —Jørgen Ekvoll (CEO)'
 		var link = 'http://systemapic.com';
-		console.log('link', link);
 		var link_text = 'Join our beta!';
 
 		// email body
