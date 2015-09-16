@@ -100,17 +100,17 @@ module.exports = api.geo = {
 			console.log('INSIDE json2cartocss point');
 
 			// OPACITY
-			var pointOpacityCarto = this.buildCarto_pointOpacity(styleJSON, headers, style);
+			var pointOpacityCarto = this.buildCarto_pointOpacity(options);
 			headers += pointOpacityCarto.headers;
 			style += pointOpacityCarto.style;
 
 			// COLOR
-			var pointColorCarto = this.buildCarto_pointColor(styleJSON, headers, style);
+			var pointColorCarto = this.buildCarto_pointColor(options);
 			headers += pointColorCarto.headers;
 			style += pointColorCarto.style;
 
 			// SIZE
-			var pointSizeCarto = this.buildCarto_pointSize(styleJSON, headers, style);
+			var pointSizeCarto = this.buildCarto_pointSize(options);
 			headers += pointSizeCarto.headers;
 			style += pointSizeCarto.style;	
 
@@ -135,9 +135,11 @@ module.exports = api.geo = {
 	// OPACITY
 	// OPACITY
 
-	buildCarto_pointOpacity : function (style) {
+	buildCarto_pointOpacity : function (options) {
 
+		var style = options.styleJSON;
 		var opacity = style.point.opacity;
+
 
 		var cartObj = {
 			headers : '',
@@ -147,8 +149,8 @@ module.exports = api.geo = {
 
 		if ( opacity.range ) {
 
-			var max = Math.floor(this.columns[opacity.range].max * 10) / 10;
-			var min = Math.floor(this.columns[opacity.range].min * 10) / 10;				
+			var max = Math.floor(options.columns[opacity.range].max * 10) / 10;
+			var min = Math.floor(options.columns[opacity.range].min * 10) / 10;				
 
 			var normalizedOffset = true;
 
@@ -181,8 +183,9 @@ module.exports = api.geo = {
 	// COLOR RANGE
 	// COLOR RANGE
 
-	buildCarto_pointColor : function (style) {
+	buildCarto_pointColor : function (options) {
 
+		var style = options.styleJSON;
 		var color = style.point.color;
 
 		var cartObj = {
@@ -194,18 +197,12 @@ module.exports = api.geo = {
 
 			var minMax = color.customMinMax ? color.customMinMax : color.minMax;
 
-
 			// Get color values
 			var c1 = color.value[0];
 			var c9 = color.value[1];
 			var c17 = color.value[2];
 			var c25 = color.value[3];
 			var c33 = color.value[4];
-
-			// Interpolate
-			// var c9 = this.hexAverage([c1, c17]);
-			// var c25 = this.hexAverage([c17, c33]);
-
 
 			// Interpolate
 			var c5 = this.hexAverage([c1, c9]);
@@ -323,8 +320,9 @@ module.exports = api.geo = {
 	// POINT SIZE
 	// POINT SIZE
 
-	buildCarto_pointSize : function (style) {
+	buildCarto_pointSize : function (options) {
 
+		var style = options.styleJSON;
 		var pointsize = style.point.pointsize;
 
 		var cartObj = {
@@ -334,8 +332,8 @@ module.exports = api.geo = {
 
 		if ( pointsize.range ) {
 
-			var max = Math.floor(this.columns[pointsize.range].max * 10) / 10;
-			var min = Math.floor(this.columns[pointsize.range].min * 10) / 10;
+			var max = Math.floor(options.columns[pointsize.range].max * 10) / 10;
+			var min = Math.floor(options.columns[pointsize.range].min * 10) / 10;
 		
 			// cartObj.headers += '@marker_size_max: ' + pointsize.minMax[1] + ';\n';
 			cartObj.headers += '@marker_size_min: ' + pointsize.minMax[0] + ';\n';

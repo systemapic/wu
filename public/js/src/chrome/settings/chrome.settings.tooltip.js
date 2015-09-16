@@ -9,6 +9,11 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 		// add events
 		this._addEvents();
+
+		// shortcut
+		app.Tools = app.Tools || {};
+		app.Tools.Tooltip = this;
+		
 	},
 
 	_initContainer : function () {

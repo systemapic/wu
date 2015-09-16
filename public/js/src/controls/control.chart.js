@@ -442,6 +442,20 @@ Wu.Control.Chart = Wu.Control.extend({
 	// Chart
 	C3Chart : function (c3Obj) {
 		
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('C3Chart');
+		console.log('');
+		console.log('c3Obj', c3Obj);
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+
 		var data = c3Obj.d3array;
 
 		// Ticks
