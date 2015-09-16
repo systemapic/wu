@@ -251,12 +251,10 @@
 }
 
 .share-invite-title {
-	font-size: 14px;
+	font-size: 20px;
 	font-weight: 500;
 	margin-left: 0px;
 	position: relative;
-	float: left;
-	margin: 2px;
 }
 
 .share-invite-toggle {
@@ -293,8 +291,25 @@
 }
 
 
+.share-invite-input-link {
+	width: 100%;
+	background: rgba(113, 196, 168, 1);
+	padding: 2px;
+	border: 0;
+}
 
-
+.share-invite-input-link::selection {
+	background: rgba(113, 196, 168, 1);
+	color: white;
+}
+.share-invite-title-post {
+	font-weight: 300;
+	position: relative;
+	padding: 4px;
+	padding-left: 0px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
 
 
 

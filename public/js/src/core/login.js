@@ -1,8 +1,24 @@
 var feedbackTimer;
 
 
-
+// check_invite();
+// return;
 check_token();
+
+
+
+function check_invite() {
+	console.log('check invite!', window.location);
+
+
+
+	var invite = window.location;
+
+
+}
+
+
+
 function check_token() {
 	if (!checkToken()){
 		var ie = document.getElementById('input-email');
@@ -69,6 +85,7 @@ function checkToken() {
 }
 
 function getToken() {
+	console.log('window.location', window.location);
 	var token = window.location.search.split('=')[1];
 	return token;
 }
@@ -320,27 +337,6 @@ function sendLoginCheck (options, callback) {
 	}
 
 	http.send(JSON.stringify(options));
-}
-
-function debugSetPassword () {
-
-	var http = new XMLHttpRequest(),
-	    url = window.location.origin + '/debugSetPassword';
-
-	http.open("POST", url, true);
-
-	//Send the proper header information along with the request
-	http.setRequestHeader('Content-type', 'application/json');
-
-	http.onreadystatechange = function() {
-		if (http.readyState == 4 && http.status == 200) {
-
-			// callback
-			callback && callback(null, http.responseText); 
-		}
-	}
-
-	http.send(JSON.stringify({debug : true}));
 }
 
 

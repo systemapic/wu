@@ -78,10 +78,57 @@ module.exports = api.portal = {
 	signup : function (req, res) {
 		
 		// debug
-		return api.login(req, res); 
+		return res.redirect('/login');
 
 		res.render('../../views/signup.ejs', { message: req.flash('signupMessage') });
 	},
+
+
+	invite : function (req, res) {
+
+		// get client/project
+		var path = req.originalUrl.split('/');
+		console.log('path: ', path);
+		
+		var hotlink = {
+			// client : client,
+			// project : project, 
+			invite : 'lol invite'
+		};
+
+		var token = path[2];
+
+		console.log('token: ', token);
+
+		var redis_key = 'invite:token:' + token;
+
+		api.redis.tokens.get(redis_key, function (err, token_store) {
+			console.log('got token? ', err, token_store);
+
+
+			if (req.isAuthenticated()) {
+				req.session.hotlink = hotlink;
+				res.render('../../views/app.serve.ejs', {
+					hotlink : hotlink || {},
+					access_token : req.session.access_token || {}
+				});
+			} else {
+				// redirect to login with hotlink embedded
+				req.session.hotlink = hotlink;
+				res.render('../../views/invite.ejs', {
+					hotlink : hotlink || {},
+					invite : token_store,
+					access_token : req.session.access_token || {}
+				});
+			}
+
+
+
+		})
+
+
+	},
+
 
 	getBase : function (req, res) {
 
@@ -248,8 +295,6 @@ module.exports = api.portal = {
 
 		// send ping to client
 	},
-
-
 
 
 

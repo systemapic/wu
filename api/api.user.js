@@ -43,6 +43,92 @@ var api = module.parent.exports;
 module.exports = api.user = { 
 
 
+	register : function (options, done) {
+
+
+		var ops = [],
+		    created_user,
+		    token_store;
+
+		    console.log('options,', options);
+
+		ops.push(function (callback) {
+			var token = options.invite_token;
+			var redis_key = 'invite:token:' + token;
+			api.redis.tokens.get(redis_key, callback);
+		});
+
+
+		ops.push(function (tokenJSON, callback) {
+
+			token_store = JSON.parse(tokenJSON);
+			var invitedBy = token_store.invited_by.uuid;
+			var project_id = token_store.project.id;
+
+			// create the user
+			var newUser            	= new User();
+			newUser.local.email    	= options.email;
+			newUser.local.password 	= newUser.generateHash(options.password);
+			newUser.uuid 		= 'user-' + uuid.v4();
+			newUser.company 	= options.company;
+			newUser.position 	= options.position;
+			newUser.firstName 	= options.firstname;
+			newUser.lastName 	= options.lastname;
+			newUser.invitedBy 	= invitedBy;
+
+			// save the user
+			newUser.save(function(err) {
+				created_user = newUser;
+				callback(err, project_id);
+			});
+		});
+
+
+		ops.push(function (project_id, callback) {
+			Project
+			.findOne({uuid : project_id})
+			.populate('roles')
+			.exec(callback);
+		});
+
+
+		ops.push(function (project, callback) {
+
+			var a = token_store.project.access_type;
+			var role_slug = 'noRole';
+
+			if (a == 'view') role_slug = 'projectReader';
+			// if (a == 'edit') role_slug = 'projectEditor'; // etc.
+
+
+
+			// find reader role
+			var readerRole = _.find(project.roles, function (r) {
+				return r.slug == 'projectReader';
+			});
+
+			Role
+			.findOne({uuid : readerRole.uuid})
+			.exec(function (err, role) {
+
+				// add user to reader role of project
+				role.members.addToSet(created_user.uuid);
+
+				// save
+				role.save(function (err, r) {
+					callback(err);
+				});
+			});
+		});
+
+		async.waterfall(ops, function (err, results) {
+			done(err, created_user);
+		});
+	
+	},
+
+
+
 	// invite users
 	invite : function (req, res) {
 		var options = req.body;
@@ -109,6 +195,62 @@ module.exports = api.user = {
 
 		callback(null, options);
 
+	},
+
+	getInviteLink : function (req, res) {
+		var options = req.body;
+		options.user = req.user;
+
+		api.user._createInviteLink(options, function (err, inviteLink) {
+
+			res.end(inviteLink);
+
+		});
+
+
+	},
+
+	_createInviteLink : function (options, callback) {
+		var project_id = options.project_id,
+		    project_name = options.project_name,
+		    user = options.user,
+		    access_type = options.access_type;
+
+
+		// create token and save in redis with options
+		var token = api.utils.getRandomChars(20, 'abcdefghijklmnopqrstuvwxyz1234567890');
+		console.log('invite token: ', token);
+
+		var token_store = {
+			project : {
+				id : project_id,
+				name : project_name,
+				access_type : access_type
+			},
+			invited_by : {
+				uuid : user.uuid,
+				firstName : user.firstName,
+				lastName : user.lastName,
+				company : user.company
+			},
+			token : token,
+			timestamp : new Date().getTime(),
+		}
+
+		console.log('token store', token_store);
+
+
+		var redis_key = 'invite:token:' + token;
+		console.log('redis_key: ', redis_key);	
+		api.redis.tokens.set(redis_key, JSON.stringify(token_store), function (err) {
+
+			console.log('saved redis token', err);
+
+
+			var inviteLink = api.config.portalServer.uri + 'invite/' + token;
+
+			callback(null, inviteLink);
+		});
 	},
 
 

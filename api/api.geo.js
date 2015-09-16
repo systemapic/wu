@@ -75,7 +75,8 @@ module.exports = api.geo = {
 
 		console.log('api.geo._json2cartocss -> styleJSON : ', styleJSON);
 
-
+		if (!styleJSON) return callback('Missing styleJSON');
+		
 		// json in, cartocss out
 
 		var headers = '';

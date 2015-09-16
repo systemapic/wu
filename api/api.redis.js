@@ -21,6 +21,7 @@ redisTemp.auth(config.serverConfig.redis.temp.auth);
 // exports
 module.exports = api.redis = { 
 	layers : redisLayers,
+	tokens : redisLayers, // todo: create own instance for this?
 	stats : redisStats,
 	temp : redisTemp
 }

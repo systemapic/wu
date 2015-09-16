@@ -610,6 +610,14 @@ module.exports = function(app, passport) {
 	});
 
 
+	// =====================================
+	// CHECK UNIQUE USER/EMAIL =============
+	// =====================================
+	app.post('/api/invite/link', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.user.getInviteLink(req, res);
+	});
+
+
 
 	// =====================================
 	// access: GET ROLE  ===============
@@ -730,6 +738,14 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
+	// LOGOUT ==============================
+	// =====================================
+	app.get('/invite/*', function(req, res) {
+		api.portal.invite(req, res);
+	});
+
+
+	// =====================================
 	// SIGNUP ==============================
 	// =====================================
 	app.post('/signup', passport.authenticate('local-signup', {
@@ -755,6 +771,16 @@ module.exports = function(app, passport) {
 	app.post('/forgot', function (req, res) {
 		api.auth.forgotPassword(req, res);
 	});
+
+
+	// =====================================
+	// FORGOT PASSWORD =====================
+	// =====================================
+	app.post('/register', passport.authenticate('local-signup', {
+		successRedirect : '/', // redirect to the secure profile section
+		failureRedirect : '/login', // redirect back to the signup page if there is an error
+		failureFlash : true // allow flash messages
+	}));
 
 
 	// =====================================
