@@ -201,7 +201,7 @@ L.UtfGrid = L.Class.extend({
 	//TODO: Load from center etc
 	_update: function () {
 
-		console.log('update');
+		console.error('update');
 
 		var map = this._map || app._map; // systemapic hack
 

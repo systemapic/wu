@@ -130,19 +130,23 @@ Wu.MapPane = Wu.Pane.extend({
 		}, this)
 
 
+		// // on map load
 		map.on('load', function (e) {
 
-			var lm = app.MapPane.getControls().layermenu;
-			lm._enableDefaultLayers();
+			// hack due to race conditions
+			setTimeout(function () { 
+				// enable layers that are marked as on by default
+				var lm = app.MapPane.getControls().layermenu;
+				lm && lm._enableDefaultLayers();
+			}, 10);
+			
 		});
 
 	},
 
 	_invalidateTiles : function () {
-
 		var options = {
 			access_token : app.tokens.access_token, // unique identifier
-
 		}
 	},
 
