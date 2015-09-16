@@ -85,9 +85,20 @@ Wu.App = Wu.Class.extend({
 		}
 	},
 
+	_checkForInvite : function () {
+		var pathname = window.location.pathname;
+		if (pathname.indexOf('/invite/') == -1) return;
+		var invite_token = pathname.split('/').reverse()[0];
+		if (invite_token) this.options.invite_token = invite_token;
+	},
+
 	initServer : function () {
 		console.log('Securely connected to server: \n', this.options.servers.portal);
 
+		// check for invite link
+		this._checkForInvite();
+
+		// data for server
 		var data = JSON.stringify(this.options);
 		
 		// post         path          json      callback    this
@@ -225,6 +236,9 @@ Wu.App = Wu.Class.extend({
 	// init default view on page-load
 	_initView : function () {
 
+		// check invite
+		if (this._initInvite()) return;
+
 		// check location
 		if (this._initLocation()) return;
 			
@@ -238,11 +252,27 @@ Wu.App = Wu.Class.extend({
 		this.StartPane.activate();
 	},
 
-	_initEvents : function () {
+	_initInvite : function () {
+		var project = this.options.json.invite;
 
+		console.log('ivnnite: ', project);
+
+		if (!project) return false;
+
+		// select project
+		Wu.Mixin.Events.fire('projectSelected', {detail : {
+			projectUuid : project.id
+		}});
+
+		app.feedback.setMessage({
+			title : 'Project access granted',
+			description : 'You\'ve been given access to the project ' + project.name 
+		});
 
 	},
 
+	_initEvents : function () {
+	},
 
 	_getDimensions : function (e) {
 		var w = window,
@@ -272,7 +302,6 @@ Wu.App = Wu.Class.extend({
 	_initAccess : function () {
 		this.Access = new Wu.Access(this.options.json.access);
 	},
-
 
 	_lonelyProject : function () {
 		//default case: hidden/ghost project (belongs to no client). Preferable to stick to the Start Pane
