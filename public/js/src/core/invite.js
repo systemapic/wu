@@ -32,9 +32,10 @@ Wu.Invite = Wu.Class.extend({
 		var projectName = this._invite.project.name;
 
 		// create header
-		var headerTitle = 'You have been invited by ' + invited_by;
-		if (company) headerTitle += ' from ' + company;
-		headerTitle += ' to project ' + projectName;
+		var headerTitle = 'You have been invited to collaborate.';// + invited_by;
+		headerTitle += '<br>Project: ' + projectName;
+		headerTitle += '<br>Invited by: ' + invited_by.camelize();
+		if (company) headerTitle += ' (' + company.camelize() +')';
 		var headerTitleDiv = Wu.DomUtil.create('div', 'invite-header-title', wrapper, headerTitle);
 
 		// login instead of register if you have account

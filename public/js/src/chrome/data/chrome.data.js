@@ -64,8 +64,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this.topTitle = Wu.DomUtil.create('div', 'chrome-header-title', this.topContainer, 'Data Library')
 
 		// Upload button
-		this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this.topContainer);
-		this.uploadButton.innerHTML = 'Upload files...';
+		if (app.access.to.upload_file(this._project)) {
+			this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this.topContainer);
+			this.uploadButton.innerHTML = 'Upload files...';
+		}
 	},
 
 
@@ -193,11 +195,18 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		}
 
 		// File list (global)
-		this.fileProviders = {
-			myFiles      : {
+		this.fileProviders = {};
+
+		// add postgis files
+		if (app.access.to.edit_project(this._project)) {
+			
+			this.fileProviders.postgis = {
 				name : 'My Files',
-				data : []
-			},
+				data : [],
+				getFiles : function () {
+					return app.Account.getFiles()
+				}
+			}
 		}
 
 
@@ -272,27 +281,16 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			this.createNoLayer(D3container, noDataText);
 
 		} 
-		
-		
-
 
 
 		// FILES
-		// FILES
-		// FILES
-
-		// Init files data
-		var files = app.Account.getFiles();
-		this.fileProviders.myFiles.data = _.toArray(files)
-
-		// Roll out file list for each provider
-		for ( var f in this.fileProviders ) {
-
-			var D3container = this.fileListContainers[f].D3container;
-			var data = this.fileProviders[f].data;
-
-			this.initFileList(D3container, data, f);
-
+		for (var p in this.fileProviders) {
+			var provider = this.fileProviders[p];
+			var files = provider.getFiles();
+			provider.data = _.toArray(files);
+			var D3container = this.fileListContainers[p].D3container;
+			var data = this.fileProviders[p].data;
+			this.initFileList(D3container, data, p);
 		}
 
 	},
@@ -599,6 +597,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Disable actions for Layers
 		var isDisabled = (library == 'layers'),
+		    canEdit = app.access.to.edit_project(this._project),
 		    that = this;
 	
 		var action = {
@@ -613,7 +612,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			},			
 			changeName : {
 				name : 'Change Name',
-				disabled : false,
+				disabled : !canEdit
 			},			
 			download : {
 				name : 'Download',
@@ -621,7 +620,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			},
 			delete : {
 				name : 'Delete',
-				disabled : false,
+				disabled : !canEdit
 			},
 		}
 
@@ -723,7 +722,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// pass to fn
 		if (library == 'layers') return this._layerActionTriggered(trigger, file, context, library);
-		if (library == 'myFiles') return this._fileActionTriggered(trigger, file, context, library);
+		if (library == 'postgis') return this._fileActionTriggered(trigger, file, context, library);
  
 		return console.error('neither file nor layer??');
 	},
