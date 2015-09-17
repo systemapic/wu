@@ -369,25 +369,21 @@ Wu.Control.Chart = Wu.Control.extend({
 	// xoxoxoxoxoxoxo
 	chartTicks : function (c3Obj) {
 
-		console.log('%c chartTicks ', 'background: #FF33FF; color: white;');
-		console.log('c3Obj', c3Obj);
-
 		// Data
 		var data = c3Obj.d3array;
 		
 		// Ticks
 		var t = data.ticks;
 
-
-		// Start date 
-		var start = moment(t[0]).format("DD.MM.YYYY");
-
-		// End date 
-		var end = moment(t[t.length-1]).format("DD.MM.YYYY");		
+		// var first_data_point = t[0]; // wrong, first tick is actually second data point
+		var first_data_point = data.x[1];
+		var last_data_point = data.x[data.x.length -1];
+		
+		// start/end date
+		var start = moment(first_data_point).format("DD.MM.YYYY");
+		var end = moment(last_data_point).format("DD.MM.YYYY");		
 
 		this._footerContainer.innerHTML = '<span class="start-date">' + start + '</span><span class="end-date">' + end + '</span>';
-
-
 	},
 
 
@@ -493,12 +489,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Ticks
 		var t = data.ticks;
-
-		console.log('%c C3Chart ', 'background: #FF33FF; color: white;');
-		console.log('data.ticks', data.ticks);
-
-		// var t = [data.ticks[0], data.ticks[data.ticks.length-1]];
-
 
 		// X's and Why's
 		var x = data.x;
@@ -715,8 +705,6 @@ Wu.Control.Chart = Wu.Control.extend({
 			for (var m in meta.fields) {
 
 				var field = meta.fields[m];
-
-
 
 				// only add active tooltips
 				if (field.on) {
