@@ -21,15 +21,15 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button', this._container);		
 
 		// Portal Logo
-		this._portalLogo = Wu.DomUtil.create('div', 'chrome-portal-logo', this._container);
-		this._portalLogoImg = Wu.DomUtil.create('img', '', this._portalLogo);
-		this._portalLogoImg.src = '/css/images/systemapic-portal-logo.png';
+		// this._portalLogo = Wu.DomUtil.create('div', 'chrome-portal-logo', this._container);
+		// this._portalLogoImg = Wu.DomUtil.create('img', '', this._portalLogo);
+		// this._portalLogoImg.src = '/css/images/systemapic-portal-logo.png';
 
 		// Project title container
 		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title-container', this._container);
 
 		// Client Logo
-		this._clientLogo = Wu.DomUtil.create('div', 'chrome-client-logo', this._projectTitleContainer);
+		this._clientLogo = Wu.DomUtil.create('div', 'chrome-portal-logo', this._container);
 		this._clientLogoImg = Wu.DomUtil.create('img', '', this._clientLogo);		
 
 		// Project title
