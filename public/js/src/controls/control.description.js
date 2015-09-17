@@ -308,7 +308,7 @@ L.Control.Description = Wu.Control.extend({
 		legendObj.description_meta = {
 			'Number of points' : num_points,
 			'Covered area (km<sup>2</sup>)' : area,
-			'Data size' : size_bytes,
+			// 'Data size' : size_bytes,
 			'Start date' : startend.start,
 			'End date' : startend.end
 		}

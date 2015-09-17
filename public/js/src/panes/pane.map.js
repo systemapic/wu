@@ -5,15 +5,15 @@ Wu.MapPane = Wu.Pane.extend({
 	options : {
 		controls : [
 			'description',
-			'inspect',
+			// 'inspect',
 			'layermenu',
 			'zoom',
-			'legends',
+			// 'legends',
 			'measure',
 			'geolocation',
 			'mouseposition',
-			'baselayertoggle',
-			'cartocss',
+			// 'baselayertoggle',
+			// 'cartocss',
 			'draw',
 		]
 	},
@@ -118,7 +118,8 @@ Wu.MapPane = Wu.Pane.extend({
 		this._attributionControl = L.control.attribution({position : 'bottomleft', prefix : false});
 		map.addControl(this._attributionControl);
 
-		this._attributionControl.addAttribution('<a href="http://systemapic.com">Powered by Systemapic.com</a>');
+		// this._attributionControl.addAttribution('<a href="http://systemapic.com">Powered by Systemapic.com</a>');
+		this._attributionControl.addAttribution('<a class="systemapic-attribution-logo" href="http://systemapic.com"><img src="../css/images/systemapic-attribution-logo-white.png"></a>');
 		this._attributionControl.removeAttribution('Leaflet');
 
 
