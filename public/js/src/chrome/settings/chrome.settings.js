@@ -373,20 +373,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 			var colorBall_1 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-1', colorBallWrapper);
 			    colorBall_1.id = 'color-range-ball-1-' + key;
 			    colorBall_1.style.background = val[0];
-			    colorBall_1.setAttribute('hex', val[0]);			        			    			    
-
-
-			    console.log('');
-			    console.log('');
-			    console.log('');
-			    console.log('');
-			    console.log('');
-			    console.log('val', val);
-			    console.log('');
-			    console.log('');
-			    console.log('');
-			    console.log('');
-			    console.log('');
+			    colorBall_1.setAttribute('hex', val[0]);
 
 			    
 			    this.initSpectrum(this, val[0], colorBall_1, key);
@@ -705,7 +692,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 	_validateDateFormat : function (key) {
 
 		// Default fields that for some reason gets read as time formats...
-		if ( key == 'the_geom_3857' || key == 'the_geom_4326' ) return false;
+		if ( key == 'the_geom_3857' || key == 'the_geom_4326' || key == '_columns' ) return false;
 
 		// If it's Frano's time series format
 		var m = moment(key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
