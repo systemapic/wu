@@ -1821,6 +1821,7 @@ aka feedback pane
 	cursor: default;
 	color: black;
 	padding-left: 15px;
+	padding-right: 25px;
 	}
 
 
@@ -1942,5 +1943,101 @@ aka feedback pane
 
 
 
+#c3-container {
+	margin-right: 15px;
+	/*margin-top: 7px;*/
+	}
+
+#c3-container:before {
+/*	content: 'Scroll to zoom';
+	position: absolute;
+	top: -14px;
+	width: 100%;
+	text-align: center;
+	font-size: 12px;*/
+	content: 'Scroll to zoom';
+	position: absolute;
+	bottom: 11px;
+	width: 100%;
+	text-align: center;
+	font-size: 12px;
+	color: #999;	
+	}
+
+#c3-container:after {
+	content: 'mm';
+	position: absolute;
+	color: #999;
+	left: 9px;
+	bottom: 21px;
+	font-size: 11px;
+	}
+
+#c3-header-metacontainer {
+	position: relative;
+	}
+
+/*#c3-header-metacontainer:before {
+	content: 'mm';
+	position: absolute;
+	bottom: -184px;
+	font-size: 11px;
+	left: 8px;
+	color: #999;
+	}*/
+
+.c3-footer {
+	font-size: 12px;
+	font-weight: 500;
+	padding-left: 30px;
+	padding-right: 20px;
+	position: relative;
+	bottom: 26px;
+	width: 100%;
+	float: right;
+	margin: 0;
+	height: 0;
+	}
+
+.end-date {
+	float: right;
+	}
 
 
+
+.chrome-project-title {
+	text-align: center;
+	font-size: 14px;
+	color: #666;
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+	width: auto;
+	top: 3px;
+	left: 9px;
+	font-weight: 900;	
+	}	
+
+
+.systemapic-attribution-logo img {
+	padding-top: 4px;
+	padding-bottom: 4px;
+	}
+
+
+.leflet-container.leaflet-popup {
+	z-index: 99999;
+	max-height: 300px;
+}	
+
+
+.leaflet-control-attribution {
+  background: transparent !important;	
+}
+
+
+.leaflet-draw-section,
+.leaflet-draw-draw-polygon {
+	width: 26px;
+	height: 26px;
+}
