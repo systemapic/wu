@@ -1104,10 +1104,10 @@
             data_selection_multiple: true,
             data_selection_draggable: false,
             data_onclick: function () {
-                console.log('data_onclick');
+                // console.log('data_onclick');
             },
             data_onmouseover: function () {
-                console.log('data onmouseover');
+                // console.log('data onmouseover');
             },
             data_onmouseout: function () {},
             data_onselected: function () {},
