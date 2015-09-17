@@ -1,4 +1,4 @@
-Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
+Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 
 	_initialize : function () {
@@ -9,21 +9,35 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 
 		// add events
 		this._addEvents();
+
+		// shortcut
+		app.Tools = app.Tools || {};
+		app.Tools.Tooltip = this;
+		
 	},
 
 	_initContainer : function () {
 
 		// create container
-		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane styler', this.options.appendTo);
+		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane chrome-tooltip', this.options.appendTo);
 	},
 
 	_initLayout : function () {
 
+
 		if (!this._project) return;
   
 
+  		// Scroller
+		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
+		this._midOuterScroller = Wu.DomUtil.create('div', 'chrome-middle-section-outer-scroller', this._midSection);
+		this._midInnerScroller = Wu.DomUtil.create('div', 'chrome-middle-section-inner-scroller', this._midOuterScroller);
+
 		// active layer
-		this._initLayout_activeLayers();
+		this.layerSelector = this._initLayout_activeLayers(false, false, this._midInnerScroller);
+
+		// Fields wrapper
+		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 
 		// mark as inited
 		this._inited = true;
@@ -31,18 +45,21 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 
 	_refresh : function () {
 
-		this._flush();
+		// this._flush();
 		this._initLayout();
 	},
 
 	_flush : function () {
+
 		this._container.innerHTML = '';
 	},
 
 	// Runs on init
 	show : function () {
-		
+
 		if (!this._inited) this._initLayout();
+
+		this._fieldsWrapper.innerHTML = '';
 
 		// hide others
 		this.hideAll();
@@ -52,12 +69,26 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 
 		// mark button
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+
+		// Enable settings from layer we're working with
+		var layerUuid = this._getActiveLayerUuid();
+		if ( layerUuid ) this._selectedActiveLayer(false, layerUuid);
+
+		// Select layer we're working on
+		var options = this.layerSelector.childNodes;
+		for ( var k in options ) {
+			if ( options[k].value == layerUuid ) options[k].selected = true;
+		}		
 	},
 
 	// Event run when layer selected 
-	_selectedActiveLayer : function (e) {
+	_selectedActiveLayer : function (e, uuid) {
 
-		var layerUuid = e.target.value;
+		var layerUuid = uuid ? uuid : e.target.value;
+		
+		// Store uuid of layer we're working with
+		this._storeActiveLayerUuid(layerUuid);
+		
 		this._layer = this._project.getLayer(layerUuid);
 
 		// Get stored tooltip meta
@@ -69,7 +100,8 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		// If no tooltip meta stored, create from layer meta
 		if ( !this.tooltipMeta ) this.tooltipMeta = this.createTooltipMeta(layerMeta);
 
-		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._container);
+		// this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
+		this._fieldsWrapper.innerHTML = '';
 
 		// Init title
 		this.initTitle();
@@ -188,7 +220,6 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 	// Init meta fields and time series
 	initFields : function () {
 
-		// 
 		this.fieldListFromObject('Fields');
 		if ( this.tooltipMeta.timeSeries ) this.initTimeSeries();
 	},
@@ -264,21 +295,21 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		}
 		var useMinMaxFromStyle = this._createMetaFieldLine(options)
 
-		// Use min/max from styling switch
-		var options = {
-			key 		: 'graphstyle', 
-			wrapper 	: sectionWrapper,
-			input 		: false,
-			title 		: 'Graph style',
-			isOn 		: this.tooltipMeta.timeSeries.graphstyle,
-			rightPos	: true,
-			type 		: 'dropdown',
-			dropdown	: ['scatter', 'line'],
+		// // Use min/max from styling switch
+		// var options = {
+		// 	key 		: 'graphstyle', 
+		// 	wrapper 	: sectionWrapper,
+		// 	input 		: false,
+		// 	title 		: 'Graph style',
+		// 	isOn 		: this.tooltipMeta.timeSeries.graphstyle,
+		// 	rightPos	: true,
+		// 	type 		: 'dropdown',
+		// 	dropdown	: ['scatter', 'line'],
 			
 			
-		}
+		// }
 
-		var graphType = this._createMetaFieldLine(options)
+		// var graphType = this._createMetaFieldLine(options)
 
 
 		// Create list of time series fields
@@ -391,25 +422,4 @@ Wu.Chrome.Content.Tooltip = Wu.Chrome.Content.extend({
 		console.log('open!', this);
 	},
 
-	show : function () {
-		if (!this._inited) this._initLayout();
-
-		// hide others
-		this.hideAll();
-
-		// show this
-		this._container.style.display = 'block';
-
-		// mark button
-		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
-	},
-
-	// // Validate date format
-	// checkDateFormat : function (key) {
-
-	// 	if ( key.length != 8 ) return false;		
-	// 	var m = moment(key, ["YYYYMMDD", moment.ISO_8601]).format("MMM Do YY");		
-	// 	if ( m == 'Invalid date' ) return false;
-	// 	return true;
-	// },
 });

@@ -21,12 +21,17 @@ Wu.Popup.Chart = L.Control.extend({
 		}
 	},
 
-	initialize: function (options, source) {
+
+
+	initialize: function (options) {
 
 		// set options
 		L.setOptions(this, options);
 		this._map = app._map;
 		this._pane = this.options.appendTo;
+
+		// listen to events
+		this._listen();
 
 		// init container
 		this._initLayout();
@@ -98,7 +103,7 @@ Wu.Popup.Chart = L.Control.extend({
 		// remove
 		try {
 			this._pane.removeChild(this._container);
-		} catch (e) {}; // lazy hack fml
+		} catch (e) {}; // lazy hack
 		
 		// remove events
 		this._removeEvents();
@@ -121,7 +126,6 @@ Wu.Popup.Chart = L.Control.extend({
 	},
 
 	setContent: function (content) {
-
 		this._content = content;
 		this.update();
 		return this;
@@ -252,6 +256,17 @@ Wu.Popup.Chart = L.Control.extend({
 		// remember last pos
 		this._lastPopupPos = position;
 	},
+
+	_listen : function () {
+		Wu.Mixin.Events.on('layerDeleted',    this._onLayerDeleted, this);
+	},
+
+	// clean up
+	_onLayerDeleted  : function () {
+		this.close();
+	},
+
+
 	
 });
 

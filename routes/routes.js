@@ -46,7 +46,6 @@ module.exports = function(app, passport) {
 	// OAUTH2: Get Token ==============
 	// ================================
 	app.post('/oauth/token', api.oauth2.getToken);
-
 	app.get('/api/token/check', passport.authenticate('bearer', {session: false}), function (req, res) {
 		res.end('OK');
 	});
@@ -132,8 +131,6 @@ module.exports = function(app, passport) {
 	});
 	
 
-	
-
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
@@ -142,51 +139,12 @@ module.exports = function(app, passport) {
 	});
 
 
-
-
-
-
-	// #####################################
 	// =====================================
-	// BRIDGE API ==========================
+	// GET UPLOAD ==========================
 	// =====================================
-	// brigde to mongoose for pile.js
-	// #####################################
-
-
 	app.get('/api/upload/get', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.getUpload(req, res);
 	});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	// #####################################
-	// =====================================
-	// POSTGIS API  ========================
-	// =====================================
-	// #####################################
-
 
 
 	// =====================================
@@ -203,40 +161,12 @@ module.exports = function(app, passport) {
 		api.upload.getUploadStatus(req, res);
 	});
 
-	// // =====================================
-	// // GET FILE MODEL FROM FILEUUID ========
-	// // =====================================
-	// app.get('/api/data/file', passport.authenticate('bearer', {session: false}), function (req, res) {
-	// 	api.file.getFile(req, res);
-	// });
-
-	// // =====================================
-	// // GET FILE MODEL FROM FILEUUID ========
-	// // =====================================
-	// app.get('/api/data/export/', passport.authenticate('bearer', {session: false}), function (req, res) {
-	// 	api.file.getFile(req, res);
-	// });
-
-
-
-
+	// =====================================
+	// JOIN BETA MAIL ======================
+	// =====================================
 	app.get('/api/joinbeta', function (req, res) {
 		api.portal.joinBeta(req, res);
 	});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 	// =====================================
@@ -401,6 +331,7 @@ module.exports = function(app, passport) {
 	});
 
 
+
 	// =====================================
 	// AUTO-CREATE LEGENDS =================
 	// =====================================
@@ -426,10 +357,24 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
-	// REQUEST FILE DOWNLOAD (zip'n send) ==
+	// GET GEOJSON FILES ===================
 	// =====================================
-	app.post('/api/file/download', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.file.zipAndSend(req, res);
+	app.post('/api/geo/json2cartocss', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.geo.json2cartocss(req, res);
+	});
+
+	// =====================================
+	// DOWNLOAD DATASET ====================
+	// =====================================
+	app.post('/api/file/downloadDataset', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.postgis.downloadDatasetFromFile(req, res);
+	});
+
+	// =====================================
+	// DOWNLOAD DATASET ====================
+	// =====================================
+	app.post('/api/layer/downloadDataset', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.postgis.downloadDatasetFromLayer(req, res);
 	});
 
 	
@@ -440,12 +385,19 @@ module.exports = function(app, passport) {
 		api.file.update(req, res);
 	});
 
+	// =====================================
+	// GET LAYERS OF FILE ==================
+	// =====================================
+	app.post('/api/file/getLayers', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.file.getLayers(req, res);
+	});
+
 
 	// =====================================
 	// DELETE FILE(S) ===================
 	// =====================================
 	app.post('/api/file/delete', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.file.deleteFiles(req, res);
+		api.file.deleteFile(req, res);
 	});
 
 
@@ -561,6 +513,21 @@ module.exports = function(app, passport) {
 		api.user.checkUniqueEmail(req, res);
 	});
 
+	// =====================================
+	// CHECK UNIQUE USER/EMAIL =============
+	// =====================================
+	app.post('/api/user/invite', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.user.invite(req, res);
+	});
+
+
+	// =====================================
+	// CHECK UNIQUE USER/EMAIL =============
+	// =====================================
+	app.post('/api/invite/link', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.user.getInviteLink(req, res);
+	});
+
 
 	// =====================================
 	// access: GET ROLE  ===============
@@ -664,12 +631,12 @@ module.exports = function(app, passport) {
 	});
 
 
-	// =====================================
-	// SIGNUP ==============================
-	// =====================================
-	app.get('/signup', function(req, res) {
-		api.portal.signup(req, res);
-	});
+	// // =====================================
+	// // SIGNUP ==============================
+	// // =====================================
+	// app.get('/signup', function(req, res) {
+	// 	api.portal.signup(req, res);
+	// });
 
 
 	// =====================================
@@ -677,6 +644,14 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.get('/logout', function(req, res) {
 		api.portal.logout(req, res);
+	});
+
+
+	// =====================================
+	// LOGOUT ==============================
+	// =====================================
+	app.get('/invite/*', function(req, res) {
+		api.portal.invite(req, res);
 	});
 
 
@@ -706,6 +681,16 @@ module.exports = function(app, passport) {
 	app.post('/forgot', function (req, res) {
 		api.auth.forgotPassword(req, res);
 	});
+
+
+	// =====================================
+	// FORGOT PASSWORD =====================
+	// =====================================
+	app.post('/register', passport.authenticate('local-signup', {
+		successRedirect : '/', // redirect to the secure profile section
+		failureRedirect : '/invite', // redirect back to the signup page if there is an error
+		failureFlash : true // allow flash messages
+	}));
 
 
 	// =====================================

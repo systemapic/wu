@@ -110,3 +110,119 @@
 #chrome-content-filter-chart {
 	font-size: 10px;
 }
+
+.brush-catcher {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	/*background: red;*/
+	z-index: 999999999999;
+}
+
+
+
+
+/*top chrome buttons*/
+.chrome-button.settingsSelector {
+	background-position: -6px -3px;
+}
+
+.debug-button {
+	    width: 200px;
+    height: 35px;
+    background: #FF5E5E;
+    border-radius: 3px;
+    text-align: center;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto;
+    padding: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+
+.chrome-button.share {
+	background-position: -128px -4px;
+}
+
+
+.share-dropdown {
+	position: absolute;
+	background: white;
+	right: 3px;
+	padding: 13px 20px 13px 19px;
+	box-shadow: 0 0 2px 1px rgba(0,0,0,0.4);
+	z-index: 10000010;
+	top: 27px;
+	width: 142px;
+	cursor: default;
+}
+.share-dropdown .share-item {
+	font-size: 14px;
+	line-height: 1.8;
+	cursor: pointer;
+}
+.share-dropdown .share-item:hover {
+	color: black;
+}
+.share-ghost {
+	width: 100%;
+	height: 100%;
+	z-index: 10000009;
+	position: absolute;
+}
+
+.chrome-top {
+	z-index: 10000000;
+}
+.chrome-right {
+	z-index: 10000002;
+}
+
+.share-input {
+	/*position: absolute;*/
+	height: 30px;
+	width: 113px;
+	/*background: blue;*/
+	left: 0;
+	bottom: 9px;
+	border: none !important;
+}
+.share-input::selection {
+	background: #71c4a8;
+}
+
+.share-link-pdf {
+	position: absolute;
+	height: auto;
+	width: 100%;
+	left: 0;
+	bottom: 37px;
+	border: none !important;
+	background-color: white;
+	margin-left: 0;
+	color: #3F4652;
+	padding-left: 19px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+
+/*temporary override*/
+.file-action-share {
+	color: gainsboro;
+	}
+	
+.file-action-share:hover {
+	color: gainsboro;
+	}
+
+.chrome-content-filter-label {
+	height: 20px;
+	width: 100%;
+	position: absolute;
+	bottom: -24px;
+	margin-left: 39px;
+	font-size: 11px;
+	}

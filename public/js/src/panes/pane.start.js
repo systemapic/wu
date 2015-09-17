@@ -285,15 +285,8 @@ Wu.StartPane = Wu.Pane.extend({
 
 	selectProject : function(project) {
 
-		console.log('select!');
-
 		// a hack to disable hook temporarily
 		if (this._hooksDisabled) return;
-
-		console.log('..selecting');
-
-		// select project
-		// project.select();
 
 		// refresh sidepane
 		app.SidePane.refreshMenu();

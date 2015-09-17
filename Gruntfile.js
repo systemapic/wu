@@ -270,7 +270,8 @@ module.exports = function(grunt) {
 					'public/js/src/chrome/chrome.top.js',	
 					'public/js/src/chrome/chrome.left.js',	
 					'public/js/src/chrome/chrome.right.js',	
-					'public/js/src/chrome/chrome.center.js',	
+					'public/js/src/chrome/chrome.center.js',
+					'public/js/src/chrome/chrome.data.js',
 					'public/js/src/chrome/content/chrome.content.js',	
 					'public/js/src/chrome/content/chrome.settingsselector.js',	
 					'public/js/src/chrome/content/chrome.mapsettings.js',	
@@ -288,6 +289,7 @@ module.exports = function(grunt) {
 					'public/js/src/models/model.files.js',
 					'public/js/src/models/model.roles.js',
 					'public/js/src/models/model.D3List.js',
+					'public/js/src/models/model.D3dataLibList.js',
 
 					// Access
 					'public/js/src/core/access.js',

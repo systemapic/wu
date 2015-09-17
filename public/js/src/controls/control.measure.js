@@ -55,7 +55,7 @@ L.Control.Measure = Wu.Control.extend({
 	},
 
 	_show : function () {
-		this._container.style.display = 'block';
+		this._container.style.display = 'inline-block';
 
 		// this.__toggle();
 	},

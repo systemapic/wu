@@ -8,6 +8,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 	sortDirection : {},
 
 	_initContent : function () {
+		
 
 		// create new fullscreen page, and set as default content
 		this._content = Wu.DomUtil.create('div', 'data-library', Wu.app._appPane);
@@ -248,7 +249,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		this._unload(e);
 
 		// refresh uploader
-		this._refreshResumable();
+		// this._refreshResumable();
 
 	},
 
@@ -343,7 +344,7 @@ Wu.SidePane.DataLibrary = Wu.SidePane.Item.extend({
 		});
 
 		// add to memory
-		this._resumables[r.get_id()] = r;
+		this._resumables[r._get_id()] = r;
 
 	},
 

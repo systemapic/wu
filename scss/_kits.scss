@@ -35,6 +35,24 @@ may need to be adjusted to function on all browsers.
 	@keyframes linkFader {		0% { background-color: #fefae2; } 100% { background-color: white; }}	
 
 
+.share-link-pdf {
+	-webkit-animation: linkFader 2500ms ease;
+	-webkit-animation-fill-mode: forwards;
+	-moz-animation: linkFader 2500ms ease;
+	-moz-animation-fill-mode: forwards;
+	-o-animation: linkFader 2500ms ease;
+	-o-animation-fill-mode: forwards;
+	animation: linkFader 2500ms ease;
+	animation-fill-mode: forwards;
+
+	}
+
+	@-webkit-keyframes linkFader {	0% { background-color: #71c4a8; } 100% { background-color: white; }}	
+	@-moz-keyframes linkFader {	0% { background-color: #71c4a8; } 100% { background-color: white; }}	
+	@-o-keyframes linkFader {	0% { background-color: #71c4a8; } 100% { background-color: white; }}	
+	@keyframes linkFader {		0% { background-color: #71c4a8; } 100% { background-color: white; }}	
+
+
 /* Open Info Menu */
 /*IS THIS ONE STILL VALID???*/
 .open-uncollapse {

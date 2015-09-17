@@ -194,7 +194,7 @@ Wu.Access = Wu.Class.extend({
 
 		project_capability : function (user, project, capability) {
 			if (!user || !project) return;
-			
+
 			var user = user || app.Account,
 			    roles = project.getRoles(),
 			    permission = false;

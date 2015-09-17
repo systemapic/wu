@@ -75,13 +75,33 @@ module.exports = api.portal = {
 		res.render('../../views/login.serve.ejs', { message: req.flash('loginMessage') });
 	},
 
-	signup : function (req, res) {
-		
-		// debug
-		return api.login(req, res); 
+	invite : function (req, res) {
 
-		res.render('../../views/signup.ejs', { message: req.flash('signupMessage') });
+		// get client/project
+		var path = req.originalUrl.split('/');
+		var invite_token = path[2];
+
+		// get token from redis
+		var redis_key = 'invite:token:' + invite_token;
+		api.redis.tokens.get(redis_key, function (err, token_store) {
+
+			// if logged in
+			if (req.isAuthenticated()) {
+				res.render('../../views/app.serve.ejs', {
+					hotlink : {},
+					access_token : req.session.access_token || {}
+				});
+
+			// if not logged in
+			} else {
+				res.render('../../views/invite.ejs', {
+					invite : token_store,
+					access_token : req.session.access_token || {}
+				});
+			}
+		});
 	},
+
 
 	getBase : function (req, res) {
 
@@ -108,9 +128,6 @@ module.exports = api.portal = {
 			refresh_token : refresh_token
 		}
 
-		console.log('access_token'.red, access_token);
-		console.log('hotlink: ', req.session.hotlink);
-
 		req.session.access_token = access_token;
 
 		// render app html				
@@ -135,8 +152,10 @@ module.exports = api.portal = {
 		// send email
 		api.email.sendJoinBetaMail(email);
 
+		// debug print
 		api.portal.getBetaMembers();
 
+		// return
 		res.end();
 	},
 
@@ -147,17 +166,44 @@ module.exports = api.portal = {
 		});
 	},
 
-	// #########################################
-	// ###  API: Get Portal                  ###
-	// #########################################
+	_checkInvite : function (options) {
+		var invite_token = options.invite_token;
+		if (!invite_token) return false;
+		if (invite_token.length == 20) return true;
+		return false;
+	},
+
+	
 	// served at initalization of Portal
 	getPortal : function (req, res) {
 
 		// print debug
 		api.portal.printDebug(req);
+		
+		// options
+		var options = req.body,
+		    account = req.user,
+		    a = {}, 
+		    invite = this._checkInvite(options);	 // check for invite token
 
-		var account = req.user,
-		    a = {};
+		// include invite access
+		if (invite) a.invite = function (callback) {
+
+			// process token
+			api.user._processInviteToken({
+				user : req.user,
+				invite_token : options.invite_token
+			}, function (err, project_json) {
+				callback(null, project_json);
+			});
+		}		
+
+		// get account
+		a.account = function (callback) {
+			api.user._getSingle({
+				user : account
+			}, callback);
+		}
 
 		// get projects
 		a.projects = function (callback) { 
@@ -191,30 +237,19 @@ module.exports = api.portal = {
 		async.series(a, function (err, result) {
 			if (err || !result) return api.error.general(req, res, err || 'No result.');
 
-			// add user account
-			result.account = account;
-
-			console.log('req.body', req.body);
-
 			var gzip = true;
 			if (req.body.gzip === false) {
 				gzip = false;
 			}
-
-
-			// var dontZip = JSON.parse(req.body).dontZip;
-
-			// console.log('dontZip? ', dontZip, req.body);
 			
 			// if (dontZip) return res.json(result);
 			if (!gzip) return res.json(result);
+			
 			// return result gzipped
 			res.writeHead(200, {'Content-Type': 'application/json', 'Content-Encoding': 'gzip'});
 			zlib.gzip(JSON.stringify(result), function (err, zipped) {
 				res.end(zipped);
 			});
-
-
 		});
 	},
 
@@ -224,28 +259,11 @@ module.exports = api.portal = {
 		console.log('  Name:  ' + req.user.firstName + ' ' + req.user.lastName);
 		console.log('  Uuid:  ' + req.user.uuid);
 		console.log('  Email: ' + req.user.local.email);
-		console.log('  IP:    ' + req.headers['x-real-ip']);
+		console.log('  IP:    ' + req.headers['x-forwarded-for']);
 		console.log('_______________________________________________________________________'.yellow);
 		console.log('_______________________________________________________________________'.yellow);
 		console.log('');
 	},
-
-
-
-	grindDone : function (req, res) {
-
-		// close connection
-		res.end('Thanks!');
-
-		var options = req.body,
-		    fileUuid = options.fileUuid;
-
-		// send ping to client
-	},
-
-
-
-
 
 
 }

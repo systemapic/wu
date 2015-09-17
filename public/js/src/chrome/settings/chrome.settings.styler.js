@@ -1,11 +1,14 @@
-Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
-
-	// UNIVERSALS
-	// UNIVERSALS	
-	// UNIVERSALS
+Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	cartoJSON : {
 
+	},
+
+	options : {
+		dropdown : {
+			staticText : 'Fixed value',
+			staticDivider : '-'
+		}
 	},
 
 	_initialize : function () {
@@ -15,6 +18,10 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 		// add events
 		this._addEvents();
+
+		// shortcut
+		app.Tools = app.Tools || {};
+		app.Tools.Styler = this;
 	},
 
 	_initContainer : function () {
@@ -25,20 +32,24 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 	_initLayout : function () {
 		if (!this._project) return;
-  		
+
+		// Scroller
+		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
+		this._midOuterScroller = Wu.DomUtil.create('div', 'chrome-middle-section-outer-scroller', this._midSection);		
+		this._midInnerScroller = Wu.DomUtil.create('div', 'chrome-middle-section-inner-scroller', this._midOuterScroller);
+
 		// active layer
-		this._initLayout_activeLayers();
+		this.layerSelector = this._initLayout_activeLayers(false, false, this._midInnerScroller); // appending to this._midSection
 
-		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._container);
-
-		this._createRefresh();
+		// Create field wrapper
+		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 
 		// mark as inited
 		this._inited = true;
 	},
 
+	
 	_refresh : function () {
-
 		this._flush();
 		this._initLayout();
 	},
@@ -59,50 +70,54 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 		// mark button
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+		
+		// Enable settings from layer we're working with
+		var layerUuid = this._getActiveLayerUuid();
+		if ( layerUuid ) this._selectedActiveLayer(false, layerUuid);		
+
+		// Select layer we're working on
+		var options = this.layerSelector.childNodes;
+		for ( var k in options ) {
+			if ( options[k].value == layerUuid ) options[k].selected = true;
+		}
 	},
 
 	closed : function () {
 		// clean up
 		this._tempRemoveLayers();
-		// this._cleanup();
 	},	
 	
 	// event run when layer selected 
-	_selectedActiveLayer : function (e) {
+	_selectedActiveLayer : function (e, uuid) {
 
 		this._fieldsWrapper.innerHTML = '';
 
-		this.layerUuid = e.target.value;
+		this.layerUuid = uuid ? uuid : e.target.value
 
 		this._layer = this._project.getLayer(this.layerUuid);
+
+		if (!this._layer) return;
+
+		// Store uuid of layer we're working with
+		this._storeActiveLayerUuid(this.layerUuid);		
 
 		// get current style, returns default if none
 		var style = this._layer.getStyling();
 
 		this.tabindex = 1;
 
-		if ( style ) { 
-			this.cartoJSON = style;	
-		} else {
-			this.cartoJSON = {};
-		}
+		this.cartoJSON = style || {};
 
 		// init style json
 		this._initStyle();
 
-		// fitte	
+		// Add temp layer
 		this._tempaddLayer();
+
 	},
 
 
-	_createRefresh : function () {
 
-		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
-		this._refreshButton = Wu.DomUtil.create('div', 'chrome chrome-content cartocss refresh-button', this._container, text);
-
-		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
-		Wu.DomEvent.on(this._refreshButton, 'mouseover', this._closeColorRangeSelector, this);
-	},	
 
 	_closeColorRangeSelector : function () {
 
@@ -135,7 +150,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		// Get columns
 		this.columns = layerMeta.columns;
 
-		this.metaFields = ['static', '---------------'];
+		this.metaFields = [this.options.dropdown.staticText, this.options.dropdown.staticDivider];
 
 		for ( var k in this.columns ) {
 
@@ -184,13 +199,14 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			input 		: false,
 			title 		: '<b>Point</b>',
 			isOn 		: isOn,
-			rightPos	: false,
+			rightPos	: true,
 			type 		: 'switch'
 		}
 		this._createMetaFieldLine(lineOptions);
 
 
-		this._saveToServer('point', '', isOn);
+		// this._saveToServer('point', '', isOn);
+		this.initPointOffOn(isOn);
 
 	},
 
@@ -222,7 +238,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 		// xoxoxox 
 
-		var defaultRange = ['#ff0000', '#a5ff00', '#003dff'];
+		var defaultRange = ['#ff0000', '#ffff00', '#a5ff00', '#00ffff', '#003dff'];
 
 		// Get stores states
 		var isOn   = this.cartoJSON.point[key].range ? false : true;
@@ -238,7 +254,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			input 		: false,
 			title 		: '<b>Color</b>',
 			isOn 		: isOn,
-			rightPos	: false,
+			rightPos	: true,
 			type 		: 'color',
 			value 		: staticVal,
 			dropArray 	: this.metaFields,
@@ -275,7 +291,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			input 		: false,
 			title 		: '<b>Opacity</b>',
 			isOn 		: isOn,
-			rightPos	: false,
+			rightPos	: true,
 			type 		: 'miniInput',
 			value 		: val,
 			dropArray 	: this.metaFields,
@@ -311,7 +327,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			input 		: false,
 			title 		: '<b>Point size</b>',
 			isOn 		: isOn,
-			rightPos	: false,
+			rightPos	: true,
 			type 		: 'miniInput',
 			value 		: val,
 			dropArray 	: this.metaFields,
@@ -358,8 +374,8 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			var colorRange = options.colorRange;
 
 			if ( !colorRange ) return;
-			if ( colorRange == 'static' ) return;
-			if ( colorRange == '---------------' ) return;
+			if ( colorRange == this.options.dropdown.staticText ) return;
+			if ( colorRange == this.options.dropdown.staticDivider ) return;
 			
 			var fieldName = colorRange;
 
@@ -372,8 +388,8 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			var pointSizeRange = options.pointSizeRange;
 
 			if ( !pointSizeRange ) 	return;
-			if ( pointSizeRange == 'static' ) return;
-			if ( pointSizeRange == '---------------' ) return;
+			if ( pointSizeRange == this.options.dropdown.staticText ) return;
+			if ( pointSizeRange == this.options.dropdown.staticDivider ) return;
 			
 			var fieldName = pointSizeRange;
 
@@ -390,30 +406,40 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	// On toggle switch button
 	_saveToServer : function (key, title, on) {
 
-		if ( key == 'point' ) {
+		this.initPointOffOn(on);
 
-			if ( on ) {
-				this.cartoJSON[key].enabled = true;
-				this.initPointOptions(this._pointSectionWrapper);
+		// UPDATE
+		this._updateStyle();
+	},
 
-				var colorRange = this.cartoJSON[key].color.range ? this.cartoJSON[key].color.range : false;
-				var opacityRange = this.cartoJSON[key].opacity.range ? this.cartoJSON[key].color.opacity : false;
-				var pointSizeRange = this.cartoJSON[key].pointsize.range ? this.cartoJSON[key].pointsize.range : false;
 
-				var options = {
-					colorRange : colorRange,
-					opacityRange : opacityRange,
-					pointSizeRange : pointSizeRange,
-				}
-				
-				this.initOpenFields(options, 'color');
-				this.initOpenFields(options, 'pointsize');
+	initPointOffOn : function (on) {
 
-			} else {
-				this.cartoJSON[key].enabled = false;
-				this.clearPointOptions();				
-			}			
-		}
+		var key = 'point';
+
+		if ( on ) {
+			this.cartoJSON[key].enabled = true;
+			this.initPointOptions(this._pointSectionWrapper);
+
+			var colorRange = this.cartoJSON[key].color.range ? this.cartoJSON[key].color.range : false;
+			var opacityRange = this.cartoJSON[key].opacity.range ? this.cartoJSON[key].color.opacity : false;
+			var pointSizeRange = this.cartoJSON[key].pointsize.range ? this.cartoJSON[key].pointsize.range : false;
+
+			var options = {
+				colorRange : colorRange,
+				opacityRange : opacityRange,
+				pointSizeRange : pointSizeRange,
+			}
+			
+			this.initOpenFields(options, 'color');
+			this.initOpenFields(options, 'pointsize');
+
+		} else {
+			this.cartoJSON[key].enabled = false;
+			this.clearPointOptions();				
+		}			
+	
+
 	},
 
 	// ON SELECT MINI DROP DOWN
@@ -422,12 +448,14 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		var key = e.target.getAttribute('key');
 		var fieldName = e.target.value;
 
+		var wrapper = e.target.parentElement;
+
 		// UNSELECTING FIELD
 		// UNSELECTING FIELD
 		// UNSELECTING FIELD
 
 		// Clean up if we UNSELECTED field
-		if ( fieldName == 'static' || fieldName == '---------------') {
+		if ( fieldName == this.options.dropdown.staticText || fieldName == this.options.dropdown.staticDivider) {
 			
 			// Make static inputs available
 			if ( key == 'opacity' || key == 'pointsize' ) {	
@@ -445,6 +473,11 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 			this.cartoJSON.point[key].range = false;
 
+			// UPDATE
+			this._updateStyle();
+
+			Wu.DomUtil.removeClass(wrapper, 'full-width');
+
 			return;		
 		} 			
 
@@ -452,6 +485,9 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		// SELECTING FIELD
 		// SELECTING FIELD
 		// SELECTING FIELD				
+
+
+		Wu.DomUtil.addClass(wrapper, 'full-width');
 
 		// DISABLE mini input fields
 		if ( key == 'opacity' || key == 'pointsize' ) {
@@ -470,6 +506,11 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 		// Add fields
 		this.addExtraFields(key, fieldName);
+
+
+		// UPDATE
+		this._updateStyle();
+
 	},
 
 	// ON BLUR IN MINI FIELDS
@@ -505,6 +546,9 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			// Set value in input
 			inputField.value = value;
 
+			// Do not save if value is unchanged
+			if ( this.cartoJSON.point[key].value == value ) return;
+
 			// Store in json
 			this.cartoJSON.point[key].value = value;
 
@@ -526,6 +570,9 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 			// Set value in input
 			inputField.value = value;
+
+			// Do not save if value is unchanged
+			if ( this.cartoJSON.point[key].value == value ) return;
 
 			// Stors in json
 			this.cartoJSON.point[key].value = value;
@@ -555,6 +602,9 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 				// Make sure min value is not higher than max value
 				value = this.validateNumber(value, maxVal, true);
 
+				// Do not save if value is unchanged
+				if ( this.cartoJSON.point.pointsize.minMax[0] == value ) return;
+
 				// Set value in input
 				minField.value = value;
 
@@ -576,6 +626,9 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 				// Make sure max value is not less than min value
 				value = this.validateNumber(value, minVal, false);
+
+				// Do not save if value is unchanged
+				if ( this.cartoJSON.point.pointsize.minMax[1] == value ) return;
 
 				// Set value in input
 				maxField.value = value;
@@ -605,6 +658,9 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 				value = this.validateNumber(value, maxVal, true);
 
+				// Do not save if value is unchanged
+				if ( this.cartoJSON.point.color.customMinMax[0] == value ) return;
+
 				minField.value = value;
 
 				this.cartoJSON.point.color.customMinMax = [value, maxVal];
@@ -621,16 +677,24 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 
 				value = this.validateNumber(value, minVal, false);
 
+				// Do not save if value is unchanged
+				if ( this.cartoJSON.point.color.customMinMax[1] == value ) return;
+
 				maxField.value = value;
 
 				this.cartoJSON.point.color.customMinMax = [minVal, value];
 			}			
 		}
+
+
+		// UPDATE
+		this._updateStyle();
+
 	},	
 
 	updateColor : function (hex, key, wrapper) {
 
-		// fittepølse
+
 		if ( key == 'color' ) {
 			this.cartoJSON.point[key].staticVal = hex;
 		}
@@ -655,19 +719,25 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			var color2 = colorBall_2.getAttribute('hex');
 			var color3 = colorBall_3.getAttribute('hex');
 
+
 			// Build color array
-			var colors = [color1, color2, color3];
+			// var colors = [color1, color2, color3];
+
+			// fittepølse 
+			var colors = this.convertToFiveColors([color1, color2, color3]);
 
 			// Color range bar
 			var colorRangeBar = Wu.DomUtil.get('chrome-color-range_' + key);
 
 			// Set styling
-			var gradientStyle = 'background: -webkit-linear-gradient(left, ' + colors.join() + ');';
-			gradientStyle    += 'background: -o-linear-gradient(right, '     + colors.join() + ');';
-			gradientStyle    += 'background: -moz-linear-gradient(right, '   + colors.join() + ');';
-			gradientStyle    += 'background: linear-gradient(to right, '     + colors.join() + ');';			
+		
+			var gradientStyle = this._gradientStyle(colors);
 
 			colorRangeBar.setAttribute('style', gradientStyle);
+
+			// Do not save if value is unchanged
+			// if ( this.cartoJSON.point.color.value == value ) return;
+			if ( this.cartoJSON.point.color.value == colors ) return;
 
 			// Store in JSON
 			this.cartoJSON.point.color.value = colors;
@@ -675,7 +745,104 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 		}
 
 		this._closeColorRangeSelector();
+
+		// UPDATE
+		this._updateStyle();
+
 	},
+
+
+
+	// xoxoxoxox
+	selectColorPreset : function (e) {
+
+		var elem = e.target;
+		var hex = elem.getAttribute('hex');
+		var hexArray = hex.split(',');
+
+		// Five colors
+		var colorArray = this.convertToFiveColors(hexArray);
+
+		// Color range bar
+		var colorRangeBar = Wu.DomUtil.get('chrome-color-range_colorrange');
+
+		// Set styling		
+		var gradientStyle = this._gradientStyle(colorArray);
+
+		// Set style on colorrange bar
+		colorRangeBar.setAttribute('style', gradientStyle);
+
+
+		// Update color balls
+		var colorBall_1 = Wu.DomUtil.get('color-range-ball-1-colorrange');
+		    colorBall_1.style.background = colorArray[0];
+		    colorBall_1.setAttribute('hex', colorArray[0]);
+
+		var colorBall_2 = Wu.DomUtil.get('color-range-ball-2-colorrange');
+		    colorBall_2.style.background = colorArray[2];
+		    colorBall_2.setAttribute('hex', colorArray[2]);
+
+		var colorBall_3 = Wu.DomUtil.get('color-range-ball-3-colorrange');
+		    colorBall_3.style.background = colorArray[4];
+		    colorBall_3.setAttribute('hex', colorArray[4]);
+
+
+		this._closeColorRangeSelector();
+
+		// Do not save if value is unchanged
+		if ( this.cartoJSON.point.color.value[0] == colorArray[0] &&
+		     this.cartoJSON.point.color.value[1] == colorArray[1] && 
+		     this.cartoJSON.point.color.value[2] == colorArray[2] &&
+		     this.cartoJSON.point.color.value[3] == colorArray[3] &&
+		     this.cartoJSON.point.color.value[4] == colorArray[4] ) {
+
+			return;
+		}
+
+		// Store in JSON
+		this.cartoJSON.point.color.value = colorArray;		
+
+		// UPDATE
+		this._updateStyle();		
+
+	},
+
+
+	convertToFiveColors : function (colorArray) {
+
+
+		// Make three values from two
+		if ( colorArray.length == 2 ) {
+			var c1 = colorArray[0];
+			var c5 = colorArray[1];
+
+			var c3 = this.hexAverage([c1, c5]);
+
+			var c2 = this.hexAverage([c1, c3]);
+			var c4 = this.hexAverage([c3, c5]);
+
+			colorArray = [c1, c2, c3, c4, c5];
+		}
+
+
+		// Make five from three
+		if ( colorArray.length == 3 ) {
+
+			var c1 = colorArray[0];
+			var c3 = colorArray[1];
+			var c5 = colorArray[2];
+
+			var c2 = this.hexAverage([c1, c3]);
+			var c4 = this.hexAverage([c3, c5]);
+
+			colorArray = [c1, c2, c3, c4, c5];
+
+		}
+
+		return colorArray;
+
+	},
+
 
 
 	// ADD EXTRA FIELDS
@@ -726,11 +893,12 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			// COLOR RANGE
 			// COLOR RANGE
 			// COLOR RANGE
-
-			var defaultRange = ['#ff0000', '#a5ff00', '#003dff'];
+			var defaultRange = ['#ff0000', '#ffff00', '#a5ff00', '#00ffff', '#003dff'];
 
 			// Get stores states
 			var value  = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : defaultRange;
+
+			if ( value.length < 5 ) value = this.convertToFiveColors(value);
 
 			var lineOptions = {
 				key 		: 'colorrange', 
@@ -747,6 +915,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			// SAVE JSON
 			this.cartoJSON.point[key].range = fieldName;
 			this.cartoJSON.point[key].value = value;
+
 
 
 
@@ -852,357 +1021,47 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 	},
 
 
-	// ADD/REMOVE THIN LAYERS
-	// ADD/REMOVE THIN LAYERS
-	// ADD/REMOVE THIN LAYERS
 
-	_tempaddLayer : function () {
+	getCartoCSSFromJSON : function (json, callback) {
 
-		// remember
-		this._temps = this._temps || [];
+		var options = {
+			styleJSON : json,
+			columns : this.columns
+		}
 
-		// remove other styling layers
-		this._tempRemoveLayers();
 
-		// add
-		this._layer._addThin();
-
-		// remember
-		this._temps.push(this._layer);
+		Wu.post('/api/geo/json2cartocss', JSON.stringify(options), callback.bind(this), this);
 
 	},
-
-	_tempRemoveLayers : function () {
-		if (!this._temps) return;
-
-		// remove other layers added tempy for styling
-		this._temps.forEach(function (layer) {
-			layer._removeThin();
-		}, this);
-	},
-
-
-
-
-
-
-
-	// initPolygon : function () {
-
-	// 	var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
-
-	// 	var lineOptions = {
-	// 		key 		: 'polygon', 
-	// 		wrapper 	: sectionWrapper,
-	// 		input 		: false,
-	// 		title 		: 'Polygon',
-	// 		isOn 		: false,
-	// 		rightPos	: false,
-	// 		type 		: 'switch'
-	// 	}
-
-	// 	this._createMetaFieldLine(lineOptions);
-
-
-	// },
-
-	// initLine : function () {
-
-	// 	var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
-
-	// 	var lineOptions = {
-	// 		key 		: 'line', 
-	// 		wrapper 	: sectionWrapper,
-	// 		input 		: false,
-	// 		title 		: 'Line',
-	// 		isOn 		: false,
-	// 		rightPos	: false,
-	// 		type 		: 'switch'
-	// 	}
-
-	// 	this._createMetaFieldLine(lineOptions);
-
-	// },
-
-
-
-	// _createField : function (json) {
-
-
-
-	// },
-
-
-
-
 
 
 	// CARTO CARTO CARTO CARTO
 	// CARTO CARTO CARTO CARTO
-	// CARTO CARTO CARTO CARTO		
+	// CARTO CARTO CARTO CARTO
 
 	_updateStyle : function () {
 
-		var cartoJSON = this.cartoJSON;
+		this.getCartoCSSFromJSON(this.cartoJSON, function (ctx, finalCarto) {
+			this.saveCartoJSON(finalCarto);
+		});
 
-		var headers = '';
-		var style   = '#layer {\n\n';
-
-		var allowOverlap = 'true';
-		var markerClip  = 'false';
-		var compOp      = 'screen'
-
-		// CREATE DEFAULT STYLING
-		style += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
-		style += '\tmarker-clip: ' + markerClip + ';\n';
-		style += '\tmarker-comp-op: ' + compOp + ';\n\n';
-
-
-		// STYLE POINT
-		// STYLE POINT
-		// STYLE POINT
-
-		if ( cartoJSON.point && cartoJSON.point.enabled == true ) {
-
-			// OPACITY
-			var pointOpacityCarto = this.buildCarto_pointOpacity(headers, style);
-			headers += pointOpacityCarto.headers;
-			style += pointOpacityCarto.style;
-
-			// COLOR
-			var pointColorCarto = this.buildCarto_pointColor(headers, style);
-			headers += pointColorCarto.headers;
-			style += pointColorCarto.style;
-
-			// SIZE
-			var pointSizeCarto = this.buildCarto_pointSize(headers, style);
-			headers += pointSizeCarto.headers;
-			style += pointSizeCarto.style;			
-
-		}
-			
-		style += '}'
-
-		var finalCarto = headers + style;
-
-		this.saveCartoJSON(finalCarto);
 	},
 
-	buildCarto_pointOpacity : function () {
-
-		// OPACITY
-		// OPACITY
-		// OPACITY
-
-		var opacity = this.cartoJSON.point.opacity;
-
-		var cartObj = {
-			headers : '',
-			style   : ''
-		}
-
-
-		if ( opacity.range ) {
-
-			var max = Math.floor(this.columns[opacity.range].max * 10) / 10;
-			var min = Math.floor(this.columns[opacity.range].min * 10) / 10;				
-
-			var normalizedOffset = true;
-
-			// NORMALIZED OFFSET 
-			// i.e. if the lowest number is 30, and 
-		 	// highest is 100, 30 will return 0.3 and not 0
-			if ( normalizedOffset ) {
-				if ( min > 0 ) min = 0;
-			}
-
-			cartObj.headers += '@opacity_field_max: ' + max + ';\n';
-			cartObj.headers += '@opacity_field_min: ' + min + ';\n';
-			cartObj.headers += '@opacity_field_range: [' + opacity.range + '];\n\n';
-
-			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
-
-		
-		} else {
-
-			// static opacity
-			cartObj.headers += '@opacity_field: ' + opacity.value + ';\n';
-		}
-
-		cartObj.style += '\tmarker-opacity: @opacity_field;\n\n';
-
-		return cartObj;
-	},
-
-	buildCarto_pointColor : function (headers, style) {
-
-		// COLOR RANGE
-		// COLOR RANGE
-		// COLOR RANGE
-
-		var color = this.cartoJSON.point.color;
-
-		var cartObj = {
-			headers : '',
-			style   : ''
-		}		
-
-		if ( color.range ) {
-
-			var minMax = color.customMinMax ? color.customMinMax : color.minMax;
-
-			// Get color values
-			var c1 = color.value[0];
-			var c5 = color.value[1];
-			var c9 = color.value[2];
-
-			// Interpolate
-			var c3 = this.hexAverage([c1, c5]);
-			var c7 = this.hexAverage([c5, c9]);
-
-			// Interpolate
-			var c2 = this.hexAverage([c1, c3]);
-			var c4 = this.hexAverage([c3, c5]);
-			var c6 = this.hexAverage([c5, c7]);
-			var c8 = this.hexAverage([c7, c9]);
-
-
-			colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9];
-
-
-			// CREATE VARS
-			var fieldName = '@' + color.range;
-			var maxField  = fieldName + '_max';
-			var minField  = fieldName + '_min';
-			var deltaName = fieldName + '_delta';
-			
-
-			// DEFINE FIELD NAME + MIN/MAX
-			cartObj.headers += fieldName + ': [' + color.range + '];\n';
-			cartObj.headers += maxField  + ': '  + minMax[1] + ';\n'; 
-			cartObj.headers += minField  + ': '  + minMax[0] + ';\n\n';
-			
-
-			// COLORS VALUES
-			colorArray.forEach(function(c, i) {	
-				cartObj.headers += fieldName + '_color_' + (i+1) + ': ' + c + ';\n';
-			})
-
-			cartObj.headers += '\n';
-			
-			// COLOR STEPS (DELTA)
-			cartObj.headers += fieldName + '_delta: (' + maxField + ' - ' + minField + ')/' + colorArray.length + ';\n'
-			
-			colorArray.forEach(function(c, i) {	
-				cartObj.headers += fieldName + '_step_' + (i+1) + ': (' + minField + ' + ' + fieldName + '_delta * ' + i + ');\n';
-			})
-
-
-			cartObj.headers += '\n';
-
-
-
-			// STYLE STYLE STYLE
-			// STYLE STYLE STYLE
-			// STYLE STYLE STYLE
-
-
-			colorArray.forEach(function(c,i) {
-
-				var no = i+1;
-
-				if ( no == 1 ) {
-
-					cartObj.style += '\t[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + '] ';
-					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
-
-				}
-
-				if ( no > 1 && no < colorArray.length ) {
-
-					cartObj.style += '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + ']';
-					cartObj.style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
-					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
-
-				}
-
-				if ( no == colorArray.length ) {
-
-					cartObj.style +=  '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + '] ';
-					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n\n';
-				}
-			})
-			
-		
-		} else {
-		
-			// static color
-			cartObj.style += '\tmarker-fill: ' + color.staticVal + ';\n\n';
-		}
-
-		return cartObj;
-	},
-
-	buildCarto_pointSize : function (headers, style) {
-
-		// POINT SIZE
-		// POINT SIZE
-		// POINT SIZE
-
-		var pointsize = this.cartoJSON.point.pointsize;
-
-		var cartObj = {
-			headers : '',
-			style   : ''
-		}		
-
-		if ( pointsize.range ) {
-
-			var max = Math.floor(this.columns[pointsize.range].max * 10) / 10;
-			var min = Math.floor(this.columns[pointsize.range].min * 10) / 10;
-		
-			// cartObj.headers += '@marker_size_max: ' + pointsize.minMax[1] + ';\n';
-			cartObj.headers += '@marker_size_min: ' + pointsize.minMax[0] + ';\n';
-			cartObj.headers += '@marker_size_range: ' + (pointsize.minMax[1] - pointsize.minMax[0]) + ';\n';
-			cartObj.headers += '@marker_size_field: [' + pointsize.range + '];\n';
-			cartObj.headers += '@marker_size_field_maxVal: ' + max + ';\n';
-			cartObj.headers += '@marker_size_field_minVal: ' + min + ';\n';
-			cartObj.headers += '\n//TODO: Fix this!\n';
-			cartObj.headers += '@marker_size_factor: (@marker_size_field / (@marker_size_field_maxVal - @marker_size_field_minVal)) * (@marker_size_range + @marker_size_min);\n\n';
-			
-		} else {
-
-			cartObj.headers += '@marker_size_factor: ' + pointsize.value + ';\n';
-
-		}
-
-
-		cartObj.headers += '[zoom=10] { marker-width: 0.3 * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=11] { marker-width: 0.5 * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=12] { marker-width: 1   * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=13] { marker-width: 1   * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=14] { marker-width: 2   * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=15] { marker-width: 4   * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=16] { marker-width: 6   * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=17] { marker-width: 8   * @marker_size_factor; }\n';
-		cartObj.headers += '[zoom=18] { marker-width: 12  * @marker_size_factor; }\n\n';
-
-
-		return cartObj;
-	},
 
 	saveCartoJSON : function (finalCarto) {
 
 		this._layer.setStyling(this.cartoJSON);
 
+		var sql = this._layer.getSQL();
+
 		// request new layer
 		var layerOptions = {
 			css : finalCarto, 
-			sql : "(SELECT * FROM table) as sub",
+			sql : sql,
 			layer : this._layer
 		}
 
-		this._updateLayer(layerOptions);
+		this._updateLayer(layerOptions);;		
 
 	},
 
@@ -1240,7 +1099,7 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 			layerUuid : layer.getUuid()
 		}
 
-
+		var that = this;
 
 		// create layer on server
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
@@ -1254,13 +1113,13 @@ Wu.Chrome.Content.Styler = Wu.Chrome.Content.extend({
 				return console.error(newLayerStyle.error);
 			}
 
-			// set & update
-			layer.setStyle(newLayerStyle.options);
-			layer.update({enable : true});
+
+			// update layer
+			layer.updateStyle(newLayerStyle);
 
 			// return
 			done && done();
-		});
+		}.bind(this));
 
 	},	
 

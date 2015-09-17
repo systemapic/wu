@@ -131,7 +131,7 @@ module.exports = api.upload = {
 	chunkedUpload : function (req, res) {
 	    	var options 		 = req.body,
 		    fileUuid 		 = options.fileUuid,
-		    projectUuid 	 = options.projectUuid,
+		    // projectUuid 	 = options.projectUuid,
 		    fileName 		 = fileUuid + '-' + options.resumableFilename,
 		    outputPath 		 = '/data/tmp/' + fileName,
 		    stream 		 = fs.createWriteStream(outputPath),
@@ -148,8 +148,11 @@ module.exports = api.upload = {
 
 	    	ops.push(function (callback) {
 
-	    		  // create unique file_id
+	    		// create unique file_id
 		    	var upload_file_id_key = 'upload_id:' + resumableIdentifier;
+		    	
+		    	console.log('upload_file_id_key', upload_file_id_key);
+
 		    	api.redis.layers.get(upload_file_id_key, function (err, stored_file_id) {
 		    		console.log('redis get stored file_id', err, stored_file_id);
 		    		
@@ -161,7 +164,7 @@ module.exports = api.upload = {
 
 		    		// first chunk, create file_id
 		    		if (!stored_file_id) {
-		    			var stored_file_id =  'file_' + api.utils.getRandomChars(20);
+		    			var stored_file_id = 'file_' + api.utils.getRandomChars(20);
 		    			return api.redis.layers.set(upload_file_id_key, stored_file_id, function (err) {
 		    				file_id = stored_file_id;
 		    				console.log('saved stored filei', err, stored_file_id)
@@ -216,7 +219,7 @@ module.exports = api.upload = {
 						body 			: req.body,
 						fileName 		: options.resumableFilename,
 						original_filename 	: filename,
-						projectUuid 		: projectUuid,
+						// projectUuid 		: projectUuid,
 						resumableTotalChunks 	: options.resumableTotalChunks,
 						resumableIdentifier 	: options.resumableIdentifier,
 						file_id 		: file_id,
@@ -234,7 +237,7 @@ module.exports = api.upload = {
 		async.series(ops, function (err) {
 
 			var upload_file_id_key = 'upload_id:' + resumableIdentifier;
-		    	api.redis.temp.del(upload_file_id_key, function (err) {
+		    	api.redis.layers.del(upload_file_id_key, function (err) {
 
 		    		console.log('deleted upload_file_id_key', err);
 		    	});
@@ -353,8 +356,6 @@ module.exports = api.upload = {
 				if (err) console.log('rem done chunks err!', err);
 			});
 
-			// all done
-			// done && done(null);
 		});
 		
 	},
@@ -368,11 +369,11 @@ module.exports = api.upload = {
 		    body = options.body,
 		    access_token = options.access_token,
 		    file_id = uploadStatus.file_id,
-		    project_id = body.projectUuid,
 		    import_start_time = new Date().getTime();
 
 
 		var ops = [];
+
 
 		// import data
 		ops.push(function (callback) {
@@ -400,13 +401,23 @@ module.exports = api.upload = {
 			api.upload._createFileModel(file_id, function (err, file) {
 				if (err) return callback(err);
 				
-				// add to project if available
-				if (!body.projectUuid) return callback(null);	
+				// get uploadStatus, get meta, set to file
+				api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
 
-				// add to project
-				var projectUuid = body.projectUuid;
-				api.file.addToProject(file._id, projectUuid, callback);
-				
+					var meta = uploadStatus.metadata;
+
+					// save meta to file
+					file.data.postgis.metadata = meta;
+					file.save(function (err, doc) {
+
+						// add to user
+						api.file.addNewFileToUser({
+							user : user,
+							file : doc
+						}, callback);
+
+					});
+				});
 			});
 		});
 
@@ -420,60 +431,6 @@ module.exports = api.upload = {
 			}, callback);
 		});
 
-
-		// create default layer (layer model + pile layer)
-		ops.push(function (callback) {
-
-			var layerOptions = {
-				"geom_column": "the_geom_3857",
-				"geom_type": "geometry",
-				"raster_band": "",
-				"srid": "",
-				"affected_tables": "",
-				"interactivity": "",
-				"attributes": "",
-				"access_token": access_token,
-				"cartocss_version": "2.0.1",
-				"cartocss": "#layer {  \n polygon-fill: red; \n marker-fill: #001980; \n marker-allow-overlap: true; \n marker-clip: false; \n marker-comp-op: screen;}",
-				"sql": "(SELECT * FROM " + file_id + ") as sub",
-				"file_id": file_id,
-				"return_model" : true,
-				"projectUuid" : project_id
-			}
-
-			// create pile layer
-			api.layer.createPileLayer(layerOptions, function (err, pileLayer) {
-
-				// set upload status
-				api.upload.updateStatus(file_id, {
-					default_layer : pileLayer.layerUuid,
-				}, function (err) {
-
-					// create wu.layer
-					var options = {
-						projectUuid : project_id, // pass to automatically attach to project
-						data : {
-							postgis : pileLayer.options
-						},
-						metadata : pileLayer.options.metadata,
-						title : 'temp title',
-						description : 'temp description',
-						file : file_id,
-					}
-
-					api.layer.createModel(options, function (err, doc) {
-
-						// set upload status
-						api.upload.updateStatus(file_id, {
-							default_layer_model : doc.uuid,
-							added_to_project : project_id
-						}, callback);
-					});
-				});
-
-			});
-
-		});
 
 
 		// run ops
@@ -519,15 +476,9 @@ module.exports = api.upload = {
 		});	
 	},
 
-
-
-
-
 	_notifyProcessingDone : function (options) {
 		api.socket.processingDone(options)
 	},
-
-
 
 
 	// after upload, calling this to get results
@@ -613,6 +564,18 @@ module.exports = api.upload = {
 
 			// create file model
 			api.file._createModel(fileModel, done);	
+		});
+	},
+
+	_getUploadStatus : function (file_id, callback) {
+		var file_id_key = 'uploadStatus:' + file_id;
+		api.redis.layers.get(file_id_key, function (err, uploadStatusJSON) {
+			if (err) return callback && callback(err);
+
+			// add keys
+			var uploadStatus = JSON.parse(uploadStatusJSON);
+
+			callback(null, uploadStatus);
 		});
 	},
 

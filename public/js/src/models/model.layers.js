@@ -84,7 +84,9 @@ Wu.Layer = Wu.Class.extend({
 		map.addLayer(this.layer);
 
 		// add gridLayer if available
-		if (this.gridLayer) map.addLayer(this.gridLayer);
+		if (this.gridLayer) {
+			map.addLayer(this.gridLayer);
+		}
 
 		// add to active layers
 		app.MapPane.addActiveLayer(this);	// includes baselayers
@@ -112,21 +114,29 @@ Wu.Layer = Wu.Class.extend({
 
 	_removeThin : function () {
 		if (!this._inited) this.initLayer();
+
 		app._map.removeLayer(this.layer);
 	},
 
 	flyTo : function () {
-
 		var extent = this.getMeta().extent;
 		if (!extent) return;
 
 		var southWest = L.latLng(extent[1], extent[0]),
 		    northEast = L.latLng(extent[3], extent[2]),
-		    bounds = L.latLngBounds(southWest, northEast);
+		    bounds = L.latLngBounds(southWest, northEast),
+		    map = app._map,
+		    row_count = parseInt(this.getMeta().row_count),
+		    flyOptions = {};
+
+		// if large file, don't zoom out
+		if (row_count > 500000) { 
+			var zoom = map.getZoom();
+			flyOptions.minZoom = zoom;
+		}
 
 		// fly
-		var map = app._map;
-		map.fitBounds(bounds);
+		map.fitBounds(bounds, flyOptions);
 	},
 
 
@@ -134,8 +144,8 @@ Wu.Layer = Wu.Class.extend({
 
 		if (this._isBase) return;
 
-		this._addToLegends();
-		this._addToInspect();
+		// this._addToLegends();
+		// this._addToInspect();
 		this._addToDescription();
 		this._addToLayermenu();
 	},
@@ -168,7 +178,8 @@ Wu.Layer = Wu.Class.extend({
 		var descriptionControl = app.MapPane.getControls().description;
 		if (!descriptionControl) return;
 
-		descriptionControl.setLayer(this);
+		// xoxoxo
+		descriptionControl._addLayer(this);
 
 		// hide if empty and not editor
 		var isEditor = app.access.to.edit_project(app.activeProject);
@@ -199,6 +210,8 @@ Wu.Layer = Wu.Class.extend({
 		return app.MapPane.getZIndexControls();
 	},
 
+
+	// xoxoxox
 	remove : function (map) {
 		var map = map || app._map;
 
@@ -217,20 +230,9 @@ Wu.Layer = Wu.Class.extend({
 		// remove from zIndex
 		this._removeFromZIndex();
 
-		// remove from inspectControl if available
-		var inspectControl = app.MapPane.getControls().inspect;			// refactor to events
-		if (inspectControl) inspectControl.removeLayer(this);
-
-		// remove from legendsControl if available
-		var legendsControl = app.MapPane.getControls().legends;
-		if (legendsControl) legendsControl.removeLegend(this);
-
 		// remove from descriptionControl if avaialbe
 		var descriptionControl = app.MapPane.getControls().description;
-		if (descriptionControl) {
-			descriptionControl.removeLayer(this);
-			descriptionControl._container.style.display = 'none'; // (j)		// refactor to descriptionControl
-		}
+		if ( descriptionControl ) descriptionControl._removeLayer(this);
 
 		this._added = false;
 	},
@@ -261,13 +263,11 @@ Wu.Layer = Wu.Class.extend({
 	},
 
 	getTitle : function () {
-		// override, get file title instead (if exists)
-		var file = this.getFile();
-		if (file) return file.getName();
 		return this.store.title;
 	},
 
 	setTitle : function (title) {
+
 		this.store.title = title;
 		this.save('title');
 
@@ -469,11 +469,8 @@ Wu.Layer = Wu.Class.extend({
 		this.setLegends(legends);
 	},
 
-	setStyle : function (postgis) {
-		if (!postgis) return console.error('no styloe to set!');
-		
-		this.store.data.postgis = postgis;
-		this.save('data');
+	setStyle : function () {
+
 	},
 
 	createLegends : function (callback) {
@@ -559,6 +556,17 @@ Wu.Layer = Wu.Class.extend({
 
 	},
 
+	downloadLayer : function () {
+
+	},
+	shareLayer : function () {
+		console.log('share layer', this);
+	},
+	deleteLayer : function () {
+		console.log('delete layer', this);
+	},
+	
+
 });
 
 
@@ -572,7 +580,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		this._inited = true;
 	},
 
-	update : function (options) {
+	update : function (options, callback) {
 		var map = app._map;
 
 		// remove
@@ -588,7 +596,29 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		if (options && options.enable) {
 			map.addLayer(this.layer);
 			this.layer.bringToFront();
+
 		}
+
+		callback && callback();
+	},
+
+	setStyle : function (postgis) {
+		if (!postgis) return console.error('no styloe to set!');
+		
+		this.store.data.postgis = postgis;
+		this.save('data');
+	},
+
+	// on change in style editor, etc.
+	updateStyle : function (style) {
+		var layerUuid = style.layerUuid,
+		    postgisOptions = style.options;
+
+		// save 
+		this.setStyle(postgisOptions);
+
+		// update layer option
+		this._refreshLayer(layerUuid);
 	},
 
 	_getLayerUuid : function () {
@@ -603,8 +633,25 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		return this.store.data.postgis.sql;
 	},
 
+	setFilter : function (filter) {
+		this.store.filter = filter;
+		this.save('filter');
+	},
+
+	getFilter : function () {
+		return this.store.filter;
+	},
+
 	getPostGISData : function () {
 		return this.store.data.postgis;
+	},
+
+	_refreshLayer : function (layerUuid) {
+		this.layer.setOptions({
+			layerUuid : layerUuid
+		});
+
+		this.layer.redraw();
 	},
 
 
@@ -618,7 +665,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		var layerUuid = this._getLayerUuid();
 		var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.png' + access_token;
 
-
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			layerUuid: this._getLayerUuid(),
@@ -626,9 +672,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 			maxRequests : 0,
 			maxZoom : 19
 		});
-
-		// load grid after all pngs.. (dont remember why..)
-		// Wu.DomEvent.on(this.layer, 'load', this._updateGrid, this);
 
 	},
 
@@ -642,6 +685,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		// and it's much more stable if gridlayer requests tiles after raster layer... perhpas todo: improve this hack!
 		// - also, removed listeners in L.UtfGrid (onAdd)
 		// 
+
 		if (this.gridLayer) {
 			this.gridLayer._update();
 		}
@@ -673,15 +717,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		this._addGridEvents();
 
 	},
-
-
-	// updateStyle : function () {
-	// 	return console.error('updateStyle, todo: remove');
-	// 	// set new options and redraw
-	// 	if (this.layer) this.layer.setOptions({
-	// 		cartoid : this.getCartoid(),
-	// 	});
-	// },
 
 
 	_fetchData : function (e, callback) {
@@ -718,10 +753,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		var event = e.e.originalEvent;
 
 		if (this._event === undefined || this._event.x == event.x) {
-			// open popup 
-			// app.MapPane.openPopup(e);
-
-			// console.log('pop 7 open');
+			
 		} else {
 			// clear old
 			app.MapPane._clearPopup();
@@ -740,7 +772,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		this._fetchData(e, function (ctx, json) {
 			
 			var data = JSON.parse(json);
-			console.log('fetched data: ', data);
 			e.data = data;
 			var event = e.e.originalEvent;
 			this._event = {
@@ -754,6 +785,57 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 
 	},
+
+
+	downloadLayer : function () {
+		
+		var options = {
+			layer_id : this.getUuid()
+		}
+
+		Wu.post('/api/layer/downloadDataset', JSON.stringify(options), this._downloadedDataset.bind(this));
+
+		// set progress
+		app.ProgressBar.timedProgress(2000);
+
+	},
+
+	_downloadedDataset : function (err, response) {
+
+		// parse results
+		var filePath = response;
+		var path = app.options.servers.portal;
+		path += 'api/file/download/';
+		path += '?file=' + filePath;
+		// path += '?raw=true'; // add raw to path
+		path += '&type=shp';
+		path += '&access_token=' + app.tokens.access_token;
+
+		// open (note: some browsers will block pop-ups. todo: test browsers!)
+		window.open(path, 'mywindow')
+
+	},
+
+	shareLayer : function () {
+		console.log('share layer postgis', this);
+	},
+	deleteLayer : function () {
+
+		// confirm
+		var message = 'Are you sure you want to delete this layer? \n - ' + this.getTitle();
+		if (!confirm(message)) return console.log('No layer deleted.');
+
+		// get project
+		var layerUuid = this.getUuid();
+		var project = _.find(app.Projects, function (p) {
+			return p.layers[layerUuid];
+		})
+
+		// delete layer
+		project.deleteLayer(this);
+
+	},
+	
 
 });
 

@@ -1,4 +1,4 @@
-Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
+Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 
 	// INITS
@@ -24,8 +24,15 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 
 		if (!this._project) return;
 
+		this._topButtonWrapper = Wu.DomUtil.create('div', 'chrome-layers-top-button-wrapper', this._container);
+
+		// Scroller
+		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
+		this._midOuterScroller = Wu.DomUtil.create('div', 'chrome-middle-section-outer-scroller', this._midSection);
+		this._midInnerScroller = Wu.DomUtil.create('div', 'chrome-middle-section-inner-scroller', this._midOuterScroller);
+
 		// Inner wrapper
-		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._container);
+		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 
 		// Init layer/baselayer toggle
 		this.initLayerBaselayerToggle();
@@ -76,17 +83,7 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 	},
 
 	open : function () {
-		console.log('open!', this);
 	},
-
-
-	// closed : function () {
-	// 	console.log('i was closed!');
-	// },
-
-	// hide : function () {
-	// 	console.log('i was hidden!');
-	// },
 
 
 
@@ -97,7 +94,7 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 
 	initLayerBaselayerToggle : function () {
 
-		var wrapper = Wu.DomUtil.create('div',   'chrome-layer-baselayer-toggle', this._fieldsWrapper);
+		var wrapper = Wu.DomUtil.create('div',   'chrome-layer-baselayer-toggle', this._topButtonWrapper);
 		this.baselayerButton = Wu.DomUtil.create('div', 'chrome-layer-toggle-button chrome-baselayer', wrapper, 'BASE LAYERS');
 		this.layerButton = Wu.DomUtil.create('div',     'chrome-layer-toggle-button chrome-layer layer-toggle-active', wrapper, 'LAYERS');
 
@@ -108,13 +105,19 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 	toggleToBaseLayers : function () {
 		Wu.DomUtil.addClass(this.baselayerButton, 'layer-toggle-active')
 		Wu.DomUtil.removeClass(this.layerButton, 'layer-toggle-active')
-		this._mode = 'baselayer';	
+
+		Wu.DomUtil.addClass(this._fieldsWrapper, 'editing-baselayers')
+
+		this._mode = 'baselayer';
 		this.update();		
 	},
 
 	toggleToLayers : function () {
 		Wu.DomUtil.removeClass(this.baselayerButton, 'layer-toggle-active')
 		Wu.DomUtil.addClass(this.layerButton, 'layer-toggle-active')
+
+		Wu.DomUtil.removeClass(this._fieldsWrapper, 'editing-baselayers')
+
 		this._mode = 'layer';
 		this.update();
 	},
@@ -161,8 +164,18 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 		
 		// set active or not
 		this._project.store.baseLayers.forEach(function (b) {
-			if ( uuid == b.uuid ) { on = true; return; } 
+			if ( uuid == b.uuid ) { 
+				on = true; 
+				return; 
+			} 
 		}.bind(this));
+
+
+		// get saved state of enabled-by-default
+		layermenuItem = _.find(this._project.store.layermenu, function (l) {
+			return l.layer == uuid;
+		});
+		var enabledByDefault = layermenuItem && layermenuItem.enabled;
 
 		var lineOptions = {
 			key 		: uuid,
@@ -171,7 +184,9 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 			title 		: layerTitle,
 			isOn 		: on,
 			rightPos	: false,
-			type 		: 'switch'
+			type 		: 'switch',
+			radio 		: true,
+			radioOn		: enabledByDefault
 		}
 
 		this._createMetaFieldLine(lineOptions);
@@ -203,9 +218,7 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 			}
 			for (var l in layers) {
 				var layer = layers[l];
-
 				if (layer) {
-
 					if (layer.store && layer.store.data.hasOwnProperty(key)) {
 						sort.layers.push(layer)
 					}
@@ -214,33 +227,24 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 			results.push(sort);
 		}, this);
 
-		// console.log('SROOTED', results);
 		this.numberOfProviders = results.length;
 		return results;
 	},
 
 
-
-
-
-
-	// UPDATE
-	// UPDATE
 	// UPDATE		
-
 	update : function () {
 
 		if ( !this._mode ) this._mode = 'layer';
-
 		if ( this._mode == 'baselayer' ) this.markBaseLayerOccupied();
 		if ( this._mode == 'layer' )     this.markLayerOccupied();
 		
 		this.updateSwitches();
+		this.updateRadios();
 	},
 
 
 	// MARK BASE LAYERS AS OCCUPIED
-
 	markBaseLayerOccupied : function () {
 
 		// get layers and active baselayers
@@ -262,9 +266,7 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 	},
 
 	// MARK LAYERS AS OCCUPIED
-
 	markLayerOccupied : function () {
-
 
 		var project = this._project;
 
@@ -283,31 +285,129 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 	},
 
 	// SET LAYER AS NOT OCCUPIED
-
 	activateLayer : function (layerUuid) {
-
 		var id = 'field_wrapper_' + layerUuid;
 		var elem = Wu.DomUtil.get(id);
-
 		Wu.DomUtil.removeClass(elem, 'deactivated-layer');
-
 	},
 
 	// SET LAYER AS OCCUPIED
-
 	deactivateLayer : function (layerUuid) {
-
 		var id = 'field_wrapper_' + layerUuid;
 		var elem = Wu.DomUtil.get(id);
-
 		Wu.DomUtil.addClass(elem, 'deactivated-layer');
+	},
+
+	// Toggle radio
+	toggleRadio : function (e) {
+		var elem = e.target;
+		var state = elem.getAttribute('state');
+		state == 'true' ? this.radioOff(elem) : this.radioOn(elem);
+	},
+
+	radioOn : function (elem) {
+
+		var id = elem.id;
+		var layer_id = id.slice(6, id.length);		
+
+		Wu.DomUtil.addClass(elem, 'radio-on');
+		elem.setAttribute('state', 'true');
+
+		// save state
+		var layerMenu = app.MapPane.getControls().layermenu;
+		layerMenu._setEnabledOnInit(layer_id, true);
 
 	},
 
+	radioOff : function (elem) {
+
+		var id = elem.id;
+		var layer_id = id.slice(6, id.length);
+
+		Wu.DomUtil.removeClass(elem, 'radio-on');
+		elem.setAttribute('state', 'false');
+
+		// save state
+		var layerMenu = app.MapPane.getControls().layermenu;
+		layerMenu._setEnabledOnInit(layer_id, false);
+	},
+
+
+
+	// UPDATE RADIOS
+	// UPDATE RADIOS
+	// UPDATE RADIOS	
+
+
+	updateRadios : function () {
+
+	       	this.sortedLayers.forEach(function (provider) {
+	       		provider.layers.forEach(function (layer) {
+	       			this.updateRadio(layer);
+	       		}, this);
+	       	}, this);		
+	},
+
+
+	updateRadio : function (layer) {
+
+		// Get title 
+		var layerTitle = layer.getTitle();
+		var uuid       = layer.store.uuid;
+		var layerActive = false;
+		
+
+		// Only show radio if layer is active...
+		if (this._mode == 'layer') {
+			this._project.store.layermenu.forEach(function (b) {
+				if ( uuid == b.layer ) { layerActive = true; return; }
+			}, this);
+		}
+
+		// Get switch
+		var s = Wu.DomUtil.get('radio_' + uuid);
+
+		if (layerActive) {
+			Wu.DomUtil.removeClass(s, 'displayNone');
+		} else {
+			Wu.DomUtil.addClass(s, 'displayNone');		
+		}
+	},	
+
 
 	// UPDATE SWITCHES
 	// UPDATE SWITCHES
 	// UPDATE SWITCHES
+
+	// Toggle switch
+	toggleSwitch : function (e) {
+
+		// get state
+		var stateAttrib = e.target.getAttribute('state');
+		var on = (stateAttrib == 'true');
+		var key = e.target.getAttribute('key');
+
+		if ( on ) {
+			e.target.setAttribute('state', 'false');
+			Wu.DomUtil.removeClass(e.target, 'switch-on');
+			var isOn = false;		
+
+			// Turn off radio
+			var radioElem = Wu.DomUtil.get('radio_' + key);
+			this.radioOff(radioElem);
+			
+		} else {
+			e.target.setAttribute('state', 'true');
+			Wu.DomUtil.addClass(e.target, 'switch-on');
+			var isOn = true;
+		}	
+
+		// save
+		this._saveToServer(key, '', isOn)
+
+		// Update radios
+		this.updateRadios();
+	},	
 
 	updateSwitches : function () {
 
@@ -411,13 +511,10 @@ Wu.Chrome.Content.Layers = Wu.Chrome.Content.extend({
 
 		var layerMenu = app.MapPane.getControls().layermenu;
 		layerMenu.add(layer);
-
 	},
 
 	// DISABLE LAYER (AND SAVE)
 	disableLayer : function (uuid) {
-
-		console.log(uuid);
 
 		var layer = this._project.layers[uuid];
 		var _uuid = layer.store.uuid;

@@ -30,7 +30,7 @@ Wu.Socket = Wu.Class.extend({
 
 		socket.on('server_stats', function (data) {
 			var stats = data.server_stats;
-			app.Chrome.Top.updateCPUclock(stats.cpu_usage);
+			if (app.Chrome) app.Chrome.Top.updateCPUclock(stats.cpu_usage);
 		})
 
 		socket.on('connect', function(){
@@ -62,7 +62,8 @@ Wu.Socket = Wu.Class.extend({
 			// notify data lib
 			var file_id = data.file_id;
 			var import_took_ms = data.import_took_ms;
-			app.SidePane.DataLibrary._socketNotificationOfDoneFile(file_id, import_took_ms);
+
+			app.Data._onImportedFile(file_id, import_took_ms);
 			
 		});
 		socket.on('errorMessage', function (data) {
