@@ -44,7 +44,7 @@ module.exports = api.error = {
 	unauthorized : function (req, res) {
 		console.log('api.error.unauthorized'.red);
 		
-		var message = "Don't be cheeky! All your IP are belong to us.";
+		var message = "Don't be cheeky! All your IP's are belong to us.";
 		res.end(JSON.stringify({ 
 			error : message 
 		}));
@@ -138,7 +138,7 @@ module.exports = api.error = {
 		    fileLine = options.file.split('/').reverse()[0] + ':' + options.line,
 		    find = api.config.portalServer.uri,
 		    re = new RegExp(find, 'g'),
-		    cleanStack = stack.replace(re, ''),
+		    cleanStack = stack ? stack.replace(re, '') : '',
 		    text = '*Error*: ' + domain + ' `' + fileLine + '` ```' + cleanStack + '```';
 
 		// send error to slack

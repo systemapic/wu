@@ -14,9 +14,9 @@ var redis = require('redis');
 var config = api.config;
 
 // token redis
-var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host);
-r.auth(config.tokenRedis.auth);
-r.on('error', console.error);
+// var r = redis.createClient(config.tokenRedis.port, config.tokenRedis.host);
+// r.auth(config.tokenRedis.auth);
+// r.on('error', console.error);
 
 // expose this function to our app using module.exports
 module.exports = function(passport) {
@@ -66,20 +66,8 @@ module.exports = function(passport) {
 				// check to see if there's already a user with that email
 				if (user) return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
 
-				// if there is no user with that email,
-				// create the user
-				var newUser            = new User();
-
-				// set the user's local credentials
-				newUser.local.email    = email;
-				newUser.local.password = newUser.generateHash(password);
-				newUser.uuid = 'user-' + uuid.v4();
-
-				// save the user
-				newUser.save(function(err) {
-					if (err) console.error(err);
-					return done(null, newUser);
-				});
+				// register user
+				api.user.register(req.body, done);
 			});    
 		});
 	}));
@@ -98,32 +86,39 @@ module.exports = function(passport) {
 	},
 	function(req, email, password, done) { // callback with email and password from our form
 	  
+		var invite_token = req.body.invite_token;
+		console.log('invite_token', invite_token);
 
 		// find a user whose email is the same as the forms email
 		// we are checking to see if the user trying to login already exists
 		User.findOne({ 'local.email' :  email }, function(err, user) {
 
-			console.log('found user: ', user, password);
-
 			// if there are any errors, return the error before anything else
 			if (err) return done(err);
 
 			// if no user is found, return the message
-			if (!user) return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
+			if (!user) return done(null, false, req.flash('loginMessage', 'Oops! Bad credentials.')); // req.flash is the way to set flashdata using connect-flash
 
 			// if the user is found but the password is wrong
-			if (!user.validPassword(password)) return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
+			if (!user.validPassword(password)) return done(null, false, req.flash('loginMessage', 'Oops! Bad credentials.')); // create the loginMessage and save it to session as flashdata
 
-			// set token, save to user
-			user.token = setRedisToken(user);
-			user.save(function (err) {
-				if (err) console.error(err);
+			// process invite token
+			api.user._processInviteToken({
+				invite_token : invite_token,
+				user : user
+			}, function (err, project_id){
 
-				// slack
-				api.slack.loggedIn({user : user});
+				// set token, save to user
+				user.token = setRedisToken(user);
+				user.save(function (err) {
+					if (err) console.error(err);
 
-				// all is well, return successful user
-				return done(null, user);
+					// slack
+					api.slack.loggedIn({user : user});
+
+					// all is well, return successful user
+					return done(null, user);
+				});
 			});
 		});
 	}));
@@ -134,11 +129,10 @@ module.exports = function(passport) {
 	// BEARER ACCESS TOKEN =====================================================
 	// =========================================================================
 	// calls made to API endpoints with an access_token
-	//
 	passport.use(new BearerStrategy(
 		function (accessToken, done) {
 
-			console.log('passport.js:193 BearerStrategy > accessToken'.yellow, accessToken); // is used when calling API endpoint with access_token
+			// console.log('passport.js:193 BearerStrategy > accessToken'.yellow, accessToken); // is used when calling API endpoint with access_token
 
 			api.oauth2.store.accessTokens.find(accessToken, function (err, token) {
 				if (err) return done(err);
@@ -187,8 +181,6 @@ module.exports = function(passport) {
 	passport.use(new BasicStrategy(
 		function (username, password, done) {
 
-			console.log('auth.js:53 BasicStrategy'.yellow, username, password);
-
 			api.oauth2.store.clients.findByClientId(username, function (err, client) {
 				if (err) return done(err);
 				
@@ -198,7 +190,6 @@ module.exports = function(passport) {
 					return done(null, false);
 				}
 
-				console.log('found client!', client.clientId);
 				return done(null, client);
 			});
 		}
@@ -226,7 +217,7 @@ module.exports = function(passport) {
 		var token = key + '.' + crypto.randomBytes(12).toString('hex');  // ASFSAlkdmflsdkfmdslk2lk  // random string
 
 		// async set
-		r.set(key, token);
+		api.redis.temp.set(key, token);
 		
 		// return token
 		return token;

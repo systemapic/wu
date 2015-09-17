@@ -35,6 +35,24 @@ may need to be adjusted to function on all browsers.
 	@keyframes linkFader {		0% { background-color: #fefae2; } 100% { background-color: white; }}	
 
 
+.share-link-pdf {
+	-webkit-animation: linkFader 2500ms ease;
+	-webkit-animation-fill-mode: forwards;
+	-moz-animation: linkFader 2500ms ease;
+	-moz-animation-fill-mode: forwards;
+	-o-animation: linkFader 2500ms ease;
+	-o-animation-fill-mode: forwards;
+	animation: linkFader 2500ms ease;
+	animation-fill-mode: forwards;
+
+	}
+
+	@-webkit-keyframes linkFader {	0% { background-color: #71c4a8; } 100% { background-color: white; }}	
+	@-moz-keyframes linkFader {	0% { background-color: #71c4a8; } 100% { background-color: white; }}	
+	@-o-keyframes linkFader {	0% { background-color: #71c4a8; } 100% { background-color: white; }}	
+	@keyframes linkFader {		0% { background-color: #71c4a8; } 100% { background-color: white; }}	
+
+
 /* Open Info Menu */
 /*IS THIS ONE STILL VALID???*/
 .open-uncollapse {
@@ -202,20 +220,15 @@ input[type=checkbox] + label.check {
 	}*/
 
 .q-editor-container {
-	-webkit-transition: height 250ms ease, width 250ms ease;
+/*	-webkit-transition: height 250ms ease, width 250ms ease;
 	-moz-transition: height 250ms ease, width 250ms ease;
 	transition: height 250ms ease, width 250ms ease;	
-	}	
+*/	}	
 
 .q-editor-content-item {
-
-	-webkit-transition: opacity 250ms ease;
+/*	-webkit-transition: opacity 250ms ease;
 	-moz-transition: opacity 250ms ease;
 	transition: opacity 250ms ease;
-
-/*	-webkit-transition: height 250ms ease, width 250ms ease, padding 250ms ease;
-	-moz-transition: height 250ms ease, width 250ms ease, padding 250ms ease;
-	transition: height 250ms ease, width 250ms ease, padding 250ms ease;
 */	}
 
 #header {
@@ -226,11 +239,11 @@ input[type=checkbox] + label.check {
 	}
 
 .leaflet-top.leaflet-right {
-	-webkit-transition: bottom 250ms ease, right 250ms ease;
+/*	-webkit-transition: bottom 250ms ease, right 250ms ease;
 	-moz-transition: bottom 250ms ease, right 250ms ease;	
 	-o-transition: bottom 250ms ease, right 250ms ease;	
 	transition: bottom 250ms ease, right 250ms ease;	
-	}
+*/	}
 
 .uncollapse-killer {
 	-webkit-transition: width 250ms ease, height 250ms ease, left 250ms ease, margin 250ms ease;
@@ -315,7 +328,7 @@ input[type=checkbox] + label.check {
 #editor-map-initpos-coordinates,
 #editor-map-bounds-coordinates,
 .settings-outer,
-.q-editor-menu,
+/*.q-editor-menu,*/
 .project-item {
 	-webkit-transition: height 250ms ease;
 	-moz-transition: height 250ms ease;

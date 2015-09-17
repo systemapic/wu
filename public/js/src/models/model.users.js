@@ -3,6 +3,56 @@ Wu.User = Wu.Class.extend({
 	initialize : function (store) {
 		this.store = store;
 		this.lastSaved = _.cloneDeep(store);
+
+		// init file objects
+		this.initFiles();
+	},
+
+	initFiles : function () {
+
+		// get files
+		var files = this.store.files;
+		this._files = {};
+		if (!files) return;
+
+		// create
+		files.forEach(function (file) {
+			this._files[file.uuid] = new Wu.Files(file);
+		}, this);
+	},
+
+	getFiles : function () {
+		return this._files;
+	},
+
+	getFileStore : function (fileUuid) {
+		var file = _.find(this.store.files, function (f) {
+			return f.uuid == fileUuid;
+		});
+		return file;
+	},
+
+	getFile : function (fileUuid) {
+		return this._files[fileUuid]; // return object
+	},
+
+
+	setFile : function (file) {
+		this.store.files.push(file);
+		this._files[file.uuid] = new Wu.Files(file);
+		return this._files[file.uuid];
+	},
+
+	removeFile : function (file) {
+		var fileUuid = file.file_id;
+		var r = _.remove(this.store.files, function (f) {
+			return f.uuid ==fileUuid;
+		});
+
+		this._files[fileUuid] = null;
+		delete this._files[fileUuid];
+
+		console.log('REMMM r', r);
 	},
 
 	// set functions

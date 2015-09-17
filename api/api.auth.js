@@ -55,7 +55,7 @@ module.exports = api.auth = {
 		var token = req.body.token;
 		var password = req.body.password;
 
-		api.redis.get(token, function (err, userUuid) {
+		api.redis.temp.get(token, function (err, userUuid) {
 			if (err || !userUuid) return res.end(JSON.stringify({
 				err : err || 'Invalid token'
 			}));
@@ -100,7 +100,7 @@ module.exports = api.auth = {
 
 		// check token
 		var token = req.body.token;
-		api.redis.get(token, function (err, userUuid) {
+		api.redis.temp.get(token, function (err, userUuid) {
 			return res.end(JSON.stringify({
 				valid : userUuid ? true : false
 			}));
@@ -122,10 +122,10 @@ module.exports = api.auth = {
 		    key = user.uuid;
 
 		// set temp token
-		api.redis.set(token, key);  
+		api.redis.temp.set(token, key);  
 		
 		// expire in ten mins
-		if (!dontexpire) api.redis.expire(token, 600); 
+		if (!dontexpire) api.redis.temp.expire(token, 600); 
 
 		return token;
 	},
