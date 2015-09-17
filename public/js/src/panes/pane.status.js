@@ -274,22 +274,11 @@ Wu.StatusPane = Wu.Class.extend({
 
 	setContentHeights : function () {
 
-		// var clientsPane = app.SidePane.Clients;
-		// var optionsPane = app.SidePane.Options;
-
-		// if (clientsPane) clientsPane.setContentHeight();
-		// if (optionsPane) optionsPane.setContentHeight();
+		
 	},
 
 	checkMapBlur : function () {
 
-		// var blur = false;
-
-		// if ( app._activeMenuItem == 'users'       && app.SidePane.Users.fullsize ) 	 blur = true;
-		// if ( app._activeMenuItem == 'dataLibrary' && app.SidePane.DataLibrary.fullsize ) blur = true;
-		// if ( app._activeMenuItem == 'documents' )					 blur = true;
-
-		// if ( blur ) Wu.DomUtil.addClass(app.MapPane._container, "map-blur");	
 		
 
 

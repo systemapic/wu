@@ -1,4 +1,4 @@
-Wu.Chrome.Content = Wu.Chrome.extend({
+Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	_initialize : function () {
 
@@ -26,6 +26,14 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 	_windowResize : function () {
 
+	},
+
+	_onLayerAdded : function () {
+		this._refresh();
+	},
+
+	_onLayerEdited : function () {
+		this._refresh();
 	},
 
 	show : function () {
@@ -62,10 +70,8 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 	
 	// Hides the "add folder" in layer menu
 	_hideLayerEditor : function () {
-
 		var layerMenu = app.MapPane.getControls().layermenu;
 		if (layerMenu) layerMenu.disableEdit();
-
 	},
 
 	_projectSelected : function (e) {
@@ -81,16 +87,15 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 
 	_refresh : function () {
-
 	},
 
-	_initLayout_activeLayers : function (title, subtitle) {
+	_initLayout_activeLayers : function (title, subtitle, container) {
 
 		var title = title || 'Layer';
 		var subtitle = subtitle || 'Select a layer to style...';
 
 		// active layer wrapper
-		var wrap = this._activeLayersWrap = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper', this._container);
+		var wrap = this._activeLayersWrap = Wu.DomUtil.create('div', 'chrome chrome-content styler-content active-layer wrapper', container);
 
 		// title
 		var title = Wu.DomUtil.create('div', 'chrome chrome-content active-layer title', wrap, title);
@@ -119,13 +124,63 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		Wu.DomEvent.on(select, 'change', this._selectedActiveLayer, this); // todo: mem leak?
 
 
+		return select;
+
+	},
+
+
+	_storeActiveLayerUuid : function (uuid) {
+		app.Chrome.Right.options.editingLayer = uuid;
+	},
+
+	_getActiveLayerUuid : function () {
+		var uuid;
+		app.Chrome.Right.options.editingLayer ? uuid = app.Chrome.Right.options.editingLayer : uuid = false;
+		return uuid;
 	},
 
 	opened : function () {
 	},
 
 	closed : function () {
-		console.log('i was also closed!', this);
+		
+	},
+
+
+	// add layer temporarily for editing
+	_tempaddLayer : function () {
+
+		// remember
+		this._temps = this._temps || [];
+
+		// remove others
+		this._tempRemoveLayers();
+
+		// if not already added to map
+		if (!this._layer._added) {
+
+			// add
+			this._layer._addThin();
+
+			// remember
+			this._temps.push(this._layer);
+
+			// move into view
+			this._layer.flyTo();
+		}
+
+	},
+
+	// remove temp added layers
+	_tempRemoveLayers : function () {
+		if (!this._temps) return;
+
+		// remove other layers added tempy for styling
+		this._temps.forEach(function (layer) {
+			layer._removeThin();
+		}, this);
+
+		this._temps = [];
 	},
 
 
@@ -165,7 +220,7 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 				fieldSwitch.setAttribute('state', 'true');
 			} else {
 				fieldSwitch.setAttribute('state', 'false');
-			}	    
+			}
 
 			// Add hooks
 			Wu.DomEvent.on(fieldSwitch, 'click', this.toggleSwitch, this);		    
@@ -285,10 +340,7 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		if ( type == 'colorrange' ) {
 
 			// Set styling
-			var gradientStyle = 'background: -webkit-linear-gradient(left, ' + val.join() + ');';
-			gradientStyle    += 'background: -o-linear-gradient(right, '     + val.join() + ');';
-			gradientStyle    += 'background: -moz-linear-gradient(right, '   + val.join() + ');';
-			gradientStyle    += 'background: linear-gradient(to right, '     + val.join() + ');';
+			var gradientStyle = this._gradientStyle(val);
 
 			var colorRangeWrapper = Wu.DomUtil.create('div', 'chrome-color-range-wrapper', fieldWrapper)
 			    colorRangeWrapper.setAttribute('key', key);
@@ -305,28 +357,90 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 			var colorSelectorWrapper = Wu.DomUtil.create('div', 'chrome-color-selector-wrapper displayNone', colorRangeWrapper);
 			    colorSelectorWrapper.id = 'chrome-color-selector-wrapper-' + key;
 
-			var colorBall_3 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-3', colorSelectorWrapper);
-			    colorBall_3.id = 'color-range-ball-3-' + key;
-			    colorBall_3.style.background = val[2];
-			    colorBall_3.setAttribute('hex', val[2]);
-			    
-			var colorBall_2 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-2', colorSelectorWrapper);
-			    colorBall_2.id = 'color-range-ball-2-' + key;
-			    colorBall_2.style.background = val[1];
-			    colorBall_2.setAttribute('hex', val[1]);
 
-			var colorBall_1 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-1', colorSelectorWrapper);
+			var colorBallWrapper = Wu.DomUtil.create('div', 'chrome-color-ball-wrapper', colorSelectorWrapper)
+
+			var colorBall_3 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-3', colorBallWrapper);
+			    colorBall_3.id = 'color-range-ball-3-' + key;
+			    colorBall_3.style.background = val[4];
+			    colorBall_3.setAttribute('hex', val[4]);
+			    
+			var colorBall_2 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-2', colorBallWrapper);
+			    colorBall_2.id = 'color-range-ball-2-' + key;
+			    colorBall_2.style.background = val[2];
+			    colorBall_2.setAttribute('hex', val[2]);
+
+			var colorBall_1 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-1', colorBallWrapper);
 			    colorBall_1.id = 'color-range-ball-1-' + key;
 			    colorBall_1.style.background = val[0];
 			    colorBall_1.setAttribute('hex', val[0]);			        			    			    
 
+
+			    console.log('');
+			    console.log('');
+			    console.log('');
+			    console.log('');
+			    console.log('');
+			    console.log('val', val);
+			    console.log('');
+			    console.log('');
+			    console.log('');
+			    console.log('');
+			    console.log('');
+
+			    
 			    this.initSpectrum(this, val[0], colorBall_1, key);
-			    this.initSpectrum(this, val[1], colorBall_2, key);
-			    this.initSpectrum(this, val[2], colorBall_3, key);
+			    this.initSpectrum(this, val[2], colorBall_2, key);
+			    this.initSpectrum(this, val[4], colorBall_3, key);
+
+
+			// Color range presets
+			// Color range presets
+			// Color range presets
+
+			var colorRangePresetWrapper = Wu.DomUtil.create('div', 'color-range-preset-wrapper', colorSelectorWrapper);
+
+			var colorRangesPresets = [
+				['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'],
+				['#0000ff', '#00ffff', '#00ff00', '#ffff00', '#ff0000'],
+				['#ff007d', '#ffff00', '#007dff'],
+				['#ff7d00', '#ffff00', '#00ff7d'],
+				['#ff00ff', '#ffff00', '#00ffff'],
+				['#ffff00', '#ff00ff', '#00ffff'],
+				['#ff007d', '#ffff00'],
+				['#0000ff', '#ffff00'],
+				['#ff7d00', '#00ff00']
+			]
+
+			colorRangesPresets.forEach(function(preset, i) {
+
+				var gradientStyle = this._gradientStyle(preset);
+				var colorRangePreset = Wu.DomUtil.create('div', 'color-range-preset', colorRangePresetWrapper);
+				    colorRangePreset.id = 'color-range-preset-' + i;
+				    colorRangePreset.setAttribute('style', gradientStyle);
+				    colorRangePreset.setAttribute('hex', preset.join(','));
+
+				    Wu.DomEvent.on(colorRangePreset, 'click', this.selectColorPreset, this);
+
+			}.bind(this))
 
 			Wu.DomEvent.on(color, 'click', this.toggleColorRange, this);
-
 			Wu.DomEvent.on(clickCatcher, 'click', this.stopEditingColorRange, this);
+		}
+
+		if ( options.radio ) {
+
+			var radio = Wu.DomUtil.create('div', 'layer-radio', fieldWrapper);
+			radio.id = 'radio_' + key;
+
+			if ( options.radioOn ) {
+				Wu.DomUtil.addClass(radio, 'radio-on');
+				radio.setAttribute('state', 'true');
+			} else {
+				radio.setAttribute('state', 'false');
+			}
+
+			Wu.DomEvent.on(radio, 'click', this.toggleRadio, this);
 		}
 
 
@@ -335,7 +449,7 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 		}
 
 		// Create input field
-		if (input) {
+		if ( input ) {
 
 			// create
 			var fieldName = Wu.DomUtil.createId('input', 'field_input_' + key, fieldWrapper);
@@ -356,6 +470,18 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 			var fieldName = Wu.DomUtil.create('div', 'chrome-field-line', fieldWrapper);
 			fieldName.innerHTML = title ? title : key;
 		}
+	},
+
+
+	_gradientStyle : function (colorArray) {
+
+		var gradientStyle = 'background: -webkit-linear-gradient(left, ' + colorArray.join() + ');';
+		gradientStyle    += 'background: -o-linear-gradient(right, '     + colorArray.join() + ');';
+		gradientStyle    += 'background: -moz-linear-gradient(right, '   + colorArray.join() + ');';
+		gradientStyle    += 'background: linear-gradient(to right, '     + colorArray.join() + ');';
+
+		return gradientStyle;
+
 	},
 
 	initSpectrum : function (context, hex, wrapper, key) {
@@ -390,6 +516,11 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 	},
 
+
+	selectColorPreset : function (e) {
+
+	},
+
 	
 	toggleColorRange : function (e) {
 	        
@@ -415,17 +546,6 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 	},
 
-	// _closeColorRangeSelector : function () {
-
-	// 	var key = 'colorrange';
-
-	// 	var rangeSelector = Wu.DomUtil.get('chrome-color-selector-wrapper-' + key);
-	// 	var clickCatcher = Wu.DomUtil.get('click-catcher-' + key);
-
-	// 	Wu.DomUtil.addClass(rangeSelector, 'displayNone');
-	// 	Wu.DomUtil.addClass(clickCatcher, 'displayNone');		
-
-	// },
 
 	// Make sure hex decimals have two digits
 	padToTwo : function (numberString) {
@@ -456,6 +576,12 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 		// only allow '0-9' + '.' and '-'
 		return e.charCode >= 45 && e.charCode <= 57 && e.charCode != 47;
+
+	},
+
+
+	// Toggle radio
+	toggleRadio : function (e) {
 
 	},
 
@@ -509,32 +635,29 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 	},
 
 	toggleSet : function (e) {
-
 		var elem  = e.target;
 		var id    = elem.id;
 		var key   = elem.getAttribute('key')
-
 		this.saveSet(key);
 	},
-
-
 
 	_init_miniDropDown : function (array, wrap, _key, selected) {
 
 		// create dropdown
 		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-mini-dropdown active-field select-field-wrap', wrap);
 		var select = this._select = Wu.DomUtil.create('select', 'active-field-select', selectWrap);
-		    select.setAttribute('key', _key);
+		select.setAttribute('key', _key);
+
+		if ( selected ) Wu.DomUtil.addClass(selectWrap, 'full-width');
 
 		// get layers
 		var layers = this._project.getPostGISLayers();
 
 		// placeholder
 		var option = Wu.DomUtil.create('option', '', select);
-		option.innerHTML = 'select field';
+		option.innerHTML = 'Select column...';
 		option.setAttribute('disabled', '');
 		option.setAttribute('selected', '');
-
 
 		// fill select options
 		array.forEach(function (field) {
@@ -552,63 +675,31 @@ Wu.Chrome.Content = Wu.Chrome.extend({
 
 	// Saver dummy
 	_selectedMiniDropDown : function () {
-
-		console.log('%c ***************************** ', 'background: red; color: white');
-		console.log('%c Did you foget something?', 'color: blue');
-		console.log('%c Function "_selectedMiniDropDown" fired from parent function...', 'color: blue');
-		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
-		console.log('%c ***************************** ', 'background: red; color: white');
+		console.log('%c Function "_selectedMiniDropDown" fired from parent function => nothing happens', 'background: red; color: white');
 	},
 
 	// Saver dummy
 	saveMiniBlur : function () {
-
-		console.log('%c ***************************** ', 'background: red; color: white');
-		console.log('%c Did you foget something?', 'color: blue');
-		console.log('%c Function "saveMiniBlur" fired from parent function...', 'color: blue');
-		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
-		console.log('%c ***************************** ', 'background: red; color: white');
+		console.log('%c Function "saveMiniBlur" fired from parent function => nothing happens', 'background: red; color: white');
 	},
 
 	// Saver dummy
 	saveFromBlur : function () {
-
-		console.log('%c *****************************', 'background: red; color: white');
-		console.log('%c Did you foget something?', 'color: blue');
-		console.log('%c Function "saveFromBlur" fired from parent function...', 'color: blue');
-		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
-		console.log('%c ***************************** ', 'background: red; color: white');
+		console.log('%c Function "saveFromBlur" fired from parent function => nothing happens', 'background: red; color: white');
 	},
 
 	// Saver dummy
 	_saveToServer : function () {
-
-		console.log('%c ***************************** ', 'background: red; color: white');
-		console.log('%c Did you foget something?', 'color: blue');
-		console.log('%c Function "_saveToServer" fired from parent function...', 'color: blue');
-		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
-		console.log('%c ***************************** ', 'background: red; color: white');
+		console.log('%c Function "_saveToServer" fired from parent function => nothing happens', 'background: red; color: white');
 	},
 
 
 	saveSetClear : function () {
-
-		console.log('%c ***************************** ', 'background: red; color: white');
-		console.log('%c Did you foget something?', 'color: blue');
-		console.log('%c Function "saveSetClear" fired from parent function...', 'color: blue');
-		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
-		console.log('%c ***************************** ', 'background: red; color: white');
-
+		console.log('%c Function "saveSetClear" fired from parent function => nothing happens', 'background: red; color: white');
 	},
 
 	saveSet : function () {
-
-		console.log('%c ***************************** ', 'background: red; color: white');
-		console.log('%c Did you foget something?', 'color: blue');
-		console.log('%c Function "saveSet" fired from parent function...', 'color: blue');
-		console.log('%c It should be fired from the setting you\'re working in', 'color: blue');
-		console.log('%c ***************************** ', 'background: red; color: white');
-
+		console.log('%c Function "saveSet" fired from parent function => nothing happens', 'background: red; color: white');
 	},
 
 	_validateDateFormat : function (key) {

@@ -1,8 +1,16 @@
 var feedbackTimer;
 
 
-
 check_token();
+
+function check_invite() {
+	var search = window.location.search;
+	if (!search) return;
+	var invite_token = search.split('?')[1].split('invite=')[1];
+	var input = document.getElementById('invite_input');
+	input.value = invite_token;
+}
+
 function check_token() {
 	if (!checkToken()){
 		var ie = document.getElementById('input-email');
@@ -17,11 +25,9 @@ function check_token() {
 	}
 
 	sendRequest('/reset/checktoken', options, function (err, body){
-		console.log('checked token', err, body);
 
 		var response = JSON.parse(body);
 		if (!response.valid) {
-			console.error('invalid token');
 			
 			showForgotPassword();
 
@@ -35,23 +41,10 @@ function check_token() {
 }
 
 window.onload = function () {
-	// console.log('window.onload');
-
-	// We need to access the form element
-	// var form = document.getElementById("login-form");
-
-
-	
-
-	// var p = document.getElementById('password-input');
-	// var r = document.getElementById('password-repeat');
-	// p.onkeyup = keyedup;
-	// r.onkeyup = keyedup;
-
+	check_invite();
 }
 
 function login_key_up() {
-	console.log('KEYOU')
 }
 
 function initScripts() {
@@ -74,9 +67,7 @@ function getToken() {
 }
 
 function getPortal() {
-	console.log('getPortal');
-
-	var url = window.location.origin + '/portal';
+	// var url = window.location.origin + '/portal';
 	var http = new XMLHttpRequest();
 	http.open( "GET", url, false );
 	http.setRequestHeader('Authorization', 'Bearer ' + window.access_token); 
@@ -99,8 +90,6 @@ function sendAccessTokenRequest(entryPoint, options, callback) {
 	http.send(JSON.stringify(options));
 }
 
-
-
 function spin() {
 
 	// spinning map + logo
@@ -121,7 +110,6 @@ function checkmobile() {
 		styletag.innerHTML = styleURL;
 	}
 }
-
 
 function addhooks() {
 
@@ -149,7 +137,6 @@ function addhooks() {
 	// create password
 	var createButton = document.getElementById('create-button');
 	createButton.onclick = submitNewPassword;
-
 }
 
 function submitNewPassword () {	
@@ -320,27 +307,6 @@ function sendLoginCheck (options, callback) {
 	}
 
 	http.send(JSON.stringify(options));
-}
-
-function debugSetPassword () {
-
-	var http = new XMLHttpRequest(),
-	    url = window.location.origin + '/debugSetPassword';
-
-	http.open("POST", url, true);
-
-	//Send the proper header information along with the request
-	http.setRequestHeader('Content-type', 'application/json');
-
-	http.onreadystatechange = function() {
-		if (http.readyState == 4 && http.status == 200) {
-
-			// callback
-			callback && callback(null, http.responseText); 
-		}
-	}
-
-	http.send(JSON.stringify({debug : true}));
 }
 
 

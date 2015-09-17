@@ -50,6 +50,210 @@ var api = module.parent.exports;
 module.exports = api.postgis = { 
 
 	
+
+	deleteTable : function (options, done) {
+		var database_name = options.database_name,
+		    table_name = options.table_name,
+		    DROP_TABLE_SCRIPT = '../scripts/postgis/drop_table.sh';
+
+		// missing information
+		if (!database_name || !table_name) return api.error.missingInformation(req, res);
+
+		// validation
+		if (!table_name.length == 25) return api.error.general(req, res, 'Invalid table name!' + table_name);
+
+		var command = [
+			DROP_TABLE_SCRIPT,
+			database_name,
+			table_name
+		].join(' ');
+
+		// create database in postgis
+		exec(command, {maxBuffer: 1024 * 50000}, function (err) {
+			if (err) return done(err);
+			done(null);
+		});
+	},
+
+
+	downloadDatasetFromLayer : function (req, res) {
+
+		var options = req.body,
+		    layerUuid = options.layer_id,
+		    format = options.format,
+		    ops = [];
+
+		ops.push(function (callback) {
+			Layer
+			.findOne({uuid : layerUuid})
+			.exec(callback);
+		});
+
+		ops.push(function (layer, callback) {
+
+			var options = {
+				database_name 	: layer.data.postgis.database_name,
+				table_name 	: layer.data.postgis.table_name,
+				data_type 	: layer.data.postgis.data_type,
+				query 		: api.postgis._cleanSQLQuery(layer.data.postgis.sql),
+				name 		: layer.title.replace(/ /g,'').replace('.zip', '')
+			}
+
+			// get dataset
+			api.postgis.downloadDataset(options, callback);
+		});
+
+		async.waterfall(ops, function (err, results) {
+			res.end(results);
+		});
+
+	},
+
+	_cleanSQLQuery : function (sql) {
+		var sql = sql;
+		var a = sql.replace('(', '');
+		var b = a.replace(') as sub', '');
+		var c = b.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var c = c.replace('\n', ' ');
+		var cleanSQL = '"' + c + '"';
+		return cleanSQL;
+	},
+
+
+	downloadDatasetFromFile: function (req, res) {
+		var options = req.body,
+		    fileUuid = options.file_id,
+		    format = options.format,
+		    ops = [];
+
+		ops.push(function (callback) {
+			File
+			.findOne({uuid : fileUuid})
+			.exec(callback);
+		});
+
+		ops.push(function (file, callback) {
+
+			var table_name = file.data.postgis.table_name;
+
+			var options = {
+				database_name 	: file.data.postgis.database_name,
+				table_name 	: file.data.postgis.table_name,
+				data_type 	: file.data.postgis.data_type,
+				query 		: '"SELECT * FROM ' + table_name + '"',
+				name 		: file.name.replace(/ /g,'').replace('.zip', ''),
+			}
+
+			// get dataset
+			api.postgis.downloadDataset(options, callback);
+		});
+
+		async.waterfall(ops, function (err, results) {
+			res.end(results);
+		});
+	},
+
+	downloadDataset : function (options, done) {
+		
+		var database_name = options.database_name,
+		    table_name = options.table_name,
+		    data_type = options.data_type,
+		    query = options.query,
+		    name = options.name,
+		    ops = [];
+
+
+		ops.push(function (callback) {
+
+			// where to put file
+			var filePath = database_name + '/' + table_name + '/' +  api.utils.getRandomChars(5) + '/',
+			    folder = api.config.path.temp + filePath,
+			    filename = name,
+			    output = folder + filename,
+			    returnOutput = filePath + filename,
+			    DOWNLOAD_TABLE_SCRIPT = '../scripts/postgis/download_table.sh';
+
+
+			// create folder
+			fs.ensureDir(folder, function (err) {
+
+				var command = [
+					DOWNLOAD_TABLE_SCRIPT,
+					database_name,
+					output,
+					query
+				].join(' ');
+
+				console.log('dump to shp cmd: ', command);
+
+				// create database in postgis
+				exec(command, {maxBuffer: 1024 * 50000}, function (err, stdout) {
+					console.log('err, stdout', err, stdout);
+
+					if (err) return callback(err);
+
+					var options = {
+						zipfolder : folder,
+						zipfile : folder + filename,
+						returnOutput : returnOutput
+					}
+					
+					callback(null, options);
+
+				});
+			});
+		});
+
+
+		ops.push(function (options, callback) {
+			var zipfolder = options.zipfolder,
+			    tarfile = options.zipfile + '.tar',
+			    zipfile = tarfile + '.gz',
+			    returnOutput = options.returnOutput + '.tar.gz';
+
+			var cmd = [
+				'tar',
+				'cvf',
+				// 'loka.tar',
+				tarfile,
+				'-C',
+				'"' + zipfolder + '"',
+				'.',
+				'&&',
+				'pigz',
+				tarfile
+				// 'loka.tar'
+				// zipfile
+			].join(' ');
+
+			console.log('tar cmd: ', cmd);
+
+			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout) {
+				console.log('err, stdout', err, stdout);
+
+				if (err) return callback(err);
+				callback(null, returnOutput);
+			});
+		});
+
+		async.waterfall(ops, function (err, zipfile) {
+			done(err, zipfile);
+		});
+
+	},
+
+	
 	createDatabase : function (options, done) {
 		var user = options.user,
 		    userUuid = options.user.uuid,
@@ -218,7 +422,7 @@ module.exports = api.postgis = {
 				if (err) return callback(err);
 
 				var metadataJSON = JSON.stringify(metadata);
-				
+
 				// set upload status
 				api.upload.updateStatus(file_id, {
 					metadata : metadataJSON
@@ -403,8 +607,6 @@ module.exports = api.postgis = {
 		ops.push(function (callback) {
 
 
-			// var query = 'SELECT ST_Extent(the_geom_4326) FROM ' + file_id
-
 			var query = 'SELECT * FROM ' + file_id + ' LIMIT 1';
 
 			api.postgis.query({
@@ -413,18 +615,15 @@ module.exports = api.postgis = {
 			}, function (err, results) {
 
 				var rows = results.rows[0];
-
 				var columns = [];
+				var min_max_values = {};
+				var jobs = [];
 
 				for (var r in rows) {
 					if (r != 'geom' && r != 'the_geom_3857' && r != 'the_geom_4326') {
 						columns.push(r);
 					}
 				}
-
-
-				var min_max_values = {};
-				var jobs = [];
 
 				columns.forEach(function (column) {
 
@@ -454,7 +653,6 @@ module.exports = api.postgis = {
 							if (err) return done(null);
 
 							var json = stdout.split('\n')[2];
-
 							var data = JSON.parse(json);
 							
 							min_max_values[column] = data;
@@ -462,16 +660,12 @@ module.exports = api.postgis = {
 							// callback
 							done(null, data);
 						});
-
-
 					});	
-
-
-
 				});
 
 
 				async.parallel(jobs, function (err, values) {
+					min_max_values._columns = columns;
 					metadata.columns = min_max_values;
 
 					callback(null);
@@ -481,11 +675,6 @@ module.exports = api.postgis = {
 
 		// get total area
 		ops.push(function (callback) {
-
-			// meta:
-			// 1. row count (ie. how many points)
-			// 2. file size
-			// 3. total area of file
 
 			var GET_EXTENT_SCRIPT_PATH = '../scripts/postgis/get_st_extent_as_geojson.sh';
 
@@ -505,7 +694,6 @@ module.exports = api.postgis = {
 				var area = geojsonArea.geometry(geojson);
 
 				metadata.extent_geojson = geojson;
-
 				metadata.total_area = area; // square meters
 
 				// callback
@@ -536,7 +724,6 @@ module.exports = api.postgis = {
 		// get size of table in bytes
 		ops.push(function (callback) {
 
-			// var query = 'SELECT count(*) FROM ' + file_id;
 			var query = "SELECT pg_size_pretty(pg_table_size('" + file_id + "'));"
 			
 			api.postgis.query({
@@ -546,21 +733,134 @@ module.exports = api.postgis = {
 				if (err) return callback();
 
 				var json = results.rows[0];
-				
 				metadata.size_bytes = json.pg_size_pretty;
 
 				callback();
 			});
 		});
 
+		
+		// get histograms
+		ops.push(function (callback) {
 
-		// todo: get fields for cartocss pro-tips
+			var columns = metadata.columns._columns;
+			var histogram = {};
 
+			async.each(columns, function (column, cb) {
+
+				api.postgis.fetchHistogram({
+					database_name : postgis_db,
+					table_name : file_id, 
+					num_buckets : api.config.postgis.filters.num_buckets,
+					column : column
+				}, function (err, histo) {
+					if (err) console.log('hisgto err', err);
+
+					histogram[column] = histo;
+					cb(null);
+				});
+
+
+			}, function (err, results) {
+
+				// set histogram to meta
+				metadata.histogram = histogram;
+
+				callback();
+			})
+
+
+		});
+
+
+		// get geometry type
+		ops.push(function (callback) {
+
+			// do sql query on postgis
+			var GET_HISTOGRAM_SCRIPT = '../scripts/postgis/get_geometry_type.sh';
+
+			// st_extent script 
+			var command = [
+				GET_HISTOGRAM_SCRIPT, 	// script
+				postgis_db, 	// database name
+				file_id,	// table
+			].join(' ');
+
+
+			// do postgis script
+			exec(command, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+				if (err) return callback(err);
+
+				var arr = stdout.split('\n'),
+				    result = [];
+
+				arr.forEach(function (arrr) {
+					try {
+						var item = JSON.parse(arrr);
+						result.push(item);
+					} catch (e) {};
+				});
+
+				console.log('geometry type result: ', result);
+				metadata.geometry_type = result[0].st_geometrytype;
+
+				callback(null, result);
+
+			});
+		});
 
 		async.series(ops, function (err, results) {
 			done(err, metadata);
 		});
 	},
+
+	fetchHistogram : function (options, done) {
+
+		var table_name = options.table_name,
+		    database_name = options.database_name,
+		    num_buckets = options.num_buckets || 50, // todo: move to config
+		    column = options.column,
+		    ops = [];
+
+
+		ops.push(function (callback) {
+
+			// do sql query on postgis
+			var GET_HISTOGRAM_SCRIPT = '../scripts/postgis/get_histogram.sh';
+
+			// st_extent script 
+			var command = [
+				GET_HISTOGRAM_SCRIPT, 	// script
+				database_name, 	// database name
+				table_name,
+				column,
+				num_buckets
+			].join(' ');
+
+
+			// do postgis script
+			exec(command, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+				if (err) return callback(err);
+
+				var arr = stdout.split('\n'),
+				    result = [];
+
+				arr.forEach(function (arrr) {
+					try {
+						var item = JSON.parse(arrr);
+						result.push(item);
+					} catch (e) {};
+				});
+
+				callback(null, result);
+
+			});
+		});
+
+		async.waterfall(ops, done);
+
+	},
+
 
 	_primeTableWithGeometries : function (options, done) {
 
@@ -670,8 +970,6 @@ module.exports = api.postgis = {
 		async.waterfall(ops, function (err, results) {
 			done(err);
 		});
-
-
 
 	},
 

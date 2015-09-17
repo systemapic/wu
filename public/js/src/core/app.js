@@ -1,4 +1,4 @@
-Wu.version = '1.0.6';
+Wu.version = '1.2.1';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -17,7 +17,7 @@ Wu.App = Wu.Class.extend({
 		console.log('Systemapic v.' + Wu.version);
 
 		// set global this
-		Wu.app = window.app = this;
+		Wu.app = window.app = this; // todo: remove Wu.app, use only window.app
 
 		// set access token
 		this.setAccessTokens();
@@ -69,8 +69,8 @@ Wu.App = Wu.Class.extend({
 		window.onerror = function (message, file, line, char, ref) {
 			
 			var stack = ref.stack;
-			var project = app.activeProject ? app.activeProject.getTitle() : 'None';
-			var username = app.Account ? app.Account.getName() : 'No name';
+			var project = app.activeProject ? app.activeProject.getTitle() : 'No active project';
+			var username = app.Account ? app.Account.getName() : 'No username';
 			
 			var options = JSON.stringify({
 				message : message,
@@ -85,9 +85,20 @@ Wu.App = Wu.Class.extend({
 		}
 	},
 
+	_checkForInvite : function () {
+		var pathname = window.location.pathname;
+		if (pathname.indexOf('/invite/') == -1) return;
+		var invite_token = pathname.split('/').reverse()[0];
+		if (invite_token) this.options.invite_token = invite_token;
+	},
+
 	initServer : function () {
 		console.log('Securely connected to server: \n', this.options.servers.portal);
 
+		// check for invite link
+		this._checkForInvite();
+
+		// data for server
 		var data = JSON.stringify(this.options);
 		
 		// post         path          json      callback    this
@@ -108,9 +119,6 @@ Wu.App = Wu.Class.extend({
 		// access
 		this._initAccess();
 
-		// init global events
-		// this._initEvents();
-
 		// load json model
 		this._initObjects();
 
@@ -122,9 +130,6 @@ Wu.App = Wu.Class.extend({
 
 		// create panes
 		this._initPanes();
-
-		// init tools
-		this._initTools();
 
 		// init pane view
 		this._initView();
@@ -142,8 +147,11 @@ Wu.App = Wu.Class.extend({
 
 	_initObjects : function () {
 
+		// data controller
+		this.Data = new Wu.Data();
+
 		// controller
-		this.Controller = new Wu.Controller();
+		this.Controller = new Wu.Controller(); // todo: remove this?
 
 		// main user account
 		this.Account = new Wu.User(this.options.json.account);
@@ -175,6 +183,10 @@ Wu.App = Wu.Class.extend({
 
 		// right chrome
 		this.Chrome.Right = new Wu.Chrome.Right();
+
+		// todo: 
+		// left
+		// center
 
 	},
 
@@ -214,21 +226,16 @@ Wu.App = Wu.Class.extend({
 		// render eror pane
 		this.FeedbackPane = new Wu.FeedbackPane();
 
-		
+		// share pane
+		this.Share = new Wu.Share();
 	},
 
-	_initTools : function () {
-
-		// // init tools
-		// this.Tools = {};
-		// this.Tools.FreeDraw = new Wu.Tool.FreeDraw({
-		// 	map : this.MapPane._map
-		// });
-	
-	},
 
 	// init default view on page-load
 	_initView : function () {
+
+		// check invite
+		if (this._initInvite()) return;
 
 		// check location
 		if (this._initLocation()) return;
@@ -239,46 +246,27 @@ Wu.App = Wu.Class.extend({
 		// set project if only one
 		if (this._lonelyProject()) return;
 
-		// // if user is admin or manager, set Projects and Users as default panes
-		// var user = app.Account;
-		// if (app.access.is.superAdmin() || app.access.is.portalAdmin()) {
-		// 	// set panes 
-		// 	this.SidePane.refresh(['Clients', 'Users', 'Account']);		
-		// }
-
 		// activate startpane
 		this.StartPane.activate();
 	},
 
-	_initEvents : function () {
+	_initInvite : function () {
+		var project = this.options.json.invite;
 
-		// set event fire
-		// this.fire = new Wu.Events();
+		if (!project) return false;
 
-		Wu.DomEvent.on(window, 'resize', this._resizeEvents, this);
+		// select project
+		Wu.Mixin.Events.fire('projectSelected', {detail : {
+			projectUuid : project.id
+		}});
+
+		app.feedback.setMessage({
+			title : 'Project access granted',
+			description : 'You\'ve been given access to the project ' + project.name 
+		});
 	},
 
-	_resizeEvents : function (e) {
-
-		return;
-		// todo: rewrite to emit resize event!
-
-		// get window dimensions
-		var dimensions = this._getDimensions(e);
-
-		// startpane resize event
-		if (app.StartPane.isOpen) app.StartPane.resizeEvent(dimensions);
-
-		// mappane resize event
-		if (app.MapPane) app.MapPane.resizeEvent(dimensions);
-
-		// legends control resize
-		var legendsControl = app.MapPane.getControls().legends;
-		if (legendsControl) legendsControl.resizeEvent(dimensions);
-
-		// layermenu control resize
-		var layermenuControl = app.MapPane.getControls().layermenu;
-		if (layermenuControl) layermenuControl.resizeEvent(dimensions);
+	_initEvents : function () {
 	},
 
 	_getDimensions : function (e) {
@@ -310,22 +298,17 @@ Wu.App = Wu.Class.extend({
 		this.Access = new Wu.Access(this.options.json.access);
 	},
 
-	// _isDev : function (user) {
-	// 	if (user.uuid.slice(0,-13) == 'user-b76a8d27-6db6-46e0-8fc3') return true; // phantomJS user
-	// 	if (user.uuid.slice(0,-13) == 'user-9fed4b5f-ad48-479a-88c3') return true; // phantomJS user
-	// 	if (user.uuid.slice(0,-13) == 'user-e6e5d7d9-3b4c-403b-ad80') return true; // phantomJS user
-	// 	return false;
-	// },
-
 	_lonelyProject : function () {
 		//default case: hidden/ghost project (belongs to no client). Preferable to stick to the Start Pane
 		if (_.size(app.Projects) == 1) {
 			for (p in app.Projects) {
 				var project = app.Projects[p]; 
-				//if project is hidden/ghost it has no client
-			    if(project.getClient() === undefined){
+				
+				// if project is hidden/ghost it has no client
+			   	if (project.getClient() === undefined) {
 					return false;
 				}
+
 				this._setProject(project);
 				return true;
 			}
@@ -336,11 +319,9 @@ Wu.App = Wu.Class.extend({
 			for (p in app.Projects) {
 	
 				var project = app.Projects[p]; 
-				//if project is hidden/ghost it has no client
-				if(project.getClient() === undefined){
+				if (project.getClient() === undefined) {
 					continue;
 				}
-				
 				this._setProject(project);
 				return true;
 			}
@@ -519,9 +500,6 @@ Wu.App = Wu.Class.extend({
 			}
 		}), callback, this);
 
-		// // return
-		// return json.hash;
-
 	},
 
 
@@ -536,8 +514,6 @@ Wu.App = Wu.Class.extend({
 	   	// set hash for phantom
 	   	this._phantomHash = hash;
 
-	   	// if (!app.Projects) return;
-
 		// get project
 		var project = app.Projects[projectUuid];
 		
@@ -549,9 +525,6 @@ Wu.App = Wu.Class.extend({
 			projectUuid : projectUuid
 		}});
 
-		// app.activeProject = project;
-
-		
 		// check for hash
 		if (hash) {
 
@@ -565,7 +538,6 @@ Wu.App = Wu.Class.extend({
 		}
 
 		// acticate legends for baselayers
-		// app.MapPane.legendsControl.refreshAllLegends();
 		app.MapPane._controls.legends.refreshAllLegends();
 
 		// remove startpane
@@ -593,14 +565,10 @@ Wu.App = Wu.Class.extend({
 		// check if ready for screenshot
 		if (!this._loaded || !this._loading) return false;
 
-		// Wu.send('/api/debug/phantom', {
-		// 	loaded : this._loaded.length,
-		// 	loading : this._loading.length,
-		// 	num : numLayers
-		// });
-
+		// if no layers, return
 		if (numLayers == 0) return true;
 
+		// if not loaded, return
 		if (this._loaded.length == 0 ) return false; 
 
 		// if all layers loaded

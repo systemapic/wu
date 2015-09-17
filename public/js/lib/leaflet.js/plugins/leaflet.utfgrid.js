@@ -61,8 +61,6 @@ L.UtfGrid = L.Class.extend({
 		this._url = url;
 		this._cache = {};
 
-		console.log('utf init!');
-
 
 		// Find a unique id in window we can use for our callbacks
 		// Required for jsonP
@@ -200,8 +198,6 @@ L.UtfGrid = L.Class.extend({
 	//Load up all required json grid files
 	//TODO: Load from center etc
 	_update: function () {
-
-		console.log('update');
 
 		var map = this._map || app._map; // systemapic hack
 

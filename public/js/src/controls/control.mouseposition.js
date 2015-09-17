@@ -46,7 +46,7 @@ L.Control.Mouseposition = Wu.Control.extend({
                 this._hide();
         },
         _show : function () {
-                this._container.style.display = 'block';
+                this._container.style.display = 'inline-block';
         },
         _hide : function () {
                 this._container.style.display = 'none';

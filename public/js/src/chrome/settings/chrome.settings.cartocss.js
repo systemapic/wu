@@ -1,4 +1,4 @@
-Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
+Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 
 	_initialize : function () {
 
@@ -18,11 +18,14 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 
 	_initLayout : function () {
 
+		// Mid section
+		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
+
 		// active layer
-		this._initLayout_activeLayers();
+		this.layerSelector = this._initLayout_activeLayers(false, false, this._midSection);
 
 		// wrapper
-		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._container);
+		this._codewrap = Wu.DomUtil.create('input', 'chrome chrome-content cartocss code-wrapper', this._midSection);
 
 		// sql editor
 		// this._createSqlEditor();
@@ -163,7 +166,8 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		var carto = this._cartoEditor.getWrapperElement();
 		if (carto) {
 			carto.style.width = dims.width + 'px';
-			carto.style.height = (dims.height/3*2) - 150 + 'px';
+			// carto.style.height = dims.height - 363 + 'px';
+			carto.style.height = dims.height - 387 + 'px';
 		}
 
 		
@@ -176,8 +180,11 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 
 	_createRefresh : function () {
 
+		// create fixed bottom container
+		this._bottomContainer = Wu.DomUtil.create('div', 'chrome-content-bottom-container displayNone', this._container);		
+
 		var text = (navigator.platform == 'MacIntel') ? 'Save (⌘-S)' : 'Save (Ctrl-S)';
-		this._refreshButton = Wu.DomUtil.create('div', 'chrome chrome-content cartocss refresh-button', this._container, text);
+		this._refreshButton = Wu.DomUtil.create('div', 'chrome-right-big-button', this._bottomContainer, text);
 
 		Wu.DomEvent.on(this._refreshButton, 'click', this._updateStyle, this);
 	},
@@ -299,10 +306,15 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 		console.log('open!', this);
 	},
 
-	_selectedActiveLayer : function (e) {
+	_selectedActiveLayer : function (e, uuid) {
+
+		var layerUuid = uuid ? uuid : e.target.value;
+		
+		// Store uuid of layer we're working with
+		this._storeActiveLayerUuid(layerUuid);
 
 		// get layer
-		var layerUuid = e.target.value;
+		// var layerUuid = e.target.value;
 		this._layer = this._project.getLayer(layerUuid);
 
 		// selecting layer in dropdown...
@@ -321,32 +333,13 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 
 		// add layer temporarily to map
 		this._tempaddLayer();
+
+
+		// Display bottom container
+		Wu.DomUtil.removeClass(this._bottomContainer, 'displayNone');		
 	},
 
-	_tempaddLayer : function () {
-
-		// remember
-		this._temps = this._temps || [];
-
-		// remove other styling layers
-		this._tempRemoveLayers();
-
-		// add
-		this._layer._addThin();
-
-		// remember
-		this._temps.push(this._layer);
-
-	},
-
-	_tempRemoveLayers : function () {
-		if (!this._temps) return;
-
-		// remove other layers added tempy for styling
-		this._temps.forEach(function (layer) {
-			layer._removeThin();
-		}, this);
-	},
+	
 
 	opened : function () {
 
@@ -403,5 +396,16 @@ Wu.Chrome.Content.Cartocss = Wu.Chrome.Content.extend({
 
 		// mark button
 		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+
+		// Enable settings from layer we're working with
+		var layerUuid = this._getActiveLayerUuid();
+		if ( layerUuid ) this._selectedActiveLayer(false, layerUuid);		
+
+		// Select layer we're working on
+		var options = this.layerSelector.childNodes;
+		for ( var k in options ) {
+			if ( options[k].value == layerUuid ) options[k].selected = true;
+		}
+
 	},
 });

@@ -33,7 +33,8 @@ var fileSchema = mongoose.Schema({
 			database_name : String,
 			table_name : String,
 			data_type : String, 		// raster or vector
-			original_format : String 	// GeoTIFF, etc.
+			original_format : String, 	// GeoTIFF, etc.
+			metadata : String,
 		}, 				
 		
 

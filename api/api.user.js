@@ -42,6 +42,311 @@ var api = module.parent.exports;
 // exports
 module.exports = api.user = { 
 
+	register : function (options, done) {
+		var ops = [],
+		    created_user,
+		    token_store;
+
+		// get token store from redis
+		ops.push(function (callback) {
+			var token = options.invite_token;
+			var redis_key = 'invite:token:' + token;
+			api.redis.tokens.get(redis_key, callback);
+		});
+
+		// create new user
+		ops.push(function (tokenJSON, callback) {
+
+			// parse token_store
+			token_store = JSON.parse(tokenJSON);
+
+			// create the user
+			var newUser            	= new User();
+			newUser.local.email    	= options.email;
+			newUser.local.password 	= newUser.generateHash(options.password);
+			newUser.uuid 		= 'user-' + uuid.v4();
+			newUser.company 	= options.company;
+			newUser.position 	= options.position;
+			newUser.firstName 	= options.firstname;
+			newUser.lastName 	= options.lastname;
+			newUser.invitedBy 	= token_store.invited_by.uuid;
+
+			// save the user
+			newUser.save(function(err) {
+				created_user = newUser;
+				callback(err, token_store.project.id);
+			});
+		});
+
+		// find project for adding to roles
+		ops.push(function (project_id, callback) {
+			Project
+			.findOne({uuid : project_id})
+			.populate('roles')
+			.exec(callback);
+		});
+
+		// add user to project roles
+		ops.push(function (project, callback) {
+
+			var a = token_store.project.access_type;
+			
+			// default role
+			var role_slug = 'noRole';
+
+			// decide which role
+			if (a == 'view') role_slug = 'projectReader'; // todo: other access types
+
+			// find reader role
+			var access_role = _.find(project.roles, function (r) {
+				return r.slug == role_slug;
+			});
+
+			Role
+			.findOne({uuid : access_role.uuid})
+			.exec(function (err, role) {
+
+				// add user to reader role of project
+				role.members.addToSet(created_user.uuid);
+
+				// save
+				role.save(function (err) {
+					callback(err);
+				});
+			});
+		});
+
+		ops.push(function (callback) {
+
+
+			// send slack
+			api.slack.registeredUser({
+				user_name 	: created_user.firstName + ' ' + created_user.lastName,
+				user_company 	: created_user.company,
+				user_email 	: created_user.local.email,
+				user_position 	: created_user.position,
+				inviter_name 	: token_store.invited_by.firstName + ' ' + token_store.invited_by.lastName,
+				inviter_company : token_store.invited_by.company,
+				project_name 	: token_store.project.name,
+				timestamp 	: token_store.timestamp
+			});
+
+
+			// send email
+			api.email.sendInvitedEmail({
+				email : created_user.local.email,
+				name : created_user.firstName,
+			});
+
+
+			callback(null);
+
+
+
+
+		});
+
+		// done
+		async.waterfall(ops, function (err, results) {
+			if (err) return done(err);
+
+
+			// send email
+
+
+			done(null, created_user);
+		});
+	
+	},
+
+
+	_processInviteToken : function (options, done) {
+		var user = options.user,
+		    invite_token,
+		    ops = [];
+
+		// return if no token
+		if (!options.invite_token) return done(null);
+
+		// get token store from redis
+		ops.push(function (callback) {
+			var redis_key = 'invite:token:' + options.invite_token;
+			api.redis.tokens.get(redis_key, callback);
+		});
+
+		// find project for adding to roles
+		ops.push(function (inviteJSON, callback) {
+			
+			// parse
+			invite_token = JSON.parse(inviteJSON);
+
+			Project
+			.findOne({uuid : invite_token.project.id})
+			.populate('roles')
+			.exec(callback);
+
+		});
+
+		// add user to project roles
+		ops.push(function (project, callback) {
+
+			var a = invite_token.project.access_type;
+			
+			// default role
+			var role_slug = 'noRole';
+
+			// decide which role
+			if (a == 'view') role_slug = 'projectReader'; // todo: other access types
+
+			// find reader role
+			var access_role = _.find(project.roles, function (r) {
+				return r.slug == role_slug;
+			});
+
+			Role
+			.findOne({uuid : access_role.uuid})
+			.exec(function (err, role) {
+
+				// add user to reader role of project
+				role.members.addToSet(user.uuid);
+
+				// save
+				role.save(callback);
+			});
+		});
+
+		async.waterfall(ops, function (err, results) {
+			var project_json = {
+				name : invite_token.project.name,
+				id : invite_token.project.id
+			}
+			done(null, project_json);
+		});
+
+	},
+
+	// invite users
+	invite : function (req, res) {
+		var options = req.body;
+
+		// invite users
+		api.user._invite(options, function (err, results) {
+			res.json(results);
+		});
+	},
+
+	_invite : function (options, callback) {
+
+		var access_type = options.access_type,
+		    invite_emails = options.emails,
+		    project_id = options.project_id;
+
+
+
+		// 1. if exisitng user, add access and notify
+		// 2. if not existing, send create user link and store access in redis or whatever
+
+
+		// if not existing
+		// ---------------
+		// 
+		// - need to send link to user with token. 
+		// - token must be stored in redis and contain: email, project, type access, who invited, when invited 
+		// - possible to sign up with that email address only
+		// - when following link, taken to sign-up site: 
+		// 	1) enter details (name, organization, type profession?, etc.)
+		//	2) will create account on that email, give view/edit access to project.
+		// 	3) log user in immediately, activate project
+		// 	
+		// - should take invited user < 1 min to sign up.
+		//
+		// - new user has access to:
+		// 	1) view/edit project invited for
+		// 	2) NOT create new project ...
+		// 	3) NOT upload data 
+		// 	4) invite others for VIEW
+		// 	
+		// 	- should set certain limitations on others' servers. ie, if GLOBESAR has a server, others should perhaps not
+		//		be able to invite to it. perhaps invite to SYSTEMAPIC server instead?
+		// 	- actually, only GLOBESAR should be able to invite uploaders to his own portal.
+		// 	- need to syncronize servers soon! 
+
+
+
+		// PILOT FLOW:
+		// 1. frano can only invite VIEWERS
+		// 2. if he wants more admins, we'll add them for him.
+		// 3. anybody can invite VIEWERS to own projects ?
+		//
+		// 4. ALSO would be really cool: just send anyone a link, and they can login/register and get access to project.
+
+
+		var results = {
+
+		}
+
+		callback(null, options);
+
+	},
+
+	getInviteLink : function (req, res) {
+		var options = req.body;
+		options.user = req.user;
+
+		api.user._createInviteLink(options, function (err, inviteLink) {
+			res.end(inviteLink);
+		});
+	},
+
+	_createInviteLink : function (options, callback) {
+		var project_id = options.project_id,
+		    project_name = options.project_name,
+		    user = options.user,
+		    access_type = options.access_type;
+
+
+		// create token and save in redis with options
+		var token = api.utils.getRandomChars(20, 'abcdefghijklmnopqrstuvwxyz1234567890');
+
+		var token_store = {
+			project : {
+				id : project_id,
+				name : project_name,
+				access_type : access_type
+			},
+			invited_by : {
+				uuid : user.uuid,
+				firstName : user.firstName,
+				lastName : user.lastName,
+				company : user.company
+			},
+			token : token,
+			timestamp : new Date().getTime(),
+		}
+
+		// save token to redis
+		var redis_key = 'invite:token:' + token;
+		api.redis.tokens.set(redis_key, JSON.stringify(token_store), function (err) {
+			var inviteLink = api.config.portalServer.uri + 'invite/' + token;
+			callback(null, inviteLink);
+		});
+	},
+
+
+
+	_inviteNewUser : function (options, callback) {
+
+
+
+	},
+
+	_inviteExistingUser : function (options, callback) {
+
+
+
+	},
+
+
 
 
 	// create user
@@ -59,8 +364,6 @@ module.exports = api.user = {
 
 		// return on missing info
 		if (!options.email) return api.error.missingInformation(req, res);
-
-		console.log('create user', account, projectUuid, options);
 
 		// permissions hack, need project to get a capability... todo: refactor whole permissions thing
 		ops.push(function (callback) {
@@ -343,10 +646,19 @@ module.exports = api.user = {
 		});
 	},
 
+	_getSingle : function (options, done) {
+		var userUuid = options.user.uuid;
+
+		User
+		.findOne({uuid : userUuid})
+		.populate('files')
+		.exec(done);
+	},
 
 	_getAll : function (options, done) {
 		User
 		.find()
+		.populate('files')
 		.exec(done);
 	},
 
@@ -390,6 +702,7 @@ module.exports = api.user = {
 		ops.push(function (users, callback) {
 			User
 			.find()
+			.populate('files')
 			.or([
 				{ uuid : { $in : users }}, 		// roles
 				{ createdBy : user.getUuid()}, 	// createdBy self

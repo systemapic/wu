@@ -17,6 +17,9 @@ Wu.Files = Wu.Class.extend({
 	getName : function () {
 		return this.store.name;
 	},
+	getTitle : function () {
+		return this.getName();
+	},
 
 	getType : function () {
 		return this.store.type;
@@ -103,8 +106,6 @@ Wu.Files = Wu.Class.extend({
 
 		Wu.Util.postcb('/api/file/addtoproject', JSON.stringify(options), function (err, body) {
 
-			console.log('_addToProject err, body', err, body);
-
 		});
 	},
 
@@ -131,8 +132,6 @@ Wu.Files = Wu.Class.extend({
 	},
 
 	setCategory : function (category) {
-		console.log('Wu.Files.setCategory: ', category);
-
 		this.store.category = category; // should be string
 		this.save('category');
 	},
@@ -148,7 +147,6 @@ Wu.Files = Wu.Class.extend({
 	},
 
 	setDescription : function (description) {
-		console.log('saving description1!!!!!');
 		this.store.description = description;
 		this.save('description');
 	},
@@ -175,26 +173,323 @@ Wu.Files = Wu.Class.extend({
 		// TODO: save only if actual changes! saving too much already
 		Wu.save('/api/file/update', string); // save to server   
 
-		console.log('SAVING FILE!!');                         
 		app.setSaveStatus();// set status
 	},
 
 
 
 	// todo: move all delete of files here
-	_delete : function () {
+	_deleteFile : function () {
+
+		// check if dataset has layers
+		this._getLayers(function (err, layers) {
+
+			var num_layers = layers.length;
+			var pretty_layers = [];
+
+			layers.forEach(function (l, n, m) {
+				pretty_layers.push('- ' + l.title);
+			});
+
+			var has_layers_msg = 'There exists ' + num_layers + ' layers based on this dataset: \n' + pretty_layers.join('\n') + '\n\nDeleting dataset will delete all layers. Are you sure?';
+			var just_confirm = 'Do you really want to delete dataset ' + this.getName() + '?';
+			var message = num_layers ? has_layers_msg : just_confirm;
+			var confirmed = confirm(message);
+
+			if (!confirmed) return console.log('Nothing deleted.');
+			
+			// delete file
+			var postgisOptions = this.getPostGISData();
+			Wu.post('/api/file/delete', JSON.stringify(postgisOptions), function (err, response) {
+				console.log('deleted?', err, response);
+
+				var removedObjects = Wu.parse(response);
+
+				// clean up locally
+				this._fileDeleted(removedObjects);
+
+
+			}.bind(this));
+
+		}.bind(this));
+
 
 	},
 
+	_fileDeleted : function (result) {
+
+		// catch error
+		if (result.error || !result.success) return console.error(result.error || 'No success deleting!');
+
+		// update user locally
+		app.Account.removeFile(result.removed.file);
+
+		// update projects locally
+		this._removeLayersLocally(result.removed.layers);
+
+		// fire event
+		Wu.Mixin.Events.fire('fileDeleted', {detail : {
+			fileUuid : 'lol'
+		}});
+	},
 
 
+	_removeLayersLocally : function (layers) {
+
+		layers.forEach(function (layer) {
+
+			// find project 
+			var project = _.find(app.Projects, function (p) {
+				return p.getLayer(layer.uuid);
+			});
 
 
+			// remove layer
+			project.removeLayer(layer);
+
+		});
+
+		// fire event
+		Wu.Mixin.Events.fire('layerDeleted', {detail : {
+			fileUuid : 'lol'
+		}});
+
+	},
+
+	
+	_getLayers : function (callback) {
+
+		// get layers connected to dataset
+		var postgisOptions = this.getPostGISData();
+		Wu.post('/api/file/getLayers', JSON.stringify(postgisOptions), function (err, response) {
+			var layers = Wu.parse(response);
+			callback(err, layers);
+		});
+	},
+
+	getPostGISData : function () {
+		if (!this.store.data) return false;
+		return this.store.data.postgis;
+	},
+
+	_shareFile : function () {
+		console.log('file._shareFile', this.getName());
+	},
+
+	_createLayer : function (project) {
+		this._createDefaultLayer(project);
+	},
+
+	_downloadFile : function () {
+		this._downloadDataset();
+	}, 
+
+	_downloadDataset : function () {
+
+		var options = {
+			file_id : this.getUuid(),
+		}
+
+		Wu.post('/api/file/downloadDataset', JSON.stringify(options), this._downloadedDataset.bind(this));
+
+		// set progress
+		app.ProgressBar.timedProgress(2000);
+
+	},
+
+	_downloadedDataset : function (err, response) {
+
+		// parse results
+		var filePath = response;
+		var path = app.options.servers.portal;
+		path += 'api/file/download/';
+		path += '?file=' + filePath;
+		// path += '?raw=true'; // add raw to path
+		path += '&type=shp';
+		path += '&access_token=' + app.tokens.access_token;
+
+		// open (note: some browsers will block pop-ups. todo: test browsers!)
+		window.open(path, 'mywindow')
+
+	},
+
+	_getGeometryType : function () {
+		var meta = this.getMeta();
+		return meta.geometry_type;
+	},
+
+	_getDefaultStyling : function () {
+
+		// returns geom type from file meta
+		var geometry_type = this._getGeometryType();
+
+		if (geometry_type == 'ST_Point') { 
+			return this._defaultStyling;
+		}
+		// if (geometry_type == 'ST_Polygon') { 
+		// 	return this._defaultStyling.polygon;
+		// }
+		// if (geometry_type == 'ST_LineString') { 
+		// 	return this._defaultStyling.line;
+		// }
+	},
+
+	_createDefaultCartocss : function (json, callback) {
+
+		var styler = app.Tools.Styler;
+		styler.getCartoCSSFromJSON(json, callback);
+	},
 
 
+	// default cartocss styling
+	_defaultStyling : {
+		
+		// default styling
+		point : { 
+			enabled : true, 
+			color : { 
+				range : false, 
+				minMax : [-426.6, 105.9], 
+				customMinMax : [-426.6, 105.9], 
+				staticVal : "yellow",
+				value : [
+					"#ff0000",
+					"#a5ff00",
+					"#003dff"
+				]
+			},
+			opacity : { 
+				range : false,
+				value : 0.5
+			}, 
+			pointsize : { 
+				range :false,
+				minMax : false,
+				value : 1.
+			}
+		},
+		// polygon : {},
+		// line : {}
+	},
+
+	_createDefaultLayer : function (project) {
+
+		var file_id = this.getUuid();
+		var file = this;
+
+		// get default style
+		var defaultStyle = this._getDefaultStyling();
+		
+		// create css from json (server side)
+		this._createDefaultCartocss(defaultStyle, function (ctx, defaultCartocss) {
+
+			var options = {
+				file : file,
+				defaultCartocss : defaultCartocss,
+				project : project,
+				defaultStyle : defaultStyle
+			}
+
+			// create layer on server
+			this._requestDefaultLayer(options)
 
 
+		}.bind(this));
 
+	
+
+	},
+
+	_requestDefaultLayer : function (options) {
+
+		var file = options.file,
+		    file_id = file.getUuid(),
+		    project = options.project,
+		    defaultCartocss = options.defaultCartocss,
+		    defaultStyle = options.defaultStyle;
+
+
+		var layerJSON = {
+			"geom_column": "the_geom_3857",
+			"geom_type": "geometry",
+			"raster_band": "",
+			"srid": "",
+			"affected_tables": "",
+			"interactivity": "",
+			"attributes": "",
+			"access_token": app.tokens.access_token,
+			"cartocss_version": "2.0.1",
+			"cartocss": defaultCartocss, 	// save default cartocss style (will be active on first render)
+			"sql": "(SELECT * FROM " + file_id + ") as sub",
+			"file_id": file_id,
+			"return_model" : true,
+			"projectUuid" : project.getUuid()
+		}
+
+		// create postgis layer
+		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
+			var layer = Wu.parse(layerJSON);
+
+			var options = {
+				projectUuid : project.getUuid(), // pass to automatically attach to project
+				data : {
+					postgis : layer.options
+				},
+				metadata : layer.options.metadata,
+				title : 'Layer from ' + file.getName(),
+				description : 'Description: Layer created from ' + file.getName(),
+				file : file.getUuid(),
+				style : JSON.stringify(defaultStyle) // save default json style
+			}
+
+			// create new layer model
+			this._createLayerModel(options, function (err, layerModel) {
+
+				// refresh Sidepane Options
+				project.addLayer(layerModel);
+
+				// todo: set layer icon
+				app.feedback.setMessage({
+					title : 'Created layer from dataset',
+					description : 'Added <strong>' + layerModel.title + '</strong> to project.',
+				});	
+
+				// select project
+				Wu.Mixin.Events.fire('layerAdded', {detail : {
+					projectUuid : project.getUuid()
+				}});
+			});
+			
+		}.bind(this));
+
+	},
+
+	_createLayerModel : function (options, done) {
+		Wu.Util.postcb('/api/layers/new', JSON.stringify(options), function (err, body) {
+			var layerModel = Wu.parse(body);
+			done(null, layerModel);
+		}.bind(this));
+	},
+
+	getMeta : function () {
+		if (!this.store.data.postgis) return false;
+		if (!this.store.data.postgis.metadata) return false;
+		var meta = Wu.parse(this.store.data.postgis.metadata);
+		return meta;
+	},
+
+	getHistograms : function () {
+		var meta = this.getMeta();
+		if (!meta) return false;
+		var histogram = meta.histogram;
+		return histogram;
+	},
+
+	getHistogram : function (column) {
+		var h = this.getHistograms();
+		if (!h) return false;
+		return h[column];
+	},
 
 
 

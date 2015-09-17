@@ -15,7 +15,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// add html
 		this._layermenuOuter 	= Wu.DomUtil.create('div', 'scroller-frame');
-		// var _scrollUp 		= Wu.DomUtil.create('div', 'scroll-up', this._layermenuOuter);
 		var _innerScroller 	= Wu.DomUtil.create('div', 'inner-scroller', this._layermenuOuter);
 		this._content 		= Wu.DomUtil.createId('div', 'layer-menu-inner-content', _innerScroller);
 
@@ -38,10 +37,14 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._added = true;
 	},
 
-
 	_flush : function () {
 		this.layers = {};
 		this._content.innerHTML = '';
+	},
+
+	_onLayerEdited : function (e) {
+		var layer = e.detail.layer;
+		this._refresh();
 	},
 
 	_refresh : function (hide) {
@@ -68,6 +71,18 @@ L.Control.Layermenu = Wu.Control.extend({
 		var dimensions = app._getDimensions();
 		this.resizeEvent(dimensions);
 
+		// enable layers that are active by default
+		// this._enableDefaultLayers();
+
+	},
+
+	_enableDefaultLayers : function () {
+		for (var l in this.layers) {
+			var layermenuItem = this.layers[l];
+			if (layermenuItem.item.enabled) {
+				this._enableDefaultLayer(layermenuItem);
+			}
+		}
 	},
 
 	// refresh for names etc, but keep active layers
@@ -103,20 +118,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Append to DOM
 		app._map._controlCorners.bottomright.appendChild(this._openLayers);
-
-		// Pick up Elements dealing with the Legends
-		var legends = app.MapPane.getControls().legends;
-		if (legends) {
-			this._legendsContainer = legends._legendsContainer;
-			this._legendsCollapser = legends._legendsCollapser;
-		}
-
-		// add extra padding	
-		var inspect = app.MapPane.getControls().inspect;	
-		if (!inspect) {
-			var corner = app._map._controlCorners.bottomright;
-			corner.style.paddingBottom = 6 + 'px';
-		}
 
 		// Store when the pane is open/closed ~ so that the legends container width can be calculated
 		this._open = true;
@@ -248,12 +249,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},	
 
 	_setHeight : function (extra) {
-		// count open items
-		// var numOpen = this._getOpenItems();
-		// if (this.editMode && !extra) extra = 50;
-		// var extra = extra ? extra + 50 : 50;
-		// var height = numOpen * 30 + extra + 'px';
-		// this._innerContainer.style.height = height;
+		
 	},
 
 	_getOpenItems : function () {
@@ -324,7 +320,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomUtil.removeClass(this._innerContainer, 'closed');
 	},
 
-
 	// enter edit mode of layermenu
 	enableEdit : function () {
 		if (this.editMode) return;
@@ -336,20 +331,16 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.editMode = true;
 
 		// turn off dragging etc. on map
-		app.MapPane.disableInteraction(true);
+		// app.MapPane.disableInteraction(true);
 
 		// turn off dropzone dragging
-		// if (app.Dropzone) app.Dropzone.disable();
-		app.SidePane.DataLibrary._disableResumable();
+		app.Data.disableUploader();
 
 		// Set attribute draggable to true on all divs
 		this.enableDraggable();
 		
 		// enable drag'n drop in layermenu
 		this.enableSortable();
-
-		// set title
-		// this._layerMenuHeaderTitle.innerHTML = 'Edit Layer Menu';  
 
 		// add edit style
 		Wu.DomUtil.addClass(this._innerContainer, 'edit-mode');
@@ -384,11 +375,10 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.editMode = false;
 		
 		// re-enable dragging etc. on map
-		Wu.app.MapPane.enableInteraction(true);
+		// Wu.app.MapPane.enableInteraction(true);
 
 		// turn off dropzone dragging
-		// if (app.Dropzone) app.Dropzone.enable();
-		app.SidePane.DataLibrary._enableResumable();
+		app.Data.enableUploader();
 
 		// Set attribute draggable to true on all divs
 		this.disableDraggable();		
@@ -629,7 +619,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	clearInvalid : function () {
-		for (l in this.layers) {
+		for (var l in this.layers) {
 			var layer = this.layers[l];
 			Wu.DomUtil.removeClass(layer.el, 'invalidLayermenuitem');
 		}
@@ -804,7 +794,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	closeAll : function () {
 		this.updateLogic();
-		for (l in this._logic) {
+		for (var l in this._logic) {
 			var item = this.layers[l];
 			if (item) {
 				this._logic[l].isOpen = true;
@@ -815,7 +805,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	openAll : function () {
 		this.updateLogic();
-		for (l in this._logic) {
+		for (var l in this._logic) {
 			var item = this.layers[l];
 			if (item) {
 				this._logic[l].isOpen = false;
@@ -828,7 +818,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	toggleFolder : function (layerItem) {
 		this.updateLogic();	
 		this.enforceLogic(layerItem);
-
 	},
 
 	toggleLayer : function (item) {
@@ -840,12 +829,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		// toggle
 		if (item.on) {
 			this.disableLayer(item);
-			// Google Analytics event tracking
-			app.Analytics.setGaEvent(['Controls', 'Layer hide: ' + _layerName ]);
 		} else {
 			this.enableLayer(item);
-			// Google Analytics event tracking
-			app.Analytics.setGaEvent(['Controls', 'Layer show: ' + _layerName ]);
 		}    
 	},
 
@@ -861,6 +846,10 @@ L.Control.Layermenu = Wu.Control.extend({
 		// mark active
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 		layerItem.on = true;
+	},
+	
+	_enableDefaultLayer : function (layer) {
+		this.enableLayer(layer);
 	},
 
 	_enableLayerByUuid : function (layerUuid) {
@@ -885,6 +874,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
 
+		app.Chrome.Right.options.editingLayer = layer.getUuid();
+
 	},
 
 	// disable by layermenuItem
@@ -899,6 +890,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		// Make room for Layer inspector
 		var dimensions = app._getDimensions();
 		this.resizeEvent(dimensions);		
+
+		app.Chrome.Right.options.editingLayer = false;
 	},
 
 	// disable by layer
@@ -915,21 +908,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomUtil.removeClass(layermenuItem.el, 'layer-active');
 	},
 
-	flyTo : function (layer) {
-		if (!layer) return;
-
-		var extent = layer.getMeta().extent;
-		if (!extent) return;
-
-		var southWest = L.latLng(extent[1], extent[0]),
-		    northEast = L.latLng(extent[3], extent[2]),
-		    bounds = L.latLngBounds(southWest, northEast);
-
-		// fly
-		var map = app._map;
-		map.fitBounds(bounds);
-
-	},
 
 	_getLayermenuItem : function (layerUuid) {
 		var layermenuItem = _.find(this.layers, function (l) { return l.item.layer == layerUuid; });
@@ -959,20 +937,12 @@ L.Control.Layermenu = Wu.Control.extend({
 	// turn off a layer from options
 	remove : function (uuid) {				// todo: clean up layers vs layermenuitems, see _getLayermenuItem above
 		
-
-		console.log('%c control.layermenu.js => remove', 'background: blue; color: white');
-		console.log('uuid', uuid);
-
 		// get layermenuItem
 		var layermenuItem = this.layers[uuid];
-		console.log('layermenuItem', layermenuItem);
 
 		// remove from DOM
 		var elem = layermenuItem.el;
 		if (elem) elem.parentNode.removeChild(elem);
-
-		// set inactive in sidepane layermenu
-		// if (layermenuItem.layer) app.SidePane.Options.settings.layermenu._off(layermenuItem.layer);
 
 		// remove layer from map
 		var layer = layermenuItem.layer;
@@ -986,14 +956,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// save
 		this.save();
-
-		// update Options pane
-		// var baseLayer = app.SidePane.Options.settings.baselayer;
-		// var layerMenu = app.SidePane.Options.settings.layermenu;
-		// if (baseLayer) baseLayer.markOccupied();
-		// if (layerMenu) layerMenu.markOccupied();
-
-		// this._setHeight();
 
 	},
 
@@ -1046,8 +1008,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		var item  = layerItem.item;
 		var layer = layerItem.layer;
 
-		var file = layer && layer.getFile ? layer.getFile() : false;
-		var caption = file ? file.store.name : item.caption;
+		var caption = layer && layer.getTitle ? layer.getTitle() : item.caption;
 
 		// create div
 		var className  = 'layer-menu-item-wrap';
@@ -1074,7 +1035,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		// var layerItemMoversWrap = Wu.DomUtil.create('div', 'layer-item-movers-wrap', wrap);
 		var up = Wu.DomUtil.create('div', 'layer-item-up', wrap);
 		var down = Wu.DomUtil.create('div', 'layer-item-down', wrap);
-		var del = Wu.DomUtil.create('div', 'layer-item-delete', wrap);
+		
+		if (!layer) {
+			// create delete button only on folder
+			var del = Wu.DomUtil.create('div', 'layer-item-delete', wrap);
+		}
 
 		if (layer) {
 			var layerItemFlyTo = Wu.DomUtil.createId('div', 'layer-flyto-' + layer.getUuid(), wrap);
@@ -1086,22 +1051,19 @@ L.Control.Layermenu = Wu.Control.extend({
 		inner.innerHTML = caption;
 
 
-		// append to layermenu
-		// this._content.appendChild(wrap); 	
-
 		// add hooks
 		Wu.DomEvent.on(up,   'click', function (e) { this.upFolder(uuid); 	  }, this);
 		Wu.DomEvent.on(down, 'click', function (e) { this.downFolder(uuid); 	  }, this);
-		Wu.DomEvent.on(del,  'click', function (e) { this.deleteMenuFolder(uuid); }, this);
 		
 		if (!layer) { // folder
 			Wu.DomEvent.on(inner, 'dblclick', function (e) { this._editFolderTitle(uuid); },this);
+			Wu.DomEvent.on(del,  'click', function (e) { this.deleteMenuFolder(uuid); }, this);
+			Wu.DomEvent.on(del,  'mousedown', Wu.DomEvent.stop, this);
 		}
 
 		// prevent layer activation
 		Wu.DomEvent.on(up,   'mousedown', Wu.DomEvent.stop, this);
 		Wu.DomEvent.on(down, 'mousedown', Wu.DomEvent.stop, this);
-		Wu.DomEvent.on(del,  'mousedown', Wu.DomEvent.stop, this);
 
 		// drag
 		// set dragstart event
@@ -1122,7 +1084,7 @@ L.Control.Layermenu = Wu.Control.extend({
 			var flyto = Wu.DomUtil.get('layer-flyto-' + layer.getUuid());
 			Wu.DomEvent.on(flyto, 'mousedown', function (e) {
 				Wu.DomEvent.stop(e);
-				this.flyTo(layer);
+				layer.flyTo();
 			}, this);
 		}
 
@@ -1130,12 +1092,10 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.layers[item.uuid] = layerItem;
 	},
 
-
 	getLayers : function () {
 		return this.layers;
 	},
 	
-
 	addMenuFolder : function () {
 		this.addFolder();		// todo: remove
 	},
@@ -1236,9 +1196,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		var leg = app.MapPane._controls.legends;
 		leg && leg._refresh(true);
 
-		// update layermenu
-		app.SidePane.Options.settings.layermenu.update(true)
-
 	},
 
 
@@ -1317,36 +1274,22 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	},
 
-	_projectSelected : function (e) {
+	
+	_setEnabledOnInit : function (layer_id, onoff) {
 
-		var projectUuid = e.detail.projectUuid;
+		var l = this._project.store.layermenu;
+		var i = -1;
 
-		if (!projectUuid) {
-			this._project = null;
-			return this._off();
-		}
-		// set project
-		this._project = app.activeProject = app.Projects[projectUuid];
+		l.forEach(function (item, n) {
+			if (item.layer == layer_id) i = n;
+		});
 
-		// refresh pane
-		this._refresh();
+		// err
+		if (i < 0) return console.error('couldnt save');
 
-		// select first layer by default
-		this._selectDefaultLayer();
-
-	},
-
-	_selectDefaultLayer : function () {
-		var layerItem;
-
-		// get first layer
-		_.forEach(this.layers, function (l) {
-			layerItem = l;
-			return false;
-		}.bind(this));
-
-		if (!layerItem) return; // no layers in layermenu
-
+		// save
+		this._project.store.layermenu[i].enabled = onoff;
+		this.save();
 	},
 
 
@@ -1355,6 +1298,3 @@ L.Control.Layermenu = Wu.Control.extend({
 L.control.layermenu = function (options) {
 	return new L.Control.Layermenu(options);
 };
-
-
-

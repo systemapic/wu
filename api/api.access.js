@@ -941,7 +941,6 @@ module.exports = api.access = {
 			    project = options.project,
 			    ops = {};
 
-			// console.log('_check +++++++++++++', options, capability);
 
 			ops.admin = function (callback) {
 				// if is admin
@@ -958,10 +957,10 @@ module.exports = api.access = {
 			};
 
 			async.series(ops, function (err, is) {
-				// console.log('__err, is', err, is);
 				if (!err && is.admin || is.capable) return done(null, options);
+				
+				// no access
 				done(api.access.textTemplates.no_access);
-				// done("You can't do that!");
 			});
 		},
 
@@ -1078,7 +1077,10 @@ module.exports = api.access = {
 		},
 
 		edit_file : function (options, done) {
-			Project
+
+			console.log('access edit_file: ', options);
+
+			User
 			.findOne({files : options.file._id})
 			.populate('roles')
 			.exec(function (err, project) {

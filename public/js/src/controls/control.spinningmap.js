@@ -17,7 +17,7 @@ L.SpinningMap = L.Class.extend({
 		position : {
 			lat : 59.91843,
 			lng : 10.74721,
-			zoom : [4, 17]
+			zoom : [15, 17]
 		},
 		circle : {
 			radius : 120, // px
@@ -137,15 +137,19 @@ L.SpinningMap = L.Class.extend({
 		    zoom = this.options.position.zoom;
 
 		// create map
-		var map = this._map = L.mapbox.map(this._container);
+		var map = this._map = L.mapbox.map(this._container, {
+			attributionControl : true
+		});
 
 		// add layer
 		var layer = L.mapbox.tileLayer(this.options.layer, {
-			format : this.options.tileFormat
+			format : this.options.tileFormat,
+
 		}).addTo(map);
 
 		// set map options
-		this.setView(lat, lng, this._getZoomLevel());
+		// this.setView(lat, lng, this._getZoomLevel());
+		this.changeView();
 		
 		// set map options
 		if (!this.options.interactivity) {
@@ -159,7 +163,7 @@ L.SpinningMap = L.Class.extend({
 
 		// remove zoom and attribution
 		map.zoomControl.removeFrom(map);
-		map.attributionControl.removeFrom(map);
+		// map.attributionControl.removeFrom(map);
 
 	},
 
@@ -171,14 +175,60 @@ L.SpinningMap = L.Class.extend({
 		var lat = this.options.position.lat,
 		    lng = this.options.position.lng;
 
+		var place = this._getPlace();
+
 		// set view
-		this.setView(lat, lng, this._getZoomLevel());
+		this.setView(place.lat, place.lng, place.zoom);
 		
 		// restart to change direction
 		this.stop();
 		this.start();
 	},
 
+	_getPlace : function () {
+		
+		var place = this._places[Math.floor(Math.random() * this._places.length)];
+		return place;
+		
+	},
+
+
+	_places : [
+		{ 
+			lat : 40.789, // nyc
+			lng : -73.953,
+			zoom : 15
+		},
+		
+		{
+			lat : 59.91843,
+			lng : 10.74721,
+			zoom :  14 	// oslo
+
+		},
+		{
+			lat: 37.789, 
+			lng: -122.4,
+			zoom : 16 	// sf
+		},
+
+		{
+			lat : 35.71, 
+			lng : 139.821, 
+			zoom : 14 	// tokyo
+		},
+		{
+			lat : -2.68, 
+			lng : -65.915, 
+			zoom : 8 	// amazonas
+		},
+
+		{
+			lat: 15.089, 
+			lng : 39.922, 
+			zoom : 10 	// eritrea
+		}
+	],
 
 
 	addHooks : function () {
@@ -198,22 +248,22 @@ L.SpinningMap = L.Class.extend({
 
 	_onResize : function () {
 
-		// sizes
-		var newSize = this._container.offsetWidth,
-	    	    oldSize = this._past || newSize,
-	 	    diff = oldSize - newSize,
-	 	    moved = diff/2 * 0.75;
-		this._past = newSize;
+		// // sizes
+		// var newSize = this._container.offsetWidth,
+	 //    	    oldSize = this._past || newSize,
+	 // 	    diff = oldSize - newSize,
+	 // 	    moved = diff/2 * 0.75;
+		// this._past = newSize;
 
-		// set centre to circle
-		this._map.panBy([-moved, 0], {
-			duration : 0
-		});
+		// // set centre to circle
+		// this._map.panBy([-moved, 0], {
+		// 	duration : 0
+		// });
 
 	},
 
 	createCircle : function () {
-
+		return;
 		// create divs
 		this._circleContainer = L.DomUtil.create('div', 'startpane-circle-container', this._wrapper);
 		this._circle = L.DomUtil.create('div', 'startpane-circle', this._circleContainer);
@@ -245,10 +295,10 @@ L.SpinningMap = L.Class.extend({
 		    offsetTop = d.height * 0.5 - d.width;
 
 		// set dimensions
-		this._container.style.height = d.width * 2 + 'px';
-		this._container.style.width = d.width * 2 + 'px';
-		this._container.style.top = offsetTop + 'px';
-		this._container.style.left = offsetLeft + 'px';
+		// this._container.style.height = d.width * 2 + 'px';
+		// this._container.style.width = d.width * 2 + 'px';
+		// this._container.style.top = offsetTop + 'px';
+		// this._container.style.left = offsetLeft + 'px';
 
 	},
 
@@ -297,9 +347,32 @@ L.SpinningMap = L.Class.extend({
 	_getZoomLevel : function (current) {
 		var min = this.options.position.zoom[0];
 		var max = this.options.position.zoom[1];
-		var random = Math.floor(Math.random()*(max-min+1)+min);
-		if (random == 13 || random == 14 || random == 15) return this._getZoomLevel();
-		return random;
+		var random = Math.floor(Math.random() * (max - min) + min);
+
+		var items = [3, 5, 13, 14];
+
+		var item = items[Math.floor(Math.random()*items.length)];
+
+		console.log('item', item);
+
+		var map = this._map._container.firstChild;
+		window._map = this._map;
+		map.style = 'transform: rotate(90deg); left: 100%;'
+
+		// var turns = [
+		// 	'turn-right',
+		// 	'turn-left'
+		// ]
+
+		// var turn = turns[Math.floor(Math.random()*turns.length)];
+
+		// L.DomUtil.removeClass(map, 'turn-right');
+		// L.DomUtil.removeClass(map, 'turn-left');
+
+		// L.DomUtil.addClass(map, turn);
+
+		// return 1;
+		return item;
 	},
 
 

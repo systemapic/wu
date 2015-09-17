@@ -16,7 +16,7 @@ var projectSchema = mongoose.Schema({
 	keywords 	: [{ type: String, default: '' }],
 	categories 	: [String],
 
-	roles     : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
+	roles : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
 
 			// image
 	logo		: String, 
@@ -35,7 +35,6 @@ var projectSchema = mongoose.Schema({
 			// all available layers connected to project
 	layers 		: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Layer' }],	
 
-
 	collections : [{
 		files : [String], // file ObjectId's or uuid's
 		title : String,
@@ -50,14 +49,13 @@ var projectSchema = mongoose.Schema({
 		cartodb : [String]
 	},
 
-			// active baselayers
+	// active baselayers
 	baseLayers : [{
 		uuid 	: String, 	// layer uuid
 		zIndex 	: { type: Number, default: '1' },
 		opacity : { type : Number, default: '1'}
 	}],
 
-	
 	bounds : {
 		northEast : {
 			lat : String,
@@ -71,31 +69,26 @@ var projectSchema = mongoose.Schema({
 		maxZoom : String
 	},
 	
-			// map initial position
+	// map initial position
 	position : {
 		lat  : { type: String, default: '0' }, 	// JSON, { lat: 44, lng: 44, zoom: 4}
 		lng  : { type: String, default: '0' },
 		zoom : { type: String, default: '2' }
 	},
-	
 
-			// layermenu for project
-	layermenu : [
+	// layermenu for project
+	layermenu : [{
+		uuid 	: String, // layermenu item uuid
+		layer   : String, // layer uuid or _id
+		caption : String, // caption/title in layermenu
+		pos     : String, // position in menu
+		zIndex  : String,
+		opacity : String,
+		folder  : { type: Boolean, default: false },
+		enabled	: { type: Boolean, default: false }, // on by default
+	}],	
 
-		{
-			uuid 	: String, // layermenu item uuid
-			layer   : String, // layer uuid or _id
-			caption : String, // caption/title in layermenu
-			pos     : String, // position in menu
-			zIndex  : String,
-			opacity : String,
-			folder  : { type: Boolean, default: false }
-		}
-	
-	],	
-	
-
-			// folders in documents pane, incl. content in html
+	// folders in documents pane, incl. content in html
 	folders : [
 		{
 			uuid    : String,
@@ -104,8 +97,7 @@ var projectSchema = mongoose.Schema({
 		}
 	],
 
-
-			// header of project/map
+	// header of project/map
 	header : {
 		logo 	 : { type: String, default: '' },
 		title 	 : { type: String, default: 'New title' },
@@ -114,8 +106,7 @@ var projectSchema = mongoose.Schema({
 		css 	 : { type: String, default: '' }
 	},
 
-
-			// controls in map
+	// controls in map
 	controls : {
 		zoom 		: { type: Boolean, default: true  },
 		measure 	: { type: Boolean, default: true  },

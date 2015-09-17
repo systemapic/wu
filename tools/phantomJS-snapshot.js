@@ -18,6 +18,9 @@ var outfile 	= path;
 
 console.log('a2rgs: ', args);
 
+console.log('isPdf', isPdf);
+console.log('outfile', outfile);
+
 // connect
 var page = require('webpage').create(),
 	server = serverUrl,

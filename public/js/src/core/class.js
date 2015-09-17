@@ -423,9 +423,6 @@ Wu.Util = {
 	},
 
 
-
-
-
 	
 
 	_getServerUrl : function () {

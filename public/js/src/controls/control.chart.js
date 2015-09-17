@@ -1,7 +1,7 @@
 Wu.Control.Chart = Wu.Control.extend({
 
 	initialize : function(options) {
-		
+
 		// OTHER OPTIONS
 		var multiPopUp = options.multiPopUp;
 		var e = options.e;
@@ -26,7 +26,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		}
 
 		// clear old popup
-		// this._popup = null;
+		this._popup = null;
 
 		// return if no content
 		if (!content) return;
@@ -39,11 +39,13 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Open popup
 		this.openPopup(e, multiPopUp);
+
 	},
 
 
 	// Open pop-up
 	openPopup : function (e, multiPopUp) {
+
 		if (this._popup) return;
 
 		var popup   = this._createPopup(),
@@ -142,8 +144,8 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Create smaller pop-up if there are no graphs to show
 		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == false ) {
-			var maxWidth = 150;
-			var minWidth = 150;
+			var maxWidth = 200;
+			var minWidth = 200;
 
 		// Create large pop-up for graph
 		} else {
@@ -162,6 +164,13 @@ Wu.Control.Chart = Wu.Control.extend({
 			appendTo : app._appPane // where to put popup
 		});
 
+
+
+		if ( !this.popupSettings.timeSeries || this.popupSettings.timeSeries.enable == false ) {
+			Wu.DomUtil.addClass(popup._container, 'tiny-pop-up')
+		}
+
+
 		return popup;
 	},
 
@@ -169,10 +178,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	// Create single point C3 pop-up content
 	singlePopUp : function (e) {
-
-
-		console.log('%c single pop-up', 'background: red; color: white;');
-		console.log('this.popupSettings', this.popupSettings);
 
 		// check if timeseries
 		var timeSeries = (this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == true );
@@ -271,8 +276,7 @@ Wu.Control.Chart = Wu.Control.extend({
 	},
 
 	// Create multi point C3 pop-up content
-	multiPointPopUp : function (_data) {	
-
+	multiPointPopUp : function (_data) {
 
 		var _average = _data.average;
 		var _center = _data.center;
@@ -333,9 +337,16 @@ Wu.Control.Chart = Wu.Control.extend({
 		var _header = this.createHeader(headerOptions);
 		content.appendChild(_header);
 
-		// Create chart
-		var _chart = this.C3Chart(_c3Obj);
-		content.appendChild(_chart);
+
+		if ( this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == true ) {
+
+			// Create chart
+			var _chart = this.C3Chart(_c3Obj);
+			content.appendChild(_chart);
+
+		}
+
+
 
 		return content;
 	},		
@@ -447,8 +458,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Get range
 		var range;
-
-		console.log('c2Ob', c3Obj);
 
 		var settingsRange = c3Obj.popupSettings.timeSeries.minmaxRange;
 	
@@ -646,6 +655,8 @@ Wu.Control.Chart = Wu.Control.extend({
 
 				var field = meta.fields[m];
 
+
+
 				// only add active tooltips
 				if (field.on) {
 
@@ -676,6 +687,12 @@ Wu.Control.Chart = Wu.Control.extend({
 	// Split time series from other meta
 	// TODO: fix this sheeet
 	C3dataObjBuilder : function (_key, _val, d3array) {
+
+		// Stop if disabled date in timeseries
+		if ( this.popupSettings.timeSeries && this.popupSettings.timeSeries[_key] ) {
+			if ( !this.popupSettings.timeSeries[_key].on ) return;
+		}
+		     
 
 		var isDate = this._validateDateFormat(_key);
 

@@ -13,42 +13,76 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	initContainer : function () {
 
+
 		// container to hold errything
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-top', app._appPane);
 
 		// Menu Button
-		this._menuBtn = Wu.DomUtil.create('div', 'chrome-menu-button', this._container);		
+		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button', this._container);		
 
 		// Portal Logo
 		this._portalLogo = Wu.DomUtil.create('div', 'chrome-portal-logo', this._container);
 		this._portalLogoImg = Wu.DomUtil.create('img', '', this._portalLogo);
+		this._portalLogoImg.src = '/css/images/systemapic-portal-logo.png';
+
+		// Project title container
+		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title-container', this._container);
+
+		// Client Logo
+		this._clientLogo = Wu.DomUtil.create('div', 'chrome-client-logo', this._projectTitleContainer);
+		this._clientLogoImg = Wu.DomUtil.create('img', '', this._clientLogo);		
 
 		// Project title
-		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title', this._container);
+		this._projectTitle = Wu.DomUtil.create('div', 'chrome-project-title', this._projectTitleContainer);
+
+
 
 		// WRAPPER FOR BUTTONS			// todo: make pluggable
-		this._buttons = Wu.DomUtil.create('div', 'chrome-buttons', this._container);
+		this._buttonWrapper = Wu.DomUtil.create('div', 'chrome-buttons', this._container);
 
 		// User name button container
-		this._usrNameContainer = Wu.DomUtil.create('div', 'username-container', this._buttons);
+		this._userNameContainer = Wu.DomUtil.create('div', 'username-container', this._buttonWrapper);
 
 		// Username
-		this._usrName = Wu.DomUtil.create('div', 'top-username', this._usrNameContainer);
+		this._userName = Wu.DomUtil.create('div', 'top-username', this._userNameContainer);
 
 		// Divider
-		this._usrDivider = Wu.DomUtil.create('div', 'top-divider', this._usrNameContainer, '&nbsp;|&nbsp;');
+		this._userDivider = Wu.DomUtil.create('div', 'top-divider', this._userNameContainer, '&nbsp;|&nbsp;');
+
+
+
 
 		// Logout
-		this._usrLogout = Wu.DomUtil.create('div', 'top-logout', this._usrNameContainer, 'log out');
+		this._userLogout = Wu.DomUtil.create('div', 'top-logout', this._userNameContainer, 'log out');
 
 		// Layers button
-		this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton displayNone', this._buttons);
-		
-		// Settings button
-		this._settingsButton = Wu.DomUtil.create('div', 'chrome-button cartoeditor displayNone', this._buttons);
+		this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton displayNone', this._buttonWrapper);
+	
 
+		// set default
 		this.initDefault();
 
+	},
+
+	// add button to top chrome
+	_registerButton : function (button) {
+
+		// button options
+		var className = button.className,
+		    trigger = button.trigger,
+		    name = button.name,
+		    ctx = button.context;
+
+		// buttons holder
+		this._buttons = this._buttons || {};
+
+		// create button
+		var buttonDiv = this._buttons[name] = Wu.DomUtil.create('div', className, this._buttonWrapper);
+
+		// register event
+		Wu.DomEvent.on(buttonDiv, 'click', trigger, ctx);
+
+		return buttonDiv;
 	},
 
 
@@ -58,9 +92,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._setPortalLogo();
 
 		// Init CPU clock
-		this.initCPUclock(this._buttons);
-
-
+		this.initCPUclock(this._buttonWrapper);
 	},
 
 
@@ -115,16 +147,18 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_setHooks : function (onoff) {
 
 		// click event on carto editor button
-		Wu.DomEvent[onoff](this._settingsButton, 'click', this._toggleSettingsPane, this);
+		// Wu.DomEvent[onoff](this._settingsButton, 'click', this._toggleSettingsPane, this);
+
+		// Wu.DomEvent[onoff](this._dataButton, 'click', this._toggleDataLibPane, this);
 
 		// Toggle layer menu
 		Wu.DomEvent[onoff](this._layersBtn, 'click', this._toggleLayermenu, this);
 
 		// Toggle left pane
-		Wu.DomEvent[onoff](this._menuBtn, 'click', this._toggleLeftPane, this);
+		Wu.DomEvent[onoff](this._menuButton, 'click', this._toggleLeftPane, this);
 
 		// Log out button
-		Wu.DomEvent[onoff](this._usrLogout, 'click', this._logOut, this);
+		Wu.DomEvent[onoff](this._userLogout, 'click', this._logOut, this);
 
 	},
 
@@ -157,8 +191,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// The layer menu
 		this.__layerMenu = app.MapPane.getControls().layermenu;
 		
-		// Show settings button if user has access to it...
-		if ( this.hasSettingsAccess() ) Wu.DomUtil.removeClass(this._settingsButton, 'displayNone');
 
 		// TODO: fikse dette...
 		setTimeout(function() {
@@ -170,27 +202,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	},
 
-	// TODO: Knut har sikkert en fiffig funksjon for dett, men...
-	hasSettingsAccess : function () {
-
-		var uuid = app.Account.store.uuid;
-		var portalRoleMembers = app.Access.store.portalRole.members;
-		var superRoleMembers = app.Access.store.superRole.members;
-
-		var hasSettingsAccess = false;
-
-		for ( var i = 0; i < portalRoleMembers.length; i++ ) {
-			if ( portalRoleMembers[i] == uuid ) hasSettingsAccess = true;
-		}
-
-		for ( var i = 0; i < superRoleMembers.length; i++ ) {
-			if ( superRoleMembers[i] == uuid ) hasSettingsAccess = true;
-		}
-
-		return hasSettingsAccess;
-
-	},
-
+	
 	_showHideLayerButton : function () {
 
 		// If there are no layers, hide button
@@ -204,25 +216,24 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_setProjectTitle : function () {
 
-		// TODO: Bedre måte å finne client name på?
+		// get client & project names
 		this._clientName = this._project.getClient().getName();
-		this._projectTitle = this._project.getHeaderTitle();
+		this._projectTitleName = this._project.getHeaderTitle();
 
-		this._projectTitleContainer.innerHTML = this._clientName.toLowerCase() + '&nbsp;:&nbsp;' + this._projectTitle.toLowerCase();
+		// set project title
+		// this._projectTitleContainer.innerHTML = this._clientName.toLowerCase() + '&nbsp;:&nbsp;' + this._projectTitle.toLowerCase();
+		this._projectTitle.innerHTML = this._projectTitleName.toLowerCase();
 	},
 
 	_setUsername : function () {
-
 		var username = app.Account.getFullName();
-		this._usrName.innerHTML = username.toLowerCase();
-
+		this._userName.innerHTML = username.toLowerCase();
 	},
 
 	_setPortalLogo : function () {
 
-		this._portalLogoImg.src = app.options.servers.portal + 'css/images/globesar-web-logo.png';
-		// this._portalLogoImg = Wu.DomUtil.create('img', '', this._portalLogo);
-		// this._portalLogoImg.src = 'https://dev2.systemapic.com/css/images/globesar-web-logo.png';
+		// portal logo from config
+		this._clientLogoImg.src = app.options.servers.portal + app.options.logos.portalLogo;
 	},
 
 
@@ -230,7 +241,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		Wu.DomEvent.stop(e);
 
 		this._leftPaneisOpen ? this.closeLeftPane() : this.openLeftPane();
-
 	},
 
 	openLeftPane : function () {
@@ -239,7 +249,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._leftPaneisOpen = true;
 
 		// Set active state of button
-		Wu.DomUtil.addClass(this._menuBtn, 'active');
+		Wu.DomUtil.addClass(this._menuButton, 'active');
 
 		// expand sidepane
 		if (app.SidePane) app.SidePane.expand();
@@ -262,8 +272,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._leftPaneisOpen = false;
 
 		// Remove active state of button
-		Wu.DomUtil.removeClass(this._menuBtn, 'active');
-
+		Wu.DomUtil.removeClass(this._menuButton, 'active');
 
 		// collapse sidepane
 		if (app.SidePane) app.SidePane.collapse();
@@ -338,35 +347,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		if (confirm('Are you sure you want to log out?')) {
 			window.location.href = app.options.servers.portal + 'logout';
 		}
-	},
-
-	_toggleSettingsPane : function () {
-		// if this is true ?         then do this        :        if not, this
-		this._settingsPaneOpen ? this._closeRightChrome() : this._openRightChrome();
-	},
-
-	_openRightChrome : function () {
-
-		// use a variable to mark editor as open
-		this._settingsPaneOpen = true;
-
-		// Add "active" class from button
-		Wu.DomUtil.addClass(this._settingsButton, 'active');
-
-		// trigger fn in right chrome to open it
-		app.Chrome.Right.open();
-	},
-
-	_closeRightChrome : function () {		
-
-		// mark not open
-		this._settingsPaneOpen = false;
-
-		// Remove "active" class from button
-		Wu.DomUtil.removeClass(this._settingsButton, 'active');
-
-		// close right chrome
-		app.Chrome.Right.close();
 	},
 
 
