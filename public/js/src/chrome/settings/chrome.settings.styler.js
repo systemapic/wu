@@ -231,6 +231,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// INIT COLOR
 	initPointOptionColor : function (sectionWrapper) {
 
+
 		var key = 'color';
 
 		// Create JSON obj if it's not already there
@@ -238,7 +239,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		// xoxoxox 
 
-		var defaultRange = ['#ff0000', '#ffff00', '#a5ff00', '#00ffff', '#003dff'];
+		var defaultRange = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'];
 
 		// Get stores states
 		var isOn   = this.cartoJSON.point[key].range ? false : true;
@@ -700,6 +701,11 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		}
 
 		if ( key == 'colorrange' ) {
+
+			console.log('updateColor updateColor updateColor updateColor updateColor updateColor updateColor');
+			console.log('updateColor updateColor updateColor updateColor updateColor updateColor updateColor');
+			console.log('updateColor updateColor updateColor updateColor updateColor updateColor updateColor');
+
 			
 			var colorBall_1 = Wu.DomUtil.get('color-range-ball-1-' + key);
 			var colorBall_2 = Wu.DomUtil.get('color-range-ball-2-' + key);
@@ -722,8 +728,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 			// Build color array
 			// var colors = [color1, color2, color3];
-
-			// fittepølse 
 			var colors = this.convertToFiveColors([color1, color2, color3]);
 
 			// Color range bar
@@ -893,10 +897,11 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			// COLOR RANGE
 			// COLOR RANGE
 			// COLOR RANGE
-			var defaultRange = ['#ff0000', '#ffff00', '#a5ff00', '#00ffff', '#003dff'];
+			var defaultRange = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'];
 
 			// Get stores states
 			var value  = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : defaultRange;
+
 
 			if ( value.length < 5 ) value = this.convertToFiveColors(value);
 

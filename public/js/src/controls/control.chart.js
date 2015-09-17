@@ -221,9 +221,13 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Create HTML
 		var _header = this.createHeader(headerOptions);
+		var _chartContainer = this.createChartContainer();
+		var _footer = this.createFooter();
 
 		var content = Wu.DomUtil.create('div', 'popup-inner-content');
 		content.appendChild(_header);
+		content.appendChild(_chartContainer);
+		content.appendChild(_footer)
 
 		return content;		
 	},	
@@ -262,13 +266,18 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Create header HTML
 		var _header = this.createHeader(headerOptions);
+		var _chartContainer = this.createChartContainer();
+		var _footer = this.createFooter();
 		content.appendChild(_header);
+		content.appendChild(_chartContainer);
+		content.appendChild(_footer);
 
 		// Create graph HTML
 		if ( this.popupSettings && this.popupSettings.timeSeries.enable != false) {
 			
 			var _chart = this.C3Chart(_c3Obj);
-			content.appendChild(_chart);
+			var _chartTicks = this.chartTicks(_c3Obj);
+			_chartContainer.appendChild(_chart);
 		
 		}
 
@@ -335,14 +344,19 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Create header
 		var _header = this.createHeader(headerOptions);
+		var _chartContainer = this.createChartContainer();
+		var _footer = this.createFooter();
 		content.appendChild(_header);
+		content.appendChild(_chartContainer);
+		content.appendChild(_footer);
 
 
 		if ( this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == true ) {
 
 			// Create chart
 			var _chart = this.C3Chart(_c3Obj);
-			content.appendChild(_chart);
+			var _chartTicks = this.chartTicks(_c3Obj);
+			_chartContainer.appendChild(_chart);
 
 		}
 
@@ -352,10 +366,50 @@ Wu.Control.Chart = Wu.Control.extend({
 	},		
 
 
+	// xoxoxoxoxoxoxo
+	chartTicks : function (c3Obj) {
+
+		console.log('%c chartTicks ', 'background: #FF33FF; color: white;');
+		console.log('c3Obj', c3Obj);
+
+		// Data
+		var data = c3Obj.d3array;
+		
+		// Ticks
+		var t = data.ticks;
+
+
+		// Start date 
+		var start = moment(t[0]).format("DD.MM.YYYY");
+
+		// End date 
+		var end = moment(t[t.length-1]).format("DD.MM.YYYY");		
+
+		this._footerContainer.innerHTML = '<span class="start-date">' + start + '</span><span class="end-date">' + end + '</span>';
+
+
+	},
+
 
 	// PRODUCE HTML
 	// PRODUCE HTML
 	// PRODUCE HTML		
+
+	createFooter : function () {
+	
+		var footerContainer = this._footerContainer = Wu.DomUtil.create('div', 'c3-footer');
+		return footerContainer;
+
+	},
+
+
+	createChartContainer : function () {
+	
+		var chartContainer = this._chartContainer = Wu.DomUtil.create('div', 'c3-chart-container');
+		return chartContainer;
+
+	},
+
 
 	// Header
 	createHeader : function (options) {
@@ -440,6 +494,12 @@ Wu.Control.Chart = Wu.Control.extend({
 		// Ticks
 		var t = data.ticks;
 
+		console.log('%c C3Chart ', 'background: #FF33FF; color: white;');
+		console.log('data.ticks', data.ticks);
+
+		// var t = [data.ticks[0], data.ticks[data.ticks.length-1]];
+
+
 		// X's and Why's
 		var x = data.x;
 		var y = data.y;
@@ -505,7 +565,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		        
 			size: {
 				height: 200,
-				width: 460
+				width: 430
 			},
 
 			point : {
@@ -553,8 +613,9 @@ Wu.Control.Chart = Wu.Control.extend({
 		                        localtime: false,
 		                        tick: {
 		                                format: '%Y',
-		                                values: t,
-		                                multiline: false                                        
+		                                // values: t,
+		                                values: [],
+		                                multiline: false
 		                        }
 		                },
 
@@ -562,7 +623,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		                	max : range,
 		                	min : -range,
 					tick: {
-						format: function (d) { return Math.floor(d * 100)/100 }
+						format: function (d) { return Math.floor(d * 100)/100}
 					}
 		                },
 
@@ -711,8 +772,13 @@ Wu.Control.Chart = Wu.Control.extend({
 
 
 			// Get only year
-			var year = moment(isDate).format("YYYY");
-			var chartTick = new Date(year);
+			// var year = moment(isDate).format("YYYY");
+			// var chartTick = new Date(year);
+
+			var cleanDate = moment(isDate);
+			var chartTick = new Date(cleanDate);
+
+
 
 			var newTick = true;
 
