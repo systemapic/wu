@@ -4,12 +4,12 @@ Wu.SidePane = Wu.Pane.extend({
 
 	_allPanes : [
 		'Clients', 
-		'Options', 
-		'Documents', 
-		'DataLibrary', 
+		// 'Options', 
+		// 'Documents', 
+		// 'DataLibrary', 
 		'Users', 
-		'Share', 
-		'Account'
+		// 'Share', 
+		// 'Account'
 	],
 
 	_initialize : function (options) {
@@ -73,13 +73,13 @@ Wu.SidePane = Wu.Pane.extend({
 
 		// render sidepanes
 		if (pane.clients) 	this.Clients 	  = new Wu.SidePane.Clients();
-		if (pane.options) 	this.Options 	  = new Wu.SidePane.Options();		// Options
-		if (pane.documents) 	this.Documents 	  = new Wu.SidePane.Documents();
-		if (pane.dataLibrary) 	this.DataLibrary  = new Wu.SidePane.DataLibrary();
-		if (pane.mediaLibrary) 	this.MediaLibrary = new Wu.SidePane.MediaLibrary();
+		// if (pane.options) 	this.Options 	  = new Wu.SidePane.Options();		// Options
+		// if (pane.documents) 	this.Documents 	  = new Wu.SidePane.Documents();
+		// if (pane.dataLibrary) 	this.DataLibrary  = new Wu.SidePane.DataLibrary();
+		// if (pane.mediaLibrary) 	this.MediaLibrary = new Wu.SidePane.MediaLibrary();
 		if (pane.users) 	this.Users 	  = new Wu.SidePane.Users();
-		if (pane.share) 	this.Share 	  = new Wu.SidePane.Share();
-		if (pane.account) 	this.Account 	  = new Wu.SidePane.Account();
+		// if (pane.share) 	this.Share 	  = new Wu.SidePane.Share();
+		// if (pane.account) 	this.Account 	  = new Wu.SidePane.Account();
 
 		this.refreshMenu();
 	},
@@ -114,13 +114,13 @@ Wu.SidePane = Wu.Pane.extend({
 	// call _deactivate on all items
 	_deactivate : function () {
 		if (this.Clients) 	this.Clients._deactivate();
-		if (this.Options) 	this.Options._deactivate();
-		if (this.Documents) 	this.Documents._deactivate();
-		if (this.DataLibrary) 	this.DataLibrary._deactivate();
-		if (this.MediaLibrary) 	this.MediaLibrary._deactivate();
+		// if (this.Options) 	this.Options._deactivate();
+		// if (this.Documents) 	this.Documents._deactivate();
+		// if (this.DataLibrary) 	this.DataLibrary._deactivate();
+		// if (this.MediaLibrary) 	this.MediaLibrary._deactivate();
 		if (this.Users) 	this.Users._deactivate();
-		if (this.Share) 	this.Share._deactivate();
-		if (this.Account) 	this.Account._deactivate();
+		// if (this.Share) 	this.Share._deactivate();
+		// if (this.Account) 	this.Account._deactivate();
 	},
 
 
@@ -214,13 +214,13 @@ Wu.SidePane = Wu.Pane.extend({
 		    canManage = app.access.to.edit_user(project, user);
 
 		if (pane.clients) 					panes.push('Clients');
-		if (pane.options 	&& canEdit) 			panes.push('Options'); 
-		if (pane.documents   	&& settings.documentsPane) 	panes.push('Documents');
-		if (pane.dataLibrary 	&& settings.dataLibrary) 	panes.push('DataLibrary');
-		if (pane.MediaLibrary 	&& settings.mediaLibrary) 	panes.push('MediaLibrary');
+		// if (pane.options 	&& canEdit) 			panes.push('Options'); 
+		// if (pane.documents   	&& settings.documentsPane) 	panes.push('Documents');
+		// if (pane.dataLibrary 	&& settings.dataLibrary) 	panes.push('DataLibrary');
+		// if (pane.MediaLibrary 	&& settings.mediaLibrary) 	panes.push('MediaLibrary');
 		if (pane.users 		&& canManage) 			panes.push('Users');
-		if (pane.share 		&& settings.socialSharing) 	panes.push('Share');
-		if (pane.account) 					panes.push('Account');
+		// if (pane.share 		&& settings.socialSharing) 	panes.push('Share');
+		// if (pane.account) 					panes.push('Account');
 
 		// set, return
 		this._panes = panes;
@@ -248,16 +248,15 @@ Wu.SidePane = Wu.Pane.extend({
 		Wu.DomUtil.addClass(app._editorContentPane, 'hide-menu');
 
 		// Make map clickable behind...
-		setTimeout(function(){
-			Wu.DomUtil.addClass(app._editorContentPane, 'displayNone');	
-		}, 50)
+		// setTimeout(function(){
+		Wu.DomUtil.addClass(app._editorContentPane, 'displayNone');	
+		// }, 50)
 
 		// refresh leaflet
 		this._refreshLeaflet();
 
 		// todo: what if panes not there?
-		Wu.DomUtil.removeClass(app.SidePane.Documents._content, 'show'); 	// refactorrr
-		Wu.DomUtil.removeClass(app.SidePane.DataLibrary._content, 'show');
+		// Wu.DomUtil.removeClass(app.SidePane.Documents._content, 'show'); 	// refactorrr
 		Wu.DomUtil.removeClass(app.SidePane.Users._content, 'show');
 	},
 
@@ -278,9 +277,9 @@ Wu.SidePane = Wu.Pane.extend({
 		Wu.DomUtil.removeClass(app._editorContentPane, 'displayNone');
 
 		// Have to set a micro timeout, so that it doesn't mess with the displayNone class above
-		setTimeout(function() {
-			Wu.DomUtil.removeClass(app._editorContentPane, 'hide-menu');
-		}, 50)
+		// setTimeout(function() {
+		Wu.DomUtil.removeClass(app._editorContentPane, 'hide-menu');
+		// }, 50)
 
 		// refresh leaflet
 		this._refreshLeaflet();
@@ -291,7 +290,7 @@ Wu.SidePane = Wu.Pane.extend({
 
 	// By Jørgen ~ Do not open full screen panes
 	openOnMobile : function () {
-		if (app._activeMenuItem == 'documents' || app._activeMenuItem == 'dataLibrary' || app._activeMenuItem == 'users') {
+		if (app._activeMenuItem == 'users') {
 			app.SidePane.Clients.activate();	
 		}
 	},

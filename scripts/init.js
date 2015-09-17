@@ -38,21 +38,20 @@ var mapnikOmnivore  = require('mapnik-omnivore');
 
 // mongo
 var mongoose = require('mongoose');
-var configDB = require('./database.js');
-
-// connect to our database
-mongoose.connect(configDB.url); 
 
 
 
 var prompt = require('prompt');
 
 // config
-var config  = require('../config/config.js');
+var config  = require('../config/server-config.js').serverConfig;
 
 var global;
 
 
+
+// connect to our database
+mongoose.connect(config.mongo.url); 
 
 
 
@@ -99,18 +98,24 @@ function create_models() {
 	// create super admin role
 	ops.push(function (user, callback) {
 
+		console.log('crataeing superadmin', user);
+
 		var role = new Role();
 		role.uuid = 'role-' + uuid.v4();
 		role.name = 'Super Admin';
 		role.members.push(user.uuid);
 		role.slug = 'superAdmin';
 		role.save(function (err, role) {
-			// set all capabilities to true
-			_.each(role.capabilities, function (cap, key) {
-				role.capabilities[key] = true;
-			})
+			
+
+			for (var o in role.capabilities.toObject()) {
+				role.capabilities[o] = true;
+			}
+
 			role.markModified('capabilities');
+			console.log('saving?')
 			role.save(function (err, role) {
+				console.log('saved?', err, role);
 
 				var msg = 'Add this Super Admin Role uuid to config.js: '.yellow + role.uuid;
 				print_info(msg);
@@ -131,9 +136,9 @@ function create_models() {
 		role.slug = 'portalAdmin';
 		role.save(function (err, role) {
 			// set all capabilities to true
-			_.each(role.capabilities, function (cap, key) {
-				role.capabilities[key] = true;
-			});
+			for (var o in role.capabilities.toObject()) {
+				role.capabilities[o] = true;
+			}
 
 			// set super cow to false
 			role.capabilities.have_superpowers = false;

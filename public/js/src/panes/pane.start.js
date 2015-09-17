@@ -28,9 +28,6 @@ Wu.StartPane = Wu.Pane.extend({
 		// refresh latest projects
 		this.refreshProjects();
 
-		// Show the header pane.
-		Wu.DomUtil.removeClass(Wu.app.HeaderPane._container, 'displayNone');
-
 	},	
 
 	deactivate : function() {
@@ -288,15 +285,8 @@ Wu.StartPane = Wu.Pane.extend({
 
 	selectProject : function(project) {
 
-		console.log('select!');
-
 		// a hack to disable hook temporarily
 		if (this._hooksDisabled) return;
-
-		console.log('..selecting');
-
-		// select project
-		// project.select();
 
 		// refresh sidepane
 		app.SidePane.refreshMenu();

@@ -50,6 +50,7 @@ L.Control.Inspect = Wu.Control.extend({
 		// stop
 		Wu.DomEvent.on(container, 'mousedown click dblclick', Wu.DomEvent.stop, this);
 
+		
 		return this;
 	},
 
@@ -195,6 +196,7 @@ L.Control.Inspect = Wu.Control.extend({
 
 	// currently called from layers.js:63 .. refactor.. dont chain, do modules, event emitters
 	addLayer : function (layer) {
+		if (!this._layers) return; // bc fn called even if inspect is disabled
 		
 		// Make sure that the layer inspector is visible
 		this._content.style.display = 'block';
@@ -204,7 +206,7 @@ L.Control.Inspect = Wu.Control.extend({
 		var arrowsWrap 	= Wu.DomUtil.create('div', 'inspect-arrows-wrap', wrapper);
 		var upArrow 	= Wu.DomUtil.create('div', 'inspect-arrow-up', arrowsWrap);
 		var downArrow 	= Wu.DomUtil.create('div', 'inspect-arrow-down', arrowsWrap);
-		var text 	= Wu.DomUtil.create('div', 'inspect-text', wrapper, layer.store.title);
+		var text 	= Wu.DomUtil.create('div', 'inspect-text', wrapper, layer.getTitle());
 		var fly 	= Wu.DomUtil.create('div', 'inspect-fly', wrapper);
 		var eye 	= Wu.DomUtil.create('div', 'inspect-eye', wrapper);
 		var kill 	= Wu.DomUtil.create('div', 'inspect-kill', wrapper);
@@ -531,7 +533,7 @@ L.Control.Inspect = Wu.Control.extend({
 		var descriptionControl = app.MapPane.getControls().description;
 		if (descriptionControl) descriptionControl.removeLayer(entry.layer);	
 
-		// Hise Layer inspector if it's empty
+		// Hide Layer inspector if it's empty
 		if (!this._layers.length) this._content.style.display = 'none';
 
 	},

@@ -1,0 +1,1537 @@
+/* CHROME CHROME CHROME CHROME CHROME CHROME CHROME CHROME */
+/* CHROME CHROME CHROME CHROME CHROME CHROME CHROME CHROME */
+/* CHROME CHROME CHROME CHROME CHROME CHROME CHROME CHROME */
+
+
+/* TOP TOP TOP */
+/* TOP TOP TOP */
+/* TOP TOP TOP */
+
+.chrome-top {
+    background: white;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 35px;
+    width: 100%;
+    z-index: 9999999999;
+    }
+
+/* TOP: Menu button */
+.chrome-menu-button {
+    position: absolute;
+    width: 42px;
+    height: 35px;
+    border-right: 1px dashed #A6A6A6;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+    z-index: 200;
+    }
+
+.chrome-menu-button:before {
+    content: '';
+    background-image: url(images/systemapic-sprite.png);
+    background-repeat: no-repeat;
+    background-position: 1px -43px;
+    position: absolute;
+    width: 42px;
+    height: 35px;
+    top: 0;
+    left: 0;
+    opacity: 0.5;
+    }
+
+.chrome-menu-button.active:before,
+.chrome-menu-button:hover:before {
+    opacity: 1;
+    }
+
+/* TOP: Logo */
+.chrome-portal-logo {
+    position: relative;
+    left: 50px;
+    top: 3px;  
+    }
+
+.chrome-top:before {
+    content: '';
+    background: black;
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    top: 35px;
+    z-index: 0;
+    opacity: 0.2;
+    }
+
+/* TOP: Project title */
+.chrome-project-title-container {
+    position: absolute;
+    top: 4px;
+    width: 100%;
+    text-align: center;
+    }
+
+.chrome-project-title {
+    text-align: center;
+    font-size: 14px;
+    color: #999;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    width: auto;
+    top: 3px;
+    left: 9px;    
+    }
+
+/* TOP: Client logo */
+.chrome-client-logo {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;    
+    }
+
+
+/* TOP: username */
+.username-container {
+    font-size: 14px;
+    color: #999;
+    top: 7px;
+    right: 11px;
+    }
+
+.username-container,
+.username-container .top-username,
+.username-container .top-logout,
+.username-container .top-divider {
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    }
+
+.username-container .top-username,
+.username-container .top-logout {
+    cursor: pointer;
+    }
+
+.username-container .top-username:hover,
+.username-container .top-logout:hover {
+    color: #333;
+    }
+
+/* TOP RIGHT BUTTONS */
+.chrome-buttons {
+    position: absolute;
+    width: 100%;
+    height: 35px;
+    text-align: right;
+    top: 0;
+    z-index: 100;
+    }
+
+.chrome-button {
+    background-image: url(images/systemapic-sprite.png);
+    background-repeat: no-repeat;    
+    position: relative;
+    width: 30px;
+    height: 35px;
+    display: inline-block;
+    vertical-align: top;    
+    margin-right: 5px;
+    opacity: 0.5;
+    cursor: pointer;
+    }
+
+.chrome-button.active,
+.chrome-button:hover {
+    opacity: 1;
+    }
+
+.chrome-button.cartoeditor {
+    background-position: -6px -3px;
+    }
+
+.chrome-button.layerbutton {
+    background-position: -44px -2px;
+    }
+
+.chrome-button.datalib {
+    background-position: -85px -2px;
+    }
+
+.chrome-layer-button-arrow {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: 35px;
+    right: 8px;
+    background: white;
+    display: none;
+    -ms-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    }
+
+.share-dropdown {
+    top: 38px !important;
+    }
+
+
+
+
+
+/* RIGHT RIGHT RIGHT */
+/* RIGHT RIGHT RIGHT */
+/* RIGHT RIGHT RIGHT */
+
+.chrome-right {
+    background: white;
+    position: absolute;
+    right: 0;
+    top: 35px;
+    height: 100%;
+    width: 0;
+    z-index: 99999999999;
+    }
+
+.chrome.chrome-content.styleditor.header {
+    width: 100%;
+    height: 80px;
+    background: #F76F6F;
+    }
+
+.chrome.chrome-content.styleditor.title {
+    font-size: 28px;
+    padding: 5px;
+    }
+
+.chrome.chrome-content.styleditor.subtitle {
+    font-size: 16px;
+    padding: 5px;
+    }
+
+.chrome.chrome-content.styleditor.tabs-container {
+    height: 30px;
+    width: 100%;
+    background: #AAFFAA;
+    border-top: 1px solid grey;
+    }
+
+.chrome.chrome-content.styleditor.tab {
+    width: 30%;
+    height: 100%;
+    position: relative;
+    background: red;
+    float: left;
+    }
+
+.chrome.chrome-content.styleditor.tab.fullauto {
+    background: blue;
+    }
+
+.chrome.chrome-content.styleditor.tab.sql {
+    background: cyan;
+    }
+
+.chrome.chrome-content.styleditor.tab.open {
+    width: 40%;
+    }
+
+/*.chrome-content.settingsSelector { */
+.settingsSelector-header {
+    position: relative;
+    padding-bottom: 20px;
+    width: 100%;
+    border-bottom: 1px dashed #ccc;
+    }
+
+.chrome-content.settings-button-wrapper {
+    margin-left: 20px;
+    }
+
+.chrome-content.settings-button {
+    background: #ddd;
+    width: auto;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    padding: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-right: 4px;
+    font-weight: 500;
+    color: black;
+    cursor: pointer;
+    margin-top: 4px;
+    font-size: 15px;
+    }
+
+.chrome-content.settings-button:hover {
+    background: #ccc;
+    }
+
+.chrome-content.settings-button:active {
+    background: #bbb;
+    }    
+
+.chrome-content.settings-title {
+    font-size: 18px;
+    margin: 5px;
+    margin-left: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 0;
+    margin-top: 8px;
+    }
+
+.chrome-content.settings-tabs-wrapper {
+    position: absolute;
+    /*top: 120px;*/
+    top: 108px;
+    }
+
+.chrome-content.title,
+.chrome-content.active-layer.title {
+    font-size: 16px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-weight: 900;
+    }
+
+.chrome-content.active-layer.select-wrap {
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    /*min-width: 312px;*/
+    /*max-width: 360px;*/
+    width: 100%;
+    border-radius: 3px;
+    overflow: hidden;
+    background-color: #fff;
+    position: relative;
+    z-index: 100;
+    }
+
+.chrome-content.active-layer.select-wrap:before {
+    content: '';
+    background: white;
+    position: absolute;
+    right: 0;
+    width: 20px;
+    top: 4px;
+    height: 20px;
+    z-index: 101;
+    background: #fff url("images/arrowdown.gif") no-repeat;
+    pointer-events: none;
+    }
+
+.chrome-content.active-layer.select-wrap select {
+    padding: 5px 8px;
+    width: 130%;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    background-image: none;
+    -webkit-appearance: none;
+       -moz-appearance: none;
+            appearance: none;
+    }
+
+.chrome-content.active-layer.select-wrap select:focus {
+    outline: none;
+    }
+
+.chrome-content.settings-button.active-tab {
+    background: #71C4A8;
+    color: white;
+    }
+
+.chrome-content.settings-button.active-tab:hover {
+    background: #67B097;
+    }
+
+.chrome-content.settings-button.active-tab:active {
+    background: #5a9b87;
+    }    
+
+.chrome.chrome-content.styler {
+    margin-top: 5px;
+    }
+
+.chrome-right {
+    border-top: 1px solid #999;
+    }
+
+.chrome-right:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -2px;
+    width: 2px;
+    height: 100%;
+    background: black;
+    opacity: 0.2;
+    }
+
+.chrome-right-big-button {
+    width: 200px;
+    height: 35px;
+    background: #FF5E5E;
+    border-radius: 3px;
+    text-align: center;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto;
+    padding: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+    }
+
+.chrome-right-big-button:hover {
+    background: red;
+    }
+
+.chrome-right-big-button.upload {
+    background: #71C4A8;
+    }
+
+.chrome-right-big-button.upload:hover {
+    background: #67B097;
+    }
+
+.chrome-right-big-button.upload:active {
+    background: #5a9b87;
+    }    
+
+.chrome.chrome-content.cartocss.title {
+    font-size: 15px;
+    margin: 5px;
+    margin-top: 20px;
+    margin-left: 20px;
+    opacity: 0;
+    transition: opacity 0.5s linear;
+    }
+
+.chrome.chrome-content.styler-content.active-layer.wrapper {
+    padding-left: 30px;
+    padding-bottom: 30px;
+    padding-right: 7px;
+    }
+
+
+/* CODE MIRROR */
+
+.CodeMirror { 
+        height: 100%;
+        border: 1px solid #ddd;
+        visibility: visible !important;
+        position: relative !important;
+        top: 0 !important;
+        -webkit-transition: opacity 0.5s linear;
+        -moz-transition: opacity 0.5s linear;
+        -ms-transition: opacity 0.5s linear;
+        -o-transition: opacity 0.5s linear;
+        transition: opacity 0.5s linear;
+        opacity: 0;
+        background: white;
+        font-size: 12px;    
+        }
+
+.CodeMirror pre { 
+        padding-left: 7px; 
+        line-height: 1.25; 
+        }
+
+.span.cm-carto-valid-identifier {
+    color: #353535;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* IMPORTED FROM CHROME.CSS => STILL NEED TO MATCH IT UP WITH CODE ABOVE!!! */
+/* IMPORTED FROM CHROME.CSS => STILL NEED TO MATCH IT UP WITH CODE ABOVE!!! */
+/* IMPORTED FROM CHROME.CSS => STILL NEED TO MATCH IT UP WITH CODE ABOVE!!! */
+
+
+/* RIGHT PANE HEADER */
+/* RIGHT PANE HEADER */
+/* RIGHT PANE HEADER */
+
+/* HEADER BUTTON WRAPPER */
+/* HEADER BUTTON WRAPPER */
+/* HEADER BUTTON WRAPPER */
+
+.chrome-content.settings-button-wrapper {
+    padding-right: 20px;
+    }
+
+
+/* HEADER TITLE */
+/* HEADER TITLE */
+/* HEADER TITLE */
+
+.chrome-header-title {
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 0;
+    }    
+
+/* HEADER BUTTONS */
+/* HEADER BUTTONS */
+/* HEADER BUTTONS */
+
+.chrome-content.settings-button {
+    margin-top: 3px;
+    font-size: 14px;
+    margin-right: 3px;    
+    padding-bottom: 3px;
+    }
+
+
+/* RIGHT PANE CONTENT WRAPPER */
+/* RIGHT PANE CONTENT WRAPPER */
+/* RIGHT PANE CONTENT WRAPPER */
+
+.settings-tabs-wrapper {
+    max-height: 100%;
+    position: absolute;
+    top: 108px;
+    padding-top: 0px;
+    min-height: 100%;
+    width: 100%;
+    padding-bottom: 150px;
+    box-sizing: border-box;
+    overflow: hidden;
+    }
+
+
+/* MIDDLE CONTAINER (WITH SCROLLER) */
+/* MIDDLE CONTAINER (WITH SCROLLER) */
+/* MIDDLE CONTAINER (WITH SCROLLER) */
+
+.chrome-middle-section {
+    padding-bottom: 141px;
+    padding-right: 0px;
+    position: absolute;
+    height: 100%;
+    width: 351px;
+    }
+
+.chrome-middle-section.middle-section-padding-bottom {
+    padding-bottom: 290px;
+    }
+
+
+.chrome-middle-section-outer-scroller {
+    position: relative;
+    width: 337px;
+    height: 100%;
+    overflow: hidden;
+    }
+
+.chrome-middle-section-inner-scroller {
+    position: relative;
+    width: 352px;
+    height: 100%;
+    overflow-y: scroll;
+    padding-right: 24px;
+    overflow-x: hidden;
+    padding-top: 17px;
+    }
+
+
+/* BOTTOM CONTAINER */
+/* BOTTOM CONTAINER */
+/* BOTTOM CONTAINER */
+
+.chrome-content-bottom-container {
+    position: absolute;
+    width: 100%;
+    bottom: 153px;
+    padding-bottom: 30px;
+    padding-top: 20px;
+    border-top: 1px dashed #ccc;
+    }
+
+
+/* EACH PANE WRAPPER */
+/* EACH PANE WRAPPER */
+/* EACH PANE WRAPPER */
+
+.chrome.chrome-content.chrome-pane {
+    width: 352px;
+    min-height: 100%;
+    position: absolute;
+    }
+
+
+/* LAYER SELECTOR WRAPPER */
+/* LAYER SELECTOR WRAPPER */
+/* LAYER SELECTOR WRAPPER */
+
+.chrome-content.active-layer.wrapper {
+    margin-top: 0 !important;
+    }
+
+
+/* SECTION WRAPPER */
+/* SECTION WRAPPER */
+/* SECTION WRAPPER */
+
+.chrome-content-section-wrapper {
+    margin-bottom: 20px;
+    }
+
+
+/* FIELD WRAPPER */
+/* FIELD WRAPPER */
+/* FIELD WRAPPER */
+
+.chrome-field-wrapper {
+    padding: 0px 30px 200px 30px;
+    width: 352px;
+    }
+
+
+/* CONTENT HEADER */
+/* CONTENT HEADER */
+/* CONTENT HEADER */
+
+.chrome-content-header {
+    font-weight: 900;
+    font-size: 14px;
+    margin-bottom: 5px;    
+    }
+
+.chrome-content-header-gray {
+    font-style: italic;
+    color: #999;
+    font-weight: 500;    
+    }
+
+
+/* CONTENT FIELDS/LINES */
+/* CONTENT FIELDS/LINES */
+/* CONTENT FIELDS/LINES */
+
+.chrome-metafield-line {
+    border-top: 1px solid #999;
+    /*padding-top: 2px;*/
+    /*padding-bottom: 2px;*/
+
+    padding-top: 4px;
+    padding-bottom: 4px;
+
+    font-size: 14px;
+    position: relative;
+    }
+
+.chrome-metafield-line:last-child {
+    border-bottom: 1px solid #999;    
+    }
+
+.chrome-metafield-line .chrome-metafield-line {
+    border: none;
+    color: #999;
+    border-top: 1px dashed #999;
+    margin-top: 1px;   
+    padding-bottom: 0; 
+    }    
+
+input.chrome-field-input {
+    border: none;
+    }
+
+
+/* INPUT TYPES */
+/* INPUT TYPES */
+/* INPUT TYPES */
+
+/* SWITCH */
+/* SWITCH */
+/* SWITCH */
+
+.chrome-switch-container {
+    width: 29px;
+    height: 16px;
+    background-color: white;
+    border-radius: 20px;
+    top: 2px;
+    float: left;
+    margin-right: 10px;    
+    position: relative;
+    box-shadow: 0 0 1px 0 rgba(0,0,0,0.5) inset;
+    cursor: pointer;
+    overflow: visible;
+    -webkit-transition: background-color 100ms;
+    -moz-transition: background-color 100ms;
+    -ms-transition: background-color 100ms;
+    -o-transition: background-color 100ms;
+    transition: background-color 100ms;
+    }
+
+.chrome-switch-container:before {
+    content: '';
+    position: absolute;
+    background-color: white;
+    left: 0;
+    width: 15px;
+    height: 15px;
+    border-radius: 20px;
+    box-shadow: 0 0 1px 0 rgba(0,0,0,0.1) inset, 1px 1px 2px 0 rgba(0,0,0,0.3);
+    -webkit-transition: left 100ms;
+    -moz-transition: left 100ms;
+    -ms-transition: left 100ms;
+    -o-transition: left 100ms;
+    transition: left 100ms;
+    }    
+
+.chrome-switch-container.switch-on {
+    background-color: #71c4a8;
+    }
+
+.chrome-switch-container.switch-on:before {
+    left: 15px;
+    }
+
+.right-switch {
+    float: right;
+    margin-left: 10px;
+    margin-right: 0;
+    }
+
+
+
+/* MINI INPUT */
+/* MINI INPUT */
+/* MINI INPUT */
+
+.chrome-field-mini-input,
+.chrome-field-mini-input:focus {
+    width: 34px;
+    height: 18px;
+    position: relative;
+    float: right;
+    border: 1px solid #ccc !important;
+    top: 1px;
+    text-align: center;
+    line-height: 1.2;
+    font-size: 12px;
+    font-weight: 900;
+    margin-left: 2px;
+    opacity: 1;
+    }
+
+.left-mini,
+.left-mini:focus {
+    float: left;
+    margin-left: 0;
+    margin-right: 5px;
+    -webkit-transition: width 100ms, opacity 100ms, margin 100ms;
+    transition: width 100ms, opacity 100ms, margin 100ms;
+    }
+
+.left-mini-kill,
+.left-mini-kill:focus {
+    width: 0;
+    opacity: 0;
+    margin: 0;
+    border: none !important;
+    }    
+
+
+/* DOUBLE MINI INPUT */
+/* DOUBLE MINI INPUT */
+/* DOUBLE MINI INPUT */
+
+.mini-input-dual,
+.mini-input-dual:focus {
+    width: 80px !important;
+    }    
+
+
+/* SET/CLEAR BUTTON */
+/* SET/CLEAR BUTTON */
+/* SET/CLEAR BUTTON */
+
+.setClear,
+.chrome-set {
+    background: #ddd;
+    position: relative;
+    float: left;
+    font-size: 11px;
+    font-weight: 900;
+    width: 50px;
+    text-align: center;
+    height: 17px;
+    line-height: 1.5;
+    margin-right: 8px;
+    border-radius: 3px;
+    top: 1px;
+    color: white;
+    cursor: pointer;
+    }
+
+.setClear {
+    color: #666;
+    }
+
+.setClear:hover {
+    background: #bbb;
+    }
+
+.setClear:active {
+    background: #ccc;
+    }
+
+.chrome-set,
+.setClear.setClear-on {
+    background: #6AB69C;
+    color: white;
+    }
+
+.chrome-set:hover,
+.setClear.setClear-on:hover {   
+    background: #67B097;
+    }
+
+.chrome-set:active,
+.setClear.setClear-on:active {
+    background: #5a9b87;
+    }
+
+.chrome-set:active {
+    background: #5a9b87;
+    }
+
+
+/* MINI DROPDOWN */
+/* MINI DROPDOWN */
+/* MINI DROPDOWN */
+
+.select-field-wrap {
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    width: 37px;
+    border-radius: 3px;
+    overflow: hidden;
+    background-color: #fff;
+    z-index: 100;
+    position: absolute;
+    right: 0px;
+    font-size: 12px;
+    }
+
+.select-field-wrap:before {
+    content: '';
+    background: white;
+    position: absolute;
+    right: -2px;
+    width: 20px;
+    top: -2px;
+    height: 20px;
+    z-index: 101;
+    background: #fff url("images/arrowdown.gif") no-repeat;
+    pointer-events: none;
+    }
+
+.select-field-wrap select {
+    padding: 1px 8px 0px 8px;
+    width: 130%;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    background-image: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;    
+    }
+
+.active-field-option {
+    color: black;
+    }
+
+.chrome-mini-dropdown {
+    width: 125px;
+    }
+
+.chrome-mini-dropdown.full-width {
+    width: 162px;
+    right: 0 !important;
+    }    
+
+
+/* COLOR BALL */
+/* COLOR BALL */
+/* COLOR BALL */
+
+.chrome-color-ball {
+    width: 18px;
+    height: 18px;
+    position: relative;
+    float: right;
+    border-radius: 14px;
+    top: 1px;
+    right: 10px;
+    box-shadow: 0 0 0 1px #666 inset, 0 0 0 3px white inset;
+    cursor: pointer;
+    margin-left: 2px;
+    }    
+
+
+/* RADIO */
+/* RADIO */
+/* RADIO */
+
+
+.layer-radio {
+    width: 15px;
+    height: 15px;
+    position: absolute;
+    right: 0;
+    /*top: 4px;*/
+    top: 6px;
+    box-shadow: 0 0 0 1px #ccc inset, 0 0 0 3px #FFFFFF inset;
+    z-index: 9999;
+    border-radius: 10px;
+    background: #eee;
+    cursor: pointer;
+    }
+
+.layer-radio:hover {
+    background: #ddd;
+    }
+
+.radio-on {
+    background: #71C4A8;
+    }
+
+.radio-on:hover {
+    background: #67B097;
+    }
+
+.radio-on:active {
+    background: #5a9b87;
+    }
+
+
+
+/* ***************************************** */
+
+
+
+
+
+
+
+/* TOOLTIP SPECIFIC */
+/* TOOLTIP SPECIFIC */
+/* TOOLTIP SPECIFIC */
+
+.chrome-content-tooltip-title-field,
+.chrome-content-tooltip-title-field:focus {
+    width: 100%;
+    border: 1px solid #ccc !important;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    }
+
+/* ***************************************** */
+
+
+
+
+/* PROJECT LAYERS SPECIFIC */
+/* PROJECT LAYERS SPECIFIC */
+/* PROJECT LAYERS SPECIFIC */
+
+/* TOGGLE BUTTONS OUER WRAPPER */
+/* TOGGLE BUTTONS OUER WRAPPER */
+/* TOGGLE BUTTONS OUER WRAPPER */
+
+.chrome-layers-top-button-wrapper {
+    margin: auto;
+    top: 0;
+    position: relative;
+    background: white;
+    padding: 10px 20px 10px 20px;
+    height: 56px;
+    border-bottom: 1px dashed #ccc;
+    }
+
+
+/* TOGGLE BUTTON WRAPPER */
+/* TOGGLE BUTTON WRAPPER */
+/* TOGGLE BUTTON WRAPPER */
+
+.chrome-layer-baselayer-toggle {
+    margin-bottom: 25px;
+    }
+
+
+/* TOGGLE BUTTONS */
+/* TOGGLE BUTTONS */
+/* TOGGLE BUTTONS */
+
+.chrome-layer-toggle-button {
+    width: 50%;
+    background: #ddd;
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    padding: 7px 1px 7px 1px;
+    color: #333;
+    font-weight: 900;
+    font-size: 14px;
+    cursor: pointer;
+    }
+
+.chrome-layer-toggle-button:hover {
+    background: #ccc;
+    }    
+
+.chrome-layer-toggle-button:active {
+    background: #bbb;
+    }        
+
+.chrome-layer-toggle-button.chrome-baselayer {
+    border-radius: 4px 0px 0px 4px;
+    }
+
+.chrome-layer-toggle-button.chrome-layer {
+    border-radius: 0px 4px 4px 0px;
+    border-left: 1px solid white;
+    }
+
+.layer-toggle-active {
+    background: #71C4A8;
+    color: white;
+    }
+
+.layer-toggle-active:hover {
+    background: #67B097;
+    }
+
+.layer-toggle-active:active {
+    background: #5a9b87;
+    }
+
+
+/* PSEUDO ELEMENT FOR OCCUPIED LAYER */
+/* PSEUDO ELEMENT FOR OCCUPIED LAYER */
+/* PSEUDO ELEMENT FOR OCCUPIED LAYER */
+
+.deactivated-layer:before {
+    content: 'base layer';
+    background: rgba(255,255,255,0.7);
+    z-index: 9999;
+    position: absolute;
+    width: 289px;
+    height: 20px;
+    text-align: right;
+    font-weight: 900;
+    font-style: italic;
+    color: #71C4A8;
+    line-height: 1.3;
+    }
+
+.editing-baselayers .deactivated-layer:before { 
+    content: 'layer';
+    }
+
+
+/* EACH LINE ADJUSTMENTS */
+/* EACH LINE ADJUSTMENTS */
+/* EACH LINE ADJUSTMENTS */
+
+.chrome-pane.layers .chrome-field-line {
+    padding-left: 39px;
+    }
+
+.chrome-pane.layers {
+    padding-top: 0;
+    }    
+
+
+/* ***************************************** */
+
+
+
+/* STYLER SPECIFIC */
+/* STYLER SPECIFIC */
+/* STYLER SPECIFIC */
+
+
+.chrome.chrome-content.styler {
+    margin-top: 0;
+    }
+
+/* COLOR RANGE */
+/* COLOR RANGE */
+/* COLOR RANGE */
+
+
+.chrome-color-range-wrapper {
+    top: 2px;
+    }
+
+.chrome-color-range-wrapper,
+.chrome-color-range {
+    position: relative;
+    float: right;
+    box-shadow: 0 0 0px 1px #ccc inset, 0 0 0px 2px white inset;
+    cursor: pointer;
+    z-index: 1000;
+    }
+
+.chrome-color-range {
+    height: 18px;
+    width: 140px;
+    width: 163px;
+    }
+
+.chrome-color-selector-wrapper {
+    right: -5px;
+    background: transparent;
+    position: absolute;
+    right: -10px;
+    z-index: 9999999;
+    width: 178px;
+    height: 24px;
+    padding-top: 2px;
+    top: -3px !important;
+    }
+
+.color-range-ball {
+    margin: 0;
+    right: 0;
+    }
+
+.rangeball-1 {
+    position: absolute;
+    left: 2px;
+    top: 3px;
+    }
+
+.rangeball-2 {
+    position: absolute;
+    left: 78px;
+    top: 3px;
+    }
+
+.rangeball-3 {
+    position: absolute;
+    right: 2px;
+    top: 3px;
+    }
+
+.click-catcher {
+    position: fixed;
+    width: 350px;
+    height: 100%;
+    top: 262px;
+    right: 0;
+    z-index: 999;
+    }
+
+.color-range-preset-wrapper {
+    padding: 5px;
+    background: white;
+    box-shadow: 0 0 3px 0 rgba(0,0,0,0.4);
+    top: 26px;
+    position: relative;
+    }
+
+.color-range-preset {
+    padding: 10px;
+    margin-bottom: 1px;
+    }
+
+
+/* STYLER ADJUST INPUTS */
+/* STYLER ADJUST INPUTS */
+/* STYLER ADJUST INPUTS */
+
+.chrome-pane.styler .chrome-field-line {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    }
+
+.chrome-pane.styler .chrome-switch-container {
+    top: 6px;
+    right: 4px;
+    }
+
+.chrome-pane.styler .chrome-field-mini-input, 
+.chrome-pane.styler .chrome-field-mini-input:focus {
+    height: 22px;
+    top: 3px;
+    }
+
+.chrome-pane.styler .select-field-wrap {
+    right: 37px;
+    margin-top: 3px;
+    }
+
+.chrome-pane.styler .select-field-wrap:before {
+    top: 0;
+    }
+
+.chrome-pane.styler .chrome-color-range {
+    height: 22px;
+    }
+
+.chrome-pane.styler .chrome-color-selector-wrapper {
+    top: -1px;
+    }
+
+.chrome-pane.styler .select-field-wrap select {
+    padding: 2px 8px 2px 8px;
+    }    
+
+.chrome-pane.styler .chrome-color-ball {
+    top: 5px;
+    right: 8px;
+    }
+
+
+/* ***************************************** */
+
+
+/* MAP SETTINGS SPECIFIC */
+/* MAP SETTINGS SPECIFIC */
+/* MAP SETTINGS SPECIFIC */
+
+.chrome.chrome-content.chrome-pane.mapsettings {
+    padding-top: 0px;
+    }
+
+.chrome-pane.mapsettings {
+    padding-top: 0px;
+    }
+
+/* ***************************************** */    
+
+
+/* CARTOCSS SPECIFIC */
+/* CARTOCSS SPECIFIC */
+/* CARTOCSS SPECIFIC */
+
+.chrome-pane.cartocss {
+    padding-top: 17px;
+    }
+
+.chrome.chrome-content.cartocss.refresh-button {
+    z-index: 9999999999;
+    }
+
+.chrome-pane.cartocss .active-layer.wrapper {
+    padding-right: 30px !important;
+    }
+
+
+
+/* ***************************************** */    
+
+
+
+/* FILTERS SPECIFIC */
+/* FILTERS SPECIFIC */
+/* FILTERS SPECIFIC */
+
+
+.chrome-pane.filters .chrome-middle-section {
+    transition: padding-bottom 250ms ease;
+    }
+
+.chrome-pane.filters .chrome-middle-section.no-sql {
+    /*padding-bottom: 176px;*/
+    padding-bottom: 186px;
+    }
+
+.chrome-content.sql-wrapper-outer {
+    opacity: 0;
+    height: 114px;
+    -webkit-transition: opacity 200ms linear;
+    transition: opacity 200ms linear;
+    }    
+
+.chrome-content.sql-wrapper-outer.active {
+    opacity: 1;
+    }
+
+
+
+/* BOTTOM CONTAINER */
+/* BOTTOM CONTAINER */
+/* BOTTOM CONTAINER */
+
+.sql-bottom-container {
+    position: absolute;
+    width: 100%;
+    /*bottom: 32px;*/
+    /*bottom: 42px;*/
+    bottom: 39px;
+    padding-bottom: 0;
+    padding-top: 0;
+    border-top: 1px dashed #ccc;
+    opacity: 0;
+    transition: opacity 0.5s linear, bottom 250ms ease;
+    }
+
+.sql-bottom-container.active {
+    bottom: 143px;
+    }
+
+.chrome.chrome-content.cartocss.title {
+    font-size: 16px;
+    margin: 5px 5px 5px 30px;
+    opacity: 1;
+    -webkit-transition: opacity 0.5s linear;
+    transition: opacity 0.5s linear;
+    height: 22px;
+    }
+
+
+/* SAVE BUTTON */
+.sql-save {
+    background: #71C4A8;
+    color: white;
+    padding: 6px;
+    position: absolute;
+    right: 6px;
+    top: 4px;
+    font-weight: 900;
+    line-height: 1;
+    opacity: 0;
+    -webkit-transition: opacity 200ms linear;
+    transition: opacity 200ms linear;
+    padding-top: 4px;
+    cursor: pointer;
+    }
+
+.sql-save:hover {
+    background: #67B097;
+    }
+
+.sql-save:active {
+    background: #5a9b87;
+    }
+
+.sql-save.active {
+    opacity: 1;
+    }    
+
+
+/* CHART */
+/* CHART */
+/* CHART */
+
+#chrome-content-filter-chart {
+    margin-bottom: 20px;
+    position: relative;
+    }
+
+.null-histogram:before {
+    content: 'No valid data to create histogram from.';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.8);
+    text-align: center;
+    font-size: 13px;
+    padding-top: 74px;
+    padding-left: 22px;
+    }
+
+.chrome-content.sql.title {
+    padding: 5px;
+    cursor: pointer;
+    font-weight: 900;
+    left: 10px;
+    position: relative;
+    margin-bottom: 0px;    
+    }
+
+/* ***************************************** */
+
+
+
+/* DATA LIBRARY */
+/* DATA LIBRARY */
+/* DATA LIBRARY */
+
+.chrome-data-top {
+    border-bottom: 1px dashed #ccc;
+    position: absolute;
+    width: 100%;
+    height: 80px;
+    padding: 10px 20px 20px 20px;    
+    }
+
+.chrome-data-bottom {
+    border-top: 1px dashed #ccc;
+    position: absolute;
+    bottom: 35px;
+    width: 100%;
+    height: 91px;
+    padding-top: 17px;
+    }
+
+.chrome-data-inner {
+    padding: 80px 25px 0px 25px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    }
+
+.chrome-data-outer-scroller {
+    width: 300px;
+    height: 100%;
+    overflow: hidden;
+    }
+
+.chrome-data-scroller {
+    height: 100%;
+    overflow-x: scroll;    
+    width: 320px;
+    padding-right: 20px;
+    }
+
+.chrome-data-inner.padding-top {
+    padding-top: 55px;
+    }    
+
+.chrome-upload-button {
+    border-radius: 0;
+    text-align: center;
+    font-weight: 700;
+    color: white;
+    padding: 5px 0px 5px 0px;
+    cursor: pointer;
+    line-height: 1;
+    background: #71C4A8;
+    position: relative;
+    margin-top: 3px; 
+    }
+
+.file-list-container {
+    margin-top: 20px;
+    margin-bottom: 35px;
+    }
+
+.data-list-line {
+    cursor: pointer;
+    position: relative;
+    padding-left: 5px;
+    line-height: 1.2;
+    padding-bottom: 4px;
+    padding-top: 4px;
+    }
+
+.file-list-container-title {
+    font-size: 16px;
+    margin-bottom: 9px;
+    }
+
+.file-selected:before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #70c4aa;
+    z-index: -1;
+    border-radius: 0px;
+    left: 0;
+    opacity: 0.15;
+    top: 0px;
+    }
+
+.file-popup {
+    position: absolute;
+    background: white;
+    right: 3px;
+    padding: 13px 20px 13px 19px;
+    box-shadow: 0 0 2px 1px rgba(0,0,0,0.4);
+    z-index: 400;
+    top: 27px;
+    width: 142px;
+    cursor: default;
+    }
+
+.file-popup-trigger {
+    position: absolute;
+    top: 3px;
+    z-index: 300;
+    opacity: 1;
+    width: 18px;
+    height: 18px;
+    border-radius: 10px;
+    right: 1px;
+    box-shadow: 0 0 0 1px #666 inset;
+    background: white;
+    opacity: 0.5;
+    }
+
+.file-popup-trigger.active,
+.file-popup-trigger:hover {
+    opacity: 1;
+    }    
+
+.file-popup-trigger:before {
+    content: '...';
+    position: absolute;
+    top: -3px;
+    right: 3px;
+    }
+
+.file-action {
+    font-size: 14px;
+    line-height: 1.8;
+    cursor: pointer;
+    }
+
+.file-action:hover {
+    color: black;
+    }
+
+.file-name-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    z-index: 200;
+    resize: none;
+    padding-top: 4px;
+    padding-left: 5px;
+    }
+
+
+
+/* ***************************************** */
+

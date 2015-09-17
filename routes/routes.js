@@ -46,6 +46,9 @@ module.exports = function(app, passport) {
 	// OAUTH2: Get Token ==============
 	// ================================
 	app.post('/oauth/token', api.oauth2.getToken);
+	app.get('/api/token/check', passport.authenticate('bearer', {session: false}), function (req, res) {
+		res.end('OK');
+	});
 
 
 	// ================================
@@ -108,7 +111,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
-	app.get('/api/upload', passport.authenticate('bearer', {session: false}), function (req, res) {
+	app.get('/api/data/upload/chunked', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.chunkedCheck(req, res);
 	});
 
@@ -119,20 +122,50 @@ module.exports = function(app, passport) {
 		api.upload.chunkedIdent(req, res);
 	});
 
+	// todo: this route is now DEAD; still alive in wu.js
 	// =====================================
-	// UPLOAD DATA LIBRARY FILES ===========
+	// UPLOAD DATA LIBRARY FILES =========== // renamed route to /chunked
 	// =====================================
-	app.post('/api/upload', passport.authenticate('bearer', {session: false}), function (req, res) {
+	app.post('/api/data/upload/chunked', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.chunkedUpload(req, res);
 	});
 	
-
 
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
 	app.post('/api/project/new', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.project.create(req, res);
+	});
+
+
+	// =====================================
+	// GET UPLOAD ==========================
+	// =====================================
+	app.get('/api/upload/get', passport.authenticate('bearer', {session: false}), function (req, res) {
+		api.upload.getUpload(req, res);
+	});
+
+
+	// =====================================
+	// IMPORT DATA to POSTGIS ==============
+	// =====================================
+	app.post('/api/import', passport.authenticate('bearer', {session: false}), function (req, res) {
+		api.upload.import(req, res);
+	});
+
+	// =====================================
+	// GET UPLOAD STATUS ===================
+	// =====================================
+	app.get('/api/import/status', passport.authenticate('bearer', {session: false}), function (req, res) {
+		api.upload.getUploadStatus(req, res);
+	});
+
+	// =====================================
+	// JOIN BETA MAIL ======================
+	// =====================================
+	app.get('/api/joinbeta', function (req, res) {
+		api.portal.joinBeta(req, res);
 	});
 
 
@@ -298,6 +331,7 @@ module.exports = function(app, passport) {
 	});
 
 
+
 	// =====================================
 	// AUTO-CREATE LEGENDS =================
 	// =====================================
@@ -323,10 +357,24 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
-	// REQUEST FILE DOWNLOAD (zip'n send) ==
+	// GET GEOJSON FILES ===================
 	// =====================================
-	app.post('/api/file/download', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.file.zipAndSend(req, res);
+	app.post('/api/geo/json2cartocss', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.geo.json2cartocss(req, res);
+	});
+
+	// =====================================
+	// DOWNLOAD DATASET ====================
+	// =====================================
+	app.post('/api/file/downloadDataset', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.postgis.downloadDatasetFromFile(req, res);
+	});
+
+	// =====================================
+	// DOWNLOAD DATASET ====================
+	// =====================================
+	app.post('/api/layer/downloadDataset', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.postgis.downloadDatasetFromLayer(req, res);
 	});
 
 	
@@ -337,12 +385,27 @@ module.exports = function(app, passport) {
 		api.file.update(req, res);
 	});
 
+	// =====================================
+	// GET LAYERS OF FILE ==================
+	// =====================================
+	app.post('/api/file/getLayers', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.file.getLayers(req, res);
+	});
+
 
 	// =====================================
 	// DELETE FILE(S) ===================
 	// =====================================
 	app.post('/api/file/delete', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.file.deleteFiles(req, res);
+		api.file.deleteFile(req, res);
+	});
+
+
+	// =====================================
+	// ADD/LINK FILE TO NEW PROJECT ========
+	// =====================================
+	app.post('/api/file/addtoproject', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.file.addFileToProject(req, res);
 	});
 
 
@@ -366,6 +429,7 @@ module.exports = function(app, passport) {
 	// CREATE NEW LAYER ====================
 	// =====================================
 	app.post('/api/layers/new', passport.authenticate('bearer', {session: false}), function (req, res) {
+		console.log('/api/layers/new');
 		api.layer.create(req, res);
 	});
 
@@ -447,6 +511,21 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.post('/api/user/unique', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.user.checkUniqueEmail(req, res);
+	});
+
+	// =====================================
+	// CHECK UNIQUE USER/EMAIL =============
+	// =====================================
+	app.post('/api/user/invite', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.user.invite(req, res);
+	});
+
+
+	// =====================================
+	// CHECK UNIQUE USER/EMAIL =============
+	// =====================================
+	app.post('/api/invite/link', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.user.getInviteLink(req, res);
 	});
 
 
@@ -552,12 +631,12 @@ module.exports = function(app, passport) {
 	});
 
 
-	// =====================================
-	// SIGNUP ==============================
-	// =====================================
-	app.get('/signup', function(req, res) {
-		api.portal.signup(req, res);
-	});
+	// // =====================================
+	// // SIGNUP ==============================
+	// // =====================================
+	// app.get('/signup', function(req, res) {
+	// 	api.portal.signup(req, res);
+	// });
 
 
 	// =====================================
@@ -565,6 +644,14 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.get('/logout', function(req, res) {
 		api.portal.logout(req, res);
+	});
+
+
+	// =====================================
+	// LOGOUT ==============================
+	// =====================================
+	app.get('/invite/*', function(req, res) {
+		api.portal.invite(req, res);
 	});
 
 
@@ -597,6 +684,16 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
+	// FORGOT PASSWORD =====================
+	// =====================================
+	app.post('/register', passport.authenticate('local-signup', {
+		successRedirect : '/', // redirect to the secure profile section
+		failureRedirect : '/invite', // redirect back to the signup page if there is an error
+		failureFlash : true // allow flash messages
+	}));
+
+
+	// =====================================
 	// WILDCARD PATHS ======================		
 	// =====================================
 	app.get('*', function (req, res) {
@@ -608,6 +705,14 @@ module.exports = function(app, passport) {
 	function isLoggedIn(req, res, next) {
 		if (req.isAuthenticated()) return next();
 		res.redirect('/');
+	}
+
+	function internalAccess(req, res, next) {
+		var token = req.query.token || req.body.token;
+		if (token == 'thisissecret') return next();
+		res.end(JSON.stringify({
+			error : 'No access.'
+		}))
 	}
 
 	

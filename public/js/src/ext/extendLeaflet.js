@@ -1,3 +1,33 @@
+
+
+
+
+
+// smoother zooming, especially on apple mousepad
+L._lastScroll = new Date().getTime();
+L.Map.ScrollWheelZoom.prototype._onWheelScroll = function (e) {
+    if (new Date().getTime() - L._lastScroll < 200) { return; }
+    var delta = L.DomEvent.getWheelDelta(e);
+    var debounce = this._map.options.wheelDebounceTime;
+
+    this._delta += delta;
+    this._lastMousePos = this._map.mouseEventToContainerPoint(e);
+
+    if (!this._startTime) {
+        this._startTime = +new Date();
+    }
+
+    var left = Math.max(debounce - (+new Date() - this._startTime), 0);
+
+    clearTimeout(this._timer);
+    L._lastScroll = new Date().getTime();
+    this._timer = setTimeout(L.bind(this._performZoom, this), left);
+
+    L.DomEvent.stop(e);
+}
+
+
+
 L.Map.include({
 
 	// refresh map container size
@@ -5,136 +35,65 @@ L.Map.include({
 		if (!this._loaded) { return this; }
 		this._sizeChanged = true;
 		this.fire('moveend');
-	}
-});
-
-// // add wrapper for draw controls
-// L.Control.Draw.include({
-
-// 	// custom onAdd
-// 	onAdd: function (map) {
-// 		var container = L.DomUtil.create('div', 'leaflet-draw'),
-// 			addedTopClass = false,
-// 			topClassName = 'leaflet-draw-toolbar-top',
-// 			toolbarContainer;
-
-// 		// create wrappers
-// 		var sectionButton = L.DomUtil.create('div', 'leaflet-draw-section-button', container);
-// 		var sectionWrapper = L.DomUtil.create('div', 'leaflet-draw-section-wrapper', container);
-// 		this._wrapper = sectionWrapper;	// shorthand for adding more stuff to this wrapper
-
-// 		// add tooltip
-// 		app.Tooltip.add(sectionButton, 'Draw on the map');
-
-// 		// add hook to button
-// 		L.DomEvent.on(sectionButton, 'mousedown', function (e) {
-// 			L.DomEvent.stop(e);
-// 			if (L.DomUtil.hasClass(sectionWrapper, 'draw-expander')) {
-// 				L.DomUtil.removeClass(sectionWrapper, 'draw-expander') 
-// 				L.DomUtil.removeClass(sectionButton, 'open-drawer');
-// 			} else {
-// 				L.DomUtil.addClass(sectionWrapper, 'draw-expander');
-// 				L.DomUtil.addClass(sectionButton, 'open-drawer');
-// 			}
-// 		}, this);
-// 		L.DomEvent.on(sectionButton, 'dblclick', L.DomEvent.stop, this);
-
-// 		for (var toolbarId in this._toolbars) {
-// 			if (this._toolbars.hasOwnProperty(toolbarId)) {
-// 				toolbarContainer = this._toolbars[toolbarId].addToolbar(map);
-
-// 				if (toolbarContainer) {
-// 					// Add class to the first toolbar to remove the margin
-// 					if (!addedTopClass) {
-// 						if (!L.DomUtil.hasClass(toolbarContainer, topClassName)) {
-// 							L.DomUtil.addClass(toolbarContainer.childNodes[0], topClassName);
-// 						}
-// 						addedTopClass = true;
-// 					}
-
-// 					// add to sectionWrapper instead of container
-// 					sectionWrapper.appendChild(toolbarContainer);
-// 				}
-// 			}
-// 		}
-
-// 		return container;
-// 	},
-
-// });
-
-
-
-L.Popup.include({
-
-	_initLayout: function () {
-
-		var prefix = 'leaflet-popup',
-			containerClass = prefix + ' ' + this.options.className + ' leaflet-zoom-' +
-			        (this._animated ? 'animated' : 'hide'),
-			container = this._container = L.DomUtil.create('div', containerClass),
-			closeButton;
-
-		if (this.options.closeButton) {
-			closeButton = this._closeButton =
-			        L.DomUtil.create('a', prefix + '-close-button', container);
-			closeButton.href = '#close';
-			closeButton.innerHTML = '&#215;';
-			L.DomEvent.disableClickPropagation(closeButton);
-
-			L.DomEvent.on(closeButton, 'click', this._onCloseButtonClick, this);
-		}
-
-		var wrapper = this._wrapper =
-		        L.DomUtil.create('div', prefix + '-content-wrapper', container);
-		L.DomEvent.disableClickPropagation(wrapper);
-
-		this._contentNode = L.DomUtil.create('div', prefix + '-content', wrapper);
-
-		L.DomEvent.disableScrollPropagation(this._contentNode);
-		L.DomEvent.on(wrapper, 'contextmenu', L.DomEvent.stopPropagation);
-
-		this._tipContainer = L.DomUtil.create('div', prefix + '-tip-container', container);
-		this._tip = L.DomUtil.create('div', prefix + '-tip', this._tipContainer);
 	},
 
+	fitBounds: function (bounds, options) {
 
-	_updateLayout: function () {
+		options = options || {};
+		bounds = bounds.getBounds ? bounds.getBounds() : L.latLngBounds(bounds);
 
-		var container = this._contentNode,
-		    style = container.style;
+		var paddingTL = L.point(options.paddingTopLeft || options.padding || [0, 0]),
+		    paddingBR = L.point(options.paddingBottomRight || options.padding || [0, 0]),
 
-		var parent_container = container.parentNode;  
+		    zoom = this.getBoundsZoom(bounds, false, paddingTL.add(paddingBR)),
+		    paddingOffset = paddingBR.subtract(paddingTL).divideBy(2),
 
-		style.width = '';
-		style.whiteSpace = 'nowrap';
+		    swPoint = this.project(bounds.getSouthWest(), zoom),
+		    nePoint = this.project(bounds.getNorthEast(), zoom),
+		    center = this.unproject(swPoint.add(nePoint).divideBy(2).add(paddingOffset), zoom);
 
-		var width = container.offsetWidth;
-		width = Math.min(width, this.options.maxWidth);
-		width = Math.max(width, this.options.minWidth);
+		zoom = options && options.maxZoom ? Math.min(options.maxZoom, zoom) : zoom;
 
-		style.width = (width + 46) + 'px';
-		style.whiteSpace = '';
+		// added minZoom option
+		zoom = options && options.minZoom ? Math.max(options.minZoom, zoom) : zoom;
 
-		style.height = '';
+		return this.setView(center, zoom, options);
+	},
+});
 
-		var height = container.offsetHeight,
-		    maxHeight = this.options.maxHeight,
-		    scrolledClass = 'leaflet-popup-scrolled';
 
-		if (maxHeight && height > maxHeight) {
-			style.height = maxHeight + 'px';
-			L.DomUtil.addClass(container, scrolledClass);
-		} else {
-			L.DomUtil.removeClass(container, scrolledClass);
+L.Polygon.include({
+
+	getCenter: function () {
+		var i, j, p1, p2, f, area, x, y, center,
+		    points = this._rings[0],
+		    len = points.length;
+
+		if (!len) { return null; }
+
+		// polygon centroid algorithm; only uses the first ring if there are multiple
+
+		area = x = y = 0;
+
+		for (i = 0, j = len - 1; i < len; j = i++) {
+			p1 = points[i];
+			p2 = points[j];
+
+			f = p1.y * p2.x - p2.y * p1.x;
+			x += (p1.x + p2.x) * f;
+			y += (p1.y + p2.y) * f;
+			area += f * 3;
 		}
 
-		this._containerWidth = this._container.offsetWidth;
-
-		parent_container.style.width = (width + 46) + 'px';
-	}
-
-});
+		if (area === 0) {
+			// Polygon is so small that all points are on same pixel.
+			center = points[0];
+		} else {
+			center = [x / area, y / area];
+		}
+		return this._map.layerPointToLatLng(center);
+	},
+})
 
 // prevent minifed bug
 L.Icon.Default.imagePath = '/css/images';

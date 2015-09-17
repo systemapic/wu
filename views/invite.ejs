@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+<title>Systemapic Invitation</title>
+	<script src='/loginConfig.js'></script>
+	<script src='../js/src/core/class.js'></script>
+	<script src='../js/src/core/invite.js'></script>
+	<link href='../css/invite.css' rel='stylesheet' />
+
+	<script type="text/javascript">(function(){
+		window.tokens = JSON.parse('<%- JSON.stringify(access_token) %>');
+		window.invite_store = JSON.parse('<%- invite %>');
+		}());
+	</script>
+
+</head>
+<body>
+
+	<div id="invitation-header">
+		<img src="../css/images/systemapic-login-logo.png"/>
+	</div>
+
+	<div id="invitation-wrapper">
+
+		<div id="header"></div>
+		<div id="invite">
+			
+			<!-- LOGIN FORM -->
+			<form action="/register" method="post" id="registration-form">
+				<div class="form-group">
+					<label>Email</label>
+					<input type="email" placeholder="Enter your email..." required class="form-control" name="email">
+				</div>
+				<div class="form-group">
+					<label>Password</label>
+					<input type="password" placeholder="At least 10 characters..." required pattern=".{10,}" class="form-control" name="password">
+				</div>
+				<div class="form-group">
+					<label>First Name</label>
+					<input type="text" placeholder="The name your mother gave you..." required class="form-control" name="firstname">
+				</div>
+				<div class="form-group">
+					<label>Last Name</label>
+					<input type="text" placeholder="The name your father gave you..." required class="form-control" name="lastname">
+				</div>
+				<div class="form-group">
+					<label>Company</label>
+					<input type="text"  placeholder="Where you go in the morning..." class="form-control" name="company">
+				</div>
+				<div class="form-group">
+					<label>Position</label>
+					<input type="text" placeholder="The hat you wear at work..." class="form-control" name="position">
+				</div>
+				<div class="form-group" style="display:none;">
+					<input type="text" class="form-control" name="invite_token" style="display: none;" id="invite_token">
+				</div>
+				
+				<button type="submit" class="btn btn-warning btn-lg">Sign Up</button>
+			</form>
+
+		</div>
+
+	</div>	
+
+	<div id="footer">
+		<a href="mailto:info@systemapic.com">info@systemapic.com</a>
+		<a href="http://systemapic.com" target="_blank">Systemapic.com ©</a>
+	</div>
+
+
+
+	<script> 
+		var app = new Wu.Invite({
+			id : 'invite',
+			header : 'header',
+			footer: 'footer'
+		});
+	</script>
+
+	<script type="text/javascript">
+		var gaID = loginConfig.ga.id; 
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		ga('create', gaID, 'auto');
+		ga('send', 'pageview');
+	</script>
+</body>
+</html>

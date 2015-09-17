@@ -29,12 +29,22 @@ var fileSchema = mongoose.Schema({
 
 	data : {
 
-		shapefiles : [String],        // can be several files 	// todo: remove? no need - all geo is geo/topojson
-		geojson    : String,		// geojson-adlskmdsalkdsmad-saslkdmasldksa.geojson
-		raster	   : String,
-		topojson   : String,
-		document   : String,		// also not needed??
-		other      : [String],		// also not needed??
+		postgis    : { 				// postgis data
+			database_name : String,
+			table_name : String,
+			data_type : String, 		// raster or vector
+			original_format : String, 	// GeoTIFF, etc.
+			metadata : String,
+		}, 				
+		
+
+
+		// shapefiles : [String],        	// can be several files 	// todo: remove? no need - all geo is geo/topojson
+		// geojson    : String,		// geojson-adlskmdsalkdsmad-saslkdmasldksa.geojson
+		// raster	   : String,
+		// topojson   : String,
+		// document   : String,		// also not needed??
+		// other      : [String],		// also not needed??
 		// cartocss   : String,		// cartocss ID 
 
 		image : {
@@ -64,8 +74,6 @@ var fileSchema = mongoose.Schema({
 				}
 			}]
 		}
-		
-
 	},
 
 

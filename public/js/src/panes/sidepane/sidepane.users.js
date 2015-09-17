@@ -113,13 +113,13 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	_deactivate : function () {
 
 		// show other controls
-		this._showControls();
+		// this._showControls();
 	},
 
 	_activate : function () {
 
 		// hide other controls
-		this._hideControls();
+		// this._hideControls();
 
 		// hide manage if open
 		if (this._manage) this._manage.close();

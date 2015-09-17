@@ -14,6 +14,7 @@ Wu.Project = Wu.Class.extend({
 
 		// init roles, files, layers
 		this._initObjects();
+
 	},
 
 	_initObjects : function () {
@@ -60,7 +61,8 @@ Wu.Project = Wu.Class.extend({
 
 		// create
 		layers.forEach(function (layer) {
-			this.layers[layer.uuid] = new Wu.createLayer(layer);
+			var wuLayer =  new Wu.createLayer(layer);
+			if (wuLayer) this.layers[layer.uuid] = wuLayer;
 		}, this);
 	},
 
@@ -71,8 +73,9 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	addLayer : function (layer) {
-		this.layers[layer.uuid] = new Wu.createLayer(layer);
-		return this.layers[layer.uuid];
+		var l = new Wu.createLayer(layer);
+		if (l) this.layers[layer.uuid] = l;
+		return l || false;
 	},
 
 	addBaseLayer : function (layer) {
@@ -118,8 +121,6 @@ Wu.Project = Wu.Class.extend({
 		return title;
 	},
 
-	
-
 	createLayerFromGeoJSON : function (geojson) {
 
 		// set options
@@ -137,11 +138,10 @@ Wu.Project = Wu.Class.extend({
 
 		// parse layer data
 		var parsed = JSON.parse(data);
+
+		console.error('TODO: created layer from GeoJSON, needs to be added to Data.');
 		
-		// callback
-		app.SidePane.DataLibrary.uploaded(parsed, {
-			autoAdd : true
-		});
+		
 	},
 
 	createLayer : function () {
@@ -205,12 +205,6 @@ Wu.Project = Wu.Class.extend({
 
 		// flush
 		this._reset();
-
-		// init files
-		// this.initFiles();
-
-  		// create layers 
-		// this.initLayers();
 
 		// init roles
 		this.initRoles();
@@ -276,7 +270,6 @@ Wu.Project = Wu.Class.extend({
 		this.refreshSidepane();
 	},
 
-
 	_update : function (field) {
 
 		// set fields
@@ -314,7 +307,6 @@ Wu.Project = Wu.Class.extend({
 	_save : function (string) {
 		// save to server                                       	// TODO: pgp
 		Wu.send('/api/project/update', string, this._saved.bind(this));  
-		                       // TODO: save only if actual changes! saving too much already
 	},
 
 	// callback for save
@@ -467,6 +459,39 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
+	deleteLayer : function (layer) {
+
+		var options = {
+			layerUuid : layer.getUuid(),
+			projectUuid : this.getUuid()
+		}
+
+		Wu.post('/api/layers/delete', JSON.stringify(options), function (err, response) {
+			if (err) return console.error('layer delete err:', err);
+
+			console.log('deleted form server?', err, response);
+
+			var result = Wu.parse(response);
+
+			if (result.error) return console.error('layer delete result.error:', result.error);
+
+			// remove locally, and from layermenu etc.
+			this._removeLayer(layer);
+
+			// fire event
+			Wu.Mixin.Events.fire('layerDeleted', { detail : {
+				layer : this
+			}}); 
+
+		}.bind(this));
+
+	},
+
+	removeLayer : function (layerStore) {
+		var layer = this.getLayer(layerStore.uuid);
+		this._removeLayer(layer);
+	},
+
 	_removeLayer : function (layer) {
 
 		// remove from layermenu & baselayer store
@@ -536,6 +561,33 @@ Wu.Project = Wu.Class.extend({
 		return _.toArray(this.layers);
 	},
 
+	getPostGISLayers : function () {
+		// return _.filter(this.layers, function (l) {
+		// 	if (!l) return false;
+		// 	if (!l.store.data) return false;
+		// 	return l.store.data.postgis;
+		// });
+
+		var layers = [];
+
+		for (var l in this.layers) {
+			var layer = this.layers[l];
+
+			if (layer.store && layer.store.data && layer.store.data.postgis) layers.push(layer);
+		}
+
+		return layers;
+
+	},
+
+	// debug
+	getDeadLayers : function () {
+		return _.filter(this.layers, function (l) {
+			if (!l) return true;
+			return l.store.data == null;
+		});
+	},
+
 	getActiveLayers : function () {
 
 		// get all layers in project
@@ -557,14 +609,25 @@ Wu.Project = Wu.Class.extend({
 		return this.layers[uuid];
 	},
 
+	getPostGISLayer : function (layer_id) {
+		return _.find(this.layers, function (layer) {
+			if (!layer.store) return;
+			if (!layer.store.data) return;
+			if (!layer.store.data.postgis) return;
+			return layer.store.data.postgis.layer_id == layer_id;
+		});
+	},
+
 	getStylableLayers : function () {
 		// get active baselayers and layermenulayers that are editable (geojson)
 		var all = this.getActiveLayers();
 		var cartoLayers = _.filter(all, function (l) {
 
 			if (l) {
+				if (!l.store) return false;
 				if (l.store.data.hasOwnProperty('geojson')) return true;
 				if (l.store.data.hasOwnProperty('osm')) return true;
+				if (l.store.data.hasOwnProperty('postgis')) return true;
 
 			} else {
 				return false;
@@ -747,6 +810,35 @@ Wu.Project = Wu.Class.extend({
 		return this.store.settings;
 	},
 
+	clearPendingFiles : function () {
+		this.store.pending = [];
+		this._update('pending');
+	},
+
+	setPendingFile : function (file_id) {
+		this.store.pending.push(file_id);
+		this._update('pending');
+	},
+
+	getPendingFiles : function () {
+		return this.store.pending;
+	},
+
+	removePendingFile : function (file_id) {
+		var remd = _.remove(this.store.pending, function (p) {
+			return p == file_id;
+		});
+		this._update('pending');
+	},
+
+	setPopupPosition : function (pos) {
+		this._popupPosition = pos;
+	},
+
+	getPopupPosition : function () {
+		return this._popupPosition;
+	},
+
 	setSettings : function (settings) {
 		this.store.settings = settings;
 		this._update('settings');
@@ -838,65 +930,7 @@ Wu.Project = Wu.Class.extend({
 
 	removeFiles : function (files) {
 
-		var list = app.SidePane.DataLibrary.list,
-		    layerMenu = app.MapPane.getControls().layermenu,
-		    _fids = [],
-		    uuids = [],
-		    that = this;
-
-		// iterate over files and delete
-		files.forEach(function(file, i, arr) {
-
-			// remove from list
-			// list.remove('uuid', file.uuid);
-		
-			// remove from local project
-			_.remove(this.store.files, function (item) { return item.uuid == file.uuid; });
-
-			// remove from this.files
-			delete this.files[file.uuid];
-
-			// get layer if any
-			var layer = _.find(this.layers, function (l) { return l.store.file == file.uuid; });
-
-			// remove layers
-			if (layer) {
-				// remove from layermenu & baselayer store
-				_.remove(this.store.layermenu, function (item) { return item.layer == layer.store.uuid; });
-				_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.store.uuid; });
-
-				// remove from layermenu
-				if (layerMenu) layerMenu.onDelete(layer);
-
-				// remove from map
-				layer.remove();
-					
-				// remove from local store
-				var a = _.remove(this.store.layers, function (item) { return item.uuid == layer.store.uuid; });	// dobbelt opp, lagt til to ganger! todo
-				delete this.layers[layer.store.uuid];	
-			}
-			
-			// prepare remove from server
-			_fids.push(file._id);
-			uuids.push(file.uuid);
-
-		}, this);
-
-		// save changes
-		this._update('layermenu'); 
-		this._update('baseLayers');
-
-		setTimeout(function () {	// ugly hack, cause two records can't be saved at same time, server side.. FUBAR!
-			// remove from server
-			var json = {
-			    '_fids' : _fids,
-			    'puuid' : that.store.uuid,
-			    'uuids' : uuids
-			}
-			var string = JSON.stringify(json);
-			Wu.save('/api/file/delete', string); 
-				
-		}, 1000);
+		return console.error('remove files, needs to be rewritten with new Wu.Data');
 
 	},
 
