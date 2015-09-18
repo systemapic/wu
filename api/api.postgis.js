@@ -358,6 +358,7 @@ module.exports = api.postgis = {
 	_fetchSrid : function (prj, done) {
 
 		var terms = encodeURIComponent(prj);
+		// http://prj2epsg.org/apidocs.html
 		var url = 'http://prj2epsg.org/search.json?mode=wkt&terms=' + terms;
 		var options = {
 			url: url,
@@ -420,7 +421,7 @@ module.exports = api.postgis = {
 				if (err) {
 					console.log('import_shapefile_script err: ', err, stdout);
 				}
-				
+
 				var endTime = new Date().getTime();
 
 				// set import time to status
