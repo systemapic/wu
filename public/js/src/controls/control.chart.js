@@ -7,6 +7,8 @@ Wu.Control.Chart = Wu.Control.extend({
 		var e = options.e;
 
 		
+		console.error('chart options', options);
+
 		if ( multiPopUp ) {
 
 			// Get pop-up settings
@@ -287,6 +289,8 @@ Wu.Control.Chart = Wu.Control.extend({
 	// Create multi point C3 pop-up content
 	multiPointPopUp : function (_data) {
 
+		console.log('ASFDAS data', _data);
+
 		var _average = _data.average;
 		var _center = _data.center;
 		var _layer = this._getWuLayerFromPostGISLayer(_data.layer_id);
@@ -371,6 +375,8 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Data
 		var data = c3Obj.d3array;
+
+		console.log('data: ', data);
 		
 		// Ticks
 		var t = data.ticks;
@@ -378,10 +384,14 @@ Wu.Control.Chart = Wu.Control.extend({
 		// var first_data_point = t[0]; // wrong, first tick is actually second data point
 		var first_data_point = data.x[1];
 		var last_data_point = data.x[data.x.length -1];
+
+		console.log('last_dat', last_data_point, data.x);
 		
 		// start/end date
 		var start = moment(first_data_point).format("DD.MM.YYYY");
-		var end = moment(last_data_point).format("DD.MM.YYYY");		
+		var end = moment(last_data_point).format("DD.MM.YYYY");	
+
+		console.log('start, end', start, end);	
 
 		this._footerContainer.innerHTML = '<span class="start-date">' + start + '</span><span class="end-date">' + end + '</span>';
 	},
@@ -444,9 +454,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 			var _key = meta[0];
 			var _val = meta[1];
-
-			// if ( this.popupSettings ) var setting = this.popupSettings.metaFields[_key];
-			// else	  		  var setting = false;
 
 			var setting = this.popupSettings ? this.popupSettings.metaFields[_key] : false;
 

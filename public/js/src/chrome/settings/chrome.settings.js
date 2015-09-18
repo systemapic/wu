@@ -390,6 +390,11 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 			var colorRangesPresets = [
 				['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'],
 				['#0000ff', '#00ffff', '#00ff00', '#ffff00', '#ff0000'],
+
+
+				['#ff0000', '#ffff00', '#00ff00'],
+				['#00ff00', '#ffff00', '#ff0000'],
+
 				['#ff007d', '#ffff00', '#007dff'],
 				['#ff7d00', '#ffff00', '#00ff7d'],
 				['#ff00ff', '#ffff00', '#00ffff'],

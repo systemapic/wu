@@ -110,6 +110,8 @@ L.Control.Draw = Wu.Control.extend({
 		}, function (err, results) {
 			var resultObject = Wu.parse(results);
 
+			console.log('FETCH RESULT', resultObject);
+
 			// add center
 			resultObject.center = layer.getBounds().getCenter();
 
