@@ -46,8 +46,8 @@ ops.push(function (callback) {
 	user.uuid 		= userUuid;
 	user.local.email    	= userEmail;	
 	user.local.password 	= user.generateHash(password);
-	user.firstName 		= 'Superadmin';
-	user.lastName 		= '';
+	user.firstName 		= userFirstname;
+	user.lastName 		= userLastname;
 	user.createdBy		= userUuid;
 	user.save(callback);
 
