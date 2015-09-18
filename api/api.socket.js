@@ -78,6 +78,8 @@ module.exports = api.socket = {
 		// get socket
 		var socket = api.socket.getSocket(options);
 
+
+
 		// send to user
 		socket && socket.emit('processingProgress', options.result);
 	},
@@ -89,11 +91,13 @@ module.exports = api.socket = {
 
 		var sock = api.socket._getSocket(user_id);
 
+		console.log('processing done!', sock);
+		console.log('socket processing done...');
+
 		// send to user
 		sock && sock.emit('processingDone', {
 			file_id : file_id,
 			import_took_ms : options.import_took_ms
-
 		});
 	},
 
