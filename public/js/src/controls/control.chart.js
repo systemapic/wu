@@ -445,10 +445,14 @@ Wu.Control.Chart = Wu.Control.extend({
 			var _key = meta[0];
 			var _val = meta[1];
 
-			if ( this.popupSettings ) var setting = this.popupSettings.metaFields[_key];
-			else	  		  var setting = false;
+			// if ( this.popupSettings ) var setting = this.popupSettings.metaFields[_key];
+			// else	  		  var setting = false;
 
-			if ( _key == 'geom' || _key == 'the_geom_3857' || _key == 'the_geom_4326' ) { return }
+			var setting = this.popupSettings ? this.popupSettings.metaFields[_key] : false;
+
+			if (!setting) return;
+
+			if ( _key == 'geom' || _key == 'the_geom_3857' || _key == 'the_geom_4326' ) return;
 			
 			// Do not show field if there is no value
 			if ( !_val ) return;
@@ -813,7 +817,10 @@ Wu.Control.Chart = Wu.Control.extend({
 		if (_key.length < 6) return false; // cant possibly be date
 
 		// if only letters, not a date
-		if (this._isOnlyLetters(_key)) return;
+		if (this._validate.onlyLetters(_key)) return;
+
+		// if less than six and has letters
+		if (this._validate.shortWithLetters(_key)) return;
 
 		// If it's Frano's time series format
 		var _m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
@@ -827,14 +834,28 @@ Wu.Control.Chart = Wu.Control.extend({
 		return false;
 	},	
 
-	_isOnlyLetters : function (string) {
-		var nums = [];
-		_.each(string, function (s) {
-			if (!isNaN(s)) nums.push(s);
-		})
-		if (nums.length) return false;
-		return true;
-	},			
+	_validate : {
 
+		onlyLetters : function (string) {
+			var nums = [];
+			_.each(string, function (s) {
+				if (!isNaN(s)) nums.push(s);
+			})
+			if (nums.length) return false;
+			return true;
+		},
+
+		shortWithLetters : function (string) {
+			var letters = [];
+			_.each(string, function (s) {
+				if (isNaN(s)) letters.push(s);
+			});
+
+			if (letters.length && string.length < 7) return true;
+			return false;
+		},
+	},
+
+	
 
 })
