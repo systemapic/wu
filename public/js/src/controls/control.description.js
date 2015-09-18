@@ -347,7 +347,8 @@ L.Control.Description = Wu.Control.extend({
 
 		} else {
 
-			legendObj.legendHTML = 'TODO: Create legend for static colors!';
+			// legendObj.legendHTML = 'TODO: Create legend for static colors!';
+			legendObj.legendHTML = '';
 
 		}
 
