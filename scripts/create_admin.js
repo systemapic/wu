@@ -41,8 +41,7 @@ var ops = [];
 ops.push(function (callback) {
 
 	// create user
-	// var password 		= crypto.randomBytes(16).toString('hex');
-	var password 		= 'new_admin_user'
+	var password 		= crypto.randomBytes(16).toString('hex');
 	var user            	= new User();
 	user.uuid 		= userUuid;
 	user.local.email    	= userEmail;	
