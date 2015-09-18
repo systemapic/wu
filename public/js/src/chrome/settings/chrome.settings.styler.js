@@ -702,10 +702,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		if ( key == 'colorrange' ) {
 
-			console.log('updateColor updateColor updateColor updateColor updateColor updateColor updateColor');
-			console.log('updateColor updateColor updateColor updateColor updateColor updateColor updateColor');
-			console.log('updateColor updateColor updateColor updateColor updateColor updateColor updateColor');
-
 			
 			var colorBall_1 = Wu.DomUtil.get('color-range-ball-1-' + key);
 			var colorBall_2 = Wu.DomUtil.get('color-range-ball-2-' + key);
