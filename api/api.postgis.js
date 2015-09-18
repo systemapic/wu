@@ -340,6 +340,42 @@ module.exports = api.postgis = {
 
 	},
 
+	_getSrid : function (prj, done) {
+
+		if (!prj) return callback(null, false);
+
+		fs.readFile(prj, function (err, prj4) {
+			var srid = srs.parse(prj4);
+
+			// if failed, ask boundlessgeo (fml)
+			if (err || !srid.srid) return api.postgis._fetchSrid(prj4, done);
+
+			callback(err, srid.srid);
+		});
+	
+	},
+
+	_fetchSrid : function (prj, done) {
+
+		var terms = encodeURIComponent(prj);
+		var url = 'http://prj2epsg.org/search.json?mode=wkt&terms=' + terms;
+		var options = {
+			url: url,
+			method: 'GET',
+		}
+
+		// Start the request
+		request(options, function (error, response, body) {
+			if (!error && response.statusCode == 200) {
+				console.log('got anser: ', body);
+				var srids = JSON.parse(body);
+				var srid = srids.codes[0].code;
+				done(null, srid);
+			}
+		});
+
+	},
+
 
 	importShapefile : function (options, done) {
 		var files 	= options.files,
@@ -359,22 +395,15 @@ module.exports = api.postgis = {
 		// read projection
 		ops.push(function (callback) {
 
-			if (prjfile) {
-				fs.readFile(prjfile, function (err, prj4) {
-					var srid = srs.parse(prj4);
-					callback(err, srid);
-				});
-			} else {
-				// no prj file
-				callback(null, false);
-			}
+			// get srid
+			api.postgis._getSrid(prjfile, callback);
 		});
 
 
 		// import with bash script
 		ops.push(function (srid, callback) {
 
-			var srid_converted = srid.srid;// + ':3857';  // convert on import. todo: create the_geom + the_geom_webmercator columns after import instead
+			var srid_converted = srid;// + ':3857';  // convert on import. todo: create the_geom + the_geom_webmercator columns after import instead
 
 			// create database script
 			var cmd = [
@@ -388,8 +417,10 @@ module.exports = api.postgis = {
 			// import to postgis
 			var startTime = new Date().getTime();
 			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
-				if (err) console.log('import_shapefile_script err: ', err);
-
+				if (err) {
+					console.log('import_shapefile_script err: ', err, stdout);
+				}
+				
 				var endTime = new Date().getTime();
 
 				// set import time to status
