@@ -15,8 +15,9 @@ L.Control.Draw = Wu.Control.extend({
 					message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
 				},
 				shapeOptions: {
-					color: 'yellow'
-				}
+					color: 'blue',
+				}, 
+				smoothFactor : 0.5
 			}
 		},
 	},
@@ -109,8 +110,6 @@ L.Control.Draw = Wu.Control.extend({
 			layer : layer
 		}, function (err, results) {
 			var resultObject = Wu.parse(results);
-
-			console.log('FETCH RESULT', resultObject);
 
 			// add center
 			resultObject.center = layer.getBounds().getCenter();
@@ -311,9 +310,6 @@ L.Control.Draw = Wu.Control.extend({
 
 	},
 
-
-	
-
 	_initialize: function (options) {
 
 		// create layer container
@@ -350,8 +346,6 @@ L.Control.Draw = Wu.Control.extend({
 			this._toolbars[L.EditToolbar.TYPE].on('enable', this._toolbarEnabled, this);
 		}
 	},
-
-	
 
 	onAdd: function (map) {
 		var container = L.DomUtil.create('div', 'leaflet-draw'),
