@@ -406,6 +406,8 @@ module.exports = api.postgis = {
 		// import with bash script
 		ops.push(function (srid, callback) {
 
+			console.log('final srid: ', srid);
+
 			var srid_converted = srid;// + ':3857';  // convert on import. todo: create the_geom + the_geom_webmercator columns after import instead
 
 			// create database script
@@ -417,9 +419,13 @@ module.exports = api.postgis = {
 				srid_converted
 			].join(' ');
 
+
+			console.log('import shaepfile cmd: ', cmd);
+
 			// import to postgis
 			var startTime = new Date().getTime();
 			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+				console.log('srr, std', err, stdout);
 				if (err) {
 					console.log('import_shapefile_script err: ', err, stdout);
 				}
