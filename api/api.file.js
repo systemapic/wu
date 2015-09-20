@@ -106,8 +106,6 @@ module.exports = api.file = {
 
 	addNewFileToUser : function (options, done) {
 
-		console.log('addNewFileToUser', options);
-
 		var userUuid = options.user.uuid,
 		    file_id = options.file._id;
 
@@ -115,7 +113,6 @@ module.exports = api.file = {
 		User
 		.findOne({uuid : userUuid})
 		.exec(function (err, user) {
-			console.log('find user??', err, user);
 			if (err) return done(err);
 
 			// add file
@@ -124,7 +121,6 @@ module.exports = api.file = {
 			
 			// save
 			user.save(function (err, doc) {
-				console.log('|SAVED USER!??!?', err, doc);
 				done(err);
 			});
 		});
@@ -223,12 +219,8 @@ module.exports = api.file = {
 			
 
 			var folder = api.config.path.file + fileUuid;
-			console.log('get pdf: ', options);
-
-			console.log('folder: ', folder);
 
 			fs.readdir(folder, function (err, files) {
-				console.log('FILES IN FOLDER: ', files);
 
 				var pdf = '';
 				files.forEach(function (f) {
@@ -380,8 +372,6 @@ module.exports = api.file = {
 
 	deleteFile : function (req, res) {
 
-		console.log('deleteFile', req.body);
-		
 		// could be other type files later, but postgis only for now.
 
 		var options = req.body,
@@ -442,7 +432,6 @@ module.exports = api.file = {
 			File
 			.findOne({uuid : fileUuid})
 			.remove(function (err, rmf) {
-				console.log('removed file model', err, rmf);
 				removedObjects.file = {
 					file_id : fileUuid
 				}
@@ -485,7 +474,6 @@ module.exports = api.file = {
 		});
 
 		async.waterfall(ops, function (err, results) {
-			console.log('waterfall done', err, results);
 			res.json({
 				success : true,
 				error : err,
@@ -511,20 +499,17 @@ module.exports = api.file = {
 		async.each(layers, function (layer, callback) {
 
 			var layer_id = layer._id;
-			console.log('layer-----id', layer_id);
 
 			// find project
 			Project
 			.findOne({layers : layer_id})
 			.exec(function (err, p) {
-				console.log('FOUND PROJECT WITH LAYER -> ', p);
 
 				if (!p) return callback();
 
 				p.layers.pull(layer_id);
 				p.markModified('layers');
 				p.save(function (err) {
-					console.log('removed layer from project', err);
 					callback(err);
 				});
 
@@ -532,8 +517,6 @@ module.exports = api.file = {
 
 
 		}, function (err) {
-
-			console.log('removed all layers from all projects?', err);
 
 			done(err);
 
@@ -545,8 +528,6 @@ module.exports = api.file = {
 	// get postgis layers on dataset
 	getLayers : function (req, res) {
 
-		console.log('getLayers', req.body);
-		
 		var options = req.body,
 		    database_name = options.database_name,
 		    table_name = options.table_name,
@@ -565,8 +546,6 @@ module.exports = api.file = {
 		.exec(function (err, layers) {
 			if (err) return api.error.general(req, res, err);
 			
-			console.log('found layers: ', layers);
-
 			res.json(layers);
 		});
 
@@ -939,8 +918,6 @@ module.exports = api.file = {
 
 	createModel : function (options, callback) {
 
-		console.log('api.file.createModel'.red);
-
 		var file 		= new File();
 		file.uuid 		= options.uuid;
 		file.createdBy 		= options.createdBy;
@@ -1141,9 +1118,6 @@ module.exports = api.file = {
 
 			var remoteUrl = 'http://grind:3004/';
 
-			console.log('--------->>>>>remoteUrl: ', remoteUrl);
-			console.log('localFolder / localFile', localFolder, localFile);
-
 			// ping tileserver storage to notify of file transfer
 			request({
 				method : 'POST',
@@ -1153,8 +1127,6 @@ module.exports = api.file = {
 
 			// callback
 			function (err, response, body) {
-
-				console.log('request done', err, body);
 
 				api.socket.setProcessing({
 					userId : user._id,
