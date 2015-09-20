@@ -475,7 +475,6 @@ module.exports = api.upload = {
 	},
 
 	_notifyProcessingDone : function (options) {
-		console.log('processing done!!');
 		api.socket.processingDone(options)
 	},
 

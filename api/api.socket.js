@@ -91,9 +91,6 @@ module.exports = api.socket = {
 
 		var sock = api.socket._getSocket(user_id);
 
-		console.log('processing done!', sock);
-		console.log('socket processing done...');
-
 		// send to user
 		sock && sock.emit('processingDone', {
 			file_id : file_id,
