@@ -171,9 +171,8 @@ module.exports = api.upload = {
 		    				callback(null);
 		    			});
 		    		};
-		    	})
-
-	    	})
+		    	});
+	    	});
 
 	  
 	    	ops.push(function (callback) {
@@ -181,6 +180,8 @@ module.exports = api.upload = {
 
 			// resumable		
 			r.post(req, function(status, filename, original_filename, identifier){
+
+				console.log('r status', status, identifier);
 
 				// set redis count id
 				var redis_id = resumableIdentifier + file_id;
@@ -204,9 +205,6 @@ module.exports = api.upload = {
 				api.redis.temp.get('done-chunks-' + redis_id, function (err, count) {
 
 					// return if not all done
-					console.log('done chunks:', count);
-					console.log('total chunks:', options.resumableTotalChunks);
-
 					if (count != options.resumableTotalChunks) {
 						return;
 					} 

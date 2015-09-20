@@ -51,18 +51,8 @@ module.exports = api.geo = {
 	json2cartocss : function (req, res) {
 		var options = req.body;
 
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('options', options);
-		console.log('');
-		console.log('');
-		console.log('');
-
 		// convert json to cartocss
 		api.geo._json2cartocss(options, function (err, css) {
-
-			console.log('json2css done! ', err, css);
 
 			res.end(css);
 		});
@@ -72,8 +62,6 @@ module.exports = api.geo = {
 	_json2cartocss : function (options, callback) {
 
 		var styleJSON = options.styleJSON;
-
-		console.log('api.geo._json2cartocss -> styleJSON : ', styleJSON);
 
 		if (!styleJSON) return callback('Missing styleJSON');
 		
@@ -98,8 +86,6 @@ module.exports = api.geo = {
 
 		if ( styleJSON.point && styleJSON.point.enabled == true ) {
 
-			console.log('INSIDE json2cartocss point');
-
 			// OPACITY
 			var pointOpacityCarto = this.buildCarto_pointOpacity(options);
 			headers += pointOpacityCarto.headers;
@@ -120,8 +106,6 @@ module.exports = api.geo = {
 		style += '}'
 
 		var finalCarto = headers + style;
-
-		console.log('json2cartocss final', finalCarto);
 
 
 		// return cartocss
