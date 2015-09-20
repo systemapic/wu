@@ -342,15 +342,17 @@ module.exports = api.postgis = {
 
 	_getSrid : function (prj, done) {
 
-		if (!prj) return callback(null, false);
+		if (!prj) return done(null, false);
 
 		fs.readFile(prj, function (err, prj4) {
 			var srid = srs.parse(prj4);
 
+			console.log('got node srid:', srid);
+
 			// if failed, ask boundlessgeo (fml)
 			if (err || !srid.srid) return api.postgis._fetchSrid(prj4, done);
 
-			callback(err, srid.srid);
+			done(err, srid.srid);
 		});
 	
 	},
@@ -368,8 +370,8 @@ module.exports = api.postgis = {
 		// Start the request
 		request(options, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
-				console.log('got anser: ', body);
 				var srids = JSON.parse(body);
+				console.log('got internet srid: ', srids);
 				var srid = srids.codes[0].code;
 				done(null, srid);
 			}
@@ -772,48 +774,48 @@ module.exports = api.postgis = {
 		});
 
 		
-		// get histograms
-		ops.push(function (callback) {
+		// // get histograms
+		// ops.push(function (callback) {
 
-			var columns = metadata.columns._columns;
-			var histogram = {};
+		// 	var columns = metadata.columns._columns;
+		// 	var histogram = {};
 
-			async.each(columns, function (column, cb) {
+		// 	async.each(columns, function (column, cb) {
 
-				api.postgis.fetchHistogram({
-					database_name : postgis_db,
-					table_name : file_id, 
-					num_buckets : api.config.postgis.filters.num_buckets,
-					column : column
-				}, function (err, histo) {
-					if (err) console.log('hisgto err', err);
+		// 		api.postgis.fetchHistogram({
+		// 			database_name : postgis_db,
+		// 			table_name : file_id, 
+		// 			num_buckets : api.config.postgis.filters.num_buckets,
+		// 			column : column
+		// 		}, function (err, histo) {
+		// 			if (err) console.log('hisgto err', err);
 
-					histogram[column] = histo;
-					cb(null);
-				});
-
-
-			}, function (err, results) {
-
-				// set histogram to meta
-				metadata.histogram = histogram;
-
-				callback();
-			})
+		// 			histogram[column] = histo;
+		// 			cb(null);
+		// 		});
 
 
-		});
+		// 	}, function (err, results) {
+
+		// 		// set histogram to meta
+		// 		metadata.histogram = histogram;
+
+		// 		callback();
+		// 	})
+
+
+		// });
 
 
 		// get geometry type
 		ops.push(function (callback) {
 
 			// do sql query on postgis
-			var GET_HISTOGRAM_SCRIPT = '../scripts/postgis/get_geometry_type.sh';
+			var GET_GEOMETRY_TYPE_SCRIPT = '../scripts/postgis/get_geometry_type.sh';
 
 			// st_extent script 
 			var command = [
-				GET_HISTOGRAM_SCRIPT, 	// script
+				GET_GEOMETRY_TYPE_SCRIPT, // script
 				postgis_db, 	// database name
 				file_id,	// table
 			].join(' ');
@@ -833,7 +835,6 @@ module.exports = api.postgis = {
 					} catch (e) {};
 				});
 
-				console.log('geometry type result: ', result);
 				metadata.geometry_type = result[0].st_geometrytype;
 
 				callback(null, result);
