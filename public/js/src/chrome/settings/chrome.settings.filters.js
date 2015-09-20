@@ -530,10 +530,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 	_updateChart : function (histogram, column) {
 
-		console.log('%c _updateChart ', 'background: #FF33FF; color: white;');
-		console.log('histogram.length => ', histogram.length);
-		console.log('column => ', column);
-
 		var ndx = crossfilter(histogram),
 		    runDimension = ndx.dimension(function(d) {return +d.bucket;}), 			// x-axis
 		    speedSumGroup = runDimension.group().reduceSum(function(d) {return d.freq;}),	// y-axis
@@ -815,7 +811,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	_getHistogram : function (column, done, fresh) {
 
 		// debug switch
-		// var fresh = true;
+		var fresh = true;
 
 		// get fresh histogram from server, if requested
 		if (fresh) return this._getFreshHistogram(column, done);
