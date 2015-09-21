@@ -361,6 +361,7 @@ module.exports = api.geo = {
 	// OMG code... haven't written it myself...
 	// But it interpolates values between hex values
 	hexAverage : function (twoHexes) {
+		if (!twoHexes[1]) return twoHexes[0];
 		return twoHexes.reduce(function (previousValue, currentValue) {
 			return currentValue
 			.replace(/^#/, '')
