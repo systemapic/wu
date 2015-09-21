@@ -66,6 +66,8 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_initErrorHandling : function () {
+
+		// log all errors
 		window.onerror = function (message, file, line, char, ref) {
 			
 			var stack = ref.stack;
@@ -82,6 +84,11 @@ Wu.App = Wu.Class.extend({
 			});
 
 			Wu.save('/api/error/log', options);
+		}
+
+		// forward console.error's to log also
+		console.error = function (message) {
+			throw Error(message);
 		}
 	},
 
@@ -139,6 +146,7 @@ Wu.App = Wu.Class.extend({
 
 		// debug
 		this._debug();
+
 	},
 
 	_initAnalytics : function () {

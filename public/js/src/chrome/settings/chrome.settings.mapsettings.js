@@ -225,32 +225,25 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 		// Get control
 		var control = app.MapPane.getControls()[item];
 
+		if (!control) return console.error('no control!', item, title, on);
+
 		// Save
 		var project = app.activeProject;
 		    project.store.controls[item] = on;
 		    project._update('controls');
 
 		// toggle on map
-		if (on) {
-			control._on();
-		} else {
-			control._off();
-		}
+		on ? control._on() : control._off();
 
 	},
 
 
 	saveSetClear : function (key, on) {
-
-		// Set/Clear bounds
 		if ( key == 'bounds' ) on ? this.setBounds() : this.clearBounds();
-
 	},
 
 	saveSet : function (key) {
-
 		if ( key == 'position' ) this.setPosition();
-
 	},
 
 
@@ -279,7 +272,6 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 
 		// save to project
 		project.setPosition(position);
-
 	},		
 
 
@@ -315,7 +307,6 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 			maxZoom : 18
 		});
 		
-
 		// enforce new bounds
 		this.enforceBounds();
 	},

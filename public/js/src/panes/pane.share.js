@@ -87,7 +87,6 @@ Wu.Share = Wu.Pane.extend({
 		this._shareInviteButton.innerHTML = 'Invite users...';
 		Wu.DomUtil.removeClass(this._shareDropdown, 'wide-share');
 
-
 		// remove ghost
 		this._removeGhost();
 
@@ -98,14 +97,12 @@ Wu.Share = Wu.Pane.extend({
 	_fillTitles : function () {
 		this._shareImageButton.innerHTML = 'Share Image';
 		this._sharePrintButton.innerHTML = 'Share PDF';
-		// this._shareLinkButton.innerHTML = 'Share link';
 		this._shareInviteButton.innerHTML = 'Invite users...';
 	},
 
 	_clearTitles : function () {
 		this._shareImageButton.innerHTML = '';
 		this._sharePrintButton.innerHTML = '';
-		// this._shareLinkButton.innerHTML = '';
 		this._shareInviteButton.innerHTML = '';
 	},
 
@@ -176,7 +173,6 @@ Wu.Share = Wu.Pane.extend({
 		var shareLink = window.location.href + '/' + link.hash.id;
 
 		this._insertShareLink(shareLink);
-
 	},
 
 	_insertShareLink : function (url) {
@@ -233,11 +229,13 @@ Wu.Share = Wu.Pane.extend({
 		// insert open pdf link
 		context._insertPDFLink(path);
 
+		// hide progress bar
 		app.ProgressBar.hideProgress();
 	},
 
 	_insertPDFLink : function (url) {
 
+		// remove old
 		if (this._sharePDFInput) Wu.DomUtil.remove(this._sharePDFInput);
 
 		// create input
@@ -248,32 +246,27 @@ Wu.Share = Wu.Pane.extend({
 
 		// add to dom
 		this._shareDropdown.appendChild(this._sharePDFInput);
-
 	},
 
 
 	_shareInvite : function () {
-
-		console.log('share invite!');
-
 		Wu.DomUtil.addClass(this._shareDropdown, 'wide-share');
-
 		this._createInviteView();
-
 	},
 
 	_createInviteView : function () {
 
-
-		this._getInviteLink(function (ctx, link) {
+		// get invite link
+		this._getInviteLink(['read_project', 'download_file', 'share_project'], function (ctx, link) {
 
 			console.log('got ivnite link: ', ctx, link);
-
 			console.log('projects?', this._project, app.activeProject);
 
-			if (this._inviteWrapper) Wu.DomUtil.remove(this._inviteWrapper);
-
+			// clear other shares
 			this._clearTitles();
+
+			// clear old
+			if (this._inviteOuterWrapper) Wu.DomUtil.remove(this._inviteOuterWrapper);
 
 			// invite wrapper
 			this._inviteOuterWrapper = Wu.DomUtil.create('div', 'share-invite-wrapper opacitizer', this._shareDropdown);
@@ -286,24 +279,24 @@ Wu.Share = Wu.Pane.extend({
 			this._insertInviteTitle(this._inviteWrapper, link);
 
 		}.bind(this));
-
-
-
 	},
 
 
-	_getInviteLink : function (callback) {
+	_getInviteLink : function (permissions, callback) {
+
+		var permissions = permissions || ['read_project', 'download_file', 'share_project'];
 
 		var options = {
 			project_id : this._project.getUuid(),
 			project_name : this._project.getTitle(),
-			access_type : 'view'
+			access_type : 'view',
+			permissions : permissions
 		}
+
+		console.log('options', options);
 
 		// get invite link
 		Wu.post('/api/invite/link', JSON.stringify(options), callback);
-
-
 	},
 
 	_insertInviteTitle : function (appendTo, link) {
@@ -313,19 +306,90 @@ Wu.Share = Wu.Pane.extend({
 
 		// create first part of title
 		var pre = Wu.DomUtil.create('div', 'share-invite-title', titleWrap);
-		pre.innerHTML = 'Invite users to view project:<br> ' + this._project.getTitle();
+		pre.innerHTML = 'Invite users to project:<br> ' + this._project.getTitle();
 
 		// create last part of title
 		var post = Wu.DomUtil.create('div', 'share-invite-title-post', titleWrap);	 
-		post.innerHTML = 'Invite users to view this project by sending them this link. If they are not already registed, they will be allowed to create an account.';		
+		post.innerHTML = 'Invite users to this project by sending them this link:';		
 
-		var copyKey = (navigator.platform == 'MacIntel') ? '⌘-C' : 'Ctrl-C';
-		post.innerHTML += '<br><br>(Press ' + copyKey + ' to copy to clipboard.)';
+		// link input
+		this._createInviteLink(titleWrap, link)
 
-		var input = Wu.DomUtil.create('input', 'share-invite-input-link', titleWrap);
+		// permissions
+		this._createPermissionsCheckboxes({
+			appendTo : titleWrap,
+		});
+	},
+
+	_createInviteLink : function (titleWrap, link) {
+		var input = this._linkinput = Wu.DomUtil.create('input', 'share-invite-input-link', titleWrap);
 		input.value = link;
 		input.select();
+	},
 
+	_createPermissionsCheckboxes : function (options) {
+
+		var container = options.appendTo;
+
+		// wrapper
+		var wrapper = Wu.DomUtil.create('div', 'invite-permissions-wrapper', container);
+
+		// title
+		var title = Wu.DomUtil.create('div', 'share-invite-title-post', wrapper, 'Permissions granted:');
+
+		// create checkboxes
+		this._createCheckboxes(wrapper);
+	},
+
+	_createCheckboxes : function (wrapper) {
+		this._checkboxes = [];
+		this._createCheckbox('read_project',  wrapper, 'View project');
+		this._createCheckbox('download_file', wrapper, 'Download data');
+		this._createCheckbox('share_project', wrapper, 'Invite others');
+	},
+
+	_createCheckbox : function (id, container, title) {
+
+		// wrapper
+		var w = Wu.DomUtil.create('div', 'invite-permissions-checkbox-wrap', container);
+		
+		// checkbox
+		var checkbox = Wu.DomUtil.create('input', 'invite-permissions-checkbox', w);
+		checkbox.type = "checkbox";
+		checkbox.name = id;
+		checkbox.value = id;
+		checkbox.id = id;
+		checkbox.checked = true; // default todo: only if user self has permissions to give out (eg. if can invite, but not download)
+
+		// change event
+		Wu.DomEvent.on(checkbox, 'change', this._checkboxChange, this);
+
+		// label
+		var label = Wu.DomUtil.create('label', 'invite-permissions-label', w);
+		label.htmlFor = id
+		label.appendChild(document.createTextNode(title));
+
+		// add to list
+		this._checkboxes.push(checkbox);
+	},
+
+	_checkboxChange : function (e) {
+		console.log('evalue', e.target.value, e.target.checked);
+
+		var permissions = this._getPermissions();
+
+		// get invite link
+		this._getInviteLink(permissions, function (ctx, link) {
+			this._linkinput.value = link;
+		}.bind(this));
+	},
+
+	_getPermissions : function () {
+		var p = [];
+		this._checkboxes.forEach(function (c) {
+			if (c.checked) p.push(c.value);
+		});
+		return p;
 	},
 
 	_toggleInviteType : function () {
@@ -339,84 +403,82 @@ Wu.Share = Wu.Pane.extend({
 		if (type == 'edit') {
 			this._inviteTypeToggle.innerHTML = 'view';
 		}
-
-
 	},
 
-	_submittingInvite : function () {
-		console.log('submit invite!');
+	// _submittingInvite : function () {
+	// 	console.log('submit invite!');
 
-		var emails = [];
+	// 	var emails = [];
 
-		this._inviteInputs.forEach(function (input) {
-			if (input.value) emails.push(input.value);
-		});
+	// 	this._inviteInputs.forEach(function (input) {
+	// 		if (input.value) emails.push(input.value);
+	// 	});
 
 
-		var access_type = 'view';
+	// 	var access_type = 'view';
 		
-		console.log('emails; ', emails, access_type);
+	// 	console.log('emails; ', emails, access_type);
 
 
-		var options = {
-			access_type : access_type,
-			emails : emails,
-			project_id : this._project.getUuid()
-		}
+	// 	var options = {
+	// 		access_type : access_type,
+	// 		emails : emails,
+	// 		project_id : this._project.getUuid()
+	// 	}
 
-		console.log('sending ivnite', options);
+	// 	console.log('sending ivnite', options);
 
-		// send request to server
-		Wu.post('/api/user/invite', JSON.stringify(options), this._sentInvitations.bind(this), this);
+	// 	// send request to server
+	// 	Wu.post('/api/user/invite', JSON.stringify(options), this._sentInvitations.bind(this), this);
 
-	},
+	// },
 
-	_sentInvitations : function (ctx, results) {
-		console.log('_sentInvitations', results);
+	// _sentInvitations : function (ctx, results) {
+	// 	console.log('_sentInvitations', results);
 
 
-		this._inviteWrapper.innerHTML = 'Invites sent!';
+	// 	this._inviteWrapper.innerHTML = 'Invites sent!';
 
-	},
+	// },
 
-	_createInviteInput : function () {
+	// _createInviteInput : function () {
 
-		// max twenty inputs
-		if (this._inviteInputs.length > 20) {
-			this._removeInviteInputEvents();
-			return alert('You can only invite 20 at a time.');
-		}
+	// 	// max twenty inputs
+	// 	if (this._inviteInputs.length > 20) {
+	// 		this._removeInviteInputEvents();
+	// 		return alert('You can only invite 20 at a time.');
+	// 	}
 
-		// create input
-		var input = Wu.DomUtil.create('input', 'share-invite-input', this._inviteInputsWrapper);
-		input.setAttribute('placeHolder', 'Enter email...');
-		this._inviteInputs.push(input);
+	// 	// create input
+	// 	var input = Wu.DomUtil.create('input', 'share-invite-input', this._inviteInputsWrapper);
+	// 	input.setAttribute('placeHolder', 'Enter email...');
+	// 	this._inviteInputs.push(input);
 
-		// refresh focus event
-		this._refreshInviteInputEvents();
-	},
+	// 	// refresh focus event
+	// 	this._refreshInviteInputEvents();
+	// },
 
-	_refreshInviteInputEvents : function () {
+	// _refreshInviteInputEvents : function () {
 
-		// remove previous events
-		this._removeInviteInputEvents();
+	// 	// remove previous events
+	// 	this._removeInviteInputEvents();
 
-		// get last input
-		var i = this._inviteInputs.length - 1;
-		var input = this._inviteInputs[i];
+	// 	// get last input
+	// 	var i = this._inviteInputs.length - 1;
+	// 	var input = this._inviteInputs[i];
 
-		// add event
-		Wu.DomEvent.on(input, 'focus', this._createInviteInput, this);
-	},
+	// 	// add event
+	// 	Wu.DomEvent.on(input, 'focus', this._createInviteInput, this);
+	// },
 
-	_removeInviteInputEvents : function () {
+	// _removeInviteInputEvents : function () {
 
-		// remove all events
-		this._inviteInputs.forEach(function (input) {
-			Wu.DomEvent.off(input, 'focus', this._createInviteInput, this);
-		}.bind(this));
+	// 	// remove all events
+	// 	this._inviteInputs.forEach(function (input) {
+	// 		Wu.DomEvent.off(input, 'focus', this._createInviteInput, this);
+	// 	}.bind(this));
 
-	},
+	// },
 
 
 });

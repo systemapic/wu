@@ -226,3 +226,63 @@
 	margin-left: 39px;
 	font-size: 11px;
 	}
+
+
+
+
+
+
+input.invite-permissions-checkbox {
+	display: inline-block;
+}
+.invite-permissions-label {
+	margin-left: 4px;
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.wide-share {
+	min-height: 350px;
+	min-width: 300px;
+}
+
+.share-invite-wrapper {
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+}
+
+.invite-permissions-checkbox-wrap {
+	float: left;
+	width: 100%;
+}
+
+.share-invite-title-clip {
+	margin-top: 10px;
+}
+.invite-permissions-wrapper {
+	position: relative;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
