@@ -142,12 +142,10 @@ Wu.Share = Wu.Pane.extend({
 
 		// can share
 		var canShare = app.access.to.share_project(this._project);
-		console.log('canShare', canShare);
 
 		if (!canShare) {
 			Wu.DomUtil.addClass(this._shareInviteButton, 'disabled');
 			Wu.DomEvent.off(this._shareInviteButton, 'click', this._shareInvite, this);
-			
 		} else {
 			Wu.DomUtil.removeClass(this._shareInviteButton, 'disabled');
 			Wu.DomEvent.on(this._shareInviteButton, 'click', this._shareInvite, this);
