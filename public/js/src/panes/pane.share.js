@@ -8,7 +8,7 @@ Wu.Share = Wu.Pane.extend({
 			title : 'View project',
 			permission : 'read_project',
 			checked : true,
-			enabled : true
+			enabled : false
 		},{
 			title : 'Download data',
 			permission : 'download_file',
