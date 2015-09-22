@@ -65,8 +65,6 @@ L.Control.Description = Wu.Control.extend({
 	
 		// prevent map double clicks
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
-		// Wu.DomEvent.on(this._button,    'mousedown mouseup click dblclick',  Wu.DomEvent.stopPropagation, this);
-
 	},
 
 	
@@ -80,7 +78,6 @@ L.Control.Description = Wu.Control.extend({
 		this._isActive() ? this._show() : this._hide();
 		this.toggleScale(true);
 	},
-
 
 	_show : function () {
 		this.refresh();
@@ -100,7 +97,6 @@ L.Control.Description = Wu.Control.extend({
 
 		this._container.style.display = 'block';
 		this.isOpen = true;
-
 	},
 
 	_hide : function () {	
@@ -114,7 +110,6 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_clear : function () {
-		
 		this.isOpen = false;
 		this.toggleScale(false);
 	},
@@ -138,8 +133,12 @@ L.Control.Description = Wu.Control.extend({
 
 	},
 
-	_addTo : function () {
+	_onLayerStyleEdited   : function (e) {
+		var layer = e.detail.layer;
+		this._refreshLayer(layer);
+	},
 
+	_addTo : function () {
 		this.addTo(app._map);
 		this._initContainer();
 		this._addHooks();
@@ -147,6 +146,9 @@ L.Control.Description = Wu.Control.extend({
 	},	
 
 
+	_refreshLayer : function (layer) {
+		console.log('layer edited. refresh something!');
+	},
 
 	// TOGGLE FULL SIZE/SMALL SIZE
 	// TOGGLE FULL SIZE/SMALL SIZE
@@ -196,7 +198,7 @@ L.Control.Description = Wu.Control.extend({
 
 	_addLayer : function (layer) {
 
-		if ( !this.layers ) this.layers = {};
+		this.layers = this.layers || {};
 
 		var layerUuid = layer.getUuid();
 		this.layers[layerUuid] = this.storeLegendData(layer);
