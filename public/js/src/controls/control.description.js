@@ -57,7 +57,6 @@ L.Control.Description = Wu.Control.extend({
 
 	},
 
-
 	_addHooks : function () {
 		
 		// collapsers
@@ -66,7 +65,6 @@ L.Control.Description = Wu.Control.extend({
 		// prevent map double clicks
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
 	},
-
 	
 	_isActive : function () {
 		if (!this._project) return false;
@@ -145,15 +143,11 @@ L.Control.Description = Wu.Control.extend({
 		this._added = true;
 	},	
 
-
 	_refreshLayer : function (layer) {
-		console.log('layer edited. refresh something!');
+		this.layers[layer.getUuid()] = this.storeLegendData(layer);
+		this.setHTMLfromStore(layer.getUuid());
+		this.updateMultiple(layer.getUuid());
 	},
-
-	// TOGGLE FULL SIZE/SMALL SIZE
-	// TOGGLE FULL SIZE/SMALL SIZE
-	// TOGGLE FULL SIZE/SMALL SIZE
-
 
 	toggle : function () {
 		if ( !this.isCollapsed ) this.isCollapsed = false;
@@ -168,11 +162,10 @@ L.Control.Description = Wu.Control.extend({
 		Wu.DomUtil.removeClass(this._header, 'minimized');		
 
 		var description = this._description.innerHTML;
-		if ( description && description != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
+		if (description && description != '') Wu.DomUtil.removeClass(this._description, 'displayNone');
 		
 		Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
 		Wu.DomUtil.removeClass(this._toggle, 'legend-toggle-open');
-
 	},
 
 	toggleClose : function () {
@@ -185,16 +178,7 @@ L.Control.Description = Wu.Control.extend({
 		Wu.DomUtil.addClass(this._description, 'displayNone');
 		Wu.DomUtil.addClass(this._metaContainer, 'displayNone');		
 		Wu.DomUtil.addClass(this._toggle, 'legend-toggle-open');
-
 	},
-
-
-
-
-
-
-
-	// xoxoxox
 
 	_addLayer : function (layer) {
 
@@ -207,7 +191,6 @@ L.Control.Description = Wu.Control.extend({
 
 		// For multiple layers
 		this.updateMultiple(layerUuid);
-
 	},
 
 	_removeLayer : function (layer) {
@@ -226,9 +209,7 @@ L.Control.Description = Wu.Control.extend({
 		this.updateMultiple(first);
 
 		this.refresh();
-
 	},
-
 
 	updateMultiple : function (layerUuid) {
 
@@ -256,11 +237,9 @@ L.Control.Description = Wu.Control.extend({
 			}
 
 			Wu.DomEvent.on(multipleLayer, 'click', this.toggleLegend, this);
-	
 		}
 	},
 
-	// xoxoxox
 	toggleLegend : function (e) {
 
 		var id = e.target.id;
@@ -274,10 +253,7 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 
-	// Store legend data ...
-	// Store legend data ...
 	// Store legend data ...		
-
 	storeLegendData : function (layer) {
 
 		// Hard coded key
@@ -310,7 +286,6 @@ L.Control.Description = Wu.Control.extend({
 		legendObj.description_meta = {
 			'Number of points' : num_points,
 			'Covered area (km<sup>2</sup>)' : area,
-			// 'Data size' : size_bytes,
 			'Start date' : startend.start,
 			'End date' : startend.end
 		}
@@ -375,9 +350,6 @@ L.Control.Description = Wu.Control.extend({
 		// Legend
 		var legend = layer.legendHTML;
 
-		// Set title
-		// this.setTitleHTML(title);
-
 		// Set description
 		this.setDescriptionHTML(description);
 
@@ -389,43 +361,12 @@ L.Control.Description = Wu.Control.extend({
 
 	},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	// SET HTML SET HTML SET HTML
-	// SET HTML SET HTML SET HTML
-	// SET HTML SET HTML SET HTML
-
-	// setTitleHTML : function (title) {
-	// 	this._title.innerHTML = title;
-	// },
-
 	setMetaHTML : function (meta) {
 
 		// Clear container
 		this._metaContainer.innerHTML = '';
 
 		for (var key in meta) {
-
 			var val = meta[key]
 
 			// Make new content	
@@ -439,37 +380,17 @@ L.Control.Description = Wu.Control.extend({
 		this._legendContainer.innerHTML = HTML;
 	},
 
-
 	setDescriptionHTML : function (text) {
 		if ( !text || text != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
 		if ( this.isCollapsed ) Wu.DomUtil.addClass(this._description, 'displayNone');
 		this._description.innerHTML = text;
 	},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	// HELPERS HELPERS HELPERS
-	// HELPERS HELPERS HELPERS
-	// HELPERS HELPERS HELPERS
-
 	_parseStartEndDate : function (meta) {
 
 		// get all columns with dates
 		var columns = meta.columns;
-
 		var times = [];
 
 		for (var c in columns) {
@@ -515,7 +436,6 @@ L.Control.Description = Wu.Control.extend({
 		gradientStyle    += 'background: -moz-linear-gradient(right, '  + colorStops.join() + ');';
 		gradientStyle    += 'background: linear-gradient(to right, '    + colorStops.join() + ');';
   
-
 		// Container
 		var _legendHTML = '<div class="info-legend-container">';
 
@@ -537,25 +457,18 @@ L.Control.Description = Wu.Control.extend({
 		return _legendHTML;
 	},	
 
-
 	isEmpty : function (obj) {
-	    for(var prop in obj) {
-	        if(obj.hasOwnProperty(prop))
-	            return false;
-	    }
+		for(var prop in obj) {
+			if (obj.hasOwnProperty(prop)) return false;
+		}
 
-	    return true;
+		return true;
 	},
 
 
 
 	// EXTERNAL EXTERNAL EXTERNAL
-	// EXTERNAL EXTERNAL EXTERNAL
-	// EXTERNAL EXTERNAL EXTERNAL
-
 	// Toggle scale/measure/mouseposition corner
-	// Toggle scale/measure/mouseposition corner
-
 	toggleScale : function (openDescription) {
 
 		if ( !app._map._controlCorners.topright ) return;
@@ -565,7 +478,6 @@ L.Control.Description = Wu.Control.extend({
 		} else {
 			Wu.DomUtil.removeClass(app._map._controlCorners.topright, 'toggle-scale');
 		}
-
 	},
 
 
