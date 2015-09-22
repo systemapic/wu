@@ -6,9 +6,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		var multiPopUp = options.multiPopUp;
 		var e = options.e;
 
-		
-		console.error('chart options', options);
-
 		if ( multiPopUp ) {
 
 			// Get pop-up settings
@@ -18,6 +15,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			// Create content
 			var content = this.multiPointPopUp(multiPopUp);
 
+
 		} else {
 
 			// Get pop-up settings
@@ -25,6 +23,7 @@ Wu.Control.Chart = Wu.Control.extend({
 
 			// Create content
 			var content = this.singlePopUp(e);
+
 		}
 
 		// clear old popup
@@ -193,6 +192,7 @@ Wu.Control.Chart = Wu.Control.extend({
 	// Create "normal" pop-up content without time series
 	_createPopupContent : function (e) {
 
+
 		var c3Obj = {
 			data : e.data,
 			layer : e.layer,
@@ -230,6 +230,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		content.appendChild(_header);
 		content.appendChild(_chartContainer);
 		content.appendChild(_footer)
+
 
 		return content;		
 	},	
@@ -283,13 +284,152 @@ Wu.Control.Chart = Wu.Control.extend({
 		
 		}
 
+		// console.time('regression');
+		// this._calculateRegression(_c3Obj)
+		// console.timeEnd('regression');
+
+
 		return content;			
+	},
+
+	_calculateRegression : function (c) {
+
+		// console.log('_calculateRegression c:', c);
+
+		var c = this._c3object;
+
+		// get x, y's 
+		var x = []; // dates
+
+		var y_ = _.clone(c.d3array.y);
+		y_.splice(0,1);
+
+		// console.log('y_set: ', y_);
+
+
+		var y = [];
+		y_.forEach(function (value) {
+			y.push(parseFloat(value));
+		});
+
+		var dates = _.clone(c.d3array.x);
+
+		dates.splice(0,1);
+
+		// console.log('date: ', dates);
+
+		var start_date;
+
+		dates.forEach(function (d, i) {
+			// console.log('d: ', d);
+			// console.log('i: ', i);
+
+			if (i == 0) {
+				
+				// set start date
+				start_date = moment(d);
+				// console.log('start_date', start_date);
+				x.push(0);
+
+			} else {
+
+				// days since start_date
+				// var a = moment(start_date);
+				var b = moment(d);
+
+				var diff_in_days = b.diff(start_date, 'days');
+
+				// console.log('a: ', a);
+				// console.log('b: ', b);
+				// console.log('diff_in_days', diff_in_days);
+
+				x.push(diff_in_days);
+			}
+		});
+
+		// console.log('DONE -> ', x, y);
+
+		var xx = [];
+		var xy = [];
+
+		x.forEach(function (x_, i) {
+			xy.push(x[i] * y[i]);
+			xx.push(x[i] * x[i]);
+		});
+
+		// console.log('xx: ', xx);
+		// console.log('xy: ', xy);
+
+		var x_sum = 0;
+		var y_sum = 0;
+		var xx_sum = 0;
+		var xy_sum = 0;
+
+		x.forEach(function (value, i) {
+			x_sum += value;
+		});
+
+		y.forEach(function (value, i) {
+			y_sum += value;
+		});
+
+		xx.forEach(function (value, i) {
+			xx_sum += value;
+		});
+
+		xy.forEach(function (value, i) {
+			xy_sum += value;
+		});
+
+		// console.log('x_sum:', x_sum);
+		// console.log('y_sum:', y_sum);
+		// console.log('xy_sum:', xy_sum);
+		// console.log('xx_sum:', xx_sum);
+
+		var n = y.length;
+
+		// console.log('n: ', n);
+
+		var result_a = ((y_sum * xx_sum) - (x_sum * xy_sum)) / ((n * xx_sum) - (x_sum * x_sum));
+
+		// console.log('result_a', result_a);
+
+		var result_b = ((n * xy_sum) - (x_sum * y_sum)) / ((n * xx_sum) - (x_sum * x_sum));
+
+		// console.log('result_b', result_b);
+
+
+		var result_y_start = result_a + (result_b * x[0])
+
+		var result_y_end = result_a + (result_b * x[x.length-1]);
+
+		// console.log('start, end', result_y_start, result_y_end);
+
+		// need every step
+
+		var reg = ['regression'];
+
+		y.forEach(function (y_, i) {
+
+			if (i == 0) {
+				reg.push(result_y_start);
+			} else {
+				var val = (result_y_end / n) * (i);
+				reg.push(val);
+			}
+
+
+		})
+
+		console.log('REFFF __>', reg);
+		// var reg = ['regression', result_y_start, result_y_end];
+
+		return reg;
+
 	},
 
 	// Create multi point C3 pop-up content
 	multiPointPopUp : function (_data) {
-
-		console.log('ASFDAS data', _data);
 
 		var _average = _data.average;
 		var _center = _data.center;
@@ -364,10 +504,12 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		}
 
-
+		
 
 		return content;
 	},		
+
+
 
 
 	// xoxoxoxoxoxoxo
@@ -376,8 +518,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		// Data
 		var data = c3Obj.d3array;
 
-		console.log('data: ', data);
-		
 		// Ticks
 		var t = data.ticks;
 
@@ -385,15 +525,11 @@ Wu.Control.Chart = Wu.Control.extend({
 		var first_data_point = data.x[1];
 		var last_data_point = data.x[data.x.length -1];
 
-		console.log('last_dat', last_data_point, data.x);
-		
 		// start/end date
 		var start = moment(first_data_point).format("DD.MM.YYYY");
 		var end = moment(last_data_point).format("DD.MM.YYYY");	
 
-		console.log('start, end', start, end);	
-
-		this._footerContainer.innerHTML = '<span class="start-date">' + start + '</span><span class="end-date">' + end + '</span>';
+		this._footerDates.innerHTML = '<span class="start-date">' + start + '</span><span class="end-date">' + end + '</span>';
 	},
 
 
@@ -402,18 +538,16 @@ Wu.Control.Chart = Wu.Control.extend({
 	// PRODUCE HTML		
 
 	createFooter : function () {
-	
 		var footerContainer = this._footerContainer = Wu.DomUtil.create('div', 'c3-footer');
-		return footerContainer;
 
+		var dates = this._footerDates = Wu.DomUtil.create('div', 'c3-footer-dates', footerContainer);
+		return footerContainer;
 	},
 
 
 	createChartContainer : function () {
-	
 		var chartContainer = this._chartContainer = Wu.DomUtil.create('div', 'c3-chart-container');
 		return chartContainer;
-
 	},
 
 
@@ -553,6 +687,15 @@ Wu.Control.Chart = Wu.Control.extend({
 		// Colums
 		_columns = [x, y];
 
+		// console.log('_columns', _columns);
+
+		// var reg = this._calculateRegression(c3Obj);
+
+		// console.log('REGGG', reg);
+
+		// _columns.push(reg);
+
+
 		// Create container
 		var _C3Container = Wu.DomUtil.createId('div', 'c3-container');	
 
@@ -583,19 +726,13 @@ Wu.Control.Chart = Wu.Control.extend({
 
 			zoom : {
 				enabled : false,
-				onzoomstart : function () {
-
-				},
-				onzoom : function (d) {
-					
-				},
-				onzoomend : function () {
-				},
+				
 			},
 		        data: {
 
 		                xs: {
-		                        field_y: 'field_x'
+		                        field_y: 'field_x',
+		                        regression : 'regression'
 		                },
 
 		                columns: _columns,
@@ -604,8 +741,9 @@ Wu.Control.Chart = Wu.Control.extend({
 		                	field_y: '#0000FF'
 		                },
 		                type: 'scatter',
-
 		        },
+
+
 
 		        axis: {
 
@@ -616,7 +754,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		                                format: '%Y',
 		                                // values: t,
 		                                values: [],
-		                                multiline: false
+		                                multiline: true
 		                        }
 		                },
 
@@ -627,6 +765,8 @@ Wu.Control.Chart = Wu.Control.extend({
 						format: function (d) { return Math.floor(d * 100)/100}
 					}
 		                },
+
+		              
 
 		        },
 
@@ -649,7 +789,60 @@ Wu.Control.Chart = Wu.Control.extend({
 		// add zoom events
 		this._addChartEvents(_C3Container);
 
+		// add regression button
+		this._addRegressionButton();
+
 		return _C3Container;
+	},
+
+
+	_addRegressionButton : function () {
+
+		console.log('create regresison button');
+
+		var w = Wu.DomUtil.create('div', 'regression-button-wrapper', this._footerContainer);
+
+		var button = this._regressionButton = Wu.DomUtil.create('input', 'chart-regression-button', w);
+		button.type = 'checkbox';
+		button.id = 'regression';
+
+		// label
+		var label = Wu.DomUtil.create('label', 'invite-permissions-label', w);
+		label.htmlFor = 'regression';
+		label.appendChild(document.createTextNode('Regression'));
+
+		// change event
+		Wu.DomEvent.on(button, 'change', this._toggleRegression, this);
+
+	},
+
+	_toggleRegression : function () {
+
+
+		if (this._regressionButton.checked) {
+			// add line
+
+			// get regression 
+			var reg = this._calculateRegression();
+
+			console.log('chart: ', this._chart);
+			console.log('reg column?;', reg);
+
+			// add to chart
+			this._chart.load({
+				columns: [reg]	// funker ikke?? (http://c3js.org/samples/simple_multiple.html, http://c3js.org/samples/timeseries.html)
+			});
+
+			// do some d3 magic instead?
+
+
+		} else {
+			// remove line
+
+
+		}
+
+		
 	},
 
 
@@ -739,6 +932,9 @@ Wu.Control.Chart = Wu.Control.extend({
 				this.C3dataObjBuilder(_key, _val, d3array);
 			}
 		}
+
+
+		this._c3object = c3Obj;
 
 		return c3Obj;
 	},

@@ -267,9 +267,14 @@ input.invite-permissions-checkbox {
 
 
 
+/*regression button*/
+.c3-footer {
+	height: 50px;
+}
 
-
-
+input.chart-regression-button {
+	display: inline-block;
+}
 
 
 

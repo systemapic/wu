@@ -89,6 +89,44 @@ module.exports = api.user = {
 		// add user to project roles
 		ops.push(function (project, callback) {
 
+
+			// TODO:
+			// 	
+			// download_file: true
+			// share_project: true
+			// read_project: true
+			// 
+			// create_client: false
+			// create_project: false
+			// create_user: false
+			// create_version: false
+			// delegate_to_user: true
+			// delete_client: false
+			// delete_file: false
+			// delete_other_client: false
+			// delete_other_file: false
+			// delete_other_project: false
+			// delete_other_user: false
+			// delete_other_version: false
+			// delete_project: false
+			// delete_user: false
+			// delete_version: false
+			// edit_client: false
+			// edit_file: false
+			// edit_other_client: false
+			// edit_other_file: false
+			// edit_other_project: false
+			// edit_other_user: false
+			// edit_project: false
+			// edit_user: false
+			// have_superpowers: false
+			// manage_analytics: false
+			// read_analytics: false
+			// read_client: false
+			// upload_file: false
+
+
+
 			var a = token_store.project.access_type;
 			
 			// default role
@@ -299,10 +337,14 @@ module.exports = api.user = {
 	},
 
 	_createInviteLink : function (options, callback) {
+
+		console.log('options', options);
+
 		var project_id = options.project_id,
 		    project_name = options.project_name,
 		    user = options.user,
-		    access_type = options.access_type;
+		    access_type = options.access_type,
+		    permissions = options.permissions;
 
 
 		// create token and save in redis with options
@@ -312,7 +354,8 @@ module.exports = api.user = {
 			project : {
 				id : project_id,
 				name : project_name,
-				access_type : access_type
+				access_type : access_type,
+				permissions : permissions
 			},
 			invited_by : {
 				uuid : user.uuid,

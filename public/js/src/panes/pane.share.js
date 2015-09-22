@@ -3,6 +3,25 @@ Wu.Share = Wu.Pane.extend({
 	type : 'share',
 	title : 'Share',
 
+	options : {
+		permissions : [{
+			title : 'View project',
+			permission : 'read_project',
+			checked : true,
+			enabled : true
+		},{
+			title : 'Download data',
+			permission : 'download_file',
+			checked : true,
+			enabled : true
+		},{
+			title : 'Invite others',
+			permission : 'share_project',
+			checked : true,
+			enabled : true
+		}]
+	},
+
 	initialize : function (options) {
 
 		// set options
@@ -32,7 +51,6 @@ Wu.Share = Wu.Pane.extend({
 		// items
 		this._shareImageButton = Wu.DomUtil.create('div', 'share-item', this._shareDropdown);
 		this._sharePrintButton = Wu.DomUtil.create('div', 'share-item', this._shareDropdown);
-		// this._shareLinkButton  = Wu.DomUtil.create('div', 'share-item', this._shareDropdown);
 		this._shareInviteButton  = Wu.DomUtil.create('div', 'share-item', this._shareDropdown);
 
 		// enter titles
@@ -105,7 +123,6 @@ Wu.Share = Wu.Pane.extend({
 		this._sharePrintButton.innerHTML = '';
 		this._shareInviteButton.innerHTML = '';
 	},
-
 
 	_addGhost : function () {
 		this._ghost = Wu.DomUtil.create('div', 'share-ghost', app._appPane);
@@ -282,23 +299,6 @@ Wu.Share = Wu.Pane.extend({
 	},
 
 
-	_getInviteLink : function (permissions, callback) {
-
-		var permissions = permissions || ['read_project', 'download_file', 'share_project'];
-
-		var options = {
-			project_id : this._project.getUuid(),
-			project_name : this._project.getTitle(),
-			access_type : 'view',
-			permissions : permissions
-		}
-
-		console.log('options', options);
-
-		// get invite link
-		Wu.post('/api/invite/link', JSON.stringify(options), callback);
-	},
-
 	_insertInviteTitle : function (appendTo, link) {
 
 		// wrap
@@ -343,12 +343,15 @@ Wu.Share = Wu.Pane.extend({
 
 	_createCheckboxes : function (wrapper) {
 		this._checkboxes = [];
-		this._createCheckbox('read_project',  wrapper, 'View project');
-		this._createCheckbox('download_file', wrapper, 'Download data');
-		this._createCheckbox('share_project', wrapper, 'Invite others');
+		var items = this.options.permissions;
+		items.forEach(function (i) {
+			var permission = i.permission;
+			var title = i.title;
+			this._createCheckbox(permission,  wrapper, title, i.checked, i.enabled);
+		}, this);
 	},
 
-	_createCheckbox : function (id, container, title) {
+	_createCheckbox : function (id, container, title, checked, enabled) {
 
 		// wrapper
 		var w = Wu.DomUtil.create('div', 'invite-permissions-checkbox-wrap', container);
@@ -359,14 +362,18 @@ Wu.Share = Wu.Pane.extend({
 		checkbox.name = id;
 		checkbox.value = id;
 		checkbox.id = id;
-		checkbox.checked = true; // default todo: only if user self has permissions to give out (eg. if can invite, but not download)
+		checkbox.checked = checked; // default todo: only if user self has permissions to give out (eg. if can invite, but not download)
+
+		if (!enabled) {
+			checkbox.setAttribute('disabled', 'disabled');
+		}
 
 		// change event
 		Wu.DomEvent.on(checkbox, 'change', this._checkboxChange, this);
 
 		// label
 		var label = Wu.DomUtil.create('label', 'invite-permissions-label', w);
-		label.htmlFor = id
+		label.htmlFor = id;
 		label.appendChild(document.createTextNode(title));
 
 		// add to list
@@ -391,6 +398,25 @@ Wu.Share = Wu.Pane.extend({
 		});
 		return p;
 	},
+
+
+	_getInviteLink : function (permissions, callback) {
+
+		var permissions = permissions || ['read_project', 'download_file', 'share_project'];
+
+		var options = {
+			project_id : this._project.getUuid(),
+			project_name : this._project.getTitle(),
+			access_type : 'view',
+			permissions : permissions
+		}
+
+		console.log('options', options);
+
+		// get invite link
+		Wu.post('/api/invite/link', JSON.stringify(options), callback);
+	},
+
 
 	_toggleInviteType : function () {
 
