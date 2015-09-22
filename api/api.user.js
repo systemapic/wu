@@ -95,7 +95,7 @@ module.exports = api.user = {
 			// download_file: true
 			// share_project: true
 			// read_project: true
-			// 
+
 			// create_client: false
 			// create_project: false
 			// create_user: false
@@ -128,30 +128,43 @@ module.exports = api.user = {
 
 
 			var a = token_store.project.access_type;
+
+			console.log('token_store: ', token_store);
+
+			var permissions = token_store.project.permissions;
+
+			console.log('permissions', permissions);
+
+			// create role
+			api.user._createRole({
+				permissions : permissions,
+				members : [created_user],
+				project_id : token_store.project.id
+			}, callback)
 			
-			// default role
-			var role_slug = 'noRole';
+			// // default role
+			// var role_slug = 'noRole';
 
-			// decide which role
-			if (a == 'view') role_slug = 'projectReader'; // todo: other access types
+			// // decide which role
+			// if (a == 'view') role_slug = 'projectReader'; // todo: other access types
 
-			// find reader role
-			var access_role = _.find(project.roles, function (r) {
-				return r.slug == role_slug;
-			});
+			// // find reader role
+			// var access_role = _.find(project.roles, function (r) {
+			// 	return r.slug == role_slug;
+			// });
 
-			Role
-			.findOne({uuid : access_role.uuid})
-			.exec(function (err, role) {
+			// Role
+			// .findOne({uuid : access_role.uuid})
+			// .exec(function (err, role) {
 
-				// add user to reader role of project
-				role.members.addToSet(created_user.uuid);
+			// 	// add user to reader role of project
+			// 	role.members.addToSet(created_user.uuid);
 
-				// save
-				role.save(function (err) {
-					callback(err);
-				});
-			});
+			// 	// save
+			// 	role.save(function (err) {
+			// 		callback(err);
+			// 	});
+			// });
 		});
 
 		ops.push(function (callback) {
@@ -195,6 +208,68 @@ module.exports = api.user = {
 			done(null, created_user);
 		});
 	
+	},
+
+	_createRole : function (options, done) {
+		var permissions = options.permissions,
+		    members = options.members,
+		    project_id = options.project_id,
+		    ops = [];
+
+
+
+		ops.push(function (callback) {
+			// create the user
+			var role = new Role();
+			role.uuid = 'role-' + uuid.v4();
+			
+			// caps
+			// for (var c in role.capabilities) {
+			// 	var cap = role.capabilities[c];
+			// 	console.log('c, cap', c, cap);
+			// 	if (permissions.indexOf(c) > -1) {
+			// 		cap = true;
+			// 	} 
+			// }
+
+			permissions.forEach(function (p) {
+				console.log('p: ', p);
+				role.capabilities[p] = true;
+			})
+
+			// members
+			members.forEach(function (m) {
+				role.members.push(m.uuid);
+			});
+
+			// save the role
+			role.save(function(err, doc) {
+				callback(err, doc);
+			});
+
+		});
+
+		ops.push(function (role, callback) {
+
+			// add to project
+			Project
+			.findOne({uuid : project_id})
+			.exec(function (err, project) {
+
+				project.roles.push(role._id);
+				project.markModified('roles');
+				project.save(callback);
+			});
+		});
+		
+
+		async.waterfall(ops, function (err, results) {
+			console.log('create role, err, reslts', err, results);
+
+			done(err);
+		});
+
+
 	},
 
 

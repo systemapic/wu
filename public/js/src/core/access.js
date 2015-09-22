@@ -306,6 +306,7 @@ Wu.Access = Wu.Class.extend({
 		},
 		
 		read_project		: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.has.project_capability(user, project, 'read_project')) return true;
 			return false;
 		},
@@ -392,7 +393,7 @@ Wu.Access = Wu.Class.extend({
 			return false;
 		},
 		
-		share_project		: function (user) { 
+		share_project		: function (project, user) { 
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'share_project')) return true;
 			if (app.access.has.project_capability(user, project, 'share_project')) return true;
