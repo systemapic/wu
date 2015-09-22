@@ -294,60 +294,34 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	_calculateRegression : function (c) {
 
-		// console.log('_calculateRegression c:', c);
-
 		var c = this._c3object;
-
-		// get x, y's 
 		var x = []; // dates
+		var start_date;
 
 		var y_ = _.clone(c.d3array.y);
 		y_.splice(0,1);
-
-		// console.log('y_set: ', y_);
-
-
+		
 		var y = [];
 		y_.forEach(function (value) {
 			y.push(parseFloat(value));
 		});
 
 		var dates = _.clone(c.d3array.x);
-
 		dates.splice(0,1);
 
-		// console.log('date: ', dates);
-
-		var start_date;
-
 		dates.forEach(function (d, i) {
-			// console.log('d: ', d);
-			// console.log('i: ', i);
-
 			if (i == 0) {
-				
 				// set start date
 				start_date = moment(d);
-				// console.log('start_date', start_date);
 				x.push(0);
 
 			} else {
-
 				// days since start_date
-				// var a = moment(start_date);
 				var b = moment(d);
-
 				var diff_in_days = b.diff(start_date, 'days');
-
-				// console.log('a: ', a);
-				// console.log('b: ', b);
-				// console.log('diff_in_days', diff_in_days);
-
 				x.push(diff_in_days);
 			}
 		});
-
-		// console.log('DONE -> ', x, y);
 
 		var xx = [];
 		var xy = [];
@@ -356,9 +330,6 @@ Wu.Control.Chart = Wu.Control.extend({
 			xy.push(x[i] * y[i]);
 			xx.push(x[i] * x[i]);
 		});
-
-		// console.log('xx: ', xx);
-		// console.log('xy: ', xy);
 
 		var x_sum = 0;
 		var y_sum = 0;
@@ -381,48 +352,25 @@ Wu.Control.Chart = Wu.Control.extend({
 			xy_sum += value;
 		});
 
-		// console.log('x_sum:', x_sum);
-		// console.log('y_sum:', y_sum);
-		// console.log('xy_sum:', xy_sum);
-		// console.log('xx_sum:', xx_sum);
-
 		var n = y.length;
-
-		// console.log('n: ', n);
-
 		var result_a = ((y_sum * xx_sum) - (x_sum * xy_sum)) / ((n * xx_sum) - (x_sum * x_sum));
-
-		// console.log('result_a', result_a);
-
 		var result_b = ((n * xy_sum) - (x_sum * y_sum)) / ((n * xx_sum) - (x_sum * x_sum));
-
-		// console.log('result_b', result_b);
-
-
 		var result_y_start = result_a + (result_b * x[0])
-
 		var result_y_end = result_a + (result_b * x[x.length-1]);
 
-		// console.log('start, end', result_y_start, result_y_end);
 
-		// need every step
+		// var reg = ['regression', result_y_start, result_y_end];
 
+		// need every step 
 		var reg = ['regression'];
-
 		y.forEach(function (y_, i) {
-
 			if (i == 0) {
 				reg.push(result_y_start);
 			} else {
 				var val = (result_y_end / n) * (i);
 				reg.push(val);
 			}
-
-
-		})
-
-		console.log('REFFF __>', reg);
-		// var reg = ['regression', result_y_start, result_y_end];
+		});
 
 		return reg;
 
