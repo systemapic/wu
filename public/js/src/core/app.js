@@ -68,28 +68,33 @@ Wu.App = Wu.Class.extend({
 	_initErrorHandling : function () {
 
 		// log all errors
-		window.onerror = function (message, file, line, char, ref) {
-			
-			var stack = ref.stack;
-			var project = app.activeProject ? app.activeProject.getTitle() : 'No active project';
-			var username = app.Account ? app.Account.getName() : 'No username';
-			
-			var options = JSON.stringify({
-				message : message,
-				file : file,
-				line : line,
-				user : username,
-				stack : stack,
-				project : project
-			});
-
-			Wu.save('/api/error/log', options);
-		}
+		window.onerror = this._onError;
 
 		// forward console.error's to log also
-		console.error = function (message) {
-			throw Error(message);
-		}
+		// console.error = function (message) {
+		// 	try { throw Error(message); } 
+		// 	catch (e) {}
+		// }
+	},
+
+	_onError : function (message, file, line, char, ref) {
+
+		console.log('ionerror');
+			
+		var stack = ref.stack;
+		var project = app.activeProject ? app.activeProject.getTitle() : 'No active project';
+		var username = app.Account ? app.Account.getName() : 'No username';
+		
+		var options = JSON.stringify({
+			message : message,
+			file : file,
+			line : line,
+			user : username,
+			stack : stack,
+			project : project
+		});
+
+		Wu.save('/api/error/log', options);
 	},
 
 	_checkForInvite : function () {
