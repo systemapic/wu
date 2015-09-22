@@ -635,13 +635,13 @@ Wu.Control.Chart = Wu.Control.extend({
 		// Colums
 		_columns = [x, y];
 
-		// console.log('_columns', _columns);
+		console.log('_columns', _columns);
 
-		// var reg = this._calculateRegression(c3Obj);
+		var reg = this._calculateRegression(c3Obj);
 
-		// console.log('REGGG', reg);
+		console.log('REGGG', reg);
 
-		// _columns.push(reg);
+		_columns.push(reg);
 
 
 		// Create container
@@ -777,13 +777,12 @@ Wu.Control.Chart = Wu.Control.extend({
 			console.log('reg column?;', reg);
 
 			// add to chart
-			this._chart.load({
-				columns: [reg]	// funker ikke?? (http://c3js.org/samples/simple_multiple.html, http://c3js.org/samples/timeseries.html)
-			});
+			// this._chart.load({
+			// 	columns: [reg]	// funker ikke?? (http://c3js.org/samples/simple_multiple.html, http://c3js.org/samples/timeseries.html)
+			// });
 
 			// do some d3 magic instead?
-
-
+		
 		} else {
 			// remove line
 
