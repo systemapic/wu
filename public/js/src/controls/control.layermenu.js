@@ -876,6 +876,11 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		app.Chrome.Right.options.editingLayer = layer.getUuid();
 
+		// fire event
+		Wu.Mixin.Events.fire('layerEnabled', { detail : {
+			layer : layer
+		}}); 
+
 	},
 
 	// disable by layermenuItem
@@ -892,6 +897,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.resizeEvent(dimensions);		
 
 		app.Chrome.Right.options.editingLayer = false;
+
+		// fire event
+		Wu.Mixin.Events.fire('layerDisabled', { detail : {
+			layer : layer
+		}}); 
 	},
 
 	// disable by layer

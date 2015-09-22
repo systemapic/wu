@@ -833,7 +833,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 		// delete layer
 		project.deleteLayer(this);
-
 	},
 	
 
