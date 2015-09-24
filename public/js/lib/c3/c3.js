@@ -3377,7 +3377,7 @@
     };
     c3_chart_internal_fn.getTextRect = function (text, cls) {
         var dummy = this.d3.select('body').append('div').classed('c3', true),
-            svg = dummy.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
+            svg = dummy.append("svg").style('visibility', 'hidden').style('opacity', 0).style('position', 'fixed').style('top', 0).style('left', 0),
             rect;
         svg.selectAll('.dummy')
             .data([text])
@@ -3629,9 +3629,9 @@
             xgridLine, ygridLine, yv;
 
         // hide if arc type
-        $$.grid.style('visibility', $$.hasArcType() ? 'hidden' : 'visible');
+        $$.grid.style('visibility', $$.hasArcType() ? 'hidden' : 'visible').style('opacity', $$.hasArcType() ? 0 : 1);
 
-        main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden");
+        main.select('line.' + CLASS.xgridFocus).style("visibility", "hidden").style("opacity", "0");
         if (config.grid_x_show) {
             $$.updateXGrid();
         }
@@ -3904,7 +3904,7 @@
         $$.legendHasRendered = false;
         $$.legend = $$.svg.append("g").attr("transform", $$.getTranslate('legend'));
         if (!$$.config.legend_show) {
-            $$.legend.style('visibility', 'hidden');
+            $$.legend.style('visibility', 'hidden').style('opacity', 0);
             $$.hiddenLegendIds = $$.mapToIds($$.data.targets);
             return;
         }
@@ -4001,7 +4001,7 @@
         var $$ = this, config = $$.config;
         if (config.legend_show && isEmpty(targetIds)) {
             config.legend_show = false;
-            $$.legend.style('visibility', 'hidden');
+            $$.legend.style('visibility', 'hidden').style('opacity', 0);
         }
         $$.addHiddenLegendIds(targetIds);
         $$.legend.selectAll($$.selectorLegends(targetIds))
@@ -4125,6 +4125,7 @@
             .enter().append('g')
             .attr('class', function (id) { return $$.generateClass(CLASS.legendItem, id); })
             .style('visibility', function (id) { return $$.isLegendToShow(id) ? 'visible' : 'hidden'; })
+            .style('opacity', function (id) { return $$.isLegendToShow(id) ? 1 : 0; })
             .style('cursor', 'pointer')
             .on('click', function (id) {
                 if (config.legend_item_onclick) {
@@ -4272,7 +4273,8 @@
             .attr("class", CLASS.axis + ' ' + CLASS.axisX)
             .attr("clip-path", $$.clipPathForXAxis)
             .attr("transform", $$.getTranslate('x'))
-            .style("visibility", config.axis_x_show ? 'visible' : 'hidden');
+            .style("visibility", config.axis_x_show ? 'visible' : 'hidden')
+            .style("opacity", config.axis_x_show ? 1 : 0);
         $$.axes.x.append("text")
             .attr("class", CLASS.axisXLabel)
             .attr("transform", config.axis_rotated ? "rotate(-90)" : "")
@@ -4281,7 +4283,8 @@
             .attr("class", CLASS.axis + ' ' + CLASS.axisY)
             .attr("clip-path", config.axis_y_inner ? "" : $$.clipPathForYAxis)
             .attr("transform", $$.getTranslate('y'))
-            .style("visibility", config.axis_y_show ? 'visible' : 'hidden');
+            .style("visibility", config.axis_y_show ? 'visible' : 'hidden')
+            .style("opacity", config.axis_y_show ? 1 : 0);
         $$.axes.y.append("text")
             .attr("class", CLASS.axisYLabel)
             .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
@@ -4291,7 +4294,8 @@
             .attr("class", CLASS.axis + ' ' + CLASS.axisY2)
             // clip-path?
             .attr("transform", $$.getTranslate('y2'))
-            .style("visibility", config.axis_y2_show ? 'visible' : 'hidden');
+            .style("visibility", config.axis_y2_show ? 'visible' : 'hidden')
+            .style("opacity", config.axis_y2_show ? 1 : 0);
         $$.axes.y2.append("text")
             .attr("class", CLASS.axisY2Label)
             .attr("transform", config.axis_rotated ? "" : "rotate(-90)")
@@ -4547,7 +4551,7 @@
                 this.updateXAxisTickValues(targetsToShow, axis);
             }
             dummy = $$.d3.select('body').append('div').classed('c3', true);
-            svg = dummy.append("svg").style('visibility', 'hidden').style('position', 'fixed').style('top', 0).style('left', 0),
+            svg = dummy.append("svg").style('visibility', 'hidden').style('opacity', 0).style('position', 'fixed').style('top', 0).style('left', 0),
             svg.append('g').call(axis).each(function () {
                 $$.d3.select(this).selectAll('text').each(function () {
                     var box = this.getBoundingClientRect();
@@ -5136,7 +5140,7 @@
         var $$ = this, config = $$.config;
 
         // hide if arc type
-        $$.region.style('visibility', $$.hasArcType() ? 'hidden' : 'visible');
+        $$.region.style('visibility', $$.hasArcType() ? 'hidden' : 'visible').style('opacity', $$.hasArcType() ? 0 : 1);
 
         $$.mainRegion = $$.main.select('.' + CLASS.regions).selectAll('.' + CLASS.region)
             .data(config.regions);
@@ -5381,7 +5385,7 @@
         var $$ = this, config = $$.config,
             context = $$.context = $$.svg.append("g").attr("transform", $$.getTranslate('context'));
 
-        context.style('visibility', config.subchart_show ? 'visible' : 'hidden');
+        context.style('visibility', config.subchart_show ? 'visible' : 'hidden').style('opacity', config.subchart_show ? 1 : 0);
 
         // Define g for chart area
         context.append('g')
@@ -5511,7 +5515,7 @@
         var $$ = this, d3 = $$.d3, config = $$.config,
             drawAreaOnSub, drawBarOnSub, drawLineOnSub;
 
-        $$.context.style('visibility', config.subchart_show ? 'visible' : 'hidden');
+        $$.context.style('visibility', config.subchart_show ? 'visible' : 'hidden').style('opacity', config.subchart_show ? 1 : 0);
 
         // subchart
         if (config.subchart_show) {

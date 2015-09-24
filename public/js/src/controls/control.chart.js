@@ -700,7 +700,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		                        localtime: false,
 		                        tick: {
 		                                format: '%Y',
-		                                // values: t,
 		                                values: [],
 		                                multiline: true
 		                        }

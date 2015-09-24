@@ -1822,6 +1822,7 @@ aka feedback pane
 	color: black;
 	padding-left: 15px;
 	padding-right: 25px;
+	word-break: break-all;
 	}
 
 
@@ -2040,4 +2041,22 @@ aka feedback pane
 .leaflet-draw-draw-polygon {
 	width: 26px;
 	height: 26px;
+}
+
+
+
+
+
+
+
+
+
+.share-dropdown,
+.wide-share {
+	width: auto !important;
+	height: auto !important;
+	min-height: auto !important;
+	max-height: auto !important;
+	min-width: auto !important;
+	max-height: auto !important;
 }
