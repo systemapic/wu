@@ -598,6 +598,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Disable actions for Layers
 		var isDisabled = (library == 'layers'),
 		    canEdit = app.access.to.edit_project(this._project),
+		    canDownload = app.access.to.download_file(this._project),
 		    that = this;
 	
 		var action = {
@@ -616,7 +617,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			},			
 			download : {
 				name : 'Download',
-				disabled : false,
+				disabled : !canDownload,
 			},
 			delete : {
 				name : 'Delete',

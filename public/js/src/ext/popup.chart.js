@@ -260,6 +260,7 @@ Wu.Popup.Chart = L.Control.extend({
 
 	_listen : function () {
 		Wu.Mixin.Events.on('layerDeleted',    this._onLayerDeleted, this);
+		Wu.Mixin.Events.on('layerDisabled',    this._onLayerDeleted, this);
 	},
 
 	// clean up

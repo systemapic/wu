@@ -619,6 +619,11 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 		// update layer option
 		this._refreshLayer(layerUuid);
+
+		// fire event
+		Wu.Mixin.Events.fire('layerStyleEdited', { detail : {
+			layer : this
+		}}); 
 	},
 
 	_getLayerUuid : function () {
@@ -833,7 +838,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 		// delete layer
 		project.deleteLayer(this);
-
 	},
 	
 
