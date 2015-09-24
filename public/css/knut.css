@@ -242,8 +242,8 @@ input.invite-permissions-checkbox {
 }
 
 .wide-share {
-	min-height: 350px;
-	min-width: 300px;
+	/*min-height: 350px;*/
+	/*min-width: 300px;*/
 }
 
 .share-invite-wrapper {

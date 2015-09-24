@@ -45,13 +45,14 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 	_refresh : function () {
 
-		// this._flush();
+		if ( this._inited ) this._flush();
 		this._initLayout();
 	},
 
 	_flush : function () {
 
-		this._container.innerHTML = '';
+		// this._container.innerHTML = '';
+		this._midSection.innerHTML = '';
 	},
 
 	// Runs on init
