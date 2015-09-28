@@ -90,6 +90,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// event run when layer selected 
 	_selectedActiveLayer : function (e, uuid) {
 
+		console.log('e', e);
+		console.log('uuid', uuid);		
+
 		this._fieldsWrapper.innerHTML = '';
 
 		this.layerUuid = uuid ? uuid : e.target.value
@@ -145,7 +148,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var tooltipMeta = layer.getTooltip();
 		
 		// Get layermeta
-		var layerMeta = Wu.parse(layer.getMeta())		
+		var layerMeta = layer.getMeta();
 
 		console.log('wot?', layerMeta, layer.getMeta());
 
@@ -176,71 +179,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// this.initPolygon();
 		// this.initLine();
 
-		this.initGlobesarExtras();
 	},	
 
-
-	// GLOBSAR EXTRAS
-	// GLOBSAR EXTRAS
-	// GLOBSAR EXTRAS
-
-	initGlobesarExtras : function () {
-
-		var wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper);
-		
-		var header = Wu.DomUtil.create('div', 'chrome-content-header globesar-extras', wrapper, 'Globesar Extras');
-
-
-
-		// xoxoxoxoxoxo 
-		var lineOptions = {
-			key 		: 'satelliteAngle',
-			wrapper 	: wrapper,
-			input 		: false,
-			title 		: 'Satellite angle',
-			value 		: '0',
-			isOn 		: true,
-			rightPos	: true,
-			type 		: 'miniInput'
-		}
-		this._createMetaFieldLine(lineOptions);
-
-
-
-
-		var lineOptions = {
-			key 		: 'satellitePath',
-			wrapper 	: wrapper,
-			input 		: false,
-			title 		: 'Satellite path',
-			value 		: '0',
-			isOn 		: true,
-			rightPos	: true,
-			type 		: 'miniInput'
-		}
-		this._createMetaFieldLine(lineOptions);
-
-
-		// var lineOptions = {
-		// 	key 		: 'globesarExtras',
-		// 	wrapper 	: wrapper,
-		// 	input 		: false,
-		// 	title 		: 'Satellite path',
-		// 	isOn 		: false,
-		// 	rightPos	: true,
-		// 	type 		: 'switch'
-		// }
-		// this._createMetaFieldLine(lineOptions);		
-
-		// var satellitePosition = Wu.DomUtil.create('div', 'satellite-position-wrapper', wrapper) 
-
-		// var satelliteAngle = Wu.
-		// var satellitePath  = 
-
-
-		// var legendFotterData = 
-
-	},
 
 
 	// INIT POINT
