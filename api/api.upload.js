@@ -179,8 +179,12 @@ module.exports = api.upload = {
 				// set redis count id
 				var redis_id = resumableIdentifier + file_id;
 
+				console.log('CHUNK_INFO:', status);
+
 				// if success
 				if (status == 'done' || status == 'partly_done') {
+
+					console.log('200');
 					
 					// return status
 					res.status(200).send({file_id : file_id});
@@ -189,6 +193,8 @@ module.exports = api.upload = {
 					api.redis.temp.incr('done-chunks-' + redis_id);
 
 				} else {
+
+					console.log('308');
 
 					// return status
 					res.status(308).send({file_id : file_id});
@@ -212,7 +218,6 @@ module.exports = api.upload = {
 						body 			: req.body,
 						fileName 		: options.resumableFilename,
 						original_filename 	: filename,
-						// projectUuid 		: projectUuid,
 						resumableTotalChunks 	: options.resumableTotalChunks,
 						resumableIdentifier 	: options.resumableIdentifier,
 						file_id 		: file_id,
@@ -302,7 +307,6 @@ module.exports = api.upload = {
 			// save upload id to redis
 			var key = 'uploadStatus:' + uploadStatus.file_id;
 			api.redis.layers.set(key, JSON.stringify(uploadStatus), function (err) {
-				console.log('err1', err);
 				if (err) return callback(err);
 
 				callback(null, uploadStatus);
@@ -326,11 +330,9 @@ module.exports = api.upload = {
 				access_token : access_token
 			}
 
-			console.log('gon import1');
-
 			// import file
 			api.upload._import(options, function (err, results) {
-				console.log('impoerted 2', err, results);
+
 				// done
 				callback(err);
 			});
@@ -341,7 +343,7 @@ module.exports = api.upload = {
 		async.waterfall(ops, function (err, result) {
 			if (err) console.log('oooooooo err!  chunked upload done err!!', err);
 			
-			console.log('ALWAYS ARRAIVING HEREHEHERHRHEH');
+			console.log('...always arriving here: upload done (or failed)');
 
 			// clean up, remove chunks
 			var removePath = '/data/tmp/resumable-' + uniqueIdentifier + '.*';
@@ -383,52 +385,24 @@ module.exports = api.upload = {
 				timestamp : uploadStatus.timestamp
 			}
 
-			console.log('gon import 3');
-
 			// process upload
 			api.upload.prepareImport(options, function (err, opts) {
-				console.log('prepared import, err, opts', err, opts);
 				if (err) return callback(err);
-
-				console.log('prepared import: ', opts);
 
 				// get uploadStatus, get meta, set to file
 				api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
 
 					if (uploadStatus.data_type == 'raster') {
 
-						console.log('raster import!');
-
-
-
 						api.geo.handleRaster(opts, callback);
 					} else {
 						
-						console.log('postgis.import');
-
 						// postgis import
 						api.postgis.import(opts, callback);
 					}
 
 				});
 
-				// // temp rasters
-				// var raster_formats = ['tif', 'tiff', 'jp2', 'ecw'];
-
-				// if (raster_formats.indexOf(opts.ext) > -1) {
-
-				// 	// simple raster import
-				// 	console.log('raster import!');
-
-
-				// } else {
-
-				// 	console.log('postgis.import');
-				// 	// postgis import
-				// 	api.postgis.import(opts, callback);
-				// }
-
-				
 			});
 		});
 
@@ -441,8 +415,6 @@ module.exports = api.upload = {
 				api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
 
 					var meta = uploadStatus.metadata;
-
-					console.log('GOT FUCKING META', meta);
 
 					// save meta to file
 					if (uploadStatus.data_type == 'vector') {
@@ -696,8 +668,6 @@ module.exports = api.upload = {
 		options.ext = ext;
 		options.originalFilename = files.data.originalFilename;
 
-		console.log('preparing import 1');
-
 		// organize files so output is equal no matter what :)
 		if (ext == 'zip') ops.push(function (callback) {
 			api.upload.unzip(options, function (err, files) {
@@ -721,28 +691,21 @@ module.exports = api.upload = {
 		if (ext == 'tif') ops.push(function (callback) {
 			options.files = [temporaryPath];
 			api.upload.updateStatus(options.file_id, {data_type : 'raster'}, callback)
-			// callback(null);
 		});
 
 		if (ext == 'tiff') ops.push(function (callback) {
 			options.files = [temporaryPath];
 			api.upload.updateStatus(options.file_id, {data_type : 'raster'}, callback)
-
-			// callback(null);
 		});
 
 		if (ext == 'ecw') ops.push(function (callback) {
 			options.files = [temporaryPath];
 			api.upload.updateStatus(options.file_id, {data_type : 'raster'}, callback)
-
-			// callback(null);
 		});
 
 		if (ext == 'jp2') ops.push(function (callback) {
 			options.files = [temporaryPath];
-			// callback(null);
 			api.upload.updateStatus(options.file_id, {data_type : 'raster'}, callback)
-
 		});
 
 		// run ops
