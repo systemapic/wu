@@ -375,12 +375,136 @@ module.exports = api.file = {
 		// could be other type files later, but postgis only for now.
 
 		var options = req.body,
-		    database_name = options.database_name,
-		    table_name = options.table_name,
+		    type = options.type,
+		    data = options.data;
+
+
+		console.log('api.file.deleteFile', options, type);
+
+
+		if (type == 'postgis') {
+			return api.file.deletePostGISFile(req, res);
+		}
+
+		if (type == 'raster') {
+			return api.file.deleteRasterFile(req, res);
+		}
+
+		return api.error.missingInformation(req, res);
+
+	},
+
+
+	deleteRasterFile : function (req, res) {
+		
+		var options = req.body,
+		    data = options.data,
+		    file_id = data.file_id,
+		    removedObjects = {},
+		    ops = [],
+		    user = req.user;
+
+
+		if (!file_id) return api.error.missingInformation(req, res);
+
+		// get file model
+		ops.push(function (callback) {
+			File
+			.findOne({uuid : file_id})
+			.exec(callback)
+		});
+
+		// check permissions
+		ops.push(function (file, callback) {
+			console.log('TODO! permission to delete file!')
+
+			// api.access.to.delete_file({
+			// 	file : file,
+			// 	user : account
+			// }, callback);
+
+			callback(null, file);
+		});
+
+		// remove file from user
+		ops.push(function (file, callback) {
+
+			User
+			.findOne({uuid : user.uuid})
+			.exec(function (err, u) {
+				u.files.pull(file._id);
+				u.markModified('files');
+				u.save(function (err) {
+
+					removedObjects.user = {
+						file_id : file._id
+					}
+
+					callback(null);
+				});
+			});
+		});
+
+		// remove file model
+		ops.push(function (callback) {
+
+			File
+			.findOne({uuid : file_id})
+			.remove(function (err, rmf) {
+				removedObjects.file = {
+					file_id : file_id
+				}
+				callback(null);
+			});
+		});
+
+		// remove layers based on dataset
+		ops.push(function (callback) {
+
+			Layer
+			.find({'file' : file_id})
+			.exec(function (err, layers) {
+				if (err) return api.error.general(req, res, err);
+
+				// todo: remove layers from projects
+				api.file.deleteLayersFromProjects({
+					layers : layers
+				}, function (err) {
+
+					// delete layer models
+					async.each(layers, function (layer, done) {
+						layer.remove(done)
+					}, function (err) {
+						removedObjects.layers = layers;
+						callback(err);
+					});
+				});
+			});
+		});
+
+		async.waterfall(ops, function (err, results) {
+			res.json({
+				success : true,
+				error : err,
+				removed : removedObjects
+			});
+		});
+
+	},
+
+	deletePostGISFile : function (req, res) {
+
+		var options = req.body,
+		    data = options.data,
+		    database_name = data.database_name,
+		    table_name = data.table_name,
 		    fileUuid = table_name,
-		    data_type = options.data_type,
+		    data_type = data.data_type,
 		    user = req.user,
 		    ops = [];
+
+		console.log('api.file.deletePostGISFile', req.body);
+
 
 		if (!database_name || !table_name) return api.error.missingInformation(req, res);
 
@@ -529,27 +653,55 @@ module.exports = api.file = {
 	getLayers : function (req, res) {
 
 		var options = req.body,
-		    database_name = options.database_name,
-		    table_name = options.table_name,
+		    type = options.type;
+
+
+		console.log('getLayers', type, options);
+
+		if (type == 'raster') {
+			return api.file._getRasterLayers(req, res);
+		}
+
+		if (type == 'postgis') {
+			return api.file._getPostGISLayers(req, res);
+		}
+
+		return api.error.missingInformation(req, res);
+	},
+
+	_getRasterLayers : function (req, res) {
+		var options = req.body,
+		    data = options.data,
+		    file_id = data.file_id;
+
+		Layer
+		.find({'file' : file_id})
+		.exec(function (err, layers) {
+			if (err) return api.error.general(req, res, err);
+			res.json(layers);
+		});
+	},
+
+	_getPostGISLayers : function (req, res) {
+
+		var options = req.body,
+		    data = options.data,
+		    database_name = data.database_name,
+		    table_name = data.table_name,
 		    fileUuid = table_name,
-		    data_type = options.data_type,
+		    data_type = data.data_type,
 		    user = req.user,
 		    ops = [];
 
 		if (!database_name || !table_name) return api.error.missingInformation(req, res);
 
 		// todo: permissons
-
-
 		Layer
 		.find({'data.postgis.table_name' : table_name})
 		.exec(function (err, layers) {
 			if (err) return api.error.general(req, res, err);
-			
 			res.json(layers);
 		});
-
-
 	},
 
 	// delete a file
@@ -560,6 +712,9 @@ module.exports = api.file = {
 		    uuids = req.body.uuids,
 		    ops = [],
 		    _lids = [];
+
+
+
 
 		// validate
 		if (!_fids || !puuid || !userid) return api.error.missingInformation(req, res);
