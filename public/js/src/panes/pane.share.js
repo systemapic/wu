@@ -320,7 +320,7 @@ Wu.Share = Wu.Pane.extend({
 
 		// create first part of title
 		var pre = Wu.DomUtil.create('div', 'share-invite-title', titleWrap);
-		pre.innerHTML = 'Invite users to project:<br> ' + this._project.getTitle();
+		pre.innerHTML = 'Invite users to project:<br> <span style="font-weight: 900">' + this._project.getTitle() + '</span>';
 
 		// create last part of title
 		var post = Wu.DomUtil.create('div', 'share-invite-title-post', titleWrap);	 
@@ -349,7 +349,7 @@ Wu.Share = Wu.Pane.extend({
 		var wrapper = Wu.DomUtil.create('div', 'invite-permissions-wrapper', container);
 
 		// title
-		var title = Wu.DomUtil.create('div', 'share-invite-title-post', wrapper, 'Permissions granted:');
+		var title = Wu.DomUtil.create('div', 'share-invite-permission-title', wrapper, 'Permissions granted:');
 
 		// create checkboxes
 		this._createCheckboxes(wrapper);
@@ -371,19 +371,26 @@ Wu.Share = Wu.Pane.extend({
 		var w = Wu.DomUtil.create('div', 'invite-permissions-checkbox-wrap', container);
 		
 		// checkbox
-		var checkbox = Wu.DomUtil.create('input', 'invite-permissions-checkbox', w);
-		checkbox.type = "checkbox";
-		checkbox.name = id;
-		checkbox.value = id;
-		checkbox.id = id;
-		checkbox.checked = checked; // default todo: only if user self has permissions to give out (eg. if can invite, but not download)
+		// var checkbox = Wu.DomUtil.create('input', 'invite-permissions-checkbox', w);
+		// checkbox.type = "checkbox";
+		// checkbox.name = id;
+		// checkbox.value = id;
+		// checkbox.id = id;
+		// checkbox.checked = checked; // default todo: only if user self has permissions to give out (eg. if can invite, but not download)
+
+
+		var checkbox = Wu.DomUtil.create('div', 'chrome-switch-container', w);
+		checkbox.setAttribute('checked', checked);
+
+		if (checked) Wu.DomUtil.addClass(checkbox, 'switch-on');
 
 		if (!enabled) {
-			checkbox.setAttribute('disabled', 'disabled');
+			Wu.DomUtil.addClass(checkbox, 'disabled-switch');
+			// checkbox.setAttribute('disabled', 'disabled');
 		}
 
 		// change event
-		Wu.DomEvent.on(checkbox, 'change', this._checkboxChange, this);
+		Wu.DomEvent.on(checkbox, 'click', this._checkboxChange, this);
 
 		// label
 		var label = Wu.DomUtil.create('label', 'invite-permissions-label', w);
@@ -395,7 +402,17 @@ Wu.Share = Wu.Pane.extend({
 	},
 
 	_checkboxChange : function (e) {
-		console.log('evalue', e.target.value, e.target.checked);
+
+		var checkbox = e.target;
+		var checked = checkbox.getAttribute('checked');
+
+		if ( checked == 'true' ) {
+			Wu.DomUtil.removeClass(checkbox, 'switch-on');
+			checkbox.setAttribute('checked', 'false');
+		} else {
+			Wu.DomUtil.addClass(checkbox, 'switch-on');
+			checkbox.setAttribute('checked', 'true');
+		}
 
 		var permissions = this._getPermissions();
 

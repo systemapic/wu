@@ -1765,13 +1765,14 @@ aka feedback pane
 	}
 
 .each-multiple-description {
-	padding: 4px 15px 4px 25px;
+	padding: 4px 27px 4px 25px;
 	border-bottom: 1px dashed #ccc;
 	font-size: 12px;
 	font-weight: 900;
 	cursor: pointer;
 	text-transform: uppercase;
 	position: relative;
+	word-break: break-all;
 	}
 
 .each-multiple-description:hover {
@@ -1822,7 +1823,9 @@ aka feedback pane
 	color: black;
 	padding-left: 15px;
 	padding-right: 25px;
-	word-break: break-all;
+	white-space: normal;
+	word-break: normal;
+	line-height: 1.2;
 	}
 
 
@@ -1876,7 +1879,7 @@ aka feedback pane
 	margin-left: 0px;
 	position: relative;
 	font-size: 19px;
-	font-weight: 900 !important;
+	/*font-weight: 900 !important;*/
 	margin-bottom: 10px;
 	text-align: center;
 	
@@ -1970,12 +1973,13 @@ aka feedback pane
 	position: absolute;
 	color: #999;
 	left: 9px;
-	bottom: 21px;
+	bottom: 19px;
 	font-size: 11px;
 	}
 
 #c3-header-metacontainer {
 	position: relative;
+	max-width: 444px;
 	}
 
 /*#c3-header-metacontainer:before {
@@ -2028,7 +2032,7 @@ aka feedback pane
 
 .leflet-container.leaflet-popup {
 	z-index: 99999;
-	max-height: 300px;
+	/*max-height: 300px;*/
 }	
 
 
@@ -2059,4 +2063,79 @@ aka feedback pane
 	max-height: auto !important;
 	min-width: auto !important;
 	max-height: auto !important;
+	}
+
+.share-invite-permission-title {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	font-weight: 900;	
+	}
+
+
+.chrome-switch-container {
+	z-index: 99999999;
+}	
+
+
+.chrome-switch-container.disabled-switch:after {
+  content: '';
+  background: white;
+  left: 0;
+  top: -1px;
+  position: absolute;
+  height: 20px;
+  width: 33px;
+  opacity: 0.7;	
+}
+
+
+
+.c3-tooltip th {
+	text-align: center;
+}
+
+.c3-tooltip td.value {
+  text-align: center;
+  font-weight: 900;
+  padding: 4px 4px 2px 5px;
+  font-size: 12px;	
+}
+
+td.name {
+	width: auto;
+}
+
+
+
+
+
+.d3-satellite-wrapper {
+	position: relative;
+	top: 6px;
+	text-align: center;
+	height: 45px;
+	}
+
+#d3-satellite-compass-container,
+#d3-satellite-angle-container {
+	display: inline-block;
+	position: relative;
+	}
+
+
+
+
+.regression-button-wrapper {
+	position: relative;
+	top: 10px;
+	border-top: 1px solid #ccc;
+	padding-top: 10px;
+	margin: 0;
+	}
+
+
+	
+
+.globesar-extras {
+	margin-top: 50px;
 }

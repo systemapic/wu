@@ -202,7 +202,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			d3array : {
 		    		meta 	: [],
 		    		xName 	: 'field_x', 
-		    		yName 	: 'field_y',
+		    		yName 	: 'mm',
 		    		x 	: [],
 		    		y 	: [],
 		    		ticks 	: [],
@@ -211,10 +211,10 @@ Wu.Control.Chart = Wu.Control.extend({
 			multiPopUp : false
 		}
 
-		var _c3Obj = this.createC3dataObj(c3Obj);
+		this._c3Obj = this.createC3dataObj(c3Obj);
 
 		var headerOptions = {
-			headerMeta 	: _c3Obj.d3array.meta,
+			headerMeta 	: this._c3Obj.d3array.meta,
 			layerName 	: e.layer.store.title,
 			areaSQ 		: false,
 			pointCount 	: false,
@@ -246,7 +246,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			d3array : {
 		    		meta 	: [],
 		    		xName 	: 'field_x', 
-		    		yName 	: 'field_y',
+		    		yName 	: 'mm',
 		    		x 	: [],
 		    		y 	: [],
 		    		ticks 	: [],
@@ -254,10 +254,10 @@ Wu.Control.Chart = Wu.Control.extend({
 			},
 		}
 
-		var _c3Obj = this.createC3dataObj(c3Obj);
+		this._c3Obj = this.createC3dataObj(c3Obj);
 
 		var headerOptions = {
-			headerMeta 	: _c3Obj.d3array.meta,
+			headerMeta 	: this._c3Obj.d3array.meta,
 			layerName 	: e.layer.store.title,
 			areaSQ 		: false,
 			pointCount 	: false,
@@ -278,19 +278,20 @@ Wu.Control.Chart = Wu.Control.extend({
 		// Create graph HTML
 		if ( this.popupSettings && this.popupSettings.timeSeries.enable != false) {
 			
-			var _chart = this.C3Chart(_c3Obj);
-			var _chartTicks = this.chartTicks(_c3Obj);
+			var _chart = this.C3Chart(this._c3Obj);
+			var _chartTicks = this.chartTicks(this._c3Obj);
 			_chartContainer.appendChild(_chart);
 		
 		}
 
-		// console.time('regression');
+		// console.time('reression');
 		// this._calculateRegression(_c3Obj)
 		// console.timeEnd('regression');
 
 
 		return content;			
 	},
+
 
 	_calculateRegression : function (c) {
 
@@ -408,7 +409,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			d3array 	: {
 				    		meta 	: [],
 				    		xName 	: 'field_x', 
-				    		yName 	: 'field_y',
+				    		yName 	: 'mm',
 				    		x 	: [],
 				    		y 	: [],
 				    		ticks 	: [],
@@ -420,11 +421,11 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		}
 
-		var _c3Obj = this.createC3dataObj(c3Obj);
+		this._c3Obj = this.createC3dataObj(c3Obj);
 
 
 		var headerOptions = {
-			headerMeta 	: _c3Obj.d3array.meta,
+			headerMeta 	: this._c3Obj.d3array.meta,
 			layerName 	: _layerName,
 			areaSQ 		: _areaSQ,
 			pointCount 	: _totalPoints,
@@ -446,8 +447,8 @@ Wu.Control.Chart = Wu.Control.extend({
 		if ( this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == true ) {
 
 			// Create chart
-			var _chart = this.C3Chart(_c3Obj);
-			var _chartTicks = this.chartTicks(_c3Obj);
+			var _chart = this.C3Chart(this._c3Obj);
+			var _chartTicks = this.chartTicks(this._c3Obj);
 			_chartContainer.appendChild(_chart);
 
 		}
@@ -632,16 +633,14 @@ Wu.Control.Chart = Wu.Control.extend({
 		x.unshift(xName);
 		y.unshift(yName);
 
-		// Colums
+
+		// var reg_y = this._calculateRegression(c3Obj);
+		// var reg_x = ['reg_x', x[1], x[x.length-1]];
+
+		// _columns = [x, y, reg_x, reg_y];
+
 		_columns = [x, y];
 
-		console.log('_columns', _columns);
-
-		var reg = this._calculateRegression(c3Obj);
-
-		console.log('REGGG', reg);
-
-		_columns.push(reg);
 
 
 		// Create container
@@ -661,6 +660,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			},
 
 			point : {
+				show : false,
 				r: 3,
 			},
 
@@ -679,16 +679,20 @@ Wu.Control.Chart = Wu.Control.extend({
 		        data: {
 
 		                xs: {
-		                        field_y: 'field_x',
-		                        regression : 'regression'
+		                        mm: 'field_x',
+		                        regression : 'reg_x'
 		                },
 
 		                columns: _columns,
 
 		                colors : {
-		                	field_y: '#0000FF'
+		                	mm: '#0000FF',
+		                	regression: '#C83333'
 		                },
-		                type: 'scatter',
+		                types: {
+		                	mm : 'scatter',
+		                	regression : 'line'
+		                }
 		        },
 
 
@@ -718,11 +722,13 @@ Wu.Control.Chart = Wu.Control.extend({
 		        },
 
 			tooltip: {
+				grouped : true,
 				format: {
 					title: function (d) { 
 						var nnDate = moment(d).format("DD.MM.YYYY");
 						return nnDate;
 					},
+					// name: function (name, ratio, id, index) { return 'fetta'; }
 			
 				},
 				
@@ -732,6 +738,14 @@ Wu.Control.Chart = Wu.Control.extend({
 				pattern: ['#000000']
 			}		        
 		});
+
+
+		// var regLine = this._chart.append('line')
+
+
+
+
+
 
 		// add zoom events
 		this._addChartEvents(_C3Container);
@@ -749,9 +763,18 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		var w = Wu.DomUtil.create('div', 'regression-button-wrapper', this._footerContainer);
 
-		var button = this._regressionButton = Wu.DomUtil.create('input', 'chart-regression-button', w);
-		button.type = 'checkbox';
+		// var button = this._regressionButton = Wu.DomUtil.create('input', 'chart-regression-button', w);
+		// button.type = 'checkbox';
+		// button.id = 'regression';
+
+		var button = this._regressionButton = Wu.DomUtil.create('div', 'chrome-switch-container', w);
+		
+		button.setAttribute('on', 'false');
+		// button.type = 'checkbox';
 		button.id = 'regression';
+
+
+		// radio-on
 
 		// label
 		var label = Wu.DomUtil.create('label', 'invite-permissions-label', w);
@@ -759,35 +782,46 @@ Wu.Control.Chart = Wu.Control.extend({
 		label.appendChild(document.createTextNode('Regression'));
 
 		// change event
-		Wu.DomEvent.on(button, 'change', this._toggleRegression, this);
+		// Wu.DomEvent.on(button, 'change', this._toggleRegression, this);
+
+		Wu.DomEvent.on(button, 'click', this._toggleRegression, this);
 
 	},
 
-	_toggleRegression : function () {
+	_toggleRegression : function (e) {
+
+		var elem = e.target;
+		var on = elem.getAttribute('on');
 
 
-		if (this._regressionButton.checked) {
-			// add line
+		if ( on == 'false' ) {
+			
+			Wu.DomUtil.addClass(elem, 'switch-on');
+			elem.setAttribute('on', 'true');
 
 			// get regression 
 			var reg = this._calculateRegression();
+			var x = this._c3Obj.d3array.x;
 
-			console.log('chart: ', this._chart);
-			console.log('reg column?;', reg);
+			var reg_y = [reg[0], reg[1], reg[reg.length-1]];
+			var reg_x = ['reg_x', x[1], x[x.length-1]];
 
 			// add to chart
-			// this._chart.load({
-			// 	columns: [reg]	// funker ikke?? (http://c3js.org/samples/simple_multiple.html, http://c3js.org/samples/timeseries.html)
-			// });
+			this._chart.load({
+				columns: [reg_x, reg_y]
+			});
 
-			// do some d3 magic instead?
 		
 		} else {
-			// remove line
 
+			Wu.DomUtil.removeClass(elem, 'switch-on');
+			elem.setAttribute('on', 'false');
+
+			this._chart.unload({
+				ids : 'regression'
+			})
 
 		}
-
 		
 	},
 
