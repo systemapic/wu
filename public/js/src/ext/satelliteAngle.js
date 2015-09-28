@@ -14,37 +14,37 @@ Wu.satteliteAngle = Wu.Class.extend({
 
 		this.color = '#019688';
 
-		this._innerContainer = Wu.DomUtil.create('div', 'd3-satellite-wrapper', this.container);
+		this._innerContainer = Wu.DomUtil.create('div', 'd3-satellite-wrapper displayNone', this.container);
+		this._header = Wu.DomUtil.create('div', 'satellite-measurement-geometry', this._innerContainer, 'Measurement geometry');
 
-		var angle = this.options.angle;
-		var path = this.options.path;
-
-		this.initAngle(angle);
-		this.initCompass(path);
+		this.angleContainer = Wu.DomUtil.createId('div', 'd3-satellite-angle-container', this._innerContainer);
+		this.compassContainer = Wu.DomUtil.createId('div', 'd3-satellite-compass-container', this._innerContainer);
 	},
 
 	update : function (options) {
 
-		console.log('update sat...', options);
-
 		this.angleContainer.innerHTML = '';
-		this.angleContainer.remove();
-
 		this.compassContainer.innerHTML = '';
-		this.compassContainer.remove();
 
+		var angle = options.angle ? options.angle : false;
+		var path  = options.path ? options.path : false;
 
-		var angle = options.angle;
-		var path  = options.path;
+		if ( !angle && !path ) {
 
+			console.log('no angle, no path');
+			Wu.DomUtil.addClass(this._innerContainer, 'displayNone');
+		} else {
+			console.log('angle & path');
+			Wu.DomUtil.removeClass(this._innerContainer, 'displayNone');
+		}
 
-		this.initAngle(angle);
-		this.initCompass(path);
+		this.initAngle(parseInt(angle));
+		this.initCompass(parseInt(path));
 	},
 
-	initAngle : function (angle) {
+	initAngle : function (angle) {		
 
-		this.angleContainer = Wu.DomUtil.createId('div', 'd3-satellite-angle-container', this._innerContainer);
+		if ( !angle ) return;
 
 		var size = 0.55;
 		var startX = 10;
@@ -53,6 +53,10 @@ Wu.satteliteAngle = Wu.Class.extend({
 		var width = 45;
 		var height = 75;
 
+		var flip = false;
+		if ( angle < 0 ) flip = true;
+
+
 		var D3angle = d3.select(this.angleContainer)
 				.append("svg")
                               	.attr("width", (width + startX*2) * size)
@@ -60,9 +64,15 @@ Wu.satteliteAngle = Wu.Class.extend({
 
                 var yLine = D3angle
 				.append("line")
-				.attr("x1", startX * size)
+				.attr("x1", function () {
+					if ( flip ) return (width + startX) * size;
+						    return startX * size;
+				})
 				.attr("y1", startY * size)
-				.attr("x2", startX * size)
+				.attr("x2", function () {
+					if ( flip ) return (width + startX) * size;
+						    return startX * size;
+				})
 				.attr("y2", (height - startY) * size)
 				// Styling
 				.attr("stroke-width", 1)
@@ -82,9 +92,15 @@ Wu.satteliteAngle = Wu.Class.extend({
                 var angleLine = D3angle
 				.append("line")
 				.classed('angle-line', true)
-				.attr("x1", startX * size)
+				.attr("x1", function () {
+					if ( flip ) return (width + startX) * size;
+						    return startX * size;					
+				})
 				.attr("y1", startY * size)
-				.attr("x2", (angle + startX) * size)
+				.attr("x2", function () {
+					if ( flip ) return ((width + startX) + angle) * size;
+						    return (angle + startX) * size;
+				})
 				.attr("y2", (height - startY - 1) * size)
 				// styling
 				.attr('stroke-width', 2)
@@ -93,7 +109,10 @@ Wu.satteliteAngle = Wu.Class.extend({
 
 		var startCircle = D3angle
 				.append("circle")
-				.attr('cx', startX * size)
+				.attr('cx', function () {
+					if ( flip ) return (width + startX) * size;
+						    return startX * size;					
+				})
 				.attr('cy', startY * size)
 				.attr('r', 3)
 				// styling
@@ -112,15 +131,18 @@ Wu.satteliteAngle = Wu.Class.extend({
 				.attr('font-weight', 900)
 				.attr('fill', '#999')
 				.attr("text-anchor", "middle")
-				.text(angle + '°');
+				.text(function() {
+					if ( flip ) return  (-angle) + '°';
+						    return  angle + '°'
+				});
 
 
 	},
 
 
-	initCompass : function (path) {
+	initCompass : function (path) {		
 
-		this.compassContainer = Wu.DomUtil.createId('div', 'd3-satellite-compass-container', this._innerContainer);
+		if ( !path ) return;
 
 		var size = 0.75;
 		var startX = 10;
