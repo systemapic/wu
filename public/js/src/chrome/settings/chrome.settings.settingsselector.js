@@ -32,6 +32,11 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 				enabled : true,
 				text : 'CartoCSS'
 			},
+
+			extras : {
+				enabled : true,
+				text : 'Extras'
+			},
 		}
 		
 	},
@@ -115,9 +120,12 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 				var text = this.options.tabs[o].text;
 				var tab = o.camelize();
 
+					console.log('tab: ', tab);
+
 				// create tab contents
 				if (Wu.Chrome.SettingsContent[tab]) {
 
+					console.log('ok');
 					// create tab button
 					var trigger = Wu.DomUtil.create('div', 'chrome chrome-content settings-button', this._buttonWrapper, text);
 

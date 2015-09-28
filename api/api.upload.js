@@ -197,7 +197,7 @@ module.exports = api.upload = {
 				// check if all done
 				api.redis.temp.get('done-chunks-' + redis_id, function (err, count) {
 
-					console.log('Done chunks: ', count);
+					console.log('Done chunks: ', count, options.resumableTotalChunks);
 
 					// return if not all done
 					if (count != options.resumableTotalChunks) {
@@ -254,6 +254,7 @@ module.exports = api.upload = {
 		    redis_id 		= redis_id,
 		    access_token 	= options.access_token;
 
+		console.log('_chunkedUploadDone');
 
 		// merge chunks
 		ops.push(function (callback) {
