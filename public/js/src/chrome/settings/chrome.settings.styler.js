@@ -90,9 +90,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// event run when layer selected 
 	_selectedActiveLayer : function (e, uuid) {
 
-		console.log('e', e);
-		console.log('uuid', uuid);		
-
 		this._fieldsWrapper.innerHTML = '';
 
 		this.layerUuid = uuid ? uuid : e.target.value
@@ -149,8 +146,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		
 		// Get layermeta
 		var layerMeta = layer.getMeta();
-
-		console.log('wot?', layerMeta, layer.getMeta());
 
 		// Get columns
 		this.columns = layerMeta.columns;

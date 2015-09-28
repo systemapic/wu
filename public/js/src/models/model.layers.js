@@ -520,15 +520,7 @@ Wu.Layer = Wu.Class.extend({
 	// save updates to layer (like description, style)
 	save : function (field) {
 
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('field', field)
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('');
+		
 
 		var json = {};
 		json[field] = this.store[field];
