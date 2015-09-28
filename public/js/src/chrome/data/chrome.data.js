@@ -265,8 +265,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var D3container = this.projectLayersContainers.D3container;
 
 		// If project has no layers...
-		var layers = this._project.getPostGISLayers()
-
+		// var layers = this._project.getPostGISLayers
+		var layers = this._project.getDataLayers();
+		
+		console.log('pg layerS: ', layers);
 
 		this.projectLayers.data = layers;
 

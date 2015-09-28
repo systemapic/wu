@@ -335,7 +335,6 @@ Wu.Files = Wu.Class.extend({
 	},
 
 	_createDefaultCartocss : function (json, callback) {
-
 		var styler = app.Tools.Styler;
 		styler.getCartoCSSFromJSON(json, callback);
 	},
@@ -372,8 +371,107 @@ Wu.Files = Wu.Class.extend({
 		// line : {}
 	},
 
+	_getType : function () {
+		if (this.store.data && this.store.data.postgis) return 'vector';
+		if (this.store.data && this.store.data.raster) return 'raster';
+		return false;
+	},
+
 	_createDefaultLayer : function (project) {
 
+		var type = this._getType();
+
+		if (type == 'vector') {
+			this._createDefaultVectorLayer(project);
+		}
+
+		if (type == 'raster') {
+			this._createDefaultRasterLayer(project);
+		}
+	},
+
+	_createDefaultRasterLayer : function (project) {
+		
+		var options = {
+			file : this,
+			project : project,
+		}
+
+		// create layer on server
+		this._requestDefaultRasterLayer(options)
+
+	},
+
+	_requestDefaultRasterLayer : function (options) {
+
+		console.log('_requestDefaultLayer', options);
+
+		var file = options.file,
+		    file_id = file.getUuid(),
+		    project = options.project;
+
+
+		var layerJSON = {
+			"geom_column": "the_geom_3857",
+			"geom_type": "geometry",
+			"raster_band": "",
+			"srid": "",
+			"affected_tables": "",
+			"interactivity": "",
+			"attributes": "",
+			"access_token": app.tokens.access_token,
+			"cartocss_version": "2.0.1",
+			// "cartocss": defaultCartocss, 	// save default cartocss style (will be active on first render)
+			// "sql": "(SELECT * FROM " + file_id + ") as sub",
+			"file_id": file_id,
+			"return_model" : true,
+			"projectUuid" : project.getUuid()
+		}
+
+		// create postgis layer
+		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
+			var layer = Wu.parse(layerJSON);
+
+
+			console.log('layer::::', layer);
+
+			// return;
+
+			var options = {
+				projectUuid : project.getUuid(), // pass to automatically attach to project
+				data : {
+					raster : layer.layerUuid
+				},
+				metadata : layer.options.metadata, 	// TODO
+				title : 'Layer from ' + file.getName(),
+				description : 'Description: Layer created from ' + file.getName(),
+				file : file.getUuid(),
+				// style : JSON.stringify(defaultStyle) // save default json style
+			}
+
+			// create new layer model
+			this._createLayerModel(options, function (err, layerModel) {
+
+				// refresh Sidepane Options
+				project.addLayer(layerModel);
+
+				// todo: set layer icon
+				app.feedback.setMessage({
+					title : 'Created layer from dataset',
+					description : 'Added <strong>' + layerModel.title + '</strong> to project.',
+				});	
+
+				// select project
+				Wu.Mixin.Events.fire('layerAdded', {detail : {
+					projectUuid : project.getUuid()
+				}});
+			});
+			
+		}.bind(this));
+	},
+
+	_createDefaultVectorLayer : function (project) {
+		
 		var file_id = this.getUuid();
 		var file = this;
 
@@ -391,16 +489,15 @@ Wu.Files = Wu.Class.extend({
 			}
 
 			// create layer on server
-			this._requestDefaultLayer(options)
+			this._requestDefaultVectorLayer(options)
 
 
 		}.bind(this));
-
-	
-
 	},
 
-	_requestDefaultLayer : function (options) {
+	_requestDefaultVectorLayer : function (options) {
+
+		console.log('_requestDefaultLayer', options);
 
 		var file = options.file,
 		    file_id = file.getUuid(),
@@ -429,6 +526,8 @@ Wu.Files = Wu.Class.extend({
 		// create postgis layer
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
 			var layer = Wu.parse(layerJSON);
+
+			console.log('db create layer', layer);
 
 			var options = {
 				projectUuid : project.getUuid(), // pass to automatically attach to project
@@ -475,6 +574,13 @@ Wu.Files = Wu.Class.extend({
 		if (!this.store.data.postgis) return false;
 		if (!this.store.data.postgis.metadata) return false;
 		var meta = Wu.parse(this.store.data.postgis.metadata);
+		return meta;
+	},
+
+	getRasterMeta : function () {
+		if (!this.store.data.raster) return false;
+		if (!this.store.data.raster.metadata) return false;
+		var meta = Wu.parse(this.store.data.raster.metadata);
 		return meta;
 	},
 

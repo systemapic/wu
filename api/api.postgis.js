@@ -914,6 +914,8 @@ module.exports = api.postgis = {
 				query : 'SELECT ST_GeometryType(geom) from "' + file_id + '" limit 1'
 			}, function (err, results) {
 				if (err) return callback(err);
+				console.log('results', results);
+				if (!results || !results.rows || !results.rows.length) return callback('The dataset contains no valid geodata.');
 				var geometry_type = results.rows[0].st_geometrytype.split('ST_')[1];
 				callback(null, geometry_type);
 			})
