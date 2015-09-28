@@ -21,8 +21,6 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 	_initLayout : function () {
 
-		console.log('%c _initLayout ', 'background: red; color: white');
-
 		this._layers = this._project.getDataLayers();
 
 		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
@@ -65,8 +63,6 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 		var path = satpos.path ? satpos.path : false;
 		var angle = satpos.angle ? satpos.angle : false;
-		console.log('');
-		console.log('');
 
 
 		var lineOptions = {
