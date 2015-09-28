@@ -290,9 +290,6 @@ Wu.Share = Wu.Pane.extend({
 		// get invite link
 		this._getInviteLink(['read_project', 'download_file', 'share_project'], function (ctx, link) {
 
-			console.log('got ivnite link: ', ctx, link);
-			console.log('projects?', this._project, app.activeProject);
-
 			// clear other shares
 			this._clearTitles();
 
@@ -442,8 +439,6 @@ Wu.Share = Wu.Pane.extend({
 			permissions : permissions
 		}
 
-		console.log('options', options);
-
 		// get invite link
 		Wu.post('/api/invite/link', JSON.stringify(options), callback);
 	},
@@ -462,80 +457,6 @@ Wu.Share = Wu.Pane.extend({
 		}
 	},
 
-	// _submittingInvite : function () {
-	// 	console.log('submit invite!');
-
-	// 	var emails = [];
-
-	// 	this._inviteInputs.forEach(function (input) {
-	// 		if (input.value) emails.push(input.value);
-	// 	});
-
-
-	// 	var access_type = 'view';
-		
-	// 	console.log('emails; ', emails, access_type);
-
-
-	// 	var options = {
-	// 		access_type : access_type,
-	// 		emails : emails,
-	// 		project_id : this._project.getUuid()
-	// 	}
-
-	// 	console.log('sending ivnite', options);
-
-	// 	// send request to server
-	// 	Wu.post('/api/user/invite', JSON.stringify(options), this._sentInvitations.bind(this), this);
-
-	// },
-
-	// _sentInvitations : function (ctx, results) {
-	// 	console.log('_sentInvitations', results);
-
-
-	// 	this._inviteWrapper.innerHTML = 'Invites sent!';
-
-	// },
-
-	// _createInviteInput : function () {
-
-	// 	// max twenty inputs
-	// 	if (this._inviteInputs.length > 20) {
-	// 		this._removeInviteInputEvents();
-	// 		return alert('You can only invite 20 at a time.');
-	// 	}
-
-	// 	// create input
-	// 	var input = Wu.DomUtil.create('input', 'share-invite-input', this._inviteInputsWrapper);
-	// 	input.setAttribute('placeHolder', 'Enter email...');
-	// 	this._inviteInputs.push(input);
-
-	// 	// refresh focus event
-	// 	this._refreshInviteInputEvents();
-	// },
-
-	// _refreshInviteInputEvents : function () {
-
-	// 	// remove previous events
-	// 	this._removeInviteInputEvents();
-
-	// 	// get last input
-	// 	var i = this._inviteInputs.length - 1;
-	// 	var input = this._inviteInputs[i];
-
-	// 	// add event
-	// 	Wu.DomEvent.on(input, 'focus', this._createInviteInput, this);
-	// },
-
-	// _removeInviteInputEvents : function () {
-
-	// 	// remove all events
-	// 	this._inviteInputs.forEach(function (input) {
-	// 		Wu.DomEvent.off(input, 'focus', this._createInviteInput, this);
-	// 	}.bind(this));
-
-	// },
-
+	
 
 });
