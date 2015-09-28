@@ -17,14 +17,9 @@ Wu.satteliteAngle = Wu.Class.extend({
 		this._innerContainer = Wu.DomUtil.create('div', 'd3-satellite-wrapper displayNone', this.container);
 		this._header = Wu.DomUtil.create('div', 'satellite-measurement-geometry', this._innerContainer, 'Measurement geometry');
 
-		this.angleContainer = Wu.DomUtil.createId('div', 'd3-satellite-angle-container', this._innerContainer);
-		this.compassContainer = Wu.DomUtil.createId('div', 'd3-satellite-compass-container', this._innerContainer);
 	},
 
 	update : function (options) {
-
-		this.angleContainer.innerHTML = '';
-		this.compassContainer.innerHTML = '';
 
 		var angle = options.angle ? options.angle : false;
 		var path  = options.path ? options.path : false;
@@ -44,45 +39,46 @@ Wu.satteliteAngle = Wu.Class.extend({
 	initAngle : function (angle) {		
 
 		if ( !angle ) return;
+		if ( this.angleContainer ) {
+			this.angleContainer.innerHTML = '';			
+			this.angleContainer.remove();
+		}
+		this.angleContainer = Wu.DomUtil.createId('div', 'd3-satellite-angle-container', this._innerContainer);
 
-		var size = 0.55;
-		var startX = 10;
-		var startY = 10;
-		var paddingBottom = 10;
-		var width = 45;
-		var height = 75;
-
-		var flip = false;
-		if ( angle < 0 ) flip = true;
+		var size = 0.55,
+		    padding = 10,
+		    width = 45,
+		    height = 75,
+		    flip = angle < 0 ? true : false;
 
 
 		var D3angle = d3.select(this.angleContainer)
 				.append("svg")
-                              	.attr("width", (width + startX*2) * size)
-                              	.attr("height", (height * size) + paddingBottom);
+                              	.attr("width", (width + padding*2) * size)
+                              	.attr("height", (height * size) + padding);
 
                 var yLine = D3angle
 				.append("line")
 				.attr("x1", function () {
-					if ( flip ) return (width + startX) * size;
-						    return startX * size;
+					if ( flip ) return (width + padding) * size;
+						    return padding * size;
 				})
-				.attr("y1", startY * size)
+				.attr("y1", padding * size)
 				.attr("x2", function () {
-					if ( flip ) return (width + startX) * size;
-						    return startX * size;
+					if ( flip ) return (width + padding) * size;
+						    return padding * size;
 				})
-				.attr("y2", (height - startY) * size)
+				.attr("y2", (height - padding) * size)
 				// Styling
 				.attr("stroke-width", 1)
 				.attr("stroke", "#999");
 
                 var xLine = D3angle
 				.append("line")
-				.attr("x1", startX * size)
-				.attr("y1", (height - startY - 1) * size)
-				.attr("x2", (width + startX) * size)
-				.attr("y2", (height - startY - 1) * size)
+				.attr("x1", padding * size)
+				.attr("y1", (height - padding - 1) * size)
+				.attr("x2", (width + padding) * size)
+				.attr("y2", (height - padding - 1) * size)
 				// Styling
 				.attr("stroke-width", 1)
 				.attr("stroke", "#999");				
@@ -92,15 +88,15 @@ Wu.satteliteAngle = Wu.Class.extend({
 				.append("line")
 				.classed('angle-line', true)
 				.attr("x1", function () {
-					if ( flip ) return (width + startX) * size;
-						    return startX * size;					
+					if ( flip ) return (width + padding) * size;
+						    return padding * size;					
 				})
-				.attr("y1", startY * size)
+				.attr("y1", padding * size)
 				.attr("x2", function () {
-					if ( flip ) return ((width + startX) + angle) * size;
-						    return (angle + startX) * size;
+					if ( flip ) return ((width + padding) + angle) * size;
+						    return (angle + padding) * size;
 				})
-				.attr("y2", (height - startY - 1) * size)
+				.attr("y2", (height - padding - 1) * size)
 				// styling
 				.attr('stroke-width', 2)
 				.attr('stroke', this.color)
@@ -109,10 +105,10 @@ Wu.satteliteAngle = Wu.Class.extend({
 		var startCircle = D3angle
 				.append("circle")
 				.attr('cx', function () {
-					if ( flip ) return (width + startX) * size;
-						    return startX * size;					
+					if ( flip ) return (width + padding) * size;
+						    return padding * size;					
 				})
-				.attr('cy', startY * size)
+				.attr('cy', padding * size)
 				.attr('r', 3)
 				// styling
 				.attr('fill', '#FFF')
@@ -123,7 +119,7 @@ Wu.satteliteAngle = Wu.Class.extend({
 		// Angle
 		var text = D3angle
 				.append('text')
-				.attr('x', ((width/2)+startX) * size)
+				.attr('x', ((width/2)+padding) * size)
 				.attr('y', (height+15) * size)
 				.attr('font-family', 'sans-serif')
 				.attr('font-size', '10px')
@@ -142,25 +138,28 @@ Wu.satteliteAngle = Wu.Class.extend({
 	initCompass : function (path) {		
 
 		if ( !path ) return;
+		if ( this.compassContainer ) {
+			this.compassContainer.innerHTML = '';
+			this.compassContainer.remove();
+		}
+		this.compassContainer = Wu.DomUtil.createId('div', 'd3-satellite-angle-container', this._innerContainer);
 
-		var size = 0.75;
-		var startX = 10;
-		var startY = 10;
-		var paddingBottom = 10;
-		var width = 65;
-		var height = 65;		
+		var size = 0.75,
+		    padding = 10,
+		    width = 65,
+		    height = 65;		
 
 		var D3container = d3.select(this.compassContainer)
 				.append("svg")
                               	.attr("width", width * size)
-                              	.attr("height", (height * size) + paddingBottom);
+                              	.attr("height", (height * size) + padding);
 
 
                 // North
 		var N = D3container
 				.append('text')
 				.attr('x', width/2 * size)
-				.attr('y', (startY + 2 ) * size)
+				.attr('y', (padding + 2 ) * size)
 				.attr('font-family', 'sans-serif')
 				.attr('font-size', (10 * size) + 'px')
 				.attr('fill', '#999')
@@ -181,7 +180,7 @@ Wu.satteliteAngle = Wu.Class.extend({
 		// West
 		var W = D3container
 				.append('text')
-				.attr('x', (startX - 2) * size)
+				.attr('x', (padding - 2) * size)
 				.attr('y', (height/2 + 3) * size) 
 				.attr('font-family', 'sans-serif')
 				.attr('font-size', (10 * size) + 'px')
@@ -204,7 +203,7 @@ Wu.satteliteAngle = Wu.Class.extend({
                 // East-West line
 		var ewLine = D3container
 				.append('line')
-				.attr("x1", (startX + 5) * size)
+				.attr("x1", (padding + 5) * size)
 				.attr("y1", (height/2 * size))
 				.attr("x2", ((width-15) * size))
 				.attr("y2", (height/2 * size))
@@ -217,7 +216,7 @@ Wu.satteliteAngle = Wu.Class.extend({
 		var nsLine = D3container
 				.append('line')
 				.attr("x1", (width/2 * size))
-				.attr("y1", (startY + 5) * size)
+				.attr("y1", (padding + 5) * size)
 				.attr("x2", (width/2 * size))
 				.attr("y2", ((height-15) * size))
 				// style
@@ -250,7 +249,7 @@ Wu.satteliteAngle = Wu.Class.extend({
 				.classed('angle-line', true)
 				.attr('fill', 'white')
 				.attr("x1", (width/2 * size))
-				.attr("y1", startY * size)
+				.attr("y1", padding * size)
 				.attr("x2", (width/2 * size))
 				.attr("y2", ((height-10) * size))
 				// style
@@ -263,7 +262,7 @@ Wu.satteliteAngle = Wu.Class.extend({
 				.append("path")
 				.attr("d", function() {
 					var _startX = width/2;
-					var _startY = startY - 5;
+					var _startY = padding - 5;
 					var M = "M" + (_startX*size) + ',' + (_startY*size);
 					var L1 = "L" + ((_startX + 4)*size) + ',' + ((_startY + 6)*size);
 					var L2 = "L" + ((_startX - 4)*size) + ',' + ((_startY + 6)*size);
@@ -293,7 +292,7 @@ Wu.satteliteAngle = Wu.Class.extend({
 				.append('text')
 				.attr('x', width/2 * size)
 				.attr('y', (height+10) * size)
-
+				// style
 				.attr('font-family', 'sans-serif')
 				.attr('font-size', '10px')
 				.attr('font-weight', 900)
