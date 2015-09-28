@@ -1182,11 +1182,12 @@ Wu.RasterLayer = Wu.Layer.extend({
 
 	getMeta : function () {
 		var metajson = this.store.metadata;
-
-		return this.getFileMeta();
+		var meta = Wu.parse(metajson);
+		return meta;
 	},
 
 	getFileMeta : function () {
+		console.error('getFileMeta');
 		var file = app.Account.getFile(this.store.file);
 		var metajson = file.store.data.raster.metadata;
 		var meta = Wu.parse(metajson);
