@@ -44,7 +44,6 @@ L.Control.Description = Wu.Control.extend({
 		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._inner);		
 
 		// init satellite path container
-		// this.satelliteAngle = new Wu.satteliteAngle({angle : 0, path: 0, appendTo : this._inner});
 		this.satelliteAngle = new Wu.satteliteAngle({angle : false, path: false, appendTo : this._inner});
 
 		// legend
@@ -170,6 +169,9 @@ L.Control.Description = Wu.Control.extend({
 		
 		Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
 		Wu.DomUtil.removeClass(this._toggle, 'legend-toggle-open');
+
+
+		if ( !this.satelliteAngle.closed ) Wu.DomUtil.removeClass(this.satelliteAngle._innerContainer, 'displayNone');
 	},
 
 	toggleClose : function () {
@@ -182,6 +184,9 @@ L.Control.Description = Wu.Control.extend({
 		Wu.DomUtil.addClass(this._description, 'displayNone');
 		Wu.DomUtil.addClass(this._metaContainer, 'displayNone');		
 		Wu.DomUtil.addClass(this._toggle, 'legend-toggle-open');
+
+
+		Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
 	},
 
 	_addLayer : function (layer) {
