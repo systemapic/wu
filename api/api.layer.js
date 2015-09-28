@@ -50,6 +50,8 @@ module.exports = api.layer = {
 		var options = req.body;
 
 		api.layer.createModel(options, function (err, doc) {
+			console.log('create layer, err, doc', err, doc);
+
 			if (err) return api.error.general(res, err);
 
 			res.json(doc);
@@ -571,6 +573,11 @@ module.exports = api.layer = {
 
 
 	createModel : function (options, callback) {
+
+		// metadata sometimes come as object... todo: check why!
+		if (typeof(options.metadata) == 'object') {
+			options.metadata = JSON.stringify(options.metadata);
+		}
 
 		var layer 		= new Layer();
 		layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),
