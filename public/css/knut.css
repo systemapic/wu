@@ -16,7 +16,7 @@
 }
 
 .c3-tooltip-name-field_y .name { 
-	display: none !important;
+	/*display: none !important;*/
 }
 
 .leaflet-popup-drag {
@@ -236,10 +236,11 @@ input.invite-permissions-checkbox {
 	display: inline-block;
 }
 .invite-permissions-label {
-	margin-left: 4px;
-	font-size: 12px;
+	margin-left: 2px;
+	font-size: 13px;
 	font-weight: 500;
-}
+	padding-bottom: 0;
+	}
 
 .wide-share {
 	/*min-height: 350px;*/
@@ -262,6 +263,8 @@ input.invite-permissions-checkbox {
 }
 .invite-permissions-wrapper {
 	position: relative;
+	border-top: 1px dashed #ccc;
+	margin-top: 15px;	
 }
 
 
@@ -269,7 +272,8 @@ input.invite-permissions-checkbox {
 
 /*regression button*/
 .c3-footer {
-	height: 50px;
+	/*height: 50px;*/
+	height: auto;
 }
 
 input.chart-regression-button {
