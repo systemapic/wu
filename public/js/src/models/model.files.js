@@ -188,7 +188,7 @@ Wu.Files = Wu.Class.extend({
 			var num_layers = layers.length;
 			var pretty_layers = [];
 
-			layers.forEach(function (l, n, m) {
+			if (num_layers) layers.forEach(function (l, n, m) {
 				pretty_layers.push('- ' + l.title);
 			});
 
@@ -200,7 +200,7 @@ Wu.Files = Wu.Class.extend({
 			if (!confirmed) return console.log('Nothing deleted.');
 			
 			// delete file
-			var postgisOptions = this.getPostGISData();
+			var postgisOptions = this._getLayerData();
 			Wu.post('/api/file/delete', JSON.stringify(postgisOptions), function (err, response) {
 				console.log('deleted?', err, response);
 
@@ -261,9 +261,10 @@ Wu.Files = Wu.Class.extend({
 	_getLayers : function (callback) {
 
 		// get layers connected to dataset
-		var postgisOptions = this.getPostGISData();
-		Wu.post('/api/file/getLayers', JSON.stringify(postgisOptions), function (err, response) {
+		var options = this._getLayerData();
+		Wu.post('/api/file/getLayers', JSON.stringify(options), function (err, response) {
 			var layers = Wu.parse(response);
+			console.log('got layers', layers);
 			callback(err, layers);
 		});
 	},
@@ -271,6 +272,25 @@ Wu.Files = Wu.Class.extend({
 	getPostGISData : function () {
 		if (!this.store.data) return false;
 		return this.store.data.postgis;
+	},
+
+	_getLayerData : function () {
+		if (!this.store.data) return false;
+		if (this.store.data.postgis) {
+			var options = {
+				data : this.store.data.postgis, 
+				type : 'postgis'
+			}
+			return options;
+		}
+		if (this.store.data.raster) {
+			var options = {
+				data : this.store.data.raster, 
+				type : 'raster'
+			}
+			return options;
+		}
+		return false;
 	},
 
 	_shareFile : function () {

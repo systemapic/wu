@@ -266,8 +266,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// var layers = this._project.getPostGISLayers
 		var layers = this._project.getDataLayers();
 		
-		console.log('pg layerS: ', layers);
-
 		this.projectLayers.data = layers;
 
 		// Remove text for no layers...
