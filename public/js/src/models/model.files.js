@@ -183,7 +183,8 @@ Wu.Files = Wu.Class.extend({
 
 		// check if dataset has layers
 		this._getLayers(function (err, layers) {
-
+			if (err) console.log('err', err);
+			
 			var num_layers = layers.length;
 			var pretty_layers = [];
 

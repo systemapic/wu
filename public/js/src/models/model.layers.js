@@ -1175,20 +1175,13 @@ Wu.RasterLayer = Wu.Layer.extend({
 	},
 
 	getFileMeta : function () {
-		console.log('fucking meta??', this);
 		var file = app.Account.getFile(this.store.file);
-
-		console.log('file: ', file);
 		var metajson = file.store.data.raster.metadata;
-
-		console.log('meta: ', metajson);
 		var meta = Wu.parse(metajson);
 		return meta;
-		// return false;
 	},
 
 	flyTo : function () {
-		console.log('flyyy');
 		var extent = this.getMeta().extent;
 		if (!extent) return;
 
@@ -1207,6 +1200,22 @@ Wu.RasterLayer = Wu.Layer.extend({
 
 		// fly
 		map.fitBounds(bounds, flyOptions);
+	},
+
+	deleteLayer : function () {
+
+		// confirm
+		var message = 'Are you sure you want to delete this layer? \n - ' + this.getTitle();
+		if (!confirm(message)) return console.log('No layer deleted.');
+
+		// get project
+		var layerUuid = this.getUuid();
+		var project = _.find(app.Projects, function (p) {
+			return p.layers[layerUuid];
+		})
+
+		// delete layer
+		project.deleteLayer(this);
 	},
 });
 

@@ -174,7 +174,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// initContent : function () {
 	_initFileLists : function () {
 
-
 		// Holds each section (project files, my files, etc)
 		this.fileListContainers = {};
 
@@ -186,7 +185,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Edit file name
 		this.editingName = false;
-
 
 		// Layer list (for this project)
 		this.projectLayers = {

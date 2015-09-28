@@ -14,6 +14,8 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 	_initContainer : function () {
 
+		console.log('container -- ', this);
+
 		// create container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane extras', this.options.appendTo);
 	},
