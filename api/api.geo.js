@@ -689,14 +689,15 @@ module.exports = api.geo = {
 
 	handleRaster : function (options, done) {
 
-		var fileUuid = options.fileUuid,
-		    inFile = options.path,
+		var fileUuid = options.fileUuid || options.file_id,
+		    inFile = options.path || options.files[0],
+		    name = fileUuid,
 		    outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
 		    ops = [];
 
 
 		ops.push(function (callback) {
-			var out = api.config.path.file + fileUuid + '/' + options.name;
+			var out = api.config.path.file + fileUuid + '/' + fileUuid;
 			var inn = inFile;
 			// console.log('COPYYY inn, out', inn, out);
 
@@ -732,7 +733,7 @@ module.exports = api.geo = {
 
 		// get file size
 		ops.push(function (dataset, callback) {
-			fs.stat(options.path, function (err, stats) {
+			fs.stat(inFile, function (err, stats) {
 				options.fileSize = stats.size;
 				callback(null, dataset);
 			});
@@ -840,35 +841,44 @@ module.exports = api.geo = {
 		});
 
 		ops.push(function (meta, callback) {
+			// set upload status
+				api.upload.updateStatus(fileUuid, {
+					metadata : meta
+				}, function (err) {
+					callback(null, meta);
+				});
+		})
+
+		ops.push(function (meta, callback) {
 			
-			// var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
-			// // var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=1 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
-			// console.log('cmd: ', cmd);
+			var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -a 0,0,0 -p mercator --no-kml "' + inFile + '" "' + outFolder + '"';
+			// var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=1 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
+			console.log('cmd: ', cmd);
 
-			// var exec = require('child_process').exec;
-			// exec(cmd, { maxBuffer: 2000 * 1024 }, function (err, stdout, stdin) {
-			// 	console.log('ppgdal2tiles:'.green, stdout);
-			// 	if (err) {
-			// 		console.log('gdal2tiles err: '.red + err);
+			var exec = require('child_process').exec;
+			exec(cmd, { maxBuffer: 2000 * 1024 }, function (err, stdout, stdin) {
+				console.log('ppgdal2tiles:'.green, stdout);
+				if (err) {
+					console.log('gdal2tiles err: '.red + err);
 					
-			// 		api.error.log(err);
-			// 		var errMsg = 'There was an error generating tiles for this raster image. Please check #error-log for more information.'
-			// 		return callback(errMsg);
-			// 	}
+					api.error.log(err);
+					var errMsg = 'There was an error generating tiles for this raster image. Please check #error-log for more information.'
+					return callback(errMsg);
+				}
 
-			// 	// return as db entry
-			// 	var db = {
-			// 		data : {
-			// 			raster : options.name
-			// 		},
-			// 		title : options.name,
-			// 		file : fileUuid,
-			// 		metadata : JSON.stringify(meta)
-			// 	}
+				// return as db entry
+				var db = {
+					data : {
+						raster : fileUuid
+					},
+					title : fileUuid,
+					file : fileUuid,
+					metadata : JSON.stringify(meta)
+				}
 
-			// 	console.log('db created'.yellow, db);
-			// 	callback(null, db);
-			// });
+				console.log('db created'.yellow, db);
+				callback(null, db);
+			});
 
 				// var key = results[1];
 				// if (!key) return callback('No key.');
@@ -891,19 +901,19 @@ module.exports = api.geo = {
 				// }
 
 				// return as db entry
-				var db = {
-					data : {
-						raster : options.name
-					},
-					title : options.name,
-					file : fileUuid,
-					metadata : JSON.stringify(meta)
-				}
-				api.geo.copyToVileRasterFolder(options.path, fileUuid, function (err) {
-					if (err) return callback('copytToVile err: ' + err);
+				// var db = {
+				// 	data : {
+				// 		raster : options.name
+				// 	},
+				// 	title : options.name,
+				// 	file : fileUuid,
+				// 	metadata : JSON.stringify(meta)
+				// }
+				// api.geo.copyToVileRasterFolder(options.path, fileUuid, function (err) {
+				// 	if (err) return callback('copytToVile err: ' + err);
 
-					callback(null, db);
-				});
+				// 	callback(null, db);
+				// });
 		});
 
 		async.waterfall(ops, done);

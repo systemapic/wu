@@ -1146,13 +1146,16 @@ Wu.RasterLayer = Wu.Layer.extend({
 		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
 		    tileServer 	= app.options.servers.tiles.uri,
 		    subdomains  = app.options.servers.tiles.subdomains,
-		    token 	= '?token=' + app.Account.getToken(),
+		    token 	= '?access_token=' + app.tokens.access_token,
 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
+
+		var layerUuid = this._getLayerUuid();
+		var url = 'https://{s}.systemapic.com/overlay_tiles/{layerUuid}/{z}/{x}/{y}.png' + token;
 
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
 			fileUuid: fileUuid,
-			cartoid : cartoid,
+			layerUuid : layerUuid,
 			subdomains : subdomains,
 			maxRequests : 0,
 			tms : true
@@ -1160,6 +1163,51 @@ Wu.RasterLayer = Wu.Layer.extend({
 
 	},
 
+
+	_getLayerUuid : function () {
+		return this.store.data.raster;
+	},
+
+	getMeta : function () {
+		var metajson = this.store.metadata;
+
+		return this.getFileMeta();
+	},
+
+	getFileMeta : function () {
+		console.log('fucking meta??', this);
+		var file = app.Account.getFile(this.store.file);
+
+		console.log('file: ', file);
+		var metajson = file.store.data.raster.metadata;
+
+		console.log('meta: ', metajson);
+		var meta = Wu.parse(metajson);
+		return meta;
+		// return false;
+	},
+
+	flyTo : function () {
+		console.log('flyyy');
+		var extent = this.getMeta().extent;
+		if (!extent) return;
+
+		var southWest = L.latLng(extent[1], extent[0]),
+		    northEast = L.latLng(extent[3], extent[2]),
+		    bounds = L.latLngBounds(southWest, northEast),
+		    map = app._map,
+		    row_count = parseInt(this.getMeta().row_count),
+		    flyOptions = {};
+
+		// if large file, don't zoom out
+		if (row_count > 500000) { 
+			var zoom = map.getZoom();
+			flyOptions.minZoom = zoom;
+		}
+
+		// fly
+		map.fitBounds(bounds, flyOptions);
+	},
 });
 
 

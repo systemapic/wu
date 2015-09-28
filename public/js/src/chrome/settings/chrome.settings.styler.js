@@ -145,7 +145,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var tooltipMeta = layer.getTooltip();
 		
 		// Get layermeta
-		var layerMeta = JSON.parse(layer.store.metadata)		
+		var layerMeta = Wu.parse(layer.getMeta())		
+
+		console.log('wot?', layerMeta, layer.getMeta());
 
 		// Get columns
 		this.columns = layerMeta.columns;

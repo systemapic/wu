@@ -144,17 +144,12 @@ module.exports = api.upload = {
 
 	    	var ops = [];
 
-	    	console.log('CHUNKED UPLOAD!');
-
 	    	ops.push(function (callback) {
 
 	    		// create unique file_id
 		    	var upload_file_id_key = 'upload_id:' + resumableIdentifier;
 		    	
-		    	console.log('upload_file_id_key', upload_file_id_key);
-
 		    	api.redis.layers.get(upload_file_id_key, function (err, stored_file_id) {
-		    		console.log('redis get stored file_id', err, stored_file_id);
 		    		
 		    		// got id
 		    		if (stored_file_id) {
@@ -181,8 +176,6 @@ module.exports = api.upload = {
 			// resumable		
 			r.post(req, function(status, filename, original_filename, identifier){
 
-				console.log('r status', status, identifier);
-
 				// set redis count id
 				var redis_id = resumableIdentifier + file_id;
 
@@ -203,6 +196,8 @@ module.exports = api.upload = {
 
 				// check if all done
 				api.redis.temp.get('done-chunks-' + redis_id, function (err, count) {
+
+					console.log('Done chunks: ', count);
 
 					// return if not all done
 					if (count != options.resumableTotalChunks) {
@@ -236,8 +231,7 @@ module.exports = api.upload = {
 
 			var upload_file_id_key = 'upload_id:' + resumableIdentifier;
 		    	api.redis.layers.del(upload_file_id_key, function (err) {
-
-		    		console.log('deleted upload_file_id_key', err);
+		    		if (err) console.log(err);
 		    	});
 
 		})
@@ -278,7 +272,7 @@ module.exports = api.upload = {
 
 		// set uploadStatus
 		ops.push(function (stats, callback) {
-			
+
 			// set upload status
 			var uploadStatus = {
 				file_id : file_id,
@@ -293,7 +287,7 @@ module.exports = api.upload = {
 				processing_success : null,
 				rows_count : null,
 				import_took_ms : null,
-				data_type : null,
+				data_type : 'vector',
 				original_format : null,
 				table_name : null, 
 				database_name : null,
@@ -302,9 +296,12 @@ module.exports = api.upload = {
 				default_layer_model : null,
 			}
 
+			console.log('uploadStatus', uploadStatus);
+
 			// save upload id to redis
 			var key = 'uploadStatus:' + uploadStatus.file_id;
 			api.redis.layers.set(key, JSON.stringify(uploadStatus), function (err) {
+				console.log('err1', err);
 				if (err) return callback(err);
 
 				callback(null, uploadStatus);
@@ -328,14 +325,14 @@ module.exports = api.upload = {
 				access_token : access_token
 			}
 
+			console.log('gon import1');
+
 			// import file
 			api.upload._import(options, function (err, results) {
-
-				
+				console.log('impoerted 2', err, results);
 				// done
 				callback(err);
 			});
-
 
 		});
 
@@ -385,12 +382,52 @@ module.exports = api.upload = {
 				timestamp : uploadStatus.timestamp
 			}
 
+			console.log('gon import 3');
+
 			// process upload
 			api.upload.prepareImport(options, function (err, opts) {
+				console.log('prepared import, err, opts', err, opts);
 				if (err) return callback(err);
 
-				// postgis import
-				api.postgis.import(opts, callback);
+				console.log('prepared import: ', opts);
+
+				// get uploadStatus, get meta, set to file
+				api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
+
+					if (uploadStatus.data_type == 'raster') {
+
+						console.log('raster import!');
+
+
+
+						api.geo.handleRaster(opts, callback);
+					} else {
+						
+						console.log('postgis.import');
+
+						// postgis import
+						api.postgis.import(opts, callback);
+					}
+
+				});
+
+				// // temp rasters
+				// var raster_formats = ['tif', 'tiff', 'jp2', 'ecw'];
+
+				// if (raster_formats.indexOf(opts.ext) > -1) {
+
+				// 	// simple raster import
+				// 	console.log('raster import!');
+
+
+				// } else {
+
+				// 	console.log('postgis.import');
+				// 	// postgis import
+				// 	api.postgis.import(opts, callback);
+				// }
+
+				
 			});
 		});
 
@@ -404,8 +441,16 @@ module.exports = api.upload = {
 
 					var meta = uploadStatus.metadata;
 
+					console.log('GOT FUCKING META', meta);
+
 					// save meta to file
-					file.data.postgis.metadata = meta;
+					if (uploadStatus.data_type == 'vector') {
+						file.data.postgis.metadata = meta;
+					} else {
+						file.data.raster.metadata = JSON.stringify(meta);
+					}
+					
+
 					file.save(function (err, doc) {
 
 						// add to user
@@ -544,21 +589,37 @@ module.exports = api.upload = {
 		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
 			var u = JSON.parse(uploadStatus);
 
-			var fileModel = {
-				uuid : file_id,
-				createdBy : u.user_id,
-				name : u.filename,
-				type : 'postgis',
-				dataSize : u.size,
-				data : {
-					postgis : {
-						database_name 	: u.database_name,
-						table_name 	: u.table_name,
-						data_type 	: u.data_type,
-						original_format : u.original_format
+			if (u.data_type == 'vector') {
+				var fileModel = {
+					uuid : file_id,
+					createdBy : u.user_id,
+					name : u.filename,
+					type : 'postgis',
+					dataSize : u.size,
+					data : {
+						postgis : {
+							database_name 	: u.database_name,
+							table_name 	: u.table_name,
+							data_type 	: u.data_type,
+							original_format : u.original_format
+						}
+					}
+				}
+			} else {
+				var fileModel = {
+					uuid : file_id,
+					createdBy : u.user_id,
+					name : u.filename,
+					type : 'raster',
+					dataSize : u.size,
+					data : {
+						raster : {
+							file_id : file_id
+						}
 					}
 				}
 			}
+			
 
 			// create file model
 			api.file._createModel(fileModel, done);	
@@ -585,7 +646,7 @@ module.exports = api.upload = {
 
 			// add keys
 			var uploadStatus = JSON.parse(uploadStatusJSON);
-			for (s in status) {
+			for (var s in status) {
 				if (s != 'expire') uploadStatus[s] = status[s]; // set status (except ttl)
 			};
 
@@ -631,7 +692,10 @@ module.exports = api.upload = {
 
 		// set original filename + size
 		options.size = files.data.size;
+		options.ext = ext;
 		options.originalFilename = files.data.originalFilename;
+
+		console.log('preparing import 1');
 
 		// organize files so output is equal no matter what :)
 		if (ext == 'zip') ops.push(function (callback) {
@@ -655,22 +719,29 @@ module.exports = api.upload = {
 
 		if (ext == 'tif') ops.push(function (callback) {
 			options.files = [temporaryPath];
-			callback(null);
+			api.upload.updateStatus(options.file_id, {data_type : 'raster'}, callback)
+			// callback(null);
 		});
 
 		if (ext == 'tiff') ops.push(function (callback) {
 			options.files = [temporaryPath];
-			callback(null);
+			api.upload.updateStatus(options.file_id, {data_type : 'raster'}, callback)
+
+			// callback(null);
 		});
 
 		if (ext == 'ecw') ops.push(function (callback) {
 			options.files = [temporaryPath];
-			callback(null);
+			api.upload.updateStatus(options.file_id, {data_type : 'raster'}, callback)
+
+			// callback(null);
 		});
 
 		if (ext == 'jp2') ops.push(function (callback) {
 			options.files = [temporaryPath];
-			callback(null);
+			// callback(null);
+			api.upload.updateStatus(options.file_id, {data_type : 'raster'}, callback)
+
 		});
 
 		// run ops

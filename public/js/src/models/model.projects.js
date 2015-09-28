@@ -74,6 +74,7 @@ Wu.Project = Wu.Class.extend({
 
 	addLayer : function (layer) {
 		var l = new Wu.createLayer(layer);
+		console.log('createlayer  in project', layer, l);
 		if (l) this.layers[layer.uuid] = l;
 		return l || false;
 	},
@@ -577,6 +578,29 @@ Wu.Project = Wu.Class.extend({
 		}
 
 		return layers;
+
+	},
+
+	getRasterLayers : function () {
+		var layers = [];
+
+		for (var l in this.layers) {
+			var layer = this.layers[l];
+
+			if (layer.store && layer.store.data && layer.store.data.raster) layers.push(layer);
+		}
+
+		return layers;
+	},
+
+	getDataLayers : function () {
+
+		var pg_layers = this.getPostGISLayers();
+		var r_layers = this.getRasterLayers();
+
+		var data_layers = pg_layers.concat(r_layers);
+
+		return data_layers;
 
 	},
 

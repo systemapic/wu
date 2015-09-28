@@ -196,6 +196,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	providerTitle : function (provider) {
 
 		if (provider == 'postgis') var title = 'Data Library';
+		if (provider == 'raster')  var title = 'Raster Overlays';
 		if (provider == 'mapbox')  var title = 'Mapbox';
 		if (provider == 'norkart') var title = 'Norkart';
 		if (provider == 'google')  var title = 'Google';
@@ -208,7 +209,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	// sort layers by provider
 	sortLayers : function (layers) {
 
-		var keys = ['postgis', 'google', 'norkart', 'geojson', 'mapbox', 'raster'];
+		var keys = ['postgis', 'raster', 'google', 'norkart', 'geojson', 'mapbox'];
 		var results = [];
 	
 		keys.forEach(function (key) {
