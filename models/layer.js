@@ -8,9 +8,9 @@ var timestamps = require('mongoose-times');
 var layerSchema = mongoose.Schema({
 
 	uuid 		: String,	// layer uuid
-
 	title 		: String,
 	description 	: String, 	// html
+	satellite_position : String,
 	copyright 	: String,
 	legend 		: String,	// html
 	maxZoom		: String,
@@ -23,17 +23,17 @@ var layerSchema = mongoose.Schema({
 
 	// data source for layer
 	data : {
-		geojson 	: String,			// file uuid, file saved on server - needs to be if over 4MB (mongodb limit)
-		topojson	: String,			// file uuid ... // simply request, check auth, serve file.
+		geojson 	: String,		// file uuid, file saved on server - needs to be if over 4MB (mongodb limit)
+		topojson	: String,		// file uuid ... // simply request, check auth, serve file.
 		
 		cartoid   	: String,
 		raster 		: String,
 
-		rastertile 	: String,			// server raster path: raster/hubble2/hubble
-		vectortile 	: String,			// server vector tile: vector/bigassvector/bigvector
-		mapbox 		: String,			// mapbox id: rawger.geography-class
-		cartodb 	: String,			// cartodb id: 
-		osm 		: String,			// osm id?
+		rastertile 	: String,		// server raster path: raster/hubble2/hubble
+		vectortile 	: String,		// server vector tile: vector/bigassvector/bigvector
+		mapbox 		: String,		// mapbox id: rawger.geography-class
+		cartodb 	: String,		// cartodb id: 
+		osm 		: String,		// osm id?
 		norkart     	: String,
 		google 		: String,
 

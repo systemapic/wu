@@ -44,7 +44,8 @@ L.Control.Description = Wu.Control.extend({
 		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._inner);		
 
 		// init satellite path container
-		this.satelliteAngle = new Wu.satteliteAngle({angle : 0, path: 0, appendTo : this._inner});
+		// this.satelliteAngle = new Wu.satteliteAngle({angle : 0, path: 0, appendTo : this._inner});
+		this.satelliteAngle = new Wu.satteliteAngle({angle : false, path: false, appendTo : this._inner});
 
 		// legend
 		this._legendContainer = Wu.DomUtil.create('div', 'description-control-legend-container', this._inner);
@@ -357,9 +358,14 @@ L.Control.Description = Wu.Control.extend({
 		// Legend
 		var legend = layer.legendHTML;
 
-		var angle = layer.angle;
-		var path = layer.path;
-		this.satelliteAngle.update({angle : path});
+
+		var _layer = this._project.getLayer(uuid);
+		var satPos = Wu.parse(_layer.getSatellitePosition());
+
+		var _angle = satPos.angle;
+		var _path = satPos.path;
+
+		this.satelliteAngle.update({angle : _angle, path : _path});
 
 		// Set description
 		this.setDescriptionHTML(description);

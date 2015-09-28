@@ -283,6 +283,15 @@ Wu.Layer = Wu.Class.extend({
 		this.save('description');
 	},
 
+	getSatellitePosition : function () {
+		return this.store.satellite_position;
+	},
+
+	setSatellitePosition : function (satellite_position) {
+		this.store.satellite_position = satellite_position;
+		this.save('satellite_position');
+	},
+
 	getCopyright : function () {
 		return this.store.copyright;
 	},
@@ -510,6 +519,17 @@ Wu.Layer = Wu.Class.extend({
 
 	// save updates to layer (like description, style)
 	save : function (field) {
+
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('field', field)
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('');
+
 		var json = {};
 		json[field] = this.store[field];
 		json.layer  = this.store.uuid;

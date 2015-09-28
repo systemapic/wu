@@ -379,9 +379,6 @@ module.exports = api.file = {
 		    data = options.data;
 
 
-		console.log('api.file.deleteFile', options, type);
-
-
 		if (type == 'postgis') {
 			return api.file.deletePostGISFile(req, res);
 		}
@@ -502,8 +499,6 @@ module.exports = api.file = {
 		    data_type = data.data_type,
 		    user = req.user,
 		    ops = [];
-
-		console.log('api.file.deletePostGISFile', req.body);
 
 
 		if (!database_name || !table_name) return api.error.missingInformation(req, res);
