@@ -370,15 +370,6 @@ Wu.Share = Wu.Pane.extend({
 		// wrapper
 		var w = Wu.DomUtil.create('div', 'invite-permissions-checkbox-wrap', container);
 		
-		// checkbox
-		// var checkbox = Wu.DomUtil.create('input', 'invite-permissions-checkbox', w);
-		// checkbox.type = "checkbox";
-		// checkbox.name = id;
-		// checkbox.value = id;
-		// checkbox.id = id;
-		// checkbox.checked = checked; // default todo: only if user self has permissions to give out (eg. if can invite, but not download)
-
-
 		var checkbox = Wu.DomUtil.create('div', 'chrome-switch-container', w);
 		checkbox.setAttribute('checked', checked);
 
@@ -398,7 +389,10 @@ Wu.Share = Wu.Pane.extend({
 		label.appendChild(document.createTextNode(title));
 
 		// add to list
-		this._checkboxes.push(checkbox);
+		this._checkboxes.push({
+			div : checkbox,
+			value : id
+		});
 	},
 
 	_checkboxChange : function (e) {
@@ -424,9 +418,15 @@ Wu.Share = Wu.Pane.extend({
 
 	_getPermissions : function () {
 		var p = [];
+
 		this._checkboxes.forEach(function (c) {
-			if (c.checked) p.push(c.value);
+
+			var div = c.div;
+			var value = c.value;
+			var checked = div.getAttribute('checked');
+			if (checked == 'true') p.push(value);
 		});
+
 		return p;
 	},
 
