@@ -354,8 +354,10 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_getSortedColumns : function () {
-		if (!this._layer) return false;
+		if (!this._layer) return false
 
+		if (!this._layer.getPostGISData) return false;
+	
 		var meta = Wu.parse(this._layer.getPostGISData().metadata),
 		    columns = meta.columns,
 		    keys = Object.keys(columns),

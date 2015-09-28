@@ -147,7 +147,8 @@ L.Control.Description = Wu.Control.extend({
 	},	
 
 	_refreshLayer : function (layer) {
-		this.layers[layer.getUuid()] = this.storeLegendData(layer);
+		// this.layers[layer.getUuid()] = this.storeLegendData(layer);
+		this.layers[layer.getUuid()] = layer;
 		this.setHTMLfromStore(layer.getUuid());
 		this.updateMultiple(layer.getUuid());
 	},
@@ -194,7 +195,8 @@ L.Control.Description = Wu.Control.extend({
 		this.layers = this.layers || {};
 
 		var layerUuid = layer.getUuid();
-		this.layers[layerUuid] = this.storeLegendData(layer);
+		// this.layers[layerUuid] = this.storeLegendData(layer);
+		this.layers[layerUuid] = layer;
 
 		this.setHTMLfromStore(layerUuid);
 
@@ -222,6 +224,8 @@ L.Control.Description = Wu.Control.extend({
 
 	updateMultiple : function (layerUuid) {
 
+		if ( this.isCollapsed ) Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
+
 		var wrapper = this._multipleLegendInner;
 		wrapper.innerHTML = '';
 
@@ -232,7 +236,10 @@ L.Control.Description = Wu.Control.extend({
 
 		for ( var uuid in this.layers ) {
 
-			var title = this.layers[uuid].title;
+			var layer = this.layers[uuid];
+
+			// var title = this.layers[uuid].title;
+			title = layer.getTitle();
 			var multipleLayer = Wu.DomUtil.create('div', 'each-multiple-description', wrapper, title);
 			    multipleLayer.id = 'mulitidec_' + uuid;
 
@@ -283,10 +290,6 @@ L.Control.Description = Wu.Control.extend({
 		
 		// set description
 		legendObj.description = layer.getDescription();
-
-		// set satellite info
-		legendObj.angle = 12;
-		legendObj.path = -22;
 
 		// create description meta
 		var area = Math.floor(meta.total_area / 1000000 * 100) / 100;
@@ -347,25 +350,96 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 
+	getLegend : function (layer) {
+
+		var style = Wu.parse(layer.store.style);
+		var key = 'point';
+
+		
+		// COLOR RANGE
+		if ( style && style[key].color.range ) {
+
+			var colorStops = style[key].color.value;
+			var customMinMax = style[key].color.customMinMax;
+			var minMax = style[key].color.minMax
+
+			if ( customMinMax[0] != null || customMinMax[0] != NaN || customMinMax[0] != '' ) {
+				var min = customMinMax[0];
+			} else {
+				var min = minMax[0];
+			}
+
+			if ( customMinMax[1] != null || customMinMax[1] != NaN || customMinMax[1] != '' ) {
+				var max = customMinMax[1];
+			} else {
+				var max = minMax[1];
+			}
+
+
+			// create legend
+			var gradientOptions = {
+				colorStops : colorStops,
+				minVal : customMinMax[0],
+				// medVal : (customMinMax[0]+customMinMax[1]),
+				maxVal : customMinMax[1],
+				bline : 'Velocity (mm pr. year)'
+			}
+
+			var legendHTML = this.gradientLegend(gradientOptions);
+
+		} else {
+
+			// legendObj.legendHTML = 'TODO: Create legend for static colors!';
+			var legendHTML = '';
+
+		}
+
+		return legendHTML;
+
+	},
+
+	getMetaDescription : function (layer) {
+
+		var meta = layer.getMeta();
+
+		// create description meta
+		var area = Math.floor(meta.total_area / 1000000 * 100) / 100;
+		var num_points = meta.row_count;
+		// var num_columns = _.size(meta.columns);
+		// var size_bytes = meta.size_bytes;
+		var startend = this._parseStartEndDate(meta);
+
+		var description_meta = {
+			'Number of points' : num_points,
+			'Covered area (km<sup>2</sup>)' : area,
+			'Start date' : startend.start,
+			'End date' : startend.end
+		}
+
+		return description_meta;
+
+	},
+
+
 	setHTMLfromStore : function (uuid) {
 
-		var layer = this.layers[uuid];
+		// var layer = this.layers[uuid];
+		var layer = this._project.getLayer(uuid);
 
 		// Title
-		var title = layer.title;
+		var title = layer.getTitle();
 		
 		// Description
-		var description = layer.description;
+		var description = layer.getDescription();
 		
 		// Description meta
-		var descriptionMeta = layer.description_meta;
+		var descriptionMeta = this.getMetaDescription(layer);
 
 		// Legend
-		var legend = layer.legendHTML;
+		var legend = this.getLegend(layer);
 
-
-		var _layer = this._project.getLayer(uuid);
-		var satPos = Wu.parse(_layer.getSatellitePosition());
+		// var _layer = this._project.getLayer(uuid);
+		var satPos = Wu.parse(layer.getSatellitePosition());
 
 		var _angle = satPos.angle;
 		var _path = satPos.path;

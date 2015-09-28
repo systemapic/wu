@@ -659,8 +659,6 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		option.setAttribute('selected', '');
 
 
-		console.log('MINID ROP', array, wrap, _key, selected);
-
 		// fill select options
 		array.forEach(function (field) {
 			var option = Wu.DomUtil.create('option', 'active-layer-option', select);
