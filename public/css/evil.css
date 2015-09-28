@@ -2103,8 +2103,7 @@ aka feedback pane
 
 td.name {
 	width: auto;
-}
-
+	}
 
 
 
@@ -2113,17 +2112,23 @@ td.name {
 	position: relative;
 	top: 6px;
 	text-align: center;
-	height: 45px;
+	height: 65px;
 	}
+
+.satellite-measurement-geometry {
+	position: relative;
+	top: 2px;
+	font-size: 12px;
+	color: #666;	
+	}	
 
 #d3-satellite-compass-container,
 #d3-satellite-angle-container {
 	display: inline-block;
 	position: relative;
+	margin-right: 5px;
+	margin-left: 5px;	
 	}
-
-
-
 
 .regression-button-wrapper {
 	position: relative;
@@ -2133,9 +2138,26 @@ td.name {
 	margin: 0;
 	}
 
+.chrome-content.settings-button-wrapper {
+	padding-right: 10px;
+	}
 
-	
+.chrome-pane.extras .chrome-metafield-line {
+	height: 32px;
+	}
 
-.globesar-extras {
-	margin-top: 50px;
-}
+.chrome-pane.extras .chrome-field-mini-input, 
+.chrome-pane.extras .chrome-field-mini-input:focus {
+	height: 21px;	
+	}
+
+.chrome-pane.extras .chrome-field-line {
+	padding-top: 2px;
+	padding-bottom: 2px;	
+	}
+
+
+
+
+
+

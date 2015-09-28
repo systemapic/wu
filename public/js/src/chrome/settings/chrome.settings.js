@@ -89,7 +89,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 	_refresh : function () {
 	},
 
-	_initLayout_activeLayers : function (title, subtitle, container) {
+	_initLayout_activeLayers : function (title, subtitle, container, layers) {
 
 		var title = title || 'Layer';
 		var subtitle = subtitle || 'Select a layer to style...';
@@ -105,7 +105,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		var select = this._select = Wu.DomUtil.create('select', 'active-layer-select', selectWrap);
 
 		// get layers
-		var layers = this._project.getPostGISLayers();
+		if ( !layers ) var layers = this._project.getPostGISLayers();
 
 		// placeholder
 		var option = Wu.DomUtil.create('option', '', select);
@@ -120,9 +120,9 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 			option.innerHTML = layer.getTitle();
 		});	
 
+
 		// select event
 		Wu.DomEvent.on(select, 'change', this._selectedActiveLayer, this); // todo: mem leak?
-
 
 		return select;
 
@@ -197,7 +197,8 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		    type 	= options.type,
 		    dropArray   = options.dropArray,
 		    color 	= options.color,
-		    val 	= options.value;
+		    val 	= options.value,
+		    placeholder = options.placeholder;
 
 		var fieldWrapper = Wu.DomUtil.create('div', 'chrome-metafield-line', wrapper);
 		fieldWrapper.id = 'field_wrapper_' + key;
@@ -232,7 +233,12 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 			// create
 			var miniInput = Wu.DomUtil.createId('input', 'field_mini_input_' + key, fieldWrapper);
 			miniInput.className = 'chrome-field-mini-input';
-			miniInput.setAttribute('placeholder', 'auto');
+
+			if ( placeholder ) {
+				miniInput.setAttribute('placeholder', placeholder);
+			} else {
+				miniInput.setAttribute('placeholder', 'auto');
+			}
 
 			miniInput.setAttribute('tabindex', options.tabindex);
 			

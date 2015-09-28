@@ -173,6 +173,14 @@ module.exports = api.layer = {
 		Layer.findOne({'uuid' : layerUuid}, function (err, layer) {
 			if (err || !layer) return api.error.missingInformation(req, res);
 
+
+			// update satpos
+			if (req.body.hasOwnProperty('satellite_position')) {
+				var satellite_position = req.body.satellite_position;
+				layer.satellite_position = satellite_position;
+				layer.save();
+			};
+
 			// update description
 			if (req.body.hasOwnProperty('description')) {
 				var description = req.body.description;
