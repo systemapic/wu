@@ -391,6 +391,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 				['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'],
 				['#0000ff', '#00ffff', '#00ff00', '#ffff00', '#ff0000'],
 
+				['#ff0000', '#a5ff00', '#003dff'],
 
 				['#ff0000', '#ffff00', '#00ff00'], 		// todo: throws error if 4 colors..	
 				['#00ff00', '#ffff00', '#ff0000'],

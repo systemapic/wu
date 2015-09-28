@@ -173,7 +173,72 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this.initPoint();
 		// this.initPolygon();
 		// this.initLine();
+
+		this.initGlobesarExtras();
 	},	
+
+
+	// GLOBSAR EXTRAS
+	// GLOBSAR EXTRAS
+	// GLOBSAR EXTRAS
+
+	initGlobesarExtras : function () {
+
+		var wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper);
+		
+		var header = Wu.DomUtil.create('div', 'chrome-content-header globesar-extras', wrapper, 'Globesar Extras');
+
+
+
+		// xoxoxoxoxoxo 
+		var lineOptions = {
+			key 		: 'satelliteAngle',
+			wrapper 	: wrapper,
+			input 		: false,
+			title 		: 'Satellite angle',
+			value 		: '0',
+			isOn 		: true,
+			rightPos	: true,
+			type 		: 'miniInput'
+		}
+		this._createMetaFieldLine(lineOptions);
+
+
+
+
+		var lineOptions = {
+			key 		: 'satellitePath',
+			wrapper 	: wrapper,
+			input 		: false,
+			title 		: 'Satellite path',
+			value 		: '0',
+			isOn 		: true,
+			rightPos	: true,
+			type 		: 'miniInput'
+		}
+		this._createMetaFieldLine(lineOptions);
+
+
+		// var lineOptions = {
+		// 	key 		: 'globesarExtras',
+		// 	wrapper 	: wrapper,
+		// 	input 		: false,
+		// 	title 		: 'Satellite path',
+		// 	isOn 		: false,
+		// 	rightPos	: true,
+		// 	type 		: 'switch'
+		// }
+		// this._createMetaFieldLine(lineOptions);		
+
+		// var satellitePosition = Wu.DomUtil.create('div', 'satellite-position-wrapper', wrapper) 
+
+		// var satelliteAngle = Wu.
+		// var satellitePath  = 
+
+
+		// var legendFotterData = 
+
+	},
 
 
 	// INIT POINT
@@ -811,7 +876,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	convertToFiveColors : function (colorArray) {
 
 
-		// Make three values from two
+		// Make five values from two
 		if ( colorArray.length == 2 ) {
 			var c1 = colorArray[0];
 			var c5 = colorArray[1];
@@ -838,6 +903,13 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			colorArray = [c1, c2, c3, c4, c5];
 
 		}
+
+		if ( colorArray.length == 4 ) {
+			colorArray = ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'];
+		}
+
+
+
 
 		return colorArray;
 
