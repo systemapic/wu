@@ -18,7 +18,7 @@ Wu.Popup.Chart = L.Control.extend({
 		defaultPosition : {
 			x : 7,
 			y : 6
-			// y : 25 	// from bottom
+			// y : 48 	// from bottom
 		}
 	},
 

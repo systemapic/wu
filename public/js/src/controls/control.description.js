@@ -35,13 +35,16 @@ L.Control.Description = Wu.Control.extend({
 		// header
 		this._header = Wu.DomUtil.create('div', 'description-control-header-section', this._inner);
 		// this._title = Wu.DomUtil.create('div', 'description-control-header-title', this._header);
-		this._toggle = Wu.DomUtil.create('div', 'description-control-header-toggle', this._multipleLegendOuter);
+		this._toggle = Wu.DomUtil.create('div', 'description-control-header-toggle', this._multipleLegendOuter);		
 
 		// description
 		this._description = Wu.DomUtil.create('div', 'description-control-description displayNone', this._inner);
 
 		// meta
-		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._inner);
+		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._inner);		
+
+		// init satellite path container
+		this.satelliteAngle = new Wu.satteliteAngle({angle : 0, path: 0, appendTo : this._inner});
 
 		// legend
 		this._legendContainer = Wu.DomUtil.create('div', 'description-control-legend-container', this._inner);
@@ -52,7 +55,7 @@ L.Control.Description = Wu.Control.extend({
 		// add tooltip
 		app.Tooltip.add(this._container, 'Shows layer information', { extends : 'systyle', tipJoint : 'left' });
 			       
-	
+
 		this._addHooks();
 
 	},
@@ -275,6 +278,10 @@ L.Control.Description = Wu.Control.extend({
 		// set description
 		legendObj.description = layer.getDescription();
 
+		// set satellite info
+		legendObj.angle = 12;
+		legendObj.path = -22;
+
 		// create description meta
 		var area = Math.floor(meta.total_area / 1000000 * 100) / 100;
 		var num_points = meta.row_count;
@@ -349,6 +356,10 @@ L.Control.Description = Wu.Control.extend({
 
 		// Legend
 		var legend = layer.legendHTML;
+
+		var angle = layer.angle;
+		var path = layer.path;
+		this.satelliteAngle.update({angle, path});
 
 		// Set description
 		this.setDescriptionHTML(description);
