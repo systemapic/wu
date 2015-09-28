@@ -30,11 +30,10 @@ Wu.satteliteAngle = Wu.Class.extend({
 		var path  = options.path ? options.path : false;
 
 		if ( !angle && !path ) {
-
-			console.log('no angle, no path');
+			this.closed = true;
 			Wu.DomUtil.addClass(this._innerContainer, 'displayNone');
 		} else {
-			console.log('angle & path');
+			this.closed = false;
 			Wu.DomUtil.removeClass(this._innerContainer, 'displayNone');
 		}
 
