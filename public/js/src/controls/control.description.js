@@ -359,7 +359,7 @@ L.Control.Description = Wu.Control.extend({
 
 		var angle = layer.angle;
 		var path = layer.path;
-		this.satelliteAngle.update({angle, path});
+		this.satelliteAngle.update({angle : path});
 
 		// Set description
 		this.setDescriptionHTML(description);
