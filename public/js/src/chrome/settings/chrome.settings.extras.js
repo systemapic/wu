@@ -21,7 +21,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 	_initLayout : function () {
 
-		this._flush();
+		console.log('%c _initLayout ', 'background: red; color: white');
 
 		this._layers = this._project.getDataLayers();
 
@@ -40,6 +40,8 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 		this.layerUuid = uuid ? uuid : e.target.value
 
+		// this._initLayout();
+
 		// Globesar Extras
 		this.initGlobesarExtras();
 
@@ -51,6 +53,8 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 	// GLOBSAR EXTRAS
 
 	initGlobesarExtras : function () {
+
+		this._fieldsWrapper.innerHTML = '';
 
 		var wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper);
 		var header = Wu.DomUtil.create('div', 'chrome-content-header globesar-extras', wrapper, 'Globesar Extras');
