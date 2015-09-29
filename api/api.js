@@ -12,8 +12,10 @@ api.clientConfig = config.clientConfig;
 api.loginConfig = config.loginConfig;
 
 
+
 // exports
 module.exports 		= api;
+module.exports.log 	= require('./api.log');
 module.exports.redis 	= require('./api.redis');
 module.exports.geo 	= require('./api.geo');
 module.exports.file 	= require('./api.file');
@@ -39,4 +41,4 @@ module.exports.provider = require('./api.provider');
 module.exports.analytics = require('./api.analytics');
 
 // print version
-console.log('\nSystemapic API version is ', api.version, '\n');
+console.log('Systemapic API version is ', api.version);
