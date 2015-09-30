@@ -551,7 +551,7 @@ Wu.App = Wu.Class.extend({
 		}
 
 		// acticate legends for baselayers
-		app.MapPane._controls.legends.refreshAllLegends();
+		// app.MapPane._controls.legends.refreshAllLegends();
 
 		// remove startpane
 		if (this.StartPane) this.StartPane.deactivate();
@@ -560,7 +560,7 @@ Wu.App = Wu.Class.extend({
 		isThumb ? app.Style.phantomJSthumb() : app.Style.phantomJS();
 
 		// avoid Loading! etc in status
-		app.setStatus('systemapic'); // too early
+		// app.setStatus('systemapic'); // too early
 
 	},
 	
