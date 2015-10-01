@@ -6570,6 +6570,7 @@ L.DomEvent = {
 	_skipEvents: {},
 
 	_fakeStop: function (e) {
+		console.error('fakeStop');
 		// fakes stopPropagation by setting a special event flag, checked/reset with L.DomEvent._skipped(e)
 		L.DomEvent._skipEvents[e.type] = true;
 	},

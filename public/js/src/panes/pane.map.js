@@ -527,6 +527,7 @@ Wu.MapPane = Wu.Pane.extend({
 
 	// Create pop-up
 	_addPopupContent : function (e, multiPopUp) {
+		console.log('_addPopupContent');
 		var options = {
 			e 		: e,
 			multiPopUp 	: multiPopUp,
@@ -535,6 +536,7 @@ Wu.MapPane = Wu.Pane.extend({
 	},
 
 	_clearPopup : function () {
+		console.error('_clearPopup');
 		if (this._chart) {
 			this._chart._refresh();
 		}
