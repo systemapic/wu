@@ -181,8 +181,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 			id       : uuid,
 			appendTo : wrapper,
 			title    : layerTitle,
-			input    : false,
-			context  : this
+			input    : false
 		});		
 
 		var _switch = new Wu.button({ 
@@ -191,8 +190,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 			isOn 	 : on,
 			right 	 : false,
 			appendTo : line.container,
-			fn 	 : this._saveSwitch,
-			context  : this
+			fn 	 : this._saveSwitch.bind(this),
 		});
 
 
@@ -202,8 +200,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 			isOn 	 : enabledByDefault,
 			right 	 : true,
 			appendTo : line.container,
-			fn 	 : this._saveRadio,
-			context  : this
+			fn 	 : this._saveRadio.bind(this),
 		});		
 
 
@@ -324,11 +321,11 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	},
 
 
-	_saveRadio : function (e, context) {
+	_saveRadio : function (e) {
 
 		var elem = e.target;
 		var state = elem.getAttribute('state');
-		state == 'true' ? context.radioOff(elem) : context.radioOn(elem);		
+		state == 'true' ? this.radioOff(elem) : this.radioOn(elem);		
 
 	},
 
@@ -450,16 +447,16 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	// SAVE
 	// SAVE		
 
-	_saveSwitch : function (e, isOn, context) {
+	_saveSwitch : function (e, isOn) {
 
 		var stateAttrib = e.target.getAttribute('state'),
 		    on          = (stateAttrib == 'true'),
 		    key         = e.target.getAttribute('key');
 
-		if ( context._mode == 'baselayer' ) {
-			on ? context.enableBaseLayer(key) : context.disableBaseLayer(key);
+		if ( this._mode == 'baselayer' ) {
+			on ? this.enableBaseLayer(key) : this.disableBaseLayer(key);
 		} else {
-			on ? context.enableLayer(key) : context.disableLayer(key);
+			on ? this.enableLayer(key) : this.disableLayer(key);
 		}
 	},
 
