@@ -805,6 +805,8 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 
 	downloadLayer : function () {
+
+		console.error('downloadLayer');
 		
 		var options = {
 			layer_id : this.getUuid()
@@ -856,6 +858,128 @@ Wu.PostGISLayer = Wu.Layer.extend({
 });
 
 
+
+
+// systemapic layers
+Wu.RasterLayer = Wu.Layer.extend({
+
+	initialize : function (layer) {
+
+		// set source
+		this.store = layer; // db object
+		
+		// data not loaded
+		this.loaded = false;
+
+	},
+
+
+	initLayer : function () {
+		this.update();
+	},
+
+	update : function () {
+		var map = app._map;
+
+		// remove
+		// if (this.layer) this.remove();
+
+		this._fileUuid = this.store.file;
+		this._defaultCartoid = 'raster';
+
+		// prepare raster
+		this._prepareRaster();
+
+		// prepare utfgrid
+		// this._prepareGrid();
+		
+	},
+
+
+	_prepareRaster : function () {
+
+		// set ids
+		var fileUuid 	= this._fileUuid,	// file id of geojson
+		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
+		    tileServer 	= app.options.servers.tiles.uri,
+		    subdomains  = app.options.servers.tiles.subdomains,
+		    token 	= '?access_token=' + app.tokens.access_token,
+		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
+
+		var layerUuid = this._getLayerUuid();
+		var url = 'https://{s}.systemapic.com/overlay_tiles/{layerUuid}/{z}/{x}/{y}.png' + token;
+
+		// add vector tile raster layer
+		this.layer = L.tileLayer(url, {
+			fileUuid: fileUuid,
+			layerUuid : layerUuid,
+			subdomains : subdomains,
+			maxRequests : 0,
+			tms : true
+		});
+
+	},
+
+
+	_getLayerUuid : function () {
+		return this.store.data.raster;
+	},
+
+	getMeta : function () {
+		var metajson = this.store.metadata;
+		var meta = Wu.parse(metajson);
+		return meta;
+	},
+
+	getFileMeta : function () {
+		console.error('getFileMeta');
+		var file = app.Account.getFile(this.store.file);
+		var metajson = file.store.data.raster.metadata;
+		var meta = Wu.parse(metajson);
+		return meta;
+	},
+
+	flyTo : function () {
+		var extent = this.getMeta().extent;
+		if (!extent) return;
+
+		var southWest = L.latLng(extent[1], extent[0]),
+		    northEast = L.latLng(extent[3], extent[2]),
+		    bounds = L.latLngBounds(southWest, northEast),
+		    map = app._map,
+		    row_count = parseInt(this.getMeta().row_count),
+		    flyOptions = {};
+
+		// if large file, don't zoom out
+		if (row_count > 500000) { 
+			var zoom = map.getZoom();
+			flyOptions.minZoom = zoom;
+		}
+
+		// fly
+		map.fitBounds(bounds, flyOptions);
+	},
+
+	deleteLayer : function () {
+
+		// confirm
+		var message = 'Are you sure you want to delete this layer? \n - ' + this.getTitle();
+		if (!confirm(message)) return console.log('No layer deleted.');
+
+		// get project
+		var layerUuid = this.getUuid();
+		var project = _.find(app.Projects, function (p) {
+			return p.layers[layerUuid];
+		})
+
+		// delete layer
+		project.deleteLayer(this);
+	},
+
+	downloadLayer : function () {
+		console.log('raster downloadLayer');
+	}
+});
 
 
 
@@ -1112,124 +1236,6 @@ Wu.NorkartLayer = Wu.Layer.extend({
 
 
 
-});
-
-
-// systemapic layers
-Wu.RasterLayer = Wu.Layer.extend({
-
-	initialize : function (layer) {
-
-		// set source
-		this.store = layer; // db object
-		
-		// data not loaded
-		this.loaded = false;
-
-	},
-
-
-	initLayer : function () {
-		this.update();
-	},
-
-	update : function () {
-		var map = app._map;
-
-		// remove
-		// if (this.layer) this.remove();
-
-		this._fileUuid = this.store.file;
-		this._defaultCartoid = 'raster';
-
-		// prepare raster
-		this._prepareRaster();
-
-		// prepare utfgrid
-		// this._prepareGrid();
-		
-	},
-
-
-	_prepareRaster : function () {
-
-		// set ids
-		var fileUuid 	= this._fileUuid,	// file id of geojson
-		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
-		    tileServer 	= app.options.servers.tiles.uri,
-		    subdomains  = app.options.servers.tiles.subdomains,
-		    token 	= '?access_token=' + app.tokens.access_token,
-		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
-
-		var layerUuid = this._getLayerUuid();
-		var url = 'https://{s}.systemapic.com/overlay_tiles/{layerUuid}/{z}/{x}/{y}.png' + token;
-
-		// add vector tile raster layer
-		this.layer = L.tileLayer(url, {
-			fileUuid: fileUuid,
-			layerUuid : layerUuid,
-			subdomains : subdomains,
-			maxRequests : 0,
-			tms : true
-		});
-
-	},
-
-
-	_getLayerUuid : function () {
-		return this.store.data.raster;
-	},
-
-	getMeta : function () {
-		var metajson = this.store.metadata;
-		var meta = Wu.parse(metajson);
-		return meta;
-	},
-
-	getFileMeta : function () {
-		console.error('getFileMeta');
-		var file = app.Account.getFile(this.store.file);
-		var metajson = file.store.data.raster.metadata;
-		var meta = Wu.parse(metajson);
-		return meta;
-	},
-
-	flyTo : function () {
-		var extent = this.getMeta().extent;
-		if (!extent) return;
-
-		var southWest = L.latLng(extent[1], extent[0]),
-		    northEast = L.latLng(extent[3], extent[2]),
-		    bounds = L.latLngBounds(southWest, northEast),
-		    map = app._map,
-		    row_count = parseInt(this.getMeta().row_count),
-		    flyOptions = {};
-
-		// if large file, don't zoom out
-		if (row_count > 500000) { 
-			var zoom = map.getZoom();
-			flyOptions.minZoom = zoom;
-		}
-
-		// fly
-		map.fitBounds(bounds, flyOptions);
-	},
-
-	deleteLayer : function () {
-
-		// confirm
-		var message = 'Are you sure you want to delete this layer? \n - ' + this.getTitle();
-		if (!confirm(message)) return console.log('No layer deleted.');
-
-		// get project
-		var layerUuid = this.getUuid();
-		var project = _.find(app.Projects, function (p) {
-			return p.layers[layerUuid];
-		})
-
-		// delete layer
-		project.deleteLayer(this);
-	},
 });
 
 
