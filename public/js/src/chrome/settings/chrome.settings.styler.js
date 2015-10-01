@@ -199,7 +199,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			appendTo     : this._pointSectionWrapper,
 			title        : '<b>Point</b>',
 			input        : false,
-			context      : this
 		});		
 
 		var _switch = new Wu.button({
@@ -208,20 +207,19 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			isOn 	     : isOn,
 			right 	     : true,
 			appendTo     : _line.container,
-			fn 	     : this._updatePointSwitch,
-			context      : this
+			fn 	     : this._updatePointSwitch.bind(this),
 		});
 
 		this.initPointOffOn(isOn, 'point');
 
 	},
 
-	_updatePointSwitch : function (e, on, context) {
+	_updatePointSwitch : function (e, on) {
 
-		context.initPointOffOn(on, 'point');
+		this.initPointOffOn(on, 'point');
 
 		// UPDATE
-		context._updateStyle();
+		this._updateStyle();
 
 	},
 
@@ -268,7 +266,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			appendTo     : sectionWrapper,
 			title        : '<b>Color</b>',
 			input        : false,
-			context      : this,
 			childWrapper : 'point-color-children'
 		});	
 
@@ -280,8 +277,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			isOn 	 : isOn,
 			right 	 : true,
 			appendTo : _colorLine.container,
-			fn 	 : this._selectedMiniDropDown,
-			context  : this,
+			fn 	 : this._selectedMiniDropDown.bind(this),
 			array 	 : this.metaFields,
 			selected : range,
 			layers   : this._project.getPostGISLayers()
@@ -294,9 +290,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			right    : true,
 			isOn 	 : isOn,
 			appendTo : _colorLine.container,
-			fn       : this._updateColorBall,
+			fn       : this._updateColorBall.bind(this),
 			value    : staticVal,
-			context  : this
 		})
 
 
@@ -330,7 +325,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			appendTo : sectionWrapper,
 			title    : '<b>Opacity</b>',
 			input    : false,
-			context  : this
 		});	
 
 		// Dropdown
@@ -339,8 +333,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			type 	 : 'dropdown',
 			right 	 : true,
 			appendTo : _opacityLine.container,
-			fn 	 : this._selectedMiniDropDown,
-			context  : this,
+			fn 	 : this._selectedMiniDropDown.bind(this),
 			array 	 : this.metaFields,
 			selected : range,
 			layers   : this._project.getPostGISLayers()
@@ -357,8 +350,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			value       : val,
 			placeholder : 'auto',
 			tabindex    : this.tabindex++,
-			fn 	    : this._saveOpacityFromBlur,
-			context     : this			
+			fn 	    : this._saveOpacityFromBlur.bind(this),
 		});
 
 
@@ -387,7 +379,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			appendTo     : sectionWrapper,
 			title        : '<b>Point size</b>',
 			input        : false,
-			context      : this,
 			childWrapper : 'point-size-children'
 		});	
 
@@ -397,8 +388,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			type 	 : 'dropdown',
 			right 	 : true,
 			appendTo : _pointSizeLine.container,
-			fn 	 : this._selectedMiniDropDown,
-			context  : this,
+			fn 	 : this._selectedMiniDropDown.bind(this),
 			array 	 : this.metaFields,
 			selected : range,
 			layers   : this._project.getPostGISLayers()
@@ -414,8 +404,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			value       : val,
 			placeholder : 'auto',
 			tabindex    : this.tabindex++,
-			fn 	    : this._savePointSizeFromBlur,
-			context     : this			
+			fn 	    : this._savePointSizeFromBlur.bind(this),
 		});
 
 
@@ -659,21 +648,19 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	},
 
 
-	_updateColorBall : function (hex, key, wrapper, context) {
+	_updateColorBall : function (hex, key, wrapper) {
 
 		// Store
-		context.cartoJSON.point[key].staticVal = hex;
+		this.cartoJSON.point[key].staticVal = hex;
 		
 		// Close
-		context._closeColorRangeSelector();
+		this._closeColorRangeSelector();
 
 		// UPDATE
-		context._updateStyle();		
+		this._updateStyle();		
 	},
 
-	updateColorRange : function (hex, key, wrapper, context) {
-
-		context = context.options.context;
+	updateColorRange : function (hex, key, wrapper) {
 
 		var colorBall_1 = Wu.DomUtil.get('color-range-ball-1-' + key);
 		var colorBall_2 = Wu.DomUtil.get('color-range-ball-2-' + key);
@@ -688,26 +675,26 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var color3 = colorBall_3.getAttribute('hex');
 
 		// Build color array
-		var colors = context.convertToFiveColors([color1, color2, color3]);
+		var colors = this.convertToFiveColors([color1, color2, color3]);
 
 		// Color range bar
 		var colorRangeBar = Wu.DomUtil.get('chrome-color-range_' + key);
 
 		// Set styling
-		var gradientStyle = context._gradientStyle(colors);
+		var gradientStyle = this._gradientStyle(colors);
 
 		colorRangeBar.setAttribute('style', gradientStyle);
 
 		// Do not save if value is unchanged
-		if ( context.cartoJSON.point.color.value == colors ) return;
+		if ( this.cartoJSON.point.color.value == colors ) return;
 
 		// Store in JSON
-		context.cartoJSON.point.color.value = colors;
+		this.cartoJSON.point.color.value = colors;
 
-		context._closeColorRangeSelector();
+		this._closeColorRangeSelector();
 
 		// UPDATE
-		context._updateStyle();
+		this._updateStyle();
 
 	},
 
@@ -865,7 +852,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			appendTo  : childWrapper,
 			title     : 'Color range',
 			input     : false,
-			context   : this,
 			className : 'sub-line'
 		});
 
@@ -877,9 +863,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			type 	  : 'colorrange',
 			right 	  : true,
 			appendTo  : _colorRangeLine.container,
-			presetFn  : this.selectColorPreset,
-			customFn  : this.updateColorRange,
-			context   : this,
+			presetFn  : this.selectColorPreset.bind(this),
+			customFn  : this.updateColorRange.bind(this),
 			value     : value
 		});
 	
@@ -903,7 +888,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			appendTo  : childWrapper,
 			title     : 'Min/max range',
 			input     : false,
-			context   : this,
 			className : 'sub-line'
 		});
 
@@ -913,9 +897,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			type 	  : 'dualinput',
 			right 	  : true,
 			appendTo  : _minMaxLine.container,
-			context   : this,
 			value     : value,
-			fn        : this.saveColorRangeDualBlur,
+			fn        : this.saveColorRangeDualBlur.bind(this),
 			minmax    : [fieldMinRange, fieldMaxRange],
 			tabindex  : [this.tabindex++, this.tabindex++]
 		});
@@ -929,24 +912,24 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	},
 
 
-	saveColorRangeDualBlur : function (max, min, absoluteMax, absoluteMin, context) {
+	saveColorRangeDualBlur : function (max, min, absoluteMax, absoluteMin) {
 
 		if ( !max ) max = absoluteMax;
 		if ( !min ) min = absoluteMin;
 
-		context.cartoJSON.point.color.customMinMax = [min, max];
-		context._updateStyle();
+		this.cartoJSON.point.color.customMinMax = [min, max];
+		this._updateStyle();
 
 	},
 
-	savePointSizeDualBlur : function (max, min, absoluteMax, absoluteMin, context) {
+	savePointSizeDualBlur : function (max, min, absoluteMax, absoluteMin) {
 
 		if ( !max ) max = absoluteMax;
 		if ( !min ) min = absoluteMin;		
 
 		// xoxoxoxoxoxoxo
-		context.cartoJSON.point.pointsize.minMax = [min, max];
-		context._updateStyle();
+		this.cartoJSON.point.pointsize.minMax = [min, max];
+		this._updateStyle();
 
 	},
 
@@ -984,7 +967,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			appendTo  : childWrapper,
 			title     : 'Min/max point size',
 			input     : false,
-			context   : this,
 			className : 'sub-line'
 		});
 
@@ -997,9 +979,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			type 	  : 'dualinput',
 			right 	  : true,
 			appendTo  : _minMaxPointSize.container,
-			context   : this,
 			value     : minMax,
-			fn        : this.savePointSizeDualBlur,
+			fn        : this.savePointSizeDualBlur.bind(this),
 			minmax    : minMax,
 			tabindex  : [this.tabindex++, this.tabindex++]
 		});

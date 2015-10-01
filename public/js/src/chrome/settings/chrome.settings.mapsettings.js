@@ -140,7 +140,6 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 					appendTo : sectionWrapper,
 					title    : title,
 					input    : false,
-					context  : this
 				});		
 
 				var _switch = new Wu.button({ 
@@ -149,8 +148,7 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 					isOn 	 : project.store.controls[key],
 					right 	 : false,
 					appendTo : line.container,
-					fn 	 : this._saveSwitch,
-					context  : this
+					fn 	 : this._saveSwitch.bind(this),
 				});
 			}
 		}
@@ -173,7 +171,6 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 			appendTo : sectionWrapper,
 			title    : 'Bounds',
 			input    : false,
-			context  : this
 		});
 
 		// Switch
@@ -183,8 +180,7 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 			isOn 	 : isBoundsSet,
 			right 	 : false,
 			appendTo : boundsLine.container,
-			fn 	 : this._saveSetClear,
-			context  : this
+			fn 	 : this._saveSetClear.bind(this),
 		});
 
 
@@ -198,7 +194,6 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 			appendTo : sectionWrapper,
 			title    : 'Position',
 			input    : false,
-			context  : this			
 		})				
 
 		// Switch
@@ -208,8 +203,7 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 			isOn 	 : false,
 			right 	 : false,
 			appendTo : positionLine.container,
-			fn 	 : this._saveSet,
-			context  : this
+			fn 	 : this._saveSet.bind(this),
 		});
 
 	},
@@ -251,7 +245,7 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 	// SAVERS
 	// SAVERS
 
-	_saveSwitch : function (e, context) {
+	_saveSwitch : function (e) {
 
 		var item = e.target;
 		var stateAttrib = e.target.getAttribute('state');
@@ -274,12 +268,12 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 	},
 
 
-	_saveSetClear : function (key, on, context) {
-		if ( key == 'bounds' ) on ? context.setBounds() : context.clearBounds();
+	_saveSetClear : function (key, on) {
+		if ( key == 'bounds' ) on ? this.setBounds() : this.clearBounds();
 	},
 
-	_saveSet : function (key, context) {
-		if ( key == 'position' ) context.setPosition();
+	_saveSet : function (key) {
+		if ( key == 'position' ) this.setPosition();
 	},
 
 
