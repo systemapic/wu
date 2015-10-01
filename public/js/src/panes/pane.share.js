@@ -375,8 +375,8 @@ Wu.Share = Wu.Pane.extend({
 			right 	     : false,
 			disabled     : !enabled,
 			appendTo     : w,
-			fn 	     : this._checkboxChange,
-			context      : this
+			fn 	     : this._checkboxChange.bind(this),
+			className    : 'relative-switch'
 		});
 
 		// label
@@ -388,17 +388,17 @@ Wu.Share = Wu.Pane.extend({
 		this._checkboxes.push(_switch);
 	},
 
-	_checkboxChange : function (e, on, context) {
+	_checkboxChange : function (e, on) {
 
 		var checkbox = e.target;
 		var checked = checkbox.getAttribute('checked');
 
-		var permissions = context._getPermissions();
+		var permissions = this._getPermissions();
 
 		// get invite link
-		context._getInviteLink(permissions, function (ctx, link) {
-			context._linkinput.value = link;
-		}.bind(context));
+		this._getInviteLink(permissions, function (ctx, link) {
+			this._linkinput.value = link;
+		}.bind(this));
 	},
 
 	_getPermissions : function () {

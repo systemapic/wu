@@ -256,8 +256,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 				appendTo : sectionWrapper,
 				title    : title,
 				input    : true,
-				fn 	 : this._saveFromBlur,
-				context  : this
+				fn 	 : this._saveFromBlur.bind(this),
 			});		
 
 			var _switch = new Wu.button({
@@ -266,8 +265,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 				isOn 	 : isOn,
 				right 	 : false,
 				appendTo : line.container,
-				fn 	 : this._saveSwitch,
-				context  : this
+				fn 	 : this._saveSwitch.bind(this),
 			});
 
 
@@ -297,7 +295,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			appendTo : sectionWrapper,
 			title    : 'Enable time series',
 			input    : false,
-			context  : this
 		});		
 
 		var timeSeriesSwitch = new Wu.button({
@@ -306,8 +303,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			isOn 	 : this.tooltipMeta.timeSeries.enable,
 			right 	 : false,
 			appendTo : timeSeriesLine.container,
-			fn 	 : this._saveSwitch,
-			context  : this
+			fn 	 : this._saveSwitch.bind(this),
 		});
 
 
@@ -321,7 +317,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			appendTo : sectionWrapper,
 			title    : 'Range',
 			input    : false,
-			context  : this			
 		})
 
 		var rangeMiniInput = new Wu.button({
@@ -333,8 +328,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			value       : this.tooltipMeta.timeSeries.minmaxRange,
 			placeholder : 'auto',
 			tabindex    : 1,
-			fn 	    : this._saveMiniBlur,
-			context     : this			
+			fn 	    : this._saveMiniBlur.bind(this),
 		})
 
 
@@ -380,7 +374,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	},
 
 	// Saves switches, etc
-	_saveSwitch : function (e, on, context) {
+	_saveSwitch : function (e, on) {
 
 		var elem = e.target;
 		var key = elem.getAttribute('key');
@@ -392,7 +386,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		var title = titleField ? titleField.value : false;
 
 		// Save to server
-		context._saveToServer(key, on, title);
+		this._saveToServer(key, on, title);
 	},
 
 
