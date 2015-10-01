@@ -235,7 +235,7 @@ module.exports = api.user = {
 		    ops = [];
 
 
-		console.log('_processInviteToken:', options);
+		// console.log('_processInviteToken:', options);
 
 		// return if no token
 		if (!options.invite_token) return done(null);

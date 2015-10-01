@@ -203,14 +203,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 			fn 	 : this._saveRadio.bind(this),
 		});		
 
-
-		console.log('');
-		console.log('%c radio! ', 'background: green; color: white;');
-		console.log('enabledByDefault', enabledByDefault);
-		console.log('_radio', _radio);
-		console.log('');
-
-
 	},
 
 

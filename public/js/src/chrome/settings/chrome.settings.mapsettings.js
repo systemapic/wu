@@ -167,10 +167,11 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 
 		// Line
 		var boundsLine = new Wu.fieldLine({
-			id       : 'bounds',
-			appendTo : sectionWrapper,
-			title    : 'Bounds',
-			input    : false,
+			id        : 'bounds',
+			appendTo  : sectionWrapper,
+			title     : 'Bounds',
+			className : 'no-padding',
+			input     : false,
 		});
 
 		// Switch
@@ -190,10 +191,11 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 
 		// Line
 		var positionLine = new Wu.fieldLine({
-			id       : 'position',
-			appendTo : sectionWrapper,
-			title    : 'Position',
-			input    : false,
+			id        : 'position',
+			appendTo  : sectionWrapper,
+			title     : 'Position',
+			className : 'no-padding',
+			input     : false,
 		})				
 
 		// Switch
