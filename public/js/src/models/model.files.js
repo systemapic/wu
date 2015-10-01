@@ -372,11 +372,7 @@ Wu.Files = Wu.Class.extend({
 				minMax : [-426.6, 105.9], 
 				customMinMax : [-426.6, 105.9], 
 				staticVal : "yellow",
-				value : [
-					"#ff0000",
-					"#a5ff00",
-					"#003dff"
-				]
+				value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
 			},
 			opacity : { 
 				range : false,
@@ -388,7 +384,7 @@ Wu.Files = Wu.Class.extend({
 				value : 1.
 			}
 		},
-		// polygon : {},
+		// polygon : {},	 // todo
 		// line : {}
 	},
 

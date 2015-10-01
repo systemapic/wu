@@ -902,6 +902,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			// COLOR RANGE
 			// COLOR RANGE
 			// COLOR RANGE
+			// var defaultRange = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'];
 			var defaultRange = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'];
 
 			// Get stores states

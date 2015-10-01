@@ -2,8 +2,6 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	_initialize : function () {
 
-		console.log('chrome.content');
-
 	},
 
 	initLayout : function () {
@@ -397,18 +395,21 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 				['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'],
 				['#0000ff', '#00ffff', '#00ff00', '#ffff00', '#ff0000'],
 
-				['#ff0000', '#a5ff00', '#003dff'],
+				// ['#ff0000', '#a5ff00', '#003dff'],
 
 				['#ff0000', '#ffff00', '#00ff00'], 		// todo: throws error if 4 colors..	
 				['#00ff00', '#ffff00', '#ff0000'],
 
 				['#ff007d', '#ffff00', '#007dff'],
 				['#ff7d00', '#ffff00', '#00ff7d'],
+
 				['#ff00ff', '#ffff00', '#00ffff'],
 				['#ffff00', '#ff00ff', '#00ffff'],
+				
 				['#ff007d', '#ffff00'],
 				['#0000ff', '#ffff00'],
-				['#ff7d00', '#00ff00']
+				
+				// ['#ff7d00', '#00ff00']
 			]
 
 			colorRangesPresets.forEach(function(preset, i) {

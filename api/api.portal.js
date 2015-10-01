@@ -51,7 +51,7 @@ module.exports = api.portal = {
 		    hotlink = {
 			client : client,
 			project : project
-		};
+		    };
 
 		if (req.isAuthenticated()) {
 			req.session.hotlink = hotlink;
@@ -179,7 +179,7 @@ module.exports = api.portal = {
 
 		// print debug
 		api.portal.printDebug(req);
-		
+
 		// options
 		var options = req.body,
 		    account = req.user,
@@ -254,7 +254,7 @@ module.exports = api.portal = {
 	},
 
 	printDebug : function (req) {
-		console.log('\033[2J');
+		console.log('_______________________________________________________________________'.yellow);
 		console.log('Logged in user:'.yellow);
 		console.log('  Name:  ' + req.user.firstName + ' ' + req.user.lastName);
 		console.log('  Uuid:  ' + req.user.uuid);
@@ -264,6 +264,5 @@ module.exports = api.portal = {
 		console.log('_______________________________________________________________________'.yellow);
 		console.log('');
 	},
-
 
 }
