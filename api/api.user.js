@@ -90,8 +90,6 @@ module.exports = api.user = {
 		ops.push(function (project, callback) {
 
 
-			// TODO:
-			// 	
 			// download_file: true
 			// share_project: true
 			// read_project: true
@@ -142,29 +140,6 @@ module.exports = api.user = {
 				project_id : token_store.project.id
 			}, callback)
 			
-			// // default role
-			// var role_slug = 'noRole';
-
-			// // decide which role
-			// if (a == 'view') role_slug = 'projectReader'; // todo: other access types
-
-			// // find reader role
-			// var access_role = _.find(project.roles, function (r) {
-			// 	return r.slug == role_slug;
-			// });
-
-			// Role
-			// .findOne({uuid : access_role.uuid})
-			// .exec(function (err, role) {
-
-			// 	// add user to reader role of project
-			// 	role.members.addToSet(created_user.uuid);
-
-			// 	// save
-			// 	role.save(function (err) {
-			// 		callback(err);
-			// 	});
-			// });
 		});
 
 		ops.push(function (callback) {
@@ -192,19 +167,11 @@ module.exports = api.user = {
 
 			callback(null);
 
-
-
-
 		});
 
 		// done
 		async.waterfall(ops, function (err, results) {
 			if (err) return done(err);
-
-
-			// send email
-
-
 			done(null, created_user);
 		});
 	
@@ -222,15 +189,6 @@ module.exports = api.user = {
 			// create the user
 			var role = new Role();
 			role.uuid = 'role-' + uuid.v4();
-			
-			// caps
-			// for (var c in role.capabilities) {
-			// 	var cap = role.capabilities[c];
-			// 	console.log('c, cap', c, cap);
-			// 	if (permissions.indexOf(c) > -1) {
-			// 		cap = true;
-			// 	} 
-			// }
 
 			permissions.forEach(function (p) {
 				console.log('p: ', p);
@@ -255,7 +213,6 @@ module.exports = api.user = {
 			Project
 			.findOne({uuid : project_id})
 			.exec(function (err, project) {
-
 				project.roles.push(role._id);
 				project.markModified('roles');
 				project.save(callback);
@@ -265,7 +222,6 @@ module.exports = api.user = {
 
 		async.waterfall(ops, function (err, results) {
 			console.log('create role, err, reslts', err, results);
-
 			done(err);
 		});
 
@@ -277,6 +233,9 @@ module.exports = api.user = {
 		var user = options.user,
 		    invite_token,
 		    ops = [];
+
+
+		console.log('_processInviteToken:', options);
 
 		// return if no token
 		if (!options.invite_token) return done(null);
@@ -304,28 +263,15 @@ module.exports = api.user = {
 		ops.push(function (project, callback) {
 
 			var a = invite_token.project.access_type;
-			
-			// default role
-			var role_slug = 'noRole';
+			var permissions = invite_token.project.permissions;
 
-			// decide which role
-			if (a == 'view') role_slug = 'projectReader'; // todo: other access types
+			// create role
+			api.user._createRole({
+				permissions : permissions,
+				members : [user],
+				project_id : invite_token.project.id
+			}, callback)
 
-			// find reader role
-			var access_role = _.find(project.roles, function (r) {
-				return r.slug == role_slug;
-			});
-
-			Role
-			.findOne({uuid : access_role.uuid})
-			.exec(function (err, role) {
-
-				// add user to reader role of project
-				role.members.addToSet(user.uuid);
-
-				// save
-				role.save(callback);
-			});
 		});
 
 		async.waterfall(ops, function (err, results) {
@@ -394,9 +340,6 @@ module.exports = api.user = {
 		// 4. ALSO would be really cool: just send anyone a link, and they can login/register and get access to project.
 
 
-		var results = {
-
-		}
 
 		callback(null, options);
 
@@ -413,7 +356,7 @@ module.exports = api.user = {
 
 	_createInviteLink : function (options, callback) {
 
-		console.log('options', options);
+		console.log(options);
 
 		var project_id = options.project_id,
 		    project_name = options.project_name,
@@ -453,18 +396,10 @@ module.exports = api.user = {
 
 
 	_inviteNewUser : function (options, callback) {
-
-
-
 	},
 
 	_inviteExistingUser : function (options, callback) {
-
-
-
 	},
-
-
 
 
 	// create user

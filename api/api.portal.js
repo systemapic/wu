@@ -77,6 +77,8 @@ module.exports = api.portal = {
 
 	invite : function (req, res) {
 
+		console.log('api.portal.invite');
+
 		// get client/project
 		var path = req.originalUrl.split('/');
 		var invite_token = path[2];
