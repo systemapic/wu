@@ -122,13 +122,10 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 				enable : false,
 				name   : 'CartoCSS'
 			},
-
 		}
-
 
 		// Get control
 		var project = app.activeProject;
-
 
 		for ( var key in options ) {
 			
@@ -138,18 +135,21 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 
 				var title = options[key].name;
 
-				var lineOptions = {
-					key 		: key, 
-					wrapper 	: sectionWrapper,
-					input 		: false,
-					title 		: title,
-					isOn 		: project.store.controls[key],
-					rightPos	: false,
-					type 		: 'switch'
-					
-				}
+				var line = new Wu.fieldLine({
+					id       : key,
+					appendTo : sectionWrapper,
+					title    : title,
+					input    : false,
+				});		
 
-				this._createMetaFieldLine(lineOptions);
+				var _switch = new Wu.button({ 
+					id 	 : key,					
+					type 	 : 'switch',
+					isOn 	 : project.store.controls[key],
+					right 	 : false,
+					appendTo : line.container,
+					fn 	 : this._saveSwitch.bind(this),
+				});
 			}
 		}
 	},
@@ -161,29 +161,52 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 
 		var isBoundsSet = this.isBoundsSet();
 
-		var lineOptions = {
-			key 		: 'bounds', 
-			wrapper 	: sectionWrapper,
-			input 		: false,
-			title 		: 'Bounds',			
-			isOn 		: isBoundsSet,
-			rightPos	: false,
-			type 		: 'setClear',
-		}
+		// BOUNDS
+		// BOUNDS
+		// BOUNDS
 
-		this._createMetaFieldLine(lineOptions);
+		// Line
+		var boundsLine = new Wu.fieldLine({
+			id        : 'bounds',
+			appendTo  : sectionWrapper,
+			title     : 'Bounds',
+			className : 'no-padding',
+			input     : false,
+		});
 
-		var lineOptions = {
-			key 		: 'position', 
-			wrapper 	: sectionWrapper,
-			input 		: false,
-			title 		: 'Position',			
-			isOn 		: false,
-			rightPos	: false,
-			type 		: 'set',
-		}
+		// Switch
+		var setClearBounds = new Wu.button({ 
+			id 	 : 'bounds',
+			type 	 : 'setclear',
+			isOn 	 : isBoundsSet,
+			right 	 : false,
+			appendTo : boundsLine.container,
+			fn 	 : this._saveSetClear.bind(this),
+		});
 
-		this._createMetaFieldLine(lineOptions);
+
+		// POSITION
+		// POSITION
+		// POSITION
+
+		// Line
+		var positionLine = new Wu.fieldLine({
+			id        : 'position',
+			appendTo  : sectionWrapper,
+			title     : 'Position',
+			className : 'no-padding',
+			input     : false,
+		})				
+
+		// Switch
+		var setPosition = new Wu.button({ 
+			id 	 : 'position',
+			type 	 : 'set',
+			isOn 	 : false,
+			right 	 : false,
+			appendTo : positionLine.container,
+			fn 	 : this._saveSet.bind(this),
+		});
 
 	},
 
@@ -216,20 +239,29 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 
 	},
 
+
+
+
+
 	// SAVERS 
 	// SAVERS
 	// SAVERS
 
-	_saveToServer : function (item, title, on) {
+	_saveSwitch : function (e) {
+
+		var item = e.target;
+		var stateAttrib = e.target.getAttribute('state');
+		var on = (stateAttrib == 'true');
+		var key = e.target.getAttribute('key');		
 
 		// Get control
-		var control = app.MapPane.getControls()[item];
+		var control = app.MapPane.getControls()[key];
 
-		if (!control) return console.error('no control!', item, title, on);
+		if (!control) return console.error('no control!', key, on);
 
 		// Save
 		var project = app.activeProject;
-		    project.store.controls[item] = on;
+		    project.store.controls[key] = on;
 		    project._update('controls');
 
 		// toggle on map
@@ -238,11 +270,11 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 	},
 
 
-	saveSetClear : function (key, on) {
+	_saveSetClear : function (key, on) {
 		if ( key == 'bounds' ) on ? this.setBounds() : this.clearBounds();
 	},
 
-	saveSet : function (key) {
+	_saveSet : function (key) {
 		if ( key == 'position' ) this.setPosition();
 	},
 

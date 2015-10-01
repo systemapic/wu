@@ -4,6 +4,8 @@ var _ = require('lodash-node');
 // api
 var api = module.parent.exports;
 
+console.log('api.log config: ', api.config.path.log);
+
 // logger
 var winston_logger = new (winston.Logger)({
 	

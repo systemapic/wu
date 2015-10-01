@@ -92,6 +92,15 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		
 		this._layer = this._project.getLayer(layerUuid);
 
+
+		console.log('%c _selectedActiveLayer ', 'background: #ff33ff; color: white;');
+		console.log('e', e);
+		console.log('uuid', uuid);
+		console.log('layerUuid', layerUuid);
+		console.log('this._project', this._project);
+		console.log('this._layer', this._layer);
+		console.log('');	
+
 		// Get stored tooltip meta
 		this.tooltipMeta = this._layer.getTooltip();
 		
@@ -242,18 +251,25 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			// Block 
 			if ( key == 'enable' || key == 'minmaxRange' || key == 'graphstyle' ) return;
 
-			var options = {
-				key 		: key, 
-				wrapper 	: sectionWrapper,
-				input 		: true,
-				title 		: title,
-				isOn 		: isOn,
-				rightPos	: false,
-				type 		: 'switch'
-				
-			}
+			var line = new Wu.fieldLine({
+				id       : key,
+				appendTo : sectionWrapper,
+				title    : title,
+				input    : true,
+				fn 	 : this._saveFromBlur.bind(this),
+			});		
 
-			this._createMetaFieldLine(options);
+			var _switch = new Wu.button({
+				id 	 : key,
+				type 	 : 'switch',
+				isOn 	 : isOn,
+				right 	 : false,
+				appendTo : line.container,
+				fn 	 : this._saveSwitch.bind(this),
+			});
+
+
+
 		}
 	},
 
@@ -269,48 +285,52 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, 'Time series');
 		var headerExtra = Wu.DomUtil.create('span', 'chrome-content-header-gray', header, ' (auto detected)');
 
-		// Enable tims series switch
-		var options = {
-			key 		: 'enable', 
-			wrapper 	: sectionWrapper,
-			input 		: false,
-			title 		: 'Enable time series',
-			isOn 		: this.tooltipMeta.timeSeries.enable,
-			rightPos	: true,
-			type 		: 'switch'
 
-		}
-		var enableTimeSeries = this._createMetaFieldLine(options);
-		
-		// Use min/max from styling switch
-		var options = {
-			key 		: 'minmaxRange', 
-			wrapper 	: sectionWrapper,
-			input 		: false,
-			title 		: 'Range',
-			isOn 		: true,
-			rightPos	: true,
-			type 		: 'miniInput',
-			value 		: this.tooltipMeta.timeSeries.minmaxRange,
-			
-		}
-		var useMinMaxFromStyle = this._createMetaFieldLine(options)
+		// Time series switch
+		// Time series switch
+		// Time series switch
 
-		// // Use min/max from styling switch
-		// var options = {
-		// 	key 		: 'graphstyle', 
-		// 	wrapper 	: sectionWrapper,
-		// 	input 		: false,
-		// 	title 		: 'Graph style',
-		// 	isOn 		: this.tooltipMeta.timeSeries.graphstyle,
-		// 	rightPos	: true,
-		// 	type 		: 'dropdown',
-		// 	dropdown	: ['scatter', 'line'],
-			
-			
-		// }
+		var timeSeriesLine = new Wu.fieldLine({
+			id       : 'enable',
+			appendTo : sectionWrapper,
+			title    : 'Enable time series',
+			input    : false,
+		});		
 
-		// var graphType = this._createMetaFieldLine(options)
+		var timeSeriesSwitch = new Wu.button({
+			id 	 : 'enable',
+			type 	 : 'switch',
+			isOn 	 : this.tooltipMeta.timeSeries.enable,
+			right 	 : false,
+			appendTo : timeSeriesLine.container,
+			fn 	 : this._saveSwitch.bind(this),
+		});
+
+
+
+		// RANGE
+		// RANGE
+		// RANGE
+
+		var rangeLine = new Wu.fieldLine({
+			id       : 'minmaxRange',
+			appendTo : sectionWrapper,
+			title    : 'Range',
+			input    : false,
+		})
+
+		var rangeMiniInput = new Wu.button({
+			id 	    : 'minmaxRange',
+			type 	    : 'miniInput',
+			right 	    : false,
+			isOn        : true,
+			appendTo    : rangeLine.container,
+			value       : this.tooltipMeta.timeSeries.minmaxRange,
+			placeholder : 'auto',
+			tabindex    : 1,
+			fn 	    : this._saveMiniBlur.bind(this),
+		})
+
 
 
 		// Create list of time series fields
@@ -325,31 +345,39 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		this._layer.setTooltip(this.tooltipMeta);
 	},
 
-	// Save input fields in meta field lines
-	saveFromBlur : function (e) {
-		
-		var key   = e.target.id.substring(12, e.target.id.length);
-		var value = e.target.value;
-		
-		var thisSwitch = Wu.DomUtil.get('field_switch_' + key);
-		var thisSwitchState = thisSwitch.getAttribute('state');
-
-		var on = thisSwitchState ? true : false;
-
-		this._saveToServer(key, value, on);
-	},
-
 	// Saves tiny input to right
-	saveMiniBlur : function (e) {
+	_saveMiniBlur : function (e) {
 
 		var key   = e.target.id.substring(17, e.target.id.length)
 		var value = e.target.value;
 
-		this._saveToServer(key, false, value);
+		this._saveToServer(key, value);
+	},
+
+	// Save input fields in meta field lines
+	_saveFromBlur : function (e) {
+	
+		var key   = e.target.id.substring(12, e.target.id.length);
+		var title = e.target.value;
+		
+		var thisSwitch = Wu.DomUtil.get('switch_' + key);
+		var thisSwitchState = thisSwitch.getAttribute('state');
+
+		// var on = thisSwitchState ? true : false;
+		if ( thisSwitchState == 'true' ) {
+			var on = true;
+		} else {
+			var on = false;
+		}
+
+		this._saveToServer(key, on, title);
 	},
 
 	// Saves switches, etc
-	_saveToServer : function (key, title, on) {
+	_saveSwitch : function (e, on) {
+
+		var elem = e.target;
+		var key = elem.getAttribute('key');
 
 		var titleField = Wu.DomUtil.get('field_input_' + key);
 		var title      = titleField ? titleField.value : false;
@@ -357,30 +385,40 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		// If no title, set to false
 		var title = titleField ? titleField.value : false;
 
+		// Save to server
+		this._saveToServer(key, on, title);
+	},
+
+
+
+
+	_saveToServer : function (key, value, title) {
 
 		if ( key == 'enable' || key == 'minmaxRange' || key == 'graphstyle' ) {
 			
 			// Update object
-			this.tooltipMeta.timeSeries[key] = on;
+			this.tooltipMeta.timeSeries[key] = value;
 
 			// Save to server
 			this._layer.setTooltip(this.tooltipMeta);
 
-			return;
+		} else {
+
+			// Check if key is date	
+			var keyIsDate = this._validateDateFormat(key);
+			
+			// If key is date, try to update timeseries
+			if ( keyIsDate ) var timeUpdated = this.updateTimeSeriesMeta(key, title, value);
+			
+			// If key is not date, or could not be found in time series, go through metafields
+			if ( !timeUpdated || !keyIsDate ) this.updateMeta(key, title, value);
+		
 		}
 
-		// Check if key is date	
-		var keyIsDate = this._validateDateFormat(key);
-		
-		// If key is date, try to update timeseries
-		if ( keyIsDate ) var timeUpdated = this.updateTimeSeriesMeta(key, title, on);
-		
-		// If key is not date, or could not be found in time series, go through metafields
-		if ( !timeUpdated || !keyIsDate ) this.updateMeta(key, title, on);
-	
-		// Save to server
 		this._layer.setTooltip(this.tooltipMeta);
 	},
+
+
 
 	// Save helpers – goes through the JSON object to find a key match in the time series
 	updateTimeSeriesMeta : function (key, title, on) {
@@ -392,8 +430,8 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 			if ( f == key ) {
 
-				timeSeries[f].title = title;
-				timeSeries[f].on = on;			
+				if ( title ) timeSeries[f].title = title;
+				if ( on ) timeSeries[f].on = on;			
 
 				hit = true
 			}
@@ -410,7 +448,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		for ( var f in metaFields ) {
 
 			if ( f == key ) {
-
 				metaFields[f].title = title;
 				metaFields[f].on = on;
 				return;

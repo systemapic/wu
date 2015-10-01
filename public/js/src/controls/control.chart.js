@@ -633,14 +633,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		x.unshift(xName);
 		y.unshift(yName);
 
-
-		// var reg_y = this._calculateRegression(c3Obj);
-		// var reg_x = ['reg_x', x[1], x[x.length-1]];
-
-		// _columns = [x, y, reg_x, reg_y];
-
 		_columns = [x, y];
-
 
 
 		// Create container
@@ -728,8 +721,6 @@ Wu.Control.Chart = Wu.Control.extend({
 						var nnDate = moment(d).format("DD.MM.YYYY");
 						return nnDate;
 					},
-					// name: function (name, ratio, id, index) { return 'fetta'; }
-			
 				},
 				
 			},	        
@@ -738,13 +729,6 @@ Wu.Control.Chart = Wu.Control.extend({
 				pattern: ['#000000']
 			}		        
 		});
-
-
-		// var regLine = this._chart.append('line')
-
-
-
-
 
 
 		// add zoom events
@@ -759,29 +743,34 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	_addRegressionButton : function () {
 
-		// create button
+
 		var w = Wu.DomUtil.create('div', 'regression-button-wrapper', this._footerContainer);
-		var button = this._regressionButton = Wu.DomUtil.create('div', 'chrome-switch-container', w);
-		button.setAttribute('on', 'false');
-		button.id = 'regression';
+
+		this.regressionButton = new Wu.button({ 
+			type 	  : 'switch',
+			isOn 	  : false,
+			right 	  : false,
+			id 	  : 'regression-button',
+			appendTo  : w,
+			fn 	  : this._updateRegression.bind(this),
+			className : 'relative-switch'
+		})
 
 		// label
 		var label = Wu.DomUtil.create('label', 'invite-permissions-label', w);
 		label.htmlFor = 'regression';
 		label.appendChild(document.createTextNode('Regression'));
 
-		// event
-		Wu.DomEvent.on(button, 'click', this._toggleRegression, this);
+
 	},
 
-	_toggleRegression : function (e) {
+	_updateRegression : function (e) {
 
 		var elem = e.target;
 		var on = elem.getAttribute('on');
 
+		if ( on == 'false' || !on ) {
 
-		if ( on == 'false' ) {
-			
 			Wu.DomUtil.addClass(elem, 'switch-on');
 			elem.setAttribute('on', 'true');
 
