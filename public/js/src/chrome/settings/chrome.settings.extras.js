@@ -38,8 +38,6 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 		this.layerUuid = uuid ? uuid : e.target.value
 
-		// this._initLayout();
-
 		// Globesar Extras
 		this.initGlobesarExtras();
 
@@ -65,32 +63,56 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		var angle = satpos.angle ? satpos.angle : false;
 
 
-		var lineOptions = {
-			key 		: 'satelliteAngle',
-			wrapper 	: wrapper,
-			input 		: false,
-			title 		: 'Satellite angle',
-			value 		: angle,
-			placeholder 	: 'none',
-			isOn 		: true,
-			rightPos	: true,
-			type 		: 'miniInput'
-		}
-		this._createMetaFieldLine(lineOptions);
+		// ANGLE
+		// ANGLE
+		// ANGLE
+
+		var angleLine = new Wu.fieldLine({
+			id       : 'satelliteAngle',
+			appendTo : wrapper,
+			title    : 'Satellite angle',
+			input    : false,
+			context  : this			
+		})
+
+		var angleMiniInput = new Wu.button({
+			id 	    : 'satelliteAngle',
+			type 	    : 'miniInput',
+			right 	    : true,
+			isOn        : true,
+			appendTo    : angleLine.container,
+			value       : angle,
+			placeholder : 'none',
+			tabindex    : 1,
+			fn 	    : this._saveMiniBlur,
+			context     : this			
+		})
 
 
-		var lineOptions = {
-			key 		: 'satellitePath',
-			wrapper 	: wrapper,
-			input 		: false,
-			title 		: 'Satellite path',
-			value 		: path,
-			placeholder 	: 'none',
-			isOn 		: true,
-			rightPos	: true,
-			type 		: 'miniInput'
-		}
-		this._createMetaFieldLine(lineOptions);
+		// PATH
+		// PATH
+		// PATH
+
+		var pathLine = new Wu.fieldLine({
+			id       : 'satellitePath',
+			appendTo : wrapper,
+			title    : 'Satellite path',
+			input    : false,
+			context  : this			
+		})
+
+		var pathMiniInput = new Wu.button({
+			id 	    : 'satellitePath',
+			type 	    : 'miniInput',
+			right 	    : true,
+			isOn        : true,
+			appendTo    : pathLine.container,
+			value       : path,
+			placeholder : 'none',
+			tabindex    : 2,
+			fn 	    : this._saveMiniBlur,
+			context     : this			
+		})
 
 
 	},
@@ -98,7 +120,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 
 	// ON BLUR IN MINI FIELDS
-	saveMiniBlur : function (e) {
+	_saveMiniBlur : function (e) {
 
 		var angle = Wu.DomUtil.get('field_mini_input_satelliteAngle').value;
 		var path  = Wu.DomUtil.get('field_mini_input_satellitePath').value;
