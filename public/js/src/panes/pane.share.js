@@ -369,28 +369,18 @@ Wu.Share = Wu.Pane.extend({
 
 		// wrapper
 		var w = Wu.DomUtil.create('div', 'invite-permissions-checkbox-wrap', container);
-		
-		// checkbox
-		// var checkbox = Wu.DomUtil.create('input', 'invite-permissions-checkbox', w);
-		// checkbox.type = "checkbox";
-		// checkbox.name = id;
-		// checkbox.value = id;
-		// checkbox.id = id;
-		// checkbox.checked = checked; // default todo: only if user self has permissions to give out (eg. if can invite, but not download)
 
 
-		var checkbox = Wu.DomUtil.create('div', 'chrome-switch-container', w);
-		checkbox.setAttribute('checked', checked);
-
-		if (checked) Wu.DomUtil.addClass(checkbox, 'switch-on');
-
-		if (!enabled) {
-			Wu.DomUtil.addClass(checkbox, 'disabled-switch');
-			// checkbox.setAttribute('disabled', 'disabled');
-		}
-
-		// change event
-		Wu.DomEvent.on(checkbox, 'click', this._checkboxChange, this);
+		var _switch = new Wu.button({
+			id 	     : id,
+			type 	     : 'switch',
+			isOn 	     : checked,
+			right 	     : false,
+			disabled     : !enabled,
+			appendTo     : w,
+			fn 	     : this._checkboxChange,
+			context      : this
+		});
 
 		// label
 		var label = Wu.DomUtil.create('label', 'invite-permissions-label', w);
@@ -398,34 +388,33 @@ Wu.Share = Wu.Pane.extend({
 		label.appendChild(document.createTextNode(title));
 
 		// add to list
-		this._checkboxes.push(checkbox);
+		this._checkboxes.push(_switch);
 	},
 
-	_checkboxChange : function (e) {
+	_checkboxChange : function (e, on, context) {
 
 		var checkbox = e.target;
 		var checked = checkbox.getAttribute('checked');
 
-		if ( checked == 'true' ) {
-			Wu.DomUtil.removeClass(checkbox, 'switch-on');
-			checkbox.setAttribute('checked', 'false');
-		} else {
-			Wu.DomUtil.addClass(checkbox, 'switch-on');
-			checkbox.setAttribute('checked', 'true');
-		}
-
-		var permissions = this._getPermissions();
+		var permissions = context._getPermissions();
 
 		// get invite link
-		this._getInviteLink(permissions, function (ctx, link) {
-			this._linkinput.value = link;
-		}.bind(this));
+		context._getInviteLink(permissions, function (ctx, link) {
+			context._linkinput.value = link;
+		}.bind(context));
 	},
 
 	_getPermissions : function () {
 		var p = [];
+
 		this._checkboxes.forEach(function (c) {
-			if (c.checked) p.push(c.value);
+
+			var div = c._switch;
+			var value = c.value;
+			var checked = div.getAttribute('state');
+
+			if (checked == 'true') p.push(value);
+
 		});
 		return p;
 	},

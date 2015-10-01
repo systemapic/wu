@@ -33,6 +33,12 @@ Wu.Control = L.Control.extend({
 	_projectSelected : function (e) {
 		var projectUuid = e.detail.projectUuid;
 
+		console.log('');
+		console.log('%c _projectSelected ', 'background: blue; color: white;');
+		console.log('projectUuid', projectUuid);
+		console.log('this', this);
+		console.log('');
+
 		if (!projectUuid) {
 			this._project = null;
 			return this._off();
