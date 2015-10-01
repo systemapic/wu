@@ -266,6 +266,8 @@ Wu.App = Wu.Class.extend({
 	_initInvite : function () {
 		var project = this.options.json.invite;
 
+		console.log('_initInvite', project);
+
 		if (!project) return false;
 
 		// select project

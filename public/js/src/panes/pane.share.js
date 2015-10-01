@@ -430,6 +430,8 @@ Wu.Share = Wu.Pane.extend({
 			permissions : permissions
 		}
 
+		console.log('_getInviteLink', options);
+
 		// get invite link
 		Wu.post('/api/invite/link', JSON.stringify(options), callback);
 	},

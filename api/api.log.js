@@ -1,4 +1,5 @@
 var winston = require('winston');
+var _ = require('lodash-node');
 
 // api
 var api = module.parent.exports;
@@ -29,16 +30,22 @@ var logger = new (winston.Logger)({
 			maxsize : 10000000 // 10MB
 		}),
 
-		// console
-		new winston.transports.Console({
-			colorize : true
-		}),
 	],
 });
 
+
 // globally pipe console to winston
-console.log = logger.info;
-console.error = logger.error;
+console.log = function () {
+	var arr = _.toArray(arguments);
+	console.info(arr);
+	// console.info(arr.join(' '));
+	logger.info(arguments);
+}
+console.error = function () {
+	var arr = _.toArray(arguments);
+	console.info(arr.join(' '));
+	logger.error(arguments);
+}
 
 // exports
 module.exports = api.log = { 

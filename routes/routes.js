@@ -651,6 +651,7 @@ module.exports = function(app, passport) {
 	// LOGOUT ==============================
 	// =====================================
 	app.get('/invite/*', function(req, res) {
+		console.log('/invite/*');
 		api.portal.invite(req, res);
 	});
 
