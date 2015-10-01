@@ -293,6 +293,8 @@ module.exports = api.user = {
 			// parse
 			invite_token = JSON.parse(inviteJSON);
 
+			if (!invite_token) return callback('Missing invite token.');
+
 			Project
 			.findOne({uuid : invite_token.project.id})
 			.populate('roles')
@@ -329,6 +331,8 @@ module.exports = api.user = {
 		});
 
 		async.waterfall(ops, function (err, results) {
+			if (err) return done(err);
+			
 			var project_json = {
 				name : invite_token.project.name,
 				id : invite_token.project.id
