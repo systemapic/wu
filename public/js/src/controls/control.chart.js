@@ -289,11 +289,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		
 		}
 
-		// console.time('reression');
-		// this._calculateRegression(_c3Obj)
-		// console.timeEnd('regression');
-
-
 		return content;			
 	},
 
@@ -764,33 +759,19 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	_addRegressionButton : function () {
 
-		console.log('create regresison button');
-
+		// create button
 		var w = Wu.DomUtil.create('div', 'regression-button-wrapper', this._footerContainer);
-
-		// var button = this._regressionButton = Wu.DomUtil.create('input', 'chart-regression-button', w);
-		// button.type = 'checkbox';
-		// button.id = 'regression';
-
 		var button = this._regressionButton = Wu.DomUtil.create('div', 'chrome-switch-container', w);
-		
 		button.setAttribute('on', 'false');
-		// button.type = 'checkbox';
 		button.id = 'regression';
-
-
-		// radio-on
 
 		// label
 		var label = Wu.DomUtil.create('label', 'invite-permissions-label', w);
 		label.htmlFor = 'regression';
 		label.appendChild(document.createTextNode('Regression'));
 
-		// change event
-		// Wu.DomEvent.on(button, 'change', this._toggleRegression, this);
-
+		// event
 		Wu.DomEvent.on(button, 'click', this._toggleRegression, this);
-
 	},
 
 	_toggleRegression : function (e) {

@@ -68,7 +68,6 @@ Wu.Popup.Chart = L.Control.extend({
 		
 		// create wrapper
 		var wrapper = this._wrapper = L.DomUtil.create('div', 'leaflet-popup-content-wrapper', container);
-		L.DomEvent.disableClickPropagation(wrapper);
 
 		// draggable pane
 		this._initDraggable();
@@ -118,7 +117,6 @@ Wu.Popup.Chart = L.Control.extend({
 	},
 
 	close : function () {
-		console.log('popup.chart.close()');
 		this._map.fire('popupclose')
 		this._remove();
 	},
@@ -185,8 +183,6 @@ Wu.Popup.Chart = L.Control.extend({
 
 	_dragStart : function (e) {
 
-		console.log('dragstart');
-
 		// get mouse pos offset in relation to popup
 		var popupPosition = {
 			x : this._container.offsetLeft,
@@ -207,6 +203,9 @@ Wu.Popup.Chart = L.Control.extend({
 			y : m.y - p.y
 		}
 
+		// set window height
+		this._windowDimensions = this._getWindowDimensions();
+
 		// create ghost pane
 		this._ghost = Wu.DomUtil.create('div', 'leaflet-popup-ghost', app._appPane);
 
@@ -218,9 +217,6 @@ Wu.Popup.Chart = L.Control.extend({
 
 	_dragStop : function (e) {
 
-		console.log('dragstop');
-
-		
 		// remove events
 		Wu.DomEvent.off(this._ghost, 'mouseup', this._dragStop, this);
 		Wu.DomEvent.off(this._ghost, 'mousemove', this._dragging, this);
@@ -235,9 +231,7 @@ Wu.Popup.Chart = L.Control.extend({
 
 	_dragging : function (e) {
 
-		console.log('draggin');
-
-		var window_height = this._getWindowDimensions().height;
+		var window_height = this._windowDimensions.height;
 
 		// calc pos
 		var diff = {

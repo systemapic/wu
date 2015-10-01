@@ -67,8 +67,6 @@ L.Control.Draw = Wu.Control.extend({
 
 	_clearAll : function () {
 
-		console.error('draw _clearAll')
-
 		var r = this._toolbars.edit._modes.remove.handler;
 		var e = this._toolbars.edit._modes.edit.handler;
 		var layers = r._deletableLayers.getLayers();
