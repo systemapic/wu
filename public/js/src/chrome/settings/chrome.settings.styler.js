@@ -124,7 +124,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var key = 'colorrange';
 
 		var rangeSelector = Wu.DomUtil.get('chrome-color-selector-wrapper-' + key);
-		var clickCatcher = Wu.DomUtil.get('click-catcher-' + key);
+		var clickCatcher  = Wu.DomUtil.get('click-catcher-' + key);
 
 		if ( rangeSelector ) Wu.DomUtil.addClass(rangeSelector, 'displayNone');
 		if ( clickCatcher  ) Wu.DomUtil.addClass(clickCatcher, 'displayNone');		
@@ -194,21 +194,34 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Create wrapper
 		this._pointSectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
 
-		// Create line
-		var lineOptions = {
-			key 		: 'point',
-			wrapper 	: this._pointSectionWrapper,
-			input 		: false,
-			title 		: '<b>Point</b>',
-			isOn 		: isOn,
-			rightPos	: true,
-			type 		: 'switch'
-		}
-		this._createMetaFieldLine(lineOptions);
+		var _line = new Wu.fieldLine({
+			id           : 'point',
+			appendTo     : this._pointSectionWrapper,
+			title        : '<b>Point</b>',
+			input        : false,
+			context      : this
+		});		
 
+		var _switch = new Wu.button({
+			id 	     : 'point',
+			type 	     : 'switch',
+			isOn 	     : isOn,
+			right 	     : true,
+			appendTo     : _line.container,
+			fn 	     : this._updatePointSwitch,
+			context      : this
+		});
 
-		// this._saveToServer('point', '', isOn);
-		this.initPointOffOn(isOn);
+		this.initPointOffOn(isOn, 'point');
+
+	},
+
+	_updatePointSwitch : function (e, on, context) {
+
+		context.initPointOffOn(on, 'point');
+
+		// UPDATE
+		context._updateStyle();
 
 	},
 
@@ -239,31 +252,54 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Create JSON obj if it's not already there
 		if ( !this.cartoJSON.point[key] ) this.cartoJSON.point[key] = {};
 
-		// xoxoxox 
-
 		var defaultRange = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'];
 
 		// Get stores states
-		var isOn   = this.cartoJSON.point[key].range ? false : true;
-		var staticVal = this.cartoJSON.point[key].staticVal ? this.cartoJSON.point[key].staticVal : '#FF33FF';
-		var val    = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : defaultRange;
-		var range  = this.cartoJSON.point[key].range ? this.cartoJSON.point[key].range : false;
-		var minMax = this.cartoJSON.point[key].minMax ? this.cartoJSON.point[key].minMax : false;
+		var isOn         = this.cartoJSON.point[key].range ? false : true;
+		var staticVal    = this.cartoJSON.point[key].staticVal ? this.cartoJSON.point[key].staticVal : '#FF33FF';
+		var val          = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : defaultRange;
+		var range        = this.cartoJSON.point[key].range ? this.cartoJSON.point[key].range : false;
+		var minMax       = this.cartoJSON.point[key].minMax ? this.cartoJSON.point[key].minMax : false;
 		var customMinMax = this.cartoJSON.point[key].customMinMax ? this.cartoJSON.point[key].customMinMax : false;
 
-		var lineOptions = {
-			key 		: key, 
-			wrapper 	: sectionWrapper,
-			input 		: false,
-			title 		: '<b>Color</b>',
-			isOn 		: isOn,
-			rightPos	: true,
-			type 		: 'color',
-			value 		: staticVal,
-			dropArray 	: this.metaFields,
-			selectedField   : range
-		}
-		this._createMetaFieldLine(lineOptions);
+		// Container
+		var _colorLine = new Wu.fieldLine({
+			id           : 'color',
+			appendTo     : sectionWrapper,
+			title        : '<b>Color</b>',
+			input        : false,
+			context      : this,
+			childWrapper : 'point-color-children'
+		});	
+
+
+		// Dropdown
+		var _colorDropDown = new Wu.button({
+			id 	 : 'color',
+			type 	 : 'dropdown',
+			isOn 	 : isOn,
+			right 	 : true,
+			appendTo : _colorLine.container,
+			fn 	 : this._selectedMiniDropDown,
+			context  : this,
+			array 	 : this.metaFields,
+			selected : range,
+			layers   : this._project.getPostGISLayers()
+		});
+
+		// Color selector
+		var _colorBall = new Wu.button({
+			id 	 : 'color',
+			type 	 : 'colorball',
+			right    : true,
+			isOn 	 : isOn,
+			appendTo : _colorLine.container,
+			fn       : this._updateColorBall,
+			value    : staticVal,
+			context  : this
+		})
+
+
 
 		// SAVE JSON
 		this.cartoJSON.point[key] = {
@@ -288,20 +324,43 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var val    = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : 1;
 		var range  = this.cartoJSON.point[key].range ? this.cartoJSON.point[key].range : false;	
 
-		var lineOptions = {
-			key 		: key,
-			wrapper 	: sectionWrapper,
-			input 		: false,
-			title 		: '<b>Opacity</b>',
-			isOn 		: isOn,
-			rightPos	: true,
-			type 		: 'miniInput',
-			value 		: val,
-			dropArray 	: this.metaFields,
-			selectedField   : range,
-			tabindex 	: this.tabindex++
-		}
-		this._createMetaFieldLine(lineOptions);
+		// Container
+		var _opacityLine = new Wu.fieldLine({
+			id       : 'opacity',
+			appendTo : sectionWrapper,
+			title    : '<b>Opacity</b>',
+			input    : false,
+			context  : this
+		});	
+
+		// Dropdown
+		var _opacityDropDown = new Wu.button({
+			id 	 : 'opacity',
+			type 	 : 'dropdown',
+			right 	 : true,
+			appendTo : _opacityLine.container,
+			fn 	 : this._selectedMiniDropDown,
+			context  : this,
+			array 	 : this.metaFields,
+			selected : range,
+			layers   : this._project.getPostGISLayers()
+		});
+
+
+		// Input
+		var _opacityInput = new Wu.button({
+			id 	    : 'opacity',
+			type 	    : 'miniInput',
+			right 	    : true,
+			isOn        : isOn,
+			appendTo    : _opacityLine.container,
+			value       : val,
+			placeholder : 'auto',
+			tabindex    : this.tabindex++,
+			fn 	    : this._saveOpacityFromBlur,
+			context     : this			
+		});
+
 
 		// SAVE JSON
 		this.cartoJSON.point[key] = {
@@ -313,50 +372,75 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// INIT POINT SIZE
 	initPointOptionPointSize : function (sectionWrapper) {
 
-		var key = 'pointsize';
-
 		// Create JSON obj if it's not already there
-		if ( !this.cartoJSON.point[key] ) this.cartoJSON.point[key] = {};
+		if ( !this.cartoJSON.point.pointsize ) this.cartoJSON.point.pointsize = {};
 
 		// Get stores states
-		var isOn   = this.cartoJSON.point[key].range ? false : true;
-		var val    = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : 1.2;
-		var range  = this.cartoJSON.point[key].range ? this.cartoJSON.point[key].range : false;
-		var minMax = this.cartoJSON.point[key].minMax ? this.cartoJSON.point[key].minMax : false;				
+		var isOn   = this.cartoJSON.point.pointsize.range ? false : true;
+		var val    = this.cartoJSON.point.pointsize.value ? this.cartoJSON.point.pointsize.value : 1.2;
+		var range  = this.cartoJSON.point.pointsize.range ? this.cartoJSON.point.pointsize.range : false;
+		var minMax = this.cartoJSON.point.pointsize.minMax ? this.cartoJSON.point.pointsize.minMax : false;
 
-		var lineOptions = {
-			key 		: key, 
-			wrapper 	: sectionWrapper,
-			input 		: false,
-			title 		: '<b>Point size</b>',
-			isOn 		: isOn,
-			rightPos	: true,
-			type 		: 'miniInput',
-			value 		: val,
-			dropArray 	: this.metaFields,
-			selectedField   : range,
-			tabindex 	: this.tabindex++
-		}
-		this._createMetaFieldLine(lineOptions);	
+		// Container
+		var _pointSizeLine = new Wu.fieldLine({
+			id           : 'pointsize',
+			appendTo     : sectionWrapper,
+			title        : '<b>Point size</b>',
+			input        : false,
+			context      : this,
+			childWrapper : 'point-size-children'
+		});	
+
+		// Dropdown
+		var _opacityDropDown = new Wu.button({
+			id 	 : 'pointsize',
+			type 	 : 'dropdown',
+			right 	 : true,
+			appendTo : _pointSizeLine.container,
+			fn 	 : this._selectedMiniDropDown,
+			context  : this,
+			array 	 : this.metaFields,
+			selected : range,
+			layers   : this._project.getPostGISLayers()
+		});
+
+		// Input
+		var _opacityInput = new Wu.button({
+			id 	    : 'pointsize',
+			type 	    : 'miniInput',
+			right 	    : true,
+			isOn        : isOn,
+			appendTo    : _pointSizeLine.container,
+			value       : val,
+			placeholder : 'auto',
+			tabindex    : this.tabindex++,
+			fn 	    : this._savePointSizeFromBlur,
+			context     : this			
+		});
+
 
 		// SAVE JSON
 		this.cartoJSON.point[key] = {
 			range 	    : range,
 			minMax 	    : minMax,			
-			value 	    : lineOptions.value
+			value 	    : val
 		};
 	},
 
 	// CLEAR POINT OPTIONS
 	clearPointOptions : function () {
 
-		var colorWrapper     = Wu.DomUtil.get('field_wrapper_color');
-		var opacityWrapper   = Wu.DomUtil.get('field_wrapper_opacity');
-		var pointsizeWrapper = Wu.DomUtil.get('field_wrapper_pointsize');
+		var colorWrapper      = Wu.DomUtil.get('field_wrapper_color');
+		var colorChildren     = Wu.DomUtil.get('point-color-children')
+		var opacityWrapper    = Wu.DomUtil.get('field_wrapper_opacity');
+		var pointsizeWrapper  = Wu.DomUtil.get('field_wrapper_pointsize');
+		var pointsizeChildren = Wu.DomUtil.get('point-size-children')
 		
-		if ( colorWrapper ) colorWrapper.remove();
-		if ( opacityWrapper ) opacityWrapper.remove();
-		if ( pointsizeWrapper ) pointsizeWrapper.remove();
+		if ( colorWrapper )      colorWrapper.remove();
+		if ( colorChildren )     colorChildren.remove();
+		if ( opacityWrapper )    opacityWrapper.remove();
+		if ( pointsizeWrapper )  pointsizeWrapper.remove();
+		if ( pointsizeChildren ) pointsizeChildren.remove();
 	},
 
 
@@ -367,40 +451,36 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	initOpenFields : function (options, key) {
 
-
-		// ON LOAD: SHOULD FIELDS BE OPEN OR NOT
-		// ON LOAD: SHOULD FIELDS BE OPEN OR NOT
-		// ON LOAD: SHOULD FIELDS BE OPEN OR NOT						
-
-		if ( key == 'color' ) {
-
-			var colorRange = options.colorRange;
-
-			if ( !colorRange ) return;
-			if ( colorRange == this.options.dropdown.staticText ) return;
-			if ( colorRange == this.options.dropdown.staticDivider ) return;
-			
-			var fieldName = colorRange;
-
-			this.addExtraFields(key, fieldName);
-
-		}
-
-		if ( key == 'pointsize' ) {
-
-			var pointSizeRange = options.pointSizeRange;
-
-			if ( !pointSizeRange ) 	return;
-			if ( pointSizeRange == this.options.dropdown.staticText ) return;
-			if ( pointSizeRange == this.options.dropdown.staticDivider ) return;
-			
-			var fieldName = pointSizeRange;
-
-			this.addExtraFields(key, fieldName);			
-		}
+		if ( key == 'color' )     this._initColorFields(options, key);
+		if ( key == 'pointsize' ) this._initPointSizeFields(options, key);
 	},
 
+	_initColorFields : function(options, key) {
 
+		var colorRange = options.colorRange;
+
+		if ( !colorRange ) return;
+		if ( colorRange == this.options.dropdown.staticText )    return;
+		if ( colorRange == this.options.dropdown.staticDivider ) return;
+		
+		var fieldName = colorRange;
+
+		this.addExtraFields(key, fieldName);
+
+	},
+
+	_initPointSizeFields : function (options, key) {		
+
+		var pointSizeRange = options.pointSizeRange;
+
+		if ( !pointSizeRange ) 	return;
+		if ( pointSizeRange == this.options.dropdown.staticText )    return;
+		if ( pointSizeRange == this.options.dropdown.staticDivider ) return;
+		
+		var fieldName = pointSizeRange;
+
+		this.addExtraFields(key, fieldName);	
+	},
 
 	// SAVERS
 	// SAVERS
@@ -409,16 +489,14 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// On toggle switch button
 	_saveToServer : function (key, title, on) {
 
-		this.initPointOffOn(on);
+		this.initPointOffOn(on, key);
 
 		// UPDATE
 		this._updateStyle();
 	},
 
 
-	initPointOffOn : function (on) {
-
-		var key = 'point';
+	initPointOffOn : function (on, key) {
 
 		if ( on ) {
 			this.cartoJSON[key].enabled = true;
@@ -481,9 +559,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 			Wu.DomUtil.removeClass(wrapper, 'full-width');
 
-			return;		
-		} 			
-
+			return;
+		}
 
 		// SELECTING FIELD
 		// SELECTING FIELD
@@ -510,14 +587,13 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Add fields
 		this.addExtraFields(key, fieldName);
 
-
 		// UPDATE
 		this._updateStyle();
 
 	},
 
-	// ON BLUR IN MINI FIELDS
-	saveMiniBlur : function (e) {
+
+	_saveOpacityFromBlur : function (e) {
 
 		var value = parseFloat(e.target.value);
 		var key   = e.target.id.slice(17, e.target.id.length);
@@ -528,234 +604,113 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			key = key.slice(4, key.length);
 		}
 
+		// Get field 
+		var inputField = Wu.DomUtil.get('field_mini_input_opacity');
 
-		// OPACITY
-		// OPACITY
-		// OPACITY
 
-		// Save static OPACITY value
-		if ( key == 'opacity' ) {
-
-			// Get field 
-			var inputField = Wu.DomUtil.get('field_mini_input_opacity');
-
-
-			// If more than one, make it one
-			if ( value > 1  && value < 10  ) value = 1;
-			if ( value > 10 && value < 100 ) value = value/100;
-			if ( value > 100 ) 	         value = 1;
-			
-
-			// Set value in input
-			inputField.value = value;
-
-			// Do not save if value is unchanged
-			if ( this.cartoJSON.point[key].value == value ) return;
-
-			// Store in json
-			this.cartoJSON.point[key].value = value;
-
-		}
-
-
-		// POINT SIZE
-		// POINT SIZE
-		// POINT SIZE
-
-		// Save static POINT SIZE value
-		if ( key == 'pointsize' ) {
-
-			// Get field 
-			var inputField = Wu.DomUtil.get('field_mini_input_pointsize');
-
-			// If less than 0.5, make it 0.5
-			if ( value < 0.5 ) value = 0.5;
-
-			// Set value in input
-			inputField.value = value;
-
-			// Do not save if value is unchanged
-			if ( this.cartoJSON.point[key].value == value ) return;
-
-			// Stors in json
-			this.cartoJSON.point[key].value = value;
-
-		}	
-
-		// Save dynamic POINT SIZE values
-		if ( key == 'minmaxpointsize' ) {
-
-			var minField = Wu.DomUtil.get('field_mini_input_min_minmaxpointsize');
-			var maxField = Wu.DomUtil.get('field_mini_input_max_minmaxpointsize');
-
-			var defaultMin = 1;
-			var defaultMax = 10;
-
-			if ( pre == 'min_' ) {
-
-				// If not set, use default min
-				if ( isNaN(value) ) value = defaultMin;
-
-				// If less than zero, make it zero
-				if ( value < 0 ) value = 0;
-
-				// Get max value
-				var maxVal = parseFloat(maxField.value);
-
-				// Make sure min value is not higher than max value
-				value = this.validateNumber(value, maxVal, true);
-
-				// Do not save if value is unchanged
-				if ( this.cartoJSON.point.pointsize.minMax[0] == value ) return;
-
-				// Set value in input
-				minField.value = value;
-
-				// Stor in json
-				this.cartoJSON.point.pointsize.minMax[0] = value;
-			
-			}
-
-			if ( pre == 'max_' ) {
-
-				// If not set, use default max
-				if ( isNaN(value) ) value = defaultMax;
-
-				// If less than 0.5, make it 0.5
-				if ( value < 0.5 ) value = 0.5;
-
-				// Get min value
-				var minVal = parseFloat(minField.value);
-
-				// Make sure max value is not less than min value
-				value = this.validateNumber(value, minVal, false);
-
-				// Do not save if value is unchanged
-				if ( this.cartoJSON.point.pointsize.minMax[1] == value ) return;
-
-				// Set value in input
-				maxField.value = value;
-
-				// Store in json
-				this.cartoJSON.point.pointsize.minMax[1] = value;	
-			}	
-		}
-
-
-		// COLOR RANGE
-		// COLOR RANGE
-		// COLOR RANGE
-
-		if ( key == 'minmaxcolorrange' ) {
-
-			var maxField = Wu.DomUtil.get('field_mini_input_max_minmaxcolorrange');
-			var minField = Wu.DomUtil.get('field_mini_input_min_minmaxcolorrange');			
-			
-			if ( pre == 'min_' ) {
-
-				// SAVE MIN AND MAX VALUE
-				var maxVal = parseFloat(maxField.value);
-
-				if ( isNaN(value)  ) value  = this.cartoJSON.point.color.minMax[0];
-				if ( isNaN(maxVal) ) maxVal = this.cartoJSON.point.color.minMax[1];
-
-				value = this.validateNumber(value, maxVal, true);
-
-				// Do not save if value is unchanged
-				if ( this.cartoJSON.point.color.customMinMax[0] == value ) return;
-
-				minField.value = value;
-
-				this.cartoJSON.point.color.customMinMax = [value, maxVal];
-			}
-
-			if ( pre == 'max_' ) {
-
-				// SAVE MIN AND MAX VALUE
-				
-				var minVal = parseFloat(minField.value);
-				
-				if ( isNaN(value) )  value = this.cartoJSON.point.color.minMax[1];
-				if ( isNaN(minVal) ) minVal = this.cartoJSON.point.color.minMax[0];
-
-				value = this.validateNumber(value, minVal, false);
-
-				// Do not save if value is unchanged
-				if ( this.cartoJSON.point.color.customMinMax[1] == value ) return;
-
-				maxField.value = value;
-
-				this.cartoJSON.point.color.customMinMax = [minVal, value];
-			}			
-		}
-
-
-		// UPDATE
-		this._updateStyle();
-
-	},	
-
-	updateColor : function (hex, key, wrapper) {
-
-
-		if ( key == 'color' ) {
-			this.cartoJSON.point[key].staticVal = hex;
-		}
-
-		if ( key == 'colorrange' ) {
-
-			
-			var colorBall_1 = Wu.DomUtil.get('color-range-ball-1-' + key);
-			var colorBall_2 = Wu.DomUtil.get('color-range-ball-2-' + key);
-			var colorBall_3 = Wu.DomUtil.get('color-range-ball-3-' + key);
-
-			// Litt klønete koding her... 
-			// men bakgrunnsfarge blir alltid lest som RGB, 
-			// selv om man skriver den som HEX. Burde kanskje
-			// hatt en RGB2HEX istedet, men jeg gjorde det nå
-			// sånn her i første omgang. Det funker.
-
-			// Set HEX value on ball we've changed
-			wrapper.setAttribute('hex', hex);
-
-			// Get color values
-			var color1 = colorBall_1.getAttribute('hex');
-			var color2 = colorBall_2.getAttribute('hex');
-			var color3 = colorBall_3.getAttribute('hex');
-
-
-			// Build color array
-			// var colors = [color1, color2, color3];
-			var colors = this.convertToFiveColors([color1, color2, color3]);
-
-			// Color range bar
-			var colorRangeBar = Wu.DomUtil.get('chrome-color-range_' + key);
-
-			// Set styling
+		// If more than one, make it one
+		if ( value > 1  && value < 10  ) value = 1;
+		if ( value > 10 && value < 100 ) value = value/100;
+		if ( value > 100 ) 	         value = 1;
 		
-			var gradientStyle = this._gradientStyle(colors);
 
-			colorRangeBar.setAttribute('style', gradientStyle);
+		// Set value in input
+		inputField.value = value;
 
-			// Do not save if value is unchanged
-			// if ( this.cartoJSON.point.color.value == value ) return;
-			if ( this.cartoJSON.point.color.value == colors ) return;
+		// Do not save if value is unchanged
+		if ( this.cartoJSON.point[key].value == value ) return;
 
-			// Store in JSON
-			this.cartoJSON.point.color.value = colors;
+		// Store in json
+		this.cartoJSON.point[key].value = value;
 
+
+		this._updateStyle();
+		
+	},
+
+	_savePointSizeFromBlur : function (e) {
+
+		var value = parseFloat(e.target.value);
+		var key   = e.target.id.slice(17, e.target.id.length);
+		
+		var pre = key.substring(0,4);
+
+		if ( pre == 'min_' || pre == 'max_' ) {
+			key = key.slice(4, key.length);
 		}
 
-		this._closeColorRangeSelector();
+		// Get field 
+		var inputField = Wu.DomUtil.get('field_mini_input_pointsize');
 
-		// UPDATE
+		// If less than 0.5, make it 0.5
+		if ( value < 0.5 ) value = 0.5;
+
+		// Set value in input
+		inputField.value = value;
+
+		// Do not save if value is unchanged
+		if ( this.cartoJSON.point[key].value == value ) return;
+
+		// Stors in json
+		this.cartoJSON.point[key].value = value;
+
 		this._updateStyle();
 
 	},
 
 
+	_updateColorBall : function (hex, key, wrapper, context) {
 
-	// xoxoxoxox
+		// Store
+		context.cartoJSON.point[key].staticVal = hex;
+		
+		// Close
+		context._closeColorRangeSelector();
+
+		// UPDATE
+		context._updateStyle();		
+	},
+
+	updateColorRange : function (hex, key, wrapper, context) {
+
+		context = context.options.context;
+
+		var colorBall_1 = Wu.DomUtil.get('color-range-ball-1-' + key);
+		var colorBall_2 = Wu.DomUtil.get('color-range-ball-2-' + key);
+		var colorBall_3 = Wu.DomUtil.get('color-range-ball-3-' + key);
+
+		// Set HEX value on ball we've changed
+		wrapper.setAttribute('hex', hex);
+
+		// Get color values
+		var color1 = colorBall_1.getAttribute('hex');
+		var color2 = colorBall_2.getAttribute('hex');
+		var color3 = colorBall_3.getAttribute('hex');
+
+		// Build color array
+		var colors = context.convertToFiveColors([color1, color2, color3]);
+
+		// Color range bar
+		var colorRangeBar = Wu.DomUtil.get('chrome-color-range_' + key);
+
+		// Set styling
+		var gradientStyle = context._gradientStyle(colors);
+
+		colorRangeBar.setAttribute('style', gradientStyle);
+
+		// Do not save if value is unchanged
+		if ( context.cartoJSON.point.color.value == colors ) return;
+
+		// Store in JSON
+		context.cartoJSON.point.color.value = colors;
+
+		context._closeColorRangeSelector();
+
+		// UPDATE
+		context._updateStyle();
+
+	},
+
 	selectColorPreset : function (e) {
 
 		var elem = e.target;
@@ -845,13 +800,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			colorArray = ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'];
 		}
 
-
-
-
 		return colorArray;
 
 	},
-
 
 
 	// ADD EXTRA FIELDS
@@ -862,106 +813,141 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	addExtraFields : function (key, fieldName) {
 
 		// ADD COLOR FIELDS
-		this.addColorFields(key, fieldName);
+		if ( key == 'color' ) this.addColorFields(key, fieldName);
 		
 		// ADD POINT SIZE FIELDS
-		this.addPointSizeFields(key, fieldName);
+		if ( key == 'pointsize') this.addPointSizeFields(key, fieldName);
 	},
 
 	// ADD COLOR FIELDS
 	addColorFields : function (key, fieldName) {
 
+		console.log('');
+		console.log('addColorFields', key);
 
-		if ( key == 'color' ) {
+		var defaultRange = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'];
+		var value  = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : defaultRange;
 
-			// Get wrapper
-			var fieldsWrapper = Wu.DomUtil.get('field_wrapper_color');
+		if ( value.constructor !== Array ) return;
 
-			// UPDATE MIN/MAX IF IT'S ALREADY OPEN
-			// UPDATE MIN/MAX IF IT'S ALREADY OPEN	
-			// UPDATE MIN/MAX IF IT'S ALREADY OPEN
+		// Get wrapper
+		var childWrapper = Wu.DomUtil.get('point-color-children');
 
-			var fieldMaxRange = Math.floor(this.columns[fieldName].max * 10) / 10;
-			var fieldMinRange = Math.floor(this.columns[fieldName].min * 10) / 10;
+		// UPDATE MIN/MAX IF IT'S ALREADY OPEN
+		// UPDATE MIN/MAX IF IT'S ALREADY OPEN	
+		// UPDATE MIN/MAX IF IT'S ALREADY OPEN
 
-			// Do not add if we've already added it!
-			var minMaxColorRange = Wu.DomUtil.get('field_wrapper_minmaxcolorrange');
-			
-			if ( minMaxColorRange ) {
-			
-				var max = Wu.DomUtil.get('field_mini_input_max_minmaxcolorrange');
-				var min = Wu.DomUtil.get('field_mini_input_min_minmaxcolorrange');
-				max.value = fieldMaxRange;
-				min.value = fieldMinRange;
+		var fieldMaxRange = Math.floor(this.columns[fieldName].max * 10) / 10;
+		var fieldMinRange = Math.floor(this.columns[fieldName].min * 10) / 10;
 
-				this.cartoJSON.point[key].customMinMax = false;
-
-				return;
-			}
-
-			// COLOR RANGE
-			// COLOR RANGE
-			// COLOR RANGE
-			// var defaultRange = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'];
-			var defaultRange = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'];
-
-			// Get stores states
-			var value  = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : defaultRange;
-
-
-			if ( value.length < 5 ) value = this.convertToFiveColors(value);
-
-			var lineOptions = {
-				key 		: 'colorrange', 
-				wrapper 	: fieldsWrapper,
-				input 		: false,
-				title 		: 'Color range',
-				isOn 		: false,
-				rightPos	: true,
-				type 		: 'colorrange',
-				value 		: value
-			}
-			this._createMetaFieldLine(lineOptions);	
+		// Do not add if we've already added it!
+		var minMaxColorRange = Wu.DomUtil.get('field_wrapper_minmaxcolorrange');
 		
-			// SAVE JSON
-			this.cartoJSON.point[key].range = fieldName;
-			this.cartoJSON.point[key].value = value;
+		if ( minMaxColorRange ) {
+		
+			var max = Wu.DomUtil.get('field_mini_input_max_minmaxcolorrange');
+			var min = Wu.DomUtil.get('field_mini_input_min_minmaxcolorrange');
+			max.value = fieldMaxRange;
+			min.value = fieldMinRange;
 
+			this.cartoJSON.point[key].customMinMax = false;
 
-
-
-			// MIN/MAX
-			// MIN/MAX
-			// MIN/MAX
-
-			var value  = this.cartoJSON.point[key].customMinMax ? this.cartoJSON.point[key].customMinMax : [fieldMinRange, fieldMaxRange];
-
-			
-			// Use placeholder value if empty
-			if ( isNaN(value[0]) ) value[0] = fieldMinRange;
-			if ( isNaN(value[1]) ) value[1] = fieldMaxRange;
-
-
-			var lineOptions = {
-				key 		: 'minmaxcolorrange', 
-				wrapper 	: fieldsWrapper,
-				input 		: false,
-				title 		: 'Min/max range',
-				isOn 		: false,
-				rightPos	: true,
-				type 		: 'dualMiniInput',
-				value 		: value,
-				minMax 		: [fieldMinRange, fieldMaxRange],
-				tabindex 	: [this.tabindex++, this.tabindex++]
-			}
-			this._createMetaFieldLine(lineOptions);
-
-			// SAVE JSON
-			this.cartoJSON.point[key].customMinMax = value;
-			this.cartoJSON.point[key].minMax       = [fieldMinRange, fieldMaxRange];
-			
-
+			return;
 		}
+
+
+
+		if ( value.length < 5 ) value = this.convertToFiveColors(value);
+
+		// Container
+		var _colorRangeLine = new Wu.fieldLine({
+			id        : 'colorrange',
+			appendTo  : childWrapper,
+			title     : 'Color range',
+			input     : false,
+			context   : this,
+			className : 'sub-line'
+		});
+
+
+		
+		// Dropdown
+		var _colorRangePicker = new Wu.button({
+			id 	  : 'colorrange',
+			type 	  : 'colorrange',
+			right 	  : true,
+			appendTo  : _colorRangeLine.container,
+			presetFn  : this.selectColorPreset,
+			customFn  : this.updateColorRange,
+			context   : this,
+			value     : value
+		});
+	
+		// SAVE JSON
+		this.cartoJSON.point[key].range = fieldName;
+		this.cartoJSON.point[key].value = value;
+
+		// MIN/MAX
+		// MIN/MAX
+		// MIN/MAX
+
+		var value  = this.cartoJSON.point[key].customMinMax ? this.cartoJSON.point[key].customMinMax : [fieldMinRange, fieldMaxRange];
+		
+		// Use placeholder value if empty
+		if ( isNaN(value[0]) ) value[0] = fieldMinRange;
+		if ( isNaN(value[1]) ) value[1] = fieldMaxRange;
+
+		// Container
+		var _minMaxLine = new Wu.fieldLine({
+			id        : 'minmaxcolorrange',
+			appendTo  : childWrapper,
+			title     : 'Min/max range',
+			input     : false,
+			context   : this,
+			className : 'sub-line'
+		});
+
+		// Inputs
+		var _minMaxInputs = new Wu.button({
+			id 	  : 'minmaxcolorrange',
+			type 	  : 'dualinput',
+			right 	  : true,
+			appendTo  : _minMaxLine.container,
+			context   : this,
+			value     : value,
+			fn        : this.saveColorRangeDualBlur,
+			minmax    : [fieldMinRange, fieldMaxRange],
+			tabindex  : [this.tabindex++, this.tabindex++]
+		});
+
+
+		// SAVE JSON
+		this.cartoJSON.point[key].customMinMax = value;
+		this.cartoJSON.point[key].minMax       = [fieldMinRange, fieldMaxRange];
+		
+
+	},
+
+
+	saveColorRangeDualBlur : function (max, min, absoluteMax, absoluteMin, context) {
+
+		if ( !max ) max = absoluteMax;
+		if ( !min ) min = absoluteMin;
+
+		context.cartoJSON.point.color.customMinMax = [min, max];
+		context._updateStyle();
+
+	},
+
+	savePointSizeDualBlur : function (max, min, absoluteMax, absoluteMin, context) {
+
+		if ( !max ) max = absoluteMax;
+		if ( !min ) min = absoluteMin;		
+
+		// xoxoxoxoxoxoxo
+		context.cartoJSON.point.pointsize.minMax = [min, max];
+		context._updateStyle();
+
 	},
 
 	validateNumber : function (originNo, compareTo, isLess) {
@@ -984,34 +970,45 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// ADD POINT SIZE FIELDS
 	addPointSizeFields : function (key, fieldName) {
 
-		if ( key == 'pointsize' ) {
+		// var fieldsWrapper = Wu.DomUtil.get('field_wrapper_pointsize');
+		var childWrapper = Wu.DomUtil.get('point-size-children');
 
-			var fieldsWrapper = Wu.DomUtil.get('field_wrapper_pointsize');
+		// Do not add if we've already added it!
+		var minMaxPointSize = Wu.DomUtil.get('field_wrapper_minmaxpointsize');
+		if ( minMaxPointSize ) return;
 
-			// Do not add if we've already added it!
-			var minMaxPointSize = Wu.DomUtil.get('field_wrapper_minmaxpointsize');
-			if ( minMaxPointSize ) return;
+		var minMax  = this.cartoJSON.point[key].minMax ? this.cartoJSON.point[key].minMax : [1,10];
 
-			var minMax  = this.cartoJSON.point[key].minMax ? this.cartoJSON.point[key].minMax : [1,10];
+		var _minMaxPointSize = new Wu.fieldLine({
+			id        : 'minmaxpointsize',
+			appendTo  : childWrapper,
+			title     : 'Min/max point size',
+			input     : false,
+			context   : this,
+			className : 'sub-line'
+		});
 
-			var lineOptions = {
-				key 		: 'minmaxpointsize', 
-				wrapper 	: fieldsWrapper,
-				input 		: false,
-				title 		: 'Min/max point size',
-				isOn 		: false,
-				rightPos	: true,
-				type 		: 'dualMiniInput',
-				value 		: minMax,
-				tabindex 	: [this.tabindex++, this.tabindex++]
-			}
-			this._createMetaFieldLine(lineOptions);	
-					
-			// SAVE JSON
-			this.cartoJSON.point[key].range  = fieldName;
-			this.cartoJSON.point[key].minMax = minMax;
 
-		}
+		console.log('this.cartoJSON.point[key].minMax', this.cartoJSON.point[key].minMax);
+
+		// Inputs
+		var _minMaxPointSizeInputs = new Wu.button({
+			id 	  : 'minmaxpointsize',
+			type 	  : 'dualinput',
+			right 	  : true,
+			appendTo  : _minMaxPointSize.container,
+			context   : this,
+			value     : minMax,
+			fn        : this.savePointSizeDualBlur,
+			minmax    : minMax,
+			tabindex  : [this.tabindex++, this.tabindex++]
+		});
+
+
+		// SAVE JSON
+		this.cartoJSON.point[key].range  = fieldName;
+		this.cartoJSON.point[key].minMax = minMax;
+
 	},
 
 	// CLEAN UP EXTRA FIELDS
@@ -1052,6 +1049,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	_updateStyle : function () {
 
+		console.log('');
+		console.log('updateStyle');
+
 		this.getCartoCSSFromJSON(this.cartoJSON, function (ctx, finalCarto) {
 			this.saveCartoJSON(finalCarto);
 		});
@@ -1083,7 +1083,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		    layer = options.layer,
 		    file_id = layer.getFileUuid(),
 		    sql = options.sql,
-		    // sql = this._createSQL(file_id, sql),
 		    project = this._project;
 
 
