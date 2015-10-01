@@ -24,7 +24,7 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 		this._search.setAttribute("placeholder", "Search users");
 
 		// Add user button
-		this._addUser = Wu.DomUtil.create('div', 'users-add-user smap-button-gray users', this._usersControlsInner, 'Create user');
+		// this._addUser = Wu.DomUtil.create('div', 'users-add-user smap-button-gray users', this._usersControlsInner, 'Create user');
 
 		// Delete user button
 		this._deleteUser = Wu.DomUtil.create('div', 'users-delete-user smap-button-gray users', this._usersControlsInner, 'Delete user');
@@ -84,29 +84,27 @@ Wu.SidePane.Users = Wu.SidePane.Item.extend({
 	addEditHooks : function () {
 		
 		// add button
-		Wu.DomEvent.on(this._addUser, 'mousedown', this.inputUser, this);
+		// Wu.DomEvent.on(this._addUser, 'mousedown', this.inputUser, this);
 
 		// delete button
 		Wu.DomEvent.on(this._deleteUser, 'mousedown', this.deleteUser, this);
 
 		// show edit buttons
-		Wu.DomUtil.removeClass(this._addUser, 'displayNone');
+		// Wu.DomUtil.removeClass(this._addUser, 'displayNone');
 		Wu.DomUtil.removeClass(this._deleteUser, 'displayNone');
-		Wu.DomUtil.removeClass(this._addUser, 'displayNone');
 	},
 
 	removeEditHooks : function () {
 		
 		// add button
-		Wu.DomEvent.off(this._addUser, 'mousedown', this.inputUser, this);
+		// Wu.DomEvent.off(this._addUser, 'mousedown', this.inputUser, this);
 
 		// delete button
 		Wu.DomEvent.off(this._deleteUser, 'mousedown', this.deleteUser, this);
 
 		// hide edit buttons
-		Wu.DomUtil.addClass(this._addUser, 'displayNone');
+		// Wu.DomUtil.addClass(this._addUser, 'displayNone');
 		Wu.DomUtil.addClass(this._deleteUser, 'displayNone');
-		Wu.DomUtil.addClass(this._addUser, 'displayNone');
 	},
 
 	// fired when different sidepane selected, for clean-up
