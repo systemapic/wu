@@ -17,7 +17,7 @@ Wu.Popup.Chart = L.Control.extend({
 		zoomAnimation: false,
 		defaultPosition : {
 			x : 7,
-			y : 6
+			y : 6 		// from bottom
 			// y : 48 	// from bottom
 		}
 	},
@@ -118,6 +118,7 @@ Wu.Popup.Chart = L.Control.extend({
 	},
 
 	close : function () {
+		console.log('popup.chart.close()');
 		this._map.fire('popupclose')
 		this._remove();
 	},
@@ -164,7 +165,7 @@ Wu.Popup.Chart = L.Control.extend({
 
 		// or, set default, set from bottom
 		var pos = this.options.defaultPosition;
-		this.setPosition(pos, true);
+		this.setPosition(pos);
 	},
 
 	getSavedPosition : function () {
@@ -183,6 +184,8 @@ Wu.Popup.Chart = L.Control.extend({
 	},
 
 	_dragStart : function (e) {
+
+		console.log('dragstart');
 
 		// get mouse pos offset in relation to popup
 		var popupPosition = {
@@ -214,6 +217,9 @@ Wu.Popup.Chart = L.Control.extend({
 	},
 
 	_dragStop : function (e) {
+
+		console.log('dragstop');
+
 		
 		// remove events
 		Wu.DomEvent.off(this._ghost, 'mouseup', this._dragStop, this);
@@ -229,10 +235,14 @@ Wu.Popup.Chart = L.Control.extend({
 
 	_dragging : function (e) {
 
+		console.log('draggin');
+
+		var window_height = this._getWindowDimensions().height;
+
 		// calc pos
 		var diff = {
 			x : e.offsetX - this._mouseOffset.x,
-			y : e.offsetY - this._mouseOffset.y
+			y : window_height - (e.offsetY - this._mouseOffset.y) - this._container.offsetHeight // todo: calc from bottom instead
 		}
 
 		// set pos
@@ -242,17 +252,26 @@ Wu.Popup.Chart = L.Control.extend({
 		});
 	},
 
+	_getWindowDimensions : function () {
+		
+		var dims = {};
+		dims.width = window.innerWidth
+			|| document.documentElement.clientWidth
+			|| document.body.clientWidth;
+
+		dims.height = window.innerHeight
+			|| document.documentElement.clientHeight
+			|| document.body.clientHeight;
+		return dims;
+	},
+
 	setPosition : function (position, bottom) {
 
 		// set left
 		this._container.style.left = position.x + 'px';
 
-		// set top/bottom
-		if (bottom) {
-			this._container.style.bottom = position.y + 'px';
-		} else {
-			this._container.style.top = position.y + 'px';
-		}
+		// set bottom
+		this._container.style.bottom = position.y + 'px';
 
 		// remember last pos
 		this._lastPopupPos = position;

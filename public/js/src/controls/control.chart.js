@@ -117,12 +117,15 @@ Wu.Control.Chart = Wu.Control.extend({
 		map.on('popupclose',  this._clearPopup, this);
 	},
 
+	_removePopupCloseEvent : function () {
+		var map = app._map;
+		map.off('popupclose',  this._clearPopup, this);
+	},
+
 	_refresh : function () {
 
-		if (this._popup) {
-			this._popup._remove();
-		} 
-
+		if (this._popup) this._popup._remove();
+		
 		this._clearPopup(false);
 	},
 
@@ -138,6 +141,8 @@ Wu.Control.Chart = Wu.Control.extend({
 		// remove marker
 		this.popUpMarkerCircle && app._map.removeLayer(this.popUpMarkerCircle);
 
+		// remove event
+		this._removePopupCloseEvent();
 	},
 	
 	// Create leaflet pop-up
