@@ -492,8 +492,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	// ENABLE LAYER (AND SAVE)
 	enableLayer : function (uuid) {
 
-		console.log('%c enableLayer ', 'background: blue; color: white;');
-
 		var layer = this._project.layers[uuid];
 
 		var layerMenu = app.MapPane.getControls().layermenu;
@@ -502,8 +500,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 	// DISABLE LAYER (AND SAVE)
 	disableLayer : function (uuid) {
-
-		console.log('%c disableLayer ', 'background: blue; color: white;');
 
 		var layer = this._project.layers[uuid];
 		var _uuid = layer.store.uuid;

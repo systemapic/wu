@@ -32,7 +32,11 @@ Wu.Control = L.Control.extend({
 
 	_projectSelected : function (e) {
 		var projectUuid = e.detail.projectUuid;
+<<<<<<< HEAD
 		
+=======
+
+>>>>>>> cb22419a17dabd0527efed82b81adc4762ebff87
 		if (!projectUuid) {
 			this._project = null;
 			return this._off();
