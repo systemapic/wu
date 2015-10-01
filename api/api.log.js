@@ -5,7 +5,7 @@ var _ = require('lodash-node');
 var api = module.parent.exports;
 
 // logger
-var logger = new (winston.Logger)({
+var winston_logger = new (winston.Logger)({
 	
 	transports: [
 
@@ -36,18 +36,26 @@ var logger = new (winston.Logger)({
 
 // globally pipe console to winston
 console.log = function () {
-	var arr = _.toArray(arguments);
-	console.info(arr);
-	// console.info(arr.join(' '));
-	logger.info(arguments);
+	try {
+		var arr = _.toArray(arguments);
+		console.info(arr);
+		winston_logger.info(arguments);
+
+	} catch (e) {
+		console.info('CONSOLE ERROR 1', e);
+	}
 }
 console.error = function () {
-	var arr = _.toArray(arguments);
-	console.info(arr.join(' '));
-	logger.error(arguments);
+	try {
+		var arr = _.toArray(arguments);
+		console.info(arr.join(' '));
+		winston_logger.error(arguments);
+	} catch (e) {
+		console.info('CONSOLE.ERROR', e);
+	}
 }
 
 // exports
 module.exports = api.log = { 
-	winston : logger
+	winston : winston_logger
 }
