@@ -633,14 +633,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		x.unshift(xName);
 		y.unshift(yName);
 
-
-		// var reg_y = this._calculateRegression(c3Obj);
-		// var reg_x = ['reg_x', x[1], x[x.length-1]];
-
-		// _columns = [x, y, reg_x, reg_y];
-
 		_columns = [x, y];
-
 
 
 		// Create container
@@ -728,8 +721,6 @@ Wu.Control.Chart = Wu.Control.extend({
 						var nnDate = moment(d).format("DD.MM.YYYY");
 						return nnDate;
 					},
-					// name: function (name, ratio, id, index) { return 'fetta'; }
-			
 				},
 				
 			},	        
@@ -738,13 +729,6 @@ Wu.Control.Chart = Wu.Control.extend({
 				pattern: ['#000000']
 			}		        
 		});
-
-
-		// var regLine = this._chart.append('line')
-
-
-
-
 
 
 		// add zoom events
@@ -759,55 +743,45 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	_addRegressionButton : function () {
 
-		console.log('create regresison button');
-
 		var w = Wu.DomUtil.create('div', 'regression-button-wrapper', this._footerContainer);
 
-		// var button = this._regressionButton = Wu.DomUtil.create('input', 'chart-regression-button', w);
-		// button.type = 'checkbox';
-		// button.id = 'regression';
-
-		var button = this._regressionButton = Wu.DomUtil.create('div', 'chrome-switch-container', w);
-		
-		button.setAttribute('on', 'false');
-		// button.type = 'checkbox';
-		button.id = 'regression';
-
-
-		// radio-on
+		this.regressionButton = new Wu.button({ 
+			type 	 : 'switch',
+			isOn 	 : false,
+			right 	 : false,
+			id 	 : 'regression-button',
+			appendTo : w,
+			fn 	 : this._updateRegression,
+			context  : this
+		})
 
 		// label
 		var label = Wu.DomUtil.create('label', 'invite-permissions-label', w);
 		label.htmlFor = 'regression';
 		label.appendChild(document.createTextNode('Regression'));
 
-		// change event
-		// Wu.DomEvent.on(button, 'change', this._toggleRegression, this);
-
-		Wu.DomEvent.on(button, 'click', this._toggleRegression, this);
 
 	},
 
-	_toggleRegression : function (e) {
+	_updateRegression : function (e, context) {
 
 		var elem = e.target;
 		var on = elem.getAttribute('on');
 
+		if ( on == 'false' || !on ) {
 
-		if ( on == 'false' ) {
-			
 			Wu.DomUtil.addClass(elem, 'switch-on');
 			elem.setAttribute('on', 'true');
 
 			// get regression 
-			var reg = this._calculateRegression();
-			var x = this._c3Obj.d3array.x;
+			var reg = context._calculateRegression();
+			var x = context._c3Obj.d3array.x;
 
 			var reg_y = [reg[0], reg[1], reg[reg.length-1]];
 			var reg_x = ['reg_x', x[1], x[x.length-1]];
 
 			// add to chart
-			this._chart.load({
+			context._chart.load({
 				columns: [reg_x, reg_y]
 			});
 
@@ -817,7 +791,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			Wu.DomUtil.removeClass(elem, 'switch-on');
 			elem.setAttribute('on', 'false');
 
-			this._chart.unload({
+			context._chart.unload({
 				ids : 'regression'
 			})
 
