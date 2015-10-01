@@ -460,7 +460,7 @@ Wu.Files = Wu.Class.extend({
 					raster : layer.layerUuid
 				},
 				metadata : layer.options.metadata, 	// TODO
-				title : 'Layer from ' + file.getName(),
+				title : 'Layer: ' + file.getName(),
 				description : 'Description: Layer created from ' + file.getName(),
 				file : file.getUuid(),
 				// style : JSON.stringify(defaultStyle) // save default json style
@@ -552,7 +552,7 @@ Wu.Files = Wu.Class.extend({
 					postgis : layer.options
 				},
 				metadata : layer.options.metadata,
-				title : 'Layer from ' + file.getName(),
+				title : 'Layer: ' + file.getName(),
 				description : 'Description: Layer created from ' + file.getName(),
 				file : file.getUuid(),
 				style : JSON.stringify(defaultStyle) // save default json style

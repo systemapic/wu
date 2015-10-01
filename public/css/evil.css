@@ -1,4 +1,4 @@
-/* KNUT KNUT KNUT KNUT */
+ KNUT KNUT KNUT KNUT */
 /* KNUT KNUT KNUT KNUT */
 /* KNUT KNUT KNUT KNUT */
 /* KNUT KNUT KNUT KNUT */
@@ -2074,6 +2074,9 @@ aka feedback pane
 
 .chrome-switch-container {
 	z-index: 99999999;
+
+	position: absolute;
+  	top: 6px;	
 }	
 
 
@@ -2161,3 +2164,112 @@ td.name {
 
 
 
+
+
+
+.right-switch {
+	float: right;
+	margin-left: 10px;
+	margin-right: 0;
+	top: 5px;
+	position: absolute;
+	right: 0;	
+	}
+
+.chrome-field-line {
+	display: inline-block;
+	position: relative;
+	}
+
+.setClear, .chrome-set {
+	display: inline-block;
+	}
+
+/*.chrome-pane.layers */
+.chrome-field-line,
+.chrome-field-input {
+	/*padding-left: 0;*/
+	padding-left: 39px;
+	}
+
+
+.chrome-field-mini-input, 
+.chrome-field-mini-input:focus {
+	/*left: 0;
+	top: 4px;
+	position: absolute;*/	
+	}
+
+.chrome-pane.styler .chrome-field-line {
+  	padding-left: 0px;	
+	}
+
+.chrome-pane.chrome-tooltip .chrome-field-mini-input  {
+	position: absolute;
+	left: 0;
+	top: 4px;
+	}
+
+
+.deactivated-layer:before {
+	left: 0;
+	z-index: 9999999999999;
+	height: 86%;
+	}
+
+.chrome-pane.styler .select-field-wrap {
+	margin-top: 1px;
+	float: right;
+	position: relative;	
+	}
+
+.chrome-pane.styler .chrome-color-ball {
+	position: absolute;
+	}
+
+.chrome-pane.styler .select-field-wrap {
+	position: absolute;
+  	top: 6px;
+	}
+
+.disable-color-ball {
+	display: none;
+	}
+
+.chrome-metafield-line-children .chrome-metafield-line {
+	border-top: 1px dashed #ccc;
+	border-bottom: none;
+	}
+
+.chrome-metafield-line-children:last-child {
+	border-bottom: 1px solid;
+	}
+
+.chrome-pane.styler .chrome-switch-container {
+	top: 10px;
+	right: 4px;	
+	}
+
+
+
+
+.relative-switch {
+	position: relative;
+	top: 0;
+}
+
+
+.chrome-content.chrome-pane.extras .chrome-field-line, 
+.chrome-content.chrome-pane.extras .chrome-field-input {
+	padding-left: 0;
+}
+
+.layer-active .layer-menu-flyto {
+	height: 21px;	
+	}
+
+
+.no-padding .chrome-field-line,
+.no-padding .chrome-field-input {
+	padding-left: 0;
+	}	

@@ -321,6 +321,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		// Enable settings from layer we're working with
 		var layerUuid = this._getActiveLayerUuid();
+		console.log('layerUuid');
 		if (layerUuid) this._selectedActiveLayer(false, layerUuid);		
 
 		// Select layer we're working on
@@ -405,7 +406,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		]
 
 		// fill dropdown
-		columns.forEach(function (column) {
+		columns && columns.forEach(function (column) {
 			if (mute_columns.indexOf(column) == -1) {
 				var option = Wu.DomUtil.create('option', 'active-layer-option', select);
 				option.value = column;
