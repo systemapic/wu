@@ -747,13 +747,13 @@ Wu.Control.Chart = Wu.Control.extend({
 		var w = Wu.DomUtil.create('div', 'regression-button-wrapper', this._footerContainer);
 
 		this.regressionButton = new Wu.button({ 
-			type 	 : 'switch',
-			isOn 	 : false,
-			right 	 : false,
-			id 	 : 'regression-button',
-			appendTo : w,
-			fn 	 : this._updateRegression,
-			context  : this
+			type 	  : 'switch',
+			isOn 	  : false,
+			right 	  : false,
+			id 	  : 'regression-button',
+			appendTo  : w,
+			fn 	  : this._updateRegression.bind(this),
+			className : 'relative-switch'
 		})
 
 		// label
@@ -764,7 +764,7 @@ Wu.Control.Chart = Wu.Control.extend({
 
 	},
 
-	_updateRegression : function (e, context) {
+	_updateRegression : function (e) {
 
 		var elem = e.target;
 		var on = elem.getAttribute('on');
@@ -775,14 +775,14 @@ Wu.Control.Chart = Wu.Control.extend({
 			elem.setAttribute('on', 'true');
 
 			// get regression 
-			var reg = context._calculateRegression();
-			var x = context._c3Obj.d3array.x;
+			var reg = this._calculateRegression();
+			var x = this._c3Obj.d3array.x;
 
 			var reg_y = [reg[0], reg[1], reg[reg.length-1]];
 			var reg_x = ['reg_x', x[1], x[x.length-1]];
 
 			// add to chart
-			context._chart.load({
+			this._chart.load({
 				columns: [reg_x, reg_y]
 			});
 
@@ -792,7 +792,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			Wu.DomUtil.removeClass(elem, 'switch-on');
 			elem.setAttribute('on', 'false');
 
-			context._chart.unload({
+			this._chart.unload({
 				ids : 'regression'
 			})
 

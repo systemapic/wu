@@ -2074,6 +2074,9 @@ aka feedback pane
 
 .chrome-switch-container {
 	z-index: 99999999;
+
+	position: absolute;
+  	top: 6px;	
 }	
 
 
@@ -2182,13 +2185,36 @@ td.name {
 	display: inline-block;
 	}
 
-.chrome-pane.layers .chrome-field-line {
-	padding-left: 0;
+/*.chrome-pane.layers */
+.chrome-field-line,
+.chrome-field-input {
+	/*padding-left: 0;*/
+	padding-left: 39px;
 	}
+
+
+.chrome-field-mini-input, 
+.chrome-field-mini-input:focus {
+	/*left: 0;
+	top: 4px;
+	position: absolute;*/	
+	}
+
+.chrome-pane.styler .chrome-field-line {
+  	padding-left: 0px;	
+	}
+
+.chrome-pane.chrome-tooltip .chrome-field-mini-input  {
+	position: absolute;
+	left: 0;
+	top: 4px;
+	}
+
 
 .deactivated-layer:before {
 	left: 0;
 	z-index: 9999999999999;
+	height: 86%;
 	}
 
 .chrome-pane.styler .select-field-wrap {
@@ -2224,3 +2250,20 @@ td.name {
 	right: 4px;	
 	}
 
+
+
+
+.relative-switch {
+	position: relative;
+	top: 0;
+}
+
+
+.chrome-content.chrome-pane.extras .chrome-field-line, 
+.chrome-content.chrome-pane.extras .chrome-field-input {
+	padding-left: 0;
+}
+
+.layer-active .layer-menu-flyto {
+	height: 21px;	
+	}

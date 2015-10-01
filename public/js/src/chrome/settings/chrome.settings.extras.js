@@ -71,21 +71,19 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			id       : 'satelliteAngle',
 			appendTo : wrapper,
 			title    : 'Satellite angle',
-			input    : false,
-			context  : this			
+			input    : false,		
 		})
 
 		var angleMiniInput = new Wu.button({
 			id 	    : 'satelliteAngle',
 			type 	    : 'miniInput',
-			right 	    : true,
+			right 	    : false,
 			isOn        : true,
 			appendTo    : angleLine.container,
 			value       : angle,
 			placeholder : 'none',
 			tabindex    : 1,
-			fn 	    : this._saveMiniBlur,
-			context     : this			
+			fn 	    : this._saveMiniBlur.bind(this),
 		})
 
 
@@ -97,21 +95,19 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			id       : 'satellitePath',
 			appendTo : wrapper,
 			title    : 'Satellite path',
-			input    : false,
-			context  : this			
+			input    : false,	
 		})
 
 		var pathMiniInput = new Wu.button({
 			id 	    : 'satellitePath',
 			type 	    : 'miniInput',
-			right 	    : true,
+			right 	    : false,
 			isOn        : true,
 			appendTo    : pathLine.container,
 			value       : path,
 			placeholder : 'none',
 			tabindex    : 2,
-			fn 	    : this._saveMiniBlur,
-			context     : this			
+			fn 	    : this._saveMiniBlur.bind(this),		
 		})
 
 
