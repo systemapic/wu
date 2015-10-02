@@ -170,7 +170,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		this.getLayerMeta();
 
-		this.initPoint();
+		this._createPointContainer();
 		// this.initPolygon();
 		// this.initLine();
 
@@ -182,7 +182,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// INIT POINT
 	// INIT POINT		
 
-	initPoint : function () {
+
+	// point container switch
+	_createPointContainer : function () {
 
 
 		// Create JSON obj if it's not already there
@@ -194,6 +196,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Create wrapper
 		this._pointSectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
 
+		// wrapper
 		var _line = new Wu.fieldLine({
 			id           : 'point',
 			appendTo     : this._pointSectionWrapper,
@@ -201,22 +204,23 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			input        : false,
 		});		
 
+		// switch button
 		var _switch = new Wu.button({
 			id 	     : 'point',
 			type 	     : 'switch',
 			isOn 	     : isOn,
 			right 	     : true,
 			appendTo     : _line.container,
-			fn 	     : this._updatePointSwitch.bind(this),
+			fn 	     : this._onPointSwitch.bind(this), // onSwitch
 		});
 
-		this.initPointOffOn(isOn, 'point');
+		this._togglePointContainer(isOn, 'point');
 
 	},
 
-	_updatePointSwitch : function (e, on) {
+	_onPointSwitch : function (e, on) {
 
-		this.initPointOffOn(on, 'point');
+		this._togglePointContainer(on, 'point');
 
 		// UPDATE
 		this._updateStyle();
@@ -229,6 +233,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// INIT POINT OPTIONS
 	// INIT POINT OPTIONS
 
+
+	// creates content of point container
 	initPointOptions : function (sectionWrapper) {
 
 		// COLOR
@@ -269,6 +275,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			childWrapper : 'point-color-children'
 		});	
 
+		console.log('_colorLine', _colorLine);
 
 		// Dropdown
 		var _colorDropDown = new Wu.button({
@@ -278,9 +285,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			right 	 : true,
 			appendTo : _colorLine.container,
 			fn 	 : this._selectedMiniDropDown.bind(this),
-			array 	 : this.metaFields,
-			selected : range,
-			layers   : this._project.getPostGISLayers()
+			array 	 : this.metaFields, // columns in dropdown
+			selected : range, // preselected item
+			// layers   : this._project.getPostGISLayers()
 		});
 
 		// Color selector
@@ -296,7 +303,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 
 
-		// SAVE JSON
+		// SAVE JSON // remember preset locally
 		this.cartoJSON.point[key] = {
 			range 	     : range,
 			minMax 	     : minMax,
@@ -350,7 +357,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			value       : val,
 			placeholder : 'auto',
 			tabindex    : this.tabindex++,
-			fn 	    : this._saveOpacityFromBlur.bind(this),
+			fn 	    : this._saveOpacityFromBlur.bind(this), // blur event, not click
 		});
 
 
@@ -416,7 +423,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		};
 	},
 
-	// CLEAR POINT OPTIONS
+	// CLEAR POINT OPTIONS  (on toggle close (point switch))
 	clearPointOptions : function () {
 
 		var colorWrapper      = Wu.DomUtil.get('field_wrapper_color');
@@ -438,6 +445,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// INIT OPEN FIELDS
 	// INIT OPEN FIELDS
 
+	// run when toggling point switch on
 	initOpenFields : function (options, key) {
 
 		if ( key == 'color' )     this._initColorFields(options, key);
@@ -478,38 +486,43 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// On toggle switch button
 	_saveToServer : function (key, title, on) {
 
-		this.initPointOffOn(on, key);
+		this._togglePointContainer(on, key);
 
 		// UPDATE
 		this._updateStyle();
 	},
 
 
-	initPointOffOn : function (on, key) {
+	_enablePoint : function (key) {
+		this.cartoJSON[key].enabled = true;
+		
+		// create point continaer
+		this.initPointOptions(this._pointSectionWrapper);
 
-		if ( on ) {
-			this.cartoJSON[key].enabled = true;
-			this.initPointOptions(this._pointSectionWrapper);
+		// opitons for sub menus
+		var colorRange = this.cartoJSON[key].color.range ? this.cartoJSON[key].color.range : false;
+		var opacityRange = this.cartoJSON[key].opacity.range ? this.cartoJSON[key].color.opacity : false;
+		var pointSizeRange = this.cartoJSON[key].pointsize.range ? this.cartoJSON[key].pointsize.range : false;
 
-			var colorRange = this.cartoJSON[key].color.range ? this.cartoJSON[key].color.range : false;
-			var opacityRange = this.cartoJSON[key].opacity.range ? this.cartoJSON[key].color.opacity : false;
-			var pointSizeRange = this.cartoJSON[key].pointsize.range ? this.cartoJSON[key].pointsize.range : false;
+		var options = {
+			colorRange : colorRange,
+			opacityRange : opacityRange,
+			pointSizeRange : pointSizeRange,
+		}
+		
+		// init subemnus on relevant fields
+		this.initOpenFields(options, 'color'); 		
+		this.initOpenFields(options, 'pointsize');
+	},
 
-			var options = {
-				colorRange : colorRange,
-				opacityRange : opacityRange,
-				pointSizeRange : pointSizeRange,
-			}
-			
-			this.initOpenFields(options, 'color');
-			this.initOpenFields(options, 'pointsize');
+	_disablePoint : function (key) {
+		this.cartoJSON[key].enabled = false;
+		this.clearPointOptions();
+	},
 
-		} else {
-			this.cartoJSON[key].enabled = false;
-			this.clearPointOptions();				
-		}			
-	
 
+	_togglePointContainer : function (on, key) {
+		on ? this._enablePoint(key) : this._disablePoint(key);
 	},
 
 	// ON SELECT MINI DROP DOWN
@@ -519,6 +532,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var fieldName = e.target.value;
 
 		var wrapper = e.target.parentElement;
+
+		console.log('_selectedMiniDropDown', this);
 
 		// UNSELECTING FIELD
 		// UNSELECTING FIELD
@@ -571,10 +586,10 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		}
 
 		// SAVE JSON
-		this.cartoJSON.point[key].range = fieldName;
+		this.cartoJSON.point[key].range = fieldName; // range == column
 
 		// Add fields
-		this.addExtraFields(key, fieldName);
+		this.addExtraFields(key, fieldName); // sub meny
 
 		// UPDATE
 		this._updateStyle();
@@ -647,7 +662,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-
+	// point only
 	_updateColorBall : function (hex, key, wrapper) {
 
 		// Store
@@ -660,6 +675,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		this._updateStyle();		
 	},
 
+	// on color preset color ball selection
 	updateColorRange : function (hex, key, wrapper) {
 
 		var colorBall_1 = Wu.DomUtil.get('color-range-ball-1-' + key);
@@ -691,13 +707,14 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// Store in JSON
 		this.cartoJSON.point.color.value = colors;
 
-		this._closeColorRangeSelector();
+		this._closeColorRangeSelector(); // close popup
 
 		// UPDATE
 		this._updateStyle();
 
 	},
 
+	// on click on color range presets
 	selectColorPreset : function (e) {
 
 		var elem = e.target;
@@ -795,8 +812,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// ADD EXTRA FIELDS
 	// ADD EXTRA FIELDS
 	// ADD EXTRA FIELDS
-
-	// INIT ADD EXTRA FIELDS
+ 
+	// INIT ADD EXTRA FIELDS, // add submenus to sub
 	addExtraFields : function (key, fieldName) {
 
 		// ADD COLOR FIELDS
@@ -806,7 +823,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		if ( key == 'pointsize') this.addPointSizeFields(key, fieldName);
 	},
 
-	// ADD COLOR FIELDS
+	// ADD COLOR FIELDS (color preset, color min/max)
 	addColorFields : function (key, fieldName) {
 
 		console.log('');
@@ -815,7 +832,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var defaultRange = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'];
 		var value  = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : defaultRange;
 
-		if ( value.constructor !== Array ) return;
+		if (!_.isArray(value)) return; // if not array, it's 'fixed' selection
 
 		// Get wrapper
 		var childWrapper = Wu.DomUtil.get('point-color-children');
@@ -827,9 +844,10 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var fieldMaxRange = Math.floor(this.columns[fieldName].max * 10) / 10;
 		var fieldMinRange = Math.floor(this.columns[fieldName].min * 10) / 10;
 
-		// Do not add if we've already added it!
+		// Do not add if we've already added it! // 
 		var minMaxColorRange = Wu.DomUtil.get('field_wrapper_minmaxcolorrange');
 		
+		// update instead of create
 		if ( minMaxColorRange ) {
 		
 			var max = Wu.DomUtil.get('field_mini_input_max_minmaxcolorrange');
@@ -863,8 +881,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			type 	  : 'colorrange',
 			right 	  : true,
 			appendTo  : _colorRangeLine.container,
-			presetFn  : this.selectColorPreset.bind(this),
-			customFn  : this.updateColorRange.bind(this),
+			presetFn  : this.selectColorPreset.bind(this), // preset selection
+			customFn  : this.updateColorRange.bind(this),  // color ball selection
 			value     : value
 		});
 	
@@ -927,7 +945,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		if ( !max ) max = absoluteMax;
 		if ( !min ) min = absoluteMin;		
 
-		// xoxoxoxoxoxoxo
 		this.cartoJSON.point.pointsize.minMax = [min, max];
 		this._updateStyle();
 
@@ -950,7 +967,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	},
 
-	// ADD POINT SIZE FIELDS
+	// ADD POINT SIZE FIELDS // subfields for point size
 	addPointSizeFields : function (key, fieldName) {
 
 		// var fieldsWrapper = Wu.DomUtil.get('field_wrapper_pointsize');
