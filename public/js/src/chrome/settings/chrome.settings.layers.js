@@ -175,18 +175,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		});
 		var enabledByDefault = layermenuItem && layermenuItem.enabled;
 
-
-		console.log('');
-		console.log('');
-		console.log('%c radio ', 'background: red; color: white;');
-		console.log('enabledByDefault', enabledByDefault);
-		console.log('this._project.store.layermenu', this._project.store.layermenu);
-		console.log('layermenuItem', layermenuItem);
-		console.log('');
-		console.log('');
-
-
-		// xoxoxoxoxoxo
 		var line = new Wu.fieldLine({
 			id       : uuid,
 			appendTo : wrapper,

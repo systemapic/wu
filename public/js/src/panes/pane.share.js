@@ -150,6 +150,32 @@ Wu.Share = Wu.Pane.extend({
 			Wu.DomUtil.removeClass(this._shareInviteButton, 'disabled');
 			Wu.DomEvent.on(this._shareInviteButton, 'click', this._shareInvite, this);
 		}
+
+		// refresh permissions
+		this._refreshDefaultPermission();
+	},
+
+	_refreshDefaultPermission : function () {
+
+		this.options.permissions = [{
+			title : 'View project',
+			permission : 'read_project',
+			checked : true,
+			enabled : false
+		},{
+			title : 'Download data',
+			permission : 'download_file',
+			checked : false,
+			enabled : app.access.to.download_file(this._project)
+		},{
+			title : 'Invite others',
+			permission : 'share_project',
+			checked : true,
+			enabled : true
+		}]
+
+		console.log('_refreshDefaultPermission', this.options.permissions);
+
 	},
 
 	_shareImage : function () {
