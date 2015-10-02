@@ -115,13 +115,8 @@ Wu.MapPane = Wu.Pane.extend({
 			// zoomAnimationThreshold : 2
 		});
 
-		this._attributionControl = L.control.attribution({position : 'bottomleft', prefix : false});
-		map.addControl(this._attributionControl);
-
-		// this._attributionControl.addAttribution('<a href="http://systemapic.com">Powered by Systemapic.com</a>');
-		this._attributionControl.addAttribution('<a class="systemapic-attribution-logo" href="http://systemapic.com" target="_blank"><img src="../css/images/systemapic-attribution-logo-white.png"></a>');
-		this._attributionControl.removeAttribution('Leaflet');
-
+		// add attribution
+		this._addAttribution(map);
 
 
 		// global map events
@@ -144,6 +139,7 @@ Wu.MapPane = Wu.Pane.extend({
 
 			// send invalidate to pile
 			this._invalidateTiles();
+
 		}, this)
 
 
@@ -155,9 +151,22 @@ Wu.MapPane = Wu.Pane.extend({
 				var lm = app.MapPane.getControls().layermenu;
 				lm && lm._enableDefaultLayers();
 			}, 10);
-			
 		});
 
+	},
+
+	_addAttribution : function (map) {
+		this._attributionControl = L.control.attribution({position : 'bottomleft', prefix : false});
+		map.addControl(this._attributionControl);
+
+		// this._attributionControl.addAttribution('<a href="http://systemapic.com">Powered by Systemapic.com</a>');
+		this._attributionControl.addAttribution('<a class="systemapic-attribution-logo" href="http://systemapic.com" target="_blank"><img src="../css/images/systemapic-attribution-logo-white.png"></a>');
+		this._attributionControl.removeAttribution('Leaflet');
+
+		// slack event on attribution
+		Wu.DomEvent.on(this._attributionControl._container, 'click', function () {
+			app.Analytics.onAttributionClick();
+		}, this);
 	},
 
 	_invalidateTiles : function () {
