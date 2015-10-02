@@ -46,36 +46,6 @@ var api = module.parent.exports;
 module.exports = api.analytics = { 
 
 
-	userEvent : function (req) {
-
-
-
-
-
-	},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
