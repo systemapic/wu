@@ -173,24 +173,24 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		})
 
 
-		// console.log('this.metaFields', this.metaFields);
+		console.log('this.metaFields', this.metaFields);
 
-		// var range = 'None';
-		// var isOn  = range ? false : true;
+		var range = 'None';
+		var isOn  = range ? false : true;
 
 
-		// // Dropdown
-		// var referenceDropDown = new Wu.button({
-		// 	id 	 : 'referencepoint',
-		// 	type 	 : 'dropdown',
-		// 	isOn 	 : isOn,
-		// 	right 	 : true,
-		// 	appendTo : referenceLine.container,
-		// 	fn 	 : this._selectedMiniDropDown.bind(this),
-		// 	array 	 : this.metaFields,
-		// 	selected : range,
-		// 	// layers   : this._project.getPostGISLayers()
-		// });
+		// Dropdown
+		var referenceDropDown = new Wu.button({
+			id 	 : 'referencepoint',
+			type 	 : 'dropdown',
+			isOn 	 : isOn,
+			right 	 : true,
+			appendTo : referenceLine.container,
+			fn 	 : this._selectedMiniDropDown.bind(this),
+			array 	 : this.metaFields,
+			selected : range,
+			// layers   : this._project.getPostGISLayers()
+		});
 
 
 		// var referenceDropDown = new Wu.button({
