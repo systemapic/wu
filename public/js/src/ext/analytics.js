@@ -126,6 +126,24 @@ Wu.Analytics = Wu.Class.extend({
 		})
 	},
 
+	onScreenshot : function (options) {
+
+		var project_name = options.project_name,
+		    file_id = options.file_id;
+
+		// slack
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'took a `screenshot` of project',
+		    	description : project_name,
+		    	timestamp : Date.now(),
+		    	options : {
+		    		screenshot : true,
+		    		file_id : file_id
+		    	}
+		})
+	},
+
 
 	onEnabledRegression : function () {
 
