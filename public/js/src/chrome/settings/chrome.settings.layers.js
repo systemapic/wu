@@ -176,6 +176,16 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		var enabledByDefault = layermenuItem && layermenuItem.enabled;
 
 
+		console.log('');
+		console.log('');
+		console.log('%c radio ', 'background: red; color: white;');
+		console.log('enabledByDefault', enabledByDefault);
+		console.log('this._project.store.layermenu', this._project.store.layermenu);
+		console.log('layermenuItem', layermenuItem);
+		console.log('');
+		console.log('');
+
+
 		// xoxoxoxoxoxo
 		var line = new Wu.fieldLine({
 			id       : uuid,
@@ -317,7 +327,8 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 		var elem = e.target;
 		var state = elem.getAttribute('state');
-		state == 'true' ? this.radioOff(elem) : this.radioOn(elem);		
+
+		state == 'true' ? this.radioOn(elem) : this.radioOff(elem);		
 
 	},
 
@@ -340,6 +351,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		// save state
 		var layerMenu = app.MapPane.getControls().layermenu;
 		layerMenu._setEnabledOnInit(layer_id, false);
+		
 	},
 
 
@@ -450,6 +462,8 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		} else {
 			on ? this.enableLayer(key) : this.disableLayer(key);
 		}
+
+		this.updateRadios();
 	},
 
 
