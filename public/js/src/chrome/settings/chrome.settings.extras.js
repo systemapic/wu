@@ -2,6 +2,13 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 	_ : 'extras',
 
+	options : {
+		dropdown : {
+			staticText : 'None',
+			staticDivider : '-'
+		}
+	},	
+
 	_initialize : function () {
 
 		// init container
@@ -31,6 +38,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 		// Create Field Wrapper
 		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
+		
 
 	},
 
@@ -38,10 +46,53 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 		this.layerUuid = uuid ? uuid : e.target.value
 
+		// Clear
+		this._fieldsWrapper.innerHTML = '';
+
+		this.getLayerMeta();
+
 		// Globesar Extras
 		this.initGlobesarExtras();
 
 	},
+
+
+
+
+	// Get all metafields
+	// Get all metafields
+	// Get all metafields	
+
+	getLayerMeta : function () {
+
+		console.log('getLayerMeta');
+		console.log('this._project', this._project);
+
+
+		// Get layer
+		var layer = this._project.getLayer(this.layerUuid);
+
+		// Get stored tooltip meta
+		var tooltipMeta = layer.getTooltip();
+		
+		// Get layermeta
+		var layerMeta = layer.getMeta();
+
+		// Get columns
+		this.columns = layerMeta.columns;
+
+		this.metaFields = [this.options.dropdown.staticText, this.options.dropdown.staticDivider];
+
+		for ( var k in this.columns ) {
+
+			var isDate = this._validateDateFormat(k);
+
+			if ( !isDate ) {
+				this.metaFields.push(k);
+			}
+		}
+	},
+
 
 
 	// GLOBSAR EXTRAS
@@ -50,7 +101,6 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 	initGlobesarExtras : function () {
 
-		this._fieldsWrapper.innerHTML = '';
 
 		var wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper);
 		var header = Wu.DomUtil.create('div', 'chrome-content-header globesar-extras', wrapper, 'Globesar Extras');
@@ -77,7 +127,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		var angleMiniInput = new Wu.button({
 			id 	    : 'satelliteAngle',
 			type 	    : 'miniInput',
-			right 	    : false,
+			right 	    : true,
 			isOn        : true,
 			appendTo    : angleLine.container,
 			value       : angle,
@@ -101,7 +151,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		var pathMiniInput = new Wu.button({
 			id 	    : 'satellitePath',
 			type 	    : 'miniInput',
-			right 	    : false,
+			right 	    : true,
 			isOn        : true,
 			appendTo    : pathLine.container,
 			value       : path,
@@ -110,6 +160,59 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			fn 	    : this._saveMiniBlur.bind(this),		
 		})
 
+
+		// Reference point
+		// Reference point
+		// Reference point
+
+		var referenceLine = new Wu.fieldLine({
+			id       : 'referencepoint',
+			appendTo : wrapper,
+			title    : 'Reference point',
+			input    : false,	
+		})
+
+
+		// console.log('this.metaFields', this.metaFields);
+
+		// var range = 'None';
+		// var isOn  = range ? false : true;
+
+
+		// // Dropdown
+		// var referenceDropDown = new Wu.button({
+		// 	id 	 : 'referencepoint',
+		// 	type 	 : 'dropdown',
+		// 	isOn 	 : isOn,
+		// 	right 	 : true,
+		// 	appendTo : referenceLine.container,
+		// 	fn 	 : this._selectedMiniDropDown.bind(this),
+		// 	array 	 : this.metaFields,
+		// 	selected : range,
+		// 	// layers   : this._project.getPostGISLayers()
+		// });
+
+
+		// var referenceDropDown = new Wu.button({
+			// id 	    : 'satellitePath',
+			// type 	    : 'dropdown',
+			// right 	    : true,
+			// isOn        : true,
+			// appendTo    : referenceLine.container,
+			// value       : path,
+			// placeholder : 'none',
+			// tabindex    : 2,
+			// fn 	    : this._saveMiniBlur.bind(this),		
+		// })
+
+
+
+	},
+
+
+	_selectedMiniDropDown : function (e) {
+
+		console.log('_selectedMiniDropDown');
 
 	},
 

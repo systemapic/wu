@@ -290,8 +290,7 @@ Wu.button = Wu.Class.extend({
 		    right       = this.options.right,
 		    array 	= this.options.array,
 		    selected    = this.options.selected,
-		    className   = this.options.className,
-		    layers 	= this.options.layers;
+		    className   = this.options.className;
 
 		var _class = 'chrome chrome-mini-dropdown active-field select-field-wrap ';
 		if ( className ) _class += className;
