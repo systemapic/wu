@@ -589,7 +589,28 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		this.update();
 		this.addHooks();
 
+		this._listen();
+
 		this._inited = true;
+	},
+
+	_listen : function () {
+		Wu.DomEvent.on(this.layer, 'load', this._onLayerLoaded, this);
+		Wu.DomEvent.on(this.layer, 'loading', this._onLayerLoading, this);
+	},
+
+	_onLayerLoading : function () {
+		this._loadStart = Date.now();
+	},
+
+	_onLayerLoaded : function () {
+		var loadTime = Date.now() - this._loadStart;
+
+
+		app.Analytics._eventLayerLoaded({
+			layer : this.getTitle(),
+			load_time : loadTime,
+		});
 	},
 
 	update : function (options, callback) {
@@ -798,6 +819,9 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 			// open popup
 			app.MapPane._addPopupContent(e);
+
+			// analytics/slack
+			app.Analytics._eventSelectedPoint(e);
 		});
 
 

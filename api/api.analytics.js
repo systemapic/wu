@@ -45,6 +45,41 @@ var api = module.parent.exports;
 // exports
 module.exports = api.analytics = { 
 
+
+	userEvent : function (req) {
+
+
+
+
+
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	set : function (req, res) {
 		var options = req.body;
 

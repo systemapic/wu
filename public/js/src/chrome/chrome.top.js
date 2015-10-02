@@ -82,7 +82,16 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// register event
 		Wu.DomEvent.on(buttonDiv, 'click', trigger, ctx);
 
+		// event
+		Wu.DomEvent.on(buttonDiv, 'click', this._buttonClick, this);
+
 		return buttonDiv;
+	},
+
+	_buttonClick : function () {
+
+	
+
 	},
 
 

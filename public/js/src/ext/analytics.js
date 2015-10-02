@@ -51,13 +51,159 @@ Wu.Analytics = Wu.Class.extend({
 	_listen : function () {
 
 		Wu.Mixin.Events.on('projectSelected', this._projectSelected, this);
+		Wu.Mixin.Events.on('editEnabled',     this._editEnabled, this);
+		Wu.Mixin.Events.on('editDisabled',    this._editDisabled, this);
+		Wu.Mixin.Events.on('layerEnabled',    this._layerEnabled, this);
+		Wu.Mixin.Events.on('layerDisabled',   this._layerDisabled, this);
+		Wu.Mixin.Events.on('layerSelected',   this._layerSelected, this);
+		Wu.Mixin.Events.on('layerAdded',      this._onLayerAdded, this);
+		Wu.Mixin.Events.on('layerEdited',     this._onLayerEdited, this);
+		Wu.Mixin.Events.on('layerStyleEdited',this._onLayerStyleEdited, this);
+		Wu.Mixin.Events.on('layerDeleted',    this._onLayerDeleted, this);
+		Wu.Mixin.Events.on('fileImported',    this._onFileImported, this);
+		Wu.Mixin.Events.on('fileDeleted',     this._onFileDeleted, this);
+
+		var map = app._map;
+		if (map) {
+			map.on('zoomstart', this._onZoomStart);
+			map.on('zoomend', this._onZoomEnd);
+		}
+	},
+
+	// dummies
+	_editEnabled 	 : function () {},
+	_editDisabled 	 : function () {},
+	_layerEnabled 	 : function () {},
+	_layerDisabled 	 : function () {},
+	_updateView 	 : function () {},
+	_refresh 	 : function () {},
+	_onFileImported  : function () {},
+	_onFileDeleted   : function () {},
+	_onLayerAdded    : function () {},
+	_onLayerEdited   : function () {},
+	_onLayerStyleEdited   : function () {},
+	_onLayerDeleted  : function () {},
+	
+
+	_onZoomStart : function () {
+		var map = app._map;
+		app._eventZoom = map.getZoom();
+		console.log('this:-zoom', app._eventZoom);
+	},
+
+	_onZoomEnd : function () {
+		var map = app._map;
+		var zoom = map.getZoom();
+
+		console.log('zoom', zoom);
+
+		// slack
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'zoomed',
+		    	description : 'from `' + app._eventZoom + ' to ' + zoom + '` ',
+		    	timestamp : Date.now()
+		})
+	},
+
+	_getPointKeys : function () {
+
+		return ['gid', 'vel', 'mvel', 'coherence'];
+	},
+
+	_eventEnabledRegression : function () {
+
+		// slack
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'viewed regression',
+		    	description : '',
+		    	timestamp : Date.now()
+		})
 
 	},
 
-	_projectSelected : function (e) {
-		var uuid = e.detail.projectUuid;
+	_eventLayerLoaded : function (options) {
+		// slack
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'watched',
+		    	description : 'layer load for `' + options.load_time + 'ms`',
+		    	timestamp : Date.now()
+		})
+	},
 
-		this.setGaPageview(uuid);
+	_eventSelectedPoint : function (data) {
+
+		console.log('datA: ', data);
+
+		var prevLatlng = app._prevLatlng;
+
+		var latlng = data.latlng.toString()
+		app._prevLatlng = data.latlng;
+
+		var keys = this._getPointKeys();
+
+		var description = '`at ' + latlng + '` ';
+		description +='\n     on ' + data.layer.getTitle() + '.' 
+		
+		keys.forEach(function (key) {
+			if (data.data[key]) {
+				description += '\n     `' + key + ': ' + data.data[key] + '` ';
+			}
+		});
+		
+		if (prevLatlng) description += '\n      Distance from last query: `' + parseInt(data.latlng.distanceTo(prevLatlng)) + 'meters`';
+		if (prevLatlng) console.log(data.latlng.distanceTo(prevLatlng));
+
+		// slack
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'queried point',
+		    	description : description,
+		    	timestamp : Date.now()
+		})
+	},
+
+
+
+
+	_layerSelected 	 : function (e) {
+		var layer = e.detail.layer;
+
+
+		// slack
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'selected',
+		    	description : '`layer` ' + layer.getTitle(),
+		    	timestamp : Date.now()
+		})
+
+	},
+
+
+
+
+
+
+
+
+
+	_projectSelected : function (e) {
+		// set project
+		this._project = app.Projects[e.detail.projectUuid];
+
+		// stats
+		this.setGaPageview(e.detail.projectUuid);
+
+		// slack
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'selected',
+		    	description : '`project` ' + this._project.getName(),
+		    	timestamp : Date.now()
+		})
 	},	
 
 	// send to server

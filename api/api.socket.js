@@ -55,6 +55,23 @@ module.exports = api.socket = {
 
 	},
 
+
+	userEvent :function (req) {
+
+		console.log('req', req);
+		var options = req.data;
+
+
+		// var user = options.user,
+		//     event = options.event,
+		//     description = options.description,
+		//     timestamp = options.timestamp;
+
+		// send to slack
+		api.slack.userEvent(options);
+
+	},
+
 	sendError : function (userId, err) {
 		var sock = api.socket._getSocket(userId);
 

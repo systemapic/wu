@@ -138,6 +138,8 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 	},
 
 	opened : function () {
+
+		
 	},
 
 	closed : function () {

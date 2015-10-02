@@ -25,6 +25,13 @@ Wu.Socket = Wu.Class.extend({
 		socket.emit('get_server_stats');
 	},
 
+	sendUserEvent : function (options) {
+
+		var socket = this._socket;
+		socket.emit('user_event', options);
+
+	},
+
 	_listen : function () {
 		var socket = this._socket;
 
