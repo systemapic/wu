@@ -210,6 +210,13 @@ Wu.Share = Wu.Pane.extend({
 		// close share dropdown
 		this._close();
 
+		var project = app.activeProject;
+
+		app.Analytics.onScreenshot({
+			project_name : project.getName(),
+			file_id : image
+		});
+
 	},
 
 	_shareLink : function () {
@@ -455,6 +462,9 @@ Wu.Share = Wu.Pane.extend({
 		}
 
 		console.log('_getInviteLink', options);
+
+		// slack
+		app.Analytics.onInvite(options);
 
 		// get invite link
 		Wu.post('/api/invite/link', JSON.stringify(options), callback);
