@@ -872,7 +872,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var stop = false;
 
 		// Stop when clicking on these classes
-		classes.forEach(function(c) {
+		if (classes.forEach) classes.forEach(function(c) {
 			if ( c == 'file-action') stop = true;
 			if ( c == 'file-popup-trigger') stop = true;
 			if ( c == 'file-popup') stop = true;
