@@ -456,6 +456,9 @@ Wu.Share = Wu.Pane.extend({
 
 		console.log('_getInviteLink', options);
 
+		// slack
+		app.Analytics.onInvite(options);
+
 		// get invite link
 		Wu.post('/api/invite/link', JSON.stringify(options), callback);
 	},
