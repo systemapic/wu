@@ -2273,3 +2273,13 @@ td.name {
 .no-padding .chrome-field-input {
 	padding-left: 0;
 	}	
+
+
+.file-name-content {
+	padding-right: 26px;
+}
+
+
+.file-popup {
+	margin-bottom: 100px;
+}
