@@ -52,11 +52,15 @@ module.exports = api.project = {
 		    account = req.user,
 		    ops = [];
 
+		console.log('creat project');
+
 		// return if missing info
 		if (!store) return api.error.missingInformation(req, res);
 
 		// check access
 		ops.push(function (callback) {
+			console.log('api.project.create 1');
+
 			api.access.to.create_project({
 				user : account
 			}, callback);
@@ -64,6 +68,7 @@ module.exports = api.project = {
 
 		// create role
 		ops.push(function (options, callback) {
+			console.log('api.project.create 2');
 			api.access._createDefaultRoles({
 				user : account,
 			}, callback);
@@ -71,6 +76,7 @@ module.exports = api.project = {
 
 		// create project
 		ops.push(function (roles, callback) {
+			console.log('api.project.create 3');
 			api.project._create({
 				user : account,
 				roles : roles,
@@ -80,6 +86,7 @@ module.exports = api.project = {
 
 		// set default mapbox account
 		ops.push(function (project, callback) {
+			console.log('api.project.create 4');
 			api.provider.mapbox.setDefault({
 				project : project
 			}, callback);
@@ -87,6 +94,7 @@ module.exports = api.project = {
 
 		// add norkart layers
 		ops.push(function (project, callback) {
+			console.log('api.project.create 5');
 			api.provider.norkart.setDefaults({
 				project : project
 			}, callback);
@@ -94,6 +102,7 @@ module.exports = api.project = {
 
 		// add google layers
 		ops.push(function (project, callback) {
+			console.log('api.project.create 6');
 			api.provider.google.setDefault({
 				project : project
 			}, callback);
@@ -101,6 +110,7 @@ module.exports = api.project = {
 
 		// get updated project
 		ops.push(function (project, callback) {
+			console.log('api.project.create 7');
 			Project
 			.findOne({uuid : project.uuid})
 			.exec(function (err, updatedProject) {
@@ -113,6 +123,8 @@ module.exports = api.project = {
 		// run ops
 		async.waterfall(ops, function (err, project) {
 			if (err) return api.error.general(req, res, err);
+
+			console.log('project created!!');
 
 			// slack
 			api.slack.createdProject({
