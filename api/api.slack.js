@@ -96,6 +96,22 @@ module.exports = api.slack = {
 		});
 	},
 
+	userEvent : function (options) {
+
+		var user = options.user,
+		    event = options.event,
+		    description = options.description,
+		    timestamp = options.timestamp;
+
+		var text = user + ' ' + event + ' ' + description;
+
+		api.slack._send({
+			text : text,
+			channel : api.config.slack.monitor
+		});
+
+	},
+
 	createdProject : function (options) {
 		var project = options.project,
 		    user = options.user;

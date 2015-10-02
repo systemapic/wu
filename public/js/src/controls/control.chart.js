@@ -786,6 +786,9 @@ Wu.Control.Chart = Wu.Control.extend({
 				columns: [reg_x, reg_y]
 			});
 
+			// analytics/slack
+			app.Analytics._eventEnabledRegression();
+
 		
 		} else {
 

@@ -831,6 +831,11 @@ L.Control.Layermenu = Wu.Control.extend({
 			this.disableLayer(item);
 		} else {
 			this.enableLayer(item);
+
+			// fire event
+			Wu.Mixin.Events.fire('layerSelected', { detail : {
+				layer : layer
+			}}); 
 		}    
 	},
 

@@ -101,6 +101,16 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// open/close
 		this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
+
+		if (this._isOpen) {
+			// fire event
+			app.Socket.sendUserEvent({
+				user : app.Account.getFullName(),
+				event : 'opened',
+				description : 'the data library',
+				timestamp : Date.now()
+			})
+		}
 	},
 
 	_show : function () {
@@ -124,6 +134,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	onOpened : function () {
+
+
 	},
 
 	onClosed : function () {

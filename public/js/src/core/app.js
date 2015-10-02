@@ -32,7 +32,7 @@ Wu.App = Wu.Class.extend({
 		Wu.setOptions(this, options);
 
 		// Init analytics
-		this._initAnalytics();
+		// this._initAnalytics();
 
 		// set page title
 		document.title = this.options.portalTitle;
@@ -42,6 +42,8 @@ Wu.App = Wu.Class.extend({
 
 		// Detect mobile devices
 		this.detectMobile();
+
+
 
 	},
 
@@ -152,6 +154,15 @@ Wu.App = Wu.Class.extend({
 		// debug
 		this._debug();
 
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'entered',
+		    	description : 'the wu.',
+		    	timestamp : Date.now()
+		})
+
+		this.Analytics = new Wu.Analytics();
+
 	},
 
 	_initAnalytics : function () {
@@ -241,6 +252,7 @@ Wu.App = Wu.Class.extend({
 
 		// share pane
 		this.Share = new Wu.Share();
+
 	},
 
 

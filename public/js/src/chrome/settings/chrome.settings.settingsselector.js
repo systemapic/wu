@@ -149,6 +149,16 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 		// open/close
 		this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
+
+		if (this._isOpen) {
+			// fire event
+			app.Socket.sendUserEvent({
+			    	user : app.Account.getFullName(),
+			    	event : 'opened',
+			    	description : 'the settings',
+			    	timestamp : Date.now()
+			})
+		}
 	},
 
 	_show : function () {
