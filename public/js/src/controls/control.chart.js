@@ -788,7 +788,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 			// analytics/slack
 			app.Analytics.onEnabledRegression();
-
 		
 		} else {
 
