@@ -111,7 +111,23 @@ Wu.Analytics = Wu.Class.extend({
 		return ['gid', 'vel', 'mvel', 'coherence'];
 	},
 
-	_eventEnabledRegression : function () {
+
+	onInvite : function (options) {
+
+		var project_name = options.project_name,
+		    permissions = options.permissions;
+
+		// slack
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'invited to project',
+		    	description : project_name + ' `(' + permissions.join(', ') + ')`',
+		    	timestamp : Date.now()
+		})
+	},
+
+
+	onEnabledRegression : function () {
 
 		// slack
 		app.Socket.sendUserEvent({
