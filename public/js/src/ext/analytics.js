@@ -170,7 +170,7 @@ Wu.Analytics = Wu.Class.extend({
 
 	_layerSelected 	 : function (e) {
 		var layer = e.detail.layer;
-
+		if (!layer) return;
 
 		// slack
 		app.Socket.sendUserEvent({
