@@ -53,8 +53,6 @@ module.exports = api.slack = {
 		    icon = options.icon,
 		    channel = options.channel;
 
-		console.log('slack send'.red, options);
-
 		var slack_options = {
 			text 		: text,
 			channel 	: channel || api.config.slack.channel,
