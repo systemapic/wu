@@ -821,7 +821,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 			app.MapPane._addPopupContent(e);
 
 			// analytics/slack
-			app.Analytics._eventSelectedPoint(e);
+			app.Analytics.onPointQuery(e);
 		});
 
 

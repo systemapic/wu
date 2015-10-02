@@ -144,6 +144,52 @@ Wu.Analytics = Wu.Class.extend({
 		})
 	},
 
+	onAttributionClick : function () {
+		// slack
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'clicked',
+		    	description : 'Systemapic logo',
+		    	timestamp : Date.now(),
+		})
+	},
+
+	onPolygonQuery : function (options) {
+
+		var data = options.result;
+
+		var total_points = data.total_points;
+
+		var area = data.area;
+		if (area > 1000000) {
+			area = 'approx. ' + parseInt(area / 1000000) + ' km2';
+		} else {
+			area = 'approx. ' + parseInt(area) + ' m2';
+		}
+
+		var description = 'on ' + options.layer_name; // + '`(total_points: ' + options.total_points + ')`',
+
+		// total points
+		description += '\n     `total points: ' + total_points + '` ';
+		description += '\n     `area: ' + area + '` ';
+		
+		// add description for keys
+		var keys = this._getPointKeys();
+		keys.forEach(function (key) {
+			if (data.average[key]) {
+				description += '\n     `' + key + ': ' + data.average[key] + '` ';
+			}
+		});
+
+		// slack
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'queried polygon',
+		    	description : description,
+		    	timestamp : Date.now()
+		})
+	},
+
 
 	onEnabledRegression : function () {
 
@@ -167,26 +213,30 @@ Wu.Analytics = Wu.Class.extend({
 		})
 	},
 
-	_eventSelectedPoint : function (data) {
+	onPointQuery : function (data) {
 
-		console.log('datA: ', data);
-
+		// get latlngs
 		var prevLatlng = app._prevLatlng;
-
 		var latlng = data.latlng.toString()
+		
+		// remember prev latlng
 		app._prevLatlng = data.latlng;
 
+		// get keys
 		var keys = this._getPointKeys();
 
+		// description
 		var description = '`at ' + latlng + '` ';
 		description +='\n     on ' + data.layer.getTitle() + '.' 
 		
+		// add description for keys
 		keys.forEach(function (key) {
 			if (data.data[key]) {
 				description += '\n     `' + key + ': ' + data.data[key] + '` ';
 			}
 		});
 		
+		// add distance from previous query
 		if (prevLatlng) description += '\n      Distance from last query: `' + parseInt(data.latlng.distanceTo(prevLatlng)) + 'meters`';
 		if (prevLatlng) console.log(data.latlng.distanceTo(prevLatlng));
 
