@@ -12,7 +12,7 @@ Wu.Share = Wu.Pane.extend({
 		},{
 			title : 'Download data',
 			permission : 'download_file',
-			checked : true,
+			checked : false,
 			enabled : true
 		},{
 			title : 'Invite others',
@@ -288,7 +288,7 @@ Wu.Share = Wu.Pane.extend({
 	_createInviteView : function () {
 
 		// get invite link
-		this._getInviteLink(['read_project', 'download_file', 'share_project'], function (ctx, link) {
+		this._getInviteLink(false, function (ctx, link) {
 
 			// clear other shares
 			this._clearTitles();
@@ -405,14 +405,10 @@ Wu.Share = Wu.Pane.extend({
 		var p = [];
 
 		this._checkboxes.forEach(function (c) {
-
-
 			var div = c._switch;
 			var value = c.value;
 			var checked = div.getAttribute('state');
-
 			if (checked == 'true') p.push(value);
-
 		});
 
 		return p;
@@ -421,7 +417,9 @@ Wu.Share = Wu.Pane.extend({
 
 	_getInviteLink : function (permissions, callback) {
 
-		var permissions = permissions || ['read_project', 'download_file', 'share_project'];
+		// get default permissions
+		var plucked = _.pluck(_.where(this.options.permissions, { 'checked' : true }), 'permission');
+		var permissions = permissions || plucked;
 
 		var options = {
 			project_id : this._project.getUuid(),
