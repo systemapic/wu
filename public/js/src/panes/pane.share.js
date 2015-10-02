@@ -210,6 +210,13 @@ Wu.Share = Wu.Pane.extend({
 		// close share dropdown
 		this._close();
 
+		var project = app.activeProject;
+
+		app.Analytics.onScreenshot({
+			project_name : project.getName(),
+			file_id : image
+		});
+
 	},
 
 	_shareLink : function () {

@@ -249,11 +249,19 @@ module.exports = function(app, passport) {
 		api.pixels.serveImagePixelPerfection(req, res);
 	});
 
+	// =====================================
+	// SERVE STATIC FILES SECURELY  ========
+	// =====================================
+	app.get('/pixels/screenshot/*', function (req,res) {
+		api.pixels.serveScreenshot(req, res);
+	});
+
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	app.get('/pixels/*', passport.authenticate('bearer', {session: false}), function (req,res) {
+		console.log('pixels!');
 		api.pixels.servePixelPerfection(req, res);
 	});
 
