@@ -24,5 +24,5 @@ PGPASSWORD=docker
 PGUSERNAME=docker
 PGHOST=postgis
 
-pgsql2shp -f $2 -h $PGHOST -u $PGUSERNAME -P $PGPASSWORD $1 "$3"
+pgsql2shp -f "$2" -h $PGHOST -u $PGUSERNAME -P $PGPASSWORD "$1" "$3"
 

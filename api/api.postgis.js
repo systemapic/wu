@@ -286,10 +286,13 @@ module.exports = api.postgis = {
 
 		ops.push(function (callback) {
 
+			var sanitize = require("sanitize-filename");
+
+
 			// where to put file
 			var filePath = database_name + '/' + table_name + '/' +  api.utils.getRandomChars(5) + '/',
 			    folder = api.config.path.temp + filePath,
-			    filename = name,
+			    filename = sanitize(name),
 			    output = folder + filename,
 			    returnOutput = filePath + filename,
 			    DOWNLOAD_TABLE_SCRIPT = '../scripts/postgis/download_table.sh';
