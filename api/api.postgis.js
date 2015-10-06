@@ -81,7 +81,9 @@ module.exports = api.postgis = {
 		var options = req.body,
 		    layerUuid = options.layer_id,
 		    format = options.format,
-		    ops = [];
+		    user = req.user,
+		    ops = [],
+		    layername;
 
 		ops.push(function (callback) {
 			Layer
@@ -91,20 +93,29 @@ module.exports = api.postgis = {
 
 		ops.push(function (layer, callback) {
 
-			var options = {
+			layername = layer.title.replace(/ /g,'').replace('.zip', '');
+
+			var opts = {
 				database_name 	: layer.data.postgis.database_name,
 				table_name 	: layer.data.postgis.table_name,
 				data_type 	: layer.data.postgis.data_type,
 				query 		: api.postgis._cleanSQLQuery(layer.data.postgis.sql),
-				name 		: layer.title.replace(/ /g,'').replace('.zip', '')
+				name 		: layername,
+				user 		: req.user
 			}
 
 			// get dataset
-			api.postgis.downloadDataset(options, callback);
+			api.postgis.downloadDataset(opts, callback);
 		});
 
 		async.waterfall(ops, function (err, results) {
 			res.end(results);
+
+			// send to slack
+			api.analytics.downloadedLayer({
+				user : user,
+				filename : layername
+			})
 		});
 
 	},
@@ -135,7 +146,9 @@ module.exports = api.postgis = {
 		var options = req.body,
 		    fileUuid = options.file_id,
 		    format = options.format,
-		    ops = [];
+		    user = req.user,
+		    ops = [],
+		    filename;
 
 		ops.push(function (callback) {
 			File
@@ -146,13 +159,15 @@ module.exports = api.postgis = {
 		ops.push(function (file, callback) {
 
 			var table_name = file.data.postgis.table_name;
+			filename = file.name.replace(/ /g,'').replace('.zip', '');
 
 			var options = {
 				database_name 	: file.data.postgis.database_name,
 				table_name 	: file.data.postgis.table_name,
 				data_type 	: file.data.postgis.data_type,
 				query 		: '"SELECT * FROM ' + table_name + '"',
-				name 		: file.name.replace(/ /g,'').replace('.zip', ''),
+				name 		: filename,
+				user 		: req.user
 			}
 
 			// get dataset
@@ -160,7 +175,14 @@ module.exports = api.postgis = {
 		});
 
 		async.waterfall(ops, function (err, results) {
+
 			res.end(results);
+
+			// send to slack
+			api.analytics.downloadedDataset({
+				user : user,
+				filename : filename
+			})
 		});
 	},
 
@@ -171,6 +193,7 @@ module.exports = api.postgis = {
 		    data_type = options.data_type,
 		    query = options.query,
 		    name = options.name,
+		    user = options.user,
 		    ops = [];
 
 
@@ -249,6 +272,8 @@ module.exports = api.postgis = {
 
 		async.waterfall(ops, function (err, zipfile) {
 			done(err, zipfile);
+
+
 		});
 
 	},
