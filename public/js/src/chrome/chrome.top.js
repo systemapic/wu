@@ -13,29 +13,23 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	initContainer : function () {
 
-
 		// container to hold errything
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-top', app._appPane);
 
 		// Menu Button
 		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button', this._container);		
 
-		// Portal Logo
-		// this._portalLogo = Wu.DomUtil.create('div', 'chrome-portal-logo', this._container);
-		// this._portalLogoImg = Wu.DomUtil.create('img', '', this._portalLogo);
-		// this._portalLogoImg.src = '/css/images/systemapic-portal-logo.png';
-
 		// Project title container
 		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title-container', this._container);
 
 		// Client Logo
 		this._clientLogo = Wu.DomUtil.create('div', 'chrome-portal-logo', this._container);
+
+		// client log image
 		this._clientLogoImg = Wu.DomUtil.create('img', '', this._clientLogo);		
 
 		// Project title
 		this._projectTitle = Wu.DomUtil.create('div', 'chrome-project-title', this._projectTitleContainer);
-
-
 
 		// WRAPPER FOR BUTTONS			// todo: make pluggable
 		this._buttonWrapper = Wu.DomUtil.create('div', 'chrome-buttons', this._container);
@@ -48,9 +42,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// Divider
 		this._userDivider = Wu.DomUtil.create('div', 'top-divider', this._userNameContainer, '&nbsp;|&nbsp;');
-
-
-
 
 		// Logout
 		this._userLogout = Wu.DomUtil.create('div', 'top-logout', this._userNameContainer, 'log out');
@@ -71,13 +62,22 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		var className = button.className,
 		    trigger = button.trigger,
 		    name = button.name,
-		    ctx = button.context;
+		    ctx = button.context,
+		    project_dependent = button.project_dependent;
+
+		if (project_dependent) className += ' displayNone';
 
 		// buttons holder
 		this._buttons = this._buttons || {};
 
 		// create button
-		var buttonDiv = this._buttons[name] = Wu.DomUtil.create('div', className, this._buttonWrapper);
+		var buttonDiv = Wu.DomUtil.create('div', className, this._buttonWrapper);
+
+		// save
+		this._buttons[name] = {
+			div : buttonDiv,
+			options : button
+		}
 
 		// register event
 		Wu.DomEvent.on(buttonDiv, 'click', trigger, ctx);
@@ -90,8 +90,29 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_buttonClick : function () {
 
-	
+	},
 
+	_updateButtonVisibility : function () {
+		if (app.activeProject) {
+
+			var buttons = _.filter(this._buttons, function (b) {
+				return b.options.project_dependent;
+			});
+
+			buttons.forEach(function (button) {
+				Wu.DomUtil.removeClass(button.div, 'displayNone');
+			});
+
+		} else {
+
+			var buttons = _.filter(this._buttons, function (b) {
+				return b.options.project_dependent;
+			});
+
+			buttons.forEach(function (button) {
+				Wu.DomUtil.addClass(button.div, 'displayNone');
+			});
+		}
 	},
 
 
@@ -147,18 +168,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	},
 
-
-
-	// HOOKS
-	// HOOKS
-	// HOOKS
-
 	_setHooks : function (onoff) {
-
-		// click event on carto editor button
-		// Wu.DomEvent[onoff](this._settingsButton, 'click', this._toggleSettingsPane, this);
-
-		// Wu.DomEvent[onoff](this._dataButton, 'click', this._toggleDataLibPane, this);
 
 		// Toggle layer menu
 		Wu.DomEvent[onoff](this._layersBtn, 'click', this._toggleLayermenu, this);
@@ -180,9 +190,12 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	},
 
 	_projectSelected : function (e) {
+		
+		// show settings/share buttons
+		this._updateButtonVisibility();
 
+		// get project
 		var projectUuid = e.detail.projectUuid;
-
 		if (!projectUuid) return;
 
 		// set project
@@ -208,7 +221,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 			if ( this.__layerMenu._open ) this._openLayerMenu();
 
 		}.bind(this), 50);
-
 	},
 
 	

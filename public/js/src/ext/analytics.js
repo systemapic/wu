@@ -107,7 +107,6 @@ Wu.Analytics = Wu.Class.extend({
 	},
 
 	_getPointKeys : function () {
-
 		return ['gid', 'vel', 'mvel', 'coherence'];
 	},
 
@@ -249,9 +248,6 @@ Wu.Analytics = Wu.Class.extend({
 		})
 	},
 
-
-
-
 	_layerSelected 	 : function (e) {
 		var layer = e.detail.layer;
 		if (!layer) return;
@@ -266,26 +262,21 @@ Wu.Analytics = Wu.Class.extend({
 
 	},
 
-
-
-
-
-
-
-
-
 	_projectSelected : function (e) {
+
 		// set project
 		this._project = app.Projects[e.detail.projectUuid];
 
 		// stats
 		this.setGaPageview(e.detail.projectUuid);
 
+		var projectName = this._project ? '`project` ' + this._project.getName() : 'no project.'
+		
 		// slack
 		app.Socket.sendUserEvent({
 		    	user : app.Account.getFullName(),
 		    	event : 'selected',
-		    	description : '`project` ' + this._project.getName(),
+		    	description : projectName,
 		    	timestamp : Date.now()
 		})
 	},	
