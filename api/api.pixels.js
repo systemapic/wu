@@ -940,14 +940,14 @@ module.exports = api.pixels = {
 		var image = options.image; // /data/images/snap-project-8a29019a-e325-46c4-8a51-4691f92632ac-KTKE29.png
 
 		var outPath = image + '.resized_screenshot.jpg';
-		var width = 800;
+		var width = 1200;
 
 		// do crunch magic
 		gm(image)
 		.resize(width)						// todo: if h/w is false, calc ratio					
 		.autoOrient()
 		.noProfile()							// todo: strip of all exif?
-		.quality(60)
+		.quality(90)
 		.write(outPath, function (err) {
 			if (err) return callback(err);
 			var base = outPath.split('/').reverse()[0];

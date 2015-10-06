@@ -48,7 +48,7 @@ Wu.Project = Wu.Class.extend({
 
 		// create
 		files.forEach(function (file) {
-			this.files[file.uuid] = new Wu.Files(file);
+			this.files[file.uuid] = new Wu.Model.File(file);
 		}, this);
 	},
 
@@ -870,7 +870,7 @@ Wu.Project = Wu.Class.extend({
 
 	setFile : function (file) {
 		this.store.files.push(file);
-		this.files[file.uuid] = new Wu.Files(file);
+		this.files[file.uuid] = new Wu.Model.File(file);
 	},
 
 	setLogo : function (path) {

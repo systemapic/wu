@@ -1,4 +1,4 @@
-Wu.Layer = Wu.Class.extend({
+Wu.Model.Layer = Wu.Model.extend({
 
 	type : 'layer',
 
@@ -6,7 +6,7 @@ Wu.Layer = Wu.Class.extend({
 		hoverTooltip : true,	// hover instead of click  todo..
 	},
 
-	initialize : function (layer) {
+	_initialize : function (layer) {
 
 		// set source
 		this.store = layer; // db object
@@ -583,18 +583,18 @@ Wu.Layer = Wu.Class.extend({
 
 
 
-Wu.PostGISLayer = Wu.Layer.extend({
+Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 	initLayer : function () {
 		this.update();
 		this.addHooks();
 
-		this._listen();
+		this._listenLocally();
 
 		this._inited = true;
 	},
 
-	_listen : function () {
+	_listenLocally : function () {
 		Wu.DomEvent.on(this.layer, 'load', this._onLayerLoaded, this);
 		Wu.DomEvent.on(this.layer, 'loading', this._onLayerLoading, this);
 	},
@@ -830,26 +830,36 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 	downloadLayer : function () {
 
-		console.error('downloadLayer');
-		
 		var options = {
-			layer_id : this.getUuid()
+			layer_id : this.getUuid(), 
+			socket_notification : true
 		}
 
-		Wu.post('/api/layer/downloadDataset', JSON.stringify(options), this._downloadedDataset.bind(this));
+		// set download id for feedback
+		this._downloadingID = Wu.Util.createRandom(5);
 
-		// set progress
-		app.ProgressBar.timedProgress(2000);
+		Wu.post('/api/layer/downloadDataset', JSON.stringify(options), function (err, resp) {
+
+			// give feedback
+			app.feedback.setMessage({
+				title : 'Preparing download',
+				description : 'Hold tight! Your download will be ready in a minute.',
+				id : this._downloadingID
+			});	
+		});
 
 	},
 
-	_downloadedDataset : function (err, response) {
+	_onDownloadReady : function (e) {
+		var options = e.detail,
+		    file_id = options.file_id,
+		    finished = options.finished,
+		    filepath = options.filepath;
 
 		// parse results
-		var filePath = response;
 		var path = app.options.servers.portal;
 		path += 'api/file/download/';
-		path += '?file=' + filePath;
+		path += '?file=' + filepath;
 		// path += '?raw=true'; // add raw to path
 		path += '&type=shp';
 		path += '&access_token=' + app.tokens.access_token;
@@ -857,7 +867,26 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		// open (note: some browsers will block pop-ups. todo: test browsers!)
 		window.open(path, 'mywindow')
 
+		// remove feedback
+		app.feedback.remove(this._downloadingID);
 	},
+
+
+	// _downloadedDataset : function (err, response) {
+
+	// 	// parse results
+	// 	var filePath = response;
+	// 	var path = app.options.servers.portal;
+	// 	path += 'api/file/download/';
+	// 	path += '?file=' + filePath;
+	// 	// path += '?raw=true'; // add raw to path
+	// 	path += '&type=shp';
+	// 	path += '&access_token=' + app.tokens.access_token;
+
+	// 	// open (note: some browsers will block pop-ups. todo: test browsers!)
+	// 	window.open(path, 'mywindow')
+
+	// },
 
 	shareLayer : function () {
 		console.log('share layer postgis', this);
@@ -885,7 +914,7 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 
 // systemapic layers
-Wu.RasterLayer = Wu.Layer.extend({
+Wu.RasterLayer = Wu.Model.Layer.extend({
 
 	initialize : function (layer) {
 
@@ -1010,7 +1039,7 @@ Wu.RasterLayer = Wu.Layer.extend({
 
 
 
-Wu.MapboxLayer = Wu.Layer.extend({
+Wu.MapboxLayer = Wu.Model.Layer.extend({
 
 	type : 'mapboxLayer',
 	
@@ -1033,7 +1062,7 @@ Wu.MapboxLayer = Wu.Layer.extend({
 
 
 
-Wu.GoogleLayer = Wu.Layer.extend({
+Wu.GoogleLayer = Wu.Model.Layer.extend({
 
 	type : 'googleLayer',
 
@@ -1097,7 +1126,7 @@ Wu.GoogleLayer = Wu.Layer.extend({
 });
 
 
-Wu.NorkartLayer = Wu.Layer.extend({
+Wu.NorkartLayer = Wu.Model.Layer.extend({
 
 	type : 'norkartLayer',
 
@@ -1263,9 +1292,9 @@ Wu.NorkartLayer = Wu.Layer.extend({
 });
 
 
-Wu.CartodbLayer = Wu.Layer.extend({});
+Wu.CartodbLayer = Wu.Model.Layer.extend({});
 
-Wu.ErrorLayer = Wu.Layer.extend({})
+Wu.ErrorLayer = Wu.Model.Layer.extend({})
 
 
 // shorthand for creating all kinds of layers

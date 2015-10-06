@@ -17,7 +17,7 @@ Wu.User = Wu.Class.extend({
 
 		// create
 		files.forEach(function (file) {
-			this._files[file.uuid] = new Wu.Files(file);
+			this._files[file.uuid] = new Wu.Model.File(file);
 		}, this);
 	},
 
@@ -39,7 +39,7 @@ Wu.User = Wu.Class.extend({
 
 	setFile : function (file) {
 		this.store.files.push(file);
-		this._files[file.uuid] = new Wu.Files(file);
+		this._files[file.uuid] = new Wu.Model.File(file);
 		return this._files[file.uuid];
 	},
 
