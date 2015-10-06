@@ -43,9 +43,14 @@ module.exports = function(app, passport) {
 
 
 	// ================================
-	// OAUTH2: Get Token ==============
+	// OAUTH2: Post Token ==============
 	// ================================
 	app.post('/oauth/token', api.oauth2.getToken);
+	
+
+	// ================================
+	// OAUTH2: Get Token ==============
+	// ================================
 	app.get('/api/token/check', passport.authenticate('bearer', {session: false}), function (req, res) {
 		res.end('OK');
 	});

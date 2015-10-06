@@ -76,39 +76,6 @@ module.exports = api.postgis = {
 	},
 
 
-	downloadDatasetFromLayer : function (req, res) {
-
-		var options = req.body,
-		    layerUuid = options.layer_id,
-		    format = options.format,
-		    ops = [];
-
-		ops.push(function (callback) {
-			Layer
-			.findOne({uuid : layerUuid})
-			.exec(callback);
-		});
-
-		ops.push(function (layer, callback) {
-
-			var options = {
-				database_name 	: layer.data.postgis.database_name,
-				table_name 	: layer.data.postgis.table_name,
-				data_type 	: layer.data.postgis.data_type,
-				query 		: api.postgis._cleanSQLQuery(layer.data.postgis.sql),
-				name 		: layer.title.replace(/ /g,'').replace('.zip', '')
-			}
-
-			// get dataset
-			api.postgis.downloadDataset(options, callback);
-		});
-
-		async.waterfall(ops, function (err, results) {
-			res.end(results);
-		});
-
-	},
-
 	_cleanSQLQuery : function (sql) {
 		var sql = sql;
 		var a = sql.replace('(', '');
@@ -130,47 +97,190 @@ module.exports = api.postgis = {
 		return cleanSQL;
 	},
 
+	_setDownloadProgress : function (options, callback) {
+		var id = 'download_status:' + options.download_status_id;
+		api.redis.layers.set(id, JSON.stringify(options), callback);
+	},
+
+	_getDownloadProgress : function (options, callback) {
+		var id = 'download_status:' + options.download_status_id;
+		api.redis.layers.set(id, callback);
+	},
+
+	// query progress by GET
+	getDownloadProgress : function (req, res) {
+		var options = req.body,
+		    download_status_id = options.download_status_id;
+		
+		if (!download_status_id) return api.error.missingInformation(req, res);
+
+		// get status
+		api.postgis._getDownloadProgress(options, function (err, status) {
+			if (err) return api.error.general(req, res, err);
+
+			// return status
+			res.json(status);
+		});
+	},
+
+
+	downloadDatasetFromLayer : function (req, res) {
+
+		var options = req.body,
+		    layer_id = options.layer_id,
+		    format = options.format,
+		    user = req.user,
+		    ops = [],
+		    layername;
+
+		// set download status is
+		var download_status_id = api.utils.getRandomChars(8);
+		var status = {
+			download_status_id : download_status_id,
+			finished : false,
+			time_start : Date().now,
+			file_id : layer_id
+		}
+
+		// set download status
+		api.postgis._setDownloadProgress(status);
+
+		// return result
+		res.json(status);
+
+		ops.push(function (callback) {
+			Layer
+			.findOne({uuid : layer_id})
+			.exec(callback);
+		});
+
+		ops.push(function (layer, callback) {
+
+			layername = layer.title.replace(/ /g,'').replace('.zip', '');
+
+			var opts = {
+				database_name 	: layer.data.postgis.database_name,
+				table_name 	: layer.data.postgis.table_name,
+				data_type 	: layer.data.postgis.data_type,
+				query 		: api.postgis._cleanSQLQuery(layer.data.postgis.sql),
+				name 		: layername,
+				user 		: req.user
+			}
+
+			// get dataset
+			api.postgis.downloadDataset(opts, callback);
+		});
+
+		async.waterfall(ops, function (err, filepath) {
+
+			var status = {
+				download_status_id : download_status_id,
+				finished : true,
+				filepath : filepath,
+				file_id : layer_id
+			}
+
+			// set download status
+			api.postgis._setDownloadProgress(status);
+
+			// send socket notification (if subscribed)
+			if (options.socket_notification) api.socket.downloadReady({
+				user : req.user,
+				status : status
+			});
+
+			// send to slack
+			api.analytics.downloadedDataset({
+				user : user,
+				filename : layername
+			})
+		});
+
+	},
+
+
 
 	downloadDatasetFromFile: function (req, res) {
 		var options = req.body,
-		    fileUuid = options.file_id,
+		    file_id = options.file_id,
 		    format = options.format,
-		    ops = [];
+		    user = req.user,
+		    ops = [],
+		    filename;
 
+		// set download status is
+		var download_status_id = api.utils.getRandomChars(8);
+		var status = {
+			download_status_id : download_status_id,
+			finished : false,
+			time_start : Date().now,
+			file_id : file_id
+		}
+
+		// set download status
+		api.postgis._setDownloadProgress(status);
+
+		// return result
+		res.json(status);
+
+		// get file
 		ops.push(function (callback) {
 			File
-			.findOne({uuid : fileUuid})
+			.findOne({uuid : file_id})
 			.exec(callback);
 		});
 
 		ops.push(function (file, callback) {
 
 			var table_name = file.data.postgis.table_name;
+			filename = file.name.replace(/ /g,'').replace('.zip', '');
 
 			var options = {
 				database_name 	: file.data.postgis.database_name,
 				table_name 	: file.data.postgis.table_name,
 				data_type 	: file.data.postgis.data_type,
 				query 		: '"SELECT * FROM ' + table_name + '"',
-				name 		: file.name.replace(/ /g,'').replace('.zip', ''),
+				name 		: filename,
+				user 		: req.user
 			}
 
 			// get dataset
 			api.postgis.downloadDataset(options, callback);
 		});
 
-		async.waterfall(ops, function (err, results) {
-			res.end(results);
+		async.waterfall(ops, function (err, filepath) {
+
+			var status = {
+				download_status_id : download_status_id,
+				finished : true,
+				filepath : filepath,
+				file_id : file_id
+			}
+
+			// set download status
+			api.postgis._setDownloadProgress(status);
+
+			// send socket notification (if subscribed)
+			if (options.socket_notification) api.socket.downloadReady({
+				user : req.user,
+				status : status
+			});
+
+			// send to slack
+			api.analytics.downloadedDataset({
+				user : user,
+				filename : filename
+			})
 		});
 	},
 
 	downloadDataset : function (options, done) {
-		
 		var database_name = options.database_name,
 		    table_name = options.table_name,
 		    data_type = options.data_type,
 		    query = options.query,
 		    name = options.name,
+		    user = options.user,
 		    ops = [];
 
 

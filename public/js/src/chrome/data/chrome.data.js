@@ -130,11 +130,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		this._container.style.display = 'none';
 		this._isOpen = false;
-
 	},
 
 	onOpened : function () {
-
 
 	},
 

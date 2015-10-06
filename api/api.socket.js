@@ -74,6 +74,17 @@ module.exports = api.socket = {
 		});
 	},
 
+
+	downloadReady : function (options) {
+
+		// get socket
+		var socket = api.socket.getSocket(options);
+
+		// send to user
+		socket && socket.emit('downloadReady', options.status);
+	},
+
+
 	uploadDone : function (options) {
 
 		// get socket

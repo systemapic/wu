@@ -1,12 +1,13 @@
-Wu.Files = Wu.Class.extend({
+Wu.Model.File = Wu.Model.extend({
+
+// Wu.Files = Wu.Class.extend({
 
 	_ : 'file',
 
-	initialize : function (store) {
+	_initialize : function (store) {
 
 		// set store
 		this.store = store;
-
 	},
 
 	getStore : function () {
@@ -244,17 +245,14 @@ Wu.Files = Wu.Class.extend({
 				return p.getLayer(layer.uuid);
 			});
 
-
 			// remove layer
 			project.removeLayer(layer);
-
 		});
 
 		// fire event
 		Wu.Mixin.Events.fire('layerDeleted', {detail : {
 			fileUuid : 'lol'
 		}});
-
 	},
 
 	
@@ -294,7 +292,6 @@ Wu.Files = Wu.Class.extend({
 	},
 
 	_shareFile : function () {
-		console.log('file._shareFile', this.getName());
 	},
 
 	_createLayer : function (project) {
@@ -309,22 +306,36 @@ Wu.Files = Wu.Class.extend({
 
 		var options = {
 			file_id : this.getUuid(),
+			socket_notification : true
 		}
 
-		Wu.post('/api/file/downloadDataset', JSON.stringify(options), this._downloadedDataset.bind(this));
+		// set download id for feedback
+		this._downloadingID = Wu.Util.createRandom(5);
 
-		// set progress
-		app.ProgressBar.timedProgress(2000);
+		// post download request to server
+		Wu.post('/api/file/downloadDataset', JSON.stringify(options), function (err, response) {
+
+			// give feedback
+			app.feedback.setMessage({
+				title : 'Preparing download',
+				description : 'Hold tight! Your download will be ready in a minute.',
+				id : this._downloadingID
+			});	
+
+		}.bind(this));
 
 	},
 
-	_downloadedDataset : function (err, response) {
+	_onDownloadReady : function (e) {
+		var options = e.detail,
+		    file_id = options.file_id,
+		    finished = options.finished,
+		    filepath = options.filepath;
 
 		// parse results
-		var filePath = response;
 		var path = app.options.servers.portal;
 		path += 'api/file/download/';
-		path += '?file=' + filePath;
+		path += '?file=' + filepath;
 		// path += '?raw=true'; // add raw to path
 		path += '&type=shp';
 		path += '&access_token=' + app.tokens.access_token;
@@ -332,6 +343,8 @@ Wu.Files = Wu.Class.extend({
 		// open (note: some browsers will block pop-ups. todo: test browsers!)
 		window.open(path, 'mywindow')
 
+		// remove feedback
+		app.feedback.remove(this._downloadingID);
 	},
 
 	_getGeometryType : function () {
