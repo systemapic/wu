@@ -597,10 +597,66 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 	_listenLocally : function () {
 		Wu.DomEvent.on(this.layer, 'load', this._onLayerLoaded, this);
 		Wu.DomEvent.on(this.layer, 'loading', this._onLayerLoading, this);
+		Wu.DomEvent.on(this.layer, 'tileloadstart', this._onTileLoadStart, this);
+		Wu.DomEvent.on(this.layer, 'tileload', this._onTileLoad, this);
 	},
 
 	_onLayerLoading : function () {
 		this._loadStart = Date.now();
+	},
+
+	_tilesLoading : [],
+
+	_onTileLoadStart : function (e) {
+		console.log('_onTileLoadStart', this.getTitle());
+
+		// var tile = e.url;
+
+		// console.error('THIS', this, e);
+
+
+		// console.log('tile: ', tile);
+
+		var tile = this._getTileUrl(e.url);
+
+		console.log('tile: ', tile);
+
+		this._tilesLoading.push(tile);
+
+		// console.log('currently loading: ', this._tilesLoading.length);
+	},
+
+	_getTileUrl : function (url) {
+		return '/tiles/' + url.split('/tiles/').reverse()[0];
+	},
+
+	_onTileLoad : function (e) {
+		console.log('_onTileLoad', this.getTitle());
+
+		var tile = this._getTileUrl(e.url);
+
+		_.remove(this._tilesLoading, function (t) {
+			return t == tile;
+		});
+	},
+
+	_onCancelTileRequests : function (e) {
+		if (!this._tilesLoading.length) return;
+
+		console.error('layer._onCancelTileRequests!', this._tilesLoading.length, this.getTitle());
+
+		// console.log('cancel tile requests: ', this._tilesLoading);
+
+		var options = {
+			access_token : app.tokens.access_token,
+			tiles : this._tilesLoading
+		}
+
+		Wu.post('/api/db/cancelTiles', options, function (err, resp) {
+			console.log('cancelledTiles');
+
+		});
+
 	},
 
 	_onLayerLoaded : function () {
@@ -730,6 +786,7 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 	},
 
 	_prepareGrid : function () {
+		return;
 
 		// set ids
 		var subdomains  = app.options.servers.tiles.subdomains,

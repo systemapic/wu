@@ -125,22 +125,46 @@ Wu.MapPane = Wu.Pane.extend({
 			map.eachLayer(function (layer) {
 				if (!layer.options) return;
 
-				var layerUuid = layer.options.layerUuid;
+				var layer_id = layer.options.layerUuid;
 
-				if (!layerUuid) return;
+				if (!layer_id) return;
 
-				// get wu layer
-				var l = app.activeProject.getPostGISLayer(layerUuid);
+				// // get wu layer
+				var l = app.activeProject.getPostGISLayer(layer_id);
 		
 				if (!l) return  
 				
-				l._invalidateTiles();
+				// l._invalidateTiles();
+				console.error('FIRE');
+				var event_id = 'cancelTileRequests-' + l.getUuid();
+				console.log('event_id map', event_id);
+				Wu.Mixin.Events.fire(event_id, {detail : {
+					layer_id : l.getUuid()
+				}});
 			});
 
 			// send invalidate to pile
-			this._invalidateTiles();
+			// this._invalidateTiles();
 
-		}, this)
+		}, this);
+
+		map.on('layerremove', function (e) {
+
+			console.log('layerremove', e);
+
+			var layer_id = e.layer.options.layerUuid;
+			var layer = app.activeProject.getPostGISLayer(layer_id);
+
+			if (!layer) return;
+
+			console.error('FIRE');
+			var event_id = 'cancelTileRequests-' + layer.getUuid();
+			console.log('event_id map', event_id);
+			Wu.Mixin.Events.fire(event_id, {detail : {
+				layer_id : layer.getUuid()
+			}});
+
+		})
 
 
 		// // on map load

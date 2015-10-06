@@ -24,9 +24,13 @@ Wu.Model = Wu.Class.extend({
 		Wu.Mixin.Events.on('layerEdited',     this._onLayerEdited, this);
 		Wu.Mixin.Events.on('layerDeleted',    this._onLayerDeleted, this);
 
-		// file events
+		// model events
 		var event_id = 'downloadReady-' + this.getUuid();
 		Wu.Mixin.Events.on(event_id, this._onDownloadReady, this);
+
+		var event_id = 'cancelTileRequests-' + this.getUuid();
+		console.log('event_id:', event_id);
+		Wu.Mixin.Events.on(event_id, this._onCancelTileRequests, this);
 
 	},
 
@@ -61,6 +65,7 @@ Wu.Model = Wu.Class.extend({
 	_onLayerDeleted  : function () {},
 	
 	_onDownloadReady : function () {},
+	_onCancelTileRequests : function () {},
 
 
 });

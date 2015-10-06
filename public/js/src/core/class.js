@@ -384,6 +384,10 @@ Wu.Util = {
 			}
 		}
 
+		if (typeof(json) == 'object') {
+			json = JSON.stringify(json);
+		}
+
 		http.send(json);
 	},
 
@@ -457,6 +461,16 @@ Wu.Util = {
 			return false; 
 		}
 
+	},
+
+	// parse with error handling
+	_stringify : function (obj) {
+		try { 
+			var json = JSON.stringify(obj); 
+			return json;
+		} catch (e) { 
+			return false; 
+		}
 	},
 
 
@@ -1008,6 +1022,7 @@ Wu.save = Wu.Util.post;
 Wu.post = Wu.Util.postcb;
 Wu.send = Wu.Util.send;
 Wu.parse = Wu.Util._parse;
+Wu.stringify = Wu.Util._stringify;
 Wu.zip = Wu.Util.generateZip;
 Wu.zave = Wu.Util.zipSave;
 Wu.can = Wu.Util.can;
