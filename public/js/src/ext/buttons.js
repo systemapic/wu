@@ -290,19 +290,24 @@ Wu.button = Wu.Class.extend({
 		    right       = this.options.right,
 		    array 	= this.options.array,
 		    selected    = this.options.selected,
+		    reversed    = this.options.reversed,
 		    className   = this.options.className;
 
 		var _class = 'chrome chrome-mini-dropdown active-field select-field-wrap ';
 		if ( className ) _class += className;
 
 		// create dropdown
-		var selectWrap = Wu.DomUtil.create('div', _class, appendTo);
+		var selectWrap = this.container = Wu.DomUtil.create('div', _class, appendTo);
 		var select = this._select = Wu.DomUtil.create('select', 'active-field-select', selectWrap);
 		select.setAttribute('key', key);
 
-		if ( selected ) Wu.DomUtil.addClass(selectWrap, 'full-width');
+		// if ( selected ) 
+		if ( reversed ) {
+			if ( !selected ) Wu.DomUtil.addClass(selectWrap, 'full-width');
+		} else {
+			if ( selected )  Wu.DomUtil.addClass(selectWrap, 'full-width');
+		}
 
-		// get layers
 
 		// placeholder
 		var option = Wu.DomUtil.create('option', '', select);
@@ -340,7 +345,8 @@ Wu.button = Wu.Class.extend({
 		    tabindex    = this.options.tabindex,
 		    right       = this.options.right,
 		    className   = this.options.className,
-		    isOn        = this.options.isOn;
+		    isOn        = this.options.isOn,
+		    allowText   = this.options.allowText;
 
 
 		var _class = 'chrome-field-mini-input ';
@@ -357,13 +363,13 @@ Wu.button = Wu.Class.extend({
 
 		// other options
 		if ( !right ) Wu.DomUtil.addClass(miniInput, 'left-mini');
-		if ( !isOn  ) Wu.DomUtil.addClass(miniInput, 'left-mini-kill');			    
+		if ( !isOn  ) Wu.DomUtil.addClass(miniInput, 'left-mini-kill');
 
 		// set event
 		Wu.DomEvent.on(miniInput, 'blur', fn);
 
 		// Force numeric
-		miniInput.onkeypress = this.forceNumeric;		    
+		if ( !allowText ) miniInput.onkeypress = this.forceNumeric;		    
 
 	},
 
