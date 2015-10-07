@@ -139,25 +139,20 @@ module.exports = api.geo = {
 
 	},
 
-
 	buildReferencePoint : function(referencepoint) {
 
 		var cartoStr = '\n';
-
 		    
 		    cartoStr += '\t[' + referencepoint.column + '=' + referencepoint.value + '] {\n';
 		    cartoStr += '\t\tmarker-comp-op: src-over;\n';
 		    cartoStr += '\t\tmarker-opacity: 1;\n';
-		    cartoStr += '\t\tmarker-fill: #FF33FF;\n';
-		    cartoStr += '\t\tmarker-width: 12;\n';
+		    cartoStr += "\t\tmarker-file: url('public/star-marker.png');\n";
+		    cartoStr += '\t\tmarker-width: 30;\n';
 		    cartoStr += '\t}\n\n';
-
 
 		return cartoStr;
 
 	},
-
-
 
 	// OPACITY
 	// OPACITY
