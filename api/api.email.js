@@ -80,12 +80,12 @@ module.exports = api.email = {
 		// var inviter = req.user.firstName + req.user.lastName;
 		// todo: SSL
 
-		var name    = user.firstName + ' ' + user.lastName;
-		var email   = user.local.email;
-		var token   = api.auth.setPasswordResetToken(user);
-		var link 	= api.config.portalServer.uri + 'login?token=' + token;
-		var to      = email;
-		var subject = 'Please confirm your request for a password reset';
+		var name           = user.firstName + ' ' + user.lastName;
+		var email          = user.local.email;
+		var token          = api.auth.setPasswordResetToken(user);
+		var link           = api.config.portalServer.uri + 'login?token=' + token;
+		var to             = email;
+		var subject        = 'Please confirm your request for a password reset';
 
 		var logo = api.config.portalServer.uri + api.config.mail.systemapic.logo;
 		var bgcolor = api.config.mail.systemapic.color;
@@ -216,6 +216,7 @@ module.exports = api.email = {
 		var logo = api.config.portalServer.uri + api.config.mail.systemapic.logo;
 		var bgcolor = api.config.mail.systemapic.color;
 
+
 		// email body
 		var body  = '<script type="application/ld+json">';
 			body  += '{';
@@ -335,16 +336,15 @@ module.exports = api.email = {
 
 		if (!email) return;
 
-		var portal = api.config.portalServer.uri;
-		var login_link = portal + 'login';
-
-		var title = 'Welcome!';
-		var subject = 'Welcome to Systemapic';
-		var subtitle = 'Hi ' + name + '. Your account is now active. You currently have read access to projects that have been shared with you. '
-		subtitle += '<br><br>Contact us if you would like to join our beta and create your own projects. You can sign up for our beta on our <a href="http://systemapic.com" target="_blank">website</a>.';
-		subtitle += '<br><br>We hope you will enjoy your new way of sharing and collaborating on geodata. We wish you a great workday on <a href="' + login_link + '">Systemapic.com</a>! <br><br> —Jørgen Ekvoll (CEO)'
-		var link = 'http://systemapic.com';
-		var link_text = 'Join our beta!';
+		var portal         = api.config.portalServer.uri;
+		var login_link     = portal + 'login';
+		var title          = 'Welcome!';
+		var subject        = 'Welcome to Systemapic';
+		var subtitle       = 'Hi ' + name + '. Your account is now active. You currently have read access to projects that have been shared with you. '
+		    subtitle      += '<br><br>Contact us if you would like to join our beta and create your own projects. You can sign up for our beta on our <a href="http://systemapic.com" target="_blank">website</a>.';
+		    subtitle      += '<br><br>We hope you will enjoy your new way of sharing and collaborating on geodata. We wish you a great workday on <a href="' + login_link + '">Systemapic.com</a>! <br><br> —Jørgen Ekvoll (CEO)'
+		var link           = 'http://systemapic.com';
+		var link_text      = 'Join our beta!';
 
 		var logo = api.config.portalServer.uri + api.config.mail.systemapic.logo;
 		var bgcolor = api.config.mail.systemapic.color;
@@ -467,11 +467,11 @@ module.exports = api.email = {
 		if (!email) return;
 
 
-		var title = 'Thank you!';
-		var subject = 'Systemapic Beta: Early Access Mailing List';
-		var subtitle = 'You have been signed up for the Systemapic Beta: Early Access mailing list. We will contact you as soon as we have available slots!<br><br>In the meantime, feel free to read our blog and follow our progress:';
-		var link = 'http://systemapic.com/blog';
-		var link_text = 'Systemapic Blog';
+		var title          = 'Thank you!';
+		var subject        = 'Systemapic Beta: Early Access Mailing List';
+		var subtitle       = 'You have been signed up for the Systemapic Beta: Early Access mailing list. We will contact you as soon as we have available slots!<br><br>In the meantime, feel free to read our blog and follow our progress:';
+		var link           = 'http://systemapic.com/blog';
+		var link_text      = 'Systemapic Blog';
 
 		var logo = api.config.portalServer.uri + api.config.mail.systemapic.logo;
 		var bgcolor = api.config.mail.systemapic.color;

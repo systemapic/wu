@@ -2250,19 +2250,15 @@ td.name {
 	right: 4px;	
 	}
 
-
-
-
 .relative-switch {
 	position: relative;
 	top: 0;
-}
-
+	}
 
 .chrome-content.chrome-pane.extras .chrome-field-line, 
 .chrome-content.chrome-pane.extras .chrome-field-input {
 	padding-left: 0;
-}
+	}
 
 .layer-active .layer-menu-flyto {
 	height: 21px;	
@@ -2274,12 +2270,29 @@ td.name {
 	padding-left: 0;
 	}	
 
-
 .file-name-content {
 	padding-right: 26px;
-}
-
+	}
 
 .file-popup {
 	margin-bottom: 100px;
-}
+	}
+
+.globesar-extras-ref-point-dropdown {
+	top: 6px;
+	left: 110px;
+	}
+
+.globesar-extras-input,
+.globesar-extras-input:focus {
+  	width: 53px;	
+	}
+
+
+.globesar-extras-ref-point-dropdown.full-width {
+  	width: 181px;	
+	}
+
+
+
+
