@@ -132,9 +132,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 	},
 
 	_getActiveLayerUuid : function () {
-		var uuid;
-		app.Chrome.Right.options.editingLayer ? uuid = app.Chrome.Right.options.editingLayer : uuid = false;
-		return uuid;
+		return app.Chrome.Right.options.editingLayer
 	},
 
 	opened : function () {

@@ -447,6 +447,7 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	setStyling : function (styleJSON) {
+		console.error('setStyle', styleJSON);
 		this.store.style = JSON.stringify(styleJSON);
 		this.save('style');
 	},
