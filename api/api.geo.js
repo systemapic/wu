@@ -38,7 +38,6 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var pg = require('pg');
-var exec = require('child_process').exec;
 
 // api
 var api = module.parent.exports;
@@ -46,96 +45,124 @@ var api = module.parent.exports;
 // exports
 module.exports = api.geo = { 
 
-
-
 	json2cartocss : function (req, res) {
 		var options = req.body;
 
 		// convert json to cartocss
 		api.geo._json2cartocss(options, function (err, css) {
-
 			res.end(css);
 		});
 	},
 
-
 	_json2cartocss : function (options, callback) {
-
-		var styleJSON = options.styleJSON;
-
-		if (!styleJSON) return callback('Missing styleJSON');
+		if (!options.style) return callback('Missing style!');
 		
-		// json in, cartocss out
+		// find vector types
+		var isPoint 	= (options.style.point && options.style.point.enabled);
+		var isPolygon 	= (options.style.polygon && options.style.polygon.enabled);
+		var isLine 	= (options.style.line && options.style.line.enabled);
 
-		var headers = '';
-		var style   = '#layer {\n\n';
-
-		var allowOverlap = 'true';
-		var markerClip  = 'false';
-		var compOp      = 'screen'
-
-		// CREATE DEFAULT STYLING
-		style += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
-		style += '\tmarker-clip: ' + markerClip + ';\n';
-		style += '\tmarker-comp-op: ' + compOp + ';\n\n';
-
-
-		// Add extras...
-		if ( options.styleJSON.extras ) {
-			var extras = this.buildExtras(options)
-			style += extras;
+		// style
+		var style = {
+			headers : '',
+			layer : ''
 		}
 
+		// start #layer
+		style.layer = '#layer {\n\n';
+		
+		// extra styling (eg. reference point)
+		if (options.style.extras) style.layer += this.buildExtras(options);
 
 
-		// STYLE POINT
-		// STYLE POINT
-		// STYLE POINT
+		// point styling
+		if (isPoint) style = api.geo._createPointCarto(options, style);
 
-		if ( styleJSON.point && styleJSON.point.enabled == true ) {
-
-			// OPACITY
-			var pointOpacityCarto = this.buildCarto_pointOpacity(options);
-			headers += pointOpacityCarto.headers;
-			style += pointOpacityCarto.style;
-
-			// COLOR
-			var pointColorCarto = this.buildCarto_pointColor(options);
-			headers += pointColorCarto.headers;
-			style += pointColorCarto.style;
-
-			// SIZE
-			var pointSizeCarto = this.buildCarto_pointSize(options);
-			headers += pointSizeCarto.headers;
-			style += pointSizeCarto.style;	
-
-		}
+		// polygon styling
+		if (isPolygon) style = api.geo._createPolygonCarto(options, style);
 			
-		style += '}'
+		// polygon styling
+		if (isLine) style = api.geo._createLineCarto(options, style);
 
-		var finalCarto = headers + style;
 
+		// close #layer
+		style.layer += '}'
+		
+		// debug
+		console.log('created style: ', style);
+
+		// concat
+		var finalCarto = style.headers + style.layer;
 
 		// return cartocss
 		callback(null, finalCarto);
 
 	},
 
+	_createPointCarto : function (options, style) {
+
+		var allowOverlap = 'true';
+		var markerClip  = 'false';
+		var compOp      = 'screen'
+
+		// CREATE DEFAULT STYLING
+		style.layer += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
+		style.layer += '\tmarker-clip: ' + markerClip + ';\n';
+		style.layer += '\tmarker-comp-op: ' + compOp + ';\n\n';
+
+		// OPACITY
+		var pointOpacityCarto = this.buildCarto_pointOpacity(options);
+		style.headers += pointOpacityCarto.headers;
+		style.layer += pointOpacityCarto.style;
+
+		// COLOR
+		var pointColorCarto = this.buildCarto_pointColor(options);
+		style.headers += pointColorCarto.headers;
+		style.layer += pointColorCarto.style;
+
+		// SIZE
+		var pointSizeCarto = this.buildCarto_pointSize(options);
+		style.headers += pointSizeCarto.headers;
+		style.layer += pointSizeCarto.style;	
+
+		return style;
+
+	},
+
+	_createPolygonCarto : function (options, style) {
+
+		// opacity
+		var polygonOpacityCarto = this.buildCarto_polygonOpacity(options);
+		style.headers += polygonOpacityCarto.headers;
+		style.layer += polygonOpacityCarto.style;
+
+		// color
+		var polygonColorCarto = this.buildCarto_polygonColor(options);
+		style.headers += polygonColorCarto.headers;
+		style.layer += polygonColorCarto.style;
+
+		// add line styling todo!
+
+		return style;
+
+	},
+
+	_createLineCarto : function (options, style) {
+		return style;
+	},
+
 
 	buildExtras : function (options) {
 
-		var style = options.styleJSON;
+		var style = options.style;
 		var extras = style.extras;
 
-		if ( extras.referencepoint ) {
-
-			if ( !extras.referencepoint.column || !extras.referencepoint.value ) return '';
-
-			var referencepoint = this.buildReferencePoint(extras.referencepoint);
-			return referencepoint;
-		} else {
-			return '';
-		}
+		// extra: reference point
+		if (extras.referencepoint && extras.referencepoint.column && extras.referencepoint.value) {
+			
+			// create reference point
+			return this.buildReferencePoint(extras.referencepoint);
+		};
 
 	},
 
@@ -143,18 +170,13 @@ module.exports = api.geo = {
 	buildReferencePoint : function(referencepoint) {
 
 		var cartoStr = '\n';
-
-		    
-		    cartoStr += '\t[' + referencepoint.column + '=' + referencepoint.value + '] {\n';
-		    cartoStr += '\t\tmarker-comp-op: src-over;\n';
-		    cartoStr += '\t\tmarker-opacity: 1;\n';
-		    cartoStr += '\t\tmarker-fill: #FF33FF;\n';
-		    cartoStr += '\t\tmarker-width: 12;\n';
-		    cartoStr += '\t}\n\n';
-
-
+		cartoStr += '\t[' + referencepoint.column + '=' + referencepoint.value + '] {\n';
+		cartoStr += '\t\tmarker-comp-op: src-over;\n';
+		cartoStr += '\t\tmarker-opacity: 1;\n';
+		cartoStr += "\t\tmarker-file: url('public/star-marker.png');\n";
+		cartoStr += '\t\tmarker-width: 30;\n';
+		cartoStr += '\t}\n\n';
 		return cartoStr;
-
 	},
 
 
@@ -165,9 +187,8 @@ module.exports = api.geo = {
 
 	buildCarto_pointOpacity : function (options) {
 
-		var style = options.styleJSON;
-		var opacity = style.point.opacity;
-
+		var style = options.style.point;
+		var opacity = style.opacity;
 
 		var cartObj = {
 			headers : '',
@@ -206,6 +227,93 @@ module.exports = api.geo = {
 		return cartObj;
 	},
 
+	buildCarto_polygonOpacity : function (options) {
+
+		var style = options.style.polygon;
+		var opacity = style.opacity;
+
+
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}
+
+
+		if ( opacity.range ) {
+
+			var max = Math.floor(options.columns[opacity.range].max * 10) / 10;
+			var min = Math.floor(options.columns[opacity.range].min * 10) / 10;				
+
+			var normalizedOffset = true;
+
+			// NORMALIZED OFFSET 
+			// i.e. if the lowest number is 30, and 
+		 	// highest is 100, 30 will return 0.3 and not 0
+			if ( normalizedOffset ) {
+				if ( min > 0 ) min = 0;
+			}
+
+			cartObj.headers += '@opacity_field_max: ' + max + ';\n';
+			cartObj.headers += '@opacity_field_min: ' + min + ';\n';
+			cartObj.headers += '@opacity_field_range: [' + opacity.range + '];\n\n';
+			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
+
+		
+		} else {
+
+			// static opacity
+			cartObj.headers += '@opacity_field: ' + opacity.value + ';\n';
+		}
+
+		cartObj.style += '\tpolygon-opacity: @opacity_field;\n\n';
+
+		return cartObj;
+	},
+
+	buildCarto_lineOpacity : function (options) {
+
+		var style = options.style.line;
+		var opacity = style.opacity;
+
+
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}
+
+
+		if ( opacity.range ) {
+
+			var max = Math.floor(options.columns[opacity.range].max * 10) / 10;
+			var min = Math.floor(options.columns[opacity.range].min * 10) / 10;				
+
+			var normalizedOffset = true;
+
+			// NORMALIZED OFFSET 
+			// i.e. if the lowest number is 30, and 
+		 	// highest is 100, 30 will return 0.3 and not 0
+			if ( normalizedOffset ) {
+				if ( min > 0 ) min = 0;
+			}
+
+			cartObj.headers += '@opacity_field_max: ' + max + ';\n';
+			cartObj.headers += '@opacity_field_min: ' + min + ';\n';
+			cartObj.headers += '@opacity_field_range: [' + opacity.range + '];\n\n';
+			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
+
+		
+		} else {
+
+			// static opacity
+			cartObj.headers += '@opacity_field: ' + opacity.value + ';\n';
+		}
+
+		cartObj.style += '\tpolygon-opacity: @opacity_field;\n\n';
+
+		return cartObj;
+	},
+
+
 
 	// COLOR RANGE
 	// COLOR RANGE
@@ -213,8 +321,274 @@ module.exports = api.geo = {
 
 	buildCarto_pointColor : function (options) {
 
-		var style = options.styleJSON;
-		var color = style.point.color;
+		var style = options.style.point;
+		var color = style.color;
+
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}		
+
+		if ( color.range ) {
+
+			var minMax = color.customMinMax ? color.customMinMax : color.minMax;
+
+			// Get color values
+			var c1 = color.value[0];
+			var c9 = color.value[1];
+			var c17 = color.value[2];
+			var c25 = color.value[3];
+			var c33 = color.value[4];
+
+			// Interpolate
+			var c5 = this.hexAverage([c1, c9]);
+			var c13 = this.hexAverage([c9, c17]);
+			var c21 = this.hexAverage([c17, c25]);
+			var c29 = this.hexAverage([c25, c33]);
+
+			// Interpolate
+			var c3 = this.hexAverage([c1, c5]);
+			var c7 = this.hexAverage([c5, c9]);
+			var c11 = this.hexAverage([c9, c13]);
+			var c15 = this.hexAverage([c13, c17]);
+			var c19 = this.hexAverage([c17, c21]);
+			var c23 = this.hexAverage([c21, c25]);
+			var c27 = this.hexAverage([c25, c29]);
+			var c31 = this.hexAverage([c29, c33]);
+
+			// Interpolate
+			var c2 = this.hexAverage([c1, c3]);
+			var c4 = this.hexAverage([c3, c5]);
+			var c6 = this.hexAverage([c5, c7]);
+			var c8 = this.hexAverage([c7, c9]);
+			var c10 = this.hexAverage([c9, c11]);
+			var c12 = this.hexAverage([c11, c13]);
+			var c14 = this.hexAverage([c13, c15]);
+			var c16 = this.hexAverage([c15, c17]);
+			var c18 = this.hexAverage([c17, c19]);
+			var c20 = this.hexAverage([c19, c21]);
+			var c22 = this.hexAverage([c21, c23]);
+			var c24 = this.hexAverage([c23, c25]);
+			var c26 = this.hexAverage([c25, c27]);
+			var c28 = this.hexAverage([c27, c29]);
+			var c30 = this.hexAverage([c29, c31]);
+			var c32 = this.hexAverage([c31, c33]);
+
+			var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33];
+
+
+
+			// CREATE VARS
+			var fieldName = '@' + color.range;
+			var maxField  = fieldName + '_max';
+			var minField  = fieldName + '_min';
+			var deltaName = fieldName + '_delta';
+			
+
+			// DEFINE FIELD NAME + MIN/MAX
+			cartObj.headers += fieldName + ': [' + color.range + '];\n';
+			cartObj.headers += maxField  + ': '  + minMax[1] + ';\n'; 
+			cartObj.headers += minField  + ': '  + minMax[0] + ';\n\n';
+			
+
+			// COLORS VALUES
+			colorArray.forEach(function(c, i) {	
+				cartObj.headers += fieldName + '_color_' + (i+1) + ': ' + c + ';\n';
+			})
+
+			cartObj.headers += '\n';
+			
+			// COLOR STEPS (DELTA)
+			cartObj.headers += fieldName + '_delta: (' + maxField + ' - ' + minField + ')/' + colorArray.length + ';\n'
+			
+			colorArray.forEach(function(c, i) {	
+				cartObj.headers += fieldName + '_step_' + (i+1) + ': (' + minField + ' + ' + fieldName + '_delta * ' + i + ');\n';
+			})
+
+
+			cartObj.headers += '\n';
+
+
+
+			// STYLE STYLE STYLE
+			// STYLE STYLE STYLE
+			// STYLE STYLE STYLE
+
+
+			colorArray.forEach(function(c,i) {
+
+				var no = i+1;
+
+				if ( no == 1 ) {
+
+					cartObj.style += '\t[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + '] ';
+					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
+
+				}
+
+				if ( no > 1 && no < colorArray.length ) {
+
+					cartObj.style += '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + ']';
+					cartObj.style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
+					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
+
+				}
+
+				if ( no == colorArray.length ) {
+
+					cartObj.style +=  '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + '] ';
+					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n\n';
+				}
+			})
+			
+		
+		} else {
+		
+			// static color
+			cartObj.style += '\tmarker-fill: ' + color.staticVal + ';\n\n';
+		}
+
+		return cartObj;
+	},
+
+
+	buildCarto_polygonColor : function (options) {
+
+		var style = options.style.polygon;
+		var color = style.color;
+
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}		
+
+		if ( color.range ) {
+
+			var minMax = color.customMinMax ? color.customMinMax : color.minMax;
+
+			// Get color values
+			var c1 = color.value[0];
+			var c9 = color.value[1];
+			var c17 = color.value[2];
+			var c25 = color.value[3];
+			var c33 = color.value[4];
+
+			// Interpolate
+			var c5 = this.hexAverage([c1, c9]);
+			var c13 = this.hexAverage([c9, c17]);
+			var c21 = this.hexAverage([c17, c25]);
+			var c29 = this.hexAverage([c25, c33]);
+
+			// Interpolate
+			var c3 = this.hexAverage([c1, c5]);
+			var c7 = this.hexAverage([c5, c9]);
+			var c11 = this.hexAverage([c9, c13]);
+			var c15 = this.hexAverage([c13, c17]);
+			var c19 = this.hexAverage([c17, c21]);
+			var c23 = this.hexAverage([c21, c25]);
+			var c27 = this.hexAverage([c25, c29]);
+			var c31 = this.hexAverage([c29, c33]);
+
+			// Interpolate
+			var c2 = this.hexAverage([c1, c3]);
+			var c4 = this.hexAverage([c3, c5]);
+			var c6 = this.hexAverage([c5, c7]);
+			var c8 = this.hexAverage([c7, c9]);
+			var c10 = this.hexAverage([c9, c11]);
+			var c12 = this.hexAverage([c11, c13]);
+			var c14 = this.hexAverage([c13, c15]);
+			var c16 = this.hexAverage([c15, c17]);
+			var c18 = this.hexAverage([c17, c19]);
+			var c20 = this.hexAverage([c19, c21]);
+			var c22 = this.hexAverage([c21, c23]);
+			var c24 = this.hexAverage([c23, c25]);
+			var c26 = this.hexAverage([c25, c27]);
+			var c28 = this.hexAverage([c27, c29]);
+			var c30 = this.hexAverage([c29, c31]);
+			var c32 = this.hexAverage([c31, c33]);
+
+			var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33];
+
+
+
+			// CREATE VARS
+			var fieldName = '@' + color.range;
+			var maxField  = fieldName + '_max';
+			var minField  = fieldName + '_min';
+			var deltaName = fieldName + '_delta';
+			
+
+			// DEFINE FIELD NAME + MIN/MAX
+			cartObj.headers += fieldName + ': [' + color.range + '];\n';
+			cartObj.headers += maxField  + ': '  + minMax[1] + ';\n'; 
+			cartObj.headers += minField  + ': '  + minMax[0] + ';\n\n';
+			
+
+			// COLORS VALUES
+			colorArray.forEach(function(c, i) {	
+				cartObj.headers += fieldName + '_color_' + (i+1) + ': ' + c + ';\n';
+			})
+
+			cartObj.headers += '\n';
+			
+			// COLOR STEPS (DELTA)
+			cartObj.headers += fieldName + '_delta: (' + maxField + ' - ' + minField + ')/' + colorArray.length + ';\n'
+			
+			colorArray.forEach(function(c, i) {	
+				cartObj.headers += fieldName + '_step_' + (i+1) + ': (' + minField + ' + ' + fieldName + '_delta * ' + i + ');\n';
+			})
+
+
+			cartObj.headers += '\n';
+
+
+
+			// STYLE STYLE STYLE
+			// STYLE STYLE STYLE
+			// STYLE STYLE STYLE
+
+
+			colorArray.forEach(function(c,i) {
+
+				var no = i+1;
+
+				if ( no == 1 ) {
+
+					cartObj.style += '\t[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + '] ';
+					cartObj.style += '{ polygon-fill: ' + fieldName + '_color_' + no + '; }\n';
+
+				}
+
+				if ( no > 1 && no < colorArray.length ) {
+
+					cartObj.style += '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + ']';
+					cartObj.style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
+					cartObj.style += '{ polygon-fill: ' + fieldName + '_color_' + no + '; }\n';
+
+				}
+
+				if ( no == colorArray.length ) {
+
+					cartObj.style +=  '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + '] ';
+					cartObj.style += '{ polygon-fill: ' + fieldName + '_color_' + no + '; }\n\n';
+				}
+			})
+			
+		
+		} else {
+		
+			// static color
+			cartObj.style += '\tpolygon-fill: ' + color.staticVal + ';\n\n';
+		}
+
+		return cartObj;
+	},
+
+
+	buildCarto_lineColor : function (options) {
+
+		var style = options.style.line;
+		var color = style.color;
 
 		var cartObj = {
 			headers : '',
@@ -350,23 +724,23 @@ module.exports = api.geo = {
 
 	buildCarto_pointSize : function (options) {
 
-		var style = options.styleJSON;
-		var pointsize = style.point.pointsize;
+		var style = options.style.point;
+		var pointSize = style.pointSize;
 
 		var cartObj = {
 			headers : '',
 			style   : ''
 		}		
 
-		if ( pointsize.range ) {
+		if ( pointSize.range ) {
 
-			var max = Math.floor(options.columns[pointsize.range].max * 10) / 10;
-			var min = Math.floor(options.columns[pointsize.range].min * 10) / 10;
+			var max = Math.floor(options.columns[pointSize.range].max * 10) / 10;
+			var min = Math.floor(options.columns[pointSize.range].min * 10) / 10;
 		
-			// cartObj.headers += '@marker_size_max: ' + pointsize.minMax[1] + ';\n';
-			cartObj.headers += '@marker_size_min: ' + pointsize.minMax[0] + ';\n';
-			cartObj.headers += '@marker_size_range: ' + (pointsize.minMax[1] - pointsize.minMax[0]) + ';\n';
-			cartObj.headers += '@marker_size_field: [' + pointsize.range + '];\n';
+			// cartObj.headers += '@marker_size_max: ' + pointSize.minMax[1] + ';\n';
+			cartObj.headers += '@marker_size_min: ' + pointSize.minMax[0] + ';\n';
+			cartObj.headers += '@marker_size_range: ' + (pointSize.minMax[1] - pointSize.minMax[0]) + ';\n';
+			cartObj.headers += '@marker_size_field: [' + pointSize.range + '];\n';
 			cartObj.headers += '@marker_size_field_maxVal: ' + max + ';\n';
 			cartObj.headers += '@marker_size_field_minVal: ' + min + ';\n';
 			cartObj.headers += '\n//TODO: Fix this!\n';
@@ -374,7 +748,7 @@ module.exports = api.geo = {
 			
 		} else {
 
-			cartObj.headers += '@marker_size_factor: ' + pointsize.value + ';\n';
+			cartObj.headers += '@marker_size_factor: ' + pointSize.value + ';\n';
 
 		}
 
@@ -388,6 +762,50 @@ module.exports = api.geo = {
 		cartObj.headers += '[zoom=16] { marker-width: 6   * @marker_size_factor; }\n';
 		cartObj.headers += '[zoom=17] { marker-width: 8   * @marker_size_factor; }\n';
 		cartObj.headers += '[zoom=18] { marker-width: 12  * @marker_size_factor; }\n\n';
+
+
+		return cartObj;
+	},
+
+	buildCarto_lineWidth : function (options) {
+
+		var style = options.style.line;
+		var lineWidth = style.lineWidth;
+
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}		
+
+		if ( lineWidth.range ) {
+
+			var max = Math.floor(options.columns[lineWidth.range].max * 10) / 10;
+			var min = Math.floor(options.columns[lineWidth.range].min * 10) / 10;
+		
+			cartObj.headers += '@line_size_min: ' + lineWidth.minMax[0] + ';\n';
+			cartObj.headers += '@line_size_range: ' + (lineWidth.minMax[1] - lineWidth.minMax[0]) + ';\n';
+			cartObj.headers += '@line_size_field: [' + lineWidth.range + '];\n';
+			cartObj.headers += '@line_size_field_maxVal: ' + max + ';\n';
+			cartObj.headers += '@line_size_field_minVal: ' + min + ';\n';
+			cartObj.headers += '\n//TODO: Fix this!\n';
+			cartObj.headers += '@line_size_factor: (@line_size_field / (@line_size_field_maxVal - @line_size_field_minVal)) * (@line_size_range + @line_size_min);\n\n';
+			
+		} else {
+
+			cartObj.headers += '@line_size_factor: ' + lineWidth.value + ';\n';
+
+		}
+
+
+		cartObj.headers += '[zoom=10] { line-width: 0.3 * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=11] { line-width: 0.5 * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=12] { line-width: 1   * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=13] { line-width: 1   * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=14] { line-width: 2   * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=15] { line-width: 4   * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=16] { line-width: 6   * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=17] { line-width: 8   * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=18] { line-width: 12  * @line_size_factor; }\n\n';
 
 
 		return cartObj;

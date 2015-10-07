@@ -354,18 +354,24 @@ Wu.Model.File = Wu.Model.extend({
 
 	_getDefaultStyling : function () {
 
-		// returns geom type from file meta
+		// get geom type
 		var geometry_type = this._getGeometryType();
 
+		// get style
+		var style = this._defaultStyling;
+
+		// enable style by geom type
 		if (geometry_type == 'ST_Point') { 
-			return this._defaultStyling;
+			style.point.enabled = true;
 		}
-		// if (geometry_type == 'ST_Polygon') { 
-		// 	return this._defaultStyling.polygon;
-		// }
+		if (geometry_type == 'ST_MultiPolygon') { 
+			style.point.enabled = true;
+		}
 		// if (geometry_type == 'ST_LineString') { 
 		// 	return this._defaultStyling.line;
 		// }
+
+		return style;
 	},
 
 	_createDefaultCartocss : function (json, callback) {
@@ -379,7 +385,7 @@ Wu.Model.File = Wu.Model.extend({
 		
 		// default styling
 		point : { 
-			enabled : true, 
+			enabled : false, 
 			color : { 
 				range : false, 
 				minMax : [-426.6, 105.9], 
@@ -391,14 +397,63 @@ Wu.Model.File = Wu.Model.extend({
 				range : false,
 				value : 0.5
 			}, 
-			pointsize : { 
+			pointSize : { 
 				range :false,
 				minMax : false,
-				value : 1.
+				value : 1
 			}
 		},
-		// polygon : {},	 // todo
-		// line : {}
+
+		polygon : { 
+			enabled : false, 
+			color : { 
+				range : false, 
+				minMax : [-426.6, 105.9], 
+				customMinMax : [-426.6, 105.9], 
+				staticVal : "red",
+				value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
+			},
+			opacity : { 
+				range : false,
+				value : 0.5
+			}, 
+			lineWidth : { 
+				range :false,
+				minMax : false,
+				value : 1
+			},
+			lineOpacity : {
+				range : false,
+				value : 0.5
+			},
+			lineColor : {
+				range : false, 
+				minMax : [-426.6, 105.9], 
+				customMinMax : [-426.6, 105.9], 
+				staticVal : "green",
+				value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
+			}
+		},
+
+		line : {
+			enabled : false,
+			lineWidth : { 
+				range :false,
+				minMax : false,
+				value : 1
+			},
+			lineOpacity : {
+				range : false,
+				value : 0.5
+			},
+			lineColor : {
+				range : false, 
+				minMax : [-426.6, 105.9], 
+				customMinMax : [-426.6, 105.9], 
+				staticVal : "green",
+				value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
+			}
+		}
 	},
 
 	_getType : function () {

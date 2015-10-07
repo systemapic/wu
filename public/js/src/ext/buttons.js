@@ -131,9 +131,9 @@ Wu.button = Wu.Class.extend({
 		    colorBall_1.setAttribute('hex', value[0]);
 
 		    
-		    this.initSpectrum(this, value[0], colorBall_1, key, customFn);
-		    this.initSpectrum(this, value[2], colorBall_2, key, customFn);
-		    this.initSpectrum(this, value[4], colorBall_3, key, customFn);
+		this.initSpectrum(this, value[0], colorBall_1, key, customFn);
+		this.initSpectrum(this, value[2], colorBall_2, key, customFn);
+		this.initSpectrum(this, value[4], colorBall_3, key, customFn);
 
 
 		// Color range presets
@@ -600,6 +600,8 @@ Wu.fieldLine = Wu.Class.extend({
 	initialize : function (options) {
 
 		this._initContent(options);
+
+		// return this;
 
 	},
 

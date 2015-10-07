@@ -1770,7 +1770,6 @@ aka feedback pane
 	font-size: 12px;
 	font-weight: 900;
 	cursor: pointer;
-	text-transform: uppercase;
 	position: relative;
 	word-break: break-all;
 	}
@@ -1818,7 +1817,7 @@ aka feedback pane
 	}
 
 .each-multiple-description.one-layer {
-	font-size: 15px;
+	font-size: 19px;
 	cursor: default;
 	color: black;
 	padding-left: 15px;

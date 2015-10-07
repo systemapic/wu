@@ -284,6 +284,17 @@ input.chart-regression-button {
 
 
 
+.styler-plus-button {
+	border-radius: 30px;
+	height: 25px;
+	width: 25px;
+	border: 2px solid black;
+	font-size: 30px;
+	line-height: 0.5;
+	padding-left: 1px;
+	cursor: pointer;
+	margin-left: -20px;
+}
 
 
 

@@ -357,7 +357,7 @@ L.Control.Description = Wu.Control.extend({
 
 		
 		// COLOR RANGE
-		if ( style && style[key].color.range ) {
+		if (style && style[key] && style[key].color && style[key].color.range) {
 
 			var colorStops = style[key].color.value;
 			var customMinMax = style[key].color.customMinMax;
