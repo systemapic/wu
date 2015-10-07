@@ -554,3 +554,37 @@ body {
 	transform: rotate(90deg) !important; 
 	left: 100%;
 }
+
+
+
+
+
+
+
+/* White logo background */
+/* White logo background */
+/* White logo background */
+
+.logo-background-white,
+.logo-background-white #powered-by {
+	background: rgba(255,255,255,0.85) !important;
+	}
+
+.logo-background-white input,
+.logo-background-white #powered-by,
+.logo-background-white #powered-by a,
+.logo-background-white h1,
+.logo-background-white #forgot-link {
+	color: black !important;
+	}
+
+.logo-background-white #login-button,
+.logo-background-white #request-button {
+	background: black !important;
+	color: white !important;
+	}
+
+
+
+
+
