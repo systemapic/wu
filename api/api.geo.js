@@ -725,7 +725,7 @@ module.exports = api.geo = {
 	buildCarto_pointSize : function (options) {
 
 		var style = options.style.point;
-		var pointSize = style.pointSize;
+		var pointSize = style.pointSize || style.pointsize;
 
 		var cartObj = {
 			headers : '',
