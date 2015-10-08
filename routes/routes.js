@@ -372,8 +372,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// GET GEOJSON FILES ===================
 	// =====================================
-	app.post('/api/geo/json2cartocss', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.geo.json2cartocss(req, res);
+	app.post('/api/geo/json2carto', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.geo.json2carto(req, res);
 	});
 
 	// =====================================

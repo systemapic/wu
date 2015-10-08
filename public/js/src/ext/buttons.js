@@ -4,15 +4,15 @@ Wu.button = Wu.Class.extend({
 
 		this.options = options;
 
-		if ( options.type == 'switch' )     this.initSwitch();
-		if ( options.type == 'set' ) 	    this.initSet();
-		if ( options.type == 'setclear' )   this.initSetClear();
-		if ( options.type == 'radio' )	    this.initRadio();
-		if ( options.type == 'miniInput' )  this.initMiniInput();
-		if ( options.type == 'dropdown')    this.initMiniDropDown();
-		if ( options.type == 'colorball')   this.initColorBall();
-		if ( options.type == 'colorrange')  this.initColorRange();
-		if ( options.type == 'dualinput')   this.initDualInput();
+		if (options.type == 'switch')      this.initSwitch();
+		if (options.type == 'set') 	   this.initSet();
+		if (options.type == 'setclear')    this.initSetClear();
+		if (options.type == 'radio')	   this.initRadio();
+		if (options.type == 'miniInput')   this.initMiniInput();
+		if (options.type == 'dropdown')    this.initMiniDropDown();
+		if (options.type == 'colorball')   this.initColorBall();
+		if (options.type == 'colorrange')  this.initColorRange();
+		if (options.type == 'dualinput')   this.initDualInput();
 
 	},
 
@@ -33,47 +33,58 @@ Wu.button = Wu.Class.extend({
 		    fn          = this.options.fn;
 
 
-		var _class = 'chrome-field-mini-input mini-input-dual ';
-		if ( className ) _class += className;
+		var prefix = 'chrome-field-mini-input mini-input-dual ';
+		if ( className ) prefix += className;
 
+
+
+		// create max input
 		var miniInputMax = Wu.DomUtil.createId('input', 'field_mini_input_max_' + key, appendTo);
-		miniInputMax.className = _class;
+		miniInputMax.className = prefix;
 		miniInputMax.setAttribute('placeholder', 'auto');
-
 		miniInputMax.setAttribute('tabindex', tabindex[1]);
+		if (minmax) miniInputMax.setAttribute('placeholder', minmax[1]);
+		if (value) miniInputMax.value = value[1];
 
-		if ( minmax ) miniInputMax.setAttribute('placeholder', minmax[1]);
-		if ( value  ) miniInputMax.value = value[1];
-
-		Wu.DomEvent.on(miniInputMax, 'blur', function () { this.saveDualBlur(miniInputMax, miniInputMin, minmax[1], minmax[0], this.options) }.bind(this), this);
+		// set blur save event
+		Wu.DomEvent.on(miniInputMax, 'blur', function () { 
+			this.saveDualBlur(miniInputMax, miniInputMin, minmax[1], minmax[0], this.options);  // todo: mem leak
+		}.bind(this), this);
 
 		// Force numeric
 		miniInputMax.onkeypress = this.forceNumeric;
+		
+		// remember
+		this.max = miniInputMax;
 
+
+
+		// create min input
 		var miniInputMin = Wu.DomUtil.createId('input', 'field_mini_input_min_' + key, appendTo);
 		miniInputMin.className = 'chrome-field-mini-input mini-input-dual';
 		miniInputMin.setAttribute('placeholder', 'auto');
-
 		miniInputMin.setAttribute('tabindex', tabindex[0]);
+		if (minmax) miniInputMin.setAttribute('placeholder', minmax[0]);
+		if (value) miniInputMin.value = value[0];
 
-		if ( minmax ) miniInputMin.setAttribute('placeholder', minmax[0]);
-		if ( value  ) miniInputMin.value = value[0];
-
-		Wu.DomEvent.on(miniInputMin, 'blur', function () { this.saveDualBlur(miniInputMax, miniInputMin, minmax[1], minmax[0], this.options) }.bind(this), this);
+		// set blur save event
+		Wu.DomEvent.on(miniInputMin, 'blur', function () { 
+			this.saveDualBlur(miniInputMax, miniInputMin, minmax[1], minmax[0], this.options);  	// todo: mem leak
+		}.bind(this), this);
 
 		// Force numeric
 		miniInputMin.onkeypress = this.forceNumeric;
 
+		// remember
+		this.min = miniInputMin;
 
 	},
 
 	saveDualBlur : function (maxElem, minElem, absoluteMax, absoluteMin, options) {
-
 		var fn      = options.fn,
 		    key     = options.key;
 
 		fn(maxElem.value, minElem.value, absoluteMax, absoluteMin)
-
 	},
 
 
@@ -100,37 +111,70 @@ Wu.button = Wu.Class.extend({
 		var colorRangeWrapper = Wu.DomUtil.create('div', _class, appendTo)
 		    colorRangeWrapper.setAttribute('key', key);
 
+
+
+
 		var color = Wu.DomUtil.create('div', 'chrome-color-range', colorRangeWrapper);
 		color.id = 'chrome-color-range_' + key;
 		color.setAttribute('key', key);
 		color.setAttribute('style', gradientStyle);
 
+		// rememeber
+		this._color = color;
+
+
+
 		var clickCatcher = Wu.DomUtil.create('div', 'click-catcher displayNone', appendTo);
-		    clickCatcher.id = 'click-catcher-' + key;
-		    clickCatcher.setAttribute('key', key);
+		clickCatcher.id = 'click-catcher-' + key;
+		clickCatcher.setAttribute('key', key);
+
+		// remember
+		this._clicker = clickCatcher;
+
+
+
+
 
 		var colorSelectorWrapper = Wu.DomUtil.create('div', 'chrome-color-selector-wrapper displayNone', colorRangeWrapper);
-		    colorSelectorWrapper.id = 'chrome-color-selector-wrapper-' + key;
+		colorSelectorWrapper.id = 'chrome-color-selector-wrapper-' + key;
+
+		// remember;
+		this._colorSelectorWrapper = colorSelectorWrapper;
+
+
+
 
 
 		var colorBallWrapper = Wu.DomUtil.create('div', 'chrome-color-ball-wrapper', colorSelectorWrapper)
 
 		var colorBall_3 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-3', colorBallWrapper);
-		    colorBall_3.id = 'color-range-ball-3-' + key;
-		    colorBall_3.style.background = value[4];
-		    colorBall_3.setAttribute('hex', value[4]);
+		colorBall_3.id = 'color-range-ball-3-' + key;
+		colorBall_3.style.background = value[4];
+		colorBall_3.setAttribute('hex', value[4]);
+
+		// remember
+		this._colorball3 = colorBall_3;
 		    
+
+
 		var colorBall_2 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-2', colorBallWrapper);
-		    colorBall_2.id = 'color-range-ball-2-' + key;
-		    colorBall_2.style.background = value[2];
-		    colorBall_2.setAttribute('hex', value[2]);
+		colorBall_2.id = 'color-range-ball-2-' + key;
+		colorBall_2.style.background = value[2];
+		colorBall_2.setAttribute('hex', value[2]);
+
+		// remember
+		this._colorball2 = colorBall_2;
+
 
 		var colorBall_1 = Wu.DomUtil.create('div', 'chrome-color-ball color-range-ball rangeball-1', colorBallWrapper);
-		    colorBall_1.id = 'color-range-ball-1-' + key;
-		    colorBall_1.style.background = value[0];
-		    colorBall_1.setAttribute('hex', value[0]);
+		colorBall_1.id = 'color-range-ball-1-' + key;
+		colorBall_1.style.background = value[0];
+		colorBall_1.setAttribute('hex', value[0]);
 
-		    
+		// remember
+		this._colorball1 = colorBall_1;
+
+
 		this.initSpectrum(this, value[0], colorBall_1, key, customFn);
 		this.initSpectrum(this, value[2], colorBall_2, key, customFn);
 		this.initSpectrum(this, value[4], colorBall_3, key, customFn);
@@ -161,15 +205,20 @@ Wu.button = Wu.Class.extend({
 		]
 
 
+		// remember presets
+		this._presets = [];
+
 		colorRangesPresets.forEach(function(preset, i) {
 
 			var gradientStyle = this._gradientStyle(preset);
 			var colorRangePreset = Wu.DomUtil.create('div', 'color-range-preset', colorRangePresetWrapper);
-			    colorRangePreset.id = 'color-range-preset-' + i;
-			    colorRangePreset.setAttribute('style', gradientStyle);
-			    colorRangePreset.setAttribute('hex', preset.join(','));
+			colorRangePreset.id = 'color-range-preset-' + i;
+			colorRangePreset.setAttribute('style', gradientStyle);
+			colorRangePreset.setAttribute('hex', preset.join(','));
 
-			    Wu.DomEvent.on(colorRangePreset, 'click', presetFn);
+			this._presets.push(colorRangePreset);
+
+			Wu.DomEvent.on(colorRangePreset, 'click', presetFn);
 
 		}.bind(this))
 
@@ -235,6 +284,8 @@ Wu.button = Wu.Class.extend({
 		var color = Wu.DomUtil.create('div', _class, appendTo);
 		color.id = 'color_ball_' + key;
 		color.style.background = value;
+
+		this.color = color;
 
 		if ( !on ) Wu.DomUtil.addClass(color, 'disable-color-ball');
 		if ( !right ) Wu.DomUtil.addClass(color, 'left-ball');
@@ -357,6 +408,8 @@ Wu.button = Wu.Class.extend({
 		miniInput.className = _class;
 		miniInput.setAttribute('placeholder', placeholder);
 		miniInput.setAttribute('tabindex', tabindex);
+
+		this.input = miniInput;
 		
 		// set value
 		if (value) miniInput.value = value;
