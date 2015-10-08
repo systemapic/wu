@@ -87,8 +87,8 @@ module.exports = api.email = {
 		var to             = email;
 		var subject        = 'Please confirm your request for a password reset';
 
-		var logo = api.config.portalServer.uri + api.config.mail.systemapic.logo;
-		var bgcolor = api.config.mail.systemapic.color;
+		var logo = api.config.portalServer.uri + api.config.mail.portal.logo;
+		var bgcolor = api.config.mail.portal.color;
 
 		var body 	= '<script type="application/ld+json">';
 			body 	+= '{';
@@ -183,7 +183,7 @@ module.exports = api.email = {
 			body    +=  '<tr>';
 		    body    +=  '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
 			body    +=  '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a><br>';
-			body    +=  '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Systemapic.com</a>  &copy;';
+			body    +=  '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a>';
 			body    +=  '</td>';
 			body    +=  '</tr>';
 			body    +=  '</table>';
@@ -213,8 +213,8 @@ module.exports = api.email = {
 		var link = api.config.portalServer.uri + 'login?token=' + token;
 		var fullname = account.firstName  + ' ' + account.lastName;
 		
-		var logo = api.config.portalServer.uri + api.config.mail.systemapic.logo;
-		var bgcolor = api.config.mail.systemapic.color;
+		var logo = api.config.portalServer.uri + api.config.mail.portal.logo;
+		var bgcolor = api.config.mail.portal.color;
 
 
 		// email body
@@ -311,7 +311,7 @@ module.exports = api.email = {
 			body += '<tr>';
 			body += '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
 			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a><br>';
-			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Systemapic.com</a>  &copy;';
+			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a>';
 			body += '</td>';
 			body += '</tr>';
 			body += '</table>';
@@ -346,8 +346,8 @@ module.exports = api.email = {
 		var link           = 'http://systemapic.com';
 		var link_text      = 'Join our beta!';
 
-		var logo = api.config.portalServer.uri + api.config.mail.systemapic.logo;
-		var bgcolor = api.config.mail.systemapic.color;
+		var logo = api.config.portalServer.uri + api.config.mail.portal.logo;
+		var bgcolor = api.config.mail.portal.color;
 
 		// email body
 		var body  = '<script type="application/ld+json">';
@@ -443,7 +443,7 @@ module.exports = api.email = {
 			body += '<tr>';
 			body += '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
 			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a><br>';
-			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Systemapic.com</a>  &copy;';
+			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a>';
 			body += '</td>';
 			body += '</tr>';
 			body += '</table>';
@@ -570,7 +570,7 @@ module.exports = api.email = {
 			body += '<tr>';
 			body += '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
 			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a><br>';
-			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Systemapic.com</a>  &copy;';
+			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a>';
 			body += '</td>';
 			body += '</tr>';
 			body += '</table>';
