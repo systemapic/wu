@@ -83,10 +83,19 @@ L.SpinningMap = L.Class.extend({
 		// create map
 		this._gl ? this.initGLMap() : this.initMap();
 
+		// Get wrapper
+		this._loginForm = L.DomUtil.get('login-form');
+		L.DomUtil.addClass(this._loginForm, this.options.logoBackgroundClass);
+
+		// this._loginForm.style.backgroundColor = this.options.logoBackground;
+
+
 		// set logo
 		this._logo = L.DomUtil.get('login-logo');
-		var img = 'url("' + this.options.logo + '")';
+		var img = 'url("' + this.options.loginLogo + '")';
 		this._logo.style.backgroundImage = img;
+
+
 		
 		
 	},

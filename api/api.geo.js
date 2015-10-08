@@ -80,6 +80,14 @@ module.exports = api.geo = {
 		style += '\tmarker-comp-op: ' + compOp + ';\n\n';
 
 
+		// Add extras...
+		if ( options.styleJSON.extras ) {
+			var extras = this.buildExtras(options)
+			style += extras;
+		}
+
+
+
 		// STYLE POINT
 		// STYLE POINT
 		// STYLE POINT
@@ -113,6 +121,41 @@ module.exports = api.geo = {
 
 	},
 
+
+	buildExtras : function (options) {
+
+		var style = options.styleJSON;
+		var extras = style.extras;
+
+		if ( extras.referencepoint ) {
+
+			if ( !extras.referencepoint.column || !extras.referencepoint.value ) return '';
+
+			var referencepoint = this.buildReferencePoint(extras.referencepoint);
+			return referencepoint;
+		} else {
+			return '';
+		}
+
+	},
+
+
+	buildReferencePoint : function(referencepoint) {
+
+		var cartoStr = '\n';
+
+		    
+		    cartoStr += '\t[' + referencepoint.column + '=' + referencepoint.value + '] {\n';
+		    cartoStr += '\t\tmarker-comp-op: src-over;\n';
+		    cartoStr += '\t\tmarker-opacity: 1;\n';
+		    cartoStr += '\t\tmarker-fill: #FF33FF;\n';
+		    cartoStr += '\t\tmarker-width: 12;\n';
+		    cartoStr += '\t}\n\n';
+
+
+		return cartoStr;
+
+	},
 
 
 

@@ -89,7 +89,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			name : 'data',
 			className : 'chrome-button datalib',
 			trigger : this._togglePane,
-			context : this
+			context : this,
+			project_dependent : true
 		});
 
 	},

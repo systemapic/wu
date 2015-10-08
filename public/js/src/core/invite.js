@@ -2,6 +2,7 @@ Wu.Invite = Wu.Class.extend({
 
 	initialize : function (options) {
 
+
 		// set options
 		Wu.setOptions(this, options);
 
