@@ -87,6 +87,8 @@ L.SpinningMap = L.Class.extend({
 		this._loginForm = L.DomUtil.get('login-form');
 		L.DomUtil.addClass(this._loginForm, this.options.logoBackgroundClass);
 
+		console.log('this._loginForm', this._loginForm, this.options.logoBackgroundClass);
+
 		// this._loginForm.style.backgroundColor = this.options.logoBackground;
 
 
