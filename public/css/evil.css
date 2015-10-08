@@ -2224,6 +2224,7 @@ td.name {
 
 .chrome-pane.styler .chrome-color-ball {
 	position: absolute;
+	top: 9px;
 	}
 
 .chrome-pane.styler .select-field-wrap {

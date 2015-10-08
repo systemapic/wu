@@ -45,16 +45,16 @@ var api = module.parent.exports;
 // exports
 module.exports = api.geo = { 
 
-	json2cartocss : function (req, res) {
+	json2carto : function (req, res) {
 		var options = req.body;
 
 		// convert json to cartocss
-		api.geo._json2cartocss(options, function (err, css) {
+		api.geo._json2carto(options, function (err, css) {
 			res.end(css);
 		});
 	},
 
-	_json2cartocss : function (options, callback) {
+	_json2carto : function (options, callback) {
 		if (!options.style) return callback('Missing style!');
 		
 		// find vector types
@@ -725,7 +725,7 @@ module.exports = api.geo = {
 	buildCarto_pointSize : function (options) {
 
 		var style = options.style.point;
-		var pointSize = style.pointSize || style.pointsize;
+		var pointSize = style.pointsize;
 
 		var cartObj = {
 			headers : '',
@@ -822,8 +822,10 @@ module.exports = api.geo = {
 	// OMG code... haven't written it myself...
 	// But it interpolates values between hex values
 	hexAverage : function (twoHexes) {
+		console.log('twoHexes', twoHexes);
 		if (!twoHexes[1]) return twoHexes[0];
 		return twoHexes.reduce(function (previousValue, currentValue) {
+			console.log('prev, cur', previousValue, currentValue);
 			return currentValue
 			.replace(/^#/, '')
 			.match(/.{2}/g)

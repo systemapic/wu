@@ -349,6 +349,7 @@ Wu.Model.File = Wu.Model.extend({
 
 	_getGeometryType : function () {
 		var meta = this.getMeta();
+		console.log('meta: ', meta);
 		return meta.geometry_type;
 	},
 
@@ -365,7 +366,7 @@ Wu.Model.File = Wu.Model.extend({
 			style.point.enabled = true;
 		}
 		if (geometry_type == 'ST_MultiPolygon') { 
-			style.point.enabled = true;
+			style.polygon.enabled = true;
 		}
 		// if (geometry_type == 'ST_LineString') { 
 		// 	return this._defaultStyling.line;
@@ -376,7 +377,7 @@ Wu.Model.File = Wu.Model.extend({
 
 	_createDefaultCartocss : function (json, callback) {
 		var styler = app.Tools.Styler;
-		styler.getCartoCSSFromJSON(json, callback);
+		styler.createCarto(json, callback);
 	},
 
 
@@ -397,7 +398,7 @@ Wu.Model.File = Wu.Model.extend({
 				range : false,
 				value : 0.5
 			}, 
-			pointSize : { 
+			pointsize : { 
 				range :false,
 				minMax : false,
 				value : 1
@@ -417,36 +418,38 @@ Wu.Model.File = Wu.Model.extend({
 				range : false,
 				value : 0.5
 			}, 
-			lineWidth : { 
-				range :false,
-				minMax : false,
-				value : 1
-			},
-			lineOpacity : {
-				range : false,
-				value : 0.5
-			},
-			lineColor : {
-				range : false, 
-				minMax : [-426.6, 105.9], 
-				customMinMax : [-426.6, 105.9], 
-				staticVal : "green",
-				value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
+			line : {
+				width : { 
+					range :false,
+					minMax : false,
+					value : 1
+				},
+				opacity : {
+					range : false,
+					value : 0.5
+				},
+				color : {
+					range : false, 
+					minMax : [-426.6, 105.9], 
+					customMinMax : [-426.6, 105.9], 
+					staticVal : "green",
+					value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
+				}
 			}
 		},
 
 		line : {
 			enabled : false,
-			lineWidth : { 
+			width : { 
 				range :false,
 				minMax : false,
 				value : 1
 			},
-			lineOpacity : {
+			opacity : {
 				range : false,
 				value : 0.5
 			},
-			lineColor : {
+			color : {
 				range : false, 
 				minMax : [-426.6, 105.9], 
 				customMinMax : [-426.6, 105.9], 
