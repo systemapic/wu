@@ -385,13 +385,11 @@ Wu.Styler.Point = Wu.Styler.extend({
 	// ADD POINT SIZE FIELDS // subfields for point size
 	_addPointSizeFields : function (key, fieldName) {
 
-		// Do not add if we've already added it!
-		var pointsize = this._content[this.type].pointsize;
-		var minMaxPointSize = pointsize.minmax ? pointsize.minmax.line.container : false;
-		if (minMaxPointSize) return;
-
 		// get wrapper
-		var childWrapper = this._content[this.type].pointsize.childWrapper;
+		var childWrapper = this._content[this.type].pointsize.line.childWrapper;
+
+		// clear old
+		childWrapper.innerHTML = '';
 
 		// get min/max values
 		var minMax  = this.options.carto[this.type][key].minMax || [1,10];
