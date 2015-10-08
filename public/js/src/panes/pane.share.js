@@ -74,7 +74,9 @@ Wu.Share = Wu.Pane.extend({
 			name : 'share',
 			className : 'chrome-button share',
 			trigger : this._togglePane,
-			context : this
+			context : this,
+			project_dependent : true
+			
 		});
 	},
 

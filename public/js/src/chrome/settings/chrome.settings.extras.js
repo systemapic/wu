@@ -6,8 +6,9 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		dropdown : {
 			staticText : 'None',
 			staticDivider : '-'
-		}
-	},	
+		},
+
+	},
 
 	_initialize : function () {
 
@@ -46,13 +47,38 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 		this.layerUuid = uuid ? uuid : e.target.value
 
-		// Clear
-		this._fieldsWrapper.innerHTML = '';
+		this._layer = this._project.getLayer(this.layerUuid);
+
+		if (!this._layer) return;
+
+		// Store uuid of layer we're working with
+		this._storeActiveLayerUuid(this.layerUuid);		
+
+		// get current style, returns default if none
+		var style = this._layer.getStyling();
+
+		this.tabindex = 1;
+
+		this.cartoJSON = style || {};
+
+		
+
 
 		this.getLayerMeta();
 
+		// Add temp layer
+		this._tempaddLayer();
+
+
+		// Clear
+		this._fieldsWrapper.innerHTML = '';
+
+	
 		// Globesar Extras
 		this.initGlobesarExtras();
+
+
+
 
 	},
 
@@ -65,12 +91,11 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 	getLayerMeta : function () {
 
-		console.log('getLayerMeta');
-		console.log('this._project', this._project);
-
-
 		// Get layer
-		var layer = this._project.getLayer(this.layerUuid);
+		var layer = this._layer = this._project.getLayer(this.layerUuid);
+
+		// Get styling json
+		this.cartoJSON = layer.getStyling();
 
 		// Get stored tooltip meta
 		var tooltipMeta = layer.getTooltip();
@@ -100,6 +125,17 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 	// GLOBSAR EXTRAS
 
 	initGlobesarExtras : function () {
+
+		if ( !this.cartoJSON.extras || !this.cartoJSON.extras.referencepoint ) {
+
+			this.cartoJSON.extras = {
+				referencepoint : {
+					column : false,
+					value  : false
+				}
+			}
+
+		}		
 
 
 		var wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper);
@@ -132,6 +168,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			appendTo    : angleLine.container,
 			value       : angle,
 			placeholder : 'none',
+			className   : 'globesar-extras-input',
 			tabindex    : 1,
 			fn 	    : this._saveMiniBlur.bind(this),
 		})
@@ -156,6 +193,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 			appendTo    : pathLine.container,
 			value       : path,
 			placeholder : 'none',
+			className   : 'globesar-extras-input',
 			tabindex    : 2,
 			fn 	    : this._saveMiniBlur.bind(this),		
 		})
@@ -173,50 +211,126 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		})
 
 
-		// console.log('this.metaFields', this.metaFields);
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('this.cartoJSON', this.cartoJSON);
+		console.log('');
+		console.log('');
+		console.log('');
 
-		// var range = 'None';
-		// var isOn  = range ? false : true;
+		var range = this.cartoJSON.extras.referencepoint.column;
+		var val   = this.cartoJSON.extras.referencepoint.value;
+		var isOn  = range ? false : true;
 
-
-		// // Dropdown
-		// var referenceDropDown = new Wu.button({
-		// 	id 	 : 'referencepoint',
-		// 	type 	 : 'dropdown',
-		// 	isOn 	 : isOn,
-		// 	right 	 : true,
-		// 	appendTo : referenceLine.container,
-		// 	fn 	 : this._selectedMiniDropDown.bind(this),
-		// 	array 	 : this.metaFields,
-		// 	selected : range,
-		// 	// layers   : this._project.getPostGISLayers()
-		// });
-
-
-		// var referenceDropDown = new Wu.button({
-			// id 	    : 'satellitePath',
-			// type 	    : 'dropdown',
-			// right 	    : true,
-			// isOn        : true,
-			// appendTo    : referenceLine.container,
-			// value       : path,
-			// placeholder : 'none',
-			// tabindex    : 2,
-			// fn 	    : this._saveMiniBlur.bind(this),		
-		// })
+		// Dropdown
+		var referenceDropDown = new Wu.button({
+			id 	  : 'referencepoint',
+			type 	  : 'dropdown',
+			right 	  : true,
+			appendTo  : referenceLine.container,
+			fn 	  : this._selectedMiniDropDown.bind(this),
+			array 	  : this.metaFields,
+			selected  : range,
+			reversed  : true,
+			className : 'globesar-extras-ref-point-dropdown'
+		});
 
 
+		// Input
+		var _referencePointInput = new Wu.button({
+			id 	    : 'referencepoint',
+			type 	    : 'miniInput',
+			right 	    : true,
+			isOn        : !isOn,
+			appendTo    : referenceLine.container,
+			value       : val,
+			placeholder : 'value',
+			tabindex    : 3,
+			className   : 'globesar-extras-input',
+			allowText   : true,
+			fn 	    : this._blurRefPointValue.bind(this),
+		});		
 
 	},
 
 
+
+	// ON SELECT MINI DROP DOWN
 	_selectedMiniDropDown : function (e) {
 
-		console.log('_selectedMiniDropDown');
+		var key = e.target.getAttribute('key');
+		var fieldName = e.target.value;
+
+		var wrapper = e.target.parentElement;
+
+		var _miniInput = Wu.DomUtil.get('field_mini_input_referencepoint');		
+
+		// UNSELECTING FIELD
+		// UNSELECTING FIELD
+		// UNSELECTING FIELD
+
+		// Clean up if we UNSELECTED field
+		if ( fieldName == this.options.dropdown.staticText || fieldName == this.options.dropdown.staticDivider) {
+
+			this.selectedColumn = false;
+			this.cartoJSON.extras = {
+				referencepoint : false
+			}
+
+
+			Wu.DomUtil.addClass(_miniInput, 'left-mini-kill');
+			Wu.DomUtil.addClass(wrapper, 'full-width');
+
+			return;
+		}
+
+
+		this.selectedColumn = fieldName;
+		this._saveRefPointValue();		
+
+		// SELECTING FIELD
+		// SELECTING FIELD
+		// SELECTING FIELD
+
+		Wu.DomUtil.removeClass(_miniInput, 'left-mini-kill');
+		Wu.DomUtil.removeClass(wrapper, 'full-width');
 
 	},
 
 
+
+	_blurRefPointValue : function (e) {
+
+		this.selectedValue = e.target.value;
+		this._saveRefPointValue();
+
+	},
+
+	_saveRefPointValue : function () {
+
+		var value  = this.selectedValue;
+		var column = this.selectedColumn;
+
+		// If no value
+		if ( !value || value == '' || column == this.options.staticText || column == this.options.staticDivider ) {
+			this.cartoJSON.extras = {
+				referencepoint : false,
+			}
+
+		// Store value
+		} else {
+			this.cartoJSON.extras = {
+				referencepoint : {
+					column : column,
+					value  : value
+				}
+			}
+		}
+
+		this._updateStyle();
+
+	},
 
 	// ON BLUR IN MINI FIELDS
 	_saveMiniBlur : function (e) {
@@ -250,6 +364,119 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 	_flush : function () {
 		this._container.innerHTML = '';
 	},
+
+
+
+
+	// CARTO CARTO CARTO CARTO
+	// CARTO CARTO CARTO CARTO
+	// CARTO CARTO CARTO CARTO
+
+	_updateStyle : function () {
+
+		console.log('');
+		console.log('');
+		console.log('');
+		console.log('this.cartoJSON.extras.referencepoint', this.cartoJSON.extras.referencepoint)
+		console.log('');
+		console.log('');
+		console.log('');
+		
+		this.getCartoCSSFromJSON(this.cartoJSON, function (ctx, finalCarto) {
+			this.saveCartoJSON(finalCarto);
+		});
+
+	},
+
+
+	getCartoCSSFromJSON : function (json, callback) {
+
+		var options = {
+			styleJSON : json,
+			columns : this.columns
+		}
+
+
+		Wu.post('/api/geo/json2cartocss', JSON.stringify(options), callback.bind(this), this);
+
+	},	
+
+
+	saveCartoJSON : function (finalCarto) {
+
+		console.log(finalCarto);
+
+		this._layer.setStyling(this.cartoJSON);
+
+		var sql = this._layer.getSQL();
+
+		// request new layer
+		var layerOptions = {
+			css : finalCarto, 
+			sql : sql,
+			layer : this._layer
+		}
+
+		this._updateLayer(layerOptions);;		
+
+	},
+
+
+	_updateLayer : function (options, done) {
+
+		var css = options.css,
+		    layer = options.layer,
+		    file_id = layer.getFileUuid(),
+		    sql = options.sql,
+		    project = this._project;
+
+
+		var layerOptions = layer.store.data.postgis;
+
+		layerOptions.sql = sql;
+		layerOptions.css = css;
+		layerOptions.file_id = file_id;		
+
+		var layerJSON = {
+			geom_column: 'the_geom_3857',
+			geom_type: 'geometry',
+			raster_band: '',
+			srid: '',
+			affected_tables: '',
+			interactivity: '',
+			attributes: '',
+			access_token: app.tokens.access_token,
+			cartocss_version: '2.0.1',
+			cartocss : css,
+			sql: sql,
+			file_id: file_id,
+			return_model : true,
+			layerUuid : layer.getUuid()
+		}
+
+		var that = this;
+
+		// create layer on server
+		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
+
+			// new layer
+			var newLayerStyle = Wu.parse(newLayerJSON);
+
+			// catch errors
+			if (newLayerStyle.error) {
+				done && done();
+				return console.error(newLayerStyle.error);
+			}
+
+
+			// update layer
+			layer.updateStyle(newLayerStyle);
+
+			// return
+			done && done();
+		}.bind(this));
+
+	},		
 });
 
 

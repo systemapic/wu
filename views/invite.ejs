@@ -16,9 +16,8 @@
 </head>
 <body>
 
-	<div id="invitation-header">
-		<img src="../css/images/systemapic-login-logo.png"/>
-	</div>
+	<div id="invitation-header"></div>
+
 
 	<div id="invitation-wrapper">
 
@@ -70,6 +69,16 @@
 
 
 	<script> 
+
+		var logoHeader = Wu.DomUtil.get('invitation-header');
+
+		// Set header logo
+		if ( loginConfig.invitationLogo ) logoHeader.innerHTML = '<img src="' + loginConfig.invitationLogo + '">';
+
+		// Set header background
+		if ( loginConfig.logoBackground ) logoHeader.style.background = loginConfig.logoBackground;
+
+
 		var app = new Wu.Invite({
 			id : 'invite',
 			header : 'header',

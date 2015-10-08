@@ -44,7 +44,7 @@ Wu.Control = L.Control.extend({
 	},
 
 	// dummies
-	_initialize 	: function () {},
+	_initialize 	 : function () {},
 	_editEnabled 	 : function () {},
 	_editDisabled 	 : function () {},
 	_layerEnabled 	 : function () {},
@@ -57,6 +57,6 @@ Wu.Control = L.Control.extend({
 	_onLayerEdited   : function () {},
 	_onLayerStyleEdited   : function () {},
 	_onLayerDeleted  : function () {},
-
+	_off 		 : function () {},
 
 });

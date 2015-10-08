@@ -101,7 +101,8 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 			name : 'settingsSelector',
 			className : 'chrome-button settingsSelector',
 			trigger : this._togglePane,
-			context : this
+			context : this,
+			project_dependent : true
 		});
 	},
 
