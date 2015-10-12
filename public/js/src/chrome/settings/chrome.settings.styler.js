@@ -68,7 +68,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		var pointStyler = new Wu.Styler.Point(options);
 
 		// create polygon styler
-		// var polygonStyler = new Wu.Styler.Polygon(options);
+		var polygonStyler = new Wu.Styler.Polygon(options);
 
 	},	
 	

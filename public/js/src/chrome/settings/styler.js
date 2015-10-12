@@ -43,7 +43,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// switch button
 		var button = new Wu.button({
-			id 	     : [this.type],
+			id 	     : this.type,
 			type 	     : 'switch',
 			isOn 	     : isOn,
 			right 	     : true,
@@ -273,30 +273,9 @@ Wu.Styler = Wu.Class.extend({
 		};
 	},
 
-	_clearOptions : function () {
-
-		var content = this._content[this.type];
-
-		// return if not content yet
-		if (_.isEmpty(content)) return;
-
-		// get divs
-		var color_wrapper = content.color.line.container;
-		var color_children = content.color.line.childWrapper;
-		var opacity_wrapper = content.opacity.line.container;
-		var pointsize_wrapper = content.pointsize.line.container;
-		var pointsize_children = content.pointsize.line.childWrapper;
-
-		// remove divs
-		color_wrapper && Wu.DomUtil.remove(color_wrapper);
-		color_children && Wu.DomUtil.remove(color_children);
-		opacity_wrapper && Wu.DomUtil.remove(opacity_wrapper);
-		pointsize_wrapper && Wu.DomUtil.remove(pointsize_wrapper);
-		pointsize_children && Wu.DomUtil.remove(pointsize_children);
-	},
-
-
 	_updateColor : function (hex, key, wrapper) {
+
+		console.log('_updateColor', hex);
 
 		// save carto
 		this.options.carto[this.type].color.staticVal = hex;
@@ -306,6 +285,38 @@ Wu.Styler = Wu.Class.extend({
 
 		// update
 		this._updateStyle();		
+	},
+
+	_updateOpacity : function (e) {
+
+		var value = parseFloat(e.target.value);
+		var key   = e.target.id.slice(17, e.target.id.length); 	// todo: remove these also. 
+		var pre = key.substring(0,4);				// whole object is now available in this._content[this.type].opacity.input
+									// eg. id = this._content[this.type].opacity.input.id, etc..
+		if (pre == 'min_' || pre == 'max_') {
+			key = key.slice(4, key.length);
+		}
+
+		// Get field 
+		var inputField = this._content[this.type].opacity.input.input;
+
+		// If more than one, make it one
+		if ( value > 1  && value < 10  ) value = 1;
+		if ( value > 10 && value < 100 ) value = value/100;
+		if ( value > 100 ) 	         value = 1;
+		
+		// Set value in input
+		inputField.value = value;
+
+		// don't save if unchanged
+		if (this.options.carto[this.type].opacity.value == value) return;
+
+		// save carto
+		this.options.carto[this.type].opacity.value = value;
+
+		// update
+		this._updateStyle();
+		
 	},
 
 	saveColorRangeDualBlur : function (max, min, absoluteMax, absoluteMin) {
@@ -320,7 +331,6 @@ Wu.Styler = Wu.Class.extend({
 		// update		
 		this._updateStyle();
 	},
-
 
 	_dropdownSelected : function (e) {
 
@@ -339,6 +349,8 @@ Wu.Styler = Wu.Class.extend({
 
 
 	_initOpenFields : function (options, key) {
+		console.log('_initOpenFields', options, key);
+		
 		if (key == 'color')     this._initColorFields(options, key);
 		if (key == 'pointsize') this._initPointSizeFields(options, key);
 	},
@@ -373,6 +385,23 @@ Wu.Styler = Wu.Class.extend({
 		// ADD POINT SIZE FIELDS
 		if ( key == 'pointsize') this._addPointSizeFields(key, fieldName);
 	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	_createCarto : function (json, callback) {
@@ -449,6 +478,7 @@ Wu.Styler = Wu.Class.extend({
 
 			// return
 			done && done();
+
 		}.bind(this));
 
 	},	

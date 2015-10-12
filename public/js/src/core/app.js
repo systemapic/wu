@@ -40,13 +40,18 @@ Wu.App = Wu.Class.extend({
 		// get objects from server
 		this.initServer();
 
+		// init sniffers
+		this._initSniffers();
+	},
+
+	_initSniffers : function () {
+
 		// Detect mobile devices
 		this.detectMobile();
 
-
-
+		// get user agent
+		this.sniffer = Sniffer(navigator.userAgent);
 	},
-
 	
 	setAccessTokens : function () {
 
@@ -154,15 +159,28 @@ Wu.App = Wu.Class.extend({
 		// debug
 		this._debug();
 
-		app.Socket.sendUserEvent({
-		    	user : app.Account.getFullName(),
-		    	event : 'entered',
-		    	description : 'the wu.',
-		    	timestamp : Date.now()
-		})
+		// analytics
+		this._logEntry();
 
 		this.Analytics = new Wu.Analytics();
 
+	},
+
+	_logEntry : function () {
+
+
+		var b = this.sniffer.browser;
+		var o = this.sniffer.os;
+
+		var browser = b.fullName + ' ' + b.majorVersion + '.' + b.minorVersion;
+		var os = o.fullName + ' ' + o.majorVersion + '.' + o.minorVersion;
+
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'entered',
+		    	description : 'the wu: `' + browser + '` on `' + os + '`',
+		    	timestamp : Date.now()
+		})
 	},
 
 	_initAnalytics : function () {

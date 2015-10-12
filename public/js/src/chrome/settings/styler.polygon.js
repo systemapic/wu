@@ -17,45 +17,43 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 	},
 
 	
-	_updateOpacity : function (e) {
+	// _updateOpacity : function (e) {
 
-		// var value = parseFloat(e.target.value);
-		// var key   = e.target.id.slice(17, e.target.id.length);
-		// var pre = key.substring(0,4);
+	// 	var value = parseFloat(e.target.value);
+	// 	var key   = e.target.id.slice(17, e.target.id.length); 	// todo: remove these also. 
+	// 	var pre = key.substring(0,4);				// whole object is now available in this._content[this.type].opacity.input
+	// 								// eg. id = this._content[this.type].opacity.input.id, etc..
+	// 	if (pre == 'min_' || pre == 'max_') {
+	// 		key = key.slice(4, key.length);
+	// 	}
 
-		// if (pre == 'min_' || pre == 'max_') {
-		// 	key = key.slice(4, key.length);
-		// }
+	// 	// Get field 
+	// 	var inputField = this._content[this.type].opacity.input.input;
 
-		// // Get field 
-		// var inputField = Wu.DomUtil.get('field_mini_input_opacity'); // todo: not pluggable!
-
-
-		// // If more than one, make it one
-		// if ( value > 1  && value < 10  ) value = 1;
-		// if ( value > 10 && value < 100 ) value = value/100;
-		// if ( value > 100 ) 	         value = 1;
+	// 	// If more than one, make it one
+	// 	if ( value > 1  && value < 10  ) value = 1;
+	// 	if ( value > 10 && value < 100 ) value = value/100;
+	// 	if ( value > 100 ) 	         value = 1;
 		
+	// 	// Set value in input
+	// 	inputField.value = value;
 
-		// // Set value in input
-		// inputField.value = value;
+	// 	// don't save if unchanged
+	// 	if (this.options.carto[this.type].opacity.value == value) return;
 
-		// // don't save if unchanged
-		// if (this.options.carto.point.opacity.value == value) return;
+	// 	// save carto
+	// 	this.options.carto[this.type].opacity.value = value;
 
-		// // save carto
-		// this.options.carto.point.opacity.value = value;
-
-		// // update
-		// this._updateStyle();
+	// 	// update
+	// 	this._updateStyle();
 		
-	},
+	// },
 
 	_selectOptions : function () {
 
-		// opitons for sub menus
-		var colorRange = this.options.carto.point.color.range;
-		var opacityRange = this.options.carto.point.opacity.range;
+		// options for sub menus
+		var colorRange = this.options.carto.polygon.color.range;
+		var opacityRange = this.options.carto.polygon.opacity.range;
 
 		var options = {
 			colorRange : colorRange,
@@ -69,109 +67,140 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 
 	_unselectField : function (key, wrapper) {
 
-		// // Make static inputs available
-		// if (key == 'opacity' || key == 'pointsize') {	
-		// 	var miniInput = Wu.DomUtil.get('field_mini_input_' + key);	
-		// 	Wu.DomUtil.removeClass(miniInput, 'left-mini-kill');
-		// 	this._removeExtras(key);
-		// }
+		// Make static inputs available
+		if (key == 'opacity' || key == 'pointsize') {	
+			var miniInput = Wu.DomUtil.get('field_mini_input_' + key);	
+			Wu.DomUtil.removeClass(miniInput, 'left-mini-kill');
+			this._removeExtras(key);
+		}
 
-		// // Make static color available
-		// if (key == 'color') {
-		// 	var colorBall = Wu.DomUtil.get('color_ball_color'); 	// todo: not pluggable
-		// 	Wu.DomUtil.removeClass(colorBall, 'disable-color-ball');
-		// 	this._removeExtras(key);
-		// }
+		// Make static color available
+		if (key == 'color') {
+			var colorBall = Wu.DomUtil.get('color_ball_color'); 	// todo: not pluggable
+			Wu.DomUtil.removeClass(colorBall, 'disable-color-ball');
+			this._removeExtras(key);
+		}
 
-		// // adjust width
-		// Wu.DomUtil.removeClass(wrapper, 'full-width');
+		// adjust width
+		Wu.DomUtil.removeClass(wrapper, 'full-width');
 
-		// // save style
-		// this.options.carto.point[key].range = false;
+		// save style
+		this.options.carto[this.type][key].range = false;
 
-		// // refresh
-		// this._updateStyle();
+		// refresh
+		this._updateStyle();
 	},
 
 	_selectField : function (key, wrapper, field) {
 
-		// // add class
-		// Wu.DomUtil.addClass(wrapper, 'full-width');
+		// add class
+		Wu.DomUtil.addClass(wrapper, 'full-width');
 
-		// // DISABLE mini input fields
-		// if ( key == 'opacity' || key == 'pointsize' ) {
-		// 	var miniInput = Wu.DomUtil.get('field_mini_input_' + key);
-		// 	Wu.DomUtil.addClass(miniInput, 'left-mini-kill');
-		// }
+		// DISABLE mini input fields
+		if ( key == 'opacity' || key == 'pointsize' ) {
+			var miniInput = Wu.DomUtil.get('field_mini_input_' + key);
+			Wu.DomUtil.addClass(miniInput, 'left-mini-kill');
+		}
 
-		// // DISABLE static color ball
-		// if ( key == 'color' ) {
-		// 	var colorBall = Wu.DomUtil.get('color_ball_color');
-		// 	Wu.DomUtil.addClass(colorBall, 'disable-color-ball');
-		// }
+		// DISABLE static color ball
+		if ( key == 'color' ) {
+			var colorBall = Wu.DomUtil.get('color_ball_color');
+			Wu.DomUtil.addClass(colorBall, 'disable-color-ball');
+		}
 
-		// // SAVE JSON
-		// this.options.carto.point[key].range = field; // range == column
+		// SAVE JSON
+		this.options.carto[this.type][key].range = field; // range == column
 
-		// // Add fields
-		// this._addExtras(key, field); // sub meny
+		// Add fields
+		this._addExtras(key, field); // sub meny
 
-		// // UPDATE
-		// this._updateStyle();
+		// UPDATE
+		this._updateStyle();
 
 	},
 
-	// CLEAN UP EXTRA FIELDS
+	// // CLEAN UP EXTRA FIELDS
+	// _removeExtras : function (key) {
+
+	// 	if (key == 'pointsize') {
+	// 		var minMaxPointSize = Wu.DomUtil.get('field_wrapper_minmaxpointsize');
+	// 		if ( minMaxPointSize ) minMaxPointSize.remove();
+	// 	}
+
+	// 	if (key == 'color') {
+	// 		var minMaxColorRange = Wu.DomUtil.get('field_wrapper_minmaxcolorrange');
+	// 		if ( minMaxColorRange ) minMaxColorRange.remove();
+
+	// 		var colorRange = Wu.DomUtil.get('field_wrapper_colorrange');
+	// 		if ( colorRange ) colorRange.remove();
+	// 	}		
+	// },
+
 	_removeExtras : function (key) {
 
-		// if ( key == 'pointsize' ) {
-		// 	var minMaxPointSize = Wu.DomUtil.get('field_wrapper_minmaxpointsize');
-		// 	if ( minMaxPointSize ) minMaxPointSize.remove();
-		// }
+		if (key == 'pointsize') {
 
-		// if ( key == 'color' ) {
-		// 	var minMaxColorRange = Wu.DomUtil.get('field_wrapper_minmaxcolorrange');
-		// 	if ( minMaxColorRange ) minMaxColorRange.remove();
+			// pointsize
+			var pointsize = this._content[this.type].pointsize;
+			var minMaxPointSize = pointsize.minmax ? pointsize.minmax.line.container : false;
+			minMaxPointSize && Wu.DomUtil.remove(minMaxPointSize);
+		}
 
-		// 	var colorRange = Wu.DomUtil.get('field_wrapper_colorrange');
-		// 	if ( colorRange ) colorRange.remove();
-		// }		
+		if (key == 'color') {
+
+			// min/max
+			var minmax = this._content[this.type].color.minmax;
+			var minMaxColorRange = minmax ? minmax.line.container : false;
+			minMaxColorRange && Wu.DomUtil.remove(minMaxColorRange);
+
+			// range
+			var range = this._content[this.type].color.range;
+			var colorRange = range ? range.line.container : false;
+			colorRange && Wu.DomUtil.remove(colorRange);
+		}		
 	},
 
-	// ADD COLOR FIELDS (color preset, color min/max)
+
+	_clearOptions : function () {
+
+		var content = this._content[this.type];
+
+		// return if not content yet
+		if (_.isEmpty(content)) return;
+
+		// get divs
+		var color_wrapper = content.color.line.container;
+		var color_children = content.color.line.childWrapper;
+		var opacity_wrapper = content.opacity.line.container;
+
+		// remove divs
+		color_wrapper && Wu.DomUtil.remove(color_wrapper);
+		color_children && Wu.DomUtil.remove(color_children);
+		opacity_wrapper && Wu.DomUtil.remove(opacity_wrapper);
+	},
+
+
 	_addColorFields : function (key, fieldName) {
 
 		// get color value
-		var value  = this.options.carto.point[key].value || this.options.defaultRange;
+		var value  = this.options.carto[this.type][key].value || this.options.defaultRange;
 
 		// if not array, it's 'fixed' selection
 		if (!_.isArray(value)) return; 
 
 		// Get wrapper
-		var childWrapper = Wu.DomUtil.get('point-color-children');
+		var childWrapper = this._content[this.type].color.line.childWrapper;
+
+		// remove old
+		childWrapper.innerHTML = '';
 
 		// update min/max
 		var fieldMaxRange = Math.floor(this.options.columns[fieldName].max * 10) / 10;
 		var fieldMinRange = Math.floor(this.options.columns[fieldName].min * 10) / 10;
 
 		// get div
-		var minMaxColorRange = Wu.DomUtil.get('field_wrapper_minmaxcolorrange'); 	// todo: not pluggable!
-		
-		// update instead of create
-		if (minMaxColorRange) {
-		
-			// set div values
-			var max = Wu.DomUtil.get('field_mini_input_max_minmaxcolorrange');
-			var min = Wu.DomUtil.get('field_mini_input_min_minmaxcolorrange'); 	// todo: not pluggable
-			max.value = fieldMaxRange;
-			min.value = fieldMinRange;
-
-			// save carto
-			this.options.carto.point[key].customMinMax = false;
-
-			// end early
-			return;
-		}
+		var range = this._content[this.type].color.range;
+		var color_range = range ? range.line.container : false;
 
 		// convert to five colors
 		if (value.length < 5) value = this._convertToFiveColors(value);
@@ -195,20 +224,26 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 			customFn  : this._updateRange.bind(this),  // color ball selection
 			value     : value
 		});
+
+		// rememeber 
+		this._content[this.type].color.range = {
+			line : line,
+			dropdown : dropdown
+		}
 	
 		// save carto
-		this.options.carto.point[key].range = fieldName;
-		this.options.carto.point[key].value = value;
+		this.options.carto[this.type][key].range = fieldName;
+		this.options.carto[this.type][key].value = value;
 
 		// get min/max
-		var value  = this.options.carto.point[key].customMinMax || [fieldMinRange, fieldMaxRange];
+		var value = this.options.carto[this.type][key].customMinMax || [fieldMinRange, fieldMaxRange];
 		
 		// Use placeholder value if empty
 		if (isNaN(value[0])) value[0] = fieldMinRange;
 		if (isNaN(value[1])) value[1] = fieldMaxRange;
 
 		// Container
-		var minline = new Wu.fieldLine({
+		var line = new Wu.fieldLine({
 			id        : 'minmaxcolorrange',
 			appendTo  : childWrapper,
 			title     : 'Min/max range',
@@ -217,22 +252,77 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		});
 
 		// Inputs
-		var inputs = new Wu.button({
+		var input = new Wu.button({
 			id 	  : 'minmaxcolorrange',
 			type 	  : 'dualinput',
 			right 	  : true,
-			appendTo  : minline.container,
+			appendTo  : line.container,
 			value     : value,
 			fn        : this.saveColorRangeDualBlur.bind(this),
 			minmax    : [fieldMinRange, fieldMaxRange],
 			tabindex  : [this.tabindex++, this.tabindex++]
 		});
 
+		// rememeber 
+		this._content[this.type].color.minmax = {
+			line : line,
+			input : input
+		}
+
 		// save carto
-		this.options.carto.point[key].customMinMax = value;
-		this.options.carto.point[key].minMax = [fieldMinRange, fieldMaxRange];
+		this.options.carto[this.type][key].customMinMax = value;
+		this.options.carto[this.type][key].minMax = [fieldMinRange, fieldMaxRange];
 		
 	},
+
+	// on color preset color ball selection
+	_updateRange : function (hex, key, wrapper) {
+
+		var colorBall_1 = this._content[this.type].color.dropdown._colorball1;
+		var colorBall_2 = this._content[this.type].color.dropdown._colorball2;
+		var colorBall_3 = this._content[this.type].color.dropdown._colorball3;
+
+		// Set HEX value on ball we've changed
+		wrapper.setAttribute('hex', hex);
+
+		// Get color values
+		var color1 = colorBall_1.getAttribute('hex');
+		var color2 = colorBall_2.getAttribute('hex');
+		var color3 = colorBall_3.getAttribute('hex');
+
+		// Build color array
+		var colors = this._convertToFiveColors([color1, color2, color3]);
+
+		// Color range bar
+		var colorRangeBar = this._content[this.type].color.range.dropdown._color;
+
+		// Set styling
+		var gradientStyle = this._gradientStyle(colors);
+		colorRangeBar.setAttribute('style', gradientStyle);
+
+		// Do not save if value is unchanged
+		if (this.options.carto[this.type].color.value == colors) return;
+
+		// save carto
+		this.options.carto[this.type].color.value = colors;
+
+		// close popup
+		this._closeColorRangeSelector(); 
+
+		// UPDATE
+		this._updateStyle();
+
+	},
+
+	_closeColorRangeSelector : function () {
+		
+		console.log('_closeColorRangeSelector', this._content[this.type].color);
+		
+		var rangeSelector = this._content[this.type].color.dropdown._colorSelectorWrapper;
+		var clickCatcher = this._content[this.type].color.dropdown._clicker;
+		if (rangeSelector) Wu.DomUtil.addClass(rangeSelector, 'displayNone');
+		if (clickCatcher) Wu.DomUtil.addClass(clickCatcher, 'displayNone');		
+	},	
 
 	// on click on color range presets
 	selectColorPreset : function (e) {
@@ -288,5 +378,4 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 
 	},
 
-
-})
+});

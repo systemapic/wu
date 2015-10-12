@@ -2,7 +2,6 @@ Wu.Styler.Point = Wu.Styler.extend({
 
 	type : 'point',
 
-	
 	// creates content of point container
 	_createOptions : function () {
 
@@ -35,38 +34,37 @@ Wu.Styler.Point = Wu.Styler.extend({
 	},
 
 
-	_updateOpacity : function (e) {
+	// _updateOpacity : function (e) {
 
-		var value = parseFloat(e.target.value);
-		var key   = e.target.id.slice(17, e.target.id.length); 	// todo: remove these also. 
-		var pre = key.substring(0,4);				// whole object is now available in this._content[this.type].opacity.input
-									// eg. id = this._content[this.type].opacity.input.id, etc..
-		if (pre == 'min_' || pre == 'max_') {
-			key = key.slice(4, key.length);
-		}
+	// 	var value = parseFloat(e.target.value);
+	// 	var key   = e.target.id.slice(17, e.target.id.length); 	// todo: remove these also. 
+	// 	var pre = key.substring(0,4);				// whole object is now available in this._content[this.type].opacity.input
+	// 								// eg. id = this._content[this.type].opacity.input.id, etc..
+	// 	if (pre == 'min_' || pre == 'max_') {
+	// 		key = key.slice(4, key.length);
+	// 	}
 
-		// Get field 
-		// var inputField = Wu.DomUtil.get('field_mini_input_opacity'); // todo: not pluggable!
-		var inputField = this._content[this.type].opacity.input.input;
+	// 	// Get field 
+	// 	var inputField = this._content[this.type].opacity.input.input;
 
-		// If more than one, make it one
-		if ( value > 1  && value < 10  ) value = 1;
-		if ( value > 10 && value < 100 ) value = value/100;
-		if ( value > 100 ) 	         value = 1;
+	// 	// If more than one, make it one
+	// 	if ( value > 1  && value < 10  ) value = 1;
+	// 	if ( value > 10 && value < 100 ) value = value/100;
+	// 	if ( value > 100 ) 	         value = 1;
 		
-		// Set value in input
-		inputField.value = value;
+	// 	// Set value in input
+	// 	inputField.value = value;
 
-		// don't save if unchanged
-		if (this.options.carto[this.type].opacity.value == value) return;
+	// 	// don't save if unchanged
+	// 	if (this.options.carto[this.type].opacity.value == value) return;
 
-		// save carto
-		this.options.carto[this.type].opacity.value = value;
+	// 	// save carto
+	// 	this.options.carto[this.type].opacity.value = value;
 
-		// update
-		this._updateStyle();
+	// 	// update
+	// 	this._updateStyle();
 		
-	},
+	// },
 
 	_updatePointsize : function (e) {
 
@@ -170,28 +168,54 @@ Wu.Styler.Point = Wu.Styler.extend({
 	_removeExtras : function (key) {
 
 		if (key == 'pointsize') {
+
+			// pointsize
 			var pointsize = this._content[this.type].pointsize;
 			var minMaxPointSize = pointsize.minmax ? pointsize.minmax.line.container : false;
 			minMaxPointSize && Wu.DomUtil.remove(minMaxPointSize);
 		}
 
 		if (key == 'color') {
+
+			// min/max
 			var minmax = this._content[this.type].color.minmax;
 			var minMaxColorRange = minmax ? minmax.line.container : false;
 			minMaxColorRange && Wu.DomUtil.remove(minMaxColorRange);
 
+			// range
 			var range = this._content[this.type].color.range;
 			var colorRange = range ? range.line.container : false;
 			colorRange && Wu.DomUtil.remove(colorRange);
 		}		
 	},
 
+	_clearOptions : function () {
+
+		var content = this._content[this.type];
+
+		// return if not content yet
+		if (_.isEmpty(content)) return;
+
+		// get divs
+		var color_wrapper = content.color.line.container;
+		var color_children = content.color.line.childWrapper;
+		var opacity_wrapper = content.opacity.line.container;
+		var pointsize_wrapper = content.pointsize.line.container;
+		var pointsize_children = content.pointsize.line.childWrapper;
+
+		// remove divs
+		color_wrapper && Wu.DomUtil.remove(color_wrapper);
+		color_children && Wu.DomUtil.remove(color_children);
+		opacity_wrapper && Wu.DomUtil.remove(opacity_wrapper);
+		pointsize_wrapper && Wu.DomUtil.remove(pointsize_wrapper);
+		pointsize_children && Wu.DomUtil.remove(pointsize_children);
+	},
 
 
 	_addColorFields : function (key, fieldName) {
 
 		// get color value
-		var value  = this.options.carto.point[key].value || this.options.defaultRange;
+		var value  = this.options.carto[this.type][key].value || this.options.defaultRange;
 
 		// if not array, it's 'fixed' selection
 		if (!_.isArray(value)) return; 
