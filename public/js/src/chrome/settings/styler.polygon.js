@@ -17,148 +17,30 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 	},
 
 	
-	// _updateOpacity : function (e) {
+	_preSelectOptions : function () {
 
-	// 	var value = parseFloat(e.target.value);
-	// 	var key   = e.target.id.slice(17, e.target.id.length); 	// todo: remove these also. 
-	// 	var pre = key.substring(0,4);				// whole object is now available in this._content[this.type].opacity.input
-	// 								// eg. id = this._content[this.type].opacity.input.id, etc..
-	// 	if (pre == 'min_' || pre == 'max_') {
-	// 		key = key.slice(4, key.length);
-	// 	}
-
-	// 	// Get field 
-	// 	var inputField = this._content[this.type].opacity.input.input;
-
-	// 	// If more than one, make it one
-	// 	if ( value > 1  && value < 10  ) value = 1;
-	// 	if ( value > 10 && value < 100 ) value = value/100;
-	// 	if ( value > 100 ) 	         value = 1;
-		
-	// 	// Set value in input
-	// 	inputField.value = value;
-
-	// 	// don't save if unchanged
-	// 	if (this.options.carto[this.type].opacity.value == value) return;
-
-	// 	// save carto
-	// 	this.options.carto[this.type].opacity.value = value;
-
-	// 	// update
-	// 	this._updateStyle();
-		
-	// },
-
-	_selectOptions : function () {
-
-		// options for sub menus
-		var colorRange = this.options.carto.polygon.color.range;
-		var opacityRange = this.options.carto.polygon.opacity.range;
-
-		var options = {
-			colorRange : colorRange,
-			opacityRange : opacityRange,
-		}
-		
-		// init subemnus on relevant fields
-		this._initOpenFields(options, 'color'); 		
-	},
-
-
-	_unselectField : function (key, wrapper) {
-
-		// Make static inputs available
-		if (key == 'opacity' || key == 'pointsize') {	
-			var miniInput = Wu.DomUtil.get('field_mini_input_' + key);	
-			Wu.DomUtil.removeClass(miniInput, 'left-mini-kill');
-			this._removeExtras(key);
-		}
-
-		// Make static color available
-		if (key == 'color') {
-			var colorBall = Wu.DomUtil.get('color_ball_color'); 	// todo: not pluggable
-			Wu.DomUtil.removeClass(colorBall, 'disable-color-ball');
-			this._removeExtras(key);
-		}
-
-		// adjust width
-		Wu.DomUtil.removeClass(wrapper, 'full-width');
-
-		// save style
-		this.options.carto[this.type][key].range = false;
-
-		// refresh
-		this._updateStyle();
-	},
-
-	_selectField : function (key, wrapper, field) {
-
-		// add class
-		Wu.DomUtil.addClass(wrapper, 'full-width');
-
-		// DISABLE mini input fields
-		if ( key == 'opacity' || key == 'pointsize' ) {
-			var miniInput = Wu.DomUtil.get('field_mini_input_' + key);
-			Wu.DomUtil.addClass(miniInput, 'left-mini-kill');
-		}
-
-		// DISABLE static color ball
-		if ( key == 'color' ) {
-			var colorBall = Wu.DomUtil.get('color_ball_color');
-			Wu.DomUtil.addClass(colorBall, 'disable-color-ball');
-		}
-
-		// SAVE JSON
-		this.options.carto[this.type][key].range = field; // range == column
-
-		// Add fields
-		this._addExtras(key, field); // sub meny
-
-		// UPDATE
-		this._updateStyle();
+		this._initSubfields(this.carto().color.column, 'color');
+		this._initSubfields(this.carto().opacity.column, 'opacity');
 
 	},
 
-	// // CLEAN UP EXTRA FIELDS
+
 	// _removeExtras : function (key) {
 
-	// 	if (key == 'pointsize') {
-	// 		var minMaxPointSize = Wu.DomUtil.get('field_wrapper_minmaxpointsize');
-	// 		if ( minMaxPointSize ) minMaxPointSize.remove();
-	// 	}
+	// 	// remove div
+	// 	var field = this._content[this.type][key].minmax;
+	// 	var div = field ? field.line.container : false;
+	// 	div && Wu.DomUtil.remove(div);
 
+	// 	// extra
 	// 	if (key == 'color') {
-	// 		var minMaxColorRange = Wu.DomUtil.get('field_wrapper_minmaxcolorrange');
-	// 		if ( minMaxColorRange ) minMaxColorRange.remove();
 
-	// 		var colorRange = Wu.DomUtil.get('field_wrapper_colorrange');
-	// 		if ( colorRange ) colorRange.remove();
+	// 		// range
+	// 		var range = this._content[this.type].color.range;
+	// 		var div = range ? range.line.container : false;
+	// 		div && Wu.DomUtil.remove(div);
 	// 	}		
 	// },
-
-	_removeExtras : function (key) {
-
-		if (key == 'pointsize') {
-
-			// pointsize
-			var pointsize = this._content[this.type].pointsize;
-			var minMaxPointSize = pointsize.minmax ? pointsize.minmax.line.container : false;
-			minMaxPointSize && Wu.DomUtil.remove(minMaxPointSize);
-		}
-
-		if (key == 'color') {
-
-			// min/max
-			var minmax = this._content[this.type].color.minmax;
-			var minMaxColorRange = minmax ? minmax.line.container : false;
-			minMaxColorRange && Wu.DomUtil.remove(minMaxColorRange);
-
-			// range
-			var range = this._content[this.type].color.range;
-			var colorRange = range ? range.line.container : false;
-			colorRange && Wu.DomUtil.remove(colorRange);
-		}		
-	},
 
 
 	_clearOptions : function () {
@@ -180,10 +62,10 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 	},
 
 
-	_addColorFields : function (key, fieldName) {
+	_addColorFields : function (column) {
 
 		// get color value
-		var value  = this.options.carto[this.type][key].value || this.options.defaultRange;
+		var value  = this.carto().color.value || this.options.defaults.range;
 
 		// if not array, it's 'fixed' selection
 		if (!_.isArray(value)) return; 
@@ -195,8 +77,8 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		childWrapper.innerHTML = '';
 
 		// update min/max
-		var fieldMaxRange = Math.floor(this.options.columns[fieldName].max * 10) / 10;
-		var fieldMinRange = Math.floor(this.options.columns[fieldName].min * 10) / 10;
+		var fieldMaxRange = Math.floor(this.options.columns[column].max * 10) / 10;
+		var fieldMinRange = Math.floor(this.options.columns[column].min * 10) / 10;
 
 		// get div
 		var range = this._content[this.type].color.range;
@@ -232,11 +114,11 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		}
 	
 		// save carto
-		this.options.carto[this.type][key].range = fieldName;
-		this.options.carto[this.type][key].value = value;
+		this.carto().color.column = column;
+		this.carto().color.value = value;
 
 		// get min/max
-		var value = this.options.carto[this.type][key].customMinMax || [fieldMinRange, fieldMaxRange];
+		var value = this.carto().color.range || [fieldMinRange, fieldMaxRange];
 		
 		// Use placeholder value if empty
 		if (isNaN(value[0])) value[0] = fieldMinRange;
@@ -270,8 +152,7 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		}
 
 		// save carto
-		this.options.carto[this.type][key].customMinMax = value;
-		this.options.carto[this.type][key].minMax = [fieldMinRange, fieldMaxRange];
+		this.carto().color.range = [fieldMinRange, fieldMaxRange];
 		
 	},
 
@@ -301,10 +182,10 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		colorRangeBar.setAttribute('style', gradientStyle);
 
 		// Do not save if value is unchanged
-		if (this.options.carto[this.type].color.value == colors) return;
+		if (this.carto().color.value == colors) return;
 
 		// save carto
-		this.options.carto[this.type].color.value = colors;
+		this.carto().color.value = colors;
 
 		// close popup
 		this._closeColorRangeSelector(); 
@@ -361,17 +242,17 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		this._closeColorRangeSelector();
 
 		// Do not save if value is unchanged
-		if ( this.options.carto[this.type].color.value[0] == colorArray[0] &&
-		     this.options.carto[this.type].color.value[1] == colorArray[1] && 
-		     this.options.carto[this.type].color.value[2] == colorArray[2] &&
-		     this.options.carto[this.type].color.value[3] == colorArray[3] &&
-		     this.options.carto[this.type].color.value[4] == colorArray[4] ) {
+		if ( this.carto().color.value[0] == colorArray[0] &&
+		     this.carto().color.value[1] == colorArray[1] && 
+		     this.carto().color.value[2] == colorArray[2] &&
+		     this.carto().color.value[3] == colorArray[3] &&
+		     this.carto().color.value[4] == colorArray[4] ) {
 
 			return;
 		}
 
 		// Store in JSON
-		this.options.carto[this.type].color.value = colorArray;		
+		this.carto().color.value = colorArray;		
 
 		// UPDATE
 		this._updateStyle();		

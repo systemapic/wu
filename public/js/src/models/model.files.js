@@ -388,19 +388,20 @@ Wu.Model.File = Wu.Model.extend({
 		point : { 
 			enabled : false, 
 			color : { 
-				range : false, 
-				minMax : [-426.6, 105.9], 
-				customMinMax : [-426.6, 105.9], 
+				column : false, 
+				range : [-426.6, 105.9], 
+				// customMinMax : [-426.6, 105.9], 
 				staticVal : "yellow",
 				value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
 			},
 			opacity : { 
-				range : false,
+				column : false,
+				range : [-426.6, 105.9],
 				value : 0.5
 			}, 
 			pointsize : { 
-				range :false,
-				minMax : false,
+				column :false,
+				range : [0, 10],
 				value : 1
 			}
 		},
@@ -408,30 +409,32 @@ Wu.Model.File = Wu.Model.extend({
 		polygon : { 
 			enabled : false, 
 			color : { 
-				range : false, 
-				minMax : [-426.6, 105.9], 
-				customMinMax : [-426.6, 105.9], 
+				column : false, 
+				range : [-426.6, 105.9], 
+				// customMinMax : [-426.6, 105.9], 
 				staticVal : "red",
 				value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
 			},
 			opacity : { 
-				range : false,
+				column : false,
+				range : [-426.6, 105.9],
 				value : 0.5
 			}, 
 			line : {
 				width : { 
-					range :false,
-					minMax : false,
+					column :false,
+					range : false,
 					value : 1
 				},
 				opacity : {
-					range : false,
+					column : false,
+					range : [-426.6, 105.9],
 					value : 0.5
 				},
 				color : {
-					range : false, 
-					minMax : [-426.6, 105.9], 
-					customMinMax : [-426.6, 105.9], 
+					column : false, 
+					range : [-426.6, 105.9], 
+					// customMinMax : [-426.6, 105.9], 
 					staticVal : "green",
 					value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
 				}
@@ -441,18 +444,18 @@ Wu.Model.File = Wu.Model.extend({
 		line : {
 			enabled : false,
 			width : { 
-				range :false,
+				column :false,
 				minMax : false,
 				value : 1
 			},
 			opacity : {
-				range : false,
+				column : false,
 				value : 0.5
 			},
 			color : {
-				range : false, 
-				minMax : [-426.6, 105.9], 
-				customMinMax : [-426.6, 105.9], 
+				column : false, 
+				range : [-426.6, 105.9], 
+				// customMinMax : [-426.6, 105.9], 
 				staticVal : "green",
 				value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
 			}
