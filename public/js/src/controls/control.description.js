@@ -308,31 +308,33 @@ L.Control.Description = Wu.Control.extend({
 
 		
 		// COLOR RANGE
-		if ( style && style[key].color.range ) {
+		if ( style && style[key].color.column ) {
 
 			var colorStops = style[key].color.value;
-			var customMinMax = style[key].color.customMinMax;
-			var minMax = style[key].color.minMax
+			// var customMinMax = style[key].color.customMinMax;
+			var minMax = style[key].color.range;
 
-			if ( customMinMax[0] != null || customMinMax[0] != NaN || customMinMax[0] != '' ) {
-				var min = customMinMax[0];
-			} else {
-				var min = minMax[0];
-			}
+			// if ( customMinMax[0] != null || customMinMax[0] != NaN || customMinMax[0] != '' ) {
+			// 	var min = customMinMax[0];
+			// } else {
+			// 	var min = minMax[0];
+			// }
 
-			if ( customMinMax[1] != null || customMinMax[1] != NaN || customMinMax[1] != '' ) {
-				var max = customMinMax[1];
-			} else {
-				var max = minMax[1];
-			}
+			// if ( customMinMax[1] != null || customMinMax[1] != NaN || customMinMax[1] != '' ) {
+			// 	var max = customMinMax[1];
+			// } else {
+			// 	var max = minMax[1];
+			// }
 
+			var min = minMax[0];
+			var max = minMax[1];
 
 			// create legend
 			var gradientOptions = {
 				colorStops : colorStops,
-				minVal : customMinMax[0],
-				// medVal : (customMinMax[0]+customMinMax[1]),
-				maxVal : customMinMax[1],
+				minVal : minMax[0],
+				// medVal : (minMax[0] + minMax[1]),
+				maxVal : minMax[1],
 				bline : 'Velocity (mm pr. year)'
 			}
 
@@ -360,28 +362,18 @@ L.Control.Description = Wu.Control.extend({
 		if (style && style[key] && style[key].color && style[key].color.range) {
 
 			var colorStops = style[key].color.value;
-			var customMinMax = style[key].color.customMinMax;
-			var minMax = style[key].color.minMax
 
-			if ( customMinMax[0] != null || customMinMax[0] != NaN || customMinMax[0] != '' ) {
-				var min = customMinMax[0];
-			} else {
-				var min = minMax[0];
-			}
+			var minMax = style[key].color.range
 
-			if ( customMinMax[1] != null || customMinMax[1] != NaN || customMinMax[1] != '' ) {
-				var max = customMinMax[1];
-			} else {
-				var max = minMax[1];
-			}
-
+			var min = minMax[0];
+			var max = minMax[1];
 
 			// create legend
 			var gradientOptions = {
 				colorStops : colorStops,
-				minVal : customMinMax[0],
+				minVal : minMax[0],
 				// medVal : (customMinMax[0]+customMinMax[1]),
-				maxVal : customMinMax[1],
+				maxVal : minMax[1],
 				bline : 'Velocity (mm pr. year)'
 			}
 

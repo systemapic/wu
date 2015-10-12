@@ -196,10 +196,10 @@ module.exports = api.geo = {
 		}
 
 
-		if ( opacity.range ) {
+		if ( opacity.column ) {
 
-			var max = Math.floor(options.columns[opacity.range].max * 10) / 10;
-			var min = Math.floor(options.columns[opacity.range].min * 10) / 10;				
+			var max = Math.floor(options.columns[opacity.column].max * 10) / 10;
+			var min = Math.floor(options.columns[opacity.column].min * 10) / 10;				
 
 			var normalizedOffset = true;
 
@@ -212,7 +212,7 @@ module.exports = api.geo = {
 
 			cartObj.headers += '@opacity_field_max: ' + max + ';\n';
 			cartObj.headers += '@opacity_field_min: ' + min + ';\n';
-			cartObj.headers += '@opacity_field_range: [' + opacity.range + '];\n\n';
+			cartObj.headers += '@opacity_field_range: [' + opacity.column + '];\n\n';
 			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
 
 		
@@ -239,10 +239,12 @@ module.exports = api.geo = {
 		}
 
 
-		if ( opacity.range ) {
+		if ( opacity.column ) {
 
-			var max = Math.floor(options.columns[opacity.range].max * 10) / 10;
-			var min = Math.floor(options.columns[opacity.range].min * 10) / 10;				
+			var max = Math.floor(options.columns[opacity.column].max * 10) / 10;
+			var min = Math.floor(options.columns[opacity.column].min * 10) / 10;				
+
+			var range = opacity.range;			
 
 			var normalizedOffset = true;
 
@@ -253,9 +255,9 @@ module.exports = api.geo = {
 				if ( min > 0 ) min = 0;
 			}
 
-			cartObj.headers += '@opacity_field_max: ' + max + ';\n';
-			cartObj.headers += '@opacity_field_min: ' + min + ';\n';
-			cartObj.headers += '@opacity_field_range: [' + opacity.range + '];\n\n';
+			cartObj.headers += '@opacity_field_max: ' + range[1] + ';\n';
+			cartObj.headers += '@opacity_field_min: ' + range[0] + ';\n';
+			cartObj.headers += '@opacity_field_range: [' + opacity.column + '];\n\n';
 			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
 
 		
@@ -282,10 +284,12 @@ module.exports = api.geo = {
 		}
 
 
-		if ( opacity.range ) {
+		if ( opacity.column ) {
 
-			var max = Math.floor(options.columns[opacity.range].max * 10) / 10;
-			var min = Math.floor(options.columns[opacity.range].min * 10) / 10;				
+			var max = Math.floor(options.columns[opacity.column].max * 10) / 10;
+			var min = Math.floor(options.columns[opacity.column].min * 10) / 10;	
+
+			var range = opacity.range;			
 
 			var normalizedOffset = true;
 
@@ -296,9 +300,9 @@ module.exports = api.geo = {
 				if ( min > 0 ) min = 0;
 			}
 
-			cartObj.headers += '@opacity_field_max: ' + max + ';\n';
-			cartObj.headers += '@opacity_field_min: ' + min + ';\n';
-			cartObj.headers += '@opacity_field_range: [' + opacity.range + '];\n\n';
+			cartObj.headers += '@opacity_field_max: ' + range[1] + ';\n';
+			cartObj.headers += '@opacity_field_min: ' + range[0] + ';\n';
+			cartObj.headers += '@opacity_field_range: [' + opacity.column + '];\n\n';
 			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
 
 		
@@ -329,9 +333,9 @@ module.exports = api.geo = {
 			style   : ''
 		}		
 
-		if ( color.range ) {
+		if ( color.column ) {
 
-			var minMax = color.customMinMax ? color.customMinMax : color.minMax;
+			var minMax = color.range;// ? color.customMinMax : color.minMax;
 
 			// Get color values
 			var c1 = color.value[0];
@@ -379,14 +383,14 @@ module.exports = api.geo = {
 
 
 			// CREATE VARS
-			var fieldName = '@' + color.range;
+			var fieldName = '@' + color.column;
 			var maxField  = fieldName + '_max';
 			var minField  = fieldName + '_min';
 			var deltaName = fieldName + '_delta';
 			
 
 			// DEFINE FIELD NAME + MIN/MAX
-			cartObj.headers += fieldName + ': [' + color.range + '];\n';
+			cartObj.headers += fieldName + ': [' + color.column + '];\n';
 			cartObj.headers += maxField  + ': '  + minMax[1] + ';\n'; 
 			cartObj.headers += minField  + ': '  + minMax[0] + ';\n\n';
 			
@@ -462,9 +466,9 @@ module.exports = api.geo = {
 			style   : ''
 		}		
 
-		if ( color.range ) {
+		if ( color.column ) {
 
-			var minMax = color.customMinMax ? color.customMinMax : color.minMax;
+			var minMax = color.range;// ? color.customMinMax : color.minMax;
 
 			// Get color values
 			var c1 = color.value[0];
@@ -512,14 +516,14 @@ module.exports = api.geo = {
 
 
 			// CREATE VARS
-			var fieldName = '@' + color.range;
+			var fieldName = '@' + color.column;
 			var maxField  = fieldName + '_max';
 			var minField  = fieldName + '_min';
 			var deltaName = fieldName + '_delta';
 			
 
 			// DEFINE FIELD NAME + MIN/MAX
-			cartObj.headers += fieldName + ': [' + color.range + '];\n';
+			cartObj.headers += fieldName + ': [' + color.column + '];\n';
 			cartObj.headers += maxField  + ': '  + minMax[1] + ';\n'; 
 			cartObj.headers += minField  + ': '  + minMax[0] + ';\n\n';
 			
@@ -595,9 +599,9 @@ module.exports = api.geo = {
 			style   : ''
 		}		
 
-		if ( color.range ) {
+		if ( color.column ) {
 
-			var minMax = color.customMinMax ? color.customMinMax : color.minMax;
+			var minMax = color.range;// ? color.customMinMax : color.minMax;
 
 			// Get color values
 			var c1 = color.value[0];
@@ -645,14 +649,14 @@ module.exports = api.geo = {
 
 
 			// CREATE VARS
-			var fieldName = '@' + color.range;
+			var fieldName = '@' + color.column;
 			var maxField  = fieldName + '_max';
 			var minField  = fieldName + '_min';
 			var deltaName = fieldName + '_delta';
 			
 
 			// DEFINE FIELD NAME + MIN/MAX
-			cartObj.headers += fieldName + ': [' + color.range + '];\n';
+			cartObj.headers += fieldName + ': [' + color.column + '];\n';
 			cartObj.headers += maxField  + ': '  + minMax[1] + ';\n'; 
 			cartObj.headers += minField  + ': '  + minMax[0] + ';\n\n';
 			
@@ -732,15 +736,15 @@ module.exports = api.geo = {
 			style   : ''
 		}		
 
-		if ( pointSize.range ) {
+		if ( pointSize.column ) {
 
-			var max = Math.floor(options.columns[pointSize.range].max * 10) / 10;
-			var min = Math.floor(options.columns[pointSize.range].min * 10) / 10;
+			var max = Math.floor(options.columns[pointSize.column].max * 10) / 10;
+			var min = Math.floor(options.columns[pointSize.column].min * 10) / 10;
 		
 			// cartObj.headers += '@marker_size_max: ' + pointSize.minMax[1] + ';\n';
-			cartObj.headers += '@marker_size_min: ' + pointSize.minMax[0] + ';\n';
-			cartObj.headers += '@marker_size_range: ' + (pointSize.minMax[1] - pointSize.minMax[0]) + ';\n';
-			cartObj.headers += '@marker_size_field: [' + pointSize.range + '];\n';
+			cartObj.headers += '@marker_size_min: ' + pointSize.range[0] + ';\n';
+			cartObj.headers += '@marker_size_range: ' + (pointSize.range[1] - pointSize.range[0]) + ';\n';
+			cartObj.headers += '@marker_size_field: [' + pointSize.column + '];\n';
 			cartObj.headers += '@marker_size_field_maxVal: ' + max + ';\n';
 			cartObj.headers += '@marker_size_field_minVal: ' + min + ';\n';
 			cartObj.headers += '\n//TODO: Fix this!\n';
@@ -777,14 +781,14 @@ module.exports = api.geo = {
 			style   : ''
 		}		
 
-		if ( lineWidth.range ) {
+		if ( lineWidth.column ) {
 
-			var max = Math.floor(options.columns[lineWidth.range].max * 10) / 10;
-			var min = Math.floor(options.columns[lineWidth.range].min * 10) / 10;
+			var max = Math.floor(options.columns[lineWidth.column].max * 10) / 10;
+			var min = Math.floor(options.columns[lineWidth.column].min * 10) / 10;
 		
-			cartObj.headers += '@line_size_min: ' + lineWidth.minMax[0] + ';\n';
-			cartObj.headers += '@line_size_range: ' + (lineWidth.minMax[1] - lineWidth.minMax[0]) + ';\n';
-			cartObj.headers += '@line_size_field: [' + lineWidth.range + '];\n';
+			cartObj.headers += '@line_size_min: ' + lineWidth.range[0] + ';\n';
+			cartObj.headers += '@line_size_range: ' + (lineWidth.range[1] - lineWidth.range[0]) + ';\n';
+			cartObj.headers += '@line_size_field: [' + lineWidth.column + '];\n';
 			cartObj.headers += '@line_size_field_maxVal: ' + max + ';\n';
 			cartObj.headers += '@line_size_field_minVal: ' + min + ';\n';
 			cartObj.headers += '\n//TODO: Fix this!\n';
