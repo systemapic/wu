@@ -430,7 +430,7 @@ Wu.Model.Layer = Wu.Model.extend({
 	getTooltip : function () {
 		var json = this.store.tooltip;
 		if (!json) return false;
-		var meta = JSON.parse(json);
+		var meta = Wu.parse(json);
 		return meta;
 	},
 
@@ -442,7 +442,8 @@ Wu.Model.Layer = Wu.Model.extend({
 	getStyling : function () {
 		var json = this.store.style;
 		if (!json) return false;
-		var styleJSON = JSON.parse(json);
+		var styleJSON = Wu.parse(json);
+		console.log('GOT STYLE:', styleJSON);
 		return styleJSON;
 	},
 
@@ -454,7 +455,7 @@ Wu.Model.Layer = Wu.Model.extend({
 
 	getLegends : function () {
 		var meta = this.store.legends
-		if (meta) return JSON.parse(meta);
+		if (meta) return Wu.parse(meta);
 		return false;
 	},
 
