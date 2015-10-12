@@ -19,28 +19,10 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 	
 	_preSelectOptions : function () {
 
+		// open relevant subfields
 		this._initSubfields(this.carto().color.column, 'color');
 		this._initSubfields(this.carto().opacity.column, 'opacity');
-
 	},
-
-
-	// _removeExtras : function (key) {
-
-	// 	// remove div
-	// 	var field = this._content[this.type][key].minmax;
-	// 	var div = field ? field.line.container : false;
-	// 	div && Wu.DomUtil.remove(div);
-
-	// 	// extra
-	// 	if (key == 'color') {
-
-	// 		// range
-	// 		var range = this._content[this.type].color.range;
-	// 		var div = range ? range.line.container : false;
-	// 		div && Wu.DomUtil.remove(div);
-	// 	}		
-	// },
 
 
 	_clearOptions : function () {
@@ -62,99 +44,99 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 	},
 
 
-	_addColorFields : function (column) {
+	// _addColorFields : function (column) {
 
-		// get color value
-		var value  = this.carto().color.value || this.options.defaults.range;
+	// 	// get color value
+	// 	var value  = this.carto().color.value || this.options.defaults.range;
 
-		// if not array, it's 'fixed' selection
-		if (!_.isArray(value)) return; 
+	// 	// if not array, it's 'fixed' selection
+	// 	if (!_.isArray(value)) return; 
 
-		// Get wrapper
-		var childWrapper = this._content[this.type].color.line.childWrapper;
+	// 	// Get wrapper
+	// 	var childWrapper = this._content[this.type].color.line.childWrapper;
 
-		// remove old
-		childWrapper.innerHTML = '';
+	// 	// remove old
+	// 	childWrapper.innerHTML = '';
 
-		// update min/max
-		var fieldMaxRange = Math.floor(this.options.columns[column].max * 10) / 10;
-		var fieldMinRange = Math.floor(this.options.columns[column].min * 10) / 10;
+	// 	// update min/max
+	// 	var fieldMaxRange = Math.floor(this.options.columns[column].max * 10) / 10;
+	// 	var fieldMinRange = Math.floor(this.options.columns[column].min * 10) / 10;
 
-		// get div
-		var range = this._content[this.type].color.range;
-		var color_range = range ? range.line.container : false;
+	// 	// get div
+	// 	var range = this._content[this.type].color.range;
+	// 	var color_range = range ? range.line.container : false;
 
-		// convert to five colors
-		if (value.length < 5) value = this._convertToFiveColors(value);
+	// 	// convert to five colors
+	// 	if (value.length < 5) value = this._convertToFiveColors(value);
 
-		// Container
-		var line = new Wu.fieldLine({
-			id        : 'colorrange',
-			appendTo  : childWrapper,
-			title     : 'Color range',
-			input     : false,
-			className : 'sub-line'
-		});
+	// 	// Container
+	// 	var line = new Wu.fieldLine({
+	// 		id        : 'colorrange',
+	// 		appendTo  : childWrapper,
+	// 		title     : 'Color range',
+	// 		input     : false,
+	// 		className : 'sub-line'
+	// 	});
 
-		// dropdown
-		var dropdown = new Wu.button({
-			id 	  : 'colorrange',
-			type 	  : 'colorrange',
-			right 	  : true,
-			appendTo  : line.container,
-			presetFn  : this.selectColorPreset.bind(this), // preset selection
-			customFn  : this._updateRange.bind(this),  // color ball selection
-			value     : value
-		});
+	// 	// dropdown
+	// 	var dropdown = new Wu.button({
+	// 		id 	  : 'colorrange',
+	// 		type 	  : 'colorrange',
+	// 		right 	  : true,
+	// 		appendTo  : line.container,
+	// 		presetFn  : this.selectColorPreset.bind(this), // preset selection
+	// 		customFn  : this._updateRange.bind(this),  // color ball selection
+	// 		value     : value
+	// 	});
 
-		// rememeber 
-		this._content[this.type].color.range = {
-			line : line,
-			dropdown : dropdown
-		}
+	// 	// rememeber 
+	// 	this._content[this.type].color.range = {
+	// 		line : line,
+	// 		dropdown : dropdown
+	// 	}
 	
-		// save carto
-		this.carto().color.column = column;
-		this.carto().color.value = value;
+	// 	// save carto
+	// 	this.carto().color.column = column;
+	// 	this.carto().color.value = value;
 
-		// get min/max
-		var value = this.carto().color.range || [fieldMinRange, fieldMaxRange];
+	// 	// get min/max
+	// 	var value = this.carto().color.range || [fieldMinRange, fieldMaxRange];
 		
-		// Use placeholder value if empty
-		if (isNaN(value[0])) value[0] = fieldMinRange;
-		if (isNaN(value[1])) value[1] = fieldMaxRange;
+	// 	// Use placeholder value if empty
+	// 	if (isNaN(value[0])) value[0] = fieldMinRange;
+	// 	if (isNaN(value[1])) value[1] = fieldMaxRange;
 
-		// Container
-		var line = new Wu.fieldLine({
-			id        : 'minmaxcolorrange',
-			appendTo  : childWrapper,
-			title     : 'Min/max range',
-			input     : false,
-			className : 'sub-line'
-		});
+	// 	// Container
+	// 	var line = new Wu.fieldLine({
+	// 		id        : 'minmaxcolorrange',
+	// 		appendTo  : childWrapper,
+	// 		title     : 'Min/max range',
+	// 		input     : false,
+	// 		className : 'sub-line'
+	// 	});
 
-		// Inputs
-		var input = new Wu.button({
-			id 	  : 'minmaxcolorrange',
-			type 	  : 'dualinput',
-			right 	  : true,
-			appendTo  : line.container,
-			value     : value,
-			fn        : this.saveColorRangeDualBlur.bind(this),
-			minmax    : [fieldMinRange, fieldMaxRange],
-			tabindex  : [this.tabindex++, this.tabindex++]
-		});
+	// 	// Inputs
+	// 	var input = new Wu.button({
+	// 		id 	  : 'minmaxcolorrange',
+	// 		type 	  : 'dualinput',
+	// 		right 	  : true,
+	// 		appendTo  : line.container,
+	// 		value     : value,
+	// 		fn        : this.saveColorRangeDualBlur.bind(this),
+	// 		minmax    : [fieldMinRange, fieldMaxRange],
+	// 		tabindex  : [this.tabindex++, this.tabindex++]
+	// 	});
 
-		// rememeber 
-		this._content[this.type].color.minmax = {
-			line : line,
-			input : input
-		}
+	// 	// rememeber 
+	// 	this._content[this.type].color.minmax = {
+	// 		line : line,
+	// 		input : input
+	// 	}
 
-		// save carto
-		this.carto().color.range = [fieldMinRange, fieldMaxRange];
+	// 	// save carto
+	// 	this.carto().color.range = [fieldMinRange, fieldMaxRange];
 		
-	},
+	// },
 
 	// on color preset color ball selection
 	_updateRange : function (hex, key, wrapper) {
@@ -196,9 +178,6 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 	},
 
 	_closeColorRangeSelector : function () {
-		
-		console.log('_closeColorRangeSelector', this._content[this.type].color);
-		
 		var rangeSelector = this._content[this.type].color.dropdown._colorSelectorWrapper;
 		var clickCatcher = this._content[this.type].color.dropdown._clicker;
 		if (rangeSelector) Wu.DomUtil.addClass(rangeSelector, 'displayNone');

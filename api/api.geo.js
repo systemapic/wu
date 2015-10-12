@@ -198,24 +198,28 @@ module.exports = api.geo = {
 
 		if ( opacity.column ) {
 
-			var max = Math.floor(options.columns[opacity.column].max * 10) / 10;
-			var min = Math.floor(options.columns[opacity.column].min * 10) / 10;				
+			// var max = Math.floor(options.columns[opacity.column].max * 10) / 10;
+			// var min = Math.floor(options.columns[opacity.column].min * 10) / 10;	
 
-			var normalizedOffset = true;
+			var range = opacity.range;			
+
+
+			// var normalizedOffset = true;
 
 			// NORMALIZED OFFSET 
 			// i.e. if the lowest number is 30, and 
 		 	// highest is 100, 30 will return 0.3 and not 0
-			if ( normalizedOffset ) {
-				if ( min > 0 ) min = 0;
-			}
+			// if ( normalizedOffset ) {
+				// if ( min > 0 ) min = 0;
+			// }
+			
+			var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
+			var field_calc = parseFloat(range[1]) / field_floor;
 
-			cartObj.headers += '@opacity_field_max: ' + max + ';\n';
-			cartObj.headers += '@opacity_field_min: ' + min + ';\n';
 			cartObj.headers += '@opacity_field_range: [' + opacity.column + '];\n\n';
-			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
-
-		
+			cartObj.headers += '@opacity_field: @opacity_field_range / ' + field_floor + ' - ' + field_calc + ';\n\n';
+			// 			o 	=    (1400-700)/ (1200-700)
+			// 			r = 700 - 1200
 		} else {
 
 			// static opacity

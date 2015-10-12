@@ -5,115 +5,26 @@ Wu.Styler.Point = Wu.Styler.extend({
 	// creates content of point container
 	_createOptions : function () {
 
-		// COLOR
+		// color
 		this._createColor();
 
-		// OPACITY
+		// opacity
 		this._createOpacity();
 
-		// POINT SIZE
+		// pointsize
 		this._createPointsize();
 	},
 
 	_preSelectOptions : function () {
 
+		// open relevant subfields
 		this._initSubfields(this.carto().color.column, 'color');
 		this._initSubfields(this.carto().opacity.column, 'opacity');
 		this._initSubfields(this.carto().pointsize.column, 'pointsize');
-
 	},
 
 	
-	_updatePointsize : function (e) {
-
-		var value = parseFloat(e.target.value);
-		var key   = e.target.id.slice(17, e.target.id.length);
-		var pre = key.substring(0,4);
-
-		if ( pre == 'min_' || pre == 'max_' ) {
-			key = key.slice(4, key.length);
-		}
-
-		// Get field 
-		var inputField = this._content[this.type].pointsize.input.input;
-
-		// If less than 0.5, make it 0.5
-		if ( value < 0.5 ) value = 0.5;
-
-		// Set value in input
-		inputField.value = value;
-
-		// don't save if no changes
-		if (this.carto().pointsize.value == value) return;
-
-		// save carto
-		this.carto().pointsize.value = value;
-
-		// update
-		this._updateStyle();
-
-	},
-
 	
-
-	// _selectField : function (field, wrapper, column) {
-
-	// 	// add class
-	// 	Wu.DomUtil.addClass(wrapper, 'full-width');
-
-	// 	// remove static inputs
-	// 	if (field == 'opacity') {
-	// 		var miniInput = this._content[this.type].opacity.input.input;
-	// 		Wu.DomUtil.addClass(miniInput, 'left-mini-kill');
-	// 	}
-
-	// 	// remove static inputs
-	// 	if (field == 'pointsize') {
-	// 		var miniInput = this._content[this.type].pointsize.input.input;
-	// 		Wu.DomUtil.addClass(miniInput, 'left-mini-kill');
-	// 	}
-
-	// 	// remove static inputs
-	// 	if (field == 'color') {
-	// 		var colorBall = this._content[this.type].color.ball.color;
-	// 		Wu.DomUtil.addClass(colorBall, 'disable-color-ball');
-	// 	}
-
-	// 	// save carto
-	// 	this.options.carto[this.type][field].column = column; // range == column
-
-	// 	// Add fields
-	// 	this._initSubfields(column, field); // sub meny
-
-	// 	// UPDATE
-	// 	this._updateStyle();
-
-	// },
-
-	// // CLEAN UP EXTRA FIELDS
-	// _removeExtras : function (key) {
-
-	// 	if (key == 'pointsize') {
-
-	// 		// pointsize
-	// 		var pointsize = this._content[this.type].pointsize;
-	// 		var minMaxPointSize = pointsize.minmax ? pointsize.minmax.line.container : false;
-	// 		minMaxPointSize && Wu.DomUtil.remove(minMaxPointSize);
-	// 	}
-
-	// 	if (key == 'color') {
-
-	// 		// min/max
-	// 		var minmax = this._content[this.type].color.minmax;
-	// 		var minMaxColorRange = minmax ? minmax.line.container : false;
-	// 		minMaxColorRange && Wu.DomUtil.remove(minMaxColorRange);
-
-	// 		// range
-	// 		var range = this._content[this.type].color.range;
-	// 		var colorRange = range ? range.line.container : false;
-	// 		colorRange && Wu.DomUtil.remove(colorRange);
-	// 	}		
-	// },
 
 	_clearOptions : function () {
 
@@ -147,13 +58,14 @@ Wu.Styler.Point = Wu.Styler.extend({
 		childWrapper.innerHTML = '';
 
 		// get min/max values
+		console.log('PINTSIZE', this.carto().pointsize, this);
 		var minMax  = this.carto().pointsize.range || [1,10];
 
 		// line
 		var line = new Wu.fieldLine({
 			id        : 'minmaxpointsize',
 			appendTo  : childWrapper,
-			title     : 'Min/max point size',
+			title     : 'Min/max size',
 			input     : false,
 			className : 'sub-line'
 		});
@@ -182,7 +94,7 @@ Wu.Styler.Point = Wu.Styler.extend({
 
 	},
 
-	
+
 	_addColorFields : function (column) {
 
 		// get color value
@@ -369,16 +281,15 @@ Wu.Styler.Point = Wu.Styler.extend({
 
 
 	_closeColorRangeSelector : function () {
-		var rangeSelector = this._content[this.type].color.range.dropdown._colorSelectorWrapper;
-		var clickCatcher = this._content[this.type].color.range.dropdown._clicker;
+		var range = this._content[this.type].color.range;
+		if (!range) return;
+
+		var rangeSelector = range.dropdown._colorSelectorWrapper;
+		var clickCatcher = range.dropdown._clicker;
 		if (rangeSelector) Wu.DomUtil.addClass(rangeSelector, 'displayNone');
 		if (clickCatcher) Wu.DomUtil.addClass(clickCatcher, 'displayNone');		
 	},	
 
-	
-	
-
-	
 
 
-})
+});
