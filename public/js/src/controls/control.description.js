@@ -34,7 +34,6 @@ L.Control.Description = Wu.Control.extend({
 
 		// header
 		this._header = Wu.DomUtil.create('div', 'description-control-header-section', this._inner);
-		// this._title = Wu.DomUtil.create('div', 'description-control-header-title', this._header);
 		this._toggle = Wu.DomUtil.create('div', 'description-control-header-toggle', this._multipleLegendOuter);		
 
 		// description
@@ -56,8 +55,8 @@ L.Control.Description = Wu.Control.extend({
 		app.Tooltip.add(this._container, 'Shows layer information', { extends : 'systyle', tipJoint : 'left' });
 			       
 
+		// add event hooks
 		this._addHooks();
-
 	},
 
 	_addHooks : function () {
@@ -147,8 +146,11 @@ L.Control.Description = Wu.Control.extend({
 	},	
 
 	_refreshLayer : function (layer) {
-		// this.layers[layer.getUuid()] = this.storeLegendData(layer);
+
+		// get layer
 		this.layers[layer.getUuid()] = layer;
+
+
 		this.setHTMLfromStore(layer.getUuid());
 		this.updateMultiple(layer.getUuid());
 	},
@@ -195,7 +197,6 @@ L.Control.Description = Wu.Control.extend({
 		this.layers = this.layers || {};
 
 		var layerUuid = layer.getUuid();
-		// this.layers[layerUuid] = this.storeLegendData(layer);
 		this.layers[layerUuid] = layer;
 
 		this.setHTMLfromStore(layerUuid);
@@ -306,7 +307,6 @@ L.Control.Description = Wu.Control.extend({
 			'End date' : startend.end
 		}
 
-		
 		// COLOR RANGE
 		if ( style && style[key].color.column ) {
 
@@ -314,18 +314,6 @@ L.Control.Description = Wu.Control.extend({
 			// var customMinMax = style[key].color.customMinMax;
 			var minMax = style[key].color.range;
 
-			// if ( customMinMax[0] != null || customMinMax[0] != NaN || customMinMax[0] != '' ) {
-			// 	var min = customMinMax[0];
-			// } else {
-			// 	var min = minMax[0];
-			// }
-
-			// if ( customMinMax[1] != null || customMinMax[1] != NaN || customMinMax[1] != '' ) {
-			// 	var max = customMinMax[1];
-			// } else {
-			// 	var max = minMax[1];
-			// }
-
 			var min = minMax[0];
 			var max = minMax[1];
 
@@ -333,7 +321,6 @@ L.Control.Description = Wu.Control.extend({
 			var gradientOptions = {
 				colorStops : colorStops,
 				minVal : minMax[0],
-				// medVal : (minMax[0] + minMax[1]),
 				maxVal : minMax[1],
 				bline : 'Velocity (mm pr. year)'
 			}
@@ -341,47 +328,60 @@ L.Control.Description = Wu.Control.extend({
 			legendObj.legendHTML = this.gradientLegend(gradientOptions);
 
 		} else {
-
-			// legendObj.legendHTML = 'TODO: Create legend for static colors!';
 			legendObj.legendHTML = '';
-
 		}
 
 		return legendObj;
-
 	},
 
 
 	getLegend : function (layer) {
 
-		var style = Wu.parse(layer.store.style);
-		var key = 'point';
+		// get styling
+		var style = layer.getStyling();
 
 		
-		// COLOR RANGE
-		if (style && style[key] && style[key].color && style[key].color.range) {
+		// point
+		if (style && style.point && style.point.color && style.point.color.column) {
 
-			var colorStops = style[key].color.value;
-
-			var minMax = style[key].color.range
-
+			var colorStops = style.point.color.value;
+			var minMax = style.point.color.range
 			var min = minMax[0];
 			var max = minMax[1];
+			var bline = this._getLegendCaption(style.point.color);
 
 			// create legend
 			var gradientOptions = {
 				colorStops : colorStops,
 				minVal : minMax[0],
-				// medVal : (customMinMax[0]+customMinMax[1]),
 				maxVal : minMax[1],
-				bline : 'Velocity (mm pr. year)'
+				bline : bline
 			}
 
 			var legendHTML = this.gradientLegend(gradientOptions);
 
+		// polygon
+		} else if (style && style.polygon && style.polygon.color && style.polygon.color.column) {
+
+			var colorStops = style.polygon.color.value;
+			var minMax = style.polygon.color.range
+			var min = minMax[0];
+			var max = minMax[1];
+			var bline = this._getLegendCaption(style.polygon.color);
+
+			// create legend
+			var gradientOptions = {
+				colorStops : colorStops,
+				minVal : minMax[0],
+				maxVal : minMax[1],
+				bline : bline
+			}
+
+			var legendHTML = this.gradientLegend(gradientOptions);
+
+		// catch-all
 		} else {
 
-			// legendObj.legendHTML = 'TODO: Create legend for static colors!';
 			var legendHTML = '';
 
 		}
@@ -390,26 +390,50 @@ L.Control.Description = Wu.Control.extend({
 
 	},
 
+	_getLegendCaption : function (color) {
+
+		var column = color.column;
+
+		if (column) {
+
+			// special case
+			if (column == 'vel' || column == 'mvel') {
+				return 'Velocity (mm/year)'
+			}
+
+			// camelize, return
+			return column.camelize();
+		}
+
+		return '';
+
+	},
+
 	getMetaDescription : function (layer) {
 
 		var meta = layer.getMeta();
 
+		// set geom type
+		var geom_type = 'items'
+		if (meta.geometry_type == 'ST_Point') geom_type = 'points';
+		if (meta.geometry_type == 'ST_MultiPolygon') geom_type = 'polygons';
+
 		// create description meta
 		var area = Math.floor(meta.total_area / 1000000 * 100) / 100;
 		var num_points = meta.row_count;
-		// var num_columns = _.size(meta.columns);
-		// var size_bytes = meta.size_bytes;
 		var startend = this._parseStartEndDate(meta);
 
-		var description_meta = {
-			'Number of points' : num_points,
-			'Covered area (km<sup>2</sup>)' : area,
-			'Start date' : startend.start,
-			'End date' : startend.end
+		description_meta = {};
+		description_meta['Number of ' + geom_type] = num_points;
+		description_meta['Covered area (km<sup>2</sup>)'] = area;
+		
+		if (startend.start != startend.end) {
+			description_meta['Start date'] = startend.start;
+			description_meta['End date'] = startend.end;
 		}
 
-		return description_meta;
 
+		return description_meta;
 	},
 
 

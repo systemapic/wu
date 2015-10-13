@@ -443,7 +443,6 @@ Wu.Model.Layer = Wu.Model.extend({
 		var json = this.store.style;
 		if (!json) return false;
 		var styleJSON = Wu.parse(json);
-		console.log('GOT STYLE:', styleJSON);
 		return styleJSON;
 	},
 

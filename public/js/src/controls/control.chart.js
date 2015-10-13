@@ -223,7 +223,8 @@ Wu.Control.Chart = Wu.Control.extend({
 			layerName 	: e.layer.store.title,
 			areaSQ 		: false,
 			pointCount 	: false,
-			multiPopUp 	: false
+			multiPopUp 	: false,
+			layer 		: e.layer
 		}
 
 		// Create HTML
@@ -266,7 +267,8 @@ Wu.Control.Chart = Wu.Control.extend({
 			layerName 	: e.layer.store.title,
 			areaSQ 		: false,
 			pointCount 	: false,
-			multiPopUp 	: false
+			multiPopUp 	: false,
+			layer 		: e.layer
 		}
 
 
@@ -429,7 +431,8 @@ Wu.Control.Chart = Wu.Control.extend({
 			layerName 	: _layerName,
 			areaSQ 		: _areaSQ,
 			pointCount 	: _totalPoints,
-			multiPopUp 	: true
+			multiPopUp 	: true,
+			layer 		: _layer
 		}
 
 
@@ -503,11 +506,14 @@ Wu.Control.Chart = Wu.Control.extend({
 	// Header
 	createHeader : function (options) {
 
+		// get vars
 		var headerMeta = options.headerMeta;
 		var layerName  = options.layerName;
 		var areaSQ     = options.areaSQ;
 		var pointCount = options.pointCount;
 		var multiPopUp = options.multiPopUp;
+
+		
 
 		// If custom title
 		if ( this.popupSettings.title && this.popupSettings.title != '' ) {
@@ -526,8 +532,17 @@ Wu.Control.Chart = Wu.Control.extend({
 		var headerWrapper = Wu.DomUtil.create('div', 'c3-header-wrapper', container);
 		var headerName = Wu.DomUtil.create('div', 'c3-header-layer-name', headerWrapper, layerName)
 
-		if ( multiPopUp ) {
-			var plural = 'sampling ' + pointCount + ' points over approx. ' + areaSQ;
+		// add more text for multiquery
+		if (multiPopUp) {
+			
+			// set geom text based on type
+			var geom_type = options.layer.getMeta().geometry_type;
+			var geom_text = 'items'
+			if (geom_type == 'ST_Point') geom_text = 'points';
+			if (geom_type == 'ST_MultiPolygon') geom_text = 'polygons';
+
+			// set text
+			var plural = 'Sampling ' + pointCount + ' ' + geom_text + ' over approx. ' + areaSQ;
 			var _pointCount = Wu.DomUtil.create('div', 'c3-point-count', headerWrapper, plural);
 		}
 
