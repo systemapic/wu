@@ -33,6 +33,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_initLayout : function () {
+
 		if (!this._project) return;
 
 		// Scroller
@@ -73,6 +74,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	},	
 	
 	_refresh : function () {
+
 		this._flush();
 		this._initLayout();
 	},
@@ -109,7 +111,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// clean up
 		this._tempRemoveLayers();
 	},	
-	
+
+
+
 	// event run when layer selected 
 	_selectedActiveLayer : function (e, uuid) {
 
@@ -432,6 +436,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// 	if ( pre == 'min_' || pre == 'max_' ) {
 	// 		key = key.slice(4, key.length);
 	// 	}
+
 
 	// 	// Get field 
 	// 	var inputField = Wu.DomUtil.get('field_mini_input_opacity');

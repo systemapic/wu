@@ -14,7 +14,7 @@
     top: 0;
     height: 35px;
     width: 100%;
-    z-index: 9999999999;
+    z-index: 10000000;    
     }
 
 /* TOP: Menu button */
@@ -76,13 +76,14 @@
 .chrome-project-title {
     text-align: center;
     font-size: 14px;
-    color: #999;
+    color: #666;
     position: relative;
     display: inline-block;
     vertical-align: top;
     width: auto;
     top: 3px;
-    left: 9px;    
+    left: 9px;
+    font-weight: 900;       
     }
 
 /* TOP: Client logo */
@@ -160,6 +161,10 @@
     background-position: -85px -2px;
     }
 
+.chrome-button.share {
+    background-position: -128px -4px;
+    }    
+
 .chrome-layer-button-arrow {
     position: absolute;
     width: 10px;
@@ -177,6 +182,56 @@
     top: 38px !important;
     }
 
+.chrome-button.settingsSelector {
+    background-position: -6px -3px;
+    }
+
+.debug-button {
+    width: 200px;
+    height: 35px;
+    background: #FF5E5E;
+    border-radius: 3px;
+    text-align: center;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto;
+    padding: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+    }
+
+/* CPU */
+/* CPU */
+/* CPU */
+
+.cpu-wrapper {
+    width: 18px;
+    border-left: 1px dashed #999;
+    height: 100%;
+    position: relative;
+    top: 0;
+    display: inline-block;
+    vertical-align: top;
+    padding: 3px;
+    padding-left: 5px;
+    float: right;
+    }
+
+.cpu-bar {
+    width: 7px;
+    height: 2px;
+    margin-bottom: 1px;
+    -webkit-transition: background-color 0.5s ease;
+    -mos-transition: background-color 0.5s ease;
+    -ms-transition: background-color 0.5s ease;
+    -o-transition: background-color 0.5s ease;
+    transition: background-color 0.5s ease;
+    background-color: #cccccc;  
+    }
+
+.cpu-bar.cpu-on {
+    background-color: #ff0000;
+    }
 
 
 
@@ -192,8 +247,21 @@
     top: 35px;
     height: 100%;
     width: 0;
-    z-index: 99999999999;
+    z-index: 10000002;    
+    border-top: 1px solid #999;
     }
+
+.chrome-right:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -2px;
+    width: 2px;
+    height: 100%;
+    background: black;
+    opacity: 0.2;
+    }
+
 
 .chrome.chrome-content.styleditor.header {
     width: 100%;
@@ -241,14 +309,13 @@
 /*.chrome-content.settingsSelector { */
 .settingsSelector-header {
     position: relative;
-    padding-bottom: 20px;
     width: 100%;
     border-bottom: 1px dashed #ccc;
+    padding: 29px;
+    padding-top: 9px;
+    padding-bottom: 19px;    
     }
 
-.chrome-content.settings-button-wrapper {
-    margin-left: 20px;
-    }
 
 .chrome-content.settings-button {
     background: #ddd;
@@ -277,17 +344,13 @@
 
 .chrome-content.settings-title {
     font-size: 18px;
-    margin: 5px;
-    margin-left: 20px;
     font-weight: 900;
-    text-transform: uppercase;
-    margin-bottom: 0;
-    margin-top: 8px;
+    margin: 0;
+    padding: 0;    
     }
 
 .chrome-content.settings-tabs-wrapper {
     position: absolute;
-    /*top: 120px;*/
     top: 108px;
     }
 
@@ -359,21 +422,6 @@
     margin-top: 5px;
     }
 
-.chrome-right {
-    border-top: 1px solid #999;
-    }
-
-.chrome-right:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -2px;
-    width: 2px;
-    height: 100%;
-    background: black;
-    opacity: 0.2;
-    }
-
 .chrome-right-big-button {
     width: 200px;
     height: 35px;
@@ -418,6 +466,51 @@
     padding-bottom: 30px;
     padding-right: 7px;
     }
+
+
+
+/* CARTOCSS BUTTON */
+
+
+
+.cartocss-sql {
+    height: 100px;
+    width: 100%;
+    padding: 10px;
+    border: rgb(205, 205, 205) 1px solid;
+    resize: none;
+    font-family: Courier;
+    font-size: 14px;
+    }
+
+.cartocss-sql:focus {
+    border: rgb(205, 205, 205) 1px solid !important;
+    }
+
+/*refresh layer button*/
+.cartocss-refresh-button {
+    width: 30px;
+    height: 30px;
+    bottom: 0px;
+    border-radius: 2px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.9;
+    font-size: 15px;
+    font-weight: 500;
+    margin: auto;
+    position: absolute;
+    background-image: url('images/refresh.png');
+    left: 10px;
+    bottom: 23px;
+    background-size: 30px;
+    background-repeat: no-repeat;
+    }
+
+.cartocss-refresh-button:hover {
+    background-color: rgba(224, 223, 223, 0.81);
+    border-radius: 5px;
+    }    
 
 
 /* CODE MIRROR */
@@ -479,7 +572,8 @@
 /* HEADER BUTTON WRAPPER */
 
 .chrome-content.settings-button-wrapper {
-    padding-right: 20px;
+    padding: 0;
+    margin: 0;    
     }
 
 
@@ -490,8 +584,12 @@
 .chrome-header-title {
     font-size: 18px;
     font-weight: 900;
-    text-transform: uppercase;
     margin-bottom: 0;
+    text-align: center;
+    color: #999;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    background: #F6F6F6;
     }    
 
 /* HEADER BUTTONS */
@@ -634,12 +732,8 @@
 
 .chrome-metafield-line {
     border-top: 1px solid #999;
-    /*padding-top: 2px;*/
-    /*padding-bottom: 2px;*/
-
     padding-top: 4px;
     padding-bottom: 4px;
-
     font-size: 14px;
     position: relative;
     }
@@ -674,10 +768,8 @@ input.chrome-field-input {
     height: 16px;
     background-color: white;
     border-radius: 20px;
-    top: 2px;
     float: left;
     margin-right: 10px;    
-    position: relative;
     box-shadow: 0 0 1px 0 rgba(0,0,0,0.5) inset;
     cursor: pointer;
     overflow: visible;
@@ -686,6 +778,9 @@ input.chrome-field-input {
     -ms-transition: background-color 100ms;
     -o-transition: background-color 100ms;
     transition: background-color 100ms;
+    z-index: 99999999;
+    position: absolute;
+    top: 6px;    
     }
 
 .chrome-switch-container:before {
@@ -712,10 +807,24 @@ input.chrome-field-input {
     left: 15px;
     }
 
+.chrome-switch-container.disabled-switch:after {
+    content: '';
+    background: white;
+    left: 0;
+    top: -1px;
+    position: absolute;
+    height: 20px;
+    width: 33px;
+    opacity: 0.7;   
+    }
+
 .right-switch {
     float: right;
     margin-left: 10px;
     margin-right: 0;
+    top: 5px;
+    position: absolute;
+    right: 0;    
     }
 
 
@@ -908,8 +1017,8 @@ input.chrome-field-input {
     height: 15px;
     position: absolute;
     right: 0;
-    /*top: 4px;*/
-    top: 6px;
+    left: -17px;
+    top: 5px;    
     box-shadow: 0 0 0 1px #ccc inset, 0 0 0 3px #FFFFFF inset;
     z-index: 9999;
     border-radius: 10px;
@@ -1041,7 +1150,7 @@ input.chrome-field-input {
 /* PSEUDO ELEMENT FOR OCCUPIED LAYER */
 /* PSEUDO ELEMENT FOR OCCUPIED LAYER */
 
-.deactivated-layer:before {
+/*.deactivated-layer:before {
     content: 'base layer';
     background: rgba(255,255,255,0.7);
     z-index: 9999;
@@ -1053,11 +1162,15 @@ input.chrome-field-input {
     font-style: italic;
     color: #71C4A8;
     line-height: 1.3;
+
+    left: 0;
+    z-index: 9999999999999;
+    height: 86%;    
     }
 
 .editing-baselayers .deactivated-layer:before { 
     content: 'layer';
-    }
+    }*/
 
 
 /* EACH LINE ADJUSTMENTS */
@@ -1211,8 +1324,12 @@ input.chrome-field-input {
     }    
 
 .chrome-pane.styler .chrome-color-ball {
-    top: 5px;
+    top: 9px !important;
     right: 8px;
+    }
+
+.chrome-pane.styler .chrome-color-selector-wrapper .chrome-color-ball {
+    top: 5px !important;
     }
 
 
@@ -1385,11 +1502,11 @@ input.chrome-field-input {
 /* DATA LIBRARY */
 
 .chrome-data-top {
-    border-bottom: 1px dashed #ccc;
     position: absolute;
     width: 100%;
-    height: 80px;
-    padding: 10px 20px 20px 20px;    
+    padding: 10px 20px 20px 20px;
+    height: 55px;
+    border: none;    
     }
 
 .chrome-data-bottom {
@@ -1402,24 +1519,27 @@ input.chrome-field-input {
     }
 
 .chrome-data-inner {
-    padding: 80px 25px 0px 25px;
     position: absolute;
     width: 100%;
     height: 100%;
+    -webkit-box-sizing: border-box;
     box-sizing: border-box;
+    padding: 51px 0px 0px 0px;
     }
 
 .chrome-data-outer-scroller {
-    width: 300px;
-    height: 100%;
     overflow: hidden;
+    width: 330px;
+    height: 50%;
+    padding-left: 10px;    
     }
 
 .chrome-data-scroller {
     height: 100%;
     overflow-x: scroll;    
-    width: 320px;
     padding-right: 20px;
+    padding-left: 18px;
+    width: 335px    
     }
 
 .chrome-data-inner.padding-top {
@@ -1437,7 +1557,20 @@ input.chrome-field-input {
     background: #71C4A8;
     position: relative;
     margin-top: 3px; 
+    width: 117px;
+    position: absolute;
+    top: 10px;
+    right: 14px;        
     }
+
+.chrome-upload-button:hover {
+    background: #67B097;
+    }
+
+.chrome-upload-button:active {
+    background: #5a9b87;
+    }   
+
 
 .file-list-container {
     margin-top: 20px;
@@ -1451,7 +1584,14 @@ input.chrome-field-input {
     line-height: 1.2;
     padding-bottom: 4px;
     padding-top: 4px;
+    font-size: 14px;
+    border-top: 1px solid #999;    
     }
+
+.data-list-line:last-child {
+    border-bottom: 1px solid #999;
+    }
+
 
 .file-list-container-title {
     font-size: 16px;
@@ -1536,3 +1676,81 @@ input.chrome-field-input {
 
 /* ***************************************** */
 
+
+/* DESCRIPTION PART */
+
+.description-multiple-toggle-wrapper {
+    background: white;
+    width: 245px;   
+    position: relative;
+    }
+
+.each-multiple-description {
+    padding: 4px 27px 4px 25px;
+    border-bottom: 1px dashed #ccc;
+    font-size: 12px;
+    font-weight: 900;
+    cursor: pointer;
+    text-transform: capitalize;
+    position: relative;
+    word-break: break-all;
+    }
+
+.each-multiple-description:hover {
+    color: black;
+    }
+
+.each-multiple-description.active {
+    color: black;
+    cursor: default;
+    }
+
+.each-multiple-description.active:after {
+    content: '';
+    background: #089688;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    border-radius: 12px;
+    left: 9px;
+    padding-right: 10px;
+    opacity: 100;
+    top: 8px;   
+    }
+
+.each-multiple-description.one-layer {
+    font-size: 15px;
+    cursor: default;
+    color: black;
+    padding-left: 15px;
+    padding-right: 25px;
+    white-space: normal;
+    word-break: normal;
+    line-height: 1.2;
+    }
+
+
+
+/* Satellite angle part (for Globesar) */
+
+.d3-satellite-wrapper {
+    position: relative;
+    top: 6px;
+    text-align: center;
+    height: 65px;
+    }
+
+.satellite-measurement-geometry {
+    position: relative;
+    top: 2px;
+    font-size: 12px;
+    color: #666;    
+    }   
+
+#d3-satellite-compass-container,
+#d3-satellite-angle-container {
+    display: inline-block;
+    position: relative;
+    margin-right: 5px;
+    margin-left: 5px;   
+    }    

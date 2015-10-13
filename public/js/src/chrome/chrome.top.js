@@ -9,6 +9,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// add hooks
 		this.addHooks();
+
+		
 	},
 
 	initContainer : function () {
@@ -334,6 +336,10 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_toggleLayermenu : function () {
 
+		// Disable the ability to toggle off layer menu when in data library
+		if ( app.Tools.DataLibrary._isOpen ) return;
+
+		// Toggle
 		this._layerMenuOpen ? this._closeLayerMenu() : this._openLayerMenu();
 	},
 

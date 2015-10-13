@@ -288,7 +288,6 @@ Wu.Styler = Wu.Class.extend({
 		// get color value
 		var value  = this.carto().color.value || this.options.defaults.range;
 
-		console.log('value: ', value);
 		// if not array, it's 'fixed' selection
 		if (!_.isArray(value)) return; 
 
@@ -325,7 +324,7 @@ Wu.Styler = Wu.Class.extend({
 			right 	  : true,
 			appendTo  : line.container,
 			presetFn  : this.selectColorPreset.bind(this), // preset selection
-			customFn  : this._updateRange.bind(this),  // color ball selection
+			// customFn  : this._updateRange.bind(this),  // color ball selection
 			value     : value
 		});
 
@@ -341,7 +340,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// get min/max
 		var value = this.carto().color.range || [fieldMinRange, fieldMaxRange];
-		
+
 		// Use placeholder value if empty
 		if (isNaN(value[0])) value[0] = fieldMinRange;
 		if (isNaN(value[1])) value[1] = fieldMaxRange;
@@ -453,6 +452,45 @@ Wu.Styler = Wu.Class.extend({
 
 	},
 
+	// on color preset color ball selection
+	_updateRange : function (hex, key, wrapper) {
+
+		var colorBall_1 = this._content[this.type].color.range.dropdown._colorball1;
+		var colorBall_2 = this._content[this.type].color.range.dropdown._colorball2;
+		var colorBall_3 = this._content[this.type].color.range.dropdown._colorball3;
+
+		// Set HEX value on ball we've changed
+		wrapper.setAttribute('hex', hex);
+
+		// Get color values
+		var color1 = colorBall_1.getAttribute('hex');
+		var color2 = colorBall_2.getAttribute('hex');
+		var color3 = colorBall_3.getAttribute('hex');
+
+		// Build color array
+		var colors = this._convertToFiveColors([color1, color2, color3]);
+
+		// Color range bar
+		var colorRangeBar = this._content[this.type].color.range.dropdown._color;
+
+		// Set styling
+		var gradientStyle = this._gradientStyle(colors);
+		colorRangeBar.setAttribute('style', gradientStyle);
+
+		// Do not save if value is unchanged
+		if (this.carto().color.value == colors) return;
+
+		// save carto
+		this.carto().color.value = colors;
+
+		// close popup
+		this._closeColorRangeSelector(); 
+
+		// UPDATE
+		this._updateStyle();
+
+	},
+
 	saveColorRangeDualBlur : function (max, min, absoluteMax, absoluteMin) {
 
 		// get values
@@ -468,7 +506,56 @@ Wu.Styler = Wu.Class.extend({
 		this._updateStyle();
 	},
 
-	
+	// on click on color range presets
+	selectColorPreset : function (e) {
+
+		var elem = e.target;
+		var hex = elem.getAttribute('hex');
+		var hexArray = hex.split(',');
+
+		// Five colors
+		var colorArray = this._convertToFiveColors(hexArray);
+
+		// get divs
+		var colorRangeBar = this._content[this.type].color.range.dropdown._color;
+		var colorBall_1   = this._content[this.type].color.range.dropdown._colorball1;
+		var colorBall_2   = this._content[this.type].color.range.dropdown._colorball2;
+		var colorBall_3   = this._content[this.type].color.range.dropdown._colorball3;
+
+		// Set styling		
+		var gradientStyle = this._gradientStyle(colorArray);
+
+		// Set style on colorrange bar
+		colorRangeBar.setAttribute('style', gradientStyle);
+
+		// update colors on balls
+		colorBall_1.style.background = colorArray[0];
+		colorBall_2.style.background = colorArray[2];
+		colorBall_3.style.background = colorArray[4];
+		colorBall_1.setAttribute('hex', colorArray[0]);
+		colorBall_2.setAttribute('hex', colorArray[2]);
+		colorBall_3.setAttribute('hex', colorArray[4]);
+
+		// close
+		this._closeColorRangeSelector();
+
+		// dont' save if unchanged
+		if (this.carto().color.value[0] == colorArray[0] &&
+		    this.carto().color.value[1] == colorArray[1] && 
+		    this.carto().color.value[2] == colorArray[2] &&
+		    this.carto().color.value[3] == colorArray[3] &&
+		    this.carto().color.value[4] == colorArray[4]) {
+
+			return;
+		}
+
+		// save carto
+		this.carto().color.value = colorArray;		
+
+		// UPDATE
+		this._updateStyle();		
+
+	},
 
 	_dropdownSelected : function (e) {
 
@@ -508,8 +595,13 @@ Wu.Styler = Wu.Class.extend({
 			Wu.DomUtil.addClass(colorBall, 'disable-color-ball');
 		}
 
+		// if not same, clear old values
+		if (this.carto()[field].column != column) {
+			this.carto()[field] = {};
+		}
+
 		// save carto
-		this.carto()[field].column = column; // range == column
+		this.carto()[field].column = column; 
 
 		// Add fields
 		this._initSubfields(column, field); // sub meny
@@ -518,7 +610,6 @@ Wu.Styler = Wu.Class.extend({
 		this._updateStyle();
 
 	},
-
 
 	_unselectField : function (key, wrapper) {
 
@@ -603,11 +694,12 @@ Wu.Styler = Wu.Class.extend({
 		// clear old
 		childWrapper.innerHTML = '';
 
-		// get min/max values
-		console.log('IPACITY', this.carto().opacity, this);
-		var minMax  = this.carto().opacity.range || [1,10];
+		// get default min/max
+		var column_max = Math.floor(this.options.columns[column].max * 10) / 10;
+		var column_min = Math.floor(this.options.columns[column].min * 10) / 10;
 
-		console.log('minmax->', minMax);
+		// get stored min/max
+		var value = this.carto().opacity.range || [column_min, column_max];
 
 		// line
 		var line = new Wu.fieldLine({
@@ -624,9 +716,9 @@ Wu.Styler = Wu.Class.extend({
 			type 	  : 'dualinput',
 			right 	  : true,
 			appendTo  : line.container,
-			value     : minMax,
+			value     : value,
 			fn        : this.saveOpacityDualBlur.bind(this),
-			minmax    : minMax,
+			minmax    : value,
 			tabindex  : [this.tabindex++, this.tabindex++]
 		});
 
@@ -638,23 +730,21 @@ Wu.Styler = Wu.Class.extend({
 
 		// save carto
 		this.carto().opacity.column  = column;
-		this.carto().opacity.range = minMax;
-		
+		this.carto().opacity.range = value;
 	},
-
 
 	_getDefaultRange : function (column, field) {
 
 		// get default min/max
-		var fieldMaxRange = Math.floor(this.options.columns[column].max * 10) / 10;
-		var fieldMinRange = Math.floor(this.options.columns[column].min * 10) / 10;
+		var column_max = Math.floor(this.options.columns[column].max * 10) / 10;
+		var column_min = Math.floor(this.options.columns[column].min * 10) / 10;
 
 		// get stored min/max
-		var value = this.carto()[field].customMinMax || [fieldMinRange, fieldMaxRange];
+		var value = this.carto()[field].range || [column_min, column_max];
 		
 		// Use placeholder value if empty
-		if (isNaN(value[0])) value[0] = fieldMinRange;
-		if (isNaN(value[1])) value[1] = fieldMaxRange;
+		if (isNaN(value[0])) value[0] = column_min;
+		if (isNaN(value[1])) value[1] = column_max;
 
 		return value;
 	},
@@ -692,14 +782,15 @@ Wu.Styler = Wu.Class.extend({
 		this._updateStyle();
 	},
 
+	_closeColorRangeSelector : function () {
+		var range = this._content[this.type].color.range;
+		if (!range) return;
 
-
-
-
-
-
-
-
+		var rangeSelector = range.dropdown._colorSelectorWrapper;
+		var clickCatcher = range.dropdown._clicker;
+		if (rangeSelector) Wu.DomUtil.addClass(rangeSelector, 'displayNone');
+		if (clickCatcher) Wu.DomUtil.addClass(clickCatcher, 'displayNone');		
+	},	
 
 	_createCarto : function (json, callback) {
 
@@ -726,7 +817,6 @@ Wu.Styler = Wu.Class.extend({
 
 		// update
 		this._updateLayer(layerOptions);		
-
 	},
 
 	_updateLayer : function (options, done) {

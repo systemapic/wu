@@ -25,6 +25,7 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 		this._midInnerScroller = Wu.DomUtil.create('div', 'chrome-middle-section-inner-scroller', this._midOuterScroller);		
 
 		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
+		
 		this.initSettings('Controls');
 
 		this.initBoundPos('Bounds & Position');

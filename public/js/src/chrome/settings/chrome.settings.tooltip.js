@@ -51,7 +51,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 	_flush : function () {
 
-		// this._container.innerHTML = '';
 		this._midSection.innerHTML = '';
 	},
 
@@ -92,15 +91,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		
 		this._layer = this._project.getLayer(layerUuid);
 
-
-		console.log('%c _selectedActiveLayer ', 'background: #ff33ff; color: white;');
-		console.log('e', e);
-		console.log('uuid', uuid);
-		console.log('layerUuid', layerUuid);
-		console.log('this._project', this._project);
-		console.log('this._layer', this._layer);
-		console.log('');	
-
 		// Get stored tooltip meta
 		this.tooltipMeta = this._layer.getTooltip();
 		
@@ -110,7 +100,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		// If no tooltip meta stored, create from layer meta
 		if ( !this.tooltipMeta ) this.tooltipMeta = this.createTooltipMeta(layerMeta);
 
-		// this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 		this._fieldsWrapper.innerHTML = '';
 
 		// Init title
@@ -121,6 +110,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 		// Initialize fields
 		this.initFields();
+
 	},
 
 	// Title
@@ -150,82 +140,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	initDescription : function () {
 	},
 
-	// Tooltip meta
-	createTooltipMeta : function (layerMeta) {
-
-		// Get columns
-		var columns = layerMeta.columns;
-
-		// Returns object with timeseries separated from the other fields
-		var splitMetaData = this.buildTimeSeries(columns);
-
-		if (splitMetaData[1] > 5) {
-			return splitMetaData[0];
-		} else {
-			return this.cleanColumns(columns);
-		}
-	},
-
-	// Create clean columns (without time series)
-	cleanColumns : function (columns) {
-
-		var metaData = {
-			title : '',
-			description : false,
-			metaFields : {},
-			timeSeries : false
-		};
-
-		for (var f in columns) {
-			metaData.metaFields[f] = {
-					title : false,
-					on    : true
-			}
-		}
-
-		return metaData;
-	},
-
-	// Splits metadata into "time series" and "meta fields"
-	buildTimeSeries : function (columns) {
-
-		var metaData = {
-			title : '',
-			description : false,			
-			timeSeries : {},
-			metaFields : {}
-		}
-		
-		var timeSeriesCount = 0;
-
-		for ( var f in columns ) {
-
-			// validate time
-			var isTime = this._validateDateFormat(f);
-
-			// Is time series
-			if ( isTime ) {
-				
-				metaData.timeSeries[f] = {
-						title : false,
-						on    : true
-				}
-
-				timeSeriesCount ++;
-
-			// Is not time series
-			} else {
-				
-				metaData.metaFields[f] = {
-						title : false,
-						on    : true
-				};
-
-			}       
-		}
-
-		return [metaData, timeSeriesCount];
-	},
 
 	// Init meta fields and time series
 	initFields : function () {
@@ -237,11 +151,15 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	// Creates section with meta field lines
 	fieldListFromObject : function (title, timeSeries) {
 
-
 		var fields = timeSeries ? this.tooltipMeta.timeSeries : this.tooltipMeta.metaFields;
 
 		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
 		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, title);
+
+		// Function that saves on blur/click
+		var saveFunction = timeSeries ? this._saveSwitchTimeSeries : this._saveSwitch;
+
+		var hasInput = timeSeries ? false : true;
 
 		for ( var key in fields ) {
 			
@@ -255,7 +173,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 				id       : key,
 				appendTo : sectionWrapper,
 				title    : title,
-				input    : true,
+				input    : hasInput,
 				fn 	 : this._saveFromBlur.bind(this),
 			});		
 
@@ -265,7 +183,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 				isOn 	 : isOn,
 				right 	 : false,
 				appendTo : line.container,
-				fn 	 : this._saveSwitch.bind(this),
+				fn       : saveFunction.bind(this)
 			});
 
 
@@ -377,7 +295,23 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	_saveSwitch : function (e, on) {
 
 		var elem = e.target;
-		var key = elem.getAttribute('key');
+		var key  = elem.getAttribute('key');
+
+		var titleField = Wu.DomUtil.get('field_input_' + key);
+		var title      = titleField ? titleField.value : false;
+
+
+		// If no title, set to false
+		var title = titleField ? titleField.value : false;
+
+		// Save to server
+		this._saveToServer(key, on, title);
+	},
+
+	_saveSwitchTimeSeries : function (e, on) {
+
+		var elem = e.target;
+		var key  = elem.getAttribute('key');
 
 		var titleField = Wu.DomUtil.get('field_input_' + key);
 		var title      = titleField ? titleField.value : false;
@@ -421,7 +355,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 
 	// Save helpers – goes through the JSON object to find a key match in the time series
-	updateTimeSeriesMeta : function (key, title, on) {
+	updateTimeSeriesMeta : function (key, title, on) {	
 
 		var timeSeries = this.tooltipMeta.timeSeries;
 		var hit = false;
@@ -430,8 +364,8 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 			if ( f == key ) {
 
-				if ( title ) timeSeries[f].title = title;
-				if ( on ) timeSeries[f].on = on;			
+				timeSeries[f].title = false;
+				timeSeries[f].on = on;
 
 				hit = true
 			}
@@ -441,7 +375,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	},
 
 	// Save helper – goes through the JSON object to find a key match in the meta fields
-	updateMeta : function (key, title, on) {
+	updateMeta : function (key, title, on) {	
 
 		var metaFields = this.tooltipMeta.metaFields;
 
@@ -459,5 +393,100 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	open : function () {
 		console.log('open!', this);
 	},
+
+
+
+	// DATA BUILDERS
+	// DATA BUILDERS
+	// DATA BUILDERS
+	// DATA BUILDERS
+
+	// Gets called from Chrome Data _onLayerAdded()
+	// TODO: Events?
+
+	_buildTooltipMeta : function (layerMeta) {
+		return this.createTooltipMeta(layerMeta);
+	},
+
+
+	// Tooltip meta
+	createTooltipMeta : function (layerMeta) {
+
+		// Get columns
+		var columns = layerMeta.columns;
+
+		// Returns object with timeseries separated from the other fields
+		var splitMetaData = this.buildTimeSeries(columns);
+
+		if (splitMetaData[1] > 5) {
+			return splitMetaData[0];
+		} else {
+			return this.cleanColumns(columns);
+		}
+	},
+
+	// Create clean columns (without time series)
+	cleanColumns : function (columns) {
+
+		var metaData = {
+			title : '',
+			description : false,
+			metaFields : {},
+			timeSeries : false
+		};
+
+		for (var f in columns) {
+			metaData.metaFields[f] = {
+					title : false,
+					on    : true
+			}
+		}
+
+		return metaData;
+	},
+
+	// Splits metadata into "time series" and "meta fields"
+	buildTimeSeries : function (columns) {
+
+		var metaData = {
+			title : '',
+			description : false,			
+			timeSeries : {},
+			metaFields : {}
+		}
+		
+		var timeSeriesCount = 0;
+
+		for ( var f in columns ) {
+
+			// validate time
+			var isTime = this._validateDateFormat(f);
+
+			// Is time series
+			if ( isTime ) {
+				
+				metaData.timeSeries[f] = {
+						title : false,
+						on    : true
+				}
+
+				timeSeriesCount ++;
+
+			// Is not time series
+			} else {
+				
+				metaData.metaFields[f] = {
+						title : false,
+						on    : true
+				};
+
+			}       
+		}
+
+		// Set time series to true by default
+		metaData.timeSeries.enable = true;
+
+		return [metaData, timeSeriesCount];
+	},	
 
 });
