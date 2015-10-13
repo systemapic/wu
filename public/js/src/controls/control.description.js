@@ -403,7 +403,7 @@ L.Control.Description = Wu.Control.extend({
 			}
 
 			// camelize, return
-			return column.camelize();
+			return column;
 		}
 
 		return '';
