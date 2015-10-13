@@ -367,9 +367,9 @@ Wu.Model.File = Wu.Model.extend({
 		if (geometry_type == 'ST_MultiPolygon') { 
 			style.polygon.enabled = true;
 		}
-		// if (geometry_type == 'ST_LineString') { 
-		// 	return this._defaultStyling.line;
-		// }
+		if (geometry_type == 'ST_LineString') { 
+			style.line.enabled = true;
+		}
 
 		return style;
 	},
@@ -410,7 +410,6 @@ Wu.Model.File = Wu.Model.extend({
 			color : { 
 				column : false, 
 				range : [-426.6, 105.9], 
-				// customMinMax : [-426.6, 105.9], 
 				staticVal : "red",
 				value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
 			},
@@ -433,7 +432,6 @@ Wu.Model.File = Wu.Model.extend({
 				color : {
 					column : false, 
 					range : [-426.6, 105.9], 
-					// customMinMax : [-426.6, 105.9], 
 					staticVal : "green",
 					value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
 				}
@@ -444,7 +442,7 @@ Wu.Model.File = Wu.Model.extend({
 			enabled : false,
 			width : { 
 				column :false,
-				minMax : false,
+				range : false,
 				value : 1
 			},
 			opacity : {
@@ -454,7 +452,6 @@ Wu.Model.File = Wu.Model.extend({
 			color : {
 				column : false, 
 				range : [-426.6, 105.9], 
-				// customMinMax : [-426.6, 105.9], 
 				staticVal : "green",
 				value : ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff"]
 			}

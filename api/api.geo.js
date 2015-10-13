@@ -74,19 +74,17 @@ module.exports = api.geo = {
 		// extra styling (eg. reference point)
 		if (options.style.extras) style.layer += this.buildExtras(options);
 
-
 		// point styling
 		if (isPoint) style = api.geo._createPointCarto(options, style);
 
 		// polygon styling
-		if (isPolygon) style = api.geo._createPolygonCarto(options, style);
-			
-		// polygon styling
 		if (isLine) style = api.geo._createLineCarto(options, style);
 
-
+		// polygon styling
+		if (isPolygon) style = api.geo._createPolygonCarto(options, style);
+			
 		// close #layer
-		style.layer += '}'
+		style.layer += '}';
 		
 		// debug
 		console.log('created style: ', style);
@@ -148,9 +146,24 @@ module.exports = api.geo = {
 	},
 
 	_createLineCarto : function (options, style) {
+
+		// opacity
+		var lineOpacityCarto = this.buildCarto_lineOpacity(options);
+		style.headers += lineOpacityCarto.headers;
+		style.layer += lineOpacityCarto.style;
+
+		// color
+		var lineColorCarto = this.buildCarto_lineColor(options);
+		style.headers += lineColorCarto.headers;
+		style.layer += lineColorCarto.style;
+
+		// width
+		var lineWidthCarto = this.buildCarto_lineWidth(options);
+		style.headers += lineWidthCarto.headers;
+		style.layer += lineWidthCarto.style;
+
 		return style;
 	},
-
 
 	buildExtras : function (options) {
 
@@ -163,12 +176,10 @@ module.exports = api.geo = {
 			// create reference point
 			return this.buildReferencePoint(extras.referencepoint);
 		};
-
 	},
 
 
 	buildReferencePoint : function(referencepoint) {
-
 		var cartoStr = '\n';
 		cartoStr += '\t[' + referencepoint.column + '=' + referencepoint.value + '] {\n';
 		cartoStr += '\t\tmarker-comp-op: src-over;\n';
@@ -272,16 +283,16 @@ module.exports = api.geo = {
 			var field_calc = parseFloat(range[0]) / field_floor;
 			
 			// normalized = (x-min(x))/(max(x)-min(x))
-			css.headers += '@opacity_field: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
+			css.headers += '@line_opacity: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
 		
 		} else {
 
 			// static opacity
-			css.headers += '@opacity_field: ' + opacity.value + ';\n';
+			css.headers += '@line_opacity: ' + opacity.value + ';\n';
 		}
 
 		// add rule
-		css.style += '\tpolygon-opacity: @opacity_field;\n\n';
+		css.style += '\tline-opacity: @line_opacity;\n\n';
 
 		return css;
 	},
@@ -485,7 +496,8 @@ module.exports = api.geo = {
 
 
 			// CREATE VARS
-			var fieldName = '@' + color.column;
+			// var fieldName = '@' + color.column;
+			var fieldName = '@polygon_column';// + color.column;
 			var maxField  = fieldName + '_max';
 			var minField  = fieldName + '_min';
 			var deltaName = fieldName + '_delta';
@@ -618,7 +630,8 @@ module.exports = api.geo = {
 
 
 			// CREATE VARS
-			var fieldName = '@' + color.column;
+			// var fieldName = '@' + color.column;
+			var fieldName = '@line_column';// + color.column;
 			var maxField  = fieldName + '_max';
 			var minField  = fieldName + '_min';
 			var deltaName = fieldName + '_delta';
@@ -661,7 +674,7 @@ module.exports = api.geo = {
 				if ( no == 1 ) {
 
 					cartObj.style += '\t[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + '] ';
-					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
+					cartObj.style += '{ line-color: ' + fieldName + '_color_' + no + '; }\n';
 
 				}
 
@@ -669,14 +682,14 @@ module.exports = api.geo = {
 
 					cartObj.style += '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + ']';
 					cartObj.style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
-					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
+					cartObj.style += '{ line-color: ' + fieldName + '_color_' + no + '; }\n';
 
 				}
 
 				if ( no == colorArray.length ) {
 
 					cartObj.style +=  '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + '] ';
-					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n\n';
+					cartObj.style += '{ line-color: ' + fieldName + '_color_' + no + '; }\n\n';
 				}
 			})
 			
@@ -684,7 +697,7 @@ module.exports = api.geo = {
 		} else {
 		
 			// static color
-			cartObj.style += '\tmarker-fill: ' + color.staticVal + ';\n\n';
+			cartObj.style += '\tline-color: ' + color.staticVal + ';\n\n';
 		}
 
 		return cartObj;
@@ -743,7 +756,9 @@ module.exports = api.geo = {
 	buildCarto_lineWidth : function (options) {
 
 		var style = options.style.line;
-		var lineWidth = style.lineWidth;
+		var lineWidth = style.width;
+
+		console.log('snoop style', style);
 
 		var cartObj = {
 			headers : '',

@@ -35,11 +35,13 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		var color_wrapper = content.color.line.container;
 		var color_children = content.color.line.childWrapper;
 		var opacity_wrapper = content.opacity.line.container;
+		var opacity_children = content.opacity.line.childWrapper;
 
 		// remove divs
 		color_wrapper && Wu.DomUtil.remove(color_wrapper);
 		color_children && Wu.DomUtil.remove(color_children);
 		opacity_wrapper && Wu.DomUtil.remove(opacity_wrapper);
+		opacity_children && Wu.DomUtil.remove(opacity_children);
 	},
 
 });
