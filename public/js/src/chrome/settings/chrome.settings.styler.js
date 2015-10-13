@@ -31,6 +31,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_initLayout : function () {
+
 		if (!this._project) return;
 
 		// Scroller
@@ -50,6 +51,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	
 	_refresh : function () {
+
 		this._flush();
 		this._initLayout();
 	},
@@ -73,7 +75,7 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		
 		// Enable settings from layer we're working with
 		var layerUuid = this._getActiveLayerUuid();
-		if ( layerUuid ) this._selectedActiveLayer(false, layerUuid);		
+		if ( layerUuid ) this._selectedActiveLayer(false, layerUuid);
 
 		// Select layer we're working on
 		var options = this.layerSelector.childNodes;
@@ -86,7 +88,9 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// clean up
 		this._tempRemoveLayers();
 	},	
-	
+
+
+
 	// event run when layer selected 
 	_selectedActiveLayer : function (e, uuid) {
 
@@ -275,7 +279,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			childWrapper : 'point-color-children'
 		});	
 
-		console.log('_colorLine', _colorLine);
 
 		// Dropdown
 		var _colorDropDown = new Wu.button({
@@ -533,7 +536,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 		var wrapper = e.target.parentElement;
 
-		console.log('_selectedMiniDropDown', this);
 
 		// UNSELECTING FIELD
 		// UNSELECTING FIELD
@@ -826,9 +828,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// ADD COLOR FIELDS (color preset, color min/max)
 	addColorFields : function (key, fieldName) {
 
-		console.log('');
-		console.log('addColorFields', key);
-
 		var defaultRange = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'];
 		var value  = this.cartoJSON.point[key].value ? this.cartoJSON.point[key].value : defaultRange;
 
@@ -987,9 +986,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 			className : 'sub-line'
 		});
 
-
-		console.log('this.cartoJSON.point[key].minMax', this.cartoJSON.point[key].minMax);
-
 		// Inputs
 		var _minMaxPointSizeInputs = new Wu.button({
 			id 	  : 'minmaxpointsize',
@@ -1046,9 +1042,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	// CARTO CARTO CARTO CARTO
 
 	_updateStyle : function () {
-
-		console.log('');
-		console.log('updateStyle');
 
 		this.getCartoCSSFromJSON(this.cartoJSON, function (ctx, finalCarto) {
 			this.saveCartoJSON(finalCarto);

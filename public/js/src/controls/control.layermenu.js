@@ -9,25 +9,26 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	onAdd : function (map) {
 
-		var className = 'leaflet-control-layermenu',
-		    container = this._innerContainer = L.DomUtil.create('div', className),
-		    options   = this.options;
+		this._innerContainer = Wu.DomUtil.create('div', 'leaflet-control-layermenu');
 
 		// add html
 		this._layermenuOuter 	= Wu.DomUtil.create('div', 'scroller-frame');
 		var _innerScroller 	= Wu.DomUtil.create('div', 'inner-scroller', this._layermenuOuter);
 		this._content 		= Wu.DomUtil.createId('div', 'layer-menu-inner-content', _innerScroller);
 
-		container.appendChild(this._layermenuOuter);
+		// xoxoxoxoox
+		this._bottomContainer = Wu.DomUtil.create('div', 'layers-bottom-container', this._layermenuOuter);
+
+		this._innerContainer.appendChild(this._layermenuOuter);
 
 		// add some divsscroller-frame
 		this.initLayout();
 
 		// stops
-		Wu.DomEvent.on(container, 'mouseup', Wu.DomEvent.stop, this);
+		Wu.DomEvent.on(this._innerContainer, 'mouseup', Wu.DomEvent.stop, this);
 
 		// nb! content is not ready yet, cause not added to map! 
-		return container;
+		return this._innerContainer;
 
 	},
 
@@ -43,6 +44,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	_onLayerEdited : function (e) {
+
 		var layer = e.detail.layer;
 		this._refresh();
 	},
@@ -58,7 +60,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		// remove old content
 		this._flush();
 
-		// add new content
+		// add new content		
 		this._initContent();
 
 		// show
@@ -68,11 +70,21 @@ L.Control.Layermenu = Wu.Control.extend({
 		if (!this.editMode) this.closeAll();
 
 		// Set max height
-		var dimensions = app._getDimensions();
-		this.resizeEvent(dimensions);
+		// var dimensions = app._getDimensions();
+		// this.resizeEvent(dimensions);
+
+		if (this.editMode) this._forceOpen();
+
+
 
 		// enable layers that are active by default
 		// this._enableDefaultLayers();
+
+	},
+
+	_forceOpen : function () {
+
+		Wu.DomUtil.removeClass(this._parentWrapper, 'displayNone');
 
 	},
 
@@ -109,7 +121,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// Create the header    
 		this._layerMenuHeader = Wu.DomUtil.createId('div', 'layer-menu-header');
-		// Wu.DomUtil.addClass(this._layerMenuHeader, 'menucollapser');
 		
 		// Create the 'uncollapse' button ... will put in DOM l8r
 		this._openLayers = Wu.DomUtil.createId('div', 'open-layers');
@@ -204,53 +215,50 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	show : function () {
 		if (!this._container) return;
-		
-		// if (this._isActive()) this._show();
 		this._isActive() ? this._show() : this._hide();
 	},
 
 	hide : function () {
 		if (!this._container) return;
-
 		this._hide();
 	},
 
 
 	// Runs on window resize. Gets called up in app.js
-	resizeEvent : function (dimensions) {
+	// resizeEvent : function (dimensions) {
+
+	// 	// Window max height (minus padding)
+	// 	var layersMaxHeight = dimensions.height - 135;
+
+	// 	// Set max height of Layers selector container
+	// 	this.setMaxHeight(layersMaxHeight);
+	// },
+
+
+	// setMaxHeight : function (layersMaxHeight) {
+
+	// 	var layersMaxHeight = layersMaxHeight || window.innerHeight - 135;
+
+	// 	// Make space for inspect control, if it's there, yo
+	// 	var inspectControl = app.MapPane.getControls().inspect;
 		
-		// Window max height (minus padding)
-		var layersMaxHeight = dimensions.height - 135;
+	// 	if (inspectControl) {
 
-		// Set max height of Layers selector container
-		this.setMaxHeight(layersMaxHeight);
-	},
+	// 		var inspectorHeight = inspectControl._container.offsetHeight;
 
+	// 		layersMaxHeight -= inspectorHeight - 5;
+	// 	}
 
-	setMaxHeight : function (layersMaxHeight) {
+	// 	// Set max height of scroller container
+	// 	this._layermenuOuter.style.maxHeight = layersMaxHeight + 'px';
 
-		var layersMaxHeight = layersMaxHeight || window.innerHeight - 135;
+	// 	// set new height for relative wrapper
+	// 	this._setHeight();
+	// },	
 
-		// Make space for inspect control, if it's there, yo
-		var inspectControl = app.MapPane.getControls().inspect;
+	// _setHeight : function (extra) {
 		
-		if (inspectControl) {
-
-			var inspectorHeight = inspectControl._container.offsetHeight;
-
-			layersMaxHeight -= inspectorHeight - 5;
-		}
-
-		// Set max height of scroller container
-		this._layermenuOuter.style.maxHeight = layersMaxHeight + 'px';
-
-		// set new height for relative wrapper
-		this._setHeight();
-	},	
-
-	_setHeight : function (extra) {
-		
-	},
+	// },
 
 	_getOpenItems : function () {
 		var childNodes = this._content.childNodes;
@@ -307,21 +315,83 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	closeLayerPane : function () {
-
 		this._open = false;
-
 		Wu.DomUtil.addClass(this._innerContainer, 'closed');
 	},
 
 	openLayerPane : function () {
-
 		this._open = true;
-
 		Wu.DomUtil.removeClass(this._innerContainer, 'closed');
 	},
 
+
+	// ********************************************
+
+	enableEditSwitch : function () {
+
+		// Make container visible
+		Wu.DomUtil.removeClass(this._parentWrapper, 'displayNone');		
+
+		// open all items in layermenu
+		this.openAll();	
+
+		if ( !this._editSwitchContainer ) {
+			
+			this._editSwitchContainer = Wu.DomUtil.create('div', 'enable-edit-switch-container-outer', this._innerContainer);
+			var editSwitchContainerInner = Wu.DomUtil.create('div', 'enable-edit-switch-container-inner', this._editSwitchContainer);
+			var editSwitchTitle = Wu.DomUtil.create('div', 'enable-edit-switch-title', editSwitchContainerInner, 'Edit layer menu');
+
+			this.editSwitch = new Wu.button({
+				id 	  : 'editSwitch',
+				type 	  : 'switch',
+				isOn 	  : false,
+				right 	  : true,
+				appendTo  : editSwitchContainerInner,
+				fn        : this._enableEditing.bind(this),
+				className : 'edit-layers-switch'
+			});
+
+		} else {
+
+			Wu.DomUtil.removeClass(this._editSwitchContainer, 'displayNone');
+
+		}
+
+		Wu.DomUtil.addClass(this._innerContainer, 'enable-edit-mode');
+
+
+	},
+
+	disableEditSwitch : function () {
+
+		this._editSwitchContainer.innerHTML = '';
+		this._editSwitchContainer.remove();
+		this._editSwitchContainer = null;
+
+		Wu.DomUtil.removeClass(this._innerContainer, 'enable-edit-mode');
+		
+		this.disableEdit();
+
+	},
+
+
+	_enableEditing : function (e, on) {
+
+
+		if ( !on ) {
+			this.disableEdit();
+		} else {
+			this.enableEdit();
+		} 
+
+	},
+
+	// ********************************************
+
+
 	// enter edit mode of layermenu
 	enableEdit : function () {
+
 		if (this.editMode) return;
 
 		// Make container visible
@@ -329,9 +399,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// set editMode
 		this.editMode = true;
-
-		// turn off dragging etc. on map
-		// app.MapPane.disableInteraction(true);
 
 		// turn off dropzone dragging
 		app.Data.disableUploader();
@@ -351,20 +418,13 @@ L.Control.Layermenu = Wu.Control.extend({
 		// open all items in layermenu
 		this.openAll();
 
-		// Set max height
-		var dimensions = app._getDimensions();
-		    dimensions.height -= 45;
-		this.resizeEvent(dimensions);	
-
-		this._setHeight(50);		
-
 	},
 
 
 	// exit edit mode 
 	disableEdit : function () {
-		if (!this.editMode) return;
 
+		if (!this.editMode) return;
 
 		if (!this._project.store.layermenu || this._project.store.layermenu.length == 0 ) {
 			// Hide parent wrapper if empty
@@ -374,9 +434,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		// set editMode
 		this.editMode = false;
 		
-		// re-enable dragging etc. on map
-		// Wu.app.MapPane.enableInteraction(true);
-
 		// turn off dropzone dragging
 		app.Data.enableUploader();
 
@@ -386,9 +443,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		// disable layermenu sorting
 		this.disableSortable();
 
-		// set title
-		// this._layerMenuHeaderTitle.innerHTML = 'Layers';  
 
+		// xoxoxoxoxo
 		// remove edit style
 		Wu.DomUtil.removeClass(this._innerContainer, 'edit-mode');
 
@@ -396,10 +452,10 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._removeMenuFolder();
 
 		// Set max height
-		var dimensions = app._getDimensions();
-		this.resizeEvent(dimensions);	
+		// var dimensions = app._getDimensions();
+		// this.resizeEvent(dimensions);	
 
-		this._setHeight();	
+		// this._setHeight();	
 		
 	},
 	
@@ -410,7 +466,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		if (!this._menuFolder) {
 
 			// create if not exists
-			this._menuFolder = Wu.DomUtil.create('div', 'smap-button-white middle-item', this._innerContainer, 'Add folder');
+			this._menuFolder = Wu.DomUtil.create('div', 'smap-button-white middle-item', this._bottomContainer, 'Add folder');
 			
 			// add action
 			Wu.DomEvent.on(this._menuFolder, 'click', this.addMenuFolder, this);
@@ -418,9 +474,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		} else {
 			// show
 			Wu.DomUtil.removeClass(this._menuFolder, 'displayNone');
+			Wu.DomUtil.removeClass(this._editSwitchContainer, 'displayNone')
 		}
 
 	},
+
 
 	_removeMenuFolder : function () {
 		if (!this._menuFolder) return;
@@ -789,10 +847,12 @@ L.Control.Layermenu = Wu.Control.extend({
 			this._logic[uuid].isOpen = true;
 		}
 
-		this._setHeight();
+		// this._setHeight();
 	},
 
 	closeAll : function () {
+
+
 		this.updateLogic();
 		for (var l in this._logic) {
 			var item = this.layers[l];
@@ -873,8 +933,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		layerItem.on = true;
 
 		// Make room for Layer inspector
-		var dimensions = app._getDimensions();
-		this.resizeEvent(dimensions);
+		// var dimensions = app._getDimensions();
+		// this.resizeEvent(dimensions);
 
 		// add active class
 		Wu.DomUtil.addClass(layerItem.el, 'layer-active');
@@ -898,8 +958,8 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._disableLayer(layer);
 
 		// Make room for Layer inspector
-		var dimensions = app._getDimensions();
-		this.resizeEvent(dimensions);		
+		// var dimensions = app._getDimensions();
+		// this.resizeEvent(dimensions);		
 
 		app.Chrome.Right.options.editingLayer = false;
 
@@ -1014,7 +1074,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._project.store.layermenu.push(item); // refactor
 		this.save();
 
-		this._setHeight();
+		// this._setHeight();
 
 	},
 
@@ -1140,7 +1200,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		this._project.store.layermenu.push(folder);
 		this.save();
 
-		this._setHeight();
+		// this._setHeight();
 
 	},
 
@@ -1268,7 +1328,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		// Hides layer button if there are no layers to show
 		app.Chrome.Top._showHideLayerButton();
 
-		this._setHeight();
+		// this._setHeight();
 	},
 
 
