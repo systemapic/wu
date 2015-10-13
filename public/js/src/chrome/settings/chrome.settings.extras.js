@@ -211,14 +211,6 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		})
 
 
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('this.cartoJSON', this.cartoJSON);
-		console.log('');
-		console.log('');
-		console.log('');
-
 		var range = this.cartoJSON.extras.referencepoint.column;
 		var val   = this.cartoJSON.extras.referencepoint.value;
 		var isOn  = range ? false : true;
@@ -373,14 +365,6 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 	// CARTO CARTO CARTO CARTO
 
 	_updateStyle : function () {
-
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('this.cartoJSON.extras.referencepoint', this.cartoJSON.extras.referencepoint)
-		console.log('');
-		console.log('');
-		console.log('');
 		
 		this.getCartoCSSFromJSON(this.cartoJSON, function (ctx, finalCarto) {
 			this.saveCartoJSON(finalCarto);
@@ -403,8 +387,6 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 
 
 	saveCartoJSON : function (finalCarto) {
-
-		console.log(finalCarto);
 
 		this._layer.setStyling(this.cartoJSON);
 

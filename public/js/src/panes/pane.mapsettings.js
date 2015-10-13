@@ -1,71 +1,119 @@
-Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
+Wu.MapSettingsPane = Wu.Pane.extend({
+	
+	type : 'mapsettingspane',
+	title : 'Map settings pane',
 
-	_initialize : function () {
-
-		// init container
-		this._initContainer();
-
-		// add events
-		this._addEvents();
+	options : {
 	},
 
-	_initContainer : function () {
+	initialize : function (options) {
 
-		// create container
-		this._container = Wu.DomUtil.create('div', 'chrome chrome-content chrome-pane mapsettings', this.options.appendTo);
+		// set options
+		Wu.setOptions(this, options);
+
+		// init container
+		this._initContent();
+		
+		// listen up (events on parent)
+		this._listen();
+	},      
+
+	_initContent : function () {
+
+		// create layout
+		this._initLayout();
+
+		// put button in top chrome
+		this._registerButton();
+	},
+
+	_registerButton : function () {
+
+		// register button in top chrome
+		var top = app.Chrome.Top;
+
+		// add a button to top chrome
+		this._settingsButton = top._registerButton({
+			name : 'settings',
+			className : 'chrome-button settings',
+			trigger : this._togglePane,
+			context : this,
+			project_dependent : true
+			
+		});
 	},
 
 	_initLayout : function () {
 
-		if (!this._project) return;
+		// create dropdown
+		this._settingsDropdown = Wu.DomUtil.create('div', 'settings-dropdown displayNone', app._appPane);
 
-		// Scroller
-		this._midSection = Wu.DomUtil.create('div', 'chrome-middle-section', this._container);
-		this._midOuterScroller = Wu.DomUtil.create('div', 'chrome-middle-section-outer-scroller', this._midSection);		
-		this._midInnerScroller = Wu.DomUtil.create('div', 'chrome-middle-section-inner-scroller', this._midOuterScroller);		
+		// this.initSettings('Controls');
+		// this.initBoundPos('Bounds & Position');	
 
-		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
-		
-		this.initSettings('Controls');
-
-		this.initBoundPos('Bounds & Position');
-
-		// mark as inited
-		this._inited = true;		
 	},
 
-	// UNIVERSALS
-	// UNIVERSALS
-	// UNIVERSALS		
+	_togglePane : function () {
+		this._isOpen ? this._close() : this._open();
+	},
 
+	_open : function () {
+
+		Wu.DomUtil.removeClass(this._settingsDropdown, 'displayNone');
+
+		this._isOpen = true;
+
+		// add fullscreen click-ghost
+		this._addGhost();
+
+		// mark button active
+		Wu.DomUtil.addClass(this._settingsButton, 'active');
+
+	},
+
+	_close : function () {
+
+		Wu.DomUtil.addClass(this._settingsDropdown, 'displayNone');
+
+		this._isOpen = false;
+
+		// remove ghost
+		this._removeGhost();
+
+		// mark button inactive
+		Wu.DomUtil.removeClass(this._settingsButton, 'active');
+	},
+
+	_addGhost : function () {
+		this._ghost = Wu.DomUtil.create('div', 'share-ghost', app._appPane);
+		Wu.DomEvent.on(this._ghost, 'click', this._close, this);
+	},
+
+	_removeGhost : function () {
+		Wu.DomEvent.off(this._ghost, 'click', this._close, this);
+		Wu.DomUtil.remove(this._ghost);
+	},
+
+	// on select project
 	_refresh : function () {
 
-		this._flush();
-		this._initLayout();
+		this._settingsDropdown.innerHTML = '';
+
+		this.initSettings('Controls');
+		this.initBoundPos('Bounds & Position');		
 	},
 
-	_flush : function () {
-
-		this._container.innerHTML = '';
-	},
-	
-	show : function () {
-
-		if (!this._inited) this._initLayout();
-
-		// hide others
-		this.hideAll();
-
-		// show this
-		this._container.style.display = 'block';
-
-		// mark button
-		Wu.DomUtil.addClass(this.options.trigger, 'active-tab');
+	_refreshDefaultPermission : function () {
 	},
 
-	open : function () {
-		console.log('open!', this);
-	},	
+
+
+
+
+
+
+
+
 
 
 	// CREATE STUFF
@@ -76,7 +124,7 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 	initSettings : function (title) {
 
 
-		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
+		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._settingsDropdown)
 		var header = Wu.DomUtil.create('div', 'chrome-content title', sectionWrapper, title);
 
 		var options = {
@@ -128,7 +176,7 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 		// Get control
 		var project = app.activeProject;
 
-		for ( var key in options ) {
+		for ( var key in options ) {			
 			
 			var enable  = options[key].enable;			
 
@@ -157,7 +205,7 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 
 	initBoundPos : function (title) {
 
-		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
+		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._settingsDropdown)
 		var header = Wu.DomUtil.create('div', 'chrome-content title', sectionWrapper, title);
 
 		var isBoundsSet = this.isBoundsSet();
@@ -402,5 +450,9 @@ Wu.Chrome.SettingsContent.Mapsettings = Wu.Chrome.SettingsContent.extend({
 		
 
 		map.invalidateSize();
-	},
+	},	
+
+
+	
+
 });

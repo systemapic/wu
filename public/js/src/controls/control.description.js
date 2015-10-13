@@ -34,6 +34,7 @@ L.Control.Description = Wu.Control.extend({
 
 		// header
 		this._header = Wu.DomUtil.create('div', 'description-control-header-section', this._inner);
+
 		this._toggle = Wu.DomUtil.create('div', 'description-control-header-toggle', this._multipleLegendOuter);		
 
 		// description
@@ -442,6 +443,8 @@ L.Control.Description = Wu.Control.extend({
 		// var layer = this.layers[uuid];
 		var layer = this._project.getLayer(uuid);
 
+		if ( !layer ) return;
+		
 		// Title
 		var title = layer.getTitle();
 		
@@ -592,8 +595,17 @@ L.Control.Description = Wu.Control.extend({
 		}
 	},
 
+	_on : function () {
 
+		this._show();
 
+	},
+
+	_off : function () {
+
+		this._hide();
+
+	},
 
 
 	

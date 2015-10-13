@@ -9,10 +9,10 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 				enabled : true,
 				text : 'Style Editor'
 			},
-			layers : {
-				enabled : true,
-				text : 'Project Layers'
-			},
+			// layers : {
+			// 	enabled : true,
+			// 	text : 'Project Layers'
+			// },
 			tooltip : {
 				enabled : true,
 				text : 'Tooltip'
@@ -23,10 +23,10 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 				text : 'Data Filters'
 			},
 			
-			mapsettings : {
-				enabled : true,
-				text : 'Map Settings'
-			},	
+			// mapsettings : {
+			// 	enabled : true,
+			// 	text : 'Map Settings'
+			// },	
 
 			cartocss : {
 				enabled : true,
@@ -57,6 +57,11 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 		// hide by default
 		this._hide();
+
+
+		app.Tools = app.Tools || {};
+		app.Tools.SettingsSelector = this;
+
 	},
 
 	_refresh : function () {

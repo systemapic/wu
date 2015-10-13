@@ -268,6 +268,9 @@ Wu.App = Wu.Class.extend({
 		// render eror pane
 		this.FeedbackPane = new Wu.FeedbackPane();
 
+		// settings pane
+		this.MapSettingsPane = new Wu.MapSettingsPane();
+
 		// share pane
 		this.Share = new Wu.Share();
 
