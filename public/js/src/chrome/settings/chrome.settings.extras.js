@@ -381,7 +381,7 @@ Wu.Chrome.SettingsContent.Extras = Wu.Chrome.SettingsContent.extend({
 		}
 
 
-		Wu.post('/api/geo/json2cartocss', JSON.stringify(options), callback.bind(this), this);
+		Wu.post('/api/geo/json2carto', JSON.stringify(options), callback.bind(this), this);
 
 	},	
 
