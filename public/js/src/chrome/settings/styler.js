@@ -10,6 +10,38 @@ Wu.Styler = Wu.Class.extend({
 			staticText : 'Fixed value',
 			staticDivider : '-'
 		},
+		palettes : [ 
+			['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'],
+			['#0000ff', '#00ffff', '#00ff00', '#ffff00', '#ff0000'],
+			
+			['#f0f9e8', '#bae4bc', '#7bccc4', '#43a2ca', '#0868ac'],
+			["#0868ac", "#43a2ca", "#7bccc4", "#bae4bc", "#f0f9e8"],
+
+			['#ffffb2', '#fecc5c', '#fd8d3c', '#f03b20', '#bd0026'],
+			["#bd0026", "#f03b20", "#fd8d3c", "#fecc5c", "#ffffb2"],
+
+			['#feebe2', '#fbb4b9', '#f768a1', '#c51b8a', '#7a0177'],
+			["#7a0177", "#c51b8a", "#f768a1", "#fbb4b9", "#feebe2"],
+
+			['#d7191c', '#fdae61', '#ffffbf', '#abdda4', '#2b83ba'],
+			["#2b83ba", "#abdda4", "#ffffbf", "#fdae61", "#d7191c"],
+
+			['#d01c8b', '#f1b6da', '#f7f7f7', '#b8e186', '#4dac26'],
+			["#4dac26", "#b8e186", "#f7f7f7", "#f1b6da", "#d01c8b"],
+
+			['#e66101', '#fdb863', '#f7f7f7', '#b2abd2', '#5e3c99'],
+			["#5e3c99", "#b2abd2", "#f7f7f7", "#fdb863", "#e66101"],
+
+			['#ca0020', '#f4a582', '#f7f7f7', '#92c5de', '#0571b0'],
+			["#0571b0", "#92c5de", "#f7f7f7", "#f4a582", "#ca0020"],
+
+			['#ff00ff', '#ffff00', '#00ffff'],
+			['#00ffff', '#ffff00', '#ff00ff'],
+
+			['#ff0000', '#ffff00', '#00ff00'], // todo: throws error if 4 colors..	
+			['#00ff00', '#ffff00', '#ff0000'],
+		],
+
 	},
 
 	_content : {},
@@ -25,7 +57,6 @@ Wu.Styler = Wu.Class.extend({
 
 		// init container
 		this._initContainer();
-
 	},
 
 	_initContainer : function () {
@@ -144,6 +175,7 @@ Wu.Styler = Wu.Class.extend({
 			appendTo : line.container,
 			fn       : this._updateColor.bind(this),
 			value    : staticVal,
+			colors   : this.options.palettes
 		});
 
 		// remember items
@@ -384,8 +416,9 @@ Wu.Styler = Wu.Class.extend({
 			right 	  : true,
 			appendTo  : line.container,
 			presetFn  : this.selectColorPreset.bind(this), // preset selection
-			// customFn  : this._updateRange.bind(this),  // color ball selection
-			value     : value
+			value     : value,
+			colors   : this.options.palettes
+
 		});
 
 		// rememeber 
@@ -546,18 +579,11 @@ Wu.Styler = Wu.Class.extend({
 
 	_updateWidth : function () {
 
-		console.log('_updateWidth');
-
 		// Get field 
 		var inputField = this._content[this.type].width.input.input;
 
-		console.log('_updateWidth', inputField);
-
 		// save carto
 		this.carto().width.value = inputField.value;
-
-		// Close
-		// this._closeColorRangeSelector(); 
 
 		// update
 		this._updateStyle();		
@@ -566,13 +592,7 @@ Wu.Styler = Wu.Class.extend({
 	_updateOpacity : function (e) {
 
 		var value = parseFloat(e.target.value);
-		// var key   = e.target.id.slice(17, e.target.id.length); 	// todo: remove these also. 
-		// var pre = key.substring(0,4);				// whole object is now available in this._content[this.type].opacity.input
-		// 							// eg. id = this._content[this.type].opacity.input.id, etc..
-		// if (pre == 'min_' || pre == 'max_') {
-		// 	key = key.slice(4, key.length);
-		// }
-
+		
 		// Get field 
 		var inputField = this._content[this.type].opacity.input.input;
 
@@ -598,12 +618,12 @@ Wu.Styler = Wu.Class.extend({
 	_updatePointsize : function (e) {
 
 		var value = parseFloat(e.target.value);
-		var key   = e.target.id.slice(17, e.target.id.length);
-		var pre = key.substring(0,4);
+		// var key   = e.target.id.slice(17, e.target.id.length);
+		// var pre = key.substring(0,4);
 
-		if ( pre == 'min_' || pre == 'max_' ) {
-			key = key.slice(4, key.length);
-		}
+		// if ( pre == 'min_' || pre == 'max_' ) {
+		// 	key = key.slice(4, key.length);
+		// }
 
 		// Get field 
 		var inputField = this._content[this.type].pointsize.input.input;
@@ -785,8 +805,6 @@ Wu.Styler = Wu.Class.extend({
 	},
 
 	_unselectField : function (key, wrapper) {
-
-		console.log('_unselectField', key, wrapper);
 
 		// show static inputs
 		if (key == 'opacity') {	
@@ -1043,10 +1061,8 @@ Wu.Styler = Wu.Class.extend({
 			colorArray = [c1, c2, c3, c4, c5];
 		}
 
-		// hack: bug if four colors, override
-		if (colorArray.length == 4) {
-			colorArray = ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'];
-		}
+		// hack: bug if four colors, make three
+		if (colorArray.length == 4) colorArray.pop();
 
 		return colorArray;
 	},

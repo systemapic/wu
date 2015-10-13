@@ -1,11 +1,9 @@
 Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	_initialize : function () {
-
 	},
 
 	initLayout : function () {
-
 	},
 
 	_addEvents : function () {
@@ -83,7 +81,6 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		this._refresh();
 	},
 
-
 	_refresh : function () {
 	},
 
@@ -126,7 +123,6 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 
 	},
 
-
 	_storeActiveLayerUuid : function (uuid) {
 		app.Chrome.Right.options.editingLayer = uuid;
 	},
@@ -136,14 +132,10 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 	},
 
 	opened : function () {
-
-		
 	},
 
 	closed : function () {
-		
 	},
-
 
 	// add layer temporarily for editing
 	_tempaddLayer : function () {

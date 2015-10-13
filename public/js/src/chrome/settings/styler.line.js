@@ -32,20 +32,20 @@ Wu.Styler.Line = Wu.Styler.extend({
 		if (_.isEmpty(content)) return;
 
 		// get divs
-		var color_wrapper = content.color.line.container;
-		var color_children = content.color.line.childWrapper;
-		var opacity_wrapper = content.opacity.line.container;
-		var opacity_children = content.opacity.line.childWrapper;
-		var width_wrapper = content.width.line.container;
-		var width_children = content.width.line.childWrapper;
+		var color_wrapper 	= content.color.line.container;
+		var color_children 	= content.color.line.childWrapper;
+		var opacity_wrapper 	= content.opacity.line.container;
+		var opacity_children 	= content.opacity.line.childWrapper;
+		var width_wrapper 	= content.width.line.container;
+		var width_children 	= content.width.line.childWrapper;
 
 		// remove divs
-		color_wrapper && Wu.DomUtil.remove(color_wrapper);
-		color_children && Wu.DomUtil.remove(color_children);
-		opacity_wrapper && Wu.DomUtil.remove(opacity_wrapper);
-		opacity_children && Wu.DomUtil.remove(opacity_children);
-		width_wrapper && Wu.DomUtil.remove(width_wrapper);
-		width_children && Wu.DomUtil.remove(width_children);
+		color_wrapper && 	Wu.DomUtil.remove(color_wrapper);
+		color_children && 	Wu.DomUtil.remove(color_children);
+		opacity_wrapper && 	Wu.DomUtil.remove(opacity_wrapper);
+		opacity_children && 	Wu.DomUtil.remove(opacity_children);
+		width_wrapper && 	Wu.DomUtil.remove(width_wrapper);
+		width_children && 	Wu.DomUtil.remove(width_children);
 	},
 
 });

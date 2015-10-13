@@ -2,7 +2,6 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 
 	type : 'polygon',
 
-
 	// creates content of point container
 	_createOptions : function () {
 
@@ -15,7 +14,6 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		// create (+) button
 		console.log('(+) button');
 	},
-
 	
 	_preSelectOptions : function () {
 
