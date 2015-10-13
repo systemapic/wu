@@ -9,30 +9,18 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 				enabled : true,
 				text : 'Style Editor'
 			},
-			// layers : {
-			// 	enabled : true,
-			// 	text : 'Project Layers'
-			// },
 			tooltip : {
 				enabled : true,
 				text : 'Tooltip'
 			},
-			
 			filters : {
 				enabled : true,
 				text : 'Data Filters'
 			},
-			
-			// mapsettings : {
-			// 	enabled : true,
-			// 	text : 'Map Settings'
-			// },	
-
 			cartocss : {
 				enabled : true,
 				text : 'CartoCSS'
 			},
-
 			extras : {
 				enabled : true,
 				text : 'Extras'

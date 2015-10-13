@@ -335,7 +335,6 @@ Wu.Model.File = Wu.Model.extend({
 		var path = app.options.servers.portal;
 		path += 'api/file/download/';
 		path += '?file=' + filepath;
-		// path += '?raw=true'; // add raw to path
 		path += '&type=shp';
 		path += '&access_token=' + app.tokens.access_token;
 
