@@ -4,22 +4,23 @@ Wu.button = Wu.Class.extend({
 
 		this.options = options;
 
-		if (options.type == 'switch')      this.initSwitch();
-		if (options.type == 'set') 	   this.initSet();
-		if (options.type == 'setclear')    this.initSetClear();
-		if (options.type == 'radio')	   this.initRadio();
-		if (options.type == 'miniInput')   this.initMiniInput();
-		if (options.type == 'dropdown')    this.initMiniDropDown();
-		if (options.type == 'colorball')   this.initColorBall();
-		if (options.type == 'colorrange')  this.initColorRange();
-		if (options.type == 'dualinput')   this.initDualInput();
+		if ( options.type == 'switch' )     this.initSwitch();
+		if ( options.type == 'set' ) 	    this.initSet();
+		if ( options.type == 'setclear' )   this.initSetClear();
+		if ( options.type == 'radio' )	    this.initRadio();
+		if ( options.type == 'miniInput' )  this.initMiniInput();
+		if ( options.type == 'dropdown')    this.initMiniDropDown();
+		if ( options.type == 'colorball')   this.initColorBall();
+		if ( options.type == 'colorrange')  this.initColorRange();
+		if ( options.type == 'dualinput')   this.initDualInput();
+		if ( options.type == 'toggle')      this.initToggleButton();
 
 	},
 
 	
-	// DUAL INPUT
-	// DUAL INPUT
-	// DUAL INPUT
+	// ┌┬┐┬ ┬┌─┐┬    ┬┌┐┌┌─┐┬ ┬┌┬┐
+	//  │││ │├─┤│    ││││├─┘│ │ │ 
+	// ─┴┘└─┘┴ ┴┴─┘  ┴┘└┘┴  └─┘ ┴ 
 
 	initDualInput : function () {
 
@@ -88,9 +89,9 @@ Wu.button = Wu.Class.extend({
 	},
 
 
-	// COLOR RANGE
-	// COLOR RANGE
-	// COLOR RANGE
+	// ┌─┐┌─┐┬  ┌─┐┬─┐  ┬─┐┌─┐┌┐┌┌─┐┌─┐
+	// │  │ ││  │ │├┬┘  ├┬┘├─┤││││ ┬├┤ 
+	// └─┘└─┘┴─┘└─┘┴└─  ┴└─┴ ┴┘└┘└─┘└─┘
 
 	initColorRange : function () {
 
@@ -264,9 +265,9 @@ Wu.button = Wu.Class.extend({
 	},		
 
 
-	// COLOR BALL
-	// COLOR BALL
-	// COLOR BALL
+	// ┌─┐┌─┐┬  ┌─┐┬─┐  ┌┐ ┌─┐┬  ┬  
+	// │  │ ││  │ │├┬┘  ├┴┐├─┤│  │  
+	// └─┘└─┘┴─┘└─┘┴└─  └─┘┴ ┴┴─┘┴─┘
 
 	initColorBall : function () {
 
@@ -329,9 +330,9 @@ Wu.button = Wu.Class.extend({
 	},	
 
 
-	// MINI DROP DOWN
-	// MINI DROP DOWN
-	// MINI DROP DOWN
+	// ┌┬┐┬┌┐┌┬  ┌┬┐┬─┐┌─┐┌─┐┌┬┐┌─┐┬ ┬┌┐┌
+	// ││││││││   ││├┬┘│ │├─┘ │││ │││││││
+	// ┴ ┴┴┘└┘┴  ─┴┘┴└─└─┘┴  ─┴┘└─┘└┴┘┘└┘
 
 	initMiniDropDown : function () {
 
@@ -382,9 +383,10 @@ Wu.button = Wu.Class.extend({
 
 	},
 
-	// MINI INPUT
-	// MINI INPUT
-	// MINI INPUT
+
+	// ┌┬┐┬┌┐┌┬  ┬┌┐┌┌─┐┬ ┬┌┬┐
+	// ││││││││  ││││├─┘│ │ │ 
+	// ┴ ┴┴┘└┘┴  ┴┘└┘┴  └─┘ ┴ 
 
 	initMiniInput : function () {
 
@@ -434,9 +436,10 @@ Wu.button = Wu.Class.extend({
 
 	},	
 
-	// RADIO RADIO RADIO
-	// RADIO RADIO RADIO
-	// RADIO RADIO RADIO		
+	
+	// ┬─┐┌─┐┌┬┐┬┌─┐
+	// ├┬┘├─┤ ││││ │
+	// ┴└─┴ ┴─┴┘┴└─┘			
 
 	initRadio : function () {
 
@@ -484,9 +487,9 @@ Wu.button = Wu.Class.extend({
 	},
 
 
-	// SET SET SET
-	// SET SET SET
-	// SET SET SET		
+	// ┌─┐┌─┐┌┬┐
+	// └─┐├┤  │ 
+	// └─┘└─┘ ┴ 	
 
 	initSet : function () {
 
@@ -520,9 +523,9 @@ Wu.button = Wu.Class.extend({
 	},
 
 
-	// SET/CLEAR SET/CLEAR SET/CLEAR
-	// SET/CLEAR SET/CLEAR SET/CLEAR
-	// SET/CLEAR SET/CLEAR SET/CLEAR
+	// ┌─┐┌─┐┌┬┐  ┌─┐┬  ┌─┐┌─┐┬─┐
+	// └─┐├┤  │   │  │  ├┤ ├─┤├┬┘
+	// └─┘└─┘ ┴   └─┘┴─┘└─┘┴ ┴┴└─
 
 	initSetClear : function () {
 
@@ -580,9 +583,9 @@ Wu.button = Wu.Class.extend({
 	},	
 
 
-	// SWITCH SWITCH SWITCH
-	// SWITCH SWITCH SWITCH
-	// SWITCH SWITCH SWITCH
+	// ┌─┐┬ ┬┬┌┬┐┌─┐┬ ┬
+	// └─┐││││ │ │  ├─┤
+	// └─┘└┴┘┴ ┴ └─┘┴ ┴
 
 	initSwitch : function () {
 
@@ -645,7 +648,46 @@ Wu.button = Wu.Class.extend({
 		this.options.fn(e, isOn)
 	},	
 
+
+	// ┌┬┐┌─┐┌─┐┌─┐┬  ┌─┐  ┌┐ ┬ ┬┌┬┐┌┬┐┌─┐┌┐┌
+	//  │ │ ││ ┬│ ┬│  ├┤   ├┴┐│ │ │  │ │ ││││
+	//  ┴ └─┘└─┘└─┘┴─┘└─┘  └─┘└─┘ ┴  ┴ └─┘┘└┘
+
+	initToggleButton : function (e) {
+
+		var option1   = this.options.option1,
+		    option2   = this.options.option2,
+		    id        = this.options.id,
+		    appendTo  = this.options.appendTo,
+		    fn        = this.options.fn,
+		    className = this.options.className,
+		    selected  = this.options.selected;
+
+
+		// Create classname
+		var divclass = 'chrome-toggle-button-container';
+		if (className) divclass += ' ' + className;
+
+		// Create button
+		var _toggleButton = this._toggleButton = Wu.DomUtil.create('div', divclass, appendTo);
+		_toggleButton.setAttribute('key', id);
+		_toggleButton.id = 'togglebutton_' + id;
+
+		var _option1 = Wu.DomUtil.create('div', 'toggle-button-option-one', _toggleButton, option1)
+		var _option2 = Wu.DomUtil.create('div', 'toggle-button-option-one', _toggleButton, option2)
+
+		
+
+	},
+
 });
+
+
+
+
+
+
+
 
 
 Wu.fieldLine = Wu.Class.extend({

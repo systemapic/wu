@@ -1,0 +1,203 @@
+/* SHARE */
+/* SHARE */
+/* SHARE */
+
+
+.wide-share .share-item {
+	display: none;
+	}	
+
+.share-invite-wrapper-inner {
+	width: 260px;
+	height: 220px;
+	}	
+
+.share-invite-input {
+	position: relative;
+	float: none;
+	width: 100%;
+	margin: 3px;
+	border: 0;
+	margin-left: 20px;
+	}
+
+.share-dropdown {
+	/*-webkit-transition: width 200ms ease, height 200ms ease;*/
+  	/*transition: width 200ms ease, height 200ms ease;*/
+  	height: 100px;
+	position: absolute;
+	background: white;
+	right: 3px;
+	padding: 13px 20px 13px 19px;
+	box-shadow: 0 0 2px 1px rgba(0,0,0,0.4);
+	z-index: 10000010;
+	top: 27px;
+	width: 142px;
+	cursor: default;  	
+	}
+
+.share-dropdown .share-item {
+	font-size: 14px;
+	line-height: 1.8;
+	cursor: pointer;
+	}
+
+.share-dropdown .share-item:hover {
+	color: black;
+	}
+
+.share-ghost {
+	width: 100%;
+	height: 100%;
+	z-index: 10000009;
+	position: absolute;
+	}		
+	
+.share-invite-title {
+	margin-left: 0px;
+	position: relative;
+	font-size: 19px;
+	margin-bottom: 10px;
+	text-align: center;
+	}
+
+.share-invite-toggle {
+	font-size: 14px;
+	font-weight: 500;
+	padding-top: 10px;
+	margin-left: 0px;
+	position: relative;
+	float: left;
+	background-color: black;
+	color: white;
+	padding: 2px;
+	cursor: pointer;
+	}
+
+.share-invite-toggle:hover {
+	color: black;
+	background: white;
+	border: 1px solid black;
+	}
+
+.share-invite-submit {
+	height: auto;
+	width: 129px;
+	border: 1px solid red;
+	padding: 5px;
+	position: relative;
+	margin-left: 140px;
+	border-radius: 2px;
+	}
+
+.share-invite-submit:hover {
+	background: green;
+	color: white;
+	}
+
+.share-invite-input-link {
+	width: 100%;
+	background: rgba(113, 196, 168, 1);
+	padding: 2px;
+	border: 0;
+	}
+
+.share-invite-input-link::selection {
+	background: rgba(113, 196, 168, 1);
+	color: white;
+	}
+
+.share-invite-title-post {
+	font-weight: 400;
+	font-size: 14px;
+	position: relative;
+	padding: 4px;
+	padding-left: 0px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	}	
+
+.share-dropdown,
+.wide-share {
+	width: auto !important;
+	height: auto !important;
+	min-height: auto !important;
+	max-height: auto !important;
+	min-width: auto !important;
+	max-height: auto !important;
+	}
+
+.share-invite-permission-title {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	font-weight: 900;	
+	}
+
+.share-input {
+	height: 30px;
+	width: 113px;
+	left: 0;
+	bottom: 9px;
+	border: none !important;
+	}
+
+.share-input::selection {
+	background: #71c4a8;
+	}
+
+.share-link-pdf {
+	position: absolute;
+	height: auto;
+	width: 100%;
+	left: 0;
+	bottom: 37px;
+	border: none !important;
+	background-color: white;
+	margin-left: 0;
+	color: #3F4652;
+	padding-left: 19px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	}
+
+/*temporary override*/
+.file-action-share {
+	color: gainsboro;
+	}
+	
+.file-action-share:hover {
+	color: gainsboro;
+	}
+
+input.invite-permissions-checkbox {
+	display: inline-block;
+	}
+
+.invite-permissions-label {
+	margin-left: 2px;
+	font-size: 13px;
+	font-weight: 500;
+	padding-bottom: 0;
+	}
+
+.share-invite-wrapper {
+	overflow: hidden;
+	position: relative;
+	height: 100%;
+	}
+
+.invite-permissions-checkbox-wrap {
+	float: left;
+	width: 100%;
+	}
+
+.share-invite-title-clip {
+	margin-top: 10px;
+	}
+
+.invite-permissions-wrapper {
+	position: relative;
+	border-top: 1px dashed #ccc;
+	margin-top: 15px;	
+	}
+	
