@@ -1825,6 +1825,7 @@ aka feedback pane
 	white-space: normal;
 	word-break: normal;
 	line-height: 1.2;
+	text-transform: capitalize;
 	}
 
 

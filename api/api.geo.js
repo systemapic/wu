@@ -212,14 +212,31 @@ module.exports = api.geo = {
 			// if ( normalizedOffset ) {
 				// if ( min > 0 ) min = 0;
 			// }
-			
-			var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
-			var field_calc = parseFloat(range[1]) / field_floor;
 
-			cartObj.headers += '@opacity_field_range: [' + opacity.column + '];\n\n';
-			cartObj.headers += '@opacity_field: @opacity_field_range / ' + field_floor + ' - ' + field_calc + ';\n\n';
-			// 			o 	=    (1400-700)/ (1200-700)
-			// 			r = 700 - 1200
+
+			// if (field_calc <= field_floor) {
+			// 	console.log('field_calc === field_floor', field_calc, field_floor);
+			// 	field_calc = 0;	
+			// }
+			
+
+			if (range[1] == 1 && range[0] == 0) {
+				// coherence, special case
+
+				cartObj.headers += '@opacity_field: [' + opacity.column + '];\n\n';
+
+			} else {
+
+				var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
+				var field_calc = parseFloat(range[1]) / field_floor;
+				
+				cartObj.headers += '@opacity_column: [' + opacity.column + '];\n\n';
+				cartObj.headers += '@opacity_field: @opacity_column / ' + field_floor + ' - ' + field_calc + ';\n\n';
+
+			}
+
+
+		
 		} else {
 
 			// static opacity
@@ -255,15 +272,30 @@ module.exports = api.geo = {
 			// NORMALIZED OFFSET 
 			// i.e. if the lowest number is 30, and 
 		 	// highest is 100, 30 will return 0.3 and not 0
-			if ( normalizedOffset ) {
-				if ( min > 0 ) min = 0;
+			// if ( normalizedOffset ) {
+			// 	if ( min > 0 ) min = 0;
+			// }
+
+			// cartObj.headers += '@opacity_field_max: ' + range[1] + ';\n';
+			// cartObj.headers += '@opacity_field_min: ' + range[0] + ';\n';
+			// cartObj.headers += '@opacity_field_range: [' + opacity.column + '];\n\n';
+			// cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
+
+
+			if (range[1] == 1 && range[0] == 0) {
+
+				// coherence, special case
+				cartObj.headers += '@opacity_field: [' + opacity.column + '];\n\n';
+
+			} else {
+
+				
+				var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
+				var field_calc = parseFloat(range[1]) / field_floor;
+				
+				cartObj.headers += '@opacity_column: [' + opacity.column + '];\n\n';
+				cartObj.headers += '@opacity_field: @opacity_column / ' + field_floor + ' - ' + field_calc + ';\n\n';
 			}
-
-			cartObj.headers += '@opacity_field_max: ' + range[1] + ';\n';
-			cartObj.headers += '@opacity_field_min: ' + range[0] + ';\n';
-			cartObj.headers += '@opacity_field_range: [' + opacity.column + '];\n\n';
-			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
-
 		
 		} else {
 
