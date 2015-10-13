@@ -312,7 +312,12 @@
 	}
 
 .client-logo {
+	background-image: url(images/defaultProjectLogo.png);
+	background-position: center;
+  	background-repeat: no-repeat;
+
 	position: relative;
+	width: 100%;
 	}
 
 .client-logo.editable:hover {
@@ -487,8 +492,10 @@
 	}
 
 .project-logo {
+	background-image: url(images/defaultProjectLogo.png);
+	background-position: center;
+  	background-repeat: no-repeat;
 	position: relative;
-	/*width: 100%;*/
 	height: 100%;
 	}
 
@@ -916,7 +923,11 @@
 #map-bounds-inner {
 	padding-left: 3px;
 	padding-right: 3px;
-	}	
+	}
+
+#map-initpos-inner {
+	cursor: default !important;
+	}
 
 #map-initpos-inner label {
 	font-weight: 600;
@@ -1311,6 +1322,10 @@
 .data-library,
 .fullpage-users {
 	padding-bottom: 96px;
+	min-width: 900px;
+	max-width: 900px;
+	width: 900px;
+	padding-right: 5px;	
 	}
 
 
@@ -1326,14 +1341,12 @@
 /* Outer wrapper */
 .fullpage-documents {
 	position: absolute;
-	/*width: 100%;*/
 	height: 100%;
 	z-index: 3400;
 	display: none;
-
 	box-shadow: none;
-	width: 895px;	
-
+	width: 890px;
+	padding-right: 0;	
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	}
@@ -1344,8 +1357,8 @@
 	font-weight: $lean;
 	margin: 10px;
 	font-family: $font;
-	width: 250px;
 	top: 0px;
+	width: 200px;
 	}
 
 /* right wrapper */
@@ -1364,12 +1377,12 @@
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	top: 0px;
-	left: 250px;
 	color: #333;
 	padding-top: 0;	
 	padding-bottom: 125px;
-
-	border-left: 1px solid #EAEAEA;
+	border-left: 2.5px solid rgba(128, 128, 128, 0.17);
+	padding-right: 270px;	
+	left: 200px;
 	}
 
 /* folder list */
@@ -1578,8 +1591,12 @@ button.image-attachment {
 	background: black;
 	border-radius: 5px;
 	cursor: pointer;
+	border-radius: 5px;
+	cursor: pointer;
 	background-color: #262625;
 	box-shadow: 0 0 2px #262625;
+	overflow: scroll;
+	max-height: 300px;	
 	}
 
 .grande-sources-topwrap {
@@ -1589,11 +1606,10 @@ button.image-attachment {
 
 .grande-sources-source {
 	position: relative;
-	/*height: 50px;*/
 	border-top: 1px dotted #666;
 	width: 100%;
 	overflow: hidden;
-	padding-bottom: 3px;
+	padding-bottom: 6px;
 	}
 
 
@@ -1613,6 +1629,7 @@ button.image-attachment {
 .grande-sources-source-icon {
 	width: 30px;
 	height: 30px;
+	position: absolute;
 	}
 
 .grande-sources-source-icon.image,
@@ -1635,23 +1652,26 @@ button.image-attachment {
 
 .grande-sources-source-title {
 	color: white;
-	position: absolute;
 	top: 0px;
-	left: 34px;
 	font-size: 110%;
 	padding: 2px;
 	width: 190px;	
 	line-height: 1;
 	padding-top: 8px;
+	left: 38px;
+	position: relative;
+	display: inline-block;	
 	}
 
 .grande-sources-source-thumb {
-	position: absolute;
+	position: relative;
 	height: 39px;
-	right: 5px;
-	top: 5px;
+	right: 4px;
+	top: 3px;
 	width: auto;
 	max-width: 70px;
+	display: inline-block;
+	float: right;	
 	}	
 
 .documents-container-textarea {
@@ -1681,6 +1701,12 @@ button.image-attachment {
 	margin-left: 0px;
 	}
 
+.documents-container-textarea p img {
+	display: block;
+	position: relative;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	}
 
 
 /*
@@ -1719,7 +1745,6 @@ button.image-attachment {
 
 .fullpage-users,
 .data-library {
-	/*padding-bottom: 0;*/
 	box-shadow: none;
 	}
 
@@ -1727,13 +1752,13 @@ button.image-attachment {
 .data-library-inner {
 	height: 100%;
 	padding-bottom: 155px;
-	/*box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);*/
-	/*background: rgba(255, 255, 255, 0.9);*/
-
 	box-shadow: none;
 	background: white;    	
 	}
 
+.data-library-inner {
+	overflow: hidden;
+	}
 
 .download-dialog-link {
 	height: 100%;
@@ -1980,6 +2005,7 @@ button.image-attachment {
 	left: 0;
 	z-index: -1000;
 	margin-left: 100px;
+	display: none;
 	}
 
 .fullscreen-dropped {
@@ -2255,9 +2281,9 @@ td.tdcont.createdDate {
 	font-size: 80%;
 	}
 
-/* CUSTOM MINIMAL STYLING FOR DATALIBRARY */
-/* CUSTOM MINIMAL STYLING FOR DATALIBRARY */
 
+/* CUSTOM MINIMAL STYLING FOR DATALIBRARY */
+/* CUSTOM MINIMAL STYLING FOR DATALIBRARY */
 
 /* ==================================================== */
 /* THESE RULES SHOULD BE CONTROLLED FROM the D3List.js */
@@ -2310,6 +2336,56 @@ td.tdcont.createdDate {
 	width: 493px;
 	height: 737px;
 	}
+
+/* ==================================================== */
+
+.minimal .file-description-outer-wrapper {
+	width: 100%;
+	height: 145px;
+	}
+
+.minimal .file-description-inner-wrapper {
+	height: 110px;
+	}
+
+.minimal .list-attribute-wrapper {
+	height: 33px;
+	height: 48px;
+	}
+
+.minimal .open-list-info {
+	height: 206px;
+ 	top: 34px;
+	}
+
+.minimal .file-list-wrapper {
+	height: 151px;
+	}
+
+.minimal .manage-access-title-wrapper {
+	height: 100px;
+	}
+
+.minimal .manage-access-content-wrapper-outer {
+	padding-right: 20px;
+	box-sizing: border-box;
+	width: 515px;	
+	}
+
+.description-textarea-outer-wrapper {
+	height: 94px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	width: 540px;
+	padding-right: 30px;
+	}
+
+.minimal .description-textarea-outer-wrapper {
+	height: 108px;
+	width: 218px;
+	}	
+
+
 
 
 
@@ -2396,6 +2472,10 @@ td.tdcont.createdDate {
 	margin-bottom: 25px;
 	}
 
+.backpane-message.error {
+	color: red;
+	}
+
 /* USER MANAGEMENT, MANAGE USER PRIVILEGGES */
 .backpane-projectTitle {
 	margin-top: 20px;
@@ -2442,16 +2522,33 @@ td.tdcont.createdDate {
 	margin-right: 100%;
 	margin-top: 5px;
 	width: 310px;
-
 	line-height: 1.2;
 	}
 
+.backpane-input::-webkit-input-placeholder { /* WebKit browsers */
+    	color: white;
+	}
+
+.backpane-input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   	color: white;
+   	opacity: 1;
+	}
+
+.backpane-input::-moz-placeholder { /* Mozilla Firefox 19+ */
+   	color: white;
+   	opacity: 1;
+	}
+
+.backpane-input:-ms-input-placeholder { /* Internet Explorer 10+ */
+   	color: white;
+	}	
+
 .backpane-input.valid {
-	background-color: rgb(0,110,0) !important;
+	background-color: #4FDA4F !important;
 	}
 
 .backpane-input.invalid {
-	background-color: rgb(110,0,0) !important;
+	background-color: #F03A3A !important;
 	}
 
 .backpane-message {
@@ -2653,16 +2750,18 @@ td.tdcont.createdDate {
 	margin-bottom: 175px;
 	}
 
+.manage-access-content-wrapper-outer {
+	overflow: scroll;
+	height: 100%;
+	width: 920px;
+	padding-right: 30px;	
+	}	
+
 
 /* CUSTOM MINIMAL STYLING FOR USERS */
 /* CUSTOM MINIMAL STYLING FOR USERS */
-
-/*.fullpage-users.minimal .manage-access-roles-wrapper {
-	left: 390px;
-	}*/
 
 .fullpage-users.minimal .manage-access-roles-wrapper {
-	/*left: 303px;*/
 	left: 280px;
 	}
 
@@ -2673,6 +2772,10 @@ td.tdcont.createdDate {
 .fullpage-users.minimal {
 	padding-left: 2px;
 	left: 102px;
+
+	max-width: 497px;
+	width: 497px;
+	min-width: 497px;	
 	}
 
 .fullpage-users.minimal .user-projects-button {
@@ -2680,9 +2783,16 @@ td.tdcont.createdDate {
 	}
 
 .fullpage-users.minimal .manage-access-content-wrapper {
-	/*width: 578px;*/
 	width: 487px;
 	overflow: hidden;	
+	}
+
+.fullpage-users.show.hide-top.minimal .manage-access-project-item-description {
+	width: 190px;
+	}
+
+.fullpage-users.show.hide-top .manage-access-project-item-description {
+	width: 260px;
 	}	
 
 
@@ -2693,34 +2803,29 @@ td.tdcont.createdDate {
 
 .fullpage-users.minimal .users-inner,
 .data-library.minimal .data-library-inner {
-	/*min-height: 430px;*/
-	/*max-height: 530px;*/
-
 	height: 530px;
-
 	overflow: hidden;
 	}
 
 .fullpage-users.minimal,
 .data-library.minimal {
-	/*min-height: 430px;*/
-	/*max-height: 530px;*/
-
 	height: 530px;
 	padding-bottom: 3px;
 	overflow: hidden;	
-	}	
-
-.fullpage-users.minimal,
-.data-library.minimal {
-	max-width: 495px;
 	padding-right: 5px;
+	max-width: 495px;
+	width: 495px;
+	min-width: 495px;	
 	}
 
 .data-library.minimal .fullscreen-drop {
 	display: none;
 	}	
 
+.data-library.minimal .data-library-inner .editor-wrapper {
+	width: 520px;
+	padding-right: 30px;	
+	}
 
 
 
@@ -2938,6 +3043,12 @@ td.tdcont.createdDate {
 	text-decoration: none;
 	}
 
+.share-image-download-button:visited, 
+.share-image-download-button:link {
+	text-decoration: none !important;
+	color:white;
+	}	
+
 .expand-share-link {
 	height: 350px;
 	}
@@ -3081,47 +3192,53 @@ td.tdcont.createdDate {
 
 /* Individual user control wrapper */
 .manage-access-info-outer {
-	left: 660px !important;
+	left: 570px !important;
+	position: absolute;
+	top: 0;
+	height: 100%;
+	padding-right: 15px;
+	display: table;
+	max-width: 257px;
+	line-height: 1.3;	
+	}
+
+.manage-access-info {
+	display: table-cell;
+	vertical-align: middle;
 	}
 
 .manage-access-container {
 	background-color: rgba(255, 255, 255, 0.9);
 	height: 100%;
-	/*overflow: auto;*/
 	color: #3F4652;
-	/*padding: 50px;*/
-	/*padding-right: 60px;*/
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	padding: 0;
-
-	overflow: scroll;
+	/*overflow-y: scroll;*/
+	/*overflow-x: hidden;*/
+	overflow: hidden;
 	}
 
 /* User name + sub title */
 .manage-access-title-wrapper {
-	/*position: absolute;*/
 	width: 100%;
 	top: 0;
 	height: 120px;
 	z-index: 9999999;
-	/*padding-top: 18px;*/
 	border-bottom: 1px solid rgba(0,0,0,0.1);
-	/*left: -110px;*/
 	background: rgba(245,245,245,0.95);
 	padding-left: 110px;
-
 	position: absolute;
 	padding: 23px;
-	left: 0;	
+	left: 0;
 	}
 
 /* User name */
 .manage-access-title {
-	/*font-size: 36px;*/
 	font-size: 27px;
 	font-weight: 900;
 	text-align: center;
+	text-align: left;
 	}
 
 .minimal .manage-access-title {
@@ -3131,16 +3248,15 @@ td.tdcont.createdDate {
 
 /* User subtitle */
 .manange-access-subtitle {
-	text-align: center;
+	/*text-align: center;*/
 	margin-top: 5px;
 	font-style: italic;
 	font-size: 17px;
+	text-align: left;
 	}
 
 /* Content wrapper (list of clients and projects) */
 .manage-access-content-wrapper {
-	/*padding-top: 100px;*/
-	/*padding-top: 0;*/
 	padding: 23px;	
 	padding-top: 143px;
 	}
@@ -3243,9 +3359,7 @@ td.tdcont.createdDate {
 	position: absolute;
 	left: 90px;
 	top: 40px;
-	/*font-size: 13px;*/
 	font-size: 12px;
-	/*width: 200px;*/
 	max-width: 350px;
 	height: 40px;
 	line-height: 1.1;
@@ -3254,25 +3368,27 @@ td.tdcont.createdDate {
 /* Client each project role wrapper */
 .manage-access-roles-wrapper {
 	position: absolute;
-	left: 450px;
+	/*left: 450px;*/
 	top: 19px;
 	z-index: 1000;
+	right: 10px;
+	left: 350px;
 	}
 
 /* Client each project current role */
 .manage-access-current-role {
-	/*font-size: 120%;*/
-	/*border: 1px solid blue;*/
 	max-width: 200px;
+	padding: 10px;
 	}
 
 
 .manage-access-dropdown {
-	z-index: 1000;
 	background: white;
 	box-shadow: 0 0 3px 0 rgba(0,0,0,0.2);
 	position: relative;
-	left: -3px;	
+	left: -3px;
+	position: fixed;
+	z-index: 999999999999999;	
 	}
 
 /* Client each projec each role */
@@ -3386,6 +3502,12 @@ td.tdcont.createdDate {
 	position: relative;
 	height: 50px;
 	overflow: visible;
+
+	-webkit-transition: height 250ms ease;
+	-moz-transition: height 250ms ease;
+	-ms-transition: height 250ms ease;
+	-o-transition: height 250ms ease;
+	transition: height 250ms ease;	
 	}	
 
 .list-line:nth-child(odd) {
@@ -3511,6 +3633,7 @@ td.tdcont.createdDate {
 	display: block;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;	
+	cursor: hand;	
 	}
 
 .list-attribute {
@@ -3545,6 +3668,7 @@ td.tdcont.createdDate {
 .canEdit .list-attribute-position,
 .canEdit .list-attribute-phone {
 	cursor: pointer;
+	line-height: 1.2;
 	}
 
 /* List folder */
@@ -3826,33 +3950,27 @@ td.tdcont.createdDate {
 .file-description-outer-wrapper	{
 	height: 129px;
 	border-left: none !important;
-}
+	overflow: hidden;
+	}
 
 .file-description-outer-wrapper {
 	padding: 10px;
 	}
 
-
-
 .file-other-meta-wrapper {
 	padding-bottom: 0;
 	}
 
-
-.minimal .file-other-meta-wrapper {
-	/*display: none !important;*/
-	}
-
-
 .file-description-inner-wrapper {
 	background: transparent;
-	/*height: 151px;*/
 	height: 95px;
 	padding: 0;
 	font-size: 12px;
-	overflow: scroll;
-	width: 100%;
 	border: none;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	width: 120%;
+	padding-right: 20%;	
 	}
 
 .file-uploaded-by-title,

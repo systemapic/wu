@@ -190,62 +190,32 @@ module.exports = api.geo = {
 		var style = options.style.point;
 		var opacity = style.opacity;
 
-		var cartObj = {
+		var css = {
 			headers : '',
 			style   : ''
 		}
 
+		// create @variables
+		if (opacity.column) {
 
-		if ( opacity.column ) {
-
-			// var max = Math.floor(options.columns[opacity.column].max * 10) / 10;
-			// var min = Math.floor(options.columns[opacity.column].min * 10) / 10;	
-
+			// calc ranges
 			var range = opacity.range;			
+			var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
+			var field_calc = parseFloat(range[0]) / field_floor;
 
-
-			// var normalizedOffset = true;
-
-			// NORMALIZED OFFSET 
-			// i.e. if the lowest number is 30, and 
-		 	// highest is 100, 30 will return 0.3 and not 0
-			// if ( normalizedOffset ) {
-				// if ( min > 0 ) min = 0;
-			// }
-
-
-			// if (field_calc <= field_floor) {
-			// 	console.log('field_calc === field_floor', field_calc, field_floor);
-			// 	field_calc = 0;	
-			// }
-			
-
-			if (range[1] == 1 && range[0] == 0) {
-				// coherence, special case
-
-				cartObj.headers += '@opacity_field: [' + opacity.column + '];\n\n';
-
-			} else {
-
-				var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
-				var field_calc = parseFloat(range[1]) / field_floor;
-				
-				cartObj.headers += '@opacity_column: [' + opacity.column + '];\n\n';
-				cartObj.headers += '@opacity_field: @opacity_column / ' + field_floor + ' - ' + field_calc + ';\n\n';
-
-			}
-
-
+			// normalized = (x-min(x))/(max(x)-min(x))
+			css.headers += '@opacity_field: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
 		
 		} else {
 
 			// static opacity
-			cartObj.headers += '@opacity_field: ' + opacity.value + ';\n';
+			css.headers += '@opacity_field: ' + opacity.value + ';\n';
 		}
 
-		cartObj.style += '\tmarker-opacity: @opacity_field;\n\n';
+		// add rule
+		css.style += '\tmarker-opacity: @opacity_field;\n\n';
 
-		return cartObj;
+		return css;
 	},
 
 	buildCarto_polygonOpacity : function (options) {
@@ -254,7 +224,7 @@ module.exports = api.geo = {
 		var opacity = style.opacity;
 
 
-		var cartObj = {
+		var css = {
 			headers : '',
 			style   : ''
 		}
@@ -262,50 +232,24 @@ module.exports = api.geo = {
 
 		if ( opacity.column ) {
 
-			var max = Math.floor(options.columns[opacity.column].max * 10) / 10;
-			var min = Math.floor(options.columns[opacity.column].min * 10) / 10;				
-
+			// calc vars
 			var range = opacity.range;			
-
-			var normalizedOffset = true;
-
-			// NORMALIZED OFFSET 
-			// i.e. if the lowest number is 30, and 
-		 	// highest is 100, 30 will return 0.3 and not 0
-			// if ( normalizedOffset ) {
-			// 	if ( min > 0 ) min = 0;
-			// }
-
-			// cartObj.headers += '@opacity_field_max: ' + range[1] + ';\n';
-			// cartObj.headers += '@opacity_field_min: ' + range[0] + ';\n';
-			// cartObj.headers += '@opacity_field_range: [' + opacity.column + '];\n\n';
-			// cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
-
-
-			if (range[1] == 1 && range[0] == 0) {
-
-				// coherence, special case
-				cartObj.headers += '@opacity_field: [' + opacity.column + '];\n\n';
-
-			} else {
-
-				
-				var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
-				var field_calc = parseFloat(range[1]) / field_floor;
-				
-				cartObj.headers += '@opacity_column: [' + opacity.column + '];\n\n';
-				cartObj.headers += '@opacity_field: @opacity_column / ' + field_floor + ' - ' + field_calc + ';\n\n';
-			}
+			var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
+			var field_calc = parseFloat(range[0]) / field_floor;
+			
+			// normalized = (x-min(x))/(max(x)-min(x))
+			css.headers += '@opacity_field: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
 		
 		} else {
 
 			// static opacity
-			cartObj.headers += '@opacity_field: ' + opacity.value + ';\n';
+			css.headers += '@opacity_field: ' + opacity.value + ';\n';
 		}
 
-		cartObj.style += '\tpolygon-opacity: @opacity_field;\n\n';
+		// add rule
+		css.style += '\tpolygon-opacity: @opacity_field;\n\n';
 
-		return cartObj;
+		return css;
 	},
 
 	buildCarto_lineOpacity : function (options) {
@@ -314,43 +258,32 @@ module.exports = api.geo = {
 		var opacity = style.opacity;
 
 
-		var cartObj = {
+		var css = {
 			headers : '',
 			style   : ''
 		}
 
 
+		// calc vars
 		if ( opacity.column ) {
 
-			var max = Math.floor(options.columns[opacity.column].max * 10) / 10;
-			var min = Math.floor(options.columns[opacity.column].min * 10) / 10;	
-
 			var range = opacity.range;			
-
-			var normalizedOffset = true;
-
-			// NORMALIZED OFFSET 
-			// i.e. if the lowest number is 30, and 
-		 	// highest is 100, 30 will return 0.3 and not 0
-			if ( normalizedOffset ) {
-				if ( min > 0 ) min = 0;
-			}
-
-			cartObj.headers += '@opacity_field_max: ' + range[1] + ';\n';
-			cartObj.headers += '@opacity_field_min: ' + range[0] + ';\n';
-			cartObj.headers += '@opacity_field_range: [' + opacity.column + '];\n\n';
-			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
-
+			var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
+			var field_calc = parseFloat(range[0]) / field_floor;
+			
+			// normalized = (x-min(x))/(max(x)-min(x))
+			css.headers += '@opacity_field: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
 		
 		} else {
 
 			// static opacity
-			cartObj.headers += '@opacity_field: ' + opacity.value + ';\n';
+			css.headers += '@opacity_field: ' + opacity.value + ';\n';
 		}
 
-		cartObj.style += '\tpolygon-opacity: @opacity_field;\n\n';
+		// add rule
+		css.style += '\tpolygon-opacity: @opacity_field;\n\n';
 
-		return cartObj;
+		return css;
 	},
 
 

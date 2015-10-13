@@ -1247,7 +1247,17 @@ Wu.Evented = Wu.Class.extend({
 		for (var id in this._eventParents) {
 			this._eventParents[id].fire(e.type, Wu.extend({layer: e.target}, e), true);
 		}
+	},
+
+
+	bytesToSize : function (bytes) {
+		   var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+		   if (bytes == 0) return '0 Byte';
+		   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+		   return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 	}
+
+
 });
 
 var proto = Wu.Evented.prototype;
@@ -1916,11 +1926,6 @@ Wu.extend(Wu.DomEvent, {
 Wu.DomEvent.addListener = Wu.DomEvent.on;
 Wu.DomEvent.removeListener = Wu.DomEvent.off;
 
-
-// Wu.on = Wu.Mixin.Events.on;
-// Wu.off = Wu.Mixin.Events.off;
-// Wu.fire = Wu.Mixin.Events.fire;
-
 Array.prototype.diff = function(a) {
     return this.filter(function(i) {return a.indexOf(i) < 0;});
 };
@@ -1963,21 +1968,6 @@ String.prototype.camelize = function () {
     });
 }
 
-// JSON.parseAsync = function(data, callback) {
-// 	var worker, json
-// 	if (window.Worker) {
-// 		worker = new Worker( 'json.worker.js' );
-// 		worker.addEventListener( 'message', function (e) {
-// 			json = e.data;
-// 			callback( json );
-// 		}, false);
-// 		worker.postMessage( data );
-// 		return;
-// 	} else {
-// 		json = JSON.parse( data );
-// 		callback( json );
-// 	}
-// };
 
 // bind fn for phantomJS
 Function.prototype.bind = Function.prototype.bind || function (thisp) {
