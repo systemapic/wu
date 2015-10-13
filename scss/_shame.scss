@@ -1,3 +1,702 @@
-.leaflet-draw-toolbar a {
-	background-image: url(images/leaflet.draw.sprites.png);
-}
+.dropzone-meta {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 10001;
+	background-color: rgba(0, 0, 0, 0.69);
+	border: none !important;
+	}
+
+.drop-meta-title {
+	font-size: 700%;
+	position: relative;
+	color: white;
+	margin: auto;
+	width: 400px;
+	padding-top: 200px;
+	left: -50px;
+	}
+
+.invalidLayermenuitem .layer-menu-item {
+	background: red;
+	}
+
+.connect-title {
+	font-size: 14px;
+	position: relative;
+	text-align: left;
+	padding-top: 10px;
+	margin-bottom: 0px;
+	padding-left: 0px;
+	font-weight: 600 !important;
+	color: #666;
+	text-transform: uppercase;
+	}
+
+.resumable-drop {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 9999999 !important;
+	background-color: rgba(0, 0, 0, 0.69);
+	background-image: url('images/bigcloud.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	border: none !important;
+	display: none;
+	}
+
+.description-copyright {
+	color: gray;
+	font-style: italic;
+	font-size: 90%;
+	}
+
+.leaflet-draw-button {
+	width: 26px;
+	height: 26px !important;
+	top: 0;
+	left: 0;
+	background: white;
+	position: absolute;
+	}
+
+.leaflet-draw-button.polygon {
+	background: white;
+	}
+
+.leaflet-draw-button.polyline {
+	background: white;
+	}
+
+.leaflet-draw-button-wrapper {
+	position: absolute;
+	height: 30px;
+	}
+
+.leaflet-draw-button-wrapper.polygon {
+	top: 0px;
+	}
+
+.leaflet-draw-button-wrapper.polyline {
+	top: 30px;
+	}
+
+.leaflet-draw-button.polygon.active {
+	background: red;
+	}
+
+.leaflet-draw-button:first-child {
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+	}
+
+.leaflet-draw-button:last-child {
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+	}
+
+.leaflet-draw-button-save {
+	position: absolute;
+	left: 30px;
+	border: 1px solid green;
+	background-color: blue;
+	}
+
+.leaflet-draw-button-cancel {
+	position: absolute;
+	left: 90px;
+	border: 1px solid green;
+	background-color: blue;
+	}
+
+.leaflet-draw-button-undo {
+	position: absolute;
+	left: 60px;
+	border: 1px solid green;
+	background-color: blue;
+	}
+
+
+
+
+
+
+
+
+#map.mode-edit div.polygon-elbow {
+   	opacity: 1;
+   	pointer-events: all;
+	}
+
+#map.mode-create {
+	cursor: crosshair;
+	}
+
+svg.tracer {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	}
+
+#map div.polygon-elbow {
+	-webkit-transition: opacity .25s;
+	box-shadow: 0 0 0 2px white, 0 0 10px rgba(0, 0, 0, .35);
+	border: 5px solid #D7217E;
+	border-radius: 10px;
+	transition: opacity 0.25s;
+	cursor: move;
+	opacity: 0;
+	pointer-events: none;
+	box-sizing: border-box;
+	width: 0 !important;
+	height: 0 !important;
+	}
+
+#map section.overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+	box-shadow: inset -100px 0 100px -100px rgba(0, 0, 0, .25);
+	width: 100%;
+	height: 100%;
+	z-index: 2001;
+	}
+
+#map.mode-create {
+    cursor: crosshair !important;
+	}
+
+#map.mode-delete path {
+	cursor: no-drop !important;
+	}
+
+#map.mode-delete path:hover {
+	fill: #4d4d4d !important;
+	}
+
+#map div.polygon-elbow {
+	-webkit-transition: opacity .25s;
+	box-shadow: 0 0 0 2px white, 0 0 10px rgba(0, 0, 0, .35);
+	border: 5px solid #D7217E;
+	border-radius: 10px;
+	transition: opacity 0.25s;
+	cursor: move;
+	opacity: 0;
+	pointer-events: none;
+	box-sizing: border-box;
+	width: 0 !important;
+	height: 0 !important;
+	}
+
+#map div.polygon-elbow.non-polygon {
+	opacity: 0 !important;
+	pointer-events: none !important;
+	border: 5px solid darkgray;
+	}
+
+#map.mode-edit div.polygon-elbow {
+	opacity: 1;
+	pointer-events: all;
+	}
+
+#map svg.tracer {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 2001;
+	pointer-events: none;
+	}
+
+
+
+
+
+
+
+
+
+.list-attribute-wrapper-access:hover{
+	background: rgba(0, 0, 0, 0.2);
+	}	
+
+
+
+
+/*
+┌─┐┬─┐┬─┐┌─┐┬─┐  ┌─┐┌─┐┌┐┌┌─┐
+├┤ ├┬┘├┬┘│ │├┬┘  ├─┘├─┤│││├┤ 
+└─┘┴└─┴└─└─┘┴└─  ┴  ┴ ┴┘└┘└─┘
+aka feedback pane
+*/
+
+.feedback-pane {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: auto;
+	z-index: 999999999;
+	margin: 10px;
+	margin-bottom: 26px !important;
+	margin-left: 6px !important;
+	max-width: 350px;
+	max-height: 700px;	
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;	
+	}
+
+.feedback-pane-content {
+	background: rgba(255, 0, 0, 0.81);
+	width: 100%;
+	height: 100%;
+	opacity: 0.9;
+	cursor: default;
+	border-radius: 2px;
+	margin-right: 50px;
+	max-height: inherit;
+  	overflow: hidden;
+  	margin-top: 2px;
+  	position: relative;
+	padding: 10px 15px 10px 15px;	
+	}
+
+.feedback-pane-title,
+.feedback-pane-title2 {
+	padding-left: 0;
+	font-weight: 900;
+	font-size: 17px;
+	margin-bottom: 2px;
+	}
+
+.feedback-pane-title2 {
+	margin-top: 10px;
+	padding-top: 6px;
+	border-top: 1px dashed rgba(255,255,255,0.3);
+	}
+
+.feedback-pane-description,
+.feedback-pane-description2 {
+	font-weight: 500;
+	padding: 0px;
+	margin: 0px;
+	font-size: 13px;
+	}
+
+.feedback-pane-x {
+	position: absolute;
+	color: transparent;
+	font-weight: bold;
+	cursor: pointer;
+	text-align: center;
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: -1px -45px;
+	border-radius: 2px;
+	top: 6px;
+	right: 6px;
+	width: 15px;
+	height: 15px;
+	opacity: 0.3;
+	background-color: white;
+	}
+
+.feedback-pane-x:hover {
+	opacity: 0.7;
+	}
+
+.feedback-pane-content.message {
+	background-color: rgba(255, 255, 255, 0.81);
+	}
+
+.feedback-pane-content.error {
+	background: rgba(255, 0, 0, 0.81);
+	color: rgba(255, 255, 255, 0.94);
+	}
+
+.feedback-pane-content.success {
+	background-color: rgba(48, 98, 41, 0.81);
+	}
+
+.feedback-pane-content.action {
+	background-color: rgba(10, 57, 107, 0.81);
+	}
+
+.feedback-pane-icon {
+	max-width: 100px;
+	max-height: 100px;
+	top: 0;
+	left: 0;
+	position: relative;
+	float: left;
+	margin: 5px;
+	border-radius: 3px;
+	border: 0;
+	float: left;
+	display: none;
+	}
+
+.feedback-pane-icon-img {
+	border-radius: 3px;
+	}
+
+
+/***************************************************************************/	
+
+
+
+
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+
+.header-role {
+	border: 0px;
+ 	background: transparent;
+	display: block;
+	font-style: italic;
+	color: #666;
+	font-size: 16px;
+	float: right;
+	height: 16px;
+	word-wrap: break-word;
+	position: relative;
+	top: 0;
+	line-height: 15px;
+	overflow: hidden;
+	max-height: 31px;
+	}
+
+#editor-map-initpos-lat-value, 
+#editor-map-initpos-lng-value, 
+#editor-map-initpos-zoom-value {
+	cursor: default;
+	}
+
+.home-container,
+.dropzone-pane,
+.q-editor-container,
+.dropzone-meta,
+.fullpage-documents,
+.data-library, 
+.fullpage-mediaLibrary,
+#header,
+.fullpage-users,
+.fullpage-mediaLibrary {
+	z-index: 10001;
+	}	
+
+.status-progress-bar {
+	z-index: 100000000010;
+	}
+
+.dropzone-meta {
+	z-index: 10002 !important;
+	}
+
+.description-textarea-outer-wrapper {
+	overflow: hidden;
+	}
+
+
+
+
+
+
+
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+
+.list-process {
+	top: 0;
+	right: 0;
+	height: 50px;
+	border-left: 1px dashed rgba(255, 255, 255, 0.5);
+	text-align: center;
+	overflow: hidden;
+	width: 45%;
+	position: absolute;
+	float: right;
+	color: #333333;
+	font-size: 13px;
+	padding: 10px;
+	overflow: visible;
+	display: block;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;	
+	}
+
+.list-title {
+	height: 18px;
+	}
+
+.processing .list-title,
+.processing .list-description {
+	color: rgba(0,0,0,0.3);
+	}	
+
+.processing .item-select-button {
+	display: none;
+	}
+
+.processing .list-item-info {
+	display: none;
+	}
+
+.list-process-bar {
+	width: 290px;
+	height: 20px;
+	background: rgba(0,0,0,0.2);
+	border-radius: 27px;
+	top: 12px;
+	left: 0px;
+	padding: 4px;
+	position: relative;
+	}
+
+.list-process-bar:before {
+	content: 'Processing';
+	top: -18px;
+	position: absolute;
+	left: 0;
+	font-size: 12px;
+	}		
+
+.list-process-bar-inner {
+	background: white;
+	border-radius: 20px;
+	padding: 6px;
+	width: 0;
+	position: relative;
+	}
+
+.list-process-no {
+	position: absolute;
+	top: 22px;
+	right: 14px;
+	background: #a00000;
+	height: 20px;
+	border-radius: 20px;
+	padding-left: 9px;
+	padding-right: 8px;
+	min-width: 57px;
+	color: white;
+	font-weight: 900;
+	}
+
+.list-process-no:before {
+	content: 'Tiles';
+	color: black;
+	font-weight: 400;
+	top: -18px;
+	position: absolute;
+	left: 0;
+	font-size: 12px;	
+	}	
+
+.minimal .list-process-bar {
+	top: -3px;
+	left: 0px;
+  	width: 110px;	
+	}	
+
+.minimal .list-process-bar:before {
+	display: none;
+	}	
+
+.minimal .list-process-no {
+	top: 7px;
+	}
+
+.minimal .list-process-no:before {
+	display: none;
+	}
+
+.minimal .processing .list-title-wrapper {
+	padding: 6px 122px 4px 48px;
+	}	
+
+.list-process-grind {
+	background-image: url(/css/images/grinders/BG-grinder-small-grayDark-on-white.gif) !important;
+	height: 100%;
+	width: 100%;
+	padding: 1px;
+	background-position: 500px -4px;
+	background-repeat: no-repeat;
+	opacity: 1;
+	position: absolute;
+	right: 0;
+	background-color: white;
+	z-index: -2;
+	}
+
+.minimal .list-process-grind {
+	background-image: url(/css/images/grinders/BG-grinder-small-grayDark-on-white.gif) !important;
+	height: 42px;
+	width: 100%;
+	padding: 1px;
+	background-position: 382px -4px;
+	background-repeat: no-repeat;
+	opacity: 1;
+	position: absolute;
+	right: 0;
+	background-color: white;
+	z-index: -2;
+	background-size: auto 100%;
+	}
+
+
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */
+/* **************************************************************************************** */	
+
+
+
+/* freedraw  freedraw  freedraw  freedraw */
+/* freedraw  freedraw  freedraw  freedraw */
+/* freedraw  freedraw  freedraw  freedraw */
+
+section.map.mode-create {
+	cursor: pointer;
+	}
+
+section.map.mode-edit div.polygon-elbow {
+	opacity: 1;
+	pointer-events: all;
+	}
+
+.leaflet-container.leaflet-clickable, .leaflet-container.map-clickable, .leaflet-marker-icon, .leaflet-overlay-pane path.tracer.leaflet-clickable {
+	cursor: pointer;
+	fill-opacity: 0.7;
+	fill: #FF4646;
+	stroke: red;
+	stroke-opacity: 0.8;
+	stroke-width: 1px;
+	transition: fill-opacity 0.15s;
+	}
+
+.leaflet-container.leaflet-clickable, .leaflet-container.map-clickable, .leaflet-marker-icon, .leaflet-overlay-pane path.tracer.leaflet-clickable:hover {
+    	fill-opacity: 0.3;
+    	}
+
+
+
+
+/* ????? ????? ????? ????? ????? ????? ????? ????? */
+/* ????? ????? ????? ????? ????? ????? ????? ????? */
+/* ????? ????? ????? ????? ????? ????? ????? ????? */
+/* ????? ????? ????? ????? ????? ????? ????? ????? */
+
+
+/* ????? */
+.presets-container {
+    	width: 100px;
+    	height: 100px;
+    	border-radius: 4px;
+    	border: 1px solid black;
+    	position: relative;
+    	margin: 10px;
+    	float: right;
+    	}
+
+/* ????? */
+.presets-container-title {
+    	bottom: 0;
+    	position: absolute;
+    	}
+
+/* ????? */
+.presets-wrapper {
+    	height: 150px;
+    	}
+
+/* ????? */
+.styleeditor.selector-text {
+    	width: 60%;
+    	float: left;
+    	}
+
+/* ????? */
+.dropdown.wrapper {
+    	float: left;
+    	width: 40%;
+    	}
+
+/* ????? */
+#checkbox-marker-width-scale {
+    	display: block;
+    	}
+
+
+
+
+/* TROR DENNE ER FRA KNUT SIN RIGHT PANE DROP DOWN */
+.active-layer-option {
+    	color: black;
+    	}
+
+.leaflet-popup-drag {
+	width: 100%;
+	height: 50px;
+	background-color: rbga(44,44,44,0.5);
+	z-index: 10000;
+	position: absolute;
+	}
+
+.leaflet-popup-ghost {
+	width: 100%;
+	height: 100%;
+	z-index: 1000000;
+	position: absolute;
+	}
+
+.leaflet-popup-pin-button {
+	width: 25px;
+	height: 20px;
+	top: 7px;
+	right: 24px;
+	background-image: url(images/evil_sprite.png);
+	background-repeat: no-repeat;
+	background-position: -22px -44px;
+	opacity: 0.3;
+	position: absolute;
+	display: inline-block;
+	}
+
+.leaflet-popup-pin-button:hover {
+	opacity: 0.5;
+	}    	

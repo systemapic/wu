@@ -178,7 +178,6 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 
-
 	// todo: move all delete of files here
 	_deleteFile : function () {
 
@@ -215,8 +214,8 @@ Wu.Model.File = Wu.Model.extend({
 
 		}.bind(this));
 
-
 	},
+
 
 	_fileDeleted : function (result) {
 
@@ -473,7 +472,7 @@ Wu.Model.File = Wu.Model.extend({
 					raster : layer.layerUuid
 				},
 				metadata : layer.options.metadata, 	// TODO
-				title : 'Layer: ' + file.getName(),
+				title : file.getName(),
 				description : 'Description: Layer created from ' + file.getName(),
 				file : file.getUuid(),
 				// style : JSON.stringify(defaultStyle) // save default json style
@@ -492,8 +491,9 @@ Wu.Model.File = Wu.Model.extend({
 				});	
 
 				// select project
-				Wu.Mixin.Events.fire('layerAdded', {detail : {
-					projectUuid : project.getUuid()
+				Wu.Mixin.Events.fire('layerAdded', { detail : {
+					projectUuid : project.getUuid(),
+					layerUuid : layerModel.uuid
 				}});
 			});
 			
@@ -565,7 +565,7 @@ Wu.Model.File = Wu.Model.extend({
 					postgis : layer.options
 				},
 				metadata : layer.options.metadata,
-				title : 'Layer: ' + file.getName(),
+				title : file.getName(),
 				description : 'Description: Layer created from ' + file.getName(),
 				file : file.getUuid(),
 				style : JSON.stringify(defaultStyle) // save default json style
@@ -585,7 +585,8 @@ Wu.Model.File = Wu.Model.extend({
 
 				// select project
 				Wu.Mixin.Events.fire('layerAdded', {detail : {
-					projectUuid : project.getUuid()
+					projectUuid : project.getUuid(),
+					layerUuid : layerModel.uuid
 				}});
 			});
 			

@@ -1,0 +1,146 @@
+.chrome-toggle-button-container {
+	float: left;
+	left: -4px;
+	position: relative;
+	}
+
+.toggle-button {
+	display: inline-block;
+	vertical-align: top;
+	background: #b9b9b9;
+	color: white;
+	font-weight: 900;
+	font-size: 11px;
+	padding: 1px 4px 1px 4px;
+	height: 16px;
+	cursor: pointer;
+	}
+
+.toggle-button:hover {
+	background: #A9A9A9;
+	}
+
+.toggle-button:active {
+	background: #918E8E;
+	}
+
+.toggle-button-option-one {
+	border-radius: 2px 0px 0px 2px;
+	}
+
+.toggle-button-option-two {
+	border-radius: 0px 2px 2px 0px;
+	margin-left: 1px;
+	}
+
+.toggle-button-active {
+	background: #71C4A8;
+	}
+
+.toggle-button-active:hover {
+	background: #67B097;
+	}
+
+.toggle-button-active:active {
+	background: #5a9b87;
+	}
+
+
+
+/* **************************************************** */
+
+.file-name-content {
+	padding-right: 26px;
+	}
+
+.file-popup {
+	margin-bottom: 100px;
+	}
+
+.files-container {
+	padding-bottom: 200px;
+	}
+
+.layers-container {
+	padding-bottom: 5px;
+	margin-bottom: 34px;
+	}
+	
+.layer-list-container {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	}
+
+.file-list-container-title {
+	font-size: 14px;
+	font-weight: 900;
+	margin-bottom: 5px;	
+	}
+
+
+
+
+.layer-name-content {
+	padding-right: 26px;
+	height: 16px;
+	overflow: hidden;
+	white-space: nowrap;
+	width: 195px;
+	}
+
+.layer-name-input,
+.file-name-inpu {
+	position: absolute;
+	top: 0;
+	left: 68px;
+	width: 205px;
+	height: 100%;
+	border: none;
+	z-index: 200;
+	resize: none;
+	padding-top: 4px;
+	padding-left: 5px;	
+	}
+
+.layer-name-input {
+	padding-top: 0px;
+	}
+
+.file-name-input {
+	left: 0px;
+	}
+
+.chrome-data-top-title {
+	position: relative;
+	text-transform: none;
+	font-size: 18px;
+	margin: 5px;
+	margin-left: 6px;
+	font-weight: 900;
+	margin-bottom: 0;
+	margin-top: 4px;  
+	}	
+
+
+
+/*
+
+@-webkit-keyframes layerFader {	0% { background-color: #fefae2; } 100% { background-color: white; }}	
+@-moz-keyframes layerFader {	0% { background-color: #fefae2; } 100% { background-color: white; }}	
+@-o-keyframes layerFader {	0% { background-color: #fefae2; } 100% { background-color: white; }}	
+@keyframes layerFader {		0% { background-color: #fefae2; } 100% { background-color: white; }}	
+
+.new-layer-list-item {
+	-webkit-animation: layerFader 2500ms ease;
+	-webkit-animation-fill-mode: forwards;
+	-moz-animation: layerFader 2500ms ease;
+	-moz-animation-fill-mode: forwards;
+	-o-animation: layerFader 2500ms ease;
+	-o-animation-fill-mode: forwards;
+	animation: layerFader 2500ms ease;
+	animation-fill-mode: forwards;	
+	}
+
+*/
+
+
