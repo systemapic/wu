@@ -34,15 +34,15 @@
 	}
 
 .toggle-button-active {
-	background: #71C4A8;
+	background: $green;
 	}
 
 .toggle-button-active:hover {
-	background: #67B097;
+	background: $greenHover;
 	}
 
 .toggle-button-active:active {
-	background: #5a9b87;
+	background: $greenActive;
 	}
 
 

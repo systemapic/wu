@@ -361,25 +361,45 @@ Wu.button = Wu.Class.extend({
 		}
 
 
-		// placeholder
-		var option = Wu.DomUtil.create('option', '', select);
-		option.innerHTML = 'Select column...';
-		option.setAttribute('disabled', '');
-		option.setAttribute('selected', '');
-
+		// WITHOUT PLACEHOLDER!!!
+		// WITHOUT PLACEHOLDER!!!
+		// WITHOUT PLACEHOLDER!!!
 
 		// fill select options
-		array.forEach(function (field) {
+		array.forEach(function (field, i) {
 			var option = Wu.DomUtil.create('option', 'active-layer-option', select);
-			option.value = field;
+			option.value = field;		
 			option.innerHTML = field;
 
-			if ( field == selected ) option.selected = true;
-		});	
+			if ( !selected ) {
+				if ( i == 0 ) option.selected = true;
+			} else {
+				if ( field == selected ) option.selected = true;	
+			}
+			
+		});
+
+
+		// WITH PLACEHOLDER!!!
+		// WITH PLACEHOLDER!!!
+		// WITH PLACEHOLDER!!!
+
+		// // placeholder
+		// var option = Wu.DomUtil.create('option', '', select);
+		// option.innerHTML = 'Select column...';
+		// option.setAttribute('disabled', '');
+		// option.setAttribute('selected', '');
+
+		// // fill select options
+		// array.forEach(function (field, i) {
+		// 	var option = Wu.DomUtil.create('option', 'active-layer-option', select);
+		// 	option.value = field;		
+		// 	option.innerHTML = field;
+		// 	if ( field == selected ) option.selected = true;
+		// });
 
 		// select event
 		Wu.DomEvent.on(select, 'change', fn); // todo: mem leak?
-
 
 	},
 
