@@ -24,8 +24,13 @@
 		}
 
 	/*.chrome-pane.styler */
-	.chrome-metafield-line:last-child {
-		border-bottom: none;
+	/*.chrome-metafield-line:last-child {*/
+	.sub-line:last-child {
+		border-bottom: none !important;
+		}
+
+	.chrome-switch-container {
+		top: 10px;
 		}
 
 }

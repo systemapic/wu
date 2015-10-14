@@ -226,6 +226,12 @@ L.Control.Description = Wu.Control.extend({
 
 	updateMultiple : function (layerUuid) {
 
+		console.log('');
+		console.log('%c updateMultiple ', 'background: red; color: white;');
+		console.log('this.layers', this.layers);
+		console.log('');
+		console.log('');
+
 		if ( this.isCollapsed ) Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
 
 		var wrapper = this._multipleLegendInner;
@@ -461,7 +467,7 @@ L.Control.Description = Wu.Control.extend({
 		var satPos = Wu.parse(layer.getSatellitePosition());
 
 		var _angle = satPos.angle;
-		var _path = satPos.path;
+		var _path  = satPos.path;
 
 		this.satelliteAngle.update({angle : _angle, path : _path});
 

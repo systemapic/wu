@@ -1215,7 +1215,7 @@ input.chrome-field-input {
     float: right;
     box-shadow: 0 0 0px 1px #ccc inset, 0 0 0px 2px white inset;
     cursor: pointer;
-    z-index: 1000;
+    z-index: 999999999;
     }
 
 .chrome-color-range {
@@ -1229,7 +1229,7 @@ input.chrome-field-input {
     background: transparent;
     position: absolute;
     right: -10px;
-    z-index: 9999999;
+    z-index: 999999999;
     width: 178px;
     height: 24px;
     padding-top: 2px;
