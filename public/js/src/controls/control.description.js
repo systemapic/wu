@@ -80,6 +80,11 @@ L.Control.Description = Wu.Control.extend({
 		this.toggleScale(true);
 	},
 
+	hide : function () {
+		if (!this._container) return;
+		this._hide();
+	},
+
 	_show : function () {
 		this.refresh();
 	},
@@ -409,7 +414,7 @@ L.Control.Description = Wu.Control.extend({
 			}
 
 			// camelize, return
-			return column.camelize();
+			return column;
 		}
 
 		return '';
