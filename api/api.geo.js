@@ -74,19 +74,17 @@ module.exports = api.geo = {
 		// extra styling (eg. reference point)
 		if (options.style.extras) style.layer += this.buildExtras(options);
 
-
 		// point styling
 		if (isPoint) style = api.geo._createPointCarto(options, style);
 
 		// polygon styling
-		if (isPolygon) style = api.geo._createPolygonCarto(options, style);
-			
-		// polygon styling
 		if (isLine) style = api.geo._createLineCarto(options, style);
 
-
+		// polygon styling
+		if (isPolygon) style = api.geo._createPolygonCarto(options, style);
+			
 		// close #layer
-		style.layer += '}'
+		style.layer += '}';
 		
 		// debug
 		console.log('created style: ', style);
@@ -148,9 +146,24 @@ module.exports = api.geo = {
 	},
 
 	_createLineCarto : function (options, style) {
+
+		// opacity
+		var lineOpacityCarto = this.buildCarto_lineOpacity(options);
+		style.headers += lineOpacityCarto.headers;
+		style.layer += lineOpacityCarto.style;
+
+		// color
+		var lineColorCarto = this.buildCarto_lineColor(options);
+		style.headers += lineColorCarto.headers;
+		style.layer += lineColorCarto.style;
+
+		// width
+		var lineWidthCarto = this.buildCarto_lineWidth(options);
+		style.headers += lineWidthCarto.headers;
+		style.layer += lineWidthCarto.style;
+
 		return style;
 	},
-
 
 	buildExtras : function (options) {
 
@@ -163,12 +176,10 @@ module.exports = api.geo = {
 			// create reference point
 			return this.buildReferencePoint(extras.referencepoint);
 		};
-
 	},
 
 
 	buildReferencePoint : function(referencepoint) {
-
 		var cartoStr = '\n';
 		cartoStr += '\t[' + referencepoint.column + '=' + referencepoint.value + '] {\n';
 		cartoStr += '\t\tmarker-comp-op: src-over;\n';
@@ -190,62 +201,32 @@ module.exports = api.geo = {
 		var style = options.style.point;
 		var opacity = style.opacity;
 
-		var cartObj = {
+		var css = {
 			headers : '',
 			style   : ''
 		}
 
+		// create @variables
+		if (opacity.column) {
 
-		if ( opacity.column ) {
-
-			// var max = Math.floor(options.columns[opacity.column].max * 10) / 10;
-			// var min = Math.floor(options.columns[opacity.column].min * 10) / 10;	
-
+			// calc ranges
 			var range = opacity.range;			
+			var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
+			var field_calc = parseFloat(range[0]) / field_floor;
 
-
-			// var normalizedOffset = true;
-
-			// NORMALIZED OFFSET 
-			// i.e. if the lowest number is 30, and 
-		 	// highest is 100, 30 will return 0.3 and not 0
-			// if ( normalizedOffset ) {
-				// if ( min > 0 ) min = 0;
-			// }
-
-
-			// if (field_calc <= field_floor) {
-			// 	console.log('field_calc === field_floor', field_calc, field_floor);
-			// 	field_calc = 0;	
-			// }
-			
-
-			if (range[1] == 1 && range[0] == 0) {
-				// coherence, special case
-
-				cartObj.headers += '@opacity_field: [' + opacity.column + '];\n\n';
-
-			} else {
-
-				var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
-				var field_calc = parseFloat(range[1]) / field_floor;
-				
-				cartObj.headers += '@opacity_column: [' + opacity.column + '];\n\n';
-				cartObj.headers += '@opacity_field: @opacity_column / ' + field_floor + ' - ' + field_calc + ';\n\n';
-
-			}
-
-
+			// normalized = (x-min(x))/(max(x)-min(x))
+			css.headers += '@opacity_field: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
 		
 		} else {
 
 			// static opacity
-			cartObj.headers += '@opacity_field: ' + opacity.value + ';\n';
+			css.headers += '@opacity_field: ' + opacity.value + ';\n';
 		}
 
-		cartObj.style += '\tmarker-opacity: @opacity_field;\n\n';
+		// add rule
+		css.style += '\tmarker-opacity: @opacity_field;\n\n';
 
-		return cartObj;
+		return css;
 	},
 
 	buildCarto_polygonOpacity : function (options) {
@@ -254,7 +235,7 @@ module.exports = api.geo = {
 		var opacity = style.opacity;
 
 
-		var cartObj = {
+		var css = {
 			headers : '',
 			style   : ''
 		}
@@ -262,50 +243,24 @@ module.exports = api.geo = {
 
 		if ( opacity.column ) {
 
-			var max = Math.floor(options.columns[opacity.column].max * 10) / 10;
-			var min = Math.floor(options.columns[opacity.column].min * 10) / 10;				
-
+			// calc vars
 			var range = opacity.range;			
-
-			var normalizedOffset = true;
-
-			// NORMALIZED OFFSET 
-			// i.e. if the lowest number is 30, and 
-		 	// highest is 100, 30 will return 0.3 and not 0
-			// if ( normalizedOffset ) {
-			// 	if ( min > 0 ) min = 0;
-			// }
-
-			// cartObj.headers += '@opacity_field_max: ' + range[1] + ';\n';
-			// cartObj.headers += '@opacity_field_min: ' + range[0] + ';\n';
-			// cartObj.headers += '@opacity_field_range: [' + opacity.column + '];\n\n';
-			// cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
-
-
-			if (range[1] == 1 && range[0] == 0) {
-
-				// coherence, special case
-				cartObj.headers += '@opacity_field: [' + opacity.column + '];\n\n';
-
-			} else {
-
-				
-				var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
-				var field_calc = parseFloat(range[1]) / field_floor;
-				
-				cartObj.headers += '@opacity_column: [' + opacity.column + '];\n\n';
-				cartObj.headers += '@opacity_field: @opacity_column / ' + field_floor + ' - ' + field_calc + ';\n\n';
-			}
+			var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
+			var field_calc = parseFloat(range[0]) / field_floor;
+			
+			// normalized = (x-min(x))/(max(x)-min(x))
+			css.headers += '@opacity_field: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
 		
 		} else {
 
 			// static opacity
-			cartObj.headers += '@opacity_field: ' + opacity.value + ';\n';
+			css.headers += '@opacity_field: ' + opacity.value + ';\n';
 		}
 
-		cartObj.style += '\tpolygon-opacity: @opacity_field;\n\n';
+		// add rule
+		css.style += '\tpolygon-opacity: @opacity_field;\n\n';
 
-		return cartObj;
+		return css;
 	},
 
 	buildCarto_lineOpacity : function (options) {
@@ -314,43 +269,32 @@ module.exports = api.geo = {
 		var opacity = style.opacity;
 
 
-		var cartObj = {
+		var css = {
 			headers : '',
 			style   : ''
 		}
 
 
+		// calc vars
 		if ( opacity.column ) {
 
-			var max = Math.floor(options.columns[opacity.column].max * 10) / 10;
-			var min = Math.floor(options.columns[opacity.column].min * 10) / 10;	
-
 			var range = opacity.range;			
-
-			var normalizedOffset = true;
-
-			// NORMALIZED OFFSET 
-			// i.e. if the lowest number is 30, and 
-		 	// highest is 100, 30 will return 0.3 and not 0
-			if ( normalizedOffset ) {
-				if ( min > 0 ) min = 0;
-			}
-
-			cartObj.headers += '@opacity_field_max: ' + range[1] + ';\n';
-			cartObj.headers += '@opacity_field_min: ' + range[0] + ';\n';
-			cartObj.headers += '@opacity_field_range: [' + opacity.column + '];\n\n';
-			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
-
+			var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
+			var field_calc = parseFloat(range[0]) / field_floor;
+			
+			// normalized = (x-min(x))/(max(x)-min(x))
+			css.headers += '@line_opacity: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
 		
 		} else {
 
 			// static opacity
-			cartObj.headers += '@opacity_field: ' + opacity.value + ';\n';
+			css.headers += '@line_opacity: ' + opacity.value + ';\n';
 		}
 
-		cartObj.style += '\tpolygon-opacity: @opacity_field;\n\n';
+		// add rule
+		css.style += '\tline-opacity: @line_opacity;\n\n';
 
-		return cartObj;
+		return css;
 	},
 
 
@@ -552,7 +496,8 @@ module.exports = api.geo = {
 
 
 			// CREATE VARS
-			var fieldName = '@' + color.column;
+			// var fieldName = '@' + color.column;
+			var fieldName = '@polygon_column';// + color.column;
 			var maxField  = fieldName + '_max';
 			var minField  = fieldName + '_min';
 			var deltaName = fieldName + '_delta';
@@ -685,7 +630,8 @@ module.exports = api.geo = {
 
 
 			// CREATE VARS
-			var fieldName = '@' + color.column;
+			// var fieldName = '@' + color.column;
+			var fieldName = '@line_column';// + color.column;
 			var maxField  = fieldName + '_max';
 			var minField  = fieldName + '_min';
 			var deltaName = fieldName + '_delta';
@@ -728,7 +674,7 @@ module.exports = api.geo = {
 				if ( no == 1 ) {
 
 					cartObj.style += '\t[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + '] ';
-					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
+					cartObj.style += '{ line-color: ' + fieldName + '_color_' + no + '; }\n';
 
 				}
 
@@ -736,14 +682,14 @@ module.exports = api.geo = {
 
 					cartObj.style += '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + ']';
 					cartObj.style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
-					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
+					cartObj.style += '{ line-color: ' + fieldName + '_color_' + no + '; }\n';
 
 				}
 
 				if ( no == colorArray.length ) {
 
 					cartObj.style +=  '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + '] ';
-					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n\n';
+					cartObj.style += '{ line-color: ' + fieldName + '_color_' + no + '; }\n\n';
 				}
 			})
 			
@@ -751,7 +697,7 @@ module.exports = api.geo = {
 		} else {
 		
 			// static color
-			cartObj.style += '\tmarker-fill: ' + color.staticVal + ';\n\n';
+			cartObj.style += '\tline-color: ' + color.staticVal + ';\n\n';
 		}
 
 		return cartObj;
@@ -810,7 +756,9 @@ module.exports = api.geo = {
 	buildCarto_lineWidth : function (options) {
 
 		var style = options.style.line;
-		var lineWidth = style.lineWidth;
+		var lineWidth = style.width;
+
+		console.log('snoop style', style);
 
 		var cartObj = {
 			headers : '',

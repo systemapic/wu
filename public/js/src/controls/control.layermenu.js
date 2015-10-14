@@ -324,9 +324,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomUtil.removeClass(this._innerContainer, 'closed');
 	},
 
-
-	// ********************************************
-
 	enableEditSwitch : function () {
 
 		// Make container visible
@@ -363,6 +360,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	disableEditSwitch : function () {
+		if (!this._editSwitchContainer) return;
 
 		this._editSwitchContainer.innerHTML = '';
 		this._editSwitchContainer.remove();
@@ -371,23 +369,12 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomUtil.removeClass(this._innerContainer, 'enable-edit-mode');
 		
 		this.disableEdit();
-
 	},
 
 
 	_enableEditing : function (e, on) {
-
-
-		if ( !on ) {
-			this.disableEdit();
-		} else {
-			this.enableEdit();
-		} 
-
+		on ? this.enableEdit() : this.disableEdit();
 	},
-
-	// ********************************************
-
 
 	// enter edit mode of layermenu
 	enableEdit : function () {
@@ -419,7 +406,6 @@ L.Control.Layermenu = Wu.Control.extend({
 		this.openAll();
 
 	},
-
 
 	// exit edit mode 
 	disableEdit : function () {

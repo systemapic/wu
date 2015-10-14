@@ -50,7 +50,7 @@
 	padding: 13px 20px 13px 19px;
 	box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.4);
 	z-index: 10000010;
-	cursor: default;
+	cursor: pointer;
 	top: 38px !important;  	
 	}
 

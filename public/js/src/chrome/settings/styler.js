@@ -10,6 +10,38 @@ Wu.Styler = Wu.Class.extend({
 			staticText : 'Fixed value',
 			staticDivider : '-'
 		},
+		palettes : [ 
+			['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff'],
+			['#0000ff', '#00ffff', '#00ff00', '#ffff00', '#ff0000'],
+			
+			['#f0f9e8', '#bae4bc', '#7bccc4', '#43a2ca', '#0868ac'],
+			["#0868ac", "#43a2ca", "#7bccc4", "#bae4bc", "#f0f9e8"],
+
+			['#ffffb2', '#fecc5c', '#fd8d3c', '#f03b20', '#bd0026'],
+			["#bd0026", "#f03b20", "#fd8d3c", "#fecc5c", "#ffffb2"],
+
+			['#feebe2', '#fbb4b9', '#f768a1', '#c51b8a', '#7a0177'],
+			["#7a0177", "#c51b8a", "#f768a1", "#fbb4b9", "#feebe2"],
+
+			['#d7191c', '#fdae61', '#ffffbf', '#abdda4', '#2b83ba'],
+			["#2b83ba", "#abdda4", "#ffffbf", "#fdae61", "#d7191c"],
+
+			['#d01c8b', '#f1b6da', '#f7f7f7', '#b8e186', '#4dac26'],
+			["#4dac26", "#b8e186", "#f7f7f7", "#f1b6da", "#d01c8b"],
+
+			['#e66101', '#fdb863', '#f7f7f7', '#b2abd2', '#5e3c99'],
+			["#5e3c99", "#b2abd2", "#f7f7f7", "#fdb863", "#e66101"],
+
+			['#ca0020', '#f4a582', '#f7f7f7', '#92c5de', '#0571b0'],
+			["#0571b0", "#92c5de", "#f7f7f7", "#f4a582", "#ca0020"],
+
+			['#ff00ff', '#ffff00', '#00ffff'],
+			['#00ffff', '#ffff00', '#ff00ff'],
+
+			['#ff0000', '#ffff00', '#00ff00'], // todo: throws error if 4 colors..	
+			['#00ff00', '#ffff00', '#ff0000'],
+		],
+
 	},
 
 	_content : {},
@@ -25,7 +57,6 @@ Wu.Styler = Wu.Class.extend({
 
 		// init container
 		this._initContainer();
-
 	},
 
 	_initContainer : function () {
@@ -144,6 +175,7 @@ Wu.Styler = Wu.Class.extend({
 			appendTo : line.container,
 			fn       : this._updateColor.bind(this),
 			value    : staticVal,
+			colors   : this.options.palettes
 		});
 
 		// remember items
@@ -282,13 +314,72 @@ Wu.Styler = Wu.Class.extend({
 		};
 	},
 
+	// width box
+	_createWidth : function () {
+
+		// Create JSON obj if it's not already there
+		this.carto().width = this.carto().width || {};
+
+		// Get stores states
+		var isOn   = !(this.carto().width.column === false)
+		var val    = this.carto().width.value || 1.2;
+		var column = this.carto().width.column;
+		var minMax = this.carto().width.range;
+
+		// container
+		var line = new Wu.fieldLine({
+			id           : 'width',
+			appendTo     : this._wrapper,
+			title        : '<b>Line width</b>',
+			input        : false,
+			childWrapper : 'line-width-children'
+		});	
+
+		// column dropdown
+		var dropdown = new Wu.button({
+			id 	 : 'width',
+			type 	 : 'dropdown',
+			right 	 : true,
+			appendTo : line.container,
+			fn 	 : this._dropdownSelected.bind(this),
+			array 	 : this.options.meta,
+			selected : column,
+		});
+
+		// fixed value input
+		var input = new Wu.button({
+			id 	    : 'width',
+			type 	    : 'miniInput',
+			right 	    : true,
+			isOn        : isOn,
+			appendTo    : line.container,
+			value       : val,
+			placeholder : 'auto',
+			tabindex    : this.tabindex++,
+			fn 	    : this._updateWidth.bind(this),
+		});
+
+		// remember items
+		this._content[this.type].width = {
+			line : line,
+			dropdown : dropdown,
+			input : input
+		}
+
+		// save carto
+		this.carto().width = {
+			column 	    : column,
+			range 	    : minMax,			
+			value 	    : val
+		};
+	},
+
 
 	_addColorFields : function (column) {
 
 		// get color value
 		var value  = this.carto().color.value || this.options.defaults.range;
 
-		console.log('value: ', value);
 		// if not array, it's 'fixed' selection
 		if (!_.isArray(value)) return; 
 
@@ -325,8 +416,9 @@ Wu.Styler = Wu.Class.extend({
 			right 	  : true,
 			appendTo  : line.container,
 			presetFn  : this.selectColorPreset.bind(this), // preset selection
-			customFn  : this._updateRange.bind(this),  // color ball selection
-			value     : value
+			value     : value,
+			colors   : this.options.palettes
+
 		});
 
 		// rememeber 
@@ -341,7 +433,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// get min/max
 		var value = this.carto().color.range || [fieldMinRange, fieldMaxRange];
-		
+
 		// Use placeholder value if empty
 		if (isNaN(value[0])) value[0] = fieldMinRange;
 		if (isNaN(value[1])) value[1] = fieldMaxRange;
@@ -350,7 +442,7 @@ Wu.Styler = Wu.Class.extend({
 		var line = new Wu.fieldLine({
 			id        : 'minmaxcolorrange',
 			appendTo  : childWrapper,
-			title     : 'Min/max range',
+			title     : 'Range',
 			input     : false,
 			className : 'sub-line'
 		});
@@ -379,6 +471,100 @@ Wu.Styler = Wu.Class.extend({
 	},
 
 
+	_addOpacityFields : function (column) {
+
+		// get wrapper
+		var childWrapper = this._content[this.type].opacity.line.childWrapper;
+
+		// clear old
+		childWrapper.innerHTML = '';
+
+		// get default min/max
+		var column_max = Math.floor(this.options.columns[column].max * 10) / 10;
+		var column_min = Math.floor(this.options.columns[column].min * 10) / 10;
+
+		// get stored min/max
+		var value = this.carto().opacity.range || [column_min, column_max];
+
+		// line
+		var line = new Wu.fieldLine({
+			id        : 'minmaxopacity',
+			appendTo  : childWrapper,
+			title     : 'Range',
+			input     : false,
+			className : 'sub-line'
+		});
+
+		// Inputs
+		var input = new Wu.button({
+			id 	  : 'minmaxopacity',
+			type 	  : 'dualinput',
+			right 	  : true,
+			appendTo  : line.container,
+			value     : value,
+			fn        : this.saveOpacityDualBlur.bind(this),
+			minmax    : value,
+			tabindex  : [this.tabindex++, this.tabindex++]
+		});
+
+		// rememeber 
+		this._content[this.type].opacity.minmax = {
+			line : line,
+			input : input
+		}
+
+		// save carto
+		this.carto().opacity.column  = column;
+		this.carto().opacity.range = value;
+	},
+
+	_addWidthFields : function (column) {
+
+		// get wrapper
+		var childWrapper = this._content[this.type].width.line.childWrapper;
+
+		// clear old
+		childWrapper.innerHTML = '';
+
+		// get default min/max
+		var column_max = Math.floor(this.options.columns[column].max * 10) / 10;
+		var column_min = Math.floor(this.options.columns[column].min * 10) / 10;
+
+		// get stored min/max
+		var value = this.carto().width.range || [column_min, column_max];
+
+		// line
+		var line = new Wu.fieldLine({
+			id        : 'minmaxwidth',
+			appendTo  : childWrapper,
+			title     : 'Range',
+			input     : false,
+			className : 'sub-line'
+		});
+
+		// Inputs
+		var input = new Wu.button({
+			id 	  : 'minmaxwidth',
+			type 	  : 'dualinput',
+			right 	  : true,
+			appendTo  : line.container,
+			value     : value,
+			fn        : this.saveWidthDualBlur.bind(this),
+			minmax    : value,
+			tabindex  : [this.tabindex++, this.tabindex++]
+		});
+
+		// rememeber 
+		this._content[this.type].width.minmax = {
+			line : line,
+			input : input
+		}
+
+		// save carto
+		this.carto().width.column  = column;
+		this.carto().width.range = value;
+	},
+
 	_updateColor : function (hex, key, wrapper) {
 
 		// save carto
@@ -391,16 +577,22 @@ Wu.Styler = Wu.Class.extend({
 		this._updateStyle();		
 	},
 
+	_updateWidth : function () {
+
+		// Get field 
+		var inputField = this._content[this.type].width.input.input;
+
+		// save carto
+		this.carto().width.value = inputField.value;
+
+		// update
+		this._updateStyle();		
+	},
+
 	_updateOpacity : function (e) {
 
 		var value = parseFloat(e.target.value);
-		var key   = e.target.id.slice(17, e.target.id.length); 	// todo: remove these also. 
-		var pre = key.substring(0,4);				// whole object is now available in this._content[this.type].opacity.input
-									// eg. id = this._content[this.type].opacity.input.id, etc..
-		if (pre == 'min_' || pre == 'max_') {
-			key = key.slice(4, key.length);
-		}
-
+		
 		// Get field 
 		var inputField = this._content[this.type].opacity.input.input;
 
@@ -426,12 +618,12 @@ Wu.Styler = Wu.Class.extend({
 	_updatePointsize : function (e) {
 
 		var value = parseFloat(e.target.value);
-		var key   = e.target.id.slice(17, e.target.id.length);
-		var pre = key.substring(0,4);
+		// var key   = e.target.id.slice(17, e.target.id.length);
+		// var pre = key.substring(0,4);
 
-		if ( pre == 'min_' || pre == 'max_' ) {
-			key = key.slice(4, key.length);
-		}
+		// if ( pre == 'min_' || pre == 'max_' ) {
+		// 	key = key.slice(4, key.length);
+		// }
 
 		// Get field 
 		var inputField = this._content[this.type].pointsize.input.input;
@@ -453,6 +645,45 @@ Wu.Styler = Wu.Class.extend({
 
 	},
 
+	// on color preset color ball selection
+	_updateRange : function (hex, key, wrapper) {
+
+		var colorBall_1 = this._content[this.type].color.range.dropdown._colorball1;
+		var colorBall_2 = this._content[this.type].color.range.dropdown._colorball2;
+		var colorBall_3 = this._content[this.type].color.range.dropdown._colorball3;
+
+		// Set HEX value on ball we've changed
+		wrapper.setAttribute('hex', hex);
+
+		// Get color values
+		var color1 = colorBall_1.getAttribute('hex');
+		var color2 = colorBall_2.getAttribute('hex');
+		var color3 = colorBall_3.getAttribute('hex');
+
+		// Build color array
+		var colors = this._convertToFiveColors([color1, color2, color3]);
+
+		// Color range bar
+		var colorRangeBar = this._content[this.type].color.range.dropdown._color;
+
+		// Set styling
+		var gradientStyle = this._gradientStyle(colors);
+		colorRangeBar.setAttribute('style', gradientStyle);
+
+		// Do not save if value is unchanged
+		if (this.carto().color.value == colors) return;
+
+		// save carto
+		this.carto().color.value = colors;
+
+		// close popup
+		this._closeColorRangeSelector(); 
+
+		// UPDATE
+		this._updateStyle();
+
+	},
+
 	saveColorRangeDualBlur : function (max, min, absoluteMax, absoluteMin) {
 
 		// get values
@@ -468,7 +699,56 @@ Wu.Styler = Wu.Class.extend({
 		this._updateStyle();
 	},
 
-	
+	// on click on color range presets
+	selectColorPreset : function (e) {
+
+		var elem = e.target;
+		var hex = elem.getAttribute('hex');
+		var hexArray = hex.split(',');
+
+		// Five colors
+		var colorArray = this._convertToFiveColors(hexArray);
+
+		// get divs
+		var colorRangeBar = this._content[this.type].color.range.dropdown._color;
+		var colorBall_1   = this._content[this.type].color.range.dropdown._colorball1;
+		var colorBall_2   = this._content[this.type].color.range.dropdown._colorball2;
+		var colorBall_3   = this._content[this.type].color.range.dropdown._colorball3;
+
+		// Set styling		
+		var gradientStyle = this._gradientStyle(colorArray);
+
+		// Set style on colorrange bar
+		colorRangeBar.setAttribute('style', gradientStyle);
+
+		// update colors on balls
+		colorBall_1.style.background = colorArray[0];
+		colorBall_2.style.background = colorArray[2];
+		colorBall_3.style.background = colorArray[4];
+		colorBall_1.setAttribute('hex', colorArray[0]);
+		colorBall_2.setAttribute('hex', colorArray[2]);
+		colorBall_3.setAttribute('hex', colorArray[4]);
+
+		// close
+		this._closeColorRangeSelector();
+
+		// dont' save if unchanged
+		if (this.carto().color.value[0] == colorArray[0] &&
+		    this.carto().color.value[1] == colorArray[1] && 
+		    this.carto().color.value[2] == colorArray[2] &&
+		    this.carto().color.value[3] == colorArray[3] &&
+		    this.carto().color.value[4] == colorArray[4]) {
+
+			return;
+		}
+
+		// save carto
+		this.carto().color.value = colorArray;		
+
+		// UPDATE
+		this._updateStyle();		
+
+	},
 
 	_dropdownSelected : function (e) {
 
@@ -508,8 +788,13 @@ Wu.Styler = Wu.Class.extend({
 			Wu.DomUtil.addClass(colorBall, 'disable-color-ball');
 		}
 
+		// if not same, clear old values
+		if (this.carto()[field].column != column) {
+			this.carto()[field] = {};
+		}
+
 		// save carto
-		this.carto()[field].column = column; // range == column
+		this.carto()[field].column = column; 
 
 		// Add fields
 		this._initSubfields(column, field); // sub meny
@@ -518,7 +803,6 @@ Wu.Styler = Wu.Class.extend({
 		this._updateStyle();
 
 	},
-
 
 	_unselectField : function (key, wrapper) {
 
@@ -538,6 +822,12 @@ Wu.Styler = Wu.Class.extend({
 		if (key == 'color') {
 			var colorBall = this._content[this.type].color.ball.color;
 			Wu.DomUtil.removeClass(colorBall, 'disable-color-ball');
+		}
+
+		// show static inputs
+		if (key == 'width') {
+			var colorBall = this._content[this.type].width.input.input;
+			Wu.DomUtil.removeClass(colorBall, 'left-mini-kill');
 		}
 
 		// remove extras
@@ -592,69 +882,22 @@ Wu.Styler = Wu.Class.extend({
 		if (field == 'color') this._addColorFields(column);
 		if (field == 'pointsize') this._addPointSizeFields(column);
 		if (field == 'opacity') this._addOpacityFields(column);
-	},
-
-
-	_addOpacityFields : function (column) {
-
-		// get wrapper
-		var childWrapper = this._content[this.type].opacity.line.childWrapper;
-
-		// clear old
-		childWrapper.innerHTML = '';
-
-		// get min/max values
-		console.log('IPACITY', this.carto().opacity, this);
-		var minMax  = this.carto().opacity.range || [1,10];
-
-		console.log('minmax->', minMax);
-
-		// line
-		var line = new Wu.fieldLine({
-			id        : 'minmaxopacity',
-			appendTo  : childWrapper,
-			title     : 'Range',
-			input     : false,
-			className : 'sub-line'
-		});
-
-		// Inputs
-		var input = new Wu.button({
-			id 	  : 'minmaxopacity',
-			type 	  : 'dualinput',
-			right 	  : true,
-			appendTo  : line.container,
-			value     : minMax,
-			fn        : this.saveOpacityDualBlur.bind(this),
-			minmax    : minMax,
-			tabindex  : [this.tabindex++, this.tabindex++]
-		});
-
-		// rememeber 
-		this._content[this.type].opacity.minmax = {
-			line : line,
-			input : input
-		}
-
-		// save carto
-		this.carto().opacity.column  = column;
-		this.carto().opacity.range = minMax;
-		
+		if (field == 'width') this._addWidthFields(column);
 	},
 
 
 	_getDefaultRange : function (column, field) {
 
 		// get default min/max
-		var fieldMaxRange = Math.floor(this.options.columns[column].max * 10) / 10;
-		var fieldMinRange = Math.floor(this.options.columns[column].min * 10) / 10;
+		var column_max = Math.floor(this.options.columns[column].max * 10) / 10;
+		var column_min = Math.floor(this.options.columns[column].min * 10) / 10;
 
 		// get stored min/max
-		var value = this.carto()[field].customMinMax || [fieldMinRange, fieldMaxRange];
+		var value = this.carto()[field].range || [column_min, column_max];
 		
 		// Use placeholder value if empty
-		if (isNaN(value[0])) value[0] = fieldMinRange;
-		if (isNaN(value[1])) value[1] = fieldMaxRange;
+		if (isNaN(value[0])) value[0] = column_min;
+		if (isNaN(value[1])) value[1] = column_max;
 
 		return value;
 	},
@@ -692,14 +935,31 @@ Wu.Styler = Wu.Class.extend({
 		this._updateStyle();
 	},
 
+	saveWidthDualBlur : function (max, min, absoluteMax, absoluteMin) {
 
+		// set min/max
+		var min = parseFloat(min || absoluteMin);	
+		var max = parseFloat(max || absoluteMax);
 
+		// don't save if no changes
+		if (this.carto().width.range == [min, max]) return;
 
+		// save carto
+		this.carto().width.range = [min, max];
 
+		// updat style
+		this._updateStyle();
+	},
 
+	_closeColorRangeSelector : function () {
+		var range = this._content[this.type].color.range;
+		if (!range) return;
 
-
-
+		var rangeSelector = range.dropdown._colorSelectorWrapper;
+		var clickCatcher = range.dropdown._clicker;
+		if (rangeSelector) Wu.DomUtil.addClass(rangeSelector, 'displayNone');
+		if (clickCatcher) Wu.DomUtil.addClass(clickCatcher, 'displayNone');		
+	},	
 
 	_createCarto : function (json, callback) {
 
@@ -726,7 +986,6 @@ Wu.Styler = Wu.Class.extend({
 
 		// update
 		this._updateLayer(layerOptions);		
-
 	},
 
 	_updateLayer : function (options, done) {
@@ -802,10 +1061,8 @@ Wu.Styler = Wu.Class.extend({
 			colorArray = [c1, c2, c3, c4, c5];
 		}
 
-		// hack: bug if four colors, override
-		if (colorArray.length == 4) {
-			colorArray = ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'];
-		}
+		// hack: bug if four colors, make three
+		if (colorArray.length == 4) colorArray.pop();
 
 		return colorArray;
 	},

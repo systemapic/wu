@@ -6,16 +6,10 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 	options : {
 	},
 
-	initialize : function (options) {
-
-		// set options
-		Wu.setOptions(this, options);
+	_initialize : function (options) {
 
 		// init container
 		this._initContent();
-		
-		// listen up (events on parent)
-		this._listen();
 	},      
 
 	_initContent : function () {
@@ -25,6 +19,35 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 
 		// put button in top chrome
 		this._registerButton();
+	},
+
+	// on select project
+	_refresh : function () {
+
+		// flush
+		this._flush();
+
+		if (!this._checkAccess()) return;
+
+		// create
+		this.initSettings('Controls');
+		this.initBoundPos('Bounds & Position');		
+	},
+
+	_flush : function () {
+		if (this._settingsDropdown) this._settingsDropdown.innerHTML = '';
+	},
+
+	_checkAccess : function () {
+		if (!this._project) return false;
+
+		if (!app.access.to.edit_project(this._project)) {
+			Wu.DomUtil.addClass(this._settingsButton, 'displayNone');
+			return false;
+		} else {
+			Wu.DomUtil.removeClass(this._settingsButton, 'displayNone');
+			return true;
+		}
 	},
 
 	_registerButton : function () {
@@ -39,7 +62,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			trigger : this._togglePane,
 			context : this,
 			project_dependent : true
-			
 		});
 	},
 
@@ -47,9 +69,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 
 		// create dropdown
 		this._settingsDropdown = Wu.DomUtil.create('div', 'settings-dropdown displayNone', app._appPane);
-
-		// this.initSettings('Controls');
-		// this.initBoundPos('Bounds & Position');	
 
 	},
 
@@ -94,31 +113,9 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		Wu.DomUtil.remove(this._ghost);
 	},
 
-	// on select project
-	_refresh : function () {
-
-		this._settingsDropdown.innerHTML = '';
-
-		this.initSettings('Controls');
-		this.initBoundPos('Bounds & Position');		
-	},
-
+	
 	_refreshDefaultPermission : function () {
 	},
-
-
-
-
-
-
-
-
-
-
-
-	// CREATE STUFF
-	// CREATE STUFF
-	// CREATE STUFF		
 
 	// Creates section with meta field lines
 	initSettings : function (title) {
@@ -176,11 +173,11 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		// Get control
 		var project = app.activeProject;
 
-		for ( var key in options ) {			
+		for (var key in options) {			
 			
 			var enable  = options[key].enable;			
 
-			if ( enable ) {
+			if (enable) {
 
 				var title = options[key].name;
 
@@ -210,10 +207,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 
 		var isBoundsSet = this.isBoundsSet();
 
-		// BOUNDS
-		// BOUNDS
-		// BOUNDS
-
 		// Line
 		var boundsLine = new Wu.fieldLine({
 			id        : 'bounds',
@@ -232,11 +225,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			appendTo : boundsLine.container,
 			fn 	 : this._saveSetClear.bind(this),
 		});
-
-
-		// POSITION
-		// POSITION
-		// POSITION
 
 		// Line
 		var positionLine = new Wu.fieldLine({
@@ -258,7 +246,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		});
 
 	},
-
 
 	isBoundsSet : function () {
 
@@ -287,14 +274,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		return true;
 
 	},
-
-
-
-
-
-	// SAVERS 
-	// SAVERS
-	// SAVERS
 
 	_saveSwitch : function (e) {
 
@@ -327,11 +306,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		if ( key == 'position' ) this.setPosition();
 	},
 
-
-	// SET POSITION
-	// SET POSITION
-	// SET POSITION		
-
 	setPosition : function () {
 
 		// get actual Project object
@@ -355,11 +329,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		project.setPosition(position);
 	},		
 
-
-
-	// SET/ CLEAR BOUNDS
-	// SET/ CLEAR BOUNDS
-	// SET/ CLEAR BOUNDS		
 
 	setBounds : function (e) {
 		
@@ -448,11 +417,7 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			map.options.maxZoom = maxZoom;	
 		}
 		
-
 		map.invalidateSize();
 	},	
-
-
-	
 
 });
