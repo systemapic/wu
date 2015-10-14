@@ -117,20 +117,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 	_refreshDefaultPermission : function () {
 	},
 
-
-
-
-
-
-
-
-
-
-
-	// CREATE STUFF
-	// CREATE STUFF
-	// CREATE STUFF		
-
 	// Creates section with meta field lines
 	initSettings : function (title) {
 
