@@ -3,7 +3,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	_ : 'rightchrome', 
 
 	options : {
-		defaultWidth : 350,
+		defaultWidth : 400,
 		editingLayer : false,
 		tabs : {
 			settings : true,
@@ -78,6 +78,10 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	open : function (tab) {
+
+		console.log('%c open chrome.right.js', 'background: red; color: white;');
+		console.log('this.options.defaultWidth', this.options.defaultWidth);
+		console.log('');
 
 		// hide all tabs
 		this._forEachTab(function (tab) {
