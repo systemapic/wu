@@ -3,7 +3,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_ : 'data', 
 
 	options : {
-		defaultWidth : 350
+		defaultWidth : 400
 	},
 
 	_initialize : function () {
