@@ -402,7 +402,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		for (var p in this.fileProviders) {
 			var provider = this.fileProviders[p];
 			var files = provider.getFiles();
-			provider.data = _.toArray(files);
+
+			// get file list, sorted by last updated
+			provider.data = _.sortBy(_.toArray(files), function (f) {
+				return f.store.lastUpdated;
+			}).reverse();
+
+			// containers
 			var D3container = this.fileListContainers[p].D3container;
 			var data = this.fileProviders[p].data;
 			this.initFileList(D3container, data, p);
