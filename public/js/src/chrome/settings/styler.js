@@ -618,12 +618,6 @@ Wu.Styler = Wu.Class.extend({
 	_updatePointsize : function (e) {
 
 		var value = parseFloat(e.target.value);
-		// var key   = e.target.id.slice(17, e.target.id.length);
-		// var pre = key.substring(0,4);
-
-		// if ( pre == 'min_' || pre == 'max_' ) {
-		// 	key = key.slice(4, key.length);
-		// }
 
 		// Get field 
 		var inputField = this._content[this.type].pointsize.input.input;
