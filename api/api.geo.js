@@ -215,16 +215,16 @@ module.exports = api.geo = {
 			var field_calc = parseFloat(range[0]) / field_floor;
 
 			// normalized = (x-min(x))/(max(x)-min(x))
-			css.headers += '@opacity_field: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
+			css.headers += '@point_opacity: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
 		
 		} else {
 
 			// static opacity
-			css.headers += '@opacity_field: ' + opacity.value + ';\n';
+			css.headers += '@point_opacity: ' + opacity.value + ';\n';
 		}
 
 		// add rule
-		css.style += '\tmarker-opacity: @opacity_field;\n\n';
+		css.style += '\tmarker-opacity: @point_opacity;\n\n';
 
 		return css;
 	},
@@ -249,16 +249,16 @@ module.exports = api.geo = {
 			var field_calc = parseFloat(range[0]) / field_floor;
 			
 			// normalized = (x-min(x))/(max(x)-min(x))
-			css.headers += '@opacity_field: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
+			css.headers += '@polygon_opacity: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
 		
 		} else {
 
 			// static opacity
-			css.headers += '@opacity_field: ' + opacity.value + ';\n';
+			css.headers += '@polygon_opacity: ' + opacity.value + ';\n';
 		}
 
 		// add rule
-		css.style += '\tpolygon-opacity: @opacity_field;\n\n';
+		css.style += '\tpolygon-opacity: @polygon_opacity;\n\n';
 
 		return css;
 	},
