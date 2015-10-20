@@ -26,6 +26,11 @@ Wu.Socket = Wu.Class.extend({
 	},
 
 	sendUserEvent : function (options) {
+		// defaults
+		options.user = options.user || app.Account.getFullName();
+		options.timestamp = options.timestamp || Date.now();
+
+		// send event
 		var socket = this._socket;
 		socket.emit('user_event', options);
 	},
