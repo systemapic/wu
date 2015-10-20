@@ -126,10 +126,12 @@ Wu.Styler = Wu.Class.extend({
 
 	_updateStyle : function () {
 
-		console.log('updateStyle', this.options.carto);
+		console.log('updateStyle', this.options.carto, this);
 
 		// create carto css
 		this._createCarto(this.options.carto, this._saveCarto.bind(this));
+
+		
 	},
 
 	// create color box
@@ -576,7 +578,15 @@ Wu.Styler = Wu.Class.extend({
 		this._closeColorRangeSelector(); 
 
 		// update
-		this._updateStyle();		
+		this._updateStyle();	
+
+		console.log('_updateColor');
+
+		// send user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-color` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 	},
 
 	_updateWidth : function () {
@@ -588,7 +598,13 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().width.value = inputField.value;
 
 		// update
-		this._updateStyle();		
+		this._updateStyle();	
+
+		// send user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-width` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});	
 	},
 
 	_updateOpacity : function (e) {
@@ -614,6 +630,12 @@ Wu.Styler = Wu.Class.extend({
 
 		// update
 		this._updateStyle();
+
+		// send user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-opacity` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 		
 	},
 
@@ -638,6 +660,12 @@ Wu.Styler = Wu.Class.extend({
 
 		// update
 		this._updateStyle();
+
+		// send user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-size` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 
 	},
 
@@ -677,6 +705,12 @@ Wu.Styler = Wu.Class.extend({
 
 		// UPDATE
 		this._updateStyle();
+
+		// send user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-color range` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 
 	},
 
@@ -742,7 +776,13 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().color.value = colorArray;		
 
 		// UPDATE
-		this._updateStyle();		
+		this._updateStyle();	
+
+		// user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-color range` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 
 	},
 
@@ -913,6 +953,12 @@ Wu.Styler = Wu.Class.extend({
 
 		// updat style
 		this._updateStyle();
+
+		// user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-size` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 	},
 
 	saveOpacityDualBlur : function (max, min, absoluteMax, absoluteMin) {
@@ -929,6 +975,12 @@ Wu.Styler = Wu.Class.extend({
 
 		// updat style
 		this._updateStyle();
+
+		// user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-opacity` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 	},
 
 	saveWidthDualBlur : function (max, min, absoluteMax, absoluteMin) {
@@ -945,6 +997,12 @@ Wu.Styler = Wu.Class.extend({
 
 		// updat style
 		this._updateStyle();
+
+		// user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-width` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 	},
 
 	_closeColorRangeSelector : function () {

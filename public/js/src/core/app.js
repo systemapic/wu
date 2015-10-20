@@ -179,7 +179,7 @@ Wu.App = Wu.Class.extend({
 		    	event : 'entered',
 		    	description : 'the wu: `' + browser + '` on `' + os + '`',
 		    	timestamp : Date.now()
-		})
+		});
 	},
 
 	_initAnalytics : function () {
