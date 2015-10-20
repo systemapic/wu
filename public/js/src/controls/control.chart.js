@@ -18,6 +18,11 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		} else {
 
+			if (!e) {
+				console.error('no "e" provided?');
+				return;
+			}
+
 			// Get pop-up settings
 			this.popupSettings = e.layer.getTooltip();
 
