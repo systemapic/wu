@@ -788,9 +788,13 @@ Wu.Styler = Wu.Class.extend({
 
 	_dropdownSelected : function (e) {
 
+
 		var key = e.target.getAttribute('key'); // todo: remove DOM interaction
 		var field = e.target.value;
 		var wrapper = e.target.parentElement;
+
+		console.log('_dropdownSelected!!', e, key, field, wrapper, this.type);
+
 
 		// check if selected item is placeholders
 		var isStatic = (field == this.options.dropdown.staticText);

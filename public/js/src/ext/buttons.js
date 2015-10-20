@@ -113,8 +113,6 @@ Wu.button = Wu.Class.extend({
 		    colorRangeWrapper.setAttribute('key', key);
 
 
-
-
 		var color = Wu.DomUtil.create('div', 'chrome-color-range', colorRangeWrapper);
 		color.id = 'chrome-color-range_' + key;
 		color.setAttribute('key', key);
@@ -207,9 +205,21 @@ Wu.button = Wu.Class.extend({
 
 		}.bind(this))
 
+		// select color on range
+		Wu.DomEvent.on(color, 'click', function (e) {
+			Wu.DomUtil.removeClass(colorSelectorWrapper, 'displayNone');
+			Wu.DomUtil.removeClass(clickCatcher, 'displayNone');
 
-		Wu.DomEvent.on(color, 'click', this.toggleColorRange, this);
-		Wu.DomEvent.on(clickCatcher, 'click', this.stopEditingColorRange, this);
+		}, this);
+
+		Wu.DomEvent.on(clickCatcher, 'click', function (e) {
+			Wu.DomUtil.addClass(colorSelectorWrapper, 'displayNone');
+			Wu.DomUtil.addClass(clickCatcher, 'displayNone');
+
+		}, this);
+
+
+		// Wu.DomEvent.on(clickCatcher, 'click', this.stopEditingColorRange, this);
 
 	},
 
