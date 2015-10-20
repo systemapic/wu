@@ -168,7 +168,6 @@ Wu.App = Wu.Class.extend({
 
 	_logEntry : function () {
 
-
 		var b = this.sniffer.browser;
 		var o = this.sniffer.os;
 
@@ -197,6 +196,7 @@ Wu.App = Wu.Class.extend({
 
 		// main user account
 		this.Account = new Wu.User(this.options.json.account);
+		this.Account.setRoles(this.options.json.roles);
 
 		// create user objects
 		this.Users = {};

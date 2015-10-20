@@ -894,6 +894,7 @@ module.exports = api.access = {
 			    project = options.project,
 			    ops = [];
 
+
 			// return on missing
 			if (!project || !user || !project.roles || !capability) return done(null, false);
 
@@ -902,15 +903,36 @@ module.exports = api.access = {
 				return _.contains(r.members, user.getUuid());
 			});
 
-			// console.log('ROLEROLEROLE:', role);
-
 			// return if no role
 			if (!role || !role.capabilities) return done(null, false);
 
 			var hasCapability = role.capabilities[capability];
 
 			done(null, hasCapability);
-		}
+		},
+
+		_capability : function (options, done) {
+			var user = options.user,
+			    capability = options.capability,
+			    gotAccess = false;
+
+			if (!user || !capability) return done('Missing information.');
+
+			Role
+			.find({members : user.uuid})
+			.exec(function (err, roles) {
+
+				_.each(roles, function (r) {
+
+					if (r.capabilities[capability]) {
+						gotAccess = true;
+					}
+
+				});
+
+				return done(null, gotAccess);
+			});
+		},
 	},
 
 	// CRUD capabilities
@@ -941,6 +963,7 @@ module.exports = api.access = {
 			    project = options.project,
 			    ops = {};
 
+			console.log('_check', user, project);
 
 			ops.admin = function (callback) {
 				// if is admin
@@ -965,10 +988,21 @@ module.exports = api.access = {
 		},
 
 		create_client : function (options, callback) {  			// todo: client roles
-			api.access.is.admin(options, function (err, isAdmin) {
-				if (err || !isAdmin) return callback('No access.');
+			
+			api.access.has._capability({
+				user : options.user,
+				capability : 'create_client'
+
+			}, function (err, gotAccess) {
+				if (err || !gotAccess) return callback('No access.');
 				callback(null, options);
-			});
+			})
+
+
+			// api.access.is.admin(options, function (err, isAdmin) {
+			// 	if (err || !isAdmin) return callback('No access.');
+			// 	callback(null, options);
+			// });
 		},
 		
 		edit_client : function (options, callback) { 
@@ -1007,10 +1041,21 @@ module.exports = api.access = {
 		},
 		
 		create_project : function (options, callback) { 
-			api.access.is.admin(options, function (err, isAdmin) {
-				if (err || !isAdmin) return callback('No access.');
+
+			api.access.has._capability({
+				user : options.user,
+				capability : 'create_project'
+
+			}, function (err, gotAccess) {
+				if (err || !gotAccess) return callback('No access.');
 				callback(null, options);
-			});
+			})
+
+
+			// api.access.is.admin(options, function (err, isAdmin) {
+			// 	if (err || !isAdmin) return callback('No access.');
+			// 	callback(null, options);
+			// });
 		},
 		
 		edit_project : function (options, done) { 
@@ -1078,16 +1123,37 @@ module.exports = api.access = {
 
 		edit_file : function (options, done) {
 
-			console.log('access edit_file: ', options);
+			// var options = { file : file, user : user};
 
-			User
-			.findOne({files : options.file._id})
-			.populate('roles')
-			.exec(function (err, project) {
-				if (err || !project) return done('No access.');
-				options.project = project;
-				api.access.to._check(options, 'edit_file', done); 			// todo: if not createdBy self, pass to _other_
+			// console.log('access edit_file: ', options);
+
+
+			// if file is createdBy user
+
+			File
+			.findOne({uuid : options.file.uuid})
+			.exec(function (err, f) {
+
+				if (f.createdBy == options.user.uuid) { 
+
+					return done(null, options);
+				}
+
+				done('No assess.');
+
 			});
+
+
+
+			// Project
+			// .findOne({files : options.file._id})
+			// .populate('roles')
+			// .exec(function (err, project) {
+			// 	console.log('edit_file ####', err, project);
+			// 	if (err || !project) return done('No access.');
+			// 	options.project = project;
+			// 	api.access.to._check(options, 'edit_file', done); 			// todo: if not createdBy self, pass to _other_
+			// });
 		},
 
 		edit_other_file : function (options, done) {

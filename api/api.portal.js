@@ -201,7 +201,13 @@ module.exports = api.portal = {
 			}, function (err, project_json) {
 				callback(null, project_json);
 			});
-		}		
+		}	
+
+		a.roles = function (callback) {
+			api.user._getRoles({
+				user : account
+			}, callback);
+		}	
 
 		// get account
 		a.account = function (callback) {

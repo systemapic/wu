@@ -93,7 +93,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_initLayerListContainer : function () {
 
 		// HEADER
-		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer, 'Layers');
+		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer, 'Project Layers');
 
 		// LAYER LIST OUTER SCROLLER
 		this._layerListOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
@@ -111,7 +111,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_initFileListContainer : function () {
 
 		// HEADER
-		this._fileListTitle = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer, 'Data');
+		this._fileListTitle = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer, 'My Datasets');
 
 		// FILE LIST OUTER SCROLLER
 		this._fileListOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
