@@ -177,7 +177,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// enable edit of layer menu...
 		var layerMenu = app.MapPane.getControls().layermenu;
-		// if ( app.access.to.edit_project(this._project) ) layerMenu.enableEdit();
 		if ( app.access.to.edit_project(this._project) ) layerMenu.enableEditSwitch();
 
 		// open if closed
@@ -194,7 +193,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 		if ( this._isOpen ) {
 			var layerMenu = app.MapPane.getControls().layermenu;	 // move to settings selector
-			// if (layerMenu) layerMenu.disableEdit();
 			if (layerMenu) layerMenu.disableEditSwitch();
 		}
 
