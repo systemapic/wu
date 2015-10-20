@@ -139,11 +139,13 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().color = this.carto().color || {};
 
 		// get states
-		var isOn         = !(this.carto().color.column === false);
+		var isOn         = (this.carto().color.column === false);
 		var staticVal    = this.carto().color.staticVal || this.options.defaults.color;
 		var val          = this.carto().color.value 	|| this.options.defaults.range;
 		var column       = this.carto().color.column;
 		var minMax       = this.carto().color.range;
+
+		console.log('_createColor column: ', column, staticVal, isOn);
 
 		// container
 		var line = new Wu.fieldLine({
@@ -201,7 +203,7 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().opacity = this.carto().opacity || {};
 
 		// get states
-		var isOn   = !(this.carto().opacity.column === false);
+		var isOn   = (this.carto().opacity.column === false);
 		var value  = this.carto().opacity.value || 1;
 		var column = this.carto().opacity.column;
 		var minMax = this.carto().opacity.range;
@@ -261,7 +263,7 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().pointsize = this.carto().pointsize || {};
 
 		// Get stores states
-		var isOn   = !(this.carto().pointsize.column === false)
+		var isOn   = (this.carto().pointsize.column === false)
 		var val    = this.carto().pointsize.value || 1.2;
 		var column = this.carto().pointsize.column;
 		var minMax = this.carto().pointsize.range;
@@ -321,7 +323,7 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().width = this.carto().width || {};
 
 		// Get stores states
-		var isOn   = !(this.carto().width.column === false)
+		var isOn   = (this.carto().width.column === false)
 		var val    = this.carto().width.value || 1.2;
 		var column = this.carto().width.column;
 		var minMax = this.carto().width.range;
