@@ -842,6 +842,13 @@ Wu.Styler = Wu.Class.extend({
 		// UPDATE
 		this._updateStyle();
 
+		// user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-' + field + '` by column `' + column + '` on layer',
+		    	description : this.options.layer.getTitle() + ' in project ' + this.options.project.getName(),
+		});
+
+
 	},
 
 	_unselectField : function (key, wrapper) {
