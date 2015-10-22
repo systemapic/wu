@@ -48,7 +48,7 @@ Wu.Project = Wu.Class.extend({
 
 		// create
 		files.forEach(function (file) {
-			this.files[file.uuid] = new Wu.Files(file);
+			this.files[file.uuid] = new Wu.Model.File(file);
 		}, this);
 	},
 
@@ -74,6 +74,7 @@ Wu.Project = Wu.Class.extend({
 
 	addLayer : function (layer) {
 		var l = new Wu.createLayer(layer);
+		console.log('createlayer  in project', layer, l);
 		if (l) this.layers[layer.uuid] = l;
 		return l || false;
 	},
@@ -580,6 +581,29 @@ Wu.Project = Wu.Class.extend({
 
 	},
 
+	getRasterLayers : function () {
+		var layers = [];
+
+		for (var l in this.layers) {
+			var layer = this.layers[l];
+
+			if (layer.store && layer.store.data && layer.store.data.raster) layers.push(layer);
+		}
+
+		return layers;
+	},
+
+	getDataLayers : function () {
+
+		var pg_layers = this.getPostGISLayers();
+		var r_layers = this.getRasterLayers();
+
+		var data_layers = pg_layers.concat(r_layers);
+
+		return data_layers;
+
+	},
+
 	// debug
 	getDeadLayers : function () {
 		return _.filter(this.layers, function (l) {
@@ -846,7 +870,7 @@ Wu.Project = Wu.Class.extend({
 
 	setFile : function (file) {
 		this.store.files.push(file);
-		this.files[file.uuid] = new Wu.Files(file);
+		this.files[file.uuid] = new Wu.Model.File(file);
 	},
 
 	setLogo : function (path) {

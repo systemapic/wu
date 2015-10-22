@@ -16,7 +16,7 @@ var projectSchema = mongoose.Schema({
 	keywords 	: [{ type: String, default: '' }],
 	categories 	: [String],
 
-	roles : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
+	roles 		: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
 
 			// image
 	logo		: String, 

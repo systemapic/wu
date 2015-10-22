@@ -3,7 +3,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	_ : 'rightchrome', 
 
 	options : {
-		defaultWidth : 350,
+		defaultWidth : 400,
 		editingLayer : false,
 		tabs : {
 			settings : true,
@@ -59,7 +59,6 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	_onWindowResize : function () {
-
 	},
 
 	getDimensions : function () {
@@ -79,7 +78,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	open : function (tab) {
-		
+
 		// hide all tabs
 		this._forEachTab(function (tab) {
 			tab._hide();
@@ -104,6 +103,9 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		var width = map.offsetWidth - this.options.defaultWidth;
 		map.style.width = width + 'px';
 
+		// invalidate size
+		app._map.invalidateSize();
+
 	},
 
 	close : function (tab) {
@@ -124,6 +126,8 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		var map = app.MapPane._container;
 		map.style.width = '100%';
 
+		// invalidate size
+		app._map.invalidateSize();
 	},
 
 

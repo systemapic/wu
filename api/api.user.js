@@ -89,31 +89,57 @@ module.exports = api.user = {
 		// add user to project roles
 		ops.push(function (project, callback) {
 
+
+			// download_file: true
+			// share_project: true
+			// read_project: true
+
+			// create_client: false
+			// create_project: false
+			// create_user: false
+			// create_version: false
+			// delegate_to_user: true
+			// delete_client: false
+			// delete_file: false
+			// delete_other_client: false
+			// delete_other_file: false
+			// delete_other_project: false
+			// delete_other_user: false
+			// delete_other_version: false
+			// delete_project: false
+			// delete_user: false
+			// delete_version: false
+			// edit_client: false
+			// edit_file: false
+			// edit_other_client: false
+			// edit_other_file: false
+			// edit_other_project: false
+			// edit_other_user: false
+			// edit_project: false
+			// edit_user: false
+			// have_superpowers: false
+			// manage_analytics: false
+			// read_analytics: false
+			// read_client: false
+			// upload_file: false
+
+
+
 			var a = token_store.project.access_type;
+
+			console.log('token_store: ', token_store);
+
+			var permissions = token_store.project.permissions;
+
+			console.log('permissions', permissions);
+
+			// create role
+			api.user._createRole({
+				permissions : permissions,
+				members : [created_user],
+				project_id : token_store.project.id
+			}, callback)
 			
-			// default role
-			var role_slug = 'noRole';
-
-			// decide which role
-			if (a == 'view') role_slug = 'projectReader'; // todo: other access types
-
-			// find reader role
-			var access_role = _.find(project.roles, function (r) {
-				return r.slug == role_slug;
-			});
-
-			Role
-			.findOne({uuid : access_role.uuid})
-			.exec(function (err, role) {
-
-				// add user to reader role of project
-				role.members.addToSet(created_user.uuid);
-
-				// save
-				role.save(function (err) {
-					callback(err);
-				});
-			});
 		});
 
 		ops.push(function (callback) {
@@ -141,22 +167,65 @@ module.exports = api.user = {
 
 			callback(null);
 
-
-
-
 		});
 
 		// done
 		async.waterfall(ops, function (err, results) {
 			if (err) return done(err);
-
-
-			// send email
-
-
 			done(null, created_user);
 		});
 	
+	},
+
+	_createRole : function (options, done) {
+		var permissions = options.permissions,
+		    members = options.members,
+		    project_id = options.project_id,
+		    ops = [];
+
+
+
+		ops.push(function (callback) {
+			// create the user
+			var role = new Role();
+			role.uuid = 'role-' + uuid.v4();
+
+			permissions.forEach(function (p) {
+				console.log('p: ', p);
+				role.capabilities[p] = true;
+			})
+
+			// members
+			members.forEach(function (m) {
+				role.members.push(m.uuid);
+			});
+
+			// save the role
+			role.save(function(err, doc) {
+				callback(err, doc);
+			});
+
+		});
+
+		ops.push(function (role, callback) {
+
+			// add to project
+			Project
+			.findOne({uuid : project_id})
+			.exec(function (err, project) {
+				project.roles.push(role._id);
+				project.markModified('roles');
+				project.save(callback);
+			});
+		});
+		
+
+		async.waterfall(ops, function (err, results) {
+			console.log('create role, err, reslts', err, results);
+			done(err);
+		});
+
+
 	},
 
 
@@ -164,6 +233,9 @@ module.exports = api.user = {
 		var user = options.user,
 		    invite_token,
 		    ops = [];
+
+
+		// console.log('_processInviteToken:', options);
 
 		// return if no token
 		if (!options.invite_token) return done(null);
@@ -180,6 +252,8 @@ module.exports = api.user = {
 			// parse
 			invite_token = JSON.parse(inviteJSON);
 
+			if (!invite_token) return callback('Missing invite token.');
+
 			Project
 			.findOne({uuid : invite_token.project.id})
 			.populate('roles')
@@ -191,31 +265,20 @@ module.exports = api.user = {
 		ops.push(function (project, callback) {
 
 			var a = invite_token.project.access_type;
-			
-			// default role
-			var role_slug = 'noRole';
+			var permissions = invite_token.project.permissions;
 
-			// decide which role
-			if (a == 'view') role_slug = 'projectReader'; // todo: other access types
+			// create role
+			api.user._createRole({
+				permissions : permissions,
+				members : [user],
+				project_id : invite_token.project.id
+			}, callback)
 
-			// find reader role
-			var access_role = _.find(project.roles, function (r) {
-				return r.slug == role_slug;
-			});
-
-			Role
-			.findOne({uuid : access_role.uuid})
-			.exec(function (err, role) {
-
-				// add user to reader role of project
-				role.members.addToSet(user.uuid);
-
-				// save
-				role.save(callback);
-			});
 		});
 
 		async.waterfall(ops, function (err, results) {
+			if (err) return done(err);
+			
 			var project_json = {
 				name : invite_token.project.name,
 				id : invite_token.project.id
@@ -281,9 +344,6 @@ module.exports = api.user = {
 		// 4. ALSO would be really cool: just send anyone a link, and they can login/register and get access to project.
 
 
-		var results = {
-
-		}
 
 		callback(null, options);
 
@@ -299,10 +359,14 @@ module.exports = api.user = {
 	},
 
 	_createInviteLink : function (options, callback) {
+
+		console.log(options);
+
 		var project_id = options.project_id,
 		    project_name = options.project_name,
 		    user = options.user,
-		    access_type = options.access_type;
+		    access_type = options.access_type,
+		    permissions = options.permissions;
 
 
 		// create token and save in redis with options
@@ -312,7 +376,8 @@ module.exports = api.user = {
 			project : {
 				id : project_id,
 				name : project_name,
-				access_type : access_type
+				access_type : access_type,
+				permissions : permissions
 			},
 			invited_by : {
 				uuid : user.uuid,
@@ -335,18 +400,10 @@ module.exports = api.user = {
 
 
 	_inviteNewUser : function (options, callback) {
-
-
-
 	},
 
 	_inviteExistingUser : function (options, callback) {
-
-
-
 	},
-
-
 
 
 	// create user
@@ -644,6 +701,20 @@ module.exports = api.user = {
 				done(null, userProjects);
 			});
 		});
+	},
+
+	_getRoles : function (options, done) {
+
+		var user = options.user,
+		    uuid = user.uuid;
+
+		Role
+		.find({members : uuid})
+		.exec(function (err, roles) {
+			console.log('found all these roles: ', roles);
+			done(err, roles);
+		})
+
 	},
 
 	_getSingle : function (options, done) {

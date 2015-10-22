@@ -1,4 +1,4 @@
-Wu.Layer = Wu.Class.extend({
+Wu.Model.Layer = Wu.Model.extend({
 
 	type : 'layer',
 
@@ -6,7 +6,7 @@ Wu.Layer = Wu.Class.extend({
 		hoverTooltip : true,	// hover instead of click  todo..
 	},
 
-	initialize : function (layer) {
+	_initialize : function (layer) {
 
 		// set source
 		this.store = layer; // db object
@@ -283,6 +283,15 @@ Wu.Layer = Wu.Class.extend({
 		this.save('description');
 	},
 
+	getSatellitePosition : function () {
+		return this.store.satellite_position;
+	},
+
+	setSatellitePosition : function (satellite_position) {
+		this.store.satellite_position = satellite_position;
+		this.save('satellite_position');
+	},
+
 	getCopyright : function () {
 		return this.store.copyright;
 	},
@@ -421,7 +430,7 @@ Wu.Layer = Wu.Class.extend({
 	getTooltip : function () {
 		var json = this.store.tooltip;
 		if (!json) return false;
-		var meta = JSON.parse(json);
+		var meta = Wu.parse(json);
 		return meta;
 	},
 
@@ -433,18 +442,19 @@ Wu.Layer = Wu.Class.extend({
 	getStyling : function () {
 		var json = this.store.style;
 		if (!json) return false;
-		var styleJSON = JSON.parse(json);
+		var styleJSON = Wu.parse(json);
 		return styleJSON;
 	},
 
 	setStyling : function (styleJSON) {
+		console.log('setStyle', styleJSON);
 		this.store.style = JSON.stringify(styleJSON);
 		this.save('style');
 	},
 
 	getLegends : function () {
 		var meta = this.store.legends
-		if (meta) return JSON.parse(meta);
+		if (meta) return Wu.parse(meta);
 		return false;
 	},
 
@@ -510,6 +520,9 @@ Wu.Layer = Wu.Class.extend({
 
 	// save updates to layer (like description, style)
 	save : function (field) {
+
+		
+
 		var json = {};
 		json[field] = this.store[field];
 		json.layer  = this.store.uuid;
@@ -571,13 +584,34 @@ Wu.Layer = Wu.Class.extend({
 
 
 
-Wu.PostGISLayer = Wu.Layer.extend({
+Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 	initLayer : function () {
 		this.update();
 		this.addHooks();
 
+		this._listenLocally();
+
 		this._inited = true;
+	},
+
+	_listenLocally : function () {
+		Wu.DomEvent.on(this.layer, 'load', this._onLayerLoaded, this);
+		Wu.DomEvent.on(this.layer, 'loading', this._onLayerLoading, this);
+	},
+
+	_onLayerLoading : function () {
+		this._loadStart = Date.now();
+	},
+
+	_onLayerLoaded : function () {
+		var loadTime = Date.now() - this._loadStart;
+
+
+		app.Analytics._eventLayerLoaded({
+			layer : this.getTitle(),
+			load_time : loadTime,
+		});
 	},
 
 	update : function (options, callback) {
@@ -619,6 +653,11 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 		// update layer option
 		this._refreshLayer(layerUuid);
+
+		// fire event
+		Wu.Mixin.Events.fire('layerStyleEdited', { detail : {
+			layer : this
+		}}); 
 	},
 
 	_getLayerUuid : function () {
@@ -781,6 +820,9 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 			// open popup
 			app.MapPane._addPopupContent(e);
+
+			// analytics/slack
+			app.Analytics.onPointQuery(e);
 		});
 
 
@@ -788,25 +830,37 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 
 	downloadLayer : function () {
-		
+
 		var options = {
-			layer_id : this.getUuid()
+			layer_id : this.getUuid(), 
+			socket_notification : true
 		}
 
-		Wu.post('/api/layer/downloadDataset', JSON.stringify(options), this._downloadedDataset.bind(this));
+		// set download id for feedback
+		this._downloadingID = Wu.Util.createRandom(5);
 
-		// set progress
-		app.ProgressBar.timedProgress(2000);
+		Wu.post('/api/layer/downloadDataset', JSON.stringify(options), function (err, resp) {
+
+			// give feedback
+			app.feedback.setMessage({
+				title : 'Preparing download',
+				description : 'Hold tight! Your download will be ready in a minute.',
+				id : this._downloadingID
+			});	
+		});
 
 	},
 
-	_downloadedDataset : function (err, response) {
+	_onDownloadReady : function (e) {
+		var options = e.detail,
+		    file_id = options.file_id,
+		    finished = options.finished,
+		    filepath = options.filepath;
 
 		// parse results
-		var filePath = response;
 		var path = app.options.servers.portal;
 		path += 'api/file/download/';
-		path += '?file=' + filePath;
+		path += '?file=' + filepath;
 		// path += '?raw=true'; // add raw to path
 		path += '&type=shp';
 		path += '&access_token=' + app.tokens.access_token;
@@ -814,7 +868,26 @@ Wu.PostGISLayer = Wu.Layer.extend({
 		// open (note: some browsers will block pop-ups. todo: test browsers!)
 		window.open(path, 'mywindow')
 
+		// remove feedback
+		app.feedback.remove(this._downloadingID);
 	},
+
+
+	// _downloadedDataset : function (err, response) {
+
+	// 	// parse results
+	// 	var filePath = response;
+	// 	var path = app.options.servers.portal;
+	// 	path += 'api/file/download/';
+	// 	path += '?file=' + filePath;
+	// 	// path += '?raw=true'; // add raw to path
+	// 	path += '&type=shp';
+	// 	path += '&access_token=' + app.tokens.access_token;
+
+	// 	// open (note: some browsers will block pop-ups. todo: test browsers!)
+	// 	window.open(path, 'mywindow')
+
+	// },
 
 	shareLayer : function () {
 		console.log('share layer postgis', this);
@@ -833,7 +906,6 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 		// delete layer
 		project.deleteLayer(this);
-
 	},
 	
 
@@ -842,11 +914,133 @@ Wu.PostGISLayer = Wu.Layer.extend({
 
 
 
+// systemapic layers
+Wu.RasterLayer = Wu.Model.Layer.extend({
+
+	initialize : function (layer) {
+
+		// set source
+		this.store = layer; // db object
+		
+		// data not loaded
+		this.loaded = false;
+
+	},
+
+
+	initLayer : function () {
+		this.update();
+	},
+
+	update : function () {
+		var map = app._map;
+
+		// remove
+		// if (this.layer) this.remove();
+
+		this._fileUuid = this.store.file;
+		this._defaultCartoid = 'raster';
+
+		// prepare raster
+		this._prepareRaster();
+
+		// prepare utfgrid
+		// this._prepareGrid();
+		
+	},
+
+
+	_prepareRaster : function () {
+
+		// set ids
+		var fileUuid 	= this._fileUuid,	// file id of geojson
+		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
+		    tileServer 	= app.options.servers.tiles.uri,
+		    subdomains  = app.options.servers.tiles.subdomains,
+		    token 	= '?access_token=' + app.tokens.access_token,
+		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
+
+		var layerUuid = this._getLayerUuid();
+		var url = 'https://{s}.systemapic.com/overlay_tiles/{layerUuid}/{z}/{x}/{y}.png' + token;
+
+		// add vector tile raster layer
+		this.layer = L.tileLayer(url, {
+			fileUuid: fileUuid,
+			layerUuid : layerUuid,
+			subdomains : subdomains,
+			maxRequests : 0,
+			tms : true
+		});
+
+	},
+
+
+	_getLayerUuid : function () {
+		return this.store.data.raster;
+	},
+
+	getMeta : function () {
+		var metajson = this.store.metadata;
+		var meta = Wu.parse(metajson);
+		return meta;
+	},
+
+	getFileMeta : function () {
+		console.error('getFileMeta');
+		var file = app.Account.getFile(this.store.file);
+		var metajson = file.store.data.raster.metadata;
+		var meta = Wu.parse(metajson);
+		return meta;
+	},
+
+	flyTo : function () {
+		var extent = this.getMeta().extent;
+		if (!extent) return;
+
+		var southWest = L.latLng(extent[1], extent[0]),
+		    northEast = L.latLng(extent[3], extent[2]),
+		    bounds = L.latLngBounds(southWest, northEast),
+		    map = app._map,
+		    row_count = parseInt(this.getMeta().row_count),
+		    flyOptions = {};
+
+		// if large file, don't zoom out
+		if (row_count > 500000) { 
+			var zoom = map.getZoom();
+			flyOptions.minZoom = zoom;
+		}
+
+		// fly
+		map.fitBounds(bounds, flyOptions);
+	},
+
+	deleteLayer : function () {
+
+		// confirm
+		var message = 'Are you sure you want to delete this layer? \n - ' + this.getTitle();
+		if (!confirm(message)) return console.log('No layer deleted.');
+
+		// get project
+		var layerUuid = this.getUuid();
+		var project = _.find(app.Projects, function (p) {
+			return p.layers[layerUuid];
+		})
+
+		// delete layer
+		project.deleteLayer(this);
+	},
+
+	downloadLayer : function () {
+		console.log('raster downloadLayer');
+	}
+});
 
 
 
 
-Wu.MapboxLayer = Wu.Layer.extend({
+
+
+Wu.MapboxLayer = Wu.Model.Layer.extend({
 
 	type : 'mapboxLayer',
 	
@@ -869,7 +1063,7 @@ Wu.MapboxLayer = Wu.Layer.extend({
 
 
 
-Wu.GoogleLayer = Wu.Layer.extend({
+Wu.GoogleLayer = Wu.Model.Layer.extend({
 
 	type : 'googleLayer',
 
@@ -933,7 +1127,7 @@ Wu.GoogleLayer = Wu.Layer.extend({
 });
 
 
-Wu.NorkartLayer = Wu.Layer.extend({
+Wu.NorkartLayer = Wu.Model.Layer.extend({
 
 	type : 'norkartLayer',
 
@@ -1099,69 +1293,9 @@ Wu.NorkartLayer = Wu.Layer.extend({
 });
 
 
-// systemapic layers
-Wu.RasterLayer = Wu.Layer.extend({
+Wu.CartodbLayer = Wu.Model.Layer.extend({});
 
-	initialize : function (layer) {
-
-		// set source
-		this.store = layer; // db object
-		
-		// data not loaded
-		this.loaded = false;
-
-	},
-
-
-	initLayer : function () {
-		this.update();
-	},
-
-	update : function () {
-		var map = app._map;
-
-		// remove
-		// if (this.layer) this.remove();
-
-		this._fileUuid = this.store.file;
-		this._defaultCartoid = 'raster';
-
-		// prepare raster
-		this._prepareRaster();
-
-		// prepare utfgrid
-		// this._prepareGrid();
-		
-	},
-
-
-	_prepareRaster : function () {
-
-		// set ids
-		var fileUuid 	= this._fileUuid,	// file id of geojson
-		    cartoid 	= this.store.data.cartoid || this._defaultCartoid,
-		    tileServer 	= app.options.servers.tiles.uri,
-		    subdomains  = app.options.servers.tiles.subdomains,
-		    token 	= '?token=' + app.Account.getToken(),
-		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
-
-		// add vector tile raster layer
-		this.layer = L.tileLayer(url, {
-			fileUuid: fileUuid,
-			cartoid : cartoid,
-			subdomains : subdomains,
-			maxRequests : 0,
-			tms : true
-		});
-
-	},
-
-});
-
-
-Wu.CartodbLayer = Wu.Layer.extend({});
-
-Wu.ErrorLayer = Wu.Layer.extend({})
+Wu.ErrorLayer = Wu.Model.Layer.extend({})
 
 
 // shorthand for creating all kinds of layers

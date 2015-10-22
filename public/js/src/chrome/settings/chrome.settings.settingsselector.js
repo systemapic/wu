@@ -9,28 +9,21 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 				enabled : true,
 				text : 'Style Editor'
 			},
-			layers : {
-				enabled : true,
-				text : 'Project Layers'
-			},
 			tooltip : {
 				enabled : true,
 				text : 'Tooltip'
 			},
-			
 			filters : {
 				enabled : true,
 				text : 'Data Filters'
 			},
-			
-			mapsettings : {
-				enabled : true,
-				text : 'Map Settings'
-			},	
-
 			cartocss : {
 				enabled : true,
 				text : 'CartoCSS'
+			},
+			extras : {
+				enabled : true,
+				text : 'Extras'
 			},
 		}
 		
@@ -52,6 +45,11 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 		// hide by default
 		this._hide();
+
+
+		app.Tools = app.Tools || {};
+		app.Tools.SettingsSelector = this;
+
 	},
 
 	_refresh : function () {
@@ -96,7 +94,8 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 			name : 'settingsSelector',
 			className : 'chrome-button settingsSelector',
 			trigger : this._togglePane,
-			context : this
+			context : this,
+			project_dependent : true
 		});
 	},
 
@@ -144,6 +143,16 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 		// open/close
 		this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
+
+		if (this._isOpen) {
+			// fire event
+			app.Socket.sendUserEvent({
+			    	user : app.Account.getFullName(),
+			    	event : 'opened',
+			    	description : 'the settings',
+			    	timestamp : Date.now()
+			})
+		}
 	},
 
 	_show : function () {

@@ -61,6 +61,13 @@ module.exports = function(app, passport) {
 		api.socket.getServerStats(req);
 	});
 
+	// get stats
+	app.io.route('user_event', function (req) {
+		if (!isLoggedIn(req)) return;
+		
+		api.socket.userEvent(req);
+	});
+
 	// helper function : if is logged in
 	function isLoggedIn(req, res, next) {
 		if (req.session.passport) return true;

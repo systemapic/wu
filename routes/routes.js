@@ -43,9 +43,14 @@ module.exports = function(app, passport) {
 
 
 	// ================================
-	// OAUTH2: Get Token ==============
+	// OAUTH2: Post Token ==============
 	// ================================
 	app.post('/oauth/token', api.oauth2.getToken);
+	
+
+	// ================================
+	// OAUTH2: Get Token ==============
+	// ================================
 	app.get('/api/token/check', passport.authenticate('bearer', {session: false}), function (req, res) {
 		res.end('OK');
 	});
@@ -249,11 +254,19 @@ module.exports = function(app, passport) {
 		api.pixels.serveImagePixelPerfection(req, res);
 	});
 
+	// =====================================
+	// SERVE STATIC FILES SECURELY  ========
+	// =====================================
+	app.get('/pixels/screenshot/*', function (req,res) {
+		api.pixels.serveScreenshot(req, res);
+	});
+
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	app.get('/pixels/*', passport.authenticate('bearer', {session: false}), function (req,res) {
+		console.log('pixels!');
 		api.pixels.servePixelPerfection(req, res);
 	});
 
@@ -359,8 +372,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// GET GEOJSON FILES ===================
 	// =====================================
-	app.post('/api/geo/json2cartocss', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.geo.json2cartocss(req, res);
+	app.post('/api/geo/json2carto', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.geo.json2carto(req, res);
 	});
 
 	// =====================================
@@ -651,6 +664,7 @@ module.exports = function(app, passport) {
 	// LOGOUT ==============================
 	// =====================================
 	app.get('/invite/*', function(req, res) {
+		console.log('/invite/*');
 		api.portal.invite(req, res);
 	});
 

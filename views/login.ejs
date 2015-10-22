@@ -41,7 +41,7 @@
 
 	<div id="spinning-map"></div>
 	<div id="spinning-content">
-		<div class="col-sm-6 col-sm-offset-3">
+		<div id="login-form" class="col-sm-6 col-sm-offset-3">
 			<div id="powered-by">Powered by<a href="http://systemapic.com" target="_blank">Systemapic.com ©</a></div>
 			<div id="login-logo"></div>
 
@@ -55,7 +55,7 @@
 
 					<div class="alert alert-danger" id="feedback-message"></div>
 
-					<form action="/login" method="post" id="login-form">
+					<form action="/login" method="post" id="login-form2">
 						<div class="form-group"><input id="input-email" onkeyup="login_key_up();" type="text" class="form-control" name="email" placeholder="Enter email..."></div>
 						<div class="form-group"><input id="input-pass" onkeyup="login_key_up();" type="password" class="form-control" name="password" placeholder="Enter password..."></div>
 						<input id="invite_input" type="text" name="invite_token" style="display:none;">

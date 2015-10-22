@@ -208,6 +208,28 @@ Wu.Access = Wu.Class.extend({
 			return permission;
 		},
 
+		capability : function (user, capability) {
+
+			console.error('app.access.has.capability: ', user, capability);
+
+			var roles = user.getRoles();
+			var p = false;
+
+
+			_.each(roles, function (role) {
+
+				if (role.hasMember(user)) {
+					if (role.hasCapability(capability)) {
+						console.log('GOT IT ALL!', user, capability);
+						p = true;
+					}
+				}
+
+			});
+
+			return p;
+		},
+
 	},
 
 	is : {
@@ -240,6 +262,8 @@ Wu.Access = Wu.Class.extend({
 		create_client : function (user) { 
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'create_client')) return true;
+			if (app.access.has.capability(user, 'create_client')) return true;
+			
 			return false;
 		},
 		
@@ -277,6 +301,7 @@ Wu.Access = Wu.Class.extend({
 		create_project 		: function (user) { 
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'create_project')) return true;
+			if (app.access.has.capability(user, 'create_project')) return true;
 			return false;
 		},
 		
@@ -306,6 +331,7 @@ Wu.Access = Wu.Class.extend({
 		},
 		
 		read_project		: function (project, user) { 
+			var user = user || app.Account;
 			if (app.access.has.project_capability(user, project, 'read_project')) return true;
 			return false;
 		},
@@ -392,7 +418,7 @@ Wu.Access = Wu.Class.extend({
 			return false;
 		},
 		
-		share_project		: function (user) { 
+		share_project		: function (project, user) { 
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'share_project')) return true;
 			if (app.access.has.project_capability(user, project, 'share_project')) return true;

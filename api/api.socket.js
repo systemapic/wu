@@ -55,6 +55,16 @@ module.exports = api.socket = {
 
 	},
 
+
+	userEvent :function (req) {
+
+		var options = req.data;
+
+		// send to slack
+		api.slack.userEvent(options);
+
+	},
+
 	sendError : function (userId, err) {
 		var sock = api.socket._getSocket(userId);
 
@@ -63,6 +73,17 @@ module.exports = api.socket = {
 			error : err
 		});
 	},
+
+
+	downloadReady : function (options) {
+
+		// get socket
+		var socket = api.socket.getSocket(options);
+
+		// send to user
+		socket && socket.emit('downloadReady', options.status);
+	},
+
 
 	uploadDone : function (options) {
 
@@ -93,7 +114,6 @@ module.exports = api.socket = {
 		sock && sock.emit('processingDone', {
 			file_id : file_id,
 			import_took_ms : options.import_took_ms
-
 		});
 	},
 

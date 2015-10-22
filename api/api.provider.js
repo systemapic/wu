@@ -65,8 +65,6 @@ module.exports = api.provider = {
 			layer.save(function (err, saved_layer) {
 				project.layers.addToSet(saved_layer._id)
 
-				console.log('saved_lauer', saved_layer);
-
 				// save project
 				project.markModified('layers');
 				project.save(function (err, p) {
@@ -330,8 +328,6 @@ module.exports = api.provider = {
 			    accessToken = req.body.accessToken,
 			    userUuid 	= req.user.uuid,
 			    ops = [];
-
-			console.log('getAccount'.bgYellow);
 
 			ops.push(function (callback) {
 				Project

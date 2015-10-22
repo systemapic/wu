@@ -53,8 +53,6 @@ module.exports = api.slack = {
 		    icon = options.icon,
 		    channel = options.channel;
 
-		console.log('slack send'.red, options);
-
 		var slack_options = {
 			text 		: text,
 			channel 	: channel || api.config.slack.channel,
@@ -94,6 +92,77 @@ module.exports = api.slack = {
 			text : text,
 			// icon_emoji : ":sunglasses:"
 		});
+	},
+
+	userEvent : function (options) {
+
+		console.log('userEvent', options);
+
+		var user = options.user,
+		    event = options.event,
+		    description = options.description,
+		    timestamp = options.timestamp,
+		    custom_options = options.options,
+		    ops = [];
+
+
+		// custom options (screenshot)
+		if (custom_options && custom_options.screenshot) ops.push(function (callback) {
+
+			var file_id = custom_options.file_id;
+
+			// get raw file
+			File
+			.findOne({uuid : file_id})
+			.exec(function (err, file) {
+				if (err || !file) return callback('no screenshot');
+
+				// return raw file
+				var imageFile = file.data.image;
+				var path = '/data/images/' + imageFile.file;
+
+				// create smaller version of screenshot
+				api.pixels._resizeScreenshot({
+					image : path,	
+				}, function (err, resized_image) {
+					if (err) return callback(err);
+					var resized_path = api.config.portalServer.uri + 'pixels/screenshot/' + resized_image;
+					options.embed_image = resized_path;
+					
+					callback(null);
+				});
+			});
+		});
+
+		ops.push(function (callback) {
+			var text = user + ' ' + event + ' ' + description;
+
+			// create attachments
+			var attachments = api.slack._createAttachments(options);
+
+			api.slack._send({
+				text : text,
+				channel : api.config.slack.monitor,
+				attachments : attachments
+			});
+		})
+
+		async.series(ops, function (err) {
+		
+			if (err) console.log('ERR 83838: ', err);
+		});
+	
+
+	},
+
+	_createAttachments : function (options) {
+		if (!options.embed_image) return false;
+
+		var attachments = [{
+			image_url : options.embed_image,
+		}]
+
+		return attachments;
 	},
 
 	createdProject : function (options) {

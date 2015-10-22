@@ -68,6 +68,10 @@ userSchema.methods.getUuid = function () {
     return this.uuid;
 };
 
+userSchema.methods.getName = function () {
+    return this.firstName + ' ' + this.lastName;
+};
+
 // timestamps plugin
 userSchema.plugin(timestamps);    // adds created and lastUpdated fields automatically
 

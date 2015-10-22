@@ -6,7 +6,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		var multiPopUp = options.multiPopUp;
 		var e = options.e;
 
-		
 		if ( multiPopUp ) {
 
 			// Get pop-up settings
@@ -16,13 +15,20 @@ Wu.Control.Chart = Wu.Control.extend({
 			// Create content
 			var content = this.multiPointPopUp(multiPopUp);
 
+
 		} else {
+
+			if (!e) {
+				console.error('no "e" provided?');
+				return;
+			}
 
 			// Get pop-up settings
 			this.popupSettings = e.layer.getTooltip();
 
 			// Create content
 			var content = this.singlePopUp(e);
+
 		}
 
 		// clear old popup
@@ -116,12 +122,15 @@ Wu.Control.Chart = Wu.Control.extend({
 		map.on('popupclose',  this._clearPopup, this);
 	},
 
+	_removePopupCloseEvent : function () {
+		var map = app._map;
+		map.off('popupclose',  this._clearPopup, this);
+	},
+
 	_refresh : function () {
 
-		if (this._popup) {
-			this._popup._remove();
-		} 
-
+		if (this._popup) this._popup._remove();
+		
 		this._clearPopup(false);
 	},
 
@@ -137,6 +146,8 @@ Wu.Control.Chart = Wu.Control.extend({
 		// remove marker
 		this.popUpMarkerCircle && app._map.removeLayer(this.popUpMarkerCircle);
 
+		// remove event
+		this._removePopupCloseEvent();
 	},
 	
 	// Create leaflet pop-up
@@ -191,6 +202,7 @@ Wu.Control.Chart = Wu.Control.extend({
 	// Create "normal" pop-up content without time series
 	_createPopupContent : function (e) {
 
+
 		var c3Obj = {
 			data : e.data,
 			layer : e.layer,
@@ -200,7 +212,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			d3array : {
 		    		meta 	: [],
 		    		xName 	: 'field_x', 
-		    		yName 	: 'field_y',
+		    		yName 	: 'mm',
 		    		x 	: [],
 		    		y 	: [],
 		    		ticks 	: [],
@@ -209,21 +221,27 @@ Wu.Control.Chart = Wu.Control.extend({
 			multiPopUp : false
 		}
 
-		var _c3Obj = this.createC3dataObj(c3Obj);
+		this._c3Obj = this.createC3dataObj(c3Obj);
 
 		var headerOptions = {
-			headerMeta 	: _c3Obj.d3array.meta,
+			headerMeta 	: this._c3Obj.d3array.meta,
 			layerName 	: e.layer.store.title,
 			areaSQ 		: false,
 			pointCount 	: false,
-			multiPopUp 	: false
+			multiPopUp 	: false,
+			layer 		: e.layer
 		}
 
 		// Create HTML
 		var _header = this.createHeader(headerOptions);
+		var _chartContainer = this.createChartContainer();
+		var _footer = this.createFooter();
 
 		var content = Wu.DomUtil.create('div', 'popup-inner-content');
 		content.appendChild(_header);
+		content.appendChild(_chartContainer);
+		content.appendChild(_footer)
+
 
 		return content;		
 	},	
@@ -239,7 +257,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			d3array : {
 		    		meta 	: [],
 		    		xName 	: 'field_x', 
-		    		yName 	: 'field_y',
+		    		yName 	: 'mm',
 		    		x 	: [],
 		    		y 	: [],
 		    		ticks 	: [],
@@ -247,14 +265,15 @@ Wu.Control.Chart = Wu.Control.extend({
 			},
 		}
 
-		var _c3Obj = this.createC3dataObj(c3Obj);
+		this._c3Obj = this.createC3dataObj(c3Obj);
 
 		var headerOptions = {
-			headerMeta 	: _c3Obj.d3array.meta,
+			headerMeta 	: this._c3Obj.d3array.meta,
 			layerName 	: e.layer.store.title,
 			areaSQ 		: false,
 			pointCount 	: false,
-			multiPopUp 	: false
+			multiPopUp 	: false,
+			layer 		: e.layer
 		}
 
 
@@ -262,17 +281,107 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Create header HTML
 		var _header = this.createHeader(headerOptions);
+		var _chartContainer = this.createChartContainer();
+		var _footer = this.createFooter();
 		content.appendChild(_header);
+		content.appendChild(_chartContainer);
+		content.appendChild(_footer);
 
 		// Create graph HTML
 		if ( this.popupSettings && this.popupSettings.timeSeries.enable != false) {
 			
-			var _chart = this.C3Chart(_c3Obj);
-			content.appendChild(_chart);
+			var _chart = this.C3Chart(this._c3Obj);
+			var _chartTicks = this.chartTicks(this._c3Obj);
+			_chartContainer.appendChild(_chart);
 		
 		}
 
 		return content;			
+	},
+
+
+	_calculateRegression : function (c) {
+
+		var c = this._c3object;
+		var x = []; // dates
+		var start_date;
+
+		var y_ = _.clone(c.d3array.y);
+		y_.splice(0,1);
+		
+		var y = [];
+		y_.forEach(function (value) {
+			y.push(parseFloat(value));
+		});
+
+		var dates = _.clone(c.d3array.x);
+		dates.splice(0,1);
+
+		dates.forEach(function (d, i) {
+			if (i == 0) {
+				// set start date
+				start_date = moment(d);
+				x.push(0);
+
+			} else {
+				// days since start_date
+				var b = moment(d);
+				var diff_in_days = b.diff(start_date, 'days');
+				x.push(diff_in_days);
+			}
+		});
+
+		var xx = [];
+		var xy = [];
+
+		x.forEach(function (x_, i) {
+			xy.push(x[i] * y[i]);
+			xx.push(x[i] * x[i]);
+		});
+
+		var x_sum = 0;
+		var y_sum = 0;
+		var xx_sum = 0;
+		var xy_sum = 0;
+
+		x.forEach(function (value, i) {
+			x_sum += value;
+		});
+
+		y.forEach(function (value, i) {
+			y_sum += value;
+		});
+
+		xx.forEach(function (value, i) {
+			xx_sum += value;
+		});
+
+		xy.forEach(function (value, i) {
+			xy_sum += value;
+		});
+
+		var n = y.length;
+		var result_a = ((y_sum * xx_sum) - (x_sum * xy_sum)) / ((n * xx_sum) - (x_sum * x_sum));
+		var result_b = ((n * xy_sum) - (x_sum * y_sum)) / ((n * xx_sum) - (x_sum * x_sum));
+		var result_y_start = result_a + (result_b * x[0])
+		var result_y_end = result_a + (result_b * x[x.length-1]);
+
+
+		// var reg = ['regression', result_y_start, result_y_end];
+
+		// need every step 
+		var reg = ['regression'];
+		y.forEach(function (y_, i) {
+			if (i == 0) {
+				reg.push(result_y_start);
+			} else {
+				var val = (result_y_end / n) * (i);
+				reg.push(val);
+			}
+		});
+
+		return reg;
+
 	},
 
 	// Create multi point C3 pop-up content
@@ -307,7 +416,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			d3array 	: {
 				    		meta 	: [],
 				    		xName 	: 'field_x', 
-				    		yName 	: 'field_y',
+				    		yName 	: 'mm',
 				    		x 	: [],
 				    		y 	: [],
 				    		ticks 	: [],
@@ -319,15 +428,16 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		}
 
-		var _c3Obj = this.createC3dataObj(c3Obj);
+		this._c3Obj = this.createC3dataObj(c3Obj);
 
 
 		var headerOptions = {
-			headerMeta 	: _c3Obj.d3array.meta,
+			headerMeta 	: this._c3Obj.d3array.meta,
 			layerName 	: _layerName,
 			areaSQ 		: _areaSQ,
 			pointCount 	: _totalPoints,
-			multiPopUp 	: true
+			multiPopUp 	: true,
+			layer 		: _layer
 		}
 
 
@@ -335,36 +445,80 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// Create header
 		var _header = this.createHeader(headerOptions);
+		var _chartContainer = this.createChartContainer();
+		var _footer = this.createFooter();
 		content.appendChild(_header);
+		content.appendChild(_chartContainer);
+		content.appendChild(_footer);
 
 
 		if ( this.popupSettings.timeSeries && this.popupSettings.timeSeries.enable == true ) {
 
 			// Create chart
-			var _chart = this.C3Chart(_c3Obj);
-			content.appendChild(_chart);
+			var _chart = this.C3Chart(this._c3Obj);
+			var _chartTicks = this.chartTicks(this._c3Obj);
+			_chartContainer.appendChild(_chart);
 
 		}
 
-
+		
 
 		return content;
 	},		
 
 
 
+
+	// xoxoxoxoxoxoxo
+	chartTicks : function (c3Obj) {
+
+		// Data
+		var data = c3Obj.d3array;
+
+		// Ticks
+		var t = data.ticks;
+
+		// var first_data_point = t[0]; // wrong, first tick is actually second data point
+		var first_data_point = data.x[1];
+		var last_data_point = data.x[data.x.length -1];
+
+		// start/end date
+		var start = moment(first_data_point).format("DD.MM.YYYY");
+		var end = moment(last_data_point).format("DD.MM.YYYY");	
+
+		this._footerDates.innerHTML = '<span class="start-date">' + start + '</span><span class="end-date">' + end + '</span>';
+	},
+
+
 	// PRODUCE HTML
 	// PRODUCE HTML
 	// PRODUCE HTML		
 
+	createFooter : function () {
+		var footerContainer = this._footerContainer = Wu.DomUtil.create('div', 'c3-footer');
+
+		var dates = this._footerDates = Wu.DomUtil.create('div', 'c3-footer-dates', footerContainer);
+		return footerContainer;
+	},
+
+
+	createChartContainer : function () {
+		var chartContainer = this._chartContainer = Wu.DomUtil.create('div', 'c3-chart-container');
+		return chartContainer;
+	},
+
+
 	// Header
 	createHeader : function (options) {
 
+		// get vars
 		var headerMeta = options.headerMeta;
 		var layerName  = options.layerName;
 		var areaSQ     = options.areaSQ;
 		var pointCount = options.pointCount;
 		var multiPopUp = options.multiPopUp;
+
+		
 
 		// If custom title
 		if ( this.popupSettings.title && this.popupSettings.title != '' ) {
@@ -383,8 +537,17 @@ Wu.Control.Chart = Wu.Control.extend({
 		var headerWrapper = Wu.DomUtil.create('div', 'c3-header-wrapper', container);
 		var headerName = Wu.DomUtil.create('div', 'c3-header-layer-name', headerWrapper, layerName)
 
-		if ( multiPopUp ) {
-			var plural = 'sampling ' + pointCount + ' points over approx. ' + areaSQ;
+		// add more text for multiquery
+		if (multiPopUp) {
+			
+			// set geom text based on type
+			var geom_type = options.layer.getMeta().geometry_type;
+			var geom_text = 'items'
+			if (geom_type == 'ST_Point') geom_text = 'points';
+			if (geom_type == 'ST_MultiPolygon') geom_text = 'polygons';
+
+			// set text
+			var plural = 'Sampling ' + pointCount + ' ' + geom_text + ' over approx. ' + areaSQ;
 			var _pointCount = Wu.DomUtil.create('div', 'c3-point-count', headerWrapper, plural);
 		}
 
@@ -395,10 +558,11 @@ Wu.Control.Chart = Wu.Control.extend({
 			var _key = meta[0];
 			var _val = meta[1];
 
-			if ( this.popupSettings ) var setting = this.popupSettings.metaFields[_key];
-			else	  		  var setting = false;
+			var setting = this.popupSettings ? this.popupSettings.metaFields[_key] : false;
 
-			if ( _key == 'geom' || _key == 'the_geom_3857' || _key == 'the_geom_4326' ) { return }
+			if (!setting) return;
+
+			if ( _key == 'geom' || _key == 'the_geom_3857' || _key == 'the_geom_4326' ) return;
 			
 			// Do not show field if there is no value
 			if ( !_val ) return;
@@ -489,8 +653,8 @@ Wu.Control.Chart = Wu.Control.extend({
 		x.unshift(xName);
 		y.unshift(yName);
 
-		// Colums
 		_columns = [x, y];
+
 
 		// Create container
 		var _C3Container = Wu.DomUtil.createId('div', 'c3-container');	
@@ -505,10 +669,11 @@ Wu.Control.Chart = Wu.Control.extend({
 		        
 			size: {
 				height: 200,
-				width: 460
+				width: 430
 			},
 
 			point : {
+				show : false,
 				r: 3,
 			},
 
@@ -522,29 +687,28 @@ Wu.Control.Chart = Wu.Control.extend({
 
 			zoom : {
 				enabled : false,
-				onzoomstart : function () {
-
-				},
-				onzoom : function (d) {
-					
-				},
-				onzoomend : function () {
-				},
+				
 			},
 		        data: {
 
 		                xs: {
-		                        field_y: 'field_x'
+		                        mm: 'field_x',
+		                        regression : 'reg_x'
 		                },
 
 		                columns: _columns,
 
 		                colors : {
-		                	field_y: '#0000FF'
+		                	mm: '#0000FF',
+		                	regression: '#C83333'
 		                },
-		                type: 'scatter',
-
+		                types: {
+		                	mm : 'scatter',
+		                	regression : 'line'
+		                }
 		        },
+
+
 
 		        axis: {
 
@@ -553,8 +717,8 @@ Wu.Control.Chart = Wu.Control.extend({
 		                        localtime: false,
 		                        tick: {
 		                                format: '%Y',
-		                                values: t,
-		                                multiline: false                                        
+		                                values: [],
+		                                multiline: true
 		                        }
 		                },
 
@@ -562,19 +726,21 @@ Wu.Control.Chart = Wu.Control.extend({
 		                	max : range,
 		                	min : -range,
 					tick: {
-						format: function (d) { return Math.floor(d * 100)/100 }
+						format: function (d) { return Math.floor(d * 100)/100}
 					}
 		                },
+
+		              
 
 		        },
 
 			tooltip: {
+				grouped : true,
 				format: {
 					title: function (d) { 
 						var nnDate = moment(d).format("DD.MM.YYYY");
 						return nnDate;
 					},
-			
 				},
 				
 			},	        
@@ -584,10 +750,76 @@ Wu.Control.Chart = Wu.Control.extend({
 			}		        
 		});
 
+
 		// add zoom events
 		this._addChartEvents(_C3Container);
 
+		// add regression button
+		this._addRegressionButton();
+
 		return _C3Container;
+	},
+
+
+	_addRegressionButton : function () {
+
+
+		var w = Wu.DomUtil.create('div', 'regression-button-wrapper', this._footerContainer);
+
+		this.regressionButton = new Wu.button({ 
+			type 	  : 'switch',
+			isOn 	  : false,
+			right 	  : false,
+			id 	  : 'regression-button',
+			appendTo  : w,
+			fn 	  : this._updateRegression.bind(this),
+			className : 'relative-switch'
+		})
+
+		// label
+		var label = Wu.DomUtil.create('label', 'invite-permissions-label', w);
+		label.htmlFor = 'regression';
+		label.appendChild(document.createTextNode('Regression'));
+
+
+	},
+
+	_updateRegression : function (e) {
+
+		var elem = e.target;
+		var on = elem.getAttribute('on');
+
+		if ( on == 'false' || !on ) {
+
+			Wu.DomUtil.addClass(elem, 'switch-on');
+			elem.setAttribute('on', 'true');
+
+			// get regression 
+			var reg = this._calculateRegression();
+			var x = this._c3Obj.d3array.x;
+
+			var reg_y = [reg[0], reg[1], reg[reg.length-1]];
+			var reg_x = ['reg_x', x[1], x[x.length-1]];
+
+			// add to chart
+			this._chart.load({
+				columns: [reg_x, reg_y]
+			});
+
+			// analytics/slack
+			app.Analytics.onEnabledRegression();
+		
+		} else {
+
+			Wu.DomUtil.removeClass(elem, 'switch-on');
+			elem.setAttribute('on', 'false');
+
+			this._chart.unload({
+				ids : 'regression'
+			})
+
+		}
+		
 	},
 
 
@@ -655,8 +887,6 @@ Wu.Control.Chart = Wu.Control.extend({
 
 				var field = meta.fields[m];
 
-
-
 				// only add active tooltips
 				if (field.on) {
 
@@ -679,6 +909,9 @@ Wu.Control.Chart = Wu.Control.extend({
 				this.C3dataObjBuilder(_key, _val, d3array);
 			}
 		}
+
+
+		this._c3object = c3Obj;
 
 		return c3Obj;
 	},
@@ -711,8 +944,13 @@ Wu.Control.Chart = Wu.Control.extend({
 
 
 			// Get only year
-			var year = moment(isDate).format("YYYY");
-			var chartTick = new Date(year);
+			// var year = moment(isDate).format("YYYY");
+			// var chartTick = new Date(year);
+
+			var cleanDate = moment(isDate);
+			var chartTick = new Date(cleanDate);
+
+
 
 			var newTick = true;
 
@@ -759,7 +997,10 @@ Wu.Control.Chart = Wu.Control.extend({
 		if (_key.length < 6) return false; // cant possibly be date
 
 		// if only letters, not a date
-		if (this._isOnlyLetters(_key)) return;
+		if (this._validate.onlyLetters(_key)) return;
+
+		// if less than six and has letters
+		if (this._validate.shortWithLetters(_key)) return;
 
 		// If it's Frano's time series format
 		var _m = moment(_key, ["YYYYMMDD", moment.ISO_8601]).format("YYYY-MM-DD");
@@ -773,14 +1014,28 @@ Wu.Control.Chart = Wu.Control.extend({
 		return false;
 	},	
 
-	_isOnlyLetters : function (string) {
-		var nums = [];
-		_.each(string, function (s) {
-			if (!isNaN(s)) nums.push(s);
-		})
-		if (nums.length) return false;
-		return true;
-	},			
+	_validate : {
 
+		onlyLetters : function (string) {
+			var nums = [];
+			_.each(string, function (s) {
+				if (!isNaN(s)) nums.push(s);
+			})
+			if (nums.length) return false;
+			return true;
+		},
+
+		shortWithLetters : function (string) {
+			var letters = [];
+			_.each(string, function (s) {
+				if (isNaN(s)) letters.push(s);
+			});
+
+			if (letters.length && string.length < 7) return true;
+			return false;
+		},
+	},
+
+	
 
 })

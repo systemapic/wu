@@ -14,17 +14,10 @@ var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser'); 
 
+// api
 var api = require('../api/api');
 var config = api.config;
 var port = config.port;
-
-// mute console in production mode
-// if (prodMode) {
-// 	var nullFn = function () {};
-// 	console.log = nullFn;
-// 	console.time = nullFn;
-// 	console.timeEnd = nullFn;
-// }
 
 // socket enabled server
 app = express().http().io()
@@ -32,18 +25,16 @@ app = express().http().io()
 // connect to our database
 var sessionStore = mongoose.connect(config.mongo.url); 
 
-// var RedisStore = require('connect-redis')(express.session);
-
 // pass passport for configuration
 require('./passport')(passport); 
 
 // set up our express application
-// app.use(morgan('dev')); 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({limit: '2000mb', extended : true}));
 app.use(bodyParser.json({limit:'2000mb'}));
 app.set('view engine', 'ejs'); // set up ejs for templating
 app.use(multipart()); // for resumable.js uploads
+// app.use(morgan('dev')); 
 
 // required for passport
 app.use(express.session({
@@ -85,5 +76,3 @@ console.log('The magic happens @ ', port);
 
 // debug cleanup
 api.upload._deleteDoneChunks();
-
-

@@ -50,6 +50,8 @@ module.exports = api.layer = {
 		var options = req.body;
 
 		api.layer.createModel(options, function (err, doc) {
+			console.log('create layer, err, doc', err, doc);
+
 			if (err) return api.error.general(res, err);
 
 			res.json(doc);
@@ -172,6 +174,14 @@ module.exports = api.layer = {
 
 		Layer.findOne({'uuid' : layerUuid}, function (err, layer) {
 			if (err || !layer) return api.error.missingInformation(req, res);
+
+
+			// update satpos
+			if (req.body.hasOwnProperty('satellite_position')) {
+				var satellite_position = req.body.satellite_position;
+				layer.satellite_position = satellite_position;
+				layer.save();
+			};
 
 			// update description
 			if (req.body.hasOwnProperty('description')) {
@@ -563,6 +573,11 @@ module.exports = api.layer = {
 
 
 	createModel : function (options, callback) {
+
+		// metadata sometimes come as object... todo: check why!
+		if (typeof(options.metadata) == 'object') {
+			options.metadata = JSON.stringify(options.metadata);
+		}
 
 		var layer 		= new Layer();
 		layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),

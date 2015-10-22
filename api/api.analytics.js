@@ -45,6 +45,45 @@ var api = module.parent.exports;
 // exports
 module.exports = api.analytics = { 
 
+
+
+	downloadedDataset : function (options) {
+		var user = options.user,
+		    filename = options.filename;
+
+		// send to slack
+		api.slack.userEvent({
+			user : user.getName(),
+			event : 'downloaded',
+			description : 'dataset `' + filename + '`'
+		});
+
+		// other analytics
+	},
+
+	downloadedLayer : function (options) {
+		var user = options.user,
+		    filename = options.filename;
+
+		// send to slack
+		api.slack.userEvent({
+			user : user.getName(),
+			event : 'downloaded',
+			description : 'layer `' + filename + '`'
+		});
+
+		// other analytics
+	},
+
+
+
+
+
+
+
+
+
+
 	set : function (req, res) {
 		var options = req.body;
 

@@ -321,6 +321,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		// Enable settings from layer we're working with
 		var layerUuid = this._getActiveLayerUuid();
+		console.log('layerUuid');
 		if (layerUuid) this._selectedActiveLayer(false, layerUuid);		
 
 		// Select layer we're working on
@@ -354,8 +355,10 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_getSortedColumns : function () {
-		if (!this._layer) return false;
+		if (!this._layer) return false
 
+		if (!this._layer.getPostGISData) return false;
+	
 		var meta = Wu.parse(this._layer.getPostGISData().metadata),
 		    columns = meta.columns,
 		    keys = Object.keys(columns),
@@ -403,7 +406,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		]
 
 		// fill dropdown
-		columns.forEach(function (column) {
+		columns && columns.forEach(function (column) {
 			if (mute_columns.indexOf(column) == -1) {
 				var option = Wu.DomUtil.create('option', 'active-layer-option', select);
 				option.value = column;
@@ -529,10 +532,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_updateChart : function (histogram, column) {
-
-		console.log('%c _updateChart ', 'background: #FF33FF; color: white;');
-		console.log('histogram.length => ', histogram.length);
-		console.log('column => ', column);
 
 		var ndx = crossfilter(histogram),
 		    runDimension = ndx.dimension(function(d) {return +d.bucket;}), 			// x-axis
@@ -815,7 +814,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	_getHistogram : function (column, done, fresh) {
 
 		// debug switch
-		// var fresh = true;
+		var fresh = true;
 
 		// get fresh histogram from server, if requested
 		if (fresh) return this._getFreshHistogram(column, done);

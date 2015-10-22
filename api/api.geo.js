@@ -38,7 +38,6 @@ var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 var pg = require('pg');
-var exec = require('child_process').exec;
 
 // api
 var api = module.parent.exports;
@@ -46,89 +45,152 @@ var api = module.parent.exports;
 // exports
 module.exports = api.geo = { 
 
-
-
-	json2cartocss : function (req, res) {
+	json2carto : function (req, res) {
 		var options = req.body;
 
-		console.log('');
-		console.log('');
-		console.log('');
-		console.log('options', options);
-		console.log('');
-		console.log('');
-		console.log('');
-
 		// convert json to cartocss
-		api.geo._json2cartocss(options, function (err, css) {
-
-			console.log('json2css done! ', err, css);
-
+		api.geo._json2carto(options, function (err, css) {
 			res.end(css);
 		});
 	},
 
-
-	_json2cartocss : function (options, callback) {
-
-		var styleJSON = options.styleJSON;
-
-		console.log('api.geo._json2cartocss -> styleJSON : ', styleJSON);
-
-		if (!styleJSON) return callback('Missing styleJSON');
+	_json2carto : function (options, callback) {
+		if (!options.style) return callback('Missing style!');
 		
-		// json in, cartocss out
+		// find vector types
+		var isPoint 	= (options.style.point && options.style.point.enabled);
+		var isPolygon 	= (options.style.polygon && options.style.polygon.enabled);
+		var isLine 	= (options.style.line && options.style.line.enabled);
 
-		var headers = '';
-		var style   = '#layer {\n\n';
-
-		var allowOverlap = 'true';
-		var markerClip  = 'false';
-		var compOp      = 'screen'
-
-		// CREATE DEFAULT STYLING
-		style += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
-		style += '\tmarker-clip: ' + markerClip + ';\n';
-		style += '\tmarker-comp-op: ' + compOp + ';\n\n';
-
-
-		// STYLE POINT
-		// STYLE POINT
-		// STYLE POINT
-
-		if ( styleJSON.point && styleJSON.point.enabled == true ) {
-
-			console.log('INSIDE json2cartocss point');
-
-			// OPACITY
-			var pointOpacityCarto = this.buildCarto_pointOpacity(options);
-			headers += pointOpacityCarto.headers;
-			style += pointOpacityCarto.style;
-
-			// COLOR
-			var pointColorCarto = this.buildCarto_pointColor(options);
-			headers += pointColorCarto.headers;
-			style += pointColorCarto.style;
-
-			// SIZE
-			var pointSizeCarto = this.buildCarto_pointSize(options);
-			headers += pointSizeCarto.headers;
-			style += pointSizeCarto.style;	
-
+		// style
+		var style = {
+			headers : '',
+			layer : ''
 		}
+
+		// start #layer
+		style.layer = '#layer {\n\n';
+		
+		// extra styling (eg. reference point)
+		if (options.style.extras) style.layer += this.buildExtras(options);
+
+		// point styling
+		if (isPoint) style = api.geo._createPointCarto(options, style);
+
+		// polygon styling
+		if (isLine) style = api.geo._createLineCarto(options, style);
+
+		// polygon styling
+		if (isPolygon) style = api.geo._createPolygonCarto(options, style);
 			
-		style += '}'
+		// close #layer
+		style.layer += '}';
+		
+		// debug
+		console.log('created style: ', style);
 
-		var finalCarto = headers + style;
-
-		console.log('json2cartocss final', finalCarto);
-
+		// concat
+		var finalCarto = style.headers + style.layer;
 
 		// return cartocss
 		callback(null, finalCarto);
 
 	},
 
+	_createPointCarto : function (options, style) {
+
+		var allowOverlap = 'true';
+		var markerClip  = 'false';
+		var compOp      = 'screen'
+
+		// CREATE DEFAULT STYLING
+		style.layer += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
+		style.layer += '\tmarker-clip: ' + markerClip + ';\n';
+		style.layer += '\tmarker-comp-op: ' + compOp + ';\n\n';
+
+		// OPACITY
+		var pointOpacityCarto = this.buildCarto_pointOpacity(options);
+		style.headers += pointOpacityCarto.headers;
+		style.layer += pointOpacityCarto.style;
+
+		// COLOR
+		var pointColorCarto = this.buildCarto_pointColor(options);
+		style.headers += pointColorCarto.headers;
+		style.layer += pointColorCarto.style;
+
+		// SIZE
+		var pointSizeCarto = this.buildCarto_pointSize(options);
+		style.headers += pointSizeCarto.headers;
+		style.layer += pointSizeCarto.style;	
+
+		return style;
+
+	},
+
+	_createPolygonCarto : function (options, style) {
+
+		// opacity
+		var polygonOpacityCarto = this.buildCarto_polygonOpacity(options);
+		style.headers += polygonOpacityCarto.headers;
+		style.layer += polygonOpacityCarto.style;
+
+		// color
+		var polygonColorCarto = this.buildCarto_polygonColor(options);
+		style.headers += polygonColorCarto.headers;
+		style.layer += polygonColorCarto.style;
+
+		// add line styling todo!
+
+		return style;
+
+	},
+
+	_createLineCarto : function (options, style) {
+
+		// opacity
+		var lineOpacityCarto = this.buildCarto_lineOpacity(options);
+		style.headers += lineOpacityCarto.headers;
+		style.layer += lineOpacityCarto.style;
+
+		// color
+		var lineColorCarto = this.buildCarto_lineColor(options);
+		style.headers += lineColorCarto.headers;
+		style.layer += lineColorCarto.style;
+
+		// width
+		var lineWidthCarto = this.buildCarto_lineWidth(options);
+		style.headers += lineWidthCarto.headers;
+		style.layer += lineWidthCarto.style;
+
+		return style;
+	},
+
+	buildExtras : function (options) {
+
+		var style = options.style;
+		var extras = style.extras;
+
+		// extra: reference point
+		if (extras.referencepoint && extras.referencepoint.column && extras.referencepoint.value) {
+			
+			// create reference point
+			return this.buildReferencePoint(extras.referencepoint);
+		};
+
+		return '';
+	},
+
+
+	buildReferencePoint : function(referencepoint) {
+		var cartoStr = '\n';
+		cartoStr += '\t[' + referencepoint.column + '=' + referencepoint.value + '] {\n';
+		cartoStr += '\t\tmarker-comp-op: src-over;\n';
+		cartoStr += '\t\tmarker-opacity: 1;\n';
+		cartoStr += "\t\tmarker-file: url('public/star-marker.png');\n";
+		cartoStr += '\t\tmarker-width: 30;\n';
+		cartoStr += '\t}\n\n';
+		return cartoStr;
+	},
 
 
 
@@ -138,46 +200,105 @@ module.exports = api.geo = {
 
 	buildCarto_pointOpacity : function (options) {
 
-		var style = options.styleJSON;
-		var opacity = style.point.opacity;
+		var style = options.style.point;
+		var opacity = style.opacity;
+
+		var css = {
+			headers : '',
+			style   : ''
+		}
+
+		// create @variables
+		if (opacity.column) {
+
+			// calc ranges
+			var range = opacity.range;			
+			var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
+			var field_calc = parseFloat(range[0]) / field_floor;
+
+			// normalized = (x-min(x))/(max(x)-min(x))
+			css.headers += '@point_opacity: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
+		
+		} else {
+
+			// static opacity
+			css.headers += '@point_opacity: ' + opacity.value + ';\n';
+		}
+
+		// add rule
+		css.style += '\tmarker-opacity: @point_opacity;\n\n';
+
+		return css;
+	},
+
+	buildCarto_polygonOpacity : function (options) {
+
+		var style = options.style.polygon;
+		var opacity = style.opacity;
 
 
-		var cartObj = {
+		var css = {
 			headers : '',
 			style   : ''
 		}
 
 
-		if ( opacity.range ) {
+		if ( opacity.column ) {
 
-			var max = Math.floor(options.columns[opacity.range].max * 10) / 10;
-			var min = Math.floor(options.columns[opacity.range].min * 10) / 10;				
-
-			var normalizedOffset = true;
-
-			// NORMALIZED OFFSET 
-			// i.e. if the lowest number is 30, and 
-		 	// highest is 100, 30 will return 0.3 and not 0
-			if ( normalizedOffset ) {
-				if ( min > 0 ) min = 0;
-			}
-
-			cartObj.headers += '@opacity_field_max: ' + max + ';\n';
-			cartObj.headers += '@opacity_field_min: ' + min + ';\n';
-			cartObj.headers += '@opacity_field_range: [' + opacity.range + '];\n\n';
-			cartObj.headers += '@opacity_field: @opacity_field_range / (@opacity_field_max - @opacity_field_min);\n\n';
-
+			// calc vars
+			var range = opacity.range;			
+			var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
+			var field_calc = parseFloat(range[0]) / field_floor;
+			
+			// normalized = (x-min(x))/(max(x)-min(x))
+			css.headers += '@polygon_opacity: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
 		
 		} else {
 
 			// static opacity
-			cartObj.headers += '@opacity_field: ' + opacity.value + ';\n';
+			css.headers += '@polygon_opacity: ' + opacity.value + ';\n';
 		}
 
-		cartObj.style += '\tmarker-opacity: @opacity_field;\n\n';
+		// add rule
+		css.style += '\tpolygon-opacity: @polygon_opacity;\n\n';
 
-		return cartObj;
+		return css;
 	},
+
+	buildCarto_lineOpacity : function (options) {
+
+		var style = options.style.line;
+		var opacity = style.opacity;
+
+
+		var css = {
+			headers : '',
+			style   : ''
+		}
+
+
+		// calc vars
+		if ( opacity.column ) {
+
+			var range = opacity.range;			
+			var field_floor = parseFloat(range[1]) - parseFloat(range[0]);
+			var field_calc = parseFloat(range[0]) / field_floor;
+			
+			// normalized = (x-min(x))/(max(x)-min(x))
+			css.headers += '@line_opacity: [' + opacity.column + '] / ' + field_floor + ' - ' + field_calc + ';\n\n';
+		
+		} else {
+
+			// static opacity
+			css.headers += '@line_opacity: ' + opacity.value + ';\n';
+		}
+
+		// add rule
+		css.style += '\tline-opacity: @line_opacity;\n\n';
+
+		return css;
+	},
+
 
 
 	// COLOR RANGE
@@ -186,17 +307,17 @@ module.exports = api.geo = {
 
 	buildCarto_pointColor : function (options) {
 
-		var style = options.styleJSON;
-		var color = style.point.color;
+		var style = options.style.point;
+		var color = style.color;
 
 		var cartObj = {
 			headers : '',
 			style   : ''
 		}		
 
-		if ( color.range ) {
+		if ( color.column ) {
 
-			var minMax = color.customMinMax ? color.customMinMax : color.minMax;
+			var minMax = color.range;// ? color.customMinMax : color.minMax;
 
 			// Get color values
 			var c1 = color.value[0];
@@ -244,14 +365,14 @@ module.exports = api.geo = {
 
 
 			// CREATE VARS
-			var fieldName = '@' + color.range;
+			var fieldName = '@' + color.column;
 			var maxField  = fieldName + '_max';
 			var minField  = fieldName + '_min';
 			var deltaName = fieldName + '_delta';
 			
 
 			// DEFINE FIELD NAME + MIN/MAX
-			cartObj.headers += fieldName + ': [' + color.range + '];\n';
+			cartObj.headers += fieldName + ': [' + color.column + '];\n';
 			cartObj.headers += maxField  + ': '  + minMax[1] + ';\n'; 
 			cartObj.headers += minField  + ': '  + minMax[0] + ';\n\n';
 			
@@ -316,6 +437,274 @@ module.exports = api.geo = {
 		return cartObj;
 	},
 
+
+	buildCarto_polygonColor : function (options) {
+
+		var style = options.style.polygon;
+		var color = style.color;
+
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}		
+
+		if ( color.column ) {
+
+			var minMax = color.range;// ? color.customMinMax : color.minMax;
+
+			// Get color values
+			var c1 = color.value[0];
+			var c9 = color.value[1];
+			var c17 = color.value[2];
+			var c25 = color.value[3];
+			var c33 = color.value[4];
+
+			// Interpolate
+			var c5 = this.hexAverage([c1, c9]);
+			var c13 = this.hexAverage([c9, c17]);
+			var c21 = this.hexAverage([c17, c25]);
+			var c29 = this.hexAverage([c25, c33]);
+
+			// Interpolate
+			var c3 = this.hexAverage([c1, c5]);
+			var c7 = this.hexAverage([c5, c9]);
+			var c11 = this.hexAverage([c9, c13]);
+			var c15 = this.hexAverage([c13, c17]);
+			var c19 = this.hexAverage([c17, c21]);
+			var c23 = this.hexAverage([c21, c25]);
+			var c27 = this.hexAverage([c25, c29]);
+			var c31 = this.hexAverage([c29, c33]);
+
+			// Interpolate
+			var c2 = this.hexAverage([c1, c3]);
+			var c4 = this.hexAverage([c3, c5]);
+			var c6 = this.hexAverage([c5, c7]);
+			var c8 = this.hexAverage([c7, c9]);
+			var c10 = this.hexAverage([c9, c11]);
+			var c12 = this.hexAverage([c11, c13]);
+			var c14 = this.hexAverage([c13, c15]);
+			var c16 = this.hexAverage([c15, c17]);
+			var c18 = this.hexAverage([c17, c19]);
+			var c20 = this.hexAverage([c19, c21]);
+			var c22 = this.hexAverage([c21, c23]);
+			var c24 = this.hexAverage([c23, c25]);
+			var c26 = this.hexAverage([c25, c27]);
+			var c28 = this.hexAverage([c27, c29]);
+			var c30 = this.hexAverage([c29, c31]);
+			var c32 = this.hexAverage([c31, c33]);
+
+			var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33];
+
+
+
+			// CREATE VARS
+			// var fieldName = '@' + color.column;
+			var fieldName = '@polygon_column';// + color.column;
+			var maxField  = fieldName + '_max';
+			var minField  = fieldName + '_min';
+			var deltaName = fieldName + '_delta';
+			
+
+			// DEFINE FIELD NAME + MIN/MAX
+			cartObj.headers += fieldName + ': [' + color.column + '];\n';
+			cartObj.headers += maxField  + ': '  + minMax[1] + ';\n'; 
+			cartObj.headers += minField  + ': '  + minMax[0] + ';\n\n';
+			
+
+			// COLORS VALUES
+			colorArray.forEach(function(c, i) {	
+				cartObj.headers += fieldName + '_color_' + (i+1) + ': ' + c + ';\n';
+			})
+
+			cartObj.headers += '\n';
+			
+			// COLOR STEPS (DELTA)
+			cartObj.headers += fieldName + '_delta: (' + maxField + ' - ' + minField + ')/' + colorArray.length + ';\n'
+			
+			colorArray.forEach(function(c, i) {	
+				cartObj.headers += fieldName + '_step_' + (i+1) + ': (' + minField + ' + ' + fieldName + '_delta * ' + i + ');\n';
+			})
+
+
+			cartObj.headers += '\n';
+
+
+
+			// STYLE STYLE STYLE
+			// STYLE STYLE STYLE
+			// STYLE STYLE STYLE
+
+
+			colorArray.forEach(function(c,i) {
+
+				var no = i+1;
+
+				if ( no == 1 ) {
+
+					cartObj.style += '\t[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + '] ';
+					cartObj.style += '{ polygon-fill: ' + fieldName + '_color_' + no + '; }\n';
+
+				}
+
+				if ( no > 1 && no < colorArray.length ) {
+
+					cartObj.style += '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + ']';
+					cartObj.style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
+					cartObj.style += '{ polygon-fill: ' + fieldName + '_color_' + no + '; }\n';
+
+				}
+
+				if ( no == colorArray.length ) {
+
+					cartObj.style +=  '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + '] ';
+					cartObj.style += '{ polygon-fill: ' + fieldName + '_color_' + no + '; }\n\n';
+				}
+			})
+			
+		
+		} else {
+		
+			// static color
+			cartObj.style += '\tpolygon-fill: ' + color.staticVal + ';\n\n';
+		}
+
+		return cartObj;
+	},
+
+
+	buildCarto_lineColor : function (options) {
+
+		var style = options.style.line;
+		var color = style.color;
+
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}		
+
+		if ( color.column ) {
+
+			var minMax = color.range;// ? color.customMinMax : color.minMax;
+
+			// Get color values
+			var c1 = color.value[0];
+			var c9 = color.value[1];
+			var c17 = color.value[2];
+			var c25 = color.value[3];
+			var c33 = color.value[4];
+
+			// Interpolate
+			var c5 = this.hexAverage([c1, c9]);
+			var c13 = this.hexAverage([c9, c17]);
+			var c21 = this.hexAverage([c17, c25]);
+			var c29 = this.hexAverage([c25, c33]);
+
+			// Interpolate
+			var c3 = this.hexAverage([c1, c5]);
+			var c7 = this.hexAverage([c5, c9]);
+			var c11 = this.hexAverage([c9, c13]);
+			var c15 = this.hexAverage([c13, c17]);
+			var c19 = this.hexAverage([c17, c21]);
+			var c23 = this.hexAverage([c21, c25]);
+			var c27 = this.hexAverage([c25, c29]);
+			var c31 = this.hexAverage([c29, c33]);
+
+			// Interpolate
+			var c2 = this.hexAverage([c1, c3]);
+			var c4 = this.hexAverage([c3, c5]);
+			var c6 = this.hexAverage([c5, c7]);
+			var c8 = this.hexAverage([c7, c9]);
+			var c10 = this.hexAverage([c9, c11]);
+			var c12 = this.hexAverage([c11, c13]);
+			var c14 = this.hexAverage([c13, c15]);
+			var c16 = this.hexAverage([c15, c17]);
+			var c18 = this.hexAverage([c17, c19]);
+			var c20 = this.hexAverage([c19, c21]);
+			var c22 = this.hexAverage([c21, c23]);
+			var c24 = this.hexAverage([c23, c25]);
+			var c26 = this.hexAverage([c25, c27]);
+			var c28 = this.hexAverage([c27, c29]);
+			var c30 = this.hexAverage([c29, c31]);
+			var c32 = this.hexAverage([c31, c33]);
+
+			var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33];
+
+
+
+			// CREATE VARS
+			// var fieldName = '@' + color.column;
+			var fieldName = '@line_column';// + color.column;
+			var maxField  = fieldName + '_max';
+			var minField  = fieldName + '_min';
+			var deltaName = fieldName + '_delta';
+			
+
+			// DEFINE FIELD NAME + MIN/MAX
+			cartObj.headers += fieldName + ': [' + color.column + '];\n';
+			cartObj.headers += maxField  + ': '  + minMax[1] + ';\n'; 
+			cartObj.headers += minField  + ': '  + minMax[0] + ';\n\n';
+			
+
+			// COLORS VALUES
+			colorArray.forEach(function(c, i) {	
+				cartObj.headers += fieldName + '_color_' + (i+1) + ': ' + c + ';\n';
+			})
+
+			cartObj.headers += '\n';
+			
+			// COLOR STEPS (DELTA)
+			cartObj.headers += fieldName + '_delta: (' + maxField + ' - ' + minField + ')/' + colorArray.length + ';\n'
+			
+			colorArray.forEach(function(c, i) {	
+				cartObj.headers += fieldName + '_step_' + (i+1) + ': (' + minField + ' + ' + fieldName + '_delta * ' + i + ');\n';
+			})
+
+
+			cartObj.headers += '\n';
+
+
+
+			// STYLE STYLE STYLE
+			// STYLE STYLE STYLE
+			// STYLE STYLE STYLE
+
+
+			colorArray.forEach(function(c,i) {
+
+				var no = i+1;
+
+				if ( no == 1 ) {
+
+					cartObj.style += '\t[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + '] ';
+					cartObj.style += '{ line-color: ' + fieldName + '_color_' + no + '; }\n';
+
+				}
+
+				if ( no > 1 && no < colorArray.length ) {
+
+					cartObj.style += '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + ']';
+					cartObj.style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
+					cartObj.style += '{ line-color: ' + fieldName + '_color_' + no + '; }\n';
+
+				}
+
+				if ( no == colorArray.length ) {
+
+					cartObj.style +=  '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + '] ';
+					cartObj.style += '{ line-color: ' + fieldName + '_color_' + no + '; }\n\n';
+				}
+			})
+			
+		
+		} else {
+		
+			// static color
+			cartObj.style += '\tline-color: ' + color.staticVal + ';\n\n';
+		}
+
+		return cartObj;
+	},
+
 	
 	// POINT SIZE
 	// POINT SIZE
@@ -323,23 +712,23 @@ module.exports = api.geo = {
 
 	buildCarto_pointSize : function (options) {
 
-		var style = options.styleJSON;
-		var pointsize = style.point.pointsize;
+		var style = options.style.point;
+		var pointSize = style.pointsize;
 
 		var cartObj = {
 			headers : '',
 			style   : ''
 		}		
 
-		if ( pointsize.range ) {
+		if ( pointSize.column ) {
 
-			var max = Math.floor(options.columns[pointsize.range].max * 10) / 10;
-			var min = Math.floor(options.columns[pointsize.range].min * 10) / 10;
+			var max = Math.floor(options.columns[pointSize.column].max * 10) / 10;
+			var min = Math.floor(options.columns[pointSize.column].min * 10) / 10;
 		
-			// cartObj.headers += '@marker_size_max: ' + pointsize.minMax[1] + ';\n';
-			cartObj.headers += '@marker_size_min: ' + pointsize.minMax[0] + ';\n';
-			cartObj.headers += '@marker_size_range: ' + (pointsize.minMax[1] - pointsize.minMax[0]) + ';\n';
-			cartObj.headers += '@marker_size_field: [' + pointsize.range + '];\n';
+			// cartObj.headers += '@marker_size_max: ' + pointSize.minMax[1] + ';\n';
+			cartObj.headers += '@marker_size_min: ' + pointSize.range[0] + ';\n';
+			cartObj.headers += '@marker_size_range: ' + (pointSize.range[1] - pointSize.range[0]) + ';\n';
+			cartObj.headers += '@marker_size_field: [' + pointSize.column + '];\n';
 			cartObj.headers += '@marker_size_field_maxVal: ' + max + ';\n';
 			cartObj.headers += '@marker_size_field_minVal: ' + min + ';\n';
 			cartObj.headers += '\n//TODO: Fix this!\n';
@@ -347,7 +736,7 @@ module.exports = api.geo = {
 			
 		} else {
 
-			cartObj.headers += '@marker_size_factor: ' + pointsize.value + ';\n';
+			cartObj.headers += '@marker_size_factor: ' + pointSize.value + ';\n';
 
 		}
 
@@ -366,6 +755,52 @@ module.exports = api.geo = {
 		return cartObj;
 	},
 
+	buildCarto_lineWidth : function (options) {
+
+		var style = options.style.line;
+		var lineWidth = style.width;
+
+		console.log('snoop style', style);
+
+		var cartObj = {
+			headers : '',
+			style   : ''
+		}		
+
+		if ( lineWidth.column ) {
+
+			var max = Math.floor(options.columns[lineWidth.column].max * 10) / 10;
+			var min = Math.floor(options.columns[lineWidth.column].min * 10) / 10;
+		
+			cartObj.headers += '@line_size_min: ' + lineWidth.range[0] + ';\n';
+			cartObj.headers += '@line_size_range: ' + (lineWidth.range[1] - lineWidth.range[0]) + ';\n';
+			cartObj.headers += '@line_size_field: [' + lineWidth.column + '];\n';
+			cartObj.headers += '@line_size_field_maxVal: ' + max + ';\n';
+			cartObj.headers += '@line_size_field_minVal: ' + min + ';\n';
+			cartObj.headers += '\n//TODO: Fix this!\n';
+			cartObj.headers += '@line_size_factor: (@line_size_field / (@line_size_field_maxVal - @line_size_field_minVal)) * (@line_size_range + @line_size_min);\n\n';
+			
+		} else {
+
+			cartObj.headers += '@line_size_factor: ' + lineWidth.value + ';\n';
+
+		}
+
+
+		cartObj.headers += '[zoom=10] { line-width: 0.3 * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=11] { line-width: 0.5 * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=12] { line-width: 1   * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=13] { line-width: 1   * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=14] { line-width: 2   * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=15] { line-width: 4   * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=16] { line-width: 6   * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=17] { line-width: 8   * @line_size_factor; }\n';
+		cartObj.headers += '[zoom=18] { line-width: 12  * @line_size_factor; }\n\n';
+
+
+		return cartObj;
+	},
+
 
 	// Make sure hex decimals have two digits
 	padToTwo : function (numberString) {
@@ -377,7 +812,10 @@ module.exports = api.geo = {
 	// OMG code... haven't written it myself...
 	// But it interpolates values between hex values
 	hexAverage : function (twoHexes) {
+		console.log('twoHexes', twoHexes);
+		if (!twoHexes[1]) return twoHexes[0];
 		return twoHexes.reduce(function (previousValue, currentValue) {
+			console.log('prev, cur', previousValue, currentValue);
 			return currentValue
 			.replace(/^#/, '')
 			.match(/.{2}/g)
@@ -704,14 +1142,15 @@ module.exports = api.geo = {
 
 	handleRaster : function (options, done) {
 
-		var fileUuid = options.fileUuid,
-		    inFile = options.path,
+		var fileUuid = options.fileUuid || options.file_id,
+		    inFile = options.path || options.files[0],
+		    name = fileUuid,
 		    outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
 		    ops = [];
 
 
 		ops.push(function (callback) {
-			var out = api.config.path.file + fileUuid + '/' + options.name;
+			var out = api.config.path.file + fileUuid + '/' + fileUuid;
 			var inn = inFile;
 			// console.log('COPYYY inn, out', inn, out);
 
@@ -747,7 +1186,7 @@ module.exports = api.geo = {
 
 		// get file size
 		ops.push(function (dataset, callback) {
-			fs.stat(options.path, function (err, stats) {
+			fs.stat(inFile, function (err, stats) {
 				options.fileSize = stats.size;
 				callback(null, dataset);
 			});
@@ -855,35 +1294,44 @@ module.exports = api.geo = {
 		});
 
 		ops.push(function (meta, callback) {
+			// set upload status
+				api.upload.updateStatus(fileUuid, {
+					metadata : meta
+				}, function (err) {
+					callback(null, meta);
+				});
+		})
+
+		ops.push(function (meta, callback) {
 			
-			// var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
-			// // var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=1 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
-			// console.log('cmd: ', cmd);
+			var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -a 0,0,0 -p mercator --no-kml "' + inFile + '" "' + outFolder + '"';
+			// var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=1 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
+			console.log('cmd: ', cmd);
 
-			// var exec = require('child_process').exec;
-			// exec(cmd, { maxBuffer: 2000 * 1024 }, function (err, stdout, stdin) {
-			// 	console.log('ppgdal2tiles:'.green, stdout);
-			// 	if (err) {
-			// 		console.log('gdal2tiles err: '.red + err);
+			var exec = require('child_process').exec;
+			exec(cmd, { maxBuffer: 2000 * 1024 }, function (err, stdout, stdin) {
+				console.log('ppgdal2tiles:'.green, stdout);
+				if (err) {
+					console.log('gdal2tiles err: '.red + err);
 					
-			// 		api.error.log(err);
-			// 		var errMsg = 'There was an error generating tiles for this raster image. Please check #error-log for more information.'
-			// 		return callback(errMsg);
-			// 	}
+					api.error.log(err);
+					var errMsg = 'There was an error generating tiles for this raster image. Please check #error-log for more information.'
+					return callback(errMsg);
+				}
 
-			// 	// return as db entry
-			// 	var db = {
-			// 		data : {
-			// 			raster : options.name
-			// 		},
-			// 		title : options.name,
-			// 		file : fileUuid,
-			// 		metadata : JSON.stringify(meta)
-			// 	}
+				// return as db entry
+				var db = {
+					data : {
+						raster : fileUuid
+					},
+					title : fileUuid,
+					file : fileUuid,
+					metadata : JSON.stringify(meta)
+				}
 
-			// 	console.log('db created'.yellow, db);
-			// 	callback(null, db);
-			// });
+				console.log('db created'.yellow, db);
+				callback(null, db);
+			});
 
 				// var key = results[1];
 				// if (!key) return callback('No key.');
@@ -906,19 +1354,19 @@ module.exports = api.geo = {
 				// }
 
 				// return as db entry
-				var db = {
-					data : {
-						raster : options.name
-					},
-					title : options.name,
-					file : fileUuid,
-					metadata : JSON.stringify(meta)
-				}
-				api.geo.copyToVileRasterFolder(options.path, fileUuid, function (err) {
-					if (err) return callback('copytToVile err: ' + err);
+				// var db = {
+				// 	data : {
+				// 		raster : options.name
+				// 	},
+				// 	title : options.name,
+				// 	file : fileUuid,
+				// 	metadata : JSON.stringify(meta)
+				// }
+				// api.geo.copyToVileRasterFolder(options.path, fileUuid, function (err) {
+				// 	if (err) return callback('copytToVile err: ' + err);
 
-					callback(null, db);
-				});
+				// 	callback(null, db);
+				// });
 		});
 
 		async.waterfall(ops, done);

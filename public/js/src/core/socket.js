@@ -25,6 +25,16 @@ Wu.Socket = Wu.Class.extend({
 		socket.emit('get_server_stats');
 	},
 
+	sendUserEvent : function (options) {
+		// defaults
+		options.user = options.user || app.Account.getFullName();
+		options.timestamp = options.timestamp || Date.now();
+
+		// send event
+		var socket = this._socket;
+		socket.emit('user_event', options);
+	},
+
 	_listen : function () {
 		var socket = this._socket;
 
@@ -56,16 +66,23 @@ Wu.Socket = Wu.Class.extend({
 			console.log('uploadDone!', data);
 
 		});
+		socket.on('downloadReady', function (data) {
+			console.log('downloadReady!', data);
+
+			// select project
+			var event_id = 'downloadReady-' + data.file_id;
+			Wu.Mixin.Events.fire(event_id, {detail : data});
+
+		});
 		socket.on('processingDone', function (data) {
-			console.log('processingDone!!!', data);
 
 			// notify data lib
 			var file_id = data.file_id;
 			var import_took_ms = data.import_took_ms;
 
 			app.Data._onImportedFile(file_id, import_took_ms);
-			
 		});
+		
 		socket.on('errorMessage', function (data) {
 			console.log('errorMessage!', data);
 

@@ -15,8 +15,9 @@ L.Control.Draw = Wu.Control.extend({
 					message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
 				},
 				shapeOptions: {
-					color: 'yellow'
-				}
+					color: 'blue',
+				}, 
+				smoothFactor : 0.5
 			}
 		},
 	},
@@ -122,8 +123,22 @@ L.Control.Draw = Wu.Control.extend({
 			// memorize
 			this._latestFetch = resultObject;
 
+			var layer_name = this._getPostGISLayerName(resultObject.layer_id);
+
+			// analytics/slack
+			app.Analytics.onPolygonQuery({
+				result : resultObject,
+				layer_name : layer_name
+			});
+
 		}.bind(this));
 		
+	},
+
+	_getPostGISLayerName : function (layer_id) {
+		var layer = this._project.getPostGISLayer(layer_id);
+		if (!layer) return 'unknown';
+		return layer.getTitle();
 	},
 
 	_addLayerEvents : function (layer) {
@@ -202,6 +217,26 @@ L.Control.Draw = Wu.Control.extend({
 		if (!layer || !layer.store || !layer.store.data || !layer.store.data.postgis) return false;
 		var layer_id = layer.store.data.postgis.layer_id;
 		return layer_id;
+	},
+
+	_getActiveLayer : function () {
+		var layer_id = this._getActiveLayerID();
+		var layers = app.activeProject.getLayers();
+		var layer = _.find(layers, function (l) {
+			console.log('l: ', l);
+			if (!l.store || !l.store.data) return false;
+			if (l.store.data.postgis) {
+				return l.store.data.postgis == layer_id;
+			}
+			return false;
+		})
+		return layer;
+	},
+
+	_getActiveLayerName : function () {
+		var layer = this._getActiveLayer();
+		if (!layer) return 'No layer';
+		return layer.getTitle();
 	},
 
 	_toggleDraw : function () {
@@ -309,9 +344,6 @@ L.Control.Draw = Wu.Control.extend({
 
 	},
 
-
-	
-
 	_initialize: function (options) {
 
 		// create layer container
@@ -348,8 +380,6 @@ L.Control.Draw = Wu.Control.extend({
 			this._toolbars[L.EditToolbar.TYPE].on('enable', this._toolbarEnabled, this);
 		}
 	},
-
-	
 
 	onAdd: function (map) {
 		var container = L.DomUtil.create('div', 'leaflet-draw'),

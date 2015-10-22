@@ -297,6 +297,9 @@ module.exports = function(grunt) {
 					// Analytics
 					'public/js/src/ext/analytics.js',
 
+					// Satellite angle
+					'public/js/src/ext/satelliteAngle.js',				
+
 					// Config file
 					'public/js/src/config/client-config.js',
 					'public/js/src/lang/language.english.js',
