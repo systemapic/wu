@@ -23,11 +23,11 @@
     }
 
 .c3-header-layer-name {
-    font-size: 18px;
+    font-size: 24px;
     font-weight: 900;
     display: inline-block;
     vertical-align: top; 
-    text-transform: uppercase;  
+    text-transform: capitalize;  
     margin-bottom: 5px; 
     }
 
@@ -99,13 +99,36 @@
 
 #c3-container {
     max-height: 247px !important;
+    margin-right: 15px;
     }
+
+#c3-container:before {
+    content: 'Scroll to zoom';
+    position: absolute;
+    bottom: 11px;
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    font-style: italic; 
+    }
+
+#c3-container:after {
+    content: 'mm';
+    position: absolute;
+    color: #999;
+    left: 9px;
+    bottom: 19px;
+    font-size: 11px;
+    }    
 
 #c3-header-metacontainer {
     margin-right: 0;
     margin-left: 0;
     margin-bottom: 0px;
     line-height: 1.2;
+    position: relative;
+    max-width: 444px;    
     }
 
 .c3-header-metapair {
@@ -161,19 +184,20 @@ g.c3-event-rects.c3-event-rects-multiple rect {
 .c3-tooltip td.value {
     text-align: center;
     font-weight: 900;
-    padding: 2px 0px 2px 0px;
-    font-size: 12px;
+    padding: 4px 4px 2px 5px;
+    font-size: 12px;    
+
     }
 
 .c3-tooltip th {
     font-size: 11px;
     padding: 2px 5px;
-    text-align: left;
     background: white;
     font-weight: 600;
     width: 20px;
     background-color: #666;
     color: white;
+    text-align: center;    
     }
 
 .leaflet-popup-move-button {
@@ -196,3 +220,37 @@ g.c3-event-rects.c3-event-rects-multiple rect {
 .leflet-container.leaflet-popup.tiny-pop-up {
     max-width: 200px;
     }
+
+
+.c3-footer {
+    font-size: 12px;
+    font-weight: 500;
+    padding-left: 30px;
+    padding-right: 20px;
+    position: relative;
+    bottom: 26px;
+    width: 100%;
+    float: right;
+    margin: 0;
+    height: auto;
+    }    
+
+.end-date {
+    float: right;
+    }    
+
+td.name {
+    width: auto;
+    }    
+
+.regression-button-wrapper {
+    position: relative;
+    top: 10px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    margin: 0;
+    }    
+
+input.chart-regression-button {
+    display: inline-block;
+    }    

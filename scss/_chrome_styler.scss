@@ -1,0 +1,36 @@
+/* STYLER */
+/* STYLER */
+/* STYLER */
+
+.chrome-pane.styler {
+
+	.chrome-field-line {
+	  	padding-left: 0px;	
+		}
+
+	.select-field-wrap {
+		margin-top: 1px;
+		float: right;
+		position: relative;	
+		}
+
+	.chrome-color-ball {
+		position: absolute;
+		}
+
+	.select-field-wrap {
+		position: absolute;
+	  	top: 6px;
+		}
+
+	/*.chrome-pane.styler */
+	/*.chrome-metafield-line:last-child {*/
+	.sub-line:last-child {
+		border-bottom: none !important;
+		}
+
+	.chrome-switch-container {
+		top: 10px;
+		}
+
+}

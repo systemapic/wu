@@ -76,39 +76,6 @@ module.exports = api.postgis = {
 	},
 
 
-	downloadDatasetFromLayer : function (req, res) {
-
-		var options = req.body,
-		    layerUuid = options.layer_id,
-		    format = options.format,
-		    ops = [];
-
-		ops.push(function (callback) {
-			Layer
-			.findOne({uuid : layerUuid})
-			.exec(callback);
-		});
-
-		ops.push(function (layer, callback) {
-
-			var options = {
-				database_name 	: layer.data.postgis.database_name,
-				table_name 	: layer.data.postgis.table_name,
-				data_type 	: layer.data.postgis.data_type,
-				query 		: api.postgis._cleanSQLQuery(layer.data.postgis.sql),
-				name 		: layer.title.replace(/ /g,'').replace('.zip', '')
-			}
-
-			// get dataset
-			api.postgis.downloadDataset(options, callback);
-		});
-
-		async.waterfall(ops, function (err, results) {
-			res.end(results);
-		});
-
-	},
-
 	_cleanSQLQuery : function (sql) {
 		var sql = sql;
 		var a = sql.replace('(', '');
@@ -130,56 +97,202 @@ module.exports = api.postgis = {
 		return cleanSQL;
 	},
 
+	_setDownloadProgress : function (options, callback) {
+		var id = 'download_status:' + options.download_status_id;
+		api.redis.layers.set(id, JSON.stringify(options), callback);
+	},
+
+	_getDownloadProgress : function (options, callback) {
+		var id = 'download_status:' + options.download_status_id;
+		api.redis.layers.set(id, callback);
+	},
+
+	// query progress by GET
+	getDownloadProgress : function (req, res) {
+		var options = req.body,
+		    download_status_id = options.download_status_id;
+		
+		if (!download_status_id) return api.error.missingInformation(req, res);
+
+		// get status
+		api.postgis._getDownloadProgress(options, function (err, status) {
+			if (err) return api.error.general(req, res, err);
+
+			// return status
+			res.json(status);
+		});
+	},
+
+
+	downloadDatasetFromLayer : function (req, res) {
+
+		var options = req.body,
+		    layer_id = options.layer_id,
+		    format = options.format,
+		    user = req.user,
+		    ops = [],
+		    layername;
+
+		// set download status is
+		var download_status_id = api.utils.getRandomChars(8);
+		var status = {
+			download_status_id : download_status_id,
+			finished : false,
+			time_start : Date().now,
+			file_id : layer_id
+		}
+
+		// set download status
+		api.postgis._setDownloadProgress(status);
+
+		// return result
+		res.json(status);
+
+		ops.push(function (callback) {
+			Layer
+			.findOne({uuid : layer_id})
+			.exec(callback);
+		});
+
+		ops.push(function (layer, callback) {
+
+			layername = layer.title.replace(/ /g,'').replace('.zip', '');
+
+			var opts = {
+				database_name 	: layer.data.postgis.database_name,
+				table_name 	: layer.data.postgis.table_name,
+				data_type 	: layer.data.postgis.data_type,
+				query 		: api.postgis._cleanSQLQuery(layer.data.postgis.sql),
+				name 		: layername,
+				user 		: req.user
+			}
+
+			// get dataset
+			api.postgis.downloadDataset(opts, callback);
+		});
+
+		async.waterfall(ops, function (err, filepath) {
+
+			var status = {
+				download_status_id : download_status_id,
+				finished : true,
+				filepath : filepath,
+				file_id : layer_id
+			}
+
+			// set download status
+			api.postgis._setDownloadProgress(status);
+
+			// send socket notification (if subscribed)
+			if (options.socket_notification) api.socket.downloadReady({
+				user : req.user,
+				status : status
+			});
+
+			// send to slack
+			api.analytics.downloadedDataset({
+				user : user,
+				filename : layername
+			})
+		});
+
+	},
+
+
 
 	downloadDatasetFromFile: function (req, res) {
 		var options = req.body,
-		    fileUuid = options.file_id,
+		    file_id = options.file_id,
 		    format = options.format,
-		    ops = [];
+		    user = req.user,
+		    ops = [],
+		    filename;
 
+		// set download status is
+		var download_status_id = api.utils.getRandomChars(8);
+		var status = {
+			download_status_id : download_status_id,
+			finished : false,
+			time_start : Date().now,
+			file_id : file_id
+		}
+
+		// set download status
+		api.postgis._setDownloadProgress(status);
+
+		// return result
+		res.json(status);
+
+		// get file
 		ops.push(function (callback) {
 			File
-			.findOne({uuid : fileUuid})
+			.findOne({uuid : file_id})
 			.exec(callback);
 		});
 
 		ops.push(function (file, callback) {
 
 			var table_name = file.data.postgis.table_name;
+			filename = file.name.replace(/ /g,'').replace('.zip', '');
 
 			var options = {
 				database_name 	: file.data.postgis.database_name,
 				table_name 	: file.data.postgis.table_name,
 				data_type 	: file.data.postgis.data_type,
 				query 		: '"SELECT * FROM ' + table_name + '"',
-				name 		: file.name.replace(/ /g,'').replace('.zip', ''),
+				name 		: filename,
+				user 		: req.user
 			}
 
 			// get dataset
 			api.postgis.downloadDataset(options, callback);
 		});
 
-		async.waterfall(ops, function (err, results) {
-			res.end(results);
+		async.waterfall(ops, function (err, filepath) {
+
+			var status = {
+				download_status_id : download_status_id,
+				finished : true,
+				filepath : filepath,
+				file_id : file_id
+			}
+
+			// set download status
+			api.postgis._setDownloadProgress(status);
+
+			// send socket notification (if subscribed)
+			if (options.socket_notification) api.socket.downloadReady({
+				user : req.user,
+				status : status
+			});
+
+			// send to slack
+			api.analytics.downloadedDataset({
+				user : user,
+				filename : filename
+			})
 		});
 	},
 
 	downloadDataset : function (options, done) {
-		
 		var database_name = options.database_name,
 		    table_name = options.table_name,
 		    data_type = options.data_type,
 		    query = options.query,
 		    name = options.name,
+		    user = options.user,
 		    ops = [];
 
 
 		ops.push(function (callback) {
 
+			var sanitize = require("sanitize-filename");
+
+
 			// where to put file
 			var filePath = database_name + '/' + table_name + '/' +  api.utils.getRandomChars(5) + '/',
 			    folder = api.config.path.temp + filePath,
-			    filename = name,
+			    filename = sanitize(name),
 			    output = folder + filename,
 			    returnOutput = filePath + filename,
 			    DOWNLOAD_TABLE_SCRIPT = '../scripts/postgis/download_table.sh';
@@ -340,6 +453,45 @@ module.exports = api.postgis = {
 
 	},
 
+	_getSrid : function (prj, done) {
+
+		if (!prj) return done(null, false);
+
+		fs.readFile(prj, function (err, prj4) {
+			var srid = srs.parse(prj4);
+
+			console.log('got node srid:', srid);
+
+			// if failed, ask boundlessgeo (fml)
+			if (err || !srid.srid) return api.postgis._fetchSrid(prj4, done);
+
+			done(err, srid.srid);
+		});
+	
+	},
+
+	_fetchSrid : function (prj, done) {
+
+		var terms = encodeURIComponent(prj);
+		// http://prj2epsg.org/apidocs.html
+		var url = 'http://prj2epsg.org/search.json?mode=wkt&terms=' + terms;
+		var options = {
+			url: url,
+			method: 'GET',
+		}
+
+		// Start the request
+		request(options, function (error, response, body) {
+			if (!error && response.statusCode == 200) {
+				var srids = JSON.parse(body);
+				console.log('got internet srid: ', srids);
+				var srid = srids.codes[0].code;
+				done(null, srid);
+			}
+		});
+
+	},
+
 
 	importShapefile : function (options, done) {
 		var files 	= options.files,
@@ -359,22 +511,17 @@ module.exports = api.postgis = {
 		// read projection
 		ops.push(function (callback) {
 
-			if (prjfile) {
-				fs.readFile(prjfile, function (err, prj4) {
-					var srid = srs.parse(prj4);
-					callback(err, srid);
-				});
-			} else {
-				// no prj file
-				callback(null, false);
-			}
+			// get srid
+			api.postgis._getSrid(prjfile, callback);
 		});
 
 
 		// import with bash script
 		ops.push(function (srid, callback) {
 
-			var srid_converted = srid.srid;// + ':3857';  // convert on import. todo: create the_geom + the_geom_webmercator columns after import instead
+			console.log('final srid: ', srid);
+
+			var srid_converted = srid;// + ':3857';  // convert on import. todo: create the_geom + the_geom_webmercator columns after import instead
 
 			// create database script
 			var cmd = [
@@ -385,10 +532,16 @@ module.exports = api.postgis = {
 				srid_converted
 			].join(' ');
 
+
+			console.log('import shaepfile cmd: ', cmd);
+
 			// import to postgis
 			var startTime = new Date().getTime();
 			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
-				if (err) console.log('import_shapefile_script err: ', err);
+				console.log('srr, std', err, stdout);
+				if (err) {
+					console.log('import_shapefile_script err: ', err, stdout);
+				}
 
 				var endTime = new Date().getTime();
 
@@ -740,48 +893,48 @@ module.exports = api.postgis = {
 		});
 
 		
-		// get histograms
-		ops.push(function (callback) {
+		// // get histograms
+		// ops.push(function (callback) {
 
-			var columns = metadata.columns._columns;
-			var histogram = {};
+		// 	var columns = metadata.columns._columns;
+		// 	var histogram = {};
 
-			async.each(columns, function (column, cb) {
+		// 	async.each(columns, function (column, cb) {
 
-				api.postgis.fetchHistogram({
-					database_name : postgis_db,
-					table_name : file_id, 
-					num_buckets : api.config.postgis.filters.num_buckets,
-					column : column
-				}, function (err, histo) {
-					if (err) console.log('hisgto err', err);
+		// 		api.postgis.fetchHistogram({
+		// 			database_name : postgis_db,
+		// 			table_name : file_id, 
+		// 			num_buckets : api.config.postgis.filters.num_buckets,
+		// 			column : column
+		// 		}, function (err, histo) {
+		// 			if (err) console.log('hisgto err', err);
 
-					histogram[column] = histo;
-					cb(null);
-				});
-
-
-			}, function (err, results) {
-
-				// set histogram to meta
-				metadata.histogram = histogram;
-
-				callback();
-			})
+		// 			histogram[column] = histo;
+		// 			cb(null);
+		// 		});
 
 
-		});
+		// 	}, function (err, results) {
+
+		// 		// set histogram to meta
+		// 		metadata.histogram = histogram;
+
+		// 		callback();
+		// 	})
+
+
+		// });
 
 
 		// get geometry type
 		ops.push(function (callback) {
 
 			// do sql query on postgis
-			var GET_HISTOGRAM_SCRIPT = '../scripts/postgis/get_geometry_type.sh';
+			var GET_GEOMETRY_TYPE_SCRIPT = '../scripts/postgis/get_geometry_type.sh';
 
 			// st_extent script 
 			var command = [
-				GET_HISTOGRAM_SCRIPT, 	// script
+				GET_GEOMETRY_TYPE_SCRIPT, // script
 				postgis_db, 	// database name
 				file_id,	// table
 			].join(' ');
@@ -801,7 +954,6 @@ module.exports = api.postgis = {
 					} catch (e) {};
 				});
 
-				console.log('geometry type result: ', result);
 				metadata.geometry_type = result[0].st_geometrytype;
 
 				callback(null, result);
@@ -875,6 +1027,8 @@ module.exports = api.postgis = {
 				query : 'SELECT ST_GeometryType(geom) from "' + file_id + '" limit 1'
 			}, function (err, results) {
 				if (err) return callback(err);
+				console.log('results', results);
+				if (!results || !results.rows || !results.rows.length) return callback('The dataset contains no valid geodata.');
 				var geometry_type = results.rows[0].st_geometrytype.split('ST_')[1];
 				callback(null, geometry_type);
 			})

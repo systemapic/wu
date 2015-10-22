@@ -34,14 +34,17 @@ L.Control.Description = Wu.Control.extend({
 
 		// header
 		this._header = Wu.DomUtil.create('div', 'description-control-header-section', this._inner);
-		// this._title = Wu.DomUtil.create('div', 'description-control-header-title', this._header);
-		this._toggle = Wu.DomUtil.create('div', 'description-control-header-toggle', this._multipleLegendOuter);
+
+		this._toggle = Wu.DomUtil.create('div', 'description-control-header-toggle', this._multipleLegendOuter);		
 
 		// description
 		this._description = Wu.DomUtil.create('div', 'description-control-description displayNone', this._inner);
 
 		// meta
-		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._inner);
+		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._inner);		
+
+		// init satellite path container
+		this.satelliteAngle = new Wu.satteliteAngle({angle : false, path: false, appendTo : this._inner});
 
 		// legend
 		this._legendContainer = Wu.DomUtil.create('div', 'description-control-legend-container', this._inner);
@@ -52,11 +55,10 @@ L.Control.Description = Wu.Control.extend({
 		// add tooltip
 		app.Tooltip.add(this._container, 'Shows layer information', { extends : 'systyle', tipJoint : 'left' });
 			       
-	
+
+		// add event hooks
 		this._addHooks();
-
 	},
-
 
 	_addHooks : function () {
 		
@@ -65,10 +67,7 @@ L.Control.Description = Wu.Control.extend({
 	
 		// prevent map double clicks
 		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
-		// Wu.DomEvent.on(this._button,    'mousedown mouseup click dblclick',  Wu.DomEvent.stopPropagation, this);
-
 	},
-
 	
 	_isActive : function () {
 		if (!this._project) return false;
@@ -81,6 +80,10 @@ L.Control.Description = Wu.Control.extend({
 		this.toggleScale(true);
 	},
 
+	hide : function () {
+		if (!this._container) return;
+		this._hide();
+	},
 
 	_show : function () {
 		this.refresh();
@@ -100,7 +103,6 @@ L.Control.Description = Wu.Control.extend({
 
 		this._container.style.display = 'block';
 		this.isOpen = true;
-
 	},
 
 	_hide : function () {	
@@ -114,7 +116,6 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_clear : function () {
-		
 		this.isOpen = false;
 		this.toggleScale(false);
 	},
@@ -138,20 +139,27 @@ L.Control.Description = Wu.Control.extend({
 
 	},
 
-	_addTo : function () {
+	_onLayerStyleEdited   : function (e) {
+		var layer = e.detail.layer;
+		this._refreshLayer(layer);
+	},
 
+	_addTo : function () {
 		this.addTo(app._map);
 		this._initContainer();
 		this._addHooks();
 		this._added = true;
 	},	
 
+	_refreshLayer : function (layer) {
+
+		// get layer
+		this.layers[layer.getUuid()] = layer;
 
 
-	// TOGGLE FULL SIZE/SMALL SIZE
-	// TOGGLE FULL SIZE/SMALL SIZE
-	// TOGGLE FULL SIZE/SMALL SIZE
-
+		this.setHTMLfromStore(layer.getUuid());
+		this.updateMultiple(layer.getUuid());
+	},
 
 	toggle : function () {
 		if ( !this.isCollapsed ) this.isCollapsed = false;
@@ -166,11 +174,13 @@ L.Control.Description = Wu.Control.extend({
 		Wu.DomUtil.removeClass(this._header, 'minimized');		
 
 		var description = this._description.innerHTML;
-		if ( description && description != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
+		if (description && description != '') Wu.DomUtil.removeClass(this._description, 'displayNone');
 		
 		Wu.DomUtil.removeClass(this._metaContainer, 'displayNone');
 		Wu.DomUtil.removeClass(this._toggle, 'legend-toggle-open');
 
+
+		if ( !this.satelliteAngle.closed ) Wu.DomUtil.removeClass(this.satelliteAngle._innerContainer, 'displayNone');
 	},
 
 	toggleClose : function () {
@@ -184,28 +194,21 @@ L.Control.Description = Wu.Control.extend({
 		Wu.DomUtil.addClass(this._metaContainer, 'displayNone');		
 		Wu.DomUtil.addClass(this._toggle, 'legend-toggle-open');
 
+
+		Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
 	},
-
-
-
-
-
-
-
-	// xoxoxox
 
 	_addLayer : function (layer) {
 
-		if ( !this.layers ) this.layers = {};
+		this.layers = this.layers || {};
 
 		var layerUuid = layer.getUuid();
-		this.layers[layerUuid] = this.storeLegendData(layer);
+		this.layers[layerUuid] = layer;
 
 		this.setHTMLfromStore(layerUuid);
 
 		// For multiple layers
 		this.updateMultiple(layerUuid);
-
 	},
 
 	_removeLayer : function (layer) {
@@ -224,11 +227,17 @@ L.Control.Description = Wu.Control.extend({
 		this.updateMultiple(first);
 
 		this.refresh();
-
 	},
 
-
 	updateMultiple : function (layerUuid) {
+
+		console.log('');
+		console.log('%c updateMultiple ', 'background: red; color: white;');
+		console.log('this.layers', this.layers);
+		console.log('');
+		console.log('');
+
+		if ( this.isCollapsed ) Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
 
 		var wrapper = this._multipleLegendInner;
 		wrapper.innerHTML = '';
@@ -240,7 +249,10 @@ L.Control.Description = Wu.Control.extend({
 
 		for ( var uuid in this.layers ) {
 
-			var title = this.layers[uuid].title;
+			var layer = this.layers[uuid];
+
+			// var title = this.layers[uuid].title;
+			title = layer.getTitle();
 			var multipleLayer = Wu.DomUtil.create('div', 'each-multiple-description', wrapper, title);
 			    multipleLayer.id = 'mulitidec_' + uuid;
 
@@ -254,11 +266,9 @@ L.Control.Description = Wu.Control.extend({
 			}
 
 			Wu.DomEvent.on(multipleLayer, 'click', this.toggleLegend, this);
-	
 		}
 	},
 
-	// xoxoxox
 	toggleLegend : function (e) {
 
 		var id = e.target.id;
@@ -272,10 +282,7 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 
-	// Store legend data ...
-	// Store legend data ...
 	// Store legend data ...		
-
 	storeLegendData : function (layer) {
 
 		// Hard coded key
@@ -308,72 +315,166 @@ L.Control.Description = Wu.Control.extend({
 		legendObj.description_meta = {
 			'Number of points' : num_points,
 			'Covered area (km<sup>2</sup>)' : area,
-			'Data size' : size_bytes,
 			'Start date' : startend.start,
 			'End date' : startend.end
 		}
 
-		
 		// COLOR RANGE
-		if ( style && style[key].color.range ) {
+		if ( style && style[key].color.column ) {
 
 			var colorStops = style[key].color.value;
-			var customMinMax = style[key].color.customMinMax;
-			var minMax = style[key].color.minMax
+			// var customMinMax = style[key].color.customMinMax;
+			var minMax = style[key].color.range;
 
-			if ( customMinMax[0] != null || customMinMax[0] != NaN || customMinMax[0] != '' ) {
-				var min = customMinMax[0];
-			} else {
-				var min = minMax[0];
-			}
-
-			if ( customMinMax[1] != null || customMinMax[1] != NaN || customMinMax[1] != '' ) {
-				var max = customMinMax[1];
-			} else {
-				var max = minMax[1];
-			}
-
+			var min = minMax[0];
+			var max = minMax[1];
 
 			// create legend
 			var gradientOptions = {
 				colorStops : colorStops,
-				minVal : customMinMax[0],
-				// medVal : (customMinMax[0]+customMinMax[1]),
-				maxVal : customMinMax[1],
+				minVal : minMax[0],
+				maxVal : minMax[1],
 				bline : 'Velocity (mm pr. year)'
 			}
 
 			legendObj.legendHTML = this.gradientLegend(gradientOptions);
 
 		} else {
-
-			legendObj.legendHTML = 'TODO: Create legend for static colors!';
-
+			legendObj.legendHTML = '';
 		}
 
 		return legendObj;
+	},
 
+
+	getLegend : function (layer) {
+
+		// get styling
+		var style = layer.getStyling();
+
+		
+		// point
+		if (style && style.point && style.point.color && style.point.color.column) {
+
+			var colorStops = style.point.color.value;
+			var minMax = style.point.color.range
+			var min = minMax[0];
+			var max = minMax[1];
+			var bline = this._getLegendCaption(style.point.color);
+
+			// create legend
+			var gradientOptions = {
+				colorStops : colorStops,
+				minVal : minMax[0],
+				maxVal : minMax[1],
+				bline : bline
+			}
+
+			var legendHTML = this.gradientLegend(gradientOptions);
+
+		// polygon
+		} else if (style && style.polygon && style.polygon.color && style.polygon.color.column) {
+
+			var colorStops = style.polygon.color.value;
+			var minMax = style.polygon.color.range
+			var min = minMax[0];
+			var max = minMax[1];
+			var bline = this._getLegendCaption(style.polygon.color);
+
+			// create legend
+			var gradientOptions = {
+				colorStops : colorStops,
+				minVal : minMax[0],
+				maxVal : minMax[1],
+				bline : bline
+			}
+
+			var legendHTML = this.gradientLegend(gradientOptions);
+
+		// catch-all
+		} else {
+
+			var legendHTML = '';
+
+		}
+
+		return legendHTML;
+
+	},
+
+	_getLegendCaption : function (color) {
+
+		var column = color.column;
+
+		if (column) {
+
+			// special case
+			if (column == 'vel' || column == 'mvel') {
+				return 'Velocity (mm/year)'
+			}
+
+			// camelize, return
+			return column;
+		}
+
+		return '';
+
+	},
+
+	getMetaDescription : function (layer) {
+
+		var meta = layer.getMeta();
+
+		// set geom type
+		var geom_type = 'items'
+		if (meta.geometry_type == 'ST_Point') geom_type = 'points';
+		if (meta.geometry_type == 'ST_MultiPolygon') geom_type = 'polygons';
+
+		// create description meta
+		var area = Math.floor(meta.total_area / 1000000 * 100) / 100;
+		var num_points = meta.row_count;
+		var startend = this._parseStartEndDate(meta);
+
+		description_meta = {};
+		description_meta['Number of ' + geom_type] = num_points;
+		description_meta['Covered area (km<sup>2</sup>)'] = area;
+		
+		if (startend.start != startend.end) {
+			description_meta['Start date'] = startend.start;
+			description_meta['End date'] = startend.end;
+		}
+
+
+		return description_meta;
 	},
 
 
 	setHTMLfromStore : function (uuid) {
 
-		var layer = this.layers[uuid];
+		// var layer = this.layers[uuid];
+		var layer = this._project.getLayer(uuid);
 
+		if ( !layer ) return;
+		
 		// Title
-		var title = layer.title;
+		var title = layer.getTitle();
 		
 		// Description
-		var description = layer.description;
+		var description = layer.getDescription();
 		
 		// Description meta
-		var descriptionMeta = layer.description_meta;
+		var descriptionMeta = this.getMetaDescription(layer);
 
 		// Legend
-		var legend = layer.legendHTML;
+		var legend = this.getLegend(layer);
 
-		// Set title
-		// this.setTitleHTML(title);
+		// var _layer = this._project.getLayer(uuid);
+		var satPos = Wu.parse(layer.getSatellitePosition());
+
+		var _angle = satPos.angle;
+		var _path  = satPos.path;
+
+		this.satelliteAngle.update({angle : _angle, path : _path});
 
 		// Set description
 		this.setDescriptionHTML(description);
@@ -386,43 +487,12 @@ L.Control.Description = Wu.Control.extend({
 
 	},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	// SET HTML SET HTML SET HTML
-	// SET HTML SET HTML SET HTML
-	// SET HTML SET HTML SET HTML
-
-	// setTitleHTML : function (title) {
-	// 	this._title.innerHTML = title;
-	// },
-
 	setMetaHTML : function (meta) {
 
 		// Clear container
 		this._metaContainer.innerHTML = '';
 
 		for (var key in meta) {
-
 			var val = meta[key]
 
 			// Make new content	
@@ -436,37 +506,17 @@ L.Control.Description = Wu.Control.extend({
 		this._legendContainer.innerHTML = HTML;
 	},
 
-
 	setDescriptionHTML : function (text) {
 		if ( !text || text != '' ) Wu.DomUtil.removeClass(this._description, 'displayNone');
 		if ( this.isCollapsed ) Wu.DomUtil.addClass(this._description, 'displayNone');
 		this._description.innerHTML = text;
 	},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	// HELPERS HELPERS HELPERS
-	// HELPERS HELPERS HELPERS
-	// HELPERS HELPERS HELPERS
-
 	_parseStartEndDate : function (meta) {
 
 		// get all columns with dates
 		var columns = meta.columns;
-
 		var times = [];
 
 		for (var c in columns) {
@@ -512,7 +562,6 @@ L.Control.Description = Wu.Control.extend({
 		gradientStyle    += 'background: -moz-linear-gradient(right, '  + colorStops.join() + ');';
 		gradientStyle    += 'background: linear-gradient(to right, '    + colorStops.join() + ');';
   
-
 		// Container
 		var _legendHTML = '<div class="info-legend-container">';
 
@@ -534,25 +583,18 @@ L.Control.Description = Wu.Control.extend({
 		return _legendHTML;
 	},	
 
-
 	isEmpty : function (obj) {
-	    for(var prop in obj) {
-	        if(obj.hasOwnProperty(prop))
-	            return false;
-	    }
+		for(var prop in obj) {
+			if (obj.hasOwnProperty(prop)) return false;
+		}
 
-	    return true;
+		return true;
 	},
 
 
 
 	// EXTERNAL EXTERNAL EXTERNAL
-	// EXTERNAL EXTERNAL EXTERNAL
-	// EXTERNAL EXTERNAL EXTERNAL
-
 	// Toggle scale/measure/mouseposition corner
-	// Toggle scale/measure/mouseposition corner
-
 	toggleScale : function (openDescription) {
 
 		if ( !app._map._controlCorners.topright ) return;
@@ -562,11 +604,19 @@ L.Control.Description = Wu.Control.extend({
 		} else {
 			Wu.DomUtil.removeClass(app._map._controlCorners.topright, 'toggle-scale');
 		}
+	},
+
+	_on : function () {
+
+		this._show();
 
 	},
 
+	_off : function () {
 
+		this._hide();
 
+	},
 
 
 	

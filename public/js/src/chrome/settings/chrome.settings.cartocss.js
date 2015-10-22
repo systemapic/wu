@@ -374,12 +374,14 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 
 
 	_showEditors : function () {
+		if (!this._cartoEditor) return console.error('no cartoEditor');
 		this._cartoEditor.getWrapperElement().style.opacity = 1;
 		this._cartotitle.style.opacity = 1;
 		this._refreshButton.style.opacity = 1;
 	},
 
 	_hideEditors : function () {
+		if (!this._cartoEditor) return console.error('no cartoEditor');
 		this._cartoEditor.getWrapperElement().style.opacity = 0;
 		this._cartotitle.style.opacity = 0;
 		this._refreshButton.style.opacity = 0;

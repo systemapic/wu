@@ -1,7 +1,10 @@
 Wu.User = Wu.Class.extend({ 
 
 	initialize : function (store) {
+
+		// set vars
 		this.store = store;
+
 		this.lastSaved = _.cloneDeep(store);
 
 		// init file objects
@@ -17,7 +20,7 @@ Wu.User = Wu.Class.extend({
 
 		// create
 		files.forEach(function (file) {
-			this._files[file.uuid] = new Wu.Files(file);
+			this._files[file.uuid] = new Wu.Model.File(file);
 		}, this);
 	},
 
@@ -39,7 +42,7 @@ Wu.User = Wu.Class.extend({
 
 	setFile : function (file) {
 		this.store.files.push(file);
-		this._files[file.uuid] = new Wu.Files(file);
+		this._files[file.uuid] = new Wu.Model.File(file);
 		return this._files[file.uuid];
 	},
 
@@ -217,6 +220,19 @@ Wu.User = Wu.Class.extend({
 
 	getUuid : function () {
 		return this.store.uuid;
+	},
+
+
+	setRoles : function (roles) {
+		this._roles = [];
+		roles.forEach(function (r) {
+			var role = new Wu.Role({role : r});
+			this._roles.push(role);
+		}, this);
+	},
+
+	getRoles : function () {
+		return this._roles;
 	},
 
 

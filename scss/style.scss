@@ -5,6 +5,11 @@ $ecolor2: #3F4652;
 $translight: rgba(255, 255, 255, 0.15);
 $translighter: rgba(255, 255, 255, 0.075);
 
+$green: #71C4A8;
+$greenHover: #67B097;
+$greenActive: #5a9b87;
+
+
 
 // FONT-WEIGHT
 // Cannot be 100 as it renders too thin with fonth smoothing
@@ -22,10 +27,16 @@ $obese: 600;
 @import 'custom_imported';	// Rules copied from 3rd party stylesheets
 @import 'kits';			// All the webkit, moz, etc transitions and other properties
 @import 'startPane';		// Twirling map...
-@import 'shame';		// Basic shamefull CSS writing
-@import 'pointer_events';	// For å rydde opp i pointer eventsa
+@import 'buttons';		// Buttons and such
 @import 'chrome';		// Chrome
+@import 'chrome_styler';	// Chrome
+@import 'chrome_tooltip';	// Chrome
+@import 'chrome_filter';	// Chrome
+@import 'chrome_share';		// Chrome
+@import 'chrome_data';		// Chrome
+@import 'chrome_extras';	// Chrome
 @import 'c3chart';		// Chart for Globesar pop-ups
+@import 'shame';		// Basic shamefull CSS list-line
 
 
 /* @import 'color_picker';	// Color picker */

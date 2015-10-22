@@ -157,7 +157,7 @@ function submitNewPassword () {
 		var result = JSON.parse(body);
 		if (result.err) return console.error(result.err);
 
-		var form = document.getElementById('login-form');
+		var form = document.getElementById('login-form2');
 		var e = document.getElementById('input-email');
 		var p = document.getElementById('input-pass');
 

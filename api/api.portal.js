@@ -21,6 +21,7 @@ var uuid 	= require('node-uuid');
 var util 	= require('util');
 var utf8 	= require("utf8");
 var mime 	= require("mime");
+var path 	= require('path');
 var exec 	= require('child_process').exec;
 var dive 	= require('dive');
 var async 	= require('async');
@@ -51,9 +52,11 @@ module.exports = api.portal = {
 		    hotlink = {
 			client : client,
 			project : project
-		};
+		    };
 
 		if (req.isAuthenticated()) {
+
+			console.log('REQ AUTH?', req.isAuthenticated);
 			req.session.hotlink = hotlink;
 			res.render('../../views/app.serve.ejs', {
 				hotlink : hotlink || {},
@@ -72,10 +75,12 @@ module.exports = api.portal = {
 	},
 
 	login : function (req, res) {
-		res.render('../../views/login.serve.ejs', { message: req.flash('loginMessage') });
+		res.render(path.join(__dirname, '../views/login.serve.ejs'), { message: req.flash('loginMessage') });
 	},
 
 	invite : function (req, res) {
+
+		console.log('api.portal.invite');
 
 		// get client/project
 		var path = req.originalUrl.split('/');
@@ -179,7 +184,7 @@ module.exports = api.portal = {
 
 		// print debug
 		api.portal.printDebug(req);
-		
+
 		// options
 		var options = req.body,
 		    account = req.user,
@@ -196,7 +201,13 @@ module.exports = api.portal = {
 			}, function (err, project_json) {
 				callback(null, project_json);
 			});
-		}		
+		}	
+
+		a.roles = function (callback) {
+			api.user._getRoles({
+				user : account
+			}, callback);
+		}	
 
 		// get account
 		a.account = function (callback) {
@@ -254,7 +265,7 @@ module.exports = api.portal = {
 	},
 
 	printDebug : function (req) {
-		console.log('\033[2J');
+		console.log('_______________________________________________________________________'.yellow);
 		console.log('Logged in user:'.yellow);
 		console.log('  Name:  ' + req.user.firstName + ' ' + req.user.lastName);
 		console.log('  Uuid:  ' + req.user.uuid);
@@ -264,6 +275,5 @@ module.exports = api.portal = {
 		console.log('_______________________________________________________________________'.yellow);
 		console.log('');
 	},
-
 
 }

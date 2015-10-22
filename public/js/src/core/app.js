@@ -1,4 +1,4 @@
-Wu.version = '1.2.1';
+Wu.version = '1.3.0';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -32,7 +32,7 @@ Wu.App = Wu.Class.extend({
 		Wu.setOptions(this, options);
 
 		// Init analytics
-		this._initAnalytics();
+		// this._initAnalytics();
 
 		// set page title
 		document.title = this.options.portalTitle;
@@ -40,11 +40,18 @@ Wu.App = Wu.Class.extend({
 		// get objects from server
 		this.initServer();
 
+		// init sniffers
+		this._initSniffers();
+	},
+
+	_initSniffers : function () {
+
 		// Detect mobile devices
 		this.detectMobile();
 
+		// get user agent
+		this.sniffer = Sniffer(navigator.userAgent);
 	},
-
 	
 	setAccessTokens : function () {
 
@@ -66,23 +73,35 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_initErrorHandling : function () {
-		window.onerror = function (message, file, line, char, ref) {
-			
-			var stack = ref.stack;
-			var project = app.activeProject ? app.activeProject.getTitle() : 'No active project';
-			var username = app.Account ? app.Account.getName() : 'No username';
-			
-			var options = JSON.stringify({
-				message : message,
-				file : file,
-				line : line,
-				user : username,
-				stack : stack,
-				project : project
-			});
 
-			Wu.save('/api/error/log', options);
-		}
+		// log all errors
+		window.onerror = this._onError;
+
+		// forward console.error's to log also
+		// console.error = function (message) {
+		// 	try { throw Error(message); } 
+		// 	catch (e) {}
+		// }
+	},
+
+	_onError : function (message, file, line, char, ref) {
+
+		console.log('ionerror');
+			
+		var stack = ref.stack;
+		var project = app.activeProject ? app.activeProject.getTitle() : 'No active project';
+		var username = app.Account ? app.Account.getName() : 'No username';
+		
+		var options = JSON.stringify({
+			message : message,
+			file : file,
+			line : line,
+			user : username,
+			stack : stack,
+			project : project
+		});
+
+		Wu.save('/api/error/log', options);
 	},
 
 	_checkForInvite : function () {
@@ -139,6 +158,28 @@ Wu.App = Wu.Class.extend({
 
 		// debug
 		this._debug();
+
+		// analytics
+		this._logEntry();
+
+		this.Analytics = new Wu.Analytics();
+
+	},
+
+	_logEntry : function () {
+
+		var b = this.sniffer.browser;
+		var o = this.sniffer.os;
+
+		var browser = b.fullName + ' ' + b.majorVersion + '.' + b.minorVersion;
+		var os = o.fullName + ' ' + o.majorVersion + '.' + o.minorVersion;
+
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'entered',
+		    	description : 'the wu: `' + browser + '` on `' + os + '`',
+		    	timestamp : Date.now()
+		});
 	},
 
 	_initAnalytics : function () {
@@ -155,6 +196,7 @@ Wu.App = Wu.Class.extend({
 
 		// main user account
 		this.Account = new Wu.User(this.options.json.account);
+		this.Account.setRoles(this.options.json.roles);
 
 		// create user objects
 		this.Users = {};
@@ -226,8 +268,12 @@ Wu.App = Wu.Class.extend({
 		// render eror pane
 		this.FeedbackPane = new Wu.FeedbackPane();
 
+		// settings pane
+		this.MapSettingsPane = new Wu.MapSettingsPane();
+
 		// share pane
 		this.Share = new Wu.Share();
+
 	},
 
 
@@ -538,7 +584,7 @@ Wu.App = Wu.Class.extend({
 		}
 
 		// acticate legends for baselayers
-		app.MapPane._controls.legends.refreshAllLegends();
+		// app.MapPane._controls.legends.refreshAllLegends();
 
 		// remove startpane
 		if (this.StartPane) this.StartPane.deactivate();
@@ -547,7 +593,7 @@ Wu.App = Wu.Class.extend({
 		isThumb ? app.Style.phantomJSthumb() : app.Style.phantomJS();
 
 		// avoid Loading! etc in status
-		app.setStatus('systemapic'); // too early
+		// app.setStatus('systemapic'); // too early
 
 	},
 	

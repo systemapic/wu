@@ -23,6 +23,7 @@ Wu.Control = L.Control.extend({
 		Wu.Mixin.Events.on('layerDisabled',   this._layerDisabled, this);
 		Wu.Mixin.Events.on('layerAdded',      this._onLayerAdded, this);
 		Wu.Mixin.Events.on('layerEdited',     this._onLayerEdited, this);
+		Wu.Mixin.Events.on('layerStyleEdited',this._onLayerStyleEdited, this);
 		Wu.Mixin.Events.on('layerDeleted',    this._onLayerDeleted, this);
 		
 		Wu.Mixin.Events.on('fileImported',    this._onFileImported, this);
@@ -31,7 +32,6 @@ Wu.Control = L.Control.extend({
 
 	_projectSelected : function (e) {
 		var projectUuid = e.detail.projectUuid;
-
 		if (!projectUuid) {
 			this._project = null;
 			return this._off();
@@ -44,7 +44,7 @@ Wu.Control = L.Control.extend({
 	},
 
 	// dummies
-	_initialize 	: function () {},
+	_initialize 	 : function () {},
 	_editEnabled 	 : function () {},
 	_editDisabled 	 : function () {},
 	_layerEnabled 	 : function () {},
@@ -55,7 +55,8 @@ Wu.Control = L.Control.extend({
 	_onFileDeleted   : function () {},
 	_onLayerAdded    : function () {},
 	_onLayerEdited   : function () {},
+	_onLayerStyleEdited   : function () {},
 	_onLayerDeleted  : function () {},
-
+	_off 		 : function () {},
 
 });

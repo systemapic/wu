@@ -45,13 +45,13 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 	_refresh : function () {
 
-		// this._flush();
+		if ( this._inited ) this._flush();
 		this._initLayout();
 	},
 
 	_flush : function () {
 
-		this._container.innerHTML = '';
+		this._midSection.innerHTML = '';
 	},
 
 	// Runs on init
@@ -100,7 +100,6 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 		// If no tooltip meta stored, create from layer meta
 		if ( !this.tooltipMeta ) this.tooltipMeta = this.createTooltipMeta(layerMeta);
 
-		// this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
 		this._fieldsWrapper.innerHTML = '';
 
 		// Init title
@@ -111,6 +110,7 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 
 		// Initialize fields
 		this.initFields();
+
 	},
 
 	// Title
@@ -139,6 +139,275 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	// Description
 	initDescription : function () {
 	},
+
+
+	// Init meta fields and time series
+	initFields : function () {
+
+		this.fieldListFromObject('Fields');
+		if ( this.tooltipMeta.timeSeries ) this.initTimeSeries();
+	},
+
+	// Creates section with meta field lines
+	fieldListFromObject : function (title, timeSeries) {
+
+		var fields = timeSeries ? this.tooltipMeta.timeSeries : this.tooltipMeta.metaFields;
+
+		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
+		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, title);
+
+		// Function that saves on blur/click
+		var saveFunction = timeSeries ? this._saveSwitchTimeSeries : this._saveSwitch;
+
+		var hasInput = timeSeries ? false : true;
+
+		for ( var key in fields ) {
+			
+			var isOn = fields[key].on;
+			var title = fields[key].title;
+
+			// Block 
+			if ( key == 'enable' || key == 'minmaxRange' || key == 'graphstyle' ) return;
+
+			var line = new Wu.fieldLine({
+				id       : key,
+				appendTo : sectionWrapper,
+				title    : title,
+				input    : hasInput,
+				fn 	 : this._saveFromBlur.bind(this),
+			});		
+
+			var _switch = new Wu.button({
+				id 	 : key,
+				type 	 : 'switch',
+				isOn 	 : isOn,
+				right 	 : false,
+				appendTo : line.container,
+				fn       : saveFunction.bind(this)
+			});
+
+
+
+		}
+	},
+
+	// Cretes section with time series
+	initTimeSeries : function () {
+
+		var timeSeries = this.tooltipMeta.timeSeries;
+
+		// Wrapper
+		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)		
+		
+		// Header
+		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, 'Time series');
+		var headerExtra = Wu.DomUtil.create('span', 'chrome-content-header-gray', header, ' (auto detected)');
+
+
+		// Time series switch
+		// Time series switch
+		// Time series switch
+
+		var timeSeriesLine = new Wu.fieldLine({
+			id       : 'enable',
+			appendTo : sectionWrapper,
+			title    : 'Enable time series',
+			input    : false,
+		});		
+
+		var timeSeriesSwitch = new Wu.button({
+			id 	 : 'enable',
+			type 	 : 'switch',
+			isOn 	 : this.tooltipMeta.timeSeries.enable,
+			right 	 : false,
+			appendTo : timeSeriesLine.container,
+			fn 	 : this._saveSwitch.bind(this),
+		});
+
+
+
+		// RANGE
+		// RANGE
+		// RANGE
+
+		var rangeLine = new Wu.fieldLine({
+			id       : 'minmaxRange',
+			appendTo : sectionWrapper,
+			title    : 'Range',
+			input    : false,
+		})
+
+		var rangeMiniInput = new Wu.button({
+			id 	    : 'minmaxRange',
+			type 	    : 'miniInput',
+			right 	    : false,
+			isOn        : true,
+			appendTo    : rangeLine.container,
+			value       : this.tooltipMeta.timeSeries.minmaxRange,
+			placeholder : 'auto',
+			tabindex    : 1,
+			fn 	    : this._saveMiniBlur.bind(this),
+		})
+
+
+
+		// Create list of time series fields
+		this.fieldListFromObject('Time Series Fields', true);
+	},	
+	
+
+	// Save title
+	saveTitle : function (e) {
+
+		this.tooltipMeta.title = e.target.value;
+		this._layer.setTooltip(this.tooltipMeta);
+	},
+
+	// Saves tiny input to right
+	_saveMiniBlur : function (e) {
+
+		var key   = e.target.id.substring(17, e.target.id.length)
+		var value = e.target.value;
+
+		this._saveToServer(key, value);
+	},
+
+	// Save input fields in meta field lines
+	_saveFromBlur : function (e) {
+	
+		var key   = e.target.id.substring(12, e.target.id.length);
+		var title = e.target.value;
+		
+		var thisSwitch = Wu.DomUtil.get('switch_' + key);
+		var thisSwitchState = thisSwitch.getAttribute('state');
+
+		// var on = thisSwitchState ? true : false;
+		if ( thisSwitchState == 'true' ) {
+			var on = true;
+		} else {
+			var on = false;
+		}
+
+		this._saveToServer(key, on, title);
+	},
+
+	// Saves switches, etc
+	_saveSwitch : function (e, on) {
+
+		var elem = e.target;
+		var key  = elem.getAttribute('key');
+
+		var titleField = Wu.DomUtil.get('field_input_' + key);
+		var title      = titleField ? titleField.value : false;
+
+
+		// If no title, set to false
+		var title = titleField ? titleField.value : false;
+
+		// Save to server
+		this._saveToServer(key, on, title);
+	},
+
+	_saveSwitchTimeSeries : function (e, on) {
+
+		var elem = e.target;
+		var key  = elem.getAttribute('key');
+
+		var titleField = Wu.DomUtil.get('field_input_' + key);
+		var title      = titleField ? titleField.value : false;
+
+		// If no title, set to false
+		var title = titleField ? titleField.value : false;
+
+		// Save to server
+		this._saveToServer(key, on, title);
+	},
+
+
+
+
+	_saveToServer : function (key, value, title) {
+
+		if ( key == 'enable' || key == 'minmaxRange' || key == 'graphstyle' ) {
+			
+			// Update object
+			this.tooltipMeta.timeSeries[key] = value;
+
+			// Save to server
+			this._layer.setTooltip(this.tooltipMeta);
+
+		} else {
+
+			// Check if key is date	
+			var keyIsDate = this._validateDateFormat(key);
+			
+			// If key is date, try to update timeseries
+			if ( keyIsDate ) var timeUpdated = this.updateTimeSeriesMeta(key, title, value);
+			
+			// If key is not date, or could not be found in time series, go through metafields
+			if ( !timeUpdated || !keyIsDate ) this.updateMeta(key, title, value);
+		
+		}
+
+		this._layer.setTooltip(this.tooltipMeta);
+	},
+
+
+
+	// Save helpers – goes through the JSON object to find a key match in the time series
+	updateTimeSeriesMeta : function (key, title, on) {	
+
+		var timeSeries = this.tooltipMeta.timeSeries;
+		var hit = false;
+
+		for ( var f in timeSeries ) {
+
+			if ( f == key ) {
+
+				timeSeries[f].title = false;
+				timeSeries[f].on = on;
+
+				hit = true
+			}
+		}
+
+		return hit;
+	},
+
+	// Save helper – goes through the JSON object to find a key match in the meta fields
+	updateMeta : function (key, title, on) {	
+
+		var metaFields = this.tooltipMeta.metaFields;
+
+		for ( var f in metaFields ) {
+
+			if ( f == key ) {
+				metaFields[f].title = title;
+				metaFields[f].on = on;
+				return;
+			}
+		}
+	},
+
+	
+	open : function () {
+		console.log('open!', this);
+	},
+
+
+
+	// DATA BUILDERS
+	// DATA BUILDERS
+	// DATA BUILDERS
+	// DATA BUILDERS
+
+	// Gets called from Chrome Data _onLayerAdded()
+	// TODO: Events?
+
+	_buildTooltipMeta : function (layerMeta) {
+		return this.createTooltipMeta(layerMeta);
+	},
+
 
 	// Tooltip meta
 	createTooltipMeta : function (layerMeta) {
@@ -214,212 +483,10 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 			}       
 		}
 
+		// Set time series to true by default
+		metaData.timeSeries.enable = true;
+
 		return [metaData, timeSeriesCount];
-	},
-
-	// Init meta fields and time series
-	initFields : function () {
-
-		this.fieldListFromObject('Fields');
-		if ( this.tooltipMeta.timeSeries ) this.initTimeSeries();
-	},
-
-	// Creates section with meta field lines
-	fieldListFromObject : function (title, timeSeries) {
-
-
-		var fields = timeSeries ? this.tooltipMeta.timeSeries : this.tooltipMeta.metaFields;
-
-		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)
-		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, title);
-
-		for ( var key in fields ) {
-			
-			var isOn = fields[key].on;
-			var title = fields[key].title;
-
-			// Block 
-			if ( key == 'enable' || key == 'minmaxRange' || key == 'graphstyle' ) return;
-
-			var options = {
-				key 		: key, 
-				wrapper 	: sectionWrapper,
-				input 		: true,
-				title 		: title,
-				isOn 		: isOn,
-				rightPos	: false,
-				type 		: 'switch'
-				
-			}
-
-			this._createMetaFieldLine(options);
-		}
-	},
-
-	// Cretes section with time series
-	initTimeSeries : function () {
-
-		var timeSeries = this.tooltipMeta.timeSeries;
-
-		// Wrapper
-		var sectionWrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this._fieldsWrapper)		
-		
-		// Header
-		var header = Wu.DomUtil.create('div', 'chrome-content-header', sectionWrapper, 'Time series');
-		var headerExtra = Wu.DomUtil.create('span', 'chrome-content-header-gray', header, ' (auto detected)');
-
-		// Enable tims series switch
-		var options = {
-			key 		: 'enable', 
-			wrapper 	: sectionWrapper,
-			input 		: false,
-			title 		: 'Enable time series',
-			isOn 		: this.tooltipMeta.timeSeries.enable,
-			rightPos	: true,
-			type 		: 'switch'
-
-		}
-		var enableTimeSeries = this._createMetaFieldLine(options);
-		
-		// Use min/max from styling switch
-		var options = {
-			key 		: 'minmaxRange', 
-			wrapper 	: sectionWrapper,
-			input 		: false,
-			title 		: 'Range',
-			isOn 		: true,
-			rightPos	: true,
-			type 		: 'miniInput',
-			value 		: this.tooltipMeta.timeSeries.minmaxRange,
-			
-		}
-		var useMinMaxFromStyle = this._createMetaFieldLine(options)
-
-		// // Use min/max from styling switch
-		// var options = {
-		// 	key 		: 'graphstyle', 
-		// 	wrapper 	: sectionWrapper,
-		// 	input 		: false,
-		// 	title 		: 'Graph style',
-		// 	isOn 		: this.tooltipMeta.timeSeries.graphstyle,
-		// 	rightPos	: true,
-		// 	type 		: 'dropdown',
-		// 	dropdown	: ['scatter', 'line'],
-			
-			
-		// }
-
-		// var graphType = this._createMetaFieldLine(options)
-
-
-		// Create list of time series fields
-		this.fieldListFromObject('Time Series Fields', true);
 	},	
-	
-
-	// Save title
-	saveTitle : function (e) {
-
-		this.tooltipMeta.title = e.target.value;
-		this._layer.setTooltip(this.tooltipMeta);
-	},
-
-	// Save input fields in meta field lines
-	saveFromBlur : function (e) {
-		
-		var key   = e.target.id.substring(12, e.target.id.length);
-		var value = e.target.value;
-		
-		var thisSwitch = Wu.DomUtil.get('field_switch_' + key);
-		var thisSwitchState = thisSwitch.getAttribute('state');
-
-		var on = thisSwitchState ? true : false;
-
-		this._saveToServer(key, value, on);
-	},
-
-	// Saves tiny input to right
-	saveMiniBlur : function (e) {
-
-		var key   = e.target.id.substring(17, e.target.id.length)
-		var value = e.target.value;
-
-		this._saveToServer(key, false, value);
-	},
-
-	// Saves switches, etc
-	_saveToServer : function (key, title, on) {
-
-		var titleField = Wu.DomUtil.get('field_input_' + key);
-		var title      = titleField ? titleField.value : false;
-
-		// If no title, set to false
-		var title = titleField ? titleField.value : false;
-
-
-		if ( key == 'enable' || key == 'minmaxRange' || key == 'graphstyle' ) {
-			
-			// Update object
-			this.tooltipMeta.timeSeries[key] = on;
-
-			// Save to server
-			this._layer.setTooltip(this.tooltipMeta);
-
-			return;
-		}
-
-		// Check if key is date	
-		var keyIsDate = this._validateDateFormat(key);
-		
-		// If key is date, try to update timeseries
-		if ( keyIsDate ) var timeUpdated = this.updateTimeSeriesMeta(key, title, on);
-		
-		// If key is not date, or could not be found in time series, go through metafields
-		if ( !timeUpdated || !keyIsDate ) this.updateMeta(key, title, on);
-	
-		// Save to server
-		this._layer.setTooltip(this.tooltipMeta);
-	},
-
-	// Save helpers – goes through the JSON object to find a key match in the time series
-	updateTimeSeriesMeta : function (key, title, on) {
-
-		var timeSeries = this.tooltipMeta.timeSeries;
-		var hit = false;
-
-		for ( var f in timeSeries ) {
-
-			if ( f == key ) {
-
-				timeSeries[f].title = title;
-				timeSeries[f].on = on;			
-
-				hit = true
-			}
-		}
-
-		return hit;
-	},
-
-	// Save helper – goes through the JSON object to find a key match in the meta fields
-	updateMeta : function (key, title, on) {
-
-		var metaFields = this.tooltipMeta.metaFields;
-
-		for ( var f in metaFields ) {
-
-			if ( f == key ) {
-
-				metaFields[f].title = title;
-				metaFields[f].on = on;
-				return;
-			}
-		}
-	},
-
-	
-	open : function () {
-		console.log('open!', this);
-	},
 
 });

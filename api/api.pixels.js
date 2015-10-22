@@ -733,6 +733,8 @@ module.exports = api.pixels = {
 	resizeImage : function (option, callback) {
 		if (!option) return callback('No options provided.');
 
+		console.log('resizing!');
+
 		// basic options
 		var width   	= parseInt(option.width) || null;
 		var height  	= parseInt(option.height) || null;
@@ -919,7 +921,42 @@ module.exports = api.pixels = {
 		});
 	},			
 
+	serveScreenshot : function (req, res) {
+		if (!req.query) return api.error.missingInformation(req, res);
 
+		// set vars
+		var image_id = req.params[0]; 		// 'file-ccac0f45-ae95-41b9-8d57-0e64767ea9df'		
+		var path = '/data/images/' + image_id;
+
+		// only allow screenshot to go thru
+		if (path.indexOf('resized_screenshot.jpg') == -1) return res.end(); 
+
+		// return screenshot
+		res.sendfile(path, {maxAge : 10000000});
+	},
+
+	_resizeScreenshot : function (options, callback) {
+
+		var image = options.image; // /data/images/snap-project-8a29019a-e325-46c4-8a51-4691f92632ac-KTKE29.png
+
+		var outPath = image + '.resized_screenshot.jpg';
+		var width = 1200;
+
+		// do crunch magic
+		gm(image)
+		.resize(width)						// todo: if h/w is false, calc ratio					
+		.autoOrient()
+		.noProfile()							// todo: strip of all exif?
+		.quality(90)
+		.write(outPath, function (err) {
+			if (err) return callback(err);
+			var base = outPath.split('/').reverse()[0];
+
+			// return error and file
+			callback(null, base);
+		});
+
+	},
 
 
 
@@ -939,7 +976,7 @@ module.exports = api.pixels = {
 		var cropW      = req.query.cropw;
 		var cropH      = req.query.croph;
 
-		
+
 		// if raw quality requested, return full image
 		if (raw) return api.pixels.returnRawfile(req, res);
 
@@ -1008,6 +1045,8 @@ module.exports = api.pixels = {
 				}
 			}
 
+			console.log('gonna resize: ', template);
+
 			// create image with dimensions
 			api.pixels.resizeImage(template, callback);
 
@@ -1028,6 +1067,8 @@ module.exports = api.pixels = {
 		// run all async ops
 		async.waterfall(ops, function (err, result) {
 			if (err || !result) return api.error.general(req, res, err || 'No result.');
+
+			console.log('all done!');
 
 			api.pixels.returnImage(req, res, result);
 		});
@@ -1056,6 +1097,8 @@ module.exports = api.pixels = {
 	returnImage : function (req, res, imageFile) {
 		// send file back to client, just need file path
 		var path = api.config.path.image + imageFile.file;
+
+		console.log('returnImage', path);
 		res.sendfile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
 	},
 

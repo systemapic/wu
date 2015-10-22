@@ -1,0 +1,46 @@
+.chrome-field-line {
+    display: inline-block;
+    position: relative;
+    }
+
+.chrome-field-line,
+.chrome-field-input {
+    padding-left: 39px;
+    }
+
+.setClear, 
+.chrome-set {
+    display: inline-block;
+    }
+
+.chrome-field-mini-input, 
+.chrome-field-mini-input:focus {
+    }
+
+.disable-color-ball {
+    display: none;
+    }
+
+.chrome-metafield-line-children .chrome-metafield-line {
+    border-top: 1px dashed #ccc;
+    border-bottom: none;
+    }
+
+.chrome-metafield-line-children:last-child {
+    border-bottom: 1px solid;
+    }
+
+.chrome-pane.styler .chrome-switch-container {
+    top: 10px;
+    right: 4px; 
+    }
+
+.no-padding .chrome-field-line,
+.no-padding .chrome-field-input {
+    padding-left: 0;
+    }
+
+.relative-switch {
+    position: relative !important;
+    top: 0 !important;
+    }    

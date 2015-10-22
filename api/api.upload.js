@@ -1,4 +1,5 @@
-//API: api.upload.js
+// 
+// API: api.upload.js
 
 // database schemas
 var Project 	= require('../models/project');
@@ -144,17 +145,12 @@ module.exports = api.upload = {
 
 	    	var ops = [];
 
-	    	console.log('CHUNKED UPLOAD!');
-
 	    	ops.push(function (callback) {
 
 	    		// create unique file_id
 		    	var upload_file_id_key = 'upload_id:' + resumableIdentifier;
 		    	
-		    	console.log('upload_file_id_key', upload_file_id_key);
-
 		    	api.redis.layers.get(upload_file_id_key, function (err, stored_file_id) {
-		    		console.log('redis get stored file_id', err, stored_file_id);
 		    		
 		    		// got id
 		    		if (stored_file_id) {
@@ -171,9 +167,8 @@ module.exports = api.upload = {
 		    				callback(null);
 		    			});
 		    		};
-		    	})
-
-	    	})
+		    	});
+	    	});
 
 	  
 	    	ops.push(function (callback) {
@@ -185,8 +180,12 @@ module.exports = api.upload = {
 				// set redis count id
 				var redis_id = resumableIdentifier + file_id;
 
+				console.log('CHUNK_INFO:', status);
+
 				// if success
 				if (status == 'done' || status == 'partly_done') {
+
+					console.log('200');
 					
 					// return status
 					res.status(200).send({file_id : file_id});
@@ -196,6 +195,8 @@ module.exports = api.upload = {
 
 				} else {
 
+					console.log('308');
+
 					// return status
 					res.status(308).send({file_id : file_id});
 				}
@@ -203,10 +204,9 @@ module.exports = api.upload = {
 				// check if all done
 				api.redis.temp.get('done-chunks-' + redis_id, function (err, count) {
 
-					// return if not all done
-					console.log('done chunks:', count);
-					console.log('total chunks:', options.resumableTotalChunks);
+					console.log('Done chunks: ', count, options.resumableTotalChunks);
 
+					// return if not all done
 					if (count != options.resumableTotalChunks) {
 						return;
 					} 
@@ -219,7 +219,6 @@ module.exports = api.upload = {
 						body 			: req.body,
 						fileName 		: options.resumableFilename,
 						original_filename 	: filename,
-						// projectUuid 		: projectUuid,
 						resumableTotalChunks 	: options.resumableTotalChunks,
 						resumableIdentifier 	: options.resumableIdentifier,
 						file_id 		: file_id,
@@ -238,8 +237,7 @@ module.exports = api.upload = {
 
 			var upload_file_id_key = 'upload_id:' + resumableIdentifier;
 		    	api.redis.layers.del(upload_file_id_key, function (err) {
-
-		    		console.log('deleted upload_file_id_key', err);
+		    		if (err) console.log(err);
 		    	});
 
 		})
@@ -262,6 +260,7 @@ module.exports = api.upload = {
 		    redis_id 		= redis_id,
 		    access_token 	= options.access_token;
 
+		console.log('_chunkedUploadDone');
 
 		// merge chunks
 		ops.push(function (callback) {
@@ -280,7 +279,7 @@ module.exports = api.upload = {
 
 		// set uploadStatus
 		ops.push(function (stats, callback) {
-			
+
 			// set upload status
 			var uploadStatus = {
 				file_id : file_id,
@@ -295,7 +294,7 @@ module.exports = api.upload = {
 				processing_success : null,
 				rows_count : null,
 				import_took_ms : null,
-				data_type : null,
+				data_type : 'vector',
 				original_format : null,
 				table_name : null, 
 				database_name : null,
@@ -303,6 +302,8 @@ module.exports = api.upload = {
 				default_layer : null,
 				default_layer_model : null,
 			}
+
+			console.log('uploadStatus', uploadStatus);
 
 			// save upload id to redis
 			var key = 'uploadStatus:' + uploadStatus.file_id;
@@ -333,11 +334,9 @@ module.exports = api.upload = {
 			// import file
 			api.upload._import(options, function (err, results) {
 
-				
 				// done
 				callback(err);
 			});
-
 
 		});
 
@@ -345,7 +344,7 @@ module.exports = api.upload = {
 		async.waterfall(ops, function (err, result) {
 			if (err) console.log('oooooooo err!  chunked upload done err!!', err);
 			
-			console.log('ALWAYS ARRAIVING HEREHEHERHRHEH');
+			console.log('...always arriving here: upload done (or failed)');
 
 			// clean up, remove chunks
 			var removePath = '/data/tmp/resumable-' + uniqueIdentifier + '.*';
@@ -391,8 +390,20 @@ module.exports = api.upload = {
 			api.upload.prepareImport(options, function (err, opts) {
 				if (err) return callback(err);
 
-				// postgis import
-				api.postgis.import(opts, callback);
+				// get uploadStatus, get meta, set to file
+				api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
+
+					if (uploadStatus.data_type == 'raster') {
+
+						api.geo.handleRaster(opts, callback);
+					} else {
+						
+						// postgis import
+						api.postgis.import(opts, callback);
+					}
+
+				});
+
 			});
 		});
 
@@ -407,7 +418,13 @@ module.exports = api.upload = {
 					var meta = uploadStatus.metadata;
 
 					// save meta to file
-					file.data.postgis.metadata = meta;
+					if (uploadStatus.data_type == 'vector') {
+						file.data.postgis.metadata = meta;
+					} else {
+						file.data.raster.metadata = JSON.stringify(meta);
+					}
+					
+
 					file.save(function (err, doc) {
 
 						// add to user
@@ -546,21 +563,37 @@ module.exports = api.upload = {
 		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
 			var u = JSON.parse(uploadStatus);
 
-			var fileModel = {
-				uuid : file_id,
-				createdBy : u.user_id,
-				name : u.filename,
-				type : 'postgis',
-				dataSize : u.size,
-				data : {
-					postgis : {
-						database_name 	: u.database_name,
-						table_name 	: u.table_name,
-						data_type 	: u.data_type,
-						original_format : u.original_format
+			if (u.data_type == 'vector') {
+				var fileModel = {
+					uuid : file_id,
+					createdBy : u.user_id,
+					name : u.filename,
+					type : 'postgis',
+					dataSize : u.size,
+					data : {
+						postgis : {
+							database_name 	: u.database_name,
+							table_name 	: u.table_name,
+							data_type 	: u.data_type,
+							original_format : u.original_format
+						}
+					}
+				}
+			} else {
+				var fileModel = {
+					uuid : file_id,
+					createdBy : u.user_id,
+					name : u.filename,
+					type : 'raster',
+					dataSize : u.size,
+					data : {
+						raster : {
+							file_id : file_id
+						}
 					}
 				}
 			}
+			
 
 			// create file model
 			api.file._createModel(fileModel, done);	
@@ -587,7 +620,7 @@ module.exports = api.upload = {
 
 			// add keys
 			var uploadStatus = JSON.parse(uploadStatusJSON);
-			for (s in status) {
+			for (var s in status) {
 				if (s != 'expire') uploadStatus[s] = status[s]; // set status (except ttl)
 			};
 
@@ -633,6 +666,7 @@ module.exports = api.upload = {
 
 		// set original filename + size
 		options.size = files.data.size;
+		options.ext = ext;
 		options.originalFilename = files.data.originalFilename;
 
 		// organize files so output is equal no matter what :)
@@ -657,22 +691,22 @@ module.exports = api.upload = {
 
 		if (ext == 'tif') ops.push(function (callback) {
 			options.files = [temporaryPath];
-			callback(null);
+			api.upload.updateStatus(options.file_id, {data_type : 'raster'}, callback)
 		});
 
 		if (ext == 'tiff') ops.push(function (callback) {
 			options.files = [temporaryPath];
-			callback(null);
+			api.upload.updateStatus(options.file_id, {data_type : 'raster'}, callback)
 		});
 
 		if (ext == 'ecw') ops.push(function (callback) {
 			options.files = [temporaryPath];
-			callback(null);
+			api.upload.updateStatus(options.file_id, {data_type : 'raster'}, callback)
 		});
 
 		if (ext == 'jp2') ops.push(function (callback) {
 			options.files = [temporaryPath];
-			callback(null);
+			api.upload.updateStatus(options.file_id, {data_type : 'raster'}, callback)
 		});
 
 		// run ops

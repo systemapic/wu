@@ -114,7 +114,9 @@ module.exports = function(passport) {
 					if (err) console.error(err);
 
 					// slack
-					api.slack.loggedIn({user : user});
+					if (user.local.email != config.phantomJS.user) {
+						api.slack.loggedIn({user : user});
+					}
 
 					// all is well, return successful user
 					return done(null, user);

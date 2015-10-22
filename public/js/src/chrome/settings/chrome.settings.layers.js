@@ -93,7 +93,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 
 	initLayerBaselayerToggle : function () {
-
 		var wrapper = Wu.DomUtil.create('div',   'chrome-layer-baselayer-toggle', this._topButtonWrapper);
 		this.baselayerButton = Wu.DomUtil.create('div', 'chrome-layer-toggle-button chrome-baselayer', wrapper, 'BASE LAYERS');
 		this.layerButton = Wu.DomUtil.create('div',     'chrome-layer-toggle-button chrome-layer layer-toggle-active', wrapper, 'LAYERS');
@@ -170,32 +169,45 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 			} 
 		}.bind(this));
 
-
 		// get saved state of enabled-by-default
 		layermenuItem = _.find(this._project.store.layermenu, function (l) {
 			return l.layer == uuid;
 		});
 		var enabledByDefault = layermenuItem && layermenuItem.enabled;
 
-		var lineOptions = {
-			key 		: uuid,
-			wrapper 	: wrapper,
-			input 		: false,
-			title 		: layerTitle,
-			isOn 		: on,
-			rightPos	: false,
-			type 		: 'switch',
-			radio 		: true,
-			radioOn		: enabledByDefault
-		}
+		var line = new Wu.fieldLine({
+			id       : uuid,
+			appendTo : wrapper,
+			title    : layerTitle,
+			input    : false
+		});		
 
-		this._createMetaFieldLine(lineOptions);
+		var _switch = new Wu.button({ 
+			id 	 : uuid,
+			type 	 : 'switch',
+			isOn 	 : on,
+			right 	 : false,
+			appendTo : line.container,
+			fn 	 : this._saveSwitch.bind(this),
+		});
+
+
+		var _radio = new Wu.button({ 
+			id 	 : uuid,
+			type 	 : 'radio',
+			isOn 	 : enabledByDefault,
+			right 	 : true,
+			appendTo : line.container,
+			fn 	 : this._saveRadio.bind(this),
+		});		
+
 	},
 
 
 	providerTitle : function (provider) {
 
 		if (provider == 'postgis') var title = 'Data Library';
+		if (provider == 'raster')  var title = 'Raster Overlays';
 		if (provider == 'mapbox')  var title = 'Mapbox';
 		if (provider == 'norkart') var title = 'Norkart';
 		if (provider == 'google')  var title = 'Google';
@@ -208,7 +220,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	// sort layers by provider
 	sortLayers : function (layers) {
 
-		var keys = ['postgis', 'google', 'norkart', 'geojson', 'mapbox', 'raster'];
+		var keys = ['postgis', 'raster', 'google', 'norkart', 'geojson', 'mapbox'];
 		var results = [];
 	
 		keys.forEach(function (key) {
@@ -298,20 +310,20 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		Wu.DomUtil.addClass(elem, 'deactivated-layer');
 	},
 
-	// Toggle radio
-	toggleRadio : function (e) {
+
+	_saveRadio : function (e) {
+
 		var elem = e.target;
 		var state = elem.getAttribute('state');
-		state == 'true' ? this.radioOff(elem) : this.radioOn(elem);
+
+		state == 'true' ? this.radioOn(elem) : this.radioOff(elem);		
+
 	},
 
 	radioOn : function (elem) {
 
 		var id = elem.id;
 		var layer_id = id.slice(6, id.length);		
-
-		Wu.DomUtil.addClass(elem, 'radio-on');
-		elem.setAttribute('state', 'true');
 
 		// save state
 		var layerMenu = app.MapPane.getControls().layermenu;
@@ -324,12 +336,10 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		var id = elem.id;
 		var layer_id = id.slice(6, id.length);
 
-		Wu.DomUtil.removeClass(elem, 'radio-on');
-		elem.setAttribute('state', 'false');
-
 		// save state
 		var layerMenu = app.MapPane.getControls().layermenu;
 		layerMenu._setEnabledOnInit(layer_id, false);
+		
 	},
 
 
@@ -379,36 +389,6 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	// UPDATE SWITCHES
 	// UPDATE SWITCHES
 
-	// Toggle switch
-	toggleSwitch : function (e) {
-
-		// get state
-		var stateAttrib = e.target.getAttribute('state');
-		var on = (stateAttrib == 'true');
-		var key = e.target.getAttribute('key');
-
-		if ( on ) {
-			e.target.setAttribute('state', 'false');
-			Wu.DomUtil.removeClass(e.target, 'switch-on');
-			var isOn = false;		
-
-			// Turn off radio
-			var radioElem = Wu.DomUtil.get('radio_' + key);
-			this.radioOff(radioElem);
-			
-		} else {
-			e.target.setAttribute('state', 'true');
-			Wu.DomUtil.addClass(e.target, 'switch-on');
-			var isOn = true;
-		}	
-
-		// save
-		this._saveToServer(key, '', isOn)
-
-		// Update radios
-		this.updateRadios();
-	},	
-
 	updateSwitches : function () {
 
 	       	this.sortedLayers.forEach(function (provider) {
@@ -441,8 +421,9 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 		}
 
 		// Get switch
-		var s = Wu.DomUtil.get('field_switch_' + uuid);
+		var s = Wu.DomUtil.get('switch_' + uuid);
 
+		// xoxoxoxox
 		if ( on ) {
 			Wu.DomUtil.addClass(s, 'switch-on');
 			s.setAttribute('state', 'true');
@@ -458,13 +439,19 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 	// SAVE
 	// SAVE		
 
-	_saveToServer : function (key, title, on) {
+	_saveSwitch : function (e, isOn) {
+
+		var stateAttrib = e.target.getAttribute('state'),
+		    on          = (stateAttrib == 'true'),
+		    key         = e.target.getAttribute('key');
 
 		if ( this._mode == 'baselayer' ) {
 			on ? this.enableBaseLayer(key) : this.disableBaseLayer(key);
 		} else {
 			on ? this.enableLayer(key) : this.disableLayer(key);
 		}
+
+		this.updateRadios();
 	},
 
 
