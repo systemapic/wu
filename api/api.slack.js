@@ -148,9 +148,10 @@ module.exports = api.slack = {
 		})
 
 		async.series(ops, function (err) {
-		})
-
 		
+			if (err) console.log('ERR 83838: ', err);
+		});
+	
 
 	},
 
