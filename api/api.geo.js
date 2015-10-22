@@ -176,6 +176,8 @@ module.exports = api.geo = {
 			// create reference point
 			return this.buildReferencePoint(extras.referencepoint);
 		};
+
+		return '';
 	},
 
 
