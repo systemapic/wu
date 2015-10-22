@@ -41,46 +41,55 @@ var api = module.parent.exports;
 // exports
 module.exports = api.debug = { 
 
+	hardCrash : function () {
 
-	// #########################################
-	// ###  TODO! REMOVE REMOVE REMOVE!!!    ###
-	// #########################################
-	// #########################################
-	// ###  TODO! REMOVE REMOVE REMOVE!!!    ###
-	// #########################################
-	// #########################################
-	// ###  TODO! REMOVE REMOVE REMOVE!!!    ###
-	// #########################################
-	createRole : function (req, res) {
+		Project
+		.findOne()
+		.exec(function (err, p) {
+			p.data.thensome.ok = 'lolsl';
+		})
 
-		// STOP!
-		return res.end(JSON.stringify({error : 'Debug mode off!'}));
-
-
-
-		// create a superadmin
-		console.log('_debugCreateRole', req.body);
-
-		var options = req.body,
-		    template = options.template,
-		    userUuid = options.userUuid || req.user.uuid,
-		    ops = [];
-
-		// create role
-		api.access._createRole({
-			template : template,
-			members : [userUuid],
-			capabilities : [],
-			name : 'Superadmin'
-		}, function (err, role) {
-
-			console.log('created role: ', role);
-
-			// return 
-			res.end(JSON.stringify({
-				role : role
-			}));
-		});
 	},
+
+	// #########################################
+	// ###  TODO! REMOVE REMOVE REMOVE!!!    ###
+	// #########################################
+	// #########################################
+	// ###  TODO! REMOVE REMOVE REMOVE!!!    ###
+	// #########################################
+	// #########################################
+	// ###  TODO! REMOVE REMOVE REMOVE!!!    ###
+	// #########################################
+	// createRole : function (req, res) {
+
+	// 	// STOP!
+	// 	return res.end(JSON.stringify({error : 'Debug mode off!'}));
+
+
+
+	// 	// create a superadmin
+	// 	console.log('_debugCreateRole', req.body);
+
+	// 	var options = req.body,
+	// 	    template = options.template,
+	// 	    userUuid = options.userUuid || req.user.uuid,
+	// 	    ops = [];
+
+	// 	// create role
+	// 	api.access._createRole({
+	// 		template : template,
+	// 		members : [userUuid],
+	// 		capabilities : [],
+	// 		name : 'Superadmin'
+	// 	}, function (err, role) {
+
+	// 		console.log('created role: ', role);
+
+	// 		// return 
+	// 		res.end(JSON.stringify({
+	// 			role : role
+	// 		}));
+	// 	});
+	// },
 
 }

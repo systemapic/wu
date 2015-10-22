@@ -183,7 +183,9 @@ module.exports = api.user = {
 		    project_id = options.project_id,
 		    ops = [];
 
+		console.log('_createRole: ', options);
 
+		if (!permissions) return api.error.missingInformation(req, res);
 
 		ops.push(function (callback) {
 			// create the user
