@@ -711,7 +711,6 @@ module.exports = api.user = {
 		Role
 		.find({members : uuid})
 		.exec(function (err, roles) {
-			console.log('found all these roles: ', roles);
 			done(err, roles);
 		})
 
