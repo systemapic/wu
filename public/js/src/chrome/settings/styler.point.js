@@ -34,6 +34,7 @@ Wu.Styler.Point = Wu.Styler.extend({
 		var color_wrapper = content.color.line.container;
 		var color_children = content.color.line.childWrapper;
 		var opacity_wrapper = content.opacity.line.container;
+		var opacity_children = content.opacity.line.childWrapper;
 		var pointsize_wrapper = content.pointsize.line.container;
 		var pointsize_children = content.pointsize.line.childWrapper;
 
@@ -41,6 +42,7 @@ Wu.Styler.Point = Wu.Styler.extend({
 		color_wrapper && Wu.DomUtil.remove(color_wrapper);
 		color_children && Wu.DomUtil.remove(color_children);
 		opacity_wrapper && Wu.DomUtil.remove(opacity_wrapper);
+		opacity_children && Wu.DomUtil.remove(opacity_children);
 		pointsize_wrapper && Wu.DomUtil.remove(pointsize_wrapper);
 		pointsize_children && Wu.DomUtil.remove(pointsize_children);
 	},
