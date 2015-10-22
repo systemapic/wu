@@ -1018,12 +1018,15 @@ input.chrome-field-input {
     position: absolute;
     right: 0;
     left: -17px;
-    top: 5px;    
+    /*top: 5px;    */
     box-shadow: 0 0 0 1px #ccc inset, 0 0 0 3px #FFFFFF inset;
     z-index: 9999;
     border-radius: 10px;
     background: #eee;
     cursor: pointer;
+
+    top: 7px;
+
     }
 
 .layer-radio:hover {
@@ -1529,7 +1532,9 @@ input.chrome-field-input {
 
 .chrome-data-outer-scroller {
     overflow: hidden;
-    width: 330px;
+    /*width: 330px;*/
+    width: 380px;
+
     height: 50%;
     padding-left: 10px;    
     }
@@ -1539,7 +1544,8 @@ input.chrome-field-input {
     overflow-x: scroll;    
     padding-right: 20px;
     padding-left: 18px;
-    width: 335px    
+    /*width: 335px;*/   
+    width: 385px;
     }
 
 .chrome-data-inner.padding-top {
@@ -1625,7 +1631,8 @@ input.chrome-field-input {
 
 .file-popup-trigger {
     position: absolute;
-    top: 3px;
+    /*top: 3px;*/
+    top: 6px;
     z-index: 300;
     opacity: 1;
     width: 18px;

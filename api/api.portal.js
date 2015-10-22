@@ -21,6 +21,7 @@ var uuid 	= require('node-uuid');
 var util 	= require('util');
 var utf8 	= require("utf8");
 var mime 	= require("mime");
+var path 	= require('path');
 var exec 	= require('child_process').exec;
 var dive 	= require('dive');
 var async 	= require('async');
@@ -54,6 +55,8 @@ module.exports = api.portal = {
 		    };
 
 		if (req.isAuthenticated()) {
+
+			console.log('REQ AUTH?', req.isAuthenticated);
 			req.session.hotlink = hotlink;
 			res.render('../../views/app.serve.ejs', {
 				hotlink : hotlink || {},
@@ -72,7 +75,7 @@ module.exports = api.portal = {
 	},
 
 	login : function (req, res) {
-		res.render('../../views/login.serve.ejs', { message: req.flash('loginMessage') });
+		res.render(path.join(__dirname, '../views/login.serve.ejs'), { message: req.flash('loginMessage') });
 	},
 
 	invite : function (req, res) {
@@ -202,7 +205,13 @@ module.exports = api.portal = {
 			}, function (err, project_json) {
 				callback(null, project_json);
 			});
-		}		
+		}	
+
+		a.roles = function (callback) {
+			api.user._getRoles({
+				user : account
+			}, callback);
+		}	
 
 		// get account
 		a.account = function (callback) {

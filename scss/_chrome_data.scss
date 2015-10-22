@@ -51,6 +51,7 @@
 
 .file-name-content {
 	padding-right: 26px;
+	font-weight: 600;
 	}
 
 .file-popup {
@@ -81,11 +82,13 @@
 
 
 .layer-name-content {
-	padding-right: 26px;
+	/*padding-right: 26px;*/
 	height: 16px;
 	overflow: hidden;
 	white-space: nowrap;
-	width: 195px;
+	/*width: 195px;*/
+	width: 265px;
+	font-weight: 600;
 	}
 
 .layer-name-input,

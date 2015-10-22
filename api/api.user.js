@@ -705,6 +705,20 @@ module.exports = api.user = {
 		});
 	},
 
+	_getRoles : function (options, done) {
+
+		var user = options.user,
+		    uuid = user.uuid;
+
+		Role
+		.find({members : uuid})
+		.exec(function (err, roles) {
+			console.log('found all these roles: ', roles);
+			done(err, roles);
+		})
+
+	},
+
 	_getSingle : function (options, done) {
 		var userUuid = options.user.uuid;
 
