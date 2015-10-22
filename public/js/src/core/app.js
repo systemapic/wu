@@ -1,4 +1,4 @@
-Wu.version = '1.2.1';
+Wu.version = '1.3.0';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -168,7 +168,6 @@ Wu.App = Wu.Class.extend({
 
 	_logEntry : function () {
 
-
 		var b = this.sniffer.browser;
 		var o = this.sniffer.os;
 
@@ -180,7 +179,7 @@ Wu.App = Wu.Class.extend({
 		    	event : 'entered',
 		    	description : 'the wu: `' + browser + '` on `' + os + '`',
 		    	timestamp : Date.now()
-		})
+		});
 	},
 
 	_initAnalytics : function () {
@@ -197,6 +196,7 @@ Wu.App = Wu.Class.extend({
 
 		// main user account
 		this.Account = new Wu.User(this.options.json.account);
+		this.Account.setRoles(this.options.json.roles);
 
 		// create user objects
 		this.Users = {};

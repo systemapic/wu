@@ -126,10 +126,12 @@ Wu.Styler = Wu.Class.extend({
 
 	_updateStyle : function () {
 
-		console.log('updateStyle', this.options.carto);
+		console.log('updateStyle', this.options.carto, this);
 
 		// create carto css
 		this._createCarto(this.options.carto, this._saveCarto.bind(this));
+
+		
 	},
 
 	// create color box
@@ -139,11 +141,13 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().color = this.carto().color || {};
 
 		// get states
-		var isOn         = !(this.carto().color.column === false);
+		var isOn         = (this.carto().color.column === false);
 		var staticVal    = this.carto().color.staticVal || this.options.defaults.color;
 		var val          = this.carto().color.value 	|| this.options.defaults.range;
 		var column       = this.carto().color.column;
 		var minMax       = this.carto().color.range;
+
+		console.log('_createColor column: ', column, staticVal, isOn);
 
 		// container
 		var line = new Wu.fieldLine({
@@ -201,7 +205,7 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().opacity = this.carto().opacity || {};
 
 		// get states
-		var isOn   = !(this.carto().opacity.column === false);
+		var isOn   = (this.carto().opacity.column === false);
 		var value  = this.carto().opacity.value || 1;
 		var column = this.carto().opacity.column;
 		var minMax = this.carto().opacity.range;
@@ -261,7 +265,7 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().pointsize = this.carto().pointsize || {};
 
 		// Get stores states
-		var isOn   = !(this.carto().pointsize.column === false)
+		var isOn   = (this.carto().pointsize.column === false)
 		var val    = this.carto().pointsize.value || 1.2;
 		var column = this.carto().pointsize.column;
 		var minMax = this.carto().pointsize.range;
@@ -321,7 +325,7 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().width = this.carto().width || {};
 
 		// Get stores states
-		var isOn   = !(this.carto().width.column === false)
+		var isOn   = (this.carto().width.column === false)
 		var val    = this.carto().width.value || 1.2;
 		var column = this.carto().width.column;
 		var minMax = this.carto().width.range;
@@ -574,7 +578,15 @@ Wu.Styler = Wu.Class.extend({
 		this._closeColorRangeSelector(); 
 
 		// update
-		this._updateStyle();		
+		this._updateStyle();	
+
+		console.log('_updateColor');
+
+		// send user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-color` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 	},
 
 	_updateWidth : function () {
@@ -586,7 +598,13 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().width.value = inputField.value;
 
 		// update
-		this._updateStyle();		
+		this._updateStyle();	
+
+		// send user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-width` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});	
 	},
 
 	_updateOpacity : function (e) {
@@ -612,18 +630,18 @@ Wu.Styler = Wu.Class.extend({
 
 		// update
 		this._updateStyle();
+
+		// send user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-opacity` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 		
 	},
 
 	_updatePointsize : function (e) {
 
 		var value = parseFloat(e.target.value);
-		// var key   = e.target.id.slice(17, e.target.id.length);
-		// var pre = key.substring(0,4);
-
-		// if ( pre == 'min_' || pre == 'max_' ) {
-		// 	key = key.slice(4, key.length);
-		// }
 
 		// Get field 
 		var inputField = this._content[this.type].pointsize.input.input;
@@ -642,6 +660,12 @@ Wu.Styler = Wu.Class.extend({
 
 		// update
 		this._updateStyle();
+
+		// send user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-size` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 
 	},
 
@@ -681,6 +705,12 @@ Wu.Styler = Wu.Class.extend({
 
 		// UPDATE
 		this._updateStyle();
+
+		// send user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-color range` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 
 	},
 
@@ -746,15 +776,25 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().color.value = colorArray;		
 
 		// UPDATE
-		this._updateStyle();		
+		this._updateStyle();	
+
+		// user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-color range` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 
 	},
 
 	_dropdownSelected : function (e) {
 
+
 		var key = e.target.getAttribute('key'); // todo: remove DOM interaction
 		var field = e.target.value;
 		var wrapper = e.target.parentElement;
+
+		console.log('_dropdownSelected!!', e, key, field, wrapper, this.type);
+
 
 		// check if selected item is placeholders
 		var isStatic = (field == this.options.dropdown.staticText);
@@ -801,6 +841,13 @@ Wu.Styler = Wu.Class.extend({
 
 		// UPDATE
 		this._updateStyle();
+
+		// user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-' + field + '` by column `' + column + '` on layer',
+		    	description : this.options.layer.getTitle() + ' in project ' + this.options.project.getName(),
+		});
+
 
 	},
 
@@ -917,6 +964,12 @@ Wu.Styler = Wu.Class.extend({
 
 		// updat style
 		this._updateStyle();
+
+		// user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-size` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 	},
 
 	saveOpacityDualBlur : function (max, min, absoluteMax, absoluteMin) {
@@ -933,6 +986,12 @@ Wu.Styler = Wu.Class.extend({
 
 		// updat style
 		this._updateStyle();
+
+		// user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-opacity` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 	},
 
 	saveWidthDualBlur : function (max, min, absoluteMax, absoluteMin) {
@@ -949,6 +1008,12 @@ Wu.Styler = Wu.Class.extend({
 
 		// updat style
 		this._updateStyle();
+
+		// user event
+		app.Socket.sendUserEvent({
+		    	event : '`styled the ' + this.type + '-width` on',
+		    	description : this.options.layer.getTitle() + ' (in project ' + this.options.project.getName() + ')',
+		});
 	},
 
 	_closeColorRangeSelector : function () {

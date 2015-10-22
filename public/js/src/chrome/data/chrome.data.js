@@ -3,7 +3,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_ : 'data', 
 
 	options : {
-		defaultWidth : 350
+		defaultWidth : 400
 	},
 
 	_initialize : function () {
@@ -93,7 +93,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_initLayerListContainer : function () {
 
 		// HEADER
-		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer, 'Layers');
+		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer, 'Project Layers');
 
 		// LAYER LIST OUTER SCROLLER
 		this._layerListOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
@@ -111,7 +111,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_initFileListContainer : function () {
 
 		// HEADER
-		this._fileListTitle = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer, 'Data');
+		this._fileListTitle = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer, 'My Datasets');
 
 		// FILE LIST OUTER SCROLLER
 		this._fileListOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
@@ -177,7 +177,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// enable edit of layer menu...
 		var layerMenu = app.MapPane.getControls().layermenu;
-		// if ( app.access.to.edit_project(this._project) ) layerMenu.enableEdit();
 		if ( app.access.to.edit_project(this._project) ) layerMenu.enableEditSwitch();
 
 		// open if closed
@@ -194,7 +193,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 		if ( this._isOpen ) {
 			var layerMenu = app.MapPane.getControls().layermenu;	 // move to settings selector
-			// if (layerMenu) layerMenu.disableEdit();
 			if (layerMenu) layerMenu.disableEditSwitch();
 		}
 
@@ -402,7 +400,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		for (var p in this.fileProviders) {
 			var provider = this.fileProviders[p];
 			var files = provider.getFiles();
-			provider.data = _.toArray(files);
+
+			// get file list, sorted by last updated
+			provider.data = _.sortBy(_.toArray(files), function (f) {
+				return f.store.lastUpdated;
+			}).reverse();
+
+			// containers
 			var D3container = this.fileListContainers[p].D3container;
 			var data = this.fileProviders[p].data;
 			this.initFileList(D3container, data, p);

@@ -109,6 +109,31 @@
 
 
 .data-list-line {
-	padding-top: 5px;
-	padding-bottom: 5px;
+	padding-top: 7px;
+	padding-bottom: 7px;
 	}
+
+
+
+
+
+
+.chrome.chrome-content.chrome-pane {
+	width: 402px;
+}
+
+.chrome-middle-section {
+	width: 402px;
+}
+
+.chrome-middle-section-outer-scroller {
+	width: 387px;
+}
+
+.chrome-middle-section-inner-scroller {
+	width: 402px;
+}
+
+.chrome-field-wrapper {
+	width: 402px;
+}

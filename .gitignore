@@ -1,8 +1,6 @@
 npm-debug.log
 node_modules/*
 config/server-config.js
-public/js/src/config/client-config.js
-public/js/src/config/login-config.js
 log/*
 tests/*
 dist/tmp/*
@@ -21,3 +19,5 @@ dist/css/mobilestyle.css
 dist/css/padstyle.css
 dist/css/phantomJS.css
 dist/css/phantomJSthumb.css
+
+public/local/*

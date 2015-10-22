@@ -2,7 +2,7 @@
 funced fish_title
 function fish_title
     if [ $_ = 'fish' ]
-        echo SX: (prompt_pwd)
+        echo AX: (prompt_pwd)
     else
         echo $_
     end
@@ -33,7 +33,7 @@ function fish_prompt --description 'Write out the prompt'
 			end
 		end
 
-		echo -n -s "$USER" @ "SX $__fish_prompt_cwd" (prompt_pwd) "$__fish_prompt_normal" '# '
+		echo -n -s "$USER" @ "AX $__fish_prompt_cwd" (prompt_pwd) "$__fish_prompt_normal" '# '
 
 		case '*'
 
@@ -41,7 +41,7 @@ function fish_prompt --description 'Write out the prompt'
 			set -g __fish_prompt_cwd (set_color $fish_color_cwd)
 		end
 
-		echo -n -s "$USER" @ "SX $__fish_prompt_cwd" (prompt_pwd) "$__fish_prompt_normal" '> '
+		echo -n -s "$USER" @ "AX $__fish_prompt_cwd" (prompt_pwd) "$__fish_prompt_normal" '> '
 
 	end
 end
