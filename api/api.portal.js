@@ -188,6 +188,10 @@ module.exports = api.portal = {
 		    a = {}, 
 		    invite = this._checkInvite(options);	 // check for invite token
 
+
+		// api.debug.hardCrash();
+
+
 		// include invite access
 		if (invite) a.invite = function (callback) {
 
