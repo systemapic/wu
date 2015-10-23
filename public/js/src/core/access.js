@@ -210,8 +210,6 @@ Wu.Access = Wu.Class.extend({
 
 		capability : function (user, capability) {
 
-			console.error('app.access.has.capability: ', user, capability);
-
 			var roles = user.getRoles();
 			var p = false;
 
@@ -220,7 +218,6 @@ Wu.Access = Wu.Class.extend({
 
 				if (role.hasMember(user)) {
 					if (role.hasCapability(capability)) {
-						console.log('GOT IT ALL!', user, capability);
 						p = true;
 					}
 				}

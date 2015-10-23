@@ -617,6 +617,9 @@ module.exports = api.postgis = {
 		    shapefilePath = shapefileFolder + shapefileBasename,
 		    ops = [];
 
+		console.log('importGeojson options: ', options);
+		var file_id = options.file_id;
+
 		// create dir
 		ops.push(function (callback) {
 			fs.ensureDir(shapefileFolder, callback);
