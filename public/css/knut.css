@@ -7,3 +7,22 @@
 .data-list-line:hover {
 	background: rgba(113, 196, 168, 0.12);
 }*/
+
+.chrome-projects.chrome-projects-container {
+    background: blue;
+    top: 0;
+    left: 0;
+    height: 50%;
+}
+
+.chrome.chrome-container.chrome-left {
+	height: 100%;
+	background: white;
+}
+
+.chrome-users {
+	width: 100%;
+	height: auto;
+	background: red;
+	color: black;
+}

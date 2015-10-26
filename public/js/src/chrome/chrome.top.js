@@ -138,7 +138,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		this._CPUbars = [];
 
-		for ( i = 0; i<10; i++ ) {
+		for (var i = 0; i < 10; i++ ) {
 			this._CPUbars[i] = Wu.DomUtil.create('div', 'cpu-bar', CPUwrapper);
 		}
 
@@ -157,7 +157,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Get clean value of number
 		var p = Math.round(pp / 10);
 
-		for ( i = 0; i<10; i++ ) {
+		for (var i = 0; i<10; i++ ) {
 			
 			// Get the right div
 			var no = 9 - i;
@@ -268,26 +268,26 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	openLeftPane : function () {
 
-		// app.Chrome.Left.isOpen = true;
 		this._leftPaneisOpen = true;
 
 		// Set active state of button
 		Wu.DomUtil.addClass(this._menuButton, 'active');
 
 		// expand sidepane
-		if (app.SidePane) app.SidePane.expand();
+		// if (app.SidePane) app.SidePane.expand(); // todo: remove
 
-		// check 	TODO: remove... (Var tilpasset legend på bunn. Ikke aktuelt lenger.)		
-		this.setContentHeights();
+		// open left chrome
+		app.Chrome.Left.open();
 
+		// check
+		// this.setContentHeights();
+		
 		// trigger activation on active menu item
-		app._activeMenu._activate();
+		// app._activeMenu._activate();
 
 		// auto-close triggers
-		this._addAutoCloseTriggers();
-
+		// this._addAutoCloseTriggers();
 	},
-
 
 	closeLeftPane : function () {
 
@@ -298,11 +298,13 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		Wu.DomUtil.removeClass(this._menuButton, 'active');
 
 		// collapse sidepane
-		if (app.SidePane) app.SidePane.collapse();
+		// if (app.SidePane) app.SidePane.collapse(); // todo: remove
+
+		// open left chrome
+		app.Chrome.Left.close();
 
 		// auto-close triggers
-		this._removeAutoCloseTriggers();
-
+		// this._removeAutoCloseTriggers();
 	},
 
 	// close menu when clicking on map, header, etc.

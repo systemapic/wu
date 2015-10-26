@@ -10,7 +10,6 @@ Wu.Chrome = Wu.Class.extend({
 
 		// local initialize
 		this._initialize();
-	
 	},      
 
 	_listen : function () {
@@ -27,16 +26,54 @@ Wu.Chrome = Wu.Class.extend({
 	},
 
 	_projectSelected : function (e) {
-
-		var projectUuid = e.detail.projectUuid;
-
-		if (!projectUuid) return;
+		if (!e.detail.projectUuid) return;
 
 		// set project
-		this._project = app.activeProject = app.Projects[projectUuid];
+		this._project = app.activeProject = app.Projects[e.detail.projectUuid];
 
 		// refresh pane
 		this._refresh();
+	},
+
+	updateMapSize : function () {
+
+		var rightChrome = app.Chrome.Right;
+		var leftChrome = app.Chrome.Left;
+		var left = 0;
+		var width = app._appPane.offsetWidth;
+
+		if (!rightChrome || !leftChrome) return;
+
+		// both open
+		if (leftChrome._isOpen && rightChrome._isOpen) {
+			left = left + leftChrome.options.defaultWidth;
+			width = width - leftChrome.options.defaultWidth - rightChrome.options.defaultWidth;
+		}
+
+		// only left open
+		if (leftChrome._isOpen && !rightChrome._isOpen) {
+			left = left + leftChrome.options.defaultWidth;
+			width = width - leftChrome.options.defaultWidth;
+		}
+
+		// only right open
+		if (!leftChrome._isOpen && rightChrome._isOpen) {
+			width = width - rightChrome.options.defaultWidth;
+		}
+
+		// none open
+		if (!leftChrome._isOpen && !rightChrome._isOpen) {
+			width = app._appPane.offsetWidth;
+			left = 0;
+		}
+
+		// set size
+		var map = app._map.getContainer();
+		map.style.left = left + 'px';
+		map.style.width = width + 'px';
+
+		// update leaflet map
+		app._map.invalidateSize();
 	},
 
 	
@@ -44,7 +81,6 @@ Wu.Chrome = Wu.Class.extend({
 	// _projectSelected : function () {},
 	_initialize 	 : function () {},
 	_initContainer   : function () {},
-
 	_editEnabled 	 : function () {},
 	_editDisabled 	 : function () {},
 	_layerEnabled 	 : function () {},
@@ -56,6 +92,7 @@ Wu.Chrome = Wu.Class.extend({
 	_onLayerAdded    : function () {},
 	_onLayerEdited   : function () {},
 	_onLayerDeleted  : function () {},
+
 
 
 });

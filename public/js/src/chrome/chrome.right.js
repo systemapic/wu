@@ -31,7 +31,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		// data tab
 		if (this.options.tabs.data) {
 
-			// create settings selector
+			// create data selector
 			this._tabs.data = new Wu.Chrome.Data({
 				appendTo : this._container,
 				chrome : this // ie. right chrome
@@ -51,7 +51,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 	_addEvents : function () {
 		// todo
-		Wu.DomEvent.on(window, 'resize', this._onWindowResize, this);
+		Wu.DomEvent.on(window, 'resize', _.throttle(this._onWindowResize, 1000), this);
 	},
 
 	_removeEvents : function () {
@@ -59,6 +59,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	_onWindowResize : function () {
+		if (app._map) app._map.invalidateSize();
 	},
 
 	getDimensions : function () {
@@ -98,13 +99,8 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		this._container.style.width = this.options.defaultWidth + 'px';
 		this._container.style.display = 'block';
 
-		// move map
-		var map = app.MapPane._container;
-		var width = map.offsetWidth - this.options.defaultWidth;
-		map.style.width = width + 'px';
-
-		// invalidate size
-		app._map.invalidateSize();
+		// update size
+		this.updateMapSize();
 
 	},
 
@@ -122,14 +118,10 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		this._container.style.width = '0';
 		this._container.style.display = 'none';
 
-		// set map fullscreen
-		var map = app.MapPane._container;
-		map.style.width = '100%';
+		// update size
+		this.updateMapSize();
 
-		// invalidate size
-		app._map.invalidateSize();
 	},
-
 
 	
 });
