@@ -372,6 +372,14 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_logOut : function () {
 		if (confirm('Are you sure you want to log out?')) {
+
+			app.Socket.sendUserEvent({
+			    	user : app.Account.getFullName(),
+			    	event : 'logged out.',
+			    	description : '',
+			    	timestamp : Date.now()
+			});
+
 			window.location.href = app.options.servers.portal + 'logout';
 		}
 	},
