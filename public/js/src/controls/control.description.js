@@ -231,12 +231,6 @@ L.Control.Description = Wu.Control.extend({
 
 	updateMultiple : function (layerUuid) {
 
-		console.log('');
-		console.log('%c updateMultiple ', 'background: red; color: white;');
-		console.log('this.layers', this.layers);
-		console.log('');
-		console.log('');
-
 		if ( this.isCollapsed ) Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
 
 		var wrapper = this._multipleLegendInner;

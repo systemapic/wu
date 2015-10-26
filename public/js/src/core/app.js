@@ -226,6 +226,9 @@ Wu.App = Wu.Class.extend({
 		// right chrome
 		this.Chrome.Right = new Wu.Chrome.Right();
 
+		// right chrome
+		this.Chrome.Left = new Wu.Chrome.Left();
+
 		// todo: 
 		// left
 		// center
