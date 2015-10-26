@@ -162,6 +162,7 @@ module.exports = api.user = {
 			api.email.sendInvitedEmail({
 				email : created_user.local.email,
 				name : created_user.firstName,
+				project_name : token_store.project.name
 			});
 
 
