@@ -63,11 +63,14 @@ Wu.Analytics = Wu.Class.extend({
 		Wu.Mixin.Events.on('fileImported',    this._onFileImported, this);
 		Wu.Mixin.Events.on('fileDeleted',     this._onFileDeleted, this);
 
-		var map = app._map;
-		if (map) {
-			map.on('zoomstart', this._onZoomStart);
-			map.on('zoomend', this._onZoomEnd);
+		// map events
+		if (app._map) {
+			app._map.on('zoomstart', this._onZoomStart);
+			app._map.on('zoomend', this._onZoomEnd);
 		}
+
+		// on browser close
+		window.addEventListener("unload", this._onUnload);
 	},
 
 	// dummies
@@ -84,6 +87,15 @@ Wu.Analytics = Wu.Class.extend({
 	_onLayerStyleEdited   : function () {},
 	_onLayerDeleted  : function () {},
 	
+	_onUnload : function () {
+
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'exited.',
+		    	description : '',
+		    	timestamp : Date.now()
+		})
+	},
 
 	_onZoomStart : function () {
 		var map = app._map;
