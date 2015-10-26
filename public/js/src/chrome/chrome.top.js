@@ -132,7 +132,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// Check if superadmin
 		var isSuperAdmin = app.Access.is.superAdmin();
-		if ( !isSuperAdmin ) return;
+		if (!isSuperAdmin) return;
 
 		var CPUwrapper = Wu.DomUtil.create('div', 'cpu-wrapper', wrapper);
 
@@ -244,7 +244,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._projectTitleName = this._project.getHeaderTitle();
 
 		// set project title
-		// this._projectTitleContainer.innerHTML = this._clientName.toLowerCase() + '&nbsp;:&nbsp;' + this._projectTitle.toLowerCase();
 		this._projectTitle.innerHTML = this._projectTitleName.toLowerCase();
 	},
 
@@ -273,20 +272,14 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Set active state of button
 		Wu.DomUtil.addClass(this._menuButton, 'active');
 
+
 		// expand sidepane
 		// if (app.SidePane) app.SidePane.expand(); // todo: remove
+		// this.setContentHeights();
+
 
 		// open left chrome
 		app.Chrome.Left.open();
-
-		// check
-		// this.setContentHeights();
-		
-		// trigger activation on active menu item
-		// app._activeMenu._activate();
-
-		// auto-close triggers
-		// this._addAutoCloseTriggers();
 	},
 
 	closeLeftPane : function () {
@@ -297,14 +290,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Remove active state of button
 		Wu.DomUtil.removeClass(this._menuButton, 'active');
 
-		// collapse sidepane
-		// if (app.SidePane) app.SidePane.collapse(); // todo: remove
-
 		// open left chrome
 		app.Chrome.Left.close();
-
-		// auto-close triggers
-		// this._removeAutoCloseTriggers();
 	},
 
 	// close menu when clicking on map, header, etc.
@@ -353,7 +340,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Add "active" class from button
 		Wu.DomUtil.addClass(this._layersBtn, 'active');
 
-		
 		// TODO: Open Layer Menu
 		this.__layerMenu.openLayerPane();
 	},
@@ -368,22 +354,23 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// TODO: Close Layer Menu
 		this.__layerMenu.closeLayerPane();
-
-
 	},	
 
 	_logOut : function () {
-		if (confirm('Are you sure you want to log out?')) {
 
-			app.Socket.sendUserEvent({
-			    	user : app.Account.getFullName(),
-			    	event : 'logged out.',
-			    	description : '',
-			    	timestamp : Date.now()
-			});
+		// confirm
+		if (!confirm('Are you sure you want to log out?')) return;
 
-			window.location.href = app.options.servers.portal + 'logout';
-		}
+		// slack monitor
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'logged out.',
+		    	description : '',
+		    	timestamp : Date.now()
+		});
+
+		// redirect to logout
+		window.location.href = app.options.servers.portal + 'logout';
 	},
 
 
