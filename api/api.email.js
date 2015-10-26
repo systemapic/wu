@@ -472,8 +472,8 @@ module.exports = api.email = {
 			body += '<table width="500" border="0" cellspacing="0" cellpadding="10" align="center" class="responsive-table">';
 			body += '<tr>';
 			body += '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
-			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a>';
-			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a><br>';
+			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a><br>';
+			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a>';
 			body += '</td>';
 			body += '</tr>';
 			body += '</table>';
