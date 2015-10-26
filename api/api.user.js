@@ -162,6 +162,7 @@ module.exports = api.user = {
 			api.email.sendInvitedEmail({
 				email : created_user.local.email,
 				name : created_user.firstName,
+				project_name : token_store.project.name
 			});
 
 
@@ -713,7 +714,6 @@ module.exports = api.user = {
 		Role
 		.find({members : uuid})
 		.exec(function (err, roles) {
-			console.log('found all these roles: ', roles);
 			done(err, roles);
 		})
 
