@@ -204,11 +204,11 @@ Wu.App = Wu.Class.extend({
 		       this.Users[user.uuid] = new Wu.User(user);             
 		}, this);
 		
-		// create client objects
-		this.Clients = {};
-		this.options.json.clients.forEach(function(elem, i, arr) {
-		       this.Clients[elem.uuid] = new Wu.Client(elem, this);             
-		}, this);
+		// // create client objects
+		// this.Clients = {};
+		// this.options.json.clients.forEach(function(elem, i, arr) {
+		//        this.Clients[elem.uuid] = new Wu.Client(elem, this);             
+		// }, this);
 
 		// create project objects
 		this.Projects = {};
@@ -218,6 +218,8 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_initChrome : function () {
+
+		// chrome
 		this.Chrome = {};
 
 		// top chrome
@@ -230,7 +232,6 @@ Wu.App = Wu.Class.extend({
 		this.Chrome.Left = new Wu.Chrome.Left();
 
 		// todo: 
-		// left
 		// center
 
 	},
@@ -243,10 +244,10 @@ Wu.App = Wu.Class.extend({
 		// render style handler
 		this.Style = new Wu.Style();
 
-		// render status pane
-		this.StatusPane = new Wu.StatusPane({
-			addTo: this._appPane
-		});
+		// // render status pane
+		// this.StatusPane = new Wu.StatusPane({
+		// 	addTo: this._appPane
+		// });
 
 		// render progress bar
 		this.ProgressBar = new Wu.ProgressPane({
@@ -260,7 +261,7 @@ Wu.App = Wu.Class.extend({
 		});
 
 		// render side pane 
-		this.SidePane = new Wu.SidePane();	// todo: add settings more locally? Wu.SidePane({options})
+		// this.SidePane = new Wu.SidePane();	// todo: add settings more locally? Wu.SidePane({options})
 
 		// render header pane
 		this.HeaderPane = new Wu.HeaderPane();
@@ -350,7 +351,7 @@ Wu.App = Wu.Class.extend({
 	_lonelyProject : function () {
 		//default case: hidden/ghost project (belongs to no client). Preferable to stick to the Start Pane
 		if (_.size(app.Projects) == 1) {
-			for (p in app.Projects) {
+			for (var p in app.Projects) {
 				var project = app.Projects[p]; 
 				
 				// if project is hidden/ghost it has no client
@@ -365,7 +366,7 @@ Wu.App = Wu.Class.extend({
 		//single project plus hidden/ghost project
 		//check if single (owned) project. Redirect to it instead of sticking on the Start pane
 		if (_.size(app.Projects) == 2) {
-			for (p in app.Projects) {
+			for (var p in app.Projects) {
 	
 				var project = app.Projects[p]; 
 				if (project.getClient() === undefined) {
@@ -460,11 +461,11 @@ Wu.App = Wu.Class.extend({
 
 	// shorthands for setting status bar
 	setStatus : function (status, timer) {
-		app.StatusPane.setStatus(status, timer);
+		// app.StatusPane.setStatus(status, timer);
 	},
 
 	setSaveStatus : function (delay) {
-		app.StatusPane.setSaveStatus(delay);
+		// app.StatusPane.setSaveStatus(delay);
 	},
 
 	_initHash : function (hash, project) {

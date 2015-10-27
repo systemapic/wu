@@ -223,12 +223,12 @@ module.exports = api.portal = {
 			}, callback);
 		}
 
-		// get clients
-		a.clients = function (callback) {
-			api.client.getAll({
-				user : account
-			}, callback);
-		}
+		// // get clients
+		// a.clients = function (callback) {
+		// 	api.client.getAll({
+		// 		user : account
+		// 	}, callback);
+		// }
 
 		// get users
 		a.users = function (callback) {

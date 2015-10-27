@@ -100,14 +100,11 @@ Wu.Analytics = Wu.Class.extend({
 	_onZoomStart : function () {
 		var map = app._map;
 		app._eventZoom = map.getZoom();
-		console.log('this:-zoom', app._eventZoom);
 	},
 
 	_onZoomEnd : function () {
 		var map = app._map;
 		var zoom = map.getZoom();
-
-		console.log('zoom', zoom);
 
 		// slack
 		app.Socket.sendUserEvent({
@@ -249,7 +246,6 @@ Wu.Analytics = Wu.Class.extend({
 		
 		// add distance from previous query
 		if (prevLatlng) description += '\n      Distance from last query: `' + parseInt(data.latlng.distanceTo(prevLatlng)) + 'meters`';
-		if (prevLatlng) console.log(data.latlng.distanceTo(prevLatlng));
 
 		// slack
 		app.Socket.sendUserEvent({
@@ -298,7 +294,7 @@ Wu.Analytics = Wu.Class.extend({
 		
 		// send to server. JSON.stringify not needed for options object.
 		Wu.send('/api/analytics/set', options, function (err, result) {
-			if ( err ) console.log('GA error:', err, Wu.parse(result));			
+			if (err) console.log('GA error:', err, result);			
 		});
 
 	},
@@ -330,15 +326,16 @@ Wu.Analytics = Wu.Class.extend({
 
 		// Get parameters to pass to Google Analytics
 		var projectSlug 	= activeProject.getSlug();
-		var projectClient 	= activeProject.getClient();
-		var clientSlug 		= projectClient.getSlug();
-		var clientID 		= activeProject.getClientUuid();
+		// var projectClient 	= activeProject.getClient();
+		// var clientSlug 		= projectClient.getSlug();
+		// var clientID 		= activeProject.getClientUuid();
 		var projectName 	= activeProject.getName();
-		var clientName		= projectClient.getName();
+		// var clientName		= projectClient.getName();
 	    	var projectName 	= activeProject.getName();
 		var hostname 		= app.options.servers.portal;
 		var projectSlug 	= activeProject.getSlug();
-		var pageUrl 		= '/' + clientSlug + '/' + projectSlug;
+		// var pageUrl 		= '/' + clientSlug + '/' + projectSlug;
+		var pageUrl 		= '/' + projectSlug;
 
 		// USER
 		var userID		= app.Account.getUuid();
@@ -356,9 +353,9 @@ Wu.Analytics = Wu.Class.extend({
 			page 	    : pageUrl,
 			title 	    : projectName,
 			dimension1  : _uuid, 		// Project ID
-			dimension4  : clientID,		// Client ID
+			// dimension4  : clientID,		// Client ID
 			dimension6  : projectName,	// Project name
-			dimension7  : clientName,	// Client name
+			// dimension7  : clientName,	// Client name
 			dimension2  : dimension2Value,	// User full name
 			version     : version		// Systemapic version
 
@@ -414,10 +411,11 @@ Wu.Analytics = Wu.Class.extend({
 
 		// CURRENT PROJECT PATH
 		if ( app.activeProject ) {
-			if (app.activeProject._client === undefined || app.activeProject === undefined ) return;
-			var clientSlug  = app.activeProject._client.getSlug();
+			// if (app.activeProject._client === undefined || app.activeProject === undefined ) return;
+			// var clientSlug  = app.activeProject._client.getSlug();
 			var projectSlug = app.activeProject.getSlug()
-			var pageUrl 	= '/' + clientSlug + '/' + projectSlug;
+			// var pageUrl 	= '/' + clientSlug + '/' + projectSlug;
+			var pageUrl = '/' + projectSlug;
 			gaEvent.path = pageUrl;
 		} else {
 			gaEvent.path = '/';
