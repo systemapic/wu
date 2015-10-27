@@ -132,13 +132,13 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// Check if superadmin
 		var isSuperAdmin = app.Access.is.superAdmin();
-		if ( !isSuperAdmin ) return;
+		if (!isSuperAdmin) return;
 
 		var CPUwrapper = Wu.DomUtil.create('div', 'cpu-wrapper', wrapper);
 
 		this._CPUbars = [];
 
-		for ( i = 0; i<10; i++ ) {
+		for (var i = 0; i < 10; i++ ) {
 			this._CPUbars[i] = Wu.DomUtil.create('div', 'cpu-bar', CPUwrapper);
 		}
 
@@ -157,7 +157,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Get clean value of number
 		var p = Math.round(pp / 10);
 
-		for ( i = 0; i<10; i++ ) {
+		for (var i = 0; i<10; i++ ) {
 			
 			// Get the right div
 			var no = 9 - i;
@@ -244,7 +244,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._projectTitleName = this._project.getHeaderTitle();
 
 		// set project title
-		// this._projectTitleContainer.innerHTML = this._clientName.toLowerCase() + '&nbsp;:&nbsp;' + this._projectTitle.toLowerCase();
 		this._projectTitle.innerHTML = this._projectTitleName.toLowerCase();
 	},
 
@@ -268,26 +267,20 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	openLeftPane : function () {
 
-		// app.Chrome.Left.isOpen = true;
 		this._leftPaneisOpen = true;
 
 		// Set active state of button
 		Wu.DomUtil.addClass(this._menuButton, 'active');
 
+
 		// expand sidepane
-		if (app.SidePane) app.SidePane.expand();
+		// if (app.SidePane) app.SidePane.expand(); // todo: remove
+		// this.setContentHeights();
 
-		// check 	TODO: remove... (Var tilpasset legend på bunn. Ikke aktuelt lenger.)		
-		this.setContentHeights();
 
-		// trigger activation on active menu item
-		app._activeMenu._activate();
-
-		// auto-close triggers
-		this._addAutoCloseTriggers();
-
+		// open left chrome
+		app.Chrome.Left.open();
 	},
-
 
 	closeLeftPane : function () {
 
@@ -297,12 +290,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Remove active state of button
 		Wu.DomUtil.removeClass(this._menuButton, 'active');
 
-		// collapse sidepane
-		if (app.SidePane) app.SidePane.collapse();
-
-		// auto-close triggers
-		this._removeAutoCloseTriggers();
-
+		// open left chrome
+		app.Chrome.Left.close();
 	},
 
 	// close menu when clicking on map, header, etc.
@@ -351,7 +340,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Add "active" class from button
 		Wu.DomUtil.addClass(this._layersBtn, 'active');
 
-		
 		// TODO: Open Layer Menu
 		this.__layerMenu.openLayerPane();
 	},
@@ -366,14 +354,23 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// TODO: Close Layer Menu
 		this.__layerMenu.closeLayerPane();
-
-
 	},	
 
 	_logOut : function () {
-		if (confirm('Are you sure you want to log out?')) {
-			window.location.href = app.options.servers.portal + 'logout';
-		}
+
+		// confirm
+		if (!confirm('Are you sure you want to log out?')) return;
+
+		// slack monitor
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'logged out.',
+		    	description : '',
+		    	timestamp : Date.now()
+		});
+
+		// redirect to logout
+		window.location.href = app.options.servers.portal + 'logout';
 	},
 
 
