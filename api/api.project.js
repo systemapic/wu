@@ -52,8 +52,6 @@ module.exports = api.project = {
 		    account = req.user,
 		    ops = [];
 
-		console.log('creat project');
-
 		// return if missing info
 		if (!store) return api.error.missingInformation(req, res);
 
@@ -105,7 +103,13 @@ module.exports = api.project = {
 		ops.push(function (project, callback) {
 			Project
 			.findOne({uuid : project.uuid})
+			.populate('layers')
 			.exec(callback);
+		});
+
+		// set some default settings
+		ops.push(function (project, callback) {
+			api.project.setDefaults(project, callback);
 		});
 
 		// run ops
@@ -123,6 +127,28 @@ module.exports = api.project = {
 		});
 	},
 
+	setDefaults : function (project, callback) {
+
+		// default layer 
+		var layer = _.find(project.layers, function (l) {
+
+			// mapbox, satellite, no labels
+			return l.data.mapbox == 'systemapic.kcjonn12';
+		});
+
+		var baseLayer = {
+			uuid : layer.uuid,
+			zIndex : 1,
+			opacity : 1
+		}
+
+		// set baselayer, save
+		project.baseLayers.push(baseLayer)
+		project.markModified('baseLayers');
+		project.save(callback);
+
+	},
+
 
 	_create : function (options, done) {
 		if (!options) return done('No options.');
@@ -132,7 +158,7 @@ module.exports = api.project = {
 		    store = options.store,
 		    slug = crypto.randomBytes(3).toString('hex');
 		
-		if (!store || !user) return done('Missing information.8');
+		if (!user) return done('Missing information.8');
 
 
 		var projectName = 'Project ' + api.utils.getRandomName();
@@ -145,12 +171,13 @@ module.exports = api.project = {
 		project.createdByName   = user.firstName + ' ' + user.lastName;
 		project.slug 		= projectSlug;
 		project.name 		= projectName;
-		project.description 	= store.description;
+		project.description 	= store.description || '';
 		project.header.title    = projectName;
 		project.header.subtitle = 'Project description';
-		project.keywords 	= store.keywords;
+		project.keywords 	= store.keywords || '';
 		// project.client 		= store.client;
-		project.position 	= store.position;
+		project.position 	= store.position || api.project._getDefaultPosition(); // defaults
+		// project.bounds 		= store.bounds || api.project._getDefaultBounds();
 
 		// add roles
 		roles.forEach(function (role) {
@@ -161,6 +188,34 @@ module.exports = api.project = {
 		project.save(function (err, project, numAffected) { 	// major GOTCHA!!! product.save(function (err, product, numberAffected) 
 			done(err, project);				// returns three args!!!
 		});
+	},
+
+	_getDefaultPosition : function () {
+
+		var position = { 
+			lat: 54.213861000644926, 
+			lng: 6.767578125, 
+			zoom: 4
+		}
+
+		return position;
+	},
+
+	_getDefaultBounds : function () {
+		var bounds = {
+				northEast : {
+					lat : 0,
+					lng : 0
+				},
+				southWest : {
+					lat : 0,
+					lng : 0
+				},
+				minZoom : 1,
+				maxZoom : 22
+			};
+
+		return bounds;
 	},
 
 

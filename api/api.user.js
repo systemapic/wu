@@ -655,7 +655,6 @@ module.exports = api.user = {
 		});
 	},
 
-
 	getAll : function (options, done) {
 		if (!options) return done('No options.');
 

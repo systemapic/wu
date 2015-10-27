@@ -67,7 +67,7 @@ module.exports = function(app, passport) {
 		res.json({user : req.user, user_id: req.user.id, name: req.user.firstName, scope: req.authInfo.scope});
 	});
 
-
+	
 	// =====================================
 	// GET WHOLE SETUP FOR PORTAL ==========
 	// =====================================
@@ -139,7 +139,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
-	app.post('/api/project/new', passport.authenticate('bearer', {session: false}), function (req,res) {
+	app.post('/api/project/create', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.project.create(req, res);
 	});
 

@@ -235,7 +235,7 @@ Wu.Controller = Wu.Class.extend({
 			context : this
 		}
 
-		project._saveNew(options);
+		project.create(options);
 
 	},
 

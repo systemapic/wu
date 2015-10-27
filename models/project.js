@@ -27,7 +27,7 @@ var projectSchema = mongoose.Schema({
 	colorTheme 	: String,
 
 			// client that owns project
-	client 		: String, 
+	// client 		: String, 
 
 			// all files connected to project
 	files 		: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
@@ -89,13 +89,11 @@ var projectSchema = mongoose.Schema({
 	}],	
 
 	// folders in documents pane, incl. content in html
-	folders : [
-		{
-			uuid    : String,
-			title   : String,
-			content : String
-		}
-	],
+	folders : [{
+		uuid    : String,
+		title   : String,
+		content : String
+	}],
 
 	// header of project/map
 	header : {
@@ -137,7 +135,6 @@ var projectSchema = mongoose.Schema({
 		d3popup		: { type: Boolean, default: false },
 	},
 
-	// 
 	state : String,
 
 	pending : [String],
