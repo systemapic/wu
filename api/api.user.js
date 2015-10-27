@@ -429,7 +429,6 @@ module.exports = api.user = {
 				api.project._getProjectByUuid(projectUuid, callback);
 			} else {
 				api.project._getProjectByUserUuidAndCapability(userUuid, 'create_user', callback);
-
 			}
 		});
 

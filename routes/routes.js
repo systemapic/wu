@@ -498,7 +498,10 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CREATE NEW USER =====================
 	// =====================================
-	app.post('/api/user/new', passport.authenticate('bearer', {session: false}), function (req,res) {
+	app.post('/api/user/new', passport.authenticate('bearer', {session: false}), function (req,res) { // todo: remove /new route
+		api.user.create(req, res);
+	});
+	app.post('/api/user/create', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.user.create(req, res);
 	});
 
