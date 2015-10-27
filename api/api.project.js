@@ -2,7 +2,7 @@
 
 // database schemas
 var Project 	= require('../models/project');
-var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
+// var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
 var User  	= require('../models/user');
 var File 	= require('../models/file');
 var Layer 	= require('../models/layer');
@@ -59,8 +59,6 @@ module.exports = api.project = {
 
 		// check access
 		ops.push(function (callback) {
-			console.log('api.project.create 1');
-
 			api.access.to.create_project({
 				user : account
 			}, callback);
@@ -68,7 +66,6 @@ module.exports = api.project = {
 
 		// create role
 		ops.push(function (options, callback) {
-			console.log('api.project.create 2');
 			api.access._createDefaultRoles({
 				user : account,
 			}, callback);
@@ -76,7 +73,6 @@ module.exports = api.project = {
 
 		// create project
 		ops.push(function (roles, callback) {
-			console.log('api.project.create 3');
 			api.project._create({
 				user : account,
 				roles : roles,
@@ -86,7 +82,6 @@ module.exports = api.project = {
 
 		// set default mapbox account
 		ops.push(function (project, callback) {
-			console.log('api.project.create 4');
 			api.provider.mapbox.setDefault({
 				project : project
 			}, callback);
@@ -94,7 +89,6 @@ module.exports = api.project = {
 
 		// add norkart layers
 		ops.push(function (project, callback) {
-			console.log('api.project.create 5');
 			api.provider.norkart.setDefaults({
 				project : project
 			}, callback);
@@ -102,7 +96,6 @@ module.exports = api.project = {
 
 		// add google layers
 		ops.push(function (project, callback) {
-			console.log('api.project.create 6');
 			api.provider.google.setDefault({
 				project : project
 			}, callback);
@@ -110,21 +103,14 @@ module.exports = api.project = {
 
 		// get updated project
 		ops.push(function (project, callback) {
-			console.log('api.project.create 7');
 			Project
 			.findOne({uuid : project.uuid})
-			.exec(function (err, updatedProject) {
-
-				if (err) return callback(err);
-				callback(null, updatedProject);
-			});
+			.exec(callback);
 		});
 
 		// run ops
 		async.waterfall(ops, function (err, project) {
 			if (err) return api.error.general(req, res, err);
-
-			console.log('project created!!');
 
 			// slack
 			api.slack.createdProject({
@@ -163,7 +149,7 @@ module.exports = api.project = {
 		project.header.title    = projectName;
 		project.header.subtitle = 'Project description';
 		project.keywords 	= store.keywords;
-		project.client 		= store.client;
+		// project.client 		= store.client;
 		project.position 	= store.position;
 
 		// add roles
@@ -199,7 +185,7 @@ module.exports = api.project = {
 		if (!req.body) return api.error.missingInformation(req, res);
 
 		var account     = req.user,
-		    clientUuid 	= req.body.clientUuid,
+		    // clientUuid 	= req.body.clientUuid,
 		    projectUuid = req.body.projectUuid;
 
 		var ops = [];
@@ -360,30 +346,36 @@ module.exports = api.project = {
 	checkUniqueSlug : function (req, res) {
 		if (!req.body) return api.error.general(req, res);
 
-		var value = req.body.value,
-		    clientUuid = req.body.client,
-		    projectUuid = req.body.project,
-		    slugs = [];
+		// debug: let's say all slugs are OK - and not actually use slugs for anything but cosmetics
+		// return results
+		return res.end(JSON.stringify({
+			unique : true
+		}));
 
-		Project
-		.find({client : clientUuid})
-		.exec(function (err, projects) {
-			if (err) return api.error.general(req, res, err);
+		// var value = req.body.value,
+		//     clientUuid = req.body.client,
+		//     projectUuid = req.body.project,
+		//     slugs = [];
 
-			// get slugs
-			projects.forEach(function (p) {
-				// add but self
-				if (p.uuid != projectUuid) slugs.push(p.slug.toLowerCase());
-			});
+		// Project
+		// .find({client : clientUuid})
+		// .exec(function (err, projects) {
+		// 	if (err) return api.error.general(req, res, err);
 
-			// check if slug already exists
-			var unique = !(slugs.indexOf(value.toLowerCase()) > -1);
+		// 	// get slugs
+		// 	projects.forEach(function (p) {
+		// 		// add but self
+		// 		if (p.uuid != projectUuid) slugs.push(p.slug.toLowerCase());
+		// 	});
 
-			// return results
-			res.end(JSON.stringify({
-				unique : unique
-			}));
-		});
+		// 	// check if slug already exists
+		// 	var unique = !(slugs.indexOf(value.toLowerCase()) > -1);
+
+		// 	// return results
+		// 	res.end(JSON.stringify({
+		// 		unique : unique
+		// 	}));
+		// });
 	},
 
 	_returnProject : function (req, res, project, err) {

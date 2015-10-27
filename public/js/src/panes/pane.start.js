@@ -201,9 +201,9 @@ Wu.StartPane = Wu.Pane.extend({
 
 		if (!project) return;
 
-		var client = project.getClient();
+		// var client = project.getClient();
 
-		if (!client) return;
+		// if (!client) return;
 
 
 		var newProject = {};
@@ -250,13 +250,13 @@ Wu.StartPane = Wu.Pane.extend({
 		newProject._projectTitle = Wu.DomUtil.create('div', 'start-project-name', newProject._projectContainer);
 		newProject._projectTitle.innerHTML = project.getName();
 
-		newProject._clientName = Wu.DomUtil.create('div', 'start-project-client-name', newProject._projectContainer);
-		newProject._clientName.innerHTML = client.getName();
+		// newProject._clientName = Wu.DomUtil.create('div', 'start-project-client-name', newProject._projectContainer);
+		// newProject._clientName.innerHTML = client.getName();
 
-		if (client.getLogo()) {
-			newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
-			newProject._clientLogo.src = client.getLogo() + '?access_token=' + app.tokens.access_token;
-		}
+		// if (client.getLogo()) {
+		// 	newProject._clientLogo = Wu.DomUtil.create('img', 'start-project-client-logo', newProject._projectContainer);
+		// 	newProject._clientLogo.src = client.getLogo() + '?access_token=' + app.tokens.access_token;
+		// }
 
 		this.projectContainers.push(newProject);
 
@@ -289,17 +289,17 @@ Wu.StartPane = Wu.Pane.extend({
 		if (this._hooksDisabled) return;
 
 		// refresh sidepane
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 
 		Wu.Mixin.Events.fire('projectSelected', { detail : {
 			projectUuid : project.getUuid()
 		}});  
 
-		// Hide the Start Pane
+		// // Hide the Start Pane
 		this.deactivate();
 
-		// Google Analytics event trackign
-		app.Analytics.setGaPageview(project.getUuid());
+		// // Google Analytics event trackign
+		// app.Analytics.setGaPageview(project.getUuid());
 
 	},
 

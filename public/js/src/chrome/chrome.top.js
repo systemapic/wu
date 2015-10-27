@@ -240,7 +240,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_setProjectTitle : function () {
 
 		// get client & project names
-		this._clientName = this._project.getClient().getName();
+		// this._clientName = this._project.getClient().getName();
 		this._projectTitleName = this._project.getHeaderTitle();
 
 		// set project title

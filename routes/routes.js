@@ -271,28 +271,28 @@ module.exports = function(app, passport) {
 	});
 
 
-	// =====================================
-	// CREATE NEW CLIENT ===================
-	// =====================================
-	app.post('/api/client/new', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.client.create(req, res);
-	});
+	// // =====================================
+	// // CREATE NEW CLIENT ===================
+	// // =====================================
+	// app.post('/api/client/new', passport.authenticate('bearer', {session: false}), function (req,res) {
+	// 	api.client.create(req, res);
+	// });
 
 
-	// =====================================
-	// CHECK IF UNIQUE CLIENT NAME   =======
-	// =====================================
-	app.post('/api/client/unique', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.client.checkUniqueSlug(req, res);
-	});
+	// // =====================================
+	// // CHECK IF UNIQUE CLIENT NAME   =======
+	// // =====================================
+	// app.post('/api/client/unique', passport.authenticate('bearer', {session: false}), function (req,res) {
+	// 	api.client.checkUniqueSlug(req, res);
+	// });
 
 
-	// =====================================
-	// DELETE CLIENT =======================
-	// =====================================
-	app.post('/api/client/delete', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.client.deleteClient(req, res);
-	});
+	// // =====================================
+	// // DELETE CLIENT =======================
+	// // =====================================
+	// app.post('/api/client/delete', passport.authenticate('bearer', {session: false}), function (req,res) {
+	// 	api.client.deleteClient(req, res);
+	// });
 
 
 	// =====================================
@@ -303,12 +303,12 @@ module.exports = function(app, passport) {
 	});
 
 
-	// =====================================
-	// UPDATE CLIENT =======================
-	// =====================================
-	app.post('/api/client/update', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.client.update(req, res);
-	});
+	// // =====================================
+	// // UPDATE CLIENT =======================
+	// // =====================================
+	// app.post('/api/client/update', passport.authenticate('bearer', {session: false}), function (req,res) {
+	// 	api.client.update(req, res);
+	// });
 
 
 	// =====================================

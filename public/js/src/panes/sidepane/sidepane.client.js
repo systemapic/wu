@@ -238,12 +238,9 @@ Wu.SidePane.Client = Wu.Class.extend({
 		var store = {
 			name 		: 'Project title',
 			description 	: 'Project description',
-			// created 	: new Date().toJSON(),
-			// lastUpdated 	: new Date().toJSON(),
 			createdByName 	: app.Account.getName(),
 			keywords 	: '',
-			client 		: this.client.uuid,
-			position 	: position || {},
+			position 	: app.options.defaults.project.position || {},
 			bounds : {
 				northEast : {
 					lat : 0,

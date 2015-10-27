@@ -55,7 +55,6 @@ Wu.User = Wu.Class.extend({
 		this._files[fileUuid] = null;
 		delete this._files[fileUuid];
 
-		console.log('REMMM r', r);
 	},
 
 	// set functions

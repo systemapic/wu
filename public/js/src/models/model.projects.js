@@ -10,7 +10,7 @@ Wu.Project = Wu.Class.extend({
 		this.lastSaved = {};
 
 		// attach client
-		this._client = Wu.app.Clients[this.store.client];
+		// this._client = Wu.app.Clients[this.store.client];
 
 		// init roles, files, layers
 		this._initObjects();
@@ -240,8 +240,8 @@ Wu.Project = Wu.Class.extend({
 
 	_setUrl : function () {
 		var url = '/';
-		url += this._client.slug;
-		url += '/';
+		// url += this._client.slug;
+		// url += '/';
 		url += this.store.slug;
 		Wu.Util.setAddressBar(url);
 	},
@@ -268,7 +268,7 @@ Wu.Project = Wu.Class.extend({
 
 		// refresh project and sidepane
 		this._refresh();
-		this.refreshSidepane();
+		// this.refreshSidepane();
 	},
 
 	_update : function (field) {
@@ -335,7 +335,7 @@ Wu.Project = Wu.Class.extend({
 			description 	: this.store.description,
 			keywords 	: this.store.keywords, 
 			position 	: this.store.position,
-			client 		: this._client.uuid 			// parent client uuid 
+			// client 		: this._client.uuid 			// parent client uuid 
 		}
 		var json = JSON.stringify(options);
 		
@@ -357,7 +357,7 @@ Wu.Project = Wu.Class.extend({
 		var json = JSON.stringify({ 
 			    'pid' : this.store.uuid,
 			    'projectUuid' : this.store.uuid,
-			    'clientUuid' : this._client.uuid
+			    // 'clientUuid' : this._client.uuid
 		});
 		
 		// post with callback:    path       data    callback   context of cb
@@ -367,8 +367,9 @@ Wu.Project = Wu.Class.extend({
 	_deleted : function (project, json) {
 		
 		// set address bar
-		var client = project.getClient().getSlug();
-		var url = app.options.servers.portal + client + '/';
+		// var client = project.getClient().getSlug();
+		// var url = app.options.servers.portal + client + '/';
+		var url = app.options.servers.portal;
 		var deletedProjectName = project.getName();
 
 		// set url
@@ -385,7 +386,7 @@ Wu.Project = Wu.Class.extend({
 			app.activeProject = null;
 
 			// refresh sidepane
-			app.SidePane.refreshMenu();
+			// app.SidePane.refreshMenu();
 
 			// unload project
 			project._unload();
@@ -541,11 +542,13 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getClient : function () {
-		return app.Clients[this.store.client];
+		console.error('TODO: remove this!');
+		// return app.Clients[this.store.client];
 	},
 
 	getClientUuid : function () {
-		return this.store.client;
+		console.error('TODO: remove this!');
+		// return this.store.client;
 	},
 
 	getBaselayers : function () {
@@ -773,7 +776,7 @@ Wu.Project = Wu.Class.extend({
 	getSlugs : function () {
 		var slugs = {
 			project : this.store.slug,
-			client : this.getClient().getSlug()
+			// client : this.getClient().getSlug()
 		}
 		return slugs;
 	},
@@ -1021,7 +1024,7 @@ Wu.Project = Wu.Class.extend({
 		}
 
 		// refresh added/removed sidepanes
-		app.SidePane._refresh();
+		// app.SidePane._refresh();
 	},
 
 	// settings
@@ -1063,38 +1066,38 @@ Wu.Project = Wu.Class.extend({
 
 
 	enableScreenshot : function () {
-		app.SidePane.Share.enableScreenshot();
+		// app.SidePane.Share.enableScreenshot();
 	},
 	disableScreenshot : function () {
-		app.SidePane.Share.disableScreenshot();
+		// app.SidePane.Share.disableScreenshot();
 	},
 
 	enableDocumentsPane : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 	disableDocumentsPane : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 
 	enableDataLibrary : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 	disableDataLibrary : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 
 	enableMediaLibrary : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 	disableMediaLibrary : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 
 	enableSocialSharing : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 	disableSocialSharing : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 
 	enableAutoHelp : function () {		// auto-add folder in Docs
