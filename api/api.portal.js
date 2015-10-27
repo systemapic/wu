@@ -249,10 +249,8 @@ module.exports = api.portal = {
 			if (err || !result) return api.error.general(req, res, err || 'No result.');
 
 			var gzip = true;
-			if (req.body.gzip === false) {
-				gzip = false;
-			}
-			
+			if (req.body.gzip === 'false') gzip = false;
+
 			// if (dontZip) return res.json(result);
 			if (!gzip) return res.json(result);
 			
