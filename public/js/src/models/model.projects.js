@@ -327,7 +327,9 @@ Wu.Project = Wu.Class.extend({
 		}});
 	},
 
-	_saveNew : function (opts) {
+
+	// create project on server
+	create : function (opts) {
 	     	var callback = opts.callback;
 
 		var options = {
@@ -337,9 +339,9 @@ Wu.Project = Wu.Class.extend({
 			position 	: this.store.position,
 			// client 		: this._client.uuid 			// parent client uuid 
 		}
-		var json = JSON.stringify(options);
-		
- 		Wu.Util.postcb('/api/project/new', json, callback.bind(opts.context), this);
+
+		// send request to API		
+ 		Wu.Util.postcb('/api/project/create', JSON.stringify(options), callback.bind(opts.context), this);
 	},
 
 
