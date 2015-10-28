@@ -27,8 +27,11 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Client Logo
 		this._clientLogo = Wu.DomUtil.create('div', 'chrome-portal-logo', this._container);
 
+		// client logo link
+		this._clientLogoLink = Wu.DomUtil.create('a', '', this._clientLogo);
+
 		// client log image
-		this._clientLogoImg = Wu.DomUtil.create('img', '', this._clientLogo);		
+		this._clientLogoImg = Wu.DomUtil.create('img', '', this._clientLogoLink);		
 
 		// Project title
 		this._projectTitle = Wu.DomUtil.create('div', 'chrome-project-title', this._projectTitleContainer);
@@ -257,6 +260,12 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// portal logo from config
 		this._clientLogoImg.src = app.options.servers.portal + app.options.logos.portalLogo;
+
+		// set portal logo link from config
+		var link = app.options.logos.portalLink;
+		this._clientLogoLink.href = link;
+		this._clientLogoLink.setAttribute('target', '_blank');
+
 	},
 
 
