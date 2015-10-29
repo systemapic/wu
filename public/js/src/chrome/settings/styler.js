@@ -595,7 +595,7 @@ Wu.Styler = Wu.Class.extend({
 		var inputField = this._content[this.type].width.input.input;
 
 		// save carto
-		this.carto().width.value = inputField.value;
+		this.carto().width.staticVal = inputField.value;
 
 		// update
 		this._updateStyle();	
@@ -653,10 +653,10 @@ Wu.Styler = Wu.Class.extend({
 		inputField.value = value;
 
 		// don't save if no changes
-		if (this.carto().pointsize.value == value) return;
+		if (this.carto().pointsize.staticVal == value) return;
 
 		// save carto
-		this.carto().pointsize.value = value;
+		this.carto().pointsize.staticVal = value;
 
 		// update
 		this._updateStyle();
