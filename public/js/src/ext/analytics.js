@@ -88,14 +88,11 @@ Wu.Analytics = Wu.Class.extend({
 	_onZoomStart : function () {
 		var map = app._map;
 		app._eventZoom = map.getZoom();
-		console.log('this:-zoom', app._eventZoom);
 	},
 
 	_onZoomEnd : function () {
 		var map = app._map;
 		var zoom = map.getZoom();
-
-		console.log('zoom', zoom);
 
 		// slack
 		app.Socket.sendUserEvent({
@@ -237,7 +234,6 @@ Wu.Analytics = Wu.Class.extend({
 		
 		// add distance from previous query
 		if (prevLatlng) description += '\n      Distance from last query: `' + parseInt(data.latlng.distanceTo(prevLatlng)) + 'meters`';
-		if (prevLatlng) console.log(data.latlng.distanceTo(prevLatlng));
 
 		// slack
 		app.Socket.sendUserEvent({
