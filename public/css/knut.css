@@ -26,3 +26,73 @@
 	background: red;
 	color: black;
 }
+
+
+
+/* ###################################### */
+/* simplified look, as requested by frano */
+/* ###################################### */
+/* datalib */
+.data-list-line:last-child {
+	border: none;
+}
+.data-list-line {
+	border: none;
+}
+.file-list-container-file-list .data-list-line:hover {
+	background: rgba(246, 246, 246, 0.54);
+	color: #4FA98B;
+}
+.file-popup {
+	color: #3F4652;
+}
+.data-list-line .file-name-content {
+	font-size: 16px;
+}
+.files-container {
+	padding-bottom: 60px;
+}
+.file-list-container-file-list .data-list-line .file-popup-trigger {
+	margin-top: 9px;
+	margin-right: 4px;
+}
+.file-meta-content {
+	margin-top: 2px;
+	margin-bottom: 0px;
+}
+.file-meta-content .file-meta-author {
+	margin-right: 7px;
+	color: #B9B9B9;
+}
+
+/* editor */
+.chrome-metafield-line {
+	border: none;
+}
+.chrome-metafield-line-children:last-child {
+	border: none;
+}
+.chrome-metafield-line:last-child {
+	border: none;
+}
+#field_wrapper_point {
+	font-size: 20px;
+}
+#field_wrapper_polygon {
+	font-size: 20px;
+}
+#field_wrapper_line {
+	font-size: 20px;
+}
+.chrome-pane.styler .chrome-switch-container {
+	top: 13px;
+	zoom: 1.1;
+}
+
+/* settings dropdown */
+.settings-dropdown .chrome-metafield-line {
+	border: none;
+}
+.settings-dropdown .chrome-metafield-line:last-child {
+	border: none;
+}

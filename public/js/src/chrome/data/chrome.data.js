@@ -465,14 +465,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 		
-
+		// CREATE NAME CONTENT (file name)
+		this.createFileNameContent(dataListLine, library);
 
 		// CREATE FILE META (date and size)
 		this.createFileMetaContent(dataListLine, library);
-
-		// CREATE NAME CONTENT (file name)
-		this.createFileNameContent(dataListLine, library);		
-
+		
 		// FILE AUTHOR
 		// this.createFileAuthor(dataListLine, library);	
 
