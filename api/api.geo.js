@@ -222,7 +222,7 @@ module.exports = api.geo = {
 		} else {
 
 			// static opacity
-			css.headers += '@point_opacity: ' + opacity.value + ';\n';
+			css.headers += '@point_opacity: ' + opacity.staticVal + ';\n';
 		}
 
 		// add rule
@@ -256,7 +256,7 @@ module.exports = api.geo = {
 		} else {
 
 			// static opacity
-			css.headers += '@polygon_opacity: ' + opacity.value + ';\n';
+			css.headers += '@polygon_opacity: ' + opacity.staticVal + ';\n';
 		}
 
 		// add rule
@@ -290,7 +290,7 @@ module.exports = api.geo = {
 		} else {
 
 			// static opacity
-			css.headers += '@line_opacity: ' + opacity.value + ';\n';
+			css.headers += '@line_opacity: ' + opacity.staticVal + ';\n';
 		}
 
 		// add rule
@@ -736,7 +736,7 @@ module.exports = api.geo = {
 			
 		} else {
 
-			cartObj.headers += '@marker_size_factor: ' + pointSize.value + ';\n';
+			cartObj.headers += '@marker_size_factor: ' + pointSize.staticVal + ';\n';
 
 		}
 
@@ -782,7 +782,7 @@ module.exports = api.geo = {
 			
 		} else {
 
-			cartObj.headers += '@line_size_factor: ' + lineWidth.value + ';\n';
+			cartObj.headers += '@line_size_factor: ' + lineWidth.staticVal + ';\n';
 
 		}
 

@@ -206,7 +206,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// get states
 		var isOn   = (this.carto().opacity.column === false);
-		var value  = this.carto().opacity.value || 1;
+		var value  = this.carto().opacity.staticVal || 1;
 		var column = this.carto().opacity.column;
 		var minMax = this.carto().opacity.range;
 
@@ -254,7 +254,7 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().opacity = {
 			column : column,
 			range : minMax,
-			value : value
+			staticVal : value
 		};
 	},
 
@@ -266,7 +266,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// Get stores states
 		var isOn   = (this.carto().pointsize.column === false)
-		var val    = this.carto().pointsize.value || 1.2;
+		var val    = this.carto().pointsize.staticVal || 1.2;
 		var column = this.carto().pointsize.column;
 		var minMax = this.carto().pointsize.range;
 
@@ -314,7 +314,7 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().pointsize = {
 			column 	    : column,
 			range 	    : minMax,			
-			value 	    : val
+			staticVal : val
 		};
 	},
 
@@ -326,7 +326,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// Get stores states
 		var isOn   = (this.carto().width.column === false)
-		var val    = this.carto().width.value || 1.2;
+		var val    = this.carto().width.staticVal || 1.2;
 		var column = this.carto().width.column;
 		var minMax = this.carto().width.range;
 
@@ -374,7 +374,7 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().width = {
 			column 	    : column,
 			range 	    : minMax,			
-			value 	    : val
+			staticVal : val
 		};
 	},
 
@@ -402,7 +402,7 @@ Wu.Styler = Wu.Class.extend({
 		var color_range = range ? range.line.container : false;
 
 		// convert to five colors
-		if (value.length < 5) value = this._convertToFiveColors(value);
+		if (value.length < 5) values = this._convertToFiveColors(value);
 
 		// Container
 		var line = new Wu.fieldLine({
@@ -623,10 +623,10 @@ Wu.Styler = Wu.Class.extend({
 		inputField.value = value;
 
 		// don't save if unchanged
-		if (this.carto().opacity.value == value) return;
+		if (this.carto().opacity.staticVal == value) return;
 
 		// save carto
-		this.carto().opacity.value = value;
+		this.carto().opacity.staticVal = value;
 
 		// update
 		this._updateStyle();
@@ -795,7 +795,6 @@ Wu.Styler = Wu.Class.extend({
 
 		console.log('_dropdownSelected!!', e, key, field, wrapper, this.type);
 
-
 		// check if selected item is placeholders
 		var isStatic = (field == this.options.dropdown.staticText);
 		var isDivider = (field == this.options.dropdown.staticDivider);
@@ -809,6 +808,13 @@ Wu.Styler = Wu.Class.extend({
 
 		// add class
 		Wu.DomUtil.addClass(wrapper, 'full-width');
+
+		// if not same, clear old values
+		if (this.carto()[field].column != column) {
+			var staticVal = this.carto()[field].staticVal;
+			this.carto()[field] = {};
+			this.carto()[field].staticVal = staticVal;
+		}
 
 		// remove static inputs
 		if (field == 'opacity') {
@@ -828,10 +834,7 @@ Wu.Styler = Wu.Class.extend({
 			Wu.DomUtil.addClass(colorBall, 'disable-color-ball');
 		}
 
-		// if not same, clear old values
-		if (this.carto()[field].column != column) {
-			this.carto()[field] = {};
-		}
+		
 
 		// save carto
 		this.carto()[field].column = column; 
@@ -852,6 +855,8 @@ Wu.Styler = Wu.Class.extend({
 	},
 
 	_unselectField : function (key, wrapper) {
+
+		console.log('_unselectField', key, this.carto()[key]);
 
 		// show static inputs
 		if (key == 'opacity') {	
@@ -885,6 +890,9 @@ Wu.Styler = Wu.Class.extend({
 
 		// save style
 		this.carto()[key].column = false;
+
+		// set fixed style
+
 
 		// refresh
 		this._updateStyle();
