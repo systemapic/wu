@@ -1189,6 +1189,18 @@ Wu.Project = Wu.Class.extend({
 		var base = logo.split('/')[2];
 		var url = '/pixels/image/' + base + '?width=90&height=60&format=png' + '&access_token=' + app.tokens.access_token;
 		return url;
-	}
+	},
+
+
+	selectProject : function () {
+		
+		// select project
+		Wu.Mixin.Events.fire('projectSelected', {detail : {
+			projectUuid : this.getUuid()
+		}});
+	},
+
+
+
 
 })
