@@ -8,25 +8,75 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 	_initialize : function () {
 
+		console.log('_initialize', this._);
+
 		// init container
 		this._initContainer();
-	
-		// init content
-		this._initContent();
+
+
+		setTimeout(function() {
+			// init content
+			this._initContent();
+
+		}.bind(this), 200)
+
+
 	},
 
 	_initContainer : function () {
-		this._container = Wu.DomUtil.create('div', 'chrome-projects chrome-projects-container', this.options.appendTo);
-	},
 
+		this._container = Wu.DomUtil.create('div', 'chrome-left-section chrome-projects', this.options.appendTo);
+
+	},
+	
 	_initContent : function () {
 
-		// todo: remove dummy
-		var dummy = Wu.DomUtil.create('div', 'dummy', this._container);
-		dummy.innerHTML = 'projects, etc';
-		dummy.style.marginTop = '35px';
-	
+		// Create Container
+		var projectsContainer = Wu.DomUtil.create('div', 'chrome-left-container', this._container);
+
+		// Create Title
+		var projectsTitle = Wu.DomUtil.create('div', 'chrome-left-title projects-title', projectsContainer, 'Projects');
+
+		// Create NEW button
+		var newProjectButton = Wu.DomUtil.create('div', 'chrome-left-new-button', projectsContainer, 'New');
+
+		Wu.DomEvent.on(newProjectButton, 'click', this.createNewProject, this);
+
+
+		// Get projects
+		var projects = this.projects = app.Projects;
+
+		// Get active project ID
+		var activeProjectUuid = app.activeProject.getUuid();
+
+
+		for ( var projectID in projects ) {
+
+			var project = projects[projectID];
+			var projectName = project.getName();
+
+			var _containerClassName = 'chrome-left-itemcontainer chrome-project';
+
+			// Set active project
+			if ( activeProjectUuid == projectID ) _containerClassName += ' activeProject';
+			
+			// Create line with project
+			var _projectContainer = Wu.DomUtil.create('div', _containerClassName, projectsContainer);
+			var _projectName = Wu.DomUtil.create('div', 'chrome-left-item-name', _projectContainer, projectName);
+			var _actionTrigger = Wu.DomUtil.create('div', 'chrome-left-popup-trigger', _projectContainer);
+
+		}
+
+
+		
 	},
+
+	createNewProject : function () {
+
+		console.log('create new project')
+
+	},
+	
 
 	_onLayerAdded : function (options) {
 	},
@@ -64,14 +114,15 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	},
 
 	_show : function () {
+
 		this._container.style.display = 'block';
-		this._container.style.width = this.options.defaultWidth + 'px';
 		this._isOpen = true;
+
 	},
 
 	_hide : function () {
+
 		this._container.style.display = 'none';
-		this._container.style.width = 0;
 		this._isOpen = false;
 	},
 
@@ -99,7 +150,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	},
 
 	_refresh : function () {
-		if ( !this._project ) return;
+
+		if ( !this._project ) return;		
 	},
 
 });

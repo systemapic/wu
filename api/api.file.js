@@ -104,16 +104,18 @@ module.exports = api.file = {
 		});
 	},
 
+	// called from api.upload.js:431
 	addNewFileToUser : function (options, done) {
 
 		var userUuid = options.user.uuid,
 		    file_id = options.file._id;
 
+		console.log('addNewFileToUser', options);
 
 		User
 		.findOne({uuid : userUuid})
 		.exec(function (err, user) {
-			if (err) return done(err);
+			if (err || !user) return done(err || 'ERR 838: No user.');
 
 			// add file
 			user.files.push(file_id);
