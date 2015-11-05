@@ -10,6 +10,8 @@
 	background: white;
 	position: relative;
 	padding-top: 52px;
+	overflow-y: scroll;
+	overflow-x: none;
 	}
 
 .chrome-left:after {
@@ -27,7 +29,7 @@
 	width: 100%;
 	height: auto;
 	color: black;
-	padding: 22px;
+	/*padding: 22px;*/
 	padding-top: 0px;
 	}
 
@@ -35,17 +37,20 @@
 	position: relative;
 	padding-left: 2px;
 	padding-right: 2px;
+	color: #3C3C3C;
+	margin-right: 15px;
 	}
 
 .chrome-left-itemcontainer:hover {
-	background: #e3f3ee;
+	background: #F7F7F7;
+    	border-radius: 2px;
 	}
 
 .chrome-left-itemcontainer:hover .chrome-left-item-name {
 	opacity: 1 !important;
 	}
 
-.chrome-left-itemcontainer:hover .chrome-left-popup-trigger {
+.chrome-left-itemcontainer.active-project:hover .chrome-left-popup-trigger {
 	display: block;
 	}
 
@@ -63,11 +68,14 @@
 	margin-top: 0;
 	padding-bottom: 6px;
 	border-bottom: 1px dashed #ccc;
+	padding-left: 20px;
+	cursor: default;
 	}
 
 .chrome-left-item-name {
 	line-height: 1.8;
 	cursor: pointer;
+	padding-left: 20px;
 	}
 
 .chrome-left-popup-trigger {
@@ -76,18 +84,19 @@
 	right: 3px;
 	z-index: 300;
 	opacity: 1;
-	width: 18px;
-	height: 18px;
-	border-radius: 10px;
+	width: 20px;
+	height: 20px;
+	/*border-radius: 15px;*/
 	right: 1px;
-	box-shadow: 0 0 0 1px #666 inset;
-	background: white;
+	/*box-shadow: 0 0 0 1px #666 inset;*/
+	/*background: white;*/
 	opacity: 0.5;	
 	display: none;
 	cursor: pointer;
 	color: black;
 	font-weight: 300;
 	line-height: 1.3;	
+	margin-right: 4px;
 	}
 
 .chrome-left-popup-trigger:hover {
@@ -96,10 +105,11 @@
 
 
 .chrome-left-popup-trigger:before {
-	content: '...';
+	content: 'Edit';
 	position: absolute;
-	top: -4px;
-	right: 3px;
+	top: 0px;
+	right: 2px;
+	font-weight: 500;
 	}
 
 
@@ -396,4 +406,62 @@
 }
 .settings-dropdown .chrome-metafield-line:last-child {
 	border: none;
+}
+
+
+.smooth-fullscreen {
+	background: rgba(252, 252, 252, 1);
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 999999999;
+	width: 100%;
+
+	height: 100%;
+	/*opacity: 0.98;*/
+}
+
+.smooth-fullscreen-inner {
+  margin: auto;
+  /*border: 1px solid;*/
+  /*max-width: 600px;*/
+  width: 700px;
+  top: 120px;
+  position: relative;
+  padding: 20px;
+}
+
+.close-smooth-fullscreen {
+  border: 1px solid #ccc;
+  width: 50px;
+  height: 50px;
+  border-radius: 100px;
+  text-align: center;
+  line-height: 1.1;
+  font-size: 36px;
+  font-weight: 200;
+  position: absolute;
+  right: 30px;
+  top: 30px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.close-smooth-fullscreen:hover {
+	background: #D6D6D6;
+    	color: white;
+}
+
+.smooth-fullscreen-title {
+  font-size: 30px;
+  font-weight: 900;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 25px;
+}
+
+
+.chrome-left-container.contacts {
+	margin-top: 20px;
+	margin-bottom: 20px;
 }

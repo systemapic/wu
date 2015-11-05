@@ -1,0 +1,51 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,700,600,600italic,700italic);
+
+body {
+	font-family: 'Open Sans', serif;
+}
+
+.chrome-project-title {
+	border-bottom: 1px solid white;
+	font-size: 24px;
+	color: white;
+	text-transform: capitalize;
+	color: rgba(0, 0, 0, 0.46);
+	-webkit-text-fill-color: white;
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: rgba(0, 0, 0, 0.46);
+}
+
+.chrome-top {
+	background: none;
+}
+
+.chrome-portal-logo {
+	display: none;
+}
+
+.chrome-menu-button {
+    border-right: none;
+}
+.chrome-menu-button:before {
+    content: '';
+    background-image: url(images/systemapic_logo_white.png);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    top: 0;
+    left: 0;
+    opacity: 0.8;
+    background-size: 40px 40px;
+    padding: 5px;
+    margin: 5px;
+}
+
+.leaflet-top.leaflet-left {
+    margin-top: 50px;
+}
+
+.active-project  {
+    font-weight: 700;
+}

@@ -24,8 +24,8 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 	
 	_initContent : function () {
 
-		var usersContainer = Wu.DomUtil.create('div', 'chrome-left-container', this._container);
-		var usersTitle = Wu.DomUtil.create('div', 'chrome-left-title users-title', usersContainer, 'Users');
+		var usersContainer = Wu.DomUtil.create('div', 'chrome-left-container contacts', this._container);
+		var usersTitle = Wu.DomUtil.create('div', 'chrome-left-title users-title', usersContainer, 'Contacts');
 		var users = this.users = app.Users;
 
 		// Define D3 container
