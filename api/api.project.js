@@ -161,7 +161,7 @@ module.exports = api.project = {
 		if (!user) return done('Missing information.8');
 
 
-		var projectName = 'Project ' + api.utils.getRandomName();
+		var projectName = store.name || 'Project ' + api.utils.getRandomName();
 		var projectSlug = api.utils.createNameSlug(projectName);
 
 		// create model

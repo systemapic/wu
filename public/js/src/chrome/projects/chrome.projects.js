@@ -8,26 +8,22 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 	_initialize : function () {
 
-		console.log('_initialize', this._);
-
 		// init container
 		this._initContainer();
 
-
+		// init content
 		this._initContent();
 
 	},
 
 	_initContainer : function () {
-
 		this._container = Wu.DomUtil.create('div', 'chrome-left-section chrome-projects', this.options.appendTo);
-
 	},
 	
 	_initContent : function () {
 
 		// Create Container
-		var projectsContainer = Wu.DomUtil.create('div', 'chrome-left-container', this._container);
+		var projectsContainer = this._projectsContainer = Wu.DomUtil.create('div', 'chrome-left-container', this._container);
 
 		// Create Title
 		var projectsTitle = Wu.DomUtil.create('div', 'chrome-left-title projects-title', projectsContainer, 'Projects');
@@ -35,13 +31,19 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		// Create NEW button
 		var newProjectButton = Wu.DomUtil.create('div', 'chrome-left-new-button', projectsContainer, 'New');
 
-		Wu.DomEvent.on(newProjectButton, 'click', this.createNewProject, this);
+		// new trigger
+		Wu.DomEvent.on(newProjectButton, 'click', this._openNewProjectFullscreen, this);
 
 		// save divs
 		this._projects = {};
 
+		// sort by name
+		var projects = _.sortBy(_.toArray(app.Projects), function (p) {
+			return p.getName().toLowerCase();
+		});
+
 		// iterate projects, create item
-		_.each(app.Projects, function (project) {
+		_.each(projects, function (project) {
 
 			var className = 'chrome-left-itemcontainer chrome-project';
 
@@ -58,44 +60,165 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			Wu.DomEvent.on(wrapper, 'click', project.selectProject, project);
 
 			// edit trigger
-			Wu.DomEvent.on(trigger, 'click', this._editProject.bind(this, project), this);
+			Wu.DomEvent.on(trigger, 'click', this._openEditProjectFullscreen.bind(this, project), this);
 
 
 		}, this);
 	},
 
-	_editProject : function (project, e) {
+	_refreshContent : function () {
+
+		// remove old, todo: check for mem leaks
+		this._projectsContainer.innerHTML = '';
+		Wu.DomUtil.remove(this._projectsContainer);
+
+		// rebuild
+		this._initContent();
+	},
+
+
+	_openEditProjectFullscreen : function (project, e) {
 		Wu.DomEvent.stop(e);
-
-		console.log('edit: ', project.getName());
-
-
-
+		
+		// create fullscreen
 		this._fullscreen = Wu.DomUtil.create('div', 'smooth-fullscreen', app._appPane);
 
-		var manageAccessInner = Wu.DomUtil.create('div', 'smooth-fullscreen-inner', this._fullscreen);
-		var closeManageAccessButton = Wu.DomUtil.create('div', 'close-smooth-fullscreen', this._fullscreen, 'x');
+		// wrappers
+		var inner = Wu.DomUtil.create('div', 'smooth-fullscreen-inner', this._fullscreen);
+		var closer = Wu.DomUtil.create('div', 'close-smooth-fullscreen', this._fullscreen, 'x');
+		var header = Wu.DomUtil.create('div', 'smooth-fullscreen-title', inner);
 
-		var header = Wu.DomUtil.create('div', 'smooth-fullscreen-title', manageAccessInner);
-		header.innerHTML = '<span style="font-weight:200;">Edit</span> ' + project.getName();
+		// set title
+		var title = '<span style="font-weight:200;">Edit</span> ' + project.getName();
+		header.innerHTML = title;
 
+		// close trigger		
+		Wu.DomEvent.on(closer, 'click', this._closeFullscreen, this);
+	},
+
+	_openNewProjectFullscreen : function (e) {
+		Wu.DomEvent.stop(e);
 		
+		// create fullscreen
+		this._fullscreen = Wu.DomUtil.create('div', 'smooth-fullscreen', app._appPane);
 
-		// this.manageProjectsList(manageAccessInner);
+		// wrappers
+		var inner = Wu.DomUtil.create('div', 'smooth-fullscreen-inner', this._fullscreen);
+		var closer = Wu.DomUtil.create('div', 'close-smooth-fullscreen', this._fullscreen, 'x');
+		var title = Wu.DomUtil.create('div', 'smooth-fullscreen-title', inner);
+
+		// set title
+		var text = '<span style="font-weight:200;">Create New Project</span>';
+		title.innerHTML = text;
+
+		// add content
+		var content = Wu.DomUtil.create('div', 'smooth-fullscreen-content', inner);
 
 
-		Wu.DomEvent.on(closeManageAccessButton, 'click', this.closeManageAccess, this);
+		// project name
+		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label', content, 'Project name');
+		var name_input = Wu.DomUtil.create('input', 'smooth-input', content);
+		name_input.setAttribute('placeholder', 'Enter name here');
+		var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', content);
 
+		// save button
+		var saveBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', content, 'Create');
+
+		// pass inputs to save
+		var options = {};
+		options.name_input = name_input;
+		options.name_error = name_error;
+
+		// save button trigger
+		Wu.DomEvent.on(saveBtn, 'click', this._createProject.bind(this, options), this);
+
+		// close trigger		
+		Wu.DomEvent.on(closer, 'click', this._closeFullscreen, this);
+	},
+
+	_createProject : function (options) {
+
+		// get name
+		var projectName = options.name_input.value;
+
+		// no data
+		if (!projectName) {
+			options.name_error.innerHTML = 'Please enter a project name';
+			return;
+		}
+
+		// create project object
+		var store = {
+			name 		: projectName,
+			description 	: 'Project description',
+			createdByName 	: app.Account.getName(),
+			keywords 	: '',
+			position 	: app.options.defaults.project.position || {},
+			bounds : {
+				northEast : {
+					lat : 0,
+					lng : 0
+				},
+				southWest : {
+					lat : 0,
+					lng : 0
+				},
+				minZoom : 1,
+				maxZoom : 22
+			},
+			header : {
+				height : 50
+			},
+			folders : []
+		}
+
+		// set create options
+		var options = {
+			store : store,
+			callback : this._projectCreated,
+			context : this
+		}
+
+		// create new project with options, and save
+		var project = new Wu.Project(store);
+
+		// create project on server
+		project.create(options);
 
 	},
 
-	closeManageAccess : function () {
+	_projectCreated : function (project, json) {
+		var result = Wu.parse(json),
+		    error  = result.error,
+		    store  = result.project;
 
+		// return error
+		if (error) return app.feedback.setError({
+			title : 'There was an error creating new project!', 
+			description : error
+		});
+			
+		// add to global store
+		app.Projects[store.uuid] = project;
+
+		// update project store
+		project.setNewStore(store);
+
+		// add project to list
+		this._refreshContent();
+
+		// close fullscreen
+		this._closeFullscreen();
+
+		// select project
+		project.selectProject();
+	},
+
+	_closeFullscreen : function () {
 		this._fullscreen.innerHTML = '';
-
 		Wu.DomUtil.remove(this._fullscreen);
-
 	},
+
 
 	// fired on projectSelected
 	_refresh : function () {

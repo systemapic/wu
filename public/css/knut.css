@@ -423,8 +423,6 @@
 
 .smooth-fullscreen-inner {
   margin: auto;
-  /*border: 1px solid;*/
-  /*max-width: 600px;*/
   width: 700px;
   top: 120px;
   position: relative;
@@ -447,6 +445,10 @@
   opacity: 0.7;
 }
 
+.close-smooth-fullscreen:active {
+	background: rgba(252, 252, 252, 1);
+}
+
 .close-smooth-fullscreen:hover {
 	background: #D6D6D6;
     	color: white;
@@ -465,3 +467,81 @@
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+.smooth-input {
+	height: 50px;
+	font-size: 28px;
+	font-family: 'Open Sans', serif;
+	border: 1px solid gainsboro;
+	border-radius: 3px;
+	padding: 6px;
+	color: #4A4A4A;
+	width: 100%;
+}
+.smooth-input:focus {
+	outline: none !important;
+	border: 1px solid gainsboro !important;
+}
+
+.smooth-fullscreen-name-label {
+	margin-top: 10px;
+	margin-bottom: 4px;
+	font-size: 18px;
+	font-weight: 600;
+}
+
+.smooth-fullscreen-content {
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.smooth-fullscreen-save {
+	margin-top: 10px;
+	border: 1px solid gainsboro;
+	width: auto;
+	position: absolute;
+	padding: 5px;
+	font-size: 19px;
+	border-radius: 3px;
+	padding-left: 10px;
+	padding-right: 10px;
+	background: #F9F9F9;
+	color: #616161;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+.smooth-fullscreen-save:hover {
+	background: white;
+}
+.smooth-fullscreen-save:active {
+	background: #F9F9F9;
+}
+
+.smooth-fullscreen-error-label {
+	height: 20px;
+	color: #E45252;
+}
+
+
+
+
+
+
+
+
+
+
+
+
