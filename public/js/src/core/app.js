@@ -31,9 +31,6 @@ Wu.App = Wu.Class.extend({
 		// merge options
 		Wu.setOptions(this, options);
 
-		// Init analytics
-		// this._initAnalytics();
-
 		// set page title
 		document.title = this.options.portalTitle;
 
@@ -159,9 +156,10 @@ Wu.App = Wu.Class.extend({
 		// debug
 		this._debug();
 
-		// analytics
+		// log entry
 		this._logEntry();
 
+		// analytics
 		this.Analytics = new Wu.Analytics();
 
 	},
@@ -182,10 +180,6 @@ Wu.App = Wu.Class.extend({
 		});
 	},
 
-	_initAnalytics : function () {
-		this.Analytics = new Wu.Analytics();
-	},
-
 	_initObjects : function () {
 
 		// data controller
@@ -203,13 +197,7 @@ Wu.App = Wu.Class.extend({
 		this.options.json.users.forEach(function(user, i, arr) {
 		       this.Users[user.uuid] = new Wu.User(user);             
 		}, this);
-		
-		// // create client objects
-		// this.Clients = {};
-		// this.options.json.clients.forEach(function(elem, i, arr) {
-		//        this.Clients[elem.uuid] = new Wu.Client(elem, this);             
-		// }, this);
-
+		// 
 		// create project objects
 		this.Projects = {};
 		this.options.json.projects.forEach(function(elem, i, arr) {
@@ -244,24 +232,16 @@ Wu.App = Wu.Class.extend({
 		// render style handler
 		this.Style = new Wu.Style();
 
-		// // render status pane
-		// this.StatusPane = new Wu.StatusPane({
-		// 	addTo: this._appPane
-		// });
-
 		// render progress bar
 		this.ProgressBar = new Wu.ProgressPane({
 			color : 'white',
 			addTo : this._appPane
 		});
 
-		// render startpane
-		this.StartPane = new Wu.StartPane({
-			projects : this.Projects
-		});
-
-		// render side pane 
-		// this.SidePane = new Wu.SidePane();	// todo: add settings more locally? Wu.SidePane({options})
+		// // render startpane
+		// this.StartPane = new Wu.StartPane({
+		// 	projects : this.Projects
+		// });
 
 		// render header pane
 		this.HeaderPane = new Wu.HeaderPane();
@@ -296,8 +276,13 @@ Wu.App = Wu.Class.extend({
 		// set project if only one
 		if (this._lonelyProject()) return;
 
-		// activate startpane
-		this.StartPane.activate();
+		// open projects pane
+		app.Chrome.Left.open()
+
+		// open first project (ordered by lastUpdated)
+		_.first(_.sortBy(_.toArray(app.Projects), function (p) {
+			return p.store.lastUpdated;
+		}).reverse()).selectProject();
 	},
 
 	_initInvite : function () {
