@@ -102,6 +102,9 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		// update size
 		this.updateMapSize();
 
+		// set buttons inverted
+		Wu.DomUtil.addClass(app.Chrome.Top._buttonWrapper, 'inverted');
+
 	},
 
 	close : function (tab) {
@@ -120,6 +123,9 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 		// update size
 		this.updateMapSize();
+
+		// set buttons inverted
+		Wu.DomUtil.removeClass(app.Chrome.Top._buttonWrapper, 'inverted');
 
 	},
 

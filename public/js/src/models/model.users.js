@@ -273,4 +273,28 @@ Wu.User = Wu.Class.extend({
 		return json;
 	},
 
+	logout : function () {
+
+		// confirm
+		if (!confirm('Are you sure you want to log out?')) return;
+
+		this._logout();
+	},
+
+	_logout : function () {
+		
+		// slack monitor
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'logged out.',
+		    	description : '',
+		    	timestamp : Date.now()
+		});
+
+		// redirect to logout
+		window.location.href = app.options.servers.portal + 'logout';
+	},
+
+
+
 });
