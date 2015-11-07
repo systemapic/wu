@@ -36,17 +36,17 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// WRAPPER FOR BUTTONS			// todo: make pluggable
 		this._buttonWrapper = Wu.DomUtil.create('div', 'chrome-buttons', this._container);
 
-		// User name button container
-		this._userNameContainer = Wu.DomUtil.create('div', 'username-container', this._buttonWrapper);
+		// // User name button container
+		// this._userNameContainer = Wu.DomUtil.create('div', 'username-container', this._buttonWrapper);
 
-		// Username
-		this._userName = Wu.DomUtil.create('div', 'top-username', this._userNameContainer);
+		// // Username
+		// this._userName = Wu.DomUtil.create('div', 'top-username', this._userNameContainer);
 
-		// Divider
-		this._userDivider = Wu.DomUtil.create('div', 'top-divider', this._userNameContainer, '&nbsp;|&nbsp;');
+		// // Divider
+		// this._userDivider = Wu.DomUtil.create('div', 'top-divider', this._userNameContainer, '&nbsp;|&nbsp;');
 
-		// Logout
-		this._userLogout = Wu.DomUtil.create('div', 'top-logout', this._userNameContainer, 'log out');
+		// // Logout
+		// this._userLogout = Wu.DomUtil.create('div', 'top-logout', this._userNameContainer, 'log out');
 
 		// Layers button
 		this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton displayNone', this._buttonWrapper);
@@ -120,7 +120,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	initDefault : function () {
 
-		this._setUsername();
+		// this._setUsername();
 		this._setPortalLogo();
 
 		// Init CPU clock
@@ -179,7 +179,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		Wu.DomEvent[onoff](this._menuButton, 'click', this._toggleLeftPane, this);
 
 		// Log out button
-		Wu.DomEvent[onoff](this._userLogout, 'click', this._logOut, this);
+		// Wu.DomEvent[onoff](this._userLogout, 'click', this._logOut, this);
 
 	},
 
@@ -240,17 +240,16 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_setProjectTitle : function () {
 
 		// get client & project names
-		// this._clientName = this._project.getClient().getName();
 		this._projectTitleName = this._project.getHeaderTitle();
 
 		// set project title
-		this._projectTitle.innerHTML = this._projectTitleName.toLowerCase();
+		this._projectTitle.innerHTML = this._projectTitleName.camelize();
 	},
 
-	_setUsername : function () {
-		var username = app.Account.getFullName();
-		this._userName.innerHTML = username.toLowerCase();
-	},
+	// _setUsername : function () {
+	// 	var username = app.Account.getFullName();
+	// 	this._userName.innerHTML = username.toLowerCase();
+	// },
 
 	_setPortalLogo : function () {
 
@@ -355,23 +354,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// TODO: Close Layer Menu
 		this.__layerMenu.closeLayerPane();
 	},	
-
-	_logOut : function () {
-
-		// confirm
-		if (!confirm('Are you sure you want to log out?')) return;
-
-		// slack monitor
-		app.Socket.sendUserEvent({
-		    	user : app.Account.getFullName(),
-		    	event : 'logged out.',
-		    	description : '',
-		    	timestamp : Date.now()
-		});
-
-		// redirect to logout
-		window.location.href = app.options.servers.portal + 'logout';
-	},
 
 
 });

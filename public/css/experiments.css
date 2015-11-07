@@ -23,12 +23,16 @@ body {
 	display: none;
 }
 
+.chrome-button {
+    background-image: url(images/systemapic-sprite-white.png);
+    opacity: 0.9;
+}
 .chrome-menu-button {
     border-right: none;
 }
 .chrome-menu-button:before {
     content: '';
-    background-image: url(images/systemapic_logo_white.png);
+    background-image: url(images/filled-circle.png);
     background-repeat: no-repeat;
     background-position: 0 0;
     position: absolute;
@@ -41,6 +45,17 @@ body {
     padding: 5px;
     margin: 5px;
 }
+.chrome-right {
+    padding-top: 35px;
+    top: 0px;
+}
+.chrome-top  {
+    z-index: 100000004;
+}
+.inverted {
+    -webkit-filter: invert(50%);
+    filter: invert(50%);
+}
 
 .leaflet-top.leaflet-left {
     margin-top: 50px;
@@ -48,4 +63,22 @@ body {
 
 .active-project  {
     font-weight: 700;
+    background: #428bca;
+    color: white;
 }
+.active-project:hover {
+    background: rgba(66, 139, 202, 0.87);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

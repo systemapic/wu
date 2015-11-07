@@ -280,10 +280,9 @@ Wu.App = Wu.Class.extend({
 		app.Chrome.Left.open()
 
 		// open first project (ordered by lastUpdated)
-		_.first(_.sortBy(_.toArray(app.Projects), function (p) {
-			return p.store.lastUpdated;
-		}).reverse()).selectProject();
+		app.Controller.openLastUpdatedProject();
 	},
+
 
 	_initInvite : function () {
 		var project = this.options.json.invite;

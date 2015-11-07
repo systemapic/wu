@@ -262,6 +262,12 @@ Wu.Project = Wu.Class.extend({
 		this.initRoles();
 	},
 
+	invite : function (users) {
+
+		console.log('invite', users);
+
+	},
+
 	setMapboxAccount : function (store) {
 		// full project store
 		this.store = store;
@@ -354,7 +360,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 
-	_delete : function () {
+	_delete : function (callback) {
 		// var project = this;
 		var json = JSON.stringify({ 
 			    'pid' : this.store.uuid,
@@ -363,19 +369,17 @@ Wu.Project = Wu.Class.extend({
 		});
 		
 		// post with callback:    path       data    callback   context of cb
-		Wu.Util.postcb('/api/project/delete', json, this._deleted, this);
+		Wu.Util.postcb('/api/project/delete', json, callback || this._deleted, this);
 	},
 
 	_deleted : function (project, json) {
-		
+
 		// set address bar
-		// var client = project.getClient().getSlug();
-		// var url = app.options.servers.portal + client + '/';
 		var url = app.options.servers.portal;
 		var deletedProjectName = project.getName();
 
 		// set url
-		Wu.Util.setAddressBar(url)
+		Wu.Util.setAddressBar(url);
 
 		// delete object
 		app.Projects[project.getUuid()] = null;
@@ -387,9 +391,6 @@ Wu.Project = Wu.Class.extend({
 			// null activeproject
 			app.activeProject = null;
 
-			// refresh sidepane
-			// app.SidePane.refreshMenu();
-
 			// unload project
 			project._unload();
 			
@@ -398,18 +399,16 @@ Wu.Project = Wu.Class.extend({
 				projectUuid : false
 			}});
 
-			// show start pane
-			app.Controller.showStartPane();
+			// fire no project
+			Wu.Mixin.Events.fire('projectDeleted', { detail : {
+				projectUuid : project.getUuid()
+			}});
+
 		}
 
 		project = null;
 		delete project;
 
-		// set status
-		app.setStatus('Deleted!');
-
-		// Save new project name to GA
-		// ga('set', 'dimension9', deletedProjectName);
 	},
 
 	saveColorTheme : function () {
@@ -814,7 +813,8 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getHeaderTitle : function () {
-		return this.store.header.title;
+		// return this.store.header.title;
+		return this.getName();
 	},
 
 	getHeaderSubtitle : function () {

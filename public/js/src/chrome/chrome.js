@@ -14,6 +14,7 @@ Wu.Chrome = Wu.Class.extend({
 
 	_listen : function () {
 		Wu.Mixin.Events.on('projectSelected', this._projectSelected, this);
+		Wu.Mixin.Events.on('projectDeleted',  this._onProjectDeleted, this);
 		Wu.Mixin.Events.on('editEnabled',     this._editEnabled, this);
 		Wu.Mixin.Events.on('editDisabled',    this._editDisabled, this);
 		Wu.Mixin.Events.on('layerEnabled',    this._layerEnabled, this);
@@ -92,7 +93,7 @@ Wu.Chrome = Wu.Class.extend({
 	_onLayerAdded    : function () {},
 	_onLayerEdited   : function () {},
 	_onLayerDeleted  : function () {},
-
+	_onProjectDeleted : function () {},
 
 
 });
