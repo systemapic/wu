@@ -16,6 +16,16 @@ var projectSchema = mongoose.Schema({
 	keywords 	: [{ type: String, default: '' }],
 	categories 	: [String],
 
+	// access_v2
+	access 		: {
+		read : [String],	 // hashed user_uuid's
+		edit : [String],
+		options : {
+			share : { type: Boolean, default: true },
+			download : { type: Boolean, default: false }
+		}
+	},
+
 	roles 		: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
 
 			// image
