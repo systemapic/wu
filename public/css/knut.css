@@ -508,7 +508,7 @@
 }
 
 .smooth-fullscreen-name-label {
-	margin-top: 10px;
+	margin-top: 15px;
 	margin-bottom: 4px;
 	font-size: 18px;
 	font-weight: 600;
@@ -546,6 +546,12 @@
 .smooth-fullscreen-error-label {
 	height: 20px;
 	color: #E45252;
+	cursor: default;
+}
+
+.smooth-fullscreen-sub-label {
+	height: 20px;
+	color: #777;
 	cursor: default;
 }
 
@@ -616,12 +622,14 @@
 	font-family: 'Open Sans', serif;
 	padding: 6px;
 	color: #4A4A4A;
-	width: 10px;
+	width: 20px;
 	border: none;
-
+	padding-top: 7px;
+    	padding-bottom: 0;
+	
 	/*debug*/
-	padding: 0;
-	width: 0;
+	/*padding: 0;*/
+	/*width: 0;*/
 }
 
 .invite-list-container {
@@ -703,6 +711,7 @@
     padding-bottom: 0;
     top: 0;
     margin-right: 0px;
+    margin-bottom: 8px;
 }
 
 .mini-user-inner {

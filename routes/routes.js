@@ -98,19 +98,19 @@ module.exports = function(app, passport) {
 		api.analytics.get(req, res);
 	});
 
-	// =====================================
-	// GET NOTIFIED OF DONE GRINDS =========
-	// =====================================
-	app.post('/grind/done', function (req, res) {
-		api.socket.grindDone(req, res);
-	});
+	// // =====================================
+	// // GET NOTIFIED OF DONE GRINDS =========
+	// // =====================================
+	// app.post('/grind/done', function (req, res) {
+	// 	api.socket.grindDone(req, res);
+	// });
 
-	// =====================================
-	// GET NOTIFIED OF DONE GRINDS =========
-	// =====================================
-	app.post('/grind/raster/done', function (req, res) {
-		api.socket.grindRasterDone(req, res);
-	});
+	// // =====================================
+	// // GET NOTIFIED OF DONE GRINDS =========
+	// // =====================================
+	// app.post('/grind/raster/done', function (req, res) {
+	// 	api.socket.grindRasterDone(req, res);
+	// });
 
 
 	// =====================================
@@ -546,6 +546,13 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
+	// access: SET PROJECT ACCESS  =========
+	// =====================================
+	app.post('/api/access/set/project', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.access.setProject(req, res);
+	});
+
+	// =====================================
 	// access: GET ROLE  ===============
 	// =====================================
 	app.post('/api/access/getrole', passport.authenticate('bearer', {session: false}), function (req,res) {
@@ -612,7 +619,7 @@ module.exports = function(app, passport) {
 		});
 	});
 
-	// =====================================
+	// ===================================== // todo: rename route to /api/clientConfig.js
 	// SERVER CLIENT CONFIG ================
 	// ===================================== 
 	app.get('/clientConfig.js', isLoggedIn, function (req, res) {
@@ -621,7 +628,7 @@ module.exports = function(app, passport) {
 		res.end(configString);
 	});
 
-	// =====================================
+	// ===================================== // todo: rename route to /api/loginConfig.js
 	// SERVER LOGIN CONFIG =================
 	// ===================================== 
 	app.get('/loginConfig.js', function (req, res) {
@@ -672,14 +679,14 @@ module.exports = function(app, passport) {
 	});
 
 
-	// =====================================
-	// SIGNUP ==============================
-	// =====================================
-	app.post('/signup', passport.authenticate('local-signup', {
-		successRedirect : '/', // redirect to the secure profile section
-		failureRedirect : '/signup', // redirect back to the signup page if there is an error
-		failureFlash : true // allow flash messages
-	}));
+	// // =====================================
+	// // SIGNUP ==============================
+	// // =====================================
+	// app.post('/signup', passport.authenticate('local-signup', {
+	// 	successRedirect : '/', // redirect to the secure profile section
+	// 	failureRedirect : '/signup', // redirect back to the signup page if there is an error
+	// 	failureFlash : true // allow flash messages
+	// }));
 
 
 	// =====================================

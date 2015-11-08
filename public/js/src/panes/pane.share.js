@@ -176,8 +176,6 @@ Wu.Share = Wu.Pane.extend({
 			enabled : true
 		}]
 
-		console.log('_refreshDefaultPermission', this.options.permissions);
-
 	},
 
 	_shareImage : function () {
@@ -462,8 +460,6 @@ Wu.Share = Wu.Pane.extend({
 			access_type : 'view',
 			permissions : permissions
 		}
-
-		console.log('_getInviteLink', options);
 
 		// slack
 		app.Analytics.onInvite(options);

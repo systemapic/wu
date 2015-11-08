@@ -262,10 +262,29 @@ Wu.Project = Wu.Class.extend({
 		this.initRoles();
 	},
 
-	invite : function (users) {
+	setAccess : function (projectAccess) {
 
-		console.log('invite', users);
+		console.log('projectAccess', projectAccess);
 
+		var options = {
+			project : this.getUuid(),
+			access : projectAccess
+		}
+
+		console.log('optiosn: ', options);
+
+		// send request to API		
+ 		Wu.Util.postcb('/api/access/set/project', JSON.stringify(options), function (ctx, response) {
+ 			console.log('sat access, err, json', response);
+ 		}, this);
+
+ 		// set locally
+ 		this.store.access = projectAccess;
+
+	},
+
+	getAccess : function () {
+		return this.store.access;
 	},
 
 	setMapboxAccount : function (store) {

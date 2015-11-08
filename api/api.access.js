@@ -40,6 +40,58 @@ var api = module.parent.exports;
 
 module.exports = api.access = {
 	
+	setProject : function (req, res) {
+
+		var account = req.user;
+		var options = req.body;
+		var projectAccess = options.access;
+		var projectUuid = options.project;
+
+		console.log('api.access.setProject', options);
+
+
+
+		Project
+		.findOne({uuid : projectUuid})
+		.exec(function (err, project) {
+			project.access = projectAccess;
+			project.save(function (err, p) {
+
+				// return if err
+				if (err) return res.json({
+					error : err
+				});
+
+				// return project
+				res.json(project);
+			})
+		})
+
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// ################################################# old #############################
+
+
 	roleTemplates : {
 
 		// can do anything
