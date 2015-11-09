@@ -172,12 +172,11 @@ module.exports = api.project = {
 		project.slug 		= projectSlug;
 		project.name 		= projectName;
 		project.description 	= store.description || '';
-		project.header.title    = projectName;
-		project.header.subtitle = 'Project description';
+		// project.header.title    = projectName;
+		// project.header.subtitle = 'Project description';
 		project.keywords 	= store.keywords || '';
-		// project.client 		= store.client;
 		project.position 	= store.position || api.project._getDefaultPosition(); // defaults
-		// project.bounds 		= store.bounds || api.project._getDefaultBounds();
+		// project.access 		= store.access;
 
 		// add roles
 		roles.forEach(function (role) {

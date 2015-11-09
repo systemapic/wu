@@ -515,6 +515,10 @@
 	cursor: default;
 }
 
+.clearboth {
+	clear: both;
+}
+
 .smooth-fullscreen-content {
 	padding-top: 20px;
 	/*padding-bottom: 20px;*/
@@ -544,7 +548,7 @@
 }
 
 .smooth-fullscreen-error-label {
-	height: 20px;
+	height: auto;
 	color: #E45252;
 	cursor: default;
 }
@@ -591,7 +595,12 @@
   
 }
 
-
+.private-public-label {
+	top: 10px;
+	position: relative;
+	font-size: 16px;
+	color: #555;
+}
 
 /*slack style invite boxes*/
 
@@ -615,6 +624,7 @@
 	height: auto;
 	width: 100%;
 	cursor: text;
+	padding-left: 3px;
 }
 .invite-input-form {
 	height: 36px;
@@ -719,7 +729,7 @@
     position: relative;
     height: 24px;
     line-height: 24px;
-    padding-left: 2pc;
+    padding-left: 28px;
 }
 
 .mini-user-kill {
@@ -784,6 +794,8 @@
 	visibility: hidden;
 	text-align: center;
 	z-index: 100002;
+	max-width: 230px;
+    	height: auto;
 }
 
 .project-icon:hover .project-tooltip {
@@ -817,7 +829,74 @@
 
 
 
+.optional-medium {
+	font-weight: 400;
+	font-size: 16px;
+	color: #999;
+}
 
+
+
+
+
+/*switch*/
+.public-private-project-switch {
+	width: 110px;
+	height: 30px;
+	position: relative;
+	float: none;
+	margin-bottom: 40px;
+	content: '';
+	position: relative;
+	background-color: white;
+	left: 0;
+	width: 99px;
+   	height: 29px;
+	border-radius: 20px;
+	-webkit-transition: left 100ms;
+	-moz-transition: left 100ms;
+	-ms-transition: left 100ms;
+	-o-transition: left 100ms;
+	transition: left 100ms;
+	box-shadow: none;
+	margin-right: 20px;
+	float: left;
+}
+.public-private-project-switch {
+	background-color: #FF607E;
+}
+.public-private-project-switch:before {
+	left: 72px;
+    	top: 2px;
+    	width: 25px;
+    	height: 25px;
+    	box-shadow: none;
+}
+.public-private-project-switch.switch-on:before {
+	left: 2px;
+}
+.public-private-project-switch:after {
+	content : 'private';
+	color: white;
+}
+.public-private-project-switch.switch-on:after {
+	content: 'Public';
+	color: white;
+	font-size: 16px;
+	font-weight: 600;
+	left: 37px;
+	position: absolute;
+	top: 4px;
+}
+.public-private-project-switch:after {
+	content: 'Private';
+	color: white;
+	font-size: 16px;
+	font-weight: 600;
+	left: 12px;
+	position: absolute;
+	top: 4px;
+}
 
 
 

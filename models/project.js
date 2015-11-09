@@ -22,7 +22,8 @@ var projectSchema = mongoose.Schema({
 		edit : [String],
 		options : {
 			share : { type: Boolean, default: true },
-			download : { type: Boolean, default: false }
+			download : { type: Boolean, default: false },
+			isPublic : { type: Boolean, default: false }
 		}
 	},
 
