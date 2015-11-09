@@ -354,19 +354,17 @@ Wu.Project = Wu.Class.extend({
 
 
 	// create project on server
-	create : function (opts) {
-	     	var callback = opts.callback;
+	create : function (opts, callback) {
 
 		var options = {
 			name 		: this.store.name,
 			description 	: this.store.description,
 			keywords 	: this.store.keywords, 
 			position 	: this.store.position,
-			// client 		: this._client.uuid 			// parent client uuid 
 		}
 
 		// send request to API		
- 		Wu.Util.postcb('/api/project/create', JSON.stringify(options), callback.bind(opts.context), this);
+ 		Wu.post('/api/project/create', JSON.stringify(options), callback.bind(opts.context), this);
 	},
 
 
@@ -879,6 +877,7 @@ Wu.Project = Wu.Class.extend({
 		this._update('pending');
 	},
 
+
 	setPopupPosition : function (pos) {
 		this._popupPosition = pos;
 	},
@@ -1218,6 +1217,59 @@ Wu.Project = Wu.Class.extend({
 			projectUuid : this.getUuid()
 		}});
 	},
+
+
+
+
+
+	/////
+	//// ACCESS
+	///
+	//
+
+	isPublic : function () {
+		var access = this.getAccess();
+		var isPublic = access.options.isPublic;
+		console.log('isPublic??', isPublic, access.options);
+		return !!isPublic;
+	},
+
+	createdBy : function () {
+		return this.store.createdBy;
+	},
+
+	isEditable : function (user) {
+		var user = user || app.Account;
+
+		var access = this.getAccess();
+
+		console.log('isEditable: user, access: ', user, access);
+
+		// true: if user created project
+		if (user.getUuid() == this.createdBy()) return true;
+
+		// true: if user is listed as editor
+		if (_.contains(access.edit, user.getUuid())) return true;
+
+		// true: if user is super
+		// if (app.Account)  todo! 
+
+		// false: not createdBy and not editor
+		return false;
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -49,11 +49,19 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		_.each(projects, function (project) {
 
 			// Create line with project
-			var wrapper = 	Wu.DomUtil.create('div', 'chrome-left-itemcontainer chrome-project', projectWrapper);
-			var title = 	Wu.DomUtil.create('div', 'chrome-left-item-name', wrapper);
+			var wrapper = Wu.DomUtil.create('div', 'chrome-left-itemcontainer chrome-project', projectWrapper);
+			var title = Wu.DomUtil.create('div', 'chrome-left-item-name', wrapper);
 
-			// edit trigger, todo: only if can edit
-			var trigger = 	Wu.DomUtil.create('div', 'chrome-left-popup-trigger', wrapper);
+			// add edit button if project is editable
+			if (project.isEditable()) {
+
+				// edit trigger, todo: only if can edit
+				var trigger = Wu.DomUtil.create('div', 'chrome-left-popup-trigger', wrapper);
+			
+				// edit trigger event
+				Wu.DomEvent.on(trigger, 'click', this._openEditProjectFullscreen.bind(this, project), this);
+			}
+
 
 			var projectTitle = '';
 
@@ -80,9 +88,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			// select project trigger
 			Wu.DomEvent.on(wrapper, 'click', project.selectProject, project);
 
-			// edit trigger
-			Wu.DomEvent.on(trigger, 'click', this._openEditProjectFullscreen.bind(this, project), this);
-
+			
 			// remember
 			this._projects[project.getUuid()] = {
 				wrapper : wrapper,
@@ -103,16 +109,14 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	},
 
 
-
-	_openEditProjectFullscreen : function (project, e) {
+	_openNewProjectFullscreen : function (e) {
 
 		// stop propagation
 		Wu.DomEvent.stop(e);
 		
 		// create fullscreen
 		this._fullscreen = new Wu.Fullscreen({
-			title : '<span style="font-weight:200;">Edit</span> ' + project.getName(),
-			closeCallback : this._closed
+			title : '<span style="font-weight:200;">Create New Project</span>'
 		});
 
 		// clear invitations
@@ -121,24 +125,45 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			edit : [],
 			options : {
 				share : true,
-				download : true
+				download : true,
+				isPublic : false
 			}
 		};
 
 		// shortcut
 		var content = this._fullscreen._content;
 
-		// create project name input
-		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label', content, 'Project name');
+		// create private/public label
+		var private_toggle_label = Wu.DomUtil.create('div', 'private-public-label smooth-fullscreen-sub-label');
+
+		// add private/public toggle
+		var ppswitch = new Wu.button({
+			id 	     : 'public-switch',
+			type 	     : 'switch',
+			isOn 	     : false,
+			right 	     : false,
+			disabled     : false,
+			appendTo     : content,
+			fn 	     : this._togglePrivatePublic.bind(this, private_toggle_label),
+			className    : 'public-private-project-switch'
+		});
+
+		// add label, default value
+		content.appendChild(private_toggle_label);
+		private_toggle_label.innerHTML = 'Only invited users can access project';
+
+
+		// project name
+		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', content, 'Project name');
 		var name_input = Wu.DomUtil.create('input', 'smooth-input', content);
 		name_input.setAttribute('placeholder', 'Enter name here');
-		name_input.value = project.getName();
 		var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', content);
 
+		
 		// create invite input
 		this._createInviteUsersInput({
 			type : 'read',
-			label : 'Spectators of project',
+			label : 'Invite spectators to project <span class="optional-medium">(optional)</span>',
 			content : content,
 			container : this._fullscreen._inner,
 			sublabel : 'Spectators have read-only access to the project'
@@ -147,10 +172,99 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		// create invite input
 		this._createInviteUsersInput({
 			type : 'edit',
-			label : 'Editors of project',
+			label : 'Invite editors to project <span class="optional-medium">(optional)</span>',
 			content : content,
 			container : this._fullscreen._inner,
 			sublabel : 'Editors can edit the project'
+		});
+
+
+		// save button
+		var saveBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', content, 'Create');
+
+		// pass inputs to triggers
+		var options = {
+			name_input : name_input,
+			name_error : name_error,
+		};
+
+		// save button trigger
+		Wu.DomEvent.on(saveBtn, 'click', this._createProject.bind(this, options), this);
+
+	},
+
+	_openEditProjectFullscreen : function (project, e) {
+
+		// stop propagation
+		Wu.DomEvent.stop(e);
+		
+		// create fullscreen
+		this._fullscreen = new Wu.Fullscreen({
+			title : '<span style="font-weight:200;">Edit</span> ' + project.getName()
+		});
+
+		// clear invitations
+		this._access = {
+			read : [],
+			edit : [],
+			options : {
+				share : true,
+				download : true,
+				isPublic : false
+			}
+		};
+
+		// shortcut
+		var content = this._fullscreen._content;
+
+		// create private/public label
+		var private_toggle_label = Wu.DomUtil.create('div', 'private-public-label smooth-fullscreen-sub-label');
+
+		// add private/public toggle
+		var ppswitch = new Wu.button({
+			id 	     : 'public-switch',
+			type 	     : 'switch',
+			isOn 	     : project.isPublic(),
+			right 	     : false,
+			disabled     : false,
+			appendTo     : content,
+			fn 	     : this._togglePrivatePublic.bind(this, private_toggle_label),
+			className    : 'public-private-project-switch'
+		});
+
+		// add label, default value
+		content.appendChild(private_toggle_label);
+		private_toggle_label.innerHTML = project.isPublic() ? 'Anyone with a link can access project' : 'Only invited users can access project';
+
+
+		// create project name input
+		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', content, 'Project name');
+		var name_input = Wu.DomUtil.create('input', 'smooth-input', content);
+		name_input.setAttribute('placeholder', 'Enter name here');
+		name_input.value = project.getName();
+		var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', content);
+
+
+		
+
+		// create invite input
+		this._createInviteUsersInput({
+			type : 'read',
+			label : 'Spectators of project',
+			content : content,
+			container : this._fullscreen._inner,
+			sublabel : 'Spectators have read-only access to the project',
+			project : project
+		});
+
+		// create invite input
+		this._createInviteUsersInput({
+			type : 'edit',
+			label : 'Editors of project',
+			content : content,
+			container : this._fullscreen._inner,
+			sublabel : 'Editors can edit the project',
+			project : project
 		});
 
 		// buttons
@@ -173,6 +287,14 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 	},
 
+	_togglePrivatePublic : function (toggle, e, isPublic) {
+		console.log('_togglePrivatePublic', arguments);
+	
+		toggle.innerHTML = isPublic ? 'Anyone with a link can access project' : 'Only invited users can access project';
+
+		this._access.options.isPublic = isPublic;
+	},
+
 	_divs : {
 		read : {},
 		edit : {}
@@ -183,6 +305,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		// invite users
 		var content = this._fullscreen._content;
 		var container = this._fullscreen._container;
+		var project = options.project;
 
 		// label
 		var invite_label = options.label;
@@ -308,30 +431,33 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 
 
-		// add current access vars
-		var projectAccess = this._project.getAccess();
+		if (project) {
+			// add current access vars
+			var projectAccess = project.getAccess();
 
-
-		// add selected user item to input box
-		if (projectAccess && projectAccess[options.type]) {
 
 			// add selected user item to input box
-			projectAccess[options.type].forEach(function(userUuid) {
+			if (projectAccess && projectAccess[options.type]) {
 
-				var user = app.Users[userUuid];
+				// add selected user item to input box
+				projectAccess[options.type].forEach(function(userUuid) {
 
-				this._addUserAccessItem({
-					input : invite_input,
-					user : user,
-					type : options.type
-				});
-			}, this);
-				
+					var user = app.Users[userUuid];
+
+					this._addUserAccessItem({
+						input : invite_input,
+						user : user,
+						type : options.type
+					});
+				}, this);
+					
+			}
+			
+			// hide by default
+			invite_list_container.style.display = 'none';
+			invite_input.blur();	
 		}
 		
-		// hide by default
-		invite_list_container.style.display = 'none';
-		invite_input.blur();
 	},
 
 	_closeInviteInputs : function () {
@@ -435,7 +561,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			read : [],
 			options : {
 				share : true,
-				download : true
+				download : true,
+				isPublic : this._access.options.isPublic
 			}
 		};
 		this._access.edit.forEach(function (i) {
@@ -449,7 +576,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			edit : [],
 			options : {
 				share : true,
-				download : true
+				download : true,
+				isPublic : false
 			}
 		};
 
@@ -479,58 +607,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		project.selectProject();
 	},
 
-	_openNewProjectFullscreen : function (e) {
-
-		// stop propagation
-		Wu.DomEvent.stop(e);
-		
-		// create fullscreen
-		this._fullscreen = Wu.DomUtil.create('div', 'smooth-fullscreen', app._appPane);
-
-		// wrappers
-		var fullscreen_inner = Wu.DomUtil.create('div', 'smooth-fullscreen-inner', this._fullscreen);
-		var closer = Wu.DomUtil.create('div', 'close-smooth-fullscreen', this._fullscreen, 'x');
-		var title = Wu.DomUtil.create('div', 'smooth-fullscreen-title', fullscreen_inner);
-
-		// set title
-		var text = '<span style="font-weight:200;">Create New Project</span>';
-		title.innerHTML = text;
-
-		// add content
-		var content = Wu.DomUtil.create('div', 'smooth-fullscreen-content', fullscreen_inner);
-
-		// project name
-		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label', content, 'Project name');
-		var name_input = Wu.DomUtil.create('input', 'smooth-input', content);
-		name_input.setAttribute('placeholder', 'Enter name here');
-		var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', content);
-
-		// invitations
-		this._createInviteUsersInput({
-			content : content,
-			fullscreen_inner : fullscreen_inner,
-			sublabel : 'sublabel'
-		});
-
-		// save button
-		var saveBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', content, 'Create');
-
-		// pass inputs to triggers
-		var options = {
-			name_input : name_input,
-			name_error : name_error,
-		};
-
-		// save button trigger
-		Wu.DomEvent.on(saveBtn, 'click', this._createProject.bind(this, options), this);
-
-		// close trigger		
-		Wu.DomEvent.on(closer, 'click', this._fullscreen.close, this);
-
-		// add esc key trigger for close fullscreen
-		this._addEscapeKey();
-	},
-
+	
 	_createProject : function (options) {
 
 		// get name
@@ -546,29 +623,41 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			return;
 		}
 
+		// clean invitations array
+		var access = {
+			edit : [],
+			read : [],
+			options : {
+				share : true,
+				download : true,
+				isPublic : this._access.options.isPublic
+			}
+		};
+		this._access.edit.forEach(function (i) {
+			access.edit.push(i.user.getUuid());
+		}, this);
+		this._access.read.forEach(function (i) {
+			access.read.push(i.user.getUuid());
+		}, this);
+
+		// reset
+		this._access = {
+			read : [],
+			edit : [],
+			options : {
+				share : true,
+				download : true,
+				isPublic : false
+			}
+		};
+
+		console.log('crate project ACCESS::', access);
+
 		// create project object
 		var store = {
 			name 		: projectName,
 			description 	: 'Project description',
 			createdByName 	: app.Account.getName(),
-			keywords 	: '',
-			position 	: app.options.defaults.project.position || {},
-			bounds : {
-				northEast : {
-					lat : 0,
-					lng : 0
-				},
-				southWest : {
-					lat : 0,
-					lng : 0
-				},
-				minZoom : 1,
-				maxZoom : 22
-			},
-			header : {
-				height : 50
-			},
-			folders : []
 		}
 
 		// set create options
@@ -582,42 +671,40 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var project = new Wu.Project(store);
 
 		// create project on server
-		project.create(options);
+		project.create(options, function (project, json) {
+			var result = Wu.parse(json),
+			    error  = result.error,
+			    store  = result.project;
 
-	},
+			// return error
+			if (error) return app.feedback.setError({
+				title : 'There was an error creating new project!', 
+				description : error
+			});
+				
+			// add to global store
+			app.Projects[store.uuid] = project;
 
-	_projectCreated : function (project, json) {
-		var result = Wu.parse(json),
-		    error  = result.error,
-		    store  = result.project;
+			// update project store
+			project.setNewStore(store);
 
-		// return error
-		if (error) return app.feedback.setError({
-			title : 'There was an error creating new project!', 
-			description : error
+			// add project to list
+			this._refreshContent();
+
+			// close fullscreen
+			this._fullscreen.close();
+
+			// select project
+			project.selectProject();
+
+			// set access
+			project.setAccess(access);
+
 		});
-			
-		// add to global store
-		app.Projects[store.uuid] = project;
 
-		// update project store
-		project.setNewStore(store);
 
-		// add project to list
-		this._refreshContent();
 
-		// close fullscreen
-		this._fullscreen.close();
-
-		// select project
-		project.selectProject();
 	},
-
-	// _closeFullscreen : function () {
-	// 	this._fullscreen.innerHTML = '';
-	// 	Wu.DomUtil.remove(this._fullscreen);
-	// },
-
 
 	// fired on projectSelected
 	_refresh : function () {
@@ -645,6 +732,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		// select random project 
 		app.Controller.openFirstProject();
+		
 	},
 	_onLayerAdded : function (options) {
 	},
