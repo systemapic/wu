@@ -138,3 +138,66 @@
 .chrome-field-wrapper {
 	width: 402px;
 }
+
+
+
+
+
+
+/*
+.chrome-top {
+	border-bottom: 1px solid #ccc;
+	}
+
+.chrome-right {
+	border-top: none !important;
+	}
+
+.chrome-left {
+	border-right: 1px solid #ccc;
+	}
+
+.chrome-left-new-button {
+  	line-height: 11px !important;
+	}
+
+.chrome-left-container {
+	margin-top: 0px !important;
+	}
+
+.chrome-project.active-project {
+	background: rgb(113, 196, 168) !important;
+	color: white !important;
+	font-weight: 900 !important;
+	}
+
+.data-list-line {
+	padding-top: 3px !important;
+	padding-bottom: 3px !important;
+	}
+
+.smooth-input {
+	font-family: Helvetica Neue, helvetica, arial, open sans !important;
+	}
+
+.layer-radio {
+  	top: 4px !important;
+	}	
+
+.chrome-left-container.contacts {
+	margin-top: 20px !important;
+	}
+
+.chrome-metafield-line-children .chrome-metafield-line {
+	border-top: none !important;
+	}	
+
+.chrome-metafield-line {
+	padding-top: 2px !important;
+	padding-bottom: 2px !important;	
+	}
+
+.fa-arrow-circle-right:before {
+	opacity: 0.2 !important;
+}	
+*/
