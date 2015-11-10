@@ -772,6 +772,19 @@
 	cursor: default;
 }
 
+.project-public-icon {
+	padding-right: 5px;
+	margin-left: 16px;
+	position:relative;
+	cursor: default;
+	color: #666;
+}
+
+.active-project .project-public-icon {
+	color: #f8f8f8;
+}
+
+
 .project-tooltip {
 	top: -44px;
 	background-color: #404040;
@@ -801,7 +814,10 @@
 .project-icon:hover .project-tooltip {
     opacity:0.9;
     visibility: visible;
-
+}
+.project-public-icon:hover .project-tooltip {
+    opacity:0.9;
+    visibility: visible;
 }
 
 .project-tooltip:hover {
@@ -896,6 +912,13 @@
 	left: 12px;
 	position: absolute;
 	top: 4px;
+}
+
+.public-project-label {
+	color: gainsboro;
+}
+.active-project .public-project-label {
+	color: white;
 }
 
 
