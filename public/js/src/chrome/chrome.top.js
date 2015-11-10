@@ -257,6 +257,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._clientLogoImg.src = app.options.servers.portal + app.options.logos.portalLogo;
 	},
 
+	// default open
+	_leftPaneisOpen : true,
 
 	_toggleLeftPane : function (e) {
 		Wu.DomEvent.stop(e);
