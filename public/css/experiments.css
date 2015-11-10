@@ -45,6 +45,13 @@ body {
     padding: 5px;
     margin: 5px;
 }
+
+.chrome-menu-button.active:before { 
+    background-image: url(images/filled-sideways.png);
+    background-size: 214px 42px;
+    width: 224px;
+    top: -1px;
+}
 .chrome-right {
     padding-top: 35px;
     top: 0px;

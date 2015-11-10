@@ -19,7 +19,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-top', app._appPane);
 
 		// Menu Button
-		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button', this._container);		
+		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button active', this._container);		
 
 		// Project title container
 		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title-container', this._container);
