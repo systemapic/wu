@@ -145,6 +145,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			project_dependent : true
 		});
 
+		// css experiement
+		this._topButton.innerHTML = '<i class="top-button fa fa-cloud"></i>Data';
+
 	},
 
 	_togglePane : function () {

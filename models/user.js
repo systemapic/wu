@@ -37,8 +37,8 @@ var userSchema = mongoose.Schema({
             storage_quota : { type: Number, default: '200000000' },
             remaining_quota : { type: Number, default: '200000000' },
 
-            // private projects (not available for free)
-            private_projects : { type: Boolean, default: false },
+            // private projects
+            private_projects : { type: Boolean, default: true },
 
         },
 
@@ -88,6 +88,12 @@ userSchema.methods.getUuid = function () {
 
 userSchema.methods.getName = function () {
     return this.firstName + ' ' + this.lastName;
+};
+
+
+userSchema.methods.canCreatePrivateProject = function () {
+    console.log('user.canCreatePrivateProject', this.access.private_projects);
+    return this.access.private_projects;
 };
 
 // timestamps plugin

@@ -5,7 +5,22 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	options : {
 		defaultWidth : 220,
 		publicTooltipWidth : 55,
+		defaultAccess : {
+			read : [],
+			edit : [],
+			options : {
+				share : true,
+				download : true,
+				isPublic : true
+			}
+		},
+		labels : {
+			private_project : 'Only invited users can access project',
+			public_project : 'Anyone with a link can access project'
+		}
 	},
+
+
 
 	_initialize : function () {
 
@@ -128,15 +143,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		});
 
 		// clear invitations
-		this._access = {
-			read : [],
-			edit : [],
-			options : {
-				share : true,
-				download : true,
-				isPublic : false
-			}
-		};
+		this._access = this.options.defaultAccess;
 
 		// shortcut
 		var content = this._fullscreen._content;
@@ -148,7 +155,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var ppswitch = new Wu.button({
 			id 	     : 'public-switch',
 			type 	     : 'switch',
-			isOn 	     : false,
+			isOn 	     : this._access.options.isPublic,
 			right 	     : false,
 			disabled     : false,
 			appendTo     : content,
@@ -158,7 +165,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		// add label, default value
 		content.appendChild(private_toggle_label);
-		private_toggle_label.innerHTML = 'Only invited users can access project';
+		private_toggle_label.innerHTML = this._access.options.isPublic ? this.options.labels.public_project : this.options.labels.private_project;
 
 
 		// project name
@@ -212,15 +219,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		});
 
 		// clear invitations
-		this._access = {
-			read : [],
-			edit : [],
-			options : {
-				share : true,
-				download : true,
-				isPublic : project.isPublic()
-			}
-		};
+		this._access = this.options.defaultAccess;
 
 		// shortcut
 		var content = this._fullscreen._content;
@@ -242,7 +241,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		// add label, default value
 		content.appendChild(private_toggle_label);
-		private_toggle_label.innerHTML = project.isPublic() ? 'Anyone with a link can access project' : 'Only invited users can access project';
+		private_toggle_label.innerHTML = project.isPublic() ? this.options.labels.public_project : this.options.labels.private_project;
 
 
 		// create project name input
@@ -275,11 +274,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			project : project
 		});
 
-		// buttons
-		var buttonsWrapper = Wu.DomUtil.create('div', 'smooth-fullscreen-buttons-wrapper', content)
-		var saveBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', buttonsWrapper, 'Update');
-		var delBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-delete', buttonsWrapper, 'Delete');
-
 		// trigger options
 		var options = {
 			name_input : name_input,
@@ -287,18 +281,26 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			project : project,
 		};
 
-		// save button trigger
+		// buttons wrapper
+		var buttonsWrapper = Wu.DomUtil.create('div', 'smooth-fullscreen-buttons-wrapper', content)
+
+		// save button
+		var saveBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', buttonsWrapper, 'Update');
 		Wu.DomEvent.on(saveBtn, 'click', this._updateProject.bind(this, options), this);
 
-		// save button trigger
-		Wu.DomEvent.on(delBtn, 'click', this._deleteProject.bind(this, options), this);
+		// add delete button only if access
+		if (project.store.createdBy == app.Account.getUuid()) {
+			var delBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-delete', buttonsWrapper, 'Delete');
+			Wu.DomEvent.on(delBtn, 'click', this._deleteProject.bind(this, options), this);
+		}
 
+		
+		
 	},
 
 	_togglePrivatePublic : function (toggle, e, isPublic) {
-		console.log('_togglePrivatePublic', arguments);
 	
-		toggle.innerHTML = isPublic ? 'Anyone with a link can access project' : 'Only invited users can access project';
+		toggle.innerHTML = isPublic ? this.options.labels.public_project : this.options.labels.private_project;
 
 		this._access.options.isPublic = isPublic;
 	},
@@ -457,6 +459,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 						user : user,
 						type : options.type
 					});
+					
 				}, this);
 					
 			}
@@ -573,21 +576,14 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 				isPublic : this._access.options.isPublic
 			}
 		};
+
 		this._access.edit.forEach(function (i) {
 			access.edit.push(i.user.getUuid());
 		}, this);
 		this._access.read.forEach(function (i) {
 			access.read.push(i.user.getUuid());
 		}, this);
-		this._access = {
-			read : [],
-			edit : [],
-			options : {
-				share : true,
-				download : true,
-				isPublic : false
-			}
-		};
+		this._access = this.options.defaultAccess;
 
 		// missing data
 		if (!projectName) {
@@ -649,15 +645,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		}, this);
 
 		// reset
-		this._access = {
-			read : [],
-			edit : [],
-			options : {
-				share : true,
-				download : true,
-				isPublic : false
-			}
-		};
+		this._access = this.options.defaultAccess;
 
 		console.log('crate project ACCESS::', access);
 
@@ -666,6 +654,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			name 		: projectName,
 			description 	: 'Project description',
 			createdByName 	: app.Account.getName(),
+			access 		: access
 		}
 
 		// set create options

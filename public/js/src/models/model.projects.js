@@ -271,7 +271,7 @@ Wu.Project = Wu.Class.extend({
 
 
 		// send request to API		
- 		Wu.Util.postcb('/api/access/set/project', JSON.stringify(options), function (ctx, response) {
+ 		Wu.Util.postcb('/api/project/setAccess', JSON.stringify(options), function (ctx, response) {
  		}, this);
 
  		// set locally
@@ -352,11 +352,14 @@ Wu.Project = Wu.Class.extend({
 	// create project on server
 	create : function (opts, callback) {
 
+		console.log('this: store', this.store);
+
 		var options = {
 			name 		: this.store.name,
 			description 	: this.store.description,
 			keywords 	: this.store.keywords, 
 			position 	: this.store.position,
+			access		: this.store.access
 		}
 
 		// send request to API		

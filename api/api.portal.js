@@ -223,13 +223,6 @@ module.exports = api.portal = {
 			}, callback);
 		}
 
-		// // get clients
-		// a.clients = function (callback) {
-		// 	api.client.getAll({
-		// 		user : account
-		// 	}, callback);
-		// }
-
 		// get users
 		a.users = function (callback) {
 			api.user.getAll({
@@ -251,7 +244,6 @@ module.exports = api.portal = {
 			var gzip = true;
 			if (req.body.gzip === 'false') gzip = false;
 
-			// if (dontZip) return res.json(result);
 			if (!gzip) return res.json(result);
 			
 			// return result gzipped
