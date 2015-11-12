@@ -24,6 +24,24 @@ var userSchema = mongoose.Schema({
 
         postgis_database : String,
 
+        username : String,
+        email : String,
+        avatar : String,
+
+        access : {
+
+            // for reference
+            account_type : { type: String, default: 'free' },
+
+            // storage limits
+            storage_quota : { type: Number, default: '200000000' },
+            remaining_quota : { type: Number, default: '200000000' },
+
+            // private projects (not available for free)
+            private_projects : { type: Boolean, default: false },
+
+        },
+
         files : [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
 
         local : {

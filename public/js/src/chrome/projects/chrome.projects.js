@@ -3,7 +3,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	_ : 'projects', 
 
 	options : {
-		defaultWidth : 220
+		defaultWidth : 220,
+		publicTooltipWidth : 55,
 	},
 
 	_initialize : function () {
@@ -85,7 +86,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			// if public, add globe icon + tooltip
 			if (project.isPublic()) {
 				var tooltipText = 'Public';
-				var tooltipWidth = '50px';
+				var tooltipWidth = this.options.publicTooltipWidth + 'px';
 				projectTitle += '<i class="project-public-icon fa fa-globe"><div class="absolute"><div class="project-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div></i>'
 			}
 
