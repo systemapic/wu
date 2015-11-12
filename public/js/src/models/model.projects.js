@@ -74,7 +74,6 @@ Wu.Project = Wu.Class.extend({
 
 	addLayer : function (layer) {
 		var l = new Wu.createLayer(layer);
-		console.log('createlayer  in project', layer, l);
 		if (l) this.layers[layer.uuid] = l;
 		return l || false;
 	},
@@ -264,18 +263,15 @@ Wu.Project = Wu.Class.extend({
 
 	setAccess : function (projectAccess) {
 
-		console.log('projectAccess', projectAccess);
 
 		var options = {
 			project : this.getUuid(),
 			access : projectAccess
 		}
 
-		console.log('optiosn: ', options);
 
 		// send request to API		
  		Wu.Util.postcb('/api/access/set/project', JSON.stringify(options), function (ctx, response) {
- 			console.log('sat access, err, json', response);
  		}, this);
 
  		// set locally
@@ -488,8 +484,6 @@ Wu.Project = Wu.Class.extend({
 
 		Wu.post('/api/layers/delete', JSON.stringify(options), function (err, response) {
 			if (err) return console.error('layer delete err:', err);
-
-			console.log('deleted form server?', err, response);
 
 			var result = Wu.parse(response);
 
@@ -1230,7 +1224,6 @@ Wu.Project = Wu.Class.extend({
 	isPublic : function () {
 		var access = this.getAccess();
 		var isPublic = access.options.isPublic;
-		console.log('isPublic??', isPublic, access.options);
 		return !!isPublic;
 	},
 
@@ -1242,8 +1235,6 @@ Wu.Project = Wu.Class.extend({
 		var user = user || app.Account;
 
 		var access = this.getAccess();
-
-		console.log('isEditable: user, access: ', user, access);
 
 		// true: if user created project
 		if (user.getUuid() == this.createdBy()) return true;
