@@ -41,16 +41,6 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 	_checkAccess : function () {
 		if (!this._project) return false;
 
-		// if (!app.access.to.edit_project(this._project)) {
-		// 	Wu.DomUtil.addClass(this._settingsButton, 'displayNone');
-		// 	return false;
-		// } else {
-		// 	Wu.DomUtil.removeClass(this._settingsButton, 'displayNone');
-		// 	return true;
-		// }
-
-		console.error('_chekcacc', this._project.isEditable())
-
 		if (this._project.isEditable()) {
 			this._settingsButton.style.display = '';
 			return true;

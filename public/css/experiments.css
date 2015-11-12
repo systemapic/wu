@@ -5,14 +5,20 @@ body {
 }
 
 .chrome-project-title {
-	border-bottom: 1px solid white;
-	font-size: 24px;
-	color: white;
-	text-transform: capitalize;
-	color: rgba(0, 0, 0, 0.46);
-	-webkit-text-fill-color: white;
-	-webkit-text-stroke-width: 1px;
-	-webkit-text-stroke-color: rgba(0, 0, 0, 0.46);
+    font-size: 18px;
+    color: #555;
+    text-transform: capitalize;
+    color: rgba(0, 0, 0, 0.81);
+    background: rgba(255, 255, 255, 0.72);
+    border-radius: 4px;
+    padding-left: 4px;
+    font-weight: 600;
+    padding-right: 4px;
+    padding: 15px;
+    padding-left: 30px;
+    padding-right: 30px;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(0, 0, 0, 0.27);
 }
 
 .chrome-top {
