@@ -63,6 +63,9 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			context : this,
 			project_dependent : true
 		});
+
+		// css experiement
+		this._settingsButton.innerHTML = '<i class="top-button fa fa-gear"></i>Options';
 	},
 
 	_initLayout : function () {

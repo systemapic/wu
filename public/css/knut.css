@@ -459,13 +459,15 @@
   opacity: 0.7;
 }
 
-.close-smooth-fullscreen:active {
-	background: rgba(252, 252, 252, 1);
-}
-
 .close-smooth-fullscreen:hover {
 	background: #D6D6D6;
     	color: white;
+}
+
+
+.close-smooth-fullscreen:active {
+	background: none;
+	color: rgba(63, 70, 82, 1);
 }
 
 .smooth-fullscreen-title {

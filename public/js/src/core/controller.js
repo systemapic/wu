@@ -265,15 +265,18 @@ Wu.Controller = Wu.Class.extend({
 
 
 	openLastUpdatedProject : function () {
-		_.first(_.sortBy(_.toArray(app.Projects), function (p) {
+		var project = _.first(_.sortBy(_.toArray(app.Projects), function (p) {
 			return p.store.lastUpdated;
-		}).reverse()).selectProject();
+		}).reverse());
+		if (project) project.selectProject();
 	},
 
 	openFirstProject : function () {
-		_.first(_.sortBy(_.toArray(app.Projects), function (p) {
+		var project = _.first(_.sortBy(_.toArray(app.Projects), function (p) {
 			return p.getName().toLowerCase();
-		})).selectProject();
+		}));
+		if (project) project.selectProject();
+		
 	},
 
 

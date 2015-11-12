@@ -407,63 +407,63 @@ module.exports = api.user = {
 	},
 
 
-	// create user
-	create : function (req, res) {
-		if (!req.body) return api.error.missingInformation(req, res);
+	// // create user
+	// create : function (req, res) {
+	// 	if (!req.body) return api.error.missingInformation(req, res);
 
-		// user not added to any roles on creation
-		// blank user with no access - must be given project access, etc.
+	// 	// user not added to any roles on creation
+	// 	// blank user with no access - must be given project access, etc.
 
-		var account = req.user,
-		    projectUuid = req.body.project,
-		    userUuid = req.user.uuid,
-		    options = req.body;
-		    ops = [];
+	// 	var account = req.user,
+	// 	    projectUuid = req.body.project,
+	// 	    userUuid = req.user.uuid,
+	// 	    options = req.body;
+	// 	    ops = [];
 
-		// return on missing info
-		if (!options.email) return api.error.missingInformation(req, res);
+	// 	// return on missing info
+	// 	if (!options.email) return api.error.missingInformation(req, res);
 
-		// permissions hack, need project to get a capability... todo: refactor whole permissions thing
-		ops.push(function (callback) {
-			if (projectUuid) {
-				api.project._getProjectByUuid(projectUuid, callback);
-			} else {
-				api.project._getProjectByUserUuidAndCapability(userUuid, 'create_user', callback);
-			}
-		});
+	// 	// permissions hack, need project to get a capability... todo: refactor whole permissions thing
+	// 	ops.push(function (callback) {
+	// 		if (projectUuid) {
+	// 			api.project._getProjectByUuid(projectUuid, callback);
+	// 		} else {
+	// 			api.project._getProjectByUserUuidAndCapability(userUuid, 'create_user', callback);
+	// 		}
+	// 	});
 
-		// check access
-		ops.push(function (project, callback) {
-			api.access.to.create_user({
-				user : account,
-				project : project
-			}, callback);
-		});
+	// 	// check access
+	// 	ops.push(function (project, callback) {
+	// 		api.access.to.create_user({
+	// 			user : account,
+	// 			project : project
+	// 		}, callback);
+	// 	});
 
-		// create user
-		ops.push(function (options, callback) {
-			api.user._create({
-				options : req.body,
-				account : account
-			}, callback);
-		});
+	// 	// create user
+	// 	ops.push(function (options, callback) {
+	// 		api.user._create({
+	// 			options : req.body,
+	// 			account : account
+	// 		}, callback);
+	// 	});
 
-		// send email
-		ops.push(function (user, password, callback) {
-			console.log('got password: '.yellow, password);
-			api.email.sendWelcomeEmail(user, password, account);  // refactor plain pass
-			callback(null, user);
-		});
+	// 	// send email
+	// 	ops.push(function (user, password, callback) {
+	// 		console.log('got password: '.yellow, password);
+	// 		api.email.sendWelcomeEmail(user, password, account);  // refactor plain pass
+	// 		callback(null, user);
+	// 	});
 
 
-		// run ops
-		async.waterfall(ops, function (err, user) {
-			if (err) return api.error.general(req, res, err);
+	// 	// run ops
+	// 	async.waterfall(ops, function (err, user) {
+	// 		if (err) return api.error.general(req, res, err);
 
-			// done
-			res.end(JSON.stringify(user));
-		});
-	},
+	// 		// done
+	// 		res.end(JSON.stringify(user));
+	// 	});
+	// },
 
 
 	_create : function (job, callback) {
@@ -492,7 +492,7 @@ module.exports = api.user = {
 	},
 
 
-	// update user 	// todo: send email notifications on changes?
+	// update user 	
 	update : function (req, res) {
 		if (!req.body) return api.error.missingInformation(req, res);
 
@@ -503,33 +503,37 @@ module.exports = api.user = {
 
 		if (!userUuid || !account || !projectUuid) return api.error.missingInformation(req, res);
 
+
+		// can only edit yourself
+		if (userUuid != req.user.uuid) return api.error.general(req, res, 'No access.');
+
 		ops.push(function (callback) {
 			User
-			.findOne({uuid : userUuid})
+			.findOne({uuid : req.user.uuid})
 			.exec(callback);
 		});
 
+		// ops.push(function (user, callback) {
+		// 	Project
+		// 	.findOne({uuid : projectUuid})
+		// 	.exec(function (err, project) {
+		// 		if (err) return callback(err);
+		// 		callback(null, user, project);
+		// 	});
+		// });
+
+		// ops.push(function (user, project, callback)  {
+		// 	api.access.to.edit_user({
+		// 		user : account,
+		// 		subject : user,
+		// 		project : project
+		// 	}, callback);
+		// });
+
 		ops.push(function (user, callback) {
-			Project
-			.findOne({uuid : projectUuid})
-			.exec(function (err, project) {
-				if (err) return callback(err);
-				callback(null, user, project);
-			});
-		});
-
-		ops.push(function (user, project, callback)  {
-			api.access.to.edit_user({
-				user : account,
-				subject : user,
-				project : project
-			}, callback);
-		});
-
-		ops.push(function (options, callback) {
 			api.user._update({
 				options : req.body,
-				user : options.subject
+				user : user
 			}, callback);
 		});
 
@@ -592,49 +596,49 @@ module.exports = api.user = {
 	},
 
 		
-	// delete user  	
-	deleteUser : function (req, res) {
-		if (!req.body) return api.error.missingInformation(req, res);
+	// // delete user  	
+	// deleteUser : function (req, res) {
+	// 	if (!req.body) return api.error.missingInformation(req, res);
 	
-		var userUuid = req.body.uuid,
-		    account = req.user,
-		    ops = [];
+	// 	var userUuid = req.body.uuid,
+	// 	    account = req.user,
+	// 	    ops = [];
 
-		ops.push(function (callback) {
-			User
-			.findOne({uuid : userUuid})
-			.exec(callback);
-		});
+	// 	ops.push(function (callback) {
+	// 		User
+	// 		.findOne({uuid : userUuid})
+	// 		.exec(callback);
+	// 	});
 
-		ops.push(function (user, callback) {
-			api.access.to.delete_user({
-				user : account,
-				subject : user
-			}, callback);
-		});
+	// 	ops.push(function (user, callback) {
+	// 		api.access.to.delete_user({
+	// 			user : account,
+	// 			subject : user
+	// 		}, callback);
+	// 	});
 
-		ops.push(function (options, callback) {
-			if (!options || !options.subject) return callback('Missing information.7');
+	// 	ops.push(function (options, callback) {
+	// 		if (!options || !options.subject) return callback('Missing information.7');
 
-			//deleting token 
-			var deletedUser = options.subject;
-			var token = deletedUser.token; 
-			if (token) api.redis.temp.del(token); 
+	// 		//deleting token 
+	// 		var deletedUser = options.subject;
+	// 		var token = deletedUser.token; 
+	// 		if (token) api.redis.temp.del(token); 
 
-			//removing the whole user
-			options.subject.remove(callback);
+	// 		//removing the whole user
+	// 		options.subject.remove(callback);
 
-		});
+	// 	});
 
-		async.waterfall(ops, function (err, user) {
-			if (err || !user) api.error.general(req, res, err);
+	// 	async.waterfall(ops, function (err, user) {
+	// 		if (err || !user) api.error.general(req, res, err);
 
-			// done
-			res.end(JSON.stringify(user));
+	// 		// done
+	// 		res.end(JSON.stringify(user));
 
-			// todo: send email notifications?
-		});
-	},
+	// 		// todo: send email notifications?
+	// 	});
+	// },
 
 
 	// check unique email
@@ -658,17 +662,52 @@ module.exports = api.user = {
 		if (!options) return done('No options.');
 
 		var user = options.user;
+		var userOnInviteList = [];
+		var ops = [];
 
-		// check if admin
-		api.access.is.admin({
-			user : user
-		}, function (err, isAdmin) {
-			// not admin, get all users manually
-			if (err || !isAdmin) return api.user._getAllFiltered(options, done);
-			
-			// is admin, get all
-			api.user._getAll(options, done);
+
+		ops.push(function (callback) {
+			Project
+			.find()
+			.or([	{'access.edit' : user.getUuid()}, 
+				{createdBy : user.getUuid()}
+			])
+			.exec(callback);
+		})
+
+		ops.push(function (projects, callback) {
+			projects.forEach(function (p) {
+
+				// get edits
+				p.access.edit.forEach(function (edit_user) {
+					userOnInviteList.push(edit_user);
+				});
+
+				// get reads
+				p.access.read.forEach(function (read_user) {
+					userOnInviteList.push(read_user);
+				});
+			});
+
+			// get all users on list
+			User
+			.find({uuid : {$in : userOnInviteList}})
+			.exec(callback);
+
 		});
+		
+		ops.push(function (users, callback) {
+			console.log('found total users: ', users.length);
+
+			// find users on contact list (todo!)
+
+			callback(null, users);
+			
+		});
+
+		async.waterfall(ops, done);
+
+		
 	},
 
 

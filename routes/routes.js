@@ -143,6 +143,13 @@ module.exports = function(app, passport) {
 		api.project.create(req, res);
 	});
 
+	// =====================================
+	// CREATE NEW PROJECT  =================
+	// =====================================
+	app.post('/api/project/setAccess', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.project.setAccess(req, res);
+	});
+
 
 	// =====================================
 	// GET UPLOAD ==========================
@@ -271,28 +278,8 @@ module.exports = function(app, passport) {
 	});
 
 
-	// // =====================================
-	// // CREATE NEW CLIENT ===================
-	// // =====================================
-	// app.post('/api/client/new', passport.authenticate('bearer', {session: false}), function (req,res) {
-	// 	api.client.create(req, res);
-	// });
+	
 
-
-	// // =====================================
-	// // CHECK IF UNIQUE CLIENT NAME   =======
-	// // =====================================
-	// app.post('/api/client/unique', passport.authenticate('bearer', {session: false}), function (req,res) {
-	// 	api.client.checkUniqueSlug(req, res);
-	// });
-
-
-	// // =====================================
-	// // DELETE CLIENT =======================
-	// // =====================================
-	// app.post('/api/client/delete', passport.authenticate('bearer', {session: false}), function (req,res) {
-	// 	api.client.deleteClient(req, res);
-	// });
 
 
 	// =====================================
@@ -303,12 +290,6 @@ module.exports = function(app, passport) {
 	});
 
 
-	// // =====================================
-	// // UPDATE CLIENT =======================
-	// // =====================================
-	// app.post('/api/client/update', passport.authenticate('bearer', {session: false}), function (req,res) {
-	// 	api.client.update(req, res);
-	// });
 
 
 	// =====================================

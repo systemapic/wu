@@ -42,6 +42,43 @@ var api = module.parent.exports;
 // exports
 module.exports = api.project = { 
 
+	setAccess : function (req, res) {
+
+		var user = req.user;
+		var options = req.body;
+		var projectAccess = options.access;
+		var projectUuid = options.project;
+
+		console.log('api.project.setAccess', options);
+
+		if (!projectUuid || !projectAccess) return api.error.missingInformation(req, res);
+
+		Project
+		.findOne({uuid : projectUuid})
+		.exec(function (err, project) {
+
+			// check if access to edit
+			var canEdit = _.contains(project.access.edit, user.getUuid()) || (project.createdBy == user.getUuid());
+
+			console.log('canEdit: ', canEdit);
+
+			if (!canEdit) return api.error.general(req, res, 'No access.');
+
+			// set access, save
+			project.access = projectAccess;
+			project.save(function (err, p) {
+
+				// return if err
+				if (err) return res.json({
+					error : err
+				});
+
+				// return project
+				res.json(p);
+			})
+		})
+
+	},
 
 	// #########################################
 	// ###  API: Create Project              ###
@@ -49,31 +86,28 @@ module.exports = api.project = {
 	// createProject : function (req, res) {
 	create : function (req, res) {
 		var store = req.body,
-		    account = req.user,
+		    user = req.user,
 		    ops = [];
 
 		// return if missing info
 		if (!store) return api.error.missingInformation(req, res);
 
+		var isPublic = store.access.options.isPublic;
+
 		// check access
 		ops.push(function (callback) {
-			api.access.to.create_project({
-				user : account
-			}, callback);
-		});
+			
+			// if public, allowed to create project
+			if (isPublic) return callback(null);
 
-		// create role
-		ops.push(function (options, callback) {
-			api.access._createDefaultRoles({
-				user : account,
-			}, callback);
+			// check if user can create private project
+			user.canCreatePrivateProject() ? callback(null) : callback('No access.');
 		});
 
 		// create project
-		ops.push(function (roles, callback) {
+		ops.push(function (callback) {
 			api.project._create({
-				user : account,
-				roles : roles,
+				user : user,
 				store : store
 			}, callback);
 		});
@@ -119,13 +153,46 @@ module.exports = api.project = {
 			// slack
 			api.slack.createdProject({
 				project : project, 
-				user : account
+				user : user
 			});
 
 			// return
 			api.project._returnProject(req, res, project);
 		});
 	},
+
+	
+
+	_create : function (options, done) {
+		if (!options) return done('No options.');
+
+		var user = options.user,
+		    store = options.store,
+		    slug = crypto.randomBytes(3).toString('hex');
+		
+		if (!user) return done('Missing information.8');
+
+		var projectName = store.name;
+		var projectSlug = api.utils.createNameSlug(projectName);
+
+		// create model
+		var project 		= new Project();
+		project.uuid 		= 'project-' + uuid.v4();
+		project.createdBy 	= user.uuid;
+		project.createdByName   = user.firstName + ' ' + user.lastName;
+		project.slug 		= projectSlug;
+		project.name 		= projectName;
+		project.description 	= store.description || '';
+		project.keywords 	= store.keywords || '';
+		project.position 	= store.position || api.project._getDefaultPosition(); // defaults
+		project.access 		= store.access;
+
+		// save
+		project.save(function (err, project, numAffected) { 	// major GOTCHA!!! product.save(function (err, product, numberAffected) 
+			done(err, project);				// returns three args!!!
+		});
+	},
+
 
 	setDefaults : function (project, callback) {
 
@@ -147,46 +214,6 @@ module.exports = api.project = {
 		project.markModified('baseLayers');
 		project.save(callback);
 
-	},
-
-
-	_create : function (options, done) {
-		if (!options) return done('No options.');
-
-		var user = options.user,
-		    roles = options.roles,
-		    store = options.store,
-		    slug = crypto.randomBytes(3).toString('hex');
-		
-		if (!user) return done('Missing information.8');
-
-
-		var projectName = store.name || 'Project ' + api.utils.getRandomName();
-		var projectSlug = api.utils.createNameSlug(projectName);
-
-		// create model
-		var project 		= new Project();
-		project.uuid 		= 'project-' + uuid.v4();
-		project.createdBy 	= user.uuid;
-		project.createdByName   = user.firstName + ' ' + user.lastName;
-		project.slug 		= projectSlug;
-		project.name 		= projectName;
-		project.description 	= store.description || '';
-		// project.header.title    = projectName;
-		// project.header.subtitle = 'Project description';
-		project.keywords 	= store.keywords || '';
-		project.position 	= store.position || api.project._getDefaultPosition(); // defaults
-		// project.access 		= store.access;
-
-		// add roles
-		roles.forEach(function (role) {
-			project.roles.addToSet(role._id);
-		});
-
-		// save
-		project.save(function (err, project, numAffected) { 	// major GOTCHA!!! product.save(function (err, product, numberAffected) 
-			done(err, project);				// returns three args!!!
-		});
 	},
 
 	_getDefaultPosition : function () {
@@ -238,9 +265,8 @@ module.exports = api.project = {
 	deleteProject : function (req, res) {
 		if (!req.body) return api.error.missingInformation(req, res);
 
-		var account     = req.user,
-		    // clientUuid 	= req.body.clientUuid,
-		    projectUuid = req.body.projectUuid;
+		var user = req.user;
+		var projectUuid = req.body.projectUuid;
 
 		var ops = [];
 
@@ -252,16 +278,19 @@ module.exports = api.project = {
 		});
 
 		ops.push(function (project, callback) {
-			api.access.to.delete_project({
-				user : account, 
-				project : project
-			}, callback);
+			// api.access.to.delete_project({
+			// 	user : account, 
+			// 	project : project
+			// }, callback);
+
+			(project.createdBy == user.getUuid()) ? callback(null, project) : callback('No access.');
+
 		});
 
-		ops.push(function (options, callback) {
-			if (!options || !options.project) return callback('No project.');
+		ops.push(function (project, callback) {
+			if (!project) return callback('No project.');
 
-			options.project.remove(callback);
+			project.remove(callback);
 		});
 
 		async.waterfall(ops, function (err, project) {
@@ -270,7 +299,7 @@ module.exports = api.project = {
 			// slack
 			api.slack.deletedProject({
 				project : project,
-				user : account
+				user : user
 			});
 
 			// done
@@ -287,11 +316,9 @@ module.exports = api.project = {
 	update : function (req, res) {
 		if (!req.body) return api.error.missingInformation(req, res);
 		
-		var account = req.user,
+		var user = req.user,
 		    projectUuid = req.body.uuid,
 		    ops = [];
-
-		console.log('Updating project.'.yellow, req.body);
 
 		// return on missing
 		if (!projectUuid) return api.error.missingInformation(req, res);
@@ -299,20 +326,23 @@ module.exports = api.project = {
 		ops.push(function (callback) {
 			Project
 			.findOne({uuid : projectUuid})
-			.populate('roles')
 			.exec(callback);
 		});
 
 		ops.push(function (project, callback) {
-			api.access.to.edit_project({
-				user : account,
-				project : project
-			}, callback);
+
+			var hashedUser = user.getUuid(); // todo: use actual hash
+
+			// can edit if on edit list or created project 
+			var canEdit = _.contains(project.access.edit, hashedUser) || (project.createdBy == user.getUuid());
+
+			// continue if canEdit
+			canEdit ? callback(null, project) : callback('No access.');
 		});
 
-		ops.push(function (options, callback) {
+		ops.push(function (project, callback) {
 			api.project._update({
-				project : options.project,
+				project : project,
 				options : req.body
 			}, callback);
 		});
@@ -511,24 +541,51 @@ module.exports = api.project = {
 
 	},
 
-
 	getAll : function (options, done) {
 		if (!options) return done('No options.');
 
 		var user = options.user;
 
-		// check if admin
-		api.access.is.admin({
-			user : user
-		}, function (err, isAdmin) {
 
-			// not admin, get all users manually
-			if (err || !isAdmin) return api.project._getAllFiltered(options, done);
-			
-			// is admin, get all
-			api.project._getAll(done);
-		});
+		var hashedUser = crypto.createHash('sha256').update(user.getUuid()).digest("hex");
+
+		console.log('hashedUser', hashedUser);
+
+		var hashedUser = user.getUuid(); // todo: hash user ids
+
+		// get all projects where user is in access.edit or access.read
+		Project
+		.find()
+		.or([	{'access.edit' : hashedUser },
+			{'access.read' : hashedUser },
+			{'createdBy' : hashedUser}
+		])
+		.populate('files')
+		.populate('roles')
+		.populate('layers')
+		.exec(done);
 	},
+
+
+
+
+	// getAll : function (options, done) {
+	// 	if (!options) return done('No options.');
+
+	// 	var user = options.user;
+
+	// 	// check if admin
+	// 	api.access.is.admin({
+	// 		user : user
+	// 	}, function (err, isAdmin) {
+
+	// 		// not admin, get all users manually
+	// 		if (err || !isAdmin) return api.project._getAllFiltered(options, done);
+			
+	// 		// is admin, get all
+	// 		api.project._getAll(done);
+	// 	});
+	// },
 
 	_getAll : function (done) {
 		Project
@@ -572,6 +629,7 @@ module.exports = api.project = {
 
 	_getAllFiltered : function (options, done) {
 		if (!options) return done('No options.');
+
 
 		var user = options.user,
 		    filter = options.cap_filter || 'read_project',

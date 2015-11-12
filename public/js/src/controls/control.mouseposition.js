@@ -29,7 +29,7 @@ L.Control.Mouseposition = Wu.Control.extend({
 
         options: {
                 position: 'topright',
-                separator: ', ',
+                separator: ',  ',
                 emptyString: 'Lat/Lng',
                 lngFirst: false,
                 numDigits: 3,
@@ -117,7 +117,7 @@ L.Control.Mouseposition = Wu.Control.extend({
 
                 var value = this.options.lngFirst ? lng + this.options.separator + lat : lat + this.options.separator + lng;
                 var prefixAndValue = this.options.prefix + ' ' + value;
-                if (this.options.zoomLevel) prefixAndValue += ', ' + this._zoom;
+                if (this.options.zoomLevel) prefixAndValue += ',  ' + this._zoom;
                 this._container.innerHTML = prefixAndValue;
         },
 
@@ -129,6 +129,7 @@ L.Control.Mouseposition = Wu.Control.extend({
                 // force num of digits (add 0's)
                 var splitValue = value.toString().split('.');
                 var d = splitValue[1];
+                if (!d) return '';
                 var diff = digits - d.length;
                 for (var x = 0; x < diff; x++) {
                         d += '0';

@@ -104,6 +104,9 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 			context : this,
 			project_dependent : true
 		});
+
+		// css experiement
+		this._settingsButton.innerHTML = '<i class="top-button fa fa-paint-brush"></i>Style';
 	},
 
 	_initTabs : function () {
