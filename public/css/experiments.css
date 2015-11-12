@@ -84,11 +84,42 @@ body {
 }
 
 
+/*mouseposition*/
+.leaflet-container .leaflet-control-mouseposition {
+    background-color: rgba(85, 85, 85, 0.79);
+    padding: 0 5px;
+    margin: 0;
+    color: #eee;
+    display: inline-block;
+    margin: 0 !important;
+    position: relative;
+    vertical-align: top;
+    top: 0 !important;
+    bottom: auto;
+    float: none;
+    height: 24px;
+    font-size: 12px;
+    font-family: 'Open Sans', serif;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 2px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    cursor: default;
+    font-weight: 600;
 
+}
 
-
-
-
+.leaflet-top.leaflet-right {
+    border: 0;
+    text-align: left;
+    height: 18px;
+    text-align: right;
+    z-index: 100;
+    bottom: 10px !important;
+    right: 5px;
+    top: initial;
+}
 
 
 
