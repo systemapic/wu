@@ -87,6 +87,10 @@ Wu.Share = Wu.Pane.extend({
 	},
 
 	_open : function () {
+
+		// close other tabs
+		Wu.Mixin.Events.fire('closeMenuTabs');
+
 		Wu.DomUtil.removeClass(this._shareDropdown, 'displayNone');
 		this._isOpen = true;
 
@@ -119,6 +123,13 @@ Wu.Share = Wu.Pane.extend({
 		Wu.DomUtil.removeClass(this._shareButton, 'active');
 	},
 
+	_onCloseMenuTabs : function () {
+		
+		// app.Chrome();
+		this._close();
+	},
+
+
 	_fillTitles : function () {
 		this._shareImageButton.innerHTML = 'Share Image';
 		this._sharePrintButton.innerHTML = 'Share PDF';
@@ -137,6 +148,7 @@ Wu.Share = Wu.Pane.extend({
 	},
 
 	_removeGhost : function () {
+		if (!this._ghost) return; 
 		Wu.DomEvent.off(this._ghost, 'click', this._close, this);
 		Wu.DomUtil.remove(this._ghost);
 	},

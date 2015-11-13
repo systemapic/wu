@@ -54,19 +54,8 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 	_refresh : function () {
 
-		// remove settings button if no access to edit project
-		// if (app.Access.to.edit_project(app.activeProject)) { 			// todo: check if working
-		// 	Wu.DomUtil.removeClass(this._settingsButton, 'displayNone');
-		// } else {
-		// 	Wu.DomUtil.addClass(this._settingsButton, 'displayNone');
-		// }
-
 		// access_v2
-		if (app.activeProject.isEditable()) {
-			this._settingsButton.style.display = '';
-		} else {
-			this._settingsButton.style.display = 'none';
-		}
+		this._settingsButton.style.display = app.activeProject.isEditable() ? '' : 'none';
 	},
 
 
@@ -155,6 +144,7 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
 
 		if (this._isOpen) {
+			
 			// fire event
 			app.Socket.sendUserEvent({
 			    	user : app.Account.getFullName(),

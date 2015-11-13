@@ -57,6 +57,7 @@ Wu.Chrome.Left = Wu.Chrome.extend({
 	},
 
 	open : function () {
+		
 		if (this._isOpen) return;
 		this._isOpen = true;
 
@@ -69,6 +70,7 @@ Wu.Chrome.Left = Wu.Chrome.extend({
 	},
 
 	close : function (force) {
+
 		if (!this._isOpen && !force) return;
 		this._isOpen = false;
 
@@ -81,6 +83,10 @@ Wu.Chrome.Left = Wu.Chrome.extend({
 	},
 
 
+	_onCloseMenuTabs : function () {
+
+		this.close();
+	},
 	
 
 

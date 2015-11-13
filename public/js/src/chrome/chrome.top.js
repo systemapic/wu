@@ -93,15 +93,9 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// register event
 		Wu.DomEvent.on(buttonDiv, 'click', trigger, ctx);
 
-		// event
-		Wu.DomEvent.on(buttonDiv, 'click', this._buttonClick, this);
-
 		return buttonDiv;
 	},
 
-	_buttonClick : function () {
-
-	},
 
 	_updateButtonVisibility : function () {
 		if (app.activeProject) {
@@ -166,7 +160,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Get clean value of number
 		var p = Math.round(pp / 10);
 
-		for (var i = 0; i<10; i++ ) {
+		for (var i = 0; i < 10; i++ ) {
 			
 			// Get the right div
 			var no = 9 - i;
@@ -174,8 +168,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 			// Set the right classes
 			(i >= p) ? Wu.DomUtil.removeClass(this._CPUbars[no], 'cpu-on') : Wu.DomUtil.addClass(this._CPUbars[no], 'cpu-on');
 		}
-
-
 	},
 
 	_setHooks : function (onoff) {
@@ -276,19 +268,17 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	openLeftPane : function () {
 
+		// close other tabs
+		Wu.Mixin.Events.fire('closeMenuTabs');
+
 		this._leftPaneisOpen = true;
 
 		// Set active state of button
 		Wu.DomUtil.addClass(this._menuButton, 'active');
 
-
-		// expand sidepane
-		// if (app.SidePane) app.SidePane.expand(); // todo: remove
-		// this.setContentHeights();
-
-
 		// open left chrome
 		app.Chrome.Left.open();
+
 	},
 
 	closeLeftPane : function () {
@@ -299,7 +289,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Remove active state of button
 		Wu.DomUtil.removeClass(this._menuButton, 'active');
 
-		// open left chrome
+		// close left chrome
 		app.Chrome.Left.close();
 	},
 
@@ -365,5 +355,10 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this.__layerMenu.closeLayerPane();
 	},	
 
-
+	_onCloseMenuTabs : function () {
+		
+		// app.Chrome();
+		this.closeLeftPane();
+	},
+	
 });
