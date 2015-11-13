@@ -78,18 +78,15 @@ Wu.Chrome = Wu.Class.extend({
 		// map.style.width = width + 'px';
 
 		// css exp
-		app._map._controlCorners.bottomleft.style.left = left + 'px';
-		app._map._controlCorners.topleft.style.left = left + 'px';
-
 		// styler
-		if (rightChrome && rightChrome._currentTab && rightChrome._currentTab._ == 'settingsSelector') {
-		app._map._controlCorners.bottomleft.style.left = '0px';
+		var isStyler = (rightChrome && rightChrome._currentTab && rightChrome._currentTab._ == 'settingsSelector' && rightChrome._isOpen);
 
-		}
+		app._map._controlCorners.topleft.style.left = left + 'px';
+		app._map._controlCorners.bottomleft.style.left = isStyler ? '0px' : left + 'px';
 
 
 		// update leaflet map
-		app._map.invalidateSize();
+		// app._map.invalidateSize();
 	},
 
 	
