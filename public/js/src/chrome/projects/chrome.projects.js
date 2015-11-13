@@ -3,7 +3,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	_ : 'projects', 
 
 	options : {
-		defaultWidth : 220,
+		// defaultWidth : 220,
+		defaultWidth : 283,
 		publicTooltipWidth : 55,
 		defaultAccess : {
 			read : [],

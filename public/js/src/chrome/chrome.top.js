@@ -80,10 +80,9 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// create button
 		var buttonDiv = Wu.DomUtil.create('div', className);
-		console.log('this._buttonWrapper.lastChild', this._buttonWrapper.lastChild.previousSibling.previousSibling);
 
+		// css exp
 		this._buttonWrapper.insertBefore(buttonDiv, this._buttonWrapper.lastChild.previousSibling.previousSibling);
-
 
 		// save
 		this._buttons[name] = {
@@ -173,8 +172,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 			var no = 9 - i;
 
 			// Set the right classes
-			if ( i >= p ) 	Wu.DomUtil.removeClass(this._CPUbars[no], 'cpu-on');
-			else		Wu.DomUtil.addClass(this._CPUbars[no], 'cpu-on');
+			(i >= p) ? Wu.DomUtil.removeClass(this._CPUbars[no], 'cpu-on') : Wu.DomUtil.addClass(this._CPUbars[no], 'cpu-on');
 		}
 
 
