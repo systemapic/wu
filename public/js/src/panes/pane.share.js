@@ -95,7 +95,7 @@ Wu.Share = Wu.Pane.extend({
 		this._isOpen = true;
 
 		// add fullscreen click-ghost
-		this._addGhost();
+		// this._addGhost();
 
 		// mark button active
 		Wu.DomUtil.addClass(this._shareButton, 'active');
@@ -117,7 +117,7 @@ Wu.Share = Wu.Pane.extend({
 		Wu.DomUtil.removeClass(this._shareDropdown, 'wide-share');
 
 		// remove ghost
-		this._removeGhost();
+		// this._removeGhost();
 
 		// mark button inactive
 		Wu.DomUtil.removeClass(this._shareButton, 'active');

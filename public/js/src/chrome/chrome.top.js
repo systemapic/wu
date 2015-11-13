@@ -55,7 +55,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// this._userLogout = Wu.DomUtil.create('div', 'top-logout', this._userNameContainer, 'log out');
 
 		// Layers button
-		this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton displayNone', this._buttonWrapper);
+		// this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton displayNone', this._buttonWrapper);
 	
 
 		// set default
@@ -82,7 +82,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		var buttonDiv = Wu.DomUtil.create('div', className);
 
 		// css exp
-		this._buttonWrapper.insertBefore(buttonDiv, this._buttonWrapper.lastChild.previousSibling.previousSibling);
+		this._buttonWrapper.insertBefore(buttonDiv, this._buttonWrapper.lastChild.previousSibling);
 
 		// save
 		this._buttons[name] = {
@@ -173,7 +173,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_setHooks : function (onoff) {
 
 		// Toggle layer menu
-		Wu.DomEvent[onoff](this._layersBtn, 'click', this._toggleLayermenu, this);
+		// Wu.DomEvent[onoff](this._layersBtn, 'click', this._toggleLayermenu, this);
 
 		// Toggle left pane
 		Wu.DomEvent[onoff](this._menuButton, 'click', this._toggleLeftPane, this);
@@ -228,12 +228,12 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	
 	_showHideLayerButton : function () {
 
-		// If there are no layers, hide button
-		if (!this._project.store.layermenu || this._project.store.layermenu.length == 0 ) {
-			Wu.DomUtil.addClass(this._layersBtn, 'displayNone');
-		} else {
-			Wu.DomUtil.removeClass(this._layersBtn, 'displayNone');
-		}
+		// // If there are no layers, hide button
+		// if (!this._project.store.layermenu || this._project.store.layermenu.length == 0 ) {
+		// 	Wu.DomUtil.addClass(this._layersBtn, 'displayNone');
+		// } else {
+		// 	Wu.DomUtil.removeClass(this._layersBtn, 'displayNone');
+		// }
 
 	},
 
@@ -337,7 +337,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._layerMenuOpen = true;
 
 		// Add "active" class from button
-		Wu.DomUtil.addClass(this._layersBtn, 'active');
+		// Wu.DomUtil.addClass(this._layersBtn, 'active');
 
 		// TODO: Open Layer Menu
 		this.__layerMenu.openLayerPane();
@@ -349,7 +349,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._layerMenuOpen = false;
 
 		// Remove "active" class from button
-		Wu.DomUtil.removeClass(this._layersBtn, 'active');
+		// Wu.DomUtil.removeClass(this._layersBtn, 'active');
 
 		// TODO: Close Layer Menu
 		this.__layerMenu.closeLayerPane();

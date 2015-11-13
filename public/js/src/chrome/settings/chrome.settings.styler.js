@@ -77,7 +77,6 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 	},	
 	
 	_refresh : function () {
-
 		this._flush();
 		this._initLayout();
 	},

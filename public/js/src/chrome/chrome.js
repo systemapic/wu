@@ -46,11 +46,11 @@ Wu.Chrome = Wu.Class.extend({
 
 		if (!rightChrome || !leftChrome) return;
 
-		// both open
-		if (leftChrome._isOpen && rightChrome._isOpen) {
-			left = left + leftChrome.options.defaultWidth;
-			width = width - leftChrome.options.defaultWidth - rightChrome.options.defaultWidth;
-		}
+		// // both open
+		// if (leftChrome._isOpen && rightChrome._isOpen) {
+		// 	left = left + leftChrome.options.defaultWidth;
+		// 	width = width - leftChrome.options.defaultWidth - rightChrome.options.defaultWidth;
+		// }
 
 		// only left open
 		if (leftChrome._isOpen && !rightChrome._isOpen) {
@@ -80,6 +80,12 @@ Wu.Chrome = Wu.Class.extend({
 		// css exp
 		app._map._controlCorners.bottomleft.style.left = left + 'px';
 		app._map._controlCorners.topleft.style.left = left + 'px';
+
+		// styler
+		if (rightChrome && rightChrome._currentTab && rightChrome._currentTab._ == 'settingsSelector') {
+		app._map._controlCorners.bottomleft.style.left = '0px';
+
+		}
 
 
 		// update leaflet map

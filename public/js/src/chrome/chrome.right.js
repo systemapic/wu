@@ -106,11 +106,18 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		this._container.style.width = this.options.defaultWidth + 'px';
 		this._container.style.display = 'block';
 
+		// set height for styler pane
+		if (tab._ == 'settingsSelector') {
+			this._container.style.height = '75%';
+		} else {
+			this._container.style.height = '100%'; // todo, css exp
+		}
+
 		// update size
 		this.updateMapSize(); // css exp
 
 		// set buttons inverted
-		Wu.DomUtil.addClass(app.Chrome.Top._buttonWrapper, 'inverted');
+		// Wu.DomUtil.addClass(app.Chrome.Top._buttonWrapper, 'inverted');
 
 	},
 
@@ -134,7 +141,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		this.updateMapSize();
 
 		// set buttons inverted
-		Wu.DomUtil.removeClass(app.Chrome.Top._buttonWrapper, 'inverted');
+		// Wu.DomUtil.removeClass(app.Chrome.Top._buttonWrapper, 'inverted');
 	},
 
 	_onCloseMenuTabs : function () {
