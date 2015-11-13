@@ -87,7 +87,7 @@ body {
 
 /*mouseposition*/
 .leaflet-container .leaflet-control-mouseposition {
-    background-color: rgba(85, 85, 85, 0.79);
+    background-color: rgba(60, 71, 89, 0.7);
     padding: 0 5px;
     margin: 0;
     color: #eee;
@@ -124,7 +124,7 @@ body {
 
 
 .leaflet-control-scale-line {
-    background-color: rgba(85, 85, 85, 0.79);
+    background-color: rgba(60, 71, 89, 0.7);
     display: inline-block;
     vertical-align: top;
     border: 0px !important;
@@ -297,11 +297,11 @@ body {
 }
 
 .settings-dropdown {
-    width: 264px;
+    width: 280px;
     height: auto !important;
     position: absolute;
     background: #FCFCFC;
-    left: 178px;
+    left: 162px;
     padding: 13px 20px 13px 19px;
     /* box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.4); */
     z-index: 10000010;
@@ -316,7 +316,7 @@ body {
     height: 100px;
     position: absolute;
     background: #FCFCFC;
-    left: 316px;
+    left: 282px;
     padding: 13px 20px 13px 19px;
     z-index: 10000010;
     top: 27px;
@@ -326,7 +326,7 @@ body {
 }
 
 .share-dropdown, .wide-share {
-     width: 126px !important; 
+     width: 160px !important; 
      height: auto !important; 
 }
 
@@ -350,4 +350,48 @@ body {
     padding-left: 4px;
     padding-top: 5px;
     border: none;
+}
+
+.chrome-button:hover {
+    opacity: 1;
+    color: white !important;
+}
+.chrome-button.active {
+    text-decoration: underline;
+}
+
+.chrome-right {
+    padding-top: 35px;
+    top: 40px;
+    border: none;
+    left: 0px;
+    background: #FCFCFC;
+}
+
+.leaflet-control-attribution {
+    margin-left: 0px;
+    left: 0px;
+    bottom: 0px;
+    margin-bottom: 0px;
+    padding: 5px;
+    background: #FCFCFC;
+    background: rgba(60, 71, 89, 0.5) !important;
+    border-radius: 0 4px 0 0;
+    padding-top: 2px;
+    padding-bottom: 1px;
+    padding-right: 8px;
+}
+.leaflet-left .leaflet-control {
+    margin-left: 0px;
+}
+
+.leaflet-control-zoom {
+    margin-left: 5px !important;
+}
+.chrome.chrome-container.chrome-top {
+    cursor: pointer;
+}
+
+#map {
+    background: #3C4759 url(images/canvas.png);
 }

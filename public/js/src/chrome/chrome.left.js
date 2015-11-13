@@ -3,7 +3,7 @@ Wu.Chrome.Left = Wu.Chrome.extend({
 	_ : 'leftchrome', 
 
 	options : {
-		defaultWidth : 250,
+		defaultWidth : 282,
 		tabs : {
 			projects : true,
 			users : true,

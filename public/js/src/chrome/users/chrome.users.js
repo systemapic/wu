@@ -8,8 +8,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 	_initialize : function () {
 
-		console.log('_initialize', this._);
-
 		// init container
 		this._initContainer();
 

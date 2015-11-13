@@ -3,7 +3,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	_ : 'rightchrome', 
 
 	options : {
-		defaultWidth : 400,
+		defaultWidth : 402,
 		editingLayer : false,
 		tabs : {
 			settings : true,
@@ -100,7 +100,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		this._container.style.display = 'block';
 
 		// update size
-		this.updateMapSize();
+		this.updateMapSize(); // css exp
 
 		// set buttons inverted
 		Wu.DomUtil.addClass(app.Chrome.Top._buttonWrapper, 'inverted');
