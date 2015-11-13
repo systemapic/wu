@@ -81,6 +81,9 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 
 	_open : function () {
 
+		// close other tabs
+		Wu.Mixin.Events.fire('closeMenuTabs');
+
 		Wu.DomUtil.removeClass(this._settingsDropdown, 'displayNone');
 
 		this._isOpen = true;
@@ -106,12 +109,19 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		Wu.DomUtil.removeClass(this._settingsButton, 'active');
 	},
 
+	_onCloseMenuTabs : function () {
+		
+		// app.Chrome();
+		this._close();
+	},
+
 	_addGhost : function () {
 		this._ghost = Wu.DomUtil.create('div', 'share-ghost', app._appPane);
 		Wu.DomEvent.on(this._ghost, 'click', this._close, this);
 	},
 
 	_removeGhost : function () {
+		if (!this._ghost) return;
 		Wu.DomEvent.off(this._ghost, 'click', this._close, this);
 		Wu.DomUtil.remove(this._ghost);
 	},

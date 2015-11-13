@@ -80,11 +80,17 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 	open : function (tab) {
 
+		// close other tabs
+		Wu.Mixin.Events.fire('closeMenuTabs');
+
 		// hide all tabs
 		this._forEachTab(function (tab) {
 			tab._hide();
 			tab.onClosed();
 		});
+
+		// css exp
+		// app.Chrome.Left.close();
 
 		// show tab
 		tab._show();
@@ -94,6 +100,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		if (this._isOpen) return;
 
 		this._isOpen = true;
+		this._currentTab = tab;
 
 		// set width of right pane
 		this._container.style.width = this.options.defaultWidth + 'px';
@@ -108,10 +115,12 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	close : function (tab) {
+
+		var tab = tab || this._currentTab;
 		
 		// hide tab
-		if (tab._hide) tab._hide();
-		if (tab.onClosed) tab.onClosed();
+		if (tab && tab._hide) tab._hide();
+		if (tab && tab.onClosed) tab.onClosed();
 
 		if (!this._isOpen) return;
 
@@ -126,8 +135,10 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 		// set buttons inverted
 		Wu.DomUtil.removeClass(app.Chrome.Top._buttonWrapper, 'inverted');
-
 	},
 
-	
+	_onCloseMenuTabs : function () {
+
+		this.close();
+	},
 });

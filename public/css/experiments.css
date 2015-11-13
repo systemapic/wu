@@ -395,3 +395,11 @@ body {
 #map {
     background: #3C4759 url(images/canvas.png);
 }
+.chrome-menu-button.active:before { 
+    width: 0;
+    height: 0;
+    left: 0;
+    top: 0;
+    margin: 0;
+    padding: 0;
+}
