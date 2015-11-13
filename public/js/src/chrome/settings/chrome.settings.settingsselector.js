@@ -55,7 +55,13 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 	_refresh : function () {
 
 		// access_v2
-		this._settingsButton.style.display = app.activeProject.isEditable() ? '' : 'none';
+		// this._settingsButton.style.display = )app.activeProject.isEditable( ? '' : 'none';
+
+		if (app.activeProject.isEditable()) {
+			Wu.DomUtil.removeClass(this._settingsButton, 'disabledBtn');
+		} else {
+			Wu.DomUtil.addClass(this._settingsButton, 'disabledBtn');
+		}
 	},
 
 
@@ -136,6 +142,8 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_togglePane : function () {
+
+		if (!app.activeProject.isEditable()) return; // safeguard
 
 		// right chrome
 		var chrome = this.options.chrome;

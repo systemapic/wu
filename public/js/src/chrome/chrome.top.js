@@ -40,7 +40,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// Project title
 		// this._projectTitle = Wu.DomUtil.create('div', 'chrome-project-title', this._projectTitleContainer);
-		this._projectTitle = Wu.DomUtil.create('div', 'chrome-project-title', this._buttonWrapper);
+		this._projectTitle = Wu.DomUtil.create('div', 'chrome-button chrome-project-title', this._buttonWrapper);
 
 		// // User name button container
 		// this._userNameContainer = Wu.DomUtil.create('div', 'username-container', this._buttonWrapper);
@@ -82,7 +82,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		var buttonDiv = Wu.DomUtil.create('div', className);
 
 		// css exp
-		this._buttonWrapper.insertBefore(buttonDiv, this._buttonWrapper.lastChild.previousSibling);
+		this._buttonWrapper.insertBefore(buttonDiv, this._buttonWrapper.lastChild);
 
 		// save
 		this._buttons[name] = {
@@ -98,12 +98,15 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 
 	_updateButtonVisibility : function () {
+
+		console.log('_updateButtonVisibility');
 		if (app.activeProject) {
 
 			var buttons = _.filter(this._buttons, function (b) {
 				return b.options.project_dependent;
 			});
 
+			console.log('buttons', buttons);
 			buttons.forEach(function (button) {
 				Wu.DomUtil.removeClass(button.div, 'displayNone');
 			});
@@ -127,7 +130,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._setPortalLogo();
 
 		// Init CPU clock
-		this.initCPUclock(this._buttonWrapper);
+		this.initCPUclock(this._container);
 	},
 
 

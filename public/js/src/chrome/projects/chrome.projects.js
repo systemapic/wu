@@ -77,6 +77,9 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			
 				// edit trigger event
 				Wu.DomEvent.on(trigger, 'click', this._openEditProjectFullscreen.bind(this, project), this);
+
+				// add extra padding
+				Wu.DomUtil.addClass(title, 'extra-padding-right');
 			}
 
 

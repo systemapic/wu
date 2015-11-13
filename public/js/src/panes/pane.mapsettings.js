@@ -42,10 +42,12 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		if (!this._project) return false;
 
 		if (this._project.isEditable()) {
-			this._settingsButton.style.display = '';
+			// this._settingsButton.style.display = '';
+			Wu.DomUtil.removeClass(this._settingsButton, 'disabledBtn');
 			return true;
 		} else {
-			this._settingsButton.style.display = 'none';
+			// this._settingsButton.style.display = 'none';
+			Wu.DomUtil.addClass(this._settingsButton, 'disabledBtn');
 			return false;
 		}
 	},
@@ -76,6 +78,8 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 	},
 
 	_togglePane : function () {
+		if (!this._project.isEditable()) return; // safeguard
+		
 		this._isOpen ? this._close() : this._open();
 	},
 
