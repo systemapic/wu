@@ -78,6 +78,8 @@ Wu.Share = Wu.Pane.extend({
 			project_dependent : true
 			
 		});
+
+		this._shareButton.innerHTML = '<i class="fa fa-paper-plane"></i>';
 	},
 
 	_togglePane : function () {

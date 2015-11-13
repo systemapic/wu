@@ -169,7 +169,7 @@ body {
     border-right: none;
     position: relative;
     height: 40px;
-    background: #428BCA;
+    background: #3C4759;
 }
 .chrome-buttons {
     position: absolute;
@@ -190,25 +190,25 @@ body {
 }
 
 .chrome-button.datalib {
-    background: #428BCA;
-    width: 100px;
+    background: #3C4759;
+    width: 120px;
     padding-top: 9px;
     text-align: center;
     color: white;
     font-weight: 700;
     opacity: 1;
-    border-left: 1px solid gainsboro;
+    border-left: 1px solid rgba(220, 220, 220, 0.36);
 }
 
 .chrome-button.settingsSelector {
-    background: #428BCA;
-    width: 100px;
+    background: #3C4759;
+    width: 120px;
     padding-top: 9px;
     text-align: center;
     color: white;
     font-weight: 700;
     opacity: 1;
-    border-left: 1px solid gainsboro;
+    border-left: 1px solid rgba(220, 220, 220, 0.36);
 }
 
 .inverted {
@@ -217,16 +217,70 @@ body {
 }
 
 .chrome-button.settings {
-    background: #428BCA;
-    width: 100px;
+    background: #3C4759;
+    width: 120px;
     padding-top: 9px;
     text-align: center;
     color: white;
     font-weight: 700;
     opacity: 1;
-    border-left: 1px solid gainsboro;
+    border-left: 1px solid rgba(220, 220, 220, 0.36);
 }
 
 .chrome-menu-button.active:before {
     background: none;
+}
+
+.chrome-button.share {
+    background: #3C4759;
+    width: 40px;
+    padding-top: 9px;
+    text-align: center;
+    color: white;
+    font-weight: 700;
+    opacity: 1;
+    border-left: 1px solid rgba(220, 220, 220, 0.36);
+}
+
+.chrome-menu-button {
+    border-right: none;
+    position: relative;
+    height: 40px;
+    background: #3C4759;
+    color: white;
+    font-size: 18px;
+    padding-left: 11px;
+    padding-top: 7px;
+}
+
+.chrome-project-title {
+    color: #555;
+    text-transform: capitalize;
+    color: rgba(0, 0, 0, 0.81);
+    background: rgba(255, 255, 255, 0.72);
+    border-radius: 0 0px 4px 0;
+    padding-left: 4px;
+    font-weight: 600;
+    padding-right: 4px;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(0, 0, 0, 0.27);
+    background: #FCFCFC;
+    padding-top: 9px;
+    padding-top: 9px;
+    text-align: center;
+    color: #3C4759;
+    font-weight: 700;
+    opacity: 1;
+    border-left: 1px solid gainsboro;
+    height: 40px;
+    padding-left: 50px;
+    padding-right: 50px;
+    top: 0;
+    left: 0;
+    font-size: 14px;
+}
+
+.chrome-left-container {
+    position: relative;
+    margin-top: 10px;
 }

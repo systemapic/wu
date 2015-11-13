@@ -19,7 +19,10 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-top', app._appPane);
 
 		// Menu Button
-		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button active', this._container);		
+		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button active', this._container);
+
+		// css experiment
+		this._menuButton.innerHTML = '<i class="top-button fa fa-bars"></i>';		
 
 		// Project title container
 		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title-container', this._container);
@@ -30,11 +33,14 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// client log image
 		this._clientLogoImg = Wu.DomUtil.create('img', '', this._clientLogo);		
 
-		// Project title
-		this._projectTitle = Wu.DomUtil.create('div', 'chrome-project-title', this._projectTitleContainer);
+		
 
 		// WRAPPER FOR BUTTONS			// todo: make pluggable
 		this._buttonWrapper = Wu.DomUtil.create('div', 'chrome-buttons', this._container);
+
+		// Project title
+		// this._projectTitle = Wu.DomUtil.create('div', 'chrome-project-title', this._projectTitleContainer);
+		this._projectTitle = Wu.DomUtil.create('div', 'chrome-project-title', this._buttonWrapper);
 
 		// // User name button container
 		// this._userNameContainer = Wu.DomUtil.create('div', 'username-container', this._buttonWrapper);
@@ -73,7 +79,11 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._buttons = this._buttons || {};
 
 		// create button
-		var buttonDiv = Wu.DomUtil.create('div', className, this._buttonWrapper);
+		var buttonDiv = Wu.DomUtil.create('div', className);
+		console.log('this._buttonWrapper.lastChild', this._buttonWrapper.lastChild.previousSibling.previousSibling);
+
+		this._buttonWrapper.insertBefore(buttonDiv, this._buttonWrapper.lastChild.previousSibling.previousSibling);
+
 
 		// save
 		this._buttons[name] = {
