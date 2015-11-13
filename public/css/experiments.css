@@ -183,45 +183,55 @@ body {
     height: 40px;
     background: none;
     margin-right: 0px;
+
+    background: #3C4759;
+    width: 120px;
+    padding-top: 9px;
+    text-align: center;
+    color: #f8f8f8;
+    font-weight: 700;
+    opacity: 1;
+    border-left: 1px solid rgba(220, 220, 220, 0.36);
 }
 
 .top-button {
     padding-right: 6px;
 }
 
+.inverted {
+    -webkit-filter: invert(0%); 
+    filter: invert(0%);
+}
+
+
 .chrome-button.datalib {
-    background: #3C4759;
+    /*background: #3C4759;*/
     width: 120px;
     padding-top: 9px;
     text-align: center;
-    color: white;
+    color: #f8f8f8;
     font-weight: 700;
     opacity: 1;
     border-left: 1px solid rgba(220, 220, 220, 0.36);
 }
 
 .chrome-button.settingsSelector {
-    background: #3C4759;
+    /*background: #3C4759;*/
     width: 120px;
     padding-top: 9px;
     text-align: center;
-    color: white;
+    color: #f8f8f8;
     font-weight: 700;
     opacity: 1;
     border-left: 1px solid rgba(220, 220, 220, 0.36);
 }
 
-.inverted {
-    -webkit-filter: invert(0%); */
-    filter: invert(0%);
-}
-
 .chrome-button.settings {
-    background: #3C4759;
+    /*background: #3C4759;*/
     width: 120px;
     padding-top: 9px;
     text-align: center;
-    color: white;
+    color: #f8f8f8;
     font-weight: 700;
     opacity: 1;
     border-left: 1px solid rgba(220, 220, 220, 0.36);
@@ -232,11 +242,11 @@ body {
 }
 
 .chrome-button.share {
-    background: #3C4759;
+    /*background: #3C4759;*/
     width: 40px;
     padding-top: 9px;
     text-align: center;
-    color: white;
+    color: #f8f8f8;
     font-weight: 700;
     opacity: 1;
     border-left: 1px solid rgba(220, 220, 220, 0.36);
@@ -273,14 +283,71 @@ body {
     opacity: 1;
     border-left: 1px solid gainsboro;
     height: 40px;
-    padding-left: 50px;
-    padding-right: 50px;
+    padding-left: 70px;
+    padding-right: 70px;
     top: 0;
     left: 0;
     font-size: 14px;
+    cursor: pointer;
 }
 
 .chrome-left-container {
     position: relative;
     margin-top: 10px;
+}
+
+.settings-dropdown {
+    width: 264px;
+    height: auto !important;
+    position: absolute;
+    background: #FCFCFC;
+    left: 178px;
+    padding: 13px 20px 13px 19px;
+    /* box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.4); */
+    z-index: 10000010;
+    cursor: pointer;
+    top: 38px !important;
+    box-shadow: none;
+}
+
+.share-dropdown {
+     -webkit-transition: width 200ms ease, height 200ms ease; 
+     transition: width 200ms ease, height 200ms ease; 
+    height: 100px;
+    position: absolute;
+    background: #FCFCFC;
+    left: 316px;
+    padding: 13px 20px 13px 19px;
+    z-index: 10000010;
+    top: 27px;
+    width: 142px;
+    cursor: default;
+    box-shadow: none;
+}
+
+.share-dropdown, .wide-share {
+     width: 126px !important; 
+     height: auto !important; 
+}
+
+.chrome-left { 
+    background : #FCFCFC;
+}
+
+.cpu-wrapper {
+    width: 12px;
+    /* border-left: 1px dashed #999; */
+    height: 100%;
+    position: relative;
+    top: 0;
+    display: inline-block;
+    vertical-align: top;
+    padding: 3px;
+    padding-left: 5px;
+    float: right;
+    background: #FCFCFC;
+    height: 40px;
+    padding-left: 4px;
+    padding-top: 5px;
+    border: none;
 }
