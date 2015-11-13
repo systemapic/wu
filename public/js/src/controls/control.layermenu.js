@@ -115,6 +115,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	_off : function () {
 		this._hide();
+
 	},
 
 	initLayout : function () {	
@@ -369,6 +370,12 @@ L.Control.Layermenu = Wu.Control.extend({
 		Wu.DomUtil.removeClass(this._innerContainer, 'enable-edit-mode');
 		
 		this.disableEdit();
+
+		if (this._isEmpty()) {
+			
+			// Hide parent wrapper if empty
+			Wu.DomUtil.addClass(this._parentWrapper, 'displayNone');
+		}
 	},
 
 
@@ -407,12 +414,17 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	},
 
+	_isEmpty : function () {
+		return (!this._project.store.layermenu || this._project.store.layermenu.length == 0 );
+	},
+
 	// exit edit mode 
 	disableEdit : function () {
 
 		if (!this.editMode) return;
 
-		if (!this._project.store.layermenu || this._project.store.layermenu.length == 0 ) {
+		if (this._isEmpty()) {
+			
 			// Hide parent wrapper if empty
 			Wu.DomUtil.addClass(this._parentWrapper, 'displayNone');
 		}		

@@ -138,6 +138,9 @@ body {
     padding-top: 6px;
 }
 
+.leaflet-draw.leaflet-control {
+    margin-left: 4px !important;
+}
 
 
 
