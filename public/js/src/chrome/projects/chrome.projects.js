@@ -17,7 +17,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		},
 		labels : {
 			private_project : 'Only invited users can access project',
-			public_project : 'Anyone with a link can access project'
+			public_project : 'Anyone with a link can access project',
+			download_on : 'Allowed to download data',
+			download_off : 'Not allowed to download data',
+			share_on : 'Allowed to invite others (as spectators)',
+			share_off : 'Not allowed to invite others',
 		}
 	},
 
@@ -145,7 +149,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		});
 
 		// clear invitations
-		this._access = this.options.defaultAccess;
+		this._resetAccess();
 
 		// shortcut
 		var content = this._fullscreen._content;
@@ -186,6 +190,52 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			sublabel : 'Spectators have read-only access to the project'
 		});
 
+
+		var share_toggle_wrapper = Wu.DomUtil.create('div', 'toggle-wrapper', content);
+
+		// add share, download toggle
+		var share_toggle_label = Wu.DomUtil.create('div', 'small-toggle-label smooth-fullscreen-sub-label');
+
+		// add private/public toggle
+		var ppswitch = new Wu.button({
+			id 	     : 'share-switch',
+			type 	     : 'switch',
+			isOn 	     : true,
+			right 	     : false,
+			disabled     : false,
+			appendTo     : share_toggle_wrapper,
+			fn 	     : this._toggleShare.bind(this, share_toggle_label),
+			className    : 'share-project-switch'
+		});
+
+		// add label, default value
+		share_toggle_wrapper.appendChild(share_toggle_label);
+		share_toggle_label.innerHTML = this.options.labels.share_on;
+
+
+
+		var download_toggle_wrapper = Wu.DomUtil.create('div', 'toggle-wrapper', content);
+
+		// add share, download toggle
+		var download_toggle_label = Wu.DomUtil.create('div', 'small-toggle-label smooth-fullscreen-sub-label');
+
+		// add private/public toggle
+		var ppswitch = new Wu.button({
+			id 	     : 'share-switch',
+			type 	     : 'switch',
+			isOn 	     : true,
+			right 	     : false,
+			disabled     : false,
+			appendTo     : download_toggle_wrapper,
+			fn 	     : this._toggleDownload.bind(this, download_toggle_label),
+			className    : 'download-project-switch'
+		});
+
+		// add label, default value
+		download_toggle_wrapper.appendChild(download_toggle_label);
+		download_toggle_label.innerHTML = this.options.labels.download_on;
+
+
 		// create invite input
 		this._createInviteUsersInput({
 			type : 'edit',
@@ -210,6 +260,154 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 	},
 
+	openShare : function () {
+
+		// set project
+		var project = app.activeProject;
+
+		// stop propagation
+		// e && Wu.DomEvent.stop(e);
+		
+		// create fullscreen
+		this._fullscreen = new Wu.Fullscreen({
+			title : '<span style="font-weight:200;">Invite to</span> ' + project.getName(),
+			closeCallback : this._resetAccess.bind(this)
+		});
+
+		// clear invitations
+		this._resetAccess();
+
+		// shortcut
+		var content = this._fullscreen._content;
+
+
+		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
+
+
+		// create invite input
+		this._createInviteUsersInput({
+			type : 'read',
+			label : 'Spectators of project',
+			content : toggles_wrapper,
+			container : this._fullscreen._inner,
+			sublabel : 'Spectators have read-only access to the project',
+			project : project
+		});
+
+
+		var share_toggle_wrapper = Wu.DomUtil.create('div', 'toggle-wrapper', toggles_wrapper);
+
+		// add share, download toggle
+		var share_toggle_label = Wu.DomUtil.create('div', 'small-toggle-label smooth-fullscreen-sub-label');
+
+
+		// add private/public toggle
+		var sswitch = new Wu.button({
+			id 	     : 'share-switch',
+			type 	     : 'switch',
+			isOn 	     : project.isShareable(),
+			right 	     : false,
+			disabled     : false,
+			appendTo     : share_toggle_wrapper,
+			fn 	     : this._toggleShare.bind(this, share_toggle_label),
+			className    : 'share-project-switch'
+		});
+
+		// add label, default value
+		share_toggle_wrapper.appendChild(share_toggle_label);
+		share_toggle_label.innerHTML = project.isShareable() ? this.options.labels.share_on : this.options.labels.share_off;
+
+		this._access.options.share = project.isShareable();
+
+		var download_toggle_wrapper = Wu.DomUtil.create('div', 'toggle-wrapper', toggles_wrapper);
+
+		// add share, download toggle
+		var download_toggle_label = Wu.DomUtil.create('div', 'small-toggle-label smooth-fullscreen-sub-label');
+
+		var downloadEnabled = (project.isDownloadable() || project.isEditor())
+
+		// add private/public toggle
+		var dswitch = new Wu.button({
+			id 	     : 'download-switch',
+			type 	     : 'switch',
+			isOn 	     : project.isDownloadable(),
+			right 	     : false,
+			disabled     : !downloadEnabled,
+			appendTo     : download_toggle_wrapper,
+			fn 	     : this._toggleDownload.bind(this, download_toggle_label),
+			className    : 'download-project-switch'
+		});
+
+		// add label, default value
+		download_toggle_wrapper.appendChild(download_toggle_label);
+		download_toggle_label.innerHTML = project.isDownloadable() ? this.options.labels.download_on : this.options.labels.download_off;
+
+		this._access.options.download = project.isDownloadable();
+
+
+		if (project.isEditor()) {
+
+
+			var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
+
+
+			// create invite input
+			this._createInviteUsersInput({
+				type : 'edit',
+				label : 'Editors of project',
+				content : toggles_wrapper,
+				container : this._fullscreen._inner,
+				sublabel : 'Editors can edit the project',
+				project : project
+			});	
+
+		}
+
+
+
+		// invite someone new?
+		var invite_someone_wrapper = Wu.DomUtil.create('div', 'invite-someone-wrapper', content);
+		var invite_someone_text = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label add-message', invite_someone_wrapper, 'Want to invite someone else? Send them <a id="invite_someone_btn">an invite!</a>');
+		var inviteSomeoneBtn = Wu.DomUtil.get('invite_someone_btn');
+
+		Wu.DomEvent.on(inviteSomeoneBtn, 'click', function (e) {
+			
+			// close fullscreen
+			this._fullscreen.close();
+
+			// open invite fullscreen
+			var u = app.Chrome.Left._tabs.users;
+			u._openInvite();
+			
+			
+		}, this);
+
+		// trigger options
+		var options = {
+			// name_input : name_input,
+			// name_error : name_error,
+			project : project,
+		};
+
+		// buttons wrapper
+		var buttonsWrapper = Wu.DomUtil.create('div', 'smooth-fullscreen-buttons-wrapper', content)
+
+		// save button
+		var saveBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', buttonsWrapper, 'Invite');
+		Wu.DomEvent.on(saveBtn, 'click', this._updateInvites.bind(this, options), this);
+
+		// // add delete button only if access
+		// if (project.store.createdBy == app.Account.getUuid()) {
+		// 	var delBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-delete', buttonsWrapper, 'Delete');
+		// 	Wu.DomEvent.on(delBtn, 'click', this._deleteProject.bind(this, options), this);
+		// }
+
+	},
+
+	_updateInvites : function () {
+		console.log('update invites!', this._access);
+	},
+
 	_openEditProjectFullscreen : function (project, e) {
 
 		// set project
@@ -220,11 +418,12 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		
 		// create fullscreen
 		this._fullscreen = new Wu.Fullscreen({
-			title : '<span style="font-weight:200;">Edit</span> ' + project.getName()
+			title : '<span style="font-weight:200;">Edit</span> ' + project.getName(),
+			closeCallback : this._resetAccess.bind(this)
 		});
 
 		// clear invitations
-		this._access = this.options.defaultAccess;
+		this._resetAccess();
 
 		// shortcut
 		var content = this._fullscreen._content;
@@ -256,25 +455,104 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		name_input.value = project.getName();
 		var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', content);
 
+
+
+		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
+
+
 		// create invite input
 		this._createInviteUsersInput({
 			type : 'read',
 			label : 'Spectators of project',
-			content : content,
+			content : toggles_wrapper,
 			container : this._fullscreen._inner,
 			sublabel : 'Spectators have read-only access to the project',
 			project : project
 		});
 
+
+
+
+		var share_toggle_wrapper = Wu.DomUtil.create('div', 'toggle-wrapper', toggles_wrapper);
+
+		// add share, download toggle
+		var share_toggle_label = Wu.DomUtil.create('div', 'small-toggle-label smooth-fullscreen-sub-label');
+
+
+		// add private/public toggle
+		var sswitch = new Wu.button({
+			id 	     : 'share-switch',
+			type 	     : 'switch',
+			isOn 	     : project.isShareable(),
+			right 	     : false,
+			disabled     : false,
+			appendTo     : share_toggle_wrapper,
+			fn 	     : this._toggleShare.bind(this, share_toggle_label),
+			className    : 'share-project-switch'
+		});
+
+		// add label, default value
+		share_toggle_wrapper.appendChild(share_toggle_label);
+		share_toggle_label.innerHTML = project.isShareable() ? this.options.labels.share_on : this.options.labels.share_off;
+
+		this._access.options.share = project.isShareable();
+
+		var download_toggle_wrapper = Wu.DomUtil.create('div', 'toggle-wrapper', toggles_wrapper);
+
+		// add share, download toggle
+		var download_toggle_label = Wu.DomUtil.create('div', 'small-toggle-label smooth-fullscreen-sub-label');
+
+		var downloadEnabled = (project.isDownloadable() || project.isEditor())
+
+		// add private/public toggle
+		var dswitch = new Wu.button({
+			id 	     : 'download-switch',
+			type 	     : 'switch',
+			isOn 	     : project.isDownloadable(),
+			right 	     : false,
+			disabled     : !downloadEnabled,
+			appendTo     : download_toggle_wrapper,
+			fn 	     : this._toggleDownload.bind(this, download_toggle_label),
+			className    : 'download-project-switch'
+		});
+
+		// add label, default value
+		download_toggle_wrapper.appendChild(download_toggle_label);
+		download_toggle_label.innerHTML = project.isDownloadable() ? this.options.labels.download_on : this.options.labels.download_off;
+
+		this._access.options.download = project.isDownloadable();
+
+
+		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
+
+
 		// create invite input
 		this._createInviteUsersInput({
 			type : 'edit',
 			label : 'Editors of project',
-			content : content,
+			content : toggles_wrapper,
 			container : this._fullscreen._inner,
 			sublabel : 'Editors can edit the project',
 			project : project
 		});
+
+
+		// invite someone new?
+		var invite_someone_wrapper = Wu.DomUtil.create('div', 'invite-someone-wrapper', content);
+		var invite_someone_text = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label add-message', invite_someone_wrapper, 'Want to invite someone new? Send them <a id="invite_someone_btn">an invite!</a>');
+		var inviteSomeoneBtn = Wu.DomUtil.get('invite_someone_btn');
+
+		Wu.DomEvent.on(inviteSomeoneBtn, 'click', function (e) {
+			
+			// close fullscreen
+			this._fullscreen.close();
+
+			// open invite fullscreen
+			var u = app.Chrome.Left._tabs.users;
+			u._openInvite();
+			
+			
+		}, this);
 
 		// trigger options
 		var options = {
@@ -298,10 +576,32 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		
 	},
 
+	_toggleShare : function (toggle, e, isOn) {
+
+		// set label
+		toggle.innerHTML = isOn ? this.options.labels.share_on : this.options.labels.share_off;
+
+		// save setting
+		this._access.options.share = isOn;
+
+	},
+
+	_toggleDownload : function (toggle, e, isOn) {
+
+		// set label
+		toggle.innerHTML = isOn ? this.options.labels.download_on : this.options.labels.download_off;
+
+		// save setting
+		this._access.options.download = isOn;
+
+	},
+
 	_togglePrivatePublic : function (toggle, e, isPublic) {
 	
+		// set label
 		toggle.innerHTML = isPublic ? this.options.labels.public_project : this.options.labels.private_project;
 
+		// save setting
 		this._access.options.isPublic = isPublic;
 	},
 
@@ -313,7 +613,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	_createInviteUsersInput : function (options) {
 
 		// invite users
-		var content = this._fullscreen._content;
+		var content = options.content || this._fullscreen._content;
 		var container = this._fullscreen._container;
 		var project = options.project;
 
@@ -321,6 +621,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var invite_label = options.label;
 		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label', content, invite_label);
 		
+		// // add extra margin to edit label
+		// if (options.type == 'edit') {
+		// 	Wu.DomUtil.addClass(name, 'extra-margin-top');
+		// }
+
 		// container
 		var invite_container = Wu.DomUtil.create('div', 'invite-container', content);
 		
@@ -369,6 +674,9 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			// click event
 			Wu.DomEvent.on(list_item_container, 'click', function () {
 
+				// dont allow adding self (as editor) to read
+				if (options.type == 'read' && user.getUuid() == app.Account.getUuid()) return;
+
 				// add selected user item to input box
 				this._addUserAccessItem({
 					input : invite_input,
@@ -410,13 +718,19 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			// backspace on empty field: delete added user
 			if (key == 8 && value.length == 0 && this._access[options.type].length) {
 
+				// get last user_uuid item 
+				var last = _.last(this._access[options.type]);
+
+				// dont allow adding self (as editor) to read
+				if (options.type == 'edit' && last && last.user && last.user.getUuid() == app.Account.getUuid()) return;
+
 				// remove last item
 				var popped = this._access[options.type].pop();
 				Wu.DomUtil.remove(popped.user_container);
 			}
 
 			// enter: blur input
-			if (key == 13) {
+			if (key == 13 || key == 27) {
 				invite_input.blur();
 				invite_input.value = '';
 				this._closeInviteInputs();
@@ -429,15 +743,20 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		Wu.DomEvent.on(container, 'click', function (e) {
 
 			// only if target == self
-			if (e.target == container || e.target == this._fullscreen._inner) {
-				this._closeInviteInputs();
-			}
+			var relevantTarget = 	e.target == container || 
+						e.target == this._fullscreen._inner || 
+						e.target == name || 
+						e.target == this._fullscreen._content;
+
+			if (relevantTarget) this._closeInviteInputs();
 
 		},this);
 
 
 
 		if (project) {
+
+
 			// add current access vars
 			var projectAccess = project.getAccess();
 
@@ -449,7 +768,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 					var user = app.Users[userUuid];
 
-					this._addUserAccessItem({
+					user && this._addUserAccessItem({
 						input : invite_input,
 						user : user,
 						type : options.type
@@ -480,6 +799,9 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var invite_input = options.input;
 		var user = options.user;
 
+		// if user deleted. todo: clean up deleting
+		if (!user) return;
+
 		// focus input
 		invite_input.focus();
 
@@ -500,18 +822,30 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var invite_input_container = invite_input.parentNode;
 		invite_input_container.insertBefore(user_container, invite_input);
 
-		// click event (kill)
-		Wu.DomEvent.on(user_container, 'click', function () {
-			
-			// remove div
-			Wu.DomUtil.remove(user_container);
-			
-			// remove from array
-			_.remove(this._access[options.type], function (i) {
-				return i.user == user;
-			});
 
-		}, this);
+		// dont allow deleting of self
+		if (user.getUuid() != app.Account.getUuid()) {
+
+			// click event (kill)
+			Wu.DomEvent.on(user_container, 'click', function () {
+				
+				// remove div
+				Wu.DomUtil.remove(user_container);
+				
+				// remove from array
+				_.remove(this._access[options.type], function (i) {
+					return i.user == user;
+				});
+
+			}, this);
+		} else {
+
+			// add special color to self
+			Wu.DomUtil.addClass(user_container, 'itsme');
+
+		}
+
+		
 
 		// add to array
 		this._access[options.type].push({
@@ -566,11 +900,12 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			edit : [],
 			read : [],
 			options : {
-				share : true,
-				download : true,
+				share : this._access.options.share,
+				download : this._access.options.download,
 				isPublic : this._access.options.isPublic
 			}
 		};
+
 
 		this._access.edit.forEach(function (i) {
 			access.edit.push(i.user.getUuid());
@@ -578,7 +913,10 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		this._access.read.forEach(function (i) {
 			access.read.push(i.user.getUuid());
 		}, this);
-		this._access = this.options.defaultAccess;
+
+		// reset
+		this._resetAccess();
+
 
 		// missing data
 		if (!projectName) {
@@ -606,6 +944,20 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		project.selectProject();
 	},
 
+	_resetAccess : function () {
+
+		// set default access
+		this._access = {
+			read : [],
+			edit : [],
+			options : {
+				share : true,
+				download : true,
+				isPublic : true
+			}
+		}
+
+	},
 	
 	_createProject : function (options) {
 
@@ -627,8 +979,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			edit : [],
 			read : [],
 			options : {
-				share : true,
-				download : true,
+				share : this._access.options.share,
+				download : this._access.options.download,
 				isPublic : this._access.options.isPublic
 			}
 		};
@@ -640,9 +992,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		}, this);
 
 		// reset
-		this._access = this.options.defaultAccess;
-
-		console.log('crate project ACCESS::', access);
+		this._resetAccess();
 
 		// create project object
 		var store = {

@@ -132,7 +132,7 @@ Wu.Share = Wu.Pane.extend({
 	_fillTitles : function () {
 		this._shareImageButton.innerHTML = 'Share Image';
 		this._sharePrintButton.innerHTML = 'Share PDF';
-		this._shareInviteButton.innerHTML = 'Invite others...';
+		this._shareInviteButton.innerHTML = 'Invite to project';
 	},
 
 	_clearTitles : function () {
@@ -156,40 +156,41 @@ Wu.Share = Wu.Pane.extend({
 	_refresh : function () {
 
 		// can share
-		var canShare = app.access.to.share_project(this._project);
+		// var canShare = app.access.to.share_project(this._project);
 
-		if (!canShare) {
-			Wu.DomUtil.addClass(this._shareInviteButton, 'disabled');
-			Wu.DomEvent.off(this._shareInviteButton, 'click', this._shareInvite, this);
-		} else {
+		var project = this._project;
+
+		if (project.isShareable()) {
 			Wu.DomUtil.removeClass(this._shareInviteButton, 'disabled');
 			Wu.DomEvent.on(this._shareInviteButton, 'click', this._shareInvite, this);
+		} else {
+			Wu.DomUtil.addClass(this._shareInviteButton, 'disabled');
+			Wu.DomEvent.off(this._shareInviteButton, 'click', this._shareInvite, this);
 		}
 
-		// refresh permissions
-		this._refreshDefaultPermission();
+		
 	},
 
-	_refreshDefaultPermission : function () {
+	// _refreshDefaultPermission : function () {
 
-		this.options.permissions = [{
-			title : 'View project',
-			permission : 'read_project',
-			checked : true,
-			enabled : false
-		},{
-			title : 'Download data',
-			permission : 'download_file',
-			checked : false,
-			enabled : app.access.to.download_file(this._project)
-		},{
-			title : 'Invite others',
-			permission : 'share_project',
-			checked : true,
-			enabled : true
-		}]
+	// 	this.options.permissions = [{
+	// 		title : 'View project',
+	// 		permission : 'read_project',
+	// 		checked : true,
+	// 		enabled : false
+	// 	},{
+	// 		title : 'Download data',
+	// 		permission : 'download_file',
+	// 		checked : false,
+	// 		enabled : app.access.to.download_file(this._project)
+	// 	},{
+	// 		title : 'Invite others',
+	// 		permission : 'share_project',
+	// 		checked : true,
+	// 		enabled : true
+	// 	}]
 
-	},
+	// },
 
 	_shareImage : function () {
 
@@ -328,11 +329,11 @@ Wu.Share = Wu.Pane.extend({
 
 	_shareInvite : function () {
 
-		// app.Chrome.Left._tabs.projects._openEditProjectFullscreen();
-		// this._close();
+		app.Chrome.Left._tabs.projects.openShare()
+		this._close();
 
-		Wu.DomUtil.addClass(this._shareDropdown, 'wide-share');
-		this._createInviteView();
+		// Wu.DomUtil.addClass(this._shareDropdown, 'wide-share');
+		// this._createInviteView();
 	},
 
 	_createInviteView : function () {

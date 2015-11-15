@@ -72,6 +72,9 @@ Wu.Fullscreen = Wu.Evented.extend({
 		this._container.innerHTML = '';
 		Wu.DomUtil.remove(this._container);
 
+		var closeCallback = this.options.closeCallback;
+		closeCallback && closeCallback();
+
 		return false;
 	},
 

@@ -9,6 +9,14 @@ Wu.User = Wu.Class.extend({
 
 		// init file objects
 		this.initFiles();
+
+		this._listen();
+	},
+
+	_listen : function () {
+
+		Wu.Mixin.Events.on('closeMenuTabs',   this._onCloseMenuTabs, this);
+		
 	},
 
 	initFiles : function () {
@@ -223,11 +231,11 @@ Wu.User = Wu.Class.extend({
 
 
 	setRoles : function (roles) {
-		this._roles = [];
-		roles.forEach(function (r) {
-			var role = new Wu.Role({role : r});
-			this._roles.push(role);
-		}, this);
+		// this._roles = [];
+		// roles.forEach(function (r) {
+		// 	var role = new Wu.Role({role : r});
+		// 	this._roles.push(role);
+		// }, this);
 	},
 
 	getRoles : function () {
@@ -294,6 +302,121 @@ Wu.User = Wu.Class.extend({
 		// redirect to logout
 		window.location.href = app.options.servers.portal + 'logout';
 	},
+
+
+	addAccountTab : function () {
+
+		// return; // todo later
+
+		// register button in top chrome
+		var top = app.Chrome.Top;
+
+		// add a button to top chrome
+		this._accountTab = top._registerButton({
+			name : 'account',
+			className : 'chrome-button share',
+			trigger : this._toggleAccountTab,
+			context : this,
+			project_dependent : false
+			
+		});
+
+		// user icon
+		this._accountTab.innerHTML = '<i class="fa fa-user"></i>';
+
+	},
+
+
+	_toggleAccountTab : function () {
+
+
+		this._accountTabOpen ? this._closeAccountTab() : this._openAccountTab();
+
+	},
+
+	_openAccountTab : function () {
+
+		// close other tabs
+		Wu.Mixin.Events.fire('closeMenuTabs');
+		
+		// create dropdown
+		this._accountDropdown = Wu.DomUtil.create('div', 'share-dropdown account-dropdown', app._appPane);
+
+		// items
+		this._logoutDiv = Wu.DomUtil.create('div', 'share-item', this._accountDropdown, '<i class="fa fa-sign-out logout-icon"></i>Log out');
+
+		// events
+		Wu.DomEvent.on(this._logoutDiv,  'click', this.logout, this);
+
+		this._accountTabOpen = true;
+	},
+
+	_closeAccountTab : function () {
+
+		if (!this._accountTabOpen) return;
+
+		Wu.DomEvent.off(this._logoutDiv,  'click', this.logout, this);
+
+		Wu.DomUtil.remove(this._accountDropdown);
+
+		this._accountTabOpen = false;
+	},
+
+	logout : function () {
+		window.location.href = '/logout';
+	},
+
+	_onCloseMenuTabs : function () {
+		
+		// app.Chrome();
+		this._closeAccountTab();
+	},
+
+	// _open : function () {
+
+	// 	// close other tabs
+	// 	Wu.Mixin.Events.fire('closeMenuTabs');
+
+	// 	Wu.DomUtil.removeClass(this._shareDropdown, 'displayNone');
+	// 	this._isOpen = true;
+
+	// 	// add fullscreen click-ghost
+	// 	// this._addGhost();
+
+	// 	// mark button active
+	// 	Wu.DomUtil.addClass(this._shareButton, 'active');
+
+	// 	// fill titles
+	// 	this._fillTitles();
+	// },
+
+	// _close : function () {
+	// 	Wu.DomUtil.addClass(this._shareDropdown, 'displayNone');
+	// 	this._isOpen = false;
+
+	// 	// remove links if open
+	// 	if (this._shareLinkWrapper) Wu.DomUtil.remove(this._shareLinkWrapper);
+	// 	if (this._sharePDFInput) Wu.DomUtil.remove(this._sharePDFInput);
+	// 	if (this._inviteWrapper) Wu.DomUtil.remove(this._inviteWrapper);
+		
+	// 	this._shareInviteButton.innerHTML = 'Invite users...';
+	// 	Wu.DomUtil.removeClass(this._shareDropdown, 'wide-share');
+
+	// 	// remove ghost
+	// 	// this._removeGhost();
+
+	// 	// mark button inactive
+	// 	Wu.DomUtil.removeClass(this._shareButton, 'active');
+	// },
+
+
+
+
+
+
+
+
+
 
 
 

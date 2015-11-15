@@ -332,24 +332,18 @@ module.exports = api.user = {
 
 			// save invite
 			var invite_key = 'invite:' + uuid;
-			console.log('lkey: ', invite_key);
 			api.redis.tokens.set(invite_key, invite_options, function (err) {
-				console.log('sat redis invite token: ', err);
-				api.redis.tokens.get(invite_key, function (err, token_store) {
-					console.log('got key again: ', err, token_store);
+				
+				var invite_link = api.config.portalServer.uri + 'api/invitation/' + uuid;
+
+				// send email
+				api.email.sendInviteEmail({
+					email : email,
+					customMessage : customMessage,
+					numProjects : numProjects,
+					invite_link : invite_link,
+					invited_by : req.user.getName()
 				});
-
-			});
-
-			var invite_link = api.config.portalServer.uri + 'api/invitation/' + uuid;
-
-			// send email
-			api.email.sendInviteEmail({
-				email : email,
-				customMessage : customMessage,
-				numProjects : numProjects,
-				invite_link : invite_link,
-				invited_by : req.user.getName()
 			});
 
 		});
@@ -726,7 +720,9 @@ module.exports = api.user = {
 		ops.push(function (callback) {
 			Project
 			.find()
-			.or([	{'access.edit' : user.getUuid()}, 
+			.or([	
+				{'access.edit' : user.getUuid()}, 
+				// {'access.read' : user.getUuid()}, 
 				{createdBy : user.getUuid()}
 			])
 			.exec(callback);
