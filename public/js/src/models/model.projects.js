@@ -557,12 +557,12 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getClient : function () {
-		console.error('TODO: remove this!');
+		console.log('TODO: remove this!');
 		// return app.Clients[this.store.client];
 	},
 
 	getClientUuid : function () {
-		console.error('TODO: remove this!');
+		console.log('TODO: remove this!');
 		// return this.store.client;
 	},
 
@@ -1230,8 +1230,35 @@ Wu.Project = Wu.Class.extend({
 		return !!isPublic;
 	},
 
+	isDownloadable : function () {
+		var access = this.getAccess();
+		var isPublic = access.options.download;
+		return !!isPublic;
+	},
+	isShareable : function () {
+		var access = this.getAccess();
+		var isPublic = access.options.share;
+		return !!isPublic;
+	},
+
+
 	createdBy : function () {
 		return this.store.createdBy;
+	},
+
+	isEditor : function (user) {
+		return this.isEditable(user);
+	},
+
+	isSpectator : function (user) {
+		var user = user || app.Account;
+		var access = this.getAccess();
+
+		// true: if user is listed as editor
+		if (_.contains(access.read, user.getUuid())) return true;
+
+		// false: not createdBy and not editor
+		return false;
 	},
 
 	isEditable : function (user) {

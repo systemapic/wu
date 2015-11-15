@@ -118,12 +118,9 @@ module.exports = api.portal = {
 
 		// get token from redis
 		var redis_key = 'invite:' + invite_token;
-		console.log('redis_key: ', redis_key);
 		api.redis.tokens.get(redis_key, function (err, token_store) {
 
 			var stored_invite = api.utils.parse(token_store);
-
-			console.log('err: token', err, token_store);
 
 			if (err || !stored_invite) return api.error.missingInformation(req, res);
 
@@ -142,9 +139,6 @@ module.exports = api.portal = {
 
 			// if not logged in
 			} else {
-
-				console.log('rendiner something!??')
-
 
 				res.render('../../views/invitation.ejs', {
 					invite : token_store,
@@ -250,11 +244,11 @@ module.exports = api.portal = {
 			});
 		}	
 
-		a.roles = function (callback) {
-			api.user._getRoles({
-				user : account
-			}, callback);
-		}	
+		// a.roles = function (callback) {
+		// 	api.user._getRoles({
+		// 		user : account
+		// 	}, callback);
+		// }	
 
 		// get account
 		a.account = function (callback) {

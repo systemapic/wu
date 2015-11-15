@@ -37,7 +37,7 @@ Wu.Invite = Wu.Class.extend({
 		this._createRegister();
 
 		// shade login on load
-		this._leftshader.style.display = 'block';
+		this._rightshader.style.display = 'block';
 	},
 
 	_createLogo : function () {

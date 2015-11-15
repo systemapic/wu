@@ -70,10 +70,14 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// input box
 		var invite_input = Wu.DomUtil.create('input', 'invite-email-input-form', invite_input_container);
 		invite_input.setAttribute('placeholder', 'name@domain.com')
+		var invite_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', content);
 
 
 		// remember
-		this._emails.push(invite_input);
+		this._emails.push({
+			invite_input : invite_input,
+			invite_error : invite_error
+		});
 
 	},
 
@@ -82,7 +86,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 	_openInvite : function (e) {
 
 		// stop propagation
-		Wu.DomEvent.stop(e);
+		e && Wu.DomEvent.stop(e);
 		
 		// create fullscreen
 		this._fullscreen = new Wu.Fullscreen({
@@ -126,28 +130,31 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		}, this);
 
+		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
+
 		
 		// create invite input for projects
 		this._createInviteInput({
 			type : 'read',
 			label : 'Invite people to view these projects <span class="optional-medium invite">(optional)</span>',
-			content : content,
+			content : toggles_wrapper,
 			container : this._fullscreen._inner,
-			sublabel : 'They will get read-only access to these project'
+			sublabel : 'Users will get read-only access to these project'
 		});
 
 		// create invite input
 		this._createInviteInput({
 			type : 'edit',
 			label : 'Invite people to edit these projects <span class="optional-medium invite">(optional)</span>',
-			content : content,
+			content : toggles_wrapper,
 			container : this._fullscreen._inner,
-			sublabel : 'They will get full edit access to these the project'
+			sublabel : 'Users will get full edit access to these the project'
 		});
 
 
 		// save button
-		var saveBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite', content, 'Send Invites...');
+		var saveBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite', content, 'Send Invites');
+		var save_message = Wu.DomUtil.create('div', 'invite-success-message', content, '');
 
 		// save button trigger
 		Wu.DomEvent.on(saveBtn, 'click', this._sendInvites, this);
@@ -160,13 +167,27 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		email : {}
 	},
 
-	_sendInvites : function () {
+	_sendInvites : function (e) {
 
 		var emails = [];
 
-		this._emails.forEach(function (div) {
-			emails.push(div.value);
+		this._emails.forEach(function (divObj, i) {
+			var invite_input = divObj.invite_input;
+
+			var email_value = invite_input.value;
+
+			console.log('i', i);
+
+			if (!email_value.length && i == 0) {
+				var invite_error = divObj.invite_error;
+				invite_error.innerHTML = 'Please enter an email address';
+				return;
+			}
+
+			if (email_value.length) emails.push(email_value);
 		});
+
+		if (!emails.length) return;
 
 		var customMessage = this._customMessage.value.replace(/\n/g, '<br>');
 
@@ -195,18 +216,31 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		console.log('invite options: ', options);
 
-		Wu.send('/api/user/invite', options, this._sentInvites.bind(this), this);
+		Wu.send('/api/user/invite', options, this._sentInvites.bind(this, e.target), this);
 
 	},
 
-	_sentInvites : function (a, b) {
-		console.log('sent invites, ', a, b);
+	_sentInvites : function (saveBtn, b, c) {
+		console.log('sent invites, ', b, c, this);
+
+		saveBtn.innerHTML = 'Close'
+		// Wu.DomUtil.addClass(saveBtn, 'invites-sent');
+
+		var success_message = saveBtn.nextSibling;
+		success_message.innerHTML = 'Invitations sent!';
+
+		Wu.DomEvent.off(saveBtn, 'click', this._sendInvites, this);
+		Wu.DomEvent.on(saveBtn, 'click', this._fullscreen.close.bind(this._fullscreen), this);
+
+
+		// setTimeout(this._fullscreen.close.bind(this._fullscreen), 1000);
+
 	},
 
 	_createInviteInput : function (options) {
 
 		// invite users
-		var content = this._fullscreen._content;
+		var content = options.content || this._fullscreen._content;
 		var container = this._fullscreen._container;
 		// var project = options.project;
 
@@ -241,11 +275,27 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var monkey_scroll_inner = Wu.DomUtil.create('div', 'monkey-scroll-inner', monkey_scroll_hider);
 		var monkey_scroll_list = Wu.DomUtil.create('div', 'monkey-scroll-list', monkey_scroll_inner);
 
-		// list of all users
+
+
+
+		// list of all projects
 		var allProjects = _.sortBy(_.toArray(app.Projects), function (u) {
 			return u.store.title;
 		});
 		_.each(allProjects, function (project) {
+
+			// get access
+			var access = project.getAccess();
+			var isEditor = project.isEditor();
+			var isSpectator = project.isSpectator();
+			var isShareable = project.isShareable();
+
+			// dont allow spectators with no share access
+			if (options.type == 'read' && isSpectator && !isShareable) return;
+			
+			// dont allow spectators to give edit access
+			if (options.type == 'edit' && isSpectator) return;
+
 
 			// divs
 			var list_item_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-container project', monkey_scroll_list);
@@ -257,7 +307,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 			// set name
 			name_bold.innerHTML = project.getTitle();
-			// name_subtle.innerHTML = 'username';
 
 			// click event
 			Wu.DomEvent.on(list_item_container, 'click', function () {
@@ -322,9 +371,13 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		Wu.DomEvent.on(container, 'click', function (e) {
 
 			// only if target == self
-			if (e.target == container || e.target == this._fullscreen._inner || e.target == name || e.target == this._fullscreen._content) {
-				this._closeInviteInputs();
-			}
+			var relevantTarget = 	e.target == container || 
+						e.target == this._fullscreen._inner || 
+						e.target == name || 
+						e.target == this._fullscreen._content;
+
+			if (relevantTarget) this._closeInviteInputs();
+			
 
 		},this);
 

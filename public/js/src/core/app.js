@@ -222,6 +222,9 @@ Wu.App = Wu.Class.extend({
 		// todo: 
 		// center
 
+
+
+
 	},
 
 	_initPanes : function () {
@@ -258,6 +261,9 @@ Wu.App = Wu.Class.extend({
 		// share pane
 		this.Share = new Wu.Share();
 
+		// add account tab
+		this.Account.addAccountTab();
+
 	},
 
 
@@ -274,7 +280,7 @@ Wu.App = Wu.Class.extend({
 		if (this._initHotlink()) return;
 
 		// set project if only one
-		if (this._lonelyProject()) return;
+		// if (this._lonelyProject()) return;
 
 		// open projects pane
 		app.Chrome.Left.open()
@@ -332,36 +338,36 @@ Wu.App = Wu.Class.extend({
 		this.Access = new Wu.Access(this.options.json.access);
 	},
 
-	_lonelyProject : function () {
-		//default case: hidden/ghost project (belongs to no client). Preferable to stick to the Start Pane
-		if (_.size(app.Projects) == 1) {
-			for (var p in app.Projects) {
-				var project = app.Projects[p]; 
+	// _lonelyProject : function () {
+	// 	//default case: hidden/ghost project (belongs to no client). Preferable to stick to the Start Pane
+	// 	if (_.size(app.Projects) == 1) {
+	// 		for (var p in app.Projects) {
+	// 			var project = app.Projects[p]; 
 				
-				// if project is hidden/ghost it has no client
-			   	if (project.getClient() === undefined) {
-					return false;
-				}
+	// 			// if project is hidden/ghost it has no client
+	// 		   	if (project.getClient() === undefined) {
+	// 				return false;
+	// 			}
 
-				this._setProject(project);
-				return true;
-			}
-		}
-		//single project plus hidden/ghost project
-		//check if single (owned) project. Redirect to it instead of sticking on the Start pane
-		if (_.size(app.Projects) == 2) {
-			for (var p in app.Projects) {
+	// 			this._setProject(project);
+	// 			return true;
+	// 		}
+	// 	}
+	// 	//single project plus hidden/ghost project
+	// 	//check if single (owned) project. Redirect to it instead of sticking on the Start pane
+	// 	if (_.size(app.Projects) == 2) {
+	// 		for (var p in app.Projects) {
 	
-				var project = app.Projects[p]; 
-				if (project.getClient() === undefined) {
-					continue;
-				}
-				this._setProject(project);
-				return true;
-			}
-		}
-		return false;
-	},
+	// 			var project = app.Projects[p]; 
+	// 			if (project.getClient() === undefined) {
+	// 				continue;
+	// 			}
+	// 			this._setProject(project);
+	// 			return true;
+	// 		}
+	// 	}
+	// 	return false;
+	// },
 
 	_initLocation : function () {
 		var path    = window.location.pathname,

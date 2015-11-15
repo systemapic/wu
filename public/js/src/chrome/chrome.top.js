@@ -9,8 +9,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// add hooks
 		this.addHooks();
-
-		
 	},
 
 	initContainer : function () {
@@ -27,11 +25,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Project title container
 		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title-container', this._container);
 
-		// Client Logo
-		this._clientLogo = Wu.DomUtil.create('div', 'chrome-portal-logo', this._container);
-
-		// client log image
-		this._clientLogoImg = Wu.DomUtil.create('img', '', this._clientLogo);		
+				
 
 		
 
@@ -42,22 +36,15 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// this._projectTitle = Wu.DomUtil.create('div', 'chrome-project-title', this._projectTitleContainer);
 		this._projectTitle = Wu.DomUtil.create('div', 'chrome-button chrome-project-title', this._buttonWrapper);
 
-		// // User name button container
-		// this._userNameContainer = Wu.DomUtil.create('div', 'username-container', this._buttonWrapper);
-
-		// // Username
-		// this._userName = Wu.DomUtil.create('div', 'top-username', this._userNameContainer);
-
-		// // Divider
-		// this._userDivider = Wu.DomUtil.create('div', 'top-divider', this._userNameContainer, '&nbsp;|&nbsp;');
-
-		// // Logout
-		// this._userLogout = Wu.DomUtil.create('div', 'top-logout', this._userNameContainer, 'log out');
-
-		// Layers button
-		// this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton displayNone', this._buttonWrapper);
-	
-
+		// Client Logo
+		var clientLogo = app.options.logos.clientLogo.image;
+		if (clientLogo) {
+			this._clientLogo = Wu.DomUtil.create('div', 'chrome-button chrome-client-logo', this._buttonWrapper);
+			this._clientLogo.style.backgroundImage = 'url(' + app.options.servers.portal + clientLogo + ')';
+			this._clientLogo.style.backgroundSize = app.options.logos.clientLogo.size;
+			this._clientLogo.style.backgroundPosition = app.options.logos.clientLogo.position;
+		}
+		
 		// set default
 		this.initDefault();
 
@@ -81,8 +68,9 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// create button
 		var buttonDiv = Wu.DomUtil.create('div', className);
 
-		// css exp
-		this._buttonWrapper.insertBefore(buttonDiv, this._buttonWrapper.lastChild);
+		// css exp // hacky!
+		var referenceNode = app.options.logos.clientLogo.image ? this._buttonWrapper.lastChild.previousSibling : this._buttonWrapper.lastChild;
+		this._buttonWrapper.insertBefore(buttonDiv, referenceNode);
 
 		// save
 		this._buttons[name] = {
@@ -255,7 +243,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_setPortalLogo : function () {
 
 		// portal logo from config
-		this._clientLogoImg.src = app.options.servers.portal + app.options.logos.portalLogo;
+		// this._clientLogoImg.src = app.options.servers.portal + app.options.logos.portalLogo;
 	},
 
 	// default open

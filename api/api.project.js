@@ -64,6 +64,23 @@ module.exports = api.project = {
 
 			if (!canEdit) return api.error.general(req, res, 'No access.');
 
+			var currentAccess = project.access;
+
+			// this._access = {
+			// 	read : [],
+			// 	edit : [],
+			// 	options : {
+			// 		share : true,
+			// 		download : true,
+			// 		isPublic : true
+			// 	}
+			// }
+
+			// todo: access restricitons!
+			// 1. can not remove self from edit
+			// 2. can not do shit if not editor (ok)
+			// 3. 
+
 			// set access, save
 			project.access = projectAccess;
 			project.save(function (err, p) {

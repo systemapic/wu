@@ -274,21 +274,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	_initUploadButton : function () {
 
-		// Upload button
-		if (app.access.to.upload_file(this._project)) {
+		
+		// Return if upload button already exists
+		if ( this.uploadButton ) return;
 
-			// Return if upload button already exists
-			if ( this.uploadButton ) return;
+		// Create Upload Button
+		this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this.topContainer);
+		this.uploadButton.innerHTML = 'Upload files...';
 
-			// Create Upload Button
-			this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this.topContainer);
-			this.uploadButton.innerHTML = 'Upload files...';
-
-		} else {
-
-			// Remove upload button if it exists
-			if ( this.uploadButton ) this.uploadButton.remove();
-		}
 
 	},
 

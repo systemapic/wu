@@ -295,6 +295,36 @@ body {
     width: auto;
 }
 
+.chrome-client-logo {
+    color: #555;
+    text-transform: capitalize;
+    color: rgba(0, 0, 0, 0.81);
+    background: rgba(255, 255, 255, 0.72);
+    padding-left: 4px;
+    font-weight: 600;
+    padding-right: 4px;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(0, 0, 0, 0.27);
+    background: #3C4759;
+    padding-top: 9px;
+    padding-top: 9px;
+    text-align: center;
+    color: #3C4759;
+    font-weight: 700;
+    opacity: 1;
+    border-left: 1px solid gainsboro;
+    height: 40px;
+    padding-left: 70px;
+    padding-right: 70px;
+    top: 0;
+    left: 0;
+    font-size: 14px;
+    cursor: pointer;
+    width: auto;
+    background-repeat: no-repeat;
+    border-left: 1px solid #757C88;
+}
+
 .chrome-left-container {
     position: relative;
     margin-top: 10px;
@@ -468,7 +498,7 @@ body {
     background: #EEE;
 }
 .share-dropdown .share-item { 
-    padding-left: 38px;
+    padding-left: 30px;
     font-weight: 500;
 }
 
@@ -653,7 +683,89 @@ body {
     left: 30px;
 }
 .monkey-scroll-list-item-name-bold.project {
-     font-weight: 500;
+    font-weight: 500;
     font-size: 18px;
     padding-top: 2px;
+}
+
+
+
+
+
+
+
+.mini-user-container.itsme {
+    background: #71C4A8;
+    border: 1px solid #71C4A8;
+}
+
+
+.toggles-wrapper {
+    border: 1px solid gainsboro;
+    border-radius: 10px;
+    height: auto;
+    margin-top: 40px;
+    padding: 20px;
+    padding-top: 0px;
+}
+
+.smooth-fullscreen {
+    overflow-y: scroll;
+}
+.smooth-fullscreen-buttons-wrapper {
+    margin-top: 30px;
+    position: relative;
+    height: 100px;
+}
+
+
+.toggle-wrapper {
+    margin-left: 0px;
+}
+
+#invite_someone_btn {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+
+.invites-sent {
+    background: #428BCA !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.invites-sent:hover {
+    background: #428BCA !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.invite-success-message {
+    color: #448CCA;
+    position: absolute;
+    padding-top: 36px;
+    padding-left: 100px;
+    font-size: 18px;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+.chrome-switch-container.disabled-switch:after {
+    content: '';
+    background: white;
+    left: 0;
+    top: -1px;
+    position: absolute;
+    height: 21px;
+    width: 51px;
+    opacity: 0.7;
+}
+
+.account-dropdown {
+    width: 200px;
+}
+
+.fa.fa-sign-out.logout-icon {
+    padding-right: 6px;
 }
