@@ -99,14 +99,12 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	_updateButtonVisibility : function () {
 
-		console.log('_updateButtonVisibility');
 		if (app.activeProject) {
 
 			var buttons = _.filter(this._buttons, function (b) {
 				return b.options.project_dependent;
 			});
 
-			console.log('buttons', buttons);
 			buttons.forEach(function (button) {
 				Wu.DomUtil.removeClass(button.div, 'displayNone');
 			});

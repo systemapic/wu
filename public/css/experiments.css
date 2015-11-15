@@ -325,19 +325,34 @@ body {
     padding: 13px 20px 13px 19px;
     z-index: 10000010;
     top: 27px;
-    width: 142px;
+    width: 160px;
     cursor: default;
     box-shadow: none;
     border-radius: 0 0 4px 4px;
+    padding: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
-
-.share-dropdown, .wide-share {
+/*
+.share-dropdown{
      width: 160px !important; 
      height: auto !important; 
+}*/
+
+.share-dropdown.wide-share {
+    width: 280px;
+    height: 300px;
+    left: 162px;
+    padding: 20px;
+}
+.share-invite-wrapper-inner {
+    width: 240px;
+    height: 220px;
 }
 
 .chrome-left { 
     background : #FCFCFC;
+    z-index: 1002;
 }
 
 .cpu-wrapper {
@@ -444,4 +459,201 @@ body {
 
 .active-project .extra-padding-right {
     padding-right: 35px;
+}
+.leaflet-popup {
+    z-index: 1001;
+}
+
+.share-dropdown .share-item:hover {
+    background: #EEE;
+}
+.share-dropdown .share-item { 
+    padding-left: 38px;
+    font-weight: 500;
+}
+
+
+/*fly-to icon*/
+.fly-to {
+    font-size: 18px;
+    position: absolute;
+    right: 6px;
+    top: 5px;
+    color: #777;
+}
+.layer-menu-flyto { 
+    display: none;
+}
+.layer-active .layer-menu-flyto:hover { 
+    display: block;
+}
+.layer-active .layer-menu-flyto {
+    background: none;
+}
+
+
+
+.chrome-left-invite-users {
+    margin-left: 26px;
+    padding-top: 20px;
+    margin-bottom: 20px;
+    color: #666;
+    border-bottom: 1px double gainsboro;
+    width: 140px;
+    border-bottom-style: double;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 18px;   
+}
+
+.chrome-left-invite-users:hover {
+    border-bottom: 1px double #3C3C3C;
+}
+
+
+
+/*email invites*/
+.invite-email-input-form {
+    height: 36px;
+    font-size: 20px;
+    font-family: 'Open Sans', serif;
+    padding: 6px;
+    color: #4A4A4A;
+    width: 100%;
+    border: none;
+    padding-top: 0px;
+    padding-bottom: 0;
+    /* padding: 0; */
+    /* width: 0; */
+}
+.add-another-email {
+    font-weight: 600;
+    background: #F9F9F9;
+    border-radius: 4px;
+    padding: 9px;
+    border: 1px solid gainsboro;
+    font-size: 14px;
+    width: 120px;
+    cursor: pointer;
+    color: #428BCA;
+}
+.add-another-email:hover {
+    background: #FCFCFC;
+}
+
+.smooth-fullscreen-name-label.invite-emails {
+    font-size: 16px;
+}
+
+.smooth-fullscreen-name-label.add-message {
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    text-align: center;
+    color: gray;
+}
+#custom_message_btn {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.invite-custom-message-wrapper-textarea {
+    width: 100%;
+    border: 1px solid red;
+    height: 100px;
+    border: 1px solid gainsboro;
+    border-radius: 3px;
+    color: #4A4A4A;
+    background: white;
+    padding: 10px;
+}
+.invite-custom-message-wrapper-textarea:focus {
+    border: 1px solid gainsboro;
+    outline: 1px solid gainsboro;
+}
+
+.invite-email-message-wrap {
+    margin-bottom: 40px;
+}
+.invite-custom-message-wrapper {
+    display: none;
+    margin-top: 30px;
+}
+.invite-custom-message-wrapper.showme {
+    display: block;
+}
+
+.hideme .smooth-fullscreen-name-label.add-message {
+    display:  none;
+    margin-top: 30px;
+}
+
+.invite-custom-message-wrapper-label {
+    padding-bottom: 5px;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgb(63, 70, 82);
+}
+
+.smooth-fullscreen-save.invite {
+    margin-top: 30px;
+    color: #616161;
+    font-weight: 500;
+}
+
+.smooth-fullscreen-inner.invite {
+    margin: auto;
+    width: 700px;
+    /* top: 120px; */
+    position: relative;
+    padding: 20px;
+    overflow-y: scroll;
+    padding-top: 120px;
+    height: 100%;
+    padding-bottom: 120px;
+    margin-top: 0;
+    top: 0;
+}
+
+.smooth-fullscreen-name-label.invite {
+    font-size: 16px;
+}
+
+.optional-medium.invite {
+    font-size: 14px;
+}
+
+.mini-project-avatar {
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    /* background: #E4E4E4; */
+    left: 7px;
+    top: 0px;
+    border-radius: 1px;
+    background-size: 20px;
+    background-repeat: no-repeat;
+}
+
+.monkey-scroll-list-item-avatar.project {
+    font-size: 15px;
+}
+
+.monkey-scroll-list-item-container.project {
+    height: 40px;
+} 
+
+.project.fa.fa-map-o {
+    font-size: 20px;
+    padding-top: 5px;
+}
+
+.monkey-scroll-list-item-name-container.project {
+    left: 30px;
+}
+.monkey-scroll-list-item-name-bold.project {
+     font-weight: 500;
+    font-size: 18px;
+    padding-top: 2px;
 }

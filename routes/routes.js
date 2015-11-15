@@ -502,6 +502,13 @@ module.exports = function(app, passport) {
 		api.delegateUser(req, res);
 	});
 
+	// =====================================
+	// INVITE USER =========================
+	// =====================================
+	app.post('/api/user/invite', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.user.invite(req, res);
+	});
+
 
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
@@ -652,11 +659,19 @@ module.exports = function(app, passport) {
 
 
 	// =====================================
-	// LOGOUT ==============================
+	// INVITE ==============================
 	// =====================================
 	app.get('/invite/*', function(req, res) {
 		console.log('/invite/*');
 		api.portal.invite(req, res);
+	});
+
+	// =====================================
+	// INVITE ==============================
+	// =====================================
+	app.get('/api/invitation/*', function(req, res) {
+		console.log('/invitation/*');
+		api.portal.invitation(req, res);
 	});
 
 
@@ -696,6 +711,10 @@ module.exports = function(app, passport) {
 		failureRedirect : '/invite', // redirect back to the signup page if there is an error
 		failureFlash : true // allow flash messages
 	}));
+
+	// app.post('/register', function (req, res) {
+	// 	console.log('/register!!!', req.body);
+	// })
 
 
 	// =====================================

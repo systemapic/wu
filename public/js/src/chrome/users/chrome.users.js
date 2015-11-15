@@ -31,15 +31,376 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		
 		this.openUserCard = false;
 
-		this.initGhost();
+		// this.initGhost();
 
 		// Init user list etc.
 		this._refresh();
 
 
-		
+		// add invite
+		this._inviteButton = Wu.DomUtil.create('div', 'chrome-left-invite-users', this._container, '+ Invite People');
+
+		Wu.DomEvent.on(this._inviteButton, 'click', this._openInvite, this);
+
 	},
 
+	_createEmailInput : function (content) {
+
+		var content = this._emailsWrapper;
+		// email and + button
+
+		var options = {
+			label : 'Email Address',
+			sublabel : 'Just write the damn address',
+		}
+
+		// label
+		var invite_label = options.label;
+		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label invite-emails', content, invite_label);
+		
+		// container
+		var invite_container = Wu.DomUtil.create('div', 'invite-container narrow', content);
+		
+		// sub-label
+		// var sublabel = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label', content, options.sublabel);
+
+		var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
+		var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
+
+		// input box
+		var invite_input = Wu.DomUtil.create('input', 'invite-email-input-form', invite_input_container);
+		invite_input.setAttribute('placeholder', 'name@domain.com')
+
+
+		// remember
+		this._emails.push(invite_input);
+
+	},
+
+	_emails : [],
+
+	_openInvite : function (e) {
+
+		// stop propagation
+		Wu.DomEvent.stop(e);
+		
+		// create fullscreen
+		this._fullscreen = new Wu.Fullscreen({
+			title : '<span style="font-weight:200;">Invite people to Systemapic</span>',
+			innerClassName : 'smooth-fullscreen-inner invite',
+		});
+
+		// clear invitations
+		this._access = {
+			edit : [],
+			read : []
+		}
+
+		// shortcut
+		var content = this._fullscreen._content;
+
+		// emails wrapper
+		this._emailsWrapper = Wu.DomUtil.create('div', 'invite-emails-wrapper', content);
+
+		// create email input
+		this._createEmailInput();
+
+		// add another + button
+		var addAnotherWrapper = Wu.DomUtil.create('div', 'invite-add-another-wrapper', content);
+		var addAnotherBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label add-another-email', addAnotherWrapper, '+ Add another');
+		Wu.DomEvent.on(addAnotherBtn, 'click', this._createEmailInput, this);
+
+		// personlized message
+		var emailMessageWrap = Wu.DomUtil.create('div', 'invite-email-message-wrap', content);
+		var messageText = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label add-message', emailMessageWrap, 'Make your invites more personal by adding a <a id="custom_message_btn">custom message</a>');
+		var messageBtn = Wu.DomUtil.get('custom_message_btn');
+		var messageBoxWrap = Wu.DomUtil.create('div', 'invite-custom-message-wrapper', emailMessageWrap);
+		var messageBoxLabel = Wu.DomUtil.create('div', 'invite-custom-message-wrapper-label', messageBoxWrap, 'Custom Message'); 
+		this._customMessage = Wu.DomUtil.create('textarea', 'invite-custom-message-wrapper-textarea', messageBoxWrap); 
+
+		// event
+		Wu.DomEvent.on(messageBtn, 'click', function () {
+			Wu.DomUtil.addClass(emailMessageWrap, 'hideme');
+			Wu.DomUtil.addClass(messageBoxWrap, 'showme');
+			this._customMessage.focus();
+
+		}, this);
+
+		
+		// create invite input for projects
+		this._createInviteInput({
+			type : 'read',
+			label : 'Invite people to view these projects <span class="optional-medium invite">(optional)</span>',
+			content : content,
+			container : this._fullscreen._inner,
+			sublabel : 'They will get read-only access to these project'
+		});
+
+		// create invite input
+		this._createInviteInput({
+			type : 'edit',
+			label : 'Invite people to edit these projects <span class="optional-medium invite">(optional)</span>',
+			content : content,
+			container : this._fullscreen._inner,
+			sublabel : 'They will get full edit access to these the project'
+		});
+
+
+		// save button
+		var saveBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite', content, 'Send Invites...');
+
+		// save button trigger
+		Wu.DomEvent.on(saveBtn, 'click', this._sendInvites, this);
+
+	},
+
+	_divs : {
+		read : {},
+		edit : {},
+		email : {}
+	},
+
+	_sendInvites : function () {
+
+		var emails = [];
+
+		this._emails.forEach(function (div) {
+			emails.push(div.value);
+		});
+
+		var customMessage = this._customMessage.value.replace(/\n/g, '<br>');
+
+		var access = {
+			edit : [],
+			read : []
+		}
+
+		console.log('this_acces', this._access);
+
+		this._access.edit.forEach(function (p) {
+			access.edit.push(p.project.getUuid());
+		});
+
+		this._access.read.forEach(function (p) {
+			access.read.push(p.project.getUuid());
+		});
+
+
+
+		var options = {
+			emails : emails,
+			customMessage : customMessage,
+			access : access
+		}
+
+		console.log('invite options: ', options);
+
+		Wu.send('/api/user/invite', options, this._sentInvites.bind(this), this);
+
+	},
+
+	_sentInvites : function (a, b) {
+		console.log('sent invites, ', a, b);
+	},
+
+	_createInviteInput : function (options) {
+
+		// invite users
+		var content = this._fullscreen._content;
+		var container = this._fullscreen._container;
+		// var project = options.project;
+
+		// label
+		var invite_label = options.label;
+		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label invite', content, invite_label);
+		
+		// container
+		var invite_container = Wu.DomUtil.create('div', 'invite-container', content);
+		
+		// sub-label
+		var sublabel = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label', content, options.sublabel);
+
+		var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
+		var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
+
+		// input box
+		var invite_input = Wu.DomUtil.create('input', 'invite-input-form', invite_input_container);
+
+		// invite list
+		var invite_list_container = Wu.DomUtil.create('div', 'invite-list-container', invite_container);
+		var invite_list_inner = Wu.DomUtil.create('div', 'invite-list-inner', invite_list_container);
+
+		// remember div
+		this._divs[options.type].invite_list_container = invite_list_container;
+
+		// for manual scrollbar (js)
+		var monkey_scroll_bar = Wu.DomUtil.create('div', 'monkey-scroll-bar', invite_list_inner);
+		
+		// for holding list
+		var monkey_scroll_hider = Wu.DomUtil.create('div', 'monkey-scroll-hider', invite_list_inner);
+		var monkey_scroll_inner = Wu.DomUtil.create('div', 'monkey-scroll-inner', monkey_scroll_hider);
+		var monkey_scroll_list = Wu.DomUtil.create('div', 'monkey-scroll-list', monkey_scroll_inner);
+
+		// list of all users
+		var allProjects = _.sortBy(_.toArray(app.Projects), function (u) {
+			return u.store.title;
+		});
+		_.each(allProjects, function (project) {
+
+			// divs
+			var list_item_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-container project', monkey_scroll_list);
+			var avatar_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-avatar-container', list_item_container);
+			var avatar = Wu.DomUtil.create('div', 'monkey-scroll-list-item-avatar project', avatar_container, '<i class="project fa fa-map-o"></i>');
+			var name_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-container project', list_item_container);
+			var name_bold = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-bold project', name_container);
+			// var name_subtle = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-subtle', name_container);
+
+			// set name
+			name_bold.innerHTML = project.getTitle();
+			// name_subtle.innerHTML = 'username';
+
+			// click event
+			Wu.DomEvent.on(list_item_container, 'click', function () {
+
+				// add selected project item to input box
+				this._addAccessItem({
+					input : invite_input,
+					project : project,
+					type : options.type
+				});
+					
+			}, this);
+		}, this);
+
+
+		// events
+
+		// input focus, show dropdown
+		Wu.DomEvent.on(invite_input, 'focus', function () {
+			this._closeInviteInputs();
+			invite_list_container.style.display = 'block';
+		}, this);
+
+		// focus input on any click
+		Wu.DomEvent.on(invite_input_container, 'click', function () {
+			invite_input.focus();
+		}, this);
+
+		// input keyup
+		Wu.DomEvent.on(invite_input, 'keydown', function (e) {
+
+			// get which key
+			var key = event.which ? event.which : event.keyCode;
+
+			// get string length
+			var value = invite_input.value;
+			var text_length = value.length;
+			if (text_length <= 0) text_length = 1;
+
+			// set width of input dynamically
+			invite_input.style.width = 30 + (text_length * 20) + 'px';
+
+			// backspace on empty field: delete added user
+			if (key == 8 && value.length == 0 && this._access[options.type].length) {
+
+				// remove last item
+				var popped = this._access[options.type].pop();
+				Wu.DomUtil.remove(popped.user_container);
+			}
+
+			// enter: blur input
+			if (key == 13) {
+				invite_input.blur();
+				invite_input.value = '';
+				this._closeInviteInputs();
+			}
+
+		}, this);
+
+
+		// close dropdown on any click
+		Wu.DomEvent.on(container, 'click', function (e) {
+
+			// only if target == self
+			if (e.target == container || e.target == this._fullscreen._inner || e.target == name || e.target == this._fullscreen._content) {
+				this._closeInviteInputs();
+			}
+
+		},this);
+
+	},
+
+	_closeInviteInputs : function () {
+
+		var container = this._divs.edit.invite_list_container;
+		if (container) container.style.display = 'none';
+
+		var container = this._divs.read.invite_list_container;
+		if (container) container.style.display = 'none';
+	},
+
+	_addAccessItem : function (options) {
+
+		var invite_input = options.input;
+		var project = options.project;
+
+		// focus input
+		invite_input.focus();
+
+		// don't add twice
+		var existing = _.find(this._access[options.type], function (i) {
+			return i.project == project;
+		});
+		if (existing) return;
+
+		// insert project box in input area
+		var user_container = Wu.DomUtil.create('div', 'mini-user-container');
+		var user_inner = Wu.DomUtil.create('div', 'mini-user-inner', user_container);
+		var user_avatar = Wu.DomUtil.create('div', 'mini-project-avatar', user_inner, '<i class="fa fa-map"></i>');
+		var user_name = Wu.DomUtil.create('div', 'mini-user-name', user_inner, project.getTitle());
+		var user_kill = Wu.DomUtil.create('div', 'mini-user-kill', user_inner, 'x');
+
+		// insert before input
+		var invite_input_container = invite_input.parentNode;
+		invite_input_container.insertBefore(user_container, invite_input);
+
+		// click event (kill)
+		Wu.DomEvent.on(user_container, 'click', function () {
+			
+			// remove div
+			Wu.DomUtil.remove(user_container);
+			
+			// remove from array
+			_.remove(this._access[options.type], function (i) {
+				return i.project == project;
+			});
+
+		}, this);
+
+		// add to array
+		this._access[options.type].push({
+			project : project,
+			user_container : user_container
+		});
+
+
+		// remove from other list if active there
+		var otherType = (options.type == 'edit') ? 'read' : 'edit';
+		var existing = _.find(this._access[otherType], function (i) {
+			return i.project == project;
+		});
+		if (existing) {
+
+			// remove div
+			Wu.DomUtil.remove(existing.user_container);
+			
+			// remove from array
+			_.remove(this._access[otherType], function (i) {
+				return i == existing;
+			});
+		}
+
+	},
 
 	// GHOST
 	// GHOST

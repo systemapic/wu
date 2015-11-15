@@ -75,6 +75,7 @@ module.exports = api.portal = {
 	},
 
 	login : function (req, res) {
+		// res.render(path.join(__dirname, '../views/login.serve.ejs'), { message: req.flash('loginMessage') });
 		res.render(path.join(__dirname, '../views/login.serve.ejs'), { message: req.flash('loginMessage') });
 	},
 
@@ -100,6 +101,52 @@ module.exports = api.portal = {
 			// if not logged in
 			} else {
 				res.render('../../views/invite.ejs', {
+					invite : token_store,
+					access_token : req.session.access_token || {}
+				});
+			}
+		});
+	},
+
+	invitation : function (req, res) {
+
+		console.log('api.portal.invitation');
+
+		// get client/project
+		var path = req.originalUrl.split('/');
+		var invite_token = path[3];
+
+		// get token from redis
+		var redis_key = 'invite:' + invite_token;
+		console.log('redis_key: ', redis_key);
+		api.redis.tokens.get(redis_key, function (err, token_store) {
+
+			var stored_invite = api.utils.parse(token_store);
+
+			console.log('err: token', err, token_store);
+
+			if (err || !stored_invite) return api.error.missingInformation(req, res);
+
+			var email = stored_invite.email;
+
+			// if logged in, and it's same user
+			if (req.isAuthenticated() && req.user && req.user.local.email == email) {
+
+				console.log('already registered! add projects to user and log in! ')
+
+
+				res.render('../../views/app.serve.ejs', {
+					hotlink : {},
+					access_token : req.session.access_token || {}
+				});
+
+			// if not logged in
+			} else {
+
+				console.log('rendiner something!??')
+
+
+				res.render('../../views/invitation.ejs', {
 					invite : token_store,
 					access_token : req.session.access_token || {}
 				});

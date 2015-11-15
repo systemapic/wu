@@ -21,8 +21,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		}
 	},
 
-
-
 	_initialize : function () {
 
 		// init container
@@ -214,8 +212,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 	_openEditProjectFullscreen : function (project, e) {
 
+		// set project
+		var project = project || app.activeProject;
+
 		// stop propagation
-		Wu.DomEvent.stop(e);
+		e && Wu.DomEvent.stop(e);
 		
 		// create fullscreen
 		this._fullscreen = new Wu.Fullscreen({
@@ -254,9 +255,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		name_input.setAttribute('placeholder', 'Enter name here');
 		name_input.value = project.getName();
 		var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', content);
-
-
-		
 
 		// create invite input
 		this._createInviteUsersInput({
@@ -297,8 +295,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			var delBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-delete', buttonsWrapper, 'Delete');
 			Wu.DomEvent.on(delBtn, 'click', this._deleteProject.bind(this, options), this);
 		}
-
-		
 		
 	},
 
@@ -352,7 +348,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var monkey_scroll_inner = Wu.DomUtil.create('div', 'monkey-scroll-inner', monkey_scroll_hider);
 		var monkey_scroll_list = Wu.DomUtil.create('div', 'monkey-scroll-list', monkey_scroll_inner);
 
-
 		// list of all users
 		var allUsers = _.sortBy(_.toArray(app.Users), function (u) {
 			return u.store.firstName;
@@ -381,9 +376,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 					type : options.type
 				});
 					
-				
 			}, this);
-
 		}, this);
 
 
@@ -425,7 +418,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			// enter: blur input
 			if (key == 13) {
 				invite_input.blur();
-				// invite_list_container.style.display = 'none';
 				invite_input.value = '';
 				this._closeInviteInputs();
 			}
@@ -438,9 +430,9 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 			// only if target == self
 			if (e.target == container || e.target == this._fullscreen._inner) {
-				// invite_list_container.style.display = 'none';
 				this._closeInviteInputs();
 			}
+
 		},this);
 
 
@@ -448,7 +440,6 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		if (project) {
 			// add current access vars
 			var projectAccess = project.getAccess();
-
 
 			// add selected user item to input box
 			if (projectAccess && projectAccess[options.type]) {
