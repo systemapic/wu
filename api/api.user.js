@@ -43,6 +43,11 @@ var api = module.parent.exports;
 module.exports = api.user = { 
 
 	register : function (options, done) {
+
+		console.log('register!!!!', options);
+
+		// console.log('options. acces', options.access, options.access.read, options.access.edit);
+
 		var ops = [],
 		    created_user,
 		    token_store;
@@ -50,7 +55,11 @@ module.exports = api.user = {
 		// get token store from redis
 		ops.push(function (callback) {
 			var token = options.invite_token;
-			var redis_key = 'invite:token:' + token;
+			var redis_key = 'invite:' + token;
+
+			console.log('redis key: ', redis_key);
+
+
 			api.redis.tokens.get(redis_key, callback);
 		});
 
@@ -58,7 +67,11 @@ module.exports = api.user = {
 		ops.push(function (tokenJSON, callback) {
 
 			// parse token_store
-			token_store = JSON.parse(tokenJSON);
+			token_store = api.utils.parse(tokenJSON);
+
+			console.log('token_store: ', token_store);
+
+			console.log('access: ', token_store.access);
 
 			// create the user
 			var newUser            	= new User();
@@ -69,81 +82,68 @@ module.exports = api.user = {
 			newUser.position 	= options.position;
 			newUser.firstName 	= options.firstname;
 			newUser.lastName 	= options.lastname;
-			newUser.invitedBy 	= token_store.invited_by.uuid;
+			// newUser.invitedBy 	= token_store.invited_by.uuid;
 
 			// save the user
 			newUser.save(function(err) {
 				created_user = newUser;
-				callback(err, token_store.project.id);
+				callback(err);
 			});
 		});
 
-		// find project for adding to roles
-		ops.push(function (project_id, callback) {
-			Project
-			.findOne({uuid : project_id})
-			.populate('roles')
-			.exec(callback);
-		});
+		// add user to project
+		ops.push(function (callback) {
 
-		// add user to project roles
-		ops.push(function (project, callback) {
+			var edits = token_store.access.edit;
 
+			async.each(edits, function (project_id, cb) {
 
-			// download_file: true
-			// share_project: true
-			// read_project: true
+				Project
+				.findOne({uuid : project_id})
+				.exec(function (err, project) {
+					if (err) return callback(err);
 
-			// create_client: false
-			// create_project: false
-			// create_user: false
-			// create_version: false
-			// delegate_to_user: true
-			// delete_client: false
-			// delete_file: false
-			// delete_other_client: false
-			// delete_other_file: false
-			// delete_other_project: false
-			// delete_other_user: false
-			// delete_other_version: false
-			// delete_project: false
-			// delete_user: false
-			// delete_version: false
-			// edit_client: false
-			// edit_file: false
-			// edit_other_client: false
-			// edit_other_file: false
-			// edit_other_project: false
-			// edit_other_user: false
-			// edit_project: false
-			// edit_user: false
-			// have_superpowers: false
-			// manage_analytics: false
-			// read_analytics: false
-			// read_client: false
-			// upload_file: false
+					// add user to project
+					project.access.edit.addToSet(created_user.uuid);
 
+					project.save(function (err) {
+						cb(null);
+					})
 
+					
+				});
 
-			var a = token_store.project.access_type;
+			}, callback);
 
-			console.log('token_store: ', token_store);
-
-			var permissions = token_store.project.permissions;
-
-			console.log('permissions', permissions);
-
-			// create role
-			api.user._createRole({
-				permissions : permissions,
-				members : [created_user],
-				project_id : token_store.project.id
-			}, callback)
 			
 		});
 
+		// add user to project
 		ops.push(function (callback) {
 
+			var reads = token_store.access.read;
+
+			async.each(reads, function (project_id, cb) {
+				Project
+				.findOne({uuid : project_id})
+				.exec(function (err, project) {
+					if (err) return callback(err);
+
+					// add user to project
+					project.access.read.addToSet(created_user.uuid);
+
+					project.save(function (err) {
+						cb(null);
+					})
+
+					
+				});
+			}, callback);
+
+		});
+		
+
+		ops.push(function (callback) {
 
 			// send slack
 			api.slack.registeredUser({
@@ -151,23 +151,21 @@ module.exports = api.user = {
 				user_company 	: created_user.company,
 				user_email 	: created_user.local.email,
 				user_position 	: created_user.position,
-				inviter_name 	: token_store.invited_by.firstName + ' ' + token_store.invited_by.lastName,
-				inviter_company : token_store.invited_by.company,
-				project_name 	: token_store.project.name,
-				timestamp 	: token_store.timestamp
+				// inviter_name 	: token_store.invited_by.firstName + ' ' + token_store.invited_by.lastName,
+				// inviter_company : token_store.invited_by.company,
+				// project_name 	: token_store.project.name,
+				// timestamp 	: token_store.timestamp
 			});
 
 
-			// send email
-			api.email.sendInvitedEmail({
-				email : created_user.local.email,
-				name : created_user.firstName,
-				project_name : token_store.project.name
-			});
-
+			// // send email
+			// api.email.sendInvitedEmail({
+			// 	email : created_user.local.email,
+			// 	name : created_user.firstName,
+			// 	project_name : token_store.project.name
+			// });
 
 			callback(null);
-
 		});
 
 		// done
@@ -293,18 +291,75 @@ module.exports = api.user = {
 	invite : function (req, res) {
 		var options = req.body;
 
-		// invite users
-		api.user._invite(options, function (err, results) {
-			res.json(results);
+		// 	// invite users
+		// 	api.user._invite(options, function (err, results) {
+		// 		res.json(results);
+		// 	});
+		// },
+
+		// _invite : function (options, callback) {
+
+		// var access_type = options.access_type,
+		//     invite_emails = options.emails,
+		//     project_id = options.project_id;
+
+
+		console.log('req: ', req);
+
+		console.log('api.user._invite: ', options);
+
+		var emails = options.emails;
+		var customMessage = options.customMessage;
+		var access = options.access;
+
+		var numProjects = access.edit.length + access.read.length;
+
+		if (!emails.length) return api.error.missingInformation(req, res);
+
+
+
+		emails.forEach(function (email) {
+
+			// create unique key
+			var uuid = api.utils.getRandomChars(10);
+
+			// options
+			var invite_options = JSON.stringify({
+				email : email,
+				access : access,
+				uuid : uuid
+			});
+
+			// save invite
+			var invite_key = 'invite:' + uuid;
+			console.log('lkey: ', invite_key);
+			api.redis.tokens.set(invite_key, invite_options, function (err) {
+				console.log('sat redis invite token: ', err);
+				api.redis.tokens.get(invite_key, function (err, token_store) {
+					console.log('got key again: ', err, token_store);
+				});
+
+			});
+
+			var invite_link = api.config.portalServer.uri + 'api/invitation/' + uuid;
+
+			// send email
+			api.email.sendInviteEmail({
+				email : email,
+				customMessage : customMessage,
+				numProjects : numProjects,
+				invite_link : invite_link,
+				invited_by : req.user.getName()
+			});
+
 		});
-	},
 
-	_invite : function (options, callback) {
 
-		var access_type = options.access_type,
-		    invite_emails = options.emails,
-		    project_id = options.project_id;
+		return res.json('shit');
+		
 
+
+		// return callback(null, 'oko');
 
 
 		// 1. if exisitng user, add access and notify
@@ -346,9 +401,11 @@ module.exports = api.user = {
 
 
 
-		callback(null, options);
+		// callback(null, options);
 
 	},
+
+
 
 	getInviteLink : function (req, res) {
 		var options = req.body;

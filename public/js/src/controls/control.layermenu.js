@@ -1117,6 +1117,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		if (layer) {
 			var layerItemFlyTo = Wu.DomUtil.createId('div', 'layer-flyto-' + layer.getUuid(), wrap);
 		    	layerItemFlyTo.className = 'layer-menu-flyto';
+		    	layerItemFlyTo.innerHTML = '<i class="fa fa-plane fly-to"></i>';
 		}
 
 		var inner = Wu.DomUtil.create('div', 'layer-menu-item', wrap);

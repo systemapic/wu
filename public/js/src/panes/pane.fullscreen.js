@@ -16,8 +16,9 @@ Wu.Fullscreen = Wu.Evented.extend({
 		// create fullscreen
 		this._container = Wu.DomUtil.create('div', 'smooth-fullscreen', app._appPane);
 
+		var innerClassName = this.options.innerClassName || 'smooth-fullscreen-inner';
 		// wrappers
-		this._inner = Wu.DomUtil.create('div', 'smooth-fullscreen-inner', this._container);
+		this._inner = Wu.DomUtil.create('div', innerClassName, this._container);
 		this._closer = Wu.DomUtil.create('div', 'close-smooth-fullscreen', this._container, 'x');
 		this._header = Wu.DomUtil.create('div', 'smooth-fullscreen-title', this._inner, this.options.title);
 		this._content = Wu.DomUtil.create('div', 'smooth-fullscreen-content', this._inner);

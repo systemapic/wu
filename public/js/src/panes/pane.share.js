@@ -53,8 +53,6 @@ Wu.Share = Wu.Pane.extend({
 		this._sharePrintButton = Wu.DomUtil.create('div', 'share-item', this._shareDropdown);
 		this._shareInviteButton  = Wu.DomUtil.create('div', 'share-item', this._shareDropdown);
 
-
-
 		// enter titles
 		this._fillTitles();
 
@@ -79,6 +77,7 @@ Wu.Share = Wu.Pane.extend({
 			
 		});
 
+		// 	
 		this._shareButton.innerHTML = '<i class="fa fa-paper-plane"></i>';
 	},
 
@@ -133,7 +132,7 @@ Wu.Share = Wu.Pane.extend({
 	_fillTitles : function () {
 		this._shareImageButton.innerHTML = 'Share Image';
 		this._sharePrintButton.innerHTML = 'Share PDF';
-		this._shareInviteButton.innerHTML = 'Invite users...';
+		this._shareInviteButton.innerHTML = 'Invite others...';
 	},
 
 	_clearTitles : function () {
@@ -328,6 +327,10 @@ Wu.Share = Wu.Pane.extend({
 
 
 	_shareInvite : function () {
+
+		// app.Chrome.Left._tabs.projects._openEditProjectFullscreen();
+		// this._close();
+
 		Wu.DomUtil.addClass(this._shareDropdown, 'wide-share');
 		this._createInviteView();
 	},
