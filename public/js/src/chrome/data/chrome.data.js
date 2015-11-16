@@ -253,9 +253,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		if ( this._layersContainer ) this._layersContainer.innerHTML = '';
 		if ( this._filesContainer )  this._filesContainer.innerHTML = '';
 
-		// Layer list
-		this._initLayerList();
-		this._refreshLayers();
+
+		if (this._project.isEditable()) {
+			// Layer list
+			this._initLayerList();
+			this._refreshLayers();	
+		}
+		
 
 		// File list
 		this._initFileLists();
@@ -280,7 +284,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Create Upload Button
 		this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this.topContainer);
-		this.uploadButton.innerHTML = 'Upload files...';
+		this.uploadButton.innerHTML = '<i class="fa fa-cloud-upload"></i>Upload data';
 
 
 	},

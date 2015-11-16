@@ -343,6 +343,7 @@ Wu.User = Wu.Class.extend({
 		this._accountDropdown = Wu.DomUtil.create('div', 'share-dropdown account-dropdown', app._appPane);
 
 		// items
+		this._accountName = Wu.DomUtil.create('div', 'share-item no-hover', this._accountDropdown, '<i class="fa fa-user logout-icon"></i>' + app.Account.getFullName());
 		this._logoutDiv = Wu.DomUtil.create('div', 'share-item', this._accountDropdown, '<i class="fa fa-sign-out logout-icon"></i>Log out');
 
 		// events

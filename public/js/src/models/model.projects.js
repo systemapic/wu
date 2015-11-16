@@ -272,10 +272,38 @@ Wu.Project = Wu.Class.extend({
 
 		// send request to API		
  		Wu.Util.postcb('/api/project/setAccess', JSON.stringify(options), function (ctx, response) {
- 		}, this);
+ 		
+ 			// set locally
+ 			this.store.access = projectAccess;
 
- 		// set locally
- 		this.store.access = projectAccess;
+ 		}.bind(this), this);
+
+ 		
+
+	},
+
+	addInvites : function (projectAccess) {
+
+
+		var options = {
+			project : this.getUuid(),
+			access : projectAccess
+		}
+
+
+		// send request to API		
+ 		Wu.Util.postcb('/api/project/addInvites', JSON.stringify(options), function (ctx, response) {
+
+ 			console.log('response: ', response, ctx);
+
+ 			var updatedAccess = Wu.parse(response);
+
+ 			// set locally
+ 			this.store.access = updatedAccess;
+
+ 		}.bind(this), this);
+
+ 		
 
 	},
 

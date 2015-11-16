@@ -97,6 +97,58 @@ module.exports = api.project = {
 
 	},
 
+
+	addInvites : function (req, res) {
+
+
+		var user = req.user;
+		var options = req.body;
+		var access = options.access;
+		var projectUuid = options.project;
+
+		console.log('addInvites: ', access, projectUuid);
+
+
+		Project
+		.findOne({uuid : projectUuid})
+		.exec(function (err, project) {
+			if (err || !project) return res.json({
+				error : err || 'No such project.'
+			});
+
+			console.log('found project.access: ', project.access);
+
+
+			access.read.forEach(function (u) {
+
+				// add read (if not in edit)
+				if (!_.contains(project.access.edit, u)) {
+
+					console.log('invited user is not editor, adding as reader');
+
+					project.access.read.addToSet(u);
+				} else {
+					console.log('invited is EDITOR :', project.access);
+				}
+
+			});
+
+
+			project.save(function (err, updatedProject) {
+				if (err) return res.json({
+					error : err
+				});
+
+				console.log('saved project access: ', updatedProject.access);
+
+				// return updated access
+				res.json(updatedProject.access);
+			})
+			
+		});
+
+	},
+
 	// #########################################
 	// ###  API: Create Project              ###
 	// #########################################

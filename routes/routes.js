@@ -150,6 +150,13 @@ module.exports = function(app, passport) {
 		api.project.setAccess(req, res);
 	});
 
+	// =====================================
+	// CREATE NEW PROJECT  =================
+	// =====================================
+	app.post('/api/project/addInvites', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.project.addInvites(req, res);
+	});
+
 
 	// =====================================
 	// GET UPLOAD ==========================
