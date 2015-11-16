@@ -181,17 +181,20 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', content);
 
 		
+		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
+
+
 		// create invite input
 		this._createInviteUsersInput({
 			type : 'read',
 			label : 'Invite spectators to project <span class="optional-medium">(optional)</span>',
-			content : content,
+			content : toggles_wrapper,
 			container : this._fullscreen._inner,
 			sublabel : 'Spectators have read-only access to the project'
 		});
 
 
-		var share_toggle_wrapper = Wu.DomUtil.create('div', 'toggle-wrapper', content);
+		var share_toggle_wrapper = Wu.DomUtil.create('div', 'toggle-wrapper', toggles_wrapper);
 
 		// add share, download toggle
 		var share_toggle_label = Wu.DomUtil.create('div', 'small-toggle-label smooth-fullscreen-sub-label');
@@ -214,7 +217,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 
 
-		var download_toggle_wrapper = Wu.DomUtil.create('div', 'toggle-wrapper', content);
+		var download_toggle_wrapper = Wu.DomUtil.create('div', 'toggle-wrapper', toggles_wrapper);
 
 		// add share, download toggle
 		var download_toggle_label = Wu.DomUtil.create('div', 'small-toggle-label smooth-fullscreen-sub-label');
@@ -235,12 +238,14 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		download_toggle_wrapper.appendChild(download_toggle_label);
 		download_toggle_label.innerHTML = this.options.labels.download_on;
 
+		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
+		
 
 		// create invite input
 		this._createInviteUsersInput({
 			type : 'edit',
 			label : 'Invite editors to project <span class="optional-medium">(optional)</span>',
-			content : content,
+			content : toggles_wrapper,
 			container : this._fullscreen._inner,
 			sublabel : 'Editors can edit the project'
 		});
