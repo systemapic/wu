@@ -107,11 +107,11 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		this._container.style.display = 'block';
 
 		// set height for styler pane
-		if (tab._ == 'settingsSelector') {
-			this._container.style.height = '75%';
-		} else {
+		// if (tab._ == 'settingsSelector') {
+			// this._container.style.height = '75%';
+		// } else {
 			this._container.style.height = '100%'; // todo, css exp
-		}
+		// }
 
 		// update size
 		this.updateMapSize(); // css exp

@@ -795,10 +795,26 @@ body {
     padding-right: 4px;
 }
 
+.smooth-fullscreen-save.update-style {
+    position: relative;
+    width: 140px;
+    margin: auto;
+}
 
+.button-wrapper {
+      position: relative;
+    margin-bottom: 20px;
+}
 
-
-
+.marked-changed {
+    background: #428BCA;
+    color: #FCFCFC;
+    font-weight: 600;
+}
+.marked-changed:hover {
+    color: rgb(63, 70, 82);
+    
+}
 
 
 
