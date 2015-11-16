@@ -181,6 +181,8 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 
 	createCarto : function (json, callback) {
 
+		console.log('createCarto: ', json);
+
 		var options = {
 			style : json,
 			columns : this._columns
