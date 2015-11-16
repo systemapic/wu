@@ -19,6 +19,10 @@ else
 	grunt watch &
 	echo 'Running in development mode...'
 	nodemon --watch ../api --watch ../config --watch server.js --watch ../routes server.js
+	
+	# cd ..
+	# forever -w --watchIgnore '!{server.js,{api,config,routes}/**}' --workingDir server/ server/server.js
+	# forever -w --watchIgnore '!{server.js}' server.js
 fi
 
 cd ..
