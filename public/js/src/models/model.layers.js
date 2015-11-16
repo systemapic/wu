@@ -448,7 +448,6 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	setStyling : function (styleJSON) {
-		console.log('setStyle', styleJSON);
 		this.store.style = JSON.stringify(styleJSON);
 		this.save('style');
 	},
@@ -987,7 +986,6 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 	},
 
 	getFileMeta : function () {
-		console.error('getFileMeta');
 		var file = app.Account.getFile(this.store.file);
 		var metajson = file.store.data.raster.metadata;
 		var meta = Wu.parse(metajson);

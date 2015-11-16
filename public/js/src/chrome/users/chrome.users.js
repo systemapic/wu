@@ -177,8 +177,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 			var email_value = invite_input.value;
 
-			console.log('i', i);
-
 			if (!email_value.length && i == 0) {
 				var invite_error = divObj.invite_error;
 				invite_error.innerHTML = 'Please enter an email address';
@@ -197,7 +195,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			read : []
 		}
 
-		console.log('this_acces', this._access);
 
 		this._access.edit.forEach(function (p) {
 			access.edit.push(p.project.getUuid());
@@ -215,14 +212,12 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			access : access
 		}
 
-		console.log('invite options: ', options);
 
 		Wu.send('/api/user/invite', options, this._sentInvites.bind(this, e.target), this);
 
 	},
 
 	_sentInvites : function (saveBtn, b, c) {
-		console.log('sent invites, ', b, c, this);
 
 		saveBtn.innerHTML = 'Close'
 		// Wu.DomUtil.addClass(saveBtn, 'invites-sent');

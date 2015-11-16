@@ -79,10 +79,11 @@ Wu.Chrome = Wu.Class.extend({
 
 		// css exp
 		// styler
-		var isStyler = (rightChrome && rightChrome._currentTab && rightChrome._currentTab._ == 'settingsSelector' && rightChrome._isOpen);
+		// var isStyler = (rightChrome && rightChrome._currentTab && rightChrome._currentTab._ == 'settingsSelector' && rightChrome._isOpen);
 
 		app._map._controlCorners.topleft.style.left = left + 'px';
-		app._map._controlCorners.bottomleft.style.left = isStyler ? '0px' : left + 'px';
+		// app._map._controlCorners.bottomleft.style.left = isStyler ? '0px' : left + 'px';
+		app._map._controlCorners.bottomleft.style.left = left + 'px';
 
 
 		// update leaflet map

@@ -89,6 +89,8 @@ Wu.Styler.Point = Wu.Styler.extend({
 		this.carto().pointsize.column  = column;
 		this.carto().pointsize.range = minMax;
 
+		this.markChanged();
+
 	},
 
 });

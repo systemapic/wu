@@ -346,7 +346,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	_initFileLists : function () {
 
-		console.log('_initFileLists');
 
 		// Holds each section (project files, my files, etc)
 		// Currently only "my files"
