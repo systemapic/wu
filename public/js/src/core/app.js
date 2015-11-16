@@ -197,7 +197,10 @@ Wu.App = Wu.Class.extend({
 		this.options.json.users.forEach(function(user, i, arr) {
 		       this.Users[user.uuid] = new Wu.User(user);             
 		}, this);
-		// 
+
+		// add account to users list
+		this.Users[app.Account.getUuid()] = this.Account;
+
 		// create project objects
 		this.Projects = {};
 		this.options.json.projects.forEach(function(elem, i, arr) {

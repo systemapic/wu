@@ -222,7 +222,8 @@ module.exports = api.geo = {
 		} else {
 
 			// static opacity
-			css.headers += '@point_opacity: ' + opacity.staticVal + ';\n';
+			var staticOpacity = (opacity.staticVal === undefined) ? 1 : opacity.staticVal;
+			css.headers += '@point_opacity: ' + staticOpacity + ';\n';
 		}
 
 		// add rule
@@ -256,7 +257,8 @@ module.exports = api.geo = {
 		} else {
 
 			// static opacity
-			css.headers += '@polygon_opacity: ' + opacity.staticVal + ';\n';
+			var staticOpacity = (opacity.staticVal === undefined) ? 1 : opacity.staticVal;
+			css.headers += '@polygon_opacity: ' + staticOpacity + ';\n';
 		}
 
 		// add rule
@@ -290,7 +292,8 @@ module.exports = api.geo = {
 		} else {
 
 			// static opacity
-			css.headers += '@line_opacity: ' + opacity.staticVal + ';\n';
+			var staticOpacity = (opacity.staticVal === undefined) ? 1 : opacity.staticVal;
+			css.headers += '@line_opacity: ' + staticOpacity + ';\n';
 		}
 
 		// add rule
@@ -431,7 +434,8 @@ module.exports = api.geo = {
 		} else {
 		
 			// static color
-			cartObj.style += '\tmarker-fill: ' + color.staticVal + ';\n\n';
+			var staticColor = (color.staticVal === undefined) ? 'red' : color.staticVal;
+			cartObj.style += '\tmarker-fill: ' + staticColor + ';\n\n';
 		}
 
 		return cartObj;
@@ -565,7 +569,8 @@ module.exports = api.geo = {
 		} else {
 		
 			// static color
-			cartObj.style += '\tpolygon-fill: ' + color.staticVal + ';\n\n';
+			var staticColor = (color.staticVal === undefined) ? 'red' : color.staticVal;
+			cartObj.style += '\tpolygon-fill: ' + staticColor + ';\n\n';
 		}
 
 		return cartObj;
@@ -699,7 +704,8 @@ module.exports = api.geo = {
 		} else {
 		
 			// static color
-			cartObj.style += '\tline-color: ' + color.staticVal + ';\n\n';
+			var staticColor = (color.staticVal === undefined) ? 'red' : color.staticVal;
+			cartObj.style += '\tline-color: ' + staticColor + ';\n\n';
 		}
 
 		return cartObj;
@@ -736,7 +742,8 @@ module.exports = api.geo = {
 			
 		} else {
 
-			cartObj.headers += '@marker_size_factor: ' + pointSize.staticVal + ';\n';
+			var staticSize = (pointSize.staticVal === undefined) ? 5 : pointSize.staticVal;
+			cartObj.headers += '@marker_size_factor: ' + staticSize + ';\n';
 
 		}
 
@@ -782,7 +789,8 @@ module.exports = api.geo = {
 			
 		} else {
 
-			cartObj.headers += '@line_size_factor: ' + lineWidth.staticVal + ';\n';
+			var staticWidth = (lineWidth.staticVal === undefined) ? 3 : lineWidth.staticVal;
+			cartObj.headers += '@line_size_factor: ' + staticWidth + ';\n';
 
 		}
 
