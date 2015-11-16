@@ -180,7 +180,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// enable edit of layer menu...
 		var layerMenu = app.MapPane.getControls().layermenu;
-		if ( app.access.to.edit_project(this._project) ) layerMenu.enableEditSwitch();
+		if ( this._project.isEditable() ) layerMenu.enableEditSwitch();
 
 		// open if closed
 		if ( !layerMenu._layerMenuOpen ) app.Chrome.Top._openLayerMenu();
@@ -255,6 +255,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 		if (this._project.isEditable()) {
+
 			// Layer list
 			this._initLayerList();
 			this._refreshLayers();	
@@ -345,6 +346,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	_initFileLists : function () {
 
+		console.log('_initFileLists');
+
 		// Holds each section (project files, my files, etc)
 		// Currently only "my files"
 		this.fileListContainers = {};
@@ -362,16 +365,16 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this.fileProviders = {};
 
 		// add postgis files
-		if (app.access.to.edit_project(this._project)) {
+		// if (app.access.to.edit_project(this._project)) {
 			
-			this.fileProviders.postgis = {
-				name : 'Data Library',
-				data : [],
-				getFiles : function () {
-					return app.Account.getFiles()
-				}
+		this.fileProviders.postgis = {
+			name : 'Data Library',
+			data : [],
+			getFiles : function () {
+				return app.Account.getFiles()
 			}
 		}
+		// }
 
 		// Create FILE LIST section, with D3 container
 
@@ -795,31 +798,31 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Disable actions for Layers
 		var isDisabled = (library == 'layers'),
-		    canEdit = app.access.to.edit_project(this._project),
-		    canDownload = app.access.to.download_file(this._project),
+		    canEdit = this._project.isEditor(),
+		    canDownload = this._project.isDownloadable(),
 		    that = this;
-	
+
 		var action = {
 
 			createLayer : {
 				name : 'Add To Project',
-				disabled : isDisabled,
+				disabled : !canEdit,
 			},
 			share : {
-				name : 'Share with...',
-				disabled : false,
+				name : 'Share with...', 	// todo: implement sharing of data
+				disabled : true,
 			},			
 			changeName : {
 				name : 'Change Name',
-				disabled : !canEdit
+				disabled : true
 			},			
 			download : {
 				name : 'Download',
-				disabled : !canDownload,
+				disabled : false,
 			},
 			delete : {
 				name : 'Delete',
-				disabled : !canEdit
+				disabled : false
 			},
 		}
 
@@ -1616,8 +1619,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	initLayerActions : function (parent, library) {
 
 		// Disable actions for Layers
-		var canEdit = app.access.to.edit_project(this._project),
-		    canDownload = app.access.to.download_file(this._project),
+		var canEdit = this._project.isEditable(),
+		    canDownload = this._project.isDownloadable(),
 		    that = this;
 	
 		var action = {

@@ -182,7 +182,8 @@ Wu.Model.Layer = Wu.Model.extend({
 		descriptionControl._addLayer(this);
 
 		// hide if empty and not editor
-		var isEditor = app.access.to.edit_project(app.activeProject);
+		var project = app.activeProject;
+		var isEditor = project.isEditor();
 		if (this.store.description || isEditor) { // todo: what if only editor 
 			descriptionControl.show();
 		} else { 								// refactor to descriptionControl
