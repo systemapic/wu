@@ -348,7 +348,7 @@ body {
 .share-dropdown {
      -webkit-transition: width 200ms ease, height 200ms ease; 
      transition: width 200ms ease, height 200ms ease; 
-    height: 100px;
+    height: auto;
     position: absolute;
     background: #FCFCFC;
     left: 282px;
@@ -597,6 +597,7 @@ body {
     color: #4A4A4A;
     background: white;
     padding: 10px;
+    resize: vertical;
 }
 .invite-custom-message-wrapper-textarea:focus {
     border: 1px solid gainsboro;
@@ -765,7 +766,41 @@ body {
 .account-dropdown {
     width: 200px;
 }
+.account-dropdow .share-item {
+    padding-left: 40px;
+}
 
-.fa.fa-sign-out.logout-icon {
+.fa.logout-icon {
     padding-right: 6px;
 }
+
+.share-item.no-hover:hover {
+    background: #FCFCFC;
+    color: rgb(63, 70, 82);
+}
+
+.chrome-content.settings-tabs-wrapper {
+    position: absolute;
+    top: 140px;
+}
+
+.chrome-upload-button {
+    padding: 9px;
+    border-radius: 4px;
+    width: auto;
+    top: 5px;
+}
+
+.fa.fa-cloud-upload {
+    padding-right: 4px;
+}
+
+
+
+
+
+
+
+
+
+

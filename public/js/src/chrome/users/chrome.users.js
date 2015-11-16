@@ -116,7 +116,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		// personlized message
 		var emailMessageWrap = Wu.DomUtil.create('div', 'invite-email-message-wrap', content);
-		var messageText = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label add-message', emailMessageWrap, 'Make your invites more personal by adding a <a id="custom_message_btn">custom message</a>');
+		var messageText = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label add-message', emailMessageWrap, 'Make your invite more personal by adding a <a id="custom_message_btn">custom message</a>');
 		var messageBtn = Wu.DomUtil.get('custom_message_btn');
 		var messageBoxWrap = Wu.DomUtil.create('div', 'invite-custom-message-wrapper', emailMessageWrap);
 		var messageBoxLabel = Wu.DomUtil.create('div', 'invite-custom-message-wrapper-label', messageBoxWrap, 'Custom Message'); 
@@ -167,6 +167,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		email : {}
 	},
 
+	
 	_sendInvites : function (e) {
 
 		var emails = [];

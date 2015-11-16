@@ -948,7 +948,7 @@
 	-o-transition: left 100ms;
 	transition: left 100ms;
 	box-shadow: none;
-	margin-right: 20px;
+	margin-right: 10px;
 	float: left;
 
 	width: 50px;
@@ -1022,7 +1022,7 @@
 	-o-transition: left 100ms;
 	transition: left 100ms;
 	box-shadow: none;
-	margin-right: 20px;
+	margin-right: 10px;
 	float: left;
 
 	width: 50px;
