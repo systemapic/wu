@@ -28,19 +28,28 @@ var userSchema = mongoose.Schema({
         email : String,
         avatar : String,
 
+        // temp status notifications
+        status : {
+
+            contact_requests : [String]
+        },
+
         access : {
 
             // for reference
             account_type : { type: String, default: 'free' },
 
             // storage limits
-            storage_quota : { type: Number, default: '200000000' },
+            storage_quota : { type: Number, default: '200000000' }, // 200MB
             remaining_quota : { type: Number, default: '200000000' },
 
-            // private projects
+            // allowed private projects
             private_projects : { type: Boolean, default: true },
 
         },
+
+        contact_list : [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
 
         files : [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
 
@@ -90,10 +99,12 @@ userSchema.methods.getName = function () {
     return this.firstName + ' ' + this.lastName;
 };
 
-
 userSchema.methods.canCreatePrivateProject = function () {
-    console.log('user.canCreatePrivateProject', this.access.private_projects);
     return this.access.private_projects;
+};
+
+userSchema.methods.getEmail = function () {
+    return this.local.email;
 };
 
 // timestamps plugin

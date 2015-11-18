@@ -42,24 +42,288 @@ var api = module.parent.exports;
 // exports
 module.exports = api.user = { 
 
+
+	requestContact : function (req, res) {
+
+		console.log('request contact: ', req.body);
+
+
+		var contact_uuid = req.body.contact;
+		var request_id;
+		var contact_email;
+
+		var ops = [];
+
+		// check
+		if (!contact_uuid) return res.json({
+			error : 'No contact uuid!'
+		})
+
+		ops.push(function (callback) {
+
+			request_id = api.utils.getRandomChars(10);
+
+			var request_options = JSON.stringify({
+				requester : req.user.getUuid(),
+				contact : contact_uuid,
+				timestamp : new Date().getTime(),
+			});
+
+			// save request
+			var invite_key = 'contactRequest:' + request_id;
+			api.redis.tokens.set(invite_key, request_options, callback);
+		});
+
+		// add pending request
+		ops.push(function (callback) {
+			User
+			.findOne({uuid : contact_uuid})
+			.exec(function (err, user) {
+				if (err || !user) return res.json({
+					error : err || 'No such user.'
+				});
+
+				contact_email = user.local.email;
+
+				// add pending contact request
+				user.status.contact_requests.addToSet(request_id);
+
+				// save
+				user.markModified('status');
+				user.save(function (err) {
+					callback(err);
+				});
+			});
+		});
+
+		// send email to requested user
+		ops.push(function (callback) {
+			
+			var link = api.config.portalServer.uri + 'api/user/acceptContactRequest/' + request_id;
+
+			// send email
+			api.email.sendContactRequestEmail({
+				email : contact_email,
+				requested_by : req.user.getName(),
+				link : link
+			});
+
+			callback();
+		});
+
+		async.series(ops, function (err) {
+			console.log('contact asyn done', err);
+
+			res.json({
+				error : err
+			});
+		});
+
+	},
+
+
+	acceptContactRequest : function (req, res) {
+
+
+		console.log('ACECECEPCPEPCPEPECPEPP!!!!!');
+
+		// get client/project
+		var path = req.originalUrl.split('/');
+		var request_token = path[4];
+
+		console.log('acceptContactRequest', path);
+		console.log('request_token: ', request_token);
+
+		// check
+		if (!request_token) return res.end('Nope!');
+
+		// save request
+		var invite_key = 'contactRequest:' + request_token;
+		api.redis.tokens.get(invite_key, function (err, request_store) {
+
+			var store = api.utils.parse(request_store);
+
+			console.log('request: ', store);
+
+
+			var requester_uuid = store.requester;
+			var contact_uuid = store.contact;
+			var timestamp = store.timestamp;
+
+
+			User
+			.findOne({uuid : requester_uuid})
+			.exec(function (err, r_user) {
+				if (err) console.log('no r_user', err);
+
+				User
+				.findOne({uuid : contact_uuid})
+				.exec(function (err, c_user) {
+					if (err) console.log('no c_user', err);
+
+
+					r_user.contact_list.addToSet(c_user._id);
+					c_user.contact_list.addToSet(r_user._id);
+
+
+					r_user.save(function (err) {
+						console.log('saved r_user', err);
+					});
+					c_user.save(function (err) {
+						console.log('saved c_user', err);
+					});
+
+
+
+				});
+
+				// // add newUser to contact list
+				// r_user.contact_list.addToSet(created_user._id);
+				// r_user.save(function (err) {
+				// 	if (err) console.log('invited_by_yser: ', err);
+
+				// 	// add inviter to newUser's contact list
+				// 	created_user.contact_list.addToSet(user._id);
+				// 	created_user.save(function (err) {
+				// 		if (err) console.log('created_user invite err: ', err);
+						
+				// 		// done
+				// 		callback(null);
+				// 	});
+				// });
+			});
+
+
+
+		});
+
+		// res.render('../../views/app.serve.ejs', {
+		// 	hotlink : {},
+		// 	access_token : req.session.access_token || {}
+		// });
+
+		res.end('ok');
+	},
+
+
+	// invite users
+	// sent from client (invite by email)
+	invite : function (req, res) {
+		var options = req.body;
+
+		console.log('req: ', req);
+		console.log('api.user._invite: ', options);
+
+		var emails = options.emails;
+		var customMessage = options.customMessage;
+		var access = options.access;
+		var numProjects = access.edit.length + access.read.length;
+
+		// checks
+		if (!emails.length) return api.error.missingInformation(req, res);
+
+
+		// send emails
+		emails.forEach(function (email) {
+
+			// create unique key
+			var uuid = api.utils.getRandomChars(10);
+
+			// options
+			var invite_options = JSON.stringify({
+				email : email,
+				access : access,
+				uuid : uuid,
+				invited_by : req.user.getUuid(),
+				timestamp : new Date().getTime(),
+			});
+
+			// save invite
+			var invite_key = 'invite:' + uuid;
+			api.redis.tokens.set(invite_key, invite_options, function (err) {
+				if (err) return console.error('api.user.invite err: ', err);
+				
+				var invite_link = api.config.portalServer.uri + 'api/invitation/' + uuid;
+
+				// send email
+				api.email.sendInviteEmail({
+					email : email,
+					customMessage : customMessage,
+					numProjects : numProjects,
+					invite_link : invite_link,
+					invited_by : req.user.getName()
+				});
+			});
+		});
+
+
+		return res.json({
+			error : null
+		});
+		
+
+
+		// return callback(null, 'oko');
+
+
+		// 1. if exisitng user, add access and notify
+		// 2. if not existing, send create user link and store access in redis or whatever
+
+
+		// if not existing
+		// ---------------
+		// 
+		// - need to send link to user with token. 
+		// - token must be stored in redis and contain: email, project, type access, who invited, when invited 
+		// - possible to sign up with that email address only
+		// - when following link, taken to sign-up site: 
+		// 	1) enter details (name, organization, type profession?, etc.)
+		//	2) will create account on that email, give view/edit access to project.
+		// 	3) log user in immediately, activate project
+		// 	
+		// - should take invited user < 1 min to sign up.
+		//
+		// - new user has access to:
+		// 	1) view/edit project invited for
+		// 	2) NOT create new project ...
+		// 	3) NOT upload data 
+		// 	4) invite others for VIEW
+		// 	
+		// 	- should set certain limitations on others' servers. ie, if GLOBESAR has a server, others should perhaps not
+		//		be able to invite to it. perhaps invite to SYSTEMAPIC server instead?
+		// 	- actually, only GLOBESAR should be able to invite uploaders to his own portal.
+		// 	- need to syncronize servers soon! 
+
+
+
+		// PILOT FLOW:
+		// 1. frano can only invite VIEWERS
+		// 2. if he wants more admins, we'll add them for him.
+		// 3. anybody can invite VIEWERS to own projects ?
+		//
+		// 4. ALSO would be really cool: just send anyone a link, and they can login/register and get access to project.
+
+
+
+		// callback(null, options);
+
+	},
+
+	// called from passport.js (no req.user exists here)
 	register : function (options, done) {
-
 		console.log('register!!!!', options);
-
-		// console.log('options. acces', options.access, options.access.read, options.access.edit);
 
 		var ops = [],
 		    created_user,
-		    token_store;
+		    token_store,
+		    invited_by_user;
 
 		// get token store from redis
 		ops.push(function (callback) {
 			var token = options.invite_token;
 			var redis_key = 'invite:' + token;
 
-			console.log('redis key: ', redis_key);
-
-
+			// get token
 			api.redis.tokens.get(redis_key, callback);
 		});
 
@@ -70,7 +334,6 @@ module.exports = api.user = {
 			token_store = api.utils.parse(tokenJSON);
 
 			console.log('token_store: ', token_store);
-
 			console.log('access: ', token_store.access);
 
 			// create the user
@@ -82,7 +345,7 @@ module.exports = api.user = {
 			newUser.position 	= options.position;
 			newUser.firstName 	= options.firstname;
 			newUser.lastName 	= options.lastname;
-			// newUser.invitedBy 	= token_store.invited_by.uuid;
+			newUser.invitedBy 	= token_store.invited_by;
 
 			// save the user
 			newUser.save(function(err) {
@@ -91,55 +354,64 @@ module.exports = api.user = {
 			});
 		});
 
-		// add user to project
+		// add to contact lists
+		ops.push(function (callback) {
+
+			User
+			.findOne({uuid : token_store.invited_by})
+			.exec(function (err, user) {
+				invited_by_user = user;
+
+				// add newUser to contact list
+				invited_by_user.contact_list.addToSet(created_user._id);
+				invited_by_user.save(function (err) {
+					if (err) console.log('invited_by_yser: ', err);
+
+					// add inviter to newUser's contact list
+					created_user.contact_list.addToSet(user._id);
+					created_user.save(function (err) {
+						if (err) console.log('created_user invite err: ', err);
+						
+						// done
+						callback(null);
+					});
+				});
+			});
+		});
+
+		// add new user to project (edit)
 		ops.push(function (callback) {
 
 			var edits = token_store.access.edit;
-
 			async.each(edits, function (project_id, cb) {
 
 				Project
 				.findOne({uuid : project_id})
 				.exec(function (err, project) {
 					if (err) return callback(err);
-
-					// add user to project
 					project.access.edit.addToSet(created_user.uuid);
-
 					project.save(function (err) {
 						cb(null);
-					})
-
-					
+					});
 				});
-
 			}, callback);
-
-			
 		});
 
-		// add user to project
+		// add new user to project (read)
 		ops.push(function (callback) {
 
 			var reads = token_store.access.read;
-
 			async.each(reads, function (project_id, cb) {
 				Project
 				.findOne({uuid : project_id})
 				.exec(function (err, project) {
 					if (err) return callback(err);
-
-					// add user to project
 					project.access.read.addToSet(created_user.uuid);
-
 					project.save(function (err) {
 						cb(null);
-					})
-
-					
+					});
 				});
 			}, callback);
-
 		});
 		
 
@@ -151,19 +423,10 @@ module.exports = api.user = {
 				user_company 	: created_user.company,
 				user_email 	: created_user.local.email,
 				user_position 	: created_user.position,
-				// inviter_name 	: token_store.invited_by.firstName + ' ' + token_store.invited_by.lastName,
-				// inviter_company : token_store.invited_by.company,
-				// project_name 	: token_store.project.name,
-				// timestamp 	: token_store.timestamp
+				inviter_name 	: invited_by_user.getName(),
+				timestamp 	: token_store.timestamp
 			});
 
-
-			// // send email
-			// api.email.sendInvitedEmail({
-			// 	email : created_user.local.email,
-			// 	name : created_user.firstName,
-			// 	project_name : token_store.project.name
-			// });
 
 			callback(null);
 		});
@@ -171,6 +434,8 @@ module.exports = api.user = {
 		// done
 		async.waterfall(ops, function (err, results) {
 			if (err) return done(err);
+
+			// done
 			done(null, created_user);
 		});
 	
@@ -287,117 +552,6 @@ module.exports = api.user = {
 
 	},
 
-	// invite users
-	invite : function (req, res) {
-		var options = req.body;
-
-		// 	// invite users
-		// 	api.user._invite(options, function (err, results) {
-		// 		res.json(results);
-		// 	});
-		// },
-
-		// _invite : function (options, callback) {
-
-		// var access_type = options.access_type,
-		//     invite_emails = options.emails,
-		//     project_id = options.project_id;
-
-
-		console.log('req: ', req);
-
-		console.log('api.user._invite: ', options);
-
-		var emails = options.emails;
-		var customMessage = options.customMessage;
-		var access = options.access;
-
-		var numProjects = access.edit.length + access.read.length;
-
-		if (!emails.length) return api.error.missingInformation(req, res);
-
-
-
-		emails.forEach(function (email) {
-
-			// create unique key
-			var uuid = api.utils.getRandomChars(10);
-
-			// options
-			var invite_options = JSON.stringify({
-				email : email,
-				access : access,
-				uuid : uuid
-			});
-
-			// save invite
-			var invite_key = 'invite:' + uuid;
-			api.redis.tokens.set(invite_key, invite_options, function (err) {
-				
-				var invite_link = api.config.portalServer.uri + 'api/invitation/' + uuid;
-
-				// send email
-				api.email.sendInviteEmail({
-					email : email,
-					customMessage : customMessage,
-					numProjects : numProjects,
-					invite_link : invite_link,
-					invited_by : req.user.getName()
-				});
-			});
-
-		});
-
-
-		return res.json('shit');
-		
-
-
-		// return callback(null, 'oko');
-
-
-		// 1. if exisitng user, add access and notify
-		// 2. if not existing, send create user link and store access in redis or whatever
-
-
-		// if not existing
-		// ---------------
-		// 
-		// - need to send link to user with token. 
-		// - token must be stored in redis and contain: email, project, type access, who invited, when invited 
-		// - possible to sign up with that email address only
-		// - when following link, taken to sign-up site: 
-		// 	1) enter details (name, organization, type profession?, etc.)
-		//	2) will create account on that email, give view/edit access to project.
-		// 	3) log user in immediately, activate project
-		// 	
-		// - should take invited user < 1 min to sign up.
-		//
-		// - new user has access to:
-		// 	1) view/edit project invited for
-		// 	2) NOT create new project ...
-		// 	3) NOT upload data 
-		// 	4) invite others for VIEW
-		// 	
-		// 	- should set certain limitations on others' servers. ie, if GLOBESAR has a server, others should perhaps not
-		//		be able to invite to it. perhaps invite to SYSTEMAPIC server instead?
-		// 	- actually, only GLOBESAR should be able to invite uploaders to his own portal.
-		// 	- need to syncronize servers soon! 
-
-
-
-		// PILOT FLOW:
-		// 1. frano can only invite VIEWERS
-		// 2. if he wants more admins, we'll add them for him.
-		// 3. anybody can invite VIEWERS to own projects ?
-		//
-		// 4. ALSO would be really cool: just send anyone a link, and they can login/register and get access to project.
-
-
-
-		// callback(null, options);
-
-	},
 
 
 
@@ -713,9 +867,42 @@ module.exports = api.user = {
 		if (!options) return done('No options.');
 
 		var user = options.user;
+		var ops = {};
+		
+		ops.project_users = function (callback) {
+
+			// find users from editable projects
+			api.user._getProjectUsers({
+				user : user
+
+			}, function (err, users) {
+				callback(err, users);
+			});
+
+
+
+			// callback(null, users);
+			
+		};
+		
+		// ops.contact_list = function (callback) {
+
+		// 	// find users on contact list (todo!)
+		// 	User
+		// 	.find({id : {$in : user.contact_list}})
+		// 	.exec(function (err, users) {
+		// 		callback(null, users);
+		// 	})
+		// };
+
+		async.series(ops, done);
+	},
+
+	_getProjectUsers : function (options, done) {
+
+		var user = options.user;
 		var userOnInviteList = [];
 		var ops = [];
-
 
 		ops.push(function (callback) {
 			Project
@@ -748,19 +935,11 @@ module.exports = api.user = {
 			.exec(callback);
 
 		});
-		
-		ops.push(function (users, callback) {
-			console.log('found total users: ', users.length);
 
-			// find users on contact list (todo!)
-
-			callback(null, users);
-			
+		async.waterfall(ops, function (err, users) {
+			done(err, users);
 		});
 
-		async.waterfall(ops, done);
-
-		
 	},
 
 
@@ -808,11 +987,15 @@ module.exports = api.user = {
 	},
 
 	_getSingle : function (options, done) {
+		return api.user.getAccount(options, done);
+	},
+	getAccount : function (options, done) {
 		var userUuid = options.user.uuid;
 
 		User
 		.findOne({uuid : userUuid})
 		.populate('files')
+		.populate('contact_list')
 		.exec(done);
 	},
 

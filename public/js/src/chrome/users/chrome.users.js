@@ -31,15 +31,11 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		
 		this.openUserCard = false;
 
-		// this.initGhost();
-
 		// Init user list etc.
 		this._refresh();
 
-
 		// add invite
 		this._inviteButton = Wu.DomUtil.create('div', 'chrome-left-invite-users', this._container, '+ Invite People');
-
 		Wu.DomEvent.on(this._inviteButton, 'click', this._openInvite, this);
 
 	},
@@ -61,9 +57,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// container
 		var invite_container = Wu.DomUtil.create('div', 'invite-container narrow', content);
 		
-		// sub-label
-		// var sublabel = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label', content, options.sublabel);
-
 		var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
 		var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
 
@@ -71,7 +64,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var invite_input = Wu.DomUtil.create('input', 'invite-email-input-form', invite_input_container);
 		invite_input.setAttribute('placeholder', 'name@domain.com')
 		var invite_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', content);
-
 
 		// remember
 		this._emails.push({
@@ -132,7 +124,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
 
-		
 		// create invite input for projects
 		this._createInviteInput({
 			type : 'read',
@@ -205,32 +196,67 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		});
 
 
-
 		var options = {
 			emails : emails,
 			customMessage : customMessage,
 			access : access
 		}
 
-
+		// send to server
 		Wu.send('/api/user/invite', options, this._sentInvites.bind(this, e.target), this);
 
+		this._logInvites(options);
+
+		
+
+	},
+
+	// slack, analytics
+	_logInvites : function (options) {
+
+
+		var read = [];
+		var edit = [];
+		var description = '';
+
+		options.access.read.forEach(function (p) {
+			read.push(app.Projects[p].getTitle());
+		});
+		options.access.edit.forEach(function (p) {
+			edit.push(app.Projects[p].getTitle());
+		});
+
+		if (read.length) {
+			description += 'to read `' + read.join(', ') + '`';
+		}
+		if (read.length && edit.length) {
+			description += 'and edit `' + edit.join(', ') + '`';
+		}
+		if (!read.length && edit.length) {
+			description += 'to edit `' + edit.join(', ') + '`';
+		}
+
+		// send event
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : '`invited` ' + options.emails.join(', '),
+		    	description : description,
+		    	timestamp : Date.now()
+		});
 	},
 
 	_sentInvites : function (saveBtn, b, c) {
 
-		saveBtn.innerHTML = 'Close'
-		// Wu.DomUtil.addClass(saveBtn, 'invites-sent');
+		// close
+		this._fullscreen.close();
 
-		var success_message = saveBtn.nextSibling;
-		success_message.innerHTML = 'Invitations sent!';
+		// set feedback 
+		app.feedback.setMessage({
+			title : 'Invites sent!',
+			// description : description
+		});
 
-		Wu.DomEvent.off(saveBtn, 'click', this._sendInvites, this);
-		Wu.DomEvent.on(saveBtn, 'click', this._fullscreen.close.bind(this._fullscreen), this);
-
-
-		// setTimeout(this._fullscreen.close.bind(this._fullscreen), 1000);
-
+		
 	},
 
 	_createInviteInput : function (options) {
@@ -432,7 +458,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			user_container : user_container
 		});
 
-
 		// remove from other list if active there
 		var otherType = (options.type == 'edit') ? 'read' : 'edit';
 		var existing = _.find(this._access[otherType], function (i) {
@@ -461,7 +486,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 	},
 
 	removeGhost : function () {
-
 		Wu.DomUtil.addClass(this.ghost, 'displayNone');
 		this.openUserCard = false;
 		this._refresh();
@@ -495,11 +519,19 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		// UPDATE
 		eachUser
-			.classed('online', function (d) {
-				var uuid = d.getUuid();
-				var myId = app.Account.getUuid();
-				if ( uuid == myId ) return true;
-				return false;
+			.classed('contact', function (d) {
+				// var uuid = d.getUuid();
+				// var myId = app.Account.getUuid();
+				// if ( uuid == myId ) return true;
+				// return false;
+				return d.isContact();
+			})
+			.classed('project-contact', function (d) {
+				// var uuid = d.getUuid();
+				// var myId = app.Account.getUuid();
+				// if ( uuid == myId ) return true;
+				// return false;
+				return !d.isContact();
 			})		
 
 		// EXIT
@@ -515,10 +547,58 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		this.addUserActionTrigger(eachUser);
 
 		// Add user card
-		this.addUserCard(eachUser);				
+		this.addUserCard(eachUser);
+
+		// add icon to add contact
+		this.create_addContactIcon(eachUser);				
 	
 	},
 
+	create_addContactIcon : function (parent) {
+		
+		// Bind
+		var nameContent = 
+			parent
+			.selectAll('.contact-list-icon')
+			.data(function(d) {
+				// var a = d.isContact() ? [d] : [];
+
+				// if user is not a contact
+				var a = d.isContact() ? [] : [d];
+				return a;
+			})
+
+		// Enter
+		nameContent
+			.enter()
+			.append('i')
+			.classed('contact-list-icon', true)
+			.classed('fa', true)
+			.classed('fa-user-plus', true)
+			
+
+		// Update
+		nameContent
+			.on('click', function (d) {
+
+				// click on icon
+				this._requestContact(d);
+
+			}.bind(this));
+
+		// add tooltip
+		nameContent
+			.html(function (d) {
+				var tooltipWidth = 110 + 'px';
+				var tooltipText = 'Add as contact';
+				var innerHTML = '<div class="absolute"><div class="project-tooltip contact-add-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div>'
+				return innerHTML;
+			})
+		// Exit
+		nameContent
+			.exit()
+			.remove();
+	},
 
 	// ADD USER NAME
 	// ADD USER NAME
@@ -576,8 +656,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// Update
 		userActionTrigger
 			.on('click', function (d) {
-				var uuid = d.getUuid();
-				this.openUserCard = uuid;
+				this.openUserCard = d.getUuid();
 				this._refresh();
 			}.bind(this));
 
@@ -713,6 +792,14 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 
 
+	_requestContact : function (user) {
+
+		// send contact request
+		app.Account.sendContactRequest(user);
+	},
+
+
+
 	// MANAGE ACCESS FOR USER
 	// MANAGE ACCESS FOR USER
 	// MANAGE ACCESS FOR USER
@@ -836,10 +923,15 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 	_refresh : function () {
 
-		if ( !this._project ) return;	
+		console.log('chrome.users._refresh users: ', this.users);
 
 		// Prepare data as array
 		var data = _.toArray(this.users);
+
+		// remove self
+		_.remove(data, function (d) {
+			return d.getUuid() == app.Account.getUuid();
+		})
 
 		// Init user list
 		this.refreshUserList(data);			

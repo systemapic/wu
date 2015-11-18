@@ -70,7 +70,7 @@ Wu.Styler = Wu.Class.extend({
 		var isOn = this.carto().enabled;
 
 		// Create wrapper
-		this._wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this.options.container);
+		this._wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper toggles-wrapper', this.options.container);
 
 		// wrapper
 		var line = new Wu.fieldLine({
@@ -80,7 +80,7 @@ Wu.Styler = Wu.Class.extend({
 			input        : false,
 		});		
 
-		// switch button
+		// switch Update Style
 		var button = new Wu.button({
 			id 	     : this.type,
 			type 	     : 'switch',

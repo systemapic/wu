@@ -66,7 +66,6 @@ Wu.App = Wu.Class.extend({
 				window.location.href = app.options.servers.portal;
 			}
 		});
-
 	},
 
 	_initErrorHandling : function () {
@@ -193,9 +192,17 @@ Wu.App = Wu.Class.extend({
 		this.Account.setRoles(this.options.json.roles);
 
 		// create user objects
+		// this.Users = {};
+		// this.options.json.users.forEach(function(user, i, arr) {
+		//        this.Users[user.uuid] = new Wu.User(user);             
+		// }, this);
+
 		this.Users = {};
-		this.options.json.users.forEach(function(user, i, arr) {
-		       this.Users[user.uuid] = new Wu.User(user);             
+		app.Account.getContactList().forEach(function(user) {
+		       this.Users[user.uuid] = new Wu.User(user);    
+		}, this);
+		this.options.json.users.project_users.forEach(function(user) {
+		       if (!this.Users[user.uuid]) this.Users[user.uuid] = new Wu.User(user);             
 		}, this);
 
 		// add account to users list
