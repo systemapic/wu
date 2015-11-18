@@ -23,6 +23,10 @@ else
 	# cd ..
 	# forever -w --watchIgnore '!{server.js,{api,config,routes}/**}' --workingDir server/ server/server.js
 	# forever -w --watchIgnore '!{server.js}' server.js
+
+	# prod mode:
+	# forever server.js
+	
 fi
 
 cd ..
