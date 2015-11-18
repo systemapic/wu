@@ -355,7 +355,7 @@ body {
     padding: 13px 20px 13px 19px;
     z-index: 10000010;
     top: 27px;
-    width: 160px;
+    width: 200px;
     cursor: default;
     box-shadow: none;
     border-radius: 0 0 4px 4px;
@@ -498,7 +498,7 @@ body {
     background: #EEE;
 }
 .share-dropdown .share-item { 
-    padding-left: 30px;
+    padding-left: 50px;
     font-weight: 500;
 }
 
@@ -820,3 +820,52 @@ body {
 
 
 
+
+
+.contact-list-icon {
+    position: absolute;
+    top: 3px;
+    right: 2px;
+    display: none;
+    cursor: pointer;
+    color: #999;
+    font-size: 18px;
+}
+
+.contact {
+    color: rgb(60, 60, 60);
+}
+.project-contact {
+    color: #ccc;
+}
+.project-contact:hover {
+    color: #555;
+}
+.contact:hover .contact-list-icon {
+    display: block;
+}
+
+.project-contact:hover .contact-list-icon {
+    display: block;
+}
+.contact-list-icon:hover {
+    color: #555;
+}
+
+.chrome-user .chrome-left-item-name {
+    cursor: default;
+}
+
+.contact-list-icon:hover .project-tooltip {
+    opacity: 0.9;
+    visibility: visible;
+}
+
+.contact-add-tooltip {
+    left: -95px;
+    top: -48px;
+}
+
+.contact-list-icon:active {
+    color: #428BCA;
+}

@@ -44,15 +44,14 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// active layer
 		this.layerSelector = this._initLayout_activeLayers(false, false, this._midInnerScroller); // appending to this._midSection
 
-		// update style button
-		var buttonWrapper = Wu.DomUtil.create('div', 'button-wrapper', this._midInnerScroller);
-		this._updateStyleButton = Wu.DomUtil.create('div', 'smooth-fullscreen-save update-style', buttonWrapper, 'Update Style');
-
-		Wu.DomEvent.on(this._updateStyleButton, 'click', this._updateStyle, this);
-
 
 		// Create field wrapper
 		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
+
+		// update style button
+		var buttonWrapper = Wu.DomUtil.create('div', 'button-wrapper', this._midInnerScroller);
+		this._updateStyleButton = Wu.DomUtil.create('div', 'smooth-fullscreen-save update-style', buttonWrapper, 'Update Style');
+		Wu.DomEvent.on(this._updateStyleButton, 'click', this._updateStyle, this);		
 
 
 		// mark inited

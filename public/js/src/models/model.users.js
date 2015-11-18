@@ -14,9 +14,7 @@ Wu.User = Wu.Class.extend({
 	},
 
 	_listen : function () {
-
 		Wu.Mixin.Events.on('closeMenuTabs',   this._onCloseMenuTabs, this);
-		
 	},
 
 	initFiles : function () {
@@ -30,6 +28,49 @@ Wu.User = Wu.Class.extend({
 		files.forEach(function (file) {
 			this._files[file.uuid] = new Wu.Model.File(file);
 		}, this);
+	},
+
+	isContact : function () {
+		if (!app.Account) return console.error('too early!');
+		if (this.getUuid() == app.Account.getUuid()) return;
+
+		var isContact = _.contains(app.Account.getContactListUuids(), this.getUuid());
+
+		return isContact;
+	},
+
+	getContactListUuids : function () {
+		var uuids = [];
+		this.getContactList().forEach(function (c) {
+			uuids.push(c.uuid);
+		});
+		return uuids;
+	},
+
+	getContactList : function ()  {
+		return this.store.contact_list;
+	},
+
+	sendContactRequest : function (user) {
+
+		var options = {
+			contact : user.getUuid()
+		}
+
+		Wu.send('/api/user/requestContact', options, function (a, b) {
+
+			console.log('request sent!', a, b);
+
+
+			// set feedback 
+			app.feedback.setMessage({
+				title : 'Friend request sent',
+				// description : description
+			});
+
+
+		}, this);
+
 	},
 
 	getFiles : function () {

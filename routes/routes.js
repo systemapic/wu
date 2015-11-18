@@ -98,21 +98,6 @@ module.exports = function(app, passport) {
 		api.analytics.get(req, res);
 	});
 
-	// // =====================================
-	// // GET NOTIFIED OF DONE GRINDS =========
-	// // =====================================
-	// app.post('/grind/done', function (req, res) {
-	// 	api.socket.grindDone(req, res);
-	// });
-
-	// // =====================================
-	// // GET NOTIFIED OF DONE GRINDS =========
-	// // =====================================
-	// app.post('/grind/raster/done', function (req, res) {
-	// 	api.socket.grindRasterDone(req, res);
-	// });
-
-
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
 	// =====================================
@@ -135,7 +120,6 @@ module.exports = function(app, passport) {
 		api.upload.chunkedUpload(req, res);
 	});
 	
-
 	// =====================================
 	// CREATE NEW PROJECT  =================
 	// =====================================
@@ -157,14 +141,12 @@ module.exports = function(app, passport) {
 		api.project.addInvites(req, res);
 	});
 
-
 	// =====================================
 	// GET UPLOAD ==========================
 	// =====================================
 	app.get('/api/upload/get', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.getUpload(req, res);
 	});
-
 
 	// =====================================
 	// IMPORT DATA to POSTGIS ==============
@@ -187,14 +169,12 @@ module.exports = function(app, passport) {
 		api.portal.joinBeta(req, res);
 	});
 
-
 	// =====================================
 	// DELETE PROJECT   ====================
 	// =====================================
 	app.post('/api/project/delete', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.project.deleteProject(req, res);
 	});
-
 
 	// =====================================
 	// UPDATE PROJECT ======================
@@ -203,14 +183,12 @@ module.exports = function(app, passport) {
 		api.project.update(req, res);
 	});
 
-
 	// =====================================
 	// CHECK UNIQUE SLUG ===================
 	// =====================================
 	app.post('/api/project/unique', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.project.checkUniqueSlug(req, res);
 	});
-
 
 	// =====================================
 	// SET PROJECT HASH ====================
@@ -219,14 +197,12 @@ module.exports = function(app, passport) {
 		api.project.setHash(req, res);
 	});
 
-
 	// =====================================
 	// GET PROJECT HASH ====================
 	// =====================================
 	app.post('/api/project/hash/get', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.project.getHash(req, res);
 	});
-
 
 	// =====================================
 	// UPLOAD PROJECT LOGO  ================
@@ -235,15 +211,12 @@ module.exports = function(app, passport) {
 		api.upload.projectLogo(req, res);
 	});
 
-
 	// =====================================
 	// UPLOAD IMAGE ========================
 	// =====================================
 	app.post('/api/upload/image', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.upload.image(req, res);
 	});
-
-	// todo: access_tokens for all images.. lots of code to update client side tho..
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
@@ -252,14 +225,12 @@ module.exports = function(app, passport) {
 		api.file.sendImage(req, res);
 	});
 
-
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	app.get('/pixels/fit/*',passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.pixels.serveFitPixelPerfection(req, res);
 	});
-
 
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
@@ -275,7 +246,6 @@ module.exports = function(app, passport) {
 		api.pixels.serveScreenshot(req, res);
 	});
 
-
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
@@ -284,11 +254,6 @@ module.exports = function(app, passport) {
 		api.pixels.servePixelPerfection(req, res);
 	});
 
-
-	
-
-
-
 	// =====================================
 	// UPLOAD CLIENT LOGO  =================
 	// =====================================
@@ -296,16 +261,12 @@ module.exports = function(app, passport) {
 		api.upload.clientLogo(req, res);
 	});
 
-
-
-
 	// =====================================
 	// GET MAPBOX ACCOUNT ==================
 	// =====================================
 	app.post('/api/util/getmapboxaccount', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.provider.mapbox.getAccount(req, res);
 	});
-
 	
 	// =====================================
 	// CREATE SNAPSHOT =====================
@@ -315,14 +276,12 @@ module.exports = function(app, passport) {
 		api.pixels.createSnapshot(req, res);
 	});
 
-
 	// =====================================
 	// CREATE THUMBNAIL ====================
 	// =====================================
 	app.post('/api/util/createThumb', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.pixels.createThumb(req, res);
 	});
-
 
 	// =====================================
 	// CREATE PDF SNAPSHOT =================
@@ -331,8 +290,6 @@ module.exports = function(app, passport) {
 		api.pixels.createPDFSnapshot(req, res);
 	});
 
-
-
 	// =====================================
 	// AUTO-CREATE LEGENDS =================
 	// =====================================
@@ -340,14 +297,12 @@ module.exports = function(app, passport) {
 		api.legend.create(req, res);
 	});
 
-
 	// =====================================
 	// GET GEOJSON FILES ===================
 	// =====================================
 	app.post('/api/geojson', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.file.getGeojsonFile(req, res);
 	});
-
 	
 	// =====================================
 	// GET FILE DOWNLOAD ===================
@@ -355,7 +310,6 @@ module.exports = function(app, passport) {
 	app.get('/api/file/download', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.file.download(req, res);
 	});
-
 
 	// =====================================
 	// GET GEOJSON FILES ===================
@@ -377,7 +331,6 @@ module.exports = function(app, passport) {
 	app.post('/api/layer/downloadDataset', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.postgis.downloadDatasetFromLayer(req, res);
 	});
-
 	
 	// =====================================
 	// UPDATE FILE ===================
@@ -401,14 +354,12 @@ module.exports = function(app, passport) {
 		api.file.deleteFile(req, res);
 	});
 
-
 	// =====================================
 	// ADD/LINK FILE TO NEW PROJECT ========
 	// =====================================
 	app.post('/api/file/addtoproject', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.file.addFileToProject(req, res);
 	});
-
 
 	// =====================================
 	// DELETE LAYER(S) =====================
@@ -417,14 +368,12 @@ module.exports = function(app, passport) {
 		api.layer.deleteLayer(req, res);
 	});
 
-
 	// =====================================
 	// LAYERS ==============================
 	// =====================================
 	app.post('/api/layers', passport.authenticate('bearer', {session: false}), function (req, res) { 	// todo: layer/layers !! make all same...
 		api.layer.get(req, res);
 	});
-
 
 	// =====================================
 	// CREATE NEW LAYER ====================
@@ -434,14 +383,12 @@ module.exports = function(app, passport) {
 		api.layer.create(req, res);
 	});
 
-
 	// =====================================
 	// NEW OSM LAYERS ======================
 	// =====================================
 	app.post('/api/layers/osm/new', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.layer.createOSM(req, res);  	// todo: api.layer.osm.create()
 	});
-
 
 	// =====================================
 	// UPDATE LAYERS =======================
@@ -450,14 +397,12 @@ module.exports = function(app, passport) {
 		api.layer.update(req, res);
 	});
 
-
 	// =====================================
 	// RELOAD LAYER METADATA ===============
 	// =====================================
 	app.post('/api/layer/reloadmeta', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.layer.reloadMeta(req, res);
 	});
-
 
 	// =====================================
 	// SET CARTOCSS ========================
@@ -474,14 +419,12 @@ module.exports = function(app, passport) {
 		api.layer.getCartoCSS(req, res);
 	});
 
-
 	// =====================================
 	// UPDATE USER INFORMATION  ============
 	// =====================================
 	app.post('/api/user/update', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.user.update(req, res);
 	});
-
 
 	// =====================================
 	// CREATE NEW USER =====================
@@ -493,14 +436,12 @@ module.exports = function(app, passport) {
 		api.user.create(req, res);
 	});
 
-
 	// =====================================
 	// DELETE USER =========================
 	// =====================================
 	app.post('/api/user/delete', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.user.deleteUser(req, res);
 	});
-
 
 	// =====================================
 	// DELETE USER =========================
@@ -509,13 +450,12 @@ module.exports = function(app, passport) {
 		api.delegateUser(req, res);
 	});
 
-	// =====================================
-	// INVITE USER =========================
-	// =====================================
-	app.post('/api/user/invite', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.user.invite(req, res);
-	});
-
+	// // =====================================
+	// // INVITE USER =========================
+	// // =====================================
+	// app.post('/api/user/invite', passport.authenticate('bearer', {session: false}), function (req,res) {
+	// 	api.user.invite(req, res);
+	// });
 
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
@@ -531,6 +471,21 @@ module.exports = function(app, passport) {
 		api.user.invite(req, res);
 	});
 
+	// =====================================
+	// REQUEST CONTACT =============
+	// =====================================
+	app.post('/api/user/requestContact', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.user.requestContact(req, res);
+	});
+
+	// =====================================
+	// REQUEST CONTACT =============
+	// =====================================
+	app.get('/api/user/acceptContactRequest/*', function (req,res) {
+		console.log('REQUEST ACCEPTED!');
+
+		api.user.acceptContactRequest(req, res);
+	});
 
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
@@ -538,7 +493,6 @@ module.exports = function(app, passport) {
 	app.post('/api/invite/link', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.user.getInviteLink(req, res);
 	});
-
 
 	// =====================================
 	// access: SET PROJECT ACCESS  =========
@@ -596,7 +550,6 @@ module.exports = function(app, passport) {
 		api.auth.requestPasswordReset(req, res);
 	});
 
-
 	// =====================================
 	// CREATE PASSWORD =====================
 	// ===================================== 
@@ -632,14 +585,12 @@ module.exports = function(app, passport) {
 		res.end(configString);
 	});
 
-
 	// =====================================
 	// DEBUG: PHANTOMJS FEEDBACK ===========
 	// ===================================== 
 	app.post('/api/debug/phantom', passport.authenticate('bearer', {session: false}), function (req, res) {
 		res.end();
 	});
-
 
 	// =====================================
 	// LOGIN ===============================
@@ -648,7 +599,6 @@ module.exports = function(app, passport) {
 		api.portal.login(req, res);
 	});
 
-
 	// // =====================================
 	// // SIGNUP ==============================
 	// // =====================================
@@ -656,14 +606,12 @@ module.exports = function(app, passport) {
 	// 	api.portal.signup(req, res);
 	// });
 
-
 	// =====================================
 	// LOGOUT ==============================
 	// =====================================
 	app.get('/logout', function(req, res) {
 		api.portal.logout(req, res);
 	});
-
 
 	// =====================================
 	// INVITE ==============================
@@ -681,7 +629,6 @@ module.exports = function(app, passport) {
 		api.portal.invitation(req, res);
 	});
 
-
 	// // =====================================
 	// // SIGNUP ==============================
 	// // =====================================
@@ -690,7 +637,6 @@ module.exports = function(app, passport) {
 	// 	failureRedirect : '/signup', // redirect back to the signup page if there is an error
 	// 	failureFlash : true // allow flash messages
 	// }));
-
 
 	// =====================================
 	// LOGIN ===============================
@@ -701,14 +647,12 @@ module.exports = function(app, passport) {
 		failureFlash : true // allow flash messages
 	}));
 
-
 	// =====================================
 	// FORGOT PASSWORD =====================
 	// =====================================
 	app.post('/forgot', function (req, res) {
 		api.auth.forgotPassword(req, res);
 	});
-
 
 	// =====================================
 	// FORGOT PASSWORD =====================
@@ -723,13 +667,14 @@ module.exports = function(app, passport) {
 	// 	console.log('/register!!!', req.body);
 	// })
 
-
 	// =====================================
 	// WILDCARD PATHS ======================		
 	// =====================================
 	app.get('*', function (req, res) {
 		api.portal.wildcard(req, res);
 	});
+
+
 
 
 	// helper function : if is logged in
@@ -745,6 +690,5 @@ module.exports = function(app, passport) {
 			error : 'No access.'
 		}))
 	}
-
 	
 }

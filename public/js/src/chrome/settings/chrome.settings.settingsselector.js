@@ -80,7 +80,7 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 	_initContent : function () {
 
 		// title
-		this._title = Wu.DomUtil.create('div', 'chrome chrome-content settings-title', this._header, 'Settings');
+		// this._title = Wu.DomUtil.create('div', 'chrome chrome-content settings-title', this._header, 'Settings');
 
 		// tabs
 		this._initTabs();

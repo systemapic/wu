@@ -42,6 +42,49 @@ var api = module.parent.exports;
 // exports
 module.exports = api.portal = { 
 
+	// access_v2
+	invitation : function (req, res) {
+
+		console.log('api.portal.invitation');
+
+		// get client/project
+		var path = req.originalUrl.split('/');
+		var invite_token = path[3];
+
+		// get token from redis
+		var redis_key = 'invite:' + invite_token;
+		api.redis.tokens.get(redis_key, function (err, token_store) {
+
+			var stored_invite = api.utils.parse(token_store);
+
+			if (err || !stored_invite) return api.error.missingInformation(req, res);
+
+			var email = stored_invite.email;
+
+			// if logged in, and it's same user
+			if (req.isAuthenticated() && req.user && req.user.local.email == email) {
+
+				console.log('TODO: already registered! add projects to user and log in! ')
+				// means user is not in other user's contact list yet...
+
+
+				res.render('../../views/app.serve.ejs', {
+					hotlink : {},
+					access_token : req.session.access_token || {}
+				});
+
+			// if not logged in
+			} else {
+
+				res.render('../../views/invitation.ejs', {
+					invite : token_store,
+					access_token : req.session.access_token || {}
+				});
+			}
+		});
+	},
+
+
 	// process wildcard paths, including hotlinks
 	wildcard : function (req, res) {
 
@@ -108,45 +151,6 @@ module.exports = api.portal = {
 		});
 	},
 
-	invitation : function (req, res) {
-
-		console.log('api.portal.invitation');
-
-		// get client/project
-		var path = req.originalUrl.split('/');
-		var invite_token = path[3];
-
-		// get token from redis
-		var redis_key = 'invite:' + invite_token;
-		api.redis.tokens.get(redis_key, function (err, token_store) {
-
-			var stored_invite = api.utils.parse(token_store);
-
-			if (err || !stored_invite) return api.error.missingInformation(req, res);
-
-			var email = stored_invite.email;
-
-			// if logged in, and it's same user
-			if (req.isAuthenticated() && req.user && req.user.local.email == email) {
-
-				console.log('already registered! add projects to user and log in! ')
-
-
-				res.render('../../views/app.serve.ejs', {
-					hotlink : {},
-					access_token : req.session.access_token || {}
-				});
-
-			// if not logged in
-			} else {
-
-				res.render('../../views/invitation.ejs', {
-					invite : token_store,
-					access_token : req.session.access_token || {}
-				});
-			}
-		});
-	},
 
 
 	getBase : function (req, res) {
@@ -252,7 +256,7 @@ module.exports = api.portal = {
 
 		// get account
 		a.account = function (callback) {
-			api.user._getSingle({
+			api.user.getAccount({
 				user : account
 			}, callback);
 		}

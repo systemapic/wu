@@ -1,0 +1,373 @@
+/* JØLLE */
+/* JØLLE */
+/* JØLLE */
+
+.file-list-container {
+    margin-top: 10px;
+    }
+
+.file-list-container-file-list .data-list-line:hover,
+.file-list-container-file-list .data-list-line.editingFileName {
+    background: rgba(246, 246, 246, 0.54);
+    color: #579A84;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px #dedede, 0 0 5px 0 #eee;
+    }
+
+.file-list-container-file-list .data-list-line.editingFileName {
+    color: transparent;
+    }
+
+.file-list-container-file-list .data-list-line.file-selected {
+    background: rgba(246, 246, 246, 0.54);
+    color: #579A84;
+    border-radius: 3px;    
+    }    
+
+.file-list-container-file-list .data-list-line .file-popup-trigger {
+    margin-top: 0px;
+    margin-right: 4px;
+    opacity: 0.0;
+    }
+
+.file-list-container-file-list .data-list-line:hover .file-popup-trigger,
+.file-list-container-file-list .data-list-line.file-selected .file-popup-trigger,
+.file-list-container-file-list .data-list-line.editingFileName .file-popup-trigger {
+    opacity: 0.5;
+    }
+
+.file-popup-trigger:hover {
+    opacity: 1 !important;
+    }
+
+.file-selected:before {
+    content: '';
+    display: none;
+    }
+
+.chrome-right {
+    top: 9px;
+    }
+
+.data-list-line {
+    padding-top: 5px;
+    padding-bottom: 5px;    
+    }
+
+.chrome-data-top-title {
+    text-transform: uppercase;    
+    }
+
+
+
+
+.chrome-header-title {
+    padding-top: 15px;
+    padding-left: 26px;
+    border-bottom: none;
+    background: transparent; 
+    text-align: left; 
+    color: black; 
+    padding: 0;
+    }
+
+.file-list-container-file-list {
+    position: relative;
+    left: -5px;    
+    }
+
+.layer-list-container {
+    margin-top: 7px;    
+    }
+
+.layer-name-content {
+    text-indent: 34px;
+    }
+
+.data-list-line .chrome-switch-container {
+    left: 2px;
+    top: 5px;    
+    }
+
+.layer-radio {
+    left: -18px;
+    top: 6px;    
+    }
+
+.data-list-line:hover,
+.data-list-line.editingName {
+    background: #F8F8F8;
+    box-shadow: 0 0 0 1px #dedede, 0 0 5px 0 #eee;
+    border-radius: 3px;
+    color: #579A84;
+    }
+
+.data-list-line.editingName {
+    color: transparent;
+}
+
+.file-popup-trigger {
+    top: 4px;  
+    right: 3px;
+    opacity: 0;
+    color: black;
+    }
+
+.data-list-line.editingName .file-popup-trigger,
+.data-list-line:hover .file-popup-trigger {
+    opacity: 0.5;
+    }
+
+.file-popup-trigger:hover {
+    opacity: 1 !important;
+    }
+
+.layers-container {
+    margin-bottom: 20px;
+    }
+
+.baselayer-dropdown-wrapper {
+    padding-left: 0;
+    padding-right: 0;    
+    }
+
+.layer-name-input {
+    left: 35px;
+    padding-top: 2px;
+    width: 280px;
+    background: transparent;
+    font-weight: 600;
+    }
+
+
+
+.file-name-input {
+    background: transparent;
+    font-weight: 600;
+    padding-top: 5px;
+    height: 27px;
+    width: 315;
+    }
+
+
+.chrome-content-header {
+    font-size: 18px;
+    color: black;
+    padding-bottom: 3px;
+    }
+
+.file-list-separator {
+    border-top: 1px solid #ccc;
+    padding-top: 35px;
+    margin-top: 35px;
+    }
+
+.chrome-data-scroller {
+    padding-top: 20px;
+    }
+
+
+.chrome-content-section-wrapper.toggles-wrapper {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 3px;
+    padding: 15px;
+    padding-bottom: 10px;
+    padding-top: 6px;
+    background: white;
+    }
+
+
+
+
+
+.chrome.chrome-content.chrome-pane.styler .chrome-metafield-line {
+    font-size: 15px;
+    }
+
+.chrome-metafield-line-children .chrome-metafield-line {
+    border: none;
+    }
+
+
+/*.chrome.chrome-content.chrome-pane.styler .chrome-color-ball*/
+#color_ball_color {
+    border-radius: 0;
+    width: 34px;
+    height: 21px;
+    top: 7px !important;
+    right: 0;
+    }
+
+
+
+
+.chrome.chrome-content.chrome-pane.styler .chrome-metafield-line {
+    padding-top: 1px;
+    padding-bottom: 1px;
+    }
+
+
+.chrome-pane.styler .chrome-field-mini-input, 
+.chrome-pane.styler .chrome-field-mini-input:focus {
+    top: 6px;
+    }
+
+.chrome-color-range-wrapper {
+    top: 5px;
+    }
+
+
+.chrome-pane.styler .chrome-switch-container {
+    top: 11px;    
+    }
+
+
+.chrome.chrome-content.chrome-pane.styler .chrome-field-wrapper {
+    padding: 0px 30px 50px 30px;    
+    }
+
+
+
+
+.smooth-fullscreen-save.update-style {
+    font-size: 15px;
+    text-align: center;
+    padding: 8px;
+    font-weight: bold;
+    cursor: default;
+    }
+
+.marked-changed {
+    background: #FF5E5E;
+    color: #FCFCFC;
+    font-weight: 600;
+    border: none;
+    cursor: pointer !important;
+    }
+
+.marked-changed:hover {
+    background: red;
+    color: #FCFCFC;
+    }
+
+
+
+
+
+
+.chrome-content.settings-button {
+    margin-top: 3px;
+    font-size: 16px;
+    margin-right: 3px;
+    padding-bottom: 3px;
+    background: white;
+    border: 1px solid #999;
+    color: #999;
+    font-weight: 600;    
+    }
+
+.chrome-content.settings-button:hover {
+    background: #f6f6f6;    
+    }
+
+.chrome-content.settings-button:active {
+    background: #f0f0f0;
+    }
+
+.chrome-content.settings-button.active-tab {
+    background: #e0e0e0;
+    color: #333;    
+    }
+
+.chrome-content.settings-button.active-tab:hover {
+    background: #c0c0c0;
+    }
+
+.chrome-content.settings-button.active-tab:active {
+    background: #b0b0b0;
+    }
+
+
+
+
+
+
+.chrome-right {
+    top: 5px;
+    }
+
+.chrome-content.settings-tabs-wrapper {
+    top: 128px;
+    }
+
+.settingsSelector-header {
+    padding: 20px;
+    padding-top: 9px;    
+    padding-bottom: 13px;    
+    }
+
+
+
+
+.chrome-middle-section-outer-scroller {
+    width: 410px;
+}
+
+.chrome.chrome-content.chrome-pane.styler .chrome-field-wrapper {
+        padding: 0px 20px 50px 20px;
+}
+
+.chrome.chrome-content.styler-content.active-layer.wrapper {
+    padding-left: 20px;
+}
+
+
+.chrome-middle-section-inner-scroller {
+        padding-right: 13px;
+}
+
+input.chrome-field-input {
+    background: transparent;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.chrome.chrome-container.chrome-right:before {
+    content: '';
+    background: black;
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    left: 402px;
+    opacity: 0.05;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

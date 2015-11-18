@@ -87,9 +87,6 @@ Wu.Invite = Wu.Class.extend({
 		button.setAttribute('type', 'submit');
 		button.setAttribute('name', 'login');
 
-
-
-
 		// shader
 		Wu.DomEvent.on(wrapper, 'mouseenter', function () {
 			this._rightshader.style.display = 'none';
@@ -113,7 +110,6 @@ Wu.Invite = Wu.Class.extend({
 		var input_wrapper = Wu.DomUtil.create('form', 'input-wrapper-right', wrapper);
 		input_wrapper.setAttribute('action', '/register');
 		input_wrapper.setAttribute('method', 'post');
-
 
 		// first name
 		// var firstname_label = Wu.DomUtil.create('div', 'input-label rightside firstname', input_wrapper, 'First Name');
@@ -150,13 +146,9 @@ Wu.Invite = Wu.Class.extend({
 		invite_token.style.display = 'none';
 		invite_token.setAttribute('name', 'invite_token');
 
-
 		// button
 		var button = Wu.DomUtil.create('button', 'button', input_wrapper, 'Sign up');
 		button.setAttribute('type', 'submit');
-
-
-
 
 
 		// shader

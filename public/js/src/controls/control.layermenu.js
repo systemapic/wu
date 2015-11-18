@@ -497,7 +497,11 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	initSortable : function () {
-		if (!this.project.isEditor()) return;
+
+		// console.log('this.project', this.project);
+		// console.log('this._project', this._project);
+
+		if (!this._project.isEditor()) return;
 		this._sortingEnabled = true;
 
 		// iterate over all layers
