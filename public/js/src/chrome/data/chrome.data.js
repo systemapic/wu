@@ -81,7 +81,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 		// Top container (with upload button)
 		this.topContainer = Wu.DomUtil.create('div', 'chrome-data-top', this._container);
-		this.topTitle = Wu.DomUtil.create('div', 'chrome-data-top-title', this.topContainer, 'Data Library');
+		// this.topTitle = Wu.DomUtil.create('div', 'chrome-data-top-title', this.topContainer, 'Data Library');
 
 		// close event
 		Wu.DomEvent.on(this._innerContainer, 'click', this._closeActionPopUps, this);
@@ -93,7 +93,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_initLayerListContainer : function () {
 
 		// HEADER
-		this._layerListHeader = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer);
+		// this._layerListHeader = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer);
 
 		// LAYER LIST OUTER SCROLLER
 		this._layerListOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
@@ -102,7 +102,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// List container
 		this._layerListContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this._layerListOuterScroller);
 
-		
 		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListContainer, 'Layers for [project name]');
 
 		// Containers
@@ -134,8 +133,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// HEADER
 		this._fileListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListContainer, 'My Data');
 
+		// Upload button container
+		this._uploadButtonContainer = Wu.DomUtil.create('div', 'upload-button-container', this._layerListContainer);
+
 		// Containers
 		this._filesContainer = Wu.DomUtil.create('div', 'files-container', this._layerListContainer);
+
 	
 	},
 
@@ -280,8 +283,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		if ( !this._project ) return;
 
-		// Upload button
-		this._initUploadButton();
+		// // Upload button
+		// this._initUploadButton();
 
 		// Empty containers
 		if ( this._layersContainer ) this._layersContainer.innerHTML = '';
@@ -302,6 +305,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// File list
 		this._initFileLists();
 		this._refreshFiles();
+
+
+		// Upload button
+		this._initUploadButton();		
 		
 
 	},
@@ -321,7 +328,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		if ( this.uploadButton ) return;
 
 		// Create Upload Button
-		this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this.topContainer);
+		// this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this.topContainer);
+
+		this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this._uploadButtonContainer);
+		
 		this.uploadButton.innerHTML = '<i class="fa fa-cloud-upload"></i>Upload data';
 
 
