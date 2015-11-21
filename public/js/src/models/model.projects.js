@@ -82,9 +82,14 @@ Wu.Project = Wu.Class.extend({
 		this.store.baseLayers.push(layer);
 		this._update('baseLayers');
 	},
-
+	
 	removeBaseLayer : function (layer) {
 		_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.getUuid(); });
+		this._update('baseLayers');
+	},
+
+	setBaseLayer : function (layer) {
+		this.store.baseLayers = layer;
 		this._update('baseLayers');
 	},
 
@@ -140,12 +145,9 @@ Wu.Project = Wu.Class.extend({
 		var parsed = JSON.parse(data);
 
 		console.error('TODO: created layer from GeoJSON, needs to be added to Data.');
-		
-		
 	},
 
 	createLayer : function () {
-
 	},
 
 	setActive : function () {
@@ -169,7 +171,6 @@ Wu.Project = Wu.Class.extend({
 	addNewLayer : function (layer) {
 		this.addLayer(layer);
 	},
-
 
 	_reset : function () {
 		// this.removeHooks();
@@ -263,7 +264,6 @@ Wu.Project = Wu.Class.extend({
 
 	setAccess : function (projectAccess) {
 
-
 		var options = {
 			project : this.getUuid(),
 			access : projectAccess
@@ -278,12 +278,9 @@ Wu.Project = Wu.Class.extend({
 
  		}.bind(this), this);
 
- 		
-
 	},
 
 	addInvites : function (projectAccess) {
-
 
 		var options = {
 			project : this.getUuid(),
@@ -302,9 +299,6 @@ Wu.Project = Wu.Class.extend({
  			this.store.access = updatedAccess;
 
  		}.bind(this), this);
-
- 		
-
 	},
 
 	getAccess : function () {
@@ -1255,7 +1249,7 @@ Wu.Project = Wu.Class.extend({
 	isPublic : function () {
 		var access = this.getAccess();
 		var isPublic = access.options.isPublic;
-		return !!isPublic;
+		return !!isPublic
 	},
 
 	isDownloadable : function () {

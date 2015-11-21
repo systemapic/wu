@@ -20,3 +20,21 @@
 #header {
 	width: auto !important;
 	}
+
+.chrome-menu-button,
+.chrome-button.datalib,
+.chrome-button.settingsSelector,
+.chrome-button.settings,
+.chrome-button.share,
+.chrome-button.layer,
+.leaflet-control-layermenu.leaflet-control,
+.leaflet-top.leaflet-left,
+.leaflet-control-attribution.leaflet-control,
+.description-control-header-toggle,
+.leaflet-control-mouseposition.leaflet-control {
+	display: none !important;
+	}
+
+.chrome-buttons {
+	left: 0 !important;
+	}	

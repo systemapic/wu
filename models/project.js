@@ -3,6 +3,8 @@
 // load the things we need
 var mongoose = require('mongoose');
 var timestamps = require('mongoose-times');
+var _ = require('lodash-node');
+
 
 // define the schema for our project model
 var projectSchema = mongoose.Schema({
@@ -151,6 +153,23 @@ var projectSchema = mongoose.Schema({
 	pending : [String],
 	
 });
+
+projectSchema.methods.isPublic = function () {
+    return this.access.options.isPublic;
+};
+projectSchema.methods.isShareable = function () {
+    return this.access.options.share;
+};
+projectSchema.methods.isDownloadable = function () {
+    return this.access.options.download;
+};
+projectSchema.methods.isEditable = function (user_uuid) {
+    return _.contains(this.access.edit, user_uuid) || this.createdBy == user_uuid;
+};
+projectSchema.methods.getUuid = function (user_uuid) {
+    return this.uuid;
+};
+
 
 // timestamps plugin
 projectSchema.plugin(timestamps);	// adds created and lastUpdated fields automatically

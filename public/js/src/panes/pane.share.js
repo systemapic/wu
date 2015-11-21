@@ -59,7 +59,6 @@ Wu.Share = Wu.Pane.extend({
 		// events
 		Wu.DomEvent.on(this._shareImageButton,  'click', this._shareImage, this);
 		Wu.DomEvent.on(this._sharePrintButton,  'click', this._sharePrint, this);
-		// Wu.DomEvent.on(this._shareInviteButton, 'click', this._shareInvite, this);
 	},
 
 	_registerButton : function () {
@@ -74,10 +73,9 @@ Wu.Share = Wu.Pane.extend({
 			trigger : this._togglePane,
 			context : this,
 			project_dependent : true
-			
 		});
 
-		// 	
+		// share icon
 		this._shareButton.innerHTML = '<i class="fa fa-paper-plane"></i>';
 	},
 

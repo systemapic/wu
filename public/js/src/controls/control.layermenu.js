@@ -5,6 +5,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	options: {
 		position : 'bottomright' 
+		// position : 'bottomleft' 
 	},
 
 	onAdd : function (map) {
@@ -16,10 +17,13 @@ L.Control.Layermenu = Wu.Control.extend({
 		var _innerScroller 	= Wu.DomUtil.create('div', 'inner-scroller', this._layermenuOuter);
 		this._content 		= Wu.DomUtil.createId('div', 'layer-menu-inner-content', _innerScroller);
 
-		// xoxoxoxoox
 		this._bottomContainer = Wu.DomUtil.create('div', 'layers-bottom-container', this._layermenuOuter);
 
 		this._innerContainer.appendChild(this._layermenuOuter);
+
+
+		this._isOpen = true;
+		this.registerTopButton();
 
 		// add some divsscroller-frame
 		this.initLayout();
@@ -30,6 +34,43 @@ L.Control.Layermenu = Wu.Control.extend({
 		// nb! content is not ready yet, cause not added to map! 
 		return this._innerContainer;
 
+	},
+
+	registerTopButton : function () {
+
+
+	        var top = app.Chrome.Top;
+
+	        // add a button to top chrome
+	        this._layerButton = top._registerButton({
+	            name : 'layer',
+	            className : 'chrome-button layer',
+	            trigger : this.toggleLayerMenu,
+	            context : this,
+	            project_dependent : false
+	        });
+
+	        this._layerButton.innerHTML = '<i class="top-button fa fa-bars"></i> Layers';	        
+	        
+
+	},
+
+	toggleLayerMenu : function () {
+		this._isOpen ? this.close() : this.open();
+	},
+
+	open : function  () {
+		this._isOpen = true;
+		Wu.DomUtil.removeClass(this._innerContainer, 'displayNone');
+
+		Wu.DomUtil.removeClass(this._layerButton, 'rounded-layer-button');
+	}, 
+
+	close : function () {
+		this._isOpen = false;
+		Wu.DomUtil.addClass(this._innerContainer, 'displayNone');
+
+		Wu.DomUtil.addClass(this._layerButton, 'rounded-layer-button');
 	},
 
 	_addTo : function () {
@@ -385,6 +426,8 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	// enter edit mode of layermenu
 	enableEdit : function () {
+
+		// PØLSE
 
 		if (this.editMode) return;
 

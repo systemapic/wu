@@ -130,7 +130,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			label : 'Invite people to view these projects <span class="optional-medium invite">(optional)</span>',
 			content : toggles_wrapper,
 			container : this._fullscreen._inner,
-			sublabel : 'Users will get read-only access to these project'
+			sublabel : 'Users will get read-only access to these projects'
 		});
 
 		// create invite input
@@ -139,7 +139,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			label : 'Invite people to edit these projects <span class="optional-medium invite">(optional)</span>',
 			content : toggles_wrapper,
 			container : this._fullscreen._inner,
-			sublabel : 'Users will get full edit access to these the project'
+			sublabel : 'Users will get full edit access to these projects'
 		});
 
 
@@ -150,6 +150,88 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// save button trigger
 		Wu.DomEvent.on(saveBtn, 'click', this._sendInvites, this);
 
+	},
+
+
+	// icon on user
+	_inviteToProject : function (user, e) {
+
+		console.log('invite to project', user, e, this._project);
+
+		// stop propagation
+		e && Wu.DomEvent.stop(e);
+		
+		// create fullscreen
+		this._fullscreen = new Wu.Fullscreen({
+			title : '<span style="font-weight:200;">Invite ' + user.getFullName() + ' to projects</span>',
+			innerClassName : 'smooth-fullscreen-inner invite',
+		});
+
+		// clear invitations
+		this._access = {
+			edit : [],
+			read : []
+		}
+
+		// shortcut
+		var content = this._fullscreen._content;
+
+
+		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
+
+		// create invite input for projects
+		this._createInviteInput({
+			type : 'read',
+			label : 'Invite ' + user.getFullName() + ' to view these projects',
+			content : toggles_wrapper,
+			container : this._fullscreen._inner,
+			sublabel : 'The user will get read-only access to these project'
+		});
+
+		// create invite input
+		this._createInviteInput({
+			type : 'edit',
+			label : 'Invite ' + user.getFullName() + ' to edit these projects',
+			content : toggles_wrapper,
+			container : this._fullscreen._inner,
+			sublabel : 'The user will get full edit access to these project'
+		});
+
+
+		// save button
+		var saveBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite', content, 'Invite');
+		var save_message = Wu.DomUtil.create('div', 'invite-success-message', content, '');
+		Wu.DomEvent.on(saveBtn, 'click', this._updateInvites, this);
+
+		this._access.user = user;
+		
+
+	},
+
+	_updateInvites : function () {
+
+		var reads = []; 
+		var edits = [];
+		var user = this._access.user;
+		var read = this._access.read;
+		var edit = this._access.edit;
+
+		this._access.read.forEach(function (r) {
+			reads.push(r.project.getUuid());
+		});
+		this._access.edit.forEach(function (e) {
+			edits.push(e.project.getUuid());
+		});
+
+		// invite
+		user.inviteToProjects({
+			read : reads,
+			edit : edits
+		});
+
+		// close
+		this._fullscreen.close();
+	
 	},
 
 	_divs : {
@@ -403,6 +485,8 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		},this);
 
+
+
 	},
 
 	_closeInviteInputs : function () {
@@ -520,17 +604,9 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// UPDATE
 		eachUser
 			.classed('contact', function (d) {
-				// var uuid = d.getUuid();
-				// var myId = app.Account.getUuid();
-				// if ( uuid == myId ) return true;
-				// return false;
 				return d.isContact();
 			})
 			.classed('project-contact', function (d) {
-				// var uuid = d.getUuid();
-				// var myId = app.Account.getUuid();
-				// if ( uuid == myId ) return true;
-				// return false;
 				return !d.isContact();
 			})		
 
@@ -549,9 +625,60 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// Add user card
 		this.addUserCard(eachUser);
 
+		// add icon to invite to projects
+		this.create_inviteToProjectIcon(eachUser);			
+
 		// add icon to add contact
-		this.create_addContactIcon(eachUser);				
+		this.create_addContactIcon(eachUser);	
+
 	
+	},
+
+	create_inviteToProjectIcon : function (parent) {
+
+		// Bind
+		var nameContent = 
+			parent
+			.selectAll('.contact-invite-icon')
+			.data(function(d) {
+
+				// if user is not a contact
+				var a = d.isContact() ? [d] : [];
+				return a;
+			})
+
+		// Enter
+		nameContent
+			.enter()
+			.append('i')
+			.classed('contact-invite-icon', true)
+			.classed('fa', true)
+			.classed('fa-arrow-circle-right', true)
+			
+
+		// Update
+		nameContent
+			.on('click', function (d) {
+
+				// click on icon
+				this._inviteToProject(d);
+
+			}.bind(this));
+
+		// add tooltip
+		nameContent
+			.html(function (d) {
+				var tooltipWidth = 123 + 'px';
+				var tooltipText = 'Invite to projects';
+				var innerHTML = '<div class="absolute"><div class="project-tooltip contact-invite-tooltip" style="width:' + tooltipWidth + '">' + tooltipText + '</div></div>'
+				return innerHTML;
+			})
+		// Exit
+		nameContent
+			.exit()
+			.remove();
+
+
 	},
 
 	create_addContactIcon : function (parent) {

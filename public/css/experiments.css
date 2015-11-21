@@ -286,8 +286,8 @@ body {
     opacity: 1;
     border-left: 1px solid gainsboro;
     height: 40px;
-    padding-left: 70px;
-    padding-right: 70px;
+    padding-left: 50px;
+    padding-right: 50px;
     top: 0;
     left: 0;
     font-size: 14px;
@@ -869,3 +869,35 @@ body {
 .contact-list-icon:active {
     color: #428BCA;
 }
+
+.contact-invite-icon {
+    position: absolute;
+    top: 3px;
+    right: 2px;
+    display: none;
+    cursor: pointer;
+    color: #999;
+    font-size: 18px;
+}
+.contact:hover .contact-invite-icon {
+    display: block;
+}
+
+.project-contact:hover .contact-project-icon {
+    display: block;
+}
+.contact-project-icon:hover {
+    color: #555;
+}
+.contact-invite-icon:hover .project-tooltip {
+    opacity: 0.9;
+    visibility: visible;
+}
+.contact-invite-icon:active {
+    color: #428BCA;
+}
+.contact-invite-tooltip {
+    left: -115px;
+    top: -48px;
+}
+

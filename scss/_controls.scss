@@ -678,7 +678,7 @@
 .leaflet-bar a:first-child,
 .leaflet-bar a:last-child,
 .leaflet-control-styleeditor-interior {
-	border-radius: 0px !important;
+	/*border-radius: 0px !important;*/
 	}	
 	
 .leaflet-control-styleeditor-interior {
@@ -1618,11 +1618,19 @@
 	color: #454545;
 	font-weight: 500;
 	font-size: 13px;
-	background-color: #EEEEEE !important;	
+	/*background-color: #EEEEEE !important;	*/
+	background-color: white !important;	
 	}
 
+.layer-menu-item-wrap:hover {
+	background-color: #EEEEEE !important;		
+	}
+
+
+
 /* Layer Folder color coding */
-.menufolder {
+.layer-menu-item-wrap.menufolder,
+.layer-menu-item-wrap.menufolder:hover {
 	font-weight: 900;
 	background-image: none !important;
 	background-color: #3C4759 !important; 

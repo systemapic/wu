@@ -567,7 +567,7 @@ Wu.App = Wu.Class.extend({
 		// get project
 		var project = app.Projects[projectUuid];
 		
-		// return if n§o such project
+		// return if no such project
 		if (!project) return false;
 
 		// set project
@@ -587,17 +587,8 @@ Wu.App = Wu.Class.extend({
 			this._renderHash(this, json);
 		}
 
-		// acticate legends for baselayers
-		// app.MapPane._controls.legends.refreshAllLegends();
-
-		// remove startpane
-		if (this.StartPane) this.StartPane.deactivate();
-
 		// add phantomJS stylesheet		
 		isThumb ? app.Style.phantomJSthumb() : app.Style.phantomJS();
-
-		// avoid Loading! etc in status
-		// app.setStatus('systemapic'); // too early
 
 	},
 	

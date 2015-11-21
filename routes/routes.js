@@ -482,9 +482,14 @@ module.exports = function(app, passport) {
 	// REQUEST CONTACT =============
 	// =====================================
 	app.get('/api/user/acceptContactRequest/*', function (req,res) {
-		console.log('REQUEST ACCEPTED!');
-
 		api.user.acceptContactRequest(req, res);
+	});
+
+	// =====================================
+	// INVITE TO PROJECTS ==================
+	// =====================================
+	app.post('/api/user/inviteToProjects', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.user.inviteToProjects(req, res);
 	});
 
 	// =====================================
