@@ -767,7 +767,7 @@ input.chrome-field-input {
     }
 
 #layer-menu-inner-content {
-    border-radius: 0px 0px 4px 4px;
+    border-radius: 0px 0px 0px 4px;
     }
 
 .edit-mode #layer-menu-inner-content {
@@ -775,7 +775,7 @@ input.chrome-field-input {
     }
 
 .middle-item:after {
-    border-radius: 0px 0px 4px 4px;
+    border-radius: 0px 0px 0px 4px;
     }
 
 
