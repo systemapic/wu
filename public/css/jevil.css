@@ -6,14 +6,17 @@
     margin-top: 10px;
     }
 
+
+/* XOXOXOXOX */
 .file-list-container-file-list .data-list-line:hover,
 .file-list-container-file-list .data-list-line.editingFileName {
-    /*background: rgba(246, 246, 246, 0.54);*/
-    background: #EEE;
-    /*color: #579A84;*/
+    
     color: black;
+
+    /*    
+    background: #EEE;    
     border-radius: 3px;
-    /*box-shadow: 0 0 0 1px #dedede, 0 0 5px 0 #eee;*/
+    */
     }
 
 .file-list-container-file-list .data-list-line.editingFileName {
@@ -22,7 +25,9 @@
 
 
 /* XOXOXOXO */
-.file-list-container-file-list .data-list-line.file-selected {
+/*.file-list-container-file-list */
+.data-list-line.file-selected,
+.data-list-line.file-selected:hover {
     /*background: rgba(246, 246, 246, 0.54);*/
     color: #579A84;
     /*border-radius: 3px;    */
@@ -56,6 +61,7 @@
 .data-list-line {
     padding-top: 5px;
     padding-bottom: 5px;    
+    padding-left: 0;
     }
 
 .chrome-data-top-title {
@@ -86,7 +92,7 @@
     }
 
 .layer-name-content {
-    text-indent: 38px;
+    text-indent: 43px;
     }
 
 .data-list-line .chrome-switch-container {
@@ -104,11 +110,12 @@
 
 .data-list-line:hover:after,
 .data-list-line.editingName:after,
-.file-selected {
+.data-list-line.editingFileName:after,
+.file-selected:after {
     content: '';
     position: absolute;
     left: -40px;
-    width: 395px;
+    width: 420px;
     height: 100%;
     background: #EEE;
     top: 0;
@@ -119,11 +126,38 @@
     padding-left: 0;
     }
 
+.chrome-data-outer-scroller {    
+    width: 402px;
+    }
+
+
 .chrome-data-scroller {
     padding-left: 28px;
-    width: 400px;    
+    padding-right: 25px;
+    /*width: 400px;    */
+    width: 402px;
     }    
 
+
+/*#layer-menu-inner-content {
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 1px;
+    }*/
+
+
+/*.layer-menu-item-wrap:hover:before {
+    content: '';
+    position: absolute;
+    left: 0px;
+    width: 100%;
+    background: #EEE;
+    color: black;
+    height: 100%;
+    opacity: 0.2;
+    z-index: -1;
+    }
+*/
 
 .data-list-line:hover,
 .data-list-line.editingName {
@@ -142,14 +176,51 @@
 
 
 
+.file-action {
+    position: relative;
+}
+
+
+.file-action:hover:after {
+    content: '';
+    position: absolute;
+    width: 142px;
+    height: 100%;
+    background: #EEE;
+    left: -19px;
+    top: 0;
+    z-index: -1;
+    }
+
+
 
 
 
 .file-popup-trigger {
-    top: 4px;  
-    right: 3px;
+    width: 20px;
+    height: 20px;
+    top: 3px;  
+    right: -5px;
     opacity: 0;
     color: black;
+    }
+
+.file-popup-trigger:before {
+    top: -2px;
+    right: 4px;    
+    }
+
+.files-container .file-popup-trigger {
+    right: -4px;
+    top: 13px;    
+    }
+
+.files-container .file-popup {
+    top: 37px;
+    }
+
+.file-popup {
+    right: -5px;
     }
 
 .data-list-line.editingName .file-popup-trigger,
@@ -186,6 +257,8 @@
     padding-top: 5px;
     height: 27px;
     width: 315;
+
+    left: -5px;
     }
 
 
@@ -193,6 +266,10 @@
     font-size: 18px;
     color: #3C4759;
     padding-bottom: 3px;
+
+    font-size: 21px;
+    font-weight: 600;
+
     }
 
 .file-list-separator {
@@ -392,7 +469,7 @@ input.chrome-field-input {
 
 
 
-.chrome.chrome-container.chrome-right:before {
+/*.chrome.chrome-container.chrome-right:before {
     content: '';
     background: black;
     position: absolute;
@@ -401,7 +478,7 @@ input.chrome-field-input {
     height: 100%;
     left: 402px;
     opacity: 0.05;
-    }
+    }*/
 
 .chrome-upload-button {
     position: relative;
@@ -417,16 +494,432 @@ input.chrome-field-input {
     padding: 0;
     }
 
-
 .files-container {
-    padding-top: 10px;
-}
-
+    padding-top: 2px;
+    }
 
 .chrome-switch-container {
     zoom: 1.1;
-}
+    }
 
 .share-dropdown .share-item {
     padding-left: 18px;    
+    }
+
+.chrome-menu-button {
+    text-indent: 1px;
+    }
+
+.smooth-fullscreen .chrome-switch-container {
+    zoom: 1;
+    }
+
+
+
+
+/*.mini-user-inner {
+    padding-left: 8px;
+    }
+
+.mini-user-avatar {
+    display: none;
+    }
+*/
+
+.active-project,
+.active-project:hover {
+    background: #71c4a8 !important;    
+    }
+
+.active-project:hover {
+    /*background: #67b097;    */
+    }
+
+
+.project-icon {
+    color: #CCC;    
+    }    
+
+.active-project .project-icon {
+    color: white;
+    }
+
+
+
+
+
+
+.chrome-left-title {
+    margin-top: 0;
+    padding-bottom: 5px;
+    margin-left: 23px;
+    color: #3C4759;    
+    }
+
+
+.chrome-left-container.contacts {
+    margin-top: 28px;    
+    }
+
+/*.chrome-left-new-button {
+    width: 26px;
+    height: 26px;
+    font-weight: 600;
+    font-size: 27px;
+    text-align: center;
+    padding: 0;     
+    line-height: 20px;           
+    }*/
+
+.chrome-left-invite-users,
+.chrome-left-invite-users:hover {
+    border: none;
+    }
+
+.chrome-left-invite-users:hover {
+    color: black;
+    }
+
+.chrome-user .chrome-left-item-name {
+    /* font-weight: 600; */
+    }
+
+
+.chrome-left-itemcontainer:hover {
+    background: #EEE;    
+    }
+
+.chrome-content.title, 
+.chrome-content.active-layer.title {
+    font-size: 21px;
+    font-weight: 600;
+    text-transform: none;
+    }
+
+.chrome.chrome-content.cartocss.title {
+    font-size: 21px;
+    margin: 5px 5px 5px 20px;
+    font-weight: 600;
+    top: -5px;
+    position: relative;
+    }
+
+.chrome.chrome-content.styler-content.active-layer.wrapper {
+    padding-bottom: 20px;
+    }
+
+.layer-active .layer-menu-flyto {
+    display: block;
+    }
+
+.leaflet-top.leaflet-left {
+    margin-top: 39px;
+    margin-left: 2px;    
+    }
+
+
+
+.leaflet-draw.leaflet-control {
+    margin-left: 5px !important;    
+    }
+
+
+.cpu-wrapper {
+    width: 14px;
+    }
+
+
+
+
+
+
+.leaflet-control-layermenu .scroller-frame,
+.description-control-content-box {
+    overflow: hidden;
+    }
+
+/* LAYER MENU BOTTOM LEFT */
+
+/*
+
+.leaflet-control-attribution.leaflet-control {
+    display: none;
+    }
+
+.leaflet-control-layermenu.leaflet-control {
+    height: auto;
+    bottom: 0;
+    position: relative;
+    top: auto;
+    width: 255px;
+    left: 3px;
+    }
+
+.leaflet-control-layermenu .scroller-frame {
+    position: relative;
+    }
+
+.enable-edit-switch-container-outer {
+    top: 0;
+    position: absolute;    
+    }
+
+.layers-bottom-container {
+    left: -2px;
+    }
+
+*/
+
+
+/*
+
+.leaflet-bottom.leaflet-right {
+    position: absolute;
+    height: auto;
+    top: auto;
+    bottom: 0;
+    }
+
+.leaflet-control-description.leaflet-control {
+    position: relative !important;
+    }
+
+.leaflet-control-layermenu.leaflet-control {
+    height: auto;
+    bottom: 0;
+    position: relative;
+    top: auto;
+    width: 255px;
+    left: 3px;
+    }
+
+.leaflet-control-layermenu .scroller-frame {
+    position: relative;
+    }
+*/
+
+
+
+
+
+
+
+.leaflet-control-layermenu.leaflet-control {
+        right: -6px;
+}
+
+.chrome-button.layer {
+    margin-right: 6px;
+}
+
+.cpu-wrapper {
+    display: none;
+}
+
+.chrome-button.layer {
+    /*float: right;*/
+    position: absolute;
+    right: 0;
+    width: 246px;
+    border: none;    
+    margin-right: 0;
+}
+
+.leaflet-right .leaflet-control {
+    top: 40px;
+}
+
+/*.layer-menu-item-wrap {
+    background-color: transparent !important;
+}
+
+.layer-menu-item-wrap:hover {
+    background-color: #EEE !important;
+}*/
+
+.layer-active .layer-menu-flyto {
+    right: -2px;
+}
+
+
+
+
+/*.file-list-container */
+.data-list-line:nth-child(odd):before {
+    content: '';
+    position: absolute;
+    left: -28px;
+    width: 402px;
+    height: 100%;
+    background: #fff;
+    z-index: -1;
+    opacity: 1;
+    top: 0;    
+    }
+
+.file-list-container .data-list-line {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    }
+
+.rounded-layer-button {
+    border-radius: 0px 0px 0px 4px;
+    }
+
+#layer-menu-inner-content {
+    border-radius: 0px 0px 4px 4px;
+    }
+
+.edit-mode #layer-menu-inner-content {
+    border-radius: 0px 0px 0px 0px;
+    }
+
+.middle-item:after {
+    border-radius: 0px 0px 4px 4px;
+    }
+
+
+.leaflet-control-attribution.leaflet-control {
+    border-radius: 3px;
+    margin-left: 5px;
+    margin-bottom: 4px;
+    background: rgba(60, 71, 89, 0.6) !important;
+    }
+
+
+
+#app {
+    min-width: 1100px;
+    }
+
+
+.chrome-button.chrome-project-title,
+.chrome-button.chrome-client-logo {
+    cursor: default;
+}
+
+
+
+
+.leaflet-left .leaflet-control {
+    box-shadow: none !important;
+}
+
+
+
+
+
+/*.leaflet-control-zoom.leaflet-bar.leaflet-control {
+    padding: 15px;    
+}
+*/
+
+
+
+
+.leaflet-control-zoom-out, 
+.leaflet-control-zoom-in {
+    width: 30px !important;
+    height: 30px !important;
+    }
+
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+    background-image: none;
+    color: black !important;
+    font-size: 22px !important;
+    text-indent: 0 !important;    
+    }
+
+.leaflet-bar {
+    box-shadow: none !important;
+    }
+
+.leaflet-bar a, .leaflet-bar a:hover {
+    width: 30px !important;
+    height: 30px !important;
+    }
+
+.leaflet-draw-toolbar a:before {
+    width: 30px !important;
+    height: 30px !important;    
+    }
+
+.leaflet-control-search .search-button {
+    width: 30px !important;
+    height: 30px !important;
+
+    background: url('images/search-icon.png') no-repeat 4px -19px !important;
+    }
+
+.leaflet-control-search .search-button:hover {
+    background: url('images/search-icon.png') no-repeat 4px 5px !important;
+}
+
+.leaflet-control-search.leaflet-control {
+    width: 30px !important;
+    height: 30px !important;
+    margin-left: 5px !important;
+    border-radius: 4px !important;
+    }
+
+.leaflet-draw-draw-polygon:before {
+    background-position: -29px 0px !important;    
+    }
+
+.leaflet-draw-section, .leaflet-draw-draw-polygon {
+    width: 30px !important;
+    height: 30px !important;
+    }
+
+.leaflet-control-zoom.leaflet-bar.leaflet-control,
+.leaflet-draw-toolbar.leaflet-bar.leaflet-draw-toolbar-top {
+    border-radius: 4px !important;
+    }
+
+.leaflet-control-zoom-in {
+    border-radius: 4px 4px 0px 0px !important;
+}
+
+.leaflet-control-zoom-out {
+    border-radius: 0px 0px 4px 4px !important;
+}
+
+
+
+
+.leaflet-popup-content-wrapper {
+    border-radius: 4px;
+    box-shadow: none;    
+}
+
+.description-control-content-box {
+    border-radius: 0 0 4px 4px;
+}
+
+.description-multiple-toggle-wrapper {
+    border-radius: 4px 4px 0 0;
+}
+
+
+.chrome-left-itemcontainer {
+    margin-right: 0;
+}
+
+.active-project, .active-project:hover {
+    border-radius: 0;
+}
+
+.active-project .chrome-left-popup-trigger {
+    right: 13px;
+}
+
+.contact-invite-icon {
+    top: 4px;
+    right: 17px;
+}
+
+.contact-list-icon {
+    right: 15px;
 }

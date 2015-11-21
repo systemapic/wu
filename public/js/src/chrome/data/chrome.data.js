@@ -1192,29 +1192,37 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	},
 
-	_selectedActiveLayer : function (e, uuid) {
+	_selectedActiveLayer : function (e) {
 
-		// Remove all base layers
-
+		// Remove active baselayers
 		var baselayers = this._project.getBaselayers();
-		baselayers.forEach(function (baselayer) {
+
+		// Force array
+		// Todo: this is always array anyways...
+		var _baselayers = _.isArray(baselayers) ? baselayers : [baselayers];
+
+		_baselayers.forEach(function (baselayer) {
 			var uuid = baselayer.uuid;
-			var on = this.isBaseLayerOn(uuid);
-
-			if ( on ) {
-				var _baseLayer = this._project.getLayer(uuid);
-				this.removeBaseLayer(_baseLayer);
-			}
-
+			var layer = this._project.getLayer(uuid);
+			layer.disable();
 		}.bind(this))
 
 
-		// Add new base layer
+		// Add to map
+		var uuid = e.target.value;
+		var layer = this._project.getLayer(uuid);
+		layer._addTo('baselayer');
+		
 
-		var layerUuid = uuid ? uuid : e.target.value;
-		var layer = this._project.getLayer(layerUuid);
 
-		this.addBaseLayer(layer)
+		// Save to server
+		this._project.setBaseLayer([{
+			uuid : uuid,
+			zIndex : 1,
+			opacity : 1
+		}]);
+
+
 
 	},
 
@@ -1429,98 +1437,98 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	// TOGGLE LAYER BUTTONS
 
-	createLayerToggleButton : function (parent, library) {
+	// createLayerToggleButton : function (parent, library) {
 
-		// Bind container
-		var toggleButton = 
-			parent
-			.selectAll('.chrome-toggle-button-container')
-			.data(function(d) { return [d] });
+	// 	// Bind container
+	// 	var toggleButton = 
+	// 		parent
+	// 		.selectAll('.chrome-toggle-button-container')
+	// 		.data(function(d) { return [d] });
 
-		// Enter container
-		toggleButton
-			.enter()
-			.append('div')
-			.classed('chrome-toggle-button-container', true);
+	// 	// Enter container
+	// 	toggleButton
+	// 		.enter()
+	// 		.append('div')
+	// 		.classed('chrome-toggle-button-container', true);
 
-		// Exit
-		toggleButton
-			.exit()
-			.remove();
-
-
-		// LAYER BUTTON
-		// LAYER BUTTON
-		// LAYER BUTTON
-
-		// Bind layer button
-		var option1 = 
-			toggleButton
-			.selectAll('.toggle-button-option-one')
-			.data(function(d) { return [d] });
-
-		// Enter layer button
-		option1
-			.enter()
-			.append('div')
-			.classed('toggle-button', true)
-			.classed('toggle-button-option-one', true)
-			.html('layer')
-			.on('click', function(d) {
-				this.toggleLayer(d);
-			}.bind(this));
+	// 	// Exit
+	// 	toggleButton
+	// 		.exit()
+	// 		.remove();
 
 
-		// Update layer button
-		option1
-			.classed('toggle-button-active', function (d) {
-				var uuid = d.getUuid();
-				var on = this.isLayerOn(uuid);
-				return on;
-			}.bind(this))
+	// 	// LAYER BUTTON
+	// 	// LAYER BUTTON
+	// 	// LAYER BUTTON
+
+	// 	// Bind layer button
+	// 	var option1 = 
+	// 		toggleButton
+	// 		.selectAll('.toggle-button-option-one')
+	// 		.data(function(d) { return [d] });
+
+	// 	// Enter layer button
+	// 	option1
+	// 		.enter()
+	// 		.append('div')
+	// 		.classed('toggle-button', true)
+	// 		.classed('toggle-button-option-one', true)
+	// 		.html('layer')
+	// 		.on('click', function(d) {
+	// 			this.toggleLayer(d);
+	// 		}.bind(this));
 
 
-		// Exit layer button
-		option1
-			.exit()
-			.remove()
+	// 	// Update layer button
+	// 	option1
+	// 		.classed('toggle-button-active', function (d) {
+	// 			var uuid = d.getUuid();
+	// 			var on = this.isLayerOn(uuid);
+	// 			return on;
+	// 		}.bind(this))
+
+
+	// 	// Exit layer button
+	// 	option1
+	// 		.exit()
+	// 		.remove()
 
 
 
-		// BASE LAYER BUTTON
-		// BASE LAYER BUTTON
-		// BASE LAYER BUTTON
+	// 	// BASE LAYER BUTTON
+	// 	// BASE LAYER BUTTON
+	// 	// BASE LAYER BUTTON
 
-		// Bind base layer button
-		var option2 = 
-			toggleButton
-			.selectAll('.toggle-button-option-two')
-			.data(function(d) { return [d] });
+	// 	// Bind base layer button
+	// 	var option2 = 
+	// 		toggleButton
+	// 		.selectAll('.toggle-button-option-two')
+	// 		.data(function(d) { return [d] });
 
-		// Enter base layer button
-		option2
-			.enter()
-			.append('div')
-			.classed('toggle-button', true)
-			.classed('toggle-button-option-two', true)
-			.html('base')	
-			.on('click', function(d) {
-				this.toggleBaseLayer(d);
-			}.bind(this));				
+	// 	// Enter base layer button
+	// 	option2
+	// 		.enter()
+	// 		.append('div')
+	// 		.classed('toggle-button', true)
+	// 		.classed('toggle-button-option-two', true)
+	// 		.html('base')	
+	// 		.on('click', function(d) {
+	// 			this.toggleBaseLayer(d);
+	// 		}.bind(this));				
 
-		// Update base layer button
-		option2
-			.classed('toggle-button-active', function (d) {
-				var uuid = d.getUuid();
-				var on = this.isBaseLayerOn(uuid);
-				return on;
-			}.bind(this))
+	// 	// Update base layer button
+	// 	option2
+	// 		.classed('toggle-button-active', function (d) {
+	// 			var uuid = d.getUuid();
+	// 			var on = this.isBaseLayerOn(uuid);
+	// 			return on;
+	// 		}.bind(this))
 
-		// Exit base layer button
-		option2
-			.exit()
-			.remove()
-	},
+	// 	// Exit base layer button
+	// 	option2
+	// 		.exit()
+	// 		.remove()
+	// },
 
 
 	// TOGGLE LAYERS
@@ -1533,8 +1541,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		on ? this.removeLayer(layer) : this.addLayer(layer);
 
 		// Toggle base layer off
-		var baseOn = this.isBaseLayerOn(uuid);
-		if ( baseOn ) this.removeBaseLayer(layer);
+		// var baseOn = this.isBaseLayerOn(uuid);
+		// if ( baseOn ) this.removeBaseLayer(layer);
 
 		this._refreshLayers();		
 	},	
@@ -1566,50 +1574,51 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// TOGGLE BASE LAYERS
 	// TOGGLE BASE LAYERS
 
-	toggleBaseLayer : function (layer) {
+	// toggleBaseLayer : function (layer) {
 
-		var uuid = layer.getUuid();
+	// 	var uuid = layer.getUuid();
 
-		// Toggle layer off
-		var layerOn = this.isLayerOn(uuid);
-		if ( layerOn ) this.removeLayer(layer);	
+	// 	// Toggle layer off
+	// 	var layerOn = this.isLayerOn(uuid);
+	// 	if ( layerOn ) this.removeLayer(layer);	
 
-		var on = this.isBaseLayerOn(uuid);
-		on ? this.removeBaseLayer(layer) : this.addBaseLayer(layer);
+	// 	var on = this.§(uuid);
+	// 	on ? this.removeBaseLayer(layer) : this.addBaseLayer(layer);
 
-		this._refreshLayers();		
-	},
+	// 	this._refreshLayers();		
+	// },
 
-	// Add base layer
-	addBaseLayer : function (layer) {
+	// // Add base layer
+	// addBaseLayer : function (layer) {
 
-		var uuid = layer.getUuid()
+	// 	var uuid = layer.getUuid()
 
-		// Update map	
-		layer._addTo('baselayer');
+	// 	// Update map	
+	// 	layer._addTo('baselayer');
 
-		// Save to server
-		this._project.addBaseLayer({
-			uuid : uuid,
-			zIndex : 1,
-			opacity : layer.getOpacity()
-		});
 
-	},
+	// 	// Save to server
+	// 	this._project.addBaseLayer({
+	// 		uuid : uuid,
+	// 		zIndex : 1,
+	// 		opacity : layer.getOpacity()
+	// 	});
 
-	// Remove base layer
-	removeBaseLayer : function (layer) {
+	// },
 
-		console.log('%c removeBaseLayer ', 'background: blue; color: white;');
-		console.log(layer);
+	// // Remove base layer
+	// removeBaseLayer : function (layer) {
 
-		// Update map
-		layer.disable(); 
+	// 	console.log('%c removeBaseLayer ', 'background: blue; color: white;');
+	// 	console.log(layer);
 
-		// Save to server
-		this._project.removeBaseLayer(layer);
+	// 	// Update map
+	// 	layer.disable(); 
 
-	},
+	// 	// Save to server
+	// 	this._project.removeBaseLayer(layer);
+
+	// },
 
 	// Check if base layer is on
 	isBaseLayerOn : function (uuid) {

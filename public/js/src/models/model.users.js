@@ -73,6 +73,39 @@ Wu.User = Wu.Class.extend({
 
 	},
 
+	inviteToProjects : function (options) {
+
+		var userUuid = this.getUuid();
+		var userName = this.getFullName();
+		var num = options.edit.length + options.read.length;
+
+		var invites = {
+			edit : options.edit,
+			read : options.read,
+			user : userUuid
+		}
+
+		// send to server
+		Wu.send('/api/user/inviteToProjects', invites, function (a, response) {
+
+			var result = Wu.parse(response);
+
+			// set feedback 
+			app.feedback.setMessage({
+				title : 'Project invites sent!',
+				description : userName + ' has been invited to ' + num + ' projects'
+			});
+			
+			// update locally
+			result.projects.forEach(function (projectAccess) {
+				var project = app.Projects[projectAccess.project];
+				project.store.access = projectAccess.access;
+			});
+
+		}.bind(this), this);
+
+	},
+
 	getFiles : function () {
 		return this._files;
 	},
@@ -264,6 +297,26 @@ Wu.User = Wu.Class.extend({
 			}, this)
 		}, this);
 		return projects;
+	},
+
+	getReadProjects : function () {
+		var allProjects = app.Projects;
+
+		var readProjects = _.filter(app.Projects, function (p) {
+			return _.contains(p.getAccess().read, this.getUuid());
+		}, this);
+
+		return readProjects;
+	},
+
+	getEditProjects : function () {
+		var allProjects = app.Projects;
+
+		var editProjects = _.filter(app.Projects, function (p) {
+			return _.contains(p.getAccess().edit, this.getUuid());
+		}, this);
+
+		return editProjects;
 	},
 
 	getUuid : function () {

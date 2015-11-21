@@ -42,6 +42,143 @@ var api = module.parent.exports;
 // exports
 module.exports = api.user = { 
 
+	inviteToProjects : function (req, res) {
+	
+		console.log('inviteToProjects', req.body);
+		var options = req.body;
+
+		var edits = options.edit || [];
+		var reads = options.read || [];
+		var userUuid = options.user;
+		var account = req.user;
+		var ops = [];
+		var changed_projects = [];
+
+		// check
+		if (!userUuid) return api.error.missingInformation(req, res, 'No user uuid provided.');
+		if (!edits.length && !reads.length) return api.error.missingInformation(req, res, 'No projects provided.');
+ 
+
+		ops.push(function (callback) {
+
+			User
+			.findOne({uuid : userUuid})
+			.exec(callback);
+		});
+
+		ops.push(function (invited_user, callback) {
+
+			// add to read (if not already in edit)
+
+			// check that USER has access to invite to project
+
+			async.each(edits, function (projectUuid, done) {
+
+				Project
+				.findOne({uuid : projectUuid})
+				.exec(function (err, project) {
+					if (err || !project) return done(err || 'No such project.');
+
+					// check if isEditable by account
+					if (!project.isEditable(account.getUuid())) return done('No access.');
+
+					// add invited_user to edit
+					project.access.edit.addToSet(invited_user.getUuid());
+
+					// save
+					project.markModified('access');
+					project.save(function (err, updated_project) {
+
+						console.log('saved 1', err, updated_project.access.edit);
+
+						// remember for 
+						changed_projects.push({
+							project : updated_project.uuid,
+							access : updated_project.access
+						});
+						
+						// next					
+						done(null);
+					})
+				});
+
+
+			}, function (err, changed_edit_projects) {
+				
+				console.log('err, changed edoit: ', err, changed_edit_projects);
+
+	
+				async.each(reads, function (projectUuid, done) {
+
+					Project
+					.findOne({uuid : projectUuid})
+					.exec(function (err, project) {
+						if (err || !project) return done(err || 'No such project.');
+
+						// check if isEditable by account
+						if (!project.isEditable(account.getUuid())) return done('No access.');
+
+						// check if user is already editor
+						var isAlreadyEditor = _.contains(project.access.edit, invited_user.getUuid()) || project.createdBy == invited_user.getUuid();
+
+						if (isAlreadyEditor) return done('Can\'t add viewer that\'s already editor.');
+
+						// add invited_user to edit
+						project.access.read.addToSet(invited_user.getUuid());
+
+						project.markModified('access');
+						project.save(function (err, updated_project) {
+							
+							// remember for 
+							changed_projects.push({
+								project : updated_project.uuid,
+								access : updated_project.access
+							});
+							
+							// next					
+							done(null);
+						})
+					});
+
+
+				}, function (err, changed_read_projects) {
+
+					console.log('err, changed: ', err, changed_projects);
+
+					callback(null, changed_projects);
+
+				});				
+
+			});
+
+		});		
+
+
+		ops.push(function (projects, callback) {
+
+			console.log('changed these projects', projects);
+
+			res.json({
+				error : null,
+				projects : projects
+			});
+
+			callback(null);
+		});
+
+		async.waterfall(ops, function (err, results) {
+			if (err) console.log('api.user.inviteToProjects err: ', err);
+
+			if (err) res.json({
+				error : err
+			});
+			
+		})
+		
+
+
+	},
+
 
 	requestContact : function (req, res) {
 
