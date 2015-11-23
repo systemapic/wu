@@ -588,6 +588,16 @@ body {
     font-weight: 600;
 }
 
+.smooth-fullscreen-link-label {
+    font-size: 14px;
+    font-weight: 500;
+    text-align: right;
+}
+#share-link {
+    cursor: pointer;
+    font-weight: 600;
+}
+
 .invite-custom-message-wrapper-textarea {
     width: 100%;
     border: 1px solid red;

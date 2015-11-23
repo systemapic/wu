@@ -496,6 +496,7 @@ module.exports = function(app, passport) {
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
 	app.post('/api/invite/link', passport.authenticate('bearer', {session: false}), function (req,res) {
+		console.log('vinite link!!');
 		api.user.getInviteLink(req, res);
 	});
 

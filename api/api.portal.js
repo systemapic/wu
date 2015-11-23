@@ -118,25 +118,53 @@ module.exports = api.portal = {
 		var path = req.originalUrl.split('/');
 		var invite_token = path[2];
 
+		console.log('invite_token', invite_token);
+
 		// get token from redis
 		var redis_key = 'invite:token:' + invite_token;
 		api.redis.tokens.get(redis_key, function (err, token_store) {
+			console.log('err/token_store', err, token_store);
 
-			// if logged in
-			if (req.isAuthenticated()) {
-				res.render('../../views/app.serve.ejs', {
-					hotlink : {},
-					access_token : req.session.access_token || {}
-				});
+			var stored_invite = api.utils.parse(token_store);
 
-			// if not logged in
-			} else {
-				res.render('../../views/invite.ejs', {
-					invite : token_store,
-					access_token : req.session.access_token || {}
-				});
-			}
+			if (err || !stored_invite) return api.error.missingInformation(req, res);
+
+			// make sure logged out
+			req.logout();
+
+			// render invitation
+			res.render('../../views/invitation.ejs', {
+				invite : token_store,
+				access_token : req.session.access_token || {}
+			});
+
 		});
+
+		// console.log('api.portal.invite');
+
+		// // get client/project
+		// var path = req.originalUrl.split('/');
+		// var invite_token = path[2];
+
+		// // get token from redis
+		// var redis_key = 'invite:token:' + invite_token;
+		// api.redis.tokens.get(redis_key, function (err, token_store) {
+
+		// 	// if logged in
+		// 	if (req.isAuthenticated()) {
+		// 		res.render('../../views/app.serve.ejs', {
+		// 			hotlink : {},
+		// 			access_token : req.session.access_token || {}
+		// 		});
+
+		// 	// if not logged in
+		// 	} else {
+		// 		res.render('../../views/invite.ejs', {
+		// 			invite : token_store,
+		// 			access_token : req.session.access_token || {}
+		// 		});
+		// 	}
+		// });
 	},
 
 
