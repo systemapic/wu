@@ -23,7 +23,7 @@ body {
 
 .central {
 	height: 500px;
-	width: 810px;
+	width: 500px;
 	margin: auto;
 	position: relative;
 	border: 1px solid gainsboro;
@@ -53,7 +53,6 @@ body {
 	font-size: 30px;
 	text-align: center;
 	font-weight: 200;
-	padding-right: 40px;
 }
 
 .input {
@@ -90,12 +89,11 @@ body {
 }
 
 .input-wrapper {
-	margin-top: 150px;
 	vertical-align: middle;
-	padding-right: 40px;
+	text-align: center;
 }
 .input-wrapper-right {
-	margin-top: 40px;
+	margin-top: 70px;
 	vertical-align: middle;
 	padding-right: 40px;
 }
@@ -113,12 +111,8 @@ body {
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	/*display: none;*/
+	display: none;
 	left: -10px;
-	z-index: 2;
-	opacity: 0;
-	transition:opacity 150ms linear;
-	pointer-events: none;
 }
 
 
@@ -172,7 +166,6 @@ body {
     width: 350px;
     text-align: center;
     margin-top: 20px;
-    z-index: 1;
 }
 .forgot-link {
     font-size: 12px;
@@ -182,12 +175,21 @@ body {
     margin-left: auto;
 }
 
-label {
-	font-size: 12px;
+.input.forgot {
+	margin: auto;
 }
 
-.button:disabled { 
-	opacity: 0.4;
+.text-wrapper {
+	text-align: center;
 }
+
+.text-content {
+	width: 66%;
+	margin: auto;
+	margin-top: 50px;
+	margin-bottom: 40px;
+	font-style: italic;
+}
+
 
 

@@ -1,19 +1,12 @@
 <!doctype html>
 <html>
 <head>
-<title>Systemapic Invitation</title>
+<title>Systemapic Password Reset</title>
 	<script src='/loginConfig.js'></script>
 	<script src='/js/src/core/class.js'></script>
-	<script src='/js/src/core/invitation.js'></script>
+	<script src='/js/src/core/reset.js'></script>
 	<link rel="stylesheet" href='/css/font-awesome-4.4.0/css/font-awesome.min.css'>
-	<link href='/css/invitation.css' rel='stylesheet' />
-
-
-	<script type="text/javascript">(function(){
-		window.tokens = JSON.parse('<%- JSON.stringify(access_token) %>');
-		window.invite_store = JSON.parse('<%- invite %>');
-		}());
-	</script>
+	<link href='/css/reset.css' rel='stylesheet' />
 
 </head>
 <body>
@@ -21,12 +14,9 @@
 	<div id="container"></div>
 
 	<script> 
-
-		var app = new Wu.Invite({
-			store : window.invite_store,
+		var app = new Wu.Reset({
 			container : 'container'
 		});
-
 	</script>
 
 	<script type="text/javascript">

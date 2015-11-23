@@ -61,26 +61,15 @@ module.exports = api.portal = {
 
 			var email = stored_invite.email;
 
-			// if logged in, and it's same user
-			if (req.isAuthenticated() && req.user && req.user.local.email == email) {
+			// make sure logged out
+			req.logout();
 
-				console.log('TODO: already registered! add projects to user and log in! ')
-				// means user is not in other user's contact list yet...
+			// render invitation
+			res.render('../../views/invitation.ejs', {
+				invite : token_store,
+				access_token : req.session.access_token || {}
+			});
 
-
-				res.render('../../views/app.serve.ejs', {
-					hotlink : {},
-					access_token : req.session.access_token || {}
-				});
-
-			// if not logged in
-			} else {
-
-				res.render('../../views/invitation.ejs', {
-					invite : token_store,
-					access_token : req.session.access_token || {}
-				});
-			}
 		});
 	},
 
@@ -118,7 +107,6 @@ module.exports = api.portal = {
 	},
 
 	login : function (req, res) {
-		// res.render(path.join(__dirname, '../views/login.serve.ejs'), { message: req.flash('loginMessage') });
 		res.render(path.join(__dirname, '../views/login.serve.ejs'), { message: req.flash('loginMessage') });
 	},
 

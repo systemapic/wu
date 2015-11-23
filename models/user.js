@@ -30,7 +30,6 @@ var userSchema = mongoose.Schema({
 
         // temp status notifications
         status : {
-
             contact_requests : [String]
         },
 
@@ -49,7 +48,6 @@ var userSchema = mongoose.Schema({
         },
 
         contact_list : [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-
 
         files : [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
 
@@ -75,7 +73,6 @@ var userSchema = mongoose.Schema({
                 email        : String,
                 name         : String
         },
-        // slack : {}
 });
 
 // methods ======================
