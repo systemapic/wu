@@ -689,21 +689,20 @@ module.exports = api.user = {
 
 	},
 
-
-
-
 	getInviteLink : function (req, res) {
+		console.log('getInviteLink', req.body);
 		var options = req.body;
 		options.user = req.user;
 
 		api.user._createInviteLink(options, function (err, inviteLink) {
+			console.log('got link', err, inviteLink);
 			res.end(inviteLink);
 		});
 	},
 
 	_createInviteLink : function (options, callback) {
 
-		console.log(options);
+		console.log('create?InviteLink, ', options);
 
 		var project_id = options.project_id,
 		    project_name = options.project_name,
@@ -711,17 +710,13 @@ module.exports = api.user = {
 		    access_type = options.access_type,
 		    permissions = options.permissions;
 
+		var access = options.access;
 
 		// create token and save in redis with options
-		var token = api.utils.getRandomChars(20, 'abcdefghijklmnopqrstuvwxyz1234567890');
+		var token = api.utils.getRandomChars(10, 'abcdefghijklmnopqrstuvwxyz1234567890');
 
 		var token_store = {
-			project : {
-				id : project_id,
-				name : project_name,
-				access_type : access_type,
-				permissions : permissions
-			},
+			access : access,
 			invited_by : {
 				uuid : user.uuid,
 				firstName : user.firstName,

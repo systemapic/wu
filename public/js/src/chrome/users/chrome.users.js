@@ -95,6 +95,9 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// shortcut
 		var content = this._fullscreen._content;
 
+		// personlized message
+		var linkText = Wu.DomUtil.create('div', 'smooth-fullscreen-link-label', content, '<a id="share-link"><i class="fa fa-share-alt"></i> Get shareable link</a>');
+
 		// emails wrapper
 		this._emailsWrapper = Wu.DomUtil.create('div', 'invite-emails-wrapper', content);
 
@@ -150,6 +153,122 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// save button trigger
 		Wu.DomEvent.on(saveBtn, 'click', this._sendInvites, this);
 
+		Wu.DomEvent.on(linkText, 'click', this._openLinkShare, this);
+
+	},
+
+
+	_openLinkShare : function (e) {
+
+		console.log('_openLinkShare');
+
+		// close prev fullscreen
+		this._fullscreen.close();
+
+		// stop propagation
+		e && Wu.DomEvent.stop(e);
+		
+		// create fullscreen
+		this._fullscreen = new Wu.Fullscreen({
+			title : '<span style="font-weight:200;">Invite people to Systemapic</span>',
+			innerClassName : 'smooth-fullscreen-inner invite',
+		});
+
+		// clear invitations
+		this._access = {
+			edit : [],
+			read : []
+		}
+
+		// shortcut
+		var content = this._fullscreen._content;
+
+		// emails wrapper
+		this._emailsWrapper = Wu.DomUtil.create('div', 'invite-emails-wrapper', content);
+
+		// label
+		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label invite-emails', content, 'Share this link');
+		
+		// container
+		var invite_container = Wu.DomUtil.create('div', 'invite-container narrow', content);
+		var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
+		var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
+
+		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
+
+		// create invite input for projects
+		this._createInviteInput({
+			type : 'read',
+			label : 'Invite people to view these projects <span class="optional-medium invite">(optional)</span>',
+			content : toggles_wrapper,
+			container : this._fullscreen._inner,
+			sublabel : 'Users will get read-only access to these projects',
+			trigger : this._addedProject.bind(this)
+		});
+
+		// create invite input
+		this._createInviteInput({
+			type : 'edit',
+			label : 'Invite people to edit these projects <span class="optional-medium invite">(optional)</span>',
+			content : toggles_wrapper,
+			container : this._fullscreen._inner,
+			sublabel : 'Users will get full edit access to these projects',
+			trigger : this._addedProject.bind(this)
+		});
+
+		// input box
+		this._shareLinkInput = Wu.DomUtil.create('input', 'invite-email-input-form', invite_input_container);
+		this._shareLinkInput.value = app.options.servers.portal + 'invite';
+		var invite_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', toggles_wrapper);
+
+		// save button
+		var closeBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite', content, 'Close');
+
+		// select text on focus
+		Wu.DomEvent.on(this._shareLinkInput, 'focus click', function () {
+			this._shareLinkInput.select();
+		}, this);
+
+		// save button trigger
+		Wu.DomEvent.on(closeBtn, 'click', this._fullscreen.close.bind(this._fullscreen), this);
+
+	},
+
+	_addedProject : function (options) {
+
+		var project = options.project;
+
+		console.log('added project: ', options);
+
+		console.log('this._access', this._access);
+
+		var access = {
+			edit : [],
+			read: []
+		}
+
+		this._access.read.forEach(function (r) {
+			access.read.push(r.project.getUuid());
+		});
+		this._access.edit.forEach(function (e) {
+			access.edit.push(e.project.getUuid());
+		});
+
+		// this._access[options.type]
+		var options = JSON.stringify({
+			access : access
+		});
+
+		console.log('sedning options', options);
+
+		// create share link
+		Wu.post('/api/invite/link', options, function (a, b) {
+			console.log('got invite link? ', a, b);
+
+			this._shareLinkInput.value = b;
+		}.bind(this), this);
+
+		console.log('ok?');
 	},
 
 
@@ -207,6 +326,8 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		
 
 	},
+
+
 
 	_updateInvites : function () {
 
@@ -419,8 +540,18 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 				this._addAccessItem({
 					input : invite_input,
 					project : project,
-					type : options.type
+					type : options.type,
+					trigger : options.trigger
 				});
+
+				// optional callback
+				if (options.trigger) {
+					options.trigger({
+						project : project
+					});
+				}
+
+
 					
 			}, this);
 		}, this);
@@ -459,6 +590,13 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 				// remove last item
 				var popped = this._access[options.type].pop();
 				Wu.DomUtil.remove(popped.user_container);
+
+				// optional callback
+				if (options.trigger) {
+					options.trigger({
+						project : false
+					});
+				}
 			}
 
 			// enter: blur input
@@ -533,6 +671,13 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			_.remove(this._access[options.type], function (i) {
 				return i.project == project;
 			});
+
+			// optional callback
+			if (options.trigger) {
+				options.trigger({
+					project : false
+				});
+			}
 
 		}, this);
 
