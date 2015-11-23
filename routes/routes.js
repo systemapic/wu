@@ -556,6 +556,13 @@ module.exports = function(app, passport) {
 	});
 
 	// =====================================
+	// RESET PASSWORD ======================
+	// =====================================
+	app.get('/reset', function (req, res) {
+		api.auth.serveResetPage(req, res);
+	});
+
+	// =====================================
 	// CREATE PASSWORD =====================
 	// ===================================== 
 	app.post('/reset/password', function (req, res) {
@@ -604,6 +611,14 @@ module.exports = function(app, passport) {
 		api.portal.login(req, res);
 	});
 
+	// =====================================
+	// PRIVACY POLICY ======================
+	// =====================================
+	app.get('/privacy-policy', function(req, res) {
+		// api.portal.login(req, res);
+		res.render('../../views/privacy.ejs');
+	});
+
 	// // =====================================
 	// // SIGNUP ==============================
 	// // =====================================
@@ -622,7 +637,6 @@ module.exports = function(app, passport) {
 	// INVITE ==============================
 	// =====================================
 	app.get('/invite/*', function(req, res) {
-		console.log('/invite/*');
 		api.portal.invite(req, res);
 	});
 
@@ -630,18 +644,8 @@ module.exports = function(app, passport) {
 	// INVITE ==============================
 	// =====================================
 	app.get('/api/invitation/*', function(req, res) {
-		console.log('/invitation/*');
 		api.portal.invitation(req, res);
 	});
-
-	// // =====================================
-	// // SIGNUP ==============================
-	// // =====================================
-	// app.post('/signup', passport.authenticate('local-signup', {
-	// 	successRedirect : '/', // redirect to the secure profile section
-	// 	failureRedirect : '/signup', // redirect back to the signup page if there is an error
-	// 	failureFlash : true // allow flash messages
-	// }));
 
 	// =====================================
 	// LOGIN ===============================
@@ -652,25 +656,37 @@ module.exports = function(app, passport) {
 		failureFlash : true // allow flash messages
 	}));
 
+	// // =====================================
+	// // FORGOT PASSWORD =====================
+	// // =====================================
+	// app.post('/login', function (req, res) {
+	// 	console.log('/login::::', req.body);
+	// 	res.end();
+	// });
+
 	// =====================================
 	// FORGOT PASSWORD =====================
 	// =====================================
-	app.post('/forgot', function (req, res) {
+	app.post('/api/forgot', function (req, res) {
 		api.auth.forgotPassword(req, res);
 	});
 
 	// =====================================
 	// FORGOT PASSWORD =====================
 	// =====================================
+	app.get('/forgot', function (req, res) {
+		res.render('../../views/forgot.ejs', {
+		});
+	});
+
+	// =====================================
+	// REGISTER ACCOUNT ====================
+	// =====================================
 	app.post('/register', passport.authenticate('local-signup', {
 		successRedirect : '/', // redirect to the secure profile section
 		failureRedirect : '/invite', // redirect back to the signup page if there is an error
 		failureFlash : true // allow flash messages
 	}));
-
-	// app.post('/register', function (req, res) {
-	// 	console.log('/register!!!', req.body);
-	// })
 
 	// =====================================
 	// WILDCARD PATHS ======================		

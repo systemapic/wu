@@ -81,9 +81,9 @@ module.exports = api.email = {
 		// todo: SSL
 
 		var name           = user.firstName + ' ' + user.lastName;
-		var email          = user.local.email;
+		var email          = user.getEmail();
 		var token          = api.auth.setPasswordResetToken(user);
-		var link           = api.config.portalServer.uri + 'login?token=' + token;
+		var link           = api.config.portalServer.uri + 'reset?token=' + token + '&email=' + email;
 		var to             = email;
 		var subject        = 'Please confirm your request for a password reset';
 

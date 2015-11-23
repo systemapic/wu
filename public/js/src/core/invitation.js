@@ -1,7 +1,10 @@
 Wu.Invite = Wu.Class.extend({
 
-	initialize : function (options) {
+	options : {
 
+	},
+
+	initialize : function (options) {
 
 		// set options
 		Wu.setOptions(this, options);
@@ -35,7 +38,7 @@ Wu.Invite = Wu.Class.extend({
 		this._createRegister();
 
 		// shade login on load
-		this._rightshader.style.display = 'block';
+		this._rightshader.style.opacity = 1;
 	},
 
 	_createLogo : function () {
@@ -49,7 +52,6 @@ Wu.Invite = Wu.Class.extend({
 		// set image
 		var logo_img = loginConfig.invitationLogo;
 		logo.style.backgroundImage = 'url(../' + logo_img + ')';
-
 	},
 
 
@@ -83,13 +85,18 @@ Wu.Invite = Wu.Class.extend({
 		button.setAttribute('type', 'submit');
 		button.setAttribute('name', 'login');
 
+		// forgot password
+		var forgotWrapper = Wu.DomUtil.create('div', 'forgot-wrapper', input_wrapper);
+		var forgotLink = Wu.DomUtil.create('a', 'forgot-link', forgotWrapper, 'Forgot your password?');
+		forgotLink.setAttribute('href', 'https://' + window.location.host + '/forgot');
+
 		// shader
 		Wu.DomEvent.on(wrapper, 'mouseenter', function () {
-			this._rightshader.style.display = 'none';
-			this._leftshader.style.display = 'block';
+			this._rightshader.style.opacity = 0;
+			this._leftshader.style.opacity = 1;
 		}, this);
-
 	},
+
 
 
 	_createRegister : function () {
@@ -103,35 +110,33 @@ Wu.Invite = Wu.Class.extend({
 		// label
 		var label = Wu.DomUtil.create('div', 'top-label', wrapper, 'Create account');
 
+		// form
 		var input_wrapper = Wu.DomUtil.create('form', 'input-wrapper-right', wrapper);
 		input_wrapper.setAttribute('action', '/register');
 		input_wrapper.setAttribute('method', 'post');
 
 		// first name
-		// var firstname_label = Wu.DomUtil.create('div', 'input-label rightside firstname', input_wrapper, 'First Name');
 		var firstname_input = Wu.DomUtil.create('input', 'input firstname', input_wrapper, 'First Name');
 		firstname_input.setAttribute('name', 'firstname');
 
-		// var lastname_label = Wu.DomUtil.create('div', 'input-label rightside lastname', input_wrapper, 'Last Name');
+		// last name
 		var lastname_input = Wu.DomUtil.create('input', 'input lastname', input_wrapper, 'Last Name');
 		lastname_input.setAttribute('name', 'lastname');
 
-		// var company_label = Wu.DomUtil.create('div', 'input-label rightside company', input_wrapper, 'Company');
+		// company
 		var company_input = Wu.DomUtil.create('input', 'input company', input_wrapper, 'Company');
 		company_input.setAttribute('name', 'company');
 
-		// var position_label = Wu.DomUtil.create('div', 'input-label rightside position', input_wrapper, 'Position');
+		// position
 		var position_input = Wu.DomUtil.create('input', 'input position', input_wrapper, 'Position');
 		position_input.setAttribute('name', 'position');
 
 		// email
-		// var email_label = Wu.DomUtil.create('div', 'input-label rightside email', input_wrapper, 'Email Address');
 		var email_input = Wu.DomUtil.create('input', 'input email', input_wrapper, 'Email Address');
 		email_input.setAttribute('name', 'email');
 		email_input.value = this._invite.email || '';
 
 		// password label
-		// var password_label = Wu.DomUtil.create('div', 'input-label password', input_wrapper, 'Password');
 		var password_input = Wu.DomUtil.create('input', 'input password', input_wrapper, 'Password (minimum 8 characters)');
 		password_input.setAttribute('type', 'password');
 		password_input.setAttribute('name', 'password');
@@ -142,14 +147,30 @@ Wu.Invite = Wu.Class.extend({
 		invite_token.style.display = 'none';
 		invite_token.setAttribute('name', 'invite_token');
 
-		// button
+		// privacy policy
+		var privacy_checkbox = Wu.DomUtil.create('input', '', input_wrapper, 'Password (minimum 8 characters)');
+		privacy_checkbox.setAttribute('type', 'checkbox');
+		privacy_checkbox.id = 'privacy-checkbox';
+		var privacy_label = document.createElement('label')
+		privacy_label.htmlFor = 'privacy-checkbox';
+		privacy_label.innerHTML = 'I have read and agree to Systemapic\'s <a href="privacy-policy" target="_blank">Terms and Conditions</a>';
+		input_wrapper.appendChild(privacy_label);
+
+		// submit button
 		var button = Wu.DomUtil.create('button', 'button', input_wrapper, 'Sign up');
 		button.setAttribute('type', 'submit');
+		button.setAttribute('type', 'submit');
+		button.disabled = true;
+
+		// enable submit button when privacy policy is accepted
+		Wu.DomEvent.on(privacy_checkbox, 'click', function () {
+			button.disabled = !privacy_checkbox.checked;
+		}, this);
 
 		// shader
 		Wu.DomEvent.on(wrapper, 'mouseenter', function () {
-			this._rightshader.style.display = 'block';
-			this._leftshader.style.display = 'none';
+			this._rightshader.style.opacity = 1;
+			this._leftshader.style.opacity = 0;
 		}, this);
 	},
 
