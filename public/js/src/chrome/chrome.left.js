@@ -21,8 +21,25 @@ Wu.Chrome.Left = Wu.Chrome.extend({
 
 	initContainer : function () {
 
+
 		// create container
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-left', app._appPane);
+
+
+
+		// // Outer container
+		// this._outerContainer = Wu.DomUtil.create('div', 'chrome chrome-container chrome-left', app._appPane);
+
+		// // Outer scroller
+		// this._outerWrapper = Wu.DomUtil.create('div', 'chrome-left-outer-scroller', app._outerContainer);
+
+		// // Inner scroller
+		// this._container = Wu.DomUtil.create('div', 'chrome-left-inner-scroller', app._outerWrapper);
+
+
+
+
+
 
 		// holder for all tabs
 		this._tabs = {};

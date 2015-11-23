@@ -7,9 +7,7 @@ Wu.Invite = Wu.Class.extend({
 		Wu.setOptions(this, options);
 
 		// invite store
-		this._invite = options.store;
-
-		console.log('otpions', options);
+		this._invite = options.store || {};
 
 		// init container
 		this._initContainer();
@@ -72,12 +70,10 @@ Wu.Invite = Wu.Class.extend({
 		input_wrapper.setAttribute('method', 'post');
 
 		// email label
-		// var email_label = Wu.DomUtil.create('div', 'input-label leftside', input_wrapper, 'Email Address');
 		var email_input = Wu.DomUtil.create('input', 'input', input_wrapper, 'Email Address');
 		email_input.setAttribute('name', 'email');
 
 		// password label
-		// var password_label = Wu.DomUtil.create('div', 'input-label', input_wrapper, 'Password');
 		var password_input = Wu.DomUtil.create('input', 'input', input_wrapper, 'Password');
 		password_input.setAttribute('type', 'password');
 		password_input.setAttribute('name', 'password');
@@ -132,7 +128,7 @@ Wu.Invite = Wu.Class.extend({
 		// var email_label = Wu.DomUtil.create('div', 'input-label rightside email', input_wrapper, 'Email Address');
 		var email_input = Wu.DomUtil.create('input', 'input email', input_wrapper, 'Email Address');
 		email_input.setAttribute('name', 'email');
-		email_input.value = this.options.store.email;
+		email_input.value = this._invite.email || '';
 
 		// password label
 		// var password_label = Wu.DomUtil.create('div', 'input-label password', input_wrapper, 'Password');
@@ -142,14 +138,13 @@ Wu.Invite = Wu.Class.extend({
 
 		// hidden
 		var invite_token = Wu.DomUtil.create('input', '', input_wrapper);
-		invite_token.value = this.options.store.uuid;
+		invite_token.value = this._invite.uuid || false;
 		invite_token.style.display = 'none';
 		invite_token.setAttribute('name', 'invite_token');
 
 		// button
 		var button = Wu.DomUtil.create('button', 'button', input_wrapper, 'Sign up');
 		button.setAttribute('type', 'submit');
-
 
 		// shader
 		Wu.DomEvent.on(wrapper, 'mouseenter', function () {
@@ -159,27 +154,5 @@ Wu.Invite = Wu.Class.extend({
 	},
 
 
-
-
-
-
-
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

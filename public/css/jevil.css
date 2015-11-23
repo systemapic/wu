@@ -425,7 +425,8 @@
     }
 
 .chrome-content.settings-tabs-wrapper {
-    top: 128px;
+    top: 122px;
+    padding-bottom: 127px;
     }
 
 .settingsSelector-header {
@@ -452,6 +453,7 @@
 
 .chrome-middle-section-inner-scroller {
         padding-right: 13px;
+        width: 417px;
 }
 
 input.chrome-field-input {
@@ -550,6 +552,7 @@ input.chrome-field-input {
 
 
 .chrome-left-title {
+    border: none;
     margin-top: 0;
     padding-bottom: 5px;
     margin-left: 23px;
@@ -561,7 +564,7 @@ input.chrome-field-input {
     margin-top: 28px;    
     }
 
-/*.chrome-left-new-button {
+.chrome-left-new-button {
     width: 26px;
     height: 26px;
     font-weight: 600;
@@ -569,7 +572,8 @@ input.chrome-field-input {
     text-align: center;
     padding: 0;     
     line-height: 20px;           
-    }*/
+        top: -2px;
+    }
 
 .chrome-left-invite-users,
 .chrome-left-invite-users:hover {
@@ -705,7 +709,7 @@ input.chrome-field-input {
 
 
 .leaflet-control-layermenu.leaflet-control {
-        right: -6px;
+        right: 0px;
 }
 
 .chrome-button.layer {
@@ -717,12 +721,11 @@ input.chrome-field-input {
 }
 
 .chrome-button.layer {
-    /*float: right;*/
-    position: absolute;
-    right: 0;
+        /*float: right;*/
     width: 246px;
-    border: none;    
-    margin-right: 0;
+    border: none;
+    position: absolute;
+    right: 0;    
 }
 
 .leaflet-right .leaflet-control {
@@ -763,11 +766,11 @@ input.chrome-field-input {
     }
 
 .rounded-layer-button {
-    border-radius: 0px 0px 0px 4px;
+    border-radius: 0px 0px 4px 4px;
     }
 
 #layer-menu-inner-content {
-    border-radius: 0px 0px 0px 4px;
+    border-radius: 0px 0px 4px 4px;
     }
 
 .edit-mode #layer-menu-inner-content {
@@ -775,7 +778,7 @@ input.chrome-field-input {
     }
 
 .middle-item:after {
-    border-radius: 0px 0px 0px 4px;
+    border-radius: 0px 0px 4px 4px;
     }
 
 
