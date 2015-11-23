@@ -30,6 +30,8 @@
 .chrome.chrome-container.chrome-right,
 .chrome.chrome-container.chrome-left {
 	display: none !important;
+	visibility: none;
+	opacity: 0;
 	}
 
 .chrome-buttons {

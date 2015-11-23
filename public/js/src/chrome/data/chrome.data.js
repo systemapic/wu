@@ -208,6 +208,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	_show : function () {
 
+
+		// Open layer menu
+		app.MapPane._controls.layermenu.open();
+
+
 		// mark button active
 		Wu.DomUtil.addClass(this._topButton, 'active');
 
