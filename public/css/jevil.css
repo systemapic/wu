@@ -233,7 +233,7 @@
     }
 
 .layers-container {
-    margin-bottom: 3px;
+    margin-bottom: 15px;
     }
 
 .baselayer-dropdown-wrapper {
@@ -530,7 +530,8 @@ input.chrome-field-input {
 
 .active-project,
 .active-project:hover {
-    background: #71c4a8 !important;    
+    /*background: #71c4a8 !important;    */
+    background: #3C4759 !important;
     }
 
 .active-project:hover {
@@ -814,7 +815,7 @@ input.chrome-field-input {
 
 
 #app {
-    min-width: 1100px;
+    min-width: 1120px;
     }
 
 
@@ -978,4 +979,26 @@ input.chrome-field-input {
 
 .smooth-fullscreen-inner {
     padding-bottom: 200px;
+}
+
+
+
+.leaflet-draw-actions {
+    left: 31px;
+}
+
+.leaflet-draw-actions-top.leaflet-draw-actions-bottom a {
+    height: 31px;
+    font-size: 12px;
+    line-height: 31px;        
+}
+
+
+.smooth-fullscreen-inner.invite {
+    overflow: hidden;
+}
+
+
+.no-layers {
+    color: #C80000;
 }
