@@ -593,13 +593,9 @@ L.Control.Description = Wu.Control.extend({
 	// Toggle scale/measure/mouseposition corner
 	toggleScale : function (openDescription) {
 
-		console.log('%c toggleScale ', 'background: red; color: white; font-size: 24px;');
-		console.log('openDescription', openDescription);
-		console.log('app._map._controlCorners.topright', app._map._controlCorners.topright);
+		if (!app._map._controlCorners.topright) return;
 
-		if ( !app._map._controlCorners.topright ) return;
-
-		if ( openDescription ) {
+		if (openDescription) {
 			Wu.DomUtil.addClass(app._map._controlCorners.topright, 'toggle-scale');
 		} else {
 			Wu.DomUtil.removeClass(app._map._controlCorners.topright, 'toggle-scale');

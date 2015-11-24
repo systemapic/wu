@@ -911,3 +911,39 @@ body {
     top: -48px;
 }
 
+.clipboard-wrapper {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    right: 2px;
+    float: right;
+    top: -35px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.clipboard-wrapper:hover {
+    background: rgba(221, 222, 224, 0.41);
+}
+
+.clipboard-button {
+    font-size: 21px;
+    top: 3px;
+    position: relative;
+    right: -8px;  
+    color: #439FE0;  
+}
+.clipboard-button:active {
+    color: #3C4759;
+}
+
+.smooth-fullscreen-feedback-label {
+    height: 20px;
+    color: #3F4652;
+    cursor: default;
+    text-align: right;
+    padding-right: 0px;
+    margin-right: 0px;
+    position: relative;
+    right: -34px;
+    transition: opacity 100ms linear;
+}

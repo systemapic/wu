@@ -343,6 +343,68 @@ module.exports = api.user = {
 	},
 
 
+
+	// from shareable link flow
+	getInviteLink : function (req, res) {
+		console.log('getInviteLink', req.body);
+		var options = req.body;
+		options.user = req.user;
+
+
+		// create invite link
+		api.user._createInviteLink({
+			user : req.user,
+			access : options.access,
+			type : 'link'
+		}, function (err, invite_link) {
+			console.log('SHARE LINK: got invite_link:', err, invite_link);
+			res.end(invite_link);
+		});
+	},
+
+
+	_createInviteLink : function (options, callback) {
+
+		console.log('create?InviteLink, ', options.access);
+
+		var user = options.user;
+		var access = options.access;
+		var email = options.email || false;
+
+		// create token and save in redis with options
+		var token = api.utils.getRandomChars(7, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890');
+
+		// var token_store = {
+		// 	access : access,
+		// 	invited_by : {
+		// 		uuid : user.uuid,
+		// 		firstName : user.firstName,
+		// 		lastName : user.lastName,
+		// 		company : user.company
+		// 	},
+		// 	token : token,
+		// 	timestamp : new Date().getTime(),
+		// }
+
+		var invite_options = JSON.stringify({
+			email : email,
+			access : access,
+			// uuid : uuid,
+			token : token,
+			invited_by : user.getUuid(),
+			timestamp : new Date().getTime(),
+		});
+
+		// save token to redis
+		var redis_key = 'invite:token:' + token;
+		api.redis.tokens.set(redis_key, invite_options, function (err) {
+			var inviteLink = api.config.portalServer.uri + 'invite/' + token;
+			callback(null, inviteLink);
+		});
+	},
+
+
+
 	// invite users
 	// sent from client (invite by email)
 	invite : function (req, res) {
@@ -363,24 +425,13 @@ module.exports = api.user = {
 		// send emails
 		emails.forEach(function (email) {
 
-			// create unique key
-			var uuid = api.utils.getRandomChars(10);
 
-			// options
-			var invite_options = JSON.stringify({
-				email : email,
+			api.user._createInviteLink({
+				user : req.user,
 				access : access,
-				uuid : uuid,
-				invited_by : req.user.getUuid(),
-				timestamp : new Date().getTime(),
-			});
-
-			// save invite
-			var invite_key = 'invite:' + uuid;
-			api.redis.tokens.set(invite_key, invite_options, function (err) {
-				if (err) return console.error('api.user.invite err: ', err);
-				
-				var invite_link = api.config.portalServer.uri + 'api/invitation/' + uuid;
+				email : email,
+				type : 'email'
+			}, function (err, invite_link) {
 
 				// send email
 				api.email.sendInviteEmail({
@@ -390,7 +441,37 @@ module.exports = api.user = {
 					invite_link : invite_link,
 					invited_by : req.user.getName()
 				});
+
 			});
+
+			// // create unique key
+			// var uuid = api.utils.getRandomChars(10);
+
+			// // options
+			// var invite_options = JSON.stringify({
+			// 	email : email,
+			// 	access : access,
+			// 	uuid : uuid,
+			// 	invited_by : req.user.getUuid(),
+			// 	timestamp : new Date().getTime(),
+			// });
+
+			// // save invite
+			// var invite_key = 'invite:' + uuid;
+			// api.redis.tokens.set(invite_key, invite_options, function (err) {
+			// 	if (err) return console.error('api.user.invite err: ', err);
+				
+			// 	var invite_link = api.config.portalServer.uri + 'api/invitation/' + uuid;
+
+			// 	// send email
+			// 	api.email.sendInviteEmail({
+			// 		email : email,
+			// 		customMessage : customMessage,
+			// 		numProjects : numProjects,
+			// 		invite_link : invite_link,
+			// 		invited_by : req.user.getName()
+			// 	});
+			// });
 		});
 
 
@@ -458,7 +539,7 @@ module.exports = api.user = {
 		// get token store from redis
 		ops.push(function (callback) {
 			var token = options.invite_token;
-			var redis_key = 'invite:' + token;
+			var redis_key = 'invite:token:' + token;
 
 			// get token
 			api.redis.tokens.get(redis_key, callback);
@@ -466,6 +547,8 @@ module.exports = api.user = {
 
 		// create new user
 		ops.push(function (tokenJSON, callback) {
+
+			if (!tokenJSON) return callback('No such invite token!');
 
 			// parse token_store
 			token_store = api.utils.parse(tokenJSON);
@@ -689,59 +772,15 @@ module.exports = api.user = {
 
 	},
 
-	getInviteLink : function (req, res) {
-		console.log('getInviteLink', req.body);
-		var options = req.body;
-		options.user = req.user;
-
-		api.user._createInviteLink(options, function (err, inviteLink) {
-			console.log('got link', err, inviteLink);
-			res.end(inviteLink);
-		});
-	},
-
-	_createInviteLink : function (options, callback) {
-
-		console.log('create?InviteLink, ', options);
-
-		var project_id = options.project_id,
-		    project_name = options.project_name,
-		    user = options.user,
-		    access_type = options.access_type,
-		    permissions = options.permissions;
-
-		var access = options.access;
-
-		// create token and save in redis with options
-		var token = api.utils.getRandomChars(10, 'abcdefghijklmnopqrstuvwxyz1234567890');
-
-		var token_store = {
-			access : access,
-			invited_by : {
-				uuid : user.uuid,
-				firstName : user.firstName,
-				lastName : user.lastName,
-				company : user.company
-			},
-			token : token,
-			timestamp : new Date().getTime(),
-		}
-
-		// save token to redis
-		var redis_key = 'invite:token:' + token;
-		api.redis.tokens.set(redis_key, JSON.stringify(token_store), function (err) {
-			var inviteLink = api.config.portalServer.uri + 'invite/' + token;
-			callback(null, inviteLink);
-		});
-	},
 
 
 
-	_inviteNewUser : function (options, callback) {
-	},
 
-	_inviteExistingUser : function (options, callback) {
-	},
+	// _inviteNewUser : function (options, callback) {
+	// },
+
+	// _inviteExistingUser : function (options, callback) {
+	// },
 
 
 	// // create user
@@ -849,23 +888,6 @@ module.exports = api.user = {
 			.findOne({uuid : req.user.uuid})
 			.exec(callback);
 		});
-
-		// ops.push(function (user, callback) {
-		// 	Project
-		// 	.findOne({uuid : projectUuid})
-		// 	.exec(function (err, project) {
-		// 		if (err) return callback(err);
-		// 		callback(null, user, project);
-		// 	});
-		// });
-
-		// ops.push(function (user, project, callback)  {
-		// 	api.access.to.edit_user({
-		// 		user : account,
-		// 		subject : user,
-		// 		project : project
-		// 	}, callback);
-		// });
 
 		ops.push(function (user, callback) {
 			api.user._update({
@@ -1011,10 +1033,6 @@ module.exports = api.user = {
 				callback(err, users);
 			});
 
-
-
-			// callback(null, users);
-			
 		};
 		
 		// ops.contact_list = function (callback) {

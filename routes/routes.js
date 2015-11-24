@@ -496,7 +496,6 @@ module.exports = function(app, passport) {
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
 	app.post('/api/invite/link', passport.authenticate('bearer', {session: false}), function (req,res) {
-		console.log('vinite link!!');
 		api.user.getInviteLink(req, res);
 	});
 
@@ -641,12 +640,12 @@ module.exports = function(app, passport) {
 		api.portal.invite(req, res);
 	});
 
-	// =====================================
-	// INVITE ==============================
-	// =====================================
-	app.get('/api/invitation/*', function(req, res) {
-		api.portal.invitation(req, res);
-	});
+	// // =====================================
+	// // INVITE ==============================
+	// // =====================================
+	// app.get('/api/invitation/*', function(req, res) {
+	// 	api.portal.invitation(req, res);
+	// });
 
 	// =====================================
 	// LOGIN ===============================

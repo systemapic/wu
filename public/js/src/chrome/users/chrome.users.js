@@ -152,15 +152,11 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		// save button trigger
 		Wu.DomEvent.on(saveBtn, 'click', this._sendInvites, this);
-
 		Wu.DomEvent.on(linkText, 'click', this._openLinkShare, this);
 
 	},
 
-
 	_openLinkShare : function (e) {
-
-		console.log('_openLinkShare');
 
 		// close prev fullscreen
 		this._fullscreen.close();
@@ -189,10 +185,21 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// label
 		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label invite-emails', content, 'Share this link');
 		
-		// container
+		// input box
 		var invite_container = Wu.DomUtil.create('div', 'invite-container narrow', content);
 		var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
 		var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
+		this._shareLinkInput = Wu.DomUtil.create('input', 'invite-email-input-form', invite_input_container);
+		this._shareLinkInput.value = app.options.servers.portal + 'invite';
+		this._inviteFeedback = Wu.DomUtil.create('div', 'smooth-fullscreen-feedback-label', content);
+
+		var clipboardWrapper = Wu.DomUtil.create('div', 'clipboard-wrapper', invite_input_container);
+		var clipboardBtn = Wu.DomUtil.create('div', 'clipboard-button', clipboardWrapper);
+		clipboardBtn.innerHTML = '<i class="fa fa-clipboard"></i>';	
+
+		// clipboard events
+		Wu.DomEvent.on(clipboardWrapper, 'mousedown', this._removeClipFeedback, this);
+		Wu.DomEvent.on(clipboardWrapper, 'mouseup', this._copypasted, this);
 
 		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
 
@@ -216,11 +223,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			trigger : this._addedProject.bind(this)
 		});
 
-		// input box
-		this._shareLinkInput = Wu.DomUtil.create('input', 'invite-email-input-form', invite_input_container);
-		this._shareLinkInput.value = app.options.servers.portal + 'invite';
-		var invite_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', toggles_wrapper);
-
 		// save button
 		var closeBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save invite', content, 'Close');
 
@@ -232,15 +234,36 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// save button trigger
 		Wu.DomEvent.on(closeBtn, 'click', this._fullscreen.close.bind(this._fullscreen), this);
 
+		// create default link
+		this._createShareableInvite();
+	},
+
+	_copypasted : function () {
+		this._shareLinkInput.focus();
+		this._shareLinkInput.select();
+		var copied = document.execCommand('copy');
+		var text = copied ? 'Link copied to the clipboard!' : 'Your browser doesn\'t support this. Please copy manually.'
+		this._setClipFeedback(text);
+	},
+
+	_setClipFeedback : function (text) {
+		this._inviteFeedback.innerHTML = text;
+		this._inviteFeedback.style.opacity = 1;
+	},
+
+	_removeClipFeedback : function () {
+		this._inviteFeedback.innerHTML = '';
+		this._inviteFeedback.style.opacity = 0;
 	},
 
 	_addedProject : function (options) {
 
-		var project = options.project;
+		this._createShareableInvite();
 
-		console.log('added project: ', options);
+		this._removeClipFeedback();
+	},
 
-		console.log('this._access', this._access);
+	_createShareableInvite : function () {
 
 		var access = {
 			edit : [],
@@ -259,23 +282,14 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			access : access
 		});
 
-		console.log('sedning options', options);
-
 		// create share link
 		Wu.post('/api/invite/link', options, function (a, b) {
-			console.log('got invite link? ', a, b);
-
 			this._shareLinkInput.value = b;
 		}.bind(this), this);
-
-		console.log('ok?');
 	},
-
 
 	// icon on user
 	_inviteToProject : function (user, e) {
-
-		console.log('invite to project', user, e, this._project);
 
 		// stop propagation
 		e && Wu.DomEvent.stop(e);
@@ -294,7 +308,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		// shortcut
 		var content = this._fullscreen._content;
-
 
 		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper', content);
 
@@ -322,12 +335,9 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var save_message = Wu.DomUtil.create('div', 'invite-success-message', content, '');
 		Wu.DomEvent.on(saveBtn, 'click', this._updateInvites, this);
 
+		// remember user
 		this._access.user = user;
-		
-
 	},
-
-
 
 	_updateInvites : function () {
 
@@ -361,7 +371,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		email : {}
 	},
 
-	
 	_sendInvites : function (e) {
 
 		var emails = [];
@@ -389,7 +398,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			read : []
 		}
 
-
 		this._access.edit.forEach(function (p) {
 			access.edit.push(p.project.getUuid());
 		});
@@ -397,7 +405,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		this._access.read.forEach(function (p) {
 			access.read.push(p.project.getUuid());
 		});
-
 
 		var options = {
 			emails : emails,
@@ -408,15 +415,13 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// send to server
 		Wu.send('/api/user/invite', options, this._sentInvites.bind(this, e.target), this);
 
+		// logs
 		this._logInvites(options);
-
-		
 
 	},
 
 	// slack, analytics
 	_logInvites : function (options) {
-
 
 		var read = [];
 		var edit = [];
@@ -456,10 +461,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// set feedback 
 		app.feedback.setMessage({
 			title : 'Invites sent!',
-			// description : description
 		});
-
-		
 	},
 
 	_createInviteInput : function (options) {
@@ -467,7 +469,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// invite users
 		var content = options.content || this._fullscreen._content;
 		var container = this._fullscreen._container;
-		// var project = options.project;
 
 		// label
 		var invite_label = options.label;
@@ -500,12 +501,9 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		var monkey_scroll_inner = Wu.DomUtil.create('div', 'monkey-scroll-inner', monkey_scroll_hider);
 		var monkey_scroll_list = Wu.DomUtil.create('div', 'monkey-scroll-list', monkey_scroll_inner);
 
-
-
-
-		// list of all projects
+		// list of all projects, sort alphabetically
 		var allProjects = _.sortBy(_.toArray(app.Projects), function (u) {
-			return u.store.title;
+			return u.getTitle().toLowerCase();
 		});
 		_.each(allProjects, function (project) {
 
@@ -521,14 +519,12 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			// dont allow spectators to give edit access
 			if (options.type == 'edit' && isSpectator) return;
 
-
 			// divs
 			var list_item_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-container project', monkey_scroll_list);
 			var avatar_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-avatar-container', list_item_container);
 			var avatar = Wu.DomUtil.create('div', 'monkey-scroll-list-item-avatar project', avatar_container, '<i class="project fa fa-map-o"></i>');
 			var name_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-container project', list_item_container);
 			var name_bold = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-bold project', name_container);
-			// var name_subtle = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-subtle', name_container);
 
 			// set name
 			name_bold.innerHTML = project.getTitle();
@@ -550,14 +546,10 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 						project : project
 					});
 				}
-
-
 					
 			}, this);
 		}, this);
 
-
-		// events
 
 		// input focus, show dropdown
 		Wu.DomEvent.on(invite_input, 'focus', function () {
@@ -618,13 +610,10 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 						e.target == name || 
 						e.target == this._fullscreen._content;
 
+			// close 
 			if (relevantTarget) this._closeInviteInputs();
-			
 
 		},this);
-
-
-
 	},
 
 	_closeInviteInputs : function () {
@@ -705,33 +694,11 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 	},
 
-	// GHOST
-	// GHOST
-	// GHOST
 
-	initGhost : function () {
-		this.ghost = Wu.DomUtil.create('div', 'chrome-left-ghost displayNone', this.options.appendTo);
-		Wu.DomEvent.on(this.ghost, 'click', this.removeGhost, this);		
-	},
-
-	removeGhost : function () {
-		Wu.DomUtil.addClass(this.ghost, 'displayNone');
-		this.openUserCard = false;
-		this._refresh();
-	},
-
-	addGhost : function () {
-		Wu.DomUtil.removeClass(this.ghost, 'displayNone');
-	},
-
-
-	// REFRESH USER LIST
-	// REFRESH USER LIST
-	// REFRESH USER LIST
 
 	refreshUserList : function (data) {
 
-		if ( this.openUserCard ) this.addGhost();
+		// if (this.openUserCard) this.addGhost();
 
 		// BIND
 		var eachUser = 
@@ -765,10 +732,10 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		this.addUserName(eachUser);
 
 		// Add action trigger (the [...] button)
-		this.addUserActionTrigger(eachUser);
+		// this.addUserActionTrigger(eachUser);
 
 		// Add user card
-		this.addUserCard(eachUser);
+		// this.addUserCard(eachUser);
 
 		// add icon to invite to projects
 		this.create_inviteToProjectIcon(eachUser);			
@@ -822,7 +789,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		nameContent
 			.exit()
 			.remove();
-
 
 	},
 
@@ -905,222 +871,11 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 	},
 
-
-	// ADD USER ACTION TRIGGER
-	// ADD USER ACTION TRIGGER
-	// ADD USER ACTION TRIGGER
-
-	addUserActionTrigger : function (parent) {
-
-
-		// Bind
-		var userActionTrigger = 
-			parent
-			.selectAll('.chrome-left-popup-trigger')
-			.data(function(d) { return [d] })
-
-		// Enter
-		userActionTrigger
-			.enter()
-			.append('div')
-			.classed('chrome-left-popup-trigger', true)
-
-		// Update
-		userActionTrigger
-			.on('click', function (d) {
-				this.openUserCard = d.getUuid();
-				this._refresh();
-			}.bind(this));
-
-		// Exit
-		userActionTrigger
-			.exit()
-			.remove();
-
-
-	},
-
-	// ADD USER CARD
-	// ADD USER CARD
-	// ADD USER CARD
-
-	addUserCard : function (parent) {
-
-		// Bind
-		var userCard = 
-			parent
-			.selectAll('.chrome-user-card')
-			.data(function(d) { 
-				var uuid = d.getUuid();
-
-				// Only return data if we have a match
-				if ( this.openUserCard == uuid ) return [d];
-
-				// Return empty if not active (will not proceed);
-				return []; 
-			}.bind(this))
-
-		// Enter
-		userCard
-			.enter()
-			.append('div')
-			.classed('chrome-user-card', true);			
-
-		// Exit
-		userCard
-			.exit()
-			.remove();
-
-
-
-		// TOP CONTAINER
-		// TOP CONTAINER
-		// TOP CONTAINER
-
-		// Top Container
-		var topContainer = userCard
-			.append('div')
-			.classed('user-card-top-container', true);
-
-		// Close button
-		var closeButton = topContainer
-			.append('div')
-			.classed('user-card-close-button', true)
-			.html('x')
-			.on('click', function () {
-				this.removeGhost();
-			}.bind(this));
-
-		// User name
-		var userName = topContainer
-			.append('div')
-			.classed('card-user-name', true)
-			.html(function (d) {
-				return d.getFullName();
-			});
-
-		// Project count
-		var projectCount = topContainer
-			.append('div')
-			.classed('card-user-project-count', true)
-			.html(function (d) {
-				var projects = d.getProjects();
-				if ( projects.length == 1 ) return projects.length + ' project';
-				return projects.length + ' projects';
-			});
-
-
-		// BOTTOM CONTAINER
-		// BOTTOM CONTAINER
-		// BOTTOM CONTAINER
-
-		// Bottom Container
-		var bottomContainer = userCard
-			.append('div')
-			.classed('user-card-bottom-container', true);
-
-		var manageAccess = bottomContainer
-			.append('div')
-			.classed('manage-user-access', true)
-			.html('Manage access')
-			.on('click', function (d) {
-				this.manageAccess(d);
-			}.bind(this))
-
-		var deleteUser = bottomContainer
-			.append('div')
-			.classed('delete-user', true)
-			.html('Delete user')
-			.on('click', function (d) {				
-				this.deleteUser(d)
-			}.bind(this))		
-
-	},
-
-
-	// DELETE USER
-	// DELETE USER
-	// DELETE USER
-
-	deleteUser : function (user) {
-
-
-		var name = user.getFirstName() + ' ' + user.getLastName();
-		if (confirm('Are you sure you want to delete user ' + name + '?')) {
-			if (confirm('Are you REALLY SURE you want to delete user ' + name + '?')) {
-				this.confirmDelete(user);
-			}			
-		}		
-
-	},
-
-	confirmDelete : function (user) {
-
-		// delete user         cb
-		user.deleteUser(this, 'deletedUser');
-		this._refresh();
-
-	},
-
-
-
 	_requestContact : function (user) {
 
 		// send contact request
 		app.Account.sendContactRequest(user);
 	},
-
-
-
-	// MANAGE ACCESS FOR USER
-	// MANAGE ACCESS FOR USER
-	// MANAGE ACCESS FOR USER
-
-	manageAccess : function (user) {
-
-		var accessFullScreen = this.accessFullScreen = Wu.DomUtil.create('div', 'manage-user-access-fullscreen', app._appPane);
-
-		var manageAccessInner = Wu.DomUtil.create('div', 'manage-user-access-inner', accessFullScreen);
-		var closeManageAccessButton = Wu.DomUtil.create('div', 'close-manage-user-access', accessFullScreen, 'x');
-
-		var header = Wu.DomUtil.create('div', 'manage-access-title', manageAccessInner);
-		header.innerHTML = '<span style="font-weight:200;">Manage access for</span> ' + user.getFullName();
-
-		this.manageProjectsList(manageAccessInner);
-
-
-		Wu.DomEvent.on(closeManageAccessButton, 'click', this.closeManageAccess, this);
-
-	},
-
-	closeManageAccess : function () {
-
-		this.accessFullScreen.innerHTML = '';
-		this.accessFullScreen.remove();
-		this.removeGhost();
-
-	},
-
-	manageProjectsList : function(wrapper) {
-
-		var projects = app.Projects;
-
-		for ( var project in projects ) {
-
-			var projectWrapper = Wu.DomUtil.create('div', 'manage-access-project-wrapper', wrapper);
-			var projectTitle = Wu.DomUtil.create('div', 'manage-access-project-title', projectWrapper);
-			projectTitle.innerHTML = projects[project].getName();
-
-			var accessButtonsWrapper = Wu.DomUtil.create('div', 'manage-access-buttons-wrapper', projectWrapper);
-
-			var viewButton = Wu.DomUtil.create('div', 'access-button view-project-button active', accessButtonsWrapper, 'View project');
-			var downloadButton = Wu.DomUtil.create('div', 'access-button download-project-button', accessButtonsWrapper, 'Download data');
-			var inviteButton = Wu.DomUtil.create('div', 'access-button invite-project-button active', accessButtonsWrapper, 'Invite others');
-		}
-
-	},
-	
-
 
 	_onLayerAdded : function (options) {
 	},
@@ -1153,19 +908,16 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 				event : 'opened',
 				description : 'the left pane',
 				timestamp : Date.now()
-			})
+			});
 		}
 	},
 
 	_show : function () {
-
 		this._container.style.display = 'block';
 		this._isOpen = true;
-
 	},
 
 	_hide : function () {
-
 		this._container.style.display = 'none';
 		this._isOpen = false;
 	},
@@ -1195,8 +947,6 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 	_refresh : function () {
 
-		console.log('chrome.users._refresh users: ', this.users);
-
 		// Prepare data as array
 		var data = _.toArray(this.users);
 
@@ -1208,5 +958,218 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 		// Init user list
 		this.refreshUserList(data);			
 	},
+
+
+		// manageAccess : function (user) {
+
+	// 	var accessFullScreen = this.accessFullScreen = Wu.DomUtil.create('div', 'manage-user-access-fullscreen', app._appPane);
+
+	// 	var manageAccessInner = Wu.DomUtil.create('div', 'manage-user-access-inner', accessFullScreen);
+	// 	var closeManageAccessButton = Wu.DomUtil.create('div', 'close-manage-user-access', accessFullScreen, 'x');
+
+	// 	var header = Wu.DomUtil.create('div', 'manage-access-title', manageAccessInner);
+	// 	header.innerHTML = '<span style="font-weight:200;">Manage access for</span> ' + user.getFullName();
+
+	// 	this.manageProjectsList(manageAccessInner);
+
+
+	// 	Wu.DomEvent.on(closeManageAccessButton, 'click', this.closeManageAccess, this);
+
+	// },
+
+	// closeManageAccess : function () {
+
+	// 	this.accessFullScreen.innerHTML = '';
+	// 	this.accessFullScreen.remove();
+	// 	this.removeGhost();
+
+	// },
+
+	// manageProjectsList : function(wrapper) {
+
+	// 	var projects = app.Projects;
+
+	// 	for ( var project in projects ) {
+
+	// 		var projectWrapper = Wu.DomUtil.create('div', 'manage-access-project-wrapper', wrapper);
+	// 		var projectTitle = Wu.DomUtil.create('div', 'manage-access-project-title', projectWrapper);
+	// 		projectTitle.innerHTML = projects[project].getName();
+
+	// 		var accessButtonsWrapper = Wu.DomUtil.create('div', 'manage-access-buttons-wrapper', projectWrapper);
+
+	// 		var viewButton = Wu.DomUtil.create('div', 'access-button view-project-button active', accessButtonsWrapper, 'View project');
+	// 		var downloadButton = Wu.DomUtil.create('div', 'access-button download-project-button', accessButtonsWrapper, 'Download data');
+	// 		var inviteButton = Wu.DomUtil.create('div', 'access-button invite-project-button active', accessButtonsWrapper, 'Invite others');
+	// 	}
+
+	// },
+	
+
+	
+	// initGhost : function () {
+	// 	this.ghost = Wu.DomUtil.create('div', 'chrome-left-ghost displayNone', this.options.appendTo);
+	// 	Wu.DomEvent.on(this.ghost, 'click', this.removeGhost, this);		
+	// },
+
+	// removeGhost : function () {
+	// 	Wu.DomUtil.addClass(this.ghost, 'displayNone');
+	// 	this.openUserCard = false;
+	// 	this._refresh();
+	// },
+
+	// addGhost : function () {
+	// 	Wu.DomUtil.removeClass(this.ghost, 'displayNone');
+	// },
+
+
+
+	// ADD USER ACTION TRIGGER
+	// ADD USER ACTION TRIGGER
+	// ADD USER ACTION TRIGGER
+
+	// addUserActionTrigger : function (parent) {
+
+
+	// 	// Bind
+	// 	var userActionTrigger = 
+	// 		parent
+	// 		.selectAll('.chrome-left-popup-trigger')
+	// 		.data(function(d) { return [d] })
+
+	// 	// Enter
+	// 	userActionTrigger
+	// 		.enter()
+	// 		.append('div')
+	// 		.classed('chrome-left-popup-trigger', true)
+
+	// 	// Update
+	// 	userActionTrigger
+	// 		.on('click', function (d) {
+	// 			// this.openUserCard = d.getUuid();
+	// 			this._refresh();
+	// 		}.bind(this));
+
+	// 	// Exit
+	// 	userActionTrigger
+	// 		.exit()
+	// 		.remove();
+
+
+	// },
+
+	// ADD USER CARD
+	// ADD USER CARD
+	// ADD USER CARD
+
+	// addUserCard : function (parent) {
+
+	// 	// Bind
+	// 	var userCard = 
+	// 		parent
+	// 		.selectAll('.chrome-user-card')
+	// 		.data(function(d) { 
+	// 			var uuid = d.getUuid();
+
+	// 			// Only return data if we have a match
+	// 			if ( this.openUserCard == uuid ) return [d];
+
+	// 			// Return empty if not active (will not proceed);
+	// 			return []; 
+	// 		}.bind(this))
+
+	// 	// Enter
+	// 	userCard
+	// 		.enter()
+	// 		.append('div')
+	// 		.classed('chrome-user-card', true);			
+
+	// 	// Exit
+	// 	userCard
+	// 		.exit()
+	// 		.remove();
+
+
+
+	// 	// TOP CONTAINER
+	// 	// TOP CONTAINER
+	// 	// TOP CONTAINER
+
+	// 	// Top Container
+	// 	var topContainer = userCard
+	// 		.append('div')
+	// 		.classed('user-card-top-container', true);
+
+	// 	// Close button
+	// 	var closeButton = topContainer
+	// 		.append('div')
+	// 		.classed('user-card-close-button', true)
+	// 		.html('x')
+	// 		.on('click', function () {
+	// 			this.removeGhost();
+	// 		}.bind(this));
+
+	// 	// User name
+	// 	var userName = topContainer
+	// 		.append('div')
+	// 		.classed('card-user-name', true)
+	// 		.html(function (d) {
+	// 			return d.getFullName();
+	// 		});
+
+	// 	// Project count
+	// 	var projectCount = topContainer
+	// 		.append('div')
+	// 		.classed('card-user-project-count', true)
+	// 		.html(function (d) {
+	// 			var projects = d.getProjects();
+	// 			if ( projects.length == 1 ) return projects.length + ' project';
+	// 			return projects.length + ' projects';
+	// 		});
+
+
+	// 	// BOTTOM CONTAINER
+	// 	// BOTTOM CONTAINER
+	// 	// BOTTOM CONTAINER
+
+	// 	// Bottom Container
+	// 	var bottomContainer = userCard
+	// 		.append('div')
+	// 		.classed('user-card-bottom-container', true);
+
+	// 	var manageAccess = bottomContainer
+	// 		.append('div')
+	// 		.classed('manage-user-access', true)
+	// 		.html('Manage access')
+	// 		.on('click', function (d) {
+	// 			this.manageAccess(d);
+	// 		}.bind(this))
+
+	// 	var deleteUser = bottomContainer
+	// 		.append('div')
+	// 		.classed('delete-user', true)
+	// 		.html('Delete user')
+	// 		.on('click', function (d) {				
+	// 			this.deleteUser(d)
+	// 		}.bind(this))		
+
+	// },
+
+
+	// deleteUser : function (user) {
+	// 	var name = user.getFirstName() + ' ' + user.getLastName();
+	// 	if (confirm('Are you sure you want to delete user ' + name + '?')) {
+	// 		if (confirm('Are you REALLY SURE you want to delete user ' + name + '?')) {
+	// 			this.confirmDelete(user);
+	// 		}			
+	// 	}		
+	// },
+
+	// confirmDelete : function (user) {
+	// 	// delete user         cb
+	// 	user.deleteUser(this, 'deletedUser');
+	// 	this._refresh();
+	// },
+
+
 
 });
