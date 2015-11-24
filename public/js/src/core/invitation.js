@@ -12,6 +12,8 @@ Wu.Invite = Wu.Class.extend({
 		// invite store
 		this._invite = options.store || {};
 
+		console.log('this._invite: ', this._invite);
+
 		// init container
 		this._initContainer();
 
@@ -143,7 +145,7 @@ Wu.Invite = Wu.Class.extend({
 
 		// hidden
 		var invite_token = Wu.DomUtil.create('input', '', input_wrapper);
-		invite_token.value = this._invite.uuid || false;
+		invite_token.value = this._invite.token || false;
 		invite_token.style.display = 'none';
 		invite_token.setAttribute('name', 'invite_token');
 

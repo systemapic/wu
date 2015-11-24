@@ -6,6 +6,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		defaultWidth : 400
 	},
 
+	// When a new layer is created, we make a background fade on it
+	newLayer : false,
+
 	_initialize : function () {
 
 		// init container
@@ -20,20 +23,16 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// hide by default
 		this._hide();
 
+		// shortcut
 		app.Tools = app.Tools || {};
 		app.Tools.DataLibrary = this;	
-
-
-		// When a new layer is created, we make a background fade on it
-		// store which layer here...
-		this.newLayer = false;
-
-
 	},
 
 	_onLayerAdded : function (options) {
 
 		var uuid = options.detail.layerUuid;
+
+		// remember
 		this.newLayer = uuid;
 
 		// Get layer object
@@ -43,12 +42,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var layerMeta = JSON.parse(layer.store.metadata);
 
 		// Build tooltip object
-		// TODO: use event?
-		var tooltipMeta = app.Tools.Tooltip._buildTooltipMeta(layerMeta);
+		var tooltipMeta = app.Tools.Tooltip._buildTooltipMeta(layerMeta); // TODO: use event?
 
 		// Create tooltip meta...
 		layer.setTooltip(tooltipMeta);
 
+		// refresh
 		this._refresh();
 	},
 
@@ -73,6 +72,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Middle container
 		this._innerContainer = Wu.DomUtil.create('div', 'chrome-data-inner', this._container);
 
+		// todo: create wrapper for layers - needs to be hidden if not editor
+
 		// LAYER LIST
 		this._initLayerListContainer();
 		
@@ -92,37 +93,22 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// Layer list container
 	_initLayerListContainer : function () {
 
-		// HEADER
-		// this._layerListHeader = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer);
-
 		// LAYER LIST OUTER SCROLLER
 		this._layerListOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
 		this._layerListOuterScroller.style.height = '100%';
 
 		// List container
 		this._layerListContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this._layerListOuterScroller);
-
-		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListContainer, 'Layers for [project name]');
+		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListContainer, 'Layers');
 
 		// Containers
 		this._layersContainer = Wu.DomUtil.create('div', 'layers-container', this._layerListContainer);
 		
-
-		// XOXOXOXOXOXO
+		// base layers
 		this._baseLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListContainer, 'Base layer');
-		
 		this._baseLayerDropdownContainer = Wu.DomUtil.create('div', 'base-layer-dropdown-container', this._layerListContainer);
 
 	},
-
-
-
-
-
-
-
-
-
 
 	// File list container
 	_initFileListContainer : function () {
@@ -141,26 +127,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	
 	},
-
-
-
-	// // File list container
-	// _initFileListContainer : function () {
-
-	// 	// HEADER
-	// 	this._fileListTitle = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer, 'My Data');
-
-	// 	// FILE LIST OUTER SCROLLER
-	// 	this._fileListOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
-	// 	this._fileListOuterScroller.style.height = '55%';
-				
-	// 	// List container
-	// 	this._fileListContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this._fileListOuterScroller);
-
-	// 	// Containers
-	// 	this._filesContainer = Wu.DomUtil.create('div', 'files-container', this._fileListContainer);
-	
-	// },
 
 	_initContent : function () {
 
@@ -208,35 +174,29 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	_show : function () {
 
-
 		// Open layer menu
 		app.MapPane._controls.layermenu.open();
 
-
 		// mark button active
 		Wu.DomUtil.addClass(this._topButton, 'active');
-
 		this._container.style.display = 'block';
 		this._isOpen = true;
 
-
 		// enable edit of layer menu...
 		var layerMenu = app.MapPane.getControls().layermenu;
-		if ( this._project.isEditable() ) layerMenu.enableEditSwitch();
+		if (this._project.isEditable()) layerMenu.enableEditSwitch();
 
 		// open if closed
-		if ( !layerMenu._layerMenuOpen ) app.Chrome.Top._openLayerMenu();
-
+		if (!layerMenu._layerMenuOpen) app.Chrome.Top._openLayerMenu();
 	},
 
 	_hide : function () {
 
 		// mark button inactive
 		Wu.DomUtil.removeClass(this._topButton, 'active');
-
 		this._container.style.display = 'none';
 		
-		if ( this._isOpen ) {
+		if (this._isOpen) {
 			var layerMenu = app.MapPane.getControls().layermenu;	 // move to settings selector
 			if (layerMenu) layerMenu.disableEditSwitch();
 		}
@@ -245,21 +205,15 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	onOpened : function () {
-
 	},
-
 	onClosed : function () {
 	},
-
 	_addEvents : function () {
 	},
-
 	_removeEvents : function () {
 	},
-
 	_onWindowResize : function () {
 	},
-
 	getDimensions : function () {
 		var dims = {
 			width : this.options.defaultWidth,
@@ -273,28 +227,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 
-	// █████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗
-	// ╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝
-
-
-	// ██████╗ ███████╗███████╗██████╗ ███████╗███████╗██╗  ██╗
-	// ██╔══██╗██╔════╝██╔════╝██╔══██╗██╔════╝██╔════╝██║  ██║
-	// ██████╔╝█████╗  █████╗  ██████╔╝█████╗  ███████╗███████║
-	// ██╔══██╗██╔══╝  ██╔══╝  ██╔══██╗██╔══╝  ╚════██║██╔══██║
-	// ██║  ██║███████╗██║     ██║  ██║███████╗███████║██║  ██║
-	// ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝
-
 	_refresh : function () {
 
-		if ( !this._project ) return;
-
-		// // Upload button
-		// this._initUploadButton();
+		if (!this._project) return;
 
 		// Empty containers
 		if ( this._layersContainer ) this._layersContainer.innerHTML = '';
 		if ( this._filesContainer )  this._filesContainer.innerHTML = '';
-
 
 		if (this._project.isEditable()) {
 
@@ -302,50 +241,42 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			this._initLayerList();
 			this._refreshLayers();
 
-			this._initBaseLayerList();
+			// this._initBaseLayerList(); // why twice?
 			this._refreshBaseLayerList();
 		}
-		
+
+		this._refreshBaseLayerList();
 
 		// File list
 		this._initFileLists();
 		this._refreshFiles();
 
-
 		// Upload button
-		this._initUploadButton();		
-		
+		this._initUploadButton();
+
+		// layer title
+		var projectName = this._project.getTitle();
+		this._layerListTitle.innerHTML = 'Layers for ' + projectName;	
+
+		// hide layers if not editor
+		if (!this._project.isEditable()) {
+			// todo: put layers in wrapper and hide
+		}	
 
 	},
-
-	// ┬ ┬┌─┐┬  ┌─┐┌─┐┌┬┐  ┌┐ ┬ ┬┌┬┐┌┬┐┌─┐┌┐┌
-	// │ │├─┘│  │ │├─┤ ││  ├┴┐│ │ │  │ │ ││││
-	// └─┘┴  ┴─┘└─┘┴ ┴─┴┘  └─┘└─┘ ┴  ┴ └─┘┘└┘
-
-	// TODO: 	Is it not irrelevant if a user can upload data to project?
-	//		A user can or cannot upload data to the PORTAL, right?
-	// 		And can or cannot ADD that data to a project?
 
 	_initUploadButton : function () {
 
-		
 		// Return if upload button already exists
-		if ( this.uploadButton ) return;
+		if (this.uploadButton) return;
 
-		// Create Upload Button
-		// this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this.topContainer);
-
+		// get upload button
 		this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this._uploadButtonContainer);
 		
+		// set title
 		this.uploadButton.innerHTML = '<i class="fa fa-cloud-upload"></i>Upload data';
-
-
 	},
 
-
-	// ┌─┐┬  ┌─┐┌─┐┌─┐  ┌─┐┌─┐┌─┐┬ ┬┌─┐┌─┐
-	// │  │  │ │└─┐├┤   ├─┘│ │├─┘│ │├─┘└─┐
-	// └─┘┴─┘└─┘└─┘└─┘  ┴  └─┘┴  └─┘┴  └─┘
 
 	// When clicking on container, close popups
 	_closeActionPopUps : function (e) {
@@ -380,24 +311,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 
-	// █████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗
-	// ╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝
-
-
-
-	// ███████╗██╗██╗     ███████╗███████╗
-	// ██╔════╝██║██║     ██╔════╝██╔════╝
-	// █████╗  ██║██║     █████╗  ███████╗
-	// ██╔══╝  ██║██║     ██╔══╝  ╚════██║
-	// ██║     ██║███████╗███████╗███████║
-	// ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
-
-	// ┬┌┐┌┬┌┬┐  ┌─┐┬┬  ┌─┐┌─┐
-	// │││││ │   ├┤ ││  ├┤ └─┐
-	// ┴┘└┘┴ ┴   └  ┴┴─┘└─┘└─┘	
-
 	_initFileLists : function () {
-
 
 		// Holds each section (project files, my files, etc)
 		// Currently only "my files"
@@ -415,9 +329,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// File list (global)
 		this.fileProviders = {};
 
-		// add postgis files
-		// if (app.access.to.edit_project(this._project)) {
-			
 		this.fileProviders.postgis = {
 			name : 'Data Library',
 			data : [],
@@ -425,11 +336,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				return app.Account.getFiles()
 			}
 		}
-		// }
-
+		
 		// Create FILE LIST section, with D3 container
-
-		for ( var f in this.fileProviders ) {
+		for (var f in this.fileProviders ) {
 
 			this.fileListContainers[f] = {};
 
@@ -443,10 +352,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	},	
 
-	
-	// ┬─┐┌─┐┌─┐┬─┐┌─┐┌─┐┬ ┬  ┌─┐┬┬  ┌─┐┌─┐
-	// ├┬┘├┤ ├┤ ├┬┘├┤ └─┐├─┤  ├┤ ││  ├┤ └─┐
-	// ┴└─└─┘└  ┴└─└─┘└─┘┴ ┴  └  ┴┴─┘└─┘└─┘
 	
 	_refreshFiles : function () {
 
@@ -470,14 +375,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 
-
-
-	// ███████╗██╗██╗     ███████╗    ██╗      ██████╗  ██████╗ ██████╗               ██████╗ ██████╗ 
-	// ██╔════╝██║██║     ██╔════╝    ██║     ██╔═══██╗██╔═══██╗██╔══██╗              ██╔══██╗╚════██╗
-	// █████╗  ██║██║     █████╗      ██║     ██║   ██║██║   ██║██████╔╝    █████╗    ██║  ██║ █████╔╝
-	// ██╔══╝  ██║██║     ██╔══╝      ██║     ██║   ██║██║   ██║██╔═══╝     ╚════╝    ██║  ██║ ╚═══██╗
-	// ██║     ██║███████╗███████╗    ███████╗╚██████╔╝╚██████╔╝██║                   ██████╔╝██████╔╝
-	// ╚═╝     ╚═╝╚══════╝╚══════╝    ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝                   ╚═════╝ ╚═════╝ 
 
 	// ┌─┐┌─┐┌─┐┬ ┬  ┌─┐┬┬  ┌─┐  ┬ ┬┬─┐┌─┐┌─┐┌─┐┌─┐┬─┐
 	// ├┤ ├─┤│  ├─┤  ├┤ ││  ├┤   │││├┬┘├─┤├─┘├─┘├┤ ├┬┘
@@ -519,13 +416,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				return false;
 			}.bind(this))
 
-
-
 		// EXIT
 		dataListLine
 			.exit()
 			.remove();
-
 
 		
 		// CREATE NAME CONTENT (file name)
@@ -995,23 +889,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 
-                                                                                                                            
-	// █████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗
-	// ╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝
-
-
-
-
-
-	// ██╗      █████╗ ██╗   ██╗███████╗██████╗ ███████╗
-	// ██║     ██╔══██╗╚██╗ ██╔╝██╔════╝██╔══██╗██╔════╝
-	// ██║     ███████║ ╚████╔╝ █████╗  ██████╔╝███████╗
-	// ██║     ██╔══██║  ╚██╔╝  ██╔══╝  ██╔══██╗╚════██║
-	// ███████╗██║  ██║   ██║   ███████╗██║  ██║███████║
-	// ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝
-
-	
-
 	// ┬┌┐┌┬┌┬┐  ┬  ┌─┐┬ ┬┌─┐┬─┐┌─┐
 	// │││││ │   │  ├─┤└┬┘├┤ ├┬┘└─┐
 	// ┴┘└┘┴ ┴   ┴─┘┴ ┴ ┴ └─┘┴└─└─┘
@@ -1040,7 +917,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	       		var provider = layerBundle.key;
 	       			
-	       		if ( provider != 'postgis' ) return;
+	       		// only do our layers
+	       		if (provider != 'postgis') return;
 
 	       		var layers = layerBundle.layers;
 
@@ -1065,13 +943,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	createNoLayers : function () {
-
 		var noLayersText = 'This project has no layers.<br>Upload files, and add them to project.';
 		var noLayers = Wu.DomUtil.create('div', 'no-layers', this._layersContainer, noLayersText);
-
-
 	},
-
 
 	
 	// ┬─┐┌─┐┌─┐┬─┐┌─┐┌─┐┬ ┬  ┬  ┌─┐┬ ┬┌─┐┬─┐┌─┐
@@ -1080,12 +954,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	_refreshLayers : function () {
 
-		var projectName = this._project.getTitle();
-		this._layerListTitle.innerHTML = 'Layers for \'' + projectName + '\'';
-
 		// FILES
 		for (var p in this.layerProviders) {
-
 			var provider = this.layerProviders[p];
 			var layers = provider.layers;
 			provider.data = _.toArray(layers);
@@ -1136,23 +1006,21 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 	_initBaseLayerList : function () {
-
 		this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false)
-		
 	},
 
 	_refreshBaseLayerList : function () {
 
+		// clear
 		this._baseLayerDropdownContainer.innerHTML = '';
-		this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false)
 
+		// only create if editable
+		if (this._project.isEditable()) {
+			this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false)
+		}
 	},
 
-
-
-
 	_initLayout_activeLayers : function (title, subtitle, container, layers) {
-
 
 		// active layer wrapper
 		var wrap = this._activeLayersWrap = Wu.DomUtil.create('div', 'baselayer-dropdown-wrapper', container);
@@ -1226,21 +1094,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			zIndex : 1,
 			opacity : 1
 		}]);
-
-
-
 	},
-
-
-
-
-
-	// ██╗      █████╗ ██╗   ██╗███████╗██████╗     ██╗      ██████╗  ██████╗ ██████╗ 
-	// ██║     ██╔══██╗╚██╗ ██╔╝██╔════╝██╔══██╗    ██║     ██╔═══██╗██╔═══██╗██╔══██╗
-	// ██║     ███████║ ╚████╔╝ █████╗  ██████╔╝    ██║     ██║   ██║██║   ██║██████╔╝
-	// ██║     ██╔══██║  ╚██╔╝  ██╔══╝  ██╔══██╗    ██║     ██║   ██║██║   ██║██╔═══╝ 
-	// ███████╗██║  ██║   ██║   ███████╗██║  ██║    ███████╗╚██████╔╝╚██████╔╝██║     
-	// ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝    ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝     
 
 
 	// ┌─┐┌─┐┌─┐┬ ┬  ┬  ┌─┐┬ ┬┌─┐┬─┐  ┬ ┬┬─┐┌─┐┌─┐┌─┐┌─┐┬─┐
@@ -1260,9 +1114,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			.enter()
 			.append('div')
 			.classed('data-list-line', true);
-			// .classed('layer-list-item', true)
-			// .classed('chrome-metafield-line', true);
-
 
 		// UPDATE
 		dataListLine
@@ -1297,8 +1148,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				if ( this.editingLayerName == uuid ) return true;
 				return false;
 			}.bind(this))
-
-
 
 
 		// EXIT
