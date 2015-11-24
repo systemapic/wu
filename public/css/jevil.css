@@ -233,7 +233,7 @@
     }
 
 .layers-container {
-    margin-bottom: 3px;
+    margin-bottom: 15px;
     }
 
 .baselayer-dropdown-wrapper {
@@ -530,7 +530,8 @@ input.chrome-field-input {
 
 .active-project,
 .active-project:hover {
-    background: #71c4a8 !important;    
+    /*background: #71c4a8 !important;    */
+    background: #3C4759 !important;
     }
 
 .active-project:hover {
@@ -548,8 +549,24 @@ input.chrome-field-input {
 
 
 
+.chrome-left {
+    padding-top: 40px;
+    overflow: hidden;
+    }
 
+.chrome-left-outer-scroller {
+    /*width: 305px;*/
+    
+    width: 318px;
 
+    padding-right: 21px;
+    overflow-y: scroll;
+    position: absolute;
+    top: 0px;
+    height: 100%;
+    padding-top: 40px;
+    padding-bottom: 50px;
+}
 
 .chrome-left-title {
     border: none;
@@ -559,6 +576,10 @@ input.chrome-field-input {
     color: #3C4759;    
     }
 
+
+.chrome-left-container {
+    margin-top: 20px;    
+    }
 
 .chrome-left-container.contacts {
     margin-top: 28px;    
@@ -572,7 +593,9 @@ input.chrome-field-input {
     text-align: center;
     padding: 0;     
     line-height: 20px;           
-        top: -2px;
+    right: auto;
+    left: 240px;
+    top: 2px;
     }
 
 .chrome-left-invite-users,
@@ -792,7 +815,7 @@ input.chrome-field-input {
 
 
 #app {
-    min-width: 1100px;
+    min-width: 1120px;
     }
 
 
@@ -915,14 +938,67 @@ input.chrome-field-input {
 }
 
 .active-project .chrome-left-popup-trigger {
-    right: 13px;
+    left: 250px;
 }
 
 .contact-invite-icon {
     top: 4px;
-    right: 17px;
+    /*right: 17px;*/
+    left: 260px;
 }
 
 .contact-list-icon {
-    right: 15px;
+    /*right: 15px;*/
+    left: 258px;    
+}
+
+
+
+
+
+
+
+
+
+.feedback-pane {
+    z-index: 999999999999999999;
+    top: 0px;
+    left: 40px;
+    min-width: 350px;
+    text-align: left;
+    }
+
+
+
+
+
+.chrome.chrome-content.styler-content.active-layer.wrapper {
+    padding-right: 21px;
+}
+
+
+.smooth-fullscreen-inner {
+    padding-bottom: 200px;
+}
+
+
+
+.leaflet-draw-actions {
+    left: 31px;
+}
+
+.leaflet-draw-actions-top.leaflet-draw-actions-bottom a {
+    height: 31px;
+    font-size: 12px;
+    line-height: 31px;        
+}
+
+
+.smooth-fullscreen-inner.invite {
+    overflow: hidden;
+}
+
+
+.no-layers {
+    color: #C80000;
 }

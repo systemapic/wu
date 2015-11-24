@@ -625,6 +625,20 @@ module.exports = api.project = {
 
 		var hashedUser = user.getUuid(); // todo: hash user ids
 
+		console.log('user: ', user);
+
+		// if phantomjs bot
+		if (user.isBot()) {
+			Project
+			.find()
+			.populate('files')
+			.populate('roles')
+			.populate('layers')
+			.exec(done);
+
+			return;
+		}
+
 		// get all projects where user is in access.edit or access.read
 		Project
 		.find()

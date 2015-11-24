@@ -49,6 +49,7 @@ ops.push(function (callback) {
 	user.firstName 		= userFirstname;
 	user.lastName 		= userLastname;
 	user.createdBy		= userUuid;
+	user.access.account_type = 'bot';
 	user.save(callback);
 
 	console.log('Log in with email '.yellow + user.local.email + ' and password: '.yellow + password);

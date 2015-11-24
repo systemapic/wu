@@ -166,7 +166,7 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// create popup
 		var popup = this._popup = Wu.popup({
-			offset : [18, 0],
+			offset : [18, 0],			
 			closeButton : true,
 			zoomAnimation : false,
 			maxWidth : maxWidth,
