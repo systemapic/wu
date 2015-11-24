@@ -104,6 +104,10 @@ userSchema.methods.getEmail = function () {
     return this.local.email;
 };
 
+userSchema.methods.isBot = function () {
+    return this.local.email == 'bot@systemapic.com' && this.access.account_type == 'bot';
+};
+
 // timestamps plugin
 userSchema.plugin(timestamps);    // adds created and lastUpdated fields automatically
 

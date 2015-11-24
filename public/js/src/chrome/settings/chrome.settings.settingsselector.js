@@ -11,7 +11,7 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 			},
 			tooltip : {
 				enabled : true,
-				text : 'Tooltip'
+				text : 'Pop-up'
 			},
 			filters : {
 				enabled : true,

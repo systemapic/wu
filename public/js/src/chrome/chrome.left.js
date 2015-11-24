@@ -27,14 +27,14 @@ Wu.Chrome.Left = Wu.Chrome.extend({
 
 
 
-		// // Outer container
+		// Outer container
 		// this._outerContainer = Wu.DomUtil.create('div', 'chrome chrome-container chrome-left', app._appPane);
 
-		// // Outer scroller
-		// this._outerWrapper = Wu.DomUtil.create('div', 'chrome-left-outer-scroller', app._outerContainer);
+		// Outer scroller
+		this._outerScroller = Wu.DomUtil.create('div', 'chrome-left-outer-scroller', this._container);
 
-		// // Inner scroller
-		// this._container = Wu.DomUtil.create('div', 'chrome-left-inner-scroller', app._outerWrapper);
+		// Inner scroller
+		this._innerScroller = Wu.DomUtil.create('div', 'chrome-left-inner-scroller', this._outerScroller);
 
 
 
@@ -49,7 +49,7 @@ Wu.Chrome.Left = Wu.Chrome.extend({
 
 			// create settings selector
 			this._tabs.projects = new Wu.Chrome.Projects({
-				appendTo : this._container,
+				appendTo : this._innerScroller,
 				chrome : this
 			});
 		}
@@ -59,7 +59,7 @@ Wu.Chrome.Left = Wu.Chrome.extend({
 
 			// create settings selector
 			this._tabs.users = new Wu.Chrome.Users({
-				appendTo : this._container,
+				appendTo : this._innerScroller,
 				chrome : this // ie. left chrome
 			});
 		}
@@ -106,5 +106,12 @@ Wu.Chrome.Left = Wu.Chrome.extend({
 	},
 	
 
+	getDimensions : function () {
+		var dims = {
+			width : this.options.defaultWidth,
+			height : this._container.offsetHeight
+		}
+		return dims;
+	},
 
 });

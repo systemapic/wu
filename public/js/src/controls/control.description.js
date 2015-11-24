@@ -108,6 +108,8 @@ L.Control.Description = Wu.Control.extend({
 	_hide : function () {	
 		this._container.style.display = 'none'; 
 		this.isOpen = false;
+
+		this.toggleScale(false);
 	},
 
 	_flush : function () {
@@ -590,6 +592,10 @@ L.Control.Description = Wu.Control.extend({
 	// EXTERNAL EXTERNAL EXTERNAL
 	// Toggle scale/measure/mouseposition corner
 	toggleScale : function (openDescription) {
+
+		console.log('%c toggleScale ', 'background: red; color: white; font-size: 24px;');
+		console.log('openDescription', openDescription);
+		console.log('app._map._controlCorners.topright', app._map._controlCorners.topright);
 
 		if ( !app._map._controlCorners.topright ) return;
 
