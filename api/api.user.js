@@ -370,6 +370,7 @@ module.exports = api.user = {
 		var user = options.user;
 		var access = options.access;
 		var email = options.email || false;
+		var type = options.type;
 
 		// create token and save in redis with options
 		var token = api.utils.getRandomChars(7, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890');
@@ -389,10 +390,10 @@ module.exports = api.user = {
 		var invite_options = JSON.stringify({
 			email : email,
 			access : access,
-			// uuid : uuid,
 			token : token,
 			invited_by : user.getUuid(),
 			timestamp : new Date().getTime(),
+			type : type
 		});
 
 		// save token to redis
