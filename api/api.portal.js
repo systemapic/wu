@@ -81,8 +81,6 @@ module.exports = api.portal = {
 		var path = req.originalUrl.split('/');
 		var invite_token = path[2];
 
-		console.log('invite_token', invite_token);
-
 		// get token from redis
 		var redis_key = 'invite:token:' + invite_token;
 		api.redis.tokens.get(redis_key, function (err, token_store) {
@@ -91,6 +89,36 @@ module.exports = api.portal = {
 			var stored_invite = api.utils.parse(token_store);
 
 			if (err || !stored_invite) return api.error.missingInformation(req, res);
+
+			console.log('stored invite: ', stored_invite);
+
+			// handle already logged in users
+			if (req.isAuthenticated()) {
+				
+				// link invite, and logged in - just add access to user, log in
+				if (stored_invite.type == 'link') {
+
+					// include access and log in
+					return api.portal.includeAccess({
+						res : res,
+						req : req,
+						invite : stored_invite
+					});
+					
+				}
+
+				// logged in + same email as invite -> include access and log in
+				if (stored_invite.type == 'email' && stored_invite.email == req.user.getEmail()) {
+
+					// include access and log in
+					return api.portal.includeAccess({
+						res : res,
+						req : req,
+						invite : stored_invite
+					});
+				} 
+
+			}
 
 			// make sure logged out
 			req.logout();
@@ -106,6 +134,113 @@ module.exports = api.portal = {
 	},
 
 
+	includeAccess : function (options) {
+		var req = options.req;
+		var res = options.res;
+		var user = req.user;
+		var invite = options.invite;
+		var access = invite.access;
+		var ops = [];
+
+
+		// { 
+		// 	email: false,
+		// 	access: { 
+		// 		edit: [], 
+		// 		read: [Object] 
+		// 	},
+		// 	token: 'e0Ju2hb',
+		// 	invited_by: 'user-b19142c6-a86e-4b8b-9735-d2b7dbf4710b',
+		// 	timestamp: 1448381150099 
+		// }
+
+		ops.push(function (callback) {
+
+			// add invited to contact list
+
+			User
+			.findOne({uuid : invite.invited_by})
+			.exec(function (err, user_that_invited) {
+				if (err) return callback(err);
+
+				// add new user to inviter's contact list
+				user_that_invited.contact_list.push(user._id);
+
+				// and vice versa
+				user.contact_list.push(user_that_invited._id);
+			
+				// save both
+				user_that_invited.save(function (err) {
+
+					user.save(function (err) {
+						callback(null);
+					});
+				});
+			});
+
+		});
+
+		ops.push(function (callback) {
+
+			// add user to edit projects
+			var edits = invite.access.edit;
+
+			if (!edits.length) return callback(null);
+
+			async.each(edits, function (e, cb) {
+
+				Project
+				.findOne({uuid : e})
+				.exec(function (err, project) {
+					project.access.edit.addToSet(user.getUuid());
+					project.markModified('access');
+					project.save(cb)
+				});
+
+			}, function (err) {
+				if (err) console.log('each edit err: ', err);
+				callback(null);
+			})
+
+		});
+
+		ops.push(function (callback) {
+
+			// add user to read projects
+			var reads = invite.access.read;
+
+			if (!reads.length) return callback(null);
+
+			async.each(reads, function (e, cb) {
+
+				Project
+				.findOne({uuid : e})
+				.exec(function (err, project) {
+					project.access.read.addToSet(user.getUuid());
+					project.markModified('access');
+					project.save(cb)
+				});
+
+			}, function (err) {
+				if (err) console.log('each read err: ', err);
+				callback(null);
+			})
+
+		});
+
+
+		async.series(ops, function (err, results) {
+			if (err) console.log('includeAccess err: ', err);
+
+			res.render('../../views/app.serve.ejs', {
+				hotlink : {},
+				access_token : req.session.access_token || {}
+			});
+		})
+
+		
+
+	},
 
 	// process wildcard paths, including hotlinks
 	wildcard : function (req, res) {
