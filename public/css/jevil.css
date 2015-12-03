@@ -771,13 +771,13 @@ input.chrome-field-input {
 
 
 /*.file-list-container */
-.data-list-line:nth-child(odd):before {
+.files-container .data-list-line:nth-child(odd):before {
     content: '';
     position: absolute;
     left: -28px;
     width: 402px;
     height: 100%;
-    background: #fff;
+    background: rgb(249, 249, 249);
     z-index: -1;
     opacity: 1;
     top: 0;    

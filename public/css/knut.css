@@ -1080,3 +1080,25 @@
 .extra-margin-top {
 	margin-top: 50px;
 }
+
+/*same white color errywhere*/
+#layer-menu-inner-content {
+	background: #FCFCFC;
+}
+.layer-menu-item-wrap {
+	background: #FCFCFC !important;
+}
+.description-multiple-toggle-wrapper {
+	background: #FCFCFC;
+}
+.description-control-content-box {
+	background: #FCFCFC;
+}
+.leaflet-bar, .leaflet-control-layers {
+	background: #FCFCFC;
+}
+.leaflet-bar a, .leaflet-control-baselayertoggle {
+	background-color: #FCFCFC;
+}
+
+
