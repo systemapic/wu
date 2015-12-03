@@ -23,7 +23,7 @@ var projectSchema = mongoose.Schema({
 		read : [String],	 // hashed user_uuid's
 		edit : [String],
 		options : {
-			share : { type: Boolean, default: true },
+			share 	 : { type: Boolean, default: true },
 			download : { type: Boolean, default: false },
 			isPublic : { type: Boolean, default: false }
 		}

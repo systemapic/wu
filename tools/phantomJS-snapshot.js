@@ -18,6 +18,9 @@ var outfile 	= path;
 
 console.log('a2rgs: ', args);
 
+console.log('SERVER URL :', serverUrl);
+console.log('DATA: ', serverData);
+
 console.log('isPdf', isPdf);
 console.log('outfile', outfile);
 
