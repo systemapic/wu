@@ -62,6 +62,8 @@ module.exports = api.geo = {
 		var isPolygon 	= (options.style.polygon && options.style.polygon.enabled);
 		var isLine 	= (options.style.line && options.style.line.enabled);
 
+		console.log('_json2carto options', options);
+
 		// style
 		var style = {
 			headers : '',
@@ -87,7 +89,7 @@ module.exports = api.geo = {
 		style.layer += '}';
 		
 		// debug
-		console.log('created style: ', style);
+		// console.log('created style: ', style);
 
 		// concat
 		var finalCarto = style.headers + style.layer;
@@ -139,7 +141,15 @@ module.exports = api.geo = {
 		style.headers += polygonColorCarto.headers;
 		style.layer += polygonColorCarto.style;
 
+		// targets
+		var targetCarto = this.buildCarto_polygonTarget(options);
+		console.log('targetCarto: ', targetCarto);
+		style.headers += targetCarto.headers;
+		style.layer += targetCarto.style;
+
 		// add line styling todo!
+
+		console.log('CRAETED POLUYGON STYLE:', style);
 
 		return style;
 
@@ -197,6 +207,50 @@ module.exports = api.geo = {
 	// OPACITY
 	// OPACITY
 	// OPACITY
+
+
+	buildCarto_polygonTarget : function (options) {
+
+		console.log('buildCarto_polygonTarget', options);
+
+		var css = {
+			headers : '',
+			style : ''
+		}
+
+		var targets = options.style.polygon.targets;
+
+		console.log('targets :::: ', targets);
+
+		if (!targets || !targets.length) return css;
+
+		// create target
+		targets.forEach(function (t) {
+
+			console.log('ttt ', t);
+
+			var column = t.column;
+			var value = parseFloat(t.value) || '"' + t.value + '"'; // todo; int/float/string type must match postgis 
+			var color = t.color;
+			var opacity = t.opacity;
+
+			if (column) {
+				var string = '\n     [' + column + ' = ' + value + '] {';
+				string += '\n     polygon-fill: ' + color + ';';
+				string += '\n     polygon-opacity: ' + opacity + ';';
+				string += '\n    }\n';
+
+				css.style += string;
+			}
+
+		});
+
+
+		console.log('crated this TARGET CSS', css);
+
+		return css;
+
+	},
 
 	buildCarto_pointOpacity : function (options) {
 
