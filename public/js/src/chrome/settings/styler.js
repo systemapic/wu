@@ -129,7 +129,6 @@ Wu.Styler = Wu.Class.extend({
 	markChanged : function () {
 		this._changed = true;
 		this.options.styler.markChanged();
-
 	},
 
 	updateStyle : function () {
@@ -138,6 +137,7 @@ Wu.Styler = Wu.Class.extend({
 		// create carto css
 		this._createCarto(this.options.carto, this._saveCarto.bind(this));
 
+		// marked not changed
 		this._changed = false;
 	},
 
@@ -613,12 +613,8 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().width.staticVal = inputField.value;
 
-		// update
-		// this._updateStyle();	
-
 		// mark changed
 		this.markChanged();
-
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -648,12 +644,8 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().opacity.staticVal = value;
 
-		// update
-		// this._updateStyle();
-
 		// mark changed
 		this.markChanged();
-
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -682,12 +674,8 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().pointsize.staticVal = value;
 
-		// update
-		// this._updateStyle();
-
 		// mark changed
 		this.markChanged();
-
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -731,13 +719,8 @@ Wu.Styler = Wu.Class.extend({
 		// close popup
 		this._closeColorRangeSelector(); 
 
-		// UPDATE
-		// this._updateStyle();
-
 		// mark changed
 		this.markChanged();
-
-
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -757,9 +740,6 @@ Wu.Styler = Wu.Class.extend({
 
 		// save carto
 		this.carto().color.range = minMax;
-
-		// update		
-		// this._updateStyle();
 
 		// mark changed
 		this.markChanged();
@@ -811,12 +791,8 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().color.value = colorArray;		
 
-		// UPDATE
-		// this._updateStyle();	
-
 		// mark changed
 		this.markChanged();
-
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -872,20 +848,14 @@ Wu.Styler = Wu.Class.extend({
 			Wu.DomUtil.addClass(colorBall, 'disable-color-ball');
 		}
 
-		
-
 		// save carto
 		this.carto()[field].column = column; 
 
 		// Add fields
 		this._initSubfields(column, field); // sub meny
 
-		// UPDATE
-		// this._updateStyle();
-
 		// mark changed
 		this.markChanged();
-
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -931,15 +901,8 @@ Wu.Styler = Wu.Class.extend({
 		// save style
 		this.carto()[key].column = false;
 
-		// set fixed style
-
-
-		// refresh
-		// this._updateStyle();
-
 		// mark changed
 		this.markChanged();
-
 
 	},
 
@@ -1014,12 +977,8 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().pointsize.range = [min, max];
 
-		// updat style
-		// this._updateStyle();
-
 		// mark changed
 		this.markChanged();
-
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -1040,12 +999,8 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().opacity.range = [min, max];
 
-		// updat style
-		// this._updateStyle();
-
 		// mark changed
 		this.markChanged();
-
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -1066,12 +1021,8 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().width.range = [min, max];
 
-		// updat style
-		// this._updateStyle();
-
 		// mark changed
 		this.markChanged();
-
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -1091,6 +1042,8 @@ Wu.Styler = Wu.Class.extend({
 	},	
 
 	_createCarto : function (json, callback) {
+
+		console.log('_createCarto', json);
 
 		// fn lives on styler
 		this.options.styler.createCarto(json, callback);

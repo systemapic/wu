@@ -1102,3 +1102,110 @@
 }
 
 
+
+
+
+/*polygon-styler targets*/
+
+.add-target {
+    height: 20px;
+    width: 100%;
+    font-size: 14px;
+    margin: 10px;
+    margin-left: 0px;
+    cursor: pointer;
+}
+.add-target:hover {
+	color: black;
+}
+.add-target-icon {
+	font-size: 20px;
+	padding-right: 10px !important;
+	float: left;
+}
+.add-target-text {
+	font-size: 15px;
+	float: left;
+}
+
+.target-wrapper {
+	position: relative;
+	height: 50px;
+}
+
+.target-column-dropdown {
+	left: 0px;
+	top: 20px !important;	
+	max-width: 100px;		
+}
+
+.target-column-input {
+	left: 20px;
+}
+
+.target-column-wrapper {
+	position: absolute;
+}
+
+.target-input-wrapper {
+	position: absolute;
+	left: 105px;
+}
+
+.target-input {
+    height: 22px;
+    width: 100px;
+    position: absolute;
+    top: 21px;
+    border: 1px solid gainsboro;
+    border-radius: 2px;
+    font-size: 12px;
+    padding-left: 4px;
+    max-width: 100px;		
+}
+
+.target-color-box {
+	border-radius: 0;
+	width: 34px;
+	height: 21px;
+	top: 7px !important;
+	right: 0;
+}
+
+
+.target-color-wrapper {
+	position: absolute;
+	left: 230px;
+}
+
+.chrome-color-ball.target-color-box {
+	top: 22px !important;
+	left: -2px;
+	border: none;
+	box-shadow: none;
+	border-radius: 3px;
+	height: 20px;
+	border: none;
+	width: 35px;
+}
+
+.target-opacity-wrapper {
+	position: absolute;
+	left: 280px;
+}
+
+
+.target-input.opacity {
+	width: 30px;
+	text-align: center;
+	left: 10px;
+}
+
+.add-target-wrapper {
+	margin-top: 30px;
+}
+
+
+
+
+
