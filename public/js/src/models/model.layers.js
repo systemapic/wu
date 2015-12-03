@@ -182,7 +182,8 @@ Wu.Model.Layer = Wu.Model.extend({
 		descriptionControl._addLayer(this);
 
 		// hide if empty and not editor
-		var isEditor = app.access.to.edit_project(app.activeProject);
+		var project = app.activeProject;
+		var isEditor = project.isEditor();
 		if (this.store.description || isEditor) { // todo: what if only editor 
 			descriptionControl.show();
 		} else { 								// refactor to descriptionControl
@@ -447,7 +448,6 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	setStyling : function (styleJSON) {
-		console.log('setStyle', styleJSON);
 		this.store.style = JSON.stringify(styleJSON);
 		this.save('style');
 	},
@@ -986,7 +986,6 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 	},
 
 	getFileMeta : function () {
-		console.error('getFileMeta');
 		var file = app.Account.getFile(this.store.file);
 		var metajson = file.store.data.raster.metadata;
 		var meta = Wu.parse(metajson);

@@ -53,15 +53,12 @@ Wu.Share = Wu.Pane.extend({
 		this._sharePrintButton = Wu.DomUtil.create('div', 'share-item', this._shareDropdown);
 		this._shareInviteButton  = Wu.DomUtil.create('div', 'share-item', this._shareDropdown);
 
-
-
 		// enter titles
 		this._fillTitles();
 
 		// events
 		Wu.DomEvent.on(this._shareImageButton,  'click', this._shareImage, this);
 		Wu.DomEvent.on(this._sharePrintButton,  'click', this._sharePrint, this);
-		// Wu.DomEvent.on(this._shareInviteButton, 'click', this._shareInvite, this);
 	},
 
 	_registerButton : function () {
@@ -76,8 +73,10 @@ Wu.Share = Wu.Pane.extend({
 			trigger : this._togglePane,
 			context : this,
 			project_dependent : true
-			
 		});
+
+		// share icon
+		this._shareButton.innerHTML = '<i class="fa fa-paper-plane"></i>';
 	},
 
 	_togglePane : function () {
@@ -85,11 +84,15 @@ Wu.Share = Wu.Pane.extend({
 	},
 
 	_open : function () {
+
+		// close other tabs
+		Wu.Mixin.Events.fire('closeMenuTabs');
+
 		Wu.DomUtil.removeClass(this._shareDropdown, 'displayNone');
 		this._isOpen = true;
 
 		// add fullscreen click-ghost
-		this._addGhost();
+		// this._addGhost();
 
 		// mark button active
 		Wu.DomUtil.addClass(this._shareButton, 'active');
@@ -111,16 +114,23 @@ Wu.Share = Wu.Pane.extend({
 		Wu.DomUtil.removeClass(this._shareDropdown, 'wide-share');
 
 		// remove ghost
-		this._removeGhost();
+		// this._removeGhost();
 
 		// mark button inactive
 		Wu.DomUtil.removeClass(this._shareButton, 'active');
 	},
 
+	_onCloseMenuTabs : function () {
+		
+		// app.Chrome();
+		this._close();
+	},
+
+
 	_fillTitles : function () {
 		this._shareImageButton.innerHTML = 'Share Image';
 		this._sharePrintButton.innerHTML = 'Share PDF';
-		this._shareInviteButton.innerHTML = 'Invite users...';
+		this._shareInviteButton.innerHTML = 'Invite to project';
 	},
 
 	_clearTitles : function () {
@@ -135,6 +145,7 @@ Wu.Share = Wu.Pane.extend({
 	},
 
 	_removeGhost : function () {
+		if (!this._ghost) return; 
 		Wu.DomEvent.off(this._ghost, 'click', this._close, this);
 		Wu.DomUtil.remove(this._ghost);
 	},
@@ -143,42 +154,41 @@ Wu.Share = Wu.Pane.extend({
 	_refresh : function () {
 
 		// can share
-		var canShare = app.access.to.share_project(this._project);
+		// var canShare = app.access.to.share_project(this._project);
 
-		if (!canShare) {
-			Wu.DomUtil.addClass(this._shareInviteButton, 'disabled');
-			Wu.DomEvent.off(this._shareInviteButton, 'click', this._shareInvite, this);
-		} else {
+		var project = this._project;
+
+		if (project.isShareable()) {
 			Wu.DomUtil.removeClass(this._shareInviteButton, 'disabled');
 			Wu.DomEvent.on(this._shareInviteButton, 'click', this._shareInvite, this);
+		} else {
+			Wu.DomUtil.addClass(this._shareInviteButton, 'disabled');
+			Wu.DomEvent.off(this._shareInviteButton, 'click', this._shareInvite, this);
 		}
 
-		// refresh permissions
-		this._refreshDefaultPermission();
+		
 	},
 
-	_refreshDefaultPermission : function () {
+	// _refreshDefaultPermission : function () {
 
-		this.options.permissions = [{
-			title : 'View project',
-			permission : 'read_project',
-			checked : true,
-			enabled : false
-		},{
-			title : 'Download data',
-			permission : 'download_file',
-			checked : false,
-			enabled : app.access.to.download_file(this._project)
-		},{
-			title : 'Invite others',
-			permission : 'share_project',
-			checked : true,
-			enabled : true
-		}]
+	// 	this.options.permissions = [{
+	// 		title : 'View project',
+	// 		permission : 'read_project',
+	// 		checked : true,
+	// 		enabled : false
+	// 	},{
+	// 		title : 'Download data',
+	// 		permission : 'download_file',
+	// 		checked : false,
+	// 		enabled : app.access.to.download_file(this._project)
+	// 	},{
+	// 		title : 'Invite others',
+	// 		permission : 'share_project',
+	// 		checked : true,
+	// 		enabled : true
+	// 	}]
 
-		console.log('_refreshDefaultPermission', this.options.permissions);
-
-	},
+	// },
 
 	_shareImage : function () {
 
@@ -316,8 +326,12 @@ Wu.Share = Wu.Pane.extend({
 
 
 	_shareInvite : function () {
-		Wu.DomUtil.addClass(this._shareDropdown, 'wide-share');
-		this._createInviteView();
+
+		app.Chrome.Left._tabs.projects.openShare()
+		this._close();
+
+		// Wu.DomUtil.addClass(this._shareDropdown, 'wide-share');
+		// this._createInviteView();
 	},
 
 	_createInviteView : function () {
@@ -462,8 +476,6 @@ Wu.Share = Wu.Pane.extend({
 			access_type : 'view',
 			permissions : permissions
 		}
-
-		console.log('_getInviteLink', options);
 
 		// slack
 		app.Analytics.onInvite(options);

@@ -3,6 +3,8 @@
 // load the things we need
 var mongoose = require('mongoose');
 var timestamps = require('mongoose-times');
+var _ = require('lodash-node');
+
 
 // define the schema for our project model
 var projectSchema = mongoose.Schema({
@@ -16,6 +18,17 @@ var projectSchema = mongoose.Schema({
 	keywords 	: [{ type: String, default: '' }],
 	categories 	: [String],
 
+	// access_v2
+	access 		: {
+		read : [String],	 // hashed user_uuid's
+		edit : [String],
+		options : {
+			share 	 : { type: Boolean, default: true },
+			download : { type: Boolean, default: false },
+			isPublic : { type: Boolean, default: false }
+		}
+	},
+
 	roles 		: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
 
 			// image
@@ -27,7 +40,7 @@ var projectSchema = mongoose.Schema({
 	colorTheme 	: String,
 
 			// client that owns project
-	client 		: String, 
+	// client 		: String, 
 
 			// all files connected to project
 	files 		: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
@@ -89,13 +102,11 @@ var projectSchema = mongoose.Schema({
 	}],	
 
 	// folders in documents pane, incl. content in html
-	folders : [
-		{
-			uuid    : String,
-			title   : String,
-			content : String
-		}
-	],
+	folders : [{
+		uuid    : String,
+		title   : String,
+		content : String
+	}],
 
 	// header of project/map
 	header : {
@@ -137,12 +148,28 @@ var projectSchema = mongoose.Schema({
 		d3popup		: { type: Boolean, default: false },
 	},
 
-	// 
 	state : String,
 
 	pending : [String],
 	
 });
+
+projectSchema.methods.isPublic = function () {
+    return this.access.options.isPublic;
+};
+projectSchema.methods.isShareable = function () {
+    return this.access.options.share;
+};
+projectSchema.methods.isDownloadable = function () {
+    return this.access.options.download;
+};
+projectSchema.methods.isEditable = function (user_uuid) {
+    return _.contains(this.access.edit, user_uuid) || this.createdBy == user_uuid;
+};
+projectSchema.methods.getUuid = function (user_uuid) {
+    return this.uuid;
+};
+
 
 // timestamps plugin
 projectSchema.plugin(timestamps);	// adds created and lastUpdated fields automatically

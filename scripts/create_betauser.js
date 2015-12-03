@@ -47,26 +47,10 @@ ops.push(function (callback) {
 
 	var options = {
 		permissions : [
-			'create_client',
-			'read_client',
-			'edit_client',
-			'delete_client',
 			'create_project',
-			'read_project',
-			'edit_project',
-			'delete_project',
 			'upload_file',
-			'download_file',
-			'edit_file',
-			'create_version',
-			'delete_version',
-			'delete_file',
-			'create_user',
-			'edit_user',
+			'invite_user', 	// new
 			'share_project',
-			'read_analytics',
-			'manage_analytic',
-			'delegate_to_user'
 		],
 		members : [userUuid]
 	}

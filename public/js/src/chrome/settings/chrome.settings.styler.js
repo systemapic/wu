@@ -44,8 +44,15 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		// active layer
 		this.layerSelector = this._initLayout_activeLayers(false, false, this._midInnerScroller); // appending to this._midSection
 
+
 		// Create field wrapper
 		this._fieldsWrapper = Wu.DomUtil.create('div', 'chrome-field-wrapper', this._midInnerScroller);
+
+		// update style button
+		var buttonWrapper = Wu.DomUtil.create('div', 'button-wrapper', this._midInnerScroller);
+		this._updateStyleButton = Wu.DomUtil.create('div', 'smooth-fullscreen-save update-style', buttonWrapper, 'Update Style');
+		Wu.DomEvent.on(this._updateStyleButton, 'click', this._updateStyle, this);		
+
 
 		// mark inited
 		this._inited = true;
@@ -66,18 +73,31 @@ Wu.Chrome.SettingsContent.Styler = Wu.Chrome.SettingsContent.extend({
 		}
 
 		// create point styler
-		var pointStyler = new Wu.Styler.Point(options);
+		this._pointStyler = new Wu.Styler.Point(options);
 
 		// create polygon styler
-		var polygonStyler = new Wu.Styler.Polygon(options);
+		this._polygonStyler = new Wu.Styler.Polygon(options);
 
 		// create line styler
-		var lineStyler = new Wu.Styler.Line(options);
+		this._lineStyler = new Wu.Styler.Line(options);
 
-	},	
+	},
+
+	markChanged : function () {
+		Wu.DomUtil.addClass(this._updateStyleButton, 'marked-changed');
+	},
+
+	_updateStyle : function () {
+
+		this._pointStyler.updateStyle();
+		this._polygonStyler.updateStyle();
+		this._lineStyler.updateStyle();
+
+		Wu.DomUtil.removeClass(this._updateStyleButton, 'marked-changed');
+
+	},
 	
 	_refresh : function () {
-
 		this._flush();
 		this._initLayout();
 	},

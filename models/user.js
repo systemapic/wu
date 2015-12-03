@@ -24,6 +24,31 @@ var userSchema = mongoose.Schema({
 
         postgis_database : String,
 
+        username : String,
+        email : String,
+        avatar : String,
+
+        // temp status notifications
+        status : {
+            contact_requests : [String]
+        },
+
+        access : {
+
+            // for reference
+            account_type : { type: String, default: 'free' },
+
+            // storage limits
+            storage_quota : { type: Number, default: '200000000' }, // 200MB
+            remaining_quota : { type: Number, default: '200000000' },
+
+            // allowed private projects
+            private_projects : { type: Boolean, default: true },
+
+        },
+
+        contact_list : [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
         files : [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
 
         local : {
@@ -48,7 +73,6 @@ var userSchema = mongoose.Schema({
                 email        : String,
                 name         : String
         },
-        // slack : {}
 });
 
 // methods ======================
@@ -70,6 +94,18 @@ userSchema.methods.getUuid = function () {
 
 userSchema.methods.getName = function () {
     return this.firstName + ' ' + this.lastName;
+};
+
+userSchema.methods.canCreatePrivateProject = function () {
+    return this.access.private_projects;
+};
+
+userSchema.methods.getEmail = function () {
+    return this.local.email;
+};
+
+userSchema.methods.isBot = function () {
+    return this.local.email == 'bot@systemapic.com' && this.access.account_type == 'bot';
 };
 
 // timestamps plugin

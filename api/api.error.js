@@ -51,15 +51,17 @@ module.exports = api.error = {
 		api.error.log('unauthorized');
 	},
 
-	missingInformation : function (req, res) {
+	missingInformation : function (req, res, missing) {
 		console.log('api.error.missingInformation'.red);
 		
 		var message = 'Missing information. Stay with the program!';
+		if (missing) message += '(' + missing + ')';
+
 		res.end(JSON.stringify({ 
 			error : message 
 		}));
 		
-		api.error.log('missingInformation');
+		api.error.log(message);
 	},
 
 	general : function (req, res, err) {

@@ -78,7 +78,7 @@ Wu.Chrome.SettingsContent.Layers = Wu.Chrome.SettingsContent.extend({
 
 		// enable edit of layer menu...
 		var layerMenu = app.MapPane.getControls().layermenu;
-		if (app.access.to.edit_project(this._project)) layerMenu.enableEdit();
+		if (this._project.isEditable()) layerMenu.enableEdit();
 
 	},
 
