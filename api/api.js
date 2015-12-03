@@ -1,17 +1,14 @@
 // api.js
 
-// config
-var config = require('../config/server-config.js');
-
-
 // api
 var api = {};
 api.version = require('fs').readFileSync('../public/js/src/core/app.js').toString().split("'")[1];
+
+// config
+var config = require('../config/server-config.js');
 api.config = config.serverConfig;
 api.clientConfig = config.clientConfig;
 api.loginConfig = config.loginConfig;
-
-
 
 // exports
 module.exports 		= api;
@@ -33,7 +30,6 @@ module.exports.legend 	= require('./api.legend');
 module.exports.pixels 	= require('./api.pixels');
 module.exports.portal 	= require('./api.portal');
 module.exports.access 	= require('./api.access');
-module.exports.client 	= require('./api.client');
 module.exports.socket 	= require('./api.socket');
 module.exports.postgis  = require('./api.postgis');
 module.exports.project 	= require('./api.project');

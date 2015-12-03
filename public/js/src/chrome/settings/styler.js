@@ -70,7 +70,7 @@ Wu.Styler = Wu.Class.extend({
 		var isOn = this.carto().enabled;
 
 		// Create wrapper
-		this._wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this.options.container);
+		this._wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper toggles-wrapper', this.options.container);
 
 		// wrapper
 		var line = new Wu.fieldLine({
@@ -80,7 +80,7 @@ Wu.Styler = Wu.Class.extend({
 			input        : false,
 		});		
 
-		// switch button
+		// switch Update Style
 		var button = new Wu.button({
 			id 	     : this.type,
 			type 	     : 'switch',
@@ -100,7 +100,8 @@ Wu.Styler = Wu.Class.extend({
 		this._toggle(on);
 
 		// update
-		this._updateStyle();
+		// this.updateStyle();
+		this.markChanged();
 	},
 
 	_toggle : function (on) {
@@ -117,6 +118,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// select options
 		this._preSelectOptions();
+
 	},
 
 	_disable : function () {
@@ -124,15 +126,21 @@ Wu.Styler = Wu.Class.extend({
 		this._clearOptions();
 	},
 
-	_updateStyle : function () {
+	markChanged : function () {
+		this._changed = true;
+		this.options.styler.markChanged();
 
-		console.log('updateStyle', this.options.carto, this);
+	},
+
+	updateStyle : function () {
+		if (!this._changed) return;
 
 		// create carto css
 		this._createCarto(this.options.carto, this._saveCarto.bind(this));
 
-		
+		this._changed = false;
 	},
+
 
 	// create color box
 	_createColor : function () {
@@ -146,8 +154,6 @@ Wu.Styler = Wu.Class.extend({
 		var val          = this.carto().color.value 	|| this.options.defaults.range;
 		var column       = this.carto().color.column;
 		var minMax       = this.carto().color.range;
-
-		console.log('_createColor column: ', column, staticVal, isOn);
 
 		// container
 		var line = new Wu.fieldLine({
@@ -206,7 +212,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// get states
 		var isOn   = (this.carto().opacity.column === false);
-		var value  = this.carto().opacity.value || 1;
+		var value  = this.carto().opacity.staticVal || 1;
 		var column = this.carto().opacity.column;
 		var minMax = this.carto().opacity.range;
 
@@ -254,7 +260,7 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().opacity = {
 			column : column,
 			range : minMax,
-			value : value
+			staticVal : value
 		};
 	},
 
@@ -266,7 +272,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// Get stores states
 		var isOn   = (this.carto().pointsize.column === false)
-		var val    = this.carto().pointsize.value || 1.2;
+		var val    = this.carto().pointsize.staticVal || 1.2;
 		var column = this.carto().pointsize.column;
 		var minMax = this.carto().pointsize.range;
 
@@ -314,7 +320,7 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().pointsize = {
 			column 	    : column,
 			range 	    : minMax,			
-			value 	    : val
+			staticVal : val
 		};
 	},
 
@@ -326,7 +332,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// Get stores states
 		var isOn   = (this.carto().width.column === false)
-		var val    = this.carto().width.value || 1.2;
+		var val    = this.carto().width.staticVal || 1.2;
 		var column = this.carto().width.column;
 		var minMax = this.carto().width.range;
 
@@ -374,7 +380,7 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().width = {
 			column 	    : column,
 			range 	    : minMax,			
-			value 	    : val
+			staticVal : val
 		};
 	},
 
@@ -402,7 +408,7 @@ Wu.Styler = Wu.Class.extend({
 		var color_range = range ? range.line.container : false;
 
 		// convert to five colors
-		if (value.length < 5) value = this._convertToFiveColors(value);
+		if (value.length < 5) values = this._convertToFiveColors(value);
 
 		// Container
 		var line = new Wu.fieldLine({
@@ -471,6 +477,9 @@ Wu.Styler = Wu.Class.extend({
 
 		// save carto
 		this.carto().color.range = value;
+
+		// mark changed
+		this.markChanged();
 		
 	},
 
@@ -520,6 +529,9 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().opacity.column  = column;
 		this.carto().opacity.range = value;
+
+		// mark changed
+		this.markChanged();
 	},
 
 	_addWidthFields : function (column) {
@@ -567,6 +579,9 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().width.column  = column;
 		this.carto().width.range = value;
+
+		// mark changed
+		this.markChanged();
 	},
 
 	_updateColor : function (hex, key, wrapper) {
@@ -578,9 +593,10 @@ Wu.Styler = Wu.Class.extend({
 		this._closeColorRangeSelector(); 
 
 		// update
-		this._updateStyle();	
+		// this._updateStyle();	
 
-		console.log('_updateColor');
+		// mark changed
+		this.markChanged();
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -595,10 +611,14 @@ Wu.Styler = Wu.Class.extend({
 		var inputField = this._content[this.type].width.input.input;
 
 		// save carto
-		this.carto().width.value = inputField.value;
+		this.carto().width.staticVal = inputField.value;
 
 		// update
-		this._updateStyle();	
+		// this._updateStyle();	
+
+		// mark changed
+		this.markChanged();
+
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -623,13 +643,17 @@ Wu.Styler = Wu.Class.extend({
 		inputField.value = value;
 
 		// don't save if unchanged
-		if (this.carto().opacity.value == value) return;
+		if (this.carto().opacity.staticVal == value) return;
 
 		// save carto
-		this.carto().opacity.value = value;
+		this.carto().opacity.staticVal = value;
 
 		// update
-		this._updateStyle();
+		// this._updateStyle();
+
+		// mark changed
+		this.markChanged();
+
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -653,13 +677,17 @@ Wu.Styler = Wu.Class.extend({
 		inputField.value = value;
 
 		// don't save if no changes
-		if (this.carto().pointsize.value == value) return;
+		if (this.carto().pointsize.staticVal == value) return;
 
 		// save carto
-		this.carto().pointsize.value = value;
+		this.carto().pointsize.staticVal = value;
 
 		// update
-		this._updateStyle();
+		// this._updateStyle();
+
+		// mark changed
+		this.markChanged();
+
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -704,7 +732,12 @@ Wu.Styler = Wu.Class.extend({
 		this._closeColorRangeSelector(); 
 
 		// UPDATE
-		this._updateStyle();
+		// this._updateStyle();
+
+		// mark changed
+		this.markChanged();
+
+
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -726,7 +759,10 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().color.range = minMax;
 
 		// update		
-		this._updateStyle();
+		// this._updateStyle();
+
+		// mark changed
+		this.markChanged();
 	},
 
 	// on click on color range presets
@@ -776,7 +812,11 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().color.value = colorArray;		
 
 		// UPDATE
-		this._updateStyle();	
+		// this._updateStyle();	
+
+		// mark changed
+		this.markChanged();
+
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -793,9 +833,6 @@ Wu.Styler = Wu.Class.extend({
 		var field = e.target.value;
 		var wrapper = e.target.parentElement;
 
-		console.log('_dropdownSelected!!', e, key, field, wrapper, this.type);
-
-
 		// check if selected item is placeholders
 		var isStatic = (field == this.options.dropdown.staticText);
 		var isDivider = (field == this.options.dropdown.staticDivider);
@@ -809,6 +846,13 @@ Wu.Styler = Wu.Class.extend({
 
 		// add class
 		Wu.DomUtil.addClass(wrapper, 'full-width');
+
+		// if not same, clear old values
+		if (this.carto()[field].column != column) {
+			var staticVal = this.carto()[field].staticVal;
+			this.carto()[field] = {};
+			this.carto()[field].staticVal = staticVal;
+		}
 
 		// remove static inputs
 		if (field == 'opacity') {
@@ -828,10 +872,7 @@ Wu.Styler = Wu.Class.extend({
 			Wu.DomUtil.addClass(colorBall, 'disable-color-ball');
 		}
 
-		// if not same, clear old values
-		if (this.carto()[field].column != column) {
-			this.carto()[field] = {};
-		}
+		
 
 		// save carto
 		this.carto()[field].column = column; 
@@ -840,7 +881,11 @@ Wu.Styler = Wu.Class.extend({
 		this._initSubfields(column, field); // sub meny
 
 		// UPDATE
-		this._updateStyle();
+		// this._updateStyle();
+
+		// mark changed
+		this.markChanged();
+
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -886,8 +931,15 @@ Wu.Styler = Wu.Class.extend({
 		// save style
 		this.carto()[key].column = false;
 
+		// set fixed style
+
+
 		// refresh
-		this._updateStyle();
+		// this._updateStyle();
+
+		// mark changed
+		this.markChanged();
+
 
 	},
 
@@ -963,7 +1015,11 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().pointsize.range = [min, max];
 
 		// updat style
-		this._updateStyle();
+		// this._updateStyle();
+
+		// mark changed
+		this.markChanged();
+
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -985,7 +1041,11 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().opacity.range = [min, max];
 
 		// updat style
-		this._updateStyle();
+		// this._updateStyle();
+
+		// mark changed
+		this.markChanged();
+
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -1007,7 +1067,11 @@ Wu.Styler = Wu.Class.extend({
 		this.carto().width.range = [min, max];
 
 		// updat style
-		this._updateStyle();
+		// this._updateStyle();
+
+		// mark changed
+		this.markChanged();
+
 
 		// user event
 		app.Socket.sendUserEvent({

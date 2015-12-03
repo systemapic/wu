@@ -1,0 +1,195 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,700,600,600italic,700italic);
+
+body {
+	background: #FCFCFC;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	padding: 0;
+	margin: 0;
+	font-family: 'Open Sans', 'Helvetica Neue', serif;
+    	color: rgb(63, 70, 82);
+    	font-weight: 400;
+}
+
+#container {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	display: inline-flex;
+}
+
+.central {
+	height: 500px;
+	width: 500px;
+	margin: auto;
+	position: relative;
+	border: 1px solid gainsboro;
+	border-radius: 10px;
+	padding: 30px;
+}
+
+.left {
+	width: 405px;
+	height: 500px;
+	border-right: 1px solid gainsboro;
+	position: absolute;
+	left: 0px;
+	margin-left: 30px;
+}
+
+.right {
+	width: 405px;
+	height: 500px;
+	position: absolute;
+	left: 465px;
+}
+
+
+.top-label {
+	font-family: 'Open Sans', serif;
+	font-size: 30px;
+	text-align: center;
+	font-weight: 200;
+}
+
+.input {
+	height: 30px;
+	font-size: 20px;
+	font-family: 'Open Sans', serif;
+	border: 1px solid gainsboro;
+	border-radius: 3px;
+	padding: 6px;
+	color: #4A4A4A;
+	width: 350px;
+	margin-bottom: 10px;
+}
+
+
+.input::-webkit-input-placeholder {
+	font-size: 15px;
+	padding: 4px;
+}
+
+.input:-moz-placeholder { /* Firefox 18- */
+	font-size: 15px;
+	padding: 4px; 
+}
+
+.input::-moz-placeholder {  /* Firefox 19+ */
+	font-size: 15px;
+	padding: 4px;
+}
+
+.input:-ms-input-placeholder {  
+	font-size: 15px;
+	padding: 4px;
+}
+
+.input-wrapper {
+	vertical-align: middle;
+	text-align: center;
+}
+.input-wrapper-right {
+	margin-top: 70px;
+	vertical-align: middle;
+	padding-right: 40px;
+}
+
+
+.input-label {
+	font-size: 16px;
+	font-weight: 400;
+	margin-bottom: 1px;
+	margin-left: 1px;
+}
+
+.shader {
+	background: rgba(253, 253, 253, 0.83);
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	display: none;
+	left: -10px;
+}
+
+
+
+.button {
+	border: 1px solid gainsboro;
+	width: 120px;
+	padding: 10px;
+	font-size: 19px;
+	border-radius: 3px;
+	padding-left: 20px;
+	padding-right: 20px;
+	background: #F9F9F9;
+	color: #616161;
+	font-weight: 500;
+	cursor: pointer;
+	margin: auto;
+	margin-top: 20px;
+	text-align: center;
+	display: block;
+}
+
+.button:hover {
+	background: #428BCA;
+	color: #FCFCFC;
+}
+.button:active {
+	background: #3C4759;
+	color: #FCFCFC;
+}
+
+
+
+.logo-wrap {
+	width: 100%;
+	height: 200px;
+	position: absolute;
+}
+.logo {
+	width: 210px;
+	height: 150px;
+	margin: auto;
+	background-repeat: no-repeat;
+	background-position: 37px 16px;
+	margin-top: 20px;
+}
+
+
+.forgot-wrapper {
+    padding: 10px;
+    width: 350px;
+    text-align: center;
+    margin-top: 20px;
+}
+.forgot-link {
+    font-size: 12px;
+    margin: auto;
+    position: relative;
+    text-align: center;
+    margin-left: auto;
+}
+
+.input.forgot {
+	margin: auto;
+}
+
+.text-wrapper {
+	text-align: center;
+}
+
+.text-content {
+	width: 66%;
+	margin: auto;
+	margin-top: 50px;
+	margin-bottom: 40px;
+	font-style: italic;
+}
+
+
+

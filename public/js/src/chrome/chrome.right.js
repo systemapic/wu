@@ -3,7 +3,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	_ : 'rightchrome', 
 
 	options : {
-		defaultWidth : 400,
+		defaultWidth : 402,
 		editingLayer : false,
 		tabs : {
 			settings : true,
@@ -31,7 +31,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		// data tab
 		if (this.options.tabs.data) {
 
-			// create settings selector
+			// create data selector
 			this._tabs.data = new Wu.Chrome.Data({
 				appendTo : this._container,
 				chrome : this // ie. right chrome
@@ -51,7 +51,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 	_addEvents : function () {
 		// todo
-		Wu.DomEvent.on(window, 'resize', this._onWindowResize, this);
+		Wu.DomEvent.on(window, 'resize', _.throttle(this._onWindowResize, 1000), this);
 	},
 
 	_removeEvents : function () {
@@ -59,6 +59,7 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 	},
 
 	_onWindowResize : function () {
+		if (app._map) app._map.invalidateSize();
 	},
 
 	getDimensions : function () {
@@ -79,11 +80,17 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 
 	open : function (tab) {
 
+		// close other tabs
+		Wu.Mixin.Events.fire('closeMenuTabs');
+
 		// hide all tabs
 		this._forEachTab(function (tab) {
 			tab._hide();
 			tab.onClosed();
 		});
+
+		// css exp
+		// app.Chrome.Left.close();
 
 		// show tab
 		tab._show();
@@ -93,26 +100,34 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		if (this._isOpen) return;
 
 		this._isOpen = true;
+		this._currentTab = tab;
 
 		// set width of right pane
 		this._container.style.width = this.options.defaultWidth + 'px';
 		this._container.style.display = 'block';
 
-		// move map
-		var map = app.MapPane._container;
-		var width = map.offsetWidth - this.options.defaultWidth;
-		map.style.width = width + 'px';
+		// set height for styler pane
+		// if (tab._ == 'settingsSelector') {
+			// this._container.style.height = '75%';
+		// } else {
+			this._container.style.height = '100%'; // todo, css exp
+		// }
 
-		// invalidate size
-		app._map.invalidateSize();
+		// update size
+		this.updateMapSize(); // css exp
+
+		// set buttons inverted
+		// Wu.DomUtil.addClass(app.Chrome.Top._buttonWrapper, 'inverted');
 
 	},
 
 	close : function (tab) {
+
+		var tab = tab || this._currentTab;
 		
 		// hide tab
-		if (tab._hide) tab._hide();
-		if (tab.onClosed) tab.onClosed();
+		if (tab && tab._hide) tab._hide();
+		if (tab && tab.onClosed) tab.onClosed();
 
 		if (!this._isOpen) return;
 
@@ -122,14 +137,15 @@ Wu.Chrome.Right = Wu.Chrome.extend({
 		this._container.style.width = '0';
 		this._container.style.display = 'none';
 
-		// set map fullscreen
-		var map = app.MapPane._container;
-		map.style.width = '100%';
+		// update size
+		this.updateMapSize();
 
-		// invalidate size
-		app._map.invalidateSize();
+		// set buttons inverted
+		// Wu.DomUtil.removeClass(app.Chrome.Top._buttonWrapper, 'inverted');
 	},
 
+	_onCloseMenuTabs : function () {
 
-	
+		this.close();
+	},
 });
