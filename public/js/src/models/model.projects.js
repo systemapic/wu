@@ -613,7 +613,6 @@ Wu.Project = Wu.Class.extend({
 
 		for (var l in this.layers) {
 			var layer = this.layers[l];
-
 			if (layer.store && layer.store.data && layer.store.data.postgis) layers.push(layer);
 		}
 

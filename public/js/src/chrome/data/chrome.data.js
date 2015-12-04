@@ -916,9 +916,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	       	sortedLayers.forEach(function (layerBundle) {
 
 	       		var provider = layerBundle.key;
-	       			
+
 	       		// only do our layers
-	       		if (provider != 'postgis') return;
+	       		if (provider != 'postgis' && provider != 'raster') return;
 
 	       		var layers = layerBundle.layers;
 
@@ -1423,56 +1423,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		return on;
 	},
 
-
-	// TOGGLE BASE LAYERS
-	// TOGGLE BASE LAYERS
-	// TOGGLE BASE LAYERS
-
-	// toggleBaseLayer : function (layer) {
-
-	// 	var uuid = layer.getUuid();
-
-	// 	// Toggle layer off
-	// 	var layerOn = this.isLayerOn(uuid);
-	// 	if ( layerOn ) this.removeLayer(layer);	
-
-	// 	var on = this.§(uuid);
-	// 	on ? this.removeBaseLayer(layer) : this.addBaseLayer(layer);
-
-	// 	this._refreshLayers();		
-	// },
-
-	// // Add base layer
-	// addBaseLayer : function (layer) {
-
-	// 	var uuid = layer.getUuid()
-
-	// 	// Update map	
-	// 	layer._addTo('baselayer');
-
-
-	// 	// Save to server
-	// 	this._project.addBaseLayer({
-	// 		uuid : uuid,
-	// 		zIndex : 1,
-	// 		opacity : layer.getOpacity()
-	// 	});
-
-	// },
-
-	// // Remove base layer
-	// removeBaseLayer : function (layer) {
-
-	// 	console.log('%c removeBaseLayer ', 'background: blue; color: white;');
-	// 	console.log(layer);
-
-	// 	// Update map
-	// 	layer.disable(); 
-
-	// 	// Save to server
-	// 	this._project.removeBaseLayer(layer);
-
-	// },
 
 	// Check if base layer is on
 	isBaseLayerOn : function (uuid) {

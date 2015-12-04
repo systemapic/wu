@@ -88,7 +88,8 @@
     }
 
 .layer-list-container {
-    margin-top: 7px;    
+    margin-top: 0px;   
+    margin-bottom: 0px; 
     }
 
 .layer-name-content {
@@ -233,7 +234,7 @@
     }
 
 .layers-container {
-    margin-bottom: 15px;
+    margin-bottom: 35px;
     }
 
 .baselayer-dropdown-wrapper {
