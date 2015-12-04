@@ -1131,11 +1131,12 @@
 .target-wrapper {
 	position: relative;
 	height: 50px;
+	font-size: 12px;
 }
 
 .target-column-dropdown {
 	left: 0px;
-	top: 20px !important;	
+	top: 15px !important;	
 	max-width: 100px;		
 }
 
@@ -1156,7 +1157,7 @@
     height: 22px;
     width: 100px;
     position: absolute;
-    top: 21px;
+    top: 16px;
     border: 1px solid gainsboro;
     border-radius: 2px;
     font-size: 12px;
@@ -1175,11 +1176,11 @@
 
 .target-color-wrapper {
 	position: absolute;
-	left: 230px;
+	left: 211px;
 }
 
 .chrome-color-ball.target-color-box {
-	top: 22px !important;
+	top: 17px !important;
 	left: -2px;
 	border: none;
 	box-shadow: none;
@@ -1191,19 +1192,58 @@
 
 .target-opacity-wrapper {
 	position: absolute;
-	left: 280px;
+	left: 242px;
 }
 
 
 .target-input.opacity {
-	width: 30px;
+	width: 44px;
 	text-align: center;
 	left: 10px;
 }
 
 .add-target-wrapper {
 	margin-top: 30px;
+	margin-left: 0px;
 }
+
+.target-input-title-opacity {
+	position: absolute;
+	left: 10px;
+}
+
+.target-remove {
+    position: absolute;
+    color: rgba(220, 220, 220, 0.57);
+    left: -13px;
+    top: 20px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.target-remove:hover {
+	color: rgba(251, 22, 50, 0.58);
+}
+
+
+
+
+.target-width-wrapper {
+	position: absolute;
+	left: 291px;
+}
+.target-input.width {
+	width: 38px;
+	text-align: center;
+	left: 10px;
+}
+.target-input-title-width {
+	position: absolute;
+	left: 10px;
+}
+
+
+
 
 
 
