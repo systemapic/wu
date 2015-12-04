@@ -618,7 +618,6 @@ module.exports = api.project = {
 
 		var user = options.user;
 
-
 		var hashedUser = crypto.createHash('sha256').update(user.getUuid()).digest("hex");
 
 		console.log('hashedUser', hashedUser);
