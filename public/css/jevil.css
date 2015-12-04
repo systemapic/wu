@@ -359,7 +359,7 @@
     }
 
 .marked-changed {
-    background: #FF5E5E;
+    background: #3C4759;
     color: #FCFCFC;
     font-weight: 600;
     border: none;
@@ -367,7 +367,7 @@
     }
 
 .marked-changed:hover {
-    background: red;
+    background: rgba(60, 71, 89, 0.85);
     color: #FCFCFC;
     }
 
