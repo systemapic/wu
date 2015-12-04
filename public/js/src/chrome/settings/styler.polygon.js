@@ -14,8 +14,6 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		// targeted columns
 		this._createTargets();
 
-		// create (+) button
-		console.log('(+) button');
 	},
 	
 	_preSelectOptions : function () {
@@ -38,29 +36,22 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		var color_children = content.color.line.childWrapper;
 		var opacity_wrapper = content.opacity.line.container;
 		var opacity_children = content.opacity.line.childWrapper;
+		var targets 		= content.targets.wrapper;
 
 		// remove divs
 		color_wrapper && Wu.DomUtil.remove(color_wrapper);
 		color_children && Wu.DomUtil.remove(color_children);
 		opacity_wrapper && Wu.DomUtil.remove(opacity_wrapper);
 		opacity_children && Wu.DomUtil.remove(opacity_children);
+		targets && 		Wu.DomUtil.remove(targets);
 	},
 
 
 	// create column targets
 	_createTargets : function () {
 
-		console.log('carto()', this.carto());
-
 		// create target field
 		this.carto().targets = this.carto().targets || [];
-
-		// // get states
-		// var isOn         = (this.carto().color.column === false);
-		// var staticVal    = this.carto().color.staticVal || this.options.defaults.color;
-		// var val          = this.carto().color.value 	|| this.options.defaults.range;
-		// var column       = this.carto().color.column;
-		// var minMax       = this.carto().color.range;
 
 		// create wrapper
 		var wrapper = Wu.DomUtil.create('div', 'add-target-wrapper', this._wrapper);
@@ -68,10 +59,10 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		// create (+) box
 		var addTarget = Wu.DomUtil.create('div', 'add-target', wrapper);
 		addTarget.innerHTML = '<i class="fa fa-plus-circle add-target-icon"></i>';
-		addTarget.innerHTML += '<div class="add-target-text">Add column</div>';
+		addTarget.innerHTML += '<div id="target-text-' + this.type + '" class="add-target-text">Target specific columns</div>';
 
 		// event
-		Wu.DomEvent.on(addTarget, 'click', this._createTargetColumn, this);
+		Wu.DomEvent.on(addTarget, 'click', this._addTargetColumn, this);
 
 		// remember items
 		this._content[this.type].targets = {
@@ -79,88 +70,60 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 			addTarget : addTarget,
 		}
 
+		// fill already existing targets
+		var targets = this.carto().targets;
+		if (targets.length) {
 
-
-
-		// fill already existing values
-		if (this.carto().targets.length) {
-
-			var targets = this.carto().targets;
-
+			// add existing targets
 			targets.forEach(function (t) {
-				this._createTargetColumn(false, t);
+				this._createTargetColumn(null, t);
 			}, this);
+
+			// change button text
+			this._changeAddButtonText();
 		}
 
+	},
 
+	_changeAddButtonText : function () {
+		// change title of button (hacky)
+		var button = Wu.DomUtil.get('target-text-' + this.type);
+		button.innerHTML = 'Add column';
+	},
 
+	_addTargetColumn : function (e) {
 
+		var defaultColumn = this.options.meta[2]; // first column
 
+		// set default options
+		var options = {
+			column : defaultColumn, // default column
+			value : '', 		// targeted column value
+			color : 'red', 		// default color
+			opacity : 1, 		// default opacity
+		}
 
+		// set values
+		this.carto().targets.push({
+			column : options.column,
+			value : options.value,
+			color : options.color,
+			opacity : options.opacity
+		});
 
-		// // container
-		// var line = new Wu.fieldLine({
-		// 	id           : 'color',
-		// 	appendTo     : this._wrapper,
-		// 	title        : '<b>Color</b>',
-		// 	input        : false,
-		// 	childWrapper : 'point-color-children' // todo: make class for polyugon?
-		// });	
+		// create column
+		this._createTargetColumn(null, options);
 
-		// // dropdown
-		// var dropdown = new Wu.button({
-		// 	id 	 : 'color',
-		// 	type 	 : 'dropdown',
-		// 	isOn 	 : isOn,
-		// 	right 	 : true,
-		// 	appendTo : line.container,
-		// 	fn 	 : this._dropdownSelected.bind(this),
-		// 	array 	 : this.options.meta, // columns in dropdown
-		// 	selected : column, // preselected item
-		// });
+		// mark change
+		this.markChanged();
 
-		// // color ball
-		// var ball = new Wu.button({
-		// 	id 	 : 'color',
-		// 	type 	 : 'colorball',
-		// 	right    : true,
-		// 	isOn 	 : isOn,
-		// 	appendTo : line.container,
-		// 	fn       : this._updateColor.bind(this),
-		// 	value    : staticVal,
-		// 	colors   : this.options.palettes
-		// });
-
-		// // remember items
-		// this._content[this.type].targets = {
-		// 	line : line,
-		// 	dropdown : dropdown,
-		// 	ball : ball
-		// }
-// 
-		// // save carto
-		// this.carto().targets[column] = {
-		// 	value 	: val,
-		// 	color 	: color,
-		// 	opacity	: opacity
-		// };
+		// change button text
+		this._changeAddButtonText();
 	},
 
 
 
 	_createTargetColumn : function (e, options) {
-
-		console.log('this: ', this);
-
-		console.log('_createTargetColumn e optins', e, options);
-
-		var options = options || {
-			column : false, // default column
-			value : 'loka', // targeted column value
-			color : 'red', 	// default color
-			opacity : 1, 	// default opacity
-		}
-
 
 		// get columns
 		var columnObjects = this.options.columns;
@@ -171,21 +134,22 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 			columns.push(c);
 		}
 
-
-
-		console.log('_createTargetColumn', this._content[this.type].targets);
-
-
-
-
-		// get wrapper
+		// head wrapper
 		var wrapper = this._content[this.type].targets.wrapper;
 
 		// create target wrapper
 		var target_wrapper = Wu.DomUtil.create('div', 'target-wrapper', wrapper);
 
 
-		// column wrapper
+		// (-) button
+		var rembtn_wrapper = Wu.DomUtil.create('div', 'target-remove', target_wrapper);
+		rembtn_wrapper.innerHTML = '<i class="fa fa-minus-circle"></i>';
+		
+		// event
+		Wu.DomEvent.on(rembtn_wrapper, 'click', this._removeTarget, this);	
+
+		
+		// column dropdown
 		var column_wrapper = Wu.DomUtil.create('div', 'target-column-wrapper', target_wrapper);
 		var column_title = Wu.DomUtil.create('div', 'target-column-title', column_wrapper, 'Column');
 		var column_dropdown = new Wu.button({
@@ -200,10 +164,9 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 			className : 'target-column-dropdown'
 		});
 
-		console.log('coldrop', column_dropdown);
 
 		
-		// input value wrapper
+		// value input
 		var input_wrapper = Wu.DomUtil.create('div', 'target-input-wrapper', target_wrapper);
 		var input_title = Wu.DomUtil.create('div', 'target-input-title', input_wrapper, 'Value');
 		var column_input = Wu.DomUtil.create('input', 'target-input', input_wrapper);
@@ -214,7 +177,7 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 
 
 
-		// color wrapper
+		// color ball
 		var color_wrapper = Wu.DomUtil.create('div', 'target-color-wrapper', target_wrapper);
 		var input_title = Wu.DomUtil.create('div', 'target-input-title', color_wrapper, 'Color');
 		var ball = new Wu.button({
@@ -230,9 +193,10 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		});
 
 
-		// opacity wrapper
+
+		// opacity input
 		var opacity_wrapper = Wu.DomUtil.create('div', 'target-opacity-wrapper', target_wrapper);
-		var opacity_title = Wu.DomUtil.create('div', 'target-input-title', opacity_wrapper, 'Opacity');
+		var opacity_title = Wu.DomUtil.create('div', 'target-input-title-opacity', opacity_wrapper, 'Opacity');
 		var opacity_input = Wu.DomUtil.create('input', 'target-input opacity', opacity_wrapper);
 		opacity_input.value = options.opacity;
 
@@ -247,25 +211,43 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 			column : column_dropdown,
 			value : column_input,
 			color : ball,
-			opacity : opacity_input
+			opacity : opacity_input,
+			wrapper : target_wrapper
 		});
 
-		// set initial values
-		this.carto().targets.push({
-			column : options.column,
-			value : options.value,
-			color : options.color,
-			opacity : options.opacity
-		})
 
-		// move (+) to bottom
+		// move (+) btn to bottom
 		var button = this._content[this.type].targets.addTarget;
 		var bwrapper = this._content[this.type].targets.wrapper;
 		wrapper.appendChild(button);
 
-		console.log('this: ', this);
 	},
 
+
+	_removeTarget : function (e) {
+
+		// get target index
+		var target = e.target;
+		var targets = this._content[this.type].targets.selectors;
+		var i = _.findIndex(targets, function (t) {
+			return t.wrapper == target.parentNode.parentNode || t.wrapper == target.parentNode;
+		});
+
+		// remove div
+		var trg = targets[i];
+		var wrapper = trg.wrapper;
+		Wu.DomUtil.remove(wrapper);
+
+		// remove from carto
+		_.pullAt(this.carto().targets, i);
+
+		// remove from div list
+		_.pullAt(targets, i);
+
+		// mark changed
+		this.markChanged();
+
+	},
 
 
 	_targetColumnSelected : function (e) {
@@ -274,7 +256,6 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		var target = e.target;
 		var targets = this._content[this.type].targets.selectors;
 		var i = _.findIndex(targets, function (t) {
-			console.log('t: ', t);
 			return t.column._select == target;
 		});
 

@@ -100,7 +100,6 @@ Wu.Styler = Wu.Class.extend({
 		this._toggle(on);
 
 		// update
-		// this.updateStyle();
 		this.markChanged();
 	},
 
@@ -210,9 +209,11 @@ Wu.Styler = Wu.Class.extend({
 		// create opacity field
 		this.carto().opacity = this.carto().opacity || {};
 
+		console.log('carto.opacity: ', this.type, this.carto().opacity);
+
 		// get states
 		var isOn   = (this.carto().opacity.column === false);
-		var value  = this.carto().opacity.staticVal || 1;
+		var value  = this.carto().opacity.staticVal;
 		var column = this.carto().opacity.column;
 		var minMax = this.carto().opacity.range;
 
