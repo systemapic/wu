@@ -429,6 +429,7 @@ Wu.button = Wu.Class.extend({
 		
 		// set value
 		if (value) miniInput.value = value;
+		if (value == 0) miniInput.value = value;
 
 		// other options
 		if ( !right ) Wu.DomUtil.addClass(miniInput, 'left-mini');
