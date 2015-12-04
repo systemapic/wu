@@ -106,16 +106,31 @@ Wu.Model.Layer = Wu.Model.extend({
 	_addThin: function () {
 		if (!this._inited) this.initLayer();
 
+		var map = app._map;
+
 		// only add to map temporarily
-		app._map.addLayer(this.layer);
+		map.addLayer(this.layer);
 		this.layer.bringToFront();
+
+		// add gridLayer if available
+		if (this.gridLayer) {
+			map.addLayer(this.gridLayer);
+		}
 
 	},
 
 	_removeThin : function () {
 		if (!this._inited) this.initLayer();
 
-		app._map.removeLayer(this.layer);
+		var map = app._map;
+
+		map.removeLayer(this.layer);
+
+		// remove gridLayer if available
+		if (this.gridLayer) {
+			this.gridLayer._flush();
+			if (map.hasLayer(this.gridLayer)) map.removeLayer(this.gridLayer); 
+		}
 	},
 
 	flyTo : function () {

@@ -221,7 +221,6 @@ module.exports = api.geo = {
 		}
 
 		var targets = options.style.polygon.targets;
-
 		if (!targets || !targets.length) return css;
 
 		// create target
@@ -237,15 +236,12 @@ module.exports = api.geo = {
 				string += '\n        polygon-fill: ' + color + ';';
 				string += '\n        polygon-opacity: ' + opacity + ';';
 				string += '\n    }\n';
-
 				css.style += string;
 			}
 
 		});
 
-
 		return css;
-
 	},
 
 	buildCarto_pointTarget : function (options) {
@@ -256,7 +252,6 @@ module.exports = api.geo = {
 		}
 
 		var targets = options.style.point.targets;
-
 		if (!targets || !targets.length) return css;
 
 		// create target
@@ -310,6 +305,7 @@ module.exports = api.geo = {
 				string += '\n        line-color: ' + color + ';';
 				string += '\n        line-opacity: ' + opacity + ';';
 				string += '\n        line-width: ' + width + ';';
+				
 				string += '\n    }\n';
 
 				css.style += string;
@@ -918,6 +914,7 @@ module.exports = api.geo = {
 		}
 
 
+		cartObj.headers += '[zoom<10] { line-width: 0.1 * @line_size_factor; }\n';
 		cartObj.headers += '[zoom=10] { line-width: 0.3 * @line_size_factor; }\n';
 		cartObj.headers += '[zoom=11] { line-width: 0.5 * @line_size_factor; }\n';
 		cartObj.headers += '[zoom=12] { line-width: 1   * @line_size_factor; }\n';
@@ -928,6 +925,9 @@ module.exports = api.geo = {
 		cartObj.headers += '[zoom=17] { line-width: 8   * @line_size_factor; }\n';
 		cartObj.headers += '[zoom=18] { line-width: 12  * @line_size_factor; }\n\n';
 
+		// add line joins
+		cartObj.style += '\n        line-join: round;';
+		cartObj.style += '\n        line-cap: round;';
 
 		return cartObj;
 	},

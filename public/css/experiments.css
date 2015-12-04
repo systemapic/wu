@@ -488,7 +488,7 @@ body {
 }
 
 .active-project .extra-padding-right {
-    padding-right: 35px;
+    padding-right: 50px;
 }
 .leaflet-popup {
     z-index: 1001;
