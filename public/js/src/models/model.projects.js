@@ -1229,7 +1229,7 @@ Wu.Project = Wu.Class.extend({
 
 
 	selectProject : function () {
-		
+
 		// select project
 		Wu.Mixin.Events.fire('projectSelected', {detail : {
 			projectUuid : this.getUuid()

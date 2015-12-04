@@ -59,15 +59,25 @@ page.open(server, 'post', data, function (status, why) {
 		console.log('checking...', JSON.stringify(args));
 
 		// Check in the page if a specific element is now visible
-		return page.evaluate(function(args) {
+		var result = page.evaluate(function(args) {
 
-			if (!app) return false;
-			if (!app.Projects) return false;
+			console.log('evaluating!');
 
-			if (!app._isPhantom) app.phantomJS(args);
+			if (!app) return 'no app';
+			if (!app.Projects) return 'no projects';
 
+			if (!app._isPhantom) {
+				setTimeout(function () {
+
+					app.phantomJS(args);
+				}, 1000);
+			}
 			return app.phantomReady();
 		}, args);
+
+		console.log('result: ', result);
+
+		return result === true;
 	}, 
 
 	// callback
@@ -79,7 +89,7 @@ page.open(server, 'post', data, function (status, why) {
 			page.viewportSize = { width : 1620, height: 1080 };
 			page.render(outfile);
 			phantom.exit();
-		}, 1000);
+		}, 5000);
 
 		
 
@@ -89,7 +99,7 @@ page.open(server, 'post', data, function (status, why) {
 
 // waitFor helper fn
 function waitFor(testFx, onReady, timeOutMillis) {
-	var maxtimeOutMillis = timeOutMillis ? timeOutMillis : 5000, //< Default Max Timout is 3s
+	var maxtimeOutMillis = timeOutMillis ? timeOutMillis : 10000, //< Default Max Timout is 3s
 		start = new Date().getTime(),
 		condition = false,
 		interval = setInterval(function() {
