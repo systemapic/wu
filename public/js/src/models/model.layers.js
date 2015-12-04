@@ -593,6 +593,11 @@ Wu.Model.Layer = Wu.Model.extend({
 	deleteLayer : function () {
 		console.log('delete layer', this);
 	},
+
+	isPostGIS : function () {
+		if (this.store.data && this.store.data.postgis) return true;
+		return false;
+	},
 	
 
 });
