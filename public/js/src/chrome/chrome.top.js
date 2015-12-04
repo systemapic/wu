@@ -43,6 +43,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 			this._clientLogo.style.backgroundImage = 'url(' + app.options.servers.portal + clientLogo + ')';
 			this._clientLogo.style.backgroundSize = app.options.logos.clientLogo.size;
 			this._clientLogo.style.backgroundPosition = app.options.logos.clientLogo.position;
+
 		}
 		
 		// set default

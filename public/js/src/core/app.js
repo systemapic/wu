@@ -498,8 +498,22 @@ Wu.App = Wu.Class.extend({
 		var projectUuid = hash.project || result.project;	// hacky.. clean up setHash, _renderHash, errything..
 		var project = app.Projects[projectUuid];
 
+		console.error('renderHash', projectUuid);
+
+		// // set project
+		// Wu.Mixin.Events.fire('projectSelected', { detail : {
+		// 	projectUuid : projectUuid
+		// }});
+
+		project.selectProject();
+
+
 		// set position
 		app.MapPane.setPosition(hash.position);
+
+		console.log('hash: ', hash);
+
+		return;
 
 		// set layers
 		hash.layers.forEach(function (layerUuid) { 	// todo: differentiate between baselayers and layermenu
@@ -570,25 +584,42 @@ Wu.App = Wu.Class.extend({
 		// return if no such project
 		if (!project) return false;
 
-		// set project
-		Wu.Mixin.Events.fire('projectSelected', { detail : {
-			projectUuid : projectUuid
-		}});
-
 		// check for hash
 		if (hash) {
 
-			var json = JSON.stringify({
-				hash: hash,
-				project : projectUuid
-			});
+			// select project
+			project.selectProject();
 
-			// render hash
-			this._renderHash(this, json);
+			// set position
+			app.MapPane.setPosition(hash.position);
+
+			// set layers
+			hash.layers.forEach(function (layerUuid) { 	// todo: differentiate between baselayers and layermenu
+									// todo: layermenu items are not selected in layermenu itself, altho on map
+				// add layer
+				var layer = project.getLayer(layerUuid);
+
+				// if in layermenu
+				var bases = project.getBaselayers();
+				var base = _.find(bases, function (b) {
+					return b.uuid == layerUuid;
+				});
+
+				if (base) {
+					// add as baselayer
+					layer.add('baselayer'); 
+				} else {
+					layer.add();
+				}
+				
+			}, this);
+
 		}
 
 		// add phantomJS stylesheet		
 		isThumb ? app.Style.phantomJSthumb() : app.Style.phantomJS();
+
+		app._isPhantom = true;
 
 	},
 	
