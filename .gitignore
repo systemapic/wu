@@ -1,4 +1,3 @@
-public/local/*
 npm-debug.log
 node_modules/*
 config/server-config.js
@@ -7,8 +6,6 @@ tests/*
 dist/tmp/*
 views/tmp/*
 views/*.serve.*
-public/css/fonts
-public/css/images
 public/css/style.css
 dist/css/*.min.css
 dist/js/*.min.js
@@ -20,3 +17,5 @@ dist/css/mobilestyle.css
 dist/css/padstyle.css
 dist/css/phantomJS.css
 dist/css/phantomJSthumb.css
+
+public/local/*
