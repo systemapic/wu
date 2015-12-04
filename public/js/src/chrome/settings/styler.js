@@ -209,8 +209,6 @@ Wu.Styler = Wu.Class.extend({
 		// create opacity field
 		this.carto().opacity = this.carto().opacity || {};
 
-		console.log('carto.opacity: ', this.type, this.carto().opacity);
-
 		// get states
 		var isOn   = (this.carto().opacity.column === false);
 		var value  = this.carto().opacity.staticVal;
@@ -1044,8 +1042,6 @@ Wu.Styler = Wu.Class.extend({
 
 	_createCarto : function (json, callback) {
 
-		console.log('_createCarto', json);
-
 		// fn lives on styler
 		this.options.styler.createCarto(json, callback);
 	},
@@ -1337,7 +1333,8 @@ Wu.Styler = Wu.Class.extend({
 			column : options.column,
 			value : options.value,
 			color : options.color,
-			opacity : options.opacity
+			opacity : options.opacity,
+			width : options.width
 		});
 
 		// create column
@@ -1390,7 +1387,7 @@ Wu.Styler = Wu.Class.extend({
 	},
 
 
-	
+
 
 
 	_createTargetColumn : function (e, options) {
