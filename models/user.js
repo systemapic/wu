@@ -105,7 +105,8 @@ userSchema.methods.getEmail = function () {
 };
 
 userSchema.methods.isBot = function () {
-    return this.local.email == 'bot@systemapic.com' && this.access.account_type == 'bot';
+    // return this.local.email == 'bot@systemapic.com' && this.access.account_type == 'bot';
+    return this.local.email == 'bot@systemapic.com';
 };
 
 // timestamps plugin
