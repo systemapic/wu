@@ -108,6 +108,8 @@ L.Control.Description = Wu.Control.extend({
 	_hide : function () {	
 		this._container.style.display = 'none'; 
 		this.isOpen = false;
+
+		this.toggleScale(false);
 	},
 
 	_flush : function () {
@@ -230,12 +232,6 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	updateMultiple : function (layerUuid) {
-
-		console.log('');
-		console.log('%c updateMultiple ', 'background: red; color: white;');
-		console.log('this.layers', this.layers);
-		console.log('');
-		console.log('');
 
 		if ( this.isCollapsed ) Wu.DomUtil.addClass(this.satelliteAngle._innerContainer, 'displayNone');
 
@@ -597,9 +593,9 @@ L.Control.Description = Wu.Control.extend({
 	// Toggle scale/measure/mouseposition corner
 	toggleScale : function (openDescription) {
 
-		if ( !app._map._controlCorners.topright ) return;
+		if (!app._map._controlCorners.topright) return;
 
-		if ( openDescription ) {
+		if (openDescription) {
 			Wu.DomUtil.addClass(app._map._controlCorners.topright, 'toggle-scale');
 		} else {
 			Wu.DomUtil.removeClass(app._map._controlCorners.topright, 'toggle-scale');

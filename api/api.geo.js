@@ -87,7 +87,7 @@ module.exports = api.geo = {
 		style.layer += '}';
 		
 		// debug
-		console.log('created style: ', style);
+		// console.log('created style: ', style);
 
 		// concat
 		var finalCarto = style.headers + style.layer;
@@ -123,6 +123,11 @@ module.exports = api.geo = {
 		style.headers += pointSizeCarto.headers;
 		style.layer += pointSizeCarto.style;	
 
+		// targets
+		var targetCarto = this.buildCarto_pointTarget(options);
+		style.headers += targetCarto.headers;
+		style.layer += targetCarto.style;
+
 		return style;
 
 	},
@@ -139,7 +144,10 @@ module.exports = api.geo = {
 		style.headers += polygonColorCarto.headers;
 		style.layer += polygonColorCarto.style;
 
-		// add line styling todo!
+		// targets
+		var targetCarto = this.buildCarto_polygonTarget(options);
+		style.headers += targetCarto.headers;
+		style.layer += targetCarto.style;
 
 		return style;
 
@@ -161,6 +169,12 @@ module.exports = api.geo = {
 		var lineWidthCarto = this.buildCarto_lineWidth(options);
 		style.headers += lineWidthCarto.headers;
 		style.layer += lineWidthCarto.style;
+
+		// targets
+		var targetCarto = this.buildCarto_lineTarget(options);
+		style.headers += targetCarto.headers;
+		style.layer += targetCarto.style;
+
 
 		return style;
 	},
@@ -198,6 +212,113 @@ module.exports = api.geo = {
 	// OPACITY
 	// OPACITY
 
+
+	buildCarto_polygonTarget : function (options) {
+
+		var css = {
+			headers : '',
+			style : ''
+		}
+
+		var targets = options.style.polygon.targets;
+		if (!targets || !targets.length) return css;
+
+		// create target
+		targets.forEach(function (t) {
+
+			var column = t.column;
+			var value = parseFloat(t.value) || '"' + t.value + '"'; // todo; int/float/string type must match postgis 
+			var color = t.color;
+			var opacity = t.opacity;
+
+			if (column) {
+				var string = '\n    [' + column + ' = ' + value + '] {';
+				string += '\n        polygon-fill: ' + color + ';';
+				string += '\n        polygon-opacity: ' + opacity + ';';
+				string += '\n    }\n';
+				css.style += string;
+			}
+
+		});
+
+		return css;
+	},
+
+	buildCarto_pointTarget : function (options) {
+
+		var css = {
+			headers : '',
+			style : ''
+		}
+
+		var targets = options.style.point.targets;
+		if (!targets || !targets.length) return css;
+
+		// create target
+		targets.forEach(function (t) {
+
+			var column = t.column;
+			var value = parseFloat(t.value) || '"' + t.value + '"'; // todo; int/float/string type must match postgis 
+			var color = t.color;
+			var opacity = parseFloat(t.opacity);
+			var width = parseFloat(t.width) || 10;
+
+			if (column) {
+				var string = '\n    [' + column + ' = ' + value + '] {';
+				string += '\n        marker-fill: ' + color + ';';
+				string += '\n        marker-opacity: ' + opacity + ';';
+				string += '\n        marker-width: ' + width + ';';
+				string += '\n    }\n';
+
+				css.style += string;
+			}
+
+		});
+
+
+		return css;
+
+	},
+
+	buildCarto_lineTarget : function (options) {
+
+		var css = {
+			headers : '',
+			style : ''
+		}
+
+		var targets = options.style.line.targets;
+
+		if (!targets || !targets.length) return css;
+
+		// create target
+		targets.forEach(function (t) {
+
+			var column = t.column;
+			var value = parseFloat(t.value) || '"' + t.value + '"'; // todo; int/float/string type must match postgis 
+			var color = t.color;
+			var opacity = parseFloat(t.opacity);
+			var width = parseFloat(t.width) || 10;
+
+			if (column) {
+				var string = '\n    [' + column + ' = ' + value + '] {';
+				string += '\n        line-color: ' + color + ';';
+				string += '\n        line-opacity: ' + opacity + ';';
+				string += '\n        line-width: ' + width + ';';
+				
+				string += '\n    }\n';
+
+				css.style += string;
+			}
+
+		});
+
+
+		return css;
+
+	},
+
+
 	buildCarto_pointOpacity : function (options) {
 
 		var style = options.style.point;
@@ -222,7 +343,8 @@ module.exports = api.geo = {
 		} else {
 
 			// static opacity
-			css.headers += '@point_opacity: ' + opacity.value + ';\n';
+			var staticOpacity = (opacity.staticVal === undefined) ? 1 : opacity.staticVal;
+			css.headers += '@point_opacity: ' + staticOpacity + ';\n';
 		}
 
 		// add rule
@@ -256,7 +378,8 @@ module.exports = api.geo = {
 		} else {
 
 			// static opacity
-			css.headers += '@polygon_opacity: ' + opacity.value + ';\n';
+			var staticOpacity = (opacity.staticVal === undefined) ? 1 : opacity.staticVal;
+			css.headers += '@polygon_opacity: ' + staticOpacity + ';\n';
 		}
 
 		// add rule
@@ -290,7 +413,8 @@ module.exports = api.geo = {
 		} else {
 
 			// static opacity
-			css.headers += '@line_opacity: ' + opacity.value + ';\n';
+			var staticOpacity = (opacity.staticVal === undefined) ? 1 : opacity.staticVal;
+			css.headers += '@line_opacity: ' + staticOpacity + ';\n';
 		}
 
 		// add rule
@@ -431,7 +555,8 @@ module.exports = api.geo = {
 		} else {
 		
 			// static color
-			cartObj.style += '\tmarker-fill: ' + color.staticVal + ';\n\n';
+			var staticColor = (color.staticVal === undefined) ? 'red' : color.staticVal;
+			cartObj.style += '\tmarker-fill: ' + staticColor + ';\n\n';
 		}
 
 		return cartObj;
@@ -565,7 +690,8 @@ module.exports = api.geo = {
 		} else {
 		
 			// static color
-			cartObj.style += '\tpolygon-fill: ' + color.staticVal + ';\n\n';
+			var staticColor = (color.staticVal === undefined) ? 'red' : color.staticVal;
+			cartObj.style += '\tpolygon-fill: ' + staticColor + ';\n\n';
 		}
 
 		return cartObj;
@@ -699,7 +825,8 @@ module.exports = api.geo = {
 		} else {
 		
 			// static color
-			cartObj.style += '\tline-color: ' + color.staticVal + ';\n\n';
+			var staticColor = (color.staticVal === undefined) ? 'red' : color.staticVal;
+			cartObj.style += '\tline-color: ' + staticColor + ';\n\n';
 		}
 
 		return cartObj;
@@ -736,7 +863,8 @@ module.exports = api.geo = {
 			
 		} else {
 
-			cartObj.headers += '@marker_size_factor: ' + pointSize.value + ';\n';
+			var staticSize = (pointSize.staticVal === undefined) ? 5 : pointSize.staticVal;
+			cartObj.headers += '@marker_size_factor: ' + staticSize + ';\n';
 
 		}
 
@@ -760,8 +888,6 @@ module.exports = api.geo = {
 		var style = options.style.line;
 		var lineWidth = style.width;
 
-		console.log('snoop style', style);
-
 		var cartObj = {
 			headers : '',
 			style   : ''
@@ -782,11 +908,13 @@ module.exports = api.geo = {
 			
 		} else {
 
-			cartObj.headers += '@line_size_factor: ' + lineWidth.value + ';\n';
+			var staticWidth = (lineWidth.staticVal === undefined) ? 3 : lineWidth.staticVal;
+			cartObj.headers += '@line_size_factor: ' + staticWidth + ';\n';
 
 		}
 
 
+		cartObj.headers += '[zoom<10] { line-width: 0.1 * @line_size_factor; }\n';
 		cartObj.headers += '[zoom=10] { line-width: 0.3 * @line_size_factor; }\n';
 		cartObj.headers += '[zoom=11] { line-width: 0.5 * @line_size_factor; }\n';
 		cartObj.headers += '[zoom=12] { line-width: 1   * @line_size_factor; }\n';
@@ -797,6 +925,9 @@ module.exports = api.geo = {
 		cartObj.headers += '[zoom=17] { line-width: 8   * @line_size_factor; }\n';
 		cartObj.headers += '[zoom=18] { line-width: 12  * @line_size_factor; }\n\n';
 
+		// add line joins
+		cartObj.style += '\n        line-join: round;';
+		cartObj.style += '\n        line-cap: round;';
 
 		return cartObj;
 	},
@@ -812,10 +943,8 @@ module.exports = api.geo = {
 	// OMG code... haven't written it myself...
 	// But it interpolates values between hex values
 	hexAverage : function (twoHexes) {
-		console.log('twoHexes', twoHexes);
 		if (!twoHexes[1]) return twoHexes[0];
 		return twoHexes.reduce(function (previousValue, currentValue) {
-			console.log('prev, cur', previousValue, currentValue);
 			return currentValue
 			.replace(/^#/, '')
 			.match(/.{2}/g)
@@ -1007,11 +1136,7 @@ module.exports = api.geo = {
 			var shape_part = shapes[s];
 			if (shape_part && shape_part.slice(-4) == '.shp') {
 
-				console.log('shape_part: ', shape_part);
-
 				var basename = nodepath.basename(shape_part);
-
-				console.log('basnemae: ', basename);
 
 				if (basename.slice(0,1) != '.') {
 					shps.push(shape_part);
@@ -1029,11 +1154,7 @@ module.exports = api.geo = {
 			var shape_part = shapes[s];
 			if (shape_part && shape_part.slice(-4) == '.prj') {
 
-				console.log('shape_part: ', shape_part);
-
 				var basename = nodepath.basename(shape_part);
-
-				console.log('basnemae: ', basename);
 
 				if (basename.slice(0,1) != '.') {
 					shps.push(shape_part);

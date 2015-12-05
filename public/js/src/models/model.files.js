@@ -202,7 +202,6 @@ Wu.Model.File = Wu.Model.extend({
 			// delete file
 			var postgisOptions = this._getLayerData();
 			Wu.post('/api/file/delete', JSON.stringify(postgisOptions), function (err, response) {
-				console.log('deleted?', err, response);
 
 				var removedObjects = Wu.parse(response);
 
@@ -261,7 +260,6 @@ Wu.Model.File = Wu.Model.extend({
 		var options = this._getLayerData();
 		Wu.post('/api/file/getLayers', JSON.stringify(options), function (err, response) {
 			var layers = Wu.parse(response);
-			console.log('got layers', layers);
 			callback(err, layers);
 		});
 	},
@@ -347,7 +345,6 @@ Wu.Model.File = Wu.Model.extend({
 
 	_getGeometryType : function () {
 		var meta = this.getMeta();
-		console.log('meta: ', meta);
 		return meta.geometry_type;
 	},
 
@@ -490,8 +487,6 @@ Wu.Model.File = Wu.Model.extend({
 
 	_requestDefaultRasterLayer : function (options) {
 
-		console.log('_requestDefaultLayer', options);
-
 		var file = options.file,
 		    file_id = file.getUuid(),
 		    project = options.project;
@@ -517,11 +512,6 @@ Wu.Model.File = Wu.Model.extend({
 		// create postgis layer
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
 			var layer = Wu.parse(layerJSON);
-
-
-			console.log('layer::::', layer);
-
-			// return;
 
 			var options = {
 				projectUuid : project.getUuid(), // pass to automatically attach to project
@@ -584,8 +574,6 @@ Wu.Model.File = Wu.Model.extend({
 
 	_requestDefaultVectorLayer : function (options) {
 
-		console.log('_requestDefaultLayer', options);
-
 		var file = options.file,
 		    file_id = file.getUuid(),
 		    project = options.project,
@@ -613,8 +601,6 @@ Wu.Model.File = Wu.Model.extend({
 		// create postgis layer
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
 			var layer = Wu.parse(layerJSON);
-
-			console.log('db create layer', layer);
 
 			var options = {
 				projectUuid : project.getUuid(), // pass to automatically attach to project

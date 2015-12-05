@@ -49,21 +49,21 @@
 
 /* TOP: Logo */
 .chrome-portal-logo {
-    position: relative;
+    position: absolute;
     left: 50px;
     top: 3px;  
     }
 
-.chrome-top:before {
+/*.chrome-top:before {
     content: '';
     background: black;
     position: absolute;
     width: 100%;
-    height: 2px;
+    height: 1px;
     top: 35px;
     z-index: 0;
-    opacity: 0.2;
-    }
+    opacity: 0.5;
+    }*/
 
 /* TOP: Project title */
 .chrome-project-title-container {
@@ -124,7 +124,8 @@
 /* TOP RIGHT BUTTONS */
 .chrome-buttons {
     position: absolute;
-    width: 100%;
+    /*width: 100%;*/
+    right: 0;
     height: 35px;
     text-align: right;
     top: 0;
@@ -1327,8 +1328,7 @@ input.chrome-field-input {
     }    
 
 .chrome-pane.styler .chrome-color-ball {
-    top: 9px !important;
-    right: 8px;
+    top: 9px;
     }
 
 .chrome-pane.styler .chrome-color-selector-wrapper .chrome-color-ball {

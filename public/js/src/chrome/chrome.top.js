@@ -9,8 +9,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// add hooks
 		this.addHooks();
-
-		
 	},
 
 	initContainer : function () {
@@ -19,42 +17,32 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._container = Wu.DomUtil.create('div', 'chrome chrome-container chrome-top', app._appPane);
 
 		// Menu Button
-		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button', this._container);		
+		this._menuButton = Wu.DomUtil.create('div', 'chrome-menu-button active', this._container);
+
+		// css experiment
+		this._menuButton.innerHTML = '<i class="top-button fa fa-bars"></i>';		
 
 		// Project title container
 		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title-container', this._container);
 
-		// Client Logo
-		this._clientLogo = Wu.DomUtil.create('div', 'chrome-portal-logo', this._container);
-
-		// client logo link
-		this._clientLogoLink = Wu.DomUtil.create('a', '', this._clientLogo);
-
-		// client log image
-		this._clientLogoImg = Wu.DomUtil.create('img', '', this._clientLogoLink);		
-
-		// Project title
-		this._projectTitle = Wu.DomUtil.create('div', 'chrome-project-title', this._projectTitleContainer);
 
 		// WRAPPER FOR BUTTONS			// todo: make pluggable
 		this._buttonWrapper = Wu.DomUtil.create('div', 'chrome-buttons', this._container);
 
-		// User name button container
-		this._userNameContainer = Wu.DomUtil.create('div', 'username-container', this._buttonWrapper);
+		// Project title
+		// this._projectTitle = Wu.DomUtil.create('div', 'chrome-project-title', this._projectTitleContainer);
+		this._projectTitle = Wu.DomUtil.create('div', 'chrome-button chrome-project-title', this._buttonWrapper);
 
-		// Username
-		this._userName = Wu.DomUtil.create('div', 'top-username', this._userNameContainer);
+		// Client Logo
+		var clientLogo = app.options.logos.clientLogo.image;
+		if (clientLogo) {
+			this._clientLogo = Wu.DomUtil.create('div', 'chrome-button chrome-client-logo', this._buttonWrapper);
+			this._clientLogo.style.backgroundImage = 'url(' + app.options.servers.portal + clientLogo + ')';
+			this._clientLogo.style.backgroundSize = app.options.logos.clientLogo.size;
+			this._clientLogo.style.backgroundPosition = app.options.logos.clientLogo.position;
 
-		// Divider
-		this._userDivider = Wu.DomUtil.create('div', 'top-divider', this._userNameContainer, '&nbsp;|&nbsp;');
-
-		// Logout
-		this._userLogout = Wu.DomUtil.create('div', 'top-logout', this._userNameContainer, 'log out');
-
-		// Layers button
-		this._layersBtn = Wu.DomUtil.create('div', 'chrome-button layerbutton displayNone', this._buttonWrapper);
-	
-
+		}
+		
 		// set default
 		this.initDefault();
 
@@ -76,7 +64,11 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._buttons = this._buttons || {};
 
 		// create button
-		var buttonDiv = Wu.DomUtil.create('div', className, this._buttonWrapper);
+		var buttonDiv = Wu.DomUtil.create('div', className);
+
+		// css exp // hacky!
+		var referenceNode = app.options.logos.clientLogo.image ? this._buttonWrapper.lastChild.previousSibling : this._buttonWrapper.lastChild;
+		this._buttonWrapper.insertBefore(buttonDiv, referenceNode);
 
 		// save
 		this._buttons[name] = {
@@ -87,17 +79,12 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// register event
 		Wu.DomEvent.on(buttonDiv, 'click', trigger, ctx);
 
-		// event
-		Wu.DomEvent.on(buttonDiv, 'click', this._buttonClick, this);
-
 		return buttonDiv;
 	},
 
-	_buttonClick : function () {
-
-	},
 
 	_updateButtonVisibility : function () {
+
 		if (app.activeProject) {
 
 			var buttons = _.filter(this._buttons, function (b) {
@@ -123,11 +110,11 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	initDefault : function () {
 
-		this._setUsername();
+		// this._setUsername();
 		this._setPortalLogo();
 
 		// Init CPU clock
-		this.initCPUclock(this._buttonWrapper);
+		this.initCPUclock(this._container);
 	},
 
 
@@ -135,13 +122,13 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 		// Check if superadmin
 		var isSuperAdmin = app.Access.is.superAdmin();
-		if ( !isSuperAdmin ) return;
+		if (!isSuperAdmin) return;
 
 		var CPUwrapper = Wu.DomUtil.create('div', 'cpu-wrapper', wrapper);
 
 		this._CPUbars = [];
 
-		for ( i = 0; i<10; i++ ) {
+		for (var i = 0; i < 10; i++ ) {
 			this._CPUbars[i] = Wu.DomUtil.create('div', 'cpu-bar', CPUwrapper);
 		}
 
@@ -160,29 +147,26 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Get clean value of number
 		var p = Math.round(pp / 10);
 
-		for ( i = 0; i<10; i++ ) {
+		for (var i = 0; i < 10; i++ ) {
 			
 			// Get the right div
 			var no = 9 - i;
 
 			// Set the right classes
-			if ( i >= p ) 	Wu.DomUtil.removeClass(this._CPUbars[no], 'cpu-on');
-			else		Wu.DomUtil.addClass(this._CPUbars[no], 'cpu-on');
+			(i >= p) ? Wu.DomUtil.removeClass(this._CPUbars[no], 'cpu-on') : Wu.DomUtil.addClass(this._CPUbars[no], 'cpu-on');
 		}
-
-
 	},
 
 	_setHooks : function (onoff) {
 
 		// Toggle layer menu
-		Wu.DomEvent[onoff](this._layersBtn, 'click', this._toggleLayermenu, this);
+		// Wu.DomEvent[onoff](this._layersBtn, 'click', this._toggleLayermenu, this);
 
 		// Toggle left pane
 		Wu.DomEvent[onoff](this._menuButton, 'click', this._toggleLeftPane, this);
 
 		// Log out button
-		Wu.DomEvent[onoff](this._userLogout, 'click', this._logOut, this);
+		// Wu.DomEvent[onoff](this._userLogout, 'click', this._logOut, this);
 
 	},
 
@@ -231,43 +215,38 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	
 	_showHideLayerButton : function () {
 
-		// If there are no layers, hide button
-		if (!this._project.store.layermenu || this._project.store.layermenu.length == 0 ) {
-			Wu.DomUtil.addClass(this._layersBtn, 'displayNone');
-		} else {
-			Wu.DomUtil.removeClass(this._layersBtn, 'displayNone');
-		}
+		// // If there are no layers, hide button
+		// if (!this._project.store.layermenu || this._project.store.layermenu.length == 0 ) {
+		// 	Wu.DomUtil.addClass(this._layersBtn, 'displayNone');
+		// } else {
+		// 	Wu.DomUtil.removeClass(this._layersBtn, 'displayNone');
+		// }
 
 	},
 
 	_setProjectTitle : function () {
 
 		// get client & project names
-		this._clientName = this._project.getClient().getName();
 		this._projectTitleName = this._project.getHeaderTitle();
 
 		// set project title
-		// this._projectTitleContainer.innerHTML = this._clientName.toLowerCase() + '&nbsp;:&nbsp;' + this._projectTitle.toLowerCase();
-		this._projectTitle.innerHTML = this._projectTitleName.toLowerCase();
+		this._projectTitle.innerHTML = this._projectTitleName.camelize();
 	},
 
-	_setUsername : function () {
-		var username = app.Account.getFullName();
-		this._userName.innerHTML = username.toLowerCase();
-	},
+	// _setUsername : function () {
+	// 	var username = app.Account.getFullName();
+	// 	this._userName.innerHTML = username.toLowerCase();
+	// },
 
 	_setPortalLogo : function () {
 
 		// portal logo from config
-		this._clientLogoImg.src = app.options.servers.portal + app.options.logos.portalLogo;
 
-		// set portal logo link from config
-		var link = app.options.logos.portalLink;
-		this._clientLogoLink.href = link;
-		this._clientLogoLink.setAttribute('target', '_blank');
-
+		// this._clientLogoImg.src = app.options.servers.portal + app.options.logos.portalLogo;
 	},
 
+	// default open
+	_leftPaneisOpen : true,
 
 	_toggleLeftPane : function (e) {
 		Wu.DomEvent.stop(e);
@@ -277,26 +256,18 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	openLeftPane : function () {
 
-		// app.Chrome.Left.isOpen = true;
+		// close other tabs
+		Wu.Mixin.Events.fire('closeMenuTabs');
+
 		this._leftPaneisOpen = true;
 
 		// Set active state of button
 		Wu.DomUtil.addClass(this._menuButton, 'active');
 
-		// expand sidepane
-		if (app.SidePane) app.SidePane.expand();
-
-		// check 	TODO: remove... (Var tilpasset legend på bunn. Ikke aktuelt lenger.)		
-		this.setContentHeights();
-
-		// trigger activation on active menu item
-		app._activeMenu._activate();
-
-		// auto-close triggers
-		this._addAutoCloseTriggers();
+		// open left chrome
+		app.Chrome.Left.open();
 
 	},
-
 
 	closeLeftPane : function () {
 
@@ -306,12 +277,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Remove active state of button
 		Wu.DomUtil.removeClass(this._menuButton, 'active');
 
-		// collapse sidepane
-		if (app.SidePane) app.SidePane.collapse();
-
-		// auto-close triggers
-		this._removeAutoCloseTriggers();
-
+		// close left chrome
+		app.Chrome.Left.close();
 	},
 
 	// close menu when clicking on map, header, etc.
@@ -358,9 +325,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._layerMenuOpen = true;
 
 		// Add "active" class from button
-		Wu.DomUtil.addClass(this._layersBtn, 'active');
+		// Wu.DomUtil.addClass(this._layersBtn, 'active');
 
-		
 		// TODO: Open Layer Menu
 		this.__layerMenu.openLayerPane();
 	},
@@ -371,19 +337,16 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._layerMenuOpen = false;
 
 		// Remove "active" class from button
-		Wu.DomUtil.removeClass(this._layersBtn, 'active');
+		// Wu.DomUtil.removeClass(this._layersBtn, 'active');
 
 		// TODO: Close Layer Menu
 		this.__layerMenu.closeLayerPane();
-
-
 	},	
 
-	_logOut : function () {
-		if (confirm('Are you sure you want to log out?')) {
-			window.location.href = app.options.servers.portal + 'logout';
-		}
+	_onCloseMenuTabs : function () {
+		
+		// app.Chrome();
+		this.closeLeftPane();
 	},
-
-
+	
 });

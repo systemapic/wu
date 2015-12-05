@@ -166,7 +166,7 @@ Wu.Control.Chart = Wu.Control.extend({
 
 		// create popup
 		var popup = this._popup = Wu.popup({
-			offset : [18, 0],
+			offset : [18, 0],			
 			closeButton : true,
 			zoomAnimation : false,
 			maxWidth : maxWidth,
@@ -582,9 +582,15 @@ Wu.Control.Chart = Wu.Control.extend({
 			var roundedVal = 100;
 
 			if ( roundedVal ) {
-				var NewVal = Math.floor(parseFloat(_val) * roundedVal) / roundedVal;
-				_val = NewVal;
+				var newVal = Math.floor(parseFloat(_val) * roundedVal) / roundedVal;
+
+				if (!isNaN(newVal)) {
+					_val = newVal;
+				}
+				
 			}
+
+
 
 			var metaPair = Wu.DomUtil.create('div', 'c3-header-metapair metapair-' + c, container);
 			var metaKey = Wu.DomUtil.create('div', 'c3-header-metakey', metaPair, title);
@@ -904,6 +910,7 @@ Wu.Control.Chart = Wu.Control.extend({
 			for (var key in data) {
 
 				var _val = parseFloat(data[key]).toString().substring(0,10);
+				if (_val == 'NaN') _val = data[key];
 				var _key = key;
 
 				this.C3dataObjBuilder(_key, _val, d3array);

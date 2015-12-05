@@ -384,6 +384,9 @@ Wu.Util = {
 			}
 		}
 
+		// stringify objects
+		if (Wu.Util.isObject(json)) json = JSON.stringify(json);
+
 		http.send(json);
 	},
 
