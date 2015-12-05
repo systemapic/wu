@@ -13,6 +13,10 @@ Wu.Styler.Point = Wu.Styler.extend({
 
 		// pointsize
 		this._createPointsize();
+
+		// targets
+		this._createTargets();
+
 	},
 
 	_preSelectOptions : function () {
@@ -37,6 +41,8 @@ Wu.Styler.Point = Wu.Styler.extend({
 		var opacity_children = content.opacity.line.childWrapper;
 		var pointsize_wrapper = content.pointsize.line.container;
 		var pointsize_children = content.pointsize.line.childWrapper;
+		var targets 		= content.targets.wrapper;
+		
 
 		// remove divs
 		color_wrapper && Wu.DomUtil.remove(color_wrapper);
@@ -45,6 +51,7 @@ Wu.Styler.Point = Wu.Styler.extend({
 		opacity_children && Wu.DomUtil.remove(opacity_children);
 		pointsize_wrapper && Wu.DomUtil.remove(pointsize_wrapper);
 		pointsize_children && Wu.DomUtil.remove(pointsize_children);
+		targets && 		Wu.DomUtil.remove(targets);
 	},
 
 	_addPointSizeFields : function (column) {
@@ -89,6 +96,11 @@ Wu.Styler.Point = Wu.Styler.extend({
 		this.carto().pointsize.column  = column;
 		this.carto().pointsize.range = minMax;
 
+		this.markChanged();
+
 	},
+
+
+
 
 });

@@ -29,7 +29,7 @@ Wu.Data = Wu.Class.extend({
 		this._buttonContainer.appendChild(button);
 
 		// set event
-		Wu.DomEvent.on(button, 'click', this._onUploadButtonClick, this);	
+		// Wu.DomEvent.on(button, 'click', this._onUploadButtonClick, this);	
 
 		// add button to resumable
 		this._resumable.assignBrowse(button);	
@@ -43,6 +43,8 @@ Wu.Data = Wu.Class.extend({
 
 	// ping from socket
 	_onImportedFile : function (file_id, import_time_ms) {
+
+		console.log('_onImportedFile!!', file_id);
 
 		// print import time
 		app.Data._setFeedbackImportTime(import_time_ms);
@@ -65,6 +67,9 @@ Wu.Data = Wu.Class.extend({
 
 	// get file/layer objects from server
 	_getFile : function (file_id, callback) {
+
+		console.log('getfile: ', file_id);
+
 		var xhr = new XMLHttpRequest();
 		var fd = new FormData();
 		var url = app.options.servers.portal + 'api/upload/get';
@@ -84,6 +89,8 @@ Wu.Data = Wu.Class.extend({
 	},
 
 	_gotFile : function (fileObject) {
+
+		console.log('_gotFile', fileObject);
 
 		var fileStore = fileObject.file;
 		var layer = fileObject.layer;

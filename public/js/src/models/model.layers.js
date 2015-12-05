@@ -106,16 +106,31 @@ Wu.Model.Layer = Wu.Model.extend({
 	_addThin: function () {
 		if (!this._inited) this.initLayer();
 
+		var map = app._map;
+
 		// only add to map temporarily
-		app._map.addLayer(this.layer);
+		map.addLayer(this.layer);
 		this.layer.bringToFront();
+
+		// add gridLayer if available
+		if (this.gridLayer) {
+			map.addLayer(this.gridLayer);
+		}
 
 	},
 
 	_removeThin : function () {
 		if (!this._inited) this.initLayer();
 
-		app._map.removeLayer(this.layer);
+		var map = app._map;
+
+		map.removeLayer(this.layer);
+
+		// remove gridLayer if available
+		if (this.gridLayer) {
+			this.gridLayer._flush();
+			if (map.hasLayer(this.gridLayer)) map.removeLayer(this.gridLayer); 
+		}
 	},
 
 	flyTo : function () {
@@ -182,7 +197,8 @@ Wu.Model.Layer = Wu.Model.extend({
 		descriptionControl._addLayer(this);
 
 		// hide if empty and not editor
-		var isEditor = app.access.to.edit_project(app.activeProject);
+		var project = app.activeProject;
+		var isEditor = project.isEditor();
 		if (this.store.description || isEditor) { // todo: what if only editor 
 			descriptionControl.show();
 		} else { 								// refactor to descriptionControl
@@ -447,7 +463,6 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	setStyling : function (styleJSON) {
-		console.log('setStyle', styleJSON);
 		this.store.style = JSON.stringify(styleJSON);
 		this.save('style');
 	},
@@ -577,6 +592,11 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 	deleteLayer : function () {
 		console.log('delete layer', this);
+	},
+
+	isPostGIS : function () {
+		if (this.store.data && this.store.data.postgis) return true;
+		return false;
 	},
 	
 
@@ -811,6 +831,8 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 		this._fetchData(e, function (ctx, json) {
 			
 			var data = JSON.parse(json);
+
+			console.log('fetched data', data);
 			e.data = data;
 			var event = e.e.originalEvent;
 			this._event = {
@@ -986,7 +1008,6 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 	},
 
 	getFileMeta : function () {
-		console.error('getFileMeta');
 		var file = app.Account.getFile(this.store.file);
 		var metajson = file.store.data.raster.metadata;
 		var meta = Wu.parse(metajson);

@@ -6,6 +6,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		defaultWidth : 400
 	},
 
+	// When a new layer is created, we make a background fade on it
+	newLayer : false,
+
 	_initialize : function () {
 
 		// init container
@@ -20,20 +23,16 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// hide by default
 		this._hide();
 
+		// shortcut
 		app.Tools = app.Tools || {};
 		app.Tools.DataLibrary = this;	
-
-
-		// When a new layer is created, we make a background fade on it
-		// store which layer here...
-		this.newLayer = false;
-
-
 	},
 
 	_onLayerAdded : function (options) {
 
 		var uuid = options.detail.layerUuid;
+
+		// remember
 		this.newLayer = uuid;
 
 		// Get layer object
@@ -43,12 +42,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var layerMeta = JSON.parse(layer.store.metadata);
 
 		// Build tooltip object
-		// TODO: use event?
-		var tooltipMeta = app.Tools.Tooltip._buildTooltipMeta(layerMeta);
+		var tooltipMeta = app.Tools.Tooltip._buildTooltipMeta(layerMeta); // TODO: use event?
 
 		// Create tooltip meta...
 		layer.setTooltip(tooltipMeta);
 
+		// refresh
 		this._refresh();
 	},
 
@@ -73,6 +72,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Middle container
 		this._innerContainer = Wu.DomUtil.create('div', 'chrome-data-inner', this._container);
 
+		// todo: create wrapper for layers - needs to be hidden if not editor
+
 		// LAYER LIST
 		this._initLayerListContainer();
 		
@@ -81,7 +82,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 		// Top container (with upload button)
 		this.topContainer = Wu.DomUtil.create('div', 'chrome-data-top', this._container);
-		this.topTitle = Wu.DomUtil.create('div', 'chrome-data-top-title', this.topContainer, 'Data Library');
+		// this.topTitle = Wu.DomUtil.create('div', 'chrome-data-top-title', this.topContainer, 'Data Library');
 
 		// close event
 		Wu.DomEvent.on(this._innerContainer, 'click', this._closeActionPopUps, this);
@@ -92,36 +93,38 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// Layer list container
 	_initLayerListContainer : function () {
 
-		// HEADER
-		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer, 'Project Layers');
-
 		// LAYER LIST OUTER SCROLLER
 		this._layerListOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
-		this._layerListOuterScroller.style.height = '45%';
+		this._layerListOuterScroller.style.height = '100%';
 
 		// List container
 		this._layerListContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this._layerListOuterScroller);
+		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListContainer, 'Layers');
 
 		// Containers
 		this._layersContainer = Wu.DomUtil.create('div', 'layers-container', this._layerListContainer);
+		
+		// base layers
+		this._baseLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListContainer, 'Base layer');
+		this._baseLayerDropdownContainer = Wu.DomUtil.create('div', 'base-layer-dropdown-container', this._layerListContainer);
 
 	},
 
 	// File list container
 	_initFileListContainer : function () {
 
-		// HEADER
-		this._fileListTitle = Wu.DomUtil.create('div', 'chrome-header-title', this._innerContainer, 'My Datasets');
+		// Lines
+		this._fileListSeparator = Wu.DomUtil.create('div', 'file-list-separator', this._layerListContainer);
 
-		// FILE LIST OUTER SCROLLER
-		this._fileListOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
-		this._fileListOuterScroller.style.height = '55%';
-				
-		// List container
-		this._fileListContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this._fileListOuterScroller);
+		// HEADER
+		this._fileListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListContainer, 'My Data');
+
+		// Upload button container
+		this._uploadButtonContainer = Wu.DomUtil.create('div', 'upload-button-container', this._layerListContainer);
 
 		// Containers
-		this._filesContainer = Wu.DomUtil.create('div', 'files-container', this._fileListContainer);
+		this._filesContainer = Wu.DomUtil.create('div', 'files-container', this._layerListContainer);
+
 	
 	},
 
@@ -144,6 +147,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			context : this,
 			project_dependent : true
 		});
+
+		// css experiement
+		this._topButton.innerHTML = '<i class="top-button fa fa-cloud"></i>Data';
 
 	},
 
@@ -168,30 +174,29 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	_show : function () {
 
+		// Open layer menu
+		app.MapPane._controls.layermenu.open();
+
 		// mark button active
 		Wu.DomUtil.addClass(this._topButton, 'active');
-
 		this._container.style.display = 'block';
 		this._isOpen = true;
 
-
 		// enable edit of layer menu...
 		var layerMenu = app.MapPane.getControls().layermenu;
-		if ( app.access.to.edit_project(this._project) ) layerMenu.enableEditSwitch();
+		if (this._project.isEditable()) layerMenu.enableEditSwitch();
 
 		// open if closed
-		if ( !layerMenu._layerMenuOpen ) app.Chrome.Top._openLayerMenu();
-
+		if (!layerMenu._layerMenuOpen) app.Chrome.Top._openLayerMenu();
 	},
 
 	_hide : function () {
 
 		// mark button inactive
 		Wu.DomUtil.removeClass(this._topButton, 'active');
-
 		this._container.style.display = 'none';
 		
-		if ( this._isOpen ) {
+		if (this._isOpen) {
 			var layerMenu = app.MapPane.getControls().layermenu;	 // move to settings selector
 			if (layerMenu) layerMenu.disableEditSwitch();
 		}
@@ -200,21 +205,15 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	onOpened : function () {
-
 	},
-
 	onClosed : function () {
 	},
-
 	_addEvents : function () {
 	},
-
 	_removeEvents : function () {
 	},
-
 	_onWindowResize : function () {
 	},
-
 	getDimensions : function () {
 		var dims = {
 			width : this.options.defaultWidth,
@@ -228,71 +227,56 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 
-	// █████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗
-	// ╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝
-
-
-	// ██████╗ ███████╗███████╗██████╗ ███████╗███████╗██╗  ██╗
-	// ██╔══██╗██╔════╝██╔════╝██╔══██╗██╔════╝██╔════╝██║  ██║
-	// ██████╔╝█████╗  █████╗  ██████╔╝█████╗  ███████╗███████║
-	// ██╔══██╗██╔══╝  ██╔══╝  ██╔══██╗██╔══╝  ╚════██║██╔══██║
-	// ██║  ██║███████╗██║     ██║  ██║███████╗███████║██║  ██║
-	// ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝
-
 	_refresh : function () {
 
-		if ( !this._project ) return;
-
-		// Upload button
-		this._initUploadButton();
+		if (!this._project) return;
 
 		// Empty containers
 		if ( this._layersContainer ) this._layersContainer.innerHTML = '';
 		if ( this._filesContainer )  this._filesContainer.innerHTML = '';
 
-		// Layer list
-		this._initLayerList();
-		this._refreshLayers();
+		if (this._project.isEditable()) {
+
+			// Layer list
+			this._initLayerList();
+			this._refreshLayers();
+
+			// this._initBaseLayerList(); // why twice?
+			this._refreshBaseLayerList();
+		}
+
+		this._refreshBaseLayerList();
 
 		// File list
 		this._initFileLists();
 		this._refreshFiles();
-		
+
+		// Upload button
+		this._initUploadButton();
+
+		// layer title
+		var projectName = this._project.getTitle();
+		this._layerListTitle.innerHTML = 'Layers for ' + projectName;	
+
+		// hide layers if not editor
+		if (!this._project.isEditable()) {
+			// todo: put layers in wrapper and hide
+		}	
 
 	},
-
-	// ┬ ┬┌─┐┬  ┌─┐┌─┐┌┬┐  ┌┐ ┬ ┬┌┬┐┌┬┐┌─┐┌┐┌
-	// │ │├─┘│  │ │├─┤ ││  ├┴┐│ │ │  │ │ ││││
-	// └─┘┴  ┴─┘└─┘┴ ┴─┴┘  └─┘└─┘ ┴  ┴ └─┘┘└┘
-
-	// TODO: 	Is it not irrelevant if a user can upload data to project?
-	//		A user can or cannot upload data to the PORTAL, right?
-	// 		And can or cannot ADD that data to a project?
 
 	_initUploadButton : function () {
 
-		// Upload button
-		if (app.access.to.upload_file(this._project)) {
+		// Return if upload button already exists
+		if (this.uploadButton) return;
 
-			// Return if upload button already exists
-			if ( this.uploadButton ) return;
-
-			// Create Upload Button
-			this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this.topContainer);
-			this.uploadButton.innerHTML = 'Upload files...';
-
-		} else {
-
-			// Remove upload button if it exists
-			if ( this.uploadButton ) this.uploadButton.remove();
-		}
-
+		// get upload button
+		this.uploadButton = app.Data.getUploadButton('chrome-upload-button', this._uploadButtonContainer);
+		
+		// set title
+		this.uploadButton.innerHTML = '<i class="fa fa-cloud-upload"></i>Upload data';
 	},
 
-
-	// ┌─┐┬  ┌─┐┌─┐┌─┐  ┌─┐┌─┐┌─┐┬ ┬┌─┐┌─┐
-	// │  │  │ │└─┐├┤   ├─┘│ │├─┘│ │├─┘└─┐
-	// └─┘┴─┘└─┘└─┘└─┘  ┴  └─┘┴  └─┘┴  └─┘
 
 	// When clicking on container, close popups
 	_closeActionPopUps : function (e) {
@@ -327,22 +311,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 
-	// █████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗
-	// ╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝
-
-
-
-	// ███████╗██╗██╗     ███████╗███████╗
-	// ██╔════╝██║██║     ██╔════╝██╔════╝
-	// █████╗  ██║██║     █████╗  ███████╗
-	// ██╔══╝  ██║██║     ██╔══╝  ╚════██║
-	// ██║     ██║███████╗███████╗███████║
-	// ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
-
-	// ┬┌┐┌┬┌┬┐  ┌─┐┬┬  ┌─┐┌─┐
-	// │││││ │   ├┤ ││  ├┤ └─┐
-	// ┴┘└┘┴ ┴   └  ┴┴─┘└─┘└─┘	
-
 	_initFileLists : function () {
 
 		// Holds each section (project files, my files, etc)
@@ -361,21 +329,16 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// File list (global)
 		this.fileProviders = {};
 
-		// add postgis files
-		if (app.access.to.edit_project(this._project)) {
-			
-			this.fileProviders.postgis = {
-				name : 'Data Library',
-				data : [],
-				getFiles : function () {
-					return app.Account.getFiles()
-				}
+		this.fileProviders.postgis = {
+			name : 'Data Library',
+			data : [],
+			getFiles : function () {
+				return app.Account.getFiles()
 			}
 		}
-
+		
 		// Create FILE LIST section, with D3 container
-
-		for ( var f in this.fileProviders ) {
+		for (var f in this.fileProviders ) {
 
 			this.fileListContainers[f] = {};
 
@@ -389,10 +352,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	},	
 
-	
-	// ┬─┐┌─┐┌─┐┬─┐┌─┐┌─┐┬ ┬  ┌─┐┬┬  ┌─┐┌─┐
-	// ├┬┘├┤ ├┤ ├┬┘├┤ └─┐├─┤  ├┤ ││  ├┤ └─┐
-	// ┴└─└─┘└  ┴└─└─┘└─┘┴ ┴  └  ┴┴─┘└─┘└─┘
 	
 	_refreshFiles : function () {
 
@@ -417,14 +376,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 
-
-	// ███████╗██╗██╗     ███████╗    ██╗      ██████╗  ██████╗ ██████╗               ██████╗ ██████╗ 
-	// ██╔════╝██║██║     ██╔════╝    ██║     ██╔═══██╗██╔═══██╗██╔══██╗              ██╔══██╗╚════██╗
-	// █████╗  ██║██║     █████╗      ██║     ██║   ██║██║   ██║██████╔╝    █████╗    ██║  ██║ █████╔╝
-	// ██╔══╝  ██║██║     ██╔══╝      ██║     ██║   ██║██║   ██║██╔═══╝     ╚════╝    ██║  ██║ ╚═══██╗
-	// ██║     ██║███████╗███████╗    ███████╗╚██████╔╝╚██████╔╝██║                   ██████╔╝██████╔╝
-	// ╚═╝     ╚═╝╚══════╝╚══════╝    ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝                   ╚═════╝ ╚═════╝ 
-
 	// ┌─┐┌─┐┌─┐┬ ┬  ┌─┐┬┬  ┌─┐  ┬ ┬┬─┐┌─┐┌─┐┌─┐┌─┐┬─┐
 	// ├┤ ├─┤│  ├─┤  ├┤ ││  ├┤   │││├┬┘├─┤├─┘├─┘├┤ ├┬┘
 	// └─┘┴ ┴└─┘┴ ┴  └  ┴┴─┘└─┘  └┴┘┴└─┴ ┴┴  ┴  └─┘┴└─	
@@ -445,7 +396,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// UPDATE
 		dataListLine
-			.classed('file-selected', function(d) {
+			.classed('file-selected', function (d) {
 				
 				var uuid = d.getUuid();
 
@@ -458,21 +409,25 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			}.bind(this));
 
 
+		dataListLine
+			.classed('editingFileName', function (d) {
+				var uuid = d.getUuid();
+				if ( this.editingFileName == uuid ) return true;
+				return false;
+			}.bind(this))
+
 		// EXIT
 		dataListLine
 			.exit()
 			.remove();
 
-
 		
-
+		// CREATE NAME CONTENT (file name)
+		this.createFileNameContent(dataListLine, library);
 
 		// CREATE FILE META (date and size)
 		this.createFileMetaContent(dataListLine, library);
-
-		// CREATE NAME CONTENT (file name)
-		this.createFileNameContent(dataListLine, library);		
-
+		
 		// FILE AUTHOR
 		// this.createFileAuthor(dataListLine, library);	
 
@@ -610,7 +565,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Enter
 		nameInput
 			.enter()
-			.append('textarea')
+			// .append('textarea')
+			.append('input')
+			.attr('type', 'text')			
 			.classed('file-name-input', true)
 
 
@@ -797,31 +754,31 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Disable actions for Layers
 		var isDisabled = (library == 'layers'),
-		    canEdit = app.access.to.edit_project(this._project),
-		    canDownload = app.access.to.download_file(this._project),
+		    canEdit = this._project.isEditor(),
+		    canDownload = this._project.isDownloadable(),
 		    that = this;
-	
+
 		var action = {
 
 			createLayer : {
 				name : 'Add To Project',
-				disabled : isDisabled,
+				disabled : !canEdit,
 			},
 			share : {
-				name : 'Share with...',
-				disabled : false,
+				name : 'Share with...', 	// todo: implement sharing of data
+				disabled : true,
 			},			
 			changeName : {
 				name : 'Change Name',
-				disabled : !canEdit
+				disabled : true
 			},			
 			download : {
 				name : 'Download',
-				disabled : !canDownload,
+				disabled : false,
 			},
 			delete : {
 				name : 'Delete',
-				disabled : !canEdit
+				disabled : false
 			},
 		}
 
@@ -932,22 +889,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 
-                                                                                                                            
-	// █████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗█████╗
-	// ╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝╚════╝
-
-
-
-
-	// ██╗      █████╗ ██╗   ██╗███████╗██████╗ ███████╗
-	// ██║     ██╔══██╗╚██╗ ██╔╝██╔════╝██╔══██╗██╔════╝
-	// ██║     ███████║ ╚████╔╝ █████╗  ██████╔╝███████╗
-	// ██║     ██╔══██║  ╚██╔╝  ██╔══╝  ██╔══██╗╚════██║
-	// ███████╗██║  ██║   ██║   ███████╗██║  ██║███████║
-	// ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝
-
-	
-
 	// ┬┌┐┌┬┌┬┐  ┬  ┌─┐┬ ┬┌─┐┬─┐┌─┐
 	// │││││ │   │  ├─┤└┬┘├┤ ├┬┘└─┐
 	// ┴┘└┘┴ ┴   ┴─┘┴ ┴ ┴ └─┘┴└─└─┘
@@ -975,23 +916,23 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	       	sortedLayers.forEach(function (layerBundle) {
 
 	       		var provider = layerBundle.key;
+
+	       		// only do our layers
+	       		if (provider != 'postgis' && provider != 'raster') return;
+
 	       		var layers = layerBundle.layers;
 
-	       		if ( layers.length <= 0 ) return;
+	       		if ( layers.length <= 0 ) return this.createNoLayers();
 
 			this.layerProviders[provider] = {
 				name : provider,
 				layers : layers
-			}	       		
+			}			
 	       			       		
 			this.layerListContainers[provider] = {};
 
 			// Create wrapper
 			this.layerListContainers[provider].wrapper = Wu.DomUtil.create('div', 'layer-list-container', this._layersContainer);
-			
-			// Title
-			this.layerListContainers[provider].title = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this.layerListContainers[provider].wrapper);
-			this.layerListContainers[provider].title.innerHTML = provider.camelize();
 
 			// D3 Container
 			this.layerListContainers[provider].layerList = Wu.DomUtil.create('div', 'layer-list-container-layer-list', this.layerListContainers[provider].wrapper);
@@ -1001,6 +942,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	},
 
+	createNoLayers : function () {
+		var noLayersText = 'This project has no layers.<br>Upload files, and add them to project.';
+		var noLayers = Wu.DomUtil.create('div', 'no-layers', this._layersContainer, noLayersText);
+	},
 
 	
 	// ┬─┐┌─┐┌─┐┬─┐┌─┐┌─┐┬ ┬  ┬  ┌─┐┬ ┬┌─┐┬─┐┌─┐
@@ -1011,7 +956,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// FILES
 		for (var p in this.layerProviders) {
-
 			var provider = this.layerProviders[p];
 			var layers = provider.layers;
 			provider.data = _.toArray(layers);
@@ -1053,13 +997,104 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},	
 
 
+	// ██████╗  █████╗ ███████╗███████╗    ██╗      █████╗ ██╗   ██╗███████╗██████╗ ███████╗
+	// ██╔══██╗██╔══██╗██╔════╝██╔════╝    ██║     ██╔══██╗╚██╗ ██╔╝██╔════╝██╔══██╗██╔════╝
+	// ██████╔╝███████║███████╗█████╗      ██║     ███████║ ╚████╔╝ █████╗  ██████╔╝███████╗
+	// ██╔══██╗██╔══██║╚════██║██╔══╝      ██║     ██╔══██║  ╚██╔╝  ██╔══╝  ██╔══██╗╚════██║
+	// ██████╔╝██║  ██║███████║███████╗    ███████╗██║  ██║   ██║   ███████╗██║  ██║███████║
+	// ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝    ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝
 
-	// ██╗      █████╗ ██╗   ██╗███████╗██████╗     ██╗      ██████╗  ██████╗ ██████╗ 
-	// ██║     ██╔══██╗╚██╗ ██╔╝██╔════╝██╔══██╗    ██║     ██╔═══██╗██╔═══██╗██╔══██╗
-	// ██║     ███████║ ╚████╔╝ █████╗  ██████╔╝    ██║     ██║   ██║██║   ██║██████╔╝
-	// ██║     ██╔══██║  ╚██╔╝  ██╔══╝  ██╔══██╗    ██║     ██║   ██║██║   ██║██╔═══╝ 
-	// ███████╗██║  ██║   ██║   ███████╗██║  ██║    ███████╗╚██████╔╝╚██████╔╝██║     
-	// ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝    ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝     
+
+	_initBaseLayerList : function () {
+		this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false)
+	},
+
+	_refreshBaseLayerList : function () {
+
+		// clear
+		this._baseLayerDropdownContainer.innerHTML = '';
+
+		// only create if editable
+		if (this._project.isEditable()) {
+			this._initLayout_activeLayers(false, false, this._baseLayerDropdownContainer, false)
+		}
+	},
+
+	_initLayout_activeLayers : function (title, subtitle, container, layers) {
+
+		// active layer wrapper
+		var wrap = this._activeLayersWrap = Wu.DomUtil.create('div', 'baselayer-dropdown-wrapper', container);
+		
+		// create dropdown
+		var selectWrap = Wu.DomUtil.create('div', 'chrome chrome-content active-layer select-wrap', wrap);
+		var select = this._select = Wu.DomUtil.create('select', 'active-layer-select', selectWrap);
+
+		// Create select options
+		this.sortedLayers.forEach(function(provider) {
+
+			// Do not allow postgis layers to be in the baselayer dropdown
+			if ( provider.key == "postgis" ) return;
+
+			// Get each provider (mapbox, google, etc)
+			provider.layers.forEach(function(layer) {
+				
+				// Create selct option
+				var option = Wu.DomUtil.create('option', 'active-layer-option', select);
+				
+				// Get layer uuid
+				var layerUuid = layer.getUuid();
+				
+				// Set option value
+				option.value = layerUuid;
+
+				// Set selected state
+				var isSelected = this.isBaseLayerOn(layerUuid);
+				if ( isSelected ) option.selected = true;
+
+				// Print option text
+				option.innerHTML = layer.getTitle() + ' (' + provider.key + ')';
+
+
+			}.bind(this))
+		}.bind(this));
+
+		// select event
+		Wu.DomEvent.on(select, 'change', this._selectedActiveLayer, this); // todo: mem leak?
+
+		return select;
+
+	},
+
+	_selectedActiveLayer : function (e) {
+
+		// Remove active baselayers
+		var baselayers = this._project.getBaselayers();
+
+		// Force array
+		// Todo: this is always array anyways...
+		var _baselayers = _.isArray(baselayers) ? baselayers : [baselayers];
+
+		_baselayers.forEach(function (baselayer) {
+			var uuid = baselayer.uuid;
+			var layer = this._project.getLayer(uuid);
+			layer.disable();
+		}.bind(this))
+
+
+		// Add to map
+		var uuid = e.target.value;
+		var layer = this._project.getLayer(uuid);
+		layer._addTo('baselayer');
+		
+
+
+		// Save to server
+		this._project.setBaseLayer([{
+			uuid : uuid,
+			zIndex : 1,
+			opacity : 1
+		}]);
+	},
 
 
 	// ┌─┐┌─┐┌─┐┬ ┬  ┬  ┌─┐┬ ┬┌─┐┬─┐  ┬ ┬┬─┐┌─┐┌─┐┌─┐┌─┐┬─┐
@@ -1079,9 +1114,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			.enter()
 			.append('div')
 			.classed('data-list-line', true);
-			// .classed('layer-list-item', true)
-			// .classed('chrome-metafield-line', true);
-
 
 		// UPDATE
 		dataListLine
@@ -1111,7 +1143,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				return false;
 			}.bind(this))
 
-
+			.classed('editingName', function (d) {
+				var uuid = d.getUuid();
+				if ( this.editingLayerName == uuid ) return true;
+				return false;
+			}.bind(this))
 
 
 		// EXIT
@@ -1120,7 +1156,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			.remove();
 
 		// Create Toggle Button (layer/baselayer)
-		this.createLayerToggleButton(dataListLine, library);
+		// this.createLayerToggleButton(dataListLine, library);
+
+		this.createLayerToggleSwitch(dataListLine, library);
 
 		// Create Radio Button
 		this.createRadioButton(dataListLine, library);						
@@ -1217,100 +1255,134 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	//  │ │ ││ ┬│ ┬│  ├┤   │  ├─┤└┬┘├┤ ├┬┘
 	//  ┴ └─┘└─┘└─┘┴─┘└─┘  ┴─┘┴ ┴ ┴ └─┘┴└─
 
-	// TOGGLE LAYER BUTTONS
-
-	createLayerToggleButton : function (parent, library) {
+	createLayerToggleSwitch : function (parent, library) {
 
 		// Bind container
 		var toggleButton = 
 			parent
-			.selectAll('.chrome-toggle-button-container')
+			.selectAll('.chrome-switch-container')
 			.data(function(d) { return [d] });
 
 		// Enter container
 		toggleButton
 			.enter()
 			.append('div')
-			.classed('chrome-toggle-button-container', true);
+			.classed('chrome-switch-container', true);
+
+		toggleButton
+			.classed('switch-on', function (d) {
+				var uuid = d.getUuid();
+				var on = this.isLayerOn(uuid);
+				return on;
+			}.bind(this))
+
+		toggleButton
+			.on('click', function(d) {
+				this.toggleLayer(d);
+			}.bind(this));		
 
 		// Exit
 		toggleButton
 			.exit()
 			.remove();
 
-
-		// LAYER BUTTON
-		// LAYER BUTTON
-		// LAYER BUTTON
-
-		// Bind layer button
-		var option1 = 
-			toggleButton
-			.selectAll('.toggle-button-option-one')
-			.data(function(d) { return [d] });
-
-		// Enter layer button
-		option1
-			.enter()
-			.append('div')
-			.classed('toggle-button', true)
-			.classed('toggle-button-option-one', true)
-			.html('layer')
-			.on('click', function(d) {
-				this.toggleLayer(d);
-			}.bind(this));
-
-
-		// Update layer button
-		option1
-			.classed('toggle-button-active', function (d) {
-				var uuid = d.getUuid();
-				var on = this.isLayerOn(uuid);
-				return on;
-			}.bind(this))
-
-
-		// Exit layer button
-		option1
-			.exit()
-			.remove()
-
-
-
-		// BASE LAYER BUTTON
-		// BASE LAYER BUTTON
-		// BASE LAYER BUTTON
-
-		// Bind base layer button
-		var option2 = 
-			toggleButton
-			.selectAll('.toggle-button-option-two')
-			.data(function(d) { return [d] });
-
-		// Enter base layer button
-		option2
-			.enter()
-			.append('div')
-			.classed('toggle-button', true)
-			.classed('toggle-button-option-two', true)
-			.html('base')	
-			.on('click', function(d) {
-				this.toggleBaseLayer(d);
-			}.bind(this));				
-
-		// Update base layer button
-		option2
-			.classed('toggle-button-active', function (d) {
-				var uuid = d.getUuid();
-				var on = this.isBaseLayerOn(uuid);
-				return on;
-			}.bind(this))
-
-		// Exit base layer button
-		option2
-			.exit()
-			.remove()
 	},
+
+
+	// TOGGLE LAYER BUTTONS
+
+	// createLayerToggleButton : function (parent, library) {
+
+	// 	// Bind container
+	// 	var toggleButton = 
+	// 		parent
+	// 		.selectAll('.chrome-toggle-button-container')
+	// 		.data(function(d) { return [d] });
+
+	// 	// Enter container
+	// 	toggleButton
+	// 		.enter()
+	// 		.append('div')
+	// 		.classed('chrome-toggle-button-container', true);
+
+	// 	// Exit
+	// 	toggleButton
+	// 		.exit()
+	// 		.remove();
+
+
+	// 	// LAYER BUTTON
+	// 	// LAYER BUTTON
+	// 	// LAYER BUTTON
+
+	// 	// Bind layer button
+	// 	var option1 = 
+	// 		toggleButton
+	// 		.selectAll('.toggle-button-option-one')
+	// 		.data(function(d) { return [d] });
+
+	// 	// Enter layer button
+	// 	option1
+	// 		.enter()
+	// 		.append('div')
+	// 		.classed('toggle-button', true)
+	// 		.classed('toggle-button-option-one', true)
+	// 		.html('layer')
+	// 		.on('click', function(d) {
+	// 			this.toggleLayer(d);
+	// 		}.bind(this));
+
+
+	// 	// Update layer button
+	// 	option1
+	// 		.classed('toggle-button-active', function (d) {
+	// 			var uuid = d.getUuid();
+	// 			var on = this.isLayerOn(uuid);
+	// 			return on;
+	// 		}.bind(this))
+
+
+	// 	// Exit layer button
+	// 	option1
+	// 		.exit()
+	// 		.remove()
+
+
+
+	// 	// BASE LAYER BUTTON
+	// 	// BASE LAYER BUTTON
+	// 	// BASE LAYER BUTTON
+
+	// 	// Bind base layer button
+	// 	var option2 = 
+	// 		toggleButton
+	// 		.selectAll('.toggle-button-option-two')
+	// 		.data(function(d) { return [d] });
+
+	// 	// Enter base layer button
+	// 	option2
+	// 		.enter()
+	// 		.append('div')
+	// 		.classed('toggle-button', true)
+	// 		.classed('toggle-button-option-two', true)
+	// 		.html('base')	
+	// 		.on('click', function(d) {
+	// 			this.toggleBaseLayer(d);
+	// 		}.bind(this));				
+
+	// 	// Update base layer button
+	// 	option2
+	// 		.classed('toggle-button-active', function (d) {
+	// 			var uuid = d.getUuid();
+	// 			var on = this.isBaseLayerOn(uuid);
+	// 			return on;
+	// 		}.bind(this))
+
+	// 	// Exit base layer button
+	// 	option2
+	// 		.exit()
+	// 		.remove()
+	// },
 
 
 	// TOGGLE LAYERS
@@ -1323,8 +1395,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		on ? this.removeLayer(layer) : this.addLayer(layer);
 
 		// Toggle base layer off
-		var baseOn = this.isBaseLayerOn(uuid);
-		if ( baseOn ) this.removeBaseLayer(layer);
+		// var baseOn = this.isBaseLayerOn(uuid);
+		// if ( baseOn ) this.removeBaseLayer(layer);
 
 		this._refreshLayers();		
 	},	
@@ -1351,52 +1423,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		return on;
 	},
 
-
-	// TOGGLE BASE LAYERS
-	// TOGGLE BASE LAYERS
-	// TOGGLE BASE LAYERS
-
-	toggleBaseLayer : function (layer) {
-
-		var uuid = layer.getUuid();
-
-		// Toggle layer off
-		var layerOn = this.isLayerOn(uuid);
-		if ( layerOn ) this.removeLayer(layer);	
-
-		var on = this.isBaseLayerOn(uuid);
-		on ? this.removeBaseLayer(layer) : this.addBaseLayer(layer);
-
-		this._refreshLayers();		
-	},
-
-	// Add base layer
-	addBaseLayer : function (layer) {
-
-		var uuid = layer.getUuid()
-
-		// Update map	
-		layer._addTo('baselayer');
-
-		// Save to server
-		this._project.addBaseLayer({
-			uuid : uuid,
-			zIndex : 1,
-			opacity : layer.getOpacity()
-		});
-
-	},
-
-	// Remove base layer
-	removeBaseLayer : function (layer) {
-
-		// Update map
-		layer.disable(); 
-
-		// Save to server
-		this._project.removeBaseLayer(layer);
-
-	},
 
 	// Check if base layer is on
 	isBaseLayerOn : function (uuid) {
@@ -1618,8 +1644,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	initLayerActions : function (parent, library) {
 
 		// Disable actions for Layers
-		var canEdit = app.access.to.edit_project(this._project),
-		    canDownload = app.access.to.download_file(this._project),
+		var canEdit = this._project.isEditable(),
+		    canDownload = this._project.isDownloadable(),
 		    that = this;
 	
 		var action = {

@@ -256,43 +256,43 @@ Wu.Access = Wu.Class.extend({
 	// must be kept identical with api.access.js
 	to : {
 
-		create_client : function (user) { 
-			var user = user || app.Account;
-			if (app.access.as.admin(user, 'create_client')) return true;
-			if (app.access.has.capability(user, 'create_client')) return true;
+		// create_client : function (user) { 
+		// 	var user = user || app.Account;
+		// 	if (app.access.as.admin(user, 'create_client')) return true;
+		// 	if (app.access.has.capability(user, 'create_client')) return true;
 			
-			return false;
-		},
+		// 	return false;
+		// },
 		
-		edit_client : function (client, user) { 
-			var user = user || app.Account;
-			if (app.access.as.admin(user, 'edit_client')) return true;
-			return false;
-		},
+		// edit_client : function (client, user) { 
+		// 	var user = user || app.Account;
+		// 	if (app.access.as.admin(user, 'edit_client')) return true;
+		// 	return false;
+		// },
 		
-		edit_other_client : function (client, user) { 
-			var user = user || app.Account;
-			if (app.access.as.admin(user, 'edit_other_client')) return true;
-			return false;
-		},
+		// edit_other_client : function (client, user) { 
+		// 	var user = user || app.Account;
+		// 	if (app.access.as.admin(user, 'edit_other_client')) return true;
+		// 	return false;
+		// },
 		
-		delete_client		: function (client, user) { 
-			var user = user || app.Account;
-			if (app.access.as.admin(user, 'delete_client')) return true;
-			return false;
-		},
+		// delete_client		: function (client, user) { 
+		// 	var user = user || app.Account;
+		// 	if (app.access.as.admin(user, 'delete_client')) return true;
+		// 	return false;
+		// },
 		
-		delete_other_client  	: function (client, user) { 
-			var user = user || app.Account;
-			if (app.access.as.admin(user, 'delete_other_client')) return true;
-			return false;
-		},
+		// delete_other_client  	: function (client, user) { 
+		// 	var user = user || app.Account;
+		// 	if (app.access.as.admin(user, 'delete_other_client')) return true;
+		// 	return false;
+		// },
 		
-		read_client		: function (client, user) { 
-			var user = user || app.Account;
-			if (app.access.as.admin(user, 'read_client')) return true;
-			return false;
-		},
+		// read_client		: function (client, user) { 
+		// 	var user = user || app.Account;
+		// 	if (app.access.as.admin(user, 'read_client')) return true;
+		// 	return false;
+		// },
 		
 		// who else can create projects? students! 
 		create_project 		: function (user) { 
