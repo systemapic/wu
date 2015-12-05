@@ -74,7 +74,7 @@ Wu.Chrome.Left = Wu.Chrome.extend({
 	},
 
 	open : function () {
-		
+
 		if (this._isOpen) return;
 		this._isOpen = true;
 

@@ -28,6 +28,8 @@ var listedUser = process.argv[2];
 
 User
 .findOne({'local.email' : listedUser})
+.populate('files')
+.populate('contact_list')
 .exec(function (err, user) {
 	console.log(err, user)
 	// console.log(u.local.email, '|', u.firstName, u.lastName);

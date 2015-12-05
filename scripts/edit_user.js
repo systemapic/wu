@@ -26,11 +26,21 @@ mongoose.connect(config.mongo.url);
 
 
 User
-.find()
-.exec(function (err, users) {
-	// console.log(err, users)
-	users.forEach(function (u) {
-		console.log(u.local.email);
+// .find()
+// .findOne({'local.email' : 'frano@globesar.com'})
+.findOne({'local.email' : 'knutole@systemapic.com'})
+.exec(function (err, user) {
+	console.log(err, user);
+
+	user.access.account_type = 'super';
+	user.markModified('access');
+
+	user.save(function () {
+		
+	})
+
+	// users.forEach(function (u) {
+		// console.log(u.local.email);
 
 		// if (u.local.email == 'oyvind.lier@sweco,no') {
 		// 	console.log('SWECO!', u);
@@ -42,7 +52,7 @@ User
 		// }
 
 
-	});
+	// });
 	
 
 });
