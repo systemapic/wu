@@ -34,52 +34,46 @@ Project
 
 	projects.forEach(function (project, n) {
 
-		// console.log('project: ', n);
-
-		var roles = project.roles;
-
-		// console.log('project with roles:', roles);
-
-		// console.log('PROJECT ACCESS: ', project.access.read);
+		console.log('project: ', project.name);
+		console.log('read access: ', project.access.read);
+		console.log('edit access: ', project.access.edit);
 
 
-		roles.forEach(function (role) {
+		// var roles = project.roles;
 
-			// console.log('role ', role);
-
-			// console.log('role.slug', role.slug);
+		// roles.forEach(function (role) {
 
 
-			// if (role.slug == 'projectOwner') {
-			// 	console.log('projectOwners: ', role.members);
+		// 	// if (role.slug == 'projectOwner') {
+		// 	// 	console.log('projectOwners: ', role.members);
 
-			// }
+		// 	// }
 
-			// if (role.slug == 'projectEditor') {
-			// 	console.log('projectEditor: ', role.members);
-			// }
+		// 	// if (role.slug == 'projectEditor') {
+		// 	// 	console.log('projectEditor: ', role.members);
+		// 	// }
 
-			if (role.slug == 'projectReader') {
-				console.log('projectReader: ', role.members);
+		// 	if (role.slug == 'projectReader') {
+		// 		console.log('projectReader: ', role.members);
 
-				// add read
-				// add_read_to_project(project, role.members, function (err) {
-
-
-					// done!
+		// 		// add read
+		// 		// add_read_to_project(project, role.members, function (err) {
 
 
-				// });
+		// 			// done!
 
-				if (!role.members) return;
 
-				add_to_contact_list(role.members, function (err) {
+		// 		// });
 
-					console.log('done!');
-				})
-			}
+		// 		if (!role.members) return;
 
-		});
+		// 		add_to_contact_list(role.members, function (err) {
+
+		// 			console.log('done!');
+		// 		})
+		// 	}
+
+		// });
 
 
 	});

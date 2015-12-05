@@ -246,7 +246,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	},
 
 	// default open
-	_leftPaneisOpen : true,
+	// _leftPaneisOpen : false,
 
 	_toggleLeftPane : function (e) {
 		Wu.DomEvent.stop(e);

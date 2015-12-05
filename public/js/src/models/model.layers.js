@@ -832,7 +832,6 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 			
 			var data = JSON.parse(json);
 
-			console.log('fetched data', data);
 			e.data = data;
 			var event = e.e.originalEvent;
 			this._event = {

@@ -108,6 +108,10 @@ userSchema.methods.isBot = function () {
     // return this.local.email == 'bot@systemapic.com' && this.access.account_type == 'bot';
     return this.local.email == 'bot@systemapic.com';
 };
+userSchema.methods.isSuper = function () {
+    // return this.local.email == 'bot@systemapic.com' && this.access.account_type == 'bot';
+    return this.access.account_type == 'super';
+};
 
 // timestamps plugin
 userSchema.plugin(timestamps);    // adds created and lastUpdated fields automatically

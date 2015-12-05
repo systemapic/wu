@@ -293,7 +293,7 @@ Wu.App = Wu.Class.extend({
 		// if (this._lonelyProject()) return;
 
 		// open projects pane
-		app.Chrome.Left.open()
+		// app.Chrome.Left.open()
 
 		// open first project (ordered by lastUpdated)
 		app.Controller.openLastUpdatedProject();
