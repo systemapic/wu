@@ -379,13 +379,15 @@
 
 .chrome-content.settings-button {
     margin-top: 3px;
-    font-size: 16px;
-    margin-right: 3px;
+    font-size: 13px;
+    margin-right: -1px;
     padding-bottom: 3px;
     background: transparent;
     border: 1px solid #ccc;
-    color: #999;
-    font-weight: 600;   
+    color: #3C4759;
+    font-weight: 600;
+    padding-right: 14px;
+    padding-left: 14px;
     }
 
 .chrome-content.settings-button:hover {
@@ -399,13 +401,10 @@
 .chrome-content.settings-button.active-tab,
 .chrome-content.settings-button.active-tab:hover,
 .chrome-content.settings-button.active-tab:active {
-    /*  
-    background: #e0e0e0;
-    color: #333;    
-    */    
     background: #3C4759;
     color: white;
     border: 1px solid #3c4759;
+    font-weight: 700;
     }
 
 .chrome-content.settings-button.active-tab:hover {

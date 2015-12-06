@@ -1244,16 +1244,17 @@
 
 
 
-
-
-
-
-/*
-.data-list-line:hover {
-	background: rgba(113, 196, 168, 0.12);
+.chrome.chrome-content.settings-button:first-child {	
+	border-radius: 4px 0 0 4px;
+}
+.chrome.chrome-content.settings-button:last-child {	
+	border-radius: 0 4px 4px 0;
 }
 
-.chrome-portal-logo {
-	z-index: 101; 
-	width: 200px;
-}*/
+
+
+
+
+
+
+
