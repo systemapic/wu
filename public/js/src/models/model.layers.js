@@ -780,6 +780,8 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 	_fetchData : function (e, callback) {
 
+		console.log('e: ', e);
+
 		var keys = Object.keys(e.data);
 		var column = keys[0];
 		var row = e.data[column];
@@ -791,6 +793,8 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 			layer_id : layer_id,
 			access_token : app.tokens.access_token
 		}
+
+		console.log('fetchData', options);
 
 		Wu.send('/api/db/fetch', options, callback, this);
 	},
@@ -832,7 +836,6 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 			
 			var data = JSON.parse(json);
 
-			console.log('fetched data', data);
 			e.data = data;
 			var event = e.e.originalEvent;
 			this._event = {
