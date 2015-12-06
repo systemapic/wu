@@ -943,8 +943,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	createNoLayers : function () {
-		var noLayersText = 'This project has no layers.<br>Upload files, and add them to project.';
-		var noLayers = Wu.DomUtil.create('div', 'no-layers', this._layersContainer, noLayersText);
+		// var noLayersText = 'This project has no layers.<br>Upload files, and add them to project.';
+		// var noLayers = Wu.DomUtil.create('div', 'no-layers', this._layersContainer, noLayersText);
 	},
 
 	

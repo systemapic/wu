@@ -54,6 +54,10 @@ Wu.Invite = Wu.Class.extend({
 		// set image
 		var logo_img = loginConfig.invitationLogo;
 		logo.style.backgroundImage = 'url(../' + logo_img + ')';
+
+		// set width
+		var width = loginConfig.loginLogoWidth || 210;
+		logo.style.width = width + 'px';
 	},
 
 

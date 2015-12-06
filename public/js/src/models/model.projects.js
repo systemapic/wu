@@ -1294,7 +1294,7 @@ Wu.Project = Wu.Class.extend({
 		if (_.contains(access.edit, user.getUuid())) return true;
 
 		// true: if user is super
-		// if (app.Account)  todo! 
+		if (app.Account.isSuper()) return true; 
 
 		// false: not createdBy and not editor
 		return false;
