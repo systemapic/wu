@@ -180,15 +180,15 @@ Wu.Resumable = Wu.Class.extend({
 		    totalTime 	= (endTime - startTime) / 1000,
 		    size 	= file.size / 1000 / 1000,
 		    bytesps  	= size / totalTime,
-		    procTime 	= (size * 0.5).toFixed(0) + ' seconds',
+		    procTime 	= (size * 1).toFixed(0) + ' seconds',
 		    ext 	= file.fileName.split('.').reverse()[0];
 
 		// set message
-		var message = 'Estimated processing time: ' + procTime;
+		var message = 'Estimated time: ' + procTime;
 
 		// set feedback
 		app.feedback.setMessage({
-			title : 'Processing file',
+			title : 'Processing...',
 			description : message,
 		});
 
