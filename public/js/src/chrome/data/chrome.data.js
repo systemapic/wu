@@ -51,7 +51,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._refresh();
 	},
 
-
 	_onFileDeleted : function () {
 		this._refresh();
 	},
@@ -80,7 +79,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// List container
 		this._listContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this._listOuterScroller);
-
 
 
 		// LAYER LIST
@@ -229,8 +227,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		return dims;
 	},
 
-	_onFileImported : function () {
+	_onFileImported : function (e) {
 		this._refresh();
+
+		var file = e.detail.file;
+		console.log('file imported!!', file, this._project);
+
+		file._createLayer(this._project);
 	},
 
 

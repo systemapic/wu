@@ -44,8 +44,6 @@ Wu.Data = Wu.Class.extend({
 	// ping from socket
 	_onImportedFile : function (file_id, import_time_ms) {
 
-		console.log('_onImportedFile!!', file_id);
-
 		// print import time
 		app.Data._setFeedbackImportTime(import_time_ms);
 
