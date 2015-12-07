@@ -490,7 +490,19 @@ input.chrome-field-input {
     left: 0;
     float: right;
     top: -34px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background: #3C4759;
     }
+.chrome-upload-button:hover {
+    background: #F9F9F9;
+    color: #3F4652;
+    border: 1px solid gainsboro;
+}
+.chrome-upload-button:active {
+    background: #79E0C0;
+    color: #FCFCFC;
+}
 
 .chrome-data-inner {
     padding: 0;
