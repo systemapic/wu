@@ -533,8 +533,8 @@ Wu.Model.File = Wu.Model.extend({
 
 				// todo: set layer icon
 				app.feedback.setMessage({
-					title : 'Created layer from dataset',
-					description : 'Added <strong>' + layerModel.title + '</strong> to project.',
+					title : 'Added layer',
+					// description : 'Added <strong>' + layerModel.title + '</strong> to project.',
 				});	
 
 				// select project
@@ -622,8 +622,8 @@ Wu.Model.File = Wu.Model.extend({
 
 				// todo: set layer icon
 				app.feedback.setMessage({
-					title : 'Created layer from dataset',
-					description : 'Added <strong>' + layerModel.title + '</strong> to project.',
+					title : 'Added layer',
+					// description : 'Added <strong>' + layerModel.title + '</strong> to project.',
 				});	
 
 				// select project

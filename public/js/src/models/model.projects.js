@@ -935,8 +935,13 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	setName : function (name) {
+
+		// store on server
 		this.store.name = name;
 		this._update('name');
+
+		// update slug name
+		this.setSlug(name);
 	},
 
 	setDescription : function (description) {

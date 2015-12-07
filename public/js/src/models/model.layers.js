@@ -598,6 +598,9 @@ Wu.Model.Layer = Wu.Model.extend({
 		if (this.store.data && this.store.data.postgis) return true;
 		return false;
 	},
+	isPostgis : function () {
+		return this.isPostGIS();
+	}
 	
 
 });
@@ -779,8 +782,6 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 
 
 	_fetchData : function (e, callback) {
-
-		console.log('e: ', e);
 
 		var keys = Object.keys(e.data);
 		var column = keys[0];
