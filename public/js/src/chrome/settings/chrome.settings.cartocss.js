@@ -324,6 +324,8 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		// SOLUTION: temporarily add layers to map for editing, remove when done editing.
 
 
+		if (!this._layer || !this._layer.isPostgis()) return;
+
 		// refresh
 		this._refreshEditor();
 
