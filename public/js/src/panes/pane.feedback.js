@@ -18,24 +18,16 @@ Wu.FeedbackPane = Wu.Class.extend({
 	initContainer : function () {
 
 		var appendHere = app.MapPane._map._controlCorners.topleft;
-		// var appendHere = app._appPane;
 
 		this._container = Wu.DomUtil.create('div', 'feedback-pane', appendHere);
 		this._innerWrapper = Wu.DomUtil.create('div', 'feedback-pane-inner-wrapper', this._container);
 
-		// xoxoxoxoxoxoxo
-
        		Wu.DomEvent.on(this._container, 'click', Wu.DomEvent.stopPropagation)
             
-            // .on(link, 'dblclick', L.DomEvent.stopPropagation)
-            // .on(link, 'click', L.DomEvent.preventDefault)
-            // .on(link, 'click', fn, this);
-// 
-        // return link;
-   // / };		
-		// this._container
-
-
+		// .on(link, 'dblclick', L.DomEvent.stopPropagation)
+		// .on(link, 'click', L.DomEvent.preventDefault)
+		// .on(link, 'click', fn, this);
+		// return link;
 
 	},
 
@@ -142,7 +134,7 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 
 		clearTimer : true,
 		// clearDelay : 200000,
-		clearDelay : 2500,
+		clearDelay : 4500,
 		transitionDelay : 0.5, 
 		severityStyle : {
 			1 : 'message',
