@@ -66,8 +66,6 @@ Wu.Data = Wu.Class.extend({
 	// get file/layer objects from server
 	_getFile : function (file_id, callback) {
 
-		console.log('getfile: ', file_id);
-
 		var xhr = new XMLHttpRequest();
 		var fd = new FormData();
 		var url = app.options.servers.portal + 'api/upload/get';

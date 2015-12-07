@@ -109,7 +109,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._layersContainer = Wu.DomUtil.create('div', 'layers-container', this._layerListWrapper);
 		
 		// base layers
-		this._baseLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Base layer');
+		this._baseLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Background layer');
 		this._baseLayerDropdownContainer = Wu.DomUtil.create('div', 'base-layer-dropdown-container', this._layerListWrapper);
 
 		// Lines
@@ -228,11 +228,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	_onFileImported : function (e) {
+		
+		// refresh DOM
 		this._refresh();
 
+		// get file
 		var file = e.detail.file;
-		console.log('file imported!!', file, this._project);
 
+		// automatically create layer
 		file._createLayer(this._project);
 	},
 

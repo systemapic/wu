@@ -501,6 +501,7 @@ input.chrome-field-input {
 }
 .chrome-upload-button:active {
     background: #79E0C0;
+    color: #FCFCFC;
 }
 
 .chrome-data-inner {
