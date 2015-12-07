@@ -51,7 +51,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._refresh();
 	},
 
-
 	_onFileDeleted : function () {
 		this._refresh();
 	},
@@ -74,6 +73,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// todo: create wrapper for layers - needs to be hidden if not editor
 
+		// LAYER LIST OUTER SCROLLER
+		this._listOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
+		this._listOuterScroller.style.height = '100%';
+
+		// List container
+		this._listContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this._listOuterScroller);
+
+
 		// LAYER LIST
 		this._initLayerListContainer();
 		
@@ -93,37 +100,35 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// Layer list container
 	_initLayerListContainer : function () {
 
-		// LAYER LIST OUTER SCROLLER
-		this._layerListOuterScroller = Wu.DomUtil.create('div', 'chrome-data-outer-scroller', this._innerContainer);
-		this._layerListOuterScroller.style.height = '100%';
+		// xoxoxoxoxoxoxox
+		this._layerListWrapper = Wu.DomUtil.create('div', 'chrome-layer-list-wrapper', this._listContainer)		
 
-		// List container
-		this._layerListContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this._layerListOuterScroller);
-		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListContainer, 'Layers');
+		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Layers');
 
 		// Containers
-		this._layersContainer = Wu.DomUtil.create('div', 'layers-container', this._layerListContainer);
+		this._layersContainer = Wu.DomUtil.create('div', 'layers-container', this._layerListWrapper);
 		
 		// base layers
-		this._baseLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListContainer, 'Base layer');
-		this._baseLayerDropdownContainer = Wu.DomUtil.create('div', 'base-layer-dropdown-container', this._layerListContainer);
+		this._baseLayers = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Background layer');
+		this._baseLayerDropdownContainer = Wu.DomUtil.create('div', 'base-layer-dropdown-container', this._layerListWrapper);
+
+		// Lines
+		this._fileListSeparator = Wu.DomUtil.create('div', 'file-list-separator', this._layerListWrapper);		
 
 	},
 
 	// File list container
 	_initFileListContainer : function () {
 
-		// Lines
-		this._fileListSeparator = Wu.DomUtil.create('div', 'file-list-separator', this._layerListContainer);
 
 		// HEADER
-		this._fileListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListContainer, 'My Data');
+		this._fileListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._listContainer, 'My Data');
 
 		// Upload button container
-		this._uploadButtonContainer = Wu.DomUtil.create('div', 'upload-button-container', this._layerListContainer);
+		this._uploadButtonContainer = Wu.DomUtil.create('div', 'upload-button-container', this._listContainer);
 
 		// Containers
-		this._filesContainer = Wu.DomUtil.create('div', 'files-container', this._layerListContainer);
+		this._filesContainer = Wu.DomUtil.create('div', 'files-container', this._listContainer);
 
 	
 	},
@@ -222,8 +227,16 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		return dims;
 	},
 
-	_onFileImported : function () {
+	_onFileImported : function (e) {
+		
+		// refresh DOM
 		this._refresh();
+
+		// get file
+		var file = e.detail.file;
+
+		// automatically create layer
+		file._createLayer(this._project);
 	},
 
 
@@ -235,6 +248,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		if ( this._layersContainer ) this._layersContainer.innerHTML = '';
 		if ( this._filesContainer )  this._filesContainer.innerHTML = '';
 
+		// only update list if project is editable
 		if (this._project.isEditable()) {
 
 			// Layer list
@@ -261,7 +275,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// hide layers if not editor
 		if (!this._project.isEditable()) {
 			// todo: put layers in wrapper and hide
-		}	
+			Wu.DomUtil.addClass(this._layerListWrapper, 'displayNone');
+		} else {
+			Wu.DomUtil.removeClass(this._layerListWrapper, 'displayNone');
+		}
 
 	},
 
