@@ -1325,7 +1325,8 @@ Wu.Styler = Wu.Class.extend({
 			value : '', 		// targeted column value
 			color : 'red', 		// default color
 			opacity : 1, 		// default opacity
-			width : 5
+			width : 5,
+			operator : '='
 		}
 
 		// set values
@@ -1334,7 +1335,8 @@ Wu.Styler = Wu.Class.extend({
 			value : options.value,
 			color : options.color,
 			opacity : options.opacity,
-			width : options.width
+			width : options.width,
+			operator : options.operator
 		});
 
 		// create column
@@ -1387,9 +1389,6 @@ Wu.Styler = Wu.Class.extend({
 	},
 
 
-
-
-
 	_createTargetColumn : function (e, options) {
 
 		// get columns
@@ -1428,8 +1427,22 @@ Wu.Styler = Wu.Class.extend({
 			fn 	 : this._targetColumnSelected.bind(this),
 			array 	 : columns, // columns in dropdown
 			selected : options.column, // preselected item
-			className : 'target-column-dropdown'
+			className : 'target-column-dropdown tiny'
 		});
+
+
+		// < = > input
+		var operator_wrapper = Wu.DomUtil.create('div', 'target-column-wrapper', target_wrapper);
+		var operator_dropdown = new Wu.button({
+			id 	 : 'equals_selection',
+			type 	 : 'clicker',
+			appendTo : operator_wrapper,
+			fn 	 : this._operatorSelected.bind(this),
+			array 	 : ['<', '=', '>'], // columns in dropdown
+			selected : options.operator, // preselected item
+			className : 'target-equals-clicker'
+		});
+
 
 
 		
@@ -1489,7 +1502,8 @@ Wu.Styler = Wu.Class.extend({
 			color : ball,
 			opacity : opacity_input,
 			width : width_input,
-			wrapper : target_wrapper
+			wrapper : target_wrapper,
+			operator : operator_dropdown
 		});
 
 
@@ -1500,6 +1514,22 @@ Wu.Styler = Wu.Class.extend({
 
 	},
 
+
+	_operatorSelected : function (e, value) {
+
+		// get target index
+		var target = e.target;
+		var targets = this._content[this.type].targets.selectors;
+		var i = _.findIndex(targets, function (t) {
+			return t.operator._button == e.target;
+		});
+
+		// set carto
+		this.carto().targets[i].operator = value;
+
+		// mark changed
+		this.markChanged();
+	},
 
 
 });
