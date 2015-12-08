@@ -563,11 +563,14 @@ module.exports = api.upload = {
 		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
 			var u = JSON.parse(uploadStatus);
 
+			var cleanName = u.filename.split('.')[0];
+
 			if (u.data_type == 'vector') {
 				var fileModel = {
 					uuid : file_id,
 					createdBy : u.user_id,
-					name : u.filename,
+					// name : u.filename,
+					name : cleanName,
 					type : 'postgis',
 					dataSize : u.size,
 					data : {
@@ -583,7 +586,8 @@ module.exports = api.upload = {
 				var fileModel = {
 					uuid : file_id,
 					createdBy : u.user_id,
-					name : u.filename,
+					// name : u.filename,
+					name : cleanName,
 					type : 'raster',
 					dataSize : u.size,
 					data : {
