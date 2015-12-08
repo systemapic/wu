@@ -630,6 +630,8 @@ L.Control.Description = Wu.Control.extend({
 	// xoxoxoxoxoxox
 	legendary : function  (layer) {
 
+		if ( !layer.isPostgis() ) return;
+
 		var styleJSON   = Wu.parse(layer.store.style);
 
 		var point 	= styleJSON.point;
