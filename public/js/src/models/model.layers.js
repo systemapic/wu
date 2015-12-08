@@ -725,7 +725,8 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 		    access_token = '?access_token=' + app.tokens.access_token;
 
 		var layerUuid = this._getLayerUuid();
-		var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.png' + access_token;
+		// var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.png' + access_token;
+		var url = app.options.servers.tiles.uri + '{layerUuid}/{z}/{x}/{y}.png' + access_token;
 
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
@@ -756,11 +757,17 @@ Wu.PostGISLayer = Wu.Model.Layer.extend({
 	_prepareGrid : function () {
 
 		// set ids
-		var subdomains  = app.options.servers.tiles.subdomains,
+		var subdomains  = app.options.servers.utfgrid.subdomains,
 		    access_token = '?access_token=' + app.tokens.access_token;
 		
 		var layerUuid = this._getLayerUuid();
-		var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.grid' + access_token;
+		// var url = 'https://{s}.systemapic.com/tiles/{layerUuid}/{z}/{x}/{y}.grid' + access_token;
+		// var url = app.options.servers.tiles.uri + '{layerUuid}/{z}/{x}/{y}.png' + access_token;
+		// var url = app.options.servers.tiles.uri + '{layerUuid}/{z}/{x}/{y}.png' + access_token;
+		// var url = 'https://{s}.globesar.com/tiles/{layerUuid}/{z}/{x}/{y}.grid' + access_token;
+		var url = app.options.servers.tiles.uri + "{layerUuid}/{z}/{x}/{y}.grid" + access_token;
+
+		console.log('grid url: ', url);
 
 		// create gridlayer
 		this.gridLayer = new L.UtfGrid(url, {
@@ -987,7 +994,8 @@ Wu.RasterLayer = Wu.Model.Layer.extend({
 		    url 	= tileServer + '{fileUuid}/{cartoid}/{z}/{x}/{y}.png' + token;
 
 		var layerUuid = this._getLayerUuid();
-		var url = 'https://{s}.systemapic.com/overlay_tiles/{layerUuid}/{z}/{x}/{y}.png' + token;
+		// var url = 'https://{s}.systemapic.com/overlay_tiles/{layerUuid}/{z}/{x}/{y}.png' + token;
+		var url = app.options.servers.subdomain + '/overlay_tiles/{layerUuid}/{z}/{x}/{y}.png' + token;
 
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
@@ -1127,8 +1135,11 @@ Wu.GoogleLayer = Wu.Model.Layer.extend({
 		var type = this.getTileType();
 		// var format = this.options.tileformats[type];
 		var access_token = '?access_token=' + app.tokens.access_token;
-		var url = 'https://{s}.systemapic.com/proxy/google/{type}/{z}/{x}/{y}.png' + access_token;
+		// var url = 'https://{s}.systemapic.com/proxy/google/{type}/{z}/{x}/{y}.png' + access_token;
+		var url = app.options.servers.proxy.uri + 'google/{type}/{z}/{x}/{y}.png' + access_token;
 		var subdomains  = app.options.servers.proxy.subdomains;
+
+		console.log('norkart url:' , url);
 
 		// add vector tile raster layer
 		this.layer = L.tileLayer(url, {
@@ -1205,7 +1216,8 @@ Wu.NorkartLayer = Wu.Model.Layer.extend({
 		var type = this.getTileType();
 		var format = this.options.tileformats[type];
 		var access_token = '?access_token=' + app.tokens.access_token;
-		var url = 'https://{s}.systemapic.com/proxy/norkart/{type}/{z}/{x}/{y}.{format}' + access_token;
+		// var url = 'https://{s}.systemapic.com/proxy/norkart/{type}/{z}/{x}/{y}.{format}' + access_token;
+		var url = app.options.servers.proxy.uri + 'norkart/{type}/{z}/{x}/{y}.{format}' + access_token;
 		var subdomains  = app.options.servers.proxy.subdomains;
 
 		// add vector tile raster layer
