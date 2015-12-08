@@ -229,10 +229,11 @@ module.exports = api.geo = {
 			var column = t.column;
 			var value = parseFloat(t.value) || '"' + t.value + '"'; // todo; int/float/string type must match postgis 
 			var color = t.color;
-			var opacity = t.opacity;
+			var opacity = parseFloat(t.opacity);
+			var operator = t.operator || '=';
 
 			if (column) {
-				var string = '\n    [' + column + ' = ' + value + '] {';
+				var string = '\n    [' + column + ' ' + operator + ' ' + value + '] {';
 				string += '\n        polygon-fill: ' + color + ';';
 				string += '\n        polygon-opacity: ' + opacity + ';';
 				string += '\n    }\n';
@@ -262,9 +263,10 @@ module.exports = api.geo = {
 			var color = t.color;
 			var opacity = parseFloat(t.opacity);
 			var width = parseFloat(t.width) || 10;
+			var operator = t.operator || '=';
 
 			if (column) {
-				var string = '\n    [' + column + ' = ' + value + '] {';
+				var string = '\n    [' + column + ' ' + operator + ' ' + value + '] {';
 				string += '\n        marker-fill: ' + color + ';';
 				string += '\n        marker-opacity: ' + opacity + ';';
 				string += '\n        marker-width: ' + width + ';';
@@ -299,9 +301,11 @@ module.exports = api.geo = {
 			var color = t.color;
 			var opacity = parseFloat(t.opacity);
 			var width = parseFloat(t.width) || 10;
+			var operator = t.operator || '=';
+
 
 			if (column) {
-				var string = '\n    [' + column + ' = ' + value + '] {';
+				var string = '\n    [' + column + ' ' + operator + ' ' + value + '] {';
 				string += '\n        line-color: ' + color + ';';
 				string += '\n        line-opacity: ' + opacity + ';';
 				string += '\n        line-width: ' + width + ';';
