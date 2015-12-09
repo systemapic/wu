@@ -115,7 +115,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._setPortalLogo();
 
 		// Init CPU clock
-		this.initCPUclock(this._container);
+		// this.initCPUclock(this._container);
 	},
 
 
@@ -137,6 +137,7 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 
 	updateCPUclock : function (percent) {
+		return;
 
 		// Return if not super admin...
 		var isSuperAdmin = app.Access.is.superAdmin();

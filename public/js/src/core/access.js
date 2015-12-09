@@ -2,6 +2,8 @@ Wu.Access = Wu.Class.extend({
 
 	initialize : function (options) {
 
+		console.error('access');
+
 		// shortcut
 		app.access = this;
 
@@ -23,6 +25,7 @@ Wu.Access = Wu.Class.extend({
 
 
 	addRoleMember : function (opts, callback) {
+		console.error('access');
 		var user = opts.user,
 		    project = opts.project,
 		    role = opts.role,
@@ -60,6 +63,7 @@ Wu.Access = Wu.Class.extend({
 
 		// get role of user in project
 		role : function (options) {
+		console.error('access');
 			var project = options.project,
 			    user = options.user;
 
@@ -77,6 +81,7 @@ Wu.Access = Wu.Class.extend({
 
 		availableRoles : function (options) {
 
+		console.error('access');
 			// if you're SUPERADMIN 	=> you can delegate all
 			// if you're PORTALADMIN 	=> you can delegate READER, EDITOR, MANAGER, COLLABORATOR
 			// if you're EDITOR 		=> can delegate READER, MANAGER, COLLABORATOR
@@ -122,10 +127,12 @@ Wu.Access = Wu.Class.extend({
 		},
 
 		portalRole : function () {
+		console.error('access');
 			return app.options.json.access.portalRole;
 		},
 
 		superRole : function () {
+		console.error('access');
 			return app.options.json.access.superRole;
 		},
 
@@ -135,6 +142,7 @@ Wu.Access = Wu.Class.extend({
 	filter : {
 
 		roles : function (options) {
+		console.error('access');
 			// get roles which options.role can delegate to
 			var role = options.role,
 			    noAdmins = options.noAdmins,
@@ -164,6 +172,7 @@ Wu.Access = Wu.Class.extend({
 	can : {
 		// convenience method
 		delegate : function (account, project) {
+		console.error('access');
 			return  app.access.has.project_capability(account, project, 'delegate_to_user') ||
 	                	app.access.is.portalAdmin(account) ||
 	                	app.access.is.superAdmin(account);
@@ -174,6 +183,7 @@ Wu.Access = Wu.Class.extend({
 	as : {
 		// convenience method
 		admin : function (user, capability) {
+		console.error('access');
 
 			if (app.access.is.superAdmin(user)) {
 				var capabilities = app.access.get.superRole().capabilities;
@@ -193,6 +203,7 @@ Wu.Access = Wu.Class.extend({
 	has : {
 
 		project_capability : function (user, project, capability) {
+		console.error('access');
 			if (!user || !project) return;
 
 			var user = user || app.Account,
@@ -210,6 +221,7 @@ Wu.Access = Wu.Class.extend({
 
 		capability : function (user, capability) {
 
+		console.error('access');
 			var roles = user.getRoles();
 			var p = false;
 
@@ -232,10 +244,12 @@ Wu.Access = Wu.Class.extend({
 	is : {
 
 		contained : function (array, item) { 	// replace with _.contains(array, item)
+		console.error('access');
 			return array.indexOf(item) > 0;
 		},
 
 		admin : function (user) {
+		console.error('access');
 			var user = user || app.Account;
 			var portaladmin = app.access.is.portalAdmin(user);
 			var superadmin = app.access.is.superAdmin(user);
@@ -243,11 +257,13 @@ Wu.Access = Wu.Class.extend({
 		},
 
 		portalAdmin : function (user) {
+		console.error('access');
 			var user = user || app.Account;
 			return app.access._portalRole.hasMember(user);
 		},
 
 		superAdmin : function (user) {
+		console.error('access');
 			var user = user || app.Account;
 			return app.access._superRole.hasMember(user);
 		},
@@ -296,6 +312,7 @@ Wu.Access = Wu.Class.extend({
 		
 		// who else can create projects? students! 
 		create_project 		: function (user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'create_project')) return true;
 			if (app.access.has.capability(user, 'create_project')) return true;
@@ -303,6 +320,7 @@ Wu.Access = Wu.Class.extend({
 		},
 		
 		edit_project 		: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_project')) return true;
 			if (app.access.has.project_capability(user, project, 'edit_project')) return true;
@@ -310,12 +328,14 @@ Wu.Access = Wu.Class.extend({
 		},
 		
 		edit_other_project 	: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_other_project')) return true;
 			return false;
 		},
 		
 		delete_project		: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_project')) return true;
 			if (app.access.has.project_capability(user, project, 'delete_project')) return true;
@@ -323,17 +343,20 @@ Wu.Access = Wu.Class.extend({
 		},
 		
 		delete_other_project	: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_other_project')) return true;
 		},
 		
 		read_project		: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.has.project_capability(user, project, 'read_project')) return true;
 			return false;
 		},
 		
 		upload_file 		: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'upload_file')) return true;
 			if (app.access.has.project_capability(user, project, 'upload_file')) return true;
@@ -341,6 +364,7 @@ Wu.Access = Wu.Class.extend({
 		},
 		
 		download_file 		: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'download_file')) return true;
 			if (app.access.has.project_capability(user, project, 'download_file')) return true;
@@ -350,6 +374,7 @@ Wu.Access = Wu.Class.extend({
 		// todo: edit_file, edit_other_file
 		
 		create_version 		: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'create_version')) return true;
 			if (app.access.has.project_capability(user, project, 'create_version')) return true;
@@ -357,6 +382,7 @@ Wu.Access = Wu.Class.extend({
 		},
 		
 		delete_version 		: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_version')) return true;
 			if (app.access.has.project_capability(user, project, 'delete_version')) return true;
@@ -364,12 +390,14 @@ Wu.Access = Wu.Class.extend({
 		},
 
 		delete_other_version    : function (project, user) {
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_other_version')) return true;
 			return false;
 		},
 		
 		delete_file 		: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_file')) return true;
 			if (app.access.has.project_capability(user, project, 'delete_file')) return true;
@@ -377,12 +405,14 @@ Wu.Access = Wu.Class.extend({
 		},
 		
 		delete_other_file 	: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_other_file')) return true;
 			return false;
 		},
 		
 		create_user		: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'create_user')) return true;
 			if (app.access.has.project_capability(user, project, 'create_user')) return true;
@@ -390,6 +420,7 @@ Wu.Access = Wu.Class.extend({
 		},
 		
 		edit_user 		: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_user')) return true;
 			if (!project) return false;
@@ -398,24 +429,28 @@ Wu.Access = Wu.Class.extend({
 		},
 		
 		edit_other_user 	: function (user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_other_user')) return true;
 			return false;
 		},
 		
 		delete_user		: function (user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_user')) return true;
 			return false;
 		},
 		
 		delete_other_user 	: function (user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delete_user')) return true;
 			return false;
 		},
 		
 		share_project		: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'share_project')) return true;
 			if (app.access.has.project_capability(user, project, 'share_project')) return true;
@@ -423,18 +458,21 @@ Wu.Access = Wu.Class.extend({
 		},
 		
 		read_analytics 		: function (user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_user')) return true;
 			return false;
 		},
 		
 		manage_analytics 	: function (user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'edit_user')) return true;
 			return false;
 		},
 		
 		delegate_to_user 	: function (project, user) { 
+			console.error('access');
 			var user = user || app.Account;
 			if (app.access.as.admin(user, 'delegate_to_user')) return true;
 			if (app.access.has.project_capability(user, project, 'delegate_to_user')) return true;

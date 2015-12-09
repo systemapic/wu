@@ -334,121 +334,121 @@ Wu.Share = Wu.Pane.extend({
 		// this._createInviteView();
 	},
 
-	_createInviteView : function () {
+	// _createInviteView : function () {
 
-		// get invite link
-		this._getInviteLink(false, function (ctx, link) {
+	// 	// get invite link
+	// 	this._getInviteLink(false, function (ctx, link) {
 
-			// clear other shares
-			this._clearTitles();
+	// 		// clear other shares
+	// 		this._clearTitles();
 
-			// clear old
-			if (this._inviteOuterWrapper) Wu.DomUtil.remove(this._inviteOuterWrapper);
+	// 		// clear old
+	// 		if (this._inviteOuterWrapper) Wu.DomUtil.remove(this._inviteOuterWrapper);
 
-			// invite wrapper
-			this._inviteOuterWrapper = Wu.DomUtil.create('div', 'share-invite-wrapper opacitizer', this._shareDropdown);
-			this._inviteWrapper = Wu.DomUtil.create('div', 'share-invite-wrapper-inner', this._inviteOuterWrapper);
+	// 		// invite wrapper
+	// 		this._inviteOuterWrapper = Wu.DomUtil.create('div', 'share-invite-wrapper opacitizer', this._shareDropdown);
+	// 		this._inviteWrapper = Wu.DomUtil.create('div', 'share-invite-wrapper-inner', this._inviteOuterWrapper);
 
-			// hide invite button
-			this._shareInviteButton.innerHTML = '';
+	// 		// hide invite button
+	// 		this._shareInviteButton.innerHTML = '';
 
-			// insert title
-			this._insertInviteTitle(this._inviteWrapper, link);
+	// 		// insert title
+	// 		this._insertInviteTitle(this._inviteWrapper, link);
 
-		}.bind(this));
-	},
-
-
-	_insertInviteTitle : function (appendTo, link) {
-
-		// wrap
-		var titleWrap = Wu.DomUtil.create('div', 'share-invite-title-wrap', appendTo);
-
-		// create first part of title
-		var pre = Wu.DomUtil.create('div', 'share-invite-title', titleWrap);
-		pre.innerHTML = 'Invite users to project:<br> <span style="font-weight: 900">' + this._project.getTitle() + '</span>';
-
-		// create last part of title
-		var post = Wu.DomUtil.create('div', 'share-invite-title-post', titleWrap);	 
-		post.innerHTML = 'Invite users to this project by sending them this link:';		
-
-		// link input
-		this._createInviteLink(titleWrap, link)
-
-		// permissions
-		this._createPermissionsCheckboxes({
-			appendTo : titleWrap,
-		});
-	},
-
-	_createInviteLink : function (titleWrap, link) {
-		var input = this._linkinput = Wu.DomUtil.create('input', 'share-invite-input-link', titleWrap);
-		input.value = link;
-		input.select();
-	},
-
-	_createPermissionsCheckboxes : function (options) {
-
-		var container = options.appendTo;
-
-		// wrapper
-		var wrapper = Wu.DomUtil.create('div', 'invite-permissions-wrapper', container);
-
-		// title
-		var title = Wu.DomUtil.create('div', 'share-invite-permission-title', wrapper, 'Permissions granted:');
-
-		// create checkboxes
-		this._createCheckboxes(wrapper);
-	},
-
-	_createCheckboxes : function (wrapper) {
-		this._checkboxes = [];
-		var items = this.options.permissions;
-		items.forEach(function (i) {
-			var permission = i.permission;
-			var title = i.title;
-			this._createCheckbox(permission,  wrapper, title, i.checked, i.enabled);
-		}, this);
-	},
-
-	_createCheckbox : function (id, container, title, checked, enabled) {
-
-		// wrapper
-		var w = Wu.DomUtil.create('div', 'invite-permissions-checkbox-wrap', container);
+	// 	}.bind(this));
+	// },
 
 
-		var _switch = new Wu.button({
-			id 	     : id,
-			type 	     : 'switch',
-			isOn 	     : checked,
-			right 	     : false,
-			disabled     : !enabled,
-			appendTo     : w,
-			fn 	     : this._checkboxChange.bind(this),
-			className    : 'relative-switch'
-		});
+	// _insertInviteTitle : function (appendTo, link) {
 
-		// label
-		var label = Wu.DomUtil.create('label', 'invite-permissions-label', w);
-		label.htmlFor = id;
-		label.appendChild(document.createTextNode(title));
+	// 	// wrap
+	// 	var titleWrap = Wu.DomUtil.create('div', 'share-invite-title-wrap', appendTo);
 
-		// add to list
-		this._checkboxes.push(_switch);
-	},
+	// 	// create first part of title
+	// 	var pre = Wu.DomUtil.create('div', 'share-invite-title', titleWrap);
+	// 	pre.innerHTML = 'Invite users to project:<br> <span style="font-weight: 900">' + this._project.getTitle() + '</span>';
 
-	_checkboxChange : function (e, on) {
+	// 	// create last part of title
+	// 	var post = Wu.DomUtil.create('div', 'share-invite-title-post', titleWrap);	 
+	// 	post.innerHTML = 'Invite users to this project by sending them this link:';		
 
-		var checkbox = e.target;
-		var checked = checkbox.getAttribute('checked');
+	// 	// link input
+	// 	this._createInviteLink(titleWrap, link)
 
-		var permissions = this._getPermissions();
+	// 	// permissions
+	// 	this._createPermissionsCheckboxes({
+	// 		appendTo : titleWrap,
+	// 	});
+	// },
 
-		// get invite link
-		this._getInviteLink(permissions, function (ctx, link) {
-			this._linkinput.value = link;
-		}.bind(this));
-	},
+	// _createInviteLink : function (titleWrap, link) {
+	// 	var input = this._linkinput = Wu.DomUtil.create('input', 'share-invite-input-link', titleWrap);
+	// 	input.value = link;
+	// 	input.select();
+	// },
+
+	// _createPermissionsCheckboxes : function (options) {
+
+	// 	var container = options.appendTo;
+
+	// 	// wrapper
+	// 	var wrapper = Wu.DomUtil.create('div', 'invite-permissions-wrapper', container);
+
+	// 	// title
+	// 	var title = Wu.DomUtil.create('div', 'share-invite-permission-title', wrapper, 'Permissions granted:');
+
+	// 	// create checkboxes
+	// 	this._createCheckboxes(wrapper);
+	// },
+
+	// _createCheckboxes : function (wrapper) {
+	// 	this._checkboxes = [];
+	// 	var items = this.options.permissions;
+	// 	items.forEach(function (i) {
+	// 		var permission = i.permission;
+	// 		var title = i.title;
+	// 		this._createCheckbox(permission,  wrapper, title, i.checked, i.enabled);
+	// 	}, this);
+	// },
+
+	// _createCheckbox : function (id, container, title, checked, enabled) {
+
+	// 	// wrapper
+	// 	var w = Wu.DomUtil.create('div', 'invite-permissions-checkbox-wrap', container);
+
+
+	// 	var _switch = new Wu.button({
+	// 		id 	     : id,
+	// 		type 	     : 'switch',
+	// 		isOn 	     : checked,
+	// 		right 	     : false,
+	// 		disabled     : !enabled,
+	// 		appendTo     : w,
+	// 		fn 	     : this._checkboxChange.bind(this),
+	// 		className    : 'relative-switch'
+	// 	});
+
+	// 	// label
+	// 	var label = Wu.DomUtil.create('label', 'invite-permissions-label', w);
+	// 	label.htmlFor = id;
+	// 	label.appendChild(document.createTextNode(title));
+
+	// 	// add to list
+	// 	this._checkboxes.push(_switch);
+	// },
+
+	// _checkboxChange : function (e, on) {
+
+	// 	var checkbox = e.target;
+	// 	var checked = checkbox.getAttribute('checked');
+
+	// 	var permissions = this._getPermissions();
+
+	// 	// get invite link
+	// 	this._getInviteLink(permissions, function (ctx, link) {
+	// 		this._linkinput.value = link;
+	// 	}.bind(this));
+	// },
 
 	_getPermissions : function () {
 		var p = [];
