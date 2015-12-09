@@ -67,6 +67,8 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		// iterate projects, create item
 		_.each(projects, function (project) {
 
+			var project = app.Projects[project.getUuid()];
+
 			// Create line with project
 			var wrapper = Wu.DomUtil.create('div', 'chrome-left-itemcontainer chrome-project', projectWrapper);
 			var title = Wu.DomUtil.create('div', 'chrome-left-item-name', wrapper);
@@ -115,7 +117,10 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 			title.innerHTML = projectTitle;
 
 			// select project trigger
-			Wu.DomEvent.on(wrapper, 'click', project.selectProject, project);
+			// Wu.DomEvent.on(wrapper, 'click', project.selectProject, project);
+			Wu.DomEvent.on(wrapper, 'click', function () {
+				project.selectProject();
+			}, project);
 
 			
 			// remember
@@ -358,14 +363,12 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 	},
 
 	_addInvites : function (options) {
-		console.log('update invites!', this._access, options);
 
 		var access = {
 			read : []
 		}
 
 		this._access.read.forEach(function (v) {
-			console.log('v: ', v);
 			access.read.push(v.user.getUuid());
 		});
 
@@ -912,13 +915,11 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 
 		var readDelta = _.difference(access.read, this._access.read);
 		if (readDelta.length) {
-			console.log('readDelta: ', readDelta);
 			description += ', added ' + readDelta.length + ' readers';
 		}
 
 		var editDelta = _.difference(access.edit, this._access.edit);
 		if (editDelta.length) {
-			console.log('editDelta: ', editDelta);
 			description += ', added ' + editDelta.length + ' editors';
 		}
 

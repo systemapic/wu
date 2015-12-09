@@ -518,7 +518,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		var pointCount = options.pointCount;
 		var multiPopUp = options.multiPopUp;
 
-		
 
 		// If custom title
 		if ( this.popupSettings.title && this.popupSettings.title != '' ) {
@@ -555,8 +554,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		var c = 0;
 		headerMeta.forEach(function(meta, i) {
 
-			console.log('headereMet: ', meta);
-
 			var _key = meta[0];
 			var _val = meta[1];
 
@@ -583,12 +580,8 @@ Wu.Control.Chart = Wu.Control.extend({
 
 			var roundedVal = 100;
 
-			console.log('va1', _val);
-
 			if ( roundedVal ) {
 				var newVal = Math.floor(parseFloat(_val) * roundedVal) / roundedVal;
-				console.log('iSNANA??', isNaN(newVal));
-				// if (newVal != 'NaN') 
 
 				if (!isNaN(newVal)) {
 					_val = newVal;
@@ -598,12 +591,11 @@ Wu.Control.Chart = Wu.Control.extend({
 
 
 
-			console.log('va2', _val);
-
-
-			var metaPair = Wu.DomUtil.create('div', 'c3-header-metapair metapair-' + c, container);
-			var metaKey = Wu.DomUtil.create('div', 'c3-header-metakey', metaPair, title);
-			var metaVal = Wu.DomUtil.create('div', 'c3-header-metaval', metaPair, _val);
+			if ( _val ) {
+				var metaPair = Wu.DomUtil.create('div', 'c3-header-metapair metapair-' + c, container);
+				var metaKey = Wu.DomUtil.create('div', 'c3-header-metakey', metaPair, title);
+				var metaVal = Wu.DomUtil.create('div', 'c3-header-metaval', metaPair, _val);
+			}
 
 		}.bind(this));
 
@@ -916,11 +908,7 @@ Wu.Control.Chart = Wu.Control.extend({
 		// first time use of meta.. (or something)
 		} else {
 
-			console.log('data: ', data);
-
 			for (var key in data) {
-
-
 
 				var _val = parseFloat(data[key]).toString().substring(0,10);
 				if (_val == 'NaN') _val = data[key];
@@ -987,9 +975,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		// CREATE META FIELDS
 		// CREATE META FIELDS
 		} else {
-
-
-			console.log('not a date:', _key, _val);
 
 			d3array.meta.push([_key, _val])
 

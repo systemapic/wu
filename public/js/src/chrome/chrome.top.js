@@ -25,9 +25,6 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		// Project title container
 		this._projectTitleContainer = Wu.DomUtil.create('div', 'chrome-project-title-container', this._container);
 
-				
-
-		
 
 		// WRAPPER FOR BUTTONS			// todo: make pluggable
 		this._buttonWrapper = Wu.DomUtil.create('div', 'chrome-buttons', this._container);
@@ -43,6 +40,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 			this._clientLogo.style.backgroundImage = 'url(' + app.options.servers.portal + clientLogo + ')';
 			this._clientLogo.style.backgroundSize = app.options.logos.clientLogo.size;
 			this._clientLogo.style.backgroundPosition = app.options.logos.clientLogo.position;
+			this._clientLogo.style.backgroundColor = app.options.logos.clientLogo.backgroundColor;
+
 		}
 		
 		// set default
@@ -243,11 +242,12 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 	_setPortalLogo : function () {
 
 		// portal logo from config
+
 		// this._clientLogoImg.src = app.options.servers.portal + app.options.logos.portalLogo;
 	},
 
 	// default open
-	_leftPaneisOpen : true,
+	// _leftPaneisOpen : false,
 
 	_toggleLeftPane : function (e) {
 		Wu.DomEvent.stop(e);

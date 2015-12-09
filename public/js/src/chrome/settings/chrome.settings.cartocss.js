@@ -274,8 +274,6 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 			layerUuid : layer.getUuid()
 		}
 
-		console.log('_upfateLayer', layerJSON);
-
 		// create layer on server
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, newLayerJSON) {
 
@@ -299,11 +297,9 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_refreshLayer : function () {
-		console.log('_refreshLayer');
 	},
 
 	open : function () {
-		console.log('open!', this);
 	},
 
 	_selectedActiveLayer : function (e, uuid) {
@@ -327,6 +323,8 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		// ----------
 		// SOLUTION: temporarily add layers to map for editing, remove when done editing.
 
+
+		if (!this._layer || !this._layer.isPostgis()) return;
 
 		// refresh
 		this._refreshEditor();

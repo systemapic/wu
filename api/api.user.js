@@ -668,7 +668,9 @@ module.exports = api.user = {
 		    project_id = options.project_id,
 		    ops = [];
 
+		console.log('_createRole: ', options);
 
+		if (!permissions) return done('missingInformation');
 
 		ops.push(function (callback) {
 			// create the user
@@ -1023,18 +1025,33 @@ module.exports = api.user = {
 
 		var user = options.user;
 		var ops = {};
+
+		// if phantomjs bot
+		if (user.isSuper()) {
+			
+			ops.project_users = function (callback) {
+
+				User
+				.find()
+				.exec(callback);
+			};	
+
+		} else {
+
+			ops.project_users = function (callback) {
+
+				// find users from editable projects
+				api.user._getProjectUsers({
+					user : user
+
+				}, function (err, users) {
+					callback(err, users);
+				});
+
+			};	
+		}
 		
-		ops.project_users = function (callback) {
-
-			// find users from editable projects
-			api.user._getProjectUsers({
-				user : user
-
-			}, function (err, users) {
-				callback(err, users);
-			});
-
-		};
+		
 		
 		// ops.contact_list = function (callback) {
 

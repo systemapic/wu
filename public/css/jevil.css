@@ -88,11 +88,13 @@
     }
 
 .layer-list-container {
-    margin-top: 7px;    
+    margin-top: 0px;   
+    margin-bottom: 0px; 
     }
 
 .layer-name-content {
     text-indent: 43px;
+    width: 325px;    
     }
 
 .data-list-line .chrome-switch-container {
@@ -233,7 +235,7 @@
     }
 
 .layers-container {
-    margin-bottom: 15px;
+    margin-bottom: 35px;
     }
 
 .baselayer-dropdown-wrapper {
@@ -378,13 +380,15 @@
 
 .chrome-content.settings-button {
     margin-top: 3px;
-    font-size: 16px;
-    margin-right: 3px;
+    font-size: 13px;
+    margin-right: -1px;
     padding-bottom: 3px;
     background: transparent;
     border: 1px solid #ccc;
-    color: #999;
-    font-weight: 600;   
+    color: #3C4759;
+    font-weight: 600;
+    padding-right: 14px;
+    padding-left: 14px;
     }
 
 .chrome-content.settings-button:hover {
@@ -398,13 +402,10 @@
 .chrome-content.settings-button.active-tab,
 .chrome-content.settings-button.active-tab:hover,
 .chrome-content.settings-button.active-tab:active {
-    /*  
-    background: #e0e0e0;
-    color: #333;    
-    */    
     background: #3C4759;
     color: white;
     border: 1px solid #3c4759;
+    font-weight: 700;
     }
 
 .chrome-content.settings-button.active-tab:hover {
@@ -425,8 +426,8 @@
     }
 
 .chrome-content.settings-tabs-wrapper {
-    top: 122px;
-    padding-bottom: 127px;
+    top: 90px;
+    padding-bottom: 95px;
     }
 
 .settingsSelector-header {
@@ -436,7 +437,9 @@
     }
 
 
-
+.chrome-middle-section {
+    padding-bottom: 90px;
+}
 
 .chrome-middle-section-outer-scroller {
     width: 410px;
@@ -490,7 +493,19 @@ input.chrome-field-input {
     left: 0;
     float: right;
     top: -34px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background: #3C4759;
     }
+.chrome-upload-button:hover {
+    background: #F9F9F9;
+    color: #3F4652;
+    border: 1px solid gainsboro;
+}
+.chrome-upload-button:active {
+    background: #79E0C0;
+    color: #FCFCFC;
+}
 
 .chrome-data-inner {
     padding: 0;
@@ -917,8 +932,11 @@ input.chrome-field-input {
 
 .leaflet-popup-content-wrapper {
     border-radius: 4px;
-    box-shadow: none;    
-}
+    box-shadow: none;
+
+    max-height: 400px;
+    overflow-y: scroll;
+    }
 
 .description-control-content-box {
     border-radius: 0 0 4px 4px;
@@ -1002,3 +1020,51 @@ input.chrome-field-input {
 .no-layers {
     color: #C80000;
 }
+
+
+
+
+
+
+
+
+.c3-header-wrapper {
+    overflow: hidden;
+}
+
+.leflet-container.leaflet-popup.tiny-pop-up {
+    max-width: none;
+}
+
+
+.layer-menu-item {
+    overflow: hidden;
+}
+
+.each-multiple-description.one-layer {
+    /*width: 215px;    */
+    word-break: break-all;    
+    }
+
+
+
+
+.legend-each-container {
+    height: 20px;
+    position: relative;
+}
+
+.legend-each-name {
+    text-indent: 31px;
+}
+
+.legend-each-color {
+    opacity: 1;
+    width: 25px;
+    height: 17px;
+    border-radius: 2px;
+    position: absolute;
+    left: 1px;
+    top: 0px;  
+}
+
