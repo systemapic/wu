@@ -7,15 +7,15 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		tabs : {
 			styler : {
 				enabled : true,
-				text : 'Style Editor'
+				text : 'Style'
 			},
 			tooltip : {
 				enabled : true,
-				text : 'Pop-up'
+				text : 'Popup'
 			},
 			filters : {
 				enabled : true,
-				text : 'Data Filters'
+				text : 'Filters'
 			},
 			cartocss : {
 				enabled : true,

@@ -24,16 +24,35 @@ var config  = require('../config/server-config.js').serverConfig;
 // connect to our database
 mongoose.connect(config.mongo.url); 
 
-var listedUser = process.argv[2];
 
+var cloneUser = process.argv[2];
+
+if (!cloneUser) {
+	console.log('Usage: node add_all_contacts.js to_this_user@email.com');
+	return process.exit(0);
+}
+
+// return;
 User
-.findOne({'local.email' : listedUser})
-.populate('files')
-.populate('contact_list')
-.exec(function (err, user) {
-	console.log(err, user)
-	// console.log(u.local.email, '|', u.firstName, u.lastName);
+.find()
+.exec(function (err, users) {
+	
+	User
+	.findOne({'local.email' : cloneUser})
+	.exec(function (err, user) {
 
-	process.exit(0);
+		async.each(users, function (u, callback) {
+			user.contact_list.addToSet(u._id);
+			user.save(function (err) {
+				u.contact_list.addToSet(user._id);
+				u.save(callback);
+			});
+
+		}, function (err) {
+			console.log('added contacts!');
+			process.exit(0);
+		});
+
+	});
 
 });

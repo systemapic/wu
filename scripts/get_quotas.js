@@ -24,16 +24,35 @@ var config  = require('../config/server-config.js').serverConfig;
 // connect to our database
 mongoose.connect(config.mongo.url); 
 
-var listedUser = process.argv[2];
+
 
 User
-.findOne({'local.email' : listedUser})
+.find()
 .populate('files')
 .populate('contact_list')
-.exec(function (err, user) {
-	console.log(err, user)
-	// console.log(u.local.email, '|', u.firstName, u.lastName);
+.exec(function (err, users) {
 
+	
+
+	console.log('Storage quotas per user:');
+
+	users.forEach(function (user) {
+
+		var storage = 0;
+
+		user.files.forEach(function (f) {
+
+			// console.log('f: ',f);
+			storage += parseFloat(f.dataSize);
+		});
+
+		console.log('User: ', user.getName());
+		console.log('Storage: ', parseInt(storage/1000000) + 'MB');
+		console.log('')
+
+	})
+
+	
 	process.exit(0);
 
 });

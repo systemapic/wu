@@ -613,7 +613,6 @@ Wu.Project = Wu.Class.extend({
 
 		for (var l in this.layers) {
 			var layer = this.layers[l];
-
 			if (layer.store && layer.store.data && layer.store.data.postgis) layers.push(layer);
 		}
 
@@ -936,8 +935,13 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	setName : function (name) {
+
+		// store on server
 		this.store.name = name;
 		this._update('name');
+
+		// update slug name
+		this.setSlug(name);
 	},
 
 	setDescription : function (description) {
@@ -1230,7 +1234,7 @@ Wu.Project = Wu.Class.extend({
 
 
 	selectProject : function () {
-		
+
 		// select project
 		Wu.Mixin.Events.fire('projectSelected', {detail : {
 			projectUuid : this.getUuid()
@@ -1295,7 +1299,7 @@ Wu.Project = Wu.Class.extend({
 		if (_.contains(access.edit, user.getUuid())) return true;
 
 		// true: if user is super
-		// if (app.Account)  todo! 
+		if (app.Account.isSuper()) return true; 
 
 		// false: not createdBy and not editor
 		return false;

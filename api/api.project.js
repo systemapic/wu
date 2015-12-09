@@ -61,7 +61,7 @@ module.exports = api.project = {
 		.exec(function (err, project) {
 
 			// check if access to edit
-			var canEdit = _.contains(project.access.edit, user.getUuid()) || (project.createdBy == user.getUuid());
+			var canEdit = _.contains(project.access.edit, user.getUuid()) || (project.createdBy == user.getUuid() || user.isSuper());
 
 			console.log('canEdit: ', canEdit);
 
@@ -355,7 +355,7 @@ module.exports = api.project = {
 			// 	project : project
 			// }, callback);
 
-			(project.createdBy == user.getUuid()) ? callback(null, project) : callback('No access.');
+			(project.createdBy == user.getUuid() || user.isSuper()) ? callback(null, project) : callback('No access.');
 
 		});
 
@@ -406,7 +406,7 @@ module.exports = api.project = {
 			var hashedUser = user.getUuid(); // todo: use actual hash
 
 			// can edit if on edit list or created project 
-			var canEdit = _.contains(project.access.edit, hashedUser) || (project.createdBy == user.getUuid());
+			var canEdit = _.contains(project.access.edit, hashedUser) || (project.createdBy == user.getUuid() || user.isSuper());
 
 			// continue if canEdit
 			canEdit ? callback(null, project) : callback('No access.');
@@ -618,7 +618,6 @@ module.exports = api.project = {
 
 		var user = options.user;
 
-
 		var hashedUser = crypto.createHash('sha256').update(user.getUuid()).digest("hex");
 
 		console.log('hashedUser', hashedUser);
@@ -628,7 +627,7 @@ module.exports = api.project = {
 		console.log('user: ', user);
 
 		// if phantomjs bot
-		if (user.isBot()) {
+		if (user.isBot() || user.isSuper()) {
 			Project
 			.find()
 			.populate('files')

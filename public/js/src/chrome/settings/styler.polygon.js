@@ -87,9 +87,21 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 			fn 	 : this._targetColumnSelected.bind(this),
 			array 	 : columns, // columns in dropdown
 			selected : options.column, // preselected item
-			className : 'target-column-dropdown'
+			className : 'target-column-dropdown tiny'
 		});
 
+
+		// < = > input
+		var operator_wrapper = Wu.DomUtil.create('div', 'target-column-wrapper', target_wrapper);
+		var operator_dropdown = new Wu.button({
+			id 	 : 'equals_selection',
+			type 	 : 'clicker',
+			appendTo : operator_wrapper,
+			fn 	 : this._operatorSelected.bind(this),
+			array 	 : ['<', '=', '>'], // columns in dropdown
+			selected : options.operator, // preselected item
+			className : 'target-equals-clicker'
+		});
 
 		
 		// value input
@@ -138,7 +150,8 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 			value : column_input,
 			color : ball,
 			opacity : opacity_input,
-			wrapper : target_wrapper
+			wrapper : target_wrapper,
+			operator : operator_dropdown
 		});
 
 

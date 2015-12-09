@@ -467,6 +467,10 @@ Wu.User = Wu.Class.extend({
 		this._closeAccountTab();
 	},
 
+	isSuper : function () {
+		return this.store.access.account_type == 'super';
+	},
+
 	// _open : function () {
 
 	// 	// close other tabs

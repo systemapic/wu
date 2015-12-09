@@ -26,13 +26,28 @@ mongoose.connect(config.mongo.url);
 
 var listedUser = process.argv[2];
 
+if (!listedUser) {
+	console.log('Usage: node get_quota.js email@domain.com');
+	process.exit();
+	return;
+}
+
+
 User
 .findOne({'local.email' : listedUser})
 .populate('files')
 .populate('contact_list')
 .exec(function (err, user) {
-	console.log(err, user)
-	// console.log(u.local.email, '|', u.firstName, u.lastName);
+
+	var storage = 0;
+
+	user.files.forEach(function (f) {
+
+		// console.log('f: ',f);
+		storage += parseFloat(f.dataSize);
+	});
+
+	console.log('total storage: ', storage);
 
 	process.exit(0);
 
