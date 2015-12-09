@@ -338,7 +338,12 @@ L.Control.Description = Wu.Control.extend({
 
 		} else {
 			// legendObj.legendHTML = '';
-			legendObj.legendHTML = this.createLegend();
+
+			if (layer.isPostgis()) {
+				legendObj.legendHTML = this.createLegend();
+			} else {
+				legendObj.legendHTML = '';
+			}
 
 		}
 
@@ -394,7 +399,13 @@ L.Control.Description = Wu.Control.extend({
 		} else {
 
 			// var legendHTML = '';
-			var legendHTML = this.createLegend();
+			// var legendHTML = this.createLegend();
+
+			if (layer.isPostgis()) {
+				var legendHTML = this.createLegend();
+			} else {
+				var legendHTML = '';
+			}
 
 		}
 
@@ -1076,10 +1087,6 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	createLegend : function () {
-
-		// console.log('%c************************************', 'background: blue; color: white;');
-		// console.log('legendObj', this.legendObj);
-		// console.log('%c************************************', 'background: blue; color: white;');
 
 		var str = '';
 
