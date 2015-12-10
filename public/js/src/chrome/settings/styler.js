@@ -662,7 +662,7 @@ Wu.Styler = Wu.Class.extend({
 		var inputField = this._content[this.type].pointsize.input.input;
 
 		// If less than 0.5, make it 0.5
-		if ( value < 0.5 ) value = 0.5;
+		// if ( value < 0 ) value = 0;
 
 		// Set value in input
 		inputField.value = value;
