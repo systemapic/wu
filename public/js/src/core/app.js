@@ -257,7 +257,7 @@ Wu.App = Wu.Class.extend({
 		// });
 
 		// render header pane
-		this.HeaderPane = new Wu.HeaderPane();
+		// this.HeaderPane = new Wu.HeaderPane();
 
 		// render map pane
 		this.MapPane = new Wu.MapPane();

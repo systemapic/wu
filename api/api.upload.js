@@ -260,7 +260,6 @@ module.exports = api.upload = {
 		    redis_id 		= redis_id,
 		    access_token 	= options.access_token;
 
-		console.log('_chunkedUploadDone');
 
 		// merge chunks
 		ops.push(function (callback) {
@@ -298,6 +297,7 @@ module.exports = api.upload = {
 				original_format : null,
 				table_name : null, 
 				database_name : null,
+				uniqueIdentifier : uniqueIdentifier,
 
 				default_layer : null,
 				default_layer_model : null,
@@ -386,9 +386,34 @@ module.exports = api.upload = {
 				timestamp : uploadStatus.timestamp
 			}
 
+			// ping progress
+			api.socket.processingProgress({
+				user_id : user._id,
+				progress : {
+					text : 'Preparing import...',
+					error : null,
+					percent : 10,
+					uniqueIdentifier : uploadStatus.uniqueIdentifier,
+				}
+			});
+
 			// process upload
 			api.upload.prepareImport(options, function (err, opts) {
 				if (err) return callback(err);
+
+				opts.user_id = user._id;
+				opts.uniqueIdentifier = uploadStatus.uniqueIdentifier;
+
+				// ping progress
+				api.socket.processingProgress({
+					user_id : user._id,
+					progress : {
+						text : 'Importing...',
+						error : null,
+						percent : 20,
+						uniqueIdentifier : uploadStatus.uniqueIdentifier,
+					}
+				});
 
 				// get uploadStatus, get meta, set to file
 				api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
@@ -396,6 +421,7 @@ module.exports = api.upload = {
 					if (uploadStatus.data_type == 'raster') {
 
 						api.geo.handleRaster(opts, callback);
+
 					} else {
 						
 						// postgis import
@@ -479,13 +505,22 @@ module.exports = api.upload = {
 			var import_stop_time = new Date().getTime();
 			var import_took_ms = import_stop_time - import_start_time;
 
-			console.log('Import took', import_took_ms, 'ms');
-
 			// ping client
 			api.upload._notifyProcessingDone({
 				file_id : file_id,
 				user_id : user._id,
 				import_took_ms : import_took_ms
+			});
+
+			// ping progress
+			api.socket.processingProgress({
+				user_id : user._id,
+				progress : {
+					text : 'Processing done!',
+					error : null,
+					percent : 100,
+					uniqueIdentifier : uploadStatus.uniqueIdentifier,
+				}
 			});
 
 			// all done
@@ -494,7 +529,7 @@ module.exports = api.upload = {
 	},
 
 	_notifyProcessingDone : function (options) {
-		api.socket.processingDone(options)
+		api.socket.processingDone(options);
 	},
 
 
@@ -563,11 +598,14 @@ module.exports = api.upload = {
 		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
 			var u = JSON.parse(uploadStatus);
 
+			var cleanName = u.filename.split('.')[0];
+
 			if (u.data_type == 'vector') {
 				var fileModel = {
 					uuid : file_id,
 					createdBy : u.user_id,
-					name : u.filename,
+					// name : u.filename,
+					name : cleanName,
 					type : 'postgis',
 					dataSize : u.size,
 					data : {
@@ -583,7 +621,8 @@ module.exports = api.upload = {
 				var fileModel = {
 					uuid : file_id,
 					createdBy : u.user_id,
-					name : u.filename,
+					// name : u.filename,
+					name : cleanName,
 					type : 'raster',
 					dataSize : u.size,
 					data : {

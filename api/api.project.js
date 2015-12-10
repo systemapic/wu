@@ -161,8 +161,9 @@ module.exports = api.project = {
 		    user = req.user,
 		    ops = [];
 
+
 		// return if missing info
-		if (!store) return api.error.missingInformation(req, res);
+		if (!store || !store.access || !store.name || !store.access.options) return api.error.missingInformation(req, res);
 
 		var isPublic = store.access.options.isPublic;
 
