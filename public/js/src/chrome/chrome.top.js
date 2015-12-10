@@ -115,33 +115,34 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		this._setPortalLogo();
 
 		// Init CPU clock
-		// this.initCPUclock(this._container);
+		this.initCPUclock(this._container);
 	},
 
 
 	initCPUclock : function (wrapper) {	
 
-		// Check if superadmin
-		var isSuperAdmin = app.Access.is.superAdmin();
-		if (!isSuperAdmin) return;
-
-		var CPUwrapper = Wu.DomUtil.create('div', 'cpu-wrapper', wrapper);
+		this._CPUwrapper = Wu.DomUtil.create('div', 'cpu-wrapper', wrapper);
 
 		this._CPUbars = [];
 
 		for (var i = 0; i < 10; i++ ) {
-			this._CPUbars[i] = Wu.DomUtil.create('div', 'cpu-bar', CPUwrapper);
+			this._CPUbars[i] = Wu.DomUtil.create('div', 'cpu-bar', this._CPUwrapper);
 		}
 
 	},
 
 
 	updateCPUclock : function (percent) {
-		return;
 
-		// Return if not super admin...
-		var isSuperAdmin = app.Access.is.superAdmin();
-		if ( !isSuperAdmin ) return;		
+
+		// hide if not editor
+		var project = app.activeProject;
+		if (!project || !project.isEditable()) {
+			this._CPUwrapper.style.display = 'none';
+		} else {
+			this._CPUwrapper.style.display = 'block';
+		}
+
 
 		// Get value as numbers
 		var pp = parseInt(percent);
