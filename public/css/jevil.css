@@ -677,7 +677,7 @@ input.chrome-field-input {
 
 
 .cpu-wrapper {
-    width: 14px;
+    width: 8px;
     }
 
 
@@ -765,7 +765,7 @@ input.chrome-field-input {
 }
 
 .cpu-wrapper {
-    display: none;
+    /*display: none;*/
 }
 
 .chrome-button.layer {
