@@ -184,7 +184,8 @@ Wu.Styler = Wu.Class.extend({
 			appendTo : line.container,
 			fn       : this._updateColor.bind(this),
 			value    : staticVal,
-			colors   : this.options.palettes
+			colors   : this.options.palettes,
+			className: 'target-color-box'
 		});
 
 		// remember items

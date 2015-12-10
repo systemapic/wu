@@ -546,7 +546,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		// chart settings
 		this._chart
-		    .width(340)
+		    .width(400)
 		    .height(180)
 		    .gap(2)
 		    .x(d3.scale.linear().domain([0, num_buckets]))

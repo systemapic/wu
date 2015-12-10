@@ -87,7 +87,7 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 			fn 	 : this._targetColumnSelected.bind(this),
 			array 	 : columns, // columns in dropdown
 			selected : options.column, // preselected item
-			className : 'target-column-dropdown tiny'
+			className : 'target-column-dropdown tiny polygon'
 		});
 
 
@@ -107,7 +107,7 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		// value input
 		var input_wrapper = Wu.DomUtil.create('div', 'target-input-wrapper', target_wrapper);
 		var input_title = Wu.DomUtil.create('div', 'target-input-title', input_wrapper, 'Value');
-		var column_input = Wu.DomUtil.create('input', 'target-input', input_wrapper);
+		var column_input = Wu.DomUtil.create('input', 'target-input polygon', input_wrapper);
 		column_input.value = options.value;
 
 		// blur event
