@@ -89,6 +89,8 @@ Wu.Styler.Point = Wu.Styler.extend({
 			tabindex  : [this.tabindex++, this.tabindex++]
 		});
 
+
+
 		// rememeber 
 		this._content[this.type].pointsize.minmax = {
 			line : line,

@@ -159,7 +159,6 @@ L.Control.Description = Wu.Control.extend({
 		// get layer
 		this.layers[layer.getUuid()] = layer;
 
-
 		this.setHTMLfromStore(layer.getUuid());
 		this.updateMultiple(layer.getUuid());
 	},
@@ -248,7 +247,6 @@ L.Control.Description = Wu.Control.extend({
 
 			var layer = this.layers[uuid];
 
-			// var title = this.layers[uuid].title;
 			title = layer.getTitle();
 			var multipleLayer = Wu.DomUtil.create('div', 'each-multiple-description', wrapper, title);
 			    multipleLayer.id = 'mulitidec_' + uuid;
@@ -316,36 +314,35 @@ L.Control.Description = Wu.Control.extend({
 			'End date' : startend.end
 		}
 
-		// COLOR RANGE
-		if ( style && style[key].color.column ) {
+		// // COLOR RANGE
+		// if ( style && style[key].color.column ) {
 
-			var colorStops = style[key].color.value;
-			// var customMinMax = style[key].color.customMinMax;
-			var minMax = style[key].color.range;
+		// 	var colorStops = style[key].color.value;
+		// 	// var customMinMax = style[key].color.customMinMax;
+		// 	var minMax = style[key].color.range;
 
-			var min = minMax[0];
-			var max = minMax[1];
+		// 	var min = minMax[0];
+		// 	var max = minMax[1];
 
-			// create legend
-			var gradientOptions = {
-				colorStops : colorStops,
-				minVal : minMax[0],
-				maxVal : minMax[1],
-				bline : 'Velocity (mm pr. year)'
-			}
+		// 	// create legend
+		// 	var gradientOptions = {
+		// 		colorStops : colorStops,
+		// 		minVal : minMax[0],
+		// 		maxVal : minMax[1],
+		// 		bline : 'Velocity (mm pr. year)'
+		// 	}
 
-			legendObj.legendHTML = this.gradientLegend(gradientOptions);
+		// 	legendObj.legendHTML = this.gradientLegend(gradientOptions);
 
+		// } else {
+
+		if (layer.isPostgis()) {
+			legendObj.legendHTML = this.createLegendHTML();
 		} else {
-			// legendObj.legendHTML = '';
-
-			if (layer.isPostgis()) {
-				legendObj.legendHTML = this.createLegend();
-			} else {
-				legendObj.legendHTML = '';
-			}
-
+			legendObj.legendHTML = '';
 		}
+
+		// }
 
 		return legendObj;
 	},
@@ -354,60 +351,60 @@ L.Control.Description = Wu.Control.extend({
 	getLegend : function (layer) {
 
 		// get styling
-		var style = layer.getStyling();
+		// var style = layer.getStyling();
 
 		
-		// point
-		if (style && style.point && style.point.color && style.point.color.column) {
+		// // point
+		// if (style && style.point && style.point.color && style.point.color.column) {
 
-			var colorStops = style.point.color.value;
-			var minMax = style.point.color.range
-			var min = minMax[0];
-			var max = minMax[1];
-			var bline = this._getLegendCaption(style.point.color);
+		// 	var colorStops = style.point.color.value;
+		// 	var minMax = style.point.color.range
+		// 	var min = minMax[0];
+		// 	var max = minMax[1];
+		// 	var bline = this._getLegendCaption(style.point.color);
 
-			// create legend
-			var gradientOptions = {
-				colorStops : colorStops,
-				minVal : minMax[0],
-				maxVal : minMax[1],
-				bline : bline
-			}
+		// 	// create legend
+		// 	var gradientOptions = {
+		// 		colorStops : colorStops,
+		// 		minVal : minMax[0],
+		// 		maxVal : minMax[1],
+		// 		bline : bline
+		// 	}
 
-			var legendHTML = this.gradientLegend(gradientOptions);
+		// 	var legendHTML = this.gradientLegend(gradientOptions);
 
-		// polygon
-		} else if (style && style.polygon && style.polygon.color && style.polygon.color.column) {
+		// // polygon
+		// } else if (style && style.polygon && style.polygon.color && style.polygon.color.column) {
 
-			var colorStops = style.polygon.color.value;
-			var minMax = style.polygon.color.range
-			var min = minMax[0];
-			var max = minMax[1];
-			var bline = this._getLegendCaption(style.polygon.color);
+		// 	var colorStops = style.polygon.color.value;
+		// 	var minMax = style.polygon.color.range
+		// 	var min = minMax[0];
+		// 	var max = minMax[1];
+		// 	var bline = this._getLegendCaption(style.polygon.color);
 
-			// create legend
-			var gradientOptions = {
-				colorStops : colorStops,
-				minVal : minMax[0],
-				maxVal : minMax[1],
-				bline : bline
-			}
+		// 	// create legend
+		// 	var gradientOptions = {
+		// 		colorStops : colorStops,
+		// 		minVal : minMax[0],
+		// 		maxVal : minMax[1],
+		// 		bline : bline
+		// 	}
 
-			var legendHTML = this.gradientLegend(gradientOptions);
+		// 	var legendHTML = this.gradientLegend(gradientOptions);
 
-		// catch-all
-		} else {
+		// // catch-all
+		// } else {
 
 			// var legendHTML = '';
 			// var legendHTML = this.createLegend();
 
-			if (layer.isPostgis()) {
-				var legendHTML = this.createLegend();
-			} else {
-				var legendHTML = '';
-			}
-
+		if (layer.isPostgis()) {
+			var legendHTML = this.createLegendHTML();
+		} else {
+			var legendHTML = '';
 		}
+
+		// }
 
 		return legendHTML;
 
@@ -455,21 +452,19 @@ L.Control.Description = Wu.Control.extend({
 			description_meta['End date'] = startend.end;
 		}
 
-
 		return description_meta;
 	},
 
 
 	setHTMLfromStore : function (uuid) {
 
-
 		// var layer = this.layers[uuid];
 		var layer = this._project.getLayer(uuid);
 
 		if ( !layer ) return;
 
-		// xoxoxoxooxo
-		this.legendary(layer);		
+		// Build legend object
+		this.buildLegendObject(layer);		
 		
 		// Title
 		var title = layer.getTitle();
@@ -567,37 +562,7 @@ L.Control.Description = Wu.Control.extend({
 		return startend;
 	},
 
-	gradientLegend : function (options) {
 
-		// Set color stops
-		var colorStops = options.colorStops;
-
-		// Set styling
-		var gradientStyle = 'background: -webkit-linear-gradient(left, ' + colorStops.join() + ');';
-		gradientStyle    += 'background: -o-linear-gradient(right, '    + colorStops.join() + ');';
-		gradientStyle    += 'background: -moz-linear-gradient(right, '  + colorStops.join() + ');';
-		gradientStyle    += 'background: linear-gradient(to right, '    + colorStops.join() + ');';
-  
-		// Container
-		var _legendHTML = '<div class="info-legend-container">';
-
-		// Legend Frame
-		_legendHTML += '<div class="info-legend-frame">';
-		_legendHTML += '<div class="info-legend-val info-legend-min-val">' + options.minVal + '</div>';
-		_legendHTML += '<div class="info-legend-val info-legend-max-val">' + options.maxVal + '</div>';
-
-		// Gradient
-		_legendHTML += '<div class="info-legend-gradient-container" style="' + gradientStyle + '"></div>';
-		_legendHTML += '</div>';
-
-		if (options.bline) {
-			_legendHTML += '<div class="info-legend-gradient-bottomline"">' + options.bline + '</div>';
-		}
-
-		_legendHTML += '</div>';
-
-		return _legendHTML;
-	},	
 
 	isEmpty : function (obj) {
 		for(var prop in obj) {
@@ -638,11 +603,18 @@ L.Control.Description = Wu.Control.extend({
 
 
 
-	// xoxoxoxoxoxox
-	legendary : function  (layer) {
 
+
+	// BUILD LEGEND OBJECT
+	// BUILD LEGEND OBJECT
+	// BUILD LEGEND OBJECT
+
+	buildLegendObject : function  (layer) {
+
+		// Stop if raster layer
 		if ( !layer.isPostgis() ) return;
 
+		// Get style
 		var styleJSON   = Wu.parse(layer.store.style);
 
 		var point 	= styleJSON.point;
@@ -650,7 +622,8 @@ L.Control.Description = Wu.Control.extend({
 		var polygon 	= styleJSON.polygon;
 
 
-		var legendObj = this.legendObj = {
+		// Create blank legend object
+		this.legendObj = {
 
 			layerName : layer.getTitle(),
 			
@@ -671,422 +644,457 @@ L.Control.Description = Wu.Control.extend({
 		};
 
 
-		// POINT
-		// POINT
-		// POINT
+		// Build legend object
+		this.legendPoint(point);
+		this.legendPolygon(polygon);
+		this.legendLine(line);
 
-		if ( point.enabled ) {
-
-			var legend = {};
-
-			// COLOR
-			// COLOR
-			// COLOR
-
-			// polygon color range
-			if ( point.color.column ) {
-
-				var column   = point.color.column;
-				var value    = point.color.value; 
-				var minRange = point.color.range[0];
-				var maxRange = point.color.range[1];
-
-				// Save legend data
-				legend.color = {};
-				legend.color.column   = column; 
-				legend.color.value    = value;
-				legend.color.minRange = minRange;
-				legend.color.maxRange = maxRange;
-
-
-			// static polygon color
-			} else {
-
-				var value = polygon.color.staticVal ? polygon.color.staticVal : 1;
-
-				// Save legend data
-				legend.color = {};
-				legend.color.column = false;
-				legend.color.value  = value;
-
-			}
-			
-
-			// OPACITY
-			// OPACITY
-			// OPACITY
-
-			// polygon opacity range
-			if ( point.opacity.column ) {
-
-				var column   = point.opacity.column;
-				var minRange = point.opacity.range[0];
-				var maxRange = point.opacity.range[1];
-
-				// Save legend data
-				legend.opacity = {};
-				legend.opacity.column   = column; 
-				legend.opacity.minRange = minRange;
-				legend.opacity.maxRange = maxRange;
-
-
-			// static polygon opacity
-			} else {
-
-
-				var value = polygon.opacity.staticVal ? polygon.opacity.staticVal : 1;
-
-				// Save legend data
-				legend.opacity = {};
-				legend.opacity.column = false;
-				legend.opacity.value  = value;
-
-			}
-
-
-			// POINT SIZE
-			// POINT SIZE
-			// POINT SIZE
-
-			// polygon pointsize range
-			if ( point.pointsize.column ) {
-
-				var column   = point.pointsize.column;
-				var minRange = point.pointsize.range[0];
-				var maxRange = point.pointsize.range[1];
-
-				// Save legend data
-				legend.pointsize = {};
-				legend.pointsize.column   = column; 
-				legend.pointsize.minRange = minRange;
-				legend.pointsize.maxRange = maxRange;
-
-
-			// static polygon pointsize
-			} else {
-
-
-				var value = point.pointsize.staticVal ? point.pointsize.staticVal : 1;
-
-				// Save legend data
-				legend.pointsize = {};
-				legend.pointsize.column = false;
-				legend.pointsize.value  = value;
-
-			}
-
-
-
-
-			// Push legend object into array
-			legendObj.point.all = legend;
-
-
-
-			// FILTERS
-			// FILTERS
-			// FILTERS
-
-			// polygon filters
-			if ( point.targets.length >= 1 ) {
-
-				point.targets.forEach(function (target, i) {
-					
-					var column   = target.column;
-					var color    = target.color;					
-					var opacity  = target.opacity;
-					var value    = target.value;
-					var width    = target.width;
-
-					// Save legend data
-					var legend = {
-						column  : column,
-						color   : color,
-						opacity : opacity,
-						value   : value
-					}
-
-					legendObj.point.target.push(legend);
-
-				})	
-
-			
-			}	
-
-
-		}
-
-
-
-
-
-
-		// POLYGON
-		// POLYGON
-		// POLYGON
-
-		// polygon enabled
-		if ( polygon.enabled ) {
-
-		
-			// Create blank legend
-			var legend = {};
-
-			// COLOR
-			// COLOR
-			// COLOR
-
-			// polygon color range
-			if ( polygon.color.column ) {
-
-				var column   = polygon.color.column;
-				var value    = polygon.color.value; 
-				var minRange = polygon.color.range[0];
-				var maxRange = polygon.color.range[1];
-
-				// Save legend data
-				legend.color = {};
-				legend.color.column   = column; 
-				legend.color.value    = value;
-				legend.color.minRange = minRange;
-				legend.color.maxRange = maxRange;
-
-
-			// static polygon color
-			} else {
-
-				var value = polygon.color.staticVal ? polygon.color.staticVal : 1;
-
-				// Save legend data
-				legend.color = {};
-				legend.color.column = false;
-				legend.color.value  = value;
-
-			}
-			
-
-			// OPACITY
-			// OPACITY
-			// OPACITY
-
-			// polygon opacity range
-			if ( polygon.opacity.column ) {
-
-				var column   = polygon.opacity.column;
-				var value    = polygon.opacity.value; 
-				var minRange = polygon.opacity.range[0];
-				var maxRange = polygon.opacity.range[1];
-
-				// Save legend data
-				legend.opacity = {};
-				legend.opacity.column   = column; 
-				legend.opacity.value    = value;
-				legend.opacity.minRange = minRange;
-				legend.opacity.maxRange = maxRange;
-
-
-			// static polygon opacity
-			} else {
-
-				var value = polygon.opacity.staticVal ? polygon.opacity.staticVal : 1;
-
-				// Save legend data
-				legend.opacity = {};
-				legend.opacity.column = false;
-				legend.opacity.value  = value;
-
-			}
-
-
-			// Push legend object into array
-			legendObj.polygon.all = legend;
-
-
-
-			// FILTERS	
-			// FILTERS
-			// FILTERS
-
-			// polygon filters
-			if ( polygon.targets.length >= 1 ) {
-
-				polygon.targets.forEach(function (target, i) {
-					
-					var column   = target.column;
-					var color    = target.color;					
-					var opacity  = target.opacity;
-					var value    = target.value;
-
-					// Save legend data
-					var legend = {
-						column  : column,
-						color   : color,
-						opacity : opacity,
-						value   : value
-					}
-
-					legendObj.polygon.target.push(legend);
-
-				})	
-
-			
-			}			
-
-		
-		}
-
-
-
-		// LINE
-		// LINE
-		// LINE
-
-		// line enabled
-		if ( line.enabled ) {
-			
-			// Create blank legend
-			var legend = {};			
-
-			// COLOR
-			// COLOR
-			// COLOR
-
-			// line color range
-			if ( line.color.column ) {
-
-				var column 	= line.color.column;
-				var value 	= line.color.value;
-				var minRange	= line.color.range[0];
-				var maxRange	= line.color.range[1];
-
-				// Save legend data
-				legend.color = {};
-				legend.color.column   = column; 
-				legend.color.value    = value;
-				legend.color.minRange = minRange;
-				legend.color.maxRange = maxRange;
-
-
-			// static line color
-			} else {
-
-				var value = line.color.staticVal ? line.color.staticVal : 1;
-
-				// Save legend data
-				legend.color = {};
-				legend.color.column = false;
-				legend.color.value  = value;
-
-
-			}
-
-
-			// OPACITY
-			// OPACITY
-			// OPACITY
-
-			// line opacity range
-			if ( line.opacity.column ) {
-
-				var column = line.opacity.column;
-				var minRange = line.opacity.range[0];
-				var maxRange = line.opacity.range[1];
-
-				// Save legend data
-				legend.opacity = {};
-				legend.opacity.column   = column; 
-				legend.opacity.minRange = minRange;
-				legend.opacity.maxRange = maxRange;
-
-			// line static opacity
-			} else {
-
-				var value = line.opacity.staticVal ? line.opacity.staticVal : 1;
-
-				// Save legend data
-				legend.opacity = {};
-				legend.opacity.column   = false;
-				legend.opacity.value    = value;
-			
-			}
-
-
-			// WIDTH
-			// WIDTH
-			// WIDTH
-
-			// line width range
-			if ( line.width.column ) {
-
-				var column = line.width.column;
-				var minRange = line.width.range[0];
-				var maxRange = line.width.range[1];
-
-				// Save legend data
-				legend.width = {};
-				legend.width.column   = column;
-				legend.width.minRange = minRange;
-				legend.width.maxRange = maxRange;
-
-			// static line width
-			} else {
-
-				var value = line.width.staticVal ? line.width.staticVal : 1;
-
-				// Save legend data
-				legend.width = {};
-				legend.width.column   = false;
-				legend.width.value    = value;
-
-			}
-
-
-			legendObj.line.all = legend;
-
-
-					
-
-			// FILTERS
-			// FILTERS
-			// FILTERS
-
-			// line filters
-			if ( line.targets.length >= 1 ) {
-
-				line.targets.forEach(function (target, i) {
-
-					var column  = target.column;
-					var color   = target.color;					
-					var opacity = target.opacity;
-					var value   = target.value;
-					var width   = target.width;
-
-					// Save legend data
-					var legend = {
-						column  : column,
-						color   : color,
-						opacity : opacity,
-						value   : value,
-						width   : width
-					}
-
-					legendObj.line.target.push(legend);
-										
-
-				})
-
-			} 
-
-		}
-
-
-
-
-
-		
 	},
 
-	createLegend : function () {
+	// BUILD LEGEND OBJECT: POINT
+	// BUILD LEGEND OBJECT: POINT
+	// BUILD LEGEND OBJECT: POINT
+
+	legendPoint : function (point) {
+	
+		if ( !point.enabled ) return;		
+
+		var legend = {};
+
+		// COLOR
+		// COLOR
+		// COLOR
+
+		// polygon color range
+		if ( point.color.column ) {
+
+			var column   = point.color.column;
+			var value    = point.color.value; 
+			var minRange = point.color.range[0];
+			var maxRange = point.color.range[1];
+
+			// Save legend data
+			legend.color = {};
+			legend.color.column   = column; 
+			legend.color.value    = value;
+			legend.color.minRange = minRange;
+			legend.color.maxRange = maxRange;
+
+
+		// static polygon color
+		} else {				
+
+			var value = point.color.staticVal ? point.color.staticVal : 'red';
+
+			// Save legend data
+			legend.color = {};
+			legend.color.column = false;
+			legend.color.value  = value;
+
+		}
+		
+
+		// OPACITY
+		// OPACITY
+		// OPACITY
+
+		// polygon opacity range
+		if ( point.opacity.column ) {
+
+			var column   = point.opacity.column;
+			var minRange = point.opacity.range[0];
+			var maxRange = point.opacity.range[1];
+
+			// Save legend data
+			legend.opacity = {};
+			legend.opacity.column   = column; 
+			legend.opacity.minRange = minRange;
+			legend.opacity.maxRange = maxRange;
+
+
+		// static polygon opacity
+		} else {
+
+			if ( !point.opacity.staticVal && point.opacity.staticVal != 0 ) {
+				var value = 1;
+			} else {
+				var value = point.opacity.staticVal;
+			}				
+
+			// Save legend data
+			legend.opacity = {};
+			legend.opacity.column = false;
+			legend.opacity.value  = value;
+
+		}
+
+
+		// POINT SIZE
+		// POINT SIZE
+		// POINT SIZE
+
+		// polygon pointsize range
+		if ( point.pointsize.column ) {
+
+			var column   = point.pointsize.column;
+			var minRange = point.pointsize.range[0];
+			var maxRange = point.pointsize.range[1];
+
+			// Save legend data
+			legend.pointsize = {};
+			legend.pointsize.column   = column; 
+			legend.pointsize.minRange = minRange;
+			legend.pointsize.maxRange = maxRange;
+
+
+		// static polygon pointsize
+		} else {
+
+			if ( !point.pointsize.staticVal && point.pointsize.staticVal != 0 ) {
+				var value = 1.2;
+			} else {
+				var value = point.pointsize.staticVal;
+			}				
+
+			// Save legend data
+			legend.pointsize = {};
+			legend.pointsize.column = false;
+			legend.pointsize.value  = value;
+
+		}
+
+
+
+
+		// Push legend object into array
+		this.legendObj.point.all = legend;
+
+
+
+		// FILTERS
+		// FILTERS
+		// FILTERS
+
+		// polygon filters
+		if ( point.targets && point.targets.length >= 1 ) {
+
+			point.targets.forEach(function (target, i) {
+
+				console.log('point.targets', point.targets);
+				
+				var column   = target.column;
+				var color    = target.color;					
+				var opacity  = target.opacity;
+				var value    = target.value;
+				var width    = target.width;
+				var operator = target.operator;
+
+				// Save legend data
+				var legend = {
+					column   : column,
+					color    : color,
+					opacity  : opacity,
+					value    : value,
+					width    : width,
+					operator : operator
+				}
+
+				this.legendObj.point.target.push(legend);
+
+			}.bind(this))
+
+		
+		}	
+
+	},	
+
+
+	// BUILD LEGEND OBJECT: POLYGON
+	// BUILD LEGEND OBJECT: POLYGON
+	// BUILD LEGEND OBJECT: POLYGON
+
+	legendPolygon : function (polygon) {
+
+
+		// polygon enabled
+		if ( !polygon.enabled ) return;
+
+	
+		// Create blank legend
+		var legend = {};
+
+		// COLOR
+		// COLOR
+		// COLOR
+
+		// polygon color range
+		if ( polygon.color.column ) {
+
+			var column   = polygon.color.column;
+			var value    = polygon.color.value; 
+			var minRange = polygon.color.range[0];
+			var maxRange = polygon.color.range[1];
+
+			// Save legend data
+			legend.color = {};
+			legend.color.column   = column; 
+			legend.color.value    = value;
+			legend.color.minRange = minRange;
+			legend.color.maxRange = maxRange;
+
+
+		// static polygon color
+		} else {
+
+			
+			var value = polygon.color.staticVal ? polygon.color.staticVal : "red";
+			
+
+			// Save legend data
+			legend.color = {};
+			legend.color.column = false;
+			legend.color.value  = value;
+
+		}
+		
+
+		// OPACITY
+		// OPACITY
+		// OPACITY
+
+		// polygon opacity range
+		if ( polygon.opacity.column ) {
+
+			var column   = polygon.opacity.column;
+			var value    = polygon.opacity.value; 
+			var minRange = polygon.opacity.range[0];
+			var maxRange = polygon.opacity.range[1];
+
+			// Save legend data
+			legend.opacity = {};
+			legend.opacity.column   = column; 
+			legend.opacity.value    = value;
+			legend.opacity.minRange = minRange;
+			legend.opacity.maxRange = maxRange;
+
+
+		// static polygon opacity
+		} else {
+
+			if ( !polygon.opacity.staticVal && polygon.opacity.staticVal != 0 ) {
+				var value = 1;
+			} else {
+				var value = polygon.opacity.staticVal;
+			}
+
+			// Save legend data
+			legend.opacity = {};
+			legend.opacity.column = false;
+			legend.opacity.value  = value;
+
+		}
+
+
+		// Push legend object into array
+		this.legendObj.polygon.all = legend;
+
+
+
+		// FILTERS	
+		// FILTERS
+		// FILTERS
+
+		// polygon filters
+		if ( polygon.targets && polygon.targets.length >= 1 ) {
+
+			polygon.targets.forEach(function (target, i) {
+				
+				var column   = target.column;
+				var color    = target.color;					
+				var opacity  = target.opacity;
+				var value    = target.value;
+				var operator = target.operator;
+
+				// Save legend data
+				var legend = {
+					column   : column,
+					color    : color,
+					opacity  : opacity,
+					value    : value,
+					operator : operator
+				}
+
+				this.legendObj.polygon.target.push(legend);
+
+			}.bind(this))	
+
+		
+		}			
+
+	},
+
+	// BUILD LEGEND OBJECTL: LINE
+	// BUILD LEGEND OBJECTL: LINE
+	// BUILD LEGEND OBJECTL: LINE
+	
+	legendLine : function (line) {
+
+
+		// line enabled
+		if ( !line.enabled ) return;
+		
+		// Create blank legend
+		var legend = {};			
+
+		// COLOR
+		// COLOR
+		// COLOR
+
+		// line color range
+		if ( line.color.column ) {
+
+			var column 	= line.color.column;
+			var value 	= line.color.value;
+			var minRange	= line.color.range[0];
+			var maxRange	= line.color.range[1];
+
+			// Save legend data
+			legend.color = {};
+			legend.color.column   = column; 
+			legend.color.value    = value;
+			legend.color.minRange = minRange;
+			legend.color.maxRange = maxRange;
+
+
+		// static line color
+		} else {
+			
+			var value = line.color.staticVal ? line.color.staticVal : 'red';
+
+			// Save legend data
+			legend.color = {};
+			legend.color.column = false;
+			legend.color.value  = value;
+
+
+		}
+
+
+		// OPACITY
+		// OPACITY
+		// OPACITY
+
+		// line opacity range
+		if ( line.opacity.column ) {
+
+			var column = line.opacity.column;
+			var minRange = line.opacity.range[0];
+			var maxRange = line.opacity.range[1];
+
+			// Save legend data
+			legend.opacity = {};
+			legend.opacity.column   = column; 
+			legend.opacity.minRange = minRange;
+			legend.opacity.maxRange = maxRange;
+
+		// line static opacity
+		} else {
+
+			if ( !line.opacity.staticVal && line.opacity.staticVal != 0 ) {
+				var value = 1;
+			} else {
+				var value = line.opacity.staticVal;
+			}				
+
+			// Save legend data
+			legend.opacity = {};
+			legend.opacity.column   = false;
+			legend.opacity.value    = value;
+		
+		}
+
+
+		// WIDTH
+		// WIDTH
+		// WIDTH
+
+		// line width range
+		if ( line.width.column ) {
+
+			var column = line.width.column;
+			var minRange = line.width.range[0];
+			var maxRange = line.width.range[1];
+
+			// Save legend data
+			legend.width = {};
+			legend.width.column   = column;
+			legend.width.minRange = minRange;
+			legend.width.maxRange = maxRange;
+
+		// static line width
+		} else {
+
+
+			if ( !line.width.staticVal && line.width.staticVal != 0 ) {
+				var value = 5;
+			} else {
+				var value = line.width.staticVal;
+			}
+
+
+			// Save legend data
+			legend.width = {};
+			legend.width.column   = false;
+			legend.width.value    = value;
+
+		}
+
+
+		this.legendObj.line.all = legend;
+
+
+				
+
+		// FILTERS
+		// FILTERS
+		// FILTERS
+
+		// line filters
+		if ( line.targets && line.targets.length >= 1 ) {
+
+			line.targets.forEach(function (target, i) {
+
+				var column   = target.column;
+				var color    = target.color;					
+				var opacity  = target.opacity;
+				var value    = target.value;
+				var width    = target.width;
+				var operator = target.operator;
+
+				// Save legend data
+				var legend = {
+					column   : column,
+					color    : color,
+					opacity  : opacity,
+					value    : value,
+					width    : width,
+					operator : operator
+				}
+
+				this.legendObj.line.target.push(legend);
+									
+
+			}.bind(this))
+
+		} 
+
+	},
+
+	// CREATE LEGEND HTML
+	// CREATE LEGEND HTML
+	// CREATE LEGEND HTML
+
+	createLegendHTML : function () {
 
 		var str = '';
 
@@ -1096,6 +1104,194 @@ L.Control.Description = Wu.Control.extend({
 		var lines    = this.legendObj.line;
 		var points   = this.legendObj.point;
 
+		// POINTS
+		str += this.pointsHTML(points);
+
+		// POLYGONS AND LINES
+		str += this.polygonAndLinesHTML(polygons, lines);
+
+		return str;
+
+	},
+
+	// POINTS HTML
+	// POINTS HTML
+	// POINTS HTML
+
+	pointsHTML : function (points) {
+	
+		var str = '';
+
+
+		// TARGETED POINTS
+		// TARGETED POINTS
+		// TARGETED POINTS
+
+		points.target.forEach(function (point, i) {
+
+			// Color & opacity
+			var color   = point.color;
+			var opacity = point.opacity;
+			var RGB     = this.color2RGB(color);
+			var rgba    = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
+			var style   = 'background:' + rgba + '; ';
+		
+			// Name
+			var name = '';
+			var operator = point.operator + ' ';
+			if ( operator != '= ' ) name += operator;
+			name += point.value;
+
+			// Size
+			var size    = point.width;
+			if ( size > 20 ) size = 20;
+			if ( size < 5  ) size = 5;
+			style      += 'width: ' + size + 'px; height: ' + size + 'px; border-radius: ' + size + 'px;';
+
+			// Set dot position
+			var topLeft = (20/2) - (size/2);
+			style += 'top: ' + topLeft + 'px; ' + 'left: ' + topLeft + 'px; ';
+
+			// Set HTML
+			str += '<div class="legend-each-container">';
+			str += '<div class="legend-each-name">' + name + '</div>';
+			str += '<div class="legend-each-color" style="' + style + '"></div>';
+			str += '</div>';
+
+		}.bind(this));
+
+
+		// *******************************************************************************************************************
+		// *******************************************************************************************************************
+		// *******************************************************************************************************************
+
+		// ALL POINTS
+		// ALL POINTS
+		// ALL POINTS
+
+		// Can contain range
+
+		// Static colors
+		// Static colors
+		// Static colors
+
+		var pointStyle = '';
+		var hasAllStyle = false;
+
+		
+		if ( points.all.color && !points.all.color.column ) {
+
+			var color   = points.all.color.value;
+			var opacity = points.all.opacity.value;			
+			var RGB = this.color2RGB(color);
+			var rgba = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
+			pointStyle += 'background:' + rgba + ';';
+
+			// Size
+			var size    = points.all.pointsize.value;
+			if ( size > 20 ) size = 20;
+			if ( size < 5  ) size = 5;
+
+			pointStyle += 'width: ' + size + 'px; height: ' + size + 'px; border-radius: ' + size + 'px;';
+
+			// Set dot position
+			var topLeft = (20/2) - (size/2);
+			pointStyle += 'top: ' + topLeft + 'px; ' + 'left: ' + topLeft + 'px; ';			
+
+			if ( opacity != 0 ) hasAllStyle = true;
+		}
+
+
+		if ( hasAllStyle ) {
+
+			var layerName = this.legendObj.layerName;
+
+			var name = 'All ' + layerName;
+			str += '<div class="legend-each-container">';
+			str += '<div class="legend-each-name">' + name + '</div>';
+			str += '<div class="legend-each-color" style="' + pointStyle + '"></div>';
+			str += '</div>';
+
+		}
+
+
+
+		// Color range
+		// Color range
+		// Color range
+
+		if ( points.all.color && points.all.color.column ) {
+
+			var colorStops = points.all.color.value;
+			var minVal     = points.all.color.minRange;
+			var maxVal     = points.all.color.maxRange;
+			var column     = points.all.color.column;
+
+			// create legend
+			var gradientOptions = {
+				colorStops : colorStops,
+				minVal     : minVal,
+				maxVal     : maxVal,
+				bline      : column
+			}
+
+			var gradient = this.gradientLegend(gradientOptions);
+
+			str += gradient;
+
+		}		
+
+		return str;
+
+	},
+
+	// POLYGONS AND LINES HTML
+	// POLYGONS AND LINES HTML
+	// POLYGONS AND LINES HTML
+
+	polygonAndLinesHTML : function  (polygons, lines) {
+	
+		var str = '';
+
+		// MATCHING TARGETS
+		// MATCHING TARGETS
+		// MATCHING TARGETS
+
+		// (aka. we have a line and a polygon with the same target)
+
+		var linePolygonTargetMatches = {}
+
+		lines.target.forEach(function (l, i) {
+			polygons.target.forEach(function (p, a) {
+
+				// If it is a match
+				if ( p.value == l.value ) {
+
+					// Line style
+					var lineColor   = l.color;
+					var lineOpacity = l.opacity;
+					var lineWidth   = l.width;
+					var lineRGB     = this.color2RGB(lineColor);
+					var lineRgba    = 'rgba(' + lineRGB.r + ',' + lineRGB.g + ',' + lineRGB.b + ',' + lineOpacity + ');';
+					var lineStyle   = 'border: ' + (lineWidth/2) + 'px solid ' + lineRgba;
+
+					// Polygon style
+					var polygonColor   = p.color;
+					var polygonOpacity = p.opacity;
+					var polygonRGB     = this.color2RGB(polygonColor);
+					var polygonRgba    = 'rgba(' + polygonRGB.r + ',' + polygonRGB.g + ',' + polygonRGB.b + ',' + polygonOpacity + ');';
+					var polygonStyle   = 'background:' + polygonRgba;
+
+					var style = lineStyle + polygonStyle;
+
+					// Store matches
+					linePolygonTargetMatches[l.value] = style;
+				}
+
+			}.bind(this))
+		}.bind(this))
+
+
 
 		// LINES LINES LINES LINES LINES LINES LINES 
 		// LINES LINES LINES LINES LINES LINES LINES 
@@ -1105,54 +1301,25 @@ L.Control.Description = Wu.Control.extend({
 		// TARGETED LINES
 		// TARGETED LINES
 
-		lines.target.forEach(function (line) {
+		lines.target.forEach(function (line, i) {
+
+			// Stop if this target also exists in polygons
+			if ( linePolygonTargetMatches[line.value] ) return;
 			
-			var name    = line.value;
+			// Style
 			var color   = line.color;
 			var opacity = line.opacity;
 			var width   = line.width;
+			var RGB     = this.color2RGB(color);
+			var rgba    = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
+			var style   = 'border: ' + width + 'px solid ' + rgba;
 
-			// Convert color to RGB
-			var RGB = this.color2RGB(color);
-			var rgba = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';			
+			// Name
+			var name = '';
+			var operator = line.operator + ' ';
+			if ( operator != '= ' ) name += operator;
+			name += line.value;
 
-			var style = 'border: ' + width + 'px solid ' + rgba;
-
-			str += '<div class="legend-each-container">';
-			str += '<div class="legend-each-name">' + name + '</div>';
-			str += '<div class="legend-each-color" style="' + style + '"></div>';
-			str += '</div>';
-
-		}.bind(this));
-
-
-		// ALL LINES
-		// ALL LINES
-		// ALL LINES
-
-
-
-
-
-		// POLYGONS POLYGONS POLYGONS POLYGONS POLYGONS 
-		// POLYGONS POLYGONS POLYGONS POLYGONS POLYGONS 
-		// POLYGONS POLYGONS POLYGONS POLYGONS POLYGONS 
-
-		// TARGETED POLYGONS
-		// TARGETED POLYGONS
-		// TARGETED POLYGONS
-
-		polygons.target.forEach(function (polygon) {
-			
-			var name    = polygon.value;
-			var color   = polygon.color;
-			var opacity = polygon.opacity;
-
-			// Convert color to RGB
-			var RGB = this.color2RGB(color);
-			var rgba = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
-
-			var style = 'background:' + rgba;
 
 			str += '<div class="legend-each-container">';
 			str += '<div class="legend-each-name">' + name + '</div>';
@@ -1163,99 +1330,213 @@ L.Control.Description = Wu.Control.extend({
 
 
 
+		// POLYGONS POLYGONS POLYGONS POLYGONS POLYGONS 
+		// POLYGONS POLYGONS POLYGONS POLYGONS POLYGONS 
+		// POLYGONS POLYGONS POLYGONS POLYGONS POLYGONS 
 
-		// ALL POLYGONS & LINES
-		// ALL POLYGONS & LINES
-		// ALL POLYGONS & LINES
+		// TARGETED POLYGONS
+		// TARGETED POLYGONS
+		// TARGETED POLYGONS
 
-		if ( polygons.all.color && !polygons.all.color.column ) {
+		polygons.target.forEach(function (polygon, i) {
 
-			var name = 'All ' + layerName;
-			var color   = polygons.all.color.value;
-			var opacity = polygons.all.opacity.value;
-				
-			var RGB = this.color2RGB(color);
-			var rgba = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
-
-			var style = 'background:' + rgba;
-
-
-			if ( lines.all.color && !lines.all.color.column ) {
-				
-				var color   = lines.all.color.value;
-				var opacity = lines.all.opacity.value;
-				var width   = lines.all.width.value;
-
-				var RGB = this.color2RGB(color);
-				var rgba = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
-
-				style += 'border: ' + width + 'px solid ' + rgba;
+			// Stop if this target also exists in polygons
+			if ( linePolygonTargetMatches[polygon.value] ) {
+				var style = linePolygonTargetMatches[polygon.value];
+			} else {
+				var color   = polygon.color;
+				var opacity = polygon.opacity;
+				var RGB     = this.color2RGB(color);
+				var rgba    = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
+				var style   = 'background:' + rgba;
 			}
 
+			// Name
+			var name = '';
+			var operator = polygon.operator + ' ';
+			if ( operator != '= ' ) name += operator;
+			name += polygon.value;
+
+			// Write HTML
 			str += '<div class="legend-each-container">';
 			str += '<div class="legend-each-name">' + name + '</div>';
 			str += '<div class="legend-each-color" style="' + style + '"></div>';
 			str += '</div>';
 
+		}.bind(this));
 
+
+		// *******************************************************************************************************************
+		// *******************************************************************************************************************
+		// *******************************************************************************************************************
+
+		// ALL POLYGONS & LINES - ALL POLYGONS & LINES - ALL POLYGONS & LINES
+		// ALL POLYGONS & LINES - ALL POLYGONS & LINES - ALL POLYGONS & LINES
+		// ALL POLYGONS & LINES - ALL POLYGONS & LINES - ALL POLYGONS & LINES
+
+
+		// Static colors
+		// Static colors
+		// Static colors
+
+		var allStyle = '';
+		var hasAllStyle = false;
+
+		// Polygon
+		if ( polygons.all.color && !polygons.all.color.column ) {
+			var color   = polygons.all.color.value;
+			var opacity = polygons.all.opacity.value;			
+			var RGB = this.color2RGB(color);
+			var rgba = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
+			allStyle += 'background:' + rgba;
+
+			if ( opacity != 0 ) hasAllStyle = true;
+		}
+
+		// Line
+		if ( lines.all.color && !lines.all.color.column ) {
+			var color   = lines.all.color.value;
+			var opacity = lines.all.opacity.value;
+			var width   = lines.all.width.value;
+			var RGB = this.color2RGB(color);
+			var rgba = 'rgba(' + RGB.r + ',' + RGB.g + ',' + RGB.b + ',' + opacity + ');';
+			allStyle += 'border: ' + width + 'px solid ' + rgba;
+
+			if ( opacity != 0 ) hasAllStyle = true;
+		}
+
+
+		if ( hasAllStyle ) {
+
+			var layerName = this.legendObj.layerName;
+
+			var name = 'All ' + layerName;
+			str += '<div class="legend-each-container">';
+			str += '<div class="legend-each-name">' + name + '</div>';
+			str += '<div class="legend-each-color" style="' + allStyle + '"></div>';
+			str += '</div>';
 		}
 
 
 
+		// Color range
+		// Color range
+		// Color range
+
+		if ( polygons.all.color && polygons.all.color.column ) {
+
+			var colorStops = polygons.all.color.value;
+			var minVal     = polygons.all.color.minRange;
+			var maxVal     = polygons.all.color.maxRange;
+			var column     = polygons.all.color.column;
+
+			// create legend
+			var gradientOptions = {
+				colorStops : colorStops,
+				minVal     : minVal,
+				maxVal     : maxVal,
+				bline      : column
+			}
+
+			var gradient = this.gradientLegend(gradientOptions);
+
+			str += gradient;
+
+		}		
+
 		return str;
+
 	},
 
 
+	// GRADIENT HTML
+	// GRADIENT HTML
+	// GRADIENT HTML
 
-	// color tools
-	// color tools
-	// color tools
-	// color tools
-	// color tools
-	// color tools
+	gradientLegend : function (options) {
 
+		// Set color stops
+		var colorStops = options.colorStops;
+
+		// Set styling
+		var gradientStyle = 'background: -webkit-linear-gradient(left, ' + colorStops.join() + ');';
+		gradientStyle    += 'background: -o-linear-gradient(right, '    + colorStops.join() + ');';
+		gradientStyle    += 'background: -moz-linear-gradient(right, '  + colorStops.join() + ');';
+		gradientStyle    += 'background: linear-gradient(to right, '    + colorStops.join() + ');';
+  
+		// Container
+		var _legendHTML = '<div class="info-legend-container">';
+
+		// Legend Frame
+		_legendHTML += '<div class="info-legend-frame">';
+		_legendHTML += '<div class="info-legend-val info-legend-min-val">' + options.minVal + '</div>';
+		_legendHTML += '<div class="info-legend-val info-legend-max-val">' + options.maxVal + '</div>';
+
+		// Gradient
+		_legendHTML += '<div class="info-legend-gradient-container" style="' + gradientStyle + '"></div>';
+		_legendHTML += '</div>';
+
+		if (options.bline) {
+			_legendHTML += '<div class="info-legend-gradient-bottomline"">' + options.bline + '</div>';
+		}
+
+		_legendHTML += '</div>';
+
+		return _legendHTML;
+
+	},		
+
+
+
+	// color tools – color tools – color tools – color tools – color tools
+	// color tools – color tools – color tools – color tools – color tools
+	// color tools – color tools – color tools – color tools – color tools
+	// color tools – color tools – color tools – color tools – color tools
+	// color tools – color tools – color tools – color tools – color tools
+	// color tools – color tools – color tools – color tools – color tools
+
+	// Coverts any color (RGB, RGBA, Names (lavender), #333, #ff33ff) to [r,g,b]
 	color2RGB : function (color) {
 		
 		// The color is a hex decimal
-		if ( color[0] == '#' ) return this.checkHex(color);
+		if ( color[0] == '#' ) return this.hex2RGB(color);
 
-		// The color is RGB
-		if ( color.substring(0,2) == 'rgb' ) {
-			return '#000000';
+		// The color is RGBA
+		if ( color.substring(0,3).toLowerCase() == 'rgba' ) {
+			var end = color[color.length-1] == ';' ? color.length-2 : color.length-1;
+			var cc = c.substring(5,end);
+			var expl = cc.split(",");
+			var rgb = {
+				r : expl[0],
+				g : expl[1],
+				b : expl[2]
+			}
+			return rgb;
 		}
 
+		// The color is RGB
+		if ( color.substring(0,2).toLowerCase() == 'rgb' ) {		
+			var end = color[color.length-1] == ';' ? color.length-2 : color.length-1;
+			var cc = c.substring(4,end);
+			var expl = cc.split(",");
+			var rgb = {
+				r : expl[0],
+				g : expl[1],
+				b : expl[2]
+			}
+			return rgb;
+		}
+
+		// ... or else the color has a name
 		var convertedColor = this.colorNameToHex(color);
 		return this.hex2RGB(convertedColor);
 
-
 	},
 
-	checkHex : function (hex) {
-		
-		// If it's a 6 digit hex (plus #), run it.
-		if ( hex.length == 7 ) {
-			return this.hex2RGB(hex);
-		}
-
-		// If it's a 3 digit hex, convert
-		if ( hex.length == 4 ) {
-			var paddedHex = this.padHex(hex);
-			return this.hex2RGB(paddedHex);			
-		}
-
-	},
-
-	padHex : function (hex) {
-		var r = parseInt(hex.substring(1,3), 16);
-		var g = parseInt(hex.substring(3,5), 16);
-		var b = parseInt(hex.substring(5,7), 16);
-
-		return '#' + r + r + g + g + b + b;
-
-	},
-
+	// Creates RGB from hex
 	hex2RGB : function (hex) {
 
+		hex = this.checkHex(hex);
 
 		var r = parseInt(hex.substring(1,3), 16);
 		var g = parseInt(hex.substring(3,5), 16);
@@ -1269,9 +1550,27 @@ L.Control.Description = Wu.Control.extend({
 
 		return rgb;
 
+	},	
+
+	// Turns 3 digit hex values to 6 digits
+	checkHex : function (hex) {
+		
+		// If it's a 6 digit hex (plus #), run it.
+		if ( hex.length == 7 ) {
+			return hex;
+		}
+
+		// If it's a 3 digit hex, convert
+		if ( hex.length == 4 ) {
+			var r = parseInt(hex.substring(1,3), 16);
+			var g = parseInt(hex.substring(3,5), 16);
+			var b = parseInt(hex.substring(5,7), 16);
+			return '#' + r + r + g + g + b + b;
+		}
+
 	},
-
-
+	
+	// Turns color names (lavender) to hex
 	colorNameToHex : function (color) {
 
     		var colors = {	"aliceblue" : "#f0f8ff",
@@ -1422,6 +1721,7 @@ L.Control.Description = Wu.Control.extend({
 		if ( colors[c] ) return colors[c];
 		
 		// Return black if there are no matches
+		// (could return false, but will have to catch that error later)
 		return '#000000';				
 	},	
 
