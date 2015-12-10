@@ -14,6 +14,9 @@ Wu.Styler.Point = Wu.Styler.extend({
 		// pointsize
 		this._createPointsize();
 
+		// blend mode
+		this._createBlendMode();
+
 		// targets
 		this._createTargets();
 
