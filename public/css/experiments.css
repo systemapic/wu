@@ -505,10 +505,10 @@ body {
 
 /*fly-to icon*/
 .fly-to {
-    font-size: 18px;
+    font-size: 13px;
     position: absolute;
-    right: 6px;
-    top: 5px;
+    right: 8px;
+    top: 7px;
     color: #777;
 }
 .layer-menu-flyto { 
