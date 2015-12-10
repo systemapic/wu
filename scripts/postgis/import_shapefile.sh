@@ -32,5 +32,4 @@ echo "Imoprting shapefile, srid: $SRID"
 
 
 # import shapefile
-# shp2pgsql -D $SRID $ENCODING "$1" $2 | PGPASSWORD=$PGPASSWORD psql -q --host=$PGHOST --username=$PGUSERNAME $3
-shp2pgsql -D $SRID $ENCODING "$1" $2 > /data/tmp/postgis_import_test_huge.sql
+shp2pgsql -D $SRID $ENCODING "$1" $2 | PGPASSWORD=$PGPASSWORD psql -q --host=$PGHOST --username=$PGUSERNAME $3
