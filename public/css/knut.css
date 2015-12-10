@@ -1253,6 +1253,61 @@
 
 
 
+.target-column-dropdown.tiny {
+	width: 80px;
+}
+
+.clicker-button.target-equals-clicker {
+    width: 21px;
+    height: 22px;
+    left: 82px;
+    position: absolute;
+    top: 16px;
+    border: 1px solid gainsboro;
+    border-radius: 3px;
+    background: white;
+    cursor: pointer;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.3;
+    padding-left: 5px;
+}
+
+
+
+.data-list-line.processing {
+	background: #3C4759;
+	color: white;
+	padding: 10px;
+	height: 60px;
+}
+.file-name-content.processing {
+	padding-left: 5px;
+	position: absolute;
+}
+.file-feedback.processing {
+	padding: 5px;
+	font-size: 13px;
+	font-weight: 600;
+	position: absolute;
+	bottom: 0px;
+}
+.file-feedback-percent.processing {
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+	padding: 5px;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+
+
+
+
+
+
+
 
 
 

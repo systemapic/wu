@@ -75,6 +75,11 @@ Wu.Resumable = Wu.Class.extend({
 		// file added
 		r.on('fileAdded', function(file){
 
+			// fire layer edited
+			Wu.Mixin.Events.fire('fileProcessing', {detail : {
+				file: file
+			}});
+
 			// set starttime
 			r._startTime = new Date().getTime();
 			
@@ -102,30 +107,38 @@ Wu.Resumable = Wu.Class.extend({
 		// set progress bar
 		r.on('fileProgress', function(file){
 			var progress = file.progress() * 100;
-			if (progress > 99) progress = 0;
+			if (progress > 99) progress = 100;
+
+			// set progress bar
 			app.ProgressBar.setProgress(progress);
+
+			// set processing progress
+			Wu.Mixin.Events.fire('processingProgress', {
+				detail : {
+					text : 'Uploading...',
+					error : null,
+					percent : parseInt(progress),
+					uniqueIdentifier : file.uniqueIdentifier,
+				}
+			});
+
 		}.bind(this));
 
 		r.on('cancel', function(){
 			this._uploadDone();
-
 		}.bind(this));
 		
 		r.on('uploadStart', function(){
-		
 		}.bind(this));
 		
 		r.on('complete', function(data){
 			this._uploadDone();
-
 		}.bind(this));
 		
 		r.on('pause', function(){
-		
 		}.bind(this));
 		
 		r.on('fileError', function(file, message){
-		
 		}.bind(this));
 
 	},
@@ -153,6 +166,9 @@ Wu.Resumable = Wu.Class.extend({
 	enable : function () {
 	},
 
+
+
+
 	// feedback upload started
 	feedbackUploadStarted : function (file) {
 
@@ -161,10 +177,14 @@ Wu.Resumable = Wu.Class.extend({
 		    fileName = file.fileName,
 		    message = 'File: ' + fileName + '<br>Size: ' + size;
 		
-		// set feedback
-		app.feedback.setMessage({
-			title : 'Uploading',
-			description : message,
+		// set processing progress
+		Wu.Mixin.Events.fire('processingProgress', {
+			detail : {
+				text : 'Uploading...',
+				error : null,
+				percent : 0,
+				uniqueIdentifier : file.uniqueIdentifier,
+			}
 		});
 	},
 
@@ -186,10 +206,14 @@ Wu.Resumable = Wu.Class.extend({
 		// set message
 		var message = 'Estimated time: ' + procTime;
 
-		// set feedback
-		app.feedback.setMessage({
-			title : 'Processing...',
-			description : message,
+		// set processing progress
+		Wu.Mixin.Events.fire('processingProgress', {
+			detail : {
+				text : 'Uploaded!',
+				error : null,
+				percent : 100,
+				uniqueIdentifier : file.uniqueIdentifier,
+			}
 		});
 
 	},

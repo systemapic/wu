@@ -518,7 +518,6 @@ Wu.Control.Chart = Wu.Control.extend({
 		var pointCount = options.pointCount;
 		var multiPopUp = options.multiPopUp;
 
-		
 
 		// If custom title
 		if ( this.popupSettings.title && this.popupSettings.title != '' ) {
@@ -592,9 +591,11 @@ Wu.Control.Chart = Wu.Control.extend({
 
 
 
-			var metaPair = Wu.DomUtil.create('div', 'c3-header-metapair metapair-' + c, container);
-			var metaKey = Wu.DomUtil.create('div', 'c3-header-metakey', metaPair, title);
-			var metaVal = Wu.DomUtil.create('div', 'c3-header-metaval', metaPair, _val);
+			if ( _val ) {
+				var metaPair = Wu.DomUtil.create('div', 'c3-header-metapair metapair-' + c, container);
+				var metaKey = Wu.DomUtil.create('div', 'c3-header-metakey', metaPair, title);
+				var metaVal = Wu.DomUtil.create('div', 'c3-header-metaval', metaPair, _val);
+			}
 
 		}.bind(this));
 

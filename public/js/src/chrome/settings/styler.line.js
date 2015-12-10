@@ -15,6 +15,9 @@ Wu.Styler.Line = Wu.Styler.extend({
 		// pointsize
 		this._createWidth();
 
+		// blend
+		// this._createBlendMode();
+
 		// targets
 		this._createTargets();
 	},

@@ -14,6 +14,7 @@ Wu.button = Wu.Class.extend({
 		if ( options.type == 'colorrange')  this.initColorRange();
 		if ( options.type == 'dualinput')   this.initDualInput();
 		if ( options.type == 'toggle')      this.initToggleButton();
+		if ( options.type == 'clicker')     this.initClicker();
 
 	},
 
@@ -440,6 +441,48 @@ Wu.button = Wu.Class.extend({
 
 		// Force numeric
 		if ( !allowText ) miniInput.onkeypress = this.forceNumeric;		    
+
+	},
+
+
+	initClicker : function () {
+
+		var appendTo = this.options.appendTo;
+		var id = this.options.id;
+		var type = this.options.type;
+		var fn = this.options.fn;
+		var array = this.options.array;
+		var selected = this.options.selected || '=';
+		var className = this.options.className;
+
+
+
+		// set index
+		this._cidx = _.findIndex(array, selected);
+		if (this._cidx > 0) this._cidx = 1;
+
+		// create button
+		var button = this._button = Wu.DomUtil.create('div', 'clicker-button ' + className, appendTo, selected);
+
+		// click event, toggle array content
+		Wu.DomEvent.on(button, 'click', function (e) {
+
+			// set index
+			this._cidx = this._cidx + 1;
+			if (this._cidx == array.length) this._cidx = 0;
+
+			// get content
+			var content = array[this._cidx];
+
+			// set content
+			button.innerHTML = content;
+
+			// callback
+			fn(e, content);
+
+		}, this);
+
+
 
 	},
 
