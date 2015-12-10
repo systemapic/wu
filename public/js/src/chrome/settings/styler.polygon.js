@@ -11,6 +11,9 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		// opacity
 		this._createOpacity();
 
+		// blend 
+		// this._createBlendMode();
+
 		// targeted columns
 		this._createTargets();
 

@@ -100,10 +100,11 @@ module.exports = api.geo = {
 	_createPointCarto : function (options, style) {
 
 		var allowOverlap = 'true';
-		var markerClip  = 'false';
-		var compOp      = 'screen'
+		var markerClip = 'false';
+		var compOp = options.style.point.blend ? options.style.point.blend.mode || 'screen' : 'screen';
 
-		// CREATE DEFAULT STYLING
+
+		// global style
 		style.layer += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
 		style.layer += '\tmarker-clip: ' + markerClip + ';\n';
 		style.layer += '\tmarker-comp-op: ' + compOp + ';\n\n';
@@ -133,6 +134,16 @@ module.exports = api.geo = {
 	},
 
 	_createPolygonCarto : function (options, style) {
+
+		// check if comp-op active
+		var compOp = false;
+		if (options.style.polygon.blend && options.style.polygon.blend.mode) {
+			compOp = options.style.polygon.blend.mode;
+		}
+
+		// global styling
+		if (compOp) style.layer += '\tpolygon-comp-op: ' + compOp + ';\n\n';
+
 
 		// opacity
 		var polygonOpacityCarto = this.buildCarto_polygonOpacity(options);

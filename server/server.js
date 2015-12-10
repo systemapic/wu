@@ -47,7 +47,8 @@ app.use(express.session({
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
-app.use(favicon(__dirname + '/../dist/css/favicon.ico'));
+// app.use(favicon(__dirname + '/../dist/css/favicon.ico'));
+app.use(favicon(__dirname + '/../public/local/favicon.ico'));
 
 // enable compression
 app.use(compress());

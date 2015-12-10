@@ -42,6 +42,9 @@ Wu.Styler = Wu.Class.extend({
 			['#00ff00', '#ffff00', '#ff0000'],
 		],
 
+		blendModes : ["color", "color-burn", "color-dodge", "contrast", "darken", "difference", "dst", "dst-atop", "dst-in", "dst-out", "dst-over", "exclusion", "grain-extract", "grain-merge", "hard-light", "hue", "invert", "invert-rgb", "lighten", "minus", "multiply", "overlay", "plus", "saturation", "screen", "soft-light", "src", "src-atop", "src-in", "src-out", "src-over", "value", "xor"],
+
+
 	},
 
 	_content : {},
@@ -262,6 +265,58 @@ Wu.Styler = Wu.Class.extend({
 			range : minMax,
 			staticVal : value
 		};
+	},
+
+	_createBlendMode : function () {
+
+		// Create JSON obj if it's not already there
+		this.carto().blend = this.carto().blend || {};
+
+		var blendmode = this.carto().blend.mode || 'screen';
+
+		// container
+		var line = new Wu.fieldLine({
+			id           : 'blendmode',
+			appendTo     : this._wrapper,
+			title        : '<b>Blend mode</b>',
+			input        : false,
+			childWrapper : 'point-size-children'
+		});
+
+		// blend modes dropdown
+		var dropdown = new Wu.button({
+			id 	 : 'blendmode',
+			type 	 : 'dropdown',
+			right 	 : true,
+			appendTo : line.container,
+			fn 	 : this._blendmodeSelected.bind(this),
+			array 	 : this.options.blendModes,
+			selected : blendmode,
+		});
+
+		// remember items
+		this._content[this.type].blendmode = {
+			line : line,
+			dropdown : dropdown,
+		}
+
+		// save carto
+		this.carto().blend = {
+			mode : blendmode
+		};
+
+
+	},
+
+	_blendmodeSelected : function (e) {
+		var dropdown = e.target;
+		var blendmode = dropdown.options[dropdown.selectedIndex].value;
+
+		// save
+		this.carto().blend.mode = blendmode;
+
+		// mark changed
+		this.markChanged();
 	},
 
 	// point size box
@@ -592,9 +647,6 @@ Wu.Styler = Wu.Class.extend({
 		// Close
 		this._closeColorRangeSelector(); 
 
-		// update
-		// this._updateStyle();	
-
 		// mark changed
 		this.markChanged();
 
@@ -663,7 +715,7 @@ Wu.Styler = Wu.Class.extend({
 		var inputField = this._content[this.type].pointsize.input.input;
 
 		// If less than 0.5, make it 0.5
-		if ( value < 0.5 ) value = 0.5;
+		// if ( value < 0 ) value = 0;
 
 		// Set value in input
 		inputField.value = value;
