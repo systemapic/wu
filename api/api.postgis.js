@@ -537,11 +537,11 @@ module.exports = api.postgis = {
 
 			// import to postgis
 			var startTime = new Date().getTime();
-			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
-				console.log('srr, std', err, stdout);
-				if (err) {
-					console.log('import_shapefile_script err: ', err, stdout);
-				}
+			exec(cmd, {maxBuffer: 1024 * 1024 * 50000}, function () {
+				// console.log('srr, std', err, stdout);
+				// if (err) {
+				// 	console.log('import_shapefile_script err: ', err, stdout);
+				// }
 
 				var endTime = new Date().getTime();
 
@@ -551,7 +551,7 @@ module.exports = api.postgis = {
 					import_took_ms : endTime - startTime,
 					table_name : file_id,
 					database_name : pg_db
-				}, function () {
+				}, function (err) {
 					callback(err, 'Shapefile imported successfully.');
 				});
 			});
