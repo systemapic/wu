@@ -1,5 +1,11 @@
 Wu.ProgressPane = Wu.Class.extend({
 
+	options : {
+
+		color : 'white',
+		
+	},
+
 	initialize : function (options) {
 		
 		// set options
@@ -31,7 +37,7 @@ Wu.ProgressPane = Wu.Class.extend({
 		var bar = this._progressBar;
 		bar.style.opacity = 1;
 		bar.style.width = percent + '%';
-		bar.style.backgroundColor = 'red';
+		bar.style.backgroundColor = this.options.color;
 		this._current = percent;
 	},
 
@@ -40,7 +46,7 @@ Wu.ProgressPane = Wu.Class.extend({
 		bar.style.opacity = 0;
 		this._current = 0;
 		bar.style.width = 0;
-		bar.style.backgroundColor = 'white';
+		// bar.style.backgroundColor = 'white';
 
 		if (this._progressTimer) clearTimeout(this._progressTimer)
 	},
