@@ -14,6 +14,9 @@ Wu.Invite = Wu.Class.extend({
 
 		console.log('this._invite: ', this._invite);
 
+		// set page title
+		document.title = loginConfig.pageTitle;
+
 		// init container
 		this._initContainer();
 
