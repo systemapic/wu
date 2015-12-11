@@ -523,7 +523,7 @@ module.exports = api.postgis = {
 
 			console.log('final srid: ', srid);
 
-			var srid_converted = srid;// + ':3857';  // convert on import. todo: create the_geom + the_geom_webmercator columns after import instead
+			var srid_converted = srid;
 
 			// create database script
 			var cmd = [
@@ -544,7 +544,7 @@ module.exports = api.postgis = {
 				progress : {
 					text : 'Importing...',
 					error : null,
-					percent : 30,
+					percent : 20,
 					uniqueIdentifier : uniqueIdentifier,
 				}
 			});
@@ -553,10 +553,6 @@ module.exports = api.postgis = {
 			var startTime = new Date().getTime();
 
 			exec(cmd, {maxBuffer: 1024 * 1024 * 50000}, function () {
-				// console.log('srr, std', err, stdout);
-				// if (err) {
-				// 	console.log('import_shapefile_script err: ', err, stdout);
-				// }
 
 				var endTime = new Date().getTime();
 
@@ -581,7 +577,7 @@ module.exports = api.postgis = {
 				progress : {
 					text : 'Creating geometries...',
 					error : null,
-					percent : 60,
+					percent : 40,
 					uniqueIdentifier : uniqueIdentifier,
 				}
 			});
@@ -944,40 +940,7 @@ module.exports = api.postgis = {
 			});
 		});
 
-		
-		// // get histograms
-		// ops.push(function (callback) {
-
-		// 	var columns = metadata.columns._columns;
-		// 	var histogram = {};
-
-		// 	async.each(columns, function (column, cb) {
-
-		// 		api.postgis.fetchHistogram({
-		// 			database_name : postgis_db,
-		// 			table_name : file_id, 
-		// 			num_buckets : api.config.postgis.filters.num_buckets,
-		// 			column : column
-		// 		}, function (err, histo) {
-		// 			if (err) console.log('hisgto err', err);
-
-		// 			histogram[column] = histo;
-		// 			cb(null);
-		// 		});
-
-
-		// 	}, function (err, results) {
-
-		// 		// set histogram to meta
-		// 		metadata.histogram = histogram;
-
-		// 		callback();
-		// 	})
-
-
-		// });
-
-
+	
 		// get geometry type
 		ops.push(function (callback) {
 
@@ -1174,7 +1137,13 @@ module.exports = api.postgis = {
 
 
 		async.waterfall(ops, function (err, results) {
-			done(err);
+
+			console.log('priming waterfall', err, results);
+
+			console.log('err messssss', err.message);
+			var errMsg = err && err.message ? err.message : null;
+			
+			done(errMsg);
 		});
 
 	},

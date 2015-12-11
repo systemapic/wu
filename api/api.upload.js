@@ -486,13 +486,15 @@ module.exports = api.upload = {
 				api.upload.updateStatus(file_id, { // todo: more specific error reporting
 					error_code : 1, 
 					error_text : err,
+					processing_success : false,
 					status : 'Failed'
 				}, function (err2) {
 
 					// send error message on socket
 					api.socket.sendError(user._id, {
 						title : 'Upload failed.',
-						description : err
+						description : err,
+						uniqueIdentifier : uploadStatus.uniqueIdentifier,
 					});
 				});
 

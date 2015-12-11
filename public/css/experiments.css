@@ -948,10 +948,6 @@ body {
     transition: opacity 100ms linear;
 }
 
-
-
-
-
 .share-dropdown {
     padding-bottom: 0px;
 }
@@ -971,3 +967,8 @@ body {
     font-weight: 600;
 }
 
+.account-dropdown {
+    width: 200px;
+    border-radius: 0 0 4px 4px;
+    padding-bottom: 10px;
+}

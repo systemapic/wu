@@ -27,6 +27,7 @@ Wu.Chrome = Wu.Class.extend({
 		Wu.Mixin.Events.on('closeMenuTabs',   this._onCloseMenuTabs, this);
 		Wu.Mixin.Events.on('fileProcessing',  this._onFileProcessing, this);
 		Wu.Mixin.Events.on('processingProgress',  this._onProcessingProgress, this);
+		Wu.Mixin.Events.on('processingError',  this._onProcessingError, this);
 	},
 
 	_projectSelected : function (e) {
@@ -112,6 +113,7 @@ Wu.Chrome = Wu.Class.extend({
 	_onCloseMenuTabs  : function () {},
 	_onFileProcessing : function () {},
 	_onProcessingProgress : function () {},
+	_onProcessingError : function () {},
 
 
 });

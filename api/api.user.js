@@ -44,7 +44,6 @@ module.exports = api.user = {
 
 	inviteToProjects : function (req, res) {
 	
-		console.log('inviteToProjects', req.body);
 		var options = req.body;
 
 		var edits = options.edit || [];
@@ -89,8 +88,6 @@ module.exports = api.user = {
 					project.markModified('access');
 					project.save(function (err, updated_project) {
 
-						console.log('saved 1', err, updated_project.access.edit);
-
 						// remember for 
 						changed_projects.push({
 							project : updated_project.uuid,
@@ -105,9 +102,6 @@ module.exports = api.user = {
 
 			}, function (err, changed_edit_projects) {
 				
-				console.log('err, changed edoit: ', err, changed_edit_projects);
-
-	
 				async.each(reads, function (projectUuid, done) {
 
 					Project
@@ -143,8 +137,6 @@ module.exports = api.user = {
 
 				}, function (err, changed_read_projects) {
 
-					console.log('err, changed: ', err, changed_projects);
-
 					callback(null, changed_projects);
 
 				});				
@@ -156,7 +148,6 @@ module.exports = api.user = {
 
 		ops.push(function (projects, callback) {
 
-			console.log('changed these projects', projects);
 
 			res.json({
 				error : null,
@@ -181,9 +172,6 @@ module.exports = api.user = {
 
 
 	requestContact : function (req, res) {
-
-		console.log('request contact: ', req.body);
-
 
 		var contact_uuid = req.body.contact;
 		var request_id;
@@ -249,7 +237,6 @@ module.exports = api.user = {
 		});
 
 		async.series(ops, function (err) {
-			console.log('contact asyn done', err);
 
 			res.json({
 				error : err
@@ -262,14 +249,9 @@ module.exports = api.user = {
 	acceptContactRequest : function (req, res) {
 
 
-		console.log('ACECECEPCPEPCPEPECPEPP!!!!!');
-
 		// get client/project
 		var path = req.originalUrl.split('/');
 		var request_token = path[4];
-
-		console.log('acceptContactRequest', path);
-		console.log('request_token: ', request_token);
 
 		// check
 		if (!request_token) return res.end('Nope!');
@@ -279,10 +261,6 @@ module.exports = api.user = {
 		api.redis.tokens.get(invite_key, function (err, request_store) {
 
 			var store = api.utils.parse(request_store);
-
-			console.log('request: ', store);
-
-
 			var requester_uuid = store.requester;
 			var contact_uuid = store.contact;
 			var timestamp = store.timestamp;
@@ -314,39 +292,19 @@ module.exports = api.user = {
 
 				});
 
-				// // add newUser to contact list
-				// r_user.contact_list.addToSet(created_user._id);
-				// r_user.save(function (err) {
-				// 	if (err) console.log('invited_by_yser: ', err);
-
-				// 	// add inviter to newUser's contact list
-				// 	created_user.contact_list.addToSet(user._id);
-				// 	created_user.save(function (err) {
-				// 		if (err) console.log('created_user invite err: ', err);
-						
-				// 		// done
-				// 		callback(null);
-				// 	});
-				// });
 			});
 
 
 
 		});
 
-		// res.render('../../views/app.serve.ejs', {
-		// 	hotlink : {},
-		// 	access_token : req.session.access_token || {}
-		// });
-
-		res.end('ok');
+		res.end('ok'); // todo
 	},
 
 
 
 	// from shareable link flow
 	getInviteLink : function (req, res) {
-		console.log('getInviteLink', req.body);
 		var options = req.body;
 		options.user = req.user;
 
@@ -357,15 +315,12 @@ module.exports = api.user = {
 			access : options.access,
 			type : 'link'
 		}, function (err, invite_link) {
-			console.log('SHARE LINK: got invite_link:', err, invite_link);
 			res.end(invite_link);
 		});
 	},
 
 
 	_createInviteLink : function (options, callback) {
-
-		console.log('create?InviteLink, ', options.access);
 
 		var user = options.user;
 		var access = options.access;
@@ -411,9 +366,6 @@ module.exports = api.user = {
 	invite : function (req, res) {
 		var options = req.body;
 
-		console.log('req: ', req);
-		console.log('api.user._invite: ', options);
-
 		var emails = options.emails;
 		var customMessage = options.customMessage;
 		var access = options.access;
@@ -445,34 +397,6 @@ module.exports = api.user = {
 
 			});
 
-			// // create unique key
-			// var uuid = api.utils.getRandomChars(10);
-
-			// // options
-			// var invite_options = JSON.stringify({
-			// 	email : email,
-			// 	access : access,
-			// 	uuid : uuid,
-			// 	invited_by : req.user.getUuid(),
-			// 	timestamp : new Date().getTime(),
-			// });
-
-			// // save invite
-			// var invite_key = 'invite:' + uuid;
-			// api.redis.tokens.set(invite_key, invite_options, function (err) {
-			// 	if (err) return console.error('api.user.invite err: ', err);
-				
-			// 	var invite_link = api.config.portalServer.uri + 'api/invitation/' + uuid;
-
-			// 	// send email
-			// 	api.email.sendInviteEmail({
-			// 		email : email,
-			// 		customMessage : customMessage,
-			// 		numProjects : numProjects,
-			// 		invite_link : invite_link,
-			// 		invited_by : req.user.getName()
-			// 	});
-			// });
 		});
 
 
@@ -530,7 +454,6 @@ module.exports = api.user = {
 
 	// called from passport.js (no req.user exists here)
 	register : function (options, done) {
-		console.log('register!!!!', options);
 
 		var ops = [],
 		    created_user,
@@ -553,9 +476,6 @@ module.exports = api.user = {
 
 			// parse token_store
 			token_store = api.utils.parse(tokenJSON);
-
-			console.log('token_store: ', token_store);
-			console.log('access: ', token_store.access);
 
 			// create the user
 			var newUser            	= new User();
@@ -668,8 +588,6 @@ module.exports = api.user = {
 		    project_id = options.project_id,
 		    ops = [];
 
-		console.log('_createRole: ', options);
-
 		if (!permissions) return done('missingInformation');
 
 		ops.push(function (callback) {
@@ -678,7 +596,6 @@ module.exports = api.user = {
 			role.uuid = 'role-' + uuid.v4();
 
 			permissions.forEach(function (p) {
-				console.log('p: ', p);
 				role.capabilities[p] = true;
 			})
 
@@ -708,7 +625,6 @@ module.exports = api.user = {
 		
 
 		async.waterfall(ops, function (err, results) {
-			console.log('create role, err, reslts', err, results);
 			done(err);
 		});
 
@@ -721,8 +637,6 @@ module.exports = api.user = {
 		    invite_token,
 		    ops = [];
 
-
-		// console.log('_processInviteToken:', options);
 
 		// return if no token
 		if (!options.invite_token) return done(null);
@@ -776,73 +690,6 @@ module.exports = api.user = {
 	},
 
 
-
-
-
-	// _inviteNewUser : function (options, callback) {
-	// },
-
-	// _inviteExistingUser : function (options, callback) {
-	// },
-
-
-	// // create user
-	// create : function (req, res) {
-	// 	if (!req.body) return api.error.missingInformation(req, res);
-
-	// 	// user not added to any roles on creation
-	// 	// blank user with no access - must be given project access, etc.
-
-	// 	var account = req.user,
-	// 	    projectUuid = req.body.project,
-	// 	    userUuid = req.user.uuid,
-	// 	    options = req.body;
-	// 	    ops = [];
-
-	// 	// return on missing info
-	// 	if (!options.email) return api.error.missingInformation(req, res);
-
-	// 	// permissions hack, need project to get a capability... todo: refactor whole permissions thing
-	// 	ops.push(function (callback) {
-	// 		if (projectUuid) {
-	// 			api.project._getProjectByUuid(projectUuid, callback);
-	// 		} else {
-	// 			api.project._getProjectByUserUuidAndCapability(userUuid, 'create_user', callback);
-	// 		}
-	// 	});
-
-	// 	// check access
-	// 	ops.push(function (project, callback) {
-	// 		api.access.to.create_user({
-	// 			user : account,
-	// 			project : project
-	// 		}, callback);
-	// 	});
-
-	// 	// create user
-	// 	ops.push(function (options, callback) {
-	// 		api.user._create({
-	// 			options : req.body,
-	// 			account : account
-	// 		}, callback);
-	// 	});
-
-	// 	// send email
-	// 	ops.push(function (user, password, callback) {
-	// 		console.log('got password: '.yellow, password);
-	// 		api.email.sendWelcomeEmail(user, password, account);  // refactor plain pass
-	// 		callback(null, user);
-	// 	});
-
-
-	// 	// run ops
-	// 	async.waterfall(ops, function (err, user) {
-	// 		if (err) return api.error.general(req, res, err);
-
-	// 		// done
-	// 		res.end(JSON.stringify(user));
-	// 	});
-	// },
 
 
 	_create : function (job, callback) {
@@ -957,50 +804,7 @@ module.exports = api.user = {
 		return queries;
 	},
 
-		
-	// // delete user  	
-	// deleteUser : function (req, res) {
-	// 	if (!req.body) return api.error.missingInformation(req, res);
 	
-	// 	var userUuid = req.body.uuid,
-	// 	    account = req.user,
-	// 	    ops = [];
-
-	// 	ops.push(function (callback) {
-	// 		User
-	// 		.findOne({uuid : userUuid})
-	// 		.exec(callback);
-	// 	});
-
-	// 	ops.push(function (user, callback) {
-	// 		api.access.to.delete_user({
-	// 			user : account,
-	// 			subject : user
-	// 		}, callback);
-	// 	});
-
-	// 	ops.push(function (options, callback) {
-	// 		if (!options || !options.subject) return callback('Missing information.7');
-
-	// 		//deleting token 
-	// 		var deletedUser = options.subject;
-	// 		var token = deletedUser.token; 
-	// 		if (token) api.redis.temp.del(token); 
-
-	// 		//removing the whole user
-	// 		options.subject.remove(callback);
-
-	// 	});
-
-	// 	async.waterfall(ops, function (err, user) {
-	// 		if (err || !user) api.error.general(req, res, err);
-
-	// 		// done
-	// 		res.end(JSON.stringify(user));
-
-	// 		// todo: send email notifications?
-	// 	});
-	// },
 
 
 	// check unique email
