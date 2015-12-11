@@ -1,7 +1,7 @@
 #!/bin/bash
 
 USERNAME=knutole@systemapic.com
-PASSWORD=92f5422658601ae9f23b4921b4bd6b8e
+PASSWORD=o1bbxb1q
 SERVER=dev.systemapic.com
 
 # get access token
