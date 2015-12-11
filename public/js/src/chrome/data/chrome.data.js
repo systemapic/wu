@@ -167,13 +167,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
 
 		if (this._isOpen) {
+
 			// fire event
 			app.Socket.sendUserEvent({
 				user : app.Account.getFullName(),
 				event : 'opened',
 				description : 'the data library',
 				timestamp : Date.now()
-			})
+			});
 		}
 	},
 
@@ -454,7 +455,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// set feedback
 		tempfile.feedback.innerHTML = error.description;
-		tempfile.percent.innerHTML = 'Failed';
+		tempfile.percent.innerHTML = 'Upload failed';
 		tempfile.datawrap.style.background = '#F13151';
 		
 		// close on click

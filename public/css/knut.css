@@ -1331,6 +1331,7 @@ input.target-input.polygon {
 	padding: 5px;
 	font-size: 14px;
 	font-weight: 600;
+	background: inherit;
 }
 
 .data-list-line.processing:hover {
