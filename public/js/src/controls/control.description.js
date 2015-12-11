@@ -657,7 +657,7 @@ L.Control.Description = Wu.Control.extend({
 
 	legendPoint : function (point) {
 	
-		if ( !point.enabled ) return;		
+		if (!point || !point.enabled ) return;		
 
 		var legend = {};
 
@@ -817,7 +817,7 @@ L.Control.Description = Wu.Control.extend({
 
 
 		// polygon enabled
-		if ( !polygon.enabled ) return;
+		if (!polygon || !polygon.enabled ) return;
 
 	
 		// Create blank legend
@@ -941,7 +941,7 @@ L.Control.Description = Wu.Control.extend({
 
 
 		// line enabled
-		if ( !line.enabled ) return;
+		if (!line || !line.enabled ) return;
 		
 		// Create blank legend
 		var legend = {};			
