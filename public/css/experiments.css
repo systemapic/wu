@@ -947,3 +947,27 @@ body {
     right: -34px;
     transition: opacity 100ms linear;
 }
+
+
+
+
+
+.share-dropdown {
+    padding-bottom: 0px;
+}
+.share-item-processing {
+    padding-bottom: 10px;
+    border-radius: 0 0 4px 4px;
+}
+.invite-feedback-active {
+    background: #3C4759;
+    color: #FCFCFC;
+    font-size: 12px;
+    padding: 5px;
+    padding-left: 10px;
+}
+.invite-feedback-active a {
+    color: white;
+    font-weight: 600;
+}
+

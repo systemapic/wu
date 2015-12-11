@@ -447,33 +447,6 @@ Wu.App = Wu.Class.extend({
 		// set position
 		app.MapPane.setPosition(hash.position);
 
-		return;
-
-		// // set layers
-		// hash.layers.forEach(function (layerUuid) { 	// todo: differentiate between baselayers and layermenu
-		// 						// todo: layermenu items are not selected in layermenu itself, altho on map
-		// 	// add layer
-		// 	var layer = project.getLayer(layerUuid);
-
-		// 	// if in layermenu
-		// 	var bases = project.getBaselayers();
-		// 	var base = _.find(bases, function (b) {
-		// 		return b.uuid == layerUuid;
-		// 	});
-
-		// 	if (base) {
-		// 		// add as baselayer
-		// 		layer.add('baselayer'); 
-		// 	} else {
-		// 		// ass as layermenu
-		// 		var lm = app.MapPane.getControls().layermenu;
-		// 		if (lm) {
-		// 			var lmi = lm._getLayermenuItem(layerUuid);
-		// 			lm.enableLayer(lmi);
-		// 		}
-		// 	}
-			
-		// }, this);
 	},
 
 	// save a hash // todo: move to controller
@@ -527,26 +500,39 @@ Wu.App = Wu.Class.extend({
 			// set position
 			app.MapPane.setPosition(hash.position);
 
-			// set layers
-			hash.layers.forEach(function (layerUuid) { 	// todo: differentiate between baselayers and layermenu
-									// todo: layermenu items are not selected in layermenu itself, altho on map
-				// add layer
-				var layer = project.getLayer(layerUuid);
+			setTimeout(function () {
 
-				// if in layermenu
-				var bases = project.getBaselayers();
-				var base = _.find(bases, function (b) {
-					return b.uuid == layerUuid;
+				// deselect all default layers
+				var map = app._map;
+				var lm = app.MapPane.getControls().layermenu;
+				var activeLayers = lm._getActiveLayers();
+				activeLayers.forEach(function (al) {
+					al.layer.remove(map);
 				});
 
-				if (base) {
-					// add as baselayer
-					layer.add('baselayer'); 
-				} else {
-					layer.add();
-				}
-				
-			}, this);
+				// set layers
+				hash.layers.forEach(function (layerUuid) { 	
+										
+					// add layer
+					var layer = project.getLayer(layerUuid);
+
+					// if in layermenu
+					var bases = project.getBaselayers();
+					var base = _.find(bases, function (b) {
+						return b.uuid == layerUuid;
+					});
+
+					if (base) {
+						// add as baselayer
+						layer.add('baselayer'); 
+					} else {
+						layer.add();
+					}
+					
+				}, this);
+
+			}.bind(this), 2000);
+
 
 		}
 
