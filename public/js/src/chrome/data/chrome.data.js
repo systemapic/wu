@@ -167,13 +167,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
 
 		if (this._isOpen) {
+
 			// fire event
 			app.Socket.sendUserEvent({
 				user : app.Account.getFullName(),
 				event : 'opened',
 				description : 'the data library',
 				timestamp : Date.now()
-			})
+			});
 		}
 	},
 
@@ -243,6 +244,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_refresh : function () {
 
 		if (!this._project) return;
+
+		// remove temp files
+		_.each(this._tempFiles, function (tempFile, etc) {
+			console.log('_each', tempFile, etc);
+			Wu.DomUtil.remove(tempFile.datawrap);
+			
+		});
+		this._tempFiles = {};
 
 		// Empty containers
 		if ( this._layersContainer ) this._layersContainer.innerHTML = '';
@@ -390,6 +399,69 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	},
 
+	// create temp file holder in file list while processing
+	_onFileProcessing : function (e) {
+		var file = e.detail.file;
+
+		var unique_id = file.uniqueIdentifier;
+		var filename = file.fileName;
+		var size = parseInt(file.size / 1000 / 1000) + 'MB';
+
+		// add temp file holder
+		var datawrap = Wu.DomUtil.create('div', 'data-list-line processing');
+		var title = Wu.DomUtil.create('div', 'file-name-content processing', datawrap, filename);
+		var feedback = Wu.DomUtil.create('div', 'file-feedback processing', datawrap);
+		var percent = Wu.DomUtil.create('div', 'file-feedback-percent processing', datawrap);
+
+		// remember
+		this._tempFiles = this._tempFiles || {}
+		this._tempFiles[unique_id] = {
+			feedback : feedback,
+			percent : percent,
+			file : file,
+			datawrap : datawrap
+		}
+
+		// get file list
+		var file_list = this.fileListContainers.postgis.wrapper;
+
+		// prepend
+		file_list.insertBefore(datawrap, file_list.firstChild);
+	},
+
+	_onProcessingProgress : function (e) {
+
+		var data = e.detail;
+		var percent = data.percent;
+		var text = data.text;
+		var uniqueIdentifier = data.uniqueIdentifier;
+
+		// get temp file divs
+		var tempfile = this._tempFiles[uniqueIdentifier];
+
+		// set feedback
+		tempfile.feedback.innerHTML = text;
+		tempfile.percent.innerHTML = percent + '% done';
+
+	},
+
+	_onProcessingError : function (e) {
+
+		var error = e.detail;
+		var uniqueIdentifier = error.uniqueIdentifier;
+
+		// get temp file divs
+		var tempfile = this._tempFiles[uniqueIdentifier];
+
+		// set feedback
+		tempfile.feedback.innerHTML = error.description;
+		tempfile.percent.innerHTML = 'Upload failed';
+		tempfile.datawrap.style.background = '#F13151';
+		
+		// close on click
+		Wu.DomEvent.on(tempfile.datawrap, 'click', this._refresh, this);
+
+	},
 
 
 

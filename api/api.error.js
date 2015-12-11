@@ -51,15 +51,14 @@ module.exports = api.error = {
 		api.error.log('unauthorized');
 	},
 
-	missingInformation : function (req, res, missing) {
+	missingInformation : function (req, res) {
 		console.log('api.error.missingInformation'.red);
 		
-		var message = 'Missing information. Stay with the program!';
-		if (missing) message += '(' + missing + ')';
+		var message = 'Missing information. Check out https://docs.systemapic.com/ for details on the API.';
 
-		res.end(JSON.stringify({ 
+		res.json({ 
 			error : message 
-		}));
+		});
 		
 		api.error.log(message);
 	},

@@ -37,7 +37,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		var clientLogo = app.options.logos.clientLogo.image;
 		if (clientLogo) {
 			this._clientLogo = Wu.DomUtil.create('div', 'chrome-button chrome-client-logo', this._buttonWrapper);
-			this._clientLogo.style.backgroundImage = 'url(' + app.options.servers.portal + clientLogo + ')';
+			// this._clientLogo.style.backgroundImage = 'url(' + app.options.servers.portal + clientLogo + ')';
+			this._clientLogo.style.backgroundImage = clientLogo;
 			this._clientLogo.style.backgroundSize = app.options.logos.clientLogo.size;
 			this._clientLogo.style.backgroundPosition = app.options.logos.clientLogo.position;
 			this._clientLogo.style.backgroundColor = app.options.logos.clientLogo.backgroundColor;
@@ -121,16 +122,12 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	initCPUclock : function (wrapper) {	
 
-		// Check if superadmin
-		var isSuperAdmin = app.Access.is.superAdmin();
-		if (!isSuperAdmin) return;
-
-		var CPUwrapper = Wu.DomUtil.create('div', 'cpu-wrapper', wrapper);
+		this._CPUwrapper = Wu.DomUtil.create('div', 'cpu-wrapper', wrapper);
 
 		this._CPUbars = [];
 
 		for (var i = 0; i < 10; i++ ) {
-			this._CPUbars[i] = Wu.DomUtil.create('div', 'cpu-bar', CPUwrapper);
+			this._CPUbars[i] = Wu.DomUtil.create('div', 'cpu-bar', this._CPUwrapper);
 		}
 
 	},
@@ -138,9 +135,15 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 
 	updateCPUclock : function (percent) {
 
-		// Return if not super admin...
-		var isSuperAdmin = app.Access.is.superAdmin();
-		if ( !isSuperAdmin ) return;		
+
+		// hide if not editor
+		var project = app.activeProject;
+		if (!project || !project.isEditable()) {
+			this._CPUwrapper.style.display = 'none';
+		} else {
+			this._CPUwrapper.style.display = 'block';
+		}
+
 
 		// Get value as numbers
 		var pp = parseInt(percent);

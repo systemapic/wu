@@ -28,9 +28,6 @@ Wu.Data = Wu.Class.extend({
 		// append to container
 		this._buttonContainer.appendChild(button);
 
-		// set event
-		// Wu.DomEvent.on(button, 'click', this._onUploadButtonClick, this);	
-
 		// add button to resumable
 		this._resumable.assignBrowse(button);	
 
@@ -52,14 +49,15 @@ Wu.Data = Wu.Class.extend({
 	},
 
 	_onUploadDone : function () {
+		console.log('uploadDOne');
 	},
 
 	_setFeedbackImportTime : function (import_time_ms) {
 		var import_took_pretty = (parseInt(import_time_ms / 1000)) + ' seconds';
 		var description = 'Import took ' + import_took_pretty;
 		app.feedback.setMessage({
-			title : 'Import successful',
-			description : description
+			title : 'Data imported successfully',
+			// description : description
 		});
 	},
 
@@ -86,7 +84,7 @@ Wu.Data = Wu.Class.extend({
 
 	_gotFile : function (fileObject) {
 
-		console.log('_gotFile', fileObject);
+		console.log('Imported file:', fileObject);
 
 		var fileStore = fileObject.file;
 		var layer = fileObject.layer;

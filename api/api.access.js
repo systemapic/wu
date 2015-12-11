@@ -893,6 +893,7 @@ module.exports = api.access = {
 		},
 
 		createdBy : function (user, account) {
+			if (!user) return false;
 			return user.createdBy == account.getUuid();
 		},
 	},

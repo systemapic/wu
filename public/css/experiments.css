@@ -505,10 +505,10 @@ body {
 
 /*fly-to icon*/
 .fly-to {
-    font-size: 18px;
+    font-size: 13px;
     position: absolute;
-    right: 6px;
-    top: 5px;
+    right: 8px;
+    top: 7px;
     color: #777;
 }
 .layer-menu-flyto { 
@@ -946,4 +946,29 @@ body {
     position: relative;
     right: -34px;
     transition: opacity 100ms linear;
+}
+
+.share-dropdown {
+    padding-bottom: 0px;
+}
+.share-item-processing {
+    padding-bottom: 10px;
+    border-radius: 0 0 4px 4px;
+}
+.invite-feedback-active {
+    background: #3C4759;
+    color: #FCFCFC;
+    font-size: 12px;
+    padding: 5px;
+    padding-left: 10px;
+}
+.invite-feedback-active a {
+    color: white;
+    font-weight: 600;
+}
+
+.account-dropdown {
+    width: 200px;
+    border-radius: 0 0 4px 4px;
+    padding-bottom: 10px;
 }

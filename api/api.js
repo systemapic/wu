@@ -26,6 +26,7 @@ module.exports.slack 	= require('./api.slack');
 module.exports.debug 	= require('./api.debug');
 module.exports.utils 	= require('./api.utils');
 module.exports.upload 	= require('./api.upload');
+module.exports.import 	= require('./api.import');
 module.exports.legend 	= require('./api.legend');
 module.exports.pixels 	= require('./api.pixels');
 module.exports.portal 	= require('./api.portal');
