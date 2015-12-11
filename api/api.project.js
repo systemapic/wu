@@ -52,8 +52,6 @@ module.exports = api.project = {
 		var projectAccess = options.access;
 		var projectUuid = options.project;
 
-		console.log('api.project.setAccess', options);
-
 		if (!projectUuid || !projectAccess) return api.error.missingInformation(req, res);
 
 		Project
@@ -62,8 +60,6 @@ module.exports = api.project = {
 
 			// check if access to edit
 			var canEdit = _.contains(project.access.edit, user.getUuid()) || (project.createdBy == user.getUuid() || user.isSuper());
-
-			console.log('canEdit: ', canEdit);
 
 			if (!canEdit) return api.error.general(req, res, 'No access.');
 
@@ -109,9 +105,6 @@ module.exports = api.project = {
 		var access = options.access;
 		var projectUuid = options.project;
 
-		console.log('addInvites: ', access, projectUuid);
-
-
 		Project
 		.findOne({uuid : projectUuid})
 		.exec(function (err, project) {
@@ -119,19 +112,14 @@ module.exports = api.project = {
 				error : err || 'No such project.'
 			});
 
-			console.log('found project.access: ', project.access);
-
 
 			access.read.forEach(function (u) {
 
 				// add read (if not in edit)
 				if (!_.contains(project.access.edit, u)) {
 
-					console.log('invited user is not editor, adding as reader');
-
 					project.access.read.addToSet(u);
 				} else {
-					console.log('invited is EDITOR :', project.access);
 				}
 
 			});
@@ -141,8 +129,6 @@ module.exports = api.project = {
 				if (err) return res.json({
 					error : err
 				});
-
-				console.log('saved project access: ', updatedProject.access);
 
 				// return updated access
 				res.json(updatedProject.access);
@@ -161,8 +147,9 @@ module.exports = api.project = {
 		    user = req.user,
 		    ops = [];
 
+
 		// return if missing info
-		if (!store) return api.error.missingInformation(req, res);
+		if (!store || !store.access || !store.name || !store.access.options) return api.error.missingInformation(req, res);
 
 		var isPublic = store.access.options.isPublic;
 
@@ -620,11 +607,7 @@ module.exports = api.project = {
 
 		var hashedUser = crypto.createHash('sha256').update(user.getUuid()).digest("hex");
 
-		console.log('hashedUser', hashedUser);
-
 		var hashedUser = user.getUuid(); // todo: hash user ids
-
-		console.log('user: ', user);
 
 		// if phantomjs bot
 		if (user.isBot() || user.isSuper()) {
@@ -651,26 +634,6 @@ module.exports = api.project = {
 		.exec(done);
 	},
 
-
-
-
-	// getAll : function (options, done) {
-	// 	if (!options) return done('No options.');
-
-	// 	var user = options.user;
-
-	// 	// check if admin
-	// 	api.access.is.admin({
-	// 		user : user
-	// 	}, function (err, isAdmin) {
-
-	// 		// not admin, get all users manually
-	// 		if (err || !isAdmin) return api.project._getAllFiltered(options, done);
-			
-	// 		// is admin, get all
-	// 		api.project._getAll(done);
-	// 	});
-	// },
 
 	_getAll : function (done) {
 		Project

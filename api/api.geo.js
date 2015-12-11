@@ -100,10 +100,11 @@ module.exports = api.geo = {
 	_createPointCarto : function (options, style) {
 
 		var allowOverlap = 'true';
-		var markerClip  = 'false';
-		var compOp      = 'screen'
+		var markerClip = 'false';
+		var compOp = options.style.point.blend ? options.style.point.blend.mode || 'screen' : 'screen';
 
-		// CREATE DEFAULT STYLING
+
+		// global style
 		style.layer += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
 		style.layer += '\tmarker-clip: ' + markerClip + ';\n';
 		style.layer += '\tmarker-comp-op: ' + compOp + ';\n\n';
@@ -133,6 +134,16 @@ module.exports = api.geo = {
 	},
 
 	_createPolygonCarto : function (options, style) {
+
+		// check if comp-op active
+		var compOp = false;
+		if (options.style.polygon.blend && options.style.polygon.blend.mode) {
+			compOp = options.style.polygon.blend.mode;
+		}
+
+		// global styling
+		if (compOp) style.layer += '\tpolygon-comp-op: ' + compOp + ';\n\n';
+
 
 		// opacity
 		var polygonOpacityCarto = this.buildCarto_polygonOpacity(options);
@@ -1305,6 +1316,8 @@ module.exports = api.geo = {
 		var fileUuid = options.fileUuid || options.file_id,
 		    inFile = options.path || options.files[0],
 		    name = fileUuid,
+		    user_id = options.user_id,
+		    uniqueIdentifier = options.uniqueIdentifier,
 		    outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
 		    ops = [];
 
@@ -1324,6 +1337,17 @@ module.exports = api.geo = {
 
 		// validation
 		ops.push(function (callback) {
+
+			// ping progress
+			api.socket.processingProgress({
+				user_id : user_id,
+				progress : {
+					text : 'Opening file...',
+					error : null,
+					percent : 20,
+					uniqueIdentifier : uniqueIdentifier,
+				}
+			});
 
 			var dataset = gdal.open(inFile);
 
@@ -1346,6 +1370,18 @@ module.exports = api.geo = {
 
 		// get file size
 		ops.push(function (dataset, callback) {
+
+			// ping progress
+			api.socket.processingProgress({
+				user_id : user_id,
+				progress : {
+					text : 'Getting metadata...',
+					error : null,
+					percent : 25,
+					uniqueIdentifier : uniqueIdentifier,
+				}
+			});
+
 			fs.stat(inFile, function (err, stats) {
 				options.fileSize = stats.size;
 				callback(null, dataset);
@@ -1355,9 +1391,22 @@ module.exports = api.geo = {
 
 		// get meta 
 		ops.push(function (dataset, callback) {
+
+
 			
 			// get projection
 			var s_srs = dataset.srs ? dataset.srs.toProj4() : 'null';
+
+			// ping progress
+			api.socket.processingProgress({
+				user_id : user_id,
+				progress : {
+					text : 'Got projection ' + s_srs,
+					error : null,
+					percent : 30,
+					uniqueIdentifier : uniqueIdentifier,
+				}
+			});
 
 			// get extent
 			var extent = api.geo._getRasterExtent(dataset);
@@ -1455,14 +1504,25 @@ module.exports = api.geo = {
 
 		ops.push(function (meta, callback) {
 			// set upload status
-				api.upload.updateStatus(fileUuid, {
-					metadata : meta
-				}, function (err) {
-					callback(null, meta);
-				});
+			api.upload.updateStatus(fileUuid, {
+				metadata : meta
+			}, function (err) {
+				callback(null, meta);
+			});
 		})
 
 		ops.push(function (meta, callback) {
+
+			// ping progress
+			api.socket.processingProgress({
+				user_id : user_id,
+				progress : {
+					text : 'Creating tiles...',
+					error : null,
+					percent : 40,
+					uniqueIdentifier : uniqueIdentifier,
+				}
+			});
 			
 			var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -a 0,0,0 -p mercator --no-kml "' + inFile + '" "' + outFolder + '"';
 			// var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=1 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
@@ -1478,6 +1538,18 @@ module.exports = api.geo = {
 					var errMsg = 'There was an error generating tiles for this raster image. Please check #error-log for more information.'
 					return callback(errMsg);
 				}
+
+
+				// ping progress
+				api.socket.processingProgress({
+					user_id : user_id,
+					progress : {
+						text : 'Almost done...',
+						error : null,
+						percent : 90,
+						uniqueIdentifier : uniqueIdentifier,
+					}
+				});
 
 				// return as db entry
 				var db = {

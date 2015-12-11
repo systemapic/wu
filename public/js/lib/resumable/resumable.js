@@ -583,11 +583,11 @@
 					$.tested = true;
 					var status = $.status();
 					if(status=='success') {
-						console.log('GOT CHUNK!');
+						console.log('Chunk already uploaded.');
 						$.callback(status, $.message());
 						$.resumableObj.uploadNextChunk();
 					} else {
-						console.log('NO CHUNK!');	
+						console.log('Uploading chunk.');	
 						$.send();
 					}
 				};
@@ -876,6 +876,15 @@
 				} else {
 					input.removeAttribute('webkitdirectory');
 				}
+
+				// only accept designated fileTypes (systemapic hack)
+				var filetypes = $.getOpt('fileType');
+				var acceptFiles = [];
+				filetypes.forEach(function (f) {
+					acceptFiles.push('.' + f);
+				});
+				input.setAttribute('accept', acceptFiles.join(','));
+
 				// When new files are added, simply append them to the overall list
 				input.addEventListener('change', function(e){
 					appendFilesFromFileList(e.target.files,e);

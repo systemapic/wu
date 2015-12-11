@@ -1017,6 +1017,7 @@ Wu.can = Wu.Util.can;
 Wu.setStyle = Wu.Util.setStyle;
 Wu.getStyle = Wu.Util.getStyle;
 Wu.verify = Wu.Util.verifyResponse;
+Wu.getJSON = Wu.Util._getJSON;
 
 
 // Wu.CustomEvents = {
