@@ -25,12 +25,11 @@ PGUSERNAME=docker
 PGHOST=postgis
 
 # encoding // todo!
-ENCODING="-W 'LATIN1"
+# ENCODING="-W 'LATIN1"
 ENCODING=""
 
 echo "Importing shapefile, srid: $SRID"
 
-# import shapefile
 
-# shp2pgsql -D -s $4 $ENCODING -I "$1" $2 | PGPASSWORD=$PGPASSWORD psql --host=$PGHOST --username=$PGUSERNAME $3
-shp2pgsql -D $SRID $ENCODING "$1" $2 | PGPASSWORD=$PGPASSWORD psql -q --host=$PGHOST --username=$PGUSERNAME $3 
+# import shapefile
+shp2pgsql -D $SRID $ENCODING "$1" $2 | PGPASSWORD=$PGPASSWORD psql -q --host=$PGHOST --username=$PGUSERNAME $3

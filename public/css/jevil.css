@@ -94,6 +94,7 @@
 
 .layer-name-content {
     text-indent: 43px;
+    width: 325px;    
     }
 
 .data-list-line .chrome-switch-container {
@@ -310,11 +311,18 @@
 
 /*.chrome.chrome-content.chrome-pane.styler .chrome-color-ball*/
 #color_ball_color {
-    border-radius: 0;
-    width: 34px;
-    height: 21px;
-    top: 7px !important;
-    right: 0;
+    /*border-radius: 0;*/
+    /*width: 34px;*/
+    /*height: 21px;*/
+    /*top: 7px !important;*/
+    /*float: right !important;*/
+    /*right: 0;*/
+
+    top: 17px !important;
+    /*float: right !important;*/
+    position: absolute !important;
+    right: 0 !important;
+    left: auto !important;    
     }
 
 
@@ -357,6 +365,7 @@
     padding: 8px;
     font-weight: bold;
     cursor: default;
+    margin-bottom: 100px;
     }
 
 .marked-changed {
@@ -375,19 +384,21 @@
 
 
 
-
+.chrome-content.settings-button-wrapper {
+    margin-left: 10px;
+    }
 
 .chrome-content.settings-button {
     margin-top: 3px;
-    font-size: 13px;
+    font-size: 14px;
     margin-right: -1px;
     padding-bottom: 3px;
     background: transparent;
     border: 1px solid #ccc;
     color: #3C4759;
     font-weight: 600;
-    padding-right: 14px;
-    padding-left: 14px;
+    padding-right: 15px;
+    padding-left: 15px;
     }
 
 .chrome-content.settings-button:hover {
@@ -425,8 +436,8 @@
     }
 
 .chrome-content.settings-tabs-wrapper {
-    top: 122px;
-    padding-bottom: 127px;
+    top: 90px;
+    padding-bottom: 95px;
     }
 
 .settingsSelector-header {
@@ -436,7 +447,9 @@
     }
 
 
-
+.chrome-middle-section {
+    padding-bottom: 90px;
+}
 
 .chrome-middle-section-outer-scroller {
     width: 410px;
@@ -664,7 +677,7 @@ input.chrome-field-input {
 
 
 .cpu-wrapper {
-    width: 14px;
+    width: 9px;
     }
 
 
@@ -752,7 +765,7 @@ input.chrome-field-input {
 }
 
 .cpu-wrapper {
-    display: none;
+    /*display: none;*/
 }
 
 .chrome-button.layer {
@@ -929,8 +942,11 @@ input.chrome-field-input {
 
 .leaflet-popup-content-wrapper {
     border-radius: 4px;
-    box-shadow: none;    
-}
+    box-shadow: none;
+
+    max-height: 400px;
+    overflow-y: scroll;
+    }
 
 .description-control-content-box {
     border-radius: 0 0 4px 4px;
@@ -1014,3 +1030,191 @@ input.chrome-field-input {
 .no-layers {
     color: #C80000;
 }
+
+
+
+
+
+
+
+
+.c3-header-wrapper {
+    overflow: hidden;
+}
+
+.leflet-container.leaflet-popup.tiny-pop-up {
+    max-width: none;
+}
+
+
+.layer-menu-item {
+    overflow: hidden;
+}
+
+.each-multiple-description.one-layer {
+    /*width: 215px;    */
+    word-break: break-all;    
+    }
+
+
+
+
+.legend-each-container {
+    height: 20px;
+    position: relative;
+}
+
+.legend-each-name {
+    text-indent: 31px;
+    position: relative;
+    top: 1px;
+}
+
+.legend-each-color {
+    opacity: 1;
+    width: 25px;
+    height: 17px;
+    border-radius: 2px;
+    position: absolute;
+    left: 1px;
+    top: 0px;  
+}
+
+
+
+
+.add-target-wrapper {
+    margin-top: 15px;
+    margin-left: 0px;
+    padding-top: 15px;
+    border-top: 1px dashed #eee;
+}
+
+
+
+
+
+/* WIDER WIDER WIDER WIDER */
+/* WIDER WIDER WIDER WIDER */
+/* WIDER WIDER WIDER WIDER */
+
+/* ADDING 41 pixels to the width */
+
+.chrome.chrome-content.chrome-pane {
+    width: 443px;
+}
+
+.chrome-middle-section {
+    width: 443px;
+}
+
+.chrome-middle-section-outer-scroller {
+    width: 451px;
+}
+
+.chrome-middle-section-inner-scroller {
+    width: 458px;
+}
+
+.chrome-field-wrapper {
+    width: 443px;
+}
+
+.chrome-data-outer-scroller {
+    width: 443px;
+}
+
+.chrome-data-scroller {
+    width: 443px;
+}
+
+.layer-name-content {
+    width: 366px;
+}
+
+.data-list-line:hover:after, .data-list-line.editingName:after, .data-list-line.editingFileName:after, .file-selected:after {
+    width: 461px;
+}
+
+.files-container .data-list-line:nth-child(odd):before {
+    width: 443px;
+}
+
+
+
+
+
+
+
+.chrome-color-range {
+    width: 182px;
+    }
+
+.chrome-color-selector-wrapper {
+    width: 200px;
+    }
+
+.rangeball-2 {
+    left: 90px;
+    }
+
+.chrome-mini-dropdown.full-width {
+    width: 182px;
+    }
+
+.chrome-field-mini-input, .chrome-field-mini-input:focus {
+    width: 44px;
+    border-radius: 2px;
+    font-weight: 500;
+    position: absolute !important;
+    top: 8px !important;
+    right: 0;    
+    }
+
+
+.chrome-mini-dropdown {
+    width: 134px;
+    }
+
+.chrome-pane.styler .select-field-wrap {
+    position: relative;
+    right: 48px;
+    }
+
+#field_wrapper_color {
+    border-top: 1px dashed #eee;
+    padding-top: 9px;
+    margin-top: 6px;
+    }    
+
+
+/*.chrome-metafield-line .chrome-field-mini-input   {
+    position: absolute;
+    right: 0;
+    top: 8px;    
+    }*/
+
+
+.chrome-pane.styler .chrome-field-mini-input, .chrome-pane.styler .chrome-field-mini-input:focus {
+    
+    }    
+
+.mini-input-dual, .mini-input-dual:focus {
+    width: 89px !important;
+    margin-left: 4px;
+    position: relative !important;
+    }
+
+
+
+
+
+.histogram-wrapper {
+    position: absolute;
+    background: red;
+    padding: 10px;
+    right: 0;
+    bottom: -23px;
+    z-index: 99999;
+    width: 182px;    
+    }

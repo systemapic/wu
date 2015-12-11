@@ -14,6 +14,9 @@ Wu.Styler.Point = Wu.Styler.extend({
 		// pointsize
 		this._createPointsize();
 
+		// blend mode
+		this._createBlendMode();
+
 		// targets
 		this._createTargets();
 
@@ -85,6 +88,8 @@ Wu.Styler.Point = Wu.Styler.extend({
 			minmax    : minMax,
 			tabindex  : [this.tabindex++, this.tabindex++]
 		});
+
+
 
 		// rememeber 
 		this._content[this.type].pointsize.minmax = {

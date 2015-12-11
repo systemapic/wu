@@ -390,6 +390,51 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	},
 
+	// create temp file holder in file list while processing
+	_onFileProcessing : function (e) {
+		var file = e.detail.file;
+
+		var unique_id = file.uniqueIdentifier;
+		var filename = file.fileName;
+		var size = parseInt(file.size / 1000 / 1000) + 'MB';
+
+		// add temp file holder
+		var datawrap = Wu.DomUtil.create('div', 'data-list-line processing');
+		var title = Wu.DomUtil.create('div', 'file-name-content processing', datawrap, filename);
+		var feedback = Wu.DomUtil.create('div', 'file-feedback processing', datawrap);
+		var percent = Wu.DomUtil.create('div', 'file-feedback-percent processing', datawrap);
+
+		// remember
+		this._tempFiles = this._tempFiles || {}
+		this._tempFiles[unique_id] = {
+			feedback : feedback,
+			percent : percent,
+			file : file
+		}
+
+		// get file list
+		var file_list = this.fileListContainers.postgis.fileList;
+
+		// prepend
+		file_list.insertBefore(datawrap, file_list.firstChild);
+	},
+
+	_onProcessingProgress : function (e) {
+
+		var data = e.detail;
+		var error = data.error;
+		var percent = data.percent;
+		var text = data.text;
+		var uniqueIdentifier = data.uniqueIdentifier;
+
+		// get temp file divs
+		var tempfile = this._tempFiles[uniqueIdentifier];
+
+		// set feedback
+		tempfile.feedback.innerHTML = text;
+		tempfile.percent.innerHTML = percent + '% done';
+
+	},
 
 
 

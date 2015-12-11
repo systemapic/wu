@@ -1,10 +1,10 @@
 #!/bin/bash
 
-USERNAME=knutole@systemapic.com
-PASSWORD=***REMOVED***
+
+USERNAME=your_email
+PASSWORD=your_password
 SERVER=maps.globesar.com
 FILEPATH=/home/tsx_huge.tar.gz
-# FILEPATH=/home/tsx_tiny.tar.gz
 
 # get access token
 ACCESS_TOKEN=$(curl -s --header "Authorization: Basic YWJjMTIzOnNzaC1zZWNyZXQ=" --data "grant_type=password&username=$USERNAME&password=$PASSWORD&scope=offline_access" https://$SERVER/oauth/token | jq -r ".access_token")

@@ -11,6 +11,9 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 		// opacity
 		this._createOpacity();
 
+		// blend 
+		// this._createBlendMode();
+
 		// targeted columns
 		this._createTargets();
 
@@ -87,15 +90,27 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 			fn 	 : this._targetColumnSelected.bind(this),
 			array 	 : columns, // columns in dropdown
 			selected : options.column, // preselected item
-			className : 'target-column-dropdown'
+			className : 'target-column-dropdown tiny polygon'
 		});
 
+
+		// < = > input
+		var operator_wrapper = Wu.DomUtil.create('div', 'target-column-wrapper', target_wrapper);
+		var operator_dropdown = new Wu.button({
+			id 	 : 'equals_selection',
+			type 	 : 'clicker',
+			appendTo : operator_wrapper,
+			fn 	 : this._operatorSelected.bind(this),
+			array 	 : ['<', '=', '>'], // columns in dropdown
+			selected : options.operator, // preselected item
+			className : 'target-equals-clicker'
+		});
 
 		
 		// value input
 		var input_wrapper = Wu.DomUtil.create('div', 'target-input-wrapper', target_wrapper);
 		var input_title = Wu.DomUtil.create('div', 'target-input-title', input_wrapper, 'Value');
-		var column_input = Wu.DomUtil.create('input', 'target-input', input_wrapper);
+		var column_input = Wu.DomUtil.create('input', 'target-input polygon', input_wrapper);
 		column_input.value = options.value;
 
 		// blur event
@@ -138,7 +153,8 @@ Wu.Styler.Polygon = Wu.Styler.extend({
 			value : column_input,
 			color : ball,
 			opacity : opacity_input,
-			wrapper : target_wrapper
+			wrapper : target_wrapper,
+			operator : operator_dropdown
 		});
 
 

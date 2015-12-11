@@ -42,6 +42,9 @@ Wu.Styler = Wu.Class.extend({
 			['#00ff00', '#ffff00', '#ff0000'],
 		],
 
+		blendModes : ["color", "color-burn", "color-dodge", "contrast", "darken", "difference", "dst", "dst-atop", "dst-in", "dst-out", "dst-over", "exclusion", "grain-extract", "grain-merge", "hard-light", "hue", "invert", "invert-rgb", "lighten", "minus", "multiply", "overlay", "plus", "saturation", "screen", "soft-light", "src", "src-atop", "src-in", "src-out", "src-over", "value", "xor"],
+
+
 	},
 
 	_content : {},
@@ -184,7 +187,8 @@ Wu.Styler = Wu.Class.extend({
 			appendTo : line.container,
 			fn       : this._updateColor.bind(this),
 			value    : staticVal,
-			colors   : this.options.palettes
+			colors   : this.options.palettes,
+			className: 'target-color-box'
 		});
 
 		// remember items
@@ -261,6 +265,58 @@ Wu.Styler = Wu.Class.extend({
 			range : minMax,
 			staticVal : value
 		};
+	},
+
+	_createBlendMode : function () {
+
+		// Create JSON obj if it's not already there
+		this.carto().blend = this.carto().blend || {};
+
+		var blendmode = this.carto().blend.mode || 'screen';
+
+		// container
+		var line = new Wu.fieldLine({
+			id           : 'blendmode',
+			appendTo     : this._wrapper,
+			title        : '<b>Blend mode</b>',
+			input        : false,
+			childWrapper : 'point-size-children'
+		});
+
+		// blend modes dropdown
+		var dropdown = new Wu.button({
+			id 	 : 'blendmode',
+			type 	 : 'dropdown',
+			right 	 : true,
+			appendTo : line.container,
+			fn 	 : this._blendmodeSelected.bind(this),
+			array 	 : this.options.blendModes,
+			selected : blendmode,
+		});
+
+		// remember items
+		this._content[this.type].blendmode = {
+			line : line,
+			dropdown : dropdown,
+		}
+
+		// save carto
+		this.carto().blend = {
+			mode : blendmode
+		};
+
+
+	},
+
+	_blendmodeSelected : function (e) {
+		var dropdown = e.target;
+		var blendmode = dropdown.options[dropdown.selectedIndex].value;
+
+		// save
+		this.carto().blend.mode = blendmode;
+
+		// mark changed
+		this.markChanged();
 	},
 
 	// point size box
@@ -591,9 +647,6 @@ Wu.Styler = Wu.Class.extend({
 		// Close
 		this._closeColorRangeSelector(); 
 
-		// update
-		// this._updateStyle();	
-
 		// mark changed
 		this.markChanged();
 
@@ -662,7 +715,7 @@ Wu.Styler = Wu.Class.extend({
 		var inputField = this._content[this.type].pointsize.input.input;
 
 		// If less than 0.5, make it 0.5
-		if ( value < 0.5 ) value = 0.5;
+		// if ( value < 0 ) value = 0;
 
 		// Set value in input
 		inputField.value = value;
@@ -1325,7 +1378,8 @@ Wu.Styler = Wu.Class.extend({
 			value : '', 		// targeted column value
 			color : 'red', 		// default color
 			opacity : 1, 		// default opacity
-			width : 5
+			width : 5,
+			operator : '='
 		}
 
 		// set values
@@ -1334,7 +1388,8 @@ Wu.Styler = Wu.Class.extend({
 			value : options.value,
 			color : options.color,
 			opacity : options.opacity,
-			width : options.width
+			width : options.width,
+			operator : options.operator
 		});
 
 		// create column
@@ -1387,9 +1442,6 @@ Wu.Styler = Wu.Class.extend({
 	},
 
 
-
-
-
 	_createTargetColumn : function (e, options) {
 
 		// get columns
@@ -1428,8 +1480,22 @@ Wu.Styler = Wu.Class.extend({
 			fn 	 : this._targetColumnSelected.bind(this),
 			array 	 : columns, // columns in dropdown
 			selected : options.column, // preselected item
-			className : 'target-column-dropdown'
+			className : 'target-column-dropdown tiny'
 		});
+
+
+		// < = > input
+		var operator_wrapper = Wu.DomUtil.create('div', 'target-column-wrapper', target_wrapper);
+		var operator_dropdown = new Wu.button({
+			id 	 : 'equals_selection',
+			type 	 : 'clicker',
+			appendTo : operator_wrapper,
+			fn 	 : this._operatorSelected.bind(this),
+			array 	 : ['<', '=', '>'], // columns in dropdown
+			selected : options.operator, // preselected item
+			className : 'target-equals-clicker'
+		});
+
 
 
 		
@@ -1489,7 +1555,8 @@ Wu.Styler = Wu.Class.extend({
 			color : ball,
 			opacity : opacity_input,
 			width : width_input,
-			wrapper : target_wrapper
+			wrapper : target_wrapper,
+			operator : operator_dropdown
 		});
 
 
@@ -1500,6 +1567,22 @@ Wu.Styler = Wu.Class.extend({
 
 	},
 
+
+	_operatorSelected : function (e, value) {
+
+		// get target index
+		var target = e.target;
+		var targets = this._content[this.type].targets.selectors;
+		var i = _.findIndex(targets, function (t) {
+			return t.operator._button == e.target;
+		});
+
+		// set carto
+		this.carto().targets[i].operator = value;
+
+		// mark changed
+		this.markChanged();
+	},
 
 
 });
