@@ -28,7 +28,7 @@ PGHOST=postgis
 # ENCODING="-W 'LATIN1"
 ENCODING=""
 
-echo "Imoprting shapefile, srid: $SRID"
+echo "Importing shapefile, srid: $SRID"
 
 
 # import shapefile

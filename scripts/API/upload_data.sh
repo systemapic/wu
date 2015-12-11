@@ -1,8 +1,9 @@
 #!/bin/bash
 
+
 USERNAME=your_email
 PASSWORD=your_password
-# SERVER=maps.globesar.com
+SERVER=maps.globesar.com
 FILEPATH=/home/tsx_huge.tar.gz
 
 # get access token

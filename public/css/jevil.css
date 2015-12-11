@@ -902,6 +902,7 @@ input.chrome-field-input {
     height: 30px !important;
 
     background: url('images/search-icon.png') no-repeat 4px -19px !important;
+        background-color: #FCFCFC !important;
     }
 
 .leaflet-control-search .search-button:hover {
