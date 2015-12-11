@@ -58,8 +58,8 @@ Wu.Data = Wu.Class.extend({
 		var import_took_pretty = (parseInt(import_time_ms / 1000)) + ' seconds';
 		var description = 'Import took ' + import_took_pretty;
 		app.feedback.setMessage({
-			title : 'Upload successful!',
-			description : description
+			title : 'Data imported successfully',
+			// description : description
 		});
 	},
 
