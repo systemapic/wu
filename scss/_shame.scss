@@ -316,8 +316,9 @@ aka feedback pane
 	}
 
 .feedback-pane-content.error {
-	background: rgba(255, 0, 0, 0.81);
-	color: rgba(255, 255, 255, 0.94);
+	background: rgba(241, 49, 81, 0.85);
+	color: rgb(252, 252, 252);
+	border-radius: 6px;
 	}
 
 .feedback-pane-content.success {

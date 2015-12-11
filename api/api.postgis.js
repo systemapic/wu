@@ -1137,12 +1137,11 @@ module.exports = api.postgis = {
 
 
 		async.waterfall(ops, function (err, results) {
-
 			console.log('priming waterfall', err, results);
 
-			console.log('err messssss', err.message);
 			var errMsg = err && err.message ? err.message : null;
-			
+
+			console.log('errMs', errMsg);
 			done(errMsg);
 		});
 

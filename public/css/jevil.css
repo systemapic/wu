@@ -511,6 +511,8 @@ input.chrome-field-input {
     background: #F9F9F9;
     color: #3F4652;
     border: 1px solid gainsboro;
+    padding-top: 8px;
+    padding-bottom: 8px;
 }
 .chrome-upload-button:active {
     background: #79E0C0;

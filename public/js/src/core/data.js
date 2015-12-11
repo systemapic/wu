@@ -28,9 +28,6 @@ Wu.Data = Wu.Class.extend({
 		// append to container
 		this._buttonContainer.appendChild(button);
 
-		// set event
-		// Wu.DomEvent.on(button, 'click', this._onUploadButtonClick, this);	
-
 		// add button to resumable
 		this._resumable.assignBrowse(button);	
 
@@ -52,6 +49,7 @@ Wu.Data = Wu.Class.extend({
 	},
 
 	_onUploadDone : function () {
+		console.log('uploadDOne');
 	},
 
 	_setFeedbackImportTime : function (import_time_ms) {

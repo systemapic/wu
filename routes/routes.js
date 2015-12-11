@@ -152,7 +152,7 @@ module.exports = function(app, passport) {
 	// IMPORT DATA to POSTGIS ==============
 	// =====================================
 	app.post('/api/import', passport.authenticate('bearer', {session: false}), function (req, res) {
-		api.upload.import(req, res);
+		api.upload.upload(req, res);
 	});
 
 	// =====================================
