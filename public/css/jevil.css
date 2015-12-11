@@ -993,7 +993,7 @@ input.chrome-field-input {
     z-index: 999999999999999999;
     top: 0px;
     left: 40px;
-    min-width: 350px;
+    min-width: 250px;
     text-align: left;
     }
 
