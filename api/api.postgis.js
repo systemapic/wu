@@ -499,6 +499,8 @@ module.exports = api.postgis = {
 		    prjfile 	= api.geo.getTheProjection(files)[0],
 		    file_id 	= options.file_id,
 		    pg_db 	= options.user.postgis_database,
+		    user_id 	= options.user_id,
+		    uniqueIdentifier = options.uniqueIdentifier,
 		    ops 	= [];
 
 
@@ -536,14 +538,25 @@ module.exports = api.postgis = {
 
 			console.log('import shaepfile cmd: ', cmd);
 
+			// ping progress
+			api.socket.processingProgress({
+				user_id : user_id,
+				progress : {
+					text : 'Importing...',
+					error : null,
+					percent : 30,
+					uniqueIdentifier : uniqueIdentifier,
+				}
+			});
+
 			// import to postgis
 			var startTime = new Date().getTime();
-			exec(cmd, {maxBuffer: 1024 * 1024 * 50000}, function (err, stdin, stdout) {
-				console.log('err?', err);
 
-				if (err) {
-					console.log('import_shapefile_script err: ', err);
-				}
+			exec(cmd, {maxBuffer: 1024 * 1024 * 50000}, function () {
+				// console.log('srr, std', err, stdout);
+				// if (err) {
+				// 	console.log('import_shapefile_script err: ', err, stdout);
+				// }
 
 				var endTime = new Date().getTime();
 
@@ -553,7 +566,7 @@ module.exports = api.postgis = {
 					import_took_ms : endTime - startTime,
 					table_name : file_id,
 					database_name : pg_db
-				}, function () {
+				}, function (err) {
 					callback(err, 'Shapefile imported successfully.');
 				});
 			});
@@ -561,6 +574,18 @@ module.exports = api.postgis = {
 
 		// prime geometries in new table
 		ops.push(function (success, callback) {
+
+			// ping progress
+			api.socket.processingProgress({
+				user_id : user_id,
+				progress : {
+					text : 'Creating geometries...',
+					error : null,
+					percent : 60,
+					uniqueIdentifier : uniqueIdentifier,
+				}
+			});
+
 			api.postgis._primeTableWithGeometries({
 				file_id : file_id,
 				postgis_db : pg_db,
@@ -569,6 +594,17 @@ module.exports = api.postgis = {
 
 		// get metadata
 		ops.push(function (callback) {
+
+			// ping progress
+			api.socket.processingProgress({
+				user_id : user_id,
+				progress : {
+					text : 'Getting metadata...',
+					error : null,
+					percent : 70,
+					uniqueIdentifier : uniqueIdentifier,
+				}
+			});
 
 			api.postgis._getMetadata({
 				file_id : file_id,
@@ -589,6 +625,17 @@ module.exports = api.postgis = {
 		
 		// count rows for upload status
 		ops.push(function (callback) {
+
+			// ping progress
+			api.socket.processingProgress({
+				user_id : user_id,
+				progress : {
+					text : 'Almost done...',
+					error : null,
+					percent : 90,
+					uniqueIdentifier : uniqueIdentifier,
+				}
+			});
 			
 			api.postgis.query({
 				postgis_db : pg_db,

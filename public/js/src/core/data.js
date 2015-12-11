@@ -58,7 +58,7 @@ Wu.Data = Wu.Class.extend({
 		var import_took_pretty = (parseInt(import_time_ms / 1000)) + ' seconds';
 		var description = 'Import took ' + import_took_pretty;
 		app.feedback.setMessage({
-			title : 'Import successful',
+			title : 'Upload successful!',
 			description : description
 		});
 	},
@@ -86,7 +86,7 @@ Wu.Data = Wu.Class.extend({
 
 	_gotFile : function (fileObject) {
 
-		console.log('_gotFile', fileObject);
+		console.log('Imported file:', fileObject);
 
 		var fileStore = fileObject.file;
 		var layer = fileObject.layer;

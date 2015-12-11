@@ -100,10 +100,11 @@ module.exports = api.geo = {
 	_createPointCarto : function (options, style) {
 
 		var allowOverlap = 'true';
-		var markerClip  = 'false';
-		var compOp      = 'screen'
+		var markerClip = 'false';
+		var compOp = options.style.point.blend ? options.style.point.blend.mode || 'screen' : 'screen';
 
-		// CREATE DEFAULT STYLING
+
+		// global style
 		style.layer += '\tmarker-allow-overlap: ' + allowOverlap + ';\n';
 		style.layer += '\tmarker-clip: ' + markerClip + ';\n';
 		style.layer += '\tmarker-comp-op: ' + compOp + ';\n\n';
@@ -133,6 +134,16 @@ module.exports = api.geo = {
 	},
 
 	_createPolygonCarto : function (options, style) {
+
+		// check if comp-op active
+		var compOp = false;
+		if (options.style.polygon.blend && options.style.polygon.blend.mode) {
+			compOp = options.style.polygon.blend.mode;
+		}
+
+		// global styling
+		if (compOp) style.layer += '\tpolygon-comp-op: ' + compOp + ';\n\n';
+
 
 		// opacity
 		var polygonOpacityCarto = this.buildCarto_polygonOpacity(options);
@@ -229,10 +240,11 @@ module.exports = api.geo = {
 			var column = t.column;
 			var value = parseFloat(t.value) || '"' + t.value + '"'; // todo; int/float/string type must match postgis 
 			var color = t.color;
-			var opacity = t.opacity;
+			var opacity = parseFloat(t.opacity);
+			var operator = t.operator || '=';
 
 			if (column) {
-				var string = '\n    [' + column + ' = ' + value + '] {';
+				var string = '\n    [' + column + ' ' + operator + ' ' + value + '] {';
 				string += '\n        polygon-fill: ' + color + ';';
 				string += '\n        polygon-opacity: ' + opacity + ';';
 				string += '\n    }\n';
@@ -262,9 +274,10 @@ module.exports = api.geo = {
 			var color = t.color;
 			var opacity = parseFloat(t.opacity);
 			var width = parseFloat(t.width) || 10;
+			var operator = t.operator || '=';
 
 			if (column) {
-				var string = '\n    [' + column + ' = ' + value + '] {';
+				var string = '\n    [' + column + ' ' + operator + ' ' + value + '] {';
 				string += '\n        marker-fill: ' + color + ';';
 				string += '\n        marker-opacity: ' + opacity + ';';
 				string += '\n        marker-width: ' + width + ';';
@@ -299,9 +312,11 @@ module.exports = api.geo = {
 			var color = t.color;
 			var opacity = parseFloat(t.opacity);
 			var width = parseFloat(t.width) || 10;
+			var operator = t.operator || '=';
+
 
 			if (column) {
-				var string = '\n    [' + column + ' = ' + value + '] {';
+				var string = '\n    [' + column + ' ' + operator + ' ' + value + '] {';
 				string += '\n        line-color: ' + color + ';';
 				string += '\n        line-opacity: ' + opacity + ';';
 				string += '\n        line-width: ' + width + ';';
@@ -443,49 +458,83 @@ module.exports = api.geo = {
 
 			var minMax = color.range;// ? color.customMinMax : color.minMax;
 
+			// color range experiment
+			var color_range = [];
+			var colorLerp = require('color-lerp');
+
 			// Get color values
-			var c1 = color.value[0];
-			var c9 = color.value[1];
-			var c17 = color.value[2];
-			var c25 = color.value[3];
-			var c33 = color.value[4];
+			var color1 = color.value[0];
+			var color2 = color.value[1];
+			var color3 = color.value[2];
+			var color4 = color.value[3];
+			var color5 = color.value[4];
 
-			// Interpolate
-			var c5 = this.hexAverage([c1, c9]);
-			var c13 = this.hexAverage([c9, c17]);
-			var c21 = this.hexAverage([c17, c25]);
-			var c29 = this.hexAverage([c25, c33]);
+			// get three, four colors in between each 5-color => 12
+			var triad12 = colorLerp(color1, color2, 4, 'rgb');
+			var triad23 = colorLerp(color2, color3, 4, 'rgb');
+			var triad34 = colorLerp(color3, color4, 4, 'rgb');
+			var triad45 = colorLerp(color4, color5, 4, 'rgb');
 
-			// Interpolate
-			var c3 = this.hexAverage([c1, c5]);
-			var c7 = this.hexAverage([c5, c9]);
-			var c11 = this.hexAverage([c9, c13]);
-			var c15 = this.hexAverage([c13, c17]);
-			var c19 = this.hexAverage([c17, c21]);
-			var c23 = this.hexAverage([c21, c25]);
-			var c27 = this.hexAverage([c25, c29]);
-			var c31 = this.hexAverage([c29, c33]);
+			// concat
+			color_range.push(triad12);
+			color_range.push(triad23);
+			color_range.push(triad34);
+			color_range.push(triad45);
 
-			// Interpolate
-			var c2 = this.hexAverage([c1, c3]);
-			var c4 = this.hexAverage([c3, c5]);
-			var c6 = this.hexAverage([c5, c7]);
-			var c8 = this.hexAverage([c7, c9]);
-			var c10 = this.hexAverage([c9, c11]);
-			var c12 = this.hexAverage([c11, c13]);
-			var c14 = this.hexAverage([c13, c15]);
-			var c16 = this.hexAverage([c15, c17]);
-			var c18 = this.hexAverage([c17, c19]);
-			var c20 = this.hexAverage([c19, c21]);
-			var c22 = this.hexAverage([c21, c23]);
-			var c24 = this.hexAverage([c23, c25]);
-			var c26 = this.hexAverage([c25, c27]);
-			var c28 = this.hexAverage([c27, c29]);
-			var c30 = this.hexAverage([c29, c31]);
-			var c32 = this.hexAverage([c31, c33]);
+			// flatten
+			color_range = _.flatten(color_range);
 
-			var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33];
+			// remove duplicates
+			color_range = _.unique(color_range);
 
+
+
+			// // Get color values
+			// var c1 = color.value[0];
+			// var c9 = color.value[1];
+			// var c17 = color.value[2];
+			// var c25 = color.value[3];
+			// var c33 = color.value[4];
+
+			// // Interpolate
+			// var c5 = this.hexAverage([c1, c9]);
+			// var c13 = this.hexAverage([c9, c17]);
+			// var c21 = this.hexAverage([c17, c25]);
+			// var c29 = this.hexAverage([c25, c33]);
+
+			// // Interpolate
+			// var c3 = this.hexAverage([c1, c5]);
+			// var c7 = this.hexAverage([c5, c9]);
+			// var c11 = this.hexAverage([c9, c13]);
+			// var c15 = this.hexAverage([c13, c17]);
+			// var c19 = this.hexAverage([c17, c21]);
+			// var c23 = this.hexAverage([c21, c25]);
+			// var c27 = this.hexAverage([c25, c29]);
+			// var c31 = this.hexAverage([c29, c33]);
+
+			// // Interpolate
+			// var c2 = this.hexAverage([c1, c3]);
+			// var c4 = this.hexAverage([c3, c5]);
+			// var c6 = this.hexAverage([c5, c7]);
+			// var c8 = this.hexAverage([c7, c9]);
+			// var c10 = this.hexAverage([c9, c11]);
+			// var c12 = this.hexAverage([c11, c13]);
+			// var c14 = this.hexAverage([c13, c15]);
+			// var c16 = this.hexAverage([c15, c17]);
+			// var c18 = this.hexAverage([c17, c19]);
+			// var c20 = this.hexAverage([c19, c21]);
+			// var c22 = this.hexAverage([c21, c23]);
+			// var c24 = this.hexAverage([c23, c25]);
+			// var c26 = this.hexAverage([c25, c27]);
+			// var c28 = this.hexAverage([c27, c29]);
+			// var c30 = this.hexAverage([c29, c31]);
+			// var c32 = this.hexAverage([c31, c33]);
+
+			// // set color array
+			// var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33];
+
+			// override with new color_range
+			var colorArray = color_range;
 
 
 			// CREATE VARS
@@ -504,7 +553,7 @@ module.exports = api.geo = {
 			// COLORS VALUES
 			colorArray.forEach(function(c, i) {	
 				cartObj.headers += fieldName + '_color_' + (i+1) + ': ' + c + ';\n';
-			})
+			});
 
 			cartObj.headers += '\n';
 			
@@ -513,7 +562,7 @@ module.exports = api.geo = {
 			
 			colorArray.forEach(function(c, i) {	
 				cartObj.headers += fieldName + '_step_' + (i+1) + ': (' + minField + ' + ' + fieldName + '_delta * ' + i + ');\n';
-			})
+			});
 
 
 			cartObj.headers += '\n';
@@ -538,7 +587,7 @@ module.exports = api.geo = {
 
 				if ( no > 1 && no < colorArray.length ) {
 
-					cartObj.style += '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + ']';
+					cartObj.style += '\t[' + fieldName + ' >= ' + fieldName + '_step_' + no + ']';
 					cartObj.style += '[' + fieldName + ' < ' + fieldName + '_step_' + (no+1) + ']';
 					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n';
 
@@ -546,7 +595,7 @@ module.exports = api.geo = {
 
 				if ( no == colorArray.length ) {
 
-					cartObj.style +=  '\t[' + fieldName + ' > ' + fieldName + '_step_' + no + '] ';
+					cartObj.style +=  '\t[' + fieldName + ' >= ' + fieldName + '_step_' + no + '] ';
 					cartObj.style += '{ marker-fill: ' + fieldName + '_color_' + no + '; }\n\n';
 				}
 			})
@@ -869,6 +918,7 @@ module.exports = api.geo = {
 		}
 
 
+		cartObj.headers += '[zoom<10] { marker-width: 0.2 * @marker_size_factor; }\n';
 		cartObj.headers += '[zoom=10] { marker-width: 0.3 * @marker_size_factor; }\n';
 		cartObj.headers += '[zoom=11] { marker-width: 0.5 * @marker_size_factor; }\n';
 		cartObj.headers += '[zoom=12] { marker-width: 1   * @marker_size_factor; }\n';
@@ -1454,242 +1504,10 @@ module.exports = api.geo = {
 				callback(null, db);
 			});
 
-				// var key = results[1];
-				// if (!key) return callback('No key.');
-
-				// var path = key.path;
-				// var name = key.name;
-				// var fileUuid = key.fileUuid;
-
-				// // add geojson file to list
-				// shapefiles.push(name);
-
-				// return as db entry
-				// var db = {
-				// 	files : shapefiles,
-				// 	data : {
-				// 		geojson : name
-				// 	},
-				// 	title : name,
-				// 	file : fileUuid
-				// }
-
-				// return as db entry
-				// var db = {
-				// 	data : {
-				// 		raster : options.name
-				// 	},
-				// 	title : options.name,
-				// 	file : fileUuid,
-				// 	metadata : JSON.stringify(meta)
-				// }
-				// api.geo.copyToVileRasterFolder(options.path, fileUuid, function (err) {
-				// 	if (err) return callback('copytToVile err: ' + err);
-
-				// 	callback(null, db);
-				// });
 		});
 
 		async.waterfall(ops, done);
 	},
-
-
-	// handleJPEG2000 : function (options, done) {
-	// 	return api.geo.handleRaster(options, done);
-
-
-	// },
-
-	// handleRaster : function (options, done) {
-
-	// 	var fileUuid = options.fileUuid,
-	// 	    inFile = options.path,
-	// 	    outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
-	// 	    ops = [];
-
-
-	// 	// console.log('GDAL VERSION'.red, gdal.version);
-	// 	// console.log('GDAL DRIVERS'.red, gdal.drivers.getNames());
-	// 	console.log('options.'.green, options);
-
-	// 	// async.parallel([function (callback) {
-	// 	// 	var out = api.config.path.file + fileUuid + '/' + options.name;
-	// 	// 	var inn = inFile;
-	// 	// 	console.log('inn, out', inn, out);
-
-	// 	// 	fs.copy(inn, out, callback)
-	// 	// }], console.log)
-
-	// 	ops.push(function (callback) {
-	// 		var out = api.config.path.file + fileUuid + '/' + options.name;
-	// 		var inn = inFile;
-	// 		console.log('COPYYY inn, out', inn, out);
-
-	// 		if (inn == out) return callback(null);
-
-	// 		fs.copy(inn, out, function (err) {
-	// 			callback(err);
-	// 		});
-	// 	})
-
-	// 	// validation
-	// 	ops.push(function (callback) {
-
-	// 		var dataset = gdal.open(inFile);
-
-	// 		if (!dataset) return callback('Invalid dataset.');
-	// 		if (!dataset.srs) return callback('Invalid projection.');
-	// 		if (!dataset.srs.validate) return callback('Invalid projection.');
-
-	// 		// check if valid projection
-	// 		var invalid = dataset.srs.validate();
-
-	// 		// valid
-	// 		if (!invalid) return callback(null, dataset);
-			
-	// 		// invalid
-	// 		var msg = 'Invalid projection: ' + dataset.srs.toWKT();
-	// 		console.log('msg: ', msg);
-	// 		callback(msg); // err
-	// 	});
-
-
-	// 	// get file size
-	// 	ops.push(function (dataset, callback) {
-	// 		fs.stat(options.path, function (err, stats) {
-	// 			options.fileSize = stats.size;
-	// 			callback(null, dataset);
-	// 		});
-	// 	});
-
-
-	// 	// get meta 
-	// 	ops.push(function (dataset, callback) {
-			
-	// 		// get projection
-	// 		var s_srs = dataset.srs ? dataset.srs.toProj4() : 'null';
-
-	// 		// get extent
-	// 		var extent = api.geo._getRasterExtent(dataset);
-
-	// 		var meta = {
-	// 			projection : s_srs,
-	// 			geotransform : dataset.geoTransform,
-	// 			bands : dataset.bands.count(),
-	// 			extent : extent.extent,
-	// 			center : extent.center,
-	// 			minzoom : 0,
-	// 			maxzoom : 18,
-	// 			filetype : options.extension,
-	// 			filesize : options.fileSize, // bytes
-	// 			filename : options.name,
-	// 			size : {
-	// 				x : dataset.rasterSize.x,
-	// 				y : dataset.rasterSize.y
-	// 			},
-	// 		}
-
-	// 		// "{
-	// 		//   "filesize": 184509,
-	// 		//   "projection": "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs",
-	// 		//   "filename": "sydney",
-	// 		//   "center": [
-	// 		//     150.441711504,
-	// 		//     -33.52856723049999
-	// 		//   ],
-	// 		//   "extent": [
-	// 		//     149.39475100800001, 	// left
-	// 		//     -34.30833595899998, 	// bottom
-	// 		//     151.488672, 		// right 
-	// 		//     -32.748798502		// top
-	// 		//   ],
-	// 		//   "json": {
-	// 		//     "vector_layers": [
-	// 		//       {
-	// 		//         "id": "subunitsExMS",
-	// 		//         "description": "",
-	// 		//         "minzoom": 0,
-	// 		//         "maxzoom": 22,
-	// 		//         "fields": {
-	// 		//           "id": "String",
-	// 		//           "name": "String"
-	// 		//         }
-	// 		//       }
-	// 		//     ]
-	// 		//   },
-	// 		//   "minzoom": 0,
-	// 		//   "maxzoom": 12,
-	// 		//   "layers": [
-	// 		//     "subunitsExMS"
-	// 		//   ],
-	// 		//   "dstype": "ogr",
-	// 		//   "filetype": ".geojson"
-	// 		// }"
-			
-	// 		callback(null, meta);
-	// 	});
-
-
-	// 	// reproject if necessary
-	// 	ops.push(function (meta, callback) {
-
-	// 		var proj4 = meta.projection;
-	// 		var ourProj4 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ';
-	// 		var source = gdal.SpatialReference.fromProj4(proj4);
-	// 		var target = gdal.SpatialReference.fromProj4(ourProj4);
-	// 		var isSame = source.isSame(target);
-
-	// 		// same, no reprojection necessary
-	// 		if (isSame) return callback(null, meta);
-
-	// 		var outFile = inFile + '.reprojected';
-	// 		var cmd = 'gdalwarp -srcnodata 0 -dstnodata 0 -t_srs "' + ourProj4 + '" "' + inFile + '" "' + outFile + '"';
-	// 		console.log('gdalwarp cmd: ', cmd);
-
-	// 		var exec = require('child_process').exec;
-	// 		exec(cmd, function (err, stdout, stdin) {
-	// 			if (err) return callback(err);
-
-	// 			options.path = outFile;
-	// 			callback(null, meta);
-	// 		});
-
-	// 	});
-
-	// 	ops.push(function (meta, callback) {
-			
-	// 		var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
-	// 		// var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=1 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
-	// 		console.log('cmd: ', cmd);
-
-	// 		var exec = require('child_process').exec;
-	// 		exec(cmd, { maxBuffer: 2000 * 1024 }, function (err, stdout, stdin) {
-	// 			console.log('ppgdal2tiles:'.green, stdout);
-	// 			if (err) {
-	// 				console.log('gdal2tiles err: '.red + err);
-					
-	// 				api.error.log(err);
-	// 				var errMsg = 'There was an error generating tiles for this raster image. Please check #error-log for more information.'
-	// 				return callback(errMsg);
-	// 			}
-
-	// 			// return as db entry
-	// 			var db = {
-	// 				data : {
-	// 					raster : options.name
-	// 				},
-	// 				title : options.name,
-	// 				file : fileUuid,
-	// 				metadata : JSON.stringify(meta)
-	// 			}
-
-	// 			console.log('db created'.yellow, db);
-	// 			callback(null, db);
-	// 		});
-	// 	});
-
-	// 	async.waterfall(ops, done);
-	// },
 
 
 	_getRasterExtent : function (dataset) {

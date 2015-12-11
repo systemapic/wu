@@ -191,12 +191,7 @@ Wu.App = Wu.Class.extend({
 		this.Account = new Wu.User(this.options.json.account);
 		this.Account.setRoles(this.options.json.roles);
 
-		// create user objects
-		// this.Users = {};
-		// this.options.json.users.forEach(function(user, i, arr) {
-		//        this.Users[user.uuid] = new Wu.User(user);             
-		// }, this);
-
+		// contact list
 		this.Users = {};
 		app.Account.getContactList().forEach(function(user) {
 		       this.Users[user.uuid] = new Wu.User(user);    
@@ -229,12 +224,6 @@ Wu.App = Wu.Class.extend({
 		// right chrome
 		this.Chrome.Left = new Wu.Chrome.Left();
 
-		// todo: 
-		// center
-
-
-
-
 	},
 
 	_initPanes : function () {
@@ -250,14 +239,6 @@ Wu.App = Wu.Class.extend({
 			color : 'white',
 			addTo : this._appPane
 		});
-
-		// // render startpane
-		// this.StartPane = new Wu.StartPane({
-		// 	projects : this.Projects
-		// });
-
-		// render header pane
-		this.HeaderPane = new Wu.HeaderPane();
 
 		// render map pane
 		this.MapPane = new Wu.MapPane();
@@ -288,12 +269,6 @@ Wu.App = Wu.Class.extend({
 			
 		// runs hotlink
 		if (this._initHotlink()) return;
-
-		// set project if only one
-		// if (this._lonelyProject()) return;
-
-		// open projects pane
-		// app.Chrome.Left.open()
 
 		// open first project (ordered by lastUpdated)
 		app.Controller.openLastUpdatedProject();
@@ -345,39 +320,8 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_initAccess : function () {
-		this.Access = new Wu.Access(this.options.json.access);
+		// this.Access = new Wu.Access(this.options.json.access);
 	},
-
-	// _lonelyProject : function () {
-	// 	//default case: hidden/ghost project (belongs to no client). Preferable to stick to the Start Pane
-	// 	if (_.size(app.Projects) == 1) {
-	// 		for (var p in app.Projects) {
-	// 			var project = app.Projects[p]; 
-				
-	// 			// if project is hidden/ghost it has no client
-	// 		   	if (project.getClient() === undefined) {
-	// 				return false;
-	// 			}
-
-	// 			this._setProject(project);
-	// 			return true;
-	// 		}
-	// 	}
-	// 	//single project plus hidden/ghost project
-	// 	//check if single (owned) project. Redirect to it instead of sticking on the Start pane
-	// 	if (_.size(app.Projects) == 2) {
-	// 		for (var p in app.Projects) {
-	
-	// 			var project = app.Projects[p]; 
-	// 			if (project.getClient() === undefined) {
-	// 				continue;
-	// 			}
-	// 			this._setProject(project);
-	// 			return true;
-	// 		}
-	// 	}
-	// 	return false;
-	// },
 
 	_initLocation : function () {
 		var path    = window.location.pathname,
@@ -498,48 +442,38 @@ Wu.App = Wu.Class.extend({
 		var projectUuid = hash.project || result.project;	// hacky.. clean up setHash, _renderHash, errything..
 		var project = app.Projects[projectUuid];
 
-		console.error('renderHash', projectUuid);
-
-		// // set project
-		// Wu.Mixin.Events.fire('projectSelected', { detail : {
-		// 	projectUuid : projectUuid
-		// }});
-
 		project.selectProject();
-
 
 		// set position
 		app.MapPane.setPosition(hash.position);
 
-		console.log('hash: ', hash);
-
 		return;
 
-		// set layers
-		hash.layers.forEach(function (layerUuid) { 	// todo: differentiate between baselayers and layermenu
-								// todo: layermenu items are not selected in layermenu itself, altho on map
-			// add layer
-			var layer = project.getLayer(layerUuid);
+		// // set layers
+		// hash.layers.forEach(function (layerUuid) { 	// todo: differentiate between baselayers and layermenu
+		// 						// todo: layermenu items are not selected in layermenu itself, altho on map
+		// 	// add layer
+		// 	var layer = project.getLayer(layerUuid);
 
-			// if in layermenu
-			var bases = project.getBaselayers();
-			var base = _.find(bases, function (b) {
-				return b.uuid == layerUuid;
-			});
+		// 	// if in layermenu
+		// 	var bases = project.getBaselayers();
+		// 	var base = _.find(bases, function (b) {
+		// 		return b.uuid == layerUuid;
+		// 	});
 
-			if (base) {
-				// add as baselayer
-				layer.add('baselayer'); 
-			} else {
-				// ass as layermenu
-				var lm = app.MapPane.getControls().layermenu;
-				if (lm) {
-					var lmi = lm._getLayermenuItem(layerUuid);
-					lm.enableLayer(lmi);
-				}
-			}
+		// 	if (base) {
+		// 		// add as baselayer
+		// 		layer.add('baselayer'); 
+		// 	} else {
+		// 		// ass as layermenu
+		// 		var lm = app.MapPane.getControls().layermenu;
+		// 		if (lm) {
+		// 			var lmi = lm._getLayermenuItem(layerUuid);
+		// 			lm.enableLayer(lmi);
+		// 		}
+		// 	}
 			
-		}, this);
+		// }, this);
 	},
 
 	// save a hash // todo: move to controller
