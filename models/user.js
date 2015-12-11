@@ -33,6 +33,10 @@ var userSchema = mongoose.Schema({
             contact_requests : [String]
         },
 
+        state : {
+            lastProject : [String],  // projectUuid of last opened project
+        },
+
         access : {
 
             // for reference
