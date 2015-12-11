@@ -147,7 +147,7 @@ Wu.Chrome.SettingsContent = Wu.Chrome.extend({
 		this._tempRemoveLayers();
 
 		// if not already added to map
-		if (!this._layer._added) {
+		if (this._layer && !this._layer._added) {
 
 			// add
 			this._layer._addThin();

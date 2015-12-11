@@ -37,7 +37,8 @@ Wu.Chrome.Top = Wu.Chrome.extend({
 		var clientLogo = app.options.logos.clientLogo.image;
 		if (clientLogo) {
 			this._clientLogo = Wu.DomUtil.create('div', 'chrome-button chrome-client-logo', this._buttonWrapper);
-			this._clientLogo.style.backgroundImage = 'url(' + app.options.servers.portal + clientLogo + ')';
+			// this._clientLogo.style.backgroundImage = 'url(' + app.options.servers.portal + clientLogo + ')';
+			this._clientLogo.style.backgroundImage = clientLogo;
 			this._clientLogo.style.backgroundSize = app.options.logos.clientLogo.size;
 			this._clientLogo.style.backgroundPosition = app.options.logos.clientLogo.position;
 			this._clientLogo.style.backgroundColor = app.options.logos.clientLogo.backgroundColor;
