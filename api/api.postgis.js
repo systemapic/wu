@@ -529,7 +529,8 @@ module.exports = api.postgis = {
 				'"' + shape + '"',
 				file_id,
 				pg_db,
-				srid_converted
+				srid_converted,
+				"> /dev/null 2>&1"
 			].join(' ');
 
 
@@ -537,10 +538,11 @@ module.exports = api.postgis = {
 
 			// import to postgis
 			var startTime = new Date().getTime();
-			exec(cmd, {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
-				console.log('srr, std', err, stdout);
+			exec(cmd, {maxBuffer: 1024 * 1024 * 50000}, function (err, stdin, stdout) {
+				console.log('err?', err);
+
 				if (err) {
-					console.log('import_shapefile_script err: ', err, stdout);
+					console.log('import_shapefile_script err: ', err);
 				}
 
 				var endTime = new Date().getTime();
