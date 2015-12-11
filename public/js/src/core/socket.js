@@ -82,10 +82,23 @@ Wu.Socket = Wu.Class.extend({
 
 			var content = data.error;
 
-			app.FeedbackPane.setError({
-				title : content.title,
-				description : content.description
-			});
+			var uniqueIdentifier = content.uniqueIdentifier;
+
+			if (uniqueIdentifier) {
+				
+				// file error
+				Wu.Mixin.Events.fire('processingError', {
+					detail : content
+				});
+
+			} else {
+
+				app.FeedbackPane.setError({
+					title : content.title,
+					description : content.description
+				});
+			}
+
 		});
 		
 

@@ -244,6 +244,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		if (!this._project) return;
 
+		// remove temp files
+		_.each(this._tempFiles, function (tempFile, etc) {
+			console.log('_each', tempFile, etc);
+			Wu.DomUtil.remove(tempFile.datawrap);
+			
+		});
+		this._tempFiles = {};
+
 		// Empty containers
 		if ( this._layersContainer ) this._layersContainer.innerHTML = '';
 		if ( this._filesContainer )  this._filesContainer.innerHTML = '';
@@ -409,11 +417,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._tempFiles[unique_id] = {
 			feedback : feedback,
 			percent : percent,
-			file : file
+			file : file,
+			datawrap : datawrap
 		}
 
 		// get file list
-		var file_list = this.fileListContainers.postgis.fileList;
+		var file_list = this.fileListContainers.postgis.wrapper;
 
 		// prepend
 		file_list.insertBefore(datawrap, file_list.firstChild);
@@ -422,7 +431,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_onProcessingProgress : function (e) {
 
 		var data = e.detail;
-		var error = data.error;
 		var percent = data.percent;
 		var text = data.text;
 		var uniqueIdentifier = data.uniqueIdentifier;
@@ -433,6 +441,24 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// set feedback
 		tempfile.feedback.innerHTML = text;
 		tempfile.percent.innerHTML = percent + '% done';
+
+	},
+
+	_onProcessingError : function (e) {
+
+		var error = e.detail;
+		var uniqueIdentifier = error.uniqueIdentifier;
+
+		// get temp file divs
+		var tempfile = this._tempFiles[uniqueIdentifier];
+
+		// set feedback
+		tempfile.feedback.innerHTML = error.description;
+		tempfile.percent.innerHTML = 'Failed';
+		tempfile.datawrap.style.background = '#F13151';
+		
+		// close on click
+		Wu.DomEvent.on(tempfile.datawrap, 'click', this._refresh, this);
 
 	},
 

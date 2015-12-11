@@ -75,8 +75,6 @@ module.exports = api.portal = {
 
 	invite : function (req, res) {
 
-		console.log('api.portal.invite');
-
 		// get client/project
 		var path = req.originalUrl.split('/');
 		var invite_token = path[2];
@@ -84,13 +82,10 @@ module.exports = api.portal = {
 		// get token from redis
 		var redis_key = 'invite:token:' + invite_token;
 		api.redis.tokens.get(redis_key, function (err, token_store) {
-			console.log('err/token_store', err, token_store);
 
 			var stored_invite = api.utils.parse(token_store);
 
 			if (err || !stored_invite) return api.error.missingInformation(req, res);
-
-			console.log('stored invite: ', stored_invite);
 
 			// handle already logged in users
 			if (req.isAuthenticated()) {
@@ -256,7 +251,6 @@ module.exports = api.portal = {
 
 		if (req.isAuthenticated()) {
 
-			console.log('REQ AUTH?', req.isAuthenticated);
 			req.session.hotlink = hotlink;
 			res.render('../../views/app.serve.ejs', {
 				hotlink : hotlink || {},

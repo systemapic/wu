@@ -1333,7 +1333,9 @@ input.target-input.polygon {
 	font-weight: 600;
 }
 
-
+.data-list-line.processing:hover {
+	color: white;
+}
 
 
 
