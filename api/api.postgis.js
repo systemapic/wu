@@ -13,6 +13,7 @@ var Group 	= require('../models/group');
 var _ 		= require('lodash-node');
 var fs 		= require('fs-extra');
 var gm 		= require('gm');
+var pg 		= require('pg');
 var kue 	= require('kue');
 var fss 	= require("q-io/fs");
 var srs 	= require('srs');
@@ -29,19 +30,16 @@ var crypto      = require('crypto');
 var fspath 	= require('path');
 var mapnik 	= require('mapnik');
 var request 	= require('request');
+var sanitize 	= require("sanitize-filename");
 var nodepath    = require('path');
 var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
+var geojsonArea = require('geojson-area');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
-var geojsonArea = require('geojson-area');
-
 // resumable.js
 var r = require('../tools/resumable-node')('/data/tmp/');
-
-// postgres
-var pg = require('pg');
 
 // api
 var api = module.parent.exports;
@@ -283,11 +281,7 @@ module.exports = api.postgis = {
 		    user = options.user,
 		    ops = [];
 
-
 		ops.push(function (callback) {
-
-			var sanitize = require("sanitize-filename");
-
 
 			// where to put file
 			var filePath = database_name + '/' + table_name + '/' +  api.utils.getRandomChars(5) + '/',
@@ -438,7 +432,7 @@ module.exports = api.postgis = {
 			var geotype = api.postgis._getGeotype(options);
 
 			// if no geotype, something's wrong
-			if (!geotype) return callback('api.upload.organizeImport err 4: invalid geotype!');
+			if (!geotype) return callback('Invalid geotype. Please only provide one dataset per archive.');
 
 			// send to appropriate api.postgis.import
 			if (geotype == 'shapefile') 	return api.postgis.importShapefile(options, callback);
@@ -459,8 +453,6 @@ module.exports = api.postgis = {
 
 		fs.readFile(prj, function (err, prj4) {
 			var srid = srs.parse(prj4);
-
-			console.log('got node srid:', srid);
 
 			// if failed, ask boundlessgeo (fml)
 			if (err || !srid.srid) return api.postgis._fetchSrid(prj4, done);
@@ -484,7 +476,6 @@ module.exports = api.postgis = {
 		request(options, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
 				var srids = JSON.parse(body);
-				console.log('got internet srid: ', srids);
 				var srid = srids.codes[0].code;
 				done(null, srid);
 			}
@@ -501,8 +492,8 @@ module.exports = api.postgis = {
 		    pg_db 	= options.user.postgis_database,
 		    user_id 	= options.user_id,
 		    uniqueIdentifier = options.uniqueIdentifier,
+		    encoding 	= options.encoding || '',
 		    ops 	= [];
-
 
 
 		if (!prjfile) return done('Please provide a projection file.');
@@ -521,51 +512,75 @@ module.exports = api.postgis = {
 		// import with bash script
 		ops.push(function (srid, callback) {
 
-			console.log('final srid: ', srid);
 
-			var srid_converted = srid;
+			options.srid = srid;
 
-			// create database script
-			var cmd = [
-				IMPORT_SHAPEFILE_SCRIPT_PATH, 	// script
-				'"' + shape + '"',
-				file_id,
-				pg_db,
-				srid_converted,
-				"> /dev/null 2>&1"
-			].join(' ');
+			api.postgis._importShapefileToPostgis(options, function (err, result) {
+
+				console.lo
+
+				callback(err, result);
+
+			})
+
+			// var srid_converted = srid;
+
+			// // create database script
+			// var cmd = [
+			// 	IMPORT_SHAPEFILE_SCRIPT_PATH, 	// script
+			// 	'"' + shape + '"',
+			// 	file_id,
+			// 	pg_db,
+			// 	srid_converted,
+			// 	encoding,
+			// 	// "> /dev/null 2>&1"
+			// ].join(' ');
 
 
-			console.log('import shaepfile cmd: ', cmd);
+			// console.log('import shaepfile cmd: ', cmd);
 
-			// ping progress
-			api.socket.processingProgress({
-				user_id : user_id,
-				progress : {
-					text : 'Importing...',
-					error : null,
-					percent : 20,
-					uniqueIdentifier : uniqueIdentifier,
-				}
-			});
+			// // ping progress
+			// api.socket.processingProgress({
+			// 	user_id : user_id,
+			// 	progress : {
+			// 		text : 'Importing...',
+			// 		error : null,
+			// 		percent : 20,
+			// 		uniqueIdentifier : uniqueIdentifier,
+			// 	}
+			// });
 
-			// import to postgis
-			var startTime = new Date().getTime();
+			// // import to postgis
+			// var startTime = new Date().getTime();
 
-			exec(cmd, {maxBuffer: 1024 * 1024 * 50000}, function () {
+			// exec(cmd, {maxBuffer: 1024 * 1024 * 50000}, function (err, stdout, stdin) {
+			// 	console.log('###############################');
+			// 	console.log('postgis shapefile import err', err);
+			// 	console.log('postgis shapefile import stdout', stdout);
+			// 	console.log('postgis shapefile import stdin', stdin);
+			// 	console.log('###############################');
 
-				var endTime = new Date().getTime();
 
-				// set import time to status
-				api.upload.updateStatus(file_id, { 	// todo: set err if err
-					data_type : 'vector',
-					import_took_ms : endTime - startTime,
-					table_name : file_id,
-					database_name : pg_db
-				}, function (err) {
-					callback(err, 'Shapefile imported successfully.');
-				});
-			});
+			// 	// check of LATIN1 encoding errors
+			// 	if (stdin.indexOf('LATIN1') > -1) {
+			// 		console.log('latin encoding, try agian!');
+			// 		// callback('LATIN1');
+			// 		// options.encoding = '-W LATIN1';
+			// 		// return api.postgis.importShapefile(options, done);
+			// 	}
+
+			// 	var endTime = new Date().getTime();
+
+			// 	// set import time to status
+			// 	api.upload.updateStatus(file_id, { 	// todo: set err if err
+			// 		data_type : 'vector',
+			// 		import_took_ms : endTime - startTime,
+			// 		table_name : file_id,
+			// 		database_name : pg_db
+			// 	}, function (err) {
+			// 		callback(err, 'Shapefile imported successfully.');
+			// 	});
+			// });
 		});
 
 		// prime geometries in new table
@@ -652,6 +667,99 @@ module.exports = api.postgis = {
 	},
 
 
+	_importShapefileToPostgis : function (options, done) {
+		var files 	= options.files,
+		    shape 	= api.geo.getTheShape(files)[0],
+		    prjfile 	= api.geo.getTheProjection(files)[0],
+		    file_id 	= options.file_id,
+		    pg_db 	= options.user.postgis_database,
+		    user_id 	= options.user_id,
+		    uniqueIdentifier = options.uniqueIdentifier,
+		    encoding 	= options.encoding || '',
+		    ops 	= [],
+		    attempts 	= 0,
+		    srid 	= options.srid;
+
+		var srid_converted = srid;
+		var IMPORT_SHAPEFILE_SCRIPT_PATH = '../scripts/postgis/import_shapefile.sh'; 
+
+		// create database script
+		var cmd = [
+			IMPORT_SHAPEFILE_SCRIPT_PATH, 	// script
+			'"' + shape + '"',
+			file_id,
+			pg_db,
+			srid_converted,
+			encoding,
+			// "> /dev/null 2>&1"
+		].join(' ');
+
+
+		console.log('import shaepfile cmd: ', cmd);
+
+		// ping progress
+		api.socket.processingProgress({
+			user_id : user_id,
+			progress : {
+				text : 'Importing...',
+				error : null,
+				percent : 20,
+				uniqueIdentifier : uniqueIdentifier,
+			}
+		});
+
+		// import to postgis
+		var startTime = new Date().getTime();
+
+		exec(cmd, {maxBuffer: 1024 * 1024 * 50000}, function (err, stdout, stdin) {
+			console.log('###############################');
+			console.log('postgis shapefile import err', err);
+			console.log('postgis shapefile import stdout', stdout);
+			console.log('postgis shapefile import stdin', stdin);
+			console.log('###############################');
+
+			attempts++;
+
+			// check of LATIN1 encoding errors
+			if (stdin.indexOf('LATIN1') > -1 && attempts < 2) {
+				var endTime = new Date().getTime();
+
+				// set error on status
+				return api.upload.updateStatus(file_id, { 	// todo: set err if err
+					data_type : 'vector',
+					import_took_ms : endTime - startTime,
+					table_name : file_id,
+					database_name : pg_db,
+					error : true,
+					error_text : 'Encoding error. Try LATIN1.'
+				}, function (err) {
+					// callback(err, 'Shapefile imported successfully.');
+
+					done('Encoding error, use utf8.');
+				});
+
+
+			}
+
+			var endTime = new Date().getTime();
+
+			// set import time to status
+			api.upload.updateStatus(file_id, { 	// todo: set err if err
+				data_type : 'vector',
+				import_took_ms : endTime - startTime,
+				table_name : file_id,
+				database_name : pg_db
+			}, function (err) {
+				// callback(err, 'Shapefile imported successfully.');
+
+				done(err, 'Shapefile imported successfully.');
+			});
+		});
+
+
+	},
+
+
 	importGeojson : function (options, done) {
 
 		// need to convert to ESRI shapefile (ouch!) first..
@@ -726,6 +834,7 @@ module.exports = api.postgis = {
 		var clientName 	= options.clientName,
 		    raster 	= options.files[0],
 		    // file_id 	= 'raster_' + api.utils.getRandom(10),
+		    user_id 	= options.user_id,
 		    file_id 	= options.file_id,
 		    pg_db 	= options.user.postgis_database,
 		    original_format = api.postgis._getRasterType(raster);
@@ -739,6 +848,17 @@ module.exports = api.postgis = {
 			file_id,
 			pg_db
 		].join(' ');
+
+		// ping progress
+		api.socket.processingProgress({
+			user_id : user_id,
+			progress : {
+				text : 'Importing raster...',
+				error : null,
+				percent : 20,
+				uniqueIdentifier : uniqueIdentifier,
+			}
+		});
 
 		// import to postgis
 		var startTime = new Date().getTime();

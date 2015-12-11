@@ -18,18 +18,18 @@ if [ "$4" == "" ]; then
 	SRID=""
 fi
 
-
 # env vars
 PGPASSWORD=docker
 PGUSERNAME=docker
 PGHOST=postgis
 
 # encoding // todo!
-# ENCODING="-W 'LATIN1"
-ENCODING=""
+ENCODING="-W 'LATIN1"
+# ENCODING=""
+ENCODING=$5
 
-echo "Importing shapefile, srid: $SRID"
+echo "Importing shapefile, SRID: $SRID"
 
 
 # import shapefile
-shp2pgsql -D $SRID $ENCODING "$1" $2 | PGPASSWORD=$PGPASSWORD psql -q --host=$PGHOST --username=$PGUSERNAME $3
+shp2pgsql -D $SRID $ENCODING "$1" $2 | PGPASSWORD=$PGPASSWORD psql -q --host=$PGHOST --username=$PGUSERNAME $3 || echo "FAILEDFAILED!"
