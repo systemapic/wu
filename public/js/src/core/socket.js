@@ -83,7 +83,14 @@ Wu.Socket = Wu.Class.extend({
 
 			if (data.err) {
 				console.error('generetate err', data);
+
+				return;
 			}
+
+			// fire
+			Wu.Mixin.Events.fire('generatedTiles', {
+				detail : data
+			});
 
 		});
 		socket.on('downloadReady', function (data) {

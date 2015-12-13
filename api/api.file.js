@@ -823,6 +823,7 @@ module.exports = api.file = {
 			'category',
 			'version',
 			'copyright',
+			'data'
 		];
 
  		// enqueue queries for valid fields
