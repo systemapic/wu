@@ -1837,38 +1837,90 @@ module.exports = api.geo = {
 		var zoom_max = req.data.zoom_max;
 		var user_id = req.session.passport.user;
 
-		// check tile count
-		api.geo.tileCount(req, function (err, data) {
+		var ops = [];
+
+		ops.push(function (callback) {
+			api.geo.tileCount(req, callback);
+		});
+
+		ops.push(function (data, callback) {
+
 			var tile_count = data.tiles;
+
+			// err
+			if (!tile_count) return callback('Tile count error: ' + tile_count);
+
+			// limit
+			if (tile_count > 11001) callback('Too many tiles: ' + tile_count);
+
+			// generate
+			api.geo._generateTiles({
+				zoom_min : zoom_min,
+				zoom_max : zoom_max,
+				file_id : file_id
+			}, callback);
+
+		});
+
+		ops.push(function (meta, callback) {
+
+			// send reply
+			api.socket.send('generate_tiles', user_id, {
+				metadata : meta,
+				file_id : file_id
+			});
+
+		});
+
+		async.waterfall(ops, function (err, results) {
+
+			// send socket err
+			if (err) return api.socket.send('generate_tiles', user_id, {
+				err : err
+			});
+
+		});
+
+		// // check tile count
+		// api.geo.tileCount(req, function (err, data) {
+		// 	var tile_count = data.tiles;
 		
+		// 	if (!tile_count || err) {
+		// 		console.log('tile_count error', tile_count, err);
 
-			if (tile_count < 11001) {
+		// 		// send socket err
+		// 		api.socket.send('generate_tiles', user_id, {
+		// 			err : 'Tile count error'
+		// 		});
+		// 	}
 
-				console.log('generate tiles, re', req.data);
+		// 	if (tile_count < 11001) { // todo: limit from account
 
-				// generate
-				api.geo._generateTiles({
-					zoom_min : zoom_min,
-					zoom_max : zoom_max,
-					file_id : file_id
-				}, function (err, metadata) {
+		// 		console.log('generate tiles, re', req.data);
 
-					// send socket err
-					api.socket.send('generate_tiles', user_id, {
-						metadata : metadata
-					});
+		// 		// generate
+		// 		api.geo._generateTiles({
+		// 			zoom_min : zoom_min,
+		// 			zoom_max : zoom_max,
+		// 			file_id : file_id
+		// 		}, function (err, metadata) {
 
-				});				
-			} else {
+		// 			// send socket err
+		// 			api.socket.send('generate_tiles', user_id, {
+		// 				metadata : metadata
+		// 			});
 
-				console.log('tilecount > 3k');
+		// 		});				
+		// 	} else {
 
-				// send socket err
-				api.socket.send('generate_tiles', user_id, {
-					err : 'Too many tiles.'
-				});
-			}
-		})
+		// 		console.log('tilecount > 3k');
+
+		// 		// send socket err
+		// 		api.socket.send('generate_tiles', user_id, {
+		// 			err : 'Too many tiles.'
+		// 		});
+		// 	}
+		// })
 
 
 		
@@ -1930,8 +1982,10 @@ module.exports = api.geo = {
 			console.log('cmd: ', cmd);
 			console.log('infile', inFile);
 
+			console.log('metadata pre parse', status.metadata);
 
-			meta = api.utils.parse(status.metadata);
+
+			meta = status.metadata;
 
 			// script command
 			// var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -a 200,200,0  -p mercator --no-kml "' + inFile + '" "' + outFolder + '"';

@@ -964,6 +964,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			var meta = file.getMeta();
 
+			console.error('meta:', meta);
+
 			// meta info
 			var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta')
 			var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Raster');
@@ -1079,6 +1081,18 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 
+	},
+
+	_onGeneratedTiles : function (e) {
+		var data = e.detail.data;
+
+		var meta = data.metadata;
+		var file_id = data.file_id;
+
+		console.log('METTTTTA', meta);
+
+		var file = app.Account.getFile(file_id);
+		file.setMetadata(meta);
 	},
 
 

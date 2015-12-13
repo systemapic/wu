@@ -684,6 +684,18 @@ Wu.Model.File = Wu.Model.extend({
 		return h[column];
 	},
 
+	setMetadata : function (metadata) {
+		console.log('setmeta', metadata);
+		if (this.store.data.raster) {
+			this.store.data.raster.metadata = JSON.stringify(metadata);
+			return this.save('data');
+		}
+		if (this.store.data.postgis) {
+			this.store.data.postgis.metadata = JSON.stringify(metadata);
+			return this.save('data');
+		}
+
+	},
 
 	isRaster : function () {
 		if (!this.store.data || !this.store.data.raster || !this.store.data.raster.file_id) return false;

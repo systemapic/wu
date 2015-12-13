@@ -37,6 +37,7 @@
     margin-top: 0px;
     margin-right: 0px;
     opacity: 0.0;
+    cursor: pointer;
     }
 
 .file-list-container-file-list .data-list-line:hover .file-popup-trigger,
@@ -794,6 +795,7 @@ input.chrome-field-input {
     padding-bottom: 12px;
     padding-left: 30px;
     padding-right: 30px;
+    cursor: default;
     }
 
 .rounded-layer-button {
@@ -1309,6 +1311,9 @@ input.chrome-field-input {
    height: 39px; 
 }
 
+.data-list-line:hover .file-name-content {
+    font-weight: 900;
+}
 
 /*slider*/
 .noUi-pips-horizontal {

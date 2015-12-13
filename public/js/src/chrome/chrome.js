@@ -29,6 +29,7 @@ Wu.Chrome = Wu.Class.extend({
 		Wu.Mixin.Events.on('processingProgress',  this._onProcessingProgress, this);
 		Wu.Mixin.Events.on('processingError',  this._onProcessingError, this);
 		Wu.Mixin.Events.on('tileCount',  this._onTileCount, this);
+		Wu.Mixin.Events.on('generatedTiles',  this._onGeneratedTiles, this);
 	},
 
 	_projectSelected : function (e) {
@@ -116,6 +117,7 @@ Wu.Chrome = Wu.Class.extend({
 	_onProcessingProgress : function () {},
 	_onProcessingError : function () {},
 	_onTileCount : function () {},
+	_onGeneratedTiles : function () {},
 
 
 });
