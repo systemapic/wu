@@ -29,7 +29,7 @@ var fileSchema = mongoose.Schema({
 
 	data : {
 
-		postgis    : { 				// postgis data
+		postgis : { 				// postgis data
 			database_name : String,
 			table_name : String,
 			data_type : String, 		// raster or vector

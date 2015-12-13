@@ -68,6 +68,21 @@ module.exports = function(app, passport) {
 		api.socket.userEvent(req);
 	});
 
+	// get stats
+	app.io.route('tile_count', function (req) {
+		if (!isLoggedIn(req)) return;
+		
+		api.geo.tileCount(req);
+	});
+
+	// get stats
+	app.io.route('generate_tiles', function (req) {
+		if (!isLoggedIn(req)) return;
+		
+		api.geo.generateTiles(req);
+	});
+
+
 	// helper function : if is logged in
 	function isLoggedIn(req, res, next) {
 		if (req.session.passport) return true;

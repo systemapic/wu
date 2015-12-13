@@ -51,7 +51,7 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 	getCreatedByName : function () {
-		return this.store.createdByName;
+		return this.store.createdByName || app.Users[this.getCreatedBy()].getFullName();
 	},
 
 	getCreatedBy : function () {
@@ -645,6 +645,19 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 	getMeta : function () {
+
+		if (this.isRaster()) {
+			return this.getRasterMeta();
+		}
+
+		if (this.isPostgis()) {
+			return this.getPostgisMeta();
+		}
+
+		return false;
+	},
+
+	getPostgisMeta : function () {
 		if (!this.store.data.postgis) return false;
 		if (!this.store.data.postgis.metadata) return false;
 		var meta = Wu.parse(this.store.data.postgis.metadata);
@@ -672,8 +685,19 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 
+	isRaster : function () {
+		if (!this.store.data || !this.store.data.raster || !this.store.data.raster.file_id) return false;
+		return true;
+	},
 
+	isPostgis : function () {
+		if (!this.store.data || !this.store.data.postgis) return false;
+		return true;
+	},
 
-
-
+	getDatasizePretty : function () {
+		var size = this.getDatasize();
+		var pretty = Wu.Util.bytesToSize(size);
+		return pretty;
+	},
 });
