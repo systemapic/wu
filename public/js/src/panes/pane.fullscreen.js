@@ -17,11 +17,14 @@ Wu.Fullscreen = Wu.Evented.extend({
 		this._container = Wu.DomUtil.create('div', 'smooth-fullscreen', app._appPane);
 
 		var innerClassName = this.options.innerClassName || 'smooth-fullscreen-inner';
+
+		var titleClassName = this.options.titleClassName ? 'smooth-fullscreen-title ' + this.options.titleClassName : 'smooth-fullscreen-title';
+
 		// wrappers
 		this._inner = Wu.DomUtil.create('div', innerClassName, this._container);
-		this._closer = Wu.DomUtil.create('div', 'close-smooth-fullscreen', this._container, 'x');
-		this._header = Wu.DomUtil.create('div', 'smooth-fullscreen-title', this._inner, this.options.title);
+		this._header = Wu.DomUtil.create('div', titleClassName, this._inner, this.options.title);
 		this._content = Wu.DomUtil.create('div', 'smooth-fullscreen-content', this._inner);
+		this._closer = Wu.DomUtil.create('div', 'close-smooth-fullscreen', this._container, 'x');
 	},
 
 	addInput : function (options) {

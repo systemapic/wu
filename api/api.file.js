@@ -110,8 +110,6 @@ module.exports = api.file = {
 		var userUuid = options.user.uuid,
 		    file_id = options.file._id;
 
-		console.log('addNewFileToUser', options);
-
 		User
 		.findOne({uuid : userUuid})
 		.exec(function (err, user) {
@@ -652,8 +650,6 @@ module.exports = api.file = {
 		var options = req.body,
 		    type = options.type;
 
-
-		console.log('getLayers', type, options);
 
 		if (type == 'raster') {
 			return api.file._getRasterLayers(req, res);

@@ -1297,6 +1297,19 @@ module.exports = api.postgis = {
 		var files = options.files,
 		    type = false;
 
+		    if (!files) return 'false';
+
+		if (files.data) {
+			var filename = files.data.originalFilename;
+			var ext = filename.split('.').reverse()[0];
+			if (ext == 'geojson') return 'geojson';
+			if (ext == 'ecw') return 'raster';
+			if (ext == 'jp2') return 'raster';
+			if (ext == 'tif') return 'raster';
+			if (ext == 'tiff') return 'raster';
+			return false;
+		}
+
 		// only one file
 		if (files.length == 1) {
 			var ext = files[0].split('.').reverse()[0];
@@ -1306,6 +1319,8 @@ module.exports = api.postgis = {
 			if (ext == 'tif') return 'raster';
 			if (ext == 'tiff') return 'raster';
 		}
+
+		console.log('files: ', files);
 
 		// several files
 		files.forEach(function (file) {

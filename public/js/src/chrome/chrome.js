@@ -28,6 +28,7 @@ Wu.Chrome = Wu.Class.extend({
 		Wu.Mixin.Events.on('fileProcessing',  this._onFileProcessing, this);
 		Wu.Mixin.Events.on('processingProgress',  this._onProcessingProgress, this);
 		Wu.Mixin.Events.on('processingError',  this._onProcessingError, this);
+		Wu.Mixin.Events.on('tileCount',  this._onTileCount, this);
 	},
 
 	_projectSelected : function (e) {
@@ -114,6 +115,7 @@ Wu.Chrome = Wu.Class.extend({
 	_onFileProcessing : function () {},
 	_onProcessingProgress : function () {},
 	_onProcessingError : function () {},
+	_onTileCount : function () {},
 
 
 });

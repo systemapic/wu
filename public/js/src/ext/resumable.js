@@ -98,7 +98,7 @@ Wu.Resumable = Wu.Class.extend({
 			var file_id = data.file_id;
 
 			// check upload status (long-polling, websocket fallback) // todo: overkill, figure out why websocket is fickle.
-			this._checkStatusPeriodically(file_id);
+			// this._checkStatusPeriodically(file_id);
 
 			// hide progess bar
 			app.ProgressBar.hideProgress();
