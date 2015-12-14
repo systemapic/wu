@@ -1381,3 +1381,51 @@ input.target-input.polygon {
 .height-42 {
 	height: 42px;
 }
+
+
+.file-popup-trigger.add-layer {
+	left: 10px;
+}
+
+.fa.fa-plus-square.add-trigger {
+	padding-right: 3px;
+}
+
+
+.file-popup-trigger.add-layer {
+    bottom: 25px;
+    width: auto;
+    right: 11px;
+    background: none;
+    position: absolute;
+    left: initial;
+}
+
+
+.disabled-btn {
+	pointer-events: none;
+	opacity: 0.2;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

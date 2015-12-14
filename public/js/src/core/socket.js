@@ -61,6 +61,11 @@ Wu.Socket = Wu.Class.extend({
 				detail : data
 			});
 		});
+		socket.on('tileset_meta', function(data){
+			Wu.Mixin.Events.fire('tileset_meta', {
+				detail : data
+			});
+		});
 
 		socket.on('disconnect', function(){
 			console.log('disconnect!');

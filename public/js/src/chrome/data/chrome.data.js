@@ -80,7 +80,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// List container
 		this._listContainer = Wu.DomUtil.create('div', 'chrome-data-scroller', this._listOuterScroller);
 
-
 		// LAYER LIST
 		this._initLayerListContainer();
 		
@@ -100,7 +99,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// Layer list container
 	_initLayerListContainer : function () {
 
-		// xoxoxoxoxoxoxox
 		this._layerListWrapper = Wu.DomUtil.create('div', 'chrome-layer-list-wrapper', this._listContainer)		
 
 		this._layerListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title', this._layerListWrapper, 'Layers');
@@ -120,17 +118,14 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	// File list container
 	_initFileListContainer : function () {
 
-
 		// HEADER
-		this._fileListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title layer-list', this._listContainer, 'My Data');
+		this._fileListTitle = Wu.DomUtil.create('div', 'chrome-content-header layer-list-container-title layer-list', this._listContainer, '<i class="fa fa-database"></i> My Datasets');
 
 		// Upload button container
 		this._uploadButtonContainer = Wu.DomUtil.create('div', 'upload-button-container', this._listContainer);
 
 		// Containers
 		this._filesContainer = Wu.DomUtil.create('div', 'files-container', this._listContainer);
-
-	
 	},
 
 	_initContent : function () {
@@ -220,6 +215,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 	_onWindowResize : function () {
 	},
+
 	getDimensions : function () {
 		var dims = {
 			width : this.options.defaultWidth,
@@ -566,8 +562,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				_str += '<span class="file-meta-author">' + userName + '</span>';
 
 				// Date
-				var date = moment(d.getCreated()).format('DD MMMM YYYY');
-				_str += '<span class="file-meta-date">' + date + '</span>';
+				// var date = moment(d.getCreated()).format('DD MMMM YYYY');
+				var date = d.getCreatedPretty();
+				_str += '- <span class="file-meta-date">' + date + '</span>';
 
 				// Size
 				var bytes = d.getStore().dataSize;				
@@ -720,6 +717,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	createFilePopUpTrigger : function (parent, library) {
 
+
+		// open file options button
+
 		// Bind
 		var popupTrigger = 
 			parent
@@ -749,6 +749,41 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// Exit
 		popupTrigger
+			.exit()
+			.remove();
+
+
+
+		// add layer button
+
+		// Bind
+		var addTrigger = 
+			parent
+			.selectAll('.file-popup-trigger.add-layer')
+			.data(function(d) { return [d] })
+
+		// Enter
+		addTrigger
+			.enter()
+			.append('div')	
+			.classed('file-popup-trigger add-layer', true)
+			.html('<i class="fa fa-plus-square add-trigger"></i>Add layer')
+
+
+		// Update
+		addTrigger
+			.classed('active', function (d) {
+				var uuid = d.getUuid()
+				if ( uuid == this.showFileActionFor ) return true;
+				return false;
+			}.bind(this))
+			.on('click', function (file) {
+				file._createLayer(app.activeProject);
+			}.bind(this))	
+
+
+		// Exit
+		addTrigger
 			.exit()
 			.remove();
 
@@ -939,7 +974,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// console.log('file: ', file);
 
 		// create fullscreen
-		this._fullscreen = new Wu.Fullscreen({
+		var fullscreen = this._fullscreen = new Wu.Fullscreen({
 			title : '<i class="fa fa-bars file-option"></i>Options for ' + file.getName(),
 			titleClassName : 'slim-font'
 		});
@@ -962,9 +997,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// raster
 		if (file.isRaster()) {
 
-			var meta = file.getMeta();
+			console.log('file', file);
 
-			console.error('meta:', meta);
+			var meta = file.getMeta();
 
 			// meta info
 			var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta')
@@ -974,14 +1009,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			var size_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Raster size:</span> ' + meta.size.x + 'x' + meta.size.y);
 			var projection_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Projection:</span> ' + meta.projection);
 			var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
+			var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created on:</span> ' + moment(file.getCreated()).format('MMMM Do YYYY, h:mm:ss a'));
 
 			// nice border box
 			var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
 			var tiles_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Tileset')
 			var generated_tiles_title = Wu.DomUtil.create('div', 'file-option title generated-tiles', toggles_wrapper, 'Generated tile-range')
 			
-
-
 			// zoom levels
 			var zoomlevels_wrapper = Wu.DomUtil.create('div', 'zoomlevels-wrapper', toggles_wrapper);
 			var zoom_levels = _.sortBy(meta.zoom_levels);
@@ -1007,7 +1041,63 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				}
 			});
 
-			
+			// total tiles div
+			var totaltiles_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Total tiles:</span> ' + meta.total_tiles);
+			var tilesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Tileset size:</span> ');
+
+			// error feedback
+			var generated_tiles_error = this._generated_tiles_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-error', toggles_wrapper);
+
+			// generate button
+			var generateBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-22', toggles_wrapper);
+			var generateBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save generate-tiles', generateBtnWrap, 'Generate tiles');
+
+			// wrapper-3: download box
+			var toggles_wrapper3 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
+			var download_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper3, 'Download dataset');
+
+			// download button
+			var downloadBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper3);
+			var downloadBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', downloadBtnWrap, 'Download');
+
+			// wrapper-4: delete box
+			var toggles_wrapper4 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
+			var delete_title = Wu.DomUtil.create('div', 'file-option title red-font', toggles_wrapper4, 'Delete');
+
+			// download button
+			var deleteBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper4);
+			var deleteBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', deleteBtnWrap, 'Delete');
+
+			// deleete button event
+			Wu.DomEvent.on(deleteBtn, 'click', function (e) {
+				
+				// confirm dialog
+				Wu.confirm('Are you sure you want to delete this dataset? This cannot be undone!', function (confirmed) {
+					if (!confirmed) return; 
+
+					// delete file
+					file._deleteFile(function (err, removedFile) {
+						console.log('deletefile err, removedFile', err, removedFile);
+
+						// close fullscreen
+						fullscreen.close();
+
+						// delete successful
+						if (!err && removedFile && removedFile.success) {
+							return app.feedback.setMessage({
+								title : 'Dataset deleted!', 
+								description : file.getName() + ' was deleted.'
+							});
+						} else {
+							return app.feedback.setError({
+								title : 'Something went wrong.', 
+								description : 'Dataset not deleted.'
+							});
+						}
+					});
+				}.bind(this))
+			}, this);
+
 			// slider events
 			stepSlider.noUiSlider.on('update', function (values, handle) {
 
@@ -1017,55 +1107,69 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				var zoom_levels_text = z_min + ' to ' + z_max;
 				zoomlevels_div.innerHTML = '<span class="bold-font">Zoom-levels:</span> ' + zoom_levels_text;
 
-				// check tile count
-				app.Socket.send('tile_count', {
+				// check tile count (local)
+				this.calculateTileCount({
 					zoom_min : z_min,
 					zoom_max : z_max,
 					file_id : file.getUuid()				
+				}, function (err, tile_count) {
+					
+					// check tiles
+					if (tile_count > 11000) { // todo: make account dependent
+
+						// mark too high tile-count
+						totaltiles_div.innerHTML = '<span class="bold-font red-font">Total tiles: ' + tile_count + '</span>';
+
+						// set error feedback
+						generated_tiles_error.innerHTML = '<span class="bold-font">The tile count is too high. Please select a lower zoom-level.</span>';
+
+						// disable button
+						Wu.DomUtil.addClass(generateBtn, 'disabled-btn');
+
+					} else {
+						
+						// set tile count
+						totaltiles_div.innerHTML = '<span class="bold-font">Total tiles:</span> ' + tile_count;
+
+						// set error feedback
+						generated_tiles_error.innerHTML = '';
+					
+						// enable button
+						Wu.DomUtil.removeClass(generateBtn, 'disabled-btn');
+					}
 				});
 
 			}.bind(this));
 
-			// total tiles div
-			this._totaltiles_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Total tiles:</span> ' + meta.total_tiles);
-
-			// error feedback
-			this._generated_tiles_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-error', toggles_wrapper);
-
-			// generate button
-			var generateBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-22', toggles_wrapper);
-			var generateBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save generate-tiles', generateBtnWrap, 'Generate tiles');
-
+			// generate button event
 			Wu.DomEvent.on(generateBtn, 'click', function () {
-
-				console.log('tyo');
 
 				// set zoom levels
 				var values = stepSlider.noUiSlider.get();
 				var z_min = parseInt(values[0]);
 				var z_max = parseInt(values[1]);
 
-				app.Socket.send('generate_tiles', {
+				// check tile count (local)
+				this.calculateTileCount({
 					zoom_min : z_min,
 					zoom_max : z_max,
 					file_id : file.getUuid()				
+				}, function (err, tile_count) {
+					
+					// check tile count
+					if (tile_count > 11000) return;// todo: account dependent
+
+					// generate tiles
+					app.Socket.send('generate_tiles', {
+						zoom_min : z_min,
+						zoom_max : z_max,
+						file_id : file.getUuid()				
+					});
+
+					// set feedback
+					generated_tiles_error.innerHTML = '<span class="bold-font dark-font">Generating tiles. This will take a few minutes...</span>';
 				});
-
 			}, this);
-
-			// wrapper-3: download box
-			var toggles_wrapper3 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
-			var download_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper3, 'Download dataset');
-
-			// download button
-			var downloadBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper3);
-			var downloadBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', downloadBtnWrap, 'Download');
-			// var addlayerBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', content, 'Add layer to project');
-
-			// add layer to project
-			// download
-			// add more zoom levels to raster
-
 
 		}		
 
@@ -1083,20 +1187,40 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	},
 
-	_onGeneratedTiles : function (e) {
-		var data = e.detail.data;
 
-		var meta = data.metadata;
-		var file_id = data.file_id;
+	calculateTileCount : function (options, done) {
 
-		console.log('METTTTTA', meta);
+		var file_id = options.file_id;
+		var zoom_min = options.zoom_min;
+		var zoom_max = options.zoom_max;
+		var all_levels_count = this._calcTileCount(file_id);
+		var zoom_range = _.range(zoom_min, zoom_max + 1);
 
-		var file = app.Account.getFile(file_id);
-		file.setMetadata(meta);
+		// add zoom levels 
+		var tile_count = 0;
+		zoom_range.forEach(function (zr) {
+			tile_count += all_levels_count[zr];
+		});
+
+		// done
+		done(null, tile_count);
+
+
+		app.Socket.send('tileset_meta', {
+			file_id : file_id				
+		});
+		
 	},
 
+	_onTilesetMeta : function (e) {
+		console.log('_onTilesetMeta', e);
 
-	_onTileCount : function (e) {
+		var tile_set = e.detail.data;
+
+		console.log('tile_set:', tile_set);
+		return;
+
+
 		var data = e.detail.data;
 		var tile_count = parseInt(data.tiles) * (-1);
 
@@ -1122,6 +1246,64 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 	},
 
+	_calcTileCount : function (file_id) {
+
+		// set options
+		var zoom_min = 0;
+		var zoom_max = 20;
+		var zoom_levels = _.range(0, zoom_max + 1);
+		var total_tiles = [];
+
+		// get file extent
+		var file = app.Account.getFile(file_id);
+		var meta = file.getMeta();
+		var extent = meta.extent;
+
+		// get edges
+		var north_edge = extent[3];
+		var south_edge = extent[1];
+		var west_edge = extent[0];
+		var east_edge = extent[2];
+
+		// calculate tiles per zoom-level
+		zoom_levels.forEach(function (z) {
+			var zoom = z;
+			var top_tile = this._lat2tile(north_edge, zoom);
+			var left_tile = this._lon2tile(west_edge, zoom);
+			var bottom_tile = this._lat2tile(south_edge, zoom);
+			var right_tile = this._lon2tile(east_edge, zoom);
+			var width = Math.abs(left_tile - right_tile) + 1;
+			var height = Math.abs(top_tile - bottom_tile) + 1;
+			var total_tiles_at_zoom = width * height;
+
+			total_tiles.push(total_tiles_at_zoom);
+
+		}, this);
+
+		return total_tiles;
+
+	},
+
+	_lon2tile : function (lon,zoom) { return (Math.floor((lon+180)/360*Math.pow(2,zoom))); },
+ 	_lat2tile : function (lat,zoom)  { return (Math.floor((1-Math.log(Math.tan(lat*Math.PI/180) + 1/Math.cos(lat*Math.PI/180))/Math.PI)/2 *Math.pow(2,zoom))); },
+
+	_onGeneratedTiles : function (e) {
+		var data = e.detail.data;
+
+		var meta = data.metadata;
+		var file_id = data.file_id;
+
+		console.log('Generated tiles! new meta:', meta);
+
+		var file = app.Account.getFile(file_id);
+		file.setMetadata(meta);
+
+		// feedback
+		this._generated_tiles_error.innerHTML = '<span class="bold-font dark-font">Done!</span>';
+
+	},
+
+
 	
 
 
@@ -1134,7 +1316,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this.editingFileName = false;
 		this._refreshFiles();
 	},
-
 
 
 	// ┬┌┐┌┬┌┬┐  ┬  ┌─┐┬ ┬┌─┐┬─┐┌─┐
