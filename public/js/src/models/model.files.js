@@ -62,6 +62,11 @@ Wu.Model.File = Wu.Model.extend({
 		return this.store.created;
 	},
 
+	getCreatedPretty : function () {
+		var date_created = this.store.created;
+		return Wu.Util.prettyDate(date_created);
+	},
+
 	getCategory : function () {
 		return this.store.category;
 	},
@@ -179,7 +184,7 @@ Wu.Model.File = Wu.Model.extend({
 
 
 	// todo: move all delete of files here
-	_deleteFile : function () {
+	_deleteFile : function (done) {
 
 		// check if dataset has layers
 		this._getLayers(function (err, layers) {
@@ -208,6 +213,8 @@ Wu.Model.File = Wu.Model.extend({
 				// clean up locally
 				this._fileDeleted(removedObjects);
 
+				// callback
+				done && done(null, removedObjects);
 
 			}.bind(this));
 

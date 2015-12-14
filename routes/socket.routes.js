@@ -69,10 +69,10 @@ module.exports = function(app, passport) {
 	});
 
 	// get stats
-	app.io.route('tile_count', function (req) {
+	app.io.route('tileset_meta', function (req) {
 		if (!isLoggedIn(req)) return;
 		
-		api.geo.tileCount(req);
+		api.geo.getTilesetMeta(req);
 	});
 
 	// get stats

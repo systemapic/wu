@@ -1246,11 +1246,11 @@ input.chrome-field-input {
     width: 50px;
     height: 20px;
     right: -5px;
-    bottom: 9px;
+    bottom: 5px;
     color: #FCFCFC;
     opacity: 1;
     border-radius: 0;
-    right: 12px;
+    right: 20px;
     font-weight: 900;
     font-size: 12px;
     width: auto;
