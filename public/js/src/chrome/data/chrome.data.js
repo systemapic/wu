@@ -233,7 +233,39 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var file = e.detail.file;
 
 		// automatically create layer
-		file._createLayer(this._project);
+		console.log('_onFileImported', e);
+
+		file._createLayer(this._project, function (err, layer) {
+			console.log('created layer: ', err, layer);
+
+			// automatically add layer to layermenu
+			this._addOnImport(layer);
+
+		}.bind(this));
+
+
+	},
+
+
+	_addOnImport : function (layer) {
+
+		// add
+		this.addLayer(layer)
+
+		// enable layer
+		this.enableLayer(layer);
+
+		// fly to
+		layer.flyTo();
+
+		// refresh
+		this._refreshLayers();
+
+		// open styler if postgis
+		if (layer.isPostgis()) {
+			app.Tools.SettingsSelector.open();
+		}
+
 	},
 
 
@@ -1149,6 +1181,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				var z_min = parseInt(values[0]);
 				var z_max = parseInt(values[1]);
 
+
 				// check tile count (local)
 				this.calculateTileCount({
 					zoom_min : z_min,
@@ -1170,6 +1203,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 					generated_tiles_error.innerHTML = '<span class="bold-font dark-font">Generating tiles. This will take a few minutes...</span>';
 				});
 			}, this);
+
+
+			// download button
+			Wu.DomEvent.on(downloadBtn, 'click', file._downloadFile, file);
 
 		}		
 
@@ -1830,10 +1867,30 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		this._refreshLayers();		
 	},	
 
+	addAfterImport : function (layer) {
+
+		// in layermenu
+		var layerMenu = app.MapPane.getControls().layermenu;
+		layerMenu._enableLayerByUuid(layer.getUuid());
+
+		// in data meny
+
+
+	},
+
+	enableLayer : function (layer) {
+
+		// 
+
+		// in layermenu
+		var layerMenu = app.MapPane.getControls().layermenu;
+		layerMenu._enableLayerByUuid(layer.getUuid());
+	},
+
 	// Add layer
 	addLayer : function (layer) {
 		var layerMenu = app.MapPane.getControls().layermenu;
-		layerMenu.add(layer);
+		return layerMenu.add(layer);
 	},
 
 	// Remove layer

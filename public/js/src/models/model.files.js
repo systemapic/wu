@@ -298,13 +298,22 @@ Wu.Model.File = Wu.Model.extend({
 	_shareFile : function () {
 	},
 
-	_createLayer : function (project) {
-		this._createDefaultLayer(project);
-	},
-
 	_downloadFile : function () {
-		this._downloadDataset();
-	}, 
+		if (this.isPostgis()) this._downloadDataset();
+		if (this.isRaster()) this._downloadRaster();
+	}, 	
+
+	_downloadRaster : function () {
+
+		// parse results
+		var path = app.options.servers.portal;
+		path += 'api/file/download/';
+		path += '?file=' + this.getUuid();
+		path += '&access_token=' + app.tokens.access_token;
+
+		window.open(path, 'mywindow')
+
+	},
 
 	_downloadDataset : function () {
 
@@ -467,20 +476,28 @@ Wu.Model.File = Wu.Model.extend({
 		return false;
 	},
 
-	_createDefaultLayer : function (project) {
 
-		var type = this._getType();
-
-		if (type == 'vector') {
-			this._createDefaultVectorLayer(project);
-		}
-
-		if (type == 'raster') {
-			this._createDefaultRasterLayer(project);
-		}
+	_createLayer : function (project, callback) {
+		this._createDefaultLayer(project, callback);
 	},
 
-	_createDefaultRasterLayer : function (project) {
+
+	_createDefaultLayer : function (project, callback) {
+
+		console.log('isVector', this.isVector());
+		console.log('isRaster', this.isRaster());
+
+		this.isVector() && this._createDefaultVectorLayer(project, callback);
+		this.isRaster() && this._createDefaultRasterLayer(project, callback);
+		
+	},
+
+	isVector : function () {
+		return this.isPostgis();
+	},
+
+
+	_createDefaultRasterLayer : function (project, callback) {
 		
 		var options = {
 			file : this,
@@ -488,11 +505,11 @@ Wu.Model.File = Wu.Model.extend({
 		}
 
 		// create layer on server
-		this._requestDefaultRasterLayer(options)
+		this._requestDefaultRasterLayer(options, callback)
 
 	},
 
-	_requestDefaultRasterLayer : function (options) {
+	_requestDefaultRasterLayer : function (options, callback) {
 
 		var file = options.file,
 		    file_id = file.getUuid(),
@@ -535,8 +552,8 @@ Wu.Model.File = Wu.Model.extend({
 			// create new layer model
 			this._createLayerModel(options, function (err, layerModel) {
 
-				// refresh Sidepane Options
-				project.addLayer(layerModel);
+				// create layer on project
+				var layer = project.addLayer(layerModel);
 
 				// todo: set layer icon
 				app.feedback.setMessage({
@@ -549,12 +566,15 @@ Wu.Model.File = Wu.Model.extend({
 					projectUuid : project.getUuid(),
 					layerUuid : layerModel.uuid
 				}});
+
+				// callback
+				callback && callback(null, layer);
 			});
 			
 		}.bind(this));
 	},
 
-	_createDefaultVectorLayer : function (project) {
+	_createDefaultVectorLayer : function (project, done) {
 		
 		var file_id = this.getUuid();
 		var file = this;
@@ -573,13 +593,15 @@ Wu.Model.File = Wu.Model.extend({
 			}
 
 			// create layer on server
-			this._requestDefaultVectorLayer(options)
+			this._requestDefaultVectorLayer(options, done)
 
 
 		}.bind(this));
 	},
 
-	_requestDefaultVectorLayer : function (options) {
+	_requestDefaultVectorLayer : function (options, done) {
+
+		console.log('rdvl', options)
 
 		var file = options.file,
 		    file_id = file.getUuid(),
@@ -609,6 +631,8 @@ Wu.Model.File = Wu.Model.extend({
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
 			var layer = Wu.parse(layerJSON);
 
+			console.log('c l', layer);
+
 			var options = {
 				projectUuid : project.getUuid(), // pass to automatically attach to project
 				data : {
@@ -624,8 +648,10 @@ Wu.Model.File = Wu.Model.extend({
 			// create new layer model
 			this._createLayerModel(options, function (err, layerModel) {
 
+				console.log('l mod', layerModel);
+
 				// refresh Sidepane Options
-				project.addLayer(layerModel);
+				var layer = project.addLayer(layerModel);
 
 				// todo: set layer icon
 				app.feedback.setMessage({
@@ -638,6 +664,9 @@ Wu.Model.File = Wu.Model.extend({
 					projectUuid : project.getUuid(),
 					layerUuid : layerModel.uuid
 				}});
+
+				// callback
+				done && done(null, layer);
 			});
 			
 		}.bind(this));
