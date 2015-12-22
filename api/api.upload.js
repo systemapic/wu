@@ -462,6 +462,7 @@ module.exports = api.upload = {
 					createdBy : u.user_id,
 					// name : u.filename,
 					name : cleanName,
+					originalName : u.filename,
 					type : 'postgis',
 					dataSize : u.size,
 					data : {
@@ -479,6 +480,7 @@ module.exports = api.upload = {
 					createdBy : u.user_id,
 					// name : u.filename,
 					name : cleanName,
+					originalName : u.filename,
 					type : 'raster',
 					dataSize : u.size,
 					data : {
