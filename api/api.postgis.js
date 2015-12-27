@@ -57,16 +57,17 @@ module.exports = api.postgis = {
 		// missing information
 		if (!database_name || !table_name) return api.error.missingInformation(req, res);
 
-		// validation
+		// validation, todo: improve
 		if (!table_name.length == 25) return api.error.general(req, res, 'Invalid table name!' + table_name);
 
+		// cmd
 		var command = [
 			DROP_TABLE_SCRIPT,
 			database_name,
 			table_name
 		].join(' ');
 
-		// create database in postgis
+		// run
 		exec(command, {maxBuffer: 1024 * 50000}, function (err) {
 			if (err) return done(err);
 			done(null);
@@ -110,6 +111,7 @@ module.exports = api.postgis = {
 		var options = req.body,
 		    download_status_id = options.download_status_id;
 		
+		// missing info
 		if (!download_status_id) return api.error.missingInformation(req, res);
 
 		// get status
@@ -123,37 +125,48 @@ module.exports = api.postgis = {
 
 
 	downloadDatasetFromLayer : function (req, res) {
-
 		var options = req.body,
 		    layer_id = options.layer_id,
 		    format = options.format,
 		    user = req.user,
 		    ops = [],
 		    layername;
-
-		// set download status is
+		
 		var download_status_id = api.utils.getRandomChars(8);
-		var status = {
-			download_status_id : download_status_id,
-			finished : false,
-			time_start : Date().now,
-			file_id : layer_id
-		}
 
-		// set download status
-		api.postgis._setDownloadProgress(status);
 
-		// return result
-		res.json(status);
+		// mark and return
+		ops.push(function (callback) {
 
+			// set download status is
+			var status = {
+				download_status_id : download_status_id,
+				finished : false,
+				time_start : Date().now,
+				file_id : layer_id
+			}
+
+			// set download status
+			api.postgis._setDownloadProgress(status);
+
+			// return result
+			res.json(status);
+
+			// next
+			callback(null);
+		});
+
+		// get layer
 		ops.push(function (callback) {
 			Layer
 			.findOne({uuid : layer_id})
 			.exec(callback);
 		});
 
+		// download
 		ops.push(function (layer, callback) {
 
+			// prettify name
 			layername = layer.title.replace(/ /g,'').replace('.zip', '');
 
 			var opts = {
@@ -169,6 +182,7 @@ module.exports = api.postgis = {
 			api.postgis.downloadDataset(opts, callback);
 		});
 
+		// run ops
 		async.waterfall(ops, function (err, filepath) {
 
 			var status = {
@@ -181,13 +195,13 @@ module.exports = api.postgis = {
 			// set download status
 			api.postgis._setDownloadProgress(status);
 
-			// send socket notification (if subscribed)
+			// send socket notification if subscribed
 			if (options.socket_notification) api.socket.downloadReady({
 				user : req.user,
 				status : status
 			});
 
-			// send to slack
+			// send to slack-monitor
 			api.analytics.downloadedDataset({
 				user : user,
 				filename : layername
@@ -205,22 +219,31 @@ module.exports = api.postgis = {
 		    user = req.user,
 		    ops = [],
 		    filename;
-
-		// set download status is
+		
 		var download_status_id = api.utils.getRandomChars(8);
-		var status = {
-			download_status_id : download_status_id,
-			finished : false,
-			time_start : Date().now,
-			file_id : file_id
-		}
 
-		// set download status
-		api.postgis._setDownloadProgress(status);
+		// mark, return json
+		ops.push(function (callback) {
 
-		// return result
-		res.json(status);
+			// set download status id
+			var status = {
+				download_status_id : download_status_id,
+				finished : false,
+				time_start : Date().now,
+				file_id : file_id
+			}
 
+			// set download status
+			api.postgis._setDownloadProgress(status);
+
+			// return result
+			res.json(status);
+
+			// next
+			callback(null);
+		});
+
+		
 		// get file
 		ops.push(function (callback) {
 			File
@@ -228,8 +251,10 @@ module.exports = api.postgis = {
 			.exec(callback);
 		});
 
+		// download
 		ops.push(function (file, callback) {
 
+			// prettify name
 			var table_name = file.data.postgis.table_name;
 			filename = file.name.replace(/ /g,'').replace('.zip', '');
 
@@ -246,6 +271,7 @@ module.exports = api.postgis = {
 			api.postgis.downloadDataset(options, callback);
 		});
 
+		// run ops
 		async.waterfall(ops, function (err, filepath) {
 
 			var status = {
@@ -293,7 +319,7 @@ module.exports = api.postgis = {
 
 
 			// create folder
-			fs.ensureDir(folder, function (err) {
+			fs.ensureDir(folder, function (err) { 	// todo: refactor async
 
 				var command = [
 					DOWNLOAD_TABLE_SCRIPT,
@@ -332,7 +358,6 @@ module.exports = api.postgis = {
 			var cmd = [
 				'tar',
 				'cvf',
-				// 'loka.tar',
 				tarfile,
 				'-C',
 				'"' + zipfolder + '"',
@@ -340,8 +365,6 @@ module.exports = api.postgis = {
 				'&&',
 				'pigz',
 				tarfile
-				// 'loka.tar'
-				// zipfile
 			].join(' ');
 
 			console.log('tar cmd: ', cmd);
@@ -512,75 +535,16 @@ module.exports = api.postgis = {
 		// import with bash script
 		ops.push(function (srid, callback) {
 
-
+			// set srid
 			options.srid = srid;
 
+			// import
 			api.postgis._importShapefileToPostgis(options, function (err, result) {
 
-				console.lo
-
+				// next
 				callback(err, result);
+			});
 
-			})
-
-			// var srid_converted = srid;
-
-			// // create database script
-			// var cmd = [
-			// 	IMPORT_SHAPEFILE_SCRIPT_PATH, 	// script
-			// 	'"' + shape + '"',
-			// 	file_id,
-			// 	pg_db,
-			// 	srid_converted,
-			// 	encoding,
-			// 	// "> /dev/null 2>&1"
-			// ].join(' ');
-
-
-			// console.log('import shaepfile cmd: ', cmd);
-
-			// // ping progress
-			// api.socket.processingProgress({
-			// 	user_id : user_id,
-			// 	progress : {
-			// 		text : 'Importing...',
-			// 		error : null,
-			// 		percent : 20,
-			// 		uniqueIdentifier : uniqueIdentifier,
-			// 	}
-			// });
-
-			// // import to postgis
-			// var startTime = new Date().getTime();
-
-			// exec(cmd, {maxBuffer: 1024 * 1024 * 50000}, function (err, stdout, stdin) {
-			// 	console.log('###############################');
-			// 	console.log('postgis shapefile import err', err);
-			// 	console.log('postgis shapefile import stdout', stdout);
-			// 	console.log('postgis shapefile import stdin', stdin);
-			// 	console.log('###############################');
-
-
-			// 	// check of LATIN1 encoding errors
-			// 	if (stdin.indexOf('LATIN1') > -1) {
-			// 		console.log('latin encoding, try agian!');
-			// 		// callback('LATIN1');
-			// 		// options.encoding = '-W LATIN1';
-			// 		// return api.postgis.importShapefile(options, done);
-			// 	}
-
-			// 	var endTime = new Date().getTime();
-
-			// 	// set import time to status
-			// 	api.upload.updateStatus(file_id, { 	// todo: set err if err
-			// 		data_type : 'vector',
-			// 		import_took_ms : endTime - startTime,
-			// 		table_name : file_id,
-			// 		database_name : pg_db
-			// 	}, function (err) {
-			// 		callback(err, 'Shapefile imported successfully.');
-			// 	});
-			// });
 		});
 
 		// prime geometries in new table
@@ -597,6 +561,7 @@ module.exports = api.postgis = {
 				}
 			});
 
+			// prime tables
 			api.postgis._primeTableWithGeometries({
 				file_id : file_id,
 				postgis_db : pg_db,
@@ -617,6 +582,7 @@ module.exports = api.postgis = {
 				}
 			});
 
+			// get meta
 			api.postgis._getMetadata({
 				file_id : file_id,
 				postgis_db : pg_db
@@ -722,6 +688,9 @@ module.exports = api.postgis = {
 
 			// check of LATIN1 encoding errors
 			if (stdin.indexOf('LATIN1') > -1 && attempts < 2) {
+
+				console.log('LATIN!!');
+
 				var endTime = new Date().getTime();
 
 				// set error on status
@@ -735,6 +704,7 @@ module.exports = api.postgis = {
 				}, function (err) {
 					// callback(err, 'Shapefile imported successfully.');
 
+					// safe guard, todo: catch more edge cases, make them work
 					done('Encoding error, use utf8.');
 				});
 
