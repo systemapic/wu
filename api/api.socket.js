@@ -43,6 +43,20 @@ module.exports = api.socket = {
 	_processing : {},
 
 
+	send : function (channel, user_id, data) {
+
+		console.log('socket send', channel, user_id, data);
+
+		var sock = api.socket._getSocket(user_id);
+
+		// send to user
+		sock && sock.emit(channel, {
+			data : data
+		});
+
+	},
+
+
 	getServerStats : function (req) {
 
 		// get stats from redis
@@ -73,6 +87,8 @@ module.exports = api.socket = {
 			error : err
 		});
 	},
+
+
 
 
 	downloadReady : function (options) {

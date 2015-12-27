@@ -365,14 +365,14 @@
 	border: none;
 }
 .file-list-container-file-list .data-list-line:hover {
-	background: rgba(246, 246, 246, 0.54);
-	color: #4FA98B;
+    background: rgb(60, 71, 89) !important;
+    color: white !important;
 }
 .file-popup {
 	color: #3F4652;
 }
 .data-list-line .file-name-content {
-	font-size: 16px;
+	font-size: 14px;
 }
 .files-container {
 	padding-bottom: 60px;
@@ -476,6 +476,7 @@
   text-align: center;
   border-bottom: 1px solid #ccc;
   padding-bottom: 25px;
+  cursor: default;	
 }
 
 
@@ -1338,6 +1339,93 @@ input.target-input.polygon {
 .data-list-line.processing:hover {
 	color: white;
 }
+
+
+.padding-top-10 {
+	padding-top: 10px;
+}
+
+
+.red-font {
+	color: #E45252;
+}
+
+.dark-font {
+	color: #3F4652;
+}
+.smooth-fullscreen-save.generate-tiles {
+    position: absolute;
+    width: auto;
+    top: 105px;
+    right: 18px;
+}
+
+.pos-abs {
+	position: absolute;
+};
+.w-auto {
+	width: auto;
+}
+.top-105 {
+	top: 105px;
+}
+.right-18 {
+	right: 18px;
+}
+.height-26 {
+	height: 26px;
+}
+.height-22 {
+	height: 22px;
+}
+.height-42 {
+	height: 42px;
+}
+
+
+.file-popup-trigger.add-layer {
+	left: 10px;
+}
+
+.fa.fa-plus-square.add-trigger {
+	padding-right: 3px;
+}
+
+
+.file-popup-trigger.add-layer {
+    bottom: 25px;
+    width: auto;
+    right: 11px;
+    background: none;
+    position: absolute;
+    left: initial;
+}
+
+
+.disabled-btn {
+	pointer-events: none;
+	opacity: 0.2;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

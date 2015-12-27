@@ -312,6 +312,14 @@ module.exports = function(app, passport) {
 	});
 
 	// =====================================
+	// GET FILE DOWNLOAD ===================
+	// =====================================
+	app.get('/api/util/getTilecount', passport.authenticate('bearer', {session: false}), function (req, res) {
+		api.geo.getTilecount(req, res);
+	});
+
+
+	// =====================================
 	// GET GEOJSON FILES ===================
 	// =====================================
 	app.post('/api/geo/json2carto', passport.authenticate('bearer', {session: false}), function (req,res) {

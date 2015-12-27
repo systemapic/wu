@@ -1165,7 +1165,10 @@ module.exports = api.access = {
 		download_file : function (options, done) { 
 			// some files not attached to projects, like temp-files (pdfs, etc)
 			// so, if created by self, it's ok..
+
+			console.log('download_file access 1/2');
 			if (api.access.is.createdBy(options.file, options.user)) return done(null, options);
+			console.log('download_file access 2/2');
 
 			// need to find project, and check project_capability
 			var ops = [];

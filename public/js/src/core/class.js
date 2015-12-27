@@ -959,6 +959,13 @@ Wu.Util = {
 		return jss.getAll(tag);
 	},
 
+
+	confirm : function (msg, callback) {
+
+		var confirmed = confirm(msg);
+
+		callback(confirmed);
+	},
 	
 
 	
@@ -1018,26 +1025,7 @@ Wu.setStyle = Wu.Util.setStyle;
 Wu.getStyle = Wu.Util.getStyle;
 Wu.verify = Wu.Util.verifyResponse;
 Wu.getJSON = Wu.Util._getJSON;
-
-
-// Wu.CustomEvents = {
-
-// 	on : function (obj, type, fn, ctx) {
-// 		// var event = new CustomEvent('build', { 'detail': elem.dataset.time });
-// 		// document.addEventListener(type, fn, false);
-// 		Wu.DomEvent.on(obj, type, fn, ctx)
-// 	},
-
-// 	off : function (obj, type, fn, ctx) {
-// 		Wu.DomEvent.off(obj, type, fn, ctx)
-// 	},
-
-// 	fire : function (type, data) {
-// 		var event = new CustomEvent(type, data);
-// 		document.dispatchEvent(event);
-// 	},
-
-// };
+Wu.confirm = Wu.Util.confirm;
 
 
 Wu.Evented = Wu.Class.extend({
@@ -1980,3 +1968,4 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
 		return fn.apply(thisp, arguments);
 	};
 };
+
