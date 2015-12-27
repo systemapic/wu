@@ -277,12 +277,15 @@ Wu.Model.Layer = Wu.Model.extend({
 	},
 
 	setOpacity : function (opacity) {
-		this.opacity = opacity || 1;
+		if (isNaN(opacity)) opacity = 1;
+		this.opacity = opacity;
 		this.layer.setOpacity(this.opacity);
 	},
 
 	getOpacity : function () {
-		return this.opacity || this.store.opacity || 1;
+		var opacity = this.opacity || this.store.opacity;
+		if (isNaN(opacity)) opacity = 1;
+		return opacity;
 	},
 
 	getContainer : function () {

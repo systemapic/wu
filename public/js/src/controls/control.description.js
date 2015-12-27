@@ -405,12 +405,9 @@ L.Control.Description = Wu.Control.extend({
 
 	setHTMLfromStore : function (uuid) {
 
-		// var layer = this.layers[uuid];
+		// get layer
 		var layer = this._project.getLayer(uuid);
-
-		console.log('layer: ', layer);	
-
-		if ( !layer ) return;
+		if (!layer) return;
 
 		// Build legend object
 		this.buildLegendObject(layer);		
@@ -456,16 +453,16 @@ L.Control.Description = Wu.Control.extend({
 			this._createOpacitySlider(layer);
 		}
 		
-		console.log('layer: ', layer);
-
 		// set current layer
 		this._slider.layer = layer;
 
-		// set opacity value
+		// set opacity value on slider
 		var opacity = layer.getOpacity();
-		console.log('OPA', opacity);
 		this._slider.set(parseInt(opacity * 100));
+
+		// set opacity on layer
 		layer.setOpacity(opacity);
+
 	},
 
 	_createOpacitySlider : function (layer) {
@@ -479,7 +476,6 @@ L.Control.Description = Wu.Control.extend({
 				'max': [100]
 			},
 		});
-		console.log('slider: ', this._slider);
 
 		// events
 		this._slider.on('update', this._updateOpacity.bind(this));
@@ -487,20 +483,12 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_updateOpacity : function (values, handle) {
-		console.log('slider event, value', values, handle);
-		console.log('thisi, this', this, this._slider);
 
 		var opacity = parseFloat(values[0]) / 100;
-
-		console.log('opacity: ', opacity);
+		var layer = this._slider.layer;
 
 		// set value on layer
-		var layer = this._slider.layer;
-		if (layer) {
-			console.log('layer: ', layer.getTitle());
-		
-			layer.saveOpacity(opacity);
-		}
+		layer && layer.saveOpacity(opacity);
 
 	},
 
@@ -782,8 +770,6 @@ L.Control.Description = Wu.Control.extend({
 
 			point.targets.forEach(function (target, i) {
 
-				console.log('point.targets', point.targets);
-				
 				var column   = target.column;
 				var color    = target.color;					
 				var opacity  = target.opacity;
