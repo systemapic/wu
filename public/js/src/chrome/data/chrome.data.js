@@ -1063,51 +1063,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			var generateBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-22', toggles_wrapper);
 			var generateBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save generate-tiles', generateBtnWrap, 'Generate tiles');
 
-			// wrapper-3: download box
-			var toggles_wrapper3 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
-			var download_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper3, 'Download dataset');
-
-			// download button
-			var downloadBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper3);
-			var downloadBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', downloadBtnWrap, 'Download');
-
-			// wrapper-4: delete box
-			var toggles_wrapper4 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
-			var delete_title = Wu.DomUtil.create('div', 'file-option title red-font', toggles_wrapper4, 'Delete');
-
-			// download button
-			var deleteBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper4);
-			var deleteBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', deleteBtnWrap, 'Delete');
-
-			// deleete button event
-			Wu.DomEvent.on(deleteBtn, 'click', function (e) {
-				
-				// confirm dialog
-				Wu.confirm('Are you sure you want to delete this dataset? This cannot be undone!', function (confirmed) {
-					if (!confirmed) return; 
-
-					// delete file
-					file._deleteFile(function (err, removedFile) {
-
-						// close fullscreen
-						fullscreen.close();
-
-						// delete successful
-						if (!err && removedFile && removedFile.success) {
-							return app.feedback.setMessage({
-								title : 'Dataset deleted!', 
-								description : file.getName() + ' was deleted.'
-							});
-						} else {
-							return app.feedback.setError({
-								title : 'Something went wrong.', 
-								description : 'Dataset not deleted.'
-							});
-						}
-					});
-				}.bind(this))
-			}, this);
-
 			// slider events
 			stepSlider.noUiSlider.on('update', function (values, handle) {
 
@@ -1159,7 +1114,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				var z_min = parseInt(values[0]);
 				var z_max = parseInt(values[1]);
 
-				// check tile count (local)
+				// double check tile count (local)
 				this.calculateTileCount({
 					zoom_min : z_min,
 					zoom_max : z_max,
@@ -1167,7 +1122,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				}, function (err, tile_count) {
 					
 					// check tile count
-					if (tile_count > 11000) return;// todo: account dependent
+					if (tile_count > 11000) return; // todo: account dependent
 
 					// generate tiles
 					app.Socket.send('generate_tiles', {
@@ -1182,12 +1137,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			}, this);
 
 
-			// download button
-			Wu.DomEvent.on(downloadBtn, 'click', file._downloadFile, file);
-
 		}		
-
-
 
 
 
@@ -1203,58 +1153,64 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
 			var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
 			var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created on:</span> ' + moment(file.getCreated()).format('MMMM Do YYYY, h:mm:ss a'));
-
-
-			// wrapper-3: download box
-			var toggles_wrapper3 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
-			var download_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper3, 'Download dataset');
-
-			// download button
-			var downloadBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper3);
-			var downloadBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', downloadBtnWrap, 'Download');
-
-			// wrapper-4: delete box
-			var toggles_wrapper4 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
-			var delete_title = Wu.DomUtil.create('div', 'file-option title red-font', toggles_wrapper4, 'Delete');
-
-			// download button
-			var deleteBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper4);
-			var deleteBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', deleteBtnWrap, 'Delete');
-
-			// deleete button event
-			Wu.DomEvent.on(deleteBtn, 'click', function (e) {
-				
-				// confirm dialog
-				Wu.confirm('Are you sure you want to delete this dataset? This cannot be undone!', function (confirmed) {
-					if (!confirmed) return; 
-
-					// delete file
-					file._deleteFile(function (err, removedFile) {
-
-						// close fullscreen
-						fullscreen.close();
-
-						// delete successful
-						if (!err && removedFile && removedFile.success) {
-							return app.feedback.setMessage({
-								title : 'Dataset deleted!', 
-								description : file.getName() + ' was deleted.'
-							});
-						} else {
-							return app.feedback.setError({
-								title : 'Something went wrong.', 
-								description : 'Dataset not deleted.'
-							});
-						}
-					});
-				}.bind(this))
-			}, this);
-
-			// download button
-			Wu.DomEvent.on(downloadBtn, 'click', file._downloadFile, file);
-
+		
 		}
 
+
+		// wrapper-3: download box
+		var toggles_wrapper3 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
+		var download_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper3, 'Download dataset');
+
+		// download button
+		var downloadBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper3);
+		var downloadBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', downloadBtnWrap, 'Download');
+
+		// wrapper-4: delete box
+		var toggles_wrapper4 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
+		var delete_title = Wu.DomUtil.create('div', 'file-option title red-font', toggles_wrapper4, 'Delete');
+
+		// download button
+		var deleteBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper4);
+		var deleteBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', deleteBtnWrap, 'Delete');
+
+		// deleete button event
+		Wu.DomEvent.on(deleteBtn, 'click', function (e) {
+			
+			// confirm dialog
+			Wu.confirm('Are you sure you want to delete this dataset? This cannot be undone!', function (confirmed) {
+				if (!confirmed) return; 
+
+				// delete file
+				file._deleteFile(function (err, removedFile) {
+
+					// close fullscreen
+					fullscreen.close();
+
+					// delete successful
+					if (!err && removedFile && removedFile.success) {
+						app.feedback.setMessage({
+							title : 'Dataset deleted!', 
+							description : file.getName() + ' was deleted.'
+						});
+					} else {
+						app.feedback.setError({
+							title : 'Something went wrong.', 
+							description : 'Dataset not deleted.'
+						});
+					}
+				});
+
+			}.bind(this))
+
+		}, this);
+
+
+		// download button
+		Wu.DomEvent.on(downloadBtn, 'click', file._downloadFile, file);
+
+
+		// share dataset
+		console.error('share');
 
 
 	},
