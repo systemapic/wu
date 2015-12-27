@@ -1006,6 +1006,22 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', toggles_wrapper);
 
 
+		// vector 
+		if (file.isPostgis()) {
+
+			// get meta
+			var meta = file.getMeta();
+
+			// meta info
+			var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta')
+			var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Vector');
+			var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
+			var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
+			var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created on:</span> ' + moment(file.getCreated()).format('MMMM Do YYYY, h:mm:ss a'));
+		
+		}
+		
+
 		// raster
 		if (file.isRaster()) {
 
@@ -1138,23 +1154,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 
 		}		
-
-
-
-
-		if (file.isPostgis()) {
-
-			// get meta
-			var meta = file.getMeta();
-
-			// meta info
-			var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta')
-			var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Vector');
-			var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
-			var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
-			var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created on:</span> ' + moment(file.getCreated()).format('MMMM Do YYYY, h:mm:ss a'));
-		
-		}
 
 
 		// wrapper-3: download box
