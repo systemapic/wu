@@ -20,6 +20,7 @@ var layerSchema = mongoose.Schema({
 	tms 		: Boolean,	
 	attribution     : String,
 	accessToken 	: String, 	// some layers have access tokens, like mapbox
+	opacity 	: String, 	
 
 	// data source for layer
 	data : {
