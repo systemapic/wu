@@ -233,10 +233,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var file = e.detail.file;
 
 		// automatically create layer
-		console.log('_onFileImported', e);
-
 		file._createLayer(this._project, function (err, layer) {
-			console.log('created layer: ', err, layer);
 
 			// automatically add layer to layermenu
 			this._addOnImport(layer);
@@ -275,9 +272,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// remove temp files
 		_.each(this._tempFiles, function (tempFile, etc) {
-			console.log('_each', tempFile, etc);
 			Wu.DomUtil.remove(tempFile.datawrap);
-			
 		});
 		this._tempFiles = {};
 
@@ -1093,7 +1088,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 					// delete file
 					file._deleteFile(function (err, removedFile) {
-						console.log('deletefile err, removedFile', err, removedFile);
 
 						// close fullscreen
 						fullscreen.close();
@@ -1291,13 +1285,11 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	},
 
 	_onTilesetMeta : function (e) {
-		console.log('_onTilesetMeta', e);
 
-		var tile_set = e.detail.data;
 
-		console.log('tile_set:', tile_set);
 		return;
 
+		var tile_set = e.detail.data;
 
 		var data = e.detail.data;
 		var tile_count = parseInt(data.tiles) * (-1);
@@ -1366,14 +1358,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
  	_lat2tile : function (lat,zoom)  { return (Math.floor((1-Math.log(Math.tan(lat*Math.PI/180) + 1/Math.cos(lat*Math.PI/180))/Math.PI)/2 *Math.pow(2,zoom))); },
 
 	_onGeneratedTiles : function (e) {
-		var data = e.detail.data;
 
+		var data = e.detail.data;
 		var meta = data.metadata;
 		var file_id = data.file_id;
-
-		console.log('Generated tiles! new meta:', meta);
-
 		var file = app.Account.getFile(file_id);
+
+		// set meta
 		file.setMetadata(meta);
 
 		// feedback
