@@ -1541,6 +1541,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			// Do not allow postgis layers to be in the baselayer dropdown
 			if ( provider.key == "postgis" ) return;
+			if ( provider.key == "raster" ) return; // temporary disable rasters. todo: create nice dropdown with mulitple choice
 
 			// Get each provider (mapbox, google, etc)
 			provider.layers.forEach(function(layer) {

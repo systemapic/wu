@@ -45,7 +45,11 @@ L.Control.Description = Wu.Control.extend({
 		this._metaContainer = Wu.DomUtil.create('div', 'description-control-meta-container', this._inner);		
 
 		// init satellite path container
-		this.satelliteAngle = new Wu.satteliteAngle({angle : false, path: false, appendTo : this._inner});
+		this.satelliteAngle = new Wu.satelliteAngle({angle : false, path: false, appendTo : this._inner});
+
+		// opacity 
+		var opacityTitle = Wu.DomUtil.create('div', 'description-control-opacity-title', this._inner, 'Opacity:');
+		this._opacityContainer = Wu.DomUtil.create('div', 'description-control-opacity-container', this._inner);
 
 		// legend
 		this._legendContainer = Wu.DomUtil.create('div', 'description-control-legend-container', this._inner);
@@ -67,7 +71,7 @@ L.Control.Description = Wu.Control.extend({
 		Wu.DomEvent.on(this._toggle, 'click', this.toggle, this);	
 	
 		// prevent map double clicks
-		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stopPropagation, this);
+		Wu.DomEvent.on(this._container, 'mousedown click dblclick',  Wu.DomEvent.stop, this);
 	},
 	
 	_isActive : function () {
@@ -247,9 +251,9 @@ L.Control.Description = Wu.Control.extend({
 
 			var layer = this.layers[uuid];
 
-			title = layer.getTitle();
+			var title = layer.getTitle();
 			var multipleLayer = Wu.DomUtil.create('div', 'each-multiple-description', wrapper, title);
-			    multipleLayer.id = 'mulitidec_' + uuid;
+			multipleLayer.id = 'mulitidec_' + uuid;
 
 			if ( uuid == layerUuid ) {
 				length > 1 ? Wu.DomUtil.addClass(multipleLayer, 'active') : Wu.DomUtil.addClass(multipleLayer, 'one-layer');
@@ -349,65 +353,8 @@ L.Control.Description = Wu.Control.extend({
 
 
 	getLegend : function (layer) {
-
-		// get styling
-		// var style = layer.getStyling();
-
-		
-		// // point
-		// if (style && style.point && style.point.color && style.point.color.column) {
-
-		// 	var colorStops = style.point.color.value;
-		// 	var minMax = style.point.color.range
-		// 	var min = minMax[0];
-		// 	var max = minMax[1];
-		// 	var bline = this._getLegendCaption(style.point.color);
-
-		// 	// create legend
-		// 	var gradientOptions = {
-		// 		colorStops : colorStops,
-		// 		minVal : minMax[0],
-		// 		maxVal : minMax[1],
-		// 		bline : bline
-		// 	}
-
-		// 	var legendHTML = this.gradientLegend(gradientOptions);
-
-		// // polygon
-		// } else if (style && style.polygon && style.polygon.color && style.polygon.color.column) {
-
-		// 	var colorStops = style.polygon.color.value;
-		// 	var minMax = style.polygon.color.range
-		// 	var min = minMax[0];
-		// 	var max = minMax[1];
-		// 	var bline = this._getLegendCaption(style.polygon.color);
-
-		// 	// create legend
-		// 	var gradientOptions = {
-		// 		colorStops : colorStops,
-		// 		minVal : minMax[0],
-		// 		maxVal : minMax[1],
-		// 		bline : bline
-		// 	}
-
-		// 	var legendHTML = this.gradientLegend(gradientOptions);
-
-		// // catch-all
-		// } else {
-
-			// var legendHTML = '';
-			// var legendHTML = this.createLegend();
-
-		if (layer.isPostgis()) {
-			var legendHTML = this.createLegendHTML();
-		} else {
-			var legendHTML = '';
-		}
-
-		// }
-
+		var legendHTML = layer.isPostgis() ? this.createLegendHTML() : '';
 		return legendHTML;
-
 	},
 
 	_getLegendCaption : function (color) {
@@ -417,7 +364,7 @@ L.Control.Description = Wu.Control.extend({
 		if (column) {
 
 			// special case
-			if (column == 'vel' || column == 'mvel') {
+			if (column == 'vel' || column == 'mvel') { // todo: make not hardcoded!
 				return 'Velocity (mm/year)'
 			}
 
@@ -461,6 +408,8 @@ L.Control.Description = Wu.Control.extend({
 		// var layer = this.layers[uuid];
 		var layer = this._project.getLayer(uuid);
 
+		console.log('layer: ', layer);	
+
 		if ( !layer ) return;
 
 		// Build legend object
@@ -478,13 +427,12 @@ L.Control.Description = Wu.Control.extend({
 		// Legend
 		var legend = this.getLegend(layer);
 
-		// var _layer = this._project.getLayer(uuid);
+		// satellite angle
 		var satPos = Wu.parse(layer.getSatellitePosition());
-
-		var _angle = satPos.angle;
-		var _path  = satPos.path;
-
-		this.satelliteAngle.update({angle : _angle, path : _path});
+		this.satelliteAngle.update({
+			angle : satPos.angle, 
+			path : satPos.path
+		});
 
 		// Set description
 		this.setDescriptionHTML(description);
@@ -495,6 +443,64 @@ L.Control.Description = Wu.Control.extend({
 		// Set legend
 		this.setLegendHTML(legend);
 
+
+		// set opacity slider
+		this.setOpacity(layer);
+
+	},
+
+	setOpacity : function (layer) {
+
+		// create slider once
+		if (!this._slider) {
+			this._createOpacitySlider(layer);
+		}
+		
+		console.log('layer: ', layer);
+
+		// set current layer
+		this._slider.layer = layer;
+
+		// set opacity value
+		var opacity = layer.getOpacity();
+		console.log('OPA', opacity);
+		this._slider.set(parseInt(opacity * 100));
+		layer.setOpacity(opacity);
+	},
+
+	_createOpacitySlider : function (layer) {
+
+		// create slider
+		this._sliderContainer = Wu.DomUtil.create('div', 'opacity-slider', this._opacityContainer);
+		this._slider = noUiSlider.create(this._sliderContainer, {
+			start: [100],
+			range: {
+				'min': [0],
+				'max': [100]
+			},
+		});
+		console.log('slider: ', this._slider);
+
+		// events
+		this._slider.on('update', this._updateOpacity.bind(this));
+
+	},
+
+	_updateOpacity : function (values, handle) {
+		console.log('slider event, value', values, handle);
+		console.log('thisi, this', this, this._slider);
+
+		var opacity = parseFloat(values[0]) / 100;
+
+		console.log('opacity: ', opacity);
+
+		// set value on layer
+		var layer = this._slider.layer;
+		if (layer) {
+			console.log('layer: ', layer.getTitle());
+		
+			layer.saveOpacity(opacity);
+		}
 
 	},
 
@@ -588,15 +594,11 @@ L.Control.Description = Wu.Control.extend({
 	},
 
 	_on : function () {
-
 		this._show();
-
 	},
 
 	_off : function () {
-
 		this._hide();
-
 	},
 
 
