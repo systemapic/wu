@@ -13,21 +13,24 @@ Wu.Chrome = Wu.Class.extend({
 	},      
 
 	_listen : function () {
-		Wu.Mixin.Events.on('projectSelected', this._projectSelected, this);
-		Wu.Mixin.Events.on('projectDeleted',  this._onProjectDeleted, this);
-		Wu.Mixin.Events.on('editEnabled',     this._editEnabled, this);
-		Wu.Mixin.Events.on('editDisabled',    this._editDisabled, this);
-		Wu.Mixin.Events.on('layerEnabled',    this._layerEnabled, this);
-		Wu.Mixin.Events.on('layerDisabled',   this._layerDisabled, this);
-		Wu.Mixin.Events.on('fileImported',    this._onFileImported, this);
-		Wu.Mixin.Events.on('fileDeleted',     this._onFileDeleted, this);
-		Wu.Mixin.Events.on('layerAdded',      this._onLayerAdded, this);
-		Wu.Mixin.Events.on('layerEdited',     this._onLayerEdited, this);
-		Wu.Mixin.Events.on('layerDeleted',    this._onLayerDeleted, this);
-		Wu.Mixin.Events.on('closeMenuTabs',   this._onCloseMenuTabs, this);
-		Wu.Mixin.Events.on('fileProcessing',  this._onFileProcessing, this);
+		Wu.Mixin.Events.on('projectSelected', 	this._projectSelected, this);
+		Wu.Mixin.Events.on('projectDeleted',  	this._onProjectDeleted, this);
+		Wu.Mixin.Events.on('editEnabled',     	this._editEnabled, this);
+		Wu.Mixin.Events.on('editDisabled',    	this._editDisabled, this);
+		Wu.Mixin.Events.on('layerEnabled',    	this._layerEnabled, this);
+		Wu.Mixin.Events.on('layerDisabled',   	this._layerDisabled, this);
+		Wu.Mixin.Events.on('fileImported',    	this._onFileImported, this);
+		Wu.Mixin.Events.on('fileDeleted',     	this._onFileDeleted, this);
+		Wu.Mixin.Events.on('layerAdded',      	this._onLayerAdded, this);
+		Wu.Mixin.Events.on('layerEdited',     	this._onLayerEdited, this);
+		Wu.Mixin.Events.on('layerDeleted',    	this._onLayerDeleted, this);
+		Wu.Mixin.Events.on('closeMenuTabs',   	this._onCloseMenuTabs, this);
+		Wu.Mixin.Events.on('fileProcessing',  	this._onFileProcessing, this);
 		Wu.Mixin.Events.on('processingProgress',  this._onProcessingProgress, this);
-		Wu.Mixin.Events.on('processingError',  this._onProcessingError, this);
+		Wu.Mixin.Events.on('processingError',  	this._onProcessingError, this);
+		Wu.Mixin.Events.on('tileCount',  	this._onTileCount, this);
+		Wu.Mixin.Events.on('tileset_meta',  	this._onTilesetMeta, this);
+		Wu.Mixin.Events.on('generatedTiles',  	this._onGeneratedTiles, this);
 	},
 
 	_projectSelected : function (e) {
@@ -114,6 +117,9 @@ Wu.Chrome = Wu.Class.extend({
 	_onFileProcessing : function () {},
 	_onProcessingProgress : function () {},
 	_onProcessingError : function () {},
+	_onTileCount : function () {},
+	_onGeneratedTiles : function () {},
+	_onTilesetMeta : function () {},
 
 
 });

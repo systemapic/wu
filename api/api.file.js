@@ -110,8 +110,6 @@ module.exports = api.file = {
 		var userUuid = options.user.uuid,
 		    file_id = options.file._id;
 
-		console.log('addNewFileToUser', options);
-
 		User
 		.findOne({uuid : userUuid})
 		.exec(function (err, user) {
@@ -280,24 +278,66 @@ module.exports = api.file = {
 			}, callback);
 		});
 
+
 		ops.push(function (options, callback) {
-			var record = options.file,
-			    name = record.name.replace(/\s+/g, ''),
-			    out = api.config.path.temp + name + '_' + record.type + '.zip',
-			    cwd = api.config.path.file + fileUuid,
-			    command = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store',
-			    exec = require('child_process').exec;				
+
+			console.log('optionsnsns', options);
+			var file = options.file;
+
+			if (file.type == 'postgis') {
+				var name = file.name.replace(/\s+/g, '');
+				var out = api.config.path.temp + name + '_' + file.type + '.zip';
+				var cwd = api.config.path.file + fileUuid;
+				var command = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store';
+				var exec = require('child_process').exec;
+
+				console.log('cwd:', cwd);
 			
-			exec(command, {cwd : cwd}, function (err, stdout, stdin) {
-				callback(err, out);
-			});
+				var proc = exec(command, {cwd : cwd}, function (err, stdout, stdin) {
+					callback(err, out);
+				});
+
+				return;
+			}
+
+			if (file.type == 'raster') {
+
+				// make a copy first
+				var path = api.config.path.file + fileUuid + '/' + fileUuid;
+				var renamed = api.config.path.temp + fileUuid + '/' + file.originalName;
+				console.log('rater path: ', path);
+				console.log('rater renamed: ', renamed);
+				fs.copy(path, renamed, function (err) {
+
+					var zipfile_name = api.config.path.temp + fileUuid + '/' + file.originalName + '_' + file.type + '.zip';
+					console.log('zipfile_name: ', zipfile_name);
+					var cwd = api.config.path.temp;
+					var command = 'zip -rj ' + zipfile_name + ' ' + renamed;
+					var exec = require('child_process').exec;
+
+					console.log('command: ', command);
+
+					console.log('cwd:', cwd);
+				
+					var proc = exec(command, {cwd : cwd}, function (err, stdout, stdin) {
+						console.log('copppp err, std', err, stdout, stdin);
+						callback(err, zipfile_name);
+					});
+
+					// callback(err, renamed);
+				});
+
+			}
+
 		});
 
 		async.waterfall(ops, function (err, path) {
 			if (err) console.log('ERR 12'.red, err);
-
 			if (err) return api.error.general(req, res, err);
+
+			// send file
 			res.download(path);
+
 		});
 	},
 
@@ -653,8 +693,6 @@ module.exports = api.file = {
 		    type = options.type;
 
 
-		console.log('getLayers', type, options);
-
 		if (type == 'raster') {
 			return api.file._getRasterLayers(req, res);
 		}
@@ -827,6 +865,7 @@ module.exports = api.file = {
 			'category',
 			'version',
 			'copyright',
+			'data'
 		];
 
  		// enqueue queries for valid fields

@@ -16,6 +16,7 @@ var fileSchema = mongoose.Schema({
 	folder          :  String,
 	absfolder       :  String,
 	name            :  String,
+	originalName 	:  String,
 	description     :  String,
 	copyright 	:  String,
 	keywords        : [String],
@@ -29,7 +30,7 @@ var fileSchema = mongoose.Schema({
 
 	data : {
 
-		postgis    : { 				// postgis data
+		postgis : { 				// postgis data
 			database_name : String,
 			table_name : String,
 			data_type : String, 		// raster or vector

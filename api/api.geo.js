@@ -1311,6 +1311,22 @@ module.exports = api.geo = {
 	},
 
 
+	pingProgress : function (options, message, percent) {
+
+		// ping progress
+		api.socket.processingProgress({
+			user_id : options.user_id,
+			progress : {
+				text : message,
+				error : null,
+				percent : percent,
+				uniqueIdentifier : options.uniqueIdentifier,
+			}
+		});
+
+	},
+
+
 	handleRaster : function (options, done) {
 
 		var fileUuid = options.fileUuid || options.file_id,
@@ -1319,17 +1335,19 @@ module.exports = api.geo = {
 		    user_id = options.user_id,
 		    uniqueIdentifier = options.uniqueIdentifier,
 		    outFolder = '/data/raster_tiles/' + fileUuid + '/raster/',
+		    processingTimer, // global timer 
 		    ops = [];
 
+		    console.log('infile, outfolder', inFile, outFolder);
 
 		ops.push(function (callback) {
 			var out = api.config.path.file + fileUuid + '/' + fileUuid;
 			var inn = inFile;
-			// console.log('COPYYY inn, out', inn, out);
 
 			// dont copy if already there
 			if (inn == out) return callback(null);
 
+			// copy
 			fs.copy(inn, out, function (err) {
 				callback(err);
 			});
@@ -1339,15 +1357,8 @@ module.exports = api.geo = {
 		ops.push(function (callback) {
 
 			// ping progress
-			api.socket.processingProgress({
-				user_id : user_id,
-				progress : {
-					text : 'Opening file...',
-					error : null,
-					percent : 20,
-					uniqueIdentifier : uniqueIdentifier,
-				}
-			});
+			api.geo.pingProgress(options, 'Opening file...', 10);
+			
 
 			var dataset = gdal.open(inFile);
 
@@ -1363,7 +1374,6 @@ module.exports = api.geo = {
 			
 			// invalid
 			var msg = 'Invalid projection: ' + dataset.srs.toWKT();
-			// console.log('msg: ', msg);
 			callback(msg); // err
 		});
 
@@ -1372,16 +1382,9 @@ module.exports = api.geo = {
 		ops.push(function (dataset, callback) {
 
 			// ping progress
-			api.socket.processingProgress({
-				user_id : user_id,
-				progress : {
-					text : 'Getting metadata...',
-					error : null,
-					percent : 25,
-					uniqueIdentifier : uniqueIdentifier,
-				}
-			});
+			api.geo.pingProgress(options, 'Getting metadata...', 15);
 
+			// get stats
 			fs.stat(inFile, function (err, stats) {
 				options.fileSize = stats.size;
 				callback(null, dataset);
@@ -1392,25 +1395,16 @@ module.exports = api.geo = {
 		// get meta 
 		ops.push(function (dataset, callback) {
 
-
-			
 			// get projection
 			var s_srs = dataset.srs ? dataset.srs.toProj4() : 'null';
 
 			// ping progress
-			api.socket.processingProgress({
-				user_id : user_id,
-				progress : {
-					text : 'Got projection ' + s_srs,
-					error : null,
-					percent : 30,
-					uniqueIdentifier : uniqueIdentifier,
-				}
-			});
+			api.geo.pingProgress(options, 'Projection:' + s_srs, 16);
 
 			// get extent
 			var extent = api.geo._getRasterExtent(dataset);
 
+			// set meta
 			var meta = {
 				projection : s_srs,
 				geotransform : dataset.geoTransform,
@@ -1427,6 +1421,9 @@ module.exports = api.geo = {
 					y : dataset.rasterSize.y
 				},
 			}
+
+			// return meta
+			callback(null, meta);
 
 			// "{
 			//   "filesize": 184509,
@@ -1464,8 +1461,6 @@ module.exports = api.geo = {
 			//   "dstype": "ogr",
 			//   "filetype": ".geojson"
 			// }"
-			
-			callback(null, meta);
 		});
 
 
@@ -1485,85 +1480,148 @@ module.exports = api.geo = {
 			// debug
 			return callback(null, meta);
 
-			// same, no reprojection necessary
-			if (isSame) return callback(null, meta);
+			// // same, no reprojection necessary
+			// if (isSame) return callback(null, meta);
 
-			var outFile = inFile + '.reprojected';
-			var cmd = 'gdalwarp -srcnodata 0 -dstnodata 0 -t_srs "' + ourProj4 + '" "' + inFile + '" "' + outFile + '"';
-			// console.log('gdalwarp cmd: ', cmd);
+			// var outFile = inFile + '.reprojected';
+			// var cmd = 'gdalwarp -srcnodata 0 -dstnodata 0 -t_srs "' + ourProj4 + '" "' + inFile + '" "' + outFile + '"';
 
-			var exec = require('child_process').exec;
-			exec(cmd, function (err, stdout, stdin) {
-				if (err) return callback(err);
+			// var exec = require('child_process').exec;
+			// var proc = exec(cmd, function (err, stdout, stdin) {
+			// 	if (err) return callback(err);
 
-				options.path = outFile;
-				callback(null, meta);
-			});
+			// 	options.path = outFile;
+			// 	callback(null, meta);
+			// });
+
+			// proc.stdout.on('data', function(data) {
+			// 	console.log('warping stdout: ', data); 
+			// });
 
 		});
 
 		ops.push(function (meta, callback) {
+			
 			// set upload status
 			api.upload.updateStatus(fileUuid, {
-				metadata : meta
+				metadata : meta,
+				tmpfile : inFile,
 			}, function (err) {
 				callback(null, meta);
 			});
-		})
+		});
 
 		ops.push(function (meta, callback) {
 
 			// ping progress
-			api.socket.processingProgress({
-				user_id : user_id,
-				progress : {
-					text : 'Creating tiles...',
-					error : null,
-					percent : 40,
-					uniqueIdentifier : uniqueIdentifier,
-				}
-			});
-			
-			var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -a 0,0,0 -p mercator --no-kml "' + inFile + '" "' + outFolder + '"';
-			// var cmd = api.config.path.tools + 'pp2gdal2tiles.py --processes=1 -w none -p mercator --no-kml "' + options.path + '" "' + outFolder + '"';
+			api.geo.pingProgress(options, 'Generating tiles...', 20);
+
+			// zoom levels to render
+			var zoomLevels = [14, 15].join('-');
+			console.log('zoomLevels', zoomLevels);
+			var percentDone = 20;
+			// -z ' + zoomLevels + '
+
+			var cmd = [
+				api.config.path.tools + 'gdal2tiles_parallel.py',
+				'--processes=6',
+				'--webviewer none',
+				'--srcnodata 0,0,0',
+				'--profile mercator',
+				'--no-kml',
+				'"' + inFile + '"',
+				'"' + outFolder + '"',
+			].join(' ');
+
+
+
+			// script command
+			// var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -a 200,200,0  -p mercator --no-kml "' + inFile + '" "' + outFolder + '"';
 			console.log('cmd: ', cmd);
 
+			// child process script
 			var exec = require('child_process').exec;
-			exec(cmd, { maxBuffer: 2000 * 1024 }, function (err, stdout, stdin) {
-				console.log('ppgdal2tiles:'.green, stdout);
+			var proc = exec(cmd, { maxBuffer: 2000 * 1024 }, function (err, stdout, stdin) {
+				
+				// handle errors
 				if (err) {
-					console.log('gdal2tiles err: '.red + err);
-					
 					api.error.log(err);
 					var errMsg = 'There was an error generating tiles for this raster image. Please check #error-log for more information.'
 					return callback(errMsg);
 				}
 
+				// clear interval
+				clearInterval(processingTimer);
 
 				// ping progress
-				api.socket.processingProgress({
-					user_id : user_id,
-					progress : {
-						text : 'Almost done...',
-						error : null,
-						percent : 90,
-						uniqueIdentifier : uniqueIdentifier,
-					}
+				api.geo.pingProgress(options, 'Almost done...', 95);
+
+				// REFACTOR!!
+
+				// get tile info
+				var nodeDir = require('node-dir');
+				nodeDir.files(outFolder, function (err, files) {
+
+					// set meta
+					meta.total_tiles = files.length;
+
+					// get tile zoom levels
+					nodeDir.subdirs(outFolder, function(err, subdirs) {
+
+						var zooms = [];
+
+						subdirs.forEach(function (sd) {
+							var part1 = sd.split(outFolder)[1];
+							var part2 = part1.split('/')[0];
+							zooms.push(parseInt(part2));
+						});
+
+						var total_zooms = _.unique(zooms);
+
+						// set meta
+						meta.zoom_levels = _.sortBy(total_zooms);
+
+						// save meta
+						api.upload.updateStatus(fileUuid, {
+							metadata : meta
+						}, callback);
+
+					});
 				});
-
-				// return as db entry
-				var db = {
-					data : {
-						raster : fileUuid
-					},
-					title : fileUuid,
-					file : fileUuid,
-					metadata : JSON.stringify(meta)
-				}
-
-				console.log('db created'.yellow, db);
-				callback(null, db);
 			});
+
+			// processing feedback
+			proc.stdout.on('data', function(data, b, c) {
+				console.log('tiling stdout: ', data, b, c); 
+
+				// incr progress
+				percentDone++;
+
+				if (percentDone > 95) percentDone = 95;
+
+				var text = (percentDone == 95) ? 'Almost done...' : 'Generating tiles...';
+
+
+				// ping progress
+				api.geo.pingProgress(options, text, percentDone);
+				
+			});
+
+			// ping by interval to give impression of progress
+			processingTimer = setInterval(function () {
+
+				percentDone++;
+
+				if (percentDone > 95) percentDone = 95;
+
+				var text = (percentDone == 95) ? 'Almost done...' : 'Generating tiles...';
+
+				// ping progress
+				api.geo.pingProgress(options, text, percentDone);
+
+			}, 5000);
+
+
 
 		});
 
@@ -1600,10 +1658,10 @@ module.exports = api.geo = {
 		});
 		
 		var realExtent = {
-			top : extent.top.y,
-			left : extent.left.x,
-			bottom : extent.bottom.y,
-			right : extent.right.x
+			top 	: extent.top.y,
+			left 	: extent.left.x,
+			bottom 	: extent.bottom.y,
+			right 	: extent.right.x
 		};
 
 		// return object
@@ -1620,10 +1678,472 @@ module.exports = api.geo = {
 			]
 		}
 		
-		// console.log('metadataExtent', metadataExtent);
+		console.log('setting metadataExtent', metadataExtent);
 
 		return metadataExtent;
 	},
+
+
+
+	getTilesetMeta : function (req, done) {
+
+		var file_id = req.data.file_id;
+		var user_id = req.session.passport.user;
+		var folder = api.config.path.raster_tiles + file_id + '/raster/';
+
+		var ops = {};
+
+		ops.tile_count = function (callback) {
+
+			// get number of files in tilset folder
+			var cmd = 'find ' + folder + ' -type f | wc -l'
+			var exec = require('child_process').exec;
+			var proc = exec(cmd, { maxBuffer: 2000 * 1024 * 1024}, function (err, stdout, stdin) {
+				console.log('tile_count exec:', err, stdout, stdin);
+				var tile_count = parseInt(stdout);
+				callback(err, tile_count);
+			});
+		}
+
+		ops.tile_size = function (callback) {
+
+			// get size of tileset folder
+			var cmd = 'du -s ' + folder;
+			var exec = require('child_process').exec;
+			var proc = exec(cmd, { maxBuffer: 2000 * 1024 * 1024}, function (err, stdout, stdin) {
+				console.log('tile_size exec:', err, stdout, stdin);
+				var tile_size = parseInt(stdout.split('  ')[0]); // KB
+				callback(err, tile_size);
+			});
+		}
+
+		async.parallel(ops, function (err, result) {
+
+			// return callback if any
+			if (done) return done(err, result)
+
+			// or ping socket
+			api.socket.send('tileset_meta', user_id, result);
+		})
+		
+		
+
+
+	},
+
+	tileCount : function (req, done) {
+
+		var file_id = req.data.file_id;
+		var zoom_min = req.data.zoom_min;
+		var zoom_max = req.data.zoom_max;
+		var ops = [];
+
+		console.log('reaq.data', req.data);
+		console.log('########### req', req);
+		console.log('cookie', req.session.cookie);
+		console.log('passport', req.session.passport);
+
+		ops.push(function (callback) {
+			File
+			.findOne({uuid : file_id})
+			.exec(callback);
+		})
+		
+		ops.push(function (file, callback) {
+			
+			if (!file.data.raster) return callback('Not raster.');
+			
+			// get extent
+			var metadata = api.utils.parse(file.data.raster.metadata);
+
+			var extent = metadata.extent;
+
+			console.log('metadata extent:', extent, metadata);
+
+			// http://tools.geofabrik.de/tiledb?map=geofabrik_standard&
+			// l=5.538061999999896
+			// r=13.613258562499794
+			// t=51.852097592066265
+			// b=47.23631199999996
+			// z=6
+
+			// [ -49, -7.0000000000008, -47.9999999999992, -6 ]
+
+			var extent_left 	= (-1) * extent[3];
+			var extent_right 	= (-1) * extent[1];
+			var extent_top 		= (-1) * extent[2];
+			var extent_bottom 	= (-1) * extent[0];
+
+			var url = 'http://tools.geofabrik.de/tiledb?map=geofabrik_standard&l=5.538061999999896&r=13.613258562499794&t=51.852097592066265&b=47.23631199999996&z=6'
+			
+			var url = [
+				'http://tools.geofabrik.de/tiledb?map=geofabrik_standard',
+				'&l=' + extent_left,
+				'&r=' + extent_right,
+				'&t=' + extent_top,
+				'&b=' + extent_bottom,
+				'&z=' + zoom_min
+			].join('');
+
+			
+			request(url, function (err, response, body) {
+				// err handling
+				// console.log('err, response, body)', err, response, body)
+
+				// parse result
+				var tile_count = JSON.parse(body);
+
+				var tiles = tile_count.tiles;
+
+				console.log('tiles: ', tiles);
+
+				// calc tiles
+				var lower = tiles[zoom_max];
+
+				
+
+				var data = {
+					zoom_max : zoom_max,
+					tiles : tile_count.tiles[zoom_max],
+					extent : {
+						extent_left : extent_left,
+						extent_right : extent_right,
+						extent_top : extent_top,
+						extent_bottom : extent_bottom,
+					}
+				}
+
+				// return layers to async ops
+				callback(null, data);
+			});
+
+
+		});
+
+		ops.push(function (data, callback) {
+
+			var user_id = req.session.passport.user;
+
+			
+			if (done) {
+
+				// return callback
+				done(null, data);
+			} else {
+
+				// send socket
+				api.socket.send('tile_count', user_id, data);
+			}
+			
+
+			// '{"memory":[0,0,0,0,0,0,1449.5,1021.921875,763.8984375,422383,1077127.9223632812,3342917.5869140625,11203657.877197266,568200005.8731743,1078945199.609375,5169977867.444824,8563502655.513611,79728201110.9375,0,0],"tiles":[1,1,1,1,1,2,2,2,2,1536,5115,18396,73548,285950,1143800,4509564,18037980,71889950,287558700,1149709767]}' },
+
+		});
+
+
+		async.waterfall(ops, function (err, result) {
+
+			if (err) done(err);
+		});
+
+
+	},
+
+
+
+	// tileCount : function (req, done) {
+
+	// 	var file_id = req.data.file_id;
+	// 	var zoom_min = req.data.zoom_min;
+	// 	var zoom_max = req.data.zoom_max;
+
+
+	// 	var ops = [];
+
+	// 	console.log('reaq.data', req.data);
+	// 	console.log('########### req', req);
+
+
+	// 	console.log('cookie', req.session.cookie);
+	// 	console.log('passport', req.session.passport);
+
+	// 	ops.push(function (callback) {
+	// 		File
+	// 		.findOne({uuid : file_id})
+	// 		.exec(callback);
+	// 	})
+		
+	// 	ops.push(function (file, callback) {
+			
+	// 		if (!file.data.raster) return callback('Not raster.');
+			
+	// 		// get extent
+	// 		var metadata = api.utils.parse(file.data.raster.metadata);
+
+	// 		var extent = metadata.extent;
+
+	// 		console.log('metadata extent:', extent, metadata);
+
+	// 		// http://tools.geofabrik.de/tiledb?map=geofabrik_standard&
+	// 		// l=5.538061999999896
+	// 		// r=13.613258562499794
+	// 		// t=51.852097592066265
+	// 		// b=47.23631199999996
+	// 		// z=6
+
+	// 		// [ -49, -7.0000000000008, -47.9999999999992, -6 ]
+
+	// 		var extent_left 	= (-1) * extent[3];
+	// 		var extent_right 	= (-1) * extent[1];
+	// 		var extent_top 		= (-1) * extent[2];
+	// 		var extent_bottom 	= (-1) * extent[0];
+
+	// 		var url = 'http://tools.geofabrik.de/tiledb?map=geofabrik_standard&l=5.538061999999896&r=13.613258562499794&t=51.852097592066265&b=47.23631199999996&z=6'
+			
+	// 		var url = [
+	// 			'http://tools.geofabrik.de/tiledb?map=geofabrik_standard',
+	// 			'&l=' + extent_left,
+	// 			'&r=' + extent_right,
+	// 			'&t=' + extent_top,
+	// 			'&b=' + extent_bottom,
+	// 			'&z=' + zoom_min
+	// 		].join('');
+
+			
+	// 		request(url, function (err, response, body) {
+	// 			// err handling
+	// 			// console.log('err, response, body)', err, response, body)
+
+	// 			// parse result
+	// 			var tile_count = JSON.parse(body);
+
+	// 			var tiles = tile_count.tiles;
+
+	// 			console.log('tiles: ', tiles);
+
+	// 			// calc tiles
+	// 			var lower = tiles[zoom_max];
+
+				
+
+	// 			var data = {
+	// 				zoom_max : zoom_max,
+	// 				tiles : tile_count.tiles[zoom_max],
+	// 				extent : {
+	// 					extent_left : extent_left,
+	// 					extent_right : extent_right,
+	// 					extent_top : extent_top,
+	// 					extent_bottom : extent_bottom,
+	// 				}
+	// 			}
+
+	// 			// return layers to async ops
+	// 			callback(null, data);
+	// 		});
+
+
+	// 	});
+
+	// 	ops.push(function (data, callback) {
+
+	// 		var user_id = req.session.passport.user;
+
+	// 		// callback
+	// 		if (done) return done(null, data);
+
+	// 		// send socket
+	// 		api.socket.send('tile_count', user_id, data);
+
+	// 		// '{"memory":[0,0,0,0,0,0,1449.5,1021.921875,763.8984375,422383,1077127.9223632812,3342917.5869140625,11203657.877197266,568200005.8731743,1078945199.609375,5169977867.444824,8563502655.513611,79728201110.9375,0,0],"tiles":[1,1,1,1,1,2,2,2,2,1536,5115,18396,73548,285950,1143800,4509564,18037980,71889950,287558700,1149709767]}' },
+
+	// 	});
+
+
+	// 	async.waterfall(ops, function (err, result) {
+
+
+
+	// 	});
+
+
+	// },
+
+
+
+
+	generateTiles : function (req) {
+
+		var file_id = req.data.file_id;
+		var zoom_min = req.data.zoom_min;
+		var zoom_max = req.data.zoom_max;
+		var user_id = req.session.passport.user;
+
+		var ops = [];
+
+		ops.push(function (callback) {
+			api.geo.tileCount(req, callback);
+		});
+
+		ops.push(function (data, callback) {
+
+			var tile_count = data.tiles;
+
+			// err
+			if (!tile_count) return callback('Tile count error: ' + tile_count);
+
+			// limit
+			if (tile_count > 11001) callback('Too many tiles: ' + tile_count);
+
+			// generate
+			api.geo._generateTiles({
+				zoom_min : zoom_min,
+				zoom_max : zoom_max,
+				file_id : file_id
+			}, callback);
+
+		});
+
+		ops.push(function (meta, callback) {
+
+			// send reply
+			api.socket.send('generate_tiles', user_id, {
+				metadata : meta,
+				file_id : file_id
+			});
+
+		});
+
+		async.waterfall(ops, function (err, results) {
+
+			// send socket err
+			if (err) return api.socket.send('generate_tiles', user_id, {
+				err : err
+			});
+
+		});
+
+	},
+
+
+
+
+
+	_generateTiles : function (options, done) {
+
+		console.log('_generateTiles', options);
+
+		var file_id = options.file_id;
+		var zoom_min = options.zoom_min;
+		var zoom_max = options.zoom_max;
+		var outFolder = api.config.path.raster_tiles + file_id + '/raster/'; // todo: put in config
+
+		var ops = [];
+		var status;
+		var meta;
+
+
+		ops.push(function (callback) {
+			var key = 'uploadStatus:' + file_id;
+			api.redis.layers.get(key, function (err, stat) {
+				status = api.utils.parse(stat);
+
+				console.log('stauts', status);
+				callback(err);
+			});
+		});
+
+		ops.push(function (callback) {
+
+			// zoom levels to render
+			var zoomLevels = [zoom_min, zoom_max].join('-');
+
+			// file name
+			var inFile = status.tmpfile;
+
+			// script command
+			var cmd = [
+				api.config.path.tools + 'gdal2tiles_parallel.py',
+				'--processes=6',
+				'--webviewer none',
+				'--srcnodata 0,0,0',
+				'--profile mercator',
+				'--zoom ' + zoomLevels,	
+				'--resume',
+				'--no-kml',
+				'"' + inFile + '"',
+				'"' + outFolder + '"',
+			].join(' ');
+
+			console.log('zoomLevels', zoomLevels);
+			console.log('cmd: ', cmd);
+			console.log('infile', inFile);
+
+			console.log('metadata pre parse', status.metadata);
+
+
+			meta = status.metadata;
+
+			// script command
+			// var cmd = api.config.path.tools + 'gdal2tiles_parallel.py --processes=6 -w none -a 200,200,0  -p mercator --no-kml "' + inFile + '" "' + outFolder + '"';
+
+			// child process script
+			var exec = require('child_process').exec;
+			var proc = exec(cmd, { maxBuffer: 2000 * 1024 * 1024}, function (err, stdout, stdin) {
+
+				console.log('exec err', err, stdout, stdin);
+		
+				// get tile info
+				var nodeDir = require('node-dir');
+				nodeDir.files(outFolder, function (err, files) {
+
+					// set meta
+					meta.total_tiles = files.length;
+
+					// get tile zoom levels
+					nodeDir.subdirs(outFolder, function(err, subdirs) {
+
+						var zooms = [];
+
+						subdirs.forEach(function (sd) {
+							var part1 = sd.split(outFolder)[1];
+							var part2 = part1.split('/')[0];
+							zooms.push(parseInt(part2));
+						});
+
+						var total_zooms = _.unique(zooms);
+
+						// set meta
+						meta.zoom_levels = _.sortBy(total_zooms);
+
+						// save meta
+						api.upload.updateStatus(file_id, {
+							metadata : meta
+						}, callback);
+
+					});
+				});
+			});
+		});
+
+		ops.push(function (callback) {
+			callback();
+		});
+
+
+		async.series(ops, function (err, result) {
+			done(err, meta);
+		})
+	},
+
+
+
+
+
+
+
+
+
+
 
 
 

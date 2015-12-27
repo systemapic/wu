@@ -322,7 +322,7 @@ body {
     cursor: pointer;
     width: auto;
     background-repeat: no-repeat;
-    border-left: 1px solid #757C88;
+    border-left: 1px solid gainsboro;
 }
 
 .chrome-left-container {

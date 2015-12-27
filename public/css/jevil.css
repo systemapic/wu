@@ -37,6 +37,7 @@
     margin-top: 0px;
     margin-right: 0px;
     opacity: 0.0;
+    cursor: pointer;
     }
 
 .file-list-container-file-list .data-list-line:hover .file-popup-trigger,
@@ -109,7 +110,7 @@
     height: 17px;
     }
 
-
+/*
 .data-list-line:hover:after,
 .data-list-line.editingName:after,
 .data-list-line.editingFileName:after,
@@ -122,7 +123,7 @@
     background: #EEE;
     top: 0;
     z-index: -1;
-    }
+    }*/
 
 .chrome-data-outer-scroller {
     padding-left: 0;
@@ -198,24 +199,7 @@
 
 
 
-.file-popup-trigger {
-    width: 20px;
-    height: 20px;
-    top: 3px;  
-    right: -5px;
-    opacity: 0;
-    color: black;
-    }
 
-.file-popup-trigger:before {
-    top: -2px;
-    right: 4px;    
-    }
-
-.files-container .file-popup-trigger {
-    right: -4px;
-    top: 13px;    
-    }
 
 .files-container .file-popup {
     top: 37px;
@@ -514,10 +498,6 @@ input.chrome-field-input {
     padding-top: 8px;
     padding-bottom: 8px;
 }
-.chrome-upload-button:active {
-    background: #79E0C0;
-    color: #FCFCFC;
-}
 
 .chrome-data-inner {
     padding: 0;
@@ -798,7 +778,7 @@ input.chrome-field-input {
 
 
 /*.file-list-container */
-.files-container .data-list-line:nth-child(odd):before {
+/*.files-container .data-list-line:nth-child(odd):before {
     content: '';
     position: absolute;
     left: -28px;
@@ -809,10 +789,13 @@ input.chrome-field-input {
     opacity: 1;
     top: 0;    
     }
-
+*/
 .file-list-container .data-list-line {
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 30px;
+    padding-right: 30px;
+    cursor: default;
     }
 
 .rounded-layer-button {
@@ -1132,9 +1115,9 @@ input.chrome-field-input {
 }
 
 .layer-name-content {
-    width: 366px;
+    width: auto;
 }
-
+/*
 .data-list-line:hover:after, .data-list-line.editingName:after, .data-list-line.editingFileName:after, .file-selected:after {
     width: 461px;
 }
@@ -1142,7 +1125,7 @@ input.chrome-field-input {
 .files-container .data-list-line:nth-child(odd):before {
     width: 443px;
 }
-
+*/
 
 
 
@@ -1221,3 +1204,153 @@ input.chrome-field-input {
     z-index: 99999;
     width: 182px;    
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*data pane*/
+.chrome-data-scroller {
+    padding: 0;
+}
+.chrome-layer-list-wrapper {
+    padding: 30px;
+}
+.chrome-content-header.layer-list-container-title.layer-list {
+    padding-left: 30px;
+}
+.upload-button-container {
+    padding-right: 30px;
+}
+.file-list-container-file-list .data-list-line:nth-child(odd) {
+    background: #F9F9F9;
+}
+.file-popup-trigger {
+    position: absolute;
+    z-index: 300;
+    opacity: 1;
+    width: 18px;
+    height: 18px;
+    right: 1px;
+    box-shadow: none;
+    background: #3C4759;
+    width: 50px;
+    height: 20px;
+    right: -5px;
+    bottom: 5px;
+    color: #FCFCFC;
+    opacity: 1;
+    border-radius: 0;
+    right: 20px;
+    font-weight: 900;
+    font-size: 12px;
+    width: auto;
+    border: 0;
+}
+.fa.fa-bars.file-trigger  {
+    padding: 4px;
+}
+.fa.fa-bars.file-option  {
+    padding: 10px;
+}
+.file-popup-trigger:hover {
+    text-decoration: underline;    
+}
+.slim-font {
+    font-weight: 200;
+}
+.file-option {
+    cursor: default;
+}
+.file-option.title {
+    font-size: 18px;
+    padding-top: 20px;
+    font-weight: 600;
+}
+.file-option.sub {
+    padding-left: 2px;
+}
+.toggles-wrapper.file-options {
+    margin-top: 20px;
+    position: relative;
+}
+.bold-font {
+    font-weight: 600;
+}
+.tiles-slider {
+    width: 400px;
+    /*zoom: 0.7;*/
+    position: absolute;
+    right: 0px;
+    top: 14px;
+}
+.smooth-input.smaller-input {
+    height: 40px;
+    font-size: 18px;
+}
+.zoomlevels-wrapper {
+    position: relative;
+}
+
+.file-option.title.generated-tiles {
+    left: 238px;
+    position: absolute;
+    top: 0px;
+}
+.smooth-fullscreen-error-label.tiles-error {
+   padding-top: 20px;
+   height: 39px; 
+}
+
+.data-list-line:hover .file-name-content {
+    font-weight: 900;
+}
+
+/*slider*/
+.noUi-pips-horizontal {
+    top: 40%;
+}
+.noUi-value-horizontal {
+    margin-left: -20px;
+    padding-top: 7px;
+    font-size: 10px;
+}
+.noUi-horizontal {
+    height: 13px;
+}
+.noUi-marker-horizontal.noUi-marker-large {
+    height: 6px;
+}
+.noUi-horizontal .noUi-handle {
+    width: 24px;
+    height: 20px;
+    left: -12px;
+    top: -5px;
+    cursor: pointer;
+}
+.noUi-handle:after, .noUi-handle:before {
+    content: "";
+    display: block;
+    position: absolute;
+    height: 8px;
+    width: 1px;
+    background: #E8E7E6;
+    left: 9px;
+    top: 6px;
+}
+.noUi-handle:after {
+    left: 12px;
+}
+
+
+
+

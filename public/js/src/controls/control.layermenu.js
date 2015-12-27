@@ -124,9 +124,7 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	_forceOpen : function () {
-
 		Wu.DomUtil.removeClass(this._parentWrapper, 'displayNone');
-
 	},
 
 	_enableDefaultLayers : function () {
@@ -1113,7 +1111,7 @@ L.Control.Layermenu = Wu.Control.extend({
 		}
 
 		// add
-		this._add(layerItem);
+		var l = this._add(layerItem);
 
 		// save
 		this._project.store.layermenu.push(item); // refactor
@@ -1121,6 +1119,7 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// this._setHeight();
 
+		return l;
 	},
 
 	_add : function (layerItem) {	
@@ -1211,6 +1210,8 @@ L.Control.Layermenu = Wu.Control.extend({
 
 		// add to local store
 		this.layers[item.uuid] = layerItem;
+
+		return layerItem;
 	},
 
 	getLayers : function () {
