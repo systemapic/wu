@@ -54,7 +54,11 @@ Wu.Share = Wu.Pane.extend({
 		this._shareInviteButton  = Wu.DomUtil.create('div', 'share-item', this._shareDropdown);
 
 		// enter titles
-		this._fillTitles();
+		// this._fillTitles();
+
+		// Print (PDF) – cog
+		this._processingPrint = Wu.DomUtil.create('i', 'fa fa-cog', this._sharePrintButton);
+		
 
 		// events
 		Wu.DomEvent.on(this._shareImageButton,  'click', this._shareImage, this);
@@ -288,6 +292,11 @@ Wu.Share = Wu.Pane.extend({
 			Wu.post('/api/util/pdfsnapshot', json, that._createdPrint, that);
 
 		});
+
+		// xoxoxoxoxox
+		// Wu.DomUtil.addClass('this._sharePrintButton', )
+		
+
 
 		// set progress bar for a 5sec run
 		app.ProgressBar.timedProgress(5000);
