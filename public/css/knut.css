@@ -123,7 +123,7 @@
 
 
 .chrome-left-itemcontainer.activeProject {
-	background: #71c4a8;
+	background: #3C4759;
 	color: white;
 	font-weight: 900;
 	text-indent: 2px;
@@ -341,15 +341,15 @@
 
 
 .access-button.active {
-	background: #71c4a8;
+	background: #3C4759;
 	}
 
 .access-button.active:hover {
-	background: #67B097;
+	background: #3C4759;
 	}
 
 .access-button.active:active {
-	background: #5a9b87;
+	background: #3C4759;
 	}	
 
 
@@ -1307,23 +1307,37 @@ input.target-input.polygon {
     	width: 125px !important;
 	}
 
-.data-list-line.processing {
+.data-list-line.processing,
+.data-list-line.processing:hover {
 	background: #3C4759;
 	color: white;
-	padding: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
 	height: 60px;
-}
-.file-name-content.processing {
+	color: white !important;
+	}
+
+.data-list-line.processing:before,
+.data-list-line.processing:after {
+	display: none;
+	}
+
+
+.file-name-content.processing,
+.file-name-content.processing:hover {
 	padding-left: 5px;
 	position: absolute;
-}
-.file-feedback.processing {
+	}
+
+.file-feedback.processing,
+.file-feedback.processing:hover {
 	padding: 5px;
 	font-size: 13px;
 	font-weight: 600;
 	position: absolute;
 	bottom: 0px;
-}
+	}
+
 .file-feedback-percent.processing {
 	position: absolute;
 	right: 0px;

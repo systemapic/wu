@@ -62,6 +62,7 @@
     padding-top: 5px;
     padding-bottom: 5px;    
     padding-left: 0;
+    width: 390px;
     }
 
 .chrome-data-top-title {
@@ -507,15 +508,18 @@ input.chrome-field-input {
     padding-right: 20px;
     background: #3C4759;
     }
+
 .chrome-upload-button:hover {
     background: #F9F9F9;
     color: #3F4652;
-    border: 1px solid gainsboro;
-}
+    box-shadow: 0 0 0px 1px #DCDCDC inset;
+    }
+
 .chrome-upload-button:active {
-    background: #79E0C0;
-    color: #FCFCFC;
-}
+    background: #EEE;
+    color: #3F4652;
+    box-shadow: 0 0 0px 1px #DCDCDC inset;
+    }
 
 .chrome-data-inner {
     padding: 0;
@@ -555,7 +559,7 @@ input.chrome-field-input {
 
 .active-project,
 .active-project:hover {
-    /*background: #71c4a8 !important;    */
+    /*background: #3C4759 !important;    */
     background: #3C4759 !important;
     }
 
@@ -901,11 +905,11 @@ input.chrome-field-input {
     width: 30px !important;
     height: 30px !important;
 
-    background: url('images/search-icon.png') no-repeat 4px -19px !important;
+    background: url('../images/search-icon.png') no-repeat 4px -19px !important;
     }
 
 .leaflet-control-search .search-button:hover {
-    background: url('images/search-icon.png') no-repeat 4px 5px !important;
+    background: url('../images/search-icon.png') no-repeat 4px 5px !important;
 }
 
 .leaflet-control-search.leaflet-control {
@@ -1217,4 +1221,34 @@ input.chrome-field-input {
     bottom: -23px;
     z-index: 99999;
     width: 182px;    
+    }
+
+
+
+.data-list-line .file-name-content {
+    word-break: break-all;
+    }
+
+.chrome-content-bottom-container {
+    bottom: 95px;
+    }
+
+
+.chrome-tooltip .chrome-field-mini-input {
+    top: 5px !important;
+    width: 35px !important;
+    }
+
+
+
+
+.share-item i {
+    font-size: 16px;
+}
+
+.data-list-line.processing {
+    position: relative;
+    left: -15px;
+    width: 417px;
+    border-radius: 3px;
     }

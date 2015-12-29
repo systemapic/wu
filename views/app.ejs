@@ -9,12 +9,11 @@
 		<!-- @if NODE_ENV == 'DEVELOPMENT' -->
 
 			<!-- DEPENDENCIES STYLESHEETS -->
+			<link rel="stylesheet" href='../fonts/font-awesome-4.4.0/css/font-awesome.min.css'>
+
 			<link rel="stylesheet" href='/js/lib/codemirror/mode/cartocss/spectrum.css'>
 			<link rel="stylesheet" href='/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.css'>
-			<link rel="stylesheet" href='/js/lib/grande/css/menu.css'>
-			<link rel="stylesheet" href='/js/lib/grande/css/editor.css'>
-			<link rel="stylesheet" href='/css/bootstrap.min.css'>
-			<link rel="stylesheet" href='/css/font-awesome-4.4.0/css/font-awesome.min.css'>
+			<link rel="stylesheet" href='/css/bootstrap.min.css'>			
 			<link rel="stylesheet" href='/css/mapbox.css'>        
 			<link rel="stylesheet" href='/js/lib/leaflet.js/leaflet.css'>
 			<link rel="stylesheet" href='/js/lib/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css'>
@@ -28,6 +27,7 @@
 			<link rel="stylesheet" type="text/css" href="/js/lib/dc.js/dc.css">
 		
 			<!-- SYSTEMAPIC STYLESHEETS -->
+			<link rel="stylesheet" href="/css/fonts.css">
 			<link rel="stylesheet" href="/css/style.css">			
 			<link rel="stylesheet" href="/css/evil.css">			
 			<link rel="stylesheet" href="/css/magda.css">			
@@ -43,12 +43,15 @@
 		<!-- @if NODE_ENV == 'PRODUCTION' -->
 
 			<!-- DEPENDENCIES STYLESHEETS -->
-			<link rel="stylesheet" href="/css/css.dependencies.min.css">
+			<link rel="stylesheet" href='../fonts/font-awesome-4.4.0/css/font-awesome.min.css'>
+			<link rel="stylesheet" href="/dist/css.dependencies.min.css">
 
 			<!-- SYSTEMAPIC STYLESHEETS -->
-			<link rel="stylesheet" href="/css/css.portal.min.css">
+			<link rel="stylesheet" href="/dist/fonts.css">
+			<link rel="stylesheet" href="/dist/css.portal.min.css">
 	
 		<!-- @endif -->
+
 		<script type="text/javascript">(function(){
 			window.hotlink = '<%- JSON.stringify(hotlink) %>';
 			window.tokens = JSON.parse('<%- JSON.stringify(access_token) %>');
@@ -86,6 +89,7 @@
 			<script type="text/javascript" src="/js/lib/dc.js/dc.js"></script>
 
 			<!-- socket.io -->
+			<!-- OBS! - DO NOT INCLUDE IN GRUNT CONCAT -->
 			<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 
 			<!-- dep libs -->
@@ -105,11 +109,6 @@
 
 			<!-- resumable.js -->
 			<script type="text/javascript" src="/js/lib/resumable/resumable.js"></script>
-
-			<!-- grande.js -->
-			<script type="text/javascript" src="/js/lib/grande/js/grande.class.js"></script>
-			<script type="text/javascript" src="/js/lib/grande/js/grande.js"></script>
-			<script type="text/javascript" src="/js/lib/grande/js/grande.attachments.js"></script>
 
 			<!-- codemirror -->
 			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/cartoref.js"></script>
@@ -132,8 +131,11 @@
 			<script type="text/javascript" src="/js/lib/sniffer/sniffer.module.js"></script>
 			<script type="text/javascript" src="/js/lib/cryptojs/sha3.js"></script>
 			
-			<!-- hotlink -->
-			<script type="text/javascript">(function(){window.hotlink = '<%- JSON.stringify(hotlink) %>';}());</script>
+
+			<!-- SOURCE -->
+			<!-- SOURCE -->
+			<!-- SOURCE -->
+
 
 			<!-- class.js must be added first -->
 			<script type="text/javascript" src="/js/src/core/class.js"></script>
@@ -161,7 +163,6 @@
 			<script type="text/javascript" src="/js/src/chrome/chrome.bottom.js"></script>
 			<script type="text/javascript" src="/js/src/chrome/chrome.left.js"></script>
 			<script type="text/javascript" src="/js/src/chrome/chrome.right.js"></script>
-			
 			<script type="text/javascript" src="/js/src/chrome/data/chrome.data.js"></script>
 			<script type="text/javascript" src="/js/src/chrome/projects/chrome.projects.js"></script>
 			<script type="text/javascript" src="/js/src/chrome/users/chrome.users.js"></script>
@@ -225,14 +226,14 @@
 		<!-- @if NODE_ENV == 'PRODUCTION' -->		
 
 			<!-- DEPENDENCIES -->
-			<script type="text/javascript" src="/js/js.dependencies.min.js"></script>
+			<script type="text/javascript" src="/dist/js.dependencies.min.js"></script>
 			<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 			
 			<!-- CONFIG -->
 			<script type="text/javascript" src="/clientConfig.js"></script>
 
 			<!-- LIBRARY -->
-			<script type="text/javascript" src="/js/js.portal.min.js"></script>
+			<script type="text/javascript" src="/dist/js.portal.min.js"></script>
 
 		<!-- @endif -->
 
