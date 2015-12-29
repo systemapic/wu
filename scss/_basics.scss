@@ -14,7 +14,7 @@ body {
 	background-color: rgba(8, 18, 30, 1);
 	color: $ecolor2;
 	line-height: 1.4;
-	font-family: $font;
+	font-family: 'Open Sans', sans-serif, "Helvetica Neue", Helvetica, Arial;
 	font-size: 14px;
 	text-align: left;
 	-webkit-font-smoothing: antialiased;
@@ -145,7 +145,7 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 /* Main name (in table) */
 .dln {
 	margin-left: 30px;
-	font-family: $font;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
 	background: none;
 	border: none;
 	font-size : 130%;
@@ -165,7 +165,7 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 	font-weight: 400;
 	font-size: 100%;
 	margin: 0 10px 0 0;
-	font-family: $font;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
 	color: #333;
 	background: none;
 	border: none;
@@ -393,7 +393,7 @@ label.info {
 .search {
 	margin: 0px;
 	border: none;
-	font-family: $font;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, 'Open Sans';
 	font-weight: $lean;
 	color: black;
 	background: white;
@@ -420,7 +420,7 @@ label.info {
 
 /* Button */
 .dropdown-button {
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: 4px 8px;
 	position: absolute;
@@ -817,7 +817,7 @@ input.cmn-toggle-round-flat + label:before {
 #login-logo {
 	width: 390px;
 	height: 324px;
-	background-image: url(images/ruppellsgriffon_logo.png);
+	background-image: url(../images/ruppellsgriffon_logo.png);
 	margin: auto;
 	position: relative;
 	top: 0;
@@ -845,7 +845,7 @@ input.cmn-toggle-round-flat + label:before {
 	}
 
 .secure-logn-symbol {
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -469px 1px;
 	width: 26px;
@@ -1045,7 +1045,7 @@ input.cmn-toggle-round-flat + label:before {
 
 .home-logo {
 	background: none;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	height: 50px;

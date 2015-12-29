@@ -44,12 +44,19 @@ Wu.Forgot = Wu.Class.extend({
 		// wrap
 		var logo_wrap = Wu.DomUtil.create('div', 'logo-wrap', this._container);
 
+		// // logo
+		// var logo = Wu.DomUtil.create('div', 'logo', logo_wrap);
+
+		// // set image
+		// var logo_img = loginConfig.invitationLogo;
+		// logo.style.backgroundImage = 'url(../' + logo_img + ')';
+
 		// logo
-		var logo = Wu.DomUtil.create('div', 'logo', logo_wrap);
+		var logo = Wu.DomUtil.create('img', '', logo_wrap);
 
 		// set image
 		var logo_img = loginConfig.invitationLogo;
-		logo.style.backgroundImage = 'url(../' + logo_img + ')';
+		logo.src = logo_img;
 	},
 
 
