@@ -78,49 +78,53 @@ module.exports = function(grunt) {
 
 				
 			cssDependencies:{  
-				src : 'dist/tmp/css.dependencies.css',
-				dest : 'dist/css/css.dependencies.min.css'
+				src : 'public/dist/tmp/css.dependencies.css',
+				dest : 'public/dist/css.dependencies.min.css'
 				
 			},
 
 			cssPortal : {
-				src : 'dist/tmp/css.portal.css',
-				dest : 'dist/css/css.portal.min.css'
+				src : 'public/dist/tmp/css.portal.css',
+				dest : 'public/dist/css.portal.min.css'
 			},
 
 			cssLogin : {
-				src : 'dist/tmp/css.login.combined.css',
-				dest : 'dist/css/login.min.css'
+				src : 'public/dist/tmp/css.login.combined.css',
+				dest : 'public/dist/login.min.css'
 			},
 
 			phantomJSthumb : {
 				 
 					src : 'public/css/phantomJSthumb.css',
-					dest : 'dist/css/phantomJSthumb.css'
+					dest : 'public/dist/phantomJSthumb.css'
 			},
 
 			phantomJS : {
-				 
 					src : 'public/css/phantomJS.css',
-					dest : 'dist/css/phantomJS.css'
+					dest : 'public/dist/phantomJS.css'
 			},
 
-			mobilestyle : {
-				 
-					src : 'public/css/mobilestyle.css',
-					dest : 'dist/css/mobilestyle.css'
-			},
+			fonts : {
+					src : 'public/css/fonts.css',
+					dest : 'public/dist/fonts.css'
+			},			
 
-			mobilestyleLogin : {
+			// mobilestyle : {
 				 
-					src : 'public/css/mobilestyle-login.css',
-					dest : 'dist/css/mobilestyle-login.css'
-			},
-			padstyle : {
+			// 		src : 'public/css/mobilestyle.css',
+			// 		dest : 'public/dist/css/mobilestyle.css'
+			// },
+
+			// mobilestyleLogin : {
 				 
-					src : 'public/css/padstyle.css',
-					dest : 'dist/css/padstyle.css'
-			},	
+			// 		src : 'public/css/mobilestyle-login.css',
+			// 		dest : 'public/dist/css/mobilestyle-login.css'
+			// },
+			// padstyle : {
+				 
+			// 		src : 'public/css/padstyle.css',
+			// 		dest : 'public/dist/css/padstyle.css'
+			// },	
 		},
 
 
@@ -142,12 +146,9 @@ module.exports = function(grunt) {
 					'public/js/lib/d3.js/d3.js',
 
 					// c3
-					'public/js/lib/d3/c3.js',
+					'public/js/lib/c3/c3.js',
 					'public/js/lib/dc.js/crossfilter.js',
 					'public/js/lib/dc.js/dc.js',
-
-					// socket.io
-					'/js/lib/socket.io/socket.io.js',
 
 					// dependencies 
 					'public/js/lib/codemirror/mode/cartocss/jquery-2.1.1.min.js',
@@ -164,13 +165,13 @@ module.exports = function(grunt) {
 					'public/js/lib/list.js/list.min.js',
 					'public/js/lib/sortable.js/Sortable.js',
 
-					// grande
-					'public/js/lib/grande/js/grande.class.js',
-					'public/js/lib/grande/js/grande.js',
-					'public/js/lib/grande/js/grande.attachments.js',
-
 					// resumable
 					'public/js/lib/resumable/resumable.js',
+
+					// // grande
+					// 'public/js/lib/grande/js/grande.class.js',
+					// 'public/js/lib/grande/js/grande.js',
+					// 'public/js/lib/grande/js/grande.attachments.js',
 
 					// codemirror
 					'public/js/lib/codemirror/mode/cartocss/cartoref.js',
@@ -190,10 +191,16 @@ module.exports = function(grunt) {
 					'public/js/lib/jss.js/jss.js',	
 					'public/js/lib/keymaster/keymaster.js',	
 					'public/js/lib/moment.js/moment.min.js',
+					'public/js/lib/sniffer/sniffer.module.js',
+					'public/js/lib/cryptojs/sha3.js',
+					'public/js/lib/nouislider/nouislider.js',
+		
+
+
 
 				],
 				
-				dest : 'dist/tmp/systemapic.dependencies.combined.js',
+				dest : 'public/dist/tmp/systemapic.dependencies.combined.js',
 
 			},
 
@@ -208,40 +215,49 @@ module.exports = function(grunt) {
 
 					// controller
 					'public/js/src/core/controller.js',
+
+					'public/js/src/core/data.js',
+					'public/js/src/core/evented.js',
+					'public/js/src/ext/resumable.js',
 					
-					// Sidepane 
+					// Panes
 					'public/js/src/panes/pane.js',
-					'public/js/src/panes/sidepane/sidepane.js',
-					'public/js/src/panes/sidepane/sidepane.item.js',
-					'public/js/src/panes/sidepane/sidepane.clients.js',
-					'public/js/src/panes/sidepane/sidepane.project.js',
-					'public/js/src/panes/sidepane/sidepane.client.js',
-					'public/js/src/panes/sidepane/sidepane.users.js',
-					'public/js/src/panes/sidepane/sidepane.documents.js',
-					'public/js/src/panes/sidepane/sidepane.datalibrary.js',
-					'public/js/src/panes/sidepane/sidepane.medialibrary.js',
-					'public/js/src/panes/sidepane/sidepane.share.js',
-					'public/js/src/panes/sidepane/sidepane.account.js',
-					'public/js/src/panes/sidepane/sidepane.manage.js',
-					'public/js/src/panes/sidepane/sidepane.options.js',
-
-					'public/js/src/panes/sidepane/option.item.js',
-					'public/js/src/panes/sidepane/option.baselayers.js',
-					'public/js/src/panes/sidepane/option.bounds.js',
-					'public/js/src/panes/sidepane/option.connect.js',
-					'public/js/src/panes/sidepane/option.controls.js',
-					'public/js/src/panes/sidepane/option.layermenu.js',
-					'public/js/src/panes/sidepane/option.position.js',
-					'public/js/src/panes/sidepane/option.settings.js',
-
-					// Other Panes 
 					'public/js/src/panes/pane.header.js',
 					'public/js/src/panes/pane.progress.js',
 					'public/js/src/panes/pane.map.js',
 					'public/js/src/panes/pane.status.js',
 					'public/js/src/panes/pane.start.js',
 					'public/js/src/panes/pane.feedback.js',
-					'public/js/src/panes/pane.dropzone.js',
+					'public/js/src/panes/pane.share.js',
+					'public/js/src/panes/pane.mapsettings.js',
+					'public/js/src/panes/pane.fullscreen.js',
+
+
+					// chrome
+					'public/js/src/chrome/chrome.js',	
+					'public/js/src/chrome/chrome.top.js',	
+					'public/js/src/chrome/chrome.bottom.js',						
+					'public/js/src/chrome/chrome.left.js',	
+					'public/js/src/chrome/chrome.right.js',	
+
+					'public/js/src/chrome/data/chrome.data.js',
+
+					'public/js/src/chrome/projects/chrome.projects.js',
+					'public/js/src/chrome/users/chrome.users.js',
+					'public/js/src/chrome/settings/chrome.settings.js',
+					'public/js/src/chrome/settings/chrome.settings.filters.js',
+					'public/js/src/chrome/settings/chrome.settings.cartocss.js',
+					'public/js/src/chrome/settings/chrome.settings.tooltip.js',
+					'public/js/src/chrome/settings/chrome.settings.mapsettings.js',
+					'public/js/src/chrome/settings/chrome.settings.settingsselector.js',
+					'public/js/src/chrome/settings/chrome.settings.styler.js',
+					'public/js/src/chrome/settings/styler.js',
+					'public/js/src/chrome/settings/styler.polygon.js',
+					'public/js/src/chrome/settings/styler.point.js',
+					'public/js/src/chrome/settings/styler.line.js',
+					'public/js/src/chrome/settings/chrome.settings.layers.js',
+					'public/js/src/chrome/settings/chrome.settings.extras.js',
+
 
 					// Controls 
 					'public/js/src/controls/control.js',
@@ -252,36 +268,17 @@ module.exports = function(grunt) {
 					'public/js/src/controls/control.measure.js',
 					'public/js/src/controls/control.geolocation.js',
 					'public/js/src/controls/control.layermenu.js',
-					'public/js/src/controls/control.inspect.js',
 					'public/js/src/controls/control.description.js',
-					'public/js/src/controls/control.legends.js',
 					'public/js/src/controls/control.mouseposition.js',
-					'public/js/src/controls/control.baselayertoggle.js',
-					'public/js/src/controls/control.cartocss.js',
-					'public/js/src/controls/control.tooltip.js',
 					'public/js/src/controls/control.style.js',
+					'public/js/src/controls/control.tooltip.js',				
 					'public/js/src/controls/control.spinningmap.js',
-					'public/js/src/controls/control.freedraw.js',
-					'public/js/src/controls/control.chart.js',	
-
-					// chrome
-					'public/js/src/chrome/chrome.js',	
-					'public/js/src/chrome/chrome.bottom.js',	
-					'public/js/src/chrome/chrome.top.js',	
-					'public/js/src/chrome/chrome.left.js',	
-					'public/js/src/chrome/chrome.right.js',	
-					'public/js/src/chrome/chrome.center.js',
-					'public/js/src/chrome/chrome.data.js',
-					'public/js/src/chrome/content/chrome.content.js',	
-					'public/js/src/chrome/content/chrome.settingsselector.js',	
-					'public/js/src/chrome/content/chrome.mapsettings.js',	
-					'public/js/src/chrome/content/chrome.layers.js',	
-					'public/js/src/chrome/content/chrome.cartocss.js',	
-					'public/js/src/chrome/content/chrome.styler.js',	
-					'public/js/src/chrome/content/chrome.tooltip.js',	
-					'public/js/src/chrome/content/chrome.filters.js',	
+					'public/js/src/ext/popup.chart.js',
+					'public/js/src/controls/control.chart.js',
+					
 
 					// Models 
+					'public/js/src/models/model.js',
 					'public/js/src/models/model.projects.js',
 					'public/js/src/models/model.clients.js',
 					'public/js/src/models/model.users.js',
@@ -289,7 +286,6 @@ module.exports = function(grunt) {
 					'public/js/src/models/model.files.js',
 					'public/js/src/models/model.roles.js',
 					'public/js/src/models/model.D3List.js',
-					'public/js/src/models/model.D3dataLibList.js',
 
 					// Access
 					'public/js/src/core/access.js',
@@ -298,22 +294,29 @@ module.exports = function(grunt) {
 					'public/js/src/ext/analytics.js',
 
 					// Satellite angle
-					'public/js/src/ext/satelliteAngle.js',				
+					'public/js/src/ext/satelliteAngle.js',	
 
-					// Config file
-					'public/js/src/config/client-config.js',
+					// Buttons
+					'public/js/src/ext/buttons.js',
+
+					// Language file
 					'public/js/src/lang/language.english.js',
 
 					// Extend Leaflet
 					'public/js/src/ext/extendLeaflet.js',
-					'public/js/src/ext/popup.chart.js',
-					'public/js/src/ext/resumable.js',
+					
+					// Momory
+					'public/js/src/tests/memory.js',
 					
 					// App 
 					'public/js/src/core/app.js'
+
+
+
+
 				],
 				
-				dest : 'dist/tmp/systemapic.combined.js',
+				dest : 'public/dist/tmp/systemapic.combined.js',
 
 			},
 
@@ -323,10 +326,11 @@ module.exports = function(grunt) {
 				src : [  
 
 					'public/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.css',
-					'public/js/lib/grande/css/menu.css',                    
-					'public/js/lib/grande/css/editor.css',
+
+					// 'public/js/lib/grande/css/menu.css',                    
+					// 'public/js/lib/grande/css/editor.css',
 					'public/css/bootstrap.min.css',
-					'public/css/font-awesome.min.css',
+					// 'public/css/font-awesome-4.4.0/css/font-awesome.min.css',
 					'public/css/mapbox.css',        
 					'public/js/lib/leaflet.js/leaflet.css',
 					'public/js/lib/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css',
@@ -335,12 +339,13 @@ module.exports = function(grunt) {
 					'public/js/lib/codemirror/mode/cartocss/codemirror.carto.css',
 					'public/js/lib/codemirror/mode/cartocss/codemirror.fetta.css',
 					'public/js/lib/codemirror/theme/mbo.css',
+					'public/js/lib/nouislider/nouislider.min.css',
 					'public/css/opentip.css',
 					'public/js/lib/c3/c3.css',
 					'public/js/lib/dc.js/dc.css'
 				],
 				
-				dest : 'dist/tmp/css.dependencies.css'
+				dest : 'public/dist/tmp/css.dependencies.css'
 			},
 
 
@@ -348,46 +353,57 @@ module.exports = function(grunt) {
 
 				src : [
 					'public/js/lib/codemirror/mode/cartocss/spectrum.css', // Does not work when merged with other css dependency files'			
-					'dist/css/css.dependencies.min.css'
+					'public/dist/css.dependencies.min.css'
 				],
 
-				dest : 'dist/css/css.dependencies.min.css'
+				dest : 'public/dist/css.dependencies.min.css'
 
 			},
 
 			cssPortal : {
 				
 				src : [
-					'public/css/style.css', // from sass files
-					'public/css/knut.css',	// knut's overrider
-					'public/css/evil.css'	// jorgen's overrider					
+					'public/css/style.css',
+					'public/css/evil.css',	
+					'public/css/magda.css',	
+					'public/css/chrome.css',
+					'public/css/knut.css',
+					'public/css/experiments.css',
+					'public/css/jevil.css'					
 				],
 
-				dest : 'dist/tmp/css.portal.css'
+				dest : 'public/dist/tmp/css.portal.css'
 			},
 
 			cssLogin : {
 				
 				src : [
-					'public/css/mapbox.css',
-					'public/css/login.css'					
+					// 'public/css/mapbox.css',
+					// 'public/css/login.css'
+
+					// 'public/css/font-awesome-4.4.0/css/font-awesome.min.css',
+					'public/css/invitation.css'				
 				],
 
-				dest : 'dist/tmp/css.login.combined.css'
+				dest : 'public/dist/tmp/css.login.combined.css'
 			},
 
 
 			jsLogin : {
 				
 				src : [
-					'public/js/lib/mapbox.js/mapbox.2.1.4.js',
-					'public/js/src/controls/control.spinningmap.js',
+					// 'public/js/lib/mapbox.js/mapbox.2.1.4.js',
+					// 'public/js/src/controls/control.spinningmap.js',
 					// 'public/js/src/config/login-config.js',
-					'public/js/lib/zxcvbn/zxcvbn-async.js',
-					'public/js/src/core/login.js',
+					// 'public/js/lib/zxcvbn/zxcvbn-async.js',
+					// 'public/js/src/core/login.js',
+
+					'public/js/src/core/class.js',
+					'public/js/src/core/invitation.js'
+
 				],
 
-				dest : 'dist/tmp/login.combined.js'
+				dest : 'public/dist/tmp/login.combined.js'
 			}			
 
 		},
@@ -403,21 +419,21 @@ module.exports = function(grunt) {
 			
 			jsPortal:{  
 				files:{  
-					'dist/js/js.portal.min.js' : 'dist/tmp/systemapic.combined.js',
+					'public/dist/js.portal.min.js' : 'public/dist/tmp/systemapic.combined.js',
 
 				}
 			},
 
 			jsDependencies : {  
 				files : {  
-					'dist/js/js.dependencies.min.js' : 'dist/tmp/systemapic.dependencies.combined.js',
+					'public/dist/js.dependencies.min.js' : 'public/dist/tmp/systemapic.dependencies.combined.js',
 				}
 			},
 
 
 			jsLogin : {  
 				files : {  
-					'dist/js/login.min.js' : 'dist/tmp/login.combined.js',	
+					'public/dist/login.min.js' : 'public/dist/tmp/login.combined.js',	
 				}
 			},
 
@@ -550,9 +566,9 @@ module.exports = function(grunt) {
 			'cssmin:cssPortal',
 			'cssmin:phantomJSthumb',
 			'cssmin:phantomJS',
-			'cssmin:mobilestyle',
-			'cssmin:mobilestyleLogin',
-			'cssmin:padstyle',
+			// 'cssmin:mobilestyle',
+			// 'cssmin:mobilestyleLogin',
+			// 'cssmin:padstyle',
 			'concat:jsDependencies',
 			'uglify:jsDependencies',
 			'concat:jsPortal',
