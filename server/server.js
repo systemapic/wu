@@ -55,7 +55,9 @@ app.use(compress());
 app.use(cors());
 
 // static files
-var staticPath = prodMode ? '../dist' : '../public';
+// var staticPath = prodMode ? '../dist' : '../public';
+var staticPath = '../public';
+
 app.use(express.static(path.join(__dirname, staticPath)));
 
 // load our routes and pass in our app and fully configured passport
