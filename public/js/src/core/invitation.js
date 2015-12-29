@@ -52,7 +52,7 @@ Wu.Invite = Wu.Class.extend({
 		var logo_wrap = Wu.DomUtil.create('div', 'logo-wrap', this._container);
 
 		// logo
-		var logo = Wu.DomUtil.create('img', '', logo_wrap);
+		var logo = Wu.DomUtil.create('div', 'logo', logo_wrap);
 
 		// set image
 		var logo_img = loginConfig.invitationLogo;
@@ -61,9 +61,8 @@ Wu.Invite = Wu.Class.extend({
 		// set width
 		var width = loginConfig.loginLogoWidth || 210;
 		logo.style.width = width + 'px';
-
 	},
-
+	
 
 	_createLogin : function () {
 
