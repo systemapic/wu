@@ -6,7 +6,7 @@ else
 	PRODMODE=false	
 fi;
 
-	PRODMODE=true
+	# PRODMODE=true
 
 cd server
 
