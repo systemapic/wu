@@ -20,7 +20,7 @@
 	height: 20px;
 	top: 7px;
 	right: 4px;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -22px -44px;
 	opacity: 0.3;
@@ -55,7 +55,7 @@
 	}
 
 .leaflet-draw-toolbar a {
-	background-image: url(images/leaflet.draw.sprites.png);
+	background-image: url(../images/leaflet.draw.sprites.png);
 	}	
 
 .leaflet-draw-toolbar-notop a:first-child {
@@ -73,7 +73,7 @@
 
 .leaflet-draw-toolbar a:before {
 	content: '';
-	background-image: url(images/leaflet.draw.sprites.png);
+	background-image: url(../images/leaflet.draw.sprites.png);
 	background-repeat: no-repeat;
 	width: 26px;
 	height: 26px;
@@ -89,7 +89,7 @@
 
 .leaflet-draw-toolbar a.leaflet-draw-edit-edit:before {
 	content: '';
-	background-image: url(images/leaflet.draw.sprites.png);
+	background-image: url(../images/leaflet.draw.sprites.png);
 	background-repeat: no-repeat;
 	width: 26px;
 	height: 26px;
@@ -102,7 +102,7 @@
 
 .leaflet-draw-toolbar a.leaflet-draw-edit-remove:before {
 	content: '';
-	background-image: url(images/leaflet.draw.sprites.png);
+	background-image: url(../images/leaflet.draw.sprites.png);
 	background-repeat: no-repeat;
 	width: 26px;
 	height: 26px;
@@ -682,7 +682,7 @@
 	}	
 	
 .leaflet-control-styleeditor-interior {
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: 2px -271px;
 	background-color: white;
@@ -731,7 +731,7 @@
 
 .leaflet-control-baselayertoggle:after {
 	content: '';
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -145px -75px;
 	height: 26px !important;
@@ -848,7 +848,7 @@
 	left: 0;
 	width: 26px;
 	height: 26px;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -99px -106px;
 	opacity: 0.75;
@@ -1004,7 +1004,7 @@
 	top: 2px;
 	left: 2px;
 	cursor: pointer;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -26px -168px;
 	opacity: 0.5;
@@ -1018,7 +1018,7 @@
 	top: 2px;
 	right: 2px;	
 	cursor: pointer;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: 2px -168px;	
 	opacity: 0.5;
@@ -1665,7 +1665,7 @@
 	position: absolute;
 	right: 0;
 	width: 21px;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -281px -44px;
 	display: none;
@@ -1834,7 +1834,7 @@
 	padding: 0px 0px 0px 2px;
 	font-size: 160%;
 	color: transparent;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	top: 1px;
 	background-position: 7px -74px;
@@ -1850,7 +1850,7 @@
 	padding: 0px 0px 0px 2px;
 	font-size: 160%;
 	color: transparent;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	top: 1px;
 	height: 24px;
@@ -1869,7 +1869,7 @@
 	padding: 0px 0px 0px 2px;
 	font-size: 160%;
 	color: transparent;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	top: 1px;
 	border-radius: 0px;
@@ -2029,7 +2029,7 @@
 	height: 50%;
 	top: 0px;
 	width: 20px;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: 6px -9px;
 	cursor: pointer;
@@ -2045,7 +2045,7 @@
 	height: 50%;
 	bottom: 0px;
 	width: 20px;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: 6px 2px;
 	cursor: pointer;
@@ -2080,7 +2080,7 @@
 	right: 25px;
 	height: 100%;
 	width: 25px;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	top: 0px;
 	background-repeat: no-repeat;
 	background-position: -124px -43px;
@@ -2105,7 +2105,7 @@
 	position: absolute;
 	top: 3px;
 	right: 42px;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -278px -47px;
 	cursor: pointer;
@@ -2124,7 +2124,7 @@
 	top: 0px;
 	height: 100%;
 	width: 25px;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: 4px -40px;
 	opacity: 0.5;
@@ -2202,7 +2202,7 @@
 	padding: 0;
 	width: 17px;
 	height: 17px;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	border-radius: 0;	
 	top: 4px;
@@ -2355,11 +2355,11 @@
 	}
 
 .leaflet-control-search .search-button {
-	background: url('images/search-icon.png') no-repeat 2px -22px !important;
+	background: url('../images/search-icon.png') no-repeat 2px -22px !important;
 	}
 
 .leaflet-control-search .search-button:hover {
-	background: url('images/search-icon.png') no-repeat 2px 2px !important;
+	background: url('../images/search-icon.png') no-repeat 2px 2px !important;
 	}	
 
 .search-tooltip	{
@@ -2502,7 +2502,7 @@
 	top: 0;
 	left: 0;
 	position: absolute;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: 2px -271px;
 	opacity: 0.7;
@@ -2690,7 +2690,7 @@
 	}
 
 .close-cartocss-editor-x {
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	width: 20px;
 	height: 20px;
@@ -2772,7 +2772,7 @@
 	}
 
 .cartocss-style-dropdown-arrow {
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: 0px 0px;
 	width: 13px;

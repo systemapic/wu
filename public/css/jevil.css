@@ -63,6 +63,7 @@
     padding-top: 5px;
     padding-bottom: 5px;    
     padding-left: 0;
+    width: 443px;
     }
 
 .chrome-data-top-title {
@@ -491,13 +492,25 @@ input.chrome-field-input {
     padding-right: 20px;
     background: #3C4759;
     }
+
 .chrome-upload-button:hover {
     background: #F9F9F9;
     color: #3F4652;
+/*<<<<<<< HEAD*/
     border: 1px solid gainsboro;
     padding-top: 8px;
     padding-bottom: 8px;
 }
+/*=======
+    box-shadow: 0 0 0px 1px #DCDCDC inset;
+    }
+
+.chrome-upload-button:active {
+    background: #EEE;
+    color: #3F4652;
+    box-shadow: 0 0 0px 1px #DCDCDC inset;
+    }
+>>>>>>> 3f85c79d12440467bbb33415fefdb283a759d6a2*/
 
 .chrome-data-inner {
     padding: 0;
@@ -537,7 +550,7 @@ input.chrome-field-input {
 
 .active-project,
 .active-project:hover {
-    /*background: #71c4a8 !important;    */
+    /*background: #3C4759 !important;    */
     background: #3C4759 !important;
     }
 
@@ -886,12 +899,16 @@ input.chrome-field-input {
     width: 30px !important;
     height: 30px !important;
 
+/*<<<<<<< HEAD*/
     background: url('images/search-icon.png') no-repeat 4px -19px !important;
         background-color: #FCFCFC !important;
+/*=======
+    background: url('../images/search-icon.png') no-repeat 4px -19px !important;
+>>>>>>> 3f85c79d12440467bbb33415fefdb283a759d6a2*/
     }
 
 .leaflet-control-search .search-button:hover {
-    background: url('images/search-icon.png') no-repeat 4px 5px !important;
+    background: url('../images/search-icon.png') no-repeat 4px 5px !important;
 }
 
 .leaflet-control-search.leaflet-control {
@@ -1207,13 +1224,30 @@ input.chrome-field-input {
 
 
 
+/*<<<<<<< HEAD
+
+
+
+=======
+.data-list-line .file-name-content {
+    word-break: break-all;
+    }
+
+.chrome-content-bottom-container {
+    bottom: 95px;
+    }
+
+
+.chrome-tooltip .chrome-field-mini-input {
+    top: 5px !important;
+    width: 35px !important;
+    }
+>>>>>>> 3f85c79d12440467bbb33415fefdb283a759d6a2*/
 
 
 
 
-
-
-
+/*<<<<<<< HEAD*/
 
 
 
@@ -1353,4 +1387,16 @@ input.chrome-field-input {
 
 
 
+/*
+=======
+.share-item i {
+    font-size: 16px;
+}
 
+.data-list-line.processing {
+    position: relative;
+    left: -15px;
+    width: 417px;
+    border-radius: 3px;
+    }
+>>>>>>> 3f85c79d12440467bbb33415fefdb283a759d6a2*/
