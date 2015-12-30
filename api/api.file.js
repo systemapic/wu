@@ -362,7 +362,7 @@ module.exports = api.file = {
 		    found,
 		    ops = [];
 	
-		// todo: this is fucked. not even dealing with a file object here, just paths.. 
+		// todo: this is #$SD. not even dealing with a file object here, just paths.. 
 		// 	not solid! FIX!
 		
 		// find zip file
@@ -1332,6 +1332,140 @@ module.exports = api.file = {
 		// });
 
 	},
+
+
+
+	shareDataset : function (req, res) {
+		console.log('share Dataset');
+
+		console.log('body', req.body);
+
+		var ops = [];
+
+		var user = req.user;
+		var users = req.body.users;
+		var file_id = req.body.dataset;
+		var userModels = [];
+		var foundFile;
+		var file;
+
+		// check access
+		console.log('user.files', user.files);
+
+
+
+		ops.push(function (callback) {
+			File
+			.findOne({uuid : file_id})
+			.exec(function (err, f) {
+				file = f;
+				callback(null);
+			});
+		});
+
+		ops.push(function (callback) {
+			User
+			.findOne({uuid : user.uuid})
+			.populate('files')
+			.exec(callback);
+		});
+
+
+		ops.push(function (user, callback) {
+				
+			// check if file is on user
+			foundFile = _.find(user.files, function (f) {
+				return f.uuid == file_id;
+			});
+
+			console.log('foundFile', foundFile);
+
+			// if no file, no access
+			if (_.isEmpty(foundFile)) return callback('No access.');
+
+			// next
+			callback(null);
+
+		});
+
+		ops.push(function (callback) {
+
+			// get users
+			async.each(users, function (user, done) {
+				User
+				.findOne({uuid : user})
+				.exec(function (err, u) {
+					userModels.push(u);
+					done(null);
+				});
+			}, callback);
+
+		});
+
+		ops.push(function (callback) {
+
+			console.log('userModels:::', userModels);
+
+			async.each(userModels, function (user, done) {
+
+				console.log('adding foundfdile: ', foundFile.name)
+				console.log('adding file: ', file.name)
+
+				// add dataset to user
+				user.files.addToSet(file._id);
+				user.markModified('files');
+				user.save(function (err, u) {
+					console.log('user saved: ', err, u);
+					done(null);
+				});
+			
+			}, callback);
+
+
+		});
+
+
+		async.waterfall(ops, function (err, results) {
+			if (err) return res.json({
+				err : err
+			});
+
+
+			res.end('shareDataset ok');
+
+		})
+
+
+
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
