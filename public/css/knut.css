@@ -1312,27 +1312,11 @@ input.target-input.polygon {
 .data-list-line.processing:hover {
 	background: #3C4759;
 	color: white;
-/*<<<<<<< HEAD*/
 	padding: 10px;
 	height: 70px;
 }
 .file-name-content.processing {
-/*=======
-	padding-left: 10px;
-	padding-right: 10px;
-	height: 60px;
-	color: white !important;
-	}
 
-.data-list-line.processing:before,
-.data-list-line.processing:after {
-	display: none;
-	}
-
-
-.file-name-content.processing,
-.file-name-content.processing:hover {
->>>>>>> 3f85c79d12440467bbb33415fefdb283a759d6a2*/
 	padding-left: 5px;
 	position: absolute;
 	}
@@ -1344,13 +1328,8 @@ input.target-input.polygon {
 	font-weight: 600;
 	position: absolute;
 	bottom: 0px;
-/*<<<<<<< HEAD*/
 	width: 280px;
 }
-/*=======
-	}
-
->>>>>>> 3f85c79d12440467bbb33415fefdb283a759d6a2*/
 .file-feedback-percent.processing {
 	position: absolute;
 	right: 0px;
@@ -1365,6 +1344,9 @@ input.target-input.polygon {
 	color: white;
 }
 
+.data-list-line {
+	width: 443px;
+}
 
 .padding-top-10 {
 	padding-top: 10px;
