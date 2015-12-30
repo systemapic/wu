@@ -187,7 +187,7 @@ Wu.Project = Wu.Class.extend({
 		this.initLayers();
 
 		// init roles
-		this.initRoles();
+		// this.initRoles();
 
 		// update url
 		this._setUrl();
@@ -208,7 +208,7 @@ Wu.Project = Wu.Class.extend({
 		this._reset();
 
 		// init roles
-		this.initRoles();
+		// this.initRoles();
 
 		// update url
 		this._setUrl();
@@ -999,9 +999,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	removeFiles : function (files) {
-
 		return console.error('remove files, needs to be rewritten with new Wu.Data');
-
 	},
 
 	getGrandeFiles : function () {
@@ -1065,9 +1063,6 @@ Wu.Project = Wu.Class.extend({
 		for (setting in this.getSettings()) {
 			this.getSettings()[setting] ? this['enable' + setting.camelize()]() : this['disable' + setting.camelize()]();
 		}
-
-		// refresh added/removed sidepanes
-		// app.SidePane._refresh();
 	},
 
 	// settings

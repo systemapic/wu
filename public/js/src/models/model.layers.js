@@ -263,13 +263,29 @@ Wu.Model.Layer = Wu.Model.extend({
 		this.remove();
 	},
 
+	saveOpacity : function (opacity) {
+
+		// set
+		this.setOpacity(opacity);
+
+		// save if editable
+		var project = app.activeProject;
+		if (project.isEditable()) {
+			this.store.opacity = opacity;
+			this.save('opacity');
+		}
+	},
+
 	setOpacity : function (opacity) {
-		this.opacity = opacity || 1;
+		if (isNaN(opacity)) opacity = 1;
+		this.opacity = opacity;
 		this.layer.setOpacity(this.opacity);
 	},
 
 	getOpacity : function () {
-		return this.opacity || 1;
+		var opacity = this.opacity || this.store.opacity;
+		if (isNaN(opacity)) opacity = 1;
+		return opacity;
 	},
 
 	getContainer : function () {

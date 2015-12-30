@@ -152,7 +152,7 @@ module.exports = function(app, passport) {
 	// IMPORT DATA to POSTGIS ==============
 	// =====================================
 	app.post('/api/import', passport.authenticate('bearer', {session: false}), function (req, res) {
-		api.upload.import(req, res);
+		api.upload.upload(req, res);
 	});
 
 	// =====================================
@@ -250,7 +250,6 @@ module.exports = function(app, passport) {
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
 	app.get('/pixels/*', passport.authenticate('bearer', {session: false}), function (req,res) {
-		console.log('pixels!');
 		api.pixels.servePixelPerfection(req, res);
 	});
 
@@ -312,6 +311,14 @@ module.exports = function(app, passport) {
 	});
 
 	// =====================================
+	// GET FILE DOWNLOAD ===================
+	// =====================================
+	app.get('/api/util/getTilecount', passport.authenticate('bearer', {session: false}), function (req, res) {
+		api.geo.getTilecount(req, res);
+	});
+
+
+	// =====================================
 	// GET GEOJSON FILES ===================
 	// =====================================
 	app.post('/api/geo/json2carto', passport.authenticate('bearer', {session: false}), function (req,res) {
@@ -333,7 +340,7 @@ module.exports = function(app, passport) {
 	});
 	
 	// =====================================
-	// UPDATE FILE ===================
+	// UPDATE FILE =========================
 	// =====================================
 	app.post('/api/file/update', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.file.update(req, res);
@@ -346,9 +353,16 @@ module.exports = function(app, passport) {
 		api.file.getLayers(req, res);
 	});
 
+	// =====================================
+	// SHARE DATASET =======================
+	// =====================================
+	app.post('/api/dataset/share', passport.authenticate('bearer', {session: false}), function (req,res) {
+		api.file.shareDataset(req, res);
+	});
+	
 
 	// =====================================
-	// DELETE FILE(S) ===================
+	// DELETE FILE(S) ======================
 	// =====================================
 	app.post('/api/file/delete', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.file.deleteFile(req, res);
@@ -379,7 +393,6 @@ module.exports = function(app, passport) {
 	// CREATE NEW LAYER ====================
 	// =====================================
 	app.post('/api/layers/new', passport.authenticate('bearer', {session: false}), function (req, res) {
-		console.log('/api/layers/new');
 		api.layer.create(req, res);
 	});
 
@@ -566,7 +579,6 @@ module.exports = function(app, passport) {
 	// CREATE PASSWORD =====================
 	// ===================================== 
 	app.post('/reset/password', function (req, res) {
-		console.log('reset pas!');
 		api.auth.createPassword(req, res);
 	});
 
@@ -656,13 +668,7 @@ module.exports = function(app, passport) {
 		failureFlash : true // allow flash messages
 	}));
 
-	// // =====================================
-	// // FORGOT PASSWORD =====================
-	// // =====================================
-	// app.post('/login', function (req, res) {
-	// 	console.log('/login::::', req.body);
-	// 	res.end();
-	// });
+	
 
 	// =====================================
 	// FORGOT PASSWORD =====================

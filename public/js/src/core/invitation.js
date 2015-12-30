@@ -62,7 +62,7 @@ Wu.Invite = Wu.Class.extend({
 		var width = loginConfig.loginLogoWidth || 210;
 		logo.style.width = width + 'px';
 	},
-
+	
 
 	_createLogin : function () {
 

@@ -45,6 +45,7 @@ Wu.Styler.Point = Wu.Styler.extend({
 		var pointsize_wrapper = content.pointsize.line.container;
 		var pointsize_children = content.pointsize.line.childWrapper;
 		var targets 		= content.targets.wrapper;
+		var blendmode 		= content.blendmode.line.container;
 		
 
 		// remove divs
@@ -55,6 +56,7 @@ Wu.Styler.Point = Wu.Styler.extend({
 		pointsize_wrapper && Wu.DomUtil.remove(pointsize_wrapper);
 		pointsize_children && Wu.DomUtil.remove(pointsize_children);
 		targets && 		Wu.DomUtil.remove(targets);
+		blendmode && 		Wu.DomUtil.remove(blendmode);
 	},
 
 	_addPointSizeFields : function (column) {

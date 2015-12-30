@@ -2,11 +2,27 @@
 <html>
 <head>
 <title>Systemapic Invitation</title>
+
 	<script src='/loginConfig.js'></script>
+
+	
+	<!-- @if NODE_ENV == 'DEVELOPMENT' -->
+
 	<script src='/js/src/core/class.js'></script>
-	<script src='/js/src/core/invitation.js'></script>
-	<link rel="stylesheet" href='/css/font-awesome-4.4.0/css/font-awesome.min.css'>
+	<script src='/js/src/core/invitation.js'></script>	
 	<link href='/css/invitation.css' rel='stylesheet' />
+	<link rel="stylesheet" href='/css/font-awesome-4.4.0/css/font-awesome.min.css'>
+
+	<!-- @endif -->
+
+	<!-- @if NODE_ENV == 'PRODUCTION' -->
+	
+	<script src='/dist/login.min.js'></script>
+	<link rel="stylesheet" href='/dist/login.min.css'>
+	<link rel="stylesheet" href='/dist/font-awesome-4.4.0/css/font-awesome.min.css'>
+
+	<!-- @endif -->
+
 
 
 	
