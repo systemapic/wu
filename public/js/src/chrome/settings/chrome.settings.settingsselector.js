@@ -149,7 +149,7 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		var chrome = this.options.chrome;
 
 		// open/close
-		this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
+		this._isOpen ? this.close() : this.open(); // pass this tab
 
 		if (this._isOpen) {
 			
@@ -161,6 +161,19 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 			    	timestamp : Date.now()
 			})
 		}
+	},
+
+	open : function () {
+		if (!app.activeProject.isEditable()) return;
+		this._open();
+	},
+	_open : function () {
+		var chrome = this.options.chrome;
+		chrome.open(this);
+	},
+	close : function () {
+		var chrome = this.options.chrome;
+		chrome.close(this);
 	},
 
 	_show : function () {

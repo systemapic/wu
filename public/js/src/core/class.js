@@ -367,6 +367,8 @@ Wu.Util = {
 
 		http.open("POST", url, true);
 
+		console.log('ulrl', url);
+
 		//Send the proper header information along with the request
 		http.setRequestHeader('Content-type', 'application/json');
 
@@ -375,6 +377,10 @@ Wu.Util = {
 
 		http.onreadystatechange = function() {
 			if(http.readyState == 4 && http.status == 200) {
+
+				if (http.responseText.length < 1000) {
+					console.log('http.responseText', http.responseText);
+				}
 
 				// verify response
 				var valid = Wu.verify(http.responseText);
@@ -386,6 +392,8 @@ Wu.Util = {
 
 		// stringify objects
 		if (Wu.Util.isObject(json)) json = JSON.stringify(json);
+
+		console.log('json:', json);
 
 		http.send(json);
 	},
@@ -461,6 +469,17 @@ Wu.Util = {
 		}
 
 	},
+
+	// parse with error handling
+	_stringify : function (json) {
+		try { 
+			var str = JSON.stringify(json); 
+			return str;
+		} catch (e) { 
+			return false; 
+		}
+	},
+
 
 
 	_getParentClientID : function (pid) {
@@ -959,6 +978,15 @@ Wu.Util = {
 		return jss.getAll(tag);
 	},
 
+
+	confirm : function (msg, callback) {
+
+		var confirmed = confirm(msg);
+
+		callback && callback(confirmed);
+
+		return confirmed;
+	},
 	
 
 	
@@ -1011,32 +1039,15 @@ Wu.save = Wu.Util.post;
 Wu.post = Wu.Util.postcb;
 Wu.send = Wu.Util.send;
 Wu.parse = Wu.Util._parse;
+Wu.stringify = Wu.Util._stringify;
 Wu.zip = Wu.Util.generateZip;
 Wu.zave = Wu.Util.zipSave;
 Wu.can = Wu.Util.can;
 Wu.setStyle = Wu.Util.setStyle;
 Wu.getStyle = Wu.Util.getStyle;
 Wu.verify = Wu.Util.verifyResponse;
-
-
-// Wu.CustomEvents = {
-
-// 	on : function (obj, type, fn, ctx) {
-// 		// var event = new CustomEvent('build', { 'detail': elem.dataset.time });
-// 		// document.addEventListener(type, fn, false);
-// 		Wu.DomEvent.on(obj, type, fn, ctx)
-// 	},
-
-// 	off : function (obj, type, fn, ctx) {
-// 		Wu.DomEvent.off(obj, type, fn, ctx)
-// 	},
-
-// 	fire : function (type, data) {
-// 		var event = new CustomEvent(type, data);
-// 		document.dispatchEvent(event);
-// 	},
-
-// };
+Wu.getJSON = Wu.Util._getJSON;
+Wu.confirm = Wu.Util.confirm;
 
 
 Wu.Evented = Wu.Class.extend({
@@ -1979,3 +1990,4 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
 		return fn.apply(thisp, arguments);
 	};
 };
+

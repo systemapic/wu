@@ -167,7 +167,7 @@ Wu.Chrome.SettingsContent.Cartocss = Wu.Chrome.SettingsContent.extend({
 		if (carto) {
 			carto.style.width = dims.width + 'px';
 			// carto.style.height = dims.height - 363 + 'px';
-			carto.style.height = dims.height - 387 + 'px';
+			carto.style.height = dims.height - 325 + 'px';
 		}
 
 		

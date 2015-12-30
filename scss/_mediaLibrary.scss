@@ -217,7 +217,7 @@ $thumbWidthInnerSlider: $thumbBaseWidth + 20px;
 
 .mediaLibrary-header:before {
 	content: '';
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	width: 13px;
 	height: 9px;
@@ -239,7 +239,7 @@ $thumbWidthInnerSlider: $thumbBaseWidth + 20px;
 
 .mediaLibrary-footer:before {
 	content: '';
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	width: 13px;
 	height: 9px;

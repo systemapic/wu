@@ -3,7 +3,7 @@ var loginConfig = {
 	autoStart : true,
 	accessToken : 'pk.eyJ1Ijoic3lzdGVtYXBpYyIsImEiOiJkV2JONUNVIn0.TJrzQrsehgz_NAfuF8Sr1Q',
 	layer : 'systemapic.kcjonn12',
-	logo : 'css/images/systemapic-login-logo.png',
+	logo : 'images/systemapic-login-logo.png',
 	wrapper : false,
 	speed : 1000,
 	position : {

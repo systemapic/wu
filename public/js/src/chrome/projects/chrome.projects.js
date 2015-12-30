@@ -573,6 +573,7 @@ Wu.Chrome.Projects = Wu.Chrome.extend({
 		edit : {}
 	},
 
+	// todo: refactor into module, var userList = new Wu.Tools.UserList();
 	_createInviteUsersInput : function (options) {
 
 		// invite users

@@ -312,7 +312,7 @@
 	}
 
 .client-logo {
-	background-image: url(images/defaultProjectLogo.png);
+	background-image: url(../images/defaultProjectLogo.png);
 	background-position: center;
   	background-repeat: no-repeat;
 
@@ -364,7 +364,7 @@
 	font-size: 220%;
 	
 	color: transparent;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-position: -55px -37px;
 	}	
 
@@ -372,7 +372,7 @@
 	background: white;
 
 	color: transparent;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-position: -55px -37px;
 	}	
 
@@ -492,7 +492,7 @@
 	}
 
 .project-logo {
-	background-image: url(images/defaultProjectLogo.png);
+	background-image: url(../images/defaultProjectLogo.png);
 	background-position: center;
   	background-repeat: no-repeat;
 	position: relative;
@@ -520,7 +520,7 @@
 	width: 16px;
 	z-index: 100000;
 	position: absolute;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -118px -203px;
 	top: 5px;
@@ -711,14 +711,14 @@
 	width: 26px;
 
 	color: transparent;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-position: -55px -37px;
 	}
 
 .new-project-button:hover {
 	background: white;
 	color: transparent;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-position: -55px -37px;	
 	}
 
@@ -1217,7 +1217,7 @@
 	width: 100%;
 	height: 100%;
 	position: absolute;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	/*background-position: -119px -155px;*/
 	background-position: -236px -86px;
 	background-repeat: no-repeat;
@@ -1244,7 +1244,7 @@
 	width: 100%;
 	height: 100%;
 	position: absolute;	
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-position: -271px -86px;
 	background-repeat: no-repeat;
 	opacity: 0.25;
@@ -1453,7 +1453,7 @@
 	font-weight: 900;
 	margin-top: 1px;
 	color: transparent;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-position: -26px -43px;
 	opacity: 0.2;
 	}
@@ -1504,7 +1504,7 @@
 
 .text-menu .options .url {
 	color: transparent;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -64px -160px;
 	}
@@ -1634,7 +1634,7 @@ button.image-attachment {
 
 .grande-sources-source-icon.image,
 .grande-sources-source-icon.Image {
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -187px -75px;
 	height: 26px !important;
@@ -1643,7 +1643,7 @@ button.image-attachment {
 
 .grande-sources-source-icon.layer,
 .grande-sources-source-icon.Layer {
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -144px -75px;
 	height: 26px !important;
@@ -2073,7 +2073,7 @@ button.image-attachment {
 	left: 0;
 	z-index: 9999999 !important;
 	background-color: rgba(0, 0, 0, 0.69);
-	background-image: url('images/bigcloud.png');
+	background-image: url('../images/bigcloud.png');
 	background-position: center;
 	background-repeat: no-repeat;
 	border: none !important;
@@ -2998,7 +2998,7 @@ td.tdcont.createdDate {
 
 .share-image-wrap:before {
 	content: '';
-	background-image: url(images/grinders/cloud-large-grinder-grayLight-on-white.gif);
+	background-image: url(../images/grinders/cloud-large-grinder-grayLight-on-white.gif);
 	background-repeat: no-repeat;
 	text-align: center;
 	width: 100%;
@@ -3063,7 +3063,7 @@ td.tdcont.createdDate {
 .share-icon-box.image,
 .share-icon-box.print,
 .share-icon-box.link {
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	overflow: hidden;
 	border: none;
@@ -3091,7 +3091,7 @@ td.tdcont.createdDate {
 
 .share-print-download a,
 .share-print-download-button {
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -180px -160px;
 	width: 93px;
@@ -3562,7 +3562,7 @@ td.tdcont.createdDate {
 	top: 0px;
 	width: 18px;
 	height: 18px;
-	background-image: url(images/evil_sprite.png);
+	background-image: url(../images/evil_sprite.png);
 	background-repeat: no-repeat;
 	background-position: -60px -75px;
 	opacity: 0;
@@ -3677,7 +3677,7 @@ td.tdcont.createdDate {
 	width: 60px;
 	height: 50px;
 	left: 11px;	
-	background-image: url('images/evil_sprite.png');
+	background-image: url('../images/evil_sprite.png');
 	background-repeat: no-repeat;
 	background-position: -102px -141px;
 	}
@@ -3689,7 +3689,7 @@ td.tdcont.createdDate {
 	height: 18px;
 	left: -4px;
 	top: 15px;
-	background-image: url('images/evil_sprite.png');
+	background-image: url('../images/evil_sprite.png');
 	background-repeat: no-repeat;
 	background-position: 4px -79px;
 	cursor: pointer;
@@ -3714,7 +3714,7 @@ td.tdcont.createdDate {
 	height: 19px;
 	border-radius: 20px;
 	position: absolute;
-	background-image: url('images/evil_sprite.png');
+	background-image: url('../images/evil_sprite.png');
 	background-repeat: no-repeat;
 	background-position: -87px -202px;
 	right: 14px;

@@ -1,16 +1,9 @@
-@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,700,600,600italic,700italic);
-
-body {
-    font-family: 'Open Sans', serif;
-}
-
 .chrome-project-title {
     font-size: 18px;
     color: #555;
     text-transform: capitalize;
     color: rgba(0, 0, 0, 0.81);
     background: rgba(255, 255, 255, 0.72);
-    /*border-radius: 4px;*/
     padding-left: 4px;
     font-weight: 600;
     padding-right: 4px;
@@ -19,26 +12,28 @@ body {
     padding-right: 30px;
     color: rgba(255, 255, 255, 0.92);
     background: rgba(0, 0, 0, 0.27);
-}
+    }
 
 .chrome-top {
     background: none;
-}
+    }
 
 .chrome-portal-logo {
     display: none;
-}
+    }
 
 .chrome-button {
-    background-image: url(images/systemapic-sprite-white.png);
+    background-image: url(../images/systemapic-sprite-white.png);
     opacity: 0.9;
-}
+    }
+
 .chrome-menu-button {
     border-right: none;
-}
+    }
+
 .chrome-menu-button:before {
     content: '';
-    background-image: url(images/filled-circle.png);
+    background-image: url(../images/filled-circle.png);
     background-repeat: no-repeat;
     background-position: 0 0;
     position: absolute;
@@ -53,7 +48,7 @@ body {
 }
 
 .chrome-menu-button.active:before { 
-    background-image: url(images/filled-sideways.png);
+    background-image: url(../images/filled-sideways.png);
     background-size: 214px 42px;
     width: 224px;
     top: -1px;
@@ -100,7 +95,7 @@ body {
     float: none;
     height: 24px;
     font-size: 12px;
-    font-family: 'Open Sans', serif;
+    /*font-family: 'Open Sans', serif;*/
     padding-left: 15px;
     padding-right: 15px;
     border-radius: 2px;
@@ -133,7 +128,7 @@ body {
     border-radius: 2px;
     color: #eee;
     font-size: 12px;
-    font-family: 'Open Sans', serif;
+    /*font-family: 'Open Sans', serif;*/
     font-weight: 600;
     padding-top: 6px;
 }
@@ -322,7 +317,7 @@ body {
     cursor: pointer;
     width: auto;
     background-repeat: no-repeat;
-    border-left: 1px solid #757C88;
+    border-left: 1px solid gainsboro;
 }
 
 .chrome-left-container {
@@ -447,7 +442,7 @@ body {
 }
 
 #map {
-    background: #3C4759 url(images/canvas.png);
+    background: #3C4759 url(../images/canvas.png);
 }
 .chrome-menu-button.active:before { 
     width: 0;
@@ -460,7 +455,7 @@ body {
 
 /*logo*/
 .chrome-project-logo {
-    background-image: url('css/images/systemapic-portal-logo.png');
+    background-image: url('../images/systemapic-portal-logo.png');
     background-repeat: no-repeat;
     width: 200px;
     position: relative;
@@ -546,7 +541,7 @@ body {
 .invite-email-input-form {
     height: 36px;
     font-size: 20px;
-    font-family: 'Open Sans', serif;
+    /*font-family: 'Open Sans', serif;*/
     padding: 6px;
     color: #4A4A4A;
     width: 100%;
@@ -706,8 +701,8 @@ body {
 
 
 .mini-user-container.itsme {
-    background: #71C4A8;
-    border: 1px solid #71C4A8;
+    background: #3C4759;
+    border: 1px solid #3C4759;
 }
 
 
@@ -864,21 +859,21 @@ body {
 
 .chrome-user .chrome-left-item-name {
     cursor: default;
-}
+    }
 
 .contact-list-icon:hover .project-tooltip {
     opacity: 0.9;
     visibility: visible;
-}
+    }
 
 .contact-add-tooltip {
     left: -95px;
     top: -48px;
-}
+    }
 
 .contact-list-icon:active {
     color: #428BCA;
-}
+    }
 
 .contact-invite-icon {
     position: absolute;
@@ -888,28 +883,33 @@ body {
     cursor: pointer;
     color: #999;
     font-size: 18px;
-}
+    }
+
 .contact:hover .contact-invite-icon {
     display: block;
-}
+    }
 
 .project-contact:hover .contact-project-icon {
     display: block;
-}
+    }
+
 .contact-project-icon:hover {
     color: #555;
-}
+    }
+
 .contact-invite-icon:hover .project-tooltip {
     opacity: 0.9;
     visibility: visible;
-}
+    }
+
 .contact-invite-icon:active {
     color: #428BCA;
-}
+    }
+
 .contact-invite-tooltip {
     left: -115px;
     top: -48px;
-}
+    }
 
 .clipboard-wrapper {
     position: relative;
@@ -920,10 +920,11 @@ body {
     top: -35px;
     border-radius: 2px;
     cursor: pointer;
-}
+    }
+
 .clipboard-wrapper:hover {
     background: rgba(221, 222, 224, 0.41);
-}
+    }
 
 .clipboard-button {
     font-size: 21px;
@@ -931,10 +932,11 @@ body {
     position: relative;
     right: -8px;  
     color: #439FE0;  
-}
+    }
+
 .clipboard-button:active {
     color: #3C4759;
-}
+    }
 
 .smooth-fullscreen-feedback-label {
     height: 20px;
@@ -946,4 +948,33 @@ body {
     position: relative;
     right: -34px;
     transition: opacity 100ms linear;
+/*<<<<<<< HEAD*/
 }
+
+.share-dropdown {
+    padding-bottom: 0px;
+}
+.share-item-processing {
+    padding-bottom: 10px;
+    border-radius: 0 0 4px 4px;
+}
+.invite-feedback-active {
+    background: #3C4759;
+    color: #FCFCFC;
+    font-size: 12px;
+    padding: 5px;
+    padding-left: 10px;
+}
+.invite-feedback-active a {
+    color: white;
+    font-weight: 600;
+}
+
+.account-dropdown {
+    width: 200px;
+    border-radius: 0 0 4px 4px;
+    padding-bottom: 10px;
+}
+/*=======
+    }
+>>>>>>> 3f85c79d12440467bbb33415fefdb283a759d6a2*/

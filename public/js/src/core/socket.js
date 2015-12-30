@@ -33,6 +33,14 @@ Wu.Socket = Wu.Class.extend({
 		socket.emit('user_event', options);
 	},
 
+	send : function (channel, options, callback) {
+
+		// send event
+		var socket = this._socket;
+		socket.emit(channel, options);
+
+	},
+
 	_listen : function () {
 		var socket = this._socket;
 
@@ -47,6 +55,18 @@ Wu.Socket = Wu.Class.extend({
 		socket.on('event', function(data){
 			console.log('event data: ', data);
 		});
+
+		socket.on('tile_count', function(data){
+			Wu.Mixin.Events.fire('tileCount', {
+				detail : data
+			});
+		});
+		socket.on('tileset_meta', function(data){
+			Wu.Mixin.Events.fire('tileset_meta', {
+				detail : data
+			});
+		});
+
 		socket.on('disconnect', function(){
 			console.log('disconnect!');
 		});
@@ -61,6 +81,22 @@ Wu.Socket = Wu.Class.extend({
 		socket.on('stats', function(data){
 		});
 		socket.on('uploadDone', function (data) {
+		});
+		socket.on('generate_tiles', function (data) {
+
+			console.log('generate tiles done?', data);
+
+			if (data.err) {
+				console.error('generetate err', data);
+
+				return;
+			}
+
+			// fire
+			Wu.Mixin.Events.fire('generatedTiles', {
+				detail : data
+			});
+
 		});
 		socket.on('downloadReady', function (data) {
 
@@ -82,10 +118,23 @@ Wu.Socket = Wu.Class.extend({
 
 			var content = data.error;
 
-			app.FeedbackPane.setError({
-				title : content.title,
-				description : content.description
-			});
+			var uniqueIdentifier = content.uniqueIdentifier;
+
+			if (uniqueIdentifier) {
+				
+				// file error
+				Wu.Mixin.Events.fire('processingError', {
+					detail : content
+				});
+
+			} else {
+
+				app.FeedbackPane.setError({
+					title : content.title,
+					description : content.description
+				});
+			}
+
 		});
 		
 
