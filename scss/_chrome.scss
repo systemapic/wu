@@ -31,7 +31,7 @@
 
 .chrome-menu-button:before {
     content: '';
-    background-image: url(images/systemapic-sprite.png);
+    background-image: url(../images/systemapic-sprite.png);
     background-repeat: no-repeat;
     background-position: 1px -43px;
     position: absolute;
@@ -133,7 +133,7 @@
     }
 
 .chrome-button {
-    background-image: url(images/systemapic-sprite.png);
+    background-image: url(../images/systemapic-sprite.png);
     background-repeat: no-repeat;    
     position: relative;
     width: 30px;
@@ -385,7 +385,7 @@
     top: 4px;
     height: 20px;
     z-index: 101;
-    background: #fff url("images/arrowdown.gif") no-repeat;
+    background: #fff url("../images/arrowdown.gif") no-repeat;
     pointer-events: none;
     }
 
@@ -406,16 +406,16 @@
     }
 
 .chrome-content.settings-button.active-tab {
-    background: #71C4A8;
+    background: #3C4759;
     color: white;
     }
 
 .chrome-content.settings-button.active-tab:hover {
-    background: #67B097;
+    background: #3C4759;
     }
 
 .chrome-content.settings-button.active-tab:active {
-    background: #5a9b87;
+    background: #3C4759;
     }    
 
 .chrome.chrome-content.styler {
@@ -441,15 +441,15 @@
     }
 
 .chrome-right-big-button.upload {
-    background: #71C4A8;
+    background: #3C4759;
     }
 
 .chrome-right-big-button.upload:hover {
-    background: #67B097;
+    background: #3C4759;
     }
 
 .chrome-right-big-button.upload:active {
-    background: #5a9b87;
+    background: #3C4759;
     }    
 
 .chrome.chrome-content.cartocss.title {
@@ -500,7 +500,7 @@
     font-weight: 500;
     margin: auto;
     position: absolute;
-    background-image: url('images/refresh.png');
+    background-image: url('../images/refresh.png');
     left: 10px;
     bottom: 23px;
     background-size: 30px;
@@ -800,7 +800,7 @@ input.chrome-field-input {
     }    
 
 .chrome-switch-container.switch-on {
-    background-color: #71c4a8;
+    background-color: #3C4759;
     }
 
 .chrome-switch-container.switch-on:before {
@@ -913,22 +913,22 @@ input.chrome-field-input {
 
 .chrome-set,
 .setClear.setClear-on {
-    background: #6AB69C;
+    background: #3C4759;
     color: white;
     }
 
 .chrome-set:hover,
 .setClear.setClear-on:hover {   
-    background: #67B097;
+    background: #4F5A6B;
     }
 
 .chrome-set:active,
 .setClear.setClear-on:active {
-    background: #5a9b87;
+    background: #3C4759;
     }
 
 .chrome-set:active {
-    background: #5a9b87;
+    background: #3C4759;
     }
 
 
@@ -959,7 +959,7 @@ input.chrome-field-input {
     top: -2px;
     height: 20px;
     z-index: 101;
-    background: #fff url("images/arrowdown.gif") no-repeat;
+    background: #fff url("../images/arrowdown.gif") no-repeat;
     pointer-events: none;
     }
 
@@ -1034,15 +1034,15 @@ input.chrome-field-input {
     }
 
 .radio-on {
-    background: #71C4A8;
+    background: #3C4759;
     }
 
 .radio-on:hover {
-    background: #67B097;
+    background: #3C4759;
     }
 
 .radio-on:active {
-    background: #5a9b87;
+    background: #3C4759;
     }
 
 
@@ -1136,16 +1136,16 @@ input.chrome-field-input {
     }
 
 .layer-toggle-active {
-    background: #71C4A8;
+    background: #3C4759;
     color: white;
     }
 
 .layer-toggle-active:hover {
-    background: #67B097;
+    background: #3C4759;
     }
 
 .layer-toggle-active:active {
-    background: #5a9b87;
+    background: #3C4759;
     }
 
 
@@ -1435,7 +1435,7 @@ input.chrome-field-input {
 
 /* SAVE BUTTON */
 .sql-save {
-    background: #71C4A8;
+    background: #3C4759;
     color: white;
     padding: 6px;
     position: absolute;
@@ -1451,11 +1451,11 @@ input.chrome-field-input {
     }
 
 .sql-save:hover {
-    background: #67B097;
+    background: #3C4759;
     }
 
 .sql-save:active {
-    background: #5a9b87;
+    background: #3C4759;
     }
 
 .sql-save.active {
@@ -1559,7 +1559,7 @@ input.chrome-field-input {
     padding: 5px 0px 5px 0px;
     cursor: pointer;
     line-height: 1;
-    background: #71C4A8;
+    background: #3C4759;
     position: relative;
     margin-top: 3px; 
     width: 117px;
@@ -1569,11 +1569,11 @@ input.chrome-field-input {
     }
 
 .chrome-upload-button:hover {
-    background: #67B097;
+    background: #3C4759;
     }
 
 .chrome-upload-button:active {
-    background: #5a9b87;
+    background: #3C4759;
     }   
 
 

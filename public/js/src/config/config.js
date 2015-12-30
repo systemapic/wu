@@ -20,7 +20,7 @@ var systemapicConfigOptions = {
 	},
 
 	logos : {
-		projectDefault : '/css/images/grinders/BG-grinder-small-grayDark-on-white.gif',
+		projectDefault : '/images/grinders/BG-grinder-small-grayDark-on-white.gif',
 	},	
 	
 	// default settings (overridden by project settings)

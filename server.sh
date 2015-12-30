@@ -6,13 +6,18 @@ else
 	PRODMODE=false	
 fi;
 
+	# PRODMODE=true
+
 cd server
 
+
 if $PRODMODE; then
+
 	echo 'Production mode'
 	grunt prod 
 	echo 'Running in production mode...'
 	forever server.js prod
+
 else
 	echo 'Development mode'
 	grunt dev 
