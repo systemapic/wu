@@ -1378,8 +1378,6 @@ module.exports = api.file = {
 				return f.uuid == file_id;
 			});
 
-			console.log('foundFile', foundFile);
-
 			// if no file, no access
 			if (_.isEmpty(foundFile)) return callback('No access.');
 
@@ -1404,18 +1402,14 @@ module.exports = api.file = {
 
 		ops.push(function (callback) {
 
-			console.log('userModels:::', userModels);
-
 			async.each(userModels, function (user, done) {
 
-				console.log('adding foundfdile: ', foundFile.name)
 				console.log('adding file: ', file.name)
 
 				// add dataset to user
 				user.files.addToSet(file._id);
 				user.markModified('files');
 				user.save(function (err, u) {
-					console.log('user saved: ', err, u);
 					done(null);
 				});
 			
@@ -1431,7 +1425,16 @@ module.exports = api.file = {
 			});
 
 
-			res.end('shareDataset ok');
+			// return success
+			res.json({
+				err : null,
+				success : true,
+				file_shared : {
+					file_name : file.name,
+					file_uuid : file.uuid
+				},
+				users_shared_with : users
+			});
 
 		})
 

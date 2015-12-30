@@ -1182,6 +1182,12 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var shareBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper5);
 		var shareBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', shareBtnWrap, 'Share Dataset');
 
+		// feedback
+		var share_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label label-share_feedback', toggles_wrapper5, '');
+
+		this._divs.share_feedback = share_feedback;
+
+
 		// download button
 		Wu.DomEvent.on(shareBtn, 'click', this._shareDataset, this);
 
@@ -1238,10 +1244,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		Wu.DomEvent.on(downloadBtn, 'click', file._downloadFile, file);
 
 
-		// share dataset
-		console.error('share');
-
-
 	},
 
 	_divs : {
@@ -1265,6 +1267,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 		// sub-label
 		var sublabel = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label', content, options.sublabel);
+
 
 		var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
 		var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
@@ -1412,6 +1415,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		console.log('_shareDataset', this);
 
 		console.log('fuile', this._fullscreen._file);
+		console.log('fs', this._fullscreen);
 		console.log('users:L ,', this._divs.users);
 
 		var users = this._divs.users;
@@ -1448,7 +1452,27 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 				console.log('shared dataset', err, result);
 
-			});
+				if (err) console.error('err', err);
+
+				var result = Wu.parse(result);
+
+				if (result.err || !result.success) {
+					console.error('something went worng', result);
+				}
+
+				console.log('success success', err, result);
+
+
+
+				// app.feedback.setMessage({
+				// 	title : 'Dataset shared!', 
+				// 	description : file.getName() + ' was deleted.'
+				// });
+
+
+				this._divs.share_feedback.innerHTML = 'Dataset shared with ' + names + '!';
+
+			}.bind(this));
 		}
 
 	},
