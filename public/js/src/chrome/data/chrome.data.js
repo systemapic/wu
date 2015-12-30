@@ -992,6 +992,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			titleClassName : 'slim-font'
 		});
 
+		this._fullscreen._file = file;
+
+		this._currentFile = file;
+
 		// shortcut
 		var content = this._fullscreen._content;
 
@@ -1156,6 +1160,38 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		}		
 
 
+		// wrapper-5: share box
+		var toggles_wrapper5 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
+		// var share_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper5, 'Share dataset');
+
+		// // download button
+		// var downloadBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper3);
+		// var downloadBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', downloadBtnWrap, 'Download');
+
+		// create user list input
+		this._createInviteUsersInput({
+			type : 'read',
+			label : 'Share Dataset',
+			content : toggles_wrapper5,
+			container : this._fullscreen._inner,
+			sublabel : 'Users get their own copy of your dataset.'
+		});
+
+
+		// share button
+		var shareBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper5);
+		var shareBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', shareBtnWrap, 'Share Dataset');
+
+		// feedback
+		var share_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label label-share_feedback', toggles_wrapper5, '');
+
+		this._divs.share_feedback = share_feedback;
+
+
+		// download button
+		Wu.DomEvent.on(shareBtn, 'click', this._shareDataset, this);
+
+
 		// wrapper-3: download box
 		var toggles_wrapper3 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
 		var download_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper3, 'Download dataset');
@@ -1208,12 +1244,288 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		Wu.DomEvent.on(downloadBtn, 'click', file._downloadFile, file);
 
 
-		// share dataset
-		console.error('share');
+	},
 
+	_divs : {
+
+		users : [],
+	},
+
+	_createInviteUsersInput : function (options) {
+
+		// invite users
+		var content = options.content || this._fullscreen._content;
+		var container = this._fullscreen._container;
+		var project = options.project;
+
+		// label
+		var invite_label = options.label;
+		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label', content, invite_label);
+
+		// container
+		var invite_container = Wu.DomUtil.create('div', 'invite-container', content);
+		
+		// sub-label
+		var sublabel = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label', content, options.sublabel);
+
+
+		var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
+		var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
+
+		// input box
+		var invite_input = Wu.DomUtil.create('input', 'invite-input-form', invite_input_container);
+
+		// invite list
+		var invite_list_container = Wu.DomUtil.create('div', 'invite-list-container', invite_container);
+		var invite_list_inner = Wu.DomUtil.create('div', 'invite-list-inner', invite_list_container);
+
+		// remember div
+		this._divs.invite_list_container = invite_list_container;
+
+		// for manual scrollbar (js)
+		var monkey_scroll_bar = Wu.DomUtil.create('div', 'monkey-scroll-bar', invite_list_inner);
+		
+		// for holding list
+		var monkey_scroll_hider = Wu.DomUtil.create('div', 'monkey-scroll-hider', invite_list_inner);
+		var monkey_scroll_inner = Wu.DomUtil.create('div', 'monkey-scroll-inner', monkey_scroll_hider);
+		var monkey_scroll_list = Wu.DomUtil.create('div', 'monkey-scroll-list', monkey_scroll_inner);
+
+		// list of all users
+		var allUsers = _.sortBy(_.toArray(app.Users), function (u) {
+			return u.store.firstName;
+		});
+
+		_.each(allUsers, function (user) {
+
+			console.log('list itme', user.getName());
+
+			if (user.getUuid() == app.Account.getUuid()) return;
+
+			// divs
+			var list_item_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-container', monkey_scroll_list);
+			var avatar_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-avatar-container', list_item_container);
+			var avatar = Wu.DomUtil.create('div', 'monkey-scroll-list-item-avatar default-avatar', avatar_container);
+			var name_container = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-container', list_item_container);
+			var name_bold = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-bold', name_container);
+			var name_subtle = Wu.DomUtil.create('div', 'monkey-scroll-list-item-name-subtle', name_container);
+
+			// set name
+			name_bold.innerHTML = user.getFullName();
+			name_subtle.innerHTML = user.getEmail();
+
+			// click event
+			Wu.DomEvent.on(list_item_container, 'click', function () {
+
+				console.log('click: ', user);
+
+				// dont allow adding self 
+				if (user.getUuid() == app.Account.getUuid()) return;
+
+				// add selected user item to input box
+				this._addUserAccessItem({
+					input : invite_input,
+					user : user,
+					type : options.type
+				});
+					
+			}, this);
+		}, this);
+
+
+		// events
+
+		// input focus, show dropdown
+		Wu.DomEvent.on(invite_input, 'focus', function () {
+			this._closeInviteInputs();
+			invite_list_container.style.display = 'block';
+		}, this);
+
+		// focus input on any click
+		Wu.DomEvent.on(invite_input_container, 'click', function () {
+			invite_input.focus();
+		}, this);
+
+		// input keyup
+		Wu.DomEvent.on(invite_input, 'keydown', function (e) {
+
+			// get which key
+			var key = event.which ? event.which : event.keyCode;
+
+			// get string length
+			var value = invite_input.value;
+			var text_length = value.length;
+			if (text_length <= 0) text_length = 1;
+
+			// set width of input dynamically
+			invite_input.style.width = 30 + (text_length * 20) + 'px';
+
+			// backspace on empty field: delete added user
+			if (key == 8 && value.length == 0 && this._access[options.type].length) {
+
+				// get last user_uuid item 
+				var last = _.last(this._access[options.type]);
+
+				// dont allow adding self (as editor) to read
+				if (options.type == 'edit' && last && last.user && last.user.getUuid() == app.Account.getUuid()) return;
+
+				// remove last item
+				var popped = this._access[options.type].pop();
+				Wu.DomUtil.remove(popped.user_container);
+			}
+
+			// enter: blur input
+			if (key == 13 || key == 27) {
+				invite_input.blur();
+				invite_input.value = '';
+				this._closeInviteInputs();
+			}
+
+		}, this);
+
+
+		// close dropdown on any click
+		Wu.DomEvent.on(container, 'click', function (e) {
+
+			// only if target == self
+			var relevantTarget = 	e.target == container || 
+						e.target == this._fullscreen._inner || 
+						e.target == name || 
+						e.target == this._fullscreen._content;
+
+			if (relevantTarget) this._closeInviteInputs();
+
+		},this);
+
+		
+	},
+	_closeInviteInputs : function () {
+		console.log('closee');
+	},
+
+	_closeInviteInputs : function () {
+
+		var container = this._divs.invite_list_container;
+		if (container) container.style.display = 'none';
 
 	},
 
+	_currentFile : {},
+
+	_shareDataset : function () {
+		console.log('_shareDataset', this);
+
+		console.log('fuile', this._fullscreen._file);
+		console.log('fs', this._fullscreen);
+		console.log('users:L ,', this._divs.users);
+
+		var users = this._divs.users;
+		var dataset = this._fullscreen._file;
+
+		console.log('current datatset:', dataset.getName());
+		console.log('_currentFile:', this._currentFile.getName());
+
+		if (!users.length) return;
+
+		var userNames = [];
+		users.forEach(function (user) {
+			userNames.push(user.user.getFullName());
+		})
+
+		var names = userNames.join(', ');
+
+		if (Wu.confirm('Are you sure you want to share the dataset with ' + names + '?')) {
+			console.log('SHARING!');
+
+			// Wu.send('/');
+
+			console.log('sharing file:', dataset.getName());
+
+			var userUuids = [];
+			users.forEach(function (u) {
+				userUuids.push(u.user.getUuid());
+			});
+			
+			app.api.shareDataset({
+				dataset : dataset.getUuid(),
+				users : userUuids,
+			}, function (err, result) {
+
+				console.log('shared dataset', err, result);
+
+				if (err) console.error('err', err);
+
+				var result = Wu.parse(result);
+
+				if (result.err || !result.success) {
+					console.error('something went worng', result);
+				}
+
+				console.log('success success', err, result);
+
+
+
+				// app.feedback.setMessage({
+				// 	title : 'Dataset shared!', 
+				// 	description : file.getName() + ' was deleted.'
+				// });
+
+
+				this._divs.share_feedback.innerHTML = 'Dataset shared with ' + names + '!';
+
+			}.bind(this));
+		}
+
+	},
+	_addUserAccessItem : function (options) {
+
+		var invite_input = options.input;
+		var user = options.user;
+
+		// if user deleted. todo: clean up deleting
+		if (!user) return;
+
+		// focus input
+		invite_input.focus();
+
+		// don't add twice
+		var existing = _.find(this._divs.users, function (i) {
+			return i.user == user;
+		});
+		if (existing) return;
+
+		// insert user box in input area
+		var user_container = Wu.DomUtil.create('div', 'mini-user-container');
+		var user_inner = Wu.DomUtil.create('div', 'mini-user-inner', user_container);
+		var user_avatar = Wu.DomUtil.create('div', 'mini-user-avatar default-avatar', user_inner);
+		var user_name = Wu.DomUtil.create('div', 'mini-user-name', user_inner, user.getFullName());
+		var user_kill = Wu.DomUtil.create('div', 'mini-user-kill', user_inner, 'x');
+
+		// insert before input
+		var invite_input_container = invite_input.parentNode;
+		invite_input_container.insertBefore(user_container, invite_input);
+
+
+		// click event (kill)
+		Wu.DomEvent.on(user_container, 'click', function () {
+			
+			// remove div
+			Wu.DomUtil.remove(user_container);
+			
+			// remove from array
+			_.remove(this._divs.users, function (i) {
+				return i.user == user;
+			});
+
+		}, this);
+
+		// add to array
+		this._divs.users.push({
+			user : user,
+			user_container : user_container
+		});
+
+
+	},
 
 	calculateTileCount : function (options, done) {
 

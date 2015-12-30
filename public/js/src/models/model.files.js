@@ -206,8 +206,8 @@ Wu.Model.File = Wu.Model.extend({
 			
 			// delete file
 			var postgisOptions = this._getLayerData();
-			Wu.post('/api/file/delete', JSON.stringify(postgisOptions), function (err, response) {
 
+			app.api.deleteDataset(postgisOptions, function (err, response) {
 				var removedObjects = Wu.parse(response);
 
 				// clean up locally
@@ -215,8 +215,19 @@ Wu.Model.File = Wu.Model.extend({
 
 				// callback
 				done && done(null, removedObjects);
-
 			}.bind(this));
+
+			// Wu.post('/api/file/delete', JSON.stringify(postgisOptions), function (err, response) {
+
+			// 	var removedObjects = Wu.parse(response);
+
+			// 	// clean up locally
+			// 	this._fileDeleted(removedObjects);
+
+			// 	// callback
+			// 	done && done(null, removedObjects);
+
+			// }.bind(this));
 
 		}.bind(this));
 

@@ -1432,7 +1432,12 @@ input.target-input.polygon {
 
 
 
-
+.smooth-fullscreen-sub-label.label-share_feedback {
+    left: 200px;
+    position: absolute;
+    top: 126px;
+    font-weight: 600;
+}
 
 
 
