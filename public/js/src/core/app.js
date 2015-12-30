@@ -110,6 +110,8 @@ Wu.App = Wu.Class.extend({
 	initServer : function () {
 		console.log('Securely connected to server: \n', this.options.servers.portal);
 
+		app.api = new Wu.Api();
+
 		// check for invite link
 		this._checkForInvite();
 

@@ -354,6 +354,14 @@ module.exports = function(app, passport) {
 		api.file.getLayers(req, res);
 	});
 
+	// =====================================
+	// SHARE DATASET ==================
+	// =====================================
+	app.post('/api/dataset/share', passport.authenticate('bearer', {session: false}), function (req,res) {
+		console.log('/api/dataset/share');
+		api.file.shareDataset(req, res);
+	});
+	
 
 	// =====================================
 	// DELETE FILE(S) ===================
@@ -402,6 +410,7 @@ module.exports = function(app, passport) {
 	// UPDATE LAYERS =======================
 	// =====================================
 	app.post('/api/layer/update', passport.authenticate('bearer', {session: false}), function (req, res) {
+		console.log('layer uipdate');
 		api.layer.update(req, res);
 	});
 

@@ -209,6 +209,7 @@ module.exports = function(grunt) {
 				src : [  
 					// Class 
 					'public/js/src/core/class.js',
+					'public/js/src/core/api.js',
 
 					// socket.io
 					'public/js/src/core/socket.js',

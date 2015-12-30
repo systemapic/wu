@@ -367,6 +367,8 @@ Wu.Util = {
 
 		http.open("POST", url, true);
 
+		console.log('ulrl', url);
+
 		//Send the proper header information along with the request
 		http.setRequestHeader('Content-type', 'application/json');
 
@@ -375,6 +377,10 @@ Wu.Util = {
 
 		http.onreadystatechange = function() {
 			if(http.readyState == 4 && http.status == 200) {
+
+				if (http.responseText.length < 1000) {
+					console.log('http.responseText', http.responseText);
+				}
 
 				// verify response
 				var valid = Wu.verify(http.responseText);
@@ -386,6 +392,8 @@ Wu.Util = {
 
 		// stringify objects
 		if (Wu.Util.isObject(json)) json = JSON.stringify(json);
+
+		console.log('json:', json);
 
 		http.send(json);
 	},
@@ -461,6 +469,17 @@ Wu.Util = {
 		}
 
 	},
+
+	// parse with error handling
+	_stringify : function (json) {
+		try { 
+			var str = JSON.stringify(json); 
+			return str;
+		} catch (e) { 
+			return false; 
+		}
+	},
+
 
 
 	_getParentClientID : function (pid) {
@@ -964,7 +983,9 @@ Wu.Util = {
 
 		var confirmed = confirm(msg);
 
-		callback(confirmed);
+		callback && callback(confirmed);
+
+		return confirmed;
 	},
 	
 
@@ -1018,6 +1039,7 @@ Wu.save = Wu.Util.post;
 Wu.post = Wu.Util.postcb;
 Wu.send = Wu.Util.send;
 Wu.parse = Wu.Util._parse;
+Wu.stringify = Wu.Util._stringify;
 Wu.zip = Wu.Util.generateZip;
 Wu.zave = Wu.Util.zipSave;
 Wu.can = Wu.Util.can;
