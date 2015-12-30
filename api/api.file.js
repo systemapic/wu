@@ -281,7 +281,6 @@ module.exports = api.file = {
 
 		ops.push(function (options, callback) {
 
-			console.log('optionsnsns', options);
 			var file = options.file;
 
 			if (file.type == 'postgis') {
@@ -291,8 +290,6 @@ module.exports = api.file = {
 				var command = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store';
 				var exec = require('child_process').exec;
 
-				console.log('cwd:', cwd);
-			
 				var proc = exec(command, {cwd : cwd}, function (err, stdout, stdin) {
 					callback(err, out);
 				});
@@ -305,26 +302,17 @@ module.exports = api.file = {
 				// make a copy first
 				var path = api.config.path.file + fileUuid + '/' + fileUuid;
 				var renamed = api.config.path.temp + fileUuid + '/' + file.originalName;
-				console.log('rater path: ', path);
-				console.log('rater renamed: ', renamed);
 				fs.copy(path, renamed, function (err) {
 
 					var zipfile_name = api.config.path.temp + fileUuid + '/' + file.originalName + '_' + file.type + '.zip';
-					console.log('zipfile_name: ', zipfile_name);
 					var cwd = api.config.path.temp;
 					var command = 'zip -rj ' + zipfile_name + ' ' + renamed;
 					var exec = require('child_process').exec;
 
-					console.log('command: ', command);
-
-					console.log('cwd:', cwd);
-				
 					var proc = exec(command, {cwd : cwd}, function (err, stdout, stdin) {
-						console.log('copppp err, std', err, stdout, stdin);
 						callback(err, zipfile_name);
 					});
 
-					// callback(err, renamed);
 				});
 
 			}
@@ -647,14 +635,6 @@ module.exports = api.file = {
 
 	deleteLayersFromProjects : function (options, done) {
 		var layers = options.layers;
-
-
-		Project
-		.findOne({uuid : "project-d574c970-4bcd-4d94-aaa5-9fab88069849"})
-		.exec(function (err, randomProject) {
-			console.log('randomProject', randomProject);
-		})
-
 
 
 		async.each(layers, function (layer, callback) {
@@ -1336,22 +1316,14 @@ module.exports = api.file = {
 
 
 	shareDataset : function (req, res) {
-		console.log('share Dataset');
-
-		console.log('body', req.body);
 
 		var ops = [];
-
 		var user = req.user;
 		var users = req.body.users;
 		var file_id = req.body.dataset;
 		var userModels = [];
 		var foundFile;
 		var file;
-
-		// check access
-		console.log('user.files', user.files);
-
 
 
 		ops.push(function (callback) {
@@ -1404,8 +1376,6 @@ module.exports = api.file = {
 
 			async.each(userModels, function (user, done) {
 
-				console.log('adding file: ', file.name)
-
 				// add dataset to user
 				user.files.addToSet(file._id);
 				user.markModified('files');
@@ -1414,8 +1384,6 @@ module.exports = api.file = {
 				});
 			
 			}, callback);
-
-
 		});
 
 
@@ -1435,9 +1403,7 @@ module.exports = api.file = {
 				},
 				users_shared_with : users
 			});
-
-		})
-
+		});
 
 
 	},

@@ -1297,8 +1297,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		_.each(allUsers, function (user) {
 
-			console.log('list itme', user.getName());
-
 			if (user.getUuid() == app.Account.getUuid()) return;
 
 			// divs
@@ -1315,8 +1313,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 			// click event
 			Wu.DomEvent.on(list_item_container, 'click', function () {
-
-				console.log('click: ', user);
 
 				// dont allow adding self 
 				if (user.getUuid() == app.Account.getUuid()) return;
@@ -1412,17 +1408,10 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 	_currentFile : {},
 
 	_shareDataset : function () {
-		console.log('_shareDataset', this);
-
-		console.log('fuile', this._fullscreen._file);
-		console.log('fs', this._fullscreen);
-		console.log('users:L ,', this._divs.users);
-
+		
 		var users = this._divs.users;
 		var dataset = this._fullscreen._file;
 
-		console.log('current datatset:', dataset.getName());
-		console.log('_currentFile:', this._currentFile.getName());
 
 		if (!users.length) return;
 
@@ -1434,11 +1423,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var names = userNames.join(', ');
 
 		if (Wu.confirm('Are you sure you want to share the dataset with ' + names + '?')) {
-			console.log('SHARING!');
-
-			// Wu.send('/');
-
-			console.log('sharing file:', dataset.getName());
 
 			var userUuids = [];
 			users.forEach(function (u) {
@@ -1450,7 +1434,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				users : userUuids,
 			}, function (err, result) {
 
-				console.log('shared dataset', err, result);
 
 				if (err) console.error('err', err);
 
@@ -1458,19 +1441,15 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 				if (result.err || !result.success) {
 					console.error('something went worng', result);
+					
+					// set feedback
+					this._divs.share_feedback.innerHTML = 'Something went wrong.';
+				} else {
+					
+					// set feedback
+					this._divs.share_feedback.innerHTML = 'Dataset shared with ' + names + '!';
 				}
-
-				console.log('success success', err, result);
-
-
-
-				// app.feedback.setMessage({
-				// 	title : 'Dataset shared!', 
-				// 	description : file.getName() + ' was deleted.'
-				// });
-
-
-				this._divs.share_feedback.innerHTML = 'Dataset shared with ' + names + '!';
+				
 
 			}.bind(this));
 		}
