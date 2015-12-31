@@ -1157,6 +1157,49 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			}, this);
 
 
+
+			// cut alpha in raster
+			var toggles_wrapper9 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
+			var ralpha_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper9, 'Transparency');
+			var alpha_input = Wu.DomUtil.create('input', 'invite-input-form alpha-input', toggles_wrapper9);
+			alpha_input.setAttribute('placeholder', 'Enter color or #hex value');
+			var alphaBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper9);
+			var alphaBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', alphaBtnWrap, 'Cut');
+
+
+			// on area click
+			Wu.DomEvent.on(toggles_wrapper9, 'click', function (e) {
+
+				// highlight
+				this._highlightFullscreenElement(toggles_wrapper9);
+
+				// debug: unhighlight
+				setTimeout(function () {
+					this._unhighlightFullscreenElement();
+				}.bind(this), 3000);
+
+			}, this);
+
+			Wu.DomEvent.on(alphaBtn, 'click', function (e) {
+
+				console.log('cut raster', e);
+
+				var color = alpha_input.value;
+
+				console.log('ciolor:', color);
+
+				// fubar: it's the layer that needs cutting (with gm), not file.. 
+
+				app.api.cutRasterAlpha({
+					color : color,
+					file_id : file.getUuid()
+				}, function (err, results) {
+					console.log('cutRasterAlpha err, res', err, results);
+				})
+
+			});
+
+
 		}		
 
 
@@ -1180,7 +1223,7 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// share button
 		var shareBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper5);
-		var shareBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', shareBtnWrap, 'Share Dataset');
+		var shareBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', shareBtnWrap, 'Share dataset');
 
 		// feedback
 		var share_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label label-share_feedback', toggles_wrapper5, '');
@@ -1243,6 +1286,43 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// download button
 		Wu.DomEvent.on(downloadBtn, 'click', file._downloadFile, file);
 
+
+	},
+
+	_highlightFullscreenElement : function (elem) {
+
+		// hide fullscreen
+		jss.set('.smooth-fullscreen', {
+			'visibility' : 'hidden',
+			'overflow' : 'hidden',
+		});
+
+		// hide chrome
+		jss.set('.chrome-right', {
+			'visibility' : 'hidden',
+		});
+
+		// hide controls
+		jss.set('.leaflet-control-container', {
+			'visibility' : 'hidden',
+		});
+
+		// show only one element
+		elem.style.visibility = 'visible';
+		elem.style.background = '#FCFCFC';
+
+		// disable map zoom
+		app._map.scrollWheelZoom.disable()
+
+	},
+
+	_unhighlightFullscreenElement : function () {
+		jss.remove('.smooth-fullscreen');
+		jss.remove('.chrome-right');
+		jss.remove('.leaflet-control-container');
+
+		// enable map zoom
+		app._map.scrollWheelZoom.enable()
 
 	},
 

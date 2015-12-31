@@ -1440,7 +1440,14 @@ input.target-input.polygon {
 }
 
 
-
+.invite-input-form.alpha-input {
+	width: 260px;
+	border: 1px solid gainsboro;
+	border-radius: 4px;
+	padding: 10px;
+	margin: 10px;
+	margin-left: 0;
+}
 
 
 
