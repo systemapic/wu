@@ -1400,3 +1400,7 @@ input.chrome-field-input {
 .data-list-line.editingFileName:hover .file-name-input {
     color: white;
 }
+
+.chrome-switch-container.switch-on {
+    background-color: #EEEEEE;
+}
