@@ -1416,7 +1416,7 @@ input.chrome-field-input {
     width: 20px;
     height: 21px;
     left: -12px;
-    top: -5px;
+    top: -9px;
     cursor: pointer;
 }
 
@@ -1425,4 +1425,11 @@ input.chrome-field-input {
 }
 .description-control-opacity-container .noUi-handle:before {
     left: 7px;
+}
+.description-control-opacity-container {
+    margin-top: 10px;
+}
+.description-control-opacity-container .noUi-horizontal {
+    height: 5px;
+    cursor: pointer;
 }
