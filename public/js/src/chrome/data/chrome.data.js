@@ -2408,7 +2408,8 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				return d.getTitle();
 			}.bind(this))
 			.on('dblclick', function (d) {
-				if ( library == 'postgis' ) this.activateLayerInput(d, library);
+				var editable = (library == 'postgis' || library == 'raster');
+				editable && this.activateLayerInput(d, library);
 			}.bind(this));			
 
 
