@@ -680,7 +680,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// Enter
 		nameInput
 			.enter()
-			// .append('textarea')
 			.append('input')
 			.attr('type', 'text')			
 			.classed('file-name-input', true)
@@ -1349,9 +1348,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 				file : file,
 				color : 'white'
 			}, function (err, layer) {
-				console.log('OK!');
 
-				transparency_feedback.innerHTML = 'Layer created with cut color.'
+				// set feedback text
+				transparency_feedback.innerHTML = 'New layer created and added to project!';
 			});
 
 		}, this);
@@ -1381,11 +1380,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		}, function (err, layer) {
 			if (err) return console.error(err);
 
-			console.log('layer::', layer);
-
 			// rename layer
 			var layerName = layer.getTitle();
-			layerName += ' - cut white';
+			layerName += ' (white areas cut)';
 			layer.setTitle(layerName);
 
 			// automatically add layer to layermenu

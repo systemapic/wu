@@ -424,9 +424,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	// enter edit mode of layermenu
 	enableEdit : function () {
-
-		// PØLSE
-
 		if (this.editMode) return;
 
 		// Make container visible
@@ -461,7 +458,6 @@ L.Control.Layermenu = Wu.Control.extend({
 
 	// exit edit mode 
 	disableEdit : function () {
-
 		if (!this.editMode) return;
 
 		if (this._isEmpty()) {
@@ -482,20 +478,11 @@ L.Control.Layermenu = Wu.Control.extend({
 		// disable layermenu sorting
 		this.disableSortable();
 
-
-		// xoxoxoxoxo
 		// remove edit style
 		Wu.DomUtil.removeClass(this._innerContainer, 'edit-mode');
 
 		// remove new drag'n drop folder
 		this._removeMenuFolder();
-
-		// Set max height
-		// var dimensions = app._getDimensions();
-		// this.resizeEvent(dimensions);	
-
-		// this._setHeight();	
-		
 	},
 	
 
@@ -538,9 +525,6 @@ L.Control.Layermenu = Wu.Control.extend({
 	},
 
 	initSortable : function () {
-
-		// console.log('this.project', this.project);
-		// console.log('this._project', this._project);
 
 		if (!this._project.isEditor()) return;
 		this._sortingEnabled = true;
