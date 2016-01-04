@@ -807,6 +807,7 @@ module.exports = api.postgis = {
 		    user_id 	= options.user_id,
 		    file_id 	= options.file_id,
 		    pg_db 	= options.user.postgis_database,
+		    uniqueIdentifier = options.uniqueIdentifier,
 		    original_format = api.postgis._getRasterType(raster);
 
 		var IMPORT_RASTER_SCRIPT_PATH = '../scripts/postgis/import_raster.sh'; // todo: put in config
