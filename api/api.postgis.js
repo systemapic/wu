@@ -803,10 +803,10 @@ module.exports = api.postgis = {
 	importRaster : function (options, done) {
 		var clientName 	= options.clientName,
 		    raster 	= options.files[0],
-		    // file_id 	= 'raster_' + api.utils.getRandom(10),
 		    user_id 	= options.user_id,
 		    file_id 	= options.file_id,
 		    pg_db 	= options.user.postgis_database,
+		    uniqueIdentifier = options.uniqueIdentifier,
 		    original_format = api.postgis._getRasterType(raster);
 
 		var IMPORT_RASTER_SCRIPT_PATH = '../scripts/postgis/import_raster.sh'; // todo: put in config
