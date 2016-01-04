@@ -1332,35 +1332,62 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		// create divs
 		var toggles_wrapper9 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
 		var ralpha_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper9, 'Transparency');
-		var alpha_input = Wu.DomUtil.create('input', 'invite-input-form alpha-input', toggles_wrapper9);
-		alpha_input.setAttribute('placeholder', 'Enter color or #hex value');
-		var alphaBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper9);
-		var alphaBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', alphaBtnWrap, 'Cut');
+		// var alpha_input = Wu.DomUtil.create('input', 'invite-input-form alpha-input', toggles_wrapper9);
+		// alpha_input.setAttribute('placeholder', 'Enter color or #hex value');
 		var feedbackText = 'A new layer will be created with the cut color.'
 		var transparency_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-transparency', toggles_wrapper9, feedbackText);
-
+		var alphaBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper9);
+		var whiteBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', alphaBtnWrap, 'Cut white');
+		// var blackBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save left140', alphaBtnWrap, 'Cut black');
+	
 		// on click
-		Wu.DomEvent.on(alphaBtn, 'click', function (e) {
-			var color = alpha_input.value;
+		Wu.DomEvent.on(whiteBtn, 'click', function (e) {
+			// var color = alpha_input.value;
 
-			console.log('cut raster', e);
-			console.log('ciolor:', color);
-
-			// cut rater
-			file.cutRasterColor({
-				color : color,
-				project : this._project
+			// cut raster
+			this._cutRaster({
+				file : file,
+				color : 'white'
 			}, function (err, layer) {
-				console.log('file.cutRasterColor err, layer', err, layer);
+				console.log('OK!');
 
-				// automatically add layer to layermenu
-				this._addOnImport(layer);
-
-			}.bind(this));
-
+				transparency_feedback.innerHTML = 'Layer created with cut color.'
+			});
 
 		}, this);
 
+		// // on click
+		// Wu.DomEvent.on(blackBtn, 'click', function (e) {
+		// 	// var color = alpha_input.value;
+
+		// 	// cut raster
+		// 	this._cutRaster({
+		// 		file : file,
+		// 		color : 'black'
+		// 	});
+
+		// }, this);
+
+	},
+
+	_cutRaster : function (options, done) {
+		var file = options.file;
+		var color = options.color;
+
+		// cut raster
+		file.cutRasterColor({
+			color : color,
+			project : this._project
+		}, function (err, layer) {
+			if (err) return console.error(err);
+
+			// automatically add layer to layermenu
+			this._addOnImport(layer);
+
+			// done
+			done && done(err, layer);
+
+		}.bind(this));
 	},
 
 	_highlightFullscreenElement : function (elem) {
@@ -1397,11 +1424,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 
 		// enable map zoom
 		app._map.scrollWheelZoom.enable()
-
 	},
 
 	_divs : {
-
 		users : [],
 	},
 
@@ -1421,7 +1446,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 		// sub-label
 		var sublabel = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label', content, options.sublabel);
-
 
 		var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
 		var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
