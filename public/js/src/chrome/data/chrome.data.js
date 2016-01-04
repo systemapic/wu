@@ -1381,6 +1381,13 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		}, function (err, layer) {
 			if (err) return console.error(err);
 
+			console.log('layer::', layer);
+
+			// rename layer
+			var layerName = layer.getTitle();
+			layerName += ' - cut white';
+			layer.setTitle(layerName);
+
 			// automatically add layer to layermenu
 			this._addOnImport(layer);
 
