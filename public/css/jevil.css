@@ -244,9 +244,10 @@
     padding-top: 5px;
     height: 27px;
     width: 315;
-
     left: -5px;
-    }
+    left: 25px;
+    top: 5px;
+}
 
 
 .chrome-content-header {
@@ -1246,7 +1247,7 @@ input.chrome-field-input {
     height: 18px;
     right: 1px;
     box-shadow: none;
-    background: #3C4759;
+    background: transparent;
     width: 50px;
     height: 20px;
     right: -5px;
@@ -1386,4 +1387,16 @@ input.chrome-field-input {
     background-color: #FCFCFC;
     color: #3C4759;
     font-weight: 600;
+}
+
+.data-list-line.editingFileName:hover .file-name-content {
+    visibility: hidden;
+}
+.file-name-input {
+    visibility: visible;
+    color: #3C4759;
+}
+
+.data-list-line.editingFileName:hover .file-name-input {
+    color: white;
 }
