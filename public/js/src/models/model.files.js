@@ -487,6 +487,33 @@ Wu.Model.File = Wu.Model.extend({
 		return false;
 	},
 
+	cutRasterColor : function (options, callback) {
+
+		console.log('opitons', options)
+
+
+		// request layer with cut
+		this._requestDefaultRasterLayer({
+			file : this,
+			project : options.project,
+			cutColor : options.color // todo: validate
+		}, callback);
+
+
+		// // fubar: it's the layer that needs cutting (with gm), not file.. 
+		// app.api.cutRasterColor({
+		// 	color : color,
+		// 	file_id : file.getUuid()
+		// }, function (err, results) {
+		// 	console.log('cutRasterAlpha err, res', err, results);
+
+		// 	// create new layer with cut
+		// 	// add layer automatically
+		// 	// layer gets cut on exit
+
+		// });
+
+	},
 
 	_createLayer : function (project, callback) {
 		this._createDefaultLayer(project, callback);
@@ -526,6 +553,10 @@ Wu.Model.File = Wu.Model.extend({
 		    file_id = file.getUuid(),
 		    project = options.project;
 
+		var cutColor = options.cutColor || false;
+
+		console.log('cutColor', cutColor)
+
 
 		var layerJSON = {
 			"geom_column": "the_geom_3857",
@@ -541,7 +572,8 @@ Wu.Model.File = Wu.Model.extend({
 			// "sql": "(SELECT * FROM " + file_id + ") as sub",
 			"file_id": file_id,
 			"return_model" : true,
-			"projectUuid" : project.getUuid()
+			"projectUuid" : project.getUuid(),
+			"cutColor" : cutColor
 		}
 
 		// create postgis layer
