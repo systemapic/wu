@@ -1402,5 +1402,27 @@ input.chrome-field-input {
 }
 
 .chrome-switch-container.switch-on {
-    background-color: #EEEEEE;
+    background-color: rgba(60, 71, 89, 0.28);
+}
+
+.description-control-opacity-container .noUi-active {
+    box-shadow: none;
+}
+.description-control-opacity-container .noUi-handle {
+    box-shadow: none;
+    background: #3C4759;    
+}
+.description-control-opacity-container .noUi-horizontal .noUi-handle {
+    width: 20px;
+    height: 21px;
+    left: -12px;
+    top: -5px;
+    cursor: pointer;
+}
+
+.description-control-opacity-container .noUi-handle:after {
+    left: 10px;
+}
+.description-control-opacity-container .noUi-handle:before {
+    left: 7px;
 }
