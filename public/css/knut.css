@@ -1450,7 +1450,12 @@ input.target-input.polygon {
 }
 
 
-
+.smooth-fullscreen-error-label.tiles-transparency {
+    left: 100px;
+    position: absolute;
+    top: 120px;
+    color: #3F4652;
+}
 
 
 

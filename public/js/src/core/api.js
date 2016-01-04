@@ -27,9 +27,4 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
-	cutRaster : function (options, done) {
-		var path = '/api/db/cutRasterColor';
-		this.post(path, options, done);
-	}
-
 });
