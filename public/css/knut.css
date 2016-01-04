@@ -1440,10 +1440,26 @@ input.target-input.polygon {
 }
 
 
+.invite-input-form.alpha-input {
+	width: 260px;
+	border: 1px solid gainsboro;
+	border-radius: 4px;
+	padding: 10px;
+	margin: 10px;
+	margin-left: 0;
+}
 
 
+.smooth-fullscreen-error-label.tiles-transparency {
+    left: 100px;
+    top: 120px;
+    color: #3F4652;
+}
 
+.left140 {
+	left: 140px;
+}
 
-
-
-
+.leaflet-control-search .search-button:hover {
+    background: url('../images/search-icon.png') no-repeat 4px 5px !important;
+}

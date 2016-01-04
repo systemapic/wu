@@ -992,181 +992,252 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			titleClassName : 'slim-font'
 		});
 
+		// shortcuts
 		this._fullscreen._file = file;
-
 		this._currentFile = file;
-
-		// shortcut
 		var content = this._fullscreen._content;
 
-		// nice border box
-		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
+		// name box
+		var nameContainer = this._createNameBox({
+			container : content,
+			file : file
+		});
+
 		
-		// dataset name
+
+		// if vector 
+		if (file.isPostgis()) {
+
+			// vector meta
+			this._createVectorMetaBox({
+				container : nameContainer,
+				file : file
+			});
+		}
+		
+
+		// if raster
+		if (file.isRaster()) {
+
+			// raster meta
+			this._createRasterMetaBox({
+				container : nameContainer,
+				file : file
+			});
+
+			// tileset box
+			this._createTilesetBox({
+				container : content,
+				file : file
+			});
+
+			// transparency box
+			this._createTransparencyBox({
+				container : content,
+				file : file
+			});
+
+		}		
+
+		// share button
+		this._createShareBox({
+			container : content,
+			file : file,
+			fullscreen : fullscreen
+		});
+
+
+		// download button
+		this._createDownloadBox({
+			container : content,
+			file : file,
+			fullscreen : fullscreen
+		});
+
+		// delete button
+		this._createDeleteBox({
+			container : content,
+			file : file,
+			fullscreen : fullscreen
+		});
+		
+
+	},
+
+	_createNameBox : function (options) {
+		var container = options.container;
+		var file = options.file;
+		
+		// create divs
+		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
 		var name = Wu.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, 'Dataset name');
 		var name_input = Wu.DomUtil.create('input', 'smooth-input smaller-input', toggles_wrapper);
 		name_input.setAttribute('placeholder', 'Enter name here');
 		name_input.value = file.getName();
 		var name_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label', toggles_wrapper);
 
+		// return wrapper
+		return toggles_wrapper;
+	},
 
-		// vector 
-		if (file.isPostgis()) {
+	_createVectorMetaBox : function (options) {
+		var container = options.container;
+		var file = options.file;
+		var meta = file.getMeta();
+		var toggles_wrapper = container;
 
-			// get meta
-			var meta = file.getMeta();
-
-			// meta info
-			var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta')
-			var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Vector');
-			var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
-			var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
-			var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created on:</span> ' + moment(file.getCreated()).format('MMMM Do YYYY, h:mm:ss a'));
+		// meta info
+		var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta')
+		var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Vector');
+		var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
+		var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
+		var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created on:</span> ' + moment(file.getCreated()).format('MMMM Do YYYY, h:mm:ss a'));
 		
-		}
+	},
+
+	_createRasterMetaBox : function (options) {
+		var container = options.container;
+		var file = options.file;
+		var meta = file.getMeta();
+		var toggles_wrapper = container;
+
+		// meta info
+		var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta')
+		var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Raster');
+		var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
+		var bands_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Bands:</span> ' + meta.bands);
+		var size_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Raster size:</span> ' + meta.size.x + 'x' + meta.size.y);
+		var projection_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Projection:</span> ' + meta.projection);
+		var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
+		var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created on:</span> ' + moment(file.getCreated()).format('MMMM Do YYYY, h:mm:ss a'));
+	},
+
+	_createTilesetBox : function (options) {
+		var container = options.container;
+		var file = options.file;
+		var meta = file.getMeta();
+
+		// nice border box
+		var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+		var tiles_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Tileset')
+		var generated_tiles_title = Wu.DomUtil.create('div', 'file-option title generated-tiles', toggles_wrapper, 'Generated tile-range')
 		
+		// zoom levels
+		var zoomlevels_wrapper = Wu.DomUtil.create('div', 'zoomlevels-wrapper', toggles_wrapper);
+		var zoom_levels = _.sortBy(meta.zoom_levels);
+		var zoom_min = _.first(zoom_levels);
+		var zoom_max = _.last(zoom_levels);
+		var zoom_levels_text = zoom_min	 + ' to ' + zoom_max;
+		var zoomlevels_div = Wu.DomUtil.create('div', 'file-option sub padding-top-10', zoomlevels_wrapper, '<span class="bold-font">Zoom-levels:</span> ' + zoom_levels_text);
 
-		// raster
-		if (file.isRaster()) {
+		// create slider
+		var stepSlider = Wu.DomUtil.create('div', 'tiles-slider', zoomlevels_wrapper);
+		noUiSlider.create(stepSlider, {
+			start: [zoom_min, zoom_max],
+			step: 1,
+			range: {
+				'min': [2],
+				'max': [19]
+			},
+			pips: {
+				mode: 'count',
+				values: [18],
+				density : 18,
+				stepped : true
+			}
+		});
 
-			// get meta
-			var meta = file.getMeta();
+		// total tiles div
+		var totaltiles_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Total tiles:</span> ' + meta.total_tiles);
+		var tilesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Tileset size:</span> ');
 
-			// meta info
-			var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta')
-			var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Raster');
-			var filesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Size:</span> ' + file.getDatasizePretty());
-			var bands_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Bands:</span> ' + meta.bands);
-			var size_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Raster size:</span> ' + meta.size.x + 'x' + meta.size.y);
-			var projection_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Projection:</span> ' + meta.projection);
-			var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created by:</span> ' + file.getCreatedByName());
-			var createdby_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Created on:</span> ' + moment(file.getCreated()).format('MMMM Do YYYY, h:mm:ss a'));
+		// error feedback
+		var generated_tiles_error = this._generated_tiles_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-error', toggles_wrapper);
 
-			// nice border box
-			var toggles_wrapper = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
-			var tiles_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Tileset')
-			var generated_tiles_title = Wu.DomUtil.create('div', 'file-option title generated-tiles', toggles_wrapper, 'Generated tile-range')
-			
-			// zoom levels
-			var zoomlevels_wrapper = Wu.DomUtil.create('div', 'zoomlevels-wrapper', toggles_wrapper);
-			var zoom_levels = _.sortBy(meta.zoom_levels);
-			var zoom_min = _.first(zoom_levels);
-			var zoom_max = _.last(zoom_levels);
-			var zoom_levels_text = zoom_min	 + ' to ' + zoom_max;
-			var zoomlevels_div = Wu.DomUtil.create('div', 'file-option sub padding-top-10', zoomlevels_wrapper, '<span class="bold-font">Zoom-levels:</span> ' + zoom_levels_text);
+		// generate button
+		var generateBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-22', toggles_wrapper);
+		var generateBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save generate-tiles', generateBtnWrap, 'Generate tiles');
 
-			// create slider
-			var stepSlider = Wu.DomUtil.create('div', 'tiles-slider', zoomlevels_wrapper);
-			noUiSlider.create(stepSlider, {
-				start: [zoom_min, zoom_max],
-				step: 1,
-				range: {
-					'min': [2],
-					'max': [19]
-				},
-				pips: {
-					mode: 'count',
-					values: [18],
-					density : 18,
-					stepped : true
+		// slider events
+		stepSlider.noUiSlider.on('update', function (values, handle) {
+
+			// set zoom levels
+			var z_min = parseInt(values[0]);
+			var z_max = parseInt(values[1]);
+			var zoom_levels_text = z_min + ' to ' + z_max;
+			zoomlevels_div.innerHTML = '<span class="bold-font">Zoom-levels:</span> ' + zoom_levels_text;
+
+			// check tile count (local)
+			this.calculateTileCount({
+				zoom_min : z_min,
+				zoom_max : z_max,
+				file_id : file.getUuid()				
+			}, function (err, tile_count) {
+				
+				// check tiles
+				if (tile_count > 11000) { // todo: make account dependent
+
+					// mark too high tile-count
+					totaltiles_div.innerHTML = '<span class="bold-font red-font">Total tiles: ' + tile_count + '</span>';
+
+					// set error feedback
+					generated_tiles_error.innerHTML = '<span class="bold-font">The tile count is too high. Please select a lower zoom-level.</span>';
+
+					// disable button
+					Wu.DomUtil.addClass(generateBtn, 'disabled-btn');
+
+				} else {
+					
+					// set tile count
+					totaltiles_div.innerHTML = '<span class="bold-font">Total tiles:</span> ' + tile_count;
+
+					// set error feedback
+					generated_tiles_error.innerHTML = '';
+				
+					// enable button
+					Wu.DomUtil.removeClass(generateBtn, 'disabled-btn');
 				}
 			});
 
-			// total tiles div
-			var totaltiles_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Total tiles:</span> ' + meta.total_tiles);
-			var tilesize_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Tileset size:</span> ');
+		}.bind(this));
 
-			// error feedback
-			var generated_tiles_error = this._generated_tiles_error = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-error', toggles_wrapper);
+		// generate button event
+		Wu.DomEvent.on(generateBtn, 'click', function () {
 
-			// generate button
-			var generateBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-22', toggles_wrapper);
-			var generateBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save generate-tiles', generateBtnWrap, 'Generate tiles');
+			// set zoom levels
+			var values = stepSlider.noUiSlider.get();
+			var z_min = parseInt(values[0]);
+			var z_max = parseInt(values[1]);
 
-			// slider events
-			stepSlider.noUiSlider.on('update', function (values, handle) {
+			// double check tile count (local)
+			this.calculateTileCount({
+				zoom_min : z_min,
+				zoom_max : z_max,
+				file_id : file.getUuid()				
+			}, function (err, tile_count) {
+				
+				// check tile count
+				if (tile_count > 11000) return; // todo: account dependent
 
-				// set zoom levels
-				var z_min = parseInt(values[0]);
-				var z_max = parseInt(values[1]);
-				var zoom_levels_text = z_min + ' to ' + z_max;
-				zoomlevels_div.innerHTML = '<span class="bold-font">Zoom-levels:</span> ' + zoom_levels_text;
-
-				// check tile count (local)
-				this.calculateTileCount({
+				// generate tiles
+				app.Socket.send('generate_tiles', {
 					zoom_min : z_min,
 					zoom_max : z_max,
 					file_id : file.getUuid()				
-				}, function (err, tile_count) {
-					
-					// check tiles
-					if (tile_count > 11000) { // todo: make account dependent
-
-						// mark too high tile-count
-						totaltiles_div.innerHTML = '<span class="bold-font red-font">Total tiles: ' + tile_count + '</span>';
-
-						// set error feedback
-						generated_tiles_error.innerHTML = '<span class="bold-font">The tile count is too high. Please select a lower zoom-level.</span>';
-
-						// disable button
-						Wu.DomUtil.addClass(generateBtn, 'disabled-btn');
-
-					} else {
-						
-						// set tile count
-						totaltiles_div.innerHTML = '<span class="bold-font">Total tiles:</span> ' + tile_count;
-
-						// set error feedback
-						generated_tiles_error.innerHTML = '';
-					
-						// enable button
-						Wu.DomUtil.removeClass(generateBtn, 'disabled-btn');
-					}
 				});
 
-			}.bind(this));
+				// set feedback
+				generated_tiles_error.innerHTML = '<span class="bold-font dark-font">Generating tiles. This will take a few minutes...</span>';
+			});
+		}, this);
 
-			// generate button event
-			Wu.DomEvent.on(generateBtn, 'click', function () {
+	},
 
-				// set zoom levels
-				var values = stepSlider.noUiSlider.get();
-				var z_min = parseInt(values[0]);
-				var z_max = parseInt(values[1]);
-
-				// double check tile count (local)
-				this.calculateTileCount({
-					zoom_min : z_min,
-					zoom_max : z_max,
-					file_id : file.getUuid()				
-				}, function (err, tile_count) {
-					
-					// check tile count
-					if (tile_count > 11000) return; // todo: account dependent
-
-					// generate tiles
-					app.Socket.send('generate_tiles', {
-						zoom_min : z_min,
-						zoom_max : z_max,
-						file_id : file.getUuid()				
-					});
-
-					// set feedback
-					generated_tiles_error.innerHTML = '<span class="bold-font dark-font">Generating tiles. This will take a few minutes...</span>';
-				});
-			}, this);
-
-
-		}		
-
+	_createShareBox : function (options) {
+		var container = options.container;
 
 		// wrapper-5: share box
-		var toggles_wrapper5 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
-		// var share_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper5, 'Share dataset');
-
-		// // download button
-		// var downloadBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper3);
-		// var downloadBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', downloadBtnWrap, 'Download');
+		var toggles_wrapper5 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
 
 		// create user list input
 		this._createInviteUsersInput({
@@ -1177,31 +1248,44 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			sublabel : 'Users get their own copy of your dataset.'
 		});
 
-
 		// share button
 		var shareBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper5);
-		var shareBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', shareBtnWrap, 'Share Dataset');
+		var shareBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save red-btn', shareBtnWrap, 'Share dataset');
 
 		// feedback
 		var share_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label label-share_feedback', toggles_wrapper5, '');
 
+		// remember
 		this._divs.share_feedback = share_feedback;
-
 
 		// download button
 		Wu.DomEvent.on(shareBtn, 'click', this._shareDataset, this);
+	},
 
+	_createDownloadBox : function (options) {
+		var container = options.container;
+		var file = options.file;
 
 		// wrapper-3: download box
-		var toggles_wrapper3 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
+		var toggles_wrapper3 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
 		var download_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper3, 'Download dataset');
 
 		// download button
 		var downloadBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper3);
 		var downloadBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', downloadBtnWrap, 'Download');
+		
+		// download button
+		Wu.DomEvent.on(downloadBtn, 'click', file._downloadFile, file);
+	},
+
+	_createDeleteBox : function (options) {
+
+		var container = options.container;
+		var file = options.file;
+		var fullscreen = options.fullscreen;
 
 		// wrapper-4: delete box
-		var toggles_wrapper4 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', content);
+		var toggles_wrapper4 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
 		var delete_title = Wu.DomUtil.create('div', 'file-option title red-font', toggles_wrapper4, 'Delete');
 
 		// download button
@@ -1238,16 +1322,118 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 			}.bind(this))
 
 		}, this);
+	},
+	
 
+	_createTransparencyBox : function (options) {
+		var container = options.container;
+		var file = options.file;
 
-		// download button
-		Wu.DomEvent.on(downloadBtn, 'click', file._downloadFile, file);
+		// create divs
+		var toggles_wrapper9 = Wu.DomUtil.create('div', 'toggles-wrapper file-options', container);
+		var ralpha_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper9, 'Transparency');
+		// var alpha_input = Wu.DomUtil.create('input', 'invite-input-form alpha-input', toggles_wrapper9);
+		// alpha_input.setAttribute('placeholder', 'Enter color or #hex value');
+		var feedbackText = 'A new layer will be created with the cut color.'
+		var transparency_feedback = Wu.DomUtil.create('div', 'smooth-fullscreen-error-label tiles-transparency', toggles_wrapper9, feedbackText);
+		var alphaBtnWrap = Wu.DomUtil.create('div', 'pos-rel height-42', toggles_wrapper9);
+		var whiteBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save', alphaBtnWrap, 'Cut white');
+		// var blackBtn = Wu.DomUtil.create('div', 'smooth-fullscreen-save left140', alphaBtnWrap, 'Cut black');
+	
+		// on click
+		Wu.DomEvent.on(whiteBtn, 'click', function (e) {
+			// var color = alpha_input.value;
 
+			// cut raster
+			this._cutRaster({
+				file : file,
+				color : 'white'
+			}, function (err, layer) {
+				console.log('OK!');
+
+				transparency_feedback.innerHTML = 'Layer created with cut color.'
+			});
+
+		}, this);
+
+		// // on click
+		// Wu.DomEvent.on(blackBtn, 'click', function (e) {
+		// 	// var color = alpha_input.value;
+
+		// 	// cut raster
+		// 	this._cutRaster({
+		// 		file : file,
+		// 		color : 'black'
+		// 	});
+
+		// }, this);
 
 	},
 
-	_divs : {
+	_cutRaster : function (options, done) {
+		var file = options.file;
+		var color = options.color;
 
+		// cut raster
+		file.cutRasterColor({
+			color : color,
+			project : this._project
+		}, function (err, layer) {
+			if (err) return console.error(err);
+
+			console.log('layer::', layer);
+
+			// rename layer
+			var layerName = layer.getTitle();
+			layerName += ' - cut white';
+			layer.setTitle(layerName);
+
+			// automatically add layer to layermenu
+			this._addOnImport(layer);
+
+			// done
+			done && done(err, layer);
+
+		}.bind(this));
+	},
+
+	_highlightFullscreenElement : function (elem) {
+
+		// hide fullscreen
+		jss.set('.smooth-fullscreen', {
+			'visibility' : 'hidden',
+			'overflow' : 'hidden',
+		});
+
+		// hide chrome
+		jss.set('.chrome-right', {
+			'visibility' : 'hidden',
+		});
+
+		// hide controls
+		jss.set('.leaflet-control-container', {
+			'visibility' : 'hidden',
+		});
+
+		// show only one element
+		elem.style.visibility = 'visible';
+		elem.style.background = '#FCFCFC';
+
+		// disable map zoom
+		app._map.scrollWheelZoom.disable()
+
+	},
+
+	_unhighlightFullscreenElement : function () {
+		jss.remove('.smooth-fullscreen');
+		jss.remove('.chrome-right');
+		jss.remove('.leaflet-control-container');
+
+		// enable map zoom
+		app._map.scrollWheelZoom.enable()
+	},
+
+	_divs : {
 		users : [],
 	},
 
@@ -1267,7 +1453,6 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		
 		// sub-label
 		var sublabel = Wu.DomUtil.create('div', 'smooth-fullscreen-sub-label', content, options.sublabel);
-
 
 		var invite_inner = Wu.DomUtil.create('div', 'invite-inner', invite_container);
 		var invite_input_container = Wu.DomUtil.create('div', 'invite-input-container', invite_inner);
