@@ -244,9 +244,10 @@
     padding-top: 5px;
     height: 27px;
     width: 315;
-
     left: -5px;
-    }
+    left: 25px;
+    top: 5px;
+}
 
 
 .chrome-content-header {
@@ -496,21 +497,10 @@ input.chrome-field-input {
 .chrome-upload-button:hover {
     background: #F9F9F9;
     color: #3F4652;
-/*<<<<<<< HEAD*/
     border: 1px solid gainsboro;
     padding-top: 8px;
     padding-bottom: 8px;
 }
-/*=======
-    box-shadow: 0 0 0px 1px #DCDCDC inset;
-    }
-
-.chrome-upload-button:active {
-    background: #EEE;
-    color: #3F4652;
-    box-shadow: 0 0 0px 1px #DCDCDC inset;
-    }
->>>>>>> 3f85c79d12440467bbb33415fefdb283a759d6a2*/
 
 .chrome-data-inner {
     padding: 0;
@@ -898,17 +888,24 @@ input.chrome-field-input {
 .leaflet-control-search .search-button {
     width: 30px !important;
     height: 30px !important;
-
-/*<<<<<<< HEAD*/
-    background: url('images/search-icon.png') no-repeat 4px -19px !important;
-        background-color: #FCFCFC !important;
-/*=======
-    background: url('../images/search-icon.png') no-repeat 4px -19px !important;
->>>>>>> 3f85c79d12440467bbb33415fefdb283a759d6a2*/
-    }
+    background: url('../images/search-icon.png') no-repeat 4px 5px !important;
+    background-color: #FCFCFC !important;
+    opacity: 0.7;
+}
 
 .leaflet-control-search .search-button:hover {
     background: url('../images/search-icon.png') no-repeat 4px 5px !important;
+    opacity: 1;
+    background-color: #FCFCFC !important;
+}
+
+.leaflet-control-search .search-input { 
+    position: absolute;
+    margin: 0;
+    margin-left: 40px;
+    height: 30px;
+    padding: 10px;
+    font-size: 16px;
 }
 
 .leaflet-control-search.leaflet-control {
@@ -916,6 +913,7 @@ input.chrome-field-input {
     height: 30px !important;
     margin-left: 5px !important;
     border-radius: 4px !important;
+    font-family: 'Open Sans', sans-serif;
     }
 
 .leaflet-draw-draw-polygon:before {
@@ -1224,33 +1222,6 @@ input.chrome-field-input {
 
 
 
-/*<<<<<<< HEAD
-
-
-
-=======
-.data-list-line .file-name-content {
-    word-break: break-all;
-    }
-
-.chrome-content-bottom-container {
-    bottom: 95px;
-    }
-
-
-.chrome-tooltip .chrome-field-mini-input {
-    top: 5px !important;
-    width: 35px !important;
-    }
->>>>>>> 3f85c79d12440467bbb33415fefdb283a759d6a2*/
-
-
-
-
-/*<<<<<<< HEAD*/
-
-
-
 
 /*data pane*/
 .chrome-data-scroller {
@@ -1276,7 +1247,7 @@ input.chrome-field-input {
     height: 18px;
     right: 1px;
     box-shadow: none;
-    background: #3C4759;
+    background: transparent;
     width: 50px;
     height: 20px;
     right: -5px;
@@ -1386,17 +1357,79 @@ input.chrome-field-input {
 }
 
 
-
-/*
-=======
-.share-item i {
-    font-size: 16px;
+.leaflet-control-search .search-tooltip {
+    overflow: hidden;
+    margin-left: 34px;
+    margin-top: 0px;
+    border-radius: 4px;
+    background-color: rgba(0,0,0,0) !important;
+    box-shadow: none;
+    opacity: 1 !important;
 }
 
-.data-list-line.processing {
-    position: relative;
-    left: -15px;
-    width: 417px;
-    border-radius: 3px;
-    }
->>>>>>> 3f85c79d12440467bbb33415fefdb283a759d6a2*/
+.leaflet-control-search .search-tip {
+    margin: 0;
+    padding: 6px 6px;
+    display: block;
+    background: rgba(252, 252, 252, 0.96);
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    /*border-radius: 4px !important;*/
+}
+.search-tip:first-child {
+    border-radius: 4px 4px 0 0 !important;
+}
+.search-tip:last-child {
+    border-radius: 0 0 4px 4px !important;
+}
+.search-tip:hover {
+    background-color: #FCFCFC;
+    color: #3C4759;
+    font-weight: 600;
+}
+
+.data-list-line.editingFileName:hover .file-name-content {
+    visibility: hidden;
+}
+.file-name-input {
+    visibility: visible;
+    color: #3C4759;
+}
+
+.data-list-line.editingFileName:hover .file-name-input {
+    color: white;
+}
+
+.chrome-switch-container.switch-on {
+    background-color: rgba(60, 71, 89, 0.28);
+}
+
+.description-control-opacity-container .noUi-active {
+    box-shadow: none;
+}
+.description-control-opacity-container .noUi-handle {
+    box-shadow: none;
+    background: #3C4759;    
+}
+.description-control-opacity-container .noUi-horizontal .noUi-handle {
+    width: 20px;
+    height: 21px;
+    left: -12px;
+    top: -9px;
+    cursor: pointer;
+}
+
+.description-control-opacity-container .noUi-handle:after {
+    left: 10px;
+}
+.description-control-opacity-container .noUi-handle:before {
+    left: 7px;
+}
+.description-control-opacity-container {
+    margin-top: 10px;
+}
+.description-control-opacity-container .noUi-horizontal {
+    height: 5px;
+    cursor: pointer;
+}
