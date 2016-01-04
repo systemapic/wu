@@ -39,7 +39,7 @@ L.Control.Geolocation = Wu.Control.extend({
 		collapsed: true,			// collapse search control at startup
 		autoCollapse: true,			// collapse search control after submit (on button or on tips if enabled tipAutoSubmit)
 							// TODO add option for persist markerLoc after collapse!
-		autoCollapseTime: 1200,			// delay for autoclosing alert and collapse after blur
+		autoCollapseTime: 10200,			// delay for autoclosing alert and collapse after blur
 		zoom: 14,				// zoom after pan to location found, default: map.getZoom()
 		box : true,
 		text: 'Enter address...',		// placeholder value	
