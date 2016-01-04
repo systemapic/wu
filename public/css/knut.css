@@ -1460,3 +1460,6 @@ input.target-input.polygon {
 	left: 140px;
 }
 
+.leaflet-control-search .search-button:hover {
+    background: url('../images/search-icon.png') no-repeat 4px 5px !important;
+}
