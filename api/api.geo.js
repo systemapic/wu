@@ -1533,6 +1533,7 @@ module.exports = api.geo = {
 				'"' + outFolder + '"',
 			].join(' ');
 
+			// todo! move this fn to tileserver (pile)!!
 
 
 			// script command
