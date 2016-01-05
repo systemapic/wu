@@ -91,6 +91,7 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 			edit : [],
 			read : []
 		}
+		this._emails = [];
 
 		// shortcut
 		var content = this._fullscreen._content;
@@ -417,6 +418,9 @@ Wu.Chrome.Users = Wu.Chrome.extend({
 
 		// logs
 		this._logInvites(options);
+
+		// clear old
+		this._emails = [];
 
 	},
 

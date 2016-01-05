@@ -108,6 +108,9 @@ module.exports = api.import = {
 				// get uploadStatus, get meta, set to file
 				api.upload._getUploadStatus(file_id, function (err, uploadStatus) {
 
+					console.log('uploadSTATUSSTSUTA', uploadStatus);
+					console.log('TYPE', uploadStatus.data_type);
+
 					if (uploadStatus.data_type == 'raster') {
 
 						api.geo.handleRaster(opts, callback);
@@ -250,6 +253,8 @@ module.exports = api.import = {
 			api.upload.unzip(options, function (err, files) {
 				options.files = files;
 				callback(err);
+
+				// todo: mark if vector/raster?
 			});
 		});
 

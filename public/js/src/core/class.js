@@ -364,10 +364,7 @@ Wu.Util = {
 		
 		url += path;
 
-
 		http.open("POST", url, true);
-
-		console.log('ulrl', url);
 
 		//Send the proper header information along with the request
 		http.setRequestHeader('Content-type', 'application/json');
@@ -377,10 +374,6 @@ Wu.Util = {
 
 		http.onreadystatechange = function() {
 			if(http.readyState == 4 && http.status == 200) {
-
-				if (http.responseText.length < 1000) {
-					console.log('http.responseText', http.responseText);
-				}
 
 				// verify response
 				var valid = Wu.verify(http.responseText);
@@ -392,8 +385,6 @@ Wu.Util = {
 
 		// stringify objects
 		if (Wu.Util.isObject(json)) json = JSON.stringify(json);
-
-		console.log('json:', json);
 
 		http.send(json);
 	},
@@ -530,17 +521,12 @@ Wu.Util = {
 
 	// experimental zip fn's
 	generateZip : function (data) {
-		// console.log('# generateZip #')
 
 		if (!typeof data == 'string') {
-			// console.log('stringify')
 			data = JSON.stringify(data);
 		}
 
-		// console.log('string length: ', data.length);
 		var compressed = LZString.compress(data);
-		// console.log('compressd length: ', compressed.length);
-		
 
 		return compressed;
 
@@ -549,7 +535,6 @@ Wu.Util = {
 	zipSave : function (path, json) {
 
 		if (!typeof json == 'string') {
-			// console.log('stringify')
 			var string = JSON.stringify(json);
 		} else {
 			var string = json;
@@ -558,11 +543,7 @@ Wu.Util = {
 		var my_lzma = new LZMA('//85.10.202.87:8080/js/lib/lzma/lzma_worker.js');
 		my_lzma.compress(string, 1, function (result) {
 		       
-			// console.log('my_lzma finished!');
-			// console.log(result);
-			// console.log(typeof result);
 			var string = JSON.stringify(result);
-			// console.log('string: ', string);
 
 			var http = new XMLHttpRequest();
 			var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
