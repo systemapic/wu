@@ -30,7 +30,7 @@ User
 .exec(function (err, users) {
 	// console.log(err, users)
 	users.forEach(function (u) {
-		console.log(u.local.email, '|', u.firstName, u.lastName);
+		console.log(u.local.email, ', ', u.firstName, u.lastName, ', ', u.username);
 	});
 	process.exit(0);
 

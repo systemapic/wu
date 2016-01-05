@@ -21,4 +21,14 @@ Wu.Api = Wu.Class.extend({
 		this.post(path, options, done);
 	},
 
+	verifyAccessToken : function () {
+		var path = '/api/userinfo';
+		this.post(path, {}, function (err, body) {
+			if (err == 401) {
+				console.error('you been logged out');
+				window.location.href = app.options.servers.portal;
+			}
+		});
+	}
+
 });
