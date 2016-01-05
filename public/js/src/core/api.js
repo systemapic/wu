@@ -1,9 +1,5 @@
 Wu.Api = Wu.Class.extend({
 
-	initialize : function () {
-		console.log('init api');
-	},
-
 	// post to path
 	post : function (path, options, done) {
 		Wu.post(path, JSON.stringify(options), function (err, response) {
