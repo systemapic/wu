@@ -480,6 +480,20 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
+	app.post('/api/user/uniqueUsername', function (req,res) {
+		api.user.checkUniqueUsername(req, res);
+	});
+
+	// =====================================
+	// CHECK UNIQUE USER/EMAIL =============
+	// =====================================
+	app.post('/api/user/uniqueEmail', function (req,res) {
+		api.user.checkUniqueEmail(req, res);
+	});
+
+	// =====================================
+	// CHECK UNIQUE USER/EMAIL =============
+	// =====================================
 	app.post('/api/user/invite', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.user.invite(req, res);
 	});

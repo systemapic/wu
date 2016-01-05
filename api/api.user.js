@@ -472,31 +472,44 @@ module.exports = api.user = {
 		// create new user
 		ops.push(function (tokenJSON, callback) {
 
-			if (!tokenJSON) return callback('No such invite token!');
+			var invite_only = api.config.portal.invite_only;
 
-			// parse token_store
-			token_store = api.utils.parse(tokenJSON);
+			console.log('invite_only?', invite_only);
 
-			// create the user
-			var newUser            	= new User();
-			newUser.local.email    	= options.email;
-			newUser.local.password 	= newUser.generateHash(options.password);
-			newUser.uuid 		= 'user-' + uuid.v4();
-			newUser.company 	= options.company;
-			newUser.position 	= options.position;
-			newUser.firstName 	= options.firstname;
-			newUser.lastName 	= options.lastname;
-			newUser.invitedBy 	= token_store.invited_by;
+			if (invite_only && !tokenJSON) return callback('You don\'t have a valid invite. Please sign up on our beta-invite list on https://systemapic.com');
 
-			// save the user
-			newUser.save(function(err) {
-				created_user = newUser;
-				callback(err);
+			var username = options.email.split('@')[0];
+			api.user.ensureUniqueUsername(username, function (err, unique_username) {
+
+				// parse token_store
+				var token_store = tokenJSON ? api.utils.parse(tokenJSON) : false;
+
+				// create the user
+				var newUser            	= new User();
+				newUser.local.email    	= options.email;
+				newUser.local.password 	= newUser.generateHash(options.password);
+				newUser.uuid 		= 'user-' + uuid.v4();
+				newUser.company 	= options.company;
+				newUser.position 	= options.position;
+				newUser.firstName 	= options.firstname;
+				newUser.lastName 	= options.lastname;
+				newUser.invitedBy 	= token_store ? token_store.invited_by : 'self';
+				newUser.username 	= unique_username;
+
+				// save the user
+				newUser.save(function(err) {
+					created_user = newUser;
+					callback(err);
+				});
+
 			});
+			
 		});
 
 		// add to contact lists
 		ops.push(function (callback) {
+
+			if (!token_store) return callback(null);
 
 			User
 			.findOne({uuid : token_store.invited_by})
@@ -523,6 +536,8 @@ module.exports = api.user = {
 		// add new user to project (edit)
 		ops.push(function (callback) {
 
+			if (!token_store) return callback(null);
+
 			var edits = token_store.access.edit;
 			async.each(edits, function (project_id, cb) {
 
@@ -540,6 +555,8 @@ module.exports = api.user = {
 
 		// add new user to project (read)
 		ops.push(function (callback) {
+
+			if (!token_store) return callback(null);
 
 			var reads = token_store.access.read;
 			async.each(reads, function (project_id, cb) {
@@ -564,8 +581,8 @@ module.exports = api.user = {
 				user_company 	: created_user.company,
 				user_email 	: created_user.local.email,
 				user_position 	: created_user.position,
-				inviter_name 	: invited_by_user.getName(),
-				timestamp 	: token_store.timestamp
+				inviter_name 	: invited_by_user ? invited_by_user.getName() : 'self',
+				timestamp 	: token_store ? token_store.timestamp : Date.now()
 			});
 
 
@@ -815,13 +832,72 @@ module.exports = api.user = {
 		    email = req.body.email,
 		    unique = false;
 
+		    console.log('check unique EMAIL', email);
+
 		User.findOne({'local.email' : email}, function (err, result) {
 			if (err) return api.error.general(req, res, 'Error checking email.');
 			if (!result) unique = true; 
-			return res.end(JSON.stringify({
+
+			res.json({
 				unique : unique
-			}));
+			});
 		});
+	},
+
+	ensureUniqueUsername : function (username, done, n) {
+
+		var n = n || 0;
+
+		User
+		.find()
+		.exec(function (err, users) {
+
+			// check if exists already
+			var unique = _.isEmpty(_.find(users, function (u) {
+				return u.username == username;
+			}));
+
+			if (!unique) {
+				
+				// must create another username
+				var new_username = username + api.utils.getRandomChars(3, '0123456789');
+
+				// flood safe
+				if (n>100) return done('too many attempts.');
+
+				// check again
+				api.user.ensureUniqueUsername(new_username, done, n++);
+			}
+
+			// return 
+			done(err, username);
+		});
+	},
+
+	_checkUniqueUsername : function (username, done) {
+		User
+		.findOne({username : username}) 
+		.exec(function (err, user) {
+			var unique = _.isEmpty(user);
+			done && done(err, unique);
+		});
+	},
+
+	// check unique username
+	checkUniqueUsername : function (req, res) {
+		if (!req.body) return api.error.missingInformation(req, res);
+
+		var username = req.body.username;
+
+		// check if unique
+		api.user._checkUniqueUsername(username, function (err, unique) {
+			if (err) return api.error.general(req, res, 'Error checking email.');
+			
+			res.json({
+				unique : unique
+			});
+		});
+
 	},
 
 	getAll : function (options, done) {

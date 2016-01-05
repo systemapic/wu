@@ -121,6 +121,10 @@ Wu.User = Wu.Class.extend({
 		return this._files[fileUuid]; // return object
 	},
 
+	getUsername : function () {
+		return this.store.username;
+	},
+
 
 	setFile : function (file) {
 		this.store.files.push(file);
@@ -436,8 +440,10 @@ Wu.User = Wu.Class.extend({
 		// create dropdown
 		this._accountDropdown = Wu.DomUtil.create('div', 'share-dropdown account-dropdown', app._appPane);
 
+		var account_name = app.Account.getUsername();
+
 		// items
-		this._accountName = Wu.DomUtil.create('div', 'share-item no-hover', this._accountDropdown, '<i class="fa fa-user logout-icon"></i>' + app.Account.getFullName());
+		this._accountName = Wu.DomUtil.create('div', 'share-item no-hover', this._accountDropdown, '<i class="fa fa-user logout-icon"></i>' + account_name);
 		this._logoutDiv = Wu.DomUtil.create('div', 'share-item', this._accountDropdown, '<i class="fa fa-sign-out logout-icon"></i>Log out');
 
 		// events

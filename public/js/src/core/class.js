@@ -428,6 +428,7 @@ Wu.Util = {
 	
 
 	_getServerUrl : function () {
+		// return window.location.origin;
 		return app.options.servers.portal.slice(0,-1);
 	},
 
