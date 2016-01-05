@@ -1,17 +1,20 @@
 #!/bin/bash
 
-if [ "$1" == "prod" ];then
-	PRODMODE=true
-else 
-	PRODMODE=false	
-fi;
+# if [ "$1" == "prod" ];then
+# 	SYSTEMAPIC_PRODMODE=true
+# else 
+# 	SYSTEMAPIC_PRODMODE=false	
+# fi;
 
-	# PRODMODE=true
+
+# env set in docker-compose.yml
+echo 'Prod mode?'
+echo $SYSTEMAPIC_PRODMODE 
 
 cd server
 
 
-if $PRODMODE; then
+if $SYSTEMAPIC_PRODMODE; then
 
 	echo 'Production mode'
 	grunt prod 
@@ -24,13 +27,6 @@ else
 	grunt watch &
 	echo 'Running in development mode...'
 	nodemon --watch ../api --watch ../config --watch server.js --watch ../routes server.js
-	
-	# cd ..
-	# forever -w --watchIgnore '!{server.js,{api,config,routes}/**}' --workingDir server/ server/server.js
-	# forever -w --watchIgnore '!{server.js}' server.js
-
-	# prod mode:
-	# forever server.js
 	
 fi
 
