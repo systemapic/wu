@@ -126,9 +126,6 @@ Wu.App = Wu.Class.extend({
 		// set vars
 		this.options.json = portalStore;
 
-		// access
-		// this._initAccess();
-
 		// load json model
 		this._initObjects();
 
@@ -245,32 +242,23 @@ Wu.App = Wu.Class.extend({
 
 		// add account tab
 		this.Account.addAccountTab();
-
 	},
-
 
 	// init default view on page-load
 	_initView : function () {
 
-		console.log('_initView 0');
-
 		// check invite
 		if (this._initInvite()) return;
-		console.log('_initView 1');
 
 		// check location
 		if (this._initLocation()) return;
-		console.log('_initView 2');
 			
 		// runs hotlink
 		if (this._initHotlink()) return;
-		console.log('_initView 3');
 
 		// open first project (ordered by lastUpdated)
 		app.Controller.openLastUpdatedProject();
-		console.log('_initView 4');
 	},
-
 
 	_initInvite : function () {
 		var project = this.options.json.invite;
@@ -290,19 +278,18 @@ Wu.App = Wu.Class.extend({
 
 	_initLocation : function () {
 		var path    = window.location.pathname,
-		    client  = path.split('/')[1],
+		    username  = path.split('/')[1],
 		    project = path.split('/')[2],
 		    hash    = path.split('/')[3],
 		    search  = window.location.search.split('?'),
 		    params  = Wu.Util.parseUrl();
 
-		console.log('_initLocation', path, client, project, hash, search, params);
 
 		// done if no location
-		if (!client || !project) return false;
+		if (!username || !project) return false;
 
 		// get project
-		var project = this._projectExists(project, client);
+		var project = this._projectExists(project, username);
 		
 		// return if no such project
 		if (!project) {
@@ -319,6 +306,41 @@ Wu.App = Wu.Class.extend({
 			this._initHash(hash, project);
 		}
 		return true;
+	},
+
+	_initHotlink : function () {
+		
+		// parse error prone content of hotlink..
+		this.hotlink = Wu.parse(window.hotlink);
+
+		// return if no hotlink
+		if (!this.hotlink) return false;
+
+		// check if project slug exists, and if belongs to client slug
+		var project = this._projectExists(this.hotlink.project, this.hotlink.client);
+
+		// return if not found
+		if (!project) return false;
+
+		// set project
+		this._setProject(project);
+
+		return true;
+	},
+
+
+	// check if project exists (for hotlink)
+	_projectExists : function (project_slug, username) {
+
+		// find project slug in Wu.app.Projects
+		var project_slug = project_slug || window.hotlink.project;
+		for (p in Wu.app.Projects) {
+			var project = Wu.app.Projects[p];
+			if (project_slug == project.store.slug) {
+				if (project.store.createdByUsername == username) return project; 
+			}
+		}
+		return false;
 	},
 
 	_initEvents : function () {
@@ -349,54 +371,13 @@ Wu.App = Wu.Class.extend({
 		this._mapContainer = Wu.DomUtil.createId('div', 'map-container', this._appPane);
 	},
 
-	// _initAccess : function () {
-	// 	// this.Access = new Wu.Access(this.options.json.access);
-	// },
-
-	
-
 	_setProject : function (project) {
-		
+
 		// select project
 		Wu.Mixin.Events.fire('projectSelected', {detail : {
 			projectUuid : project.getUuid()
 		}});
 
-	},
-
-	_initHotlink : function () {
-		
-		// parse error prone content of hotlink..
-		Wu.parse(window.hotlink);
-
-		// return if no hotlink
-		if (!this.hotlink) return false;
-
-		// check if project slug exists, and if belongs to client slug
-		var project = this._projectExists(this.hotlink.project, this.hotlink.client);
-
-		// return if not found
-		if (!project) return false;
-
-		// set project
-		this._setProject(project);
-
-		return true;
-	},
-
-
-	// check if project exists (for hotlink)
-	_projectExists : function (projectSlug, clientSlug) {
-
-		// find project slug in Wu.app.Projects
-		var projectSlug = projectSlug || window.hotlink.project;
-		for (p in Wu.app.Projects) {
-			var project = Wu.app.Projects[p];
-			if (projectSlug == project.store.slug) {
-				if (project._client.slug == clientSlug) return project; 
-			}
-		}
-		return false;
 	},
 
 	// get name provided for portal from options hash 
@@ -443,6 +424,7 @@ Wu.App = Wu.Class.extend({
 		var projectUuid = hash.project || result.project;	// hacky.. clean up setHash, _renderHash, errything..
 		var project = app.Projects[projectUuid];
 
+		// select project
 		project.selectProject();
 
 		// set position

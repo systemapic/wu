@@ -12,6 +12,7 @@ var projectSchema = mongoose.Schema({
 	uuid 		: String,
 	createdBy 	: String,
 	createdByName   : String,
+	createdByUsername   : String,
 	name 		: { type: String, default: 'Project name' },
 	slug 		: { type: String, default: 'projectslug' },
 	description 	: { type: String, default: 'Description' },

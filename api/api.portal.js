@@ -42,36 +42,6 @@ var api = module.parent.exports;
 // exports
 module.exports = api.portal = { 
 
-	// // access_v2
-	// invitation : function (req, res) {
-
-	// 	console.log('api.portal.invitation');
-
-	// 	// get client/project
-	// 	var path = req.originalUrl.split('/');
-	// 	var invite_token = path[3];
-
-	// 	// get token from redis
-	// 	var redis_key = 'invite:' + invite_token;
-	// 	api.redis.tokens.get(redis_key, function (err, token_store) {
-
-	// 		var stored_invite = api.utils.parse(token_store);
-
-	// 		if (err || !stored_invite) return api.error.missingInformation(req, res);
-
-	// 		var email = stored_invite.email;
-
-	// 		// make sure logged out
-	// 		req.logout();
-
-	// 		// render invitation
-	// 		res.render('../../views/invitation.ejs', {
-	// 			invite : token_store,
-	// 			access_token : req.session.access_token || {}
-	// 		});
-
-	// 	});
-	// },
 
 	invite : function (req, res) {
 
