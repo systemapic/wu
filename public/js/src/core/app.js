@@ -19,6 +19,9 @@ Wu.App = Wu.Class.extend({
 		// set global this
 		Wu.app = window.app = this; // todo: remove Wu.app, use only window.app
 
+		// init api
+		app.api = new Wu.Api();
+
 		// set access token
 		this.setAccessTokens();
 
@@ -52,20 +55,14 @@ Wu.App = Wu.Class.extend({
 	
 	setAccessTokens : function () {
 
+		// get tokens
 		app.tokens = window.tokens;
 
+		// get access token
 		var access_token = app.tokens.access_token;
 
-		// print debug
-		// console.log('Debug: access_token: ', access_token);
-
-		// test access token
-		Wu.send('/api/userinfo', {}, function (err, body) {
-			if (err == 401) {
-				console.error('you been logged out');
-				window.location.href = app.options.servers.portal;
-			}
-		});
+		// verify token
+		app.api.verifyAccessToken();
 	},
 
 	_initErrorHandling : function () {
@@ -82,8 +79,6 @@ Wu.App = Wu.Class.extend({
 
 	_onError : function (message, file, line, char, ref) {
 
-		console.log('ionerror');
-			
 		var stack = ref.stack;
 		var project = app.activeProject ? app.activeProject.getTitle() : 'No active project';
 		var username = app.Account ? app.Account.getName() : 'No username';
@@ -110,8 +105,6 @@ Wu.App = Wu.Class.extend({
 	initServer : function () {
 		console.log('Securely connected to server: \n', this.options.servers.portal);
 
-		app.api = new Wu.Api();
-
 		// check for invite link
 		this._checkForInvite();
 
@@ -134,7 +127,7 @@ Wu.App = Wu.Class.extend({
 		this.options.json = portalStore;
 
 		// access
-		this._initAccess();
+		// this._initAccess();
 
 		// load json model
 		this._initObjects();
@@ -162,14 +155,11 @@ Wu.App = Wu.Class.extend({
 
 		// analytics
 		this.Analytics = new Wu.Analytics();
-
 	},
 
 	_logEntry : function () {
-
 		var b = this.sniffer.browser;
 		var o = this.sniffer.os;
-
 		var browser = b.fullName + ' ' + b.majorVersion + '.' + b.minorVersion;
 		var os = o.fullName + ' ' + o.majorVersion + '.' + o.minorVersion;
 
@@ -202,7 +192,7 @@ Wu.App = Wu.Class.extend({
 		       if (!this.Users[user.uuid]) this.Users[user.uuid] = new Wu.User(user);             
 		}, this);
 
-		// add account to users list
+		// add self to users list
 		this.Users[app.Account.getUuid()] = this.Account;
 
 		// create project objects
@@ -225,7 +215,6 @@ Wu.App = Wu.Class.extend({
 
 		// right chrome
 		this.Chrome.Left = new Wu.Chrome.Left();
-
 	},
 
 	_initPanes : function () {
@@ -263,17 +252,23 @@ Wu.App = Wu.Class.extend({
 	// init default view on page-load
 	_initView : function () {
 
+		console.log('_initView 0');
+
 		// check invite
 		if (this._initInvite()) return;
+		console.log('_initView 1');
 
 		// check location
 		if (this._initLocation()) return;
+		console.log('_initView 2');
 			
 		// runs hotlink
 		if (this._initHotlink()) return;
+		console.log('_initView 3');
 
 		// open first project (ordered by lastUpdated)
 		app.Controller.openLastUpdatedProject();
+		console.log('_initView 4');
 	},
 
 
@@ -291,6 +286,39 @@ Wu.App = Wu.Class.extend({
 			title : 'Project access granted',
 			description : 'You\'ve been given access to the project ' + project.name 
 		});
+	},
+
+	_initLocation : function () {
+		var path    = window.location.pathname,
+		    client  = path.split('/')[1],
+		    project = path.split('/')[2],
+		    hash    = path.split('/')[3],
+		    search  = window.location.search.split('?'),
+		    params  = Wu.Util.parseUrl();
+
+		console.log('_initLocation', path, client, project, hash, search, params);
+
+		// done if no location
+		if (!client || !project) return false;
+
+		// get project
+		var project = this._projectExists(project, client);
+		
+		// return if no such project
+		if (!project) {
+			Wu.Util.setAddressBar(this.options.servers.portal);
+			return false;
+		}
+
+		// set project
+		this._setProject(project);
+
+		// init hash
+		if (hash) {
+			console.log('got hash!', hash, project);
+			this._initHash(hash, project);
+		}
+		return true;
 	},
 
 	_initEvents : function () {
@@ -321,40 +349,11 @@ Wu.App = Wu.Class.extend({
 		this._mapContainer = Wu.DomUtil.createId('div', 'map-container', this._appPane);
 	},
 
-	_initAccess : function () {
-		// this.Access = new Wu.Access(this.options.json.access);
-	},
+	// _initAccess : function () {
+	// 	// this.Access = new Wu.Access(this.options.json.access);
+	// },
 
-	_initLocation : function () {
-		var path    = window.location.pathname,
-		    client  = path.split('/')[1],
-		    project = path.split('/')[2],
-		    hash    = path.split('/')[3],
-		    search  = window.location.search.split('?'),
-		    params  = Wu.Util.parseUrl();
-
-		// done if no location
-		if (!client || !project) return false;
-
-		// get project
-		var project = this._projectExists(project, client);
-		
-		// return if no such project
-		if (!project) {
-			Wu.Util.setAddressBar(this.options.servers.portal);
-			return false;
-		}
-
-		// set project
-		this._setProject(project);
-
-		// init hash
-		if (hash) {
-			console.log('got hash!', hash, project);
-			this._initHash(hash, project);
-		}
-		return true;
-	},
+	
 
 	_setProject : function (project) {
 		
