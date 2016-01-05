@@ -45,6 +45,8 @@ module.exports = api.portal = {
 
 	invite : function (req, res) {
 
+		console.log('patrh:', path);
+
 		// get client/project
 		var path = req.originalUrl.split('/');
 		var invite_token = path[2];
@@ -210,6 +212,10 @@ module.exports = api.portal = {
 	// process wildcard paths, including hotlinks
 	wildcard : function (req, res) {
 
+		console.log('path: ', req.originalUrl);
+
+		// console.log('req', req);
+
 		// get client/project
 		var path = req.originalUrl.split('/'),
 		    client = path[1],
@@ -239,6 +245,7 @@ module.exports = api.portal = {
 	},
 
 	login : function (req, res) {
+		console.log('hotlink bling?', req.session.hotlink);
 		res.render(path.join(__dirname, '../views/login.serve.ejs'), { message: req.flash('loginMessage') });
 	},
 

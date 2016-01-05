@@ -634,6 +634,7 @@ module.exports = function(app, passport) {
 	// LOGIN ===============================
 	// =====================================
 	app.get('/login', function(req, res) {
+		console.log('get login');
 		api.portal.login(req, res);
 	});
 
