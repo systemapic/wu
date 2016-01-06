@@ -33,23 +33,55 @@ var api = require('../api/api');
 module.exports = function(app, passport) {
 
 	app.io.route('ready', function (req) {
-		console.log('socket ready'.red);
+
 		if (!isLoggedIn(req)) return;
 
-		req.session.name = req.data
-		req.session.save(function() {
-			req.io.emit('get-feelings')
-		});
+		// req.session.name = req.data
+		// req.session.save(function() {
+		// 	req.io.emit('get-feelings')
+		// });
+
+		// send cpu monitor
+		// api.socket._sendStatisticsContinuously(req);
 	});
 
 	// Send back the session data.
 	app.io.route('send-feelings', function(req) {
-		console.log('socket feels something'.red);
-		req.session.feelings = req.data
-		req.session.save(function() {
-			req.io.emit('session', req.session)
-		});
+		// console.log('socket feels something'.red);
+		// req.session.feelings = req.data
+		// req.session.save(function() {
+		// 	req.io.emit('session', req.session)
+		// });
 	});
+
+	// get stats
+	app.io.route('get_server_stats', function (req) {
+		if (!isLoggedIn(req)) return;
+		
+		api.socket.getServerStats(req);
+	});
+
+	// get stats
+	app.io.route('user_event', function (req) {
+		if (!isLoggedIn(req)) return;
+		
+		api.socket.userEvent(req);
+	});
+
+	// get stats
+	app.io.route('tileset_meta', function (req) {
+		if (!isLoggedIn(req)) return;
+		
+		api.geo.getTilesetMeta(req);
+	});
+
+	// get stats
+	app.io.route('generate_tiles', function (req) {
+		if (!isLoggedIn(req)) return;
+		
+		api.geo.generateTiles(req);
+	});
+
 
 	// helper function : if is logged in
 	function isLoggedIn(req, res, next) {

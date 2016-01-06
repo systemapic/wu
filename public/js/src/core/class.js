@@ -337,7 +337,6 @@ Wu.Util = {
 	post : function (path, json) {
 		var that = this,
 		    http = new XMLHttpRequest(),
-		    // url = window.location.origin;
 		    url = Wu.Util._getServerUrl(); 
 		url += path;
 		
@@ -345,6 +344,9 @@ Wu.Util = {
 
 		//Send the proper header information along with the request
 		http.setRequestHeader("Content-type", "application/json");
+
+		// set access_token on header
+		http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
 
 		http.onreadystatechange = function() {
 			if(http.readyState == 4 && http.status == 200) {
@@ -367,6 +369,9 @@ Wu.Util = {
 		//Send the proper header information along with the request
 		http.setRequestHeader('Content-type', 'application/json');
 
+		// set access_token on header
+		http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
+
 		http.onreadystatechange = function() {
 			if(http.readyState == 4 && http.status == 200) {
 
@@ -378,14 +383,14 @@ Wu.Util = {
 			}
 		}
 
+		// stringify objects
+		if (Wu.Util.isObject(json)) json = JSON.stringify(json);
+
 		http.send(json);
 	},
 
 
-	_getServerUrl : function () {
-		return app.options.servers.portal.slice(0,-1);
-	},
-
+	
 	// post with callback and error handling (do callback.bind(this) for context)
 	send : function (path, json, callback) {
 		var that = this;
@@ -395,6 +400,10 @@ Wu.Util = {
 
 		http.open("POST", url, true);
 		http.setRequestHeader('Content-type', 'application/json');
+
+		// set access_token on header
+		http.setRequestHeader("Authorization", "Bearer " + app.tokens.access_token);
+
 		http.onreadystatechange = function() {
 			if (http.readyState == 4) {
 		    		
@@ -415,6 +424,12 @@ Wu.Util = {
 		http.send(json);
 	},
 
+
+	
+
+	_getServerUrl : function () {
+		return app.options.servers.portal.slice(0,-1);
+	},
 
 	// get with callback
 	_getJSON : function (url, callback) {
@@ -446,6 +461,17 @@ Wu.Util = {
 
 	},
 
+	// parse with error handling
+	_stringify : function (json) {
+		try { 
+			var str = JSON.stringify(json); 
+			return str;
+		} catch (e) { 
+			return false; 
+		}
+	},
+
+
 
 	_getParentClientID : function (pid) {
 		var cid = '';
@@ -473,6 +499,16 @@ Wu.Util = {
 		return Math.random().toString(36).slice((digits) * -1).toUpperCase()
 	},
 
+	getRandomChars : function (len, charSet) {
+		charSet = charSet || 'abcdefghijklmnopqrstuvwxyz';
+		var randomString = '';
+		for (var i = 0; i < len; i++) {
+			var randomPoz = Math.floor(Math.random() * charSet.length);
+			randomString += charSet.substring(randomPoz,randomPoz+1);
+		}
+		return randomString;
+	},
+
 	deselectText : function () {
 		var selection = ('getSelection' in window)
 		? window.getSelection()
@@ -485,17 +521,12 @@ Wu.Util = {
 
 	// experimental zip fn's
 	generateZip : function (data) {
-		// console.log('# generateZip #')
 
 		if (!typeof data == 'string') {
-			// console.log('stringify')
 			data = JSON.stringify(data);
 		}
 
-		// console.log('string length: ', data.length);
 		var compressed = LZString.compress(data);
-		// console.log('compressd length: ', compressed.length);
-		
 
 		return compressed;
 
@@ -504,7 +535,6 @@ Wu.Util = {
 	zipSave : function (path, json) {
 
 		if (!typeof json == 'string') {
-			// console.log('stringify')
 			var string = JSON.stringify(json);
 		} else {
 			var string = json;
@@ -513,11 +543,7 @@ Wu.Util = {
 		var my_lzma = new LZMA('//85.10.202.87:8080/js/lib/lzma/lzma_worker.js');
 		my_lzma.compress(string, 1, function (result) {
 		       
-			// console.log('my_lzma finished!');
-			// console.log(result);
-			// console.log(typeof result);
 			var string = JSON.stringify(result);
-			// console.log('string: ', string);
 
 			var http = new XMLHttpRequest();
 			var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
@@ -933,6 +959,15 @@ Wu.Util = {
 		return jss.getAll(tag);
 	},
 
+
+	confirm : function (msg, callback) {
+
+		var confirmed = confirm(msg);
+
+		callback && callback(confirmed);
+
+		return confirmed;
+	},
 	
 
 	
@@ -985,32 +1020,15 @@ Wu.save = Wu.Util.post;
 Wu.post = Wu.Util.postcb;
 Wu.send = Wu.Util.send;
 Wu.parse = Wu.Util._parse;
+Wu.stringify = Wu.Util._stringify;
 Wu.zip = Wu.Util.generateZip;
 Wu.zave = Wu.Util.zipSave;
 Wu.can = Wu.Util.can;
 Wu.setStyle = Wu.Util.setStyle;
 Wu.getStyle = Wu.Util.getStyle;
 Wu.verify = Wu.Util.verifyResponse;
-
-
-// Wu.CustomEvents = {
-
-// 	on : function (obj, type, fn, ctx) {
-// 		// var event = new CustomEvent('build', { 'detail': elem.dataset.time });
-// 		// document.addEventListener(type, fn, false);
-// 		Wu.DomEvent.on(obj, type, fn, ctx)
-// 	},
-
-// 	off : function (obj, type, fn, ctx) {
-// 		Wu.DomEvent.off(obj, type, fn, ctx)
-// 	},
-
-// 	fire : function (type, data) {
-// 		var event = new CustomEvent(type, data);
-// 		document.dispatchEvent(event);
-// 	},
-
-// };
+Wu.getJSON = Wu.Util._getJSON;
+Wu.confirm = Wu.Util.confirm;
 
 
 Wu.Evented = Wu.Class.extend({
@@ -1224,7 +1242,17 @@ Wu.Evented = Wu.Class.extend({
 		for (var id in this._eventParents) {
 			this._eventParents[id].fire(e.type, Wu.extend({layer: e.target}, e), true);
 		}
+	},
+
+
+	bytesToSize : function (bytes) {
+		   var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+		   if (bytes == 0) return '0 Byte';
+		   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+		   return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 	}
+
+
 });
 
 var proto = Wu.Evented.prototype;
@@ -1893,11 +1921,6 @@ Wu.extend(Wu.DomEvent, {
 Wu.DomEvent.addListener = Wu.DomEvent.on;
 Wu.DomEvent.removeListener = Wu.DomEvent.off;
 
-
-// Wu.on = Wu.Mixin.Events.on;
-// Wu.off = Wu.Mixin.Events.off;
-// Wu.fire = Wu.Mixin.Events.fire;
-
 Array.prototype.diff = function(a) {
     return this.filter(function(i) {return a.indexOf(i) < 0;});
 };
@@ -1935,26 +1958,11 @@ Array.prototype.moveDown = function(value, by) {
 };
 
 String.prototype.camelize = function () {
-    return this.replace (/(?:^|[-_])(\w)/g, function (_, c) {
+    return this.replace (/(?:^|[_])(\w)/g, function (_, c) {
       return c ? c.toUpperCase () : '';
     });
 }
 
-// JSON.parseAsync = function(data, callback) {
-// 	var worker, json
-// 	if (window.Worker) {
-// 		worker = new Worker( 'json.worker.js' );
-// 		worker.addEventListener( 'message', function (e) {
-// 			json = e.data;
-// 			callback( json );
-// 		}, false);
-// 		worker.postMessage( data );
-// 		return;
-// 	} else {
-// 		json = JSON.parse( data );
-// 		callback( json );
-// 	}
-// };
 
 // bind fn for phantomJS
 Function.prototype.bind = Function.prototype.bind || function (thisp) {
@@ -1963,3 +1971,4 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
 		return fn.apply(thisp, arguments);
 	};
 };
+

@@ -4,13 +4,10 @@ var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
 var timestamps = require('mongoose-times');
 
-// property => group => role => capabilities + members
-
 // define the schema for our user model
 var userSchema = mongoose.Schema({
 
         uuid        : String,
-
         firstName   : String,
         lastName    : String,
         company     : String,
@@ -18,9 +15,45 @@ var userSchema = mongoose.Schema({
         phone       : String,
         mobile      : String,
         createdBy   : String,
+        invitedBy   : String,
 
         // tile server auth token
         token       : String,
+
+        access_token : String,
+
+        postgis_database : String,
+
+        username : String,
+        email : String,
+        avatar : String,
+
+        // temp status notifications
+        status : {
+            contact_requests : [String]
+        },
+
+        state : {
+            lastProject : [String],  // projectUuid of last opened project
+        },
+
+        access : {
+
+            // for reference
+            account_type : { type: String, default: 'free' },
+
+            // storage limits
+            storage_quota : { type: Number, default: '200000000' }, // 200MB
+            remaining_quota : { type: Number, default: '200000000' },
+
+            // allowed private projects
+            private_projects : { type: Boolean, default: true },
+
+        },
+
+        contact_list : [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
+        files : [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
 
         local : {
                 email        : String,      // login name
@@ -44,16 +77,13 @@ var userSchema = mongoose.Schema({
                 email        : String,
                 name         : String
         },
-        // slack : {}
 });
 
 // methods ======================
 // generating a hash
 userSchema.methods.generateHash = function(password) {
-    console.log('----------hashing passowrd ---------------');
     console.log('password: ', password);
     var hashed = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-    console.log('hashed: ', hashed);
     return hashed;
 };
 
@@ -64,6 +94,27 @@ userSchema.methods.validPassword = function(password) {
 
 userSchema.methods.getUuid = function () {
     return this.uuid;
+};
+
+userSchema.methods.getName = function () {
+    return this.firstName + ' ' + this.lastName;
+};
+
+userSchema.methods.canCreatePrivateProject = function () {
+    return this.access.private_projects;
+};
+
+userSchema.methods.getEmail = function () {
+    return this.local.email;
+};
+
+userSchema.methods.isBot = function () {
+    // return this.local.email == 'bot@systemapic.com' && this.access.account_type == 'bot';
+    return this.local.email == 'bot@systemapic.com';
+};
+userSchema.methods.isSuper = function () {
+    // return this.local.email == 'bot@systemapic.com' && this.access.account_type == 'bot';
+    return this.access.account_type == 'super';
 };
 
 // timestamps plugin

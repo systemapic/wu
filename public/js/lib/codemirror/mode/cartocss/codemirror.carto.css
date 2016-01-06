@@ -80,22 +80,22 @@
 .CodeMirror-dialog .hidden:target { display:block; }
 
 span.cm-keyword,
-span.cm-carto-variable           { color:#708; }
+span.cm-carto-variable           { color:#B537FF; }
 span.cm-carto-color-variable     { color:#B60049; }
 span.cm-number,
 span.cm-carto-unit               { color:#281; }
 span.cm-atom,
-span.cm-carto-value              { color:#708; }
-span.cm-carto-valid-value        { color:#B60049; }
-span.cm-carto-selector           { color:#b64f90; }
+span.cm-carto-value              { color:#FF8515; }
+span.cm-carto-valid-value        { color:#8CA894; }
+span.cm-carto-selector           { color:#7979D5; }
 span.cm-carto-identifier         { color:#999; }
-span.cm-carto-valid-identifier   { color:#333; }
+span.cm-carto-valid-identifier   { color:#C3C3C3; }
 span.cm-carto-important          { color:#03c; }
-span.cm-carto-colorcode          { color:#048; }
+span.cm-carto-colorcode          { color:#0984FF; }
 span.cm-carto-punctuation        { color:#666; }
 span.cm-carto-comment            { color:#999; }
 span.cm-string,
-span.cm-carto-string             { color:#8010a0; }
+span.cm-carto-string             { color:#25CD97; }
 span.cm-carto-filter             { color:#66475B; }
 
 .dark .CodeMirror { background:transparent; border-top: 1px solid rgba(0,0,0,.2); }
@@ -103,7 +103,7 @@ span.cm-carto-filter             { color:#66475B; }
 .dark .CodeMirror pre { background: transparent;}
 .dark .CodeMirror .CodeMirror-cursor { border-color:#ccc; }
 .dark .CodeMirror-selected,
-.dark .CodeMirror-focused .CodeMirror-selected { background:#303030; }
+.dark .CodeMirror-focused .CodeMirror-selected { background:#1F1F1F; }
 
 .dark .CodeMirror pre                  { color:#ccc; }
 .dark span.cm-keyword,

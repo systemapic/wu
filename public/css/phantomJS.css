@@ -3,14 +3,37 @@
     src: url(phantomfont/Open_Sans/OpenSans-Light.ttf);
 	}
 
-.leaflet-bottom.leaflet-right,
-.leaflet-top.leaflet-right,
 .leaflet-top.leaflet-left,
+.leaflet-control-layermenu.leaflet-control,
 #legends-collapser,
-#start-pane {
-	display: none !important;
+#start-pane{
+
 	}
 
-#header {
-	width: auto !important;
+.cartocss-toolbar-button{
+	display: none !important;
+	opacity: 0 !important;
 	}
+
+
+.chrome-menu-button,
+.chrome-button.datalib,
+.chrome-button.settingsSelector,
+.chrome-button.settings,
+.chrome-button.share,
+.chrome-button.layer,
+.leaflet-control-layermenu.leaflet-control,
+.leaflet-top.leaflet-left,
+.leaflet-control-attribution.leaflet-control,
+.description-control-header-toggle,
+.leaflet-control-mouseposition.leaflet-control,
+.chrome.chrome-container.chrome-right,
+.chrome.chrome-container.chrome-left {
+	display: none !important;
+	visibility: none;
+	opacity: 0;
+	}
+
+.chrome-buttons {
+	left: 0 !important;
+	}	

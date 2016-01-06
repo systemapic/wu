@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Systemapic Secure Portal</title>
+		<title></title>
 	
 		<link rel="icon" type="image/png" href="favicon.ico">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	
+		
+
+		<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800,300,300italic,400italic,600italic,700italic,800italic' rel='stylesheet' type='text/css'>		
 		<!-- @if NODE_ENV == 'DEVELOPMENT' -->
 
 			<!-- DEPENDENCIES STYLESHEETS -->
+			<link rel="stylesheet" href='../fonts/font-awesome-4.4.0/css/font-awesome.min.css'>
+
 			<link rel="stylesheet" href='/js/lib/codemirror/mode/cartocss/spectrum.css'>
 			<link rel="stylesheet" href='/js/lib/leaflet.js/plugins/leaflet-search/src/leaflet-search.css'>
-			<link rel="stylesheet" href='/js/lib/grande/css/menu.css'>
-			<link rel="stylesheet" href='/js/lib/grande/css/editor.css'>
-			<link rel="stylesheet" href='/css/bootstrap.min.css'>
-			<link rel="stylesheet" href='/css/font-awesome.min.css'>
+			<link rel="stylesheet" href='/css/bootstrap.min.css'>			
 			<link rel="stylesheet" href='/css/mapbox.css'>        
 			<link rel="stylesheet" href='/js/lib/leaflet.js/leaflet.css'>
 			<link rel="stylesheet" href='/js/lib/leaflet.js/plugins/styleEditor/Leaflet.StyleEditor.css'>
@@ -23,12 +24,20 @@
 			<link rel="stylesheet" href='/js/lib/codemirror/mode/cartocss/codemirror.carto.css'>
 			<link rel="stylesheet" href='/js/lib/codemirror/mode/cartocss/codemirror.fetta.css'>
 			<link rel="stylesheet" href='/js/lib/codemirror/theme/mbo.css'>
+			<link rel="stylesheet" href='/js/lib/nouislider/nouislider.min.css'>
 			<link rel="stylesheet" href='/css/opentip.css'>
+			<link rel="stylesheet" type="text/css" href="/js/lib/c3/c3.css">
+			<link rel="stylesheet" type="text/css" href="/js/lib/dc.js/dc.css">
 		
 			<!-- SYSTEMAPIC STYLESHEETS -->
+			<link rel="stylesheet" href="/css/fonts.css">
 			<link rel="stylesheet" href="/css/style.css">			
-			<link rel="stylesheet" href="/css/knut.css">
 			<link rel="stylesheet" href="/css/evil.css">			
+			<link rel="stylesheet" href="/css/magda.css">			
+			<link rel="stylesheet" href="/css/chrome.css">			
+			<link rel="stylesheet" href="/css/knut.css">
+			<link rel="stylesheet" href="/css/experiments.css">
+			<link rel="stylesheet" href="/css/jevil.css">
 			
 
 		<!-- @endif -->
@@ -37,13 +46,21 @@
 		<!-- @if NODE_ENV == 'PRODUCTION' -->
 
 			<!-- DEPENDENCIES STYLESHEETS -->
-			<link rel="stylesheet" href="/css/css.dependencies.min.css">
+			<link rel="stylesheet" href='../fonts/font-awesome-4.4.0/css/font-awesome.min.css'>
+			<link rel="stylesheet" href="/dist/css.dependencies.min.css">
 
 			<!-- SYSTEMAPIC STYLESHEETS -->
-			<link rel="stylesheet" href="/css/css.portal.min.css">
+			<link rel="stylesheet" href="/dist/fonts.css">
+			<link rel="stylesheet" href="/dist/css.portal.min.css">
 	
 		<!-- @endif -->
-		<script type="text/javascript">(function(){window.hotlink = '<%- JSON.stringify(hotlink) %>';}());</script>
+
+
+		<script type="text/javascript">(function(){
+			window.hotlink = '<%- JSON.stringify(hotlink) %>';
+			window.tokens = JSON.parse('<%- JSON.stringify(access_token) %>');
+			}());
+		</script>
 
 
 	</head>
@@ -70,9 +87,13 @@
 			<!-- D3.js -->
 			<script type="text/javascript" src="/js/lib/d3.js/d3.js"></script>
 
+			<!-- C3.js -->
+			<script type="text/javascript" src="/js/lib/c3/c3.js"></script>
+			<script type="text/javascript" src="/js/lib/dc.js/crossfilter.js"></script>
+			<script type="text/javascript" src="/js/lib/dc.js/dc.js"></script>
+
 			<!-- socket.io -->
-			<!-- <script type="text/javascript" src="/js/lib/socket.io/socket.io.js"></script> -->
-			<!-- <script type="text/javascript" src="/js/lib/socket.io/socket.io.js"></script> -->
+			<!-- OBS! - DO NOT INCLUDE IN GRUNT CONCAT -->
 			<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 
 			<!-- dep libs -->
@@ -83,6 +104,7 @@
 			<!-- leaflet.js -->
 			<script type="text/javascript" src="/js/lib/leaflet.js/leaflet-0.7.3-src.js"></script>
 			<script type="text/javascript" src="/js/lib/leaflet.js/plugins/leaflet.utfgrid.js"></script>
+			<script type="text/javascript" src="/js/lib/leaflet.js/plugins/leaflet-draw/leaflet.draw-src.js"></script>
 
 			<!-- Other stuff -->
 			<script type="text/javascript" src="/js/lib/dropzone.js/dropzone.min.js"></script> 
@@ -91,11 +113,6 @@
 
 			<!-- resumable.js -->
 			<script type="text/javascript" src="/js/lib/resumable/resumable.js"></script>
-
-			<!-- grande.js -->
-			<script type="text/javascript" src="/js/lib/grande/js/grande.class.js"></script>
-			<script type="text/javascript" src="/js/lib/grande/js/grande.js"></script>
-			<script type="text/javascript" src="/js/lib/grande/js/grande.attachments.js"></script>
 
 			<!-- codemirror -->
 			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/cartoref.js"></script>
@@ -108,58 +125,68 @@
 			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/codemirror.palette.js"></script>
 			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/sexagesimal.js"></script>
 			<script type="text/javascript" src="/js/lib/codemirror/mode/cartocss/spectrum.js"></script>
+			<script type="text/javascript" src="/js/lib/codemirror/mode/sql/sql.js"></script>
 
+			<!-- div deps -->
 			<script type="text/javascript" src="/js/lib/opentip/opentip-native.js"></script>
 			<script type="text/javascript" src="/js/lib/jss.js/jss.js"></script>
+			<script type="text/javascript" src="/js/lib/keymaster/keymaster.js"></script>
+			<script type="text/javascript" src="/js/lib/moment.js/moment.js"></script>
+			<script type="text/javascript" src="/js/lib/sniffer/sniffer.module.js"></script>
+			<script type="text/javascript" src="/js/lib/cryptojs/sha3.js"></script>
+			<script type="text/javascript" src="/js/lib/nouislider/nouislider.js"></script>
+			
 
-			<script type="text/javascript">(function(){window.hotlink = '<%- JSON.stringify(hotlink) %>';}());</script>
+			<!-- SOURCE -->
+			<!-- SOURCE -->
+			<!-- SOURCE -->
 
-
-
-			<!-- LIBRARY -->
-			<!-- LIBRARY -->
-			<!-- LIBRARY -->
 
 			<!-- class.js must be added first -->
 			<script type="text/javascript" src="/js/src/core/class.js"></script>
+			<script type="text/javascript" src="/js/src/core/api.js"></script>
 			<script type="text/javascript" src="/js/src/core/socket.js"></script>
-
-			<!-- <script type="text/javascript" src="../socket.io/socket.io.js"></script> -->
-			
 			<script type="text/javascript" src="/js/src/core/controller.js"></script>
+			<script type="text/javascript" src="/js/src/core/data.js"></script>
+			<script type="text/javascript" src="/js/src/core/evented.js"></script>
+			<script type="text/javascript" src="/js/src/ext/resumable.js"></script>
 			
+			<!-- panes -->
 			<script type="text/javascript" src="/js/src/panes/pane.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/sidepane.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/sidepane.item.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/sidepane.clients.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/sidepane.project.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/sidepane.client.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/sidepane.users.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/sidepane.documents.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/sidepane.datalibrary.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/sidepane.medialibrary.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/sidepane.share.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/sidepane.account.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/sidepane.manage.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/sidepane.options.js"></script>
-
-			<script type="text/javascript" src="/js/src/panes/sidepane/option.item.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/option.baselayers.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/option.bounds.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/option.connect.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/option.controls.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/option.layermenu.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/option.position.js"></script>
-			<script type="text/javascript" src="/js/src/panes/sidepane/option.settings.js"></script>
-
 			<script type="text/javascript" src="/js/src/panes/pane.header.js"></script>
 			<script type="text/javascript" src="/js/src/panes/pane.progress.js"></script>
 			<script type="text/javascript" src="/js/src/panes/pane.map.js"></script>
 			<script type="text/javascript" src="/js/src/panes/pane.status.js"></script>
 			<script type="text/javascript" src="/js/src/panes/pane.start.js"></script>
 			<script type="text/javascript" src="/js/src/panes/pane.feedback.js"></script>
-			<script type="text/javascript" src="/js/src/panes/pane.dropzone.js"></script>
+			<script type="text/javascript" src="/js/src/panes/pane.share.js"></script>
+			<script type="text/javascript" src="/js/src/panes/pane.mapsettings.js"></script>
+			<script type="text/javascript" src="/js/src/panes/pane.fullscreen.js"></script>
 
+			<!-- chrome -->
+			<script type="text/javascript" src="/js/src/chrome/chrome.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/chrome.top.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/chrome.bottom.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/chrome.left.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/chrome.right.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/data/chrome.data.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/projects/chrome.projects.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/users/chrome.users.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.filters.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.cartocss.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.tooltip.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.mapsettings.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.settingsselector.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.styler.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/styler.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/styler.polygon.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/styler.point.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/styler.line.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.layers.js"></script>
+			<script type="text/javascript" src="/js/src/chrome/settings/chrome.settings.extras.js"></script>
+
+			<!-- controls -->
 			<script type="text/javascript" src="/js/src/controls/control.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.zoom.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.geojson.draw.js"></script>
@@ -168,16 +195,16 @@
 			<script type="text/javascript" src="/js/src/controls/control.measure.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.geolocation.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.layermenu.js"></script>
-			<script type="text/javascript" src="/js/src/controls/control.inspect.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.description.js"></script>
-			<script type="text/javascript" src="/js/src/controls/control.legends.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.mouseposition.js"></script>
-			<script type="text/javascript" src="/js/src/controls/control.baselayertoggle.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.style.js"></script>
-			<script type="text/javascript" src="/js/src/controls/control.cartocss.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.tooltip.js"></script>
 			<script type="text/javascript" src="/js/src/controls/control.spinningmap.js"></script>
-
+			<script type="text/javascript" src="/js/src/ext/popup.chart.js"></script>
+			<script type="text/javascript" src="/js/src/controls/control.chart.js"></script>
+			
+			<!-- models -->
+			<script type="text/javascript" src="/js/src/models/model.js"></script>
 			<script type="text/javascript" src="/js/src/models/model.projects.js"></script>
 			<script type="text/javascript" src="/js/src/models/model.clients.js"></script>
 			<script type="text/javascript" src="/js/src/models/model.users.js"></script>
@@ -187,29 +214,32 @@
 			<script type="text/javascript" src="/js/src/models/model.D3List.js"></script>
 
 			<script type="text/javascript" src="/js/src/core/access.js"></script>
-
 			<script type="text/javascript" src="/js/src/ext/analytics.js"></script>
-
-			<!-- <script type="text/javascript" src="/js/src/config/client-config.js"></script> -->
+			<script type="text/javascript" src="/js/src/ext/satelliteAngle.js"></script>
+			<script type="text/javascript" src="/js/src/ext/buttons.js"></script>
+			
+			<!-- config -->
 			<script type="text/javascript" src="/clientConfig.js"></script>
 			<script type="text/javascript" src="/js/src/lang/language.english.js"></script>
 			<script type="text/javascript" src="/js/src/ext/extendLeaflet.js"></script>
-
 			<script type="text/javascript" src="/js/src/tests/memory.js"></script>
 
+			<!-- app -->
 			<script type="text/javascript" src="/js/src/core/app.js"></script>
-
-
 
 		<!-- @endif -->
 
 		<!-- @if NODE_ENV == 'PRODUCTION' -->		
 
 			<!-- DEPENDENCIES -->
-			<script type="text/javascript" src="/js/js.dependencies.min.js"></script>
+			<script type="text/javascript" src="/dist/js.dependencies.min.js"></script>
+			<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+			
+			<!-- CONFIG -->
+			<script type="text/javascript" src="/clientConfig.js"></script>
 
 			<!-- LIBRARY -->
-			<script type="text/javascript" src="/js/js.portal.min.js"></script>
+			<script type="text/javascript" src="/dist/js.portal.min.js"></script>
 
 		<!-- @endif -->
 

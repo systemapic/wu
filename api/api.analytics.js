@@ -26,7 +26,7 @@ var exec 	= require('child_process').exec;
 var dive 	= require('dive');
 var async 	= require('async');
 var carto 	= require('carto');
-var nodeSlack 	= require('node-slack');
+var nodeSlack 	= require('../tools/slack');
 var crypto      = require('crypto');
 var fspath 	= require('path');
 var mapnik 	= require('mapnik');
@@ -39,18 +39,53 @@ var ua 		= require('universal-analytics');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
 
-var ua = require('universal-analytics');
-
-
 // api
 var api = module.parent.exports;
 
 // exports
 module.exports = api.analytics = { 
 
+
+
+	downloadedDataset : function (options) {
+		var user = options.user,
+		    filename = options.filename;
+
+		// send to slack
+		api.slack.userEvent({
+			user : user.getName(),
+			event : 'downloaded',
+			description : 'dataset `' + filename + '`'
+		});
+
+		// other analytics
+	},
+
+	downloadedLayer : function (options) {
+		var user = options.user,
+		    filename = options.filename;
+
+		// send to slack
+		api.slack.userEvent({
+			user : user.getName(),
+			event : 'downloaded',
+			description : 'layer `' + filename + '`'
+		});
+
+		// other analytics
+	},
+
+
+
+
+
+
+
+
+
+
 	set : function (req, res) {
 		var options = req.body;
-		// called from routes.js:64, /api/analytics/set
 
 		if (!options) return api.error.missingInformation(req, res);
 
@@ -88,19 +123,15 @@ module.exports = api.analytics = {
 
 		// Create GA user instance
 		var visitor = ua(trackingID, clientID, {
+		
 
 			// This is because we're not using
 			// GOOGLE's preferred format
 			strictCidFormat: false
 
-
 		});
 
-
-
-
 		// TRACKING PAGEVIEWS
-
 		if ( gaPageview ) {
 
 			// OPTIONS
@@ -134,7 +165,6 @@ module.exports = api.analytics = {
 				cd3: gaPageview.version
 
 			}
-
 
 			visitor.pageview(pageviewParams, function (err) {
 
@@ -187,6 +217,8 @@ module.exports = api.analytics = {
 			});
 
 		}
+
+
 
 	},
 

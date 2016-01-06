@@ -77,7 +77,6 @@ module.exports = api.file = {
 				var src = api.config.path.file + file.uuid ; // folder
 
 				// copy
-				// fs.copy(src, dest, function(err) { callback(err) });	
 				fs.copy(src, dest, callback);	
 
 			}, 
@@ -85,7 +84,6 @@ module.exports = api.file = {
 			// final callback
 			function (err) {	// todo: err handling
 				if (err) console.log('ERR 10'.red, err);
-
 				if (err) return api.error.general(req, res, err);
 
 				// execute cmd line zipping 
@@ -104,6 +102,158 @@ module.exports = api.file = {
 				});
 			});
 		});
+	},
+
+	// called from api.upload.js:431
+	addNewFileToUser : function (options, done) {
+
+		var userUuid = options.user.uuid,
+		    file_id = options.file._id;
+
+		User
+		.findOne({uuid : userUuid})
+		.exec(function (err, user) {
+			if (err || !user) return done(err || 'ERR 838: No user.');
+
+			// add file
+			user.files.push(file_id);
+			user.markModified('files');
+			
+			// save
+			user.save(function (err, doc) {
+				done(err);
+			});
+		});
+
+
+	},
+
+	addFileToProject : function (req, res) {
+		var options = req.body,
+		    fileUuid = options.fileUuid,
+		    projectUuid = options.projectUuid,
+		    ops = [],
+		    thefile,
+		    theproject,
+		    thelayers = [];
+
+
+		ops.push(function (callback) {
+
+			File
+			.findOne({uuid : fileUuid})
+			.exec(function (err, file) {
+				thefile = file;
+				callback(err);
+			});
+
+		});
+
+		// get all layers connected to file
+		ops.push(function (callback) {
+			
+			Layer
+			.find({file : thefile.uuid})
+			.exec(function (err, layers) {
+				thelayers = layers;
+				callback(err);
+			});
+
+		});
+
+		// get and save project
+		ops.push(function (callback) {
+			Project
+			.findOne({uuid : projectUuid})
+			.exec(function (err, project) {
+				theproject = project;
+				callback(err);
+			});
+		});
+		ops.push(function (callback) {
+			theproject.files.push(thefile._id);
+			thelayers.forEach(function (layer) {
+				theproject.layers.push(layer._id);
+			});
+			theproject.markModified('files');
+			theproject.markModified('layers');
+			theproject.save(function (err, project) {
+				theproject = project;
+				callback(err);
+			});
+
+		});
+
+		async.series(ops, function (err, results) {
+			if (err) return api.error.general(res, err);
+			res.json(theproject);
+		});
+
+	},
+
+
+	// handle file downloads
+	downloadPDF : function (req, res) {
+		var fileUuid = req.query.file,
+		    account = req.user,
+		    ops = [];
+
+		if (!fileUuid) return api.error.missingInformation(req, res);
+
+		ops.push(function (callback) {
+			File
+			.findOne({uuid : fileUuid})
+			.exec(callback);
+		});
+
+		ops.push(function (file, callback) {
+			api.access.to.download_file({
+				file : file,
+				user : account
+			}, callback);
+		});
+
+		ops.push(function (options, callback) {
+			var record = options.file,
+			    name = record.name.replace(/\s+/g, '');
+			
+
+			var folder = api.config.path.file + fileUuid;
+
+			fs.readdir(folder, function (err, files) {
+
+				var pdf = '';
+				files.forEach(function (f) {
+					var ext = f.slice(-3);
+					if (ext == 'pdf') {
+						pdf = f;
+					}
+				
+					
+				});
+
+				var path = folder + '/' + pdf;
+
+
+				callback(null, path);
+
+			});
+
+			
+
+		});
+
+		async.waterfall(ops, function (err, path) {
+			if (err) console.log('ERR 12'.red, err);
+			if (err) return api.error.general(req, res, err);
+
+			res.setHeader('Content-type', 'application/pdf');
+
+			var filestream = fs.createReadStream(path);
+			filestream.pipe(res);
+
+		});
+		
 	},
 
 
@@ -128,27 +278,68 @@ module.exports = api.file = {
 			}, callback);
 		});
 
+
 		ops.push(function (options, callback) {
-			var record = options.file,
-			    name = record.name.replace(/\s+/g, ''),
-			    out = api.config.path.temp + name + '_' + record.type + '.zip',
-			    cwd = api.config.path.file + fileUuid,
-			    command = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store',
-			    exec = require('child_process').exec;				
-			
-			// run command
-			exec(command, {cwd : cwd}, function (err, stdout, stdin) {
-				callback(err, out);
-			});
+
+			var file = options.file;
+
+			if (file.type == 'postgis') {
+				var name = file.name.replace(/\s+/g, '');
+				var out = api.config.path.temp + name + '_' + file.type + '.zip';
+				var cwd = api.config.path.file + fileUuid;
+				var command = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store';
+				var exec = require('child_process').exec;
+
+				var proc = exec(command, {cwd : cwd}, function (err, stdout, stdin) {
+					callback(err, out);
+				});
+
+				return;
+			}
+
+			if (file.type == 'raster') {
+
+				// make a copy first
+				var path = api.config.path.file + fileUuid + '/' + fileUuid;
+				var renamed = api.config.path.temp + fileUuid + '/' + file.originalName;
+				fs.copy(path, renamed, function (err) {
+
+					var zipfile_name = api.config.path.temp + fileUuid + '/' + file.originalName + '_' + file.type + '.zip';
+					var cwd = api.config.path.temp;
+					var command = 'zip -rj ' + zipfile_name + ' ' + renamed;
+					var exec = require('child_process').exec;
+
+					var proc = exec(command, {cwd : cwd}, function (err, stdout, stdin) {
+						callback(err, zipfile_name);
+					});
+
+				});
+
+			}
+
 		});
 
 		async.waterfall(ops, function (err, path) {
 			if (err) console.log('ERR 12'.red, err);
-
 			if (err) return api.error.general(req, res, err);
+
+			// send file
 			res.download(path);
+
 		});
 	},
+
+
+	downloadShape : function (req, res) {
+
+		// todo: permissions!
+
+		var file = req.query.file;
+		var filePath = api.config.path.temp + file;
+
+		res.download(filePath);
+	},
+
 
 
 	// download zip
@@ -159,7 +350,7 @@ module.exports = api.file = {
 		    found,
 		    ops = [];
 	
-		// todo: this is fucked. not even dealing with a file object here, just paths.. 
+		// todo: this is #$SD. not even dealing with a file object here, just paths.. 
 		// 	not solid! FIX!
 		
 		// find zip file
@@ -197,12 +388,336 @@ module.exports = api.file = {
 		
 		// zip file
 		if (type == 'zip') return api.file.downloadZip(req, res);
-			
+		
+		// pdf
+		if (type == 'pdf') return api.file.downloadPDF(req, res);
+
+		// pdf
+		if (type == 'shp') return api.file.downloadShape(req, res);
+
 		// normal file
 		return api.file.downloadFile(req, res);
-		
 	},
 
+
+	deleteFile : function (req, res) {
+
+		// could be other type files later, but postgis only for now.
+
+		var options = req.body,
+		    type = options.type,
+		    data = options.data;
+
+
+		if (type == 'postgis') {
+			return api.file.deletePostGISFile(req, res);
+		}
+
+		if (type == 'raster') {
+			return api.file.deleteRasterFile(req, res);
+		}
+
+		return api.error.missingInformation(req, res);
+
+	},
+
+
+	deleteRasterFile : function (req, res) {
+		
+		var options = req.body,
+		    data = options.data,
+		    file_id = data.file_id,
+		    removedObjects = {},
+		    ops = [],
+		    user = req.user;
+
+
+		if (!file_id) return api.error.missingInformation(req, res);
+
+		// get file model
+		ops.push(function (callback) {
+			File
+			.findOne({uuid : file_id})
+			.exec(callback)
+		});
+
+		// check permissions
+		ops.push(function (file, callback) {
+			console.log('TODO! permission to delete file!')
+
+			// api.access.to.delete_file({
+			// 	file : file,
+			// 	user : account
+			// }, callback);
+
+			callback(null, file);
+		});
+
+		// remove file from user
+		ops.push(function (file, callback) {
+
+			User
+			.findOne({uuid : user.uuid})
+			.exec(function (err, u) {
+				u.files.pull(file._id);
+				u.markModified('files');
+				u.save(function (err) {
+
+					removedObjects.user = {
+						file_id : file._id
+					}
+
+					callback(null);
+				});
+			});
+		});
+
+		// remove file model
+		ops.push(function (callback) {
+
+			File
+			.findOne({uuid : file_id})
+			.remove(function (err, rmf) {
+				removedObjects.file = {
+					file_id : file_id
+				}
+				callback(null);
+			});
+		});
+
+		// remove layers based on dataset
+		ops.push(function (callback) {
+
+			Layer
+			.find({'file' : file_id})
+			.exec(function (err, layers) {
+				if (err) return api.error.general(req, res, err);
+
+				// todo: remove layers from projects
+				api.file.deleteLayersFromProjects({
+					layers : layers
+				}, function (err) {
+
+					// delete layer models
+					async.each(layers, function (layer, done) {
+						layer.remove(done)
+					}, function (err) {
+						removedObjects.layers = layers;
+						callback(err);
+					});
+				});
+			});
+		});
+
+		async.waterfall(ops, function (err, results) {
+			res.json({
+				success : true,
+				error : err,
+				removed : removedObjects
+			});
+		});
+
+	},
+
+	deletePostGISFile : function (req, res) {
+
+		var options = req.body,
+		    data = options.data,
+		    database_name = data.database_name,
+		    table_name = data.table_name,
+		    fileUuid = table_name,
+		    data_type = data.data_type,
+		    user = req.user,
+		    ops = [];
+
+
+		if (!database_name || !table_name) return api.error.missingInformation(req, res);
+
+
+		var removedObjects = {};
+
+
+		// get file model
+		ops.push(function (callback) {
+			File
+			.findOne({uuid : fileUuid})
+			.exec(callback)
+		});
+
+		// check permissions
+		ops.push(function (file, callback) {
+			console.log('TODO! permission to delete file!')
+
+			// api.access.to.delete_file({
+			// 	file : file,
+			// 	user : account
+			// }, callback);
+
+			callback(null, file);
+		});
+
+		// remove file from user
+		ops.push(function (file, callback) {
+
+			User
+			.findOne({uuid : user.uuid})
+			.exec(function (err, u) {
+				u.files.pull(file._id);
+				u.markModified('files');
+				u.save(function (err) {
+
+					removedObjects.user = {
+						file_id : file._id
+					}
+
+					callback(null);
+				});
+			});
+		});
+
+		// remove file model
+		ops.push(function (callback) {
+
+			File
+			.findOne({uuid : fileUuid})
+			.remove(function (err, rmf) {
+				removedObjects.file = {
+					file_id : fileUuid
+				}
+				callback(null);
+			});
+		});
+
+
+		// remove postgis data
+		ops.push(function (callback) {
+			api.postgis.deleteTable({
+				database_name : database_name,
+				table_name : table_name
+			}, callback);
+		});
+
+
+		// remove layers based on dataset
+		ops.push(function (callback) {
+
+			Layer
+			.find({'data.postgis.table_name' : table_name})
+			.exec(function (err, layers) {
+				if (err) return api.error.general(req, res, err);
+
+				// todo: remove layers from projects
+				api.file.deleteLayersFromProjects({
+					layers : layers
+				}, function (err) {
+
+					// delete layer models
+					async.each(layers, function (layer, done) {
+						layer.remove(done)
+					}, function (err) {
+						removedObjects.layers = layers;
+						callback(err);
+					});
+				});
+			});
+		});
+
+		async.waterfall(ops, function (err, results) {
+			res.json({
+				success : true,
+				error : err,
+				removed : removedObjects
+			});
+		});
+
+
+	},
+
+	deleteLayersFromProjects : function (options, done) {
+		var layers = options.layers;
+
+
+		async.each(layers, function (layer, callback) {
+
+			var layer_id = layer._id;
+
+			// find project
+			Project
+			.findOne({layers : layer_id})
+			.exec(function (err, p) {
+
+				if (!p) return callback();
+
+				p.layers.pull(layer_id);
+				p.markModified('layers');
+				p.save(function (err) {
+					callback(err);
+				});
+
+			})
+
+
+		}, function (err) {
+
+			done(err);
+
+		});
+
+	},
+
+
+	// get postgis layers on dataset
+	getLayers : function (req, res) {
+
+		var options = req.body,
+		    type = options.type;
+
+
+		if (type == 'raster') {
+			return api.file._getRasterLayers(req, res);
+		}
+
+		if (type == 'postgis') {
+			return api.file._getPostGISLayers(req, res);
+		}
+
+		return api.error.missingInformation(req, res);
+	},
+
+	_getRasterLayers : function (req, res) {
+		var options = req.body,
+		    data = options.data,
+		    file_id = data.file_id;
+
+		Layer
+		.find({'file' : file_id})
+		.exec(function (err, layers) {
+			if (err) return api.error.general(req, res, err);
+			res.json(layers);
+		});
+	},
+
+	_getPostGISLayers : function (req, res) {
+
+		var options = req.body,
+		    data = options.data,
+		    database_name = data.database_name,
+		    table_name = data.table_name,
+		    fileUuid = table_name,
+		    data_type = data.data_type,
+		    user = req.user,
+		    ops = [];
+
+		if (!database_name || !table_name) return api.error.missingInformation(req, res);
+
+		// todo: permissons
+		Layer
+		.find({'data.postgis.table_name' : table_name})
+		.exec(function (err, layers) {
+			if (err) return api.error.general(req, res, err);
+			res.json(layers);
+		});
+	},
 
 	// delete a file
 	deleteFiles : function (req, res) {
@@ -213,11 +728,7 @@ module.exports = api.file = {
 		    ops = [],
 		    _lids = [];
 
-		// console.log('API: deleteFiles');
-		// console.log('_fids: ', _fids);
-		// console.log('puuid: ', puuid);
-		// console.log('userid: ', userid);
-		// console.log('uuids: ', uuids);
+
 
 
 		// validate
@@ -227,18 +738,13 @@ module.exports = api.file = {
 		ops.push(function (callback) {
 
 			Layer.find({file : {$in : uuids}}, function (err, layers) {
-
 				layers.forEach(function (layer) {
 					_lids.push(layer._id);
 				});
-
 				
 				// todo: delete?
-
 				return callback(err);
-		
 			});
-
 		});
 
 		// delete file from project
@@ -264,15 +770,13 @@ module.exports = api.file = {
 				project.markModified('layers');
 
 				project.save(function (err) {
-					return callback(err);
+					if (err) console.log('delete file save err 445', err);
+					callback(null);
 				});
 			});
 		});
 
 		
-
-
-	
 		// run queries
 		async.series(ops, function(err) {
 			if (err) console.log('ERR 15'.red, err);
@@ -290,15 +794,15 @@ module.exports = api.file = {
 		var fileUuid = req.body.uuid,
 		    account = req.user,
 		    ops = [];
-		
+
 		if (!fileUuid) return api.error.missingInformation(req, res);
+
 
 		ops.push(function (callback) {
 			File
 			.findOne({uuid : fileUuid})
 			.exec(callback);
 		});
-
 
 		ops.push(function (file, callback) {
 			api.access.to.edit_file({
@@ -330,6 +834,8 @@ module.exports = api.file = {
 		    options = job.options,
 		    queries = {};
 
+		// console.log('update file'.green, options);
+		
 		// valid fields
 		var valid = [
 			'name', 
@@ -338,6 +844,8 @@ module.exports = api.file = {
 			'status',
 			'category',
 			'version',
+			'copyright',
+			'data'
 		];
 
  		// enqueue queries for valid fields
@@ -383,7 +891,6 @@ module.exports = api.file = {
 		    fileUuid = options.fileUuid,
 		    out = api.config.path.file + fileUuid + options.out;
 
-
 		fs.ensureDir(out, function (err) {
 			if (err) console.log('handlezip 903 err: '.red + err);
 			if (err) return callback(err);
@@ -392,22 +899,8 @@ module.exports = api.file = {
 			var cmd = 'unzip -o -d "' + out + '" "' + inn + '" -x "*DS_Store*" "*__MACOSX*"'; 	// to folder .shp
 			var exec = require('child_process').exec;
 
-			// unzip
-			exec(cmd, function (err, stdout, stdin) {
-				if (err) console.log('handleziup 00 err: '.red + err);
-				if (err) return callback(err);
+			exec(cmd, callback);
 
-				// remove unnecessary files - important!
-				fs.unlink(inn, function (err) {
-					if (err) console.log('handle zip unlink  err: '.red + err);
-					if (err) return callback(err);
-
-					fs.remove(out + '/__MACOSX', function (err) {
-						if (err) console.log('handle zip remove : '.red + err);
-						callback(err);
-					});
-				});
-			});
 		});
 	},
 
@@ -462,7 +955,6 @@ module.exports = api.file = {
 	},
 
 
-
 	// #########################################
 	// ###  FILER: documents                 ###
 	// #########################################
@@ -471,12 +963,12 @@ module.exports = api.file = {
 
 		var out = api.config.path.file + fileUuid + '/' + name;
 
-		// move to folder
-		fs.move(path, out, function (err) {
-			callback(null);
-		});
-	},
+		// do nothing if already there
+		if (path == out) return callback(null);
 
+		// move to folder
+		fs.move(path, out, callback);
+	},
 
 
 	// #########################################
@@ -487,39 +979,18 @@ module.exports = api.file = {
 	
 		// set path
 		var out = api.config.path.file + fileUuid + '/' + name;
-
-		// console.log('--------------------'.red);
-		// console.log('--------------------'.red);
-		// console.log('--------------------'.red);
-		// console.log('inn: ', inn);
-		// console.log('out: ', out);
-		// console.log('name: ', name);
-		// console.log('type: ', type);
-		// console.log('fileUuid: ', fileUuid);
-		// console.log('---------------------'.red);
-
-
 		var ops = {};
 
 		// move if not already in right place
 		if (inn != out) {
 			ops.move = function (callback) {
-
-				fs.move(inn, out, function (err) {
-
-
-						callback(err);
-					
-				});
-				
+				fs.move(inn, out, callback);
 			};
 		}
 
+		// process geo
 		ops.geo = function (callback) {
-
-			// process geo
 			if (type != 'geojson') return callback('Not a valid .geojson file.');
-
 
 			api.geo.handleGeoJSON(out, fileUuid, function (err, db) {
 				if (err) console.log('ERR 51'.red, err);
@@ -527,21 +998,17 @@ module.exports = api.file = {
 
 				// populate db 
 				db.data = {
-					geojson : name
+					geojson : name,
+					cartoid : 'default'
 				}
 				db.title = name;
 
 				callback(err, db);
-
 			});	
-			
-
 		};
-
 
 		async.series(ops, function (err, results) {
 			if (err) console.log('ERR 60'.red, err);
-
 			done(err, results.geo);
 		});
 
@@ -609,7 +1076,6 @@ module.exports = api.file = {
 
 		// read file and ship it
 		fs.readJson(path, function (err, data) {
-			if (err) console.log('send geo json err: '.red + err);
 			if (err) console.log('ERR 17'.red, err);
 			if (err || !data) return api.error.general(req, res, err || 'No file.');
 
@@ -620,42 +1086,6 @@ module.exports = api.file = {
 			res.end(JSON.stringify(data));
 		});
 	},
-
-
-	// todo: possibly old, to be removed?
-	// send geojson helper 
-	_sendGeoJsonFile : function (req, res, record) {
-
-		var geofile = [];
-
-		// for each file
-		async.each(record.files, function (file, callback) {
-			fs.readFile(file, function (err, data) {
-				if (data) geofile.push(JSON.parse(data));	// added error handling
-				callback(err);
-			})		
-		}, 
-
-		// final callback
-		function (err) {
-			if (err) console.log('___send geo json  e err: '.red + err);
-			if (err) console.log('ERR 18'.red, err);
-			if (err || !geofile) return api.error.general(req, res, err);
-
-			// set filesize
-			var string = JSON.stringify(geofile);
-			var length = string.length.toString();
-			res.set({
-				'Content-Type': 'text/json',
-				'Content-Length': length
-			});
-			
-			// return geojson string
-			res.end(string);
-		});
-		
-	},
-
 
 	createModel : function (options, callback) {
 
@@ -672,22 +1102,42 @@ module.exports = api.file = {
 		file.dataSize 		= options.dataSize;
 		file.data 		= options.data;
 
+
 		file.save(function (err, doc) {
-			callback(err, doc);
+			// console.log('file model created:', err, doc);
+			if (err) console.log(err);
+			callback(null, doc);
 		});
+	},
+
+	// new: postgis file model
+	_createModel : function (fileModel, callback) {
+		var file = new File();
+		for (f in fileModel) {
+			file[f] = fileModel[f];
+			file.markModified(f);
+		}
+		file.save(callback);
+	},
+
+
+	_getFile : function (fileUuid, callback) {
+
 	},
 
 	// save file to project (file, layer, project id's)
 	addToProject : function (file_id, projectUuid, callback) {
+
 		Project
 		.findOne({'uuid' : projectUuid })
 		.exec(function (err, project) {
 			if (err) return callback && callback(err);
 			if (!project) return callback && callback('No project');
+
 			project.files.push(file_id);			
 			project.markModified('files');
 			project.save(function (err) {
-				callback && callback(err, done);
+				callback && callback(err);
 			});
 		});
 	},
@@ -699,6 +1149,292 @@ module.exports = api.file = {
 		// send
 		res.sendfile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
 	},
+
+	
+	tileCount : function (req, res) {
+		var fileUuid = req.body.fileUuid,
+		    path = '/data/raster_tiles/' + fileUuid,
+		    cmd = 'find raster/ -type f | wc -l',
+		    exec = require('child_process').exec;				
+					
+		// run command
+		exec(cmd, { cwd : path }, function (err, stdout, stdin) {
+			if (err) console.log('ERR 11'.red, err);
+
+			var count = stdout;
+			res.end(count);
+		});
+	},
+
+	_sendToProcessing : function (options, done) {
+		var pack = options.pack,
+		    user = options.user,
+		    layers = pack.layers,
+		    size = options.size,
+		    ops = [];
+
+		// can be several layers in each upload
+		layers.forEach(function (layer) {
+			ops.push(function (callback) {
+				if (options.isRaster)  api.file._sendToProcessingRaster(layer, options, callback);
+				if (options.isGeojson) api.file._sendToProcessingGeojson(layer, options, callback);
+				if (!options.isRaster && !options.isGeojson) callback();
+			});
+			
+		});
+
+		async.series(ops, function (err, results) {
+			done && done(null, 'All DONE');
+		});
+	},
+
+	_sendToProcessingRaster : function (layer, options, done) {
+		var pack = options.pack,
+		    user = options.user,
+		    layers = pack.layers,
+		    size = options.size,
+		    ops = [],
+		    fileUuid = layer.file,
+		    localFile = layer.data.raster,
+		    localFolder = api.config.path.file + fileUuid + '/',
+		    remoteFolder = '/data/grind/raster/' + fileUuid + '/',
+		    uniqueIdentifier = options.uniqueIdentifier,
+		    remoteSSH = 'px_vile_grind',
+		    remoteUrl = api.config.vile_grind.remote_url;
+
+		var remoteUrl = 'http://grind:3004/';
+		
+		var sendOptions = {
+			fileUuid : fileUuid,
+			filename : layer.data.raster,
+			uniqueIdentifier : uniqueIdentifier,
+			sender_ssh : api.config.vile_grind.sender_ssh,
+			sender_url : api.config.vile_grind.sender_url,
+			api_hook : 'grind/raster/done',
+		}
+
+
+		// notify remote of file
+		ops.push(function (callback) {
+			request({
+				method : 'POST',
+				uri : remoteUrl + 'grind/raster/job',
+				json : sendOptions
+			}, callback); 
+		});
+
+		// run ops
+		async.series(ops, function (err, results) {
+			if (err) return done(err);
+
+			// register socket
+			api.socket.setProcessing({
+				userId : user._id,
+				fileUuid : fileUuid,
+				uniqueIdentifier : uniqueIdentifier,
+				pack : pack,
+				size : size
+			});
+
+	
+			// api.file._startProcessingProgress({
+			// 	fileUuid : fileUuid
+			// });			
+
+			// callback
+			done && done(null, 'All done!');
+		})
+
+	},
+
+	_startProcessingProgress : function () {
+
+		// send processing progress by socket
+		api.socket.pushProcessingProgress({
+			userId : user._id,
+			fileUuid : fileUuid
+		})
+
+	},
+
+	_sendToProcessingGeojson : function (layer, options, done) {
+		var pack = options.pack,
+		    user = options.user,
+		    layers = pack.layers,
+		    size = options.size,
+		    ops = [],
+		    fileUuid = layer.file,
+		    localFile = fileUuid + '.geojson',
+		    localFolder = api.config.path.geojson,
+		    remoteFolder = '/data/grind/geojson/',
+		    uniqueIdentifier = options.uniqueIdentifier,
+		    remoteSSH = 'px_vile_grind',
+		    remoteUrl = api.config.vile_grind.remote_url;
+
+		// debug
+
+		var cmd = 'tar -cf - -C ' + localFolder + ' ' + localFile + ' | pigz | ssh ' + remoteSSH + ' "pigz -d | tar xf - -C ' + remoteFolder + '"';
+
+		var sendOptions = {
+			fileUuid : fileUuid,
+			uniqueIdentifier : uniqueIdentifier,
+			sender_ssh : api.config.vile_grind.sender_ssh,
+			sender_url : api.config.vile_grind.sender_url,
+			api_hook : 'grind/done'
+		}
+
+		// send file over ssh
+		// exec(cmd, function (err, stdout, stdin) {
+			// if (err) console.log('err'.red, err);
+
+			var remoteUrl = 'http://grind:3004/';
+
+			// ping tileserver storage to notify of file transfer
+			request({
+				method : 'POST',
+				uri : remoteUrl + 'grind/job',
+				json : sendOptions
+			}, 
+
+			// callback
+			function (err, response, body) {
+
+				api.socket.setProcessing({
+					userId : user._id,
+					fileUuid : fileUuid,
+					uniqueIdentifier : uniqueIdentifier,
+					pack : pack,
+					size : size
+				});
+
+				done(null, 'All done!');
+			});
+		// });
+
+	},
+
+
+
+	shareDataset : function (req, res) {
+
+		var ops = [];
+		var user = req.user;
+		var users = req.body.users;
+		var file_id = req.body.dataset;
+		var userModels = [];
+		var foundFile;
+		var file;
+
+
+		ops.push(function (callback) {
+			File
+			.findOne({uuid : file_id})
+			.exec(function (err, f) {
+				file = f;
+				callback(null);
+			});
+		});
+
+		ops.push(function (callback) {
+			User
+			.findOne({uuid : user.uuid})
+			.populate('files')
+			.exec(callback);
+		});
+
+
+		ops.push(function (user, callback) {
+				
+			// check if file is on user
+			foundFile = _.find(user.files, function (f) {
+				return f.uuid == file_id;
+			});
+
+			// if no file, no access
+			if (_.isEmpty(foundFile)) return callback('No access.');
+
+			// next
+			callback(null);
+
+		});
+
+		ops.push(function (callback) {
+
+			// get users
+			async.each(users, function (user, done) {
+				User
+				.findOne({uuid : user})
+				.exec(function (err, u) {
+					userModels.push(u);
+					done(null);
+				});
+			}, callback);
+
+		});
+
+		ops.push(function (callback) {
+
+			async.each(userModels, function (user, done) {
+
+				// add dataset to user
+				user.files.addToSet(file._id);
+				user.markModified('files');
+				user.save(function (err, u) {
+					done(null);
+				});
+			
+			}, callback);
+		});
+
+
+		async.waterfall(ops, function (err, results) {
+			if (err) return res.json({
+				err : err
+			});
+
+
+			// return success
+			res.json({
+				err : null,
+				success : true,
+				file_shared : {
+					file_name : file.name,
+					file_uuid : file.uuid
+				},
+				users_shared_with : users
+			});
+		});
+
+
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

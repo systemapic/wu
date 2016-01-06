@@ -38,16 +38,73 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
+
+function constantLoopFunctions () {
+	setInterval(function () {
+
+		// get stats on server
+		api.utils.updateStatistics();
+	
+	}, 1000);
+};
+
+constantLoopFunctions();
+
+
 // exports
 module.exports = api.utils = { 
 
+	parse : function (string) {
+		try {
+			var object = JSON.parse(string);	
+		} catch (e) {
+			var object = false;
+		}
+		return object;
+	},
+
+	updateStatistics : function () {
+
+		// get stats
+		STATS_SCRIPT_PATH = '../scripts/get_cpu_stats.sh'; // todo: put in config
+		
+		// create database in postgis
+		exec(STATS_SCRIPT_PATH, {maxBuffer: 1024 * 50000}, function (err, stdin, stdout) {
+			if (err) return;
+			var cpu_usage = -1;
+			try {
+				var stdin_split = stdin.split('\n');
+				var cpu_usage = parseFloat(stdin_split[1].split('   ')[2]);
+
+			} catch (e) {}
+			
+			// save stats to redis
+			api.redis.stats.lpush('server_stats', JSON.stringify({
+				time : _.now(),
+				cpu_usage : cpu_usage
+			}));
+		});
+	},
+
+	getRandomChars : function (len, charSet) {
+		charSet = charSet || 'abcdefghijklmnopqrstuvwxyz';
+		var randomString = '';
+		for (var i = 0; i < len; i++) {
+			var randomPoz = Math.floor(Math.random() * charSet.length);
+			randomString += charSet.substring(randomPoz,randomPoz+1);
+		}
+		return randomString;
+	},
+
+	getRandom : function (len, charSet) {
+		return api.utils.getRandomChars(len, charSet);
+	},
 
 	createNameSlug : function (name) {
 		var slug = name.replace(/\s+/g, '').toLowerCase();
 		slug =api.utils.stripAccents(slug);
 		return slug;
 	},
-
 
 	getRandomName : function () {
 		return _.sample(api.utils.randomNames);
@@ -534,9 +591,100 @@ module.exports = api.utils = {
 		var mapping = function (c) {
 			return map[c] || c; 
 		};
-
 		
 		return str.replace(nonWord, mapping);
+	},
+
+	prettyDate : function(date, compareTo){
+		/*
+		 * Javascript Humane Dates
+		 * Copyright (c) 2008 Dean Landolt (deanlandolt.com)
+		 * Re-write by Zach Leatherman (zachleat.com)
+		 * Refactor by Chris Pearce (github.com/Chrisui)
+		 *
+		 * Adopted from the John Resig's pretty.js
+		 * at http://ejohn.org/blog/javascript-pretty-date
+		 * and henrah's proposed modification
+		 * at http://ejohn.org/blog/javascript-pretty-date/#comment-297458
+		 *
+		 * Licensed under the MIT license.
+		*/
+
+		function normalize(val, single)
+		{
+			var margin = 0.1;
+			if(val >= single && val <= single * (1+margin)) {
+				return single;
+			}
+			return val;
+		}
+
+		if(!date) {
+			return;
+		}
+
+		var lang = {
+			ago: 'Ago',
+			from: '',
+			now: 'Just Now',
+			minute: 'Minute',
+			minutes: 'Minutes',
+			hour: 'Hour',
+			hours: 'Hours',
+			day: 'Day',
+			days: 'Days',
+			week: 'Week',
+			weeks: 'Weeks',
+			month: 'Month',
+			months: 'Months',
+			year: 'Year',
+			years: 'Years'
+		},
+		formats = [
+			[60, lang.now],
+			[3600, lang.minute, lang.minutes, 60], // 60 minutes, 1 minute
+			[86400, lang.hour, lang.hours, 3600], // 24 hours, 1 hour
+			[604800, lang.day, lang.days, 86400], // 7 days, 1 day
+			[2628000, lang.week, lang.weeks, 604800], // ~1 month, 1 week
+			[31536000, lang.month, lang.months, 2628000], // 1 year, ~1 month
+			[Infinity, lang.year, lang.years, 31536000] // Infinity, 1 year
+		];
+
+		var isString = typeof date == 'string',
+			date = isString ?
+						new Date(('' + date).replace(/-/g,"/").replace(/T|(?:\.\d+)?Z/g," ")) :
+						date,
+			compareTo = compareTo || new Date,
+			seconds = (compareTo - date +
+							(compareTo.getTimezoneOffset() -
+								// if we received a GMT time from a string, doesn't include time zone bias
+								// if we got a date object, the time zone is built in, we need to remove it.
+								(isString ? 0 : date.getTimezoneOffset())
+							) * 60000
+						) / 1000,
+			token;
+
+		if(seconds < 0) {
+			seconds = Math.abs(seconds);
+			token = lang.from ? ' ' + lang.from : '';
+		} else {
+			token = lang.ago ? ' ' + lang.ago : '';
+		}
+
+		for(var i = 0, format = formats[0]; formats[i]; format = formats[++i]) {
+			if(seconds < format[0]) {
+				if(i === 0) {
+					// Now
+					return format[1];
+				}
+
+				var val = Math.ceil(normalize(seconds, format[3]) / (format[3]));
+				return val +
+						' ' +
+						(val != 1 ? format[2] : format[1]) +
+						(i > 0 ? token : '');
+			}
+		}
 	},
 
 

@@ -79,7 +79,7 @@ L.Control.Legends = Wu.Control.extend({
 		this._legendsInnerSlider.innerHTML = '';
 	},
 
-	_refresh : function () {
+	_refresh : function (hide) {
 
 		// should be active
 		if (!this._added) this._addTo();
@@ -100,7 +100,7 @@ L.Control.Legends = Wu.Control.extend({
 		// this.refreshLegends();
 
 		// show
-		this._show();
+		!hide && this._show();
 	},
 
 	_on : function () {
@@ -115,31 +115,9 @@ L.Control.Legends = Wu.Control.extend({
 		this.refreshLegends();
 	},
 
-	// _initContent : function () {
-
-	// },
-
-	// // is called when changing/selecting project
-	// update : function (project) {
-	       
-	// 	// project is ready only here, so init relevant vars
-	// 	// update is called from enableLayermenu toggle in MapPane
-
-	// 	// get vars
-	// 	this.project = project || Wu.app._activeProject;
-	// 	this._content = this._legendsContainer;
-
-	// 	// init divs
-	// 	this.initContainer();		
-
-	// 	this.calculateHeight();
-
-	// },
 
 	_initContent : function () {
 	
-		
-
 		this.legends = {};
 		this._layers = [];
 
@@ -156,6 +134,7 @@ L.Control.Legends = Wu.Control.extend({
 			// Mobile arrow	
 		    	Wu.DomUtil.create('div', 'legends-mobile-arrow', this._content);
 		}
+
 	},
 
 
@@ -481,7 +460,18 @@ L.Control.Legends = Wu.Control.extend({
 			var e = Wu.DomUtil.create('div', 'legend-feature', d);
 			var f = Wu.DomUtil.create('img', 'legend-image1', e);
 			var g = Wu.DomUtil.create('img', 'legend-image2', e);
-			var h = Wu.DomUtil.create('div', 'legend-feature-name', d, legend.value);
+			
+			var title = '';
+			
+			if (legend.key == 'layer') {
+				var title = legend.value;
+			} else {
+				if (legend.key) {
+					var title = legend.key.toLowerCase().camelize() + ': ' + legend.value;
+				}
+			}
+
+			var h = Wu.DomUtil.create('div', 'legend-feature-name', d, title);
 
 			f.src = legend.base64;
 			g.src = legend.base64;
