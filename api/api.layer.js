@@ -39,8 +39,6 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
-console.log('lauyer');
-
 // exports
 module.exports = api.layer = { 
 
@@ -48,18 +46,19 @@ module.exports = api.layer = {
 	// create layer
 	create : function (req, res) {
 
-		// lol?
-		return res.end(JSON.stringify({error : 'Unsupported.'}))
 
-		// var layerType = req.body.layerType;
+		var options = req.body;
 
-		// if (layerType == 'geojson') return api.layer.createLayerFromGeoJSON(req, res);
+		api.layer.createModel(options, function (err, doc) {
+			console.log('create layer, err, doc', err, doc);
 
-		// res.end(JSON.stringify({
-		// 	layer : 'yo!'
-		// }));
+			if (err) return api.error.general(res, err);
+
+			res.json(doc);
+		});
 
 	},
+
 
 	// create OSM layer
 	createOSM : function (req, res) {
@@ -84,6 +83,26 @@ module.exports = api.layer = {
 			// add to project
 			doc && api.layer.addToProject(doc._id, projectUuid);
 		});
+	},
+
+
+	createPileLayer : function (options, callback) {
+
+		var host = api.config.portalServer.uri;
+
+		// send to tileserver storage
+		request({
+			method : 'POST',
+			uri : host + 'api/db/createLayer',
+			json : options
+		}, 
+
+		// callback
+		function (err, response, body) {
+			callback(err, body);
+
+		});
+
 	},
 
 
@@ -151,8 +170,18 @@ module.exports = api.layer = {
 		if (!layerUuid) return api.error.missingInformation(req, res);
 
 
+		console.log('up[date layer!', req.body);
+
 		Layer.findOne({'uuid' : layerUuid}, function (err, layer) {
 			if (err || !layer) return api.error.missingInformation(req, res);
+
+
+			// update satpos
+			if (req.body.hasOwnProperty('satellite_position')) {
+				var satellite_position = req.body.satellite_position;
+				layer.satellite_position = satellite_position;
+				layer.save();
+			};
 
 			// update description
 			if (req.body.hasOwnProperty('description')) {
@@ -161,8 +190,16 @@ module.exports = api.layer = {
 				layer.save();
 			};
 
+			// update description
+			if (req.body.hasOwnProperty('copyright')) {
+				var copyright = req.body.copyright;
+				layer.copyright = copyright;
+				layer.save();
+			};
+
 			// update title
 			if (req.body.hasOwnProperty('title')) {
+				console.log('TITLE!!');
 				var title = req.body.title;
 				layer.title = title;
 				layer.save();
@@ -175,10 +212,33 @@ module.exports = api.layer = {
 				layer.save();
 			}
 
+			// update style
+			if (req.body.hasOwnProperty('style')) {
+				var style = req.body.style;
+				layer.style = style;
+				layer.save();
+			}
+
+			// update filter
+			if (req.body.hasOwnProperty('filter')) {
+				var filter = req.body.filter;
+				layer.filter = filter;
+
+				console.log('filteR: ', filter);
+				layer.save();
+			}
+
 			// update legends
 			if (req.body.hasOwnProperty('legends')) {
 				var legends = req.body.legends;
 				layer.legends = legends;
+				layer.save();
+			}
+
+			// update opacity
+			if (req.body.hasOwnProperty('opacity')) {
+				var opacity = req.body.opacity;
+				layer.opacity = opacity;
 				layer.save();
 			}
 
@@ -189,70 +249,127 @@ module.exports = api.layer = {
 				layer.save();
 			}
 
+			// update data
+			if (req.body.hasOwnProperty('data')) {
+				var data = req.body.data;
+				layer.data = data;
+				layer.markModified('data');
+				layer.save();
+			}
+
 			res.end('save done');
 		});
 
 	},
 
-
 	deleteLayer : function (req, res) {
 
-		var projectUuid  = req.body.projectUuid,
-		    userid = req.user.uuid,
-		    layerUuids = req.body.layerUuids,
-		    ops = [],
-		    _lids = [];
 
-		// validate
-		if (!projectUuid || !userid) return api.error.missingInformation(req, res);
+		var options = req.body,
+		    layerUuid = options.layerUuid,
+		    projectUuid = options.projectUuid,
+		    ops = [];
 
-		// find layer _ids for removing in project
+
+		// delete layer model
+		// delete from project
+
 		ops.push(function (callback) {
-			Layer.find({uuid : {$in : layerUuids}}, function (err, layers) {
-				if (err || !layers) return callback(err || 'No layers.');
 
-				layers.forEach(function (layer) {
-					_lids.push(layer._id);
-				});
+			Layer
+			.findOne({uuid : layerUuid})
+			.remove(function (err, layer) {
+				console.log('removed layer: ', err, layer);
 
-				callback(err);
-			});
+				callback(err, layer._id);
+			})
+
 		});
 
+		ops.push(function (layer_id, callback) {
 
-
-		// delete layer from project
-		ops.push(function (callback) {
-			
 			Project
 			.findOne({uuid : projectUuid})
 			.exec(function (err, project) {
-				if (err || !project) return callback(err || 'No project.');
 
-				// pull layers
-				_lids.forEach(function (l) {
-					project.layers.pull(l)
-				})
-				
-				// project.markModified('files');
+				project.layers.pull(layer_id)
 				project.markModified('layers');
-				project.save(function (err) {
-					callback(err);
-				});
+				project.save(callback);
+			})
+		});
+
+		async.waterfall(ops, function (err, results) {
+			console.log('all done? ', err, results);
+			res.json({
+				success : true,
+				error : err
 			});
 		});
 
-	
-		// run queries
-		async.series(ops, function(err) {
-			if (err) return api.error.general(req, res, err);		
-
-			res.end(JSON.stringify({
-				error : err
-			}));
-		});
 
 	},
+
+
+
+
+	// deleteLayer : function (req, res) {
+
+	// 	var projectUuid  = req.body.projectUuid,
+	// 	    userid = req.user.uuid,
+	// 	    layerUuids = req.body.layerUuids,
+	// 	    ops = [],
+	// 	    _lids = [];
+
+	// 	// validate
+	// 	if (!projectUuid || !userid) return api.error.missingInformation(req, res);
+
+	// 	// find layer _ids for removing in project
+	// 	ops.push(function (callback) {
+	// 		Layer.find({uuid : {$in : layerUuids}}, function (err, layers) {
+	// 			if (err || !layers) return callback(err || 'No layers.');
+
+	// 			layers.forEach(function (layer) {
+	// 				_lids.push(layer._id);
+	// 			});
+
+	// 			callback(err);
+	// 		});
+	// 	});
+
+
+
+	// 	// delete layer from project
+	// 	ops.push(function (callback) {
+			
+	// 		Project
+	// 		.findOne({uuid : projectUuid})
+	// 		.exec(function (err, project) {
+	// 			if (err || !project) return callback(err || 'No project.');
+
+	// 			// pull layers
+	// 			_lids.forEach(function (l) {
+	// 				project.layers.pull(l)
+	// 			})
+				
+	// 			// project.markModified('files');
+	// 			project.markModified('layers');
+	// 			project.save(function (err) {
+	// 				callback(err);
+	// 			});
+	// 		});
+	// 	});
+
+	
+	// 	// run queries
+	// 	async.series(ops, function(err) {
+	// 		if (err) return api.error.general(req, res, err);		
+
+	// 		res.end(JSON.stringify({
+	// 			error : err
+	// 		}));
+	// 	});
+
+	// },
 
 
 	// reload layer meta
@@ -333,8 +450,6 @@ module.exports = api.layer = {
 	// set carto css
 	setCartoCSS : function (req, res) {
 
-		console.log('setCartoCSS!'.yellow);
-
 		// get params
 		var fileUuid 	= req.body.fileUuid,
 		    css 	= req.body.css,
@@ -346,11 +461,8 @@ module.exports = api.layer = {
 
 		var host = api.config.vile.uri;
 
-		console.log('host: ', host);
-
 		// save css to file by cartoId 
 		fs.writeFile(csspath, css, {encoding : 'utf8'}, function (err) {
-			console.log('write err?', err);
 			if (err) return api.error.general(req, res);
 
 			// send to tileserver storage
@@ -366,7 +478,6 @@ module.exports = api.layer = {
 
 			// callback
 			function (err, response, body) {
-				console.log('err', err);
 
 				// custom error handling
 				if (err) {
@@ -412,218 +523,8 @@ module.exports = api.layer = {
 	},
 
 
-	_createStylesheet : function (options, callback) {
-		var featureKey = options.key,
-		    featureValue = options.value,
-		    css = options.css,
-		    lid = options.id,
-		    properties = {};
+	
 
-		// set key/value
-		properties[featureKey] = featureValue;
-
-		var geojson = {
-			"type" : "FeatureCollection",
-			"features" : [
-				{
-				"type" : "Feature",
-         			 "properties" : properties,
-				"geometry": {
-					"type": "Polygon",
-					"coordinates": [
-						[
-						[
-					              -45,
-					              0
-					            ],
-					            [
-					              -45,
-					              45
-					            ],
-					            [
-					              0,
-					              45
-					            ],
-					            [
-					              0,
-					              0
-					             
-					            ],
-					            [
-					              -45,
-					              0
-					            ]
-						]
-						]
-					}
-				}
-			]
-		}
-
-
-		// write geojson template to disk
-		var toFile = api.config.path.legends + 'template-' + lid + '.geojson'; 
-
-		fs.outputFile(toFile, JSON.stringify(geojson), function (err) {
-			if (err) return callback(err);
-
-			var options = {
-				"srs": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over",
-
-				"Stylesheet": [{
-					"id" : 'layer',
-					"data" : css
-				}],
-
-				"Layer": [{
-					"id" : "layer",	
-					"name" : "layer",
-					"Datasource" : {
-						"file" : toFile,
-						"type" : "geojson"
-					}
-				}]
-			}
-
-			try {
-				var cr = new carto.Renderer({});
-				var xml = cr.render(options);
-				var stylepath = api.config.path.legends + 'stylesheet-' + lid + '.xml';
-
-				fs.outputFile(stylepath, xml, function (err) {
-					if (err) return callback(err);
-
-					var result = {
-						stylepath : stylepath,
-						lid : lid
-					}
-
-					callback(null, result);
-				});
-
-			} catch (e) { callback(e); }
-
-		});
-
-	},
-
-
-	// #########################################
-	// ###  API: Get Layer Feature Values    ###
-	// #########################################	
-	// get features from geojson that are active in cartoid.mss (ie. only active/visible layers)
-	_getLayerFeaturesValues : function (fileUuid, cartoid, callback) {
-		if (!fileUuid || !cartoid) return callback('Missing information.1');
-
-		api.layer._getLayerFeaturesValuesGeoJSON(fileUuid, cartoid, callback);
-
-		// if (fileUuid == 'osm') {
-		// 	api.layer._getLayerFeaturesValuesOSM(fileUuid, cartoid, callback);
-		// } else {
-		// 	api.layer._getLayerFeaturesValuesGeoJSON(fileUuid, cartoid, callback);
-		// }
-	},
-
-	_getLayerFeaturesValuesOSM : function (fileUuid, cartoid, callback) {
-		callback('debug');
-	},
-
-	_getLayerFeaturesValuesGeoJSON : function (fileUuid, cartoid, callback) {       // todo: optimize!
-		if (!fileUuid || !cartoid) return callback('Missing information.2');
-
-		console.log('## _getLayerFeaturesValues'.green);
-
-		File
-		.findOne({uuid : fileUuid})
-		.exec(function (err, file) {
-
-			console.log('## .findOne'.green, err, file);
-
-			if (err || !file) return callback(err || 'No file.');
-
-			// read css from file
-			var cartopath = api.config.path.cartocss + cartoid + '.mss';
-			
-			console.log('## cartopath'.green, cartopath);
-
-			fs.readFile(cartopath, 'utf8', function (err, buffer) {
-				if (err || !buffer) return callback(err || 'No data.');
-
-				console.log('## readfile ok!'.green);
-
-
-
-				try {
-					var output = new carto.Renderer({
-						filename: cartopath,
-						local_data_dir: fspath.dirname(cartopath),
-					}).renderMSS(buffer);
-				} catch(err) {
-					console.log('err11'.red, err);
-					if (Array.isArray(err)) {
-						err.forEach(function(e) {
-							carto.writeError(e, options);
-						});
-					} else { console.error('err22'.red, err); }
-				}
-				console.log('op: ', output);
-
-				// fs.writeFileSync('/home/cartocss.output', output);
-
-
-				try {
-
-					// get rules from carto (forked! see explain below...)
-					var css = buffer.toString();
-					var renderer = new carto.Renderer();
-					var info = renderer.getRules(css);
-					var string = JSON.stringify(info);
-					var jah = [];
-					var rules1 = info.rules;//[0].rules;
-
-					// console.log('## css:'.green, css);
-					// console.log('## info:'.green, info);
-					// console.log('## rules1:'.green, rules1);
-
-					// iterate
-					rules1.forEach(function (rule1) {
-						var rules2 = rule1.rules;
-						if (!rules2) return;				// todo? forEach on rule1?
-						rules2.forEach(function (rrules) {
-							if (!rrules.selectors) return;
-							rrules.selectors.forEach(function (s) {
-								var rule = s.filters.filters;
-								for (var r in rule) {
-									var jahrule = rule[r];
-									jah.push({
-										key : jahrule.key.value,
-										value : jahrule.val.value
-									});
-								}
-							});
-						});
-					});
-
-					console.log('## CRACK!'.green);
-
-					// add #layer
-					jah.push({
-						key : 'layer',
-						value : file.name
-					});
-
-					var result = {
-						rules : jah,
-						css : css
-					}
-
-					return callback(null, result);
-
-				// catch errros
-				} catch (e) { callback(e); }
-			});
-		});
-	},
 
 	
 
@@ -679,26 +580,38 @@ module.exports = api.layer = {
 
 
 	createModel : function (options, callback) {
-		console.log('api.layer.createModel'.yellow, options);
+
+		// metadata sometimes come as object... todo: check why!
+		if (typeof(options.metadata) == 'object') {
+			options.metadata = JSON.stringify(options.metadata);
+		}
 
 		var layer 		= new Layer();
-		layer.uuid 		= options.uuid;
+		layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),
 		layer.title 		= options.title;
 		layer.description 	= options.description || '';
 		layer.legend 		= options.legend || '';
 		layer.file 		= options.file;
 		layer.metadata 		= options.metadata;
+		layer.data 		= options.data;
+		layer.style 		= options.style;
 
-		if (options.data.geojson) layer.data.geojson = options.data.geojson;
-		if (options.data.raster)  layer.data.raster  = options.data.raster;
+		layer.save(function (err, savedLayer) {
+			if (err) return callback(err);
 
-		layer.save(function (err, doc) {
-			callback && callback(err, doc);
+			if (options.projectUuid) {
+				return api.layer.addToProject(layer._id, options.projectUuid, function (err) {
+					callback && callback(err, savedLayer);
+				});
+			}
+			
+			callback && callback(err, savedLayer);
 		});
 	},
 
 	// save file to project (file, layer, project id's)
 	addToProject : function (layer_id, projectUuid, callback) {
+
 		Project
 		.findOne({'uuid' : projectUuid })
 		.exec(function (err, project) {
@@ -715,22 +628,16 @@ module.exports = api.layer = {
 
 // systemapic hack
 carto.Renderer.prototype.getRules = function render(data) {
-	console.log('++++ YO!!'.green);
-    var env = _(this.env).defaults({
-        benchmark: true,
-        validation_data: false,
-        effects: []
-    });
+	var env = _(this.env).defaults({
+		benchmark: true,
+		validation_data: false,
+		effects: []
+	});
 
-    // console.log('env', this.env);
+	carto.tree.Reference.setVersion(this.options.mapnik_version);
 
-    // if (!carto.tree.Reference.setVersion(this.options.mapnik_version)) {
-    //     throw new Error("Could not set mapnik version to " + this.options.mapnik_version);
-    // }
-	console.log('++++ YO!! 2 '.green, data);
+	var parser = (carto.Parser(env)).parse(data);
 
-    var parser = (carto.Parser(env)).parse(data);
-	console.log('++++ YO!! 3'.green);
-    return parser;
+	return parser;
 }
 

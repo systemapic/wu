@@ -29,12 +29,12 @@ L.Control.Mouseposition = Wu.Control.extend({
 
         options: {
                 position: 'topright',
-                separator: ' : ',
+                separator: ',  ',
                 emptyString: 'Lat/Lng',
                 lngFirst: false,
-                numDigits: 5,
-                lngFormatter: undefined,
-                latFormatter: undefined,
+                numDigits: 3,
+                lngFormatter: this.formatNum,
+                latFormatter: this.formatNum,
                 prefix: "",
                 zoomLevel : true
         },
@@ -46,7 +46,7 @@ L.Control.Mouseposition = Wu.Control.extend({
                 this._hide();
         },
         _show : function () {
-                this._container.style.display = 'block';
+                this._container.style.display = 'inline-block';
         },
         _hide : function () {
                 this._container.style.display = 'none';
@@ -55,6 +55,7 @@ L.Control.Mouseposition = Wu.Control.extend({
         _addTo : function () {
                 this.addTo(app._map);
                 this._added = true;
+
         },
 
         _refresh : function () {
@@ -108,13 +109,35 @@ L.Control.Mouseposition = Wu.Control.extend({
         },
 
         _onMouseMove: function (e) {
-                var lng = this.options.lngFormatter ? this.options.lngFormatter(e.latlng.lng) : L.Util.formatNum(e.latlng.lng, this.options.numDigits);
-                var lat = this.options.latFormatter ? this.options.latFormatter(e.latlng.lat) : L.Util.formatNum(e.latlng.lat, this.options.numDigits);
+                // var lng = this.options.lngFormatter ? this.options.lngFormatter(e.latlng.lng) : L.Util.formatNum(e.latlng.lng, this.options.numDigits);
+                // var lat = this.options.latFormatter ? this.options.latFormatter(e.latlng.lat) : L.Util.formatNum(e.latlng.lat, this.options.numDigits);
+                
+                var lng = this.formatNum(e.latlng.lng, this.options.numDigits);
+                var lat = this.formatNum(e.latlng.lat, this.options.numDigits);
+
                 var value = this.options.lngFirst ? lng + this.options.separator + lat : lat + this.options.separator + lng;
                 var prefixAndValue = this.options.prefix + ' ' + value;
-                if (this.options.zoomLevel) prefixAndValue += ' | ' + this._zoom;
+                if (this.options.zoomLevel) prefixAndValue += ',  ' + this._zoom;
                 this._container.innerHTML = prefixAndValue;
-        }
+        },
+
+        formatNum : function (num, digits) {
+                // L.Util.formatNum
+                var pow = Math.pow(10, digits || 5);
+                var value = Math.round(num * pow) / pow;
+
+                // force num of digits (add 0's)
+                var splitValue = value.toString().split('.');
+                var d = splitValue[1];
+                if (!d) return '';
+                var diff = digits - d.length;
+                for (var x = 0; x < diff; x++) {
+                        d += '0';
+                } 
+                var enforced = splitValue[0] + '.' + d;
+                return enforced;
+
+        },
 
 });
 

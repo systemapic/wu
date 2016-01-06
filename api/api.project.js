@@ -2,7 +2,7 @@
 
 // database schemas
 var Project 	= require('../models/project');
-var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
+// var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
 var User  	= require('../models/user');
 var File 	= require('../models/file');
 var Layer 	= require('../models/layer');
@@ -42,6 +42,101 @@ var api = module.parent.exports;
 // exports
 module.exports = api.project = { 
 
+	
+
+
+	setAccess : function (req, res) {
+
+		var user = req.user;
+		var options = req.body;
+		var projectAccess = options.access;
+		var projectUuid = options.project;
+
+		if (!projectUuid || !projectAccess) return api.error.missingInformation(req, res);
+
+		Project
+		.findOne({uuid : projectUuid})
+		.exec(function (err, project) {
+
+			// check if access to edit
+			var canEdit = _.contains(project.access.edit, user.getUuid()) || (project.createdBy == user.getUuid() || user.isSuper());
+
+			if (!canEdit) return api.error.general(req, res, 'No access.');
+
+			var currentAccess = project.access;
+
+			// this._access = {
+			// 	read : [],
+			// 	edit : [],
+			// 	options : {
+			// 		share : true,
+			// 		download : true,
+			// 		isPublic : true
+			// 	}
+			// }
+
+			// todo: access restricitons!
+			// 1. can not remove self from edit
+			// 2. can not do shit if not editor (ok)
+			// 3. 
+
+			// set access, save
+			project.access = projectAccess;
+			project.save(function (err, p) {
+
+				// return if err
+				if (err) return res.json({
+					error : err
+				});
+
+				// return project
+				res.json(p);
+			})
+		})
+
+	},
+
+
+	addInvites : function (req, res) {
+
+
+		var user = req.user;
+		var options = req.body;
+		var access = options.access;
+		var projectUuid = options.project;
+
+		Project
+		.findOne({uuid : projectUuid})
+		.exec(function (err, project) {
+			if (err || !project) return res.json({
+				error : err || 'No such project.'
+			});
+
+
+			access.read.forEach(function (u) {
+
+				// add read (if not in edit)
+				if (!_.contains(project.access.edit, u)) {
+
+					project.access.read.addToSet(u);
+				} else {
+				}
+
+			});
+
+
+			project.save(function (err, updatedProject) {
+				if (err) return res.json({
+					error : err
+				});
+
+				// return updated access
+				res.json(updatedProject.access);
+			})
+			
+		});
+
+	},
 
 	// #########################################
 	// ###  API: Create Project              ###
@@ -49,31 +144,29 @@ module.exports = api.project = {
 	// createProject : function (req, res) {
 	create : function (req, res) {
 		var store = req.body,
-		    account = req.user,
+		    user = req.user,
 		    ops = [];
 
+
 		// return if missing info
-		if (!store) return api.error.missingInformation(req, res);
+		if (!store || !store.access || !store.name || !store.access.options) return api.error.missingInformation(req, res);
+
+		var isPublic = store.access.options.isPublic;
 
 		// check access
 		ops.push(function (callback) {
-			api.access.to.create_project({
-				user : account
-			}, callback);
-		});
+			
+			// if public, allowed to create project
+			if (isPublic) return callback(null);
 
-		// create role
-		ops.push(function (options, callback) {
-			api.access._createDefaultRoles({
-				user : account,
-			}, callback);
+			// check if user can create private project
+			user.canCreatePrivateProject() ? callback(null) : callback('No access.');
 		});
 
 		// create project
-		ops.push(function (roles, callback) {
+		ops.push(function (callback) {
 			api.project._create({
-				user : account,
-				roles : roles,
+				user : user,
 				store : store
 			}, callback);
 		});
@@ -85,16 +178,31 @@ module.exports = api.project = {
 			}, callback);
 		});
 
+		// add norkart layers
+		ops.push(function (project, callback) {
+			api.provider.norkart.setDefaults({
+				project : project
+			}, callback);
+		});
+
+		// add google layers
+		ops.push(function (project, callback) {
+			api.provider.google.setDefault({
+				project : project
+			}, callback);
+		});
+
 		// get updated project
 		ops.push(function (project, callback) {
 			Project
 			.findOne({uuid : project.uuid})
-			.exec(function (err, updatedProject) {
-				console.log('updatedProject:'.yellow, updatedProject);
+			.populate('layers')
+			.exec(callback);
+		});
 
-				if (err) return callback(err);
-				callback(null, updatedProject);
-			});
+		// set some default settings
+		ops.push(function (project, callback) {
+			api.project.setDefaults(project, callback);
 		});
 
 		// run ops
@@ -104,7 +212,7 @@ module.exports = api.project = {
 			// slack
 			api.slack.createdProject({
 				project : project, 
-				user : account
+				user : user
 			});
 
 			// return
@@ -112,19 +220,18 @@ module.exports = api.project = {
 		});
 	},
 
+	
 
 	_create : function (options, done) {
 		if (!options) return done('No options.');
 
 		var user = options.user,
-		    roles = options.roles,
 		    store = options.store,
 		    slug = crypto.randomBytes(3).toString('hex');
 		
-		if (!store || !user) return done('Missing information.8');
+		if (!user) return done('Missing information.8');
 
-
-		var projectName = 'Project ' + api.utils.getRandomName();
+		var projectName = store.name;
 		var projectSlug = api.utils.createNameSlug(projectName);
 
 		// create model
@@ -134,15 +241,10 @@ module.exports = api.project = {
 		project.createdByName   = user.firstName + ' ' + user.lastName;
 		project.slug 		= projectSlug;
 		project.name 		= projectName;
-		project.description 	= store.description;
-		project.keywords 	= store.keywords;
-		project.client 		= store.client;
-		project.position 	= store.position;
-
-		// add roles
-		roles.forEach(function (role) {
-			project.roles.addToSet(role._id);
-		});
+		project.description 	= store.description || '';
+		project.keywords 	= store.keywords || '';
+		project.position 	= store.position || api.project._getDefaultPosition(); // defaults
+		project.access 		= store.access;
 
 		// save
 		project.save(function (err, project, numAffected) { 	// major GOTCHA!!! product.save(function (err, product, numberAffected) 
@@ -151,15 +253,79 @@ module.exports = api.project = {
 	},
 
 
+	setDefaults : function (project, callback) {
+
+		// default layer 
+		var layer = _.find(project.layers, function (l) {
+
+			// mapbox, satellite, no labels
+			return l.data.mapbox == 'systemapic.kcjonn12';
+		});
+
+		var baseLayer = {
+			uuid : layer.uuid,
+			zIndex : 1,
+			opacity : 1
+		}
+
+		// set baselayer, save
+		project.baseLayers.push(baseLayer)
+		project.markModified('baseLayers');
+		project.save(callback);
+
+	},
+
+	_getDefaultPosition : function () {
+
+		var position = { 
+			lat: 54.213861000644926, 
+			lng: 6.767578125, 
+			zoom: 4
+		}
+
+		return position;
+	},
+
+	_getDefaultBounds : function () {
+		var bounds = {
+				northEast : {
+					lat : 0,
+					lng : 0
+				},
+				southWest : {
+					lat : 0,
+					lng : 0
+				},
+				minZoom : 1,
+				maxZoom : 22
+			};
+
+		return bounds;
+	},
+
+
+	_getProjectByUuid : function (projectUuid, done) {
+		Project
+		.find({uuid : projectUuid})
+		.populate('files')
+		.populate('roles')
+		.populate('layers')
+		.exec(done);
+	},
+
+	_getProjectsByUserUuid : function (userUuid, done) {
+
+
+	},
+
 	// #########################################
 	// ###  API: Delete Project              ###
 	// #########################################
 	deleteProject : function (req, res) {
 		if (!req.body) return api.error.missingInformation(req, res);
 
-		var account     = req.user,
-		    clientUuid 	= req.body.clientUuid,
-		    projectUuid = req.body.projectUuid;
+		var user = req.user;
+		var projectUuid = req.body.projectUuid;
 
 		var ops = [];
 
@@ -171,16 +337,19 @@ module.exports = api.project = {
 		});
 
 		ops.push(function (project, callback) {
-			api.access.to.delete_project({
-				user : account, 
-				project : project
-			}, callback);
+			// api.access.to.delete_project({
+			// 	user : account, 
+			// 	project : project
+			// }, callback);
+
+			(project.createdBy == user.getUuid() || user.isSuper()) ? callback(null, project) : callback('No access.');
+
 		});
 
-		ops.push(function (options, callback) {
-			if (!options || !options.project) return callback('No project.');
+		ops.push(function (project, callback) {
+			if (!project) return callback('No project.');
 
-			options.project.remove(callback);
+			project.remove(callback);
 		});
 
 		async.waterfall(ops, function (err, project) {
@@ -189,7 +358,7 @@ module.exports = api.project = {
 			// slack
 			api.slack.deletedProject({
 				project : project,
-				user : account
+				user : user
 			});
 
 			// done
@@ -206,12 +375,9 @@ module.exports = api.project = {
 	update : function (req, res) {
 		if (!req.body) return api.error.missingInformation(req, res);
 		
-		var account = req.user,
+		var user = req.user,
 		    projectUuid = req.body.uuid,
 		    ops = [];
-
-		console.log('Updating project.'.yellow);
-		// console.log('body: ', req.body);
 
 		// return on missing
 		if (!projectUuid) return api.error.missingInformation(req, res);
@@ -219,20 +385,23 @@ module.exports = api.project = {
 		ops.push(function (callback) {
 			Project
 			.findOne({uuid : projectUuid})
-			.populate('roles')
 			.exec(callback);
 		});
 
 		ops.push(function (project, callback) {
-			api.access.to.edit_project({
-				user : account,
-				project : project
-			}, callback);
+
+			var hashedUser = user.getUuid(); // todo: use actual hash
+
+			// can edit if on edit list or created project 
+			var canEdit = _.contains(project.access.edit, hashedUser) || (project.createdBy == user.getUuid() || user.isSuper());
+
+			// continue if canEdit
+			canEdit ? callback(null, project) : callback('No access.');
 		});
 
-		ops.push(function (options, callback) {
+		ops.push(function (project, callback) {
 			api.project._update({
-				project : options.project,
+				project : project,
 				options : req.body
 			}, callback);
 		});
@@ -273,7 +442,8 @@ module.exports = api.project = {
 			'settings',
 			'categories',
 			'thumbCreated',
-			'state'
+			'state',
+			'pending'
 		];
 
  		// enqueue queries for valid fields
@@ -305,12 +475,12 @@ module.exports = api.project = {
 			project[field] = options[field];
 			project.markModified(field);
 			project.save(function (err, doc) {
-				console.log('saved?!'.red, err);
-				callback(err, doc);
+				callback(null, doc);
 			});
 		};
 		return queries;
 	},
+
 
 
 	// #########################################
@@ -319,30 +489,36 @@ module.exports = api.project = {
 	checkUniqueSlug : function (req, res) {
 		if (!req.body) return api.error.general(req, res);
 
-		var value = req.body.value,
-		    clientUuid = req.body.client,
-		    projectUuid = req.body.project,
-		    slugs = [];
+		// debug: let's say all slugs are OK - and not actually use slugs for anything but cosmetics
+		// return results
+		return res.end(JSON.stringify({
+			unique : true
+		}));
 
-		Project
-		.find({client : clientUuid})
-		.exec(function (err, projects) {
-			if (err) return api.error.general(req, res, err);
+		// var value = req.body.value,
+		//     clientUuid = req.body.client,
+		//     projectUuid = req.body.project,
+		//     slugs = [];
 
-			// get slugs
-			projects.forEach(function (p) {
-				// add but self
-				if (p.uuid != projectUuid) slugs.push(p.slug.toLowerCase());
-			});
+		// Project
+		// .find({client : clientUuid})
+		// .exec(function (err, projects) {
+		// 	if (err) return api.error.general(req, res, err);
 
-			// check if slug already exists
-			var unique = !(slugs.indexOf(value.toLowerCase()) > -1);
+		// 	// get slugs
+		// 	projects.forEach(function (p) {
+		// 		// add but self
+		// 		if (p.uuid != projectUuid) slugs.push(p.slug.toLowerCase());
+		// 	});
 
-			// return results
-			res.end(JSON.stringify({
-				unique : unique
-			}));
-		});
+		// 	// check if slug already exists
+		// 	var unique = !(slugs.indexOf(value.toLowerCase()) > -1);
+
+		// 	// return results
+		// 	res.end(JSON.stringify({
+		// 		unique : unique
+		// 	}));
+		// });
 	},
 
 	_returnProject : function (req, res, project, err) {
@@ -354,8 +530,6 @@ module.exports = api.project = {
 		.populate('layers')
 		.populate('roles')
 		.exec(function (err, project) {
-			console.log('##########'.cyan);
-			console.log('returning project: '.cyan, project);
 			res.end(JSON.stringify({
 				error : err,
 				project: project
@@ -421,32 +595,47 @@ module.exports = api.project = {
 		.exec(function (err, project) {
 			project.state = hashId;
 			project.save(function (err, doc) {
-				console.log('saved state!');
 			});
 		});
 
 	},
-
 
 	getAll : function (options, done) {
 		if (!options) return done('No options.');
 
 		var user = options.user;
 
-		// check if admin
-		api.access.is.admin({
-			user : user
-		}, function (err, isAdmin) {
+		var hashedUser = crypto.createHash('sha256').update(user.getUuid()).digest("hex");
 
-			// not admin, get all users manually
-			if (err || !isAdmin) return api.project._getAllFiltered(options, done);
-			
-			// is admin, get all
-			api.project._getAll(options, done);
-		});
+		var hashedUser = user.getUuid(); // todo: hash user ids
+
+		// if phantomjs bot
+		if (user.isBot() || user.isSuper()) {
+			Project
+			.find()
+			.populate('files')
+			.populate('roles')
+			.populate('layers')
+			.exec(done);
+
+			return;
+		}
+
+		// get all projects where user is in access.edit or access.read
+		Project
+		.find()
+		.or([	{'access.edit' : hashedUser },
+			{'access.read' : hashedUser },
+			{'createdBy' : hashedUser}
+		])
+		.populate('files')
+		.populate('roles')
+		.populate('layers')
+		.exec(done);
 	},
 
-	_getAll : function (options, done) {
+
+	_getAll : function (done) {
 		Project
 		.find()
 		.populate('files')
@@ -456,8 +645,39 @@ module.exports = api.project = {
 	},
 
 
+	_getProjectByUserUuidAndCapability : function (userUuid, capability, done) {
+		// get all roles with user as read_project
+		var cap_filter = 'capabilities.' + capability,
+		    roleIds = [];
+
+		Role
+		.find({ members : userUuid })
+		.where(cap_filter, true)
+		.exec(function (err, roles) {
+			if (err) return done(err);
+
+			// push role id's to array
+			roles.forEach(function (role) { roleIds.push(role._id); });
+
+			Project
+			.findOne({roles : { $in : roleIds }})
+			.populate('files')
+			.populate('roles')
+			.populate('layers')
+			.exec(function (err, project) {
+				if (err) return done(err);
+				if (!project) return done('No project found.');
+				
+				// success
+				done(null, project);
+			});
+		});
+	},
+
+
 	_getAllFiltered : function (options, done) {
 		if (!options) return done('No options.');
+
 
 		var user = options.user,
 		    filter = options.cap_filter || 'read_project',

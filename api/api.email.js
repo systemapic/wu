@@ -44,6 +44,8 @@ module.exports = api.email = {
 
 	_send : function (options) {
 
+		// console.log('_send email'.green, options);
+
 		// hook up to gmail
 		var transporter = nodemailer.createTransport(api.config.nodemailer);
 
@@ -54,7 +56,7 @@ module.exports = api.email = {
 		options.from = options.from || api.config.nodemailer.from;
 
 		// overwrite to // debug
-		options.to = 'knutole@noerd.biz';
+		// options.to = 'knutole@noerd.biz';
 
 		// send email
 		transporter.sendMail(options);
@@ -67,43 +69,256 @@ module.exports = api.email = {
 		// 	html    : body
 		// }
 
-		console.log('Sent email!'.yellow, options);
+		console.log('Sent email!'.yellow);
 	},
 
 
 	sendPasswordResetEmail : function (user) {
 		if (!user) return;
-
+		
+		//api.user.js
+		// var inviter = req.user.firstName + req.user.lastName;
 		// todo: SSL
-		var name    = user.firstName + ' ' + user.lastName;
-		var email   = user.local.email;
-		var token   = api.access.setPasswordResetToken(user);
-		var link    = api.config.portalServer.uri + 'reset?email=' + email + '&token=' + token;
 
-		var to      = email;
-		var subject = 'Please confirm your request for a password reset';
-		var body    = '<div style="background-color: #f8f8f8; padding: 0; margin: 0; font-family: helvetica neue, helvetica, \'Open Sans\'; position: relative; top: 0; left: 0;width: 100%; height: 100%; padding-top: 100px;"><div style="width: 500px; margin: auto; background-color: white; border-radius: 20px; padding: 20px; color: #3f4652; position: relative; margin-bottom: 25px;"><div style="text-align: center;background: white;width: 140px;min-height: 140px;border-radius: 100px;position: relative;top: 0;margin: auto;"><img style="position: relative; top: 10px;" src="http://systemapic.com/logo/Just_Circle/120x120/grayDark-systemapic-logo-circle-120x120.png"></div><h1 style="font-weight: 500;font-size: 36px;text-align: center;margin: 0;">Hello ' + name + '</h1><div style="border-top: 1px dashed #3f4652;margin-top: 40px;margin-bottom: 40px;opacity: 0.15;"></div><h4 style="font-size: 17px;padding: 0;margin: 5px;margin-bottom: 20px;line-height: 1.4;">You have requested a password reset.</h4><h5 style="font-size: 14px; padding: 0; margin: 5px;">Reset your password by clicking this link: <br><a style="color: #4a89f7; text-decoration: none; href="link">' + link + '</a></h5><div style="border-top: 1px dashed #3f4652;margin-top: 40px;margin-bottom: 30px;opacity: 0.15;"></div><div style="font-size: 13px;line-height: 1.3;font-style: italic;padding-bottom: 20px;opacity: 0.5;">The link is valid for ten minutes. If you think you have received this email in error, no further action is required.<br></div></div><div style="left: 0;font-size: 12px;font-style: italic;width: 100%;text-align: center; margin-bottom: 100px; padding-bottom: 100px;"><a style="text-decoration: none; color: #3f4652;" href="mailto:info@systemapic.com">info@systemapic.com</a> ~ <a style="text-decoration: none; color:#3f4652;" href="http:/systemapic.com">Systemapic.com</a> &copy;</div></div>';		
+		var name           = user.firstName + ' ' + user.lastName;
+		var email          = user.getEmail();
+		var token          = api.auth.setPasswordResetToken(user);
+		var link           = api.config.portalServer.uri + 'reset?token=' + token + '&email=' + email;
+		var to             = email;
+		var subject        = 'Please confirm your request for a password reset';
+
+		var logo = api.config.portalServer.uri + api.config.mail.portal.logo;
+		var bgcolor = api.config.mail.portal.color;
+
+		var body 	= '<script type="application/ld+json">';
+			body 	+= '{';
+			body 	+= '"@context":       "http://schema.org",';
+			body	+= '"@type":          "EmailMessage",';
+			body 	+= '"description":    "You have requested a password reset for Systemapic.com. Reset your password now!",';
+			body 	+= '"potentialAction": {';
+			body 	+= '"@type": "ViewAction",';
+			body 	+= '"target":   "https://dev.systemapic.com/login",';
+			body	+= '"name": "Reset Password"';
+			body 	+= '},';
+			body 	+= '"publisher": ';
+			body 	+= '{';
+			body 	+= '"@type": "Organization",';
+			body 	+= '"name": "Systemapic",';
+			body 	+= '"url": "https://systemapic.com"';
+			body 	+= '}';
+			body 	+= '}';
+			body	+= '</script>';
+			body    +=  '<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">';
+		    body    +=  '<tr>';
+		    body    +=  '<td bgcolor="' + bgcolor + '" >';
+		    body    +=  '<div align="center" style="padding: 0px 10px 0px 10px;">';
+		    body    +=  '<table border="0" cellpadding="0" cellspacing="0" width="500" class="wrapper">';
+		    body    +=  '<tr>';
+		    body    +=  '<td style="padding: 10px 0px 10px 0px;" class="logo">';
+		    body    +=  '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
+		    body    +=  '<tr>';
+		    body    +=  '<td width="100" align="center"><a href="http://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
+		    body    +=  '</tr>';
+			body    +=  '</table>';
+			body    +=  '</td>';
+		    body    +=  '</tr>';
+			body    +=  '</table>';
+			body    +=  '</div>';
+			body    +=  '</td>';
+		    body    +=  '</tr>';
+			body    +=  '</table>';
+			body    +=  '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
+		    body    +=  '<tr bgcolor="#EBEAE8">';
+			body    +=  '<td align="center" style="padding: 30px 15px 30px 15px;" class="section-padding">';
+		    body    +=  '<table border="0" cellpadding="0" cellspacing="0" width="500">';
+			body    +=  '<tr>';
+			body    +=  '<td bgcolor="#FFFFFF" style="border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;">';
+			body    +=  '<table width="100%" border="0" cellspacing="0" cellpadding="0">';
+			body    +=  '<tr>';
+			body    +=  '<td>';
+			body    +=  '<table width="100%" border="0" cellspacing="0" cellpadding="10" align = "center">';
+			body    +=  '<tr>';
+			body    +=  '<td align="center" style="font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; padding: 15px 0px 0px 0px; text-align:center"><span style="font-size: 24px;">Dear ' + name + '</span></td>';
+			body    +=  '</tr>';
+			body    +=  '<tr>';
+			body    +=  '<td align="center" style="font-size: 16px; padding: 25px 0px 0px 0px;  line-height: 25px; font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; text-align: center;">You have requested a password reset. <br/> Click the button below to create your new password.</td>';
+			body    +=  '</tr>';
+			body    +=  '</table>';
+			body    +=  '</td>';
+			body    +=  '</tr>';
+			body    +=  '<tr>';
+			body    +=  '<td align="center">';
+			body    +=  '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="mobile-button-container">';
+			body    +=  '<tr>';
+			body    +=  '<td align="center" style="padding: 15px 0 0 0;" class="padding-copy">';
+			body    +=  '<table border="0" cellspacing="0" cellpadding="10" class="responsive-table">';
+			body    +=  '<tr>';
+			body    +=  '<td align="center" style="padding-bottom:25px;">';
+			body    +=  '<a href="' + link + '" target="_blank" style="font-size: 16px; font-family: Helvetica Neue, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px; background-color: #3f4652; border-top: 15px solid #3f4652; border-bottom: 15px solid #3f4652; border-right: 25px solid #3f4652; border-left: 25px solid #3f4652;display: inline-block;" class="on-the-fly-behavior"> Reset Password &rarr;</a>';
+			body    +=  '</td>';
+			body    +=  '</tr>';
+			body    +=  '<tr>';
+			body    +=  '<td align="center" style="padding: 0px 0px 25px 0px; font-size: 14px; line-height: 20px; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #313640;"><span style="font-style: italic;">';
+			body    +=  'The link is valid for ten minutes. <br/> If you think you have received this email in error, <br/>no further action is required.';
+			body    +=  '</span>';
+		    body    +=  '</td>';
+			body    +=  '</tr>';
+			body    +=  '</table>';
+			body    +=  '</td>';
+			body    +=  '</tr>';
+			body    +=  '</table>';
+		    body    +=  '</td>';
+		    body    +=  '</tr>';
+			body    +=  '</table>';
+			body    +=  '</td>';
+			body    +=  '</tr>';
+		    body    +=  '</table>';
+		   	body    +=  '</td>';
+		    body    +=  '</tr>';
+			body    +=  '</table>';
+			body    +=  '<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">';
+		    body    +=  '<tr bgcolor="#EBEAE8">';
+		    body    +=  '<td align="center">';
+			body    +=  '<table width="500" border="0" cellspacing="0" cellpadding="10" align="center" class="responsive-table">';
+			body    +=  '<tr>';
+		    body    +=  '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
+			body    +=  '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a><br>';
+			body    +=  '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a>';
+			body    +=  '</td>';
+			body    +=  '</tr>';
+			body    +=  '</table>';
+			body    +=  '</td>';
+		    body    +=  '</tr>';
+			body    +=  '</table>';
+
 
 		// send email
 		api.email._send({
 			to : to,
-			body : body,
+			html : body,
 			subject : subject
 		});
-
 
 	},
 
 
-	sendWelcomeEmail : function (newUser, password) {
+	sendWelcomeEmail : function (newUser, password, account) {
 		if (!newUser || !newUser.local) return;
 
 		// todo: SSL
-		var name    = newUser.firstName + ' ' + newUser.lastName;
-		var email   = newUser.local.email;
+		var name = newUser.firstName + ' ' + newUser.lastName;
+		var email = newUser.local.email;
+		var domain = api.config.portalServer.uri.split('/')[2];
+		var token = api.auth.setNewLoginToken(newUser);
+		var link = api.config.portalServer.uri + 'login?token=' + token;
+		var fullname = account.firstName  + ' ' + account.lastName;
+		
+		var logo = api.config.portalServer.uri + api.config.mail.portal.logo;
+		var bgcolor = api.config.mail.portal.color;
+
 
 		// email body
-		var body    = '<div style="background-color: #f8f8f8; padding: 0; margin: 0; font-family: helvetica neue, helvetica, \'Open Sans\'; position: relative; top: 0; left: 0;width: 100%; height: 100%; padding-top: 100px;"><div style="width: 500px; margin: auto; background-color: white; border-radius: 20px; padding: 20px; color: #3f4652; position: relative; margin-bottom: 25px;"><div style="text-align: center;background: white;width: 140px;min-height: 140px;border-radius: 100px;position: relative;top: 0;margin: auto;"><img style="position: relative; top: 10px;" src="http://systemapic.com/logo/Just_Circle/120x120/grayDark-systemapic-logo-circle-120x120.png">	</div><h1 style="font-weight: 500;font-size: 23px;text-align: center;margin: 10px;">Welcome to <a href="http://systemapic.com" style="text-decoration: none; color: #3f4652">Systemapic.com</a></h1><h1 style="font-weight: 500;font-size: 36px;text-align: center;margin: 0;">' + name + '</h1><div style="border-top: 1px dashed #3f4652;margin-top: 40px;margin-bottom: 40px;opacity: 0.15;"></div><h4 style="font-size: 17px;padding: 0;margin: 5px;margin-bottom: 20px;line-height: 1.4;">You can now log into <a style="text-decoration: none; color: #4a89f7" href="https://maps.systemapic.com">maps.systemapic.com</a> with the following details:</h4><h5 style="font-size: 14px; padding: 0; margin: 5px;">Username: <a style="color: #4a89f7; text-decoration: none; href="#">' + email + '</a></h5><h5 style="font-size: 14px; padding: 0; margin: 5px;">Password: <span style="color: #4a89f7">' + password + '</span></h5><div style="border-top: 1px dashed #3f4652;margin-top: 40px;margin-bottom: 30px;opacity: 0.15;"></div><div style="font-size: 13px;line-height: 1.3;font-style: italic;padding-bottom: 20px;opacity: 0.5;">Keep your password stored in a safe place. <br>For security reasons, you may not change your password.<br></div></div><div style="left: 0;font-size: 12px;font-style: italic;width: 100%;text-align: center; margin-bottom: 100px; padding-bottom: 100px;"><a style="text-decoration: none; color: #3f4652;" href="mailto:info@systemapic.com">info@systemapic.com</a> ~ <a style="text-decoration: none; color:#3f4652;" href="http:/systemapic.com">Systemapic.com</a> &copy;</div></div>';
+		var body  = '<script type="application/ld+json">';
+			body  += '{';
+			body  += '"@context":       "http://schema.org",';
+			body  += '"@type":          "EmailMessage",';
+			body  += '"description":    "Welcome to Systemapic, view your account now!",';
+			body  += '"potentialAction": {';
+			body  += '"@type": "ViewAction",';
+			body  += '"target":   "https://dev.systemapic.com/login",';
+			body  += '"name": "View your account"';
+			body  += '},';
+			body  += '"publisher": ';
+			body  += '{';
+			body  += '"@type": "Organization",';
+			body  += '"name": "Systemapic",';
+			body  += '"url": "https://systemapic.com"';
+			body  += '}';
+			body  += '}';
+			body  += '</script>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">';
+		    body += '<tr>';
+	        body += '<td bgcolor="' + bgcolor + '" >';
+			body += '<div align="center" style="padding: 0px 10px 0px 10px;">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="500" class="wrapper">';
+			body += '<tr>';
+			body += '<td style="padding: 10px 0px 10px 0px;" class="logo">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
+			body += '<tr>';
+			body += '<td width="100" align="center"><a href="http://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</div>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
+		    body += '<tr bgcolor="#EBEAE8">';
+			body += '<td align="center" style="padding: 30px 15px 30px 15px;" class="section-padding">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="500">';
+			body += '<tr>';
+			body += '<td bgcolor="#FFFFFF" style="border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;">';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="0">';
+			body += '<tr>';
+			body += '<td>';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="10">';
+			body += '<tr>';
+			body += '<td align="center" style="font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; padding: 15px 0px 0px 0px; text-align:center"><span style="font-size: 24px;">Dear ' + name + '</span></td>';
+			body += '</tr>';
+			body += '<tr>';
+			body += '<td align="center" style="font-size: 16px; padding: 25px 0px 0px 0px;  line-height: 25px; font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; text-align: center;">Welcome to Systemapic.com<br/>You have been invited by ' + fullname + '.<br/> Click the button below to log in and create your own password.</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+	        body += '<tr>';
+			body += '<td align="center">';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="mobile-button-container">';
+			body += '<tr>';
+			body += '<td align="center" style="padding: 15px 0 0 0;" class="padding-copy">';
+			body += '<table border="0" cellspacing="0" cellpadding="10" class="responsive-table">';
+			body += '<tr>';
+			body += '<td align="center" style="padding-bottom:25px;">';
+			body += '<a href="' + link + '" target="_blank" style="font-size: 16px; font-family: Helvetica Neue, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px; background-color: #3f4652; border-top: 15px solid #3f4652; border-bottom: 15px solid #3f4652; border-right: 25px solid #3f4652; border-left: 25px solid #3f4652; display: inline-block;"> Login &rarr;</a>';
+			body += '</td>';
+			body += '</tr>';
+			body += '<tr>';
+			body += '<td align="center" style="padding: 0px 0px 25px 0px; font-size: 14px; line-height: 20px; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #313640;"><span style="font-style: italic;">';
+			body += 'If you think you have received this email in error, <br>no further action is required.';
+			body += '</span>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">';
+		    body += '<tr bgcolor="#EBEAE8">';
+			body += '<td align="center">';
+			body += '<table width="500" border="0" cellspacing="0" cellpadding="10" align="center" class="responsive-table">';
+			body += '<tr>';
+			body += '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
+			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a><br>';
+			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+
 
 		// send email
 		api.email._send({
@@ -114,25 +329,566 @@ module.exports = api.email = {
 	},
 
 
-	sendConfirmPasswordChange : function (newUser, password) {
-		if (!newUser || !newUser.local) return;
-		
-		// todo: SSL
-		var name    = newUser.firstName + ' ' + newUser.lastName;
-		var email   = newUser.local.email;
+	sendInvitedEmail : function (options) {
 
-		var from    = 'Systemapic.com <knutole@noerd.biz>';
-		var to      = email;
-		var body    = '<h1>Welcome to Systemapic.com ' + name + '</h1><br><h3>Login to <a href="http://systemapic.com" target="_blank">Systemapic.com</a> with the following details:</h3><br>Username: ' + email + ' <br>Password: ' + password;
-		var subject = 'Congratulations! Here are your access details for Systemapic.com';
-		var bcc     = ['knutole@noerd.biz']; // todo: add admins, superadmins to bcc
+		var email = options.email,
+		    name = options.name,
+		    project_name = options.project_name, 
+		    customMessage = options.customMessage;
+
+		if (!email) return;
+
+
+		
+		// get template
+		var template = api.config.mail.templates.invited;
+		var title = template.title;
+		var subject = template.subject;
+		var messageBody = template.body;
+		var button_text = template.button_text;
+
+		// vars
+		var portal = api.config.portalServer.uri;
+		var button_link = portal + 'login';
+	
+		// replace
+		messageBody = messageBody.replace('[name]', name);
+		messageBody = messageBody.replace('[project_name]', project_name);
+
+		var logo = api.config.portalServer.uri + api.config.mail.portal.logo;
+		var bgcolor = api.config.mail.portal.color;
+
+		// email body
+		var body  = '<script type="application/ld+json">';
+			body  += '{';
+			body  += '"@context":       "http://schema.org",';
+			body  += '"@type":          "EmailMessage",';
+			body  += '"description":    "Welcome to Systemapic",';
+			body  += '"potentialAction": {';
+			body  += '"@type": "ViewAction",';
+			body  += '"target":   "http://systemapic.com/",';
+			body  += '"name": "Your access details for Systemapic"';
+			body  += '},';
+			body  += '"publisher": ';
+			body  += '{';
+			body  += '"@type": "Organization",';
+			body  += '"name": "Systemapic",';
+			body  += '"url": "http://systemapic.com"';
+			body  += '}';
+			body  += '}';
+			body  += '</script>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">';
+		    body += '<tr>';
+	        body += '<td bgcolor="' + bgcolor + '" >';
+			body += '<div align="center" style="padding: 0px 10px 0px 10px;">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="500" class="wrapper">';
+			body += '<tr>';
+			body += '<td style="padding: 10px 0px 10px 0px;" class="logo">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
+			body += '<tr>';
+			body += '<td width="100" align="center"><a href="http://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</div>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
+		    body += '<tr bgcolor="#EBEAE8">';
+			body += '<td align="center" style="padding: 30px 15px 30px 15px;" class="section-padding">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="500">';
+			body += '<tr>';
+			body += '<td bgcolor="#FFFFFF" style="border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;">';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="0">';
+			body += '<tr>';
+			body += '<td>';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="10">';
+			body += '<tr>';
+			body += '<td align="center" style="font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; padding: 15px; text-align:center"><span style="font-size: 24px;">' + title + '</span></td>';
+			body += '</tr>';
+			body += '<tr>';
+			body += '<td align="center" style="font-size: 16px; padding: 25px 25px 0px 25px;  line-height: 25px; font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; text-align: center;">' + messageBody + '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+	        body += '<tr>';
+			body += '<td align="center">';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="mobile-button-container">';
+			body += '<tr>';
+			body += '<td align="center" style="padding: 15px 0 0 0;" class="padding-copy">';
+			body += '<table border="0" cellspacing="0" cellpadding="10" class="responsive-table">';
+			body += '<tr>';
+			body += '<td align="center" style="padding-bottom:25px;">';
+			body += '<a href="' + button_link + '" target="_blank" style="font-size: 16px; font-family: Helvetica Neue, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px; background-color: #3f4652; border-top: 15px solid #3f4652; border-bottom: 15px solid #3f4652; border-right: 25px solid #3f4652; border-left: 25px solid #3f4652; display: inline-block;"> ' + button_text + '</a>';
+			body += '</td>';
+			body += '</tr>';
+		body += '<tr>';
+			body += '<td align="center" style="padding: 0px 0px 25px 0px; font-size: 12px; line-height: 20px; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #313640;"><span style="font-style: italic;">';
+			body += 'If you think you have received this email in error, <br>no further action is required.';
+			body += '</span>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">';
+		    body += '<tr bgcolor="#EBEAE8">';
+			body += '<td align="center">';
+			body += '<table width="500" border="0" cellspacing="0" cellpadding="10" align="center" class="responsive-table">';
+			body += '<tr>';
+			body += '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
+			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a><br>';
+			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+
 
 		// send email
 		api.email._send({
-			to : to,
-			body : body,
-			subject : subject
+			to      : email,	
+			subject : subject,
+			html    : body
 		});
 	},
+
+
+	// from access_v2
+	sendInviteEmail : function (options) {
+
+		var email = options.email,
+		    customMessage = options.customMessage,
+		    numProjects = options.numProjects,
+		    invite_link = options.invite_link,
+		    invited_by = options.invited_by;
+
+		if (!email) return;
+
+
+		
+		// get template
+		var template = api.config.mail.templates.invited;
+		var title = template.title;
+		var subject = template.subject;
+		var messageBody = template.body;
+		var button_text = template.button_text;
+
+		// vars
+		var button_link = invite_link;
+	
+		// replace
+		messageBody = messageBody.replace('[inviter_name]', invited_by);
+
+		if (customMessage.length) {
+			messageBody += '<br><br><div style="border: 2px solid #ebeae8; padding: 10px; padding-left: 30px;border-radius: 10px; text-align: left; font-size: 15px; font-style: italic;">Message:<br>';
+			messageBody += customMessage + '</div>'
+		}
+
+		var logo = api.config.portalServer.uri + api.config.mail.portal.logo;
+		var bgcolor = api.config.mail.portal.color;
+
+		// email body
+		var body  = '<script type="application/ld+json">';
+			body  += '{';
+			body  += '"@context":       "http://schema.org",';
+			body  += '"@type":          "EmailMessage",';
+			body  += '"description":    "Welcome to Systemapic",';
+			body  += '"potentialAction": {';
+			body  += '"@type": "ViewAction",';
+			body  += '"target":   "http://systemapic.com/",';
+			body  += '"name": "Your access details for Systemapic"';
+			body  += '},';
+			body  += '"publisher": ';
+			body  += '{';
+			body  += '"@type": "Organization",';
+			body  += '"name": "Systemapic",';
+			body  += '"url": "http://systemapic.com"';
+			body  += '}';
+			body  += '}';
+			body  += '</script>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">';
+		    body += '<tr>';
+	        body += '<td bgcolor="' + bgcolor + '" >';
+			body += '<div align="center" style="padding: 0px 10px 0px 10px;">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="500" class="wrapper">';
+			body += '<tr>';
+			body += '<td style="padding: 10px 0px 10px 0px;" class="logo">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
+			body += '<tr>';
+			body += '<td width="100" align="center"><a href="http://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</div>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
+		    body += '<tr bgcolor="#EBEAE8">';
+			body += '<td align="center" style="padding: 30px 15px 30px 15px;" class="section-padding">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="500">';
+			body += '<tr>';
+			body += '<td bgcolor="#FFFFFF" style="border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;">';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="0">';
+			body += '<tr>';
+			body += '<td>';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="10">';
+			body += '<tr>';
+			body += '<td align="center" style="font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; padding: 15px; text-align:center"><span style="font-size: 24px;">' + title + '</span></td>';
+			body += '</tr>';
+			body += '<tr>';
+			body += '<td align="center" style="font-size: 16px; padding: 25px 25px 0px 25px;  line-height: 25px; font-family:  \'Open Sans\', Helvetica Neue, helvetica; color: #333333; text-align: center;">' + messageBody + '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+	        body += '<tr>';
+			body += '<td align="center">';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="mobile-button-container">';
+			body += '<tr>';
+			body += '<td align="center" style="padding: 15px 0 0 0;" class="padding-copy">';
+			body += '<table border="0" cellspacing="0" cellpadding="10" class="responsive-table">';
+			body += '<tr>';
+			body += '<td align="center" style="padding-bottom:25px;">';
+			body += '<a href="' + button_link + '" target="_blank" style="font-size: 16px; font-family: \'Open Sans\', Helvetica Neue, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px; background-color: #3f4652; border-top: 15px solid #3f4652; border-bottom: 15px solid #3f4652; border-right: 25px solid #3f4652; border-left: 25px solid #3f4652; display: inline-block;"> ' + button_text + '</a>';
+			body += '</td>';
+			body += '</tr>';
+		body += '<tr>';
+			body += '<td align="center" style="padding: 0px 0px 25px 0px; font-size: 12px; line-height: 20px; font-family: \'Open Sans\', helvetica neue, helvetica; color: #313640;"><span style="font-style: italic;">';
+			body += 'If you think you have received this email in error, <br>no further action is required.';
+			body += '</span>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">';
+		    body += '<tr bgcolor="#EBEAE8">';
+			body += '<td align="center">';
+			body += '<table width="500" border="0" cellspacing="0" cellpadding="10" align="center" class="responsive-table">';
+			body += '<tr>';
+			body += '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
+			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a><br>';
+			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+
+
+		// send email
+		api.email._send({
+			to      : email,	
+			subject : subject,
+			html    : body
+		});
+	},
+
+
+
+	sendJoinBetaMail : function (email) {
+		
+		if (!email) return;
+
+
+		var title          = 'Thank you!';
+		var subject        = 'Systemapic Beta: Early Access Mailing List';
+		var subtitle       = 'You have been signed up for the Systemapic Beta: Early Access mailing list. We will contact you as soon as we have available slots!<br><br>In the meantime, feel free to read our blog and follow our progress:';
+		var link           = 'http://systemapic.com/blog';
+		var link_text      = 'Systemapic Blog';
+
+		var logo = api.config.portalServer.uri + api.config.mail.systemapic.logo;
+		var bgcolor = api.config.mail.systemapic.color;
+
+		// email body
+		var body  = '<script type="application/ld+json">';
+			body  += '{';
+			body  += '"@context":       "http://schema.org",';
+			body  += '"@type":          "EmailMessage",';
+			body  += '"description":    "Welcome to Systemapic Beta Mailing List",';
+			body  += '"potentialAction": {';
+			body  += '"@type": "ViewAction",';
+			body  += '"target":   "http://systemapic.com/",';
+			body  += '"name": "Join Beta Mailing List"';
+			body  += '},';
+			body  += '"publisher": ';
+			body  += '{';
+			body  += '"@type": "Organization",';
+			body  += '"name": "Systemapic",';
+			body  += '"url": "http://systemapic.com"';
+			body  += '}';
+			body  += '}';
+			body  += '</script>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">';
+		    body += '<tr>';
+	        body += '<td bgcolor="' + bgcolor + '" >';
+			body += '<div align="center" style="padding: 0px 10px 0px 10px;">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="500" class="wrapper">';
+			body += '<tr>';
+			body += '<td style="padding: 10px 0px 10px 0px;" class="logo">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
+			body += '<tr>';
+			body += '<td width="100" align="center"><a href="http://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</div>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
+		    body += '<tr bgcolor="#EBEAE8">';
+			body += '<td align="center" style="padding: 30px 15px 30px 15px;" class="section-padding">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="500">';
+			body += '<tr>';
+			body += '<td bgcolor="#FFFFFF" style="border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;">';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="0">';
+			body += '<tr>';
+			body += '<td>';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="10">';
+			body += '<tr>';
+			body += '<td align="center" style="font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; padding: 15px; text-align:center"><span style="font-size: 24px;">' + title + '</span></td>';
+			body += '</tr>';
+			body += '<tr>';
+			body += '<td align="center" style="font-size: 16px; padding: 25px 25px 0px 25px;  line-height: 25px; font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; text-align: center;">' + subtitle + '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+	        body += '<tr>';
+			body += '<td align="center">';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="mobile-button-container">';
+			body += '<tr>';
+			body += '<td align="center" style="padding: 15px 0 0 0;" class="padding-copy">';
+			body += '<table border="0" cellspacing="0" cellpadding="10" class="responsive-table">';
+			body += '<tr>';
+			body += '<td align="center" style="padding-bottom:25px;">';
+			body += '<a href="' + link + '" target="_blank" style="font-size: 16px; font-family: Helvetica Neue, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px; background-color: #3f4652; border-top: 15px solid #3f4652; border-bottom: 15px solid #3f4652; border-right: 25px solid #3f4652; border-left: 25px solid #3f4652; display: inline-block;"> ' + link_text + '</a>';
+			body += '</td>';
+			body += '</tr>';
+			body += '<tr>';
+			body += '<td align="center" style="padding: 0px 0px 25px 0px; font-size: 14px; line-height: 20px; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #313640;"><span style="font-style: italic;">';
+			body += 'If you think you have received this email in error, <br>no further action is required.';
+			body += '</span>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">';
+		    body += '<tr bgcolor="#EBEAE8">';
+			body += '<td align="center">';
+			body += '<table width="500" border="0" cellspacing="0" cellpadding="10" align="center" class="responsive-table">';
+			body += '<tr>';
+			body += '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
+			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a><br>';
+			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+
+
+		// send email
+		api.email._send({
+			to      : email,	
+			subject : subject,
+			html    : body
+		});
+	},
+
+	sendContactRequestEmail : function (options) {
+
+		var email = options.email;
+		var requested_by = options.requested_by;
+		var link = options.link;
+
+		    // customMessage = options.customMessage,
+		    // numProjects = options.numProjects,
+		    // invite_link = options.invite_link,
+		    // invited_by = options.invited_by;
+
+		if (!email) return;
+
+		// get template
+		var template = api.config.mail.templates.contactRequest;
+		var title = template.title;
+		var subject = template.subject;
+		var messageBody = template.body;
+		var button_text = template.button_text;
+
+		// vars
+		var button_link = link;
+	
+		// replace
+		title = title.replace('[inviter_name]', requested_by);
+		messageBody = messageBody.replace('[inviter_name]', requested_by);
+
+		// if (customMessage.length) {
+		// 	messageBody += '<br><br><div style="border: 2px solid #ebeae8; padding: 10px; padding-left: 30px;border-radius: 10px; text-align: left; font-size: 15px; font-style: italic;">Message:<br>';
+		// 	messageBody += customMessage + '</div>'
+		// }
+
+		var logo = api.config.portalServer.uri + api.config.mail.portal.logo;
+		var bgcolor = api.config.mail.portal.color;
+
+		// email body
+		var body  = '<script type="application/ld+json">';
+			body  += '{';
+			body  += '"@context":       "http://schema.org",';
+			body  += '"@type":          "EmailMessage",';
+			body  += '"description":    "Welcome to Systemapic",';
+			body  += '"potentialAction": {';
+			body  += '"@type": "ViewAction",';
+			body  += '"target":   "http://systemapic.com/",';
+			body  += '"name": "Your access details for Systemapic"';
+			body  += '},';
+			body  += '"publisher": ';
+			body  += '{';
+			body  += '"@type": "Organization",';
+			body  += '"name": "Systemapic",';
+			body  += '"url": "http://systemapic.com"';
+			body  += '}';
+			body  += '}';
+			body  += '</script>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">';
+		    body += '<tr>';
+	        body += '<td bgcolor="' + bgcolor + '" >';
+			body += '<div align="center" style="padding: 0px 10px 0px 10px;">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="500" class="wrapper">';
+			body += '<tr>';
+			body += '<td style="padding: 10px 0px 10px 0px;" class="logo">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
+			body += '<tr>';
+			body += '<td width="100" align="center"><a href="http://systemapic.com/" target="_blank"><img alt="Logo" src="' + logo + '" style="display: block; font-family: helvetica neue, helvetica, \'Open Sans\'; color: #BFC2C8; font-size: 16px;" border="0"></a></td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</div>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%">';
+		    body += '<tr bgcolor="#EBEAE8">';
+			body += '<td align="center" style="padding: 30px 15px 30px 15px;" class="section-padding">';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="500">';
+			body += '<tr>';
+			body += '<td bgcolor="#FFFFFF" style="border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;">';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="0">';
+			body += '<tr>';
+			body += '<td>';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="10">';
+			body += '<tr>';
+			body += '<td align="center" style="font-family: Helvetica Neue, helvetica, \'Open Sans\'; color: #333333; padding: 15px; text-align:center"><span style="font-size: 24px;">' + title + '</span></td>';
+			body += '</tr>';
+			body += '<tr>';
+			body += '<td align="center" style="font-size: 16px; padding: 25px 25px 0px 25px;  line-height: 25px; font-family:  \'Open Sans\', Helvetica Neue, helvetica; color: #333333; text-align: center;">' + messageBody + '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+	        body += '<tr>';
+			body += '<td align="center">';
+			body += '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="mobile-button-container">';
+			body += '<tr>';
+			body += '<td align="center" style="padding: 15px 0 0 0;" class="padding-copy">';
+			body += '<table border="0" cellspacing="0" cellpadding="10" class="responsive-table">';
+			body += '<tr>';
+			body += '<td align="center" style="padding-bottom:25px;">';
+			body += '<a href="' + button_link + '" target="_blank" style="font-size: 16px; font-family: \'Open Sans\', Helvetica Neue, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px; background-color: #3f4652; border-top: 15px solid #3f4652; border-bottom: 15px solid #3f4652; border-right: 25px solid #3f4652; border-left: 25px solid #3f4652; display: inline-block;"> ' + button_text + '</a>';
+			body += '</td>';
+			body += '</tr>';
+		body += '<tr>';
+			body += '<td align="center" style="padding: 0px 0px 25px 0px; font-size: 12px; line-height: 20px; font-family: \'Open Sans\', helvetica neue, helvetica; color: #313640;"><span style="font-style: italic;">';
+			// body += 'If you think you have received this email in error, <br>no further action is required.';
+			body += '</span>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+			body += '<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">';
+		    body += '<tr bgcolor="#EBEAE8">';
+			body += '<td align="center">';
+			body += '<table width="500" border="0" cellspacing="0" cellpadding="10" align="center" class="responsive-table">';
+			body += '<tr>';
+			body += '<td align="center" valign="middle" style="font-size: 12px; line-height: 18px; font-family: helvetica neue, helvetica, \'Open Sans\'; color:#313640; padding: 0px 0px 15px 0px;">';
+			// body += 'If you think you have received this email in error, no further action is required.<br>';
+			body += '<a class="original-only" style="color: #313640; text-decoration: none; " href="http:/systemapic.com">Powered by Systemapic.com</a><br>';
+			body += '<a class="appleFooter" style="color:#313640;" href="mailto:info@systemapic.com">info@systemapic.com</a>';
+			body += '</td>';
+			body += '</tr>';
+			body += '</table>';
+			body += '</td>';
+		    body += '</tr>';
+			body += '</table>';
+
+
+		// send email
+		api.email._send({
+			to      : email,	
+			subject : subject,
+			html    : body
+		});
+
+	},
+
 
 }

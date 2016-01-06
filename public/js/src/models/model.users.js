@@ -1,8 +1,142 @@
 Wu.User = Wu.Class.extend({ 
 
 	initialize : function (store) {
+
+		// set vars
 		this.store = store;
+
 		this.lastSaved = _.cloneDeep(store);
+
+		// init file objects
+		this.initFiles();
+
+		this._listen();
+	},
+
+	_listen : function () {
+		Wu.Mixin.Events.on('closeMenuTabs',   this._onCloseMenuTabs, this);
+	},
+
+	initFiles : function () {
+
+		// get files
+		var files = this.store.files;
+		this._files = {};
+		if (!files) return;
+
+		// create
+		files.forEach(function (file) {
+			this._files[file.uuid] = new Wu.Model.File(file);
+		}, this);
+	},
+
+	isContact : function () {
+		if (!app.Account) return console.error('too early!');
+		if (this.getUuid() == app.Account.getUuid()) return;
+
+		var isContact = _.contains(app.Account.getContactListUuids(), this.getUuid());
+
+		return isContact;
+	},
+
+	getContactListUuids : function () {
+		var uuids = [];
+		this.getContactList().forEach(function (c) {
+			uuids.push(c.uuid);
+		});
+		return uuids;
+	},
+
+	getContactList : function ()  {
+		return this.store.contact_list;
+	},
+
+	sendContactRequest : function (user) {
+
+		var options = {
+			contact : user.getUuid()
+		}
+
+		Wu.send('/api/user/requestContact', options, function (a, b) {
+
+			console.log('request sent!', a, b);
+
+
+			// set feedback 
+			app.feedback.setMessage({
+				title : 'Friend request sent',
+				// description : description
+			});
+
+
+		}, this);
+
+	},
+
+	inviteToProjects : function (options) {
+
+		var userUuid = this.getUuid();
+		var userName = this.getFullName();
+		var num = options.edit.length + options.read.length;
+
+		var invites = {
+			edit : options.edit,
+			read : options.read,
+			user : userUuid
+		}
+
+		// send to server
+		Wu.send('/api/user/inviteToProjects', invites, function (a, response) {
+
+			var result = Wu.parse(response);
+
+			// set feedback 
+			app.feedback.setMessage({
+				title : 'Project invites sent!',
+				description : userName + ' has been invited to ' + num + ' projects'
+			});
+			
+			// update locally
+			result.projects.forEach(function (projectAccess) {
+				var project = app.Projects[projectAccess.project];
+				project.store.access = projectAccess.access;
+			});
+
+		}.bind(this), this);
+
+	},
+
+	getFiles : function () {
+		return this._files;
+	},
+
+	getFileStore : function (fileUuid) {
+		var file = _.find(this.store.files, function (f) {
+			return f.uuid == fileUuid;
+		});
+		return file;
+	},
+
+	getFile : function (fileUuid) {
+		return this._files[fileUuid]; // return object
+	},
+
+
+	setFile : function (file) {
+		this.store.files.push(file);
+		this._files[file.uuid] = new Wu.Model.File(file);
+		return this._files[file.uuid];
+	},
+
+	removeFile : function (file) {
+		var fileUuid = file.file_id;
+		var r = _.remove(this.store.files, function (f) {
+			return f.uuid ==fileUuid;
+		});
+
+		this._files[fileUuid] = null;
+		delete this._files[fileUuid];
+
 	},
 
 	// set functions
@@ -165,8 +299,41 @@ Wu.User = Wu.Class.extend({
 		return projects;
 	},
 
+	getReadProjects : function () {
+		var allProjects = app.Projects;
+
+		var readProjects = _.filter(app.Projects, function (p) {
+			return _.contains(p.getAccess().read, this.getUuid());
+		}, this);
+
+		return readProjects;
+	},
+
+	getEditProjects : function () {
+		var allProjects = app.Projects;
+
+		var editProjects = _.filter(app.Projects, function (p) {
+			return _.contains(p.getAccess().edit, this.getUuid());
+		}, this);
+
+		return editProjects;
+	},
+
 	getUuid : function () {
 		return this.store.uuid;
+	},
+
+
+	setRoles : function (roles) {
+		// this._roles = [];
+		// roles.forEach(function (r) {
+		// 	var role = new Wu.Role({role : r});
+		// 	this._roles.push(role);
+		// }, this);
+	},
+
+	getRoles : function () {
+		return this._roles;
 	},
 
 
@@ -207,5 +374,149 @@ Wu.User = Wu.Class.extend({
 		this.lastSaved = _.cloneDeep(this.store);  // update lastSaved
 		return json;
 	},
+
+	logout : function () {
+
+		// confirm
+		if (!confirm('Are you sure you want to log out?')) return;
+
+		this._logout();
+	},
+
+	_logout : function () {
+		
+		// slack monitor
+		app.Socket.sendUserEvent({
+		    	user : app.Account.getFullName(),
+		    	event : 'logged out.',
+		    	description : '',
+		    	timestamp : Date.now()
+		});
+
+		// redirect to logout
+		window.location.href = app.options.servers.portal + 'logout';
+	},
+
+
+	addAccountTab : function () {
+
+		// return; // todo later
+
+		// register button in top chrome
+		var top = app.Chrome.Top;
+
+		// add a button to top chrome
+		this._accountTab = top._registerButton({
+			name : 'account',
+			className : 'chrome-button share',
+			trigger : this._toggleAccountTab,
+			context : this,
+			project_dependent : false
+			
+		});
+
+		// user icon
+		this._accountTab.innerHTML = '<i class="fa fa-user"></i>';
+
+	},
+
+
+	_toggleAccountTab : function () {
+
+
+		this._accountTabOpen ? this._closeAccountTab() : this._openAccountTab();
+
+	},
+
+	_openAccountTab : function () {
+
+		// close other tabs
+		Wu.Mixin.Events.fire('closeMenuTabs');
+		
+		// create dropdown
+		this._accountDropdown = Wu.DomUtil.create('div', 'share-dropdown account-dropdown', app._appPane);
+
+		// items
+		this._accountName = Wu.DomUtil.create('div', 'share-item no-hover', this._accountDropdown, '<i class="fa fa-user logout-icon"></i>' + app.Account.getFullName());
+		this._logoutDiv = Wu.DomUtil.create('div', 'share-item', this._accountDropdown, '<i class="fa fa-sign-out logout-icon"></i>Log out');
+
+		// events
+		Wu.DomEvent.on(this._logoutDiv,  'click', this.logout, this);
+
+		this._accountTabOpen = true;
+	},
+
+	_closeAccountTab : function () {
+
+		if (!this._accountTabOpen) return;
+
+		Wu.DomEvent.off(this._logoutDiv,  'click', this.logout, this);
+
+		Wu.DomUtil.remove(this._accountDropdown);
+
+		this._accountTabOpen = false;
+	},
+
+	logout : function () {
+		window.location.href = '/logout';
+	},
+
+	_onCloseMenuTabs : function () {
+		
+		// app.Chrome();
+		this._closeAccountTab();
+	},
+
+	isSuper : function () {
+		return this.store.access.account_type == 'super';
+	},
+
+	// _open : function () {
+
+	// 	// close other tabs
+	// 	Wu.Mixin.Events.fire('closeMenuTabs');
+
+	// 	Wu.DomUtil.removeClass(this._shareDropdown, 'displayNone');
+	// 	this._isOpen = true;
+
+	// 	// add fullscreen click-ghost
+	// 	// this._addGhost();
+
+	// 	// mark button active
+	// 	Wu.DomUtil.addClass(this._shareButton, 'active');
+
+	// 	// fill titles
+	// 	this._fillTitles();
+	// },
+
+	// _close : function () {
+	// 	Wu.DomUtil.addClass(this._shareDropdown, 'displayNone');
+	// 	this._isOpen = false;
+
+	// 	// remove links if open
+	// 	if (this._shareLinkWrapper) Wu.DomUtil.remove(this._shareLinkWrapper);
+	// 	if (this._sharePDFInput) Wu.DomUtil.remove(this._sharePDFInput);
+	// 	if (this._inviteWrapper) Wu.DomUtil.remove(this._inviteWrapper);
+		
+	// 	this._shareInviteButton.innerHTML = 'Invite users...';
+	// 	Wu.DomUtil.removeClass(this._shareDropdown, 'wide-share');
+
+	// 	// remove ghost
+	// 	// this._removeGhost();
+
+	// 	// mark button inactive
+	// 	Wu.DomUtil.removeClass(this._shareButton, 'active');
+	// },
+
+
+
+
+
+
+
+
+
+
+
 
 });

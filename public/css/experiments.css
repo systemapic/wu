@@ -1,0 +1,980 @@
+.chrome-project-title {
+    font-size: 18px;
+    color: #555;
+    text-transform: capitalize;
+    color: rgba(0, 0, 0, 0.81);
+    background: rgba(255, 255, 255, 0.72);
+    padding-left: 4px;
+    font-weight: 600;
+    padding-right: 4px;
+    padding: 15px;
+    padding-left: 30px;
+    padding-right: 30px;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(0, 0, 0, 0.27);
+    }
+
+.chrome-top {
+    background: none;
+    }
+
+.chrome-portal-logo {
+    display: none;
+    }
+
+.chrome-button {
+    background-image: url(../images/systemapic-sprite-white.png);
+    opacity: 0.9;
+    }
+
+.chrome-menu-button {
+    border-right: none;
+    }
+
+.chrome-menu-button:before {
+    content: '';
+    background-image: url(../images/filled-circle.png);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    top: 0;
+    left: 0;
+    opacity: 0.8;
+    background-size: 40px 40px;
+    padding: 5px;
+    margin: 5px;
+}
+
+.chrome-menu-button.active:before { 
+    background-image: url(../images/filled-sideways.png);
+    background-size: 214px 42px;
+    width: 224px;
+    top: -1px;
+    left: -1px;
+}
+.chrome-right {
+    padding-top: 35px;
+    top: 0px;
+}
+.chrome-top  {
+    z-index: 100000004;
+}
+.inverted {
+    -webkit-filter: invert(50%);
+    filter: invert(50%);
+}
+
+.leaflet-top.leaflet-left {
+    margin-top: 50px;
+}
+
+.active-project  {
+    font-weight: 700;
+    background: #428bca;
+    color: white;
+}
+.active-project:hover {
+    background: rgba(66, 139, 202, 0.87);
+}
+
+
+/*mouseposition*/
+.leaflet-container .leaflet-control-mouseposition {
+    background-color: rgba(60, 71, 89, 0.7);
+    padding: 0 5px;
+    margin: 0;
+    color: #eee;
+    display: inline-block;
+    margin: 0 !important;
+    position: relative;
+    vertical-align: top;
+    top: 0 !important;
+    bottom: auto;
+    float: none;
+    height: 24px;
+    font-size: 12px;
+    /*font-family: 'Open Sans', serif;*/
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 2px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    cursor: default;
+    font-weight: 600;
+
+}
+
+.leaflet-top.leaflet-right {
+    border: 0;
+    text-align: left;
+    height: 18px;
+    text-align: right;
+    z-index: 100;
+    bottom: 10px !important;
+    right: 5px;
+    top: initial;
+}
+
+
+.leaflet-control-scale-line {
+    background-color: rgba(60, 71, 89, 0.7);
+    display: inline-block;
+    vertical-align: top;
+    border: 0px !important;
+    margin-right: 2px;
+    height: 17px;
+    border-radius: 2px;
+    color: #eee;
+    font-size: 12px;
+    /*font-family: 'Open Sans', serif;*/
+    font-weight: 600;
+    padding-top: 6px;
+}
+
+.leaflet-draw.leaflet-control {
+    margin-left: 4px !important;
+}
+
+
+
+
+
+
+
+
+
+
+/*mapbox style header buttons*/
+
+.chrome-menu-button:before {
+    content: '';
+    background: none;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    top: 0;
+    left: 0;
+    opacity: 0.8;
+    background-size: 40px 40px;
+    padding: 5px;
+    margin: 5px;
+}
+.chrome-menu-button {
+    border-right: none;
+    position: relative;
+    height: 40px;
+    background: #3C4759;
+}
+.chrome-buttons {
+    position: absolute;
+    left: 42px;
+    height: 4px;
+    text-align: left;
+    top: 0;
+    z-index: 100;
+}
+.chrome-button {
+    height: 40px;
+    background: none;
+    margin-right: 0px;
+
+    background: #3C4759;
+    width: 120px;
+    padding-top: 9px;
+    text-align: center;
+    color: #f8f8f8;
+    font-weight: 700;
+    opacity: 1;
+    border-left: 1px solid rgba(220, 220, 220, 0.36);
+}
+
+.top-button {
+    padding-right: 6px;
+}
+
+.inverted {
+    -webkit-filter: invert(0%); 
+    filter: invert(0%);
+}
+
+
+.chrome-button.datalib {
+    /*background: #3C4759;*/
+    width: 120px;
+    padding-top: 9px;
+    text-align: center;
+    color: #f8f8f8;
+    font-weight: 700;
+    opacity: 1;
+    border-left: 1px solid rgba(220, 220, 220, 0.36);
+}
+
+.chrome-button.settingsSelector {
+    /*background: #3C4759;*/
+    width: 120px;
+    padding-top: 9px;
+    text-align: center;
+    color: #f8f8f8;
+    font-weight: 700;
+    opacity: 1;
+    border-left: 1px solid rgba(220, 220, 220, 0.36);
+}
+
+.chrome-button.settings {
+    /*background: #3C4759;*/
+    width: 120px;
+    padding-top: 9px;
+    text-align: center;
+    color: #f8f8f8;
+    font-weight: 700;
+    opacity: 1;
+    border-left: 1px solid rgba(220, 220, 220, 0.36);
+}
+
+.chrome-menu-button.active:before {
+    background: none;
+}
+
+.chrome-button.share {
+    /*background: #3C4759;*/
+    width: 40px;
+    padding-top: 9px;
+    text-align: center;
+    color: #f8f8f8;
+    font-weight: 700;
+    opacity: 1;
+    border-left: 1px solid rgba(220, 220, 220, 0.36);
+}
+
+.chrome-menu-button {
+    border-right: none;
+    position: relative;
+    height: 40px;
+    background: #3C4759;
+    color: white;
+    font-size: 18px;
+    padding-left: 11px;
+    padding-top: 7px;
+}
+
+.chrome-project-title {
+    color: #555;
+    text-transform: capitalize;
+    color: rgba(0, 0, 0, 0.81);
+    background: rgba(255, 255, 255, 0.72);
+    /*border-radius: 0 0px 4px 0;*/
+    padding-left: 4px;
+    font-weight: 600;
+    padding-right: 4px;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(0, 0, 0, 0.27);
+    background: #FCFCFC;
+    padding-top: 9px;
+    padding-top: 9px;
+    text-align: center;
+    color: #3C4759;
+    font-weight: 700;
+    opacity: 1;
+    border-left: 1px solid gainsboro;
+    height: 40px;
+    padding-left: 50px;
+    padding-right: 50px;
+    top: 0;
+    left: 0;
+    font-size: 14px;
+    cursor: pointer;
+    width: auto;
+}
+
+.chrome-client-logo {
+    color: #555;
+    text-transform: capitalize;
+    color: rgba(0, 0, 0, 0.81);
+    background: rgba(255, 255, 255, 0.72);
+    padding-left: 4px;
+    font-weight: 600;
+    padding-right: 4px;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(0, 0, 0, 0.27);
+    background: #3C4759;
+    padding-top: 9px;
+    padding-top: 9px;
+    text-align: center;
+    color: #3C4759;
+    font-weight: 700;
+    opacity: 1;
+    border-left: 1px solid gainsboro;
+    height: 40px;
+    padding-left: 70px;
+    padding-right: 70px;
+    top: 0;
+    left: 0;
+    font-size: 14px;
+    cursor: pointer;
+    width: auto;
+    background-repeat: no-repeat;
+    border-left: 1px solid gainsboro;
+}
+
+.chrome-left-container {
+    position: relative;
+    margin-top: 10px;
+}
+
+.settings-dropdown {
+    width: 280px;
+    height: auto !important;
+    position: absolute;
+    background: #FCFCFC;
+    left: 162px;
+    padding: 13px 20px 13px 19px;
+    /* box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.4); */
+    z-index: 10000010;
+    cursor: pointer;
+    top: 38px !important;
+    box-shadow: none;
+    border-radius: 0 0 4px 4px;
+}
+
+.share-dropdown {
+     -webkit-transition: width 200ms ease, height 200ms ease; 
+     transition: width 200ms ease, height 200ms ease; 
+    height: auto;
+    position: absolute;
+    background: #FCFCFC;
+    left: 282px;
+    padding: 13px 20px 13px 19px;
+    z-index: 10000010;
+    top: 27px;
+    width: 200px;
+    cursor: default;
+    box-shadow: none;
+    border-radius: 0 0 4px 4px;
+    padding: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+/*
+.share-dropdown{
+     width: 160px !important; 
+     height: auto !important; 
+}*/
+
+.share-dropdown.wide-share {
+    width: 280px;
+    height: 300px;
+    left: 162px;
+    padding: 20px;
+}
+.share-invite-wrapper-inner {
+    width: 240px;
+    height: 220px;
+}
+
+.chrome-left { 
+    background : #FCFCFC;
+    z-index: 1002;
+}
+
+.cpu-wrapper {
+    width: 12px;
+    /* border-left: 1px dashed #999; */
+    height: 100%;
+    position: absolute;
+    top: 0;
+    display: inline-block;
+    vertical-align: top;
+    padding: 3px;
+    padding-left: 5px;
+    float: right;
+    background: #FCFCFC;
+    height: 40px;
+    padding-left: 4px;
+    padding-top: 5px;
+    border: none;
+    top: 0;
+    right: 0px;
+}
+
+.chrome-button:hover {
+    opacity: 1;
+    color: white !important;
+}
+
+.chrome-button.active {
+    text-decoration: underline;
+}
+
+.chrome-right {
+    padding-top: 35px;
+    top: 40px;
+    border: none;
+    left: 0px;
+    background: #FCFCFC;
+}
+
+.leaflet-control-attribution {
+    margin-left: 0px;
+    left: 0px;
+    bottom: 0px;
+    margin-bottom: 0px;
+    padding: 5px;
+    background: #FCFCFC;
+    background: rgba(60, 71, 89, 0.5) !important;
+    border-radius: 0 4px 0 0;
+    padding-top: 2px;
+    padding-bottom: 1px;
+    padding-right: 8px;
+}
+.leaflet-left .leaflet-control {
+    margin-left: 0px;
+}
+
+.leaflet-control-zoom {
+    margin-left: 5px !important;
+}
+.chrome.chrome-container.chrome-top {
+    cursor: pointer;
+}
+
+#map {
+    background: #3C4759 url(../images/canvas.png);
+}
+.chrome-menu-button.active:before { 
+    width: 0;
+    height: 0;
+    left: 0;
+    top: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/*logo*/
+.chrome-project-logo {
+    background-image: url('../images/systemapic-portal-logo.png');
+    background-repeat: no-repeat;
+    width: 200px;
+    position: relative;
+    background-position: 27px 5px;
+    border-radius: 0 0 4px;
+    background-size: 143px;
+}
+.chrome-project-title:hover {
+    color: #3C4759 !important;
+}
+
+.chrome-buttons .chrome-button:last-child {
+    border-radius: 0 0 4px 0;
+}
+
+.disabledBtn {
+    color: rgba(220, 220, 220, 0.156863) !important;
+    pointer-events: none !important; 
+    pointer: default !important;
+}
+.disabledBtn:hover {
+    color: rgba(220, 220, 220, 0.156863) !important;
+    pointer-events: none !important;
+    pointer: default !important;
+}
+
+.active-project .extra-padding-right {
+    padding-right: 50px;
+}
+.leaflet-popup {
+    z-index: 1001;
+}
+
+.share-dropdown .share-item:hover {
+    background: #EEE;
+}
+.share-dropdown .share-item { 
+    padding-left: 50px;
+    font-weight: 500;
+}
+
+
+/*fly-to icon*/
+.fly-to {
+    font-size: 13px;
+    position: absolute;
+    right: 8px;
+    top: 7px;
+    color: #777;
+}
+.layer-menu-flyto { 
+    display: none;
+}
+.layer-active .layer-menu-flyto:hover { 
+    display: block;
+}
+.layer-active .layer-menu-flyto {
+    background: none;
+}
+
+
+
+.chrome-left-invite-users {
+    margin-left: 26px;
+    padding-top: 20px;
+    margin-bottom: 20px;
+    color: #666;
+    border-bottom: 1px double gainsboro;
+    width: 140px;
+    border-bottom-style: double;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 18px;   
+}
+
+.chrome-left-invite-users:hover {
+    border-bottom: 1px double #3C3C3C;
+}
+
+
+
+/*email invites*/
+.invite-email-input-form {
+    height: 36px;
+    font-size: 20px;
+    /*font-family: 'Open Sans', serif;*/
+    padding: 6px;
+    color: #4A4A4A;
+    width: 100%;
+    border: none;
+    padding-top: 0px;
+    padding-bottom: 0;
+    /* padding: 0; */
+    /* width: 0; */
+}
+.add-another-email {
+    font-weight: 600;
+    background: #F9F9F9;
+    border-radius: 4px;
+    padding: 9px;
+    border: 1px solid gainsboro;
+    font-size: 14px;
+    width: 120px;
+    cursor: pointer;
+    color: #428BCA;
+}
+.add-another-email:hover {
+    background: #FCFCFC;
+}
+
+.smooth-fullscreen-name-label.invite-emails {
+    font-size: 16px;
+}
+
+.smooth-fullscreen-name-label.add-message {
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    text-align: center;
+    color: gray;
+}
+#custom_message_btn {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.smooth-fullscreen-link-label {
+    font-size: 14px;
+    font-weight: 500;
+    text-align: right;
+}
+#share-link {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.invite-custom-message-wrapper-textarea {
+    width: 100%;
+    border: 1px solid red;
+    height: 100px;
+    border: 1px solid gainsboro;
+    border-radius: 3px;
+    color: #4A4A4A;
+    background: white;
+    padding: 10px;
+    resize: vertical;
+}
+.invite-custom-message-wrapper-textarea:focus {
+    border: 1px solid gainsboro;
+    outline: 1px solid gainsboro;
+}
+
+.invite-email-message-wrap {
+    margin-bottom: 40px;
+}
+.invite-custom-message-wrapper {
+    display: none;
+    margin-top: 30px;
+}
+.invite-custom-message-wrapper.showme {
+    display: block;
+}
+
+.hideme .smooth-fullscreen-name-label.add-message {
+    display:  none;
+    margin-top: 30px;
+}
+
+.invite-custom-message-wrapper-label {
+    padding-bottom: 5px;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgb(63, 70, 82);
+}
+
+.smooth-fullscreen-save.invite {
+    margin-top: 30px;
+    color: #616161;
+    font-weight: 500;
+}
+
+.smooth-fullscreen-inner.invite {
+    margin: auto;
+    width: 700px;
+    /* top: 120px; */
+    position: relative;
+    padding: 20px;
+    overflow-y: scroll;
+    padding-top: 120px;
+    height: 100%;
+    padding-bottom: 120px;
+    margin-top: 0;
+    top: 0;
+}
+
+.smooth-fullscreen-name-label.invite {
+    font-size: 16px;
+}
+
+.optional-medium.invite {
+    font-size: 14px;
+}
+
+.mini-project-avatar {
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    /* background: #E4E4E4; */
+    left: 7px;
+    top: 0px;
+    border-radius: 1px;
+    background-size: 20px;
+    background-repeat: no-repeat;
+}
+
+.monkey-scroll-list-item-avatar.project {
+    font-size: 15px;
+}
+
+.monkey-scroll-list-item-container.project {
+    height: 40px;
+} 
+
+.project.fa.fa-map-o {
+    font-size: 20px;
+    padding-top: 5px;
+}
+
+.monkey-scroll-list-item-name-container.project {
+    left: 30px;
+}
+.monkey-scroll-list-item-name-bold.project {
+    font-weight: 500;
+    font-size: 18px;
+    padding-top: 2px;
+}
+
+
+
+
+
+
+
+.mini-user-container.itsme {
+    background: #3C4759;
+    border: 1px solid #3C4759;
+}
+
+
+.toggles-wrapper {
+    border: 1px solid gainsboro;
+    border-radius: 10px;
+    height: auto;
+    margin-top: 40px;
+    padding: 20px;
+    padding-top: 0px;
+}
+
+.smooth-fullscreen {
+    overflow-y: scroll;
+}
+.smooth-fullscreen-buttons-wrapper {
+    margin-top: 30px;
+    position: relative;
+    height: 100px;
+}
+
+
+.toggle-wrapper {
+    margin-left: 0px;
+}
+
+#invite_someone_btn {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+
+.invites-sent {
+    background: #428BCA !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.invites-sent:hover {
+    background: #428BCA !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.invite-success-message {
+    color: #448CCA;
+    position: absolute;
+    padding-top: 36px;
+    padding-left: 100px;
+    font-size: 18px;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+.chrome-switch-container.disabled-switch:after {
+    content: '';
+    background: white;
+    left: 0;
+    top: -1px;
+    position: absolute;
+    height: 21px;
+    width: 51px;
+    opacity: 0.7;
+}
+
+.account-dropdown {
+    width: 200px;
+}
+.account-dropdow .share-item {
+    padding-left: 40px;
+}
+
+.fa.logout-icon {
+    padding-right: 6px;
+}
+
+.share-item.no-hover:hover {
+    background: #FCFCFC;
+    color: rgb(63, 70, 82);
+}
+
+.chrome-content.settings-tabs-wrapper {
+    position: absolute;
+    top: 140px;
+}
+
+.chrome-upload-button {
+    padding: 9px;
+    border-radius: 4px;
+    width: auto;
+    top: 5px;
+}
+
+.fa.fa-cloud-upload {
+    padding-right: 4px;
+}
+
+.smooth-fullscreen-save.update-style {
+    position: relative;
+    width: 140px;
+    margin: auto;
+}
+
+.button-wrapper {
+      position: relative;
+    margin-bottom: 20px;
+}
+
+.marked-changed {
+    background: #428BCA;
+    color: #FCFCFC;
+    font-weight: 600;
+}
+.marked-changed:hover {
+    color: rgb(63, 70, 82);
+    
+}
+
+
+
+
+
+
+
+.contact-list-icon {
+    position: absolute;
+    top: 3px;
+    right: 2px;
+    display: none;
+    cursor: pointer;
+    color: #999;
+    font-size: 18px;
+}
+
+.contact {
+    color: rgb(60, 60, 60);
+}
+.project-contact {
+    color: #ccc;
+}
+.project-contact:hover {
+    color: #555;
+}
+.contact:hover .contact-list-icon {
+    display: block;
+}
+
+.project-contact:hover .contact-list-icon {
+    display: block;
+}
+.contact-list-icon:hover {
+    color: #555;
+}
+
+.chrome-user .chrome-left-item-name {
+    cursor: default;
+    }
+
+.contact-list-icon:hover .project-tooltip {
+    opacity: 0.9;
+    visibility: visible;
+    }
+
+.contact-add-tooltip {
+    left: -95px;
+    top: -48px;
+    }
+
+.contact-list-icon:active {
+    color: #428BCA;
+    }
+
+.contact-invite-icon {
+    position: absolute;
+    top: 3px;
+    right: 2px;
+    display: none;
+    cursor: pointer;
+    color: #999;
+    font-size: 18px;
+    }
+
+.contact:hover .contact-invite-icon {
+    display: block;
+    }
+
+.project-contact:hover .contact-project-icon {
+    display: block;
+    }
+
+.contact-project-icon:hover {
+    color: #555;
+    }
+
+.contact-invite-icon:hover .project-tooltip {
+    opacity: 0.9;
+    visibility: visible;
+    }
+
+.contact-invite-icon:active {
+    color: #428BCA;
+    }
+
+.contact-invite-tooltip {
+    left: -115px;
+    top: -48px;
+    }
+
+.clipboard-wrapper {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    right: 2px;
+    float: right;
+    top: -35px;
+    border-radius: 2px;
+    cursor: pointer;
+    }
+
+.clipboard-wrapper:hover {
+    background: rgba(221, 222, 224, 0.41);
+    }
+
+.clipboard-button {
+    font-size: 21px;
+    top: 3px;
+    position: relative;
+    right: -8px;  
+    color: #439FE0;  
+    }
+
+.clipboard-button:active {
+    color: #3C4759;
+    }
+
+.smooth-fullscreen-feedback-label {
+    height: 20px;
+    color: #3F4652;
+    cursor: default;
+    text-align: right;
+    padding-right: 0px;
+    margin-right: 0px;
+    position: relative;
+    right: -34px;
+    transition: opacity 100ms linear;
+/*<<<<<<< HEAD*/
+}
+
+.share-dropdown {
+    padding-bottom: 0px;
+}
+.share-item-processing {
+    padding-bottom: 10px;
+    border-radius: 0 0 4px 4px;
+}
+.invite-feedback-active {
+    background: #3C4759;
+    color: #FCFCFC;
+    font-size: 12px;
+    padding: 5px;
+    padding-left: 10px;
+}
+.invite-feedback-active a {
+    color: white;
+    font-weight: 600;
+}
+
+.account-dropdown {
+    width: 200px;
+    border-radius: 0 0 4px 4px;
+    padding-bottom: 10px;
+}
+/*=======
+    }
+>>>>>>> 3f85c79d12440467bbb33415fefdb283a759d6a2*/

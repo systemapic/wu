@@ -2,7 +2,7 @@
 
 // database schemas
 var Project 	= require('../models/project');
-var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
+// var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
 var User  	= require('../models/user');
 var File 	= require('../models/file');
 var Layer 	= require('../models/layer');
@@ -40,24 +40,78 @@ var api = module.parent.exports;
 
 module.exports = api.access = {
 	
+	// setProject : function (req, res) {
+
+	// 	var account = req.user;
+	// 	var options = req.body;
+	// 	var projectAccess = options.access;
+	// 	var projectUuid = options.project;
+
+	// 	console.log('api.access.setProject', options);
+
+
+
+	// 	Project
+	// 	.findOne({uuid : projectUuid})
+	// 	.exec(function (err, project) {
+	// 		project.access = projectAccess;
+	// 		project.save(function (err, p) {
+
+	// 			// return if err
+	// 			if (err) return res.json({
+	// 				error : err
+	// 			});
+
+	// 			// return project
+	// 			res.json(project);
+	// 		})
+	// 	})
+
+	// },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// ################################################# old #############################
+
+
 	roleTemplates : {
 
 		// can do anything
 		superAdmin : {
 			name : 'Super Admin',
 			capabilities : {
-				create_client 		: true,	
-				read_client 		: true, 		
-				edit_client 		: true, 		
-				edit_other_client 	: true, 	
-				delete_client 		: true, 	
-				delete_other_client 	: true,  
+				// create_client 		: true,	
+				// read_client 		: true, 		
+				// edit_client 		: true, 		
+				// edit_other_client 	: true, 	
+				// delete_client 		: true, 	
+				// delete_other_client 	: true,  
+				
 				create_project 		: true, 	
 				read_project 		: true, 	
 				edit_project 		: true, 	
 				edit_other_project 	: true, 	
 				delete_project 		: true, 	
 				delete_other_project 	: true,
+				
 				upload_file 		: true, 	
 				download_file 		: true, 	
 				edit_file 		: true, 	
@@ -67,6 +121,7 @@ module.exports = api.access = {
 				delete_other_version 	: true,
 				delete_file 		: true, 	
 				delete_other_file 	: true, 	
+				
 				create_user 		: true, 
 				read_user 		: true,
 				read_other_user		: true,	
@@ -74,6 +129,7 @@ module.exports = api.access = {
 				edit_other_user 	: true, 	
 				delete_user 		: true, 	
 				delete_other_user 	: true, 	
+				
 				share_project 		: true, 	
 				read_analytics 		: true, 	
 				manage_analytics	: true, 	
@@ -86,12 +142,12 @@ module.exports = api.access = {
 		portalAdmin : {
 			name : 'Portal Admin',
 			capabilities : {
-				create_client 		: true,	
-				read_client 		: true, 		
-				edit_client 		: true, 		
-				edit_other_client 	: true, 	
-				delete_client 		: true, 	
-				delete_other_client 	: true,  
+				// create_client 		: true,	
+				// read_client 		: true, 		
+				// edit_client 		: true, 		
+				// edit_other_client 	: true, 	
+				// delete_client 		: true, 	
+				// delete_other_client 	: true,  
 				create_project 		: true, 	
 				read_project 		: true, 	
 				edit_project 		: true, 	
@@ -148,12 +204,12 @@ module.exports = api.access = {
 				delegate_to_user 	: true,
 
 				create_project 		: false, 	
-				create_client 		: false,	
-				read_client 		: false, 		
-				edit_client 		: false, 		
-				edit_other_client 	: false, 	
-				delete_client 		: false, 	
-				delete_other_client 	: false,  
+				// create_client 		: false,	
+				// read_client 		: false, 		
+				// edit_client 		: false, 		
+				// edit_other_client 	: false, 	
+				// delete_client 		: false, 	
+				// delete_other_client 	: false,  
 				edit_other_project 	: false, 	
 				delete_other_project 	: false,
 				edit_other_user 	: false, 	
@@ -186,12 +242,12 @@ module.exports = api.access = {
 
 				create_project 		: false, 	
 				delete_project 		: false, 	
-				create_client 		: false,	
-				read_client 		: false, 		
-				edit_client 		: false, 		
-				edit_other_client 	: false, 	
-				delete_client 		: false, 	
-				delete_other_client 	: false,  
+				// create_client 		: false,	
+				// read_client 		: false, 		
+				// edit_client 		: false, 		
+				// edit_other_client 	: false, 	
+				// delete_client 		: false, 	
+				// delete_other_client 	: false,  
 				edit_other_project 	: false, 	
 				delete_other_project 	: false,
 				edit_other_file 	: false, 	
@@ -219,12 +275,12 @@ module.exports = api.access = {
 				share_project 		: true, 	
 				delegate_to_user 	: true,
 
-				create_client 		: false,	
-				read_client 		: false, 		
-				edit_client 		: false, 		
-				edit_other_client 	: false, 	
-				delete_client 		: false, 	
-				delete_other_client 	: false,  
+				// create_client 		: false,	
+				// read_client 		: false, 		
+				// edit_client 		: false, 		
+				// edit_other_client 	: false, 	
+				// delete_client 		: false, 	
+				// delete_other_client 	: false,  
 				create_project 		: false, 	
 				edit_project 		: false, 	
 				edit_other_project 	: false, 	
@@ -260,12 +316,12 @@ module.exports = api.access = {
 				delete_file 		: true, 	
 				share_project 		: true, 	
 
-				create_client 		: false,	
-				read_client 		: false, 		
-				edit_client 		: false, 		
-				edit_other_client 	: false, 	
-				delete_client 		: false, 	
-				delete_other_client 	: false,  
+				// create_client 		: false,	
+				// read_client 		: false, 		
+				// edit_client 		: false, 		
+				// edit_other_client 	: false, 	
+				// delete_client 		: false, 	
+				// delete_other_client 	: false,  
 				create_project 		: false, 	
 				edit_other_project 	: false, 	
 				delete_project 		: false, 	
@@ -296,12 +352,12 @@ module.exports = api.access = {
 				download_file 		: true, 	
 				share_project 		: true, 	
 
-				create_client 		: false,	
-				read_client 		: false, 		
-				edit_client 		: false, 		
-				edit_other_client 	: false, 	
-				delete_client 		: false, 	
-				delete_other_client 	: false,  
+				// create_client 		: false,	
+				// read_client 		: false, 		
+				// edit_client 		: false, 		
+				// edit_other_client 	: false, 	
+				// delete_client 		: false, 	
+				// delete_other_client 	: false,  
 				create_project 		: false, 	
 				edit_project 		: false, 	
 				edit_other_project 	: false, 	
@@ -336,12 +392,12 @@ module.exports = api.access = {
 				read_project 		: false, 	
 				download_file 		: false, 	
 				share_project 		: false, 	
-				create_client 		: false,	
-				read_client 		: false, 		
-				edit_client 		: false, 		
-				edit_other_client 	: false, 	
-				delete_client 		: false, 	
-				delete_other_client 	: false,  
+				// create_client 		: false,	
+				// read_client 		: false, 		
+				// edit_client 		: false, 		
+				// edit_other_client 	: false, 	
+				// delete_client 		: false, 	
+				// delete_other_client 	: false,  
 				create_project 		: false, 	
 				edit_project 		: false, 	
 				edit_other_project 	: false, 	
@@ -523,6 +579,8 @@ module.exports = api.access = {
 
 		// return on missing info
 		if (!projectUuid || !userUuid || !roleUuid) return api.error.missingInformation(req, res);
+
+		console.log('projreoroor', projectUuid);
 
 		// get role 
 		ops.push(function (callback) {
@@ -835,6 +893,7 @@ module.exports = api.access = {
 		},
 
 		createdBy : function (user, account) {
+			if (!user) return false;
 			return user.createdBy == account.getUuid();
 		},
 	},
@@ -871,6 +930,7 @@ module.exports = api.access = {
 			    roles = project.roles,
 			    access = false;
 			
+			// console.log('..............has', options, capability);
 			if (roles) roles.forEach(function (role) {
 				// if user in role
 				if (_.contains(role.members, user.getUuid())) {
@@ -887,6 +947,7 @@ module.exports = api.access = {
 			    project = options.project,
 			    ops = [];
 
+
 			// return on missing
 			if (!project || !user || !project.roles || !capability) return done(null, false);
 
@@ -901,7 +962,30 @@ module.exports = api.access = {
 			var hasCapability = role.capabilities[capability];
 
 			done(null, hasCapability);
-		}
+		},
+
+		_capability : function (options, done) {
+			var user = options.user,
+			    capability = options.capability,
+			    gotAccess = false;
+
+			if (!user || !capability) return done('Missing information.');
+
+			Role
+			.find({members : user.uuid})
+			.exec(function (err, roles) {
+
+				_.each(roles, function (r) {
+
+					if (r.capabilities[capability]) {
+						gotAccess = true;
+					}
+
+				});
+
+				return done(null, gotAccess);
+			});
+		},
 	},
 
 	// CRUD capabilities
@@ -932,6 +1016,8 @@ module.exports = api.access = {
 			    project = options.project,
 			    ops = {};
 
+			console.log('_check', user, project);
+
 			ops.admin = function (callback) {
 				// if is admin
 				api.access.is.admin(options, callback);
@@ -948,58 +1034,105 @@ module.exports = api.access = {
 
 			async.series(ops, function (err, is) {
 				if (!err && is.admin || is.capable) return done(null, options);
-				done('No access.');
+				
+				// no access
+				done(api.access.textTemplates.no_access);
 			});
 		},
 
-		create_client : function (options, callback) {  			// todo: client roles
-			api.access.is.admin(options, function (err, isAdmin) {
-				if (err || !isAdmin) return callback('No access.');
-				callback(null, options);
-			});
-		},
+		// create_client : function (options, callback) {  			// todo: client roles
+			
+		// 	api.access.has._capability({
+		// 		user : options.user,
+		// 		capability : 'create_client'
+
+		// 	}, function (err, gotAccess) {
+		// 		if (err || !gotAccess) return callback('No access.');
+		// 		callback(null, options);
+		// 	})
+
+
+		// 	// api.access.is.admin(options, function (err, isAdmin) {
+		// 	// 	if (err || !isAdmin) return callback('No access.');
+		// 	// 	callback(null, options);
+		// 	// });
+		// },
 		
-		edit_client : function (options, callback) { 
-			api.access.is.admin(options, function (err, isAdmin) {
-				if (err || !isAdmin) return callback('No access.');
-				callback(null, options);
-			});
-		},
+		// edit_client : function (options, callback) { 
+		// 	api.access.is.admin(options, function (err, isAdmin) {
+		// 		if (err || !isAdmin) return callback('No access.');
+		// 		callback(null, options);
+		// 	});
+		// },
 		
-		edit_other_client : function (options, callback) { 
-			api.access.is.admin(options, function (err, isAdmin) {
-				if (err || !isAdmin) return callback('No access.');
-				callback(null, options);
-			});
-		},
+		// edit_other_client : function (options, callback) { 
+		// 	api.access.is.admin(options, function (err, isAdmin) {
+		// 		if (err || !isAdmin) return callback('No access.');
+		// 		callback(null, options);
+		// 	});
+		// },
 		
-		delete_client : function (options, callback) { 
-			api.access.is.admin(options, function (err, isAdmin) {
-				if (err || !isAdmin) return callback('No access.');
-				callback(null, options);
-			});
-		},
+		// delete_client : function (options, callback) { 
+		// 	api.access.is.admin(options, function (err, isAdmin) {
+		// 		if (err || !isAdmin) return callback('No access.');
+		// 		callback(null, options);
+		// 	});
+		// },
 		
-		delete_other_client : function (options, callback) { 
-			api.access.is.admin(options, function (err, isAdmin) {
-				if (err || !isAdmin) return callback('No access.');
-				callback(null, options);
-			});
-		},
+		// delete_other_client : function (options, callback) { 
+		// 	api.access.is.admin(options, function (err, isAdmin) {
+		// 		if (err || !isAdmin) return callback('No access.');
+		// 		callback(null, options);
+		// 	});
+		// },
 		
-		read_client : function (options, callback) { 
-			api.access.is.admin(options, function (err, isAdmin) {
-				if (err || !isAdmin) return callback('No access.');
-				callback(null, options);
-			});
-		},
+		// read_client : function (options, callback) { 
+		// 	api.access.is.admin(options, function (err, isAdmin) {
+		// 		if (err || !isAdmin) return callback('No access.');
+		// 		callback(null, options);
+		// 	});
+		// },
 		
 		create_project : function (options, callback) { 
-			api.access.is.admin(options, function (err, isAdmin) {
-				if (err || !isAdmin) return callback('No access.');
+
+			api.access.has._capability({
+				user : options.user,
+				capability : 'create_project'
+
+			}, function (err, gotAccess) {
+				if (err || !gotAccess) return callback('No access.');
 				callback(null, options);
-			});
+			})
+
+
+			// api.access.is.admin(options, function (err, isAdmin) {
+			// 	if (err || !isAdmin) return callback('No access.');
+			// 	callback(null, options);
+			// });
 		},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
 		
 		edit_project : function (options, done) { 
 			api.access.to._check(options, 'edit_project', done);
@@ -1020,6 +1153,10 @@ module.exports = api.access = {
 		read_project : function (options, done) { 
 			api.access.to._check(options, 'read_project', done);
 		},
+
+		read_file : function (options, done) {
+			// access to read file if ... // todo! not added to list of caps either. 
+		},
 		
 		upload_file : function (options, done) { 
 			api.access.to._check(options, 'upload_file', done);
@@ -1028,7 +1165,10 @@ module.exports = api.access = {
 		download_file : function (options, done) { 
 			// some files not attached to projects, like temp-files (pdfs, etc)
 			// so, if created by self, it's ok..
+
+			console.log('download_file access 1/2');
 			if (api.access.is.createdBy(options.file, options.user)) return done(null, options);
+			console.log('download_file access 2/2');
 
 			// need to find project, and check project_capability
 			var ops = [];
@@ -1061,7 +1201,38 @@ module.exports = api.access = {
 		},
 
 		edit_file : function (options, done) {
-			api.access.to._check(options, 'edit_file', done); 			// todo: if not createdBy self, pass to _other_
+
+			// var options = { file : file, user : user};
+
+			// console.log('access edit_file: ', options);
+
+
+			// if file is createdBy user
+
+			File
+			.findOne({uuid : options.file.uuid})
+			.exec(function (err, f) {
+
+				if (f.createdBy == options.user.uuid) { 
+
+					return done(null, options);
+				}
+
+				done('No assess.');
+
+			});
+
+
+
+			// Project
+			// .findOne({files : options.file._id})
+			// .populate('roles')
+			// .exec(function (err, project) {
+			// 	console.log('edit_file ####', err, project);
+			// 	if (err || !project) return done('No access.');
+			// 	options.project = project;
+			// 	api.access.to._check(options, 'edit_file', done); 			// todo: if not createdBy self, pass to _other_
+			// });
 		},
 
 		edit_other_file : function (options, done) {
@@ -1083,6 +1254,11 @@ module.exports = api.access = {
 		edit_user : function (options, done) { 
 			var account = options.user, 
 			    user = options.subject;
+
+
+			// console.log('edit_user ::::', options);
+			// ok if self
+			if (account.uuid == user.uuid) return done(null, options);
 
 			// if not createdBy self, pass to edit_other_user
 			if (!api.access.is.createdBy(user, account)) return api.access.to.edit_other_user(options, done);
@@ -1196,4 +1372,8 @@ module.exports = api.access = {
 			api.access.to._check(options, 'delegate_to_user', done);
 		},
 	},
+
+	textTemplates : {
+		no_access : "You don't have permission to do that.",
+	}
 }

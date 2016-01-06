@@ -8,9 +8,10 @@ var timestamps = require('mongoose-times');
 var layerSchema = mongoose.Schema({
 
 	uuid 		: String,	// layer uuid
-
 	title 		: String,
 	description 	: String, 	// html
+	satellite_position : String,
+	copyright 	: String,
 	legend 		: String,	// html
 	maxZoom		: String,
 	minZoom		: String,	// which zoom levels layer is active for, todo later..
@@ -19,27 +20,50 @@ var layerSchema = mongoose.Schema({
 	tms 		: Boolean,	
 	attribution     : String,
 	accessToken 	: String, 	// some layers have access tokens, like mapbox
+	opacity 	: String, 	
 
 	// data source for layer
 	data : {
-		geojson 	: String,			// file uuid, file saved on server - needs to be if over 4MB (mongodb limit)
-		topojson	: String,			// file uuid ... // simply request, check auth, serve file.
+		geojson 	: String,		// file uuid, file saved on server - needs to be if over 4MB (mongodb limit)
+		topojson	: String,		// file uuid ... // simply request, check auth, serve file.
 		
 		cartoid   	: String,
 		raster 		: String,
 
-		rastertile 	: String,			// server raster path: raster/hubble2/hubble
-		vectortile 	: String,			// server vector tile: vector/bigassvector/bigvector
-		mapbox 		: String,			// mapbox id: rawger.geography-class
-		cartodb 	: String,			// cartodb id: 
-		osm 		: String,			// osm id?
+		rastertile 	: String,		// server raster path: raster/hubble2/hubble
+		vectortile 	: String,		// server vector tile: vector/bigassvector/bigvector
+		mapbox 		: String,		// mapbox id: rawger.geography-class
+		cartodb 	: String,		// cartodb id: 
+		osm 		: String,		// osm id?
+		norkart     	: String,
+		google 		: String,
+
+		postgis : {
+
+			sql : String,
+			cartocss : String,
+			cartocss_version : String,
+			geom_column : String,
+			file_id : String,
+			database_name : String,
+			table_name : String,
+			data_type : String,
+			geom_type : String,
+			raster_band : Number,
+			layer_id : String,
+			metadata : String,
+		}
+
 	}, 
+
 
 	metadata : String, // json string with loads of meta
 	tooltip : String,  // json string with cartocss tooltips
 	legends : String,  // json string with cartocss legends
-	file : String 	   // file uuid that layer is connected to, if any
-
+	file : String,	   // file uuid that layer is connected to, if any
+	style : String,
+	filter : String,
+	tileType : String, // tiletype, eg. 'aerial', 'hybrid'
 });
 
 

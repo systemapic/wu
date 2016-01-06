@@ -41,6 +41,13 @@ module.exports = api.pixels = {
 
 
 
+	// function removeChars(validChars, inputString) {
+	// 	var regex = new RegExp('[^' + validChars + ']', 'g');
+	// 	return inputString.replace(regex, '');
+	// }
+
+	// var newString = removeChars('01234567890%-', "The result is -2,003% of the total");
+
 	// #########################################
 	// ###  API: Create PDF Snapshot         ###
 	// #########################################
@@ -48,7 +55,21 @@ module.exports = api.pixels = {
 		if (!req.body || !req.body.hash) return api.error.missingInformation(req, res);
 
 		var projectUuid = req.body.hash.project;
-		var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.png';
+		// var filename = 'snap-' + projectUuid + '-' + req.body.hash.id + '.png';
+		// var filename = req.body.hash.slug + 
+
+		console.log('req.body.hash', req.body.hash);
+
+		var validChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMONPQRSTUVQXYZ0123456789';
+		var regex = new RegExp('[^' + validChars + ']', 'g');
+		var slug = req.body.hash.slug.replace(regex, '');
+		// var slug = req.body.hash.slug.trim().replace(' ', '_').
+		var today = new Date();
+		var dd = today.getDate();
+		var mm = today.getMonth()+1; //January is 0!
+		var yyyy = today.getFullYear();
+		var prettyDate = dd + '.' + dd + '.' + yyyy;
+		var filename = 'Systemapic - Project ' + slug + ' - ' + prettyDate + '.png';
 		var fileUuid = 'file-' + uuid.v4();
 		var folder = api.config.path.file + fileUuid;
 		var path = folder + '/' + filename;
@@ -116,6 +137,7 @@ module.exports = api.pixels = {
 				callback(null);
 
 			} catch (e) {
+				console.log('pdf error', e);
 				callback(e);
 			}
 
@@ -124,6 +146,7 @@ module.exports = api.pixels = {
 		// get size
 		ops.push(function (callback) {
 			fs.stat(pdfpath, function (err, stats) {
+				console.log('stat pdfpath', pdfpath, err, stats);
 				if (err) return callback(err);
 
 				dataSize = stats.size;
@@ -409,6 +432,7 @@ module.exports = api.pixels = {
 			entry.data.image.dimensions  = dimensions;
 			entry.dataSize        	     = dataSize;
 			entry.data.image.file        = file;
+			entry.type 		     = 'image';
 			
 			if (exif) {
 				entry.data.image.created     = api.pixels.getExif.created(exif);
@@ -709,6 +733,8 @@ module.exports = api.pixels = {
 	resizeImage : function (option, callback) {
 		if (!option) return callback('No options provided.');
 
+		console.log('resizing!');
+
 		// basic options
 		var width   	= parseInt(option.width) || null;
 		var height  	= parseInt(option.height) || null;
@@ -726,6 +752,8 @@ module.exports = api.pixels = {
 		var path    	= option.file; 						// original file
 		var newFile 	= 'image-' + uuid.v4();					// unique filename
 		var newPath 	= api.config.path.image + newFile;				// modified file
+		var format 	= option.format || 'jpeg';
+
 
 		// wtf
 		gm.prototype.checkSize = function (action) {
@@ -740,7 +768,7 @@ module.exports = api.pixels = {
 			.autoOrient()
 			.crop(cropW, cropH, cropX, cropY)				// x, y is offset from top left corner
 			.noProfile()							// todo: strip of all exif?
-			.setFormat('JPEG')						// todo: watermark systemapic? or client?
+			.setFormat(format.toUpperCase())						// todo: watermark systemapic? or client?
 			.quality(quality)
 			.write(newPath, function (err) {
 				if (err) return callback(err);
@@ -863,13 +891,19 @@ module.exports = api.pixels = {
 		var cropY      = req.query.cropy;
 		var cropW      = req.query.cropw;
 		var cropH      = req.query.croph;
+		var format     = req.query.format;
 	
 		var imagePath = '/data/images/' + imageId;
+
+		console.log('imageId: ', imageId);
+
+		if (imageId == 'images') return res.end();
 
 		var options = {
 			height: height,
 			width : width,
 			file : imagePath,
+			format : format,
 			crop : {
 				x : cropX,
 				y : cropY,
@@ -887,7 +921,42 @@ module.exports = api.pixels = {
 		});
 	},			
 
+	serveScreenshot : function (req, res) {
+		if (!req.query) return api.error.missingInformation(req, res);
 
+		// set vars
+		var image_id = req.params[0]; 		// 'file-ccac0f45-ae95-41b9-8d57-0e64767ea9df'		
+		var path = '/data/images/' + image_id;
+
+		// only allow screenshot to go thru
+		if (path.indexOf('resized_screenshot.jpg') == -1) return res.end(); 
+
+		// return screenshot
+		res.sendfile(path, {maxAge : 10000000});
+	},
+
+	_resizeScreenshot : function (options, callback) {
+
+		var image = options.image; // /data/images/snap-project-8a29019a-e325-46c4-8a51-4691f92632ac-KTKE29.png
+
+		var outPath = image + '.resized_screenshot.jpg';
+		var width = 1200;
+
+		// do crunch magic
+		gm(image)
+		.resize(width)						// todo: if h/w is false, calc ratio					
+		.autoOrient()
+		.noProfile()							// todo: strip of all exif?
+		.quality(90)
+		.write(outPath, function (err) {
+			if (err) return callback(err);
+			var base = outPath.split('/').reverse()[0];
+
+			// return error and file
+			callback(null, base);
+		});
+
+	},
 
 
 
@@ -907,7 +976,7 @@ module.exports = api.pixels = {
 		var cropW      = req.query.cropw;
 		var cropH      = req.query.croph;
 
-		
+
 		// if raw quality requested, return full image
 		if (raw) return api.pixels.returnRawfile(req, res);
 
@@ -976,6 +1045,8 @@ module.exports = api.pixels = {
 				}
 			}
 
+			console.log('gonna resize: ', template);
+
 			// create image with dimensions
 			api.pixels.resizeImage(template, callback);
 
@@ -996,6 +1067,8 @@ module.exports = api.pixels = {
 		// run all async ops
 		async.waterfall(ops, function (err, result) {
 			if (err || !result) return api.error.general(req, res, err || 'No result.');
+
+			console.log('all done!');
 
 			api.pixels.returnImage(req, res, result);
 		});
@@ -1024,6 +1097,8 @@ module.exports = api.pixels = {
 	returnImage : function (req, res, imageFile) {
 		// send file back to client, just need file path
 		var path = api.config.path.image + imageFile.file;
+
+		console.log('returnImage', path);
 		res.sendfile(path, {maxAge : 10000000});	// cache age, 115 days.. cache not working?
 	},
 

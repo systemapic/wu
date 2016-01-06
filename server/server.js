@@ -1,5 +1,3 @@
-
-
 // server.js
 var express  = require('express.io');
 var mongoose = require('mongoose');
@@ -11,22 +9,15 @@ var favicon  = require('serve-favicon');
 var cors     = require('cors');
 var morgan   = require('morgan');
 var session  = require('express-session');
-var prodMode = process.argv[2] == 'production';
+var prodMode = process.argv[2] == 'prod';
 var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser'); 
-// var config = require('../config/server-config.js').serverConfig;
+
+// api
 var api = require('../api/api');
 var config = api.config;
 var port = config.port;
-
-// mute console in production mode
-if (prodMode) {
-	var nullFn = function () {};
-	console.log = nullFn;
-	console.time = nullFn;
-	console.timeEnd = nullFn;
-}
 
 // socket enabled server
 app = express().http().io()
@@ -38,12 +29,12 @@ var sessionStore = mongoose.connect(config.mongo.url);
 require('./passport')(passport); 
 
 // set up our express application
-app.use(morgan('dev')); 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({limit: '2000mb', extended : true}));
 app.use(bodyParser.json({limit:'2000mb'}));
 app.set('view engine', 'ejs'); // set up ejs for templating
 app.use(multipart()); // for resumable.js uploads
+// app.use(morgan('dev')); 
 
 // required for passport
 app.use(express.session({
@@ -56,14 +47,17 @@ app.use(express.session({
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
-app.use(favicon(__dirname + '/../dist/css/favicon.ico'));
+// app.use(favicon(__dirname + '/../dist/css/favicon.ico'));
+app.use(favicon(__dirname + '/../public/local/favicon.ico'));
 
 // enable compression
 app.use(compress());
 app.use(cors());
 
 // static files
-var staticPath = prodMode ? '../dist' : '../public';
+// var staticPath = prodMode ? '../dist' : '../public';
+var staticPath = '../public';
+
 app.use(express.static(path.join(__dirname, staticPath)));
 
 // load our routes and pass in our app and fully configured passport
@@ -71,6 +65,11 @@ require('../routes/routes.js')(app, passport);
 
 // load our socket api
 require('../routes/socket.routes.js')(app, passport);
+
+// catch route errors
+app.use(function(err, req, res, next){ 
+	err.status === 400 ? res.render('../../views/index.ejs') : next(err);
+});
 
 // launch 
 var server = app.listen(port);

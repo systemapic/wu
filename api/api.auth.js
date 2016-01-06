@@ -38,14 +38,61 @@ var mapnikOmnivore = require('mapnik-omnivore');
 // api
 var api = module.parent.exports;
 
+
 // exports
 module.exports = api.auth = { 
 
-
+	
 	forgotPassword : function (req, res) {
-		res.render('../../views/forgot.ejs', {message : ''});
+		console.log('forgotPassword', req.body);
+
+		// get email
+		var email = req.body.email;
+
+		User
+		.findOne({'local.email' : email})
+		.exec(function (err, user) {
+			if (err || !user) return;
+
+			api.email.sendPasswordResetEmail(user);
+		});
+
+		res.end();
 	},
 
+	serveResetPage : function (req, res) {
+		res.render('../../views/reset.ejs');
+	},
+
+	createPassword : function (req, res) {
+
+		// check token
+		var token = req.body.token;
+		var password = req.body.password;
+
+		api.redis.temp.get(token, function (err, userUuid) {
+			if (err || !userUuid) return res.end(JSON.stringify({
+				err : err || 'Invalid token'
+			}));
+
+			User
+			.findOne({uuid : userUuid})
+			.exec(function (err, user) {
+				if (err || !user) {
+					return res.end('no such user');
+				}
+
+				api.auth.setPassword(user, password, function (err, doc) {
+					
+					// send to login page
+					res.redirect('/login');
+
+					// delete temp token
+					if (token) api.redis.temp.del(token);
+				});
+			});
+		});
+	},
 
 	requestPasswordReset : function (req, res) {
 		// get email
@@ -55,71 +102,50 @@ module.exports = api.auth = {
 		.findOne({'local.email' : email})
 		.exec(function (err, user) {
 
+			var text = 'Please check your email for password reset link.';
+
 			// send password reset email
-			if (!err && user) api.email.sendPasswordResetEmail(user);
-
-			// finish
-			res.render('../../views/login.serve.ejs', { message: 'Please check your email for further instructions.' });
-			res.end();
+			if (!err && user) {
+				api.email.sendPasswordResetEmail(user);
+				res.end(text);
+			} else {
+				res.end(text);
+			}
 		});
 	},
 
+	checkResetToken : function (req, res) {
 
-	confirmPasswordReset : function (req, res) {
-		var email = req.query.email,
-	 	    token = req.query.token;
-
-		User
-		.findOne({'local.email' : email})
-		.exec(function (err, user) {
-			if (err || !user) api.error.general(req, res, err || 'No such user. Maybe. ;)');
-
-			// check token
-			api.auth.checkPasswordResetToken(user, token, function (valid) {
-
-				// reset if valid token
-				if (valid) {
-					api.auth.resetPassword(user);
-					var message = 'Please check your email for new login details.';
-				} else {
-					var message = 'Authorization failed. Please try again.';
-				}
-
-				// finish
-				res.render('../../views/login.serve.ejs', { message : message });
-			});
+		// check token
+		var token = req.body.token;
+		api.redis.temp.get(token, function (err, userUuid) {
+			return res.end(JSON.stringify({
+				valid : userUuid ? true : false
+			}));
 		});
 	},
 
-
-	resetPassword : function (user) {
-		var password = crypto.randomBytes(16).toString('hex');
+	setPassword : function (user, password, callback) {
 		user.local.password = user.generateHash(password);
 		user.markModified('local');
-	
-		// save the user
-		user.save(function(err, doc) { 
-			// send email with login details to user
-			api.email.sendWelcomeEmail(user, password);
-		});
+		user.save(callback);
 	},
 
+	setNewLoginToken : function (user) {
+		return this.setPasswordResetToken(user, true);
+	},
 
-	setPasswordResetToken : function (user) {
-		var token = crypto.randomBytes(16).toString('hex'),
-		    key = 'resetToken-' + user.uuid;
+	setPasswordResetToken : function (user, dontexpire) {
+		var token = crypto.randomBytes(20).toString('hex'),
+		    key = user.uuid;
 
-		api.redis.set(key, token);  // set temp token
-		api.redis.expire(key, 600); // expire in ten mins
+		// set temp token
+		api.redis.temp.set(token, key);  
+		
+		// expire in ten mins
+		if (!dontexpire) api.redis.temp.expire(token, 600); 
+
 		return token;
-	},
-
-
-	checkPasswordResetToken : function (user, token, callback) {
-		var key = 'resetToken-' + user.uuid;
-		api.redis.get(key, function (err, actualToken) {
-			callback(!err && actualToken && actualToken == token)
-		});
 	},
 
 }

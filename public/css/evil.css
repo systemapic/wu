@@ -1,194 +1,203 @@
-.map-blur {
-	opacity: 1;
+.enable-edit-switch-container-outer {
+	width: 266px;
+	padding: 0px 15px 0px 5px;
+	position: relative;	
 	}
 
-.map-blur:after {
-	content: '';
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	left: 0;
-	top: 0;
-	background: rgba(0,0,0,0.7);	
-	z-index: 9999;
+.enable-edit-switch-container-inner {
+	background: #FCFCFC;
+
+  	padding: 6px;
 	}
 
-.home-container,
-.dropzone-pane,
-.q-editor-container,
-.dropzone-meta,
-.fullpage-documents,
-.data-library,
-.data-library, 
-.fullpage-mediaLibrary,
-#header,
-.fullpage-users,
-.fullpage-mediaLibrary {
-	z-index: 10001;
+.enable-edit-switch-title {
+	padding-left: 9px;
+	font-size: 15px;
+	font-weight: 900;	
+	}
+
+.edit-layers-switch {
+	right: 25px;
+	top: 9px;	
+	}
+
+.layers-bottom-container {
+	position: relative;
+	left: 1px;
+	top: 1px;
+	}
+
+.edit-mode .scroller-frame {
+	padding-top: 35px;
+	}
+
+.chrome-button.settings {
+	background-position: -6px -3px;
+	}
+
+.chrome-button.settingsSelector {
+  	background-position: -160px -4px;	
 	}	
 
-.status-progress-bar {
-	z-index: 10010;
-	}
-
-.dropzone-meta {
-	z-index: 10002 !important;
-	}
 
 
-/*
-┌─┐┬─┐┬─┐┌─┐┬─┐  ┌─┐┌─┐┌┐┌┌─┐
-├┤ ├┬┘├┬┘│ │├┬┘  ├─┘├─┤│││├┤ 
-└─┘┴└─┴└─└─┘┴└─  ┴  ┴ ┴┘└┘└─┘
-aka feedback pane
-*/
-
-.feedback-pane {
+.settings-dropdown {
+	width: 225px;
+	height: auto !important;
 	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: auto;
-	z-index: 999999999;
-	margin: 10px;
-	box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	max-width: 350px;
-	max-height: 700px;
+	background: white;
+	right: 3px;
+	padding: 13px 20px 13px 19px;
+	box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.4);
+	z-index: 10000010;
+	cursor: pointer;
+	top: 38px !important;  	
 	}
 
-.feedback-pane-content {
-	background: rgba(255, 0, 0, 0.81);
-	width: 100%;
-	height: 100%;
-	opacity: 0.9;
-	cursor: default;
-	border-radius: 2px;
-	margin-right: 50px;
-	max-height: inherit;
-  	overflow: hidden;
-  	margin-top: 2px;
-  	position: relative;
-	padding: 10px 15px 10px 15px;	
+.settings-dropdown .chrome-content-section-wrapper:last-child {
+	margin-bottom: 0;
 	}
 
-.feedback-pane-title,
-.feedback-pane-title2 {
-	color: white;
-	padding-left: 0;
-	font-weight: 900;
-	font-size: 17px;
+.settings-dropdown .chrome-metafield-line {
+ 	border-top: 1px solid #ccc;
+ 	padding-top: 3px;
+ 	padding-bottom: 3px;
+	}
+
+.settings-dropdown .chrome-metafield-line:last-child {
+	border-bottom: 1px solid #ccc;;
+	}
+
+
+.settings-dropdown .chrome-switch-container {
+	top: 5px;
+
+	}
+
+
+
+
+
+.file-meta-content {
+	font-size: 11px;
+	font-weight: 600;
+	color: #aaa !important;
 	margin-bottom: 2px;
 	}
 
-.feedback-pane-title2 {
-	margin-top: 10px;
-	padding-top: 6px;
-	border-top: 1px dashed rgba(255,255,255,0.3);
+.file-meta-author {
+	/*font-size: 11px;*/
+	/*font-weight: 600;*/
+	color: #3C4759;	
+	margin-right: 4px;
 	}
 
-.feedback-pane-description,
-.feedback-pane-description2 {
-	color: white;
-	font-weight: 500;
-	padding: 0px;
-	margin: 0px;
-	font-size: 13px;
-	}
-
-.feedback-pane-x {
-	position: absolute;
-	color: transparent;
-	font-weight: bold;
-	cursor: pointer;
-	text-align: center;
-	background-image: url(images/evil_sprite.png);
-	background-repeat: no-repeat;
-	background-position: -1px -45px;
-	border-radius: 2px;
-	top: 6px;
-	right: 6px;
-	width: 15px;
-	height: 15px;
-	opacity: 0.3;
-	background-color: white;
-	}
-
-.feedback-pane-x:hover {
-	opacity: 0.7;
-	}
-
-.feedback-pane-content.message {
-	background-color: rgba(77, 87, 102, 0.81);
-	}
-
-.feedback-pane-content.error {
-	background-color: rgba(132, 14, 14, 0.81);
-	}
-
-.feedback-pane-content.success {
-	background-color: rgba(48, 98, 41, 0.81);
-	}
-
-.feedback-pane-content.action {
-	background-color: rgba(10, 57, 107, 0.81);
-	}
-
-.feedback-pane-icon {
-	max-width: 100px;
-	max-height: 100px;
-	top: 0;
-	left: 0;
-	position: relative;
-	float: left;
-	margin: 5px;
-	border-radius: 3px;
-	border: 0;
-	float: left;
-	display: none;
-	}
-
-.feedback-pane-icon-img {
-	border-radius: 3px;
+.file-meta-date {
+	/*font-size: 11px;*/
+	/*font-weight: 600;*/
+	/*color: #5a9b87;	*/
 	}
 
 
-/***************************************************************************/
+.file-meta-size {
+	/*font-size: 11px;*/
+	/*font-weight: 600;*/
+	/*color: #5a9b87;	*/
+	/*font-style: italic;*/
+	}
 
-.description-textarea-outer-wrapper {
-  overflow: hidden;
+
+
+
+.data-list-line {
+	padding-top: 7px;
+	padding-bottom: 7px;
+	}
+
+
+
+
+
+
+.chrome.chrome-content.chrome-pane {
+	width: 402px;
 }
 
-.file-description-inner-wrapper {
-	overflow-y: scroll;
-	overflow-x: hidden;
-	width: 120%;
-	padding-right: 20%;
+.chrome-middle-section {
+	width: 402px;
+}
+
+.chrome-middle-section-outer-scroller {
+	width: 387px;
+}
+
+.chrome-middle-section-inner-scroller {
+	width: 402px;
+}
+
+.chrome-field-wrapper {
+	width: 402px;
 }
 
 
-.minimal .file-description-outer-wrapper {
-	  width: 100%;
-}
 
-.minimal .list-attribute-wrapper {
-	height: 33px;
-}
 
-.minimal .open-list-info {
-	  height: 206px;
- 		top: 34px;
-}
 
-.minimal .file-list-wrapper {
-	height: 151px;
-}
 
-.manage-access-container {
-	overflow-y: scroll;
-	overflow-x: hidden;
-}
+/*
+.chrome-top {
+	border-bottom: 1px solid #ccc;
+	}
 
-@media screen and (max-width: 780px)
-.file-copright-wrapper {
-  width: 252px;
-}
+.chrome-right {
+	border-top: none !important;
+	}
+
+.chrome-left {
+	border-right: 1px solid #ccc;
+	}
+
+.chrome-left-new-button {
+  	line-height: 11px !important;
+	}
+
+.chrome-left-container {
+	margin-top: 0px !important;
+	}
+
+.chrome-project.active-project {
+	background: rgb(113, 196, 168) !important;
+	color: white !important;
+	font-weight: 900 !important;
+	}
+
+.data-list-line {
+	padding-top: 3px !important;
+	padding-bottom: 3px !important;
+	}
+
+.smooth-input {
+	font-family: Helvetica Neue, helvetica, arial, open sans !important;
+	}
+
+.layer-radio {
+  	top: 4px !important;
+	}	
+
+.chrome-left-container.contacts {
+	margin-top: 20px !important;
+	}
+
+.chrome-metafield-line-children .chrome-metafield-line {
+	border-top: none !important;
+	}	
+
+.chrome-metafield-line {
+	padding-top: 2px !important;
+	padding-bottom: 2px !important;	
+	}
+
+.fa-arrow-circle-right:before {
+	opacity: 0.2 !important;
+}	
+*/

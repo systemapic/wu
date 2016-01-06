@@ -2,7 +2,7 @@
 
 // database schemas
 var Project 	= require('../models/project');
-var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
+// var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
 var User  	= require('../models/user');
 var File 	= require('../models/file');
 var Layer 	= require('../models/layer');
@@ -26,7 +26,7 @@ var exec 	= require('child_process').exec;
 var dive 	= require('dive');
 var async 	= require('async');
 var carto 	= require('carto');
-var nodeSlack 	= require('node-slack');
+var nodeSlack 	= require('../tools/slack');
 var crypto      = require('crypto');
 var fspath 	= require('path');
 var mapnik 	= require('mapnik');
@@ -47,77 +47,152 @@ var slack = new nodeSlack(api.config.slack.webhook);
 // exports
 module.exports = api.slack = { 
 
-
 	_send : function (options) {
 		var text = options.text,
 		    attachments = options.attachments,
 		    icon = options.icon,
 		    channel = options.channel;
 
-		// send to slack
-		slack.send({
+		var slack_options = {
 			text 		: text,
 			channel 	: channel || api.config.slack.channel,
 			username 	: api.config.slack.botname,
-			icon_url 	: icon || api.config.slack.icon,
+			icon_url 	: api.config.slack.icon,
 			unfurl_links 	: true,
 			link_names 	: 1,
 			attachments 	: attachments,
+		}
+
+		if (options.icon_emoji) {
+			slack_options.icon_emoji = options.icon_emoji;
+		}
+
+		// send to slack
+		slack.send(slack_options);
+	},
+
+	registeredUser : function (options) {
+
+		// get time since invite
+		var age_of_link = api.utils.prettyDate(new Date(options.timestamp));
+
+		// text
+		var text = 'A new user registered to ' + api.config.slack.baseurl +' \n\n';
+		text += '`Name:` ' + options.user_name;
+		text += '\n`Email:` ' + options.user_email;
+		if (options.user_company) text 	+= '\n`Company:` ' + options.user_company;
+		if (options.user_position) text += '\n`Position:` ' + options.user_position;
+		text += '\n`Invited by:` ' + options.inviter_name;
+		if (options.inviter_company) text += ' (' + options.inviter_company + ')';
+		text += '\n`Invited to project:` ' + options.project_name;
+		text += '\n`Invite link was created:` ' + age_of_link;
+
+		// send
+		api.slack._send({
+			text : text,
+			// icon_emoji : ":sunglasses:"
 		});
 	},
 
+	userEvent : function (options) {
+
+		console.log('userEvent', options);
+
+		var user = options.user,
+		    event = options.event,
+		    description = options.description,
+		    timestamp = options.timestamp,
+		    custom_options = options.options,
+		    ops = [];
+
+
+		// custom options (screenshot)
+		if (custom_options && custom_options.screenshot) ops.push(function (callback) {
+
+			var file_id = custom_options.file_id;
+
+			// get raw file
+			File
+			.findOne({uuid : file_id})
+			.exec(function (err, file) {
+				if (err || !file) return callback('no screenshot');
+
+				// return raw file
+				var imageFile = file.data.image;
+				var path = '/data/images/' + imageFile.file;
+
+				// create smaller version of screenshot
+				api.pixels._resizeScreenshot({
+					image : path,	
+				}, function (err, resized_image) {
+					if (err) return callback(err);
+					var resized_path = api.config.portalServer.uri + 'pixels/screenshot/' + resized_image;
+					options.embed_image = resized_path;
+					
+					callback(null);
+				});
+			});
+		});
+
+		ops.push(function (callback) {
+			var text = user + ' ' + event + ' ' + description;
+
+			// create attachments
+			var attachments = api.slack._createAttachments(options);
+
+			api.slack._send({
+				text : text,
+				channel : api.config.slack.monitor,
+				attachments : attachments
+			});
+		})
+
+		async.series(ops, function (err) {
+		
+			if (err) console.log('ERR 83838: ', err);
+		});
+	
+
+	},
+
+	_createAttachments : function (options) {
+		if (!options.embed_image) return false;
+
+		var attachments = [{
+			image_url : options.embed_image,
+		}];
+
+		return attachments;
+	},
 
 	createdProject : function (options) {
 		var project = options.project,
 		    user = options.user;
 
-		// get client for name
-		api.slack._getClient(project, function (err, client) {
-			if (err || !client) return;
+		// set vars
+		var baseurl 	= api.config.slack.baseurl,
+		    projectName = project.name,
+		    fullName 	= user.firstName + user.lastName,
+		    url 	= baseurl + project.slug,
+		    text 	= fullName + ' created a project: ' + url;
 
-			// set vars
-			var baseurl 	= api.config.slack.baseurl,
-			    projectName = project.name,
-			    clientName 	= client.name,
-			    fullName 	= user.firstName + user.lastName,
-			    slugs 	= client.slug + '/' + project.slug,
-			    url 	= baseurl + slugs,
-			    text 	= fullName + ' created a project for client ' + clientName + ': ' + url;
-
-			// send
-			api.slack._send({text : text});
-			
-		});
+		// send
+		api.slack._send({text : text});
 	},
-
-	
 
 	deletedProject : function (options) {
 		var project = options.project,
 		    user = options.user;
 
-		// get client for name
-		api.slack._getClient(project, function (err, client) {
-			if (err || !client) return;
+		// set vars
+		var baseurl 	= api.config.slack.baseurl,
+		    projectName = project.name,
+		    fullName 	= user.firstName + user.lastName,
+		    url 	= baseurl + project.slug,
+		    text 	= fullName + ' deleted a project: ' + projectName;
 
-			// set vars
-			var baseurl 	= api.config.slack.baseurl,
-			    projectName = project.name,
-			    clientName 	= client.name,
-			    fullName 	= user.firstName + user.lastName,
-			    slugs 	= client.slug + '/' + project.slug,
-			    url 	= baseurl + slugs,
-			    text 	= fullName + ' deleted a project: ' + projectName;
-
-			// send to slack
-			api.slack._send({text: text});
-		});
-	},
-
-	_getClient : function (project, callback) {
-		Clientel
-		.findOne({uuid : project.client})
-		.exec(callback)
+		// send to slack
+		api.slack._send({text: text});
 	},
 
 
@@ -128,9 +203,8 @@ module.exports = api.slack = {
 		    text = fullName + ' logged in to ' + api.config.slack.baseurl;
 
 		// send
-		api.slack._send({ text : text });
-
+		api.slack._send({ 
+			text : text,
+		});
 	},
-
 };
-

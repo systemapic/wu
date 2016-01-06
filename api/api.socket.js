@@ -42,7 +42,40 @@ module.exports = api.socket = {
 
 	_processing : {},
 
-	send : function (options) {
+
+	send : function (channel, user_id, data) {
+
+		console.log('socket send', channel, user_id, data);
+
+		var sock = api.socket._getSocket(user_id);
+
+		// send to user
+		sock && sock.emit(channel, {
+			data : data
+		});
+
+	},
+
+
+	getServerStats : function (req) {
+
+		// get stats from redis
+		api.redis.stats.lrange('server_stats', 0, 0, function (err, range) {
+			var stats = api.utils.parse(range);
+			req.io.socket.emit('server_stats', {
+				server_stats : stats
+			});
+		});
+
+	},
+
+
+	userEvent :function (req) {
+
+		var options = req.data;
+
+		// send to slack
+		api.slack.userEvent(options);
 
 	},
 
@@ -55,14 +88,105 @@ module.exports = api.socket = {
 		});
 	},
 
-	uploadDone : function (options) {
-		console.log('uploadDone'.yellow);
 
-		var userId = api.socket._getUserId(options);
-		var sock = api.socket._getSocket(userId);
+
+
+	downloadReady : function (options) {
+
+		// get socket
+		var socket = api.socket.getSocket(options);
 
 		// send to user
-		sock && sock.emit('uploadDone', options.result);
+		socket && socket.emit('downloadReady', options.status);
+	},
+
+
+	uploadDone : function (options) {
+
+		// get socket
+		var socket = api.socket.getSocket(options);
+
+		// send to user
+		socket && socket.emit('uploadDone', options.result);
+	},
+
+	processingProgress : function (options) {
+
+		var user_id = options.user_id;
+		var progress = options.progress;
+
+		// get socket
+		var socket = api.socket._getSocket(user_id);
+
+		// send to user
+		socket && socket.emit('processingProgress', progress);
+	},
+
+	processingDone : function (options) {
+
+		var file_id = options.file_id,
+		    user_id = options.user_id;
+
+		var sock = api.socket._getSocket(user_id);
+
+		// send to user
+		sock && sock.emit('processingDone', {
+			file_id : file_id,
+			import_took_ms : options.import_took_ms
+		});
+	},
+
+	grindRasterDone : function (req, res) {
+
+		var fileUuid = req.body.fileUuid,
+		    process = api.socket._getProcessing(fileUuid),
+		    timeDiff = new Date().getTime() - process._timestamp,
+		    userId = process.userId,
+		    sock = api.socket._getSocket(userId),
+		    error = req.body.error,
+		    uniqueIdentifier = req.body.uniqueIdentifier;
+
+		// send to user
+		sock && sock.emit('processingDone', {
+			processingDone : fileUuid,
+			elapsed : timeDiff,
+			error : error,
+			size : process.size,
+			uniqueIdentifier : uniqueIdentifier
+		});
+
+		// end connection
+		res.end();
+	},
+
+
+	grindDone : function (req, res) {
+		var fileUuid = req.body.fileUuid,
+		    process = api.socket._getProcessing(fileUuid),
+		    timeDiff = new Date().getTime() - process._timestamp,
+		    userId = process.userId,
+		    sock = api.socket._getSocket(userId),
+		    error = req.body.error,
+		    uniqueIdentifier = req.body.uniqueIdentifier;
+
+		// send to user
+		sock && sock.emit('processingDone', {
+			processingDone : fileUuid,
+			elapsed : timeDiff,
+			error : error,
+			size : process.size,
+			uniqueIdentifier : uniqueIdentifier
+		});
+
+		// end connection
+		res.end();
+	},
+
+
+	getSocket : function (options) {
+		var userId = api.socket._getUserId(options);
+		var sock = api.socket._getSocket(userId);
+		return sock;
 	},
 
 	_getUserId : function (options) {
@@ -87,49 +211,13 @@ module.exports = api.socket = {
 	},
 
 	setProcessing : function (process) {
-		console.log('setProcessing'.green, process);
 		this._processing[process.fileUuid] = process;
 		this._processing[process.fileUuid]._timestamp = new Date().getTime();
 	},
 
-	getProcessing : function (id) {
+	_getProcessing : function (id) {
 		return this._processing[id];
 	},
 
-	processingDone : function (options) {
-		console.log('processingDone'.yellow);
-
-		var userId = api.socket._getUserId(options);
-		var sock = api.socket._getSocket(userId);
-
-		// send to user
-		sock && sock.emit('processingDone', options.result);
-	},
-
-	grindDone : function (req, res) {
-		console.log('grindDone'.yellow, req.body);
-		
-		var fileUuid = req.body.fileUuid,
-		    process = api.socket.getProcessing(fileUuid),
-		    timeDiff = new Date().getTime() - process._timestamp,
-		    userId = process.userId,
-		    sock = api.socket._getSocket(userId),
-		    error = req.body.error,
-		    uniqueIdentifier = req.body.uniqueIdentifier;
-
-		console.log('grindDone: err?'.yellow, error);
-
-		// send to user
-		sock && sock.emit('processingDone', {
-			processingDone : fileUuid,
-			elapsed : timeDiff,
-			error : error,
-			size : process.size,
-			uniqueIdentifier : uniqueIdentifier
-		});
-
-		// end connection
-		res.end();
-	},
-
+	
 }

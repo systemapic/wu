@@ -41,11 +41,16 @@ L.Control.Inspect = Wu.Control.extend({
 
 		// add class and append to control corner
 		L.DomUtil.addClass(container, 'leaflet-control');
-		corner.appendChild(container);
+		if (pos.indexOf('bottom') !== -1) {
+			corner.insertBefore(container, corner.firstChild);
+		} else {
+			corner.appendChild(container);
+		}
 
 		// stop
 		Wu.DomEvent.on(container, 'mousedown click dblclick', Wu.DomEvent.stop, this);
 
+		
 		return this;
 	},
 
@@ -59,7 +64,7 @@ L.Control.Inspect = Wu.Control.extend({
 
 	},
 
-	_refresh : function () {
+	_refresh : function (hide) {
 
 		// should be active
 		if (!this._added) this.addTo(app._map);
@@ -74,7 +79,16 @@ L.Control.Inspect = Wu.Control.extend({
 		this._flush();
 
 		// show
-		this._show();
+		!hide && this._show();
+
+		// enable scroll
+		this.disableScrollzoom();
+	},
+
+	// refresh but keep active layers
+	_refreshContent : function (hide) {
+		this._refresh(hide);
+		this._addAlreadyActiveLayers();
 	},
 
 	// turned on and off by sidepane/options/controls toggle
@@ -163,8 +177,12 @@ L.Control.Inspect = Wu.Control.extend({
 
 		// prevent map scrollzoom
                 var map = app._map;
-                Wu.DomEvent.on(this._container, 'mouseenter', function () { map.scrollWheelZoom.disable(); }, this);
-                Wu.DomEvent.on(this._container, 'mouseleave', function () { map.scrollWheelZoom.enable();  }, this); 
+                Wu.DomEvent.on(this._container, 'mouseenter', function () { 
+                	map.scrollWheelZoom.disable(); 
+                }, this);
+                Wu.DomEvent.on(this._container, 'mouseleave', function () { 
+                	map.scrollWheelZoom.enable();  
+                }, this); 
 	},
 
 	resetScrollzoom : function () {
@@ -178,7 +196,8 @@ L.Control.Inspect = Wu.Control.extend({
 
 	// currently called from layers.js:63 .. refactor.. dont chain, do modules, event emitters
 	addLayer : function (layer) {
-
+		if (!this._layers) return; // bc fn called even if inspect is disabled
+		
 		// Make sure that the layer inspector is visible
 		this._content.style.display = 'block';
 
@@ -187,7 +206,7 @@ L.Control.Inspect = Wu.Control.extend({
 		var arrowsWrap 	= Wu.DomUtil.create('div', 'inspect-arrows-wrap', wrapper);
 		var upArrow 	= Wu.DomUtil.create('div', 'inspect-arrow-up', arrowsWrap);
 		var downArrow 	= Wu.DomUtil.create('div', 'inspect-arrow-down', arrowsWrap);
-		var text 	= Wu.DomUtil.create('div', 'inspect-text', wrapper, layer.store.title);
+		var text 	= Wu.DomUtil.create('div', 'inspect-text', wrapper, layer.getTitle());
 		var fly 	= Wu.DomUtil.create('div', 'inspect-fly', wrapper);
 		var eye 	= Wu.DomUtil.create('div', 'inspect-eye', wrapper);
 		var kill 	= Wu.DomUtil.create('div', 'inspect-kill', wrapper);
@@ -514,7 +533,7 @@ L.Control.Inspect = Wu.Control.extend({
 		var descriptionControl = app.MapPane.getControls().description;
 		if (descriptionControl) descriptionControl.removeLayer(entry.layer);	
 
-		// Hise Layer inspector if it's empty
+		// Hide Layer inspector if it's empty
 		if (!this._layers.length) this._content.style.display = 'none';
 
 	},

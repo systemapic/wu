@@ -1,0 +1,14 @@
+{
+  "geom_column": "geom",
+  "geom_type": "geometry",
+  "raster_band": "",
+  "srid": "",
+  "affected_tables": "",
+  "interactivity": "",
+  "attributes": "",
+  "access_token": "1Q45CYWIMYahrv3YRBPJ0KA4QwyFRYvizTgLetRuw0ANtUJZ3LMEW49zipLeUONNUnC27NKpzcdgj2kAsEF5Kr7q5ImoFqkK9ELKhmF3N4cW9isqkLNiLa3lejMmR6jKWdvbYHlk41lq1DIp7l9zOkzjgfPoLeia9ApLqFODCG02CbDEEcRDPEue9CdDjcqu9uMH2czSlluhAeeeW9TiqCT23jQBT81I7C4K90nmb8ASWyCaWY6cmsQ3VfClj94x",
+  "cartocss_version": "2.0.1",
+  "cartocss": "#layer {  marker-allow-overlap: true; [vel < -40] { marker-fill: yellow} [vel > -40] { marker-fill: red} }",
+  "sql": "(SELECT * FROM file_ifesiymozbhiogqcfopi) as sub",
+  "file_id": "file_ifesiymozbhiogqcfopi"
+}
