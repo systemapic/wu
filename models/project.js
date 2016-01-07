@@ -3,7 +3,7 @@
 // load the things we need
 var mongoose = require('mongoose');
 var timestamps = require('mongoose-times');
-var _ = require('lodash-node');
+var _ = require('lodash');
 
 
 // define the schema for our project model
