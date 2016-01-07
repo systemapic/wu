@@ -365,8 +365,15 @@
 	border: none;
 }
 .file-list-container-file-list .data-list-line:hover {
-    background: rgb(60, 71, 89) !important;
+    /*background: rgb(60, 71, 89) !important;*/
+    background: #C7CACF !important;
     color: white !important;
+}
+.data-list-line:hover .file-meta-content {
+	color: #3F4652 !important;
+}
+.data-list-line:hover .file-meta-content .file-meta-author {
+	color: #3F4652 !important;
 }
 .file-popup {
 	color: #3F4652;

@@ -1,9 +1,5 @@
 Wu.Api = Wu.Class.extend({
 
-	initialize : function () {
-		console.log('init api');
-	},
-
 	// post to path
 	post : function (path, options, done) {
 		Wu.post(path, JSON.stringify(options), function (err, response) {
@@ -20,5 +16,15 @@ Wu.Api = Wu.Class.extend({
 		var path = '/api/file/delete';
 		this.post(path, options, done);
 	},
+
+	verifyAccessToken : function () {
+		var path = '/api/userinfo';
+		this.post(path, {}, function (err, body) {
+			if (err == 401) {
+				console.error('you been logged out');
+				window.location.href = app.options.servers.portal;
+			}
+		});
+	}
 
 });

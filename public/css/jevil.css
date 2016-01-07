@@ -1252,7 +1252,7 @@ input.chrome-field-input {
     height: 20px;
     right: -5px;
     bottom: 5px;
-    color: #FCFCFC;
+    color: #3C4759;
     opacity: 1;
     border-radius: 0;
     right: 20px;
@@ -1318,6 +1318,7 @@ input.chrome-field-input {
 
 .data-list-line:hover .file-name-content {
     font-weight: 900;
+    color: #3C4759;
 }
 
 /*slider*/
