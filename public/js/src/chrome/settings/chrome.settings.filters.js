@@ -280,6 +280,8 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 	},
 
 	_refreshSQL : function () {
+		if (!this._layer) return;
+		if (!this._layer.isPostgis()) return;
 
 		// get
 		var meta = this._layer.getPostGISData();
@@ -321,7 +323,6 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		// Enable settings from layer we're working with
 		var layerUuid = this._getActiveLayerUuid();
-		console.log('layerUuid');
 		if (layerUuid) this._selectedActiveLayer(false, layerUuid);		
 
 		// Select layer we're working on
@@ -428,8 +429,13 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 		if (this._filterDiv) this._filterDiv.innerHTML = '';		
 	},
 
+	_selectNone : function () {
+		this._select.selectedIndex = 0;
+	},
+
 	_autoSelectFilter : function () {
 		if (!this._layer) return;
+		if (!this._layer.isPostgis()) return this._selectNone();
 		
 		var filter = Wu.parse(this._layer.getFilter());
 
@@ -540,7 +546,7 @@ Wu.Chrome.SettingsContent.Filters = Wu.Chrome.SettingsContent.extend({
 
 		// chart settings
 		this._chart
-		    .width(340)
+		    .width(400)
 		    .height(180)
 		    .gap(2)
 		    .x(d3.scale.linear().domain([0, num_buckets]))

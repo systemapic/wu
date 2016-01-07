@@ -16,8 +16,19 @@ Wu.FeedbackPane = Wu.Class.extend({
 	},
 
 	initContainer : function () {
-		this._container = Wu.DomUtil.create('div', 'feedback-pane', app._appPane);
+
+		var appendHere = app.MapPane._map._controlCorners.topleft;
+
+		this._container = Wu.DomUtil.create('div', 'feedback-pane', appendHere);
 		this._innerWrapper = Wu.DomUtil.create('div', 'feedback-pane-inner-wrapper', this._container);
+
+       		Wu.DomEvent.on(this._container, 'click', Wu.DomEvent.stopPropagation)
+            
+		// .on(link, 'dblclick', L.DomEvent.stopPropagation)
+		// .on(link, 'click', L.DomEvent.preventDefault)
+		// .on(link, 'click', fn, this);
+		// return link;
+
 	},
 
 	set : function (options) {
@@ -122,7 +133,8 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 	options : {
 
 		clearTimer : true,
-		clearDelay : 10000,
+		clearDelay : 5000,
+		// clearDelay : 2000000, // debug 
 		transitionDelay : 0.5, 
 		severityStyle : {
 			1 : 'message',
@@ -163,7 +175,7 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 		this._content.style.transition 	     = 'opacity ' + this.options.transitionDelay + 's';
 
 		// x
-		this._x = Wu.DomUtil.create('div', 'feedback-pane-x', this._content, 'X');
+		this._x = Wu.DomUtil.create('div', 'feedback-pane-x displayNone', this._content, 'X');
 
 		// events
 		this.addEvents();
@@ -261,6 +273,7 @@ Wu.FeedbackPane.Message = Wu.Class.extend({
 		setTimeout(function () {
 			app.feedback.remove(this.options.id);
 		}.bind(this), this.options.transitionDelay * 1000); // timed with css transition
+		
 	},
 
 	show : function () {

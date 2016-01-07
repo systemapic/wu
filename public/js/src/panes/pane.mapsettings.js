@@ -41,12 +41,14 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 	_checkAccess : function () {
 		if (!this._project) return false;
 
-		if (!app.access.to.edit_project(this._project)) {
-			Wu.DomUtil.addClass(this._settingsButton, 'displayNone');
-			return false;
-		} else {
-			Wu.DomUtil.removeClass(this._settingsButton, 'displayNone');
+		if (this._project.isEditable()) {
+			// this._settingsButton.style.display = '';
+			Wu.DomUtil.removeClass(this._settingsButton, 'disabledBtn');
 			return true;
+		} else {
+			// this._settingsButton.style.display = 'none';
+			Wu.DomUtil.addClass(this._settingsButton, 'disabledBtn');
+			return false;
 		}
 	},
 
@@ -63,6 +65,9 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 			context : this,
 			project_dependent : true
 		});
+
+		// css experiement
+		this._settingsButton.innerHTML = '<i class="top-button fa fa-gear"></i>Options';
 	},
 
 	_initLayout : function () {
@@ -73,17 +78,22 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 	},
 
 	_togglePane : function () {
+		if (!this._project.isEditable()) return; // safeguard
+		
 		this._isOpen ? this._close() : this._open();
 	},
 
 	_open : function () {
+
+		// close other tabs
+		Wu.Mixin.Events.fire('closeMenuTabs');
 
 		Wu.DomUtil.removeClass(this._settingsDropdown, 'displayNone');
 
 		this._isOpen = true;
 
 		// add fullscreen click-ghost
-		this._addGhost();
+		// this._addGhost();
 
 		// mark button active
 		Wu.DomUtil.addClass(this._settingsButton, 'active');
@@ -97,10 +107,16 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 		this._isOpen = false;
 
 		// remove ghost
-		this._removeGhost();
+		// this._removeGhost();
 
 		// mark button inactive
 		Wu.DomUtil.removeClass(this._settingsButton, 'active');
+	},
+
+	_onCloseMenuTabs : function () {
+		
+		// app.Chrome();
+		this._close();
 	},
 
 	_addGhost : function () {
@@ -109,6 +125,7 @@ Wu.MapSettingsPane = Wu.Pane.extend({
 	},
 
 	_removeGhost : function () {
+		if (!this._ghost) return;
 		Wu.DomEvent.off(this._ghost, 'click', this._close, this);
 		Wu.DomUtil.remove(this._ghost);
 	},

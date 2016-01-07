@@ -7,15 +7,15 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 		tabs : {
 			styler : {
 				enabled : true,
-				text : 'Style Editor'
+				text : 'Style'
 			},
 			tooltip : {
 				enabled : true,
-				text : 'Tooltip'
+				text : 'Popup'
 			},
 			filters : {
 				enabled : true,
-				text : 'Data Filters'
+				text : 'Filters'
 			},
 			cartocss : {
 				enabled : true,
@@ -54,11 +54,13 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 	_refresh : function () {
 
-		// remove settings button if no access to edit project
-		if (app.Access.to.edit_project(app.activeProject)) { 			// todo: check if working
-			Wu.DomUtil.removeClass(this._settingsButton, 'displayNone');
+		// access_v2
+		// this._settingsButton.style.display = )app.activeProject.isEditable( ? '' : 'none';
+
+		if (app.activeProject.isEditable()) {
+			Wu.DomUtil.removeClass(this._settingsButton, 'disabledBtn');
 		} else {
-			Wu.DomUtil.addClass(this._settingsButton, 'displayNone');
+			Wu.DomUtil.addClass(this._settingsButton, 'disabledBtn');
 		}
 	},
 
@@ -78,7 +80,7 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 	_initContent : function () {
 
 		// title
-		this._title = Wu.DomUtil.create('div', 'chrome chrome-content settings-title', this._header, 'Settings');
+		// this._title = Wu.DomUtil.create('div', 'chrome chrome-content settings-title', this._header, 'Settings');
 
 		// tabs
 		this._initTabs();
@@ -97,6 +99,9 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 			context : this,
 			project_dependent : true
 		});
+
+		// css experiement
+		this._settingsButton.innerHTML = '<i class="top-button fa fa-paint-brush"></i>Style';
 	},
 
 	_initTabs : function () {
@@ -138,13 +143,16 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 
 	_togglePane : function () {
 
+		if (!app.activeProject.isEditable()) return; // safeguard
+
 		// right chrome
 		var chrome = this.options.chrome;
 
 		// open/close
-		this._isOpen ? chrome.close(this) : chrome.open(this); // pass this tab
+		this._isOpen ? this.close() : this.open(); // pass this tab
 
 		if (this._isOpen) {
+			
 			// fire event
 			app.Socket.sendUserEvent({
 			    	user : app.Account.getFullName(),
@@ -153,6 +161,19 @@ Wu.Chrome.SettingsContent.SettingsSelector = Wu.Chrome.SettingsContent.extend({
 			    	timestamp : Date.now()
 			})
 		}
+	},
+
+	open : function () {
+		if (!app.activeProject.isEditable()) return;
+		this._open();
+	},
+	_open : function () {
+		var chrome = this.options.chrome;
+		chrome.open(this);
+	},
+	close : function () {
+		var chrome = this.options.chrome;
+		chrome.close(this);
 	},
 
 	_show : function () {

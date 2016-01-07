@@ -1,4 +1,4 @@
-Wu.satteliteAngle = Wu.Class.extend({
+Wu.satelliteAngle = Wu.Class.extend({
 
 	initialize : function (options) {
 

@@ -364,7 +364,6 @@ Wu.Util = {
 		
 		url += path;
 
-
 		http.open("POST", url, true);
 
 		//Send the proper header information along with the request
@@ -383,6 +382,9 @@ Wu.Util = {
 				if (cb && valid) cb(context, http.responseText); 
 			}
 		}
+
+		// stringify objects
+		if (Wu.Util.isObject(json)) json = JSON.stringify(json);
 
 		http.send(json);
 	},
@@ -426,6 +428,7 @@ Wu.Util = {
 	
 
 	_getServerUrl : function () {
+		// return window.location.origin;
 		return app.options.servers.portal.slice(0,-1);
 	},
 
@@ -458,6 +461,17 @@ Wu.Util = {
 		}
 
 	},
+
+	// parse with error handling
+	_stringify : function (json) {
+		try { 
+			var str = JSON.stringify(json); 
+			return str;
+		} catch (e) { 
+			return false; 
+		}
+	},
+
 
 
 	_getParentClientID : function (pid) {
@@ -508,17 +522,12 @@ Wu.Util = {
 
 	// experimental zip fn's
 	generateZip : function (data) {
-		// console.log('# generateZip #')
 
 		if (!typeof data == 'string') {
-			// console.log('stringify')
 			data = JSON.stringify(data);
 		}
 
-		// console.log('string length: ', data.length);
 		var compressed = LZString.compress(data);
-		// console.log('compressd length: ', compressed.length);
-		
 
 		return compressed;
 
@@ -527,7 +536,6 @@ Wu.Util = {
 	zipSave : function (path, json) {
 
 		if (!typeof json == 'string') {
-			// console.log('stringify')
 			var string = JSON.stringify(json);
 		} else {
 			var string = json;
@@ -536,11 +544,7 @@ Wu.Util = {
 		var my_lzma = new LZMA('//85.10.202.87:8080/js/lib/lzma/lzma_worker.js');
 		my_lzma.compress(string, 1, function (result) {
 		       
-			// console.log('my_lzma finished!');
-			// console.log(result);
-			// console.log(typeof result);
 			var string = JSON.stringify(result);
-			// console.log('string: ', string);
 
 			var http = new XMLHttpRequest();
 			var url = window.location.origin; //"http://85.10.202.87:8080/";// + path;//api/project/update";
@@ -956,6 +960,15 @@ Wu.Util = {
 		return jss.getAll(tag);
 	},
 
+
+	confirm : function (msg, callback) {
+
+		var confirmed = confirm(msg);
+
+		callback && callback(confirmed);
+
+		return confirmed;
+	},
 	
 
 	
@@ -1008,32 +1021,15 @@ Wu.save = Wu.Util.post;
 Wu.post = Wu.Util.postcb;
 Wu.send = Wu.Util.send;
 Wu.parse = Wu.Util._parse;
+Wu.stringify = Wu.Util._stringify;
 Wu.zip = Wu.Util.generateZip;
 Wu.zave = Wu.Util.zipSave;
 Wu.can = Wu.Util.can;
 Wu.setStyle = Wu.Util.setStyle;
 Wu.getStyle = Wu.Util.getStyle;
 Wu.verify = Wu.Util.verifyResponse;
-
-
-// Wu.CustomEvents = {
-
-// 	on : function (obj, type, fn, ctx) {
-// 		// var event = new CustomEvent('build', { 'detail': elem.dataset.time });
-// 		// document.addEventListener(type, fn, false);
-// 		Wu.DomEvent.on(obj, type, fn, ctx)
-// 	},
-
-// 	off : function (obj, type, fn, ctx) {
-// 		Wu.DomEvent.off(obj, type, fn, ctx)
-// 	},
-
-// 	fire : function (type, data) {
-// 		var event = new CustomEvent(type, data);
-// 		document.dispatchEvent(event);
-// 	},
-
-// };
+Wu.getJSON = Wu.Util._getJSON;
+Wu.confirm = Wu.Util.confirm;
 
 
 Wu.Evented = Wu.Class.extend({
@@ -1963,7 +1959,7 @@ Array.prototype.moveDown = function(value, by) {
 };
 
 String.prototype.camelize = function () {
-    return this.replace (/(?:^|[-_])(\w)/g, function (_, c) {
+    return this.replace (/(?:^|[_])(\w)/g, function (_, c) {
       return c ? c.toUpperCase () : '';
     });
 }
@@ -1976,3 +1972,4 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
 		return fn.apply(thisp, arguments);
 	};
 };
+

@@ -43,6 +43,20 @@ module.exports = api.socket = {
 	_processing : {},
 
 
+	send : function (channel, user_id, data) {
+
+		console.log('socket send', channel, user_id, data);
+
+		var sock = api.socket._getSocket(user_id);
+
+		// send to user
+		sock && sock.emit(channel, {
+			data : data
+		});
+
+	},
+
+
 	getServerStats : function (req) {
 
 		// get stats from redis
@@ -75,6 +89,8 @@ module.exports = api.socket = {
 	},
 
 
+
+
 	downloadReady : function (options) {
 
 		// get socket
@@ -96,11 +112,14 @@ module.exports = api.socket = {
 
 	processingProgress : function (options) {
 
+		var user_id = options.user_id;
+		var progress = options.progress;
+
 		// get socket
-		var socket = api.socket.getSocket(options);
+		var socket = api.socket._getSocket(user_id);
 
 		// send to user
-		socket && socket.emit('processingProgress', options.result);
+		socket && socket.emit('processingProgress', progress);
 	},
 
 	processingDone : function (options) {

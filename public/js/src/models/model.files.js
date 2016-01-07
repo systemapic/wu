@@ -51,7 +51,7 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 	getCreatedByName : function () {
-		return this.store.createdByName;
+		return this.store.createdByName || app.Users[this.getCreatedBy()].getFullName();
 	},
 
 	getCreatedBy : function () {
@@ -60,6 +60,11 @@ Wu.Model.File = Wu.Model.extend({
 
 	getCreated : function () {
 		return this.store.created;
+	},
+
+	getCreatedPretty : function () {
+		var date_created = this.store.created;
+		return Wu.Util.prettyDate(date_created);
 	},
 
 	getCategory : function () {
@@ -179,7 +184,7 @@ Wu.Model.File = Wu.Model.extend({
 
 
 	// todo: move all delete of files here
-	_deleteFile : function () {
+	_deleteFile : function (done) {
 
 		// check if dataset has layers
 		this._getLayers(function (err, layers) {
@@ -201,16 +206,28 @@ Wu.Model.File = Wu.Model.extend({
 			
 			// delete file
 			var postgisOptions = this._getLayerData();
-			Wu.post('/api/file/delete', JSON.stringify(postgisOptions), function (err, response) {
-				console.log('deleted?', err, response);
 
+			app.api.deleteDataset(postgisOptions, function (err, response) {
 				var removedObjects = Wu.parse(response);
 
 				// clean up locally
 				this._fileDeleted(removedObjects);
 
-
+				// callback
+				done && done(null, removedObjects);
 			}.bind(this));
+
+			// Wu.post('/api/file/delete', JSON.stringify(postgisOptions), function (err, response) {
+
+			// 	var removedObjects = Wu.parse(response);
+
+			// 	// clean up locally
+			// 	this._fileDeleted(removedObjects);
+
+			// 	// callback
+			// 	done && done(null, removedObjects);
+
+			// }.bind(this));
 
 		}.bind(this));
 
@@ -261,7 +278,6 @@ Wu.Model.File = Wu.Model.extend({
 		var options = this._getLayerData();
 		Wu.post('/api/file/getLayers', JSON.stringify(options), function (err, response) {
 			var layers = Wu.parse(response);
-			console.log('got layers', layers);
 			callback(err, layers);
 		});
 	},
@@ -293,13 +309,22 @@ Wu.Model.File = Wu.Model.extend({
 	_shareFile : function () {
 	},
 
-	_createLayer : function (project) {
-		this._createDefaultLayer(project);
-	},
-
 	_downloadFile : function () {
-		this._downloadDataset();
-	}, 
+		if (this.isPostgis()) this._downloadDataset();
+		if (this.isRaster()) this._downloadRaster();
+	}, 	
+
+	_downloadRaster : function () {
+
+		// parse results
+		var path = app.options.servers.portal;
+		path += 'api/file/download/';
+		path += '?file=' + this.getUuid();
+		path += '&access_token=' + app.tokens.access_token;
+
+		window.open(path, 'mywindow')
+
+	},
 
 	_downloadDataset : function () {
 
@@ -347,7 +372,6 @@ Wu.Model.File = Wu.Model.extend({
 
 	_getGeometryType : function () {
 		var meta = this.getMeta();
-		console.log('meta: ', meta);
 		return meta.geometry_type;
 	},
 
@@ -463,20 +487,55 @@ Wu.Model.File = Wu.Model.extend({
 		return false;
 	},
 
-	_createDefaultLayer : function (project) {
+	cutRasterColor : function (options, callback) {
 
-		var type = this._getType();
+		console.log('opitons', options)
 
-		if (type == 'vector') {
-			this._createDefaultVectorLayer(project);
-		}
 
-		if (type == 'raster') {
-			this._createDefaultRasterLayer(project);
-		}
+		// request layer with cut
+		this._requestDefaultRasterLayer({
+			file : this,
+			project : options.project,
+			cutColor : options.color // todo: validate
+		}, callback);
+
+
+		// // fubar: it's the layer that needs cutting (with gm), not file.. 
+		// app.api.cutRasterColor({
+		// 	color : color,
+		// 	file_id : file.getUuid()
+		// }, function (err, results) {
+		// 	console.log('cutRasterAlpha err, res', err, results);
+
+		// 	// create new layer with cut
+		// 	// add layer automatically
+		// 	// layer gets cut on exit
+
+		// });
+
 	},
 
-	_createDefaultRasterLayer : function (project) {
+	_createLayer : function (project, callback) {
+		this._createDefaultLayer(project, callback);
+	},
+
+
+	_createDefaultLayer : function (project, callback) {
+
+		console.log('isVector', this.isVector());
+		console.log('isRaster', this.isRaster());
+
+		this.isVector() && this._createDefaultVectorLayer(project, callback);
+		this.isRaster() && this._createDefaultRasterLayer(project, callback);
+		
+	},
+
+	isVector : function () {
+		return this.isPostgis();
+	},
+
+
+	_createDefaultRasterLayer : function (project, callback) {
 		
 		var options = {
 			file : this,
@@ -484,17 +543,19 @@ Wu.Model.File = Wu.Model.extend({
 		}
 
 		// create layer on server
-		this._requestDefaultRasterLayer(options)
+		this._requestDefaultRasterLayer(options, callback)
 
 	},
 
-	_requestDefaultRasterLayer : function (options) {
-
-		console.log('_requestDefaultLayer', options);
+	_requestDefaultRasterLayer : function (options, callback) {
 
 		var file = options.file,
 		    file_id = file.getUuid(),
 		    project = options.project;
+
+		var cutColor = options.cutColor || false;
+
+		console.log('cutColor', cutColor)
 
 
 		var layerJSON = {
@@ -511,17 +572,13 @@ Wu.Model.File = Wu.Model.extend({
 			// "sql": "(SELECT * FROM " + file_id + ") as sub",
 			"file_id": file_id,
 			"return_model" : true,
-			"projectUuid" : project.getUuid()
+			"projectUuid" : project.getUuid(),
+			"cutColor" : cutColor
 		}
 
 		// create postgis layer
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
 			var layer = Wu.parse(layerJSON);
-
-
-			console.log('layer::::', layer);
-
-			// return;
 
 			var options = {
 				projectUuid : project.getUuid(), // pass to automatically attach to project
@@ -538,13 +595,13 @@ Wu.Model.File = Wu.Model.extend({
 			// create new layer model
 			this._createLayerModel(options, function (err, layerModel) {
 
-				// refresh Sidepane Options
-				project.addLayer(layerModel);
+				// create layer on project
+				var layer = project.addLayer(layerModel);
 
 				// todo: set layer icon
 				app.feedback.setMessage({
-					title : 'Created layer from dataset',
-					description : 'Added <strong>' + layerModel.title + '</strong> to project.',
+					title : 'Layer added to project',
+					// description : 'Added <strong>' + layerModel.title + '</strong> to project.',
 				});	
 
 				// select project
@@ -552,12 +609,15 @@ Wu.Model.File = Wu.Model.extend({
 					projectUuid : project.getUuid(),
 					layerUuid : layerModel.uuid
 				}});
+
+				// callback
+				callback && callback(null, layer);
 			});
 			
 		}.bind(this));
 	},
 
-	_createDefaultVectorLayer : function (project) {
+	_createDefaultVectorLayer : function (project, done) {
 		
 		var file_id = this.getUuid();
 		var file = this;
@@ -576,15 +636,15 @@ Wu.Model.File = Wu.Model.extend({
 			}
 
 			// create layer on server
-			this._requestDefaultVectorLayer(options)
+			this._requestDefaultVectorLayer(options, done)
 
 
 		}.bind(this));
 	},
 
-	_requestDefaultVectorLayer : function (options) {
+	_requestDefaultVectorLayer : function (options, done) {
 
-		console.log('_requestDefaultLayer', options);
+		console.log('rdvl', options)
 
 		var file = options.file,
 		    file_id = file.getUuid(),
@@ -614,7 +674,7 @@ Wu.Model.File = Wu.Model.extend({
 		Wu.post('/api/db/createLayer', JSON.stringify(layerJSON), function (err, layerJSON) {
 			var layer = Wu.parse(layerJSON);
 
-			console.log('db create layer', layer);
+			console.log('c l', layer);
 
 			var options = {
 				projectUuid : project.getUuid(), // pass to automatically attach to project
@@ -631,13 +691,15 @@ Wu.Model.File = Wu.Model.extend({
 			// create new layer model
 			this._createLayerModel(options, function (err, layerModel) {
 
+				console.log('l mod', layerModel);
+
 				// refresh Sidepane Options
-				project.addLayer(layerModel);
+				var layer = project.addLayer(layerModel);
 
 				// todo: set layer icon
 				app.feedback.setMessage({
-					title : 'Created layer from dataset',
-					description : 'Added <strong>' + layerModel.title + '</strong> to project.',
+					title : 'Layer added to project',
+					// description : 'Added <strong>' + layerModel.title + '</strong> to project.',
 				});	
 
 				// select project
@@ -645,6 +707,9 @@ Wu.Model.File = Wu.Model.extend({
 					projectUuid : project.getUuid(),
 					layerUuid : layerModel.uuid
 				}});
+
+				// callback
+				done && done(null, layer);
 			});
 			
 		}.bind(this));
@@ -659,6 +724,19 @@ Wu.Model.File = Wu.Model.extend({
 	},
 
 	getMeta : function () {
+
+		if (this.isRaster()) {
+			return this.getRasterMeta();
+		}
+
+		if (this.isPostgis()) {
+			return this.getPostgisMeta();
+		}
+
+		return false;
+	},
+
+	getPostgisMeta : function () {
 		if (!this.store.data.postgis) return false;
 		if (!this.store.data.postgis.metadata) return false;
 		var meta = Wu.parse(this.store.data.postgis.metadata);
@@ -685,9 +763,32 @@ Wu.Model.File = Wu.Model.extend({
 		return h[column];
 	},
 
+	setMetadata : function (metadata) {
+		console.log('setmeta', metadata);
+		if (this.store.data.raster) {
+			this.store.data.raster.metadata = JSON.stringify(metadata);
+			return this.save('data');
+		}
+		if (this.store.data.postgis) {
+			this.store.data.postgis.metadata = JSON.stringify(metadata);
+			return this.save('data');
+		}
 
+	},
 
+	isRaster : function () {
+		if (!this.store.data || !this.store.data.raster || !this.store.data.raster.file_id) return false;
+		return true;
+	},
 
+	isPostgis : function () {
+		if (!this.store.data || !this.store.data.postgis) return false;
+		return true;
+	},
 
-
+	getDatasizePretty : function () {
+		var size = this.getDatasize();
+		var pretty = Wu.Util.bytesToSize(size);
+		return pretty;
+	},
 });

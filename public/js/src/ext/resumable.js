@@ -7,7 +7,7 @@ Wu.Resumable = Wu.Class.extend({
 		testChunks : true, 
 		maxFiles : 5,
 		fileType : ['zip', 'gz', 'geojson', 'tif', 'tiff', 'jp2', 'ecw'],
-		fileTypeErrorCallback : this._fileTypeErrorCallback,
+		// fileTypeErrorCallback : this._fileTypeErrorCallback,
 	},
 
 
@@ -30,12 +30,13 @@ Wu.Resumable = Wu.Class.extend({
 
 	_create : function () {
 
+		this.options.fileTypeErrorCallback = this._fileTypeErrorCallback;
+
 		// create resumable instance
 		var r = this.r = new Resumable(this.options);
 
 		// add events
 		this._addResumableEvents();
-
 	},
 
 	destroy : function () {
@@ -75,6 +76,11 @@ Wu.Resumable = Wu.Class.extend({
 		// file added
 		r.on('fileAdded', function(file){
 
+			// fire layer edited
+			Wu.Mixin.Events.fire('fileProcessing', {detail : {
+				file: file
+			}});
+
 			// set starttime
 			r._startTime = new Date().getTime();
 			
@@ -88,10 +94,12 @@ Wu.Resumable = Wu.Class.extend({
 
 		// file success
 		r.on('fileSuccess', function(file, message){
+			var data = Wu.parse(message);
+			var file_id = data.file_id;
 
-			// give feedback
-			this.feedbackUploadSuccess(file, message);
-			
+			// check upload status (long-polling, websocket fallback) // todo: overkill, figure out why websocket is fickle.
+			// this._checkStatusPeriodically(file_id);
+
 			// hide progess bar
 			app.ProgressBar.hideProgress();
 
@@ -102,32 +110,86 @@ Wu.Resumable = Wu.Class.extend({
 		// set progress bar
 		r.on('fileProgress', function(file){
 			var progress = file.progress() * 100;
-			if (progress > 99) progress = 0;
+			if (progress > 99) progress = 100;
+
+			// set progress bar
 			app.ProgressBar.setProgress(progress);
+
+			// set processing progress
+			Wu.Mixin.Events.fire('processingProgress', {
+				detail : {
+					text : 'Uploading...',
+					error : null,
+					percent : parseInt(progress),
+					uniqueIdentifier : file.uniqueIdentifier,
+				}
+			});
+
 		}.bind(this));
 
 		r.on('cancel', function(){
 			this._uploadDone();
-
 		}.bind(this));
 		
 		r.on('uploadStart', function(){
-		
 		}.bind(this));
 		
 		r.on('complete', function(data){
 			this._uploadDone();
-
 		}.bind(this));
 		
 		r.on('pause', function(){
-		
 		}.bind(this));
 		
 		r.on('fileError', function(file, message){
-		
 		}.bind(this));
 
+	},
+
+	_checkStatusPeriodically : function (file_id) {
+
+		// get upload status
+		this.getUploadStatus(file_id, function (status) {
+
+			var us = Wu.parse(status);
+
+			console.log('uis: ', us);
+
+			// success
+			if (us.processing_success && us.upload_success) {
+
+			// error
+			} else if (us.error) {
+
+				console.error('us.error', us.error);
+
+				// file error
+				Wu.Mixin.Events.fire('processingError', {
+					detail : {
+						uniqueIdentifier : us.uniqueIdentifier,
+						description : us.error_text
+					}
+				});
+
+			// not done yet
+			} else {
+				setTimeout(function () {
+					this._checkStatusPeriodically(file_id);
+				}.bind(this), 2000);
+			}
+
+		}.bind(this));
+
+
+	},
+
+	_handleError : function (uniqueIdentifier, errMsg) {
+
+	},
+
+	getUploadStatus : function (file_id, callback) {
+		var url = 'api/import/status?file_id=' + file_id + '&access_token=' + app.tokens.access_token;
+		Wu.getJSON(url, callback);
 	},
 
 	_removeEvents : function () {
@@ -153,6 +215,7 @@ Wu.Resumable = Wu.Class.extend({
 	enable : function () {
 	},
 
+
 	// feedback upload started
 	feedbackUploadStarted : function (file) {
 
@@ -161,10 +224,14 @@ Wu.Resumable = Wu.Class.extend({
 		    fileName = file.fileName,
 		    message = 'File: ' + fileName + '<br>Size: ' + size;
 		
-		// set feedback
-		app.feedback.setMessage({
-			title : 'Uploading',
-			description : message,
+		// set processing progress
+		Wu.Mixin.Events.fire('processingProgress', {
+			detail : {
+				text : 'Uploading...',
+				error : null,
+				percent : 0,
+				uniqueIdentifier : file.uniqueIdentifier,
+			}
 		});
 	},
 
@@ -180,16 +247,20 @@ Wu.Resumable = Wu.Class.extend({
 		    totalTime 	= (endTime - startTime) / 1000,
 		    size 	= file.size / 1000 / 1000,
 		    bytesps  	= size / totalTime,
-		    procTime 	= (size * 0.5).toFixed(0) + ' seconds',
+		    procTime 	= (size * 1).toFixed(0) + ' seconds',
 		    ext 	= file.fileName.split('.').reverse()[0];
 
 		// set message
-		var message = 'Estimated processing time: ' + procTime;
+		var message = 'Estimated time: ' + procTime;
 
-		// set feedback
-		app.feedback.setMessage({
-			title : 'Processing file',
-			description : message,
+		// set processing progress
+		Wu.Mixin.Events.fire('processingProgress', {
+			detail : {
+				text : 'Uploaded!',
+				error : null,
+				percent : 100,
+				uniqueIdentifier : file.uniqueIdentifier,
+			}
 		});
 
 	},
@@ -202,7 +273,6 @@ Wu.Resumable = Wu.Class.extend({
 		return this._id;
 	},
 
-
 	// options helper fn's
 	_generateUniqueIdentifier : function (file) {
 		var uid = file.size + '-' + file.lastModified + '-' + app.Account.getUuid() + '-'  + file.name;
@@ -211,7 +281,6 @@ Wu.Resumable = Wu.Class.extend({
 	_generateQuery : function () {
 		var query = {
 			fileUuid : Wu.Util.guid('r'),
-			// projectUuid : app.activeProject.getUuid(),
 			access_token : app.tokens.access_token,
 		};
 		return query;

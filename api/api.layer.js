@@ -235,6 +235,13 @@ module.exports = api.layer = {
 				layer.save();
 			}
 
+			// update opacity
+			if (req.body.hasOwnProperty('opacity')) {
+				var opacity = req.body.opacity;
+				layer.opacity = opacity;
+				layer.save();
+			}
+
 			// update zIndex
 			if (req.body.hasOwnProperty('zIndex')) {
 				var zIndex = req.body.zIndex;

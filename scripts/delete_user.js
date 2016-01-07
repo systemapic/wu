@@ -33,25 +33,43 @@ if (!deleteUser) {
 	return process.exit(0);
 }
 
-console.log('User to delete:'.red, deleteUser);
+User
+.findOne({'local.email' : deleteUser})
+.exec(function (err, u) {
 
-prompt.get({
-	properties : {
-		confirm : {
-			description : 'Does this look right? Write [yes] to go ahead and delete user'.yellow
-		}
-	}
-}, function (err, answer) {
-	if (err || answer.confirm != 'yes') {
-		console.log('Aborting!'.red);
+	if (err) {
+		console.log('error retreiving user');
 		return process.exit(0);
 	}
 
-	User
-	.remove({'local.email' : deleteUser})
-	.exec(function (err, user) {
-		console.log('User [' + deleteUser + '] deleted!'.red);
-		process.exit(0);
+	if (!u) {
+		console.log('No such user exists!');
+		return process.exit(0);
+	}
+
+
+	console.log('User to delete:'.red, u.getName());
+
+	prompt.get({
+		properties : {
+			confirm : {
+				description : 'Does this look right? Write [yes] to go ahead and delete user'.yellow
+			}
+		}
+	}, function (err, answer) {
+		if (err || answer.confirm != 'yes') {
+			console.log('Aborting!'.red);
+			return process.exit(0);
+		}
+
+		User
+		.remove({'local.email' : deleteUser})
+		.exec(function (err, user) {
+			console.log('User [' + deleteUser + '] deleted!'.red);
+			process.exit(0);
+		});
+
 	});
 
-});
+})
+

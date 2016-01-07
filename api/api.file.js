@@ -104,16 +104,16 @@ module.exports = api.file = {
 		});
 	},
 
+	// called from api.upload.js:431
 	addNewFileToUser : function (options, done) {
 
 		var userUuid = options.user.uuid,
 		    file_id = options.file._id;
 
-
 		User
 		.findOne({uuid : userUuid})
 		.exec(function (err, user) {
-			if (err) return done(err);
+			if (err || !user) return done(err || 'ERR 838: No user.');
 
 			// add file
 			user.files.push(file_id);
@@ -278,24 +278,54 @@ module.exports = api.file = {
 			}, callback);
 		});
 
+
 		ops.push(function (options, callback) {
-			var record = options.file,
-			    name = record.name.replace(/\s+/g, ''),
-			    out = api.config.path.temp + name + '_' + record.type + '.zip',
-			    cwd = api.config.path.file + fileUuid,
-			    command = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store',
-			    exec = require('child_process').exec;				
-			
-			exec(command, {cwd : cwd}, function (err, stdout, stdin) {
-				callback(err, out);
-			});
+
+			var file = options.file;
+
+			if (file.type == 'postgis') {
+				var name = file.name.replace(/\s+/g, '');
+				var out = api.config.path.temp + name + '_' + file.type + '.zip';
+				var cwd = api.config.path.file + fileUuid;
+				var command = 'zip -rj ' + out + ' *' + ' -x __MACOSX .DS_Store';
+				var exec = require('child_process').exec;
+
+				var proc = exec(command, {cwd : cwd}, function (err, stdout, stdin) {
+					callback(err, out);
+				});
+
+				return;
+			}
+
+			if (file.type == 'raster') {
+
+				// make a copy first
+				var path = api.config.path.file + fileUuid + '/' + fileUuid;
+				var renamed = api.config.path.temp + fileUuid + '/' + file.originalName;
+				fs.copy(path, renamed, function (err) {
+
+					var zipfile_name = api.config.path.temp + fileUuid + '/' + file.originalName + '_' + file.type + '.zip';
+					var cwd = api.config.path.temp;
+					var command = 'zip -rj ' + zipfile_name + ' ' + renamed;
+					var exec = require('child_process').exec;
+
+					var proc = exec(command, {cwd : cwd}, function (err, stdout, stdin) {
+						callback(err, zipfile_name);
+					});
+
+				});
+
+			}
+
 		});
 
 		async.waterfall(ops, function (err, path) {
 			if (err) console.log('ERR 12'.red, err);
-
 			if (err) return api.error.general(req, res, err);
+
+			// send file
 			res.download(path);
+
 		});
 	},
 
@@ -320,7 +350,7 @@ module.exports = api.file = {
 		    found,
 		    ops = [];
 	
-		// todo: this is fucked. not even dealing with a file object here, just paths.. 
+		// todo: this is #$SD. not even dealing with a file object here, just paths.. 
 		// 	not solid! FIX!
 		
 		// find zip file
@@ -607,14 +637,6 @@ module.exports = api.file = {
 		var layers = options.layers;
 
 
-		Project
-		.findOne({uuid : "project-d574c970-4bcd-4d94-aaa5-9fab88069849"})
-		.exec(function (err, randomProject) {
-			console.log('randomProject', randomProject);
-		})
-
-
-
 		async.each(layers, function (layer, callback) {
 
 			var layer_id = layer._id;
@@ -650,8 +672,6 @@ module.exports = api.file = {
 		var options = req.body,
 		    type = options.type;
 
-
-		console.log('getLayers', type, options);
 
 		if (type == 'raster') {
 			return api.file._getRasterLayers(req, res);
@@ -825,6 +845,7 @@ module.exports = api.file = {
 			'category',
 			'version',
 			'copyright',
+			'data'
 		];
 
  		// enqueue queries for valid fields
@@ -1291,6 +1312,129 @@ module.exports = api.file = {
 		// });
 
 	},
+
+
+
+	shareDataset : function (req, res) {
+
+		var ops = [];
+		var user = req.user;
+		var users = req.body.users;
+		var file_id = req.body.dataset;
+		var userModels = [];
+		var foundFile;
+		var file;
+
+
+		ops.push(function (callback) {
+			File
+			.findOne({uuid : file_id})
+			.exec(function (err, f) {
+				file = f;
+				callback(null);
+			});
+		});
+
+		ops.push(function (callback) {
+			User
+			.findOne({uuid : user.uuid})
+			.populate('files')
+			.exec(callback);
+		});
+
+
+		ops.push(function (user, callback) {
+				
+			// check if file is on user
+			foundFile = _.find(user.files, function (f) {
+				return f.uuid == file_id;
+			});
+
+			// if no file, no access
+			if (_.isEmpty(foundFile)) return callback('No access.');
+
+			// next
+			callback(null);
+
+		});
+
+		ops.push(function (callback) {
+
+			// get users
+			async.each(users, function (user, done) {
+				User
+				.findOne({uuid : user})
+				.exec(function (err, u) {
+					userModels.push(u);
+					done(null);
+				});
+			}, callback);
+
+		});
+
+		ops.push(function (callback) {
+
+			async.each(userModels, function (user, done) {
+
+				// add dataset to user
+				user.files.addToSet(file._id);
+				user.markModified('files');
+				user.save(function (err, u) {
+					done(null);
+				});
+			
+			}, callback);
+		});
+
+
+		async.waterfall(ops, function (err, results) {
+			if (err) return res.json({
+				err : err
+			});
+
+
+			// return success
+			res.json({
+				err : null,
+				success : true,
+				file_shared : {
+					file_name : file.name,
+					file_uuid : file.uuid
+				},
+				users_shared_with : users
+			});
+		});
+
+
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

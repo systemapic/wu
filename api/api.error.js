@@ -54,12 +54,13 @@ module.exports = api.error = {
 	missingInformation : function (req, res) {
 		console.log('api.error.missingInformation'.red);
 		
-		var message = 'Missing information. Stay with the program!';
-		res.end(JSON.stringify({ 
+		var message = 'Missing information. Check out https://docs.systemapic.com/ for details on the API.';
+
+		res.json({ 
 			error : message 
-		}));
+		});
 		
-		api.error.log('missingInformation');
+		api.error.log(message);
 	},
 
 	general : function (req, res, err) {
