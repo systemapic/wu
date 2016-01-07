@@ -16,9 +16,8 @@ Wu.Popup.Chart = L.Control.extend({
 		className: '',
 		zoomAnimation: false,
 		defaultPosition : {
-			x : 7,
-			y : 6 		// from bottom
-			// y : 48 	// from bottom
+			x : 7,			
+			y : 6
 		}
 	},
 
@@ -160,6 +159,24 @@ Wu.Popup.Chart = L.Control.extend({
 		// set saved position
 		var pos = this.getSavedPosition();
 		if (pos) return this.setPosition(pos);
+
+		// If left pane is open
+		if ( app.Chrome.Left._isOpen ) {
+			var dims = app.Chrome.Left.getDimensions();
+			var _x = dims.width + 10;
+			var _y = this.options.defaultPosition.y;
+			var pos = { x : _x, y : _y }	
+			return this.setPosition(pos);		
+		}
+
+		// If right pane is open
+		if ( app.Chrome.Right._isOpen ) {
+			var dims = app.Chrome.Right.getDimensions();
+			var _x = dims.width + 10;
+			var _y = this.options.defaultPosition.y;
+			var pos = {  x : _x, y : _y }
+			return this.setPosition(pos);
+		}		
 
 		// or, set default, set from bottom
 		var pos = this.options.defaultPosition;

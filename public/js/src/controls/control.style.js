@@ -17,10 +17,9 @@ Wu.Style = Wu.Class.extend({
 		this._project = app.Projects[projectUuid];
 		if (!this._project) return;
 
-		setTimeout(function () {
-			this._project.getSettings()['darkTheme'] ? this.setDarkTheme() : this.setLightTheme();
-		}.bind(this), 1000)
-		
+		// setTimeout(function () {
+			// this._project.getSettings()['darkTheme'] ? this.setDarkTheme() : this.setLightTheme();
+		// }.bind(this), 1000)
 	},
 
 	setDarkTheme : function () {	
@@ -37,7 +36,7 @@ Wu.Style = Wu.Class.extend({
 	},
 
 	setLightTheme : function () {
-		
+
 		// remove darktheme stylesheet
 		this._styletag.innerHTML = '';
 

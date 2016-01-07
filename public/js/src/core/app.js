@@ -1,4 +1,4 @@
-Wu.version = '1.3.0';
+Wu.version = '1.3.5';
 Wu.App = Wu.Class.extend({
 	_ : 'app',
 
@@ -19,6 +19,9 @@ Wu.App = Wu.Class.extend({
 		// set global this
 		Wu.app = window.app = this; // todo: remove Wu.app, use only window.app
 
+		// init api
+		app.api = new Wu.Api();
+
 		// set access token
 		this.setAccessTokens();
 
@@ -30,9 +33,6 @@ Wu.App = Wu.Class.extend({
 
 		// merge options
 		Wu.setOptions(this, options);
-
-		// Init analytics
-		// this._initAnalytics();
 
 		// set page title
 		document.title = this.options.portalTitle;
@@ -55,21 +55,14 @@ Wu.App = Wu.Class.extend({
 	
 	setAccessTokens : function () {
 
+		// get tokens
 		app.tokens = window.tokens;
 
+		// get access token
 		var access_token = app.tokens.access_token;
 
-		// print debug
-		// console.log('Debug: access_token: ', access_token);
-
-		// test access token
-		Wu.send('/api/userinfo', {}, function (err, body) {
-			if (err == 401) {
-				console.error('you been logged out');
-				window.location.href = app.options.servers.portal;
-			}
-		});
-
+		// verify token
+		app.api.verifyAccessToken();
 	},
 
 	_initErrorHandling : function () {
@@ -86,8 +79,6 @@ Wu.App = Wu.Class.extend({
 
 	_onError : function (message, file, line, char, ref) {
 
-		console.log('ionerror');
-			
 		var stack = ref.stack;
 		var project = app.activeProject ? app.activeProject.getTitle() : 'No active project';
 		var username = app.Account ? app.Account.getName() : 'No username';
@@ -135,9 +126,6 @@ Wu.App = Wu.Class.extend({
 		// set vars
 		this.options.json = portalStore;
 
-		// access
-		this._initAccess();
-
 		// load json model
 		this._initObjects();
 
@@ -159,18 +147,16 @@ Wu.App = Wu.Class.extend({
 		// debug
 		this._debug();
 
-		// analytics
+		// log entry
 		this._logEntry();
 
+		// analytics
 		this.Analytics = new Wu.Analytics();
-
 	},
 
 	_logEntry : function () {
-
 		var b = this.sniffer.browser;
 		var o = this.sniffer.os;
-
 		var browser = b.fullName + ' ' + b.majorVersion + '.' + b.minorVersion;
 		var os = o.fullName + ' ' + o.majorVersion + '.' + o.minorVersion;
 
@@ -180,10 +166,6 @@ Wu.App = Wu.Class.extend({
 		    	description : 'the wu: `' + browser + '` on `' + os + '`',
 		    	timestamp : Date.now()
 		});
-	},
-
-	_initAnalytics : function () {
-		this.Analytics = new Wu.Analytics();
 	},
 
 	_initObjects : function () {
@@ -198,17 +180,17 @@ Wu.App = Wu.Class.extend({
 		this.Account = new Wu.User(this.options.json.account);
 		this.Account.setRoles(this.options.json.roles);
 
-		// create user objects
+		// contact list
 		this.Users = {};
-		this.options.json.users.forEach(function(user, i, arr) {
-		       this.Users[user.uuid] = new Wu.User(user);             
+		app.Account.getContactList().forEach(function(user) {
+		       this.Users[user.uuid] = new Wu.User(user);    
 		}, this);
-		
-		// create client objects
-		this.Clients = {};
-		this.options.json.clients.forEach(function(elem, i, arr) {
-		       this.Clients[elem.uuid] = new Wu.Client(elem, this);             
+		this.options.json.users.project_users.forEach(function(user) {
+		       if (!this.Users[user.uuid]) this.Users[user.uuid] = new Wu.User(user);             
 		}, this);
+
+		// add self to users list
+		this.Users[app.Account.getUuid()] = this.Account;
 
 		// create project objects
 		this.Projects = {};
@@ -218,6 +200,8 @@ Wu.App = Wu.Class.extend({
 	},
 
 	_initChrome : function () {
+
+		// chrome
 		this.Chrome = {};
 
 		// top chrome
@@ -226,10 +210,8 @@ Wu.App = Wu.Class.extend({
 		// right chrome
 		this.Chrome.Right = new Wu.Chrome.Right();
 
-		// todo: 
-		// left
-		// center
-
+		// right chrome
+		this.Chrome.Left = new Wu.Chrome.Left();
 	},
 
 	_initPanes : function () {
@@ -240,27 +222,11 @@ Wu.App = Wu.Class.extend({
 		// render style handler
 		this.Style = new Wu.Style();
 
-		// render status pane
-		this.StatusPane = new Wu.StatusPane({
-			addTo: this._appPane
-		});
-
 		// render progress bar
 		this.ProgressBar = new Wu.ProgressPane({
 			color : 'white',
 			addTo : this._appPane
 		});
-
-		// render startpane
-		this.StartPane = new Wu.StartPane({
-			projects : this.Projects
-		});
-
-		// render side pane 
-		this.SidePane = new Wu.SidePane();	// todo: add settings more locally? Wu.SidePane({options})
-
-		// render header pane
-		this.HeaderPane = new Wu.HeaderPane();
 
 		// render map pane
 		this.MapPane = new Wu.MapPane();
@@ -274,8 +240,9 @@ Wu.App = Wu.Class.extend({
 		// share pane
 		this.Share = new Wu.Share();
 
+		// add account tab
+		this.Account.addAccountTab();
 	},
-
 
 	// init default view on page-load
 	_initView : function () {
@@ -289,11 +256,8 @@ Wu.App = Wu.Class.extend({
 		// runs hotlink
 		if (this._initHotlink()) return;
 
-		// set project if only one
-		if (this._lonelyProject()) return;
-
-		// activate startpane
-		this.StartPane.activate();
+		// open first project (ordered by lastUpdated)
+		app.Controller.openLastUpdatedProject();
 	},
 
 	_initInvite : function () {
@@ -310,6 +274,73 @@ Wu.App = Wu.Class.extend({
 			title : 'Project access granted',
 			description : 'You\'ve been given access to the project ' + project.name 
 		});
+	},
+
+	_initLocation : function () {
+		var path    = window.location.pathname,
+		    username  = path.split('/')[1],
+		    project = path.split('/')[2],
+		    hash    = path.split('/')[3],
+		    search  = window.location.search.split('?'),
+		    params  = Wu.Util.parseUrl();
+
+
+		// done if no location
+		if (!username || !project) return false;
+
+		// get project
+		var project = this._projectExists(project, username);
+		
+		// return if no such project
+		if (!project) {
+			Wu.Util.setAddressBar(this.options.servers.portal);
+			return false;
+		}
+
+		// set project
+		this._setProject(project);
+
+		// init hash
+		if (hash) {
+			console.log('got hash!', hash, project);
+			this._initHash(hash, project);
+		}
+		return true;
+	},
+
+	_initHotlink : function () {
+		
+		// parse error prone content of hotlink..
+		this.hotlink = Wu.parse(window.hotlink);
+
+		// return if no hotlink
+		if (!this.hotlink) return false;
+
+		// check if project slug exists, and if belongs to client slug
+		var project = this._projectExists(this.hotlink.project, this.hotlink.client);
+
+		// return if not found
+		if (!project) return false;
+
+		// set project
+		this._setProject(project);
+
+		return true;
+	},
+
+
+	// check if project exists (for hotlink)
+	_projectExists : function (project_slug, username) {
+
+		// find project slug in Wu.app.Projects
+		var project_slug = project_slug || window.hotlink.project;
+		for (p in Wu.app.Projects) {
+			var project = Wu.app.Projects[p];
+			if (project_slug == project.store.slug) {
+				if (project.store.createdByUsername == username) return project; 
+			}
+		}
+		return false;
 	},
 
 	_initEvents : function () {
@@ -340,114 +371,13 @@ Wu.App = Wu.Class.extend({
 		this._mapContainer = Wu.DomUtil.createId('div', 'map-container', this._appPane);
 	},
 
-	_initAccess : function () {
-		this.Access = new Wu.Access(this.options.json.access);
-	},
-
-	_lonelyProject : function () {
-		//default case: hidden/ghost project (belongs to no client). Preferable to stick to the Start Pane
-		if (_.size(app.Projects) == 1) {
-			for (p in app.Projects) {
-				var project = app.Projects[p]; 
-				
-				// if project is hidden/ghost it has no client
-			   	if (project.getClient() === undefined) {
-					return false;
-				}
-
-				this._setProject(project);
-				return true;
-			}
-		}
-		//single project plus hidden/ghost project
-		//check if single (owned) project. Redirect to it instead of sticking on the Start pane
-		if (_.size(app.Projects) == 2) {
-			for (p in app.Projects) {
-	
-				var project = app.Projects[p]; 
-				if (project.getClient() === undefined) {
-					continue;
-				}
-				this._setProject(project);
-				return true;
-			}
-		}
-		return false;
-	},
-
-	_initLocation : function () {
-		var path    = window.location.pathname,
-		    client  = path.split('/')[1],
-		    project = path.split('/')[2],
-		    hash    = path.split('/')[3],
-		    search  = window.location.search.split('?'),
-		    params  = Wu.Util.parseUrl();
-
-		// done if no location
-		if (!client || !project) return false;
-
-		// get project
-		var project = this._projectExists(project, client);
-		
-		// return if no such project
-		if (!project) {
-			Wu.Util.setAddressBar(this.options.servers.portal);
-			return false;
-		}
-
-		// set project
-		this._setProject(project);
-
-		// init hash
-		if (hash) {
-			console.log('got hash!', hash, project);
-			this._initHash(hash, project);
-		}
-		return true;
-	},
-
 	_setProject : function (project) {
-		
+
 		// select project
 		Wu.Mixin.Events.fire('projectSelected', {detail : {
 			projectUuid : project.getUuid()
 		}});
 
-	},
-
-	_initHotlink : function () {
-		
-		// parse error prone content of hotlink..
-		Wu.parse(window.hotlink);
-
-		// return if no hotlink
-		if (!this.hotlink) return false;
-
-		// check if project slug exists, and if belongs to client slug
-		var project = this._projectExists(this.hotlink.project, this.hotlink.client);
-
-		// return if not found
-		if (!project) return false;
-
-		// set project
-		this._setProject(project);
-
-		return true;
-	},
-
-
-	// check if project exists (for hotlink)
-	_projectExists : function (projectSlug, clientSlug) {
-
-		// find project slug in Wu.app.Projects
-		var projectSlug = projectSlug || window.hotlink.project;
-		for (p in Wu.app.Projects) {
-			var project = Wu.app.Projects[p];
-			if (projectSlug == project.store.slug) {
-				if (project._client.slug == clientSlug) return project; 
-			}
-		}
-		return false;
 	},
 
 	// get name provided for portal from options hash 
@@ -457,11 +387,11 @@ Wu.App = Wu.Class.extend({
 
 	// shorthands for setting status bar
 	setStatus : function (status, timer) {
-		app.StatusPane.setStatus(status, timer);
+		// app.StatusPane.setStatus(status, timer);
 	},
 
 	setSaveStatus : function (delay) {
-		app.StatusPane.setSaveStatus(delay);
+		// app.StatusPane.setSaveStatus(delay);
 	},
 
 	_initHash : function (hash, project) {
@@ -494,34 +424,12 @@ Wu.App = Wu.Class.extend({
 		var projectUuid = hash.project || result.project;	// hacky.. clean up setHash, _renderHash, errything..
 		var project = app.Projects[projectUuid];
 
+		// select project
+		project.selectProject();
+
 		// set position
 		app.MapPane.setPosition(hash.position);
 
-		// set layers
-		hash.layers.forEach(function (layerUuid) { 	// todo: differentiate between baselayers and layermenu
-								// todo: layermenu items are not selected in layermenu itself, altho on map
-			// add layer
-			var layer = project.getLayer(layerUuid);
-
-			// if in layermenu
-			var bases = project.getBaselayers();
-			var base = _.find(bases, function (b) {
-				return b.uuid == layerUuid;
-			});
-
-			if (base) {
-				// add as baselayer
-				layer.add('baselayer'); 
-			} else {
-				// ass as layermenu
-				var lm = app.MapPane.getControls().layermenu;
-				if (lm) {
-					var lmi = lm._getLayermenuItem(layerUuid);
-					lm.enableLayer(lmi);
-				}
-			}
-			
-		}, this);
 	},
 
 	// save a hash // todo: move to controller
@@ -563,37 +471,58 @@ Wu.App = Wu.Class.extend({
 		// get project
 		var project = app.Projects[projectUuid];
 		
-		// return if n§o such project
+		// return if no such project
 		if (!project) return false;
-
-		// set project
-		Wu.Mixin.Events.fire('projectSelected', { detail : {
-			projectUuid : projectUuid
-		}});
 
 		// check for hash
 		if (hash) {
 
-			var json = JSON.stringify({
-				hash: hash,
-				project : projectUuid
-			});
+			// select project
+			project.selectProject();
 
-			// render hash
-			this._renderHash(this, json);
+			// set position
+			app.MapPane.setPosition(hash.position);
+
+			setTimeout(function () {
+
+				// deselect all default layers
+				var map = app._map;
+				var lm = app.MapPane.getControls().layermenu;
+				var activeLayers = lm._getActiveLayers();
+				activeLayers.forEach(function (al) {
+					al.layer.remove(map);
+				});
+
+				// set layers
+				hash.layers.forEach(function (layerUuid) { 	
+										
+					// add layer
+					var layer = project.getLayer(layerUuid);
+
+					// if in layermenu
+					var bases = project.getBaselayers();
+					var base = _.find(bases, function (b) {
+						return b.uuid == layerUuid;
+					});
+
+					if (base) {
+						// add as baselayer
+						layer.add('baselayer'); 
+					} else {
+						layer.add();
+					}
+					
+				}, this);
+
+			}.bind(this), 2000);
+
+
 		}
-
-		// acticate legends for baselayers
-		// app.MapPane._controls.legends.refreshAllLegends();
-
-		// remove startpane
-		if (this.StartPane) this.StartPane.deactivate();
 
 		// add phantomJS stylesheet		
 		isThumb ? app.Style.phantomJSthumb() : app.Style.phantomJS();
 
-		// avoid Loading! etc in status
-		// app.setStatus('systemapic'); // too early
+		app._isPhantom = true;
 
 	},
 	

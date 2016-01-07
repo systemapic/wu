@@ -9,9 +9,6 @@ Wu.Project = Wu.Class.extend({
 		// ready save object
 		this.lastSaved = {};
 
-		// attach client
-		this._client = Wu.app.Clients[this.store.client];
-
 		// init roles, files, layers
 		this._initObjects();
 
@@ -74,7 +71,6 @@ Wu.Project = Wu.Class.extend({
 
 	addLayer : function (layer) {
 		var l = new Wu.createLayer(layer);
-		console.log('createlayer  in project', layer, l);
 		if (l) this.layers[layer.uuid] = l;
 		return l || false;
 	},
@@ -83,9 +79,14 @@ Wu.Project = Wu.Class.extend({
 		this.store.baseLayers.push(layer);
 		this._update('baseLayers');
 	},
-
+	
 	removeBaseLayer : function (layer) {
 		_.remove(this.store.baseLayers, function (b) { return b.uuid == layer.getUuid(); });
+		this._update('baseLayers');
+	},
+
+	setBaseLayer : function (layer) {
+		this.store.baseLayers = layer;
 		this._update('baseLayers');
 	},
 
@@ -141,12 +142,9 @@ Wu.Project = Wu.Class.extend({
 		var parsed = JSON.parse(data);
 
 		console.error('TODO: created layer from GeoJSON, needs to be added to Data.');
-		
-		
 	},
 
 	createLayer : function () {
-
 	},
 
 	setActive : function () {
@@ -171,7 +169,6 @@ Wu.Project = Wu.Class.extend({
 		this.addLayer(layer);
 	},
 
-
 	_reset : function () {
 		// this.removeHooks();
 	},
@@ -185,9 +182,6 @@ Wu.Project = Wu.Class.extend({
 
   		// create layers 
 		this.initLayers();
-
-		// init roles
-		this.initRoles();
 
 		// update url
 		this._setUrl();
@@ -206,9 +200,6 @@ Wu.Project = Wu.Class.extend({
 
 		// flush
 		this._reset();
-
-		// init roles
-		this.initRoles();
 
 		// update url
 		this._setUrl();
@@ -240,10 +231,14 @@ Wu.Project = Wu.Class.extend({
 
 	_setUrl : function () {
 		var url = '/';
-		url += this._client.slug;
+		url += this.getCreatedByUsername();
 		url += '/';
 		url += this.store.slug;
 		Wu.Util.setAddressBar(url);
+	},
+
+	getCreatedByUsername : function () {
+		return this.store.createdByUsername;
 	},
 
 	setNewStore : function (store) {
@@ -262,13 +257,56 @@ Wu.Project = Wu.Class.extend({
 		this.initRoles();
 	},
 
+	setAccess : function (projectAccess) {
+
+		var options = {
+			project : this.getUuid(),
+			access : projectAccess
+		}
+
+
+		// send request to API		
+ 		Wu.Util.postcb('/api/project/setAccess', JSON.stringify(options), function (ctx, response) {
+ 		
+ 			// set locally
+ 			this.store.access = projectAccess;
+
+ 		}.bind(this), this);
+
+	},
+
+	addInvites : function (projectAccess) {
+
+		var options = {
+			project : this.getUuid(),
+			access : projectAccess
+		}
+
+
+		// send request to API		
+ 		Wu.Util.postcb('/api/project/addInvites', JSON.stringify(options), function (ctx, response) {
+
+ 			console.log('response: ', response, ctx);
+
+ 			var updatedAccess = Wu.parse(response);
+
+ 			// set locally
+ 			this.store.access = updatedAccess;
+
+ 		}.bind(this), this);
+	},
+
+	getAccess : function () {
+		return this.store.access;
+	},
+
 	setMapboxAccount : function (store) {
 		// full project store
 		this.store = store;
 
 		// refresh project and sidepane
 		this._refresh();
-		this.refreshSidepane();
+		// this.refreshSidepane();
 	},
 
 	_update : function (field) {
@@ -327,19 +365,22 @@ Wu.Project = Wu.Class.extend({
 		}});
 	},
 
-	_saveNew : function (opts) {
-	     	var callback = opts.callback;
+
+	// create project on server
+	create : function (opts, callback) {
+
+		console.log('this: store', this.store);
 
 		var options = {
 			name 		: this.store.name,
 			description 	: this.store.description,
 			keywords 	: this.store.keywords, 
 			position 	: this.store.position,
-			client 		: this._client.uuid 			// parent client uuid 
+			access		: this.store.access
 		}
-		var json = JSON.stringify(options);
-		
- 		Wu.Util.postcb('/api/project/new', json, callback.bind(opts.context), this);
+
+		// send request to API		
+ 		Wu.post('/api/project/create', JSON.stringify(options), callback.bind(opts.context), this);
 	},
 
 
@@ -352,27 +393,26 @@ Wu.Project = Wu.Class.extend({
 	},
 
 
-	_delete : function () {
+	_delete : function (callback) {
 		// var project = this;
 		var json = JSON.stringify({ 
 			    'pid' : this.store.uuid,
 			    'projectUuid' : this.store.uuid,
-			    'clientUuid' : this._client.uuid
+			    // 'clientUuid' : this._client.uuid
 		});
 		
 		// post with callback:    path       data    callback   context of cb
-		Wu.Util.postcb('/api/project/delete', json, this._deleted, this);
+		Wu.Util.postcb('/api/project/delete', json, callback || this._deleted, this);
 	},
 
 	_deleted : function (project, json) {
-		
+
 		// set address bar
-		var client = project.getClient().getSlug();
-		var url = app.options.servers.portal + client + '/';
+		var url = app.options.servers.portal;
 		var deletedProjectName = project.getName();
 
 		// set url
-		Wu.Util.setAddressBar(url)
+		Wu.Util.setAddressBar(url);
 
 		// delete object
 		app.Projects[project.getUuid()] = null;
@@ -384,9 +424,6 @@ Wu.Project = Wu.Class.extend({
 			// null activeproject
 			app.activeProject = null;
 
-			// refresh sidepane
-			app.SidePane.refreshMenu();
-
 			// unload project
 			project._unload();
 			
@@ -395,18 +432,16 @@ Wu.Project = Wu.Class.extend({
 				projectUuid : false
 			}});
 
-			// show start pane
-			app.Controller.showStartPane();
+			// fire no project
+			Wu.Mixin.Events.fire('projectDeleted', { detail : {
+				projectUuid : project.getUuid()
+			}});
+
 		}
 
 		project = null;
 		delete project;
 
-		// set status
-		app.setStatus('Deleted!');
-
-		// Save new project name to GA
-		// ga('set', 'dimension9', deletedProjectName);
 	},
 
 	saveColorTheme : function () {
@@ -469,8 +504,6 @@ Wu.Project = Wu.Class.extend({
 
 		Wu.post('/api/layers/delete', JSON.stringify(options), function (err, response) {
 			if (err) return console.error('layer delete err:', err);
-
-			console.log('deleted form server?', err, response);
 
 			var result = Wu.parse(response);
 
@@ -541,11 +574,13 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getClient : function () {
-		return app.Clients[this.store.client];
+		console.log('TODO: remove this!');
+		// return app.Clients[this.store.client];
 	},
 
 	getClientUuid : function () {
-		return this.store.client;
+		console.log('TODO: remove this!');
+		// return this.store.client;
 	},
 
 	getBaselayers : function () {
@@ -573,7 +608,6 @@ Wu.Project = Wu.Class.extend({
 
 		for (var l in this.layers) {
 			var layer = this.layers[l];
-
 			if (layer.store && layer.store.data && layer.store.data.postgis) layers.push(layer);
 		}
 
@@ -773,7 +807,7 @@ Wu.Project = Wu.Class.extend({
 	getSlugs : function () {
 		var slugs = {
 			project : this.store.slug,
-			client : this.getClient().getSlug()
+			// client : this.getClient().getSlug()
 		}
 		return slugs;
 	},
@@ -809,7 +843,8 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	getHeaderTitle : function () {
-		return this.store.header.title;
+		// return this.store.header.title;
+		return this.getName();
 	},
 
 	getHeaderSubtitle : function () {
@@ -855,6 +890,7 @@ Wu.Project = Wu.Class.extend({
 		this._update('pending');
 	},
 
+
 	setPopupPosition : function (pos) {
 		this._popupPosition = pos;
 	},
@@ -894,8 +930,13 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	setName : function (name) {
+
+		// store on server
 		this.store.name = name;
 		this._update('name');
+
+		// update slug name
+		this.setSlug(name);
 	},
 
 	setDescription : function (description) {
@@ -953,9 +994,7 @@ Wu.Project = Wu.Class.extend({
 	},
 
 	removeFiles : function (files) {
-
 		return console.error('remove files, needs to be rewritten with new Wu.Data');
-
 	},
 
 	getGrandeFiles : function () {
@@ -1019,9 +1058,6 @@ Wu.Project = Wu.Class.extend({
 		for (setting in this.getSettings()) {
 			this.getSettings()[setting] ? this['enable' + setting.camelize()]() : this['disable' + setting.camelize()]();
 		}
-
-		// refresh added/removed sidepanes
-		app.SidePane._refresh();
 	},
 
 	// settings
@@ -1063,38 +1099,38 @@ Wu.Project = Wu.Class.extend({
 
 
 	enableScreenshot : function () {
-		app.SidePane.Share.enableScreenshot();
+		// app.SidePane.Share.enableScreenshot();
 	},
 	disableScreenshot : function () {
-		app.SidePane.Share.disableScreenshot();
+		// app.SidePane.Share.disableScreenshot();
 	},
 
 	enableDocumentsPane : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 	disableDocumentsPane : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 
 	enableDataLibrary : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 	disableDataLibrary : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 
 	enableMediaLibrary : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 	disableMediaLibrary : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 
 	enableSocialSharing : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 	disableSocialSharing : function () {
-		app.SidePane.refreshMenu();
+		// app.SidePane.refreshMenu();
 	},
 
 	enableAutoHelp : function () {		// auto-add folder in Docs
@@ -1184,6 +1220,95 @@ Wu.Project = Wu.Class.extend({
 		var base = logo.split('/')[2];
 		var url = '/pixels/image/' + base + '?width=90&height=60&format=png' + '&access_token=' + app.tokens.access_token;
 		return url;
-	}
+	},
+
+
+	selectProject : function () {
+
+		// select project
+		Wu.Mixin.Events.fire('projectSelected', {detail : {
+			projectUuid : this.getUuid()
+		}});
+	},
+
+
+
+
+
+	/////
+	//// ACCESS
+	///
+	//
+
+	isPublic : function () {
+		var access = this.getAccess();
+		var isPublic = access.options.isPublic;
+		return !!isPublic
+	},
+
+	isDownloadable : function () {
+		var access = this.getAccess();
+		var isPublic = access.options.download;
+		return !!isPublic;
+	},
+	isShareable : function () {
+		var access = this.getAccess();
+		var isPublic = access.options.share;
+		return !!isPublic;
+	},
+
+
+	createdBy : function () {
+		return this.store.createdBy;
+	},
+
+	isEditor : function (user) {
+		return this.isEditable(user);
+	},
+
+	isSpectator : function (user) {
+		var user = user || app.Account;
+		var access = this.getAccess();
+
+		// true: if user is listed as editor
+		if (_.contains(access.read, user.getUuid())) return true;
+
+		// false: not createdBy and not editor
+		return false;
+	},
+
+	isEditable : function (user) {
+		var user = user || app.Account;
+
+		var access = this.getAccess();
+
+		// true: if user created project
+		if (user.getUuid() == this.createdBy()) return true;
+
+		// true: if user is listed as editor
+		if (_.contains(access.edit, user.getUuid())) return true;
+
+		// true: if user is super
+		if (app.Account.isSuper()) return true; 
+
+		// false: not createdBy and not editor
+		return false;
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 })

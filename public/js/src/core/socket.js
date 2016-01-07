@@ -13,11 +13,9 @@ Wu.Socket = Wu.Class.extend({
 	},
 
 	_addLoops : function () {
-
 		setInterval(function () {
 			this._getServerStats();
 		}.bind(this), 2000);
-
 	},
 
 	_getServerStats : function () {
@@ -35,14 +33,21 @@ Wu.Socket = Wu.Class.extend({
 		socket.emit('user_event', options);
 	},
 
+	send : function (channel, options, callback) {
+
+		// send event
+		var socket = this._socket;
+		socket.emit(channel, options);
+
+	},
+
 	_listen : function () {
 		var socket = this._socket;
 
 		socket.on('server_stats', function (data) {
 			var stats = data.server_stats;
 			if (app.Chrome) app.Chrome.Top.updateCPUclock(stats.cpu_usage);
-		})
-
+		});
 		socket.on('connect', function(){
 			console.log('Securely connected to socket.');
 			socket.emit('ready', 'koko')
@@ -50,6 +55,18 @@ Wu.Socket = Wu.Class.extend({
 		socket.on('event', function(data){
 			console.log('event data: ', data);
 		});
+
+		socket.on('tile_count', function(data){
+			Wu.Mixin.Events.fire('tileCount', {
+				detail : data
+			});
+		});
+		socket.on('tileset_meta', function(data){
+			Wu.Mixin.Events.fire('tileset_meta', {
+				detail : data
+			});
+		});
+
 		socket.on('disconnect', function(){
 			console.log('disconnect!');
 		});
@@ -57,22 +74,35 @@ Wu.Socket = Wu.Class.extend({
 			console.log('hola!', data);
 		});
 		socket.on('processingProgress', function(data){
-			console.log('processingProgress:', data);
+			Wu.Mixin.Events.fire('processingProgress', {
+				detail : data
+			});
 		});
 		socket.on('stats', function(data){
-			console.log('stats:', data);
 		});
 		socket.on('uploadDone', function (data) {
-			console.log('uploadDone!', data);
+		});
+		socket.on('generate_tiles', function (data) {
+
+			console.log('generate tiles done?', data);
+
+			if (data.err) {
+				console.error('generetate err', data);
+
+				return;
+			}
+
+			// fire
+			Wu.Mixin.Events.fire('generatedTiles', {
+				detail : data
+			});
 
 		});
 		socket.on('downloadReady', function (data) {
-			console.log('downloadReady!', data);
 
 			// select project
 			var event_id = 'downloadReady-' + data.file_id;
 			Wu.Mixin.Events.fire(event_id, {detail : data});
-
 		});
 		socket.on('processingDone', function (data) {
 
@@ -88,10 +118,23 @@ Wu.Socket = Wu.Class.extend({
 
 			var content = data.error;
 
-			app.FeedbackPane.setError({
-				title : content.title,
-				description : content.description
-			})
+			var uniqueIdentifier = content.uniqueIdentifier;
+
+			if (uniqueIdentifier) {
+				
+				// file error
+				Wu.Mixin.Events.fire('processingError', {
+					detail : content
+				});
+
+			} else {
+
+				app.FeedbackPane.setError({
+					title : content.title,
+					description : content.description
+				});
+			}
+
 		});
 		
 

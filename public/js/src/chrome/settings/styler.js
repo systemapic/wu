@@ -42,6 +42,9 @@ Wu.Styler = Wu.Class.extend({
 			['#00ff00', '#ffff00', '#ff0000'],
 		],
 
+		blendModes : ["color", "color-burn", "color-dodge", "contrast", "darken", "difference", "dst", "dst-atop", "dst-in", "dst-out", "dst-over", "exclusion", "grain-extract", "grain-merge", "hard-light", "hue", "invert", "invert-rgb", "lighten", "minus", "multiply", "overlay", "plus", "saturation", "screen", "soft-light", "src", "src-atop", "src-in", "src-out", "src-over", "value", "xor"],
+
+
 	},
 
 	_content : {},
@@ -70,7 +73,7 @@ Wu.Styler = Wu.Class.extend({
 		var isOn = this.carto().enabled;
 
 		// Create wrapper
-		this._wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper', this.options.container);
+		this._wrapper = Wu.DomUtil.create('div', 'chrome-content-section-wrapper toggles-wrapper', this.options.container);
 
 		// wrapper
 		var line = new Wu.fieldLine({
@@ -80,7 +83,7 @@ Wu.Styler = Wu.Class.extend({
 			input        : false,
 		});		
 
-		// switch button
+		// switch Update Style
 		var button = new Wu.button({
 			id 	     : this.type,
 			type 	     : 'switch',
@@ -100,7 +103,7 @@ Wu.Styler = Wu.Class.extend({
 		this._toggle(on);
 
 		// update
-		this._updateStyle();
+		this.markChanged();
 	},
 
 	_toggle : function (on) {
@@ -117,6 +120,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// select options
 		this._preSelectOptions();
+
 	},
 
 	_disable : function () {
@@ -124,15 +128,21 @@ Wu.Styler = Wu.Class.extend({
 		this._clearOptions();
 	},
 
-	_updateStyle : function () {
+	markChanged : function () {
+		this._changed = true;
+		this.options.styler.markChanged();
+	},
 
-		console.log('updateStyle', this.options.carto, this);
+	updateStyle : function () {
+		if (!this._changed) return;
 
 		// create carto css
 		this._createCarto(this.options.carto, this._saveCarto.bind(this));
 
-		
+		// marked not changed
+		this._changed = false;
 	},
+
 
 	// create color box
 	_createColor : function () {
@@ -146,8 +156,6 @@ Wu.Styler = Wu.Class.extend({
 		var val          = this.carto().color.value 	|| this.options.defaults.range;
 		var column       = this.carto().color.column;
 		var minMax       = this.carto().color.range;
-
-		console.log('_createColor column: ', column, staticVal, isOn);
 
 		// container
 		var line = new Wu.fieldLine({
@@ -179,7 +187,8 @@ Wu.Styler = Wu.Class.extend({
 			appendTo : line.container,
 			fn       : this._updateColor.bind(this),
 			value    : staticVal,
-			colors   : this.options.palettes
+			colors   : this.options.palettes,
+			className: 'target-color-box'
 		});
 
 		// remember items
@@ -206,7 +215,7 @@ Wu.Styler = Wu.Class.extend({
 
 		// get states
 		var isOn   = (this.carto().opacity.column === false);
-		var value  = this.carto().opacity.staticVal || 1;
+		var value  = this.carto().opacity.staticVal;
 		var column = this.carto().opacity.column;
 		var minMax = this.carto().opacity.range;
 
@@ -256,6 +265,58 @@ Wu.Styler = Wu.Class.extend({
 			range : minMax,
 			staticVal : value
 		};
+	},
+
+	_createBlendMode : function () {
+
+		// Create JSON obj if it's not already there
+		this.carto().blend = this.carto().blend || {};
+
+		var blendmode = this.carto().blend.mode || 'screen';
+
+		// container
+		var line = new Wu.fieldLine({
+			id           : 'blendmode',
+			appendTo     : this._wrapper,
+			title        : '<b>Blend mode</b>',
+			input        : false,
+			childWrapper : 'point-size-children'
+		});
+
+		// blend modes dropdown
+		var dropdown = new Wu.button({
+			id 	 : 'blendmode',
+			type 	 : 'dropdown',
+			right 	 : true,
+			appendTo : line.container,
+			fn 	 : this._blendmodeSelected.bind(this),
+			array 	 : this.options.blendModes,
+			selected : blendmode,
+		});
+
+		// remember items
+		this._content[this.type].blendmode = {
+			line : line,
+			dropdown : dropdown,
+		}
+
+		// save carto
+		this.carto().blend = {
+			mode : blendmode
+		};
+
+
+	},
+
+	_blendmodeSelected : function (e) {
+		var dropdown = e.target;
+		var blendmode = dropdown.options[dropdown.selectedIndex].value;
+
+		// save
+		this.carto().blend.mode = blendmode;
+
+		// mark changed
+		this.markChanged();
 	},
 
 	// point size box
@@ -471,6 +532,9 @@ Wu.Styler = Wu.Class.extend({
 
 		// save carto
 		this.carto().color.range = value;
+
+		// mark changed
+		this.markChanged();
 		
 	},
 
@@ -520,6 +584,9 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().opacity.column  = column;
 		this.carto().opacity.range = value;
+
+		// mark changed
+		this.markChanged();
 	},
 
 	_addWidthFields : function (column) {
@@ -567,6 +634,9 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().width.column  = column;
 		this.carto().width.range = value;
+
+		// mark changed
+		this.markChanged();
 	},
 
 	_updateColor : function (hex, key, wrapper) {
@@ -577,10 +647,8 @@ Wu.Styler = Wu.Class.extend({
 		// Close
 		this._closeColorRangeSelector(); 
 
-		// update
-		this._updateStyle();	
-
-		console.log('_updateColor');
+		// mark changed
+		this.markChanged();
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -595,10 +663,10 @@ Wu.Styler = Wu.Class.extend({
 		var inputField = this._content[this.type].width.input.input;
 
 		// save carto
-		this.carto().width.value = inputField.value;
+		this.carto().width.staticVal = inputField.value;
 
-		// update
-		this._updateStyle();	
+		// mark changed
+		this.markChanged();
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -628,8 +696,8 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().opacity.staticVal = value;
 
-		// update
-		this._updateStyle();
+		// mark changed
+		this.markChanged();
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -647,19 +715,19 @@ Wu.Styler = Wu.Class.extend({
 		var inputField = this._content[this.type].pointsize.input.input;
 
 		// If less than 0.5, make it 0.5
-		if ( value < 0.5 ) value = 0.5;
+		// if ( value < 0 ) value = 0;
 
 		// Set value in input
 		inputField.value = value;
 
 		// don't save if no changes
-		if (this.carto().pointsize.value == value) return;
+		if (this.carto().pointsize.staticVal == value) return;
 
 		// save carto
-		this.carto().pointsize.value = value;
+		this.carto().pointsize.staticVal = value;
 
-		// update
-		this._updateStyle();
+		// mark changed
+		this.markChanged();
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -703,8 +771,8 @@ Wu.Styler = Wu.Class.extend({
 		// close popup
 		this._closeColorRangeSelector(); 
 
-		// UPDATE
-		this._updateStyle();
+		// mark changed
+		this.markChanged();
 
 		// send user event
 		app.Socket.sendUserEvent({
@@ -725,8 +793,8 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().color.range = minMax;
 
-		// update		
-		this._updateStyle();
+		// mark changed
+		this.markChanged();
 	},
 
 	// on click on color range presets
@@ -775,8 +843,8 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().color.value = colorArray;		
 
-		// UPDATE
-		this._updateStyle();	
+		// mark changed
+		this.markChanged();
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -792,8 +860,6 @@ Wu.Styler = Wu.Class.extend({
 		var key = e.target.getAttribute('key'); // todo: remove DOM interaction
 		var field = e.target.value;
 		var wrapper = e.target.parentElement;
-
-		console.log('_dropdownSelected!!', e, key, field, wrapper, this.type);
 
 		// check if selected item is placeholders
 		var isStatic = (field == this.options.dropdown.staticText);
@@ -834,16 +900,14 @@ Wu.Styler = Wu.Class.extend({
 			Wu.DomUtil.addClass(colorBall, 'disable-color-ball');
 		}
 
-		
-
 		// save carto
 		this.carto()[field].column = column; 
 
 		// Add fields
 		this._initSubfields(column, field); // sub meny
 
-		// UPDATE
-		this._updateStyle();
+		// mark changed
+		this.markChanged();
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -855,8 +919,6 @@ Wu.Styler = Wu.Class.extend({
 	},
 
 	_unselectField : function (key, wrapper) {
-
-		console.log('_unselectField', key, this.carto()[key]);
 
 		// show static inputs
 		if (key == 'opacity') {	
@@ -891,11 +953,8 @@ Wu.Styler = Wu.Class.extend({
 		// save style
 		this.carto()[key].column = false;
 
-		// set fixed style
-
-
-		// refresh
-		this._updateStyle();
+		// mark changed
+		this.markChanged();
 
 	},
 
@@ -970,8 +1029,8 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().pointsize.range = [min, max];
 
-		// updat style
-		this._updateStyle();
+		// mark changed
+		this.markChanged();
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -992,8 +1051,8 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().opacity.range = [min, max];
 
-		// updat style
-		this._updateStyle();
+		// mark changed
+		this.markChanged();
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -1014,8 +1073,8 @@ Wu.Styler = Wu.Class.extend({
 		// save carto
 		this.carto().width.range = [min, max];
 
-		// updat style
-		this._updateStyle();
+		// mark changed
+		this.markChanged();
 
 		// user event
 		app.Socket.sendUserEvent({
@@ -1183,6 +1242,347 @@ Wu.Styler = Wu.Class.extend({
 		gradientStyle    += 'background: -moz-linear-gradient(right, '   + colorArray.join() + ');';
 		gradientStyle    += 'background: linear-gradient(to right, '     + colorArray.join() + ');';
 		return gradientStyle;
-	},	
+	},
+
+	_targetColumnSelected : function (e) {
+
+		// get target index
+		var target = e.target;
+		var targets = this._content[this.type].targets.selectors;
+		var i = _.findIndex(targets, function (t) {
+			return t.column._select == target;
+		});
+
+		// get value
+		var column = target.value;
+
+		// set carto
+		this.carto().targets[i].column = column;
+
+		// mark changed
+		this.markChanged();
+	},
+
+	_targetColorSelected : function (color, id, e) {
+
+		// get target index
+		var target = e.target;
+		var targets = this._content[this.type].targets.selectors;
+		var i = _.findIndex(targets, function (t) {
+			return t.color.color == e;
+		});
+
+		// set carto
+		this.carto().targets[i].color = color;
+
+		// mark changed
+		this.markChanged();
+	},
+
+	_targetValueSelected : function (e) {
+
+		// get target index
+		var target = e.target;
+		var targets = this._content[this.type].targets.selectors;
+		var i = _.findIndex(targets, function (t) {
+			return t.value == e.target;
+		});
+
+		// get opacity value
+		var value = e.target.value;
+
+		// set carto
+		this.carto().targets[i].value = value;
+
+		// mark changed
+		this.markChanged();
+	},
+
+	_targetOpacitySelected : function (e) {
+
+		// get target index
+		var target = e.target;
+		var targets = this._content[this.type].targets.selectors;
+		var i = _.findIndex(targets, function (t) {
+			return t.opacity == e.target;
+		});
+
+		// get opacity value
+		var opacity_value = parseFloat(e.target.value);
+
+		// set carto
+		this.carto().targets[i].opacity = opacity_value;
+
+		// mark changed
+		this.markChanged();
+	},
+
+	_targetWidthSelected : function (e) {
+
+		// get target index
+		var target = e.target;
+		var targets = this._content[this.type].targets.selectors;
+		var i = _.findIndex(targets, function (t) {
+			return t.width == e.target;
+		});
+
+		// get width value
+		var width_value = parseFloat(e.target.value);
+
+		// set carto
+		this.carto().targets[i].width = width_value;
+
+		// mark changed
+		this.markChanged();
+	},
+
+
+	_removeTarget : function (e) {
+
+		// get target index
+		var target = e.target;
+		var targets = this._content[this.type].targets.selectors;
+		var i = _.findIndex(targets, function (t) {
+			return t.wrapper == target.parentNode.parentNode || t.wrapper == target.parentNode;
+		});
+
+		// remove div
+		var trg = targets[i];
+		var wrapper = trg.wrapper;
+		Wu.DomUtil.remove(wrapper);
+
+		// remove from carto
+		_.pullAt(this.carto().targets, i);
+
+		// remove from div list
+		_.pullAt(targets, i);
+
+		// mark changed
+		this.markChanged();
+
+	},
+
+	_changeAddButtonText : function () {
+		// change title of button (hacky)
+		var button = Wu.DomUtil.get('target-text-' + this.type);
+		button.innerHTML = 'Add column';
+	},
+
+	_addTargetColumn : function (e) {
+
+		var defaultColumn = this.options.meta[2]; // first column
+
+		// set default options
+		var options = {
+			column : defaultColumn, // default column
+			value : '', 		// targeted column value
+			color : 'red', 		// default color
+			opacity : 1, 		// default opacity
+			width : 5,
+			operator : '='
+		}
+
+		// set values
+		this.carto().targets.push({
+			column : options.column,
+			value : options.value,
+			color : options.color,
+			opacity : options.opacity,
+			width : options.width,
+			operator : options.operator
+		});
+
+		// create column
+		this._createTargetColumn(null, options);
+
+		// mark change
+		this.markChanged();
+
+		// change button text
+		this._changeAddButtonText();
+	},
+
+
+	// create column targets
+	_createTargets : function () {
+
+		// create target field
+		this.carto().targets = this.carto().targets || [];
+
+		// create wrapper
+		var wrapper = Wu.DomUtil.create('div', 'add-target-wrapper', this._wrapper);
+
+		// create (+) box
+		var addTarget = Wu.DomUtil.create('div', 'add-target', wrapper);
+		addTarget.innerHTML = '<i class="fa fa-plus-circle add-target-icon"></i>';
+		addTarget.innerHTML += '<div id="target-text-' + this.type + '" class="add-target-text">Target specific columns</div>';
+
+		// event
+		Wu.DomEvent.on(addTarget, 'click', this._addTargetColumn, this);
+
+		// remember items
+		this._content[this.type].targets = {
+			wrapper : wrapper,
+			addTarget : addTarget,
+		}
+
+		// fill already existing targets
+		var targets = this.carto().targets;
+		if (targets.length) {
+
+			// add existing targets
+			targets.forEach(function (t) {
+				this._createTargetColumn(null, t);
+			}, this);
+
+			// change button text
+			this._changeAddButtonText();
+		}
+
+	},
+
+
+	_createTargetColumn : function (e, options) {
+
+		// get columns
+		var columnObjects = this.options.columns;
+		var columns = [];
+
+		// get column names only
+		for (var c in columnObjects) {
+			columns.push(c);
+		}
+
+		// head wrapper
+		var wrapper = this._content[this.type].targets.wrapper;
+
+		// create target wrapper
+		var target_wrapper = Wu.DomUtil.create('div', 'target-wrapper', wrapper);
+
+
+		// (-) button
+		var rembtn_wrapper = Wu.DomUtil.create('div', 'target-remove', target_wrapper);
+		rembtn_wrapper.innerHTML = '<i class="fa fa-minus-circle"></i>';
+		
+		// event
+		Wu.DomEvent.on(rembtn_wrapper, 'click', this._removeTarget, this);	
+
+		
+		// column dropdown
+		var column_wrapper = Wu.DomUtil.create('div', 'target-column-wrapper', target_wrapper);
+		var column_title = Wu.DomUtil.create('div', 'target-column-title', column_wrapper, 'Column');
+		var column_dropdown = new Wu.button({
+			id 	 : 'target',
+			type 	 : 'dropdown',
+			isOn 	 : true,
+			right 	 : true,
+			appendTo : column_wrapper,
+			fn 	 : this._targetColumnSelected.bind(this),
+			array 	 : columns, // columns in dropdown
+			selected : options.column, // preselected item
+			className : 'target-column-dropdown tiny'
+		});
+
+
+		// < = > input
+		var operator_wrapper = Wu.DomUtil.create('div', 'target-column-wrapper', target_wrapper);
+		var operator_dropdown = new Wu.button({
+			id 	 : 'equals_selection',
+			type 	 : 'clicker',
+			appendTo : operator_wrapper,
+			fn 	 : this._operatorSelected.bind(this),
+			array 	 : ['<', '=', '>'], // columns in dropdown
+			selected : options.operator, // preselected item
+			className : 'target-equals-clicker'
+		});
+
+
+
+		
+		// value input
+		var input_wrapper = Wu.DomUtil.create('div', 'target-input-wrapper', target_wrapper);
+		var input_title = Wu.DomUtil.create('div', 'target-input-title', input_wrapper, 'Value');
+		var column_input = Wu.DomUtil.create('input', 'target-input', input_wrapper);
+		column_input.value = options.value;
+
+		// blur event
+		Wu.DomEvent.on(column_input, 'blur', this._targetValueSelected, this);
+
+
+
+		// color ball
+		var color_wrapper = Wu.DomUtil.create('div', 'target-color-wrapper', target_wrapper);
+		var input_title = Wu.DomUtil.create('div', 'target-input-title', color_wrapper, 'Color');
+		var ball = new Wu.button({
+			id 	 : 'target-color',
+			type 	 : 'colorball',
+			right    : true,
+			isOn 	 : true,
+			appendTo : color_wrapper,
+			fn       : this._targetColorSelected.bind(this),
+			value    : options.color,
+			colors   : this.options.palettes,
+			className : 'target-color-box'
+		});
+
+
+
+		// opacity input
+		var opacity_wrapper = Wu.DomUtil.create('div', 'target-opacity-wrapper', target_wrapper);
+		var opacity_title = Wu.DomUtil.create('div', 'target-input-title-opacity', opacity_wrapper, 'Opacity');
+		var opacity_input = Wu.DomUtil.create('input', 'target-input opacity', opacity_wrapper);
+		opacity_input.value = options.opacity;
+
+		// blur event
+		Wu.DomEvent.on(opacity_input, 'blur', this._targetOpacitySelected, this);
+
+
+		// width input
+		var width_wrapper = Wu.DomUtil.create('div', 'target-width-wrapper', target_wrapper);
+		var width_title = Wu.DomUtil.create('div', 'target-input-title-width', width_wrapper, 'Width');
+		var width_input = Wu.DomUtil.create('input', 'target-input width', width_wrapper);
+		width_input.value = options.width;
+
+		// blur event
+		Wu.DomEvent.on(width_input, 'blur', this._targetWidthSelected, this);
+
+
+		// remember
+		this._content[this.type].targets.selectors = this._content[this.type].targets.selectors || [];
+		this._content[this.type].targets.selectors.push({
+			column : column_dropdown,
+			value : column_input,
+			color : ball,
+			opacity : opacity_input,
+			width : width_input,
+			wrapper : target_wrapper,
+			operator : operator_dropdown
+		});
+
+
+		// move (+) btn to bottom
+		var button = this._content[this.type].targets.addTarget;
+		var bwrapper = this._content[this.type].targets.wrapper;
+		wrapper.appendChild(button);
+
+	},
+
+
+	_operatorSelected : function (e, value) {
+
+		// get target index
+		var target = e.target;
+		var targets = this._content[this.type].targets.selectors;
+		var i = _.findIndex(targets, function (t) {
+			return t.operator._button == e.target;
+		});
+
+		// set carto
+		this.carto().targets[i].operator = value;
+
+		// mark changed
+		this.markChanged();
+	},
+
 
 });

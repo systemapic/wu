@@ -85,11 +85,13 @@ Wu.Chrome.SettingsContent.Tooltip = Wu.Chrome.SettingsContent.extend({
 	_selectedActiveLayer : function (e, uuid) {
 
 		var layerUuid = uuid ? uuid : e.target.value;
+
+		this._layer = this._project.getLayer(layerUuid);
+
+		if (!this._layer) return; // hack
 		
 		// Store uuid of layer we're working with
 		this._storeActiveLayerUuid(layerUuid);
-		
-		this._layer = this._project.getLayer(layerUuid);
 
 		// Get stored tooltip meta
 		this.tooltipMeta = this._layer.getTooltip();

@@ -2,7 +2,7 @@
 
 // database schemas
 var Project 	= require('../models/project');
-var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
+// var Clientel 	= require('../models/client');	// weird name cause 'Client' is restricted name
 var User  	= require('../models/user');
 var File 	= require('../models/file');
 var Layer 	= require('../models/layer');
@@ -160,7 +160,7 @@ module.exports = api.slack = {
 
 		var attachments = [{
 			image_url : options.embed_image,
-		}]
+		}];
 
 		return attachments;
 	},
@@ -169,51 +169,33 @@ module.exports = api.slack = {
 		var project = options.project,
 		    user = options.user;
 
-		// get client for name
-		api.slack._getClient(project, function (err, client) {
-			if (err || !client) return;
+		// set vars
+		var baseurl 	= api.config.slack.baseurl,
+		    projectName = project.name,
+		    fullName 	= user.firstName + user.lastName,
+		    url 	= baseurl + project.slug,
+		    text 	= fullName + ' created a project: ' + url;
 
-			// set vars
-			var baseurl 	= api.config.slack.baseurl,
-			    projectName = project.name,
-			    clientName 	= client.name,
-			    fullName 	= user.firstName + user.lastName,
-			    slugs 	= client.slug + '/' + project.slug,
-			    url 	= baseurl + slugs,
-			    text 	= fullName + ' created a project for client ' + clientName + ': ' + url;
-
-			// send
-			api.slack._send({text : text});
-		});
+		// send
+		api.slack._send({text : text});
 	},
 
 	deletedProject : function (options) {
 		var project = options.project,
 		    user = options.user;
 
-		// get client for name
-		api.slack._getClient(project, function (err, client) {
-			if (err || !client) return;
+		// set vars
+		var baseurl 	= api.config.slack.baseurl,
+		    projectName = project.name,
+		    fullName 	= user.firstName + user.lastName,
+		    url 	= baseurl + project.slug,
+		    text 	= fullName + ' deleted a project: ' + projectName;
 
-			// set vars
-			var baseurl 	= api.config.slack.baseurl,
-			    projectName = project.name,
-			    clientName 	= client.name,
-			    fullName 	= user.firstName + user.lastName,
-			    slugs 	= client.slug + '/' + project.slug,
-			    url 	= baseurl + slugs,
-			    text 	= fullName + ' deleted a project: ' + projectName;
-
-			// send to slack
-			api.slack._send({text: text});
-		});
+		// send to slack
+		api.slack._send({text: text});
 	},
 
-	_getClient : function (project, callback) {
-		Clientel
-		.findOne({uuid : project.client})
-		.exec(callback)
-	},
+
 
 	loggedIn : function (options) {
 		var user = options.user,

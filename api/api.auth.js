@@ -44,12 +44,27 @@ module.exports = api.auth = {
 
 	
 	forgotPassword : function (req, res) {
-		res.render('../../views/forgot.ejs', {message : ''});
+		console.log('forgotPassword', req.body);
+
+		// get email
+		var email = req.body.email;
+
+		User
+		.findOne({'local.email' : email})
+		.exec(function (err, user) {
+			if (err || !user) return;
+
+			api.email.sendPasswordResetEmail(user);
+		});
+
+		res.end();
+	},
+
+	serveResetPage : function (req, res) {
+		res.render('../../views/reset.ejs');
 	},
 
 	createPassword : function (req, res) {
-
-		console.log('createPassword', req.body);
 
 		// check token
 		var token = req.body.token;
@@ -63,11 +78,14 @@ module.exports = api.auth = {
 			User
 			.findOne({uuid : userUuid})
 			.exec(function (err, user) {
+				if (err || !user) {
+					return res.end('no such user');
+				}
+
 				api.auth.setPassword(user, password, function (err, doc) {
-					res.end(JSON.stringify({
-						err : null,
-						email : user.local.email
-					}));
+					
+					// send to login page
+					res.redirect('/login');
 
 					// delete temp token
 					if (token) api.redis.temp.del(token);

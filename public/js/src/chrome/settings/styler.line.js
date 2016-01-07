@@ -14,6 +14,12 @@ Wu.Styler.Line = Wu.Styler.extend({
 
 		// pointsize
 		this._createWidth();
+
+		// blend
+		// this._createBlendMode();
+
+		// targets
+		this._createTargets();
 	},
 
 	_preSelectOptions : function () {
@@ -38,6 +44,7 @@ Wu.Styler.Line = Wu.Styler.extend({
 		var opacity_children 	= content.opacity.line.childWrapper;
 		var width_wrapper 	= content.width.line.container;
 		var width_children 	= content.width.line.childWrapper;
+		var targets 		= content.targets.wrapper;
 
 		// remove divs
 		color_wrapper && 	Wu.DomUtil.remove(color_wrapper);
@@ -46,6 +53,11 @@ Wu.Styler.Line = Wu.Styler.extend({
 		opacity_children && 	Wu.DomUtil.remove(opacity_children);
 		width_wrapper && 	Wu.DomUtil.remove(width_wrapper);
 		width_children && 	Wu.DomUtil.remove(width_children);
+		targets && 		Wu.DomUtil.remove(targets);
+
+		// clear targets
 	},
+
+
 
 });
