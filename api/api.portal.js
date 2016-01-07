@@ -42,38 +42,10 @@ var api = module.parent.exports;
 // exports
 module.exports = api.portal = { 
 
-	// // access_v2
-	// invitation : function (req, res) {
-
-	// 	console.log('api.portal.invitation');
-
-	// 	// get client/project
-	// 	var path = req.originalUrl.split('/');
-	// 	var invite_token = path[3];
-
-	// 	// get token from redis
-	// 	var redis_key = 'invite:' + invite_token;
-	// 	api.redis.tokens.get(redis_key, function (err, token_store) {
-
-	// 		var stored_invite = api.utils.parse(token_store);
-
-	// 		if (err || !stored_invite) return api.error.missingInformation(req, res);
-
-	// 		var email = stored_invite.email;
-
-	// 		// make sure logged out
-	// 		req.logout();
-
-	// 		// render invitation
-	// 		res.render('../../views/invitation.ejs', {
-	// 			invite : token_store,
-	// 			access_token : req.session.access_token || {}
-	// 		});
-
-	// 	});
-	// },
 
 	invite : function (req, res) {
+
+		console.log('patrh:', path);
 
 		// get client/project
 		var path = req.originalUrl.split('/');
@@ -240,6 +212,10 @@ module.exports = api.portal = {
 	// process wildcard paths, including hotlinks
 	wildcard : function (req, res) {
 
+		console.log('path: ', req.originalUrl);
+
+		// console.log('req', req);
+
 		// get client/project
 		var path = req.originalUrl.split('/'),
 		    client = path[1],
@@ -269,6 +245,7 @@ module.exports = api.portal = {
 	},
 
 	login : function (req, res) {
+		console.log('hotlink bling?', req.session.hotlink);
 		res.render(path.join(__dirname, '../views/login.serve.ejs'), { message: req.flash('loginMessage') });
 	},
 

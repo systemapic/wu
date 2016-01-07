@@ -1100,6 +1100,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var meta = file.getMeta();
 		var toggles_wrapper = container;
 
+		// if no meta
+		if (!meta) return;
+
 		// meta info
 		var meta_title = Wu.DomUtil.create('div', 'file-option title', toggles_wrapper, 'Dataset meta')
 		var type_div = Wu.DomUtil.create('div', 'file-option sub', toggles_wrapper, '<span class="bold-font">Type:</span> Raster');
@@ -1756,6 +1759,9 @@ Wu.Chrome.Data = Wu.Chrome.extend({
 		var file = app.Account.getFile(file_id);
 		var meta = file.getMeta();
 		var extent = meta.extent;
+
+		// return if no meta
+		if (!meta) return;
 
 		// get edges
 		var north_edge = extent[3];
