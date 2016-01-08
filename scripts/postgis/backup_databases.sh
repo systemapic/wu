@@ -5,20 +5,19 @@ export PGPASSWORD=docker
 export PGDATABASE=template1
 export PGHOST
 
-if test -z "${PGHOST}"; then
-	echo -n "Enter postgis ip or hostname (no PGHOST env found): "
-	read PGHOST
-fi
-
 if test -z "$1"; then
 	echo "Usage: $0 <outdir>" >&2
 	exit 1
 fi
-
 OUTDIR="$1"
 if test -e "${OUTDIR}"; then
 	echo "Output dir already exist, will not proceed" >&2
 	exit 1
+fi
+
+if test -z "${PGHOST}"; then
+	echo -n "Enter postgis ip or hostname (no PGHOST env found): "
+	read PGHOST
 fi
 
 mkdir -p "${OUTDIR}" || exit 1
