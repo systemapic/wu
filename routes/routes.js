@@ -159,6 +159,7 @@ module.exports = function(app, passport) {
 	// GET UPLOAD STATUS ===================
 	// =====================================
 	app.get('/api/import/status', passport.authenticate('bearer', {session: false}), function (req, res) {
+		console.log('GET UPLOAD STATUS');
 		api.upload.getUploadStatus(req, res);
 	});
 
