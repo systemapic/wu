@@ -12,62 +12,62 @@ var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 
 describe('User', function () {
-	it('should be created', function (done) {
-		util.create_user(done);
-	});
+    it('should be created', function (done) {
+        util.create_user(done);
+    });
 
-	it('should be found', function (done) {
-		User.findOne({uuid : util.test_user.uuid}).exec(done);
-	});
+    it('should be found', function (done) {
+        User.findOne({uuid : util.test_user.uuid}).exec(done);
+    });
 
-	it('should have correct details', function (done) {
-		User.findOne({uuid : util.test_user.uuid})
-		.exec(function (err, userModel) {
-			assert.ifError(err);
-			assert.equal(userModel.local.email, util.test_user.email);
-			assert.equal(userModel.firstName, util.test_user.firstName);
-			assert.equal(userModel.lastName, util.test_user.lastName);
-			assert.ok(userModel._id);
-			done();
-		});
-	});
+    it('should have correct details', function (done) {
+        User.findOne({uuid : util.test_user.uuid})
+        .exec(function (err, userModel) {
+            assert.ifError(err);
+            assert.equal(userModel.local.email, util.test_user.email);
+            assert.equal(userModel.firstName, util.test_user.firstName);
+            assert.equal(userModel.lastName, util.test_user.lastName);
+            assert.ok(userModel._id);
+            done();
+        });
+    });
 
-	it('should get access token with username & password', function (done) {
-		util.get_access_token(function (err, token) {
-			assert.ifError(err);
-			assert.ok(token);
-			assert.ok(token.access_token);
-			assert.equal(token.expires_in, 36000);
-			assert.equal(token.token_type, 'Bearer');
-			done(err);
-		});
-	});
+    it('should get access token with username & password', function (done) {
+        util.get_access_token(function (err, token) {
+            assert.ifError(err);
+            assert.ok(token);
+            assert.ok(token.access_token);
+            assert.equal(token.expires_in, 36000);
+            assert.equal(token.token_type, 'Bearer');
+            done(err);
+        });
+    });
 
-	it('should get portal store with access token', function (done) {
-		token(function (err, token) {
-			api.post('/api/userinfo')
-			.set('Authorization', 'Bearer ' + token)
-			.expect(200)
-			.end(function (err, res) {
-				assert.ifError(err);
-				var store = util.parse(res.text);
-				assert.ok(store.user._id);
-				assert.equal(store.user.local.email, util.test_user.email);
-				assert.equal(store.user.firstName, util.test_user.firstName);
-				done();
-			});
-		})
-	});
+    it('should get portal store with access token', function (done) {
+        token(function (err, token) {
+            api.post('/api/userinfo')
+            .set('Authorization', 'Bearer ' + token)
+            .expect(200)
+            .end(function (err, res) {
+                assert.ifError(err);
+                var store = util.parse(res.text);
+                assert.ok(store.user._id);
+                assert.equal(store.user.local.email, util.test_user.email);
+                assert.equal(store.user.firstName, util.test_user.firstName);
+                done();
+            });
+        })
+    });
 
-	it('should delete user', function (done) {
-		User
-		.findOne({uuid : util.test_user.uuid})
-		.remove()
-		.exec(function (err, user) {
-			assert.ifError(err);
-			assert.ok(user.result.ok);
-			done();
-		});
-	});
+    it('should delete user', function (done) {
+        User
+        .findOne({uuid : util.test_user.uuid})
+        .remove()
+        .exec(function (err, user) {
+            assert.ifError(err);
+            assert.ok(user.result.ok);
+            done();
+        });
+    });
 
 });
