@@ -402,35 +402,59 @@ module.exports = api.file = {
 
 	deleteFile : function (req, res) {
 
-		// could be other type files later, but postgis only for now.
-
-		var options = req.body,
-		    type = options.type,
-		    data = options.data;
+		var file_id = req.body.file_id;
+		var ops = [];
 
 
-		if (type == 'postgis') {
-			return api.file.deletePostGISFile(req, res);
-		}
+		File
+		.findOne({uuid : file_id})
+		.exec(function (err, file) {
+			if (err || !file) return api.error.general(req, res, err || 'No such file.');
 
-		if (type == 'raster') {
-			return api.file.deleteRasterFile(req, res);
-		}
+			var type = file.type;
 
-		return api.error.missingInformation(req, res);
+			if (type == 'postgis') {
+				ops.push(function (callback) {
+					console.log('postot');
+					api.file.deletePostGISFile({
+						user : req.user,
+						file : file
+					}, callback);
+				});
+			}
+
+			if (type == 'raster') {
+				ops.push(function (callback) {
+					console.log('postot');
+					api.file.deleteRasterFile({
+						user : req.user,
+						file : file
+					}, callback);
+				});
+			}
+
+			async.series(ops, function (err, result) {
+				console.log('err, result', err, result);
+				
+				res.json({
+					err : err,
+					success : !err
+				});
+			});
+		});
+
 
 	},
 
 
-	deleteRasterFile : function (req, res) {
+	deleteRasterFile : function (options, done) {
 		
-		var options = req.body,
-		    data = options.data,
-		    file_id = data.file_id,
-		    removedObjects = {},
-		    ops = [],
-		    user = req.user;
-
+		var file = options.file;
+		var user = options.user;
+		var data = file.data.raster;
+		var file_id = data.file_id;
+		var removedObjects = {};
+		var ops = [];
 
 		if (!file_id) return api.error.missingInformation(req, res);
 
@@ -510,7 +534,12 @@ module.exports = api.file = {
 		});
 
 		async.waterfall(ops, function (err, results) {
-			res.json({
+			// res.json({
+			// 	success : true,
+			// 	error : err,
+			// 	removed : removedObjects
+			// });
+			done(err, {
 				success : true,
 				error : err,
 				removed : removedObjects
@@ -519,22 +548,19 @@ module.exports = api.file = {
 
 	},
 
-	deletePostGISFile : function (req, res) {
+	deletePostGISFile : function (options, done) {
 
-		var options = req.body,
-		    data = options.data,
-		    database_name = data.database_name,
-		    table_name = data.table_name,
-		    fileUuid = table_name,
-		    data_type = data.data_type,
-		    user = req.user,
-		    ops = [];
-
+		var file = options.file;
+		var user = options.user;
+		var data = file.data.postgis;
+		var database_name = data.database_name;
+		var table_name = data.table_name;
+		var fileUuid = table_name;
+		var data_type = data.data_type;
+		var ops = [];
+		var removedObjects = {};
 
 		if (!database_name || !table_name) return api.error.missingInformation(req, res);
-
-
-		var removedObjects = {};
 
 
 		// get file model
@@ -623,12 +649,18 @@ module.exports = api.file = {
 		});
 
 		async.waterfall(ops, function (err, results) {
-			res.json({
+			// res.json({
+			// 	success : true,
+			// 	error : err,
+			// 	removed : removedObjects
+			// });
+			done(err, {
 				success : true,
 				error : err,
 				removed : removedObjects
-			});
+			})
 		});
+
 
 
 	},
