@@ -53,7 +53,6 @@ module.exports = util = {
 		});
 	},
 
-
 	parse : function (body) {
 		try {
 			var parsed = JSON.parse(body)
@@ -65,6 +64,52 @@ module.exports = util = {
 		return parsed;
 	},
 
+	create_user : function (done) {
+		var user = new User();
+		user.local.email = util.test_user.email;	
+		user.local.password = user.generateHash(util.test_user.password);
+		user.uuid = util.test_user.uuid;
+		user.firstName = util.test_user.firstName;
+		user.lastName = util.test_user.lastName;
+		user.save(done);
+	},
 
+	delete_user : function (done) {
+		User
+		.findOne({uuid : util.test_user.uuid})
+		.remove()
+		.exec(done);
+	},
+
+	create_project : function (done) {
+		var projectOptions = {
+			name : 'mocha test project',
+			access : {
+				edit : [],
+				read : [],
+				options : {
+					download : true,
+					isPublic : true,
+					share : true
+				}
+			}
+		}
+		util.post_to_api({
+			endpoint : '/api/project/create',
+			form : projectOptions
+		}, function (err, store) {
+			util.test_user.pid = store.project.uuid;
+			done(err, store);
+		});
+	},
+
+	delete_project : function (done) {
+		util.post_to_api({
+			endpoint : '/api/project/delete',
+			form : {
+				projectUuid : util.test_user.pid
+			}
+		}, done)
+	},
 
 }
