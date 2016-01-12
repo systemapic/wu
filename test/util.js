@@ -7,6 +7,8 @@ var request = require('request');
 var User = require('../models/user');
 var config = require('../config/server-config.js').serverConfig;
 mongoose.connect(config.mongo.url); 
+var supertest = require('supertest');
+var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 
 module.exports = util = { 
 
@@ -33,23 +35,9 @@ module.exports = util = {
 		});
 	},
 
-	post_to_api : function (options, done) {
+	token : function (done) {
 		util.get_access_token(function (err, tokens) {
-			options.headers = {'Authorization': 'Bearer ' + tokens.access_token};
-			options.url = 'https://' + process.env.SYSTEMAPIC_DOMAIN + options.endpoint;
-			request.post(options, function (err, res, body) {
-				done && done(err, util.parse(body));
-			});
-		});
-	},
-
-	get_to_api : function (options, done) {
-		util.get_access_token(function (err, tokens) {
-			var url = 'https://' + process.env.SYSTEMAPIC_DOMAIN + options.endpoint + options.query + '&access_token=' + tokens.access_token;
-			request(url, function (err, response, body) {
-				var parsed = util.parse(body);
-				done(err, parsed);
-			});
+			done(err, tokens.access_token);
 		});
 	},
 
@@ -82,65 +70,32 @@ module.exports = util = {
 	},
 
 	create_project : function (done) {
-		var projectOptions = {
-			name : 'mocha test project',
-			access : {
-				edit : [],
-				read : [],
-				options : {
-					download : true,
-					isPublic : true,
-					share : true
-				}
-			}
-		}
-		util.post_to_api({
-			endpoint : '/api/project/create',
-			form : projectOptions
-		}, function (err, store) {
-			util.test_user.pid = store.project.uuid;
-			done(err, store);
+		util.token(function (err, token) {
+			api.post('/api/project/create')
+			.set('Authorization', 'Bearer ' + token)
+			.send({name : 'mocha-test-project'})
+			.expect(200)
+			.end(function (err, res) {
+				assert.ifError(err);
+				var project = util.parse(res.text).project;
+				assert.ok(project);
+				assert.ok(project.uuid);
+				assert.equal(project.name, 'mocha-test-project');
+				// tmp.project = project;
+				util.test_user.pid = project.uuid;
+				done();
+			});
 		});
 	},
 
 	delete_project : function (done) {
-		util.post_to_api({
-			endpoint : '/api/project/delete',
-			form : {
-				projectUuid : util.test_user.pid
-			}
-		}, done)
+		util.token(function (err, token) {
+			api.post('/api/project/delete')
+			.set('Authorization', 'Bearer ' + token)
+			.send({projectUuid : util.test_user.pid})
+			.expect(200)
+			.end(done);
+		});
 	},
-
-
-	delete_file : function (file_id, done) {
-		util.post_to_api({
-			endpoint : '/api/file/delete',
-			form : {
-				file_id : file_id,
-			}
-		}, done);
-	},
-
-
-	get_upload_status : function (file_id, done) {
-		util.get_access_token(function (err, tokens) {
-			util.get_to_api({
-				endpoint : '/api/import/status',
-				query : '?file_id=' + file_id
-			}, done);
-		});	
-	},
-
-	upload_file : function (path, done) {
-		util.post_to_api({
-			endpoint : '/api/import',
-			formData : {
-				userUuid : util.test_user.uuid,
-		  	data : fs.createReadStream(__dirname + '/data/shapefile.zip'),
-			}
-		}, done);
-	}
-
 
 }
