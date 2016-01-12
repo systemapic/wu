@@ -337,6 +337,7 @@ module.exports = api.project = {
 		});
 
 		ops.push(function (project, callback) {
+			if (!project) return callback('No such project: ' + projectUuid);
 			// api.access.to.delete_project({
 			// 	user : account, 
 			// 	project : project
