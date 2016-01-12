@@ -112,4 +112,35 @@ module.exports = util = {
 		}, done)
 	},
 
+
+	delete_file : function (file_id, done) {
+		util.post_to_api({
+			endpoint : '/api/file/delete',
+			form : {
+				file_id : file_id,
+			}
+		}, done);
+	},
+
+
+	get_upload_status : function (file_id, done) {
+		util.get_access_token(function (err, tokens) {
+			util.get_to_api({
+				endpoint : '/api/import/status',
+				query : '?file_id=' + file_id
+			}, done);
+		});	
+	},
+
+	upload_file : function (path, done) {
+		util.post_to_api({
+			endpoint : '/api/import',
+			formData : {
+				userUuid : util.test_user.uuid,
+		  	data : fs.createReadStream(__dirname + '/data/shapefile.zip'),
+			}
+		}, done);
+	}
+
+
 }
