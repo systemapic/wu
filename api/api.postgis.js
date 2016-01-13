@@ -430,7 +430,7 @@ module.exports = api.postgis = {
 		.findOne({uuid : userUuid})
 		.exec(function (err, user) {
 			console.log('esnure', err, user);
-			if (err) return done(err);
+			if (err || !user) return done(err || 'No user.');
 
 			// if already exists, return
 			if (user.postgis_database) return done(null, options);
