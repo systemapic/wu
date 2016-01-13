@@ -12,11 +12,6 @@ var util = require('./util');
 var token = util.token;
 
 
-// todo:    - all updates on project (see api.project.js:440), check that update is correct.
-//      - document what key/value fields are needed as options for the different updates
-//      - create tests for error handling: missing fields, wrong data, too large data, impossible values, etc. should return 403/422 etc. with good error description.
-
-
 describe('Project', function () {
 
     // prepare
@@ -27,6 +22,7 @@ describe('Project', function () {
 
 
     it('should be able to create empty project and get valid project in response', function (done) {
+     this.slow(1500);
         token(function (err, token) {
             api.post('/api/project/create')
             .set('Authorization', 'Bearer ' + token)
