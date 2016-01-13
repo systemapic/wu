@@ -60,6 +60,7 @@ module.exports = api.upload = {
 	 * @param {object} req - Express Request object
 	 * @param {object} res - Express Request object
 	 * @returns {object} Success, errors and ID of upload
+	 * @private
 	 *
 	 * @example
 	 * // example curl usage for this endpoint ('/api/import') // todo: change to /api/upload
@@ -129,6 +130,7 @@ module.exports = api.upload = {
 	 * @param {object} req - Express Request object
 	 * @param {object} res - Express Request object
 	 * @returns {object} Success, errors and ID of upload
+	 * @private
 	 *
 	 */
 	chunkedUpload : function (req, res) {
