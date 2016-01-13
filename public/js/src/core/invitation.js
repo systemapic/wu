@@ -124,6 +124,10 @@ Wu.Invite = Wu.Class.extend({
 		input_wrapper.setAttribute('action', '/register');
 		input_wrapper.setAttribute('method', 'post');
 
+		// username
+		var username_input = Wu.DomUtil.create('input', 'input firstname', input_wrapper, 'Choose a username');
+		username_input.setAttribute('name', 'username');
+
 		// first name
 		var firstname_input = Wu.DomUtil.create('input', 'input firstname', input_wrapper, 'First Name');
 		firstname_input.setAttribute('name', 'firstname');
@@ -166,7 +170,7 @@ Wu.Invite = Wu.Class.extend({
 		input_wrapper.appendChild(privacy_label);
 
 		// submit button
-		var button = Wu.DomUtil.create('button', 'button', input_wrapper, 'Sign up');
+		var button = this._submitBtn = Wu.DomUtil.create('button', 'button', input_wrapper, 'Sign up');
 		button.setAttribute('type', 'submit');
 		button.setAttribute('type', 'submit');
 		button.disabled = true;
@@ -174,6 +178,8 @@ Wu.Invite = Wu.Class.extend({
 		// enable submit button when privacy policy is accepted
 		Wu.DomEvent.on(privacy_checkbox, 'click', function () {
 			button.disabled = !privacy_checkbox.checked;
+			this._privacyChecked = privacy_checkbox.checked;
+			this.checkSubmitBtn();
 		}, this);
 
 		// shader
@@ -181,8 +187,86 @@ Wu.Invite = Wu.Class.extend({
 			this._rightshader.style.opacity = 1;
 			this._leftshader.style.opacity = 0;
 		}, this);
+
+
+		// check unique username
+		Wu.DomEvent.on(username_input, 'keyup', this._checkUniqueUsername, this);
+		Wu.DomEvent.on(username_input, 'blur',  this._checkUniqueUsername, this);
+		
+		// check unique email
+		Wu.DomEvent.on(email_input, 'keyup', this._checkUniqueEmail, this);
+		Wu.DomEvent.on(email_input, 'blur',  this._checkUniqueEmail, this);
+	
+		// check email immediately, since it's autofilled
+		setTimeout(function () { // delay hack due to slow DOM
+			this._checkUniqueEmail({target : email_input});
+		}.bind(this), 500);
 	},
 
+	checkSubmitBtn : function () {
+		var allgood = (this._uniqueUsername && this._uniqueEmail && this._privacyChecked);
+		this._submitBtn.disabled = !allgood;
+	},
+
+	_checkUniqueEmail : function (e) {
+
+		var input = e.target;
+		var email = input.value;
+
+		// post to endpoint
+		this._post('/api/user/uniqueEmail', {
+			email : email
+		}, function (err, result) {
+
+			// remember
+			this._uniqueEmail = result.unique;
+
+			// mark submit button disabled/enabled
+			this.checkSubmitBtn();
+
+			// mark input
+			input.style.backgroundColor = this._uniqueEmail ? 'transparent' : '#FF4545';
+
+		}.bind(this));
+	},
+
+
+	_checkUniqueUsername : function (e) {
+
+		var input = e.target;
+		var username = input.value;
+
+		// post to endpoint
+		this._post('/api/user/uniqueUsername', {
+			username : username
+		}, function (err, result) {
+
+			// remember
+			this._uniqueUsername = result.unique;
+
+			// mark submit button disabled/enabled
+			this.checkSubmitBtn();
+
+			// mark input
+			input.style.backgroundColor = this._uniqueUsername ? 'transparent' : '#FF4545';
+
+		}.bind(this));
+	},
+
+	_post : function (endpoint, json, done) {	
+		var url = window.location.origin + endpoint;
+		var http = new XMLHttpRequest();
+		http.open("POST", url, true);
+		http.setRequestHeader('Content-type', 'application/json');
+		http.onreadystatechange = function() {
+			if (http.readyState == 4 && http.status == 200) {
+				var answer = Wu.parse(http.responseText);
+				done && done(null, answer);
+			}
+		}
+		if (Wu.Util.isObject(json)) json = JSON.stringify(json);
+		http.send(json);
+	},
 
 });
 

@@ -207,7 +207,7 @@ Wu.Model.File = Wu.Model.extend({
 			// delete file
 			var postgisOptions = this._getLayerData();
 
-			app.api.deleteDataset(postgisOptions, function (err, response) {
+			app.api.deleteDataset({file_id : this.getUuid()}, function (err, response) {
 				var removedObjects = Wu.parse(response);
 
 				// clean up locally

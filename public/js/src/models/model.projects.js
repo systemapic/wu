@@ -9,9 +9,6 @@ Wu.Project = Wu.Class.extend({
 		// ready save object
 		this.lastSaved = {};
 
-		// attach client
-		// this._client = Wu.app.Clients[this.store.client];
-
 		// init roles, files, layers
 		this._initObjects();
 
@@ -186,9 +183,6 @@ Wu.Project = Wu.Class.extend({
   		// create layers 
 		this.initLayers();
 
-		// init roles
-		// this.initRoles();
-
 		// update url
 		this._setUrl();
 
@@ -206,9 +200,6 @@ Wu.Project = Wu.Class.extend({
 
 		// flush
 		this._reset();
-
-		// init roles
-		// this.initRoles();
 
 		// update url
 		this._setUrl();
@@ -240,10 +231,14 @@ Wu.Project = Wu.Class.extend({
 
 	_setUrl : function () {
 		var url = '/';
-		// url += this._client.slug;
-		// url += '/';
+		url += this.getCreatedByUsername();
+		url += '/';
 		url += this.store.slug;
 		Wu.Util.setAddressBar(url);
+	},
+
+	getCreatedByUsername : function () {
+		return this.store.createdByUsername;
 	},
 
 	setNewStore : function (store) {

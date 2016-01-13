@@ -1,5 +1,5 @@
 var winston = require('winston');
-var _ = require('lodash-node');
+var _ = require('lodash');
 
 // api
 var api = module.parent.exports;

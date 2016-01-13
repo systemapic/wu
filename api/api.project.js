@@ -11,7 +11,7 @@ var Role 	= require('../models/role');
 var Group 	= require('../models/group');
 
 // utils
-var _ 		= require('lodash-node');
+var _ 		= require('lodash');
 var fs 		= require('fs-extra');
 var gm 		= require('gm');
 var kue 	= require('kue');
@@ -138,20 +138,33 @@ module.exports = api.project = {
 
 	},
 
+
+	defaultStoreAccess : function (access) {
+		var access = access || {}
+		access.edit = _.isArray(access.edit) ? access.edit : [];
+		access.read = _.isArray(access.read) ? access.read : [];
+		access.options = _.isObject(access.options) ? access.options : {};
+		access.options.share = _.isBoolean(access.options.share) ? access.options.share : false;
+		access.options.download = _.isBoolean(access.options.download) ? access.options.download : false;
+		access.options.isPublic = _.isBoolean(access.options.isPublic) ? access.options.isPublic : false;
+		return access;
+	},
+
 	// #########################################
 	// ###  API: Create Project              ###
 	// #########################################
 	// createProject : function (req, res) {
 	create : function (req, res) {
-		var store = req.body,
-		    user = req.user,
-		    ops = [];
-
+		var store = req.body;
+		var user = req.user;
+		var ops = [];
 
 		// return if missing info
-		if (!store || !store.access || !store.name || !store.access.options) return api.error.missingInformation(req, res);
-
-		var isPublic = store.access.options.isPublic;
+		if (!store || !store.name) return api.error.missingInformation(req, res, 'Please provide a project `name`.');
+		
+		// get access
+		var storeAccess = api.project.defaultStoreAccess(store.access);
+		var isPublic = storeAccess.options.isPublic;
 
 		// check access
 		ops.push(function (callback) {
@@ -337,6 +350,7 @@ module.exports = api.project = {
 		});
 
 		ops.push(function (project, callback) {
+			if (!project) return callback('No such project: ' + projectUuid);
 			// api.access.to.delete_project({
 			// 	user : account, 
 			// 	project : project
@@ -376,7 +390,7 @@ module.exports = api.project = {
 		if (!req.body) return api.error.missingInformation(req, res);
 		
 		var user = req.user,
-		    projectUuid = req.body.uuid,
+		    projectUuid = req.body.uuid || req.body.projectUuid || req.body.project_id,
 		    ops = [];
 
 		// return on missing
