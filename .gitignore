@@ -8,8 +8,6 @@ views/tmp/*
 views/*.serve.*
 public/css/style.css
 public/*
-public/
-public
 public/docs/api/*
 dist/css/*.min.css
 dist/js/*.min.js
