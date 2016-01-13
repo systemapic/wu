@@ -333,7 +333,7 @@ module.exports = api.portal = {
 		var options = req.body,
 		    account = req.user,
 		    a = {}, 
-		    invite = this._checkInvite(options);	 // check for invite token
+		    invite = api.portal._checkInvite(options);	 // check for invite token
 
 
 		// api.debug.hardCrash();

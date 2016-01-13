@@ -43,7 +43,7 @@ describe('User', function () {
         });
     });
 
-    it('should get portal store with access token', function (done) {
+    it('should get user info with access token', function (done) {
         token(function (err, token) {
             api.post('/api/userinfo')
             .set('Authorization', 'Bearer ' + token)
@@ -54,6 +54,26 @@ describe('User', function () {
                 assert.ok(store.user._id);
                 assert.equal(store.user.local.email, util.test_user.email);
                 assert.equal(store.user.firstName, util.test_user.firstName);
+                done();
+            });
+        })
+    });
+
+    it('should get portal store with access token', function (done) {
+        this.slow(700);
+        token(function (err, token) {
+            api.post('/api/portal')
+            .set('Authorization', 'Bearer ' + token)
+            .expect(200)
+            .end(function (err, res) {
+                assert.ifError(err);
+                var store = util.parse(res.text);
+                assert.ok(store);
+                assert.ok(store.account);
+                assert.ok(store.projects);
+                assert.ok(store.users);
+                assert.equal(store.account.local.email, util.test_user.email);
+                assert.equal(store.account.firstName, util.test_user.firstName);
                 done();
             });
         })
