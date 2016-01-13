@@ -140,23 +140,17 @@ module.exports = function(app, passport) {
 	// =====================================
 	// ERROR LOGGING =======================
 	// =====================================
-	app.post('/api/error/log', passport.authenticate('bearer', {session: false}), function (req, res) {
-		api.error.clientLog(req, res);
-	});
+	app.post('/api/error/log', passport.authenticate('bearer', {session: false}), api.error.clientLog);
 
 	// =====================================
 	// ANALYTICS ===================
 	// =====================================
-	app.post('/api/analytics/set', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.analytics.set(req, res);
-	});
+	app.post('/api/analytics/set', passport.authenticate('bearer', {session: false}), api.analytics.set);
 
 	// =====================================
 	// ANALYTICS ===================
 	// =====================================
-	app.post('/api/analytics/get', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.analytics.get(req, res);
-	});
+	app.post('/api/analytics/get', passport.authenticate('bearer', {session: false}), api.analytics.get);
 
 	// =====================================
 	// RESUMABLE.js UPLOADS ================
