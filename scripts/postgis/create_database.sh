@@ -14,8 +14,10 @@ if [ "$3" == "" ]; then
 	exit 1 # missing args
 fi
 
+BASEDB=template1
+
 # create database
-PGPASSWORD=docker psql -U docker -d systemapic -h postgis -c "CREATE DATABASE $1"
+PGPASSWORD=docker psql -U docker -d $BASEDB -h postgis -c "CREATE DATABASE $1"
 
 # enable spatial
 PGPASSWORD=docker psql -U docker -d $1 -h postgis -c "CREATE EXTENSION postgis"
