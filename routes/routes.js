@@ -32,7 +32,80 @@ var api = require('../api/api');
 // function exports
 module.exports = function(app, passport) {
 
+	// link
 	api.app = app;
+
+
+	/**
+	* @apiDefine token
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (403)
+	* @apiParam {String} access_token A valid access token
+	*/
+
+	
+	
+	// =====================================
+	// GET PORTAL  =========================
+	// =====================================
+	/**
+	* @api {post} /api/portal Get portal store
+	* @apiName getPortal
+	* @apiGroup User
+	* @apiUse token
+	*
+	* @apiSuccess {object} Projects Projects that user have access to
+	* @apiSuccess {object} Datasets Datasets that user owns or have access to
+	* @apiSuccess {object} Contacts Contacts that user has in contact list
+	*/
+	app.post('/api/portal', passport.authenticate('bearer', {session: false}), api.portal.getPortal);
+
+
+
+	// =====================================
+	// CREATE NEW PROJECT  =================
+	// =====================================
+	/**
+	* @api {post} /api/project/create Create a project
+	* @apiName create
+	* @apiGroup Project
+	* @apiUse token
+	* @apiParam {String} name Name of project
+	*
+	* @apiSuccess {JSON} Project JSON object of the newly created project
+	*/
+	app.post('/api/project/create', passport.authenticate('bearer', {session: false}), api.project.create);
+
+
+
+	// =====================================
+	// DELETE PROJECT   ====================
+	// =====================================
+	/**
+	* @api {post} /api/project/delete Delete a project
+	* @apiName delete
+	* @apiGroup Project
+	* @apiUse token
+	* @apiParam {String} projectUuid Uuid of project
+	*
+	* @apiSuccess {String} project ID of deleted project
+	* @apiSuccess {String} deleted Boolean
+	* @apiSuccessExample {json} Success-Response:
+	*     {
+	*       "project": "project-o121l2m-12d12dlk-addasml",
+	*       "deleted": true
+	*     }
+	*/
+	app.post('/api/project/delete', passport.authenticate('bearer', {session: false}), api.project.deleteProject);
+
+
+
+
+
+
+
+
+	
+
 
 	// ================================
 	// HOME PAGE (with login links) ===
@@ -41,20 +114,17 @@ module.exports = function(app, passport) {
 		api.portal.getBase(req, res);
 	});
 
-
 	// ================================
 	// OAUTH2: Post Token ==============
 	// ================================
 	app.post('/oauth/token', api.oauth2.getToken);
 	
-
 	// ================================
 	// OAUTH2: Get Token ==============
 	// ================================
 	app.get('/api/token/check', passport.authenticate('bearer', {session: false}), function (req, res) {
 		res.end('OK');
 	});
-
 
 	// ================================
 	// OAUTH2: Debug token ============
@@ -67,22 +137,12 @@ module.exports = function(app, passport) {
 		res.json({user : req.user, user_id: req.user.id, name: req.user.firstName, scope: req.authInfo.scope});
 	});
 
-	
-	// =====================================
-	// GET WHOLE SETUP FOR PORTAL ==========
-	// =====================================
-	app.post('/api/portal',  passport.authenticate('bearer', {session: false}), function (req, res) {
-		api.portal.getPortal(req, res);
-	});
-
-	
 	// =====================================
 	// ERROR LOGGING =======================
 	// =====================================
 	app.post('/api/error/log', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.error.clientLog(req, res);
 	});
-
 
 	// =====================================
 	// ANALYTICS ===================
@@ -112,23 +172,16 @@ module.exports = function(app, passport) {
 		api.upload.chunkedIdent(req, res);
 	});
 
-	// todo: this route is now DEAD; still alive in wu.js
+	// todo: this route is now DEAD; still alive in wu.js (?? still true?)
 	// =====================================
-	// UPLOAD DATA LIBRARY FILES =========== // renamed route to /chunked
+	// UPLOAD DATA LIBRARY FILES =========== // renamed route to /chunked (still true??)
 	// =====================================
 	app.post('/api/data/upload/chunked', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.upload.chunkedUpload(req, res);
 	});
-	
-	// =====================================
-	// CREATE NEW PROJECT  =================
-	// =====================================
-	app.post('/api/project/create', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.project.create(req, res);
-	});
 
 	// =====================================
-	// CREATE NEW PROJECT  =================
+	// SET ACCESS / deprecated =============
 	// =====================================
 	app.post('/api/project/setAccess', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.project.setAccess(req, res);
@@ -167,13 +220,6 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.get('/api/joinbeta', function (req, res) {
 		api.portal.joinBeta(req, res);
-	});
-
-	// =====================================
-	// DELETE PROJECT   ====================
-	// =====================================
-	app.post('/api/project/delete', passport.authenticate('bearer', {session: false}), function (req, res) {
-		api.project.deleteProject(req, res);
 	});
 
 	// =====================================
@@ -317,7 +363,6 @@ module.exports = function(app, passport) {
 		api.geo.getTilecount(req, res);
 	});
 
-
 	// =====================================
 	// GET GEOJSON FILES ===================
 	// =====================================
@@ -423,7 +468,6 @@ module.exports = function(app, passport) {
 	app.post('/api/layers/cartocss/set', passport.authenticate('bearer', {session: false}), function (req, res) {
 		api.layer.setCartoCSS(req, res);
 	});
-
 
 	// =====================================
 	// GET CARTOCSS ========================
@@ -683,8 +727,6 @@ module.exports = function(app, passport) {
 		failureFlash : true // allow flash messages
 	}));
 
-	
-
 	// =====================================
 	// FORGOT PASSWORD =====================
 	// =====================================
@@ -725,12 +767,12 @@ module.exports = function(app, passport) {
 		res.redirect('/');
 	}
 
-	function internalAccess(req, res, next) {
-		var token = req.query.token || req.body.token;
-		if (token == 'thisissecret') return next();
-		res.end(JSON.stringify({
-			error : 'No access.'
-		}))
-	}
+	// function internalAccess(req, res, next) {
+	// 	var token = req.query.token || req.body.token;
+	// 	if (token == 'thisissecret') return next();
+	// 	res.end(JSON.stringify({
+	// 		error : 'No access.'
+	// 	}))
+	// }
 	
 }
