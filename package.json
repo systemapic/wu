@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "test": "mocha -R spec --slow 200",
-    "docs": "documentation --format html --output public/docs/ routes/routes.js"
+    "apidocs": "./tools/gen_apidocs.sh"
   },
   "apidoc": {
     "title": "Systemapic API Documentation",
