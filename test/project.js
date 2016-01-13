@@ -27,6 +27,7 @@ describe('Project', function () {
 
 
     it('should be able to create empty project and get valid project in response', function (done) {
+     this.slow(1500);
         token(function (err, token) {
             api.post('/api/project/create')
             .set('Authorization', 'Bearer ' + token)
