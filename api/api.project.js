@@ -65,7 +65,7 @@ module.exports = api.project = {
 
 			var currentAccess = project.access;
 
-			// this._access = {
+			// var access = {
 			// 	read : [],
 			// 	edit : [],
 			// 	options : {

@@ -98,7 +98,7 @@ module.exports = api.analytics = {
 		// https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
 
 		// Validate request
-	 	var _error = this.validate(options);
+	 	var _error = api.analytics.validate(options);
 
 	 	// INVALID REQIEST
 	 	if ( _error ) {	 		
