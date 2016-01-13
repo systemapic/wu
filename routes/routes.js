@@ -293,12 +293,12 @@ module.exports = function(app, passport) {
 		api.pixels.servePixelPerfection(req, res);
 	});
 
-	// =====================================
-	// UPLOAD CLIENT LOGO  =================
-	// =====================================
-	app.post('/api/client/uploadlogo', passport.authenticate('bearer', {session: false}), function (req,res) {
-		api.upload.clientLogo(req, res);
-	});
+	// // =====================================
+	// // UPLOAD CLIENT LOGO  =================
+	// // =====================================
+	// app.post('/api/client/uploadlogo', passport.authenticate('bearer', {session: false}), function (req,res) {
+	// 	api.upload.clientLogo(req, res);
+	// });
 
 	// =====================================
 	// GET MAPBOX ACCOUNT ==================
