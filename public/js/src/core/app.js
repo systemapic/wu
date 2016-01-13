@@ -19,6 +19,9 @@ Wu.App = Wu.Class.extend({
 		// set global this
 		Wu.app = window.app = this; // todo: remove Wu.app, use only window.app
 
+		// init api
+		app.api = new Wu.Api();
+
 		// set access token
 		this.setAccessTokens();
 
@@ -52,20 +55,14 @@ Wu.App = Wu.Class.extend({
 	
 	setAccessTokens : function () {
 
+		// get tokens
 		app.tokens = window.tokens;
 
+		// get access token
 		var access_token = app.tokens.access_token;
 
-		// print debug
-		// console.log('Debug: access_token: ', access_token);
-
-		// test access token
-		Wu.send('/api/userinfo', {}, function (err, body) {
-			if (err == 401) {
-				console.error('you been logged out');
-				window.location.href = app.options.servers.portal;
-			}
-		});
+		// verify token
+		app.api.verifyAccessToken();
 	},
 
 	_initErrorHandling : function () {
@@ -82,8 +79,6 @@ Wu.App = Wu.Class.extend({
 
 	_onError : function (message, file, line, char, ref) {
 
-		console.log('ionerror');
-			
 		var stack = ref.stack;
 		var project = app.activeProject ? app.activeProject.getTitle() : 'No active project';
 		var username = app.Account ? app.Account.getName() : 'No username';
@@ -110,8 +105,6 @@ Wu.App = Wu.Class.extend({
 	initServer : function () {
 		console.log('Securely connected to server: \n', this.options.servers.portal);
 
-		app.api = new Wu.Api();
-
 		// check for invite link
 		this._checkForInvite();
 
@@ -132,9 +125,6 @@ Wu.App = Wu.Class.extend({
 	initApp : function (portalStore) {
 		// set vars
 		this.options.json = portalStore;
-
-		// access
-		this._initAccess();
 
 		// load json model
 		this._initObjects();
@@ -162,14 +152,11 @@ Wu.App = Wu.Class.extend({
 
 		// analytics
 		this.Analytics = new Wu.Analytics();
-
 	},
 
 	_logEntry : function () {
-
 		var b = this.sniffer.browser;
 		var o = this.sniffer.os;
-
 		var browser = b.fullName + ' ' + b.majorVersion + '.' + b.minorVersion;
 		var os = o.fullName + ' ' + o.majorVersion + '.' + o.minorVersion;
 
@@ -202,7 +189,7 @@ Wu.App = Wu.Class.extend({
 		       if (!this.Users[user.uuid]) this.Users[user.uuid] = new Wu.User(user);             
 		}, this);
 
-		// add account to users list
+		// add self to users list
 		this.Users[app.Account.getUuid()] = this.Account;
 
 		// create project objects
@@ -225,7 +212,6 @@ Wu.App = Wu.Class.extend({
 
 		// right chrome
 		this.Chrome.Left = new Wu.Chrome.Left();
-
 	},
 
 	_initPanes : function () {
@@ -256,9 +242,7 @@ Wu.App = Wu.Class.extend({
 
 		// add account tab
 		this.Account.addAccountTab();
-
 	},
-
 
 	// init default view on page-load
 	_initView : function () {
@@ -276,7 +260,6 @@ Wu.App = Wu.Class.extend({
 		app.Controller.openLastUpdatedProject();
 	},
 
-
 	_initInvite : function () {
 		var project = this.options.json.invite;
 
@@ -291,6 +274,73 @@ Wu.App = Wu.Class.extend({
 			title : 'Project access granted',
 			description : 'You\'ve been given access to the project ' + project.name 
 		});
+	},
+
+	_initLocation : function () {
+		var path    = window.location.pathname,
+		    username  = path.split('/')[1],
+		    project = path.split('/')[2],
+		    hash    = path.split('/')[3],
+		    search  = window.location.search.split('?'),
+		    params  = Wu.Util.parseUrl();
+
+
+		// done if no location
+		if (!username || !project) return false;
+
+		// get project
+		var project = this._projectExists(project, username);
+		
+		// return if no such project
+		if (!project) {
+			Wu.Util.setAddressBar(this.options.servers.portal);
+			return false;
+		}
+
+		// set project
+		this._setProject(project);
+
+		// init hash
+		if (hash) {
+			console.log('got hash!', hash, project);
+			this._initHash(hash, project);
+		}
+		return true;
+	},
+
+	_initHotlink : function () {
+		
+		// parse error prone content of hotlink..
+		this.hotlink = Wu.parse(window.hotlink);
+
+		// return if no hotlink
+		if (!this.hotlink) return false;
+
+		// check if project slug exists, and if belongs to client slug
+		var project = this._projectExists(this.hotlink.project, this.hotlink.client);
+
+		// return if not found
+		if (!project) return false;
+
+		// set project
+		this._setProject(project);
+
+		return true;
+	},
+
+
+	// check if project exists (for hotlink)
+	_projectExists : function (project_slug, username) {
+
+		// find project slug in Wu.app.Projects
+		var project_slug = project_slug || window.hotlink.project;
+		for (p in Wu.app.Projects) {
+			var project = Wu.app.Projects[p];
+			if (project_slug == project.store.slug) {
+				if (project.store.createdByUsername == username) return project; 
+			}
+		}
+		return false;
 	},
 
 	_initEvents : function () {
@@ -321,83 +371,13 @@ Wu.App = Wu.Class.extend({
 		this._mapContainer = Wu.DomUtil.createId('div', 'map-container', this._appPane);
 	},
 
-	_initAccess : function () {
-		// this.Access = new Wu.Access(this.options.json.access);
-	},
-
-	_initLocation : function () {
-		var path    = window.location.pathname,
-		    client  = path.split('/')[1],
-		    project = path.split('/')[2],
-		    hash    = path.split('/')[3],
-		    search  = window.location.search.split('?'),
-		    params  = Wu.Util.parseUrl();
-
-		// done if no location
-		if (!client || !project) return false;
-
-		// get project
-		var project = this._projectExists(project, client);
-		
-		// return if no such project
-		if (!project) {
-			Wu.Util.setAddressBar(this.options.servers.portal);
-			return false;
-		}
-
-		// set project
-		this._setProject(project);
-
-		// init hash
-		if (hash) {
-			console.log('got hash!', hash, project);
-			this._initHash(hash, project);
-		}
-		return true;
-	},
-
 	_setProject : function (project) {
-		
+
 		// select project
 		Wu.Mixin.Events.fire('projectSelected', {detail : {
 			projectUuid : project.getUuid()
 		}});
 
-	},
-
-	_initHotlink : function () {
-		
-		// parse error prone content of hotlink..
-		Wu.parse(window.hotlink);
-
-		// return if no hotlink
-		if (!this.hotlink) return false;
-
-		// check if project slug exists, and if belongs to client slug
-		var project = this._projectExists(this.hotlink.project, this.hotlink.client);
-
-		// return if not found
-		if (!project) return false;
-
-		// set project
-		this._setProject(project);
-
-		return true;
-	},
-
-
-	// check if project exists (for hotlink)
-	_projectExists : function (projectSlug, clientSlug) {
-
-		// find project slug in Wu.app.Projects
-		var projectSlug = projectSlug || window.hotlink.project;
-		for (p in Wu.app.Projects) {
-			var project = Wu.app.Projects[p];
-			if (projectSlug == project.store.slug) {
-				if (project._client.slug == clientSlug) return project; 
-			}
-		}
-		return false;
 	},
 
 	// get name provided for portal from options hash 
@@ -444,6 +424,7 @@ Wu.App = Wu.Class.extend({
 		var projectUuid = hash.project || result.project;	// hacky.. clean up setHash, _renderHash, errything..
 		var project = app.Projects[projectUuid];
 
+		// select project
 		project.selectProject();
 
 		// set position

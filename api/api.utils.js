@@ -11,7 +11,7 @@ var Role 	= require('../models/role');
 var Group 	= require('../models/group');
 
 // utils
-var _ 		= require('lodash-node');
+var _ 		= require('lodash');
 var fs 		= require('fs-extra');
 var gm 		= require('gm');
 var kue 	= require('kue');
@@ -370,6 +370,7 @@ module.exports = api.utils = {
 		*
 		* @param {String} str
 		* @return {String}
+		* @private
 		*/
 
 		var map = {
@@ -608,6 +609,7 @@ module.exports = api.utils = {
 		 * at http://ejohn.org/blog/javascript-pretty-date/#comment-297458
 		 *
 		 * Licensed under the MIT license.
+		 * @private
 		*/
 
 		function normalize(val, single)

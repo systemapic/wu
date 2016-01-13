@@ -9,7 +9,7 @@ var favicon  = require('serve-favicon');
 var cors     = require('cors');
 var morgan   = require('morgan');
 var session  = require('express-session');
-var prodMode = process.argv[2] == 'prod';
+var prodMode = (process.argv[2] == 'prod');
 var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser'); 
@@ -47,7 +47,6 @@ app.use(express.session({
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
-// app.use(favicon(__dirname + '/../dist/css/favicon.ico'));
 app.use(favicon(__dirname + '/../public/local/favicon.ico'));
 
 // enable compression
@@ -55,9 +54,7 @@ app.use(compress());
 app.use(cors());
 
 // static files
-// var staticPath = prodMode ? '../dist' : '../public';
 var staticPath = '../public';
-
 app.use(express.static(path.join(__dirname, staticPath)));
 
 // load our routes and pass in our app and fully configured passport
