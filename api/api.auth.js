@@ -132,7 +132,7 @@ module.exports = api.auth = {
 	},
 
 	setNewLoginToken : function (user) {
-		return this.setPasswordResetToken(user, true);
+		return api.auth.setPasswordResetToken(user, true);
 	},
 
 	setPasswordResetToken : function (user, dontexpire) {
