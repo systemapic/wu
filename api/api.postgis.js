@@ -385,6 +385,8 @@ module.exports = api.postgis = {
 
 	
 	createDatabase : function (options, done) {
+		console.log('DCDBDB', options);
+
 		var user = options.user,
 		    userUuid = options.user.uuid,
 		    userName = '"' + options.user.firstName + ' ' + options.user.lastName + '"',
@@ -399,6 +401,8 @@ module.exports = api.postgis = {
 			userUuid		// userUuid
 		].join(' ');
 
+		console.log('comd', command);
+		
 		// create database in postgis
 		exec(command, {maxBuffer: 1024 * 50000}, function (err) {
 			if (err) return done(err);
@@ -407,6 +411,8 @@ module.exports = api.postgis = {
 			User
 			.findOne({uuid : userUuid})
 			.exec(function (err, usr) {
+				console.log('ERR???', err, usr);
+				if (err || !usr) return done(err || 'no such user');
 				usr.postgis_database = pg_db;
 				usr.save(function (err) {
 					options.user = usr; // add updated user
@@ -423,6 +429,7 @@ module.exports = api.postgis = {
 		User
 		.findOne({uuid : userUuid})
 		.exec(function (err, user) {
+			console.log('esnure', err, user);
 			if (err) return done(err);
 
 			// if already exists, return

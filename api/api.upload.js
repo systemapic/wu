@@ -60,6 +60,7 @@ module.exports = api.upload = {
 	 * @param {object} req - Express Request object
 	 * @param {object} res - Express Request object
 	 * @returns {object} Success, errors and ID of upload
+	 * @private
 	 *
 	 * @example
 	 * // example curl usage for this endpoint ('/api/import') // todo: change to /api/upload
@@ -70,10 +71,12 @@ module.exports = api.upload = {
 	 *      https://dev.systemapic.com/api/data/import
 	 */
 	upload : function (req, res) {
-		if (!req.files || !req.files.data) return api.error.missingInformation(res, 'No file.');
+		// if (!req.files || !req.files.data) return api.error.missingInformation(res, 'Missing file.');
 
 		var files = req.files;
 		var user = req.user;
+
+		console.log('upload', files);
 
 		// set upload status
 		var uploadStatus = {
@@ -127,6 +130,7 @@ module.exports = api.upload = {
 	 * @param {object} req - Express Request object
 	 * @param {object} res - Express Request object
 	 * @returns {object} Success, errors and ID of upload
+	 * @private
 	 *
 	 */
 	chunkedUpload : function (req, res) {
@@ -533,12 +537,13 @@ module.exports = api.upload = {
 
 	// gets queried from pile.js
 	getUploadStatus : function (req, res) {
+		console.log('getupload', file_id);
 		var file_id = req.query.file_id,
 		    file_id_key = 'uploadStatus:' + file_id;
 
 		api.redis.layers.get(file_id_key, function (err, uploadStatus) {
 			if (err) return api.error.general(req, res, err);
-
+			console.log('upst', uploadStatus);
 			// return upload status
 			res.end(uploadStatus || JSON.stringify({ error : 'Upload ID not found or expired.'}));
 		});
