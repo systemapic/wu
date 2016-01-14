@@ -420,12 +420,12 @@ module.exports = api.portal = {
 
 		// get versions
 		ops.versions = function (callback) {
-			api.portal._getVersions(function (err, versions) {
-					callback(null, {
-						systemapic_api : api.version, 
-						postgis : versions.postgis,
-						postgres : versions.postgres
-					});
+			api.portal.getVersions(function (err, versions) {
+				callback(null, {
+					systemapic_api : api.version, 
+					postgis : versions.postgis,
+					postgres : versions.postgres
+				});
 			});
 		}
 
@@ -439,7 +439,7 @@ module.exports = api.portal = {
 	},
 
 
-	_getVersions : function (done) {
+	_queryVersions : function (done) {
 
 		var ops = {};
 
@@ -472,7 +472,42 @@ module.exports = api.portal = {
 			});
 		}
 
-		async.parallel(ops, done);
+		async.parallel(ops, function (err, versions) {
+			if (err) return done(err);
+
+			versions.timestamp = Date.now();
+
+			// write to redis
+			api.redis.stats.set('status_version', JSON.stringify(versions));
+
+			// return
+			done(err, versions);
+		});
+	},
+
+	_readVersions : function (done) {
+
+		// write to redis
+		api.redis.stats.get('status_version', function (err, status) {
+			var versions = api.utils.parse(status);
+
+			// query new version if older than ten seconds
+			if (Date.now() - versions.timestamp > 10000) {
+				return done('too old');
+			}  else {
+				done(null, versions);
+			}
+
+		});
+
+	},
+
+	getVersions : function (done) {
+		api.portal._readVersions(function (err, versions) {
+			if (err) return api.portal._queryVersions(done);
+
+			done(null, versions);
+		});
 	},
 
 }
