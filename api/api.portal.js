@@ -491,6 +491,8 @@ module.exports = api.portal = {
 		api.redis.stats.get('status_version', function (err, status) {
 			var versions = api.utils.parse(status);
 
+			if (!versions) return done('too old');
+			
 			// query new version if older than ten seconds
 			if (Date.now() - versions.timestamp > 10000) {
 				return done('too old');
