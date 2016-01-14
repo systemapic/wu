@@ -414,4 +414,87 @@ module.exports = api.portal = {
 		console.log('');
 	},
 
+	status : function (req, res) {
+
+		var ops = {};
+
+		// get versions
+		ops.versions = function (callback) {
+			api.portal._getVersions(function (err, versions) {
+					callback(null, {
+						systemapic_api : api.version, 
+						postgis : versions.postgis,
+						postgres : versions.postgres
+					});
+			});
+		}
+
+		async.series(ops, function (err, status) {
+			if (err) return res.end('Error');
+			res.json({
+				status : status
+			});
+		});
+
+	},
+
+
+	_getVersions : function (done) {
+
+		var ops = {};
+
+		ops.postgis = function (callback) {
+
+			// create database in postgis
+			exec('../scripts/postgis/get_postgis_version.sh', {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+				if (err) return done(null);
+
+				var json = stdout.split('\n')[2];
+				var data = api.utils.parse(json);
+				var replaced = data.postgis_full_version.replace(/"/g, "");
+
+				// callback
+				callback(null, replaced);
+			});
+		}
+
+		ops.postgres = function (callback) {
+
+			// create database in postgis
+			exec('../scripts/postgis/get_postgres_version.sh', {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+				if (err) return done(null);
+
+				var json = stdout.split('\n')[2];
+				var data = api.utils.parse(json);
+				
+				// callback
+				callback(null, data.version);
+			});
+		}
+
+		async.parallel(ops, done);
+	},
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

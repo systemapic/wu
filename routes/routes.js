@@ -102,7 +102,7 @@ module.exports = function(app, passport) {
 
 
 
-
+	app.get('/api/status', api.portal.status);
 
 	
 
