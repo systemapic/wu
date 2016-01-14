@@ -335,10 +335,10 @@ module.exports = api.project = {
 	// ###  API: Delete Project              ###
 	// #########################################
 	deleteProject : function (req, res) {
-		if (!req.body) return api.error.missingInformation(req, res);
+		if (_.isEmpty(req.body)) return api.error.missingInformation(req, res);
 
 		var user = req.user;
-		var projectUuid = req.body.projectUuid;
+		var projectUuid = req.body.projectUuid || req.body.project_id;
 
 		var ops = [];
 
@@ -350,23 +350,22 @@ module.exports = api.project = {
 		});
 
 		ops.push(function (project, callback) {
-			if (!project) return callback('No such project: ' + projectUuid);
-			// api.access.to.delete_project({
-			// 	user : account, 
-			// 	project : project
-			// }, callback);
-
-			(project.createdBy == user.getUuid() || user.isSuper()) ? callback(null, project) : callback('No access.');
-
+			if (!project) return callback(new Error(util.format('No such project.')));
+			
+			// check access to delete
+			var gotAccess = (project.createdBy == user.getUuid() || user.isSuper());
+			gotAccess ? callback(null, project) : callback('No access.');
 		});
 
 		ops.push(function (project, callback) {
 			if (!project) return callback('No project.');
 
+			// delete
 			project.remove(callback);
 		});
 
 		async.waterfall(ops, function (err, project) {
+			console.log('delllele err', err);
 			if (err || !project) return api.error.general(req, res, err);
 
 			// slack
@@ -376,10 +375,10 @@ module.exports = api.project = {
 			});
 
 			// done
-			res.end(JSON.stringify({
+			res.json({
 				project : project.uuid,
 				deleted : true
-			}));
+			});
 		})
 	},
 
@@ -396,6 +395,9 @@ module.exports = api.project = {
 		// return on missing
 		if (!projectUuid) return api.error.missingInformation(req, res);
 
+		// no fields except project_id
+		if (_.size(req.body) == 1) api.error.missingInformation(req, res);
+
 		ops.push(function (callback) {
 			Project
 			.findOne({uuid : projectUuid})
@@ -406,11 +408,22 @@ module.exports = api.project = {
 
 			var hashedUser = user.getUuid(); // todo: use actual hash
 
+			if (!project || !project.access) {
+				
+
+                               	// note to igor: must return callback here, not api.error.general - because callback must be called, plus res.end can only
+                               	// 	be fired once, which is handled in async.waterfall fn below.
+                               	return callback(new Error(util.format('No such project.')));
+
+                               	// can't return this.. must return callback()
+                               	// return api.error.general(req, res, new Error(util.format('No such project.')));
+                        }
+
 			// can edit if on edit list or created project 
 			var canEdit = _.contains(project.access.edit, hashedUser) || (project.createdBy == user.getUuid() || user.isSuper());
 
-			// continue if canEdit
-			canEdit ? callback(null, project) : callback('No access.');
+			// continue only if canEdit
+			canEdit ? callback(null, project) : callback(new Error(util.format('No access.')));
 		});
 
 		ops.push(function (project, callback) {
@@ -424,7 +437,7 @@ module.exports = api.project = {
 			if (err) return api.error.general(req, res, err);
 
 			// done
-			res.end(JSON.stringify(project));
+			res.json(project);
 		});
 	},
 
