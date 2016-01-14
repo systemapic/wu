@@ -423,8 +423,8 @@ module.exports = api.portal = {
 			api.portal.getVersions(function (err, versions) {
 				callback(null, {
 					systemapic_api : api.version, 
-					postgis : versions.postgis,
-					postgres : versions.postgres
+					postgis : versions ? versions.postgis : null,
+					postgres : versions ? versions.postgres : null
 				});
 			});
 		}
@@ -451,6 +451,8 @@ module.exports = api.portal = {
 
 				var json = stdout.split('\n')[2];
 				var data = api.utils.parse(json);
+				if (!data) return callback('no data');
+
 				var replaced = data.postgis_full_version.replace(/"/g, "");
 
 				// callback
@@ -466,6 +468,8 @@ module.exports = api.portal = {
 
 				var json = stdout.split('\n')[2];
 				var data = api.utils.parse(json);
+
+				if (!data) return callback('no data');
 				
 				// callback
 				callback(null, data.version);
@@ -492,7 +496,7 @@ module.exports = api.portal = {
 			var versions = api.utils.parse(status);
 
 			if (!versions) return done('too old');
-			
+
 			// query new version if older than ten seconds
 			if (Date.now() - versions.timestamp > 10000) {
 				return done('too old');
