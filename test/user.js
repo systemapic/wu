@@ -39,7 +39,7 @@ describe('User', function () {
             assert.ok(token.access_token);
             assert.equal(token.expires_in, 36000);
             assert.equal(token.token_type, 'Bearer');
-            done(err);
+            done();
         });
     });
 
