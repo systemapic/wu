@@ -23,9 +23,7 @@ describe('File', function () {
         
 		before(function(done) {
 			util.create_file(function (err, result) {
-                	if (err) {
-                		done(err);
-                	}
+                	if (err) return done(err);
 
                 	testFile = result;
                 	done();
