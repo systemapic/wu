@@ -207,9 +207,9 @@ module.exports = api.project = {
 		// get updated project
 		ops.push(function (project, callback) {
 			Project
-					.findOne({uuid : project.uuid})
-					.populate('layers')
-					.exec(callback);
+				.findOne({uuid : project.uuid})
+				.populate('layers')
+				.exec(callback);
 		});
 
 		// set some default settings
@@ -382,19 +382,19 @@ module.exports = api.project = {
 		if (!req.body) return api.error.missingInformation(req, res);
 
 		var user = req.user,
-				projectUuid = req.body.uuid || req.body.projectUuid || req.body.project_id,
-				ops = [];
+			projectUuid = req.body.uuid || req.body.projectUuid || req.body.project_id,
+			ops = [];
 
 		// return on missing
 		if (!projectUuid) return api.error.missingInformation(req, res);
 
 		// no fields except project_id
-		if (_.size(req.body) == 1) api.error.missingInformation(req, res);
+		if (_.size(req.body) === 1) api.error.missingInformation(req, res);
 
 		ops.push(function (callback) {
 			Project
-					.findOne({uuid : projectUuid})
-					.exec(callback);
+				.findOne({uuid : projectUuid})
+				.exec(callback);
 		});
 
 		ops.push(function (project, callback) {
@@ -507,7 +507,7 @@ module.exports = api.project = {
 	// ###  API: Check Unique Slug           ###
 	// #########################################
 	checkUniqueSlug : function (req, res) {
-		if (!req.body) return api.error.general(req, res);
+		if (!req.body) return api.error.general(req, res, new Error('request body is empty'));
 
 		// debug: let's say all slugs are OK - and not actually use slugs for anything but cosmetics
 		// return results
