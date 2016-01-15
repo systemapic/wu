@@ -40,9 +40,8 @@ describe('Project', function () {
                 .send({name : 'mocha-test-project'})
                 .expect(200)
                 .end(function (err, res) {
-                    if (err) {
-                        done(err);
-                    }
+                    if (err) return done(err);
+
                     var project = util.parse(res.text).project;
                     assert.ok(project);
                     assert.ok(project.uuid);
@@ -238,9 +237,8 @@ describe('Project', function () {
                 })
                 .expect(200)
                 .end(function (err, res) {
-                    if (err) {
-                        done(err);
-                    }
+                    if (err) return done(err);
+
                     var result = util.parse(res.text);
 
                     expect(result.name.name).to.be.equal('mocha-test-updated-name');
@@ -307,9 +305,8 @@ describe('Project', function () {
                     .send({project_id : tmp.project.uuid})
                     .expect(200)
                     .end(function (err, res) {
-                        if (err) {
-                            done(err);
-                        }
+                        if (err) return done(err);
+
                         var result = util.parse(res.text);
                         assert.ok(result.deleted);
                         assert.equal(result.project, tmp.project.uuid);
@@ -362,9 +359,7 @@ describe('Project', function () {
                     .send({})
                     .expect(200)
                     .end(function (err, res) {
-                        if (err) {
-                            done(err);
-                        }
+                        if (err) return done(err);
 
                         var result = util.parse(res.text);
 
