@@ -40,9 +40,9 @@ var api = module.parent.exports;
 
 
 // exports
-module.exports = api.project = { 
+module.exports = api.project = {
 
-	
+
 
 
 	setAccess : function (req, res) {
@@ -55,98 +55,97 @@ module.exports = api.project = {
 		if (!projectUuid || !projectAccess) return api.error.missingInformation(req, res);
 
 		Project
-		.findOne({uuid : projectUuid})
-		.exec(function (err, project) {
+			.findOne({uuid : projectUuid})
+			.exec(function (err, project) {
 
-			// check if access to edit
-			var canEdit = _.contains(project.access.edit, user.getUuid()) || (project.createdBy == user.getUuid() || user.isSuper());
+				// check if access to edit
+				var canEdit = _.contains(project.access.edit, user.getUuid()) || (project.createdBy == user.getUuid() || user.isSuper());
 
-			if (!canEdit) return api.error.general(req, res, 'No access.');
+				if (!canEdit) return api.error.general(req, res, 'No access.');
 
-			var currentAccess = project.access;
+				var currentAccess = project.access;
 
-			// var access = {
-			// 	read : [],
-			// 	edit : [],
-			// 	options : {
-			// 		share : true,
-			// 		download : true,
-			// 		isPublic : true
-			// 	}
-			// }
+				// var access = {
+				// 	read : [],
+				// 	edit : [],
+				// 	options : {
+				// 		share : true,
+				// 		download : true,
+				// 		isPublic : true
+				// 	}
+				// }
 
-			// todo: access restricitons!
-			// 1. can not remove self from edit
-			// 2. can not do shit if not editor (ok)
-			// 3. 
+				// todo: access restricitons!
+				// 1. can not remove self from edit
+				// 2. can not do shit if not editor (ok)
+				// 3.
 
-			// set access, save
-			project.access = projectAccess;
-			project.save(function (err, p) {
+				// set access, save
+				project.access = projectAccess;
+				project.save(function (err, p) {
 
-				// return if err
-				if (err) return res.json({
-					error : err
-				});
+					// return if err
+					if (err) return res.json({
+						error : err
+					});
 
-				// return project
-				res.json(p);
-			})
-		})
+					// return project
+					res.json(p);
+				})
+			});
 
 	},
 
 
 	addInvites : function (req, res) {
-
-
-		var user = req.user;
 		var options = req.body;
 		var access = options.access;
 		var projectUuid = options.project;
 
 		Project
-		.findOne({uuid : projectUuid})
-		.exec(function (err, project) {
-			if (err || !project) return res.json({
-				error : err || 'No such project.'
-			});
-
-
-			access.read.forEach(function (u) {
-
-				// add read (if not in edit)
-				if (!_.contains(project.access.edit, u)) {
-
-					project.access.read.addToSet(u);
-				} else {
-				}
-
-			});
-
-
-			project.save(function (err, updatedProject) {
-				if (err) return res.json({
-					error : err
+			.findOne({uuid : projectUuid})
+			.exec(function (err, project) {
+				if (err || !project) return res.json({
+					error : err || 'No such project.'
 				});
 
-				// return updated access
-				res.json(updatedProject.access);
-			})
-			
-		});
+
+				access.read.forEach(function (u) {
+
+					// add read (if not in edit)
+					if (!_.contains(project.access.edit, u)) {
+
+						project.access.read.addToSet(u);
+					} else {
+					}
+
+				});
+
+
+				project.save(function (err, updatedProject) {
+					if (err) return res.json({
+						error : err
+					});
+
+					// return updated access
+					res.json(updatedProject.access);
+				})
+
+			});
 
 	},
 
 
 	defaultStoreAccess : function (access) {
-		var access = access || {}
+		var access = access || {};
+
 		access.edit = _.isArray(access.edit) ? access.edit : [];
 		access.read = _.isArray(access.read) ? access.read : [];
 		access.options = _.isObject(access.options) ? access.options : {};
 		access.options.share = _.isBoolean(access.options.share) ? access.options.share : false;
 		access.options.download = _.isBoolean(access.options.download) ? access.options.download : false;
 		access.options.isPublic = _.isBoolean(access.options.isPublic) ? access.options.isPublic : false;
+
 		return access;
 	},
 
@@ -161,19 +160,19 @@ module.exports = api.project = {
 
 		// return if missing info
 		if (!store || !store.name) return api.error.missingInformation(req, res, 'Please provide a project `name`.');
-		
+
 		// get access
 		var storeAccess = api.project.defaultStoreAccess(store.access);
 		var isPublic = storeAccess.options.isPublic;
 
 		// check access
 		ops.push(function (callback) {
-			
+
 			// if public, allowed to create project
 			if (isPublic) return callback(null);
 
 			// check if user can create private project
-			user.canCreatePrivateProject() ? callback(null) : callback('No access.');
+			user.canCreatePrivateProject() ? callback(null) : callback(new Error('No access.'));
 		});
 
 		// create project
@@ -208,9 +207,9 @@ module.exports = api.project = {
 		// get updated project
 		ops.push(function (project, callback) {
 			Project
-			.findOne({uuid : project.uuid})
-			.populate('layers')
-			.exec(callback);
+				.findOne({uuid : project.uuid})
+				.populate('layers')
+				.exec(callback);
 		});
 
 		// set some default settings
@@ -224,7 +223,7 @@ module.exports = api.project = {
 
 			// slack
 			api.slack.createdProject({
-				project : project, 
+				project : project,
 				user : user
 			});
 
@@ -233,15 +232,14 @@ module.exports = api.project = {
 		});
 	},
 
-	
+
 
 	_create : function (options, done) {
 		if (!options) return done('No options.');
 
-		var user = options.user,
-		    store = options.store,
-		    slug = crypto.randomBytes(3).toString('hex');
-		
+		var user = options.user;
+		var store = options.store;
+
 		if (!user) return done('Missing information.8');
 
 		var projectName = store.name;
@@ -279,10 +277,10 @@ module.exports = api.project = {
 			uuid : layer.uuid,
 			zIndex : 1,
 			opacity : 1
-		}
+		};
 
 		// set baselayer, save
-		project.baseLayers.push(baseLayer)
+		project.baseLayers.push(baseLayer);
 		project.markModified('baseLayers');
 		project.save(callback);
 
@@ -290,28 +288,28 @@ module.exports = api.project = {
 
 	_getDefaultPosition : function () {
 
-		var position = { 
-			lat: 54.213861000644926, 
-			lng: 6.767578125, 
+		var position = {
+			lat: 54.213861000644926,
+			lng: 6.767578125,
 			zoom: 4
-		}
+		};
 
 		return position;
 	},
 
 	_getDefaultBounds : function () {
 		var bounds = {
-				northEast : {
-					lat : 0,
-					lng : 0
-				},
-				southWest : {
-					lat : 0,
-					lng : 0
-				},
-				minZoom : 1,
-				maxZoom : 22
-			};
+			northEast : {
+				lat : 0,
+				lng : 0
+			},
+			southWest : {
+				lat : 0,
+				lng : 0
+			},
+			minZoom : 1,
+			maxZoom : 22
+		};
 
 		return bounds;
 	},
@@ -319,50 +317,44 @@ module.exports = api.project = {
 
 	_getProjectByUuid : function (projectUuid, done) {
 		Project
-		.find({uuid : projectUuid})
-		.populate('files')
-		.populate('roles')
-		.populate('layers')
-		.exec(done);
+			.find({uuid : projectUuid})
+			.populate('files')
+			.populate('roles')
+			.populate('layers')
+			.exec(done);
 	},
 
-	_getProjectsByUserUuid : function (userUuid, done) {
-
-
-	},
 
 	// #########################################
 	// ###  API: Delete Project              ###
 	// #########################################
 	deleteProject : function (req, res) {
-		if (!req.body) return api.error.missingInformation(req, res);
+		if (_.isEmpty(req.body)) return api.error.missingInformation(req, res);
 
 		var user = req.user;
-		var projectUuid = req.body.projectUuid;
+		var projectUuid = req.body.projectUuid || req.body.project_id;
 
 		var ops = [];
 
 		ops.push(function (callback) {
 			Project
-			.findOne({uuid : projectUuid})
-			.populate('roles')
-			.exec(callback);
+				.findOne({uuid : projectUuid})
+				.populate('roles')
+				.exec(callback);
 		});
 
 		ops.push(function (project, callback) {
-			if (!project) return callback('No such project: ' + projectUuid);
-			// api.access.to.delete_project({
-			// 	user : account, 
-			// 	project : project
-			// }, callback);
+			if (!project) return callback(new Error('No such project.'));
 
-			(project.createdBy == user.getUuid() || user.isSuper()) ? callback(null, project) : callback('No access.');
-
+			// check access to delete
+			var gotAccess = (project.createdBy == user.getUuid() || user.isSuper());
+			gotAccess ? callback(null, project) : callback('No access.');
 		});
 
 		ops.push(function (project, callback) {
 			if (!project) return callback('No project.');
 
+			// delete
 			project.remove(callback);
 		});
 
@@ -376,10 +368,10 @@ module.exports = api.project = {
 			});
 
 			// done
-			res.end(JSON.stringify({
+			res.json({
 				project : project.uuid,
 				deleted : true
-			}));
+			});
 		})
 	},
 
@@ -388,29 +380,43 @@ module.exports = api.project = {
 	// #########################################
 	update : function (req, res) {
 		if (!req.body) return api.error.missingInformation(req, res);
-		
+
 		var user = req.user,
-		    projectUuid = req.body.uuid || req.body.projectUuid || req.body.project_id,
-		    ops = [];
+			projectUuid = req.body.uuid || req.body.projectUuid || req.body.project_id,
+			ops = [];
 
 		// return on missing
 		if (!projectUuid) return api.error.missingInformation(req, res);
 
+		// no fields except project_id
+		if (_.size(req.body) === 1) api.error.missingInformation(req, res);
+
 		ops.push(function (callback) {
 			Project
-			.findOne({uuid : projectUuid})
-			.exec(callback);
+				.findOne({uuid : projectUuid})
+				.exec(callback);
 		});
 
 		ops.push(function (project, callback) {
 
 			var hashedUser = user.getUuid(); // todo: use actual hash
 
-			// can edit if on edit list or created project 
+			if (!project || !project.access) {
+
+
+				// note to igor: must return callback here, not api.error.general - because callback must be called, plus res.end can only
+				// 	be fired once, which is handled in async.waterfall fn below.
+				return callback(new Error('No such project.'));
+
+				// can't return this.. must return callback()
+				// return api.error.general(req, res, new Error(util.format('No such project.')));
+			}
+
+			// can edit if on edit list or created project
 			var canEdit = _.contains(project.access.edit, hashedUser) || (project.createdBy == user.getUuid() || user.isSuper());
 
-			// continue if canEdit
-			canEdit ? callback(null, project) : callback('No access.');
+			// continue only if canEdit
+			canEdit ? callback(null, project) : callback(new Error('No access.'));
 		});
 
 		ops.push(function (project, callback) {
@@ -424,7 +430,7 @@ module.exports = api.project = {
 			if (err) return api.error.general(req, res, err);
 
 			// done
-			res.end(JSON.stringify(project));
+			res.json(project);
 		});
 	},
 
@@ -433,22 +439,22 @@ module.exports = api.project = {
 		if (!job) return callback('Missing job.');
 
 		var project = job.project,
-		    options = job.options,
-		    queries = {};
+				options = job.options,
+				queries = {};
 
 		// valid fields
 		var valid = [
-			'name', 
-			'logo', 
-			'header', 
+			'name',
+			'logo',
+			'header',
 			'baseLayers',
 			'position',
 			'bounds',
-			'layermenu', 
-			'folders', 
-			'controls', 
-			'description', 
-			'keywords', 
+			'layermenu',
+			'folders',
+			'controls',
+			'description',
+			'keywords',
 			'colorTheme',
 			'title',
 			'slug',
@@ -460,7 +466,7 @@ module.exports = api.project = {
 			'pending'
 		];
 
- 		// enqueue queries for valid fields
+		// enqueue queries for valid fields
 		valid.forEach(function (field) {
 			if (options[field]) queries = api.project._enqueueUpdate({
 				queries : queries,
@@ -480,12 +486,12 @@ module.exports = api.project = {
 		if (!job) return;
 
 		var queries = job.queries,
-		    field = job.field,
-		    project = job.project,
-		    options = job.options;
+			field = job.field,
+			project = job.project,
+			options = job.options;
 
 		// create update queue op
-		queries[field] = function(callback) {	
+		queries[field] = function(callback) {
 			project[field] = options[field];
 			project.markModified(field);
 			project.save(function (err, doc) {
@@ -501,7 +507,7 @@ module.exports = api.project = {
 	// ###  API: Check Unique Slug           ###
 	// #########################################
 	checkUniqueSlug : function (req, res) {
-		if (!req.body) return api.error.general(req, res);
+		if (!req.body) return api.error.general(req, res, new Error('request body is empty'));
 
 		// debug: let's say all slugs are OK - and not actually use slugs for anything but cosmetics
 		// return results
@@ -537,48 +543,49 @@ module.exports = api.project = {
 
 	_returnProject : function (req, res, project, err) {
 		if (!project) return api.error.general(req, res, err);
-		
+
 		Project
-		.findOne({uuid : project.uuid})
-		.populate('files')
-		.populate('layers')
-		.populate('roles')
-		.exec(function (err, project) {
-			res.end(JSON.stringify({
-				error : err,
-				project: project
-			}));
-		});
+			.findOne({uuid : project.uuid})
+			.populate('files')
+			.populate('layers')
+			.populate('roles')
+			.exec(function (err, project) {
+				res.end(JSON.stringify({
+					error : err,
+					project: project
+				}));
+			});
 	},
 
 
 	getHash : function (req, res) {
 		if (!req.body) return api.error.general(req, res);
-	
+
 		var id = req.body.id,
-		    projectUuid = req.body.projectUuid;		// todo: access restrictions
+			projectUuid = req.body.projectUuid;		// todo: access restrictions
 
 		Hash
-		.findOne({id : id, project : projectUuid})
-		.exec(function (err, doc) {
-			res.end(JSON.stringify({
-				error: err,
-				hash : doc
-			}));
-		});
+			.findOne({id : id, project : projectUuid})
+			.exec(function (err, doc) {
+				res.end(JSON.stringify({
+					error: err,
+					hash : doc
+				}));
+			});
 	},
 
 	setHash : function (req, res) {
 		if (!req.body || !req.user) return api.error.general(req, res);
 
 		var projectUuid = req.body.projectUuid,
-		    position 	= req.body.hash.position,
-		    layers 	= req.body.hash.layers,
-		    id 		= req.body.hash.id,
-		    saveState   = req.body.saveState;
+			position 	= req.body.hash.position,
+			layers 	= req.body.hash.layers,
+			id 		= req.body.hash.id,
+			saveState   = req.body.saveState;
 
 		// create new hash
 		var hash 	= new Hash();
+		
 		hash.uuid 	= 'hash-' + uuid.v4();
 		hash.position 	= position;
 		hash.layers 	= layers;
@@ -598,19 +605,19 @@ module.exports = api.project = {
 				hashId : id
 			});
 		});
-	},	
+	},
 
 	_saveState : function (options) {
 		var projectUuid = options.projectUuid,
-		    hashId = options.hashId;
+			hashId = options.hashId;
 
 		Project
-		.findOne({uuid : projectUuid})
-		.exec(function (err, project) {
-			project.state = hashId;
-			project.save(function (err, doc) {
+			.findOne({uuid : projectUuid})
+			.exec(function (err, project) {
+				project.state = hashId;
+				project.save(function (err, doc) {
+				});
 			});
-		});
 
 	},
 
@@ -626,66 +633,66 @@ module.exports = api.project = {
 		// if phantomjs bot
 		if (user.isBot() || user.isSuper()) {
 			Project
-			.find()
-			.populate('files')
-			.populate('roles')
-			.populate('layers')
-			.exec(done);
+				.find()
+				.populate('files')
+				.populate('roles')
+				.populate('layers')
+				.exec(done);
 
 			return;
 		}
 
 		// get all projects where user is in access.edit or access.read
 		Project
-		.find()
-		.or([	{'access.edit' : hashedUser },
-			{'access.read' : hashedUser },
-			{'createdBy' : hashedUser}
-		])
-		.populate('files')
-		.populate('roles')
-		.populate('layers')
-		.exec(done);
+			.find()
+			.or([	{'access.edit' : hashedUser },
+				{'access.read' : hashedUser },
+				{'createdBy' : hashedUser}
+			])
+			.populate('files')
+			.populate('roles')
+			.populate('layers')
+			.exec(done);
 	},
 
 
 	_getAll : function (done) {
 		Project
-		.find()
-		.populate('files')
-		.populate('roles')
-		.populate('layers')
-		.exec(done);
+			.find()
+			.populate('files')
+			.populate('roles')
+			.populate('layers')
+			.exec(done);
 	},
 
 
 	_getProjectByUserUuidAndCapability : function (userUuid, capability, done) {
 		// get all roles with user as read_project
 		var cap_filter = 'capabilities.' + capability,
-		    roleIds = [];
+				roleIds = [];
 
 		Role
-		.find({ members : userUuid })
-		.where(cap_filter, true)
-		.exec(function (err, roles) {
-			if (err) return done(err);
-
-			// push role id's to array
-			roles.forEach(function (role) { roleIds.push(role._id); });
-
-			Project
-			.findOne({roles : { $in : roleIds }})
-			.populate('files')
-			.populate('roles')
-			.populate('layers')
-			.exec(function (err, project) {
+			.find({ members : userUuid })
+			.where(cap_filter, true)
+			.exec(function (err, roles) {
 				if (err) return done(err);
-				if (!project) return done('No project found.');
-				
-				// success
-				done(null, project);
+
+				// push role id's to array
+				roles.forEach(function (role) { roleIds.push(role._id); });
+
+				Project
+						.findOne({roles : { $in : roleIds }})
+						.populate('files')
+						.populate('roles')
+						.populate('layers')
+						.exec(function (err, project) {
+							if (err) return done(err);
+							if (!project) return done('No project found.');
+
+							// success
+							done(null, project);
+						});
 			});
-		});
 	},
 
 
@@ -694,16 +701,16 @@ module.exports = api.project = {
 
 
 		var user = options.user,
-		    filter = options.cap_filter || 'read_project',
-		    cap_filter = 'capabilities.' + filter,
-		    ops = [];
+			filter = options.cap_filter || 'read_project',
+			cap_filter = 'capabilities.' + filter,
+			ops = [];
 
 		ops.push(function (callback) {
 			// get all roles with user as read_project
 			Role
-			.find({ members : user.uuid })
-			.where(cap_filter, true)
-			.exec(callback);
+				.find({ members : user.uuid })
+				.where(cap_filter, true)
+				.exec(callback);
 		});
 
 		ops.push(function (roles, callback) {
@@ -714,15 +721,14 @@ module.exports = api.project = {
 			});
 
 			Project
-			.find({roles : { $in : roleIds }}) // todo: doesnt work?
-			.populate('files')
-			.populate('roles')
-			.populate('layers')
-			.exec(callback);
+				.find({roles : { $in : roleIds }}) // todo: doesnt work?
+				.populate('files')
+				.populate('roles')
+				.populate('layers')
+				.exec(callback);
 		});
 
-
 		async.waterfall(ops, done);
-	},
+	}
 
-}
+};
