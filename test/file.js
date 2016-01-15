@@ -18,6 +18,7 @@ var testFile;
 describe('File', function () {
     before(function(done) { util.create_user(done); });
     after(function(done) { util.delete_user(done); });
+    this.slow(300);
 
 	describe('/api/file/update', function () {
         
@@ -63,29 +64,26 @@ describe('File', function () {
             });
         });
 
-        context('when user can\'t edit file', function () {
-            
-            before(function (done) {
-                util.create_user_by_parameters(second_test_user, done);
-            });
-
-            after(function (done) {
-                util.delete_user_by_id(second_test_user.uuid, done);
-            });
-
-	        it('should respond with status code 422 and error if user can\'t edit file', function (done) {
-                util.users_token(second_test_user, function (err, token) {
-                    api.post('/api/file/update')
-                        .set('Authorization', 'Bearer ' + token)
-                        .send({
-                            fileUuid: testFile.uuid
-                        })
-                        .expect(422, expected.missing_information)
-                        .end(done);
-                });
-	        });
-
+        before(function (done) {
+            util.create_user_by_parameters(second_test_user, done);
         });
+
+        after(function (done) {
+            util.delete_user_by_id(second_test_user.uuid, done);
+        });
+
+        it('should respond with status code 422 and error if not authenticated', function (done) {
+            util.users_token(second_test_user, function (err, token) {
+                api.post('/api/file/update')
+                    .set('Authorization', 'Bearer ' + token)
+                    .send({
+                        fileUuid: testFile.uuid
+                    })
+                    .expect(422, expected.missing_information)
+                    .end(done);
+            });
+        });
+
 
 	});
 });
