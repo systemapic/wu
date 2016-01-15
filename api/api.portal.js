@@ -421,6 +421,7 @@ module.exports = api.portal = {
 		// get versions
 		ops.versions = function (callback) {
 			api.portal.getVersions(function (err, versions) {
+				console.log('err, versions', err, versions);
 				callback(null, {
 					systemapic_api : api.version, 
 					postgis : versions ? versions.postgis : null,
