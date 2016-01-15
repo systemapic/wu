@@ -40,6 +40,26 @@ module.exports = util = {
         });
     },
 
+    get_users_access_token : function (_user, callback) {
+      api.post('/oauth/token')
+        .set('Authorization', 'Basic YWJjMTIzOnNzaC1zZWNyZXQ=')
+        .send({
+            grant_type : 'password',
+            username : _user.email,
+            password : _user.password
+        })
+        .expect(200)
+        .end(function (err, res) {
+            callback(err, util.parse(res.text));
+        });
+    },
+
+    users_token: function (_user, callback) {
+        util.get_users_access_token(_user, function (err, tokens) {
+            callback(err, tokens.access_token);
+        });
+    },
+
     parse : function (body) {
         try {
             var parsed = JSON.parse(body)
@@ -62,10 +82,26 @@ module.exports = util = {
     },
 
     delete_user : function (done) {
-        User
-        .findOne({uuid : util.test_user.uuid})
-        .remove()
-        .exec(done);
+        User.findOne({uuid : util.test_user.uuid})
+            .remove()
+            .exec(done);
+    },
+
+    create_user_by_parameters : function (_user, callback) {
+        var user = new User();
+
+        user.local.email = _user.email;    
+        user.local.password = user.generateHash(_user.password);
+        user.uuid = _user.uuid;
+        user.firstName = _user.firstName;
+        user.lastName = _user.lastName;
+        user.save(callback);
+    },
+
+    delete_user_by_id: function (_userId, callback) {
+        User.findOne({uuid : _userId})
+            .remove()
+            .exec(callback);
     },
 
     create_project : function (done) {
