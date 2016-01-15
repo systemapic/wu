@@ -12,7 +12,7 @@ var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 
 
-describe('Data', function () {
+describe('Import', function () {
     describe('Upload shapefile (zipped)', function () {
 
         // prepare
@@ -73,6 +73,16 @@ describe('Data', function () {
                 });
             })
         });
+    });
+
+    describe('Upload shapefile with missing .prj file', function () {
+
+
+    });
+
+    describe('Process shapefile', function () {
+
+        console.log('Waiting for processing...')
 
         it('should be processed in < 10s', function (done) {
             // wait to finish processing (around ten seconds for shapefile.zip)
