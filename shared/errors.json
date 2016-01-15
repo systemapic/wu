@@ -1,0 +1,11 @@
+{
+    "missing_information": {
+        "error": "Missing information. Check out https://docs.systemapic.com/ for details on the API."
+    },
+    "no_such_project": {
+        "error": "No such project."
+    },
+    "no_access": {
+        "error": "No access."
+    }
+}

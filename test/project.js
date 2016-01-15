@@ -12,20 +12,7 @@ var User = require('../models/user');
 var config = require('../config/server-config.js').serverConfig;
 var util = require('./util');
 var token = util.token;
-
-// for easy changing of error messages
-var expected = {
-    missing_information : {
-        error: 'Missing information. Check out https://docs.systemapic.com/ for details on the API.'
-    },
-    no_such_project : {
-        error : 'No such project.'
-    },
-    no_access : {
-        error : 'No access.'  
-    }
-};
-
+var expected = require('../shared/errors');
 var second_test_user = {
     email : 'second_mocha_test_user@systemapic.com',
     firstName : 'Igor',
@@ -316,18 +303,18 @@ describe('Project', function () {
         it('should be able to delete project', function (done) {
             token(function (err, token) {
                 api.post('/api/project/delete')
-                .set('Authorization', 'Bearer ' + token)
-                .send({project_id : tmp.project.uuid})
-                .expect(200)
-                .end(function (err, res) {
-                    if (err) {
-                        done(err);
-                    }
-                    var result = util.parse(res.text);
-                    assert.ok(result.deleted);
-                    assert.equal(result.project, tmp.project.uuid);
-                    done();
-                });
+                    .set('Authorization', 'Bearer ' + token)
+                    .send({project_id : tmp.project.uuid})
+                    .expect(200)
+                    .end(function (err, res) {
+                        if (err) {
+                            done(err);
+                        }
+                        var result = util.parse(res.text);
+                        assert.ok(result.deleted);
+                        assert.equal(result.project, tmp.project.uuid);
+                        done();
+                    });
             });
         });
 
