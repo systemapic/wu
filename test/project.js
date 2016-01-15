@@ -30,7 +30,7 @@ describe('Project', function () {
     after(function(done) { util.delete_user(done); });
 
 
-    describe('Create /api/project/create', function () {
+    describe('/api/project/create', function () {
 
         it('should be able to create empty project and get valid project in response', function (done) {
             this.slow(1500);
@@ -84,7 +84,7 @@ describe('Project', function () {
 
     });
 
-    describe('Update /api/project/update', function () {
+    describe('/api/project/update', function () {
 
         it("should respond with status code 401 when not authenticated", function (done) {
             api.post('/api/project/update')
@@ -126,30 +126,28 @@ describe('Project', function () {
             });
         });
 
-        context ('when user can\'t edit project', function () {
             
-            before(function (done) {
-                util.create_user_by_parameters(second_test_user, done);
-            });
-
-            after(function (done) {
-                util.delete_user_by_id(second_test_user.uuid, done);
-            });
-
-            it('should respond with status code 422 and specific error message', function (done) {
-                util.users_token(second_test_user, function (err, token) {
-                    api.post('/api/project/update')
-                        .set('Authorization', 'Bearer ' + token)
-                        .send({
-                            name: 'mocha-test-updated-name',
-                            project_id: tmp.project.uuid
-                        })
-                        .expect(422, expected.no_access)
-                        .end(done);
-                });
-            }); 
-
+        before(function (done) {
+            util.create_user_by_parameters(second_test_user, done);
         });
+
+        after(function (done) {
+            util.delete_user_by_id(second_test_user.uuid, done);
+        });
+
+        it('should respond with status code 422 and specific error message when not authorized', function (done) {
+            util.users_token(second_test_user, function (err, token) {
+                api.post('/api/project/update')
+                    .set('Authorization', 'Bearer ' + token)
+                    .send({
+                        name: 'mocha-test-updated-name',
+                        project_id: tmp.project.uuid
+                    })
+                    .expect(422, expected.no_access)
+                    .end(done);
+            });
+        }); 
+
 
         it('should respond with status code 200 and shouldn\'t update nonexistent fields', function (done) {
             token(function (err, token) {
@@ -165,7 +163,7 @@ describe('Project', function () {
             });
         });
 
-        it('should be able to update name, slug, logo, position, bounds, folders, of project', function (done) {
+        it('should be able to update all fields of project', function (done) {
             token(function (err, token) {
                 api.post('/api/project/update')
                 .set('Authorization', 'Bearer ' + token)
@@ -296,7 +294,7 @@ describe('Project', function () {
 
     });
 
-    describe('Delete /api/project/delete', function () {
+    describe('/api/project/delete', function () {
 
         it('should be able to delete project', function (done) {
             token(function (err, token) {
@@ -344,7 +342,7 @@ describe('Project', function () {
 
     });
 
-    describe('Unique /api/project/unique', function () {
+    describe('/api/project/unique', function () {
         it("should respond with status code 401 when not authenticated", function (done) {
             api.post('/api/project/unique')
                 .send({})
