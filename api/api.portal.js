@@ -421,11 +421,13 @@ module.exports = api.portal = {
 		// get versions
 		ops.versions = function (callback) {
 			api.portal.getVersions(function (err, versions) {
-				console.log('err, versions', err, versions);
+				var versions = versions || {};
 				callback(null, {
 					systemapic_api : api.version, 
-					postgis : versions ? versions.postgis : null,
-					postgres : versions ? versions.postgres : null
+					postgis : versions.postgis,
+					postgres : versions.postgres, 
+					mongodb : versions.mongo,
+					redis : versions.redis,
 				});
 			});
 		}
@@ -475,6 +477,35 @@ module.exports = api.portal = {
 				// callback
 				callback(null, data.version);
 			});
+		}
+
+		ops.mongo = function (callback) {
+
+			var mongoose = require('mongoose');
+
+			mongoose.connect('mongodb://localhost/test', function(err){
+				var admin = new mongoose.mongo.Admin(mongoose.connection.db);
+					admin.buildInfo(function (err, info) {
+					console.log(info.version);
+					callback(null, info.version);
+				});
+			});
+		}
+
+		ops.redis = function (callback) {
+
+
+			api.redis.stats.info(function (err, stats) {
+				console.log('err, stats', err, stats)
+
+				var redis_info = require('redis-info');
+				var info = redis_info.parse(stats);
+
+				// var info = api.utils.parse(info);
+				console.log('info:', info.redis_version);
+				callback(err, info.redis_version);
+			});
+
 		}
 
 		async.parallel(ops, function (err, versions) {

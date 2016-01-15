@@ -11,11 +11,11 @@
   "apidoc": {
     "title": "Systemapic API Documentation",
     "name": "Systemapic API Documentation",
-    "url" : "",
-    "header" : {
-        "title" : "Systemapic API"
+    "url": "",
+    "header": {
+      "title": "Systemapic API"
     },
-    "sampleUrl" : "https://dev.systemapic.com"
+    "sampleUrl": "https://dev.systemapic.com"
   },
   "dependencies": {
     "acl": "^0.4.9",
@@ -85,6 +85,7 @@
     "q-io": "^1.13.2",
     "queue-async": "^1.0.7",
     "redis": "^0.12.1",
+    "redis-info": "^3.0.6",
     "request": "^2.67.0",
     "resumable": "0.0.1-1",
     "sanitize-filename": "^1.5.3",
