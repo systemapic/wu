@@ -66,9 +66,9 @@ module.exports = api.error = {
 	general : function (req, res, err) {
 		console.log('api.error.genera2l:', err, api.error.pretty(err));
 
-		res.status(422).end(JSON.stringify({
+		res.status(422).json({
 			error : api.error.pretty(err)
-		}));
+		});
 		
 		// send to socket
 		api.socket.sendError(req.user._id, err.message || err);
