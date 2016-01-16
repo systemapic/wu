@@ -366,7 +366,6 @@ module.exports = function(grunt) {
 				src : [
 					'public/css/style.css',
 					'public/css/evil.css',	
-					'public/css/magda.css',	
 					'public/css/chrome.css',
 					'public/css/knut.css',
 					'public/css/experiments.css',
