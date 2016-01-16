@@ -38,8 +38,8 @@ module.exports = function(app, passport) {
 
 	/**
 	* @apiDefine token
-	* @apiError Unauthorized The <code>access_token</code> is invalid. (403)
 	* @apiParam {String} access_token A valid access token
+	* @apiError Unauthorized The <code>access_token</code> is invalid. (403)
 	*/
 
 	
@@ -99,9 +99,29 @@ module.exports = function(app, passport) {
 
 
 
-
-
-
+	// =====================================
+	// GET STATUS   ====================
+	// =====================================
+	/**
+	* @api {get} /api/status Get portal status
+	* @apiName status
+	* @apiGroup Admin
+	* @apiUse token
+	*
+	* @apiSuccess {json} status Status of portal, versions etc.
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*   "status": {
+	*     "versions": {
+	*       "systemapic_api": "1.3.5",
+	*       "postgis": "POSTGIS=2.1.7 r13414 GEOS=3.4.2-CAPI-1.8.2 r3921 PROJ=Rel. 4.8.0, 6 March 2012 GDAL=GDAL 1.10.1, released 2013/08/26 LIBXML=2.9.1 LIBJSON=UNKNOWN TOPOLOGY RASTER",
+	*       "postgres": "PostgreSQL 9.3.9 on x86_64-unknown-linux-gnu, compiled by gcc (Ubuntu 4.8.2-19ubuntu1) 4.8.2, 64-bit",
+	*       "mongodb": "3.2.1",
+	*       "redis": "3.0.6"
+	*     }
+	*   }
+	* }
+	*/
 	app.get('/api/status', passport.authenticate('bearer', {session: false}), api.portal.status);
 
 	
@@ -117,6 +137,26 @@ module.exports = function(app, passport) {
 	// ================================
 	// OAUTH2: Post Token ==============
 	// ================================
+	// =====================================
+	// GET STATUS   ====================
+	// =====================================
+	/**
+	* @api {post} /oauth/token Get access token
+	* @apiName access_token
+	* @apiGroup User
+	* @apiHeader {String} Authorization="Basic YWJjMTIzOnNzaC1zZWNyZXQ="
+	* @apiParam {String} username Email
+	* @apiParam {String} password Password
+	* @apiParam {String} grant_type=password
+	*
+	* @apiSuccess {json} status Access token JSON
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*	"access_token":"AMduTdFBlXcBc1PKS5Ot4MZzwGjPhKw3y2LzJwJ0CGz0lpRGhK5xHGMcGLqvrOfY1aBR4M9Y4O126WRr5YSQGNZoLPbN0EXMwlRD0ajCqsd4MRr55UpfVYAfrLRL9i0tuglrtGYVs2iT8bl75ZVfYnbDl4Vjp4ElQoWqf6XdqMsIr25XxO5cZB9NRRl3mxA8gWRzCd5bvgZFZTWa6Htx5ugRqwWiudc8lbWNDCx85ms1up94HLKrQXoGMC8FVgf4",
+	*	"expires_in":"36000",
+	*	"token_type":"Bearer"
+	* }
+	*/
 	app.post('/oauth/token', api.oauth2.getToken);
 	
 	// ================================
@@ -275,6 +315,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
+	// change to /api/... 
 	// special route, don't touch for now
 	app.get('/pixels/fit/*',passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.pixels.serveFitPixelPerfection(req, res);
@@ -283,6 +324,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
+	// change to /api/... 
 	app.get('/pixels/image/*', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.pixels.serveImagePixelPerfection(req, res);
 	});
@@ -290,6 +332,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
+	// change to /api/... 
 	app.get('/pixels/screenshot/*', function (req,res) {
 		api.pixels.serveScreenshot(req, res);
 	});
@@ -297,6 +340,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// SERVE STATIC FILES SECURELY  ========
 	// =====================================
+	// change to /api/... 
 	app.get('/pixels/*', passport.authenticate('bearer', {session: false}), function (req,res) {
 		api.pixels.servePixelPerfection(req, res);
 	});
@@ -650,6 +694,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// RESET PASSWORD ======================
 	// =====================================
+	// change to /api/... 
 	app.post('/reset', function (req, res) {
 		api.auth.requestPasswordReset(req, res);
 	});
@@ -657,6 +702,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// RESET PASSWORD ======================
 	// =====================================
+	// change to /api/... 
 	app.get('/reset', function (req, res) {
 		api.auth.serveResetPage(req, res);
 	});
@@ -664,6 +710,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// CREATE PASSWORD =====================
 	// ===================================== 
+	// change to /api/... 
 	app.post('/reset/password', function (req, res) {
 		api.auth.createPassword(req, res);
 	});
@@ -671,6 +718,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// ZXCVBN DICTIONARY =================
 	// ===================================== 
+	// change to /api/... 
 	app.get('/zxcvbn.js', function (req, res) {
 		fs.readFile('../public/js/lib/zxcvbn/zxcvbn.js', function (err, data) {
 			res.send(data);
@@ -679,7 +727,8 @@ module.exports = function(app, passport) {
 
 	// ===================================== // todo: rename route to /api/clientConfig.js
 	// SERVER CLIENT CONFIG ================
-	// ===================================== 
+	// =====================================
+	// change to /api/... 
 	app.get('/clientConfig.js', isLoggedIn, function (req, res) {
 		var configString = 'var systemapicConfigOptions = ' + JSON.stringify(api.clientConfig);
 		res.setHeader("content-type", "application/javascript");
@@ -689,6 +738,7 @@ module.exports = function(app, passport) {
 	// ===================================== // todo: rename route to /api/loginConfig.js
 	// SERVER LOGIN CONFIG =================
 	// ===================================== 
+	// change to /api/... 
 	app.get('/loginConfig.js', function (req, res) {
 		var configString = 'var loginConfig = ' + JSON.stringify(api.loginConfig);
 		res.setHeader("content-type", "application/javascript");
@@ -713,6 +763,7 @@ module.exports = function(app, passport) {
 	// =====================================
 	// PRIVACY POLICY ======================
 	// =====================================
+	// change to /api/privacy-policy
 	app.get('/privacy-policy', function(req, res) {
 		// api.portal.login(req, res);
 		res.render('../../views/privacy.ejs');
