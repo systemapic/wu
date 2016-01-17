@@ -135,6 +135,10 @@ module.exports = function(passport) {
 	passport.use(new BearerStrategy(
 		function (accessToken, done) {
 
+
+			// todo: refactor, check latest passport.js, redo all?
+			// 	 for public version
+
 			// console.log('passport.js:193 BearerStrategy > accessToken'.yellow, accessToken); // is used when calling API endpoint with access_token
 
 			api.oauth2.store.accessTokens.find(accessToken, function (err, token) {
@@ -143,9 +147,11 @@ module.exports = function(passport) {
 				if (!token) return done(null, false);
 				
 				if (new Date() > token.expirationDate) {
-					api.oauth2.store.accessTokens.delete(accessToken, function (err) {
-						return done(err);
-					});
+					// api.oauth2.store.accessTokens.delete(accessToken, function (err) {
+					// 	return done(err);
+					// });
+					return api.oauth2.store.accessTokens.delete(accessToken, done);
+
 			
 				} else {
 					if (token.userID !== null) {

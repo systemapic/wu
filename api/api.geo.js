@@ -11,7 +11,7 @@ var Role 	= require('../models/role');
 var Group 	= require('../models/group');
 
 // utils
-var _ 		= require('lodash-node');
+var _ 		= require('lodash');
 var fs 		= require('fs-extra');
 var gm 		= require('gm');
 var kue 	= require('kue');
@@ -72,7 +72,7 @@ module.exports = api.geo = {
 		style.layer = '#layer {\n\n';
 		
 		// extra styling (eg. reference point)
-		if (options.style.extras) style.layer += this.buildExtras(options);
+		if (options.style.extras) style.layer += api.geo.buildExtras(options);
 
 		// point styling
 		if (isPoint) style = api.geo._createPointCarto(options, style);
@@ -110,22 +110,22 @@ module.exports = api.geo = {
 		style.layer += '\tmarker-comp-op: ' + compOp + ';\n\n';
 
 		// OPACITY
-		var pointOpacityCarto = this.buildCarto_pointOpacity(options);
+		var pointOpacityCarto = api.geo.buildCarto_pointOpacity(options);
 		style.headers += pointOpacityCarto.headers;
 		style.layer += pointOpacityCarto.style;
 
 		// COLOR
-		var pointColorCarto = this.buildCarto_pointColor(options);
+		var pointColorCarto = api.geo.buildCarto_pointColor(options);
 		style.headers += pointColorCarto.headers;
 		style.layer += pointColorCarto.style;
 
 		// SIZE
-		var pointSizeCarto = this.buildCarto_pointSize(options);
+		var pointSizeCarto = api.geo.buildCarto_pointSize(options);
 		style.headers += pointSizeCarto.headers;
 		style.layer += pointSizeCarto.style;	
 
 		// targets
-		var targetCarto = this.buildCarto_pointTarget(options);
+		var targetCarto = api.geo.buildCarto_pointTarget(options);
 		style.headers += targetCarto.headers;
 		style.layer += targetCarto.style;
 
@@ -146,17 +146,17 @@ module.exports = api.geo = {
 
 
 		// opacity
-		var polygonOpacityCarto = this.buildCarto_polygonOpacity(options);
+		var polygonOpacityCarto = api.geo.buildCarto_polygonOpacity(options);
 		style.headers += polygonOpacityCarto.headers;
 		style.layer += polygonOpacityCarto.style;
 
 		// color
-		var polygonColorCarto = this.buildCarto_polygonColor(options);
+		var polygonColorCarto = api.geo.buildCarto_polygonColor(options);
 		style.headers += polygonColorCarto.headers;
 		style.layer += polygonColorCarto.style;
 
 		// targets
-		var targetCarto = this.buildCarto_polygonTarget(options);
+		var targetCarto = api.geo.buildCarto_polygonTarget(options);
 		style.headers += targetCarto.headers;
 		style.layer += targetCarto.style;
 
@@ -167,22 +167,22 @@ module.exports = api.geo = {
 	_createLineCarto : function (options, style) {
 
 		// opacity
-		var lineOpacityCarto = this.buildCarto_lineOpacity(options);
+		var lineOpacityCarto = api.geo.buildCarto_lineOpacity(options);
 		style.headers += lineOpacityCarto.headers;
 		style.layer += lineOpacityCarto.style;
 
 		// color
-		var lineColorCarto = this.buildCarto_lineColor(options);
+		var lineColorCarto = api.geo.buildCarto_lineColor(options);
 		style.headers += lineColorCarto.headers;
 		style.layer += lineColorCarto.style;
 
 		// width
-		var lineWidthCarto = this.buildCarto_lineWidth(options);
+		var lineWidthCarto = api.geo.buildCarto_lineWidth(options);
 		style.headers += lineWidthCarto.headers;
 		style.layer += lineWidthCarto.style;
 
 		// targets
-		var targetCarto = this.buildCarto_lineTarget(options);
+		var targetCarto = api.geo.buildCarto_lineTarget(options);
 		style.headers += targetCarto.headers;
 		style.layer += targetCarto.style;
 
@@ -199,7 +199,7 @@ module.exports = api.geo = {
 		if (extras.referencepoint && extras.referencepoint.column && extras.referencepoint.value) {
 			
 			// create reference point
-			return this.buildReferencePoint(extras.referencepoint);
+			return api.geo.buildReferencePoint(extras.referencepoint);
 		};
 
 		return '';
@@ -488,51 +488,6 @@ module.exports = api.geo = {
 			color_range = _.unique(color_range);
 
 
-
-			// // Get color values
-			// var c1 = color.value[0];
-			// var c9 = color.value[1];
-			// var c17 = color.value[2];
-			// var c25 = color.value[3];
-			// var c33 = color.value[4];
-
-			// // Interpolate
-			// var c5 = this.hexAverage([c1, c9]);
-			// var c13 = this.hexAverage([c9, c17]);
-			// var c21 = this.hexAverage([c17, c25]);
-			// var c29 = this.hexAverage([c25, c33]);
-
-			// // Interpolate
-			// var c3 = this.hexAverage([c1, c5]);
-			// var c7 = this.hexAverage([c5, c9]);
-			// var c11 = this.hexAverage([c9, c13]);
-			// var c15 = this.hexAverage([c13, c17]);
-			// var c19 = this.hexAverage([c17, c21]);
-			// var c23 = this.hexAverage([c21, c25]);
-			// var c27 = this.hexAverage([c25, c29]);
-			// var c31 = this.hexAverage([c29, c33]);
-
-			// // Interpolate
-			// var c2 = this.hexAverage([c1, c3]);
-			// var c4 = this.hexAverage([c3, c5]);
-			// var c6 = this.hexAverage([c5, c7]);
-			// var c8 = this.hexAverage([c7, c9]);
-			// var c10 = this.hexAverage([c9, c11]);
-			// var c12 = this.hexAverage([c11, c13]);
-			// var c14 = this.hexAverage([c13, c15]);
-			// var c16 = this.hexAverage([c15, c17]);
-			// var c18 = this.hexAverage([c17, c19]);
-			// var c20 = this.hexAverage([c19, c21]);
-			// var c22 = this.hexAverage([c21, c23]);
-			// var c24 = this.hexAverage([c23, c25]);
-			// var c26 = this.hexAverage([c25, c27]);
-			// var c28 = this.hexAverage([c27, c29]);
-			// var c30 = this.hexAverage([c29, c31]);
-			// var c32 = this.hexAverage([c31, c33]);
-
-			// // set color array
-			// var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33];
-
 			// override with new color_range
 			var colorArray = color_range;
 
@@ -634,38 +589,38 @@ module.exports = api.geo = {
 			var c33 = color.value[4];
 
 			// Interpolate
-			var c5 = this.hexAverage([c1, c9]);
-			var c13 = this.hexAverage([c9, c17]);
-			var c21 = this.hexAverage([c17, c25]);
-			var c29 = this.hexAverage([c25, c33]);
+			var c5 = api.geo.hexAverage([c1, c9]);
+			var c13 = api.geo.hexAverage([c9, c17]);
+			var c21 = api.geo.hexAverage([c17, c25]);
+			var c29 = api.geo.hexAverage([c25, c33]);
 
 			// Interpolate
-			var c3 = this.hexAverage([c1, c5]);
-			var c7 = this.hexAverage([c5, c9]);
-			var c11 = this.hexAverage([c9, c13]);
-			var c15 = this.hexAverage([c13, c17]);
-			var c19 = this.hexAverage([c17, c21]);
-			var c23 = this.hexAverage([c21, c25]);
-			var c27 = this.hexAverage([c25, c29]);
-			var c31 = this.hexAverage([c29, c33]);
+			var c3 = api.geo.hexAverage([c1, c5]);
+			var c7 = api.geo.hexAverage([c5, c9]);
+			var c11 = api.geo.hexAverage([c9, c13]);
+			var c15 = api.geo.hexAverage([c13, c17]);
+			var c19 = api.geo.hexAverage([c17, c21]);
+			var c23 = api.geo.hexAverage([c21, c25]);
+			var c27 = api.geo.hexAverage([c25, c29]);
+			var c31 = api.geo.hexAverage([c29, c33]);
 
 			// Interpolate
-			var c2 = this.hexAverage([c1, c3]);
-			var c4 = this.hexAverage([c3, c5]);
-			var c6 = this.hexAverage([c5, c7]);
-			var c8 = this.hexAverage([c7, c9]);
-			var c10 = this.hexAverage([c9, c11]);
-			var c12 = this.hexAverage([c11, c13]);
-			var c14 = this.hexAverage([c13, c15]);
-			var c16 = this.hexAverage([c15, c17]);
-			var c18 = this.hexAverage([c17, c19]);
-			var c20 = this.hexAverage([c19, c21]);
-			var c22 = this.hexAverage([c21, c23]);
-			var c24 = this.hexAverage([c23, c25]);
-			var c26 = this.hexAverage([c25, c27]);
-			var c28 = this.hexAverage([c27, c29]);
-			var c30 = this.hexAverage([c29, c31]);
-			var c32 = this.hexAverage([c31, c33]);
+			var c2 = api.geo.hexAverage([c1, c3]);
+			var c4 = api.geo.hexAverage([c3, c5]);
+			var c6 = api.geo.hexAverage([c5, c7]);
+			var c8 = api.geo.hexAverage([c7, c9]);
+			var c10 = api.geo.hexAverage([c9, c11]);
+			var c12 = api.geo.hexAverage([c11, c13]);
+			var c14 = api.geo.hexAverage([c13, c15]);
+			var c16 = api.geo.hexAverage([c15, c17]);
+			var c18 = api.geo.hexAverage([c17, c19]);
+			var c20 = api.geo.hexAverage([c19, c21]);
+			var c22 = api.geo.hexAverage([c21, c23]);
+			var c24 = api.geo.hexAverage([c23, c25]);
+			var c26 = api.geo.hexAverage([c25, c27]);
+			var c28 = api.geo.hexAverage([c27, c29]);
+			var c30 = api.geo.hexAverage([c29, c31]);
+			var c32 = api.geo.hexAverage([c31, c33]);
 
 			var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33];
 
@@ -769,38 +724,38 @@ module.exports = api.geo = {
 			var c33 = color.value[4];
 
 			// Interpolate
-			var c5 = this.hexAverage([c1, c9]);
-			var c13 = this.hexAverage([c9, c17]);
-			var c21 = this.hexAverage([c17, c25]);
-			var c29 = this.hexAverage([c25, c33]);
+			var c5 = api.geo.hexAverage([c1, c9]);
+			var c13 = api.geo.hexAverage([c9, c17]);
+			var c21 = api.geo.hexAverage([c17, c25]);
+			var c29 = api.geo.hexAverage([c25, c33]);
 
 			// Interpolate
-			var c3 = this.hexAverage([c1, c5]);
-			var c7 = this.hexAverage([c5, c9]);
-			var c11 = this.hexAverage([c9, c13]);
-			var c15 = this.hexAverage([c13, c17]);
-			var c19 = this.hexAverage([c17, c21]);
-			var c23 = this.hexAverage([c21, c25]);
-			var c27 = this.hexAverage([c25, c29]);
-			var c31 = this.hexAverage([c29, c33]);
+			var c3 = api.geo.hexAverage([c1, c5]);
+			var c7 = api.geo.hexAverage([c5, c9]);
+			var c11 = api.geo.hexAverage([c9, c13]);
+			var c15 = api.geo.hexAverage([c13, c17]);
+			var c19 = api.geo.hexAverage([c17, c21]);
+			var c23 = api.geo.hexAverage([c21, c25]);
+			var c27 = api.geo.hexAverage([c25, c29]);
+			var c31 = api.geo.hexAverage([c29, c33]);
 
 			// Interpolate
-			var c2 = this.hexAverage([c1, c3]);
-			var c4 = this.hexAverage([c3, c5]);
-			var c6 = this.hexAverage([c5, c7]);
-			var c8 = this.hexAverage([c7, c9]);
-			var c10 = this.hexAverage([c9, c11]);
-			var c12 = this.hexAverage([c11, c13]);
-			var c14 = this.hexAverage([c13, c15]);
-			var c16 = this.hexAverage([c15, c17]);
-			var c18 = this.hexAverage([c17, c19]);
-			var c20 = this.hexAverage([c19, c21]);
-			var c22 = this.hexAverage([c21, c23]);
-			var c24 = this.hexAverage([c23, c25]);
-			var c26 = this.hexAverage([c25, c27]);
-			var c28 = this.hexAverage([c27, c29]);
-			var c30 = this.hexAverage([c29, c31]);
-			var c32 = this.hexAverage([c31, c33]);
+			var c2 = api.geo.hexAverage([c1, c3]);
+			var c4 = api.geo.hexAverage([c3, c5]);
+			var c6 = api.geo.hexAverage([c5, c7]);
+			var c8 = api.geo.hexAverage([c7, c9]);
+			var c10 = api.geo.hexAverage([c9, c11]);
+			var c12 = api.geo.hexAverage([c11, c13]);
+			var c14 = api.geo.hexAverage([c13, c15]);
+			var c16 = api.geo.hexAverage([c15, c17]);
+			var c18 = api.geo.hexAverage([c17, c19]);
+			var c20 = api.geo.hexAverage([c19, c21]);
+			var c22 = api.geo.hexAverage([c21, c23]);
+			var c24 = api.geo.hexAverage([c23, c25]);
+			var c26 = api.geo.hexAverage([c25, c27]);
+			var c28 = api.geo.hexAverage([c27, c29]);
+			var c30 = api.geo.hexAverage([c29, c31]);
+			var c32 = api.geo.hexAverage([c31, c33]);
 
 			var colorArray = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33];
 
@@ -1003,7 +958,7 @@ module.exports = api.geo = {
 			});
 		}, [0, 0, 0])
 		.reduce(function (previousValue, currentValue) {
-			var newValue = this.padToTwo(Math.floor(currentValue / twoHexes.length).toString(16));
+			var newValue = api.geo.padToTwo(Math.floor(currentValue / twoHexes.length).toString(16));
 			return previousValue + newValue;
 		}.bind(this), '#');
 	},

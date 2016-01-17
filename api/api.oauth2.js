@@ -11,7 +11,7 @@ var Role 	= require('../models/role');
 var Group 	= require('../models/group');
 
 // utils
-var _ 		= require('lodash-node');
+var _ 		= require('lodash');
 var fs 		= require('fs-extra');
 var gm 		= require('gm');
 var kue 	= require('kue');
@@ -256,6 +256,7 @@ module.exports = api.oauth2 = {
  * The callback accepts the `client`, which is exchanging the client's id from the token
  * request for verification.  If this value is validated, the application issues an access
  * token on behalf of the client who authorized the code
+ * @private
  */
 oauth2server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, done) {
 

@@ -1,10 +1,11 @@
 var winston = require('winston');
-var _ = require('lodash-node');
+var _ = require('lodash');
 
 // api
 var api = module.parent.exports;
 
-console.log('api.log config: ', api.config.path.log);
+
+var logPath = api.config.path.log || '/data/logs/';
 
 // logger
 var winston_logger = new (winston.Logger)({
@@ -13,7 +14,7 @@ var winston_logger = new (winston.Logger)({
 
 		// all console.log's
 		new winston.transports.File({ 
-			filename: api.config.path.log + 'wu.log',
+			filename: logPath + 'wu.log',
 			name : 'info',
 			level : 'info',
 			prettyPrint : true,
@@ -23,7 +24,7 @@ var winston_logger = new (winston.Logger)({
 		
 		// console.errors
 		new winston.transports.File({
-			filename: api.config.path.log + 'wu.error.log',
+			filename: logPath + 'wu.error.log',
 			name : 'error',
 			level : 'error',
 			eol : '\n\n',
