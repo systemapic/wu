@@ -59,6 +59,30 @@ ops.push(function (callback) {
 });
 
 
+ops.push(function (callback) {
+	Project
+	.find()
+	.exec(function (err, projects) {
+
+		async.each(projects, function (project, done) {
+
+			var user_id = project.createdBy;
+			User
+			.findOne({uuid : user_id})
+			.exec(function (err, user) {
+				if (err || !user) {
+					console.log('err:', err, user_id);
+					return done();
+				}
+				project.createdByUsername = user.username;
+				console.log('username:', user.username);
+				project.save(done);
+			});
+
+		}, callback);
+	});
+})
+
 // do it
 async.series(ops, function (err, result) {
 	console.log('Done!');
