@@ -7,6 +7,8 @@ dist/tmp/*
 views/tmp/*
 views/*.serve.*
 public/css/style.css
+public/*
+public/docs/api/*
 dist/css/*.min.css
 dist/js/*.min.js
 public/css/style.min.css

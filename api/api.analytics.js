@@ -11,7 +11,7 @@ var Role 	= require('../models/role');
 var Group 	= require('../models/group');
 
 // utils
-var _ 		= require('lodash-node');
+var _ 		= require('lodash');
 var fs 		= require('fs-extra');
 var gm 		= require('gm');
 var kue 	= require('kue');
@@ -98,7 +98,7 @@ module.exports = api.analytics = {
 		// https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
 
 		// Validate request
-	 	var _error = this.validate(options);
+	 	var _error = api.analytics.validate(options);
 
 	 	// INVALID REQIEST
 	 	if ( _error ) {	 		

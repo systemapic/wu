@@ -10,7 +10,7 @@ var Role 	= require('../models/role');
 var Group 	= require('../models/group');
 
 // utils
-var _ 		= require('lodash-node');
+var _ 		= require('lodash');
 var fs 		= require('fs-extra');
 var gm 		= require('gm');
 var kue 	= require('kue');
@@ -211,12 +211,12 @@ module.exports = api.socket = {
 	},
 
 	setProcessing : function (process) {
-		this._processing[process.fileUuid] = process;
-		this._processing[process.fileUuid]._timestamp = new Date().getTime();
+		api.socket._processing[process.fileUuid] = process;
+		api.socket._processing[process.fileUuid]._timestamp = new Date().getTime();
 	},
 
 	_getProcessing : function (id) {
-		return this._processing[id];
+		return api.socket._processing[id];
 	},
 
 	

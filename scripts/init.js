@@ -11,7 +11,7 @@ var Role 	 = require('../models/role');
 var Group 	 = require('../models/group');
 
 // utils
-var _ 		 = require('lodash-node');
+var _ 		 = require('lodash');
 var fs 		 = require('fs-extra');
 var gm 		 = require('gm');
 var kue 	 = require('kue');

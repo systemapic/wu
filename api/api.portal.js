@@ -11,7 +11,7 @@ var Role 	= require('../models/role');
 var Group 	= require('../models/group');
 
 // utils
-var _ 		= require('lodash-node');
+var _ 		= require('lodash');
 var fs 		= require('fs-extra');
 var gm 		= require('gm');
 var kue 	= require('kue');
@@ -42,38 +42,10 @@ var api = module.parent.exports;
 // exports
 module.exports = api.portal = { 
 
-	// // access_v2
-	// invitation : function (req, res) {
-
-	// 	console.log('api.portal.invitation');
-
-	// 	// get client/project
-	// 	var path = req.originalUrl.split('/');
-	// 	var invite_token = path[3];
-
-	// 	// get token from redis
-	// 	var redis_key = 'invite:' + invite_token;
-	// 	api.redis.tokens.get(redis_key, function (err, token_store) {
-
-	// 		var stored_invite = api.utils.parse(token_store);
-
-	// 		if (err || !stored_invite) return api.error.missingInformation(req, res);
-
-	// 		var email = stored_invite.email;
-
-	// 		// make sure logged out
-	// 		req.logout();
-
-	// 		// render invitation
-	// 		res.render('../../views/invitation.ejs', {
-	// 			invite : token_store,
-	// 			access_token : req.session.access_token || {}
-	// 		});
-
-	// 	});
-	// },
 
 	invite : function (req, res) {
+
+		console.log('patrh:', path);
 
 		// get client/project
 		var path = req.originalUrl.split('/');
@@ -240,6 +212,10 @@ module.exports = api.portal = {
 	// process wildcard paths, including hotlinks
 	wildcard : function (req, res) {
 
+		console.log('path: ', req.originalUrl);
+
+		// console.log('req', req);
+
 		// get client/project
 		var path = req.originalUrl.split('/'),
 		    client = path[1],
@@ -269,6 +245,7 @@ module.exports = api.portal = {
 	},
 
 	login : function (req, res) {
+		console.log('hotlink bling?', req.session.hotlink);
 		res.render(path.join(__dirname, '../views/login.serve.ejs'), { message: req.flash('loginMessage') });
 	},
 
@@ -356,7 +333,7 @@ module.exports = api.portal = {
 		var options = req.body,
 		    account = req.user,
 		    a = {}, 
-		    invite = this._checkInvite(options);	 // check for invite token
+		    invite = api.portal._checkInvite(options);	 // check for invite token
 
 
 		// api.debug.hardCrash();
@@ -437,4 +414,160 @@ module.exports = api.portal = {
 		console.log('');
 	},
 
+	status : function (req, res) {
+
+		var ops = {};
+
+		// get versions
+		ops.versions = function (callback) {
+			api.portal.getVersions(function (err, versions) {
+				var versions = versions || {};
+				callback(null, {
+					systemapic_api : api.version, 
+					postgis : versions.postgis,
+					postgres : versions.postgres, 
+					mongodb : versions.mongo,
+					redis : versions.redis,
+				});
+			});
+		}
+
+		async.series(ops, function (err, status) {
+			if (err) return res.end('Error');
+			res.json({
+				status : status
+			});
+		});
+
+	},
+
+
+	_queryVersions : function (done) {
+
+		var ops = {};
+
+		ops.postgis = function (callback) {
+
+			// create database in postgis
+			exec('../scripts/postgis/get_postgis_version.sh', {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+				if (err) return done(null);
+
+				var json = stdout.split('\n')[2];
+				var data = api.utils.parse(json);
+				if (!data) return callback('no data');
+
+				var replaced = data.postgis_full_version.replace(/"/g, "");
+
+				// callback
+				callback(null, replaced);
+			});
+		}
+
+		ops.postgres = function (callback) {
+
+			// create database in postgis
+			exec('../scripts/postgis/get_postgres_version.sh', {maxBuffer: 1024 * 50000}, function (err, stdout, stdin) {
+				if (err) return done(null);
+
+				var json = stdout.split('\n')[2];
+				var data = api.utils.parse(json);
+
+				if (!data) return callback('no data');
+				
+				// callback
+				callback(null, data.version);
+			});
+		}
+
+		ops.mongo = function (callback) {
+
+			var mongoose = require('mongoose');
+
+			mongoose.connect('mongodb://localhost/test', function(err){
+				var admin = new mongoose.mongo.Admin(mongoose.connection.db);
+					admin.buildInfo(function (err, info) {
+					console.log(info.version);
+					callback(null, info.version);
+				});
+			});
+		}
+
+		ops.redis = function (callback) {
+
+
+			api.redis.stats.info(function (err, stats) {
+				console.log('err, stats', err, stats)
+
+				var redis_info = require('redis-info');
+				var info = redis_info.parse(stats);
+
+				// var info = api.utils.parse(info);
+				console.log('info:', info.redis_version);
+				callback(err, info.redis_version);
+			});
+
+		}
+
+		async.parallel(ops, function (err, versions) {
+			if (err) return done(err);
+
+			versions.timestamp = Date.now();
+
+			// write to redis
+			api.redis.stats.set('status_version', JSON.stringify(versions));
+
+			// return
+			done(err, versions);
+		});
+	},
+
+	_readVersions : function (done) {
+
+		// write to redis
+		api.redis.stats.get('status_version', function (err, status) {
+			var versions = api.utils.parse(status);
+
+			if (!versions) return done('too old');
+
+			// query new version if older than ten seconds
+			if (Date.now() - versions.timestamp > 10000) {
+				return done('too old');
+			}  else {
+				done(null, versions);
+			}
+
+		});
+
+	},
+
+	getVersions : function (done) {
+		api.portal._readVersions(function (err, versions) {
+			if (err) return api.portal._queryVersions(done);
+
+			done(null, versions);
+		});
+	},
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
