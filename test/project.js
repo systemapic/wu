@@ -34,10 +34,13 @@ describe('Project', function () {
 
         it('should be able to create empty project and get valid project in response', function (done) {
             this.slow(1500);
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/project/create')
                 .set('Authorization', 'Bearer ' + token)
-                .send({name : 'mocha-test-project'})
+                .send({
+                    // access_token : access_token,
+                    name : 'mocha-test-project'
+                })
                 .expect(200)
                 .end(function (err, res) {
                     if (err) return done(err);

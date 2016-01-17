@@ -35,11 +35,19 @@ module.exports = function(app, passport) {
 	// link
 	api.app = app;
 
+	// authenticate shorthand
+	var checkAccess = api.token.authenticate;
+
 
 	/**
 	* @apiDefine token
 	* @apiParam {String} access_token A valid access token
 	* @apiError Unauthorized The <code>access_token</code> is invalid. (403)
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*    "error": "Invalid access token."
+	* }
 	*/
 
 	
@@ -134,20 +142,52 @@ module.exports = function(app, passport) {
 		api.portal.getBase(req, res);
 	});
 
+	
+	app.post('/oauth/token', api.oauth2.getToken);
+	
+
 	// ================================
-	// OAUTH2: Post Token ==============
+	// ACCOUNT  =======================
 	// ================================
-	// =====================================
-	// GET STATUS   ====================
-	// =====================================
+	// ================================
+	// GET TOKEN ======================
+	// ================================
 	/**
-	* @api {post} /oauth/token Get access token
+	* @api {post} /api/token Get access token
 	* @apiName access_token
 	* @apiGroup User
-	* @apiHeader {String} Authorization="Basic YWJjMTIzOnNzaC1zZWNyZXQ="
-	* @apiParam {String} username Email
+	* @apiParam {String} username Email or username
 	* @apiParam {String} password Password
-	* @apiParam {String} grant_type=password
+	* @apiParam {Boolean} [refresh=false] Refresh access token
+	*
+	* @apiSuccess {json} status Access token JSON
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*	"access_token":"AMduTdFBlXcBc1PKS5Ot4MZzwGjPhKw3y2LzJwJ0CGz0lpRGhK5xHGMcGLqvrOfY1aBR4M9Y4O126WRr5YSQGNZoLPbN0EXMwlRD0ajCqsd4MRr55UpfVYAfrLRL9i0tuglrtGYVs2iT8bl75ZVfYnbDl4Vjp4ElQoWqf6XdqMsIr25XxO5cZB9NRRl3mxA8gWRzCd5bvgZFZTWa6Htx5ugRqwWiudc8lbWNDCx85ms1up94HLKrQXoGMC8FVgf4",
+	*	"expires_in":"36000",
+	*	"token_type":"Bearer"
+	* }
+	* @apiError {json} Unauthorized Missing or invalid information.
+	* @apiErrorExample {json} Error-Response:
+	* Error 401: Unauthorized
+	* {
+	*     "error": "Please provide username/email and password."
+	* }
+	*/
+	app.post('/api/token', api.token.get_from_pass);
+
+
+	// ================================
+	// ACCOUNT  =======================
+	// ================================
+	// ================================
+	// GET TOKEN ======================
+	// ================================
+	/**
+	* @api {post} /api/token/refresh Refresh access token
+	* @apiName refresh_access_token
+	* @apiGroup User
+	* @apiUse token
 	*
 	* @apiSuccess {json} status Access token JSON
 	* @apiSuccessExample {json} Success-Response:
@@ -157,14 +197,50 @@ module.exports = function(app, passport) {
 	*	"token_type":"Bearer"
 	* }
 	*/
-	app.post('/oauth/token', api.oauth2.getToken);
+	app.post('/api/token/refresh', checkAccess, api.token.refresh);
+
 	
 	// ================================
-	// OAUTH2: Get Token ==============
+	// ACCOUNT  =======================
 	// ================================
-	app.get('/api/token/check', passport.authenticate('bearer', {session: false}), function (req, res) {
-		res.end('OK');
+	// ================================
+	// CHECK TOKEN ====================
+	// ================================
+	/**
+	* @api {post} /api/token/check Check access token
+	* @apiName check_access_token
+	* @apiGroup User
+	* @apiUse token
+	*
+	* @apiSuccess {json} status Access token JSON
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*	"access_token":"AMduTdFBlXcBc1PKS5Ot4MZzwGjPhKw3y2LzJwJ0CGz0lpRGhK5xHGMcGLqvrOfY1aBR4M9Y4O126WRr5YSQGNZoLPbN0EXMwlRD0ajCqsd4MRr55UpfVYAfrLRL9i0tuglrtGYVs2iT8bl75ZVfYnbDl4Vjp4ElQoWqf6XdqMsIr25XxO5cZB9NRRl3mxA8gWRzCd5bvgZFZTWa6Htx5ugRqwWiudc8lbWNDCx85ms1up94HLKrQXoGMC8FVgf4",
+	*	"expires_in":"36000",
+	*	"token_type":"Bearer"
+	* }
+	*/
+	app.post('/api/token/check', checkAccess, function (req, res) {
+		res.send(req.user);
 	});
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
 
 	// ================================
 	// OAUTH2: Debug token ============
