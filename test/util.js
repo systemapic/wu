@@ -139,10 +139,10 @@ module.exports = util = {
     },
 
     create_project : function (done) {
-        util.token(function (err, token) {
+        util.token(function (err, access_token) {
             api.post('/api/project/create')
-            .set('Authorization', 'Bearer ' + token)
-            .send({name : 'mocha-test-project'})
+            // .set('Authorization', 'Bearer ' + token)
+            .send({name : 'mocha-test-project', access_token : access_token})
             .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);
@@ -158,10 +158,10 @@ module.exports = util = {
     },
 
     delete_project : function (done) {
-        util.token(function (err, token) {
+        util.token(function (err, access_token) {
             api.post('/api/project/delete')
-            .set('Authorization', 'Bearer ' + token)
-            .send({projectUuid : util.test_user.pid})
+            // .set('Authorization', 'Bearer ' + token)
+            .send({projectUuid : util.test_user.pid, access_token : access_token})
             .expect(200)
             .end(done);
         });

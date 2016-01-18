@@ -81,6 +81,43 @@ module.exports = api.token = {
 		});
 	},
 
+	// route: get user info
+	userInfo : function (req, res) {
+
+		// get public or user from session
+		api.token.getSession(req, function (err, user_and_access_token) {
+			if (err) return res.status(401).send(err.message);
+			res.send(user_and_access_token);
+		});
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	getSession : function (req, done) {
+		// console.log('getSession', req.session)
+		
+		// check for session
+		if (req.session) {
+			var access_token = req.session.access_token;
+			// console.log('GOT SESSION??!', req.session, access_token);
+		} 
+
+		done(null, {
+			user : {},
+			access_token : 'maybe'
+		})
+	},
 
 
 
@@ -148,10 +185,12 @@ module.exports = api.token = {
 		var user = options.user;
 		var token = options.token;
 		ops.push(function (callback) {
+			// save user to access_token
 			var key = 'access_token:' + user._id + user.uuid;
 			api.redis.tokens.set(key, JSON.stringify(token), callback);
 		});
 		ops.push(function (callback) {
+			// save access_token to user
 			var key = token.access_token;
 			api.redis.tokens.set(key, JSON.stringify({
 				user_id : user._id,
@@ -192,6 +231,7 @@ module.exports = api.token = {
 
 	// create access token
 	create : function (user, done) {
+		console.log('crate:', user, done);
 		var token = {
 			access_token : 'pk.' + api.token.generateToken(40),
 			expires : api.token.calculateExpirationDate(36000),
@@ -212,9 +252,48 @@ module.exports = api.token = {
 
 	
 
+	getPublic : function (done) {
+		var ops = [];
+		ops.push(function (callback) {
+			User
+			.findOne({uuid : 'systemapic-public'})
+			.exec(function (err, public_user) {
+				console.log('pub user?', err, public_user);
+				if (err) return callback(err);
+				if (!public_user) return api.token.createPublicUser(callback);
+				callback(null, public_user);
+			});
+		});
 
+		ops.push(function (public_user, callback) {
+			api.token.create(public_user, callback);
+		});
 
+		async.waterfall(ops, function (err, result) {
+			console.log('getPublic err, res', err, result);
+			done(err, result);
+		});
+	},
 
+	// only runs once ever, but better to
+	// have init here than in external scripts
+	createPublicUser : function (done) {
+
+		// create the user
+		var public_user            	= new User();
+		public_user.local.email    	= 'info@systemapic.com';
+		public_user.local.password 	= 'systemapic-public';
+		public_user.uuid 		= 'systemapic-public';
+		public_user.username 		= 'public';
+		public_user.company 		= 'Systemapic'
+		public_user.position 		= 'Public'
+		public_user.firstName 		= 'Systemapic'
+		public_user.lastName 		= 'Public';
+		public_user.invitedBy 		= 'self';
+
+		// save the user
+		public_user.save(done);
+	},
 
 
 
@@ -227,18 +306,15 @@ module.exports = api.token = {
 	// utils
 	calculateExpirationDate : function (duration) {
 		var duration = duration || api.config.token.expiresIn;
-		console.log('duration', duration);
 		return new Date(new Date().getTime() + (duration * 1000));
 	},
 	generateToken : function (len) {
 		var buf = [];
 		var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		var charlen = chars.length;
-
-		for (var i = 0; i < len; ++i) {
+		for (var i = 0; i < len; ++i) { 
 			buf.push(chars[api.token.getRandomInt(0, charlen - 1)]);
 		}
-
 		return buf.join('');
 	},
 	getRandomInt : function (min, max) {
