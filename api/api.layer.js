@@ -34,6 +34,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var errors = require('../shared/errors')
 
 
 // api
@@ -45,18 +46,25 @@ module.exports = api.layer = {
 
 	// create layer
 	create : function (req, res) {
-
-
 		var options = req.body;
+		var ops = [];
+		// res.json(options);
+		ops.push(function (callback) {
+			api.layer._checkExistingLayer(options, callback);
+		});
 
-		api.layer.createModel(options, function (err, doc) {
+		ops.push(function (params, callback) {
+			api.layer.createModel(params, callback);
+		});
+
+		async.waterfall(ops, function (err, doc) {
 			console.log('create layer, err, doc', err, doc);
 
-			if (err) return api.error.general(res, err);
+			console.log(err);
+			if (err) return api.error.general(req, res, err);
 
 			res.json(doc);
 		});
-
 	},
 
 
@@ -578,6 +586,20 @@ module.exports = api.layer = {
 
 	},
 
+	_checkExistingLayer : function (options, callback) {
+		if (options.uuid) {
+			Layer.findOne({uuid : options.uuid})
+				.exec(function (err, layer) {
+					if (err || !layer) {
+						return callback(null, options);
+					}
+
+					return callback(new Error(errors.layer_already_exist.error));
+				});
+		} else {
+			return callback(null, options);
+		}
+	},
 
 	createModel : function (options, callback) {
 

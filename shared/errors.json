@@ -10,5 +10,8 @@
     },
     "missing_request_parameters": {
     	"error": "request body should contains %s"
+    },
+    "layer_already_exist": {
+    	"error": "layer with such uuid already exist"
     }
 }
