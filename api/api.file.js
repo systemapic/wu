@@ -34,6 +34,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var errors = require('../shared/errors')
 
 // api
 var api = module.parent.exports;
@@ -705,11 +706,11 @@ module.exports = api.file = {
 		    type = options.type;
 
 
-		if (type == 'raster') {
+		if (type === 'raster') {
 			return api.file._getRasterLayers(req, res);
 		}
 
-		if (type == 'postgis') {
+		if (type === 'postgis') {
 			return api.file._getPostGISLayers(req, res);
 		}
 
@@ -717,10 +718,14 @@ module.exports = api.file = {
 	},
 
 	_getRasterLayers : function (req, res) {
-		var options = req.body,
-		    data = options.data,
-		    file_id = data.file_id;
-
+		var options = req.body;
+		var data = options.data || {};
+		var file_id = data.file_id;
+		
+		if (!file_id) {
+			return api.error.general(req, res, new Error(util.format(errors.missing_request_parameters, 'data.file_id')));
+		}
+		
 		Layer
 		.find({'file' : file_id})
 		.exec(function (err, layers) {
@@ -732,7 +737,7 @@ module.exports = api.file = {
 	_getPostGISLayers : function (req, res) {
 
 		var options = req.body,
-		    data = options.data,
+		    data = options.data || {},
 		    database_name = data.database_name,
 		    table_name = data.table_name,
 		    fileUuid = table_name,

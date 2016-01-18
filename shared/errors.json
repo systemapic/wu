@@ -7,5 +7,8 @@
     },
     "no_access": {
         "error": "No access."
+    },
+    "missing_request_parameters": {
+    	"error": "request body should contains %s"
     }
 }
