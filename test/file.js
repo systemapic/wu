@@ -2,7 +2,6 @@ var supertest = require('supertest');
 var chai = require('chai');
 var expect = chai.expect;
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
-var config = require('../config/server-config.js').serverConfig;
 var util = require('./util');
 var token = util.token;
 var expected = require('../shared/errors');
@@ -102,11 +101,11 @@ describe('File', function () {
                             data_type : 'new data_type',         // raster or vector
                             original_format : 'new original_format',   // GeoTIFF, etc.
                             metadata : 'new metadata',
-                        },  
+                        },
                         raster : {
                             file_id : 'new file_id',
                             metadata : 'new metadata'
-                        },
+                        }
                     }
                 };
             util.users_token(second_test_user, function (err, token) {
