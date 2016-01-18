@@ -232,6 +232,7 @@ module.exports = function(grunt) {
 					'public/js/src/panes/pane.share.js',
 					'public/js/src/panes/pane.mapsettings.js',
 					'public/js/src/panes/pane.fullscreen.js',
+					'public/js/src/panes/pane.login.js',
 
 
 					// chrome

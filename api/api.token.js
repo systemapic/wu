@@ -44,10 +44,13 @@ module.exports = api.token = {
 
 	// middleware for routes
 	authenticate : function (req, res, next) {
+
+		// check request first
 		var access_token = req.body.access_token || req.query.access_token;
+
+		// verify access_token
 		api.token.check(access_token, function (err, user) {
-			if (err) return res.status(401).send({error : err.message});
-			if (!user) return res.status(401).send({error : 'Invalid access token.'});
+			if (err || !user) return res.status(401).send({error : 'Invalid access token.'});
 
 			User
 			.findOne({_id : user._id})
@@ -58,18 +61,26 @@ module.exports = api.token = {
 					userModel.local.password = true;
 				}
 
-				// attach user to req, next
+				// attach user to req
 				req.user = userModel;
+
+				// continue
 				next();
 			});
 		});
 	},
 
 	// route: get access token from password
-	get_from_pass : function (req, res) {
-		api.token._get_from_pass(req.body, function (err, access_token) {
+	getTokenFromPassword : function (req, res) {
+
+		api.token._get_token_from_password(req.body, function (err, tokens) {
 			if (err) return res.status(401).send({error : err.message});
-			res.send(access_token);
+
+			// update cookie
+			req.session.tokens = api.utils.parse(tokens);
+
+			// return tokens
+			res.send(tokens);
 		});
 	},
 
@@ -81,13 +92,28 @@ module.exports = api.token = {
 		});
 	},
 
-	// route: get user info
-	userInfo : function (req, res) {
+	// route: check if existing session, returns tokens only
+	checkSession : function (req, res) {
+		// first request - check if active user in session, if not return public
 
-		// get public or user from session
-		api.token.getSession(req, function (err, user_and_access_token) {
-			if (err) return res.status(401).send(err.message);
-			res.send(user_and_access_token);
+		var ops = [];
+
+		// check for access_token in session
+		var tokens = _.isObject(req.session) ? req.session.tokens : false;
+
+		// no session, return public user
+		if (!tokens) return api.token.getPublicToken(function (err, public_token) {
+			res.send(public_token);
+		});
+
+		// got some session, either public or user
+		api.token.check(tokens.access_token, function (err, user) {
+
+			// return err
+			if (err) res.status(422).send({error : err.message});
+
+			// return user
+			res.send(tokens);
 		});
 	},
 
@@ -104,32 +130,13 @@ module.exports = api.token = {
 
 
 
-	getSession : function (req, done) {
-		// console.log('getSession', req.session)
-		
-		// check for session
-		if (req.session) {
-			var access_token = req.session.access_token;
-			// console.log('GOT SESSION??!', req.session, access_token);
-		} 
-
-		done(null, {
-			user : {},
-			access_token : 'maybe'
-		})
-	},
-
-
-
-
-
 	// get access token from password
-	_get_from_pass : function (options, done) {
+	_get_token_from_password : function (options, done) {
 
 		// details
 		var ops = [];
 		var refresh = (options.refresh == 'true');
-		var username = options.username;
+		var username = options.username || options.email;
 		var password = options.password;
 
 		// throw if no credentials
@@ -142,6 +149,8 @@ module.exports = api.token = {
 
 		// check password, get token
 		ops.push(function (user, callback) {
+
+			// no user
 			if (!user) return callback(new Error('Invalid credentials.'))
 
 			// check password
@@ -151,23 +160,26 @@ module.exports = api.token = {
 			callback(null, user);
 		});
 
+		// refresh or dont
 		ops.push(function (user, callback) {
 
-			if (refresh) {
+			// if (refresh) {
+			// 	// reset access token
+			// 	api.token.reset(user, callback);
+			// } else {
+			// 	// get access token for user
+			// 	api.token.get_create_token(user, callback);
+			// }
 
-				// reset access token
-				api.token.reset(user, callback);
-			} else {
-
-				// get access token for user
-				api.token.get_create(user, callback);
-			}
-			
+			// get access token for user
+			api.token.get_create_token(user, callback);
 		});
 
 		// run ops
 		async.waterfall(ops, function (err, access_token) {
 			if (err) return done(new Error('Invalid credentials.'));
+
+			// all good, return access_token
 			done(null, access_token);
 		});
 
@@ -208,7 +220,7 @@ module.exports = api.token = {
 			if (err) return done(err);
 			if (!token) return done(new Error('Invalid access token.'));
 
-			var stored_token = JSON.parse(token);
+			var stored_token = api.utils.parse(token);
 
 			User
 			.findOne({_id : stored_token.user_id})
@@ -217,12 +229,12 @@ module.exports = api.token = {
 	},
 
 	// should always return an access_token (get or create)
-	get_create : function (user, done) {
+	get_create_token : function (user, done) {
 		api.token.get(user, function (err, access_token) {
 			if (err) return done(err);
 
 			// create if not exists
-			if (!access_token) return api.token.create(user, done);
+			if (!access_token) return api.token.createToken(user, done);
 			
 			// return token
 			done(null, access_token);
@@ -230,8 +242,8 @@ module.exports = api.token = {
 	},
 
 	// create access token
-	create : function (user, done) {
-		console.log('crate:', user, done);
+	createToken : function (user, done) {
+		console.log('api.token.createToken 1:', user.username);
 		var token = {
 			access_token : 'pk.' + api.token.generateToken(40),
 			expires : api.token.calculateExpirationDate(36000),
@@ -245,33 +257,52 @@ module.exports = api.token = {
 		}, done);
 	},
 
-	// reset access token
-	reset : function (user, done) {
-		api.token.create(user, done);
+	// create public access token
+	createPublicToken : function (user, done) {
+		console.log('api.token.createPublic 1: ', user.username);
+		var token = {
+			access_token : 'public',
+			expires : api.token.calculateExpirationDate(3600000000),
+			token_type : 'multipass',
+			public : true
+		};
+
+		// save token
+		api.token.set({
+			user : user,
+			token : token
+		}, done);
 	},
 
-	
+	// reset access token
+	reset : function (user, done) {
+		api.token.createToken(user, done);
+	},
 
-	getPublic : function (done) {
+
+	getPublicToken : function (done) {
 		var ops = [];
 		ops.push(function (callback) {
-			User
-			.findOne({uuid : 'systemapic-public'})
-			.exec(function (err, public_user) {
-				console.log('pub user?', err, public_user);
-				if (err) return callback(err);
-				if (!public_user) return api.token.createPublicUser(callback);
-				callback(null, public_user);
-			});
+			api.token.getPublicUser(callback);
 		});
 
 		ops.push(function (public_user, callback) {
-			api.token.create(public_user, callback);
+			api.token.createPublicToken(public_user, callback);
 		});
 
-		async.waterfall(ops, function (err, result) {
-			console.log('getPublic err, res', err, result);
-			done(err, result);
+		async.waterfall(ops, function (err, public_token) {
+			console.log('getPublicToken result: err, res', err, public_token);
+			done(err, public_token);
+		});
+	},
+
+	getPublicUser : function (done) {
+		User
+		.findOne({uuid : 'systemapic-public'})
+		.exec(function (err, public_user) {
+			if (err) return done(err);
+			if (!public_user) return api.token.createPublicUser(done);
+			done(null, public_user);
 		});
 	},
 
