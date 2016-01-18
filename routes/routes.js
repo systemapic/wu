@@ -148,16 +148,11 @@ module.exports = function(app, passport) {
 
 
 
-	
+	// deprecated
 	app.post('/oauth/token', api.oauth2.getToken);
 	
 
-	// ================================
-	// ACCOUNT  =======================
-	// ================================
-	// ================================
-	// GET TOKEN ======================
-	// ================================
+	
 	/**
 	* @api {post} /api/token Get access token
 	* @apiName access_token
@@ -180,15 +175,13 @@ module.exports = function(app, passport) {
 	*     "error": "Please provide username/email and password."
 	* }
 	*/
-	app.post('/api/token', api.token.get_from_pass);
+	// ================================
+	// GET TOKEN FROM PASSWORD ========
+	// ================================
+	app.post('/api/token', api.token.getTokenFromPassword);
 
 
-	// ================================
-	// ACCOUNT  =======================
-	// ================================
-	// ================================
-	// GET TOKEN ======================
-	// ================================
+
 	/**
 	* @api {post} /api/token/refresh Refresh access token
 	* @apiName refresh_access_token
@@ -203,6 +196,9 @@ module.exports = function(app, passport) {
 	*	"token_type":"Bearer"
 	* }
 	*/
+	// ================================
+	// REFRESH TOKEN ==================
+	// ================================
 	app.post('/api/token/refresh', checkAccess, api.token.refresh);
 
 	
@@ -224,16 +220,16 @@ module.exports = function(app, passport) {
 
 	
 	/**
-	* @api {post} /api/user/info Get info on user
-	* @apiName user_info
+	* @api {post} /api/user/session Check if already logged in (browser-only)
+	* @apiName user_session
 	* @apiGroup User
 	*
-	* @apiSuccess {json} status User JSON
+	* @apiSuccess {json} access_token Valid access token (either user or public)
 	*/
 	// ================================
-	// CHECK TOKEN ====================
+	// CHECK SESSION ==================
 	// ================================
-	app.post('/api/user/info', checkAccess, api.token.userInfo);
+	app.post('/api/user/session', api.token.checkSession);
 
 
 
@@ -250,16 +246,6 @@ module.exports = function(app, passport) {
 
 
 
-	// ================================
-	// OAUTH2: Debug token ============
-	// ================================
-	// this works!
-	// app.get('/api/userinfo', checkAccess, function(req, res) {
-	// 	res.json({user : req.user, user_id: req.user.id, name: req.user.firstName, scope: req.authInfo.scope});
-	// });
-	// app.post('/api/userinfo', checkAccess, function(req, res) {
-	// 	res.json({user : req.user, user_id: req.user.id, name: req.user.firstName, scope: req.authInfo.scope});
-	// });
 
 	// =====================================
 	// ERROR LOGGING =======================
@@ -452,13 +438,6 @@ module.exports = function(app, passport) {
 		api.pixels.servePixelPerfection(req, res);
 	});
 
-	// // =====================================
-	// // UPLOAD CLIENT LOGO  =================
-	// // =====================================
-	// app.post('/api/client/uploadlogo', checkAccess, function (req,res) {
-	// 	api.upload.clientLogo(req, res);
-	// });
-
 	// =====================================
 	// GET MAPBOX ACCOUNT ==================
 	// =====================================
@@ -503,7 +482,8 @@ module.exports = function(app, passport) {
 	// =====================================
 	// GET GEOJSON FILES ===================
 	// =====================================
-	// change to /api/data/get ... todo: perhaps improve this, put all downloads together, with type/format in query/form.. todo later
+	// change to /api/data/get ... 
+	// todo: perhaps improve this, put all downloads together, with type/format in query/form.. todo later
 	app.post('/api/geojson', checkAccess, function (req,res) {
 		api.file.getGeojsonFile(req, res);
 	});
@@ -696,13 +676,6 @@ module.exports = function(app, passport) {
 		api.delegateUser(req, res);
 	});
 
-	// // =====================================
-	// // INVITE USER =========================
-	// // =====================================
-	// app.post('/api/user/invite', checkAccess, function (req,res) {
-	// 	api.user.invite(req, res);
-	// });
-
 	// =====================================
 	// CHECK UNIQUE USER/EMAIL =============
 	// =====================================
@@ -844,7 +817,7 @@ module.exports = function(app, passport) {
 		});
 	});
 
-	// ===================================== // todo: rename route to /api/clientConfig.js
+	// ===================================== // todo: rename route to /api/config/client.js
 	// SERVER CLIENT CONFIG ================
 	// =====================================
 	// change to /api/... 
@@ -949,6 +922,7 @@ module.exports = function(app, passport) {
 	// 	failureFlash : true // allow flash messages
 	// }));
 
+	
 	// =====================================
 	// WILDCARD PATHS ======================		
 	// =====================================
@@ -965,12 +939,5 @@ module.exports = function(app, passport) {
 		res.redirect('/');
 	}
 
-	// function internalAccess(req, res, next) {
-	// 	var token = req.query.token || req.body.token;
-	// 	if (token == 'thisissecret') return next();
-	// 	res.end(JSON.stringify({
-	// 		error : 'No access.'
-	// 	}))
-	// }
 	
 }
