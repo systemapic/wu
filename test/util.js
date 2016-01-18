@@ -6,6 +6,7 @@ var crypto = require('crypto');
 var request = require('request');
 var User = require('../models/user');
 var File = require('../models/file');
+var Layer = require('../models/layer');
 var config = require('../config/server-config.js').serverConfig;
 mongoose.connect(config.mongo.url); 
 var supertest = require('supertest');
@@ -41,6 +42,18 @@ module.exports = util = {
         keywords : 'test_file_keywords',
         type : 'test_file_type',
         format : ['test_file_format']
+    },
+
+    test_layer : {
+        uuid: 'test_layer_uuid',
+        title: 'test_layer_title',
+        description: 'test_layer_description',
+        file: 'test_layer_file',
+        data: {
+            postgis : {
+                table_name: 'test_layer_data_postgis_table_name'
+            }
+        }
     },
 
     get_access_token : function (done) {
@@ -182,9 +195,27 @@ module.exports = util = {
         file.save(callback);
     },
 
-    delete_file: function (done) {
+    delete_file: function (callback) {
         File.findOne({uuid : util.test_file.uuid})
             .remove()
-            .exec(done);
+            .exec(callback);
+    },
+
+    createLayer: function (callback) {
+        var layer = new Layer();
+
+        layer.uuid = util.test_layer.uuid;
+        layer.title = util.test_layer.title;
+        layer.description = util.test_layer.description;
+        layer.file = util.test_layer.file;
+        layer.data = util.test_layer.data;
+        
+        layer.save(callback);
+    },
+
+    deleteLayer: function (callback) {
+        Layer.findOne({uuid : util.test_layer.uuid})
+            .remove()
+            .exec(callback);
     }
 }
