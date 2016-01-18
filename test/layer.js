@@ -3,6 +3,7 @@ var chai = require('chai');
 var expect = chai.expect;
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var util = require('./util');
+var _ = require('lodash');
 var token = util.token;
 var expected = require('../shared/errors');
 var Layer   = require('../models/layer');
@@ -12,10 +13,10 @@ describe('Layer', function () {
     before(function(done) { util.create_user(done); });
     after(function(done) { util.delete_user(done); });
 
-	describe('/api/layers/new', function () {
+    describe('/api/layers/new', function () {
         
         var newLayer = {
-            uuid: 'new mocha test layer uuid',   // layer uuid
+            // uuid: 'new mocha test layer uuid',   // layer uuid
             title: 'new mocha test layer title',
             description: 'new mocha test layer description',   // html
         };
@@ -43,7 +44,8 @@ describe('Layer', function () {
                         }
 
                         var result = util.parse(res.text);
-                        expect(result.uuid).to.be.equal(newLayer.uuid);
+                        // expect(result.uuid).to.be.equal(newLayer.uuid);
+                        assert.equal(_.size(result.uuid), 42);
                         expect(result.title).to.be.equal(newLayer.title);
                         expect(result.description).to.be.equal(newLayer.description);
                         done();
@@ -51,19 +53,19 @@ describe('Layer', function () {
             });
         });
 
-        it('should respond with status code 422 and error if layer with such uuid already exist', function (done) {
-	        token(function (err, token) {
-	        	if (err) {
-	        		return done(err);
-	        	}
+        // it('should respond with status code 422 and error if layer with such uuid already exist', function (done) {
+        //     token(function (err, token) {
+        //         if (err) {
+        //             return done(err);
+        //         }
 
-	            api.post('/api/layers/new')
-                    .set('Authorization', 'Bearer ' + token)
-	                .send(newLayer)
-	                .expect(422, expected.layer_already_exist)
-	                .end(done);
-        	});
-	    });
+        //         api.post('/api/layers/new')
+        //                .set('Authorization', 'Bearer ' + token)
+        //             .send(newLayer)
+        //             .expect(422, expected.layer_already_exist)
+        //             .end(done);
+        //     });
+        // });
 
         after(function (done) {
             Layer.findOne({uuid : newLayer.uuid})
@@ -71,5 +73,5 @@ describe('Layer', function () {
                 .exec(done);
         });
 
-	});
+    });
 });
