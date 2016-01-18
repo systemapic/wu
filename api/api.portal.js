@@ -318,6 +318,7 @@ module.exports = api.portal = {
 	},
 
 	logout : function (req, res) {
+		req.session.reset();
 		req.logout();
 		res.redirect('/');
 	},
@@ -327,44 +328,85 @@ module.exports = api.portal = {
 	},
 
 	
-
-
 	getBase : function (req, res) {
 
-		// return if not logged in 			
-		if (!req.isAuthenticated()) return res.render('../../views/index.ejs'); 
-		
-		// create access token TODO: hacky, rewrite errything
-		var authCode = {
-			scope : '*',
-			userID : req.user._id,
-			clientID : 1,
-			expires_in : api.oauth2.calculateExpirationDate()
-		}
-		var token = api.oauth2.util.uid(api.config.token.accessTokenLength);
-		api.oauth2.store.accessTokens.save(token, authCode.expires_in, authCode.userID, authCode.clientID, authCode.scope, console.log);
+		console.log('req.cookie', req.cookies);
+		console.log('req.session', req.session);
 
-		var refresh_token = api.oauth2.util.uid(api.config.token.accessTokenLength);
-		api.oauth2.store.accessTokens.save(refresh_token, authCode.expires_in, authCode.userID, authCode.clientID, authCode.scope, console.log);
+		// console.log('req:', req);
 
-		var access_token = {
-			access_token : token,
-			expires_in : authCode.expires_in,
-			scope : authCode.scope,
-			refresh_token : refresh_token
-		}
 
-		req.session.access_token = access_token;
+		console.log('not authenticated!');
 
-		// render app html				
-		res.render('../../views/app.serve.ejs', {
-			hotlink : req.session.hotlink,
-			access_token : access_token
+		// get public access_token
+		var public_access_token = api.token.getPublic(function (err, public_access_token) {
+			console.log('public_access_token', arguments);
+
+			req.session.access_token = public_access_token;
+
+			// render app html				
+			res.render('../../views/app.serve.ejs', {
+				hotlink : req.session.hotlink,
+				access_token : public_access_token
+			});
+
+			// reset hotlink
+			req.session.hotlink = {};
+
 		});
 
-		// reset hotlink
-		req.session.hotlink = {};
+
+		// req.session.access_token = access_token;
+
+		// get public access_token
+
+		// // render app html				
+		// res.render('../../views/app.serve.ejs', {
+		// 	hotlink : req.session.hotlink,
+		// 	access_token : access_token
+		// });
+
+		// // reset hotlink
+		// req.session.hotlink = {};
 	},
+
+
+	// getBase : function (req, res) {
+
+	// 	// return if not logged in 			
+	// 	if (!req.isAuthenticated()) return res.render('../../views/index.ejs'); 
+		
+	// 	// create access token TODO: hacky, rewrite errything
+	// 	var authCode = {
+	// 		scope : '*',
+	// 		userID : req.user._id,
+	// 		clientID : 1,
+	// 		expires_in : api.oauth2.calculateExpirationDate()
+	// 	}
+	// 	var token = api.oauth2.util.uid(api.config.token.accessTokenLength);
+	// 	api.oauth2.store.accessTokens.save(token, authCode.expires_in, authCode.userID, authCode.clientID, authCode.scope, console.log);
+
+	// 	var refresh_token = api.oauth2.util.uid(api.config.token.accessTokenLength);
+	// 	api.oauth2.store.accessTokens.save(refresh_token, authCode.expires_in, authCode.userID, authCode.clientID, authCode.scope, console.log);
+
+	// 	var access_token = {
+	// 		access_token : token,
+	// 		expires_in : authCode.expires_in,
+	// 		scope : authCode.scope,
+	// 		refresh_token : refresh_token
+	// 	}
+
+	// 	req.session.access_token = access_token;
+
+	// 	// render app html				
+	// 	res.render('../../views/app.serve.ejs', {
+	// 		hotlink : req.session.hotlink,
+	// 		access_token : access_token
+	// 	});
+
+	// 	// reset hotlink
+	// 	req.session.hotlink = {};
+	// },
 
 
 	joinBeta : function (req, res) {

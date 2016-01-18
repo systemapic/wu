@@ -28,14 +28,14 @@ describe('Import', function () {
         context('zipped', function () {
 
             it('should upload', function (done) {
-                    token(function (err, token) {
+                    token(function (err, access_token) {
                     api.post('/api/import')
-                    .set('Authorization', 'Bearer ' + token)
                     .type('form')
-                    .field('userUuid', util.test_user.uuid)
+                    .field('access_token', access_token)
                     .field('data', fs.createReadStream(__dirname + '/data/shapefile.zip'))
                     .expect(200)
                     .end(function (err, res) {
+                        console.log('res', res.text);
                         assert.ifError(err);
                         var result = util.parse(res.text);
                         assert.ok(result.file_id);
@@ -53,12 +53,9 @@ describe('Import', function () {
             });
 
             it('should get upload status', function (done) {
-                token(function (err, token) {
+                token(function (err, access_token) {
                     api.get('/api/import/status')
-                    .query({
-                        file_id : tmp.file_id,
-                        access_token : token
-                    })
+                    .query({file_id : tmp.file_id, access_token : access_token})
                     .expect(200)
                     .end(function (err, res) {
                         assert.ifError(err);
@@ -80,11 +77,11 @@ describe('Import', function () {
         context.skip('with missing .prj file', function () {
 
             it('should upload', function (done) {
-                    token(function (err, token) {
+                    token(function (err, access_token) {
                     api.post('/api/import')
-                    .set('Authorization', 'Bearer ' + token)
                     .type('form')
                     .field('userUuid', util.test_user.uuid)
+                    .field('access_token', access_token)
                     .field('data', fs.createReadStream(__dirname + '/data/shapefile.missing-prj.zip'))
                     .expect(200)
                     .end(function (err, res) {
@@ -105,12 +102,9 @@ describe('Import', function () {
             });
 
             it('should get upload status', function (done) {
-                token(function (err, token) {
+                token(function (err, access_token) {
                     api.get('/api/import/status')
-                    .query({
-                        file_id : tmp.file_id,
-                        access_token : token
-                    })
+                    .query({ file_id : tmp.file_id, access_token : access_token})
                     .expect(200)
                     .end(function (err, res) {
                         assert.ifError(err);
@@ -126,11 +120,8 @@ describe('Import', function () {
                     });
                 })
             });
-
         });
-
     });
-
 });
 
 
@@ -145,12 +136,9 @@ describe('Process', function () {
     });
 
     it('should be processed without errors', function (done) {
-        token(function (err, token) {
+        token(function (err, access_token) {
             api.get('/api/import/status')
-            .query({
-                file_id : tmp.file_id,
-                access_token : token
-            })
+            .query({file_id : tmp.file_id, access_token : access_token})
             .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);
@@ -170,10 +158,9 @@ describe('Process', function () {
     });
 
     it('should be able to delete file', function (done) {
-        token(function (err, token) {
+        token(function (err, access_token) {
             api.post('/api/file/delete')
-            .set('Authorization', 'Bearer ' + token)
-            .send({file_id : tmp.file_id})
+            .send({file_id : tmp.file_id, access_token : access_token})
             .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);
