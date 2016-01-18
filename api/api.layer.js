@@ -49,12 +49,12 @@ module.exports = api.layer = {
 		var options = req.body;
 		var ops = [];
 		// res.json(options);
-		ops.push(function (callback) {
-			api.layer._checkExistingLayer(options, callback);
-		});
+		// ops.push(function (callback) {
+		// 	api.layer._checkExistingLayer(options, callback);
+		// });
 
-		ops.push(function (params, callback) {
-			api.layer.createModel(params, callback);
+		ops.push(function (callback) {
+			api.layer.createModel(options, callback);
 		});
 
 		async.waterfall(ops, function (err, doc) {
@@ -604,12 +604,13 @@ module.exports = api.layer = {
 	createModel : function (options, callback) {
 
 		// metadata sometimes come as object... todo: check why!
-		if (typeof(options.metadata) == 'object') {
+		if (_.isObject(options.metadata)) {
 			options.metadata = JSON.stringify(options.metadata);
 		}
 
 		var layer 		= new Layer();
-		layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),
+		// layer.uuid 		= options.uuid || 'layer-' + uuid.v4(),
+		layer.uuid 		= 'layer-' + uuid.v4(), 
 		layer.title 		= options.title;
 		layer.description 	= options.description || '';
 		layer.legend 		= options.legend || '';

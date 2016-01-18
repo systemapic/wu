@@ -195,7 +195,7 @@ describe('File', function () {
             }); 
         });
 
-        it('should respond with status code 200 and array of specific layers if type is raster and all parameters are correctly', function (done) {
+        it('should respond with status code 200 and array of layers if type is raster and all parameters are correct', function (done) {
            token(function (err, token) {
                 api.post('/api/file/getLayers')
                     .set('Authorization', 'Bearer ' + token)
