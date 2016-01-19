@@ -218,6 +218,27 @@ module.exports = function(app, passport) {
 		res.send(req.user);
 	});
 
+	/**
+	* @api {get} /api/token/check Check access token
+	* @apiName check_access_token
+	* @apiGroup User
+	* @apiUse token
+	*
+	* @apiSuccess {json} status Valid status
+	* @apiSuccessExample {json} Success-Response:
+	* {
+	*	"valid" : true
+	* }
+	*/
+	// ================================
+	// CHECK TOKEN ====================
+	// ================================
+	app.get('/api/token/check', checkAccess, function (req, res) {
+		res.send({
+			valid : true
+		});
+	});
+
 	
 	/**
 	* @api {post} /api/user/session Check if already logged in (browser-only)
