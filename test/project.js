@@ -10,8 +10,8 @@ var expect = chai.expect;
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var User = require('../models/user');
 var config = require('../config/server-config.js').serverConfig;
-var util = require('./util');
-var token = util.token;
+var helpers = require('./helpers');
+var token = helpers.token;
 var expected = require('../shared/errors');
 var second_test_user = {
     email : 'second_mocha_test_user@systemapic.com',
@@ -26,8 +26,8 @@ describe('Project', function () {
     // prepare
     var tmp = {};
     this.slow(500);
-    before(function(done) { util.create_user(done); });
-    after(function(done) { util.delete_user(done); });
+    before(function(done) { helpers.create_user(done); });
+    after(function(done) { helpers.delete_user(done); });
 
 
     describe('/api/project/create', function () {
@@ -42,7 +42,7 @@ describe('Project', function () {
                 .end(function (err, res) {
                     if (err) return done(err);
 
-                    var project = util.parse(res.text).project;
+                    var project = helpers.parse(res.text).project;
                     assert.ok(project);
                     assert.ok(project.uuid);
                     assert.equal(project.name, 'mocha-test-project');
@@ -128,15 +128,15 @@ describe('Project', function () {
 
             
         before(function (done) {
-            util.create_user_by_parameters(second_test_user, done);
+            helpers.create_user_by_parameters(second_test_user, done);
         });
 
         after(function (done) {
-            util.delete_user_by_id(second_test_user.uuid, done);
+            helpers.delete_user_by_id(second_test_user.uuid, done);
         });
 
         it('should respond with status code 422 and specific error message when not authorized', function (done) {
-            util.users_token(second_test_user, function (err, token) {
+            helpers.users_token(second_test_user, function (err, token) {
                 api.post('/api/project/update')
                     .set('Authorization', 'Bearer ' + token)
                     .send({
@@ -237,7 +237,7 @@ describe('Project', function () {
                 .end(function (err, res) {
                     if (err) return done(err);
 
-                    var result = util.parse(res.text);
+                    var result = helpers.parse(res.text);
 
                     expect(result.name.name).to.be.equal('mocha-test-updated-name');
                     expect(result.slug.slug).to.be.equal('mocha-test-updated-slug');
@@ -305,7 +305,7 @@ describe('Project', function () {
                     .end(function (err, res) {
                         if (err) return done(err);
 
-                        var result = util.parse(res.text);
+                        var result = helpers.parse(res.text);
                         assert.ok(result.deleted);
                         assert.equal(result.project, tmp.project.uuid);
                         done();
@@ -359,7 +359,7 @@ describe('Project', function () {
                     .end(function (err, res) {
                         if (err) return done(err);
 
-                        var result = util.parse(res.text);
+                        var result = helpers.parse(res.text);
 
                         expect(result.unique).to.be.true;
                         done();
