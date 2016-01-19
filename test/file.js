@@ -57,9 +57,9 @@ describe('File', function () {
                 api.post('/api/file/update')
                     .set('Authorization', 'Bearer ' + token)
                     .send({
-                    	fileUuid: "invalid file id"
+                    	uuid: "invalid file id"
                     })
-                    .expect(422, expected.missing_information)
+                    .expect(422, expected.bad_file_uuid)
                     .end(done);
             });
         });
@@ -77,16 +77,16 @@ describe('File', function () {
                 api.post('/api/file/update')
                     .set('Authorization', 'Bearer ' + token)
                     .send({
-                        fileUuid: testFile.uuid
+                        uuid: testFile.uuid
                     })
-                    .expect(422, expected.missing_information)
+                    .expect(422, expected.no_access)
                     .end(done);
             });
         });
 
         it('should respond with status code 200 and update file correctly', function (done) {
             var fileUpdates = {
-                    fileUuid: testFile.uuid,
+                    uuid: testFile.uuid,
                     name: 'new name', 
                     description: 'new description', 
                     keywords: ['new keywords'], 
@@ -108,7 +108,7 @@ describe('File', function () {
                         }
                     }
                 };
-            helpers.users_token(second_test_user, function (err, token) {
+            helpers.token(function (err, token) {
                 api.post('/api/file/update')
                     .set('Authorization', 'Bearer ' + token)
                     .send(fileUpdates)
@@ -119,15 +119,30 @@ describe('File', function () {
                         }
 
                         var result = helpers.parse(res.text);
-
-                        expect(result.name).to.be.equal(fileUpdates.name);
-                        expect(result.description).to.be.equal(fileUpdates.description);
-                        expect(result.keywords).to.be.equal(fileUpdates.keywords);
-                        expect(result.status).to.be.equal(fileUpdates.status);
-                        expect(result.category).to.be.equal(fileUpdates.category);
-                        expect(result.version).to.be.equal(fileUpdates.version);
-                        expect(result.copyright).to.be.equal(fileUpdates.copyright);
-                        expect(result.data).to.be.equal(fileUpdates.data);
+                        expect(result.updated).to.be.not.empty;
+                        expect(result.updated).to.include('name');
+                        expect(result.updated).to.include('description');
+                        expect(result.updated).to.include('keywords');
+                        expect(result.updated).to.include('status');
+                        expect(result.updated).to.include('category');
+                        expect(result.updated).to.include('version');
+                        expect(result.updated).to.include('copyright');
+                        expect(result.updated).to.include('data');
+                        expect(result.file.name).to.be.equal(fileUpdates.name);
+                        expect(result.file.description).to.be.equal(fileUpdates.description);
+                        expect(result.file.keywords[0]).to.be.equal(fileUpdates.keywords[0]);
+                        expect(result.file.status).to.be.equal(fileUpdates.status);
+                        expect(result.file.category).to.be.equal(fileUpdates.category);
+                        expect(result.file.version).to.be.equal(fileUpdates.version);
+                        expect(result.file.copyright).to.be.equal(fileUpdates.copyright);
+                        expect(result.file.data.postgis.database_name).to.be.equal(fileUpdates.data.postgis.database_name);
+                        expect(result.file.data.postgis.table_name).to.be.equal(fileUpdates.data.postgis.table_name);
+                        expect(result.file.data.postgis.data_type).to.be.equal(fileUpdates.data.postgis.data_type);
+                        expect(result.file.data.postgis.original_format).to.be.equal(fileUpdates.data.postgis.original_format);
+                        expect(result.file.data.postgis.metadata).to.be.equal(fileUpdates.data.postgis.metadata);
+                        expect(result.file.data.raster.file_id).to.be.equal(fileUpdates.data.raster.file_id);
+                        expect(result.file.data.raster.metadata).to.be.equal(fileUpdates.data.raster.metadata);
+                        done();
                     });
             });
         });

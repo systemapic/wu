@@ -834,11 +834,10 @@ module.exports = api.file = {
 
 		if (!fileUuid) return api.error.missingInformation(req, res);
 
-
 		ops.push(function (callback) {
 			File
-			.findOne({uuid : fileUuid})
-			.exec(callback);
+				.findOne({uuid : fileUuid})
+				.exec(callback);
 		});
 
 		ops.push(function (file, callback) {
@@ -855,21 +854,21 @@ module.exports = api.file = {
 			}, callback);
 		});
 
-		async.waterfall(ops, function (err, file) {
+		async.waterfall(ops, function (err, result) {
 			if (err) console.log('file update err: '.red + err);
 			if (err) console.log('ERR 16'.red, err);
-			if (err || !file) return api.error.general(req, res, err);
+			if (err || !result) return api.error.general(req, res, err);
 
-			res.end(JSON.stringify(file));
+			res.end(JSON.stringify(result));
 		});
-
 
 	},
 
-	_update : function (job, callback) {
+	_update : function (job, done) {
 		var file = job.file,
 		    options = job.options,
-		    queries = {};
+		    updates = {}
+		    ops = [];
 
 		// console.log('update file'.green, options);
 		
@@ -885,37 +884,50 @@ module.exports = api.file = {
 			'data'
 		];
 
- 		// enqueue queries for valid fields
-		valid.forEach(function (field) {
-			if (options[field]) queries = api.file._enqueueUpdate({
-				queries : queries,
-				field : field,
-				file : file,
-				options : options
-			});
+		updates = _.pick(options, valid);
+
+		ops.push(function (callback) {
+			file.update({ $set: _.pick(options, valid) })
+				.exec(function (err, result) {
+					if (err) {
+						callback(err);
+					}
+
+					callback(null, {
+						updated: _.keys(updates)
+					});
+				});
+		});
+		ops.push(function (params, callback) {
+			File.findOne({uuid: options.uuid})
+				.exec(function (err, res) {
+					if (err) {
+						return callback(err);
+					}
+					params.file = res;
+					callback(null, params);
+				});
 		});
 
-		// run queries to database
-		async.parallel(queries, callback);
-
+		async.waterfall(ops, done);
 	},
 
 
 	// async mongo update queue
-	_enqueueUpdate : function (job) {
-		var queries = job.queries,
-		    field = job.field,
-		    file = job.file,
-		    options = job.options;
+	// _enqueueUpdate : function (job) {
+	// 	var queries = job.queries,
+	// 	    field = job.field,
+	// 	    file = job.file,
+	// 	    options = job.options;
 
-		// create update queue op
-		queries[field] = function(callback) {	
-			file[field] = options[field];
-			file.markModified(field);
-			file.save(callback);
-		};
-		return queries;
-	},
+	// 	// create update queue op
+	// 	queries[field] = function(callback) {	
+	// 		file[field] = options[field];
+	// 		file.markModified(field);
+	// 		file.save(callback);
+	// 	};
+	// 	return queries;
+	// },
 
 
 

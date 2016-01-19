@@ -34,6 +34,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var errors = require('../shared/errors')
 
 // api
 var api = module.parent.exports;
@@ -1209,18 +1210,25 @@ module.exports = api.access = {
 
 			// if file is createdBy user
 
+			if (!options || !options.file) {
+				return done(new Error(errors.bad_file_uuid.error));
+			}
+
+			if (!options || !options.user) {
+				return done(new Error(errors.bad_user_uuid.error));
+			}
+
 			File
-			.findOne({uuid : options.file.uuid})
-			.exec(function (err, f) {
+				.findOne({uuid : options.file.uuid})
+				.exec(function (err, f) {
 
-				if (f.createdBy == options.user.uuid) { 
+					if (f.createdBy == options.user.uuid) {
+						return done(null, options);
+					}
 
-					return done(null, options);
-				}
+					done(new Error(errors.no_access.error));
 
-				done('No assess.');
-
-			});
+				});
 
 
 
