@@ -6,8 +6,8 @@ var crypto = require('crypto');
 var request = require('supertest');
 var User = require('../models/user');
 var config = require('../config/server-config.js').serverConfig;
-var util = require('./util');
-var token = util.token;
+var helpers = require('./helpers');
+var token = helpers.token;
 var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 var tmp = {};
@@ -15,10 +15,10 @@ var tmp = {};
 
 // prepare
 before(function(callback) {
-    async.series([util.create_user, util.create_project], callback);
+    async.series([helpers.create_user, helpers.create_project], callback);
 });
 after(function(callback) {
-    async.series([util.delete_project, util.delete_user], callback);
+    async.series([helpers.delete_project, helpers.delete_user], callback);
 });
 
 describe('Import', function () {
@@ -32,12 +32,12 @@ describe('Import', function () {
                     api.post('/api/import')
                     .set('Authorization', 'Bearer ' + token)
                     .type('form')
-                    .field('userUuid', util.test_user.uuid)
+                    .field('userUuid', helpers.test_user.uuid)
                     .field('data', fs.createReadStream(__dirname + '/data/shapefile.zip'))
                     .expect(200)
                     .end(function (err, res) {
                         assert.ifError(err);
-                        var result = util.parse(res.text);
+                        var result = helpers.parse(res.text);
                         assert.ok(result.file_id);
                         assert.ok(result.user_id);
                         assert.ok(result.upload_success);
@@ -62,7 +62,7 @@ describe('Import', function () {
                     .expect(200)
                     .end(function (err, res) {
                         assert.ifError(err);
-                        var result = util.parse(res.text);
+                        var result = helpers.parse(res.text);
                         assert.ok(result.file_id);
                         assert.ok(result.user_id);
                         assert.ok(result.upload_success);
@@ -84,12 +84,12 @@ describe('Import', function () {
                     api.post('/api/import')
                     .set('Authorization', 'Bearer ' + token)
                     .type('form')
-                    .field('userUuid', util.test_user.uuid)
+                    .field('userUuid', helpers.test_user.uuid)
                     .field('data', fs.createReadStream(__dirname + '/data/shapefile.missing-prj.zip'))
                     .expect(200)
                     .end(function (err, res) {
                         assert.ifError(err);
-                        var result = util.parse(res.text);
+                        var result = helpers.parse(res.text);
                         assert.ok(result.file_id);
                         assert.ok(result.user_id);
                         assert.ok(result.upload_success);
@@ -114,7 +114,7 @@ describe('Import', function () {
                     .expect(200)
                     .end(function (err, res) {
                         assert.ifError(err);
-                        var result = util.parse(res.text);
+                        var result = helpers.parse(res.text);
                         assert.ok(result.file_id);
                         assert.ok(result.user_id);
                         assert.ok(result.upload_success);
@@ -154,12 +154,12 @@ describe('Process', function () {
             .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);
-                var status = util.parse(res.text);
+                var status = helpers.parse(res.text);
                 assert.ifError(err);
                 assert.ok(status.upload_success);
                 assert.ifError(status.error_code);
                 assert.ifError(status.error_text);
-                assert.equal(status.user_id, util.test_user.uuid);
+                assert.equal(status.user_id, helpers.test_user.uuid);
                 assert.equal(status.data_type, 'vector');
                 assert.ok(status.processing_success);
                 assert.equal(status.status, 'Done');
@@ -177,7 +177,7 @@ describe('Process', function () {
             .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);
-                var status = util.parse(res.text);
+                var status = helpers.parse(res.text);
                 assert.ifError(status.error);
                 assert.ok(status);
                 done();

@@ -98,7 +98,7 @@ module.exports = util = {
 
     parse : function (body) {
         try {
-            var parsed = JSON.parse(body)
+            var parsed = JSON.parse(body);
         } catch (e) {
             console.log('failed to parse:', body);
             throw e;
@@ -215,6 +215,24 @@ module.exports = util = {
 
     deleteLayer: function (callback) {
         Layer.findOne({uuid : util.test_layer.uuid})
+            .remove()
+            .exec(callback);
+    },
+
+    create_layer_by_parameters: function (layerInfo, callback) {
+        var layer = new Layer();
+
+        layer.uuid = layerInfo.uuid;
+        layer.title = layerInfo.title;
+        layer.description = layerInfo.description;
+        layer.file = layerInfo.file;
+        layer.data = layerInfo.data;
+        
+        layer.save(callback);
+    },
+
+    delete_layer_by_id: function (layerId, callback) {
+        Layer.findOne({uuid: layerId})
             .remove()
             .exec(callback);
     }
