@@ -42,11 +42,19 @@ var api = module.parent.exports;
 // exports
 module.exports = api.error = { 
 
+	invalidAccessToken : function (req, res) {
+		res.status(403).send({ 
+			error : "Invalid access token.",
+			description : "Check out https://docs.systemapic.com/ for details on the API."
+		});
+		api.error.log('Invalid access token.');
+	},
+
 	unauthorized : function (req, res) {
-		var message = "Don't be cheeky! All your IP's are belong to us.";
-		res.end(JSON.stringify({ 
-			error : message 
-		}));
+		res.status(403).send({ 
+			error : "Your request was not authorized.",
+			description : "Check out https://docs.systemapic.com/ for details on the API."
+		});
 
 		api.error.log('unauthorized');
 	},
