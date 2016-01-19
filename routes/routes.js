@@ -234,9 +234,7 @@ module.exports = function(app, passport) {
 	// CHECK TOKEN ====================
 	// ================================
 	app.get('/api/token/check', checkAccess, function (req, res) {
-		res.send({
-			valid : true
-		});
+		res.send({valid : true});
 	});
 
 	

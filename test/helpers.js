@@ -4,8 +4,10 @@ var async = require('async');
 var fs = require('fs');
 var crypto = require('crypto');
 var request = require('request');
+var _ = require('lodash');
 var User = require('../models/user');
 var File = require('../models/file');
+var Layer = require('../models/layer');
 var config = require('../config/server-config.js').serverConfig;
 mongoose.connect(config.mongo.url); 
 var supertest = require('supertest');
@@ -44,18 +46,19 @@ module.exports = util = {
         format : ['test_file_format']
     },
 
+    test_layer : {
+        uuid: 'test_layer_uuid',
+        title: 'test_layer_title',
+        description: 'test_layer_description',
+        file: 'test_layer_file',
+        data: {
+            postgis : {
+                table_name: 'test_layer_data_postgis_table_name'
+            }
+        }
+    },
+
     get_access_token : function (done) {
-        // api.post('/oauth/token')
-        // .set('Authorization', 'Basic YWJjMTIzOnNzaC1zZWNyZXQ=')
-        // .send({ 
-        //     grant_type : 'password',
-        //     username : util.test_user.email,
-        //     password : util.test_user.password
-        // })
-        // .expect(200)
-        // .end(function (err, res) {
-        //     done(err, util.parse(res.text));
-        // });
         api.post('/api/token')
         .send({ 
             username : util.test_user.email,
@@ -63,7 +66,10 @@ module.exports = util = {
         })
         .expect(200)
         .end(function (err, res) {
-            done(err, util.parse(res.text));
+            var tokens = util.parse(res.text);
+            assert.equal(tokens.token_type, 'multipass');
+            assert.equal(_.size(tokens.access_token), 43);
+            done(err, tokens);
         });
     },
 
@@ -75,7 +81,6 @@ module.exports = util = {
 
     get_users_access_token : function (_user, callback) {
       api.post('/oauth/token')
-        .set('Authorization', 'Basic YWJjMTIzOnNzaC1zZWNyZXQ=')
         .send({
             grant_type : 'password',
             username : _user.email,
@@ -95,7 +100,7 @@ module.exports = util = {
 
     parse : function (body) {
         try {
-            var parsed = JSON.parse(body)
+            var parsed = JSON.parse(body);
         } catch (e) {
             console.log('failed to parse:', body);
             throw e;
@@ -123,7 +128,6 @@ module.exports = util = {
 
     create_user_by_parameters : function (_user, callback) {
         var user = new User();
-
         user.local.email = _user.email;    
         user.local.password = user.generateHash(_user.password);
         user.uuid = _user.uuid;
@@ -142,7 +146,10 @@ module.exports = util = {
         util.token(function (err, access_token) {
             api.post('/api/project/create')
             // .set('Authorization', 'Bearer ' + token)
-            .send({name : 'mocha-test-project', access_token : access_token})
+            .send({
+                name : 'mocha-test-project', 
+                access_token : access_token
+            })
             .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);
@@ -161,7 +168,10 @@ module.exports = util = {
         util.token(function (err, access_token) {
             api.post('/api/project/delete')
             // .set('Authorization', 'Bearer ' + token)
-            .send({projectUuid : util.test_user.pid, access_token : access_token})
+            .send({
+                projectUuid : util.test_user.pid, 
+                access_token : access_token
+            })
             .expect(200)
             .end(done);
         });
@@ -193,9 +203,45 @@ module.exports = util = {
         file.save(callback);
     },
 
-    delete_file: function (done) {
+    delete_file: function (callback) {
         File.findOne({uuid : util.test_file.uuid})
             .remove()
-            .exec(done);
+            .exec(callback);
+    },
+
+    createLayer: function (callback) {
+        var layer = new Layer();
+
+        layer.uuid = util.test_layer.uuid;
+        layer.title = util.test_layer.title;
+        layer.description = util.test_layer.description;
+        layer.file = util.test_layer.file;
+        layer.data = util.test_layer.data;
+        
+        layer.save(callback);
+    },
+
+    deleteLayer: function (callback) {
+        Layer.findOne({uuid : util.test_layer.uuid})
+            .remove()
+            .exec(callback);
+    },
+
+    create_layer_by_parameters: function (layerInfo, callback) {
+        var layer = new Layer();
+
+        layer.uuid = layerInfo.uuid;
+        layer.title = layerInfo.title;
+        layer.description = layerInfo.description;
+        layer.file = layerInfo.file;
+        layer.data = layerInfo.data;
+        
+        layer.save(callback);
+    },
+
+    delete_layer_by_id: function (layerId, callback) {
+        Layer.findOne({uuid: layerId})
+            .remove()
+            .exec(callback);
     }
 }

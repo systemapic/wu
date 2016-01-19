@@ -34,6 +34,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var error_messages = require('../shared/errors.json');
 
 // api
 var api = module.parent.exports;
@@ -345,7 +346,7 @@ module.exports = api.project = {
 		});
 
 		ops.push(function (project, callback) {
-			if (!project) return callback(new Error('No such project.'));
+			if (!project) return callback(new Error(error_messages.missing_information.error));
 
 			// check access to delete
 			var gotAccess = (project.createdBy == user.getUuid() || user.isSuper());
@@ -380,7 +381,7 @@ module.exports = api.project = {
 	// ###  API: Update Project              ###
 	// #########################################
 	update : function (req, res) {
-		if (!req.body) return api.error.missingInformation(req, res);
+		if (_.isEmpty(req.body)) return api.error.missingInformation(req, res);
 
 		var user = req.user,
 			projectUuid = req.body.uuid || req.body.projectUuid || req.body.project_id,
@@ -389,8 +390,8 @@ module.exports = api.project = {
 		// return on missing
 		if (!projectUuid) return api.error.missingInformation(req, res);
 
-		// no fields except project_id
-		if (_.size(req.body) === 1) api.error.missingInformation(req, res);
+		// no fields except project_id and access_token
+		if (_.size(req.body) < 3) api.error.missingInformation(req, res);
 
 		ops.push(function (callback) {
 			Project
@@ -403,14 +404,7 @@ module.exports = api.project = {
 			var hashedUser = user.getUuid(); // todo: use actual hash
 
 			if (!project || !project.access) {
-
-
-				// note to igor: must return callback here, not api.error.general - because callback must be called, plus res.end can only
-				// 	be fired once, which is handled in async.waterfall fn below.
-				return callback(new Error('No such project.'));
-
-				// can't return this.. must return callback()
-				// return api.error.general(req, res, new Error(util.format('No such project.')));
+				return callback(new Error(error_messages.missing_information));
 			}
 
 			// can edit if on edit list or created project

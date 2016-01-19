@@ -6,54 +6,54 @@ var crypto = require('crypto');
 var request = require('request');
 var User = require('../models/user');
 var config = require('../config/server-config.js').serverConfig;
-var util = require('./util');
-var token = util.token;
+var helpers = require('./helpers');
+var token = helpers.token;
 var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
 
 describe('User', function () {
     it('should be created', function (done) {
-        util.create_user(done);
+        helpers.create_user(done);
     });
 
     it('should be found', function (done) {
-        User.findOne({uuid : util.test_user.uuid}).exec(done);
+        User.findOne({uuid : helpers.test_user.uuid}).exec(done);
     });
 
     it('should have correct details', function (done) {
-        User.findOne({uuid : util.test_user.uuid})
+        User.findOne({uuid : helpers.test_user.uuid})
         .exec(function (err, userModel) {
             assert.ifError(err);
-            assert.equal(userModel.local.email, util.test_user.email);
-            assert.equal(userModel.firstName, util.test_user.firstName);
-            assert.equal(userModel.lastName, util.test_user.lastName);
+            assert.equal(userModel.local.email, helpers.test_user.email);
+            assert.equal(userModel.firstName, helpers.test_user.firstName);
+            assert.equal(userModel.lastName, helpers.test_user.lastName);
             assert.ok(userModel._id);
             done();
         });
     });
 
     it('should get access token with username & password', function (done) {
-        util.get_access_token(function (err, token) {
+        helpers.get_access_token(function (err, access_token) {
             assert.ifError(err);
-            assert.ok(token);
-            assert.ok(token.access_token);
-            assert.equal(token.expires_in, 36000);
-            assert.equal(token.token_type, 'Bearer');
+            assert.ok(access_token);
+            assert.ok(access_token.access_token);
+            // todo: expires
+            assert.equal(access_token.token_type, 'multipass');
             done();
         });
     });
 
     it('should get user info with access token', function (done) {
-        token(function (err, token) {
-            api.post('/api/userinfo')
-            .set('Authorization', 'Bearer ' + token)
+        token(function (err, access_token) {
+            api.post('/api/token/check')
+            .send({access_token : access_token})
             .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);
-                var store = util.parse(res.text);
-                assert.ok(store.user._id);
-                assert.equal(store.user.local.email, util.test_user.email);
-                assert.equal(store.user.firstName, util.test_user.firstName);
+                var user = helpers.parse(res.text);
+                assert.ok(user._id);
+                assert.equal(user.local.email, helpers.test_user.email);
+                assert.equal(user.firstName, helpers.test_user.firstName);
                 done();
             });
         })
@@ -61,19 +61,19 @@ describe('User', function () {
 
     it('should get portal store with access token', function (done) {
         this.slow(700);
-        token(function (err, token) {
+        token(function (err, access_token) {
             api.post('/api/portal')
-            .set('Authorization', 'Bearer ' + token)
+            .send({access_token : access_token})
             .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);
-                var store = util.parse(res.text);
+                var store = helpers.parse(res.text);
                 assert.ok(store);
                 assert.ok(store.account);
                 assert.ok(store.projects);
                 assert.ok(store.users);
-                assert.equal(store.account.local.email, util.test_user.email);
-                assert.equal(store.account.firstName, util.test_user.firstName);
+                assert.equal(store.account.local.email, helpers.test_user.email);
+                assert.equal(store.account.firstName, helpers.test_user.firstName);
                 done();
             });
         })
@@ -81,7 +81,7 @@ describe('User', function () {
 
     it('should delete user', function (done) {
         User
-        .findOne({uuid : util.test_user.uuid})
+        .findOne({uuid : helpers.test_user.uuid})
         .remove()
         .exec(function (err, user) {
             assert.ifError(err);
