@@ -45,7 +45,7 @@ var passport = require('passport');
 var login = require('connect-ensure-login');
 
 
-// memory store of access tokens
+// memory store of access tokens, deleted on restart
 var accessTokens = {};
 var refreshTokens = {};
 
@@ -185,7 +185,6 @@ module.exports = api.oauth2 = {
 					}
 				}
 				return done(null, null);
-
 			}
 		},
 
@@ -247,9 +246,8 @@ module.exports = api.oauth2 = {
 			res.json({error: "invalid_token"});
 		}
 	},
-
 }
-
+	
 /**
  * Exchange the refresh token for an access token.
  *
@@ -278,7 +276,7 @@ oauth2server.exchange(oauth2orize.exchange.refreshToken(function (client, refres
 
 // bearer token
 oauth2server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, done) {
-
+	console.log('oauth2orize', arguments);
 	//Validate the user
 	api.oauth2.store.users.findByUsername(username, function (err, user) {
 		if (err) return done(err);

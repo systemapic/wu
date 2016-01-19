@@ -232,6 +232,8 @@ module.exports = function(grunt) {
 					'public/js/src/panes/pane.share.js',
 					'public/js/src/panes/pane.mapsettings.js',
 					'public/js/src/panes/pane.fullscreen.js',
+					'public/js/src/panes/pane.login.js',
+					'public/js/src/panes/pane.account.js',
 
 
 					// chrome
@@ -366,7 +368,6 @@ module.exports = function(grunt) {
 				src : [
 					'public/css/style.css',
 					'public/css/evil.css',	
-					'public/css/magda.css',	
 					'public/css/chrome.css',
 					'public/css/knut.css',
 					'public/css/experiments.css',

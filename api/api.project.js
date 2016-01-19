@@ -250,6 +250,7 @@ module.exports = api.project = {
 		project.uuid 		= 'project-' + uuid.v4();
 		project.createdBy 	= user.uuid;
 		project.createdByName   = user.firstName + ' ' + user.lastName;
+		project.createdByUsername = user.username;
 		project.slug 		= projectSlug;
 		project.name 		= projectName;
 		project.description 	= store.description || '';
