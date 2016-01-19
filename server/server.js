@@ -69,6 +69,7 @@ app.io.use(function(socket, next){
 	if (!socket || !socket.headers || !socket.headers.cookie) return next('invalid');
 	var a = socket.headers.cookie.split('=');
 	var decoded_cookie = clientSession.util.decode(sessionOptions, a[a.length-1]);
+	if (!decoded_cookie) return next('invalid');
 	var tokens = decoded_cookie.content ? decoded_cookie.content.tokens : false;
 	if (!tokens || !tokens.access_token) return next(new Error('Invalid access token.'));
 	api.token.authenticate_socket(tokens.access_token, function (err, user) {
