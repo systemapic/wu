@@ -209,85 +209,213 @@ module.exports = api.portal = {
 
 	},
 
+	// _checkForPublicProject : function (options, done) {
+	// 	var username = options.username;
+	// 	var project_slug = options.project_slug;
+
+	// 	var errMsg = 'Not a public project.';
+		
+	// 	User
+	// 	.findOne({username : username})
+	// 	.exec(function (err, user) {
+	// 		if (err || !user) return done(err || errMsg)
+
+	// 		// find project, check if public
+	// 		Project
+	// 		.findOne({
+	// 			createdBy : user.uuid,
+	// 			slug : project_slug
+	// 		})
+	// 		.exec(function (err, project) {
+	// 			if (err || !project) return done(err || errMsg);
+
+	// 			// check if public
+	// 			if (project.access.options.isPublic) {
+	// 				return done(null, project);
+	// 			} else {
+	// 				return done(errMsg);
+	// 			}
+	// 		});
+	// 	});
+
+	// },
+
 	// process wildcard paths, including hotlinks
 	wildcard : function (req, res) {
 
-		console.log('path: ', req.originalUrl);
-
-		// console.log('req', req);
+		console.log('wildcard: ', req.originalUrl);
 
 		// get client/project
-		var path = req.originalUrl.split('/'),
-		    client = path[1],
-		    project = path[2],
-		    hotlink = {
-			client : client,
-			project : project
-		    };
+		var path = req.originalUrl.split('/');
+		var username = path[1];
+		var project_slug = path[2];
+		var hotlink = {
+			client : username,
+			project : project_slug
+		};
 
-		if (req.isAuthenticated()) {
+		req.session.hotlink = hotlink;
+		res.render('../../views/app.serve.ejs', {
+			hotlink : hotlink || {},
+		});
 
-			req.session.hotlink = hotlink;
-			res.render('../../views/app.serve.ejs', {
-				hotlink : hotlink || {},
-				access_token : req.session.access_token || {}
-			});
-		} else {
-			// redirect to login with hotlink embedded
-			req.session.hotlink = hotlink;
-			res.redirect('/login');
-		}
+		return;
+
+		// // if project in url, check if public
+		// if (username && project_slug) {
+
+		// 	// at least there's something in url
+
+
+		// 	api.portal._checkForPublicProject({
+		// 		username : username,
+		// 		project_slug : project_slug
+		// 	}, function (err, project) {
+		// 		if (err || !project) return console.log('NO PROJECT!!', err);
+
+
+		// 		console.log('PROJECT IS PUBLIC!');
+
+		// 		if (req.isAuthenticated()) {
+		// 			req.session.hotlink = hotlink;
+		// 			res.render('../../views/app.serve.ejs', {
+		// 				hotlink : hotlink || {},
+		// 				access_token : req.session.access_token || {}
+		// 			});
+		// 		} else {
+
+		// 			// so log in as public user.. with a public access token (that works for all public projects)
+
+		// 			req.session.hotlink = hotlink;
+		// 			res.render('../../views/app.serve.ejs', {
+		// 				hotlink : hotlink || {},
+		// 				access_token : req.session.access_token || {}
+		// 			});
+
+		// 			// // redirect to login with hotlink embedded
+		// 			// req.session.hotlink = hotlink;
+		// 			// res.redirect('/login');
+		// 		}
+
+		// 	});
+
+		// // nothing in url
+		// } else {
+
+		// 	if (req.isAuthenticated()) {
+		// 		req.session.hotlink = hotlink;
+		// 		res.render('../../views/app.serve.ejs', {
+		// 			hotlink : hotlink || {},
+		// 			access_token : req.session.access_token || {}
+		// 		});
+		// 	} else {
+		// 		// redirect to login with hotlink embedded
+		// 		req.session.hotlink = hotlink;
+		// 		res.redirect('/login');
+		// 	}
+
+		// }
+
+
+		
 	},
 
 	logout : function (req, res) {
+		req.session.reset();
 		req.logout();
 		res.redirect('/');
 	},
 
 	login : function (req, res) {
-		console.log('hotlink bling?', req.session.hotlink);
 		res.render(path.join(__dirname, '../views/login.serve.ejs'), { message: req.flash('loginMessage') });
 	},
 
 	
-
-
 	getBase : function (req, res) {
 
-		// return if not logged in 			
-		if (!req.isAuthenticated()) return res.render('../../views/index.ejs'); 
-		
-		// create access token TODO: hacky, rewrite errything
-		var authCode = {
-			scope : '*',
-			userID : req.user._id,
-			clientID : 1,
-			expires_in : api.oauth2.calculateExpirationDate()
-		}
-		var token = api.oauth2.util.uid(api.config.token.accessTokenLength);
-		api.oauth2.store.accessTokens.save(token, authCode.expires_in, authCode.userID, authCode.clientID, authCode.scope, console.log);
+		// console.log('req.cookie', req.cookies);
+		// console.log('req.session', req.session);
 
-		var refresh_token = api.oauth2.util.uid(api.config.token.accessTokenLength);
-		api.oauth2.store.accessTokens.save(refresh_token, authCode.expires_in, authCode.userID, authCode.clientID, authCode.scope, console.log);
+		// // console.log('req:', req);
 
-		var access_token = {
-			access_token : token,
-			expires_in : authCode.expires_in,
-			scope : authCode.scope,
-			refresh_token : refresh_token
-		}
 
-		req.session.access_token = access_token;
+		// console.log('not authenticated!');
 
-		// render app html				
+		// // get public access_token
+		// var public_access_token = api.token.getPublicToken(function (err, public_access_token) {
+		// 	console.log('public_access_token', arguments);
+
+		// 	req.session.access_token = public_access_token;
+
+		// 	// render app html				
+		// 	res.render('../../views/app.serve.ejs', {
+		// 		hotlink : req.session.hotlink,
+		// 		access_token : public_access_token
+		// 	});
+
+		// 	// reset hotlink
+		// 	req.session.hotlink = {};
+
+		// });
+
+
+
 		res.render('../../views/app.serve.ejs', {
-			hotlink : req.session.hotlink,
-			access_token : access_token
+			hotlink : {},
+			// access_token : public_access_token
 		});
 
-		// reset hotlink
-		req.session.hotlink = {};
+		// req.session.access_token = access_token;
+
+		// get public access_token
+
+		// // render app html				
+		// res.render('../../views/app.serve.ejs', {
+		// 	hotlink : req.session.hotlink,
+		// 	access_token : access_token
+		// });
+
+		// // reset hotlink
+		// req.session.hotlink = {};
 	},
+
+
+	// getBase : function (req, res) {
+
+	// 	// return if not logged in 			
+	// 	if (!req.isAuthenticated()) return res.render('../../views/index.ejs'); 
+		
+	// 	// create access token TODO: hacky, rewrite errything
+	// 	var authCode = {
+	// 		scope : '*',
+	// 		userID : req.user._id,
+	// 		clientID : 1,
+	// 		expires_in : api.oauth2.calculateExpirationDate()
+	// 	}
+	// 	var token = api.oauth2.util.uid(api.config.token.accessTokenLength);
+	// 	api.oauth2.store.accessTokens.save(token, authCode.expires_in, authCode.userID, authCode.clientID, authCode.scope, console.log);
+
+	// 	var refresh_token = api.oauth2.util.uid(api.config.token.accessTokenLength);
+	// 	api.oauth2.store.accessTokens.save(refresh_token, authCode.expires_in, authCode.userID, authCode.clientID, authCode.scope, console.log);
+
+	// 	var access_token = {
+	// 		access_token : token,
+	// 		expires_in : authCode.expires_in,
+	// 		scope : authCode.scope,
+	// 		refresh_token : refresh_token
+	// 	}
+
+	// 	req.session.access_token = access_token;
+
+	// 	// render app html				
+	// 	res.render('../../views/app.serve.ejs', {
+	// 		hotlink : req.session.hotlink,
+	// 		access_token : access_token
+	// 	});
+
+	// 	// reset hotlink
+	// 	req.session.hotlink = {};
+	// },
 
 
 	joinBeta : function (req, res) {
@@ -351,12 +479,6 @@ module.exports = api.portal = {
 			});
 		}	
 
-		// a.roles = function (callback) {
-		// 	api.user._getRoles({
-		// 		user : account
-		// 	}, callback);
-		// }	
-
 		// get account
 		a.account = function (callback) {
 			api.user.getAccount({
@@ -416,6 +538,10 @@ module.exports = api.portal = {
 
 	status : function (req, res) {
 
+		// if .. req.isAuthenticated()
+
+		console.log('req.user: ', req.user);
+
 		var ops = {};
 
 		// get versions
@@ -434,7 +560,7 @@ module.exports = api.portal = {
 
 		async.series(ops, function (err, status) {
 			if (err) return res.end('Error');
-			res.json({
+			res.send({
 				status : status
 			});
 		});

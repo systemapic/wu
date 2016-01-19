@@ -34,9 +34,7 @@ module.exports = function(passport) {
 
 	// used to deserialize the user
 	passport.deserializeUser(function(id, done) {
-		User.findById(id, function(err, user) {
-			done(err, user);
-		});
+		User.findById(id, done);
 	});
 
 	// =========================================================================
@@ -92,6 +90,7 @@ module.exports = function(passport) {
 
 		// find a user whose email is the same as the forms email
 		// we are checking to see if the user trying to login already exists
+		// todo: check username also, so can login w username OR email
 		User.findOne({ 'local.email' :  email }, function(err, user) {
 
 			// if there are any errors, return the error before anything else
@@ -135,7 +134,12 @@ module.exports = function(passport) {
 	passport.use(new BearerStrategy(
 		function (accessToken, done) {
 
+			// REQ passes an access_token, wants deserialized user in return.
+			// 	if access_token is not valid, done returns err/null,false
+			// 	
+			//	this is the only access-token check.
 
+			console.log('access_token', accessToken);
 			// todo: refactor, check latest passport.js, redo all?
 			// 	 for public version
 
@@ -147,14 +151,9 @@ module.exports = function(passport) {
 				if (!token) return done(null, false);
 				
 				if (new Date() > token.expirationDate) {
-					// api.oauth2.store.accessTokens.delete(accessToken, function (err) {
-					// 	return done(err);
-					// });
 					return api.oauth2.store.accessTokens.delete(accessToken, done);
-
-			
 				} else {
-					if (token.userID !== null) {
+					// if (token.userID !== null) {
 						api.oauth2.store.users.find(token.userID, function (err, user) {
 							if (err) return done(err);
 							
@@ -166,21 +165,21 @@ module.exports = function(passport) {
 							var info = {scope: '*'};
 							return done(null, user, info);
 						});
-					} else {
-						//The request came from a client only since userID is null
-						//therefore the client is passed back instead of a user
-						api.oauth2.store.clients.find(token.clientID, function (err, client) {
-							if (err) return done(err);
+					// } else {
+					// 	//The request came from a client only since userID is null
+					// 	//therefore the client is passed back instead of a user
+					// 	api.oauth2.store.clients.find(token.clientID, function (err, client) {
+					// 		if (err) return done(err);
 							
-							if (!client) return done(null, false);
+					// 		if (!client) return done(null, false);
 							
 						
-							// to keep this example simple, restricted scopes are not implemented,
-							// and this is just for illustrative purposes
-							var info = {scope: '*'};
-							return done(null, client, info);
-						});
-					}
+					// 		// to keep this example simple, restricted scopes are not implemented,
+					// 		// and this is just for illustrative purposes
+					// 		var info = {scope: '*'};
+					// 		return done(null, client, info);
+					// 	});
+					// }
 				}
 			});
 		}

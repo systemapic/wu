@@ -42,7 +42,6 @@ var api = module.parent.exports;
 // exports
 module.exports = api.auth = { 
 
-	
 	forgotPassword : function (req, res) {
 		console.log('forgotPassword', req.body);
 
@@ -105,12 +104,9 @@ module.exports = api.auth = {
 			var text = 'Please check your email for password reset link.';
 
 			// send password reset email
-			if (!err && user) {
-				api.email.sendPasswordResetEmail(user);
-				res.end(text);
-			} else {
-				res.end(text);
-			}
+			if (!err && user) api.email.sendPasswordResetEmail(user);
+			
+			res.end(text);
 		});
 	},
 
