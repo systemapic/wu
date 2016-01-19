@@ -34,6 +34,7 @@ var formidable  = require('formidable');
 var nodemailer  = require('nodemailer');
 var uploadProgress = require('node-upload-progress');
 var mapnikOmnivore = require('mapnik-omnivore');
+var errors = require('../shared/errors')
 
 // api
 var api = module.parent.exports;
@@ -705,11 +706,11 @@ module.exports = api.file = {
 		    type = options.type;
 
 
-		if (type == 'raster') {
+		if (type === 'raster') {
 			return api.file._getRasterLayers(req, res);
 		}
 
-		if (type == 'postgis') {
+		if (type === 'postgis') {
 			return api.file._getPostGISLayers(req, res);
 		}
 
@@ -717,10 +718,14 @@ module.exports = api.file = {
 	},
 
 	_getRasterLayers : function (req, res) {
-		var options = req.body,
-		    data = options.data,
-		    file_id = data.file_id;
-
+		var options = req.body;
+		var data = options.data || {};
+		var file_id = data.file_id;
+		
+		if (!file_id) {
+			return api.error.general(req, res, new Error(util.format(errors.missing_request_parameters, 'data.file_id')));
+		}
+		
 		Layer
 		.find({'file' : file_id})
 		.exec(function (err, layers) {
@@ -732,7 +737,7 @@ module.exports = api.file = {
 	_getPostGISLayers : function (req, res) {
 
 		var options = req.body,
-		    data = options.data,
+		    data = options.data || {},
 		    database_name = data.database_name,
 		    table_name = data.table_name,
 		    fileUuid = table_name,
@@ -829,11 +834,10 @@ module.exports = api.file = {
 
 		if (!fileUuid) return api.error.missingInformation(req, res);
 
-
 		ops.push(function (callback) {
 			File
-			.findOne({uuid : fileUuid})
-			.exec(callback);
+				.findOne({uuid : fileUuid})
+				.exec(callback);
 		});
 
 		ops.push(function (file, callback) {
@@ -850,21 +854,21 @@ module.exports = api.file = {
 			}, callback);
 		});
 
-		async.waterfall(ops, function (err, file) {
+		async.waterfall(ops, function (err, result) {
 			if (err) console.log('file update err: '.red + err);
 			if (err) console.log('ERR 16'.red, err);
-			if (err || !file) return api.error.general(req, res, err);
+			if (err || !result) return api.error.general(req, res, err);
 
-			res.end(JSON.stringify(file));
+			res.end(JSON.stringify(result));
 		});
-
 
 	},
 
-	_update : function (job, callback) {
+	_update : function (job, done) {
 		var file = job.file,
 		    options = job.options,
-		    queries = {};
+		    updates = {}
+		    ops = [];
 
 		// console.log('update file'.green, options);
 		
@@ -880,37 +884,50 @@ module.exports = api.file = {
 			'data'
 		];
 
- 		// enqueue queries for valid fields
-		valid.forEach(function (field) {
-			if (options[field]) queries = api.file._enqueueUpdate({
-				queries : queries,
-				field : field,
-				file : file,
-				options : options
-			});
+		updates = _.pick(options, valid);
+
+		ops.push(function (callback) {
+			file.update({ $set: _.pick(options, valid) })
+				.exec(function (err, result) {
+					if (err) {
+						callback(err);
+					}
+
+					callback(null, {
+						updated: _.keys(updates)
+					});
+				});
+		});
+		ops.push(function (params, callback) {
+			File.findOne({uuid: options.uuid})
+				.exec(function (err, res) {
+					if (err) {
+						return callback(err);
+					}
+					params.file = res;
+					callback(null, params);
+				});
 		});
 
-		// run queries to database
-		async.parallel(queries, callback);
-
+		async.waterfall(ops, done);
 	},
 
 
 	// async mongo update queue
-	_enqueueUpdate : function (job) {
-		var queries = job.queries,
-		    field = job.field,
-		    file = job.file,
-		    options = job.options;
+	// _enqueueUpdate : function (job) {
+	// 	var queries = job.queries,
+	// 	    field = job.field,
+	// 	    file = job.file,
+	// 	    options = job.options;
 
-		// create update queue op
-		queries[field] = function(callback) {	
-			file[field] = options[field];
-			file.markModified(field);
-			file.save(callback);
-		};
-		return queries;
-	},
+	// 	// create update queue op
+	// 	queries[field] = function(callback) {	
+	// 		file[field] = options[field];
+	// 		file.markModified(field);
+	// 		file.save(callback);
+	// 	};
+	// 	return queries;
+	// },
 
 
 

@@ -6,7 +6,7 @@ var crypto = require('crypto');
 var request = require('request');
 var User = require('../models/user');
 var config = require('../config/server-config.js').serverConfig;
-var util = require('./util');
+var helpers = require('./helpers');
 var token = util.token;
 var supertest = require('supertest');
 var api = supertest('https://' + process.env.SYSTEMAPIC_DOMAIN);
@@ -15,23 +15,23 @@ describe('Access', function () {
     this.slow(200);
 
     before(function (done) {
-        util.create_user(done);
+        helpers.create_user(done);
     });
     after(function (done) {
-        util.delete_user(done);
+        helpers.delete_user(done);
     });
 
     context('/api/token', function () {
         it('should get access token with email and password', function (done) {
             api.post('/api/token')
             .send({ 
-                username : util.test_user.email,
-                password : util.test_user.password
+                username : helpers.test_user.email,
+                password : helpers.test_user.password
             })
             .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);
-                var tokens = util.parse(res.text);
+                var tokens = helpers.parse(res.text);
                 assert.ok(tokens);
                 assert.ok(tokens.access_token);
                 assert.equal(tokens.access_token.length, 43);
@@ -44,13 +44,13 @@ describe('Access', function () {
         it('should get access token with username and password', function (done) {
             api.post('/api/token')
             .send({ 
-                username : util.test_user.username,
-                password : util.test_user.password
+                username : helpers.test_user.username,
+                password : helpers.test_user.password
             })
             .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);
-                var tokens = util.parse(res.text);
+                var tokens = helpers.parse(res.text);
                 assert.ok(tokens);
                 assert.ok(tokens.access_token);
                 assert.equal(tokens.access_token.length, 43);
@@ -72,13 +72,13 @@ describe('Access', function () {
         it('should get 401 if wrong password', function (done) {
             api.post('/api/token')
             .send({ 
-                username : util.test_user.email,
+                username : helpers.test_user.email,
                 password : 'wrong-password'
             })
             .expect(401)
             .end(function (err, res) {
                 assert.ifError(err);
-                var response = util.parse(res.text);
+                var response = helpers.parse(res.text);
                 assert.ok(response);
                 assert.ok(response.error);
                 assert.equal(response.error, 'Invalid credentials.');
@@ -95,7 +95,7 @@ describe('Access', function () {
             .expect(401)
             .end(function (err, res) {
                 assert.ifError(err);
-                var response = util.parse(res.text);
+                var response = helpers.parse(res.text);
                 assert.ok(response);
                 assert.ok(response.error);
                 assert.equal(response.error, 'Invalid credentials.');
@@ -109,7 +109,7 @@ describe('Access', function () {
             .expect(401)
             .end(function (err, res) {
                 assert.ifError(err);
-                var response = util.parse(res.text);
+                var response = helpers.parse(res.text);
                 assert.ok(response);
                 assert.ok(response.error);
                 assert.equal(response.error, 'Invalid credentials.');
@@ -129,7 +129,7 @@ describe('Access', function () {
                 .expect(200)
                 .end(function (err, res) {
                     assert.ifError(err);
-                    var tokens = util.parse(res.text);
+                    var tokens = helpers.parse(res.text);
                     assert.ok(tokens);
                     assert.ok(tokens.access_token);
                     assert.ok(tokens.access_token != access_token);
@@ -147,7 +147,7 @@ describe('Access', function () {
                 .expect(401)
                 .end(function (err, res) {
                     assert.ifError(err);
-                    var response = util.parse(res.text);
+                    var response = helpers.parse(res.text);
                     assert.ok(response);
                     assert.ok(response.error);
                     assert.equal(response.error, 'Invalid access token.');
@@ -162,7 +162,7 @@ describe('Access', function () {
             .expect(401)
             .end(function (err, res) {
                 assert.ifError(err);
-                var response = util.parse(res.text);
+                var response = helpers.parse(res.text);
                 assert.ok(response);
                 assert.ok(response.error);
                 assert.equal(response.error, 'Invalid access token.');
@@ -181,9 +181,9 @@ describe('Access', function () {
                 .expect(200)
                 .end(function (err, res) {
                     assert.ifError(err);
-                    var user = util.parse(res.text);
+                    var user = helpers.parse(res.text);
                     assert.ok(user);
-                    assert.equal(user.uuid, util.test_user.uuid);
+                    assert.equal(user.uuid, helpers.test_user.uuid);
                     done();
                 });
             });
@@ -198,7 +198,7 @@ describe('Access', function () {
                 .expect(401)
                 .end(function (err, res) {
                     assert.ifError(err);
-                    var response = util.parse(res.text);
+                    var response = helpers.parse(res.text);
                     assert.ok(response);
                     assert.ok(response.error);
                     assert.equal(response.error, 'Invalid access token.');
@@ -214,7 +214,7 @@ describe('Access', function () {
                 .expect(401)
                 .end(function (err, res) {
                     assert.ifError(err);
-                    var response = util.parse(res.text);
+                    var response = helpers.parse(res.text);
                     assert.ok(response);
                     assert.ok(response.error);
                     assert.equal(response.error, 'Invalid access token.');
