@@ -8,6 +8,9 @@
     "no_access": {
         "error": "No access."
     },
+    "invalid_token" : {
+        "error" : "Invalid access token."
+    },
     "missing_request_parameters": {
     	"error": "request body should contains %s"
     },

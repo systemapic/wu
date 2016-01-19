@@ -33,27 +33,27 @@ describe('User', function () {
     });
 
     it('should get access token with username & password', function (done) {
-        helpers.get_access_token(function (err, token) {
+        helpers.get_access_token(function (err, access_token) {
             assert.ifError(err);
-            assert.ok(token);
-            assert.ok(token.access_token);
-            assert.equal(token.expires_in, 36000);
-            assert.equal(token.token_type, 'Bearer');
+            assert.ok(access_token);
+            assert.ok(access_token.access_token);
+            // todo: expires
+            assert.equal(access_token.token_type, 'multipass');
             done();
         });
     });
 
     it('should get user info with access token', function (done) {
-        token(function (err, token) {
-            api.post('/api/userinfo')
-            .set('Authorization', 'Bearer ' + token)
+        token(function (err, access_token) {
+            api.post('/api/token/check')
+            .send({access_token : access_token})
             .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);
-                var store = helpers.parse(res.text);
-                assert.ok(store.user._id);
-                assert.equal(store.user.local.email, helpers.test_user.email);
-                assert.equal(store.user.firstName, helpers.test_user.firstName);
+                var user = helpers.parse(res.text);
+                assert.ok(user._id);
+                assert.equal(user.local.email, helpers.test_user.email);
+                assert.equal(user.firstName, helpers.test_user.firstName);
                 done();
             });
         })
@@ -61,9 +61,9 @@ describe('User', function () {
 
     it('should get portal store with access token', function (done) {
         this.slow(700);
-        token(function (err, token) {
+        token(function (err, access_token) {
             api.post('/api/portal')
-            .set('Authorization', 'Bearer ' + token)
+            .send({access_token : access_token})
             .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);

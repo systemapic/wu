@@ -4,6 +4,7 @@ var async = require('async');
 var fs = require('fs');
 var crypto = require('crypto');
 var request = require('request');
+var _ = require('lodash');
 var User = require('../models/user');
 var File = require('../models/file');
 var Layer = require('../models/layer');
@@ -58,17 +59,6 @@ module.exports = util = {
     },
 
     get_access_token : function (done) {
-        // api.post('/oauth/token')
-        // .set('Authorization', 'Basic YWJjMTIzOnNzaC1zZWNyZXQ=')
-        // .send({ 
-        //     grant_type : 'password',
-        //     username : util.test_user.email,
-        //     password : util.test_user.password
-        // })
-        // .expect(200)
-        // .end(function (err, res) {
-        //     done(err, util.parse(res.text));
-        // });
         api.post('/api/token')
         .send({ 
             username : util.test_user.email,
@@ -76,7 +66,10 @@ module.exports = util = {
         })
         .expect(200)
         .end(function (err, res) {
-            done(err, util.parse(res.text));
+            var tokens = util.parse(res.text);
+            assert.equal(tokens.token_type, 'multipass');
+            assert.equal(_.size(tokens.access_token), 43);
+            done(err, tokens);
         });
     },
 
@@ -88,7 +81,6 @@ module.exports = util = {
 
     get_users_access_token : function (_user, callback) {
       api.post('/oauth/token')
-        .set('Authorization', 'Basic YWJjMTIzOnNzaC1zZWNyZXQ=')
         .send({
             grant_type : 'password',
             username : _user.email,
@@ -136,7 +128,6 @@ module.exports = util = {
 
     create_user_by_parameters : function (_user, callback) {
         var user = new User();
-
         user.local.email = _user.email;    
         user.local.password = user.generateHash(_user.password);
         user.uuid = _user.uuid;
@@ -155,7 +146,10 @@ module.exports = util = {
         util.token(function (err, access_token) {
             api.post('/api/project/create')
             // .set('Authorization', 'Bearer ' + token)
-            .send({name : 'mocha-test-project', access_token : access_token})
+            .send({
+                name : 'mocha-test-project', 
+                access_token : access_token
+            })
             .expect(200)
             .end(function (err, res) {
                 assert.ifError(err);
@@ -174,7 +168,10 @@ module.exports = util = {
         util.token(function (err, access_token) {
             api.post('/api/project/delete')
             // .set('Authorization', 'Bearer ' + token)
-            .send({projectUuid : util.test_user.pid, access_token : access_token})
+            .send({
+                projectUuid : util.test_user.pid, 
+                access_token : access_token
+            })
             .expect(200)
             .end(done);
         });

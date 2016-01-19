@@ -36,9 +36,8 @@ describe('Project', function () {
             this.slow(1500);
             token(function (err, access_token) {
                 api.post('/api/project/create')
-                .set('Authorization', 'Bearer ' + token)
                 .send({
-                    // access_token : access_token,
+                    access_token : access_token,
                     name : 'mocha-test-project'
                 })
                 .expect(200)
@@ -65,20 +64,21 @@ describe('Project', function () {
         });
 
         it('should respond with status code 422 and specific error message if empty body', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/project/create')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send()
+                    .send({access_token : access_token})
                     .expect(422, expected.missing_information)
                     .end(done);
             });
         });
 
         it('should respond with status code 422 and specific error message if no project name', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/project/create')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send({foo : 'mocha-test-updated-name'})
+                    .send({
+                        foo : 'mocha-test-updated-name',
+                        access_token : access_token
+                    })
                     .expect(422, expected.missing_information)
                     .end(done);
             });
@@ -100,30 +100,33 @@ describe('Project', function () {
         });
 
         it('should respond with status code 422 and specific error message if empty body', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/project/update')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send()
+                    .send({access_token : access_token})
                     .expect(422, expected.missing_information)
                     .end(done);
             });
         });
 
         it('should respond with status code 422 and specific error message if no project_id', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/project/update')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send({name : 'mocha-test-updated-name'})
+                    .send({
+                        name : 'mocha-test-updated-name',
+                        access_token : access_token
+                    })
                     .expect(422, expected.missing_information)
                     .end(done);
             });
         });
 
         it('should respond with status code 422 and specific error message if no field to update', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/project/update')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send({project_id : tmp.project.uuid})
+                    .send({
+                        project_id : tmp.project.uuid,
+                        access_token : access_token
+                    })
                     .expect(422, expected.missing_information)
                     .end(done);
             });
@@ -138,28 +141,27 @@ describe('Project', function () {
             helpers.delete_user_by_id(second_test_user.uuid, done);
         });
 
-        it('should respond with status code 422 and specific error message when not authorized', function (done) {
-            helpers.users_token(second_test_user, function (err, token) {
+        it('should respond with status code 401 and specific error message when not authorized', function (done) {
+            helpers.users_token(second_test_user, function (err, access_token) {
                 api.post('/api/project/update')
-                    .set('Authorization', 'Bearer ' + token)
                     .send({
                         name: 'mocha-test-updated-name',
-                        project_id: tmp.project.uuid
+                        project_id: tmp.project.uuid,
+                        access_token : access_token
                     })
-                    .expect(422, expected.no_access)
+                    .expect(401, expected.invalid_token)
                     .end(done);
             });
         }); 
 
 
         it('should respond with status code 200 and shouldn\'t update nonexistent fields', function (done) {
-            token(function (err, token) {
-                api
-                    .post('/api/project/update')
-                    .set('Authorization', 'Bearer ' + token)
+            token(function (err, access_token) {
+                api.post('/api/project/update')
                     .send({
                         project_has_not_this_field : 'mocha-test-updated-name',
-                        project_id : tmp.project.uuid
+                        project_id : tmp.project.uuid,
+                        access_token : access_token
                     })
                     .expect(200, {})
                     .end(done);
@@ -167,10 +169,10 @@ describe('Project', function () {
         });
 
         it('should be able to update all fields of project', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/project/update')
-                .set('Authorization', 'Bearer ' + token)
                 .send({
+                    access_token : access_token,
                     name : 'mocha-test-updated-name',
                     slug : 'mocha-test-updated-slug',
                     logo : 'mocha-test-updated-logo',
@@ -300,10 +302,12 @@ describe('Project', function () {
     describe('/api/project/delete', function () {
 
         it('should be able to delete project', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/project/delete')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send({project_id : tmp.project.uuid})
+                    .send({
+                        project_id : tmp.project.uuid,
+                        access_token : access_token
+                    })
                     .expect(200)
                     .end(function (err, res) {
                         if (err) return done(err);
@@ -324,21 +328,22 @@ describe('Project', function () {
         });
 
         it('should respond with status code 422 and specific error message if empty body', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/project/delete')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send()
+                    .send({access_token : access_token})
                     .expect(422, expected.missing_information)
                     .end(done);
             });
         });
 
         it('should respond with status code 422 and specific error message if no project_id', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/project/delete')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send({foo : 'mocha-test-updated-name'})
-                    .expect(422, expected.no_such_project)
+                    .send({
+                        foo : 'mocha-test-updated-name',
+                        access_token : access_token
+                    })
+                    .expect(422, expected.missing_information)
                     .end(done);
             });
         });
@@ -354,10 +359,9 @@ describe('Project', function () {
         });
 
         it('should respond with status code 200', function (done) {
-            token(function (err, token) {
+            token(function (err, access_token) {
                 api.post('/api/project/unique')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send({})
+                    .send({access_token : access_token})
                     .expect(200)
                     .end(function (err, res) {
                         if (err) return done(err);
