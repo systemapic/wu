@@ -44,35 +44,37 @@ module.exports = api.token = {
 
 	// middleware for routes
 	authenticate : function (req, res, next) {
-
-		// check request first
 		var access_token = req.body.access_token || req.query.access_token;
+		api.token._authenticate(access_token, function (err, user) {
+			if (err || !user) return res.status(401).send({error : err.message});
+			req.user = user;
+			next();
+		});
+	},
+
+	// middleware for socket routes
+	authenticate_socket : function (access_token, done) {
+		api.token._authenticate(access_token, function (err, user) {
+			if (err) return done(err);
+			if (!user) return done(new Error('Invalid access token.'));
+			done(null, user);
+		});
+	},
+
+	_authenticate : function (access_token, done) {
 
 		// verify access_token
 		api.token.check(access_token, function (err, user) {
-			if (err || !user) return res.status(401).send({error : 'Invalid access token.'});
-
+			if (err) return done(err);
+			if (!user) return done(new Error('Invalid access token.'));
 			User
 			.findOne({_id : user._id})
-			.exec(function (err, userModel) {
-				
-				// redact password
-				if (userModel && userModel.local && userModel.local.password) {
-					userModel.local.password = true;
-				}
-
-				// attach user to req
-				req.user = userModel;
-
-				// continue
-				next();
-			});
+			.exec(done);
 		});
 	},
 
 	// route: get access token from password
 	getTokenFromPassword : function (req, res) {
-
 		api.token._get_token_from_password(req.body, function (err, tokens) {
 			if (err) return res.status(401).send({error : err.message});
 
@@ -163,14 +165,6 @@ module.exports = api.token = {
 		// refresh or dont
 		ops.push(function (user, callback) {
 
-			// if (refresh) {
-			// 	// reset access token
-			// 	api.token.reset(user, callback);
-			// } else {
-			// 	// get access token for user
-			// 	api.token.get_create_token(user, callback);
-			// }
-
 			// get access token for user
 			api.token.get_create_token(user, callback);
 		});
@@ -217,7 +211,7 @@ module.exports = api.token = {
 	// check if access token is valid
 	check : function (access_token, done) {
 		api.redis.tokens.get(access_token, function (err, token) {
-			if (err) return done(err);
+			if (err) return done(new Error('Invalid access token.'));
 			if (!token) return done(new Error('Invalid access token.'));
 
 			var stored_token = api.utils.parse(token);
@@ -243,7 +237,6 @@ module.exports = api.token = {
 
 	// create access token
 	createToken : function (user, done) {
-		console.log('api.token.createToken 1:', user.username);
 		var token = {
 			access_token : 'pk.' + api.token.generateToken(40),
 			expires : api.token.calculateExpirationDate(36000),
@@ -259,7 +252,6 @@ module.exports = api.token = {
 
 	// create public access token
 	createPublicToken : function (user, done) {
-		console.log('api.token.createPublic 1: ', user.username);
 		var token = {
 			access_token : 'public',
 			expires : api.token.calculateExpirationDate(3600000000),
@@ -291,7 +283,6 @@ module.exports = api.token = {
 		});
 
 		async.waterfall(ops, function (err, public_token) {
-			console.log('getPublicToken result: err, res', err, public_token);
 			done(err, public_token);
 		});
 	},

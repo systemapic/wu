@@ -26,17 +26,22 @@ mongoose.connect(config.mongo.url);
 
 // args
 var userEmail = process.argv[2];
-var userFirstname = process.argv[3];
-var userLastname = process.argv[4];
+var username = process.argv[3];
+var userFirstname = process.argv[4];
+var userLastname = process.argv[5];
 var userUuid = 'user-' + uuid.v4();
 
-if (!userEmail || !userFirstname || !userLastname) {
-	console.log('Usage: node create_betauser.js EMAIL FIRST_NAME LAST_NAME'.yellow);
+if (!userEmail || !userFirstname || !userLastname || !username) {
+	console.log('Usage: node create_betauser.js EMAIL USERNAME FIRST_NAME LAST_NAME'.yellow);
 	process.exit(1);
 }
 
 
 var ops = [];
+
+ops.push(function (callback) {
+	ensureUniqueUsername(username, callback);
+})
 
 ops.push(function (callback) {
 
@@ -49,6 +54,7 @@ ops.push(function (callback) {
 	user.firstName 		= userFirstname;
 	user.lastName 		= userLastname;
 	user.createdBy		= userUuid;
+	user.username 		= username;
 
 	user.save(callback);
 
@@ -56,9 +62,38 @@ ops.push(function (callback) {
 });
 
 
-async.waterfall(ops, function (err, result) {
+async.series(ops, function (err, result) {
+	if (err) console.log('ERROR:', err);
 	process.exit(0);
 });
 
 
+var n = 0;
+// helper fn
+function ensureUniqueUsername(username, done) {
 
+	User
+	.find()
+	.exec(function (err, users) {
+
+		// check if exists already
+		var unique = _.isEmpty(_.find(users, function (u) {
+			return u.username == username;
+		}));
+
+		if (!unique) {
+			n++;
+			
+			// must create another username
+			var new_username = username + n;
+
+			// check again
+			ensureUniqueUsername(new_username, done);
+
+			return;
+		}
+
+		// return 
+		done(err, username);
+	});
+}
